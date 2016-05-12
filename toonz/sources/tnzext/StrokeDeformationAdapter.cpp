@@ -2,8 +2,7 @@
 
 #include "ext/StrokeDeformationAdapter.h"
 
-ToonzExt::StrokeDeformationAdapter::StrokeDeformationAdapter()
-	: ref_(0)
+ToonzExt::StrokeDeformationAdapter::StrokeDeformationAdapter() : ref_(0)
 {
 }
 
@@ -21,8 +20,7 @@ void ToonzExt::StrokeDeformationAdapter::setStrokeDeformation(StrokeDeformation 
 	ref_ = sd;
 }
 
-ToonzExt::StrokeDeformation *
-ToonzExt::StrokeDeformationAdapter::getStrokeDeformation()
+ToonzExt::StrokeDeformation *ToonzExt::StrokeDeformationAdapter::getStrokeDeformation()
 {
 	return ref_;
 }

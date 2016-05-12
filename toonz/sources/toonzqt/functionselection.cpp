@@ -33,7 +33,7 @@ class KeyframesCopyUndo : public TUndo
 {
 	QMimeData *m_oldData, *m_newData;
 
-public:
+  public:
 	KeyframesCopyUndo(const QMimeData *oldData, const QMimeData *newData)
 		: m_oldData(cloneData(oldData)), m_newData(cloneData(newData))
 	{
@@ -44,22 +44,13 @@ public:
 		delete m_newData;
 	}
 
-	void undo() const
-	{
-		QApplication::clipboard()->setMimeData(cloneData(m_oldData));
-	}
-	void redo() const
-	{
-		QApplication::clipboard()->setMimeData(cloneData(m_newData));
-	}
+	void undo() const { QApplication::clipboard()->setMimeData(cloneData(m_oldData)); }
+	void redo() const { QApplication::clipboard()->setMimeData(cloneData(m_newData)); }
 	int getSize() const
 	{
 		return sizeof(*this) + sizeof(QMimeData) * 2; // approx
 	}
-	QString getHistoryString()
-	{
-		return QObject::tr("Copy Keyframe");
-	}
+	QString getHistoryString() { return QObject::tr("Copy Keyframe"); }
 };
 
 //-----------------------------------------------------------------------------
@@ -75,11 +66,9 @@ class KeyframesPasteUndo : public TUndo
 	FunctionKeyframesData *m_data;
 	double m_frame;
 
-public:
-	KeyframesPasteUndo(
-		std::vector<TDoubleParam *> &params,
-		const FunctionKeyframesData *data,
-		double frame)
+  public:
+	KeyframesPasteUndo(std::vector<TDoubleParam *> &params, const FunctionKeyframesData *data,
+					   double frame)
 		: m_data(dynamic_cast<FunctionKeyframesData *>(data->clone())), m_frame(frame)
 	{
 		assert((int)params.size() <= data->getColumnCount());
@@ -140,7 +129,7 @@ public:
 
 class KeyframesDeleteUndo : public TUndo
 {
-public:
+  public:
 	struct ColumnKeyframes {
 		TDoubleParam *m_param;
 		std::vector<TDoubleKeyframe> m_keyframes;
@@ -159,8 +148,7 @@ public:
 				continue;
 			param->addRef();
 			const QSet<int> &keyframes = columns[col].m_keyframes;
-			for (QSet<int>::const_iterator it = keyframes.begin();
-				 it != keyframes.end(); ++it)
+			for (QSet<int>::const_iterator it = keyframes.begin(); it != keyframes.end(); ++it)
 				m_columns[col].m_keyframes.push_back(param->getKeyframe(*it));
 		}
 	}
@@ -186,12 +174,9 @@ public:
 	{
 		return sizeof(*this) + sizeof(TDoubleKeyframe) * m_columns.size(); // sbagliato!
 	}
-	QString getHistoryString()
-	{
-		return QObject::tr("Delete Keyframe");
-	}
+	QString getHistoryString() { return QObject::tr("Delete Keyframe"); }
 
-private:
+  private:
 	std::vector<ColumnKeyframes> m_columns;
 };
 
@@ -199,10 +184,8 @@ private:
 
 class KeyframesMoveUndo : public TUndo
 {
-public:
-	KeyframesMoveUndo()
-	{
-	}
+  public:
+	KeyframesMoveUndo() {}
 	~KeyframesMoveUndo()
 	{
 		for (int i = 0; i < (int)m_movements.size(); i++)
@@ -232,20 +215,11 @@ public:
 			m_movements[i].m_param->setKeyframe(m_movements[i].m_kIndex, kf);
 		}
 	}
-	int getSize() const
-	{
-		return sizeof(*this) + sizeof(m_movements[0]) * m_movements.size();
-	}
-	int getCount() const
-	{
-		return (int)m_movements.size();
-	}
-	QString getHistoryString()
-	{
-		return QObject::tr("Move Keyframe");
-	}
+	int getSize() const { return sizeof(*this) + sizeof(m_movements[0]) * m_movements.size(); }
+	int getCount() const { return (int)m_movements.size(); }
+	QString getHistoryString() { return QObject::tr("Move Keyframe"); }
 
-private:
+  private:
 	struct KeyframeMovement {
 		TDoubleParam *m_param;
 		int m_kIndex;
@@ -265,7 +239,8 @@ private:
 //-----------------------------------------------------------------------------
 
 FunctionSelection::FunctionSelection()
-	: m_selectedCells(), m_selectedKeyframes(), m_selectedSegment(-1), m_frameHandle(0), m_columnToCurveMapper(0)
+	: m_selectedCells(), m_selectedKeyframes(), m_selectedSegment(-1), m_frameHandle(0),
+	  m_columnToCurveMapper(0)
 {
 }
 
@@ -288,8 +263,7 @@ void FunctionSelection::setColumnToCurveMapper(ColumnToCurveMapper *mapper)
 
 void FunctionSelection::selectCurve(TDoubleParam *curve)
 {
-	if (m_selectedKeyframes.size() == 1 &&
-		m_selectedKeyframes[0].first == curve)
+	if (m_selectedKeyframes.size() == 1 && m_selectedKeyframes[0].first == curve)
 		return;
 	curve->addRef();
 	deselectAllKeyframes();
@@ -336,7 +310,7 @@ void FunctionSelection::selectNone()
 	emit selectionChanged();
 }
 
-//called from FunctionSheet::selectCells
+// called from FunctionSheet::selectCells
 void FunctionSelection::selectCells(const QRect &selectedCells, const QList<TDoubleParam *> &curves)
 {
 	assert(selectedCells.width() == curves.size());
@@ -350,7 +324,7 @@ void FunctionSelection::selectCells(const QRect &selectedCells, const QList<TDou
 	double r0 = selectedCells.top();
 	double r1 = selectedCells.bottom();
 
-	//Update selected keyframes
+	// Update selected keyframes
 	for (int i = 0; i < curves.size(); i++) {
 		TDoubleParam *curve = curves[i];
 		m_selectedKeyframes.push_back(qMakePair(curve, QSet<int>()));
@@ -362,10 +336,10 @@ void FunctionSelection::selectCells(const QRect &selectedCells, const QList<TDou
 			}
 	}
 
-	//Update selected segment
+	// Update selected segment
 	if (curves.size() != 1)
 		m_selectedSegment = -1;
-	else if (!curves[0]) //curves[0] may be zero
+	else if (!curves[0]) // curves[0] may be zero
 		m_selectedSegment = -1;
 	else {
 		int r0 = selectedCells.top();
@@ -374,16 +348,16 @@ void FunctionSelection::selectCells(const QRect &selectedCells, const QList<TDou
 		int k1 = curves[0]->getPrevKeyframe(r1);
 		// PrevKeyFrame does NOT include itself if the specified row is keyframe
 
-		if (k0 == curves[0]->getKeyframeCount() - 1) //select bottom of the segments
+		if (k0 == curves[0]->getKeyframeCount() - 1) // select bottom of the segments
 			m_selectedSegment = -1;
-		else if (k0 != k1) //select over a keyframe
+		else if (k0 != k1) // select over a keyframe
 		{
-			//then select the segment on top in the selection
+			// then select the segment on top in the selection
 			if (curves[0]->isKeyframe(r0))
 				m_selectedSegment = k0 + 1;
 			else
 				m_selectedSegment = k0;
-		} else //select single segment
+		} else // select single segment
 			m_selectedSegment = k0;
 	}
 
@@ -410,11 +384,12 @@ void FunctionSelection::select(TDoubleParam *curve, int k)
 	if (row > (double)m_selectedCells.bottom())
 		m_selectedCells.setBottom(ceil(row));
 
-	if (m_selectedSegment >= 0										  // if a segment is selected
-		&& (m_selectedKeyframes.size() != 1							  // and there is not a single curve selected
-			|| m_selectedSegment != k || m_selectedSegment + 1 != k)) // or the new selected keyframe
-																	  // is not a selected segment end
-		m_selectedSegment = -1;										  // then clear the segment selection
+	if (m_selectedSegment >= 0 // if a segment is selected
+		&&
+		(m_selectedKeyframes.size() != 1 // and there is not a single curve selected
+		 || m_selectedSegment != k || m_selectedSegment + 1 != k)) // or the new selected keyframe
+																   // is not a selected segment end
+		m_selectedSegment = -1; // then clear the segment selection
 	makeCurrent();
 	emit selectionChanged();
 	m_selectedCells = QRect();
@@ -461,8 +436,7 @@ void FunctionSelection::selectSegment(TDoubleParam *curve, int k, QRect selected
 		return;
 
 	// if a different curve is selected the clear the old selection
-	if (m_selectedKeyframes.size() != 1 ||
-		m_selectedKeyframes[0].first != curve) {
+	if (m_selectedKeyframes.size() != 1 || m_selectedKeyframes[0].first != curve) {
 		curve->addRef();
 		for (int i = 0; i < m_selectedKeyframes.size(); i++)
 			if (m_selectedKeyframes[i].first)
@@ -481,7 +455,8 @@ void FunctionSelection::selectSegment(TDoubleParam *curve, int k, QRect selected
 
 bool FunctionSelection::isSegmentSelected(TDoubleParam *curve, int k) const
 {
-	return m_selectedKeyframes.size() == 1 && m_selectedKeyframes[0].first == curve && m_selectedSegment == k;
+	return m_selectedKeyframes.size() == 1 && m_selectedKeyframes[0].first == curve &&
+		   m_selectedSegment == k;
 }
 
 QPair<TDoubleParam *, int> FunctionSelection::getSelectedSegment() const
@@ -508,7 +483,8 @@ void FunctionSelection::doCopy()
 	int columnCount = m_selectedKeyframes.size();
 	data->setColumnCount(columnCount);
 	for (int col = 0; col < columnCount; col++)
-		data->getData(col, m_selectedKeyframes[col].first, m_selectedCells.top(), m_selectedKeyframes[col].second);
+		data->getData(col, m_selectedKeyframes[col].first, m_selectedCells.top(),
+					  m_selectedKeyframes[col].second);
 	const QMimeData *oldData = QApplication::clipboard()->mimeData();
 	TUndoManager::manager()->add(new KeyframesCopyUndo(oldData, data));
 	QApplication::clipboard()->setMimeData(data);
@@ -558,7 +534,8 @@ void FunctionSelection::doPaste()
 	/*--- カーブの貼り付け時に循環参照をチェックして、駄目ならアラートを返す ---*/
 	for (int c = 0; c < columnCount; c++) {
 		if (!data->isCircularReferenceFree(c, params[c])) {
-			DVGui::warning(tr("There is a circular reference in the definition of the interpolation."));
+			DVGui::warning(
+				tr("There is a circular reference in the definition of the interpolation."));
 			return;
 		}
 	}
@@ -671,11 +648,8 @@ void FunctionKeyframesData::setColumnCount(int columnCount)
 	m_keyframes.resize(columnCount);
 }
 
-void FunctionKeyframesData::getData(
-	int columnIndex,
-	TDoubleParam *curve,
-	double frame,
-	const QSet<int> &kIndices)
+void FunctionKeyframesData::getData(int columnIndex, TDoubleParam *curve, double frame,
+									const QSet<int> &kIndices)
 {
 	assert(0 <= columnIndex && columnIndex < (int)m_keyframes.size());
 	Keyframes &keyframes = m_keyframes[columnIndex];
@@ -691,10 +665,7 @@ void FunctionKeyframesData::getData(
 	}
 }
 
-void FunctionKeyframesData::setData(
-	int columnIndex,
-	TDoubleParam *curve,
-	double frame) const
+void FunctionKeyframesData::setData(int columnIndex, TDoubleParam *curve, double frame) const
 {
 	assert(0 <= columnIndex && columnIndex < (int)m_keyframes.size());
 	const Keyframes &keyframes = m_keyframes[columnIndex];
@@ -736,19 +707,17 @@ int FunctionKeyframesData::getRowCount() const
 }
 
 /*---- カーブの貼り付け時に循環参照をチェックして、駄目ならfalseを返す ----*/
-bool FunctionKeyframesData::isCircularReferenceFree(
-	int columnIndex,
-	TDoubleParam *curve) const
+bool FunctionKeyframesData::isCircularReferenceFree(int columnIndex, TDoubleParam *curve) const
 {
 	const Keyframes &keyframes = m_keyframes[columnIndex];
 	int n = (int)keyframes.size();
-	//for each key frame
+	// for each key frame
 	for (int i = 0; i < n; i++) {
 		TDoubleKeyframe keyframe(keyframes[i]);
-		//only check Expression type
+		// only check Expression type
 		if (keyframe.m_type != TDoubleKeyframe::Expression)
 			continue;
-		//check circular reference
+		// check circular reference
 		TExpression expr;
 		expr.setGrammar(curve->getGrammar());
 		expr.setText(keyframe.m_expressionText);

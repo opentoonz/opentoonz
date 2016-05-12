@@ -38,7 +38,7 @@ class DVAPI TRasterImage : public TImage
 	std::string m_name;
 	//! The savebox of the image
 	TRect m_savebox;
-	//double m_hPos;
+	// double m_hPos;
 	//! Specify if the image is an opaque image.
 	bool m_isOpaque;
 	//! Specify if the image is a BW Scan image.
@@ -49,19 +49,19 @@ class DVAPI TRasterImage : public TImage
 
 	int m_subsampling;
 
-public:
+  public:
 	TRasterImage();
 	TRasterImage(const TRasterP &raster);
 	~TRasterImage();
 
-private:
+  private:
 	//! Is used to clone an existing ToonzImage.
 	TRasterImage(const TRasterImage &);
 
 	//! not implemented
 	TRasterImage &operator=(const TRasterImage &);
 
-public:
+  public:
 	//! Return the image type
 	TImage::Type getType() const { return TImage::RASTER; }
 
@@ -101,9 +101,9 @@ public:
 	void setOffset(const TPoint &offset) { m_offset = offset; }
 
 	//! Return raster hPos \b m_hPos
-	//double gethPos() const {return m_hPos;}
+	// double gethPos() const {return m_hPos;}
 	//! Set raster hPos \b m_hPos
-	//void sethPos(double hPos) {m_hPos= hPos;}
+	// void sethPos(double hPos) {m_hPos= hPos;}
 
 	//! Return a clone of image
 	TImage *cloneImage() const;
@@ -129,10 +129,7 @@ public:
 	bool isEmpty() const { return !m_mainRaster; }
 
 	//! Return true if the raster comes from BW Scan
-	bool isScanBW() const
-	{
-		return m_isScanBW;
-	}
+	bool isScanBW() const { return m_isScanBW; }
 	void setScanBWFlag(bool isScanBW) { m_isScanBW = isScanBW; }
 
 	//! Return true if the raster is opaque
@@ -153,7 +150,7 @@ template class DVAPI TDerivedSmartPointerT<TRasterImage, TImage>;
 
 class DVAPI TRasterImageP : public TDerivedSmartPointerT<TRasterImage, TImage>
 {
-public:
+  public:
 	TRasterImageP() {}
 	TRasterImageP(TRasterImage *image) : DerivedSmartPointer(image) {}
 	TRasterImageP(TImageP image) : DerivedSmartPointer(image) {}

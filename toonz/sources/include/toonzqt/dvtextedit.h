@@ -45,11 +45,11 @@ class DvMiniToolBar : public QFrame
 {
 	QPoint m_dragPos;
 
-public:
+  public:
 	DvMiniToolBar(QWidget *parent = 0);
 	~DvMiniToolBar();
 
-protected:
+  protected:
 	void mousePressEvent(QMouseEvent *);
 	void mouseMoveEvent(QMouseEvent *);
 };
@@ -60,15 +60,15 @@ class DvTextEditButton : public QWidget
 {
 	Q_OBJECT
 
-public:
+  public:
 	DvTextEditButton(QWidget *parent = 0);
 	~DvTextEditButton();
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 	void mousePressEvent(QMouseEvent *);
 
-signals:
+  signals:
 	void clicked();
 };
 
@@ -89,26 +89,22 @@ class DVAPI DvTextEdit : public QTextEdit
 
 	QActionGroup *m_alignActionGroup;
 
-	QAction *m_boldAction,
-		*m_italicAction,
-		*m_underlineAction,
-		*m_alignLeftAction,
-		*m_alignRightAction,
-		*m_alignCenterAction;
+	QAction *m_boldAction, *m_italicAction, *m_underlineAction, *m_alignLeftAction,
+		*m_alignRightAction, *m_alignCenterAction;
 
 	ColorField *m_colorField;
 
 	DvMiniToolBar *m_miniToolBar;
 	DvTextEditButton *m_button;
 
-public:
+  public:
 	DvTextEdit(QWidget *parent = 0);
 	~DvTextEdit();
 
 	void setMiniToolBarEnabled(bool value) { m_miniToolBarEnabled = value; }
 	void changeFont(const QFont &f);
 
-protected:
+  protected:
 	void createActions();
 	void createMiniToolBar();
 
@@ -125,14 +121,14 @@ protected:
 
 	void dragMoveEvent(QDragMoveEvent *);
 
-private:
+  private:
 	void fontChanged(const QFont &f);
 	void colorChanged(const QColor &c);
 	void alignmentChanged(Qt::Alignment a);
 
 	void mergeFormatOnWordOrSelection(const QTextCharFormat &format);
 
-protected slots:
+  protected slots:
 
 	void onCurrentCharFormatChanged(const QTextCharFormat &format);
 	void onCursorPositionChanged();
@@ -148,13 +144,13 @@ protected slots:
 	void setTextSize(const QString &p);
 	void setTextAlign(QAction *);
 
-signals:
+  signals:
 
 	void focusIn();
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
-#endif //DVTEXTEDIT_H
+#endif // DVTEXTEDIT_H

@@ -7,8 +7,7 @@
 
 using TConsts::epsilon;
 
-TMathException::TMathException(std::string msg)
-	: m_msg(toWideString(msg))
+TMathException::TMathException(std::string msg) : m_msg(toWideString(msg))
 {
 }
 
@@ -26,7 +25,7 @@ const double RELERROR = 1.0e-14;
 //! max power of 10 we wish to search to
 const int MAXPOW = 32;
 
-//!max number of iterations
+//! max number of iterations
 const int MAXIT = 800;
 
 //! a coefficient smaller than SMALL_ENOUGH is considered to be zero (0.0).
@@ -41,8 +40,7 @@ inline int getEl(int i, int j, int n)
 //-------------------------------------------------------------------------
 
 //! structure type for representing a polynomial
-typedef struct
-	{
+typedef struct {
 	int ord;
 	double coef[MAX_ORDER + 1];
 } poly;
@@ -82,7 +80,7 @@ void convert(const poly &p, std::vector<double> &v)
   *
   *  calculates the modulus of u(x) / v(x) leaving it in r, it
   *  returns 0 if r(x) is a constant.
-  *  note: this function assumes the leading coefficient of v 
+  *  note: this function assumes the leading coefficient of v
   *  is 1 or -1
   */
 int modp(poly *u, poly *v, poly *r)
@@ -166,9 +164,7 @@ int buildsturm(int ord, poly *sseq)
   */
 int numroots(int np, poly *sseq, int &atneg, int &atpos)
 {
-	int
-		atposinf = 0,
-		atneginf = 0;
+	int atposinf = 0, atneginf = 0;
 
 	poly *s;
 	double f, lf;
@@ -243,27 +239,21 @@ int numchanges(int np, poly *sseq, double a)
   * described in sseq to isolate intervals in which roots occur,
   * the roots are returned in the roots array in order of magnitude.
   */
-void sbisect(int np,
-			 poly *sseq,
-			 double min,
-			 double max,
-			 int atmin,
-			 int atmax,
-			 double *roots)
+void sbisect(int np, poly *sseq, double min, double max, int atmin, int atmax, double *roots)
 {
 	double mid;
 	int n1 = 0, n2 = 0, its, atmid;
 
 	if ((atmin - atmax) == 1) {
-		//first try a less expensive technique.
+		// first try a less expensive technique.
 
 		if (modrf(sseq->ord, sseq->coef, min, max, &roots[0]))
 			return;
 
 		/*
-        * if we get here we have to evaluate the root the hard
-        * way by using the Sturm sequence.
-      */
+		* if we get here we have to evaluate the root the hard
+		* way by using the Sturm sequence.
+	  */
 		for (its = 0; its < MAXIT; its++) {
 			mid = (min + max) / 2;
 
@@ -287,10 +277,10 @@ void sbisect(int np,
 
 		if (its == MAXIT) {
 			/*
-      fprintf(stderr, "sbisect: overflow min %f max %f\
-      diff %e nroot %d n1 %d n2 %d\n",
-      min, max, max - min, nroot, n1, n2);
-        */
+	  fprintf(stderr, "sbisect: overflow min %f max %f\
+	  diff %e nroot %d n1 %d n2 %d\n",
+	  min, max, max - min, nroot, n1, n2);
+		*/
 			roots[0] = mid;
 		}
 
@@ -298,8 +288,8 @@ void sbisect(int np,
 	}
 
 	/*
-    * more than one root in the interval, we have to bisect...
-    */
+	* more than one root in the interval, we have to bisect...
+	*/
 	for (its = 0; its < MAXIT; its++) {
 		mid = (min + max) / 2;
 
@@ -322,11 +312,11 @@ void sbisect(int np,
 
 	if (its == MAXIT) {
 		/*
-    fprintf(stderr, "sbisect: roots too close together\n");
-    fprintf(stderr, "sbisect: overflow min %f max %f diff %e\
-    nroot %d n1 %d n2 %d\n",
-    min, max, max - min, nroot, n1, n2);
-      */
+	fprintf(stderr, "sbisect: roots too close together\n");
+	fprintf(stderr, "sbisect: overflow min %f max %f diff %e\
+	nroot %d n1 %d n2 %d\n",
+	min, max, max - min, nroot, n1, n2);
+	  */
 		for (n1 = atmax; n1 < atmin; n1++)
 			roots[n1 - atmax] = mid;
 	}
@@ -338,7 +328,7 @@ void sbisect(int np,
   * evalpoly
   *
   * evaluate polynomial defined in coef returning its value.
-    */
+	*/
 double evalpoly(int ord, double *coef, double x)
 {
 	double *fp, f;
@@ -355,13 +345,13 @@ double evalpoly(int ord, double *coef, double x)
 //-------------------------------------------------------------------------
 
 /*
-    * modrf
-    *
-    * uses the modified regula-falsi method to evaluate the root
-    * in interval [a,b] of the polynomial described in coef. The
-    * root is returned is returned in *val. The routine returns zero
-    * if it can't converge.
-    */
+	* modrf
+	*
+	* uses the modified regula-falsi method to evaluate the root
+	* in interval [a,b] of the polynomial described in coef. The
+	* root is returned is returned in *val. The routine returns zero
+	* if it can't converge.
+	*/
 int modrf(int ord, double *coef, double a, double b, double *val)
 {
 	int its;
@@ -433,27 +423,27 @@ int modrf(int ord, double *coef, double a, double b, double *val)
 //-------------------------------------------------------------------------
 
 /*!
-    a x^2 + b x + c
-    
-      Remark: 
-      poly[0] = c 
-      poly[1] = b
-      poly[2] = a 
-    */
+	a x^2 + b x + c
+
+	  Remark:
+	  poly[0] = c
+	  poly[1] = b
+	  poly[2] = a
+	*/
 int rootForQuadraticEquation(const std::vector<double> &v, std::vector<double> &sol)
 {
 	double q, delta;
 
 	/*
-      if( isAlmostZero(v[2]))
-      {
-      if ( isAlmostZero(v[1]) )
-      return -1;
-      
-        sol.push_back(-v[0]/v[1]);
-        return 1;
-        }
-      */
+	  if( isAlmostZero(v[2]))
+	  {
+	  if ( isAlmostZero(v[1]) )
+	  return -1;
+
+		sol.push_back(-v[0]/v[1]);
+		return 1;
+		}
+	  */
 
 	if (isAlmostZero(v[1])) {
 		q = -v[0] / v[2];
@@ -496,20 +486,20 @@ int rootForQuadraticEquation(const std::vector<double> &v, std::vector<double> &
 //-----------------------------------------------------------------------------
 
 /*
-    a x^3+b x^2 + c x + d
-    
-      Remark: 
-      poly[0] = d 
-      poly[1] = c
-      poly[2] = b 
-      poly[3] = a 
-    */
+	a x^3+b x^2 + c x + d
+
+	  Remark:
+	  poly[0] = d
+	  poly[1] = c
+	  poly[2] = b
+	  poly[3] = a
+	*/
 int rootForCubicEquation(const std::vector<double> &p, std::vector<double> &sol)
 {
 	/*
-    if( isAlmostZero(p[3]) )
-    return rootForQuadraticEquation(p,sol);
-      */
+	if( isAlmostZero(p[3]) )
+	return rootForQuadraticEquation(p,sol);
+	  */
 
 	if (isAlmostZero(p[0])) {
 		int numberOfSol;
@@ -530,23 +520,15 @@ int rootForCubicEquation(const std::vector<double> &p, std::vector<double> &sol)
 		return numberOfSol;
 	}
 
-	double
-		inv_v3 = 1.0 / p[3],
-		a = p[2] * inv_v3,
-		b = p[1] * inv_v3,
-		c = p[0] * inv_v3;
+	double inv_v3 = 1.0 / p[3], a = p[2] * inv_v3, b = p[1] * inv_v3, c = p[0] * inv_v3;
 
 	static const double inv_3 = 1.0 / 3.0;
 	static const double inv_9 = 1.0 / 9.0;
 	static const double inv_54 = 1.0 / 54.0;
 
-	double
-		Q = (sq(a) - 3.0 * b) * inv_9,
-		R = (2.0 * sq(a) * a - 9.0 * a * b + 27.0 * c) * inv_54;
+	double Q = (sq(a) - 3.0 * b) * inv_9, R = (2.0 * sq(a) * a - 9.0 * a * b + 27.0 * c) * inv_54;
 
-	double
-		R_2 = sq(R),
-		Q_3 = sq(Q) * Q;
+	double R_2 = sq(R), Q_3 = sq(Q) * Q;
 
 	if (R_2 < Q_3) {
 		double Q_sqrt = sqrt(Q);
@@ -751,7 +733,7 @@ void tsolveSistem(double *a, int n, double *res)
 	assert(tdet(a, n, d) != 0);
 	/*
   if( isAlmostZero(tdet(a, n, d)) )
-    throw TMathException("Singular matrix in routine tLUDecomposition\n");    
+	throw TMathException("Singular matrix in routine tLUDecomposition\n");
   */
 	tbackSubstitution(a, n, &indx[0], res);
 }
@@ -776,15 +758,16 @@ int rootFinding(const std::vector<double> &in_poly, std::vector<double> &sol)
 
 	while (!p.empty() && p.front() == 0) {
 		sol.push_back(0.0);
-		p.erase(p.begin()); //se i coefficienti bassi sono zero, ci sono soluzioni pari a 0.0. le metto,
-	}						//e abbasso il grado del polinomio(piu' veloce)
+		p.erase(p.begin()); // se i coefficienti bassi sono zero, ci sono soluzioni pari a 0.0. le
+							// metto,
+	} // e abbasso il grado del polinomio(piu' veloce)
 
 	switch (p.size()) {
 	case 0:
 		if (sol.empty())
 			return INFINITE_SOLUTIONS;
 		break;
-	case 1: //no solutions
+	case 1: // no solutions
 		break;
 	case 2:
 		sol.push_back(-p[0] / p[1]);
@@ -809,11 +792,7 @@ int numberOfRootsInInterval(int order, const double *polyH, double min, double m
 {
 	poly sseq[MAX_ORDER];
 
-	int
-		i,
-		nchanges_0,
-		nchanges_1,
-		np;
+	int i, nchanges_0, nchanges_1, np;
 
 	if (order > MAX_ORDER)
 		return -1;
@@ -828,7 +807,7 @@ int numberOfRootsInInterval(int order, const double *polyH, double min, double m
 	//  build the Sturm sequence
 	np = buildsturm(order, sseq);
 
-	//compute number of variation on 0.0
+	// compute number of variation on 0.0
 	nchanges_0 = numchanges(np, sseq, min);
 
 	nchanges_1 = numchanges(np, sseq, max);

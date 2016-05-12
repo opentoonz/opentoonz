@@ -10,9 +10,7 @@
 ------------------------------------------------------------*/
 
 template <typename RASTER, typename PIXEL>
-void Iwa_GradientWarpFx::setSourceRaster(const RASTER srcRas,
-										 float4 *dstMem,
-										 TDimensionI dim)
+void Iwa_GradientWarpFx::setSourceRaster(const RASTER srcRas, float4 *dstMem, TDimensionI dim)
 {
 	float4 *chann_p = dstMem;
 	for (int j = 0; j < dim.ly; j++) {
@@ -31,9 +29,7 @@ void Iwa_GradientWarpFx::setSourceRaster(const RASTER srcRas,
 ------------------------------------------------------------*/
 
 template <typename RASTER, typename PIXEL>
-void Iwa_GradientWarpFx::setWarperRaster(const RASTER warperRas,
-										 float *dstMem,
-										 TDimensionI dim)
+void Iwa_GradientWarpFx::setWarperRaster(const RASTER warperRas, float *dstMem, TDimensionI dim)
 {
 	float *chann_p = dstMem;
 	for (int j = 0; j < dim.ly; j++) {
@@ -52,9 +48,7 @@ void Iwa_GradientWarpFx::setWarperRaster(const RASTER warperRas,
  出力結果をChannel値に変換してタイルに格納
 ------------------------------------------------------------*/
 template <typename RASTER, typename PIXEL>
-void Iwa_GradientWarpFx::setOutputRaster(float4 *srcMem,
-										 const RASTER dstRas,
-										 TDimensionI dim,
+void Iwa_GradientWarpFx::setOutputRaster(float4 *srcMem, const RASTER dstRas, TDimensionI dim,
 										 int2 margin)
 {
 	int out_j = 0;
@@ -65,21 +59,24 @@ void Iwa_GradientWarpFx::setOutputRaster(float4 *srcMem,
 		for (int i = 0; i < dstRas->getLx(); i++, pix++, chan_p++) {
 			float val;
 			val = (*chan_p).x * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->r = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->r = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chan_p).y * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->g = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->g = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chan_p).z * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->b = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->b = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chan_p).w * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->m = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->m = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 		}
 	}
 }
 
 //------------------------------------
 
-Iwa_GradientWarpFx::Iwa_GradientWarpFx()
-	: m_h_maxlen(0.0), m_v_maxlen(0.0), m_scale(1.0)
+Iwa_GradientWarpFx::Iwa_GradientWarpFx() : m_h_maxlen(0.0), m_v_maxlen(0.0), m_scale(1.0)
 {
 	/*- 共通パラメータのバインド -*/
 	addInputPort("Source", m_source);
@@ -97,9 +94,7 @@ Iwa_GradientWarpFx::Iwa_GradientWarpFx()
 
 //------------------------------------
 
-void Iwa_GradientWarpFx::doCompute(TTile &tile,
-								   double frame,
-								   const TRenderSettings &settings)
+void Iwa_GradientWarpFx::doCompute(TTile &tile, double frame, const TRenderSettings &settings)
 {
 	/*- ソース画像が刺さっていなければreturn -*/
 	if (!m_source.isConnected()) {
@@ -127,12 +122,12 @@ void Iwa_GradientWarpFx::doCompute(TTile &tile,
 		return;
 	}
 
-	int margin = static_cast<int>(ceil((abs(hLength) < abs(vLength)) ? abs(vLength) : abs(hLength)));
+	int margin =
+		static_cast<int>(ceil((abs(hLength) < abs(vLength)) ? abs(vLength) : abs(hLength)));
 
 	/*- 素材計算範囲を計算 -*/
 	/*- 出力範囲 -*/
-	TRectD rectOut(tile.m_pos, TDimensionD(
-								   tile.getRaster()->getLx(), tile.getRaster()->getLy()));
+	TRectD rectOut(tile.m_pos, TDimensionD(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
 	TRectD enlargedRect = rectOut.enlarge((double)margin);
 	TDimensionI enlargedDim((int)enlargedRect.getLx(), (int)enlargedRect.getLy());
 
@@ -144,10 +139,8 @@ void Iwa_GradientWarpFx::doCompute(TTile &tile,
 	{
 		/*- タイルはこのフォーカス内だけ使用。正規化してsource_hostに取り込んだらもう使わない。 -*/
 		TTile sourceTile;
-		m_source->allocateAndCompute(
-			sourceTile, enlargedRect.getP00(),
-			enlargedDim,
-			tile.getRaster(), frame, settings);
+		m_source->allocateAndCompute(sourceTile, enlargedRect.getP00(), enlargedDim,
+									 tile.getRaster(), frame, settings);
 		/*- タイルの画像を０〜１に正規化してホストメモリに読み込む -*/
 		TRaster32P ras32 = (TRaster32P)sourceTile.getRaster();
 		TRaster64P ras64 = (TRaster64P)sourceTile.getRaster();
@@ -165,10 +158,8 @@ void Iwa_GradientWarpFx::doCompute(TTile &tile,
 	{
 		/*- タイルはこのフォーカス内だけ使用。正規化してwarper_hostに取り込んだらもう使わない -*/
 		TTile warperTile;
-		m_warper->allocateAndCompute(
-			warperTile, enlargedRect.getP00(),
-			enlargedDim,
-			tile.getRaster(), frame, settings);
+		m_warper->allocateAndCompute(warperTile, enlargedRect.getP00(), enlargedDim,
+									 tile.getRaster(), frame, settings);
 		/*- タイルの画像の輝度値を０〜１に正規化してホストメモリに読み込む -*/
 		TRaster32P ras32 = (TRaster32P)warperTile.getRaster();
 		TRaster64P ras64 = (TRaster64P)warperTile.getRaster();
@@ -189,13 +180,8 @@ void Iwa_GradientWarpFx::doCompute(TTile &tile,
 	float4 *result_host;
 	result_host_ras->lock();
 	result_host = (float4 *)result_host_ras->getRawData();
-	doCompute_CPU(tile, frame, settings,
-				  hLength, vLength,
-				  margin,
-				  enlargedDim,
-				  source_host,
-				  warper_host,
-				  result_host);
+	doCompute_CPU(tile, frame, settings, hLength, vLength, margin, enlargedDim, source_host,
+				  warper_host, result_host);
 	/*- ポインタ入れ替え -*/
 	source_host = result_host;
 
@@ -221,16 +207,10 @@ void Iwa_GradientWarpFx::doCompute(TTile &tile,
  Fx計算
 ------------------------------------*/
 
-void Iwa_GradientWarpFx::doCompute_CPU(TTile &tile,
-									   const double frame,
-									   const TRenderSettings &settings,
-									   double hLength,
-									   double vLength,
-									   int margin,
-									   TDimensionI &enlargedDim,
-									   float4 *source_host,
-									   float *warper_host,
-									   float4 *result_host)
+void Iwa_GradientWarpFx::doCompute_CPU(TTile &tile, const double frame,
+									   const TRenderSettings &settings, double hLength,
+									   double vLength, int margin, TDimensionI &enlargedDim,
+									   float4 *source_host, float *warper_host, float4 *result_host)
 {
 	float4 *res_p = result_host + margin * enlargedDim.lx + margin;
 
@@ -251,16 +231,15 @@ void Iwa_GradientWarpFx::doCompute_CPU(TTile &tile,
 
 			int2 index = {(int)(samplePos.x + (float)enlargedDim.lx) - enlargedDim.lx,
 						  (int)(samplePos.y + (float)enlargedDim.ly) - enlargedDim.ly};
-			float2 ratio = {samplePos.x - (float)index.x,
-							samplePos.y - (float)index.y};
+			float2 ratio = {samplePos.x - (float)index.x, samplePos.y - (float)index.y};
 
 			/*- サンプリング点回りのピクセルを線形補間 -*/
-			float4 col1 = interp_CPU(getSourceVal_CPU(source_host, enlargedDim, index.x, index.y),
-									 getSourceVal_CPU(source_host, enlargedDim, index.x + 1, index.y),
-									 ratio.x);
-			float4 col2 = interp_CPU(getSourceVal_CPU(source_host, enlargedDim, index.x, index.y + 1),
-									 getSourceVal_CPU(source_host, enlargedDim, index.x + 1, index.y + 1),
-									 ratio.x);
+			float4 col1 = interp_CPU(
+				getSourceVal_CPU(source_host, enlargedDim, index.x, index.y),
+				getSourceVal_CPU(source_host, enlargedDim, index.x + 1, index.y), ratio.x);
+			float4 col2 = interp_CPU(
+				getSourceVal_CPU(source_host, enlargedDim, index.x, index.y + 1),
+				getSourceVal_CPU(source_host, enlargedDim, index.x + 1, index.y + 1), ratio.x);
 			*res_p = interp_CPU(col1, col2, ratio.y);
 		}
 
@@ -272,12 +251,10 @@ void Iwa_GradientWarpFx::doCompute_CPU(TTile &tile,
 	}
 }
 
-float4 Iwa_GradientWarpFx::getSourceVal_CPU(float4 *source_host,
-											TDimensionI &enlargedDim,
+float4 Iwa_GradientWarpFx::getSourceVal_CPU(float4 *source_host, TDimensionI &enlargedDim,
 											int pos_x, int pos_y)
 {
-	if (pos_x < 0 || pos_x >= enlargedDim.lx ||
-		pos_y < 0 || pos_y >= enlargedDim.ly)
+	if (pos_x < 0 || pos_x >= enlargedDim.lx || pos_y < 0 || pos_y >= enlargedDim.ly)
 		return float4{0.0f, 0.0f, 0.0f, 0.0f};
 
 	return source_host[pos_y * enlargedDim.lx + pos_x];
@@ -285,17 +262,14 @@ float4 Iwa_GradientWarpFx::getSourceVal_CPU(float4 *source_host,
 
 float4 Iwa_GradientWarpFx::interp_CPU(float4 val1, float4 val2, float ratio)
 {
-	return float4{(1.0f - ratio) * val1.x + ratio * val2.x,
-				  (1.0f - ratio) * val1.y + ratio * val2.y,
-				  (1.0f - ratio) * val1.z + ratio * val2.z,
-				  (1.0f - ratio) * val1.w + ratio * val2.w};
+	return float4{
+		(1.0f - ratio) * val1.x + ratio * val2.x, (1.0f - ratio) * val1.y + ratio * val2.y,
+		(1.0f - ratio) * val1.z + ratio * val2.z, (1.0f - ratio) * val1.w + ratio * val2.w};
 }
 
 //------------------------------------
 
-bool Iwa_GradientWarpFx::doGetBBox(double frame,
-								   TRectD &bBox,
-								   const TRenderSettings &info)
+bool Iwa_GradientWarpFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 {
 	if (!m_source.isConnected()) {
 		bBox = TRectD();
@@ -309,18 +283,15 @@ bool Iwa_GradientWarpFx::doGetBBox(double frame,
 
 //------------------------------------
 
-bool Iwa_GradientWarpFx::canHandle(const TRenderSettings &info,
-								   double frame)
+bool Iwa_GradientWarpFx::canHandle(const TRenderSettings &info, double frame)
 {
 	return false;
 }
 
 //------------------------------------
 
-void Iwa_GradientWarpFx::get_render_real_hv(const double frame,
-											const TAffine affine,
-											double &h_maxlen,
-											double &v_maxlen)
+void Iwa_GradientWarpFx::get_render_real_hv(const double frame, const TAffine affine,
+											double &h_maxlen, double &v_maxlen)
 {
 	/*--- ベクトルにする(プラス値) --- */
 	TPointD rend_vect;
@@ -335,15 +306,12 @@ void Iwa_GradientWarpFx::get_render_real_hv(const double frame,
 
 //------------------------------------
 
-void Iwa_GradientWarpFx::get_render_enlarge(const double frame,
-											const TAffine affine,
-											TRectD &bBox)
+void Iwa_GradientWarpFx::get_render_enlarge(const double frame, const TAffine affine, TRectD &bBox)
 {
 	double h_maxlen = 0.0;
 	double v_maxlen = 0.0;
 	this->get_render_real_hv(frame, affine, h_maxlen, v_maxlen);
-	const int margin = static_cast<int>(ceil(
-		(h_maxlen < v_maxlen) ? v_maxlen : h_maxlen));
+	const int margin = static_cast<int>(ceil((h_maxlen < v_maxlen) ? v_maxlen : h_maxlen));
 	if (0 < margin) {
 		bBox = bBox.enlarge(static_cast<double>(margin));
 	}

@@ -9,14 +9,14 @@
 typedef unsigned char UBYTE8;
 typedef unsigned int UINT32;
 
-//structure pixel RGB
+// structure pixel RGB
 struct ValuePixel {
 	UBYTE8 r;
 	UBYTE8 g;
 	UBYTE8 b;
 };
 
-//structure position (old and new) and distance^2 of neighbours,
+// structure position (old and new) and distance^2 of neighbours,
 struct NEIGHBOUR {
 	short X;
 	short Y;
@@ -26,39 +26,40 @@ struct NEIGHBOUR {
 
 class CObjectTracker
 {
-public:
+  public:
 	short objID;
 	bool track;
 
-private:
+  private:
 	struct OBJECT_SPECS {
 		bool Status;
 		bool assignedAnObject;
 
-		short dim_temp;				//dimension searce template area (real area = (2*dim_temp+1)*(2*dim_temp+1))
-		short var_dim;				//variation dimension window (dimension in pixel)
-		float threshold_distance;   //threshold of lose object
-		float threshold_distance_B; //threshold of lose object
+		short dim_temp; // dimension searce template area (real area =
+						// (2*dim_temp+1)*(2*dim_temp+1))
+		short var_dim; // variation dimension window (dimension in pixel)
+		float threshold_distance; // threshold of lose object
+		float threshold_distance_B; // threshold of lose object
 
-		//characterize
+		// characterize
 		short X;
 		short Y;
 		short W;
 		short H;
-		short half_pixelx; //precision half pixel x
-		short half_pixely; //precision half pixel y
+		short half_pixelx; // precision half pixel x
+		short half_pixely; // precision half pixel y
 
-		//old characterize
+		// old characterize
 		short X_old;
 		short Y_old;
 		short W_old;
 		short H_old;
 
-		//histogram
+		// histogram
 		std::unique_ptr<float[]> initHistogram;
 		std::unique_ptr<float[]> weights_background;
 
-		//template characterize
+		// template characterize
 		short X_temp;
 		short Y_temp;
 		short W_temp;
@@ -103,7 +104,7 @@ private:
 
 	void SetPixelValues(TRaster32P *frame, ValuePixel pixelValues, short x, short y);
 
-public:
+  public:
 	CObjectTracker(int imW, int imH, bool _colorimage, bool _att_background, bool _man_occlusion);
 	//--------------------------------------------------------------------------------------------------------
 
@@ -116,7 +117,8 @@ public:
 	void ObjeckTrackerHandlerByUser(TRaster32P *frame);
 	//--------------------------------------------------------------------------------------------------------
 
-	void ObjectTrackerInitObjectParameters(short id, short x, short y, short Width, short Height, short _dim, short _var_dim, float _dist, float _distB);
+	void ObjectTrackerInitObjectParameters(short id, short x, short y, short Width, short Height,
+										   short _dim, short _var_dim, float _dist, float _distB);
 	//--------------------------------------------------------------------------------------------------------
 
 	void updateTemp();
@@ -166,6 +168,6 @@ public:
 	//--------------------------------------------------------------------------------------------------------
 	short getId() { return objID; }
 
-}; //end of trackobject class
+}; // end of trackobject class
 //---------------------------------------------------------------------------
 #endif

@@ -15,16 +15,16 @@ class TXshSimpleLevel;
 
 class TFilmstripSelection : public TSelection
 {
-public:
+  public:
 	typedef std::pair<TFrameId, TFrameId> InbetweenRange;
 
-private:
+  private:
 	std::set<TFrameId> m_selectedFrames;
 	InbetweenRange m_inbetweenRange;
 
 	void updateInbetweenRange();
 
-public:
+  public:
 	TFilmstripSelection();
 	~TFilmstripSelection();
 
@@ -39,7 +39,10 @@ public:
 	const std::set<TFrameId> &getSelectedFids() const { return m_selectedFrames; }
 
 	InbetweenRange getInbetweenRange() const { return m_inbetweenRange; }
-	bool isInInbetweenRange(const TFrameId &fid) const { return m_inbetweenRange.first < fid && fid < m_inbetweenRange.second; }
+	bool isInInbetweenRange(const TFrameId &fid) const
+	{
+		return m_inbetweenRange.first < fid && fid < m_inbetweenRange.second;
+	}
 
 	void selectAll();
 	void invertSelection();

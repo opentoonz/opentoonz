@@ -16,11 +16,9 @@
 namespace tcg
 {
 
-template <typename ElemRng, typename IndxRng>
-struct _perm_rng_traits {
-	typedef boost::permutation_iterator<
-		typename boost::range_iterator<ElemRng>::type,
-		typename boost::range_iterator<IndxRng>::type> iterator;
+template <typename ElemRng, typename IndxRng> struct _perm_rng_traits {
+	typedef boost::permutation_iterator<typename boost::range_iterator<ElemRng>::type,
+										typename boost::range_iterator<IndxRng>::type> iterator;
 	typedef std::pair<iterator, iterator> range;
 };
 

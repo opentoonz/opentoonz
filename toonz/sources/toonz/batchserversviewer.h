@@ -21,19 +21,19 @@ class QListWidgetItem;
 class FarmServerListView : public QListWidget
 {
 	Q_OBJECT
-public:
+  public:
 	FarmServerListView(QWidget *parent);
 
 	~FarmServerListView(){};
 
 	void update();
 
-protected slots:
+  protected slots:
 
 	void activate();
 	void deactivate();
 
-private:
+  private:
 	void openContextMenu(const QPoint &p);
 	void mousePressEvent(QMouseEvent *event);
 	std::unique_ptr<QMenu> m_menu;
@@ -43,7 +43,7 @@ class BatchServersViewer : public QFrame
 {
 	Q_OBJECT
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	BatchServersViewer(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -53,12 +53,12 @@ public:
 
 	void updateSelected();
 
-protected slots:
+  protected slots:
 	void setGRoot();
 	void onProcessWith(int index);
 	void onCurrentItemChanged(QListWidgetItem *);
 
-private:
+  private:
 	QString m_serverId;
 	DVGui::LineEdit *m_farmRootField;
 	QComboBox *m_processWith;
@@ -74,4 +74,4 @@ private:
 	void updateServerInfo(const QString &id);
 };
 
-#endif //BATCHSERVERSVIEWER_H
+#endif // BATCHSERVERSVIEWER_H

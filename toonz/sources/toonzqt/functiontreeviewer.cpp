@@ -53,9 +53,10 @@
 namespace
 {
 
-class ParamChannelGroup : public FunctionTreeModel::ParamWrapper, public FunctionTreeModel::ChannelGroup
+class ParamChannelGroup : public FunctionTreeModel::ParamWrapper,
+						  public FunctionTreeModel::ChannelGroup
 {
-public:
+  public:
 	ParamChannelGroup(TParam *param, const std::wstring &fxId, std::string &paramName);
 
 	void refresh();
@@ -66,11 +67,12 @@ public:
 
 class StageObjectChannelGroup : public FunctionTreeModel::ChannelGroup
 {
-public:
-	TStageObject *m_stageObject;					 //!< (not owned) Referenced stage object
-	FunctionTreeModel::ChannelGroup *m_plasticGroup; //!< (not owned) Eventual plastic channels group
+  public:
+	TStageObject *m_stageObject; //!< (not owned) Referenced stage object
+	FunctionTreeModel::ChannelGroup
+		*m_plasticGroup; //!< (not owned) Eventual plastic channels group
 
-public:
+  public:
 	StageObjectChannelGroup(TStageObject *pegbar);
 	~StageObjectChannelGroup();
 
@@ -89,13 +91,15 @@ public:
 
 class SkVDChannelGroup : public FunctionTreeModel::ChannelGroup
 {
-public:
+  public:
 	StageObjectChannelGroup *m_stageObjectGroup; //!< Parent stage object group
 	const QString *m_vxName;					 //!< The associated vertex name
 
-public:
+  public:
 	SkVDChannelGroup(const QString *vxName, StageObjectChannelGroup *stageGroup)
-		: ChannelGroup(*vxName), m_stageObjectGroup(stageGroup), m_vxName(vxName) {}
+		: ChannelGroup(*vxName), m_stageObjectGroup(stageGroup), m_vxName(vxName)
+	{
+	}
 
 	QString getShortName() const { return m_stageObjectGroup->getShortName(); }
 	QString getLongName() const { return *m_vxName; }
@@ -172,14 +176,16 @@ QVariant FunctionTreeModel::ChannelGroup::data(int role) const
 			static QIcon folderOpen(":Resources/folder_open.png");
 			static QIcon folderClose(":Resources/folder_close.png");
 
-			return animated ? isOpen() ? folderAnimOpen : folderAnimClose : isOpen() ? folderOpen : folderClose;
+			return animated ? isOpen() ? folderAnimOpen : folderAnimClose : isOpen() ? folderOpen
+																					 : folderClose;
 		} else {
 			static QIcon folderAnimOpen(":Resources/folderanim_open_off.png");
 			static QIcon folderAnimClose(":Resources/folderanim_close_off.png");
 			static QIcon folderOpen(":Resources/folder_open_off.png");
 			static QIcon folderClose(":Resources/folder_close_off.png");
 
-			return animated ? isOpen() ? folderAnimOpen : folderAnimClose : isOpen() ? folderOpen : folderClose;
+			return animated ? isOpen() ? folderAnimOpen : folderAnimClose : isOpen() ? folderOpen
+																					 : folderClose;
 		}
 	} else
 		return Item::data(role);
@@ -192,7 +198,8 @@ void FunctionTreeModel::ChannelGroup::applyShowFilter()
 {
 	int i, itemCount = getChildCount();
 	for (i = 0; i < itemCount; i++) {
-		FunctionTreeModel::Channel *channel = dynamic_cast<FunctionTreeModel::Channel *>(getChild(i));
+		FunctionTreeModel::Channel *channel =
+			dynamic_cast<FunctionTreeModel::Channel *>(getChild(i));
 		/*--- ChannelGroupの内部も同じフィルタで更新する ---*/
 		if (!channel) {
 			FunctionTreeModel::ChannelGroup *channelGroup =
@@ -204,8 +211,7 @@ void FunctionTreeModel::ChannelGroup::applyShowFilter()
 			continue;
 		}
 
-		bool showItem =
-			(m_showFilter == ShowAllChannels) || channel->getParam()->hasKeyframes();
+		bool showItem = (m_showFilter == ShowAllChannels) || channel->getParam()->hasKeyframes();
 
 		QModelIndex modelIndex = createIndex();
 		getModel()->setRowHidden(i, modelIndex, !showItem);
@@ -244,15 +250,17 @@ QString FunctionTreeModel::ChannelGroup::getIdName() const
 void FunctionTreeModel::ChannelGroup::setChildrenAllActive(bool active)
 {
 	for (int i = 0; i < getChildCount(); i++) {
-		//for Channel
-		FunctionTreeModel::Channel *channel = dynamic_cast<FunctionTreeModel::Channel *>(getChild(i));
+		// for Channel
+		FunctionTreeModel::Channel *channel =
+			dynamic_cast<FunctionTreeModel::Channel *>(getChild(i));
 		if (channel) {
 			channel->setIsActive(active);
 			continue;
 		}
-		//for ChannelGroup
+		// for ChannelGroup
 		else {
-			FunctionTreeModel::ChannelGroup *channelGroup = dynamic_cast<FunctionTreeModel::ChannelGroup *>(getChild(i));
+			FunctionTreeModel::ChannelGroup *channelGroup =
+				dynamic_cast<FunctionTreeModel::ChannelGroup *>(getChild(i));
 			if (channelGroup) {
 				channelGroup->setChildrenAllActive(active);
 				continue;
@@ -288,7 +296,8 @@ QVariant StageObjectChannelGroup::data(int role) const
 		std::string name = m_stageObject->getName();
 		std::string id = m_stageObject->getId().toString();
 
-		return (name == id) ? QString::fromStdString(name) : QString::fromStdString(id + " (" + name + ")");
+		return (name == id) ? QString::fromStdString(name)
+							: QString::fromStdString(id + " (" + name + ")");
 
 	} else if (role == Qt::ForegroundRole) {
 		FunctionTreeModel *model = dynamic_cast<FunctionTreeModel *>(getModel());
@@ -306,7 +315,8 @@ QVariant StageObjectChannelGroup::data(int role) const
 			return Qt::black;
 #endif
 		TStageObjectId currentId = model->getCurrentStageObject()->getId();
-		return m_stageObject->getId() == currentId ? view->getCurrentTextColor() : view->getTextColor();
+		return m_stageObject->getId() == currentId ? view->getCurrentTextColor()
+												   : view->getTextColor();
 	} else
 		return ChannelGroup::data(role);
 }
@@ -338,8 +348,7 @@ QString StageObjectChannelGroup::getIdName() const
 //
 //-----------------------------------------------------------------------------
 
-FxChannelGroup::FxChannelGroup(TFx *fx)
-	: m_fx(fx)
+FxChannelGroup::FxChannelGroup(TFx *fx) : m_fx(fx)
 {
 	if (m_fx)
 		m_fx->addRef();
@@ -384,7 +393,8 @@ QVariant FxChannelGroup::data(int role) const
 		}
 		bool isOneChildActive = false;
 		for (i = 0; i < getChildCount(); i++) {
-			FunctionTreeModel::Channel *channel = dynamic_cast<FunctionTreeModel::Channel *>(getChild(i));
+			FunctionTreeModel::Channel *channel =
+				dynamic_cast<FunctionTreeModel::Channel *>(getChild(i));
 			if (!channel || !channel->isActive())
 				continue;
 			isOneChildActive = true;
@@ -396,14 +406,16 @@ QVariant FxChannelGroup::data(int role) const
 			static QIcon folderOpen(":Resources/folder_open.png");
 			static QIcon folderClose(":Resources/folder_close.png");
 
-			return isAnimated ? isOpen() ? folderAnimOpen : folderAnimClose : isOpen() ? folderOpen : folderClose;
+			return isAnimated ? isOpen() ? folderAnimOpen : folderAnimClose
+							  : isOpen() ? folderOpen : folderClose;
 		} else {
 			static QIcon folderAnimOpen(":Resources/folderanim_open_off.png");
 			static QIcon folderAnimClose(":Resources/folderanim_close_off.png");
 			static QIcon folderOpen(":Resources/folder_open_off.png");
 			static QIcon folderClose(":Resources/folder_close_off.png");
 
-			return isAnimated ? isOpen() ? folderAnimOpen : folderAnimClose : isOpen() ? folderOpen : folderClose;
+			return isAnimated ? isOpen() ? folderAnimOpen : folderAnimClose
+							  : isOpen() ? folderOpen : folderClose;
 		}
 	} else if (role == Qt::DisplayRole) {
 		std::wstring name = m_fx->getName();
@@ -484,8 +496,12 @@ void FxChannelGroup::refresh()
 //
 //-----------------------------------------------------------------------------
 
-ParamChannelGroup::ParamChannelGroup(TParam *param, const std::wstring &fxId, std::string &paramName)
-	: ParamWrapper(param, fxId), ChannelGroup(param->hasUILabel() ? QString::fromStdString(param->getUILabel()) : QString::fromStdWString(TStringTable::translate(paramName)))
+ParamChannelGroup::ParamChannelGroup(TParam *param, const std::wstring &fxId,
+									 std::string &paramName)
+	: ParamWrapper(param, fxId),
+	  ChannelGroup(param->hasUILabel()
+					   ? QString::fromStdString(param->getUILabel())
+					   : QString::fromStdWString(TStringTable::translate(paramName)))
 {
 }
 
@@ -533,13 +549,16 @@ QVariant SkVDChannelGroup::data(int role) const
 		// Check whether current selection is a PlasticVertex one - in case, paint it red
 		// if this group refers to current vertex
 
-		if (PlasticVertexSelection *vxSel = dynamic_cast<PlasticVertexSelection *>(TSelection::getCurrent()))
-			if (TStageObject *obj = static_cast<FunctionTreeModel *>(getModel())->getCurrentStageObject())
+		if (PlasticVertexSelection *vxSel =
+				dynamic_cast<PlasticVertexSelection *>(TSelection::getCurrent()))
+			if (TStageObject *obj =
+					static_cast<FunctionTreeModel *>(getModel())->getCurrentStageObject())
 				if (obj == m_stageObjectGroup->m_stageObject)
 					if (const SkDP &sd = obj->getPlasticSkeletonDeformation()) {
 						int vIdx = *vxSel;
 
-						if (vIdx >= 0 && sd->skeleton(vxSel->skeletonId())->vertex(vIdx).name() == getLongName())
+						if (vIdx >= 0 &&
+							sd->skeleton(vxSel->skeletonId())->vertex(vIdx).name() == getLongName())
 #if QT_VERSION >= 0x050000
 							return QColor(Qt::red);
 #else
@@ -564,7 +583,8 @@ QVariant SkVDChannelGroup::data(int role) const
 
 FunctionTreeModel::Channel::Channel(FunctionTreeModel *model, TDoubleParam *param,
 									std::string paramNamePref, std::wstring fxId)
-	: ParamWrapper(param, fxId), m_model(model), m_group(0), m_isActive(false), m_paramNamePref(paramNamePref)
+	: ParamWrapper(param, fxId), m_model(model), m_group(0), m_isActive(false),
+	  m_paramNamePref(paramNamePref)
 {
 }
 
@@ -601,7 +621,8 @@ QVariant FunctionTreeModel::Channel::data(int role) const
 		static QIcon paramOn(":Resources/param_on.png");
 		static QIcon paramOff(":Resources/param_off.png");
 
-		return m_param->hasKeyframes() ? isActive() ? paramAnimOn : paramAnimOff : isActive() ? paramOn : paramOff;
+		return m_param->hasKeyframes() ? isActive() ? paramAnimOn : paramAnimOff
+									   : isActive() ? paramOn : paramOff;
 	} else if (role == Qt::DisplayRole) {
 		if (m_param->hasUILabel()) {
 			return QString::fromStdString(m_param->getUILabel());
@@ -612,7 +633,7 @@ QVariant FunctionTreeModel::Channel::data(int role) const
 			return QString::fromStdWString(translatedName + L" (" + m_fxId + L")");
 		return QString::fromStdWString(translatedName);
 	} else if (role == Qt::ForegroundRole) {
-		//130221 iwasawa
+		// 130221 iwasawa
 		FunctionTreeView *view = dynamic_cast<FunctionTreeView *>(m_model->m_view);
 		if (!view)
 #if QT_VERSION >= 0x050000
@@ -668,12 +689,10 @@ void FunctionTreeModel::Channel::setParam(const TParamP &param)
 */
 QString FunctionTreeModel::Channel::getExprRefName() const
 {
-	QString tmpName =
-		QString(QString::fromStdWString(
-			TStringTable::translate(m_paramNamePref + m_param->getName())));
+	QString tmpName = QString(
+		QString::fromStdWString(TStringTable::translate(m_paramNamePref + m_param->getName())));
 	/*--- stage objectパラメータの場合、TableにあわせてtmpNameを代表的なExpression名にする---*/
-	StageObjectChannelGroup *stageGroup =
-		dynamic_cast<StageObjectChannelGroup *>(m_group);
+	StageObjectChannelGroup *stageGroup = dynamic_cast<StageObjectChannelGroup *>(m_group);
 	if (stageGroup) {
 		if (tmpName == "N/S")
 			tmpName = "ns";
@@ -759,16 +778,18 @@ void FunctionTreeModel::Channel::setIsCurrent(bool current)
 			return; // already it is: nothing to do
 		m_model->m_currentChannel = this;
 
-		//change the current fx if the FxChannelGroup is clicked
+		// change the current fx if the FxChannelGroup is clicked
 		FxChannelGroup *fxGroup = dynamic_cast<FxChannelGroup *>(m_group);
 		if (fxGroup && m_model->getFxHandle()) {
 			m_model->getFxHandle()->setFx(fxGroup->getFx());
 		}
-		//or, change the current object if the stageObjectChannelGroup is clicked
+		// or, change the current object if the stageObjectChannelGroup is clicked
 		else {
-			StageObjectChannelGroup *stageObjectGroup = dynamic_cast<StageObjectChannelGroup *>(m_group);
+			StageObjectChannelGroup *stageObjectGroup =
+				dynamic_cast<StageObjectChannelGroup *>(m_group);
 			if (stageObjectGroup && m_model->getObjectHandle()) {
-				m_model->getObjectHandle()->setObjectId(stageObjectGroup->getStageObject()->getId());
+				m_model->getObjectHandle()->setObjectId(
+					stageObjectGroup->getStageObject()->getId());
 			}
 		}
 
@@ -783,7 +804,7 @@ void FunctionTreeModel::Channel::setIsCurrent(bool current)
 			m_model->emitDataChanged(oldCurrent);
 		m_model->emitDataChanged(this);
 		m_model->emitCurveSelected(getParam());
-		//scroll the column to ensure visible the current channel
+		// scroll the column to ensure visible the current channel
 		m_model->emitCurrentChannelChanged(this);
 	} else {
 		// this channel is not the current anymore
@@ -817,7 +838,8 @@ void FunctionTreeModel::Channel::onChange(const TParamChange &ch)
 //-----------------------------------------------------------------------------
 
 FunctionTreeModel::FunctionTreeModel(FunctionTreeView *parent)
-	: TreeModel(parent), m_currentChannel(0), m_stageObjects(0), m_fxs(0), m_currentStageObject(0), m_currentFx(0), m_paramsChanged(false)
+	: TreeModel(parent), m_currentChannel(0), m_stageObjects(0), m_fxs(0), m_currentStageObject(0),
+	  m_currentFx(0), m_paramsChanged(false)
 {
 }
 
@@ -872,17 +894,10 @@ void FunctionTreeModel::refreshData(TXsheet *xsh)
 void FunctionTreeModel::refreshStageObjects(TXsheet *xsh)
 {
 	static const int channelIds[TStageObject::T_ChannelCount] = {
-		TStageObject::T_X,
-		TStageObject::T_Y,
-		TStageObject::T_Z,
-		TStageObject::T_SO,
-		TStageObject::T_Path,
-		TStageObject::T_Angle,
-		TStageObject::T_ScaleX,
-		TStageObject::T_ScaleY,
-		TStageObject::T_Scale,
-		TStageObject::T_ShearX,
-		TStageObject::T_ShearY}; // Explicitly ordered channels
+		TStageObject::T_X,		TStageObject::T_Y,		TStageObject::T_Z,
+		TStageObject::T_SO,		TStageObject::T_Path,   TStageObject::T_Angle,
+		TStageObject::T_ScaleX, TStageObject::T_ScaleY, TStageObject::T_Scale,
+		TStageObject::T_ShearX, TStageObject::T_ShearY}; // Explicitly ordered channels
 
 	// Retrieve all (not-empty) root stage objects, and add them in the tree model
 	QList<TreeModel::Item *> newItems;
@@ -899,14 +914,13 @@ void FunctionTreeModel::refreshStageObjects(TXsheet *xsh)
 	}
 
 	/*--- newItemsの中で、これまでのChildrenに無いものだけ
-        m_stageObjectsの子に追加。既に有るものはnewChildrenから除外---*/
+		m_stageObjectsの子に追加。既に有るものはnewChildrenから除外---*/
 	m_stageObjects->setChildren(newItems);
 
 	// Add channels to the NEW stage entries (see the above call to setChildren())
 	iCount = newItems.size();
 	for (i = 0; i < iCount; ++i) {
-		StageObjectChannelGroup *pegbarItem =
-			dynamic_cast<StageObjectChannelGroup *>(newItems[i]);
+		StageObjectChannelGroup *pegbarItem = dynamic_cast<StageObjectChannelGroup *>(newItems[i]);
 
 		TStageObject *stageObject = pegbarItem->getStageObject();
 
@@ -935,17 +949,18 @@ void FunctionTreeModel::refreshFxs(TXsheet *xsh)
 	std::vector<TFx *> fxs;
 	xsh->getFxDag()->getFxs(fxs);
 	for (int i = 0; i < xsh->getColumnCount(); i++) {
-		TXshZeraryFxColumn *zc =
-			dynamic_cast<TXshZeraryFxColumn *>(xsh->getColumn(i));
+		TXshZeraryFxColumn *zc = dynamic_cast<TXshZeraryFxColumn *>(xsh->getColumn(i));
 		if (!zc)
 			continue;
 		fxs.push_back(zc->getZeraryColumnFx()->getZeraryFx());
 	}
 
-	//sort items by fxId
+	// sort items by fxId
 	for (int j = 1; j < (int)fxs.size(); j++) {
 		int index = j;
-		while (index > 0 && QString::localeAwareCompare(QString::fromStdWString(fxs[index - 1]->getFxId()), QString::fromStdWString(fxs[index]->getFxId())) > 0) {
+		while (index > 0 &&
+			   QString::localeAwareCompare(QString::fromStdWString(fxs[index - 1]->getFxId()),
+										   QString::fromStdWString(fxs[index]->getFxId())) > 0) {
 			std::swap(fxs[index - 1], fxs[index]);
 			index = index - 1;
 		}
@@ -1033,16 +1048,17 @@ void FunctionTreeModel::refreshPlasticDeformations()
 				for (; vdt != vdEnd; ++vdt) {
 					const QString *str = (*vdt).first;
 
-					QList<TreeModel::Item *>::iterator it = std::lower_bound(
-						plasticItems.begin(), plasticItems.end(),
-						*str, SkVDChannelGroup::compareStr);
+					QList<TreeModel::Item *>::iterator it =
+						std::lower_bound(plasticItems.begin(), plasticItems.end(), *str,
+										 SkVDChannelGroup::compareStr);
 
 					plasticItems.insert(it, new SkVDChannelGroup(str, stageItem));
 				}
 
 				// Add the channel corresponding to the skeleton id
 				{
-					Channel *skelIdsChannel = new Channel(this, sd->skeletonIdsParam().getPointer());
+					Channel *skelIdsChannel =
+						new Channel(this, sd->skeletonIdsParam().getPointer());
 
 					plasticItems.insert(plasticItems.begin(), skelIdsChannel);
 					skelIdsChannel->setChannelGroup(plasticGroup);
@@ -1083,19 +1099,15 @@ void FunctionTreeModel::refreshPlasticDeformations()
 
 //-----------------------------------------------------------------------------
 
-void FunctionTreeModel::addParameter(
-	ChannelGroup *group,
-	const std::string &prefixString,
-	const std::wstring &fxId,
-	TParam *param)
+void FunctionTreeModel::addParameter(ChannelGroup *group, const std::string &prefixString,
+									 const std::wstring &fxId, TParam *param)
 {
 	if (TDoubleParam *dp = dynamic_cast<TDoubleParam *>(param)) {
 		Channel *channel = new Channel(this, dp, prefixString, fxId);
 
 		group->appendChild(channel);
 		channel->setChannelGroup(group);
-	} else if (dynamic_cast<TPointParam *>(param) ||
-			   dynamic_cast<TRangeParam *>(param) ||
+	} else if (dynamic_cast<TPointParam *>(param) || dynamic_cast<TRangeParam *>(param) ||
 			   dynamic_cast<TPixelParam *>(param)) {
 		TParamSet *paramSet = dynamic_cast<TParamSet *>(param);
 		assert(paramSet);
@@ -1311,8 +1323,7 @@ void FunctionTreeModel::applyShowFilters()
 
 //-----------------------------------------------------------------------------
 
-void FunctionTreeModel::addParameter(
-	TParam *parameter, const TFilePath &folder)
+void FunctionTreeModel::addParameter(TParam *parameter, const TFilePath &folder)
 {
 	struct locals {
 		static void locateExistingRoot(ChannelGroup *&root, TFilePath &fp)
@@ -1389,9 +1400,8 @@ FunctionTreeView::FunctionTreeView(FunctionViewer *parent)
 	setObjectName("FunctionEditorTree");
 	setSelectionMode(QAbstractItemView::NoSelection);
 
-	connect(
-		this, SIGNAL(pressed(const QModelIndex &)),
-		this, SLOT(onActivated(const QModelIndex &)));
+	connect(this, SIGNAL(pressed(const QModelIndex &)), this,
+			SLOT(onActivated(const QModelIndex &)));
 
 	setFocusPolicy(Qt::NoFocus);
 	setIndentation(14);
@@ -1481,7 +1491,8 @@ void FunctionTreeView::onClick(TreeModel::Item *item, const QPoint &itemPos, QMo
 	m_draggingChannel = 0;
 	FunctionTreeModel::Channel *channel = dynamic_cast<FunctionTreeModel::Channel *>(item);
 	FxChannelGroup *fxChannelGroup = dynamic_cast<FxChannelGroup *>(item);
-	StageObjectChannelGroup *stageObjectChannelGroup = dynamic_cast<StageObjectChannelGroup *>(item);
+	StageObjectChannelGroup *stageObjectChannelGroup =
+		dynamic_cast<StageObjectChannelGroup *>(item);
 
 	m_clickedItem = channel;
 
@@ -1513,8 +1524,7 @@ void FunctionTreeView::onClick(TreeModel::Item *item, const QPoint &itemPos, QMo
 
 void FunctionTreeView::onMidClick(TreeModel::Item *item, const QPoint &itemPos, QMouseEvent *e)
 {
-	FunctionTreeModel::Channel *channel =
-		dynamic_cast<FunctionTreeModel::Channel *>(item);
+	FunctionTreeModel::Channel *channel = dynamic_cast<FunctionTreeModel::Channel *>(item);
 	if (channel && e->button() == Qt::MidButton) {
 		m_draggingChannel = channel;
 		m_dragStartPosition = e->pos();
@@ -1526,9 +1536,8 @@ void FunctionTreeView::onMidClick(TreeModel::Item *item, const QPoint &itemPos, 
 
 void FunctionTreeView::onDrag(TreeModel::Item *item, const QPoint &itemPos, QMouseEvent *e)
 {
-	//middle drag of the channel item can retrieve expression name
-	if ((e->buttons() & Qt::MidButton) &&
-		m_draggingChannel &&
+	// middle drag of the channel item can retrieve expression name
+	if ((e->buttons() & Qt::MidButton) && m_draggingChannel &&
 		(e->pos() - m_dragStartPosition).manhattanLength() >= QApplication::startDragDistance()) {
 		QDrag *drag = new QDrag(this);
 		QMimeData *mimeData = new QMimeData;
@@ -1586,7 +1595,8 @@ void FunctionTreeView::openContextMenu(TreeModel::Item *item, const QPoint &glob
 {
 	if (FunctionTreeModel::Channel *channel = dynamic_cast<FunctionTreeModel::Channel *>(item))
 		openContextMenu(channel, globalPos);
-	else if (FunctionTreeModel::ChannelGroup *group = dynamic_cast<FunctionTreeModel::ChannelGroup *>(item))
+	else if (FunctionTreeModel::ChannelGroup *group =
+				 dynamic_cast<FunctionTreeModel::ChannelGroup *>(item))
 		openContextMenu(group, globalPos);
 }
 
@@ -1625,12 +1635,14 @@ void FunctionTreeView::openContextMenu(FunctionTreeModel::Channel *channel, cons
 	else if (action == &loadCurveAction)
 		fv->emitIoCurve((int)FunctionViewer::eLoadCurve, curve, "");
 	else if (action == &exportDataAction)
-		fv->emitIoCurve((int)FunctionViewer::eExportCurve, curve, channel->getLongName().toStdString());
+		fv->emitIoCurve((int)FunctionViewer::eExportCurve, curve,
+						channel->getLongName().toStdString());
 }
 
 //-----------------------------------------------------------------------------
 
-void FunctionTreeView::openContextMenu(FunctionTreeModel::ChannelGroup *group, const QPoint &globalPos)
+void FunctionTreeView::openContextMenu(FunctionTreeModel::ChannelGroup *group,
+									   const QPoint &globalPos)
 {
 	assert(group);
 
@@ -1648,7 +1660,8 @@ void FunctionTreeView::openContextMenu(FunctionTreeModel::ChannelGroup *group, c
 		return;
 
 	FunctionTreeModel::ChannelGroup::ShowFilter showFilter =
-		(action == &showAll) ? FunctionTreeModel::ChannelGroup::ShowAllChannels : FunctionTreeModel::ChannelGroup::ShowAnimatedChannels;
+		(action == &showAll) ? FunctionTreeModel::ChannelGroup::ShowAllChannels
+							 : FunctionTreeModel::ChannelGroup::ShowAnimatedChannels;
 
 	expand(group->createIndex());
 	group->setShowFilter(showFilter);
@@ -1689,7 +1702,8 @@ void FunctionTreeModel::ChannelGroup::displayAnimatedChannels()
 	int i;
 
 	for (i = 0; i < itemCount; i++) {
-		FunctionTreeModel::Channel *channel = dynamic_cast<FunctionTreeModel::Channel *>(getChild(i));
+		FunctionTreeModel::Channel *channel =
+			dynamic_cast<FunctionTreeModel::Channel *>(getChild(i));
 		if (!channel) {
 			FunctionTreeModel::ChannelGroup *channelGroup =
 				dynamic_cast<FunctionTreeModel::ChannelGroup *>(getChild(i));

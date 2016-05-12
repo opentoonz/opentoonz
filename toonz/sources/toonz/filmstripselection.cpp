@@ -35,8 +35,7 @@
 
 //-----------------------------------------------------------------------------
 
-TFilmstripSelection::TFilmstripSelection()
-	: m_inbetweenRange(TFrameId(1), TFrameId(0))
+TFilmstripSelection::TFilmstripSelection() : m_inbetweenRange(TFrameId(1), TFrameId(0))
 {
 }
 
@@ -60,14 +59,14 @@ void TFilmstripSelection::enableCommands()
 	int type = sl->getType();
 	TFilePath path = sl->getPath();
 
-	bool doEnable = (type == PLI_XSHLEVEL ||
-					 type == TZP_XSHLEVEL ||
-					 type == MESH_XSHLEVEL ||
+	bool doEnable = (type == PLI_XSHLEVEL || type == TZP_XSHLEVEL || type == MESH_XSHLEVEL ||
 					 (type == OVL_XSHLEVEL && path.getType() != "psd"));
 
-	TRasterImageP ri = (TRasterImageP)sl->getSimpleLevel()->getFrame(sl->getSimpleLevel()->getFirstFid(), false);
+	TRasterImageP ri =
+		(TRasterImageP)sl->getSimpleLevel()->getFrame(sl->getSimpleLevel()->getFirstFid(), false);
 
-	bool isNotEditableFullColorLevel = (type == OVL_XSHLEVEL && path.getFrame() == TFrameId::NO_FRAME || (ri && ri->isScanBW()));
+	bool isNotEditableFullColorLevel =
+		(type == OVL_XSHLEVEL && path.getFrame() == TFrameId::NO_FRAME || (ri && ri->isScanBW()));
 
 	if (doEnable && !isNotEditableFullColorLevel) {
 		enableCommand(this, MI_Cut, &TFilmstripSelection::cutFrames);
@@ -154,7 +153,8 @@ void TFilmstripSelection::select(const TFrameId &fid, bool selected)
 		tool->setSelectedFrames(m_selectedFrames);
 
 	TXshSimpleLevel *sl = app->getCurrentLevel()->getSimpleLevel();
-	bool rasterLevel = sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL || sl->getType() == TZI_XSHLEVEL;
+	bool rasterLevel = sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL ||
+					   sl->getType() == TZI_XSHLEVEL;
 
 	CommandManager::instance()->enable(MI_CanvasSize, rasterLevel);
 }
@@ -190,7 +190,8 @@ void TFilmstripSelection::selectAll()
 	updateInbetweenRange();
 	TTool *tool = TApp::instance()->getCurrentTool()->getTool();
 	tool->setSelectedFrames(m_selectedFrames);
-	bool rasterLevel = sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL || sl->getType() == TZI_XSHLEVEL;
+	bool rasterLevel = sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL ||
+					   sl->getType() == TZI_XSHLEVEL;
 	CommandManager::instance()->enable(MI_CanvasSize, rasterLevel);
 	notifyView();
 }
@@ -215,7 +216,8 @@ void TFilmstripSelection::invertSelection()
 	updateInbetweenRange();
 	TTool *tool = TApp::instance()->getCurrentTool()->getTool();
 	tool->setSelectedFrames(m_selectedFrames);
-	if (sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL || sl->getType() == TZI_XSHLEVEL)
+	if (sl->getType() == TZP_XSHLEVEL || sl->getType() == OVL_XSHLEVEL ||
+		sl->getType() == TZI_XSHLEVEL)
 		CommandManager::instance()->enable(MI_CanvasSize, true);
 	notifyView();
 }

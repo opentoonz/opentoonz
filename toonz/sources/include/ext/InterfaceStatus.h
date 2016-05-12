@@ -24,46 +24,34 @@
 
 namespace ToonzExt
 {
-class DVAPI
-	InterfaceStatus
-	: public CompositeStatus
+class DVAPI InterfaceStatus : public CompositeStatus
 {
 	// From Client information
-	TPointD
-		curr_, // current position of pointer
-		prev_, // previous position of pointer (drag)
-		down_; // position of mouse click
+	TPointD curr_, // current position of pointer
+		prev_,	 // previous position of pointer (drag)
+		down_;	 // position of mouse click
 	//  how much curve to move
-	double
-		lengthOfAction_;
+	double lengthOfAction_;
 
 	//  how much curve to move
-	double
-		deformerSensibility_;
+	double deformerSensibility_;
 
 	// pixel size
-	double
-		pixelSize_;
+	double pixelSize_;
 
 	// degree of an angle to be a corner
-	int
-		cornerSize_;
+	int cornerSize_;
 
-public:
+  public:
 	InterfaceStatus();
 
-	InterfaceStatus(const TPointD &curr,
-					const TPointD &prev,
-					const TPointD &down,
-					double lengthOfAction,
-					double deformerSensibility,
-					double pixelSize,
+	InterfaceStatus(const TPointD &curr, const TPointD &prev, const TPointD &down,
+					double lengthOfAction, double deformerSensibility, double pixelSize,
 					int cornerSize);
 
 	virtual ~InterfaceStatus();
 
-	void
-	init();
+	void init();
 
 	const TPointD &curr() const { return curr_; }
 	TPointD &curr() { return curr_; }
@@ -74,27 +62,19 @@ public:
 	const TPointD &down() const { return down_; }
 	TPointD &down() { return down_; }
 
-	double
-	getDeformationLength() const;
+	double getDeformationLength() const;
 
-	void
-	setDeformationLength(double val);
+	void setDeformationLength(double val);
 
-	double
-	getSensibility() const;
+	double getSensibility() const;
 
-	void
-	setSensibility(double val);
+	void setSensibility(double val);
 
-	double
-	getPixelSize() const;
-	void
-	setPixelSize(double val);
+	double getPixelSize() const;
+	void setPixelSize(double val);
 
-	int
-	getCornerSize() const;
-	void
-	setCornerSize(int val);
+	int getCornerSize() const;
+	void setCornerSize(int val);
 };
 
 //---------------------------------------------------------------------------

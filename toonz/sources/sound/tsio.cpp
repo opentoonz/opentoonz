@@ -8,7 +8,9 @@
 
 // static TPluginInfo info("soundIOPlugin");
 
-void cribbioNonCapiscoNulla() {}
+void cribbioNonCapiscoNulla()
+{
+}
 
 void mammaChePaura()
 {

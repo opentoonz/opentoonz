@@ -14,7 +14,7 @@ typedef std::pair<ResourceDeclaration *, TCacheResourceP> ResourceData;
 
 class TFxCacheManager;
 class TFxCacheManagerDelegate;
-//class TFxCacheManagerListener;
+// class TFxCacheManagerListener;
 
 //=======================================================================
 
@@ -62,22 +62,20 @@ class DVAPI ResourceBuilder
 	TFxCacheManager *m_cacheManager;
 	ResourceData m_data;
 
-protected:
+  protected:
 	virtual void simCompute(const TRectD &rect) = 0;
 	virtual void compute(const TRectD &rect) = 0;
 
 	virtual void upload(TCacheResourceP &resource) = 0;
 	virtual bool download(TCacheResourceP &resource) = 0;
 
-public:
-	ResourceBuilder(const std::string &resourceName,
-					const TFxP &fx, double frame, const TRenderSettings &rs);
+  public:
+	ResourceBuilder(const std::string &resourceName, const TFxP &fx, double frame,
+					const TRenderSettings &rs);
 	virtual ~ResourceBuilder() {}
 
-	static void declareResource(
-		const std::string &alias, const TFxP &fx,
-		const TRectD &rect, double frame, const TRenderSettings &rs,
-		bool subtileable = true);
+	static void declareResource(const std::string &alias, const TFxP &fx, const TRectD &rect,
+								double frame, const TRenderSettings &rs, bool subtileable = true);
 
 	void simBuild(const TRectD &tile);
 	void build(const TRectD &tile);
@@ -97,24 +95,24 @@ struct ResourceDeclaration {
 	//! a render process. It is destroyed before the actual process begins due to
 	//! its considerable size.
 	struct RawData {
-		//Requested infos for calculation
+		// Requested infos for calculation
 
-		//!Fx who generated the data
+		//! Fx who generated the data
 		TFxP m_fx;
-		//!Frame at which the data was generated
+		//! Frame at which the data was generated
 		double m_frame;
-		//!Render settings associated with the data
+		//! Render settings associated with the data
 		TRenderSettings m_rs;
-		//!Tiles declared in the prediction process.
-		//!May differ from those actually calculated by the renderer.
+		//! Tiles declared in the prediction process.
+		//! May differ from those actually calculated by the renderer.
 		std::vector<TRectD> m_tiles;
 
-		//Useful infos
+		// Useful infos
 
-		//!Bounding box associated with the considered fx calculation
-		//TRectD m_bbox;
+		//! Bounding box associated with the considered fx calculation
+		// TRectD m_bbox;
 
-		//!Whether the resource may be subdivided for calculation
+		//! Whether the resource may be subdivided for calculation
 		bool m_subtileable;
 	};
 
@@ -128,7 +126,7 @@ struct ResourceDeclaration {
 		TileData(const TRectD &rect) : m_rect(rect), m_refCount(0), m_calculated(false) {}
 	};
 
-public:
+  public:
 	RawData *m_rawData;
 	std::vector<TileData> m_tiles;
 	int m_tilesCount;
@@ -175,8 +173,8 @@ class DVAPI TFxCacheManager : public TRenderResourceManager
 {
 	T_RENDER_RESOURCE_MANAGER
 
-private:
-	//std::set<TFxCacheManagerListener*> m_listeners;
+  private:
+	// std::set<TFxCacheManagerListener*> m_listeners;
 	std::set<TFxCacheManagerDelegate *> m_delegates;
 
 	std::set<std::string> m_staticCacheIds;
@@ -184,7 +182,7 @@ private:
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	TFxCacheManager();
 	~TFxCacheManager();
 
@@ -196,25 +194,23 @@ public:
 	void onRenderStatusStart(int renderStatus);
 	void onRenderStatusEnd(int renderStatus);
 
-	//void install(TFxCacheManagerListener* listener);
-	//void uninstall(TFxCacheManagerListener* listener);
+	// void install(TFxCacheManagerListener* listener);
+	// void uninstall(TFxCacheManagerListener* listener);
 
-private:
+  private:
 	friend class ResourceBuilder;
 
-	void declareResource(
-		const std::string &alias, const TFxP &fx,
-		const TRectD &rect, double frame, const TRenderSettings &rs,
-		bool subtileable);
+	void declareResource(const std::string &alias, const TFxP &fx, const TRectD &rect, double frame,
+						 const TRenderSettings &rs, bool subtileable);
 
-	ResourceData getResource(const std::string &resourceName,
-							 const TFxP &fx, double frame, const TRenderSettings &rs);
+	ResourceData getResource(const std::string &resourceName, const TFxP &fx, double frame,
+							 const TRenderSettings &rs);
 
 	/*void notifyResourceUpload(const TCacheResourceP& resource, const TRect& rect);
   void notifyResourceDownload(const TCacheResourceP& resource, const TRect& rect);
   void notifyPredictedRelease(const TCacheResourceP& resource);*/
 
-private:
+  private:
 	friend class TFxCacheManagerDelegate;
 
 	void install(TFxCacheManagerDelegate *managerDelegate);
@@ -243,13 +239,12 @@ MANAGER_FILESCOPE_DECLARATION_DEP macro to achieve that.
 
 class TFxCacheManagerDelegate : public TRenderResourceManager
 {
-public:
+  public:
 	TFxCacheManagerDelegate() {}
 
-	virtual void getResource(
-		TCacheResourceP &resource, const std::string &alias,
-		const TFxP &fx, double frame, const TRenderSettings &rs,
-		ResourceDeclaration *resData) = 0;
+	virtual void getResource(TCacheResourceP &resource, const std::string &alias, const TFxP &fx,
+							 double frame, const TRenderSettings &rs,
+							 ResourceDeclaration *resData) = 0;
 
 	virtual void onRenderInstanceStart(unsigned long renderId)
 	{
@@ -275,4 +270,4 @@ public:
   virtual void onPredictedRelease(const TCacheResourceP& resource) {}
 };*/
 
-#endif //TFXCACHEMANAGER_H
+#endif // TFXCACHEMANAGER_H

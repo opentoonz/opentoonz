@@ -27,12 +27,12 @@ TImageLocation::TImageLocation(int row, int col)
 
 /*
 TImageLocation::TImageLocation(const TStageObjectId &pid)
-                      : m_row(0)
-                      , m_col(0)
-                      , m_fid()
-                      , m_pid(pid)
-                      , m_levelName(L"")
-                      , m_type(PathImage)
+					  : m_row(0)
+					  , m_col(0)
+					  , m_fid()
+					  , m_pid(pid)
+					  , m_levelName(L"")
+					  , m_type(PathImage)
 {
 }
 */

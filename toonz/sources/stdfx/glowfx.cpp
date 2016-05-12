@@ -70,8 +70,7 @@ void makeRectCoherent(TRectD &rect, const TPointD &pos)
 
 namespace
 {
-template <typename T>
-void fade(TRasterPT<T> ras, double fade, T color) //Why it is not in TRop..??
+template <typename T> void fade(TRasterPT<T> ras, double fade, T color) // Why it is not in TRop..??
 {
 	if (fade <= 0.0)
 		return;
@@ -131,7 +130,7 @@ class GlowFx : public TBaseRasterFx
 	TDoubleParamP m_fade;
 	TPixelParamP m_color;
 
-public:
+  public:
 	GlowFx() : m_value(10.0), m_brightness(100.0), m_color(TPixel::White), m_fade(0.0)
 	{
 		m_value->setMeasureName("fxLength");
@@ -150,9 +149,7 @@ public:
 
 	//---------------------------------------------------------------------------
 
-	~GlowFx()
-	{
-	}
+	~GlowFx() {}
 
 	//---------------------------------------------------------------------------
 
@@ -176,20 +173,22 @@ public:
 
 	//---------------------------------------------------------------------------
 
-	inline void buildLightRects(const TRectD &tileRect, TRectD &inRect, TRectD &outRect, double blur)
+	inline void buildLightRects(const TRectD &tileRect, TRectD &inRect, TRectD &outRect,
+								double blur)
 	{
-		if (inRect != TConsts::infiniteRectD) //Could be, if the input light is a zerary Fx
+		if (inRect != TConsts::infiniteRectD) // Could be, if the input light is a zerary Fx
 			makeRectCoherent(inRect, tileRect.getP00());
 
 		int blurI = tceil(blur);
 
-		//It seems that the TRop::blur does wrong with these (cuts at the borders).
-		//I don't know why - they would be best...
-		//TRectD blurOutRect((lightRect).enlarge(blurI) * tileRect);
-		//lightRect = ((tileRect).enlarge(blurI) * lightRect);
+		// It seems that the TRop::blur does wrong with these (cuts at the borders).
+		// I don't know why - they would be best...
+		// TRectD blurOutRect((lightRect).enlarge(blurI) * tileRect);
+		// lightRect = ((tileRect).enlarge(blurI) * lightRect);
 
-		//So we revert to the sum of the two
-		outRect = inRect = ((tileRect).enlarge(blurI) * inRect) + ((inRect).enlarge(blurI) * tileRect);
+		// So we revert to the sum of the two
+		outRect = inRect =
+			((tileRect).enlarge(blurI) * inRect) + ((inRect).enlarge(blurI) * tileRect);
 	}
 
 	//---------------------------------------------------------------------------
@@ -199,23 +198,23 @@ public:
 		Status status = getFxStatus(m_light, m_lighted);
 
 		if (status & NoPortsConnected)
-			//If no port, just do nothing :)
+			// If no port, just do nothing :)
 			return;
 
-		//Calculate source
+		// Calculate source
 		if (status & Port1Connected)
 			m_lighted->compute(tile, frame, ri);
 
-		//Calculate light
+		// Calculate light
 		if (status & Port0Connected) {
-			//Init light infos
+			// Init light infos
 			TDimension tileSize(tile.getRaster()->getSize());
 			TRectD tileRect(tile.m_pos, TDimensionD(tileSize.lx, tileSize.ly));
 
 			double scale = sqrt(fabs(ri.m_affine.det()));
 			double blur = m_value->getValue(frame) * scale;
 
-			//Build the light interesting rect
+			// Build the light interesting rect
 			TRectD lightRect, blurOutRect;
 			m_light->getBBox(frame, lightRect, ri);
 
@@ -226,19 +225,20 @@ public:
 			if ((blurOutRect.getLx() <= 0) || (blurOutRect.getLy() <= 0))
 				return;
 
-			//Calculate the light tile
+			// Calculate the light tile
 			TTile lightTile;
 			TDimension lightSize(tround(lightRect.getLx()), tround(lightRect.getLy()));
-			m_light->allocateAndCompute(lightTile, lightRect.getP00(), lightSize, tile.getRaster(), frame, ri);
+			m_light->allocateAndCompute(lightTile, lightRect.getP00(), lightSize, tile.getRaster(),
+										frame, ri);
 
-			//Init glow parameters
+			// Init glow parameters
 			TPixel32 color = m_color->getValue(frame);
 			double brightness = m_brightness->getValue(frame) / 100.0;
 			double fade = m_fade->getValue(frame) / 100.0;
 
-			//Now, apply the glow
+			// Now, apply the glow
 
-			//First, deal with the fade
+			// First, deal with the fade
 			{
 				TRasterP light = lightTile.getRaster();
 				TRaster32P light32 = light;
@@ -251,42 +251,41 @@ public:
 					assert(false);
 			}
 
-			//Then, build the blur
+			// Then, build the blur
 			TRasterP blurOut;
 			if (blur > 0) {
-				//Build a temporary output to the blur
+				// Build a temporary output to the blur
 				{
 					TRasterP light(lightTile.getRaster());
 
-					blurOut = light->create(
-						tround(blurOutRect.getLx()),
-						tround(blurOutRect.getLy()));
+					blurOut =
+						light->create(tround(blurOutRect.getLx()), tround(blurOutRect.getLy()));
 
-					//Apply the blur. Please note that SSE2 should not be used for now - I've seen it
-					//doing strange things to the blur...
+					// Apply the blur. Please note that SSE2 should not be used for now - I've seen
+					// it
+					// doing strange things to the blur...
 					TPointD displacement(lightRect.getP00() - blurOutRect.getP00());
-					TRop::blur(blurOut, light, blur, tround(displacement.x), tround(displacement.y), false);
+					TRop::blur(blurOut, light, blur, tround(displacement.x), tround(displacement.y),
+							   false);
 				}
 			} else
 				blurOut = lightTile.getRaster();
 
-			//Apply the rgbm scale
+			// Apply the rgbm scale
 			TRop::rgbmScale(blurOut, blurOut, 1, 1, 1, brightness);
 
-			//Apply the add
+			// Apply the add
 			{
 				TRectD interestingRect(tileRect * blurOutRect);
 
-				TRect interestingTileRect(
-					tround(interestingRect.x0 - tileRect.x0),
-					tround(interestingRect.y0 - tileRect.y0),
-					tround(interestingRect.x1 - tileRect.x0) - 1,
-					tround(interestingRect.y1 - tileRect.y0) - 1);
-				TRect interestingBlurRect(
-					tround(interestingRect.x0 - blurOutRect.x0),
-					tround(interestingRect.y0 - blurOutRect.y0),
-					tround(interestingRect.x1 - blurOutRect.x0) - 1,
-					tround(interestingRect.y1 - blurOutRect.y0) - 1);
+				TRect interestingTileRect(tround(interestingRect.x0 - tileRect.x0),
+										  tround(interestingRect.y0 - tileRect.y0),
+										  tround(interestingRect.x1 - tileRect.x0) - 1,
+										  tround(interestingRect.y1 - tileRect.y0) - 1);
+				TRect interestingBlurRect(tround(interestingRect.x0 - blurOutRect.x0),
+										  tround(interestingRect.y0 - blurOutRect.y0),
+										  tround(interestingRect.x1 - blurOutRect.x0) - 1,
+										  tround(interestingRect.y1 - blurOutRect.y0) - 1);
 
 				if ((interestingTileRect.getLx() <= 0) || (interestingTileRect.getLy() <= 0))
 					return;
@@ -302,9 +301,7 @@ public:
 
 	//---------------------------------------------------------------------------
 
-	virtual void doDryCompute(TRectD &rect,
-							  double frame,
-							  const TRenderSettings &info)
+	virtual void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info)
 	{
 		Status status = getFxStatus(m_light, m_lighted);
 		if (status & NoPortsConnected)
@@ -333,7 +330,7 @@ public:
 
 	//---------------------------------------------------------------------------
 
-	//Just like the blur
+	// Just like the blur
 	bool canHandle(const TRenderSettings &info, double frame)
 	{
 		if (m_light.isConnected())
@@ -354,10 +351,7 @@ public:
 
 	//---------------------------------------------------------------------------
 
-	TFxPort *getXsheetPort() const
-	{
-		return getInputPort(1);
-	}
+	TFxPort *getXsheetPort() const { return getInputPort(1); }
 };
 
 //==================================================================

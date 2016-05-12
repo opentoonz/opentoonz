@@ -18,10 +18,10 @@ class ScreenPicker : public QObject, public DVGui::ScreenBoard::Drawing
 
 	bool m_mousePressed, m_mouseGrabbed;
 
-public:
+  public:
 	ScreenPicker(QWidget *parent = 0);
 
-protected:
+  protected:
 	void event(QWidget *widget, QEvent *e);
 
 	void mousePressEvent(QWidget *widget, QMouseEvent *me);
@@ -32,10 +32,10 @@ protected:
 
 	bool acceptScreenEvents(const QRect &screenRect) const;
 
-public slots:
+  public slots:
 
 	void startGrab();
 	void pick();
 };
 
-#endif //SCREEN_PICKER_H
+#endif // SCREEN_PICKER_H

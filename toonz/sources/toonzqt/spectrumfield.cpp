@@ -39,9 +39,9 @@ using namespace DVGui;
 /*!	\fn void DVGui::SpectrumBar::currentKeyChanged()
 		The signal is emitted when current key index change.
 */
-SpectrumBar::SpectrumBar(QWidget *parent,
-						 TPixel32 color)
-	: QWidget(parent), m_x0(10), m_currentKeyIndex(0), m_spectrum(color, color), m_chessBg(":Resources/backg.png")
+SpectrumBar::SpectrumBar(QWidget *parent, TPixel32 color)
+	: QWidget(parent), m_x0(10), m_currentKeyIndex(0), m_spectrum(color, color),
+	  m_chessBg(":Resources/backg.png")
 {
 	setMinimumWidth(200);
 	setFixedHeight(WidgetHeight);
@@ -68,7 +68,8 @@ int SpectrumBar::getCurrentPos()
 */
 TPixel32 SpectrumBar::getCurrentColor()
 {
-	if (m_currentKeyIndex == -1) //C'e' sicuramente una key perche' lo spectrum e' strutturato in modo da non avere mai size nulla.
+	if (m_currentKeyIndex == -1) // C'e' sicuramente una key perche' lo spectrum e' strutturato in
+								 // modo da non avere mai size nulla.
 		return m_spectrum.getKey(getMaxPosKeyIndex()).second;
 	return m_spectrum.getKey(m_currentKeyIndex).second;
 }
@@ -159,32 +160,32 @@ void SpectrumBar::paintEvent(QPaintEvent *e)
 	int x1 = width() - m_x0;
 	QRectF rectBar = QRectF(m_x0, 0, x1 - m_x0 + 1, y1);
 
-	//Build the linear gradient
+	// Build the linear gradient
 	QLinearGradient linearGrad(QPointF(m_x0, h), QPointF(x1, h));
 	int spectrumSize = m_spectrum.getKeyCount();
 	int i;
 	for (i = 0; i < spectrumSize; i++) {
 		TSpectrum::ColorKey key = m_spectrum.getKey(i);
-		//Linear Gradient
+		// Linear Gradient
 		TPixel32 pix = key.second;
 		double spectrumValue = key.first;
 		linearGrad.setColorAt(spectrumValue, QColor(pix.r, pix.g, pix.b, pix.m));
-		//Frecce delle key
+		// Frecce delle key
 		int pos = spectrumValueToPos(spectrumValue);
 		int f = 4;
-		drawArrow(p, QPointF(pos - f, y1 + f), QPointF(pos, y1), QPointF(pos + f, y1 + f),
-				  true, (m_currentKeyIndex == i) ? Qt::black : Qt::white);
+		drawArrow(p, QPointF(pos - f, y1 + f), QPointF(pos, y1), QPointF(pos + f, y1 + f), true,
+				  (m_currentKeyIndex == i) ? Qt::black : Qt::white);
 	}
 
 	p.setPen(Qt::NoPen);
 
-	//Draw chess bg
+	// Draw chess bg
 	QBrush bg;
 	bg.setTexture(m_chessBg);
 	p.setBrush(bg);
 	p.drawRect(rectBar);
 
-	//Draw the gradient
+	// Draw the gradient
 	p.setBrush(linearGrad);
 	p.drawRect(rectBar);
 }
@@ -211,7 +212,7 @@ void SpectrumBar::mousePressEvent(QMouseEvent *e)
 	// Se x e' vicino a una key esistente setto questa come corrente
 	if (index != -1)
 		setCurrentKeyIndex(index);
-	else //Altrimenti aggiungo una nuova key
+	else // Altrimenti aggiungo una nuova key
 		addKeyAt(x);
 }
 
@@ -316,8 +317,7 @@ int SpectrumBar::getNearPosKeyIndex(int pos)
 	int i;
 	int gap = 20;
 	for (i = 0; i < m_spectrum.getKeyCount(); i++)
-		if (areAlmostEqual(double(pos),
-						   double(spectrumValueToPos(m_spectrum.getKey(i).first)),
+		if (areAlmostEqual(double(pos), double(spectrumValueToPos(m_spectrum.getKey(i).first)),
 						   gap))
 			return i;
 	return -1;
@@ -336,8 +336,7 @@ int SpectrumBar::getNearPosKeyIndex(int pos)
 		\b Example: Spectrum Field.
 		\image html SpectrumField.jpg
 */
-SpectrumField::SpectrumField(QWidget *parent,
-							 TPixel32 color)
+SpectrumField::SpectrumField(QWidget *parent, TPixel32 color)
 	: QWidget(parent), m_margin(0), m_spacing(4)
 {
 	setFixedHeight(60);
@@ -355,8 +354,8 @@ SpectrumField::SpectrumField(QWidget *parent,
 	layout->addWidget(m_spectrumbar);
 
 	m_colorField = new ColorField(this, true, color, 36);
-	connect(m_colorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
-			this, SLOT(onColorChanged(const TPixel32 &, bool)));
+	connect(m_colorField, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+			SLOT(onColorChanged(const TPixel32 &, bool)));
 	layout->addWidget(m_colorField, 0, Qt::AlignLeft);
 
 	setLayout(layout);
@@ -403,7 +402,8 @@ void SpectrumField::paintEvent(QPaintEvent *e)
 	QPainter p(this);
 	int x0 = 18 + m_margin;
 	int y0 = 2 * m_margin + WidgetHeight + m_spacing;
-	int y = m_margin + m_spacing + (WidgetHeight * 0.5 - 4); //4 e' l'altezza della freccia nella spectrum bar
+	int y = m_margin + m_spacing +
+			(WidgetHeight * 0.5 - 4); // 4 e' l'altezza della freccia nella spectrum bar
 	int y1 = y0 - y * 0.5 + 1;
 	int y2 = y0 - y;
 	curPos += m_margin;

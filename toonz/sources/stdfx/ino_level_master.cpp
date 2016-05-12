@@ -19,12 +19,10 @@ class ino_level_master : public TStandardRasterFx
 	TBoolParamP m_anti_alias;
 	TIntEnumParamP m_ref_mode;
 
-public:
+  public:
 	ino_level_master()
-		: m_in(DoublePair(
-			  0.0 * ino::param_range(), 1.0 * ino::param_range())),
-		  m_out(DoublePair(
-			  0.0 * ino::param_range(), 1.0 * ino::param_range())),
+		: m_in(DoublePair(0.0 * ino::param_range(), 1.0 * ino::param_range())),
+		  m_out(DoublePair(0.0 * ino::param_range(), 1.0 * ino::param_range())),
 		  m_gamma(1.0 * ino::param_range()), m_alpha_rendering(false)
 
 		  ,
@@ -41,16 +39,12 @@ public:
 		bindParam(this, "anti_alias", this->m_anti_alias);
 		bindParam(this, "reference", this->m_ref_mode);
 
-		this->m_in->getMin()->setValueRange(
-			0.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_in->getMax()->setValueRange(
-			0.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_out->getMin()->setValueRange(
-			0.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_out->getMax()->setValueRange(
-			0.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_gamma->setValueRange(
-			0.1 * ino::param_range(), 10.0 * ino::param_range()); /* gamma値 */
+		this->m_in->getMin()->setValueRange(0.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_in->getMax()->setValueRange(0.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_out->getMin()->setValueRange(0.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_out->getMax()->setValueRange(0.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_gamma->setValueRange(0.1 * ino::param_range(),
+									 10.0 * ino::param_range()); /* gamma値 */
 
 		this->m_ref_mode->addItem(1, "Green");
 		this->m_ref_mode->addItem(2, "Blue");
@@ -67,18 +61,13 @@ public:
 			return false;
 		}
 	}
-	bool canHandle(const TRenderSettings &info, double frame)
-	{
-		return true;
-	}
-	void doCompute(
-		TTile &tile, double frame, const TRenderSettings &rend_sets);
+	bool canHandle(const TRenderSettings &info, double frame) { return true; }
+	void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
 };
 FX_PLUGIN_IDENTIFIER(ino_level_master, "inoLevelMasterFx");
 //------------------------------------------------------------
 #include "igs_levels.h"
-void ino_level_master::doCompute(
-	TTile &tile, double frame, const TRenderSettings &rend_sets)
+void ino_level_master::doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets)
 {
 	/* ------ 接続していなければ処理しない -------------------- */
 	if (!this->m_input.isConnected()) {
@@ -87,8 +76,7 @@ void ino_level_master::doCompute(
 	}
 
 	/* ------ サポートしていないPixelタイプはエラーを投げる --- */
-	if (!((TRaster32P)tile.getRaster()) &&
-		!((TRaster64P)tile.getRaster())) {
+	if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
 		throw TRopException("unsupported input pixel type");
 	}
 
@@ -113,8 +101,9 @@ void ino_level_master::doCompute(
 	if (this->m_refer.isConnected()) {
 		reference_sw = true;
 		this->m_refer->allocateAndCompute(
-			reference_tile, tile.m_pos, TDimensionI(/* Pixel単位 */
-													tile.getRaster()->getLx(), tile.getRaster()->getLy()),
+			reference_tile, tile.m_pos,
+			TDimensionI(/* Pixel単位 */
+						tile.getRaster()->getLx(), tile.getRaster()->getLy()),
 			tile.getRaster(), frame, rend_sets);
 	}
 
@@ -124,23 +113,15 @@ void ino_level_master::doCompute(
 	if (log_sw) {
 		std::ostringstream os;
 		os << "params"
-		   << "  in_min " << v_in.first
-		   << "  in_max " << v_in.second
-		   << "  out_min " << v_out.first
-		   << "  out_max " << v_out.second
-		   << "  gamma " << gamma
-		   << "  alp_rend_sw " << alp_rend_sw
-		   << "  anti_alias " << anti_alias_sw
-		   << "  reference " << ref_mode
-		   << "   tile w " << tile.getRaster()->getLx()
-		   << "  h " << tile.getRaster()->getLy()
-		   << "  pixbits " << ino::pixel_bits(tile.getRaster())
-		   << "   frame " << frame;
+		   << "  in_min " << v_in.first << "  in_max " << v_in.second << "  out_min " << v_out.first
+		   << "  out_max " << v_out.second << "  gamma " << gamma << "  alp_rend_sw " << alp_rend_sw
+		   << "  anti_alias " << anti_alias_sw << "  reference " << ref_mode << "   tile w "
+		   << tile.getRaster()->getLx() << "  h " << tile.getRaster()->getLy() << "  pixbits "
+		   << ino::pixel_bits(tile.getRaster()) << "   frame " << frame;
 		if (reference_sw) {
-			os
-				<< "  reference_tile.m_pos " << reference_tile.m_pos
-				<< "  reference_tile_getLx " << reference_tile.getRaster()->getLx()
-				<< "  y " << reference_tile.getRaster()->getLy();
+			os << "  reference_tile.m_pos " << reference_tile.m_pos << "  reference_tile_getLx "
+			   << reference_tile.getRaster()->getLx() << "  y "
+			   << reference_tile.getRaster()->getLy();
 		}
 	}
 	/* ------ fx処理 ------------------------------------------ */
@@ -149,34 +130,36 @@ void ino_level_master::doCompute(
 
 		in_ras->lock();
 
-		TRasterGR8P in_gr8(
-			in_ras->getLy(), in_ras->getLx() * ino::channels() *
-								 ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
+		TRasterGR8P in_gr8(in_ras->getLy(), in_ras->getLx() * ino::channels() *
+												((TRaster64P)in_ras ? sizeof(unsigned short)
+																	: sizeof(unsigned char)));
 		in_gr8->lock();
 		ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
 
 		const TRasterP refer_ras = (reference_sw ? reference_tile.getRaster() : nullptr);
-		igs::levels::change(
-			in_gr8->getRawData()
+		igs::levels::change(in_gr8->getRawData()
 
-				,
-			in_ras->getLy(), in_ras->getLx() // Not use in_ras->getWrap()
-			,
-			ino::channels(), ino::bits(in_ras)
+								,
+							in_ras->getLy(), in_ras->getLx() // Not use in_ras->getWrap()
+							,
+							ino::channels(), ino::bits(in_ras)
 
-								 ,
-			(((0 <= ref_mode) && refer_ras) ? refer_ras->getRawData() : 0) // BGRA
-			,
-			(((0 <= ref_mode) && refer_ras) ? ino::bits(refer_ras) : 0), ref_mode
+												 ,
+							(((0 <= ref_mode) && refer_ras) ? refer_ras->getRawData() : 0) // BGRA
+							,
+							(((0 <= ref_mode) && refer_ras) ? ino::bits(refer_ras) : 0), ref_mode
 
-			,
-			v_in.first, v_in.second, v_in.first, v_in.second, v_in.first, v_in.second, v_in.first, v_in.second, gamma, gamma, gamma, gamma, v_out.first, v_out.second, v_out.first, v_out.second, v_out.first, v_out.second, v_out.first, v_out.second
+							,
+							v_in.first, v_in.second, v_in.first, v_in.second, v_in.first,
+							v_in.second, v_in.first, v_in.second, gamma, gamma, gamma, gamma,
+							v_out.first, v_out.second, v_out.first, v_out.second, v_out.first,
+							v_out.second, v_out.first, v_out.second
 
-			,
-			true // clamp_sw
-			,
-			alp_rend_sw, anti_alias_sw // --> add_blend_sw, default is true
-			);
+							,
+							true // clamp_sw
+							,
+							alp_rend_sw, anti_alias_sw // --> add_blend_sw, default is true
+							);
 
 		ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
 		in_gr8->unlock();

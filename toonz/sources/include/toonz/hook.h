@@ -34,28 +34,29 @@ class TXsheet;
 
 class DVAPI Hook
 {
-public:
+  public:
 	Hook();
 
 	bool isEmpty() const;
-	bool isKeyframe(const TFrameId &fid) const; //!< Returns true if the frames table contains \b fid.
+	bool
+	isKeyframe(const TFrameId &fid) const; //!< Returns true if the frames table contains \b fid.
 
 	TPointD getPos(const TFrameId &fid) const;
 	TPointD getAPos(const TFrameId &fid) const;
 	TPointD getBPos(const TFrameId &fid) const;
 
 	/*!
-    Set aPos of the frame with the frame id \b fid to \b pos.
-    If pos is near to bPos, aPos is set to bPos, else aPos and bPos are set to pos.
-    Make update at the end.
-    \attention if aPos==bPos then  setAPos change also bPos
+	Set aPos of the frame with the frame id \b fid to \b pos.
+	If pos is near to bPos, aPos is set to bPos, else aPos and bPos are set to pos.
+	Make update at the end.
+	\attention if aPos==bPos then  setAPos change also bPos
   */
 	void setAPos(const TFrameId &fid, TPointD pos);
 
 	/*!
-    Set bPos of the frame with the frame id \b fid to \b pos.
-    If pos is near to aPos, bPos is set to aPos, else bPos is set to pos.
-    Make update at the end.
+	Set bPos of the frame with the frame id \b fid to \b pos.
+	If pos is near to aPos, bPos is set to aPos, else bPos is set to pos.
+	Make update at the end.
   */
 	void setBPos(const TFrameId &fid, TPointD pos);
 
@@ -82,7 +83,7 @@ public:
 	void saveData(TOStream &os);
 	void loadData(TIStream &is);
 
-private:
+  private:
 	struct Frame {
 		TPointD m_aPos, m_bPos;
 		TPointD m_pos; // tiene conto dei delta (m_bpos-m_apos) precedenti
@@ -90,7 +91,7 @@ private:
 
 	typedef std::map<TFrameId, Frame> Frames;
 
-private:
+  private:
 	Frames m_frames;
 	TPointD m_delta;
 	int m_id;
@@ -101,7 +102,7 @@ private:
 	double m_width;  // trackerRegion width
 	double m_height; // trackerRegion height
 
-private:
+  private:
 	friend class HookSet;
 
 	Frames::const_iterator find(TFrameId fid) const;
@@ -114,10 +115,10 @@ private:
 
 class DVAPI HookSet
 {
-public:
+  public:
 	static const int maxHooksCount = 99; //!< Maximum size of a HookSet
 
-public:
+  public:
 	HookSet();
 	~HookSet();
 
@@ -128,19 +129,19 @@ public:
 	Hook *getHook(int index) const;
 
 	/*!
-    Creates (if needed) and returns the hook with specified index.
-    \warning Null pointer Hooks for indices smaller than \b index can be created.
+	Creates (if needed) and returns the hook with specified index.
+	\warning Null pointer Hooks for indices smaller than \b index can be created.
   */
 	Hook *touchHook(int index);
 
 	/*!
-    Adds a hook to the set.
+	Adds a hook to the set.
 
-    A Hook can be added replacing a null pointer in the Hook container with a new Hook,
-    getting an empty hook or adding a new Hook at the end of the container.
+	A Hook can be added replacing a null pointer in the Hook container with a new Hook,
+	getting an empty hook or adding a new Hook at the end of the container.
 
-    It is possible to istantiate at max HookSet::maxHooksCount hooks - beyond
-    which this function will return 0.
+	It is possible to istantiate at max HookSet::maxHooksCount hooks - beyond
+	which this function will return 0.
   */
 	Hook *addHook();
 
@@ -160,7 +161,7 @@ public:
 	void saveData(TOStream &os);
 	void loadData(TIStream &is);
 
-private:
+  private:
 	std::vector<Hook *> m_hooks; //!< (owned) The hooks container
 	TrackerObjectsSet *m_trackerObjectsSet;
 };
@@ -171,7 +172,7 @@ private:
 
 class DVAPI TrackerObject
 {
-public:
+  public:
 	TrackerObject(int id) : m_id(id) {}
 
 	int getId() const { return m_id; }
@@ -184,7 +185,7 @@ public:
 	void addHook(Hook *hook);
 	void removeHook(int index);
 
-private:
+  private:
 	int m_id;
 	std::vector<Hook *> m_hooks; //!< (NOT owned)
 };
@@ -195,7 +196,7 @@ private:
 
 class DVAPI TrackerObjectsSet
 {
-public:
+  public:
 	TrackerObjectsSet() {}
 
 	int getTrackerObjectsCount() const { return m_trackerObjects.size(); }
@@ -211,7 +212,7 @@ public:
 
 	void clearAll();
 
-private:
+  private:
 	std::map<int, TrackerObject *> m_trackerObjects; // (owned) tracker id -> TrackerObject
 };
 

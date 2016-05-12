@@ -56,13 +56,17 @@ class UndoAutoclose : public ToolUtils::TToolUndo
 	int m_column;
 	std::vector<int> m_changedStrokes;
 
-public:
+  public:
 	VIStroke *m_newStroke;
 	int m_newStrokeId;
 	int m_newStrokePos;
 
-	UndoAutoclose(TXshSimpleLevel *level, const TFrameId &frameId, int pos1, int pos2, std::vector<TFilledRegionInf> *fillInformation, const std::vector<int> &changedStrokes)
-		: ToolUtils::TToolUndo(level, frameId), m_oldStroke1(0), m_oldStroke2(0), m_pos1(pos1), m_pos2(pos2), m_newStrokePos(-1), m_fillInformation(fillInformation), m_changedStrokes(changedStrokes)
+	UndoAutoclose(TXshSimpleLevel *level, const TFrameId &frameId, int pos1, int pos2,
+				  std::vector<TFilledRegionInf> *fillInformation,
+				  const std::vector<int> &changedStrokes)
+		: ToolUtils::TToolUndo(level, frameId), m_oldStroke1(0), m_oldStroke2(0), m_pos1(pos1),
+		  m_pos2(pos2), m_newStrokePos(-1), m_fillInformation(fillInformation),
+		  m_changedStrokes(changedStrokes)
 	{
 		TVectorImageP image = level->getFrame(m_frameId, true);
 		if (pos1 != -1) {
@@ -172,14 +176,8 @@ public:
 		return sizeof(*this) + m_fillInformation->capacity() * sizeof(TFilledRegionInf) + 500;
 	}
 
-	virtual QString getToolName()
-	{
-		return QString("Autoclose Tool");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::AutocloseTool;
-	}
+	virtual QString getToolName() { return QString("Autoclose Tool"); }
+	int getHistoryType() { return HistoryType::AutocloseTool; }
 };
 
 } // namespace
@@ -209,11 +207,15 @@ class VectorTapeTool : public TTool
 	TDoubleProperty m_autocloseFactor;
 	TEnumProperty m_type;
 
-public:
+  public:
 	VectorTapeTool()
-		: TTool("T_Tape"), m_secondPoint(false), m_strokeIndex1(-1), m_strokeIndex2(-1), m_w1(-1.0), m_w2(-1.0), m_pixelSize(1), m_draw(false), m_smooth("Smooth", false) // W_ToolOptions_Smooth
+		: TTool("T_Tape"), m_secondPoint(false), m_strokeIndex1(-1), m_strokeIndex2(-1), m_w1(-1.0),
+		  m_w2(-1.0), m_pixelSize(1), m_draw(false),
+		  m_smooth("Smooth", false) // W_ToolOptions_Smooth
 		  ,
-		  m_joinStrokes("JoinStrokes", false), m_mode("Mode"), m_type("Type"), m_autocloseFactor("Distance", 0.1, 100, 0.5), m_firstTime(true), m_selectionRect(), m_startRect()
+		  m_joinStrokes("JoinStrokes", false), m_mode("Mode"), m_type("Type"),
+		  m_autocloseFactor("Distance", 0.1, 100, 0.5), m_firstTime(true), m_selectionRect(),
+		  m_startRect()
 	{
 		bind(TTool::Vectors);
 
@@ -254,7 +256,8 @@ public:
 		m_selectionRect = TRectD();
 		m_startRect = TPointD();
 
-		if (propertyName == "Distance" && (ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose))
+		if (propertyName == "Distance" &&
+			(ToonzCheck::instance()->getChecks() & ToonzCheck::eAutoclose))
 			notifyImageChanged();
 		return true;
 	}
@@ -270,10 +273,7 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	TPropertyGroup *getProperties(int targetType)
-	{
-		return &m_prop;
-	}
+	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
 	void draw()
 	{
@@ -283,9 +283,9 @@ public:
 		if (!vi)
 			return;
 
-		//TAffine viewMatrix = getViewer()->getViewMatrix();
-		//glPushMatrix();
-		//tglMultMatrix(viewMatrix);
+		// TAffine viewMatrix = getViewer()->getViewMatrix();
+		// glPushMatrix();
+		// tglMultMatrix(viewMatrix);
 		if (m_type.getValue() == RECT) {
 			if (!m_selectionRect.isEmpty())
 				ToolUtils::drawRect(m_selectionRect, TPixel::Black, 0x3F33, true);
@@ -298,7 +298,7 @@ public:
 
 		TStroke *stroke1 = vi->getStroke(m_strokeIndex1);
 		TThickPoint point1 = stroke1->getPoint(m_w1);
-		//TThickPoint point1 = stroke1->getControlPoint(m_cpIndex1);
+		// TThickPoint point1 = stroke1->getControlPoint(m_cpIndex1);
 
 		m_pixelSize = getPixelSize();
 		double thick = tmax(6.0 * m_pixelSize, point1.thick);
@@ -320,7 +320,7 @@ public:
 			tglDrawCircle(point2, thick);
 			tglDrawSegment(point1, point2);
 		}
-		//glPopMatrix();
+		// glPopMatrix();
 	}
 
 	//-----------------------------------------------------------------------------
@@ -331,10 +331,10 @@ public:
 		if (!vi)
 			return;
 
-		//BUTTA e rimetti (Dava problemi con la penna)
+		// BUTTA e rimetti (Dava problemi con la penna)
 		if (!m_draw)
-			return; //Questa riga potrebbe non essere messa
-		//m_draw=true;   //Perche'??? Non basta dargli true in onEnter??
+			return; // Questa riga potrebbe non essere messa
+		// m_draw=true;   //Perche'??? Non basta dargli true in onEnter??
 
 		if (m_type.getValue() == RECT)
 			return;
@@ -370,7 +370,7 @@ public:
 					minDistance2 = distance2;
 					m_strokeIndex1 = i;
 					m_w1 = 0.0;
-					//m_cpIndex1=0;
+					// m_cpIndex1=0;
 				}
 
 				cpMax = stroke->getControlPointCount() - 1;
@@ -379,7 +379,7 @@ public:
 					minDistance2 = distance2;
 					m_strokeIndex1 = i;
 					m_w1 = 1.0;
-					//m_cpIndex1=cpMax;
+					// m_cpIndex1=cpMax;
 				}
 			}
 		}
@@ -408,7 +408,8 @@ public:
 			return;
 
 		if (m_type.getValue() == RECT) {
-			m_selectionRect = TRectD(tmin(m_startRect.x, pos.x), tmin(m_startRect.y, pos.y), tmax(m_startRect.x, pos.x), tmax(m_startRect.y, pos.y));
+			m_selectionRect = TRectD(tmin(m_startRect.x, pos.x), tmin(m_startRect.y, pos.y),
+									 tmax(m_startRect.x, pos.x), tmax(m_startRect.y, pos.y));
 			invalidate();
 			return;
 		}
@@ -486,12 +487,14 @@ public:
 			TXshSimpleLevel *level = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
 			std::vector<int> v(1);
 			v[0] = minindex;
-			autoCloseUndo = new UndoAutoclose(level, getCurrentFid(), minindex, maxindex, fillInfo, v);
+			autoCloseUndo =
+				new UndoAutoclose(level, getCurrentFid(), minindex, maxindex, fillInfo, v);
 		}
-		VIStroke *newStroke = vi->joinStroke(m_strokeIndex1, m_strokeIndex2,
-											 (m_w1 == 0.0) ? 0 : vi->getStroke(m_strokeIndex1)->getControlPointCount() - 1,
-											 (m_w2 == 0.0) ? 0 : vi->getStroke(m_strokeIndex2)->getControlPointCount() - 1,
-											 m_smooth.getValue());
+		VIStroke *newStroke = vi->joinStroke(
+			m_strokeIndex1, m_strokeIndex2,
+			(m_w1 == 0.0) ? 0 : vi->getStroke(m_strokeIndex1)->getControlPointCount() - 1,
+			(m_w2 == 0.0) ? 0 : vi->getStroke(m_strokeIndex2)->getControlPointCount() - 1,
+			m_smooth.getValue());
 
 		if (autoCloseUndo) {
 			autoCloseUndo->m_newStroke = cloneVIStroke(newStroke);
@@ -517,14 +520,16 @@ public:
 			v[0] = m_strokeIndex1;
 			v[1] = m_strokeIndex2;
 			TXshSimpleLevel *level = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
-			autoCloseUndo = new UndoAutoclose(level, getCurrentFid(), m_strokeIndex1, -1, fillInfo, v);
+			autoCloseUndo =
+				new UndoAutoclose(level, getCurrentFid(), m_strokeIndex1, -1, fillInfo, v);
 		}
 
 		VIStroke *newStroke;
 
-		newStroke = vi->extendStroke(m_strokeIndex1, vi->getStroke(m_strokeIndex2)->getThickPoint(m_w2),
-									 (m_w1 == 0.0) ? 0 : vi->getStroke(m_strokeIndex1)->getControlPointCount() - 1,
-									 m_smooth.getValue());
+		newStroke = vi->extendStroke(
+			m_strokeIndex1, vi->getStroke(m_strokeIndex2)->getThickPoint(m_w2),
+			(m_w1 == 0.0) ? 0 : vi->getStroke(m_strokeIndex1)->getControlPointCount() - 1,
+			m_smooth.getValue());
 
 		if (autoCloseUndo) {
 			autoCloseUndo->m_newStroke = cloneVIStroke(newStroke);
@@ -542,7 +547,7 @@ public:
 	void joinLineToLine(const TVectorImageP &vi, std::vector<TFilledRegionInf> *fillInfo)
 	{
 		if (TTool::getApplication()->getCurrentObject()->isSpline())
-			return; //Caanot add vectros to spline... Spline can be only one std::vector
+			return; // Caanot add vectros to spline... Spline can be only one std::vector
 
 		TThickPoint p1 = vi->getStroke(m_strokeIndex1)->getThickPoint(m_w1);
 		TThickPoint p2 = vi->getStroke(m_strokeIndex2)->getThickPoint(m_w2);
@@ -578,7 +583,8 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	void inline rearrangeClosingPoints(const TVectorImageP &vi, std::pair<int, double> &closingPoint, const TPointD &p)
+	void inline rearrangeClosingPoints(const TVectorImageP &vi,
+									   std::pair<int, double> &closingPoint, const TPointD &p)
 	{
 		int erasedIndex = tmax(m_strokeIndex1, m_strokeIndex2);
 		int joinedIndex = tmin(m_strokeIndex1, m_strokeIndex2);
@@ -645,13 +651,15 @@ public:
 			TUndoManager::manager()->endBlock();
 	}
 
-	int doTape(const TVectorImageP &vi, std::vector<TFilledRegionInf> *fillInformation, bool joinStrokes)
+	int doTape(const TVectorImageP &vi, std::vector<TFilledRegionInf> *fillInformation,
+			   bool joinStrokes)
 	{
 		int type;
 		if (!joinStrokes)
 			type = l2l;
 		else {
-			type = (m_w1 == 0.0 || m_w1 == 1.0) ? ((m_w2 == 0.0 || m_w2 == 1.0) ? p2p : p2l) : ((m_w2 == 0.0 || m_w2 == 1.0) ? l2p : l2l);
+			type = (m_w1 == 0.0 || m_w1 == 1.0) ? ((m_w2 == 0.0 || m_w2 == 1.0) ? p2p : p2l)
+												: ((m_w2 == 0.0 || m_w2 == 1.0) ? l2p : l2l);
 			if (type == l2p) {
 				tswap(m_strokeIndex1, m_strokeIndex2);
 				tswap(m_w1, m_w2);
@@ -701,8 +709,9 @@ public:
 		QMutexLocker lock(vi->getMutex());
 		m_secondPoint = false;
 		std::vector<TFilledRegionInf> *fillInformation = new std::vector<TFilledRegionInf>;
-		ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation, vi->getStroke(m_strokeIndex1)->getBBox() +
-																				   vi->getStroke(m_strokeIndex2)->getBBox());
+		ImageUtils::getFillingInformationOverlappingArea(
+			vi, *fillInformation,
+			vi->getStroke(m_strokeIndex1)->getBBox() + vi->getStroke(m_strokeIndex2)->getBBox());
 
 		doTape(vi, fillInformation, m_joinStrokes.getValue());
 
@@ -726,7 +735,7 @@ public:
 	void onLeave()
 	{
 		m_draw = false;
-		//m_strokeIndex1=-1;
+		// m_strokeIndex1=-1;
 	}
 
 	void onActivate()
@@ -758,4 +767,4 @@ public:
 
 } vectorTapeTool;
 
-//TTool *getAutocloseTool() {return &autocloseTool;}
+// TTool *getAutocloseTool() {return &autocloseTool;}

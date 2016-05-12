@@ -29,10 +29,10 @@ class Grammar;
 
 class DVAPI TExpressionField : public TTextField
 {
-public:
+  public:
 	class Listener
 	{
-	public:
+	  public:
 		virtual void onExpressionChange(string s, bool isValid) = 0;
 		virtual ~Listener() {}
 	};
@@ -41,17 +41,14 @@ public:
 	Listener *m_listener;
 	void apply();
 
-public:
+  public:
 	TExpressionField(TWidget *parent, string name = "expressionField");
 	~TExpressionField();
 
 	void setGrammar(TSyntax::Grammar *grammar);
 	TSyntax::Grammar *getGrammar() const;
 
-	void setListener(Listener *listener)
-	{
-		m_listener = listener;
-	}
+	void setListener(Listener *listener) { m_listener = listener; }
 
 	void keyDown(int key, TUINT32 status, const TPoint &p);
 	void drawFieldText(const TPoint &origin, wstring text);

@@ -7,11 +7,8 @@
 
 class TUSBScannerIOPD
 {
-public:
-	TUSBScannerIOPD()
-		: m_handle(INVALID_HANDLE_VALUE), m_trace(false)
-	{
-	}
+  public:
+	TUSBScannerIOPD() : m_handle(INVALID_HANDLE_VALUE), m_trace(false) {}
 	HANDLE m_handle;
 	bool m_trace;
 };
@@ -41,8 +38,7 @@ void buf2printable(const unsigned char *buffer, const int size, std::ostrstream 
 
 //-----------------------------------------------------------------------------
 
-TUSBScannerIO::TUSBScannerIO()
-	: m_data(new TUSBScannerIOPD())
+TUSBScannerIO::TUSBScannerIO() : m_data(new TUSBScannerIOPD())
 {
 }
 
@@ -51,11 +47,7 @@ TUSBScannerIO::TUSBScannerIO()
 bool TUSBScannerIO::open()
 {
 	m_data->m_handle = CreateFile("\\\\.\\usbscan0", GENERIC_WRITE | GENERIC_READ,
-								  FILE_SHARE_WRITE | FILE_SHARE_READ,
-								  NULL,
-								  OPEN_EXISTING,
-								  0,
-								  NULL);
+								  FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 	if (m_data->m_handle == INVALID_HANDLE_VALUE)
 		return false;
 	return true;
@@ -85,12 +77,11 @@ int TUSBScannerIO::receive(unsigned char *buffer, int size)
 
 		OVERLAPPED overlapped;
 		memset(&overlapped, 0, sizeof(OVERLAPPED));
-		overlapped.hEvent = CreateEvent(
-			NULL, //pointertosecurityattributes,
-			//WIN95ignoresthisparameter
-			FALSE, //automaticreset
-			FALSE, //initializetonotsignaled
-			NULL); //pointertotheevent-objectname
+		overlapped.hEvent = CreateEvent(NULL, // pointertosecurityattributes,
+										// WIN95ignoresthisparameter
+										FALSE, // automaticreset
+										FALSE, // initializetonotsignaled
+										NULL); // pointertotheevent-objectname
 
 		ReadFile(m_data->m_handle, ptr, bytesToRead, &count, &overlapped);
 		DWORD waitRC = WaitForSingleObject(overlapped.hEvent, INFINITE);
@@ -120,7 +111,7 @@ int TUSBScannerIO::send(unsigned char *buffer, int size)
 	int bytesLeft = size;
 	DWORD count;
 	static int m_maxWriteSize = 64;
-	//bytesLeft = 64;
+	// bytesLeft = 64;
 	do {
 		int bytesToWrite = bytesLeft;
 		notMoreThan<int>(m_maxWriteSize, bytesToWrite);

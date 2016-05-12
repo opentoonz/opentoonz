@@ -12,7 +12,7 @@ class TFilePath;
 //
 
 #undef DVAPI
-#ifdef TNZCORE_EXPORTS //TNZCORE_DLL
+#ifdef TNZCORE_EXPORTS // TNZCORE_DLL
 #define DVAPI DV_EXPORT_API
 #else
 #define DVAPI DV_IMPORT_API

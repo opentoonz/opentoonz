@@ -26,9 +26,7 @@ class TFilePath;
 
 //------------------------------------------------------------------------------
 
-bool ReportStatusToSCMgr(long currentState,
-						 long win32ExitCode,
-						 long WaitHint);
+bool ReportStatusToSCMgr(long currentState, long win32ExitCode, long WaitHint);
 
 void AddToMessageLog(char *msg);
 
@@ -40,7 +38,7 @@ TFARMAPI std::string getLastErrorText();
 
 class TFARMAPI TService
 {
-public:
+  public:
 	TService(const std::string &name, const std::string &displayName);
 	virtual ~TService();
 
@@ -71,17 +69,15 @@ public:
 	static void start(const std::string &name);
 	static void stop(const std::string &name);
 
-	static void install(
-		const std::string &name,
-		const std::string &displayName,
-		const TFilePath &appPath);
+	static void install(const std::string &name, const std::string &displayName,
+						const TFilePath &appPath);
 
 	static void remove(const std::string &name);
 
 	static void addToMessageLog(const std::string &msg);
 	static void addToMessageLog(const QString &msg);
 
-private:
+  private:
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 

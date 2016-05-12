@@ -18,7 +18,8 @@ LineEdit::LineEdit(QWidget *parent, bool forbiddenSpecialChars)
 //-----------------------------------------------------------------------------
 
 LineEdit::LineEdit(const QString &contents, QWidget *parent, bool forbiddenSpecialChars)
-	: QLineEdit(contents, parent), m_isReturnPressed(false), m_forbiddenSpecialChars(forbiddenSpecialChars)
+	: QLineEdit(contents, parent), m_isReturnPressed(false),
+	  m_forbiddenSpecialChars(forbiddenSpecialChars)
 {
 }
 
@@ -53,7 +54,8 @@ void LineEdit::keyPressEvent(QKeyEvent *event)
 			case Qt::Key_Less:
 			case Qt::Key_Bar:
 			case Qt::Key_Period:
-				DVGui::info(tr("A file name cannot contains any of the following chracters: /\\:*?\"<>|."));
+				DVGui::info(
+					tr("A file name cannot contains any of the following chracters: /\\:*?\"<>|."));
 				return;
 			default:
 				QLineEdit::keyPressEvent(event);

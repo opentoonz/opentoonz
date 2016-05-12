@@ -6,7 +6,8 @@
 //----------------------------------------------------------------------
 
 TFxAttributes::TFxAttributes()
-	: m_id(0), m_dagNodePos(TConst::nowhere), m_enabled(true), m_speedAware(false), m_isOpened(false), m_speed(), m_groupSelector(-1), m_passiveCacheDataIdx(-1)
+	: m_id(0), m_dagNodePos(TConst::nowhere), m_enabled(true), m_speedAware(false),
+	  m_isOpened(false), m_speed(), m_groupSelector(-1), m_passiveCacheDataIdx(-1)
 {
 }
 
@@ -46,9 +47,7 @@ void TFxAttributes::setGroupId(int value, int position)
 
 int TFxAttributes::getGroupId()
 {
-	return m_groupId.isEmpty() ||
-				   m_groupSelector < 0 ||
-				   m_groupSelector >= m_groupId.size()
+	return m_groupId.isEmpty() || m_groupSelector < 0 || m_groupSelector >= m_groupId.size()
 			   ? 0
 			   : m_groupId[m_groupSelector];
 }
@@ -110,9 +109,7 @@ void TFxAttributes::setGroupName(const std::wstring &name, int position)
 std::wstring TFxAttributes::getGroupName(bool fromEditor)
 {
 	int groupSelector = fromEditor ? m_groupSelector + 1 : m_groupSelector;
-	return m_groupName.isEmpty() ||
-				   groupSelector < 0 ||
-				   groupSelector >= m_groupName.size()
+	return m_groupName.isEmpty() || groupSelector < 0 || groupSelector >= m_groupName.size()
 			   ? L""
 			   : m_groupName[groupSelector];
 }

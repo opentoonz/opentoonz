@@ -53,7 +53,10 @@ FxSelection::FxSelection()
 //---------------------------------------------------------
 
 FxSelection::FxSelection(const FxSelection &src)
-	: m_selectedFxs(src.m_selectedFxs), m_selectedLinks(src.m_selectedLinks), m_xshHandle(src.m_xshHandle), m_fxHandle(src.m_fxHandle), m_selectedColIndexes(src.m_selectedColIndexes), m_pastePosition(TConst::nowhere), m_schematicScene(src.m_schematicScene)
+	: m_selectedFxs(src.m_selectedFxs), m_selectedLinks(src.m_selectedLinks),
+	  m_xshHandle(src.m_xshHandle), m_fxHandle(src.m_fxHandle),
+	  m_selectedColIndexes(src.m_selectedColIndexes), m_pastePosition(TConst::nowhere),
+	  m_schematicScene(src.m_schematicScene)
 {
 }
 
@@ -174,8 +177,8 @@ bool FxSelection::isSelected(SchematicLink *link)
 void FxSelection::deleteSelection()
 {
 	std::list<TFxP, std::allocator<TFxP>> fxList = m_selectedFxs.toStdList();
-	TFxCommand::deleteSelection(fxList, m_selectedLinks.toStdList(), m_selectedColIndexes.toStdList(),
-								m_xshHandle, m_fxHandle);
+	TFxCommand::deleteSelection(fxList, m_selectedLinks.toStdList(),
+								m_selectedColIndexes.toStdList(), m_xshHandle, m_fxHandle);
 }
 
 //---------------------------------------------------------
@@ -204,7 +207,8 @@ void FxSelection::pasteSelection()
 	if (m_selectedFxs.size() >= 1 && m_selectedLinks.size() == 0 && m_selectedColIndexes.isEmpty())
 		replacePasteSelection();
 	/*--- Linkを１つだけ選択していた場合、Insert paste ---*/
-	else if (m_selectedFxs.size() == 0 && m_selectedLinks.size() >= 1 && m_selectedColIndexes.isEmpty())
+	else if (m_selectedFxs.size() == 0 && m_selectedLinks.size() >= 1 &&
+			 m_selectedColIndexes.isEmpty())
 		insertPasteSelection();
 	else {
 		QClipboard *clipboard = QApplication::clipboard();
@@ -220,12 +224,14 @@ void FxSelection::pasteSelection()
 
 		// in case of the paste command triggered from short cut key
 		if (m_pastePosition == TConst::nowhere && m_schematicScene) {
-			SchematicSceneViewer *ssv = dynamic_cast<SchematicSceneViewer *>(m_schematicScene->views().at(0));
+			SchematicSceneViewer *ssv =
+				dynamic_cast<SchematicSceneViewer *>(m_schematicScene->views().at(0));
 			if (ssv)
 				m_pastePosition = TPointD(ssv->getOldScenePos().x(), ssv->getOldScenePos().y());
 		}
 
-		TFxCommand::pasteFxs(fxs.toStdList(), zeraryFxColumnSize.toStdMap(), columns.toStdList(), m_pastePosition, m_xshHandle, m_fxHandle);
+		TFxCommand::pasteFxs(fxs.toStdList(), zeraryFxColumnSize.toStdMap(), columns.toStdList(),
+							 m_pastePosition, m_xshHandle, m_fxHandle);
 
 		if (m_schematicScene) {
 			selectNone();
@@ -479,7 +485,7 @@ Link FxSelection::getBoundingFxs(SchematicPort *inputPort, SchematicPort *output
 	}
 
 	if (outputNode->isA(eGroupedFx)) {
-		//devo prima trovare l'effetto interno al gruppo al quale inputNode e' linkato.
+		// devo prima trovare l'effetto interno al gruppo al quale inputNode e' linkato.
 		FxGroupNode *groupNode = dynamic_cast<FxGroupNode *>(outputNode);
 		assert(groupNode);
 		QList<TFx *> fxs;
@@ -492,11 +498,13 @@ Link FxSelection::getBoundingFxs(SchematicPort *inputPort, SchematicPort *output
 			if (groupNode->contains(outputFx))
 				fxs.push_back(outputFx);
 		}
-		if (fxs.size() != 1) //un nodo esterno al gruppo puo' essere linkato a piu' nodi interni al gruppo
+		if (fxs.size() !=
+			1) // un nodo esterno al gruppo puo' essere linkato a piu' nodi interni al gruppo
 			return boundingFxs;
 
 		TFx *outputFx = fxs[0];
-		//ho tovato l'effetto, ora devo trovare l'indice della porta a cui e' linkato l'effetto in input
+		// ho tovato l'effetto, ora devo trovare l'indice della porta a cui e' linkato l'effetto in
+		// input
 		for (i = 0; i < outputFx->getInputPortCount(); i++) {
 			TFxPort *inputPort = outputFx->getInputPort(i);
 			TFx *fx = inputPort->getFx();
@@ -516,7 +524,8 @@ Link FxSelection::getBoundingFxs(SchematicPort *inputPort, SchematicPort *output
 			FxSchematicPort *inputAppPort = outputNode->getInputPort(i);
 			int j;
 			for (j = 0; j < inputAppPort->getLinkCount(); j++) {
-				FxSchematicNode *outputAppNode = dynamic_cast<FxSchematicNode *>(inputAppPort->getLinkedNode(j));
+				FxSchematicNode *outputAppNode =
+					dynamic_cast<FxSchematicNode *>(inputAppPort->getLinkedNode(j));
 				if (!outputAppNode)
 					continue;
 				FxSchematicPort *outputAppPort = outputAppNode->getOutputPort();
@@ -584,7 +593,8 @@ void FxSelection::visitFx(TFx *fx, QList<TFx *> &visitedFxs)
 		if (!inputFx)
 			continue;
 		bool canBeGrouped = !inputFx->getAttributes()->isGrouped() ||
-							(inputFx->getAttributes()->getEditingGroupId() == fx->getAttributes()->getEditingGroupId());
+							(inputFx->getAttributes()->getEditingGroupId() ==
+							 fx->getAttributes()->getEditingGroupId());
 		if (!visitedFxs.contains(inputFx) && isSelected(inputFx) && canBeGrouped)
 			visitFx(inputFx, visitedFxs);
 	}
@@ -607,7 +617,8 @@ void FxSelection::visitFx(TFx *fx, QList<TFx *> &visitedFxs)
 		if (!outputFx)
 			continue;
 		bool canBeGrouped = !outputFx->getAttributes()->isGrouped() ||
-							(outputFx->getAttributes()->getEditingGroupId() == fx->getAttributes()->getEditingGroupId());
+							(outputFx->getAttributes()->getEditingGroupId() ==
+							 fx->getAttributes()->getEditingGroupId());
 		if (!visitedFxs.contains(outputFx) && isSelected(outputFx) && canBeGrouped)
 			visitFx(outputFx, visitedFxs);
 	}

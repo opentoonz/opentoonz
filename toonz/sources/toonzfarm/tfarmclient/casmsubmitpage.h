@@ -7,7 +7,7 @@
 
 class CasmSubmitPage : public TabPage
 {
-public:
+  public:
 	CasmSubmitPage(TWidget *parent);
 	~CasmSubmitPage();
 
@@ -16,7 +16,7 @@ public:
 	void onActivate();
 	void onDeactivate();
 
-private:
+  private:
 	class Data;
 	Data *m_data;
 };

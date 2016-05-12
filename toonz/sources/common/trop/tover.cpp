@@ -106,7 +106,7 @@ void do_over(TRasterPT<PixTypeOut> rout, const TRasterPT<PixTypeDn> &rdn,
 			else {
 				PixTypeUp p(*up_pix);
 				p.m = mask_pix->value;
-				*out_pix = overPix(*dn_pix, p); //hei!
+				*out_pix = overPix(*dn_pix, p); // hei!
 			}
 		}
 	}
@@ -123,8 +123,7 @@ void do_over(TRasterCM32P rout, const TRasterCM32P &rup)
 		const TPixelCM32 *up_pix = rup->pixels(y);
 
 		for (; out_pix < out_end; ++out_pix, ++up_pix) {
-			if (!up_pix->isPureInk() &&
-				up_pix->getPaint() != 0) // BackgroundStyle)
+			if (!up_pix->isPureInk() && up_pix->getPaint() != 0) // BackgroundStyle)
 				*out_pix = *up_pix;
 			else if (!up_pix->isPurePaint()) {
 				TUINT32 *outl = (TUINT32 *)out_pix, *upl = (TUINT32 *)up_pix;
@@ -139,8 +138,7 @@ void do_over(TRasterCM32P rout, const TRasterCM32P &rup)
 
 //-----------------------------------------------------------------------------
 
-template <class T, class Q>
-void do_overT2(TRasterPT<T> rout, const TRasterPT<T> &rup)
+template <class T, class Q> void do_overT2(TRasterPT<T> rout, const TRasterPT<T> &rup)
 {
 	UINT max = T::maxChannelValue;
 	double maxD = max;
@@ -204,7 +202,8 @@ void do_over_SSE2(TRaster32P rout, const TRaster32P &rup)
 				out_pix_packed_i = _mm_unpacklo_epi8(_mm_cvtsi32_si128(*(DWORD *)out_pix), zeros);
 				out_pix_packed = _mm_cvtepi32_ps(_mm_unpacklo_epi16(out_pix_packed_i, zeros));
 
-				out_pix_packed = _mm_add_ps(up_pix_packed, _mm_mul_ps(out_pix_packed, factor_packed));
+				out_pix_packed =
+					_mm_add_ps(up_pix_packed, _mm_mul_ps(out_pix_packed, factor_packed));
 				out_pix_packed = _mm_min_ps(maxChanneValue_packed, out_pix_packed);
 
 				out_pix_packed_i = _mm_cvtps_epi32(out_pix_packed);
@@ -273,7 +272,8 @@ void do_over(TRaster32P rout, const TRasterGR8P &rup, const TPixel32 &color)
 
 		for (; out_pix < out_end; ++out_pix, ++up_pix) {
 			double v = up_pix->value / 255.0;
-			TPixel32 up(troundp(v * color.r), troundp(v * color.g), troundp(v * color.b), troundp(v * color.m));
+			TPixel32 up(troundp(v * color.r), troundp(v * color.g), troundp(v * color.b),
+						troundp(v * color.m));
 			*out_pix = overPix(*out_pix, up);
 		}
 	}
@@ -407,7 +407,7 @@ void TRop::addBackground(TRasterP ras, const TPixel32 &col)
 
 //===================================================================
 
-//Usata tinylinetest
+// Usata tinylinetest
 static void my_do_over(TRaster32P rout, const TRasterGR8P &rup)
 {
 	assert(rout->getSize() == rup->getSize());
@@ -427,9 +427,7 @@ static void my_do_over(TRaster32P rout, const TRasterGR8P &rup)
 
 //===================================================================
 
-void TRop::over(const TRasterP &out,
-				const TRasterP &up,
-				const TAffine &aff,
+void TRop::over(const TRasterP &out, const TRasterP &up, const TAffine &aff,
 				ResampleFilterType filterType)
 {
 	out->lock();
@@ -441,7 +439,8 @@ void TRop::over(const TRasterP &out,
 		TRect rasterBounds = up->getBounds();
 		TRectD dbounds(rasterBounds.x0, rasterBounds.y0, rasterBounds.x1 + 1, rasterBounds.y1 + 1);
 		dbounds = aff * dbounds;
-		TRect bounds(tfloor(dbounds.x0), tfloor(dbounds.y0), tceil(dbounds.x1) - 1, tceil(dbounds.y1) - 1);
+		TRect bounds(tfloor(dbounds.x0), tfloor(dbounds.y0), tceil(dbounds.x1) - 1,
+					 tceil(dbounds.y1) - 1);
 		TRasterP tmp = up->create(bounds.getLx(), bounds.getLy());
 		resample(tmp, up, TTranslation(-bounds.x0, -bounds.y0) * aff, filterType);
 		over(out, tmp, bounds.getP00());
@@ -454,7 +453,7 @@ void TRop::over(const TRasterP &out, const TRasterP &up, const TPoint &pos, cons
 				ResampleFilterType filterType)
 {
 	if (aff.isIdentity())
-		//simple over with offset
+		// simple over with offset
 		TRop::over(out, up, pos);
 	else {
 		TRect rasterBounds = up->getBounds();
@@ -467,7 +466,8 @@ void TRop::over(const TRasterP &out, const TRasterP &up, const TPoint &pos, cons
 	}
 }
 
-void TRop::over(TRasterP rout, const TRasterCM32P &rup, TPalette *palette, const TPoint &point, const TAffine &aff)
+void TRop::over(TRasterP rout, const TRasterCM32P &rup, TPalette *palette, const TPoint &point,
+				const TAffine &aff)
 {
 	TRaster32P app(rup->getSize());
 	TRop::convert(app, rup, palette);
@@ -476,19 +476,18 @@ void TRop::over(TRasterP rout, const TRasterCM32P &rup, TPalette *palette, const
 
 //===================================================================
 
-void TRop::quickPut(const TRasterP &out,
-					const TRasterP &up,
-					const TAffine &aff,
-					const TPixel32 &colorScale,
-					bool doPremultiply, bool whiteTransp, bool firstColumn,
-					bool doRasterDarkenBlendedView)
+void TRop::quickPut(const TRasterP &out, const TRasterP &up, const TAffine &aff,
+					const TPixel32 &colorScale, bool doPremultiply, bool whiteTransp,
+					bool firstColumn, bool doRasterDarkenBlendedView)
 {
-	::quickPut(out, up, aff, ClosestPixel, colorScale, doPremultiply, whiteTransp, firstColumn, doRasterDarkenBlendedView);
+	::quickPut(out, up, aff, ClosestPixel, colorScale, doPremultiply, whiteTransp, firstColumn,
+			   doRasterDarkenBlendedView);
 }
 
 //===================================================================
 
-void TRop::over(const TRasterP &out, const TRasterP &dn, const TRasterP &up, const TRasterGR8P &mask)
+void TRop::over(const TRasterP &out, const TRasterP &dn, const TRasterP &up,
+				const TRasterGR8P &mask)
 {
 	out->lock();
 	up->lock();

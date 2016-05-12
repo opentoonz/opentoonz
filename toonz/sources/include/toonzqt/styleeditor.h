@@ -22,7 +22,7 @@
 #include "toonzqt/colorfield.h"
 #include "toonzqt/tabbar.h"
 
-//Toonz includes
+// Toonz includes
 //#include "../toonz/tapp.h" //iwsw commented out temporarily
 
 // Qt includes
@@ -36,7 +36,7 @@
 #include <QMouseEvent>
 #include <QPointF>
 
-//iwsw commented out temporarily
+// iwsw commented out temporarily
 //#include "ghibli_3dlut_util.h"
 
 #undef DVAPI
@@ -81,15 +81,7 @@ namespace StyleEditorGUI
 {
 //=============================================================================
 
-enum ColorChannel {
-	eRed = 0,
-	eGreen,
-	eBlue,
-	eAlpha,
-	eHue,
-	eSaturation,
-	eValue
-};
+enum ColorChannel { eRed = 0, eGreen, eBlue, eAlpha, eHue, eSaturation, eValue };
 
 //=============================================================================
 /*! \brief The ColorModel provides an object to manage color change and
@@ -104,7 +96,7 @@ class DVAPI ColorModel
 	void rgb2hsv();
 	void hsv2rgb();
 
-public:
+  public:
 	ColorModel();
 
 	void setTPixel(const TPixel32 &color);
@@ -135,11 +127,7 @@ public:
 
 //=============================================
 
-enum CurrentWheel {
-	none,
-	leftWheel,
-	rightTriangle
-};
+enum CurrentWheel { none, leftWheel, rightTriangle };
 
 class DVAPI HexagonalColorWheel : public QGLWidget
 {
@@ -157,15 +145,15 @@ class DVAPI HexagonalColorWheel : public QGLWidget
 
 	CurrentWheel m_currentWheel;
 
-	//iwsw commented out temporarily  about 3DLUT
-	//Ghibli3DLutUtil * m_ghibli3DLutUtil;
+	// iwsw commented out temporarily  about 3DLUT
+	// Ghibli3DLutUtil * m_ghibli3DLutUtil;
 
-private:
+  private:
 	void drawCurrentColorMark();
 	void clickLeftWheel(const QPoint &pos);
 	void clickRightTriangle(const QPoint &pos);
 
-public:
+  public:
 	HexagonalColorWheel(QWidget *parent);
 	void setColor(const ColorModel &color) { m_color = color; };
 
@@ -174,20 +162,17 @@ public:
 	void setBGColor(const QColor &color) { m_bgColor = color; }
 	QColor getBGColor() const { return m_bgColor; }
 
-protected:
+  protected:
 	void initializeGL();
 	void resizeGL(int width, int height);
 	void paintGL();
-	QSize SizeHint() const
-	{
-		return QSize(300, 200);
-	};
+	QSize SizeHint() const { return QSize(300, 200); };
 
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 
-signals:
+  signals:
 	void colorChanged(const ColorModel &color, bool isDragging);
 };
 
@@ -198,7 +183,7 @@ signals:
 
 		This object show a square faded from one color channel to another color channel,
 		the two channel represent x and y axis of square.
-		It's possible to choose viewed shade using \b setChannel(). 
+		It's possible to choose viewed shade using \b setChannel().
 		Click in square change current SquaredColorWheel.
 */
 class DVAPI SquaredColorWheel : public QWidget
@@ -207,13 +192,13 @@ class DVAPI SquaredColorWheel : public QWidget
 	ColorChannel m_channel;
 	ColorModel m_color;
 
-public:
+  public:
 	SquaredColorWheel(QWidget *parent);
 
 	/*! Doesn't call update(). */
 	void setColor(const ColorModel &color);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 
 	void click(const QPoint &pos);
@@ -221,7 +206,7 @@ protected:
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 
-public slots:
+  public slots:
 	/*! Connect channels to the two square axes:
 			\li eRed : connect x-axis to eGreen and y-axis to eBlue;
 			\li eGreen : connect x-axis to eRed and y-axis to eBlue;
@@ -231,7 +216,7 @@ public slots:
 			\li eValue : connect x-axis to eHue and y-axis to eSaturation; */
 	void setChannel(int channel);
 
-signals:
+  signals:
 	void colorChanged(const ColorModel &color, bool isDragging);
 };
 
@@ -246,7 +231,7 @@ signals:
 class DVAPI ColorSlider : public QSlider
 {
 	Q_OBJECT
-public:
+  public:
 	ColorSlider(Qt::Orientation orientation, QWidget *parent = 0);
 
 	/*! set channel and color. doesn't call update(). */
@@ -255,7 +240,7 @@ public:
 
 	ColorChannel getChannel() const { return m_channel; }
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
@@ -265,7 +250,7 @@ protected:
 	//	QRect getFirstArrowRect();
 	//	QRect getLastArrowRect();
 
-private:
+  private:
 	ColorChannel m_channel;
 	ColorModel m_color;
 };
@@ -283,25 +268,27 @@ class ArrowButton : public QToolButton
 	int m_timerId;
 	int m_firstTimerId;
 
-public:
-	ArrowButton(QWidget *parent = 0, Qt::Orientation orientation = Qt::Horizontal, bool m_isFirstArrow = true);
+  public:
+	ArrowButton(QWidget *parent = 0, Qt::Orientation orientation = Qt::Horizontal,
+				bool m_isFirstArrow = true);
 
-protected:
+  protected:
 	void stopTime(int timerId);
 	void timerEvent(QTimerEvent *event);
 	void notifyChanged();
 
-protected slots:
+  protected slots:
 	void onPressed();
 	void onRelease();
 
-signals:
+  signals:
 	void add();
 	void remove();
 };
 
 //=============================================================================
-/*! \brief The ColorSliderBar is a colorSlider with  two arrow to add or remove one to current value.
+/*! \brief The ColorSliderBar is a colorSlider with  two arrow to add or remove one to current
+   value.
 
 		Inherits \b QToolBar.
 */
@@ -311,7 +298,7 @@ class DVAPI ColorSliderBar : public QWidget
 
 	ColorSlider *m_colorSlider;
 
-public:
+  public:
 	ColorSliderBar(QWidget *parent = 0, Qt::Orientation orientation = Qt::Vertical);
 
 	void setValue(int value) { m_colorSlider->setValue(value); }
@@ -322,18 +309,18 @@ public:
 
 	ColorChannel getChannel() const { return m_colorSlider->getChannel(); }
 
-protected slots:
+  protected slots:
 	void onRemove();
 	void onAdd();
 
-signals:
+  signals:
 	void valueChanged(int);
 	void valueChanged();
 };
 
 //=============================================================================
 /*! \brief The ChannelLineEdit is a cutomized version of IntLineEdit for channel value.
-    It calls selectAll() at the moment of the first click.
+	It calls selectAll() at the moment of the first click.
 */
 class ChannelLineEdit : public DVGui::IntLineEdit
 {
@@ -341,13 +328,13 @@ class ChannelLineEdit : public DVGui::IntLineEdit
 
 	bool m_isEditing;
 
-public:
+  public:
 	ChannelLineEdit(QWidget *parent, int value, int minValue, int maxValue)
 		: IntLineEdit(parent, value, minValue, maxValue), m_isEditing(false)
 	{
 	}
 
-protected:
+  protected:
 	void mousePressEvent(QMouseEvent *);
 	void focusOutEvent(QFocusEvent *);
 	void paintEvent(QPaintEvent *);
@@ -375,11 +362,11 @@ class DVAPI ColorChannelControl : public QWidget
 	int m_value;
 	bool m_signalEnabled;
 
-public:
+  public:
 	ColorChannelControl(ColorChannel channel, QWidget *parent = 0);
 	void setColor(const ColorModel &color);
 
-protected slots:
+  protected slots:
 	void onFieldChanged();
 	void onSliderChanged(int value);
 	void onSliderReleased();
@@ -387,25 +374,25 @@ protected slots:
 	void onAddButtonClicked();
 	void onSubButtonClicked();
 
-signals:
+  signals:
 	void colorChanged(const ColorModel &color, bool isDragging);
 };
 
 //=============================================================================
 /*! \brief The StyleEditorPage is the base class of StyleEditor pages.
- 
+
 		Inherits \b QFrame.
 		Inherited by \b PlainColorPage and \b StyleChooserPage.
 */
 class StyleEditorPage : public QFrame
 {
-public:
+  public:
 	StyleEditorPage(QWidget *parent);
 };
 
 //=============================================================================
 /*! \brief The ColorParameterSelector is used for styles having more
-    than one color parameter to select the current one.
+	than one color parameter to select the current one.
 
 		Inherits \b QWidget.
 */
@@ -418,26 +405,26 @@ class ColorParameterSelector : public QWidget
 	const QSize m_chipSize;
 	const QPoint m_chipOrigin, m_chipDelta;
 
-public:
+  public:
 	ColorParameterSelector(QWidget *parent);
 	int getSelected() const { return m_index; }
 	void setStyle(const TColorStyle &style);
 	void clear();
 
-signals:
+  signals:
 	void colorParamChanged();
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 	void mousePressEvent(QMouseEvent *);
 };
 
 //=============================================================================
-/*! \brief The PlainColorPage is used to control the color parameter. 
+/*! \brief The PlainColorPage is used to control the color parameter.
 
 		Inherits \b StyleEditorPage.
 
-		The PlainColorPage is made of a \b SquaredColorWheel and a \b ColorSlider, 
+		The PlainColorPage is made of a \b SquaredColorWheel and a \b ColorSlider,
 		a collection of \b ColorChannelControl, and a number of radio button (to control
 		the ColorWheel behaviour).
 */
@@ -445,10 +432,10 @@ class PlainColorPage : public StyleEditorPage
 {
 	Q_OBJECT
 
-	//ColorSliderBar *m_verticalSlider;
-	//QRadioButton *m_modeButtons[7];
+	// ColorSliderBar *m_verticalSlider;
+	// QRadioButton *m_modeButtons[7];
 	ColorChannelControl *m_channelControls[7];
-	//SquaredColorWheel *m_squaredColorWheel; //iwsw not used
+	// SquaredColorWheel *m_squaredColorWheel; //iwsw not used
 
 	HexagonalColorWheel *m_hexagonalColorWheel;
 
@@ -457,31 +444,31 @@ class PlainColorPage : public StyleEditorPage
 
 	void updateControls();
 
-public:
+  public:
 	PlainColorPage(QWidget *parent = 0);
 	~PlainColorPage() {}
 
 	void setColor(const TColorStyle &style, int colorParameterIndex);
 
-protected:
+  protected:
 	void resizeEvent(QResizeEvent *);
 
-signals:
+  signals:
 	void colorChanged(const ColorModel &, bool isDragging);
 
-protected slots:
+  protected slots:
 	void onWheelChanged(const ColorModel &color, bool isDragging);
-	//void onWheelSliderChanged(int value);
-	//void onWheelSliderReleased();
+	// void onWheelSliderChanged(int value);
+	// void onWheelSliderReleased();
 
-public slots:
-	//void setWheelChannel(int channel);
+  public slots:
+	// void setWheelChannel(int channel);
 	void onControlChanged(const ColorModel &color, bool isDragging);
 };
 
 //=============================================================================
-/*! \brief The StyleChooserPage is the base class of pages with texture, 
-    special style and custom style. It features a collection of selectable 'chips'. 
+/*! \brief The StyleChooserPage is the base class of pages with texture,
+	special style and custom style. It features a collection of selectable 'chips'.
 
 		Inherits \b StyleEditorPage.
 */
@@ -489,13 +476,13 @@ class StyleChooserPage : public StyleEditorPage
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	QPoint m_chipOrigin;
 	QSize m_chipSize;
 	int m_chipPerRow;
 	static TFilePath m_rootPath;
 
-public:
+  public:
 	StyleChooserPage(QWidget *parent = 0);
 
 	QSize getChipSize() const { return m_chipSize; }
@@ -507,11 +494,11 @@ public:
 	virtual void onSelect(int index) {}
 
 	//! \see StyleEditor::setRootPath()
-	//TOGLIERE
+	// TOGLIERE
 	static void setRootPath(const TFilePath &rootPath);
 	static TFilePath getRootPath() { return m_rootPath; }
 
-protected:
+  protected:
 	int m_currentIndex;
 
 	int posToIndex(const QPoint &pos) const;
@@ -522,9 +509,9 @@ protected:
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event) {}
 	void mouseReleaseEvent(QMouseEvent *event);
-protected slots:
+  protected slots:
 	void computeSize();
-signals:
+  signals:
 	void styleSelected(const TColorStyle &style);
 };
 
@@ -534,8 +521,8 @@ signals:
   \brief    The SettingsPage is used to show/edit style parameters.
 
   \details  This class stores the GUI for editing a \a copy of the
-            current color style. Updates of the actual current color
-            style are \a not performed directly by this class.
+			current color style. Updates of the actual current color
+			style are \a not performed directly by this class.
 */
 
 class SettingsPage : public QScrollArea
@@ -550,8 +537,8 @@ class SettingsPage : public QScrollArea
 	TColorStyleP m_editedStyle; //!< A copy of the current style being edited by the Style Editor.
 
 	bool m_updating; //!< Whether the page is copying style content to its widget,
-	//!  to be displayed.
-public:
+					 //!  to be displayed.
+  public:
 	SettingsPage(QWidget *parent);
 
 	void setStyle(const TColorStyleP &editedStyle);
@@ -559,11 +546,11 @@ public:
 
 	void enableAutopaintToggle(bool enabled);
 
-signals:
+  signals:
 
 	void paramStyleChanged(bool isDragging); //!< Signals that the edited style has changed.
 
-private slots:
+  private slots:
 
 	void onAutofillChanged();
 	void onValueChanged(bool isDragging = false);
@@ -598,8 +585,9 @@ class DVAPI StyleEditor : public QWidget
 	QPushButton *m_autoButton;  //!< "Auto Apply" checkbox on the right panel side.
 	QPushButton *m_applyButton; //!< "Apply" button on the right panel side.
 
-	QToolBar *m_toolBar;							  //!< Lower toolbar.
-	ColorParameterSelector *m_colorParameterSelector; //!< Secondary color parameter selector in the lower toolbar.
+	QToolBar *m_toolBar; //!< Lower toolbar.
+	ColorParameterSelector
+		*m_colorParameterSelector; //!< Secondary color parameter selector in the lower toolbar.
 
 	TabBarContainter *m_tabBarContainer; //!< Tabs container for style types.
 
@@ -620,7 +608,7 @@ class DVAPI StyleEditor : public QWidget
 	bool m_enabledOnlyFirstTab;
 	bool m_enabledFirstAndLastTab;
 
-public:
+  public:
 	StyleEditor(PaletteController *, QWidget *parent = 0);
 	~StyleEditor();
 
@@ -634,37 +622,36 @@ public:
 
 	/*! rootPath generally is STUFFDIR/Library. Contains directories 'textures' and
 			'custom styles' */
-	//TOGLIERE
+	// TOGLIERE
 	void setRootPath(const TFilePath &rootPath);
 
-	void enableAutopaintToggle(bool enabled)
-	{
-		m_settingsPage->enableAutopaintToggle(enabled);
-	}
+	void enableAutopaintToggle(bool enabled) { m_settingsPage->enableAutopaintToggle(enabled); }
 
-protected:
+  protected:
 	/*! Return false if style is linked and style must be set to null.*/
 	bool setStyle(TColorStyle *currentStyle);
 
-	void setEditedStyleToStyle(const TColorStyle *style); //!< Clones the supplied style and considers that as the edited one.
-	void setOldStyleToStyle(const TColorStyle *style);	//!< Clones the supplied style and considers that as the previously current one.
-														  //!  \todo  Why is this not assimilated to setCurrentStyleToStyle()?
+	void setEditedStyleToStyle(const TColorStyle *style); //!< Clones the supplied style and
+														  //!considers that as the edited one.
+	void setOldStyleToStyle(const TColorStyle *style); //!< Clones the supplied style and considers
+													   //!that as the previously current one.
+	//!  \todo  Why is this not assimilated to setCurrentStyleToStyle()?
 
 	/*! Return style parameter index selected in \b ColorParameterSelector. */
-	int getColorParam() const
-	{
-		return m_colorParameterSelector->getSelected();
-	}
+	int getColorParam() const { return m_colorParameterSelector->getSelected(); }
 
-	/*! Set StyleEditor view to \b enabled. If \b enabledOnlyFirstTab or if \b enabledFirstAndLastTab
-			is true hide other tab, pay attention \b enabled must be true or StyleEditor is disabled. */
-	void enable(bool enabled, bool enabledOnlyFirstTab = false, bool enabledFirstAndLastTab = false);
+	/*! Set StyleEditor view to \b enabled. If \b enabledOnlyFirstTab or if \b
+	   enabledFirstAndLastTab
+			is true hide other tab, pay attention \b enabled must be true or StyleEditor is
+	   disabled. */
+	void enable(bool enabled, bool enabledOnlyFirstTab = false,
+				bool enabledFirstAndLastTab = false);
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-protected slots:
+  protected slots:
 
 	void onStyleSwitched();
 	void onStyleChanged();
@@ -691,7 +678,7 @@ protected slots:
 
 	void onParamStyleChanged(bool isDragging);
 
-private:
+  private:
 	QFrame *createBottomWidget();
 	void updateTabBar();
 

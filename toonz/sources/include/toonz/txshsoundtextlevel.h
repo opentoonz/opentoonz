@@ -20,7 +20,7 @@
 #endif
 
 //=============================================================================
-//!The TXshSoundTextLevel
+//! The TXshSoundTextLevel
 //=============================================================================
 
 class DVAPI TXshSoundTextLevel : public TXshLevel
@@ -31,7 +31,7 @@ class DVAPI TXshSoundTextLevel : public TXshLevel
 
 	QList<QString> m_framesText;
 
-public:
+  public:
 	TXshSoundTextLevel(std::wstring name = L"");
 	~TXshSoundTextLevel();
 
@@ -49,7 +49,7 @@ public:
 	void load(){};
 	void save(){};
 
-private:
+  private:
 	// not implemented
 	TXshSoundTextLevel(const TXshSoundTextLevel &);
 	TXshSoundTextLevel &operator=(const TXshSoundTextLevel &);
@@ -60,4 +60,4 @@ template class DV_EXPORT_API TSmartPointerT<TXshSoundTextLevel>;
 #endif
 typedef TSmartPointerT<TXshSoundTextLevel> TXshSoundTextLevelP;
 
-#endif //TXSHSOUNDTEXTLEVEL_INCLUDED
+#endif // TXSHSOUNDTEXTLEVEL_INCLUDED

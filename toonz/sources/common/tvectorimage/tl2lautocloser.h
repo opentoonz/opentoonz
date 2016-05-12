@@ -19,7 +19,7 @@
 #pragma warning(disable : 4251)
 #endif
 
-//forward declaration
+// forward declaration
 class TStroke;
 
 //-----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ class DVAPI TL2LAutocloser
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	TL2LAutocloser();
 	~TL2LAutocloser();
 
@@ -52,15 +52,13 @@ public:
 	void search(std::vector<Segment> &segments, TStroke *stroke0, TStroke *stroke1);
 
 	//! use this method if you have already computed the intersections
-	void search(
-		std::vector<Segment> &segments,
-		TStroke *stroke0, TStroke *stroke1,
-		const std::vector<DoublePair> &intersection);
+	void search(std::vector<Segment> &segments, TStroke *stroke0, TStroke *stroke1,
+				const std::vector<DoublePair> &intersection);
 
 	//! debug only. show the internal state related to the last performed search
 	void draw();
 
-private:
+  private:
 	// not implemented
 	TL2LAutocloser(const TL2LAutocloser &);
 	const TL2LAutocloser &operator=(const TL2LAutocloser &);

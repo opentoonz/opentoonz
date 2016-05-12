@@ -32,7 +32,8 @@ TDoubleParamRelayProperty::TDoubleParamRelayProperty(const TDoubleParamRelayProp
 
 //-------------------------------------------------------------------
 
-TDoubleParamRelayProperty &TDoubleParamRelayProperty::operator=(const TDoubleParamRelayProperty &other)
+TDoubleParamRelayProperty &TDoubleParamRelayProperty::
+operator=(const TDoubleParamRelayProperty &other)
 {
 	TProperty::operator=(other);
 
@@ -97,7 +98,8 @@ double TDoubleParamRelayProperty::getValue() const
 
 void TDoubleParamRelayProperty::accept(TProperty::Visitor &v)
 {
-	if (TDoubleParamRelayProperty::Visitor *vv = dynamic_cast<TDoubleParamRelayProperty::Visitor *>(&v))
+	if (TDoubleParamRelayProperty::Visitor *vv =
+			dynamic_cast<TDoubleParamRelayProperty::Visitor *>(&v))
 		vv->visit(this);
 }
 

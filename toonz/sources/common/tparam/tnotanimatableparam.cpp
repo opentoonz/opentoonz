@@ -8,7 +8,7 @@ PERSIST_IDENTIFIER(TBoolParam, "boolParam")
 PERSIST_IDENTIFIER(TFilePathParam, "filePathParam")
 PERSIST_IDENTIFIER(TStringParam, "stringParam")
 PERSIST_IDENTIFIER(TNADoubleParam, "naDoubleParam")
-//PERSIST_IDENTIFIER(TIntEnumParam, "intEnumParam")
+// PERSIST_IDENTIFIER(TIntEnumParam, "intEnumParam")
 
 TPersistDeclarationT<TEnumParam> TEnumParam::m_declaration("intEnumParam");
 
@@ -116,12 +116,11 @@ void TNADoubleParam::saveData(TOStream &os)
 
 namespace
 {
-template <typename T>
-class matchesValue
+template <typename T> class matchesValue
 {
 	T m_v;
 
-public:
+  public:
 	matchesValue(T v) : m_v(v) {}
 	bool operator()(const std::pair<T, std::string> &p) { return m_v == p.first; }
 };
@@ -131,9 +130,9 @@ public:
 
 class TEnumParamImp
 {
-public:
+  public:
 	std::vector<std::pair<int, std::string>> m_items;
-	void copy(std::unique_ptr<TEnumParamImp>& src)
+	void copy(std::unique_ptr<TEnumParamImp> &src)
 	{
 		m_items.clear();
 		std::back_insert_iterator<std::vector<std::pair<int, std::string>>> bii(m_items);
@@ -182,8 +181,7 @@ TEnumParam::TEnumParam(const TEnumParam &src)
 
 //---------------------------------------------------------
 
-TEnumParam::TEnumParam()
-	: TNotAnimatableParam<int>(), m_imp(new TEnumParamImp())
+TEnumParam::TEnumParam() : TNotAnimatableParam<int>(), m_imp(new TEnumParamImp())
 
 {
 }

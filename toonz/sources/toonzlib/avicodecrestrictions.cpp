@@ -26,7 +26,7 @@ HIC getCodec(const std::wstring &codecName, int &bpp)
 	inFmt.bmiHeader.biPlanes = 1;
 	inFmt.bmiHeader.biCompression = BI_RGB;
 	for (bpp = 32; (bpp >= 24) && !found; bpp -= 8) {
-		//find the codec.
+		// find the codec.
 		inFmt.bmiHeader.biBitCount = bpp;
 		for (int i = 0; ICInfo(fccType, i, &icinfo); i++) {
 			hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_COMPRESS);
@@ -87,11 +87,12 @@ void AviCodecRestrictions::getRestrictions(const std::wstring &codecName, QStrin
 		restrictions = QObject::tr("No restrictions for uncompressed avi video");
 		return;
 	}
-	//find the codec
+	// find the codec
 	int bpp;
 	HIC hic = getCodec(codecName, bpp);
 	if (!hic) {
-		restrictions = QObject::tr("It is not possible to communicate with the codec.\n Probably the codec cannot work correctly.");
+		restrictions = QObject::tr("It is not possible to communicate with the codec.\n Probably "
+								   "the codec cannot work correctly.");
 		return;
 	}
 
@@ -115,25 +116,30 @@ void AviCodecRestrictions::getRestrictions(const std::wstring &codecName, QStrin
 	bi.bmiHeader.biBitCount = bpp;
 	for (i = 3; i >= 0; i--) {
 		bi.bmiHeader.biWidth = lx + (1 << i);
-		bi.bmiHeader.biSizeImage = ((bi.bmiHeader.biWidth * bi.bmiHeader.biBitCount + 31) / 32) * 4 * ly;
+		bi.bmiHeader.biSizeImage =
+			((bi.bmiHeader.biWidth * bi.bmiHeader.biBitCount + 31) / 32) * 4 * ly;
 
 		if (ICERR_OK != ICCompressQuery(hic, &bi.bmiHeader, NULL))
 			break;
 	}
 	if (i >= 0)
-		restrictions = QObject::tr("video width must be a multiple of %1").arg(QString::number(1 << (i + 1)));
+		restrictions =
+			QObject::tr("video width must be a multiple of %1").arg(QString::number(1 << (i + 1)));
 
 	// check the y lenght
 	bi.bmiHeader.biWidth = 640;
 	for (i = 3; i >= 0; i--) {
 		bi.bmiHeader.biHeight = ly + (1 << i);
-		bi.bmiHeader.biSizeImage = ((lx * bi.bmiHeader.biBitCount + 31) / 32) * 4 * bi.bmiHeader.biHeight;
+		bi.bmiHeader.biSizeImage =
+			((lx * bi.bmiHeader.biBitCount + 31) / 32) * 4 * bi.bmiHeader.biHeight;
 
 		if (ICERR_OK != ICCompressQuery(hic, &bi.bmiHeader, NULL))
 			break;
 	}
 	if (i >= 0)
-		restrictions = restrictions + "\n" + QObject::tr("video lenght must be a multiple of %1").arg(QString::number(1 << (i + 1)));
+		restrictions =
+			restrictions + "\n" +
+			QObject::tr("video lenght must be a multiple of %1").arg(QString::number(1 << (i + 1)));
 
 	ICClose(hic);
 
@@ -145,12 +151,13 @@ void AviCodecRestrictions::getRestrictions(const std::wstring &codecName, QStrin
 
 //-----------------------------------------------------------------------------
 
-bool AviCodecRestrictions::canWriteMovie(const std::wstring &codecName, const TDimension &resolution)
+bool AviCodecRestrictions::canWriteMovie(const std::wstring &codecName,
+										 const TDimension &resolution)
 {
 	if (codecName == L"Uncompressed") {
 		return true;
 	}
-	//find the codec
+	// find the codec
 	int bpp;
 	HIC hic = getCodec(codecName, bpp);
 	if (!hic)
@@ -169,7 +176,7 @@ bool AviCodecRestrictions::canBeConfigured(const std::wstring &codecName)
 	if (codecName == L"Uncompressed")
 		return false;
 
-	//find the codec
+	// find the codec
 	int bpp;
 	HIC hic = getCodec(codecName, bpp);
 	if (!hic)
@@ -187,7 +194,7 @@ void AviCodecRestrictions::openConfiguration(const std::wstring &codecName, void
 	if (codecName == L"Uncompressed")
 		return;
 
-	//find the codec
+	// find the codec
 	int bpp;
 	HIC hic = getCodec(codecName, bpp);
 	if (!hic)
@@ -219,7 +226,7 @@ QMap<std::wstring, bool> AviCodecRestrictions::getUsableCodecs(const TDimension 
 	inFmt.bmiHeader.biCompression = BI_RGB;
 	int bpp;
 	for (bpp = 32; (bpp >= 24); bpp -= 8) {
-		//find the codec.
+		// find the codec.
 		inFmt.bmiHeader.biBitCount = bpp;
 		for (int i = 0; ICInfo(fccType, i, &icinfo); i++) {
 			hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_COMPRESS);
@@ -229,7 +236,8 @@ QMap<std::wstring, bool> AviCodecRestrictions::getUsableCodecs(const TDimension 
 			WideCharToMultiByte(CP_ACP, 0, icinfo.szName, -1, name, sizeof(name), 0, 0);
 
 			std::wstring compressorName;
-			compressorName = toWideString(std::string(name) + " '" + toString(bpp) + "' " + std::string(descr));
+			compressorName =
+				toWideString(std::string(name) + " '" + toString(bpp) + "' " + std::string(descr));
 
 			if (hic) {
 				if (ICCompressQuery(hic, &inFmt, NULL) != ICERR_OK) {

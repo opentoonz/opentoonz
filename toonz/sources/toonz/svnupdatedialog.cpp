@@ -31,11 +31,11 @@
 //-----------------------------------------------------------------------------
 
 SVNUpdateDialog::SVNUpdateDialog(QWidget *parent, const QString &workingDir,
-								 const QStringList &files, int sceneIconsCount,
-								 bool isFolderOnly,
-								 bool updateToRevision,
-								 bool nonRecursive)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_updateSceneContentsCheckBox(0), m_workingDir(workingDir), m_files(files), m_updateToRevision(updateToRevision), m_nonRecursive(nonRecursive), m_sceneIconsCount(sceneIconsCount), m_someSceneIsMissing(false)
+								 const QStringList &files, int sceneIconsCount, bool isFolderOnly,
+								 bool updateToRevision, bool nonRecursive)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_updateSceneContentsCheckBox(0),
+	  m_workingDir(workingDir), m_files(files), m_updateToRevision(updateToRevision),
+	  m_nonRecursive(nonRecursive), m_sceneIconsCount(sceneIconsCount), m_someSceneIsMissing(false)
 {
 	setModal(false);
 	setMinimumSize(300, 180);
@@ -91,7 +91,8 @@ SVNUpdateDialog::SVNUpdateDialog(QWidget *parent, const QString &workingDir,
 		m_updateSceneContentsCheckBox->setChecked(false);
 		m_updateSceneContentsCheckBox->setText(tr("Get Scene Contents"));
 		m_updateSceneContentsCheckBox->hide();
-		connect(m_updateSceneContentsCheckBox, SIGNAL(toggled(bool)), this, SLOT(onUpdateSceneContentsToggled(bool)));
+		connect(m_updateSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+				SLOT(onUpdateSceneContentsToggled(bool)));
 
 		checkBoxLayout->addStretch();
 		checkBoxLayout->addWidget(m_updateSceneContentsCheckBox);
@@ -127,7 +128,8 @@ SVNUpdateDialog::SVNUpdateDialog(QWidget *parent, const QString &workingDir,
 	connect(&m_thread, SIGNAL(error(const QString &)), this, SLOT(onError(const QString &)));
 
 	// 1. Getting status
-	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onStatusRetrieved(const QString &)));
+	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+			SLOT(onStatusRetrieved(const QString &)));
 	m_thread.getSVNStatus(m_workingDir, m_files, true, false, true);
 }
 
@@ -147,9 +149,12 @@ void SVNUpdateDialog::onStatusRetrieved(const QString &xmlResponse)
 	for (int i = 0; i < fileSize; i++) {
 		if (m_filesToUpdate.at(i).endsWith(".tnz")) {
 			if (fileSize == 1)
-				m_textLabel->setText(tr("%1 items to update.").arg(m_filesToUpdate.size() + m_sceneResources.size()));
+				m_textLabel->setText(tr("%1 items to update.")
+										 .arg(m_filesToUpdate.size() + m_sceneResources.size()));
 			else
-				m_textLabel->setText(tr("%1 items to update.").arg(m_filesToUpdate.size() + m_sceneResources.size() - m_sceneIconsCount));
+				m_textLabel->setText(
+					tr("%1 items to update.")
+						.arg(m_filesToUpdate.size() + m_sceneResources.size() - m_sceneIconsCount));
 			if (m_updateSceneContentsCheckBox && !m_someSceneIsMissing)
 				m_updateSceneContentsCheckBox->show();
 			m_updateButton->show();
@@ -160,7 +165,8 @@ void SVNUpdateDialog::onStatusRetrieved(const QString &xmlResponse)
 
 	if (m_updateToRevision) {
 		if (m_filesWithConflict.count() > 0) {
-			m_textLabel->setText(tr("Some items are currently modified in your working copy.\nPlease commit or revert changes first."));
+			m_textLabel->setText(tr("Some items are currently modified in your working "
+									"copy.\nPlease commit or revert changes first."));
 			m_textLabel->show();
 			switchToCloseButton();
 			return;
@@ -207,16 +213,19 @@ void SVNUpdateDialog::checkFiles()
 		if ((m_updateToRevision && s.m_item == "modified") ||
 			(s.m_item == "modified" && s.m_repoStatus == "modified"))
 			m_filesWithConflict.prepend(s.m_path);
-		else if (s.m_item == "none" || s.m_item == "missing" ||
-				 s.m_repoStatus == "modified" || s.m_repoStatus == "modified") {
-			if (s.m_path.endsWith(".tnz") && (s.m_item == "missing" || s.m_item == "none" && s.m_repoStatus == "added")) {
-				TFilePath scenePath = TFilePath(m_workingDir.toStdWString()) + s.m_path.toStdWString();
+		else if (s.m_item == "none" || s.m_item == "missing" || s.m_repoStatus == "modified" ||
+				 s.m_repoStatus == "modified") {
+			if (s.m_path.endsWith(".tnz") &&
+				(s.m_item == "missing" || s.m_item == "none" && s.m_repoStatus == "added")) {
+				TFilePath scenePath =
+					TFilePath(m_workingDir.toStdWString()) + s.m_path.toStdWString();
 				TFilePath iconPath = ToonzScene::getIconPath(scenePath);
 				QDir dir(m_workingDir);
 #ifdef MACOSX
 				m_filesToUpdate.append(dir.relativeFilePath(toQString(iconPath)));
 #else
-				m_filesToUpdate.append(dir.relativeFilePath(toQString(iconPath)).replace("/", "\\"));
+				m_filesToUpdate.append(
+					dir.relativeFilePath(toQString(iconPath)).replace("/", "\\"));
 #endif
 				m_sceneIconsCount++;
 				m_someSceneIsMissing = true;
@@ -264,7 +273,8 @@ void SVNUpdateDialog::updateFiles()
 		args << "--non-recursive";
 
 	m_thread.disconnect(SIGNAL(done(const QString &)));
-	connect(&m_thread, SIGNAL(outputRetrieved(const QString &)), SLOT(addOutputText(const QString &)));
+	connect(&m_thread, SIGNAL(outputRetrieved(const QString &)),
+			SLOT(addOutputText(const QString &)));
 	connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onUpdateDone(const QString &)));
 	m_thread.executeCommand(m_workingDir, "svn", args, false);
 }
@@ -325,7 +335,8 @@ void SVNUpdateDialog::onUpdateToRevisionButtonClicked()
 
 	args << "-r" << revisionString;
 
-	connect(&m_thread, SIGNAL(outputRetrieved(const QString &)), SLOT(addOutputText(const QString &)));
+	connect(&m_thread, SIGNAL(outputRetrieved(const QString &)),
+			SLOT(addOutputText(const QString &)));
 	connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onUpdateDone(const QString &)));
 	m_thread.executeCommand(m_workingDir, "svn", args, false);
 }
@@ -435,7 +446,10 @@ void SVNUpdateDialog::onUpdateSceneContentsToggled(bool checked)
 	}
 
 	if (m_filesToUpdate.size() == 1)
-		m_textLabel->setText(tr("%1 items to update.").arg(m_filesToUpdate.size() + m_sceneResources.size()));
+		m_textLabel->setText(
+			tr("%1 items to update.").arg(m_filesToUpdate.size() + m_sceneResources.size()));
 	else
-		m_textLabel->setText(tr("%1 items to update.").arg(m_filesToUpdate.size() + m_sceneResources.size() - m_sceneIconsCount));
+		m_textLabel->setText(
+			tr("%1 items to update.")
+				.arg(m_filesToUpdate.size() + m_sceneResources.size() - m_sceneIconsCount));
 }

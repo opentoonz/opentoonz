@@ -25,7 +25,9 @@ double Player::m_onionSkinBackSize = 0;
 //-----------------------------------------------------------------------------
 
 Stage::Player::Player()
-	: m_placement(), m_dpiAff(), m_z(0), m_onionSkinDistance(c_noOnionSkin), m_ancestorColumnIndex(-1), m_isCurrentColumn(false), m_isCurrentXsheetLevel(false), m_sl(), m_xsh(), m_column(-1), m_frame(0), m_isPlaying(false), m_opacity(255), m_bingoOrder(0)
+	: m_placement(), m_dpiAff(), m_z(0), m_onionSkinDistance(c_noOnionSkin),
+	  m_ancestorColumnIndex(-1), m_isCurrentColumn(false), m_isCurrentXsheetLevel(false), m_sl(),
+	  m_xsh(), m_column(-1), m_frame(0), m_isPlaying(false), m_opacity(255), m_bingoOrder(0)
 {
 }
 
@@ -44,7 +46,8 @@ TImageP Stage::Player::image() const
 			id = id + "_rasterized";
 	}
 
-	if (TXshSimpleLevel::m_fillFullColorRaster && (slType == OVL_XSHLEVEL || slType == TZI_XSHLEVEL))
+	if (TXshSimpleLevel::m_fillFullColorRaster &&
+		(slType == OVL_XSHLEVEL || slType == TZI_XSHLEVEL))
 		id = id + "_filled";
 
 	ImageLoader::BuildExtData extData(m_sl, m_fid);
@@ -57,7 +60,8 @@ DrawableTextureDataP Stage::Player::texture() const
 {
 	if (m_sl) {
 		// Ask the sLevel directly
-		return texture_utils::getTextureData(m_sl, m_fid, -1); // -1 stands for 'current subsampling'
+		return texture_utils::getTextureData(m_sl, m_fid,
+											 -1); // -1 stands for 'current subsampling'
 	}
 
 	// The level is supposedly a sub-xsheet one. It means we have to build the texture

@@ -22,16 +22,19 @@ class VDVideoDecompressor;
 
 class TLevelWriterAvi : public TLevelWriter
 {
-public:
+  public:
 	TLevelWriterAvi(const TFilePath &path, TPropertyGroup *winfo);
 	~TLevelWriterAvi();
 	TImageWriterP getFrameWriter(TFrameId fid);
 
 	void saveSoundTrack(TSoundTrack *st);
 	void save(const TImageP &image, int frameIndex);
-	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo) { return new TLevelWriterAvi(f, winfo); }
+	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo)
+	{
+		return new TLevelWriterAvi(f, winfo);
+	}
 
-private:
+  private:
 	TThread::Mutex m_mutex;
 #ifdef _WIN32
 	PAVIFILE m_aviFile;
@@ -54,8 +57,8 @@ private:
 	void doSaveSoundTrack();
 	void searchForCodec();
 #ifdef _WIN32
-	int compressFrame(BITMAPINFOHEADER *outHeader, void **bufferOut, int frameIndex,
-					  DWORD flagsIn, DWORD &flagsOut);
+	int compressFrame(BITMAPINFOHEADER *outHeader, void **bufferOut, int frameIndex, DWORD flagsIn,
+					  DWORD &flagsOut);
 #endif
 	void createBitmap(int lx, int ly);
 };
@@ -68,7 +71,7 @@ private:
 
 class TLevelReaderAvi : public TLevelReader
 {
-public:
+  public:
 	TLevelReaderAvi(const TFilePath &path);
 	~TLevelReaderAvi();
 	TImageReaderP getFrameReader(TFrameId fid);
@@ -81,14 +84,15 @@ public:
 	void *m_decompressedBuffer;
 
 #ifdef _WIN32
-private:
+  private:
 	PAVISTREAM m_videoStream;
 	BITMAPINFO *m_srcBitmapInfo, *m_dstBitmapInfo;
 	HIC m_hic;
 	int IOError, m_prevFrame;
 
 	int readFrameFromStream(void *bufferOut, DWORD &bufferSize, int frameIndex) const;
-	DWORD decompressFrame(void *srcBuffer, int srcSize, void *dstBuffer, int currentFrame, int desiredFrame);
+	DWORD decompressFrame(void *srcBuffer, int srcSize, void *dstBuffer, int currentFrame,
+						  int desiredFrame);
 	HIC findCandidateDecompressor();
 #endif
 };
@@ -103,11 +107,11 @@ namespace Tiio
 {
 class AviWriterProperties : public TPropertyGroup
 {
-public:
+  public:
 	AviWriterProperties();
 	TEnumProperty m_codec;
 	static TEnumProperty m_defaultCodec;
 };
 }
 
-#endif //TIIO_AVI_H
+#endif // TIIO_AVI_H

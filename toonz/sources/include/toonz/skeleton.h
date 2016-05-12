@@ -24,16 +24,15 @@ class TStageObject;
 class DVAPI Skeleton
 {
 
-public:
+  public:
 	class DVAPI Bone
 	{
-	public:
-		enum PinnedStatus { FREE,
-							PINNED,
-							TEMP_PINNED };
+	  public:
+		enum PinnedStatus { FREE, PINNED, TEMP_PINNED };
 
 		Bone(TStageObject *pegbar, const TPointD &center)
-			: m_parent(0), m_stageObject(pegbar), m_center(center), m_selected(false), m_pinnedStatus(FREE)
+			: m_parent(0), m_stageObject(pegbar), m_center(center), m_selected(false),
+			  m_pinnedStatus(FREE)
 		{
 		}
 
@@ -41,7 +40,10 @@ public:
 		Bone *getParent() const { return m_parent; }
 
 		int getChildCount() const { return (int)m_children.size(); }
-		Bone *getChild(int index) const { return 0 <= index && index < getChildCount() ? m_children[index] : 0; }
+		Bone *getChild(int index) const
+		{
+			return 0 <= index && index < getChildCount() ? m_children[index] : 0;
+		}
 
 		TStageObject *getStageObject() const { return m_stageObject; }
 		int getColumnIndex() const;
@@ -53,30 +55,29 @@ public:
 		PinnedStatus getPinnedStatus() const { return m_pinnedStatus; }
 		void setPinnedStatus(PinnedStatus pinnedStatus) { m_pinnedStatus = pinnedStatus; }
 
-	private:
+	  private:
 		Bone *m_parent;
 		std::vector<Bone *> m_children;
 		TStageObject *m_stageObject;
 		TPointD m_center; // position of the rotation center of the stageobject, i.e. the "joint"
-		bool m_selected;  // true if the bone belongs to the active chain (i.e. handle <-> pinned ponts)
+		bool m_selected;  // true if the bone belongs to the active chain (i.e. handle <-> pinned
+						  // ponts)
 		PinnedStatus m_pinnedStatus;
 
 	}; // class Bone
 
-private:
+  private:
 	std::vector<Bone *> m_bones;
 	Bone *m_rootBone;
 
-public:
+  public:
 	Skeleton();
 	~Skeleton();
 
 	//! create a skeleton containing 'col'.
 	//! tempPinnedColumns contains the column indices of the temporarly pinned bones
-	void build(
-		TXsheet *xsh,
-		int row, int col,
-		const std::set<int> &tempPinnedColumns = std::set<int>());
+	void build(TXsheet *xsh, int row, int col,
+			   const std::set<int> &tempPinnedColumns = std::set<int>());
 
 	//! reset the skeleton
 	void clear();

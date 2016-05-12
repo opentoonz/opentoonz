@@ -31,8 +31,7 @@ namespace
 {
 //-----------------------------------------------------------------------------
 
-void copyStylesWithoutUndo(TPaletteP palette, int pageIndex,
-						   std::set<int> *styleIndicesInPage)
+void copyStylesWithoutUndo(TPaletteP palette, int pageIndex, std::set<int> *styleIndicesInPage)
 {
 	if (!palette || pageIndex < 0)
 		return;
@@ -55,13 +54,13 @@ void copyStylesWithoutUndo(TPaletteP palette, int pageIndex,
 
 //-----------------------------------------------------------------------------
 
-bool pasteStylesWithoutUndo(TPaletteP palette, int pageIndex,
-							std::set<int> *styleIndicesInPage)
+bool pasteStylesWithoutUndo(TPaletteP palette, int pageIndex, std::set<int> *styleIndicesInPage)
 {
 	// page = pagina corrente
 	TPalette::Page *page = palette->getPage(pageIndex);
 	assert(page);
-	// cerco il punto di inserimento (primo stile selezionato oppure dopo l'ultimo stile della pagina
+	// cerco il punto di inserimento (primo stile selezionato oppure dopo l'ultimo stile della
+	// pagina
 	// se nulla e' selezionato)
 	int indexInPage = page->getStyleCount();
 	if (!styleIndicesInPage->empty())
@@ -100,8 +99,7 @@ bool pasteStylesWithoutUndo(TPaletteP palette, int pageIndex,
 
 //-----------------------------------------------------------------------------
 
-void deleteStylesWithoutUndo(TPaletteP palette, int pageIndex,
-							 std::set<int> *styleIndicesInPage)
+void deleteStylesWithoutUndo(TPaletteP palette, int pageIndex, std::set<int> *styleIndicesInPage)
 {
 	int n = styleIndicesInPage->size();
 	if (n == 0)
@@ -145,8 +143,7 @@ void deleteStylesWithoutUndo(TPaletteP palette, int pageIndex,
 
 //-----------------------------------------------------------------------------
 
-void cutStylesWithoutUndo(TPaletteP palette, int pageIndex,
-						  std::set<int> *styleIndicesInPage)
+void cutStylesWithoutUndo(TPaletteP palette, int pageIndex, std::set<int> *styleIndicesInPage)
 {
 	copyStylesWithoutUndo(palette, pageIndex, styleIndicesInPage);
 	deleteStylesWithoutUndo(palette, pageIndex, styleIndicesInPage);
@@ -161,10 +158,8 @@ class CopyStylesUndo : public TUndo
 	QMimeData *m_oldData;
 	QMimeData *m_newData;
 
-public:
-	CopyStylesUndo(QMimeData *oldData,
-				   QMimeData *newData)
-		: m_oldData(oldData), m_newData(newData)
+  public:
+	CopyStylesUndo(QMimeData *oldData, QMimeData *newData) : m_oldData(oldData), m_newData(newData)
 	{
 	}
 
@@ -180,10 +175,7 @@ public:
 		clipboard->setMimeData(cloneData(m_newData), QClipboard::Clipboard);
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 };
 
 //=============================================================================
@@ -194,37 +186,26 @@ class PasteStylesUndo : public TUndo
 {
 	TStyleSelection *m_selection;
 
-public:
-	PasteStylesUndo(TStyleSelection *selection)
-		: m_selection(selection)
-	{
-	}
+  public:
+	PasteStylesUndo(TStyleSelection *selection) : m_selection(selection) {}
 
-	~PasteStylesUndo()
-	{
-		delete m_selection;
-	}
+	~PasteStylesUndo() { delete m_selection; }
 
 	void undo() const
 	{
 		std::set<int> styleIndicesInPage = m_selection->getIndicesInPage();
-		cutStylesWithoutUndo(m_selection->getPalette(),
-							 m_selection->getPageIndex(),
+		cutStylesWithoutUndo(m_selection->getPalette(), m_selection->getPageIndex(),
 							 &styleIndicesInPage);
 	}
 
 	void redo() const
 	{
 		std::set<int> styleIndicesInPage = m_selection->getIndicesInPage();
-		pasteStylesWithoutUndo(m_selection->getPalette(),
-							   m_selection->getPageIndex(),
+		pasteStylesWithoutUndo(m_selection->getPalette(), m_selection->getPageIndex(),
 							   &styleIndicesInPage);
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 };
 
 //=============================================================================
@@ -236,16 +217,13 @@ class DeleteStylesUndo : public TUndo
 	TStyleSelection *m_selection;
 	QMimeData *m_data;
 
-public:
+  public:
 	DeleteStylesUndo(TStyleSelection *selection, QMimeData *data)
 		: m_selection(selection), m_data(data)
 	{
 	}
 
-	~DeleteStylesUndo()
-	{
-		delete m_selection;
-	}
+	~DeleteStylesUndo() { delete m_selection; }
 
 	void undo() const
 	{
@@ -255,8 +233,7 @@ public:
 		clipboard->setMimeData(cloneData(m_data), QClipboard::Clipboard);
 
 		std::set<int> styleIndicesInPage = m_selection->getIndicesInPage();
-		pasteStylesWithoutUndo(m_selection->getPalette(),
-							   m_selection->getPageIndex(),
+		pasteStylesWithoutUndo(m_selection->getPalette(), m_selection->getPageIndex(),
 							   &styleIndicesInPage);
 
 		clipboard->setMimeData(oldData, QClipboard::Clipboard);
@@ -265,15 +242,11 @@ public:
 	void redo() const
 	{
 		std::set<int> styleIndicesInPage = m_selection->getIndicesInPage();
-		deleteStylesWithoutUndo(m_selection->getPalette(),
-								m_selection->getPageIndex(),
+		deleteStylesWithoutUndo(m_selection->getPalette(), m_selection->getPageIndex(),
 								&styleIndicesInPage);
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 };
 
 //=============================================================================
@@ -285,22 +258,18 @@ class CutStylesUndo : public TUndo
 	TStyleSelection *m_selection;
 	QMimeData *m_oldData;
 
-public:
+  public:
 	CutStylesUndo(TStyleSelection *selection, QMimeData *data)
 		: m_selection(selection), m_oldData(data)
 	{
 	}
 
-	~CutStylesUndo()
-	{
-		delete m_selection;
-	}
+	~CutStylesUndo() { delete m_selection; }
 
 	void undo() const
 	{
 		std::set<int> styleIndicesInPage = m_selection->getIndicesInPage();
-		pasteStylesWithoutUndo(m_selection->getPalette(),
-							   m_selection->getPageIndex(),
+		pasteStylesWithoutUndo(m_selection->getPalette(), m_selection->getPageIndex(),
 							   &styleIndicesInPage);
 		QClipboard *clipboard = QApplication::clipboard();
 		clipboard->setMimeData(cloneData(m_oldData), QClipboard::Clipboard);
@@ -309,15 +278,11 @@ public:
 	void redo() const
 	{
 		std::set<int> styleIndicesInPage = m_selection->getIndicesInPage();
-		cutStylesWithoutUndo(m_selection->getPalette(),
-							 m_selection->getPageIndex(),
+		cutStylesWithoutUndo(m_selection->getPalette(), m_selection->getPageIndex(),
 							 &styleIndicesInPage);
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 };
 
 //-----------------------------------------------------------------------------
@@ -328,8 +293,7 @@ public:
 // TStyleSelection
 //-----------------------------------------------------------------------------
 
-TStyleSelection::TStyleSelection()
-	: m_palette(0), m_pageIndex(-1)
+TStyleSelection::TStyleSelection() : m_palette(0), m_pageIndex(-1)
 {
 }
 
@@ -362,10 +326,7 @@ void TStyleSelection::select(const TPaletteP &palette, int pageIndex)
 
 //-------------------------------------------------------------------
 
-void TStyleSelection::select(const TPaletteP &palette,
-							 int pageIndex,
-							 int styleIndexInPage,
-							 bool on)
+void TStyleSelection::select(const TPaletteP &palette, int pageIndex, int styleIndexInPage, bool on)
 {
 	if (on) {
 		if (m_palette.getPointer() != palette.getPointer() || pageIndex != m_pageIndex)
@@ -379,12 +340,9 @@ void TStyleSelection::select(const TPaletteP &palette,
 
 //-------------------------------------------------------------------
 
-bool TStyleSelection::isSelected(const TPaletteP &palette,
-								 int pageIndex,
-								 int id) const
+bool TStyleSelection::isSelected(const TPaletteP &palette, int pageIndex, int id) const
 {
-	return m_palette.getPointer() == palette.getPointer() &&
-		   m_pageIndex == pageIndex &&
+	return m_palette.getPointer() == palette.getPointer() && m_pageIndex == pageIndex &&
 		   m_styleIndicesInPage.find(id) != m_styleIndicesInPage.end();
 }
 
@@ -392,8 +350,7 @@ bool TStyleSelection::isSelected(const TPaletteP &palette,
 
 bool TStyleSelection::isPageSelected(const TPaletteP &palette, int pageIndex) const
 {
-	return m_palette.getPointer() == palette.getPointer() &&
-		   m_pageIndex == pageIndex;
+	return m_palette.getPointer() == palette.getPointer() && m_pageIndex == pageIndex;
 }
 //-------------------------------------------------------------------
 
@@ -510,7 +467,7 @@ class UndoPasteValues : public TUndo
 	TPaletteP m_palette;
 	class Item
 	{
-	public:
+	  public:
 		int m_index;
 		TColorStyle *m_oldStyle;
 		TColorStyle *m_newStyle;
@@ -527,16 +484,10 @@ class UndoPasteValues : public TUndo
 
 	std::vector<Item *> m_items;
 
-public:
-	UndoPasteValues(const TPaletteP &palette)
-		: m_palette(palette)
-	{
-	}
+  public:
+	UndoPasteValues(const TPaletteP &palette) : m_palette(palette) {}
 
-	~UndoPasteValues()
-	{
-		clearPointerContainer(m_items);
-	}
+	~UndoPasteValues() { clearPointerContainer(m_items); }
 
 	void addItem(int index, const TColorStyle *oldStyle, const TColorStyle *newStyle)
 	{
@@ -594,7 +545,8 @@ void TStyleSelection::pasteStylesValue()
 	int i = 0;
 	UndoPasteValues *undo = new UndoPasteValues(m_palette);
 	std::set<int>::iterator it;
-	for (it = m_styleIndicesInPage.begin(); it != m_styleIndicesInPage.end() && i < data->getStyleCount(); ++it, i++) {
+	for (it = m_styleIndicesInPage.begin();
+		 it != m_styleIndicesInPage.end() && i < data->getStyleCount(); ++it, i++) {
 		int styleId = page->getStyleId(*it);
 		undo->addItem(styleId, m_palette->getStyle(styleId), data->getStyle(i));
 		m_palette->setStyle(styleId, data->getStyle(i)->clone());
@@ -622,16 +574,15 @@ class UndoBlendColor : public TUndo
 	std::vector<std::pair<int, TColorStyle *>> m_colorStyles;
 	TPixel32 m_c0, m_c1;
 
-public:
-	UndoBlendColor(TPaletteP palette, int pageIndex, std::vector<std::pair<int, TColorStyle *>> colorStyles,
-				   const TPixel32 &c0, const TPixel32 &c1)
+  public:
+	UndoBlendColor(TPaletteP palette, int pageIndex,
+				   std::vector<std::pair<int, TColorStyle *>> colorStyles, const TPixel32 &c0,
+				   const TPixel32 &c1)
 		: m_palette(palette), m_pageIndex(pageIndex), m_colorStyles(colorStyles), m_c0(c0), m_c1(c1)
 	{
 	}
 
-	~UndoBlendColor()
-	{
-	}
+	~UndoBlendColor() {}
 
 	void undo() const
 	{
@@ -647,7 +598,8 @@ public:
 			QString gname = QString::fromStdWString(st->getGlobalName());
 			if (!gname.isEmpty() && gname[0] != L'-')
 				continue;
-			m_palette->setStyle(page->getStyleId(m_colorStyles[i].first), m_colorStyles[i].second->clone());
+			m_palette->setStyle(page->getStyleId(m_colorStyles[i].first),
+								m_colorStyles[i].second->clone());
 			m_colorStyles[i].second->invalidateIcon();
 		}
 		TApp::instance()->getCurrentPalette()->notifyColorStyleChanged();
@@ -681,7 +633,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 void TStyleSelection::blendStyles()
@@ -778,8 +730,7 @@ void TStyleSelection::toggleLink()
 
 //-----------------------------------------------------------------------------
 
-QByteArray TStyleSelection::toByteArray(int pageIndex,
-										const std::set<int> &indicesInPage,
+QByteArray TStyleSelection::toByteArray(int pageIndex, const std::set<int> &indicesInPage,
 										const QString paletteGlobalName)
 {
 	QByteArray data;
@@ -796,10 +747,8 @@ QByteArray TStyleSelection::toByteArray(int pageIndex,
 
 //-----------------------------------------------------------------------------
 
-void TStyleSelection::fromByteArray(QByteArray &byteArray,
-									int &pageIndex,
-									std::set<int> &indicesInPage,
-									QString &paletteGlobalName)
+void TStyleSelection::fromByteArray(QByteArray &byteArray, int &pageIndex,
+									std::set<int> &indicesInPage, QString &paletteGlobalName)
 {
 	QBuffer dataBuffer(&byteArray);
 	dataBuffer.open(QIODevice::ReadOnly);

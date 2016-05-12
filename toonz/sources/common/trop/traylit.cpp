@@ -12,30 +12,30 @@
 namespace
 {
 
-template <typename T>
-struct RaylitFuncTraits {
-	typedef void (*function_type)(T *, T *, int, int, int, int, const TRect &, const TRect &, const TRop::RaylitParams &);
+template <typename T> struct RaylitFuncTraits {
+	typedef void (*function_type)(T *, T *, int, int, int, int, const TRect &, const TRect &,
+								  const TRop::RaylitParams &);
 };
 
 //--------------------------------------------------------------------------------------------
 
 template <typename T>
-void performStandardRaylit(T *bufIn, T *bufOut,
-						   int dxIn, int dyIn, int dxOut, int dyOut,
+void performStandardRaylit(T *bufIn, T *bufOut, int dxIn, int dyIn, int dxOut, int dyOut,
 						   const TRect &srcRect, const TRect &dstRect,
 						   const TRop::RaylitParams &params)
 {
 	/* NOTATION:  Diagram assuming octant 1
 
-        /                   |
-       /                    |
-      /  - ray_final_y      | octLy
-     / 1                    |
-    +----                   |
-    _____  octLx
+		/                   |
+	   /                    |
+	  /  - ray_final_y      | octLy
+	 / 1                    |
+	+----                   |
+	_____  octLx
 
 
-    So, octLx and octLy are the octant's lx and ly;  ray_final_y is the final height of the ray we're tracing
+	So, octLx and octLy are the octant's lx and ly;  ray_final_y is the final height of the ray
+	we're tracing
   */
 
 	// Build colors-related variables
@@ -47,13 +47,16 @@ void performStandardRaylit(T *bufIn, T *bufOut,
 	/*-- 8bit/16bitの違いを吸収する係数 --*/
 	double factor = max / 255.0;
 
-	double scale = params.m_scale;											// NOTE: These variable initializations are, well,
-	double decay = log(params.m_decay / 100.0 + 1.0) + 1.0;					// heuristic at least. They were probably tested
-	double intensity = 1e8 * log(params.m_intensity / 100.0 + 1.0) / scale; // to be good, but didn't quite make any REAL sense.
-	double smoothness = log(params.m_smoothness * 5.0 / 100.0 + 1.0);		//
-																			// They could be done MUCH better, but changing them
+	double scale = params.m_scale; // NOTE: These variable initializations are, well,
+	double decay =
+		log(params.m_decay / 100.0 + 1.0) + 1.0; // heuristic at least. They were probably tested
+	double intensity = 1e8 * log(params.m_intensity / 100.0 + 1.0) /
+					   scale; // to be good, but didn't quite make any REAL sense.
+	double smoothness = log(params.m_smoothness * 5.0 / 100.0 + 1.0); //
+	// They could be done MUCH better, but changing them
 	/*-- 1ステップ進んだ時、次のピクセルで光源が無かったときの光の弱まる割合 --*/
-	double neg_delta_p = smoothness * intensity; // would alter the way raylit has been applied until now.
+	double neg_delta_p =
+		smoothness * intensity; // would alter the way raylit has been applied until now.
 	/*-- 1ステップ進んだ時、次のピクセルで光源が有ったときの光の強まる割合 --*/
 	double quot_delta_p = intensity / max; //
 										   // Should be changed at some point, though...
@@ -69,7 +72,8 @@ void performStandardRaylit(T *bufIn, T *bufOut,
 
 	double rayPosIncrementX = 1.0 / scale;
 
-	double sq_z = sq(params.m_lightOriginSrc.z); // We'll be making square distances from p, so square it once now
+	double sq_z = sq(params.m_lightOriginSrc
+						 .z); // We'll be making square distances from p, so square it once now
 
 	// Perform raylit
 	T *pixIn, *pixOut;
@@ -87,8 +91,10 @@ void performStandardRaylit(T *bufIn, T *bufOut,
 		// Trace a single ray of light
 		TPointD rayPos(rayPosIncrementX, rayPosIncrementY);
 
-		for (x = dstRect.x0, y = dstRect.y0, pixIn = bufIn, pixOut = bufOut; (x < dstRect.x1) && (y < dstRect.y1); ++x) {
-			bool insideSrc = (x >= srcRect.x0) && (x < srcRect.x1) && (y >= srcRect.y0) && (y < srcRect.y1);
+		for (x = dstRect.x0, y = dstRect.y0, pixIn = bufIn, pixOut = bufOut;
+			 (x < dstRect.x1) && (y < dstRect.y1); ++x) {
+			bool insideSrc =
+				(x >= srcRect.x0) && (x < srcRect.x1) && (y >= srcRect.y0) && (y < srcRect.y1);
 			if (insideSrc) {
 				// Add a light component depending on source's matte
 				if (pixIn->m == opaque_val)
@@ -97,8 +103,9 @@ void performStandardRaylit(T *bufIn, T *bufOut,
 					if (pixIn->m == transp_val)
 						lightness += intensity; // Full light source - ray enforcing
 					else
-						lightness = tmax(0.0, lightness +														   // Half light source
-												  (params.m_invert ? pixIn->m : (max - pixIn->m)) * quot_delta_p); //   matte-linear enforcing
+						lightness = tmax(0.0, lightness + // Half light source
+												  (params.m_invert ? pixIn->m : (max - pixIn->m)) *
+													  quot_delta_p); //   matte-linear enforcing
 				}
 
 				if (params.m_includeInput) {
@@ -121,12 +128,17 @@ void performStandardRaylit(T *bufIn, T *bufOut,
 			if (insideDst) {
 				// Write the corresponding destination pixel
 				if (lightness > 0.0)
-					value = (int)(factor * lightness / (rayPos.x * pow((double)(sq(rayPos.x) + sq(rayPos.y) + sq_z), decay)) + 0.5); // * ^-d...  0.5 rounds
+					value = (int)(factor * lightness /
+									  (rayPos.x *
+									   pow((double)(sq(rayPos.x) + sq(rayPos.y) + sq_z), decay)) +
+								  0.5); // * ^-d...  0.5 rounds
 				else
 					value = 0;
 
-				//NOTE: pow() could be slow. If that is the case, it could be cached for the whole octant along the longest ray at integer positions,
-				// and then linearly interpolated between those... Have to profile this before resorting to that...
+				// NOTE: pow() could be slow. If that is the case, it could be cached for the whole
+				// octant along the longest ray at integer positions,
+				// and then linearly interpolated between those... Have to profile this before
+				// resorting to that...
 
 				val_r += value * r_fac;
 				val_g += value * g_fac;
@@ -156,8 +168,7 @@ void performStandardRaylit(T *bufIn, T *bufOut,
 //--------------------------------------------------------------------------------------------
 
 template <typename T>
-void performColorRaylit(T *bufIn, T *bufOut,
-						int dxIn, int dyIn, int dxOut, int dyOut,
+void performColorRaylit(T *bufIn, T *bufOut, int dxIn, int dyIn, int dxOut, int dyOut,
 						const TRect &srcRect, const TRect &dstRect,
 						const TRop::RaylitParams &params)
 {
@@ -168,14 +179,17 @@ void performColorRaylit(T *bufIn, T *bufOut,
 	double lightness_r, lightness_g, lightness_b;
 	double factor = max / 255.0;
 
-	double scale = params.m_scale;											// NOTE: These variable initializations are, well,
-	double decay = log(params.m_decay / 100.0 + 1.0) + 1.0;					// heuristic at least. They were probably tested
-	double intensity = 1e8 * log(params.m_intensity / 100.0 + 1.0) / scale; // to be good, but didn't quite make any REAL sense.
-	double smoothness = log(params.m_smoothness * 5.0 / 100.0 + 1.0);		//
-																			// They could be done MUCH better, but changing them
-	double neg_delta_p = smoothness * intensity;							// would alter the way raylit has been applied until now.
-	double quot_delta_p = intensity / max;									//
-																			// Should be changed at some point, though...
+	double scale = params.m_scale; // NOTE: These variable initializations are, well,
+	double decay =
+		log(params.m_decay / 100.0 + 1.0) + 1.0; // heuristic at least. They were probably tested
+	double intensity = 1e8 * log(params.m_intensity / 100.0 + 1.0) /
+					   scale; // to be good, but didn't quite make any REAL sense.
+	double smoothness = log(params.m_smoothness * 5.0 / 100.0 + 1.0); //
+	// They could be done MUCH better, but changing them
+	double neg_delta_p =
+		smoothness * intensity;			   // would alter the way raylit has been applied until now.
+	double quot_delta_p = intensity / max; //
+										   // Should be changed at some point, though...
 
 	// Geometry-related variables
 	int x, y, ray_final_y;
@@ -183,7 +197,8 @@ void performColorRaylit(T *bufIn, T *bufOut,
 
 	double rayPosIncrementX = 1.0 / scale;
 
-	double fac, sq_z = sq(params.m_lightOriginSrc.z); // We'll be making square distances from p, so square it once now
+	double fac, sq_z = sq(params.m_lightOriginSrc
+							  .z); // We'll be making square distances from p, so square it once now
 
 	// Perform raylit
 	T *pixIn, *pixOut;
@@ -202,17 +217,22 @@ void performColorRaylit(T *bufIn, T *bufOut,
 		// Trace a single ray of light
 		TPointD rayPos(rayPosIncrementX, rayPosIncrementY);
 
-		for (x = dstRect.x0, y = dstRect.y0, pixIn = bufIn, pixOut = bufOut; (x < dstRect.x1) && (y < dstRect.y1); ++x) {
-			bool insideSrc = (x >= srcRect.x0) && (x < srcRect.x1) && (y >= srcRect.y0) && (y < srcRect.y1);
+		for (x = dstRect.x0, y = dstRect.y0, pixIn = bufIn, pixOut = bufOut;
+			 (x < dstRect.x1) && (y < dstRect.y1); ++x) {
+			bool insideSrc =
+				(x >= srcRect.x0) && (x < srcRect.x1) && (y >= srcRect.y0) && (y < srcRect.y1);
 			if (insideSrc) {
 				val_r = pixIn->r;
 				val_g = pixIn->g;
 				val_b = pixIn->b;
 				val_m = pixIn->m;
 
-				lightness_r = tmax(0.0, val_r ? lightness_r + val_r * quot_delta_p : lightness_r - neg_delta_p);
-				lightness_g = tmax(0.0, val_g ? lightness_g + val_g * quot_delta_p : lightness_g - neg_delta_p);
-				lightness_b = tmax(0.0, val_b ? lightness_b + val_b * quot_delta_p : lightness_b - neg_delta_p);
+				lightness_r = tmax(0.0, val_r ? lightness_r + val_r * quot_delta_p
+											  : lightness_r - neg_delta_p);
+				lightness_g = tmax(0.0, val_g ? lightness_g + val_g * quot_delta_p
+											  : lightness_g - neg_delta_p);
+				lightness_b = tmax(0.0, val_b ? lightness_b + val_b * quot_delta_p
+											  : lightness_b - neg_delta_p);
 
 				if (!params.m_includeInput)
 					val_r = val_g = val_b = val_m = 0;
@@ -227,10 +247,13 @@ void performColorRaylit(T *bufIn, T *bufOut,
 			bool insideDst = (x >= 0) && (y >= 0);
 			if (insideDst) {
 				// Write the corresponding destination pixel
-				fac = factor / (rayPos.x * pow((double)(sq(rayPos.x) + sq(rayPos.y) + sq_z), decay));
+				fac =
+					factor / (rayPos.x * pow((double)(sq(rayPos.x) + sq(rayPos.y) + sq_z), decay));
 
-				//NOTE: pow() could be slow. If that is the case, it could be cached for the whole octant along the longest ray at integer positions,
-				// and then linearly interpolated between those... Have to profile this before resorting to that...
+				// NOTE: pow() could be slow. If that is the case, it could be cached for the whole
+				// octant along the longest ray at integer positions,
+				// and then linearly interpolated between those... Have to profile this before
+				// resorting to that...
 
 				val_r += l = (int)(fac * lightness_r + 0.5);
 				l_max = l;
@@ -263,8 +286,8 @@ void performColorRaylit(T *bufIn, T *bufOut,
 //--------------------------------------------------------------------------------------------
 /*-- ピザ状に8分割された領域の1つを計算する --*/
 template <typename T>
-void computeOctant(const TRasterPT<T> &src, const TRasterPT<T> &dst,
-				   int octant, const TRop::RaylitParams &params,
+void computeOctant(const TRasterPT<T> &src, const TRasterPT<T> &dst, int octant,
+				   const TRop::RaylitParams &params,
 				   typename RaylitFuncTraits<T>::function_type raylitFunc)
 {
 	// Build octant geometry variables
@@ -289,9 +312,13 @@ void computeOctant(const TRasterPT<T> &src, const TRasterPT<T> &dst,
 	if (octant == 2 || octant == 7)
 		dyIn = 1, dyOut = 1, y0 = tfloor(pOut.x), y1 = lxOut;
 	if (octant == 3 || octant == 6)
-		dyIn = -1, dyOut = -1, y0 = lxOut - tfloor(pOut.x) - 1, y1 = lxOut, tswap(srcRect.x0, srcRect.x1), srcRect.x0 = lxOut - srcRect.x0, srcRect.x1 = lxOut - srcRect.x1;
+		dyIn = -1, dyOut = -1, y0 = lxOut - tfloor(pOut.x) - 1, y1 = lxOut,
+		tswap(srcRect.x0, srcRect.x1), srcRect.x0 = lxOut - srcRect.x0,
+		srcRect.x1 = lxOut - srcRect.x1;
 	if (octant == 4 || octant == 5)
-		dxIn = -1, dxOut = -1, x0 = lxOut - tfloor(pOut.x) - 1, x1 = lxOut, tswap(srcRect.x0, srcRect.x1), srcRect.x0 = lxOut - srcRect.x0, srcRect.x1 = lxOut - srcRect.x1;
+		dxIn = -1, dxOut = -1, x0 = lxOut - tfloor(pOut.x) - 1, x1 = lxOut,
+		tswap(srcRect.x0, srcRect.x1), srcRect.x0 = lxOut - srcRect.x0,
+		srcRect.x1 = lxOut - srcRect.x1;
 
 	// Horizontal octant pairs
 	if (octant == 2 || octant == 3)
@@ -299,9 +326,13 @@ void computeOctant(const TRasterPT<T> &src, const TRasterPT<T> &dst,
 	if (octant == 1 || octant == 4)
 		dyIn = srcWrap, dyOut = dstWrap, y0 = tfloor(pOut.y), y1 = lyOut;
 	if (octant == 5 || octant == 8)
-		dyIn = -srcWrap, dyOut = -dstWrap, y0 = lyOut - tfloor(pOut.y) - 1, y1 = lyOut, tswap(srcRect.y0, srcRect.y1), srcRect.y0 = lyOut - srcRect.y0, srcRect.y1 = lyOut - srcRect.y1;
+		dyIn = -srcWrap, dyOut = -dstWrap, y0 = lyOut - tfloor(pOut.y) - 1, y1 = lyOut,
+		tswap(srcRect.y0, srcRect.y1), srcRect.y0 = lyOut - srcRect.y0,
+		srcRect.y1 = lyOut - srcRect.y1;
 	if (octant == 6 || octant == 7)
-		dxIn = -srcWrap, dxOut = -dstWrap, x0 = lyOut - tfloor(pOut.y) - 1, x1 = lyOut, tswap(srcRect.y0, srcRect.y1), srcRect.y0 = lyOut - srcRect.y0, srcRect.y1 = lyOut - srcRect.y1;
+		dxIn = -srcWrap, dxOut = -dstWrap, x0 = lyOut - tfloor(pOut.y) - 1, x1 = lyOut,
+		tswap(srcRect.y0, srcRect.y1), srcRect.y0 = lyOut - srcRect.y0,
+		srcRect.y1 = lyOut - srcRect.y1;
 
 	/*-- 縦向きのピザ領域を計算する場合は、90度回転してから --*/
 	// Swap x and y axis where necessary
@@ -316,11 +347,7 @@ void computeOctant(const TRasterPT<T> &src, const TRasterPT<T> &dst,
 	if (octLx <= 0 && octLy <= 0)
 		return;
 
-	raylitFunc(
-		bufIn, bufOut,
-		dxIn, dyIn, dxOut, dyOut,
-		srcRect, TRect(x0, y0, x1, y1),
-		params);
+	raylitFunc(bufIn, bufOut, dxIn, dyIn, dxOut, dyOut, srcRect, TRect(x0, y0, x1, y1), params);
 }
 
 //--------------------------------------------------------------------------------------------
@@ -328,15 +355,15 @@ void computeOctant(const TRasterPT<T> &src, const TRasterPT<T> &dst,
 /*
   OCTANTS:
 
-    \ 3 | 2 /
-     \  |  /
-      \ | /
-     4 \|/ 1
-    ----+----
-     5 /|\ 8
-      / | \
-     /  |  \
-    / 6 | 7 \
+	\ 3 | 2 /
+	 \  |  /
+	  \ | /
+	 4 \|/ 1
+	----+----
+	 5 /|\ 8
+	  / | \
+	 /  |  \
+	/ 6 | 7 \
 */
 
 template <typename T>

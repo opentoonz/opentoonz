@@ -30,10 +30,11 @@
 // SVNRevertDialog
 //-----------------------------------------------------------------------------
 
-SVNRevertDialog::SVNRevertDialog(QWidget *parent,
-								 const QString &workingDir, const QStringList &files,
-								 bool folderOnly, int sceneIconAdded)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir), m_files(files), m_revertSceneContentsCheckBox(0), m_folderOnly(folderOnly), m_sceneIconAdded(sceneIconAdded)
+SVNRevertDialog::SVNRevertDialog(QWidget *parent, const QString &workingDir,
+								 const QStringList &files, bool folderOnly, int sceneIconAdded)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir),
+	  m_files(files), m_revertSceneContentsCheckBox(0), m_folderOnly(folderOnly),
+	  m_sceneIconAdded(sceneIconAdded)
 {
 	setModal(false);
 	setMinimumSize(300, 150);
@@ -76,7 +77,8 @@ SVNRevertDialog::SVNRevertDialog(QWidget *parent,
 		QHBoxLayout *checkBoxLayout = new QHBoxLayout;
 		checkBoxLayout->setMargin(0);
 		m_revertSceneContentsCheckBox = new QCheckBox(this);
-		connect(m_revertSceneContentsCheckBox, SIGNAL(toggled(bool)), this, SLOT(onRevertSceneContentsToggled(bool)));
+		connect(m_revertSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+				SLOT(onRevertSceneContentsToggled(bool)));
 		m_revertSceneContentsCheckBox->setChecked(false);
 		m_revertSceneContentsCheckBox->hide();
 		m_revertSceneContentsCheckBox->setText(tr("Revert Scene Contents"));
@@ -105,7 +107,8 @@ SVNRevertDialog::SVNRevertDialog(QWidget *parent,
 	connect(&m_thread, SIGNAL(error(const QString &)), this, SLOT(onError(const QString &)));
 
 	// 1. Getting status
-	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onStatusRetrieved(const QString &)));
+	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+			SLOT(onStatusRetrieved(const QString &)));
 	m_thread.getSVNStatus(m_workingDir);
 }
 
@@ -134,7 +137,9 @@ void SVNRevertDialog::onStatusRetrieved(const QString &xmlResponse)
 		m_textLabel->setText(msg);
 		switchToCloseButton();
 	} else {
-		QString msg = QString(tr("%1 items to revert.")).arg(m_filesToRevert.size() == 1 ? 1 : m_filesToRevert.size() - m_sceneIconAdded);
+		QString msg =
+			QString(tr("%1 items to revert."))
+				.arg(m_filesToRevert.size() == 1 ? 1 : m_filesToRevert.size() - m_sceneIconAdded);
 		m_textLabel->setText(msg);
 
 		m_waitingLabel->hide();
@@ -238,7 +243,9 @@ void SVNRevertDialog::revertFiles()
 	int sceneResourceToRevertSize = m_sceneResources.size();
 	int totalFilesToRevert = fileToRevertSize + sceneResourceToRevertSize;
 	if (totalFilesToRevert > 0) {
-		m_textLabel->setText(tr("Reverting %1 items...").arg(totalFilesToRevert == 1 ? 1 : totalFilesToRevert - m_sceneIconAdded));
+		m_textLabel->setText(
+			tr("Reverting %1 items...")
+				.arg(totalFilesToRevert == 1 ? 1 : totalFilesToRevert - m_sceneIconAdded));
 
 		QStringList args;
 		args << "revert";
@@ -296,17 +303,22 @@ void SVNRevertDialog::onRevertSceneContentsToggled(bool checked)
 			}
 		}
 	}
-	m_textLabel->setText(tr("%1 items to revert.").arg(m_filesToRevert.size() + m_sceneResources.size() == 1 ? 1 : m_filesToRevert.size() + m_sceneResources.size() - m_sceneIconAdded));
+	m_textLabel->setText(
+		tr("%1 items to revert.")
+			.arg(m_filesToRevert.size() + m_sceneResources.size() == 1
+					 ? 1
+					 : m_filesToRevert.size() + m_sceneResources.size() - m_sceneIconAdded));
 }
 
 //=============================================================================
 // SVNRevertFrameRangeDialog
 //-----------------------------------------------------------------------------
 
-SVNRevertFrameRangeDialog::SVNRevertFrameRangeDialog(QWidget *parent,
-													 const QString &workingDir, const QString &file,
+SVNRevertFrameRangeDialog::SVNRevertFrameRangeDialog(QWidget *parent, const QString &workingDir,
+													 const QString &file,
 													 const QString &tempFileName)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir), m_file(file), m_tempFileName(tempFileName)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_workingDir(workingDir),
+	  m_file(file), m_tempFileName(tempFileName)
 {
 	setModal(false);
 	setMinimumSize(300, 150);
@@ -376,7 +388,8 @@ void SVNRevertFrameRangeDialog::revertFiles()
 				TSystem::removeFileOrLevel(pathToRemove);
 		}
 
-		TFilePath hookFilePath = pathToRemove.withName(pathToRemove.getName() + "_hooks").withType("xml");
+		TFilePath hookFilePath =
+			pathToRemove.withName(pathToRemove.getName() + "_hooks").withType("xml");
 		if (TSystem::doesExistFileOrLevel(hookFilePath))
 			TSystem::removeFileOrLevel(hookFilePath);
 	} catch (...) {
@@ -401,7 +414,8 @@ void SVNRevertFrameRangeDialog::revertFiles()
 		connect(&m_thread, SIGNAL(error(const QString &)), this, SLOT(onError(const QString &)));
 
 		// 1. Getting status
-		connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onStatusRetrieved(const QString &)));
+		connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+				SLOT(onStatusRetrieved(const QString &)));
 		m_thread.getSVNStatus(m_workingDir, m_files);
 	} else {
 		m_textLabel->setText(tr("Revert done successfully."));

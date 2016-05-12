@@ -21,8 +21,7 @@ typedef std::pair<int, int> IntPair;
 /*!
   \par x val to square
  */
-template <class T>
-inline T sq(T x)
+template <class T> inline T sq(T x)
 {
 	return x * x;
 }
@@ -118,8 +117,7 @@ inline double degree2rad(double degree)
  \par arg value to test
  \ret -1 if arg is negative, 1 if arg is positive, 0 if arg is zero
  */
-template <class T>
-inline int tsign(T arg)
+template <class T> inline int tsign(T arg)
 {
 	return arg < 0 ? -1 : arg > 0 ? 1 : 0;
 }
@@ -145,18 +143,13 @@ inline bool areAlmostEqual(double a, double b, double err = TConsts::epsilon)
   \par err max distance from value
   \ret bool if value are very similar.
  */
-template <class T>
-inline bool areAlmostEqual(const T &a, const T &b, double err = TConsts::epsilon)
+template <class T> inline bool areAlmostEqual(const T &a, const T &b, double err = TConsts::epsilon)
 {
 	return tdistance(a, b) < err;
 }
 
 struct TDeleteObjectFunctor {
-	template <typename T>
-	void operator()(T *ptr)
-	{
-		delete ptr;
-	}
+	template <typename T> void operator()(T *ptr) { delete ptr; }
 };
 
 //! Clear a container deleting all elements.
@@ -164,10 +157,9 @@ struct TDeleteObjectFunctor {
   Clear a container, but before recall delete for all elements.
   \par c container
   \note the code doesn't work with map because it's impossible
-        to deduce template
+		to deduce template
  */
-template <class T>
-inline void clearPointerContainer(T &c) throw()
+template <class T> inline void clearPointerContainer(T &c) throw()
 {
 	T tmp;
 	std::for_each(c.begin(), c.end(), TDeleteObjectFunctor());

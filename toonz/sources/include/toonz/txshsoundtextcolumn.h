@@ -19,7 +19,8 @@
 #endif
 
 //=============================================================================
-//!The TXshSoundTextColumn class provides a sound column in xsheet and allows its management through cell concept.
+//! The TXshSoundTextColumn class provides a sound column in xsheet and allows its management
+//! through cell concept.
 /*!Inherits \b TXshCellColumn. */
 //=============================================================================
 
@@ -27,7 +28,7 @@ class DVAPI TXshSoundTextColumn : public TXshCellColumn
 {
 	PERSIST_DECLARATION(TXshSoundTextColumn)
 
-public:
+  public:
 	TXshSoundTextColumn();
 	~TXshSoundTextColumn();
 
@@ -49,4 +50,4 @@ template class DV_EXPORT_API TSmartPointerT<TXshSoundTextColumn>;
 #endif
 typedef TSmartPointerT<TXshSoundTextColumn> TXshSoundTextColumnP;
 
-#endif //TXSHSOUNDTEXTCOLUMN_INCLUDED
+#endif // TXSHSOUNDTEXTCOLUMN_INCLUDED

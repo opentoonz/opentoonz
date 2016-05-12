@@ -47,7 +47,7 @@ class PortNameEq
 {
 	std::string m_name;
 
-public:
+  public:
 	PortNameEq(const std::string &name) : m_name(name) {}
 	~PortNameEq() {}
 	bool operator()(const NamePort &np) { return np.first == m_name; }
@@ -86,7 +86,8 @@ TPointD updateDagPosition(const TPointD &pos, const VersionNumber &tnzVersion)
 //
 //------------------------------------------------------------------------------
 
-TFxParamChange::TFxParamChange(TFx *fx, double firstAffectedFrame, double lastAffectedFrame, bool dragging)
+TFxParamChange::TFxParamChange(TFx *fx, double firstAffectedFrame, double lastAffectedFrame,
+							   bool dragging)
 	: TFxChange(fx, firstAffectedFrame, lastAffectedFrame, dragging)
 {
 }
@@ -156,7 +157,7 @@ void TFxPortDynamicGroup::clear()
 
 class TFxImp
 {
-public:
+  public:
 	TFx *m_fx;				 //!< Fx back-pointer
 	TFxImp *m_prev, *m_next; //!< Linked fxs
 
@@ -176,11 +177,10 @@ public:
 
 	static unsigned long m_nextId;
 	unsigned long m_id; //!< Unique fx identifier, per Toonz session.
-	//!< It is intended to be used \b solely to build
-	//!< an internal string description of the fx.
-public:
-	TFxImp(TFx *fx)
-		: m_fx(fx), m_activeTimeRegion(TFxTimeRegion::createUnlimited()), m_id()
+						//!< It is intended to be used \b solely to build
+						//!< an internal string description of the fx.
+  public:
+	TFxImp(TFx *fx) : m_fx(fx), m_activeTimeRegion(TFxTimeRegion::createUnlimited()), m_id()
 	{
 		m_prev = m_next = this;
 	}
@@ -201,7 +201,7 @@ public:
 		return true;
 	}
 
-private:
+  private:
 	// not copyable
 	TFxImp(const TFxImp &);
 	TFxImp &operator=(const TFxImp &);
@@ -219,15 +219,14 @@ unsigned long TFxImp::m_nextId = 0;
 
 class TFxFactory // singleton
 {
-	typedef std::map<std::string,
-					 std::pair<TFxInfo, TFxDeclaration *>> Table;
+	typedef std::map<std::string, std::pair<TFxInfo, TFxDeclaration *>> Table;
 
 	Table m_table;
 	std::vector<std::string> m_map;
 
 	TFxFactory() {}
 
-public:
+  public:
 	static TFxFactory *instance()
 	{
 		static TFxFactory _instance;
@@ -274,8 +273,7 @@ public:
 //
 //------------------------------------------------------------------------------
 
-TFxDeclaration::TFxDeclaration(const TFxInfo &info)
-	: TPersistDeclaration(info.m_name)
+TFxDeclaration::TFxDeclaration(const TFxInfo &info) : TPersistDeclaration(info.m_name)
 {
 	TFxFactory::instance()->add(info, this);
 }
@@ -292,7 +290,8 @@ DEFINE_CLASS_CODE(TFx, 3)
 
 TFx::TFx()
 	: TSmartObject(m_classCode) // TPersist(TFxImp::m_instances)
-	, m_imp(new TFxImp(this))
+	  ,
+	  m_imp(new TFxImp(this))
 {
 }
 
@@ -494,7 +493,8 @@ bool TFx::removeInputPort(const std::string &name)
 {
 	m_imp->m_portTable.erase(name);
 
-	PortArray::iterator it = std::find_if(m_imp->m_portArray.begin(), m_imp->m_portArray.end(), PortNameEq(name));
+	PortArray::iterator it =
+		std::find_if(m_imp->m_portArray.begin(), m_imp->m_portArray.end(), PortNameEq(name));
 	if (it == m_imp->m_portArray.end())
 		return false;
 
@@ -541,7 +541,9 @@ void TFx::clearDynamicPortGroup(int g)
 
 		// Traverse the ports array and remove all ports in the group
 		IsPrefix func = {prefix};
-		m_imp->m_portArray.resize(std::remove_if(m_imp->m_portArray.begin(), m_imp->m_portArray.end(), func) - m_imp->m_portArray.begin());
+		m_imp->m_portArray.resize(
+			std::remove_if(m_imp->m_portArray.begin(), m_imp->m_portArray.end(), func) -
+			m_imp->m_portArray.begin());
 	}
 
 	dg->clear(); // Has ports ownership, so deletes them
@@ -963,8 +965,8 @@ void TFx::saveData(TOStream &os)
 	}
 
 	os.openChild("ports");
-	for (PortTable::iterator pit = m_imp->m_portTable.begin();
-		 pit != m_imp->m_portTable.end(); ++pit) {
+	for (PortTable::iterator pit = m_imp->m_portTable.begin(); pit != m_imp->m_portTable.end();
+		 ++pit) {
 		os.openChild(pit->first);
 		if (pit->second->isConnected())
 			os << TFxP(pit->second->getFx()).getPointer();
@@ -1109,8 +1111,7 @@ TFxTimeRegion::TFxTimeRegion()
 //--------------------------------------------------
 
 //! Creates a time region with specified start (included) and end (\b excluded).
-TFxTimeRegion::TFxTimeRegion(double start, double end)
-	: m_start(start), m_end(end)
+TFxTimeRegion::TFxTimeRegion(double start, double end) : m_start(start), m_end(end)
 {
 }
 
@@ -1118,9 +1119,8 @@ TFxTimeRegion::TFxTimeRegion(double start, double end)
 
 TFxTimeRegion TFxTimeRegion::createUnlimited()
 {
-	return TFxTimeRegion(
-		-(std::numeric_limits<double>::max)(),
-		(std::numeric_limits<double>::max)());
+	return TFxTimeRegion(-(std::numeric_limits<double>::max)(),
+						 (std::numeric_limits<double>::max)());
 }
 
 //--------------------------------------------------

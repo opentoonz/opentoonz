@@ -105,9 +105,8 @@ class FrameCountTask : public TThread::Runnable
 	TFilePath m_path;
 	QDateTime m_modifiedDate;
 
-public:
-	FrameCountTask(const TFilePath &path,
-				   const QDateTime &modifiedDate);
+  public:
+	FrameCountTask(const TFilePath &path, const QDateTime &modifiedDate);
 
 	~FrameCountTask();
 
@@ -115,7 +114,7 @@ public:
 
 	QThread::Priority runningPriority();
 
-public slots:
+  public slots:
 
 	void onStarted(TThread::RunnableP thisTask);
 	void onCanceled(TThread::RunnableP thisTask);
@@ -159,9 +158,11 @@ inline bool isMultipleFrameType(std::string type)
 //-----------------------------------------------------------------------------
 
 #if QT_VERSION >= 0x050500
-FileBrowser::FileBrowser(QWidget *parent, Qt::WindowFlags flags, bool noContextMenu, bool multiSelectionEnabled)
+FileBrowser::FileBrowser(QWidget *parent, Qt::WindowFlags flags, bool noContextMenu,
+						 bool multiSelectionEnabled)
 #else
-FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu, bool multiSelectionEnabled)
+FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu,
+						 bool multiSelectionEnabled)
 #endif
 	: QFrame(parent), m_folderName(0), m_itemViewer(0)
 {
@@ -174,7 +175,8 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu, 
 	QFrame *box = new QFrame(this);
 	QLabel *folderLabel = new QLabel("Folder: ", this);
 	m_folderName = new QLineEdit();
-	m_itemViewer = new DvItemViewer(box, noContextMenu, multiSelectionEnabled, DvItemViewer::Browser);
+	m_itemViewer =
+		new DvItemViewer(box, noContextMenu, multiSelectionEnabled, DvItemViewer::Browser);
 	DvItemViewerTitleBar *titleBar = new DvItemViewerTitleBar(m_itemViewer, box);
 	DvItemViewerButtonBar *buttonBar = new DvItemViewerButtonBar(m_itemViewer, box);
 	DvItemViewerPanel *viewerPanel = m_itemViewer->getPanel();
@@ -198,7 +200,7 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu, 
 
 	m_itemViewer->setModel(this);
 
-	//layout
+	// layout
 	QVBoxLayout *mainLayout = new QVBoxLayout();
 	mainLayout->setMargin(3);
 	mainLayout->setSpacing(2);
@@ -229,13 +231,16 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu, 
 
 	m_mainSplitter->setSizes(QList<int>() << 270 << 500);
 
-	//signal-slot connections
-	bool ret = connect(m_folderTreeView, SIGNAL(currentNodeChanged()), itemViewPlayDelegate, SLOT(resetPlayWidget()));
-	//if the current forder is changed in the folder tree, then update in the item view
-	ret = ret && connect(m_folderTreeView, SIGNAL(currentNodeChanged()), this, SLOT(onTreeFolderChanged()));
+	// signal-slot connections
+	bool ret = connect(m_folderTreeView, SIGNAL(currentNodeChanged()), itemViewPlayDelegate,
+					   SLOT(resetPlayWidget()));
+	// if the current forder is changed in the folder tree, then update in the item view
+	ret = ret && connect(m_folderTreeView, SIGNAL(currentNodeChanged()), this,
+						 SLOT(onTreeFolderChanged()));
 
 	ret = ret && connect(m_itemViewer, SIGNAL(clickedItem(int)), this, SLOT(onClickedItem(int)));
-	ret = ret && connect(m_itemViewer, SIGNAL(selectedItems(const std::set<int> &)), this, SLOT(onSelectedItems(const std::set<int> &)));
+	ret = ret && connect(m_itemViewer, SIGNAL(selectedItems(const std::set<int> &)), this,
+						 SLOT(onSelectedItems(const std::set<int> &)));
 	ret = ret && connect(buttonBar, SIGNAL(folderUp()), this, SLOT(folderUp()));
 	ret = ret && connect(buttonBar, SIGNAL(newFolder()), this, SLOT(newFolder()));
 
@@ -248,17 +253,20 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu, 
 
 	// Version Control instance connection
 	if (Preferences::instance()->isSVNEnabled())
-		ret = ret && connect(VersionControl::instance(), SIGNAL(commandDone(const QStringList &)), this, SLOT(onVersionControlCommandDone(const QStringList &)));
+		ret = ret && connect(VersionControl::instance(), SIGNAL(commandDone(const QStringList &)),
+							 this, SLOT(onVersionControlCommandDone(const QStringList &)));
 
 	// if the folderName is edited, move the current folder accordingly
 	ret = ret && connect(m_folderName, SIGNAL(editingFinished()), this, SLOT(onFolderEdited()));
 
 	// folder history
-	ret = ret && connect(m_folderTreeView, SIGNAL(currentNodeChanged()), this, SLOT(storeFolderHistory()));
+	ret = ret &&
+		  connect(m_folderTreeView, SIGNAL(currentNodeChanged()), this, SLOT(storeFolderHistory()));
 	ret = ret && connect(buttonBar, SIGNAL(folderBack()), this, SLOT(onBackButtonPushed()));
 	ret = ret && connect(buttonBar, SIGNAL(folderFwd()), this, SLOT(onFwdButtonPushed()));
 	// when the history changes, enable/disable the history buttons accordingly
-	ret = ret && connect(this, SIGNAL(historyChanged(bool, bool)), buttonBar, SLOT(onHistoryChanged(bool, bool)));
+	ret = ret && connect(this, SIGNAL(historyChanged(bool, bool)), buttonBar,
+						 SLOT(onHistoryChanged(bool, bool)));
 
 	// store the first item("Root") in the history
 	m_indexHistoryList.append(m_folderTreeView->currentIndex());
@@ -293,7 +301,7 @@ void FileBrowser::onFolderEdited()
 
 	m_folderTreeView->setCurrentIndex(index);
 
-	//expand the folder tree
+	// expand the folder tree
 	QModelIndex tmpIndex = index;
 	while (tmpIndex.isValid()) {
 		m_folderTreeView->expand(tmpIndex);
@@ -316,19 +324,19 @@ void FileBrowser::storeFolderHistory()
 	if (m_indexHistoryList[m_currentPosition] == currentModelIndex)
 		return;
 
-	//If there is no next history item, then create it
+	// If there is no next history item, then create it
 	if (m_currentPosition == m_indexHistoryList.size() - 1) {
 		m_indexHistoryList << currentModelIndex;
 		m_currentPosition++;
 	}
-	//If the next hitory item is the same as the current one, just move to it
+	// If the next hitory item is the same as the current one, just move to it
 	else if (m_indexHistoryList[m_currentPosition + 1] == currentModelIndex) {
 		m_currentPosition++;
 	}
-	//If the next history item is different from the current one, then replace with the new one
+	// If the next history item is different from the current one, then replace with the new one
 	else {
 		int size = m_indexHistoryList.size();
-		//remove the old history items
+		// remove the old history items
 		for (int i = m_currentPosition + 1; i < size; i++)
 			m_indexHistoryList.removeLast();
 		m_indexHistoryList << currentModelIndex;
@@ -441,10 +449,11 @@ void FileBrowser::sortByDataModel(DataType dataType, bool isDiscendent)
 					  boost::bind(locals::indexLess, _1, _2, boost::ref(new2OldIdx)));
 
 			std::vector<int> newSelectedIndices;
-			tcg::substitute(newSelectedIndices, tcg::permuted_range(
-													old2NewIdx,
-													fs->getSelectedIndices() | ba::filtered(
-																				   boost::bind(std::less<int>(), _1, int(old2NewIdx.size())))));
+			tcg::substitute(newSelectedIndices,
+							tcg::permuted_range(
+								old2NewIdx, fs->getSelectedIndices() |
+												ba::filtered(boost::bind(std::less<int>(), _1,
+																		 int(old2NewIdx.size())))));
 
 			fs->select(!newSelectedIndices.empty() ? &newSelectedIndices.front() : 0,
 					   int(newSelectedIndices.size()));
@@ -462,11 +471,13 @@ void FileBrowser::sortByDataModel(DataType dataType, bool isDiscendent)
 		FileSelection *fs = dynamic_cast<FileSelection *>(m_itemViewer->getPanel()->getSelection());
 
 		if (!fs->isEmpty()) {
-			int iCount = int(m_items.size()),
-				lastIdx = iCount - 1;
+			int iCount = int(m_items.size()), lastIdx = iCount - 1;
 
 			std::vector<int> newSelectedIndices;
-			tcg::substitute(newSelectedIndices, fs->getSelectedIndices() | ba::filtered(boost::bind(std::less<int>(), _1, iCount)) | ba::transformed(boost::bind(locals::complement, _1, lastIdx)));
+			tcg::substitute(newSelectedIndices,
+							fs->getSelectedIndices() |
+								ba::filtered(boost::bind(std::less<int>(), _1, iCount)) |
+								ba::transformed(boost::bind(locals::complement, _1, lastIdx)));
 
 			fs->select(!newSelectedIndices.empty() ? &newSelectedIndices.front() : 0,
 					   int(newSelectedIndices.size()));
@@ -507,10 +518,10 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode)
 	if (fp == m_folder)
 		return;
 
-	//set the current folder path
+	// set the current folder path
 	m_folder = fp;
 	m_dayDateString = "";
-	//set the folder name
+	// set the folder name
 	if (fp == TFilePath())
 		m_folderName->setText("");
 	else
@@ -535,9 +546,11 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode)
 				if (node) {
 					TFilePath childFolderPath = node->getPath();
 					if (TFileStatus(childFolderPath).isLink())
-						m_items.push_back(Item(childFolderPath, true, true, QString::fromStdWString(node->getName())));
+						m_items.push_back(Item(childFolderPath, true, true,
+											   QString::fromStdWString(node->getName())));
 					else
-						m_items.push_back(Item(childFolderPath, true, false, QString::fromStdWString(node->getName())));
+						m_items.push_back(Item(childFolderPath, true, false,
+											   QString::fromStdWString(node->getName())));
 				}
 			}
 		}
@@ -550,14 +563,13 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode)
 		TFilePathSet all_files; // for updating m_multiFileItemMap
 
 		TFileStatus fpStatus(fp);
-		//if the item is link, then set the link target of it
+		// if the item is link, then set the link target of it
 		if (fpStatus.isLink()) {
 			QFileInfo info(toQString(fp));
 			setFolder(TFilePath(info.symLinkTarget().toStdWString()));
 			return;
 		}
-		if (fpStatus.doesExist() && fpStatus.isDirectory() &&
-			fpStatus.isReadable()) {
+		if (fpStatus.doesExist() && fpStatus.isDirectory() && fpStatus.isReadable()) {
 			try {
 				TSystem::readDirectory(files, all_files, fp);
 			} catch (...) {
@@ -569,19 +581,15 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode)
 			if (it->getType() == "plt")
 				continue;
 
-			//filter the file
+			// filter the file
 			else if (m_filter.isEmpty()) {
-				if (it->getType() != "tnz" &&
-					it->getType() != "scr" &&
-					it->getType() != "tnzbat" &&
-					it->getType() != "mpath" &&
-					it->getType() != "curve" &&
-					it->getType() != "tpl" &&
-					TFileType::getInfo(*it) == TFileType::UNKNOW_FILE)
+				if (it->getType() != "tnz" && it->getType() != "scr" && it->getType() != "tnzbat" &&
+					it->getType() != "mpath" && it->getType() != "curve" &&
+					it->getType() != "tpl" && TFileType::getInfo(*it) == TFileType::UNKNOW_FILE)
 					continue;
 			} else if (!m_filter.contains(QString::fromStdString(it->getType())))
 				continue;
-			//store the filtered file paths
+			// store the filtered file paths
 			m_items.push_back(Item(*it));
 		}
 
@@ -594,16 +602,19 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode)
 			if (levelName.isLevelName()) {
 				Item &levelItem = m_multiFileItemMap[levelName];
 
-				//TODO: とりあえず残すが、FileInfoの取得に時間がかかるようならオプション化も検討 2015/12/28 shun_iwasawa
+				// TODO: とりあえず残すが、FileInfoの取得に時間がかかるようならオプション化も検討
+				// 2015/12/28 shun_iwasawa
 				QFileInfo fileInfo(QString::fromStdWString(it->getWideString()));
-				//Update level infos
-				if (levelItem.m_creationDate.isNull() || (fileInfo.created() < levelItem.m_creationDate))
+				// Update level infos
+				if (levelItem.m_creationDate.isNull() ||
+					(fileInfo.created() < levelItem.m_creationDate))
 					levelItem.m_creationDate = fileInfo.created();
-				if (levelItem.m_creationDate.isNull() || (fileInfo.lastModified() > levelItem.m_modifiedDate))
+				if (levelItem.m_creationDate.isNull() ||
+					(fileInfo.lastModified() > levelItem.m_modifiedDate))
 					levelItem.m_modifiedDate = fileInfo.lastModified();
 				levelItem.m_fileSize += fileInfo.size();
 
-				//store frameId
+				// store frameId
 				levelItem.m_frameIds.push_back(it->getFrame());
 
 				levelItem.m_frameCount++;
@@ -613,7 +624,8 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode)
 
 	// Set Missing Version Control Items
 	int missingItemCount = 0;
-	DvDirVersionControlNode *node = dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
+	DvDirVersionControlNode *node =
+		dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
 	if (node) {
 		QList<TFilePath> list = node->getMissingFiles();
 		missingItemCount = list.size();
@@ -654,7 +666,7 @@ void FileBrowser::setUnregisteredFolder(const TFilePath &fp)
 {
 	if (fp != TFilePath()) {
 		TFileStatus fpStatus(fp);
-		//if the item is link, then set the link target of it
+		// if the item is link, then set the link target of it
 		if (fpStatus.isLink()) {
 			QFileInfo info(toQString(fp));
 			setFolder(TFilePath(info.symLinkTarget().toStdWString()));
@@ -664,7 +676,7 @@ void FileBrowser::setUnregisteredFolder(const TFilePath &fp)
 		// get both the folder & file list by readDirectory and readDirectory_Dir_ReadExe
 		TFilePathSet folders;
 		TFilePathSet files;
-		//for updating m_multiFileItemMap
+		// for updating m_multiFileItemMap
 		TFilePathSet all_files;
 
 		if (fpStatus.doesExist() && fpStatus.isDirectory() && fpStatus.isReadable()) {
@@ -677,7 +689,7 @@ void FileBrowser::setUnregisteredFolder(const TFilePath &fp)
 
 		TFilePathSet::iterator it;
 
-		//register all folder items
+		// register all folder items
 		for (it = folders.begin(); it != folders.end(); ++it) {
 			if (TFileStatus(*it).isLink())
 				m_items.push_back(Item(*it, true, true));
@@ -690,15 +702,11 @@ void FileBrowser::setUnregisteredFolder(const TFilePath &fp)
 			if (it->getType() == "plt")
 				continue;
 
-			//filtering
+			// filtering
 			else if (m_filter.isEmpty()) {
-				if (it->getType() != "tnz" &&
-					it->getType() != "scr" &&
-					it->getType() != "tnzbat" &&
-					it->getType() != "mpath" &&
-					it->getType() != "curve" &&
-					it->getType() != "tpl" &&
-					TFileType::getInfo(*it) == TFileType::UNKNOW_FILE)
+				if (it->getType() != "tnz" && it->getType() != "scr" && it->getType() != "tnzbat" &&
+					it->getType() != "mpath" && it->getType() != "curve" &&
+					it->getType() != "tpl" && TFileType::getInfo(*it) == TFileType::UNKNOW_FILE)
 					continue;
 			} else if (!m_filter.contains(QString::fromStdString(it->getType())))
 				continue;
@@ -791,11 +799,12 @@ void FileBrowser::readInfo(Item &item)
 			readFrameCount(item);
 
 		item.m_validInfo = true;
-	} else if (fp.isLevelName()) //for levels johndoe..tif etc.
+	} else if (fp.isLevelName()) // for levels johndoe..tif etc.
 	{
 		try {
-			//Find this level's item
-			std::map<TFilePath, Item>::iterator it = m_multiFileItemMap.find(TFilePath(item.m_path.getLevelName()));
+			// Find this level's item
+			std::map<TFilePath, Item>::iterator it =
+				m_multiFileItemMap.find(TFilePath(item.m_path.getLevelName()));
 			if (it == m_multiFileItemMap.end())
 				throw "";
 
@@ -809,13 +818,13 @@ void FileBrowser::readInfo(Item &item)
 			// keep the list of frameIds at the first time and try to reuse it.
 			item.m_frameIds = it->second.m_frameIds;
 
-			//The old way
+			// The old way
 			/*TLevelReaderP lr(fp);
-      item.m_frameCount = lr->loadInfo()->getFrameCount();
-      item.m_creationDate = QDateTime();
-      item.m_modifiedDate = QDateTime();
-      item.m_fileSize = -1;
-      item.m_validInfo = true;*/
+	  item.m_frameCount = lr->loadInfo()->getFrameCount();
+	  item.m_creationDate = QDateTime();
+	  item.m_modifiedDate = QDateTime();
+	  item.m_fileSize = -1;
+	  item.m_validInfo = true;*/
 		} catch (...) {
 			item.m_frameCount = 0;
 		}
@@ -826,9 +835,9 @@ void FileBrowser::readInfo(Item &item)
 
 //-----------------------------------------------------------------------------
 
-//!Frame count needs a special access function for viewable types - for they are
-//!calculated by using a dedicated thread and therefore cannot be simply
-//!classified as *valid* or *invalid* infos...
+//! Frame count needs a special access function for viewable types - for they are
+//! calculated by using a dedicated thread and therefore cannot be simply
+//! classified as *valid* or *invalid* infos...
 void FileBrowser::readFrameCount(Item &item)
 {
 	if (TFileType::isViewable(TFileType::getInfo(item.m_path))) {
@@ -1007,8 +1016,7 @@ bool FileBrowser::renameFile(TFilePath &fp, QString newName)
 	}
 	if (newFp.getType() == "")
 		newFp = newFp.withType(fp.getType());
-	if (newFp.getFrame() != TFrameId::EMPTY_FRAME &&
-		newFp.getFrame() != TFrameId::NO_FRAME) {
+	if (newFp.getFrame() != TFrameId::EMPTY_FRAME && newFp.getFrame() != TFrameId::NO_FRAME) {
 		DVGui::error(tr("Can't set a drawing number"));
 		return false;
 	}
@@ -1034,8 +1042,8 @@ bool FileBrowser::renameFile(TFilePath &fp, QString newName)
 		IconGenerator::instance()->remove(fp);
 		if (fp.getType() == "tnz") {
 			/* TFilePath folder = fp.getParentDir() + (fp.getName() + "_files");
-      TFilePath newFolder = newFp.getParentDir() + (newFp.getName() + "_files");
-      TSystem::renameFile(newFolder, folder);
+	  TFilePath newFolder = newFp.getParentDir() + (newFp.getName() + "_files");
+	  TSystem::renameFile(newFolder, folder);
 */
 			TFilePath sceneIconFp = ToonzScene::getIconPath(fp);
 			TFilePath sceneIconNewFp = ToonzScene::getIconPath(newFp);
@@ -1138,7 +1146,8 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 	menu->addAction(cm->getAction(MI_ShowFolderContents));
 	menu->addAction(cm->getAction(MI_SelectAll));
 	menu->addAction(cm->getAction(MI_FileInfo));
-	if (!clickedFile.isEmpty() && (clickedFile.getType() == "tnz" || clickedFile.getType() == "tab")) {
+	if (!clickedFile.isEmpty() &&
+		(clickedFile.getType() == "tnz" || clickedFile.getType() == "tab")) {
 		menu->addSeparator();
 		menu->addAction(cm->getAction(MI_AddToBatchRenderList));
 		menu->addAction(cm->getAction(MI_AddToBatchCleanupList));
@@ -1160,8 +1169,8 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 				break;
 		if (j == files.size()) {
 			menu->addAction(cm->getAction(MI_ConvertFiles));
-			//iwsw commented out temporarily
-			//menu->addAction(cm->getAction(MI_ToonShadedImageToTLV));
+			// iwsw commented out temporarily
+			// menu->addAction(cm->getAction(MI_ToonShadedImageToTLV));
 		}
 		if (!areFullcolor)
 			menu->addSeparator();
@@ -1173,10 +1182,12 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 	}
 #ifdef LEVO
 
-	if (files.size() == 2 && (files[0].getType() == "tif" || files[0].getType() == "tiff" || files[0].getType() == "png" ||
-							  files[0].getType() == "TIF" || files[0].getType() == "TIFF" || files[0].getType() == "PNG") &&
-		(files[1].getType() == "tif" || files[1].getType() == "tiff" || files[1].getType() == "png" ||
-		 files[1].getType() == "TIF" || files[1].getType() == "TIFF" || files[1].getType() == "PNG")) {
+	if (files.size() == 2 && (files[0].getType() == "tif" || files[0].getType() == "tiff" ||
+							  files[0].getType() == "png" || files[0].getType() == "TIF" ||
+							  files[0].getType() == "TIFF" || files[0].getType() == "PNG") &&
+		(files[1].getType() == "tif" || files[1].getType() == "tiff" ||
+		 files[1].getType() == "png" || files[1].getType() == "TIF" ||
+		 files[1].getType() == "TIFF" || files[1].getType() == "PNG")) {
 		QAction *action = new QAction(tr("Convert to Painted TLV"), menu);
 		ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(convertToPaintedTlv()));
 		menu->addAction(action);
@@ -1196,10 +1207,14 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 		menu->addAction(cm->getAction(MI_ExportScenes));
 	}
 
-	DvDirVersionControlNode *node = dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
+	DvDirVersionControlNode *node =
+		dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
 	if (node) {
 		// Check Version Control Status
-		DvItemListModel::Status status = (DvItemListModel::Status)m_itemViewer->getModel()->getItemData(index, DvItemListModel::VersionControlStatus).toInt();
+		DvItemListModel::Status status =
+			(DvItemListModel::Status)m_itemViewer->getModel()
+				->getItemData(index, DvItemListModel::VersionControlStatus)
+				.toInt();
 
 		// Remove the added actions
 		if (status == DvItemListModel::VC_Missing)
@@ -1218,11 +1233,13 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 				std::string fileType = path.getType();
 				if (fileType == "tlv" || fileType == "pli" || path.getDots() == "..") {
 					action = vcMenu->addAction(tr("Edit Frame Range..."));
-					ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(editFrameRangeVersionControl()));
+					ret = ret && connect(action, SIGNAL(triggered()), this,
+										 SLOT(editFrameRangeVersionControl()));
 				}
 			} else {
 				action = vcMenu->addAction(tr("Edit"));
-				ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(updateAndEditVersionControl()));
+				ret = ret && connect(action, SIGNAL(triggered()), this,
+									 SLOT(updateAndEditVersionControl()));
 			}
 		}
 
@@ -1234,14 +1251,14 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 			ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(revertVersionControl()));
 		}
 
-		if (status == DvItemListModel::VC_ReadOnly ||
-			status == DvItemListModel::VC_ToUpdate) {
+		if (status == DvItemListModel::VC_ReadOnly || status == DvItemListModel::VC_ToUpdate) {
 			action = vcMenu->addAction(tr("Get"));
 			ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(getVersionControl()));
 
 			if (status == DvItemListModel::VC_ReadOnly) {
 				action = vcMenu->addAction(tr("Delete"));
-				ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(deleteVersionControl()));
+				ret =
+					ret && connect(action, SIGNAL(triggered()), this, SLOT(deleteVersionControl()));
 			}
 
 			vcMenu->addSeparator();
@@ -1250,12 +1267,15 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 				action = vcMenu->addAction(tr("Get Revision..."));
 				TFilePath path = files.at(0);
 				if (path.getDots() == "..")
-					ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(getRevisionVersionControl()));
+					ret = ret && connect(action, SIGNAL(triggered()), this,
+										 SLOT(getRevisionVersionControl()));
 				else
-					ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(getRevisionHistory()));
+					ret = ret &&
+						  connect(action, SIGNAL(triggered()), this, SLOT(getRevisionHistory()));
 			} else if (files.size() > 1) {
 				action = vcMenu->addAction("Get Revision...");
-				ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(getRevisionVersionControl()));
+				ret = ret &&
+					  connect(action, SIGNAL(triggered()), this, SLOT(getRevisionVersionControl()));
 			}
 		}
 
@@ -1283,9 +1303,11 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 				action = vcMenu->addAction(tr("Revision History..."));
 				TFilePath path = files.at(0);
 				if (path.getDots() == "..")
-					ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(getRevisionVersionControl()));
+					ret = ret && connect(action, SIGNAL(triggered()), this,
+										 SLOT(getRevisionVersionControl()));
 				else
-					ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(getRevisionHistory()));
+					ret = ret &&
+						  connect(action, SIGNAL(triggered()), this, SLOT(getRevisionHistory()));
 			}
 		}
 
@@ -1294,10 +1316,12 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 			ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(getVersionControl()));
 			if (files.size() == 1) {
 				action = vcMenu->addAction(tr("Edit Frame Range..."));
-				ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(editFrameRangeVersionControl()));
+				ret = ret && connect(action, SIGNAL(triggered()), this,
+									 SLOT(editFrameRangeVersionControl()));
 
 				action = vcMenu->addAction(tr("Edit Info"));
-				ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(showFrameRangeLockInfo()));
+				ret = ret &&
+					  connect(action, SIGNAL(triggered()), this, SLOT(showFrameRangeLockInfo()));
 			}
 
 		} else if (status == DvItemListModel::VC_PartialEdited) {
@@ -1306,10 +1330,12 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 
 			if (files.size() == 1) {
 				action = vcMenu->addAction(tr("Unlock Frame Range"));
-				ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(unlockFrameRangeVersionControl()));
+				ret = ret && connect(action, SIGNAL(triggered()), this,
+									 SLOT(unlockFrameRangeVersionControl()));
 
 				action = vcMenu->addAction(tr("Edit Info"));
-				ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(showFrameRangeLockInfo()));
+				ret = ret &&
+					  connect(action, SIGNAL(triggered()), this, SLOT(showFrameRangeLockInfo()));
 			}
 		} else if (status == DvItemListModel::VC_PartialModified) {
 			action = vcMenu->addAction(tr("Get"));
@@ -1317,10 +1343,12 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index)
 
 			if (files.size() == 1) {
 				action = vcMenu->addAction(tr("Put..."));
-				ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(putFrameRangeVersionControl()));
+				ret = ret && connect(action, SIGNAL(triggered()), this,
+									 SLOT(putFrameRangeVersionControl()));
 
 				action = vcMenu->addAction(tr("Revert"));
-				ret = ret && connect(action, SIGNAL(triggered()), this, SLOT(revertFrameRangeVersionControl()));
+				ret = ret && connect(action, SIGNAL(triggered()), this,
+									 SLOT(revertFrameRangeVersionControl()));
 			}
 		}
 
@@ -1373,7 +1401,8 @@ void FileBrowser::startDragDrop()
 
 //-----------------------------------------------------------------------------
 
-bool FileBrowser::dropMimeData(QTreeWidgetItem *parent, int index, const QMimeData *data, Qt::DropAction action)
+bool FileBrowser::dropMimeData(QTreeWidgetItem *parent, int index, const QMimeData *data,
+							   Qt::DropAction action)
 {
 	return false;
 }
@@ -1422,8 +1451,7 @@ bool FileBrowser::acceptDrop(const QMimeData *data) const
 
 	if (data->hasFormat("application/vnd.toonz.levels") ||
 		data->hasFormat("application/vnd.toonz.currentscene") ||
-		data->hasFormat("application/vnd.toonz.drawings") ||
-		acceptResourceDrop(data->urls()))
+		data->hasFormat("application/vnd.toonz.drawings") || acceptResourceDrop(data->urls()))
 		return true;
 
 	return false;
@@ -1440,8 +1468,7 @@ bool FileBrowser::drop(const QMimeData *mimeData)
 		return false;
 
 	if (mimeData->hasFormat(CastItems::getMimeFormat())) {
-		const CastItems *items =
-			dynamic_cast<const CastItems *>(mimeData);
+		const CastItems *items = dynamic_cast<const CastItems *>(mimeData);
 		if (!items)
 			return false;
 
@@ -1463,9 +1490,8 @@ bool FileBrowser::drop(const QMimeData *mimeData)
 		ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 		if (scene->isUntitled()) {
 			bool ok;
-			QString sceneName = QInputDialog::getText(this, tr("Save Scene"),
-													  tr("Scene name:"), QLineEdit::Normal,
-													  QString(), &ok);
+			QString sceneName = QInputDialog::getText(this, tr("Save Scene"), tr("Scene name:"),
+													  QLineEdit::Normal, QString(), &ok);
 			if (!ok || sceneName == "")
 				return false;
 			scenePath = folderPath + sceneName.toStdWString();
@@ -1483,8 +1509,10 @@ bool FileBrowser::drop(const QMimeData *mimeData)
 		std::wstring levelName = sl->getName();
 		folderPath += TFilePath(levelName + toWideString(sl->getPath().getDottedType()));
 		if (TSystem::doesExistFileOrLevel(folderPath)) {
-			QString question = "Level " + toQString(folderPath) + " already exists\nDo you want to duplicate it?";
-			int ret = DVGui::MsgBox(question, QObject::tr("Duplicate"), QObject::tr("Don't Duplicate"), 0);
+			QString question =
+				"Level " + toQString(folderPath) + " already exists\nDo you want to duplicate it?";
+			int ret = DVGui::MsgBox(question, QObject::tr("Duplicate"),
+									QObject::tr("Don't Duplicate"), 0);
 			if (ret == 2 || ret == 0)
 				return false;
 			TFilePath path = folderPath;
@@ -1517,7 +1545,9 @@ bool FileBrowser::drop(const QMimeData *mimeData)
 			TFilePath dstFp = srcFp.withParentDir(folderPath);
 			if (dstFp != srcFp) {
 				if (!TSystem::copyFileOrLevel(dstFp, srcFp))
-					DVGui::error(tr("There was an error copying %1 to %2").arg(toQString(srcFp)).arg(toQString(dstFp)));
+					DVGui::error(tr("There was an error copying %1 to %2")
+									 .arg(toQString(srcFp))
+									 .arg(toQString(dstFp)));
 			}
 		}
 		refreshFolder(folderPath);
@@ -1551,7 +1581,8 @@ void FileBrowser::loadResources()
 void RenameAsToonzPopup::onOk()
 {
 	if (!isValidFileName(m_name->text())) {
-		DVGui::error(tr("The file name cannot be empty or contain any of the following characters:(new line)  \\ / : * ? \"  |"));
+		DVGui::error(tr("The file name cannot be empty or contain any of the following "
+						"characters:(new line)  \\ / : * ? \"  |"));
 		return;
 	}
 	accept();
@@ -1574,12 +1605,12 @@ RenameAsToonzPopup::RenameAsToonzPopup(const QString name, int frames)
 
 	m_name = new LineEdit(frames == -1 ? "" : name);
 	m_name->setFixedHeight(20);
-	//connect(m_name, SIGNAL(editingFinished()), SLOT(onNameChanged()));
-	//addWidget(tr("Level Name:"),m_name);
+	// connect(m_name, SIGNAL(editingFinished()), SLOT(onNameChanged()));
+	// addWidget(tr("Level Name:"),m_name);
 
 	m_overwrite = new QCheckBox(tr("Delete Original Files"));
 	m_overwrite->setFixedHeight(20);
-	//addWidget(m_overwrite, false);
+	// addWidget(m_overwrite, false);
 
 	QFormLayout *formLayout = new QFormLayout;
 
@@ -1649,7 +1680,8 @@ bool parsePathName(const QString &fullpath, QString &parentPath, QString &name, 
 
 //---------------------------------------------------------
 
-void getLevelFiles(const QString &parentPath, const QString &name, const QString &format, QStringList &pathIn)
+void getLevelFiles(const QString &parentPath, const QString &name, const QString &format,
+				   QStringList &pathIn)
 {
 	QString dummy, dummy1, filter = "*." + format;
 	QDir dir(parentPath, filter);
@@ -1718,7 +1750,8 @@ void renameSingleFileOrToonzLevel(const QString &fullpath)
 	std::string name = popup.getName().toStdString();
 
 	if (name == fpin.getName()) {
-		DVGui::error(QString(QObject::tr("The specified name is already assigned to the %1 file.").arg(fullpath)));
+		DVGui::error(QString(
+			QObject::tr("The specified name is already assigned to the %1 file.").arg(fullpath)));
 		return;
 	}
 
@@ -1760,7 +1793,9 @@ void doRenameAsToonzLevel(const QString &fullpath)
 	TFilePath levelOut(levelOutStr.toStdWString());
 	if (TSystem::doesExistFileOrLevel(levelOut)) {
 		QApplication::restoreOverrideCursor();
-		int ret = DVGui::MsgBox(QObject::tr("Warning: level %1 already exists; overwrite?").arg(toQString(levelOut)), QObject::tr("Yes"), QObject::tr("No"), 1);
+		int ret = DVGui::MsgBox(
+			QObject::tr("Warning: level %1 already exists; overwrite?").arg(toQString(levelOut)),
+			QObject::tr("Yes"), QObject::tr("No"), 1);
 		QApplication::setOverrideCursor(Qt::WaitCursor);
 		if (ret == 2 || ret == 0)
 			return;
@@ -1777,7 +1812,8 @@ void doRenameAsToonzLevel(const QString &fullpath)
 		if (popup.doOverwrite()) {
 			if (!QFile::rename(parentPath + "/" + pathIn[i], pathOut)) {
 				QString tmp(parentPath + "/" + pathIn[i]);
-				DVGui::error(QString(QObject::tr("It is not possible to rename the %1 file.").arg(tmp)));
+				DVGui::error(
+					QString(QObject::tr("It is not possible to rename the %1 file.").arg(tmp)));
 				return;
 			}
 		} else if (!QFile::copy(parentPath + "/" + pathIn[i], pathOut)) {
@@ -1789,7 +1825,7 @@ void doRenameAsToonzLevel(const QString &fullpath)
 	}
 }
 
-} //namespace
+} // namespace
 
 //-------------------------------------------------------------------------------
 
@@ -1824,7 +1860,8 @@ void FileBrowser::convertToUnpaintedTlv()
 	sl << "Apply Autoclose                        "
 	   << "Don't Apply Autoclose                          ";
 	bool ok;
-	QString autoclose = QInputDialog::getItem(this, tr("Convert To Unpainted Tlv"), "", sl, 0, false, &ok);
+	QString autoclose =
+		QInputDialog::getItem(this, tr("Convert To Unpainted Tlv"), "", sl, 0, false, &ok);
 	if (!ok)
 		return;
 
@@ -1833,11 +1870,14 @@ void FileBrowser::convertToUnpaintedTlv()
 	int i, totFrames = 0;
 	std::vector<Convert2Tlv *> converters;
 	for (i = 0; i < filePaths.size(); i++) {
-		Convert2Tlv *converter = new Convert2Tlv(filePaths[i], TFilePath(), TFilePath(), -1, -1, autoclose == sl.at(0), TFilePath(), 0, 0, 0);
+		Convert2Tlv *converter = new Convert2Tlv(filePaths[i], TFilePath(), TFilePath(), -1, -1,
+												 autoclose == sl.at(0), TFilePath(), 0, 0, 0);
 
 		if (TSystem::doesExistFileOrLevel(converter->m_levelOut)) {
 			QApplication::restoreOverrideCursor();
-			int ret = DVGui::MsgBox(tr("Warning: level %1 already exists; overwrite?").arg(toQString(converter->m_levelOut)), tr("Yes"), tr("No"), 1);
+			int ret = DVGui::MsgBox(tr("Warning: level %1 already exists; overwrite?")
+										.arg(toQString(converter->m_levelOut)),
+									tr("Yes"), tr("No"), 1);
 			QApplication::setOverrideCursor(Qt::WaitCursor);
 			if (ret == 2 || ret == 0) {
 				delete converter;
@@ -1919,17 +1959,21 @@ void FileBrowser::convertToPaintedTlv()
 	sl << "Apply Autoclose                      "
 	   << "Don't Apply Autoclose                        ";
 	bool ok;
-	QString autoclose = QInputDialog::getItem(this, tr("Convert To Painted Tlv"), "", sl, 0, false, &ok);
+	QString autoclose =
+		QInputDialog::getItem(this, tr("Convert To Painted Tlv"), "", sl, 0, false, &ok);
 	if (!ok)
 		return;
 
 	QApplication::setOverrideCursor(Qt::WaitCursor);
 
-	Convert2Tlv *converter = new Convert2Tlv(filePaths[0], filePaths[1], TFilePath(), -1, -1, autoclose == sl.at(0), TFilePath(), 0, 0, 0);
+	Convert2Tlv *converter = new Convert2Tlv(filePaths[0], filePaths[1], TFilePath(), -1, -1,
+											 autoclose == sl.at(0), TFilePath(), 0, 0, 0);
 
 	if (TSystem::doesExistFileOrLevel(converter->m_levelOut)) {
 		QApplication::restoreOverrideCursor();
-		int ret = DVGui::MsgBox(tr("Warning: level %1 already exists; overwrite?").arg(toQString(converter->m_levelOut)), tr("Yes"), tr("No"), 1);
+		int ret = DVGui::MsgBox(tr("Warning: level %1 already exists; overwrite?")
+									.arg(toQString(converter->m_levelOut)),
+								tr("Yes"), tr("No"), 1);
 		QApplication::setOverrideCursor(Qt::WaitCursor);
 		if (ret == 2 || ret == 0) {
 			QApplication::restoreOverrideCursor();
@@ -1997,7 +2041,8 @@ void FileBrowser::onSelectedItems(const std::set<int> &indexes)
 		frameIDs.insert(frameIDs.begin(), m_items[*it].m_frameIds);
 	}
 
-	// reuse the list of TFrameId in order to skip loadInfo() when loading the level with sequencial frames.
+	// reuse the list of TFrameId in order to skip loadInfo() when loading the level with sequencial
+	// frames.
 	emit filePathsSelected(filePaths, frameIDs);
 }
 
@@ -2006,7 +2051,7 @@ void FileBrowser::onSelectedItems(const std::set<int> &indexes)
 void FileBrowser::onClickedItem(int index)
 {
 	if (0 <= index && index < (int)m_items.size()) {
-		//if the folder is clicked, then move the current folder
+		// if the folder is clicked, then move the current folder
 		TFilePath fp = m_items[index].m_path;
 		if (m_items[index].m_isFolder) {
 			setFolder(fp, true);
@@ -2052,7 +2097,7 @@ void FileBrowser::getExpandedFolders(DvDirModelNode *node, QList<DvDirModelNode 
 
 void FileBrowser::refresh()
 {
-	TFilePath originalFolder(m_folder); //setFolder is invoked by Qt throughout the following...
+	TFilePath originalFolder(m_folder); // setFolder is invoked by Qt throughout the following...
 
 	int dx = m_folderTreeView->verticalScrollBar()->value();
 	DvDirModelNode *rootNode = DvDirModel::instance()->getNode(QModelIndex());
@@ -2174,7 +2219,8 @@ void FileBrowser::showEvent(QShowEvent *)
 	m_folderTreeView->scrollTo(m_folderTreeView->currentIndex());
 
 	// Refresh SVN
-	DvDirVersionControlNode *vcNode = dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
+	DvDirVersionControlNode *vcNode =
+		dynamic_cast<DvDirVersionControlNode *>(m_folderTreeView->getCurrentNode());
 	if (vcNode)
 		m_folderTreeView->refreshVersionControl(vcNode);
 }
@@ -2221,8 +2267,7 @@ FCData::FCData(const QDateTime &date)
 // FrameCountReader methods
 //-----------------------------------------------------------------------------
 
-FrameCountReader::FrameCountReader()
-	: m_executor()
+FrameCountReader::FrameCountReader() : m_executor()
 {
 	m_executor.setMaxActiveTasks(2);
 }
@@ -2241,17 +2286,17 @@ int FrameCountReader::getFrameCount(const TFilePath &fp)
 	std::map<TFilePath, FCData>::iterator it;
 
 	{
-		//Access the static map to find an occurrence of the path.
+		// Access the static map to find an occurrence of the path.
 		QMutexLocker locker(&frameCountMapMutex);
 		it = frameCountMap.find(fp);
 
 		if (it != frameCountMap.end()) {
 			if (it->second.m_frameCount > 0 && it->second.m_date == modifiedDate) {
-				//Found an unmodified occurrence with correctly calculated frame count
+				// Found an unmodified occurrence with correctly calculated frame count
 				return it->second.m_frameCount;
 			}
 		} else {
-			//First time this frame count is calculated - initialize FC data
+			// First time this frame count is calculated - initialize FC data
 			frameCountMap[fp] = FCData(modifiedDate);
 			goto calculateTask;
 		}
@@ -2263,15 +2308,15 @@ int FrameCountReader::getFrameCount(const TFilePath &fp)
 
 calculateTask:
 
-	//Now, we have to calculate the frame count; first, create a frame count
-	//calculation task and submit it.
+	// Now, we have to calculate the frame count; first, create a frame count
+	// calculation task and submit it.
 	FrameCountTask *task = new FrameCountTask(fp, modifiedDate);
 	connect(task, SIGNAL(finished(TThread::RunnableP)), this, SIGNAL(calculatedFrameCount()));
 	connect(task, SIGNAL(exception(TThread::RunnableP)), this, SIGNAL(calculatedFrameCount()));
 
 	m_executor.addTask(task);
 
-	return -1; //FrameCount has not yet been calculated
+	return -1; // FrameCount has not yet been calculated
 }
 
 //-----------------------------------------------------------------------------
@@ -2285,8 +2330,7 @@ inline void FrameCountReader::stopReading()
 // FrameCountTask methods
 //-----------------------------------------------------------------------------
 
-FrameCountTask::FrameCountTask(const TFilePath &path,
-							   const QDateTime &modifiedDate)
+FrameCountTask::FrameCountTask(const TFilePath &path, const QDateTime &modifiedDate)
 	: m_path(path), m_modifiedDate(modifiedDate), m_started(false)
 {
 	connect(this, SIGNAL(started(TThread::RunnableP)), this, SLOT(onStarted(TThread::RunnableP)));
@@ -2313,13 +2357,13 @@ void FrameCountTask::run()
 	if (it == frameCountMap.end())
 		return;
 
-	//Memorize the found frameCount into the frameCountMap
+	// Memorize the found frameCount into the frameCountMap
 	if (frameCount > 0) {
 		it->second.m_frameCount = frameCount;
 		it->second.m_date = m_modifiedDate;
 	} else {
-		//Seems that tlv reads sometimes may fail, returning invalid frame counts (typically 0).
-		//However, if no exception was thrown, we try to recover it
+		// Seems that tlv reads sometimes may fail, returning invalid frame counts (typically 0).
+		// However, if no exception was thrown, we try to recover it
 		it->second.m_underProgress = false;
 		it->second.m_retryCount--;
 	}
@@ -2334,8 +2378,8 @@ QThread::Priority FrameCountTask::runningPriority()
 
 //-----------------------------------------------------------------------------
 
-//NOTE: onStarted and onCanceled are invoked on the same thread - so m_started
-//operations are serialized, it can be non-thread-guarded.
+// NOTE: onStarted and onCanceled are invoked on the same thread - so m_started
+// operations are serialized, it can be non-thread-guarded.
 void FrameCountTask::onStarted(TThread::RunnableP thisTask)
 {
 	m_started = true;

@@ -48,22 +48,21 @@ class SVNDeleteDialog : public DVGui::Dialog
 
 	int m_sceneIconAdded;
 
-public:
-	SVNDeleteDialog(QWidget *parent, const QString &workingDir,
-					const QStringList &filesToDelete, bool isFolder,
-					int sceneIconAdded);
+  public:
+	SVNDeleteDialog(QWidget *parent, const QString &workingDir, const QStringList &filesToDelete,
+					bool isFolder, int sceneIconAdded);
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 
-private:
+  private:
 	void switchToCloseButton();
 
 	void updateFileBrowser();
 
 	void initTreeWidget();
 
-protected slots:
+  protected slots:
 
 	void onError(const QString &);
 	void onDeleteLocalButtonClicked();
@@ -76,7 +75,7 @@ protected slots:
 
 	void onDeleteSceneContentsToggled(bool);
 
-signals:
+  signals:
 	void done(const QStringList &);
 };
 

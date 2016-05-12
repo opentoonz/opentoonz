@@ -19,7 +19,7 @@ class BlendTzFx : public TStandardRasterFx
 	TDoubleParamP m_amount;
 	TDoubleParamP m_smoothness;
 
-public:
+  public:
 	BlendTzFx() : m_colorIndex(L"1,2,3"), m_noBlending(false), m_amount(10), m_smoothness(10)
 	{
 		m_amount->setMeasureName("fxLength");
@@ -32,24 +32,19 @@ public:
 		m_smoothness->setValueRange(0, std::numeric_limits<double>::max());
 	}
 
-	~BlendTzFx()
-	{
-	}
+	~BlendTzFx() {}
 
 	//----------------------------------------------------------------------------
 
-	void transform(double frame,
-				   int port,
-				   const TRectD &rectOnOutput,
-				   const TRenderSettings &infoOnOutput,
-				   TRectD &rectOnInput,
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
 				   TRenderSettings &infoOnInput);
 	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
 
 	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 	{
 		if (m_input.isConnected()) {
-			//Build the render data
+			// Build the render data
 			TRenderSettings info2(info);
 			buildBlendData(info2, frame);
 
@@ -62,10 +57,7 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	bool canHandle(const TRenderSettings &info, double frame)
-	{
-		return true;
-	}
+	bool canHandle(const TRenderSettings &info, double frame) { return true; }
 
 	//-----------------------------------------------------------------------------
 
@@ -73,7 +65,7 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-private:
+  private:
 	void getValues(const char *argv[], int argc, double frame)
 	{
 		double values[6];
@@ -114,7 +106,7 @@ private:
 		blendSize = m_amount->getValue(frame) * 0.5;
 		if (shrink > 0)
 			blendSize = blendSize / (double)shrink;
-		//if (blendcmapImgDpi>0.0 )
+		// if (blendcmapImgDpi>0.0 )
 		//	blendSize*=(blendcmapImgDpi*0.01);
 		return (int)blendSize + 1 + defaultBorder;
 	}
@@ -144,11 +136,8 @@ FX_PLUGIN_IDENTIFIER(BlendTzFx, "blendTzFx")
 
 //------------------------------------------------------------------------------
 
-void BlendTzFx::transform(double frame,
-						  int port,
-						  const TRectD &rectOnOutput,
-						  const TRenderSettings &infoOnOutput,
-						  TRectD &rectOnInput,
+void BlendTzFx::transform(double frame, int port, const TRectD &rectOnOutput,
+						  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
 						  TRenderSettings &infoOnInput)
 {
 	rectOnInput = rectOnOutput;

@@ -19,14 +19,14 @@ class SceneViewerContextMenu : public QMenu
 	void addShowHideCommand(QMenu *menu, TXshColumn *column);
 	void addSelectCommand(QMenu *menu, const TStageObjectId &id);
 
-public:
+  public:
 	SceneViewerContextMenu(SceneViewer *parent);
 	~SceneViewerContextMenu();
 
 	void addEnterGroupCommands(const TPointD &pos);
 	void addLevelCommands(std::vector<int> &indices);
 
-public slots:
+  public slots:
 
 	void savePreviewedFrames();
 

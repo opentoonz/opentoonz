@@ -29,15 +29,15 @@ class DVAPI StyleIndexLineEdit : public LineEdit
 {
 	TPaletteHandle *m_pltHandle;
 
-public:
+  public:
 	StyleIndexLineEdit();
 	~StyleIndexLineEdit();
 
 	void setPaletteHandle(TPaletteHandle *pltHandle) { m_pltHandle = pltHandle; }
 	TPaletteHandle *getPaletteHandle() { return m_pltHandle; }
-protected:
+  protected:
 	void paintEvent(QPaintEvent *pe);
 };
-} //namspace
+} // namspace
 
 #endif

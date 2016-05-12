@@ -10,15 +10,13 @@ using namespace DVGui;
 // CheckBox
 //-----------------------------------------------------------------------------
 
-CheckBox::CheckBox(QWidget *parent)
-	: QCheckBox(parent)
+CheckBox::CheckBox(QWidget *parent) : QCheckBox(parent)
 {
 }
 
 //-----------------------------------------------------------------------------
 
-CheckBox::CheckBox(const QString &text, QWidget *parent)
-	: QCheckBox(text, parent)
+CheckBox::CheckBox(const QString &text, QWidget *parent) : QCheckBox(text, parent)
 {
 }
 

@@ -24,7 +24,7 @@
 
 class DVAPI TUnitConverter
 {
-public:
+  public:
 	virtual ~TUnitConverter() {}
 	virtual TUnitConverter *clone() const = 0;
 	virtual double convertTo(double v) const = 0;
@@ -37,9 +37,10 @@ class DVAPI TSimpleUnitConverter : public TUnitConverter
 {
 	const double m_factor, m_offset;
 
-public:
-	TSimpleUnitConverter(double factor = 1, double offset = 0)
-		: m_factor(factor), m_offset(offset) {}
+  public:
+	TSimpleUnitConverter(double factor = 1, double offset = 0) : m_factor(factor), m_offset(offset)
+	{
+	}
 	TUnitConverter *clone() const { return new TSimpleUnitConverter(*this); }
 	double convertTo(double v) const { return v * m_factor + m_offset; }
 	double convertFrom(double v) const { return (v - m_offset) / m_factor; }
@@ -53,7 +54,7 @@ class DVAPI TUnit
 	std::vector<std::wstring> m_extensions;
 	TUnitConverter *m_converter;
 
-public:
+  public:
 	TUnit(std::wstring ext, TUnitConverter *converter = 0);
 	TUnit(const TUnit &);
 	~TUnit();
@@ -70,7 +71,7 @@ public:
 	double convertTo(double v) const { return m_converter->convertTo(v); }
 	double convertFrom(double v) const { return m_converter->convertFrom(v); }
 
-private:
+  private:
 	// not implemented
 	TUnit &operator=(const TUnit &);
 };
@@ -84,7 +85,7 @@ class DVAPI TMeasure
 	std::map<std::wstring, TUnit *> m_extensions;
 	double m_defaultValue;
 
-public:
+  public:
 	TMeasure(std::string name, TUnit *mainUnit);
 	TMeasure(const TMeasure &);
 	~TMeasure();
@@ -111,7 +112,7 @@ public:
 	double getDefaultValue() const { return m_defaultValue; }
 	void setDefaultValue(double v) { m_defaultValue = v; }
 
-private:
+  private:
 	// not implemented
 	TMeasure &operator=(const TMeasure &);
 };
@@ -123,7 +124,7 @@ class DVAPI TMeasureManager
 	std::map<std::string, TMeasure *> m_measures;
 	TMeasureManager();
 
-public:
+  public:
 	static TMeasureManager *instance()
 	{
 		static TMeasureManager _instance;
@@ -144,7 +145,7 @@ class DVAPI TMeasuredValue
 	const TMeasure *m_measure;
 	double m_value;
 
-public:
+  public:
 	TMeasuredValue(std::string measureName);
 	~TMeasuredValue();
 
@@ -152,8 +153,7 @@ public:
 	void setMeasure(const TMeasure *measure);
 	void setMeasure(std::string measureName);
 
-	enum UnitType { MainUnit,
-					CurrentUnit };
+	enum UnitType { MainUnit, CurrentUnit };
 
 	double getValue(UnitType uType) const
 	{
@@ -164,10 +164,11 @@ public:
 		m_value = uType == MainUnit ? value : m_measure->getCurrentUnit()->convertFrom(value);
 	}
 
-	bool setValue(std::wstring s, int *pErr = 0); // if pErr != then *pErr contains error code. *pErr == 0 means OK
+	bool setValue(std::wstring s,
+				  int *pErr = 0); // if pErr != then *pErr contains error code. *pErr == 0 means OK
 	std::wstring toWideString(int decimals = 7) const;
 
-private:
+  private:
 	// not implemented
 	TMeasuredValue(const TMeasuredValue &);
 	TMeasuredValue &operator=(const TMeasuredValue &);

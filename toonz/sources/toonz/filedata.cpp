@@ -20,8 +20,7 @@ FileData::FileData()
 
 //-----------------------------------------------------------------------------
 
-FileData::FileData(const FileData *src)
-	: m_files(src->m_files)
+FileData::FileData(const FileData *src) : m_files(src->m_files)
 {
 }
 
@@ -45,13 +44,14 @@ void FileData::getFiles(TFilePath folder, std::vector<TFilePath> &newFiles) cons
 	int i;
 	for (i = 0; i < (int)m_files.size(); i++) {
 		TFilePath oldPath = m_files[i];
-		//Per ora non permettiamo il copia e incolla delle scene.
+		// Per ora non permettiamo il copia e incolla delle scene.
 		if (oldPath.getType() == "tnz")
 			continue;
 		TFilePath path = folder + TFilePath(oldPath.getLevelNameW());
 
 		if (!TSystem::doesExistFileOrLevel(oldPath)) {
-			DVGui::warning(tr("It is not possible to find the %1 level.").arg(QString::fromStdWString(oldPath.getWideString())));
+			DVGui::warning(tr("It is not possible to find the %1 level.")
+							   .arg(QString::fromStdWString(oldPath.getWideString())));
 			return;
 		}
 

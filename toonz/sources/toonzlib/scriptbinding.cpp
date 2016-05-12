@@ -76,7 +76,8 @@ void Wrapper::warning(const QString &msg)
 
 //===========================================================================
 
-QScriptValue checkArgumentCount(QScriptContext *context, const QString &name, int minCount, int maxCount)
+QScriptValue checkArgumentCount(QScriptContext *context, const QString &name, int minCount,
+								int maxCount)
 {
 	int count = context->argumentCount();
 	if (minCount <= count && count <= maxCount)
@@ -86,7 +87,8 @@ QScriptValue checkArgumentCount(QScriptContext *context, const QString &name, in
 		range = QObject::tr("%1-%2").arg(minCount).arg(maxCount);
 	else
 		range = QObject::tr("%1").arg(minCount);
-	return context->throwError(QObject::tr("Expected %1 argument(s) in %2, got %3").arg(range).arg(name).arg(count));
+	return context->throwError(
+		QObject::tr("Expected %1 argument(s) in %2, got %3").arg(range).arg(name).arg(count));
 }
 
 QScriptValue checkArgumentCount(QScriptContext *context, const QString &name, int count)
@@ -98,15 +100,16 @@ QScriptValue checkColor(QScriptContext *context, const QString &colorName, QColo
 {
 	color.setNamedColor(colorName);
 	if (!color.isValid())
-		return context->throwError(QObject::tr("%1 is not a valid color (valid color names are 'red', 'transparent', '#FF8800', ecc.)").arg(colorName));
+		return context->throwError(QObject::tr("%1 is not a valid color (valid color names are "
+											   "'red', 'transparent', '#FF8800', ecc.)")
+									   .arg(colorName));
 	else
 		return QScriptValue();
 }
 
 //=============================================================================
 
-template <class T>
-void bindClass(QScriptEngine &engine, const QString &name)
+template <class T> void bindClass(QScriptEngine &engine, const QString &name)
 {
 	const QMetaObject *metaObj = &T::staticMetaObject;
 	QScriptValue ctor = engine.newFunction(T::ctor);
@@ -116,22 +119,27 @@ void bindClass(QScriptEngine &engine, const QString &name)
 }
 
 template <typename Tp>
-QScriptValue qScriptValueFromQObject(QScriptEngine *engine, Tp const &qobject) { return engine->newQObject(qobject); }
-
-template <typename Tp>
-void qScriptValueToQObject(const QScriptValue &value, Tp &qobject) { qobject = qobject_cast<Tp>(value.toQObject()); }
-
-template <typename Tp>
-int qScriptRegisterQObjectMetaType(QScriptEngine *engine, const QScriptValue &prototype = QScriptValue())
+QScriptValue qScriptValueFromQObject(QScriptEngine *engine, Tp const &qobject)
 {
-	return qScriptRegisterMetaType<Tp>(engine, qScriptValueFromQObject,
-									   qScriptValueToQObject, prototype);
+	return engine->newQObject(qobject);
 }
 
-template <class T, QScriptValue (T::*Method)(QScriptContext *, QScriptEngine *)>
-class Dummy
+template <typename Tp> void qScriptValueToQObject(const QScriptValue &value, Tp &qobject)
 {
-public:
+	qobject = qobject_cast<Tp>(value.toQObject());
+}
+
+template <typename Tp>
+int qScriptRegisterQObjectMetaType(QScriptEngine *engine,
+								   const QScriptValue &prototype = QScriptValue())
+{
+	return qScriptRegisterMetaType<Tp>(engine, qScriptValueFromQObject, qScriptValueToQObject,
+									   prototype);
+}
+
+template <class T, QScriptValue (T::*Method)(QScriptContext *, QScriptEngine *)> class Dummy
+{
+  public:
 	static QScriptValue dummy(QScriptContext *context, QScriptEngine *engine)
 	{
 		T *obj = qscriptvalue_cast<T *>(context->thisObject());
@@ -141,7 +149,8 @@ public:
 
 void deffoo(QScriptEngine &engine)
 {
-	QScriptValue f = engine.newFunction(Dummy<ToonzRasterConverter, &ToonzRasterConverter::convert>::dummy);
+	QScriptValue f =
+		engine.newFunction(Dummy<ToonzRasterConverter, &ToonzRasterConverter::convert>::dummy);
 	engine.globalObject().property("ToonzRasterConverter").setProperty("convert", f);
 }
 

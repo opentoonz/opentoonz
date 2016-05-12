@@ -29,8 +29,7 @@ using namespace PlasticToolLocals;
 namespace
 {
 
-enum { RIGID_IDX = 0,
-	   FLEX_IDX };
+enum { RIGID_IDX = 0, FLEX_IDX };
 
 } // namespace
 
@@ -48,11 +47,12 @@ class PaintRigidityUndo : public TUndo
 
 	double m_paintValue; //!< Rigidity value the vertices were
 						 //!< painted with
-public:
-	PaintRigidityUndo(const TXshCell &cell,
-					  const std::vector<std::map<int, double>> &vertices,
+  public:
+	PaintRigidityUndo(const TXshCell &cell, const std::vector<std::map<int, double>> &vertices,
 					  double paintValue)
-		: m_cell(cell), m_vertices(vertices), m_paintValue(paintValue) {}
+		: m_cell(cell), m_vertices(vertices), m_paintValue(paintValue)
+	{
+	}
 
 	int getSize() const { return 1 << 20; }
 
@@ -74,8 +74,8 @@ public:
 				mesh.vertex(vt->first).P().rigidity = m_paintValue;
 		}
 
-		PlasticDeformerStorage::instance()->invalidateMeshImage(
-			mi.getPointer(), PlasticDeformerStorage::MESH);
+		PlasticDeformerStorage::instance()->invalidateMeshImage(mi.getPointer(),
+																PlasticDeformerStorage::MESH);
 	}
 
 	void undo() const
@@ -96,8 +96,8 @@ public:
 				mesh.vertex(vt->first).P().rigidity = vt->second;
 		}
 
-		PlasticDeformerStorage::instance()->invalidateMeshImage(
-			mi.getPointer(), PlasticDeformerStorage::MESH);
+		PlasticDeformerStorage::instance()->invalidateMeshImage(mi.getPointer(),
+																PlasticDeformerStorage::MESH);
 	}
 };
 
@@ -115,14 +115,14 @@ class RigidityPainter : public tcg::polymorphic
 	std::vector<std::map<int, double>> m_oldRigidities; //!< The original values of painted vertices
 	double m_sqRadius, m_value;							//!< Drawing parameters
 
-public:
+  public:
 	RigidityPainter() : m_sqRadius(), m_value() {}
 
 	void startPainting(double radius, int rigidIdx);
 	void paint(const TPointD &pos);
 	void commit();
 
-private:
+  private:
 	void reset()
 	{
 		m_sqRadius = 0.0, m_value = 0.0;
@@ -179,8 +179,8 @@ void RigidityPainter::paint(const TPointD &pos)
 		}
 	}
 
-	PlasticDeformerStorage::instance()->invalidateMeshImage(
-		meshImg.getPointer(), PlasticDeformerStorage::MESH);
+	PlasticDeformerStorage::instance()->invalidateMeshImage(meshImg.getPointer(),
+															PlasticDeformerStorage::MESH);
 }
 
 //------------------------------------------------------------------------

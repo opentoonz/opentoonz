@@ -3,14 +3,14 @@
 #ifndef VECTORIZER_SWATCH_H
 #define VECTORIZER_SWATCH_H
 
-//Toonz includes
+// Toonz includes
 #include "tthread.h"
 #include "timage.h"
 
 #include "toonz/tcenterlinevectorizer.h"
 #include "toonzqt/planeviewer.h"
 
-//Qt includes
+// Qt includes
 #include <QFrame>
 
 #include <memory>
@@ -23,13 +23,13 @@ class VectorizerSwatchArea : public QFrame
 {
 	Q_OBJECT
 
-public:
+  public:
 	class Swatch;
 
-private:
+  private:
 	Swatch *m_leftSwatch, *m_rightSwatch;
 
-public:
+  public:
 	VectorizerSwatchArea(QWidget *parent = 0);
 
 	void updateView(const TAffine &viewAff);
@@ -41,14 +41,14 @@ public:
 	const Swatch *rightSwatch() const { return m_rightSwatch; }
 	Swatch *rightSwatch() { return m_rightSwatch; }
 
-protected:
+  protected:
 	void connectUpdates();
 	void disconnectUpdates();
 
 	void showEvent(QShowEvent *se); // { connectUpdates(); }
 	void hideEvent(QHideEvent *he); // { disconnectUpdates(); }
 
-public slots:
+  public slots:
 
 	void updateContents();
 	void invalidateContents();
@@ -69,7 +69,7 @@ class VectorizerSwatchArea::Swatch : public PlaneViewer
 	bool m_drawVectors;
 	bool m_drawInProgress;
 
-public:
+  public:
 	Swatch(VectorizerSwatchArea *area);
 
 	const TImageP &image() const { return m_img; }
@@ -78,7 +78,7 @@ public:
 	void setDrawVectors(bool draw) { m_drawVectors = draw; }
 	void setDrawInProgress(bool draw) { m_drawInProgress = draw; }
 
-protected:
+  protected:
 	bool event(QEvent *e);
 	void paintGL();
 	void drawVectors();
@@ -98,21 +98,21 @@ class VectorizationSwatchTask : public TThread::Runnable
 
 	std::auto_ptr<VectorizerConfiguration> m_config;
 
-public:
+  public:
 	VectorizationSwatchTask(int row, int col);
 
 	void run();
 	void onStarted(TThread::RunnableP task);
 	void onFinished(TThread::RunnableP task);
 
-signals:
+  signals:
 
 	void myStarted(TThread::RunnableP task);
 
-private:
+  private:
 	// Not copyable
 	VectorizationSwatchTask(const VectorizationSwatchTask &);
 	VectorizationSwatchTask &operator=(const VectorizationSwatchTask &);
 };
 
-#endif //VECTORIZER_SWATCH_H
+#endif // VECTORIZER_SWATCH_H

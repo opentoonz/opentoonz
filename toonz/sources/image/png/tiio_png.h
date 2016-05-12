@@ -16,8 +16,8 @@ namespace Tiio
 
 class PngWriterProperties : public TPropertyGroup
 {
-public:
-	//TEnumProperty m_pixelSize;
+  public:
+	// TEnumProperty m_pixelSize;
 	TBoolProperty m_matte;
 
 	PngWriterProperties();

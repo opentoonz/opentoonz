@@ -5,8 +5,7 @@
 
 //-----------------------------------------------------------------------------
 
-TPinnedRangeSet::TPinnedRangeSet()
-	: m_stageObject()
+TPinnedRangeSet::TPinnedRangeSet() : m_stageObject()
 {
 }
 
@@ -160,7 +159,7 @@ void TPinnedRangeSet::loadData(TIStream &is)
 			while (!is.matchEndTag()) {
 				int frame = 0;
 				is >> frame;
-				//m_tempPinned.push_back(frame);
+				// m_tempPinned.push_back(frame);
 			}
 			count++;
 		} else if (tagName == "lockedAngle") {

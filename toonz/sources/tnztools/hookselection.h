@@ -20,7 +20,7 @@ class HookUndo : public TUndo
 	HookSet m_oldHooks, m_newHooks;
 	TXshLevelP m_level;
 
-public:
+  public:
 	HookUndo(const TXshLevelP &level);
 	~HookUndo();
 
@@ -44,13 +44,15 @@ class HooksData : public DvMimeData
 		TPointD m_aPos, m_bPos;
 
 		HookPosition(int id, const TPointD &aPos, const TPointD &bPos)
-			: m_id(id), m_aPos(aPos), m_bPos(bPos) {}
+			: m_id(id), m_aPos(aPos), m_bPos(bPos)
+		{
+		}
 	};
 
 	std::vector<HookPosition> m_hookPositions;
 	TXshLevelP m_level;
 
-public:
+  public:
 	HooksData(const TXshLevelP &level);
 	~HooksData();
 
@@ -72,7 +74,7 @@ class HookSelection : public TSelection
 	TXshLevelP m_level;
 	std::set<std::pair<int, int>> m_hooks; // hookId, side : 1=A 2=B
 
-public:
+  public:
 	HookSelection();
 	~HookSelection();
 
@@ -88,11 +90,11 @@ public:
 	bool select(const TSelection *s);
 	void enableCommands();
 
-	//commands
+	// commands
 	void deleteSelectedHooks();
 	void copySelectedHooks();
 	void cutSelectedHooks();
 	void pasteSelectedHooks();
 };
 
-#endif //HOOK_SELECTION
+#endif // HOOK_SELECTION

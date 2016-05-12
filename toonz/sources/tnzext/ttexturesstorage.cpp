@@ -25,10 +25,10 @@ struct TexturesContainer {
 	MeshTexturizer m_texturizer; //!< The mesh texturizer - actual textures container
 	tcg::list<QString> m_keys;   //!< Keys in the storage
 
-public:
+  public:
 	TexturesContainer() {}
 
-private:
+  private:
 	TexturesContainer(const TexturesContainer &);
 	TexturesContainer &operator=(const TexturesContainer &);
 };
@@ -40,10 +40,13 @@ private:
 namespace
 {
 
-QMutex l_mutex(QMutex::Recursive); // A mutex is needed to synchronize access to the following objects
+QMutex
+	l_mutex(QMutex::Recursive); // A mutex is needed to synchronize access to the following objects
 
-std::map<int, TexturesContainer *> l_texturesContainers;	 // Texture Containers by display lists space id
-QCache<QString, DrawableTextureDataP> l_objects(500 * 1024); // 500 MB cache for now - NOTE: MUST be allocated before the following
+std::map<int, TexturesContainer *>
+	l_texturesContainers; // Texture Containers by display lists space id
+QCache<QString, DrawableTextureDataP>
+	l_objects(500 * 1024); // 500 MB cache for now - NOTE: MUST be allocated before the following
 
 } // namespace
 
@@ -115,7 +118,8 @@ TTexturesStorage::TTexturesStorage()
 TTexturesStorage::~TTexturesStorage()
 {
 	l_objects.clear();
-	std::for_each(l_texturesContainers.begin(), l_texturesContainers.end(), deleteTexturesContainer);
+	std::for_each(l_texturesContainers.begin(), l_texturesContainers.end(),
+				  deleteTexturesContainer);
 }
 
 //-------------------------------------------------------------------------------------
@@ -128,8 +132,8 @@ TTexturesStorage *TTexturesStorage::instance()
 
 //-------------------------------------------------------------------------------------
 
-DrawableTextureDataP TTexturesStorage::loadTexture(
-	const std::string &textureId, const TRaster32P &ras, const TRectD &geometry)
+DrawableTextureDataP TTexturesStorage::loadTexture(const std::string &textureId,
+												   const TRaster32P &ras, const TRectD &geometry)
 {
 	// Try to retrieve the proxy associated to current OpenGL context
 	TGlContext currentContext = tglGetCurrentContext();
@@ -159,7 +163,8 @@ DrawableTextureDataP TTexturesStorage::loadTexture(
 					 (ras->getLx() * ras->getLy() * ras->getPixelSize()) >> 10);
 
 	if (dlSpaceId < 0) {
-		// obj is a temporary. It was pushed in the cache to make space for it - however, it must not be
+		// obj is a temporary. It was pushed in the cache to make space for it - however, it must
+		// not be
 		// stored. Remove it now.
 		l_objects.remove(texString);
 	}
@@ -192,9 +197,11 @@ void TTexturesStorage::onDisplayListDestroyed(int dlSpaceId)
 
 	tcg::list<QString>::iterator st, sEnd(it->second->m_keys.end());
 
-	for (st = it->second->m_keys.begin(); st != sEnd;) // Note that the increment is performed BEFORE the texture is removed.
-		l_objects.remove(*st++);					   // This is because texture removal may destroy the key being addressed,
-													   // whose iterator would then be invalidated.
+	for (st = it->second->m_keys.begin();
+		 st != sEnd;) // Note that the increment is performed BEFORE the texture is removed.
+		l_objects.remove(
+			*st++); // This is because texture removal may destroy the key being addressed,
+					// whose iterator would then be invalidated.
 	delete it->second;
 	l_texturesContainers.erase(it);
 }

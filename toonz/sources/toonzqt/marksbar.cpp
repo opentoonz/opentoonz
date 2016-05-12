@@ -125,7 +125,7 @@ void MarksBar::mousePressEvent(QMouseEvent *me)
 
 	int val = posToVal(me->x());
 
-	//Select the nearest mark. If the distance is too great, select none.
+	// Select the nearest mark. If the distance is too great, select none.
 	int i, size = m_values.size();
 	for (i = 0; i < size; ++i) {
 		newDist = abs(m_values[i] - val);
@@ -187,7 +187,7 @@ void MarksBar::paintEvent(QPaintEvent *pe)
 
 	assert(m_values.size() == m_colors.size());
 
-	//Draw markers
+	// Draw markers
 	int i, size = m_values.size();
 	for (i = 0; i < size; ++i)
 		drawMark(p, valToPos(m_values[i]), m_colors[i]);

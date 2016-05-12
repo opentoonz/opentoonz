@@ -58,7 +58,12 @@ FilmstripFrames::FilmstripFrames(QScrollArea *parent, Qt::WindowFlags flags)
 #else
 FilmstripFrames::FilmstripFrames(QScrollArea *parent, Qt::WFlags flags)
 #endif
-	: QFrame(parent, flags), m_scrollArea(parent), m_selection(new TFilmstripSelection()), m_frameHeadGadget(0), m_inbetweenDialog(0), m_pos(0, 0), m_iconSize(dimension2QSize(IconGenerator::instance()->getIconSize())), m_frameLabelWidth(11), m_selectingRange(0, 0), m_scrollSpeed(0), m_dragSelectionStartIndex(-1), m_dragSelectionEndIndex(-1), m_timerId(0), m_selecting(false), m_dragDropArmed(false), m_readOnly(false)
+	: QFrame(parent, flags), m_scrollArea(parent), m_selection(new TFilmstripSelection()),
+	  m_frameHeadGadget(0), m_inbetweenDialog(0), m_pos(0, 0),
+	  m_iconSize(dimension2QSize(IconGenerator::instance()->getIconSize())), m_frameLabelWidth(11),
+	  m_selectingRange(0, 0), m_scrollSpeed(0), m_dragSelectionStartIndex(-1),
+	  m_dragSelectionEndIndex(-1), m_timerId(0), m_selecting(false), m_dragDropArmed(false),
+	  m_readOnly(false)
 {
 	setObjectName("filmStripFrames");
 	setFrameStyle(QFrame::StyledPanel);
@@ -95,10 +100,8 @@ TXshSimpleLevel *FilmstripFrames::getLevel() const
 
 int FilmstripFrames::y2index(int y) const
 {
-	const int dy = getIconSize().height() +
-				   fs_frameSpacing +
-				   fs_iconMarginTop +
-				   fs_iconMarginBottom;
+	const int dy =
+		getIconSize().height() + fs_frameSpacing + fs_iconMarginTop + fs_iconMarginBottom;
 	return y / dy;
 }
 
@@ -106,10 +109,8 @@ int FilmstripFrames::y2index(int y) const
 
 int FilmstripFrames::index2y(int index) const
 {
-	const int dy = getIconSize().height() +
-				   fs_frameSpacing +
-				   fs_iconMarginTop +
-				   fs_iconMarginBottom;
+	const int dy =
+		getIconSize().height() + fs_frameSpacing + fs_iconMarginTop + fs_iconMarginBottom;
 	return index * dy;
 }
 
@@ -139,10 +140,8 @@ int FilmstripFrames::getFramesHeight() const
 {
 	TXshSimpleLevel *level = getLevel();
 	int frameCount = level ? level->getFrameCount() : 1;
-	int frameHeight = m_iconSize.height() +
-					  fs_frameSpacing +
-					  fs_iconMarginTop +
-					  fs_iconMarginBottom;
+	int frameHeight =
+		m_iconSize.height() + fs_frameSpacing + fs_iconMarginTop + fs_iconMarginBottom;
 	return frameHeight * (frameCount + 1);
 }
 
@@ -150,10 +149,7 @@ int FilmstripFrames::getFramesHeight() const
 
 int FilmstripFrames::getOneFrameHeight()
 {
-	return m_iconSize.height() +
-		   fs_frameSpacing +
-		   fs_iconMarginTop +
-		   fs_iconMarginBottom;
+	return m_iconSize.height() + fs_frameSpacing + fs_iconMarginTop + fs_iconMarginBottom;
 }
 
 //-----------------------------------------------------------------------------
@@ -176,10 +172,7 @@ void FilmstripFrames::updateContentHeight(int minimumHeight)
 void FilmstripFrames::exponeFrame(int index)
 {
 	int y0 = index2y(index);
-	int y1 = y0 + m_iconSize.height() +
-			 fs_frameSpacing +
-			 fs_iconMarginTop +
-			 fs_iconMarginBottom;
+	int y1 = y0 + m_iconSize.height() + fs_frameSpacing + fs_iconMarginTop + fs_iconMarginBottom;
 	if (y1 > height())
 		setFixedHeight(y1);
 	// else if(height()-y1>=m_iconSize.height()) updateContentHeight();
@@ -204,7 +197,7 @@ void FilmstripFrames::scroll(int dy)
 void FilmstripFrames::mouseDoubleClickEvent(QMouseEvent *event)
 {
 	int index = y2index(event->pos().y());
-	select(index, ONLY_SELECT); //ONLY_SELECT
+	select(index, ONLY_SELECT); // ONLY_SELECT
 }
 
 //-----------------------------------------------------------------------------
@@ -220,7 +213,7 @@ void FilmstripFrames::select(int index, SelectionMode mode)
 		fid = index2fid(index);
 
 	switch (mode) {
-	//select one frame only
+	// select one frame only
 	case ONLY_SELECT:
 		m_selection->selectNone();
 		if (!outOfRange)
@@ -285,8 +278,7 @@ void FilmstripFrames::select(int index, SelectionMode mode)
 		m_selection->selectNone();
 
 		if (outOfRange) {
-			m_dragSelectionStartIndex =
-				m_dragSelectionEndIndex = -1;
+			m_dragSelectionStartIndex = m_dragSelectionEndIndex = -1;
 
 			break;
 		}
@@ -296,9 +288,7 @@ void FilmstripFrames::select(int index, SelectionMode mode)
 		break;
 
 	case DRAG_SELECT:
-		if (outOfRange ||
-			m_dragSelectionStartIndex < 0 ||
-			m_dragSelectionEndIndex == index)
+		if (outOfRange || m_dragSelectionStartIndex < 0 || m_dragSelectionEndIndex == index)
 			return;
 
 		m_dragSelectionEndIndex = index;
@@ -336,7 +326,8 @@ void FilmstripFrames::showEvent(QShowEvent *)
 
 	// cambiamenti al livello
 	TXshLevelHandle *levelHandle = app->getCurrentLevel();
-	connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this, SLOT(onLevelSwitched(TXshLevel *)));
+	connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+			SLOT(onLevelSwitched(TXshLevel *)));
 	connect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(onLevelChanged()));
 	connect(levelHandle, SIGNAL(xshLevelViewChanged()), this, SLOT(onLevelChanged()));
 
@@ -348,8 +339,7 @@ void FilmstripFrames::showEvent(QShowEvent *)
 	connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this, SLOT(update()));
 
 	// onion skin
-	connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()),
-			this, SLOT(update()));
+	connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
 
 	// enable navigator link with the Viewer in the InknPaint page
 	ComboViewerPanel *inknPaintViewerPanel = app->getInknPaintViewerPanel();
@@ -403,9 +393,12 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt)
 
 	p.fillRect(clipRect, Qt::black);
 	// thumbnail rect, including offsets
-	QRect iconImgRect = QRect(QPoint(fs_leftMargin + fs_iconMarginLR, fs_frameSpacing / 2 + fs_iconMarginTop), m_iconSize);
+	QRect iconImgRect =
+		QRect(QPoint(fs_leftMargin + fs_iconMarginLR, fs_frameSpacing / 2 + fs_iconMarginTop),
+			  m_iconSize);
 	// frame size with margins
-	QSize frameSize = m_iconSize + QSize(fs_iconMarginLR * 2, fs_iconMarginTop + fs_iconMarginBottom);
+	QSize frameSize =
+		m_iconSize + QSize(fs_iconMarginLR * 2, fs_iconMarginTop + fs_iconMarginBottom);
 	//  .. and with offset
 	QRect frameRect = QRect(QPoint(fs_leftMargin, fs_frameSpacing / 2), frameSize);
 
@@ -439,33 +432,42 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt)
 		// show navigator only if the inknpaint viewer is visible
 		if (inknPaintViewerPanel->isVisible()) {
 			SceneViewer *viewer = inknPaintViewerPanel->getSceneViewer();
-			//imgSize: image's pixel size
-			QSize imgSize(sl->getProperties()->getImageRes().lx, sl->getProperties()->getImageRes().ly);
-			//Viewer affine
+			// imgSize: image's pixel size
+			QSize imgSize(sl->getProperties()->getImageRes().lx,
+						  sl->getProperties()->getImageRes().ly);
+			// Viewer affine
 			TAffine viewerAff = inknPaintViewerPanel->getSceneViewer()->getViewMatrix();
 			// pixel size which will be displayed with 100% scale in Viewer Stage
 			TFrameId currentId = TApp::instance()->getCurrentFrame()->getFid();
-			double imgPixelWidth = (double)(imgSize.width()) / sl->getDpi(currentId).x * Stage::inch;
-			double imgPixelHeight = (double)(imgSize.height()) / sl->getDpi(currentId).y * Stage::inch;
+			double imgPixelWidth =
+				(double)(imgSize.width()) / sl->getDpi(currentId).x * Stage::inch;
+			double imgPixelHeight =
+				(double)(imgSize.height()) / sl->getDpi(currentId).y * Stage::inch;
 
-			//get the image's corner positions in viewer matrix (with current zoom scale)
+			// get the image's corner positions in viewer matrix (with current zoom scale)
 			TPointD imgTopRight = viewerAff * TPointD(imgPixelWidth / 2.0f, imgPixelHeight / 2.0f);
-			TPointD imgBottomLeft = viewerAff * TPointD(-imgPixelWidth / 2.0f, -imgPixelHeight / 2.0f);
+			TPointD imgBottomLeft =
+				viewerAff * TPointD(-imgPixelWidth / 2.0f, -imgPixelHeight / 2.0f);
 
-			//pixel size in viewer matrix ( with current zoom scale )
-			QSizeF imgSizeInViewer(imgTopRight.x - imgBottomLeft.x, imgTopRight.y - imgBottomLeft.y);
+			// pixel size in viewer matrix ( with current zoom scale )
+			QSizeF imgSizeInViewer(imgTopRight.x - imgBottomLeft.x,
+								   imgTopRight.y - imgBottomLeft.y);
 
-			//ratio of the Viewer frame's position and size
-			QRectF naviRatio((-(float)viewer->width() * 0.5f - (float)imgBottomLeft.x) / imgSizeInViewer.width(),
-							 1.0f - ((float)viewer->height() * 0.5f - (float)imgBottomLeft.y) / imgSizeInViewer.height(),
+			// ratio of the Viewer frame's position and size
+			QRectF naviRatio((-(float)viewer->width() * 0.5f - (float)imgBottomLeft.x) /
+								 imgSizeInViewer.width(),
+							 1.0f -
+								 ((float)viewer->height() * 0.5f - (float)imgBottomLeft.y) /
+									 imgSizeInViewer.height(),
 							 (float)viewer->width() / imgSizeInViewer.width(),
 							 (float)viewer->height() / imgSizeInViewer.height());
 
-			naviRect = QRect(iconImgRect.left() + (int)(naviRatio.left() * (float)iconImgRect.width()),
-							 iconImgRect.top() + (int)(naviRatio.top() * (float)iconImgRect.height()),
-							 (int)((float)iconImgRect.width() * naviRatio.width()),
-							 (int)((float)iconImgRect.height() * naviRatio.height()));
-			//for drag move
+			naviRect =
+				QRect(iconImgRect.left() + (int)(naviRatio.left() * (float)iconImgRect.width()),
+					  iconImgRect.top() + (int)(naviRatio.top() * (float)iconImgRect.height()),
+					  (int)((float)iconImgRect.width() * naviRatio.width()),
+					  (int)((float)iconImgRect.height() * naviRatio.height()));
+			// for drag move
 			m_naviRectPos = naviRect.center();
 
 			naviRect = naviRect.intersected(frameRect);
@@ -514,7 +516,7 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt)
 		if (0 <= i && i < frameCount) {
 			TFrameId fid = fids[i];
 
-			//normal or inbetween (for vector levels)
+			// normal or inbetween (for vector levels)
 			int flags = (sl->getType() == PLI_XSHLEVEL && range.first < fid && fid < range.second)
 							? F_INBETWEEN_RANGE
 							: F_NORMAL;
@@ -526,7 +528,7 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt)
 			p.setBrush(Qt::NoBrush);
 			p.drawRect(tmp_iconImgRect);
 
-			//Frame number
+			// Frame number
 			if (m_selection->isSelected(fids[i])) {
 				if (TApp::instance()->getCurrentFrame()->isEditingLevel() && isCurrentFrame)
 					p.setPen(Qt::red);
@@ -536,13 +538,12 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt)
 				p.setPen(QColor(192, 192, 192));
 
 			p.setBrush(Qt::NoBrush);
-			//for single frame
+			// for single frame
 			if (fid.getNumber() == TFrameId::EMPTY_FRAME || fid.getNumber() == TFrameId::NO_FRAME) {
-				p.drawText(tmp_frameRect.adjusted(0, 0, -3, 2),
-						   "Single Frame",
+				p.drawText(tmp_frameRect.adjusted(0, 0, -3, 2), "Single Frame",
 						   QTextOption(Qt::AlignRight | Qt::AlignBottom));
 			}
-			//for sequencial frame
+			// for sequencial frame
 			else {
 				p.drawText(tmp_frameRect.adjusted(0, 0, -3, 2),
 						   QString().setNum(fid.getNumber()).rightJustified(4, '0'),
@@ -552,23 +553,25 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt)
 
 			// Read-only frames (lock)
 			if (0 <= i && i < frameCount) {
-				if ((editableFrameRange.empty() && isReadOnly) || (isReadOnly &&
-																   (!editableFrameRange.empty() && editableFrameRange.count(fids[i]) == 0))) {
+				if ((editableFrameRange.empty() && isReadOnly) ||
+					(isReadOnly &&
+					 (!editableFrameRange.empty() && editableFrameRange.count(fids[i]) == 0))) {
 					static QPixmap lockPixmap(":Resources/forbidden.png");
 					p.drawPixmap(tmp_frameRect.bottomLeft() + QPoint(3, -13), lockPixmap);
 				}
 			}
 		}
 
-		//navigator rect
+		// navigator rect
 		if (naviRect.isValid() && isCurrentFrame) {
 			p.setPen(QPen(Qt::red, 1));
 			p.drawRect(naviRect.translated(0, oneFrameHeight * i));
 			p.setPen(Qt::NoPen);
 		}
 
-		//red frame for the current frame
-		if (TApp::instance()->getCurrentFrame()->isEditingLevel() && (isCurrentFrame || isSelected)) {
+		// red frame for the current frame
+		if (TApp::instance()->getCurrentFrame()->isEditingLevel() &&
+			(isCurrentFrame || isSelected)) {
 			QPen pen;
 			pen.setColor(Qt::red);
 			pen.setWidth(2);
@@ -587,12 +590,8 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt)
 
 //-----------------------------------------------------------------------------
 
-void FilmstripFrames::drawFrameIcon(
-	QPainter &p,
-	const QRect &r,
-	int index,
-	const TFrameId &fid,
-	int flags)
+void FilmstripFrames::drawFrameIcon(QPainter &p, const QRect &r, int index, const TFrameId &fid,
+									int flags)
 {
 	QPixmap pm;
 	TXshSimpleLevel *sl = getLevel();
@@ -632,7 +631,8 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event)
 
 	TXshSimpleLevel *sl = getLevel();
 	int i0 = y2index(0);
-	int frameHeight = m_iconSize.height() + fs_frameSpacing + fs_iconMarginTop + fs_iconMarginBottom;
+	int frameHeight =
+		m_iconSize.height() + fs_frameSpacing + fs_iconMarginTop + fs_iconMarginBottom;
 	QPoint clickedPos = event->pos() - QPoint(0, (index - i0) * frameHeight);
 
 	if (event->button() == Qt::LeftButton) {
@@ -642,11 +642,13 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event)
 		ComboViewerPanel *inknPaintViewerPanel = TApp::instance()->getInknPaintViewerPanel();
 
 		// navigator pan
-		if (fid == TApp::instance()->getCurrentFrame()->getFid() && sl->getType() == TZP_XSHLEVEL && inknPaintViewerPanel && inknPaintViewerPanel->isVisible() && QRect(QPoint(fs_leftMargin + fs_iconMarginLR,
-																																											   fs_frameSpacing / 2 + fs_iconMarginTop) //<- top-left position of the icon
-																																										,
-																																										m_iconSize)
-																																									  .contains(clickedPos)) {
+		if (fid == TApp::instance()->getCurrentFrame()->getFid() && sl->getType() == TZP_XSHLEVEL &&
+			inknPaintViewerPanel && inknPaintViewerPanel->isVisible() &&
+			QRect(QPoint(fs_leftMargin + fs_iconMarginLR,
+						 fs_frameSpacing / 2 + fs_iconMarginTop) //<- top-left position of the icon
+				  ,
+				  m_iconSize)
+				.contains(clickedPos)) {
 			m_isNavigatorPanning = true;
 			execNavigatorPan(event->pos());
 			QApplication::setOverrideCursor(Qt::ClosedHandCursor);
@@ -662,11 +664,12 @@ void FilmstripFrames::mousePressEvent(QMouseEvent *event)
 			}
 		} else if (event->modifiers() & Qt::ControlModifier)
 			select(index, CTRL_SELECT);
-		//inbetween
-		else if (sl->getType() == PLI_XSHLEVEL && m_selection->isInInbetweenRange(fid) && event->pos().x() > width() - 12 - fs_rightMargin) {
+		// inbetween
+		else if (sl->getType() == PLI_XSHLEVEL && m_selection->isInInbetweenRange(fid) &&
+				 event->pos().x() > width() - 12 - fs_rightMargin) {
 			inbetween();
 		} else {
-			//move current frame when clicked without modifier
+			// move current frame when clicked without modifier
 			TApp *tapp = TApp::instance();
 			std::vector<TFrameId> fids;
 			TXshLevel *level = tapp->getCurrentLevel()->getLevel();
@@ -703,16 +706,18 @@ void FilmstripFrames::execNavigatorPan(const QPoint &point)
 	TFrameId fid = index2fid(index);
 	int i0 = y2index(0);
 
-	int frameHeight = m_iconSize.height() + fs_frameSpacing + fs_iconMarginTop + fs_iconMarginBottom;
+	int frameHeight =
+		m_iconSize.height() + fs_frameSpacing + fs_iconMarginTop + fs_iconMarginBottom;
 	QPoint clickedPos = point - QPoint(0, (index - i0) * frameHeight);
 
 	if (fid != TApp::instance()->getCurrentFrame()->getFid())
 		return;
 
-	QRect iconRect = QRect(QPoint(fs_leftMargin + fs_iconMarginLR,
-								  fs_frameSpacing / 2 + fs_iconMarginTop) //<- top-left position of the icon
-						   ,
-						   m_iconSize);
+	QRect iconRect =
+		QRect(QPoint(fs_leftMargin + fs_iconMarginLR,
+					 fs_frameSpacing / 2 + fs_iconMarginTop) //<- top-left position of the icon
+			  ,
+			  m_iconSize);
 
 	QPointF delta = m_naviRectPos - clickedPos;
 
@@ -752,7 +757,7 @@ void FilmstripFrames::mouseMoveEvent(QMouseEvent *e)
 	QPoint pos = e->pos();
 	int index = y2index(e->pos().y());
 	if (e->buttons() & Qt::LeftButton) {
-		//navigator pan
+		// navigator pan
 		if (m_isNavigatorPanning) {
 			execNavigatorPan(e->pos());
 			e->accept();
@@ -937,7 +942,7 @@ void FilmstripFrames::onLevelChanged()
 void FilmstripFrames::onLevelSwitched(TXshLevel *)
 {
 	updateContentHeight(0);
-	onFrameSwitched(); //deve visualizzare il frame corrente nella levelstrip
+	onFrameSwitched(); // deve visualizzare il frame corrente nella levelstrip
 }
 
 //-----------------------------------------------------------------------------
@@ -964,7 +969,7 @@ void FilmstripFrames::onFrameSwitched()
 	int index = fid2index(fid);
 	if (index >= 0) {
 		exponeFrame(index);
-		//clear selection and select only the destination frame
+		// clear selection and select only the destination frame
 		select(index, ONLY_SELECT);
 	}
 	update();
@@ -1034,9 +1039,9 @@ void FilmstripFrames::inbetween()
 	settings.setValue(keyName, currentItem);
 
 	// lo converto nella notazione di FilmstripCmd
-	const FilmstripCmd::InbetweenInterpolation codes[] =
-		{FilmstripCmd::II_Linear, FilmstripCmd::II_EaseIn,
-		 FilmstripCmd::II_EaseOut, FilmstripCmd::II_EaseInOut};
+	const FilmstripCmd::InbetweenInterpolation codes[] = {
+		FilmstripCmd::II_Linear, FilmstripCmd::II_EaseIn, FilmstripCmd::II_EaseOut,
+		FilmstripCmd::II_EaseInOut};
 
 	FilmstripCmd::InbetweenInterpolation interpolation = codes[index];
 
@@ -1073,7 +1078,7 @@ Filmstrip::Filmstrip(QWidget *parent, Qt::WFlags flags)
 
 	m_chooseLevelCombo->setMaxVisibleItems(50);
 
-	//layout
+	// layout
 	QVBoxLayout *mainLayout = new QVBoxLayout();
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(3);
@@ -1099,7 +1104,7 @@ Filmstrip::Filmstrip(QWidget *parent, Qt::WFlags flags)
 void Filmstrip::onChooseLevelComboChanged(int index)
 {
 	TApp *tapp = TApp::instance();
-	//empty level
+	// empty level
 	if (index == m_chooseLevelCombo->findText(tr("- No Current Level -")))
 		tapp->getCurrentLevel()->setLevel(0);
 	else {
@@ -1116,14 +1121,16 @@ void Filmstrip::onChooseLevelComboChanged(int index)
 		else
 			WF = fids[0];
 
-		//this function emits xshLevelSwitched() signal and eventually calls FlipConsole::UpdateRange
-		//it may move the current frame so we need to keep the current frameId before calling setLevel.
+		// this function emits xshLevelSwitched() signal and eventually calls
+		// FlipConsole::UpdateRange
+		// it may move the current frame so we need to keep the current frameId before calling
+		// setLevel.
 		tapp->getCurrentLevel()->setLevel(m_levels[index]);
 
 		if (tapp->getCurrentSelection()->getSelection())
 			tapp->getCurrentSelection()->getSelection()->selectNone();
 
-		//move to the current working frame
+		// move to the current working frame
 		tapp->getCurrentFrame()->setFid(WF);
 
 		QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -1139,13 +1146,13 @@ void Filmstrip::onChooseLevelComboChanged(int index)
 */
 void Filmstrip::updateChooseLevelComboItems()
 {
-	//clear items
+	// clear items
 	m_chooseLevelCombo->clear();
 	m_levels.clear();
 
 	std::map<TXshSimpleLevel *, TFrameId> new_workingFrames;
 
-	//correct and register items
+	// correct and register items
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	if (scene) {
 		std::vector<TXshLevel *> levels;
@@ -1153,10 +1160,10 @@ void Filmstrip::updateChooseLevelComboItems()
 		std::vector<TXshLevel *>::iterator it;
 
 		for (it = levels.begin(); it != levels.end(); ++it) {
-			//register only TLV and PLI
+			// register only TLV and PLI
 			TXshSimpleLevel *sl = (*it)->getSimpleLevel();
 			if (sl) {
-				//register only used level in xsheet
+				// register only used level in xsheet
 				if (!scene->getTopXsheet()->isLevelUsed(sl))
 					continue;
 
@@ -1188,11 +1195,11 @@ void Filmstrip::updateChooseLevelComboItems()
 
 	m_chooseLevelCombo->addItem(tr("- No Current Level -"));
 
-	//swap the list
+	// swap the list
 	m_workingFrames.clear();
 	m_workingFrames = new_workingFrames;
 
-	//synchronize the current index of combo to the current level
+	// synchronize the current index of combo to the current level
 	updateCurrentLevelComboItem();
 }
 
@@ -1236,23 +1243,29 @@ void Filmstrip::showEvent(QShowEvent *)
 {
 	TApp *app = TApp::instance();
 	TXshLevelHandle *levelHandle = app->getCurrentLevel();
-	bool ret = connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), SLOT(onLevelSwitched(TXshLevel *)));
+	bool ret = connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)),
+					   SLOT(onLevelSwitched(TXshLevel *)));
 	ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), SLOT(onLevelChanged()));
 
-	//updateWindowTitle is called in the onLevelChanged
+	// updateWindowTitle is called in the onLevelChanged
 	ret = ret && connect(app->getPaletteController()->getCurrentLevelPalette(),
 						 SIGNAL(colorStyleChangedOnMouseRelease()), SLOT(onLevelChanged()));
 	ret = ret && connect(levelHandle, SIGNAL(xshLevelTitleChanged()), SLOT(onLevelChanged()));
 
-	ret = ret && connect(m_frameArea->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(onSliderMoved(int)));
+	ret = ret && connect(m_frameArea->verticalScrollBar(), SIGNAL(valueChanged(int)), this,
+						 SLOT(onSliderMoved(int)));
 
 	TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
-	ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(updateChooseLevelComboItems()));
-	ret = ret && connect(sceneHandle, SIGNAL(castChanged()), this, SLOT(updateChooseLevelComboItems()));
+	ret = ret &&
+		  connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(updateChooseLevelComboItems()));
+	ret = ret &&
+		  connect(sceneHandle, SIGNAL(castChanged()), this, SLOT(updateChooseLevelComboItems()));
 
-	ret = ret && connect(TApp::instance()->getCurrentXsheet(), SIGNAL(xsheetChanged()), this, SLOT(updateChooseLevelComboItems()));
+	ret = ret && connect(TApp::instance()->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
+						 SLOT(updateChooseLevelComboItems()));
 
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
+	ret = ret &&
+		  connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
 
 	assert(ret);
 
@@ -1267,22 +1280,26 @@ void Filmstrip::hideEvent(QHideEvent *)
 {
 	TApp *app = TApp::instance();
 	TXshLevelHandle *levelHandle = app->getCurrentLevel();
-	disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this, SLOT(onLevelSwitched(TXshLevel *)));
+	disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+			   SLOT(onLevelSwitched(TXshLevel *)));
 	disconnect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(onLevelChanged()));
 	disconnect(TApp::instance()->getPaletteController()->getCurrentLevelPalette(),
 			   SIGNAL(colorStyleChangedOnMouseRelease()), this, SLOT(onLevelChanged()));
 
 	disconnect(levelHandle, SIGNAL(xshLevelTitleChanged()), this, SLOT(onLevelChanged()));
 
-	disconnect(m_frameArea->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(onSliderMoved(int)));
+	disconnect(m_frameArea->verticalScrollBar(), SIGNAL(valueChanged(int)), this,
+			   SLOT(onSliderMoved(int)));
 
 	TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
 	disconnect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(updateChooseLevelComboItems()));
 	disconnect(sceneHandle, SIGNAL(castChanged()), this, SLOT(updateChooseLevelComboItems()));
 
-	disconnect(TApp::instance()->getCurrentXsheet(), SIGNAL(xsheetChanged()), this, SLOT(updateChooseLevelComboItems()));
+	disconnect(TApp::instance()->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
+			   SLOT(updateChooseLevelComboItems()));
 
-	disconnect(TApp::instance()->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
+	disconnect(TApp::instance()->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+			   SLOT(onFrameSwitched()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1319,7 +1336,7 @@ void Filmstrip::updateWindowTitle()
 			levelName += " *";
 	}
 
-	//parentWidget() is TPanel
+	// parentWidget() is TPanel
 	parentWidget()->setWindowTitle(tr("Level:  ") + levelName);
 
 	TFrameHandle *fh = TApp::instance()->getCurrentFrame();
@@ -1351,7 +1368,8 @@ void Filmstrip::onLevelSwitched(TXshLevel *oldLevel)
 
 void Filmstrip::onSliderMoved(int val)
 {
-	int oneFrameHeight = m_frames->getIconSize().height() + fs_frameSpacing + fs_iconMarginTop + fs_iconMarginBottom;
+	int oneFrameHeight =
+		m_frames->getIconSize().height() + fs_frameSpacing + fs_iconMarginTop + fs_iconMarginBottom;
 	int tmpVal = (int)((float)val / (float)oneFrameHeight + 0.5f) * oneFrameHeight;
 	m_frameArea->verticalScrollBar()->setValue(tmpVal);
 }

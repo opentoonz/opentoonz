@@ -12,8 +12,7 @@
 // SVNPartialLockReader
 //-----------------------------------------------------------------------------
 
-SVNPartialLockReader::SVNPartialLockReader(const QString &xmlSVNResponse)
-	: m_data(xmlSVNResponse)
+SVNPartialLockReader::SVNPartialLockReader(const QString &xmlSVNResponse) : m_data(xmlSVNResponse)
 {
 	addData(m_data);
 
@@ -116,8 +115,7 @@ void SVNPartialLockReader::readPartialLock(const QString &text)
 // SVNConfigReader
 //-----------------------------------------------------------------------------
 
-SVNConfigReader::SVNConfigReader(const QString &xml)
-	: m_data(xml), m_path()
+SVNConfigReader::SVNConfigReader(const QString &xml) : m_data(xml), m_path()
 {
 	addData(m_data);
 
@@ -165,8 +163,10 @@ void SVNConfigReader::readRepository()
 	repo.m_name = repoName;
 	repo.m_localPath = localPath;
 	repo.m_repoPath = repoPath;
-	repo.m_username = QString::fromStdString(PermissionsManager::instance()->getSVNUserName(m_repositories.size()));
-	repo.m_password = QString::fromStdString(PermissionsManager::instance()->getSVNPassword(m_repositories.size()));
+	repo.m_username = QString::fromStdString(
+		PermissionsManager::instance()->getSVNUserName(m_repositories.size()));
+	repo.m_password = QString::fromStdString(
+		PermissionsManager::instance()->getSVNPassword(m_repositories.size()));
 	m_repositories.append(repo);
 }
 
@@ -200,8 +200,7 @@ void SVNConfigReader::readUnknownElement()
 // SVNStatusReader
 //-----------------------------------------------------------------------------
 
-SVNStatusReader::SVNStatusReader(const QString &xmlSVNResponse)
-	: m_data(xmlSVNResponse)
+SVNStatusReader::SVNStatusReader(const QString &xmlSVNResponse) : m_data(xmlSVNResponse)
 {
 	addData(m_data);
 
@@ -448,8 +447,7 @@ void SVNStatusReader::readUnknownElement()
 // SVNLogReader
 //-----------------------------------------------------------------------------
 
-SVNLogReader::SVNLogReader(const QString &xmlSVNResponse)
-	: m_data(xmlSVNResponse)
+SVNLogReader::SVNLogReader(const QString &xmlSVNResponse) : m_data(xmlSVNResponse)
 {
 	addData(m_data);
 
@@ -520,8 +518,7 @@ void SVNLogReader::readUnknownElement()
 // SVNInfoReader
 //-----------------------------------------------------------------------------
 
-SVNInfoReader::SVNInfoReader(const QString &xmlSVNResponse)
-	: m_data(xmlSVNResponse)
+SVNInfoReader::SVNInfoReader(const QString &xmlSVNResponse) : m_data(xmlSVNResponse)
 {
 	addData(m_data);
 
@@ -579,8 +576,7 @@ void SVNInfoReader::readUnknownElement()
 // SVNListReader
 //-----------------------------------------------------------------------------
 
-SVNListReader::SVNListReader(const QString &xmlSVNResponse)
-	: m_data(xmlSVNResponse)
+SVNListReader::SVNListReader(const QString &xmlSVNResponse) : m_data(xmlSVNResponse)
 {
 	addData(m_data);
 

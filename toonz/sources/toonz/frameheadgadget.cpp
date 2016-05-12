@@ -47,7 +47,8 @@ bool isOnionSkinEnabled()
 } // namespace
 
 FrameHeadGadget::FrameHeadGadget()
-	: m_action(None), m_highlightedFosFrame(-1), m_buttonPressCellIndex(-1), m_highlightedMosFrame(-1)
+	: m_action(None), m_highlightedFosFrame(-1), m_buttonPressCellIndex(-1),
+	  m_highlightedMosFrame(-1)
 {
 }
 
@@ -62,7 +63,8 @@ void FrameHeadGadget::draw(QPainter &p, const QColor &lightColor, const QColor &
 	drawOnionSkinSelection(p, lightColor, darkColor);
 }
 
-void FrameHeadGadget::drawPlayingHead(QPainter &p, const QColor &lightColor, const QColor &darkColor)
+void FrameHeadGadget::drawPlayingHead(QPainter &p, const QColor &lightColor,
+									  const QColor &darkColor)
 {
 	int currentFrame = getCurrentFrame();
 	int yy = index2y(currentFrame);
@@ -101,7 +103,8 @@ void FrameHeadGadget::drawPlayingHead(QPainter &p, const QColor &lightColor, con
 	p.fillRect(QRect(xx - 5, yy + 7, 3, 3), QBrush(lightColor));
 }
 
-void FrameHeadGadget::drawOnionSkinSelection(QPainter &p, const QColor &lightColor, const QColor &darkColor)
+void FrameHeadGadget::drawOnionSkinSelection(QPainter &p, const QColor &lightColor,
+											 const QColor &darkColor)
 {
 	int currentRow = getCurrentFrame();
 	int xa = 12;
@@ -306,7 +309,8 @@ void FrameHeadGadget::setMos(int frame, bool on)
 }
 
 FilmstripFrameHeadGadget::FilmstripFrameHeadGadget(FilmstripFrames *filmstrip)
-	: m_filmstrip(filmstrip), m_dy(m_filmstrip->getIconSize().height() + fs_frameSpacing + fs_iconMarginTop + fs_iconMarginBottom)
+	: m_filmstrip(filmstrip), m_dy(m_filmstrip->getIconSize().height() + fs_frameSpacing +
+								   fs_iconMarginTop + fs_iconMarginBottom)
 {
 }
 
@@ -345,7 +349,8 @@ int FilmstripFrameHeadGadget::getCurrentFrame() const
 
 //-----------------------------------------------------------------------------
 
-void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p, const QColor &lightColor, const QColor &darkColor)
+void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p, const QColor &lightColor,
+													  const QColor &darkColor)
 {
 	int currentRow = getCurrentFrame();
 
@@ -359,7 +364,7 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p, const QColor 
 	int mosCount = osMask.getMosCount();
 
 	int i;
-	//OnionSkinの円の左上座標のｙ値
+	// OnionSkinの円の左上座標のｙ値
 	int onionDotYPos = m_dy / 2 - 5;
 
 	p.setPen(Qt::red);
@@ -405,10 +410,10 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p, const QColor 
 				maxMos = mos;
 		}
 		p.setBrush(Qt::NoBrush);
-		//min/maxが更新されていたら、線を描く
+		// min/maxが更新されていたら、線を描く
 		if (minMos < 0) //上方向に伸ばす線
 		{
-			int y0 = index2y(currentRow + minMos) + onionDotYPos + 10; //10は●の直径
+			int y0 = index2y(currentRow + minMos) + onionDotYPos + 10; // 10は●の直径
 			int y1 = index2y(currentRow) - 15;
 			p.drawLine(15, y0, 15, y1);
 		}
@@ -423,10 +428,10 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p, const QColor 
 	//--- Fix Onion Skinの描画
 	for (i = 0; i < osMask.getFosCount(); i++) {
 		int fos = osMask.getFos(i);
-		//if(fos == currentRow) continue;
+		// if(fos == currentRow) continue;
 		int y = index2y(fos) + onionDotYPos;
 		p.setPen(Qt::red);
-		//OnionSkinがDisableなら中空にする
+		// OnionSkinがDisableなら中空にする
 		p.setBrush(osMask.isEnabled() ? QBrush(QColor(0, 255, 255, 128)) : Qt::NoBrush);
 		p.drawEllipse(0, y, 10, 10);
 	}
@@ -437,9 +442,9 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p, const QColor 
 	//続いて、各OnionSkinの●を描く
 	p.setPen(Qt::red);
 	for (i = 0; i < mosCount; i++) {
-		//mosはOnionSkinの描かれるフレームのオフセット値
+		// mosはOnionSkinの描かれるフレームのオフセット値
 		int mos = osMask.getMos(i);
-		//100312 iwasawa ハイライトする場合は後で描くのでスキップする
+		// 100312 iwasawa ハイライトする場合は後で描くのでスキップする
 		if (currentRow + mos == m_highlightedMosFrame)
 			continue;
 
@@ -450,7 +455,7 @@ void FilmstripFrameHeadGadget::drawOnionSkinSelection(QPainter &p, const QColor 
 		p.drawEllipse(10, y, 10, 10);
 	}
 
-	//Fix Onion Skin ハイライトの描画 FixOnionSkinがマウスが乗ってハイライトされていて、
+	// Fix Onion Skin ハイライトの描画 FixOnionSkinがマウスが乗ってハイライトされていて、
 	//かつ 現在のフレームでないときに描画
 	if (m_highlightedFosFrame >= 0 && m_highlightedFosFrame != currentRow) {
 		p.setPen(QColor(255, 128, 0));
@@ -483,11 +488,11 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e)
 		//		Fixedオニオンスキンの●エリアをクリックで Fixedオニオンスキンの位置の指定
 
 		//----- それぞれのパーツの位置Rectの指定。各フレームの右上座標からのオフセットも含む。
-		//OnionSkinの円の左上座標のｙ値
+		// OnionSkinの円の左上座標のｙ値
 		int onionDotYPos = m_dy / 2 - 5;
-		//OnionSkinの●のRect
+		// OnionSkinの●のRect
 		QRect onionDotRect(10, onionDotYPos, 10, 10);
-		//FixedOnionSkinの●のRect
+		// FixedOnionSkinの●のRect
 		QRect fixedOnionDotRect(0, onionDotYPos, 10, 10);
 		//上方向のOnionSkinタブのRect
 		QRect backOnionTabRect(0, m_dy - 15, 30, 15);
@@ -522,7 +527,8 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e)
 		if (frame == currentFrame)
 			return false;
 		//カレントフレームの上下でタブをクリックした場合
-		else if ((frame == currentFrame - 1 && backOnionTabRect.contains(clickedPos)) || (frame == currentFrame + 1 && frontOnionTabRect.contains(clickedPos))) {
+		else if ((frame == currentFrame - 1 && backOnionTabRect.contains(clickedPos)) ||
+				 (frame == currentFrame + 1 && frontOnionTabRect.contains(clickedPos))) {
 			//ドラッグに備える
 			m_action = ActivateMos;
 		}
@@ -537,7 +543,7 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e)
 				//カレントフレームでなければ、オニオンスキンを切り替え
 				setMos(frame, on);
 			}
-			//FixedOnionSkinの場合
+			// FixedOnionSkinの場合
 			else if (fixedOnionDotRect.contains(clickedPos)) {
 				// Fos
 				bool on = !isFos(frame);
@@ -562,7 +568,8 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e)
 			QRect backOnionTabRect(0, m_dy - 15, 30, 15);
 			//下方向のOnionSkinタブのRect
 			QRect frontOnionTabRect(0, 0, 30, 15);
-			if ((currentFrame - 1 == frame && backOnionTabRect.contains(clickedPos)) || (currentFrame + 1 == frame && frontOnionTabRect.contains(clickedPos))) {
+			if ((currentFrame - 1 == frame && backOnionTabRect.contains(clickedPos)) ||
+				(currentFrame + 1 == frame && frontOnionTabRect.contains(clickedPos))) {
 				enableOnionSkin(!isOnionSkinEnabled());
 				viewer->update();
 			}
@@ -580,11 +587,11 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e)
 		//マウスボタンが押されていない場合
 		if (mouseEvent->buttons() == 0) {
 			//----- それぞれのパーツの位置Rectの指定。各フレームの右上座標からのオフセットも含む。
-			//OnionSkinの円の左上座標のｙ値
+			// OnionSkinの円の左上座標のｙ値
 			int onionDotYPos = m_dy / 2 - 5;
-			//OnionSkinの●のRect
+			// OnionSkinの●のRect
 			QRect onionDotRect(10, onionDotYPos, 10, 10);
-			//FixedOnionSkinの●のRect
+			// FixedOnionSkinの●のRect
 			QRect fixedOnionDotRect(0, onionDotYPos, 10, 10);
 			//上方向のOnionSkinタブのRect
 			QRect backOnionTabRect(0, m_dy - 15, 30, 15);
@@ -618,14 +625,15 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e)
 				viewer->setToolTip(tr(""));
 				return false;
 			}
-			//Fixed Onion Skin
+			// Fixed Onion Skin
 			else if (fixedOnionDotRect.contains(clickedPos))
 				viewer->setToolTip(tr("Click to Toggle Fixed Onion Skin"));
 			//通常の Onion Skin
 			else if (onionDotRect.contains(clickedPos))
 				viewer->setToolTip(tr("Click / Drag to Toggle Onion Skin"));
 			//カレントフレームの上下タブ
-			else if ((currentFrame - 1 == frame && backOnionTabRect.contains(clickedPos)) || (currentFrame + 1 == frame && frontOnionTabRect.contains(clickedPos)))
+			else if ((currentFrame - 1 == frame && backOnionTabRect.contains(clickedPos)) ||
+					 (currentFrame + 1 == frame && frontOnionTabRect.contains(clickedPos)))
 				viewer->setToolTip(tr("Drag to Extend Onion Skin, Double Click to Toggle All"));
 			else {
 				viewer->setToolTip(tr(""));
@@ -668,10 +676,8 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e)
 
 class OnionSkinToggle : public MenuItemHandler
 {
-public:
-	OnionSkinToggle() : MenuItemHandler(MI_OnionSkin)
-	{
-	}
+  public:
+	OnionSkinToggle() : MenuItemHandler(MI_OnionSkin) {}
 	void execute()
 	{
 		QAction *action = CommandManager::instance()->getAction(MI_OnionSkin);

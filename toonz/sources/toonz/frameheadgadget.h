@@ -16,15 +16,10 @@ class FrameHeadGadget : public QObject
 {
 	Q_OBJECT
 
-public:
-	enum Action { None,
-				  MoveHead,
-				  ActivateFos,
-				  DeactivateFos,
-				  ActivateMos,
-				  DeactivateMos };
+  public:
+	enum Action { None, MoveHead, ActivateFos, DeactivateFos, ActivateMos, DeactivateMos };
 
-protected:
+  protected:
 	bool m_dragging;
 	int m_action;
 	int m_highlightedFosFrame;
@@ -32,15 +27,16 @@ protected:
 
 	int m_highlightedMosFrame;
 
-public:
+  public:
 	FrameHeadGadget();
 	virtual ~FrameHeadGadget();
 
 	void draw(QPainter &p, const QColor &lightColor, const QColor &darkColor);
 
 	void drawPlayingHead(QPainter &p, const QColor &lightColor, const QColor &darkColor);
-	//reimpremented in FilmstripFrameHeadGadget
-	virtual void drawOnionSkinSelection(QPainter &p, const QColor &lightColor, const QColor &darkColor);
+	// reimpremented in FilmstripFrameHeadGadget
+	virtual void drawOnionSkinSelection(QPainter &p, const QColor &lightColor,
+										const QColor &darkColor);
 
 	virtual int getY() const = 0;
 
@@ -55,13 +51,13 @@ public:
 	void setFos(int frame, bool on);
 	void setMos(int frame, bool on);
 
-	//reimpremented in FilmstripFrameHeadGadget
+	// reimpremented in FilmstripFrameHeadGadget
 	virtual bool eventFilter(QObject *obj, QEvent *event);
 };
 
 class XsheetFrameHeadGadget : public FrameHeadGadget
 {
-public:
+  public:
 };
 
 class FilmstripFrameHeadGadget : public FrameHeadGadget
@@ -69,7 +65,7 @@ class FilmstripFrameHeadGadget : public FrameHeadGadget
 	FilmstripFrames *m_filmstrip;
 	int m_dy;
 
-public:
+  public:
 	FilmstripFrameHeadGadget(FilmstripFrames *filmstrip);
 
 	int getY() const;

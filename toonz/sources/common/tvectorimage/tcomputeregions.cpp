@@ -56,17 +56,22 @@ void roundStroke(TStroke *s)
 		s->setControlPoint(j, myRound(p));
 	}
 	if (size > 3)
-	//! it can happen that a stroke has a first or last quadratic degenerated:(3 equal control points).
-	// in that case, if the stroke has an intersection in an endpoint, the resulting w could not be  0 or 1 as expected.
-	// since the w==0 and w==1 are used in the region computing to determine if the intersection is an endpoint,
+	//! it can happen that a stroke has a first or last quadratic degenerated:(3 equal control
+	//! points).
+	// in that case, if the stroke has an intersection in an endpoint, the resulting w could not be
+	// 0 or 1 as expected.
+	// since the w==0 and w==1 are used in the region computing to determine if the intersection is
+	// an endpoint,
 	//
 
 	{
-		if (s->getControlPoint(0) == s->getControlPoint(1) && s->getControlPoint(0) == s->getControlPoint(2)) {
+		if (s->getControlPoint(0) == s->getControlPoint(1) &&
+			s->getControlPoint(0) == s->getControlPoint(2)) {
 			s->setControlPoint(2, s->getControlPoint(3));
 			s->setControlPoint(1, s->getControlPoint(3));
 		}
-		if (s->getControlPoint(size - 1) == s->getControlPoint(size - 2) && s->getControlPoint(size - 1) == s->getControlPoint(size - 3)) {
+		if (s->getControlPoint(size - 1) == s->getControlPoint(size - 2) &&
+			s->getControlPoint(size - 1) == s->getControlPoint(size - 3)) {
 			s->setControlPoint(size - 2, s->getControlPoint(size - 4));
 			s->setControlPoint(size - 3, s->getControlPoint(size - 4));
 		}
@@ -76,7 +81,7 @@ void roundStroke(TStroke *s)
 //-----------------------------------------------------------------------------
 class VIListElem
 {
-public:
+  public:
 	VIListElem *m_prev;
 	VIListElem *m_next;
 
@@ -85,13 +90,12 @@ public:
 	inline VIListElem *prev() { return m_prev; }
 };
 
-template <class T>
-class VIList
+template <class T> class VIList
 {
 	int m_size;
 	T *m_begin, *m_end;
 
-public:
+  public:
 	VIList() : m_begin(0), m_end(0), m_size(0) {}
 
 	inline T *first() const { return m_begin; };
@@ -109,23 +113,23 @@ public:
 
 class Intersection : public VIListElem
 {
-public:
-	//Intersection* m_prev, *m_next;
+  public:
+	// Intersection* m_prev, *m_next;
 	TPointD m_intersection;
 	int m_numInter;
-	//bool m_isNotErasable;
+	// bool m_isNotErasable;
 	VIList<IntersectedStroke> m_strokeList;
 
 	Intersection() : m_numInter(0), m_strokeList() {}
 
 	inline Intersection *next() { return (Intersection *)VIListElem::next(); };
 	inline Intersection *prev() { return (Intersection *)VIListElem::prev(); };
-	//inline Intersection* operator++() {return next();}
+	// inline Intersection* operator++() {return next();}
 };
 
 class IntersectedStrokeEdges
 {
-public:
+  public:
 	int m_index;
 	list<TEdge *> m_edgeList;
 	IntersectedStrokeEdges(int index) : m_index(index), m_edgeList() {}
@@ -139,16 +143,13 @@ public:
 
 class IntersectionData
 {
-public:
+  public:
 	UINT maxAutocloseId;
 	VIList<Intersection> m_intList;
 	map<int, VIStroke *> m_autocloseMap;
 	vector<IntersectedStrokeEdges> m_intersectedStrokeArray;
 
-	IntersectionData()
-		: maxAutocloseId(1), m_intList()
-	{
-	}
+	IntersectionData() : maxAutocloseId(1), m_intList() {}
 
 	~IntersectionData();
 };
@@ -160,18 +161,16 @@ class IntersectedStroke : public VIListElem
 	/*double m_w;
 TStroke *m_s;
 UINT m_index;*/
-	//IntersectedStroke* m_prev, *m_next;
-public:
+	// IntersectedStroke* m_prev, *m_next;
+  public:
 	TEdge m_edge;
 	Intersection *m_nextIntersection;
 	IntersectedStroke *m_nextStroke;
 	bool m_visited, m_gettingOut; //, m_dead;
 
-	IntersectedStroke()
-		: m_visited(false), m_nextIntersection(0), m_nextStroke(0){};
+	IntersectedStroke() : m_visited(false), m_nextIntersection(0), m_nextStroke(0){};
 
-	IntersectedStroke(Intersection *nextIntersection,
-					  IntersectedStroke *nextStroke)
+	IntersectedStroke(Intersection *nextIntersection, IntersectedStroke *nextStroke)
 		/*: m_w(-1.0)
 	 , m_s(NULL)
 	 , m_index(0)*/
@@ -184,7 +183,8 @@ public:
 	}
 
 	IntersectedStroke(const IntersectedStroke &s)
-		: m_edge(s.m_edge, false), m_nextIntersection(s.m_nextIntersection), m_nextStroke(s.m_nextStroke), m_visited(s.m_visited), m_gettingOut(s.m_gettingOut)
+		: m_edge(s.m_edge, false), m_nextIntersection(s.m_nextIntersection),
+		  m_nextStroke(s.m_nextStroke), m_visited(s.m_visited), m_gettingOut(s.m_gettingOut)
 	//, m_dead(s.m_dead)
 	{
 	}
@@ -194,8 +194,7 @@ public:
 
 //=============================================================================
 
-template <class T>
-void VIList<T>::clear()
+template <class T> void VIList<T>::clear()
 {
 	while (m_begin) {
 		T *aux = m_begin;
@@ -206,8 +205,7 @@ void VIList<T>::clear()
 	m_size = 0;
 }
 
-template <class T>
-void VIList<T>::pushBack(T *elem)
+template <class T> void VIList<T>::pushBack(T *elem)
 {
 
 	if (!m_begin) {
@@ -225,8 +223,7 @@ void VIList<T>::pushBack(T *elem)
 	m_size++;
 }
 
-template <class T>
-void VIList<T>::insert(T *before, T *elem)
+template <class T> void VIList<T>::insert(T *before, T *elem)
 {
 	assert(before && elem);
 
@@ -242,8 +239,7 @@ void VIList<T>::insert(T *before, T *elem)
 	m_size++;
 }
 
-template <class T>
-T *VIList<T>::erase(T *element)
+template <class T> T *VIList<T>::erase(T *element)
 {
 	T *ret;
 
@@ -272,8 +268,7 @@ T *VIList<T>::erase(T *element)
 	return ret;
 }
 
-template <class T>
-T *VIList<T>::getElemAt(int pos)
+template <class T> T *VIList<T>::getElemAt(int pos)
 {
 	assert(pos < m_size);
 	T *p = m_begin;
@@ -282,8 +277,7 @@ T *VIList<T>::getElemAt(int pos)
 	return p;
 }
 
-template <class T>
-int VIList<T>::getPosOf(T *elem)
+template <class T> int VIList<T>::getPosOf(T *elem)
 {
 	int count = 0;
 	T *p = m_begin;
@@ -313,7 +307,8 @@ void print(list<Intersection> &intersectionList, char *str)
 	int i, j;
 	for (i = 0, it = intersectionList.begin(); it != intersectionList.end(); it++, i++) {
 		of << "***************************" << endl;
-		of << "Intersection#" << i << ": " << it->m_intersection << "numBranches: " << it->m_numInter << endl;
+		of << "Intersection#" << i << ": " << it->m_intersection
+		   << "numBranches: " << it->m_numInter << endl;
 		of << endl;
 
 		for (j = 0, it1 = it->m_strokeList.begin(); it1 != it->m_strokeList.end(); it1++, j++) {
@@ -324,24 +319,26 @@ void print(list<Intersection> &intersectionList, char *str)
 			   << ": " << endl;
 			of << "ColorId: " << it1->m_edge.m_styleId << endl;
 			/*
-    TColorStyle* fs = it1->m_edge.m_fillStyle;
-    if (fs==0)
-      of<<"NO color: "<< endl;
-    else 
-      {
-      TFillStyleP fp = fs->getFillStyle();
-      if (fp)
-        {
-        fp->
-      assert(false) ;
-    else
-      of<<"Color: ("<< colorStyle->getColor().r<<", "<< colorStyle->getColor().g<<", "<< colorStyle->getColor().b<<")"<<endl;
+	TColorStyle* fs = it1->m_edge.m_fillStyle;
+	if (fs==0)
+	  of<<"NO color: "<< endl;
+	else
+	  {
+	  TFillStyleP fp = fs->getFillStyle();
+	  if (fp)
+		{
+		fp->
+	  assert(false) ;
+	else
+	  of<<"Color: ("<< colorStyle->getColor().r<<", "<< colorStyle->getColor().g<<", "<<
+	colorStyle->getColor().b<<")"<<endl;
    */
 
-			of << "----Stroke " << (it1->m_gettingOut ? "OUT" : "IN") << " #" << it1->m_edge.m_index << ": " << endl;
-			//if (it1->m_dead)
-			//of<<"---- DEAD Intersection.";
-			//else
+			of << "----Stroke " << (it1->m_gettingOut ? "OUT" : "IN") << " #" << it1->m_edge.m_index
+			   << ": " << endl;
+			// if (it1->m_dead)
+			// of<<"---- DEAD Intersection.";
+			// else
 			{
 				of << "---- NEXT Intersection:";
 				if (it1->m_nextIntersection != intersectionList.end()) {
@@ -360,16 +357,14 @@ void print(list<Intersection> &intersectionList, char *str)
 				else
 					of << "NULL!!";
 			}
-			of << endl
-			   << endl;
+			of << endl << endl;
 		}
 	}
 }
 
 #endif
 
-void findNearestIntersection(list<Intersection> &interList,
-							 const list<Intersection>::iterator &i1,
+void findNearestIntersection(list<Intersection> &interList, const list<Intersection>::iterator &i1,
 							 const list<IntersectedStroke>::iterator &i2);
 
 //-----------------------------------------------------------------------------
@@ -386,14 +381,14 @@ void checkInterList(list<Intersection> &intersectionList)
 			int val;
 			if (it1->m_nextIntersection != intersectionList.end()) {
 				count++;
-				//assert (it1->m_nextIntersection!=intersectionList.end());
+				// assert (it1->m_nextIntersection!=intersectionList.end());
 				assert(it1->m_nextStroke->m_nextIntersection == it);
 				assert(it1->m_nextStroke->m_nextStroke == it1);
 
-				//int k = it1->m_edge.m_index;
+				// int k = it1->m_edge.m_index;
 				val = std::distance(intersectionList.begin(), it1->m_nextIntersection);
 			}
-			//else
+			// else
 			// assert(it1->m_nextIntersection==intersectionList.end());
 		}
 		assert(count == it->m_numInter);
@@ -405,13 +400,13 @@ void checkInterList(list<Intersection> &intersectionList)
 
 //-----------------------------------------------------------------------------
 
-//void addFakeIntersection(list<Intersection>& intersectionList,TStroke* s, UINT ii, double w);
+// void addFakeIntersection(list<Intersection>& intersectionList,TStroke* s, UINT ii, double w);
 
-void addIntersections(IntersectionData &intersectionData,
-					  const vector<VIStroke *> &s, int ii, int jj, const vector<DoublePair> &intersections, int numStrokes, bool isVectorized);
+void addIntersections(IntersectionData &intersectionData, const vector<VIStroke *> &s, int ii,
+					  int jj, const vector<DoublePair> &intersections, int numStrokes,
+					  bool isVectorized);
 
-void addIntersection(IntersectionData &intData,
-					 const vector<VIStroke *> &s, int ii, int jj,
+void addIntersection(IntersectionData &intData, const vector<VIStroke *> &s, int ii, int jj,
 					 DoublePair intersections, int strokeSize, bool isVectorized);
 
 //-----------------------------------------------------------------------------
@@ -449,7 +444,7 @@ void cleanNextIntersection(const VIList<Intersection> &interList, TStroke *s)
 	for (p = interList.first(); p; p = p->next())
 		for (q = p->m_strokeList.first(); q; q = q->next())
 			if (q->m_edge.m_s == s) {
-				//if (it2->m_nextIntersection==NULL)
+				// if (it2->m_nextIntersection==NULL)
 				//  return; //gia' ripulita prima
 				if (q->m_nextIntersection) {
 					q->m_nextIntersection = 0;
@@ -463,7 +458,7 @@ void cleanNextIntersection(const VIList<Intersection> &interList, TStroke *s)
 
 void TVectorImage::Imp::eraseEdgeFromStroke(IntersectedStroke *is)
 {
-	if (is->m_edge.m_index >= 0) //elimino il puntatore all'edge nella lista della VIStroke
+	if (is->m_edge.m_index >= 0) // elimino il puntatore all'edge nella lista della VIStroke
 	{
 		VIStroke *s;
 		s = m_strokes[is->m_edge.m_index];
@@ -481,8 +476,7 @@ void TVectorImage::Imp::eraseEdgeFromStroke(IntersectedStroke *is)
 
 //-----------------------------------------------------------------------------
 
-IntersectedStroke *TVectorImage::Imp::eraseBranch(Intersection *in,
-												  IntersectedStroke *is)
+IntersectedStroke *TVectorImage::Imp::eraseBranch(Intersection *in, IntersectedStroke *is)
 {
 	if (is->m_nextIntersection) {
 		Intersection *nextInt = is->m_nextIntersection;
@@ -491,14 +485,14 @@ IntersectedStroke *TVectorImage::Imp::eraseBranch(Intersection *in,
 		assert(nextStroke->m_nextStroke == is);
 		assert(nextStroke != is);
 
-		//nextStroke->m_nextIntersection = intList.end();
-		//nextStroke->m_nextStroke = nextInt->m_strokeList.end();
+		// nextStroke->m_nextIntersection = intList.end();
+		// nextStroke->m_nextStroke = nextInt->m_strokeList.end();
 
 		if (nextStroke->m_nextIntersection) {
 			nextStroke->m_nextIntersection = 0;
 			nextInt->m_numInter--;
 		}
-		//nextInt->m_strokeList.erase(nextStroke);//non posso cancellarla, puo' servire in futuro!
+		// nextInt->m_strokeList.erase(nextStroke);//non posso cancellarla, puo' servire in futuro!
 	}
 	if (is->m_nextIntersection)
 		in->m_numInter--;
@@ -519,9 +513,9 @@ void TVectorImage::Imp::eraseDeadIntersections()
 {
 	Intersection *p = m_intersectionData->m_intList.first();
 
-	while (p) //la faccio qui, e non nella eraseIntersection. vedi commento li'.
+	while (p) // la faccio qui, e non nella eraseIntersection. vedi commento li'.
 	{
-		//Intersection* &intList = m_intersectionData->m_intList;
+		// Intersection* &intList = m_intersectionData->m_intList;
 
 		if (p->m_strokeList.size() == 1) {
 			eraseBranch(p, p->m_strokeList.first());
@@ -529,7 +523,8 @@ void TVectorImage::Imp::eraseDeadIntersections()
 			p = m_intersectionData->m_intList.erase(p);
 		} else if (p->m_strokeList.size() == 2 &&
 				   (p->m_strokeList.first()->m_edge.m_s == p->m_strokeList.last()->m_edge.m_s &&
-					p->m_strokeList.first()->m_edge.m_w0 == p->m_strokeList.last()->m_edge.m_w0)) //intersezione finta
+					p->m_strokeList.first()->m_edge.m_w0 ==
+						p->m_strokeList.last()->m_edge.m_w0)) // intersezione finta
 		{
 			IntersectedStroke *it1 = p->m_strokeList.first(), *iit1, *iit2;
 			IntersectedStroke *it2 = it1->next();
@@ -583,16 +578,17 @@ void TVectorImage::Imp::doEraseIntersection(int index, vector<int> *toBeDeleted)
 
 			if (is.m_edge.m_index == index) {
 				if (is.m_edge.m_index >= 0)
-					//if (!is.m_autoclose && (is.m_edge.m_w0==1 || is.m_edge.m_w0==0))
+					// if (!is.m_autoclose && (is.m_edge.m_w0==1 || is.m_edge.m_w0==0))
 					removeAutocloses = true;
 				else
 					deleteIt = is.m_edge.m_s;
 				p2 = eraseBranch(p1, p2);
 			} else
 				p2 = p2->next();
-			//checkInterList(interList);
+			// checkInterList(interList);
 		}
-		if (removeAutocloses) //se ho tolto una stroke dall'inter corrente, tolgo tutti le stroke di autclose che partono da qui
+		if (removeAutocloses) // se ho tolto una stroke dall'inter corrente, tolgo tutti le stroke
+							  // di autclose che partono da qui
 		{
 			assert(toBeDeleted);
 			for (p2 = p1->m_strokeList.first(); p2; p2 = p2->next())
@@ -612,11 +608,11 @@ void TVectorImage::Imp::doEraseIntersection(int index, vector<int> *toBeDeleted)
 
 //-----------------------------------------------------------------------------
 
-UINT TVectorImage::Imp::getFillData(std::unique_ptr<IntersectionBranch[]>& v)
+UINT TVectorImage::Imp::getFillData(std::unique_ptr<IntersectionBranch[]> &v)
 {
-	//print(m_intersectionData->m_intList, "C:\\temp\\intersectionPrimaSave.txt");
+	// print(m_intersectionData->m_intList, "C:\\temp\\intersectionPrimaSave.txt");
 
-	//Intersection* intList = m_intersectionData->m_intList;
+	// Intersection* intList = m_intersectionData->m_intList;
 	if (m_intersectionData->m_intList.empty())
 		return 0;
 
@@ -647,7 +643,7 @@ UINT TVectorImage::Imp::getFillData(std::unique_ptr<IntersectionBranch[]>& v)
 			b.m_strokeIndex = p2->m_edge.m_index;
 			b.m_w = p2->m_edge.m_w0;
 			b.m_style = p2->m_edge.m_styleId;
-			//assert(b.m_style<100);
+			// assert(b.m_style<100);
 			b.m_gettingOut = p2->m_gettingOut;
 			if (!p2->m_nextIntersection)
 				b.m_nextBranch = count;
@@ -655,8 +651,7 @@ UINT TVectorImage::Imp::getFillData(std::unique_ptr<IntersectionBranch[]>& v)
 				UINT distInt = m_intersectionData->m_intList.getPosOf(p2->m_nextIntersection);
 				UINT distBranch = p2->m_nextIntersection->m_strokeList.getPosOf(p2->m_nextStroke);
 
-				if ((distInt < currInt) ||
-					(distInt == currInt && distBranch < currBranch)) {
+				if ((distInt < currInt) || (distInt == currInt && distBranch < currBranch)) {
 					UINT posNext = branchesBefore[distInt] + distBranch;
 					assert(posNext < count);
 					b.m_nextBranch = posNext;
@@ -669,7 +664,7 @@ UINT TVectorImage::Imp::getFillData(std::unique_ptr<IntersectionBranch[]>& v)
 		}
 	}
 
-//for (UINT i=0; i<count; i++)
+// for (UINT i=0; i<count; i++)
 //  assert(v[i].m_nextBranch != std::numeric_limits<UINT>::max());
 
 #ifdef _DEBUG
@@ -695,15 +690,14 @@ for (UINT ii=0; ii<size; ii++)
 //-----------------------------------------------------------------------------
 namespace
 {
-TStroke *reconstructAutocloseStroke(Intersection *p1,
-									IntersectedStroke *p2)
+TStroke *reconstructAutocloseStroke(Intersection *p1, IntersectedStroke *p2)
 
 {
 	bool found = false;
 	Intersection *pp1 = p1->next();
 	IntersectedStroke *pp2;
 
-	//vector<TEdge*> vapp;
+	// vector<TEdge*> vapp;
 	for (; !found && pp1; pp1 = pp1->next()) {
 		for (pp2 = pp1->m_strokeList.first(); !found && pp2; pp2 = pp2->next()) {
 			if (p2->m_edge.m_index == pp2->m_edge.m_index) {
@@ -719,10 +713,10 @@ TStroke *reconstructAutocloseStroke(Intersection *p1,
 						v.push_back(p1->m_intersection);
 					}
 					p2->m_edge.m_s = pp2->m_edge.m_s = new TStroke(v);
-					//for (UINT ii=0; ii<vapp.size(); ii++)
+					// for (UINT ii=0; ii<vapp.size(); ii++)
 					// vapp[ii]->m_s = it2->m_edge.m_s;
 				}
-				//else if (iit2->m_edge.m_w0!=0 && iit2->m_edge.m_w0!=1)
+				// else if (iit2->m_edge.m_w0!=0 && iit2->m_edge.m_w0!=1)
 				//  vapp.push_back(&(iit2->m_edge));
 			}
 		}
@@ -734,10 +728,11 @@ TStroke *reconstructAutocloseStroke(Intersection *p1,
 	return p2->m_edge.m_s;
 }
 
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
-void TVectorImage::Imp::setFillData(std::unique_ptr<IntersectionBranch[]> const& v, UINT branchCount, bool doComputeRegions)
+void TVectorImage::Imp::setFillData(std::unique_ptr<IntersectionBranch[]> const &v,
+									UINT branchCount, bool doComputeRegions)
 {
 #ifdef _DEBUG
 /*ofstream of("C:\\temp\\fillDataIn.txt");
@@ -758,7 +753,7 @@ for (UINT ii=0; ii<branchCount; ii++)
 		return;
 
 	//{
-	//QMutexLocker sl(m_mutex);
+	// QMutexLocker sl(m_mutex);
 
 	VIList<Intersection> &intList = m_intersectionData->m_intList;
 
@@ -776,7 +771,7 @@ for (UINT ii=0; ii<branchCount; ii++)
 		const IntersectionBranch &b = v[i];
 		if (i == 0 || v[i].m_currInter != v[i - 1].m_currInter) {
 
-			if (v[i].m_currInter >= size) //pezza per immagine corrotte...evito crash
+			if (v[i].m_currInter >= size) // pezza per immagine corrotte...evito crash
 			{
 				intList.clear();
 				return;
@@ -792,7 +787,7 @@ for (UINT ii=0; ii<branchCount; ii++)
 		currInt->m_strokeList.pushBack(currBranch);
 
 		currBranch->m_edge.m_styleId = b.m_style;
-		//assert(b.m_style<100);
+		// assert(b.m_style<100);
 		currBranch->m_edge.m_index = b.m_strokeIndex;
 		if (b.m_strokeIndex >= 0)
 			currBranch->m_edge.m_s = m_strokes[b.m_strokeIndex]->m_s;
@@ -813,14 +808,15 @@ for (UINT ii=0; ii<branchCount; ii++)
 			p1 = intList.getElemAt(v[b.m_nextBranch].m_currInter);
 
 			assert(b.m_nextBranch - branchesBefore[v[b.m_nextBranch].m_currInter] >= 0);
-			p2 = p1->m_strokeList.getElemAt(b.m_nextBranch - branchesBefore[v[b.m_nextBranch].m_currInter]);
+			p2 = p1->m_strokeList.getElemAt(b.m_nextBranch -
+											branchesBefore[v[b.m_nextBranch].m_currInter]);
 
 			currBranch->m_nextIntersection = p1;
 			currBranch->m_nextStroke = p2;
 			p2->m_nextIntersection = currInt;
 			p2->m_nextStroke = currBranch;
 
-			//if (currBranch == currInt->m_strokeList.begin())
+			// if (currBranch == currInt->m_strokeList.begin())
 			//  currInt->m_intersection = currBranch->m_edge.m_s->getPoint(currBranch->m_edge.m_w0);
 
 			currInt->m_numInter++;
@@ -833,13 +829,14 @@ for (UINT ii=0; ii<branchCount; ii++)
 		}
 
 		/* {
-    assert(b.m_nextBranch<branchCount);
-    assert(v[b.m_nextBranch].m_nextBranch==i);
-    }*/
+	assert(b.m_nextBranch<branchCount);
+	assert(v[b.m_nextBranch].m_nextBranch==i);
+	}*/
 
 		if (i == branchCount - 1 || v[i].m_currInter != v[i + 1].m_currInter) {
 			int j = i;
-			while (v[j].m_strokeIndex < 0 && ((j > 0 && v[j].m_currInter == v[j - 1].m_currInter) || j == 0))
+			while (v[j].m_strokeIndex < 0 &&
+				   ((j > 0 && v[j].m_currInter == v[j - 1].m_currInter) || j == 0))
 				j--;
 			if (v[j].m_strokeIndex >= 0)
 				currInt->m_intersection = m_strokes[v[j].m_strokeIndex]->m_s->getPoint(v[j].m_w);
@@ -849,7 +846,7 @@ for (UINT ii=0; ii<branchCount; ii++)
 	for (i = 0; i < m_strokes.size(); i++)
 		m_strokes[i]->m_isNewForFill = false;
 
-	//computeRegions();
+	// computeRegions();
 
 	Intersection *p1;
 	IntersectedStroke *p2;
@@ -862,7 +859,8 @@ for (UINT ii=0; ii<branchCount; ii++)
 				(p2->m_edge.m_w0 == 0 || p2->m_edge.m_w0 == 1)) {
 				p2->m_edge.m_s = reconstructAutocloseStroke(p1, p2);
 				if (p2->m_edge.m_s)
-					m_intersectionData->m_autocloseMap[p2->m_edge.m_index] = new VIStroke(p2->m_edge.m_s, TGroupId());
+					m_intersectionData->m_autocloseMap[p2->m_edge.m_index] =
+						new VIStroke(p2->m_edge.m_s, TGroupId());
 				else
 					toBeDeleted.push_back(p2->m_edge.m_index);
 			}
@@ -875,7 +873,7 @@ for (UINT ii=0; ii<branchCount; ii++)
 				if (vs) {
 					p2->m_edge.m_s = m_intersectionData->m_autocloseMap[p2->m_edge.m_index]->m_s;
 
-					//TEdge& e = it2->m_edge;
+					// TEdge& e = it2->m_edge;
 					if (!p2->m_edge.m_s)
 						toBeDeleted.push_back(p2->m_edge.m_index);
 				}
@@ -890,7 +888,7 @@ for (UINT ii=0; ii<branchCount; ii++)
 
 	if (doComputeRegions)
 		computeRegions();
-	//print(m_intersectionData->m_intList, "C:\\temp\\intersectionDopoLoad.txt");
+	// print(m_intersectionData->m_intList, "C:\\temp\\intersectionDopoLoad.txt");
 }
 
 //-----------------------------------------------------------------------------
@@ -915,7 +913,7 @@ void findNearestIntersection(VIList<Intersection> &interList)
 
 	for (p1 = interList.first(); p1; p1 = p1->next()) {
 		for (p2 = p1->m_strokeList.first(); p2; p2 = p2->next()) {
-			if (p2->m_nextIntersection) //already set
+			if (p2->m_nextIntersection) // already set
 				continue;
 
 			int versus = (p2->m_gettingOut) ? 1 : -1;
@@ -960,7 +958,7 @@ void findNearestIntersection(VIList<Intersection> &interList)
 //-----------------------------------------------------------------------------
 void markDeadIntersections(VIList<Intersection> &intList, Intersection *p);
 
-//questa funzione "cuscinetto" serve perche crashava il compilatore in release!!!
+// questa funzione "cuscinetto" serve perche crashava il compilatore in release!!!
 void inline markDeadIntersectionsRic(VIList<Intersection> &intList, Intersection *p)
 {
 	markDeadIntersections(intList, p);
@@ -992,7 +990,7 @@ void markDeadIntersections(VIList<Intersection> &intList, Intersection *p)
 			nextStroke->m_nextIntersection = 0;
 			markDeadIntersectionsRic(intList, nextInt);
 		}
-	} else if (p->m_numInter == 2) //intersezione finta (forse)
+	} else if (p->m_numInter == 2) // intersezione finta (forse)
 	{
 		while (p1 && !p1->m_nextIntersection)
 			p1 = p1->next();
@@ -1008,7 +1006,8 @@ void markDeadIntersections(VIList<Intersection> &intList, Intersection *p)
 		if (!p2)
 			return;
 
-		if (p1->m_edge.m_s == p2->m_edge.m_s && p1->m_edge.m_w0 == p2->m_edge.m_w0) //intersezione finta
+		if (p1->m_edge.m_s == p2->m_edge.m_s &&
+			p1->m_edge.m_w0 == p2->m_edge.m_w0) // intersezione finta
 		{
 			IntersectedStroke *pp1, *pp2;
 			assert(p1->m_nextIntersection && p2->m_nextIntersection);
@@ -1019,13 +1018,13 @@ void markDeadIntersections(VIList<Intersection> &intList, Intersection *p)
 			pp2->m_edge.m_w1 = pp1->m_edge.m_w0;
 			pp1->m_edge.m_w1 = pp2->m_edge.m_w0;
 
-			//if (iit1!=0)
+			// if (iit1!=0)
 			pp1->m_nextStroke = pp2;
-			//if (iit2!=0)
+			// if (iit2!=0)
 			pp2->m_nextStroke = pp1;
-			//if (iit1!=0)
+			// if (iit1!=0)
 			pp1->m_nextIntersection = p2->m_nextIntersection;
-			//if (iit2!=0)
+			// if (iit2!=0)
 			pp2->m_nextIntersection = p1->m_nextIntersection;
 
 			p->m_numInter = 0;
@@ -1036,7 +1035,8 @@ void markDeadIntersections(VIList<Intersection> &intList, Intersection *p)
 
 //-----------------------------------------------------------------------------
 
-//se cross val era 0, cerco di spostarmi un po' su w per vedere come sono orientate le tangenti agli stroke...
+// se cross val era 0, cerco di spostarmi un po' su w per vedere come sono orientate le tangenti
+// agli stroke...
 double nearCrossVal(TStroke *s0, double w0, TStroke *s1, double w1)
 {
 	double ltot0 = s0->getLength();
@@ -1062,8 +1062,7 @@ double nearCrossVal(TStroke *s0, double w0, TStroke *s1, double w1)
 		crossVal = cross(p0, p1);
 		l0 += dl0, l1 += dl1;
 		count++;
-	} while (areAlmostEqual(crossVal, 0.0) &&
-			 ((dl0 > 0 && l0 < ltot0) || (dl0 < 0 && l0 > 0)) &&
+	} while (areAlmostEqual(crossVal, 0.0) && ((dl0 > 0 && l0 < ltot0) || (dl0 < 0 && l0 > 0)) &&
 			 ((dl1 > 0 && l1 < ltot1) || (dl1 < 0 && l1 > 0)));
 	return crossVal;
 }
@@ -1094,9 +1093,10 @@ double getAngle(const TPointD &p0, const TPointD &p1)
 }
 
 //-----------------------------------------------------------------------------
-//nel caso l'angolo tra due stroke in un certo w sia nullo,
+// nel caso l'angolo tra due stroke in un certo w sia nullo,
 // si va un po' avanti per vedere come sono orientate....
-double getNearAngle(const TStroke *s1, double w1, bool out1, const TStroke *s2, double w2, bool out2)
+double getNearAngle(const TStroke *s1, double w1, bool out1, const TStroke *s2, double w2,
+					bool out2)
 {
 	bool verse1 = (out1 && w1 < 1) || (!out1 && w1 == 0);
 	bool verse2 = (out2 && w2 < 1) || (!out2 && w2 == 0);
@@ -1108,7 +1108,8 @@ double getNearAngle(const TStroke *s1, double w1, bool out1, const TStroke *s2, 
 	double dl1 = verse1 ? dl : -dl;
 	double dl2 = verse2 ? dl : -dl;
 
-	while (((verse1 && l1 < ltot1) || (!verse1 && l1 > 0)) && ((verse2 && l2 < ltot2) || (!verse2 && l2 > 0))) {
+	while (((verse1 && l1 < ltot1) || (!verse1 && l1 > 0)) &&
+		   ((verse2 && l2 < ltot2) || (!verse2 && l2 > 0))) {
 		l1 += dl1;
 		l2 += dl2;
 		TPointD p1 = (out1 ? 1 : -1) * s1->getSpeed(s1->getParameterAtLength(l1));
@@ -1122,8 +1123,9 @@ double getNearAngle(const TStroke *s1, double w1, bool out1, const TStroke *s2, 
 
 //-----------------------------------------------------------------------------
 
-bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1, IntersectedStroke &item2,
-						  const TPointD &p1a, const TPointD &p1b, const TPointD &p2a, const TPointD &p2b)
+bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1,
+						  IntersectedStroke &item2, const TPointD &p1a, const TPointD &p1b,
+						  const TPointD &p2a, const TPointD &p2b)
 {
 	double angle1 = getAngle(p1a, p1b);
 	double angle2 = getAngle(p1a, p2a);
@@ -1133,23 +1135,27 @@ bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1, Int
 	bool eraseP1b = false, eraseP2a = false, eraseP2b = false;
 
 	if (areAlmostEqual(angle1, 0, 1e-9)) {
-		angle1 = getNearAngle(item1.m_edge.m_s, item1.m_edge.m_w0, true, item1.m_edge.m_s, item1.m_edge.m_w0, false);
+		angle1 = getNearAngle(item1.m_edge.m_s, item1.m_edge.m_w0, true, item1.m_edge.m_s,
+							  item1.m_edge.m_w0, false);
 		if (areAlmostEqual(angle1, 1e-9))
 			eraseP1b = true;
 	}
 	if (areAlmostEqual(angle2, 0, 1e-9)) {
-		angle2 = getNearAngle(item1.m_edge.m_s, item1.m_edge.m_w0, true, item2.m_edge.m_s, item2.m_edge.m_w0, true);
+		angle2 = getNearAngle(item1.m_edge.m_s, item1.m_edge.m_w0, true, item2.m_edge.m_s,
+							  item2.m_edge.m_w0, true);
 		if (areAlmostEqual(angle2, 1e-9))
 			eraseP2a = true;
 	}
 	if (areAlmostEqual(angle3, 0, 1e-9)) {
-		angle3 = getNearAngle(item1.m_edge.m_s, item1.m_edge.m_w0, true, item2.m_edge.m_s, item2.m_edge.m_w0, false);
+		angle3 = getNearAngle(item1.m_edge.m_s, item1.m_edge.m_w0, true, item2.m_edge.m_s,
+							  item2.m_edge.m_w0, false);
 		if (areAlmostEqual(angle3, 1e-9))
 			eraseP2b = true;
 	}
 
 	if (areAlmostEqual(angle1, angle2, 1e-9)) {
-		angle = getNearAngle(item1.m_edge.m_s, item1.m_edge.m_w0, false, item2.m_edge.m_s, item2.m_edge.m_w0, true);
+		angle = getNearAngle(item1.m_edge.m_s, item1.m_edge.m_w0, false, item2.m_edge.m_s,
+							 item2.m_edge.m_w0, true);
 		if (angle != 0) {
 			angle2 += angle;
 			if (angle2 > 360)
@@ -1158,7 +1164,8 @@ bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1, Int
 			eraseP2a = true;
 	}
 	if (areAlmostEqual(angle1, angle3, 1e-9)) {
-		angle = getNearAngle(item1.m_edge.m_s, item1.m_edge.m_w0, false, item2.m_edge.m_s, item2.m_edge.m_w0, false);
+		angle = getNearAngle(item1.m_edge.m_s, item1.m_edge.m_w0, false, item2.m_edge.m_s,
+							 item2.m_edge.m_w0, false);
 		if (angle != 0) {
 			angle3 += angle;
 			if (angle3 > 360)
@@ -1167,7 +1174,8 @@ bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1, Int
 			eraseP2b = true;
 	}
 	if (areAlmostEqual(angle2, angle3, 1e-9)) {
-		angle = getNearAngle(item1.m_edge.m_s, item1.m_edge.m_w0, false, item2.m_edge.m_s, item2.m_edge.m_w0, true);
+		angle = getNearAngle(item1.m_edge.m_s, item1.m_edge.m_w0, false, item2.m_edge.m_s,
+							 item2.m_edge.m_w0, true);
 		if (angle != 0) {
 			angle3 += angle;
 			if (angle3 > 360)
@@ -1179,7 +1187,7 @@ bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1, Int
 	int fac = (angle1 < angle2) | ((angle1 < angle3) << 1) | ((angle2 < angle3) << 2);
 
 	switch (fac) {
-	case 0: //p1a p2b p2a p1b
+	case 0: // p1a p2b p2a p1b
 		insertBranch(interList, item1, true);
 		if (!eraseP2b)
 			insertBranch(interList, item2, false);
@@ -1188,7 +1196,7 @@ bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1, Int
 		if (!eraseP1b)
 			insertBranch(interList, item1, false);
 		break;
-	case 1: //p1a p2b p1b p2a
+	case 1: // p1a p2b p1b p2a
 		insertBranch(interList, item1, true);
 		if (!eraseP2b)
 			insertBranch(interList, item2, false);
@@ -1200,7 +1208,7 @@ bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1, Int
 	case 2:
 		assert(false);
 		break;
-	case 3: //p1a p1b p2b p2a
+	case 3: // p1a p1b p2b p2a
 		insertBranch(interList, item1, true);
 		if (!eraseP1b)
 			insertBranch(interList, item1, false);
@@ -1209,7 +1217,7 @@ bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1, Int
 		if (!eraseP2a)
 			insertBranch(interList, item2, true);
 		break;
-	case 4: //p1a p2a p2b p1b
+	case 4: // p1a p2a p2b p1b
 		insertBranch(interList, item1, true);
 		if (!eraseP2a)
 			insertBranch(interList, item2, true);
@@ -1221,7 +1229,7 @@ bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1, Int
 	case 5:
 		assert(false);
 		break;
-	case 6: //p1a p2a p1b p2b
+	case 6: // p1a p2a p1b p2b
 		insertBranch(interList, item1, true);
 		if (!eraseP2a)
 			insertBranch(interList, item2, true);
@@ -1230,7 +1238,7 @@ bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1, Int
 		if (!eraseP2b)
 			insertBranch(interList, item2, false);
 		break;
-	case 7: //p1a p1b p2a p2b
+	case 7: // p1a p1b p2a p2b
 		insertBranch(interList, item1, true);
 		if (!eraseP1b)
 			insertBranch(interList, item1, false);
@@ -1293,21 +1301,20 @@ bool makeIntersection(IntersectionData &intData, const vector<VIStroke *> &s, in
 	bool ret1 = item1.m_edge.m_s->getSpeedTwoValues(item1.m_edge.m_w0, p0, p0b);
 	bool ret2 = item2.m_edge.m_s->getSpeedTwoValues(item2.m_edge.m_w0, p1, p1b);
 
-	if (ret1 || ret2) //punto angoloso!!!!
+	if (ret1 || ret2) // punto angoloso!!!!
 		return makeEdgeIntersection(interList, item1, item2, p0, p0b, p1, p1b);
 
 	double crossVal = cross(p0, p1);
 
-	//crossVal = cross(p0, p1);
+	// crossVal = cross(p0, p1);
 
 	if (areAlmostEqual(crossVal, 0.0)) {
 		bool endpoint1 = (item1.m_edge.m_w0 == 0.0 || item1.m_edge.m_w0 == 1.0);
 		bool endpoint2 = (item2.m_edge.m_w0 == 0.0 || item2.m_edge.m_w0 == 1.0);
-		if (endpoint1 &&
-			endpoint2 &&
+		if (endpoint1 && endpoint2 &&
 			((p0.x * p1.x >= 0 && p0.y * p1.y >= 0 && item1.m_edge.m_w0 != item2.m_edge.m_w0) ||
 			 (p0.x * p1.x <= 0 && p0.y * p1.y <= 0 && item1.m_edge.m_w0 == item2.m_edge.m_w0)))
-		//due endpoint a 180 gradi;metto
+		// due endpoint a 180 gradi;metto
 		{
 			item1.m_gettingOut = (item1.m_edge.m_w0 == 0.0);
 			interList.m_strokeList.pushBack(new IntersectedStroke(item1));
@@ -1315,14 +1322,16 @@ bool makeIntersection(IntersectionData &intData, const vector<VIStroke *> &s, in
 			interList.m_strokeList.pushBack(new IntersectedStroke(item2));
 			return true;
 		}
-		//crossVal = nearCrossVal(item1.m_edge.m_s, item1.m_edge.m_w0, item2.m_edge.m_s, item2.m_edge.m_w0);
-		//if (areAlmostEqual(crossVal, 0.0))
+		// crossVal = nearCrossVal(item1.m_edge.m_s, item1.m_edge.m_w0, item2.m_edge.m_s,
+		// item2.m_edge.m_w0);
+		// if (areAlmostEqual(crossVal, 0.0))
 		// return false;
 		return makeEdgeIntersection(interList, item1, item2, p0, p0b, p1, p1b);
 	}
 
 	if (crossVal > 0)
-		reversed = true; //std::reverse(interList.m_strokeList.begin(), interList.m_strokeList.end());
+		reversed =
+			true; // std::reverse(interList.m_strokeList.begin(), interList.m_strokeList.end());
 
 	if (item1.m_edge.m_w0 != 1.0) {
 		item1.m_gettingOut = true;
@@ -1350,22 +1359,25 @@ void checkAuto(const vector<VIStroke*>& s)
 {
 for (int i=0; i<(int)s.size(); i++)
 for (int j=i+1; j<(int)s.size(); j++)
-  if (s[i]->m_s->getChunkCount()==1 && s[j]->m_s->getChunkCount()==1) //se ha una sola quadratica, probabilmente e' un autoclose.
+  if (s[i]->m_s->getChunkCount()==1 && s[j]->m_s->getChunkCount()==1) //se ha una sola quadratica,
+probabilmente e' un autoclose.
 	  {
 		const TThickQuadratic*q = s[i]->m_s->getChunk(0);
 		const TThickQuadratic*p = s[j]->m_s->getChunk(0);
 
-		if (areAlmostEqual(q->getP0(), p->getP0(), 1e-2) && areAlmostEqual(q->getP2(), p->getP2(), 1e-2))
+		if (areAlmostEqual(q->getP0(), p->getP0(), 1e-2) && areAlmostEqual(q->getP2(), p->getP2(),
+1e-2))
 		  assert(!"eccolo!");
-		if (areAlmostEqual(q->getP0(), p->getP2(), 1e-2) && areAlmostEqual(q->getP2(), p->getP0(), 1e-2))
+		if (areAlmostEqual(q->getP0(), p->getP2(), 1e-2) && areAlmostEqual(q->getP2(), p->getP0(),
+1e-2))
 		  assert(!"eccolo!");
-    }
+	}
 }
 */
 //-----------------------------------------------------------------------------
 
-bool addAutocloseIntersection(IntersectionData &intData, vector<VIStroke *> &s,
-							  int ii, int jj, double w0, double w1, int strokeSize, bool isVectorized)
+bool addAutocloseIntersection(IntersectionData &intData, vector<VIStroke *> &s, int ii, int jj,
+							  double w0, double w1, int strokeSize, bool isVectorized)
 {
 
 	assert(s[ii]->m_groupId == s[jj]->m_groupId);
@@ -1408,15 +1420,17 @@ bool addAutocloseIntersection(IntersectionData &intData, vector<VIStroke *> &s,
 	vector<TPointD> v;
 	v.push_back(s[ii]->m_s->getPoint(w0));
 	v.push_back(s[jj]->m_s->getPoint(w1));
-	if (v[0] == v[1]) //le stroke si intersecano , ma la fottuta funzione intersect non ha trovato l'intersezione(tipicamente, questo accade agli estremi)!!!
+	if (v[0] == v[1]) // le stroke si intersecano , ma la fottuta funzione intersect non ha trovato
+					  // l'intersezione(tipicamente, questo accade agli estremi)!!!
 	{
 		addIntersection(intData, s, ii, jj, DoublePair(w0, w1), strokeSize, isVectorized);
 		return true;
 	}
 
-	//se gia e' stato messo questo autoclose, evito
+	// se gia e' stato messo questo autoclose, evito
 	for (int i = 0; i < (int)s.size(); i++)
-		if (s[i]->m_s->getChunkCount() == 1) //se ha una sola quadratica, probabilmente e' un autoclose.
+		if (s[i]->m_s->getChunkCount() ==
+			1) // se ha una sola quadratica, probabilmente e' un autoclose.
 		{
 			const TThickQuadratic *q = s[i]->m_s->getChunk(0);
 
@@ -1438,7 +1452,7 @@ bool addAutocloseIntersection(IntersectionData &intData, vector<VIStroke *> &s,
 
 //-----------------------------------------------------------------------------
 
-//double g_autocloseTolerance = c_newAutocloseTolerance;
+// double g_autocloseTolerance = c_newAutocloseTolerance;
 
 bool isCloseEnoughP2P(double facMin, double facMax, TStroke *s1, double w0, TStroke *s2, double w1)
 {
@@ -1450,7 +1464,8 @@ bool isCloseEnoughP2P(double facMin, double facMax, TStroke *s1, double w0, TStr
 
 	dist2 = tdistance2(p0, p1);
 
-	/*!when closing beetween a normal stroke and a 0-thickness stroke (very typical) the thin  one is assumed to have same thickness of the other*/
+	/*!when closing beetween a normal stroke and a 0-thickness stroke (very typical) the thin  one
+	 * is assumed to have same thickness of the other*/
 	if (p0.thick == 0)
 		p0.thick = p1.thick;
 	else if (p1.thick == 0)
@@ -1458,19 +1473,23 @@ bool isCloseEnoughP2P(double facMin, double facMax, TStroke *s1, double w0, TStr
 	if (facMin == 0) {
 		autoDistMin = 0;
 		autoDistMax = tmax(-2.0, facMax * (p0.thick + p1.thick) * (p0.thick + p1.thick));
-		if (autoDistMax < 0.0000001) //! for strokes without thickness, I connect for distances less than min between 2.5 and half of the length of the stroke)
+		if (autoDistMax < 0.0000001) //! for strokes without thickness, I connect for distances less
+									 //! than min between 2.5 and half of the length of the stroke)
 		{
 			double len1 = s1->getLength();
 			double len2 = s2->getLength();
-			autoDistMax = facMax * tmin(2.5, len1 * len1 / (2 * 2), len2 * len2 / (2 * 2), 100.0 /*dummyVal*/);
+			autoDistMax = facMax * tmin(2.5, len1 * len1 / (2 * 2), len2 * len2 / (2 * 2),
+										100.0 /*dummyVal*/);
 		}
 	} else {
 		autoDistMin = tmax(-2.0, facMin * (p0.thick + p1.thick) * (p0.thick + p1.thick));
-		if (autoDistMin < 0.0000001) //! for strokes without thickness, I connect for distances less than min between 2.5 and half of the length of the stroke)
+		if (autoDistMin < 0.0000001) //! for strokes without thickness, I connect for distances less
+									 //! than min between 2.5 and half of the length of the stroke)
 		{
 			double len1 = s1->getLength();
 			double len2 = s2->getLength();
-			autoDistMin = facMax * tmin(2.5, len1 * len1 / (2 * 2), len2 * len2 / (2 * 2), 100.0 /*dummyVal*/);
+			autoDistMin = facMax * tmin(2.5, len1 * len1 / (2 * 2), len2 * len2 / (2 * 2),
+										100.0 /*dummyVal*/);
 		}
 
 		autoDistMax = autoDistMin + (facMax - facMin) * (facMax - facMin);
@@ -1479,9 +1498,11 @@ bool isCloseEnoughP2P(double facMin, double facMax, TStroke *s1, double w0, TStr
 	if (dist2 < autoDistMin || dist2 > autoDistMax)
 		return false;
 
-	//if (dist2<=tmax(2.0, g_autocloseTolerance*(p0.thick+p1.thick)*(p0.thick+p1.thick))) //0.01 tiene conto di quando thick==0
+	// if (dist2<=tmax(2.0, g_autocloseTolerance*(p0.thick+p1.thick)*(p0.thick+p1.thick))) //0.01
+	// tiene conto di quando thick==0
 	if (s1 == s2) {
-		TRectD r = s1->getBBox(); //se e' un autoclose su una stroke piccolissima, creerebbe uan area trascurabile, ignoro
+		TRectD r = s1->getBBox(); // se e' un autoclose su una stroke piccolissima, creerebbe uan
+								  // area trascurabile, ignoro
 		if (fabs(r.x1 - r.x0) < 2 && fabs(r.y1 - r.y0) < 2)
 			return false;
 	}
@@ -1490,10 +1511,10 @@ bool isCloseEnoughP2P(double facMin, double facMax, TStroke *s1, double w0, TStr
 
 //---------------------------------------------------------------------------------------------------------------------
 /*
-bool makePoint2PointConnections(double factor, vector<VIStroke*>& s, 
-                             int ii, bool isIStartPoint, 
-                             int jj, bool isJStartPoint, IntersectionData& intData,
-                              int strokeSize)
+bool makePoint2PointConnections(double factor, vector<VIStroke*>& s,
+							 int ii, bool isIStartPoint,
+							 int jj, bool isJStartPoint, IntersectionData& intData,
+							  int strokeSize)
 {
 double w0 = (isIStartPoint?0.0:1.0);
 double w1 = (isJStartPoint?0.0:1.0);
@@ -1504,8 +1525,10 @@ return false;
 */
 //-----------------------------------------------------------------------------
 
-double getCurlW(TStroke *s, bool isBegin) //trova il punto di split su una stroke, in prossimita di un ricciolo;
-										  // un ricciolo c'e' se la curva ha un  min o max relativo su x seguito da uno su y, o viceversa.
+double
+getCurlW(TStroke *s,
+		 bool isBegin) // trova il punto di split su una stroke, in prossimita di un ricciolo;
+// un ricciolo c'e' se la curva ha un  min o max relativo su x seguito da uno su y, o viceversa.
 {
 	int numChunks = s->getChunkCount();
 	double dx2, dx1 = 0, dy2, dy1 = 0;
@@ -1542,25 +1565,28 @@ double getCurlW(TStroke *s, bool isBegin) //trova il punto di split su una strok
 
 	int maxMin1 = isBegin ? j : numChunks - 1 - j;
 
-	return getWfromChunkAndT(s, isBegin ? tmax(maxMin0, maxMin1) : tmin(maxMin0, maxMin1), isBegin ? 1.0 : 0.0);
+	return getWfromChunkAndT(s, isBegin ? tmax(maxMin0, maxMin1) : tmin(maxMin0, maxMin1),
+							 isBegin ? 1.0 : 0.0);
 }
 
 #ifdef Levo
 bool lastIsX = false, lastIsY = false;
 for (int i = 0; i < numChunks; i++) {
 	const TThickQuadratic *q = s->getChunk(isBegin ? i : numChunks - 1 - i);
-	if ((q->getP0().y < q->getP1().y && q->getP2().y < q->getP1().y) || //la quadratica ha un minimo o massimo relativo
+	if ((q->getP0().y < q->getP1().y &&
+		 q->getP2().y < q->getP1().y) || // la quadratica ha un minimo o massimo relativo
 		(q->getP0().y > q->getP1().y && q->getP2().y > q->getP1().y)) {
 		double w = getWfromChunkAndT(s, isBegin ? i : numChunks - 1 - i, isBegin ? 1.0 : 0.0);
-		if (lastIsX) //e' il secondo min o max relativo
+		if (lastIsX) // e' il secondo min o max relativo
 			return w;
 		lastIsX = false;
 		lastIsY = true;
 
-	} else if ((q->getP0().x < q->getP1().x && q->getP2().x < q->getP1().x) || //la quadratica ha un minimo o massimo relativo
+	} else if ((q->getP0().x < q->getP1().x &&
+				q->getP2().x < q->getP1().x) || // la quadratica ha un minimo o massimo relativo
 			   (q->getP0().x > q->getP1().x && q->getP2().x > q->getP1().x)) {
 		double w = getWfromChunkAndT(s, isBegin ? i : numChunks - 1 - i, isBegin ? 1.0 : 0.0);
-		if (lastIsY) //e' il secondo min o max relativo
+		if (lastIsY) // e' il secondo min o max relativo
 			return w;
 		lastIsX = true;
 		lastIsY = false;
@@ -1583,8 +1609,8 @@ bool isCloseEnoughP2L(double facMin, double facMax, TStroke *s1, double w1, TStr
 	int index;
 	TStroke sAux, *sComp;
 
-	if (s1 == s2) //per trovare le intersezioni con una stroke e se stessa, si toglie il
-				  //pezzo di stroke di cui si cercano vicinanze fino alla prima curva
+	if (s1 == s2) // per trovare le intersezioni con una stroke e se stessa, si toglie il
+	// pezzo di stroke di cui si cercano vicinanze fino alla prima curva
 	{
 		double w = getCurlW(s1, w1 == 0.0);
 		if (w == -1)
@@ -1601,16 +1627,17 @@ bool isCloseEnoughP2L(double facMin, double facMax, TStroke *s1, double w1, TStr
 			s2->getNearestChunk(sComp->getChunk(index)->getPoint(t), t, index, dummy);
 		}
 
-		//if (areAlmostEqual(w, 0.0, 0.05) || areAlmostEqual(w, 1.0, 0.05))
+		// if (areAlmostEqual(w, 0.0, 0.05) || areAlmostEqual(w, 1.0, 0.05))
 		//  return; //se w e' vicino ad un estremo, rientra nell'autoclose point to point
 
-		//if (s[jj]->m_s->getLength(w)<=s[jj]->m_s->getThickPoint(0).thick ||
+		// if (s[jj]->m_s->getLength(w)<=s[jj]->m_s->getThickPoint(0).thick ||
 		//    s[jj]->m_s->getLength(w, 1)<=s[jj]->m_s->getThickPoint(1).thick)
 		//  return;
 
 		TThickPoint p1 = s2->getChunk(index)->getThickPoint(t);
 
-		/*!when closing beetween a normal stroke and a 0-thickness stroke (very typical) the thin  one is assumed to have same thickness of the other*/
+		/*!when closing beetween a normal stroke and a 0-thickness stroke (very typical) the thin
+		 * one is assumed to have same thickness of the other*/
 		if (p0.thick == 0)
 			p0.thick = p1.thick;
 		else if (p1.thick == 0)
@@ -1618,15 +1645,21 @@ bool isCloseEnoughP2L(double facMin, double facMax, TStroke *s1, double w1, TStr
 		double autoDistMin, autoDistMax;
 		if (facMin == 0) {
 			autoDistMin = 0;
-			autoDistMax = tmax(-2.0, (facMax + 0.7) * (p0.thick + p1.thick) * (p0.thick + p1.thick));
-			if (autoDistMax < 0.0000001) //! for strokes without thickness, I connect for distances less than min between 2.5 and half of the length of the pointing stroke)
+			autoDistMax =
+				tmax(-2.0, (facMax + 0.7) * (p0.thick + p1.thick) * (p0.thick + p1.thick));
+			if (autoDistMax < 0.0000001) //! for strokes without thickness, I connect for distances
+										 //! less than min between 2.5 and half of the length of the
+										 //! pointing stroke)
 			{
 				double len1 = s1->getLength();
 				autoDistMax = facMax * tmin(2.5, len1 * len1 / (2 * 2));
 			}
 		} else {
-			autoDistMin = tmax(-2.0, (facMin + 0.7) * (p0.thick + p1.thick) * (p0.thick + p1.thick));
-			if (autoDistMin < 0.0000001) //! for strokes without thickness, I connect for distances less than min between 2.5 and half of the length of the pointing stroke)
+			autoDistMin =
+				tmax(-2.0, (facMin + 0.7) * (p0.thick + p1.thick) * (p0.thick + p1.thick));
+			if (autoDistMin < 0.0000001) //! for strokes without thickness, I connect for distances
+										 //! less than min between 2.5 and half of the length of the
+										 //! pointing stroke)
 			{
 				double len1 = s1->getLength();
 				autoDistMin = facMax * tmin(2.5, len1 * len1 / (2 * 2));
@@ -1635,13 +1668,16 @@ bool isCloseEnoughP2L(double facMin, double facMax, TStroke *s1, double w1, TStr
 			autoDistMax = autoDistMin + (facMax - facMin + 0.7) * (facMax - facMin + 0.7);
 		}
 
-		//double autoDistMin = tmax(-2.0, facMin==0?0:(facMin+0.7)*(p0.thick+p1.thick)*(p0.thick+p1.thick));
-		//double autoDistMax = tmax(-2.0, (facMax+0.7)*(p0.thick+p1.thick)*(p0.thick+p1.thick));
+		// double autoDistMin = tmax(-2.0,
+		// facMin==0?0:(facMin+0.7)*(p0.thick+p1.thick)*(p0.thick+p1.thick));
+		// double autoDistMax = tmax(-2.0, (facMax+0.7)*(p0.thick+p1.thick)*(p0.thick+p1.thick));
 
 		if (dist2 < autoDistMin || dist2 > autoDistMax)
 			return false;
 
-		//if (dist2<=(tmax(2.0, (g_autocloseTolerance+0.7)*(p0.thick+p1.thick)*(p0.thick+p1.thick)))) //0.01 tiene conto di quando thick==0
+		// if (dist2<=(tmax(2.0,
+		// (g_autocloseTolerance+0.7)*(p0.thick+p1.thick)*(p0.thick+p1.thick)))) //0.01 tiene conto
+		// di quando thick==0
 
 		w = getWfromChunkAndT(s2, index, t);
 		return true;
@@ -1651,8 +1687,9 @@ bool isCloseEnoughP2L(double facMin, double facMax, TStroke *s1, double w1, TStr
 
 //-------------------------------------------------------------
 /*
-void makePoint2LineConnection(double factor, vector<VIStroke*>& s, int ii, int jj, bool isBegin, IntersectionData& intData, 
-                    int strokeSize)
+void makePoint2LineConnection(double factor, vector<VIStroke*>& s, int ii, int jj, bool isBegin,
+IntersectionData& intData,
+					int strokeSize)
 {
 double w1 = isBegin?0.0: 1.0;
 
@@ -1698,12 +1735,12 @@ for (UINT i=0; i<vi->getStrokeCount(); i++)
   {
   TStroke*s = vi->getStroke(i);
   if (!s->getBBox().contains(p1) || !s->getBBox().contains(p2))
-    continue;
+	continue;
   if (((areAlmostEqual(s->getPoint(0.0), p1, 1e-4) && areAlmostEqual(s->getPoint(1.0), p2, 1e-4)) ||
-      (areAlmostEqual(s->getPoint(0.0), p2, 1e-4) && areAlmostEqual(s->getPoint(1.0), p1, 1e-4))) &&
-       isSegment(*s))
-    return true;
-  
+	  (areAlmostEqual(s->getPoint(0.0), p2, 1e-4) && areAlmostEqual(s->getPoint(1.0), p1, 1e-4))) &&
+	   isSegment(*s))
+	return true;
+
   }
 return false;
 }
@@ -1714,8 +1751,10 @@ bool segmentAlreadyPresent(const TVectorImageP &vi, const TPointD &p1, const TPo
 {
 	for (UINT i = 0; i < vi->getStrokeCount(); i++) {
 		TStroke *s = vi->getStroke(i);
-		if (((areAlmostEqual(s->getPoint(0.0), p1, 1e-4) && areAlmostEqual(s->getPoint(1.0), p2, 1e-4)) ||
-			 (areAlmostEqual(s->getPoint(0.0), p2, 1e-4) && areAlmostEqual(s->getPoint(1.0), p1, 1e-4))) &&
+		if (((areAlmostEqual(s->getPoint(0.0), p1, 1e-4) &&
+			  areAlmostEqual(s->getPoint(1.0), p2, 1e-4)) ||
+			 (areAlmostEqual(s->getPoint(0.0), p2, 1e-4) &&
+			  areAlmostEqual(s->getPoint(1.0), p1, 1e-4))) &&
 			isSegment(*s))
 			return true;
 	}
@@ -1724,20 +1763,21 @@ bool segmentAlreadyPresent(const TVectorImageP &vi, const TPointD &p1, const TPo
 for (UINT i=0; i<vi->getStrokeCount(); i++)
   {
   TStroke* s = vi->getStroke(i);
-  
+
   if (s->getChunkCount()!=1)
-    continue;
-  if (areAlmostEqual((TPointD)s->getControlPoint(0),                           p1, 1e-2) && 
-      areAlmostEqual((TPointD)s->getControlPoint(s->getControlPointCount()-1), p2, 1e-2))
-    return true;
+	continue;
+  if (areAlmostEqual((TPointD)s->getControlPoint(0),                           p1, 1e-2) &&
+	  areAlmostEqual((TPointD)s->getControlPoint(s->getControlPointCount()-1), p2, 1e-2))
+	return true;
   }
-  
+
 return false;
 */
 }
 
-void getClosingSegments(TL2LAutocloser &l2lautocloser, double facMin, double facMax, TStroke *s1, TStroke *s2,
-						vector<DoublePair> *intersections, vector<std::pair<double, double>> &segments)
+void getClosingSegments(TL2LAutocloser &l2lautocloser, double facMin, double facMax, TStroke *s1,
+						TStroke *s2, vector<DoublePair> *intersections,
+						vector<std::pair<double, double>> &segments)
 {
 	bool ret1 = false, ret2 = false, ret3 = false, ret4 = false;
 #define L2LAUTOCLOSE
@@ -1747,7 +1787,8 @@ void getClosingSegments(TL2LAutocloser &l2lautocloser, double facMin, double fac
 	if (facMin == 0)
 		l2lautocloser.setMaxDistance2((facMax + 0.7) * thickmax2);
 	else
-		l2lautocloser.setMaxDistance2((facMax + 0.7) * thickmax2 + (facMax - facMin + 0.7) * (facMax - facMin + 0.7));
+		l2lautocloser.setMaxDistance2((facMax + 0.7) * thickmax2 +
+									  (facMax - facMin + 0.7) * (facMax - facMin + 0.7));
 
 	std::vector<TL2LAutocloser::Segment> l2lSegments;
 	if (intersections)
@@ -1760,9 +1801,11 @@ void getClosingSegments(TL2LAutocloser &l2lautocloser, double facMin, double fac
 		double autoDistMin, autoDistMax;
 		if (facMin == 0) {
 			autoDistMin = 0;
-			autoDistMax = (facMax + 0.7) * (seg.p0.thick + seg.p1.thick) * (seg.p0.thick + seg.p1.thick);
+			autoDistMax =
+				(facMax + 0.7) * (seg.p0.thick + seg.p1.thick) * (seg.p0.thick + seg.p1.thick);
 		} else {
-			autoDistMin = (facMin + 0.7) * (seg.p0.thick + seg.p1.thick) * (seg.p0.thick + seg.p1.thick);
+			autoDistMin =
+				(facMin + 0.7) * (seg.p0.thick + seg.p1.thick) * (seg.p0.thick + seg.p1.thick);
 			autoDistMax = autoDistMin + (facMax - facMin + 0.7) * (facMax - facMin + 0.7);
 		}
 
@@ -1802,7 +1845,7 @@ void getClosingSegments(TL2LAutocloser &l2lautocloser, double facMin, double fac
 	}
 }
 
-} //namaspace
+} // namaspace
 
 //---------------------------------------------------------------------------------
 
@@ -1833,10 +1876,13 @@ void getClosingPoints(const TRectD &rect, double fac, const TVectorImageP &vi,
 			double autoTol = vi->getAutocloseTolerance();
 #endif
 
-			double enlarge1 = (autoTol + 0.7) * (s1->getMaxThickness() > 0 ? s1->getMaxThickness() : 2.5) + fac;
-			double enlarge2 = (autoTol + 0.7) * (s2->getMaxThickness() > 0 ? s2->getMaxThickness() : 2.5) + fac;
+			double enlarge1 =
+				(autoTol + 0.7) * (s1->getMaxThickness() > 0 ? s1->getMaxThickness() : 2.5) + fac;
+			double enlarge2 =
+				(autoTol + 0.7) * (s2->getMaxThickness() > 0 ? s2->getMaxThickness() : 2.5) + fac;
 
-			if (i != j && !s1->getBBox().enlarge(enlarge1).overlaps(s2->getBBox().enlarge(enlarge2)))
+			if (i != j &&
+				!s1->getBBox().enlarge(enlarge1).overlaps(s2->getBBox().enlarge(enlarge2)))
 				continue;
 
 			vector<std::pair<double, double>> segments;
@@ -1858,13 +1904,15 @@ void getClosingPoints(const TRectD &rect, double fac, const TVectorImageP &vi,
 //-------------------------------------------------------------------------------------------------------
 
 void autoclose(double factor, vector<VIStroke *> &s, int ii, int jj, IntersectionData &IntData,
-			   int strokeSize, TL2LAutocloser &l2lautocloser, vector<DoublePair> *intersections, bool isVectorized)
+			   int strokeSize, TL2LAutocloser &l2lautocloser, vector<DoublePair> *intersections,
+			   bool isVectorized)
 {
 	vector<std::pair<double, double>> segments;
 	getClosingSegments(l2lautocloser, 0, factor, s[ii]->m_s, s[jj]->m_s, intersections, segments);
 
 	for (UINT i = 0; i < segments.size(); i++)
-		addAutocloseIntersection(IntData, s, ii, jj, segments[i].first, segments[i].second, strokeSize, isVectorized);
+		addAutocloseIntersection(IntData, s, ii, jj, segments[i].first, segments[i].second,
+								 strokeSize, isVectorized);
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -1905,7 +1953,8 @@ void autoclose(double factor, vector<VIStroke *> &s, int ii, int jj, Intersectio
 
 TPointD inline getTangent(const IntersectedStroke &item)
 {
-	return (item.m_gettingOut ? 1 : -1) * item.m_edge.m_s->getSpeed(item.m_edge.m_w0, item.m_gettingOut);
+	return (item.m_gettingOut ? 1 : -1) *
+		   item.m_edge.m_s->getSpeed(item.m_edge.m_w0, item.m_gettingOut);
 }
 
 //-----------------------------------------------------------------------------
@@ -1935,7 +1984,8 @@ void addBranch(IntersectionData &intData, VIList<IntersectedStroke> &strokeList,
 	item->m_gettingOut = gettingOut;
 
 	/*
-if (strokeList.size()==2) //potrebbero essere orientati male; due branch possono stare come vogliono, ma col terzo no.
+if (strokeList.size()==2) //potrebbero essere orientati male; due branch possono stare come
+vogliono, ma col terzo no.
   {
   TPointD tan2 = getTangent(strokeList.back());
   TPointD aux= getTangent(*(strokeList.begin()));
@@ -1944,21 +1994,23 @@ if (strokeList.size()==2) //potrebbero essere orientati male; due branch possono
 	  return;
 
 	if (crossVal>0)
-    {
+	{
 		std::reverse(strokeList.begin(), strokeList.end());
-    //tan2 = getTangent(strokeList.back());
+	//tan2 = getTangent(strokeList.back());
 		}
   }
 */
 	/*
-if (areAlmostEqual(lastCross, 0.0) && tan1.x*tan2.x>=0 && tan1.y*tan2.y>=0) //significa angolo tra tangenti nullo
+if (areAlmostEqual(lastCross, 0.0) && tan1.x*tan2.x>=0 && tan1.y*tan2.y>=0) //significa angolo tra
+tangenti nullo
 	  {
-		crossVal =  nearCrossVal(item.m_edge.m_s, item.m_edge.m_w0, strokeList.back().m_edge.m_s, strokeList.back().m_edge.m_w0);
-    if (areAlmostEqual(crossVal, 0.0))
+		crossVal =  nearCrossVal(item.m_edge.m_s, item.m_edge.m_w0, strokeList.back().m_edge.m_s,
+strokeList.back().m_edge.m_w0);
+	if (areAlmostEqual(crossVal, 0.0))
 		  return;
 		if (!strokeList.back().m_gettingOut)
 		  crossVal = -crossVal;
-    }
+	}
 */
 
 	tanRef = getTangent(*item);
@@ -1969,19 +2021,19 @@ for (it=strokeList.begin(); it!=strokeList.end(); ++it)
 	TPointD curTan = getTangent(*it);
   double angle0 = getAngle(lastTan, curTan);
   double angle1 = getAngle(lastTan, tanRef);
- 
+
   if (areAlmostEqual(angle0, angle1, 1e-8))
 	  {
-		double angle = getNearAngle( it->m_edge.m_s,  it->m_edge.m_w0,  it->m_gettingOut, 
-		                            item.m_edge.m_s, item.m_edge.m_w0, item.m_gettingOut);
-    angle1 += angle; if (angle1>360) angle1-=360;
-    }
+		double angle = getNearAngle( it->m_edge.m_s,  it->m_edge.m_w0,  it->m_gettingOut,
+									item.m_edge.m_s, item.m_edge.m_w0, item.m_gettingOut);
+	angle1 += angle; if (angle1>360) angle1-=360;
+	}
 
   if (angle1<angle0)
-    {
-    strokeList.insert(it, item);
-    return;
-    }
+	{
+	strokeList.insert(it, item);
+	return;
+	}
 	lastTan=curTan;
   }*/
 
@@ -2016,14 +2068,14 @@ for (it=strokeList.begin(); it!=strokeList.end(); ++it)
 		p2 = p1;
 	}
 
-	//assert(!"add branch: can't find where to insert!");
+	// assert(!"add branch: can't find where to insert!");
 	strokeList.pushBack(item);
 }
 
 //-----------------------------------------------------------------------------
 
-void addBranches(IntersectionData &intData, Intersection &intersection, const vector<VIStroke *> &s, int ii, int jj,
-				 DoublePair intersectionPair, int strokeSize)
+void addBranches(IntersectionData &intData, Intersection &intersection, const vector<VIStroke *> &s,
+				 int ii, int jj, DoublePair intersectionPair, int strokeSize)
 {
 	bool foundS1 = false, foundS2 = false;
 	IntersectedStroke *p;
@@ -2042,24 +2094,27 @@ void addBranches(IntersectionData &intData, Intersection &intersection, const ve
 
 	if (foundS1 && foundS2) {
 		/*
-  //errore!(vedi commento sotto) possono essere un sacco di intersezioni coincidenti se passano per l'estremo di una quad
-	//significa che ci sono due intersezioni coincidenti. cioe' due stroke tangenti. quindi devo invertire l'ordine di due branch enlla rosa dei branch.
+  //errore!(vedi commento sotto) possono essere un sacco di intersezioni coincidenti se passano per
+  l'estremo di una quad
+	//significa che ci sono due intersezioni coincidenti. cioe' due stroke tangenti. quindi devo
+  invertire l'ordine di due branch enlla rosa dei branch.
   list<IntersectedStroke>::iterator it1, it2;
 	it1=intersection.m_strokeList.begin();
 	it2 = it1; it2++;
 	for (; it2!=intersection.m_strokeList.end(); ++it1, ++it2)
-    {
-    if ((*it1).m_gettingOut!=(*it2).m_gettingOut &&((*it1).m_edge.m_index==jj && (*it2).m_edge.m_index==ii) || 
-		    ((*it1).m_edge.m_index==ii && (*it2).m_edge.m_index==jj))
-      {
+	{
+	if ((*it1).m_gettingOut!=(*it2).m_gettingOut &&((*it1).m_edge.m_index==jj &&
+  (*it2).m_edge.m_index==ii) ||
+			((*it1).m_edge.m_index==ii && (*it2).m_edge.m_index==jj))
+	  {
 			IntersectedStroke& el1 = (*it1);
 			IntersectedStroke& el2 = (*it2);
-      IntersectedStroke app;
+	  IntersectedStroke app;
 			app = el1;
 			el1=el2;
 			el2=app;
 			break;
-      }
+	  }
 		}
   */
 		return;
@@ -2067,33 +2122,36 @@ void addBranches(IntersectionData &intData, Intersection &intersection, const ve
 
 	if (!foundS1) {
 		if (intersectionPair.first != 1)
-			addBranch(intData, intersection.m_strokeList, s, ii, intersectionPair.first, strokeSize, true);
+			addBranch(intData, intersection.m_strokeList, s, ii, intersectionPair.first, strokeSize,
+					  true);
 		if (intersectionPair.first != 0)
-			addBranch(intData, intersection.m_strokeList, s, ii, intersectionPair.first, strokeSize, false);
-		//assert(intersection.m_strokeList.size()-size>0);
+			addBranch(intData, intersection.m_strokeList, s, ii, intersectionPair.first, strokeSize,
+					  false);
+		// assert(intersection.m_strokeList.size()-size>0);
 	}
 	if (!foundS2) {
 		if (intersectionPair.second != 1)
-			addBranch(intData, intersection.m_strokeList, s, jj, intersectionPair.second, strokeSize, true);
+			addBranch(intData, intersection.m_strokeList, s, jj, intersectionPair.second,
+					  strokeSize, true);
 		if (intersectionPair.second != 0)
-			addBranch(intData, intersection.m_strokeList, s, jj, intersectionPair.second, strokeSize, false);
-		//intersection.m_numInter+=intersection.m_strokeList.size()-size;
-		//assert(intersection.m_strokeList.size()-size>0);
+			addBranch(intData, intersection.m_strokeList, s, jj, intersectionPair.second,
+					  strokeSize, false);
+		// intersection.m_numInter+=intersection.m_strokeList.size()-size;
+		// assert(intersection.m_strokeList.size()-size>0);
 	}
 }
 
 //-----------------------------------------------------------------------------
 
-void addIntersections(IntersectionData &intData,
-					  const vector<VIStroke *> &s, int ii, int jj,
+void addIntersections(IntersectionData &intData, const vector<VIStroke *> &s, int ii, int jj,
 					  vector<DoublePair> &intersections, int strokeSize, bool isVectorized)
 {
 	for (int k = 0; k < (int)intersections.size(); k++) {
-		if (ii >= strokeSize &&
-			(areAlmostEqual(intersections[k].first, 0.0) || areAlmostEqual(intersections[k].first, 1.0)))
+		if (ii >= strokeSize && (areAlmostEqual(intersections[k].first, 0.0) ||
+								 areAlmostEqual(intersections[k].first, 1.0)))
 			continue;
-		if (jj >= strokeSize &&
-			(areAlmostEqual(intersections[k].second, 0.0) || areAlmostEqual(intersections[k].second, 1.0)))
+		if (jj >= strokeSize && (areAlmostEqual(intersections[k].second, 0.0) ||
+								 areAlmostEqual(intersections[k].second, 1.0)))
 			continue;
 
 		addIntersection(intData, s, ii, jj, intersections[k], strokeSize, isVectorized);
@@ -2118,8 +2176,7 @@ inline double truncate(double x)
 
 //-----------------------------------------------------------------------------
 
-void addIntersection(IntersectionData &intData,
-					 const vector<VIStroke *> &s, int ii, int jj,
+void addIntersection(IntersectionData &intData, const vector<VIStroke *> &s, int ii, int jj,
 					 DoublePair intersection, int strokeSize, bool isVectorized)
 {
 	Intersection *p;
@@ -2127,12 +2184,12 @@ void addIntersection(IntersectionData &intData,
 
 	assert(ii < 0 || jj < 0 || s[ii]->m_groupId == s[jj]->m_groupId);
 
-	//UINT iw;
-	//iw = ((UINT)(intersection.first*0x3fffffff));
-	//intersection.first = truncate(intersection.first);
-	//iw = (UINT)(intersection.second*0x3fffffff);
+	// UINT iw;
+	// iw = ((UINT)(intersection.first*0x3fffffff));
+	// intersection.first = truncate(intersection.first);
+	// iw = (UINT)(intersection.second*0x3fffffff);
 
-	//intersection.second = truncate(intersection.second);
+	// intersection.second = truncate(intersection.second);
 
 	if (areAlmostEqual(intersection.first, 0.0, 1e-5))
 		intersection.first = 0.0;
@@ -2148,8 +2205,10 @@ void addIntersection(IntersectionData &intData,
 
 	for (p = intData.m_intList.first(); p; p = p->next())
 		if (p->m_intersection == point ||
-			(isVectorized && areAlmostEqual(p->m_intersection, point, 1e-2))) //devono essere rigorosamente uguali, altrimenti
-																			  // il calcolo dell'ordine dei rami con le tangenti sballa
+			(isVectorized &&
+			 areAlmostEqual(p->m_intersection, point,
+							1e-2))) // devono essere rigorosamente uguali, altrimenti
+		// il calcolo dell'ordine dei rami con le tangenti sballa
 		{
 			addBranches(intData, *p, s, ii, jj, intersection, strokeSize);
 			return;
@@ -2179,14 +2238,15 @@ void TVectorImage::Imp::findIntersections()
 	map<int, VIStroke *>::iterator it, it_b = intData.m_autocloseMap.begin();
 	map<int, VIStroke *>::iterator it_e = intData.m_autocloseMap.end();
 
-	//prima cerco le intersezioni tra nuove strokes e vecchi autoclose
+	// prima cerco le intersezioni tra nuove strokes e vecchi autoclose
 	for (i = 0; i < strokeSize; i++) {
 		TStroke *s1 = strokeArray[i]->m_s;
 		if (!strokeArray[i]->m_isNewForFill || strokeArray[i]->m_isPoint)
 			continue;
 
 		TRectD bBox = s1->getBBox();
-		double thick2 = s1->getThickPoint(0).thick * 2.1; //2.1 instead of 2.0, for usual problems of approx...
+		double thick2 =
+			s1->getThickPoint(0).thick * 2.1; // 2.1 instead of 2.0, for usual problems of approx...
 		if (bBox.getLx() <= thick2 && bBox.getLy() <= thick2) {
 			strokeArray[i]->m_isPoint = true;
 			continue;
@@ -2201,12 +2261,13 @@ void TVectorImage::Imp::findIntersections()
 			TStroke *s2 = it->second->m_s;
 			vector<DoublePair> parIntersections;
 			if (intersect(s1, s2, parIntersections, true))
-				addIntersections(intData, strokeArray, i, it->first, parIntersections, strokeSize, isVectorized);
+				addIntersections(intData, strokeArray, i, it->first, parIntersections, strokeSize,
+								 isVectorized);
 		}
 	}
 #endif
 
-	//poi,  intersezioni tra stroke, in cui almeno uno dei due deve essere nuovo
+	// poi,  intersezioni tra stroke, in cui almeno uno dei due deve essere nuovo
 
 	map<pair<int, int>, vector<DoublePair>> intersectionMap;
 
@@ -2214,10 +2275,13 @@ void TVectorImage::Imp::findIntersections()
 		TStroke *s1 = strokeArray[i]->m_s;
 		if (strokeArray[i]->m_isPoint)
 			continue;
-		for (j = i; j < strokeSize /*&& (strokeArray[i]->getBBox().x1>= strokeArray[j]->getBBox().x0)*/; j++) {
+		for (j = i;
+			 j < strokeSize /*&& (strokeArray[i]->getBBox().x1>= strokeArray[j]->getBBox().x0)*/;
+			 j++) {
 			TStroke *s2 = strokeArray[j]->m_s;
 
-			if (strokeArray[j]->m_isPoint || !(strokeArray[i]->m_isNewForFill || strokeArray[j]->m_isNewForFill))
+			if (strokeArray[j]->m_isPoint ||
+				!(strokeArray[i]->m_isNewForFill || strokeArray[j]->m_isNewForFill))
 				continue;
 			if (strokeArray[i]->m_groupId != strokeArray[j]->m_groupId)
 				continue;
@@ -2227,18 +2291,21 @@ void TVectorImage::Imp::findIntersections()
 				UINT size = intData.m_intList.size();
 
 				if (intersect(s1, s2, parIntersections, false)) {
-					//if (i==0 && j==1) parIntersections.erase(parIntersections.begin());
+					// if (i==0 && j==1) parIntersections.erase(parIntersections.begin());
 					intersectionMap[pair<int, int>(i, j)] = parIntersections;
-					addIntersections(intData, strokeArray, i, j, parIntersections, strokeSize, isVectorized);
+					addIntersections(intData, strokeArray, i, j, parIntersections, strokeSize,
+									 isVectorized);
 				} else
 					intersectionMap[pair<int, int>(i, j)] = vector<DoublePair>();
 
-				if (!strokeArray[i]->m_isNewForFill && size != intData.m_intList.size() && !strokeArray[i]->m_edgeList.empty()) //aggiunte nuove intersezioni
+				if (!strokeArray[i]->m_isNewForFill && size != intData.m_intList.size() &&
+					!strokeArray[i]->m_edgeList.empty()) // aggiunte nuove intersezioni
 				{
 					intData.m_intersectedStrokeArray.push_back(IntersectedStrokeEdges(i));
 					list<TEdge *> &_list = intData.m_intersectedStrokeArray.back().m_edgeList;
 					list<TEdge *>::const_iterator it;
-					for (it = strokeArray[i]->m_edgeList.begin(); it != strokeArray[i]->m_edgeList.end(); ++it)
+					for (it = strokeArray[i]->m_edgeList.begin();
+						 it != strokeArray[i]->m_edgeList.end(); ++it)
 						_list.push_back(new TEdge(**it, false));
 				}
 			}
@@ -2262,15 +2329,20 @@ void TVectorImage::Imp::findIntersections()
 			if (!(strokeArray[i]->m_isNewForFill || strokeArray[j]->m_isNewForFill))
 				continue;
 
-			double enlarge1 = (m_autocloseTolerance + 0.7) * (s1->getMaxThickness() > 0 ? s1->getMaxThickness() : 2.5);
-			double enlarge2 = (m_autocloseTolerance + 0.7) * (s2->getMaxThickness() > 0 ? s2->getMaxThickness() : 2.5);
+			double enlarge1 = (m_autocloseTolerance + 0.7) *
+							  (s1->getMaxThickness() > 0 ? s1->getMaxThickness() : 2.5);
+			double enlarge2 = (m_autocloseTolerance + 0.7) *
+							  (s2->getMaxThickness() > 0 ? s2->getMaxThickness() : 2.5);
 
 			if (s1->getBBox().enlarge(enlarge1).overlaps(s2->getBBox().enlarge(enlarge2))) {
-				map<pair<int, int>, vector<DoublePair>>::iterator it = intersectionMap.find(pair<int, int>(i, j));
+				map<pair<int, int>, vector<DoublePair>>::iterator it =
+					intersectionMap.find(pair<int, int>(i, j));
 				if (it == intersectionMap.end())
-					autoclose(m_autocloseTolerance, strokeArray, i, j, intData, strokeSize, l2lautocloser, 0, isVectorized);
+					autoclose(m_autocloseTolerance, strokeArray, i, j, intData, strokeSize,
+							  l2lautocloser, 0, isVectorized);
 				else
-					autoclose(m_autocloseTolerance, strokeArray, i, j, intData, strokeSize, l2lautocloser, &(it->second), isVectorized);
+					autoclose(m_autocloseTolerance, strokeArray, i, j, intData, strokeSize,
+							  l2lautocloser, &(it->second), isVectorized);
 			}
 		}
 		strokeArray[i]->m_isNewForFill = false;
@@ -2278,7 +2350,8 @@ void TVectorImage::Imp::findIntersections()
 #endif
 
 	for (i = 0; i < strokeSize; i++) {
-		list<TEdge *>::iterator it, it_b = strokeArray[i]->m_edgeList.begin(), it_e = strokeArray[i]->m_edgeList.end();
+		list<TEdge *>::iterator it, it_b = strokeArray[i]->m_edgeList.begin(),
+									it_e = strokeArray[i]->m_edgeList.end();
 		for (it = it_b; it != it_e; ++it)
 			if ((*it)->m_toBeDeleted == 1)
 				delete *it;
@@ -2286,12 +2359,12 @@ void TVectorImage::Imp::findIntersections()
 		strokeArray[i]->m_edgeList.clear();
 	}
 
-	//si devono cercare le intersezioni con i segmenti aggiunti per l'autoclose
+	// si devono cercare le intersezioni con i segmenti aggiunti per l'autoclose
 
 	for (i = strokeSize; i < (int)strokeArray.size(); ++i) {
 		TStroke *s1 = strokeArray[i]->m_s;
 
-		for (j = i + 1; j < (int)strokeArray.size(); ++j) //intersezione segmento-segmento
+		for (j = i + 1; j < (int)strokeArray.size(); ++j) // intersezione segmento-segmento
 		{
 			if (strokeArray[i]->m_groupId != strokeArray[j]->m_groupId)
 				continue;
@@ -2299,9 +2372,10 @@ void TVectorImage::Imp::findIntersections()
 			TStroke *s2 = strokeArray[j]->m_s;
 			vector<DoublePair> parIntersections;
 			if (intersect(s1, s2, parIntersections, true))
-				addIntersections(intData, strokeArray, i, j, parIntersections, strokeSize, isVectorized);
+				addIntersections(intData, strokeArray, i, j, parIntersections, strokeSize,
+								 isVectorized);
 		}
-		for (j = 0; j < strokeSize; ++j) //intersezione segmento-curva
+		for (j = 0; j < strokeSize; ++j) // intersezione segmento-curva
 		{
 			if (strokeArray[j]->m_isPoint)
 				continue;
@@ -2311,12 +2385,13 @@ void TVectorImage::Imp::findIntersections()
 			TStroke *s2 = strokeArray[j]->m_s;
 			vector<DoublePair> parIntersections;
 			if (intersect(s1, s2, parIntersections, true))
-				addIntersections(intData, strokeArray, i, j, parIntersections, strokeSize, isVectorized);
+				addIntersections(intData, strokeArray, i, j, parIntersections, strokeSize,
+								 isVectorized);
 		}
 	}
 }
 
-//la struttura delle intersezioni viene poi visitata per trovare
+// la struttura delle intersezioni viene poi visitata per trovare
 // i link tra un'intersezione e la successiva
 
 //-----------------------------------------------------------------------------
@@ -2350,13 +2425,14 @@ int TVectorImage::Imp::computeIntersections()
 
 	findNearestIntersection(intData.m_intList);
 
-	//for (it1=intData.m_intList.begin(); it1!=intData.m_intList.end();) //la faccio qui, e non nella eraseIntersection. vedi commento li'.
+	// for (it1=intData.m_intList.begin(); it1!=intData.m_intList.end();) //la faccio qui, e non
+	// nella eraseIntersection. vedi commento li'.
 	eraseDeadIntersections();
 
 	for (p1 = intData.m_intList.first(); p1; p1 = p1->next())
 		markDeadIntersections(intData.m_intList, p1);
 
-	//checkInterList(intData.m_intList);
+	// checkInterList(intData.m_intList);
 	return strokeSize;
 }
 
@@ -2390,11 +2466,8 @@ if (tdistance2(p01, p11)< 2*0.06*0.06)
 //-----------------------------------------------------------------------------
 
 // Trova una possibile regione data una lista di punti di intersezione
-TRegion *findRegion(
-	VIList<Intersection> &intList,
-	Intersection *p1,
-	IntersectedStroke *p2,
-	bool minimizeEdges)
+TRegion *findRegion(VIList<Intersection> &intList, Intersection *p1, IntersectedStroke *p2,
+					bool minimizeEdges)
 {
 	TRegion *r = new TRegion();
 	int currStyle = 0;
@@ -2403,7 +2476,7 @@ TRegion *findRegion(
 	Intersection *nextp1;
 	IntersectedStroke *nextp2;
 
-	//Cicla finche' t2 non punta ad uno stroke gia' visitato
+	// Cicla finche' t2 non punta ad uno stroke gia' visitato
 	while (!p2->m_visited) {
 
 		p2->m_visited = true;
@@ -2435,7 +2508,7 @@ TRegion *findRegion(
 		} else
 			p2->m_edge.m_styleId = currStyle;
 
-		//Aggiunge lo stroke puntato da p2 alla regione
+		// Aggiunge lo stroke puntato da p2 alla regione
 		r->addEdge(&p2->m_edge, minimizeEdges);
 
 		if (nextp2 == pStart)
@@ -2462,21 +2535,21 @@ for (UINT i=0; i<r1.getEdgeCount(); i++)
   {
   TEdge *e1 = r1.getEdge(i);
   for (j=0; j<r2.getEdgeCount(); j++)
-    {
-    TEdge *e2 = r2.getEdge(j);
-    if (e1->m_s==e2->m_s &&
-        tmin(e1->m_w0, e1->m_w1)==tmin(e2->m_w0, e2->m_w1) &&
-        tmax(e1->m_w0, e1->m_w1)==tmax(e2->m_w0, e2->m_w1))
-      {
-      if (e1->m_styleId && !e2->m_styleId)
-        e2->m_styleId=e1->m_styleId;
-      else if (e2->m_styleId && !e1->m_styleId)
-        e1->m_styleId=e2->m_styleId;
-      break;
-      }
-    }
+	{
+	TEdge *e2 = r2.getEdge(j);
+	if (e1->m_s==e2->m_s &&
+		tmin(e1->m_w0, e1->m_w1)==tmin(e2->m_w0, e2->m_w1) &&
+		tmax(e1->m_w0, e1->m_w1)==tmax(e2->m_w0, e2->m_w1))
+	  {
+	  if (e1->m_styleId && !e2->m_styleId)
+		e2->m_styleId=e1->m_styleId;
+	  else if (e2->m_styleId && !e1->m_styleId)
+		e1->m_styleId=e2->m_styleId;
+	  break;
+	  }
+	}
   if (j==r2.getEdgeCount())  //e1 non e' uguale a nessun edge di r2
-    return false;
+	return false;
   }
 
 
@@ -2488,12 +2561,12 @@ return true;
 bool isMetaRegion(const TRegion& r1, const TRegion& r2)
 {
 if (areEqualRegions(r1, r2))
-    return true;
+	return true;
 
 for (UINT i=0; i<r1.getRegionCount(); i++)
   {
   if (isMetaRegion(*r1.getRegion(i), r2))
-    return true;
+	return true;
   }
 return false;
 }
@@ -2504,7 +2577,7 @@ bool isMetaRegion(const vector<TRegion*>& m_regions, const TRegion& r)
 {
 for (UINT i=0; i<m_regions.size(); i++)
   if (isMetaRegion(*(m_regions[i]), r))
-    return true;
+	return true;
 
 return false;
 }
@@ -2514,10 +2587,10 @@ return false;
 
 class TRegionClockWiseFormula : public TRegionFeatureFormula
 {
-private:
+  private:
 	double m_quasiArea;
 
-public:
+  public:
 	TRegionClockWiseFormula() : m_quasiArea(0) {}
 
 	void inline update(const TPointD &p1, const TPointD &p2)
@@ -2540,7 +2613,7 @@ void computeRegionFeature(const TRegion &r, TRegionFeatureFormula &formula)
 	if (size == 0)
 		return;
 
-	//if (size<2)
+	// if (size<2)
 	//  return !isMetaRegion(regions, r);
 
 	int firstControlPoint;
@@ -2563,7 +2636,8 @@ void computeRegionFeature(const TRegion &r, TRegionFeatureFormula &formula)
 		if (firstControlPoint <= lastControlPoint) {
 			if (firstControlPoint & 0x1)
 				firstControlPoint++;
-			if (lastControlPoint - firstControlPoint <= 2) ///per evitare di avere troppi pochi punti....
+			if (lastControlPoint - firstControlPoint <=
+				2) /// per evitare di avere troppi pochi punti....
 			{
 				p = s->getPoint(0.333333 * e->m_w0 + 0.666666 * e->m_w1);
 				formula.update(pOld, p);
@@ -2583,11 +2657,12 @@ void computeRegionFeature(const TRegion &r, TRegionFeatureFormula &formula)
 					pointAdded++;
 				}
 		} else {
-			firstControlPoint--; //this case, getControlPointIndexBEFOREParameter
+			firstControlPoint--; // this case, getControlPointIndexBEFOREParameter
 			lastControlPoint--;
 			if (firstControlPoint & 0x1)
 				firstControlPoint--;
-			if (firstControlPoint - lastControlPoint <= 2) ///per evitare di avere troppi pochi punti....
+			if (firstControlPoint - lastControlPoint <=
+				2) /// per evitare di avere troppi pochi punti....
 			{
 				p = s->getPoint(0.333333 * e->m_w0 + 0.666666 * e->m_w1);
 				formula.update(pOld, p);
@@ -2635,7 +2710,7 @@ bool isValidArea(const vector<TRegion *> &regions, const TRegion &r)
 	if (size == 0)
 		return false;
 
-	//if (size<2)
+	// if (size<2)
 	//  return !isMetaRegion(regions, r);
 
 	int firstControlPoint;
@@ -2657,7 +2732,8 @@ bool isValidArea(const vector<TRegion *> &regions, const TRegion &r)
 		if (firstControlPoint <= lastControlPoint) {
 			if (firstControlPoint & 0x1)
 				firstControlPoint++;
-			if (lastControlPoint - firstControlPoint <= 2) ///per evitare di avere troppi pochi punti....
+			if (lastControlPoint - firstControlPoint <=
+				2) /// per evitare di avere troppi pochi punti....
 			{
 				p = s->getPoint(0.333333 * e->m_w0 + 0.666666 * e->m_w1);
 				area += (p.y + pOld.y) * (pOld.x - p.x);
@@ -2675,11 +2751,12 @@ bool isValidArea(const vector<TRegion *> &regions, const TRegion &r)
 					pointAdded++;
 				}
 		} else {
-			firstControlPoint--; //this case, getControlPointIndexBEFOREParameter
+			firstControlPoint--; // this case, getControlPointIndexBEFOREParameter
 			lastControlPoint--;
 			if (firstControlPoint & 0x1)
 				firstControlPoint--;
-			if (firstControlPoint - lastControlPoint <= 2) ///per evitare di avere troppi pochi punti....
+			if (firstControlPoint - lastControlPoint <=
+				2) /// per evitare di avere troppi pochi punti....
 			{
 				p = s->getPoint(0.333333 * e->m_w0 + 0.666666 * e->m_w1);
 				area += (p.y + pOld.y) * (pOld.x - p.x);
@@ -2711,7 +2788,8 @@ bool isValidArea(const vector<TRegion *> &regions, const TRegion &r)
 
 //-----------------------------------------------------------------------------
 
-void transferColors(const list<TEdge *> &oldList, const list<TEdge *> &newList, bool isStrokeChanged, bool isFlipped, bool overwriteColor);
+void transferColors(const list<TEdge *> &oldList, const list<TEdge *> &newList,
+					bool isStrokeChanged, bool isFlipped, bool overwriteColor);
 
 //-----------------------------------------------------------------------------
 void printStrokes1(vector<VIStroke *> &v, int size)
@@ -2751,13 +2829,13 @@ static void printTime(TStopWatch &sw, string name)
 	ss << '\n' << '\0';
 	string s = ss.str();
 	ss.freeze(false);
-	//TSystem::outputDebug(s);
+	// TSystem::outputDebug(s);
 }
 #endif
 //-----------------------------------------------------------------------------
 void printStrokes1(vector<VIStroke *> &v, int size);
 
-//void testHistory();
+// void testHistory();
 
 // Trova le regioni in una TVectorImage
 int TVectorImage::Imp::computeRegions()
@@ -2771,7 +2849,7 @@ int TVectorImage::Imp::computeRegions()
 	stopWatch.start(true);
 #endif
 
-	//testHistory();
+	// testHistory();
 
 	if (!m_computeRegions)
 		return 0;
@@ -2785,13 +2863,13 @@ int TVectorImage::Imp::computeRegions()
   for( i=0; i<n;++i) vv[i] = i;
   m_intersectionData->m_computedAlmostOnce = true;
   notifyChangedStrokes(vv,vector<TStroke*>(), false);
-  
+
   return true;
   }*/
 
-	//g_autocloseTolerance = m_autocloseTolerance;
+	// g_autocloseTolerance = m_autocloseTolerance;
 
-	//Cancella le regioni gia' esistenti per ricalcolarle
+	// Cancella le regioni gia' esistenti per ricalcolarle
 	clearPointerContainer(m_regions);
 	m_regions.clear();
 
@@ -2803,12 +2881,12 @@ int TVectorImage::Imp::computeRegions()
 		return 0;
 	}
 
-	//Inizializza la lista di intersezioni intList
+	// Inizializza la lista di intersezioni intList
 	m_computedAlmostOnce = true;
 	VIList<Intersection> &intList = m_intersectionData->m_intList;
 	cleanIntersectionMarks(intList);
 
-	//calcolo struttura delle intersezioni
+	// calcolo struttura delle intersezioni
 	int added = 0, notAdded = 0;
 	int strokeSize;
 	strokeSize = computeIntersections();
@@ -2833,7 +2911,7 @@ int TVectorImage::Imp::computeRegions()
 			if (!p2->m_nextIntersection)
 				continue;
 
-			//Se lo stroke puntato da t2 non e' stato ancora visitato, trova una regione
+			// Se lo stroke puntato da t2 non e' stato ancora visitato, trova una regione
 			if (!p2->m_visited && (region = ::findRegion(intList, p1, p2, m_minimizeEdges))) {
 
 				// Se la regione e' valida la aggiunge al vettore delle regioni
@@ -2842,7 +2920,7 @@ int TVectorImage::Imp::computeRegions()
 
 					addRegion(region);
 
-					//Lega ogni ramo della regione alla regione di appartenenza
+					// Lega ogni ramo della regione alla regione di appartenenza
 					for (UINT i = 0; i < region->getEdgeCount(); i++) {
 						TEdge *e = region->getEdge(i);
 						e->m_r = region;
@@ -2861,9 +2939,12 @@ int TVectorImage::Imp::computeRegions()
 	if (!m_notIntersectingStrokes) {
 		UINT i;
 		for (i = 0; i < m_intersectionData->m_intersectedStrokeArray.size(); i++) {
-			if (!m_strokes[m_intersectionData->m_intersectedStrokeArray[i].m_index]->m_edgeList.empty())
-				transferColors(m_intersectionData->m_intersectedStrokeArray[i].m_edgeList,
-							   m_strokes[m_intersectionData->m_intersectedStrokeArray[i].m_index]->m_edgeList, false, false, true);
+			if (!m_strokes[m_intersectionData->m_intersectedStrokeArray[i].m_index]
+					 ->m_edgeList.empty())
+				transferColors(
+					m_intersectionData->m_intersectedStrokeArray[i].m_edgeList,
+					m_strokes[m_intersectionData->m_intersectedStrokeArray[i].m_index]->m_edgeList,
+					false, false, true);
 			clearPointerContainer(m_intersectionData->m_intersectedStrokeArray[i].m_edgeList);
 			m_intersectionData->m_intersectedStrokeArray[i].m_edgeList.clear();
 		}
@@ -2872,7 +2953,7 @@ int TVectorImage::Imp::computeRegions()
 
 	assert(m_intersectionData->m_intersectedStrokeArray.empty());
 
-	//tolgo i segmenti aggiunti con l'autoclose
+	// tolgo i segmenti aggiunti con l'autoclose
 	vector<VIStroke *>::iterator it = m_strokes.begin();
 	advance(it, strokeSize);
 	m_strokes.erase(it, m_strokes.end());
@@ -2910,11 +2991,11 @@ class Branch
 			return m_next?m_next:m_intersection->m_branchList;
 			}
 	}
-	
-	 
+
+
 class Intersection
   {
-	private: 
+	private:
 	TPointD m_intersectionPoint;
   int m_intersectionCount;
   Branch *m_branchList;
@@ -2936,14 +3017,15 @@ void TVectorImage::Imp::checkRegions(const std::vector<TRegion *> &regions)
 		UINT j = 0;
 		for (j = 0; j < r->getEdgeCount(); j++) {
 			TEdge *e = r->getEdge(j);
-			//assert(areSameGroup(e->m_index, false, ==m_strokes[r->getEdge(0)->m_index]->m_groupId);
+			// assert(areSameGroup(e->m_index, false,
+			// ==m_strokes[r->getEdge(0)->m_index]->m_groupId);
 			assert(e->m_r == r);
-			//if (e->m_s->isSelfLoop())
+			// if (e->m_s->isSelfLoop())
 			//  {
 			//  assert(r->getEdgeCount()==1);
-			//assert(r->getSubregionCount()==0);
+			// assert(r->getSubregionCount()==0);
 			//  }
-			//if (j>0)
+			// if (j>0)
 			//  assert(!e->m_s->isSelfLoop());
 		}
 		if (r->getSubregionCount() > 0) {
@@ -2975,7 +3057,8 @@ TRegion *TVectorImage::findRegion(const TRegion &region) const
 {
 	TRegion *ret = 0;
 
-	for (std::vector<TRegion *>::iterator it = m_imp->m_regions.begin(); it != m_imp->m_regions.end(); ++it)
+	for (std::vector<TRegion *>::iterator it = m_imp->m_regions.begin();
+		 it != m_imp->m_regions.end(); ++it)
 		if ((ret = (*it)->findRegion(region)) != 0)
 			return ret;
 
@@ -2991,13 +3074,13 @@ void TVectorImage::Imp::addRegion(TRegion *region)
 			continue;
 
 		if (region->contains(**it)) {
-			//region->addSubregion(*it);
+			// region->addSubregion(*it);
 			region->addSubregion(*it);
 			it = m_regions.erase(it);
 			while (it != m_regions.end()) {
 				if (region->contains(**it)) {
 					region->addSubregion(*it);
-					//region->addSubregion(*it);
+					// region->addSubregion(*it);
 					it = m_regions.erase(it);
 				} else
 					it++;
@@ -3138,7 +3221,7 @@ void TVectorImage::Imp::reindexEdges(const vector<int> &indexes, bool areAdded)
 							break;
 						}
 			}
-			//assert(it2->m_edge.m_index!=1369);
+			// assert(it2->m_edge.m_index!=1369);
 		}
 }
 
@@ -3255,7 +3338,7 @@ void TVectorImage::reassignStyles(map<int, int> &table)
 {
 	UINT i;
 	UINT strokeCount = getStrokeCount();
-	//UINT regionCount = getRegionCount();
+	// UINT regionCount = getRegionCount();
 	for (i = 0; i < strokeCount; ++i) {
 		TStroke *stroke = getStroke(i);
 		int styleId = stroke->getStyle();
@@ -3275,17 +3358,14 @@ void TVectorImage::reassignStyles(map<int, int> &table)
 				map<int, int>::iterator it = table.find(p2->m_edge.m_styleId);
 				if (it != table.end())
 					p2->m_edge.m_styleId = it->second;
-				//assert(it->second<100);
+				// assert(it->second<100);
 			}
 }
 
 //-----------------------------------------------------------------------------
 
 struct TDeleteMapFunctor {
-	void operator()(pair<int, VIStroke *> ptr)
-	{
-		delete ptr.second;
-	}
+	void operator()(pair<int, VIStroke *> ptr) { delete ptr.second; }
 };
 
 IntersectionData::~IntersectionData()
@@ -3297,7 +3377,7 @@ IntersectionData::~IntersectionData()
 #ifdef _DEBUG
 void TVectorImage::Imp::checkIntersections()
 {
-	//return;
+	// return;
 	UINT i, j;
 
 	Intersection *p1;
@@ -3311,7 +3391,8 @@ void TVectorImage::Imp::checkIntersections()
 			assert(is.m_edge.m_index < (int)m_strokes.size());
 			if (is.m_edge.m_index >= 0) {
 
-				assert(is.m_edge.m_s->getChunkCount() >= 0 && is.m_edge.m_s->getChunkCount() <= 10000);
+				assert(is.m_edge.m_s->getChunkCount() >= 0 &&
+					   is.m_edge.m_s->getChunkCount() <= 10000);
 				assert(m_strokes[is.m_edge.m_index]->m_s == is.m_edge.m_s);
 			} else
 				assert(m_intersectionData->m_autocloseMap[is.m_edge.m_index]);
@@ -3332,8 +3413,9 @@ void TVectorImage::Imp::checkIntersections()
 			assert(e->m_w0 >= 0 && e->m_w1 <= 1);
 			assert(e->m_s == vs->m_s);
 			assert(e->m_s->getChunkCount() >= 0 && e->m_s->getChunkCount() <= 10000);
-			//assert(e->m_index<(int)m_strokes.size());   l'indice nella stroke potrebbe essere non valido, non importa.
-			//assert(m_strokes[e->m_index]->m_s==e->m_s); deve essere buono nella intersectionData
+			// assert(e->m_index<(int)m_strokes.size());   l'indice nella stroke potrebbe essere non
+			// valido, non importa.
+			// assert(m_strokes[e->m_index]->m_s==e->m_s); deve essere buono nella intersectionData
 		}
 	}
 
@@ -3404,8 +3486,10 @@ TStroke *TVectorImage::Imp::removeEndpoints(int strokeIndex)
 	for (p1 = m_intersectionData->m_intList.first(); p1; p1 = p1->next())
 		for (p2 = (*p1).m_strokeList.first(); p2; p2 = p2->next()) {
 			if (p2->m_edge.m_s == oldS) {
-				p2->m_edge.m_w0 = vs->m_s->getParameterAtLength(s->getLength(p2->m_edge.m_w0) - offs);
-				p2->m_edge.m_w1 = vs->m_s->getParameterAtLength(s->getLength(p2->m_edge.m_w1) - offs);
+				p2->m_edge.m_w0 =
+					vs->m_s->getParameterAtLength(s->getLength(p2->m_edge.m_w0) - offs);
+				p2->m_edge.m_w1 =
+					vs->m_s->getParameterAtLength(s->getLength(p2->m_edge.m_w1) - offs);
 				p2->m_edge.m_s = vs->m_s;
 			}
 		}
@@ -3447,8 +3531,10 @@ void TVectorImage::Imp::restoreEndpoints(int index, TStroke *oldStroke)
 	for (p1 = m_intersectionData->m_intList.first(); p1; p1 = p1->next())
 		for (p2 = (*p1).m_strokeList.first(); p2; p2 = p2->next()) {
 			if (p2->m_edge.m_s == s) {
-				p2->m_edge.m_w0 = vs->m_s->getParameterAtLength(s->getLength(p2->m_edge.m_w0) + offs);
-				p2->m_edge.m_w1 = vs->m_s->getParameterAtLength(s->getLength(p2->m_edge.m_w1) + offs);
+				p2->m_edge.m_w0 =
+					vs->m_s->getParameterAtLength(s->getLength(p2->m_edge.m_w0) + offs);
+				p2->m_edge.m_w1 =
+					vs->m_s->getParameterAtLength(s->getLength(p2->m_edge.m_w1) + offs);
 				p2->m_edge.m_s = vs->m_s;
 			}
 		}

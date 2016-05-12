@@ -18,17 +18,17 @@
 
 class SError
 {
-protected:
+  protected:
 	std::string m_msg;
 
-public:
+  public:
 	SError() : m_msg(""){};
 	SError(const char *s) : m_msg(s){};
 	virtual ~SError(){};
 	virtual void debug_print() const
 	{
 		/*if ( !m_msg.empty() )
-			smsg_error("Error %s!\n",m_msg.c_str()); 
+			smsg_error("Error %s!\n",m_msg.c_str());
 		else
 			smsg_error("\n"); */
 	}
@@ -36,14 +36,14 @@ public:
 
 class SMemAllocError : public SError
 {
-public:
+  public:
 	SMemAllocError() : SError(""){};
 	SMemAllocError(const char *s) : SError(s){};
 	virtual ~SMemAllocError(){};
 	void debug_print() const
 	{
 		/*	if ( !m_msg.empty() )
-			smsg_error("Error in Memory Allocation %s!\n",m_msg.c_str()); 
+			smsg_error("Error in Memory Allocation %s!\n",m_msg.c_str());
 		else
 			smsg_error("Error in Memory Allocation\n"); */
 	}
@@ -51,14 +51,14 @@ public:
 
 class SWriteRasterError : public SError
 {
-public:
+  public:
 	SWriteRasterError() : SError(""){};
 	SWriteRasterError(const char *s) : SError(s){};
 	virtual ~SWriteRasterError(){};
 	void debug_print() const
 	{
 		/*if ( !m_msg.empty() )
-			smsg_error("Error in Writing Raster %s!\n",m_msg.c_str()); 
+			smsg_error("Error in Writing Raster %s!\n",m_msg.c_str());
 		else
 			smsg_error("Error in Writing Raster\n"); */
 	}
@@ -66,14 +66,14 @@ public:
 
 class SBlurMatrixError : public SError
 {
-public:
+  public:
 	SBlurMatrixError() : SError(""){};
 	SBlurMatrixError(const char *s) : SError(s){};
 	virtual ~SBlurMatrixError(){};
 	void debug_print() const
 	{
 		/*	if ( !m_msg.empty() ) {
-			smsg_error("Error in Generating BlurMatrix %s!\n",m_msg.c_str()); 
+			smsg_error("Error in Generating BlurMatrix %s!\n",m_msg.c_str());
 		} else
 			smsg_error("Error in Generating BlurMatrix!\n"); */
 	}
@@ -81,14 +81,14 @@ public:
 
 class SFileReadError : public SError
 {
-public:
+  public:
 	SFileReadError() : SError(""){};
 	SFileReadError(const char *s) : SError(s){};
 	virtual ~SFileReadError(){};
 	void debug_print() const
 	{
 		/*if ( !m_msg.empty() ) {
-			smsg_error("Error in Reading File %s!\n",m_msg.c_str()); 
+			smsg_error("Error in Reading File %s!\n",m_msg.c_str());
 		} else
 			smsg_error("Error in Reading File!\n"); */
 	}

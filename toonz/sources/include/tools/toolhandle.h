@@ -40,7 +40,7 @@ class DVAPI ToolHandle : public QObject
 	QString m_oldToolName;
 	bool m_toolIsBusy;
 
-public:
+  public:
 	ToolHandle();
 	~ToolHandle();
 
@@ -64,17 +64,18 @@ public:
 	void notifyToolChanged() { emit toolChanged(); }
 
 	void notifyToolCursorTypeChanged() { emit toolCursorTypeChanged(); }
-signals:
+  signals:
 	void toolSwitched();
 	void toolChanged();
 	void toolEditingFinished();
-	//used for changing the tool cursor when the options changed with short cut keys assigned for tool options.
+	// used for changing the tool cursor when the options changed with short cut keys assigned for
+	// tool options.
 	void toolCursorTypeChanged();
 
-public slots:
+  public slots:
 	// void changeTool(QAction* action);
 	void onImageChanged(TImage::Type type);
 	void updateMatrix();
 };
 
-#endif //TOOLEHANDLE_H
+#endif // TOOLEHANDLE_H

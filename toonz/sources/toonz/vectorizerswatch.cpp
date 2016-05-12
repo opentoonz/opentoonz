@@ -54,7 +54,8 @@ inline TImageP getXsheetImage(int row, int col)
 	const TXshCell &cell = xsh->getCell(row, col);
 	TXshSimpleLevel *sl = cell.getSimpleLevel();
 
-	return sl ? sl->getFullsampledFrame(cell.getFrameId(), ImageManager::dontPutInCache) : TImageP();
+	return sl ? sl->getFullsampledFrame(cell.getFrameId(), ImageManager::dontPutInCache)
+			  : TImageP();
 }
 
 //-----------------------------------------------------------------------------
@@ -79,12 +80,15 @@ std::auto_ptr<VectorizerConfiguration> getCurrentVectorizerConfiguration(int row
 		return result_type();
 
 	int framesCount = sl->getFrameCount();
-	double vFrame = (framesCount <= 1) ? 0.0 : tcrop((cell.getFrameId().getNumber() - 1) / double(framesCount - 1), 0.0, 1.0);
+	double vFrame =
+		(framesCount <= 1)
+			? 0.0
+			: tcrop((cell.getFrameId().getNumber() - 1) / double(framesCount - 1), 0.0, 1.0);
 
 	return result_type(vParams->getCurrentConfiguration(vFrame));
 }
 
-} //Local namespace
+} // Local namespace
 
 //*****************************************************************************
 //    VectorizationSwatchData declaration
@@ -105,9 +109,8 @@ struct VectorizationBuilder : public TThread::Executor {
 
 	QList<VectorizerSwatchArea *> m_listeners;
 
-public:
-	VectorizationBuilder()
-		: m_row(-1), m_col(-1), m_image(), m_done(false), m_submitted(false)
+  public:
+	VectorizationBuilder() : m_row(-1), m_col(-1), m_image(), m_done(false), m_submitted(false)
 	{
 		setMaxActiveTasks(1);
 	}
@@ -127,7 +130,7 @@ public:
 	void notifyDone(TImageP img);
 };
 
-} //Local namespace
+} // Local namespace
 
 //*****************************************************************************
 //    VectorizationBuilder implementation
@@ -198,11 +201,10 @@ void VectorizationBuilder::notifyDone(TImageP img)
 //    VectorizationSwatchTask implementation
 //*****************************************************************************
 
-VectorizationSwatchTask::VectorizationSwatchTask(int row, int col)
-	: m_row(row), m_col(col)
+VectorizationSwatchTask::VectorizationSwatchTask(int row, int col) : m_row(row), m_col(col)
 {
-	//Establish connections to default slots; the started one must be blocking,
-	//so that run() awaits until it has been performed.
+	// Establish connections to default slots; the started one must be blocking,
+	// so that run() awaits until it has been performed.
 
 	connect(this, SIGNAL(myStarted(TThread::RunnableP)), SLOT(onStarted(TThread::RunnableP)),
 			Qt::BlockingQueuedConnection);
@@ -234,7 +236,7 @@ void VectorizationSwatchTask::run()
 	if (!m_image || !m_config.get())
 		return;
 
-	//The task must be performed - retrieve and prepare configuration data
+	// The task must be performed - retrieve and prepare configuration data
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
 	VectorizerConfiguration *c = m_config.get();
@@ -304,7 +306,8 @@ VectorizerSwatchArea::Swatch::Swatch(VectorizerSwatchArea *area)
 bool VectorizerSwatchArea::Swatch::event(QEvent *e)
 {
 	bool ret = PlaneViewer::event(e);
-	const TAffine &aff = (e->type() == QEvent::Resize) ? m_area->leftSwatch()->viewAff() : viewAff();
+	const TAffine &aff =
+		(e->type() == QEvent::Resize) ? m_area->leftSwatch()->viewAff() : viewAff();
 	m_area->updateView(aff);
 	return ret;
 }
@@ -385,8 +388,10 @@ VectorizerSwatchArea::VectorizerSwatchArea(QWidget *parent)
 	m_leftSwatch = new Swatch(this);
 	m_rightSwatch = new Swatch(this);
 
-	m_leftSwatch->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
-	m_rightSwatch->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	m_leftSwatch->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	m_rightSwatch->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 
 	QHBoxLayout *lay = new QHBoxLayout;
 	setLayout(lay);
@@ -396,7 +401,7 @@ VectorizerSwatchArea::VectorizerSwatchArea(QWidget *parent)
 
 	setMinimumHeight(150);
 
-	//The followings help in re-establishing focus for wheel events
+	// The followings help in re-establishing focus for wheel events
 	m_leftSwatch->setFocusPolicy(Qt::WheelFocus);
 	m_rightSwatch->setFocusPolicy(Qt::WheelFocus);
 }
@@ -426,12 +431,12 @@ void VectorizerSwatchArea::updateContents()
 	if (!isEnabled() || !isVisible())
 		return;
 
-	//Retrieve current image
+	// Retrieve current image
 	int row, col;
 	getCurrentXsheetPosition(row, col);
 	TImageP img = getXsheetImage(row, col);
 
-	//Update the image to be vectorized
+	// Update the image to be vectorized
 	if ((!img) || TVectorImageP(img)) {
 		m_leftSwatch->image() = TImageP();
 		m_rightSwatch->image() = TImageP();
@@ -452,12 +457,12 @@ void VectorizerSwatchArea::invalidateContents()
 	if (!isEnabled() || !isVisible())
 		return;
 
-	//Retrieve current image
+	// Retrieve current image
 	int row, col;
 	getCurrentXsheetPosition(row, col);
 	TImageP img = getXsheetImage(row, col);
 
-	//Update the image to be vectorized
+	// Update the image to be vectorized
 	if ((!img) || TVectorImageP(img)) {
 		m_leftSwatch->image() = TImageP();
 		m_rightSwatch->image() = TImageP();

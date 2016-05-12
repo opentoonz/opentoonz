@@ -8,7 +8,8 @@
 class TTileSetCM32;
 
 void rect_autofill_learn(const TToonzImageP &imgToLearn, int x1, int y1, int x2, int y2);
-bool rect_autofill_apply(const TToonzImageP &imgToApply, int x1, int y1, int x2, int y2, bool selective, TTileSetCM32 *tileSet);
+bool rect_autofill_apply(const TToonzImageP &imgToApply, int x1, int y1, int x2, int y2,
+						 bool selective, TTileSetCM32 *tileSet);
 
 void autofill_learn(const TToonzImageP &imgToLearn);
 bool autofill_apply(const TToonzImageP &imgToApply, bool selective, TTileSetCM32 *tileSet);

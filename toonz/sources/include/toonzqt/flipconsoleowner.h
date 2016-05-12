@@ -12,7 +12,7 @@ class FlipConsole;
 
 class FlipConsoleOwner
 {
-public:
+  public:
 	virtual void onDrawFrame(int frame, const ImagePainter::VisualSettings &settings) = 0;
 
 	// return true if the frmae is in cache. reimplemented only in Flipbook

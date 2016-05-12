@@ -5,7 +5,7 @@
 
 #include "tw/scrollview.h"
 
-//forward declaration
+// forward declaration
 class Thumbnail;
 class TTextField;
 class TFilePath;
@@ -35,7 +35,7 @@ class ThumbnailViewer : public TScrollView
 	class NameField;
 	NameField *m_nameField;
 
-public:
+  public:
 	ThumbnailViewer(TWidget *parent, string name = "thumbnailViewer");
 	~ThumbnailViewer();
 

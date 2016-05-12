@@ -15,7 +15,9 @@
 
 using namespace TScannerUtil;
 
-void sense(bool) {}
+void sense(bool)
+{
+}
 int scsi_maxlen()
 {
 	assert(0);
@@ -51,7 +53,7 @@ g     Scan speed                 B4 B5 A5
 G     Start Scan        B1 B2 B3 B4 B5
 
 
-e     Activate ADF   
+e     Activate ADF
 0x19  Load from ADF
 0x0C  Unload from ADF
 
@@ -77,7 +79,7 @@ class TScannerExpection : public TException
 {
 	TString m_scannerMsg;
 
-public:
+  public:
 	TScannerExpection(const std::vector<std::string> &notFatal, const std::string &fatal)
 		: TException("Scanner Expection")
 	{
@@ -180,7 +182,8 @@ void TScannerEpson::updateParameters(TScannerParameters &parameters)
 	parameters.setMaxPaperSize((25.4 * hMax) / (float)hiRes, (25.4 * vMax) / (float)hiRes);
 	parameters.updatePaperFormat();
 
-	// cambio range, default, step, e supported. aggiorno, se necessario, il value (n.b. non dovrebbe succedere
+	// cambio range, default, step, e supported. aggiorno, se necessario, il value (n.b. non
+	// dovrebbe succedere
 	// mai, perche' i range sono sempre gli stessi su tutti gli scanner
 	TScanParam defaultEpsonParam(0., 255., 128., 1.);
 	parameters.m_brightness.update(defaultEpsonParam);
@@ -220,8 +223,8 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 
 	/*
   if ((scanArea.getSize().lx > params.m_maxPaperSize.lx) ||
-      (scanArea.getSize().ly > params.m_maxPaperSize.ly))
-    throw TException("Scan area too large, select a correct paper size");
+	  (scanArea.getSize().ly > params.m_maxPaperSize.ly))
+	throw TException("Scan area too large, select a correct paper size");
 */
 
 	for (int i = 0; i < paperCount; ++i) {
@@ -269,8 +272,8 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 			ras = TRasterGR8P(dimlx, dimly);
 			bytes = tceil(dimlx / 8) * dimly;
 			rasBuffer = TRasterGR8P(tceil(dimlx / 8), dimly);
-			//bytes = (dimlx + 7) % 8 * dimly;
-			//rasBuffer = TRasterGR8P((dimlx + 7) % 8,dimly);
+			// bytes = (dimlx + 7) % 8 * dimly;
+			// rasBuffer = TRasterGR8P((dimlx + 7) % 8,dimly);
 			buffer = rasBuffer->getRawData();
 			break;
 #endif
@@ -333,12 +336,12 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 
 			log("readline: OK");
 			/*
-      if (params.getScanType() == TScannerParameters::BW )
-      {
-        for (unsigned int i = 0; i< reqBytes;i++)
-          readBuffer[i] = ~readBuffer[i];
-      }
-      */
+	  if (params.getScanType() == TScannerParameters::BW )
+	  {
+		for (unsigned int i = 0; i< reqBytes;i++)
+		  readBuffer[i] = ~readBuffer[i];
+	  }
+	  */
 			memcpy(buffer + bytes_read, readBuffer.get(), reqBytes);
 			bytes_read += reqBytes;
 			nTimes++;
@@ -349,9 +352,9 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 		}
 		log("read: OK");
 		{ /*
-    FILE *myFile = fopen("C:\\temp\\prova.dmp", "w+");
-    fwrite(buffer, 1, bytes_to_read, myFile); 
-    fclose(myFile);*/
+	FILE *myFile = fopen("C:\\temp\\prova.dmp", "w+");
+	fwrite(buffer, 1, bytes_to_read, myFile);
+	fclose(myFile);*/
 		}
 		if (params.m_paperFeeder.m_supported && (params.m_paperFeeder.m_value == 1.)) {
 			log("Advance paper");
@@ -363,7 +366,7 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 		case TScannerParameters::BW:
 #ifdef BW_USES_GRAYTONES
 			copyGR8BufferToTRasterBW(buffer, dimlx, dimly, ras, true, params.m_threshold.m_value);
-			//copyGR8BufferToTRasterGR8(buffer, dimlx, dimly, ras, true);
+			// copyGR8BufferToTRasterGR8(buffer, dimlx, dimly, ras, true);
 			break;
 #else
 			copyBWBufferToTRasterGR8(buffer, dimlx, dimly, ras, true, true);
@@ -388,7 +391,8 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 		}
 
 		if (params.getCropBox() != params.getScanArea() && !params.isPreview()) {
-			TRect scanRect(TPoint(offsetx, offsety), TDimension(dimly, dimlx)); //dimLx and ly was has been swapped
+			TRect scanRect(TPoint(offsetx, offsety),
+						   TDimension(dimly, dimlx)); // dimLx and ly was has been swapped
 			scanArea2pix(params, offsetx, offsety, dimlx, dimly, params.getScanArea());
 			TRasterP app = ras->create(dimly, dimlx);
 			TRaster32P app32(app);
@@ -407,7 +411,7 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 		}
 		log("notifying");
 		notifyImageDone(rasImg);
-		if (!(params.m_paperFeeder.m_value == 1.) || params.isPreview()) //feeder here!
+		if (!(params.m_paperFeeder.m_value == 1.) || params.isPreview()) // feeder here!
 		{
 			if ((paperCount - i) > 1)
 				notifyNextPaper();
@@ -419,7 +423,8 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 
 	/*Unload Paper if need*/
 
-	if ((m_settingsMode == NEW_STYLE) && params.m_paperFeeder.m_supported && (params.m_paperFeeder.m_value == 1.)) {
+	if ((m_settingsMode == NEW_STYLE) && params.m_paperFeeder.m_supported &&
+		(params.m_paperFeeder.m_value == 1.)) {
 		if (!ESCI_command_1b('e', 1, true)) {
 			std::vector<std::string> notFatal;
 			throw TScannerExpection(notFatal, "Scanner error (un)loading paper");
@@ -442,10 +447,22 @@ bool TScannerEpson::isAreaSupported()
 
 //-----------------------------------------------------------------------------
 
-inline unsigned char B0(const unsigned int v) { return (v & 0x000000ff); }
-inline unsigned char B1(const unsigned int v) { return (v & 0x0000ff00) >> 8; }
-inline unsigned char B2(const unsigned int v) { return (v & 0x00ff0000) >> 16; }
-inline unsigned char B3(const unsigned int v) { return (v & 0xff000000) >> 24; }
+inline unsigned char B0(const unsigned int v)
+{
+	return (v & 0x000000ff);
+}
+inline unsigned char B1(const unsigned int v)
+{
+	return (v & 0x0000ff00) >> 8;
+}
+inline unsigned char B2(const unsigned int v)
+{
+	return (v & 0x00ff0000) >> 16;
+}
+inline unsigned char B3(const unsigned int v)
+{
+	return (v & 0xff000000) >> 24;
+}
 
 void TScannerEpson::doSettings(const TScannerParameters &params, bool firstSheet)
 {
@@ -501,43 +518,43 @@ void TScannerEpson::doSettings(const TScannerParameters &params, bool firstSheet
 		cmd[2] = B2(dpi);
 		cmd[3] = B3(dpi);
 
-		//the sub scan resolution (ESC R)
+		// the sub scan resolution (ESC R)
 		cmd[4] = B0(dpi);
 		cmd[5] = B1(dpi);
 		cmd[6] = B2(dpi);
 		cmd[7] = B3(dpi);
 
-		//skipping length of main scan (ESC A)
+		// skipping length of main scan (ESC A)
 		cmd[8] = B0(offsetx);
 		cmd[9] = B1(offsetx);
 		cmd[10] = B2(offsetx);
 		cmd[11] = B3(offsetx);
 
-		//skipping length of sub scan (ESC A)
+		// skipping length of sub scan (ESC A)
 		cmd[12] = B0(offsety);
 		cmd[13] = B1(offsety);
 		cmd[14] = B2(offsety);
 		cmd[15] = B3(offsety);
 
-		//the length of main scanning (ESC A)
+		// the length of main scanning (ESC A)
 		cmd[16] = B0(sizelx);
 		cmd[17] = B1(sizelx);
 		cmd[18] = B2(sizelx);
 		cmd[19] = B3(sizelx);
 
-		//the length of sub scanning (ESC A)
+		// the length of sub scanning (ESC A)
 		cmd[20] = B0(sizely);
 		cmd[21] = B1(sizely);
 		cmd[22] = B2(sizely);
 		cmd[23] = B3(sizely);
 
 #ifdef GRAYTONES_USES_RGB
-		cmd[24] = 0x13; //scanning color (ESC C)
+		cmd[24] = 0x13; // scanning color (ESC C)
 		cmd[25] = 0x08; // data format (ESC D)
 #else
 		switch (params.getScanType()) {
 		case TScannerParameters::BW:
-			cmd[24] = 0x00; //scanning BW/Gray (ESC C)
+			cmd[24] = 0x00; // scanning BW/Gray (ESC C)
 #ifdef BW_USES_GRAYTONES
 			cmd[25] = 0x08; // data format (ESC D)
 #else
@@ -545,12 +562,12 @@ void TScannerEpson::doSettings(const TScannerParameters &params, bool firstSheet
 			break;
 #endif
 		case TScannerParameters::GR8:
-			cmd[24] = 0x00; //scanning BW/Gray (ESC C)
+			cmd[24] = 0x00; // scanning BW/Gray (ESC C)
 			cmd[25] = 0x08; // data format (ESC D)
 			break;
 
 		case TScannerParameters::RGB24:
-			cmd[24] = 0x13; //scanning color (ESC C)
+			cmd[24] = 0x13; // scanning color (ESC C)
 			cmd[25] = 0x08; // data format (ESC D)
 			break;
 
@@ -559,26 +576,29 @@ void TScannerEpson::doSettings(const TScannerParameters &params, bool firstSheet
 			break;
 		}
 
-//  cmd[24] = (params.getScanType() == TScannerParameters::RGB24)?0x13:0x00; //scanning color (ESC C)
+//  cmd[24] = (params.getScanType() == TScannerParameters::RGB24)?0x13:0x00; //scanning color (ESC
+//  C)
 //  cmd[25] = (params.getScanType() == TScannerParameters::RGB24)?0x08:0x08; // data format (ESC D)
 #endif
 
 		if (m_settingsMode == NEW_STYLE)
 			cmd[26] = 0;
 		else
-			cmd[26] = (params.m_paperFeeder.m_supported && (params.m_paperFeeder.m_value == 1.)) ? 0x01 : 0x00; // option control (ESC e)
-		cmd[27] = 0x00;																							// scanning mode (ESC g)
-		cmd[28] = 0xFF;																							// the number of block line (ESC d)
-		cmd[29] = 0x02;																							// gamma (ESC Z)
-		cmd[30] = brightness;																					//  brightness (ESC L)
-		cmd[31] = 0x80;																							// color collection (ESC M)
-		cmd[32] = 0x01;																							// half toning processing (ESC B)
-		cmd[33] = (unsigned char)params.m_threshold.m_value;													// threshold (ESC t)
-		cmd[34] = 0x00;																							// separate of area (ESC s)
-		cmd[35] = 0x01;																							// sharpness control (ESC Q)
-		cmd[36] = 0x00;																							// mirroring (ESC K)
-		cmd[37] = 0x00;																							// set film type (ESC N)
-																												// other bytes should be set to 0x00 !
+			cmd[26] = (params.m_paperFeeder.m_supported && (params.m_paperFeeder.m_value == 1.))
+						  ? 0x01
+						  : 0x00;							 // option control (ESC e)
+		cmd[27] = 0x00;										 // scanning mode (ESC g)
+		cmd[28] = 0xFF;										 // the number of block line (ESC d)
+		cmd[29] = 0x02;										 // gamma (ESC Z)
+		cmd[30] = brightness;								 //  brightness (ESC L)
+		cmd[31] = 0x80;										 // color collection (ESC M)
+		cmd[32] = 0x01;										 // half toning processing (ESC B)
+		cmd[33] = (unsigned char)params.m_threshold.m_value; // threshold (ESC t)
+		cmd[34] = 0x00;										 // separate of area (ESC s)
+		cmd[35] = 0x01;										 // sharpness control (ESC Q)
+		cmd[36] = 0x00;										 // mirroring (ESC K)
+		cmd[37] = 0x00;										 // set film type (ESC N)
+															 // other bytes should be set to 0x00 !
 
 		if (m_settingsMode == NEW_STYLE)
 			if (params.m_paperFeeder.m_supported && (params.m_paperFeeder.m_value == 1.)) {
@@ -610,7 +630,7 @@ void TScannerEpson::doSettings(const TScannerParameters &params, bool firstSheet
 			notFatal.push_back("Error setting scanner parameters - NAK on D -");
 			continue;
 		}
-		//if here, everything is ok, exit from loop
+		// if here, everything is ok, exit from loop
 		break;
 	}
 	if (retryCount <= 0)
@@ -620,7 +640,9 @@ void TScannerEpson::doSettings(const TScannerParameters &params, bool firstSheet
 
 //-----------------------------------------------------------------------------
 
-void TScannerEpson::collectInformation(char *lev0, char *lev1, unsigned short *lowRes, unsigned short *hiRes, unsigned short *hMax, unsigned short *vMax)
+void TScannerEpson::collectInformation(char *lev0, char *lev1, unsigned short *lowRes,
+									   unsigned short *hiRes, unsigned short *hMax,
+									   unsigned short *vMax)
 {
 	log("collectInformation");
 	unsigned char stx;
@@ -705,7 +727,7 @@ if (!resetScanner())
 
 	s = counter;
 	buffer = ESCI_read_data2(s);
-	//name buffer+1A
+	// name buffer+1A
 	const char *name = (const char *)(buffer.get() + 0x1A);
 	if (strncmp(name, "Perfection1640", strlen("Perfection1640"))) {
 		m_settingsMode = NEW_STYLE;
@@ -849,7 +871,8 @@ bool TScannerEpson::ESCI_command_2w(char cmd, unsigned short p0, unsigned short 
 	return status;
 }
 
-bool TScannerEpson::ESCI_command_4w(char cmd, unsigned short p0, unsigned short p1, unsigned short p2, unsigned short p3, bool checkACK)
+bool TScannerEpson::ESCI_command_4w(char cmd, unsigned short p0, unsigned short p1,
+									unsigned short p2, unsigned short p3, bool checkACK)
 {
 	bool status = false;
 	if (ESCI_command(cmd, checkACK)) {
@@ -884,7 +907,7 @@ std::unique_ptr<unsigned char[]> TScannerEpson::ESCI_read_data2(unsigned long &s
 
 bool TScannerEpson::ESCI_doADF(bool on)
 {
-	//check ref esci documentation page 3-64
+	// check ref esci documentation page 3-64
 	unsigned char eject = 0x0c;
 	int rc = send(&eject, 1);
 	bool status1 = expectACK();
@@ -905,18 +928,20 @@ bool TScannerEpson::ESCI_doADF(bool on)
 	return status;
 }
 
-void TScannerEpson::scanArea2pix(const TScannerParameters &params, unsigned short &offsetx, unsigned short &offsety,
-								 unsigned short &sizelx, unsigned short &sizely, const TRectD &scanArea)
+void TScannerEpson::scanArea2pix(const TScannerParameters &params, unsigned short &offsetx,
+								 unsigned short &offsety, unsigned short &sizelx,
+								 unsigned short &sizely, const TRectD &scanArea)
 {
 	const double f = 25.4;
 	offsetx = (unsigned short)((scanArea.x0 * params.m_dpi.m_value) / f);
 	offsety = (unsigned short)((scanArea.y0 * params.m_dpi.m_value) / f);
 	sizelx = (unsigned short)(((scanArea.x1 - scanArea.x0) * params.m_dpi.m_value) / f);
-	sizelx = (sizelx >> 3) << 3; //questo deve essere multiplo di 8
+	sizelx = (sizelx >> 3) << 3; // questo deve essere multiplo di 8
 	sizely = (unsigned short)(((scanArea.y1 - scanArea.y0) * params.m_dpi.m_value) / f);
 }
 
-void TScannerEpson::ESCI_readLineData(unsigned char &stx, unsigned char &status, unsigned short &counter, unsigned short &lines, bool &areaEnd)
+void TScannerEpson::ESCI_readLineData(unsigned char &stx, unsigned char &status,
+									  unsigned short &counter, unsigned short &lines, bool &areaEnd)
 {
 	unsigned long s = 6;
 	std::unique_ptr<unsigned char[]> buffer = ESCI_read_data2(s);
@@ -969,7 +994,8 @@ void TScannerEpson::ESCI_readLineData(unsigned char &stx, unsigned char &status,
 #endif
 }
 
-void TScannerEpson::ESCI_readLineData2(unsigned char &stx, unsigned char &status, unsigned short &counter)
+void TScannerEpson::ESCI_readLineData2(unsigned char &stx, unsigned char &status,
+									   unsigned short &counter)
 {
 	unsigned long s = 4;
 	std::unique_ptr<unsigned char[]> buffer = ESCI_read_data2(s);
@@ -1000,4 +1026,3 @@ void TScannerEpson::ESCI_readLineData2(unsigned char &stx, unsigned char &status
 	TSystem::outputDebug(os.str());
 #endif
 }
-

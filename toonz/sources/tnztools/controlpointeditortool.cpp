@@ -35,8 +35,9 @@ namespace
 {
 
 /*! Restituisce i parametri riferiti allo stroke della curva che si vuole muovere.
-    I parametri dipendono da come sono i punti in \b beforeIndex, \b nextIndex (cuspidi, lineari).
-    Puo' restituire due range nei casi in cui lo stroke e' selfLoop e la curva e' a cavallo del punto di chiusura.
+	I parametri dipendono da come sono i punti in \b beforeIndex, \b nextIndex (cuspidi, lineari).
+	Puo' restituire due range nei casi in cui lo stroke e' selfLoop e la curva e' a cavallo del
+   punto di chiusura.
 */
 void getSegmentParameter(ControlPointEditorStroke *cpEditor, int beforeIndex, int nextIndex,
 						 double &w0, double &w1, double &q0, double &q1)
@@ -46,51 +47,57 @@ void getSegmentParameter(ControlPointEditorStroke *cpEditor, int beforeIndex, in
 		return;
 	q0 = q1 = w0 = w1 = -1;
 	int cpCount = cpEditor->getControlPointCount();
-	//Il punto di controllo precedente non e' lincato
-	if (cpEditor->isSpeedOutLinear(beforeIndex) || cpEditor->isSpeedInLinear(beforeIndex) || cpEditor->isCusp(beforeIndex)) {
-		if (cpEditor->isSelfLoop() && beforeIndex == 0 && nextIndex == cpCount - 1) //Nel caso selfLoop si invertono i valori
+	// Il punto di controllo precedente non e' lincato
+	if (cpEditor->isSpeedOutLinear(beforeIndex) || cpEditor->isSpeedInLinear(beforeIndex) ||
+		cpEditor->isCusp(beforeIndex)) {
+		if (cpEditor->isSelfLoop() && beforeIndex == 0 &&
+			nextIndex == cpCount - 1) // Nel caso selfLoop si invertono i valori
 			w1 = 1;
 		else
 			w0 = stroke->getParameterAtControlPoint(cpEditor->getIndexPointInStroke(beforeIndex));
-	} else //Punto di controllo precedente lincato
+	} else // Punto di controllo precedente lincato
 	{
 		if (!cpEditor->isSelfLoop() || beforeIndex != 0)
-			w0 = stroke->getParameterAtControlPoint(cpEditor->getIndexPointInStroke(beforeIndex) - 4);
+			w0 = stroke->getParameterAtControlPoint(cpEditor->getIndexPointInStroke(beforeIndex) -
+													4);
 		else {
-			if (nextIndex == 1) //Primo chunk
+			if (nextIndex == 1) // Primo chunk
 			{
 				w0 = 0;
-				q0 = stroke->getParameterAtControlPoint(cpEditor->getIndexPointInStroke(cpCount - 1));
+				q0 = stroke->getParameterAtControlPoint(
+					cpEditor->getIndexPointInStroke(cpCount - 1));
 				q1 = 1;
-			} else if (nextIndex == cpCount - 1) //Ultimo chunk
+			} else if (nextIndex == cpCount - 1) // Ultimo chunk
 			{
 				w1 = 1;
 				q0 = 0;
 				q1 = stroke->getParameterAtControlPoint(cpEditor->getIndexPointInStroke(1));
 			} else {
 				assert(0);
-			} //Non dovrebbe mai accadere
+			} // Non dovrebbe mai accadere
 		}
 	}
-	//Il punto di controllo successivo non e' lincato
-	if (cpEditor->isSpeedInLinear(nextIndex) || cpEditor->isSpeedOutLinear(nextIndex) || cpEditor->isCusp(nextIndex)) {
-		if (cpEditor->isSelfLoop() && beforeIndex == 0 && nextIndex == cpCount - 1) //Nel caso selfLoop si invertono i valori
+	// Il punto di controllo successivo non e' lincato
+	if (cpEditor->isSpeedInLinear(nextIndex) || cpEditor->isSpeedOutLinear(nextIndex) ||
+		cpEditor->isCusp(nextIndex)) {
+		if (cpEditor->isSelfLoop() && beforeIndex == 0 &&
+			nextIndex == cpCount - 1) // Nel caso selfLoop si invertono i valori
 			w0 = stroke->getParameterAtControlPoint(cpEditor->getIndexPointInStroke(nextIndex));
 		else
 			w1 = stroke->getParameterAtControlPoint(cpEditor->getIndexPointInStroke(nextIndex));
-	} else //Punto di controllo successivo lincato
+	} else // Punto di controllo successivo lincato
 	{
 		if (!cpEditor->isSelfLoop() || nextIndex != cpCount - 1 || beforeIndex != 0)
 			w1 = stroke->getParameterAtControlPoint(cpEditor->getIndexPointInStroke(nextIndex) + 4);
-		else if (nextIndex == cpCount - 1) //Ultimo chunk
+		else if (nextIndex == cpCount - 1) // Ultimo chunk
 			w0 = stroke->getParameterAtControlPoint(cpEditor->getIndexPointInStroke(nextIndex) - 4);
 		else {
 			assert(0);
-		} //Non dovrebbe mai accadere, i vari casi dovrebbero essere gestiti sopra
+		} // Non dovrebbe mai accadere, i vari casi dovrebbero essere gestiti sopra
 	}
 }
 
-} //namespace
+} // namespace
 //=============================================================================
 // ControlPointEditorTool
 //-----------------------------------------------------------------------------
@@ -105,32 +112,32 @@ class ControlPointEditorTool : public TTool
 	bool m_isImageChanged;
 	ControlPointSelection m_selection;
 	ControlPointEditorStroke m_controlPointEditorStroke;
-	std::pair<int, int> m_moveSegmentLimitation;			 //Indici dei punti di controllo che limitano la curva da muovere
-	ControlPointEditorStroke m_moveControlPointEditorStroke; //Usate per muovere la curva durante il drag.
+	std::pair<int, int>
+		m_moveSegmentLimitation; // Indici dei punti di controllo che limitano la curva da muovere
+	ControlPointEditorStroke
+		m_moveControlPointEditorStroke; // Usate per muovere la curva durante il drag.
 	TRectD m_selectingRect;
 	TPointD m_pos;
 
 	TPropertyGroup m_prop;
-	TBoolProperty m_autoSelectDrawing; //Consente di scegliere se swichare tra i livelli.
+	TBoolProperty m_autoSelectDrawing; // Consente di scegliere se swichare tra i livelli.
 
-	enum Action { NONE,
-				  RECT_SELECTION,
-				  CP_MOVEMENT,
-				  SEGMENT_MOVEMENT,
-				  IN_SPEED_MOVEMENT,
-				  OUT_SPEED_MOVEMENT };
+	enum Action {
+		NONE,
+		RECT_SELECTION,
+		CP_MOVEMENT,
+		SEGMENT_MOVEMENT,
+		IN_SPEED_MOVEMENT,
+		OUT_SPEED_MOVEMENT
+	};
 	Action m_action;
 
-	enum CursorType { NORMAL,
-					  ADD,
-					  EDIT_SPEED,
-					  EDIT_SEGMENT,
-					  NO_ACTIVE };
+	enum CursorType { NORMAL, ADD, EDIT_SPEED, EDIT_SEGMENT, NO_ACTIVE };
 	CursorType m_cursorType;
 
 	TUndo *m_undo;
 
-public:
+  public:
 	ControlPointEditorTool();
 
 	ToolType getToolType() const { return TTool::LevelWriteTool; }
@@ -186,7 +193,10 @@ public:
 //-----------------------------------------------------------------------------
 
 ControlPointEditorTool::ControlPointEditorTool()
-	: TTool("T_ControlPointEditor"), m_draw(false), m_lastPointSelected(-1), m_isImageChanged(false), m_selectingRect(TRectD()), m_autoSelectDrawing("Auto Select Drawing", true), m_action(NONE), m_cursorType(NORMAL), m_undo(0), m_isMenuViewed(false), m_moveControlPointEditorStroke(), m_moveSegmentLimitation()
+	: TTool("T_ControlPointEditor"), m_draw(false), m_lastPointSelected(-1),
+	  m_isImageChanged(false), m_selectingRect(TRectD()),
+	  m_autoSelectDrawing("Auto Select Drawing", true), m_action(NONE), m_cursorType(NORMAL),
+	  m_undo(0), m_isMenuViewed(false), m_moveControlPointEditorStroke(), m_moveSegmentLimitation()
 {
 	bind(TTool::Vectors);
 	m_prop.bind(m_autoSelectDrawing);
@@ -241,7 +251,8 @@ void ControlPointEditorTool::getNearestStrokeColumnIndexes(std::vector<int> &ind
 		double dist2, t = 0;
 		UINT strokeIndex = -1;
 		TPointD p = getColumnMatrix(index).inv() * getMatrix() * pos;
-		if (vi->getNearestStroke(p, t, strokeIndex, dist2) && dist2 < 25 * getPixelSize() * getPixelSize())
+		if (vi->getNearestStroke(p, t, strokeIndex, dist2) &&
+			dist2 < 25 * getPixelSize() * getPixelSize())
 			newIndexes.push_back(index);
 	}
 	indexes.clear();
@@ -254,13 +265,14 @@ void ControlPointEditorTool::drawMovingSegment()
 {
 	int beforeIndex = m_moveSegmentLimitation.first;
 	int nextIndex = m_moveSegmentLimitation.second;
-	if (m_action != EDIT_SEGMENT || beforeIndex == -1 || nextIndex == -1 || !m_moveControlPointEditorStroke.getStroke())
+	if (m_action != EDIT_SEGMENT || beforeIndex == -1 || nextIndex == -1 ||
+		!m_moveControlPointEditorStroke.getStroke())
 		return;
 	tglColor(TPixel::Green);
 	double w0, w1;
 	double q0, q1;
 	getSegmentParameter(&m_moveControlPointEditorStroke, beforeIndex, nextIndex, w0, w1, q0, q1);
-	if (w0 != -1 && w1 != -1) //Dovrebbero essere sempre diversi...
+	if (w0 != -1 && w1 != -1) // Dovrebbero essere sempre diversi...
 		drawStrokeCenterline(*m_moveControlPointEditorStroke.getStroke(), getPixelSize(), w0, w1);
 	if (q0 != -1 && q1 != -1)
 		drawStrokeCenterline(*m_moveControlPointEditorStroke.getStroke(), getPixelSize(), q0, q1);
@@ -276,13 +288,14 @@ void ControlPointEditorTool::drawControlPoint()
 	int controlPointCount = m_controlPointEditorStroke.getControlPointCount();
 
 	double pix = getPixelSize() * 2.0f;
-	double pix1_5 = 1.5 * pix, pix2 = pix + pix, pix2_5 = pix1_5 + pix,
-		   pix3 = pix2 + pix, pix3_5 = pix2_5 + pix, pix4 = pix3 + pix;
+	double pix1_5 = 1.5 * pix, pix2 = pix + pix, pix2_5 = pix1_5 + pix, pix3 = pix2 + pix,
+		   pix3_5 = pix2_5 + pix, pix4 = pix3 + pix;
 
 	double maxDist2 = sq(5.0 * pix);
 	double dist2 = 0;
 	int pointIndex;
-	ControlPointEditorStroke::PointType pointType = m_controlPointEditorStroke.getPointTypeAt(m_pos, maxDist2, pointIndex);
+	ControlPointEditorStroke::PointType pointType =
+		m_controlPointEditorStroke.getPointTypeAt(m_pos, maxDist2, pointIndex);
 	int i;
 	for (i = 0; i < controlPointCount; i++) {
 		TThickPoint point = m_controlPointEditorStroke.getControlPoint(i);
@@ -335,9 +348,10 @@ void ControlPointEditorTool::draw()
 	}
 
 	TPixel color1, color2;
-	if (m_action == RECT_SELECTION) //Disegna il rettangolo per la selezione
+	if (m_action == RECT_SELECTION) // Disegna il rettangolo per la selezione
 	{
-		color1 = TPixel32::Black; //TransparencyCheck::instance()->isEnabled()?TPixel32::White:TPixel32::Black;
+		color1 = TPixel32::
+			Black; // TransparencyCheck::instance()->isEnabled()?TPixel32::White:TPixel32::Black;
 		drawRect(m_selectingRect, color1, 0x3F33, true);
 	}
 
@@ -359,7 +373,7 @@ void ControlPointEditorTool::draw()
 
 void ControlPointEditorTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 {
-	//Scelgo il cursore in base alla distanza del mouse dalla curva e dai punti di controllo
+	// Scelgo il cursore in base alla distanza del mouse dalla curva e dai punti di controllo
 	TVectorImageP vi(getImage(false));
 	if (!vi) {
 		m_controlPointEditorStroke.setStroke((TVectorImage *)0, -1);
@@ -378,11 +392,12 @@ void ControlPointEditorTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 		double maxDist = 5 * getPixelSize();
 		double maxDist2 = maxDist * maxDist;
 		int pointIndexCP;
-		ControlPointEditorStroke::PointType pointType = m_controlPointEditorStroke.getPointTypeAt(pos, maxDist2, pointIndexCP);
+		ControlPointEditorStroke::PointType pointType =
+			m_controlPointEditorStroke.getPointTypeAt(pos, maxDist2, pointIndexCP);
 		if (pointType == ControlPointEditorStroke::SEGMENT && e.isCtrlPressed())
 			m_cursorType = ADD;
-		//else if(pointType == ControlPointEditorStroke::SEGMENT)
-		//m_cursorType=EDIT_SEGMENT;
+		// else if(pointType == ControlPointEditorStroke::SEGMENT)
+		// m_cursorType=EDIT_SEGMENT;
 		else
 			m_cursorType = NORMAL;
 	}
@@ -398,13 +413,14 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos, const TMouseEven
 	double maxDist2 = maxDist * maxDist;
 	double dist2 = 0;
 	int pointIndex;
-	ControlPointEditorStroke::PointType pointType = m_controlPointEditorStroke.getPointTypeAt(pos, maxDist2, pointIndex);
+	ControlPointEditorStroke::PointType pointType =
+		m_controlPointEditorStroke.getPointTypeAt(pos, maxDist2, pointIndex);
 
 	if (pointType == ControlPointEditorStroke::NONE) {
 		// ho cliccato lontano dalla curva corrente
 		TTool::Application *app = TTool::getApplication();
 		if (m_autoSelectDrawing.getValue()) {
-			//Non sono in nessun gadget
+			// Non sono in nessun gadget
 			std::vector<int> columnIndexes;
 			getViewer()->posToColumnIndexes(e.m_pos, columnIndexes, getPixelSize() * 5, false);
 			getNearestStrokeColumnIndexes(columnIndexes, pos);
@@ -414,12 +430,14 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos, const TMouseEven
 				if (columnIndexes.size() == 1)
 					columnIndex = columnIndexes[0];
 				else {
-					ToolUtils::ColumChooserMenu *menu = new ToolUtils::ColumChooserMenu(app->getCurrentXsheet()->getXsheet(), columnIndexes);
+					ToolUtils::ColumChooserMenu *menu = new ToolUtils::ColumChooserMenu(
+						app->getCurrentXsheet()->getXsheet(), columnIndexes);
 					m_isMenuViewed = true;
 					columnIndex = menu->execute();
 				}
 				TXshColumn *column = app->getCurrentXsheet()->getXsheet()->getColumn(columnIndex);
-				if (columnIndex >= 0 && columnIndex != currentColumnIndex && column && !column->isLocked()) {
+				if (columnIndex >= 0 && columnIndex != currentColumnIndex && column &&
+					!column->isLocked()) {
 					TAffine aff = getMatrix();
 					app->getCurrentColumn()->setColumnIndex(columnIndex);
 					updateMatrix();
@@ -434,7 +452,8 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos, const TMouseEven
 			return;
 		double dist2, t = 0;
 		UINT index = -1;
-		if (vi->getNearestStroke(m_pos, t, index, dist2) && dist2 < 25 * getPixelSize() * getPixelSize()) {
+		if (vi->getNearestStroke(m_pos, t, index, dist2) &&
+			dist2 < 25 * getPixelSize() * getPixelSize()) {
 			// ho cliccato vicino alla curva index-esima
 			assert(0 <= index && index < vi->getStrokeCount());
 			m_controlPointEditorStroke.setStroke(vi, index);
@@ -456,7 +475,8 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos, const TMouseEven
 	if (!vi)
 		return;
 
-	if (pointType == ControlPointEditorStroke::SPEED_IN || pointType == ControlPointEditorStroke::SPEED_OUT) {
+	if (pointType == ControlPointEditorStroke::SPEED_IN ||
+		pointType == ControlPointEditorStroke::SPEED_OUT) {
 		bool isIn = pointType == ControlPointEditorStroke::SPEED_IN;
 		m_selection.selectNone();
 		m_selection.select(pointIndex);
@@ -498,7 +518,7 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos, const TMouseEven
 	} else if (pointType == ControlPointEditorStroke::SEGMENT && !e.isAltPressed()) {
 		m_selection.selectNone();
 		if (e.isCtrlPressed()) {
-			//Aggiungo un punto
+			// Aggiungo un punto
 			initUndo();
 			pointIndex = m_controlPointEditorStroke.addControlPoint(pos);
 			m_selection.select(pointIndex);
@@ -507,13 +527,14 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos, const TMouseEven
 			m_lastPointSelected = -1;
 			notifyImageChanged();
 		} else {
-			//Inizio a muovere la curva
+			// Inizio a muovere la curva
 			int precPointIndex, nextPointIndex;
 			precPointIndex = pointIndex;
-			nextPointIndex = (m_controlPointEditorStroke.isSelfLoop() &&
-							  precPointIndex == m_controlPointEditorStroke.getControlPointCount() - 1)
-								 ? 0
-								 : precPointIndex + 1;
+			nextPointIndex =
+				(m_controlPointEditorStroke.isSelfLoop() &&
+				 precPointIndex == m_controlPointEditorStroke.getControlPointCount() - 1)
+					? 0
+					: precPointIndex + 1;
 			if (precPointIndex > -1 && nextPointIndex > -1) {
 				if (precPointIndex > nextPointIndex)
 					tswap(precPointIndex, nextPointIndex);
@@ -521,7 +542,7 @@ void ControlPointEditorTool::leftButtonDown(const TPointD &pos, const TMouseEven
 				m_moveSegmentLimitation.second = nextPointIndex;
 			}
 			m_moveControlPointEditorStroke = *m_controlPointEditorStroke.clone();
-			//Se e' premuto shift setto a cusp i due punti di controllo che delimitano il segmento.
+			// Se e' premuto shift setto a cusp i due punti di controllo che delimitano il segmento.
 			if (e.isShiftPressed()) {
 				if (!m_controlPointEditorStroke.isCusp(precPointIndex)) {
 					m_controlPointEditorStroke.setCusp(precPointIndex, true, false);
@@ -555,7 +576,8 @@ void ControlPointEditorTool::rightButtonDown(const TPointD &pos, const TMouseEve
 	double maxDist2 = maxDist * maxDist;
 	double dist2 = 0;
 	int pointIndex;
-	ControlPointEditorStroke::PointType pointType = m_controlPointEditorStroke.getPointTypeAt(pos, maxDist2, pointIndex);
+	ControlPointEditorStroke::PointType pointType =
+		m_controlPointEditorStroke.getPointTypeAt(pos, maxDist2, pointIndex);
 	if (pointType != ControlPointEditorStroke::CONTROL_POINT)
 		return;
 	m_selection.select(pointIndex);
@@ -588,7 +610,7 @@ void ControlPointEditorTool::moveSegment(const TPointD &delta, bool dragging, bo
 {
 	int beforeIndex = m_moveSegmentLimitation.first;
 	int nextIndex = m_moveSegmentLimitation.second;
-	//Se e' premuto shift setto a cusp i due punti di controllo che delimitano il segmento.
+	// Se e' premuto shift setto a cusp i due punti di controllo che delimitano il segmento.
 	if (isShiftPressed) {
 		if (!m_controlPointEditorStroke.isCusp(beforeIndex)) {
 			if (dragging)
@@ -624,7 +646,8 @@ void ControlPointEditorTool::leftButtonDrag(const TPointD &pos, const TMouseEven
 	if (m_action == CP_MOVEMENT) {
 		m_pos = pos;
 		if (!m_selection.isSelected(m_lastPointSelected) && e.isCtrlPressed())
-			m_selection.select(m_lastPointSelected); // Controllo che non venga deselezionata l'ultima selezione nel movimento
+			m_selection.select(m_lastPointSelected); // Controllo che non venga deselezionata
+													 // l'ultima selezione nel movimento
 		moveControlPoints(delta);
 		m_isImageChanged = true;
 	}
@@ -677,8 +700,9 @@ void ControlPointEditorTool::leftButtonUp(const TPointD &pos, const TMouseEvent 
 
 	if (m_action == RECT_SELECTION) {
 		if (m_selection.isEmpty()) {
-			//Non ho selezionato nulla
-			if (!TTool::getApplication()->getCurrentObject()->isSpline()) // se non e' una spline deseleziono
+			// Non ho selezionato nulla
+			if (!TTool::getApplication()->getCurrentObject()->isSpline()) // se non e' una spline
+																		  // deseleziono
 				m_controlPointEditorStroke.setStroke((TVectorImage *)0, -1);
 			m_action = NONE;
 			m_isImageChanged = false;
@@ -698,7 +722,7 @@ void ControlPointEditorTool::leftButtonUp(const TPointD &pos, const TMouseEvent 
 	notifyImageChanged();
 	invalidate();
 
-	//Registro l'UNDO
+	// Registro l'UNDO
 	if (m_undo) {
 		TUndoManager::manager()->add(m_undo);
 		m_undo = 0;
@@ -717,7 +741,8 @@ void ControlPointEditorTool::addContextMenuItems(QMenu *menu)
 
 void ControlPointEditorTool::linkSpeedInOut(int index)
 {
-	if ((index == 0 || index == m_controlPointEditorStroke.getControlPointCount() - 1) && !m_controlPointEditorStroke.isSelfLoop())
+	if ((index == 0 || index == m_controlPointEditorStroke.getControlPointCount() - 1) &&
+		!m_controlPointEditorStroke.isSelfLoop())
 		return;
 	if (m_action == IN_SPEED_MOVEMENT || m_action == CP_MOVEMENT)
 		m_controlPointEditorStroke.setCusp(index, false, true);
@@ -741,7 +766,7 @@ bool ControlPointEditorTool::keyDown(int key, TUINT32 flags, const TPoint &pos)
 	if (!vi || (vi && m_selection.isEmpty()))
 		return false;
 
-	//Inizializzo l'UNDO
+	// Inizializzo l'UNDO
 	initUndo();
 
 	TPointD delta;
@@ -758,7 +783,7 @@ bool ControlPointEditorTool::keyDown(int key, TUINT32 flags, const TPoint &pos)
 	moveControlPoints(delta);
 
 	invalidate();
-	//Registro l'UNDO
+	// Registro l'UNDO
 	TUndoManager::manager()->add(m_undo);
 
 	return true;
@@ -790,7 +815,7 @@ void ControlPointEditorTool::onLeave()
 {
 	if (m_isMenuViewed)
 		return;
-	//m_draw=false;
+	// m_draw=false;
 }
 
 //-----------------------------------------------------------------------------
@@ -859,6 +884,6 @@ int ControlPointEditorTool::getCursorId() const
 
 //=============================================================================
 
-//TTool *getSplineEditorTool() {return &controlPointEditorTool;}
+// TTool *getSplineEditorTool() {return &controlPointEditorTool;}
 
 //=============================================================================

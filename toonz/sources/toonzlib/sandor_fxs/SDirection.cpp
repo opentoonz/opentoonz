@@ -18,8 +18,7 @@ CSDirection::CSDirection() : m_lX(0), m_lY(0), m_lDf(0)
 		m_df[i] = 0;
 }
 
-CSDirection::CSDirection(const int lX, const int lY, const UCHAR *sel,
-						 const int sens)
+CSDirection::CSDirection(const int lX, const int lY, const UCHAR *sel, const int sens)
 	: m_lX(lX), m_lY(lY), m_lDf(0)
 {
 	for (int i = 0; i < NBDIR; i++)
@@ -44,8 +43,8 @@ CSDirection::CSDirection(const int lX, const int lY, const UCHAR *sel,
 	}
 }
 
-CSDirection::CSDirection(const int lX, const int lY, const UCHAR *sel,
-						 const int sens, const int border)
+CSDirection::CSDirection(const int lX, const int lY, const UCHAR *sel, const int sens,
+						 const int border)
 	: m_lX(lX), m_lY(lY), m_lDf(0)
 {
 	for (int i = 0; i < NBDIR; i++)
@@ -69,8 +68,7 @@ CSDirection::CSDirection(const int lX, const int lY, const UCHAR *sel,
 	}
 }
 
-bool CSDirection::isContourBorder(const int xx, const int yy,
-								  const int border)
+bool CSDirection::isContourBorder(const int xx, const int yy, const int border)
 {
 	for (int y = yy - border; y <= (yy + border); y++)
 		for (int x = xx - border; x <= (xx + border); x++)
@@ -99,7 +97,7 @@ void CSDirection::setContourBorder(const int border)
 void CSDirection::null()
 {
 	m_dir.reset();
-	for (auto&& df : m_df) {
+	for (auto &&df : m_df) {
 		df.reset();
 	}
 	m_lX = m_lY = 0;
@@ -111,8 +109,7 @@ CSDirection::~CSDirection()
 	null();
 }
 
-double CSDirection::adjustAngle(const short sum[4], const int Ima,
-								const int Im45, const int Ip45)
+double CSDirection::adjustAngle(const short sum[4], const int Ima, const int Im45, const int Ip45)
 {
 	short ma = MAX(sum[Im45], sum[Ip45]);
 
@@ -190,7 +187,7 @@ UCHAR CSDirection::getDir(const int xx, const int yy, UCHAR *sel)
 		return 0;
 	short ma = MAX(MAX(MAX(sum[0], sum[1]), sum[2]), sum[3]);
 	double angle = getAngle(sum, ma);
-	//tmsg_info(" - dir - %d, %d, %d, %d angle=%f", sum[0],sum[1],sum[2],sum[3],
+	// tmsg_info(" - dir - %d, %d, %d, %d angle=%f", sum[0],sum[1],sum[2],sum[3],
 	//		                                          angle-50.0);
 	return UC_ROUND(angle);
 }
@@ -207,8 +204,7 @@ void CSDirection::makeDir(UCHAR *sel)
 		}
 }
 
-UCHAR CSDirection::equalizeDir_GTE50(UCHAR *sel,
-									 const int xx, const int yy, const int d)
+UCHAR CSDirection::equalizeDir_GTE50(UCHAR *sel, const int xx, const int yy, const int d)
 {
 	int sum = 0;
 	int w = 0;
@@ -244,8 +240,7 @@ UCHAR CSDirection::equalizeDir_GTE50(UCHAR *sel,
 	return *(sel + yy * m_lX + xx);
 }
 
-UCHAR CSDirection::equalizeDir_LT50(UCHAR *sel,
-									const int xx, const int yy, const int d)
+UCHAR CSDirection::equalizeDir_LT50(UCHAR *sel, const int xx, const int yy, const int d)
 {
 	int sum = 0;
 	int w = 0;
@@ -408,8 +403,8 @@ void CSDirection::doDir()
 	}
 }
 
-void CSDirection::doRadius(const double rH, const double rLR,
-						   const double rV, const double rRL, const int dBlur)
+void CSDirection::doRadius(const double rH, const double rLR, const double rV, const double rRL,
+						   const int dBlur)
 {
 	try {
 		int xy = m_lX * m_lY;

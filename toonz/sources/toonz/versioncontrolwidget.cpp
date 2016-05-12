@@ -14,8 +14,7 @@
 // DateChooserWidget
 //-----------------------------------------------------------------------------
 
-DateChooserWidget::DateChooserWidget(QWidget *parent)
-	: QWidget(parent), m_selectedRadioIndex(0)
+DateChooserWidget::DateChooserWidget(QWidget *parent) : QWidget(parent), m_selectedRadioIndex(0)
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->setMargin(0);
@@ -229,8 +228,7 @@ QStringList ConflictWidget::getFilesWithOption(int option) const
 // DoubleRadioWidget
 //-----------------------------------------------------------------------------
 
-DoubleRadioWidget::DoubleRadioWidget(const QString &button1Text,
-									 const QString &button2Text,
+DoubleRadioWidget::DoubleRadioWidget(const QString &button1Text, const QString &button2Text,
 									 const QString &text, QWidget *parent)
 	: QWidget(parent)
 

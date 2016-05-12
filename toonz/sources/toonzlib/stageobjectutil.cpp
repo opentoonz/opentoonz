@@ -22,8 +22,7 @@ TStageObjectValues::Channel::Channel(TStageObject::Channel actionId)
 {
 }
 
-TStageObjectValues::TStageObjectValues()
-	: m_objectId(TStageObjectId::NoneId), m_frame(-1)
+TStageObjectValues::TStageObjectValues() : m_objectId(TStageObjectId::NoneId), m_frame(-1)
 {
 }
 
@@ -37,7 +36,8 @@ TStageObjectValues::TStageObjectValues(TStageObjectId id, TStageObject::Channel 
 
 //-----------------------------------------------------------------------------
 
-TStageObjectValues::TStageObjectValues(TStageObjectId id, TStageObject::Channel a0, TStageObject::Channel a1)
+TStageObjectValues::TStageObjectValues(TStageObjectId id, TStageObject::Channel a0,
+									   TStageObject::Channel a1)
 	: m_objectId(id), m_frame(-1)
 {
 	add(a0);
@@ -101,11 +101,11 @@ void TStageObjectValues::applyValues(bool undoEnabled) const
 
 		TDoubleParam *param = pegbar->getParam((TStageObject::Channel)it->m_actionId);
 		if (!param->isKeyframe(m_frame)) {
-			KeyframeSetter setter(param, -1, undoEnabled); //Deve essere registrato l'undo
+			KeyframeSetter setter(param, -1, undoEnabled); // Deve essere registrato l'undo
 			setter.createKeyframe(m_frame);
 		}
 		int indexKeyframe = param->getClosestKeyframe(m_frame);
-		KeyframeSetter setter(param, indexKeyframe, false); //Non deve essere registrato l'undo
+		KeyframeSetter setter(param, indexKeyframe, false); // Non deve essere registrato l'undo
 		setter.setValue(it->getValue());
 	}
 	//--- Permette l'undo per l'interpolazione con la cinematica inversa
@@ -122,8 +122,7 @@ void TStageObjectValues::applyValues(bool undoEnabled) const
 
 void TStageObjectValues::Channel::setValue(double value)
 {
-	if (m_actionId == TStageObject::T_ScaleX ||
-		m_actionId == TStageObject::T_ScaleY) {
+	if (m_actionId == TStageObject::T_ScaleX || m_actionId == TStageObject::T_ScaleY) {
 		const double eps = 1.e-8;
 		if (fabs(value) < eps)
 			value = value < 0 ? -eps : eps;
@@ -266,13 +265,17 @@ void UndoSetKeyFrame::redo() const
 
 //-----------------------------------------------------------------------------
 
-int UndoSetKeyFrame::getSize() const { return 10 << 10; } // Gave up exact calculation. Say ~10 kB?
+int UndoSetKeyFrame::getSize() const
+{
+	return 10 << 10;
+} // Gave up exact calculation. Say ~10 kB?
 
 //=============================================================================
 // UndoRemoveKeyFrame
 //-----------------------------------------------------------------------------
 
-UndoRemoveKeyFrame::UndoRemoveKeyFrame(TStageObjectId objectId, int frame, TStageObject::Keyframe key, TXsheetHandle *xsheetHandle)
+UndoRemoveKeyFrame::UndoRemoveKeyFrame(TStageObjectId objectId, int frame,
+									   TStageObject::Keyframe key, TXsheetHandle *xsheetHandle)
 	: m_objId(objectId), m_frame(frame), m_xsheetHandle(xsheetHandle), m_key(key)
 {
 }
@@ -309,15 +312,17 @@ void UndoRemoveKeyFrame::redo() const
 
 //-----------------------------------------------------------------------------
 
-int UndoRemoveKeyFrame::getSize() const { return 10 << 10; } // Gave up exact calculation. Say ~10 kB?
+int UndoRemoveKeyFrame::getSize() const
+{
+	return 10 << 10;
+} // Gave up exact calculation. Say ~10 kB?
 
 //=============================================================================
 // UndoStageObjectCenterMove
 //-----------------------------------------------------------------------------
 
-UndoStageObjectCenterMove::UndoStageObjectCenterMove(
-	const TStageObjectId &id, int frame,
-	const TPointD &before, const TPointD &after)
+UndoStageObjectCenterMove::UndoStageObjectCenterMove(const TStageObjectId &id, int frame,
+													 const TPointD &before, const TPointD &after)
 	: m_pid(id), m_frame(frame), m_before(before), m_after(after)
 {
 }
@@ -344,9 +349,8 @@ void UndoStageObjectCenterMove::redo() const
 // UndoStageObjectMove
 //-----------------------------------------------------------------------------
 
-UndoStageObjectMove::UndoStageObjectMove(
-	const TStageObjectValues &before,
-	const TStageObjectValues &after)
+UndoStageObjectMove::UndoStageObjectMove(const TStageObjectValues &before,
+										 const TStageObjectValues &after)
 	: m_before(before), m_after(after)
 {
 }
@@ -371,9 +375,8 @@ void UndoStageObjectMove::redo() const
 // UndoStageObjectPinned
 //-----------------------------------------------------------------------------
 
-UndoStageObjectPinned::UndoStageObjectPinned(
-	const TStageObjectId &id, int frame,
-	const bool &before, const bool &after)
+UndoStageObjectPinned::UndoStageObjectPinned(const TStageObjectId &id, int frame,
+											 const bool &before, const bool &after)
 	: m_pid(id), m_frame(frame), m_before(before), m_after(after)
 {
 }

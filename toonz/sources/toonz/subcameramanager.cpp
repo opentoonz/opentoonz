@@ -1,9 +1,9 @@
 
 
-//Toonz app
+// Toonz app
 #include "tapp.h"
 
-//Toonz stage structures
+// Toonz stage structures
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/txsheethandle.h"
@@ -11,10 +11,10 @@
 #include "toonz/tcamera.h"
 #include "toonz/tframehandle.h"
 
-//Scene viewer
+// Scene viewer
 #include "sceneviewer.h"
 
-//Qt event-handling includes
+// Qt event-handling includes
 #include <QMouseEvent>
 
 #include "subcameramanager.h"
@@ -70,7 +70,7 @@ TRect PreviewSubCameraManager::getEditingCameraInterestRect() const
 	if (m_mousePressed)
 		return m_editingInterestRect;
 	else {
-		//Return the actual current camera's interest rect
+		// Return the actual current camera's interest rect
 		TCamera *currCamera = TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
 		return currCamera->getInterestRect();
 	}
@@ -83,12 +83,12 @@ TRectD PreviewSubCameraManager::getEditingCameraInterestStageRect() const
 	TCamera *currCamera = TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
 
 	if (m_mousePressed)
-		//Build the stage rect associated with m_editingInterestRect
-		return currCamera->getCameraToStageRef() * TRectD(
-													   m_editingInterestRect.x0, m_editingInterestRect.y0,
-													   m_editingInterestRect.x1 + 1, m_editingInterestRect.y1 + 1);
+		// Build the stage rect associated with m_editingInterestRect
+		return currCamera->getCameraToStageRef() *
+			   TRectD(m_editingInterestRect.x0, m_editingInterestRect.y0,
+					  m_editingInterestRect.x1 + 1, m_editingInterestRect.y1 + 1);
 	else
-		//Return the actual current camera's stage interest rect
+		// Return the actual current camera's stage interest rect
 		return currCamera->getInterestStageRect();
 }
 
@@ -99,7 +99,8 @@ TPointD PreviewSubCameraManager::winToCamera(SceneViewer *viewer, const QPoint &
 	TPointD worldPos(viewer->winToWorld(pos));
 
 	TApp *app = TApp::instance();
-	TAffine stageToWorldRef(app->getCurrentXsheet()->getXsheet()->getCameraAff(app->getCurrentFrame()->getFrame()));
+	TAffine stageToWorldRef(
+		app->getCurrentXsheet()->getXsheet()->getCameraAff(app->getCurrentFrame()->getFrame()));
 
 	TCamera *currCamera = app->getCurrentScene()->getScene()->getCurrentCamera();
 	return currCamera->getStageToCameraRef() * stageToWorldRef.inv() * worldPos;
@@ -110,7 +111,8 @@ TPointD PreviewSubCameraManager::winToCamera(SceneViewer *viewer, const QPoint &
 TPoint PreviewSubCameraManager::cameraToWin(SceneViewer *viewer, const TPointD &cameraPos) const
 {
 	TApp *app = TApp::instance();
-	TAffine stageToWorldRef(app->getCurrentXsheet()->getXsheet()->getCameraAff(app->getCurrentFrame()->getFrame()));
+	TAffine stageToWorldRef(
+		app->getCurrentXsheet()->getXsheet()->getCameraAff(app->getCurrentFrame()->getFrame()));
 	TCamera *currCamera = app->getCurrentScene()->getScene()->getCurrentCamera();
 
 	TPointD worldPos(stageToWorldRef * currCamera->getCameraToStageRef() * cameraPos);
@@ -150,36 +152,37 @@ bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer, QMouseEvent *e
 		}
 
 		if (m_clickAndDrag == true) {
-			//Write the temporary preview subcamera to current camera
+			// Write the temporary preview subcamera to current camera
 			TPointD worldMousePressPos(viewer->winToWorld(m_mousePressPos));
 			TPointD worldCurPos(viewer->winToWorld(curPos));
 
 			TApp *app = TApp::instance();
-			TAffine cameraAffInv(app->getCurrentXsheet()->getXsheet()->getCameraAff(app->getCurrentFrame()->getFrame()).inv());
+			TAffine cameraAffInv(app->getCurrentXsheet()
+									 ->getXsheet()
+									 ->getCameraAff(app->getCurrentFrame()->getFrame())
+									 .inv());
 
 			worldMousePressPos = cameraAffInv * worldMousePressPos;
 			worldCurPos = cameraAffInv * worldCurPos;
 
-			TRectD worldPreviewSubCameraRect(
-				tmin(worldMousePressPos.x, worldCurPos.x),
-				tmin(worldMousePressPos.y, worldCurPos.y),
-				tmax(worldMousePressPos.x, worldCurPos.x),
-				tmax(worldMousePressPos.y, worldCurPos.y));
+			TRectD worldPreviewSubCameraRect(tmin(worldMousePressPos.x, worldCurPos.x),
+											 tmin(worldMousePressPos.y, worldCurPos.y),
+											 tmax(worldMousePressPos.x, worldCurPos.x),
+											 tmax(worldMousePressPos.y, worldCurPos.y));
 
 			TCamera *camera = app->getCurrentScene()->getScene()->getCurrentCamera();
-			//camera->setInterestStageRect(worldPreviewSubCameraRect);
+			// camera->setInterestStageRect(worldPreviewSubCameraRect);
 
 			TRectD previewSubCameraD(camera->getStageToCameraRef() * worldPreviewSubCameraRect);
-			m_editingInterestRect = TRect(
-										previewSubCameraD.x0, previewSubCameraD.y0,
-										previewSubCameraD.x1 - 1, previewSubCameraD.y1 - 1) *
+			m_editingInterestRect = TRect(previewSubCameraD.x0, previewSubCameraD.y0,
+										  previewSubCameraD.x1 - 1, previewSubCameraD.y1 - 1) *
 									TRect(camera->getRes());
 
 			viewer->update();
 		} else {
 			TPoint dragDistance = getSubCameraDragDistance(viewer, curPos);
 
-			//Adjust the camera subrect
+			// Adjust the camera subrect
 			TCamera *camera = TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
 			TRect subRect(camera->getInterestRect());
 
@@ -231,7 +234,7 @@ bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer, QMouseEvent *e
 			}
 	}
 
-	//In case, perform the pan
+	// In case, perform the pan
 	return event->buttons() == Qt::MidButton;
 }
 
@@ -249,11 +252,11 @@ bool PreviewSubCameraManager::mouseReleaseEvent(SceneViewer *viewer, QMouseEvent
 	TCamera *camera = TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
 	camera->setInterestRect(m_editingInterestRect);
 
-	//Request a previewer update. Observe that whereas this previewer may not be in preview mode,
-	//another visible one may.
+	// Request a previewer update. Observe that whereas this previewer may not be in preview mode,
+	// another visible one may.
 	Previewer::instance(true)->updateView();
 
-	//Refresh viewer
+	// Refresh viewer
 	viewer->update();
 
 	return false;
@@ -275,15 +278,14 @@ UCHAR PreviewSubCameraManager::getSubCameraDragEnum(SceneViewer *viewer, const Q
 	TPointD cameraPosT(winToCamera(viewer, mousePos - QPoint(0, 10)));
 	TPointD cameraPosB(winToCamera(viewer, mousePos + QPoint(0, 10)));
 
-	TRectD cameraPosBox(
-		tmin(cameraPosL.x, cameraPosR.x, cameraPosT.x, cameraPosB.x),
-		tmin(cameraPosL.y, cameraPosR.y, cameraPosT.y, cameraPosB.y),
-		tmax(cameraPosL.x, cameraPosR.x, cameraPosT.x, cameraPosB.x),
-		tmax(cameraPosL.y, cameraPosR.y, cameraPosT.y, cameraPosB.y));
+	TRectD cameraPosBox(tmin(cameraPosL.x, cameraPosR.x, cameraPosT.x, cameraPosB.x),
+						tmin(cameraPosL.y, cameraPosR.y, cameraPosT.y, cameraPosB.y),
+						tmax(cameraPosL.x, cameraPosR.x, cameraPosT.x, cameraPosB.x),
+						tmax(cameraPosL.y, cameraPosR.y, cameraPosT.y, cameraPosB.y));
 
 	TRectD subCameraD(subCamera.x0, subCamera.y0, subCamera.x1 + 1, subCamera.y1 + 1);
 
-	//Now, find out the drag enums, in case the mouse pos is near a sensible part of the rect
+	// Now, find out the drag enums, in case the mouse pos is near a sensible part of the rect
 	UCHAR dragType = NODRAG;
 
 	if (cameraPosBox.y0 < subCameraD.y1)
@@ -309,9 +311,10 @@ UCHAR PreviewSubCameraManager::getSubCameraDragEnum(SceneViewer *viewer, const Q
 
 //-----------------------------------------------------------------------------
 
-TPoint PreviewSubCameraManager::getSubCameraDragDistance(SceneViewer *viewer, const QPoint &mousePos)
+TPoint PreviewSubCameraManager::getSubCameraDragDistance(SceneViewer *viewer,
+														 const QPoint &mousePos)
 {
-	//Build the camera drag distance
+	// Build the camera drag distance
 	if (m_clickAndDrag)
 		return TPoint();
 
@@ -349,6 +352,6 @@ void PreviewSubCameraManager::deleteSubCamera(SceneViewer *viewer)
 
 	Previewer::instance(true)->updateView();
 
-	//Refresh viewer
+	// Refresh viewer
 	viewer->update();
 }

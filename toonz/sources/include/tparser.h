@@ -29,7 +29,7 @@ class DVAPI Parser
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	Parser(const Grammar *grammar);
 	~Parser();
 
@@ -50,18 +50,13 @@ public:
 	//! the pair contains the indices of the first and the last characters of the token
 	std::pair<int, int> getErrorPos() const;
 
-	enum SyntaxStatus {
-		Correct,
-		Incomplete,
-		Error,
-		ExtraIgnored
-	};
+	enum SyntaxStatus { Correct, Incomplete, Error, ExtraIgnored };
 	SyntaxStatus checkSyntax(std::vector<SyntaxToken> &tokens, std::string text);
 
 	void getSuggestions(Grammar::Suggestions &suggestions, std::string text);
 	std::string getCurrentPatternString(std::string text);
 
-private:
+  private:
 	// not implemented
 	Parser(const Parser &);
 	Parser &operator=(const Parser &);

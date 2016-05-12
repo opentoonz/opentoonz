@@ -32,7 +32,7 @@ class FadeFx : public TStandardRasterFx
 	TRasterFxPort m_input;
 	TDoubleParamP m_value;
 
-public:
+  public:
 	FadeFx() : m_value(50)
 	{
 		m_value->setValueRange(0, 100);
@@ -78,7 +78,7 @@ class SpiralFx : public TStandardZeraryFx
 	TDoubleParamP m_phase;
 	TSpectrumParamP m_spectrum;
 
-public:
+  public:
 	SpiralFx()
 		: m_freq(0.1) // args, "Freq")
 		  ,
@@ -90,17 +90,15 @@ public:
 		const TPixel32 transparent(0, 0, 0, 0);
 		/*
 	 TPixel32 colors[] = {
-			TPixel32::Magenta, 
-			TPixel32::Black, 
-			TPixel32::Red, 
-			TPixel32::Yellow, 
-			transparent};    
+			TPixel32::Magenta,
+			TPixel32::Black,
+			TPixel32::Red,
+			TPixel32::Yellow,
+			transparent};
  */
 		TSpectrum::ColorKey colors[] = {
-			TSpectrum::ColorKey(0, TPixel32::Magenta),
-			TSpectrum::ColorKey(0.25, TPixel32::Black),
-			TSpectrum::ColorKey(0.5, TPixel32::Red),
-			TSpectrum::ColorKey(0.75, TPixel32::Yellow),
+			TSpectrum::ColorKey(0, TPixel32::Magenta), TSpectrum::ColorKey(0.25, TPixel32::Black),
+			TSpectrum::ColorKey(0.5, TPixel32::Red), TSpectrum::ColorKey(0.75, TPixel32::Yellow),
 			TSpectrum::ColorKey(1, transparent)};
 
 		m_spectrum = TSpectrumParamP(tArrayCount(colors), colors);
@@ -109,7 +107,7 @@ public:
 		bindParam(this, "freq", m_freq);
 		bindParam(this, "phase", m_phase);
 		m_freq->setValueRange(0, 1);
-		//m_spectrum->setDefaultValue(tArrayCount(colors), colors);
+		// m_spectrum->setDefaultValue(tArrayCount(colors), colors);
 	};
 	~SpiralFx(){};
 
@@ -184,26 +182,24 @@ class MultiLinearGradientFx : public TStandardZeraryFx
 	TDoubleParamP m_wave_phase;
 	TSpectrumParamP m_colors;
 
-public:
+  public:
 	MultiLinearGradientFx()
-		: m_period(100) //args, "Period")
+		: m_period(100) // args, "Period")
 		  ,
-		  m_count(2) //args, "Count")
+		  m_count(2) // args, "Count")
 		  ,
-		  m_cycle(0.0) //args, "Cycle")
+		  m_cycle(0.0) // args, "Cycle")
 		  ,
-		  m_wave_amplitude(0.0) //args, "Cycle")
+		  m_wave_amplitude(0.0) // args, "Cycle")
 		  ,
-		  m_wave_freq(0.0) //args, "Cycle")
+		  m_wave_freq(0.0) // args, "Cycle")
 		  ,
-		  m_wave_phase(0.0) //args, "Cycle")
-							//    , m_colors (0) //args, "Colors")
+		  m_wave_phase(0.0) // args, "Cycle")
+	//    , m_colors (0) //args, "Colors")
 	{
 		TSpectrum::ColorKey colors[] = {
-			TSpectrum::ColorKey(0, TPixel32::White),
-			TSpectrum::ColorKey(0.33, TPixel32::Yellow),
-			TSpectrum::ColorKey(0.66, TPixel32::Red),
-			TSpectrum::ColorKey(1, TPixel32::White)};
+			TSpectrum::ColorKey(0, TPixel32::White), TSpectrum::ColorKey(0.33, TPixel32::Yellow),
+			TSpectrum::ColorKey(0.66, TPixel32::Red), TSpectrum::ColorKey(1, TPixel32::White)};
 		m_colors = TSpectrumParamP(tArrayCount(colors), colors);
 
 		bindParam(this, "period", m_period);
@@ -254,15 +250,15 @@ class LinearGradientFx : public TStandardZeraryFx
 	TPixelParamP m_color1;
 	TPixelParamP m_color2;
 
-public:
+  public:
 	LinearGradientFx()
-		: m_period(100) //args, "Period")
+		: m_period(100) // args, "Period")
 		  ,
-		  m_wave_amplitude(0.0) //args, "Cycle")
+		  m_wave_amplitude(0.0) // args, "Cycle")
 		  ,
-		  m_wave_freq(0.0) //args, "Cycle")
+		  m_wave_freq(0.0) // args, "Cycle")
 		  ,
-		  m_wave_phase(0.0) //args, "Cycle")
+		  m_wave_phase(0.0) // args, "Cycle")
 		  ,
 		  m_color1(TPixel32::Black), m_color2(TPixel32::White)
 	//    , m_colors (0) //args, "Colors")
@@ -307,8 +303,9 @@ public:
 namespace
 {
 template <class T>
-void doComputeT(TRasterPT<T> ras, TPointD posTrasf, const TSpectrumT<T> &spectrum,
-				double period, double count, double w_amplitude, double w_freq, double w_phase, double cycle, const TAffine &aff)
+void doComputeT(TRasterPT<T> ras, TPointD posTrasf, const TSpectrumT<T> &spectrum, double period,
+				double count, double w_amplitude, double w_freq, double w_phase, double cycle,
+				const TAffine &aff)
 {
 	double shift = 0;
 	double maxRadius = period * count / 2.;
@@ -318,8 +315,8 @@ void doComputeT(TRasterPT<T> ras, TPointD posTrasf, const TSpectrumT<T> &spectru
 	for (j = 0; j < ras->getLy(); j++) {
 		TPointD posAux = posTrasf;
 
-		//TPointD pos = tile.m_pos;
-		//pos.y += j;
+		// TPointD pos = tile.m_pos;
+		// pos.y += j;
 		T *pix = ras->pixels(j);
 		T *endPix = pix + ras->getLx();
 		while (pix < endPix) {
@@ -333,7 +330,7 @@ void doComputeT(TRasterPT<T> ras, TPointD posTrasf, const TSpectrumT<T> &spectru
 			} else if (radius < 0)
 				t = 0;
 			double polinomfactor = (-2 * t + 3) * (t * t);
-			//pos.x += 1.0;
+			// pos.x += 1.0;
 			*pix++ = spectrum.getPremultipliedValue(polinomfactor);
 			posAux.x += aff.a11;
 			posAux.y += aff.a21;
@@ -359,28 +356,28 @@ void LinearGradientFx::doCompute(TTile &tile, double frame, const TRenderSetting
 	double w_phase = m_wave_phase->getValue(frame);
 	w_freq = (w_freq * 0.01 * TConsts::pi) / 180;
 
-	TSpectrum::ColorKey colors[] = {
-		TSpectrum::ColorKey(0, m_color1->getValue(frame)),
-		TSpectrum::ColorKey(1, m_color2->getValue(frame))};
+	TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, m_color1->getValue(frame)),
+									TSpectrum::ColorKey(1, m_color2->getValue(frame))};
 	TSpectrumParamP m_colors = TSpectrumParamP(tArrayCount(colors), colors);
 
 	TAffine aff = ri.m_affine.inv();
 	TPointD posTrasf = aff * tile.m_pos;
-	multiLinear(tile.getRaster(), posTrasf, m_colors, period, count, w_amplitude, w_freq, w_phase, cycle, aff, frame);
+	multiLinear(tile.getRaster(), posTrasf, m_colors, period, count, w_amplitude, w_freq, w_phase,
+				cycle, aff, frame);
 	/*
 	if (TRaster32P ras32 = tile.getRaster())
-    doComputeT<TPixel32>(
-      ras32, posTrasf, 
-      m_colors->getValue(frame), 
-      period, count, w_amplitude, w_freq, w_phase, cycle, aff);
+	doComputeT<TPixel32>(
+	  ras32, posTrasf,
+	  m_colors->getValue(frame),
+	  period, count, w_amplitude, w_freq, w_phase, cycle, aff);
   else if (TRaster64P ras64 = tile.getRaster())
-    doComputeT<TPixel64>(
-      ras64, posTrasf, 
-      m_colors->getValue64(frame), 
-      period, count, w_amplitude, w_freq, w_phase, cycle, aff);
+	doComputeT<TPixel64>(
+	  ras64, posTrasf,
+	  m_colors->getValue64(frame),
+	  period, count, w_amplitude, w_freq, w_phase, cycle, aff);
   else
-    throw TException("MultiLinearGradientFx: unsupported Pixel Type");
-    */
+	throw TException("MultiLinearGradientFx: unsupported Pixel Type");
+	*/
 }
 
 //==================================================================
@@ -399,21 +396,22 @@ void MultiLinearGradientFx::doCompute(TTile &tile, double frame, const TRenderSe
 
 	TAffine aff = ri.m_affine.inv();
 	TPointD posTrasf = aff * tile.m_pos;
-	multiLinear(tile.getRaster(), posTrasf, m_colors, period, count, w_amplitude, w_freq, w_phase, cycle, aff, frame);
+	multiLinear(tile.getRaster(), posTrasf, m_colors, period, count, w_amplitude, w_freq, w_phase,
+				cycle, aff, frame);
 	/*
 	if (TRaster32P ras32 = tile.getRaster())
-    doComputeT<TPixel32>(
-      ras32, posTrasf, 
-      m_colors->getValue(frame), 
-      period, count, w_amplitude, w_freq, w_phase, cycle, aff);
+	doComputeT<TPixel32>(
+	  ras32, posTrasf,
+	  m_colors->getValue(frame),
+	  period, count, w_amplitude, w_freq, w_phase, cycle, aff);
   else if (TRaster64P ras64 = tile.getRaster())
-    doComputeT<TPixel64>(
-      ras64, posTrasf, 
-      m_colors->getValue64(frame), 
-      period, count, w_amplitude, w_freq, w_phase, cycle, aff);
+	doComputeT<TPixel64>(
+	  ras64, posTrasf,
+	  m_colors->getValue64(frame),
+	  period, count, w_amplitude, w_freq, w_phase, cycle, aff);
   else
-    throw TException("MultiLinearGradientFx: unsupported Pixel Type");
-    */
+	throw TException("MultiLinearGradientFx: unsupported Pixel Type");
+	*/
 }
 
 //==================================================================
@@ -426,9 +424,9 @@ class RadialGradientFx : public TStandardZeraryFx
 	TPixelParamP m_color1;
 	TPixelParamP m_color2;
 
-public:
+  public:
 	RadialGradientFx()
-		: m_period(100.0), m_innerperiod(0.0) //args, "Period")
+		: m_period(100.0), m_innerperiod(0.0) // args, "Period")
 		  ,
 		  m_color1(TPixel32::White), m_color2(TPixel32::Transparent)
 	//    , m_colors (0) //args, "Colors")
@@ -478,21 +476,19 @@ class MultiRadialGradientFx : public TStandardZeraryFx
 	TDoubleParamP m_cycle;
 	TSpectrumParamP m_colors;
 
-public:
+  public:
 	MultiRadialGradientFx()
-		: m_period(100) //args, "Period")
+		: m_period(100) // args, "Period")
 		  ,
-		  m_count(2) //args, "Count")
+		  m_count(2) // args, "Count")
 		  ,
-		  m_cycle(0.0) //args, "Count")
-					   //    , m_colors (0) //args, "Colors")
+		  m_cycle(0.0) // args, "Count")
+	//    , m_colors (0) //args, "Colors")
 	{
 		m_period->setMeasureName("fxLength");
 		TSpectrum::ColorKey colors[] = {
-			TSpectrum::ColorKey(0, TPixel32::White),
-			TSpectrum::ColorKey(0.33, TPixel32::Yellow),
-			TSpectrum::ColorKey(0.66, TPixel32::Red),
-			TSpectrum::ColorKey(1, TPixel32::White)};
+			TSpectrum::ColorKey(0, TPixel32::White), TSpectrum::ColorKey(0.33, TPixel32::Yellow),
+			TSpectrum::ColorKey(0.66, TPixel32::Red), TSpectrum::ColorKey(1, TPixel32::White)};
 
 		m_colors = TSpectrumParamP(tArrayCount(colors), colors);
 
@@ -556,10 +552,9 @@ void RadialGradientFx::doCompute(TTile &tile, double frame, const TRenderSetting
 		inner = innerperiod / period;
 	else
 		inner = 1 - TConsts::epsilon;
-	TSpectrum::ColorKey colors[] = {
-		TSpectrum::ColorKey(0, m_color1->getValue(frame)),
-		TSpectrum::ColorKey(inner, m_color1->getValue(frame)),
-		TSpectrum::ColorKey(1, m_color2->getValue(frame))};
+	TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, m_color1->getValue(frame)),
+									TSpectrum::ColorKey(inner, m_color1->getValue(frame)),
+									TSpectrum::ColorKey(1, m_color2->getValue(frame))};
 	TSpectrumParamP m_colors = TSpectrumParamP(tArrayCount(colors), colors);
 	TAffine aff = ri.m_affine.inv();
 	TPointD posTrasf = aff * tile.m_pos;
@@ -576,15 +571,15 @@ class LightSpotFx : public TStandardZeraryFx
 	TDoubleParamP m_b;
 	TPixelParamP m_color;
 
-public:
+  public:
 	LightSpotFx()
-		: m_softness(0.2) //args, "Softness")
+		: m_softness(0.2) // args, "Softness")
 		  ,
-		  m_a(200) //args, "A")
+		  m_a(200) // args, "A")
 		  ,
-		  m_b(100) //args, "B")
+		  m_b(100) // args, "B")
 		  ,
-		  m_color(TPixel::Magenta) //args, "Color")
+		  m_color(TPixel::Magenta) // args, "Color")
 	{
 		m_a->setMeasureName("fxLength");
 		m_b->setMeasureName("fxLength");
@@ -595,7 +590,7 @@ public:
 		/*
 	  m_a->setDefaultValue(200);
 	  m_b->setDefaultValue(100);
-    m_color->setDefaultValue(TPixel::Magenta);
+	m_color->setDefaultValue(TPixel::Magenta);
 */
 	}
 	~LightSpotFx(){};
@@ -646,7 +641,7 @@ void doComputeT(TRasterPT<T> raster, TPointD posTrasf, const TAffine &aff, const
 			double yvar = (yyrot)*invbb + 1;
 			double result;
 			double fact, xrot, tempvar, normtmp, outsideslope;
-			//pos.x += 1.0;
+			// pos.x += 1.0;
 			xrot = (posAux.x);
 			tempvar = xrot * xrot * invaa + yvar;
 			fact = tempvar * 0.5;
@@ -695,7 +690,8 @@ void LightSpotFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 	if ((TRaster32P)tile.getRaster())
 		doComputeT<TPixel32>(tile.getRaster(), posTrasf, aff, pixelColor, softness, a, b);
 	else if ((TRaster64P)tile.getRaster())
-		doComputeT<TPixel64>(tile.getRaster(), posTrasf, aff, toPixel64(pixelColor), softness, a, b);
+		doComputeT<TPixel64>(tile.getRaster(), posTrasf, aff, toPixel64(pixelColor), softness, a,
+							 b);
 }
 
 //------------------------------------------------------------------

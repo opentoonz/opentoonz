@@ -18,7 +18,8 @@ TCleanupStyle::TCleanupStyle(const TPixel32 &color)
 //-------------------------------------------------------------------
 
 TCleanupStyle::TCleanupStyle(const TCleanupStyle &src)
-	: TSolidColorStyle(src), m_outColor(src.m_outColor), m_brightness(src.m_brightness), m_contrast(src.m_contrast), m_contrastEnable(true), m_canUpdate(src.m_canUpdate)
+	: TSolidColorStyle(src), m_outColor(src.m_outColor), m_brightness(src.m_brightness),
+	  m_contrast(src.m_contrast), m_contrastEnable(true), m_canUpdate(src.m_canUpdate)
 {
 	setName(src.getName());
 }
@@ -44,7 +45,7 @@ void TCleanupStyle::loadData(TInputStreamInterface &is)
 
 	VersionNumber version(is.versionNumber());
 	if (version.first == 1 && version.second == 18) {
-		//Toonz 6.3 ML had removed the output color option
+		// Toonz 6.3 ML had removed the output color option
 		TPixel32 dummy;
 		is >> dummy >> m_brightness >> m_contrast;
 		m_outColor = getMainColor();
@@ -180,8 +181,8 @@ bool TCleanupStyle::isContrastEnabled() const
 
 void TCleanupStyle::makeIcon(const TDimension &size)
 {
-	//Build an icon with mainColor on the top half, and
-	//getColorParamValue(1) on the bottom.
+	// Build an icon with mainColor on the top half, and
+	// getColorParamValue(1) on the bottom.
 	if (!m_icon || m_icon->getSize() != size) {
 		TRaster32P ras(size);
 		m_icon = ras;

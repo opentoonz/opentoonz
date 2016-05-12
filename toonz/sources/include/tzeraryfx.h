@@ -28,16 +28,16 @@ class TZeraryColumnFx;
 */
 class TZeraryFx : public TRasterFx
 {
-public:
+  public:
 	friend class TZeraryColumnFx; // Defined in ToonzLib
 
-public:
+  public:
 	TZeraryFx() : m_columnFx() {}
 
 	//! Returns the associated column fx, if any.
 	TZeraryColumnFx *getColumnFx() const { return m_columnFx; }
 
-private:
+  private:
 	TZeraryColumnFx *m_columnFx; //!< The associated column fx. Note that
 								 //!< it is never cloned, as expected.
 };

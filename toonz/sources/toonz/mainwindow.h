@@ -31,10 +31,12 @@ class Room : public TMainWindow
 	TFilePath m_path;
 	QString m_name;
 
-	/*-- Room毎にComboViewerの初期状態をLoadするため、MainWindowからComboViewerにアクセスできるようにする。 --*/
+	/*--
+	 * Room毎にComboViewerの初期状態をLoadするため、MainWindowからComboViewerにアクセスできるようにする。
+	 * --*/
 	ComboViewerPanel *m_centralViewer;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	Room(QWidget *parent = 0, Qt::WindowFlags flags = 0)
 #else
@@ -82,9 +84,10 @@ class MainWindow : public QMainWindow
 	/*-- show layout name in the title bar --*/
 	QString m_layoutName;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
-	MainWindow(const QString &argumentLayoutFileName, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+	MainWindow(const QString &argumentLayoutFileName, QWidget *parent = 0,
+			   Qt::WindowFlags flags = 0);
 #else
 	MainWindow(const QString &argumentLayoutFileName, QWidget *parent = 0, Qt::WFlags flags = 0);
 #endif
@@ -117,13 +120,13 @@ public:
 	void togglePickStyleLines();
 
 	QString getLayoutName() { return m_layoutName; }
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void closeEvent(QCloseEvent *);
 	void readSettings(const QString &layoutFileName);
 	void writeSettings();
 
-private:
+  private:
 	/*!Must be call before readSettings().*/
 	void defineActions();
 
@@ -134,28 +137,43 @@ private:
 	Room *createBatchesRoom();
 	Room *createBrowserRoom();
 
-	QAction *createAction(const char *id, const QString &name, const QString &defaultShortcut, CommandType type = MenuFileCommandType);
-	QAction *createRightClickMenuAction(const char *id, const QString &name, const QString &defaultShortcut);
-	QAction *createMenuFileAction(const char *id, const QString &name, const QString &defaultShortcut);
-	QAction *createMenuEditAction(const char *id, const QString &name, const QString &defaultShortcut);
-	QAction *createMenuScanCleanupAction(const char *id, const QString &name, const QString &defaultShortcut);
-	QAction *createMenuLevelAction(const char *id, const QString &name, const QString &defaultShortcut);
-	QAction *createMenuXsheetAction(const char *id, const QString &name, const QString &defaultShortcut);
-	QAction *createMenuCellsAction(const char *id, const QString &name, const QString &defaultShortcut);
-	QAction *createMenuViewAction(const char *id, const QString &name, const QString &defaultShortcut);
-	QAction *createMenuWindowsAction(const char *id, const QString &name, const QString &defaultShortcut);
+	QAction *createAction(const char *id, const QString &name, const QString &defaultShortcut,
+						  CommandType type = MenuFileCommandType);
+	QAction *createRightClickMenuAction(const char *id, const QString &name,
+										const QString &defaultShortcut);
+	QAction *createMenuFileAction(const char *id, const QString &name,
+								  const QString &defaultShortcut);
+	QAction *createMenuEditAction(const char *id, const QString &name,
+								  const QString &defaultShortcut);
+	QAction *createMenuScanCleanupAction(const char *id, const QString &name,
+										 const QString &defaultShortcut);
+	QAction *createMenuLevelAction(const char *id, const QString &name,
+								   const QString &defaultShortcut);
+	QAction *createMenuXsheetAction(const char *id, const QString &name,
+									const QString &defaultShortcut);
+	QAction *createMenuCellsAction(const char *id, const QString &name,
+								   const QString &defaultShortcut);
+	QAction *createMenuViewAction(const char *id, const QString &name,
+								  const QString &defaultShortcut);
+	QAction *createMenuWindowsAction(const char *id, const QString &name,
+									 const QString &defaultShortcut);
 
-	QAction *createPlaybackAction(const char *id, const QString &name, const QString &defaultShortcut);
+	QAction *createPlaybackAction(const char *id, const QString &name,
+								  const QString &defaultShortcut);
 	QAction *createRGBAAction(const char *id, const QString &name, const QString &defaultShortcut);
 	QAction *createFillAction(const char *id, const QString &name, const QString &defaultShortcut);
 	QAction *createMenuAction(const char *id, const QString &name, QList<QString> list);
-	QAction *createToggle(const char *id, const QString &name, const QString &defaultShortcut, bool startStatus, CommandType type);
-	QAction *createToolAction(const char *id, const char *iconName, const QString &name, const QString &defaultShortcut);
-	QAction *createViewerAction(const char *id, const QString &name, const QString &defaultShortcut);
+	QAction *createToggle(const char *id, const QString &name, const QString &defaultShortcut,
+						  bool startStatus, CommandType type);
+	QAction *createToolAction(const char *id, const char *iconName, const QString &name,
+							  const QString &defaultShortcut);
+	QAction *createViewerAction(const char *id, const QString &name,
+								const QString &defaultShortcut);
 	QAction *createMiscAction(const char *id, const QString &name, const char *defaultShortcut);
-	QAction *createToolOptionsAction(const char *id, const QString &name, const QString &defaultShortcut);
+	QAction *createToolOptionsAction(const char *id, const QString &name,
+									 const QString &defaultShortcut);
 
-protected slots:
+  protected slots:
 	void onCurrentRoomChanged(int newRoomIndex);
 	void onIndexSwapped(int firstIndex, int secondIndex);
 	void insertNewRoom();
@@ -163,20 +181,20 @@ protected slots:
 	void renameRoom(int index, const QString name);
 	void onMenuCheckboxChanged();
 
-	//make InkCheck and Ink#1Check exclusive.
+	// make InkCheck and Ink#1Check exclusive.
 	void onInkCheckTriggered(bool on);
 	void onInk1CheckTriggered(bool on);
 
 	void onUpdateCheckerDone(bool);
 
-public slots:
+  public slots:
 	/*--- タイトルにシーン名を入れる ---*/
 	void changeWindowTitle();
 	/*--- FlipモジュールでタイトルバーにロードしたLevel名を表示 ---*/
 	/*--- Cleanupモジュールでタイトルバーに進捗を表示 ---*/
 	void changeWindowTitle(QString &);
 
-signals:
+  signals:
 	void exit(bool &);
 };
 
@@ -188,11 +206,8 @@ class RecentFiles
 
 	RecentFiles();
 
-public:
-	enum FileType { Scene,
-					Level,
-					Flip,
-					None };
+  public:
+	enum FileType { Scene, Level, Flip, None };
 
 	static RecentFiles *instance();
 	~RecentFiles();
@@ -204,7 +219,7 @@ public:
 	void loadRecentFiles();
 	void saveRecentFiles();
 
-protected:
+  protected:
 	void refreshRecentFilesMenu(FileType fileType);
 	QList<QString> getFilesNameList(FileType fileType);
 };

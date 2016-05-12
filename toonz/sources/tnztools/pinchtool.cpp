@@ -69,7 +69,8 @@ struct GLMatrixGuard {
 //-----------------------------------------------------------------------------
 
 PinchTool::PinchTool()
-	: TTool("T_Pinch"), m_active(false), m_cursorEnabled(false), m_draw(false), m_undo(0), m_showSelector(true), m_toolRange("Size:", 1.0, 1000.0, 500.0) // W_ToolOptions_PinchTool
+	: TTool("T_Pinch"), m_active(false), m_cursorEnabled(false), m_draw(false), m_undo(0),
+	  m_showSelector(true), m_toolRange("Size:", 1.0, 1000.0, 500.0) // W_ToolOptions_PinchTool
 	  ,
 	  m_toolCornerSize("Corner:", 1.0, 180.0, 160.0) // W_ToolOptions_PinchCorner
 	  ,
@@ -189,52 +190,40 @@ int PinchTool::updateCursor() const
 
 //---------------------------------------------------------------------------
 
-void PinchTool::leftButtonDown(const TPointD &pos,
-							   const TMouseEvent &event)
+void PinchTool::leftButtonDown(const TPointD &pos, const TMouseEvent &event)
 {
 	m_curr = m_down = pos;
 
-	if (!m_active &&
-		!m_selector.isSelected()) {
+	if (!m_active && !m_selector.isSelected()) {
 		m_active = false;
 
 		assert(m_undo == 0);
 
-		StrokeDeformation *
-			deformation = m_deformation;
+		StrokeDeformation *deformation = m_deformation;
 
-		TVectorImageP
-			vi = TImageP(getImage(true));
+		TVectorImageP vi = TImageP(getImage(true));
 
 		if (!vi)
 			return;
 
 		m_active = true;
 
-		ContextStatus
-			*status = &m_status;
+		ContextStatus *status = &m_status;
 
 		// reset status
 		status->init();
 
-		double
-			w,
-			dist2;
+		double w, dist2;
 
 		// find nearest stroke
-		if (vi->getNearestStroke(m_down,
-								 w,
-								 m_n,
-								 dist2, true)) {
+		if (vi->getNearestStroke(m_down, w, m_n, dist2, true)) {
 
-			TStroke
-				*stroke = vi->getStroke(m_n);
+			TStroke *stroke = vi->getStroke(m_n);
 			assert(stroke && "Not valid stroke found!!!");
 			if (!stroke)
 				return;
 
-			updateStrokeStatus(stroke,
-							   w);
+			updateStrokeStatus(stroke, w);
 
 			// set parameters from sliders
 			updateInterfaceStatus(event);
@@ -243,7 +232,8 @@ void PinchTool::leftButtonDown(const TPointD &pos,
 
 			// stroke can be changed (replaced by another) during deformation activate
 			if (TTool::getApplication()->getCurrentObject()->isSpline())
-				m_undo = new ToolUtils::UndoPath(getXsheet()->getStageObject(getObjectId())->getSpline());
+				m_undo = new ToolUtils::UndoPath(
+					getXsheet()->getStageObject(getObjectId())->getSpline());
 			else {
 				TXshSimpleLevel *sl = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
 				assert(sl);
@@ -261,17 +251,14 @@ void PinchTool::leftButtonDown(const TPointD &pos,
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::leftButtonDrag(const TPointD &pos,
-							   const TMouseEvent &e)
+void PinchTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 {
 	m_curr = pos;
 
 	if (m_selector.isSelected()) {
 		m_selector.mouseDrag(m_curr);
-		TDoubleProperty::Range
-			prop_range = m_toolRange.getRange();
-		double
-			val_in_range = m_selector.getLength();
+		TDoubleProperty::Range prop_range = m_toolRange.getRange();
+		double val_in_range = m_selector.getLength();
 
 		// set value in range
 		val_in_range = std::max(std::min(val_in_range, prop_range.second), prop_range.first);
@@ -285,64 +272,51 @@ void PinchTool::leftButtonDrag(const TPointD &pos,
 
 		m_selector.setLength(m_toolRange.getValue());
 	} else {
-		TVectorImageP
-			vi(getImage(true));
+		TVectorImageP vi(getImage(true));
 
-		ContextStatus
-			*status = &m_status;
-		if (!vi ||
-			!status->stroke2change_ ||
-			!m_active)
+		ContextStatus *status = &m_status;
+		if (!vi || !status->stroke2change_ || !m_active)
 			return;
 
 		QMutexLocker lock(vi->getMutex());
 
-		//assert( status->stroke2change_->getLength() >= 0.0 );
+		// assert( status->stroke2change_->getLength() >= 0.0 );
 
-		StrokeDeformation *
-			deformation = m_deformation;
+		StrokeDeformation *deformation = m_deformation;
 
-		TPointD
-			delta = m_curr - m_prev;
+		TPointD delta = m_curr - m_prev;
 
 		deformation->update(delta);
 	}
 
 	m_prev = m_curr;
 
-	//moveCursor(pos);
+	// moveCursor(pos);
 	invalidate();
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::leftButtonUp(const TPointD &pos,
-							 const TMouseEvent &e)
+void PinchTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 {
 
-	if (!m_active ||
-		m_selector.isSelected())
+	if (!m_active || m_selector.isSelected())
 		return;
 
 	m_active = false;
 
-	TVectorImageP
-		vi(getImage(true));
+	TVectorImageP vi(getImage(true));
 
-	ContextStatus
-		*status = &m_status;
+	ContextStatus *status = &m_status;
 
-	if (!vi ||
-		!status->stroke2change_) {
+	if (!vi || !status->stroke2change_) {
 		delete m_undo;
 		m_undo = 0;
 		return;
 	}
 
 	// if mouse position is unchanged doesn't modify current stroke
-	if (areAlmostEqual(m_down,
-					   pos,
-					   PickRadius * status->pixelSize_)) {
+	if (areAlmostEqual(m_down, pos, PickRadius * status->pixelSize_)) {
 		assert(m_undo);
 		delete m_undo;
 		m_undo = 0;
@@ -362,10 +336,7 @@ void PinchTool::leftButtonUp(const TPointD &pos,
 
 	TStroke *deactivateStroke = m_deformation->deactivate();
 	deactivateStroke->outlineOptions() = status->stroke2change_->outlineOptions();
-	replaceStroke(status->stroke2change_,
-				  deactivateStroke,
-				  m_n,
-				  vi);
+	replaceStroke(status->stroke2change_, deactivateStroke, m_n, vi);
 
 	status->stroke2change_ = 0;
 
@@ -394,8 +365,8 @@ void PinchTool::onEnter()
 {
 	m_draw = true;
 	// per sicurezza
-	//m_status.stroke2change_ = 0;
-	//m_selector.setStroke(0);
+	// m_status.stroke2change_ = 0;
+	// m_selector.setStroke(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -445,32 +416,27 @@ void PinchTool::draw()
 	GLMatrixGuard guard;
 
 	TVectorImageP img(getImage(true));
-	if (!img || img->getStrokeCount() == 0) //Controllo che il numero degli stroke nell'immagine sia != 0
+	if (!img ||
+		img->getStrokeCount() == 0) // Controllo che il numero degli stroke nell'immagine sia != 0
 		return;
 	if (!m_draw)
 		return;
 
-	ContextStatus *
-		status = &m_status;
+	ContextStatus *status = &m_status;
 	if (!status)
 		return;
 
-	StrokeDeformation *
-		deformation = m_deformation;
+	StrokeDeformation *deformation = m_deformation;
 
-	OverallDesigner
-	designer((int)m_curr.x,
-			 (int)m_curr.y);
+	OverallDesigner designer((int)m_curr.x, (int)m_curr.y);
 
 	// m_active == true means that a button down is done (drag)
 	if (!m_active) {
 		if (m_cursorEnabled) {
 			glColor3d(1, 0, 1);
 			if (m_cursor.thick > 0)
-				tglDrawCircle(m_cursor,
-							  m_cursor.thick);
-			tglDrawCircle(m_cursor,
-						  m_cursor.thick + 4 * status->pixelSize_);
+				tglDrawCircle(m_cursor, m_cursor.thick);
+			tglDrawCircle(m_cursor, m_cursor.thick + 4 * status->pixelSize_);
 		}
 	}
 
@@ -493,8 +459,7 @@ void PinchTool::invalidateCursorArea()
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::mouseMove(const TPointD &pos,
-						  const TMouseEvent &event)
+void PinchTool::mouseMove(const TPointD &pos, const TMouseEvent &event)
 {
 	if (m_active)
 		return;
@@ -545,9 +510,7 @@ void PinchTool::mouseMove(const TPointD &pos,
 
 //-----------------------------------------------------------------------------
 
-bool PinchTool::keyDown(int key,
-						TUINT32 flags,
-						const TPoint &pos)
+bool PinchTool::keyDown(int key, TUINT32 flags, const TPoint &pos)
 {
 	if (!m_active)
 		m_deformation->reset();

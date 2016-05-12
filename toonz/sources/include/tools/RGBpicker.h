@@ -9,8 +9,8 @@
 
 NOTE: This stuff should be moved to ToonzQt's StyleEditor class.
 
-      It was previously in the RGBPickerTool's local namespace - but its scope
-      should be wider...
+	  It was previously in the RGBPickerTool's local namespace - but its scope
+	  should be wider...
 */
 
 namespace RGBPicker
@@ -23,6 +23,6 @@ namespace RGBPicker
 void setCurrentColor(const TPixel32 &color);
 void setCurrentColorWithUndo(const TPixel32 &color);
 
-} //namespace RGBPicker
+} // namespace RGBPicker
 
-#endif //RGB_PICKER_H
+#endif // RGB_PICKER_H

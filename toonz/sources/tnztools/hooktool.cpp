@@ -53,7 +53,7 @@ namespace
 
 class OtherHook
 {
-public:
+  public:
 	int m_columnIndex;
 	int m_hookIndex;
 	TPointD m_hookPos;
@@ -94,7 +94,7 @@ class HookTool : public TTool
 
 	void getOtherHooks(std::vector<OtherHook> &otherHooks);
 
-public:
+  public:
 	HookTool();
 
 	ToolType getToolType() const { return TTool::LevelReadTool; }
@@ -133,14 +133,8 @@ public:
 
 	bool snap(TPointD &pos, double &range2);
 
-	bool isSnappedActive() const
-	{
-		return m_snappedActive.getValue();
-	}
-	bool isEditingScene() const
-	{
-		return getApplication()->getCurrentFrame()->isEditingScene();
-	}
+	bool isSnappedActive() const { return m_snappedActive.getValue(); }
+	bool isEditingScene() const { return getApplication()->getCurrentFrame()->isEditingScene(); }
 
 	// pivot is the hook the level is attached to.
 	// returns -1 if no pivot is defined.
@@ -170,9 +164,11 @@ public:
 //-----------------------------------------------------------------------------
 
 HookTool::HookTool()
-	: TTool("T_Hook"), m_hookId(-1), m_hookSide(0), m_deselectArmed(false), m_undo(0), m_snappedActive("Snap", true) //W_ToolOptions_Snapped
+	: TTool("T_Hook"), m_hookId(-1), m_hookSide(0), m_deselectArmed(false), m_undo(0),
+	  m_snappedActive("Snap", true) // W_ToolOptions_Snapped
 	  ,
-	  m_snappedPos(), m_snappedReason(""), m_shapeBBox(), m_snapped(false), m_hookSetChanged(false), m_buttonDown(false), m_pivotOffset()
+	  m_snappedPos(), m_snappedReason(""), m_shapeBBox(), m_snapped(false), m_hookSetChanged(false),
+	  m_buttonDown(false), m_pivotOffset()
 {
 	bind(TTool::CommonLevels);
 	m_prop.bind(m_snappedActive);
@@ -312,7 +308,8 @@ void HookTool::draw()
 	if (osm.isEnabled())
 		for (i = 0; i < (int)os.size(); i++) {
 			if (isEditingScene()) {
-				const TXshCell &cell = getXsheet()->getCell(os[i], app->getCurrentColumn()->getColumnIndex());
+				const TXshCell &cell =
+					getXsheet()->getCell(os[i], app->getCurrentColumn()->getColumnIndex());
 				drawHooks(hookSet, cell.getFrameId(), true);
 			} else {
 				const TFrameId &fid2 = level->index2fid(os[i]);
@@ -322,7 +319,7 @@ void HookTool::draw()
 
 	drawHooks(hookSet, fid, false);
 
-	//TXshCell cell = xsh->getCell(row, i);
+	// TXshCell cell = xsh->getCell(row, i);
 	// draw other level hooks
 	if (isSnappedActive() && isEditingScene()) {
 		for (i = 0; i < (int)m_otherHooks.size(); i++) {
@@ -371,7 +368,8 @@ void HookTool::draw()
 			glEnd();
 			glDisable(GL_LINE_STIPPLE);
 		}
-		drawBalloon(pos, m_snappedReason, TPixel32(200, 250, 180, 200), TPoint(20, 20), false, &balloons);
+		drawBalloon(pos, m_snappedReason, TPixel32(200, 250, 180, 200), TPoint(20, 20), false,
+					&balloons);
 	}
 }
 
@@ -739,8 +737,8 @@ bool HookTool::snap(TPointD &pos, double &range2)
 		m_shapeBBox = TRectD();
 		snappedPos = m_otherHooks[k].m_hookPos;
 		m_snappedPos = snappedPos;
-		m_snappedReason =
-			"Col" + toString(m_otherHooks[k].m_columnIndex + 1) + "/" + toString(m_otherHooks[k].m_hookIndex + 1);
+		m_snappedReason = "Col" + toString(m_otherHooks[k].m_columnIndex + 1) + "/" +
+						  toString(m_otherHooks[k].m_hookIndex + 1);
 		ret = true;
 	}
 	pos = snappedPos;

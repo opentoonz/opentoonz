@@ -25,13 +25,14 @@ class TParamSetImp;
 
 class TParamSetChange : public TParamChange
 {
-public:
+  public:
 	std::vector<TParamChange *> m_paramChanges;
 
-public:
+  public:
 	TParamSetChange(TParam *param, double firstAffectedFrame, double lastAffectedFrame,
-		const std::vector<TParamChange *> &paramChanges)
-		: TParamChange(param, firstAffectedFrame, lastAffectedFrame, true, false, false), m_paramChanges(paramChanges)
+					const std::vector<TParamChange *> &paramChanges)
+		: TParamChange(param, firstAffectedFrame, lastAffectedFrame, true, false, false),
+		  m_paramChanges(paramChanges)
 	{
 	}
 
@@ -50,7 +51,7 @@ public:
 class DVAPI TParamSet : public TParam
 {
 	PERSIST_DECLARATION(TParamSet)
-public:
+  public:
 	TParamSet(std::string name = "");
 	TParamSet(const TParamSet &src);
 	~TParamSet();
@@ -81,10 +82,8 @@ public:
 	bool isKeyframe(double frame) const;
 	void deleteKeyframe(double frame);
 	void clearKeyframes();
-	void assignKeyframe(
-		double frame,
-		const TSmartPointerT<TParam> &src, double srcFrame,
-		bool changedOnly = false);
+	void assignKeyframe(double frame, const TSmartPointerT<TParam> &src, double srcFrame,
+						bool changedOnly = false);
 
 	void getKeyframes(std::set<double> &frames) const;
 	int getKeyframeCount() const;
@@ -103,7 +102,7 @@ public:
 
 	std::string getValueAlias(double frame, int precision);
 
-private:
+  private:
 	TParamSetImp *m_imp = nullptr;
 };
 
@@ -122,7 +121,7 @@ typedef TDerivedSmartPointerT<TParamSet, TParam> TParamSetP;
 
 class TPointParamObserver
 {
-public:
+  public:
 	TPointParamObserver() {}
 	virtual ~TPointParamObserver() {}
 
@@ -147,7 +146,7 @@ class DVAPI TPointParam : public TParamSet
 	TPointParamImp *m_data;
 	bool m_from_plugin;
 
-public:
+  public:
 	TPointParam(const TPointD &p = TPointD(), bool from_plugin = false);
 	TPointParam(const TPointParam &src);
 	~TPointParam();
@@ -180,7 +179,7 @@ template class DVAPI TPersistDeclarationT<TPixelParam>;
 
 class TPixelParamObserver
 {
-public:
+  public:
 	TPixelParamObserver() {}
 	virtual ~TPixelParamObserver() {}
 	virtual void onChange(const TParamChange &) = 0;
@@ -195,7 +194,7 @@ class DVAPI TPixelParam : public TParamSet
 	PERSIST_DECLARATION(TPixelParam)
 	TPixelParamImp *m_data;
 
-public:
+  public:
 	TPixelParam(const TPixel32 &pix = TPixel32::Black);
 	TPixelParam(const TPixelParam &);
 	~TPixelParam();
@@ -232,7 +231,7 @@ DEFINE_PARAM_SMARTPOINTER(TPixelParam, TPixel32)
 
 class TRangeParamObserver
 {
-public:
+  public:
 	TRangeParamObserver() {}
 	virtual ~TRangeParamObserver() {}
 	virtual void onChange(const TParamChange &) = 0;
@@ -255,7 +254,7 @@ class DVAPI TRangeParam : public TParamSet
 	PERSIST_DECLARATION(TRangeParam)
 	TRangeParamImp *m_data;
 
-public:
+  public:
 	TRangeParam(const DoublePair &range = DoublePair(0, 0));
 	TRangeParam(const TRangeParam &src);
 	~TRangeParam();

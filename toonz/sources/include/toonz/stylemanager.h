@@ -35,7 +35,7 @@ class DVAPI CustomStyleManager : public QObject
 {
 	Q_OBJECT
 
-public:
+  public:
 	struct DVAPI PatternData {
 		QImage *m_image;
 		std::string m_patternName;
@@ -47,7 +47,7 @@ public:
 	class StyleLoaderTask;
 	friend class CustomStyleManager::StyleLoaderTask;
 
-private:
+  private:
 	QList<PatternData> m_patterns;
 	TFilePath m_rootPath;
 	TFilePath m_stylesFolder;
@@ -57,9 +57,9 @@ private:
 	TThread::Executor m_executor;
 	bool m_started;
 
-public:
-	CustomStyleManager(const TFilePath &stylesFolder,
-					   QString filters = QString(), QSize chipSize = QSize(30, 30));
+  public:
+	CustomStyleManager(const TFilePath &stylesFolder, QString filters = QString(),
+					   QSize chipSize = QSize(30, 30));
 
 	const TFilePath &stylesFolder() const { return m_stylesFolder; }
 	QSize getChipSize() const { return m_chipSize; }
@@ -72,12 +72,12 @@ public:
 
 	void loadItems();
 
-private:
+  private:
 	void addPattern(const TFilePath &path);
 
-signals:
+  signals:
 
 	void patternAdded();
 };
 
-#endif //STYLEMANAGER_H
+#endif // STYLEMANAGER_H

@@ -16,7 +16,7 @@ namespace TSyntax
 
 class RunningPattern
 {
-public:
+  public:
 	std::vector<Token> m_tokens;
 	const Pattern *m_pattern;
 
@@ -37,7 +37,10 @@ public:
 		assert(!isFinished(token));
 		m_tokens.push_back(token);
 	}
-	TokenType getTokenType(const Token &token) const { return m_pattern->getTokenType(m_tokens, token); }
+	TokenType getTokenType(const Token &token) const
+	{
+		return m_pattern->getTokenType(m_tokens, token);
+	}
 
 	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack)
 	{
@@ -51,7 +54,7 @@ public:
 
 class Parser::Imp
 {
-public:
+  public:
 	const Grammar *m_grammar;
 	Tokenizer m_tokenizer;
 	std::string m_errorString;
@@ -64,7 +67,8 @@ public:
 	// Pattern *m_lastPattern;
 
 	Imp(const Grammar *grammar)
-		: m_grammar(grammar), m_errorString(""), m_isValid(false), m_calculator(0), m_position(Grammar::ExpressionStart)
+		: m_grammar(grammar), m_errorString(""), m_isValid(false), m_calculator(0),
+		  m_position(Grammar::ExpressionStart)
 	{
 	}
 	~Imp()
@@ -83,8 +87,7 @@ public:
 // Parser
 //-------------------------------------------------------------------
 
-Parser::Parser(const Grammar *grammar)
-	: m_imp(new Imp(grammar))
+Parser::Parser(const Grammar *grammar) : m_imp(new Imp(grammar))
 {
 }
 
@@ -98,7 +101,8 @@ Parser::~Parser()
 
 void Parser::Imp::flushPatterns(int minPriority, int minIndex, bool checkOnly)
 {
-	while ((int)m_patternStack.size() > minIndex && m_patternStack.back().getPriority() >= minPriority) {
+	while ((int)m_patternStack.size() > minIndex &&
+		   m_patternStack.back().getPriority() >= minPriority) {
 		if (!checkOnly)
 			m_patternStack.back().createNode(m_calculator, m_nodeStack);
 		m_patternStack.pop_back();

@@ -21,7 +21,7 @@
 
 #include "toonzqt/stageobjectsdata.h"
 
-//TODO: Method StageObjectsData::storeFxs() has no well-defined behaviour in cases
+// TODO: Method StageObjectsData::storeFxs() has no well-defined behaviour in cases
 //      of 'jumpy' fx selections.
 
 //********************************************************************************
@@ -98,8 +98,7 @@ bool isColumnSelectionTerminalFx(TFx *fx, TFxSet *terminalFxs, const std::set<TF
 		if (TZeraryFx *zfx = dynamic_cast<TZeraryFx *>(parentFx))
 			parentFx = zfx->getColumnFx();
 
-		if (parentFx &&
-			hasTerminalUpstream(parentFx, terminalFxs) &&
+		if (parentFx && hasTerminalUpstream(parentFx, terminalFxs) &&
 			!canGenerate(columnFxs, parentFx))
 			return true;
 	}
@@ -116,13 +115,13 @@ bool isColumnSelectionTerminalFx(TFx *fx, TFxSet *terminalFxs, const std::set<TF
 //! Base class used to clone a stage object's relational data inside the stage schematic.
 class TStageObjectDataElement
 {
-protected:
+  protected:
 	friend class StageObjectsData;
 
 	TStageObjectParams *m_params; //!< Stage object parameters (owned)
 	TPointD m_dagPos;			  //!< Stage object position in the viewer
 
-public:
+  public:
 	TStageObjectDataElement();
 	virtual ~TStageObjectDataElement();
 
@@ -139,8 +138,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-TStageObjectDataElement::TStageObjectDataElement()
-	: m_params(0), m_dagPos(TConst::nowhere)
+TStageObjectDataElement::TStageObjectDataElement() : m_params(0), m_dagPos(TConst::nowhere)
 {
 }
 
@@ -209,13 +207,10 @@ class TColumnDataElement : public TStageObjectDataElement
 
 	TXshColumnP m_column; //!< Column associated with the stage object
 
-public:
-	enum FxFlags {
-		eDoClone = 0x1,
-		eResetFxDagPositions = 0x2
-	};
+  public:
+	enum FxFlags { eDoClone = 0x1, eResetFxDagPositions = 0x2 };
 
-public:
+  public:
 	TColumnDataElement();
 	~TColumnDataElement();
 
@@ -223,23 +218,25 @@ public:
 	//! \warning Clones the stored TXshColumnP, too.
 	TColumnDataElement *clone() const;
 
-	//! Stores the stage object and column data of the specified column index in the supplied xsheet.
+	//! Stores the stage object and column data of the specified column index in the supplied
+	//! xsheet.
 	//! Specifically, the TXshColumnP associated with the desired column index is stored.
-	//! Supported additional flags include performing a clone of the associated TXshColumnP rather than
+	//! Supported additional flags include performing a clone of the associated TXshColumnP rather
+	//! than
 	//! storing the original.
 	void storeColumn(TXsheet *xsheet, int index, int fxFlags);
 
 	//! Inserts the stored column in the supplied xsheet with the specified column index, returning
 	//! the new associated stage object id.
-	//! Supported additional flags include performing a clone of the associated TXshColumnP rather than
+	//! Supported additional flags include performing a clone of the associated TXshColumnP rather
+	//! than
 	//! restoring the stored column directly.
 	TStageObjectId restoreColumn(TXsheet *xsh, int index, int fxFlags, bool copyPosition) const;
 };
 
 //------------------------------------------------------------------------------
 
-TColumnDataElement::TColumnDataElement()
-	: TStageObjectDataElement(), m_column(0)
+TColumnDataElement::TColumnDataElement() : TStageObjectDataElement(), m_column(0)
 {
 }
 
@@ -299,7 +296,8 @@ void TColumnDataElement::storeColumn(TXsheet *xsh, int index, int fxFlags)
 
 //------------------------------------------------------------------------------
 
-TStageObjectId TColumnDataElement::restoreColumn(TXsheet *xsh, int index, int fxFlags, bool copyPosition) const
+TStageObjectId TColumnDataElement::restoreColumn(TXsheet *xsh, int index, int fxFlags,
+												 bool copyPosition) const
 {
 	bool doClone = (fxFlags & eDoClone);
 	bool resetFxDagPositions = (fxFlags & eResetFxDagPositions);
@@ -363,7 +361,7 @@ class TCameraDataElement : public TStageObjectDataElement
 {
 	TCamera m_camera; //!< The object's camera
 
-public:
+  public:
 	TCameraDataElement();
 	~TCameraDataElement();
 
@@ -378,8 +376,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-TCameraDataElement::TCameraDataElement()
-	: TStageObjectDataElement()
+TCameraDataElement::TCameraDataElement() : TStageObjectDataElement()
 {
 }
 
@@ -442,14 +439,11 @@ TStageObjectId TCameraDataElement::restoreCamera(TXsheet *xsh, bool copyPosition
 
 class TSplineDataElement
 {
-	enum Flags {
-		eDoClone = 0x1,
-		eResetFxDagPositions = 0x2
-	};
+	enum Flags { eDoClone = 0x1, eResetFxDagPositions = 0x2 };
 
 	TStageObjectSpline *m_spline;
 
-public:
+  public:
 	TSplineDataElement();
 	~TSplineDataElement();
 
@@ -462,8 +456,7 @@ public:
 //    TSplineDataElement implementation
 //********************************************************************************
 
-TSplineDataElement::TSplineDataElement()
-	: m_spline(0)
+TSplineDataElement::TSplineDataElement() : m_spline(0)
 {
 }
 
@@ -515,8 +508,7 @@ TStageObjectSpline *TSplineDataElement::restoreSpline(int flag) const
 //    StageObjectsData  implementation
 //********************************************************************************
 
-StageObjectsData::StageObjectsData()
-	: DvMimeData()
+StageObjectsData::StageObjectsData() : DvMimeData()
 {
 }
 
@@ -627,7 +619,8 @@ StageObjectsData *StageObjectsData::clone() const
 
 //------------------------------------------------------------------------------
 
-void StageObjectsData::storeObjects(const std::vector<TStageObjectId> &ids, TXsheet *xsh, int fxFlags)
+void StageObjectsData::storeObjects(const std::vector<TStageObjectId> &ids, TXsheet *xsh,
+									int fxFlags)
 {
 	assert(m_fxTable.empty()); // Should be enforced OUTSIDE. Track implicit uses.
 	m_fxTable.clear();		   // TO BE REMOVED
@@ -687,8 +680,8 @@ void StageObjectsData::storeObjects(const std::vector<TStageObjectId> &ids, TXsh
 	// Insert terminal fxs
 	set<TFx *>::iterator jt;
 	for (jt = m_originalColumnFxs.begin(); jt != m_originalColumnFxs.end(); ++jt) {
-		if (isColumnSelectionTerminalFx(
-				*jt, xsh->getFxDag()->getTerminalFxs(), m_originalColumnFxs)) {
+		if (isColumnSelectionTerminalFx(*jt, xsh->getFxDag()->getTerminalFxs(),
+										m_originalColumnFxs)) {
 			TFx *fx = m_fxTable[*jt];
 
 			fx->addRef();
@@ -832,8 +825,8 @@ void StageObjectsData::storeColumnFxs(const std::set<int> &columnIndexes, TXshee
 		fx->addRef();
 		m_fxs.insert(fx);
 
-		if (isColumnSelectionTerminalFx(
-				fxOrig, xsh->getFxDag()->getTerminalFxs(), m_originalColumnFxs)) {
+		if (isColumnSelectionTerminalFx(fxOrig, xsh->getFxDag()->getTerminalFxs(),
+										m_originalColumnFxs)) {
 			fx->addRef();
 			m_terminalFxs.insert(fx);
 		}
@@ -864,7 +857,8 @@ void StageObjectsData::storeColumnFxs(const std::set<int> &columnIndexes, TXshee
 				linkedFx->addRef();
 				m_fxs.insert(linkedFx);
 
-				if (xsh->getFxDag()->getTerminalFxs()->containsFx(fx->getLinkedFx())) // Here too - isATerminal ?
+				if (xsh->getFxDag()->getTerminalFxs()->containsFx(
+						fx->getLinkedFx())) // Here too - isATerminal ?
 				{
 					linkedFx->addRef();
 					m_terminalFxs.insert(linkedFx);
@@ -904,14 +898,16 @@ void StageObjectsData::storeSplines(const std::list<int> &splineIds, TXsheet *xs
 
 //------------------------------------------------------------------------------
 
-std::vector<TStageObjectId> StageObjectsData::restoreObjects(std::set<int> &columnIndices, std::list<int> &restoredSpline,
-															 TXsheet *xsh, int fxFlags, const TPointD &pos) const
+std::vector<TStageObjectId> StageObjectsData::restoreObjects(std::set<int> &columnIndices,
+															 std::list<int> &restoredSpline,
+															 TXsheet *xsh, int fxFlags,
+															 const TPointD &pos) const
 {
 	bool doClone = (fxFlags & eDoClone);
 	bool resetFxDagPositions = (fxFlags & eResetFxDagPositions);
 
 	QMap<TStageObjectId, TStageObjectId> idTable; // Trace stored/restored id pairings
-	std::map<TFx *, TFx *> fxTable;					  // Same for fxs here
+	std::map<TFx *, TFx *> fxTable;				  // Same for fxs here
 	std::vector<TStageObjectId> restoredIds;
 
 	std::set<int>::iterator idxt = columnIndices.begin();
@@ -988,8 +984,8 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(std::set<int> &colu
 
 		if (parentId.isColumn()) // Why discriminating for columns only ?
 		{
-			//Columns are redirected to table ids. If no redirected parent exists, store
-			//a void value that will be avoided later
+			// Columns are redirected to table ids. If no redirected parent exists, store
+			// a void value that will be avoided later
 			QMap<TStageObjectId, TStageObjectId>::iterator it = idTable.find(parentId);
 			pastedParentId = (it == idTable.end()) ? TStageObjectId::NoneId : it.value();
 		}
@@ -1067,7 +1063,8 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(std::set<int> &colu
 					if (resetFxDagPositions)
 						linkedFx->getAttributes()->setDagNodePos(TConst::nowhere);
 					else
-						linkedFx->getAttributes()->setDagNodePos(oldLinkedFx->getAttributes()->getDagNodePos());
+						linkedFx->getAttributes()->setDagNodePos(
+							oldLinkedFx->getAttributes()->getDagNodePos());
 
 					xsh->getFxDag()->assignUniqueId(linkedFx);
 				} else
@@ -1124,7 +1121,7 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(std::set<int> &colu
 		splines[spline] = newSpline;
 	}
 
-	//paste stored path
+	// paste stored path
 	QList<TSplineDataElement *>::const_iterator splinIt;
 	for (splinIt = m_splines.begin(); splinIt != m_splines.end(); ++splinIt) {
 		TStageObjectTree *objTree = xsh->getStageObjectTree();

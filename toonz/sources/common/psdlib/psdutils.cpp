@@ -8,8 +8,7 @@
 
 #include "psdutils.h"
 
-void readrow(FILE *psd,
-			 TPSDChannelInfo *chan,
+void readrow(FILE *psd, TPSDChannelInfo *chan,
 			 psdPixel row,			   // row index
 			 unsigned char *inbuffer,  // dest buffer for the uncompressed row
 			 unsigned char *tmpbuffer) // temp rlebuffer for compressed data, 2xrb in size
@@ -46,14 +45,13 @@ void readrow(FILE *psd,
 	//	alwayswarn("# can't seek to " LL_L("%lld\n","%ld\n"), pos);
 
 	if (n < chan->rowbytes) {
-		//warn("row data short (wanted %d, got %d bytes)", chan->rowbytes, n);
+		// warn("row data short (wanted %d, got %d bytes)", chan->rowbytes, n);
 		// zero out unwritten part of row
 		memset(inbuffer + n, 0, chan->rowbytes - n);
 	}
 }
 
-int unpackrow(unsigned char *out, unsigned char *in,
-			  psdPixel outlen, psdPixel inlen)
+int unpackrow(unsigned char *out, unsigned char *in, psdPixel outlen, psdPixel inlen)
 {
 	psdPixel i, len;
 	int val;
@@ -95,7 +93,7 @@ int unpackrow(unsigned char *out, unsigned char *in,
 		}
 	}
 	if (i < outlen) {
-		//WARNING: not enough RLE data for row;
+		// WARNING: not enough RLE data for row;
 	}
 	return i;
 }
@@ -141,7 +139,7 @@ void *mymalloc(long n)
 	if (p)
 		return p;
 	else {
-		//ALLOCATION ERROR
+		// ALLOCATION ERROR
 	}
 	return NULL;
 }
@@ -150,8 +148,8 @@ void *mymalloc(long n)
 
 // ZIP WITHOUT PREDICTION
 // If no error returns 1 else returns 0
-int psdUnzipWithoutPrediction(unsigned char *src_buf, int src_len,
-							  unsigned char *dst_buf, int dst_len)
+int psdUnzipWithoutPrediction(unsigned char *src_buf, int src_len, unsigned char *dst_buf,
+							  int dst_len)
 {
 	z_stream stream;
 	int state;
@@ -183,8 +181,7 @@ int psdUnzipWithoutPrediction(unsigned char *src_buf, int src_len,
 
 // ZIP WITH PREDICTION
 
-int psdUnzipWithPrediction(unsigned char *src_buf, int src_len,
-						   unsigned char *dst_buf, int dst_len,
+int psdUnzipWithPrediction(unsigned char *src_buf, int src_len, unsigned char *dst_buf, int dst_len,
 						   int row_size, int color_depth)
 {
 	int status;

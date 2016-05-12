@@ -96,7 +96,7 @@ TRaster32P loadLight()
 	return ras;
 }
 
-} //namespace
+} // namespace
 
 //---------------------------------------------------------
 
@@ -107,7 +107,7 @@ class OnRenderCompleted : public TThread::Message
 	TFilePath m_fp;
 	bool m_error;
 
-public:
+  public:
 	OnRenderCompleted(const TFilePath &fp, bool error) : m_fp(fp), m_error(error) {}
 
 	TThread::Message *clone() const { return new OnRenderCompleted(*this); }
@@ -116,7 +116,9 @@ public:
 	{
 		if (m_error) {
 			m_error = false;
-			DVGui::error(QObject::tr("There was an error saving frames for the %1 level.").arg(QString::fromStdWString(m_fp.withoutParentDir().getWideString())));
+			DVGui::error(
+				QObject::tr("There was an error saving frames for the %1 level.")
+					.arg(QString::fromStdWString(m_fp.withoutParentDir().getWideString())));
 		}
 
 		bool isPreview = (m_fp.getType() == "noext");
@@ -129,11 +131,14 @@ public:
 				(m_fp.getType() == "mov" || m_fp.getType() == "avi" || m_fp.getType() == "3gp")) {
 				QString name = QString::fromStdString(m_fp.getName());
 				int index;
-				if ((index = name.indexOf("#RENDERID")) != -1) //!quite ugly I know....
+				if ((index = name.indexOf("#RENDERID")) != -1) //! quite ugly I know....
 					m_fp = m_fp.withName(name.left(index).toStdWString());
 
 				if (!TSystem::showDocument(m_fp)) {
-					QString msg(QObject::tr("It is not possible to display the file %1: no player associated with its format").arg(QString::fromStdWString(m_fp.withoutParentDir().getWideString())));
+					QString msg(
+						QObject::tr("It is not possible to display the file %1: no player "
+									"associated with its format")
+							.arg(QString::fromStdWString(m_fp.withoutParentDir().getWideString())));
 					DVGui::warning(msg);
 				}
 
@@ -143,14 +148,17 @@ public:
 				int r0, r1, step;
 				TApp *app = TApp::instance();
 				ToonzScene *scene = app->getCurrentScene()->getScene();
-				TOutputProperties &outputSettings = isPreview ? *scene->getProperties()->getPreviewProperties() : *scene->getProperties()->getOutputProperties();
+				TOutputProperties &outputSettings =
+					isPreview ? *scene->getProperties()->getPreviewProperties()
+							  : *scene->getProperties()->getOutputProperties();
 				outputSettings.getRange(r0, r1, step);
 				const TRenderSettings rs = outputSettings.getRenderSettings();
 				if (r0 == 0 && r1 == -1)
 					r0 = 0, r1 = scene->getFrameCount() - 1;
 
-				double timeStretchFactor = isPreview ? 1.0 : (double)outputSettings.getRenderSettings().m_timeStretchTo /
-																 outputSettings.getRenderSettings().m_timeStretchFrom;
+				double timeStretchFactor =
+					isPreview ? 1.0 : (double)outputSettings.getRenderSettings().m_timeStretchTo /
+										  outputSettings.getRenderSettings().m_timeStretchFrom;
 
 				r0 = tfloor(r0 * timeStretchFactor);
 				r1 = tceil((r1 + 1) * timeStretchFactor) - 1;
@@ -160,10 +168,13 @@ public:
 				TSoundTrack *snd = app->getCurrentXsheet()->getXsheet()->makeSound(prop);
 				if (outputSettings.getRenderSettings().m_stereoscopic) {
 					assert(!isPreview);
-					::viewFile(m_fp.withName(m_fp.getName() + "_l"), r0 + 1, r1 + 1, step, isPreview ? rs.m_shrinkX : 1, snd, 0, false, true);
-					::viewFile(m_fp.withName(m_fp.getName() + "_r"), r0 + 1, r1 + 1, step, isPreview ? rs.m_shrinkX : 1, snd, 0, false, true);
+					::viewFile(m_fp.withName(m_fp.getName() + "_l"), r0 + 1, r1 + 1, step,
+							   isPreview ? rs.m_shrinkX : 1, snd, 0, false, true);
+					::viewFile(m_fp.withName(m_fp.getName() + "_r"), r0 + 1, r1 + 1, step,
+							   isPreview ? rs.m_shrinkX : 1, snd, 0, false, true);
 				} else
-					::viewFile(m_fp, r0 + 1, r1 + 1, step, isPreview ? rs.m_shrinkX : 1, snd, 0, false, true);
+					::viewFile(m_fp, r0 + 1, r1 + 1, step, isPreview ? rs.m_shrinkX : 1, snd, 0,
+							   false, true);
 			}
 		}
 	}
@@ -183,9 +194,10 @@ class RenderCommand
 
 	int m_multimediaRender;
 
-public:
+  public:
 	RenderCommand()
-		: m_r0(0), m_r1(-1), m_step(1), m_numFrames(0), m_r(0), m_stepd(1), m_oldCameraRes(0, 0), m_timeStretchFactor(1), m_multimediaRender(0)
+		: m_r0(0), m_r1(-1), m_step(1), m_numFrames(0), m_r(0), m_stepd(1), m_oldCameraRes(0, 0),
+		  m_timeStretchFactor(1), m_multimediaRender(0)
 	{
 		setCommandHandler("MI_Render", this, &RenderCommand::onRender);
 		setCommandHandler("MI_Preview", this, &RenderCommand::onPreview);
@@ -209,7 +221,8 @@ bool RenderCommand::init(bool isPreview)
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	TSceneProperties *sprop = scene->getProperties();
 	/*-- Preview/Renderに応じてそれぞれのSettingを取得 --*/
-	TOutputProperties &outputSettings = isPreview ? *sprop->getPreviewProperties() : *sprop->getOutputProperties();
+	TOutputProperties &outputSettings =
+		isPreview ? *sprop->getPreviewProperties() : *sprop->getOutputProperties();
 	outputSettings.getRange(m_r0, m_r1, m_step);
 	/*-- シーン全体のレンダリングの場合、m_r1をScene長に設定 --*/
 	if (m_r0 == 0 && m_r1 == -1) {
@@ -256,7 +269,10 @@ bool RenderCommand::init(bool isPreview)
 	if (fp.getWideName() == L"")
 		fp = fp.withName(scene->getScenePath().getName());
 	/*-- ラスタ画像の場合、ファイル名にフレーム番号を追加 --*/
-	if (TFileType::getInfo(fp) == TFileType::RASTER_IMAGE || fp.getType() == "pct" || fp.getType() == "pic" || fp.getType() == "pict") //pct e' un formato"livello" (ha i settings di quicktime) ma fatto di diversi frames
+	if (TFileType::getInfo(fp) == TFileType::RASTER_IMAGE || fp.getType() == "pct" ||
+		fp.getType() == "pic" || fp.getType() == "pict") // pct e' un formato"livello" (ha i
+														 // settings di quicktime) ma fatto di
+														 // diversi frames
 		fp = fp.withFrame(TFrameId::EMPTY_FRAME);
 	fp = scene->decodeFilePath(fp);
 	if (!TFileStatus(fp.getParentDir()).doesExist()) {
@@ -265,7 +281,8 @@ bool RenderCommand::init(bool isPreview)
 			TSystem::mkDir(parent);
 			DvDirModel::instance()->refreshFolder(parent.getParentDir());
 		} catch (TException &e) {
-			DVGui::warning(QObject::tr("It is not possible to create folder : %1").arg(QString::fromStdString(toString(e.getMessage()))));
+			DVGui::warning(QObject::tr("It is not possible to create folder : %1")
+							   .arg(QString::fromStdString(toString(e.getMessage()))));
 			return false;
 		} catch (...) {
 			DVGui::warning(QObject::tr("It is not possible to create a folder."));
@@ -275,7 +292,8 @@ bool RenderCommand::init(bool isPreview)
 	m_fp = fp;
 
 	// Retrieve camera infos
-	const TCamera *camera = isPreview ? scene->getCurrentPreviewCamera() : scene->getCurrentCamera();
+	const TCamera *camera =
+		isPreview ? scene->getCurrentPreviewCamera() : scene->getCurrentCamera();
 	TDimension cameraSize = camera->getRes();
 	TPointD cameraDpi = camera->getDpi();
 
@@ -312,12 +330,8 @@ void RenderCommand::flashRender()
 
 	TDimension cameraSize = scene->getCurrentCamera()->getRes();
 	double frameRate = sprop->getOutputProperties()->getFrameRate();
-	TFlash flash(
-		cameraSize.lx,
-		cameraSize.ly,
-		m_numFrames,
-		frameRate,
-		sprop->getOutputProperties()->getFileFormatProperties("swf"));
+	TFlash flash(cameraSize.lx, cameraSize.ly, m_numFrames, frameRate,
+				 sprop->getOutputProperties()->getFileFormatProperties("swf"));
 	flash.setBackgroundColor(sprop->getBgColor());
 
 	std::vector<TXshSoundColumn *> columns;
@@ -346,7 +360,7 @@ void RenderCommand::flashRender()
 	fclose(fileP);
 
 	TSystem::showDocument(m_fp);
-	//QDesktopServices::openUrl(QUrl(toQString(m_fp)));
+	// QDesktopServices::openUrl(QUrl(toQString(m_fp)));
 
 	TImageCache::instance()->remove(toString(m_fp.getWideString() + L".0"));
 	TNotifier::instance()->notify(TSceneNameChange());
@@ -354,9 +368,7 @@ void RenderCommand::flashRender()
 
 //===================================================================
 
-class RenderListener
-	: public DVGui::ProgressDialog,
-	  public MovieRenderer::Listener
+class RenderListener : public DVGui::ProgressDialog, public MovieRenderer::Listener
 {
 	QString m_progressBarString;
 	int m_frameCounter;
@@ -369,31 +381,41 @@ class RenderListener
 		int m_frame;
 		QString m_labelText;
 
-	public:
-		Message(RenderListener *pb, int frame, const QString &labelText) : TThread::Message(), m_pb(pb), m_frame(frame), m_labelText(labelText) {}
+	  public:
+		Message(RenderListener *pb, int frame, const QString &labelText)
+			: TThread::Message(), m_pb(pb), m_frame(frame), m_labelText(labelText)
+		{
+		}
 		TThread::Message *clone() const { return new Message(*this); }
 		void onDeliver()
 		{
 			if (m_frame == -1)
 				m_pb->hide();
 			else {
-				m_pb->setLabelText("Rendering frame " + QString::number(m_frame) + "/" + m_labelText);
+				m_pb->setLabelText("Rendering frame " + QString::number(m_frame) + "/" +
+								   m_labelText);
 				m_pb->setValue(m_frame);
 			}
 		}
 	};
 
-public:
+  public:
 	RenderListener(TRenderer *renderer, const TFilePath &path, int steps, bool isPreview)
-		: DVGui::ProgressDialog("Precomputing " + QString::number(steps) + " Frames" + ((isPreview) ? "" : " of " + toQString(path)), "Cancel", 0, steps, TApp::instance()->getMainWindow()), m_renderer(renderer), m_frameCounter(0), m_error(false)
+		: DVGui::ProgressDialog("Precomputing " + QString::number(steps) + " Frames" +
+									((isPreview) ? "" : " of " + toQString(path)),
+								"Cancel", 0, steps, TApp::instance()->getMainWindow()),
+		  m_renderer(renderer), m_frameCounter(0), m_error(false)
 	{
 #ifdef MACOSX
-		//Modal dialogs seem to be preventing the execution of Qt::BlockingQueuedConnections on MAC...!
+		// Modal dialogs seem to be preventing the execution of Qt::BlockingQueuedConnections on
+		// MAC...!
 		setModal(false);
 #endif
-		setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
-		m_progressBarString = QString::number(steps) + ((isPreview) ? "" : " of " + toQString(path));
-		//setMinimumDuration (0);
+		setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint |
+					   Qt::WindowStaysOnTopHint);
+		m_progressBarString =
+			QString::number(steps) + ((isPreview) ? "" : " of " + toQString(path));
+		// setMinimumDuration (0);
 		show();
 	}
 
@@ -432,8 +454,9 @@ void RenderCommand::rasterRender(bool isPreview)
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
 	if (isPreview) {
-		//Let the PreviewFxManager own the rest. Just pass him the current output node.
-		PreviewFxManager::instance()->showNewPreview((TFx *)scene->getXsheet()->getFxDag()->getCurrentOutputFx());
+		// Let the PreviewFxManager own the rest. Just pass him the current output node.
+		PreviewFxManager::instance()->showNewPreview(
+			(TFx *)scene->getXsheet()->getFxDag()->getCurrentOutputFx());
 		return;
 	}
 
@@ -441,21 +464,24 @@ void RenderCommand::rasterRender(bool isPreview)
 
 #ifdef _WIN32
 	if (ext == "avi" && !isPreview) {
-		TPropertyGroup *props = scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
+		TPropertyGroup *props =
+			scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
 		std::string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
 		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
-			QString msg(QObject::tr("The resolution of the output camera does not fit with the options chosen for the output file format."));
+			QString msg(QObject::tr("The resolution of the output camera does not fit with the "
+									"options chosen for the output file format."));
 			DVGui::warning(msg);
 			return;
 		}
 	}
 #endif
 
-	//Extract output properties
-	TOutputProperties *prop = isPreview ? scene->getProperties()->getPreviewProperties() : scene->getProperties()->getOutputProperties();
+	// Extract output properties
+	TOutputProperties *prop = isPreview ? scene->getProperties()->getPreviewProperties()
+										: scene->getProperties()->getOutputProperties();
 
-	//Build thread count
+	// Build thread count
 	/*-- Dedicated CPUs のコンボボックス (Single, Half, All) --*/
 	int index = prop->getThreadIndex();
 
@@ -469,28 +495,26 @@ void RenderCommand::rasterRender(bool isPreview)
 
 	TRenderSettings rs = prop->getRenderSettings();
 
-	//Build raster granularity size
+	// Build raster granularity size
 	index = prop->getMaxTileSizeIndex();
 
-	const int maxTileSizes[4] = {
-		(std::numeric_limits<int>::max)(),
-		TOutputProperties::LargeVal,
-		TOutputProperties::MediumVal,
-		TOutputProperties::SmallVal};
+	const int maxTileSizes[4] = {(std::numeric_limits<int>::max)(), TOutputProperties::LargeVal,
+								 TOutputProperties::MediumVal, TOutputProperties::SmallVal};
 	rs.m_maxTileSize = maxTileSizes[index];
 
-//Build
+	// Build
 
 	/*-- RenderSettingsをセット --*/
 	movieRenderer.setRenderSettings(rs);
 	/*-- カメラDPIの取得、セット --*/
-	TPointD cameraDpi = isPreview ? scene->getCurrentPreviewCamera()->getDpi() : scene->getCurrentCamera()->getDpi();
+	TPointD cameraDpi = isPreview ? scene->getCurrentPreviewCamera()->getDpi()
+								  : scene->getCurrentCamera()->getDpi();
 	movieRenderer.setDpi(cameraDpi.x, cameraDpi.y);
 	movieRenderer.enablePrecomputing(true);
 
 	/*-- プログレス ダイアログの作成 --*/
-	RenderListener *listener =
-		new RenderListener(movieRenderer.getTRenderer(), m_fp, ((m_numFrames - 1) / m_step) + 1, isPreview);
+	RenderListener *listener = new RenderListener(movieRenderer.getTRenderer(), m_fp,
+												  ((m_numFrames - 1) / m_step) + 1, isPreview);
 	QObject::connect(listener, SIGNAL(canceled()), &movieRenderer, SLOT(onCanceled()));
 	movieRenderer.addListener(listener);
 
@@ -516,10 +540,12 @@ void RenderCommand::rasterRender(bool isPreview)
 		fx.m_frameA = buildSceneFx(scene, m_r, rs.m_shrinkX, isPreview);
 
 		if (fieldRendering && !isPreview)
-			fx.m_frameB = buildSceneFx(scene, m_r + 0.5 / m_timeStretchFactor, rs.m_shrinkX, isPreview);
+			fx.m_frameB =
+				buildSceneFx(scene, m_r + 0.5 / m_timeStretchFactor, rs.m_shrinkX, isPreview);
 		else if (rs.m_stereoscopic) {
 			scene->shiftCameraX(rs.m_stereoscopicShift);
-			fx.m_frameB = buildSceneFx(scene, m_r + 0.5 / m_timeStretchFactor, rs.m_shrinkX, isPreview);
+			fx.m_frameB =
+				buildSceneFx(scene, m_r + 0.5 / m_timeStretchFactor, rs.m_shrinkX, isPreview);
 			scene->shiftCameraX(-rs.m_stereoscopicShift / 2);
 		} else
 			fx.m_frameB = TRasterFxP();
@@ -529,17 +555,15 @@ void RenderCommand::rasterRender(bool isPreview)
 	/*-- プログレスバーを閉じる --*/
 	buildSceneProgressBar->close();
 
-	//resetViewer(); //TODO cancella le immagini dell'eventuale render precedente
-	//FileViewerPopupPool::instance()->getCurrent()->onClose();
+	// resetViewer(); //TODO cancella le immagini dell'eventuale render precedente
+	// FileViewerPopupPool::instance()->getCurrent()->onClose();
 
 	movieRenderer.start();
 }
 
 //===================================================================
 
-class MultimediaProgressBar
-	: public DVGui::ProgressDialog,
-	  public MultimediaRenderer::Listener
+class MultimediaProgressBar : public DVGui::ProgressDialog, public MultimediaRenderer::Listener
 {
 	QString m_progressBarString;
 	int m_frameCounter;
@@ -557,9 +581,13 @@ class MultimediaProgressBar
 		int m_pbValue;
 		QString m_labelText;
 
-	public:
-		Message(MultimediaProgressBar *pb, int frame, int column, int pbValue, const QString &labelText)
-			: TThread::Message(), m_pb(pb), m_frame(frame), m_column(column), m_pbValue(pbValue), m_labelText(labelText) {}
+	  public:
+		Message(MultimediaProgressBar *pb, int frame, int column, int pbValue,
+				const QString &labelText)
+			: TThread::Message(), m_pb(pb), m_frame(frame), m_column(column), m_pbValue(pbValue),
+			  m_labelText(labelText)
+		{
+		}
 
 		TThread::Message *clone() const { return new Message(*this); }
 
@@ -568,11 +596,11 @@ class MultimediaProgressBar
 			if (m_pbValue == -1)
 				m_pb->hide();
 			else {
-				QString modeStr(m_pb->m_renderer->getMultimediaMode() == MultimediaRenderer::COLUMNS ? "column " : "layer ");
-				m_pb->setLabelText(
-					"Rendering " + modeStr + QString::number(m_column) +
-					", frame " + QString::number(m_frame) +
-					"/" + m_labelText);
+				QString modeStr(m_pb->m_renderer->getMultimediaMode() == MultimediaRenderer::COLUMNS
+									? "column "
+									: "layer ");
+				m_pb->setLabelText("Rendering " + modeStr + QString::number(m_column) + ", frame " +
+								   QString::number(m_frame) + "/" + m_labelText);
 				m_pb->setValue(m_pbValue);
 			}
 		}
@@ -580,21 +608,21 @@ class MultimediaProgressBar
 
 	//----------------------------------------------------------
 
-public:
+  public:
 	MultimediaProgressBar(MultimediaRenderer *renderer)
-		: ProgressDialog(
-			  "Rendering " + QString::number(renderer->getFrameCount()) +
-				  " frames " + " of " + toQString(renderer->getFilePath()),
-			  "Cancel", 0, renderer->getFrameCount() * renderer->getColumnsCount()),
+		: ProgressDialog("Rendering " + QString::number(renderer->getFrameCount()) + " frames " +
+							 " of " + toQString(renderer->getFilePath()),
+						 "Cancel", 0, renderer->getFrameCount() * renderer->getColumnsCount()),
 		  m_renderer(renderer), m_frameCounter(0), m_columnCounter(0), m_pbCounter(0)
 	{
 #ifdef MACOSX
-		//Modal dialogs seem to be preventing the execution of Qt::BlockingQueuedConnections on MAC...!
+		// Modal dialogs seem to be preventing the execution of Qt::BlockingQueuedConnections on
+		// MAC...!
 		setModal(false);
 #endif
 		setWindowFlags(Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
-		m_progressBarString =
-			QString::number(m_renderer->getFrameCount()) + " of " + toQString(m_renderer->getFilePath());
+		m_progressBarString = QString::number(m_renderer->getFrameCount()) + " of " +
+							  toQString(m_renderer->getFilePath());
 		show();
 	}
 
@@ -603,7 +631,9 @@ public:
 	bool onFrameCompleted(int frame, int column)
 	{
 		bool ret = wasCanceled();
-		Message(this, ++m_frameCounter, m_columnCounter, ret ? -1 : ++m_pbCounter, m_progressBarString).send();
+		Message(this, ++m_frameCounter, m_columnCounter, ret ? -1 : ++m_pbCounter,
+				m_progressBarString)
+			.send();
 		return !ret;
 	}
 
@@ -616,13 +646,14 @@ public:
 	{
 		m_frameCounter = 0;
 		Message(this, m_frameCounter, ++m_columnCounter, m_pbCounter, m_progressBarString).send();
-		//OnRenderCompleted(fp).send();   //No output should have been put in cache - and no viewfile to be called...
+		// OnRenderCompleted(fp).send();   //No output should have been put in cache - and no
+		// viewfile to be called...
 	}
 
 	virtual void onRenderCompleted()
 	{
 		Message(this, -1, -1, -1, "").send();
-		//OnRenderCompleted(fp).send();
+		// OnRenderCompleted(fp).send();
 	}
 
 	void onCancel()
@@ -639,8 +670,8 @@ public:
 
 //---------------------------------------------------------
 
-//!Specialized render invocation for multimedia rendering. Flash rendering
-//!is currently not supported in this mode.
+//! Specialized render invocation for multimedia rendering. Flash rendering
+//! is currently not supported in this mode.
 void RenderCommand::multimediaRender()
 {
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
@@ -648,11 +679,13 @@ void RenderCommand::multimediaRender()
 
 #ifdef _WIN32
 	if (ext == "avi") {
-		TPropertyGroup *props = scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
+		TPropertyGroup *props =
+			scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
 		std::string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
 		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
-			QString msg(QObject::tr("The resolution of the output camera does not fit with the options chosen for the output file format."));
+			QString msg(QObject::tr("The resolution of the output camera does not fit with the "
+									"options chosen for the output file format."));
 			DVGui::warning(msg);
 			return;
 		}
@@ -661,7 +694,7 @@ void RenderCommand::multimediaRender()
 
 	TOutputProperties *prop = scene->getProperties()->getOutputProperties();
 
-	//Build thread count
+	// Build thread count
 	int index = prop->getThreadIndex();
 
 	const int procCount = TSystem::getProcessorCount();
@@ -669,14 +702,11 @@ void RenderCommand::multimediaRender()
 
 	int threadCount = threadCounts[index];
 
-	//Build raster granularity size
+	// Build raster granularity size
 	index = prop->getMaxTileSizeIndex();
 
-	const int maxTileSizes[4] = {
-		(std::numeric_limits<int>::max)(),
-		TOutputProperties::LargeVal,
-		TOutputProperties::MediumVal,
-		TOutputProperties::SmallVal};
+	const int maxTileSizes[4] = {(std::numeric_limits<int>::max)(), TOutputProperties::LargeVal,
+								 TOutputProperties::MediumVal, TOutputProperties::SmallVal};
 
 	TRenderSettings rs = prop->getRenderSettings();
 	rs.m_maxTileSize = maxTileSizes[index];
@@ -691,8 +721,7 @@ void RenderCommand::multimediaRender()
 	for (int i = 0; i < m_numFrames; ++i, m_r += m_stepd)
 		multimediaRenderer.addFrame(m_r);
 
-	MultimediaProgressBar *listener =
-		new MultimediaProgressBar(&multimediaRenderer);
+	MultimediaProgressBar *listener = new MultimediaProgressBar(&multimediaRenderer);
 	QObject::connect(listener, SIGNAL(canceled()), &multimediaRenderer, SLOT(onCanceled()));
 	multimediaRenderer.addListener(listener);
 
@@ -757,9 +786,11 @@ void RenderCommand::doRender(bool isPreview)
 
 	try {
 		/*-- Xsheetノードに繋がっている各ラインごとに計算するモード。
-			MultipleRender で Schematic Flows または Fx Schematic Terminal Nodes が選択されている場合
+			MultipleRender で Schematic Flows または Fx Schematic Terminal Nodes
+		が選択されている場合
 		--*/
-		if (m_multimediaRender && m_fp.getType() != "swf") //swf is not currently supported on multimedia...
+		if (m_multimediaRender &&
+			m_fp.getType() != "swf") // swf is not currently supported on multimedia...
 			multimediaRender();
 		else if (!isPreview && m_fp.getType() == "swf")
 			flashRender();

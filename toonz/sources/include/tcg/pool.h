@@ -29,33 +29,33 @@
   \brief    This file contains an implementation of the \a pool container concept.
 
   \details  A pool is a container that supports two fundamental operations, acquire() and
-            release(), whose purpose is that of marking access operations to a resource
-            that <I>should not be destroyed</I> when the access operation ends.
+			release(), whose purpose is that of marking access operations to a resource
+			that <I>should not be destroyed</I> when the access operation ends.
 
-            Creation and destruction of resources can be a time-consuming task that could
-            be avoided when it is known that resources could be reused - which is the very
-            reason why caching can be a useful approach to some problems.
+			Creation and destruction of resources can be a time-consuming task that could
+			be avoided when it is known that resources could be reused - which is the very
+			reason why caching can be a useful approach to some problems.
 
-            The classical cache concept is nothing more than that of a standard associative
-            map, tweaked to accomodate specific commodities - such as managing the cache
-            size.
+			The classical cache concept is nothing more than that of a standard associative
+			map, tweaked to accomodate specific commodities - such as managing the cache
+			size.
 
-            However, sometimes resources could be considered to be effectively indentical,
-            to the point that assigning a key is merely a way to keep the objects
-            distinct in the cache. Users are in the condition to require only two functions,
-            one to acquire() a resource, the other to release() it.
+			However, sometimes resources could be considered to be effectively indentical,
+			to the point that assigning a key is merely a way to keep the objects
+			distinct in the cache. Users are in the condition to require only two functions,
+			one to acquire() a resource, the other to release() it.
 
-            The Pool concept we are introducing satisfies the following ruleset:
+			The Pool concept we are introducing satisfies the following ruleset:
 
-            <UL>
-            <LI> The pool is a dynamical container which allocates resources by invoking the
-                 objects' default constructor. </LI>
-            <LI> Objects in the pool are \b not destructed, except when the pool is explicitly
-                 \a squeezed by the user.</LI>
-            <LI> Keys are indices, returned by the pool with an incremental ordering. </LI>
-            <LI> An object which has been acquired cannot be acquired again until it has been
-                 released </LI>
-            </UL>
+			<UL>
+			<LI> The pool is a dynamical container which allocates resources by invoking the
+				 objects' default constructor. </LI>
+			<LI> Objects in the pool are \b not destructed, except when the pool is explicitly
+				 \a squeezed by the user.</LI>
+			<LI> Keys are indices, returned by the pool with an incremental ordering. </LI>
+			<LI> An object which has been acquired cannot be acquired again until it has been
+				 released </LI>
+			</UL>
 */
 
 namespace tcg
@@ -65,19 +65,18 @@ namespace tcg
 //    TCG Indices Pool  class
 //****************************************************************************
 
-template <typename T = size_t, typename Cont = std::vector<T>>
-class indices_pool
+template <typename T = size_t, typename Cont = std::vector<T>> class indices_pool
 {
-public:
+  public:
 	typedef T value_type;
 	typedef Cont container_type;
 
-private:
+  private:
 	T m_start;				//!< First index to be acquired
 	T m_size;				//!< Current indices count
 	Cont m_releasedIndices; //!< Priority queue of released indices
 
-public:
+  public:
 	indices_pool(value_type start = 0) : m_start(start), m_size(0) {}
 	~indices_pool() {}
 
@@ -156,7 +155,8 @@ public:
 		if (m_releasedIndices.empty())
 			return;
 
-		std::sort_heap(m_releasedIndices.begin(), m_releasedIndices.end(), std::greater<T>()); // O(n logn)
+		std::sort_heap(m_releasedIndices.begin(), m_releasedIndices.end(),
+					   std::greater<T>()); // O(n logn)
 
 		// Decrease the pool size as long as the back items are unused
 		T lastIndex = m_start + m_size - 1;
@@ -168,7 +168,8 @@ public:
 		if (ut != m_releasedIndices.begin())
 			m_releasedIndices.swap(Cont(ut, uEnd));
 
-		std::make_heap(m_releasedIndices.begin(), m_releasedIndices.end(), std::greater<T>()); // O(n)
+		std::make_heap(m_releasedIndices.begin(), m_releasedIndices.end(),
+					   std::greater<T>()); // O(n)
 	}
 
 #if (TCG_RVALUES_SUPPORT > 0)
@@ -185,7 +186,10 @@ public:
 	}
 
 	indices_pool(indices_pool &&other)
-		: m_start(other.m_start), m_size(other.m_size), m_releasedIndices(std::forward<container_type &&>(other.m_releasedIndices)) {}
+		: m_start(other.m_start), m_size(other.m_size),
+		  m_releasedIndices(std::forward<container_type &&>(other.m_releasedIndices))
+	{
+	}
 
 	indices_pool &operator=(indices_pool &&other)
 	{
@@ -199,19 +203,18 @@ public:
 
 //----------------------------------------------------------------
 
-template <typename T, typename Cont = std::vector<T>>
-class pool
+template <typename T, typename Cont = std::vector<T>> class pool
 {
-public:
+  public:
 	typedef T value_type;
 	typedef Cont container_type;
 	typedef size_t size_type;
 
-private:
+  private:
 	Cont m_objects;						 //!< Objects in the pool
 	tcg::indices_pool<size_t> m_indices; //!< Indices Pool representing m_objects
 
-public:
+  public:
 	pool() {}
 	~pool() {}
 

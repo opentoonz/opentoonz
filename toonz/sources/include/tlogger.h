@@ -38,17 +38,12 @@ class DVAPI TLogger
 
 	TLogger();
 
-public:
+  public:
 	~TLogger();
 
 	static TLogger *instance();
 
-	enum MessageType {
-		Debug = 1,
-		Info,
-		Warning,
-		Error
-	};
+	enum MessageType { Debug = 1, Info, Warning, Error };
 
 	class DVAPI Message
 	{
@@ -56,7 +51,7 @@ public:
 		std::string m_timestamp;
 		std::string m_text;
 
-	public:
+	  public:
 		Message(MessageType type, std::string text);
 		MessageType getType() const { return m_type; }
 		std::string getTimestamp() const { return m_timestamp; }
@@ -65,7 +60,7 @@ public:
 
 	class Listener
 	{
-	public:
+	  public:
 		virtual void onLogChanged() = 0;
 		virtual ~Listener() {}
 	};
@@ -83,7 +78,7 @@ public:
 		MessageType m_type;
 		std::string m_text;
 
-	public:
+	  public:
 		Stream(MessageType type);
 		~Stream();
 
@@ -95,7 +90,7 @@ public:
 
 	class DVAPI NullStream
 	{
-	public:
+	  public:
 		NullStream() {}
 		~NullStream() {}
 
@@ -106,20 +101,11 @@ public:
 	};
 
 #ifdef NDEBUG
-	static NullStream debug()
-	{
-		return NullStream();
-	}
+	static NullStream debug() { return NullStream(); }
 #else
-	static Stream debug()
-	{
-		return Stream(Debug);
-	}
+	static Stream debug() { return Stream(Debug); }
 #endif
-	static Stream info()
-	{
-		return Stream(Info);
-	}
+	static Stream info() { return Stream(Info); }
 	static Stream warning() { return Stream(Warning); }
 	static Stream error() { return Stream(Error); }
 };

@@ -17,7 +17,7 @@ namespace
 
 class TStringTableImp : public TStringTable
 {
-public:
+  public:
 	bool m_initialized;
 
 	std::map<std::string, Item> m_table;
@@ -145,18 +145,15 @@ std::wstring readStringW(Tifstream &is)
 
 //-------------------------------------------------------------------
 #ifdef MACOSX
-class TMagic //singleton
+class TMagic // singleton
 {
-public:
+  public:
 	std::string m_magic;
 
-private:
-	TMagic()
-		: m_magic("stab.001")
-	{
-	}
+  private:
+	TMagic() : m_magic("stab.001") {}
 
-public:
+  public:
 	static TMagic *instance()
 	{
 		static TMagic inst;
@@ -198,7 +195,7 @@ void TStringTableImp::loadCoded(const TFilePath &fp)
 		}
 		int check = readShort(is);
 		assert(check == 12345);
-		//if(check != 12345)
+		// if(check != 12345)
 		//  throw;
 	} catch (...) {
 		// TMessage::error("Error reading StringTable file: ", fp);
@@ -211,36 +208,36 @@ void TStringTableImp::loadCoded(const TFilePath &fp)
 void TStringTableImp::saveCoded(const TFilePath &fp)
 {
   try {
-    Tofstream os(fp);
+	Tofstream os(fp);
 
-#ifdef MACOSX    
-    os.write(TMagic::instance()->m_magic.c_str(), TMagic::instance()->m_magic.length());
+#ifdef MACOSX
+	os.write(TMagic::instance()->m_magic.c_str(), TMagic::instance()->m_magic.length());
  #else
-    os.write(magic.c_str(), magic.length());
+	os.write(magic.c_str(), magic.length());
  #endif
-    writeString(os, m_defaultFontNameAndSize.first);
-    writeShort(os, m_defaultFontNameAndSize.second);
-    writeShort(os, m_table.size());
-    for(std::map<std::string, Item>::iterator it = m_table.begin();
-        it != m_table.end(); ++it)
-      {
-       Item &item = it->second;
-       int m = 1;
-       if(item.m_tip != L"") m = 3;
-       else if(item.m_help != L"") m = 2;
-       writeShort(os, m);
-       writeString(os, it->first);
-       writeStringW(os, item.m_name);
-       if(m>=2)
-         {
-          writeStringW(os, item.m_help);
-          if(m==3) 
-            writeStringW(os, item.m_tip);          
-         }
-      }
-    writeShort(os, 12345);
+	writeString(os, m_defaultFontNameAndSize.first);
+	writeShort(os, m_defaultFontNameAndSize.second);
+	writeShort(os, m_table.size());
+	for(std::map<std::string, Item>::iterator it = m_table.begin();
+		it != m_table.end(); ++it)
+	  {
+	   Item &item = it->second;
+	   int m = 1;
+	   if(item.m_tip != L"") m = 3;
+	   else if(item.m_help != L"") m = 2;
+	   writeShort(os, m);
+	   writeString(os, it->first);
+	   writeStringW(os, item.m_name);
+	   if(m>=2)
+		 {
+		  writeStringW(os, item.m_help);
+		  if(m==3)
+			writeStringW(os, item.m_tip);
+		 }
+	  }
+	writeShort(os, 12345);
   } catch(...) {
-    TMessage::error("Unable to save StringTable file: ", fp);
+	TMessage::error("Unable to save StringTable file: ", fp);
   }
 }
 */
@@ -294,7 +291,7 @@ void TStringTableImp::load(const TFilePath &fp)
 		} else
 			throw TException("unexpected tag /" + tagName + "/");
 	}
-	//m_valid =true;
+	// m_valid =true;
 }
 
 //-------------------------------------------------------------------

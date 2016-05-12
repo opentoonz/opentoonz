@@ -16,13 +16,10 @@ namespace
 
 class MatchesFx
 {
-public:
+  public:
 	MatchesFx(const TFxP &fx) : m_fx(fx) {}
 
-	bool operator()(const TFxP &fx)
-	{
-		return m_fx.getPointer() == fx.getPointer();
-	}
+	bool operator()(const TFxP &fx) { return m_fx.getPointer() == fx.getPointer(); }
 
 	TFxP m_fx;
 };
@@ -33,14 +30,16 @@ void pushParents(const TFxP &root, std::vector<TFxP> &fxs, const std::vector<TFx
 {
 	int i, count = root->getInputPortCount();
 	if (count == 0) {
-		std::vector<TFxP>::const_iterator found = std::find_if(fxs.begin(), fxs.end(), MatchesFx(root));
+		std::vector<TFxP>::const_iterator found =
+			std::find_if(fxs.begin(), fxs.end(), MatchesFx(root));
 		if (found == fxs.end())
 			fxs.push_back(root);
 		return;
 	}
 	for (i = 0; i < count; i++) {
 		TFxP inutFx = root->getInputPort(i)->getFx();
-		std::vector<TFxP>::const_iterator found = std::find_if(selectedFxs.begin(), selectedFxs.end(), MatchesFx(inutFx));
+		std::vector<TFxP>::const_iterator found =
+			std::find_if(selectedFxs.begin(), selectedFxs.end(), MatchesFx(inutFx));
 		if (found != selectedFxs.end())
 			pushParents(inutFx, fxs, selectedFxs);
 	}
@@ -55,7 +54,7 @@ std::vector<TFxP> sortFxs(const std::vector<TFxP> &fxs)
 {
 	std::vector<TFxP> app;
 	std::vector<TFxP> roots;
-	//find fxs that could be in back of the vector.
+	// find fxs that could be in back of the vector.
 	int i;
 	for (i = 0; i < (int)fxs.size(); i++) {
 		TFxP fx = fxs[i];
@@ -66,7 +65,8 @@ std::vector<TFxP> sortFxs(const std::vector<TFxP> &fxs)
 		}
 		for (j = 0; j < count; j++) {
 			TFxP connectedFx = fx->getOutputConnection(j)->getOwnerFx();
-			std::vector<TFxP>::const_iterator found = std::find_if(fxs.begin(), fxs.end(), MatchesFx(connectedFx));
+			std::vector<TFxP>::const_iterator found =
+				std::find_if(fxs.begin(), fxs.end(), MatchesFx(connectedFx));
 			if (found == fxs.end()) {
 				roots.push_back(fx);
 				break;
@@ -97,9 +97,7 @@ void collectParams(TMacroFx *macroFx)
 
 //--------------------------------------------------
 
-bool TMacroFx::analyze(const std::vector<TFxP> &fxs,
-					   TFxP &root,
-					   std::vector<TFxP> &roots,
+bool TMacroFx::analyze(const std::vector<TFxP> &fxs, TFxP &root, std::vector<TFxP> &roots,
 					   std::vector<TFxP> &leafs)
 {
 	if (fxs.size() == 1)
@@ -154,7 +152,8 @@ bool TMacroFx::analyze(const std::vector<TFxP> &fxs,
 
 			// se fx e' una foglia
 			if (inputExternalConnection > 0 || fx->getInputPortCount() == 0 ||
-				(inputExternalConnection == 0 && inputInternalConnection < fx->getInputPortCount())) {
+				(inputExternalConnection == 0 &&
+				 inputInternalConnection < fx->getInputPortCount())) {
 				leafs.push_back(fx);
 			}
 		}
@@ -208,11 +207,15 @@ bool TMacroFx::isaLeaf(TFx *fx) const
 
 //--------------------------------------------------
 
-TMacroFx::TMacroFx() : m_isEditing(false) {}
+TMacroFx::TMacroFx() : m_isEditing(false)
+{
+}
 
 //--------------------------------------------------
 
-TMacroFx::~TMacroFx() {}
+TMacroFx::~TMacroFx()
+{
+}
 
 //--------------------------------------------------
 
@@ -257,7 +260,7 @@ TFx *TMacroFx::clone(bool recursive) const
 		}
 	}
 
-	//TFx *rootClone =
+	// TFx *rootClone =
 	//  const_cast<TMacroFx*>(this)->
 	//  clone(m_root.getPointer(), recursive, visited, clones);
 
@@ -265,7 +268,7 @@ TFx *TMacroFx::clone(bool recursive) const
 	clone->setName(getName());
 	clone->setFxId(getFxId());
 
-	//Copy the index of the passive cache manager.
+	// Copy the index of the passive cache manager.
 	clone->getAttributes()->passiveCacheDataIdx() = getAttributes()->passiveCacheDataIdx();
 
 	assert(clone->getRoot() == clones[rootIndex].getPointer());
@@ -282,9 +285,7 @@ bool TMacroFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info
 
 //--------------------------------------------------
 
-void TMacroFx::doDryCompute(TRectD &rect,
-							double frame,
-							const TRenderSettings &info)
+void TMacroFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings &info)
 {
 	assert(m_root);
 	m_root->dryCompute(rect, frame, info);
@@ -405,7 +406,8 @@ TMacroFx *TMacroFx::create(const std::vector<TFxP> &fxs)
 				// se la porta k-esima del nodo di ingresso i-esimo e' collegata
 				// ad un effetto, la porta viene inserita solo se l'effetto non fa
 				// gia' parte della macro
-				if (std::find_if(orederedFxs.begin(), orederedFxs.end(), MatchesFx(portFx)) == orederedFxs.end())
+				if (std::find_if(orederedFxs.begin(), orederedFxs.end(), MatchesFx(portFx)) ==
+					orederedFxs.end())
 					macroFx->addInputPort(portName, *port);
 			} else
 				macroFx->addInputPort(portName, *port);
@@ -475,8 +477,7 @@ std::string TMacroFx::getAlias(double frame, const TRenderSettings &info) const
 void TMacroFx::compatibilityTranslatePort(int major, int minor, std::string &portName)
 {
 	// Reroute translation to the actual fx associated to the port
-	const std::string &fxId = portName.substr(portName.find_last_of('_') + 1,
-											  std::string::npos);
+	const std::string &fxId = portName.substr(portName.find_last_of('_') + 1, std::string::npos);
 
 	if (TFx *fx = getFxById(toWideString(fxId))) {
 		size_t opnEnd = portName.find_first_of('_');
@@ -595,4 +596,4 @@ void TMacroFx::saveData(TOStream &os)
 
 //--------------------------------------------------
 FX_IDENTIFIER(TMacroFx, "macroFx")
-//FX_IDENTIFIER_IS_HIDDEN(TMacroFx, "macroFx")
+// FX_IDENTIFIER_IS_HIDDEN(TMacroFx, "macroFx")

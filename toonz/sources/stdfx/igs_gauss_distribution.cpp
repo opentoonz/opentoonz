@@ -2,8 +2,8 @@
 namespace
 {
 /*
-				    center
-				      V
+					center
+					  V
 	sequence
 	  0   1   2 ...				     int_diameter-1
 	  v   v   v ...						  v
@@ -11,24 +11,24 @@ namespace
 	|<------------------- int_diameter(pixel) ----------------->|
 	  |<--- int_radius(pixel) --->|
 	   |<------ real_radius ----->|
-	      |<- int_radius(pixel) ->|
-	       |<---- real_radius --->|
-	          |<-int_radius(pi) ->|
-	           |<- real_radius -->|
-	              |<-int_radius ->|
-	               |<- real_rad ->|
-	                  |<- int   ->|
-	                   |<- real ->|
-	                      |<-   ->|
-	                       |<-  ->|
-	                          |<->|
-	                           |<>|
+		  |<- int_radius(pixel) ->|
+		   |<---- real_radius --->|
+			  |<-int_radius(pi) ->|
+			   |<- real_radius -->|
+				  |<-int_radius ->|
+				   |<- real_rad ->|
+					  |<- int   ->|
+					   |<- real ->|
+						  |<-   ->|
+						   |<-  ->|
+							  |<->|
+							   |<>|
  */
-void gauss_distribution_1d_(
-	double *sequence, const int int_diameter /* sequence配列の長さ */
-	,
-	const int int_radius, const double real_radius, const double sigma /* = 0.25 : 適当な値... */
-	)
+void gauss_distribution_1d_(double *sequence, const int int_diameter /* sequence配列の長さ */
+							,
+							const int int_radius, const double real_radius,
+							const double sigma /* = 0.25 : 適当な値... */
+							)
 {
 	/* メモリクリア */
 	for (int ii = 0; ii < int_diameter; ++ii) {
@@ -37,8 +37,7 @@ void gauss_distribution_1d_(
 
 	/* 半径がゼロでも計算を可能にする、強引に... */
 	const int int_radius2 = (0 < int_radius) ? int_radius : 1;
-	const double real_radius2 =
-		(0. < real_radius) ? real_radius : 0.000000000000001;
+	const double real_radius2 = (0. < real_radius) ? real_radius : 0.000000000000001;
 
 	/* 1pixel以下の調整
 	 * -1.0の位置を(real_radius2)の位置とする */
@@ -55,8 +54,7 @@ void gauss_distribution_1d_(
 
 	/* ガウス分布 */
 	for (int ii = start_pos; ii < end_pos; ++ii) {
-		sequence[ii] = exp(
-			-(dd * dd) / (2.0 * sigma * sigma));
+		sequence[ii] = exp(-(dd * dd) / (2.0 * sigma * sigma));
 		dd += delta;
 	}
 	/* 積算 */

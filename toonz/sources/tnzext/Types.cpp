@@ -13,15 +13,14 @@
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::OddInt::OddInt(int v)
-	: val_(v)
+ToonzExt::OddInt::OddInt(int v) : val_(v)
 {
 }
 
 //-----------------------------------------------------------------------------
 
 ToonzExt::OddInt::operator int() const
-//throw(std::range_error)
+// throw(std::range_error)
 {
 	if (!isOdd())
 		throw std::range_error("Value is Even!!!");
@@ -31,7 +30,7 @@ ToonzExt::OddInt::operator int() const
 //-----------------------------------------------------------------------------
 
 ToonzExt::OddInt::operator int()
-//throw(std::range_error)
+// throw(std::range_error)
 {
 	if (!isOdd())
 		throw std::range_error("Value is Even!!!");
@@ -49,15 +48,14 @@ bool ToonzExt::OddInt::isOdd() const
 
 // -4 -2 0 2 4..
 
-ToonzExt::EvenInt::EvenInt(int v)
-	: val_(v)
+ToonzExt::EvenInt::EvenInt(int v) : val_(v)
 {
 }
 
 //-----------------------------------------------------------------------------
 
 ToonzExt::EvenInt::operator int() const
-//throw(std::range_error)
+// throw(std::range_error)
 {
 	if (!isEven())
 		throw std::range_error("Value is Odd!!!");
@@ -68,7 +66,7 @@ ToonzExt::EvenInt::operator int() const
 //-----------------------------------------------------------------------------
 
 ToonzExt::EvenInt::operator int()
-//throw(std::range_error)
+// throw(std::range_error)
 {
 	if (!isEven())
 		throw std::range_error("Value is Odd!!!");

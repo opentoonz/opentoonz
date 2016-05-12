@@ -187,7 +187,8 @@ StudioPalette::StudioPalette()
 		}
 		try {
 			TSystem::mkDir(getLevelPalettesRoot());
-			FolderListenerManager::instance()->notifyFolderChanged(getLevelPalettesRoot().getParentDir());
+			FolderListenerManager::instance()->notifyFolderChanged(
+				getLevelPalettesRoot().getParentDir());
 		} catch (...) {
 		}
 	}
@@ -268,9 +269,7 @@ bool loadRefImg(TPalette *palette, TFilePath dir)
 
 //-------------------------------------------------------------------
 
-TPalette *StudioPalette::getPalette(
-	const TFilePath &path,
-	bool loadRefImgFlag)
+TPalette *StudioPalette::getPalette(const TFilePath &path, bool loadRefImgFlag)
 {
 	try {
 		if (path.getType() != "tpl")
@@ -355,7 +354,8 @@ bool StudioPalette::isPalette(const TFilePath &path)
 }
 
 //-------------------------------------------------------------------
-/*! check if the palette is studio palette or level palette in order to separate icons in the StudioPaletteTree.
+/*! check if the palette is studio palette or level palette in order to separate icons in the
+ * StudioPaletteTree.
 */
 bool StudioPalette::hasGlobalName(const TFilePath &path)
 {
@@ -427,7 +427,8 @@ TFilePath StudioPalette::createPalette(const TFilePath &folderPath, std::string 
 
 //-------------------------------------------------------------------
 
-void StudioPalette::setPalette(const TFilePath &palettePath, const TPalette *plt, bool notifyPaletteChanged)
+void StudioPalette::setPalette(const TFilePath &palettePath, const TPalette *plt,
+							   bool notifyPaletteChanged)
 {
 	assert(palettePath.getType() == "tpl");
 	TPalette *palette = plt->clone();
@@ -470,9 +471,7 @@ void StudioPalette::deleteFolder(const TFilePath &path)
 
 //-------------------------------------------------------------------
 
-TFilePath StudioPalette::importPalette(
-	const TFilePath &dstFolder,
-	const TFilePath &srcPath)
+TFilePath StudioPalette::importPalette(const TFilePath &dstFolder, const TFilePath &srcPath)
 {
 	TPaletteP palette;
 	std::string ext = srcPath.getType();
@@ -507,7 +506,7 @@ TFilePath StudioPalette::importPalette(
 
 //-------------------------------------------------------------------
 
-//TFilePath StudioPalette::getRefImage(const TFilePath palette)
+// TFilePath StudioPalette::getRefImage(const TFilePath palette)
 //{
 //  return palette.withType("pli");
 //}
@@ -591,9 +590,7 @@ bool StudioPalette::updateLinkedColors(TPalette *palette)
 		it = table.find(paletteId);
 		TPalette *spPalette = 0;
 		if (it == table.end()) {
-			spPalette =
-				StudioPalette::instance()
-					->getPalette(paletteId);
+			spPalette = StudioPalette::instance()->getPalette(paletteId);
 			if (!spPalette)
 				continue;
 			table[paletteId] = spPalette;
@@ -609,7 +606,7 @@ bool StudioPalette::updateLinkedColors(TPalette *palette)
 			spStyle = spStyle->clone();
 			spStyle->setGlobalName(gname);
 
-			//put the style name in the studio palette into the original name
+			// put the style name in the studio palette into the original name
 			spStyle->setOriginalName(spStyle->getName());
 			//.. and keep the style name unchanged
 			spStyle->setName(cs->getName());
@@ -684,9 +681,8 @@ void StudioPalette::addListener(Listener *listener)
 
 void StudioPalette::removeListener(Listener *listener)
 {
-	m_listeners.erase(
-		std::remove(m_listeners.begin(), m_listeners.end(), listener),
-		m_listeners.end());
+	m_listeners.erase(std::remove(m_listeners.begin(), m_listeners.end(), listener),
+					  m_listeners.end());
 }
 
 //-------------------------------------------------------------------

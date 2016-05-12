@@ -16,7 +16,8 @@
 
 namespace
 {
-TVectorImageP vectorize(const TImageP &source, const TRectD &rect, const VectorizerConfiguration &config, TAffine transform)
+TVectorImageP vectorize(const TImageP &source, const TRectD &rect,
+						const VectorizerConfiguration &config, TAffine transform)
 {
 	VectorizerCore vc;
 	TVectorImageP vi = vc.vectorize(source.getPointer(), config, source->getPalette());
@@ -44,14 +45,13 @@ TVectorImageP vectorize(const TImageP &source, const TRectD &rect, const Vectori
 	return vi;
 }
 
-} //namspace
+} // namspace
 
 //===================================================================
 // RasterImageData
 //-------------------------------------------------------------------
 
-RasterImageData::RasterImageData()
-	: m_dpiX(0), m_dpiY(0), m_transformation(), m_dim()
+RasterImageData::RasterImageData() : m_dpiX(0), m_dpiY(0), m_transformation(), m_dim()
 {
 }
 
@@ -65,8 +65,7 @@ RasterImageData::~RasterImageData()
 // ToonzImageData
 //-------------------------------------------------------------------
 
-ToonzImageData::ToonzImageData()
-	: RasterImageData(), m_copiedRaster(0), m_palette(new TPalette())
+ToonzImageData::ToonzImageData() : RasterImageData(), m_copiedRaster(0), m_palette(new TPalette())
 {
 }
 
@@ -93,8 +92,9 @@ ToonzImageData::~ToonzImageData()
 
 //-------------------------------------------------------------------
 
-void ToonzImageData::setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX, double dpiY, const TDimension &dim,
-							 const std::vector<TRectD> &rects, const std::vector<TStroke> &strokes,
+void ToonzImageData::setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX,
+							 double dpiY, const TDimension &dim, const std::vector<TRectD> &rects,
+							 const std::vector<TStroke> &strokes,
 							 const std::vector<TStroke> &originalStrokes,
 							 const TAffine &transformation)
 {
@@ -116,8 +116,9 @@ void ToonzImageData::setData(const TRasterP &copiedRaster, const TPaletteP &pale
 //-------------------------------------------------------------------
 
 void ToonzImageData::getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
-							 std::vector<TRectD> &rects, std::vector<TStroke> &strokes, std::vector<TStroke> &originalStrokes,
-							 TAffine &transformation, TPalette *targetPalette) const
+							 std::vector<TRectD> &rects, std::vector<TStroke> &strokes,
+							 std::vector<TStroke> &originalStrokes, TAffine &transformation,
+							 TPalette *targetPalette) const
 {
 	if (!m_copiedRaster || (m_rects.empty() && m_strokes.empty()))
 		return;
@@ -175,7 +176,9 @@ StrokesData *ToonzImageData::toStrokesData(ToonzScene *scene) const
 	CenterlineConfiguration cConf = vParams.getCenterlineConfiguration(0.0);
 	NewOutlineConfiguration oConf = vParams.getOutlineConfiguration(0.0);
 
-	const VectorizerConfiguration &config = vParams.m_isOutline ? static_cast<const VectorizerConfiguration &>(oConf) : static_cast<const VectorizerConfiguration &>(cConf);
+	const VectorizerConfiguration &config =
+		vParams.m_isOutline ? static_cast<const VectorizerConfiguration &>(oConf)
+							: static_cast<const VectorizerConfiguration &>(cConf);
 
 	TVectorImageP vi = vectorize(image, rect, config, m_transformation);
 
@@ -198,8 +201,7 @@ int ToonzImageData::getMemorySize() const
 		size += m_strokes[i].getControlPointCount() * sizeof(TThickPoint) + 100;
 	for (i = 0; i < (int)m_originalStrokes.size(); i++)
 		size += m_originalStrokes[i].getControlPointCount() * sizeof(TThickPoint) + 100;
-	return size + sizeof(*(m_copiedRaster.getPointer())) +
-		   sizeof(*(m_palette.getPointer())) +
+	return size + sizeof(*(m_copiedRaster.getPointer())) + sizeof(*(m_palette.getPointer())) +
 		   sizeof(*this);
 }
 
@@ -234,8 +236,10 @@ FullColorImageData::~FullColorImageData()
 
 //-------------------------------------------------------------------
 
-void FullColorImageData::setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX, double dpiY, const TDimension &dim,
-								 const std::vector<TRectD> &rects, const std::vector<TStroke> &strokes,
+void FullColorImageData::setData(const TRasterP &copiedRaster, const TPaletteP &palette,
+								 double dpiX, double dpiY, const TDimension &dim,
+								 const std::vector<TRectD> &rects,
+								 const std::vector<TStroke> &strokes,
 								 const std::vector<TStroke> &originalStrokes,
 								 const TAffine &transformation)
 {
@@ -253,8 +257,9 @@ void FullColorImageData::setData(const TRasterP &copiedRaster, const TPaletteP &
 //-------------------------------------------------------------------
 
 void FullColorImageData::getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
-								 std::vector<TRectD> &rects, std::vector<TStroke> &strokes, std::vector<TStroke> &originalStrokes,
-								 TAffine &transformation, TPalette *targetPalette) const
+								 std::vector<TRectD> &rects, std::vector<TStroke> &strokes,
+								 std::vector<TStroke> &originalStrokes, TAffine &transformation,
+								 TPalette *targetPalette) const
 {
 	if (!m_copiedRaster || (m_rects.empty() && m_strokes.empty()))
 		return;
@@ -335,7 +340,6 @@ int FullColorImageData::getMemorySize() const
 		size += m_strokes[i].getControlPointCount() * sizeof(TThickPoint) + 100;
 	for (i = 0; i < (int)m_originalStrokes.size(); i++)
 		size += m_originalStrokes[i].getControlPointCount() * sizeof(TThickPoint) + 100;
-	return size + sizeof(*(m_copiedRaster.getPointer())) +
-		   sizeof(*(m_palette.getPointer())) +
+	return size + sizeof(*(m_copiedRaster.getPointer())) + sizeof(*(m_palette.getPointer())) +
 		   sizeof(*this);
 }

@@ -59,7 +59,7 @@ DVVAR extern const double inch;
 
 class DVAPI Player
 {
-public:
+  public:
 	std::vector<int> m_masks;
 
 	TAffine m_placement; //!< Placement affine (no dpi)
@@ -70,8 +70,9 @@ public:
 
 	int m_onionSkinDistance; //!< Temporal distance from an onion skin 'companion' (supposedly)
 
-	int m_ancestorColumnIndex;   //!< Index of this object's hierarchycal root (top-most column)
-	bool m_isCurrentColumn;		 //!< Whether this player emanates from (a descendant of) the current column
+	int m_ancestorColumnIndex; //!< Index of this object's hierarchycal root (top-most column)
+	bool m_isCurrentColumn;	//!< Whether this player emanates from (a descendant of) the current
+							   //!column
 	bool m_isCurrentXsheetLevel; //!< Whether the player's xsheet is the \a current one
 
 	TXshSimpleLevel *m_sl; //!< (not owned) The player's simple level
@@ -90,14 +91,15 @@ public:
 	static double m_onionSkinFrontSize;
 	static double m_onionSkinBackSize;
 
-public:
+  public:
 	Player();
 
 	TImageP image() const; //!< Returns the image associated to m_sl at m_fid
 
 	//! Returns the texture data associated to the player
 	/*!
-    \note In case of vector images or sub-xsheet levels, the texture will have a fixed 1024 x 1024 resolution.
+	\note In case of vector images or sub-xsheet levels, the texture will have a fixed 1024 x 1024
+	resolution.
   */
 	DrawableTextureDataP texture() const;
 };

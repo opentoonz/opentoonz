@@ -6,7 +6,7 @@
 #define TILE_BIT_SIZE 6
 #define TILE_SIZE_MINUS_1 63
 
-//divisione per tileSize approssimata per eccesso
+// divisione per tileSize approssimata per eccesso
 inline int divSup(int x)
 {
 	// return (x & TILE_SIZE_MINUS_1)? (x>>TILE_BIT_SIZE)+1 : (x>>TILE_BIT_SIZE);
@@ -16,7 +16,8 @@ inline int divSup(int x)
 //------------------------------------------------------------------------
 
 TTileSaverCM32::TTileSaverCM32(const TRasterCM32P &raster, TTileSetCM32 *tileSet)
-	: m_raster(raster), m_tileSet(tileSet), m_rowSize(divSup(raster->getLx())), m_savedTiles(m_rowSize * divSup(raster->getLy()), 0)
+	: m_raster(raster), m_tileSet(tileSet), m_rowSize(divSup(raster->getLx())),
+	  m_savedTiles(m_rowSize * divSup(raster->getLy()), 0)
 {
 }
 
@@ -74,7 +75,8 @@ TTileSetCM32 *TTileSaverCM32::getTileSet() const
 //********************************************************************************
 
 TTileSaverFullColor::TTileSaverFullColor(const TRasterP &raster, TTileSetFullColor *tileSet)
-	: m_raster(raster), m_tileSet(tileSet), m_rowSize(divSup(raster->getLx())), m_savedTiles(m_rowSize * divSup(raster->getLy()), 0)
+	: m_raster(raster), m_tileSet(tileSet), m_rowSize(divSup(raster->getLx())),
+	  m_savedTiles(m_rowSize * divSup(raster->getLy()), 0)
 {
 }
 

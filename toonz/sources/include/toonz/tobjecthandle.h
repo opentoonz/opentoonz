@@ -40,7 +40,7 @@ class DVAPI TObjectHandle : public QObject
 	TVectorImage *m_splineImage;
 	TStageObjectSpline *m_currentSpline;
 
-public:
+  public:
 	TObjectHandle();
 	~TObjectHandle();
 
@@ -56,13 +56,13 @@ public:
 	TVectorImage *getSplineImage() const { return m_splineImage; }
 	void setSplineObject(TStageObjectSpline *splineObject);
 
-signals:
+  signals:
 	void objectSwitched();
 	void objectChanged(bool isDragging);
 	void splineChanged();
 
-public slots:
+  public slots:
 	void commitSplineChanges();
 };
 
-#endif //TOBJECTHANDLE_H
+#endif // TOBJECTHANDLE_H

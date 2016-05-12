@@ -116,7 +116,7 @@ inline TRectD getImageBoundsD(const TImageP &img)
 
 class FlipZoomer : public ImageUtils::ShortcutZoomer
 {
-public:
+  public:
 	FlipZoomer(ImageViewer *parent) : ShortcutZoomer(parent) {}
 
 	bool zoom(bool zoomin, bool resetZoom)
@@ -147,7 +147,7 @@ class ImageViewerShortcutReceiver
 {
 	FlipBook *m_flipbook;
 
-public:
+  public:
 	ImageViewerShortcutReceiver(FlipBook *flipbook) : m_flipbook(flipbook) {}
 	~ImageViewerShortcutReceiver() {}
 
@@ -178,7 +178,7 @@ public:
 		return false;
 	}
 };
-} //namespace
+} // namespace
 
 //=============================================================================
 
@@ -205,12 +205,16 @@ public:
 */
 
 ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook, bool showHistogram)
-	: QGLWidget(parent), m_pressedMousePos(0, 0), m_mouseButton(Qt::NoButton), m_draggingZoomSelection(false), m_image(), m_FPS(0), m_viewAff(), m_pos(0, 0), m_visualSettings(), m_compareSettings(), m_isHistogramEnable(showHistogram), m_flipbook(flipbook), m_isColorModel(false), m_histogramPopup(0), m_isRemakingPreviewFx(false)
+	: QGLWidget(parent), m_pressedMousePos(0, 0), m_mouseButton(Qt::NoButton),
+	  m_draggingZoomSelection(false), m_image(), m_FPS(0), m_viewAff(), m_pos(0, 0),
+	  m_visualSettings(), m_compareSettings(), m_isHistogramEnable(showHistogram),
+	  m_flipbook(flipbook), m_isColorModel(false), m_histogramPopup(0), m_isRemakingPreviewFx(false)
 	  //, m_ghibli3DLutUtil(0) //iwsw commented out temporarily
 	  ,
 	  m_rectRGBPick(false)
 {
-	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
+	m_visualSettings.m_sceneProperties =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties();
 	m_visualSettings.m_drawExternalBG = true;
 	setAttribute(Qt::WA_KeyCompression);
 	setFocusPolicy(Qt::StrongFocus);
@@ -220,8 +224,9 @@ ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook, bool showHistogram
 	if (m_isHistogramEnable)
 		m_histogramPopup = new HistogramPopup(tr("Flipbook Histogram"));
 
-	//iwsw commented out 2 lines temporarily
-	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && Ghibli3DLutUtil::m_isValid)
+	// iwsw commented out 2 lines temporarily
+	// if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
+	// Ghibli3DLutUtil::m_isValid)
 	//	m_ghibli3DLutUtil = new Ghibli3DLutUtil();
 }
 
@@ -244,26 +249,31 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event)
 	if (m_flipbook->getPreviewedFx()) {
 		if (!(windowState() & Qt::WindowFullScreen)) {
 			action = menu->addAction(tr("Clone Preview"));
-			action->setShortcut(QKeySequence(CommandManager::instance()->getKeyFromId(MI_ClonePreview)));
+			action->setShortcut(
+				QKeySequence(CommandManager::instance()->getKeyFromId(MI_ClonePreview)));
 			connect(action, SIGNAL(triggered()), m_flipbook, SLOT(clonePreview()));
 		}
 
 		if (m_flipbook->isFreezed()) {
 			action = menu->addAction(tr("Unfreeze Preview"));
-			action->setShortcut(QKeySequence(CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
+			action->setShortcut(
+				QKeySequence(CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
 			connect(action, SIGNAL(triggered()), m_flipbook, SLOT(unfreezePreview()));
 		} else {
 			action = menu->addAction(tr("Freeze Preview"));
-			action->setShortcut(QKeySequence(CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
+			action->setShortcut(
+				QKeySequence(CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
 			connect(action, SIGNAL(triggered()), m_flipbook, SLOT(freezePreview()));
 		}
 
 		action = menu->addAction(tr("Regenerate Preview"));
-		action->setShortcut(QKeySequence(CommandManager::instance()->getKeyFromId(MI_RegeneratePreview)));
+		action->setShortcut(
+			QKeySequence(CommandManager::instance()->getKeyFromId(MI_RegeneratePreview)));
 		connect(action, SIGNAL(triggered()), m_flipbook, SLOT(regenerate()));
 
 		action = menu->addAction(tr("Regenerate Frame Preview"));
-		action->setShortcut(QKeySequence(CommandManager::instance()->getKeyFromId(MI_RegenerateFramePr)));
+		action->setShortcut(
+			QKeySequence(CommandManager::instance()->getKeyFromId(MI_RegenerateFramePr)));
 		connect(action, SIGNAL(triggered()), m_flipbook, SLOT(regenerateFrame()));
 
 		menu->addSeparator();
@@ -297,9 +307,11 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event)
 			dynamic_cast<ImageUtils::FullScreenWidget *>(parentWidget())) {
 		bool isFullScreen = (fsWidget->windowState() & Qt::WindowFullScreen) != 0;
 
-		action = menu->addAction(isFullScreen ? tr("Exit Full Screen Mode") : tr("Full Screen Mode"));
+		action =
+			menu->addAction(isFullScreen ? tr("Exit Full Screen Mode") : tr("Full Screen Mode"));
 
-		action->setShortcut(QKeySequence(CommandManager::instance()->getKeyFromId(V_ShowHideFullScreen)));
+		action->setShortcut(
+			QKeySequence(CommandManager::instance()->getKeyFromId(V_ShowHideFullScreen)));
 		connect(action, SIGNAL(triggered()), fsWidget, SLOT(toggleFullScreen()));
 	}
 
@@ -335,7 +347,8 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event)
 void ImageViewer::setVisual(const ImagePainter::VisualSettings &settings)
 {
 	m_visualSettings = settings;
-	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
+	m_visualSettings.m_sceneProperties =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties();
 	m_visualSettings.m_drawExternalBG = true;
 }
 
@@ -343,7 +356,7 @@ void ImageViewer::setVisual(const ImagePainter::VisualSettings &settings)
 
 ImageViewer::~ImageViewer()
 {
-	//iwsw commented out temporarily
+	// iwsw commented out temporarily
 	/*
 	if (m_ghibli3DLutUtil)
 	{
@@ -406,8 +419,8 @@ void ImageViewer::initializeGL()
 	// glClearColor(1.0,1.0,1.0,1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	//iwsw commented out temporarily
-	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
+	// iwsw commented out temporarily
+	// if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 	//  m_ghibli3DLutUtil->onInit();
 }
 
@@ -427,8 +440,8 @@ void ImageViewer::resizeGL(int w, int h)
 	glTranslatef(0.375, 0.375, 0.0);
 	glTranslated(w * 0.5, h * 0.5, 0);
 
-	//iwsw commented out temporarily
-	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
+	// iwsw commented out temporarily
+	// if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 	//	m_ghibli3DLutUtil->onResize(w, h);
 }
 
@@ -436,34 +449,40 @@ void ImageViewer::resizeGL(int w, int h)
 
 void ImageViewer::paintGL()
 {
-	//iwsw commented out temporarily
-	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
+	// iwsw commented out temporarily
+	// if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 	//	m_ghibli3DLutUtil->startDraw();
 
 	TDimension viewerSize(width(), height());
 	TAffine aff = m_viewAff;
 
-	//if (!m_visualSettings.m_defineLoadbox && m_flipbook && m_flipbook->getLoadbox()!=TRect())
-	//  offs = convert(m_flipbook->getLoadbox().getP00())-TPointD(m_flipbook->getImageSize().lx/2.0, m_flipbook->getImageSize().ly/2.0);
+	// if (!m_visualSettings.m_defineLoadbox && m_flipbook && m_flipbook->getLoadbox()!=TRect())
+	//  offs = convert(m_flipbook->getLoadbox().getP00())-TPointD(m_flipbook->getImageSize().lx/2.0,
+	//  m_flipbook->getImageSize().ly/2.0);
 
 	TDimension imageSize;
 	TRect loadbox;
 
 	if (m_flipbook) {
-		QString title = (!m_image) ? m_flipbook->getTitle() + tr("  ::  Zoom : ") + QString::number(tround(sqrt(m_viewAff.det()) * 100)) + " %"
-								   : m_flipbook->getLevelZoomTitle() + tr("  ::  Zoom : ") + QString::number(tround(sqrt(m_viewAff.det()) * 100)) + " %";
+		QString title = (!m_image)
+							? m_flipbook->getTitle() + tr("  ::  Zoom : ") +
+								  QString::number(tround(sqrt(m_viewAff.det()) * 100)) + " %"
+							: m_flipbook->getLevelZoomTitle() + tr("  ::  Zoom : ") +
+								  QString::number(tround(sqrt(m_viewAff.det()) * 100)) + " %";
 		m_flipbook->parentWidget()->setWindowTitle(title);
 		imageSize = m_flipbook->getImageSize();
 		if (m_visualSettings.m_useLoadbox && m_flipbook->getLoadbox() != TRect())
 			loadbox = m_flipbook->getLoadbox();
 	}
-	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
+	m_visualSettings.m_sceneProperties =
+		TApp::instance()->getCurrentScene()->getScene()->getProperties();
 	// enable checks only in the color model
 	m_visualSettings.m_useChecks = m_isColorModel;
-	ImagePainter::paintImage(m_image, imageSize, viewerSize, aff, m_visualSettings, m_compareSettings, loadbox);
+	ImagePainter::paintImage(m_image, imageSize, viewerSize, aff, m_visualSettings,
+							 m_compareSettings, loadbox);
 
-	//when fx parameter is modified with showing the fx preview,
-	//a flipbook shows a red border line before the rendered result is shown.
+	// when fx parameter is modified with showing the fx preview,
+	// a flipbook shows a red border line before the rendered result is shown.
 	if (m_isRemakingPreviewFx) {
 		glPushMatrix();
 		glLoadIdentity();
@@ -486,8 +505,9 @@ void ImageViewer::paintGL()
 	}
 
 	if (!m_image) {
-		//iwsw commented out temporarily
-		//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
+		// iwsw commented out temporarily
+		// if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
+		// m_ghibli3DLutUtil)
 		//	m_ghibli3DLutUtil->endDraw();
 
 		return;
@@ -510,7 +530,8 @@ void ImageViewer::paintGL()
 		}
 
 		if (!vimg) {
-			TAffine aff = TTranslation(viewerSize.lx * 0.5, viewerSize.ly * 0.5) * m_viewAff * TTranslation(-centerD);
+			TAffine aff = TTranslation(viewerSize.lx * 0.5, viewerSize.ly * 0.5) * m_viewAff *
+						  TTranslation(-centerD);
 			TRectD bbox = aff * TRectD(0, 0, bounds.getLx() - 1, bounds.getLy() - 1);
 			drawSafeArea(bbox);
 		}
@@ -522,8 +543,10 @@ void ImageViewer::paintGL()
 		if (loadbox != TRect()) {
 			TPoint p00 = loadbox.getP00();
 			TPoint p11 = loadbox.getP11();
-			fromPos = TPoint(p00.x - width() * 0.5, height() * 0.5 - p00.y); //m_flipbook->getLoadbox().getP00();
-			toPos = TPoint(p11.x - width() * 0.5, height() * 0.5 - p11.y);   //m_flipbook->getLoadbox().getP11();
+			fromPos = TPoint(p00.x - width() * 0.5,
+							 height() * 0.5 - p00.y); // m_flipbook->getLoadbox().getP00();
+			toPos = TPoint(p11.x - width() * 0.5,
+						   height() * 0.5 - p11.y); // m_flipbook->getLoadbox().getP11();
 		}
 	} else if (m_draggingZoomSelection || m_rectRGBPick) {
 		fromPos = TPoint(m_pressedMousePos.x - width() * 0.5, height() * 0.5 - m_pressedMousePos.y);
@@ -532,7 +555,8 @@ void ImageViewer::paintGL()
 	if (fromPos != TPoint() || toPos != TPoint()) {
 		if (m_rectRGBPick) {
 			tglColor(TPixel32::Red);
-			//TODO: glLineStipple is deprecated in the latest OpenGL. Need to be replaced. (shun_iwasawa 2015/12/25)
+			// TODO: glLineStipple is deprecated in the latest OpenGL. Need to be replaced.
+			// (shun_iwasawa 2015/12/25)
 			glLineStipple(1, 0x3F33);
 			glEnable(GL_LINE_STIPPLE);
 
@@ -559,8 +583,8 @@ void ImageViewer::paintGL()
 		}
 	}
 
-	//iwsw commented out temporarily
-	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
+	// iwsw commented out temporarily
+	// if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 	//  m_ghibli3DLutUtil->endDraw();
 }
 
@@ -572,7 +596,7 @@ void ImageViewer::panQt(const QPoint &delta)
 	if (delta == QPoint())
 		return;
 
-	//stop panning when the image is at the edge of window
+	// stop panning when the image is at the edge of window
 	QPoint delta_(delta.x(), delta.y());
 
 	TToonzImageP timg = (TToonzImageP)m_image;
@@ -584,7 +608,9 @@ void ImageViewer::panQt(const QPoint &delta)
 		TDimension imgSize((timg) ? timg->getSize() : rimg->getRaster()->getSize());
 		int subSampling = (timg) ? timg->getSubsampling() : rimg->getSubsampling();
 
-		TPointD cornerPos = TPointD(imgSize.lx * ((isXPlus) ? -1 : 1), imgSize.ly * ((isYPlus) ? 1 : -1)) * (0.5 / (double)subSampling);
+		TPointD cornerPos =
+			TPointD(imgSize.lx * ((isXPlus) ? -1 : 1), imgSize.ly * ((isYPlus) ? 1 : -1)) *
+			(0.5 / (double)subSampling);
 		cornerPos = m_viewAff * cornerPos;
 
 		if ((cornerPos.x > 0) == isXPlus)
@@ -648,9 +674,10 @@ void ImageViewer::dragCompare(const QPoint &dp)
 void ImageViewer::updateLoadbox(const TPoint &curPos)
 {
 	TAffine aff = getImgToWidgetAffine();
-	TRect r = m_flipbook->getLoadbox(); //convert(aff*convert(m_flipbook->getLoadbox()));
+	TRect r = m_flipbook->getLoadbox(); // convert(aff*convert(m_flipbook->getLoadbox()));
 	if (m_dragType == eDrawRect)
-		r = convert(aff.inv() * convert(TRect(m_pressedMousePos, curPos))); //TRect(m_pressedMousePos, curPos);
+		r = convert(aff.inv() *
+					convert(TRect(m_pressedMousePos, curPos))); // TRect(m_pressedMousePos, curPos);
 	else if (m_dragType == eMoveRect)
 		r = r + (TPoint(curPos.x, -curPos.y) - TPoint(m_pos.x(), -m_pos.y()));
 	else {
@@ -665,13 +692,14 @@ void ImageViewer::updateLoadbox(const TPoint &curPos)
 		if (m_dragType & eMoveUp)
 			r.y0 -= fac * (curPos.y - m_pos.y());
 	}
-	m_flipbook->setLoadbox(r); //convert(aff.inv() * convert(r)));
+	m_flipbook->setLoadbox(r); // convert(aff.inv() * convert(r)));
 }
 
 //--------------------------------------------------------
 void ImageViewer::updateCursor(const TPoint &curPos)
 {
-	int dragType = getDragType(curPos, convert(getImgToWidgetAffine() * convert(m_flipbook->getLoadbox())));
+	int dragType =
+		getDragType(curPos, convert(getImgToWidgetAffine() * convert(m_flipbook->getLoadbox())));
 
 	switch (dragType) {
 	case eMoveRect:
@@ -720,9 +748,9 @@ void ImageViewer::mouseMoveEvent(QMouseEvent *event)
 		return;
 	}
 
-	//setting the cursors
+	// setting the cursors
 	if (!m_isColorModel) {
-		//when the histogram window is opened, switch to the RGB picker tool
+		// when the histogram window is opened, switch to the RGB picker tool
 		if (m_isHistogramEnable && m_histogramPopup->isVisible())
 			setToolCursor(this, ToolCursor::PickerRGB);
 		else
@@ -745,7 +773,7 @@ void ImageViewer::mouseMoveEvent(QMouseEvent *event)
 
 	// pick the color if the histogram popup is opened
 	if (m_isHistogramEnable && m_histogramPopup->isVisible() && !m_isColorModel) {
-		//Rect Pick
+		// Rect Pick
 		if (m_mouseButton == Qt::LeftButton && (event->modifiers() & Qt::ControlModifier)) {
 			if (!m_rectRGBPick && !m_visualSettings.m_defineLoadbox &&
 				(abs(m_pos.x() - m_pressedMousePos.x) > 10 ||
@@ -765,12 +793,12 @@ void ImageViewer::mouseMoveEvent(QMouseEvent *event)
 		return;
 	}
 
-	if (m_mouseButton == Qt::LeftButton && !m_isColorModel && (event->modifiers() & Qt::AltModifier)) {
+	if (m_mouseButton == Qt::LeftButton && !m_isColorModel &&
+		(event->modifiers() & Qt::AltModifier)) {
 		if (!m_draggingZoomSelection && !m_visualSettings.m_defineLoadbox &&
 			(abs(m_pos.x() - m_pressedMousePos.x) > 10 ||
 			 abs(m_pos.y() - m_pressedMousePos.y) > 10) &&
-			!(m_compareSettings.m_dragCompareX || m_compareSettings.m_dragCompareY) &&
-			m_flipbook)
+			!(m_compareSettings.m_dragCompareX || m_compareSettings.m_dragCompareY) && m_flipbook)
 			m_draggingZoomSelection = true;
 
 		if (m_draggingZoomSelection)
@@ -784,7 +812,7 @@ void ImageViewer::mouseMoveEvent(QMouseEvent *event)
 }
 
 //---------------------------------------------------------------------------------------------
-/*! notify the color picked by rgb picker to palette controller 
+/*! notify the color picked by rgb picker to palette controller
 */
 void ImageViewer::setPickedColorToStyleEditor(const TPixel32 &color)
 {
@@ -806,10 +834,9 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor)
 	if (!m_histogramPopup->isVisible())
 		return;
 
-	//avoid to pick outside of the flip
-	if ((!m_image) ||
-		!rect().contains(event->pos())) {
-		//throw transparent color
+	// avoid to pick outside of the flip
+	if ((!m_image) || !rect().contains(event->pos())) {
+		// throw transparent color
 		m_histogramPopup->updateInfo(TPixel32::Transparent, TPointD(-1, -1));
 		return;
 	}
@@ -819,35 +846,34 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor)
 	TPoint mousePos = TPoint(event->pos().x(), height() - 1 - event->pos().y());
 	TRectD area = TRectD(mousePos.x, mousePos.y, mousePos.x, mousePos.y);
 
-	//iwsw commented out temporarily
-	//if (get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	// iwsw commented out temporarily
+	// if (get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 	//	get3DLutUtil()->bindFBO();
 
 	const TPixel32 pix = picker.pickColor(area);
 
-	//iwsw commented out temporarily
-	//if (get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	// iwsw commented out temporarily
+	// if (get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 	//	get3DLutUtil()->releaseFBO();
 
 	QPoint viewP = mapFrom(this, event->pos());
-	TPointD pos = getViewAff().inv() * TPointD(viewP.x() - width() / 2,
-											   -viewP.y() + height() / 2);
-	TPointD imagePos = TPointD(0.5 * m_image->getBBox().getLx() + pos.x,
-							   0.5 * m_image->getBBox().getLy() + pos.y);
+	TPointD pos = getViewAff().inv() * TPointD(viewP.x() - width() / 2, -viewP.y() + height() / 2);
+	TPointD imagePos =
+		TPointD(0.5 * m_image->getBBox().getLx() + pos.x, 0.5 * m_image->getBBox().getLy() + pos.y);
 	if (m_image->getBBox().contains(imagePos)) {
-		//throw the picked color to the histogram
+		// throw the picked color to the histogram
 		m_histogramPopup->updateInfo(pix, imagePos);
-		//throw it to the style editor as well
+		// throw it to the style editor as well
 		if (putValueToStyleEditor)
 			setPickedColorToStyleEditor(pix);
 	} else {
-		//throw transparent color if picking outside of the image
+		// throw transparent color if picking outside of the image
 		m_histogramPopup->updateInfo(TPixel32::Transparent, TPointD(-1, -1));
 	}
 }
 
 //---------------------------------------------------------------------------------------------
-/*! rectangular rgb picking. The picked color will be an average of pixels in specified rectangle 
+/*! rectangular rgb picking. The picked color will be an average of pixels in specified rectangle
 */
 void ImageViewer::rectPickColor(bool putValueToStyleEditor)
 {
@@ -867,19 +893,19 @@ void ImageViewer::rectPickColor(bool putValueToStyleEditor)
 		return;
 	}
 
-	//iwsw commented out temporarily
-	//if (get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	// iwsw commented out temporarily
+	// if (get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 	//	get3DLutUtil()->bindFBO();
 
 	const TPixel32 pix = picker.pickColor(area.enlarge(-1, -1));
 
-	//iwsw commented out temporarily
-	//if (get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	// iwsw commented out temporarily
+	// if (get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 	//	get3DLutUtil()->releaseFBO();
 
-	//throw the picked color to the histogram
+	// throw the picked color to the histogram
 	m_histogramPopup->updateAverageColor(pix);
-	//throw it to the style editor as well
+	// throw it to the style editor as well
 	if (putValueToStyleEditor)
 		setPickedColorToStyleEditor(pix);
 }
@@ -943,7 +969,8 @@ void ImageViewer::mousePressEvent(QMouseEvent *event)
 		return;
 	}
 	if (m_visualSettings.m_defineLoadbox && m_flipbook)
-		m_dragType = getDragType(m_pressedMousePos, convert(getImgToWidgetAffine() * convert(m_flipbook->getLoadbox())));
+		m_dragType = getDragType(
+			m_pressedMousePos, convert(getImgToWidgetAffine() * convert(m_flipbook->getLoadbox())));
 	else if (m_visualSettings.m_doCompare) {
 		if (fabs(m_pos.x() - width() * m_compareSettings.m_compareX) < 20) {
 			m_compareSettings.m_dragCompareX = true;
@@ -960,7 +987,9 @@ void ImageViewer::mousePressEvent(QMouseEvent *event)
 	}
 
 	// pick color and throw it to the style editor
-	if (m_isHistogramEnable && m_histogramPopup->isVisible() && !m_isColorModel && !(event->modifiers() & Qt::ControlModifier)) // if ctrl button is pressed, which means rectangular pick
+	if (m_isHistogramEnable && m_histogramPopup->isVisible() && !m_isColorModel &&
+		!(event->modifiers() &
+		  Qt::ControlModifier)) // if ctrl button is pressed, which means rectangular pick
 	{
 		update();
 		pickColor(event, true);
@@ -991,9 +1020,9 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent *event)
 	}
 
 	if (m_rectRGBPick) {
-		//pick color in the rectangular region
+		// pick color in the rectangular region
 		rectPickColor(true);
-		//release the flag
+		// release the flag
 		m_rectRGBPick = false;
 		update();
 	}
@@ -1032,7 +1061,7 @@ void ImageViewer::setViewAff(TAffine viewAff)
 	m_viewAff = viewAff;
 	update();
 	if (m_flipbook && m_flipbook->getPreviewedFx())
-		//Update the observable fx region
+		// Update the observable fx region
 		m_flipbook->schedulePreviewedFxUpdate();
 }
 
@@ -1074,56 +1103,54 @@ TAffine ImageViewer::getImgToWidgetAffine() const
 
 //-----------------------------------------------------------------------------
 
-//!Returns the affine transform from image reference to widget's pixel one.
+//! Returns the affine transform from image reference to widget's pixel one.
 TAffine ImageViewer::getImgToWidgetAffine(const TRectD &geom) const
 {
 	TPointD geomCenter((geom.x0 + geom.x1) * 0.5, (geom.y0 + geom.y1) * 0.5);
 
 	QRect widGeom(geometry());
-	TPointD viewerCenter(
-		(widGeom.left() + widGeom.right() + 1) * 0.5,
-		(widGeom.top() + widGeom.bottom() + 1) * 0.5);
+	TPointD viewerCenter((widGeom.left() + widGeom.right() + 1) * 0.5,
+						 (widGeom.top() + widGeom.bottom() + 1) * 0.5);
 
-	return TAffine(
-		TAffine(1.0, 0.0, 0.0, 0.0, -1.0, height()) *
-		TTranslation(viewerCenter) *
-		m_viewAff *
-		TTranslation(-geomCenter));
+	return TAffine(TAffine(1.0, 0.0, 0.0, 0.0, -1.0, height()) * TTranslation(viewerCenter) *
+				   m_viewAff * TTranslation(-geomCenter));
 }
 
 //-----------------------------------------------------------------------------
 
-//!Adapts image viewer's affine to display the passed image rect at maximized ratio
+//! Adapts image viewer's affine to display the passed image rect at maximized ratio
 void ImageViewer::adaptView(const TRect &imgRect, const TRect &viewRect)
 {
 	QRect viewerRect(geometry());
 
-	double imageScale =
-		tmin(viewerRect.width() / (double)viewRect.getLx(),
-			 viewerRect.height() / (double)viewRect.getLy());
+	double imageScale = tmin(viewerRect.width() / (double)viewRect.getLx(),
+							 viewerRect.height() / (double)viewRect.getLy());
 
-	TPointD viewRectCenter((viewRect.x0 + viewRect.x1 + 1) * 0.5, (viewRect.y0 + viewRect.y1 + 1) * 0.5);
+	TPointD viewRectCenter((viewRect.x0 + viewRect.x1 + 1) * 0.5,
+						   (viewRect.y0 + viewRect.y1 + 1) * 0.5);
 	TPointD imgRectCenter((imgRect.x0 + imgRect.x1 + 1) * 0.5, (imgRect.y0 + imgRect.y1 + 1) * 0.5);
 
-	TAffine newViewAff(TScale(imageScale, imageScale) * TTranslation(imgRectCenter - viewRectCenter));
+	TAffine newViewAff(TScale(imageScale, imageScale) *
+					   TTranslation(imgRectCenter - viewRectCenter));
 	setViewAff(newViewAff);
 }
 
 //-----------------------------------------------------------------------------
 
-//!Adapts image viewer's affine to display the passed viewer rect at maximized ratio
+//! Adapts image viewer's affine to display the passed viewer rect at maximized ratio
 void ImageViewer::adaptView(const QRect &geomRect)
 {
 	if (!m_image)
 		return;
 
-	//Retrieve the rect in image reference and call the associated adaptView
+	// Retrieve the rect in image reference and call the associated adaptView
 	TRect imgBounds(getImageBounds(m_image));
 	TRectD imgBoundsD(imgBounds.x0, imgBounds.y0, imgBounds.x1 + 1, imgBounds.y1 + 1);
 
 	TRectD geomRectD(geomRect.left(), geomRect.top(), geomRect.right() + 1, geomRect.bottom() + 1);
 	TRectD viewRectD(getImgToWidgetAffine().inv() * geomRectD);
-	TRect viewRect(tfloor(viewRectD.x0), tfloor(viewRectD.y0), tceil(viewRectD.x1) - 1, tceil(viewRectD.y1) - 1);
+	TRect viewRect(tfloor(viewRectD.x0), tfloor(viewRectD.y0), tceil(viewRectD.x1) - 1,
+				   tceil(viewRectD.y1) - 1);
 
 	adaptView(imgBounds, viewRect);
 }
@@ -1143,7 +1170,7 @@ void ImageViewer::keyPressEvent(QKeyEvent *event)
 */
 class LoadRecentFlipbookImagesCommandHandler : public MenuItemHandler
 {
-public:
+  public:
 	LoadRecentFlipbookImagesCommandHandler() : MenuItemHandler(MI_LoadRecentImage) {}
 	void execute()
 	{
@@ -1172,10 +1199,7 @@ public:
 */
 class ClearRecentFlipbookImagesCommandHandler : public MenuItemHandler
 {
-public:
+  public:
 	ClearRecentFlipbookImagesCommandHandler() : MenuItemHandler(MI_ClearRecentImage) {}
-	void execute()
-	{
-		RecentFiles::instance()->clearRecentFilesList(RecentFiles::Flip);
-	}
+	void execute() { RecentFiles::instance()->clearRecentFilesList(RecentFiles::Flip); }
 } clearRecentFlipbookImagesCommandHandler;

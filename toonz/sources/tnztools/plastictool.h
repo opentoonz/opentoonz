@@ -61,12 +61,12 @@ class PlasticTool : public QObject, public TTool, public TParamObserver, public 
 
 	friend class PlasticToolOptionsBox;
 
-public:
+  public:
 	class TemporaryActivation
 	{
 		bool m_activate;
 
-	public:
+	  public:
 		TemporaryActivation(int row, int col);
 		~TemporaryActivation();
 	};
@@ -75,8 +75,7 @@ public:
 		int m_meshIdx, //!< Mesh index in a TMeshImage
 			m_idx;	 //!< Index in the referenced mesh
 
-		explicit MeshIndex(int meshIdx = -1, int idx = -1)
-			: m_meshIdx(meshIdx), m_idx(idx) {}
+		explicit MeshIndex(int meshIdx = -1, int idx = -1) : m_meshIdx(meshIdx), m_idx(idx) {}
 
 		bool operator_bool() const { return (m_meshIdx >= 0) && (m_idx >= 0); }
 
@@ -89,10 +88,11 @@ public:
 
 	typedef MultipleSelection<MeshIndex> MeshSelection;
 
-private:
-	PlasticSkeletonDeformationP m_sd;					  //!< Current column's skeleton deformation
-	int m_skelId;										  //!< Current m_sd's skeleton id
-	tcg::invalidable<PlasticSkeleton> m_deformedSkeleton; //!< The interactively-deformed \a animation-mode skeleton
+  private:
+	PlasticSkeletonDeformationP m_sd; //!< Current column's skeleton deformation
+	int m_skelId;					  //!< Current m_sd's skeleton id
+	tcg::invalidable<PlasticSkeleton>
+		m_deformedSkeleton; //!< The interactively-deformed \a animation-mode skeleton
 
 	TMeshImageP m_mi; //!< Current mesh image
 
@@ -149,21 +149,19 @@ private:
 
 	// Editing-related vars
 
-	std::auto_ptr<tcg::polymorphic> m_rigidityPainter; //!< Delegate class to deal with (undoable) rigidity painting
-	bool m_showSkeletonOS;							   //!< Whether onion-skinned skeletons must be shown
+	std::auto_ptr<tcg::polymorphic>
+		m_rigidityPainter; //!< Delegate class to deal with (undoable) rigidity painting
+	bool m_showSkeletonOS; //!< Whether onion-skinned skeletons must be shown
 
 	// Deformation-related vars
 
-	bool m_recompileOnMouseRelease; //!< Whether skeleton recompilation should happen on mouse release
+	bool m_recompileOnMouseRelease; //!< Whether skeleton recompilation should happen on mouse
+									//!release
 
-public:
-	enum Modes { MESH_IDX = 0,
-				 RIGIDITY_IDX,
-				 BUILD_IDX,
-				 ANIMATE_IDX,
-				 MODES_COUNT };
+  public:
+	enum Modes { MESH_IDX = 0, RIGIDITY_IDX, BUILD_IDX, ANIMATE_IDX, MODES_COUNT };
 
-public:
+  public:
 	PlasticTool();
 	~PlasticTool();
 
@@ -190,7 +188,7 @@ public:
 
 	bool onPropertyChanged(std::string propertyName);
 
-public:
+  public:
 	// Methods reimplemented in each interaction mode
 	void mouseMove(const TPointD &pos, const TMouseEvent &me);
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &me);
@@ -199,7 +197,7 @@ public:
 
 	void draw();
 
-public:
+  public:
 	// Skeleton methods
 
 	void setSkeletonSelection(const PlasticVertexSelection &vSel);
@@ -212,7 +210,8 @@ public:
 	void moveVertex_build(const std::vector<TPointD> &originalVxsPos, const TPointD &posShift);
 	void addVertex(const PlasticSkeletonVertex &vx);
 	void insertVertex(const PlasticSkeletonVertex &vx, int e);
-	void insertVertex(const PlasticSkeletonVertex &vx, int parent, const std::vector<int> &children);
+	void insertVertex(const PlasticSkeletonVertex &vx, int parent,
+					  const std::vector<int> &children);
 	void removeVertex();
 	void setVertexName(QString &name);
 
@@ -230,8 +229,8 @@ public:
 	void storeSkeletonId();  //!< Stores current skeleton id associated to current deformation
 
 	void onChange(); //!< Updates the tool after a deformation parameter change.
-	//!< It can be used to refresh the tool in ANIMATION mode.
-public:
+					 //!< It can be used to refresh the tool in ANIMATION mode.
+  public:
 	// Mesh methods
 
 	const MeshSelection &meshVertexesSelection() const { return m_mvSel; }
@@ -249,7 +248,7 @@ public:
 
 	void moveVertex_mesh(const std::vector<TPointD> &originalVxsPos, const TPointD &posShift);
 
-public:
+  public:
 	// Actions with associated undo
 	int addSkeleton_undo(const PlasticSkeletonP &skeleton);
 	void addSkeleton_undo(int skelId, const PlasticSkeletonP &skeleton);
@@ -259,7 +258,7 @@ public:
 
 	void editSkelId_undo(int skelId);
 
-public slots:
+  public slots:
 
 	void swapEdge_mesh_undo();
 	void collapseEdge_mesh_undo();
@@ -278,12 +277,12 @@ public slots:
 	void copyDeformation();
 	void pasteDeformation_undo();
 
-signals: // privates
+  signals: // privates
 
 	void skelIdsListChanged();
 	void skelIdChanged();
 
-protected:
+  protected:
 	void mouseMove_mesh(const TPointD &pos, const TMouseEvent &me);
 	void leftButtonDown_mesh(const TPointD &pos, const TMouseEvent &me);
 	void leftButtonDrag_mesh(const TPointD &pos, const TMouseEvent &me);
@@ -313,7 +312,7 @@ protected:
 	void draw_rigidity();
 	void draw_animate();
 
-private:
+  private:
 	// Skeleton methods
 
 	PlasticSkeleton &deformedSkeleton();
@@ -354,7 +353,7 @@ private:
 
 	void onChange(const TParamChange &);
 
-private slots:
+  private slots:
 
 	void onFrameSwitched();
 	void onColumnSwitched();
@@ -374,26 +373,26 @@ class PlasticToolOptionsBox : public GenericToolOptionsBox, public TProperty::Li
 {
 	Q_OBJECT
 
-public:
+  public:
 	PlasticToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle);
 
-private:
+  private:
 	class SkelIdsComboBox;
 
-private:
+  private:
 	TTool *m_tool;
 	GenericToolOptionsBox **m_subToolbars;
 
 	SkelIdsComboBox *m_skelIdComboBox;
 	QPushButton *m_addSkelButton, *m_removeSkelButton;
 
-private:
+  private:
 	void showEvent(QShowEvent *se);
 	void hideEvent(QHideEvent *he);
 
 	void onPropertyChanged();
 
-private slots:
+  private slots:
 
 	void onSkelIdsListChanged();
 	void onSkelIdChanged();
@@ -417,8 +416,8 @@ extern bool l_suspendParamsObservation; //!< Used to join multiple param change 
 
 // Generic functions
 
-TPointD projection(const PlasticSkeleton &skeleton,
-				   int e, const TPointD &pos); //!< Projects specified position an a skeleton edge.
+TPointD projection(const PlasticSkeleton &skeleton, int e,
+				   const TPointD &pos); //!< Projects specified position an a skeleton edge.
 
 // Global getters
 
@@ -439,9 +438,11 @@ double sdFrame(); //!< Returns current stage object's <I>parameters time</I>
 
 // Keyframe functions
 
-void setKeyframe(TDoubleParamP &param, double frame);				   //!< Sets a keyframe to the specified parameter curve.
-void setKeyframe(SkVD *vd, double frame);							   //!< Sets a keyframe to the specified vertex deformation.
-void setKeyframe(const PlasticSkeletonDeformationP &sd, double frame); //!< Sets a keyframe to an entire skeleton deformation.
+void setKeyframe(TDoubleParamP &param,
+				 double frame);			  //!< Sets a keyframe to the specified parameter curve.
+void setKeyframe(SkVD *vd, double frame); //!< Sets a keyframe to the specified vertex deformation.
+void setKeyframe(const PlasticSkeletonDeformationP &sd,
+				 double frame); //!< Sets a keyframe to an entire skeleton deformation.
 
 void invalidateXsheet(); //!< Refreshes xsheet content.
 

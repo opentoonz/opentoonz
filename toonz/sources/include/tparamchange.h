@@ -30,7 +30,7 @@ class TParam;
 
 class DVAPI TParamChange
 {
-public:
+  public:
 	TParam *m_param; //!< (not owned) The parameter being changed
 
 	double m_firstAffectedFrame,
@@ -43,9 +43,8 @@ public:
 	static double m_minFrame;
 	static double m_maxFrame;
 
-public:
-	TParamChange(TParam *param,
-				 double firstAffectedFrame, double lastAffectedFrame,
+  public:
+	TParamChange(TParam *param, double firstAffectedFrame, double lastAffectedFrame,
 				 bool keyframeChanged, bool dragging, bool undoing);
 
 	virtual ~TParamChange() {}
@@ -57,7 +56,7 @@ public:
 
 class DVAPI TParamObserver
 {
-public:
+  public:
 	virtual ~TParamObserver() {}
 
 	virtual void onChange(const TParamChange &) = 0;

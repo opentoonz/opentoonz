@@ -11,7 +11,7 @@
 // forward declaration
 class QLabel;
 class QComboBox;
-//class DVGui::MeasuredDoubleLineEdit;
+// class DVGui::MeasuredDoubleLineEdit;
 
 //=============================================================================
 // LevelCreatePopup
@@ -35,7 +35,7 @@ class LevelCreatePopup : public DVGui::Dialog
 	DVGui::MeasuredDoubleLineEdit *m_heightFld;
 	DVGui::DoubleLineEdit *m_dpiFld;
 
-public:
+  public:
 	LevelCreatePopup();
 
 	void setSizeWidgetEnable(bool isEnable);
@@ -44,13 +44,13 @@ public:
 	void update();
 	bool apply();
 
-protected:
+  protected:
 	// set m_pathFld to the default path
 	void updatePath();
 
 	void showEvent(QShowEvent *);
 
-public slots:
+  public slots:
 	void onLevelTypeChanged(const QString &text);
 	void onOkBtn();
 

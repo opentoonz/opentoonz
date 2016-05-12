@@ -30,7 +30,7 @@ class PliOuputStream : public TOutputStreamInterface
 {
 	std::vector<TStyleParam> *m_stream;
 
-public:
+  public:
 	PliOuputStream(std::vector<TStyleParam> *stream) : m_stream(stream) {}
 	TOutputStreamInterface &operator<<(double x)
 	{
@@ -72,10 +72,11 @@ class PliInputStream : public TInputStreamInterface
 	VersionNumber m_version;
 	int m_count;
 
-public:
-	PliInputStream(std::vector<TStyleParam> *stream,
-				   int majorVersion, int minorVersion)
-		: m_stream(stream), m_version(majorVersion, minorVersion), m_count(0) {}
+  public:
+	PliInputStream(std::vector<TStyleParam> *stream, int majorVersion, int minorVersion)
+		: m_stream(stream), m_version(majorVersion, minorVersion), m_count(0)
+	{
+	}
 
 	TInputStreamInterface &operator>>(double &x)
 	{
@@ -125,10 +126,10 @@ public:
 
 TPixel32 getColor(const TStroke *stroke)
 {
-	//const TStrokeStyle* style = stroke->getStyle();
-	//const TSolidColorStrokeStyle* style =   dynamic_cast<const TSolidColorStrokeStyle*>(  );
+	// const TStrokeStyle* style = stroke->getStyle();
+	// const TSolidColorStrokeStyle* style =   dynamic_cast<const TSolidColorStrokeStyle*>(  );
 
-	//if(style) return style->getAverageColor();
+	// if(style) return style->getAverageColor();
 
 	return TPixel32::Transparent;
 }
@@ -136,7 +137,7 @@ TPixel32 getColor(const TStroke *stroke)
 //---------------------------------------------------------------------------
 
 /*
-  Crea la palette dei colori, in funzione di quelli 
+  Crea la palette dei colori, in funzione di quelli
   trovati dalla funzione findColor
   */
 UINT findColor(const TPixel32 &color, const std::vector<TPixel> &colorArray)
@@ -156,7 +157,7 @@ void buildPalette(ParsedPli *pli, const TImageP img)
 	TVectorImageP tempVecImg = img;
 	TPalette *vPalette = tempVecImg->getPalette();
 	unsigned int i;
-	//if (pli->m_idWrittenColorsArray.empty())
+	// if (pli->m_idWrittenColorsArray.empty())
 	//  {
 	//  assert(vPalette);
 	//  pli->m_idWrittenColorsArray.resize(vPalette->getStyleCount());
@@ -170,9 +171,10 @@ void buildPalette(ParsedPli *pli, const TImageP img)
 		pli->m_palette_tags.push_back((PliObjectTag *)refImageTag);
 	}
 
-	//per scrivere le pages della palette, uso in modo improprio uno stile: il primo stile
-	//della paletta(o il secondo, se c'e' una refimage)  ha tutti parametri stringa, che coincidono con i nomi delle pages
-	//ilcampo m_id viene usato anche per mettere il frameIndex(per multi palette)
+	// per scrivere le pages della palette, uso in modo improprio uno stile: il primo stile
+	// della paletta(o il secondo, se c'e' una refimage)  ha tutti parametri stringa, che coincidono
+	// con i nomi delle pages
+	// ilcampo m_id viene usato anche per mettere il frameIndex(per multi palette)
 	assert(vPalette->getPageCount());
 
 	std::vector<TStyleParam> pageNames(vPalette->getPageCount());
@@ -184,7 +186,7 @@ void buildPalette(ParsedPli *pli, const TImageP img)
 
 	/*
   for(i=1 ; i<pli->m_idWrittenColorsArray.size(); i++ )
-    pli->m_idWrittenColorsArray[i]=false;
+	pli->m_idWrittenColorsArray[i]=false;
   pli->m_idWrittenColorsArray[0]=true;
   */
 
@@ -194,13 +196,13 @@ void buildPalette(ParsedPli *pli, const TImageP img)
 		if (!page)
 			continue;
 		int pageIndex = 65535;
-		//if (page)
+		// if (page)
 		pageIndex = page->getIndex();
 
 		// TColorStyle*style = tempVecImg->getPalette()->getStyle(styleId);
 		std::vector<TStyleParam> stream;
 		PliOuputStream chan(&stream);
-		style->save(chan); //viene riempito lo stream;
+		style->save(chan); // viene riempito lo stream;
 
 		assert(pageIndex >= 0 && pageIndex <= 65535);
 		StyleTag *styleTag = new StyleTag(i, pageIndex, stream.size(), stream.data());
@@ -217,7 +219,8 @@ void buildPalette(ParsedPli *pli, const TImageP img)
 		for (; it != keyFrames.end(); ++it) {
 			int frame = *it;
 			vPalette->setFrame(frame);
-			StyleTag *pageNamesTag = new StyleTag(frame, 0, 0, 0); //lo so, e' orrendo. devo mettere un numero intero
+			StyleTag *pageNamesTag =
+				new StyleTag(frame, 0, 0, 0); // lo so, e' orrendo. devo mettere un numero intero
 			pli->m_palette_tags.push_back((PliObjectTag *)pageNamesTag);
 			for (i = 1; i < (unsigned)vPalette->getStyleCount(); i++) {
 				if (vPalette->isKeyframe(i, frame)) {
@@ -226,13 +229,13 @@ void buildPalette(ParsedPli *pli, const TImageP img)
 					if (!page)
 						continue;
 					int pageIndex = 65535;
-					//if (page)
+					// if (page)
 					pageIndex = page->getIndex();
 
 					// TColorStyle*style = tempVecImg->getPalette()->getStyle(styleId);
 					std::vector<TStyleParam> stream;
 					PliOuputStream chan(&stream);
-					style->save(chan); //viene riempito lo stream;
+					style->save(chan); // viene riempito lo stream;
 
 					assert(pageIndex >= 0 && pageIndex <= 65535);
 					StyleTag *styleTag = new StyleTag(i, pageIndex, stream.size(), stream.data());
@@ -256,22 +259,22 @@ Classe locale per la scrittura di un frame del livello.
 */
 class TImageWriterPli : public TImageWriter
 {
-public:
+  public:
 	TImageWriterPli(const TFilePath &, const TFrameId &frameId, TLevelWriterPli *);
 	~TImageWriterPli() {}
 
-private:
+  private:
 	UCHAR m_precision;
-	//double m_maxThickness;
-	//not implemented
+	// double m_maxThickness;
+	// not implemented
 	TImageWriterPli(const TImageWriterPli &);
 	TImageWriterPli &operator=(const TImageWriterPli &src);
 
-public:
+  public:
 	void save(const TImageP &);
 	TFrameId m_frameId;
 
-private:
+  private:
 	TLevelWriterPli *m_lwp;
 };
 
@@ -310,7 +313,8 @@ struct CreateStrokeData {
 	CreateStrokeData() : m_styleId(-1) {}
 };
 
-void createStroke(ThickQuadraticChainTag *quadTag, TVectorImage *outVectImage, const CreateStrokeData &data)
+void createStroke(ThickQuadraticChainTag *quadTag, TVectorImage *outVectImage,
+				  const CreateStrokeData &data)
 {
 	std::vector<TThickQuadratic *> chunks(quadTag->m_numCurves);
 
@@ -325,11 +329,11 @@ void createStroke(ThickQuadraticChainTag *quadTag, TVectorImage *outVectImage, c
 
 	if (quadTag->m_isLoop)
 		stroke->setSelfLoop();
-	//stroke->setSketchMode(groupTag->m_type==GroupTag::SKETCH_STROKE);
+	// stroke->setSketchMode(groupTag->m_type==GroupTag::SKETCH_STROKE);
 	outVectImage->addStroke(stroke, false);
 }
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------
 
@@ -359,14 +363,13 @@ TImageP TImageReaderPli::doLoad()
 	CreateStrokeData strokeData;
 
 	// preparo l'immagine da restituire
-	TVectorImage
-		*outVectImage = new TVectorImage(true);
+	TVectorImage *outVectImage = new TVectorImage(true);
 	// fisso il colore di default a nero opaco
-	//TPixel currentColor=TPixel::Black;
-	//TStrokeStyle *currStyle = NULL;
+	// TPixel currentColor=TPixel::Black;
+	// TStrokeStyle *currStyle = NULL;
 	// chiudo tutto dentro un blocco try per  cautelarmi
 	//  dalle eccezioni generate in lettura
-	//try
+	// try
 	//{
 	// un contatore
 	UINT i;
@@ -419,7 +422,7 @@ TImageP TImageReaderPli::doLoad()
 
 //} // try
 
-//catch(...) // cosi' e' inutile o raccolgo qualcosa prima di rilanciare o lo elimino
+// catch(...) // cosi' e' inutile o raccolgo qualcosa prima di rilanciare o lo elimino
 //{
 //  throw;
 // }
@@ -450,10 +453,7 @@ TRect TImageReaderPli::getBBox() const
 
 //=============================================================================
 
-TImageWriterPli::TImageWriterPli(
-	const TFilePath &f,
-	const TFrameId &frameId,
-	TLevelWriterPli *pli)
+TImageWriterPli::TImageWriterPli(const TFilePath &f, const TFrameId &frameId, TLevelWriterPli *pli)
 	: TImageWriter(f), m_frameId(frameId), m_lwp(pli), m_precision(2)
 //, m_maxThickness(0)
 {
@@ -476,11 +476,12 @@ void putStroke(TStroke *stroke, int &currStyleId, std::vector<PliObjectTag *> &t
 		std::unique_ptr<TUINT32[]> color(new TUINT32[1]);
 		color[0] = (TUINT32)styleId;
 
-		std::unique_ptr<ColorTag> colorTag(new ColorTag(ColorTag::SOLID, ColorTag::STROKE_COLOR, 1, std::move(color)));
+		std::unique_ptr<ColorTag> colorTag(
+			new ColorTag(ColorTag::SOLID, ColorTag::STROKE_COLOR, 1, std::move(color)));
 		tags.push_back(colorTag.release());
 	}
 
-	//If the outline options are non-standard (not round), add the outline infos
+	// If the outline options are non-standard (not round), add the outline infos
 	TStroke::OutlineOptions &options = stroke->outlineOptions();
 	if (options.m_capStyle != TStroke::OutlineOptions::ROUND_CAP ||
 		options.m_joinStyle != TStroke::OutlineOptions::ROUND_JOIN) {
@@ -496,13 +497,14 @@ void putStroke(TStroke *stroke, int &currStyleId, std::vector<PliObjectTag *> &t
 	}
 	maxThickness = tmax(maxThickness, stroke->getChunk(chunkCount - 1)->getThickP2().thick);
 
-	ThickQuadraticChainTag *quadChainTag = new ThickQuadraticChainTag(k, &strokeChain[0], maxThickness);
+	ThickQuadraticChainTag *quadChainTag =
+		new ThickQuadraticChainTag(k, &strokeChain[0], maxThickness);
 	quadChainTag->m_isLoop = stroke->isSelfLoop();
 
-	//pli->addTag((PliObjectTag *)quadChainTag);
+	// pli->addTag((PliObjectTag *)quadChainTag);
 
 	tags.push_back((PliObjectTag *)quadChainTag);
-	//pli->addTag(groupTag[count++]);
+	// pli->addTag(groupTag[count++]);
 }
 
 //-----------------------------------------------------------------------------
@@ -525,24 +527,25 @@ void TImageWriterPli::save(const TImageP &img)
 
 	// alloco l'oggetto m_lwp->m_pli ( di tipo ParsedPli ) che si occupa di costruire la struttura
 	if (!m_lwp->m_pli) {
-		m_lwp->m_pli.reset(new ParsedPli(m_lwp->m_frameNumber, m_precision, 40, tempVecImg->getAutocloseTolerance()));
+		m_lwp->m_pli.reset(new ParsedPli(m_lwp->m_frameNumber, m_precision, 40,
+										 tempVecImg->getAutocloseTolerance()));
 		m_lwp->m_pli->setCreator(m_lwp->m_creator);
 	}
 	buildPalette(m_lwp->m_pli.get(), img);
 
 	ParsedPli *pli = m_lwp->m_pli.get();
 
-	/* 
-  comunico che il numero di frame e' aumentato (il parsed lo riceve nel 
+	/*
+  comunico che il numero di frame e' aumentato (il parsed lo riceve nel
   solo nel costruttore)
   */
 	pli->setFrameCount(m_lwp->m_frameNumber);
 
 	// alloco la struttura che conterra' i tag per la vector image corrente
 	std::vector<PliObjectTag *> tags;
-	//tags = new   std::vector<PliObjectTag *>;
+	// tags = new   std::vector<PliObjectTag *>;
 
-	//Store the precision scale to be used in saving the quadratics
+	// Store the precision scale to be used in saving the quadratics
 	{
 		int precisionScale = sq(128);
 		pli->precisionScale() = precisionScale;
@@ -568,7 +571,8 @@ void TImageWriterPli::save(const TImageP &img)
 	}
 
 	int tagsSize = tags.size();
-	std::unique_ptr<ImageTag> imageTagPtr(new ImageTag(m_frameId, tagsSize, (tagsSize > 0) ? tags.data() : nullptr));
+	std::unique_ptr<ImageTag> imageTagPtr(
+		new ImageTag(m_frameId, tagsSize, (tagsSize > 0) ? tags.data() : nullptr));
 
 	pli->addTag(imageTagPtr.release());
 
@@ -579,8 +583,7 @@ void TImageWriterPli::save(const TImageP &img)
 
 //=============================================================================
 TLevelWriterPli::TLevelWriterPli(const TFilePath &path, TPropertyGroup *winfo)
-	: TLevelWriter(path, winfo)
-	, m_frameNumber(0)
+	: TLevelWriter(path, winfo), m_frameNumber(0)
 {
 }
 
@@ -595,7 +598,8 @@ TLevelWriterPli::~TLevelWriterPli()
 		// aggiungo il tag della palette
 		CurrStyle = NULL;
 		assert(!m_pli->m_palette_tags.empty());
-		std::unique_ptr<GroupTag> groupTag(new GroupTag(GroupTag::PALETTE, m_pli->m_palette_tags.size(), m_pli->m_palette_tags.data()));
+		std::unique_ptr<GroupTag> groupTag(new GroupTag(
+			GroupTag::PALETTE, m_pli->m_palette_tags.size(), m_pli->m_palette_tags.data()));
 		m_pli->addTag(groupTag.release(), true);
 		if (m_contentHistory) {
 			QString his = m_contentHistory->serialize();
@@ -618,7 +622,8 @@ TImageWriterP TLevelWriterPli::getFrameWriter(TFrameId fid)
 //=============================================================================
 
 TLevelReaderPli::TLevelReaderPli(const TFilePath &path)
-	: TLevelReader(path), m_palette(0), m_paletteCount(0), m_doesExist(false), m_pli(0), m_readPalette(true), m_level(), m_init(false)
+	: TLevelReader(path), m_palette(0), m_paletteCount(0), m_doesExist(false), m_pli(0),
+	  m_readPalette(true), m_level(), m_init(false)
 {
 
 	if (!(m_doesExist = TFileStatus(path).doesExist()))
@@ -646,10 +651,10 @@ TPalette *readPalette(GroupTag *paletteTag, int majorVersion, int minorVersion)
 {
 	bool newPli = (majorVersion > 5 || (majorVersion == 5 && minorVersion >= 6));
 
-	//wstring pageName(L"colors");
+	// wstring pageName(L"colors");
 	TPalette *palette = new TPalette();
-	//palette->addStyleToPage(0, pageName);
-	//palette->setStyle(0,TPixel32(255,255,255,0));
+	// palette->addStyleToPage(0, pageName);
+	// palette->setStyle(0,TPixel32(255,255,255,0));
 
 	// palette->setVersion(isNew?0:-1);
 
@@ -657,18 +662,19 @@ TPalette *readPalette(GroupTag *paletteTag, int majorVersion, int minorVersion)
 	palette->getPage(0)->removeStyle(1);
 	int frame = -1;
 
-	//int m = page->getStyleCount();
+	// int m = page->getStyleCount();
 	bool pagesRead = false;
 
-	//i primi due styletag della palette sono speciali;
-	//il primo, che potrebbe non esserci, contiene l'eventuale reference image path;
-	//il secondo, che c'e' sempre contiene i nomi delle pagine.
+	// i primi due styletag della palette sono speciali;
+	// il primo, che potrebbe non esserci, contiene l'eventuale reference image path;
+	// il secondo, che c'e' sempre contiene i nomi delle pagine.
 
 	for (unsigned int i = 0; i < paletteTag->m_numObjects; i++) {
 		StyleTag *styleTag = (StyleTag *)paletteTag->m_object[i];
 
 		if (i == 0 && styleTag->m_numParams == 1 &&
-			strncmp(styleTag->m_param[0].m_string.c_str(), "refimage", 8) == 0) //questo stile contiene l'eventuale refimagepath
+			strncmp(styleTag->m_param[0].m_string.c_str(), "refimage", 8) ==
+				0) // questo stile contiene l'eventuale refimagepath
 		{
 			palette->setRefImgPath(TFilePath(styleTag->m_param[0].m_string.c_str() + 8));
 			continue;
@@ -677,7 +683,8 @@ TPalette *readPalette(GroupTag *paletteTag, int majorVersion, int minorVersion)
 		assert(styleTag->m_type == PliTag::STYLE_NGOBJ);
 		int id = styleTag->m_id;
 		int pageIndex = styleTag->m_pageIndex;
-		if (!pagesRead && newPli) //quewsto stile contiene le stringhe dei nomi delle pagine della paletta!
+		if (!pagesRead &&
+			newPli) // quewsto stile contiene le stringhe dei nomi delle pagine della paletta!
 		{
 			pagesRead = true;
 			assert(id == 0 && pageIndex == 0);
@@ -688,12 +695,12 @@ TPalette *readPalette(GroupTag *paletteTag, int majorVersion, int minorVersion)
 					palette->getPage(0)->setName(toWideString(styleTag->m_param[j].m_string));
 				else {
 					palette->addPage(toWideString(styleTag->m_param[j].m_string));
-					//palette->getPage(j)->addStyle(TPixel32::Red);
+					// palette->getPage(j)->addStyle(TPixel32::Red);
 				}
 			}
 			continue;
 		}
-		if (styleTag->m_numParams == 0) //styletag contiene il frame di una multipalette!
+		if (styleTag->m_numParams == 0) // styletag contiene il frame di una multipalette!
 		{
 			frame = styleTag->m_id;
 			palette->setFrame(frame);
@@ -701,7 +708,8 @@ TPalette *readPalette(GroupTag *paletteTag, int majorVersion, int minorVersion)
 		}
 		TPalette::Page *page = 0;
 
-		if (pageIndex < 65535) //questo valore pseciale significa che il colore non sta in alcuna pagina
+		if (pageIndex <
+			65535) // questo valore pseciale significa che il colore non sta in alcuna pagina
 		{
 			page = palette->getPage(pageIndex);
 			assert(page);
@@ -713,7 +721,7 @@ TPalette *readPalette(GroupTag *paletteTag, int majorVersion, int minorVersion)
 			params[j] = styleTag->m_param[j];
 
 		PliInputStream chan(&params, majorVersion, minorVersion);
-		TColorStyle *style = TColorStyle::load(chan); //leggo params
+		TColorStyle *style = TColorStyle::load(chan); // leggo params
 		assert(id > 0);
 		if (id < palette->getStyleCount()) {
 			if (frame > -1) {
@@ -723,7 +731,7 @@ TPalette *readPalette(GroupTag *paletteTag, int majorVersion, int minorVersion)
 			} else
 				palette->setStyle(id, style);
 		} else {
-			assert(frame == -1); //uno stile animato, ci deve gia' essere nella paletta!
+			assert(frame == -1); // uno stile animato, ci deve gia' essere nella paletta!
 			while (palette->getStyleCount() < id)
 				palette->addStyle(TPixel32::Red);
 			if (page)
@@ -733,7 +741,7 @@ TPalette *readPalette(GroupTag *paletteTag, int majorVersion, int minorVersion)
 		}
 		if (id > 0 && page && frame == -1)
 			page->addStyle(id);
-		//m = page->getStyleCount();
+		// m = page->getStyleCount();
 	}
 	palette->setFrame(0);
 	return palette;
@@ -765,9 +773,9 @@ TLevelP TLevelReaderPli::loadInfo()
 
 	m_init = true;
 
-	//m_level = TLevelP();
+	// m_level = TLevelP();
 
-	//TLevelP level;
+	// TLevelP level;
 
 	// chiudo tutto dentro un blocco try per  cautelarmi
 	//  dalle eccezioni generate in lettura
@@ -799,10 +807,7 @@ TLevelP TLevelReaderPli::loadInfo()
 
 //-----------------------------------------------------------------------------
 
-TImageReaderPli::TImageReaderPli(
-	const TFilePath &f,
-	const TFrameId &frameId,
-	TLevelReaderPli *pli)
+TImageReaderPli::TImageReaderPli(const TFilePath &f, const TFrameId &frameId, TLevelReaderPli *pli)
 	: TImageReader(f), m_frameId(frameId), m_lrp(pli)
 {
 }

@@ -47,20 +47,20 @@ class CleanupPopup : public QDialog
 {
 	Q_OBJECT
 
-public:
+  public:
 	CleanupPopup();
 	~CleanupPopup();
 
 	void execute();
 
-protected:
+  protected:
 	void closeEvent(QCloseEvent *);
 
-private:
+  private:
 	class OverwriteDialog;
 	struct CleanupLevel;
 
-private:
+  private:
 	QProgressBar *m_progressBar;
 	QLabel *m_progressLabel;
 	QLabel *m_cleanupQuestionLabel;
@@ -72,8 +72,7 @@ private:
 	QPushButton *m_cleanupButton;
 	QPushButton *m_skipButton;
 
-	std::unique_ptr<LevelUpdater>
-		m_updater; //!< The cleanup level updater.
+	std::unique_ptr<LevelUpdater> m_updater; //!< The cleanup level updater.
 
 	bc::vector<CleanupLevel> m_cleanupLevels; //!< List of levels to be cleanupped.
 	std::pair<int, int> m_idx,				  //!< Current cleanup list position.
@@ -81,13 +80,12 @@ private:
 	bool m_firstLevelFrame;					  //!< Whether this is the first cleanupped frame on
 											  //!  current level. Used in some autoadjust cases.
 
-	std::vector<TFrameId> m_cleanuppedLevelFrames; //!< Current level's list of cleanupped frames. Used
-												   //!  to selectively build the level's unpainted backup.
-	std::unique_ptr<CleanupParameters>
-		m_params; //!< Cleanup params used to cleanup.
+	std::vector<TFrameId>
+		m_cleanuppedLevelFrames; //!< Current level's list of cleanupped frames. Used
+								 //!  to selectively build the level's unpainted backup.
+	std::unique_ptr<CleanupParameters> m_params; //!< Cleanup params used to cleanup.
 
-	std::unique_ptr<OverwriteDialog>
-		m_overwriteDialog; //!< Dialog about level overwriting options.
+	std::unique_ptr<OverwriteDialog> m_overwriteDialog; //!< Dialog about level overwriting options.
 
 	/*	Palette上書きの判断をするために、保存先Levelが既に存在するかどうかのフラグ
 		ただし、REPLACE又はNOPAINT_ONLYの場合はこのフラグは無視して必ずPaletteを上書きする
@@ -101,17 +99,19 @@ private:
 	bool m_keepOriginalPalette;
 	TPalette *m_originalPalette;
 
-private:
+  private:
 	void reset();
 	void buildCleanupList();
-	bool analyzeCleanupList();									//!< Checks m_cleanupFrames for existing output levels
-																//!  and updates it depending on user choices.  \return  Whether cleanup can take place.
-	bool isValidPosition(const std::pair<int, int> &pos) const; //!< Returns whether specified cleanup position is valid.
+	bool analyzeCleanupList(); //!< Checks m_cleanupFrames for existing output levels
+	//!  and updates it depending on user choices.  \return  Whether cleanup can take place.
+	bool isValidPosition(const std::pair<int, int> &pos)
+		const; //!< Returns whether specified cleanup position is valid.
 	QString currentString() const;
 	TImageP currentImage() const;
 
 	QString setupLevel(); //!< Prepares level for cleanup.  \return  An eventual failure message.
-	QString resetLevel(); //!< Erases existing output for the cleanup operation.  \return  An eventual failure message.
+	QString resetLevel(); //!< Erases existing output for the cleanup operation.  \return  An
+						  //!eventual failure message.
 	void closeLevel();
 
 	void cleanupFrame();
@@ -120,7 +120,7 @@ private:
 	/*--- 進捗をタスクバーから確認するため、MainWindowのタイトルバーに表示する ---*/
 	void updateTitleString();
 
-private slots:
+  private slots:
 
 	void onCleanupFrame();
 	void onSkipFrame();
@@ -138,22 +138,22 @@ class CleanupPopup::OverwriteDialog : public DVGui::ValidatedChoiceDialog
 {
 	Q_OBJECT
 
-public:
+  public:
 	OverwriteDialog();
 
 	virtual void reset();
 
-private:
+  private:
 	DVGui::LineEdit *m_suffix;
 	QString m_suffixText;
 
-private:
+  private:
 	virtual QString acceptResolution(void *obj, int resolution, bool applyToAll);
 	virtual void initializeUserInteraction(const void *obj);
 
-private slots:
+  private slots:
 
 	void onButtonClicked(int buttonId);
 };
 
-#endif //CLEANUPPOPUP_H
+#endif // CLEANUPPOPUP_H

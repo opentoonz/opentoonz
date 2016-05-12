@@ -46,7 +46,7 @@ inline QString toQString(const TFilePath &path)
 
 int HasMainLoop = -1;
 
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------------
 
 TFileStatus::TFileStatus(const TFilePath &path)
@@ -235,12 +235,15 @@ TFilePath TSystem::getDllDir()
 
 TFilePath TSystem::getUniqueFile(QString field)
 {
-	QString uuid = QUuid::createUuid().toString().replace("-", "").replace("{", "").replace("}", "").toLatin1().data();
+	QString uuid = QUuid::createUuid()
+					   .toString()
+					   .replace("-", "")
+					   .replace("{", "")
+					   .replace("}", "")
+					   .toLatin1()
+					   .data();
 
-	QString path = QDir::tempPath() +
-				   QString("\\") +
-				   field +
-				   uuid;
+	QString path = QDir::tempPath() + QString("\\") + field + uuid;
 
 	return TFilePath(path.toStdString());
 }
@@ -274,7 +277,7 @@ void setPathsPermissions(const TFilePathSet &pathSet, QFile::Permissions permiss
 }
 }
 
-//gestire exception
+// gestire exception
 void TSystem::mkDir(const TFilePath &path)
 {
 	TFilePathSet pathSet = getPathsToCreate(path);
@@ -289,14 +292,14 @@ void TSystem::mkDir(const TFilePath &path)
 }
 
 //------------------------------------------------------------
-//gestire exception
+// gestire exception
 void TSystem::rmDir(const TFilePath &path)
 {
 	if (!QDir(toQString(path.getParentDir())).rmdir(QString::fromStdString(path.getName())))
 		throw TSystemException(path, "can't remove folder!");
 }
 
-//vinz
+// vinz
 
 //------------------------------------------------------------
 
@@ -321,7 +324,7 @@ void rmDirTree(const QString &path)
 		throw TSystemException("can't remove path!");
 }
 
-} //namespace
+} // namespace
 
 //------------------------------------------------------------
 
@@ -371,16 +374,16 @@ else
 wstring getFormattedMessage(DWORD lastError)
 {
 LPVOID lpMsgBuf;
-FormatMessage( 
-    FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-    FORMAT_MESSAGE_FROM_SYSTEM | 
-    FORMAT_MESSAGE_IGNORE_INSERTS,
-    NULL,
-    lastError,
-    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-    (LPTSTR) &lpMsgBuf,
-    0,
-    NULL 
+FormatMessage(
+	FORMAT_MESSAGE_ALLOCATE_BUFFER |
+	FORMAT_MESSAGE_FROM_SYSTEM |
+	FORMAT_MESSAGE_IGNORE_INSERTS,
+	NULL,
+	lastError,
+	MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+	(LPTSTR) &lpMsgBuf,
+	0,
+	NULL
 );
 
 int wSize = MultiByteToWideChar(0,0,(char*)lpMsgBuf,-1,0,0);
@@ -389,7 +392,7 @@ if(!wSize)
 
 wchar_t* wBuffer = new wchar_t [wSize+1];
 MultiByteToWideChar(0,0,(char*)lpMsgBuf,-1,wBuffer,wSize);
-wBuffer[wSize]='\0';   
+wBuffer[wSize]='\0';
 wstring wmsg(wBuffer);
 
 delete []wBuffer;
@@ -437,7 +440,7 @@ void TSystem::renameFile(const TFilePath &dst, const TFilePath &src, bool overwr
 
 //------------------------------------------------------------
 
-//gestire gli errori con GetLastError?
+// gestire gli errori con GetLastError?
 void TSystem::deleteFile(const TFilePath &fp)
 {
 	if (!QFile::remove(toQString(fp)))
@@ -460,7 +463,7 @@ void TSystem::hideFile(const TFilePath &fp)
 
 class CaselessFilepathLess : public std::binary_function<TFilePath, TFilePath, bool>
 {
-public:
+  public:
 	bool operator()(const TFilePath &a, const TFilePath &b) const
 	{
 		wstring aa = toLower(a.getWideString());
@@ -483,7 +486,8 @@ void TSystem::readDirectory_Dir_ReadExe(TFilePathSet &dst, const TFilePath &path
 
 	std::set<TFilePath, CaselessFilepathLess> fileSet;
 
-	QStringList fil = QDir(toQString(path)).entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable);
+	QStringList fil =
+		QDir(toQString(path)).entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable);
 
 	int i;
 	for (i = 0; i < fil.size(); i++) {
@@ -508,7 +512,8 @@ void TSystem::readDirectory(TFilePathSet &groupFpSet, TFilePathSet &allFpSet, co
 	std::set<TFilePath, CaselessFilepathLess> fileSet_group;
 	std::set<TFilePath, CaselessFilepathLess> fileSet_all;
 
-	QStringList fil = QDir(toQString(path)).entryList(QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
+	QStringList fil =
+		QDir(toQString(path)).entryList(QDir::Files | QDir::NoDotAndDotDot | QDir::Readable);
 
 	if (fil.size() == 0)
 		return;
@@ -518,14 +523,14 @@ void TSystem::readDirectory(TFilePathSet &groupFpSet, TFilePathSet &allFpSet, co
 
 		TFilePath son = path + TFilePath(fi.toStdWString());
 
-		//store all file paths
+		// store all file paths
 		fileSet_all.insert(son);
 
-		//in case of the sequencial files
+		// in case of the sequencial files
 		if (son.getDots() == "..")
 			son = son.withFrame();
 
-		//store the group. insersion avoids duplication of the item
+		// store the group. insersion avoids duplication of the item
 		fileSet_group.insert(son);
 	}
 
@@ -535,8 +540,7 @@ void TSystem::readDirectory(TFilePathSet &groupFpSet, TFilePathSet &allFpSet, co
 
 //------------------------------------------------------------
 
-void TSystem::readDirectory(TFilePathSet &dst, const QDir &dir,
-							bool groupFrames)
+void TSystem::readDirectory(TFilePathSet &dst, const QDir &dir, bool groupFrames)
 {
 	if (!(dir.exists() && QFileInfo(dir.path()).isDir()))
 		throw TSystemException(TFilePath(dir.path().toStdWString()), " is not a directory");
@@ -578,7 +582,8 @@ void TSystem::readDirectory(TFilePathSet &dst, const TFilePath &path, bool group
 
 //------------------------------------------------------------
 
-void TSystem::readDirectory(TFilePathSet &dst, const TFilePathSet &pathSet, bool groupFrames, bool onlyFiles, bool getHiddenFiles)
+void TSystem::readDirectory(TFilePathSet &dst, const TFilePathSet &pathSet, bool groupFrames,
+							bool onlyFiles, bool getHiddenFiles)
 {
 	for (TFilePathSet::const_iterator it = pathSet.begin(); it != pathSet.end(); it++)
 		readDirectory(dst, *it, groupFrames, onlyFiles);
@@ -586,8 +591,8 @@ void TSystem::readDirectory(TFilePathSet &dst, const TFilePathSet &pathSet, bool
 
 //------------------------------------------------------------
 
-TFilePathSet TSystem::readDirectory(const TFilePath &path, bool groupFrames,
-									bool onlyFiles, bool getHiddenFiles)
+TFilePathSet TSystem::readDirectory(const TFilePath &path, bool groupFrames, bool onlyFiles,
+									bool getHiddenFiles)
 {
 	TFilePathSet filePathSet;
 	readDirectory(filePathSet, path, groupFrames, onlyFiles, getHiddenFiles);
@@ -596,8 +601,8 @@ TFilePathSet TSystem::readDirectory(const TFilePath &path, bool groupFrames,
 
 //------------------------------------------------------------
 
-TFilePathSet TSystem::readDirectory(const TFilePathSet &pathSet, bool groupFrames,
-									bool onlyFiles, bool getHiddenFiles)
+TFilePathSet TSystem::readDirectory(const TFilePathSet &pathSet, bool groupFrames, bool onlyFiles,
+									bool getHiddenFiles)
 {
 	TFilePathSet dst;
 	readDirectory(dst, pathSet, groupFrames, onlyFiles, getHiddenFiles);
@@ -606,7 +611,8 @@ TFilePathSet TSystem::readDirectory(const TFilePathSet &pathSet, bool groupFrame
 
 //------------------------------------------------------------
 
-void TSystem::readDirectoryTree(TFilePathSet &dst, const TFilePath &path, bool groupFrames, bool onlyFiles)
+void TSystem::readDirectoryTree(TFilePathSet &dst, const TFilePath &path, bool groupFrames,
+								bool onlyFiles)
 {
 	if (!TFileStatus(path).isDirectory())
 		throw TSystemException(path, " is not a directory");
@@ -629,7 +635,8 @@ void TSystem::readDirectoryTree(TFilePathSet &dst, const TFilePath &path, bool g
 
 //------------------------------------------------------------
 
-void TSystem::readDirectoryTree(TFilePathSet &dst, const TFilePathSet &pathSet, bool groupFrames, bool onlyFiles)
+void TSystem::readDirectoryTree(TFilePathSet &dst, const TFilePathSet &pathSet, bool groupFrames,
+								bool onlyFiles)
 {
 	for (TFilePathSet::const_iterator it = pathSet.begin(); it != pathSet.end(); it++)
 		readDirectoryTree(dst, *it, groupFrames, onlyFiles);
@@ -646,7 +653,8 @@ TFilePathSet TSystem::readDirectoryTree(const TFilePath &path, bool groupFrames,
 
 //------------------------------------------------------------
 
-TFilePathSet TSystem::readDirectoryTree(const TFilePathSet &pathSet, bool groupFrames, bool onlyFiles)
+TFilePathSet TSystem::readDirectoryTree(const TFilePathSet &pathSet, bool groupFrames,
+										bool onlyFiles)
 {
 	TFilePathSet dst;
 	readDirectoryTree(dst, pathSet, groupFrames, onlyFiles);
@@ -663,7 +671,8 @@ TFilePathSet TSystem::packLevelNames(const TFilePathSet &fps)
 		tmpSet.insert(cit->getParentDir() + cit->getLevelName());
 
 	TFilePathSet fps2;
-	for (std::set<TFilePath>::const_iterator c_sit = tmpSet.begin(); c_sit != tmpSet.end(); ++c_sit) {
+	for (std::set<TFilePath>::const_iterator c_sit = tmpSet.begin(); c_sit != tmpSet.end();
+		 ++c_sit) {
 		fps2.push_back(*c_sit);
 	}
 	return fps2;
@@ -686,7 +695,7 @@ TFilePathSet TSystem::getDisks()
 
 class LocalThread : public QThread
 {
-public:
+  public:
 	static LocalThread *currentThread() { return (LocalThread *)QThread::currentThread(); }
 	void sleep(TINT64 delay) { msleep(delay); }
 };
@@ -770,9 +779,11 @@ void TSystem::copyFileOrLevel_throw(const TFilePath &dst, const TFilePath &src)
 
 //--------------------------------------------------------------
 
-void TSystem::renameFileOrLevel_throw(const TFilePath &dst, const TFilePath &src, bool renamePalette)
+void TSystem::renameFileOrLevel_throw(const TFilePath &dst, const TFilePath &src,
+									  bool renamePalette)
 {
-	if (renamePalette && ((src.getType() == "tlv") || (src.getType() == "tzp") || (src.getType() == "tzu"))) {
+	if (renamePalette &&
+		((src.getType() == "tlv") || (src.getType() == "tzp") || (src.getType() == "tzu"))) {
 		// Special case: since renames cannot be 'grouped' in the UI, palettes are automatically
 		// renamed here if required
 		const char *type = (src.getType() == "tlv") ? "tpl" : "plt";
@@ -934,8 +945,7 @@ bool TSystem::touchParentDir(const TFilePath &fp)
 bool TSystem::showDocument(const TFilePath &path)
 {
 #ifdef _WIN32
-	int ret = (int)
-		ShellExecuteW(0, L"open", path.getWideString().c_str(), 0, 0, SW_SHOWNORMAL);
+	int ret = (int)ShellExecuteW(0, L"open", path.getWideString().c_str(), 0, 0, SW_SHOWNORMAL);
 	if (ret <= 32) {
 		return false;
 		throw TSystemException(path, "Can't open");
@@ -945,7 +955,7 @@ bool TSystem::showDocument(const TFilePath &path)
 	string cmd = "open ";
 	string thePath(toString(path.getWideString()));
 	UINT pos = 0, count = 0;
-	//string newPath;
+	// string newPath;
 	char newPath[2048];
 
 	while (pos < thePath.size()) {
@@ -973,7 +983,7 @@ void TSystem::sleep(TINT64 delay)
 	Sleep((DWORD)delay);
 }
 
-//gestire gli errori con GetLastError?
+// gestire gli errori con GetLastError?
 void TSystem::deleteFile(const TFilePath &fp)
 {
 	assert(false);
@@ -1019,7 +1029,6 @@ TSystemException::TSystemException(const std::string &msg)
 }
 //--------------------------------------------------------------
 
-TSystemException::TSystemException(const wstring &msg)
-	: m_fname(""), m_err(-1), m_msg(msg)
+TSystemException::TSystemException(const wstring &msg) : m_fname(""), m_err(-1), m_msg(msg)
 {
 }

@@ -13,9 +13,8 @@ class ino_negate : public TStandardRasterFx
 	TBoolParamP m_blue;
 	TBoolParamP m_alpha;
 
-public:
-	ino_negate()
-		: m_red(true), m_green(true), m_blue(true), m_alpha(false)
+  public:
+	ino_negate() : m_red(true), m_green(true), m_blue(true), m_alpha(false)
 	{
 		addInputPort("Source", this->m_input);
 		bindParam(this, "red", this->m_red);
@@ -32,32 +31,27 @@ public:
 			return false;
 		}
 	}
-	bool canHandle(const TRenderSettings &info, double frame)
-	{
-		return true;
-	}
-	void doCompute(
-		TTile &tile, double frame, const TRenderSettings &rend_sets);
+	bool canHandle(const TRenderSettings &info, double frame) { return true; }
+	void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
 };
 FX_PLUGIN_IDENTIFIER(ino_negate, "inoNegateFx");
 //------------------------------------------------------------
 #include "igs_negate.h"
 namespace
 {
-void fx_(
-	TRasterP in_ras, const bool sw_array[4])
+void fx_(TRasterP in_ras, const bool sw_array[4])
 {
 	/***std::vector<unsigned char> in_vec;
 	ino::ras_to_vec( in_ras, ino::channels(), in_vec );***/
 
-	TRasterGR8P in_gr8(
-		in_ras->getLy(), in_ras->getLx() * ino::channels() *
-							 ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
+	TRasterGR8P in_gr8(in_ras->getLy(),
+					   in_ras->getLx() * ino::channels() *
+						   ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
 	in_gr8->lock();
 	ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
 
 	igs::negate::change(
-		//in_ras->getRawData() // BGRA
+		// in_ras->getRawData() // BGRA
 		//&in_vec.at(0) // RGBA
 		in_gr8->getRawData()
 
@@ -76,8 +70,7 @@ void fx_(
 }
 }
 //------------------------------------------------------------
-void ino_negate::doCompute(
-	TTile &tile, double frame, const TRenderSettings &rend_sets)
+void ino_negate::doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets)
 {
 	/* ------ 接続していなければ処理しない -------------------- */
 	if (!this->m_input.isConnected()) {
@@ -86,8 +79,7 @@ void ino_negate::doCompute(
 	}
 
 	/* ------ サポートしていないPixelタイプはエラーを投げる --- */
-	if (!((TRaster32P)tile.getRaster()) &&
-		!((TRaster64P)tile.getRaster())) {
+	if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
 		throw TRopException("unsupported input pixel type");
 	}
 
@@ -107,13 +99,9 @@ void ino_negate::doCompute(
 	if (log_sw) {
 		std::ostringstream os;
 		os << "params"
-		   << "  r_sw " << sw_array[0]
-		   << "  g_sw " << sw_array[1]
-		   << "  b_sw " << sw_array[2]
-		   << "  a_sw " << sw_array[3]
-		   << "   tile w " << tile.getRaster()->getLx()
-		   << "  h " << tile.getRaster()->getLy()
-		   << "  pixbits " << ino::pixel_bits(tile.getRaster())
+		   << "  r_sw " << sw_array[0] << "  g_sw " << sw_array[1] << "  b_sw " << sw_array[2]
+		   << "  a_sw " << sw_array[3] << "   tile w " << tile.getRaster()->getLx() << "  h "
+		   << tile.getRaster()->getLy() << "  pixbits " << ino::pixel_bits(tile.getRaster())
 		   << "   frame " << frame;
 	}
 	/* ------ fx処理 ------------------------------------------ */

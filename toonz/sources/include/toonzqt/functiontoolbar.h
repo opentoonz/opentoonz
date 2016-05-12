@@ -45,7 +45,7 @@ namespace DVGui
 {
 class ToolBar : public QToolBar
 {
-public:
+  public:
 	ToolBar(QWidget *parent = 0) : QToolBar(parent)
 	{
 		setFixedHeight(22);			// ;_;
@@ -62,8 +62,7 @@ class FunctionToolbar : public DVGui::ToolBar, public TParamObserver
 {
 	Q_OBJECT
 
-	QToolBar *m_valueToolbar,
-		*m_keyframeToolbar;
+	QToolBar *m_valueToolbar, *m_keyframeToolbar;
 
 	DVGui::MeasuredDoubleLineEdit *m_valueFld;
 	FrameNavigator *m_frameNavigator;
@@ -79,7 +78,7 @@ class FunctionToolbar : public DVGui::ToolBar, public TParamObserver
 	QAction *m_valueFldAction;			// brutto: da eliminare. serve solo per fare show/hide
 	QAction *m_keyframeNavigatorAction; // brutto: da eliminare. serve solo per fare show/hide
 
-public:
+  public:
 	FunctionToolbar(QWidget *parent = 0);
 	~FunctionToolbar();
 
@@ -90,16 +89,16 @@ public:
 
 	bool anyWidgetHasFocus();
 
-signals:
+  signals:
 
 	void numericalColumnToggled();
 
-public slots:
+  public slots:
 
 	void setCurve(TDoubleParam *curve);
 	void setFrame(double frame);
 
-private slots:
+  private slots:
 
 	void onValueFieldChanged();
 	void onFrameSwitched();

@@ -21,28 +21,27 @@ namespace
 const double nine_inv = 1.0 / 9.0;
 
 /*!
-           _____|  r
-          /     |\  inner
-      __/          \___|
-                       | r 
-                          outer
+		   _____|  r
+		  /     |\  inner
+	  __/          \___|
+					   | r
+						  outer
 
-                    {  1  if  r <= r
-                    {              inner
-                    {
+					{  1  if  r <= r
+					{              inner
+					{
  bowl potential(r)= {  cos( (r - r ) / (r  - r ) * pi_2 )  if   r < r  <= r
-                    {             i      o    i                  i         o
-                    {
-                    {  0  if  r > r
-                                   o
-    
+					{             i      o    i                  i         o
+					{
+					{  0  if  r > r
+								   o
+
    */
 struct bowlPotential {
 	double m_radiusInner;
 	double m_radiusOuter;
 
-	bowlPotential(double radiusInner,
-				  double radiusOuter)
+	bowlPotential(double radiusInner, double radiusOuter)
 		: m_radiusInner(radiusInner), m_radiusOuter(radiusOuter)
 	{
 		assert(m_radiusInner > 0);
@@ -57,7 +56,8 @@ struct bowlPotential {
 		if (radiusToTest > m_radiusOuter)
 			return 0.0;
 
-		return 0.5 * (1.0 + cos((radiusToTest - m_radiusInner) / (m_radiusOuter - m_radiusInner) * TConsts::pi));
+		return 0.5 * (1.0 + cos((radiusToTest - m_radiusInner) / (m_radiusOuter - m_radiusInner) *
+								TConsts::pi));
 	}
 
 	virtual double gradient(double radiusToTest)
@@ -124,23 +124,23 @@ double derivateOfGaussianPotential(double x)
 	return -2 * x * exp(-sq(x));
 }
 
-/* 
+/*
   Check if vector distance is in segment.
   bool  pointProjectionIsInSegment( const TPointD& p, const TSegment& seg )
   {
-    TPointD 
-      a ( p - seg.getP0()),
-      b ( seg.getP1() - seg.getP0());
-    
-    double  b2 = b*b;
-    
-    if( ! isAlmostZero(b2) )
-    {
-      b2 = a * b / b2;
-      if (  0 <= b2 && b2 <= 1.0 ) return true; 
-    }
-    
-    return false;
+	TPointD
+	  a ( p - seg.getP0()),
+	  b ( seg.getP1() - seg.getP0());
+
+	double  b2 = b*b;
+
+	if( ! isAlmostZero(b2) )
+	{
+	  b2 = a * b / b2;
+	  if (  0 <= b2 && b2 <= 1.0 ) return true;
+	}
+
+	return false;
   }
 	*/
 
@@ -165,16 +165,13 @@ struct TStrokePointDeformation::Imp {
 
 	bowlPotential *m_potential;
 
-	Imp(const TPointD &center,
-		double radius)
+	Imp(const TPointD &center, double radius)
 		: m_circleCenter(center), m_circleRadius(radius), m_vect(0)
 	{
 		m_potential = new bowlPotential(0.3 * m_circleRadius, m_circleRadius);
 	}
 
-	Imp(const TPointD &vect,
-		const TPointD &center,
-		double radius)
+	Imp(const TPointD &vect, const TPointD &center, double radius)
 		: m_circleCenter(center), m_circleRadius(radius), m_vect(new TPointD(vect))
 	{
 		m_potential = new bowlPotential(0.3 * m_circleRadius, m_circleRadius);
@@ -187,18 +184,16 @@ struct TStrokePointDeformation::Imp {
 	}
 };
 
-TStrokePointDeformation::TStrokePointDeformation(const TPointD &center,
-												 double radius)
-												 : m_imp(new Imp(center, radius))
+TStrokePointDeformation::TStrokePointDeformation(const TPointD &center, double radius)
+	: m_imp(new Imp(center, radius))
 {
 }
 
 //-----------------------------------------------------------------------------
 
-TStrokePointDeformation::TStrokePointDeformation(const TPointD &vect,
-												 const TPointD &center,
+TStrokePointDeformation::TStrokePointDeformation(const TPointD &vect, const TPointD &center,
 												 double radius)
-												 : m_imp(new Imp(vect, center, radius))
+	: m_imp(new Imp(vect, center, radius))
 {
 	delete m_imp;
 }
@@ -211,7 +206,8 @@ TStrokePointDeformation::~TStrokePointDeformation()
 
 //-----------------------------------------------------------------------------
 
-TThickPoint TStrokePointDeformation::getDisplacementForControlPoint(const TStroke &stroke, UINT n) const
+TThickPoint TStrokePointDeformation::getDisplacementForControlPoint(const TStroke &stroke,
+																	UINT n) const
 {
 	// riferimento ad un punto ciccione della stroke
 	TPointD pntOfStroke(convert(stroke.getControlPoint(n)));
@@ -227,7 +223,8 @@ TThickPoint TStrokePointDeformation::getDisplacementForControlPoint(const TStrok
 	}
 }
 
-TThickPoint TStrokePointDeformation::getDisplacementForControlPointLen(const TStroke &stroke, double cpLen) const
+TThickPoint TStrokePointDeformation::getDisplacementForControlPointLen(const TStroke &stroke,
+																	   double cpLen) const
 {
 	assert(0);
 	return TThickPoint();
@@ -238,8 +235,8 @@ TThickPoint TStrokePointDeformation::getDisplacementForControlPointLen(const TSt
 TThickPoint TStrokePointDeformation::getDisplacement(const TStroke &stroke, double w) const
 {
 	// riferimento ad un punto ciccione della stroke
-	TThickPoint
-		thickPnt = m_imp->m_vect ? stroke.getControlPointAtParameter(w) : stroke.getThickPoint(w);
+	TThickPoint thickPnt =
+		m_imp->m_vect ? stroke.getControlPointAtParameter(w) : stroke.getThickPoint(w);
 
 	assert(thickPnt != TConsts::natp);
 
@@ -261,13 +258,12 @@ TThickPoint TStrokePointDeformation::getDisplacement(const TStroke &stroke, doub
 double TStrokePointDeformation::getDelta(const TStroke &stroke, double w) const
 {
 	// reference to a thickpoint
-	TThickPoint
-		thickPnt = m_imp->m_vect ? stroke.getControlPointAtParameter(w) : stroke.getThickPoint(w);
+	TThickPoint thickPnt =
+		m_imp->m_vect ? stroke.getControlPointAtParameter(w) : stroke.getThickPoint(w);
 
 	assert(thickPnt != TConsts::natp);
 
-	TPointD
-		pntOfStroke = convert(thickPnt);
+	TPointD pntOfStroke = convert(thickPnt);
 
 	double d = tdistance(pntOfStroke, m_imp->m_circleCenter);
 
@@ -283,9 +279,7 @@ double TStrokePointDeformation::getMaxDiff() const
 
 //=============================================================================
 
-TStrokeParamDeformation::TStrokeParamDeformation(const TStroke *ref,
-												 const TPointD &vect,
-												 double s,
+TStrokeParamDeformation::TStrokeParamDeformation(const TStroke *ref, const TPointD &vect, double s,
 												 double l)
 	: m_pRef(ref), m_startParameter(s), m_lengthOfDeformation(l), m_vect(new TPointD(vect))
 {
@@ -296,9 +290,7 @@ TStrokeParamDeformation::TStrokeParamDeformation(const TStroke *ref,
 
 //-----------------------------------------------------------------------------
 
-TStrokeParamDeformation::TStrokeParamDeformation(const TStroke *ref,
-												 double s,
-												 double l)
+TStrokeParamDeformation::TStrokeParamDeformation(const TStroke *ref, double s, double l)
 	: m_pRef(ref), m_startParameter(s), m_lengthOfDeformation(l), m_vect(0)
 {
 	assert(m_lengthOfDeformation >= 0);
@@ -307,7 +299,8 @@ TStrokeParamDeformation::TStrokeParamDeformation(const TStroke *ref,
 }
 
 //-----------------------------------------------------------------------------
-TThickPoint TStrokeParamDeformation::getDisplacementForControlPoint(const TStroke &stroke, UINT n) const
+TThickPoint TStrokeParamDeformation::getDisplacementForControlPoint(const TStroke &stroke,
+																	UINT n) const
 {
 	// potenziale exp^(-x^2) limitato tra [-c_maxLenghtOfGaussian,c_maxLenghtOfGaussian]
 	double diff = stroke.getLengthAtControlPoint(n);
@@ -331,11 +324,12 @@ TThickPoint TStrokeParamDeformation::getDisplacementForControlPoint(const TStrok
 	return TThickPoint();
 }
 
-TThickPoint TStrokeParamDeformation::getDisplacementForControlPointLen(const TStroke &stroke, double cpLenDiff) const
+TThickPoint TStrokeParamDeformation::getDisplacementForControlPointLen(const TStroke &stroke,
+																	   double cpLenDiff) const
 {
 	// potenziale exp^(-x^2) limitato tra [-c_maxLenghtOfGaussian,c_maxLenghtOfGaussian]
-	//double  diff =  stroke.getLengthAtControlPoint(n);
-	//double  diff =  cpLen;
+	// double  diff =  stroke.getLengthAtControlPoint(n);
+	// double  diff =  cpLen;
 
 	double diff = cpLenDiff;
 	if (fabs(diff) <= m_lengthOfDeformation) {
@@ -422,9 +416,7 @@ TStrokeParamDeformation::~TStrokeParamDeformation()
 //=============================================================================
 /*
 */
-TStrokeBenderDeformation::TStrokeBenderDeformation(const TStroke *ref,
-												   double s,
-												   double l)
+TStrokeBenderDeformation::TStrokeBenderDeformation(const TStroke *ref, double s, double l)
 	: m_pRef(ref), m_startLength(s), m_lengthOfDeformation(l), m_vect(0), m_versus(INNER)
 {
 	assert(m_lengthOfDeformation >= 0);
@@ -435,13 +427,11 @@ TStrokeBenderDeformation::TStrokeBenderDeformation(const TStroke *ref,
 
 //-----------------------------------------------------------------------------
 
-TStrokeBenderDeformation::TStrokeBenderDeformation(const TStroke *ref,
-												   const TPointD &vect,
-												   double angle,
-												   double s,
-												   int innerOrOuter,
+TStrokeBenderDeformation::TStrokeBenderDeformation(const TStroke *ref, const TPointD &vect,
+												   double angle, double s, int innerOrOuter,
 												   double l)
-	: m_pRef(ref), m_startLength(s), m_lengthOfDeformation(l), m_vect(new TPointD(vect)), m_versus(innerOrOuter), m_angle(angle)
+	: m_pRef(ref), m_startLength(s), m_lengthOfDeformation(l), m_vect(new TPointD(vect)),
+	  m_versus(innerOrOuter), m_angle(angle)
 {
 	assert(m_lengthOfDeformation >= 0);
 	if (isAlmostZero(m_lengthOfDeformation))
@@ -479,7 +469,8 @@ TThickPoint TStrokeBenderDeformation::getDisplacementForControlPoint(const TStro
 			outVal = gaussianPotential(diff);
 		} else if (m_versus == OUTER) {
 			double valForGaussian =
-				-c_maxLenghtOfGaussian + 2 * c_maxLenghtOfGaussian / m_lengthOfDeformation * strokeLengthAtParameter;
+				-c_maxLenghtOfGaussian +
+				2 * c_maxLenghtOfGaussian / m_lengthOfDeformation * strokeLengthAtParameter;
 			outVal = 1.0 - gaussianPotential(valForGaussian);
 		}
 
@@ -496,7 +487,8 @@ TThickPoint TStrokeBenderDeformation::getDisplacementForControlPoint(const TStro
 	return TThickPoint();
 }
 
-TThickPoint TStrokeBenderDeformation::getDisplacementForControlPointLen(const TStroke &stroke, double cpLen) const
+TThickPoint TStrokeBenderDeformation::getDisplacementForControlPointLen(const TStroke &stroke,
+																		double cpLen) const
 {
 	assert(0);
 	return TThickPoint();
@@ -519,7 +511,8 @@ TThickPoint TStrokeBenderDeformation::getDisplacement(const TStroke &s, double w
 				outVal = gaussianPotential(diff);
 			} else if (m_versus == OUTER) {
 				double valForGaussian =
-					-c_maxLenghtOfGaussian + 2 * c_maxLenghtOfGaussian / m_lengthOfDeformation * strokeLengthAtParameter;
+					-c_maxLenghtOfGaussian +
+					2 * c_maxLenghtOfGaussian / m_lengthOfDeformation * strokeLengthAtParameter;
 				outVal = 1.0 - gaussianPotential(valForGaussian);
 			}
 
@@ -560,7 +553,8 @@ TStrokeTwirlDeformation::TStrokeTwirlDeformation(const TPointD &center, double r
 
 //-----------------------------------------------------------------------------
 
-TStrokeTwirlDeformation::TStrokeTwirlDeformation(const TPointD &center, double radius, const TPointD &v)
+TStrokeTwirlDeformation::TStrokeTwirlDeformation(const TPointD &center, double radius,
+												 const TPointD &v)
 	: m_center(center), m_innerRadius2(sq(radius)), m_vectorOfMovement(v)
 {
 	m_outerRadius = 1.25 * radius;
@@ -592,17 +586,17 @@ double TStrokeTwirlDeformation::getDelta(const TStroke &stroke, double s) const
 {
 	/*
   vector<DoublePair>  vres;
-  
+
   if(intersect( stroke, m_center, m_outerRadius, vres))
   {
-    double totalLenght = stroke.getLength();
-    
-    if(totalLenght != 0)
-    {
-      double val =  stroke.getLength(s)/totalLenght * TConsts::pi *11.0;
-      
-      return sin(val);
-    }
+	double totalLenght = stroke.getLength();
+
+	if(totalLenght != 0)
+	{
+	  double val =  stroke.getLength(s)/totalLenght * TConsts::pi *11.0;
+
+	  return sin(val);
+	}
   }
   */
 	return 0;
@@ -621,12 +615,10 @@ double TStrokeTwirlDeformation::getMaxDiff() const
 
 //=============================================================================
 
-TStrokeThicknessDeformation::TStrokeThicknessDeformation(const TStroke *ref,
-														 const TPointD &vect,
-														 double s,
-														 double l,
-														 double versus)
-	: m_lengthOfDeformation(l), m_startParameter(s), m_versus(versus), m_vect(new TPointD(vect)), m_pRef(ref)
+TStrokeThicknessDeformation::TStrokeThicknessDeformation(const TStroke *ref, const TPointD &vect,
+														 double s, double l, double versus)
+	: m_lengthOfDeformation(l), m_startParameter(s), m_versus(versus), m_vect(new TPointD(vect)),
+	  m_pRef(ref)
 {
 	assert(m_lengthOfDeformation >= 0);
 	if (isAlmostZero(m_lengthOfDeformation))
@@ -635,9 +627,7 @@ TStrokeThicknessDeformation::TStrokeThicknessDeformation(const TStroke *ref,
 
 //-----------------------------------------------------------------------------
 
-TStrokeThicknessDeformation::TStrokeThicknessDeformation(const TStroke *ref,
-														 double s,
-														 double l)
+TStrokeThicknessDeformation::TStrokeThicknessDeformation(const TStroke *ref, double s, double l)
 	: m_lengthOfDeformation(l), m_startParameter(s), m_vect(0), m_pRef(ref)
 {
 	assert(m_lengthOfDeformation >= 0);
@@ -646,7 +636,8 @@ TStrokeThicknessDeformation::TStrokeThicknessDeformation(const TStroke *ref,
 }
 
 //-----------------------------------------------------------------------------
-TThickPoint TStrokeThicknessDeformation::getDisplacementForControlPoint(const TStroke &stroke, UINT n) const
+TThickPoint TStrokeThicknessDeformation::getDisplacementForControlPoint(const TStroke &stroke,
+																		UINT n) const
 {
 	// potenziale exp^(-x^2) limitato tra [-c_maxLenghtOfGaussian,c_maxLenghtOfGaussian]
 	double diff = stroke.getLengthAtControlPoint(n);
@@ -663,20 +654,21 @@ TThickPoint TStrokeThicknessDeformation::getDisplacementForControlPoint(const TS
 		TThickPoint delta;
 
 		if (m_vect) {
-			//tsign(m_vect->y) * 0.1
+			// tsign(m_vect->y) * 0.1
 			delta = TThickPoint(0, 0, m_versus * norm(*m_vect) * gaussianPotential(diff));
 		} else {
 			double outVal = gaussianPotential(diff);
 			delta = TThickPoint(0, 0, outVal);
 		}
-		//TThickPoint cp = stroke.getControlPoint(n);
-		//if(cp.thick + delta.thick<0.001) delta.thick = 0.001-cp.thick;
+		// TThickPoint cp = stroke.getControlPoint(n);
+		// if(cp.thick + delta.thick<0.001) delta.thick = 0.001-cp.thick;
 		return delta;
 	}
 	return TThickPoint();
 }
 
-TThickPoint TStrokeThicknessDeformation::getDisplacementForControlPointLen(const TStroke &stroke, double diff) const
+TThickPoint TStrokeThicknessDeformation::getDisplacementForControlPointLen(const TStroke &stroke,
+																		   double diff) const
 {
 
 	if (fabs(diff) <= m_lengthOfDeformation) {
@@ -689,14 +681,14 @@ TThickPoint TStrokeThicknessDeformation::getDisplacementForControlPointLen(const
 		TThickPoint delta;
 
 		if (m_vect) {
-			//tsign(m_vect->y) * 0.1
+			// tsign(m_vect->y) * 0.1
 			delta = TThickPoint(0, 0, m_versus * norm(*m_vect) * gaussianPotential(diff));
 		} else {
 			double outVal = gaussianPotential(diff);
 			delta = TThickPoint(0, 0, outVal);
 		}
-		//TThickPoint cp = stroke.getControlPoint(n);
-		//if(cp.thick + delta.thick<0.001) delta.thick = 0.001-cp.thick;
+		// TThickPoint cp = stroke.getControlPoint(n);
+		// if(cp.thick + delta.thick<0.001) delta.thick = 0.001-cp.thick;
 		return delta;
 	}
 	return TThickPoint();
@@ -765,9 +757,7 @@ TStrokeThicknessDeformation::~TStrokeThicknessDeformation()
 
 //=============================================================================
 
-TPointDeformation::TPointDeformation(const TStroke *stroke,
-									 const TPointD &center,
-									 double radius)
+TPointDeformation::TPointDeformation(const TStroke *stroke, const TPointD &center, double radius)
 	: m_strokeRef(stroke), m_center(center), m_radius(radius)
 {
 	assert(m_strokeRef);
@@ -790,8 +780,7 @@ TPointDeformation::~TPointDeformation()
 TThickPoint TPointDeformation::getDisplacement(double s) const
 {
 	// riferimento ad un punto ciccione della stroke
-	TThickPoint
-		thickPnt = m_strokeRef->getPointAtLength(s);
+	TThickPoint thickPnt = m_strokeRef->getPointAtLength(s);
 
 	assert(thickPnt != TConsts::natp);
 
@@ -810,13 +799,11 @@ TThickPoint TPointDeformation::getDisplacement(double s) const
 double TPointDeformation::getCPDensity(double s) const
 {
 	// reference to a thickpoint
-	TThickPoint
-		thickPnt = m_strokeRef->getThickPointAtLength(s);
+	TThickPoint thickPnt = m_strokeRef->getThickPointAtLength(s);
 
 	assert(thickPnt != TConsts::natp);
 
-	TPointD
-		pntOfStroke = convert(thickPnt);
+	TPointD pntOfStroke = convert(thickPnt);
 
 	double d = tdistance(pntOfStroke, m_center);
 

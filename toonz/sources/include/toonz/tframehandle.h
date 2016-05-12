@@ -31,17 +31,14 @@ class DVAPI TFrameHandle : public QObject
 {
 	Q_OBJECT
 
-public:
-	enum FrameType { SceneFrame,
-					 LevelFrame };
+  public:
+	enum FrameType { SceneFrame, LevelFrame };
 
-private:
+  private:
 	int m_frame;	// valid if m_frameType == SceneFrame
 	TFrameId m_fid; // valid if m_frameType == LevelFrame
 
-	int m_sceneFrameSize,
-		m_frame0,
-		m_frame1;
+	int m_sceneFrameSize, m_frame0, m_frame1;
 
 	std::vector<TFrameId> m_fids;
 
@@ -57,13 +54,13 @@ private:
 	double m_fps;
 	QTime m_clock;
 
-	//void startPlaying(bool looping);
-	//void stopPlaying();
+	// void startPlaying(bool looping);
+	// void stopPlaying();
 	void setTimer(int frameRate);
 
 	bool scrub(int r0, int r1, double framePerSecond);
 
-public:
+  public:
 	TFrameHandle();
 	~TFrameHandle();
 
@@ -107,7 +104,7 @@ public:
 	int getStartFrame() { return m_frame0; }
 	int getEndFrame() { return m_frame1; }
 
-public slots:
+  public slots:
 
 	void nextFrame();
 	void prevFrame();
@@ -115,15 +112,15 @@ public slots:
 	void lastFrame();
 	void setPlaying(bool isPlaying);
 
-signals:
+  signals:
 	void frameSwitched();
 	void scrubStarted();
 	void scrubStopped();
 	void frameTypeChanged();
 	void isPlayingStatusChanged();
 
-protected:
+  protected:
 	void timerEvent(QTimerEvent *event);
 };
 
-#endif //TFRAMEHANDLE_H
+#endif // TFRAMEHANDLE_H

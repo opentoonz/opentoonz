@@ -55,10 +55,8 @@ void mergePalette(const TPaletteP &targetPalette, std::map<int, int> &indexTable
 // replace palette and lacking amount of styles will be copied from the other one
 // return value will be true if the style amount is changed after the operation
 
-bool mergePalette_Overlap(
-	const TPaletteP &dstPalette,
-	const TPaletteP &copiedPalette,
-	bool keepOriginalPalette)
+bool mergePalette_Overlap(const TPaletteP &dstPalette, const TPaletteP &copiedPalette,
+						  bool keepOriginalPalette)
 {
 	if (!dstPalette || !copiedPalette)
 		return false;
@@ -68,7 +66,7 @@ bool mergePalette_Overlap(
 	int dstStyleCount = dstPalette->getStyleCount();
 	int copiedStyleCount = copiedPalette->getStyleCount();
 
-	//keep original
+	// keep original
 	if (keepOriginalPalette) {
 		// do nothing if the style amount of the dst is equal or larger than the copied
 		if (dstStyleCount >= copiedStyleCount) {
@@ -76,15 +74,15 @@ bool mergePalette_Overlap(
 		}
 		// if the style amount of the dst is less than the copied
 		else {
-			//for lacking amount of styles
+			// for lacking amount of styles
 			for (int i = dstStyleCount; i < copiedStyleCount; i++) {
-				//get the page index of the copied style
+				// get the page index of the copied style
 				TPalette::Page *tmpPage = copiedPalette->getStylePage(i);
-				//clone copied style
+				// clone copied style
 				TColorStyle *tmpStyle = copiedPalette->getStyle(i)->clone();
-				//add it to the dst
+				// add it to the dst
 				int id = dstPalette->addStyle(tmpStyle);
-				//add to the page if it is not deleted in the copied
+				// add to the page if it is not deleted in the copied
 				if (tmpPage)
 					dstPalette->getPage(0)->addStyle(id);
 			}
@@ -93,13 +91,13 @@ bool mergePalette_Overlap(
 		}
 	}
 
-	//replace
+	// replace
 	else {
-		//if the style amount of the dst is larger than the copied
+		// if the style amount of the dst is larger than the copied
 		if (dstStyleCount > copiedStyleCount) {
 			TPalette *tmpPalette = copiedPalette->clone();
 
-			//for lacking amount of styles
+			// for lacking amount of styles
 			for (int i = copiedStyleCount; i < dstStyleCount; i++) {
 				TColorStyle *tmpStyle = dstPalette->getStyle(i)->clone();
 				int id = tmpPalette->addStyle(tmpStyle);
@@ -108,7 +106,7 @@ bool mergePalette_Overlap(
 				if (!tmpPage)
 					continue;
 				std::wstring pageName = tmpPage->getName();
-				//create new page with the same name if needed
+				// create new page with the same name if needed
 				int p;
 				for (p = 0; p < tmpPalette->getPageCount(); p++) {
 					if (tmpPalette->getPage(p)->getName() == pageName)

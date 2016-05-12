@@ -85,12 +85,11 @@ void hsv2rgb(TPixel32 &dstRgb, int srcHsv[3], int maxHsv)
 			dstRgb.b = tcrop((int)(q * 255), 0, 255);
 		}
 	}
-	dstRgb.m = 255; //matte
+	dstRgb.m = 255; // matte
 }
 //-----------------------------------------------------------------------------
 
-void HSV2RGB(double hue, double sat, double value,
-			 double *red, double *green, double *blue)
+void HSV2RGB(double hue, double sat, double value, double *red, double *green, double *blue)
 {
 	int i;
 	double p, q, t, f;
@@ -159,8 +158,7 @@ void HSV2RGB(double hue, double sat, double value,
 	}
 }
 
-void RGB2HSV(double r, double g, double b,
-			 double *h, double *s, double *v)
+void RGB2HSV(double r, double g, double b, double *h, double *s, double *v)
 {
 	double max, min;
 	double delta;
@@ -238,7 +236,7 @@ void rgb2hsv(int dstHsv[3], const TPixel32 &srcRgb, int maxHsv)
 
 namespace
 {
-//helper function
+// helper function
 inline double HLSValue(double n1, double n2, double h)
 {
 	if (h > 360)
@@ -255,8 +253,7 @@ inline double HLSValue(double n1, double n2, double h)
 		return n1;
 }
 }
-void HLS2RGB(double h, double l, double s,
-			 double *r, double *g, double *b)
+void HLS2RGB(double h, double l, double s, double *r, double *g, double *b)
 {
 	if (s == 0) {
 		*r = *g = *b = l;
@@ -276,8 +273,7 @@ void HLS2RGB(double h, double l, double s,
 	*b = HLSValue(m1, m2, h - 120);
 }
 
-void rgb2hls(double r, double g, double b,
-			 double *h, double *l, double *s)
+void rgb2hls(double r, double g, double b, double *h, double *l, double *s)
 
 {
 	double max, min;
@@ -315,11 +311,8 @@ void rgb2hls(double r, double g, double b,
 
 TPixel32 toPixel32(const TPixel64 &src)
 {
-	return TPixelRGBM32(
-		byteFromUshort(src.r),
-		byteFromUshort(src.g),
-		byteFromUshort(src.b),
-		byteFromUshort(src.m));
+	return TPixelRGBM32(byteFromUshort(src.r), byteFromUshort(src.g), byteFromUshort(src.b),
+						byteFromUshort(src.m));
 }
 
 //-----------------------------------------------------------------------------
@@ -327,11 +320,8 @@ TPixel32 toPixel32(const TPixel64 &src)
 TPixel32 toPixel32(const TPixelD &src)
 {
 	const double factor = 255.0;
-	return TPixel32(
-		byteCrop(tround(src.r * factor)),
-		byteCrop(tround(src.g * factor)),
-		byteCrop(tround(src.b * factor)),
-		byteCrop(tround(src.m * factor)));
+	return TPixel32(byteCrop(tround(src.r * factor)), byteCrop(tround(src.g * factor)),
+					byteCrop(tround(src.b * factor)), byteCrop(tround(src.m * factor)));
 }
 
 //-----------------------------------------------------------------------------
@@ -345,11 +335,8 @@ TPixel32 toPixel32(const TPixelGR8 &src)
 
 TPixel64 toPixel64(const TPixel32 &src)
 {
-	return TPixelRGBM64(
-		ushortFromByte(src.r),
-		ushortFromByte(src.g),
-		ushortFromByte(src.b),
-		ushortFromByte(src.m));
+	return TPixelRGBM64(ushortFromByte(src.r), ushortFromByte(src.g), ushortFromByte(src.b),
+						ushortFromByte(src.m));
 }
 
 //-----------------------------------------------------------------------------
@@ -357,11 +344,8 @@ TPixel64 toPixel64(const TPixel32 &src)
 TPixel64 toPixel64(const TPixelD &src)
 {
 	const double factor = 65535.0;
-	return TPixel64(
-		wordCrop(tround(src.r * factor)),
-		wordCrop(tround(src.g * factor)),
-		wordCrop(tround(src.b * factor)),
-		wordCrop(tround(src.m * factor)));
+	return TPixel64(wordCrop(tround(src.r * factor)), wordCrop(tround(src.g * factor)),
+					wordCrop(tround(src.b * factor)), wordCrop(tround(src.m * factor)));
 }
 
 //-----------------------------------------------------------------------------
@@ -411,7 +395,7 @@ class DVAPI TPixelCM16
 { // 754
 	static const int maxChannelValue;
 
-public:
+  public:
 	USHORT value;
 
 	TPixelCM16(int v = 0) : value(v){};
@@ -434,7 +418,7 @@ class DVAPI TPixelCM16S8
 {
 	static const int maxChannelValue;
 
-public:
+  public:
 	USHORT value;
 	TPixelCM16S8(int v = 0) : value(v){};
 };
@@ -445,7 +429,7 @@ class DVAPI TPixelCM16S12
 {
 	static const int maxChannelValue;
 
-public:
+  public:
 	USHORT value;
 	TPixelCM16S12(int v = 0) : value(v){};
 };
@@ -456,61 +440,58 @@ class DVAPI TPixelCM24
 {
 	static const int maxChannelValue;
 
-public:
+  public:
 	/* serve m_value come membro? vincenzo */
 	TUINT32 m_value;
 	UCHAR m_ink, m_paint, m_tone;
 
 	TPixelCM24(int v = 0) : m_ink((v >> 8) & 0xff), m_paint((v >> 16) & 0xff), m_tone(v & 0xff){};
-	TPixelCM24(int ink, int paint, int tone) : m_value(0), m_ink(ink), m_paint(paint), m_tone(tone){};
-	TPixelCM24(const TPixelCM24 &pix) : m_value(pix.m_value), m_ink(pix.m_ink), m_paint(pix.m_paint), m_tone(pix.m_tone){};
+	TPixelCM24(int ink, int paint, int tone)
+		: m_value(0), m_ink(ink), m_paint(paint), m_tone(tone){};
+	TPixelCM24(const TPixelCM24 &pix)
+		: m_value(pix.m_value), m_ink(pix.m_ink), m_paint(pix.m_paint), m_tone(pix.m_tone){};
 
-	inline bool operator==(const TPixelCM24 &p) const { return m_paint == p.m_paint && m_ink == p.m_ink && m_tone == p.m_tone; };
-	//rivedere
+	inline bool operator==(const TPixelCM24 &p) const
+	{
+		return m_paint == p.m_paint && m_ink == p.m_ink && m_tone == p.m_tone;
+	};
+	// rivedere
 	int getPaintIdx() { return m_paint << 16 | m_tone; };
 	int getInkIdx() { return m_ink << 16 | m_tone; };
 	// int getTone    () {return m_tone;}; m_tone e' pubblico!
 
-	//static inline TPixelRGBM from(const TPixelCM24 &pix);
+	// static inline TPixelRGBM from(const TPixelCM24 &pix);
 
 	static TPixelCM24 pureInk(int ink) { return TPixelCM24(ink, 0, 0); };
 	static TPixelCM24 purePaint(int paint) { return TPixelCM24(0, paint, 255); };
 };
 //-----------------------------------------------------------------------------
 
-//!Toonz5.0 color-map, 12+12+8 bits (ink,paint,tone)
+//! Toonz5.0 color-map, 12+12+8 bits (ink,paint,tone)
 class DVAPI TPixelCM32
 {
 
-public:
+  public:
 	TUINT32 m_value;
 
 	TPixelCM32(TUINT32 v = 0) : m_value{};
-	TPixelCM32(int ink, int paint, int tone)
-		: m_value(ink << 20 | paint << 8 | tone)
+	TPixelCM32(int ink, int paint, int tone) : m_value(ink << 20 | paint << 8 | tone)
 	{
 		assert(0 <= ink && ink < 4096);
 		assert(0 <= paint && paint < 4096);
 		assert(0 <= tone && tone < 256);
 	};
-	TPixelCM32(const TPixelCM32 &pix)
-		: m_value(pix.m_value){};
+	TPixelCM32(const TPixelCM32 &pix) : m_value(pix.m_value){};
 
-	inline bool operator==(const TPixelCM32 &p) const
-	{
-		return m_value == p.m_value;
-	};
+	inline bool operator==(const TPixelCM32 &p) const { return m_value == p.m_value; };
 
-	inline bool operator<(const TPixelCM32 &p) const
-	{
-		return m_value < p.m_value;
-	};
+	inline bool operator<(const TPixelCM32 &p) const { return m_value < p.m_value; };
 
 	int getPaint() const { return m_paint >> 16 | m_tone; };
 	int getInk() const { return m_ink << 16 | m_tone; };
 	int getTone() const { return m_tone; };
 
-	//static inline TPixelRGBM from(const TPixelCM24 &pix);
+	// static inline TPixelRGBM from(const TPixelCM24 &pix);
 
 	static TPixelCM24 pureInk(int ink) { return TPixelCM24(ink, 0, 0); };
 	static TPixelCM24 purePaint(int paint) { return TPixelCM24(0, paint, 255); };
@@ -520,7 +501,7 @@ public:
 /*!RGB 5+6+5 bits, red most significant */
 class DVAPI TPixelRGB565
 {
-public:
+  public:
 	TUINT32 r : 5;
 	TUINT32 g : 6;
 	TUINT32 b : 5;
@@ -539,17 +520,17 @@ public:
 		return r < p.r || r == p.r && (g < p.g || g == p.g && (b < p.b));
 	};
 
-	//!Converts TPixelCM8 into TPixelRGB565
+	//! Converts TPixelCM8 into TPixelRGB565
 	static inline TPixelRGB565 from(const TPixelCM8 &pix);
-	//!Returns itself
+	//! Returns itself
 	static inline TPixelRGB565 from(const TPixelRGB565 &pix) { return pix; };
-	//!Converts TPixelRGBM32 into TPixelRGB565
+	//! Converts TPixelRGBM32 into TPixelRGB565
 	static inline TPixelRGB565 from(const TPixelRGBM32 &pix);
-	//!Converts TPixelRGBM64 into TPixelRGB565
+	//! Converts TPixelRGBM64 into TPixelRGB565
 	static inline TPixelRGB565 from(const TPixelRGBM64 &pix);
-	//!Converts TPixelGR8 into TPixelRGB565
+	//! Converts TPixelGR8 into TPixelRGB565
 	static inline TPixelRGB565 from(const TPixelGR8 &pix);
-	//!Converts TPixelGR16 into TPixelRGB565
+	//! Converts TPixelGR16 into TPixelRGB565
 	static inline TPixelRGB565 from(const TPixelGR16 &pix);
 	/*
    static const TPixelRGB565 Red;
@@ -571,22 +552,16 @@ TPixelRGBM32 DVAPI TPixelRGBM32::from(const TPixelCM8 &pix)
 
 TPixelRGBM64 DVAPI TPixelRGBM64::from(const TPixelRGBM32 &pix)
 {
-	return TPixelRGBM64(
-		ushortFromByte(pix.r),
-		ushortFromByte(pix.g),
-		ushortFromByte(pix.b),
-		ushortFromByte(pix.m));
+	return TPixelRGBM64(ushortFromByte(pix.r), ushortFromByte(pix.g), ushortFromByte(pix.b),
+						ushortFromByte(pix.m));
 }
 
 //-----------------------------------------------------------------------------
 
 TPixelRGBM32 DVAPI TPixelRGBM32::from(const TPixelRGBM64 &pix)
 {
-	return TPixelRGBM32(
-		byteFromUshort(pix.r),
-		byteFromUshort(pix.g),
-		byteFromUshort(pix.b),
-		byteFromUshort(pix.m));
+	return TPixelRGBM32(byteFromUshort(pix.r), byteFromUshort(pix.g), byteFromUshort(pix.b),
+						byteFromUshort(pix.m));
 }
 
 //-----------------------------------------------------------------------------
@@ -637,46 +612,36 @@ TPixelD DVAPI TPixelD::from(const TPixelGR16 &pix)
 TPixel32 DVAPI TPixel32::from(const TPixelD &pix)
 {
 	const int max = 255;
-	return TPixel32(
-		tcrop((int)(pix.r * max + .5), 0, max),
-		tcrop((int)(pix.g * max + .5), 0, max),
-		tcrop((int)(pix.b * max + .5), 0, max),
-		tcrop((int)(pix.m * max + .5), 0, max));
+	return TPixel32(tcrop((int)(pix.r * max + .5), 0, max), tcrop((int)(pix.g * max + .5), 0, max),
+					tcrop((int)(pix.b * max + .5), 0, max), tcrop((int)(pix.m * max + .5), 0, max));
 }
 
 TPixel64 DVAPI TPixel64::from(const TPixelD &pix)
 {
 	const int max = 65535;
-	return TPixel64(
-		tcrop((int)(pix.r * max + .5), 0, max),
-		tcrop((int)(pix.g * max + .5), 0, max),
-		tcrop((int)(pix.b * max + .5), 0, max),
-		tcrop((int)(pix.m * max + .5), 0, max));
+	return TPixel64(tcrop((int)(pix.r * max + .5), 0, max), tcrop((int)(pix.g * max + .5), 0, max),
+					tcrop((int)(pix.b * max + .5), 0, max), tcrop((int)(pix.m * max + .5), 0, max));
 }
 
-//TPixelGR8 TPixelGR8::from(const TPixelD &pix)
+// TPixelGR8 TPixelGR8::from(const TPixelD &pix)
 //{
 //  return from(TPixel32::from(pix));
 //}
 
 TPixelGR8 DVAPI TPixelGR8::from(const TPixel32 &pix)
 {
-	return TPixelGR8((((UINT)(pix.r) * 19594 +
-					   (UINT)(pix.g) * 38472 +
-					   (UINT)(pix.b) * 7470 +
-					   (UINT)(1 << 15)) >>
-					  16));
+	return TPixelGR8(
+		(((UINT)(pix.r) * 19594 + (UINT)(pix.g) * 38472 + (UINT)(pix.b) * 7470 + (UINT)(1 << 15)) >>
+		 16));
 }
 
 //-----------------------------------------------------------------------------
 
 TPixelGR16 DVAPI TPixelGR16::from(const TPixel64 &pix)
 {
-	return TPixelGR16((((UINT)(pix.r) * 19594 +
-						(UINT)(pix.g) * 38472 +
-						(UINT)(pix.b) * 7470 +
-						(UINT)(1 << 15)) >>
-					   16));
+	return TPixelGR16(
+		(((UINT)(pix.r) * 19594 + (UINT)(pix.g) * 38472 + (UINT)(pix.b) * 7470 + (UINT)(1 << 15)) >>
+		 16));
 }
 
 //-----------------------------------------------------------------------------

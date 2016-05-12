@@ -31,8 +31,8 @@ void DVAPI shutdown();
 
 //------------------------------------------------------------------------------
 
-//Forward declarations
-class ExecutorId; //Private
+// Forward declarations
+class ExecutorId; // Private
 class Runnable;
 
 #if !(defined(MACOSX) || defined(LINUX))
@@ -81,24 +81,25 @@ typedef TSmartPointerT<Runnable> RunnableP;
   \code
   void MyTask::run()
   {
-    try
-    {
-      emit myStarted(this);
-      theRunCode();
-      emit myFinished(this);
-    }
-    catch(...)
-    {
-      emit myException(this);
-      throw;
-    }
+	try
+	{
+	  emit myStarted(this);
+	  theRunCode();
+	  emit myFinished(this);
+	}
+	catch(...)
+	{
+	  emit myException(this);
+	  throw;
+	}
   }
   \endcode
   \code
   ..
   MyTask* myTask = new MyTask;
-  connect(myTask, SIGNAL(myStarted(TThread::RunnableP)), myTask, SLOT(onStarted(TThread::RunnableP)),
-    Qt::BlockingQueuedConnection)   //theRunCode() waits for onStarted() to complete
+  connect(myTask, SIGNAL(myStarted(TThread::RunnableP)), myTask,
+SLOT(onStarted(TThread::RunnableP)),
+	Qt::BlockingQueuedConnection)   //theRunCode() waits for onStarted() to complete
   ..
   \endcode
 
@@ -114,11 +115,11 @@ class DVAPI Runnable : public QObject, public TSmartObject
 	int m_load;
 	int m_schedulingPriority;
 
-	friend class Executor;	//Needed to confront Executor's and Runnable's ids
-	friend class ExecutorImp; //The internal task manager needs full control over the task
-	friend class Worker;	  //Workers force tasks to emit state signals
+	friend class Executor; // Needed to confront Executor's and Runnable's ids
+	friend class ExecutorImp; // The internal task manager needs full control over the task
+	friend class Worker; // Workers force tasks to emit state signals
 
-public:
+  public:
 	Runnable();
 	virtual ~Runnable();
 
@@ -138,7 +139,7 @@ public:
 	void canceled(TThread::RunnableP sender);
 	void terminated(TThread::RunnableP sender);
 
-public Q_SLOTS:
+  public Q_SLOTS:
 
 	virtual void onStarted(TThread::RunnableP sender);
 	virtual void onFinished(TThread::RunnableP sender);
@@ -146,7 +147,7 @@ public Q_SLOTS:
 	virtual void onCanceled(TThread::RunnableP sender);
 	virtual void onTerminated(TThread::RunnableP sender);
 
-private:
+  private:
 	inline bool needsAccumulation();
 	inline bool customConditions();
 };
@@ -160,7 +161,7 @@ private:
   When an application needs to perform a resource-consuming task, it is often
   a good idea to dedicate a separate thread for it, especially in GUI applications;
   however, doing so eventually raises the problem of managing such intensive
-  tasks in a way that constantly ensures the correct use of the machine resources - 
+  tasks in a way that constantly ensures the correct use of the machine resources -
   so that in any given time the CPU usage is maximal, but not overloaded.
   Additional requests by the user may arise, including preferenced ordering
   among tasks, the necessity of salvaging some CPU resources or threads for
@@ -182,7 +183,7 @@ private:
   Basic control over the execution strategy for the group of tasks submitted by an Executor
   can be acquired using the setMaxActiveTasks() and setMaxActiveLoad() methods, both granting
   the possibility to bound the execution of tasks to custom maximum conditions.
-  For example, use setMaxActiveTasks(1) to force the execution of 1 task only at a time, 
+  For example, use setMaxActiveTasks(1) to force the execution of 1 task only at a time,
   or setMaxActiveLoad(100) to set a single CPU core available for the group.
 
   \sa \b Runnable class documentation.
@@ -193,7 +194,7 @@ class DVAPI Executor
 
 	friend class ExecutorImp;
 
-public:
+  public:
 	Executor();
 	~Executor();
 
@@ -212,7 +213,7 @@ public:
 
 	void setDedicatedThreads(bool dedicated, bool persistent = true);
 
-private:
+  private:
 	// not implemented
 	Executor &operator=(const Executor &);
 	Executor(const Executor &);
@@ -220,4 +221,4 @@ private:
 
 } // namespace TThread
 
-#endif //TTHREAD_H
+#endif // TTHREAD_H

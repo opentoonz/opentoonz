@@ -71,8 +71,7 @@ int split(std::vector<double> &values, char *s)
 } // namespace
 //---------------------------------------------------------
 
-TDoubleParamFileData::TDoubleParamFileData()
-	: m_params(), m_dirtyFlag(false)
+TDoubleParamFileData::TDoubleParamFileData() : m_params(), m_dirtyFlag(false)
 {
 }
 

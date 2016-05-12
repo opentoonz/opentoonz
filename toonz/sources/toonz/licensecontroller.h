@@ -38,7 +38,7 @@ enum ActivateStatus {
 // restituisce il primo macAddress valido
 std::string getFirstValidMacAddress();
 
-//Restituisce tutti i mac address valido delle interfacce di rete della macchine corrente
+// Restituisce tutti i mac address valido delle interfacce di rete della macchine corrente
 void getAllValidMacAddresses(std::vector<std::string> &addresses);
 // restituisce il machineCode della iesima interfaccia di rete della macchina corrente
 // Il machine code e' costituito dagli ultimi 8 caratteri del macAdress
@@ -60,15 +60,16 @@ enum LicenseType {
 
 // ritorna true sse code e' una licenza AND il mac e' giusto AND
 // (la lic e' permanente OR non e' ancorascaduta)
-//bool isValidLicense(std::string code);
+// bool isValidLicense(std::string code);
 LicenseType checkLicense(std::string code = "");
 
-//ritorna il puntatore ad un intero se la licenza e' valida, altrimenti ritorna 0
-//int* checkLicense();
+// ritorna il puntatore ad un intero se la licenza e' valida, altrimenti ritorna 0
+// int* checkLicense();
 // ritorna true sse code e' una licenza temporanea
 bool isTemporaryLicense(std::string code);
 
-// se code e' una licenza temporanea ritorna il numero di giorni rimasti (se days<=0 licenza scaduta)
+// se code e' una licenza temporanea ritorna il numero di giorni rimasti (se days<=0 licenza
+// scaduta)
 // negli altri casi ritorna 0
 int getDaysLeft(std::string code);
 
@@ -86,7 +87,7 @@ ActivateStatus activate(std::string activationCode, LicenseWizard *licenseWizard
 bool setLicense(std::string license);
 // scrive su disco il macAddress della macchina corrente
 bool writeMacAddress();
-//std::string decrypt(std::string code);
+// std::string decrypt(std::string code);
 std::string decryptLicense(std::string code);
 // aggiunge i caratteri di default alla licenza necessari per il decrypt;
 // Fatto per rendere la licenza digitata dall'utente piu' corta.
@@ -97,13 +98,13 @@ TFilePath getLicenseFilePath();
 // ritorna il fullpath del file del macAddress
 TFilePath getMacAddressFilePath();
 
-//Restituisce la sentinella cryptata
+// Restituisce la sentinella cryptata
 std::string readSentinelDate(std::string regKey);
-//Dando in input la sentinella(criptata) ritorna true se la data di
-//prima installazione(memorizzata nella sentinella) e' minore della data corrente.
+// Dando in input la sentinella(criptata) ritorna true se la data di
+// prima installazione(memorizzata nella sentinella) e' minore della data corrente.
 bool isValidSentinel(std::string license);
 std::string createClsid(std::string fullMacAddress, char *licenseType);
-//Controlla se la licenza e' del tipo STORYPLANNERPRO
+// Controlla se la licenza e' del tipo STORYPLANNERPRO
 bool isStoryPlannerPro();
 // Ritorna l'ultimo messaggio di errore
 // se non c'è stato alcun errore ritorna "no error"
@@ -120,9 +121,9 @@ class myHttp
 	int m_httpGetId;
 	LicenseWizard *m_licenseWizard;
 
-public:
+  public:
 	myHttp(const QString &requestToServer, LicenseWizard *licenseWizard);
-protected slots:
+  protected slots:
 	void httpRequestStarted(int requestId) {}
 #if QT_VERSION >= 0x050000
 	void httpRequestFinished(QNetworkReply *);
@@ -131,7 +132,8 @@ protected slots:
 	void readResponseHeader(const QHttpResponseHeader &responseHeader);
 	void readyReadExec(const QHttpResponseHeader &head) {}
 #endif
-	void slotAuthenticationRequired(const QString &hostName, quint16, QAuthenticator *authenticator);
+	void slotAuthenticationRequired(const QString &hostName, quint16,
+									QAuthenticator *authenticator);
 	void httpStateChanged(int state);
 };
 

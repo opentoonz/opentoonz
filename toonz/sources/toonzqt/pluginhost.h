@@ -21,7 +21,7 @@ namespace toonz {
 /* probe で得られる静的な plugin 情報 */
 class PluginDescription
 {
-public:
+  public:
 	std::string name_;
 	std::string vendor_;
 	std::string id_;
@@ -31,10 +31,11 @@ public:
 	int clss_;
 	toonz_plugin_version_t plugin_ver_;
 
-public:
+  public:
 	PluginDescription(const toonz::plugin_probe_t *const probe);
 
-	/* 'geometric' is known as 'Zerary' on toonz. we avoid using the word because nobody did not understand a meaning of the word */
+	/* 'geometric' is known as 'Zerary' on toonz. we avoid using the word because nobody did not
+	 * understand a meaning of the word */
 	bool is_geometric() const { return clss_ & TOONZ_PLUGIN_CLASS_MODIFIER_GEOMETRIC; }
 };
 
@@ -45,7 +46,7 @@ struct PluginDeclaration : public TFxDeclaration {
 	PluginDeclaration(PluginInformation *pi);
 	TPersist *create() const final override;
 
-private:
+  private:
 	PluginInformation *pi_;
 };
 
@@ -60,7 +61,7 @@ struct port_description_t {
 	std::string name_;
 	int type_;
 
-public:
+  public:
 	port_description_t(bool input, const char *nm, int type) : input_(input), name_(nm), type_(type)
 	{
 	}
@@ -74,7 +75,7 @@ typedef std::shared_ptr<void> library_t;
 
 class PluginInformation
 {
-public:
+  public:
 	PluginDeclaration *decl_;
 	PluginDescription *desc_;
 
@@ -92,11 +93,14 @@ public:
 	std::vector<ParamView *> param_views_;
 	std::map<std::string, port_description_t> port_mapper_;
 
-	std::vector<std::shared_ptr<void>> param_resources_;		 /* deep-copy に使う scratch area */
-	std::vector<std::shared_ptr<std::string>> param_string_tbl_; /* shared_ptr< void > では non-virtual destructor が呼ばれないので  */
+	std::vector<std::shared_ptr<void>> param_resources_; /* deep-copy に使う scratch area */
+	std::vector<std::shared_ptr<std::string>>
+		param_string_tbl_; /* shared_ptr< void > では non-virtual destructor が呼ばれないので  */
 
-public:
-	PluginInformation() : desc_(NULL), library_(NULL), handler_(NULL), host_(NULL), ini_(NULL), fin_(NULL), ref_count_(1), param_page_num_(0)
+  public:
+	PluginInformation()
+		: desc_(NULL), library_(NULL), handler_(NULL), host_(NULL), ini_(NULL), fin_(NULL),
+		  ref_count_(1), param_page_num_(0)
 	{
 	}
 
@@ -110,16 +114,16 @@ class Loader : public QObject
 {
 	Q_OBJECT;
 
-public:
+  public:
 	Loader();
 
-protected:
+  protected:
 	void doLoad(const QString &file);
 	void walkDirectory_(const QString &file);
-public slots:
+  public slots:
 	void walkDirectory(const QString &file);
 	void walkDictionary(const QString &file);
-signals:
+  signals:
 	void load_finished(PluginInformation *pi);
 	void fixup();
 };
@@ -129,14 +133,14 @@ class PluginLoadController : public QObject
 	Q_OBJECT;
 	QThread work_entity;
 
-public:
+  public:
 	PluginLoadController(const std::string &basedir, QObject *listener);
 	bool wait(int timeout_in_ms) { return work_entity.wait(timeout_in_ms); };
-public slots:
+  public slots:
 	void result(PluginInformation *pi);
 	void finished();
 
-signals:
+  signals:
 	void start(const QString &filepath);
 };
 
@@ -150,10 +154,10 @@ class RasterFxPluginHost : public TZeraryFx, public TPluginInterface
 
 	static bool validateKeyName(const char *name);
 
-protected:
+  protected:
 	virtual RasterFxPluginHost *newInstance(PluginInformation *pi) const;
 
-public:
+  public:
 	RasterFxPluginHost(PluginInformation *pinfo);
 	~RasterFxPluginHost();
 

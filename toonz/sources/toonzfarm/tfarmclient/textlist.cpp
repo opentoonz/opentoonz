@@ -22,8 +22,9 @@ const int rowHeight = 20; // 15
 
 class TTextList::Data
 {
-public:
-	Data(TWidget *w) : m_w(w), m_selAction(0), m_dblClickAction(0), m_scrollbar(new TScrollbar(w)), m_yoffset(0)
+  public:
+	Data(TWidget *w)
+		: m_w(w), m_selAction(0), m_dblClickAction(0), m_scrollbar(new TScrollbar(w)), m_yoffset(0)
 	{
 	}
 
@@ -49,10 +50,10 @@ public:
 
 		if ((m_items.size() * rowHeight) > ly) {
 			m_scrollbar->setValue(m_yoffset, 0, (m_items.size() + 1) * rowHeight - ly, ly);
-			m_scrollbar->show(); //m_scrollbar->setValue(m_yoffset,0, yrange-ly, ly);
+			m_scrollbar->show(); // m_scrollbar->setValue(m_yoffset,0, yrange-ly, ly);
 		} else {
 			m_yoffset = 0;
-			m_scrollbar->hide(); //m_scrollbar->setValue(0,0, 0, 0);
+			m_scrollbar->hide(); // m_scrollbar->setValue(0,0, 0, 0);
 		}
 		m_scrollbar->invalidate();
 	}
@@ -74,7 +75,7 @@ int TTextList::Data::posToItem(const TPoint &p)
 	/*  TDimension d = getSize();
   int i = getItemCount()-1;
 
-  10 + 
+  10 +
   for(int y=10; y<d.ly && i>=0; y+=rowHeight, --i)
 */
 
@@ -85,15 +86,13 @@ int TTextList::Data::posToItem(const TPoint &p)
 
 //==============================================================================
 
-TTextListItem::TTextListItem(const string &id, const string &caption)
-	: m_id(id), m_caption(caption)
+TTextListItem::TTextListItem(const string &id, const string &caption) : m_id(id), m_caption(caption)
 {
 }
 
 //==============================================================================
 
-TTextList::TTextList(TWidget *parent, string name)
-	: TWidget(parent, name), m_data(0)
+TTextList::TTextList(TWidget *parent, string name) : TWidget(parent, name), m_data(0)
 {
 	m_data = new Data(this);
 	m_data->m_scrollbar->setAction(new TScrollbarAction<TTextList>(this, &TTextList::scrollTo));
@@ -232,8 +231,7 @@ void TTextList::select(int i, bool on)
 
 void TTextList::select(const string &itemId, bool on)
 {
-	std::map<string, TTextListItem *>::iterator it =
-		m_data->m_items.find(itemId);
+	std::map<string, TTextListItem *>::iterator it = m_data->m_items.find(itemId);
 
 	if (it != m_data->m_items.end()) {
 		int i = distance(m_data->m_items.begin(), it);

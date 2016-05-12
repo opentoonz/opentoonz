@@ -24,24 +24,24 @@ class Writer
 	//! Current Raster
 	TRaster32P m_raster;
 
-public:
+  public:
 	//! Constructor
 	/*!
-    \param &outputFile filename of the output movie
-    \param lx an integer contains the width of the movie
-    \param ly an integer contains the height of the movie
+	\param &outputFile filename of the output movie
+	\param lx an integer contains the width of the movie
+	\param ly an integer contains the height of the movie
    */
 	Writer(const TFilePath &outputFile, int lx, int ly);
 	//! Destructor
 	~Writer();
 
 	/*! Write the raster, using the processor to the GL Context,
-      then read the context to store it in the m_raster. 
-      Hence write m_raster to the movie file using TLevelWriter
+	  then read the context to store it in the m_raster.
+	  Hence write m_raster to the movie file using TLevelWriter
   */
 	void write(const TRaster32P &ras, Processor *processor);
 
-protected:
+  protected:
 };
 
 #endif // WRITER_H

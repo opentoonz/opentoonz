@@ -13,8 +13,8 @@
 //#include "tparamundo.h"
 #include <set>
 
-#undef DVAPI 
-#undef DVVAR 
+#undef DVAPI
+#undef DVVAR
 #ifdef TPARAM_EXPORTS
   #define DVAPI DV_EXPORT_API
   #define DVVAR DV_EXPORT_VAR

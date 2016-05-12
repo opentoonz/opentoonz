@@ -14,18 +14,18 @@ typedef void *toonz_param_view_handle_t;
 /* あるパラメータの表示形式 */
 class ParamView
 {
-public:
+  public:
 	struct Component {
 		virtual ~Component() {}
 		virtual QWidget *make_widget(TFx *fx, ParamsPage *page, const char *name) const = 0;
 	};
 
-#define TOONZ_DEFINE_COMPONENT(NAME)                                                           \
-	struct NAME : public Component {                                                           \
-		QWidget *make_widget(TFx *fx, ParamsPage *page, const char *name) const final override \
-		{                                                                                      \
-			return page->new##NAME(fx, name);                                                  \
-		}                                                                                      \
+#define TOONZ_DEFINE_COMPONENT(NAME)                                                               \
+	struct NAME : public Component {                                                               \
+		QWidget *make_widget(TFx *fx, ParamsPage *page, const char *name) const final override     \
+		{                                                                                          \
+			return page->new##NAME(fx, name);                                                      \
+		}                                                                                          \
 	}
 
 	TOONZ_DEFINE_COMPONENT(ParamField);
@@ -38,23 +38,17 @@ public:
 
 #undef TOONZ_DEFINE_COMPONENT
 
-public:
+  public:
 	ParamView() {}
 
-	ParamView(const ParamView &rhs)
-		: components_(rhs.components_)
-	{
-	}
+	ParamView(const ParamView &rhs) : components_(rhs.components_) {}
 
 	inline void add_component(std::shared_ptr<Component> component)
 	{
 		components_.push_back(std::move(component));
 	}
 
-	ParamView *clone(TFx *) const
-	{
-		return new ParamView(*this);
-	}
+	ParamView *clone(TFx *) const { return new ParamView(*this); }
 
 	void build(TFx *fx, ParamsPage *page, const char *name) const
 	{
@@ -63,7 +57,7 @@ public:
 		}
 	}
 
-private:
+  private:
 	std::vector<std::shared_ptr<Component>> components_;
 };
 

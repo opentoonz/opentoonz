@@ -6,8 +6,7 @@
 
 #include "tparamset.h"
 
-static void OLDRGB2HSV(double r, double g, double b,
-					   double *h, double *s, double *v)
+static void OLDRGB2HSV(double r, double g, double b, double *h, double *s, double *v)
 {
 	double max, min;
 	double delta;
@@ -39,8 +38,8 @@ static void OLDRGB2HSV(double r, double g, double b,
 	}
 }
 
-static void OLDHSV2RGB(double hue, double sat, double value,
-					   double *red, double *green, double *blue)
+static void OLDHSV2RGB(double hue, double sat, double value, double *red, double *green,
+					   double *blue)
 {
 	int i;
 	double p, q, t, f;
@@ -118,7 +117,7 @@ class ChangeColorFx : public TStandardRasterFx
 	TDoubleParamP m_range;
 	TDoubleParamP m_falloff;
 
-public:
+  public:
 	ChangeColorFx()
 		: m_from_color(TPixel32::Red), m_to_color(TPixel32::Blue), m_range(0.0), m_falloff(0.0)
 	{
@@ -169,15 +168,16 @@ void ChangeColorFx::doCompute(TTile &tile, double frame, const TRenderSettings &
 	double range = m_range->getValue(frame) / 100;
 	double falloff = m_falloff->getValue(frame) / 100;
 
-	OLDRGB2HSV(from_color.r / 255.0, from_color.g / 255.0, from_color.b / 255.0, &from_h, &from_s, &from_v);
+	OLDRGB2HSV(from_color.r / 255.0, from_color.g / 255.0, from_color.b / 255.0, &from_h, &from_s,
+			   &from_v);
 	OLDRGB2HSV(to_color.r / 255.0, to_color.g / 255.0, to_color.b / 255.0, &to_h, &to_s, &to_v);
-	/*  
+	/*
   int from_hsv[3];
   int to_hsv[3];
   rgb2hsv(from_hsv, from_color);
   rgb2hsv(to_hsv, to_color);
- 
-///////////////  verificare   /////// 
+
+///////////////  verificare   ///////
   from_h =((double)from_hsv[0]/255.)*360.;
   from_s =from_hsv[1]/255.;
   from_v =from_hsv[2]/255.;
@@ -226,7 +226,7 @@ void ChangeColorFx::doCompute(TTile &tile, double frame, const TRenderSettings &
 			r = pix->r / 255.0;
 			g = pix->g / 255.0;
 			b = pix->b / 255.0;
-			//int hsv[3];
+			// int hsv[3];
 			OLDRGB2HSV(r, g, b, &h, &s, &v);
 			int hflag = (h <= hmax && h >= hmin);
 			if (swaprange)
@@ -268,11 +268,11 @@ void ChangeColorFx::doCompute(TTile &tile, double frame, const TRenderSettings &
 					pix->b = (UCHAR)(b * 255);
 				}
 			}
-			//premultiply(*pix);
+			// premultiply(*pix);
 			*pix++;
 		}
 	}
 	raster32->unlock();
 }
 
-//FX_PLUGIN_IDENTIFIER(ChangeColorFx    , "changeColorFx")
+// FX_PLUGIN_IDENTIFIER(ChangeColorFx    , "changeColorFx")

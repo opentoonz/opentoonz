@@ -35,14 +35,10 @@ class QDateTime;
 
 class DVAPI ShadingContext
 {
-public:
-	enum Support {
-		OK,
-		NO_PIXEL_BUFFER,
-		NO_SHADERS
-	};
+  public:
+	enum Support { OK, NO_PIXEL_BUFFER, NO_SHADERS };
 
-public:
+  public:
 	ShadingContext();
 	~ShadingContext();
 
@@ -55,9 +51,9 @@ public:
 	void doneCurrent();
 
 	/*!
-    Resizes the output buffer to the specified size. Requires that
-    the contex is made current before invocation. In case lx or ly are 0,
-    the context's output buffer is destroyed.
+	Resizes the output buffer to the specified size. Requires that
+	the contex is made current before invocation. In case lx or ly are 0,
+	the context's output buffer is destroyed.
   */
 	void resize(int lx, int ly,
 				const QGLFramebufferObjectFormat &fmt = QGLFramebufferObjectFormat());
@@ -76,18 +72,20 @@ public:
 
 	std::pair<QGLShaderProgram *, QDateTime> shaderData(const QString &shaderName) const;
 
-	GLuint loadTexture(const TRasterP &src, GLuint texUnit); //!< Loads a texture and binds it to the specified texture unit.
-															 //!  \return  The OpenGL texture id of the loaded texture.      \param src  Loaded texture.  \param texUnit  Unit the texture will be bound to.
-	void unloadTexture(GLuint texId);						 //!< Releases the specified texture id.
+	GLuint
+	loadTexture(const TRasterP &src,
+				GLuint texUnit); //!< Loads a texture and binds it to the specified texture unit.
+	//!  \return  The OpenGL texture id of the loaded texture.      \param src  Loaded texture.
+	//!  \param texUnit  Unit the texture will be bound to.
+	void unloadTexture(GLuint texId); //!< Releases the specified texture id.
 
 	//! Renders the active shader program to the specified raster.
 	void draw(const TRasterP &dst);
 
 	//! Performs transform feedback with the specified varying variables
-	void transformFeedback(int varyingsCount, const GLsizeiptr *varyingSizes,
-						   GLvoid **bufs);
+	void transformFeedback(int varyingsCount, const GLsizeiptr *varyingSizes, GLvoid **bufs);
 
-private:
+  private:
 	struct Imp;
 	std::unique_ptr<Imp> m_imp;
 

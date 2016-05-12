@@ -27,19 +27,16 @@
 
 struct Grad {
 	int x, y, z, w;
-	Grad(int x_, int y_, int z_)
-		: x(x_), y(y_), z(z_), w(0) {}
-	Grad(int x_, int y_, int z_, int w_)
-		: x(x_), y(y_), z(z_), w(w_) {}
+	Grad(int x_, int y_, int z_) : x(x_), y(y_), z(z_), w(0) {}
+	Grad(int x_, int y_, int z_, int w_) : x(x_), y(y_), z(z_), w(w_) {}
 };
 
 struct CellIds {
 	int i, j, k;
 	int i1, j1, k1;
 	int i2, j2, k2;
-	CellIds(int _i = 0, int _j = 0, int _k = 0,
-			int _i1 = 0, int _j1 = 0, int _k1 = 0,
-			int _i2 = 0, int _j2 = 0, int _k2 = 0)
+	CellIds(int _i = 0, int _j = 0, int _k = 0, int _i1 = 0, int _j1 = 0, int _k1 = 0, int _i2 = 0,
+			int _j2 = 0, int _k2 = 0)
 	{
 		i = _i;
 		j = _j;
@@ -54,15 +51,8 @@ struct CellIds {
 
 	bool operator==(const CellIds &right) const
 	{
-		return i == right.i &&
-			   j == right.j &&
-			   k == right.k &&
-			   i1 == right.i1 &&
-			   j1 == right.j1 &&
-			   k1 == right.k1 &&
-			   i2 == right.i2 &&
-			   j2 == right.j2 &&
-			   k2 == right.k2;
+		return i == right.i && j == right.j && k == right.k && i1 == right.i1 && j1 == right.j1 &&
+			   k1 == right.k1 && i2 == right.i2 && j2 == right.j2 && k2 == right.k2;
 	}
 };
 
@@ -75,22 +65,16 @@ class SimplexNoise
 		return x < xi ? xi - 1 : xi;
 	}
 
-	static double dot(Grad g, double x, double y)
-	{
-		return g.x * x + g.y * y;
-	}
+	static double dot(Grad g, double x, double y) { return g.x * x + g.y * y; }
 
-	static double dot(Grad g, double x, double y, double z)
-	{
-		return g.x * x + g.y * y + g.z * z;
-	}
+	static double dot(Grad g, double x, double y, double z) { return g.x * x + g.y * y + g.z * z; }
 
 	static double dot(Grad g, double x, double y, double z, double w)
 	{
 		return g.x * x + g.y * y + g.z * z + g.w * w;
 	}
 
-public:
+  public:
 	SimplexNoise();
 	// 2D simplex noise
 	static double noise(double xin, double yin);

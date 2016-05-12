@@ -19,13 +19,13 @@ namespace
 
 //----------------------------------------------------------------------------
 
-bool lineIntersection(const TPointD &P, const TPointD &R,
-					  const TPointD &Q, const TPointD &S, TPointD &ret);
+bool lineIntersection(const TPointD &P, const TPointD &R, const TPointD &Q, const TPointD &S,
+					  TPointD &ret);
 
 //----------------------------------------------------------------------------
 
-bool lineIntersection(const TPointD &P, const TPointD &R,
-					  const TPointD &Q, const TPointD &S, TPointD &ret)
+bool lineIntersection(const TPointD &P, const TPointD &R, const TPointD &Q, const TPointD &S,
+					  TPointD &ret)
 {
 	TPointD u = R - P;
 	TPointD v = S - Q;
@@ -47,16 +47,16 @@ bool lineIntersection(const TPointD &P, const TPointD &R,
 };
 
 #ifndef checkErrorsByGL
-#define checkErrorsByGL                      \
-	{                                        \
-		GLenum err = glGetError();           \
-		assert(err != GL_INVALID_ENUM);      \
-		assert(err != GL_INVALID_VALUE);     \
-		assert(err != GL_INVALID_OPERATION); \
-		assert(err != GL_STACK_OVERFLOW);    \
-		assert(err != GL_STACK_UNDERFLOW);   \
-		assert(err != GL_OUT_OF_MEMORY);     \
-		assert(err == GL_NO_ERROR);          \
+#define checkErrorsByGL                                                                            \
+	{                                                                                              \
+		GLenum err = glGetError();                                                                 \
+		assert(err != GL_INVALID_ENUM);                                                            \
+		assert(err != GL_INVALID_VALUE);                                                           \
+		assert(err != GL_INVALID_OPERATION);                                                       \
+		assert(err != GL_STACK_OVERFLOW);                                                          \
+		assert(err != GL_STACK_UNDERFLOW);                                                         \
+		assert(err != GL_OUT_OF_MEMORY);                                                           \
+		assert(err == GL_NO_ERROR);                                                                \
 	}
 #endif
 
@@ -69,7 +69,8 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame, const TRender
 
 	TPixel32 bgColor;
 	TRectD outBBox, inBBox;
-	outBBox = inBBox = TRectD(tile.m_pos, TDimensionD(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
+	outBBox = inBBox =
+		TRectD(tile.m_pos, TDimensionD(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
 	m_input->getBBox(frame, inBBox, ri);
 	if (inBBox == TConsts::infiniteRectD) // e' uno zerario
 		inBBox = outBBox;
@@ -100,7 +101,8 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame, const TRender
 		} else {
 			rasInPos = TPointD(inBBox.x0 / ri.m_shrinkX, inBBox.y0 / ri.m_shrinkY);
 			TTile tmp(TRaster32P(inBBoxLx, inBBoxLy), rasInPos);
-			m_input->allocateAndCompute(tmp, rasInPos, TDimension(inBBoxLx, inBBoxLy), TRaster32P(), frame, ri);
+			m_input->allocateAndCompute(tmp, rasInPos, TDimension(inBBoxLx, inBBoxLy), TRaster32P(),
+										frame, ri);
 			rasIn = tmp.getRaster();
 		}
 	}
@@ -114,7 +116,10 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame, const TRender
 	while (texHeight < (unsigned int)inBBoxLy)
 		texHeight = texHeight << 1;
 
-	while (texWidth > 1024 || texHeight > 1024) //avevo usato la costante GL_MAX_TEXTURE_SIZE invece di 1024, ma non funzionava!
+	while (
+		texWidth > 1024 ||
+		texHeight >
+			1024) // avevo usato la costante GL_MAX_TEXTURE_SIZE invece di 1024, ma non funzionava!
 	{
 		inBBoxLx = inBBoxLx >> 1;
 		inBBoxLy = inBBoxLy >> 1;
@@ -124,7 +129,8 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame, const TRender
 
 	if (rasIn->getLx() != inBBoxLx || rasIn->getLy() != inBBoxLy) {
 		TRaster32P rasOut = TRaster32P(inBBoxLx, inBBoxLy);
-		TRop::resample(rasOut, rasIn, TScale((double)rasOut->getLx() / rasIn->getLx(), (double)rasOut->getLy() / rasIn->getLy()));
+		TRop::resample(rasOut, rasIn, TScale((double)rasOut->getLx() / rasIn->getLx(),
+											 (double)rasOut->getLy() / rasIn->getLy()));
 		rasIn = rasOut;
 	}
 
@@ -133,9 +139,8 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame, const TRender
 	assert(rasterWidth > 0);
 	assert(rasterHeight > 0);
 
-	TRectD clippingRect = TRectD(tile.m_pos,
-								 TDimensionD(tile.getRaster()->getLx(),
-											 tile.getRaster()->getLy()));
+	TRectD clippingRect =
+		TRectD(tile.m_pos, TDimensionD(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
 #if CREATE_GL_CONTEXT_ONE_TIME
 	int ret = wglMakeCurrent(m_offScreenGL.m_offDC, m_offScreenGL.m_hglRC);
 	assert(ret == TRUE);
@@ -176,14 +181,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame, const TRender
 		texture->copy(rasIn);
 
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-		glTexImage2D(GL_TEXTURE_2D,
-					 0,
-					 4,
-					 texWidth,
-					 texHeight,
-					 0,
-					 GL_RGBA,
-					 GL_UNSIGNED_BYTE,
+		glTexImage2D(GL_TEXTURE_2D, 0, 4, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 					 texture->getRawData());
 	}
 #else
@@ -193,12 +191,8 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame, const TRender
 	rasaux = rasIn;
 	rasaux->lock();
 
-	glTexSubImage2D(GL_TEXTURE_2D, 0,
-					0, 0,
-					rasIn->getLx(), rasIn->getLy(),
-					GL_RGBA,
-					GL_UNSIGNED_BYTE,
-					rasIn->getRawData());
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, rasIn->getLx(), rasIn->getLy(), GL_RGBA,
+					GL_UNSIGNED_BYTE, rasIn->getRawData());
 
 #endif
 	checkErrorsByGL
@@ -233,8 +227,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame, const TRender
 		glDisable(GL_TEXTURE_2D);
 	} else
 		polygonStyle = GL_FILL;
-	checkErrorsByGL
-		p00.x /= ri.m_shrinkX;
+	checkErrorsByGL p00.x /= ri.m_shrinkX;
 	p00.y /= ri.m_shrinkY;
 
 	p10.x /= ri.m_shrinkX;
@@ -260,10 +253,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame, const TRender
 	if (vertical && horizontal)
 		details = 1;
 	glPolygonMode(GL_FRONT_AND_BACK, polygonStyle);
-	subdivision(p00, p10, p11, p01,
-				tex00, tex10, tex11, tex01,
-				clippingRect,
-				details);
+	subdivision(p00, p10, p11, p01, tex00, tex10, tex11, tex01, clippingRect, details);
 
 	if (!wireframe) {
 		// abilito l'antialiasing delle linee
@@ -305,9 +295,8 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame, const TRender
 
 	TRaster32P newRas(tile.getRaster()->getLx(), tile.getRaster()->getLy());
 	newRas->lock();
-	glReadPixels(1, 1,
-				 newRas->getLx(), newRas->getLy(),
-				 GL_RGBA, GL_UNSIGNED_BYTE, (void *)newRas->getRawData());
+	glReadPixels(1, 1, newRas->getLx(), newRas->getLy(), GL_RGBA, GL_UNSIGNED_BYTE,
+				 (void *)newRas->getRawData());
 	newRas->unlock();
 	checkErrorsByGL
 
@@ -318,16 +307,9 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame, const TRender
 
 // ------------------------------------------------------------------------
 
-void subdivision(const TPointD &p00,
-				 const TPointD &p10,
-				 const TPointD &p11,
-				 const TPointD &p01,
-				 const TPointD &tex00,
-				 const TPointD &tex10,
-				 const TPointD &tex11,
-				 const TPointD &tex01,
-				 const TRectD &clippingRect,
-				 int details)
+void subdivision(const TPointD &p00, const TPointD &p10, const TPointD &p11, const TPointD &p01,
+				 const TPointD &tex00, const TPointD &tex10, const TPointD &tex11,
+				 const TPointD &tex01, const TRectD &clippingRect, int details)
 {
 	if (details == 1) {
 		glBegin(GL_QUADS);
@@ -352,23 +334,23 @@ void subdivision(const TPointD &p00,
 		TPointD D = p01;
 
 		/*
-     *     D                L2               C
-     *     +----------------+----------------+
-     *     |                |                |
-     *     |                |                |
-     *     |                |                |
-     *     |                |                |
-     *     |                |                |
-     *  H1 +----------------+----------------+ H2
-     *     |                | M              |
-     *     |                |                |
-     *     |                |                |
-     *     |                |                |
-     *     |                |                |
-     *     +----------------+----------------+
-     *     A                L1               B
-     *
-     */
+	 *     D                L2               C
+	 *     +----------------+----------------+
+	 *     |                |                |
+	 *     |                |                |
+	 *     |                |                |
+	 *     |                |                |
+	 *     |                |                |
+	 *  H1 +----------------+----------------+ H2
+	 *     |                | M              |
+	 *     |                |                |
+	 *     |                |                |
+	 *     |                |                |
+	 *     |                |                |
+	 *     +----------------+----------------+
+	 *     A                L1               B
+	 *
+	 */
 
 		TPointD M, L1, L2, H1, H2, P1, P2;
 		bool intersection;
@@ -461,7 +443,7 @@ int splitMatrix(double **a, int n, int *index)
 		if (big == 0.0) {
 			/*printf("aho, sta matrice e 'vota!!\n");*/
 			return 0;
-			//exit(0);
+			// exit(0);
 		}
 		vv[i] = 1.0 / big;
 	}
@@ -509,8 +491,7 @@ int splitMatrix(double **a, int n, int *index)
 
 /*-----------------------------------------------------------------*/
 
-void buildMatrixes(const FourPoints &ss, const FourPoints &dd,
-				   double **a, double *b)
+void buildMatrixes(const FourPoints &ss, const FourPoints &dd, double **a, double *b)
 {
 	int i;
 	TPointD s[4], d[4];
@@ -596,8 +577,8 @@ void solveSystems(double **a, double *bx)
 
 /*-----------------------------------------------------------------*/
 
-void computeTransformation(const FourPoints &s, const FourPoints &d,
-						   TAffine &aff, TPointD &perspectDen)
+void computeTransformation(const FourPoints &s, const FourPoints &d, TAffine &aff,
+						   TPointD &perspectDen)
 {
 	double **a, *b;
 
@@ -628,7 +609,8 @@ void computeTransformation(const FourPoints &s, const FourPoints &d,
 
 /*-----------------------------------------------------------------*/
 
-FourPoints computeTransformed(const FourPoints &pointsFrom, const FourPoints &pointsTo, const FourPoints &from)
+FourPoints computeTransformed(const FourPoints &pointsFrom, const FourPoints &pointsTo,
+							  const FourPoints &from)
 {
 	TAffine aff;
 	TPointD perspectiveDen;

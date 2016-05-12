@@ -54,8 +54,7 @@ int hint_default_value(toonz_param_handle_t param, int size_in_bytes, const void
 				return TOONZ_ERROR_INVALID_SIZE;
 			}
 			const double *values = reinterpret_cast<const double *>(default_value);
-			p->setDefaultValue(toPixel32(
-				TPixelD(values[0], values[1], values[2], values[3])));
+			p->setDefaultValue(toPixel32(TPixelD(values[0], values[1], values[2], values[3])));
 		} else if (TPointParamP p = param) {
 			if (size_in_bytes != sizeof(double) * 2) {
 				return TOONZ_ERROR_INVALID_SIZE;
@@ -86,9 +85,8 @@ int hint_default_value(toonz_param_handle_t param, int size_in_bytes, const void
 			std::vector<TSpectrum::ColorKey> keys(count);
 			for (int i = 0; i < count; i++) {
 				keys[i].first = values[5 * i + 0];
-				keys[i].second = toPixel32(TPixelD(
-					values[5 * i + 1], values[5 * i + 2],
-					values[5 * i + 3], values[5 * i + 4]));
+				keys[i].second = toPixel32(TPixelD(values[5 * i + 1], values[5 * i + 2],
+												   values[5 * i + 3], values[5 * i + 4]));
 			}
 			p->setDefaultValue(TSpectrum(count, keys.data()));
 		} else if (TStringParamP p = param) {
@@ -121,9 +119,8 @@ int hint_value_range(toonz_param_handle_t param, const void *minvalue, const voi
 		TParamP param = _->param();
 
 		if (TDoubleParamP p = param) {
-			p->setValueRange(
-				*reinterpret_cast<const double *>(minvalue),
-				*reinterpret_cast<const double *>(maxvalue));
+			p->setValueRange(*reinterpret_cast<const double *>(minvalue),
+							 *reinterpret_cast<const double *>(maxvalue));
 		} else if (TRangeParamP p = param) {
 			const double minv = *reinterpret_cast<const double *>(minvalue);
 			const double maxv = *reinterpret_cast<const double *>(maxvalue);
@@ -135,9 +132,8 @@ int hint_value_range(toonz_param_handle_t param, const void *minvalue, const voi
 			p->getX()->setValueRange(minv, maxv);
 			p->getY()->setValueRange(minv, maxv);
 		} else if (TIntParamP p = param) {
-			p->setValueRange(
-				*reinterpret_cast<const int *>(minvalue),
-				*reinterpret_cast<const int *>(maxvalue));
+			p->setValueRange(*reinterpret_cast<const int *>(minvalue),
+							 *reinterpret_cast<const int *>(maxvalue));
 		} else {
 			return TOONZ_ERROR_NOT_IMPLEMENTED;
 		}
@@ -297,7 +293,7 @@ int get_type(toonz_param_handle_t param, double frame, int *ptype, int *pcount)
 				auto lst = r->getValue(frame);
 				*pcount = lst.size();
 			} else {
-				*pcount = 1; //static_cast< int >(v);
+				*pcount = 1; // static_cast< int >(v);
 			}
 			return TOONZ_OK;
 		} else
@@ -354,7 +350,8 @@ int get_string_value(toonz_param_handle_t param, int *wholesize, int rcvbufsize,
 	return TOONZ_ERROR_INVALID_HANDLE;
 }
 
-int get_spectrum_value(toonz_param_handle_t param, double frame, double x, toonz_param_spectrum_t *pvalue)
+int get_spectrum_value(toonz_param_handle_t param, double frame, double x,
+					   toonz_param_spectrum_t *pvalue)
 {
 	if (!pvalue)
 		return TOONZ_ERROR_NULL;
@@ -424,9 +421,8 @@ int set_value(toonz_param_handle_t param, double frame, int size_in_bytes, const
 			std::vector<TSpectrum::ColorKey> keys(count);
 			for (int i = 0; i < count; i++) {
 				keys[i].first = values[5 * i + 0];
-				keys[i].second = toPixel32(TPixelD(
-					values[5 * i + 1], values[5 * i + 2],
-					values[5 * i + 3], values[5 * i + 4]));
+				keys[i].second = toPixel32(TPixelD(values[5 * i + 1], values[5 * i + 2],
+												   values[5 * i + 3], values[5 * i + 4]));
 			}
 			p->setValue(frame, TSpectrum(count, keys.data()));
 		} else if (TStringParamP p = param) {

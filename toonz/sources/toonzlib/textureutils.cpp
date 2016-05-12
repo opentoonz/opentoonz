@@ -99,7 +99,8 @@ TRasterImageP getTexture(const TXshSimpleLevel *sl, const TFrameId &fid, int sub
 	std::string id = sl->getImageId(fid) + "_rasterized";
 
 	ImageLoader::BuildExtData extData(sl, fid);
-	TRasterImageP ri(ImageManager::instance()->getImage(id, ImageManager::dontPutInCache, &extData));
+	TRasterImageP ri(
+		ImageManager::instance()->getImage(id, ImageManager::dontPutInCache, &extData));
 
 	return ri;
 }
@@ -110,8 +111,8 @@ TRasterImageP getTexture(const TXshSimpleLevel *sl, const TFrameId &fid, int sub
 //    TXshSimpleLevel Texture Utilities  implementation
 //********************************************************************************************
 
-DrawableTextureDataP texture_utils::getTextureData(
-	const TXshSimpleLevel *sl, const TFrameId &fid, int subsampling)
+DrawableTextureDataP texture_utils::getTextureData(const TXshSimpleLevel *sl, const TFrameId &fid,
+												   int subsampling)
 {
 	const std::string &texId = sl->getImageId(fid);
 
@@ -132,8 +133,7 @@ DrawableTextureDataP texture_utils::getTextureData(
 
 	TRectD geom(0, 0, ras->getLx(), ras->getLy());
 	geom = TScale(ri->getSubsampling()) *
-		   TTranslation(convert(ri->getOffset()) - ras->getCenterD()) *
-		   geom;
+		   TTranslation(convert(ri->getOffset()) - ras->getCenterD()) * geom;
 
 	return TTexturesStorage::instance()->loadTexture(texId, ras, geom);
 }
@@ -192,7 +192,8 @@ DrawableTextureDataP texture_utils::getTextureData(const TXsheet *xsh, int frame
 	TRectD bbox(xsh->getBBox(frame));
 
 	// Since xsh represents a sub-xsheet, its camera affine must be applied
-	const TAffine &cameraAff = xsh->getPlacement(xsh->getStageObjectTree()->getCurrentCameraId(), frame);
+	const TAffine &cameraAff =
+		xsh->getPlacement(xsh->getStageObjectTree()->getCurrentCameraId(), frame);
 	bbox = (cameraAff.inv() * bbox).enlarge(1.0);
 
 	// Render the xsheet on the specified bbox

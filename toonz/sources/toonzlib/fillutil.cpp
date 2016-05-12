@@ -39,8 +39,8 @@ void computeSeeds(const TRasterCM32P &r, TStroke *stroke,
 
 //-----------------------------------------------------------------------------
 
-void fillArea(const TRasterCM32P &ras, TRegion *r, int colorId,
-			  bool onlyUnfilled, bool fillPaints, bool fillInks)
+void fillArea(const TRasterCM32P &ras, TRegion *r, int colorId, bool onlyUnfilled, bool fillPaints,
+			  bool fillInks)
 {
 	TRect bbox = convert(r->getBBox());
 	bbox *= ras->getBounds();
@@ -116,14 +116,15 @@ bool areRectPixelsTransparent(TPixel32 *pixels, TRect rect, int wrap)
 }
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
 // AreaFiller
 
 AreaFiller::AreaFiller(const TRasterCM32P &ras)
-	: m_ras(ras), m_bounds(ras->getBounds()), m_pixels(ras->pixels()), m_wrap(ras->getWrap()), m_color(0)
+	: m_ras(ras), m_bounds(ras->getBounds()), m_pixels(ras->pixels()), m_wrap(ras->getWrap()),
+	  m_color(0)
 {
 	m_ras->lock();
 }
@@ -136,8 +137,10 @@ AreaFiller::~AreaFiller()
 }
 
 //-----------------------------------------------------------------------------
-// questa funzione viene chiamata dopo il fill rect delle aree, e colora gli inchiostri di tipo "autoink"
-// che confinano con le aree appena fillate con il rect. rbefore e' il rect del raster prima del rectfill.
+// questa funzione viene chiamata dopo il fill rect delle aree, e colora gli inchiostri di tipo
+// "autoink"
+// che confinano con le aree appena fillate con il rect. rbefore e' il rect del raster prima del
+// rectfill.
 void fillautoInks(TRasterCM32P &rin, TRect &rect, const TRasterCM32P &rbefore, TPalette *plt)
 {
 	assert(plt);
@@ -152,7 +155,8 @@ void fillautoInks(TRasterCM32P &rin, TRect &rect, const TRasterCM32P &rbefore, T
 			int paint = pix->getPaint();
 			int tone = pix->getTone();
 			int ink = pix->getInk();
-			if (paint != pixb->getPaint() && tone > 0 && tone < 255 && ink != paint && plt->getStyle(ink)->getFlags() != 0)
+			if (paint != pixb->getPaint() && tone > 0 && tone < 255 && ink != paint &&
+				plt->getStyle(ink)->getFlags() != 0)
 				inkFill(rin, TPoint(j, i) + rect.getP00(), paint, 0, NULL, &rect);
 		}
 	}
@@ -160,10 +164,10 @@ void fillautoInks(TRasterCM32P &rin, TRect &rect, const TRasterCM32P &rbefore, T
 
 //-----------------------------------------------------------------------------
 
-void AreaFiller::rectFill(const TRect &rect, int color,
-						  bool onlyUnfilled, bool fillPaints, bool fillInks)
+void AreaFiller::rectFill(const TRect &rect, int color, bool onlyUnfilled, bool fillPaints,
+						  bool fillInks)
 {
-	//Viene trattato il caso fillInks
+	// Viene trattato il caso fillInks
 	/*- FillInkのみの場合 -*/
 	if (!fillPaints) {
 		assert(fillInks);
@@ -180,7 +184,7 @@ void AreaFiller::rectFill(const TRect &rect, int color,
 
 	int dx = r.x1 - r.x0;
 	int dy = (r.y1 - r.y0) * m_wrap;
-	if (dx < 2 || dy < 2) //rect degenere(area contenuta nulla), skippo.
+	if (dx < 2 || dy < 2) // rect degenere(area contenuta nulla), skippo.
 		return;
 
 	std::vector<int> frameSeed(2 * (r.getLx() + r.getLy() - 2));
@@ -191,14 +195,13 @@ void AreaFiller::rectFill(const TRect &rect, int color,
 	count1 = 0;
 	count2 = r.y1 - r.y0 + 1;
 
-	//Se il rettangolo non contiene il bordo del raster e se tutti i pixels
-	//contenuti nel rettangolo sono pure paint non deve fare nulla!
-	if (!rect.contains(m_bounds) &&
-		areRectPixelsPurePaint(m_pixels, r, m_wrap))
+	// Se il rettangolo non contiene il bordo del raster e se tutti i pixels
+	// contenuti nel rettangolo sono pure paint non deve fare nulla!
+	if (!rect.contains(m_bounds) && areRectPixelsPurePaint(m_pixels, r, m_wrap))
 		return;
 
-	//Viene riempito frameSeed con tutti i paint delle varie aree del rettangolo di contorno.
-	//Viene verificato se i pixels del rettangolo sono tutti pure paint.
+	// Viene riempito frameSeed con tutti i paint delle varie aree del rettangolo di contorno.
+	// Viene verificato se i pixels del rettangolo sono tutti pure paint.
 	/*- 輪郭のPaintのIDをframeseed内に格納 -*/
 	for (y = r.y0; y <= r.y1; y++, ptr += m_wrap, count1++, count2++) {
 		if (r.x0 > 0)
@@ -217,7 +220,7 @@ void AreaFiller::rectFill(const TRect &rect, int color,
 	}
 	assert(count2 == 2 * (r.getLx() + r.getLy() - 2));
 
-	//Viene fillato l'interno e il bordo del rettangolo rect con color
+	// Viene fillato l'interno e il bordo del rettangolo rect con color
 	Pixel *pix = m_pixels + r.y0 * m_wrap + r.x0;
 	if (onlyUnfilled)
 		for (y = r.y0; y <= r.y1; y++, pix += m_wrap - dx - 1) {
@@ -237,9 +240,9 @@ void AreaFiller::rectFill(const TRect &rect, int color,
 			}
 		}
 
-	//Vengono fillati i pixel del rettangolo con i paint (mantenuti in frameSeed) che
-	//c'erano prima di fillare l'intero rettangolo, in questo modo si riportano
-	//al colore originale le aree che non sono chiuse e non dovevano essere fillate.
+	// Vengono fillati i pixel del rettangolo con i paint (mantenuti in frameSeed) che
+	// c'erano prima di fillare l'intero rettangolo, in questo modo si riportano
+	// al colore originale le aree che non sono chiuse e non dovevano essere fillate.
 	count1 = 0;
 	FillParameters params;
 	if (r.x0 > 0)
@@ -279,8 +282,8 @@ void AreaFiller::rectFill(const TRect &rect, int color,
 
 //-----------------------------------------------------------------------------
 
-void AreaFiller::strokeFill(TStroke *stroke, int colorId,
-							bool onlyUnfilled, bool fillPaints, bool fillInks)
+void AreaFiller::strokeFill(TStroke *stroke, int colorId, bool onlyUnfilled, bool fillPaints,
+							bool fillInks)
 {
 	stroke->transform(TTranslation(convert(m_ras->getCenter())));
 	m_ras->lock();
@@ -304,7 +307,8 @@ void AreaFiller::strokeFill(TStroke *stroke, int colorId,
 // FullColorAreaFiller
 
 FullColorAreaFiller::FullColorAreaFiller(const TRaster32P &ras)
-	: m_ras(ras), m_bounds(ras->getBounds()), m_pixels(ras->pixels()), m_wrap(ras->getWrap()), m_color(0)
+	: m_ras(ras), m_bounds(ras->getBounds()), m_pixels(ras->pixels()), m_wrap(ras->getWrap()),
+	  m_color(0)
 {
 	m_ras->lock();
 }
@@ -318,7 +322,8 @@ FullColorAreaFiller::~FullColorAreaFiller()
 
 //-----------------------------------------------------------------------------
 
-void FullColorAreaFiller::rectFill(const TRect &rect, const FillParameters &params, bool onlyUnfilled)
+void FullColorAreaFiller::rectFill(const TRect &rect, const FillParameters &params,
+								   bool onlyUnfilled)
 {
 	TRect bbox = m_ras->getBounds();
 	TRect r = rect * bbox;
@@ -330,7 +335,7 @@ void FullColorAreaFiller::rectFill(const TRect &rect, const FillParameters &para
 
 	TPixel32 color = params.m_palette->getStyle(params.m_styleId)->getMainColor();
 
-	//Fillo tutto il quadaratino con color
+	// Fillo tutto il quadaratino con color
 	int x, y;
 	for (y = 0; y < workRas->getLy(); y++) {
 		TPixel32 *line = workRas->pixels(y);
@@ -392,9 +397,11 @@ class InkSegmenter
 	TTileSaverCM32 *m_saver;
 	float m_growFactor;
 
-public:
+  public:
 	InkSegmenter(const TRasterCM32P &r, float growFactor, TTileSaverCM32 *saver)
-		: m_r(r), m_lx(r->getLx()), m_ly(r->getLy()), m_wrap(r->getWrap()), m_buf((TPixelCM32 *)r->getRawData()), m_bBox(r->getBounds()), m_saver(saver), m_growFactor(growFactor)
+		: m_r(r), m_lx(r->getLx()), m_ly(r->getLy()), m_wrap(r->getWrap()),
+		  m_buf((TPixelCM32 *)r->getRawData()), m_bBox(r->getBounds()), m_saver(saver),
+		  m_growFactor(growFactor)
 	{
 		m_displaceVector[0] = -m_wrap - 1;
 		m_displaceVector[1] = -m_wrap;
@@ -422,7 +429,8 @@ public:
 		if (!m_bBox.contains(p))
 			return false;
 
-		if ((m_buf + p.y * m_wrap + p.x)->isPurePaint() && ((p = nearestInk(p, 2)) == TPoint(-1, -1)))
+		if ((m_buf + p.y * m_wrap + p.x)->isPurePaint() &&
+			((p = nearestInk(p, 2)) == TPoint(-1, -1)))
 			return false;
 
 		pix = m_buf + p.y * m_wrap + p.x;
@@ -441,21 +449,19 @@ public:
 		if (distance == -1)
 			return false;
 
-		if (!findDam(master, mp, slave, sp, distance,
-					 d11, d1p1, d12, d1p2))
+		if (!findDam(master, mp, slave, sp, distance, d11, d1p1, d12, d1p2))
 			d11 = d12 = d21 = d22 = 0;
 		else
-			findDamRev(master, mp, slave, sp, distance,
-					   d21, d2p1, d22, d2p2);
+			findDamRev(master, mp, slave, sp, distance, d21, d2p1, d22, d2p2);
 
-		//vector<pair<TPixelCM32*, int> > oldInks;
+		// vector<pair<TPixelCM32*, int> > oldInks;
 
 		drawSegment(d1p1, d1p2, damInk, m_saver);
 		drawSegment(d2p1, d2p2, damInk, m_saver);
 
 		inkSegmentFill(p, ink, isSelective, m_saver);
 
-		//UINT i;
+		// UINT i;
 
 		drawSegment(d1p1, d1p2, ink, m_saver);
 		drawSegment(d2p1, d2p2, ink, m_saver);
@@ -466,43 +472,33 @@ public:
 		return true;
 	}
 
-private:
+  private:
 	void drawSegment(const TPoint &p0, const TPoint &p1, int ink,
 					 /*vector<pair<TPixelCM32*, int> >& oldInks,*/ TTileSaverCM32 *saver);
 
-	int findTwinPoints(TPixelCM32 *pix, const TPoint &p,
-					   TPixelCM32 *&master, TPoint &mp,
+	int findTwinPoints(TPixelCM32 *pix, const TPoint &p, TPixelCM32 *&master, TPoint &mp,
 					   TPixelCM32 *&slave, TPoint &sp);
-	int searchForNearestSlave(TPixelCM32 *pix1, TPixelCM32 *pix2,
-							  const TPoint &p1, TPoint &p2,
+	int searchForNearestSlave(TPixelCM32 *pix1, TPixelCM32 *pix2, const TPoint &p1, TPoint &p2,
 							  TPixelCM32 *&slave, TPoint &sp);
-	int rearrangePoints(TPixelCM32 *&master, TPoint &mp,
-						TPixelCM32 *&slave, int s_prewalker,
+	int rearrangePoints(TPixelCM32 *&master, TPoint &mp, TPixelCM32 *&slave, int s_prewalker,
 						TPoint &sp, int walk);
-	int rearrangePointsRev(TPixelCM32 *&master, TPoint &mp,
-						   TPixelCM32 *&slave, int s_prewalker,
+	int rearrangePointsRev(TPixelCM32 *&master, TPoint &mp, TPixelCM32 *&slave, int s_prewalker,
 						   TPoint &sp, int walk);
 	int dragSlave(TPoint mp, TPixelCM32 *&slave, int &s_prewalker, TPoint &sp);
-	int dragSlaveRev(TPoint mp, TPixelCM32 *&slave, int &s_prewalker,
-					 TPoint &sp, TPixelCM32 *first_slave);
-	bool findDam(TPixelCM32 *master, TPoint mp,
-				 TPixelCM32 *slave, TPoint sp, int distance,
-				 TPixelCM32 *&d11, TPoint &d1p1,
-				 TPixelCM32 *&d12, TPoint &d1p2);
-	void findDamRev(TPixelCM32 *master, TPoint mp,
-					TPixelCM32 *slave, TPoint sp, int distance,
-					TPixelCM32 *&d11, TPoint &d1p1,
-					TPixelCM32 *&d12, TPoint &d1p2);
-	int nextPointIsGoodRev(TPoint mp, TPoint sp,
-						   TPixelCM32 *slave, int s_prewalker, int distance);
-	int nextPointIsGood(TPoint mp, TPoint sp,
-						TPixelCM32 *slave, int s_prewalker, int distance);
+	int dragSlaveRev(TPoint mp, TPixelCM32 *&slave, int &s_prewalker, TPoint &sp,
+					 TPixelCM32 *first_slave);
+	bool findDam(TPixelCM32 *master, TPoint mp, TPixelCM32 *slave, TPoint sp, int distance,
+				 TPixelCM32 *&d11, TPoint &d1p1, TPixelCM32 *&d12, TPoint &d1p2);
+	void findDamRev(TPixelCM32 *master, TPoint mp, TPixelCM32 *slave, TPoint sp, int distance,
+					TPixelCM32 *&d11, TPoint &d1p1, TPixelCM32 *&d12, TPoint &d1p2);
+	int nextPointIsGoodRev(TPoint mp, TPoint sp, TPixelCM32 *slave, int s_prewalker, int distance);
+	int nextPointIsGood(TPoint mp, TPoint sp, TPixelCM32 *slave, int s_prewalker, int distance);
 	void inkSegmentFill(const TPoint &p, int ink, bool isSelective, TTileSaverCM32 *saver);
 	TPoint nearestInk(const TPoint &p, int ray);
-	inline int stepReversed(TPixelCM32 *walker, int prewalker, int &distance,
-							const TPoint &p1, TPoint &p2);
-	inline int stepForward(TPixelCM32 *walker, int prewalker, int &distance,
-						   const TPoint &p1, TPoint &p2);
+	inline int stepReversed(TPixelCM32 *walker, int prewalker, int &distance, const TPoint &p1,
+							TPoint &p2);
+	inline int stepForward(TPixelCM32 *walker, int prewalker, int &distance, const TPoint &p1,
+						   TPoint &p2);
 
 	TPixelCM32 *ePix(TPixelCM32 *br) { return (br + 1); }
 	TPixelCM32 *wPix(TPixelCM32 *br) { return (br - 1); }
@@ -515,7 +511,7 @@ private:
 
 	UCHAR neighboursCode(TPixelCM32 *seed, const TPoint &p)
 	{
-		//assert(p == TPoint((seed-m_buf)%m_wrap, (seed-m_buf)/m_wrap));
+		// assert(p == TPoint((seed-m_buf)%m_wrap, (seed-m_buf)/m_wrap));
 		bool w = (p.x > 0), e = (p.x < m_lx - 1), s = (p.y > 0), n = (p.y < m_ly - 1);
 
 		return (((s && w) ? ((!swPix(seed)->isPurePaint())) : 0) |
@@ -531,32 +527,32 @@ private:
 
 //-----------------------------------------------------------------------------
 
-#define DRAW_SEGMENT(a, b, da, db, istr1, istr2, block) \
-	{                                                   \
-		d = 2 * db - da;                                \
-		incr_1 = 2 * db;                                \
-		incr_2 = 2 * (db - da);                         \
-		while (a < da) {                                \
-			if (d <= 0) {                               \
-				d += incr_1;                            \
-				a++;                                    \
-				istr1;                                  \
-			} else {                                    \
-				d += incr_2;                            \
-				a++;                                    \
-				b++;                                    \
-				istr2;                                  \
-			}                                           \
-			block;                                      \
-		}                                               \
+#define DRAW_SEGMENT(a, b, da, db, istr1, istr2, block)                                            \
+	{                                                                                              \
+		d = 2 * db - da;                                                                           \
+		incr_1 = 2 * db;                                                                           \
+		incr_2 = 2 * (db - da);                                                                    \
+		while (a < da) {                                                                           \
+			if (d <= 0) {                                                                          \
+				d += incr_1;                                                                       \
+				a++;                                                                               \
+				istr1;                                                                             \
+			} else {                                                                               \
+				d += incr_2;                                                                       \
+				a++;                                                                               \
+				b++;                                                                               \
+				istr2;                                                                             \
+			}                                                                                      \
+			block;                                                                                 \
+		}                                                                                          \
 	}
-#define SET_INK                                                              \
-	{                                                                        \
-		if (saver)                                                           \
-			saver->save(TPoint(x1 + x, y1 + y));                             \
-		/*if (buf->getInk()!=damInk)*/                                       \
-		/*  oldInks.push_back(pair<TPixelCM32*, int>(buf, buf->getInk()));*/ \
-		buf->setInk(ink);                                                    \
+#define SET_INK                                                                                    \
+	{                                                                                              \
+		if (saver)                                                                                 \
+			saver->save(TPoint(x1 + x, y1 + y));                                                   \
+		/*if (buf->getInk()!=damInk)*/                                                             \
+		/*  oldInks.push_back(pair<TPixelCM32*, int>(buf, buf->getInk()));*/                       \
+		buf->setInk(ink);                                                                          \
 	}
 
 //-----------------------------------------------------------------------------
@@ -577,10 +573,11 @@ void InkSegmenter::drawSegment(const TPoint &p0, const TPoint &p1, int ink,
 	}
 
 	TPixelCM32 *buf = m_r->pixels() + y1 * m_wrap + x1;
-	/*if (buf->getInk()!=damInk) 
+	/*if (buf->getInk()!=damInk)
 		oldInks.push_back(pair<TPixelCM32*, int>(buf, buf->getInk()));
-	if ((m_r->pixels() + y2*m_wrap + x2)->getInk()!=damInk) 
-		oldInks.push_back(pair<TPixelCM32*, int>(m_r->pixels() + y2*m_wrap + x2, (m_r->pixels() + y2*m_wrap + x2)->getInk()));*/
+	if ((m_r->pixels() + y2*m_wrap + x2)->getInk()!=damInk)
+		oldInks.push_back(pair<TPixelCM32*, int>(m_r->pixels() + y2*m_wrap + x2, (m_r->pixels() +
+	y2*m_wrap + x2)->getInk()));*/
 
 	if (saver) {
 		saver->save(p0);
@@ -632,11 +629,12 @@ void InkSegmenter::inkSegmentFill(const TPoint &p, int ink, bool isSelective, TT
 	while (!seeds.empty()) {
 		TPoint seed = seeds.top();
 		seeds.pop();
-		//if(!m_r->getBounds().contains(seed)) continue;
+		// if(!m_r->getBounds().contains(seed)) continue;
 		x = seed.x;
 		y = seed.y;
 		TPixelCM32 *pix = pixels + (y * m_wrap + x);
-		if (pix->isPurePaint() || pix->getInk() == ink || pix->getInk() == damInk || (isSelective && pix->getInk() != oldInk))
+		if (pix->isPurePaint() || pix->getInk() == ink || pix->getInk() == damInk ||
+			(isSelective && pix->getInk() != oldInk))
 			continue;
 
 		if (saver)
@@ -656,14 +654,10 @@ void InkSegmenter::inkSegmentFill(const TPoint &p, int ink, bool isSelective, TT
 		if (x == lx - 1 || x == 0 || y == ly - 1 || y == 0)
 			continue;
 
-		if (ePix(pix)->getInk() == damInk ||
-			wPix(pix)->getInk() == damInk ||
-			sPix(pix)->getInk() == damInk ||
-			nPix(pix)->getInk() == damInk ||
-			nePix(pix)->getInk() == damInk ||
-			sePix(pix)->getInk() == damInk ||
-			swPix(pix)->getInk() == damInk ||
-			nwPix(pix)->getInk() == damInk)
+		if (ePix(pix)->getInk() == damInk || wPix(pix)->getInk() == damInk ||
+			sPix(pix)->getInk() == damInk || nPix(pix)->getInk() == damInk ||
+			nePix(pix)->getInk() == damInk || sePix(pix)->getInk() == damInk ||
+			swPix(pix)->getInk() == damInk || nwPix(pix)->getInk() == damInk)
 			continue;
 
 		seeds.push(TPoint(x - 1, y - 1));
@@ -689,8 +683,7 @@ TPoint InkSegmenter::nearestInk(const TPoint &p, int ray)
 
 //-----------------------------------------------------------------------------
 
-int InkSegmenter::findTwinPoints(TPixelCM32 *pix, const TPoint &p,
-								 TPixelCM32 *&master, TPoint &mp,
+int InkSegmenter::findTwinPoints(TPixelCM32 *pix, const TPoint &p, TPixelCM32 *&master, TPoint &mp,
 								 TPixelCM32 *&slave, TPoint &sp)
 {
 	TPixelCM32 *row_p1, *col_p1, *row_p2, *col_p2;
@@ -745,7 +738,8 @@ int InkSegmenter::findTwinPoints(TPixelCM32 *pix, const TPoint &p,
 		mp = TPoint(p.x, col_y1);
 
 		auxp = TPoint(p.x, col_y2);
-		if ((distance = searchForNearestSlave(col_p1, col_p2, mp, auxp, slave, sp)) == 0 /*&& !is_connecting(p1)*/)
+		if ((distance = searchForNearestSlave(col_p1, col_p2, mp, auxp, slave, sp)) ==
+			0 /*&& !is_connecting(p1)*/)
 			return -1;
 	} else {
 		master = col_p1;
@@ -758,7 +752,8 @@ int InkSegmenter::findTwinPoints(TPixelCM32 *pix, const TPoint &p,
 		master = row_p1;
 		mp = TPoint(row_x1, p.y);
 		auxp = TPoint(row_x2, p.y);
-		if ((distance = searchForNearestSlave(row_p1, row_p2, mp, auxp, slave, sp)) == 0 /*&& !is_connecting(p1)*/)
+		if ((distance = searchForNearestSlave(row_p1, row_p2, mp, auxp, slave, sp)) ==
+			0 /*&& !is_connecting(p1)*/)
 			return -1;
 	}
 
@@ -820,9 +815,8 @@ inline int InkSegmenter::stepForward(TPixelCM32 *walker, int prewalker, int &dis
 
 //-----------------------------------------------------------------------------
 
-int InkSegmenter::searchForNearestSlave(TPixelCM32 *pix1, TPixelCM32 *pix2,
-										const TPoint &p1, TPoint &p2,
-										TPixelCM32 *&slave, TPoint &sp)
+int InkSegmenter::searchForNearestSlave(TPixelCM32 *pix1, TPixelCM32 *pix2, const TPoint &p1,
+										TPoint &p2, TPixelCM32 *&slave, TPoint &sp)
 {
 	int curr_distance, new_distance;
 	UCHAR prewalker, next;
@@ -866,8 +860,8 @@ int InkSegmenter::searchForNearestSlave(TPixelCM32 *pix1, TPixelCM32 *pix2,
 
 	next = stepReversed(walker, prewalker, new_distance, p1, p2);
 
-	if (p2.x > 0 && p2.x < m_lx - 1 && p2.y > 0 && p2.y < m_ly - 1 &&
-		curr_distance != 0 && new_distance < curr_distance) {
+	if (p2.x > 0 && p2.x < m_lx - 1 && p2.y > 0 && p2.y < m_ly - 1 && curr_distance != 0 &&
+		new_distance < curr_distance) {
 		while (new_distance < curr_distance && new_distance > 0) {
 			curr_distance = new_distance;
 			sp = p2;
@@ -887,9 +881,8 @@ int InkSegmenter::searchForNearestSlave(TPixelCM32 *pix1, TPixelCM32 *pix2,
 
 //-----------------------------------------------------------------------------
 
-int InkSegmenter::rearrangePoints(TPixelCM32 *&master, TPoint &mp,
-								  TPixelCM32 *&slave, int s_prewalker,
-								  TPoint &sp, int walk)
+int InkSegmenter::rearrangePoints(TPixelCM32 *&master, TPoint &mp, TPixelCM32 *&slave,
+								  int s_prewalker, TPoint &sp, int walk)
 {
 	int s_next;
 
@@ -906,15 +899,14 @@ int InkSegmenter::rearrangePoints(TPixelCM32 *&master, TPoint &mp,
 
 //-----------------------------------------------------------------------------
 
-int InkSegmenter::rearrangePointsRev(TPixelCM32 *&master, TPoint &mp,
-									 TPixelCM32 *&slave, int s_prewalker,
-									 TPoint &sp, int walk)
+int InkSegmenter::rearrangePointsRev(TPixelCM32 *&master, TPoint &mp, TPixelCM32 *&slave,
+									 int s_prewalker, TPoint &sp, int walk)
 {
 	int s_next;
 
 	while (walk-- && sp.x > 0 && sp.x < m_lx - 1 && sp.y > 0 && sp.y < m_ly - 1) {
 		s_next = NextPointTable[((neighboursCode(slave, sp)) << 3) | s_prewalker];
-		//s_next = NEXT_POINT_24(*slave, s_prewalker);
+		// s_next = NEXT_POINT_24(*slave, s_prewalker);
 
 		newP(s_next, sp);
 
@@ -952,8 +944,8 @@ int InkSegmenter::dragSlave(TPoint mp, TPixelCM32 *&slave, int &s_prewalker, TPo
 
 //-----------------------------------------------------------------------------
 
-int InkSegmenter::dragSlaveRev(TPoint mp, TPixelCM32 *&slave, int &s_prewalker,
-							   TPoint &sp, TPixelCM32 *first_slave)
+int InkSegmenter::dragSlaveRev(TPoint mp, TPixelCM32 *&slave, int &s_prewalker, TPoint &sp,
+							   TPixelCM32 *first_slave)
 {
 	int distance, new_distance, s_next;
 	int ret = 0;
@@ -963,8 +955,8 @@ int InkSegmenter::dragSlaveRev(TPoint mp, TPixelCM32 *&slave, int &s_prewalker,
 	s_next = stepReversed(slave, s_prewalker, new_distance, mp, sp);
 
 	while (sp.x > 0 && sp.x < m_lx - 1 && sp.y > 0 && sp.y < m_ly - 1 &&
-		   (new_distance < distance ||
-			nextPointIsGoodRev(mp, sp, slave + m_displaceVector[s_next], (~s_next) & 0x7, distance))) {
+		   (new_distance < distance || nextPointIsGoodRev(mp, sp, slave + m_displaceVector[s_next],
+														  (~s_next) & 0x7, distance))) {
 		if (!ret)
 			ret = 1;
 		distance = new_distance;
@@ -982,10 +974,9 @@ int InkSegmenter::dragSlaveRev(TPoint mp, TPixelCM32 *&slave, int &s_prewalker,
 
 //-----------------------------------------------------------------------------
 
-bool InkSegmenter::findDam(TPixelCM32 *master, TPoint mp,
-						   TPixelCM32 *slave, TPoint sp, int distance,
-						   TPixelCM32 *&d11, TPoint &d1p1,
-						   TPixelCM32 *&d12, TPoint &d1p2)
+bool InkSegmenter::findDam(TPixelCM32 *master, TPoint mp, TPixelCM32 *slave, TPoint sp,
+						   int distance, TPixelCM32 *&d11, TPoint &d1p1, TPixelCM32 *&d12,
+						   TPoint &d1p2)
 
 {
 	int ref_distance, m_prewalker, s_prewalker, m_next, next, ret;
@@ -1008,9 +999,9 @@ bool InkSegmenter::findDam(TPixelCM32 *master, TPoint mp,
 		s_prewalker = next;
 	}
 
-	while (mp.x > 0 && mp.x < m_lx - 1 && mp.y > 0 && mp.y < m_ly - 1 &&
-		   distance < ref_distance &&
-		   !(((m_next = NextPointTable[((neighboursCode(master, mp)) << 3) | m_prewalker]) == s_prewalker) &&
+	while (mp.x > 0 && mp.x < m_lx - 1 && mp.y > 0 && mp.y < m_ly - 1 && distance < ref_distance &&
+		   !(((m_next = NextPointTable[((neighboursCode(master, mp)) << 3) | m_prewalker]) ==
+			  s_prewalker) &&
 			 master == slave)) {
 		newP(m_next, mp);
 		master = master + m_displaceVector[m_next];
@@ -1043,10 +1034,9 @@ bool InkSegmenter::findDam(TPixelCM32 *master, TPoint mp,
 
 //-----------------------------------------------------------------------------
 
-void InkSegmenter::findDamRev(TPixelCM32 *master, TPoint mp,
-							  TPixelCM32 *slave, TPoint sp, int distance,
-							  TPixelCM32 *&d11, TPoint &d1p1,
-							  TPixelCM32 *&d12, TPoint &d1p2)
+void InkSegmenter::findDamRev(TPixelCM32 *master, TPoint mp, TPixelCM32 *slave, TPoint sp,
+							  int distance, TPixelCM32 *&d11, TPoint &d1p1, TPixelCM32 *&d12,
+							  TPoint &d1p2)
 
 {
 	int ref_distance, m_prewalker, s_prewalker, m_next, next;
@@ -1067,9 +1057,9 @@ void InkSegmenter::findDamRev(TPixelCM32 *master, TPoint mp,
 	} else
 		s_prewalker = FirstPreseedTable[neighboursCode(slave, sp)];
 
-	while (mp.x > 0 && mp.x < m_lx - 1 && mp.y > 0 && mp.y < m_ly - 1 &&
-		   distance < ref_distance &&
-		   !(((m_next = NextPointTableRev[((neighboursCode(master, mp)) << 3) | m_prewalker]) == s_prewalker) &&
+	while (mp.x > 0 && mp.x < m_lx - 1 && mp.y > 0 && mp.y < m_ly - 1 && distance < ref_distance &&
+		   !(((m_next = NextPointTableRev[((neighboursCode(master, mp)) << 3) | m_prewalker]) ==
+			  s_prewalker) &&
 			 master == slave)) {
 		newP(m_next, mp);
 		master = master + m_displaceVector[m_next];
@@ -1094,8 +1084,8 @@ void InkSegmenter::findDamRev(TPixelCM32 *master, TPoint mp,
 
 //-----------------------------------------------------------------------------
 
-int InkSegmenter::nextPointIsGood(TPoint mp, TPoint sp,
-								  TPixelCM32 *slave, int s_prewalker, int distance)
+int InkSegmenter::nextPointIsGood(TPoint mp, TPoint sp, TPixelCM32 *slave, int s_prewalker,
+								  int distance)
 {
 	int s_next;
 
@@ -1108,8 +1098,8 @@ int InkSegmenter::nextPointIsGood(TPoint mp, TPoint sp,
 
 //-----------------------------------------------------------------------------
 
-int InkSegmenter::nextPointIsGoodRev(TPoint mp, TPoint sp,
-									 TPixelCM32 *slave, int s_prewalker, int distance)
+int InkSegmenter::nextPointIsGoodRev(TPoint mp, TPoint sp, TPixelCM32 *slave, int s_prewalker,
+									 int distance)
 {
 	int s_next;
 
@@ -1122,7 +1112,8 @@ int InkSegmenter::nextPointIsGoodRev(TPoint mp, TPoint sp,
 
 //-----------------------------------------------------------------------------
 
-bool inkSegment(const TRasterCM32P &r, const TPoint &p, int ink, float growFactor, bool isSelective, TTileSaverCM32 *saver)
+bool inkSegment(const TRasterCM32P &r, const TPoint &p, int ink, float growFactor, bool isSelective,
+				TTileSaverCM32 *saver)
 {
 	r->lock();
 	InkSegmenter is(r, growFactor, saver);

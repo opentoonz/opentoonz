@@ -28,7 +28,7 @@ class Iwa_ParticlesManager : public TRenderResourceManager
 {
 	T_RENDER_RESOURCE_MANAGER
 
-public:
+  public:
 	struct FxData;
 
 	struct FrameData {
@@ -58,7 +58,7 @@ public:
 		FxData();
 	};
 
-public:
+  public:
 	Iwa_ParticlesManager();
 	~Iwa_ParticlesManager();
 
@@ -68,7 +68,7 @@ public:
 
 	bool isCached(unsigned long fxId);
 
-private:
+  private:
 	std::map<unsigned long, FxData *> m_fxs;
 	QMutex m_mutex;
 

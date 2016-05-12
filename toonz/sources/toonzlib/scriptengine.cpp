@@ -117,7 +117,8 @@ QScriptValue runFunction(QScriptContext *context, QScriptEngine *engine)
 
 	if (engine->hasUncaughtException()) {
 		int line = engine->uncaughtExceptionLineNumber();
-		return context->throwError(QString("%1, at line %2 of %3").arg(ret.toString()).arg(line).arg(fpStr));
+		return context->throwError(
+			QString("%1, at line %2 of %3").arg(ret.toString()).arg(line).arg(fpStr));
 	}
 
 	return ret;
@@ -126,11 +127,11 @@ QScriptValue runFunction(QScriptContext *context, QScriptEngine *engine)
 /*
   QScriptValue glub(QScriptContext *context, QScriptEngine *engine)
   {
-    QScriptValue global = engine->globalObject();
-    QScriptValue te = global.property("_engine");
-    ScriptEngine *se = qscriptvalue_cast<ScriptEngine*>(te);
-    se->postCommand(context->argument(0));
-    return 0;
+	QScriptValue global = engine->globalObject();
+	QScriptValue te = global.property("_engine");
+	ScriptEngine *se = qscriptvalue_cast<ScriptEngine*>(te);
+	se->postCommand(context->argument(0));
+	return 0;
   }
   */
 
@@ -143,7 +144,7 @@ class ScriptEngine::Executor : public QThread
 	ScriptEngine *m_engine;
 	QString m_cmd;
 
-public:
+  public:
 	Executor(ScriptEngine *engine, const QString &cmd) : m_engine(engine), m_cmd(cmd) {}
 
 	void run()
@@ -165,7 +166,7 @@ public:
 
 class ScriptEngine::MainThreadEvaluationData
 {
-public:
+  public:
 	QMutex m_mutex;
 	QWaitCondition m_cond;
 	QScriptValue m_fun, m_args, m_result;
@@ -173,7 +174,8 @@ public:
 
 //=========================================================
 
-inline void defineFunction(ScriptEngine *se, const QString &name, QScriptEngine::FunctionSignature f)
+inline void defineFunction(ScriptEngine *se, const QString &name,
+						   QScriptEngine::FunctionSignature f)
 {
 	QScriptEngine *engine = se->getQScriptEngine();
 	QScriptValue fObj = engine->newFunction(f);
@@ -183,10 +185,10 @@ inline void defineFunction(ScriptEngine *se, const QString &name, QScriptEngine:
 
 //=========================================================
 
-ScriptEngine::ScriptEngine()
-	: m_executor(0), m_engine(new QScriptEngine())
+ScriptEngine::ScriptEngine() : m_executor(0), m_engine(new QScriptEngine())
 {
-	// I must call TRenderer::initialize(), because a script could cause a rendering driven by a working thread
+	// I must call TRenderer::initialize(), because a script could cause a rendering driven by a
+	// working thread
 	TRenderer::initialize();
 
 	m_mainThreadEvaluationData = new MainThreadEvaluationData();
@@ -213,9 +215,9 @@ ScriptEngine::ScriptEngine()
   engine.globalObject().setProperty("run", run);
 
   */
-	//QScriptValue g = engine.newFunction(glub);
-	//g.setData(engine.newQObject(this));
-	//engine.globalObject().setProperty("glub", g);
+	// QScriptValue g = engine.newFunction(glub);
+	// g.setData(engine.newQObject(this));
+	// engine.globalObject().setProperty("glub", g);
 
 	// engine.globalObject().setProperty("_engine", engine.newQObject(this));
 
@@ -225,7 +227,8 @@ ScriptEngine::ScriptEngine()
 	engine.globalObject().setProperty("void", *m_voidValue);
 
 	TScriptBinding::bindAll(engine);
-	bool ret = connect(this, SIGNAL(mainThreadEvaluationPosted()), this, SLOT(onMainThreadEvaluationPosted()));
+	bool ret = connect(this, SIGNAL(mainThreadEvaluationPosted()), this,
+					   SLOT(onMainThreadEvaluationPosted()));
 	assert(ret);
 }
 
@@ -235,7 +238,8 @@ ScriptEngine::~ScriptEngine()
 	delete m_voidValue;
 }
 
-const QScriptValue &ScriptEngine::evaluateOnMainThread(const QScriptValue &fun, const QScriptValue &arguments)
+const QScriptValue &ScriptEngine::evaluateOnMainThread(const QScriptValue &fun,
+													   const QScriptValue &arguments)
 {
 	MainThreadEvaluationData *d = m_mainThreadEvaluationData;
 	QMutexLocker locker(&d->m_mutex);

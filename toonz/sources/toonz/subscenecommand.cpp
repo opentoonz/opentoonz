@@ -58,7 +58,7 @@ namespace
 {
 
 struct GroupData {
-public:
+  public:
 	QStack<int> m_groupIds;
 	QStack<std::wstring> m_groupNames;
 	int m_editingGroup;
@@ -87,8 +87,7 @@ void setFxParamToCurrentScene(TFx *fx, TXsheet *xsh)
 		TParam *param = fx->getParams()->getParam(i);
 		if (TDoubleParam *dp = dynamic_cast<TDoubleParam *>(param))
 			xsh->getStageObjectTree()->setGrammar(dp);
-		else if (dynamic_cast<TPointParam *>(param) ||
-				 dynamic_cast<TRangeParam *>(param) ||
+		else if (dynamic_cast<TPointParam *>(param) || dynamic_cast<TRangeParam *>(param) ||
 				 dynamic_cast<TPixelParam *>(param)) {
 			TParamSet *paramSet = dynamic_cast<TParamSet *>(param);
 			assert(paramSet);
@@ -127,7 +126,8 @@ std::vector<TStageObjectId> getRoots(const QList<TStageObjectId> &objIds, TXshee
 //-----------------------------------------------------------------------------
 
 std::vector<TStageObjectId> isConnected(const std::set<int> &indices,
-								   const std::set<TStageObjectId> &pegbarIds, TXsheetHandle *xshHandle)
+										const std::set<TStageObjectId> &pegbarIds,
+										TXsheetHandle *xshHandle)
 {
 	std::vector<TStageObjectId> roots;
 	std::map<TStageObjectId, std::string> parentHandles;
@@ -138,7 +138,8 @@ std::vector<TStageObjectId> isConnected(const std::set<int> &indices,
 		TStageObject *obj = pegTree->getStageObject(id, false);
 		TStageObjectId parentId = obj->getParent();
 		std::string parentHandle = obj->getParentHandle();
-		bool parentIsColumn = parentId.isColumn() && indices.find(parentId.getIndex()) != indices.end();
+		bool parentIsColumn =
+			parentId.isColumn() && indices.find(parentId.getIndex()) != indices.end();
 		if (!parentIsColumn && pegbarIds.find(parentId) == pegbarIds.end() &&
 			(parentHandles.count(parentId) == 0 || parentHandles[parentId] != parentHandle)) {
 			parentHandles[parentId] = parentHandle;
@@ -149,7 +150,8 @@ std::vector<TStageObjectId> isConnected(const std::set<int> &indices,
 	for (it2 = pegbarIds.begin(); it2 != pegbarIds.end(); it2++) {
 		TStageObject *obj = pegTree->getStageObject(*it2, false);
 		TStageObjectId parentId = obj->getParent();
-		bool parentIsColumn = parentId.isColumn() && indices.find(parentId.getIndex()) != indices.end();
+		bool parentIsColumn =
+			parentId.isColumn() && indices.find(parentId.getIndex()) != indices.end();
 		std::string parentHandle = obj->getParentHandle();
 		if (!parentIsColumn && pegbarIds.find(parentId) == pegbarIds.end() &&
 			(parentHandles.count(parentId) == 0 || parentHandles[parentId] != parentHandle)) {
@@ -163,7 +165,8 @@ std::vector<TStageObjectId> isConnected(const std::set<int> &indices,
 //-----------------------------------------------------------------------------
 
 std::map<TFx *, std::vector<TFxPort *>> isConnected(const std::set<int> &indices,
-										  const std::set<TFx *> &internalFxs, TXsheetHandle *xshHandle)
+													const std::set<TFx *> &internalFxs,
+													TXsheetHandle *xshHandle)
 {
 	TXsheet *xsh = xshHandle->getXsheet();
 	std::set<int>::const_iterator it;
@@ -192,8 +195,10 @@ std::map<TFx *, std::vector<TFxPort *>> isConnected(const std::set<int> &indices
 //-----------------------------------------------------------------------------
 
 // returns true if the column indexed with col contains only the childLevel.
-// if not, false is returned and in from and to is put the frame range contained the frame indexed with row.
-bool mustRemoveColumn(int &from, int &to, TXshChildLevel *childLevel, TXsheet *xsh, int col, int row)
+// if not, false is returned and in from and to is put the frame range contained the frame indexed
+// with row.
+bool mustRemoveColumn(int &from, int &to, TXshChildLevel *childLevel, TXsheet *xsh, int col,
+					  int row)
 {
 	bool removeColumn = true;
 	bool rangeFound = false;
@@ -231,7 +236,7 @@ class FxConnections
 	QMap<TFx *, int> m_outputLinks;
 	QList<TFx *> m_notTerminalInputFxs;
 
-public:
+  public:
 	FxConnections() {}
 	~FxConnections() {}
 
@@ -247,7 +252,8 @@ public:
 
 //-----------------------------------------------------------------------------
 
-void getFxConnections(QMap<TFx *, FxConnections> &fxConnetcions, const set<TFx *> &fxs, TXsheet *xsh)
+void getFxConnections(QMap<TFx *, FxConnections> &fxConnetcions, const set<TFx *> &fxs,
+					  TXsheet *xsh)
 {
 	TFxSet *terminalFxs = xsh->getFxDag()->getTerminalFxs();
 	set<TFx *>::const_iterator it;
@@ -289,7 +295,8 @@ void changeSaveSubXsheetAsCommand()
 
 //-----------------------------------------------------------------------------
 
-void getColumnOutputConnections(const std::set<int> &indices, QMap<TFx *, QList<TFxPort *>> &columnOutputConnections)
+void getColumnOutputConnections(const std::set<int> &indices,
+								QMap<TFx *, QList<TFxPort *>> &columnOutputConnections)
 {
 	TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 	std::set<int>::const_iterator it;
@@ -311,7 +318,8 @@ void getColumnOutputConnections(const std::set<int> &indices, QMap<TFx *, QList<
 
 //-----------------------------------------------------------------------------
 
-void getChildren(const std::set<int> &indices, QMap<TStageObjectId, QList<TStageObjectId>> &children)
+void getChildren(const std::set<int> &indices,
+				 QMap<TStageObjectId, QList<TStageObjectId>> &children)
 {
 	TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 	std::set<int>::const_iterator it;
@@ -402,7 +410,7 @@ bool isConnectedToXsheet(TFx *fx)
 
 //-----------------------------------------------------------------------------
 
-//clones in outerDag fx and all effects contained in the subtree with root in fx
+// clones in outerDag fx and all effects contained in the subtree with root in fx
 void bringFxOut(TFx *fx, QMap<TFx *, QPair<TFx *, int>> &fxs, FxDag *outerDag,
 				const GroupData &fxGroupData)
 {
@@ -442,7 +450,7 @@ void bringFxOut(TFx *fx, QMap<TFx *, QPair<TFx *, int>> &fxs, FxDag *outerDag,
 	TFxAttributes *attr = outerFx->getAttributes();
 	attr->setDagNodePos(fx->getAttributes()->getDagNodePos());
 
-	//Put in the right Fx group if needed
+	// Put in the right Fx group if needed
 	attr->removeFromAllGroup();
 	if (!fxGroupData.m_groupIds.empty()) {
 		int i;
@@ -477,8 +485,9 @@ void bringFxOut(TFx *fx, QMap<TFx *, QPair<TFx *, int>> &fxs, FxDag *outerDag,
 
 //-----------------------------------------------------------------------------
 
-TFx *explodeFxSubTree(TFx *innerFx, QMap<TFx *, QPair<TFx *, int>> &fxs, FxDag *outerDag, TXsheet *outerXsheet,
-	FxDag *innerDag, const GroupData &fxGroupData, const std::vector<TFxPort *> &outPorts)
+TFx *explodeFxSubTree(TFx *innerFx, QMap<TFx *, QPair<TFx *, int>> &fxs, FxDag *outerDag,
+					  TXsheet *outerXsheet, FxDag *innerDag, const GroupData &fxGroupData,
+					  const std::vector<TFxPort *> &outPorts)
 {
 	TXsheetFx *xsheetFx = dynamic_cast<TXsheetFx *>(innerFx);
 	if (!xsheetFx) {
@@ -522,7 +531,7 @@ TFx *explodeFxSubTree(TFx *innerFx, QMap<TFx *, QPair<TFx *, int>> &fxs, FxDag *
 			TPointD pos = root->getAttributes()->getDagNodePos();
 			overFx->getAttributes()->setDagNodePos(TPointD(pos.x + 150, pos.y));
 			root = overFx;
-			//e' brutto... mi serve solo per mettere gli over dentro il gruppo
+			// e' brutto... mi serve solo per mettere gli over dentro il gruppo
 			fxs[overFx] = QPair<TFx *, int>(overFx, -1);
 		}
 		return root;
@@ -531,12 +540,11 @@ TFx *explodeFxSubTree(TFx *innerFx, QMap<TFx *, QPair<TFx *, int>> &fxs, FxDag *
 
 //-----------------------------------------------------------------------------
 
-//brings in xsh obj and all objects contained in the subtree with root in obj
-void bringObjectOut(TStageObject *obj, TXsheet *xsh,
-					QMap<TStageObjectId, TStageObjectId> &ids,
+// brings in xsh obj and all objects contained in the subtree with root in obj
+void bringObjectOut(TStageObject *obj, TXsheet *xsh, QMap<TStageObjectId, TStageObjectId> &ids,
 					QMap<TStageObjectSpline *, TStageObjectSpline *> &splines,
-					QList<TStageObject *> &pegObjects,
-					int &pegbarIndex, const GroupData &objGroupData, int groupId)
+					QList<TStageObject *> &pegObjects, int &pegbarIndex,
+					const GroupData &objGroupData, int groupId)
 {
 	if (!obj->hasChildren())
 		return;
@@ -589,21 +597,23 @@ void bringObjectOut(TStageObject *obj, TXsheet *xsh,
 
 //-----------------------------------------------------------------------------
 
-set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TStageObjectId &parentId,
-							 const GroupData &objGroupData, const TPointD &subPos, const GroupData &fxGroupData,
+set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index,
+							 const TStageObjectId &parentId, const GroupData &objGroupData,
+							 const TPointD &subPos, const GroupData &fxGroupData,
 							 QList<TStageObject *> &pegObjects, QMap<TFx *, QPair<TFx *, int>> &fxs,
-							 QMap<TStageObjectSpline *, TStageObjectSpline *> &splines, bool onlyColumn)
+							 QMap<TStageObjectSpline *, TStageObjectSpline *> &splines,
+							 bool onlyColumn)
 {
 	/*- SubXsheet, 親Xsheet両方のツリーを取得 -*/
 	TStageObjectTree *innerTree = subXsh->getStageObjectTree();
 	TStageObjectTree *outerTree = xsh->getStageObjectTree();
-	//inner id->outer id
+	// inner id->outer id
 	QMap<TStageObjectId, TStageObjectId> ids;
-	//innerSpline->outerSpline
-	int groupId = -1; //outerTree->getNewGroupId();
-					  /*- Pegbarも持ち出す場合 -*/
+	// innerSpline->outerSpline
+	int groupId = -1; // outerTree->getNewGroupId();
+	/*- Pegbarも持ち出す場合 -*/
 	if (!onlyColumn) {
-		//add a pegbar to represent the table
+		// add a pegbar to represent the table
 		TStageObject *table = subXsh->getStageObject(TStageObjectId::TableId);
 		/*- 空いてるIndexまでpegbarIndexを進める -*/
 		int pegbarIndex = 2;
@@ -634,7 +644,7 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 		delete params;
 		obj->setParent(parentId);
 
-		//Put in the right StageObject group if needed
+		// Put in the right StageObject group if needed
 		obj->removeFromAllGroup();
 		groupId = outerTree->getNewGroupId();
 		obj->setGroupId(groupId);
@@ -648,11 +658,11 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 			for (i = 0; i < objGroupData.m_groupIds.size() && objGroupData.m_editingGroup >= 0; i++)
 				obj->editGroup();
 		}
-		//add all pegbar
+		// add all pegbar
 		bringObjectOut(table, xsh, ids, splines, pegObjects, pegbarIndex, objGroupData, groupId);
 	}
 
-	//add colums;
+	// add colums;
 	FxDag *innerDag = subXsh->getFxDag();
 	FxDag *outerDag = xsh->getFxDag();
 	set<int> indexes;
@@ -668,7 +678,8 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 
 		if (innerFx && outerFx) {
 			outerFx->getAttributes()->setDagNodePos(innerFx->getAttributes()->getDagNodePos());
-			fxs[innerColumn->getFx()] = QPair<TFx *, int>(outerColumn->getFx(), outerColumn->getIndex());
+			fxs[innerColumn->getFx()] =
+				QPair<TFx *, int>(outerColumn->getFx(), outerColumn->getIndex());
 			if (!innerDag->getTerminalFxs()->containsFx(innerColumn->getFx()))
 				outerDag->getTerminalFxs()->removeFx(outerColumn->getFx());
 		}
@@ -703,7 +714,7 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 		if (onlyColumn)
 			outerCol->setParent(parentId);
 
-		//Put in the right StageObject group if needed
+		// Put in the right StageObject group if needed
 		if (!objGroupData.m_groupIds.empty()) {
 			int j;
 			for (j = 0; j < objGroupData.m_groupIds.size(); j++) {
@@ -714,7 +725,7 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 				outerCol->editGroup();
 		}
 
-		//Put in the right Fx group if needed
+		// Put in the right Fx group if needed
 		if (outerFx && !fxGroupData.m_groupIds.empty()) {
 			int j;
 			for (j = 0; j < fxGroupData.m_groupIds.size(); j++) {
@@ -728,7 +739,7 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 		index++;
 	}
 
-	//setting column parents
+	// setting column parents
 	for (i = 0; i < subXsh->getColumnCount() && !onlyColumn; i++) {
 		TStageObjectId innerId = TStageObjectId::ColumnId(i);
 		TStageObject *innerCol = innerTree->getStageObject(innerId, false);
@@ -752,15 +763,15 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 	}
 	middlePoint = TPointD(middlePoint.x / objCount, middlePoint.y / objCount);
 
-	//faccio in modo che tutti i nodi estratti siano centrati in middlePoint
-	//Li metto poi in un gruppo
+	// faccio in modo che tutti i nodi estratti siano centrati in middlePoint
+	// Li metto poi in un gruppo
 	TPointD offset = middlePoint - subPos;
 	for (it = ids.begin(); it != ids.end(); it++) {
 		TStageObject *outerObj = outerTree->getStageObject(it.value(), false);
 		if (!outerObj)
 			continue;
 		/*outerObj->setGroupId(groupId);
-      outerObj->setGroupName(L"Group "+toWideString(groupId));*/
+	  outerObj->setGroupName(L"Group "+toWideString(groupId));*/
 		TPointD outerPos = outerObj->getDagNodePos();
 		if (outerPos != TConst::nowhere)
 			outerObj->setDagNodePos(outerPos - offset);
@@ -771,8 +782,7 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 
 //-----------------------------------------------------------------------------
 
-void explodeFxs(TXsheet *xsh, TXsheet *subXsh,
-				const GroupData &fxGroupData,
+void explodeFxs(TXsheet *xsh, TXsheet *subXsh, const GroupData &fxGroupData,
 				QMap<TFx *, QPair<TFx *, int>> &fxs, const TPointD &subPos,
 				const std::vector<TFxPort *> &outPorts, bool linkToXsheet)
 {
@@ -780,16 +790,16 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh,
 	FxDag *outerDag = xsh->getFxDag();
 	bool explosionLinked = false;
 
-	//porto fuori tutti gli effetti che partono da un nodo di output (escluso quello attaccato all'Xsheet
-	//o che ha tra i padri il nodo xsheet)
+	// porto fuori tutti gli effetti che partono da un nodo di output (escluso quello attaccato
+	// all'Xsheet
+	// o che ha tra i padri il nodo xsheet)
 	int i;
 	for (i = 0; i < innerDag->getOutputFxCount(); i++) {
 		TOutputFx *outFx = innerDag->getOutputFx(i);
 		if (isConnectedToXsheet(outFx))
 			continue;
 
-		TFx *root = explodeFxSubTree(outFx, fxs, outerDag, xsh, innerDag,
-									 fxGroupData, outPorts);
+		TFx *root = explodeFxSubTree(outFx, fxs, outerDag, xsh, innerDag, fxGroupData, outPorts);
 		if (!root)
 			continue;
 		if (outFx == innerDag->getCurrentOutputFx()) {
@@ -802,9 +812,9 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh,
 		}
 	}
 
-	//porto fuori tutti gli effetti che partono dall'xsheet
-	TFx *root = explodeFxSubTree(innerDag->getXsheetFx(), fxs, outerDag, xsh, innerDag,
-								 fxGroupData, outPorts);
+	// porto fuori tutti gli effetti che partono dall'xsheet
+	TFx *root = explodeFxSubTree(innerDag->getXsheetFx(), fxs, outerDag, xsh, innerDag, fxGroupData,
+								 outPorts);
 	if (!explosionLinked) {
 		if (outPorts.empty()) {
 			assert(root == 0);
@@ -820,7 +830,7 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh,
 			outerDag->addToXsheet(root);
 	}
 
-	//Porto fuori tutti gli altri effetti!
+	// Porto fuori tutti gli altri effetti!
 	TFxSet *innerInternals = innerDag->getInternalFxs();
 	for (i = 0; i < innerInternals->getFxCount(); i++) {
 		TFx *fx = innerInternals->getFx(i);
@@ -829,7 +839,7 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh,
 		explodeFxSubTree(fx, fxs, outerDag, xsh, innerDag, fxGroupData, outPorts);
 	}
 
-	//cerco il punto medio tra tutti i nodi
+	// cerco il punto medio tra tutti i nodi
 	TPointD middlePoint;
 	int fxsCount = 0;
 
@@ -850,8 +860,8 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh,
 	if (fxsCount > 0)
 		middlePoint = TPointD(middlePoint.x / fxsCount, middlePoint.y / fxsCount);
 
-	//faccio in modo che tutti i nodi estratti siano centrati in middlePoint
-	//Li metto poi in un gruppo
+	// faccio in modo che tutti i nodi estratti siano centrati in middlePoint
+	// Li metto poi in un gruppo
 	TPointD offset = middlePoint - subPos;
 	int groupId = outerDag->getNewGroupId();
 	for (it = fxs.begin(); it != fxs.end(); it++) {
@@ -870,15 +880,14 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh,
 set<int> explode(TXsheet *xsh, TXsheet *subXsh, int index, const TStageObjectId &parentId,
 				 const GroupData &objGroupData, const TPointD &stageSubPos,
 				 const GroupData &fxGroupData, const TPointD &fxSubPos,
-				 QList<TStageObject *> &pegObjects, QMap<TStageObjectSpline *, TStageObjectSpline *> &splines,
-				 const std::vector<TFxPort *> &outPorts, bool onlyColumn,
-				 bool linkToXsheet)
+				 QList<TStageObject *> &pegObjects,
+				 QMap<TStageObjectSpline *, TStageObjectSpline *> &splines,
+				 const std::vector<TFxPort *> &outPorts, bool onlyColumn, bool linkToXsheet)
 {
-	//innerFx->outerFxs
+	// innerFx->outerFxs
 	QMap<TFx *, QPair<TFx *, int>> fxs;
-	set<int> indexes = explodeStageObjects(xsh, subXsh, index, parentId,
-										   objGroupData, stageSubPos, fxGroupData,
-										   pegObjects, fxs, splines, onlyColumn);
+	set<int> indexes = explodeStageObjects(xsh, subXsh, index, parentId, objGroupData, stageSubPos,
+										   fxGroupData, pegObjects, fxs, splines, onlyColumn);
 	explodeFxs(xsh, subXsh, fxGroupData, fxs, fxSubPos, outPorts, linkToXsheet);
 	return indexes;
 }
@@ -891,7 +900,7 @@ class OpenChildUndo : public TUndo
 {
 	int m_row, m_col;
 
-public:
+  public:
 	OpenChildUndo()
 	{
 		TApp *app = TApp::instance();
@@ -920,10 +929,7 @@ public:
 		changeSaveSubXsheetAsCommand();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 };
 
 //=============================================================================
@@ -934,11 +940,8 @@ class CloseChildUndo : public TUndo
 {
 	std::vector<std::pair<int, int>> m_cells;
 
-public:
-	CloseChildUndo(const std::vector<std::pair<int, int>> &cells)
-		: m_cells(cells)
-	{
-	}
+  public:
+	CloseChildUndo(const std::vector<std::pair<int, int>> &cells) : m_cells(cells) {}
 
 	void undo() const
 	{
@@ -964,19 +967,10 @@ public:
 		changeSaveSubXsheetAsCommand();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Close SubXsheet");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	QString getHistoryString() { return QObject::tr("Close SubXsheet"); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -1076,7 +1070,8 @@ void closeSubXsheet(int dlevel)
 		std::pair<int, int> rowCol;
 		scene->getChildStack()->closeChild(rowCol.first, rowCol.second);
 		TXsheet *xsh = scene->getXsheet();
-		IconGenerator::instance()->invalidate(xsh->getCell(rowCol.first, rowCol.second).m_level.getPointer(), TFrameId(1));
+		IconGenerator::instance()->invalidate(
+			xsh->getCell(rowCol.first, rowCol.second).m_level.getPointer(), TFrameId(1));
 		cells.push_back(rowCol);
 	}
 	if (cells.empty())
@@ -1222,13 +1217,14 @@ void collapseColumns(std::set<int> indices, bool columnsOnly)
 	xsh->updateFrameCount();
 
 	/*-- カメラ情報のコピー --*/
-	//xsh -> childXsh
+	// xsh -> childXsh
 	TStageObjectTree *parentTree = xsh->getStageObjectTree();
 	TStageObjectTree *childTree = childXsh->getStageObjectTree();
 
 	int tmpCamId = 0;
 	for (int cam = 0; cam < parentTree->getCameraCount();) {
-		TStageObject *parentCamera = parentTree->getStageObject(TStageObjectId::CameraId(tmpCamId), false);
+		TStageObject *parentCamera =
+			parentTree->getStageObject(TStageObjectId::CameraId(tmpCamId), false);
 		/*- DeleteされたCameraはコピーしない -*/
 		if (!parentCamera) {
 			tmpCamId++;
@@ -1238,7 +1234,8 @@ void collapseColumns(std::set<int> indices, bool columnsOnly)
 		/*- Deleteされていない場合 -*/
 		if (parentCamera->getCamera()) {
 			/*- SubXsheetの対応するCameraを取得。なければ作る -*/
-			TCamera *childCamera = childTree->getStageObject(TStageObjectId::CameraId(tmpCamId))->getCamera();
+			TCamera *childCamera =
+				childTree->getStageObject(TStageObjectId::CameraId(tmpCamId))->getCamera();
 			if (parentCamera && childCamera) {
 				childCamera->setRes(parentCamera->getCamera()->getRes());
 				childCamera->setSize(parentCamera->getCamera()->getSize());
@@ -1257,8 +1254,7 @@ void collapseColumns(std::set<int> indices, bool columnsOnly)
 
 //-----------------------------------------------------------------------------
 
-void collapseColumns(std::set<int> indices,
-					 const QList<TStageObjectId> &objIds)
+void collapseColumns(std::set<int> indices, const QList<TStageObjectId> &objIds)
 {
 	if (indices.empty())
 		return;
@@ -1319,8 +1315,7 @@ void collapseColumns(std::set<int> indices,
 
 //-----------------------------------------------------------------------------
 
-void collapseColumns(std::set<int> indices,
-					 const std::set<TFx *> &fxs, bool columnsOnly)
+void collapseColumns(std::set<int> indices, const std::set<TFx *> &fxs, bool columnsOnly)
 {
 	if (indices.empty())
 		return;
@@ -1334,7 +1329,8 @@ void collapseColumns(std::set<int> indices,
 	data->storeColumns(indices, xsh, StageObjectsData::eDoClone);
 	data->storeFxs(fxs, xsh, StageObjectsData::eDoClone);
 
-	std::map<TFx *, std::vector<TFxPort *>> roots = isConnected(indices, fxs, app->getCurrentXsheet());
+	std::map<TFx *, std::vector<TFxPort *>> roots =
+		isConnected(indices, fxs, app->getCurrentXsheet());
 	app->getCurrentXsheet()->blockSignals(true);
 	app->getCurrentObject()->blockSignals(true);
 	ColumnCmd::deleteColumns(indices, true, true);
@@ -1368,7 +1364,7 @@ void collapseColumns(std::set<int> indices,
 
 	//++++++++++++++++++++++++++++++
 
-	//Rimuovo gli effetti che sono in fxs dall'xsheet
+	// Rimuovo gli effetti che sono in fxs dall'xsheet
 	std::set<TFx *>::const_iterator it2;
 	for (it2 = fxs.begin(); it2 != fxs.end(); it2++)
 		removeFx(xsh, *it2);
@@ -1393,8 +1389,7 @@ void collapseColumns(std::set<int> indices,
 
 //-----------------------------------------------------------------------------
 
-void getColumnIndexes(const QList<TStageObjectId> &objects,
-					  std::set<int> &indeces)
+void getColumnIndexes(const QList<TStageObjectId> &objects, std::set<int> &indeces)
 {
 	int i;
 	for (i = 0; i < objects.size(); i++) {
@@ -1405,8 +1400,8 @@ void getColumnIndexes(const QList<TStageObjectId> &objects,
 
 //-----------------------------------------------------------------------------
 
-void getColumnIndexesAndPegbarIds(const QList<TStageObjectId> &objects,
-								  std::set<int> &indeces, std::set<TStageObjectId> &pegbarIds)
+void getColumnIndexesAndPegbarIds(const QList<TStageObjectId> &objects, std::set<int> &indeces,
+								  std::set<TStageObjectId> &pegbarIds)
 {
 	int i;
 	for (i = 0; i < objects.size(); i++) {
@@ -1419,8 +1414,7 @@ void getColumnIndexesAndPegbarIds(const QList<TStageObjectId> &objects,
 
 //-----------------------------------------------------------------------------
 
-void getColumnIndexesAndInternalFxs(const QList<TFxP> &fxs,
-									std::set<int> &indices,
+void getColumnIndexesAndInternalFxs(const QList<TFxP> &fxs, std::set<int> &indices,
 									std::set<TFx *> &internalFx)
 {
 	int i;
@@ -1452,14 +1446,14 @@ void getColumnIndexesAndInternalFxs(const QList<TFxP> &fxs,
 class CollapseUndo : public TUndo
 {
 
-protected:
+  protected:
 	std::set<int> m_indices;
 	StageObjectsData *m_data;
 	StageObjectsData *m_newData;
 	int m_columnIndex;
 	QMap<TFx *, QList<TFxPort *>> m_columnOutputConnections;
 	QMap<TStageObjectId, QList<TStageObjectId>> m_children;
-	//id->parentId
+	// id->parentId
 	QMap<TStageObjectId, TStageObjectId> m_parents;
 
 	void doUndo() const
@@ -1474,7 +1468,8 @@ protected:
 		setChildren(m_children);
 		setParents(m_parents);
 
-		TColumnSelection *selection = dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
+		TColumnSelection *selection =
+			dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
 		if (selection) {
 			selection->selectNone();
 			std::set<int> selectIndices = m_indices;
@@ -1501,21 +1496,23 @@ protected:
 		indices.insert(m_columnIndex);
 		std::list<int> restoredSplineIds;
 		m_newData->restoreObjects(indices, restoredSplineIds, xsh, 0);
-		TColumnSelection *selection = dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
+		TColumnSelection *selection =
+			dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
 		if (selection) {
 			selection->selectNone();
 			selection->selectColumn(m_columnIndex);
 		}
 	}
 
-public:
-	CollapseUndo(const std::set<int> indices, int c0,
-				 StageObjectsData *data,
+  public:
+	CollapseUndo(const std::set<int> indices, int c0, StageObjectsData *data,
 				 StageObjectsData *newData,
 				 const QMap<TFx *, QList<TFxPort *>> &columnOutputConnections,
 				 const QMap<TStageObjectId, QList<TStageObjectId>> &children,
 				 const QMap<TStageObjectId, TStageObjectId> &parents)
-		: m_indices(indices), m_columnIndex(c0), m_data(data), m_newData(newData), m_columnOutputConnections(columnOutputConnections), m_children(children), m_parents(parents)
+		: m_indices(indices), m_columnIndex(c0), m_data(data), m_newData(newData),
+		  m_columnOutputConnections(columnOutputConnections), m_children(children),
+		  m_parents(parents)
 	{
 	}
 
@@ -1542,19 +1539,10 @@ public:
 		app->getCurrentObject()->notifyObjectIdSwitched();
 		changeSaveSubXsheetAsCommand();
 	}
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Collapse");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	QString getHistoryString() { return QObject::tr("Collapse"); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -1566,15 +1554,15 @@ class CollapseFxUndo : public CollapseUndo
 	set<TFx *> m_fxs;
 	QMap<TFx *, FxConnections> m_fxConnections;
 
-public:
-	CollapseFxUndo(const std::set<int> indices, int c0,
-				   StageObjectsData *data,
+  public:
+	CollapseFxUndo(const std::set<int> indices, int c0, StageObjectsData *data,
 				   StageObjectsData *newData,
 				   const QMap<TFx *, QList<TFxPort *>> &columnOutputConnections,
 				   const QMap<TStageObjectId, QList<TStageObjectId>> children,
-				   const QMap<TStageObjectId, TStageObjectId> &parents,
-				   const set<TFx *> &fxs, const QMap<TFx *, FxConnections> fxConnections)
-		: CollapseUndo(indices, c0, data, newData, columnOutputConnections, children, parents), m_fxs(fxs), m_fxConnections(fxConnections)
+				   const QMap<TStageObjectId, TStageObjectId> &parents, const set<TFx *> &fxs,
+				   const QMap<TFx *, FxConnections> fxConnections)
+		: CollapseUndo(indices, c0, data, newData, columnOutputConnections, children, parents),
+		  m_fxs(fxs), m_fxConnections(fxConnections)
 	{
 	}
 
@@ -1631,7 +1619,8 @@ public:
 	{
 		TApp *app = TApp::instance();
 		TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-		std::map<TFx *, std::vector<TFxPort *>> roots = isConnected(m_indices, m_fxs, app->getCurrentXsheet());
+		std::map<TFx *, std::vector<TFxPort *>> roots =
+			isConnected(m_indices, m_fxs, app->getCurrentXsheet());
 		doRedo(true);
 		std::set<TFx *>::const_iterator it2;
 		for (it2 = m_fxs.begin(); it2 != m_fxs.end(); it2++)
@@ -1649,15 +1638,9 @@ public:
 		app->getCurrentObject()->notifyObjectIdSwitched();
 		changeSaveSubXsheetAsCommand();
 	}
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Collapse (Fx)");
-	}
+	QString getHistoryString() { return QObject::tr("Collapse (Fx)"); }
 };
 
 //=============================================================================
@@ -1672,7 +1655,7 @@ class ExplodeChildUndoRemovingColumn : public TUndo
 	StageObjectsData *m_newData;
 	QMap<TFx *, QList<TFxPort *>> m_oldColumnOutputConnections;
 	QMap<TFx *, QList<TFxPort *>> m_newColumnOutputConnections;
-	//objId->parentObjId
+	// objId->parentObjId
 	QMap<TStageObjectId, TStageObjectId> m_parentIds;
 	QList<TStageObject *> m_pegObjects;
 	QMap<TStageObjectSpline *, TStageObjectSpline *> m_splines;
@@ -1681,21 +1664,24 @@ class ExplodeChildUndoRemovingColumn : public TUndo
 	std::set<TOutputFx *> m_oldOutFxs;
 	std::set<TOutputFx *> m_newOutFxs;
 
-	//to handle grouping for the subxsheet
+	// to handle grouping for the subxsheet
 	QStack<int> m_objGroupIds;
 	QStack<std::wstring> m_objGroupNames;
 
-public:
+  public:
 	ExplodeChildUndoRemovingColumn(const std::set<int> &newIndexs, int index,
-								   StageObjectsData *oldData,
-								   StageObjectsData *newData,
+								   StageObjectsData *oldData, StageObjectsData *newData,
 								   const QMap<TFx *, QList<TFxPort *>> &columnOutputConnections,
 								   const QList<TStageObject *> &pegObjects,
 								   const QMap<TStageObjectSpline *, TStageObjectSpline *> &splines,
 								   const std::set<TFx *> &oldInternalFxs,
 								   const std::set<TOutputFx *> oldOutFxs, TFx *root,
-									 const QStack<int> &objGroupIds, const QStack<std::wstring> &objGroupNames)
-		: m_newIndexs(newIndexs), m_index(index), m_oldData(oldData), m_newData(newData), m_oldColumnOutputConnections(columnOutputConnections), m_pegObjects(pegObjects), m_splines(splines), m_root(root), m_oldInternalFxs(oldInternalFxs), m_oldOutFxs(oldOutFxs), m_objGroupIds(objGroupIds), m_objGroupNames(objGroupNames)
+								   const QStack<int> &objGroupIds,
+								   const QStack<std::wstring> &objGroupNames)
+		: m_newIndexs(newIndexs), m_index(index), m_oldData(oldData), m_newData(newData),
+		  m_oldColumnOutputConnections(columnOutputConnections), m_pegObjects(pegObjects),
+		  m_splines(splines), m_root(root), m_oldInternalFxs(oldInternalFxs),
+		  m_oldOutFxs(oldOutFxs), m_objGroupIds(objGroupIds), m_objGroupNames(objGroupNames)
 	{
 		TApp *app = TApp::instance();
 		TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
@@ -1763,7 +1749,8 @@ public:
 		}
 	}
 
-	void setEditingObjGroup(TStageObject *obj, int editingGroup, const QStack<int> &objGroupIds) const
+	void setEditingObjGroup(TStageObject *obj, int editingGroup,
+							const QStack<int> &objGroupIds) const
 	{
 		obj->closeEditingGroup(objGroupIds.top());
 		while (obj->getEditingGroupId() != editingGroup)
@@ -1784,7 +1771,8 @@ public:
 		int editingGroup = -1;
 		TStageObjectId parentId = TStageObjectId::NoneId;
 		if (m_root && m_root->getOutputConnectionCount() > 0)
-			editingGroup = m_root->getOutputConnection(0)->getOwnerFx()->getAttributes()->getEditingGroupId();
+			editingGroup =
+				m_root->getOutputConnection(0)->getOwnerFx()->getAttributes()->getEditingGroupId();
 
 		std::set<int> indexesToRemove = m_newIndexs;
 		app->getCurrentXsheet()->blockSignals(true);
@@ -1823,12 +1811,13 @@ public:
 			if (m_oldOutFxs.find(*it2) == m_oldOutFxs.end())
 				xsh->getFxDag()->removeOutputFx(*it2);
 		}
-		TColumnSelection *selection = dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
+		TColumnSelection *selection =
+			dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
 		if (selection) {
 			selection->selectNone();
 			selection->selectColumn(m_index);
 		}
-		//reinsert in groups
+		// reinsert in groups
 		TStageObject *obj = xsh->getStageObject(TStageObjectId::ColumnId(m_index));
 		if (parentId != TStageObjectId::NoneId)
 			obj->setParent(parentId);
@@ -1847,7 +1836,7 @@ public:
 		if (m_root)
 			fxGroupIds = m_root->getAttributes()->getGroupIdStack();
 		if (!fxGroupIds.empty()) {
-			//recupero l'id del gruppo che si sta editando!
+			// recupero l'id del gruppo che si sta editando!
 			TFx *colFx = xsh->getColumn(m_index)->getFx();
 			assert(colFx);
 			colFx->getAttributes()->closeEditingGroup(fxGroupIds.top());
@@ -1888,7 +1877,8 @@ public:
 		std::list<int> restoredSplineIds;
 		m_newData->restoreObjects(indexes, restoredSplineIds, xsh, 0);
 		for (i = 0; i < m_pegObjects.size(); i++)
-			xsh->setStageObjectParent(m_pegObjects[i]->getId(), m_parentIds[m_pegObjects[i]->getId()]);
+			xsh->setStageObjectParent(m_pegObjects[i]->getId(),
+									  m_parentIds[m_pegObjects[i]->getId()]);
 		std::set<int>::const_iterator it;
 		for (it = m_newIndexs.begin(); it != m_newIndexs.end(); it++) {
 			TStageObjectId colId = TStageObjectId::ColumnId(*it);
@@ -1916,7 +1906,8 @@ public:
 			if (m_oldOutFxs.find(*it2) == m_oldOutFxs.end())
 				xsh->getFxDag()->addOutputFx(*it2);
 		}
-		TColumnSelection *selection = dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
+		TColumnSelection *selection =
+			dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
 		if (selection) {
 			selection->selectNone();
 			std::set<int> selectIndices = m_newIndexs;
@@ -1928,28 +1919,22 @@ public:
 		if (m_root)
 			fxGroupIds = m_root->getAttributes()->getGroupIdStack();
 		if (!fxGroupIds.empty()) {
-			//recupero l'id del gruppo che si sta editando!
+			// recupero l'id del gruppo che si sta editando!
 			int editingGroup = -1;
 			if (m_root->getOutputConnectionCount() > 0)
-				editingGroup = m_root->getOutputConnection(0)->getOwnerFx()->getAttributes()->getEditingGroupId();
+				editingGroup = m_root->getOutputConnection(0)
+								   ->getOwnerFx()
+								   ->getAttributes()
+								   ->getEditingGroupId();
 			setEditingFxGroup(m_root, editingGroup, fxGroupIds);
 		}
 		app->getCurrentXsheet()->notifyXsheetChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Explode");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	QString getHistoryString() { return QObject::tr("Explode"); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -1970,19 +1955,21 @@ class ExplodeChildUndoWithoutRemovingColumn : public TUndo
 	std::set<TOutputFx *> m_oldOutFxs;
 	std::set<TOutputFx *> m_newOutFxs;
 
-	//to handle grouping for the subxsheet
+	// to handle grouping for the subxsheet
 	QStack<int> m_objGroupIds;
 	QStack<std::wstring> m_objGroupNames;
 
-public:
-	ExplodeChildUndoWithoutRemovingColumn(const std::set<int> &newIndexs, int index, int from, int to,
-										  TCellData *cellData, StageObjectsData *newData,
-										  QList<TStageObject *> pegObjects,
-										  const QMap<TStageObjectSpline *, TStageObjectSpline *> &splines,
-										  const std::set<TFx *> &oldInternalFxs,
-										  const std::set<TOutputFx *> oldOutFxs,
-											const QStack<int> &objGroupIds, const QStack<std::wstring> &objGroupNames)
-		: m_newIndexs(newIndexs), m_index(index), m_from(from), m_to(to), m_cellData(cellData), m_newData(newData), m_pegObjects(pegObjects), m_splines(splines), m_oldInternalFxs(oldInternalFxs), m_oldOutFxs(oldOutFxs), m_objGroupIds(objGroupIds), m_objGroupNames(objGroupNames)
+  public:
+	ExplodeChildUndoWithoutRemovingColumn(
+		const std::set<int> &newIndexs, int index, int from, int to, TCellData *cellData,
+		StageObjectsData *newData, QList<TStageObject *> pegObjects,
+		const QMap<TStageObjectSpline *, TStageObjectSpline *> &splines,
+		const std::set<TFx *> &oldInternalFxs, const std::set<TOutputFx *> oldOutFxs,
+		const QStack<int> &objGroupIds, const QStack<std::wstring> &objGroupNames)
+		: m_newIndexs(newIndexs), m_index(index), m_from(from), m_to(to), m_cellData(cellData),
+		  m_newData(newData), m_pegObjects(pegObjects), m_splines(splines),
+		  m_oldInternalFxs(oldInternalFxs), m_oldOutFxs(oldOutFxs), m_objGroupIds(objGroupIds),
+		  m_objGroupNames(objGroupNames)
 	{
 		TApp *app = TApp::instance();
 		TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
@@ -2051,12 +2038,13 @@ public:
 			if (m_oldOutFxs.find(*it) == m_oldOutFxs.end())
 				xsh->getFxDag()->removeOutputFx(*it);
 		}
-		TColumnSelection *selection = dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
+		TColumnSelection *selection =
+			dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
 		if (selection) {
 			selection->selectNone();
 			selection->selectColumn(m_index);
 		}
-		//reinsert in groups
+		// reinsert in groups
 		if (!m_objGroupIds.empty()) {
 			TStageObject *obj = xsh->getStageObject(TStageObjectId::ColumnId(m_index));
 			TStageObjectId parentId = obj->getParent();
@@ -2089,7 +2077,8 @@ public:
 			if (m_oldOutFxs.find(*it) == m_oldOutFxs.end())
 				xsh->getFxDag()->addOutputFx(*it);
 		}
-		TColumnSelection *selection = dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
+		TColumnSelection *selection =
+			dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
 		if (selection) {
 			selection->selectNone();
 			std::set<int> selectIndices = m_newIndexs;
@@ -2097,7 +2086,7 @@ public:
 			while (indicesIt != selectIndices.end())
 				selection->selectColumn(*indicesIt++);
 		}
-		//reinsert in groups
+		// reinsert in groups
 		if (!m_objGroupIds.empty()) {
 			set<int>::iterator it;
 			for (it = indexes.begin(); it != indexes.end(); it++) {
@@ -2116,19 +2105,10 @@ public:
 		app->getCurrentXsheet()->notifyXsheetChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Explode");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	QString getHistoryString() { return QObject::tr("Explode"); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 } // namespace
@@ -2139,7 +2119,7 @@ public:
 
 class OpenChildCommand : public MenuItemHandler
 {
-public:
+  public:
 	OpenChildCommand() : MenuItemHandler(MI_OpenChild) {}
 	void execute() { openSubXsheet(); }
 } openChildCommand;
@@ -2150,7 +2130,7 @@ public:
 
 class CloseChildCommand : public MenuItemHandler
 {
-public:
+  public:
 	CloseChildCommand() : MenuItemHandler(MI_CloseChild) {}
 	void execute() { closeSubXsheet(1); }
 } closeChildCommand;
@@ -2214,7 +2194,8 @@ void SubsceneCmd::collapse(std::set<int> &indices)
 	newData->storeColumnFxs(indices, xsh, 0);
 
 	// Build the undo
-	CollapseUndo *undo = new CollapseUndo(oldIndices, index, oldData, newData, columnOutputConnections, children, parents);
+	CollapseUndo *undo = new CollapseUndo(oldIndices, index, oldData, newData,
+										  columnOutputConnections, children, parents);
 	TUndoManager::manager()->add(undo);
 
 	changeSaveSubXsheetAsCommand();
@@ -2258,7 +2239,8 @@ void SubsceneCmd::collapse(const QList<TStageObjectId> &objects)
 	newData->storeColumns(indices, xsh, 0);
 	newData->storeColumnFxs(indices, xsh, 0);
 
-	CollapseUndo *undo = new CollapseUndo(oldIndices, index, oldData, newData, columnOutputConnections, children, parents);
+	CollapseUndo *undo = new CollapseUndo(oldIndices, index, oldData, newData,
+										  columnOutputConnections, children, parents);
 	TUndoManager::manager()->add(undo);
 
 	changeSaveSubXsheetAsCommand();
@@ -2319,8 +2301,9 @@ void SubsceneCmd::collapse(const QList<TFxP> &fxs)
 	newData->storeColumns(indices, xsh, 0);
 	newData->storeColumnFxs(indices, xsh, 0);
 
-	CollapseFxUndo *undo = new CollapseFxUndo(oldIndices, index, oldData, newData, columnOutputConnections,
-											  children, parents, internalFx, fxConnections);
+	CollapseFxUndo *undo =
+		new CollapseFxUndo(oldIndices, index, oldData, newData, columnOutputConnections, children,
+						   parents, internalFx, fxConnections);
 	TUndoManager::manager()->add(undo);
 
 	changeSaveSubXsheetAsCommand();
@@ -2449,9 +2432,9 @@ void SubsceneCmd::explode(int index)
 		xsh->removeColumn(index);
 
 		// Explode
-		set<int> newIndexes = ::explode(xsh, childLevel->getXsheet(), index, parentId,
-										objGroupData, stageSubPos, fxGroupData, fxSubPos,
-										pegObjects, splines, outPorts, ret == 2, false);
+		set<int> newIndexes =
+			::explode(xsh, childLevel->getXsheet(), index, parentId, objGroupData, stageSubPos,
+					  fxGroupData, fxSubPos, pegObjects, splines, outPorts, ret == 2, false);
 
 		/*- Redoのためのデータの取得 -*/
 		StageObjectsData *newData = new StageObjectsData();
@@ -2464,9 +2447,9 @@ void SubsceneCmd::explode(int index)
 		if (!ports.empty())
 			root = (*ports.begin())->getFx();
 
-		ExplodeChildUndoRemovingColumn *undo = new ExplodeChildUndoRemovingColumn(newIndexes, index,
-																				  oldData, newData, columnOutputConnections, pegObjects, splines,
-																				  oldInternalFxs, oldOutFxs, root, objGroupIds, objGroupNames);
+		ExplodeChildUndoRemovingColumn *undo = new ExplodeChildUndoRemovingColumn(
+			newIndexes, index, oldData, newData, columnOutputConnections, pegObjects, splines,
+			oldInternalFxs, oldOutFxs, root, objGroupIds, objGroupNames);
 		TUndoManager::manager()->add(undo);
 	} else {
 		// Collect information for undo
@@ -2481,18 +2464,18 @@ void SubsceneCmd::explode(int index)
 		xsh->clearCells(from, index, to - from + 1);
 
 		// Explode
-		set<int> newIndexes = ::explode(xsh, childLevel->getXsheet(), index + 1, parentId,
-										objGroupData, stageSubPos + TPointD(10, 10),
-										fxGroupData, fxSubPos + TPointD(10, 10),
-										pegObjects, splines, outPorts, ret == 2, true);
+		set<int> newIndexes =
+			::explode(xsh, childLevel->getXsheet(), index + 1, parentId, objGroupData,
+					  stageSubPos + TPointD(10, 10), fxGroupData, fxSubPos + TPointD(10, 10),
+					  pegObjects, splines, outPorts, ret == 2, true);
 
 		StageObjectsData *newData = new StageObjectsData();
 		newData->storeColumns(newIndexes, xsh, 0);
 		newData->storeColumnFxs(newIndexes, xsh, 0);
 
-		ExplodeChildUndoWithoutRemovingColumn *undo = new ExplodeChildUndoWithoutRemovingColumn(newIndexes, index,
-																								from, to, cellData, newData, pegObjects, splines, oldInternalFxs,
-																								oldOutFxs, objGroupIds, objGroupNames);
+		ExplodeChildUndoWithoutRemovingColumn *undo = new ExplodeChildUndoWithoutRemovingColumn(
+			newIndexes, index, from, to, cellData, newData, pegObjects, splines, oldInternalFxs,
+			oldOutFxs, objGroupIds, objGroupNames);
 		TUndoManager::manager()->add(undo);
 	}
 

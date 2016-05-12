@@ -63,13 +63,7 @@ DEFINE_CLASS_CODE(TStageObject, 102)
 namespace
 {
 
-enum StageObjectType {
-	NONE = 0,
-	CAMERA = 1,
-	TABLE = 2,
-	PEGBAR = 5,
-	COLUMN = 6
-};
+enum StageObjectType { NONE = 0, CAMERA = 1, TABLE = 2, PEGBAR = 5, COLUMN = 6 };
 
 const int StageObjectTypeShift = 28;
 const int StageObjectMaxIndex = ((1 << StageObjectTypeShift) - 1);
@@ -81,15 +75,23 @@ const int StageObjectIndexMask = ((1 << StageObjectTypeShift) - 1);
 //    TStageObjectParams  implementation
 //************************************************************************************************
 
-TStageObjectParams::TStageObjectParams()
-	: m_spline(0), m_noScaleZ(0)
+TStageObjectParams::TStageObjectParams() : m_spline(0), m_noScaleZ(0)
 {
 }
 
 //-----------------------------------------------------------------------------
 
 TStageObjectParams::TStageObjectParams(TStageObjectParams *data)
-	: m_id(data->m_id), m_parentId(data->m_parentId), m_children(data->m_children), m_keyframes(data->m_keyframes), m_cycleEnabled(data->m_cycleEnabled), m_spline(data->m_spline), m_status(data->m_status), m_handle(data->m_handle), m_parentHandle(data->m_parentHandle), m_x(data->m_x), m_y(data->m_y), m_z(data->m_z), m_so(data->m_so), m_rot(data->m_rot), m_scalex(data->m_scalex), m_scaley(data->m_scaley), m_scale(data->m_scale), m_posPath(data->m_posPath), m_shearx(data->m_shearx), m_sheary(data->m_sheary), m_skeletonDeformation(data->m_skeletonDeformation), m_noScaleZ(data->m_noScaleZ), m_center(data->m_center), m_offset(data->m_offset), m_name(data->m_name), m_isOpened(data->m_isOpened), m_pinnedRangeSet(data->m_pinnedRangeSet->clone())
+	: m_id(data->m_id), m_parentId(data->m_parentId), m_children(data->m_children),
+	  m_keyframes(data->m_keyframes), m_cycleEnabled(data->m_cycleEnabled),
+	  m_spline(data->m_spline), m_status(data->m_status), m_handle(data->m_handle),
+	  m_parentHandle(data->m_parentHandle), m_x(data->m_x), m_y(data->m_y), m_z(data->m_z),
+	  m_so(data->m_so), m_rot(data->m_rot), m_scalex(data->m_scalex), m_scaley(data->m_scaley),
+	  m_scale(data->m_scale), m_posPath(data->m_posPath), m_shearx(data->m_shearx),
+	  m_sheary(data->m_sheary), m_skeletonDeformation(data->m_skeletonDeformation),
+	  m_noScaleZ(data->m_noScaleZ), m_center(data->m_center), m_offset(data->m_offset),
+	  m_name(data->m_name), m_isOpened(data->m_isOpened),
+	  m_pinnedRangeSet(data->m_pinnedRangeSet->clone())
 {
 }
 
@@ -143,27 +145,43 @@ ostream &operator<<(ostream &out, const TStageObjectId &id)
 //    TStageObjectId  implementation
 //************************************************************************************************
 
-TStageObjectId::TStageObjectId() : m_id(NONE << StageObjectTypeShift) {}
+TStageObjectId::TStageObjectId() : m_id(NONE << StageObjectTypeShift)
+{
+}
 
 //-----------------------------------------------------------------------------
 
-TStageObjectId::~TStageObjectId() {}
+TStageObjectId::~TStageObjectId()
+{
+}
 
 //-----------------------------------------------------------------------------
 
-bool TStageObjectId::isCamera() const { return m_id >> StageObjectTypeShift == CAMERA; }
+bool TStageObjectId::isCamera() const
+{
+	return m_id >> StageObjectTypeShift == CAMERA;
+}
 
 //-----------------------------------------------------------------------------
 
-bool TStageObjectId::isTable() const { return m_id >> StageObjectTypeShift == TABLE; }
+bool TStageObjectId::isTable() const
+{
+	return m_id >> StageObjectTypeShift == TABLE;
+}
 
 //-----------------------------------------------------------------------------
 
-bool TStageObjectId::isPegbar() const { return m_id >> StageObjectTypeShift == PEGBAR; }
+bool TStageObjectId::isPegbar() const
+{
+	return m_id >> StageObjectTypeShift == PEGBAR;
+}
 
 //-----------------------------------------------------------------------------
 
-bool TStageObjectId::isColumn() const { return m_id >> StageObjectTypeShift == COLUMN; }
+bool TStageObjectId::isColumn() const
+{
+	return m_id >> StageObjectTypeShift == COLUMN;
+}
 
 //-----------------------------------------------------------------------------
 
@@ -245,8 +263,8 @@ TDoubleKeyframe withFrame(TDoubleKeyframe k, double frame)
 
 //-----------------------------------------------------------------------------
 
-bool setKeyframe(const TDoubleParamP &param, const TDoubleKeyframe &kf,
-				 int frame, const double &easeIn, const double &easeOut)
+bool setKeyframe(const TDoubleParamP &param, const TDoubleKeyframe &kf, int frame,
+				 const double &easeIn, const double &easeOut)
 {
 	if (!kf.m_isKeyframe)
 		return false;
@@ -307,8 +325,8 @@ TPointD updateDagPosition(const TPointD &pos, const VersionNumber &tnzVersion)
 
 // Update the passed stage object keyframe and keyframe type specification with
 // a new keyframe. Returns true if specifications match, false otherwise.
-bool touchEaseAndCompare(const TDoubleKeyframe &kf,
-						 TStageObject::Keyframe &stageKf, TDoubleKeyframe::Type &type)
+bool touchEaseAndCompare(const TDoubleKeyframe &kf, TStageObject::Keyframe &stageKf,
+						 TDoubleKeyframe::Type &type)
 {
 	bool initialization = (type == TDoubleKeyframe::None);
 
@@ -316,10 +334,8 @@ bool touchEaseAndCompare(const TDoubleKeyframe &kf,
 		type = kf.m_type;
 
 	if (kf.m_type != type ||
-		(kf.m_type != TDoubleKeyframe::SpeedInOut &&
-		 kf.m_type != TDoubleKeyframe::EaseInOut &&
-		 (kf.m_prevType != TDoubleKeyframe::None &&
-		  kf.m_prevType != TDoubleKeyframe::SpeedInOut &&
+		(kf.m_type != TDoubleKeyframe::SpeedInOut && kf.m_type != TDoubleKeyframe::EaseInOut &&
+		 (kf.m_prevType != TDoubleKeyframe::None && kf.m_prevType != TDoubleKeyframe::SpeedInOut &&
 		  kf.m_prevType != TDoubleKeyframe::EaseInOut))) {
 		stageKf.m_easeIn = -1.0;
 		stageKf.m_easeOut = -1.0;
@@ -350,8 +366,7 @@ bool touchEaseAndCompare(const TDoubleKeyframe &kf,
 //    TStageObject::LazyData  implementation
 //************************************************************************************************
 
-TStageObject::LazyData::LazyData()
-	: m_time(-1.0)
+TStageObject::LazyData::LazyData() : m_time(-1.0)
 {
 }
 
@@ -360,7 +375,14 @@ TStageObject::LazyData::LazyData()
 //************************************************************************************************
 
 TStageObject::TStageObject(TStageObjectTree *tree, TStageObjectId id)
-	: m_tree(tree), m_id(id), m_parent(0), m_name(""), m_isOpened(false), m_spline(0), m_status(XY), m_x(new TDoubleParam()), m_y(new TDoubleParam()), m_z(new TDoubleParam()), m_so(new TDoubleParam()), m_rot(new TDoubleParam()), m_scalex(new TDoubleParam(1.0)), m_scaley(new TDoubleParam(1.0)), m_scale(new TDoubleParam(1.0)), m_posPath(new TDoubleParam()), m_shearx(new TDoubleParam()), m_sheary(new TDoubleParam()), m_center(), m_offset(), m_cycleEnabled(false), m_handle("B"), m_parentHandle("B"), m_dagNodePos(TConst::nowhere), m_camera(0), m_locked(false), m_noScaleZ(0), m_pinnedRangeSet(0), m_ikflag(0), m_groupSelector(-1)
+	: m_tree(tree), m_id(id), m_parent(0), m_name(""), m_isOpened(false), m_spline(0), m_status(XY),
+	  m_x(new TDoubleParam()), m_y(new TDoubleParam()), m_z(new TDoubleParam()),
+	  m_so(new TDoubleParam()), m_rot(new TDoubleParam()), m_scalex(new TDoubleParam(1.0)),
+	  m_scaley(new TDoubleParam(1.0)), m_scale(new TDoubleParam(1.0)),
+	  m_posPath(new TDoubleParam()), m_shearx(new TDoubleParam()), m_sheary(new TDoubleParam()),
+	  m_center(), m_offset(), m_cycleEnabled(false), m_handle("B"), m_parentHandle("B"),
+	  m_dagNodePos(TConst::nowhere), m_camera(0), m_locked(false), m_noScaleZ(0),
+	  m_pinnedRangeSet(0), m_ikflag(0), m_groupSelector(-1)
 {
 	// NOTA: per le unita' di misura controlla anche tooloptions.cpp
 	m_x->setName("W_EW");
@@ -458,7 +480,8 @@ TStageObject::~TStageObject()
 		m_posPath->removeObserver(this);
 
 	if (m_skeletonDeformation) {
-		PlasticDeformerStorage::instance()->releaseDeformationData(m_skeletonDeformation.getPointer());
+		PlasticDeformerStorage::instance()->releaseDeformationData(
+			m_skeletonDeformation.getPointer());
 		m_skeletonDeformation->removeObserver(this);
 	}
 
@@ -563,8 +586,7 @@ string TStageObject::getFullName() const
 {
 	string name = getName();
 	if (m_id.isColumn()) {
-		if (name.find("Col") == 0 &&
-			name.length() > 3 &&
+		if (name.find("Col") == 0 && name.length() > 3 &&
 			name.find_first_not_of("0123456789", 3) == string::npos)
 			return name;
 		else
@@ -610,16 +632,11 @@ void TStageObject::setParent(const TStageObjectId &parentId)
 	} else if (m_id.isTable()) {
 		assert(m_parent == 0);
 	} else if (m_id.isColumn()) {
-		assert(m_parent &&
-			   (m_parent->m_id.isTable() ||
-				m_parent->m_id.isColumn() ||
-				m_parent->m_id.isPegbar() ||
-				m_parent->m_id.isCamera()));
+		assert(m_parent && (m_parent->m_id.isTable() || m_parent->m_id.isColumn() ||
+							m_parent->m_id.isPegbar() || m_parent->m_id.isCamera()));
 	} else if (m_id.isPegbar()) {
-		assert(m_parent &&
-			   (m_parent->m_id.isTable() ||
-				m_parent->m_id.isCamera() ||
-				m_parent->m_id.isPegbar()));
+		assert(m_parent && (m_parent->m_id.isTable() || m_parent->m_id.isCamera() ||
+							m_parent->m_id.isPegbar()));
 	} else {
 		assert(0);
 	}
@@ -865,14 +882,9 @@ bool TStageObject::isKeyframe(int frame) const
 
 bool TStageObject::is52FullKeyframe(int frame) const
 {
-	return m_rot->isKeyframe(frame) &&
-		   m_x->isKeyframe(frame) &&
-		   m_y->isKeyframe(frame) &&
-		   m_z->isKeyframe(frame) &&
-		   m_posPath->isKeyframe(frame) &&
-		   m_scalex->isKeyframe(frame) &&
-		   m_scaley->isKeyframe(frame) &&
-		   m_shearx->isKeyframe(frame) &&
+	return m_rot->isKeyframe(frame) && m_x->isKeyframe(frame) && m_y->isKeyframe(frame) &&
+		   m_z->isKeyframe(frame) && m_posPath->isKeyframe(frame) && m_scalex->isKeyframe(frame) &&
+		   m_scaley->isKeyframe(frame) && m_shearx->isKeyframe(frame) &&
 		   m_sheary->isKeyframe(frame);
 }
 
@@ -880,17 +892,10 @@ bool TStageObject::is52FullKeyframe(int frame) const
 
 bool TStageObject::isFullKeyframe(int frame) const
 {
-	return m_rot->isKeyframe(frame) &&
-		   m_x->isKeyframe(frame) &&
-		   m_y->isKeyframe(frame) &&
-		   m_z->isKeyframe(frame) &&
-		   m_so->isKeyframe(frame) &&
-		   m_posPath->isKeyframe(frame) &&
-		   m_scalex->isKeyframe(frame) &&
-		   m_scaley->isKeyframe(frame) &&
-		   m_scale->isKeyframe(frame) &&
-		   m_shearx->isKeyframe(frame) &&
-		   m_sheary->isKeyframe(frame);
+	return m_rot->isKeyframe(frame) && m_x->isKeyframe(frame) && m_y->isKeyframe(frame) &&
+		   m_z->isKeyframe(frame) && m_so->isKeyframe(frame) && m_posPath->isKeyframe(frame) &&
+		   m_scalex->isKeyframe(frame) && m_scaley->isKeyframe(frame) &&
+		   m_scale->isKeyframe(frame) && m_shearx->isKeyframe(frame) && m_sheary->isKeyframe(frame);
 }
 
 //-----------------------------------------------------------------------------
@@ -931,20 +936,44 @@ void TStageObject::setKeyframeWithoutUndo(int frame, const TStageObject::Keyfram
 	KeyframeMap &keyframes = lazyData().m_keyframes;
 
 	bool keyWasSet = false;
-	keyWasSet = ::setKeyframe(m_rot, k.m_channels[TStageObject::T_Angle], frame, k.m_easeIn, k.m_easeOut) || keyWasSet;
-	keyWasSet = ::setKeyframe(m_x, k.m_channels[TStageObject::T_X], frame, k.m_easeIn, k.m_easeOut) || keyWasSet;
-	keyWasSet = ::setKeyframe(m_y, k.m_channels[TStageObject::T_Y], frame, k.m_easeIn, k.m_easeOut) || keyWasSet;
-	keyWasSet = ::setKeyframe(m_z, k.m_channels[TStageObject::T_Z], frame, k.m_easeIn, k.m_easeOut) || keyWasSet;
-	keyWasSet = ::setKeyframe(m_so, k.m_channels[TStageObject::T_SO], frame, k.m_easeIn, k.m_easeOut) || keyWasSet;
-	keyWasSet = ::setKeyframe(m_posPath, k.m_channels[TStageObject::T_Path], frame, k.m_easeIn, k.m_easeOut) || keyWasSet;
-	keyWasSet = ::setKeyframe(m_scalex, k.m_channels[TStageObject::T_ScaleX], frame, k.m_easeIn, k.m_easeOut) || keyWasSet;
-	keyWasSet = ::setKeyframe(m_scaley, k.m_channels[TStageObject::T_ScaleY], frame, k.m_easeIn, k.m_easeOut) || keyWasSet;
-	keyWasSet = ::setKeyframe(m_scale, k.m_channels[TStageObject::T_Scale], frame, k.m_easeIn, k.m_easeOut) || keyWasSet;
-	keyWasSet = ::setKeyframe(m_shearx, k.m_channels[TStageObject::T_ShearX], frame, k.m_easeIn, k.m_easeOut) || keyWasSet;
-	keyWasSet = ::setKeyframe(m_sheary, k.m_channels[TStageObject::T_ShearY], frame, k.m_easeIn, k.m_easeOut) || keyWasSet;
+	keyWasSet =
+		::setKeyframe(m_rot, k.m_channels[TStageObject::T_Angle], frame, k.m_easeIn, k.m_easeOut) ||
+		keyWasSet;
+	keyWasSet =
+		::setKeyframe(m_x, k.m_channels[TStageObject::T_X], frame, k.m_easeIn, k.m_easeOut) ||
+		keyWasSet;
+	keyWasSet =
+		::setKeyframe(m_y, k.m_channels[TStageObject::T_Y], frame, k.m_easeIn, k.m_easeOut) ||
+		keyWasSet;
+	keyWasSet =
+		::setKeyframe(m_z, k.m_channels[TStageObject::T_Z], frame, k.m_easeIn, k.m_easeOut) ||
+		keyWasSet;
+	keyWasSet =
+		::setKeyframe(m_so, k.m_channels[TStageObject::T_SO], frame, k.m_easeIn, k.m_easeOut) ||
+		keyWasSet;
+	keyWasSet = ::setKeyframe(m_posPath, k.m_channels[TStageObject::T_Path], frame, k.m_easeIn,
+							  k.m_easeOut) ||
+				keyWasSet;
+	keyWasSet = ::setKeyframe(m_scalex, k.m_channels[TStageObject::T_ScaleX], frame, k.m_easeIn,
+							  k.m_easeOut) ||
+				keyWasSet;
+	keyWasSet = ::setKeyframe(m_scaley, k.m_channels[TStageObject::T_ScaleY], frame, k.m_easeIn,
+							  k.m_easeOut) ||
+				keyWasSet;
+	keyWasSet = ::setKeyframe(m_scale, k.m_channels[TStageObject::T_Scale], frame, k.m_easeIn,
+							  k.m_easeOut) ||
+				keyWasSet;
+	keyWasSet = ::setKeyframe(m_shearx, k.m_channels[TStageObject::T_ShearX], frame, k.m_easeIn,
+							  k.m_easeOut) ||
+				keyWasSet;
+	keyWasSet = ::setKeyframe(m_sheary, k.m_channels[TStageObject::T_ShearY], frame, k.m_easeIn,
+							  k.m_easeOut) ||
+				keyWasSet;
 
 	if (m_skeletonDeformation)
-		keyWasSet = m_skeletonDeformation->setKeyframe(k.m_skeletonKeyframe, frame, k.m_easeIn, k.m_easeOut) || keyWasSet;
+		keyWasSet = m_skeletonDeformation->setKeyframe(k.m_skeletonKeyframe, frame, k.m_easeIn,
+													   k.m_easeOut) ||
+					keyWasSet;
 
 	if (keyWasSet)
 		keyframes[frame] = k;
@@ -975,18 +1004,18 @@ void TStageObject::setKeyframeWithoutUndo(int frame)
 
 	/*if(m_skeletonDeformation)
   {
-    const PlasticSkeleton* skeleton = m_skeletonDeformation->skeleton();
-    const tcg::list<PlasticSkeleton::vertex_type>& vertices = skeleton->vertices();
+	const PlasticSkeleton* skeleton = m_skeletonDeformation->skeleton();
+	const tcg::list<PlasticSkeleton::vertex_type>& vertices = skeleton->vertices();
 
-    tcg::list<PlasticSkeleton::vertex_type>::const_iterator vt, vEnd(vertices.end());
-    for(vt = vertices.begin(); vt != vertices.end(); ++vt)
-    {
-      SkVD* vd = m_skeletonDeformation->vertexDeformation(vt->name());
-      assert(vd);
+	tcg::list<PlasticSkeleton::vertex_type>::const_iterator vt, vEnd(vertices.end());
+	for(vt = vertices.begin(); vt != vertices.end(); ++vt)
+	{
+	  SkVD* vd = m_skeletonDeformation->vertexDeformation(vt->name());
+	  assert(vd);
 
-      for(int p=0; p<SkVD::PARAMS_COUNT; ++p)
-        setkey(vd->m_params[p], frame);
-    }
+	  for(int p=0; p<SkVD::PARAMS_COUNT; ++p)
+		setkey(vd->m_params[p], frame);
+	}
   }*/
 }
 
@@ -1106,9 +1135,7 @@ bool TStageObject::getKeyframeRange(int &r0, int &r1) const
 
 //-----------------------------------------------------------------------------
 
-bool TStageObject::getKeyframeSpan(int row,
-								   int &r0, double &ease0,
-								   int &r1, double &ease1) const
+bool TStageObject::getKeyframeSpan(int row, int &r0, double &ease0, int &r1, double &ease1) const
 {
 	const KeyframeMap &keyframes = lazyData().m_keyframes;
 
@@ -1216,7 +1243,8 @@ void TStageObject::setPlasticSkeletonDeformation(const PlasticSkeletonDeformatio
 		return;
 
 	if (m_skeletonDeformation) {
-		PlasticDeformerStorage::instance()->releaseDeformationData(m_skeletonDeformation.getPointer());
+		PlasticDeformerStorage::instance()->releaseDeformationData(
+			m_skeletonDeformation.getPointer());
 
 		m_skeletonDeformation->setGrammar(0);
 		m_skeletonDeformation->removeObserver(this);
@@ -1272,8 +1300,7 @@ TStageObject *TStageObject::clone()
 
 	std::map<int, TStageObject::Keyframe>::iterator itKf = keyframes.begin();
 	for (; itKf != keyframes.end(); ++itKf) {
-		clonedKeyframes.insert(make_pair(
-			itKf->first, itKf->second));
+		clonedKeyframes.insert(make_pair(itKf->first, itKf->second));
 	}
 	cloned->m_cycleEnabled = m_cycleEnabled;
 	cloned->lazyData().m_time = lazyData().m_time;
@@ -1460,9 +1487,8 @@ TAffine TStageObject::computeLocalPlacement(double frame)
 			pos += m_parent->getHandlePos(m_parentHandle, (int)frame);
 		pos = pos * Stage::inch + position;
 
-		m_localPlacement = TTranslation(pos) *
-						   makeRotation(ang) * shear * TScale(sx, sy) *
-						   TTranslation(-center);
+		m_localPlacement =
+			TTranslation(pos) * makeRotation(ang) * shear * TScale(sx, sy) * TTranslation(-center);
 	}
 
 	return m_localPlacement;
@@ -1668,7 +1694,8 @@ void TStageObject::updateKeyframes(LazyData &ld) const
 		}
 
 		// Finally, check the skeleton deformation keyframes
-		const std::map<QString, SkVD::Keyframe> &vdfs = stageKf.m_skeletonKeyframe.m_vertexKeyframes;
+		const std::map<QString, SkVD::Keyframe> &vdfs =
+			stageKf.m_skeletonKeyframe.m_vertexKeyframes;
 
 		std::map<QString, SkVD::Keyframe>::const_iterator vdft, vdfEnd(vdfs.end());
 		for (vdft = vdfs.begin(); easeOk && vdft != vdfEnd; ++vdft) {
@@ -1764,11 +1791,11 @@ void TStageObject::saveData(TOStream &os)
 		os.closeChild();
 
 		/*TDimensionD size = m_camera->getSize();
-    TDimension res = m_camera->getRes();
-    bool isXPrevalence = m_camera->isXPrevalence();
-    os.child("cameraSize") << size.lx << size.ly;
-    os.child("cameraRes") << res.lx << res.ly;
-    os.child("xPrevalence") << (int)isXPrevalence;*/
+	TDimension res = m_camera->getRes();
+	bool isXPrevalence = m_camera->isXPrevalence();
+	os.child("cameraSize") << size.lx << size.ly;
+	os.child("cameraRes") << res.lx << res.ly;
+	os.child("xPrevalence") << (int)isXPrevalence;*/
 	}
 }
 
@@ -1868,7 +1895,7 @@ void TStageObject::loadData(TIStream &is)
 			TPointD pos;
 			is >> pos.x >> pos.y;
 			m_dagNodePos = updateDagPosition(pos, tnzVersion);
-			//is >> m_dagNodePos.x >> m_dagNodePos.y;
+			// is >> m_dagNodePos.x >> m_dagNodePos.y;
 		}
 		//***** camera parameters till toonz 6.0 ********
 		else if (tagName == "cameraSize") {
@@ -2006,7 +2033,8 @@ void TStageObject::assignParams(const TStageObjectParams *src, bool doParameters
 		m_sheary->copy(src->m_sheary.getPointer());
 
 		if (src->m_skeletonDeformation)
-			setPlasticSkeletonDeformation(new PlasticSkeletonDeformation(*src->m_skeletonDeformation));
+			setPlasticSkeletonDeformation(
+				new PlasticSkeletonDeformation(*src->m_skeletonDeformation));
 	} else {
 		m_x = src->m_x.getPointer();
 		m_x->addObserver(this);
@@ -2059,8 +2087,7 @@ void TStageObject::assignParams(const TStageObjectParams *src, bool doParameters
 //   (che raggiungerebbe per un valore di -1000)
 //
 
-bool TStageObject::perspective(TAffine &aff,
-							   const TAffine &cameraAff, double cameraZ,
+bool TStageObject::perspective(TAffine &aff, const TAffine &cameraAff, double cameraZ,
 							   const TAffine &objectAff, double objectZ, double objectNoScaleZ)
 {
 	TPointD cameraPos(cameraAff.a13, cameraAff.a23);
@@ -2069,7 +2096,9 @@ bool TStageObject::perspective(TAffine &aff,
 	const double focus = 1000;
 	const double nearPlane = 1;
 
-	/*-- dzはカメラとオブジェクトの間の距離、focus(=1000)はPegbarをZ軸方向に動かさなかった場合のデフォルト距離 --*/
+	/*--
+	 * dzはカメラとオブジェクトの間の距離、focus(=1000)はPegbarをZ軸方向に動かさなかった場合のデフォルト距離
+	 * --*/
 	double dz = focus + cameraZ - objectZ;
 	if (dz < nearPlane) {
 		aff = TAffine();
@@ -2077,8 +2106,8 @@ bool TStageObject::perspective(TAffine &aff,
 	}
 
 	double noScaleSc = 1 - objectNoScaleZ / focus;
-	aff =
-		cameraAff * TScale((focus + cameraZ) / dz) * cameraAff.inv() * objectAff * TScale(noScaleSc);
+	aff = cameraAff * TScale((focus + cameraZ) / dz) * cameraAff.inv() * objectAff *
+		  TScale(noScaleSc);
 
 	return true;
 }
@@ -2106,9 +2135,7 @@ void TStageObject::setGroupId(int value, int position)
 
 int TStageObject::getGroupId()
 {
-	return m_groupId.isEmpty() ||
-				   m_groupSelector < 0 ||
-				   m_groupSelector >= m_groupId.size()
+	return m_groupId.isEmpty() || m_groupSelector < 0 || m_groupSelector >= m_groupId.size()
 			   ? 0
 			   : m_groupId[m_groupSelector];
 }
@@ -2170,9 +2197,7 @@ void TStageObject::setGroupName(const wstring &name, int position)
 wstring TStageObject::getGroupName(bool fromEditor)
 {
 	int groupSelector = fromEditor ? m_groupSelector + 1 : m_groupSelector;
-	return m_groupName.isEmpty() ||
-				   groupSelector < 0 ||
-				   groupSelector >= m_groupName.size()
+	return m_groupName.isEmpty() || groupSelector < 0 || groupSelector >= m_groupName.size()
 			   ? L""
 			   : m_groupName[groupSelector];
 }

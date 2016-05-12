@@ -108,16 +108,10 @@ using namespace std;
 wstring getFormattedMessage(DWORD lastError)
 {
 	LPVOID lpMsgBuf;
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,
-		lastError,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-		(LPTSTR)&lpMsgBuf,
-		0,
-		NULL);
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+					  FORMAT_MESSAGE_IGNORE_INSERTS,
+				  NULL, lastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+				  (LPTSTR)&lpMsgBuf, 0, NULL);
 
 	int wSize = MultiByteToWideChar(0, 0, (char *)lpMsgBuf, -1, 0, 0);
 	if (!wSize)
@@ -167,7 +161,8 @@ bool TSystem::memoryShortage()
 
 	assert(memStatus.ullAvailPhys <= memStatus.ullTotalPhys);
 
-	if (memStatus.ullAvailPhys < memStatus.ullTotalPhys * 0.20) //if available memory is less then 20% of total memory
+	if (memStatus.ullAvailPhys <
+		memStatus.ullTotalPhys * 0.20) // if available memory is less then 20% of total memory
 		return true;
 
 	PROCESS_MEMORY_COUNTERS c;
@@ -175,11 +170,12 @@ bool TSystem::memoryShortage()
 	BOOL ret = GetProcessMemoryInfo(GetCurrentProcess(), &c, sizeof(PROCESS_MEMORY_COUNTERS));
 	assert(ret);
 
-	return c.WorkingSetSize > memStatus.ullTotalVirtual * 0.6; //if total memory used by this process(WorkingSetSize) is
-															   //half of max allocatable memory
-															   //(ullTotalVirtual: on 32bits machines, tipically it's 2GB)
-															   //It's better "to stay large"; for values >0.6 this function may
-															   //returns that there is memory, but for fragmentation the malloc fails the same!
+	return c.WorkingSetSize > memStatus.ullTotalVirtual *
+								  0.6; // if total memory used by this process(WorkingSetSize) is
+// half of max allocatable memory
+//(ullTotalVirtual: on 32bits machines, tipically it's 2GB)
+// It's better "to stay large"; for values >0.6 this function may
+// returns that there is memory, but for fragmentation the malloc fails the same!
 
 #elif defined(MACOSX)
 
@@ -218,14 +214,15 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory)
 
 #elif defined(__sgi)
 
-	//check for virtual memory
+	// check for virtual memory
 	int numberOfResources = swapctl(SC_GETNSWP, 0); /* get number of swapping resources configued */
 
 	if (numberOfResources == 0)
 		return 0;
 
-	//avrei voluto fare: struct swaptable *table = new struct swaptable[...]
-	struct swaptable *table = (struct swaptable *)calloc(1, sizeof(struct swapent) * numberOfResources + sizeof(int));
+	// avrei voluto fare: struct swaptable *table = new struct swaptable[...]
+	struct swaptable *table =
+		(struct swaptable *)calloc(1, sizeof(struct swapent) * numberOfResources + sizeof(int));
 
 	table->swt_n = numberOfResources;
 	swapctl(SC_LIST, table); /* list all the swapping resources */
@@ -274,7 +271,7 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory)
 /*
 ostream& operator<<(ostream&out, const TTime  &t)
 {
-  return out<<t.getDate()<<" "<<t.getTime(); 
+  return out<<t.getDate()<<" "<<t.getTime();
 }
 */
 
@@ -302,13 +299,12 @@ TINT64 TSystem::getDiskSize(const TFilePath &diskName)
 	DWORD numberOfFreeClusters; // free clusters
 	DWORD totalNumberOfClusters;
 
-	BOOL rc = GetDiskFreeSpaceW(
-		diskName.getWideString().c_str(), // root path
-		&sectorsPerCluster,				  // sectors per cluster
-		&bytesPerSector,				  // bytes per sector
-		&numberOfFreeClusters,			  // free clusters
-		&totalNumberOfClusters			  // total clusters
-		);
+	BOOL rc = GetDiskFreeSpaceW(diskName.getWideString().c_str(), // root path
+								&sectorsPerCluster,				  // sectors per cluster
+								&bytesPerSector,				  // bytes per sector
+								&numberOfFreeClusters,			  // free clusters
+								&totalNumberOfClusters			  // total clusters
+								);
 
 	if (!rc)
 		throw TSystemException(diskName, getFormattedMessage(GetLastError()));
@@ -349,7 +345,7 @@ TINT64 TSystem::getFreeDiskSize(const TFilePath &diskName)
 								&totalNumberOfClusters			  // total clusters
 								);
 
-	if (!rc) //eccezione... getLastError etc...
+	if (!rc) // eccezione... getLastError etc...
 		throw TSystemException(diskName, "cannot get disk info!");
 	else
 		size = (numberOfFreeClusters * sectorsPerCluster * bytesPerSector) >> 10;
@@ -433,9 +429,7 @@ void TSystem::moveFileToRecycleBin(const TFilePath &fp)
 
 #elif defined(MACOSX)
 	FSRef foundRef;
-	OSErr err = FSFindFolder(kOnSystemDisk,
-							 kTrashFolderType, kDontCreateFolder,
-							 &foundRef);
+	OSErr err = FSFindFolder(kOnSystemDisk, kTrashFolderType, kDontCreateFolder, &foundRef);
 
 	if (err) {
 		assert(false);
@@ -449,7 +443,7 @@ void TSystem::moveFileToRecycleBin(const TFilePath &fp)
 		deleteFile(fp);
 		return;
 	}
-	//TFilePath dest = TFilePath(path)+(fp.getName()+fp.getDottedType());
+	// TFilePath dest = TFilePath(path)+(fp.getName()+fp.getDottedType());
 	string fullNameWithExt = toString(fp.getWideString());
 	int i = fullNameWithExt.rfind("/");
 	string nameWithExt = fullNameWithExt.substr(i + 1);
@@ -476,33 +470,90 @@ TString TSystemException::getMessage() const
 {
 	wstring msg;
 	switch (m_err) {
-	case -1: msg = m_msg; break; // // nothing
-	case EEXIST: msg = L": Directory was not created because filename is the name of an existing file, directory, or device"; break;
-	case ENOENT: msg = L": Path was not found, or the named file does not exist or is a null pathname."; break;
-	case ENOTEMPTY: msg = L": Given path is not a directory; directory is not empty; or directory is either current working directory or root directory"; break;
-	case EACCES: msg = L": Search permission is denied by a component of the path prefix, or write permission on the file named by path is denied, or times is NULL, and write access is denied"; break;
-	case EFAULT: msg = L": Times is not NULL and, or points outside the process's allocated address space."; break;
-	case EINTR: msg = L": A signal was caught during the utime system call."; break;
-	case ENAMETOOLONG: msg = L": The length of the path argument exceeds {PATH_MAX}, or the length of a path component exceeds {NAME_MAX} while _POSIX_NO_TRUNC is in effect."; break;
-	case ENOTDIR: msg = L": A component of the path prefix is not a directory."; break;
-	case EPERM: msg = L": The calling process does not have the super-user privilege, the effective user ID is not the owner of the file, and times is not NULL, or the file system containing the file is mounted read-only"; break;
-	case EROFS: msg = L": The current file system level range does not envelop the level of the file named by path, and the calling process does not have the super-user privilege."; break;
-	case ENOSYS: msg = L": When the named file cannot have its time reset.  The file is on a file system that doesn't have this operation."; break;
-	case EMFILE: msg = L": The maximum number of file descriptors are currently open."; break;
-	case ENFILE: msg = L": The system file table is full."; break;
-	case EBADF: msg = L": The file descriptor determined by the DIR stream is no longer valid.  This result occurs if the DIR stream has been closed."; break;
-	case EINVAL: msg = L": 64-bit and non-64-bit calls were mixed in a sequence of calls."; break;
-	default: msg = L": Unknown error"; break;
+	case -1:
+		msg = m_msg;
+		break; // // nothing
+	case EEXIST:
+		msg = L": Directory was not created because filename is the name of an existing file, "
+			  L"directory, or device";
+		break;
+	case ENOENT:
+		msg = L": Path was not found, or the named file does not exist or is a null pathname.";
+		break;
+	case ENOTEMPTY:
+		msg = L": Given path is not a directory; directory is not empty; or directory is either "
+			  L"current working directory or root directory";
+		break;
+	case EACCES:
+		msg = L": Search permission is denied by a component of the path prefix, or write "
+			  L"permission on the file named by path is denied, or times is NULL, and write access "
+			  L"is denied";
+		break;
+	case EFAULT:
+		msg = L": Times is not NULL and, or points outside the process's allocated address space.";
+		break;
+	case EINTR:
+		msg = L": A signal was caught during the utime system call.";
+		break;
+	case ENAMETOOLONG:
+		msg = L": The length of the path argument exceeds {PATH_MAX}, or the length of a path "
+			  L"component exceeds {NAME_MAX} while _POSIX_NO_TRUNC is in effect.";
+		break;
+	case ENOTDIR:
+		msg = L": A component of the path prefix is not a directory.";
+		break;
+	case EPERM:
+		msg = L": The calling process does not have the super-user privilege, the effective user "
+			  L"ID is not the owner of the file, and times is not NULL, or the file system "
+			  L"containing the file is mounted read-only";
+		break;
+	case EROFS:
+		msg = L": The current file system level range does not envelop the level of the file named "
+			  L"by path, and the calling process does not have the super-user privilege.";
+		break;
+	case ENOSYS:
+		msg = L": When the named file cannot have its time reset.  The file is on a file system "
+			  L"that doesn't have this operation.";
+		break;
+	case EMFILE:
+		msg = L": The maximum number of file descriptors are currently open.";
+		break;
+	case ENFILE:
+		msg = L": The system file table is full.";
+		break;
+	case EBADF:
+		msg = L": The file descriptor determined by the DIR stream is no longer valid.  This "
+			  L"result occurs if the DIR stream has been closed.";
+		break;
+	case EINVAL:
+		msg = L": 64-bit and non-64-bit calls were mixed in a sequence of calls.";
+		break;
+	default:
+		msg = L": Unknown error";
+		break;
 #ifndef _WIN32
-	case ELOOP: msg = L": Too many symbolic links were encountered in translating path."; break;
+	case ELOOP:
+		msg = L": Too many symbolic links were encountered in translating path.";
+		break;
 #ifndef MACOSX
-	case EMULTIHOP: msg = L": Components of path require hopping to multiple remote machines and the file system does not allow it."; break;
-	case ENOLINK: msg = L": Path points to a remote machine and the link to that machine is no longer active."; break;
+	case EMULTIHOP:
+		msg = L": Components of path require hopping to multiple remote machines and the file "
+			  L"system does not allow it.";
+		break;
+	case ENOLINK:
+		msg =
+			L": Path points to a remote machine and the link to that machine is no longer active.";
+		break;
 #endif
 #if defined(__sgi)
-	case EDIRCORRUPTED: msg = L": The directory is corrupted on disk."; break;
+	case EDIRCORRUPTED:
+		msg = L": The directory is corrupted on disk.";
+		break;
 #endif
-	case EOVERFLOW: msg = L": One of the inode number values or offset values did not fit in 32 bits, and the 64-bit interfaces were not used."; break;
+	case EOVERFLOW:
+		msg = L": One of the inode number values or offset values did not fit in 32 bits, and the "
+			  L"64-bit interfaces were not used.";
+		break;
 #endif
 	}
 	return m_fname.getWideString() + L"\n" + msg;

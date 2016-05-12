@@ -14,13 +14,13 @@ bool IsQuickTimeInstalled();
 
 class TLevelWriterMov : public TLevelWriter
 {
-public:
+  public:
 	TLevelWriterMov(const TFilePath &path, TWriterInfo *winfo);
 	~TLevelWriterMov();
 	TImageWriterP getFrameWriter(TFrameId fid);
 	friend class TImageWriterMov;
 
-public:
+  public:
 	static TLevelWriter *create(const TFilePath &f, TWriterInfo *winfo)
 	{
 		return new TLevelWriterMov(f, winfo);
@@ -30,7 +30,7 @@ public:
 
 class TLevelReaderMov : public TLevelReader
 {
-public:
+  public:
 	TLevelReaderMov(const TFilePath &path);
 	~TLevelReaderMov();
 	TImageReaderP getFrameReader(TFrameId fid);
@@ -39,7 +39,7 @@ public:
 
 	int m_IOError;
 
-private:
+  private:
 	TThread::Mutex m_mutex;
 	short m_refNum;
 	short m_resId;
@@ -48,23 +48,20 @@ private:
 	oqt_t *m_fileMov;
 	int m_lastFrameDecoded;
 
-public:
-	static TLevelReader *create(const TFilePath &f)
-	{
-		return new TLevelReaderMov(f);
-	};
+  public:
+	static TLevelReader *create(const TFilePath &f) { return new TLevelReaderMov(f); };
 };
 
 //-----------------------------------------------------------------------------
 
 class TWriterInfoMov : public TWriterInfo
 {
-	//friend TImageWriterMov;
-public:
+	// friend TImageWriterMov;
+  public:
 	static TWriterInfo *create(const string &ext) { return new TWriterInfoMov(); }
 	~TWriterInfoMov() {}
 	TWriterInfo *clone() const { return new TWriterInfoMov(); }
-private:
+  private:
 	TWriterInfoMov() {}
 
 	TWriterInfoMov(const TWriterInfoMov &);
@@ -72,4 +69,4 @@ private:
 	TWriterInfoMov &operator=(const TWriterInfoMov &); // not implemented
 };
 
-#endif //TIIO_MOV_H
+#endif // TIIO_MOV_H

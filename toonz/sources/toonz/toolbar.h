@@ -14,17 +14,17 @@ class Toolbar : public QToolBar
 	QToolButton *m_expandButton;
 	QAction *m_sep1, *m_sep2;
 
-public:
+  public:
 	Toolbar(QWidget *parent, bool isVertical = true);
 	~Toolbar();
 
-protected:
+  protected:
 	bool addAction(QAction *act);
 
 	void showEvent(QShowEvent *e);
 	void hideEvent(QHideEvent *e);
 
-protected slots:
+  protected slots:
 	void onToolChanged();
 	void updateToolbar(bool expand);
 };

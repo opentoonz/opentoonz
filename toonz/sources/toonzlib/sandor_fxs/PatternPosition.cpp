@@ -49,8 +49,8 @@ int pp_intCompare(const void *a, const void *b)
 	return 0;
 }
 
-void CPatternPosition::makeRandomPositions(const int nbPat, const int nbPixel,
-										   const int lX, const int lY, const UCHAR *sel)
+void CPatternPosition::makeRandomPositions(const int nbPat, const int nbPixel, const int lX,
+										   const int lY, const UCHAR *sel)
 {
 	try {
 		const UCHAR *pSel = sel;
@@ -70,17 +70,14 @@ void CPatternPosition::makeRandomPositions(const int nbPat, const int nbPixel,
 	}
 }
 
-void CPatternPosition::getPosAroundThis(const int lX, const int lY, const UCHAR *lSel,
-										const int xx, const int yy,
-										int &xPos, int &yPos)
+void CPatternPosition::getPosAroundThis(const int lX, const int lY, const UCHAR *lSel, const int xx,
+										const int yy, int &xPos, int &yPos)
 {
 	vector<SPOINT> ddc;
 	prepareCircle(ddc, 2.0);
 
 	int qx = 0, qy = 0, q = 0;
-	for (vector<SPOINT>::iterator p = ddc.begin();
-		 p != ddc.end();
-		 p++) {
+	for (vector<SPOINT>::iterator p = ddc.begin(); p != ddc.end(); p++) {
 		int x = xx + p->x;
 		int y = yy + p->y;
 		if (x >= 0 && y >= 0 && x < lX && y < lY)
@@ -101,8 +98,8 @@ void CPatternPosition::getPosAroundThis(const int lX, const int lY, const UCHAR 
 	}
 }
 
-bool CPatternPosition::findEmptyPos(const int lX, const int lY, const UCHAR *lSel,
-									int &xPos, int &yPos, SRECT &bb)
+bool CPatternPosition::findEmptyPos(const int lX, const int lY, const UCHAR *lSel, int &xPos,
+									int &yPos, SRECT &bb)
 {
 	int y = 0;
 	for (y = 0; y <= yPos; y++)
@@ -128,9 +125,7 @@ bool CPatternPosition::findEmptyPos(const int lX, const int lY, const UCHAR *lSe
 void CPatternPosition::eraseCurrentArea(const int lX, const int lY, UCHAR *lSel,
 										vector<SPOINT> &ddc, const int xx, const int yy)
 {
-	for (vector<SPOINT>::iterator pDdc = ddc.begin();
-		 pDdc != ddc.end();
-		 pDdc++) {
+	for (vector<SPOINT>::iterator pDdc = ddc.begin(); pDdc != ddc.end(); pDdc++) {
 		int x = xx + pDdc->x;
 		int y = yy + pDdc->y;
 		if (x >= 0 && y >= 0 && x < lX && y < lY) {
@@ -177,8 +172,8 @@ void CPatternPosition::prepareCircle(vector<SPOINT> &v, const double r)
 	}
 }
 
-void CPatternPosition::makeDDPositions(const int lX, const int lY, UCHAR *sel,
-									   const double minD, const double maxD)
+void CPatternPosition::makeDDPositions(const int lX, const int lY, UCHAR *sel, const double minD,
+									   const double maxD)
 {
 	const int maxNbDDC = 20;
 	vector<SPOINT> ddc[maxNbDDC];

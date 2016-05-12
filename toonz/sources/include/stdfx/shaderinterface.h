@@ -70,7 +70,7 @@ class QGLShaderProgram;
 */
 class DVAPI ShaderInterface : public TPersist
 {
-public: // Enums
+  public: // Enums
 	enum ParameterConceptType {
 		CONCEPT_NONE,
 		PERCENT,
@@ -108,31 +108,28 @@ public: // Enums
 		TYPESCOUNT
 	};
 
-	enum HandledWorldTransformsType {
-		HWT_UNKNOWN,
-		ANY,
-		ISOTROPIC,
-		HWTCOUNT
-	};
+	enum HandledWorldTransformsType { HWT_UNKNOWN, ANY, ISOTROPIC, HWTCOUNT };
 
-public: // Sub-classes
+  public: // Sub-classes
 	class ParameterConcept : public TPersist
 	{
 		PERSIST_DECLARATION(ParameterConcept)
 
-	public:
+	  public:
 		ParameterConceptType m_type;		   //!< The concept type (typically composite)
 		QString m_label;					   //!< Name to be shown for ui concepts
 		std::vector<QString> m_parameterNames; //!< The involved parameters (by name)
 
-	public:
+	  public:
 		ParameterConcept() : m_type(CONCEPT_NONE) {}
 		ParameterConcept(ParameterConceptType type, const QString &label)
-			: m_type(type), m_label(label) {}
+			: m_type(type), m_label(label)
+		{
+		}
 
 		bool isUI() const { return m_type >= UI_CONCEPTS && m_type < CONCEPTSCOUNT; }
 
-	protected:
+	  protected:
 		void saveData(TOStream &os);
 		void loadData(TIStream &is);
 	};
@@ -155,7 +152,7 @@ public: // Sub-classes
 	{
 		PERSIST_DECLARATION(Parameter)
 
-	public:
+	  public:
 		ParameterType m_type;
 		QString m_name;
 
@@ -164,12 +161,11 @@ public: // Sub-classes
 
 		ParameterConcept m_concept;
 
-	public:
+	  public:
 		Parameter() : m_type(PARAMETER_UNKNOWN) {}
-		Parameter(ParameterType type, const QString &name)
-			: m_type(type), m_name(name) {}
+		Parameter(ParameterType type, const QString &name) : m_type(type), m_name(name) {}
 
-	protected:
+	  protected:
 		void saveData(TOStream &os);
 		void loadData(TIStream &is);
 	};
@@ -178,20 +174,20 @@ public: // Sub-classes
 	{
 		PERSIST_DECLARATION(ShaderData)
 
-	public:
+	  public:
 		QString m_name;				  //!< A name associated to the shader action
 		TFilePath m_path;			  //!< The shader program's file path
 		QGLShader::ShaderType m_type; //!< The shader type
 
-	public:
+	  public:
 		bool isValid() const { return !m_path.isEmpty(); }
 
-	protected:
+	  protected:
 		void saveData(TOStream &os);
 		void loadData(TIStream &is);
 	};
 
-public: // Public methods
+  public: // Public methods
 	ShaderInterface();
 
 	bool isValid() const;
@@ -206,19 +202,19 @@ public: // Public methods
 	HandledWorldTransformsType hwtType() const;
 
 	/*!
-    Returns a compiled shader program against current OpenGL context, and the
-    last modified date of the associated shader file.
+	Returns a compiled shader program against current OpenGL context, and the
+	last modified date of the associated shader file.
   */
-	std::pair<QGLShaderProgram *, QDateTime> makeProgram(const ShaderData &sd,
-														 int varyingsCount = 0, const GLchar **varyingNames = 0) const;
+	std::pair<QGLShaderProgram *, QDateTime>
+	makeProgram(const ShaderData &sd, int varyingsCount = 0, const GLchar **varyingNames = 0) const;
 
-protected:
+  protected:
 	void clear();
 
 	void saveData(TOStream &os);
 	void loadData(TIStream &is);
 
-private:
+  private:
 	PERSIST_DECLARATION(ShaderInterface)
 
 	ShaderData m_mainShader;					 //!< Main (fragment) shader data

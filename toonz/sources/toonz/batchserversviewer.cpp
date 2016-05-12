@@ -23,16 +23,18 @@ using namespace TFarmStuff;
 
 class MyListItem : public QListWidgetItem
 {
-public:
+  public:
 	QString m_id;
 
-	MyListItem(const QString &id, const QString &name, QListWidget *w) : QListWidgetItem(name, w), m_id(id) {}
+	MyListItem(const QString &id, const QString &name, QListWidget *w)
+		: QListWidgetItem(name, w), m_id(id)
+	{
+	}
 };
 
 //-----------------------------------------------------------------------------
 
-FarmServerListView::FarmServerListView(QWidget *parent)
-	: QListWidget(parent)
+FarmServerListView::FarmServerListView(QWidget *parent) : QListWidget(parent)
 {
 	setFrameStyle(QFrame::StyledPanel);
 }
@@ -160,7 +162,7 @@ void BatchServersViewer::updateServerInfo(const QString &id)
 		m_cpu->setText(QString::number(TSystem::getProcessorCount()));
 
 #ifdef _WIN32
-		//Please observe that the commented value is NOT the same reported by tfarmserver...
+		// Please observe that the commented value is NOT the same reported by tfarmserver...
 		MEMORYSTATUSEX buff;
 		buff.dwLength = sizeof(MEMORYSTATUSEX);
 		GlobalMemoryStatusEx(&buff);
@@ -300,14 +302,13 @@ BatchServersViewer::BatchServersViewer(QWidget *parent, Qt::WFlags flags)
 		m_farmRootField->setText(path);
 		TFarmStuff::setGlobalRoot(TFilePath(path.toStdWString()));
 	}
-	connect(m_farmRootField, SIGNAL(editingFinished()),
-			this, SLOT(setGRoot()));
+	connect(m_farmRootField, SIGNAL(editingFinished()), this, SLOT(setGRoot()));
 
 	m_serverList = new FarmServerListView(this);
-	connect(
-		m_serverList, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
-		this, SLOT(onCurrentItemChanged(QListWidgetItem *)));
-	//connect(m_serverList, SIGNAL(itemPressed(QListWidgetItem *)), this, SLOT(onCurrentItemChanged(QListWidgetItem *)));
+	connect(m_serverList, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this,
+			SLOT(onCurrentItemChanged(QListWidgetItem *)));
+	// connect(m_serverList, SIGNAL(itemPressed(QListWidgetItem *)), this,
+	// SLOT(onCurrentItemChanged(QListWidgetItem *)));
 
 	layout->addWidget(m_serverList, row, 0, 18, 2);
 	row += 18 + 1;
@@ -353,11 +354,13 @@ void BatchServersViewer::onProcessWith(int index)
 	try {
 		connected = TFarmStuff::testConnectionToController();
 	} catch (TMissingGRootEnvironmentVariable &) {
-		DVGui::warning(QString(tr("In order to use the render farm you have to define the Farm Global Root first.")));
+		DVGui::warning(QString(
+			tr("In order to use the render farm you have to define the Farm Global Root first.")));
 		m_processWith->setCurrentIndex(0);
 		return;
 	} catch (TMissingGRootFolder &) {
-		DVGui::warning(tr("The Farm Global Root folder doesn't exist\nPlease create this folder before using the render farm."));
+		DVGui::warning(tr("The Farm Global Root folder doesn't exist\nPlease create this folder "
+						  "before using the render farm."));
 		m_processWith->setCurrentIndex(0);
 		return;
 	} catch (TException &e) {
@@ -386,11 +389,12 @@ void BatchServersViewer::onProcessWith(int index)
 
 	m_serverList->update();
 
-	//m_serversListView->update();
-	//if (m_serversListView->getItemCount() > 0)
+	// m_serversListView->update();
+	// if (m_serversListView->getItemCount() > 0)
 	//  m_serversListView->select(0, true);
 }
 
 //-------------------------------------------------------------------------------
 
-OpenFloatingPanel openBatchServersCommand(MI_OpenBatchServers, "BatchServers", QObject::tr("Batch Servers"));
+OpenFloatingPanel openBatchServersCommand(MI_OpenBatchServers, "BatchServers",
+										  QObject::tr("Batch Servers"));

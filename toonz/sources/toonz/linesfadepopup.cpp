@@ -74,10 +74,10 @@ void onChange(TRaster32P &rasIn, const TRaster32P &rasOut, TPixel32 col, int _in
 			pixOut->m = (val > 255) ? 255 : val;
 
 			/*  Fading matte here
-      pix->r=(UCHAR)(pix->r+intensity*(col.r-pix->r));
-      pix->g=(UCHAR)(pix->g+intensity*(col.g-pix->g));
-      pix->b=(UCHAR)(pix->b+intensity*(col.b-pix->b));
-      pix->m=(UCHAR)(pix->m+intensity*(col.m-pix->m));*/
+	  pix->r=(UCHAR)(pix->r+intensity*(col.r-pix->r));
+	  pix->g=(UCHAR)(pix->g+intensity*(col.g-pix->g));
+	  pix->b=(UCHAR)(pix->b+intensity*(col.b-pix->b));
+	  pix->m=(UCHAR)(pix->m+intensity*(col.m-pix->m));*/
 
 			++pixOut;
 			++pixIn;
@@ -88,7 +88,7 @@ void onChange(TRaster32P &rasIn, const TRaster32P &rasOut, TPixel32 col, int _in
 	rasOut->unlock();
 }
 
-} //namespace
+} // namespace
 
 //**************************************************************************
 //    BrightnessAndContrastPopup Swatch
@@ -98,7 +98,7 @@ class LinesFadePopup::Swatch : public PlaneViewer
 {
 	TRasterP m_ras;
 
-public:
+  public:
 	Swatch(QWidget *parent = 0) : PlaneViewer(parent)
 	{
 		setBgColor(TPixel32::White, TPixel32::White);
@@ -115,10 +115,10 @@ public:
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-			//Note GL_ONE instead of GL_SRC_ALPHA: it's needed since the input
-			//image is supposedly premultiplied - and it works because the
-			//viewer's background is opaque.
-			//See tpixelutils.h's overPixT function for comparison.
+			// Note GL_ONE instead of GL_SRC_ALPHA: it's needed since the input
+			// image is supposedly premultiplied - and it works because the
+			// viewer's background is opaque.
+			// See tpixelutils.h's overPixT function for comparison.
 
 			pushGLWorldCoordinates();
 			draw(m_ras);
@@ -146,7 +146,8 @@ LinesFadePopup::LinesFadePopup()
 	beginVLayout();
 
 	QSplitter *splitter = new QSplitter(Qt::Vertical);
-	splitter->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	splitter->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 	addWidget(splitter);
 
 	endVLayout();
@@ -160,7 +161,8 @@ LinesFadePopup::LinesFadePopup()
 	splitter->setStretchFactor(0, 1);
 
 	QFrame *topWidget = new QFrame(scrollArea);
-	topWidget->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	topWidget->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 	scrollArea->setWidget(topWidget);
 
 	QGridLayout *topLayout = new QGridLayout(this);
@@ -168,7 +170,7 @@ LinesFadePopup::LinesFadePopup()
 
 	//------------------------- Parameters --------------------------
 
-	//Fade
+	// Fade
 	QLabel *fadeLabel = new QLabel(tr("Fade:"));
 	topLayout->addWidget(fadeLabel, 0, 0, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -177,7 +179,7 @@ LinesFadePopup::LinesFadePopup()
 
 	topLayout->addWidget(m_linesColorField, 0, 1);
 
-	//Intensity
+	// Intensity
 	QLabel *intensityLabel = new QLabel(tr("Intensity:"));
 	topLayout->addWidget(intensityLabel, 1, 0, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -207,9 +209,10 @@ LinesFadePopup::LinesFadePopup()
 
 	bool ret = true;
 
-	ret = ret && connect(m_linesColorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
-						 this, SLOT(onLinesColorChanged(const TPixel32 &, bool)));
-	ret = ret && connect(m_intensity, SIGNAL(valueChanged(bool)), this, SLOT(onIntensityChanged(bool)));
+	ret = ret && connect(m_linesColorField, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+						 SLOT(onLinesColorChanged(const TPixel32 &, bool)));
+	ret = ret &&
+		  connect(m_intensity, SIGNAL(valueChanged(bool)), this, SLOT(onIntensityChanged(bool)));
 
 	assert(ret);
 
@@ -230,7 +233,8 @@ void LinesFadePopup::setCurrentSampleRaster()
 	if (cellSelection) {
 		TApp *app = TApp::instance();
 		TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-		TXshCell cell = xsh->getCell(app->getCurrentFrame()->getFrameIndex(), app->getCurrentColumn()->getColumnIndex());
+		TXshCell cell = xsh->getCell(app->getCurrentFrame()->getFrameIndex(),
+									 app->getCurrentColumn()->getColumnIndex());
 		TRasterImageP rasImage = cell.getImage(true);
 		if (rasImage && rasImage->getRaster())
 			sampleRas = rasImage->getRaster()->clone();
@@ -238,7 +242,8 @@ void LinesFadePopup::setCurrentSampleRaster()
 		TApp *app = TApp::instance();
 		TXshSimpleLevel *simpleLevel = app->getCurrentLevel()->getSimpleLevel();
 		if (simpleLevel) {
-			TRasterImageP rasImage = (TRasterImageP)simpleLevel->getFrame(app->getCurrentFrame()->getFid(), true);
+			TRasterImageP rasImage =
+				(TRasterImageP)simpleLevel->getFrame(app->getCurrentFrame()->getFid(), true);
 			if (rasImage && rasImage->getRaster())
 				sampleRas = rasImage->getRaster()->clone();
 		}
@@ -264,9 +269,12 @@ void LinesFadePopup::showEvent(QShowEvent *se)
 {
 	TApp *app = TApp::instance();
 	bool ret = true;
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this, SLOT(setCurrentSampleRaster()));
-	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(setCurrentSampleRaster()));
-	ret = ret && connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(setCurrentSampleRaster()));
+	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
+						 SLOT(setCurrentSampleRaster()));
+	ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+						 SLOT(setCurrentSampleRaster()));
+	ret = ret && connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+						 SLOT(setCurrentSampleRaster()));
 	assert(ret);
 	setCurrentSampleRaster();
 }
@@ -276,9 +284,12 @@ void LinesFadePopup::showEvent(QShowEvent *se)
 void LinesFadePopup::hideEvent(QHideEvent *he)
 {
 	TApp *app = TApp::instance();
-	disconnect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this, SLOT(setCurrentSampleRaster()));
-	disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this, SLOT(setCurrentSampleRaster()));
-	disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this, SLOT(setCurrentSampleRaster()));
+	disconnect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
+			   SLOT(setCurrentSampleRaster()));
+	disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+			   SLOT(setCurrentSampleRaster()));
+	disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
+			   SLOT(setCurrentSampleRaster()));
 	Dialog::hideEvent(he);
 
 	m_viewer->raster() = TRasterP();
@@ -296,18 +307,16 @@ class TLineFadeUndo : public TUndo
 	QString m_rasId;
 	int m_rasSize;
 
-public:
+  public:
 	TLineFadeUndo(const TPixel32 &color, int intensity, int r, int c, TRaster32P ras)
-		: m_r(r), m_c(c), m_rasId(), m_color(color), m_intensity(intensity), m_rasSize(ras->getLx() * ras->getLy() * ras->getPixelSize())
+		: m_r(r), m_c(c), m_rasId(), m_color(color), m_intensity(intensity),
+		  m_rasSize(ras->getLx() * ras->getLy() * ras->getPixelSize())
 	{
 		m_rasId = QString("LineFadeUndo") + QString::number((uintptr_t) this);
 		TImageCache::instance()->add(m_rasId, TRasterImageP(ras));
 	}
 
-	~TLineFadeUndo()
-	{
-		TImageCache::instance()->remove(m_rasId);
-	}
+	~TLineFadeUndo() { TImageCache::instance()->remove(m_rasId); }
 
 	void undo() const
 	{
@@ -316,7 +325,8 @@ public:
 		TRasterImageP rasImage = (TRasterImageP)cell.getImage(true);
 		if (!rasImage)
 			return;
-		rasImage->setRaster(((TRasterImageP)TImageCache::instance()->get(m_rasId, true))->getRaster()->clone());
+		rasImage->setRaster(
+			((TRasterImageP)TImageCache::instance()->get(m_rasId, true))->getRaster()->clone());
 		TXshSimpleLevel *simpleLevel = cell.getSimpleLevel();
 		assert(simpleLevel);
 		simpleLevel->touchFrame(cell.getFrameId());
@@ -381,7 +391,8 @@ void LinesFadePopup::apply()
 				if (!ras)
 					continue;
 				images.insert(rasImage.getPointer());
-				TUndoManager::manager()->add(new TLineFadeUndo(color, intensity, r, c, ras->clone()));
+				TUndoManager::manager()->add(
+					new TLineFadeUndo(color, intensity, r, c, ras->clone()));
 				oneImageChanged = true;
 				onChange(ras, ras, color, intensity);
 				TXshSimpleLevel *simpleLevel = cell.getSimpleLevel();
@@ -397,7 +408,8 @@ void LinesFadePopup::apply()
 			return;
 		}
 	}
-	TFilmstripSelection *filmstripSelection = dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
+	TFilmstripSelection *filmstripSelection =
+		dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
 	if (filmstripSelection) {
 		TXshSimpleLevel *simpleLevel = TApp::instance()->getCurrentLevel()->getSimpleLevel();
 		if (simpleLevel) {
@@ -445,7 +457,8 @@ void LinesFadePopup::onIntensityChanged(bool isDragging)
 {
 	if (!m_startRas || !m_viewer->raster())
 		return;
-	onChange(m_startRas, m_viewer->raster(), m_linesColorField->getColor(), m_intensity->getValue());
+	onChange(m_startRas, m_viewer->raster(), m_linesColorField->getColor(),
+			 m_intensity->getValue());
 	m_viewer->update();
 }
 

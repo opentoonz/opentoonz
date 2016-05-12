@@ -20,17 +20,16 @@ class TOutputStreamInterface;
 
 class TAirbrushRasterStyle : public TColorStyle, public TRasterStyleFx
 {
-protected:
+  protected:
 	TPixel32 m_color;
 	double m_blur;
 
-public:
-	TAirbrushRasterStyle(const TPixel32 &color, double blur)
-		: m_color(color), m_blur(blur) {}
+  public:
+	TAirbrushRasterStyle(const TPixel32 &color, double blur) : m_color(color), m_blur(blur) {}
 
 	TColorStyle *clone() const;
 
-public:
+  public:
 	// n.b. per un plain color: isRasterStyle() == true, ma getRasterStyleFx() = 0
 
 	TStrokeProp *makeStrokeProp(const TStroke *stroke) { return 0; }
@@ -52,12 +51,12 @@ public:
 
 	int getColorParamCount() const { return 1; }
 	TPixel32 getColorParamValue(int index) const { return m_color; }
-	void setColorParamValue(int index, const TPixel32 &color)
-	{
-		m_color = color;
-	}
+	void setColorParamValue(int index, const TPixel32 &color) { m_color = color; }
 
-	virtual QString getDescription() const { return QCoreApplication::translate("TAirbrushRasterStyle", "Airbrush"); }
+	virtual QString getDescription() const
+	{
+		return QCoreApplication::translate("TAirbrushRasterStyle", "Airbrush");
+	}
 
 	int getParamCount() const { return 1; }
 	TColorStyle::ParamType getParamType(int index) const
@@ -90,7 +89,7 @@ public:
 
 	void invalidateIcon();
 
-	//const TRaster32P &getIcon(const TDimension &d) {assert(false);return (TRaster32P)0;}
+	// const TRaster32P &getIcon(const TDimension &d) {assert(false);return (TRaster32P)0;}
 
 	TPixel32 getAverageColor() const { return m_color; }
 
@@ -101,7 +100,7 @@ public:
 
 	bool compute(const Params &params) const;
 
-protected:
+  protected:
 	virtual void makeIcon(const TDimension &d);
 
 	void arrangeIcon(const TDimension &d, const TRasterP &normalIc);
@@ -117,20 +116,22 @@ protected:
 
 class TBlendRasterStyle : public TAirbrushRasterStyle
 {
-public:
-	TBlendRasterStyle(const TPixel32 &color, double blur)
-		: TAirbrushRasterStyle(color, blur) {}
+  public:
+	TBlendRasterStyle(const TPixel32 &color, double blur) : TAirbrushRasterStyle(color, blur) {}
 	TColorStyle *clone() const;
 
 	int getTagId() const { return 1160; }
 
-	virtual QString getDescription() const { return QCoreApplication::translate("TBlendRasterStyle", "Blend"); }
+	virtual QString getDescription() const
+	{
+		return QCoreApplication::translate("TBlendRasterStyle", "Blend");
+	}
 
 	void makeIcon(const TDimension &d);
 
 	bool compute(const TRasterStyleFx::Params &params) const;
 
-private:
+  private:
 	double computeFactor(const TRasterStyleFx::Params &params) const;
 };
 
@@ -138,7 +139,7 @@ private:
 
 class TNoColorRasterStyle : public TColorStyle, TRasterStyleFx
 {
-public:
+  public:
 	TNoColorRasterStyle() {}
 	TColorStyle *clone() const { return new TNoColorRasterStyle(*this); }
 
@@ -152,11 +153,14 @@ public:
 	bool isStrokeStyle() const { return false; }
 	bool isRasterStyle() const { return true; }
 
-	virtual QString getDescription() const { return QCoreApplication::translate("TNoColorRasterStyle", "Markup"); }
+	virtual QString getDescription() const
+	{
+		return QCoreApplication::translate("TNoColorRasterStyle", "Markup");
+	}
 
 	bool hasMainColor() { return false; }
-	//TPixel32 getMainColor() const {return m_color;}
-	//void setMainColor(const TPixel32 &color) {m_color = color;}
+	// TPixel32 getMainColor() const {return m_color;}
+	// void setMainColor(const TPixel32 &color) {m_color = color;}
 
 	int getColorParamCount() const { return 0; }
 	TPixel32 getColorParamValue(int index) const
@@ -173,7 +177,7 @@ public:
 
 	bool compute(const Params &params) const { return false; }
 
-protected:
+  protected:
 	void makeIcon(const TDimension &d);
 
 	void loadData(TInputStreamInterface &){};

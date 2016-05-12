@@ -43,7 +43,7 @@ struct MeshBuilderOptions {
   the lower-left image corner, pixel metric)
 
   \warning The resulting mesh image has <B> no dpi <\B>. Users \b must set it manually after
-           this function has been invoked.
+		   this function has been invoked.
 */
 DVAPI TMeshImageP buildMesh(const TRasterP &ras, const MeshBuilderOptions &options);
 

@@ -9,18 +9,16 @@
 
 /*
 Questa funzione ritorna un vettore di
-coppie di double (DoublePair) che individua i parametri 
+coppie di double (DoublePair) che individua i parametri
 dei punti d'intersezione.
 
-  L'intero restituito indica il numero d'intersezioni che 
+  L'intero restituito indica il numero d'intersezioni che
   sono state individuate (per due segmenti una).
-  
-    Se i segmenti sono paralleli il parametro viene posto a -1.
+
+	Se i segmenti sono paralleli il parametro viene posto a -1.
 */
 
-int intersect(const TSegment &first,
-			  const TSegment &second,
-			  std::vector<DoublePair> &intersections)
+int intersect(const TSegment &first, const TSegment &second, std::vector<DoublePair> &intersections)
 {
 	return intersect(first.getP0(), first.getP1(), second.getP0(), second.getP1(), intersections);
 }
@@ -36,7 +34,7 @@ int intersect(const TPointD &p1, const TPointD &p2, const TPointD &p3, const TPo
 	Ax = p2.x - p1.x;
 	Bx = p3.x - p4.x;
 
-	//test delle BBox
+	// test delle BBox
 	if (Ax < 0.0) {
 		x1lo = p2.x;
 		x1hi = p1.x;
@@ -177,13 +175,11 @@ int intersect(const TPointD &p1, const TPointD &p2, const TPointD &p3, const TPo
 }
 
 //------------------------------------------------------------------------------------------------------------
-int intersectCloseControlPoints(const TQuadratic &c0,
-								const TQuadratic &c1,
+int intersectCloseControlPoints(const TQuadratic &c0, const TQuadratic &c1,
 								std::vector<DoublePair> &intersections);
 
-int intersect(const TQuadratic &c0,
-			  const TQuadratic &c1,
-			  std::vector<DoublePair> &intersections, bool checksegments)
+int intersect(const TQuadratic &c0, const TQuadratic &c1, std::vector<DoublePair> &intersections,
+			  bool checksegments)
 {
 	int ret;
 
@@ -202,12 +198,12 @@ int intersect(const TQuadratic &c0,
 	double coeff = b * d - a * e;
 	int i = 0;
 
-	if (areAlmostEqual(coeff, 0.0)) //c0 is a Segment, or a single point!!!
+	if (areAlmostEqual(coeff, 0.0)) // c0 is a Segment, or a single point!!!
 	{
 
 		TSegment s = TSegment(c0.getP0(), c0.getP2());
 		ret = intersect(s, c1, intersections);
-		if (a == 0 && d == 0) //values of t in s coincide with values of t in c0
+		if (a == 0 && d == 0) // values of t in s coincide with values of t in c0
 			return ret;
 
 		for (i = intersections.size() - ret; i < (int)intersections.size(); i++) {
@@ -227,11 +223,11 @@ int intersect(const TQuadratic &c0,
 	double p = 2 * (c1.getP1().y - c1.getP0().y);
 	double q = c1.getP0().y;
 
-	if (areAlmostEqual(h * m - g * p, 0.0)) //c1 is a Segment, or a single point!!!
+	if (areAlmostEqual(h * m - g * p, 0.0)) // c1 is a Segment, or a single point!!!
 	{
 		TSegment s = TSegment(c1.getP0(), c1.getP2());
 		ret = intersect(c0, s, intersections);
-		if (g == 0 && m == 0) //values of t in s coincide with values of t in c0
+		if (g == 0 && m == 0) // values of t in s coincide with values of t in c0
 			return ret;
 
 		for (i = intersections.size() - ret; i < (int)intersections.size(); i++) {
@@ -298,13 +294,13 @@ int intersect(const TQuadratic &c0,
 }
 
 //=============================================================================
-//questa funzione verifica se il punto di controllo p1 e' molto vicino a p0 o a p2:
-//in tal caso, si approssima la quadratica al segmento p0-p2.
-//se p1 e' vicino a p0, la relazione che lega il t del segmento al t della quadratica originaria e' tq = sqrt(ts),
-//se p1 e' vicino a p2, invece e' tq = 1-sqrt(1-ts).
+// questa funzione verifica se il punto di controllo p1 e' molto vicino a p0 o a p2:
+// in tal caso, si approssima la quadratica al segmento p0-p2.
+// se p1 e' vicino a p0, la relazione che lega il t del segmento al t della quadratica originaria e'
+// tq = sqrt(ts),
+// se p1 e' vicino a p2, invece e' tq = 1-sqrt(1-ts).
 
-int intersectCloseControlPoints(const TQuadratic &c0,
-								const TQuadratic &c1,
+int intersectCloseControlPoints(const TQuadratic &c0, const TQuadratic &c1,
 								std::vector<DoublePair> &intersections)
 {
 	int ret = -2;
@@ -324,30 +320,34 @@ int intersectCloseControlPoints(const TQuadratic &c0,
 		dist4 = 1e-20;
 	double val1 = tmax(dist3, dist4) / tmin(dist3, dist4);
 
-	if (val0 > 1000000 && val1 > 1000000) //entrambe c0 e c1  approssimate a segmenti
+	if (val0 > 1000000 && val1 > 1000000) // entrambe c0 e c1  approssimate a segmenti
 	{
 		TSegment s0 = TSegment(c0.getP0(), c0.getP2());
 		TSegment s1 = TSegment(c1.getP0(), c1.getP2());
 		ret = intersect(s0, s1, intersections);
 		for (UINT i = intersections.size() - ret; i < (int)intersections.size(); i++) {
-			intersections[i].first = (dist1 < dist2) ? sqrt(intersections[i].first) : 1 - sqrt(1 - intersections[i].first);
-			intersections[i].second = (dist3 < dist4) ? sqrt(intersections[i].second) : 1 - sqrt(1 - intersections[i].second);
+			intersections[i].first = (dist1 < dist2) ? sqrt(intersections[i].first)
+													 : 1 - sqrt(1 - intersections[i].first);
+			intersections[i].second = (dist3 < dist4) ? sqrt(intersections[i].second)
+													  : 1 - sqrt(1 - intersections[i].second);
 		}
-		//return ret;
-	} else if (val0 > 1000000) //solo c0 approssimata  a segmento
+		// return ret;
+	} else if (val0 > 1000000) // solo c0 approssimata  a segmento
 	{
 		TSegment s0 = TSegment(c0.getP0(), c0.getP2());
 		ret = intersect(s0, c1, intersections);
 		for (UINT i = intersections.size() - ret; i < (int)intersections.size(); i++)
-			intersections[i].first = (dist1 < dist2) ? sqrt(intersections[i].first) : 1 - sqrt(1 - intersections[i].first);
-		//return ret;
-	} else if (val1 > 1000000) //solo c1 approssimata  a segmento
+			intersections[i].first = (dist1 < dist2) ? sqrt(intersections[i].first)
+													 : 1 - sqrt(1 - intersections[i].first);
+		// return ret;
+	} else if (val1 > 1000000) // solo c1 approssimata  a segmento
 	{
 		TSegment s1 = TSegment(c1.getP0(), c1.getP2());
 		ret = intersect(c0, s1, intersections);
 		for (UINT i = intersections.size() - ret; i < (int)intersections.size(); i++)
-			intersections[i].second = (dist3 < dist4) ? sqrt(intersections[i].second) : 1 - sqrt(1 - intersections[i].second);
-		//return ret;
+			intersections[i].second = (dist3 < dist4) ? sqrt(intersections[i].second)
+													  : 1 - sqrt(1 - intersections[i].second);
+		// return ret;
 	}
 
 	/*
@@ -356,10 +356,10 @@ if (ret!=-2)
   std::vector<DoublePair> intersections1;
   int ret1 = intersect(c0, c1, intersections1, false);
   if (ret1>ret)
-    {
-    intersections = intersections1;
-    return ret1;
-    }
+	{
+	intersections = intersections1;
+	return ret1;
+	}
   }
 */
 
@@ -368,19 +368,15 @@ if (ret!=-2)
 
 //=============================================================================
 
-int intersect(const TQuadratic &q,
-			  const TSegment &s,
-			  std::vector<DoublePair> &intersections,
+int intersect(const TQuadratic &q, const TSegment &s, std::vector<DoublePair> &intersections,
 			  bool firstIsQuad)
 {
 	int solutionNumber = 0;
 
 	// nota la retta a*x+b*y+c = 0 andiamo alla ricerca delle soluzioni
 	//  di a*x(t)+b*y(t)+c=0 in [0,1]
-	double
-		a = s.getP0().y - s.getP1().y,
-		b = s.getP1().x - s.getP0().x,
-		c = -(a * s.getP0().x + b * s.getP0().y);
+	double a = s.getP0().y - s.getP1().y, b = s.getP1().x - s.getP0().x,
+		   c = -(a * s.getP0().x + b * s.getP0().y);
 
 	// se il segmento e' un punto
 	if (0.0 == a && 0.0 == b) {
@@ -396,7 +392,7 @@ int intersect(const TQuadratic &q,
 		return 0;
 	}
 
-	if (q.getP2() - q.getP1() == q.getP1() - q.getP0()) {//pure il secondo e' unsegmento....
+	if (q.getP2() - q.getP1() == q.getP1() - q.getP0()) { // pure il secondo e' unsegmento....
 		if (firstIsQuad)
 			return intersect(TSegment(q.getP0(), q.getP2()), s, intersections);
 		else
@@ -419,19 +415,15 @@ int intersect(const TQuadratic &q,
 	if (!(rootFinding(poly_1, sol)))
 		return 0;
 
-	double
-		segmentPar,
-		solution;
+	double segmentPar, solution;
 
 	TPointD v10(s.getP1() - s.getP0());
 	for (UINT i = 0; i < sol.size(); ++i) {
 		solution = sol[i];
-		if ((0.0 <= solution && solution <= 1.0) ||
-			areAlmostEqual(solution, 0.0, 1e-6) ||
+		if ((0.0 <= solution && solution <= 1.0) || areAlmostEqual(solution, 0.0, 1e-6) ||
 			areAlmostEqual(solution, 1.0, 1e-6)) {
 			segmentPar = (q.getPoint(solution) - s.getP0()) * v10 / (v10 * v10);
-			if ((0.0 <= segmentPar && segmentPar <= 1.0) ||
-				areAlmostEqual(segmentPar, 0.0, 1e-6) ||
+			if ((0.0 <= segmentPar && segmentPar <= 1.0) || areAlmostEqual(segmentPar, 0.0, 1e-6) ||
 				areAlmostEqual(segmentPar, 1.0, 1e-6)) {
 				TPointD p1 = q.getPoint(solution);
 				TPointD p2 = s.getPoint(segmentPar);
@@ -492,17 +484,18 @@ double tdistance(const TSegment &segment, const TPointD &point)
 This formule is derived from Graphic Gems pag. 600
 
   e = h^2 |a|/8
-  
-    e = pixel size
-    h = step
-    a = acceleration of curve (for a quadratic is a costant value)
+
+	e = pixel size
+	h = step
+	a = acceleration of curve (for a quadratic is a costant value)
 */
 
 double computeStep(const TQuadratic &quad, double pixelSize)
 {
 	double step = 2;
 
-	TPointD A = quad.getP0() - 2.0 * quad.getP1() + quad.getP2(); // 2*A is the acceleration of the curve
+	TPointD A =
+		quad.getP0() - 2.0 * quad.getP1() + quad.getP2(); // 2*A is the acceleration of the curve
 
 	double A_len = norm(A);
 
@@ -522,13 +515,9 @@ double computeStep(const TQuadratic &quad, double pixelSize)
 
 double computeStep(const TThickQuadratic &quad, double pixelSize)
 {
-	TThickPoint
-		cp0 = quad.getThickP0(),
-		cp1 = quad.getThickP1(),
-		cp2 = quad.getThickP2();
+	TThickPoint cp0 = quad.getThickP0(), cp1 = quad.getThickP1(), cp2 = quad.getThickP2();
 
-	TQuadratic
-		q1(TPointD(cp0.x, cp0.y), TPointD(cp1.x, cp1.y), TPointD(cp2.x, cp2.y)),
+	TQuadratic q1(TPointD(cp0.x, cp0.y), TPointD(cp1.x, cp1.y), TPointD(cp2.x, cp2.y)),
 		q2(TPointD(cp0.y, cp0.thick), TPointD(cp1.y, cp1.thick), TPointD(cp2.y, cp2.thick)),
 		q3(TPointD(cp0.x, cp0.thick), TPointD(cp1.x, cp1.thick), TPointD(cp2.x, cp2.thick));
 
@@ -542,14 +531,14 @@ double computeStep(const TThickQuadratic &quad, double pixelSize)
 
   Let Q be the quadratic. The tricks to explicitly integrate | Q'(t) | are:
 
-    - The integrand can be reformulated as:  | Q'(t) | = sqrt(at^2 + bt + c);
-    - Complete the square beneath the sqrt (add/subtract sq(b) / 4a)
-      and perform a linear variable change. We reduce the integrand to: sqrt(kx^2 + k),
-      where k can be taken outside => sqrt(x^2 + 1)
-    - Use x = tan y. The integrand will yield sec^3 y.
-    - Integrate by parts. In short, the resulting primitive of sqrt(x^2 + 1) is:
+	- The integrand can be reformulated as:  | Q'(t) | = sqrt(at^2 + bt + c);
+	- Complete the square beneath the sqrt (add/subtract sq(b) / 4a)
+	  and perform a linear variable change. We reduce the integrand to: sqrt(kx^2 + k),
+	  where k can be taken outside => sqrt(x^2 + 1)
+	- Use x = tan y. The integrand will yield sec^3 y.
+	- Integrate by parts. In short, the resulting primitive of sqrt(x^2 + 1) is:
 
-        F(x) = ( x * sqrt(x^2 + 1) + log(x + sqrt(x^2 + 1)) ) / 2;
+		F(x) = ( x * sqrt(x^2 + 1) + log(x + sqrt(x^2 + 1)) ) / 2;
 */
 
 void TQuadraticLengthEvaluator::setQuad(const TQuadratic &quad)
@@ -617,7 +606,7 @@ double TQuadraticLengthEvaluator::getLengthAt(double t) const
 
 	double y = t + m_tRef;
 	double sqrt_part = sqrt(sq(y) + m_e);
-	double log_arg = y + sqrt_part; //NOTE: log_arg >= log_arg0 >= TConsts::epsilon
+	double log_arg = y + sqrt_part; // NOTE: log_arg >= log_arg0 >= TConsts::epsilon
 
 	return m_sqrt_a_div_2 * (y * sqrt_part + m_e * log(log_arg)) - m_primitive_0;
 }

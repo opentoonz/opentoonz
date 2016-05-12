@@ -22,70 +22,70 @@
 #define STAT_BUF struct stat
 #endif
 
-static IMAGE *img_read_region_quantel_no_interlaced(
-	T_CHAR *fname, int x1, int y1, int x2, int y2, int scale, int type);
-static IMAGE *img_read_region_quantel_interlaced(
-	T_CHAR *fname, int x1, int y1, int x2, int y2, int scale, int type);
+static IMAGE *img_read_region_quantel_no_interlaced(T_CHAR *fname, int x1, int y1, int x2, int y2,
+													int scale, int type);
+static IMAGE *img_read_region_quantel_interlaced(T_CHAR *fname, int x1, int y1, int x2, int y2,
+												 int scale, int type);
 
-/*static char *Quantel_error[] = { "qnt locked format 720x576", 
-                                 "qtl locked format 720x486", 
-				 "yuv locked format 720x486 / 720x576", 
+/*static char *Quantel_error[] = { "qnt locked format 720x576",
+								 "qtl locked format 720x486",
+				 "yuv locked format 720x486 / 720x576",
 				 "sdl locked format 720x486 / 720x576" };
 */
 
-#define QUANTEL_BUILD_ROW                        \
-                                                 \
-	for (x = 0; x < region.scanNcol / 2; x++) {  \
-		u = *lineBuf++ - 128;                    \
-		j = *lineBuf++ - 16;                     \
-		if (j < 0)                               \
-			j = 0;                               \
-		v = *lineBuf++ - 128;                    \
-		k = *lineBuf++ - 16;                     \
-		r = 76310 * j + 104635 * v;              \
-		if (r > 0xFFFFFF)                        \
-			r = 0xFFFFFF;                        \
-		if (r <= 0xFFFF)                         \
-			r = 0;                               \
-		g = 76310 * j + -25690 * u + -53294 * v; \
-		if (g > 0xFFFFFF)                        \
-			g = 0xFFFFFF;                        \
-		if (g <= 0xFFFF)                         \
-			g = 0;                               \
-		b = 76310 * j + 132278 * u;              \
-		if (b > 0xFFFFFF)                        \
-			b = 0xFFFFFF;                        \
-		if (b <= 0xFFFF)                         \
-			b = 0;                               \
-		bufRGB->r = (unsigned char)(r >> 16);    \
-		bufRGB->g = (unsigned char)(g >> 16);    \
-		bufRGB->b = (unsigned char)(b >> 16);    \
-		bufRGB->m = 255;                         \
-		bufRGB++;                                \
-		r = 76310 * k + 104635 * v;              \
-		if (r > 0xFFFFFF)                        \
-			r = 0xFFFFFF;                        \
-		if (r <= 0xFFFF)                         \
-			r = 0;                               \
-		g = 76310 * k + -25690 * u + -53294 * v; \
-		if (g > 0xFFFFFF)                        \
-			g = 0xFFFFFF;                        \
-		if (g <= 0xFFFF)                         \
-			g = 0;                               \
-		b = 76310 * k + 132278 * u;              \
-		if (b > 0xFFFFFF)                        \
-			b = 0xFFFFFF;                        \
-		if (b <= 0xFFFF)                         \
-			b = 0;                               \
-		bufRGB->r = (unsigned char)(r >> 16);    \
-		bufRGB->g = (unsigned char)(g >> 16);    \
-		bufRGB->b = (unsigned char)(b >> 16);    \
-		bufRGB->m = 255;                         \
-		bufRGB++;                                \
-		lineBuf += ((region.step - 1) * 4);      \
+#define QUANTEL_BUILD_ROW                                                                          \
+                                                                                                   \
+	for (x = 0; x < region.scanNcol / 2; x++) {                                                    \
+		u = *lineBuf++ - 128;                                                                      \
+		j = *lineBuf++ - 16;                                                                       \
+		if (j < 0)                                                                                 \
+			j = 0;                                                                                 \
+		v = *lineBuf++ - 128;                                                                      \
+		k = *lineBuf++ - 16;                                                                       \
+		r = 76310 * j + 104635 * v;                                                                \
+		if (r > 0xFFFFFF)                                                                          \
+			r = 0xFFFFFF;                                                                          \
+		if (r <= 0xFFFF)                                                                           \
+			r = 0;                                                                                 \
+		g = 76310 * j + -25690 * u + -53294 * v;                                                   \
+		if (g > 0xFFFFFF)                                                                          \
+			g = 0xFFFFFF;                                                                          \
+		if (g <= 0xFFFF)                                                                           \
+			g = 0;                                                                                 \
+		b = 76310 * j + 132278 * u;                                                                \
+		if (b > 0xFFFFFF)                                                                          \
+			b = 0xFFFFFF;                                                                          \
+		if (b <= 0xFFFF)                                                                           \
+			b = 0;                                                                                 \
+		bufRGB->r = (unsigned char)(r >> 16);                                                      \
+		bufRGB->g = (unsigned char)(g >> 16);                                                      \
+		bufRGB->b = (unsigned char)(b >> 16);                                                      \
+		bufRGB->m = 255;                                                                           \
+		bufRGB++;                                                                                  \
+		r = 76310 * k + 104635 * v;                                                                \
+		if (r > 0xFFFFFF)                                                                          \
+			r = 0xFFFFFF;                                                                          \
+		if (r <= 0xFFFF)                                                                           \
+			r = 0;                                                                                 \
+		g = 76310 * k + -25690 * u + -53294 * v;                                                   \
+		if (g > 0xFFFFFF)                                                                          \
+			g = 0xFFFFFF;                                                                          \
+		if (g <= 0xFFFF)                                                                           \
+			g = 0;                                                                                 \
+		b = 76310 * k + 132278 * u;                                                                \
+		if (b > 0xFFFFFF)                                                                          \
+			b = 0xFFFFFF;                                                                          \
+		if (b <= 0xFFFF)                                                                           \
+			b = 0;                                                                                 \
+		bufRGB->r = (unsigned char)(r >> 16);                                                      \
+		bufRGB->g = (unsigned char)(g >> 16);                                                      \
+		bufRGB->b = (unsigned char)(b >> 16);                                                      \
+		bufRGB->m = 255;                                                                           \
+		bufRGB++;                                                                                  \
+		lineBuf += ((region.step - 1) * 4);                                                        \
 	}
 
-#define QUANTEL_GET_YSIZE(ysize) \
+#define QUANTEL_GET_YSIZE(ysize)                                                                   \
 	(abs((ysize - QNT_PAL_YSIZE)) > abs((ysize - QTL_NTSC_YSIZE))) ? QTL_NTSC_YSIZE : QNT_PAL_YSIZE;
 
 /*---------------------------------------------------------------------------*/
@@ -564,8 +564,7 @@ int img_write_quantel(const T_CHAR *fname, void *buffer, int w, int h, int type)
 
 /*---------------------------------------------------------------------------*/
 
-IMAGE *img_read_region_quantel(T_CHAR *fname, int x1, int y1, int x2, int y2,
-							   int scale, int type)
+IMAGE *img_read_region_quantel(T_CHAR *fname, int x1, int y1, int x2, int y2, int scale, int type)
 {
 	if (type == SDL_FORMAT)
 		return (img_read_region_quantel_no_interlaced(fname, x1, y1, x2, y2, scale, type));
@@ -575,8 +574,7 @@ IMAGE *img_read_region_quantel(T_CHAR *fname, int x1, int y1, int x2, int y2,
 
 /*---------------------------------------------------------------------------*/
 
-static IMAGE *img_read_region_quantel_no_interlaced(T_CHAR *fname,
-													int x1, int y1, int x2, int y2,
+static IMAGE *img_read_region_quantel_no_interlaced(T_CHAR *fname, int x1, int y1, int x2, int y2,
 													int scale, int type)
 {
 	int offset, xsize, ysize, imgoffs;
@@ -805,8 +803,7 @@ error:
 
 /*---------------------------------------------------------------------------*/
 
-static IMAGE *img_read_region_quantel_interlaced(T_CHAR *fname,
-												 int x1, int y1, int x2, int y2,
+static IMAGE *img_read_region_quantel_interlaced(T_CHAR *fname, int x1, int y1, int x2, int y2,
 												 int scale, int type)
 {
 	int offset, rgbbuf_offset, xsize, ysize, imgoffs, ret, step, x, y;
@@ -849,8 +846,7 @@ static IMAGE *img_read_region_quantel_interlaced(T_CHAR *fname,
 		offset = 0;
 	fseek(fileyuv, imgoffs + offset, SEEK_SET);
 	for (y = 0; y < region.scanNrow; y++) {
-		bufRGB = headBufRGB + rgbbuf_offset +
-				 (region.xsize * (region.scanNrow - y - 1));
+		bufRGB = headBufRGB + rgbbuf_offset + (region.xsize * (region.scanNrow - y - 1));
 		ret = fread(lineBuf, 1, BYTESPERROW, fileyuv);
 		if (!ret)
 			goto end;

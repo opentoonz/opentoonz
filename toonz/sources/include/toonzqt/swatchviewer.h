@@ -34,7 +34,7 @@ class DVAPI BgPainter
 {
 	std::string m_name;
 
-public:
+  public:
 	BgPainter(std::string name) : m_name(name) {}
 	virtual ~BgPainter() {}
 	std::string getName() const { return m_name; }
@@ -47,14 +47,10 @@ class DVAPI SolidColorBgPainter : public BgPainter
 {
 	TPixel32 m_color;
 
-public:
-	SolidColorBgPainter(std::string name, TPixel32 color)
-		: BgPainter(name), m_color(color) {}
+  public:
+	SolidColorBgPainter(std::string name, TPixel32 color) : BgPainter(name), m_color(color) {}
 
-	void paint(const TRaster32P &ras)
-	{
-		ras->fill(m_color);
-	}
+	void paint(const TRaster32P &ras) { ras->fill(m_color); }
 };
 
 //=============================================================================
@@ -63,9 +59,11 @@ class DVAPI CheckboardBgPainter : public BgPainter
 {
 	TPixel32 m_c0, m_c1;
 
-public:
+  public:
 	CheckboardBgPainter(std::string name, TPixel32 c0, TPixel32 c1)
-		: BgPainter(name), m_c0(c0), m_c1(c1) {}
+		: BgPainter(name), m_c0(c0), m_c1(c1)
+	{
+	}
 
 	void paint(const TRaster32P &ras)
 	{
@@ -85,17 +83,19 @@ class DVAPI SwatchViewer : public QWidget
 {
 	Q_OBJECT
 
-	//!La classe \b Point gestisce un punto che e' collegato a parametri \b TPointParam.
+	//! La classe \b Point gestisce un punto che e' collegato a parametri \b TPointParam.
 	/*!Questo tipo di punti consentono di modificare alcuni parametri dell'effetto corrente e
 	sono editabili dall'utente direttamente nello SwatchViewer*/
 	class Point
 	{
-	public:
+	  public:
 		int m_index;
 		TPointParamP m_param;
 		bool m_pairFlag;
 		Point(int index, const TPointParamP &param)
-			: m_index(index), m_param(param), m_pairFlag(false) {}
+			: m_index(index), m_param(param), m_pairFlag(false)
+		{
+		}
 	};
 
 	TFxP m_fx;
@@ -137,10 +137,10 @@ class DVAPI SwatchViewer : public QWidget
 
 	friend class ContentRender;
 
-public:
+  public:
 	class ContentRender : public TThread::Runnable
 	{
-	public:
+	  public:
 		TRasterFxP m_fx;
 		TRasterP m_raster;
 		int m_frame;
@@ -181,12 +181,12 @@ public:
 
 	bool isEnabled() { return m_enabled; }
 
-public slots:
+  public slots:
 	void setEnable(bool enabled);
 	void updateSize(const QSize &size);
 	void setBgPainter(TPixel32 color1, TPixel32 color2 = TPixel32());
 
-protected:
+  protected:
 	void computeContent();
 	TPoint world2win(const TPointD &p) const;
 	TPointD win2world(const TPoint &p) const;
@@ -209,7 +209,7 @@ protected:
 	void resizeEvent(QResizeEvent *event);
 	void hideEvent(QHideEvent *event);
 
-signals:
+  signals:
 	void pointPositionChanged(int index, const TPointD &p);
 };
 

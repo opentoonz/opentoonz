@@ -32,8 +32,9 @@ class ColumnLevel
 	//! frameRate
 	double m_fps;
 
-public:
-	ColumnLevel(TXshSoundLevel *soundLevel = 0, int startFrame = -1, int startOffset = -1, int endOffset = -1, double fps = -1);
+  public:
+	ColumnLevel(TXshSoundLevel *soundLevel = 0, int startFrame = -1, int startOffset = -1,
+				int endOffset = -1, double fps = -1);
 	~ColumnLevel();
 	ColumnLevel *clone() const;
 
@@ -77,8 +78,10 @@ public:
 
 //=============================================================================
 
-ColumnLevel::ColumnLevel(TXshSoundLevel *soundLevel, int startFrame, int startOffset, int endOffset, double fps)
-	: m_soundLevel(soundLevel), m_startOffset(startOffset), m_endOffset(endOffset), m_startFrame(startFrame), m_fps(fps)
+ColumnLevel::ColumnLevel(TXshSoundLevel *soundLevel, int startFrame, int startOffset, int endOffset,
+						 double fps)
+	: m_soundLevel(soundLevel), m_startOffset(startOffset), m_endOffset(endOffset),
+	  m_startFrame(startFrame), m_fps(fps)
 {
 }
 
@@ -121,7 +124,8 @@ void ColumnLevel::loadData(TIStream &is)
 
 void ColumnLevel::saveData(TOStream &os)
 {
-	os.child("SoundCells") << getStartOffset() << getEndOffset() << getStartFrame() << m_soundLevel.getPointer();
+	os.child("SoundCells") << getStartOffset() << getEndOffset() << getStartFrame()
+						   << m_soundLevel.getPointer();
 }
 
 //-----------------------------------------------------------------------------
@@ -141,7 +145,8 @@ void ColumnLevel::setEndOffset(int value)
 {
 	if (!m_soundLevel)
 		return;
-	if (value < 0 || getStartFrame() + getFrameCount() - value < getStartFrame() + getStartOffset() + 1)
+	if (value < 0 ||
+		getStartFrame() + getFrameCount() - value < getStartFrame() + getStartOffset() + 1)
 		return;
 	m_endOffset = value;
 }
@@ -155,7 +160,8 @@ void ColumnLevel::setOffsets(int startOffset, int endOffset)
 	if (startOffset < 0 || startOffset > getFrameCount() - endOffset - 1)
 		return;
 	m_startOffset = startOffset;
-	if (endOffset < 0 || getStartFrame() + getFrameCount() - endOffset < getStartFrame() + getStartOffset() + 1)
+	if (endOffset < 0 ||
+		getStartFrame() + getFrameCount() - endOffset < getStartFrame() + getStartOffset() + 1)
 		return;
 	m_endOffset = endOffset;
 }
@@ -285,7 +291,7 @@ TXshColumn *TXshSoundColumn::clone() const
 
 void TXshSoundColumn::assignLevels(const TXshSoundColumn *src)
 {
-	//Svuoto la lista dei livelli
+	// Svuoto la lista dei livelli
 	clear();
 
 	int r;
@@ -509,27 +515,27 @@ bool TXshSoundColumn::setCell(int row, const TXshCell &cell, bool updateSequence
 	ColumnLevel *l = getColumnLevelByFrame(row);
 	ColumnLevel *lNext = getColumnLevelByFrame(row + 1);
 
-	//Se non devo fare un update della sequenzialita' e la cella e' uguale a quella gia' esistente ritorno.
-	if (!updateSequence &&
-		l && l->getSoundLevel() == cell.getSoundLevel() &&
+	// Se non devo fare un update della sequenzialita' e la cella e' uguale a quella gia' esistente
+	// ritorno.
+	if (!updateSequence && l && l->getSoundLevel() == cell.getSoundLevel() &&
 		row - l->getStartFrame() == cell.getFrameId().getNumber())
 		return false;
 
-	bool isBeforeLevelInSequence = (lBefore &&
-									lBefore->getSoundLevel() == cell.getSoundLevel() &&
-									row - lBefore->getStartFrame() == cell.getFrameId().getNumber());
+	bool isBeforeLevelInSequence =
+		(lBefore && lBefore->getSoundLevel() == cell.getSoundLevel() &&
+		 row - lBefore->getStartFrame() == cell.getFrameId().getNumber());
 
-	bool isNextLevelInSequence = (lNext &&
-								  lNext->getSoundLevel() == cell.getSoundLevel() &&
+	bool isNextLevelInSequence = (lNext && lNext->getSoundLevel() == cell.getSoundLevel() &&
 								  row - lNext->getStartFrame() == cell.getFrameId().getNumber());
 
-	//Modifico solo l'endOffset del BeforeLevel
+	// Modifico solo l'endOffset del BeforeLevel
 	if (isBeforeLevelInSequence) {
 		int oldEndOffset = lBefore->getEndOffset();
 		int endOffset = (lBefore->getVisibleEndFrame() != row) ? oldEndOffset - 1 : oldEndOffset;
 		if (isNextLevelInSequence) {
 			endOffset = lNext->getEndOffset();
-			//Se precedente e successivo sono diversi elimino il successivo (caso in cui inserisci un frame in successione su una cella vuota)
+			// Se precedente e successivo sono diversi elimino il successivo (caso in cui inserisci
+			// un frame in successione su una cella vuota)
 			if (lNext != lBefore)
 				removeColumnLevel(lNext);
 		}
@@ -543,10 +549,11 @@ bool TXshSoundColumn::setCell(int row, const TXshCell &cell, bool updateSequence
 		checkColumn();
 		return true;
 	}
-	//Modifico solo lo startOffset del NextLevel
+	// Modifico solo lo startOffset del NextLevel
 	if (isNextLevelInSequence) {
 		int oldStartOffset = lNext->getStartOffset();
-		int startOffset = (lNext->getVisibleStartFrame() != row) ? oldStartOffset - 1 : oldStartOffset;
+		int startOffset =
+			(lNext->getVisibleStartFrame() != row) ? oldStartOffset - 1 : oldStartOffset;
 		if (l && l != lNext) {
 			if (l->getVisibleFrameCount() == 1)
 				removeColumnLevel(l);
@@ -558,7 +565,7 @@ bool TXshSoundColumn::setCell(int row, const TXshCell &cell, bool updateSequence
 		return true;
 	}
 
-	//I Frame non sono in successione quindi devo inserire la cella in frame un vuoto:
+	// I Frame non sono in successione quindi devo inserire la cella in frame un vuoto:
 	clearCells(row, 1);
 	setCellInEmptyFrame(row, cell);
 	checkColumn();
@@ -589,21 +596,22 @@ bool TXshSoundColumn::setCells(int row, int rowCount, const TXshCell cells[])
 void TXshSoundColumn::insertEmptyCells(int row, int rowCount)
 {
 	if (m_levels.isEmpty())
-		return; //se la colonna e' vuota non devo inserire celle
+		return; // se la colonna e' vuota non devo inserire celle
 
 	int ra = row;
 	int rb = row + rowCount - 1;
 	assert(ra <= rb);
 
-	//Se il livello nella riga ra inizia prima devo "spezzarlo"
+	// Se il livello nella riga ra inizia prima devo "spezzarlo"
 	ColumnLevel *l = getColumnLevelByFrame(ra);
 	if (l && l->getVisibleStartFrame() < ra) {
 		int oldOffset = l->getEndOffset();
 		l->setEndOffset(oldOffset + l->getVisibleEndFrame() - ra + 1);
-		insertColumnLevel(new ColumnLevel(l->getSoundLevel(), l->getStartFrame(), row - l->getStartFrame(), oldOffset));
+		insertColumnLevel(new ColumnLevel(l->getSoundLevel(), l->getStartFrame(),
+										  row - l->getStartFrame(), oldOffset));
 	}
 
-	//Sposto il first frame di tutti i livelli successivi ad ra.
+	// Sposto il first frame di tutti i livelli successivi ad ra.
 	int i;
 	for (i = m_levels.count() - 1; i >= 0; i--) {
 		ColumnLevel *cl = m_levels.at(i);
@@ -639,14 +647,15 @@ void TXshSoundColumn::removeCells(int row, int rowCount, bool shift)
 		if (visibleStartFrame < ra && visibleEndFrame > rb) {
 			int oldEndOffset = l->getEndOffset();
 			l->setEndOffset(newEndOffset);
-			insertColumnLevel(new ColumnLevel(l->getSoundLevel(), l->getStartFrame(), newStartOffset, oldEndOffset));
+			insertColumnLevel(new ColumnLevel(l->getSoundLevel(), l->getStartFrame(),
+											  newStartOffset, oldEndOffset));
 			continue;
 		}
 		if (visibleStartFrame < ra)
 			l->setEndOffset(newEndOffset);
 		if (visibleEndFrame > rb)
 			l->setStartOffset(newStartOffset);
-		//Il livello e' contenuto nel range da cancellare: lo rimuovo.
+		// Il livello e' contenuto nel range da cancellare: lo rimuovo.
 		if (visibleStartFrame >= ra && visibleEndFrame <= rb)
 			removeColumnLevel(l);
 	}
@@ -662,11 +671,10 @@ void TXshSoundColumn::removeCells(int row, int rowCount, bool shift)
 				l->setStartFrame(l->getStartFrame() - rowCount);
 		}
 
-		//Devo controllare se il livello precedente il taglio e quello successivo sono in sequenza
+		// Devo controllare se il livello precedente il taglio e quello successivo sono in sequenza
 		ColumnLevel *beforeL = getColumnLevelByFrame(ra - 1);
 		ColumnLevel *nextL = getColumnLevelByFrame(ra);
-		if (beforeL && nextL &&
-			beforeL->getSoundLevel() == nextL->getSoundLevel() &&
+		if (beforeL && nextL && beforeL->getSoundLevel() == nextL->getSoundLevel() &&
 			beforeL->getStartFrame() == nextL->getStartFrame()) {
 			beforeL->setEndOffset(nextL->getEndOffset());
 			removeColumnLevel(nextL);
@@ -683,7 +691,7 @@ void TXshSoundColumn::clearCells(int row, int rowCount)
 	if (rowCount <= 0)
 		return;
 	if (m_levels.isEmpty())
-		return; //se la colonna e' vuota non devo "sbiancare" celle
+		return; // se la colonna e' vuota non devo "sbiancare" celle
 	removeCells(row, rowCount, false);
 }
 
@@ -715,7 +723,7 @@ int TXshSoundColumn::modifyCellRange(int row, int delta, bool modifyStartValue)
 
 	int startVisibleFrame = l->getVisibleStartFrame();
 	int endVisibleFrame = l->getVisibleEndFrame();
-	//Non dovrebbe mai accadere, metto un controllo di sicurezza.
+	// Non dovrebbe mai accadere, metto un controllo di sicurezza.
 	if (startVisibleFrame != row && endVisibleFrame != row)
 		return -1;
 
@@ -739,11 +747,11 @@ int TXshSoundColumn::modifyCellRange(int row, int delta, bool modifyStartValue)
 	}
 
 	if (modifyStartValue) {
-		//Evito che vada oltre il limite infieriore
+		// Evito che vada oltre il limite infieriore
 		if (endVisibleFrame < startVisibleFrame + delta)
 			delta = endVisibleFrame - startVisibleFrame;
 		int newStartOffset = l->getStartOffset() + delta;
-		//Evito che vada oltre il limite superiore
+		// Evito che vada oltre il limite superiore
 		if (newStartOffset < 0)
 			newStartOffset = 0;
 		l->setStartOffset(newStartOffset);
@@ -752,10 +760,10 @@ int TXshSoundColumn::modifyCellRange(int row, int delta, bool modifyStartValue)
 		return l->getVisibleStartFrame();
 	}
 
-	//Evito che vada oltre il limite superiore
+	// Evito che vada oltre il limite superiore
 	if (startVisibleFrame > endVisibleFrame + delta)
 		delta = startVisibleFrame - endVisibleFrame;
-	//Evito che vada oltre il limite inferiore
+	// Evito che vada oltre il limite inferiore
 	int newEndOffset = l->getEndOffset() - delta;
 	if (newEndOffset < 0)
 		newEndOffset = 0;
@@ -881,7 +889,8 @@ void TXshSoundColumn::play(TSoundTrackP soundtrack, int s0, int s1, bool loop)
 			m_player->setVolume(m_volume);
 			TSoundTrackP mixedTrack = soundtrack;
 #else
-			TSoundTrackP mixedTrack = TSoundTrack::create(soundtrack->getFormat(), soundtrack->getSampleCount());
+			TSoundTrackP mixedTrack =
+				TSoundTrack::create(soundtrack->getFormat(), soundtrack->getSampleCount());
 			mixedTrack = TSop::mix(mixedTrack, soundtrack, 1.0, m_volume);
 #endif
 			m_player->play(mixedTrack, s0, s1, loop);
@@ -1040,7 +1049,8 @@ void TXshSoundColumn::scrub(int fromFrame, int toFrame)
 
 //-----------------------------------------------------------------------------
 
-TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame, double fps, TSoundTrackFormat format)
+TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame, double fps,
+												   TSoundTrackFormat format)
 {
 	int levelsCount = m_levels.size();
 
@@ -1128,7 +1138,8 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame, d
 
 		// Check if the soundtrack is inside the frame Range.
 		int levelStartFrame = l->getStartFrame() + l->getStartOffset();
-		int levelEndFrame = levelStartFrame + soundLevel->getFrameCount() - l->getStartOffset() - l->getEndOffset();
+		int levelEndFrame =
+			levelStartFrame + soundLevel->getFrameCount() - l->getStartOffset() - l->getEndOffset();
 		// If the soundSequence is completely before fromFrame I will skip it
 		if ((levelStartFrame < fromFrame && levelEndFrame < fromFrame))
 			continue;
@@ -1159,16 +1170,18 @@ TSoundTrackP TXshSoundColumn::getOverallSoundTrack(int fromFrame, int toFrame, d
 
 			// Copy the sound track
 			overallSoundTrack->copy(soundTrack,
-									int((levelStartFrame - fromFrame) * samplePerFrame)); // The int cast is IMPORTANT, since
-		}																				  // there are 2 overloads (int & double)
-	}																					  // with DIFFERENT SCALES. We mean the
-																						  // SAMPLES-BASED one.
+									int((levelStartFrame - fromFrame) *
+										samplePerFrame)); // The int cast is IMPORTANT, since
+		}												  // there are 2 overloads (int & double)
+	}													  // with DIFFERENT SCALES. We mean the
+														  // SAMPLES-BASED one.
 	return overallSoundTrack;
 }
 
 //-----------------------------------------------------------------------------
 
-TSoundTrackP TXshSoundColumn::mixingTogether(const std::vector<TXshSoundColumn *> &vect, int fromFrame, int toFrame, double fps)
+TSoundTrackP TXshSoundColumn::mixingTogether(const std::vector<TXshSoundColumn *> &vect,
+											 int fromFrame, int toFrame, double fps)
 {
 	int offset = 0xffff;
 	long sampleCount = 0;
@@ -1211,10 +1224,11 @@ TSoundTrackP TXshSoundColumn::mixingTogether(const std::vector<TXshSoundColumn *
 			c = oldC;
 			continue;
 		}
-		mix = TSop::mix(mix, c->getOverallSoundTrack(fromFrame, toFrame, fps, format), 1.0, c->getVolume());
+		mix = TSop::mix(mix, c->getOverallSoundTrack(fromFrame, toFrame, fps, format), 1.0,
+						c->getVolume());
 	}
 
-	//Per ora perche mov vuole solo 16 bit
+	// Per ora perche mov vuole solo 16 bit
 	TSoundTrackFormat fmt = mix->getFormat();
 	if (fmt.m_bitPerSample != 16)
 		fmt.m_bitPerSample = 16;

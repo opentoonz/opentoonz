@@ -39,7 +39,7 @@ static const int c_minorVersionNumber = 0;
 inline void ulongFromDouble1(double x, TUINT32 &hi, TUINT32 &lo)
 {
 	assert(x < 1.0);
-	//x+=1.0;
+	// x+=1.0;
 	TUINT32 *l = (TUINT32 *)&x;
 #if TNZ_LITTLE_ENDIAN
 	hi = l[1], lo = l[0];
@@ -47,14 +47,14 @@ inline void ulongFromDouble1(double x, TUINT32 &hi, TUINT32 &lo)
 	hi = l[0], lo = l[1];
 #endif
 
-	//return (hi&0XFFFFF)<<12 | ((lo&0xFFE00000)>>20);
+	// return (hi&0XFFFFF)<<12 | ((lo&0xFFE00000)>>20);
 }
 
 /*=====================================================================*/
 
 inline double doubleFromUlong1(TUINT32 hi, TUINT32 lo)
 {
-	//assert((lo&0X00000001)==0);
+	// assert((lo&0X00000001)==0);
 	TUINT32 l[2];
 #if TNZ_LITTLE_ENDIAN
 	l[1] = hi;
@@ -80,7 +80,7 @@ TThickPoint operator*(const TAffine &aff, const TThickPoint &p)
 class MyOfstream : public Tofstream
 {
 
-public:
+  public:
 	MyOfstream(const TFilePath &path) : Tofstream(path) {}
 
 	MyOfstream &operator<<(TUINT32 n)
@@ -159,13 +159,14 @@ MyOfstream &MyOfstream::operator<<(const std::string &s)
 
 /*=====================================================================*/
 
-class MyIfstream //The input is done without stl; it was crashing in release version loading textures!!
+class MyIfstream // The input is done without stl; it was crashing in release version loading
+				 // textures!!
 {
-private:
+  private:
 	bool m_isIrixEndian;
 	FILE *m_fp;
 
-public:
+  public:
 	MyIfstream() : m_isIrixEndian(false) { m_fp = 0; }
 	~MyIfstream()
 	{
@@ -186,7 +187,7 @@ public:
 		m_fp = 0;
 	}
 	TUINT32 tellg() { return (TUINT32)ftell(m_fp); }
-	//void seekg(TUINT32 pos, ios_base::seek_dir type);
+	// void seekg(TUINT32 pos, ios_base::seek_dir type);
 	void seekg(TUINT32 pos, int type);
 	void read(char *m_buf, int length) { fread((void *)m_buf, sizeof(char), length, m_fp); }
 };
@@ -221,7 +222,7 @@ inline MyIfstream &MyIfstream::operator>>(UCHAR &un)
 	int ret = fread((void *)&un, sizeof(UCHAR), 1, m_fp);
 	if (ret < 1)
 		throw TException("corrupted pli file: unexpected end of file");
-	//read((char *)&un, sizeof(UCHAR));
+	// read((char *)&un, sizeof(UCHAR));
 	return *this;
 }
 
@@ -232,7 +233,7 @@ inline MyIfstream &MyIfstream::operator>>(char &un)
 	int ret = fread((void *)&un, sizeof(char), 1, m_fp);
 	if (ret < 1)
 		throw TException("corrupted pli file: unexpected end of file");
-	//read((char *)&un, sizeof(char));
+	// read((char *)&un, sizeof(char));
 	return *this;
 }
 
@@ -260,8 +261,8 @@ inline MyIfstream &MyIfstream::operator>>(TUINT32 &un)
 	// read((char *)&un, sizeof(TUINT32));
 
 	if (m_isIrixEndian)
-		un = ((un & 0xff000000) >> 24) | ((un & 0x00ff0000) >> 8) |
-			 ((un & 0x0000ff00) << 8) | ((un & 0x000000ff) << 24);
+		un = ((un & 0xff000000) >> 24) | ((un & 0x00ff0000) >> 8) | ((un & 0x0000ff00) << 8) |
+			 ((un & 0x000000ff) << 24);
 	return *this;
 }
 
@@ -287,12 +288,18 @@ inline MyIfstream &MyIfstream::operator>>(string &un)
 UINT TStyleParam::getSize()
 {
 	switch (m_type) {
-	case SP_BYTE  : return 1;
-	case SP_INT   : return 4;
-	case SP_DOUBLE: return 4;
-	case SP_USHORT: return 2;
-	case SP_RASTER: return 2 + 2 + m_r->getLx() * m_r->getLy() * m_r->getPixelSize();
-	case SP_STRING: return (m_string.size() + sizeof(USHORT));
+	case SP_BYTE:
+		return 1;
+	case SP_INT:
+		return 4;
+	case SP_DOUBLE:
+		return 4;
+	case SP_USHORT:
+		return 2;
+	case SP_RASTER:
+		return 2 + 2 + m_r->getLx() * m_r->getLy() * m_r->getPixelSize();
+	case SP_STRING:
+		return (m_string.size() + sizeof(USHORT));
 	default:
 		assert(false);
 		return 0;
@@ -304,22 +311,22 @@ UINT TStyleParam::getSize()
 #ifdef _WIN32
 #define CHECK_FOR_READ_ERROR(filePath)
 #else
-#define CHECK_FOR_READ_ERROR(filePath)                             \
-	{                                                              \
-		/*if (m_iChan.flags()&(ios::failbit|ios::eofbit))          \
-		{                                                          \
-		m_lastError = PREMATURE_EOF;                               \
-		throw TImageException( filePath, "Error on reading file"); \
-		}*/                                                        \
+#define CHECK_FOR_READ_ERROR(filePath)                                                             \
+	{                                                                                              \
+		/*if (m_iChan.flags()&(ios::failbit|ios::eofbit))                                          \
+		{                                                                                          \
+		m_lastError = PREMATURE_EOF;                                                               \
+		throw TImageException( filePath, "Error on reading file");                                 \
+		}*/                                                                                        \
 	}
 #endif
 
-#define CHECK_FOR_WRITE_ERROR(filePath)                               \
-	{                                                                 \
-		if (m_oChan->fail() /*m_oChan.flags()&(ios::failbit)*/) {     \
-			m_lastError = WRITE_ERROR;                                \
-			throw TImageException(filePath, "Error on writing file"); \
-		}                                                             \
+#define CHECK_FOR_WRITE_ERROR(filePath)                                                            \
+	{                                                                                              \
+		if (m_oChan->fail() /*m_oChan.flags()&(ios::failbit)*/) {                                  \
+			m_lastError = WRITE_ERROR;                                                             \
+			throw TImageException(filePath, "Error on writing file");                              \
+		}                                                                                          \
 	}
 
 const TUINT32 c_magicNt = 0x4D494C50;
@@ -327,16 +334,17 @@ const TUINT32 c_magicIrix = 0x504C494D;
 
 class TagElem
 {
-public:
+  public:
 	PliTag *m_tag;
 	TUINT32 m_offset;
 	TagElem *m_next;
 
 	TagElem(PliTag *tag, TUINT32 offset, TagElem *next = NULL)
-		: m_tag(tag), m_offset(offset), m_next(next) {}
+		: m_tag(tag), m_offset(offset), m_next(next)
+	{
+	}
 
-	TagElem(const TagElem &elem)
-		: m_tag(elem.m_tag), m_offset(elem.m_offset), m_next(NULL) {}
+	TagElem(const TagElem &elem) : m_tag(elem.m_tag), m_offset(elem.m_offset), m_next(NULL) {}
 
 	~TagElem()
 	{
@@ -350,7 +358,7 @@ class TContentHistory;
 
 class ParsedPliImp
 {
-public:
+  public:
 	UCHAR m_majorVersionNumber;
 	UCHAR m_minorVersionNumber;
 	USHORT m_framesNumber;
@@ -417,7 +425,7 @@ public:
 	TagElem *findTag(PliTag *tag);
 	USHORT readTagHeader();
 
-public:
+  public:
 	enum errorType {
 		NO__ERROR = 0,
 		NO_FILE,
@@ -438,12 +446,8 @@ public:
 	MyOfstream *m_oChan;
 
 	ParsedPliImp();
-	ParsedPliImp(UCHAR majorVersionNumber,
-				 UCHAR minorVersionNumber,
-				 USHORT framesNumber,
-				 UCHAR precision,
-				 UCHAR maxThickness,
-				 double autocloseTolerance);
+	ParsedPliImp(UCHAR majorVersionNumber, UCHAR minorVersionNumber, USHORT framesNumber,
+				 UCHAR precision, UCHAR maxThickness, double autocloseTolerance);
 	ParsedPliImp(const TFilePath &filename, bool readInfo);
 	~ParsedPliImp();
 
@@ -464,7 +468,10 @@ public:
 };
 
 /*=====================================================================*/
-double ParsedPli::getMaxThickness() const { return imp->m_maxThickness; };
+double ParsedPli::getMaxThickness() const
+{
+	return imp->m_maxThickness;
+};
 void ParsedPli::setMaxThickness(double maxThickness)
 {
 	imp->m_maxThickness = maxThickness;
@@ -510,64 +517,32 @@ static inline short complement2(USHORT val)
 /*=====================================================================*/
 
 ParsedPliImp::ParsedPliImp()
-	: m_majorVersionNumber(0)
-	, m_minorVersionNumber(0)
-	, m_framesNumber(0)
-	, m_thickRatio(1.0)
-	, m_maxThickness(0.0)
-	, m_firstTag(NULL)
-	, m_lastTag(NULL)
-	, m_currTag(NULL)
-	, m_iChan()
-	, m_oChan(0)
-	, m_bufLength(0)
-	, m_affine()
-	, m_precisionScale(REGION_COMPUTING_PRECISION)
-	, m_creator("")
+	: m_majorVersionNumber(0), m_minorVersionNumber(0), m_framesNumber(0), m_thickRatio(1.0),
+	  m_maxThickness(0.0), m_firstTag(NULL), m_lastTag(NULL), m_currTag(NULL), m_iChan(),
+	  m_oChan(0), m_bufLength(0), m_affine(), m_precisionScale(REGION_COMPUTING_PRECISION),
+	  m_creator("")
 {
 }
 
 /*=====================================================================*/
 
-ParsedPliImp::ParsedPliImp(UCHAR majorVersionNumber,
-						   UCHAR minorVersionNumber,
-						   USHORT framesNumber,
-						   UCHAR precision,
-						   UCHAR maxThickness,
-						   double autocloseTolerance)
-	: m_majorVersionNumber(majorVersionNumber)
-	, m_minorVersionNumber(minorVersionNumber)
-	, m_framesNumber(framesNumber)
-	, m_maxThickness(maxThickness)
-	, m_autocloseTolerance(autocloseTolerance)
-	, m_thickRatio(maxThickness / 255.0)
-	, m_firstTag(NULL)
-	, m_lastTag(NULL)
-	, m_currTag(NULL)
-	, m_iChan()
-	, m_oChan(0)
-	, m_bufLength(0)
-	, m_affine(TScale(1.0 / pow(10.0, precision)))
-	, m_precisionScale(REGION_COMPUTING_PRECISION)
-	, m_creator("")
+ParsedPliImp::ParsedPliImp(UCHAR majorVersionNumber, UCHAR minorVersionNumber, USHORT framesNumber,
+						   UCHAR precision, UCHAR maxThickness, double autocloseTolerance)
+	: m_majorVersionNumber(majorVersionNumber), m_minorVersionNumber(minorVersionNumber),
+	  m_framesNumber(framesNumber), m_maxThickness(maxThickness),
+	  m_autocloseTolerance(autocloseTolerance), m_thickRatio(maxThickness / 255.0),
+	  m_firstTag(NULL), m_lastTag(NULL), m_currTag(NULL), m_iChan(), m_oChan(0), m_bufLength(0),
+	  m_affine(TScale(1.0 / pow(10.0, precision))), m_precisionScale(REGION_COMPUTING_PRECISION),
+	  m_creator("")
 {
 }
 
 /*=====================================================================*/
 
 ParsedPliImp::ParsedPliImp(const TFilePath &filename, bool readInfo)
-	: m_majorVersionNumber(0), m_minorVersionNumber(0)
-	, m_framesNumber(0)
-	, m_thickRatio(1.0)
-	, m_maxThickness(0)
-	, m_firstTag(NULL)
-	, m_lastTag(NULL)
-	, m_currTag(NULL)
-	, m_iChan()
-	, m_oChan(0)
-	, m_bufLength(0)
-	, m_precisionScale(REGION_COMPUTING_PRECISION)
-	, m_creator("")
+	: m_majorVersionNumber(0), m_minorVersionNumber(0), m_framesNumber(0), m_thickRatio(1.0),
+	  m_maxThickness(0), m_firstTag(NULL), m_lastTag(NULL), m_currTag(NULL), m_iChan(), m_oChan(0),
+	  m_bufLength(0), m_precisionScale(REGION_COMPUTING_PRECISION), m_creator("")
 {
 	TUINT32 magic;
 	//  TUINT32 fileLenght;
@@ -579,7 +554,7 @@ ParsedPliImp::ParsedPliImp(const TFilePath &filename, bool readInfo)
 	//#ifdef _WIN32
 	m_iChan.open(filename);
 
-	//m_iChan.exceptions( ios::failbit | ios::badbit);
+	// m_iChan.exceptions( ios::failbit | ios::badbit);
 	//#else
 	//  m_iChan.open(filename.c_str(), ios::in);
 	//#endif
@@ -610,10 +585,11 @@ ParsedPliImp::ParsedPliImp(const TFilePath &filename, bool readInfo)
 	m_iChan >> m_majorVersionNumber;
 	m_iChan >> m_minorVersionNumber;
 
-	//Loading pli versions AFTER current one is NOT SUPPORTED. This means that an
-	//exception is directly called at this point.
+	// Loading pli versions AFTER current one is NOT SUPPORTED. This means that an
+	// exception is directly called at this point.
 	if (m_majorVersionNumber > c_majorVersionNumber ||
-		(m_majorVersionNumber == c_majorVersionNumber && m_minorVersionNumber > c_minorVersionNumber))
+		(m_majorVersionNumber == c_majorVersionNumber &&
+		 m_minorVersionNumber > c_minorVersionNumber))
 		throw TImageVersionException(filename, m_majorVersionNumber, m_minorVersionNumber);
 
 	if (m_majorVersionNumber > 5 || m_majorVersionNumber == 5 && m_minorVersionNumber >= 8)
@@ -691,8 +667,8 @@ void ParsedPliImp::loadInfo(bool readPlt, TPalette *&palette, TContentHistory *&
 
 	m_currDinamicTypeBytesNum = 2;
 
-	//m_frameOffsInFile = new int[m_framesNumber];
-	//for (int i=0; i<m_framesNumber; i++)
+	// m_frameOffsInFile = new int[m_framesNumber];
+	// for (int i=0; i<m_framesNumber; i++)
 	//  m_frameOffsInFile[i] = -1;
 
 	TUINT32 pos = m_iChan.tellg();
@@ -703,12 +679,13 @@ void ParsedPliImp::loadInfo(bool readPlt, TPalette *&palette, TContentHistory *&
 			m_iChan >> frame;
 
 			char letter = 0;
-			if (m_majorVersionNumber > 6 || (m_majorVersionNumber == 6 && m_minorVersionNumber >= 6))
+			if (m_majorVersionNumber > 6 ||
+				(m_majorVersionNumber == 6 && m_minorVersionNumber >= 6))
 				m_iChan >> letter;
 
 			m_frameOffsInFile[TFrameId(frame, letter)] = m_iChan.tellg();
 
-			//m_iChan.seekg(m_tagLength, ios::cur);
+			// m_iChan.seekg(m_tagLength, ios::cur);
 			m_iChan.seekg(m_tagLength - 2, ios::cur);
 		} else if (type == PliTag::STYLE_NGOBJ) {
 			m_iChan.seekg(pos, ios::beg);
@@ -725,15 +702,15 @@ void ParsedPliImp::loadInfo(bool readPlt, TPalette *&palette, TContentHistory *&
 			delete tagElem;
 		}
 
-		else if (type == PliTag::GROUP_GOBJ && readPlt) //la paletta!!!
+		else if (type == PliTag::GROUP_GOBJ && readPlt) // la paletta!!!
 		{
 			m_iChan.seekg(pos, ios::beg);
 			TagElem *tagElem = readTag();
 			GroupTag *grouptag = (GroupTag *)tagElem->m_tag;
 			if (grouptag->m_type == (UCHAR)GroupTag::PALETTE) {
 				readPlt = false;
-				palette = readPalette((GroupTag *)tagElem->m_tag,
-									  m_majorVersionNumber, m_minorVersionNumber);
+				palette = readPalette((GroupTag *)tagElem->m_tag, m_majorVersionNumber,
+									  m_minorVersionNumber);
 			} else
 				assert(grouptag->m_type == (UCHAR)GroupTag::STROKE);
 			delete tagElem;
@@ -757,8 +734,8 @@ void ParsedPliImp::loadInfo(bool readPlt, TPalette *&palette, TContentHistory *&
 	}
 
 	assert(m_frameOffsInFile.size() == m_framesNumber);
-	//palette = new TPalette();
-	//for (int i=0; i<256; i++)
+	// palette = new TPalette();
+	// for (int i=0; i<256; i++)
 	//  palette->getPage(0)->addStyle(TPixel::Black);
 }
 
@@ -829,7 +806,7 @@ ImageTag *ParsedPliImp::loadFrame(const TFrameId &frameNumber)
 	}
 	m_firstTag = 0;
 
-	//PliTag *tag;
+	// PliTag *tag;
 	USHORT type = PliTag::IMAGE_BEGIN_GOBJ;
 	USHORT frame;
 	char letter;
@@ -847,7 +824,8 @@ ImageTag *ParsedPliImp::loadFrame(const TFrameId &frameNumber)
 		while ((type = readTagHeader()) != PliTag::END_CNTRL) {
 			if (type == PliTag::IMAGE_BEGIN_GOBJ) {
 				m_iChan >> frame;
-				if (m_majorVersionNumber > 6 || (m_majorVersionNumber == 6 && m_minorVersionNumber >= 6))
+				if (m_majorVersionNumber > 6 ||
+					(m_majorVersionNumber == 6 && m_minorVersionNumber >= 6))
 					m_iChan >> letter;
 				else
 					letter = 0;
@@ -865,7 +843,7 @@ ImageTag *ParsedPliImp::loadFrame(const TFrameId &frameNumber)
 		return 0;
 	}
 
-	//trovato; leggo i suoi tag
+	// trovato; leggo i suoi tag
 	while ((tagElem = readTag())) {
 		if (!m_firstTag)
 			m_firstTag = m_lastTag = tagElem;
@@ -1049,9 +1027,11 @@ inline void ParsedPliImp::readDinamicData(TUINT32 &val, TUINT32 &bufOffs)
 		break;
 	case 4:
 		if (m_isIrixEndian)
-			val = m_buf[bufOffs + 3] | (m_buf[bufOffs + 2] << 8) | (m_buf[bufOffs + 1] << 16) | (m_buf[bufOffs] << 24);
+			val = m_buf[bufOffs + 3] | (m_buf[bufOffs + 2] << 8) | (m_buf[bufOffs + 1] << 16) |
+				  (m_buf[bufOffs] << 24);
 		else
-			val = m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8) | (m_buf[bufOffs + 2] << 16) | (m_buf[bufOffs + 3] << 24);
+			val = m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8) | (m_buf[bufOffs + 2] << 16) |
+				  (m_buf[bufOffs + 3] << 24);
 		bufOffs += 4;
 		break;
 	default:
@@ -1081,8 +1061,7 @@ inline bool ParsedPliImp::readDinamicData(TINT32 &val, TUINT32 &bufOffs)
 				val = -val;
 				isNegative = true;
 			}
-		}
-		else {
+		} else {
 			val = (m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8)) & 0x7fff;
 			if (m_buf[bufOffs + 1] & 0x80) {
 				val = -val;
@@ -1093,14 +1072,15 @@ inline bool ParsedPliImp::readDinamicData(TINT32 &val, TUINT32 &bufOffs)
 		break;
 	case 4:
 		if (m_isIrixEndian) {
-			val = m_buf[bufOffs + 3] | (m_buf[bufOffs + 2] << 8) | (m_buf[bufOffs + 1] << 16) | (m_buf[bufOffs] << 24) & 0x7fffffff;
+			val = m_buf[bufOffs + 3] | (m_buf[bufOffs + 2] << 8) | (m_buf[bufOffs + 1] << 16) |
+				  (m_buf[bufOffs] << 24) & 0x7fffffff;
 			if (m_buf[bufOffs] & 0x80) {
 				val = -val;
 				isNegative = true;
 			}
-		}
-		else {
-			val = m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8) | (m_buf[bufOffs + 2] << 16) | (m_buf[bufOffs + 3] << 24) & 0x7fffffff;
+		} else {
+			val = m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8) | (m_buf[bufOffs + 2] << 16) |
+				  (m_buf[bufOffs + 3] << 24) & 0x7fffffff;
 			if (m_buf[bufOffs + 3] & 0x80) {
 				val = -val;
 				isNegative = true;
@@ -1183,8 +1163,8 @@ PliTag *ParsedPliImp::readThickQuadraticChainTag(bool isLoop)
 	TUINT32 numQuadratics = 0;
 	double scale;
 
-	bool newThicknessWriteMethod = ((m_majorVersionNumber == 5 && m_minorVersionNumber >= 7) ||
-									(m_majorVersionNumber > 5));
+	bool newThicknessWriteMethod =
+		((m_majorVersionNumber == 5 && m_minorVersionNumber >= 7) || (m_majorVersionNumber > 5));
 
 	scale = 1.0 / (double)m_precisionScale;
 	int maxThickness;
@@ -1206,9 +1186,11 @@ PliTag *ParsedPliImp::readThickQuadraticChainTag(bool isLoop)
 
 	p.thick = m_buf[bufOffs++] * m_thickRatio;
 	if (newThicknessWriteMethod)
-		numQuadratics = (m_tagLength - 2 * m_currDinamicTypeBytesNum - 1 - 1) / (4 * m_currDinamicTypeBytesNum + 2);
+		numQuadratics = (m_tagLength - 2 * m_currDinamicTypeBytesNum - 1 - 1) /
+						(4 * m_currDinamicTypeBytesNum + 2);
 	else
-		numQuadratics = (m_tagLength - 2 * m_currDinamicTypeBytesNum - 1) / (4 * m_currDinamicTypeBytesNum + 3);
+		numQuadratics =
+			(m_tagLength - 2 * m_currDinamicTypeBytesNum - 1) / (4 * m_currDinamicTypeBytesNum + 3);
 
 	std::unique_ptr<TThickQuadratic[]> quadratic(new TThickQuadratic[numQuadratics]);
 
@@ -1224,9 +1206,11 @@ PliTag *ParsedPliImp::readThickQuadraticChainTag(bool isLoop)
 			p.thick = m_buf[bufOffs++] * m_thickRatio;
 		else {
 			if (m_isIrixEndian)
-				p.thick = complement2((USHORT)(m_buf[bufOffs + 1] | (m_buf[bufOffs] << 8))) * m_thickRatio;
+				p.thick = complement2((USHORT)(m_buf[bufOffs + 1] | (m_buf[bufOffs] << 8))) *
+						  m_thickRatio;
 			else
-				p.thick = complement2((USHORT)(m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8))) * m_thickRatio;
+				p.thick = complement2((USHORT)(m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8))) *
+						  m_thickRatio;
 			bufOffs += 2;
 		}
 
@@ -1235,7 +1219,8 @@ PliTag *ParsedPliImp::readThickQuadraticChainTag(bool isLoop)
 		readDinamicData(d, bufOffs);
 		dy2 = scale * d;
 
-		if (dx1 == 0 && dy1 == 0) //p0==p1, or p1==p2  creates problems (in the increasecontrolpoints for example) I slightly move it...
+		if (dx1 == 0 && dy1 == 0) // p0==p1, or p1==p2  creates problems (in the
+								  // increasecontrolpoints for example) I slightly move it...
 		{
 			if (dx2 != 0 || dy2 != 0) {
 				dx1 = 0.001 * dx2;
@@ -1287,7 +1272,7 @@ PliTag *ParsedPliImp::readGroupTag()
 	assert(type < GroupTag::TYPE_HOW_MANY);
 
 	TUINT32 numObjects = (m_tagLength - 1) / m_currDinamicTypeBytesNum;
-	std::unique_ptr<PliObjectTag*[]> object(new PliObjectTag *[numObjects]);
+	std::unique_ptr<PliObjectTag *[]> object(new PliObjectTag *[numObjects]);
 
 	std::unique_ptr<TUINT32[]> tagOffs(new TUINT32[numObjects]);
 
@@ -1387,7 +1372,7 @@ PliTag *ParsedPliImp::readStyleTag()
 		case TStyleParam::SP_STRING: {
 			USHORT strLen;
 			readUShortData(strLen, bufOffs);
-			//bufOffs+=2;
+			// bufOffs+=2;
 			param.m_string = "";
 			for (i = 0; i < strLen; i++) {
 				param.m_string.append(1, m_buf[bufOffs++]);
@@ -1418,7 +1403,7 @@ PliTag *ParsedPliImp::readOutlineOptionsTag()
 
 	const double scale = 0.001;
 
-	//Read OutlineOptions
+	// Read OutlineOptions
 	int capStyle, joinStyle;
 	double miterLower, miterUpper;
 
@@ -1452,8 +1437,8 @@ PliTag *ParsedPliImp::readPrecisionScaleTag()
 void ParsedPliImp::readFloatData(double &val, TUINT32 &bufOffs)
 {
 
-	//UCHAR currDinamicTypeBytesNumSaved = m_currDinamicTypeBytesNum;
-	//m_currDinamicTypeBytesNum = 2;
+	// UCHAR currDinamicTypeBytesNumSaved = m_currDinamicTypeBytesNum;
+	// m_currDinamicTypeBytesNum = 2;
 	TINT32 valInt;
 	TUINT32 valDec;
 	bool isNegative;
@@ -1461,12 +1446,12 @@ void ParsedPliImp::readFloatData(double &val, TUINT32 &bufOffs)
 	isNegative = readDinamicData(valInt, bufOffs);
 	readDinamicData(valDec, bufOffs);
 
-	val = valInt + (double)valDec / 65536.0; //2^16
+	val = valInt + (double)valDec / 65536.0; // 2^16
 
 	if (valInt == 0 && isNegative)
 		val = -val;
 
-	//m_currDinamicTypeBytesNum = currDinamicTypeBytesNumSaved;
+	// m_currDinamicTypeBytesNum = currDinamicTypeBytesNumSaved;
 }
 
 /*=====================================================================*/
@@ -1477,8 +1462,8 @@ UINT ParsedPliImp::readRasterData(TRaster32P &r, TUINT32 &bufOffs)
 	readUShortData(lx, bufOffs);
 	readUShortData(ly, bufOffs);
 
-	//readUShortData((USHORT&)lx, bufOffs);
-	//readUShortData((USHORT&)ly, bufOffs);
+	// readUShortData((USHORT&)lx, bufOffs);
+	// readUShortData((USHORT&)ly, bufOffs);
 
 	r.create((int)lx, (int)ly);
 	UINT size = lx * ly * 4;
@@ -1497,13 +1482,13 @@ inline void getLongValFromFloat(double val, TINT32 &intVal, TUINT32 &decVal)
 	if (val < 0)
 		decVal = (TUINT32)((double)((-val) - (-intVal)) * 65536.0);
 	/*if (intVal<(0x1<<7))
-    intVal|=(0x1<<7);
-    else if (intVal<(0x1<<15))
-    intVal|=(0x1<<15);
-    else
-    {
-    assert(intVal<(0x1<<31));
-    intVal|=(0x1<<31);
+	intVal|=(0x1<<7);
+	else if (intVal<(0x1<<15))
+	intVal|=(0x1<<15);
+	else
+	{
+	assert(intVal<(0x1<<31));
+	intVal|=(0x1<<31);
 }*/
 	else
 		decVal = (TUINT32)((double)(val - intVal) * 65536.0);
@@ -1566,7 +1551,8 @@ PliTag *ParsedPliImp::readGeometricTransformationTag()
 
    m_affine = TScale(1.0/pow(10.0, realScale));*/
 
-	GeometricTransformationTag *tag = new GeometricTransformationTag(affine, (PliGeometricTag *)object);
+	GeometricTransformationTag *tag =
+		new GeometricTransformationTag(affine, (PliGeometricTag *)object);
 
 	return tag;
 }
@@ -1603,9 +1589,11 @@ void ParsedPliImp::readUShortData(USHORT &val, TUINT32 &bufOffs)
 void ParsedPliImp::readTUINT32Data(TUINT32 &val, TUINT32 &bufOffs)
 {
 	if (m_isIrixEndian)
-		val = m_buf[bufOffs + 3] | (m_buf[bufOffs + 2] << 8) | (m_buf[bufOffs + 1] << 16) | (m_buf[bufOffs] << 24);
+		val = m_buf[bufOffs + 3] | (m_buf[bufOffs + 2] << 8) | (m_buf[bufOffs + 1] << 16) |
+			  (m_buf[bufOffs] << 24);
 	else
-		val = m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8) | (m_buf[bufOffs + 2] << 16) | (m_buf[bufOffs + 3] << 24);
+		val = m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8) | (m_buf[bufOffs + 2] << 16) |
+			  (m_buf[bufOffs + 3] << 24);
 
 	bufOffs += 4;
 }
@@ -1653,7 +1641,7 @@ PliTag *ParsedPliImp::readImageTag()
 	}
 
 	TUINT32 numObjects = (m_tagLength - headerLength) / m_currDinamicTypeBytesNum;
-	std::unique_ptr<PliObjectTag*[]> object(new PliObjectTag*[numObjects]);
+	std::unique_ptr<PliObjectTag *[]> object(new PliObjectTag *[numObjects]);
 
 	std::unique_ptr<TUINT32[]> tagOffs(new TUINT32[numObjects]);
 	for (TUINT32 i = 0; i < numObjects; i++) {
@@ -1668,7 +1656,8 @@ PliTag *ParsedPliImp::readImageTag()
 			else
 				assert(false);
 
-	std::unique_ptr<ImageTag[]> tag(new ImageTag(TFrameId(frame, letter), numObjects, std::move(object)));
+	std::unique_ptr<ImageTag[]> tag(
+		new ImageTag(TFrameId(frame, letter), numObjects, std::move(object)));
 	return tag.release();
 }
 
@@ -1695,7 +1684,7 @@ inline double doubleFromUlong(TUINT32 q)
 
 /*=====================================================================*/
 
-//vedi commento sulla write per chiarimenti!!
+// vedi commento sulla write per chiarimenti!!
 
 inline double truncate(double x)
 {
@@ -1732,18 +1721,20 @@ PliTag *ParsedPliImp::readIntersectionDataTag()
 		readUShortData(style, bufOffs);
 		branchArray[i].m_style = style;
 		/*
-    */
-		if (m_buf[bufOffs] & 0x80) // in un numero double tra 0 e 1, il bit piu' significativo e' sempre 0
-								   //sfrutto questo bit; se e' 1, vuol dire che il valore e' 0.0 o 1.0 in un singolo byte
+	*/
+		if (m_buf[bufOffs] &
+			0x80) // in un numero double tra 0 e 1, il bit piu' significativo e' sempre 0
+		// sfrutto questo bit; se e' 1, vuol dire che il valore e' 0.0 o 1.0 in un singolo byte
 		{
 			branchArray[i].m_w = (m_buf[bufOffs] & 0x1) ? 1.0 : 0.0;
 			bufOffs++;
 		} else {
 			TUINT32 hi, lo;
-			hi = m_buf[bufOffs + 3] | (m_buf[bufOffs + 2] << 8) | (m_buf[bufOffs + 1] << 16) | (m_buf[bufOffs] << 24);
+			hi = m_buf[bufOffs + 3] | (m_buf[bufOffs + 2] << 8) | (m_buf[bufOffs + 1] << 16) |
+				 (m_buf[bufOffs] << 24);
 			bufOffs += 4;
 			readTUINT32Data(lo, bufOffs);
-			//readTUINT32Data(hi, bufOffs);
+			// readTUINT32Data(hi, bufOffs);
 
 			branchArray[i].m_w = doubleFromUlong1(hi, lo);
 		}
@@ -1806,7 +1797,7 @@ bool ParsedPliImp::addTag(const TagElem &elem, bool addFront)
 
 void ParsedPliImp::writeTag(TagElem *elem)
 {
-	if (elem->m_offset != 0) //already written
+	if (elem->m_offset != 0) // already written
 		return;
 
 	switch (elem->m_tag->m_type) {
@@ -1854,7 +1845,7 @@ void ParsedPliImp::writeTag(TagElem *elem)
 		break;
 	default:
 		assert(false);
-		//m_error = UNKNOWN_TAG;
+		// m_error = UNKNOWN_TAG;
 		;
 	}
 }
@@ -2001,14 +1992,14 @@ TUINT32 ParsedPliImp::writePaletteWithAlphaTag(PaletteWithAlphaTag *tag)
 
 /*=====================================================================*/
 
-#define SET_MINMAX         \
-	if (p.x < minval)      \
-		minval = (int)p.x; \
-	if (p.y < minval)      \
-		minval = (int)p.y; \
-	if (p.x > maxval)      \
-		maxval = (int)p.x; \
-	if (p.y > maxval)      \
+#define SET_MINMAX                                                                                 \
+	if (p.x < minval)                                                                              \
+		minval = (int)p.x;                                                                         \
+	if (p.y < minval)                                                                              \
+		minval = (int)p.y;                                                                         \
+	if (p.x > maxval)                                                                              \
+		maxval = (int)p.x;                                                                         \
+	if (p.y > maxval)                                                                              \
 		maxval = (int)p.y;
 
 /*=====================================================================*/
@@ -2049,7 +2040,7 @@ TUINT32 ParsedPliImp::writeThickQuadraticChainTag(ThickQuadraticChainTag *tag)
 	scale = m_precisionScale;
 
 	/*for ( i=0; i<tag->m_numCurves; i++)
-      tag->m_curve[i] =  aff*tag->m_curve[i];*/
+	  tag->m_curve[i] =  aff*tag->m_curve[i];*/
 
 	p = scale * tag->m_curve[0].getP0();
 	SET_MINMAX
@@ -2063,15 +2054,18 @@ TUINT32 ParsedPliImp::writeThickQuadraticChainTag(ThickQuadraticChainTag *tag)
 
 	setDinamicTypeBytesNum(minval, maxval);
 
-	int tagLength = (int)(2 * (2 * tag->m_numCurves + 1) * m_currDinamicTypeBytesNum + 1 + 1 + 2 * tag->m_numCurves);
+	int tagLength = (int)(2 * (2 * tag->m_numCurves + 1) * m_currDinamicTypeBytesNum + 1 + 1 +
+						  2 * tag->m_numCurves);
 	int offset;
 	if (tag->m_isLoop)
 		offset = (int)writeTagHeader((UCHAR)PliTag::THICK_QUADRATIC_LOOP_GOBJ, tagLength);
 	else
 		offset = (int)writeTagHeader((UCHAR)PliTag::THICK_QUADRATIC_CHAIN_GOBJ, tagLength);
 
-	//assert(scale*tag->m_curve[0].getThickP0().x == (double)(TINT32)(scale*tag->m_curve[0].getThickP0().x));
-	//assert(scale*tag->m_curve[0].getThickP0().y == (double)(TINT32)(scale*tag->m_curve[0].getThickP0().y));
+	// assert(scale*tag->m_curve[0].getThickP0().x ==
+	// (double)(TINT32)(scale*tag->m_curve[0].getThickP0().x));
+	// assert(scale*tag->m_curve[0].getThickP0().y ==
+	// (double)(TINT32)(scale*tag->m_curve[0].getThickP0().y));
 	double thickRatio = tag->m_maxThickness / 255.0;
 
 	assert(tag->m_maxThickness <= 255);
@@ -2121,7 +2115,8 @@ TUINT32 ParsedPliImp::writeGroupTag(GroupTag *tag)
 	unsigned int i;
 
 	for (i = 0; i < tag->m_numObjects; i++) {
-		if (!(objectOffset[i] = findOffsetFromTag(tag->m_object[i]))) // the object was not already written before: write it now
+		if (!(objectOffset[i] = findOffsetFromTag(
+				  tag->m_object[i]))) // the object was not already written before: write it now
 		{
 			TagElem elem(tag->m_object[i], 0);
 			writeTag(&elem);
@@ -2168,7 +2163,8 @@ TUINT32 ParsedPliImp::writeImageTag(ImageTag *tag)
 	objectOffset = new TUINT32[tag->m_numObjects];
 	unsigned int i;
 	for (i = 0; i < tag->m_numObjects; i++) {
-		if (!(objectOffset[i] = findOffsetFromTag(tag->m_object[i]))) // the object was not already written before: write it now
+		if (!(objectOffset[i] = findOffsetFromTag(
+				  tag->m_object[i]))) // the object was not already written before: write it now
 		{
 			TagElem elem(tag->m_object[i], 0);
 			writeTag(&elem);
@@ -2212,11 +2208,11 @@ TUINT32 ParsedPliImp::writeImageTag(ImageTag *tag)
   };
 */
 
-//per scrivere il valore m_w, molto spesso vale 0 oppure 1;
-//se vale 0, scrivo un bye con valore 0x0;
-//se vale 1, scrivo un bye con valore 0x1;
+// per scrivere il valore m_w, molto spesso vale 0 oppure 1;
+// se vale 0, scrivo un bye con valore 0x0;
+// se vale 1, scrivo un bye con valore 0x1;
 // altrimenti, 4 byte con val&0x3==0x2;
-//e gli altri (32-2) bit contenenti iol valore di w.
+// e gli altri (32-2) bit contenenti iol valore di w.
 
 inline TUINT32 ulongFromDouble(double x)
 {
@@ -2259,7 +2255,8 @@ TUINT32 ParsedPliImp::writeIntersectionDataTag(IntersectionDataTag *tag)
 	}
 	setDinamicTypeBytesNum(minval, maxval);
 
-	tagLength = 4 + tag->m_branchCount * (3 * m_currDinamicTypeBytesNum + 2) + floatWCount * 8 + (tag->m_branchCount - floatWCount) * 1;
+	tagLength = 4 + tag->m_branchCount * (3 * m_currDinamicTypeBytesNum + 2) + floatWCount * 8 +
+				(tag->m_branchCount - floatWCount) * 1;
 
 	offset = writeTagHeader((UCHAR)PliTag::INTERSECTION_DATA_GOBJ, tagLength);
 
@@ -2267,7 +2264,9 @@ TUINT32 ParsedPliImp::writeIntersectionDataTag(IntersectionDataTag *tag)
 
 	for (i = 0; i < tag->m_branchCount; i++) {
 		writeDinamicData((TINT32)tag->m_branchArray[i].m_strokeIndex);
-		writeDinamicData((tag->m_branchArray[i].m_gettingOut) ? (TINT32)(tag->m_branchArray[i].m_currInter + 1) : -(TINT32)(tag->m_branchArray[i].m_currInter + 1));
+		writeDinamicData((tag->m_branchArray[i].m_gettingOut)
+							 ? (TINT32)(tag->m_branchArray[i].m_currInter + 1)
+							 : -(TINT32)(tag->m_branchArray[i].m_currInter + 1));
 		writeDinamicData((TUINT32)tag->m_branchArray[i].m_nextBranch);
 
 		assert(tag->m_branchArray[i].m_style >= 0 && tag->m_branchArray[i].m_style < 65536);
@@ -2287,9 +2286,9 @@ TUINT32 ParsedPliImp::writeIntersectionDataTag(IntersectionDataTag *tag)
 			*m_oChan << (UCHAR)((hi >> 16) & 0xff);
 			*m_oChan << (UCHAR)((hi >> 8) & 0xff);
 			*m_oChan << (UCHAR)((hi)&0xff);
-			//m_oChan<<((TUINT32)hi);
+			// m_oChan<<((TUINT32)hi);
 			*m_oChan << (TUINT32)(lo);
-			//m_oChan<<((TUINT32)hi);
+			// m_oChan<<((TUINT32)hi);
 		}
 	}
 
@@ -2332,7 +2331,7 @@ TUINT32 ParsedPliImp::writeStyleTag(StyleTag *tag)
 {
 	assert(m_oChan);
 	TUINT32 tagLength = 0, offset;
-	//int maxval=0, minval = 100000;
+	// int maxval=0, minval = 100000;
 	int i;
 
 	tagLength = 2 + 2;
@@ -2423,7 +2422,8 @@ TUINT32 ParsedPliImp::writeGeometricTransformationTag(GeometricTransformationTag
 	TUINT32 objectOffset = 0;
 
 	if (tag->m_object) {
-		if (!(objectOffset = findOffsetFromTag(tag->m_object))) // the object was not already written before: write it now
+		if (!(objectOffset = findOffsetFromTag(
+				  tag->m_object))) // the object was not already written before: write it now
 		{
 			TagElem elem(tag->m_object, 0);
 			writeTag(&elem);
@@ -2576,14 +2576,14 @@ bool ParsedPliImp::writePli(const TFilePath &filename)
 	m_oChan = &os;
 
 	*m_oChan << c_magicNt;
-	//m_oChan << c_magicIrix;
+	// m_oChan << c_magicIrix;
 
 	*m_oChan << m_majorVersionNumber;
 	*m_oChan << m_minorVersionNumber;
 
 	*m_oChan << m_creator;
 
-	*m_oChan << (TUINT32)0; //fileLenght;
+	*m_oChan << (TUINT32)0; // fileLenght;
 	*m_oChan << m_framesNumber;
 
 	UCHAR s, i, d;
@@ -2623,17 +2623,11 @@ ParsedPli::ParsedPli()
 
 /*=====================================================================*/
 
-ParsedPli::ParsedPli(USHORT framesNumber,
-					 UCHAR precision,
-					 UCHAR maxThickness,
+ParsedPli::ParsedPli(USHORT framesNumber, UCHAR precision, UCHAR maxThickness,
 					 double autocloseTolerance)
 {
-	imp = new ParsedPliImp(c_majorVersionNumber,
-						   c_minorVersionNumber,
-						   framesNumber,
-						   precision,
-						   maxThickness,
-						   autocloseTolerance);
+	imp = new ParsedPliImp(c_majorVersionNumber, c_minorVersionNumber, framesNumber, precision,
+						   maxThickness, autocloseTolerance);
 }
 
 /*=====================================================================*/

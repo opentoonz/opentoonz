@@ -45,7 +45,7 @@ class ParamChange;
 typedef struct DVAPI PlasticSkeletonVertexDeformation : public TPersist {
 	PERSIST_DECLARATION(PlasticSkeletonVertexDeformation)
 
-public:
+  public:
 	enum Params {
 		ANGLE = 0, //!< Distance from parent vertex (delta)
 		DISTANCE,  //!< Angle with parent edge (delta)
@@ -57,16 +57,16 @@ public:
 		TDoubleKeyframe m_keyframes[PARAMS_COUNT];
 	};
 
-public:
+  public:
 	TDoubleParamP m_params[PARAMS_COUNT];
 
-public:
+  public:
 	Keyframe getKeyframe(double frame) const;
 
 	void setKeyframe(double frame);
 	bool setKeyframe(const Keyframe &values);
-	bool setKeyframe(const Keyframe &values, double frame,
-					 double easeIn = -1.0, double easeOut = -1.0);
+	bool setKeyframe(const Keyframe &values, double frame, double easeIn = -1.0,
+					 double easeOut = -1.0);
 
 	bool isKeyframe(double frame) const;
 	bool isFullKeyframe(double frame) const;
@@ -137,20 +137,22 @@ class DVAPI PlasticSkeletonDeformation : public TSmartObject, public TPersist
 	DECLARE_CLASS_CODE
 	PERSIST_DECLARATION(PlasticSkeletonDeformation)
 
-private:
+  private:
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 
-public:
+  public:
 	typedef tcg::any_it<int, int, void *>::bidirectional skelId_iterator;
-	typedef tcg::any_it<std::pair<const QString *, SkVD *>,
-						std::pair<const QString *, SkVD *>, void *>::bidirectional vd_iterator;
-	typedef tcg::any_it<std::pair<int, int>,
-						std::pair<int, int>, void *>::bidirectional vx_iterator;
+	typedef tcg::any_it<std::pair<const QString *, SkVD *>, std::pair<const QString *, SkVD *>,
+						void *>::bidirectional vd_iterator;
+	typedef tcg::any_it<std::pair<int, int>, std::pair<int, int>, void *>::bidirectional
+		vx_iterator;
 
-public:
-	PlasticSkeletonDeformation();										 //!< Constructs an empty deformation
-	PlasticSkeletonDeformation(const PlasticSkeletonDeformation &other); //!< Constructs a deformation \a cloning other's skeletons
+  public:
+	PlasticSkeletonDeformation(); //!< Constructs an empty deformation
+	PlasticSkeletonDeformation(const PlasticSkeletonDeformation &other); //!< Constructs a
+																		 //!deformation \a cloning
+																		 //!other's skeletons
 	~PlasticSkeletonDeformation();
 
 	PlasticSkeletonDeformation &operator=(const PlasticSkeletonDeformation &other);
@@ -172,26 +174,31 @@ public:
 	//! Returns the ordered range containing the skeleton ids
 	void skeletonIds(skelId_iterator &begin, skelId_iterator &end) const;
 
-	TDoubleParamP skeletonIdsParam() const; //!< Returns the skeleton id by frame animatable parameter
+	TDoubleParamP
+	skeletonIdsParam() const; //!< Returns the skeleton id by frame animatable parameter
 
-	PlasticSkeletonP skeleton(double frame) const; //!< Returns the \a active skeleton by xsheet frame
-	int skeletonId(double frame) const;			   //!< Returns the \a active skeleton id by xsheet frame
+	PlasticSkeletonP
+	skeleton(double frame) const;		//!< Returns the \a active skeleton by xsheet frame
+	int skeletonId(double frame) const; //!< Returns the \a active skeleton id by xsheet frame
 
 	// Vertex deformations-related methods
 
 	int vertexDeformationsCount() const;
 
-	SkVD *vertexDeformation(const QString &vertexName) const; //!< Returns the vertex deformation associated to given
-															  //!< vertex name. The returned pointer is <I> owned by
-															  //!< the deformation - it must \b not be deleted <\I>
+	SkVD *vertexDeformation(
+		const QString &vertexName) const; //!< Returns the vertex deformation associated to given
+										  //!< vertex name. The returned pointer is <I> owned by
+										  //!< the deformation - it must \b not be deleted <\I>
 	SkVD *vertexDeformation(int skelId, int v) const;
 
-	void vertexDeformations(vd_iterator &begin, vd_iterator &end) const; //!< Returns the ordered range of vertex deformations
+	void vertexDeformations(vd_iterator &begin, vd_iterator &end)
+		const; //!< Returns the ordered range of vertex deformations
 
-	void vdSkeletonVertices(const QString &vertexName,
-							vx_iterator &begin, vx_iterator &end) const; //!< Returns the ordered range of skeleton vertices
-																		 //!< (at max one per skeleton id) associated to a
-																		 //!< vertex name
+	void
+	vdSkeletonVertices(const QString &vertexName, vx_iterator &begin,
+					   vx_iterator &end) const; //!< Returns the ordered range of skeleton vertices
+												//!< (at max one per skeleton id) associated to a
+												//!< vertex name
 	// Hook number-related methods
 
 	int hookNumber(const QString &name) const;
@@ -209,18 +216,20 @@ public:
 
 	// Keyframes-related methods
 
-	void getKeyframeAt(double frame, SkDKey &keysMap) const; //!< \note keysMap returned by argument to avoid map
-															 //!< copies in case move semantics is not available
+	void getKeyframeAt(double frame,
+					   SkDKey &keysMap) const; //!< \note keysMap returned by argument to avoid map
+											   //!< copies in case move semantics is not available
 	void setKeyframe(double frame);
 	bool setKeyframe(const SkDKey &keyframe);
-	bool setKeyframe(const SkDKey &keyframe, double frame,
-					 double easeIn = -1.0, double easeOut = -1.0);
+	bool setKeyframe(const SkDKey &keyframe, double frame, double easeIn = -1.0,
+					 double easeOut = -1.0);
 
 	bool isKeyframe(double frame) const;
 	bool isFullKeyframe(double frame) const;
 	void deleteKeyframe(double frame);
 
-	// Interface methods using a deformed copy of the original skeleton (which is owned by this class)
+	// Interface methods using a deformed copy of the original skeleton (which is owned by this
+	// class)
 
 	void storeDeformedSkeleton(int skeletonId, double frame, PlasticSkeleton &skeleton) const;
 
@@ -229,22 +238,27 @@ public:
 	void updateAngle(const PlasticSkeleton &originalSkeleton, PlasticSkeleton &deformedSkeleton,
 					 double frame, int v, const TPointD &pos);
 
-protected:
+  protected:
 	void saveData(TOStream &os);
 	void loadData(TIStream &is);
 
-private:
+  private:
 	friend class PlasticSkeleton;
 
-	void addVertex(PlasticSkeleton *sk, int v);	//!< Deals with vertex deformations when v has been added
-	void insertVertex(PlasticSkeleton *sk, int v); //!< Deals with vertex deformations when v has been inserted in an edge
-	void deleteVertex(PlasticSkeleton *sk, int v); //!< Removes vertex deformation for v, \a before it is deleted
+	void addVertex(PlasticSkeleton *sk,
+				   int v); //!< Deals with vertex deformations when v has been added
+	void
+	insertVertex(PlasticSkeleton *sk,
+				 int v); //!< Deals with vertex deformations when v has been inserted in an edge
+	void deleteVertex(PlasticSkeleton *sk,
+					  int v); //!< Removes vertex deformation for v, \a before it is deleted
 	void vertexNameChange(PlasticSkeleton *sk, int v,
 						  const QString &newName); //!< Rebinds a vertex deformation name
 	void clear(PlasticSkeleton *sk);			   //!< Clears all vertex deformations
 
-	void loadData_prerelease(TIStream &is); // Toonz 7.0 pre-release loading function. Will be deleted
-											// in the next minor release.
+	void
+	loadData_prerelease(TIStream &is); // Toonz 7.0 pre-release loading function. Will be deleted
+									   // in the next minor release.
 };
 
 typedef PlasticSkeletonDeformation SkD;

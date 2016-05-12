@@ -30,7 +30,7 @@ class DVAPI TXsheetHandle : public QObject
 
 	TXsheet *m_xsheet;
 
-public:
+  public:
 	TXsheetHandle();
 	~TXsheetHandle();
 
@@ -40,10 +40,10 @@ public:
 	void notifyXsheetSwitched() { emit xsheetSwitched(); }
 	void notifyXsheetSoundChanged() { emit xsheetSoundChanged(); }
 
-signals:
+  signals:
 	void xsheetSwitched();
 	void xsheetChanged();
 	void xsheetSoundChanged();
 };
 
-#endif //TXSHEETHANDLE_H
+#endif // TXSHEETHANDLE_H

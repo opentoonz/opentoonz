@@ -24,11 +24,8 @@ void TDrawingView::notify(TXshSimpleLevel *, TFrameId id)
 {
 }
 
-TDrawingView::TDrawingView(
-	TXshSimpleLevel *level,
-	TFrameId fid,
-	const TDimension &size,
-	TDrawingViewObserver *o)
+TDrawingView::TDrawingView(TXshSimpleLevel *level, TFrameId fid, const TDimension &size,
+						   TDrawingViewObserver *o)
 	: m_size(size)
 {
 }
@@ -70,12 +67,11 @@ string TDrawingView::getDrawingId() const
 
 class TToolManager::Imp
 {
-public:
+  public:
 	Imp() {}
 };
 
-TToolManager::TToolManager()
-	: m_imp(new Imp())
+TToolManager::TToolManager() : m_imp(new Imp())
 {
 }
 
@@ -120,8 +116,7 @@ void TSelection::setCurrent(TSelection *)
 // TFramesMovieInfo
 //---------------------------------------------------------
 
-TFramesMovieInfo::TFramesMovieInfo()
-	: m_type("tif"), m_options(0)
+TFramesMovieInfo::TFramesMovieInfo() : m_type("tif"), m_options(0)
 {
 }
 
@@ -157,7 +152,9 @@ TFlashMovieInfo *getScrMovieInfo(bool)
 // makeScreenSaver
 //---------------------------------------------------------
 
-void makeScreenSaver(TFilePath, TFilePath, string) {}
+void makeScreenSaver(TFilePath, TFilePath, string)
+{
+}
 
 //=========================================================
 // bigBoxSize[]
@@ -228,8 +225,7 @@ TSelection *TSelection::getCurrent()
 // XshPasteBuffer
 //---------------------------------------------------------
 
-XshPasteBuffer::XshPasteBuffer(int, int)
-	: m_columnCount(0), m_rowCount(0)
+XshPasteBuffer::XshPasteBuffer(int, int) : m_columnCount(0), m_rowCount(0)
 {
 }
 
@@ -251,8 +247,12 @@ LevelThumbnail::LevelThumbnail(const TDimension &d, TXshSimpleLevel *)
 }
 */
 
-void FxController::setCurrentFx(TFx *) {}
-FxController::FxController() {}
+void FxController::setCurrentFx(TFx *)
+{
+}
+FxController::FxController()
+{
+}
 FxController *FxController::instance()
 {
 	static FxController _instance;
@@ -260,7 +260,7 @@ FxController *FxController::instance()
 }
 
 #ifndef WIN32
-//to avoid twin dep
+// to avoid twin dep
 void postThreadMsg(TThread::Msg *)
 {
 	return;

@@ -22,14 +22,13 @@
 
 //===================================================================
 
-template <class T>
-class DVAPI TSpectrumT
+template <class T> class DVAPI TSpectrumT
 {
-public:
+  public:
 	typedef std::pair<double, T> ColorKey;
 	typedef ColorKey Key;
 
-private:
+  private:
 	typedef std::vector<ColorKey> KeyTable;
 	KeyTable m_keys, m_sortedKeys;
 	typedef std::pair<T, T> Pair; // premultiplied/not premultiplied
@@ -68,15 +67,15 @@ private:
 		}
 	}
 
-public:
-	TSpectrumT()
-		: m_keys(), m_sortedKeys(), m_samples() {}
+  public:
+	TSpectrumT() : m_keys(), m_sortedKeys(), m_samples() {}
 
 	TSpectrumT(const TSpectrumT<T> &s)
-		: m_keys(s.m_keys), m_sortedKeys(s.m_sortedKeys), m_samples(s.m_samples) {}
+		: m_keys(s.m_keys), m_sortedKeys(s.m_sortedKeys), m_samples(s.m_samples)
+	{
+	}
 
-	TSpectrumT(int keyCount, ColorKey keys[], int sampleCount = 100)
-		: m_keys(keys, keys + keyCount)
+	TSpectrumT(int keyCount, ColorKey keys[], int sampleCount = 100) : m_keys(keys, keys + keyCount)
 	{
 		m_samples.resize(sampleCount);
 		update();
@@ -84,8 +83,8 @@ public:
 
 	/*SpectrumT(std::map<double, T> &keys, int sampleCount=100)
   {
-    m_keys = keys;
-    updateTable(sampleCount);
+	m_keys = keys;
+	updateTable(sampleCount);
   }
 */
 
@@ -102,10 +101,7 @@ public:
 		if (m_keys.size() != s.m_keys.size())
 			return false;
 		typename KeyTable::const_iterator i0, i1;
-		for (i0 = m_keys.begin(),
-			i1 = s.m_keys.begin();
-			 i0 != m_keys.end();
-			 ++i0, ++i1) {
+		for (i0 = m_keys.begin(), i1 = s.m_keys.begin(); i0 != m_keys.end(); ++i0, ++i1) {
 			assert(i1 != s.m_keys.end());
 			if (i0->first != i1->first)
 				return false;
@@ -115,10 +111,7 @@ public:
 		return true;
 	}
 
-	bool operator!=(const TSpectrumT<T> &s) const
-	{
-		return !operator==(s);
-	}
+	bool operator!=(const TSpectrumT<T> &s) const { return !operator==(s); }
 
 	T getValue(double s) const // non premoltiplicati
 	{
@@ -158,10 +151,7 @@ public:
 		return blend<T>(a, b, s);
 	}
 
-	int getKeyCount() const
-	{
-		return m_keys.size();
-	}
+	int getKeyCount() const { return m_keys.size(); }
 
 	Key getKey(int index) const
 	{

@@ -21,7 +21,7 @@
 
 //========================================================================
 
-//Forward declarations
+// Forward declarations
 class TDockWidget;
 
 //========================================================================
@@ -38,12 +38,12 @@ for DockLayout.
 */
 class DVAPI TMainWindow : public QWidget
 {
-	Q_OBJECT //Just needed by qobject_cast, for now
+	Q_OBJECT // Just needed by qobject_cast, for now
 
 		DockLayout *m_layout;
 	QWidget *m_menu;
 
-public:
+  public:
 	TMainWindow(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 	virtual ~TMainWindow();
 
@@ -53,13 +53,13 @@ public:
 	void setMenuWidget(QWidget *menubar);
 	QWidget *menuWidget() const { return m_menu; }
 
-	//Style options
+	// Style options
 	void setDecoAllocator(DockDecoAllocator *allocator);
 	void setSeparatorsThickness(int thick);
 
 	DockLayout *dockLayout() const { return m_layout; }
 
-protected:
+  protected:
 	virtual void resizeEvent(QResizeEvent *event);
 };
 
@@ -78,14 +78,14 @@ content widget.
 */
 class DVAPI TDockWidget : public DockWidget
 {
-	Q_OBJECT //Needed by qobject_cast
+	Q_OBJECT // Needed by qobject_cast
 
 		QWidget *m_titlebar;
 	QWidget *m_widget;
 
 	int m_margin;
 
-public:
+  public:
 	TDockWidget(const QString &title, QWidget *parent = 0, Qt::WindowFlags flags = 0);
 	TDockWidget(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 	~TDockWidget() {}
@@ -101,12 +101,11 @@ public:
 	void setFloating(bool status = true);
 	void setMaximized(bool status = true);
 
-	enum Orientation { horizontal = 0,
-					   vertical = 1 };
+	enum Orientation { horizontal = 0, vertical = 1 };
 	void setOrientation(bool direction = vertical);
 	bool getOrientation() const;
 
-private:
+  private:
 	QSize getDockedMinimumSize();
 	QSize getDockedMaximumSize();
 	void setFloatingAppearance();
@@ -120,4 +119,4 @@ private:
 	void windowTitleEvent(QEvent *e);
 };
 
-#endif //TDOCKWINDOWS_H
+#endif // TDOCKWINDOWS_H

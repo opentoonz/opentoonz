@@ -14,10 +14,7 @@ typedef long psdByte;
 typedef unsigned short psdUint16;
 typedef long psdPixel;
 
-enum { RAWDATA,
-	   RLECOMP,
-	   ZIPWITHOUTPREDICTION,
-	   ZIPWITHPREDICTION };
+enum { RAWDATA, RLECOMP, ZIPWITHOUTPREDICTION, ZIPWITHPREDICTION };
 
 struct TPSDChannelInfo {
 	int id;						   // channel id
@@ -32,10 +29,7 @@ struct TPSDChannelInfo {
 
 int unpackrow(unsigned char *out, unsigned char *in, psdPixel outlen, psdPixel inlen);
 
-void readrow(FILE *psd,
-			 TPSDChannelInfo *chan,
-			 psdPixel rowIndex,
-			 unsigned char *inbuffer,
+void readrow(FILE *psd, TPSDChannelInfo *chan, psdPixel rowIndex, unsigned char *inbuffer,
 			 unsigned char *outbuffer);
 
 void skipBlock(FILE *f);
@@ -45,8 +39,7 @@ unsigned read2UBytes(FILE *f);
 int read2Bytes(FILE *f);
 long read4Bytes(FILE *f);
 
-int psdUnzipWithoutPrediction(unsigned char *src_buf, int src_len,
-							  unsigned char *dst_buf, int dst_len);
-int psdUnzipWithPrediction(unsigned char *src_buf, int src_len,
-						   unsigned char *dst_buf, int dst_len,
+int psdUnzipWithoutPrediction(unsigned char *src_buf, int src_len, unsigned char *dst_buf,
+							  int dst_len);
+int psdUnzipWithPrediction(unsigned char *src_buf, int src_len, unsigned char *dst_buf, int dst_len,
 						   int row_size, int color_depth);

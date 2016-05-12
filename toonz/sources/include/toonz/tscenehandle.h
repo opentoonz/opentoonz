@@ -32,7 +32,7 @@ class DVAPI TSceneHandle : public QObject
 	ToonzScene *m_scene;
 	bool m_dirtyFlag;
 
-public:
+  public:
 	TSceneHandle();
 	~TSceneHandle();
 
@@ -65,7 +65,7 @@ public:
 	}
 	bool getDirtyFlag() const { return m_dirtyFlag; }
 
-public slots:
+  public slots:
 	void setDirtyFlag()
 	{
 		if (m_dirtyFlag == true)
@@ -74,7 +74,7 @@ public slots:
 		emit nameSceneChanged();
 	}
 
-signals:
+  signals:
 	void sceneSwitched();
 	void sceneChanged();
 	void castChanged();
@@ -83,4 +83,4 @@ signals:
 	void preferenceChanged();
 };
 
-#endif //TSCENEHANDLE_H
+#endif // TSCENEHANDLE_H

@@ -26,16 +26,16 @@ class DVAPI InfoViewer : public DVGui::Dialog
 	std::unique_ptr<InfoViewerImp> m_imp;
 	QWidget *m_parent;
 
-public:
+  public:
 	InfoViewer(QWidget *parent = 0);
 	~InfoViewer();
 
-protected:
+  protected:
 	void hideEvent(QHideEvent *);
 	void showEvent(QShowEvent *);
-protected slots:
+  protected slots:
 	void onSliderChanged(bool);
-public slots:
+  public slots:
 	void setItem(const TLevelP &level, TPalette *palette, const TFilePath &path);
 };
 

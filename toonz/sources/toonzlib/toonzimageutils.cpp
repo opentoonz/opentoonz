@@ -26,8 +26,8 @@ const int BackgroundStyle = 0;
 
 //-------------------------------------------------------------------
 
-TRect rasterizeStroke(TOfflineGL *&gl, const TRect &rasBounds, TStroke *stroke,
-					  TPalette *palette, const TRectD &clip, bool doAntialias)
+TRect rasterizeStroke(TOfflineGL *&gl, const TRect &rasBounds, TStroke *stroke, TPalette *palette,
+					  const TRectD &clip, bool doAntialias)
 {
 	TRectD bbox = clip * stroke->getBBox();
 	TRect rect = convert(bbox).enlarge(1) * rasBounds;
@@ -56,7 +56,8 @@ TRect rasterizeStroke(TOfflineGL *&gl, const TRect &rasBounds, TStroke *stroke,
 
 //-------------------------------------------------------------------
 
-TRect rasterizeStroke(TOfflineGL *&gl, TRect rasBounds, TStroke *stroke, TRectD clip, bool filled = false)
+TRect rasterizeStroke(TOfflineGL *&gl, TRect rasBounds, TStroke *stroke, TRectD clip,
+					  bool filled = false)
 {
 	TDimension d = rasBounds.getSize();
 
@@ -136,8 +137,8 @@ TRect rasterizeRegion(TOfflineGL *&gl, TRect rasBounds, TRegion *region, TRectD 
 
 //-------------------------------------------------------------------
 
-void fastAddPaintRegion(const TToonzImageP &ti, TRegion *region,
-						int newPaintId, int maxStyleId, TRectD clip = TRectD())
+void fastAddPaintRegion(const TToonzImageP &ti, TRegion *region, int newPaintId, int maxStyleId,
+						TRectD clip = TRectD())
 {
 	TRasterCM32P ras = ti->getRaster();
 	TOfflineGL *gl;
@@ -203,17 +204,19 @@ TRectD ToonzImageUtils::convertRasterToWorld(const TRect area, const TToonzImage
 
 //-------------------------------------------------------------------
 
-//clip in coordinate world (cioe' della stroke)
+// clip in coordinate world (cioe' della stroke)
 
-//overlaying inks, blend inks always "lose" on normal inks
+// overlaying inks, blend inks always "lose" on normal inks
 
 TRect fastAddInkStroke(const TToonzImageP &ti, TStroke *stroke, int inkId, bool selective,
-					   bool filled, TRectD clip, bool doAntialiasing = true, const set<int> &blendInks = set<int>())
+					   bool filled, TRectD clip, bool doAntialiasing = true,
+					   const set<int> &blendInks = set<int>())
 {
 	TRasterCM32P ras = ti->getRaster();
 	TOfflineGL *gl = 0;
 
-	TRect rectRender = rasterizeStroke(gl, ras->getBounds(), stroke, ti->getPalette(), clip, doAntialiasing);
+	TRect rectRender =
+		rasterizeStroke(gl, ras->getBounds(), stroke, ti->getPalette(), clip, doAntialiasing);
 	if (!gl)
 		return TRect();
 
@@ -233,7 +236,7 @@ TRect fastAddInkStroke(const TToonzImageP &ti, TStroke *stroke, int inkId, bool 
 			int dnTone = outPix->getTone();
 
 			if (doAntialiasing) {
-				//overlaying inks, blend inks always "lose" on normal inks
+				// overlaying inks, blend inks always "lose" on normal inks
 
 				bool isBlendInkDn = (blendInks.find(outPix->getInk()) != blendInks.end());
 
@@ -245,17 +248,16 @@ TRect fastAddInkStroke(const TToonzImageP &ti, TStroke *stroke, int inkId, bool 
 					continue;
 				}
 
-				//The upper pixel replaces the lower one, *if*
+				// The upper pixel replaces the lower one, *if*
 				//  a) It's more opaque
 				//  b) If the ink id id not the same, ink is not completely transparent
 				//  c)  ...
-				if ((upTone <= dnTone) &&
-					((outPix->getInk() == inkId) || (upTone != 255)) &&
+				if ((upTone <= dnTone) && ((outPix->getInk() == inkId) || (upTone != 255)) &&
 					(!selective || !outPix->isPureInk()))
 					*outPix = TPixelCM32(inkId, outPix->getPaint(), upTone);
 			} else {
 				if (!selective || !outPix->isPureInk()) {
-					//if(upTone<=192 && upTone<=dnTone)
+					// if(upTone<=192 && upTone<=dnTone)
 					if (upTone == 0)
 						*outPix = TPixelCM32(inkId, outPix->getPaint(), 0);
 				}
@@ -269,9 +271,9 @@ TRect fastAddInkStroke(const TToonzImageP &ti, TStroke *stroke, int inkId, bool 
 	return rectRender;
 }
 
-//clip in coordinate world (cioe' della stroke)
-TRect ToonzImageUtils::addInkStroke(const TToonzImageP &ti, TStroke *stroke, int inkId, bool selective,
-									bool filled, TRectD clip, bool doAntialiasing)
+// clip in coordinate world (cioe' della stroke)
+TRect ToonzImageUtils::addInkStroke(const TToonzImageP &ti, TStroke *stroke, int inkId,
+									bool selective, bool filled, TRectD clip, bool doAntialiasing)
 {
 	TStroke *s = new TStroke(*stroke);
 	TPoint tiCenter = ti->getRaster()->getCenter();
@@ -283,7 +285,8 @@ TRect ToonzImageUtils::addInkStroke(const TToonzImageP &ti, TStroke *stroke, int
 
 //-------------------------------------------------------------------
 
-TRect ToonzImageUtils::changeColorStroke(const TToonzImageP &ti, const ChangeColorStrokeSettings &settings)
+TRect ToonzImageUtils::changeColorStroke(const TToonzImageP &ti,
+										 const ChangeColorStrokeSettings &settings)
 {
 	if (!settings.changeInk && !settings.changePaint)
 		return TRect();
@@ -318,7 +321,8 @@ TRect ToonzImageUtils::changeColorStroke(const TToonzImageP &ti, const ChangeCol
 
 //-------------------------------------------------------------------
 
-TRect ToonzImageUtils::eraseRect(const TToonzImageP &ti, const TRectD &area, int maskId, bool onInk, bool onPaint)
+TRect ToonzImageUtils::eraseRect(const TToonzImageP &ti, const TRectD &area, int maskId, bool onInk,
+								 bool onPaint)
 {
 	assert(onInk || onPaint);
 	TRasterCM32P ras = ti->getRaster();
@@ -348,7 +352,7 @@ std::vector<TRect> ToonzImageUtils::paste(const TToonzImageP &ti, const TTileSet
 {
 	std::vector<TRect> rects;
 	TRasterCM32P raster = ti->getRaster();
-	//for(int i=0;i<tileSet->getTileCount();i++)
+	// for(int i=0;i<tileSet->getTileCount();i++)
 	for (int i = tileSet->getTileCount() - 1; i >= 0; i--) {
 		const TTileSetCM32::Tile *tile = tileSet->getTile(i);
 		TRasterCM32P rasCM32;
@@ -365,35 +369,36 @@ std::vector<TRect> ToonzImageUtils::paste(const TToonzImageP &ti, const TTileSet
 // DA RIFARE
 // e' lenta da far schifo
 
-//!Converts a TVectorImage into a TToonzImage. The input vector image
-//!is transformed through the passed affine \b aff, and put into a
-//!TToonzImage strictly covering the bounding box of the transformed
-//!vector image. The output image has its lower-left position in the
-//!world reference specified by the \b pos parameter, which is granted to
-//!be an integer displacement of the passed value. Additional parameters
-//!include an integer \b enlarge by which the output image is enlarged with
-//!respect to the transformed image's bbox, and the bool \b transformThickness
-//!to specify whether the transformation should involve strokes' thickensses
-//!or not.
-TToonzImageP ToonzImageUtils::vectorToToonzImage(
-	const TVectorImageP &vimage, const TAffine &aff, TPalette *palette,
-	const TPointD &outputPos, const TDimension &outputSize,
-	const std::vector<TRasterFxRenderDataP> *fxs, bool transformThickness)
+//! Converts a TVectorImage into a TToonzImage. The input vector image
+//! is transformed through the passed affine \b aff, and put into a
+//! TToonzImage strictly covering the bounding box of the transformed
+//! vector image. The output image has its lower-left position in the
+//! world reference specified by the \b pos parameter, which is granted to
+//! be an integer displacement of the passed value. Additional parameters
+//! include an integer \b enlarge by which the output image is enlarged with
+//! respect to the transformed image's bbox, and the bool \b transformThickness
+//! to specify whether the transformation should involve strokes' thickensses
+//! or not.
+TToonzImageP ToonzImageUtils::vectorToToonzImage(const TVectorImageP &vimage, const TAffine &aff,
+												 TPalette *palette, const TPointD &outputPos,
+												 const TDimension &outputSize,
+												 const std::vector<TRasterFxRenderDataP> *fxs,
+												 bool transformThickness)
 {
 	if (!vimage || !palette)
 		return 0;
 
-	//Transform the vector image through aff
+	// Transform the vector image through aff
 	TVectorImageP vi = vimage->clone();
 	vi->transform(aff, transformThickness);
 
-	//Allocate the output ToonzImage
+	// Allocate the output ToonzImage
 	TRasterCM32P raster(outputSize.lx, outputSize.ly);
 	raster->clear();
 	TToonzImageP ti(raster, raster->getBounds());
 	ti->setPalette(palette->clone());
 
-	//Shift outputPos to the origin
+	// Shift outputPos to the origin
 	vi->transform(TTranslation(-outputPos));
 
 	int strokeCount = vi->getStrokeCount();
@@ -409,13 +414,14 @@ TToonzImageP ToonzImageUtils::vectorToToonzImage(
 	vi->notifyChangedStrokes(strokeIndex, strokes);
 	int regionCount = vi->getRegionCount();
 
-	//In such reference, the clip for rendering strokes is the output size
+	// In such reference, the clip for rendering strokes is the output size
 	TRectD clip(TDimensionD(outputSize.lx, outputSize.ly));
 
 	set<int> colors;
 	if (fxs) {
 		for (i = 0; i < (int)fxs->size(); i++) {
-			SandorFxRenderData *sandorData = dynamic_cast<SandorFxRenderData *>((*fxs)[i].getPointer());
+			SandorFxRenderData *sandorData =
+				dynamic_cast<SandorFxRenderData *>((*fxs)[i].getPointer());
 			if (sandorData && sandorData->m_type == BlendTz) {
 				std::string indexes = toString(sandorData->m_blendParams.m_colorIndex);
 				std::vector<std::string> items;
@@ -429,18 +435,18 @@ TToonzImageP ToonzImageUtils::vectorToToonzImage(
 
 	int k, l;
 	for (i = 0; i < strokeCount;) {
-		//Draw all regions which have the same group.
+		// Draw all regions which have the same group.
 		for (k = 0; k < regionCount; ++k)
 			if (vi->areDifferentGroup(i, false, k, true) == -1) {
 				TRegion *region = vi->getRegion(k);
 				fastAddPaintRegion(ti, region, tmin(maxStyleId, region->getStyle()), maxStyleId);
 			}
 
-		//Find the first stroke which does not belong to the group
+		// Find the first stroke which does not belong to the group
 		for (k = i; k < strokeCount && vi->areDifferentGroup(i, false, k, false) == -1; ++k)
 			;
 
-		//Draw all found strokes
+		// Draw all found strokes
 		for (l = i; l < k; ++l) {
 			TStroke *stroke = vi->getStroke(l);
 
@@ -460,7 +466,8 @@ TToonzImageP ToonzImageUtils::vectorToToonzImage(
 				}
 			}
 			if (visible)
-				fastAddInkStroke(ti, stroke, tmin(maxStyleId, stroke->getStyle()), false, false, clip, true, colors);
+				fastAddInkStroke(ti, stroke, tmin(maxStyleId, stroke->getStyle()), false, false,
+								 clip, true, colors);
 		}
 		i = k;
 	}
@@ -506,7 +513,7 @@ TPalette *ToonzImageUtils::loadTzPalette(const TFilePath &pltFile)
 		}
 		if (x < count)
 			palette->setStyle(x, style);
-		//palette->setStyle(x, pixelRow[x]);
+		// palette->setStyle(x, pixelRow[x]);
 		else
 			palette->addStyle(style);
 	}
@@ -622,7 +629,8 @@ void ToonzImageUtils::scrambleStyles(const TToonzImageP &ti, std::map<int, int> 
 bool ToonzImageUtils::convertToTlv(const TFilePath &levelPathIn)
 {
 	try {
-		TFilePath levelPathOut = levelPathIn.getParentDir() + TFilePath(levelPathIn.getWideName() + L".tlv");
+		TFilePath levelPathOut =
+			levelPathIn.getParentDir() + TFilePath(levelPathIn.getWideName() + L".tlv");
 
 		TLevelReaderP lr(levelPathIn);
 		TLevelP level = lr->loadInfo();
@@ -651,8 +659,8 @@ bool ToonzImageUtils::convertToTlv(const TFilePath &levelPathIn)
 
 			} catch (...) {
 				return false;
-				//string msg="Frame "+toString(it->first.getNumber())+": conversion failed!";
-				//cout << msg << endl;
+				// string msg="Frame "+toString(it->first.getNumber())+": conversion failed!";
+				// cout << msg << endl;
 			}
 		}
 
@@ -666,7 +674,7 @@ bool ToonzImageUtils::convertToTlv(const TFilePath &levelPathIn)
 
 		lr = TLevelReaderP();
 		lw = TLevelWriterP();
-		//delete plt;
+		// delete plt;
 
 		return true;
 	} catch (...) {
@@ -679,20 +687,21 @@ bool ToonzImageUtils::convertToTlv(const TFilePath &levelPathIn)
 //----------------------------------------------------------------------------------
 
 void ToonzImageUtils::eraseImage(const TToonzImageP &ti, const TRaster32P &image, const TPoint &pos,
-								 bool invert, bool eraseInk, bool erasePaint, bool selective, int styleId)
+								 bool invert, bool eraseInk, bool erasePaint, bool selective,
+								 int styleId)
 {
 	TRect rasBounds = ti->getRaster()->getBounds();
 	TRect imageBounds = image->getBounds() + pos;
 
 	if (invert) {
 		/*----------------------------------------
-	  	┌───┬─┐
-	  	│③　　│②│
-	  	├─┬─┤　│
-	  	│④│★│　│
-	  	│　├─┴─┤
-	  	│　│①　　│
-	  	└─┴───┘
+		┌───┬─┐
+		│③　　│②│
+		├─┬─┤　│
+		│④│★│　│
+		│　├─┴─┤
+		│　│①　　│
+		└─┴───┘
 	   ★はFreeHandで囲んだ領域のバウンディングボックス
 	   外側のワクはラスタ画像のフチ
 	  -----------------------------------------*/
@@ -737,10 +746,14 @@ void ToonzImageUtils::eraseImage(const TToonzImageP &ti, const TRaster32P &image
 			int paint, tone;
 			if (!invert) {
 				paint = inPix->m > 0 && erasePaint && canErasePaint ? 0 : outPix->getPaint();
-				tone = inPix->m > 0 && eraseInk && canEraseInk ? tmax(outPix->getTone(), (int)inPix->m) : outPix->getTone();
+				tone = inPix->m > 0 && eraseInk && canEraseInk
+						   ? tmax(outPix->getTone(), (int)inPix->m)
+						   : outPix->getTone();
 			} else {
 				paint = inPix->m < 255 && erasePaint && canErasePaint ? 0 : outPix->getPaint();
-				tone = inPix->m < 255 && eraseInk && canEraseInk ? tmax(outPix->getTone(), 255 - (int)inPix->m) : outPix->getTone();
+				tone = inPix->m < 255 && eraseInk && canEraseInk
+						   ? tmax(outPix->getTone(), 255 - (int)inPix->m)
+						   : outPix->getTone();
 			}
 			*outPix = TPixelCM32(outPix->getInk(), paint, tone);
 		}
@@ -769,84 +782,84 @@ if (type == TFileType::VECTOR_LEVEL || type == TFileType::VECTOR_IMAGE)
 if (type != TFileType::RASTER_LEVEL && type != TFileType::RASTER_IMAGE)
   return "Cannot premultiply the selected file.";
 
-try 
+try
   {
   TLevelReaderP lr = TLevelReaderP(levelPath);
-  if (!lr) return "";    
+  if (!lr) return "";
   TLevelP level =  lr->loadInfo();
   if(!level || level->getFrameCount()==0) return "";
   string format = levelPath.getType();
 
 
-  TPropertyGroup* prop = 
-    TApplication::instance()
-    ->getCurrentScene()
-    ->getProperties()
-    ->getOutputProperties()
-    ->getFileFormatProperties(format)
-    ->clone();
+  TPropertyGroup* prop =
+	TApplication::instance()
+	->getCurrentScene()
+	->getProperties()
+	->getOutputProperties()
+	->getFileFormatProperties(format)
+	->clone();
   assert(prop);
-  
+
   TEnumProperty *p = (TEnumProperty*)prop->getProperty("Bits Per Pixel");
-  int bpp = p?atoi((toString(p->getValue()).c_str())):32; 
+  int bpp = p?atoi((toString(p->getValue()).c_str())):32;
   if (bpp!=32 && bpp!=64) //non ha senso premoltiplicare senza il canale alpha...
-    {
-    if (bpp<32)
-      p->setValue(L"32(RGBM)");
-    else 
-      p->setValue(L"64(RGBM)");
-    }
-    
+	{
+	if (bpp<32)
+	  p->setValue(L"32(RGBM)");
+	else
+	  p->setValue(L"64(RGBM)");
+	}
+
   bool isMovie = (format=="mov" || format=="avi" || format=="3gp");
 
 
   TLevelWriterP lw;
   if (!isMovie)
-    {
-    lw = TLevelWriterP(levelPath, prop);
-    if (!lw) return "";
-    }
-  
+	{
+	lw = TLevelWriterP(levelPath, prop);
+	if (!lw) return "";
+	}
+
   int count = 0;
   TLevel::Iterator it = level->begin();
-  
+
   for (;it!=level->end(); ++it)
-    {  
-    TImageReaderP ir = lr->getFrameReader(it->first);
-    
-    TRasterImageP rimg = (TRasterImageP)ir->load();
-    if (!rimg)
-      continue;
-    
-    TRop::premultiply(rimg->getRaster());
-    ir = 0;
-    
-    if (isMovie)
-      level->setFrame(it->first, rimg);
-    else
-      {
-      TImageWriterP iw = lw->getFrameWriter(it->first);	 
-      iw->save(rimg);
-      iw = 0;
-      }
-    }
+	{
+	TImageReaderP ir = lr->getFrameReader(it->first);
+
+	TRasterImageP rimg = (TRasterImageP)ir->load();
+	if (!rimg)
+	  continue;
+
+	TRop::premultiply(rimg->getRaster());
+	ir = 0;
+
+	if (isMovie)
+	  level->setFrame(it->first, rimg);
+	else
+	  {
+	  TImageWriterP iw = lw->getFrameWriter(it->first);
+	  iw->save(rimg);
+	  iw = 0;
+	  }
+	}
 
   lr = TLevelReaderP();
-  
+
   if (isMovie)
-    {
-    TSystem::deleteFile(levelPath);
-    lw = TLevelWriterP(levelPath, prop);
-    if (!lw) return "";
-    lw->save(level);
-    }
+	{
+	TSystem::deleteFile(levelPath);
+	lw = TLevelWriterP(levelPath, prop);
+	if (!lw) return "";
+	lw->save(level);
+	}
   if (prop)
-    delete prop;
-  }catch(...) 
-    {
+	delete prop;
+  }catch(...)
+	{
 	return "Cannot premultiply the selected file.";
-    }  
-    */
+	}
+	*/
 
 	return "";
 }

@@ -12,8 +12,14 @@
 
 namespace
 {
-inline void pixelConvert(TPixel32 &dst, const TPixel32 &src) { dst = src; }
-inline void pixelConvert(TPixel64 &dst, const TPixel32 &src) { dst = toPixel64(src); }
+inline void pixelConvert(TPixel32 &dst, const TPixel32 &src)
+{
+	dst = src;
+}
+inline void pixelConvert(TPixel64 &dst, const TPixel32 &src)
+{
+	dst = toPixel64(src);
+}
 
 inline TRect gridAlign(const TRect &rect, TPoint origin, double step)
 {
@@ -51,28 +57,28 @@ inline TRectD gridAlign(const TRectD &rect, TPointD origin, double step)
 namespace mosaic
 {
 /*!
-    The mosaic::CellBuilder class is the virtual base class used by MosaicFx
-    to render a Mosaic cell with supplied colors.
+	The mosaic::CellBuilder class is the virtual base class used by MosaicFx
+	to render a Mosaic cell with supplied colors.
   */
-template <typename PIXEL>
-class CellBuilder
+template <typename PIXEL> class CellBuilder
 {
-protected:
+  protected:
 	int m_lx, m_ly;
 	double m_radius;
 	int m_wrap;
 
-public:
+  public:
 	CellBuilder(int cellLx, int cellLy, double radius, int wrap)
-		: m_lx(cellLx), m_ly(cellLy), m_radius(radius), m_wrap(wrap) {}
+		: m_lx(cellLx), m_ly(cellLy), m_radius(radius), m_wrap(wrap)
+	{
+	}
 	virtual ~CellBuilder() {}
 
-	virtual void doCell(
-		PIXEL *cellBuffer, const PIXEL &cellColor, const PIXEL &bgColor,
-		int x0, int y0, int x1, int y1) = 0;
+	virtual void doCell(PIXEL *cellBuffer, const PIXEL &cellColor, const PIXEL &bgColor, int x0,
+						int y0, int x1, int y1) = 0;
 };
 
-} //namespace mosaic
+} // namespace mosaic
 
 //****************************************************************************
 //    CellBuilder implementations
@@ -81,22 +87,22 @@ public:
 namespace mosaic
 {
 
-template <typename PIXEL, typename GRAY>
-class MaskCellBuilder : public CellBuilder<PIXEL>
+template <typename PIXEL, typename GRAY> class MaskCellBuilder : public CellBuilder<PIXEL>
 {
-protected:
+  protected:
 	TRasterPT<GRAY> m_mask;
 
-public:
+  public:
 	MaskCellBuilder(int cellLx, int cellLy, double radius, int wrap)
-		: CellBuilder<PIXEL>(cellLx, cellLy, radius, wrap) {}
-
-	void doCell(
-		PIXEL *cellBuffer, const PIXEL &cellColor, const PIXEL &bgColor,
-		int x0, int y0, int x1, int y1)
+		: CellBuilder<PIXEL>(cellLx, cellLy, radius, wrap)
 	{
-		//Apply the mask to the cell. 0 pixels are bgColored, GRAY::maxChannelValue
-		//ones are cellColored.
+	}
+
+	void doCell(PIXEL *cellBuffer, const PIXEL &cellColor, const PIXEL &bgColor, int x0, int y0,
+				int x1, int y1)
+	{
+		// Apply the mask to the cell. 0 pixels are bgColored, GRAY::maxChannelValue
+		// ones are cellColored.
 		PIXEL *pix, *line = cellBuffer, *lineEnd;
 		GRAY *grPix, *grLine = m_mask->pixels(y0) + x0, *grLineEnd;
 		int x, y, grWrap = m_mask->getWrap(), lx = x1 - x0;
@@ -109,19 +115,18 @@ public:
 	}
 };
 
-template <typename PIXEL, typename GRAY>
-class SquareBuilder : public MaskCellBuilder<PIXEL, GRAY>
+template <typename PIXEL, typename GRAY> class SquareBuilder : public MaskCellBuilder<PIXEL, GRAY>
 {
-public:
+  public:
 	SquareBuilder(int cellLx, int cellLy, double radius, int wrap)
 		: MaskCellBuilder<PIXEL, GRAY>(cellLx, cellLy, radius, wrap)
 	{
-		//Build the mask corresponding to a square of passed radius
+		// Build the mask corresponding to a square of passed radius
 		GRAY *pix, *pixRev, *line, *lineEnd, *lineRev;
 		this->m_mask = TRasterPT<GRAY>(cellLx, cellLy);
 
-		//For each pixel in the lower-left quadrant, fill in the corresponding mask value.
-		//The other ones are filled by mirroring.
+		// For each pixel in the lower-left quadrant, fill in the corresponding mask value.
+		// The other ones are filled by mirroring.
 		int i, j;
 		double lxHalf = 0.5 * cellLx, lyHalf = 0.5 * cellLy;
 		int lxHalfI = tceil(lxHalf), lyHalfI = tceil(lyHalf);
@@ -140,19 +145,18 @@ public:
 	}
 };
 
-template <typename PIXEL, typename GRAY>
-class CircleBuilder : public MaskCellBuilder<PIXEL, GRAY>
+template <typename PIXEL, typename GRAY> class CircleBuilder : public MaskCellBuilder<PIXEL, GRAY>
 {
-public:
+  public:
 	CircleBuilder(int cellLx, int cellLy, double radius, int wrap)
 		: MaskCellBuilder<PIXEL, GRAY>(cellLx, cellLy, radius, wrap)
 	{
-		//Build the mask corresponding to a square of passed radius
+		// Build the mask corresponding to a square of passed radius
 		GRAY *pix, *pixRev, *line, *lineEnd, *lineRev;
 		this->m_mask = TRasterPT<GRAY>(cellLx, cellLy);
 
-		//For each pixel in the lower-left quadrant, fill in the corresponding mask value.
-		//The other ones are filled by mirroring.
+		// For each pixel in the lower-left quadrant, fill in the corresponding mask value.
+		// The other ones are filled by mirroring.
 		int i, j;
 		double lxHalf = 0.5 * cellLx, lyHalf = 0.5 * cellLy;
 		int lxHalfI = tceil(lxHalf), lyHalfI = tceil(lyHalf);
@@ -171,7 +175,7 @@ public:
 	}
 };
 
-} //namespace mosaic
+} // namespace mosaic
 
 //****************************************************************************
 //    Mosaic Fx
@@ -187,9 +191,10 @@ class MosaicFx : public TStandardRasterFx
 	TPixelParamP m_bgcolor;
 	TIntEnumParamP m_shape;
 
-public:
+  public:
 	MosaicFx()
-		: m_size(10.0), m_distance(10.0), m_bgcolor(TPixel32::Transparent), m_shape(new TIntEnumParam(0, "Square"))
+		: m_size(10.0), m_distance(10.0), m_bgcolor(TPixel32::Transparent),
+		  m_shape(new TIntEnumParam(0, "Square"))
 	{
 		m_size->setMeasureName("fxLength");
 		m_distance->setMeasureName("fxLength");
@@ -213,7 +218,7 @@ public:
 
 	bool canHandle(const TRenderSettings &info, double frame)
 	{
-		//We'll return the handled affine only through handledAffine().
+		// We'll return the handled affine only through handledAffine().
 		if ((m_size->getValue(frame) + m_distance->getValue(frame)) == 0.0)
 			return true;
 		return false;
@@ -221,14 +226,14 @@ public:
 
 	TAffine handledAffine(const TRenderSettings &info, double frame)
 	{
-		//Return the default implementation: only the scale part of the affine
-		//can be handled. Rotations and other distortions would need us have to
-		//implement diagonal grid lines - and we don't want to!
-		//Also, no translational component will be dealt for the same reason.
+		// Return the default implementation: only the scale part of the affine
+		// can be handled. Rotations and other distortions would need us have to
+		// implement diagonal grid lines - and we don't want to!
+		// Also, no translational component will be dealt for the same reason.
 		TAffine scalePart(TRasterFx::handledAffine(info, frame));
 
-		//Plus, we want to avoid dealing with antialiases even on plain orthogonal
-		//lines! So, we ensure that the step size will be flattened to integer.
+		// Plus, we want to avoid dealing with antialiases even on plain orthogonal
+		// lines! So, we ensure that the step size will be flattened to integer.
 		double stepSize = m_size->getValue(frame) + m_distance->getValue(frame);
 		double scale = tceil(stepSize * scalePart.a11) / stepSize;
 
@@ -242,8 +247,8 @@ template <typename PIXEL>
 void doMosaic(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> cellsRas, int step, const TPoint &pos,
 			  TPixel32 bgcolor, mosaic::CellBuilder<PIXEL> &cellBuilder)
 {
-	//Perform the mosaic's flattening operation on each grid cell.
-	//Cells are identified directly as we traverse the raster.
+	// Perform the mosaic's flattening operation on each grid cell.
+	// Cells are identified directly as we traverse the raster.
 
 	int lx = ras->getLx(), ly = ras->getLy();
 	int wrap = ras->getWrap();
@@ -262,11 +267,11 @@ void doMosaic(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> cellsRas, int step, const T
 	PIXEL *cellsBuf = cellsRas->pixels(0);
 	for (cellY = 0; cellY < cellLy; ++cellY)
 		for (cellX = 0; cellX < cellLx; ++cellX) {
-			//Build the cell geometry
+			// Build the cell geometry
 			x0 = pos.x + cellX * step, y0 = pos.y + cellY * step;
 			x1 = x0 + step, y1 = y0 + step;
 
-			//Retrieve the cell buffer position and its eventual adjustment
+			// Retrieve the cell buffer position and its eventual adjustment
 			int u0 = tmax(x0, 0), v0 = tmax(y0, 0);
 			int u1 = tmin(x1, lx), v1 = tmin(y1, ly);
 
@@ -274,7 +279,7 @@ void doMosaic(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> cellsRas, int step, const T
 
 			u0 -= x0, v0 -= y0, u1 -= x0, v1 -= y0;
 
-			//Retrieve the cell color
+			// Retrieve the cell color
 			PIXEL *color = cellsBuf + cellX + cellY * cellWrap;
 
 			PIXEL cellBGColor = actualBgColor;
@@ -295,15 +300,15 @@ void doMosaic(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> cellsRas, int step, const T
 
 bool MosaicFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 {
-	//Remember: info.m_affine MUST NOT BE CONSIDERED in doGetBBox's implementation
+	// Remember: info.m_affine MUST NOT BE CONSIDERED in doGetBBox's implementation
 
-	//Retrieve the input bbox without applied affines.
+	// Retrieve the input bbox without applied affines.
 
 	if (!(m_input.getFx() && m_input->doGetBBox(frame, bBox, info)))
 		return false;
 
-	//Now, the grid has a given step size; the fx result is almost the same,
-	//except that it must be ceiled to the grid step.
+	// Now, the grid has a given step size; the fx result is almost the same,
+	// except that it must be ceiled to the grid step.
 	double step = m_size->getValue(frame) + m_distance->getValue(frame);
 	if (!step)
 		return true;
@@ -319,7 +324,7 @@ void MosaicFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings &r
 	if (!m_input.isConnected())
 		return;
 
-	double scale = ri.m_affine.a11; //Legitimate due to handledAffine's implementation
+	double scale = ri.m_affine.a11; // Legitimate due to handledAffine's implementation
 
 	double stepD = (m_size->getValue(frame) + m_distance->getValue(frame)) * scale;
 	int step = tround(stepD);
@@ -331,12 +336,15 @@ void MosaicFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings &r
 
 	TRectD tileBoxD(::gridAlign(rect * bboxD, TPointD(), stepD));
 
-	TRectD srcRectD(
-		tround(tileBoxD.x0 / stepD), tround(tileBoxD.y0 / stepD),
-		tround(tileBoxD.x1 / stepD), tround(tileBoxD.y1 / stepD));
+	TRectD srcRectD(tround(tileBoxD.x0 / stepD), tround(tileBoxD.y0 / stepD),
+					tround(tileBoxD.x1 / stepD), tround(tileBoxD.y1 / stepD));
 
 	int enlargement =
-		(ri.m_quality == TRenderSettings::StandardResampleQuality) ? 1.0 : (ri.m_quality == TRenderSettings::ImprovedResampleQuality) ? 2.0 : (ri.m_quality == TRenderSettings::HighResampleQuality) ? 3.0 : 0.0;
+		(ri.m_quality == TRenderSettings::StandardResampleQuality)
+			? 1.0
+			: (ri.m_quality == TRenderSettings::ImprovedResampleQuality)
+				  ? 2.0
+				  : (ri.m_quality == TRenderSettings::HighResampleQuality) ? 3.0 : 0.0;
 
 	srcRectD = srcRectD.enlarge(enlargement);
 
@@ -353,15 +361,15 @@ void MosaicFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 	if (!m_input.isConnected())
 		return;
 
-	//ri's affine is the one that has already been carried due to upstream geom fxs.
-	//It is handled; so, we can transfer geometrical data directly.
+	// ri's affine is the one that has already been carried due to upstream geom fxs.
+	// It is handled; so, we can transfer geometrical data directly.
 
-	double scale = ri.m_affine.a11; //Legitimate due to handledAffine's implementation
+	double scale = ri.m_affine.a11; // Legitimate due to handledAffine's implementation
 
 	double stepD = (m_size->getValue(frame) + m_distance->getValue(frame)) * scale;
 	int step = stepD = tround(stepD);
 	if (step <= 0) {
-		//No blur will be done. The underlying fx may pass by.
+		// No blur will be done. The underlying fx may pass by.
 		m_input->compute(tile, frame, ri);
 		return;
 	}
@@ -370,31 +378,33 @@ void MosaicFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 
 	TPixel32 bgcolor = m_bgcolor->getPremultipliedValue(frame);
 
-	//Build the tile rect.
+	// Build the tile rect.
 	TDimension tileSize(tile.getRaster()->getSize());
 	TRectD tileRectD(tile.m_pos, TDimensionD(tileSize.lx, tileSize.ly));
 
-	//Observe that TRasterFx's documentation ensures
-	//that passed tile's position is always integer, even if it's double-defined.
+	// Observe that TRasterFx's documentation ensures
+	// that passed tile's position is always integer, even if it's double-defined.
 
-	//Retrieve the input bbox
+	// Retrieve the input bbox
 	TRectD bboxD;
 	m_input->getBBox(frame, bboxD, ri);
 
-	//Build the grid geometry. We require that the source tile is enlarged to cover
-	//a full grid step.
+	// Build the grid geometry. We require that the source tile is enlarged to cover
+	// a full grid step.
 	TRectD tileBoxD(::gridAlign(tileRectD * bboxD, TPointD(), stepD));
 
-	//Now, we'll extract cell colors by computing tileBox with a res-reducing affine.
-	//So, the source tile will be
-	TRect srcRect(
-		tround(tileBoxD.x0 / stepD), tround(tileBoxD.y0 / stepD),
-		tround(tileBoxD.x1 / stepD) - 1, tround(tileBoxD.y1 / stepD) - 1);
+	// Now, we'll extract cell colors by computing tileBox with a res-reducing affine.
+	// So, the source tile will be
+	TRect srcRect(tround(tileBoxD.x0 / stepD), tround(tileBoxD.y0 / stepD),
+				  tround(tileBoxD.x1 / stepD) - 1, tround(tileBoxD.y1 / stepD) - 1);
 
-	//The calculated source rect must be enlarged by a small amount, since the
-	//resample algrotihms add some transparency to the edges.
-	int enlargement =
-		(ri.m_quality == TRenderSettings::StandardResampleQuality) ? 1 : (ri.m_quality == TRenderSettings::ImprovedResampleQuality) ? 2 : (ri.m_quality == TRenderSettings::HighResampleQuality) ? 3 : 0;
+	// The calculated source rect must be enlarged by a small amount, since the
+	// resample algrotihms add some transparency to the edges.
+	int enlargement = (ri.m_quality == TRenderSettings::StandardResampleQuality)
+						  ? 1
+						  : (ri.m_quality == TRenderSettings::ImprovedResampleQuality)
+								? 2
+								: (ri.m_quality == TRenderSettings::HighResampleQuality) ? 3 : 0;
 	assert(enlargement > 0);
 
 	srcRect = srcRect.enlarge(enlargement);
@@ -402,31 +412,40 @@ void MosaicFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 	TRenderSettings riLow(ri);
 	riLow.m_affine = TScale(1.0 / stepD) * ri.m_affine;
 
-	//Compute the input tile.
+	// Compute the input tile.
 	TRasterP srcRas(tile.getRaster()->create(srcRect.getLx(), srcRect.getLy()));
 	TTile inTile(srcRas, TPointD(srcRect.x0, srcRect.y0));
 
 	m_input->compute(inTile, frame, riLow);
 
-	//Eliminate the enlargement performed above
-	TRect r(enlargement, enlargement, srcRas->getLx() - 1 - enlargement, srcRas->getLy() - 1 - enlargement);
+	// Eliminate the enlargement performed above
+	TRect r(enlargement, enlargement, srcRas->getLx() - 1 - enlargement,
+			srcRas->getLy() - 1 - enlargement);
 	srcRas = srcRas->extract(r);
 
-	//Now, discriminate the tile's pixel size
+	// Now, discriminate the tile's pixel size
 	TRaster32P srcRas32(srcRas);
 	TRaster64P srcRas64(srcRas);
 
 	TPoint pos(tround(tileBoxD.x0 - tileRectD.x0), tround(tileBoxD.y0 - tileRectD.y0));
 	if (srcRas32) {
 		typedef mosaic::CellBuilder<TPixel32> cb;
-		cb *cellsBuilder = (m_shape->getValue() == 0) ? (cb *)new mosaic::SquareBuilder<TPixel32, TPixelGR8>(step, step, radius, tile.getRaster()->getWrap()) : (cb *)new mosaic::CircleBuilder<TPixel32, TPixelGR8>(step, step, radius, tile.getRaster()->getWrap());
+		cb *cellsBuilder = (m_shape->getValue() == 0)
+							   ? (cb *)new mosaic::SquareBuilder<TPixel32, TPixelGR8>(
+									 step, step, radius, tile.getRaster()->getWrap())
+							   : (cb *)new mosaic::CircleBuilder<TPixel32, TPixelGR8>(
+									 step, step, radius, tile.getRaster()->getWrap());
 
 		doMosaic<TPixel32>(tile.getRaster(), srcRas32, step, pos, bgcolor, *cellsBuilder);
 
 		delete cellsBuilder;
 	} else if (srcRas64) {
 		typedef mosaic::CellBuilder<TPixel64> cb;
-		cb *cellsBuilder = (m_shape->getValue() == 0) ? (cb *)new mosaic::SquareBuilder<TPixel64, TPixelGR16>(step, step, radius, tile.getRaster()->getWrap()) : (cb *)new mosaic::CircleBuilder<TPixel64, TPixelGR16>(step, step, radius, tile.getRaster()->getWrap());
+		cb *cellsBuilder = (m_shape->getValue() == 0)
+							   ? (cb *)new mosaic::SquareBuilder<TPixel64, TPixelGR16>(
+									 step, step, radius, tile.getRaster()->getWrap())
+							   : (cb *)new mosaic::CircleBuilder<TPixel64, TPixelGR16>(
+									 step, step, radius, tile.getRaster()->getWrap());
 
 		doMosaic<TPixel64>(tile.getRaster(), srcRas64, step, pos, bgcolor, *cellsBuilder);
 
@@ -442,8 +461,7 @@ int MosaicFx::getMemoryRequirement(const TRectD &rect, double frame, const TRend
 	double scale = info.m_affine.a11;
 	double stepD = (m_size->getValue(frame) + m_distance->getValue(frame)) * scale;
 
-	TRectD srcRect(rect.x0 / stepD, rect.y0 / stepD,
-				   rect.x1 / stepD, rect.y1 / stepD);
+	TRectD srcRect(rect.x0 / stepD, rect.y0 / stepD, rect.x1 / stepD, rect.y1 / stepD);
 
 	return TRasterFx::memorySize(srcRect, info.m_bpp);
 }

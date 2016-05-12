@@ -31,10 +31,10 @@ class FunctionSheetRowViewer : public Spreadsheet::RowPanel
 {
 	FunctionSheet *m_sheet;
 
-public:
+  public:
 	FunctionSheetRowViewer(FunctionSheet *parent);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 
 	void mousePressEvent(QMouseEvent *);
@@ -46,17 +46,17 @@ protected:
 class FunctionSheetColumnHeadViewer : public Spreadsheet::ColumnPanel
 {
 	FunctionSheet *m_sheet;
-	//enable drag and drop the expression arguments
+	// enable drag and drop the expression arguments
 	QPoint m_dragStartPosition;
 	FunctionTreeModel::Channel *m_draggingChannel;
 
-public:
+  public:
 	FunctionSheetColumnHeadViewer(FunctionSheet *parent);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 	void mousePressEvent(QMouseEvent *);
-	//update the tooltip
+	// update the tooltip
 	void mouseMoveEvent(QMouseEvent *);
 
 	void contextMenuEvent(QContextMenuEvent *);
@@ -69,12 +69,12 @@ class FunctionSheetCellViewer : public Spreadsheet::CellPanel
 	DVGui::LineEdit *m_lineEdit;
 	int m_editRow, m_editCol;
 
-public:
+  public:
 	FunctionSheetCellViewer(FunctionSheet *parent);
 
 	Spreadsheet::DragTool *createDragTool(QMouseEvent *);
 
-protected:
+  protected:
 	void drawCells(QPainter &p, int r0, int c0, int r1, int c1);
 
 	void mouseDoubleClickEvent(QMouseEvent *);
@@ -84,7 +84,7 @@ protected:
 	void mouseMoveEvent(QMouseEvent *);
 	void openContextMenu(QMouseEvent *);
 
-private slots:
+  private slots:
 	void onCellEditorEditingFinished();
 };
 
@@ -92,7 +92,7 @@ class FunctionSheet : public SpreadsheetViewer
 {
 	Q_OBJECT
 
-public:
+  public:
 	FunctionSheet(QWidget *parent = 0);
 	~FunctionSheet();
 
@@ -119,11 +119,11 @@ public:
 	int getColumnIndexByCurve(TDoubleParam *param) const;
 	bool anyWidgetHasFocus();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *e);
 	void hideEvent(QHideEvent *e);
 
-private:
+  private:
 	FunctionSheetRowViewer *m_rowViewer;
 	FunctionSheetColumnHeadViewer *m_columnHeadViewer;
 	FunctionSheetCellViewer *m_cellViewer;
@@ -133,11 +133,12 @@ private:
 
 	QRect m_selectedCells;
 
-public slots:
+  public slots:
 
 	void updateAll();
 	void onFrameSwitched();
-	/*--- カレントChannelが切り替わったら、NumericalColumnsがそのChannelを表示できるようにスクロールする。---*/
+	/*---
+	 * カレントChannelが切り替わったら、NumericalColumnsがそのChannelを表示できるようにスクロールする。---*/
 	void onCurrentChannelChanged(FunctionTreeModel::Channel *);
 };
 

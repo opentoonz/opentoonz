@@ -18,9 +18,9 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TVectorRenderData;
-//class TStroke;
+// class TStroke;
 class TColorStyle;
 class TSimpleStrokeStyle;
 class TFlash;
@@ -33,10 +33,10 @@ class TCenterLineStrokeStyle;
 
 class DVAPI TSimpleStrokeProp : public TStrokeProp
 {
-protected:
+  protected:
 	TSimpleStrokeStyle *m_colorStyle;
 
-public:
+  public:
 	TSimpleStrokeProp(const TStroke *stroke, TSimpleStrokeStyle *style);
 	~TSimpleStrokeProp();
 
@@ -51,11 +51,11 @@ public:
 
 class DVAPI TRasterImagePatternStrokeProp : public TStrokeProp
 {
-protected:
+  protected:
 	TRasterImagePatternStrokeStyle *m_colorStyle;
 	std::vector<TAffine> m_transformations;
 
-public:
+  public:
 	TRasterImagePatternStrokeProp(const TStroke *stroke, TRasterImagePatternStrokeStyle *style);
 	~TRasterImagePatternStrokeProp();
 
@@ -70,11 +70,11 @@ public:
 
 class DVAPI TVectorImagePatternStrokeProp : public TStrokeProp
 {
-protected:
+  protected:
 	TVectorImagePatternStrokeStyle *m_colorStyle;
 	std::vector<TAffine> m_transformations;
 
-public:
+  public:
 	TVectorImagePatternStrokeProp(const TStroke *stroke, TVectorImagePatternStrokeStyle *style);
 	~TVectorImagePatternStrokeProp();
 
@@ -90,12 +90,12 @@ public:
 class DVAPI OutlineStrokeProp : public TStrokeProp
 {
 
-protected:
+  protected:
 	TOutlineStyleP m_colorStyle;
 	TStrokeOutline m_outline;
 	double m_outlinePixelSize;
 
-public:
+  public:
 	OutlineStrokeProp(const TStroke *stroke, TOutlineStyleP style);
 
 	const TColorStyle *getColorStyle() const;

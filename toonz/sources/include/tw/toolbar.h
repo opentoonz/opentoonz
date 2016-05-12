@@ -31,7 +31,7 @@ class DVAPI TToolButtonInfo
 	TGenericCommandAction *m_action;
 	TButtonSet *m_buttonSet;
 
-public:
+  public:
 	TToolButtonInfo(string name);
 	~TToolButtonInfo();
 
@@ -50,12 +50,12 @@ class DVAPI TToolbar : public TWidget
 {
 	TWidget *m_dockWidget;
 
-public:
+  public:
 	// static TGuiColor ToolbarColor;
 
 	class DVAPI Space : public TWidget
 	{
-	public:
+	  public:
 		Space(TWidget *parent);
 		void draw();
 	};

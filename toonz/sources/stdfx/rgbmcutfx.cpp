@@ -16,9 +16,10 @@ class RGBMCutFx : public TStandardRasterFx
 	TRangeParamP m_b_range;
 	TRangeParamP m_m_range;
 
-public:
+  public:
 	RGBMCutFx()
-		: m_r_range(DoublePair(0., 255.)), m_g_range(DoublePair(0., 255.)), m_b_range(DoublePair(0., 255.)), m_m_range(DoublePair(0., 255.))
+		: m_r_range(DoublePair(0., 255.)), m_g_range(DoublePair(0., 255.)),
+		  m_b_range(DoublePair(0., 255.)), m_m_range(DoublePair(0., 255.))
 	{
 		bindParam(this, "r_range", m_r_range);
 		bindParam(this, "g_range", m_g_range);

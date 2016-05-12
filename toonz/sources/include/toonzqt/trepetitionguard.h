@@ -20,12 +20,8 @@ class DVAPI TRepetitionGuard
 	static int m_counter;
 	bool m_counterCheck;
 
-public:
-	TRepetitionGuard()
-		: m_counterCheck(m_counter == 0)
-	{
-		++m_counter;
-	}
+  public:
+	TRepetitionGuard() : m_counterCheck(m_counter == 0) { ++m_counter; }
 
 	~TRepetitionGuard() { --m_counter; }
 

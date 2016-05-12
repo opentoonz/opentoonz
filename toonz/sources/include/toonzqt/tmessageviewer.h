@@ -28,17 +28,18 @@ class DVAPI TMessageRepository : public QObject
 	QStandardItemModel *m_sim;
 
 	Q_OBJECT
-public:
+  public:
 	static TMessageRepository *instance();
 	TMessageRepository();
 	QStandardItemModel *getModel() const { return m_sim; }
 	void clear();
 
-public slots:
+  public slots:
 	void messageReceived(int, const QString &);
 
-signals:
-	void openMessageCenter(); // TMessageRepository emits this signal to indicate that the TMessageViewer should be made visible
+  signals:
+	void openMessageCenter(); // TMessageRepository emits this signal to indicate that the
+							  // TMessageViewer should be made visible
 };
 
 //---------------------------------------------------------------------------------------
@@ -47,16 +48,16 @@ class DVAPI TMessageViewer : public QFrame
 {
 	Q_OBJECT
 
-protected:
+  protected:
 	static std::vector<TMessageViewer *> m_tmsgViewers;
 	MySortFilterProxyModel *m_proxyModel;
 	void rowsInserted(const QModelIndex &parent, int start, int end);
 
-public:
+  public:
 	QCheckBox *m_redCheck, *m_greenCheck, *m_yellowCheck;
 	TMessageViewer(QWidget *);
 	static bool isTMsgVisible();
-public slots:
+  public slots:
 	void onClicked(bool);
 	void refreshFilter(int);
 };

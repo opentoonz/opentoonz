@@ -76,10 +76,16 @@ class UndoPaletteChange : public TUndo
 
 	int m_frame;
 
-public:
-	UndoPaletteChange(TPaletteHandle *paletteHandle, int styleId,
-					  const TColorStyle &oldColor, const TColorStyle &newColor)
-		: m_paletteHandle(paletteHandle), m_palette(paletteHandle->getPalette()), m_styleId(styleId), m_oldColor(oldColor.clone()), m_newColor(newColor.clone()), m_oldName(oldColor.getName()), m_newName(newColor.getName()), m_frame(m_palette->getFrame()), m_oldEditedFlag(oldColor.getIsEditedFlag()), m_newEditedFlag(newColor.getIsEditedFlag()) {}
+  public:
+	UndoPaletteChange(TPaletteHandle *paletteHandle, int styleId, const TColorStyle &oldColor,
+					  const TColorStyle &newColor)
+		: m_paletteHandle(paletteHandle), m_palette(paletteHandle->getPalette()),
+		  m_styleId(styleId), m_oldColor(oldColor.clone()), m_newColor(newColor.clone()),
+		  m_oldName(oldColor.getName()), m_newName(newColor.getName()),
+		  m_frame(m_palette->getFrame()), m_oldEditedFlag(oldColor.getIsEditedFlag()),
+		  m_newEditedFlag(newColor.getIsEditedFlag())
+	{
+	}
 
 	void undo() const
 	{
@@ -90,7 +96,8 @@ public:
 		if (m_palette->isKeyframe(m_styleId, m_frame))
 			m_palette->setKeyframe(m_styleId, m_frame);
 
-		//don't change the dirty flag. because m_palette may not the current palette when undo executed
+		// don't change the dirty flag. because m_palette may not the current palette when undo
+		// executed
 		m_paletteHandle->notifyColorStyleChanged(false, false);
 	}
 
@@ -103,7 +110,8 @@ public:
 		if (m_palette->isKeyframe(m_styleId, m_frame))
 			m_palette->setKeyframe(m_styleId, m_frame);
 
-		//don't change the dirty flag. because m_palette may not the current palette when undo executed
+		// don't change the dirty flag. because m_palette may not the current palette when undo
+		// executed
 		m_paletteHandle->notifyColorStyleChanged(false, false);
 	}
 
@@ -123,10 +131,7 @@ public:
 			.arg(m_newColor->getMainColor().b);
 	}
 
-	int getHistoryType()
-	{
-		return HistoryType::Palette;
-	}
+	int getHistoryType() { return HistoryType::Palette; }
 };
 
 } // namespace
@@ -136,8 +141,8 @@ public:
 //*****************************************************************************
 
 const int ChannelMaxValues[] = {255, 255, 255, 255, 359, 100, 100};
-const int ChannelPairMaxValues[][2] =
-	{{255, 255}, {255, 255}, {255, 255}, {255, 255}, {100, 100}, {359, 100}, {359, 100}};
+const int ChannelPairMaxValues[][2] = {{255, 255}, {255, 255}, {255, 255}, {255, 255},
+									   {100, 100}, {359, 100}, {359, 100}};
 
 ColorModel::ColorModel()
 {
@@ -158,10 +163,8 @@ void ColorModel::rgb2hsv()
 
 void ColorModel::hsv2rgb()
 {
-	QColor converter = QColor::fromHsv(
-		m_channels[4],
-		m_channels[5] * 255 / 100,
-		m_channels[6] * 255 / 100);
+	QColor converter =
+		QColor::fromHsv(m_channels[4], m_channels[5] * 255 / 100, m_channels[6] * 255 / 100);
 
 	m_channels[0] = converter.red();
 	m_channels[1] = converter.green();
@@ -284,12 +287,9 @@ class RedShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	RedShadeMaker(const ColorModel &color) : m_color(color) {}
-	inline QRgb shade(int value) const
-	{
-		return QColor(value, m_color.g(), m_color.b()).rgba();
-	}
+	inline QRgb shade(int value) const { return QColor(value, m_color.g(), m_color.b()).rgba(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -298,12 +298,9 @@ class GreenShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	GreenShadeMaker(const ColorModel &color) : m_color(color) {}
-	inline QRgb shade(int value) const
-	{
-		return QColor(m_color.r(), value, m_color.b()).rgba();
-	}
+	inline QRgb shade(int value) const { return QColor(m_color.r(), value, m_color.b()).rgba(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -312,12 +309,9 @@ class BlueShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	BlueShadeMaker(const ColorModel &color) : m_color(color) {}
-	inline QRgb shade(int value) const
-	{
-		return QColor(m_color.r(), m_color.g(), value).rgba();
-	}
+	inline QRgb shade(int value) const { return QColor(m_color.r(), m_color.g(), value).rgba(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -326,7 +320,7 @@ class AlphaShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	AlphaShadeMaker(const ColorModel &color) : m_color(color) {}
 	inline QRgb shade(int value) const
 	{
@@ -340,11 +334,12 @@ class HueShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	HueShadeMaker(const ColorModel &color) : m_color(color) {}
 	inline QRgb shade(int value) const
 	{
-		return QColor::fromHsv(359 * value / 255, m_color.s() * 255 / 100, m_color.v() * 255 / 100).rgba();
+		return QColor::fromHsv(359 * value / 255, m_color.s() * 255 / 100, m_color.v() * 255 / 100)
+			.rgba();
 	}
 };
 
@@ -354,7 +349,7 @@ class SaturationShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	SaturationShadeMaker(const ColorModel &color) : m_color(color) {}
 	inline QRgb shade(int value) const
 	{
@@ -368,7 +363,7 @@ class ValueShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	ValueShadeMaker(const ColorModel &color) : m_color(color) {}
 	inline QRgb shade(int value) const
 	{
@@ -382,12 +377,9 @@ class RedGreenShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	RedGreenShadeMaker(const ColorModel &color) : m_color(color) {}
-	inline QRgb shade(int u, int v) const
-	{
-		return QColor(u, v, m_color.b()).rgba();
-	}
+	inline QRgb shade(int u, int v) const { return QColor(u, v, m_color.b()).rgba(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -396,12 +388,9 @@ class RedBlueShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	RedBlueShadeMaker(const ColorModel &color) : m_color(color) {}
-	inline QRgb shade(int u, int v) const
-	{
-		return QColor(u, m_color.g(), v).rgba();
-	}
+	inline QRgb shade(int u, int v) const { return QColor(u, m_color.g(), v).rgba(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -410,12 +399,9 @@ class GreenBlueShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	GreenBlueShadeMaker(const ColorModel &color) : m_color(color) {}
-	inline QRgb shade(int u, int v) const
-	{
-		return QColor(m_color.r(), u, v).rgba();
-	}
+	inline QRgb shade(int u, int v) const { return QColor(m_color.r(), u, v).rgba(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -424,12 +410,9 @@ class SaturationValueShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	SaturationValueShadeMaker(const ColorModel &color) : m_color(color) {}
-	inline QRgb shade(int u, int v) const
-	{
-		return QColor::fromHsv(m_color.h(), u, v).rgba();
-	}
+	inline QRgb shade(int u, int v) const { return QColor::fromHsv(m_color.h(), u, v).rgba(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -438,7 +421,7 @@ class HueValueShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	HueValueShadeMaker(const ColorModel &color) : m_color(color) {}
 	inline QRgb shade(int u, int v) const
 	{
@@ -452,7 +435,7 @@ class HueSaturationShadeMaker
 {
 	const ColorModel &m_color;
 
-public:
+  public:
 	HueSaturationShadeMaker(const ColorModel &color) : m_color(color) {}
 	inline QRgb shade(int u, int v) const
 	{
@@ -463,10 +446,7 @@ public:
 //-----------------------------------------------------------------------------
 
 template <class ShadeMaker>
-QPixmap makeLinearShading(
-	const ShadeMaker &shadeMaker,
-	int size,
-	bool isVertical)
+QPixmap makeLinearShading(const ShadeMaker &shadeMaker, int size, bool isVertical)
 {
 	assert(size > 0);
 	QPixmap bgPixmap;
@@ -494,11 +474,7 @@ QPixmap makeLinearShading(
 
 //-----------------------------------------------------------------------------
 
-QPixmap makeLinearShading(
-	const ColorModel &color,
-	ColorChannel channel,
-	int size,
-	bool isVertical)
+QPixmap makeLinearShading(const ColorModel &color, ColorChannel channel, int size, bool isVertical)
 {
 	switch (channel) {
 	case eRed:
@@ -535,8 +511,7 @@ QPixmap makeLinearShading(
 
 //-----------------------------------------------------------------------------
 
-template <class ShadeMaker>
-QPixmap makeSquareShading(const ShadeMaker &shadeMaker, int size)
+template <class ShadeMaker> QPixmap makeSquareShading(const ShadeMaker &shadeMaker, int size)
 {
 	assert(size > 0);
 	QPixmap bgPixmap;
@@ -554,10 +529,7 @@ QPixmap makeSquareShading(const ShadeMaker &shadeMaker, int size)
 
 //-----------------------------------------------------------------------------
 
-QPixmap makeSquareShading(
-	const ColorModel &color,
-	ColorChannel channel,
-	int size)
+QPixmap makeSquareShading(const ColorModel &color, ColorChannel channel, int size)
 {
 	switch (channel) {
 	case eRed:
@@ -587,17 +559,19 @@ QPixmap makeSquareShading(
 //*****************************************************************************
 
 HexagonalColorWheel::HexagonalColorWheel(QWidget *parent)
-	: QGLWidget(parent), m_bgColor(128, 128, 128) //defaul value in case this value does not set in the style sheet
-												  //, m_ghibli3DLutUtil(0)//iwsw commented out temporarily
+	: QGLWidget(parent),
+	  m_bgColor(128, 128, 128) // defaul value in case this value does not set in the style sheet
+//, m_ghibli3DLutUtil(0)//iwsw commented out temporarily
 {
 	setObjectName("HexagonalColorWheel");
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	setFocusPolicy(Qt::NoFocus);
 	m_currentWheel = none;
 
-	//iwsw commented out temporarily
+	// iwsw commented out temporarily
 	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && Ghibli3DLutUtil::m_isValid)
+	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() &&
+	Ghibli3DLutUtil::m_isValid)
 	{
 	m_ghibli3DLutUtil = new Ghibli3DLutUtil();
 	m_ghibli3DLutUtil->setInvert();
@@ -609,7 +583,7 @@ HexagonalColorWheel::HexagonalColorWheel(QWidget *parent)
 
 HexagonalColorWheel::~HexagonalColorWheel()
 {
-	//iwsw commented out temporarily
+	// iwsw commented out temporarily
 	/*
 	if(m_ghibli3DLutUtil)
 	{
@@ -625,7 +599,7 @@ void HexagonalColorWheel::initializeGL()
 {
 	qglClearColor(getBGColor());
 
-	//iwsw commented out temporarily
+	// iwsw commented out temporarily
 	/*
 	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 	m_ghibli3DLutUtil->onInit();
@@ -651,7 +625,7 @@ void HexagonalColorWheel::resizeGL(int width, int height)
 		m_wheelPosition.setY(((float)height - (m_triHeight * 2.0f)) / 2.0f);
 	}
 
-	//set all vertices positions
+	// set all vertices positions
 	m_wp[0].setX(m_triEdgeLen);
 	m_wp[0].setY(m_triHeight);
 	m_wp[1].setX(m_triEdgeLen * 0.5f);
@@ -674,13 +648,13 @@ void HexagonalColorWheel::resizeGL(int width, int height)
 	m_leftp[2].setX(m_leftp[1].x());
 	m_leftp[2].setY(0.0f);
 
-	//GL settings
+	// GL settings
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0.0, (GLdouble)width, (GLdouble)height, 0.0, 1.0, -1.0);
 
-	//iwsw commented out temporarily
+	// iwsw commented out temporarily
 	/*
 	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 	m_ghibli3DLutUtil->onResize(width,height);
@@ -691,12 +665,12 @@ void HexagonalColorWheel::resizeGL(int width, int height)
 
 void HexagonalColorWheel::paintGL()
 {
-	//call ClearColor() here in order to update bg color when the stylesheet is switched
+	// call ClearColor() here in order to update bg color when the stylesheet is switched
 	qglClearColor(getBGColor());
 
 	glMatrixMode(GL_MODELVIEW);
 
-	//iwsw commented out temporarily
+	// iwsw commented out temporarily
 	/*
 	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 	m_ghibli3DLutUtil->startDraw();
@@ -708,7 +682,7 @@ void HexagonalColorWheel::paintGL()
 
 	glPushMatrix();
 
-	//draw hexagonal color wheel
+	// draw hexagonal color wheel
 	glTranslatef(m_wheelPosition.rx(), m_wheelPosition.ry(), 0.0f);
 	glBegin(GL_TRIANGLE_FAN);
 	glColor3f(v, v, v);
@@ -732,7 +706,7 @@ void HexagonalColorWheel::paintGL()
 
 	QColor leftCol = QColor().fromHsv(m_color.getValue(eHue), 255, 255);
 
-	//draw triangle color picker
+	// draw triangle color picker
 	glBegin(GL_TRIANGLES);
 	glColor3f(leftCol.redF(), leftCol.greenF(), leftCol.blueF());
 	glVertex2f(m_leftp[0].x(), m_leftp[0].y());
@@ -742,12 +716,12 @@ void HexagonalColorWheel::paintGL()
 	glVertex2f(m_leftp[2].x(), m_leftp[2].y());
 	glEnd();
 
-	//draw small quad at current color position
+	// draw small quad at current color position
 	drawCurrentColorMark();
 
 	glPopMatrix();
 
-	//iwsw commented out temporarily
+	// iwsw commented out temporarily
 	/*
 	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
 	m_ghibli3DLutUtil->endDraw();
@@ -761,7 +735,7 @@ void HexagonalColorWheel::drawCurrentColorMark()
 	int h;
 	float s, v;
 
-	//show hue in a counterclockwise fashion
+	// show hue in a counterclockwise fashion
 	h = 360 - m_color.getValue(eHue);
 
 	s = (float)m_color.getValue(eSaturation) / 100.0f;
@@ -772,13 +746,13 @@ void HexagonalColorWheel::drawCurrentColorMark()
 	phi = (float)(h % 60 - 30) / 180.0f * 3.1415f;
 	d = s * m_triHeight / cosf(phi);
 
-	//set marker color
+	// set marker color
 	if (v > 0.4f)
 		glColor3f(0.0f, 0.0f, 0.0f);
 	else
 		glColor3f(1.0f, 1.0f, 1.0f);
 
-	//draw marker (in the wheel)
+	// draw marker (in the wheel)
 	glPushMatrix();
 	glTranslatef(m_wp[0].x(), m_wp[0].y(), 0.1f);
 	glRotatef(h, 0.0, 0.0, 1.0);
@@ -792,7 +766,7 @@ void HexagonalColorWheel::drawCurrentColorMark()
 	glEnd();
 	glPopMatrix();
 
-	//draw marker (in the triangle)
+	// draw marker (in the triangle)
 	glPushMatrix();
 	glTranslatef(m_leftp[1].x(), m_leftp[1].y(), 0.1f);
 	glTranslatef(-m_triEdgeLen * v * s, -m_triHeight * v * 2.0f, 0.0f);
@@ -882,7 +856,7 @@ void HexagonalColorWheel::clickLeftWheel(const QPoint &pos)
 	int h = (int)theta;
 	if (h > 359)
 		h = 359;
-	//clamping
+	// clamping
 	int s = (int)(tmin(p.length() / d, 1.0) * 100.0f);
 
 	m_color.setValues(eValue, h, s);
@@ -913,8 +887,7 @@ void HexagonalColorWheel::clickRightTriangle(const QPoint &pos)
 //    SquaredColorWheel  implementation
 //*****************************************************************************
 
-SquaredColorWheel::SquaredColorWheel(QWidget *parent)
-	: QWidget(parent), m_channel(eRed), m_color()
+SquaredColorWheel::SquaredColorWheel(QWidget *parent) : QWidget(parent), m_channel(eRed), m_color()
 {
 }
 
@@ -934,7 +907,8 @@ void SquaredColorWheel::paintEvent(QPaintEvent *)
 	int u = 0, v = 0;
 	m_color.getValues(m_channel, u, v);
 	int x = u * width() / ChannelPairMaxValues[m_channel][0];
-	int y = (ChannelPairMaxValues[m_channel][1] - v) * height() / ChannelPairMaxValues[m_channel][1];
+	int y =
+		(ChannelPairMaxValues[m_channel][1] - v) * height() / ChannelPairMaxValues[m_channel][1];
 
 	if (m_color.v() > 127)
 		p.setPen(Qt::black);
@@ -1048,8 +1022,7 @@ void ColorSlider::paintEvent(QPaintEvent *event)
 	if (!isVertical)
 		h -= 5;
 
-	QPixmap bgPixmap =
-		makeLinearShading(m_color, m_channel, isVertical ? h : w, isVertical);
+	QPixmap bgPixmap = makeLinearShading(m_color, m_channel, isVertical ? h : w, isVertical);
 
 	if (m_channel == eAlpha) {
 		static QPixmap checkboard(":Resources/backg.png");
@@ -1074,14 +1047,12 @@ void ColorSlider::paintEvent(QPaintEvent *event)
 		static QPixmap hHandleUpPm(":Resources/h_chandleUp.png");
 		static QPixmap hHandleDownPm(":Resources/h_chandleDown.png");
 		static QPixmap hHandleCenterPm(":Resources/h_chandleCenter.png");
-		int pos = QStyle::sliderPositionFromValue(0, maximum(), value(), width() - hHandleCenterPm.width(), false);
+		int pos = QStyle::sliderPositionFromValue(0, maximum(), value(),
+												  width() - hHandleCenterPm.width(), false);
 		p.drawPixmap(pos, 0, hHandleUpPm);
 		p.drawPixmap(pos, height() - hHandleDownPm.height(), hHandleDownPm);
-		p.drawPixmap(pos,
-					 hHandleUpPm.height(),
-					 hHandleCenterPm.width(),
-					 height() - hHandleUpPm.height() - hHandleDownPm.height(),
-					 hHandleCenterPm);
+		p.drawPixmap(pos, hHandleUpPm.height(), hHandleCenterPm.width(),
+					 height() - hHandleUpPm.height() - hHandleDownPm.height(), hHandleCenterPm);
 	}
 };
 
@@ -1099,14 +1070,11 @@ void ColorSlider::mousePressEvent(QMouseEvent *event)
 	QStyleOptionSlider opt;
 	initStyleOption(&opt);
 	const QRect handleRect =
-		style()->subControlRect(
-			QStyle::CC_Slider, &opt,
-			QStyle::SC_SliderHandle, this);
+		style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
 	if (!handleRect.contains(event->pos())) {
 		const QPoint handleCenter = handleRect.center();
-		const QRect grooveRect = style()->subControlRect(
-			QStyle::CC_Slider, &opt,
-			QStyle::SC_SliderGroove, this);
+		const QRect grooveRect =
+			style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove, this);
 		int pos, span;
 		bool upsideDown = false;
 		if (opt.orientation == Qt::Vertical) {
@@ -1137,7 +1105,8 @@ void ColorSlider::mouseReleaseEvent(QMouseEvent *event)
 //*****************************************************************************
 
 ArrowButton::ArrowButton(QWidget *parent, Qt::Orientation orientation, bool isFirstArrow)
-	: QToolButton(parent), m_orientaion(orientation), m_isFirstArrow(isFirstArrow), m_timerId(0), m_firstTimerId(0)
+	: QToolButton(parent), m_orientaion(orientation), m_isFirstArrow(isFirstArrow), m_timerId(0),
+	  m_firstTimerId(0)
 {
 	setFixedSize(10, 10);
 	setObjectName("StyleEditorArrowButton");
@@ -1206,8 +1175,7 @@ void ArrowButton::onRelease()
 //    ColorSliderBar  implementation
 //*****************************************************************************
 
-ColorSliderBar::ColorSliderBar(QWidget *parent, Qt::Orientation orientation)
-	: QWidget(parent)
+ColorSliderBar::ColorSliderBar(QWidget *parent, Qt::Orientation orientation) : QWidget(parent)
 {
 	bool isVertical = orientation == Qt::Vertical;
 
@@ -1300,8 +1268,7 @@ void ChannelLineEdit::paintEvent(QPaintEvent *e)
 //    ColorChannelControl  implementation
 //*****************************************************************************
 
-ColorChannelControl::ColorChannelControl(
-	ColorChannel channel, QWidget *parent)
+ColorChannelControl::ColorChannelControl(ColorChannel channel, QWidget *parent)
 	: QWidget(parent), m_channel(channel), m_value(0), m_signalEnabled(true)
 {
 	setFocusPolicy(Qt::NoFocus);
@@ -1323,7 +1290,7 @@ ColorChannelControl::ColorChannelControl(
 	m_field = new ChannelLineEdit(this, 0, minValue, maxValue);
 	m_slider = new ColorSlider(Qt::Horizontal, this);
 
-	//buttons to increment/decrement the values by 1
+	// buttons to increment/decrement the values by 1
 	QPushButton *addButton = new QPushButton(this);
 	QPushButton *subButton = new QPushButton(this);
 
@@ -1449,8 +1416,7 @@ void ColorChannelControl::onSliderReleased()
 //    StyleEditorPage  implementation
 //*****************************************************************************
 
-StyleEditorPage::StyleEditorPage(QWidget *parent)
-	: QFrame(parent)
+StyleEditorPage::StyleEditorPage(QWidget *parent) : QFrame(parent)
 {
 	setFocusPolicy(Qt::NoFocus);
 
@@ -1548,9 +1514,9 @@ PlainColorPage::PlainColorPage(QWidget *parent)
 {
 	setFocusPolicy(Qt::NoFocus);
 
-	//m_squaredColorWheel = new SquaredColorWheel(this);
+	// m_squaredColorWheel = new SquaredColorWheel(this);
 
-	//m_verticalSlider = new ColorSliderBar(this, Qt::Vertical);
+	// m_verticalSlider = new ColorSliderBar(this, Qt::Vertical);
 
 	m_hexagonalColorWheel = new HexagonalColorWheel(this);
 
@@ -1565,7 +1531,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
 			m_modeButtons[i] = button;
 			if (i == 0) button->setChecked(true);
 			channelButtonGroup->addButton(button, i);
-			//slidersLayout->addWidget(button,i,0); 
+			//slidersLayout->addWidget(button,i,0);
 			//とりあえず隠す
 			m_modeButtons[i]->hide();
 		}
@@ -1599,7 +1565,7 @@ PlainColorPage::PlainColorPage(QWidget *parent)
 	QSplitter *vSplitter = new QSplitter(this);
 
 	//プロパティの設定
-	//channelButtonGroup->setExclusive(true);
+	// channelButtonGroup->setExclusive(true);
 	wheelShowButton->setCheckable(true);
 	hsvShowButton->setCheckable(true);
 	matteShowButton->setCheckable(true);
@@ -1626,11 +1592,11 @@ PlainColorPage::PlainColorPage(QWidget *parent)
 	vSplitter->setOrientation(Qt::Vertical);
 	vSplitter->setFocusPolicy(Qt::NoFocus);
 
-	//m_verticalSlider->hide();
-	//m_squaredColorWheel->hide();
-	//m_ghibliColorWheel->hide();
+	// m_verticalSlider->hide();
+	// m_squaredColorWheel->hide();
+	// m_ghibliColorWheel->hide();
 
-	//layout
+	// layout
 	QVBoxLayout *mainLayout = new QVBoxLayout();
 	mainLayout->setSpacing(0);
 	mainLayout->setMargin(0);
@@ -1700,17 +1666,18 @@ PlainColorPage::PlainColorPage(QWidget *parent)
 	list << rect().height() / 2 << rect().height() / 2;
 	vSplitter->setSizes(list);
 
-	//connect(m_squaredColorWheel, SIGNAL(colorChanged(const ColorModel &, bool)),
+	// connect(m_squaredColorWheel, SIGNAL(colorChanged(const ColorModel &, bool)),
 	//	this, SLOT(onWheelChanged(const ColorModel &, bool)));
-	connect(m_hexagonalColorWheel, SIGNAL(colorChanged(const ColorModel &, bool)),
-			this, SLOT(onWheelChanged(const ColorModel &, bool)));
-	//m_verticalSlider->setMaximumSize(20,150);
-	//connect(m_verticalSlider, SIGNAL(valueChanged(int)), this, SLOT(onWheelSliderChanged(int)));
-	//connect(m_verticalSlider, SIGNAL(valueChanged()), this, SLOT(onWheelSliderReleased()));
-	//connect( m_verticalSlider,		SIGNAL(sliderReleased()),	this, SLOT(onWheelSliderReleased()));
-	//connect(channelButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(setWheelChannel(int)));
+	connect(m_hexagonalColorWheel, SIGNAL(colorChanged(const ColorModel &, bool)), this,
+			SLOT(onWheelChanged(const ColorModel &, bool)));
+	// m_verticalSlider->setMaximumSize(20,150);
+	// connect(m_verticalSlider, SIGNAL(valueChanged(int)), this, SLOT(onWheelSliderChanged(int)));
+	// connect(m_verticalSlider, SIGNAL(valueChanged()), this, SLOT(onWheelSliderReleased()));
+	// connect( m_verticalSlider,		SIGNAL(sliderReleased()),	this,
+	// SLOT(onWheelSliderReleased()));
+	// connect(channelButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(setWheelChannel(int)));
 
-	//Show/Hideトグルボタン
+	// Show/Hideトグルボタン
 	connect(wheelShowButton, SIGNAL(toggled(bool)), wheelFrame, SLOT(setVisible(bool)));
 	connect(hsvShowButton, SIGNAL(toggled(bool)), hsvFrame, SLOT(setVisible(bool)));
 	connect(matteShowButton, SIGNAL(toggled(bool)), matteFrame, SLOT(setVisible(bool)));
@@ -1817,7 +1784,7 @@ void PlainColorPage::onWheelSliderChanged(int value)
 	m_color.setValue(m_verticalSlider->getChannel(), value);
   updateControls();
   if(m_signalEnabled)
-    emit colorChanged(m_color, true);
+	emit colorChanged(m_color, true);
 }
 */
 //-----------------------------------------------------------------------------
@@ -1837,7 +1804,8 @@ TFilePath StyleChooserPage::m_rootPath;
 //-----------------------------------------------------------------------------
 
 StyleChooserPage::StyleChooserPage(QWidget *parent)
-	: StyleEditorPage(parent), m_chipOrigin(5, 3), m_chipSize(25, 25), m_chipPerRow(0), m_currentIndex(-1)
+	: StyleEditorPage(parent), m_chipOrigin(5, 3), m_chipSize(25, 25), m_chipPerRow(0),
+	  m_currentIndex(-1)
 {
 }
 
@@ -1849,7 +1817,7 @@ void StyleChooserPage::paintEvent(QPaintEvent *)
 		computeSize();
 
 	QPainter p(this);
-	//p.setRenderHint(QPainter::SmoothPixmapTransform);
+	// p.setRenderHint(QPainter::SmoothPixmapTransform);
 	if (m_chipPerRow == 0 || getChipCount() == 0)
 		return;
 
@@ -1945,7 +1913,7 @@ void StyleChooserPage::mouseReleaseEvent(QMouseEvent *event)
 }
 
 //-----------------------------------------------------------------------------
-//TOGLIERE
+// TOGLIERE
 void StyleChooserPage::setRootPath(const TFilePath &rootPath)
 {
 	m_rootPath = rootPath;
@@ -1957,11 +1925,8 @@ void StyleChooserPage::setRootPath(const TFilePath &rootPath)
 
 class CustomStyleChooserPage : public StyleChooserPage
 {
-public:
-	CustomStyleChooserPage(QWidget *parent = 0)
-		: StyleChooserPage(parent)
-	{
-	}
+  public:
+	CustomStyleChooserPage(QWidget *parent = 0) : StyleChooserPage(parent) {}
 
 	static CustomStyleManager *styleManager();
 
@@ -1977,19 +1942,18 @@ public:
 		disconnect(styleManager(), SIGNAL(patternAdded()), this, SLOT(computeSize()));
 	}
 	bool loadIfNeeded() { return false; } // serve?
-	/*
-    if(!m_loaded) {loadItems(); m_loaded=true;return true;}
-    else return false;
-  }
-	*/
+										  /*
+										  if(!m_loaded) {loadItems(); m_loaded=true;return true;}
+										  else return false;
+										}
+										  */
 
 	int getChipCount() const { return styleManager()->getPatternCount(); }
 
 	void drawChip(QPainter &p, QRect rect, int index)
 	{
 		assert(0 <= index && index < getChipCount());
-		CustomStyleManager::PatternData pattern =
-			styleManager()->getPattern(index);
+		CustomStyleManager::PatternData pattern = styleManager()->getPattern(index);
 		p.drawImage(rect, *pattern.m_image);
 	}
 	void onSelect(int index);
@@ -2008,11 +1972,11 @@ CustomStyleManager *CustomStyleChooserPage::styleManager()
 
 bool CustomStyleChooserPage::event(QEvent *e)
 {
-	//Intercept tooltip events
+	// Intercept tooltip events
 	if (e->type() != QEvent::ToolTip)
 		return StyleChooserPage::event(e);
 
-	//see StyleChooserPage::paintEvent
+	// see StyleChooserPage::paintEvent
 	CustomStyleManager *manager = styleManager();
 	QHelpEvent *he = static_cast<QHelpEvent *>(e);
 
@@ -2033,8 +1997,7 @@ void CustomStyleChooserPage::onSelect(int index)
 	if (index < 0 || index >= getChipCount())
 		return;
 
-	CustomStyleManager::PatternData pattern =
-		styleManager()->getPattern(index);
+	CustomStyleManager::PatternData pattern = styleManager()->getPattern(index);
 
 	if (m_currentIndex < 0)
 		return;
@@ -2055,9 +2018,8 @@ void CustomStyleChooserPage::onSelect(int index)
 
 class VectorBrushStyleChooserPage : public StyleChooserPage
 {
-public:
-	VectorBrushStyleChooserPage(QWidget *parent = 0)
-		: StyleChooserPage(parent)
+  public:
+	VectorBrushStyleChooserPage(QWidget *parent = 0) : StyleChooserPage(parent)
 	{
 		m_chipSize = QSize(60, 25);
 	}
@@ -2095,11 +2057,11 @@ CustomStyleManager *VectorBrushStyleChooserPage::styleManager()
 
 bool VectorBrushStyleChooserPage::event(QEvent *e)
 {
-	//Intercept tooltip events
+	// Intercept tooltip events
 	if (e->type() != QEvent::ToolTip)
 		return StyleChooserPage::event(e);
 
-	//see StyleChooserPage::paintEvent
+	// see StyleChooserPage::paintEvent
 	CustomStyleManager *manager = styleManager();
 	QHelpEvent *he = static_cast<QHelpEvent *>(e);
 
@@ -2125,8 +2087,7 @@ void VectorBrushStyleChooserPage::drawChip(QPainter &p, QRect rect, int index)
 		p.drawImage(rect, noSpecialStyleImage);
 	} else {
 		assert(0 <= index && index < getChipCount());
-		CustomStyleManager::PatternData pattern =
-			styleManager()->getPattern(index - 1);
+		CustomStyleManager::PatternData pattern = styleManager()->getPattern(index - 1);
 		p.drawImage(rect, *pattern.m_image);
 	}
 }
@@ -2141,8 +2102,7 @@ void VectorBrushStyleChooserPage::onSelect(int index)
 	if (index > 0) {
 		--index;
 
-		CustomStyleManager::PatternData pattern =
-			styleManager()->getPattern(index);
+		CustomStyleManager::PatternData pattern = styleManager()->getPattern(index);
 
 		if (m_currentIndex < 0)
 			return;
@@ -2176,11 +2136,8 @@ class TextureStyleChooserPage : public StyleChooserPage
 	static std::vector<Texture> m_textures;
 	static bool m_loaded;
 
-public:
-	TextureStyleChooserPage(QWidget *parent = 0)
-		: StyleChooserPage(parent)
-	{
-	}
+  public:
+	TextureStyleChooserPage(QWidget *parent = 0) : StyleChooserPage(parent) {}
 
 	bool loadIfNeeded()
 	{
@@ -2220,10 +2177,8 @@ void TextureStyleChooserPage::loadTexture(const TFilePath &fp)
 	if (fp == TFilePath()) {
 		TRaster32P ras(25, 25);
 		TTextureStyle::fillCustomTextureIcon(ras);
-		//ras->fill(TPixel::Blue);
-		Texture customText = {
-			ras,
-			QString("")};
+		// ras->fill(TPixel::Blue);
+		Texture customText = {ras, QString("")};
 
 		m_textures.push_back(customText);
 		return;
@@ -2249,13 +2204,12 @@ void TextureStyleChooserPage::loadTexture(const TFilePath &fp)
 		texture = ras32;
 	else {
 		texture = TRaster32P(d);
-		TScale sc((double)texture->getLx() / ras32->getLx(), (double)texture->getLy() / ras32->getLy());
+		TScale sc((double)texture->getLx() / ras32->getLx(),
+				  (double)texture->getLy() / ras32->getLy());
 		TRop::resample(texture, ras32, sc);
 	}
 
-	Texture text = {
-		texture,
-		QString::fromStdWString(fp.getLevelNameW())};
+	Texture text = {texture, QString::fromStdWString(fp.getLevelNameW())};
 
 	m_textures.push_back(text);
 }
@@ -2285,7 +2239,7 @@ void TextureStyleChooserPage::loadItems()
 			} catch (...) {
 			}
 		}
-	loadTexture(TFilePath()); //custom texture
+	loadTexture(TFilePath()); // custom texture
 }
 
 //-----------------------------------------------------------------------------
@@ -2310,7 +2264,8 @@ bool TextureStyleChooserPage::event(QEvent *e)
 		int index = posToIndex(pos);
 		if (index >= 0 && index < (int)m_textures.size()) {
 			toolTip = m_textures[index].m_name;
-			QToolTip::showText(helpEvent->globalPos(), toolTip != QString() ? toolTip : "Custom Texture");
+			QToolTip::showText(helpEvent->globalPos(),
+							   toolTip != QString() ? toolTip : "Custom Texture");
 		}
 		e->accept();
 	}
@@ -2327,7 +2282,7 @@ class SpecialStyleChooserPage : public StyleChooserPage
 	static std::vector<std::pair<int, QImage *>> m_customStyles;
 	static bool m_loaded;
 
-public:
+  public:
 	SpecialStyleChooserPage(QWidget *parent = 0, const TFilePath &rootDir = TFilePath())
 		: StyleChooserPage(parent)
 	{
@@ -2549,8 +2504,7 @@ void SettingBox::onValueChanged(bool isDragging)
 //    SettingsPage  implementation
 //*****************************************************************************
 
-SettingsPage::SettingsPage(QWidget *parent)
-	: QScrollArea(parent), m_updating(false)
+SettingsPage::SettingsPage(QWidget *parent) : QScrollArea(parent), m_updating(false)
 {
 	bool ret = true;
 
@@ -2570,7 +2524,7 @@ SettingsPage::SettingsPage(QWidget *parent)
 	// Add a vertical layout to store the "autofill" checkbox widgets
 	{
 		m_autopaintToggleBox = new QWidget(this);
-		//box->setFixedHeight(22);
+		// box->setFixedHeight(22);
 		paramsContainerLayout->addWidget(m_autopaintToggleBox);
 
 		QHBoxLayout *hLayout = new QHBoxLayout;
@@ -2588,8 +2542,8 @@ SettingsPage::SettingsPage(QWidget *parent)
 
 		hLayout->addStretch();
 
-		ret = connect(m_autoFillCheckBox, SIGNAL(stateChanged(int)),
-					  this, SLOT(onAutofillChanged()));
+		ret =
+			connect(m_autoFillCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onAutofillChanged()));
 		assert(ret);
 	}
 
@@ -2627,8 +2581,10 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle)
 	// NOTE: Layout reubilds must be avoided whenever possible. In particular, be warned that this
 	// function may be invoked when signals emitted from this function are still "flying"...
 
-	bool clearLayout = m_editedStyle && !(editedStyle && typeid(*m_editedStyle) == typeid(*editedStyle));
-	bool buildLayout = editedStyle && !(m_editedStyle && typeid(*m_editedStyle) == typeid(*editedStyle));
+	bool clearLayout =
+		m_editedStyle && !(editedStyle && typeid(*m_editedStyle) == typeid(*editedStyle));
+	bool buildLayout =
+		editedStyle && !(m_editedStyle && typeid(*m_editedStyle) == typeid(*editedStyle));
 
 	m_editedStyle = editedStyle;
 
@@ -2653,7 +2609,9 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle)
 				QCheckBox *checkBox = new QCheckBox;
 				m_paramsLayout->addWidget(checkBox, p, 1);
 
-				ret = QObject::connect(checkBox, SIGNAL(toggled(bool)), this, SLOT(onValueChanged())) && ret;
+				ret = QObject::connect(checkBox, SIGNAL(toggled(bool)), this,
+									   SLOT(onValueChanged())) &&
+					  ret;
 
 				break;
 			}
@@ -2667,7 +2625,9 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle)
 
 				intField->setRange(min, max);
 
-				ret = QObject::connect(intField, SIGNAL(valueChanged(bool)), this, SLOT(onValueChanged(bool))) && ret;
+				ret = QObject::connect(intField, SIGNAL(valueChanged(bool)), this,
+									   SLOT(onValueChanged(bool))) &&
+					  ret;
 
 				break;
 			}
@@ -2681,7 +2641,9 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle)
 
 				comboBox->addItems(items);
 
-				ret = QObject::connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onValueChanged())) && ret;
+				ret = QObject::connect(comboBox, SIGNAL(currentIndexChanged(int)), this,
+									   SLOT(onValueChanged())) &&
+					  ret;
 
 				break;
 			}
@@ -2695,7 +2657,9 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle)
 
 				doubleField->setRange(min, max);
 
-				ret = QObject::connect(doubleField, SIGNAL(valueChanged(bool)), this, SLOT(onValueChanged(bool))) && ret;
+				ret = QObject::connect(doubleField, SIGNAL(valueChanged(bool)), this,
+									   SLOT(onValueChanged(bool))) &&
+					  ret;
 
 				break;
 			}
@@ -2713,7 +2677,9 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle)
 				fileField->setPath(QString::fromStdWString(
 					editedStyle->getParamValue(TColorStyle::TFilePath_tag(), p).getWideString()));
 
-				ret = QObject::connect(fileField, SIGNAL(pathChanged()), this, SLOT(onValueChanged())) && ret;
+				ret = QObject::connect(fileField, SIGNAL(pathChanged()), this,
+									   SLOT(onValueChanged())) &&
+					  ret;
 
 				break;
 			}
@@ -2746,8 +2712,8 @@ void SettingsPage::updateValues()
 		// Update editor values
 		switch (m_editedStyle->getParamType(p)) {
 		case TColorStyle::BOOL: {
-			QCheckBox *checkBox = static_cast<QCheckBox *>(
-				m_paramsLayout->itemAtPosition(p, 1)->widget());
+			QCheckBox *checkBox =
+				static_cast<QCheckBox *>(m_paramsLayout->itemAtPosition(p, 1)->widget());
 
 			checkBox->setChecked(m_editedStyle->getParamValue(TColorStyle::bool_tag(), p));
 
@@ -2755,8 +2721,8 @@ void SettingsPage::updateValues()
 		}
 
 		case TColorStyle::INT: {
-			DVGui::IntField *intField = static_cast<DVGui::IntField *>(
-				m_paramsLayout->itemAtPosition(p, 1)->widget());
+			DVGui::IntField *intField =
+				static_cast<DVGui::IntField *>(m_paramsLayout->itemAtPosition(p, 1)->widget());
 
 			intField->setValue(m_editedStyle->getParamValue(TColorStyle::int_tag(), p));
 
@@ -2764,8 +2730,8 @@ void SettingsPage::updateValues()
 		}
 
 		case TColorStyle::ENUM: {
-			QComboBox *comboBox = static_cast<QComboBox *>(
-				m_paramsLayout->itemAtPosition(p, 1)->widget());
+			QComboBox *comboBox =
+				static_cast<QComboBox *>(m_paramsLayout->itemAtPosition(p, 1)->widget());
 
 			comboBox->setCurrentIndex(m_editedStyle->getParamValue(TColorStyle::int_tag(), p));
 
@@ -2773,8 +2739,8 @@ void SettingsPage::updateValues()
 		}
 
 		case TColorStyle::DOUBLE: {
-			DVGui::DoubleField *doubleField = static_cast<DVGui::DoubleField *>(
-				m_paramsLayout->itemAtPosition(p, 1)->widget());
+			DVGui::DoubleField *doubleField =
+				static_cast<DVGui::DoubleField *>(m_paramsLayout->itemAtPosition(p, 1)->widget());
 
 			doubleField->setValue(m_editedStyle->getParamValue(TColorStyle::double_tag(), p));
 
@@ -2782,8 +2748,8 @@ void SettingsPage::updateValues()
 		}
 
 		case TColorStyle::FILEPATH: {
-			DVGui::FileField *fileField = static_cast<DVGui::FileField *>(
-				m_paramsLayout->itemAtPosition(p, 1)->widget());
+			DVGui::FileField *fileField =
+				static_cast<DVGui::FileField *>(m_paramsLayout->itemAtPosition(p, 1)->widget());
 
 			fileField->setPath(QString::fromStdWString(
 				m_editedStyle->getParamValue(TColorStyle::TFilePath_tag(), p).getWideString()));
@@ -2843,14 +2809,14 @@ void SettingsPage::onValueChanged(bool isDragging)
 		m_editedStyle->setParamValue(p, static_cast<QComboBox *>(senderWidget)->currentIndex());
 		break;
 	case TColorStyle::DOUBLE:
-		m_editedStyle->setParamValue(p, static_cast<DVGui::DoubleField *>(senderWidget)->getValue());
+		m_editedStyle->setParamValue(p,
+									 static_cast<DVGui::DoubleField *>(senderWidget)->getValue());
 		break;
-	case TColorStyle::FILEPATH:
-		{
-			const QString &string = static_cast<DVGui::FileField *>(senderWidget)->getPath();
-			m_editedStyle->setParamValue(p, TFilePath(string.toStdWString()));
-			break;
-		}
+	case TColorStyle::FILEPATH: {
+		const QString &string = static_cast<DVGui::FileField *>(senderWidget)->getPath();
+		m_editedStyle->setParamValue(p, TFilePath(string.toStdWString()));
+		break;
+	}
 	}
 
 	// Forward the signal to the style editor
@@ -2892,10 +2858,14 @@ QScrollArea *makeChooserPageWithoutScrollBar(QWidget *chooser)
 //*****************************************************************************
 
 StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
-	: QWidget(parent), m_paletteController(paletteController), m_paletteHandle(paletteController->getCurrentPalette()), m_cleanupPaletteHandle(paletteController->getCurrentCleanupPalette()), m_toolBar(0), m_enabled(false), m_enabledOnlyFirstTab(false), m_enabledFirstAndLastTab(false), m_oldStyle(0), m_editedStyle(0)
+	: QWidget(parent), m_paletteController(paletteController),
+	  m_paletteHandle(paletteController->getCurrentPalette()),
+	  m_cleanupPaletteHandle(paletteController->getCurrentCleanupPalette()), m_toolBar(0),
+	  m_enabled(false), m_enabledOnlyFirstTab(false), m_enabledFirstAndLastTab(false),
+	  m_oldStyle(0), m_editedStyle(0)
 {
 	setFocusPolicy(Qt::NoFocus);
-	//TOGLIERE
+	// TOGLIERE
 	TFilePath libraryPath = ToonzFolder::getLibraryFolder();
 	setRootPath(libraryPath);
 
@@ -2978,24 +2948,26 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
 
 	bool ret = true;
 	ret = ret && connect(m_styleBar, SIGNAL(currentChanged(int)), this, SLOT(setPage(int)));
-	ret = ret && connect(m_colorParameterSelector, SIGNAL(colorParamChanged()), this, SLOT(onColorParamChanged()));
-	ret = ret && connect(m_textureStylePage, SIGNAL(styleSelected(const TColorStyle &)),
-						 this, SLOT(selectStyle(const TColorStyle &)));
-	ret = ret && connect(m_specialStylePage, SIGNAL(styleSelected(const TColorStyle &)),
-						 this, SLOT(selectStyle(const TColorStyle &)));
-	ret = ret && connect(m_customStylePage, SIGNAL(styleSelected(const TColorStyle &)),
-						 this, SLOT(selectStyle(const TColorStyle &)));
-	ret = ret && connect(m_vectorBrushesStylePage, SIGNAL(styleSelected(const TColorStyle &)),
-						 this, SLOT(selectStyle(const TColorStyle &)));
-	ret = ret && connect(m_settingsPage, SIGNAL(paramStyleChanged(bool)), this, SLOT(onParamStyleChanged(bool)));
-	ret = ret && connect(m_plainColorPage, SIGNAL(colorChanged(const ColorModel &, bool)),
-						 this, SLOT(onColorChanged(const ColorModel &, bool)));
+	ret = ret && connect(m_colorParameterSelector, SIGNAL(colorParamChanged()), this,
+						 SLOT(onColorParamChanged()));
+	ret = ret && connect(m_textureStylePage, SIGNAL(styleSelected(const TColorStyle &)), this,
+						 SLOT(selectStyle(const TColorStyle &)));
+	ret = ret && connect(m_specialStylePage, SIGNAL(styleSelected(const TColorStyle &)), this,
+						 SLOT(selectStyle(const TColorStyle &)));
+	ret = ret && connect(m_customStylePage, SIGNAL(styleSelected(const TColorStyle &)), this,
+						 SLOT(selectStyle(const TColorStyle &)));
+	ret = ret && connect(m_vectorBrushesStylePage, SIGNAL(styleSelected(const TColorStyle &)), this,
+						 SLOT(selectStyle(const TColorStyle &)));
+	ret = ret && connect(m_settingsPage, SIGNAL(paramStyleChanged(bool)), this,
+						 SLOT(onParamStyleChanged(bool)));
+	ret = ret && connect(m_plainColorPage, SIGNAL(colorChanged(const ColorModel &, bool)), this,
+						 SLOT(onColorChanged(const ColorModel &, bool)));
 	assert(ret);
 
 	/* ------- initial conditions ------- */
 	autoCheckChanged(false);
 	enable(false, false, false);
-	//set to the empty page
+	// set to the empty page
 	m_styleChooser->setCurrentIndex(6);
 }
 
@@ -3072,7 +3044,8 @@ QFrame *StyleEditor::createBottomWidget()
 	bool ret = true;
 	ret = ret && connect(m_applyButton, SIGNAL(clicked()), this, SLOT(applyButtonClicked()));
 	ret = ret && connect(m_autoButton, SIGNAL(toggled(bool)), this, SLOT(autoCheckChanged(bool)));
-	ret = ret && connect(m_oldColor, SIGNAL(clicked(const TColorStyle &)), this, SLOT(onOldStyleClicked(const TColorStyle &)));
+	ret = ret && connect(m_oldColor, SIGNAL(clicked(const TColorStyle &)), this,
+						 SLOT(onOldStyleClicked(const TColorStyle &)));
 	assert(ret);
 
 	return bottomWidget;
@@ -3114,12 +3087,13 @@ void StyleEditor::showEvent(QShowEvent *)
 	ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleChanged()), SLOT(onStyleChanged()));
 	ret = ret && connect(m_paletteHandle, SIGNAL(paletteSwitched()), this, SLOT(onStyleSwitched()));
 	if (m_cleanupPaletteHandle)
-		ret = ret && connect(m_cleanupPaletteHandle, SIGNAL(colorStyleChanged()), SLOT(onCleanupStyleChanged()));
+		ret = ret && connect(m_cleanupPaletteHandle, SIGNAL(colorStyleChanged()),
+							 SLOT(onCleanupStyleChanged()));
 
-	ret = ret && connect(m_paletteController, SIGNAL(colorAutoApplyEnabled(bool)),
-						 this, SLOT(enableColorAutoApply(bool)));
-	ret = ret && connect(m_paletteController, SIGNAL(colorSampleChanged(const TPixel32 &)),
-						 this, SLOT(setColorSample(const TPixel32 &)));
+	ret = ret && connect(m_paletteController, SIGNAL(colorAutoApplyEnabled(bool)), this,
+						 SLOT(enableColorAutoApply(bool)));
+	ret = ret && connect(m_paletteController, SIGNAL(colorSampleChanged(const TPixel32 &)), this,
+						 SLOT(setColorSample(const TPixel32 &)));
 
 	assert(ret);
 }
@@ -3141,7 +3115,7 @@ void StyleEditor::onStyleSwitched()
 	TPalette *palette = getPalette();
 
 	if (!palette) {
-		//set the current page to empty
+		// set the current page to empty
 		m_styleChooser->setCurrentIndex(6);
 		enable(false);
 		m_colorParameterSelector->clear();
@@ -3163,7 +3137,7 @@ void StyleEditor::onStyleSwitched()
 	/* ------ update the status text ------ */
 	if (!isStyleNull && isValidIndex) {
 		QString statusText;
-		//palette type
+		// palette type
 		if (isCleanUpPalette)
 			statusText = "[CLEANUP]  ";
 		else if (palette->getGlobalName() != L"")
@@ -3171,10 +3145,10 @@ void StyleEditor::onStyleSwitched()
 		else
 			statusText = "[LEVEL]  ";
 
-		//palette name
+		// palette name
 		statusText += QString::fromStdWString(L" Palette : " + palette->getPaletteName());
 
-		//style name
+		// style name
 		statusText += QString::fromStdWString(L" | Style#");
 		statusText += QString::number(styleIndex);
 		statusText += QString::fromStdWString(L" : " + m_editedStyle->getName());
@@ -3197,13 +3171,13 @@ void StyleEditor::onStyleChanged()
 	assert(0 <= styleIndex && styleIndex < palette->getStyleCount());
 
 	setEditedStyleToStyle(palette->getStyle(styleIndex));
-	setOldStyleToStyle(m_editedStyle.getPointer()); //This line is needed for proper undo behavior
+	setOldStyleToStyle(m_editedStyle.getPointer()); // This line is needed for proper undo behavior
 
 	m_plainColorPage->setColor(*m_editedStyle, getColorParam());
 	m_colorParameterSelector->setStyle(*m_editedStyle);
 	m_settingsPage->setStyle(m_editedStyle);
 	m_newColor->setStyle(*m_editedStyle);
-	m_oldColor->setStyle(*m_oldStyle); //This line is needed for proper undo behavior
+	m_oldColor->setStyle(*m_oldStyle); // This line is needed for proper undo behavior
 }
 
 //-----------------------------------------------------------------------
@@ -3217,7 +3191,7 @@ void StyleEditor::onCleanupStyleChanged()
 }
 
 //-----------------------------------------------------------------------------
-//TOGLIERE
+// TOGLIERE
 void StyleEditor::setRootPath(const TFilePath &rootPath)
 {
 	m_textureStylePage->setRootPath(rootPath);
@@ -3233,19 +3207,23 @@ void StyleEditor::copyEditedStyleToPalette(bool isDragging)
 	int styleIndex = getStyleIndex();
 	assert(0 <= styleIndex && styleIndex < palette->getStyleCount());
 
-	if (!(*m_oldStyle == *m_editedStyle) && (!isDragging || m_paletteController->isColorAutoApplyEnabled()) && m_editedStyle->getGlobalName() != L"" && m_editedStyle->getOriginalName() != L"") {
+	if (!(*m_oldStyle == *m_editedStyle) &&
+		(!isDragging || m_paletteController->isColorAutoApplyEnabled()) &&
+		m_editedStyle->getGlobalName() != L"" && m_editedStyle->getOriginalName() != L"") {
 		// If the adited style is linked to the studio palette, then activate the edited flag
 		m_editedStyle->setIsEditedFlag(true);
 	}
 
-	palette->setStyle(styleIndex, m_editedStyle->clone()); // Must be done *before* setting the eventual
-														   // palette keyframe
+	palette->setStyle(styleIndex,
+					  m_editedStyle->clone()); // Must be done *before* setting the eventual
+											   // palette keyframe
 	if (!isDragging) {
 		if (!(*m_oldStyle == *m_editedStyle)) {
-			//do not register undo if the edited color is special one (e.g. changing the ColorField in the fx settings)
+			// do not register undo if the edited color is special one (e.g. changing the ColorField
+			// in the fx settings)
 			if (palette->getPaletteName() != toWideString("EmptyColorFieldPalette"))
-				TUndoManager::manager()->add(new UndoPaletteChange(
-					m_paletteHandle, styleIndex, *m_oldStyle, *m_editedStyle));
+				TUndoManager::manager()->add(new UndoPaletteChange(m_paletteHandle, styleIndex,
+																   *m_oldStyle, *m_editedStyle));
 		}
 
 		setOldStyleToStyle(m_editedStyle.getPointer());
@@ -3279,8 +3257,7 @@ void StyleEditor::onColorChanged(const ColorModel &color, bool isDragging)
 		TPixel tColor = color.getTPixel();
 
 		if (m_editedStyle->hasMainColor()) {
-			int index = getColorParam(),
-				count = m_editedStyle->getColorParamCount();
+			int index = getColorParam(), count = m_editedStyle->getColorParamCount();
 
 			if (0 <= index && index < count)
 				m_editedStyle->setColorParamValue(index, tColor);
@@ -3302,8 +3279,7 @@ void StyleEditor::onColorChanged(const ColorModel &color, bool isDragging)
 		m_newColor->setStyle(*m_editedStyle);
 		m_colorParameterSelector->setStyle(*m_editedStyle);
 
-		if (m_autoButton->isChecked())
-		{
+		if (m_autoButton->isChecked()) {
 			copyEditedStyleToPalette(isDragging);
 		}
 	}
@@ -3313,8 +3289,7 @@ void StyleEditor::onColorChanged(const ColorModel &color, bool isDragging)
 
 void StyleEditor::enable(bool enabled, bool enabledOnlyFirstTab, bool enabledFirstAndLastTab)
 {
-	if (m_enabled != enabled ||
-		m_enabledOnlyFirstTab != enabledOnlyFirstTab ||
+	if (m_enabled != enabled || m_enabledOnlyFirstTab != enabledOnlyFirstTab ||
 		m_enabledFirstAndLastTab != enabledFirstAndLastTab) {
 		m_enabled = enabled;
 		m_enabledOnlyFirstTab = enabledOnlyFirstTab;
@@ -3364,9 +3339,10 @@ void StyleEditor::setPage(int index)
 		return;
 	}
 
-	//Se sono nel caso first and last page enable e index == 1 la pagina che voglio settare e' l'ultima!
+	// Se sono nel caso first and last page enable e index == 1 la pagina che voglio settare e'
+	// l'ultima!
 	if (index == 1)
-		index = m_styleChooser->count() - 2; //2 perche' alla fine c'e' una pagina vuota
+		index = m_styleChooser->count() - 2; // 2 perche' alla fine c'e' una pagina vuota
 	m_styleChooser->setCurrentIndex(index);
 }
 
@@ -3426,9 +3402,9 @@ bool StyleEditor::setStyle(TColorStyle *currentStyle)
 	bool isStyleNull = false;
 
 	QString gname = QString::fromStdWString(currentStyle->getGlobalName());
-	//if(!gname.isEmpty() && gname == "ColorFieldSimpleColor")
+	// if(!gname.isEmpty() && gname == "ColorFieldSimpleColor")
 	//	isStyleNull = true;
-	//else
+	// else
 	if (!gname.isEmpty() && gname[0] != L'-') {
 		currentStyle = 0;
 		isStyleNull = true;
@@ -3487,19 +3463,17 @@ void StyleEditor::selectStyle(const TColorStyle &newStyle)
 	m_editedStyle->assignNames(m_oldStyle.getPointer()); // Copy original name stored in the palette
 
 	// For convenience's sake, copy the main color from the old color, if both have one
-	if (m_oldStyle && m_oldStyle->hasMainColor() &&
-		m_editedStyle && m_editedStyle->hasMainColor())
+	if (m_oldStyle && m_oldStyle->hasMainColor() && m_editedStyle && m_editedStyle->hasMainColor())
 		m_editedStyle->setMainColor(m_oldStyle->getMainColor());
 
-	if (m_autoButton->isChecked())
-	{
+	if (m_autoButton->isChecked()) {
 		// If the adited style is linked to the studio palette, then activate the edited flag
 		if (m_editedStyle->getGlobalName() != L"" && m_editedStyle->getOriginalName() != L"")
 			m_editedStyle->setIsEditedFlag(true);
 
 		// Apply new style, if required
-		TUndoManager::manager()->add(new UndoPaletteChange(
-			m_paletteHandle, styleIndex, *m_oldStyle, *m_editedStyle));
+		TUndoManager::manager()->add(
+			new UndoPaletteChange(m_paletteHandle, styleIndex, *m_oldStyle, *m_editedStyle));
 
 		palette->setStyle(styleIndex, m_editedStyle->clone());
 

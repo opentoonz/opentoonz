@@ -22,8 +22,8 @@ struct particles_values {
 	DoublePair lifetime_val;
 	int lifetime_ctrl_val;
 	int column_lifetime_val;
-	//double lifetimemin_val;
-	//double lifetimemax_val;
+	// double lifetimemin_val;
+	// double lifetimemax_val;
 	int startpos_val;
 	int randseed_val;
 	double gravity_val;
@@ -119,8 +119,7 @@ struct pos_dummy {
 
 //------------------------------------------------------------------------------
 
-typedef struct
-	{
+typedef struct {
 	TPixel32 col;
 	int rangecol;
 	double fadecol;
@@ -130,7 +129,7 @@ typedef struct
 
 class Particle
 {
-public:
+  public:
 	double x;
 	double y;
 	double oldx;
@@ -164,58 +163,53 @@ public:
 	TRandom random;
 	int seed;
 
-public:
-	Particle(int lifetime, int seed, const std::map<int, TTile *> porttiles, const particles_values &values, const particles_ranges &ranges, std::vector<std::vector<TPointD>> &myregions, int howmany, int first, int level, int last,
-			 std::vector<std::vector<int>> &myHistogram, std::vector<float> &myWeight);
-	//Constructor
+  public:
+	Particle(int lifetime, int seed, const std::map<int, TTile *> porttiles,
+			 const particles_values &values, const particles_ranges &ranges,
+			 std::vector<std::vector<TPointD>> &myregions, int howmany, int first, int level,
+			 int last, std::vector<std::vector<int>> &myHistogram, std::vector<float> &myWeight);
+	// Constructor
 	~Particle() {}
-	//Destructor
+	// Destructor
 	void create_Animation(const particles_values &values, int first, int last);
 
 	int check_Swing(const particles_values &values);
 
-	void create_Swing(const particles_values &values,
-					  const particles_ranges &ranges,
+	void create_Swing(const particles_values &values, const particles_ranges &ranges,
 					  double randomxreference, double randomyreference);
-	void create_Colors(const particles_values &values,
-					   const particles_ranges &ranges, std::map<int, TTile *> porttiles);
+	void create_Colors(const particles_values &values, const particles_ranges &ranges,
+					   std::map<int, TTile *> porttiles);
 
-	void move(const std::map<int, TTile *> porttiles, const particles_values &values, const particles_ranges &ranges, float windx,
-			  float windy, float xgravity, float ygravity, float dpi, int lastframe);
+	void move(const std::map<int, TTile *> porttiles, const particles_values &values,
+			  const particles_ranges &ranges, float windx, float windy, float xgravity,
+			  float ygravity, float dpi, int lastframe);
 
 	void spread_color(TPixel32 &color, double range);
 	void update_Animation(const particles_values &values, int first, int last, int keep);
-	void update_Swing(const particles_values &values,
-					  const particles_ranges &ranges,
-					  struct pos_dummy &dummy,
-					  double randomxreference, double randomyreference);
-	void update_Scale(const particles_values &values,
-					  const particles_ranges &ranges,
+	void update_Swing(const particles_values &values, const particles_ranges &ranges,
+					  struct pos_dummy &dummy, double randomxreference, double randomyreference);
+	void update_Scale(const particles_values &values, const particles_ranges &ranges,
 					  double scalereference, double scalestepreference);
 
-	double set_Opacity(std::map<int, TTile *> porttiles,
-					   const particles_values &values,
+	double set_Opacity(std::map<int, TTile *> porttiles, const particles_values &values,
 					   float opacity_range, double dist_frame);
 
 	void modify_colors(TPixel32 &color, double &intensity);
-	void modify_colors_and_opacity(const particles_values &values,
-								   float curr_opacity, int dist_frame, TRaster32P raster);
+	void modify_colors_and_opacity(const particles_values &values, float curr_opacity,
+								   int dist_frame, TRaster32P raster);
 
 	bool canHandle(const TRenderSettings &info, double frame) { return false; }
-	void get_image_reference(TTile *ctrl1, const particles_values &values,
-							 double &imagereference, int type);
-	void get_image_reference(TTile *ctrl1, const particles_values &values,
-							 TPixel32 &color);
+	void get_image_reference(TTile *ctrl1, const particles_values &values, double &imagereference,
+							 int type);
+	void get_image_reference(TTile *ctrl1, const particles_values &values, TPixel32 &color);
 
-	void get_image_gravity(TTile *ctrl1, const particles_values &values,
-						   float &gx, float &gy);
+	void get_image_gravity(TTile *ctrl1, const particles_values &values, float &gx, float &gy);
 };
 
 class ComparebySize
 {
-public:
-	bool operator()(const Particle &f1,
-					const Particle &f2)
+  public:
+	bool operator()(const Particle &f1, const Particle &f2)
 	{
 		if ((f1.scale - f2.scale) > 0)
 			return 1;
@@ -226,9 +220,8 @@ public:
 
 class ComparebyLifetime
 {
-public:
-	bool operator()(const Particle &f1,
-					const Particle &f2)
+  public:
+	bool operator()(const Particle &f1, const Particle &f2)
 	{
 		if ((f1.lifetime - f1.genlifetime - f2.lifetime + f2.genlifetime) > 0)
 			return 1;

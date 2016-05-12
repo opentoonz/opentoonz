@@ -23,8 +23,7 @@ int isTTT(const char *fn)
 		} else
 			break;
 	ln = strlen(lfn);
-	if (toupper(lfn[ln - 1]) == (int)'T' &&
-		toupper(lfn[ln - 2]) == (int)'T' &&
+	if (toupper(lfn[ln - 1]) == (int)'T' && toupper(lfn[ln - 2]) == (int)'T' &&
 		toupper(lfn[ln - 3]) == (int)'T')
 		return 1;
 	return 0;

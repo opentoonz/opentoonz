@@ -23,7 +23,7 @@ class DragTool
 
 	SkeletonTool *m_tool;
 
-public:
+  public:
 	DragTool(SkeletonTool *tool) : m_tool(tool) {}
 	virtual ~DragTool() {}
 
@@ -48,7 +48,7 @@ class DragCenterTool : public DragTool
 	TPointD m_center;
 	TAffine m_affine;
 
-public:
+  public:
 	DragCenterTool(SkeletonTool *tool);
 
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &);
@@ -60,11 +60,11 @@ public:
 
 class DragChannelTool : public DragTool
 {
-protected:
+  protected:
 	TStageObjectValues m_before, m_after;
 	bool m_dragged;
 
-public:
+  public:
 	DragChannelTool(SkeletonTool *tool, TStageObject::Channel a0);
 	DragChannelTool(SkeletonTool *tool, TStageObject::Channel a0, TStageObject::Channel a1);
 
@@ -94,7 +94,7 @@ class DragPositionTool : public DragChannelTool
 {
 	TPointD m_firstPos;
 
-public:
+  public:
 	DragPositionTool(SkeletonTool *tool);
 
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &);
@@ -109,7 +109,7 @@ class DragRotationTool : public DragChannelTool
 	TPointD m_center;
 	bool m_snapped;
 
-public:
+  public:
 	DragRotationTool(SkeletonTool *tool, bool snapped);
 
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &);
@@ -149,7 +149,7 @@ class ParentChangeTool : public DragTool
 
 	double m_pixelSize;
 
-public:
+  public:
 	ParentChangeTool(SkeletonTool *tool, TTool::Viewer *viewer);
 
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
@@ -183,15 +183,16 @@ class IKTool : public DragTool
 		double m_sign;
 		bool m_active;
 		TStageObjectValues m_oldValues;
-		Joint()
-			: m_bone(0), m_prevBone(0), m_angleOffset(0), m_sign(1), m_active(true) {}
+		Joint() : m_bone(0), m_prevBone(0), m_angleOffset(0), m_sign(1), m_active(true) {}
 		Joint(Skeleton::Bone *bone, Skeleton::Bone *prevBone, double sign)
-			: m_bone(bone), m_prevBone(prevBone), m_angleOffset(0), m_sign(sign), m_active(true) {}
+			: m_bone(bone), m_prevBone(prevBone), m_angleOffset(0), m_sign(sign), m_active(true)
+		{
+		}
 	};
 	std::vector<Joint> m_joints;
 	bool isParentOf(int columnIndex, int childColumnIndex) const;
 
-public:
+  public:
 	IKTool(SkeletonTool *tool, TTool::Viewer *viewer, Skeleton *skeleton, int columnIndex);
 	~IKTool();
 
@@ -216,7 +217,7 @@ class ChangeDrawingTool : public DragTool
 	int m_dir;
 	TUndo *m_undo;
 
-public:
+  public:
 	ChangeDrawingTool(SkeletonTool *tool, int d);
 
 	void leftButtonDown(const TPointD &, const TMouseEvent &e);
@@ -234,13 +235,13 @@ class CommandHandler : public QObject
 	Skeleton *m_skeleton;
 	std::set<int> *m_tempPinnedSet;
 
-public:
+  public:
 	CommandHandler();
 	~CommandHandler();
 	void setTempPinnedSet(std::set<int> *tempPinnedSet) { m_tempPinnedSet = tempPinnedSet; }
 
 	void setSkeleton(Skeleton *skeleton);
-public slots:
+  public slots:
 	void clearPinnedRanges();
 };
 

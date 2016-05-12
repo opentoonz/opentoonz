@@ -42,15 +42,16 @@ class CaptureParameters;
 	 \n	It is the general area where the movie takes place.
 		Its features are:
 	\li the frame rate that is the movie's speed,
-	\li background color of the camera and viewer,  chessboard colors (background in the preview without the background color),
+	\li background color of the camera and viewer,  chessboard colors (background in the preview
+   without the background color),
 	guides etc...
 	*/
 class DVAPI TSceneProperties
 {
-public:
+  public:
 	typedef std::vector<double> Guides;
 
-private:
+  private:
 	Guides m_hGuides, m_vGuides;
 
 	// N.B. questo vettore serve solo durante l'I/O
@@ -72,23 +73,24 @@ private:
 	int m_fieldGuideSize;
 	double m_fieldGuideAspectRatio;
 
-	//!Xsheet Note Color, color number = 7.
+	//! Xsheet Note Color, color number = 7.
 	QList<TPixel32> m_notesColor;
 
-public:
+  public:
 	/*!
 		The constructor creates:
-	\li a new cleanup TPalette object;  
-	\li	a new CleanupParameters object that sets to default some basic attributes 
+	\li a new cleanup TPalette object;
+	\li	a new CleanupParameters object that sets to default some basic attributes
 	as basic transformation, rotation angle, scale factor, x-y offsets etc...;
 	\li a new TScannerParameters object (parameters to manage the scanner);
-    \li a new TOutputProperties object for the output and one for the preview ;
+	\li a new TOutputProperties object for the output and one for the preview ;
 
-	Sets internal attributes to default as background color, guides size and ratio, level subsampling, etc....
+	Sets internal attributes to default as background color, guides size and ratio, level
+	subsampling, etc....
 	*/
 	TSceneProperties();
 	/*!
-		Deletes object created in the constructor 
+		Deletes object created in the constructor
 		and the pointers to the vector of cameras.
 	\sa TSceneProperties.
 	*/
@@ -121,7 +123,7 @@ public:
 	const std::vector<TCamera *> &getCameras() const { return m_cameras; }
 	/*!
 		Returns a \b TOutputProperties with output scene properties.
-		Output properties are for example the render settings or output file format. 
+		Output properties are for example the render settings or output file format.
 	*/
 	TOutputProperties *getOutputProperties() const { return m_outputProp; }
 	/*!
@@ -134,11 +136,12 @@ public:
 	void loadData(TIStream &is, bool isLoadingProject);
 
 	/*!
-    Returns cleanup parameters \b CleanupParameters, i.e. basic colors.
+	Returns cleanup parameters \b CleanupParameters, i.e. basic colors.
 	*/
 	CleanupParameters *getCleanupParameters() const { return m_cleanupParameters; }
 	/*!
-		 Return scanner parameters as Black and white scanner , graytones scanner or a color scanner.
+		 Return scanner parameters as Black and white scanner , graytones scanner or a color
+	   scanner.
 	*/
 	TScannerParameters *getScanParameters() const { return m_scanParameters; }
 	/*!
@@ -146,25 +149,25 @@ public:
 	*/
 	VectorizerParameters *getVectorizerParameters() const { return m_vectorizerParameters; }
 	/*!
-     Return device capture parameters.
+	 Return device capture parameters.
   */
 	CaptureParameters *getCaptureParameters() const { return m_captureParameters; }
 
 	/*!
 		Sets the scene's background color to \b color.
-    \sa getBgColor()
+	\sa getBgColor()
 	*/
 	void setBgColor(const TPixel32 &color);
 	/*!
 		Returns the scene's background color.
-    \sa setBgColor()
+	\sa setBgColor()
 	*/
 	TPixel getBgColor() const { return m_bgColor; }
 
 	/*!
 		Provides information about xsheet markers, xsheet horizontal line.
-    Set the distance between two markers to \p distance and \b offset to markers offset,
-    \sa setMarkers()
+	Set the distance between two markers to \p distance and \b offset to markers offset,
+	\sa setMarkers()
 	*/
 	void getMarkers(int &distance, int &offset) const
 	{
@@ -175,7 +178,7 @@ public:
 		Sets information about xsheet markers, xsheet horizontal line.
 		Sets the distance between two markers to \p distance and \b offset,row of first
 		marker, to markers \b offset.
-    \sa getMarkers()
+	\sa getMarkers()
 	*/
 	void setMarkers(int distance, int offset);
 	/*!
@@ -183,12 +186,12 @@ public:
 		factor to be applied to animation levels, images when displayed in the work area
 		in order to have a faster visualization and playback; for example if it is 2,
 		one pixel each two is displayed.
-    \sa setFullcolorSubsampling()
+	\sa setFullcolorSubsampling()
 	*/
 	int getFullcolorSubsampling() const { return m_fullcolorSubsampling; }
 	/*!
-		Sets the  full-color images subsampling in scene to \p s. 
-    \sa getFullcolorSubsampling()
+		Sets the  full-color images subsampling in scene to \p s.
+	\sa getFullcolorSubsampling()
 	*/
 	void setFullcolorSubsampling(int s);
 	/*!
@@ -202,26 +205,26 @@ public:
 	*/
 	void setTlvSubsampling(int s);
 	/*!
-		Returns field guide size. 
+		Returns field guide size.
 		Field guide size is the number of fields the field guide is wide.
-    \sa setFieldGuideSize().
+	\sa setFieldGuideSize().
 	*/
 	int getFieldGuideSize() const { return m_fieldGuideSize; }
 	/*!
 		Set field guide size to \b size. Field guide size is the number of fields
 		the field guide is wide.
-    \sa getFieldGuideSize()
+	\sa getFieldGuideSize()
 	*/
 	void setFieldGuideSize(int size);
 	/*!
-		Returns field guide aspect ratio. 
+		Returns field guide aspect ratio.
 		Field guide aspect ratio is the ratio between the field guide width and height.
-    \sa setFieldGuideAspectRatio()
+	\sa setFieldGuideAspectRatio()
 	*/
 	double getFieldGuideAspectRatio() const { return m_fieldGuideAspectRatio; }
 	/*!
-		Sets field guide aspect ratio to \p ar. 
-    \sa getFieldGuideAspectRatio()
+		Sets field guide aspect ratio to \p ar.
+	\sa getFieldGuideAspectRatio()
 	*/
 	void setFieldGuideAspectRatio(double ar);
 
@@ -237,7 +240,7 @@ public:
 	TPixel32 getNoteColor(int colorIndex) const;
 	void setNoteColor(TPixel32 color, int colorIndex);
 
-private:
+  private:
 	// not implemented
 	TSceneProperties(const TSceneProperties &);
 	const TSceneProperties &operator=(const TSceneProperties &);

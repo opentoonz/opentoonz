@@ -27,7 +27,7 @@ void doComputeRadialT(TRasterPT<T> ras, TPointD posTrasf, const TSpectrumT<T> &s
 				t = (radius + cycle) * freq;
 				t -= floor(t);
 			}
-			//double polinomfactor=(-2*t+3)*(t*t);
+			// double polinomfactor=(-2*t+3)*(t*t);
 			*pix++ = spectrum.getPremultipliedValue(t);
 			posAux.x += aff.a11;
 			posAux.y += aff.a21;
@@ -41,20 +41,15 @@ void doComputeRadialT(TRasterPT<T> ras, TPointD posTrasf, const TSpectrumT<T> &s
 
 //------------------------------------------------------------------
 
-void multiRadial(
-	const TRasterP &ras,
-	TPointD posTrasf,
-	const TSpectrumParamP colors,
-	double period,
-	double count,
-	double cycle,
-	const TAffine &aff,
-	double frame)
+void multiRadial(const TRasterP &ras, TPointD posTrasf, const TSpectrumParamP colors, double period,
+				 double count, double cycle, const TAffine &aff, double frame)
 {
 	if ((TRaster32P)ras)
-		doComputeRadialT<TPixel32>(ras, posTrasf, colors->getValue(frame), period, count, cycle, aff);
+		doComputeRadialT<TPixel32>(ras, posTrasf, colors->getValue(frame), period, count, cycle,
+								   aff);
 	else if ((TRaster64P)ras)
-		doComputeRadialT<TPixel64>(ras, posTrasf, colors->getValue64(frame), period, count, cycle, aff);
+		doComputeRadialT<TPixel64>(ras, posTrasf, colors->getValue64(frame), period, count, cycle,
+								   aff);
 	else
 		throw TException("MultiRadialGradientFx: unsupported Pixel Type");
 }
@@ -65,7 +60,8 @@ namespace
 {
 template <class T>
 void doComputeLinearT(TRasterPT<T> ras, TPointD posTrasf, const TSpectrumT<T> &spectrum,
-					  double period, double count, double w_amplitude, double w_freq, double w_phase, double cycle, const TAffine &aff)
+					  double period, double count, double w_amplitude, double w_freq,
+					  double w_phase, double cycle, const TAffine &aff)
 {
 	double shift = 0;
 	double maxRadius = period * count / 2.;
@@ -75,8 +71,8 @@ void doComputeLinearT(TRasterPT<T> ras, TPointD posTrasf, const TSpectrumT<T> &s
 	for (j = 0; j < ras->getLy(); j++) {
 		TPointD posAux = posTrasf;
 
-		//TPointD pos = tile.m_pos;
-		//pos.y += j;
+		// TPointD pos = tile.m_pos;
+		// pos.y += j;
 		T *pix = ras->pixels(j);
 		T *endPix = pix + ras->getLx();
 		while (pix < endPix) {
@@ -90,7 +86,7 @@ void doComputeLinearT(TRasterPT<T> ras, TPointD posTrasf, const TSpectrumT<T> &s
 			} else if (radius < 0)
 				t = 0;
 			double polinomfactor = (-2 * t + 3) * (t * t);
-			//pos.x += 1.0;
+			// pos.x += 1.0;
 			*pix++ = spectrum.getPremultipliedValue(polinomfactor);
 			posAux.x += aff.a11;
 			posAux.y += aff.a21;
@@ -103,29 +99,16 @@ void doComputeLinearT(TRasterPT<T> ras, TPointD posTrasf, const TSpectrumT<T> &s
 }
 //------------------------------------------------------------------
 
-void multiLinear(
-	const TRasterP &ras,
-	TPointD posTrasf,
-	const TSpectrumParamP colors,
-	double period,
-	double count,
-	double amplitude,
-	double freq,
-	double phase,
-	double cycle,
-	const TAffine &aff,
-	double frame)
+void multiLinear(const TRasterP &ras, TPointD posTrasf, const TSpectrumParamP colors, double period,
+				 double count, double amplitude, double freq, double phase, double cycle,
+				 const TAffine &aff, double frame)
 {
 	if ((TRaster32P)ras)
-		doComputeLinearT<TPixel32>(
-			ras, posTrasf,
-			colors->getValue(frame),
-			period, count, amplitude, freq, phase, cycle, aff);
+		doComputeLinearT<TPixel32>(ras, posTrasf, colors->getValue(frame), period, count, amplitude,
+								   freq, phase, cycle, aff);
 	else if ((TRaster64P)ras)
-		doComputeLinearT<TPixel64>(
-			ras, posTrasf,
-			colors->getValue64(frame),
-			period, count, amplitude, freq, phase, cycle, aff);
+		doComputeLinearT<TPixel64>(ras, posTrasf, colors->getValue64(frame), period, count,
+								   amplitude, freq, phase, cycle, aff);
 	else
 		throw TException("MultiLinearGradientFx: unsupported Pixel Type");
 }

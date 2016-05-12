@@ -25,12 +25,9 @@
 
 class CasmSubmitPage::Data
 {
-public:
+  public:
 	Data(CasmSubmitPage *cspage);
-	~Data()
-	{
-		delete m_casmTask;
-	}
+	~Data() { delete m_casmTask; }
 
 	void configureNotify(const TDimension &size);
 
@@ -57,8 +54,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-CasmSubmitPage::Data::Data(CasmSubmitPage *cspage)
-	: m_cspage(cspage), m_casmTask(0)
+CasmSubmitPage::Data::Data(CasmSubmitPage *cspage) : m_cspage(cspage), m_casmTask(0)
 {
 	m_taskNameLabel = new TLabel(cspage);
 	m_taskNameLabel->setText("Task Name:");
@@ -119,8 +115,8 @@ void CasmSubmitPage::Data::browseCasmFiles()
 		fileTypes.push_back("casm");
 		popup = new FileBrowserPopup(m_cspage, fileTypes);
 
-		popup->setOkAction(
-			new TFileBrowserPopupAction<CasmSubmitPage::Data>(this, &CasmSubmitPage::Data::loadCasm));
+		popup->setOkAction(new TFileBrowserPopupAction<CasmSubmitPage::Data>(
+			this, &CasmSubmitPage::Data::loadCasm));
 	}
 
 	if (!popup)
@@ -139,7 +135,7 @@ void CasmSubmitPage::Data::browseCasmFiles()
 #endif
 
 	d -= popup->getSize();
-	//TDimension d = TMainshell::getMainshell()->getSize() - popup->getSize();
+	// TDimension d = TMainshell::getMainshell()->getSize() - popup->getSize();
 	popup->popup(TPoint(d.lx / 2, d.ly / 2));
 	popup->setCaption("Load Casm");
 }
@@ -173,9 +169,8 @@ void CasmSubmitPage::Data::submit()
 
 	int stepCount = casm->m_end - casm->m_start + 1;
 
-	TFarmTaskGroup task(
-		casmName, nativeCmdLine, TSystem::getUserName(),
-		TSystem::getHostName(), stepCount);
+	TFarmTaskGroup task(casmName, nativeCmdLine, TSystem::getUserName(), TSystem::getHostName(),
+						stepCount);
 
 	int ra = casm->m_start;
 
@@ -204,8 +199,8 @@ void CasmSubmitPage::Data::submit()
 			string name = casmName + " " + toString(ra) + "-" + toString(rb);
 			stepCount = rb - ra + 1;
 
-			task.addTask(new TFarmTask(
-				name, cmdLine, TSystem::getUserName(), TSystem::getHostName(), stepCount));
+			task.addTask(new TFarmTask(name, cmdLine, TSystem::getUserName(),
+									   TSystem::getHostName(), stepCount));
 		} catch (TException &e) {
 			TMessage::error(toString(e.getMessage()));
 		}
@@ -252,14 +247,14 @@ BOOL WINAPI EnumerateFunc(LPNETRESOURCE lpnr)
 	dwResult = WNetOpenEnum(RESOURCE_CONNECTED /*RESOURCE_GLOBALNET*/, // all network resources
 							RESOURCETYPE_ANY,						   // all resources
 							0,										   // enumerate all resources
-							lpnr,									   // NULL first time the function is called
-							&hEnum);								   // handle to the resource
+							lpnr,	// NULL first time the function is called
+							&hEnum); // handle to the resource
 
 	if (dwResult != NO_ERROR) {
 		//
 		// Process errors with an application-defined error handler.
 		//
-		//NetErrorHandler(hwnd, dwResult, (LPSTR)"WNetOpenEnum");
+		// NetErrorHandler(hwnd, dwResult, (LPSTR)"WNetOpenEnum");
 		return FALSE;
 	}
 	//
@@ -296,13 +291,13 @@ BOOL WINAPI EnumerateFunc(LPNETRESOURCE lpnr)
 				if (RESOURCEUSAGE_CONTAINER == (lpnrLocal[i].dwUsage & RESOURCEUSAGE_CONTAINER))
 					if (!EnumerateFunc(&lpnrLocal[i]))
 						return FALSE;
-				//TextOut(hdc, 10, 10, "EnumerateFunc returned FALSE.", 29);
+				// TextOut(hdc, 10, 10, "EnumerateFunc returned FALSE.", 29);
 			}
 		}
 		// Process errors.
 		//
 		else if (dwResultEnum != ERROR_NO_MORE_ITEMS) {
-			//NetErrorHandler(hwnd, dwResultEnum, (LPSTR)"WNetEnumResource");
+			// NetErrorHandler(hwnd, dwResultEnum, (LPSTR)"WNetEnumResource");
 			break;
 		}
 	}
@@ -323,7 +318,7 @@ BOOL WINAPI EnumerateFunc(LPNETRESOURCE lpnr)
 		//
 		// Process errors.
 		//
-		//NetErrorHandler(hwnd, dwResult, (LPSTR)"WNetCloseEnum");
+		// NetErrorHandler(hwnd, dwResult, (LPSTR)"WNetCloseEnum");
 		return FALSE;
 	}
 
@@ -380,8 +375,7 @@ void CasmSubmitPage::Data::loadCasm(const TFilePath &fp)
 
 //==============================================================================
 
-CasmSubmitPage::CasmSubmitPage(TWidget *parent)
-	: TabPage(parent, "SubmitCasm")
+CasmSubmitPage::CasmSubmitPage(TWidget *parent) : TabPage(parent, "SubmitCasm")
 {
 	m_data = new CasmSubmitPage::Data(this);
 }

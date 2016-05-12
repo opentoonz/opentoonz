@@ -17,15 +17,14 @@
 #endif
 
 //=============================================================================
-/* 
+/*
 * This is an example of how to use the TPointT, the TRectT and the TAffine classes.
 */
 /*!  The template class TPointT defines the x- and y-coordinates of a point.
 */
-template <class T>
-class TPointT
+template <class T> class TPointT
 {
-public:
+  public:
 	T x, y;
 
 	TPointT() : x(0), y(0){};
@@ -54,37 +53,32 @@ public:
 	inline TPointT operator-(const TPointT &a) const { return TPointT(x - a.x, y - a.y); };
 	inline TPointT operator-() const { return TPointT(-x, -y); };
 
-	bool operator!=(const TPointT &p) const
-	{
-		return x != p.x || y != p.y;
-	}
+	bool operator!=(const TPointT &p) const { return x != p.x || y != p.y; }
 };
 
-/*! \relates TPointT  
+/*! \relates TPointT
 * Rotate a point 90 degrees (counterclockwise).
-\param p a point. 
+\param p a point.
 \return the rotated point
 \sa rotate270
 */
-template <class T>
-inline TPointT<T> rotate90(const TPointT<T> &p) // counterclockwise
+template <class T> inline TPointT<T> rotate90(const TPointT<T> &p) // counterclockwise
 {
 	return TPointT<T>(-p.y, p.x);
 }
-/*! \relates TPointT  
+/*! \relates TPointT
 * Rotate a point 270 degrees (clockwise).
-\param p a point. 
+\param p a point.
 \return the rotated point
 \sa rotate90
 */
-template <class T>
-inline TPointT<T> rotate270(const TPointT<T> &p) // clockwise
+template <class T> inline TPointT<T> rotate270(const TPointT<T> &p) // clockwise
 {
 	return TPointT<T>(p.y, -p.x);
 }
 
 /*!
-\relates TPointT   
+\relates TPointT
 */
 template <class T> // prodotto scalare
 inline T operator*(const TPointT<T> &a, const TPointT<T> &b)
@@ -94,8 +88,7 @@ inline T operator*(const TPointT<T> &a, const TPointT<T> &b)
 
 //-----------------------------------------------------------------------------
 
-template <class T>
-inline std::ostream &operator<<(std::ostream &out, const TPointT<T> &p)
+template <class T> inline std::ostream &operator<<(std::ostream &out, const TPointT<T> &p)
 {
 	return out << "(" << p.x << ", " << p.y << ")";
 }
@@ -110,8 +103,7 @@ template class DVAPI TPointT<int>;
 template class DVAPI TPointT<double>;
 #endif
 
-template <class T>
-inline bool operator==(const TPointT<T> &p0, const TPointT<T> &p1)
+template <class T> inline bool operator==(const TPointT<T> &p0, const TPointT<T> &p1)
 {
 	return p0.x == p1.x && p0.y == p1.y;
 }
@@ -144,7 +136,7 @@ inline TPointD operator*(const TPointD &p, double a)
 
 //-----------------------------------------------------------------------------
 /*!
-\relates TPointT   
+\relates TPointT
 This helper function returns the square of the absolute value of the specified point (a TPointI)
 */
 inline int norm2(const TPointI &p)
@@ -154,7 +146,7 @@ inline int norm2(const TPointI &p)
 
 //-----------------------------------------------------------------------------
 /*!
-\relates TPointT   
+\relates TPointT
 This helper function returns the square of the absolute value of the specified point (a TPointD)
 */
 inline double norm2(const TPointD &p)
@@ -163,8 +155,8 @@ inline double norm2(const TPointD &p)
 }
 
 /*!
-\relates TPointT  
-This helper function returns the absolute value of the specified point 
+\relates TPointT
+This helper function returns the absolute value of the specified point
 */
 inline double norm(const TPointD &p)
 {
@@ -172,8 +164,8 @@ inline double norm(const TPointD &p)
 }
 
 /*!
-\relates TPointT  
-This helper function returns the normalized version of the specified point 
+\relates TPointT
+This helper function returns the normalized version of the specified point
 */
 inline TPointD normalize(const TPointD &p)
 {
@@ -183,7 +175,7 @@ inline TPointD normalize(const TPointD &p)
 }
 
 /*!
-\relates TPointT 
+\relates TPointT
 This helper function converts a TPoint (TPointT<int>) into a TPointD
 */
 inline TPointD convert(const TPoint &p)
@@ -192,7 +184,7 @@ inline TPointD convert(const TPoint &p)
 }
 
 /*!
-\relates TPointT 
+\relates TPointT
 This helper function converts a TPointD (TPointT<double>) into a TPoint
 */
 inline TPoint convert(const TPointD &p)
@@ -201,8 +193,8 @@ inline TPoint convert(const TPointD &p)
 }
 
 /*!
-\relates TPointT  
-This helper function returns the square of the distance between two points  
+\relates TPointT
+This helper function returns the square of the distance between two points
 */
 inline double tdistance2(const TPointD &p1, const TPointD &p2)
 {
@@ -215,8 +207,8 @@ inline bool operator==(const TPointD &p0, const TPointD &p1)
 }
 
 /*!
-\relates TPointT  
-This helper function returns the distance between two points  
+\relates TPointT
+This helper function returns the distance between two points
 */
 inline double tdistance(const TPointD &p1, const TPointD &p2)
 {
@@ -252,22 +244,17 @@ inline double atan(const TPointD &p)
 
 //=============================================================================
 
-template <class T>
-class DVAPI T3DPointT
+template <class T> class DVAPI T3DPointT
 {
-public:
+  public:
 	T x, y, z;
 
-	T3DPointT()
-		: x(0), y(0), z(0) {}
+	T3DPointT() : x(0), y(0), z(0) {}
 
-	T3DPointT(T _x, T _y, T _z)
-		: x(_x), y(_y), z(_z) {}
-	T3DPointT(const TPointT<T> &_p, T _z)
-		: x(_p.x), y(_p.y), z(_z) {}
+	T3DPointT(T _x, T _y, T _z) : x(_x), y(_y), z(_z) {}
+	T3DPointT(const TPointT<T> &_p, T _z) : x(_p.x), y(_p.y), z(_z) {}
 
-	T3DPointT(const T3DPointT &_p)
-		: x(_p.x), y(_p.y), z(_p.z) {}
+	T3DPointT(const T3DPointT &_p) : x(_p.x), y(_p.y), z(_p.z) {}
 
 	inline T3DPointT &operator=(const T3DPointT &a)
 	{
@@ -303,26 +290,16 @@ public:
 		return T3DPointT(x - a.x, y - a.y, z - a.z);
 	}
 
-	inline T3DPointT operator-() const
-	{
-		return T3DPointT(-x, -y, -z);
-	}
+	inline T3DPointT operator-() const { return T3DPointT(-x, -y, -z); }
 
-	bool operator==(const T3DPointT &p) const
-	{
-		return x == p.x && y == p.y && z == p.z;
-	}
+	bool operator==(const T3DPointT &p) const { return x == p.x && y == p.y && z == p.z; }
 
-	bool operator!=(const T3DPointT &p) const
-	{
-		return x != p.x || y != p.y || z != p.z;
-	}
+	bool operator!=(const T3DPointT &p) const { return x != p.x || y != p.y || z != p.z; }
 };
 
 //=============================================================================
 
-template <class T>
-inline std::ostream &operator<<(std::ostream &out, const T3DPointT<T> &p)
+template <class T> inline std::ostream &operator<<(std::ostream &out, const T3DPointT<T> &p)
 {
 	return out << "(" << p.x << ", " << p.y << ", " << p.z << ")";
 }
@@ -338,34 +315,30 @@ template class DVAPI T3DPointT<double>;
 //-----------------------------------------------------------------------------
 
 //!\relates T3DPointT
-template <class T>
-inline T3DPointT<T> operator*(T a, const T3DPointT<T> &p)
+template <class T> inline T3DPointT<T> operator*(T a, const T3DPointT<T> &p)
 {
 	return T3DPointT<T>(a * p.x, a * p.y, a * p.z);
 }
 
 //!\relates TPointT
-template <class T>
-inline T3DPointT<T> operator*(const T3DPointT<T> &p, T a)
+template <class T> inline T3DPointT<T> operator*(const T3DPointT<T> &p, T a)
 {
 	return T3DPointT<T>(a * p.x, a * p.y, a * p.z);
 }
 
 //-----------------------------------------------------------------------------
 /*!
-\relates TPointT   
+\relates TPointT
 This helper function returns the square of the absolute value of the specified point (a TPointI)
 */
-template <class T>
-inline T norm2(const T3DPointT<T> &p)
+template <class T> inline T norm2(const T3DPointT<T> &p)
 {
 	return p.x * p.x + p.y * p.y + p.z * p.z;
 }
 
 /*!
 */
-template <class T>
-inline T norm(const T3DPointT<T> &p)
+template <class T> inline T norm(const T3DPointT<T> &p)
 {
 	return std::sqrt(norm2(p));
 }
@@ -394,26 +367,21 @@ inline T3DPoint convert(const T3DPointD &p)
 }
 
 //!
-template <class T>
-inline T tdistance(const T3DPointT<T> &p1, const T3DPointT<T> &p2)
+template <class T> inline T tdistance(const T3DPointT<T> &p1, const T3DPointT<T> &p2)
 {
 	return norm<T>(p2 - p1);
 }
 
 //!
-template <class T>
-inline T tdistance2(const T3DPointT<T> &p1, const T3DPointT<T> &p2)
+template <class T> inline T tdistance2(const T3DPointT<T> &p1, const T3DPointT<T> &p2)
 {
 	return norm2<T>(p2 - p1);
 }
 
 //!
-template <class T>
-inline T3DPointT<T> cross(const T3DPointT<T> &a, const T3DPointT<T> &b)
+template <class T> inline T3DPointT<T> cross(const T3DPointT<T> &a, const T3DPointT<T> &b)
 {
-	return T3DPointT<T>(a.y * b.z - b.y * a.z,
-						a.z * b.x - b.z * a.x,
-						a.x * b.y - b.x * a.y);
+	return T3DPointT<T>(a.y * b.z - b.y * a.z, a.z * b.x - b.z * a.x, a.x * b.y - b.x * a.y);
 }
 //=============================================================================
 /*!
@@ -422,23 +390,18 @@ TThickPoint describe a thick point.
 */
 class DVAPI TThickPoint : public TPointD
 {
-public:
+  public:
 	double thick;
 
-	TThickPoint()
-		: TPointD(), thick(0) {}
+	TThickPoint() : TPointD(), thick(0) {}
 
-	TThickPoint(double _x, double _y, double _thick = 0)
-		: TPointD(_x, _y), thick(_thick) {}
+	TThickPoint(double _x, double _y, double _thick = 0) : TPointD(_x, _y), thick(_thick) {}
 
-	TThickPoint(const TPointD &_p, double _thick = 0)
-		: TPointD(_p.x, _p.y), thick(_thick) {}
+	TThickPoint(const TPointD &_p, double _thick = 0) : TPointD(_p.x, _p.y), thick(_thick) {}
 
-	TThickPoint(const T3DPointD &_p)
-		: TPointD(_p.x, _p.y), thick(_p.z) {}
+	TThickPoint(const T3DPointD &_p) : TPointD(_p.x, _p.y), thick(_p.z) {}
 
-	TThickPoint(const TThickPoint &_p)
-		: TPointD(_p.x, _p.y), thick(_p.thick) {}
+	TThickPoint(const TThickPoint &_p) : TPointD(_p.x, _p.y), thick(_p.thick) {}
 
 	inline TThickPoint &operator=(const TThickPoint &a)
 	{
@@ -474,20 +437,11 @@ public:
 		return TThickPoint(x - a.x, y - a.y, thick - a.thick);
 	}
 
-	inline TThickPoint operator-() const
-	{
-		return TThickPoint(-x, -y, -thick);
-	}
+	inline TThickPoint operator-() const { return TThickPoint(-x, -y, -thick); }
 
-	bool operator==(const TThickPoint &p) const
-	{
-		return x == p.x && y == p.y && thick == p.thick;
-	}
+	bool operator==(const TThickPoint &p) const { return x == p.x && y == p.y && thick == p.thick; }
 
-	bool operator!=(const TThickPoint &p) const
-	{
-		return x != p.x || y != p.y || thick != p.thick;
-	}
+	bool operator!=(const TThickPoint &p) const { return x != p.x || y != p.y || thick != p.thick; }
 };
 
 inline double operator*(const TThickPoint &a, const TThickPoint &b)
@@ -506,7 +460,7 @@ inline TThickPoint operator*(const TThickPoint &p, double a)
 }
 
 /*!
-\relates TPointD 
+\relates TPointD
 This helper function converts a TThickPoint into a TPointD
 */
 inline TPointD convert(const TThickPoint &p)
@@ -515,8 +469,8 @@ inline TPointD convert(const TThickPoint &p)
 }
 
 /*!
-\relates TThickPoint  
-This helper function returns the square of the distance between two thick points  
+\relates TThickPoint
+This helper function returns the square of the distance between two thick points
 (only x and y are used)
 */
 inline double tdistance2(const TThickPoint &p1, const TThickPoint &p2)
@@ -524,8 +478,8 @@ inline double tdistance2(const TThickPoint &p1, const TThickPoint &p2)
 	return norm2(convert(p2 - p1));
 }
 /*!
-\relates TThickPoint  
-This helper function returns the distance between two thick  points  
+\relates TThickPoint
+This helper function returns the distance between two thick  points
 (only x and y are used)
 */
 inline double tdistance(const TThickPoint &p1, const TThickPoint &p2)
@@ -540,14 +494,13 @@ inline std::ostream &operator<<(std::ostream &out, const TThickPoint &p)
 
 //=============================================================================
 //!	This is a template class representing a generic vector in a plane, i.e. a point.
-/*!	
-		It is a data structure with two objects in it representing coordinate of the point and 
+/*!
+		It is a data structure with two objects in it representing coordinate of the point and
 		the basic operations on it.
 	*/
-template <class T>
-class DVAPI TDimensionT
+template <class T> class DVAPI TDimensionT
 {
-public:
+  public:
 	T lx, ly;
 	/*!
 		Constructs a vector of two elements, i.e. a point in a plane.
@@ -595,10 +548,7 @@ public:
 	/*!
 		Compare vectors and returns \e true if are equals element by element.
 	*/
-	bool operator==(const TDimensionT &d) const
-	{
-		return lx == d.lx && ly == d.ly;
-	}
+	bool operator==(const TDimensionT &d) const { return lx == d.lx && ly == d.ly; }
 	/*!
 		Compare vectors and returns \e true if are not equals element by element.
 	*/
@@ -612,8 +562,7 @@ typedef TDimensionT<double> TDimensionD;
 
 //=============================================================================
 
-template <class T>
-inline std::ostream &operator<<(std::ostream &out, const TDimensionT<T> &p)
+template <class T> inline std::ostream &operator<<(std::ostream &out, const TDimensionT<T> &p)
 {
 	return out << "(" << p.lx << ", " << p.ly << ")";
 }
@@ -631,12 +580,11 @@ template class DVAPI TDimensionT<double>;
 \arg \a x1 specifies the x-coordinate of the upper-right corner of a rectangle.
 \arg \a y1 specifies the y-coordinate of the upper-right corner of a rectangle.
 */
-template <class T>
-class DVAPI TRectT
+template <class T> class DVAPI TRectT
 {
-public:
+  public:
 	/*! if x0>x1 || y0>y1 then rect is empty
-    if x0==y1 && y0==y1 and rect is a  TRectD then rect is empty */
+	if x0==y1 && y0==y1 and rect is a  TRectD then rect is empty */
 
 	T x0, y0;
 	T x1, y1;
@@ -644,10 +592,8 @@ public:
 	/*! makes an empty rect */
 	TRectT();
 
-	TRectT(T _x0, T _y0, T _x1, T _y1)
-		: x0(_x0), y0(_y0), x1(_x1), y1(_y1){};
-	TRectT(const TRectT &rect)
-		: x0(rect.x0), y0(rect.y0), x1(rect.x1), y1(rect.y1){};
+	TRectT(T _x0, T _y0, T _x1, T _y1) : x0(_x0), y0(_y0), x1(_x1), y1(_y1){};
+	TRectT(const TRectT &rect) : x0(rect.x0), y0(rect.y0), x1(rect.x1), y1(rect.y1){};
 	TRectT(const TPointT<T> &p0, const TPointT<T> &p1) // non importa l'ordine
 		: x0(tmin((T)p0.x, (T)p1.x)),
 		  y0(tmin((T)p0.y, (T)p1.y)),
@@ -658,26 +604,23 @@ public:
 
 	void empty();
 
-	/*! TRectD is empty if and only if (x0>x1 || y0>y1) || (x0==y1 && y0==y1); 
-    TRectI  is empty if x0>x1 || y0>y1 */
+	/*! TRectD is empty if and only if (x0>x1 || y0>y1) || (x0==y1 && y0==y1);
+	TRectI  is empty if x0>x1 || y0>y1 */
 	bool isEmpty() const;
 
 	T getLx() const;
 	T getLy() const;
 
-	TDimensionT<T> getSize() const
-	{
-		return TDimensionT<T>(getLx(), getLy());
-	};
+	TDimensionT<T> getSize() const { return TDimensionT<T>(getLx(), getLy()); };
 
 	TPointT<T> getP00() const { return TPointT<T>(x0, y0); };
 	TPointT<T> getP10() const { return TPointT<T>(x1, y0); };
 	TPointT<T> getP01() const { return TPointT<T>(x0, y1); };
 	TPointT<T> getP11() const { return TPointT<T>(x1, y1); };
 
-	//!Returns the union of two source rectangles.
-	/*!The union is the smallest rectangle that contains both source rectangles. 
-    */
+	//! Returns the union of two source rectangles.
+	/*!The union is the smallest rectangle that contains both source rectangles.
+	*/
 	TRectT<T> operator+(const TRectT<T> &rect) const
 	{ // unione
 		if (isEmpty())
@@ -685,9 +628,8 @@ public:
 		else if (rect.isEmpty())
 			return *this;
 		else
-			return TRectT<T>(
-				tmin((T)x0, (T)rect.x0), tmin((T)y0, (T)rect.y0),
-				tmax((T)x1, (T)rect.x1), tmax((T)y1, (T)rect.y1));
+			return TRectT<T>(tmin((T)x0, (T)rect.x0), tmin((T)y0, (T)rect.y0),
+							 tmax((T)x1, (T)rect.x1), tmax((T)y1, (T)rect.y1));
 	};
 	TRectT<T> &operator+=(const TRectT<T> &rect)
 	{ // unione
@@ -698,10 +640,10 @@ public:
 		return *this = *this * rect;
 	};
 
-	/*!Returns the intersection of two existing rectangles. 
-    
-      The intersection is the largest rectangle contained in both existing rectangles.
-    */
+	/*!Returns the intersection of two existing rectangles.
+
+	  The intersection is the largest rectangle contained in both existing rectangles.
+	*/
 	TRectT<T> operator*(const TRectT<T> &rect) const
 	{ // intersezione
 		if (isEmpty() || rect.isEmpty())
@@ -709,9 +651,8 @@ public:
 		else if (rect.x1 < x0 || x1 < rect.x0 || rect.y1 < y0 || y1 < rect.y0)
 			return TRectT<T>();
 		else
-			return TRectT<T>(
-				tmax((T)x0, (T)rect.x0), tmax((T)y0, (T)rect.y0),
-				tmin((T)x1, (T)rect.x1), tmin((T)y1, (T)rect.y1));
+			return TRectT<T>(tmax((T)x0, (T)rect.x0), tmax((T)y0, (T)rect.y0),
+							 tmin((T)x1, (T)rect.x1), tmin((T)y1, (T)rect.y1));
 	};
 
 	TRectT<T> &operator+=(const TPointT<T> &p)
@@ -763,8 +704,7 @@ public:
 
 	bool overlaps(const TRectT<T> &b) const
 	{
-		return x0 <= b.x1 && x1 >= b.x0 &&
-			   y0 <= b.y1 && y1 >= b.y0;
+		return x0 <= b.x1 && x1 >= b.x0 && y0 <= b.y1 && y1 >= b.y0;
 	};
 
 	TRectT<T> enlarge(T dx, T dy) const
@@ -775,10 +715,7 @@ public:
 	};
 
 	TRectT<T> enlarge(T d) const { return enlarge(d, d); };
-	TRectT<T> enlarge(TDimensionT<T> d) const
-	{
-		return enlarge(d.lx, d.ly);
-	};
+	TRectT<T> enlarge(TDimensionT<T> d) const { return enlarge(d.lx, d.ly); };
 };
 
 //-----------------------------------------------------------------------------
@@ -794,18 +731,16 @@ template class DVAPI TRectT<double>;
 //=============================================================================
 
 // check this, not final version
-/*! 
+/*!
 \relates TRectT
 Convert a TRectD into a TRect
 */
 inline TRect convert(const TRectD &r)
 {
-	return TRect(
-		(int)(r.x0 + 0.5), (int)(r.y0 + 0.5),
-		(int)(r.x1 + 0.5), (int)(r.y1 + 0.5));
+	return TRect((int)(r.x0 + 0.5), (int)(r.y0 + 0.5), (int)(r.x1 + 0.5), (int)(r.y1 + 0.5));
 }
-/*! 
-\relates TRectT  
+/*!
+\relates TRectT
 Convert a TRect into a TRectD
 */
 inline TRectD convert(const TRect &r)
@@ -814,84 +749,90 @@ inline TRectD convert(const TRect &r)
 }
 
 // template?
-/*! 
-\relates TRectT 
-\relates TPointT  
+/*!
+\relates TRectT
+\relates TPointT
 */
 inline TRectD boundingBox(const TPointD &p0, const TPointD &p1)
 {
-	return TRectD(tmin(p0.x, p1.x), tmin(p0.y, p1.y),
-				  tmax(p0.x, p1.x), tmax(p0.y, p1.y));
+	return TRectD(tmin(p0.x, p1.x), tmin(p0.y, p1.y), tmax(p0.x, p1.x), tmax(p0.y, p1.y));
 }
 /*!
-\relates TRectT 
-\relates TPointT  
+\relates TRectT
+\relates TPointT
 */
-inline TRectD boundingBox(
-	const TPointD &p0,
-	const TPointD &p1,
-	const TPointD &p2)
+inline TRectD boundingBox(const TPointD &p0, const TPointD &p1, const TPointD &p2)
 {
-	return TRectD(tmin(p0.x, p1.x, p2.x), tmin(p0.y, p1.y, p2.y),
-				  tmax(p0.x, p1.x, p2.x), tmax(p0.y, p1.y, p2.y));
+	return TRectD(tmin(p0.x, p1.x, p2.x), tmin(p0.y, p1.y, p2.y), tmax(p0.x, p1.x, p2.x),
+				  tmax(p0.y, p1.y, p2.y));
 }
 
 /*!
-\relates TRectT 
-\relates TPointT  
+\relates TRectT
+\relates TPointT
 */
-inline TRectD boundingBox(
-	const TPointD &p0,
-	const TPointD &p1,
-	const TPointD &p2,
-	const TPointD &p3)
+inline TRectD boundingBox(const TPointD &p0, const TPointD &p1, const TPointD &p2,
+						  const TPointD &p3)
 {
-	return TRectD(
-		tmin(p0.x, p1.x, p2.x, p3.x),
-		tmin(p0.y, p1.y, p2.y, p3.y),
-		tmax(p0.x, p1.x, p2.x, p3.x),
-		tmax(p0.y, p1.y, p2.y, p3.y));
+	return TRectD(tmin(p0.x, p1.x, p2.x, p3.x), tmin(p0.y, p1.y, p2.y, p3.y),
+				  tmax(p0.x, p1.x, p2.x, p3.x), tmax(p0.y, p1.y, p2.y, p3.y));
 }
 
 //-----------------------------------------------------------------------------
 
-template <>
-inline TRectT<int>::TRectT() : x0(0), y0(0), x1(-1), y1(-1) {}
+template <> inline TRectT<int>::TRectT() : x0(0), y0(0), x1(-1), y1(-1)
+{
+}
 template <>
 inline TRectT<int>::TRectT(const TPointT<int> &bottomLeft, const TDimensionT<int> &d)
-	: x0(bottomLeft.x), y0(bottomLeft.y), x1(bottomLeft.x + d.lx - 1), y1(bottomLeft.y + d.ly - 1){};
+	: x0(bottomLeft.x), y0(bottomLeft.y), x1(bottomLeft.x + d.lx - 1),
+	  y1(bottomLeft.y + d.ly - 1){};
 template <>
 inline TRectT<int>::TRectT(const TDimensionT<int> &d)
 	: x0(0), y0(0), x1(d.lx - 1), y1(d.ly - 1){};
-template <>
-inline bool TRectT<int>::isEmpty() const { return x0 > x1 || y0 > y1; }
-template <>
-inline void TRectT<int>::empty()
+template <> inline bool TRectT<int>::isEmpty() const
+{
+	return x0 > x1 || y0 > y1;
+}
+template <> inline void TRectT<int>::empty()
 {
 	x0 = y0 = 0;
 	x1 = y1 = -1;
 }
-template <>
-inline int TRectT<int>::getLx() const { return x1 >= x0 ? x1 - x0 + 1 : 0; }
-template <>
-inline int TRectT<int>::getLy() const { return y1 >= y0 ? y1 - y0 + 1 : 0; }
+template <> inline int TRectT<int>::getLx() const
+{
+	return x1 >= x0 ? x1 - x0 + 1 : 0;
+}
+template <> inline int TRectT<int>::getLy() const
+{
+	return y1 >= y0 ? y1 - y0 + 1 : 0;
+}
 
-template <>
-inline TRectT<double>::TRectT() : x0(0), y0(0), x1(0), y1(0) {}
+template <> inline TRectT<double>::TRectT() : x0(0), y0(0), x1(0), y1(0)
+{
+}
 template <>
 inline TRectT<double>::TRectT(const TPointT<double> &bottomLeft, const TDimensionT<double> &d)
 	: x0(bottomLeft.x), y0(bottomLeft.y), x1(bottomLeft.x + d.lx), y1(bottomLeft.y + d.ly){};
 template <>
 inline TRectT<double>::TRectT(const TDimensionT<double> &d)
 	: x0(0.0), y0(0.0), x1(d.lx), y1(d.ly){};
-template <>
-inline bool TRectT<double>::isEmpty() const { return (x0 == x1 && y0 == y1) || x0 > x1 || y0 > y1; }
-template <>
-inline void TRectT<double>::empty() { x0 = y0 = x1 = y1 = 0; }
-template <>
-inline double TRectT<double>::getLx() const { return x1 >= x0 ? x1 - x0 : 0; }
-template <>
-inline double TRectT<double>::getLy() const { return y1 >= y0 ? y1 - y0 : 0; }
+template <> inline bool TRectT<double>::isEmpty() const
+{
+	return (x0 == x1 && y0 == y1) || x0 > x1 || y0 > y1;
+}
+template <> inline void TRectT<double>::empty()
+{
+	x0 = y0 = x1 = y1 = 0;
+}
+template <> inline double TRectT<double>::getLx() const
+{
+	return x1 >= x0 ? x1 - x0 : 0;
+}
+template <> inline double TRectT<double>::getLy() const
+{
+	return y1 >= y0 ? y1 - y0 : 0;
+}
 
 //-----------------------------------------------------------------------------
 
@@ -931,11 +872,9 @@ inline TRectD operator/(const TRectD &rect, double factor)
 
 //-----------------------------------------------------------------------------
 
-template <class T>
-inline std::ostream &operator<<(std::ostream &out, const TRectT<T> &r)
+template <class T> inline std::ostream &operator<<(std::ostream &out, const TRectT<T> &r)
 {
-	return out << "(" << r.x0 << "," << r.y0
-			   << ";" << r.x1 << "," << r.y1 << ")";
+	return out << "(" << r.x0 << "," << r.y0 << ";" << r.x1 << "," << r.y1 << ")";
 }
 
 //=============================================================================
@@ -952,7 +891,7 @@ extern DVVAR const TRectI infiniteRectI;
 }
 
 //=============================================================================
-//!This is the base class for the affine transformations.
+//! This is the base class for the affine transformations.
 /*!
 		This class performs basic manipulations of affine transformations.
 		An affine transformation is a linear transformation followed by a translation.
@@ -962,67 +901,64 @@ extern DVVAR const TRectI infiniteRectI;
 		<p>
 		\f$ \bf{A} \f$ is a \f$ 2X2 \f$ matrix.
 		In a matrix notation:
-		<p> \f$ \left(\begin{array}{c} \vec{y} \\ 1 \end{array}\right) = 
+		<p> \f$ \left(\begin{array}{c} \vec{y} \\ 1 \end{array}\right) =
 		\left( \begin{array}{cc} \bf{A} & \vec{b} \\ \vec{0} & 1  \end{array}\right)
 		\left(\begin{array}{c}\vec{x} \\ 1 \end{array} \right) \f$ </p>
 	*/
 class DVAPI TAffine
 {
-public:
+  public:
 	double a11, a12, a13;
 	double a21, a22, a23;
 	/*!
-		By default the object is initialized with a null matrix and a null translation vector. 
+		By default the object is initialized with a null matrix and a null translation vector.
 	*/
-	TAffine() : a11(1.0), a12(0.0), a13(0.0),
-				a21(0.0), a22(1.0), a23(0.0){};
+	TAffine() : a11(1.0), a12(0.0), a13(0.0), a21(0.0), a22(1.0), a23(0.0){};
 	/*!
-		Initializes the internal matrix and vector of translation with the user values.		
+		Initializes the internal matrix and vector of translation with the user values.
 	*/
-	TAffine(
-		double p11, double p12, double p13,
-		double p21, double p22, double p23) : a11(p11), a12(p12), a13(p13),
-											  a21(p21), a22(p22), a23(p23){};
+	TAffine(double p11, double p12, double p13, double p21, double p22, double p23)
+		: a11(p11), a12(p12), a13(p13), a21(p21), a22(p22), a23(p23){};
 	/*!
 		Copy constructor.
 	*/
-	TAffine(const TAffine &a) : a11(a.a11), a12(a.a12), a13(a.a13),
-								a21(a.a21), a22(a.a22), a23(a.a23){};
+	TAffine(const TAffine &a)
+		: a11(a.a11), a12(a.a12), a13(a.a13), a21(a.a21), a22(a.a22), a23(a.a23){};
 	/*!
 		Assignment operator.
   */
 	TAffine &operator=(const TAffine &a);
 	/*Sposto in tgeometry.cpp
   {
-    a11 = a.a11; a12 = a.a12; a13 = a.a13;
-    a21 = a.a21; a22 = a.a22; a23 = a.a23;
-    return *this;
+	a11 = a.a11; a12 = a.a12; a13 = a.a13;
+	a21 = a.a21; a22 = a.a22; a23 = a.a23;
+	return *this;
   };
   */
 	/*!
 		Matrix multiplication.
 		<p>\f$\left(\begin{array}{cc}\bf{A}&\vec{a}\\\vec{0}&1\end{array}\right)
 		\left(\begin{array}{cc}\bf{B}&\vec{b}\\\vec{0}&1\end{array}\right)\f$</p>
-			
+
   */
 	TAffine operator*(const TAffine &b) const;
 	/*Sposto in tgeometry.cpp
   {
-    return TAffine (
-      a11 * b.a11 + a12 * b.a21,
-      a11 * b.a12 + a12 * b.a22,
-      a11 * b.a13 + a12 * b.a23 + a13,
-      
-      a21 * b.a11 + a22 * b.a21,
-      a21 * b.a12 + a22 * b.a22,
-      a21 * b.a13 + a22 * b.a23 + a23);
+	return TAffine (
+	  a11 * b.a11 + a12 * b.a21,
+	  a11 * b.a12 + a12 * b.a22,
+	  a11 * b.a13 + a12 * b.a23 + a13,
+
+	  a21 * b.a11 + a22 * b.a21,
+	  a21 * b.a12 + a22 * b.a22,
+	  a21 * b.a13 + a22 * b.a23 + a23);
   };
   */
 
 	TAffine operator*=(const TAffine &b);
 	/*Sposto in tgeometry.cpp
   {
-    return *this = *this * b;
+	return *this = *this * b;
   };
   */
 	/*!
@@ -1033,47 +969,47 @@ public:
 	TAffine inv() const;
 	/*Sposto in tgeometry.cpp
   {
-    if(a12 == 0.0 && a21 == 0.0)
-    {
-      assert(a11 != 0.0);
-      assert(a22 != 0.0);
-      double inv_a11 = 1.0/a11;
-      double inv_a22 = 1.0/a22;
-      return TAffine(inv_a11,0, -a13 * inv_a11, 
-        0,inv_a22, -a23 * inv_a22);
-    }
-    else if(a11 == 0.0 && a22 == 0.0)
-    {
-      assert(a12 != 0.0);
-      assert(a21 != 0.0);
-      double inv_a21 = 1.0/a21;
-      double inv_a12 = 1.0/a12;
-      return TAffine(0, inv_a21, -a23 * inv_a21, 
-        inv_a12, 0, -a13 * inv_a12);
-    }
-    else
-    {
-      double d = 1./det();  
-      return TAffine(a22*d,-a12*d, (a12*a23-a22*a13)*d, 
-        -a21*d, a11*d, (a21*a13-a11*a23)*d);
-    }
+	if(a12 == 0.0 && a21 == 0.0)
+	{
+	  assert(a11 != 0.0);
+	  assert(a22 != 0.0);
+	  double inv_a11 = 1.0/a11;
+	  double inv_a22 = 1.0/a22;
+	  return TAffine(inv_a11,0, -a13 * inv_a11,
+		0,inv_a22, -a23 * inv_a22);
+	}
+	else if(a11 == 0.0 && a22 == 0.0)
+	{
+	  assert(a12 != 0.0);
+	  assert(a21 != 0.0);
+	  double inv_a21 = 1.0/a21;
+	  double inv_a12 = 1.0/a12;
+	  return TAffine(0, inv_a21, -a23 * inv_a21,
+		inv_a12, 0, -a13 * inv_a12);
+	}
+	else
+	{
+	  double d = 1./det();
+	  return TAffine(a22*d,-a12*d, (a12*a23-a22*a13)*d,
+		-a21*d, a11*d, (a21*a13-a11*a23)*d);
+	}
   };
   */
 
 	double det() const;
 	/*Sposto in tgeometry.cpp{
-    return a11*a22-a12*a21;
+	return a11*a22-a12*a21;
   };
   */
 
 	/*!
-		Returns \e true if all elements are equals.	
+		Returns \e true if all elements are equals.
 	*/
 	bool operator==(const TAffine &a) const;
 	/*Sposto in tgeometry.cpp
   {
-    return a11==a.a11 && a12==a.a12 && a13==a.a13 &&
-      a21==a.a21 && a22==a.a22 && a23==a.a23;
+	return a11==a.a11 && a12==a.a12 && a13==a.a13 &&
+	  a21==a.a21 && a22==a.a22 && a23==a.a23;
   };
   */
 	/*!
@@ -1083,20 +1019,20 @@ public:
 	bool operator!=(const TAffine &a) const;
 	/*Sposto in tgeometry.cpp
   {
-    return a11!=a.a11 || a12!=a.a12 || a13!=a.a13 ||
-      a21!=a.a21 || a22!=a.a22 || a23!=a.a23;
-  }; 
+	return a11!=a.a11 || a12!=a.a12 || a13!=a.a13 ||
+	  a21!=a.a21 || a22!=a.a22 || a23!=a.a23;
+  };
   */
 	/*!
-		Returns \e true if the transformation is an identity, 
-		i.e in the error limit \e err leaves the vectors unchanged.	
+		Returns \e true if the transformation is an identity,
+		i.e in the error limit \e err leaves the vectors unchanged.
 	*/
 
 	bool isIdentity(double err = 1.e-8) const;
 	/*Sposto in tgeometry.cpp
   {
-    return ((a11-1.0)*(a11-1.0)+(a22-1.0)*(a22-1.0)+
-      a12*a12+a13*a13+a21*a21+a23*a23) < err;
+	return ((a11-1.0)*(a11-1.0)+(a22-1.0)*(a22-1.0)+
+	  a12*a12+a13*a13+a21*a21+a23*a23) < err;
   };
   */
 	/*!
@@ -1106,8 +1042,8 @@ public:
 	bool isTranslation(double err = 1.e-8) const;
 	/*Sposto in tgeometry.cpp
   {
-    return ((a11-1.0)*(a11-1.0)+(a22-1.0)*(a22-1.0)+
-      a12*a12+a21*a21) < err;
+	return ((a11-1.0)*(a11-1.0)+(a22-1.0)*(a22-1.0)+
+	  a12*a12+a21*a21) < err;
   };
   */
 	/*!
@@ -1128,18 +1064,18 @@ public:
 	TPointD operator*(const TPointD &p) const;
 	/*Sposto in tgeometry.cpp
   {
-    return TPointD(p.x*a11+p.y*a12+a13, p.x*a21+p.y*a22+a23);
+	return TPointD(p.x*a11+p.y*a12+a13, p.x*a21+p.y*a22+a23);
   };
   */
 
-	/*! 
+	/*!
 		Retruns the transformed box of the bounding box.
 	*/
 	TRectD operator*(const TRectD &rect) const;
 	/*Sposto in tgeometry.cpp
   {
-    if (rect != TConsts::infiniteRectD)
-    {
+	if (rect != TConsts::infiniteRectD)
+	{
 			TPointD p1= *this * rect.getP00(),
 				p2= *this * rect.getP01(),
 				p3= *this * rect.getP10(),
@@ -1148,7 +1084,7 @@ public:
 				tmax(p1.x,p2.x,p3.x,p4.x), tmax(p1.y,p2.y,p3.y,p4.y));
 		}
 		else
-      return TConsts::infiniteRectD;
+	  return TConsts::infiniteRectD;
   };
   */
 
@@ -1161,8 +1097,8 @@ public:
 	TAffine place(double u, double v, double x, double y) const;
 	/*Sposto in tgeometry.cpp
   {
-    return TAffine(a11, a12, x - (a11 * u + a12 * v),  
-      a21, a22, y - (a21 * u + a22 * v));
+	return TAffine(a11, a12, x - (a11 * u + a12 * v),
+	  a21, a22, y - (a21 * u + a22 * v));
   };
   */
 	/*!
@@ -1172,21 +1108,21 @@ public:
 	TAffine place(const TPointD &pIn, const TPointD &pOut) const;
 	/*Sposto in tgeometry.cpp
   {
-    return TAffine(a11, a12, pOut.x - (a11 * pIn.x + a12 * pIn.y),  
-      a21, a22, pOut.y - (a21 * pIn.x + a22 * pIn.y));
+	return TAffine(a11, a12, pOut.x - (a11 * pIn.x + a12 * pIn.y),
+	  a21, a22, pOut.y - (a21 * pIn.x + a22 * pIn.y));
   };
   */
 };
 
 //-----------------------------------------------------------------------------
 
-//template <>
+// template <>
 inline bool areAlmostEqual(const TPointD &a, const TPointD &b, double err = TConsts::epsilon)
 {
 	return tdistance2(a, b) < err * err;
 }
 
-//template <>
+// template <>
 inline bool areAlmostEqual(const TRectD &a, const TRectD &b, double err = TConsts::epsilon)
 {
 	return areAlmostEqual(a.getP00(), b.getP00(), err) &&
@@ -1199,7 +1135,7 @@ const TAffine AffI = TAffine();
 
 class DVAPI TTranslation : public TAffine
 {
-public:
+  public:
 	TTranslation(){};
 	TTranslation(double x, double y) : TAffine(1, 0, x, 0, 1, y){};
 	TTranslation(const TPointD &p) : TAffine(1, 0, p.x, 0, 1, p.y){};
@@ -1209,7 +1145,7 @@ public:
 
 class DVAPI TRotation : public TAffine
 {
-public:
+  public:
 	TRotation(){};
 
 	/*! makes a rotation matrix of  "degrees" degrees counterclockwise
@@ -1217,30 +1153,30 @@ public:
 	TRotation(double degrees);
 	/*Sposto in tgeometry.cpp
   {
-    double rad, sn, cs;
-    int idegrees = (int)degrees;
-    if ((double)idegrees == degrees && idegrees % 90 == 0)
-    {
-      switch ((idegrees / 90) & 3)
-      {
-      case 0:  sn =  0; cs =  1; break;
-      case 1:  sn =  1; cs =  0; break;
-      case 2:  sn =  0; cs = -1; break;
-      case 3:  sn = -1; cs =  0; break;
-      default: sn =  0; cs =  0; break;
-      }
-    }
-    else
-    {
-      rad = degrees * (TConsts::pi_180);
-      sn = sin (rad);
-      cs = cos (rad);
-      if (sn == 1 || sn == -1)
-        cs = 0;
-      if (cs == 1 || cs == -1)
-        sn = 0;
-    }
-    a11=cs;a12= -sn;a21= -a12;a22=a11;
+	double rad, sn, cs;
+	int idegrees = (int)degrees;
+	if ((double)idegrees == degrees && idegrees % 90 == 0)
+	{
+	  switch ((idegrees / 90) & 3)
+	  {
+	  case 0:  sn =  0; cs =  1; break;
+	  case 1:  sn =  1; cs =  0; break;
+	  case 2:  sn =  0; cs = -1; break;
+	  case 3:  sn = -1; cs =  0; break;
+	  default: sn =  0; cs =  0; break;
+	  }
+	}
+	else
+	{
+	  rad = degrees * (TConsts::pi_180);
+	  sn = sin (rad);
+	  cs = cos (rad);
+	  if (sn == 1 || sn == -1)
+		cs = 0;
+	  if (cs == 1 || cs == -1)
+		sn = 0;
+	}
+	a11=cs;a12= -sn;a21= -a12;a22=a11;
   };
   */
 
@@ -1249,9 +1185,9 @@ public:
 	TRotation(const TPointD &center, double degrees);
 	/*Sposto in tgeometry.cpp
   {
-    TAffine a = TTranslation(center) * TRotation(degrees) * TTranslation(-center);
-    a11 = a.a11; a12 = a.a12; a13 = a.a13;
-    a21 = a.a21; a22 = a.a22; a23 = a.a23;
+	TAffine a = TTranslation(center) * TRotation(degrees) * TTranslation(-center);
+	a11 = a.a11; a12 = a.a12; a13 = a.a13;
+	a21 = a.a21; a22 = a.a22; a23 = a.a23;
   };
   */
 };
@@ -1260,7 +1196,7 @@ public:
 
 class DVAPI TScale : public TAffine
 {
-public:
+  public:
 	TScale(){};
 	TScale(double sx, double sy) : TAffine(sx, 0, 0, 0, sy, 0){};
 	TScale(double s) : TAffine(s, 0, 0, 0, s, 0) {}
@@ -1268,18 +1204,18 @@ public:
 	TScale(const TPointD &center, double sx, double sy);
 	/*Sposto in tgeometry.cpp
   {
-    TAffine a = TTranslation(center) * TScale(sx,sy) * TTranslation(-center);
-    a11 = a.a11; a12 = a.a12; a13 = a.a13;
-    a21 = a.a21; a22 = a.a22; a23 = a.a23;
+	TAffine a = TTranslation(center) * TScale(sx,sy) * TTranslation(-center);
+	a11 = a.a11; a12 = a.a12; a13 = a.a13;
+	a21 = a.a21; a22 = a.a22; a23 = a.a23;
   }
   */
 
 	TScale(const TPointD &center, double s);
 	/*Sposto in tgeometry.cpp
   {
-    TAffine a = TTranslation(center) * TScale(s) * TTranslation(-center);
-    a11 = a.a11; a12 = a.a12; a13 = a.a13;
-    a21 = a.a21; a22 = a.a22; a23 = a.a23;
+	TAffine a = TTranslation(center) * TScale(s) * TTranslation(-center);
+	a11 = a.a11; a12 = a.a12; a13 = a.a13;
+	a21 = a.a21; a22 = a.a22; a23 = a.a23;
   }
   */
 };
@@ -1288,23 +1224,17 @@ public:
 
 class DVAPI TShear : public TAffine
 {
-public:
+  public:
 	TShear(){};
 	TShear(double sx, double sy) : TAffine(1, sx, 0, sy, 1, 0){};
 };
 
 //-----------------------------------------------------------------------------
 
-inline bool areEquals(const TAffine &a,
-					  const TAffine &b,
-					  double err = 1e-8)
+inline bool areEquals(const TAffine &a, const TAffine &b, double err = 1e-8)
 {
-	return fabs(a.a11 - b.a11) < err &&
-		   fabs(a.a12 - b.a12) < err &&
-		   fabs(a.a13 - b.a13) < err &&
-		   fabs(a.a21 - b.a21) < err &&
-		   fabs(a.a22 - b.a22) < err &&
-		   fabs(a.a23 - b.a23) < err;
+	return fabs(a.a11 - b.a11) < err && fabs(a.a12 - b.a12) < err && fabs(a.a13 - b.a13) < err &&
+		   fabs(a.a21 - b.a21) < err && fabs(a.a22 - b.a22) < err && fabs(a.a23 - b.a23) < err;
 }
 
 //-----------------------------------------------------------------------------
@@ -1318,8 +1248,8 @@ inline TAffine inv(const TAffine &a)
 
 inline std::ostream &operator<<(std::ostream &out, const TAffine &a)
 {
-	return out << "(" << a.a11 << ", " << a.a12 << ", " << a.a13
-			   << ";" << a.a21 << ", " << a.a22 << ", " << a.a23 << ")";
+	return out << "(" << a.a11 << ", " << a.a12 << ", " << a.a13 << ";" << a.a21 << ", " << a.a22
+			   << ", " << a.a23 << ")";
 }
 
 #endif //  __T_GEOMETRY_INCLUDED__

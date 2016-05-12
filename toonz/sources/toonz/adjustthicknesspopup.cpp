@@ -61,8 +61,7 @@
 namespace
 {
 
-static const double dmax = (std::numeric_limits<double>::max)(),
-					dmin = -dmax;
+static const double dmax = (std::numeric_limits<double>::max)(), dmin = -dmax;
 
 //--------------------------------------------------------------
 
@@ -94,8 +93,7 @@ struct TransformFunc {
 
 //--------------------------------------------------------------
 
-void transformThickness_image(
-	const TVectorImageP &vi, const double(&transform)[2])
+void transformThickness_image(const TVectorImageP &vi, const double(&transform)[2])
 {
 	assert(vi);
 	if (transform[0] == 0.0 && transform[1] == 1.0) // Bail out if transform is the identity
@@ -104,15 +102,13 @@ void transformThickness_image(
 	TransformFunc transformer = {*vi, transform};
 
 	std::for_each(boost::counting_iterator<int>(0),
-				  boost::counting_iterator<int>(vi->getStrokeCount()),
-				  transformer);
+				  boost::counting_iterator<int>(vi->getStrokeCount()), transformer);
 }
 
 //--------------------------------------------------------------
 
-void transformThickness_strokes(
-	const TVectorImageP &vi, const double(&transform)[2],
-	const int strokesSelection[], int strokesSelectionCount)
+void transformThickness_strokes(const TVectorImageP &vi, const double(&transform)[2],
+								const int strokesSelection[], int strokesSelectionCount)
 {
 	assert(vi);
 	if (transform[0] == 0.0 && transform[1] == 1.0) // Bail out if transform is the identity
@@ -120,8 +116,7 @@ void transformThickness_strokes(
 
 	TransformFunc transformer = {*vi, transform};
 
-	std::for_each(strokesSelection, strokesSelection + strokesSelectionCount,
-				  transformer);
+	std::for_each(strokesSelection, strokesSelection + strokesSelectionCount, transformer);
 }
 
 //--------------------------------------------------------------
@@ -131,8 +126,7 @@ namespace
 
 struct StylesFilter {
 	const TVectorImage &m_vi;
-	const int *m_stylesStart,
-		*m_stylesEnd;
+	const int *m_stylesStart, *m_stylesEnd;
 
 	bool operator()(int strokeIdx) const
 	{
@@ -143,9 +137,8 @@ struct StylesFilter {
 
 } // namespace
 
-void transformThickness_styles(
-	const TVectorImageP &vi, const double(&transform)[2],
-	const int stylesSelection[], int stylesSelectionCount)
+void transformThickness_styles(const TVectorImageP &vi, const double(&transform)[2],
+							   const int stylesSelection[], int stylesSelectionCount)
 {
 	assert(vi);
 	if (transform[0] == 0.0 && transform[1] == 1.0) // Bail out if transform is the identity
@@ -157,8 +150,7 @@ void transformThickness_styles(
 	boost::counting_iterator<int> sBegin(0), sEnd(vi->getStrokeCount());
 
 	std::for_each(boost::make_filter_iterator(filter, sBegin, sEnd),
-				  boost::make_filter_iterator(filter, sEnd, sEnd),
-				  transformer);
+				  boost::make_filter_iterator(filter, sEnd, sEnd), transformer);
 }
 
 //------------------------------------------------------------------------
@@ -222,8 +214,7 @@ std::pair<TXshSimpleLevel *, int> currentLevelIndex()
 
 double relativePosition(int start, int end, int pos)
 {
-	return tcrop((start == end) ? 0.0 : double(pos - start) / double(end - start),
-				 0.0, 1.0);
+	return tcrop((start == end) ? 0.0 : double(pos - start) / double(end - start), 0.0, 1.0);
 }
 
 } // namespace
@@ -236,7 +227,7 @@ class AdjustThicknessPopup::Swatch : public PlaneViewer
 {
 	TVectorImageP m_vi;
 
-public:
+  public:
 	Swatch(QWidget *parent = 0) : PlaneViewer(parent)
 	{
 		setBgColor(TPixel32::White, TPixel32::White);
@@ -254,9 +245,9 @@ public:
 			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
 			// Note GL_ONE instead of GL_SRC_ALPHA: it's needed since the input
-			//image is supposedly premultiplied - and it works because the
-			//viewer's background is opaque.
-			//See tpixelutils.h's overPixT function for comparison.
+			// image is supposedly premultiplied - and it works because the
+			// viewer's background is opaque.
+			// See tpixelutils.h's overPixT function for comparison.
 
 			pushGLWorldCoordinates();
 			draw(m_vi);
@@ -271,8 +262,9 @@ public:
 //    FrameData  implementation
 //**************************************************************************
 
-AdjustThicknessPopup::FrameData::FrameData()
-	: m_frameIdx(-1) {}
+AdjustThicknessPopup::FrameData::FrameData() : m_frameIdx(-1)
+{
+}
 
 //--------------------------------------------------------------
 
@@ -304,8 +296,7 @@ bool AdjustThicknessPopup::FrameData::operator==(const FrameData &other) const
 
 TVectorImageP AdjustThicknessPopup::FrameData::image() const
 {
-	return m_sl ? TVectorImageP(m_sl->getFullsampledFrame(
-					  m_sl->index2fid(m_frameIdx), false))
+	return m_sl ? TVectorImageP(m_sl->getFullsampledFrame(m_sl->index2fid(m_frameIdx), false))
 				: TVectorImageP();
 }
 
@@ -313,8 +304,9 @@ TVectorImageP AdjustThicknessPopup::FrameData::image() const
 //    SelectionData  implementation
 //**************************************************************************
 
-AdjustThicknessPopup::SelectionData::SelectionData()
-	: m_contentType(NONE), m_sl() {}
+AdjustThicknessPopup::SelectionData::SelectionData() : m_contentType(NONE), m_sl()
+{
+}
 
 //--------------------------------------------------------------
 
@@ -347,11 +339,13 @@ AdjustThicknessPopup::SelectionData::SelectionData(const TSelection *sel)
 				break;
 			case SELECTED_FRAMES:
 				// Since fid2index may return negative indexes, cut them out
-				m_this->m_frameIdxs.erase(m_this->m_frameIdxs.begin(), m_this->m_frameIdxs.lower_bound(0));
+				m_this->m_frameIdxs.erase(m_this->m_frameIdxs.begin(),
+										  m_this->m_frameIdxs.lower_bound(0));
 
 				// Also cut indexes greater than m_sl's frames count
-				m_this->m_frameIdxs.erase(m_this->m_frameIdxs.lower_bound(m_this->m_sl->getFrameCount()),
-											m_this->m_frameIdxs.end());
+				m_this->m_frameIdxs.erase(
+					m_this->m_frameIdxs.lower_bound(m_this->m_sl->getFrameCount()),
+					m_this->m_frameIdxs.end());
 
 				// Reset to empty in case no frame was selected
 				if (m_this->m_frameIdxs.empty())
@@ -451,7 +445,8 @@ AdjustThicknessPopup::SelectionData::SelectionData(const TSelection *sel)
 			TXshSimpleLevel *sl = pair.first;
 
 			if (sl && sl->getType() == PLI_XSHLEVEL) {
-				assert(selection.getImage() == sl->getFullsampledFrame(sl->index2fid(pair.second), false));
+				assert(selection.getImage() ==
+					   sl->getFullsampledFrame(sl->index2fid(pair.second), false));
 
 				m_this->m_contentType = STROKES;
 				m_this->m_framesType = SELECTED_FRAMES;
@@ -463,8 +458,7 @@ AdjustThicknessPopup::SelectionData::SelectionData(const TSelection *sel)
 				if (*m_this) {
 					const std::set<int> &strokeIdxs = selection.getSelection();
 
-					m_this->m_idxs = std::vector<int>(
-						strokeIdxs.begin(), strokeIdxs.end());
+					m_this->m_idxs = std::vector<int>(strokeIdxs.begin(), strokeIdxs.end());
 
 					// Reset to empty in case no stroke was selected
 					if (m_this->m_idxs.empty())
@@ -487,8 +481,8 @@ AdjustThicknessPopup::SelectionData::SelectionData(const TSelection *sel)
 
 				case LevelSelection::SELECTED_STYLES:
 					m_this->m_contentType = STYLES;
-					m_this->m_idxs = std::vector<int>(
-						selection.styles().begin(), selection.styles().end());
+					m_this->m_idxs =
+						std::vector<int>(selection.styles().begin(), selection.styles().end());
 
 					// Reset to empty in case no style was selected
 					if (m_this->m_idxs.empty()) {
@@ -543,11 +537,10 @@ AdjustThicknessPopup::SelectionData::SelectionData(const TSelection *sel)
 //--------------------------------------------------------------
 
 AdjustThicknessPopup::SelectionData::SelectionData(const FrameData &fd)
-	: m_contentType(IMAGE), m_framesType(SELECTED_FRAMES), m_sl(fd.m_sl), m_frameIdxs(&fd.m_frameIdx, &fd.m_frameIdx + 1)
+	: m_contentType(IMAGE), m_framesType(SELECTED_FRAMES), m_sl(fd.m_sl),
+	  m_frameIdxs(&fd.m_frameIdx, &fd.m_frameIdx + 1)
 {
-	if (!m_sl ||
-		m_sl->getType() != PLI_XSHLEVEL ||
-		m_sl->index2fid(*m_frameIdxs.begin()) < 0)
+	if (!m_sl || m_sl->getType() != PLI_XSHLEVEL || m_sl->index2fid(*m_frameIdxs.begin()) < 0)
 		*this = SelectionData();
 }
 
@@ -591,16 +584,14 @@ namespace
 
 typedef AdjustThicknessPopup::SelectionData SelectionData;
 
-TVectorImageP processFrame(
-	const SelectionData &selData, int slFrameIndex,
-	const double(&fromTransform)[2], const double(&toTransform)[2])
+TVectorImageP processFrame(const SelectionData &selData, int slFrameIndex,
+						   const double(&fromTransform)[2], const double(&toTransform)[2])
 {
 	struct locals {
 
-		static void makeTransform(
-			double(&transform)[2],
-			const double(&fromTransform)[2], const double(&toTransform)[2],
-			int startIdx, int endIdx, int curIdx)
+		static void makeTransform(double(&transform)[2], const double(&fromTransform)[2],
+								  const double(&toTransform)[2], int startIdx, int endIdx,
+								  int curIdx)
 		{
 			double relPos = ::relativePosition(startIdx, endIdx, curIdx);
 
@@ -614,8 +605,8 @@ TVectorImageP processFrame(
 		return TVectorImageP();
 
 	// Retrieve input image
-	if (TVectorImageP viIn = selData.m_sl->getFullsampledFrame(
-			selData.m_sl->index2fid(slFrameIndex), false)) {
+	if (TVectorImageP viIn =
+			selData.m_sl->getFullsampledFrame(selData.m_sl->index2fid(slFrameIndex), false)) {
 		// Retrieve operations range
 		int startIdx, endIdx;
 		selData.getRange(startIdx, endIdx);
@@ -628,8 +619,8 @@ TVectorImageP processFrame(
 			switch (selData.m_contentType) {
 			case SelectionData::IMAGE: {
 				double transform[2];
-				locals::makeTransform(transform, fromTransform, toTransform,
-					startIdx, endIdx, slFrameIndex);
+				locals::makeTransform(transform, fromTransform, toTransform, startIdx, endIdx,
+									  slFrameIndex);
 
 				::transformThickness_image(viOut, transform);
 				break;
@@ -637,29 +628,28 @@ TVectorImageP processFrame(
 
 			case SelectionData::STYLES: {
 				double transform[2];
-				locals::makeTransform(transform, fromTransform, toTransform,
-					startIdx, endIdx, slFrameIndex);
+				locals::makeTransform(transform, fromTransform, toTransform, startIdx, endIdx,
+									  slFrameIndex);
 
-				::transformThickness_styles(viOut, transform,
-					selData.m_idxs.data(), selData.m_idxs.size());
+				::transformThickness_styles(viOut, transform, selData.m_idxs.data(),
+											selData.m_idxs.size());
 				break;
 			}
 
 			case SelectionData::BOUNDARIES: {
 				double transform[2];
-				locals::makeTransform(transform, fromTransform, toTransform,
-					startIdx, endIdx, slFrameIndex);
+				locals::makeTransform(transform, fromTransform, toTransform, startIdx, endIdx,
+									  slFrameIndex);
 
 				std::vector<int> strokes = getBoundaryStrokes(*viOut);
 
-				::transformThickness_strokes(viOut, transform,
-					strokes.data(), strokes.size());
+				::transformThickness_strokes(viOut, transform, strokes.data(), strokes.size());
 				break;
 			}
 
 			case SelectionData::STROKES:
-				::transformThickness_strokes(viOut, fromTransform,
-					selData.m_idxs.data(), selData.m_idxs.size());
+				::transformThickness_strokes(viOut, fromTransform, selData.m_idxs.data(),
+											 selData.m_idxs.size());
 				break;
 
 			default:
@@ -680,7 +670,8 @@ TVectorImageP processFrame(
 //**************************************************************************
 
 AdjustThicknessPopup::AdjustThicknessPopup()
-	: DVGui::Dialog(TApp::instance()->getMainWindow(), true, false, "AdjustThickness"), m_validPreview(false)
+	: DVGui::Dialog(TApp::instance()->getMainWindow(), true, false, "AdjustThickness"),
+	  m_validPreview(false)
 {
 	setWindowTitle(tr("Adjust Thickness"));
 	setLabelWidth(0);
@@ -692,7 +683,8 @@ AdjustThicknessPopup::AdjustThicknessPopup()
 	beginVLayout();
 
 	QSplitter *splitter = new QSplitter(Qt::Vertical);
-	splitter->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	splitter->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 	addWidget(splitter);
 
 	endVLayout();
@@ -723,8 +715,8 @@ AdjustThicknessPopup::AdjustThicknessPopup()
 	m_thicknessMode = new QComboBox;
 	topLayout->addWidget(m_thicknessMode, row++, 2, Qt::AlignLeft);
 
-	m_thicknessMode->addItems(
-		QStringList() << tr("Scale Thickness") << tr("Add Thickness") << tr("Constant Thickness"));
+	m_thicknessMode->addItems(QStringList() << tr("Scale Thickness") << tr("Add Thickness")
+											<< tr("Constant Thickness"));
 
 	topLayout->addWidget(new QLabel(tr("Start:")), row, 1, Qt::AlignRight);
 
@@ -765,8 +757,8 @@ AdjustThicknessPopup::AdjustThicknessPopup()
 
 	//------------------------- View Widget -------------------------
 
-	//NOTE: It's IMPORTANT that parent widget is supplied. It's somewhat
-	//used by QSplitter to decide the initial widget sizes...
+	// NOTE: It's IMPORTANT that parent widget is supplied. It's somewhat
+	// used by QSplitter to decide the initial widget sizes...
 
 	m_viewer = new Swatch(splitter);
 	m_viewer->setMinimumHeight(150);
@@ -778,11 +770,14 @@ AdjustThicknessPopup::AdjustThicknessPopup()
 
 	// Establish connections
 	bool ret = true;
-	ret = connect(m_thicknessMode, SIGNAL(currentIndexChanged(int)), this, SLOT(onModeChanged())) && ret;
+	ret = connect(m_thicknessMode, SIGNAL(currentIndexChanged(int)), this, SLOT(onModeChanged())) &&
+		  ret;
 	ret = connect(m_fromScale, SIGNAL(valueChanged(bool)), this, SLOT(onParamsChanged())) && ret;
-	ret = connect(m_fromDisplacement, SIGNAL(valueChanged(bool)), this, SLOT(onParamsChanged())) && ret;
+	ret = connect(m_fromDisplacement, SIGNAL(valueChanged(bool)), this, SLOT(onParamsChanged())) &&
+		  ret;
 	ret = connect(m_toScale, SIGNAL(valueChanged(bool)), this, SLOT(onParamsChanged())) && ret;
-	ret = connect(m_toDisplacement, SIGNAL(valueChanged(bool)), this, SLOT(onParamsChanged())) && ret;
+	ret =
+		connect(m_toDisplacement, SIGNAL(valueChanged(bool)), this, SLOT(onParamsChanged())) && ret;
 	ret = connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply())) && ret;
 	assert(ret);
 
@@ -802,24 +797,16 @@ void AdjustThicknessPopup::showEvent(QShowEvent *se)
 	TColumnHandle *columnHandle = app->getCurrentColumn();
 
 	bool ret = true;
-	ret = connect(selectionHandle, SIGNAL(selectionChanged(TSelection *)),
-				  this, SLOT(onSelectionChanged())) &&
+	ret = connect(selectionHandle, SIGNAL(selectionChanged(TSelection *)), this,
+				  SLOT(onSelectionChanged())) &&
 		  ret;
-	ret = connect(selectionHandle, SIGNAL(selectionSwitched(TSelection *, TSelection *)),
-				  this, SLOT(onSelectionChanged())) &&
+	ret = connect(selectionHandle, SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
+				  SLOT(onSelectionChanged())) &&
 		  ret;
-	ret = connect(xsheetHandle, SIGNAL(xsheetChanged()),
-				  this, SLOT(onXsheetChanged())) &&
-		  ret;
-	ret = connect(xsheetHandle, SIGNAL(xsheetSwitched()),
-				  this, SLOT(onXsheetChanged())) &&
-		  ret;
-	ret = connect(frameHandle, SIGNAL(frameSwitched()),
-				  this, SLOT(onFrameChanged())) &&
-		  ret;
-	ret = connect(columnHandle, SIGNAL(columnIndexSwitched()),
-				  this, SLOT(onFrameChanged())) &&
-		  ret;
+	ret = connect(xsheetHandle, SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged())) && ret;
+	ret = connect(xsheetHandle, SIGNAL(xsheetSwitched()), this, SLOT(onXsheetChanged())) && ret;
+	ret = connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(onFrameChanged())) && ret;
+	ret = connect(columnHandle, SIGNAL(columnIndexSwitched()), this, SLOT(onFrameChanged())) && ret;
 	assert(ret);
 
 	onModeChanged();
@@ -932,12 +919,10 @@ void AdjustThicknessPopup::schedulePreviewUpdate()
 
 //--------------------------------------------------------------
 
-void AdjustThicknessPopup::getTransformParameters(
-	double(&fromTransform)[2], double(&toTransform)[2])
+void AdjustThicknessPopup::getTransformParameters(double(&fromTransform)[2],
+												  double(&toTransform)[2])
 {
-	enum { SCALE,
-		   ADD,
-		   CONSTANT };
+	enum { SCALE, ADD, CONSTANT };
 
 	switch (m_thicknessMode->currentIndex()) {
 	case SCALE:
@@ -979,12 +964,12 @@ void AdjustThicknessPopup::updatePreview()
 
 		if (m_selectionData) {
 			m_previewedFrameData = FrameData(m_selectionData.m_sl, m_currentFrameData.m_frameIdx);
-			m_viewer->image() = ::processFrame(
-				m_selectionData, m_currentFrameData.m_frameIdx, fromTransform, toTransform);
+			m_viewer->image() = ::processFrame(m_selectionData, m_currentFrameData.m_frameIdx,
+											   fromTransform, toTransform);
 		} else {
 			m_previewedFrameData = m_currentFrameData;
-			m_viewer->image() = ::processFrame(
-				m_currentFrameData, m_currentFrameData.m_frameIdx, fromTransform, toTransform);
+			m_viewer->image() = ::processFrame(m_currentFrameData, m_currentFrameData.m_frameIdx,
+											   fromTransform, toTransform);
 		}
 
 		m_viewer->update();
@@ -1000,40 +985,40 @@ namespace
 
 class AdjustThicknessUndo : public TUndo
 {
-public:
-	AdjustThicknessUndo(const SelectionData &selData,
-						double(&fromTransform)[2], double(&toTransform)[2]);
+  public:
+	AdjustThicknessUndo(const SelectionData &selData, double(&fromTransform)[2],
+						double(&toTransform)[2]);
 
 	void redo() const;
 	void undo() const;
 
-	int getSize() const { return (10 << 20); } // 10 MB, flat - ie, at max 10 of these for a standard 100MB
-											   // undo cache size.
-private:
+	int getSize() const
+	{
+		return (10 << 20);
+	} // 10 MB, flat - ie, at max 10 of these for a standard 100MB
+	  // undo cache size.
+  private:
 	struct ImageBackup {
 		TFrameId m_fid;
 		TVectorImageP m_vi;
 
-	public:
-		ImageBackup(const TFrameId &fid, const TVectorImageP &vi)
-			: m_fid(fid), m_vi(vi) {}
+	  public:
+		ImageBackup(const TFrameId &fid, const TVectorImageP &vi) : m_fid(fid), m_vi(vi) {}
 	};
 
-private:
+  private:
 	SelectionData m_selData; //!< Selection to be processed.
 
 	double m_fromTransform[2], //!< Thickness transform start parameters.
 		m_toTransform[2];	  //!< Thickness transform end parameters.
 
-	mutable std::vector<ImageBackup>
-		m_originalImages; //!< Original images.
+	mutable std::vector<ImageBackup> m_originalImages; //!< Original images.
 };
 
 //==============================================================
 
-AdjustThicknessUndo::AdjustThicknessUndo(
-	const SelectionData &selData,
-	double(&fromTransform)[2], double(&toTransform)[2])
+AdjustThicknessUndo::AdjustThicknessUndo(const SelectionData &selData, double(&fromTransform)[2],
+										 double(&toTransform)[2])
 	: m_selData(selData)
 {
 	std::copy(fromTransform, fromTransform + 2, m_fromTransform);
@@ -1063,8 +1048,8 @@ void AdjustThicknessUndo::redo() const
 			undo.m_originalImages.push_back(ImageBackup(fid, viIn));
 
 			// Process required frame
-			TVectorImageP viOut = ::processFrame(
-				undo.m_selData, frameIdx, undo.m_fromTransform, undo.m_toTransform);
+			TVectorImageP viOut =
+				::processFrame(undo.m_selData, frameIdx, undo.m_fromTransform, undo.m_toTransform);
 
 			sl->setFrame(fid, viOut);
 
@@ -1085,9 +1070,8 @@ void AdjustThicknessUndo::redo() const
 					  tcg::bind1st(&locals::processFrame, *this));
 		break;
 	case SelectionData::SELECTED_FRAMES:
-		std::for_each(m_selData.m_frameIdxs.begin(),
-						m_selData.m_frameIdxs.end(),
-						tcg::bind1st(&locals::processFrame, *this));
+		std::for_each(m_selData.m_frameIdxs.begin(), m_selData.m_frameIdxs.end(),
+					  tcg::bind1st(&locals::processFrame, *this));
 		break;
 	}
 }
@@ -1125,8 +1109,7 @@ void AdjustThicknessPopup::apply()
 	double fromTransform[2], toTransform[2];
 	getTransformParameters(fromTransform, toTransform);
 
-	std::auto_ptr<TUndo> undo(new AdjustThicknessUndo(
-		m_selectionData, fromTransform, toTransform));
+	std::auto_ptr<TUndo> undo(new AdjustThicknessUndo(m_selectionData, fromTransform, toTransform));
 
 	undo->redo();
 

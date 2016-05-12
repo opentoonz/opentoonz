@@ -16,8 +16,7 @@
 namespace tcg
 {
 
-template <>
-struct point_traits<TPoint> {
+template <> struct point_traits<TPoint> {
 	typedef TPoint point_type;
 	typedef int value_type;
 	typedef double float_type;
@@ -26,8 +25,7 @@ struct point_traits<TPoint> {
 	inline static value_type y(const point_type &p) { return p.y; }
 };
 
-template <>
-struct point_traits<TPointD> {
+template <> struct point_traits<TPointD> {
 	typedef TPointD point_type;
 	typedef double value_type;
 	typedef double float_type;
@@ -36,8 +34,7 @@ struct point_traits<TPointD> {
 	inline static value_type y(const point_type &p) { return p.y; }
 };
 
-template <>
-struct point_traits<TThickPoint> {
+template <> struct point_traits<TThickPoint> {
 	typedef TThickPoint point_type;
 	typedef double value_type;
 	typedef double float_type;

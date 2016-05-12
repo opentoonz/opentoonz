@@ -40,14 +40,14 @@ namespace
 
 class MatchlinePair
 {
-public:
+  public:
 	const TXshCell *m_cell;
 	TAffine m_imgAff;
 	const TXshCell *m_mcell;
 	TAffine m_matchAff;
 
-	MatchlinePair(const TXshCell &cell, const TAffine &imgAff,
-				  const TXshCell &mcell, const TAffine &matchAff)
+	MatchlinePair(const TXshCell &cell, const TAffine &imgAff, const TXshCell &mcell,
+				  const TAffine &matchAff)
 		: m_cell(&cell), m_imgAff(imgAff), m_mcell(&mcell), m_matchAff(matchAff){};
 };
 
@@ -88,12 +88,11 @@ void mergeRasterColumns(const std::vector<MatchlinePair> &matchingLevels)
 		int lyout = tround(out.getLy()) + 1 + ((offs.y < 0) ? offs.y : 0);
 
 		if (lxout <= 0 || lyout <= 0 || offs.x >= rlx || offs.y >= rly) {
-			//tmsg_error("no intersections between matchline and level");
+			// tmsg_error("no intersections between matchline and level");
 			continue;
 		}
 
-		aff = aff.place((double)(in.getLx() / 2.0),
-						(double)(in.getLy() / 2.0),
+		aff = aff.place((double)(in.getLx() / 2.0), (double)(in.getLy() / 2.0),
 						(out.getLx()) / 2.0 + ((offs.x < 0) ? offs.x : 0),
 						(out.getLy()) / 2.0 + ((offs.y < 0) ? offs.y : 0));
 
@@ -103,7 +102,7 @@ void mergeRasterColumns(const std::vector<MatchlinePair> &matchingLevels)
 			offs.y = 0;
 
 		if (lxout + offs.x > rlx || lyout + offs.y > rly) {
-			//PRINTF("TAGLIO L'IMMAGINE\n");
+			// PRINTF("TAGLIO L'IMMAGINE\n");
 			lxout = (lxout + offs.x > rlx) ? (rlx - offs.x) : lxout;
 			lyout = (lyout + offs.y > rly) ? (rly - offs.y) : lyout;
 		}
@@ -124,13 +123,13 @@ void mergeRasterColumns(const std::vector<MatchlinePair> &matchingLevels)
 		matchRas->unlock();
 
 		img->setSavebox(img->getSavebox() + (matchRas->getBounds() + offs));
-		//img->setSavebox(rout);
+		// img->setSavebox(rout);
 		// img->unlock();
 	}
 }
 
 /*------------------------------------------------------------------------*/
-///verifica se tutta l'immagine e' gia' contenuta in un gruppo.
+/// verifica se tutta l'immagine e' gia' contenuta in un gruppo.
 bool needTobeGrouped(const TVectorImageP &vimg)
 {
 	if (vimg->getStrokeCount() <= 1)
@@ -179,7 +178,7 @@ void mergeVectorColumns(const std::vector<MatchlinePair> &matchingLevels)
 /*------------------------------------------------------------------------*/
 
 /*------------------------------------------------------------------------*/
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 class MergeColumnsUndo : public TUndo
@@ -192,11 +191,11 @@ class MergeColumnsUndo : public TUndo
 	int m_column, m_mColumn;
 	TPalette *m_palette;
 
-public:
-	MergeColumnsUndo(TXshLevelP xl, int matchlineSessionId,
-					 int column, TXshSimpleLevel *level, const std::map<TFrameId, QString> &images,
-					 int mColumn, TPalette *palette)
-		: TUndo(), m_xl(xl), m_matchlineSessionId(matchlineSessionId), m_level(level), m_column(column), m_mColumn(mColumn), m_images(images), m_palette(palette->clone())
+  public:
+	MergeColumnsUndo(TXshLevelP xl, int matchlineSessionId, int column, TXshSimpleLevel *level,
+					 const std::map<TFrameId, QString> &images, int mColumn, TPalette *palette)
+		: TUndo(), m_xl(xl), m_matchlineSessionId(matchlineSessionId), m_level(level),
+		  m_column(column), m_mColumn(mColumn), m_images(images), m_palette(palette->clone())
 	{
 	}
 
@@ -210,7 +209,8 @@ public:
 		m_level->setPalette(m_palette);
 		for (; it != m_images.end(); ++it) //, ++mit)
 		{
-			QString id = "MergeColumnsUndo" + QString::number(m_matchlineSessionId) + "-" + QString::number(it->first.getNumber());
+			QString id = "MergeColumnsUndo" + QString::number(m_matchlineSessionId) + "-" +
+						 QString::number(it->first.getNumber());
 			TImageP img = TImageCache::instance()->get(id, false)->cloneImage();
 			m_level->setFrame(it->first, img);
 			fids.push_back(it->first);
@@ -233,29 +233,21 @@ public:
 		QApplication::restoreOverrideCursor();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
 	~MergeColumnsUndo()
 	{
 		std::map<TFrameId, QString>::const_iterator it = m_images.begin();
 		for (; it != m_images.end(); ++it) //, ++mit)
 		{
-			QString id = "MergeColumnsUndo" + QString::number((uintptr_t) this) + "-" + QString::number(it->first.getNumber());
+			QString id = "MergeColumnsUndo" + QString::number((uintptr_t) this) + "-" +
+						 QString::number(it->first.getNumber());
 			TImageCache::instance()->remove(id);
 		}
 	}
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Merge Raster Levels");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::FilmStrip;
-	}
+	QString getHistoryString() { return QObject::tr("Merge Raster Levels"); }
+	int getHistoryType() { return HistoryType::FilmStrip; }
 };
 
 //-----------------------------------------------------------------------------
@@ -321,14 +313,16 @@ void mergeColumns(int column, int mColumn, bool isRedo)
 		}
 
 		else if (level != cell[i].getSimpleLevel()) {
-			DVGui::warning(QObject::tr("It is not possible to perform a merging involving more than one level per column."));
+			DVGui::warning(QObject::tr("It is not possible to perform a merging involving more "
+									   "than one level per column."));
 			return;
 		}
 
 		if (!mLevel)
 			mLevel = mCell[i].getSimpleLevel();
 		else if (mLevel != mCell[i].getSimpleLevel()) {
-			DVGui::warning(QObject::tr("It is not possible to perform a merging involving more than one level per column."));
+			DVGui::warning(QObject::tr("It is not possible to perform a merging involving more "
+									   "than one level per column."));
 			return;
 		}
 		TImageP img = cell[i].getImage(true);
@@ -347,21 +341,25 @@ void mergeColumns(int column, int mColumn, bool isRedo)
 
 			if (timg) {
 				if (!tmatch) {
-					DVGui::warning(QObject::tr("Only raster levels can be merged to a raster level."));
+					DVGui::warning(
+						QObject::tr("Only raster levels can be merged to a raster level."));
 					return;
 				}
 				areRasters = true;
 			} else if (vimg) {
 				if (!vmatch) {
-					DVGui::warning(QObject::tr("Only vector levels can be merged to a vector level."));
+					DVGui::warning(
+						QObject::tr("Only vector levels can be merged to a vector level."));
 					return;
 				}
 			} else {
-				DVGui::warning(QObject::tr("It is possible to merge only Toonz vector levels or standard raster levels."));
+				DVGui::warning(QObject::tr(
+					"It is possible to merge only Toonz vector levels or standard raster levels."));
 				return;
 			}
 
-			QString id = "MergeColumnsUndo" + QString::number(MergeColumnsSessionId) + "-" + QString::number(fid.getNumber());
+			QString id = "MergeColumnsUndo" + QString::number(MergeColumnsSessionId) + "-" +
+						 QString::number(fid.getNumber());
 			TImageCache::instance()->add(id, (timg) ? timg->cloneImage() : vimg->cloneImage());
 			images[fid] = id;
 			TAffine imgAff, matchAff;
@@ -369,13 +367,15 @@ void mergeColumns(int column, int mColumn, bool isRedo)
 			getColumnPlacement(matchAff, xsh, start + i, mColumn, false);
 			TAffine dpiAff = getDpiAffine(level, fid);
 			TAffine mdpiAff = getDpiAffine(mLevel, mFid);
-			matchingLevels.push_back(MatchlinePair(cell[i], imgAff * dpiAff, mCell[i], matchAff * mdpiAff));
+			matchingLevels.push_back(
+				MatchlinePair(cell[i], imgAff * dpiAff, mCell[i], matchAff * mdpiAff));
 			alreadyDoneSet.insert(fid);
 		}
 	}
 
 	if (matchingLevels.empty()) {
-		DVGui::warning(QObject::tr("It is possible to merge only Toonz vector levels or standard raster levels."));
+		DVGui::warning(QObject::tr(
+			"It is possible to merge only Toonz vector levels or standard raster levels."));
 		return;
 	}
 
@@ -383,13 +383,12 @@ void mergeColumns(int column, int mColumn, bool isRedo)
 	TXshSimpleLevel *simpleLevel = sc->getLevelSet()->getLevel(column)->getSimpleLevel();
 
 	if (!isRedo)
-		TUndoManager::manager()->add(new MergeColumnsUndo(xl, MergeColumnsSessionId,
-														  column, level, images,
-														  mColumn, level->getPalette()));
+		TUndoManager::manager()->add(new MergeColumnsUndo(xl, MergeColumnsSessionId, column, level,
+														  images, mColumn, level->getPalette()));
 
 	if (areRasters) {
 		mergeRasterColumns(matchingLevels);
-		for (int i = 0; i < (int)cell.size(); i++) //the saveboxes must be updated
+		for (int i = 0; i < (int)cell.size(); i++) // the saveboxes must be updated
 		{
 			if (cell[i].isEmpty() || mCell[i].isEmpty())
 				continue;
@@ -402,7 +401,8 @@ void mergeColumns(int column, int mColumn, bool isRedo)
 	} else
 		mergeVectorColumns(matchingLevels);
 
-	TXshLevel *sl = TApp::instance()->getCurrentScene()->getScene()->getLevelSet()->getLevel(column);
+	TXshLevel *sl =
+		TApp::instance()->getCurrentScene()->getScene()->getLevelSet()->getLevel(column);
 	std::vector<TFrameId> fidsss;
 	sl->getFids(fidsss);
 	invalidateIcons(sl, fidsss);
@@ -469,4 +469,4 @@ QString indexes2string(const std::set<TFrameId> fids)
 	return str;
 }
 
-} //namespace
+} // namespace

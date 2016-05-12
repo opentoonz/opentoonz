@@ -31,9 +31,8 @@ class StudioPaletteTreeViewer : public QTreeWidget, public StudioPalette::Listen
 	TSceneHandle *m_sceneHandle;
 	TXshLevelHandle *m_levelHandle;
 
-public:
-	StudioPaletteTreeViewer(QWidget *parent = 0,
-							TPaletteHandle *studioPaletteHandle = 0,
+  public:
+	StudioPaletteTreeViewer(QWidget *parent = 0, TPaletteHandle *studioPaletteHandle = 0,
 							TPaletteHandle *levelPaletteHandle = 0);
 	~StudioPaletteTreeViewer();
 
@@ -54,7 +53,7 @@ public:
 	void onStudioPaletteMove(const TFilePath &dstPath, const TFilePath &srcPath) { refresh(); }
 	void onStudioPaletteChange(const TFilePath &palette) { refresh(); }
 
-protected slots:
+  protected slots:
 	void refresh();
 	void refreshItem(QTreeWidgetItem *);
 
@@ -63,7 +62,7 @@ protected slots:
 	void onItemCollapsed(QTreeWidgetItem *item);
 	void onItemSelectionChanged();
 
-public slots:
+  public slots:
 	void addNewPlt();
 	void addNewFolder();
 	void deleteItem();
@@ -74,7 +73,7 @@ public slots:
 	void replaceCurrentPlt();
 	void mergeToCurrentPlt();
 
-protected:
+  protected:
 	QTreeWidgetItem *createRootItem(const TFilePath path, const QPixmap pix);
 	bool isRootItem(QTreeWidgetItem *item);
 
@@ -107,14 +106,11 @@ class StudioPaletteViewer : public QFrame
 {
 	Q_OBJECT
 
-public:
-	StudioPaletteViewer(QWidget *parent = 0,
-						TPaletteHandle *studioPaletteHandle = 0,
-						TPaletteHandle *levelPaletteHandle = 0,
-						TSceneHandle *sceneHandle = 0,
-						TXshLevelHandle *levelHandle = 0,
-						TFrameHandle *frameHandle = 0);
+  public:
+	StudioPaletteViewer(QWidget *parent = 0, TPaletteHandle *studioPaletteHandle = 0,
+						TPaletteHandle *levelPaletteHandle = 0, TSceneHandle *sceneHandle = 0,
+						TXshLevelHandle *levelHandle = 0, TFrameHandle *frameHandle = 0);
 	~StudioPaletteViewer();
 };
 
-#endif //STUDIOPALETTEVIEWER_H
+#endif // STUDIOPALETTEVIEWER_H

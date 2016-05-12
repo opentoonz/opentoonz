@@ -41,10 +41,10 @@ bool isOpaque32(TRaster32P &ras)
 	ras->unlock();
 	return (nrows <= 0);
 
-	//m_image->setOpaqueFlag(true);
+	// m_image->setOpaqueFlag(true);
 }
 
-} //namespace
+} // namespace
 
 bool TRop::isOpaque(TRasterP ras)
 {
@@ -121,24 +121,20 @@ void TRop::copy(TRasterP dst, const TRasterP &src)
 
 namespace
 {
-template <class Q>
-class Gamma_Lut
+template <class Q> class Gamma_Lut
 {
 
-public:
+  public:
 	std::vector<Q> m_table;
 	Gamma_Lut(int insteps, int outsteps, double gamma)
 	{
 		double inspace = (double)(insteps);
 		for (int i = 0; i <= insteps; i++)
-			m_table.push_back((Q)((outsteps) *
-									  (pow(i / inspace, 1.0 / gamma)) +
-								  0.5));
+			m_table.push_back((Q)((outsteps) * (pow(i / inspace, 1.0 / gamma)) + 0.5));
 	}
 };
 
-template <class T, class Q>
-void doGammaCorrect(TRasterPT<T> raster, double gamma)
+template <class T, class Q> void doGammaCorrect(TRasterPT<T> raster, double gamma)
 {
 	Gamma_Lut<Q> lut(T::maxChannelValue, T::maxChannelValue, gamma);
 
@@ -151,17 +147,18 @@ void doGammaCorrect(TRasterPT<T> raster, double gamma)
 			pix->b = lut.m_table[pix->b];
 			pix->g = lut.m_table[pix->g];
 			/*if(pix->m != T::maxChannelValue)
-      {
-      pix->r= pix->r*pix->m/T::maxChannelValue;
-      pix->g= pix->g*pix->m/T::maxChannelValue; 
-      pix->b= pix->b*pix->m/T::maxChannelValue;
-	    }*/
+	  {
+	  pix->r= pix->r*pix->m/T::maxChannelValue;
+	  pix->g= pix->g*pix->m/T::maxChannelValue;
+	  pix->b= pix->b*pix->m/T::maxChannelValue;
+		}*/
 			*pix++;
 		}
 	}
 }
 template <class T, class Q>
-void doGammaCorrectRGBM(TRasterPT<T> raster, double gammar, double gammag, double gammab, double gammam)
+void doGammaCorrectRGBM(TRasterPT<T> raster, double gammar, double gammag, double gammab,
+						double gammam)
 {
 	Gamma_Lut<Q> lutr(T::maxChannelValue, T::maxChannelValue, gammar);
 	Gamma_Lut<Q> lutg(T::maxChannelValue, T::maxChannelValue, gammag);
@@ -177,11 +174,11 @@ void doGammaCorrectRGBM(TRasterPT<T> raster, double gammar, double gammag, doubl
 			pix->b = lutb.m_table[pix->b];
 			pix->m = lutm.m_table[pix->m];
 			/*if(pix->m != T::maxChannelValue)
-      {
-      pix->r= pix->r*pix->m/T::maxChannelValue;
-      pix->g= pix->g*pix->m/T::maxChannelValue; 
-      pix->b= pix->b*pix->m/T::maxChannelValue;
-	    }*/
+	  {
+	  pix->r= pix->r*pix->m/T::maxChannelValue;
+	  pix->g= pix->g*pix->m/T::maxChannelValue;
+	  pix->b= pix->b*pix->m/T::maxChannelValue;
+		}*/
 			*pix++;
 		}
 	}
@@ -207,8 +204,8 @@ void TRop::gammaCorrect(TRasterP raster, double gamma)
 }
 //-------------------------------------------------------------------
 
-void TRop::gammaCorrectRGBM(TRasterP raster, double gammar, double gammag,
-							double gammab, double gammam)
+void TRop::gammaCorrectRGBM(TRasterP raster, double gammar, double gammag, double gammab,
+							double gammam)
 {
 	if (gammar <= 0)
 		gammar = 0.01;
@@ -331,8 +328,7 @@ TRasterP TRop::shrink(TRasterP rin, int shrink)
 
 //-------------------------------------------------------------------
 
-template <class T>
-void doMakeStereoRaster(const TRasterPT<T> &rleft, const TRasterPT<T> &rright)
+template <class T> void doMakeStereoRaster(const TRasterPT<T> &rleft, const TRasterPT<T> &rright)
 {
 
 	int lx = rleft->getLx();
@@ -383,8 +379,10 @@ void TTile::addInCache(const TRasterP &raster)
 	m_rasterId = TImageCache::instance()->getUniqueId();
 	if (raster->getParent()) {
 		rin = raster->getParent();
-		unsigned long offs = (raster->getRawData() - raster->getParent()->getRawData()) / raster->getPixelSize();
-		m_subRect = TRect(TPoint(offs % raster->getWrap(), offs / raster->getWrap()), raster->getSize());
+		unsigned long offs =
+			(raster->getRawData() - raster->getParent()->getRawData()) / raster->getPixelSize();
+		m_subRect =
+			TRect(TPoint(offs % raster->getWrap(), offs / raster->getWrap()), raster->getSize());
 	} else {
 		m_subRect = raster->getBounds();
 		rin = raster;
@@ -400,14 +398,12 @@ void TTile::addInCache(const TRasterP &raster)
 		assert(false);
 }
 
-TTile::TTile(const TRasterP &raster)
-	: m_pos(), m_subRect()
+TTile::TTile(const TRasterP &raster) : m_pos(), m_subRect()
 {
 	addInCache(raster);
 }
 
-TTile::TTile(const TRasterP &raster, TPointD pos)
-	: m_pos(pos), m_subRect()
+TTile::TTile(const TRasterP &raster, TPointD pos) : m_pos(pos), m_subRect()
 {
 	addInCache(raster);
 }

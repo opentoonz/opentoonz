@@ -25,9 +25,15 @@
 namespace ScriptWrapper
 {
 
-Level::Level() {}
-Level::Level(TXshSimpleLevel *level) : m_name(QString::fromStdWString(level->getName())) {}
-Level::~Level() {}
+Level::Level()
+{
+}
+Level::Level(TXshSimpleLevel *level) : m_name(QString::fromStdWString(level->getName()))
+{
+}
+Level::~Level()
+{
+}
 
 TXshSimpleLevel *Level::getLevel() const
 {
@@ -50,7 +56,8 @@ QScriptValue getLevel(QScriptContext *ctx, QScriptEngine *eng)
 		levelName = QString::fromStdWString(level->getName());
 	}
 	if (level->getSimpleLevel())
-		return eng->newQObject(new ScriptWrapper::Level(level->getSimpleLevel()), QScriptEngine::ScriptOwnership);
+		return eng->newQObject(new ScriptWrapper::Level(level->getSimpleLevel()),
+							   QScriptEngine::ScriptOwnership);
 	else
 		return QScriptValue();
 }
@@ -81,9 +88,8 @@ QScriptValue foo(QScriptContext *ctx, QScriptEngine *eng)
 
 class LoadScriptPopup : public FileBrowserPopup
 {
-public:
-	LoadScriptPopup()
-		: FileBrowserPopup(tr("Load script"))
+  public:
+	LoadScriptPopup() : FileBrowserPopup(tr("Load script"))
 	{
 		QStringList sl;
 		sl << "qs";
@@ -125,10 +131,10 @@ public:
 	{
 		exec();
 		/*
-    show();
-    raise();
-    activateWindow();
-    */
+	show();
+	raise();
+	activateWindow();
+	*/
 	}
 };
 

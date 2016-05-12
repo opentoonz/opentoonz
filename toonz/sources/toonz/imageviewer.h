@@ -3,7 +3,7 @@
 #ifndef IMAGEVIEWER_INCLUDE
 #define IMAGEVIEWER_INCLUDE
 
-//iwsw commented out temporarily
+// iwsw commented out temporarily
 //#include "toonzqt/ghibli_3dlut_util.h"
 
 #include "toonz/imagepainter.h"
@@ -25,13 +25,14 @@ class HistogramPopup;
 class ImageViewer : public QGLWidget
 {
 	Q_OBJECT
-	enum DragType { eNone,
-					eDrawRect = 0x1,
-					eMoveRect = 0x2,
-					eMoveLeft = 0x4,
-					eMoveRight = 0x8,
-					eMoveUp = 0x10,
-					eMoveDown = 0x20
+	enum DragType {
+		eNone,
+		eDrawRect = 0x1,
+		eMoveRect = 0x2,
+		eMoveLeft = 0x4,
+		eMoveRight = 0x8,
+		eMoveUp = 0x10,
+		eMoveDown = 0x20
 	};
 	int m_dragType;
 	FlipBook *m_flipbook;
@@ -54,23 +55,23 @@ class ImageViewer : public QGLWidget
 	HistogramPopup *m_histogramPopup;
 
 	bool m_isColorModel;
-	//when fx parameter is modified with showing the fx preview,
-	//a flipbook shows a red border line before the rendered result is shown.
+	// when fx parameter is modified with showing the fx preview,
+	// a flipbook shows a red border line before the rendered result is shown.
 	bool m_isRemakingPreviewFx;
 
-	//iwsw commented out temporarily
-	//Ghibli3DLutUtil * m_ghibli3DLutUtil;
+	// iwsw commented out temporarily
+	// Ghibli3DLutUtil * m_ghibli3DLutUtil;
 
 	int getDragType(const TPoint &pos, const TRect &loadBox);
 	void updateLoadbox(const TPoint &curPos);
 	void updateCursor(const TPoint &curPos);
 
-	//for RGB color picker
+	// for RGB color picker
 	void pickColor(QMouseEvent *event, bool putValueToStyleEditor = false);
 	void rectPickColor(bool putValueToStyleEditor = false);
 	void setPickedColorToStyleEditor(const TPixel32 &color);
 
-public:
+  public:
 	ImageViewer(QWidget *parent, FlipBook *flipbook, bool showHistogram);
 	~ImageViewer();
 
@@ -113,10 +114,10 @@ public:
 	}
 	void changeSwapBehavior(bool enable) { setAutoBufferSwap(enable); }
 
-	//iwsw commented out temporarily
-	//Ghibli3DLutUtil* get3DLutUtil(){ return m_ghibli3DLutUtil; }
+	// iwsw commented out temporarily
+	// Ghibli3DLutUtil* get3DLutUtil(){ return m_ghibli3DLutUtil; }
 
-protected:
+  protected:
 	void contextMenuEvent(QContextMenuEvent *event);
 	void initializeGL();
 	void resizeGL(int width, int height);
@@ -134,7 +135,7 @@ protected:
 
 	void dragCompare(const QPoint &dp);
 
-public slots:
+  public slots:
 
 	void updateImageViewer();
 	void resetView();
@@ -143,4 +144,4 @@ public slots:
 	void swapCompared();
 };
 
-#endif //IMAGEVIEWER_INCLUDE
+#endif // IMAGEVIEWER_INCLUDE

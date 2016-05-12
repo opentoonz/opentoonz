@@ -37,9 +37,7 @@
 
 namespace ScaleConstraints
 {
-enum { None = 0,
-	   AspectRatio,
-	   Mass };
+enum { None = 0, AspectRatio, Mass };
 }
 
 TEnv::IntVar LockCenterX("EditToolLockCenterX", 0);
@@ -87,9 +85,11 @@ class DragCenterTool : public DragTool
 	TPointD m_center;
 	TAffine m_affine;
 
-public:
+  public:
 	DragCenterTool(bool lockCenterX, bool lockCenterY)
-		: m_objId(TTool::getApplication()->getCurrentTool()->getTool()->getObjectId()), m_frame(TTool::getApplication()->getCurrentTool()->getTool()->getFrame()), m_lockCenterX(lockCenterX), m_lockCenterY(lockCenterY)
+		: m_objId(TTool::getApplication()->getCurrentTool()->getTool()->getObjectId()),
+		  m_frame(TTool::getApplication()->getCurrentTool()->getTool()->getFrame()),
+		  m_lockCenterX(lockCenterX), m_lockCenterY(lockCenterY)
 	{
 	}
 
@@ -100,7 +100,8 @@ public:
 		TXsheet *xsh = TTool::getApplication()->getCurrentTool()->getTool()->getXsheet();
 		m_center = m_oldCenter = xsh->getCenter(m_objId, m_frame);
 		m_firstPos = pos;
-		m_affine = xsh->getPlacement(m_objId, m_frame).inv() * xsh->getParentPlacement(m_objId, m_frame);
+		m_affine =
+			xsh->getPlacement(m_objId, m_frame).inv() * xsh->getParentPlacement(m_objId, m_frame);
 		m_affine.a13 = m_affine.a23 = 0;
 	}
 
@@ -115,13 +116,15 @@ public:
 		else if (m_lockCenterY)
 			delta = TPointD(delta.x, 0.0);
 		m_center = m_oldCenter + (m_affine * delta) * factor;
-		TTool::getApplication()->getCurrentTool()->getTool()->getXsheet()->setCenter(m_objId, m_frame, m_center);
+		TTool::getApplication()->getCurrentTool()->getTool()->getXsheet()->setCenter(
+			m_objId, m_frame, m_center);
 	}
 	void leftButtonUp(const TPointD &pos, const TMouseEvent &)
 	{
 		if ((m_lockCenterX && m_lockCenterY) || m_firstPos == pos)
 			return;
-		UndoStageObjectCenterMove *undo = new UndoStageObjectCenterMove(m_objId, m_frame, m_oldCenter, m_center);
+		UndoStageObjectCenterMove *undo =
+			new UndoStageObjectCenterMove(m_objId, m_frame, m_oldCenter, m_center);
 		TTool::Application *app = TTool::getApplication();
 		undo->setObjectHandle(app->getCurrentObject());
 		undo->setXsheetHandle(app->getCurrentXsheet());
@@ -136,14 +139,14 @@ public:
 class DragChannelTool : public DragTool
 {
 
-protected:
+  protected:
 	TStageObjectValues m_before, m_after;
 	bool m_globalKeyframesEnabled;
 
 	bool m_isStarted;
 	TPointD m_firstPos;
 
-public:
+  public:
 	DragChannelTool(TStageObject::Channel a0, bool globalKeyframesEnabled)
 		: m_globalKeyframesEnabled(globalKeyframesEnabled), m_isStarted(false), m_firstPos()
 	{
@@ -207,17 +210,12 @@ public:
 		TStageObjectId objId = tool->getObjectId();
 		int frame = tool->getFrame();
 		TXsheet *xsh = tool->getXsheet();
-		return xsh->getParentPlacement(objId, frame).inv() * xsh->getPlacement(objId, frame) * (Stage::inch * xsh->getCenter(objId, frame));
+		return xsh->getParentPlacement(objId, frame).inv() * xsh->getPlacement(objId, frame) *
+			   (Stage::inch * xsh->getCenter(objId, frame));
 	}
 
-	double getOldValue(int index) const
-	{
-		return m_before.getValue(index);
-	}
-	double getValue(int index) const
-	{
-		return m_after.getValue(index);
-	}
+	double getOldValue(int index) const { return m_before.getValue(index); }
+	double getValue(int index) const { return m_after.getValue(index); }
 	void setValue(double v)
 	{
 		m_after.setValue(v);
@@ -253,9 +251,10 @@ class DragPositionTool : public DragChannelTool
 	bool m_lockPositionX;
 	bool m_lockPositionY;
 
-public:
+  public:
 	DragPositionTool(bool lockPositionX, bool lockPositionY, bool globalKeyframesEnabled)
-		: DragChannelTool(TStageObject::T_X, TStageObject::T_Y, globalKeyframesEnabled), m_lockPositionX(lockPositionX), m_lockPositionY(lockPositionY)
+		: DragChannelTool(TStageObject::T_X, TStageObject::T_Y, globalKeyframesEnabled),
+		  m_lockPositionX(lockPositionX), m_lockPositionY(lockPositionY)
 	{
 	}
 
@@ -299,9 +298,10 @@ class DragSplinePositionTool : public DragChannelTool
 	double m_splineLength;
 	double m_tolerance;
 
-public:
+  public:
 	DragSplinePositionTool(const TStroke *spline, bool globalKeyframesEnabled)
-		: DragChannelTool(TStageObject::T_Path, globalKeyframesEnabled), m_spline(spline), m_offset(0.0), m_splineLength(0), m_tolerance(0)
+		: DragChannelTool(TStageObject::T_Path, globalKeyframesEnabled), m_spline(spline),
+		  m_offset(0.0), m_splineLength(0), m_tolerance(0)
 	{
 	}
 
@@ -311,16 +311,13 @@ public:
 		double t = m_spline->getW(pos);
 		return m_spline->getLength(t);
 		/*
-    double length = m_spline->getLength();
-    if(length>0) return 100 * m_spline->getLength(t) / length;
-    else return 0.0;
-    */
+	double length = m_spline->getLength();
+	if(length>0) return 100 * m_spline->getLength(t) / length;
+	else return 0.0;
+	*/
 	}
 
-	double paramValueToLength(double s) const
-	{
-		return s * m_splineLength * 0.01;
-	}
+	double paramValueToLength(double s) const { return s * m_splineLength * 0.01; }
 	double lengthToParamValue(double len) const
 	{
 		if (m_splineLength > 0)
@@ -391,9 +388,10 @@ class DragRotationTool : public DragChannelTool
 	TPointD m_center;
 	bool m_lockRotation;
 
-public:
+  public:
 	DragRotationTool(bool lockRotation, bool globalKeyframesEnabled)
-		: DragChannelTool(TStageObject::T_Angle, globalKeyframesEnabled), m_lockRotation(lockRotation)
+		: DragChannelTool(TStageObject::T_Angle, globalKeyframesEnabled),
+		  m_lockRotation(lockRotation)
 	{
 	}
 
@@ -414,13 +412,13 @@ public:
 		TPointD b = pos - m_center;
 		m_lastPos = pos;
 		/*
-    if(cameraFlag)
-      {
-       // m_viewer->updateViewMatrix();
-       b = m_viewer->mouseToTool(gb) - m_curCenter;
-       a = m_viewer->mouseToTool(gc) - m_curCenter;
-      }
-    */
+	if(cameraFlag)
+	  {
+	   // m_viewer->updateViewMatrix();
+	   b = m_viewer->mouseToTool(gb) - m_curCenter;
+	   a = m_viewer->mouseToTool(gc) - m_curCenter;
+	  }
+	*/
 
 		double a2 = norm2(a), b2 = norm2(b);
 		const double eps = 1e-8;
@@ -442,9 +440,10 @@ class DragIsotropicScaleTool : public DragChannelTool
 	double m_r0;
 	bool m_lockGlobalScale;
 
-public:
+  public:
 	DragIsotropicScaleTool(bool lockGlobalScale, bool globalKeyframesEnabled)
-		: DragChannelTool(TStageObject::T_Scale, globalKeyframesEnabled), m_lockGlobalScale(lockGlobalScale), m_r0(0)
+		: DragChannelTool(TStageObject::T_Scale, globalKeyframesEnabled),
+		  m_lockGlobalScale(lockGlobalScale), m_r0(0)
 	{
 	}
 
@@ -484,9 +483,10 @@ class DragScaleTool : public DragChannelTool
 	bool m_lockScaleH;
 	bool m_lockScaleV;
 
-public:
+  public:
 	DragScaleTool(int constraint, bool lockScaleH, bool lockScaleV, bool globalKeyframesEnabled)
-		: DragChannelTool(TStageObject::T_ScaleX, TStageObject::T_ScaleY, globalKeyframesEnabled), m_constraint(constraint), m_lockScaleH(lockScaleH), m_lockScaleV(lockScaleV)
+		: DragChannelTool(TStageObject::T_ScaleX, TStageObject::T_ScaleY, globalKeyframesEnabled),
+		  m_constraint(constraint), m_lockScaleH(lockScaleH), m_lockScaleV(lockScaleV)
 	{
 	}
 
@@ -565,9 +565,10 @@ class DragShearTool : public DragChannelTool
 	bool m_lockShearH;
 	bool m_lockShearV;
 
-public:
+  public:
 	DragShearTool(bool lockShearH, bool lockShearV, bool globalKeyframesEnabled)
-		: DragChannelTool(TStageObject::T_ShearX, TStageObject::T_ShearY, globalKeyframesEnabled), m_lockShearH(lockShearH), m_lockShearV(lockShearV)
+		: DragChannelTool(TStageObject::T_ShearX, TStageObject::T_ShearY, globalKeyframesEnabled),
+		  m_lockShearH(lockShearH), m_lockShearV(lockShearV)
 	{
 	}
 
@@ -613,9 +614,11 @@ class DragZTool : public DragChannelTool
 	TTool::Viewer *m_viewer;
 	double m_dz;
 
-public:
+  public:
 	DragZTool(TTool::Viewer *viewer, bool globalKeyframesEnabled)
-		: DragChannelTool(TStageObject::T_Z, globalKeyframesEnabled), m_viewer(viewer) {}
+		: DragChannelTool(TStageObject::T_Z, globalKeyframesEnabled), m_viewer(viewer)
+	{
+	}
 
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 	{
@@ -665,7 +668,7 @@ class EditTool : public TTool
 		Shear,
 	};
 
-	//DragInfo m_dragInfo;
+	// DragInfo m_dragInfo;
 
 	TPointD m_lastPos;
 	TPointD m_curPos;
@@ -710,7 +713,7 @@ class EditTool : public TTool
 
 	TPropertyGroup m_prop;
 
-public:
+  public:
 	EditTool();
 	~EditTool();
 
@@ -749,10 +752,7 @@ public:
 
 	int getCursorId() const;
 
-	TPropertyGroup *getProperties(int targetType)
-	{
-		return &m_prop;
-	}
+	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
 	void updateMatrix()
 	{
@@ -765,13 +765,24 @@ public:
 //-----------------------------------------------------------------------------
 
 EditTool::EditTool()
-	: TTool("T_Edit"), m_active(false), m_what(Translation), m_highlightedDevice(None), m_currentScaleFactor(1), m_fxGadgetController(0), m_keyFrameAdded(false), m_scaleConstraint("Scale Constraint:") // W_ToolOptions_ScaleConstraint
+	: TTool("T_Edit"), m_active(false), m_what(Translation), m_highlightedDevice(None),
+	  m_currentScaleFactor(1), m_fxGadgetController(0), m_keyFrameAdded(false),
+	  m_scaleConstraint("Scale Constraint:") // W_ToolOptions_ScaleConstraint
 	  ,
 	  m_autoSelect("Auto Select Column") // W_ToolOptions_AutoSelect
 	  ,
 	  m_globalKeyframes("Global Key", false) // W_ToolsOptions_GlobalKeyframes
 	  ,
-	  m_lockCenterX("Lock Center E/W", false), m_lockCenterY("Lock Center N/S", false), m_lockPositionX("Lock Position E/W", false), m_lockPositionY("Lock Position N/S", false), m_lockRotation("Lock Rotation", false), m_lockShearH("Lock Shear H", false), m_lockShearV("Lock Shear V", false), m_lockScaleH("Lock Scale H", false), m_lockScaleV("Lock Scale V", false), m_lockGlobalScale("Lock Global Scale", false), m_showEWNSposition("E/W and N/S Positions", true), m_showZposition("Z Position", true), m_showSOposition("SO", true), m_showRotation("Rotation", true), m_showGlobalScale("Global Scale", true), m_showHVscale("Horizontal and Vertical Scale", true), m_showShear("Shear", true), m_showCenterPosition("Center Position", true), m_dragTool(0), m_firstTime(true), m_activeAxis("Active Axis")
+	  m_lockCenterX("Lock Center E/W", false), m_lockCenterY("Lock Center N/S", false),
+	  m_lockPositionX("Lock Position E/W", false), m_lockPositionY("Lock Position N/S", false),
+	  m_lockRotation("Lock Rotation", false), m_lockShearH("Lock Shear H", false),
+	  m_lockShearV("Lock Shear V", false), m_lockScaleH("Lock Scale H", false),
+	  m_lockScaleV("Lock Scale V", false), m_lockGlobalScale("Lock Global Scale", false),
+	  m_showEWNSposition("E/W and N/S Positions", true), m_showZposition("Z Position", true),
+	  m_showSOposition("SO", true), m_showRotation("Rotation", true),
+	  m_showGlobalScale("Global Scale", true), m_showHVscale("Horizontal and Vertical Scale", true),
+	  m_showShear("Shear", true), m_showCenterPosition("Center Position", true), m_dragTool(0),
+	  m_firstTime(true), m_activeAxis("Active Axis")
 {
 	bind(TTool::AllTargets);
 	m_prop.bind(m_scaleConstraint);
@@ -902,7 +913,8 @@ void EditTool::mouseMove(const TPointD &, const TMouseEvent &e)
 		selectedDevice = m_what;
 		if (m_what == Translation && e.isCtrlPressed())
 			selectedDevice = ZTranslation;
-		else if (m_what == ZTranslation && !e.isCtrlPressed()) /*--ここには、一度Z移動をした後に入る可能性がある--*/
+		else if (m_what == ZTranslation &&
+				 !e.isCtrlPressed()) /*--ここには、一度Z移動をした後に入る可能性がある--*/
 			selectedDevice = Translation;
 		else if (m_what == Scale && e.isCtrlPressed())
 			selectedDevice = ScaleXY;
@@ -956,38 +968,36 @@ void EditTool::leftButtonDown(const TPointD &ppos, const TMouseEvent &e)
 	if (!m_dragTool) {
 		switch (m_what) {
 		case Center:
-			m_dragTool = new DragCenterTool(
-				m_lockCenterX.getValue(),
-				m_lockCenterY.getValue());
+			m_dragTool = new DragCenterTool(m_lockCenterX.getValue(), m_lockCenterY.getValue());
 			break;
 
 		case Translation:
 			if (const TStroke *spline = getSpline())
 				m_dragTool = new DragSplinePositionTool(spline, m_globalKeyframes.getValue());
 			else
-				m_dragTool = new DragPositionTool(
-					m_lockPositionX.getValue(),
-					m_lockPositionY.getValue(),
-					m_globalKeyframes.getValue());
+				m_dragTool =
+					new DragPositionTool(m_lockPositionX.getValue(), m_lockPositionY.getValue(),
+										 m_globalKeyframes.getValue());
 			break;
 
 		case Rotation:
-			m_dragTool = new DragRotationTool(m_lockRotation.getValue(), m_globalKeyframes.getValue());
+			m_dragTool =
+				new DragRotationTool(m_lockRotation.getValue(), m_globalKeyframes.getValue());
 			break;
 
 		case Scale:
-			m_dragTool = new DragIsotropicScaleTool(m_lockGlobalScale.getValue(), m_globalKeyframes.getValue());
+			m_dragTool = new DragIsotropicScaleTool(m_lockGlobalScale.getValue(),
+													m_globalKeyframes.getValue());
 			break;
 
 		case ScaleXY:
-			m_dragTool = new DragScaleTool(scaleConstraint, m_lockScaleH.getValue(), m_lockScaleV.getValue(), m_globalKeyframes.getValue());
+			m_dragTool = new DragScaleTool(scaleConstraint, m_lockScaleH.getValue(),
+										   m_lockScaleV.getValue(), m_globalKeyframes.getValue());
 			break;
 
 		case Shear:
-			m_dragTool = new DragShearTool(
-				m_lockShearH.getValue(),
-				m_lockShearV.getValue(),
-				m_globalKeyframes.getValue());
+			m_dragTool = new DragShearTool(m_lockShearH.getValue(), m_lockShearV.getValue(),
+										   m_globalKeyframes.getValue());
 			break;
 		case ZTranslation:
 			m_dragTool = new DragZTool(m_viewer, m_globalKeyframes.getValue());
@@ -1161,8 +1171,8 @@ void EditTool::drawText(const TPointD &p, double unit, std::string text)
 void EditTool::draw()
 {
 	// the tool is using the coordinate system of the parent object
-	//glColor3d(1,0,1);
-	//tglDrawCircle(crossHair,50);
+	// glColor3d(1,0,1);
+	// tglDrawCircle(crossHair,50);
 
 	/*--Level編集モードのときは表示しない--*/
 	if (TTool::getApplication()->getCurrentFrame()->isEditingLevel())
@@ -1286,16 +1296,16 @@ void EditTool::draw()
 	/*--- アクティブでないカメラのPegbarを編集するときは、カメラ枠を表示する ---*/
 	if (objId.isCamera()) {
 		if (xsh->getStageObjectTree()->getCurrentCameraId() != objId) {
-			//TODO : glLineStipple has been deprecated in the OpenGL APIs. Need to be replaced. 2016/1/20 shun_iwasawa
+			// TODO : glLineStipple has been deprecated in the OpenGL APIs. Need to be replaced.
+			// 2016/1/20 shun_iwasawa
 			glEnable(GL_LINE_STIPPLE);
 			glColor3d(1.0, 0.0, 1.0);
 			glLineStipple(1, 0x1111);
-			TRectD cameraRect =
-				TTool::getApplication()
-					->getCurrentScene()
-					->getScene()
-					->getCurrentCamera()
-					->getStageRect();
+			TRectD cameraRect = TTool::getApplication()
+									->getCurrentScene()
+									->getScene()
+									->getCurrentCamera()
+									->getStageRect();
 
 			glPushMatrix();
 			tglDrawRect(cameraRect);
@@ -1337,9 +1347,9 @@ void EditTool::onActivate()
 		m_fxGadgetController = new FxGadgetController(this);
 
 		/*
-    m_foo.setTool(this);
-    m_foo.setFxHandle(getApplication()->getCurrentFx());
-    */
+	m_foo.setTool(this);
+	m_foo.setFxHandle(getApplication()->getCurrentFx());
+	*/
 
 		m_firstTime = false;
 	}

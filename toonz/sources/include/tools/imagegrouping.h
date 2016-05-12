@@ -22,14 +22,8 @@ class QMenu;
 class DVAPI TGroupCommand : public QObject
 {
 	Q_OBJECT
-public:
-	enum { NONE = 0,
-		   FRONT = 1,
-		   FORWARD = 2,
-		   BACKWARD = 4,
-		   BACK = 8,
-		   GROUP = 16,
-		   UNGROUP = 32 };
+  public:
+	enum { NONE = 0, FRONT = 1, FORWARD = 2, BACKWARD = 4, BACK = 8, GROUP = 16, UNGROUP = 32 };
 
 	StrokeSelection *m_sel;
 
@@ -69,7 +63,7 @@ public:
 	void enterGroup();
 	void exitGroup();
 
-private:
+  private:
 	void moveGroup(UCHAR moveType);
 };
 

@@ -35,23 +35,27 @@
 namespace
 {
 
-template <typename LevelType>
-LevelType *getLevel(const TXshCell &cell)
+template <typename LevelType> LevelType *getLevel(const TXshCell &cell)
 {
 	return dynamic_cast<LevelType *>(cell.m_level.getPointer());
 }
 
-template <>
-TXshLevel *getLevel<TXshLevel>(const TXshCell &cell) { return cell.m_level.getPointer(); }
+template <> TXshLevel *getLevel<TXshLevel>(const TXshCell &cell)
+{
+	return cell.m_level.getPointer();
+}
 
 //--------------------------------------------------------------------------------
 
 template <typename LevelType>
-void getSelectedFrames(CastSelection *castSelection, std::map<LevelType *, std::set<TFrameId>> &frames) {}
+void getSelectedFrames(CastSelection *castSelection,
+					   std::map<LevelType *, std::set<TFrameId>> &frames)
+{
+}
 
 template <>
-void getSelectedFrames<TXshSimpleLevel>(
-	CastSelection *castSelection, std::map<TXshSimpleLevel *, std::set<TFrameId>> &frames)
+void getSelectedFrames<TXshSimpleLevel>(CastSelection *castSelection,
+										std::map<TXshSimpleLevel *, std::set<TFrameId>> &frames)
 {
 	std::vector<TXshLevel *> levels;
 	castSelection->getSelectedLevels(levels);
@@ -62,7 +66,9 @@ void getSelectedFrames<TXshSimpleLevel>(
 		if (!sl)
 			continue;
 
-		tcg::substitute(frames[sl], boost::counting_range(0, sl->getFrameCount()) | boost::adaptors::transformed(boost::bind(&TXshSimpleLevel::getFrameId, sl, _1)));
+		tcg::substitute(frames[sl], boost::counting_range(0, sl->getFrameCount()) |
+										boost::adaptors::transformed(
+											boost::bind(&TXshSimpleLevel::getFrameId, sl, _1)));
 	}
 }
 
@@ -134,7 +140,8 @@ void getSelectedFrames(std::map<LevelType *, std::set<TFrameId>> &frames)
 	}
 
 	if (TFilmstripSelection *filmstripSelection = dynamic_cast<TFilmstripSelection *>(selection)) {
-		LevelType *level = dynamic_cast<LevelType *>(TApp::instance()->getCurrentLevel()->getLevel());
+		LevelType *level =
+			dynamic_cast<LevelType *>(TApp::instance()->getCurrentLevel()->getLevel());
 		if (level)
 			frames[level] = filmstripSelection->getSelectedFids();
 
@@ -146,13 +153,14 @@ void getSelectedFrames(std::map<LevelType *, std::set<TFrameId>> &frames)
 //    Selection utility  explicit instantiations
 //*********************************************************************************
 
-//template void getSelectedFrames<TXshLevel>(const TXsheet&, int, int, int, int,
+// template void getSelectedFrames<TXshLevel>(const TXsheet&, int, int, int, int,
 //                                                 std::map<TXshLevel*, std::set<TFrameId> >&);
 template void getSelectedFrames<TXshSimpleLevel>(const TXsheet &, int, int, int, int,
 												 std::map<TXshSimpleLevel *, std::set<TFrameId>> &);
-//template void getSelectedFrames<TXshChildLevel>(const TXsheet&, int, int, int, int,
+// template void getSelectedFrames<TXshChildLevel>(const TXsheet&, int, int, int, int,
 //                                                 std::map<TXshChildLevel*, std::set<TFrameId> >&);
 
 template void getSelectedFrames<TXshLevel>(std::map<TXshLevel *, std::set<TFrameId>> &);
-//template void getSelectedFrames<TXshSimpleLevel>(std::map<TXshSimpleLevel*, std::set<TFrameId> >&);
-//template void getSelectedFrames<TXshChildLevel>(std::map<TXshChildLevel*, std::set<TFrameId> >&);
+// template void getSelectedFrames<TXshSimpleLevel>(std::map<TXshSimpleLevel*, std::set<TFrameId>
+// >&);
+// template void getSelectedFrames<TXshChildLevel>(std::map<TXshChildLevel*, std::set<TFrameId> >&);

@@ -101,13 +101,11 @@ void copyChannels_dilate(const TRasterPT<Pix> &src, const TRasterPT<typename Pix
 namespace
 {
 
-template <typename Chan>
-struct MaxFunc {
+template <typename Chan> struct MaxFunc {
 	inline Chan operator()(const Chan &a, const Chan &b) { return tmax(a, b); }
 };
 
-template <typename Chan>
-struct MinFunc {
+template <typename Chan> struct MinFunc {
 	inline Chan operator()(const Chan &a, const Chan &b) { return tmin(a, b); }
 };
 
@@ -116,8 +114,8 @@ struct MinFunc {
 // NOTE: src and dst must be NOT OVERLAPPING (eg src != dst)
 
 template <typename Chan, typename Func>
-void erodilate_row(int len, const Chan *src, int sIncr, Chan *dst, int dIncr,
-				   int rad, double radR, Func func)
+void erodilate_row(int len, const Chan *src, int sIncr, Chan *dst, int dIncr, int rad, double radR,
+				   Func func)
 {
 	assert(rad >= 0);
 
@@ -138,11 +136,13 @@ void erodilate_row(int len, const Chan *src, int sIncr, Chan *dst, int dIncr,
 		const Chan *swBegin = src + tmax(w * swIncr - srIncr - sIncr, 0),
 				   *swEnd = src + tmin(w * swIncr + srIncr + sIncr, len * sIncr);
 
-		s = swEnd - sIncr, d = dst + ((s - src) / sIncr) * dIncr + drIncr; // d already decremented by dIncr
+		s = swEnd - sIncr,
+		d = dst + ((s - src) / sIncr) * dIncr + drIncr; // d already decremented by dIncr
 
 		Chan val = *s, oldVal;
 
-		for (s -= sIncr; (d >= dEnd) && (s >= swBegin); s -= sIncr, d -= dIncr) // s decremented here
+		for (s -= sIncr; (d >= dEnd) && (s >= swBegin);
+			 s -= sIncr, d -= dIncr) // s decremented here
 		{
 			assert(s >= src);
 			assert(s < sEnd);
@@ -209,7 +209,8 @@ void erodilate_row(int len, const Chan *src, int sIncr, Chan *dst, int dIncr,
 //--------------------------------------------------------------
 
 template <typename Pix, typename Chan>
-void erodilate_chan(const TRasterPT<Pix> &src, const TRasterPT<Chan> &dst, double radius, bool dilate)
+void erodilate_chan(const TRasterPT<Pix> &src, const TRasterPT<Chan> &dst, double radius,
+					bool dilate)
 {
 	assert(radius > 0.0);
 
@@ -226,20 +227,24 @@ void erodilate_chan(const TRasterPT<Pix> &src, const TRasterPT<Chan> &dst, doubl
 	{
 		if (dilate)
 			for (y = 0; y != ly; ++y)
-				::erodilate_row(lx, &src->pixels(y)->m, 4, temp->pixels(0) + y, ly, radI, radR, MaxFunc<Chan>());
+				::erodilate_row(lx, &src->pixels(y)->m, 4, temp->pixels(0) + y, ly, radI, radR,
+								MaxFunc<Chan>());
 		else
 			for (y = 0; y != ly; ++y)
-				::erodilate_row(lx, &src->pixels(y)->m, 4, temp->pixels(0) + y, ly, radI, radR, MinFunc<Chan>());
+				::erodilate_row(lx, &src->pixels(y)->m, 4, temp->pixels(0) + y, ly, radI, radR,
+								MinFunc<Chan>());
 	}
 
 	// Perform columns erodilation
 	{
 		if (dilate)
 			for (x = 0; x != lx; ++x)
-				::erodilate_row(ly, temp->pixels(x), 1, dst->pixels(0) + x, dst->getWrap(), radI, radR, MaxFunc<Chan>());
+				::erodilate_row(ly, temp->pixels(x), 1, dst->pixels(0) + x, dst->getWrap(), radI,
+								radR, MaxFunc<Chan>());
 		else
 			for (x = 0; x != lx; ++x)
-				::erodilate_row(ly, temp->pixels(x), 1, dst->pixels(0) + x, dst->getWrap(), radI, radR, MinFunc<Chan>());
+				::erodilate_row(ly, temp->pixels(x), 1, dst->pixels(0) + x, dst->getWrap(), radI,
+								radR, MinFunc<Chan>());
 	}
 }
 
@@ -262,8 +267,10 @@ void rect_erodilate(const TRasterPT<Pix> &src, const TRasterPT<Pix> &dst, double
 	TRasterPT<Chan> temp(src->getLx(), src->getLy());
 	::erodilate_chan(src, temp, fabs(radius), dilate);
 
-	// Remember that we have just calculated the matte values. We still have to apply them to the old RGB
-	// values, which requires depremultiplying from source matte and premultiplying with the new one.
+	// Remember that we have just calculated the matte values. We still have to apply them to the
+	// old RGB
+	// values, which requires depremultiplying from source matte and premultiplying with the new
+	// one.
 	if (dilate)
 		::copyChannels_dilate(src, temp, dst);
 	else
@@ -280,10 +287,8 @@ namespace
 {
 
 template <typename Chan, typename Func>
-void erodilate_quarters(int lx, int ly,
-						Chan *src, int sIncrX, int sIncrY,
-						Chan *dst, int dIncrX, int dIncrY,
-						double radius, double shift, Func func)
+void erodilate_quarters(int lx, int ly, Chan *src, int sIncrX, int sIncrY, Chan *dst, int dIncrX,
+						int dIncrY, double radius, double shift, Func func)
 {
 	double sqRadius = sq(radius);
 	double squareHeight = radius / tcg::consts::sqrt2;
@@ -313,7 +318,7 @@ void erodilate_quarters(int lx, int ly,
 		for (dy = 0; dy < dRect.y0; ++dy) {
 			Chan *d, *dBegin = dst + dy * dIncrY, *dEnd = dBegin + lx * dIncrX;
 			for (d = dBegin; d != dEnd; d += dIncrX) {
-				//assert(d >= dst); assert(d < dEnd); assert((d-dst) % dIncrX == 0);
+				// assert(d >= dst); assert(d < dEnd); assert((d-dst) % dIncrX == 0);
 				*d = func(*d, 0);
 			}
 		}
@@ -322,7 +327,7 @@ void erodilate_quarters(int lx, int ly,
 		for (dy = dRect.y1; dy < ly; ++dy) {
 			Chan *d, *dBegin = dst + dy * dIncrY, *dEnd = dBegin + lx * dIncrX;
 			for (d = dBegin; d != dEnd; d += dIncrX) {
-				//assert(d >= dst); assert(d < dEnd); assert((d-dst) % dIncrX == 0);
+				// assert(d >= dst); assert(d < dEnd); assert((d-dst) % dIncrX == 0);
 				*d = func(*d, 0);
 			}
 		}
@@ -330,20 +335,22 @@ void erodilate_quarters(int lx, int ly,
 		// For every dst pixel in the area, Func with the corresponding pixel in src
 		for (dy = dRect.y0, sy = sRect.y0; dy != dRect.y1; ++dy, ++sy) {
 			Chan *d, *dLine = dst + dy * dIncrY, *dBegin = dLine + dRect.x0 * dIncrX;
-			Chan *s, *sLine = src + sy * sIncrY, *sBegin = sLine + sRect.x0 * sIncrX, *sEnd = sLine + sRect.x1 * sIncrX;
+			Chan *s, *sLine = src + sy * sIncrY, *sBegin = sLine + sRect.x0 * sIncrX,
+					 *sEnd = sLine + sRect.x1 * sIncrX;
 
 			Chan *sLast = sEnd - sIncrX; // sLast would lerp with sEnd
 
-			for (d = dBegin, s = sBegin; s != sLast; d += dIncrX, s += sIncrX) // hence we stop before it
+			for (d = dBegin, s = sBegin; s != sLast;
+				 d += dIncrX, s += sIncrX) // hence we stop before it
 			{
-				//assert(s >= src); assert(s < sEnd); assert((s-src) % sIncrX == 0);
-				//assert(d >= dst); assert(d < dEnd); assert((d-dst) % dIncrX == 0);
+				// assert(s >= src); assert(s < sEnd); assert((s-src) % sIncrX == 0);
+				// assert(d >= dst); assert(d < dEnd); assert((d-dst) % dIncrX == 0);
 
 				*d = func(*d, *s * one_w + *(s + sIncrX) * w);
 			}
 
-			//assert(s >= src); assert(s < sEnd); assert((s-src) % sIncrX == 0);
-			//assert(d >= dst); assert(d < dEnd); assert((d-dst) % dIncrX == 0);
+			// assert(s >= src); assert(s < sEnd); assert((s-src) % sIncrX == 0);
+			// assert(d >= dst); assert(d < dEnd); assert((d-dst) % dIncrX == 0);
 
 			*d = func(*d, *s * one_w); // lerp sLast with 0
 		}
@@ -397,45 +404,61 @@ void circular_erodilate(const TRasterPT<Pix> &src, const TRasterPT<Pix> &dst, do
 
 		if (row_filter_radius > 0.0)
 			for (int y = 0; y != ly; ++y)
-				::erodilate_row(lx, &src->pixels(y)->m, 4, temp1->pixels(y), 1, radI, radR, MaxFunc<Chan>());
+				::erodilate_row(lx, &src->pixels(y)->m, 4, temp1->pixels(y), 1, radI, radR,
+								MaxFunc<Chan>());
 		else
 			::copyMatte(src, temp1);
 
-		::erodilate_quarters(lx, ly, temp1->pixels(0), 1, lx, temp2->pixels(0), 1, lx, radius, cseShift, MaxFunc<Chan>());
-		::erodilate_quarters(lx, ly, temp1->pixels(0) + lx - 1, -1, lx, temp2->pixels(0) + lx - 1, -1, lx, radius, cseShift, MaxFunc<Chan>());
+		::erodilate_quarters(lx, ly, temp1->pixels(0), 1, lx, temp2->pixels(0), 1, lx, radius,
+							 cseShift, MaxFunc<Chan>());
+		::erodilate_quarters(lx, ly, temp1->pixels(0) + lx - 1, -1, lx, temp2->pixels(0) + lx - 1,
+							 -1, lx, radius, cseShift, MaxFunc<Chan>());
 
 		if (row_filter_radius > 0.0)
 			for (int x = 0; x != lx; ++x)
-				::erodilate_row(ly, &src->pixels(0)[x].m, 4 * src->getWrap(), temp1->pixels(0) + x, lx, radI, radR, MaxFunc<Chan>());
+				::erodilate_row(ly, &src->pixels(0)[x].m, 4 * src->getWrap(), temp1->pixels(0) + x,
+								lx, radI, radR, MaxFunc<Chan>());
 		else
 			::copyMatte(src, temp1);
 
-		::erodilate_quarters(ly, lx, temp1->pixels(0), lx, 1, temp2->pixels(0), lx, 1, radius, cseShift, MaxFunc<Chan>());
-		::erodilate_quarters(ly, lx, temp1->pixels(0) + lx * ly - 1, -lx, -1, temp2->pixels(0) + lx * ly - 1, -lx, -1, radius, cseShift, MaxFunc<Chan>());
+		::erodilate_quarters(ly, lx, temp1->pixels(0), lx, 1, temp2->pixels(0), lx, 1, radius,
+							 cseShift, MaxFunc<Chan>());
+		::erodilate_quarters(ly, lx, temp1->pixels(0) + lx * ly - 1, -lx, -1,
+							 temp2->pixels(0) + lx * ly - 1, -lx, -1, radius, cseShift,
+							 MaxFunc<Chan>());
 	} else {
 		temp2->fill((std::numeric_limits<Chan>::max)()); // Initialize with a Func-neutral value
 
 		if (row_filter_radius > 0.0)
 			for (int y = 0; y != ly; ++y)
-				::erodilate_row(lx, &src->pixels(y)->m, 4, temp1->pixels(y), 1, radI, radR, MinFunc<Chan>());
+				::erodilate_row(lx, &src->pixels(y)->m, 4, temp1->pixels(y), 1, radI, radR,
+								MinFunc<Chan>());
 		else
 			::copyMatte(src, temp1);
 
-		::erodilate_quarters(lx, ly, temp1->pixels(0), 1, lx, temp2->pixels(0), 1, lx, radius, cseShift, MinFunc<Chan>());
-		::erodilate_quarters(lx, ly, temp1->pixels(0) + lx - 1, -1, lx, temp2->pixels(0) + lx - 1, -1, lx, radius, cseShift, MinFunc<Chan>());
+		::erodilate_quarters(lx, ly, temp1->pixels(0), 1, lx, temp2->pixels(0), 1, lx, radius,
+							 cseShift, MinFunc<Chan>());
+		::erodilate_quarters(lx, ly, temp1->pixels(0) + lx - 1, -1, lx, temp2->pixels(0) + lx - 1,
+							 -1, lx, radius, cseShift, MinFunc<Chan>());
 
 		if (row_filter_radius > 0.0)
 			for (int x = 0; x != lx; ++x)
-				::erodilate_row(ly, &src->pixels(0)[x].m, 4 * src->getWrap(), temp1->pixels(0) + x, lx, radI, radR, MinFunc<Chan>());
+				::erodilate_row(ly, &src->pixels(0)[x].m, 4 * src->getWrap(), temp1->pixels(0) + x,
+								lx, radI, radR, MinFunc<Chan>());
 		else
 			::copyMatte(src, temp1);
 
-		::erodilate_quarters(ly, lx, temp1->pixels(0), lx, 1, temp2->pixels(0), lx, 1, radius, cseShift, MinFunc<Chan>());
-		::erodilate_quarters(ly, lx, temp1->pixels(0) + lx * ly - 1, -lx, -1, temp2->pixels(0) + lx * ly - 1, -lx, -1, radius, cseShift, MinFunc<Chan>());
+		::erodilate_quarters(ly, lx, temp1->pixels(0), lx, 1, temp2->pixels(0), lx, 1, radius,
+							 cseShift, MinFunc<Chan>());
+		::erodilate_quarters(ly, lx, temp1->pixels(0) + lx * ly - 1, -lx, -1,
+							 temp2->pixels(0) + lx * ly - 1, -lx, -1, radius, cseShift,
+							 MinFunc<Chan>());
 	}
 
-	// Remember that we have just calculated the matte values. We still have to apply them to the old RGB
-	// values, which requires depremultiplying from source matte and premultiplying with the new one.
+	// Remember that we have just calculated the matte values. We still have to apply them to the
+	// old RGB
+	// values, which requires depremultiplying from source matte and premultiplying with the new
+	// one.
 	if (dilate)
 		::copyChannels_dilate(src, temp2, dst);
 	else
@@ -448,8 +471,8 @@ void circular_erodilate(const TRasterPT<Pix> &src, const TRasterPT<Pix> &dst, do
 //    EroDilate  main functions
 //********************************************************
 
-void TRop::erodilate(const TRasterP &src, const TRasterP &dst,
-					 double radius, ErodilateMaskType type)
+void TRop::erodilate(const TRasterP &src, const TRasterP &dst, double radius,
+					 ErodilateMaskType type)
 {
 	assert(src->getSize() == dst->getSize());
 

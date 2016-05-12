@@ -49,16 +49,22 @@ TStrokeProp *TSimpleStrokeProp::clone(const TStroke *stroke) const
 
 //-----------------------------------------------------------------------------
 
-void TSimpleStrokeProp::draw(const TVectorRenderData &rd) /*assenza di const non e' una dimenticanza! Alcune sottoclassi devono ridefinire questo metodo e serve che non sia const*/
+void TSimpleStrokeProp::draw(
+	const TVectorRenderData &rd) /*assenza di const non e' una dimenticanza! Alcune sottoclassi
+									devono ridefinire questo metodo e serve che non sia const*/
 {
-	if (rd.m_clippingRect != TRect() && !rd.m_is3dView && !convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
+	if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
+		!convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
 		return;
 
 	if (!rd.m_show0ThickStrokes) {
-		// >:(  This is not an implementation detail of TCenterlineStrokeStyle because the drawStroke()
-		//      function does not have access to rd - should modify the interface... it would be best.
+		// >:(  This is not an implementation detail of TCenterlineStrokeStyle because the
+		// drawStroke()
+		//      function does not have access to rd - should modify the interface... it would be
+		//      best.
 
-		const TCenterLineStrokeStyle *cs = dynamic_cast<const TCenterLineStrokeStyle *>(m_colorStyle);
+		const TCenterLineStrokeStyle *cs =
+			dynamic_cast<const TCenterLineStrokeStyle *>(m_colorStyle);
 		if (cs && cs->getParamValue(TColorStyle::double_tag(), 0) == 0)
 			return;
 	}
@@ -78,7 +84,8 @@ void TSimpleStrokeProp::draw(TFlash &flash)
 }
 //=============================================================================
 
-TRasterImagePatternStrokeProp::TRasterImagePatternStrokeProp(const TStroke *stroke, TRasterImagePatternStrokeStyle *style)
+TRasterImagePatternStrokeProp::TRasterImagePatternStrokeProp(const TStroke *stroke,
+															 TRasterImagePatternStrokeStyle *style)
 	: TStrokeProp(stroke), m_colorStyle(style)
 {
 	m_styleVersionNumber = style->getVersionNumber();
@@ -111,9 +118,12 @@ TStrokeProp *TRasterImagePatternStrokeProp::clone(const TStroke *stroke) const
 
 //-----------------------------------------------------------------------------
 
-void TRasterImagePatternStrokeProp::draw(const TVectorRenderData &rd) /*assenza di const non e' una dimenticanza! Alcune sottoclassi devono ridefinire questo metodo e serbve che non sia const*/
+void TRasterImagePatternStrokeProp::draw(
+	const TVectorRenderData &rd) /*assenza di const non e' una dimenticanza! Alcune sottoclassi
+									devono ridefinire questo metodo e serbve che non sia const*/
 {
-	if (rd.m_clippingRect != TRect() && !rd.m_is3dView && !convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
+	if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
+		!convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
 		return;
 
 	if (m_strokeChanged || m_styleVersionNumber != m_colorStyle->getVersionNumber()) {
@@ -134,7 +144,8 @@ void TRasterImagePatternStrokeProp::draw(TFlash &flash)
 //-----------------------------------------------------------------------------
 //=============================================================================
 
-TVectorImagePatternStrokeProp::TVectorImagePatternStrokeProp(const TStroke *stroke, TVectorImagePatternStrokeStyle *style)
+TVectorImagePatternStrokeProp::TVectorImagePatternStrokeProp(const TStroke *stroke,
+															 TVectorImagePatternStrokeStyle *style)
 	: TStrokeProp(stroke), m_colorStyle(style)
 {
 	m_styleVersionNumber = style->getVersionNumber();
@@ -167,9 +178,12 @@ TStrokeProp *TVectorImagePatternStrokeProp::clone(const TStroke *stroke) const
 
 //-----------------------------------------------------------------------------
 
-void TVectorImagePatternStrokeProp::draw(const TVectorRenderData &rd) /*assenza di const non e' una dimenticanza! Alcune sottoclassi devono ridefinire questo metodo e serbve che non sia const*/
+void TVectorImagePatternStrokeProp::draw(
+	const TVectorRenderData &rd) /*assenza di const non e' una dimenticanza! Alcune sottoclassi
+									devono ridefinire questo metodo e serbve che non sia const*/
 {
-	if (rd.m_clippingRect != TRect() && !rd.m_is3dView && !convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
+	if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
+		!convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
 		return;
 
 	if (m_strokeChanged || m_styleVersionNumber != m_colorStyle->getVersionNumber()) {
@@ -190,18 +204,18 @@ void TVectorImagePatternStrokeProp::draw(TFlash &flash)
 //-----------------------------------------------------------------------------
 
 /*
-void TSimpleStrokeProp::draw(TFlash &flash) 
+void TSimpleStrokeProp::draw(TFlash &flash)
 {
   // fintissima!!!! quella vera deve risalire per m_colorStyle->drawStroke()
   // come la sua sorellina di sopra
   int i, n = m_stroke->getControlPointCount();
   flash.setColor(m_colorStyle->getMainColor());
   for(i=0;i<n-1;i++)
-    {
-     TPointD a = m_stroke->getControlPoint(i);
-     TPointD b = m_stroke->getControlPoint(i+1);
-     flash.drawLine(a,b);
-    }
+	{
+	 TPointD a = m_stroke->getControlPoint(i);
+	 TPointD b = m_stroke->getControlPoint(i+1);
+	 flash.drawLine(a,b);
+	}
 }
 */
 
@@ -235,7 +249,8 @@ const TColorStyle *OutlineStrokeProp::getColorStyle() const
 
 void OutlineStrokeProp::draw(const TVectorRenderData &rd)
 {
-	if (rd.m_clippingRect != TRect() && !rd.m_is3dView && !convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
+	if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
+		!convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
 		return;
 
 	glPushMatrix();
@@ -249,11 +264,13 @@ void OutlineStrokeProp::draw(const TVectorRenderData &rd)
 	if (m_stroke->isCenterLine())
 #endif
 	{
-		TCenterLineStrokeStyle *appStyle = new TCenterLineStrokeStyle(m_colorStyle->getAverageColor(), 0, 0);
+		TCenterLineStrokeStyle *appStyle =
+			new TCenterLineStrokeStyle(m_colorStyle->getAverageColor(), 0, 0);
 		appStyle->drawStroke(rd.m_cf, m_stroke);
 		delete appStyle;
 	} else {
-		if (!isAlmostZero(pixelSize - m_outlinePixelSize, 1e-5) || m_strokeChanged || m_styleVersionNumber != m_colorStyle->getVersionNumber()) {
+		if (!isAlmostZero(pixelSize - m_outlinePixelSize, 1e-5) || m_strokeChanged ||
+			m_styleVersionNumber != m_colorStyle->getVersionNumber()) {
 			m_strokeChanged = false;
 			m_outlinePixelSize = pixelSize;
 			TOutlineUtil::OutlineParameter param;
@@ -261,8 +278,9 @@ void OutlineStrokeProp::draw(const TVectorRenderData &rd)
 			m_outline.getArray().clear();
 			m_colorStyle->computeOutline(m_stroke, m_outline, param);
 
-			//TOutlineStyle::StrokeOutlineModifier *modifier = m_colorStyle->getStrokeOutlineModifier();
-			//if(modifier)
+			// TOutlineStyle::StrokeOutlineModifier *modifier =
+			// m_colorStyle->getStrokeOutlineModifier();
+			// if(modifier)
 			//  modifier->modify(m_outline);
 
 			m_styleVersionNumber = m_colorStyle->getVersionNumber();
@@ -284,7 +302,7 @@ void OutlineStrokeProp::draw(TFlash &flash)
 //=============================================================================
 
 /* ora e' virtuale pura
-void TStrokeProp::draw(TFlash &flash) 
+void TStrokeProp::draw(TFlash &flash)
 {
 getColorStyle()->drawStroke(flash, getStroke());
 }

@@ -122,11 +122,13 @@ PaletteFilterFxRenderData::PaletteFilterFxRenderData()
 
 bool PaletteFilterFxRenderData::operator==(const TRasterFxRenderData &data) const
 {
-	const PaletteFilterFxRenderData *theData = dynamic_cast<const PaletteFilterFxRenderData *>(&data);
+	const PaletteFilterFxRenderData *theData =
+		dynamic_cast<const PaletteFilterFxRenderData *>(&data);
 	if (!theData)
 		return false;
 
-	return (theData->m_colors == m_colors && theData->m_type == m_type && theData->m_keep == m_keep);
+	return (theData->m_colors == m_colors && theData->m_type == m_type &&
+			theData->m_keep == m_keep);
 }
 
 //------------------------------------------------------------------------------
@@ -146,9 +148,12 @@ std::string PaletteFilterFxRenderData::toString() const
 //    SandorFxRenderData  implementation
 //**********************************************************************************************
 
-SandorFxRenderData::SandorFxRenderData(Type type, int argc, const char *argv[], int border, int shrink,
-									   const TRectD &controllerBBox, const TRasterP &controller)
-	: m_type(type), m_border(border), m_shrink(shrink), m_blendParams(), m_callParams(), m_contourParams(), m_argc(argc), m_controllerBBox(controllerBBox), m_controller(controller), m_controllerAlias()
+SandorFxRenderData::SandorFxRenderData(Type type, int argc, const char *argv[], int border,
+									   int shrink, const TRectD &controllerBBox,
+									   const TRasterP &controller)
+	: m_type(type), m_border(border), m_shrink(shrink), m_blendParams(), m_callParams(),
+	  m_contourParams(), m_argc(argc), m_controllerBBox(controllerBBox), m_controller(controller),
+	  m_controllerAlias()
 {
 	for (int i = 0; i < argc; i++)
 		m_argv[i] = argv[i];
@@ -247,8 +252,8 @@ TRectD SandorFxRenderData::getBBoxEnlargement(const TRectD &bbox)
 {
 	switch (m_type) {
 	case BlendTz: {
-		//Nothing happen, unless we have color 0 among the blended ones. In such case,
-		//we have to enlarge the bbox proportionally to the amount param.
+		// Nothing happen, unless we have color 0 among the blended ones. In such case,
+		// we have to enlarge the bbox proportionally to the amount param.
 		std::vector<std::string> items;
 		std::string indexes = std::string(m_argv[0]);
 		parseIndexes(indexes, items);
@@ -266,8 +271,8 @@ TRectD SandorFxRenderData::getBBoxEnlargement(const TRectD &bbox)
 		return bbox.enlarge(m_callParams.m_thickness);
 
 	case ArtAtContour:
-		return bbox.enlarge(
-			tmax(tceil(m_controllerBBox.getLx()), tceil(m_controllerBBox.getLy())) * m_contourParams.m_maxSize);
+		return bbox.enlarge(tmax(tceil(m_controllerBBox.getLx()), tceil(m_controllerBBox.getLy())) *
+							m_contourParams.m_maxSize);
 
 	default:
 		assert(false);

@@ -36,37 +36,60 @@ static TTextureMeshP cloneMesh_(const TTextureMeshP &other)
 void static_check()
 {
 	/* input iterator */
-	static_assert(std::is_same<std::iterator_traits<std::vector<TTextureMesh>::iterator>::iterator_category, std::random_access_iterator_tag>::value == true, "random");
+	static_assert(
+		std::is_same<std::iterator_traits<std::vector<TTextureMesh>::iterator>::iterator_category,
+					 std::random_access_iterator_tag>::value == true,
+		"random");
 
-	static_assert(std::is_base_of<std::input_iterator_tag, std::iterator_traits<std::vector<TTextureMesh>::iterator>::iterator_category>::value == true, "input");
+	static_assert(
+		std::is_base_of<
+			std::input_iterator_tag,
+			std::iterator_traits<std::vector<TTextureMesh>::iterator>::iterator_category>::value ==
+			true,
+		"input");
 
-	static_assert(std::is_base_of<std::forward_iterator_tag, std::iterator_traits<std::vector<TTextureMesh>::iterator>::iterator_category>::value == true, "forward");
+	static_assert(
+		std::is_base_of<
+			std::forward_iterator_tag,
+			std::iterator_traits<std::vector<TTextureMesh>::iterator>::iterator_category>::value ==
+			true,
+		"forward");
 
-	static_assert(std::is_constructible<TTextureMeshP,
-										std::iterator_traits<std::vector<TTextureMeshP>::iterator>::reference>::value == true,
-				  "akan");
+	static_assert(
+		std::is_constructible<
+			TTextureMeshP,
+			std::iterator_traits<std::vector<TTextureMeshP>::iterator>::reference>::value == true,
+		"akan");
 
 	/* converted iterator */
 	std::vector<TTextureMeshP> vec;
 	auto it = vec.end();
 	auto c = tcg::make_cast_it(it, cloneMesh_);
 
-	static_assert(std::is_same<std::iterator_traits<decltype(c)>::iterator_category, std::random_access_iterator_tag>::value == true, "random");
+	static_assert(std::is_same<std::iterator_traits<decltype(c)>::iterator_category,
+							   std::random_access_iterator_tag>::value == true,
+				  "random");
 
-	static_assert(std::is_base_of<std::input_iterator_tag, std::iterator_traits<decltype(c)>::iterator_category>::value == true, "input");
+	static_assert(std::is_base_of<std::input_iterator_tag,
+								  std::iterator_traits<decltype(c)>::iterator_category>::value ==
+					  true,
+				  "input");
 
-	static_assert(std::is_base_of<std::forward_iterator_tag, std::iterator_traits<decltype(c)>::iterator_category>::value == true, "forward");
+	static_assert(std::is_base_of<std::forward_iterator_tag,
+								  std::iterator_traits<decltype(c)>::iterator_category>::value ==
+					  true,
+				  "forward");
 
-	//TTextureMeshP p(std::iterator_traits< decltype(c) >::reference);
-	static_assert(std::is_constructible<TTextureMeshP,
-										std::iterator_traits<decltype(c)>::reference>::value == true,
-				  "akan");
+	// TTextureMeshP p(std::iterator_traits< decltype(c) >::reference);
+	static_assert(
+		std::is_constructible<TTextureMeshP, std::iterator_traits<decltype(c)>::reference>::value ==
+			true,
+		"akan");
 }
 
 //-----------------------------------------------------------------------
 
-TTextureMesh::TTextureMesh()
-	: TSmartObject(m_classCode)
+TTextureMesh::TTextureMesh() : TSmartObject(m_classCode)
 {
 }
 
@@ -157,8 +180,7 @@ void TTextureMesh::saveData(TOStream &os)
 	// the lists' internal linking could have been altered to mismatch the
 	// natural indexing referred to by primitives' data.
 
-	if (m_vertices.size() != m_vertices.nodesCount() ||
-		m_edges.size() != m_edges.nodesCount() ||
+	if (m_vertices.size() != m_vertices.nodesCount() || m_edges.size() != m_edges.nodesCount() ||
 		m_faces.size() != m_faces.nodesCount()) {
 		// Ensure the mesh is already squeezed - save a squeezed
 		// copy if necessary
@@ -298,7 +320,7 @@ void TTextureMesh::loadData(TIStream &is)
 
 class TMeshImage::Imp
 {
-public:
+  public:
 	std::vector<TTextureMeshP> m_meshes; //!< Mesh data
 	double m_dpiX, m_dpiY;				 //!< Meshes dpi
 
@@ -307,9 +329,11 @@ public:
 	Imp(const Imp &other)
 		: m_meshes(tcg::make_cast_it(other.m_meshes.begin(), cloneMesh),
 				   tcg::make_cast_it(other.m_meshes.end(), cloneMesh)),
-		  m_dpiX(other.m_dpiX), m_dpiY(other.m_dpiY) {}
+		  m_dpiX(other.m_dpiX), m_dpiY(other.m_dpiY)
+	{
+	}
 
-private:
+  private:
 	static TTextureMeshP cloneMesh(const TTextureMeshP &other)
 	{
 		return TTextureMeshP(new TTextureMesh(*other));
@@ -323,15 +347,13 @@ private:
 //    TMeshImage  implementation
 //******************************************************************************
 
-TMeshImage::TMeshImage()
-	: m_imp(new Imp)
+TMeshImage::TMeshImage() : m_imp(new Imp)
 {
 }
 
 //-----------------------------------------------------------------------
 
-TMeshImage::TMeshImage(std::shared_ptr<Imp> imp)
-	: m_imp(std::move(imp))
+TMeshImage::TMeshImage(std::shared_ptr<Imp> imp) : m_imp(std::move(imp))
 {
 }
 
@@ -343,8 +365,7 @@ TMeshImage::~TMeshImage()
 
 //-----------------------------------------------------------------------
 
-TMeshImage::TMeshImage(const TMeshImage &other)
-	: m_imp(new Imp(*other.m_imp))
+TMeshImage::TMeshImage(const TMeshImage &other) : m_imp(new Imp(*other.m_imp))
 {
 }
 

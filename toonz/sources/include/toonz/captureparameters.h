@@ -37,7 +37,7 @@ class DVAPI CaptureParameters
 	std::string m_format;
 	std::map<std::string, TPropertyGroup *> m_formatProperties;
 
-public:
+  public:
 	CaptureParameters();
 	~CaptureParameters() {}
 
@@ -77,7 +77,7 @@ public:
 	void saveData(TOStream &os);
 	void loadData(TIStream &is);
 
-protected:
+  protected:
 	void getFileFormatPropertiesExtensions(std::vector<std::string> &v) const;
 };
 #endif // CAPTUREPARAMETERS_H

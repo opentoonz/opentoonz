@@ -26,10 +26,9 @@ class CornerPinFx : public TStandardRasterFx
 {
 	FX_PLUGIN_DECLARATION(CornerPinFx)
 
-	enum { PERSPECTIVE,
-		   BILINEAR };
+	enum { PERSPECTIVE, BILINEAR };
 
-public:
+  public:
 	CornerPinFx();
 	~CornerPinFx();
 
@@ -44,23 +43,15 @@ public:
 
 	bool allowUserCacheOnPort(int port) { return port != 0; }
 
-	void transform(double frame,
-				   int port,
-				   const TRectD &rectOnOutput,
-				   const TRenderSettings &infoOnOutput,
-				   TRectD &rectOnInput,
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
 				   TRenderSettings &infoOnInput);
 
-	void safeTransform(
-		double frame,
-		int port,
-		const TRectD &rectOnOutput,
-		const TRenderSettings &infoOnOutput,
-		TRectD &rectOnInput,
-		TRenderSettings &infoOnInput,
-		TRectD &inBBox);
+	void safeTransform(double frame, int port, const TRectD &rectOnOutput,
+					   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+					   TRenderSettings &infoOnInput, TRectD &inBBox);
 
-private:
+  private:
 	TRasterFxPort m_input;
 	TRasterFxPort m_texture;
 
@@ -88,7 +79,9 @@ private:
 //==============================================================================
 
 CornerPinFx::CornerPinFx()
-	: m_distortType(new TIntEnumParam(PERSPECTIVE, "Perspective")), m_deactivate(false), m_string(L"1,2,3"), m_mode(new TIntEnumParam(SUBSTITUTE, "Texture")), m_keep(new TIntEnumParam(0, "Delete")), m_value(100)
+	: m_distortType(new TIntEnumParam(PERSPECTIVE, "Perspective")), m_deactivate(false),
+	  m_string(L"1,2,3"), m_mode(new TIntEnumParam(SUBSTITUTE, "Texture")),
+	  m_keep(new TIntEnumParam(0, "Delete")), m_value(100)
 {
 	double ext = 400.;
 	double inn = 400.;
@@ -204,16 +197,16 @@ bool CornerPinFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &i
 
 TAffine CornerPinFx::getPort1Affine(double frame) const
 {
-	//Explanation: Fxs tree decomposition on n-ary fxs (n>1) works the following way.
-	//Fxs on port 0 are considered 'column representants' - so affines found on them
-	//must be passed throughout the tree hierarchy. Therefore, their inverses are multiplied
-	//just below the other input ports in order to push the former affine above.
-	//In other words:
+	// Explanation: Fxs tree decomposition on n-ary fxs (n>1) works the following way.
+	// Fxs on port 0 are considered 'column representants' - so affines found on them
+	// must be passed throughout the tree hierarchy. Therefore, their inverses are multiplied
+	// just below the other input ports in order to push the former affine above.
+	// In other words:
 	//  port  0:  A -|                  ---|
 	//               +--   =>              + A --
 	//  port >0:  B -|         B - (Ainv) -|
 
-	//Retrieve the affine that lies just below texture's port.
+	// Retrieve the affine that lies just below texture's port.
 	TGeometryFx *AinvFx = dynamic_cast<TGeometryFx *>(m_texture.getFx());
 	if (!AinvFx)
 		return TAffine();
@@ -225,15 +218,11 @@ TAffine CornerPinFx::getPort1Affine(double frame) const
 
 // ------------------------------------------------------------------------
 
-void CornerPinFx::transform(
-	double frame,
-	int port,
-	const TRectD &rectOnOutput,
-	const TRenderSettings &infoOnOutput,
-	TRectD &rectOnInput,
-	TRenderSettings &infoOnInput)
+void CornerPinFx::transform(double frame, int port, const TRectD &rectOnOutput,
+							const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+							TRenderSettings &infoOnInput)
 {
-	//Build the input affine
+	// Build the input affine
 	infoOnInput = infoOnOutput;
 
 	TPointD p00_b = m_p00_b->getValue(frame);
@@ -246,9 +235,9 @@ void CornerPinFx::transform(
 	TPointD p01_a = m_p01_a->getValue(frame);
 	TPointD p11_a = m_p11_a->getValue(frame);
 
-	//NOTE 1: An appropriate scale factor is sent below in the schematic, depending
-	//on the image distortion. For example, if the distortion brings a 2 scale factor,
-	//we want the same factor applied on image levels, so that their detail is appropriate
+	// NOTE 1: An appropriate scale factor is sent below in the schematic, depending
+	// on the image distortion. For example, if the distortion brings a 2 scale factor,
+	// we want the same factor applied on image levels, so that their detail is appropriate
 	//(especially for vector images).
 
 	double scale = 0;
@@ -263,27 +252,28 @@ void CornerPinFx::transform(
 	scale *= sqrt(fabs(B.det()));
 
 	if (infoOnOutput.m_isSwatch) {
-		//Swatch viewers work out a lite version of the distort: only contractions
-		//are passed below in the schematic - so that input memory load is always at minimum.
-		//This is allowed in order to make fx adjusts the less frustrating as possible.
+		// Swatch viewers work out a lite version of the distort: only contractions
+		// are passed below in the schematic - so that input memory load is always at minimum.
+		// This is allowed in order to make fx adjusts the less frustrating as possible.
 		if (scale > 1)
 			scale = 1;
 	}
 
-	//NOTE 2: We further include A_1B.inv() to be applied on the level. This is done to
-	//counter the presence of A_1B just below this node - since it is preferable to place A_1B
-	//directly in the distort.
+	// NOTE 2: We further include A_1B.inv() to be applied on the level. This is done to
+	// counter the presence of A_1B just below this node - since it is preferable to place A_1B
+	// directly in the distort.
 
 	infoOnInput.m_affine = TScale(scale) * A_1B.inv();
-	//rectOnInput = (TScale(scale) * B.inv()) * rectOnOutput;
+	// rectOnInput = (TScale(scale) * B.inv()) * rectOnOutput;
 
-	//NOTE 3: The original distortion points are intended on the source port *before* applying A.
-	//But we want to have them on texture port *before* applying B; so, the following ref change arises:
+	// NOTE 3: The original distortion points are intended on the source port *before* applying A.
+	// But we want to have them on texture port *before* applying B; so, the following ref change
+	// arises:
 	//  p_b = (TScale(scale) * A_1B.inv()) * p_b == infoOnInput.m_aff * p_b;
 	//  p_a = (B * A_1B.inv()) * p_a == infoOnOutput.m_aff * p_a;
-	//Observe that scale and B are here due to NOTES 1 and 2.
+	// Observe that scale and B are here due to NOTES 1 and 2.
 
-	//Build rectOnInput
+	// Build rectOnInput
 	p00_a = infoOnOutput.m_affine * p00_a;
 	p10_a = infoOnOutput.m_affine * p10_a;
 	p01_a = infoOnOutput.m_affine * p01_a;
@@ -295,15 +285,11 @@ void CornerPinFx::transform(
 	p11_b = infoOnInput.m_affine * p11_b;
 
 	if (m_distortType->getValue() == PERSPECTIVE) {
-		PerspectiveDistorter pd(
-			p00_b, p10_b, p01_b, p11_b,
-			p00_a, p10_a, p01_a, p11_a);
+		PerspectiveDistorter pd(p00_b, p10_b, p01_b, p11_b, p00_a, p10_a, p01_a, p11_a);
 
 		rectOnInput = ((TQuadDistorter *)&pd)->invMap(rectOnOutput);
 	} else {
-		BilinearDistorter bd(
-			p00_b, p10_b, p01_b, p11_b,
-			p00_a, p10_a, p01_a, p11_a);
+		BilinearDistorter bd(p00_b, p10_b, p01_b, p11_b, p00_a, p10_a, p01_a, p11_a);
 
 		rectOnInput = ((TQuadDistorter *)&bd)->invMap(rectOnOutput);
 	}
@@ -320,14 +306,9 @@ void CornerPinFx::transform(
 
 // ------------------------------------------------------------------------
 
-void CornerPinFx::safeTransform(
-	double frame,
-	int port,
-	const TRectD &rectOnOutput,
-	const TRenderSettings &infoOnOutput,
-	TRectD &rectOnInput,
-	TRenderSettings &infoOnInput,
-	TRectD &inBBox)
+void CornerPinFx::safeTransform(double frame, int port, const TRectD &rectOnOutput,
+								const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+								TRenderSettings &infoOnInput, TRectD &inBBox)
 {
 	assert(port == 1 && m_texture.isConnected());
 
@@ -338,7 +319,7 @@ void CornerPinFx::safeTransform(
 		return;
 	}
 
-	//Avoid the singular matrix cases
+	// Avoid the singular matrix cases
 	if (fabs(infoOnOutput.m_affine.det()) < 1.e-3) {
 		infoOnInput = infoOnOutput;
 		rectOnInput.empty();
@@ -350,7 +331,8 @@ void CornerPinFx::safeTransform(
 
 	m_texture->getBBox(frame, inBBox, infoOnInput);
 
-	//In case inBBox is infinite, such as with gradients, also intersect with the input quadrilateral's bbox
+	// In case inBBox is infinite, such as with gradients, also intersect with the input
+	// quadrilateral's bbox
 	if (inBBox == TConsts::infiniteRectD) {
 		TPointD affP00_b(infoOnInput.m_affine * m_p00_b->getValue(frame));
 		TPointD affP10_b(infoOnInput.m_affine * m_p10_b->getValue(frame));
@@ -385,7 +367,7 @@ void CornerPinFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings
 	ri2.m_data.push_back(PaletteFilterData);
 	ri2.m_userCachable = false;
 
-	//First child compute: part of output that IS NOT texturized
+	// First child compute: part of output that IS NOT texturized
 	m_input->dryCompute(rect, frame, ri2);
 
 	if (!m_texture.isConnected())
@@ -396,10 +378,10 @@ void CornerPinFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings
 		ri2.m_isSwatch = false;
 	PaletteFilterData->m_keep = !(m_keep->getValue() == 1);
 
-	//Second child compute: part of output that IS to be texturized
+	// Second child compute: part of output that IS to be texturized
 	m_input->dryCompute(rect, frame, ri2);
 
-	//Deal with the texture
+	// Deal with the texture
 	if (m_deactivate->getValue())
 		m_texture->dryCompute(rect, frame, ri);
 	else {
@@ -429,13 +411,13 @@ void CornerPinFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 
 	TTile invertMaskTile;
 
-	//carico il vettore items con gli indici dei colori
+	// carico il vettore items con gli indici dei colori
 	std::vector<std::string> items;
 	std::string indexes = toString(m_string->getValue());
 	parseIndexes(indexes, items);
 
-	//genero il tile il cui raster contiene l'immagine in input a cui sono stati tolti i pixel
-	//colorati con gli indici contenuti nel vettore items
+	// genero il tile il cui raster contiene l'immagine in input a cui sono stati tolti i pixel
+	// colorati con gli indici contenuti nel vettore items
 	TRenderSettings ri2(ri);
 	PaletteFilterFxRenderData *PaletteFilterData = new PaletteFilterFxRenderData;
 	TRasterFxRenderDataP smartP(PaletteFilterData);
@@ -443,15 +425,16 @@ void CornerPinFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 	PaletteFilterData->m_keep = (m_keep->getValue() == 1);
 	ri2.m_data.push_back(PaletteFilterData);
 	ri2.m_userCachable = false;
-	m_input->allocateAndCompute(invertMaskTile, tile.m_pos, tile.getRaster()->getSize(), tile.getRaster(), frame, ri2);
+	m_input->allocateAndCompute(invertMaskTile, tile.m_pos, tile.getRaster()->getSize(),
+								tile.getRaster(), frame, ri2);
 
 	if (!m_texture.isConnected()) {
 		tile.getRaster()->copy(invertMaskTile.getRaster());
 		return;
 	}
 
-	//genero il tile il cui raster contiene l'immagine in input a cui sono stati tolti i pixel
-	//colorati con indici diversi da quelli contenuti nel vettore items
+	// genero il tile il cui raster contiene l'immagine in input a cui sono stati tolti i pixel
+	// colorati con indici diversi da quelli contenuti nel vettore items
 	bool isSwatch = ri2.m_isSwatch;
 	if (isSwatch)
 		ri2.m_isSwatch = false;
@@ -460,23 +443,23 @@ void CornerPinFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 	if (isSwatch)
 		ri2.m_isSwatch = true;
 
-	//controllo se ho ottenuto quaclosa su cui si possa lavorare.
+	// controllo se ho ottenuto quaclosa su cui si possa lavorare.
 	TRect saveBox;
 	TRop::computeBBox(tile.getRaster(), saveBox);
 	if (saveBox.isEmpty()) {
-		//I guess that this case should be wiped out...
-		m_input->compute(tile, frame, ri); //Could the invertMask be copied??
+		// I guess that this case should be wiped out...
+		m_input->compute(tile, frame, ri); // Could the invertMask be copied??
 		return;
 	}
 
-	//Then, generate the texture tile and make its distortion
+	// Then, generate the texture tile and make its distortion
 	TTile textureTile;
 	if (m_deactivate->getValue()) {
 		TDimension size = tile.getRaster()->getSize();
 		TPointD pos = tile.m_pos;
 		m_texture->allocateAndCompute(textureTile, pos, size, tile.getRaster(), frame, ri);
 	} else {
-		//Build the interesting texture region
+		// Build the interesting texture region
 		TRasterP tileRas(tile.getRaster());
 		TRectD tileRect(convert(tileRas->getBounds()) + tile.m_pos);
 
@@ -496,13 +479,13 @@ void CornerPinFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 		TTile inTile;
 		m_texture->allocateAndCompute(inTile, inRect.getP00(), inRectSize, tileRas, frame, riNew);
 
-		//Get the source quad
+		// Get the source quad
 		TPointD p00_b = m_p00_b->getValue(frame);
 		TPointD p10_b = m_p10_b->getValue(frame);
 		TPointD p01_b = m_p01_b->getValue(frame);
 		TPointD p11_b = m_p11_b->getValue(frame);
 
-		//Get destination quad
+		// Get destination quad
 		TPointD p00_a = m_p00_a->getValue(frame);
 		TPointD p10_a = m_p10_a->getValue(frame);
 		TPointD p01_a = m_p01_a->getValue(frame);
@@ -532,13 +515,13 @@ void CornerPinFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 		p01_a = ri.m_affine * p01_a;
 		p11_a = ri.m_affine * p11_a;
 
-		PerspectiveDistorter perpDistorter(
-			p00_b - inTile.m_pos, p10_b - inTile.m_pos, p01_b - inTile.m_pos, p11_b - inTile.m_pos,
-			p00_a, p10_a, p01_a, p11_a);
+		PerspectiveDistorter perpDistorter(p00_b - inTile.m_pos, p10_b - inTile.m_pos,
+										   p01_b - inTile.m_pos, p11_b - inTile.m_pos, p00_a, p10_a,
+										   p01_a, p11_a);
 
-		BilinearDistorter bilDistorter(
-			p00_b - inTile.m_pos, p10_b - inTile.m_pos, p01_b - inTile.m_pos, p11_b - inTile.m_pos,
-			p00_a, p10_a, p01_a, p11_a);
+		BilinearDistorter bilDistorter(p00_b - inTile.m_pos, p10_b - inTile.m_pos,
+									   p01_b - inTile.m_pos, p11_b - inTile.m_pos, p00_a, p10_a,
+									   p01_a, p11_a);
 
 		TDistorter *distorter;
 		if (m_distortType->getValue() == PERSPECTIVE)
@@ -554,7 +537,7 @@ void CornerPinFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 		textureTile.setRaster(textureRas);
 	}
 
-	//Then, apply the texture
+	// Then, apply the texture
 	double v = m_value->getValue(frame);
 	if (ri.m_bpp == 32) {
 		TRaster32P witheCard;
@@ -642,7 +625,8 @@ int CornerPinFx::getMemoryRequirement(const TRectD &rect, double frame, const TR
 	safeTransform(frame, 1, rect, info, inRect, riNew, inBBox);
 	inRect *= inBBox;
 
-	return tmax(TRasterFx::memorySize(rect, info.m_bpp), TRasterFx::memorySize(inRect, riNew.m_bpp));
+	return tmax(TRasterFx::memorySize(rect, info.m_bpp),
+				TRasterFx::memorySize(inRect, riNew.m_bpp));
 }
 
 //-------------------------------------------------------------------------

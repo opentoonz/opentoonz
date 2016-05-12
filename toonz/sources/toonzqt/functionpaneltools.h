@@ -13,7 +13,7 @@ class TDoubleParam;
 
 class FunctionPanel::DragTool
 {
-public:
+  public:
 	DragTool() {}
 	virtual ~DragTool() {}
 	virtual void click(QMouseEvent *e) {}
@@ -28,7 +28,7 @@ class MoveFrameDragTool : public FunctionPanel::DragTool
 	FunctionPanel *m_panel;
 	TFrameHandle *m_frameHandle;
 
-public:
+  public:
 	MoveFrameDragTool(FunctionPanel *panel, TFrameHandle *frameHandle);
 	void drag(QMouseEvent *e);
 };
@@ -39,7 +39,7 @@ class PanDragTool : public FunctionPanel::DragTool
 	QPoint m_oldPos;
 	bool m_xLocked, m_yLocked;
 
-public:
+  public:
 	PanDragTool(FunctionPanel *panel, bool xLocked, bool yLocked);
 	void click(QMouseEvent *e);
 	void drag(QMouseEvent *e);
@@ -51,10 +51,12 @@ class ZoomDragTool : public FunctionPanel::DragTool
 	QPoint m_startPos, m_oldPos;
 	int m_zoomType;
 
-public:
-	enum ZoomType { FrameZoom = 1,
-					ValueZoom = 2 };
-	ZoomDragTool(FunctionPanel *panel, ZoomType zoomType) : m_panel(panel), m_zoomType((int)zoomType) {}
+  public:
+	enum ZoomType { FrameZoom = 1, ValueZoom = 2 };
+	ZoomDragTool(FunctionPanel *panel, ZoomType zoomType)
+		: m_panel(panel), m_zoomType((int)zoomType)
+	{
+	}
 
 	void click(QMouseEvent *e);
 	void drag(QMouseEvent *e);
@@ -68,7 +70,7 @@ class RectSelectTool : public FunctionPanel::DragTool
 	QPoint m_startPos;
 	QRect m_rect;
 
-public:
+  public:
 	RectSelectTool(FunctionPanel *panel, TDoubleParam *curve) : m_panel(panel), m_curve(curve) {}
 
 	void click(QMouseEvent *e);
@@ -93,10 +95,8 @@ class MovePointDragTool : public FunctionPanel::DragTool
 	bool m_groupEnabled;
 	FunctionSelection *m_selection;
 
-public:
-	MovePointDragTool(
-		FunctionPanel *panel,
-		TDoubleParam *curve);
+  public:
+	MovePointDragTool(FunctionPanel *panel, TDoubleParam *curve);
 	~MovePointDragTool();
 
 	void addKeyframe2(int kIndex);
@@ -113,10 +113,10 @@ public:
 
 class MoveHandleDragTool : public FunctionPanel::DragTool
 {
-public:
+  public:
 	typedef FunctionPanel::Handle Handle;
 
-private:
+  private:
 	FunctionPanel *m_panel;
 	TDoubleParam *m_curve;
 	QPoint m_startPos; //, m_oldPos;
@@ -128,14 +128,10 @@ private:
 	double m_segmentWidth;
 	QPointF m_nSpeed; // speedInOut constraint
 
-public:
+  public:
 	FunctionTreeModel::ChannelGroup *m_channelGroup;
 
-	MoveHandleDragTool(
-		FunctionPanel *panel,
-		TDoubleParam *curve,
-		int kIndex,
-		Handle handle);
+	MoveHandleDragTool(FunctionPanel *panel, TDoubleParam *curve, int kIndex, Handle handle);
 
 	void click(QMouseEvent *e);
 	void drag(QMouseEvent *e);
@@ -144,20 +140,17 @@ public:
 
 class MoveGroupHandleDragTool : public FunctionPanel::DragTool
 {
-public:
+  public:
 	typedef FunctionPanel::Handle Handle;
 
-private:
+  private:
 	FunctionPanel *m_panel;
 	double m_keyframePosition;
 	Handle m_handle;
 	std::vector<std::pair<TDoubleKeyframe, KeyframeSetter *>> m_setters;
 
-public:
-	MoveGroupHandleDragTool(
-		FunctionPanel *panel,
-		double keyframePosition,
-		Handle handle);
+  public:
+	MoveGroupHandleDragTool(FunctionPanel *panel, double keyframePosition, Handle handle);
 	~MoveGroupHandleDragTool();
 
 	void click(QMouseEvent *e);

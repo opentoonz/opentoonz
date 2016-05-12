@@ -29,7 +29,7 @@
 // tcg includes
 #include "tcg/tcg_deleter_types.h"
 
-//Debug
+// Debug
 //#define DIAGNOSTICS
 //#include "diagnostics.h"
 
@@ -46,16 +46,16 @@ std::vector<const TFx *> calculateSortedFxs(TRasterFxP rootFx);
 
 namespace
 {
-//TRenderer-thread association storage. It provides TRenderers the per-thread
-//singleton status from inside a rendering process.
+// TRenderer-thread association storage. It provides TRenderers the per-thread
+// singleton status from inside a rendering process.
 QThreadStorage<TRendererImp **> rendererStorage;
 
-//Same for render process ids.
+// Same for render process ids.
 QThreadStorage<unsigned long *> renderIdsStorage;
 
 //-------------------------------------------------------------------------------
 
-//Interlacing functions for field-based rendering
+// Interlacing functions for field-based rendering
 inline void interlace(TRasterP f0, const TRasterP &f1, int field)
 {
 	if (f0->getPixelSize() != f1->getPixelSize())
@@ -111,7 +111,7 @@ class RasterItem
 {
 	std::string m_rasterId;
 
-public:
+  public:
 	int m_bpp;
 	bool m_busy;
 
@@ -134,10 +134,7 @@ public:
 
 	//---------------------------------------------------------
 
-	~RasterItem()
-	{
-		TImageCache::instance()->remove(m_rasterId);
-	}
+	~RasterItem() { TImageCache::instance()->remove(m_rasterId); }
 
 	//---------------------------------------------------------
 
@@ -147,8 +144,8 @@ public:
 		return rimg ? rimg->getRaster() : TRasterP();
 	}
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	RasterItem();
 	RasterItem(const TRaster &RasterItem);
 };
@@ -170,7 +167,7 @@ class RasterPool
 
 	TThread::Mutex m_repositoryLock;
 
-public:
+  public:
 	RasterPool() : m_size(-1, -1) {}
 	~RasterPool();
 
@@ -218,7 +215,7 @@ TRasterP RasterPool::getRaster(const TDimension &size, int bpp)
 
 //---------------------------------------------------------
 
-//!Returns for the first not-busy raster
+//! Returns for the first not-busy raster
 TRasterP RasterPool::getRaster()
 {
 	QMutexLocker sl(&m_repositoryLock);
@@ -251,15 +248,14 @@ TRasterP RasterPool::getRaster()
 
 //---------------------------------------------------------
 
-//!Cerca il raster \b r in m_rasterRepository; se lo trova setta a \b false il campo \b m_busy.
+//! Cerca il raster \b r in m_rasterRepository; se lo trova setta a \b false il campo \b m_busy.
 void RasterPool::releaseRaster(const TRasterP &r)
 {
 	if (!r)
 		return;
 
 	QMutexLocker sl(&m_repositoryLock);
-	for (RasterRepository::iterator it = m_rasterRepository.begin();
-		 it != m_rasterRepository.end();
+	for (RasterRepository::iterator it = m_rasterRepository.begin(); it != m_rasterRepository.end();
 		 ++it) {
 		RasterItem *rasItem = *it;
 		if (rasItem->getRaster()->getRawData() == r->getRawData()) {
@@ -275,9 +271,10 @@ void RasterPool::releaseRaster(const TRasterP &r)
 RasterPool::~RasterPool()
 {
 	/*if (m_rasterRepository.size())
-    TSystem::outputDebug("~RasterPool: itemCount = " + toString ((int)m_rasterRepository.size())+" (should be 0)\n");*/
+	TSystem::outputDebug("~RasterPool: itemCount = " + toString ((int)m_rasterRepository.size())+"
+	(should be 0)\n");*/
 
-	//Release all raster items
+	// Release all raster items
 	clear();
 }
 
@@ -291,17 +288,16 @@ RasterPool::~RasterPool()
 
 class TRendererImp : public TSmartObject
 {
-public:
+  public:
 	struct RenderInstanceInfos {
 		int m_canceled;
 		int m_activeTasks;
 		int m_status;
 
-		RenderInstanceInfos()
-			: m_canceled(false), m_activeTasks(0), m_status(TRenderer::IDLE) {}
+		RenderInstanceInfos() : m_canceled(false), m_activeTasks(0), m_status(TRenderer::IDLE) {}
 	};
 
-public:
+  public:
 	typedef std::vector<TRenderPort *> PortContainer;
 	typedef PortContainer::iterator PortContainerIterator;
 
@@ -328,7 +324,7 @@ public:
 	std::vector<TRenderResourceManager *> m_managers;
 
 	TAtomicVar m_undoneTasks;
-	//std::vector<QEventLoop*> m_waitingLoops;
+	// std::vector<QEventLoop*> m_waitingLoops;
 	std::vector<bool *> m_waitingLoops;
 
 	TRasterFxP rootFx;
@@ -338,7 +334,8 @@ public:
 	TRendererImp(int nThreads);
 	~TRendererImp();
 
-	void startRendering(unsigned long renderId, const std::vector<TRenderer::RenderData> &renderDatas);
+	void startRendering(unsigned long renderId,
+						const std::vector<TRenderer::RenderData> &renderDatas);
 
 	void notifyRasterStarted(const TRenderPort::RenderData &rd);
 	void notifyRasterCompleted(const TRenderPort::RenderData &rd);
@@ -401,14 +398,15 @@ class RenderTask : public TThread::Runnable
 	bool m_fieldRender, m_stereoscopic;
 
 	Mutex m_rasterGuard;
-	TTile m_tileA; //in normal and field rendering, Rendered at given frame; in stereoscopic, rendered left frame
-	TTile m_tileB; //in  field rendering, rendered at frame + 0.5; in stereoscopic, rendered right frame
+	TTile m_tileA; // in normal and field rendering, Rendered at given frame; in stereoscopic,
+				   // rendered left frame
+	TTile m_tileB; // in  field rendering, rendered at frame + 0.5; in stereoscopic, rendered right
+				   // frame
 
-public:
-	RenderTask(unsigned long renderId, unsigned long taskId,
-			   double frame, const TRenderSettings &ri, const TFxPair &fx,
-			   const TPointD &framePos, const TDimension &frameSize,
-			   const TRendererImpP &rendererImp);
+  public:
+	RenderTask(unsigned long renderId, unsigned long taskId, double frame,
+			   const TRenderSettings &ri, const TFxPair &fx, const TPointD &framePos,
+			   const TDimension &frameSize, const TRendererImpP &rendererImp);
 
 	~RenderTask() {}
 
@@ -439,13 +437,12 @@ public:
 
 TRenderer::TRenderer(int nThread)
 {
-	m_imp = new TRendererImp(nThread); //Already adds a ref
+	m_imp = new TRendererImp(nThread); // Already adds a ref
 }
 
 //---------------------------------------------------------
 
-TRenderer::TRenderer(TRendererImp *imp)
-	: m_imp(imp)
+TRenderer::TRenderer(TRendererImp *imp) : m_imp(imp)
 {
 	if (m_imp)
 		m_imp->addRef();
@@ -453,8 +450,7 @@ TRenderer::TRenderer(TRendererImp *imp)
 
 //---------------------------------------------------------
 
-TRenderer::TRenderer(const TRenderer &r)
-	: m_imp(r.m_imp)
+TRenderer::TRenderer(const TRenderer &r) : m_imp(r.m_imp)
 {
 	if (m_imp)
 		m_imp->addRef();
@@ -532,7 +528,7 @@ unsigned long TRenderer::nextRenderId()
 
 inline void TRendererImp::declareRenderStart(unsigned long renderId)
 {
-	//Inform the resource managers
+	// Inform the resource managers
 	for (unsigned int i = 0; i < m_managers.size(); ++i)
 		m_managers[i]->onRenderInstanceStart(renderId);
 }
@@ -547,7 +543,7 @@ void TRenderer::declareRenderStart(unsigned long renderId)
 
 inline void TRendererImp::declareRenderEnd(unsigned long renderId)
 {
-	//Inform the resource managers
+	// Inform the resource managers
 	for (int i = m_managers.size() - 1; i >= 0; --i)
 		m_managers[i]->onRenderInstanceEnd(renderId);
 }
@@ -562,7 +558,7 @@ void TRenderer::declareRenderEnd(unsigned long renderId)
 
 inline void TRendererImp::declareFrameStart(double frame)
 {
-	//Inform the resource managers
+	// Inform the resource managers
 	for (unsigned int i = 0; i < m_managers.size(); ++i)
 		m_managers[i]->onRenderFrameStart(frame);
 }
@@ -577,7 +573,7 @@ void TRenderer::declareFrameStart(double frame)
 
 inline void TRendererImp::declareFrameEnd(double frame)
 {
-	//Inform the resource managers
+	// Inform the resource managers
 	for (int i = m_managers.size() - 1; i >= 0; --i)
 		m_managers[i]->onRenderFrameEnd(frame);
 }
@@ -592,7 +588,7 @@ void TRenderer::declareFrameEnd(double frame)
 
 inline void TRendererImp::declareStatusStart(int renderStatus)
 {
-	//Inform the resource managers
+	// Inform the resource managers
 	for (unsigned int i = 0; i < m_managers.size(); ++i)
 		m_managers[i]->onRenderStatusStart(renderStatus);
 }
@@ -601,7 +597,7 @@ inline void TRendererImp::declareStatusStart(int renderStatus)
 
 inline void TRendererImp::declareStatusEnd(int renderStatus)
 {
-	//Inform the resource managers
+	// Inform the resource managers
 	for (int i = m_managers.size() - 1; i >= 0; --i)
 		m_managers[i]->onRenderStatusEnd(renderStatus);
 }
@@ -670,10 +666,8 @@ void TRenderer::removePort(TRenderPort *port)
 
 //---------------------------------------------------------
 
-unsigned long TRenderer::startRendering(
-	double f,
-	const TRenderSettings &info,
-	const TFxPair &actualRoot)
+unsigned long TRenderer::startRendering(double f, const TRenderSettings &info,
+										const TFxPair &actualRoot)
 {
 	assert(f >= 0);
 
@@ -694,7 +688,7 @@ unsigned long TRenderer::startRendering(const std::vector<RenderData> *renderDat
 		return -1;
 	}
 
-	//Build a new render Id
+	// Build a new render Id
 	unsigned long renderId = m_imp->m_renderIdCounter++;
 
 	TRendererStartInvoker::StartInvokerRenderData srd;
@@ -740,14 +734,15 @@ int TRenderer::getRenderStatus(unsigned long renderId) const
 //---------------------
 
 TRendererImp::TRendererImp(int nThreads)
-	: m_executor(), m_undoneTasks(), m_rendererId(m_rendererIdCounter++), m_precomputingEnabled(true)
+	: m_executor(), m_undoneTasks(), m_rendererId(m_rendererIdCounter++),
+	  m_precomputingEnabled(true)
 {
 	m_executor.setMaxActiveTasks(nThreads);
 
 	std::vector<TRenderResourceManagerGenerator *> &generators =
 		TRenderResourceManagerGenerator::generators(false);
 
-	//May be adopted by other TRenderers from now on.
+	// May be adopted by other TRenderers from now on.
 	addRef();
 
 	rendererStorage.setLocalData(new (TRendererImp *)(this));
@@ -838,21 +833,21 @@ void TRendererImp::stopRendering(bool waitForCompleteStop)
 	QMutexLocker sl(&m_renderInstancesMutex);
 
 	{
-		//Tasks already stop rendering on their own when they don't find their render ids here.
+		// Tasks already stop rendering on their own when they don't find their render ids here.
 		std::map<unsigned long, RenderInstanceInfos>::iterator it;
 		for (it = m_activeInstances.begin(); it != m_activeInstances.end(); ++it)
 			it->second.m_canceled = true;
 	}
 
 	if (waitForCompleteStop && m_undoneTasks > 0) {
-		//Sometimes, QEventLoop suddenly stops processing slots (especially those notifications
-		//from active rendering instances) - therefore resulting in a block of the application.
-		//I've not figured out why (#QTBUG-11649?) - but substituting with a plain while
-		//seems to do the trick...
+		// Sometimes, QEventLoop suddenly stops processing slots (especially those notifications
+		// from active rendering instances) - therefore resulting in a block of the application.
+		// I've not figured out why (#QTBUG-11649?) - but substituting with a plain while
+		// seems to do the trick...
 
 		/*QEventLoop eventLoop;
-    m_waitingLoops.push_back(&eventLoop);
-    eventLoop.exec();*/
+	m_waitingLoops.push_back(&eventLoop);
+	eventLoop.exec();*/
 
 		bool loopQuit = false;
 		m_waitingLoops.push_back(&loopQuit);
@@ -868,9 +863,9 @@ void TRendererImp::stopRendering(bool waitForCompleteStop)
 
 void TRendererImp::quitWaitingLoops()
 {
-	//Make the stopRendering waiting loops quit
+	// Make the stopRendering waiting loops quit
 	while (!m_waitingLoops.empty()) {
-		//rendererImp->m_waitingLoops.back()->quit();
+		// rendererImp->m_waitingLoops.back()->quit();
 		*m_waitingLoops.back() = true;
 		m_waitingLoops.pop_back();
 	}
@@ -880,8 +875,8 @@ void TRendererImp::quitWaitingLoops()
 
 void TRendererImp::notifyRasterStarted(const TRenderPort::RenderData &rd)
 {
-	//Since notifications may trigger port removals, we always work on a copy of the ports
-	//vector.
+	// Since notifications may trigger port removals, we always work on a copy of the ports
+	// vector.
 	TRendererImp::PortContainer portsCopy;
 	{
 		QReadLocker sl(&m_portsLock);
@@ -960,7 +955,7 @@ TRenderPort::~TRenderPort()
 
 //---------------------------------------------------------
 
-//!Setta \b m_renderArea a \b area e pulisce l'istanza corrente di \b RasterPool.
+//! Setta \b m_renderArea a \b area e pulisce l'istanza corrente di \b RasterPool.
 void TRenderPort::setRenderArea(const TRectD &area)
 {
 	m_renderArea = area;
@@ -968,7 +963,7 @@ void TRenderPort::setRenderArea(const TRectD &area)
 
 //---------------------------------------------------------
 
-//!Ritorna \b m_renderArea.
+//! Ritorna \b m_renderArea.
 TRectD &TRenderPort::getRenderArea()
 {
 	return m_renderArea;
@@ -980,20 +975,24 @@ TRectD &TRenderPort::getRenderArea()
 //    RenderTask
 //-------------------
 
-RenderTask::RenderTask(unsigned long renderId, unsigned long taskId,
-					   double frame, const TRenderSettings &ri, const TFxPair &fx,
-					   const TPointD &framePos, const TDimension &frameSize,
-					   const TRendererImpP &rendererImp)
-	: m_renderId(renderId), m_taskId(taskId), m_info(ri), m_fx(fx), m_frameSize(frameSize), m_framePos(framePos), m_rendererImp(rendererImp), m_fieldRender(ri.m_fieldPrevalence != TRenderSettings::NoField), m_stereoscopic(ri.m_stereoscopic)
+RenderTask::RenderTask(unsigned long renderId, unsigned long taskId, double frame,
+					   const TRenderSettings &ri, const TFxPair &fx, const TPointD &framePos,
+					   const TDimension &frameSize, const TRendererImpP &rendererImp)
+	: m_renderId(renderId), m_taskId(taskId), m_info(ri), m_fx(fx), m_frameSize(frameSize),
+	  m_framePos(framePos), m_rendererImp(rendererImp),
+	  m_fieldRender(ri.m_fieldPrevalence != TRenderSettings::NoField),
+	  m_stereoscopic(ri.m_stereoscopic)
 {
 	m_frames.push_back(frame);
 
-	//Connect the onFinished slot
+	// Connect the onFinished slot
 	connect(this, SIGNAL(finished(TThread::RunnableP)), this, SLOT(onFinished(TThread::RunnableP)));
-	connect(this, SIGNAL(exception(TThread::RunnableP)), this, SLOT(onFinished(TThread::RunnableP)));
+	connect(this, SIGNAL(exception(TThread::RunnableP)), this,
+			SLOT(onFinished(TThread::RunnableP)));
 
-	//The shrink info is currently reversed to the settings'affine. Shrink info in the TRenderSettings
-	//is no longer supported.
+	// The shrink info is currently reversed to the settings'affine. Shrink info in the
+	// TRenderSettings
+	// is no longer supported.
 	m_info.m_shrinkX = m_info.m_shrinkY = 1;
 }
 
@@ -1014,7 +1013,7 @@ void RenderTask::preRun()
 
 void RenderTask::run()
 {
-	//Retrieve the task's frame
+	// Retrieve the task's frame
 	assert(!m_frames.empty());
 	double t = m_frames[0];
 
@@ -1024,11 +1023,11 @@ void RenderTask::run()
 		return;
 	}
 
-	//Install the renderer in current thread
+	// Install the renderer in current thread
 	rendererStorage.setLocalData(new (TRendererImp *)(m_rendererImp.getPointer()));
 	renderIdsStorage.setLocalData(new unsigned long(m_renderId));
 
-	//Inform the managers of frame start
+	// Inform the managers of frame start
 	m_rendererImp->declareFrameStart(t);
 
 	auto sortedFxs = calculateSortedFxs(m_fx.m_frameA);
@@ -1043,13 +1042,13 @@ void RenderTask::run()
 		TStopWatch::global(8).start();
 
 		if (!m_fieldRender && !m_stereoscopic) {
-			//Common case - just build the first tile
+			// Common case - just build the first tile
 			buildTile(m_tileA);
 			/*-- 通常はここがFxのレンダリング処理 --*/
 			m_fx.m_frameA->compute(m_tileA, t, m_info);
 		} else {
 			assert(!(m_stereoscopic && m_fieldRender));
-			//Field rendering  or stereoscopic case
+			// Field rendering  or stereoscopic case
 			if (m_stereoscopic) {
 				buildTile(m_tileA);
 				m_fx.m_frameA->compute(m_tileA, t, m_info);
@@ -1057,7 +1056,7 @@ void RenderTask::run()
 				buildTile(m_tileB);
 				m_fx.m_frameB->compute(m_tileB, t, m_info);
 			}
-			//if fieldPrevalence, Decide the rendering frames depending on field prevalence
+			// if fieldPrevalence, Decide the rendering frames depending on field prevalence
 			else if (m_info.m_fieldPrevalence == TRenderSettings::EvenField) {
 				buildTile(m_tileA);
 				m_fx.m_frameA->compute(m_tileA, t, m_info);
@@ -1083,10 +1082,10 @@ void RenderTask::run()
 		onFrameFailed(ex);
 	}
 
-	//Inform the managers of frame end
+	// Inform the managers of frame end
 	m_rendererImp->declareFrameEnd(t);
 
-	//Uninstall the renderer from current thread
+	// Uninstall the renderer from current thread
 	rendererStorage.setLocalData(0);
 	renderIdsStorage.setLocalData(0);
 
@@ -1149,9 +1148,10 @@ void RenderTask::onFrameCompleted()
 
 void RenderTask::onFrameFailed(TException &e)
 {
-	//TRasterP evenRas(m_evenTile.getRaster());
+	// TRasterP evenRas(m_evenTile.getRaster());
 
-	TRenderPort::RenderData rd(m_frames, m_info, m_tileA.getRaster(), m_tileB.getRaster(), m_renderId, m_taskId);
+	TRenderPort::RenderData rd(m_frames, m_info, m_tileA.getRaster(), m_tileB.getRaster(),
+							   m_renderId, m_taskId);
 	m_rendererImp->notifyRasterFailure(rd, e);
 }
 
@@ -1162,12 +1162,12 @@ void RenderTask::onFinished(TThread::RunnableP)
 	TRendererImp *rendererImp = m_rendererImp.getPointer();
 	--rendererImp->m_undoneTasks;
 
-	//Tiles release back to the Raster Pool happens in the main thread, after all possible
-	//signals emitted in the onFrameCompleted/Failed notifications have been resolved, thus
-	//ensuring that no other rendering thread owns the rasters before them.
+	// Tiles release back to the Raster Pool happens in the main thread, after all possible
+	// signals emitted in the onFrameCompleted/Failed notifications have been resolved, thus
+	// ensuring that no other rendering thread owns the rasters before them.
 	releaseTiles();
 
-	//Update the render instance status
+	// Update the render instance status
 	bool instanceExpires = false;
 	{
 		QMutexLocker sl(&rendererImp->m_renderInstancesMutex);
@@ -1180,33 +1180,33 @@ void RenderTask::onFinished(TThread::RunnableP)
 		}
 	}
 
-	//If the render instance has just expired
+	// If the render instance has just expired
 	if (instanceExpires) {
 		/*-- キャンセルされた場合はm_overallRenderedRegionの更新をしない --*/
 		bool isCanceled = (m_info.m_isCanceled && *m_info.m_isCanceled);
 
-		//Inform the render ports
+		// Inform the render ports
 		rendererImp->notifyRenderFinished(isCanceled);
 
-		//NOTE: This slot is currently invoked on the main thread. It could eventually be
-		//invoked directly on rendering threads, specifying the Qt::DirectConnection option -
-		//but probably there would be no real advantage in doing so...
+		// NOTE: This slot is currently invoked on the main thread. It could eventually be
+		// invoked directly on rendering threads, specifying the Qt::DirectConnection option -
+		// but probably there would be no real advantage in doing so...
 
-		//Temporarily install the renderer in current thread
+		// Temporarily install the renderer in current thread
 		rendererStorage.setLocalData(new (TRendererImp *)(rendererImp));
 		renderIdsStorage.setLocalData(new unsigned long(m_renderId));
 
-		//Inform the resource managers
+		// Inform the resource managers
 		rendererImp->declareRenderEnd(m_renderId);
 
-		//Uninstall the temporary
+		// Uninstall the temporary
 		rendererStorage.setLocalData(0);
 		renderIdsStorage.setLocalData(0);
 
 		rendererImp->m_rasterPool.clear(); // Isn't this misplaced? Should be in the block
 	}									   // below...
 
-	//If no rendering task (of this or other render instances) is found...
+	// If no rendering task (of this or other render instances) is found...
 	if (rendererImp->m_undoneTasks == 0) {
 		QMutexLocker sl(&rendererImp->m_renderInstancesMutex);
 		rendererImp->quitWaitingLoops();
@@ -1217,8 +1217,7 @@ void RenderTask::onFinished(TThread::RunnableP)
 //    Tough Stuff
 //================================================================================
 
-void TRendererStartInvoker::emitStartRender(
-	TRendererImp *renderer, StartInvokerRenderData rd)
+void TRendererStartInvoker::emitStartRender(TRendererImp *renderer, StartInvokerRenderData rd)
 {
 	renderer->addRef();
 	Q_EMIT startRender(renderer, rd);
@@ -1226,8 +1225,7 @@ void TRendererStartInvoker::emitStartRender(
 
 //---------------------------------------------------------
 
-void TRendererStartInvoker::doStartRender(
-	TRendererImp *renderer, StartInvokerRenderData rd)
+void TRendererStartInvoker::doStartRender(TRendererImp *renderer, StartInvokerRenderData rd)
 {
 	renderer->startRendering(rd.m_renderId, *rd.m_renderDataVector);
 	renderer->release();
@@ -1252,7 +1250,7 @@ std::vector<const TFx *> calculateSortedFxs(TRasterFxP rootFx)
 		}
 
 		/* 繋がっている入力ポートの先の Fx を訪問する
-           入力ポートが無ければ終了 */
+		   入力ポートが無ければ終了 */
 		int portCount = vptr->getInputPortCount();
 		if (portCount < 1) {
 			Sources.insert(vptr);
@@ -1296,7 +1294,8 @@ std::vector<const TFx *> calculateSortedFxs(TRasterFxP rootFx)
 
 //---------------------------------------------------------
 
-void TRendererImp::startRendering(unsigned long renderId, const std::vector<TRenderer::RenderData> &renderDatas)
+void TRendererImp::startRendering(unsigned long renderId,
+								  const std::vector<TRenderer::RenderData> &renderDatas)
 {
 	rootFx = renderDatas.front().m_fxRoot.m_frameA;
 	int T = renderDatas.size();
@@ -1324,9 +1323,8 @@ void TRendererImp::startRendering(unsigned long renderId, const std::vector<TRen
 			renderIdsStorage.setLocalData(0);
 		}
 
-		static inline void declareStatusStart(
-			TRendererImp *imp, TRenderer::RenderStatus status,
-			RenderInstanceInfos *renderInfos)
+		static inline void declareStatusStart(TRendererImp *imp, TRenderer::RenderStatus status,
+											  RenderInstanceInfos *renderInfos)
 		{
 			renderInfos->m_status = status;
 			imp->declareStatusStart(status);
@@ -1340,7 +1338,9 @@ void TRendererImp::startRendering(unsigned long renderId, const std::vector<TRen
 			bool m_rollback;
 
 			InstanceDeclaration(TRendererImp *imp, unsigned long renderId)
-				: m_imp(imp), m_renderId(renderId), m_rollback(true) {}
+				: m_imp(imp), m_renderId(renderId), m_rollback(true)
+			{
+			}
 
 			~InstanceDeclaration()
 			{
@@ -1362,10 +1362,7 @@ void TRendererImp::startRendering(unsigned long renderId, const std::vector<TRen
 				setStorage(imp, renderId);
 			}
 
-			~StorageDeclaration()
-			{
-				clearStorage();
-			}
+			~StorageDeclaration() { clearStorage(); }
 		};
 
 		struct RenderDeclaration {
@@ -1399,14 +1396,11 @@ void TRendererImp::startRendering(unsigned long renderId, const std::vector<TRen
 				declareStatusStart(imp, status, renderInfos);
 			}
 
-			~StatusDeclaration()
-			{
-				m_imp->declareStatusEnd(m_status);
-			}
+			~StatusDeclaration() { m_imp->declareStatusEnd(m_status); }
 		};
 	}; // locals
 
-	//DIAGNOSTICS_CLEAR;
+	// DIAGNOSTICS_CLEAR;
 
 	//----------------------------------------------------------------------
 	//    Preliminary initializations
@@ -1423,17 +1417,17 @@ void TRendererImp::startRendering(unsigned long renderId, const std::vector<TRen
 
 	const TRenderSettings &info(renderDatas[0].m_info);
 
-	//Extract the render geometry
+	// Extract the render geometry
 	TPointD pos(renderArea.getP00());
 	TDimension frameSize(tceil(renderArea.getLx()), tceil(renderArea.getLy()));
 
 	TRectD camBox(TPointD(pos.x / info.m_shrinkX, pos.y / info.m_shrinkY),
 				  TDimensionD(frameSize.lx, frameSize.ly));
 
-	//Refresh the raster pool specs
+	// Refresh the raster pool specs
 	m_rasterPool.setRasterSpecs(frameSize, info.m_bpp);
 
-	//Set a temporary active instance count - so that hasToDie(renderId) returns false
+	// Set a temporary active instance count - so that hasToDie(renderId) returns false
 	RenderInstanceInfos *renderInfos;
 	{
 		QMutexLocker locker(&m_renderInstancesMutex);
@@ -1453,8 +1447,7 @@ void TRendererImp::startRendering(unsigned long renderId, const std::vector<TRen
 		std::vector<RenderTask *> &m_tasksVector;
 		~TasksCleaner()
 		{
-			std::for_each(m_tasksVector.begin(), m_tasksVector.end(),
-						  tcg::deleter<RenderTask>());
+			std::for_each(m_tasksVector.begin(), m_tasksVector.end(), tcg::deleter<RenderTask>());
 		}
 	} tasksCleaner = {tasksVector};
 
@@ -1491,10 +1484,8 @@ void TRendererImp::startRendering(unsigned long renderId, const std::vector<TRen
 		jt = clusters.find(alias);
 
 		if (jt == clusters.end()) {
-			RenderTask *newTask = new RenderTask(
-				renderId, tasksIdCounter++,
-				renderData.m_frame, rs, renderData.m_fxRoot,
-				pos, frameSize, this);
+			RenderTask *newTask = new RenderTask(renderId, tasksIdCounter++, renderData.m_frame, rs,
+												 renderData.m_fxRoot, pos, frameSize, this);
 
 			tasksVector.push_back(newTask);
 			clusters.insert(std::make_pair(alias, newTask));
@@ -1521,12 +1512,12 @@ void TRendererImp::startRendering(unsigned long renderId, const std::vector<TRen
 		//----------------------------------------------------------------------
 
 		if (m_precomputingEnabled) {
-			//Set current maxTileSize for cache manager precomputation
+			// Set current maxTileSize for cache manager precomputation
 			const TRenderSettings &rs = renderDatas[0].m_info;
 			TPredictiveCacheManager::instance()->setMaxTileSize(rs.m_maxTileSize);
 			TPredictiveCacheManager::instance()->setBPP(rs.m_bpp);
 
-			//Perform the first precomputing run - fx usages declaration
+			// Perform the first precomputing run - fx usages declaration
 			{
 				locals::StatusDeclaration firstrunDecl(this, TRenderer::FIRSTRUN, renderInfos);
 
@@ -1536,16 +1527,16 @@ void TRendererImp::startRendering(unsigned long renderId, const std::vector<TRen
 
 					(*kt)->preRun();
 
-					//NOTE: Thread-specific data must be temporarily uninstalled before
-					//processing events (which may redefine the thread data).
+					// NOTE: Thread-specific data must be temporarily uninstalled before
+					// processing events (which may redefine the thread data).
 					locals::clearStorage();
 					QCoreApplication::instance()->processEvents();
 					locals::setStorage(this, renderId);
 				}
 			}
 
-			//Pass to the TESTRUN status - this one should faithfully reproduce
-			//the actual COMPUTING status
+			// Pass to the TESTRUN status - this one should faithfully reproduce
+			// the actual COMPUTING status
 			{
 				locals::StatusDeclaration testrunDecl(this, TRenderer::TESTRUN, renderInfos);
 
@@ -1555,8 +1546,8 @@ void TRendererImp::startRendering(unsigned long renderId, const std::vector<TRen
 
 					(*kt)->preRun();
 
-					//NOTE: Thread-specific data must be temporarily uninstalled before
-					//processing events (which may redefine the thread data).
+					// NOTE: Thread-specific data must be temporarily uninstalled before
+					// processing events (which may redefine the thread data).
 					locals::clearStorage();
 					QCoreApplication::instance()->processEvents();
 					locals::setStorage(this, renderId);

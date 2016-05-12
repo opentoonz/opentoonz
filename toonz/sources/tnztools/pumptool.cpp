@@ -14,16 +14,16 @@
 #include "tstrokedeformations.h"
 #include "tmathutil.h"
 
-//Toonz includes
+// Toonz includes
 #include "toonz/tobjecthandle.h"
 #include "toonz/txshlevelhandle.h"
 
-//TnzTools includes
+// TnzTools includes
 #include "tools/tool.h"
 #include "tools/toolutils.h"
 #include "tools/cursors.h"
 
-//Qt includes
+// Qt includes
 #include <QCoreApplication> // For Qt translation support
 
 using namespace ToolUtils;
@@ -36,10 +36,10 @@ class PumpTool : public TTool
 {
 	Q_DECLARE_TR_FUNCTIONS(PumpTool)
 
-	int m_strokeStyleId, m_strokeIndex; //!< Edited stroke indices
-	TStroke *m_inStroke, *m_outStroke;  //!< Input/Output strokes
-	std::vector<TStroke *> m_splitStrokes;   //!< Merging these, m_inStroke is reformed
-	int m_stroke1Idx, m_stroke2Idx;		//!< Indices of deformed strokes among split ones
+	int m_strokeStyleId, m_strokeIndex;	//!< Edited stroke indices
+	TStroke *m_inStroke, *m_outStroke;	 //!< Input/Output strokes
+	std::vector<TStroke *> m_splitStrokes; //!< Merging these, m_inStroke is reformed
+	int m_stroke1Idx, m_stroke2Idx;		   //!< Indices of deformed strokes among split ones
 
 	TUndo *m_undo; //!< Undo to be added upon non-trivial button up
 
@@ -47,8 +47,9 @@ class PumpTool : public TTool
 	double m_actionS1, m_actionS2; //!< Action center length in m_stroke
 	double m_actionRadius;		   //!< Tool action radius in curve length
 
-	std::vector<double> m_splitPars;				   //!< Split parameters for action localization
-	std::vector<double> m_cpLenDiff1, m_cpLenDiff2; //!< Distorted CPs' length distances from action center
+	std::vector<double> m_splitPars; //!< Split parameters for action localization
+	std::vector<double> m_cpLenDiff1,
+		m_cpLenDiff2; //!< Distorted CPs' length distances from action center
 
 	bool m_active;		  //!< Whether a stroke is currently being edited
 	bool m_enabled;		  //!< Tells whether the image allows editing
@@ -65,9 +66,13 @@ class PumpTool : public TTool
 	TIntProperty m_accuracy;
 	TPropertyGroup m_prop;
 
-public:
+  public:
 	PumpTool()
-		: TTool("T_Pump"), m_active(false), m_actionW(0), m_strokeIndex((std::numeric_limits<UINT>::max)()), m_inStroke(0), m_outStroke(0), m_stroke1Idx(-1), m_stroke2Idx(-1), m_cursorEnabled(false), m_cursorId(ToolCursor::PumpCursor), m_actionRadius(1), m_draw(false), m_undo(0), m_toolSize("Size:", 1, 100, 20), m_accuracy("Accuracy:", 0, 100, 40), m_enabled(false)
+		: TTool("T_Pump"), m_active(false), m_actionW(0),
+		  m_strokeIndex((std::numeric_limits<UINT>::max)()), m_inStroke(0), m_outStroke(0),
+		  m_stroke1Idx(-1), m_stroke2Idx(-1), m_cursorEnabled(false),
+		  m_cursorId(ToolCursor::PumpCursor), m_actionRadius(1), m_draw(false), m_undo(0),
+		  m_toolSize("Size:", 1, 100, 20), m_accuracy("Accuracy:", 0, 100, 40), m_enabled(false)
 	{
 		bind(TTool::VectorImage);
 
@@ -104,7 +109,7 @@ public:
 
 	void onDeactivate();
 
-private:
+  private:
 	double actionRadius(double strokeLength);
 	void splitStroke(TStroke *s);
 	TStroke *mergeStrokes(const std::vector<TStroke *> &strokes);
@@ -144,7 +149,7 @@ void PumpTool::draw()
 	TPalette *palette = vi->getPalette();
 	assert(palette);
 	if (m_active) {
-		//Editing with the tool
+		// Editing with the tool
 		assert(m_outStroke);
 
 		TRectD bboxD(m_outStroke->getBBox());
@@ -152,13 +157,13 @@ void PumpTool::draw()
 
 		tglDraw(TVectorRenderData(TAffine(), bbox, palette, 0, true), m_outStroke);
 	} else {
-		//Hovering
+		// Hovering
 
 		double w, dist;
 		UINT index;
 
 		if (m_cursorEnabled) {
-			//Draw cursor
+			// Draw cursor
 			glColor3d(1.0, 0.0, 1.0);
 			if (m_cursor.thick > 0)
 				tglDrawCircle(m_cursor, m_cursor.thick);
@@ -281,7 +286,7 @@ void PumpTool::leftButtonDown(const TPointD &pos, const TMouseEvent &)
 	UINT index;
 
 	if (vi->getNearestStroke(pos, m_actionW, index, dist2)) {
-		//A stroke near the pressed point was found - modify it
+		// A stroke near the pressed point was found - modify it
 		m_active = true;
 		m_strokeIndex = index;
 
@@ -293,16 +298,16 @@ void PumpTool::leftButtonDown(const TPointD &pos, const TMouseEvent &)
 		assert(sl);
 		TFrameId id = getCurrentFid();
 
-		//Allocate the modification undo - will be assigned to the undo manager on mouse release
+		// Allocate the modification undo - will be assigned to the undo manager on mouse release
 		m_undo = new UndoModifyStrokeAndPaint(sl, id, m_strokeIndex);
 
-		//Set the stroke's style to 'none'. This is needed to make the original stroke transparent,
-		//while the deformed one is shown at its place.
+		// Set the stroke's style to 'none'. This is needed to make the original stroke transparent,
+		// while the deformed one is shown at its place.
 		m_strokeStyleId = m_inStroke->getStyle();
 		m_inStroke->setStyle(0);
 
 		if (totalLength <= 0.0) {
-			//Single point case
+			// Single point case
 			cpCount = m_inStroke->getControlPointCount();
 			m_cpLenDiff1.resize(cpCount);
 
@@ -314,7 +319,7 @@ void PumpTool::leftButtonDown(const TPointD &pos, const TMouseEvent &)
 
 			m_stroke1Idx = 0;
 		} else
-			//Common strokes - split the stroke according to deformation requirements
+			// Common strokes - split the stroke according to deformation requirements
 			splitStroke(m_inStroke);
 	}
 
@@ -334,38 +339,39 @@ void PumpTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 
 	QMutexLocker lock(vi->getMutex());
 
-	//Revert current deformation, recovering the one from button press
+	// Revert current deformation, recovering the one from button press
 	delete m_outStroke;
 
-	//Retrieve cursor's vertical displacement
+	// Retrieve cursor's vertical displacement
 	TPointD delta = TPointD(0, (pos - m_downPoint).y);
 	int deltaSign = tsign(delta.y);
 	if (deltaSign == 0) {
-		//Use a copy of the original stroke
+		// Use a copy of the original stroke
 		m_outStroke = new TStroke(*m_inStroke);
 		m_outStroke->setStyle(m_strokeStyleId);
 		invalidate();
 		return;
 	}
 
-	//Build deformation upon the original stroke pieces
+	// Build deformation upon the original stroke pieces
 	TStroke *stroke1 = 0, *stroke2 = 0;
 
 	stroke1 = new TStroke(*m_splitStrokes[m_stroke1Idx]);
 
-	//Deform stroke1
+	// Deform stroke1
 	TStrokeThicknessDeformation deformer(stroke1, delta, m_actionS1, m_actionRadius, deltaSign);
 	modifyThickness(*stroke1, deformer, m_cpLenDiff1, deltaSign < 0);
 
 	if (m_stroke2Idx >= 0) {
-		//Deform stroke2
+		// Deform stroke2
 		stroke2 = new TStroke(*m_splitStrokes[m_stroke2Idx]);
 
-		TStrokeThicknessDeformation deformer2(stroke2, delta, m_actionS2, m_actionRadius, deltaSign);
+		TStrokeThicknessDeformation deformer2(stroke2, delta, m_actionS2, m_actionRadius,
+											  deltaSign);
 		modifyThickness(*stroke2, deformer2, m_cpLenDiff2, deltaSign < 0);
 	}
 
-	//Apply deformation
+	// Apply deformation
 	std::vector<TStroke *> splitStrokesCopy(m_splitStrokes);
 	splitStrokesCopy[m_stroke1Idx] = stroke1;
 	if (stroke2)
@@ -397,7 +403,7 @@ void PumpTool::leftButtonUp(const TPointD &pos, const TMouseEvent &)
 
 		QMutexLocker lock(vi->getMutex());
 
-		//Reset cursor data
+		// Reset cursor data
 		double t;
 		UINT index;
 		double dist2;
@@ -407,11 +413,11 @@ void PumpTool::leftButtonUp(const TPointD &pos, const TMouseEvent &)
 				m_cursor = nearestStroke->getThickPoint(t);
 		}
 
-		if (m_outStroke &&
-			!areAlmostEqual(m_downPoint, pos, PickRadius * getPixelSize())) {
-			//Accept action
+		if (m_outStroke && !areAlmostEqual(m_downPoint, pos, PickRadius * getPixelSize())) {
+			// Accept action
 
-			//Clone input stroke - it is someway needed by the stroke change notifier... I wonder why...
+			// Clone input stroke - it is someway needed by the stroke change notifier... I wonder
+			// why...
 			TStroke *oldStroke = new TStroke(*m_inStroke);
 
 			m_outStroke->swap(*m_inStroke);
@@ -435,7 +441,7 @@ void PumpTool::leftButtonUp(const TPointD &pos, const TMouseEvent &)
 cleanup:
 
 	if (m_inStroke)
-		m_inStroke->setStyle(m_strokeStyleId); //Make the image stroke visible again
+		m_inStroke->setStyle(m_strokeStyleId); // Make the image stroke visible again
 
 	m_strokeIndex = m_strokeStyleId = -1;
 
@@ -466,7 +472,7 @@ void PumpTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 	if (m_active || !m_enabled)
 		return;
 
-	//Cursor preview updates on 3-pixel steps
+	// Cursor preview updates on 3-pixel steps
 	if (tdistance2(pos, m_oldPoint) < 9.0 * sq(getPixelSize()))
 		return;
 
@@ -580,21 +586,21 @@ void PumpTool::splitStroke(TStroke *s)
 
 	TStroke *stroke1 = 0, *stroke2 = 0;
 
-	//Build the action radius
+	// Build the action radius
 	double totalLength = s->getLength();
 	m_actionRadius = actionRadius(totalLength);
 
-	//Get the length at selected point and build the split (length) positions
+	// Get the length at selected point and build the split (length) positions
 	m_actionS1 = s->getLength(m_actionW);
 	double startLen = m_actionS1 - m_actionRadius;
 	double endLen = m_actionS1 + m_actionRadius;
 
-	//Now, perform splitting
+	// Now, perform splitting
 	int i, cpCount;
 
 	if ((startLen <= 0 && endLen >= totalLength) ||
 		(s->isSelfLoop() && totalLength < (m_actionRadius + m_actionRadius))) {
-		//The whole stroke is included in the action - no split
+		// The whole stroke is included in the action - no split
 		m_splitStrokes.resize(1);
 
 		m_splitPars[0] = -1;
@@ -608,10 +614,10 @@ void PumpTool::splitStroke(TStroke *s)
 		increaseControlPoints(*stroke1, deformer, getPixelSize());
 	} else {
 		if (!s->isSelfLoop() || (startLen >= 0.0 && endLen <= totalLength)) {
-			//Regular split positions, in the [0.0, totalLength] range.
-			//Split points at extremities are dealt.
+			// Regular split positions, in the [0.0, totalLength] range.
+			// Split points at extremities are dealt.
 
-			m_splitPars[0] = s->getParameterAtLength(tmax(startLen, 0.0)); //Crop in the open case
+			m_splitPars[0] = s->getParameterAtLength(tmax(startLen, 0.0)); // Crop in the open case
 			m_splitPars[1] = s->getParameterAtLength(tmin(endLen, totalLength));
 
 			if (m_splitPars[0] == 0.0) // the "&& m_splitPars[0] == totalLength" was dealt outside
@@ -635,21 +641,21 @@ void PumpTool::splitStroke(TStroke *s)
 
 				m_stroke1Idx = 1;
 
-				//Update the edit point to refer to the central stroke piece
+				// Update the edit point to refer to the central stroke piece
 				m_actionS1 -= m_splitStrokes[0]->getLength();
 			}
 
 			stroke1 = m_splitStrokes[m_stroke1Idx];
 
-			//Apply deformation to the middle piece
+			// Apply deformation to the middle piece
 			TStrokeThicknessDeformation deformer(stroke1, m_actionS1, m_actionRadius);
 			increaseControlPoints(*stroke1, deformer, getPixelSize());
 
 			m_actionS2 = 0;
 		} else {
-			//Circular 'overflow' case - (exactly) one split point is outside the regular scope.
+			// Circular 'overflow' case - (exactly) one split point is outside the regular scope.
 
-			//Since the action diameter is < totalLength, these cases are mutually exclusive.
+			// Since the action diameter is < totalLength, these cases are mutually exclusive.
 			if (startLen < 0)
 				startLen += totalLength;
 			else {
@@ -657,8 +663,8 @@ void PumpTool::splitStroke(TStroke *s)
 				m_actionS1 -= totalLength;
 			}
 
-			//The deformation must be applied in two distinct strokes, since its
-			//action interval crosses the junction point
+			// The deformation must be applied in two distinct strokes, since its
+			// action interval crosses the junction point
 
 			m_splitPars[0] = s->getParameterAtLength(endLen);
 			m_splitPars[1] = s->getParameterAtLength(startLen);
@@ -693,9 +699,8 @@ void PumpTool::splitStroke(TStroke *s)
 	double diff;
 	for (i = 0; i < cpCount; i++) {
 		diff = stroke1->getLengthAtControlPoint(i) - m_actionS1;
-		m_cpLenDiff1[i] = (s->isSelfLoop() && stroke2 && totalLength - diff < diff)
-							  ? totalLength - diff
-							  : diff;
+		m_cpLenDiff1[i] =
+			(s->isSelfLoop() && stroke2 && totalLength - diff < diff) ? totalLength - diff : diff;
 	}
 }
 
@@ -718,9 +723,10 @@ TStroke *PumpTool::mergeStrokes(const std::vector<TStroke *> &strokes)
 				strokes[m_stroke2Idx]->reduceControlPoints(m_errorTol);
 		}
 
-		//Merge split strokes
+		// Merge split strokes
 		mergedStroke = merge(strokes);
-		//mergedStroke->reduceControlPoints(0.4*getPixelSize());    //Originally on the whole result...
+		// mergedStroke->reduceControlPoints(0.4*getPixelSize());    //Originally on the whole
+		// result...
 
 		if (m_inStroke->isSelfLoop()) {
 			int cpCount = mergedStroke->getControlPointCount();

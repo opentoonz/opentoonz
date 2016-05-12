@@ -18,25 +18,26 @@ namespace borders
   The RasterEdgeIterator class models a forward iterator traversing a border of a
   raster image.
 */
-template <typename PixelSelector>
-class RasterEdgeIterator
+template <typename PixelSelector> class RasterEdgeIterator
 {
-public:
+  public:
 	typedef PixelSelector selector_type;
 	typedef typename PixelSelector::pixel_type pixel_type;
 	typedef typename PixelSelector::value_type value_type;
 	typedef TRasterT<pixel_type> raster_type;
 	typedef TRasterPT<pixel_type> raster_typeP;
 
-	enum { STRAIGHT = 0x0,
-		   LEFT = 0x1,
-		   RIGHT = 0x2,
-		   AMBIGUOUS = 0x4,
-		   AMBIGUOUS_LEFT = LEFT | AMBIGUOUS,
-		   AMBIGUOUS_RIGHT = RIGHT | AMBIGUOUS,
-		   UNKNOWN = 0x8 };
+	enum {
+		STRAIGHT = 0x0,
+		LEFT = 0x1,
+		RIGHT = 0x2,
+		AMBIGUOUS = 0x4,
+		AMBIGUOUS_LEFT = LEFT | AMBIGUOUS,
+		AMBIGUOUS_RIGHT = RIGHT | AMBIGUOUS,
+		UNKNOWN = 0x8
+	};
 
-private:
+  private:
 	raster_typeP m_ras;
 	selector_type m_selector;
 
@@ -50,9 +51,9 @@ private:
 
 	TPoint m_pos, m_dir;
 
-public:
-	RasterEdgeIterator(const raster_typeP &rin, const selector_type &selector,
-					   const TPoint &pos, const TPoint &dir, int adherence = RIGHT);
+  public:
+	RasterEdgeIterator(const raster_typeP &rin, const selector_type &selector, const TPoint &pos,
+					   const TPoint &dir, int adherence = RIGHT);
 
 	void setEdge(const TPoint &pos, const TPoint &dir);
 
@@ -82,10 +83,13 @@ public:
 
 	RasterEdgeIterator &operator++();
 
-	bool operator==(const RasterEdgeIterator &it) const { return m_pos == it.m_pos && m_dir == it.m_dir; }
+	bool operator==(const RasterEdgeIterator &it) const
+	{
+		return m_pos == it.m_pos && m_dir == it.m_dir;
+	}
 	bool operator!=(const RasterEdgeIterator &it) const { return !operator==(it); }
 
-private:
+  private:
 	void pixels(pixel_type *&pixLeft, pixel_type *&pixRight);
 	void colors(value_type &leftColor, value_type &rightColor);
 	void turn(const value_type &newLeftColor, const value_type &newRightColor);
@@ -108,10 +112,10 @@ private:
 }
 } // namespace TRop::borders
 
-#endif //RASTER_EDGE_ITERATOR_H
+#endif // RASTER_EDGE_ITERATOR_H
 
 //=====================================================================================
 
 #ifdef INCLUDE_HPP
 #include "raster_edge_iterator.hpp"
-#endif //INCLUDE_HPP
+#endif // INCLUDE_HPP

@@ -30,9 +30,11 @@ class ChannelMixerFx : public TStandardRasterFx
 	TDoubleParamP m_b_m;
 	TDoubleParamP m_m_m;
 
-public:
+  public:
 	ChannelMixerFx()
-		: m_r_r(1.0), m_g_r(0.0), m_b_r(0.0), m_m_r(0.0), m_r_g(0.0), m_g_g(1.0), m_b_g(0.0), m_m_g(0.0), m_r_b(0.0), m_g_b(0.0), m_b_b(1.0), m_m_b(0.0), m_r_m(0.0), m_g_m(0.0), m_b_m(0.0), m_m_m(1.0)
+		: m_r_r(1.0), m_g_r(0.0), m_b_r(0.0), m_m_r(0.0), m_r_g(0.0), m_g_g(1.0), m_b_g(0.0),
+		  m_m_g(0.0), m_r_b(0.0), m_g_b(0.0), m_b_b(1.0), m_m_b(0.0), m_r_m(0.0), m_g_m(0.0),
+		  m_b_m(0.0), m_m_m(1.0)
 
 	{
 		addInputPort("Source", m_input);
@@ -86,8 +88,7 @@ public:
 
 namespace
 {
-template <typename PIXEL, typename CHANNEL_TYPE>
-void depremult(PIXEL *pix)
+template <typename PIXEL, typename CHANNEL_TYPE> void depremult(PIXEL *pix)
 {
 	if (!pix->m)
 		return;
@@ -99,9 +100,9 @@ void depremult(PIXEL *pix)
 }
 
 template <typename PIXEL, typename CHANNEL_TYPE>
-void doChannelMixer(TRasterPT<PIXEL> ras, double r_r, double r_g, double r_b, double r_m, double g_r, double g_g, double g_b,
-					double g_m, double b_r, double b_g, double b_b, double b_m, double m_r,
-					double m_g, double m_b, double m_m)
+void doChannelMixer(TRasterPT<PIXEL> ras, double r_r, double r_g, double r_b, double r_m,
+					double g_r, double g_g, double g_b, double g_m, double b_r, double b_g,
+					double b_b, double b_m, double m_r, double m_g, double m_b, double m_m)
 {
 	double aux = (double)PIXEL::maxChannelValue;
 	int j;
@@ -110,7 +111,8 @@ void doChannelMixer(TRasterPT<PIXEL> ras, double r_r, double r_g, double r_b, do
 		PIXEL *pix = ras->pixels(j);
 		PIXEL *endPix = pix + ras->getLx();
 		while (pix < endPix) {
-			depremult<PIXEL, CHANNEL_TYPE>(pix); //if removed, a black line appears in the edge of a level (default values, not black lines)
+			depremult<PIXEL, CHANNEL_TYPE>(pix); // if removed, a black line appears in the edge of
+												 // a level (default values, not black lines)
 			double red = pix->r * r_r + pix->g * g_r + pix->b * b_r + pix->m * m_r;
 			double green = pix->r * r_g + pix->g * g_g + pix->b * b_g + pix->m * m_g;
 			double blue = pix->r * r_b + pix->g * g_b + pix->b * b_b + pix->m * m_b;
@@ -123,7 +125,8 @@ void doChannelMixer(TRasterPT<PIXEL> ras, double r_r, double r_g, double r_b, do
 			pix->g = (CHANNEL_TYPE)green;
 			pix->b = (CHANNEL_TYPE)blue;
 			pix->m = (CHANNEL_TYPE)matte;
-			*pix = premultiply(*pix); //if removed, a white edged line appears in the edge of a level (if m>r, g, b)
+			*pix = premultiply(*pix); // if removed, a white edged line appears in the edge of a
+									  // level (if m>r, g, b)
 			pix++;
 		}
 	}
@@ -157,11 +160,13 @@ void ChannelMixerFx::doCompute(TTile &tile, double frame, const TRenderSettings 
 
 	TRaster32P raster32 = tile.getRaster();
 	if (raster32)
-		doChannelMixer<TPixel32, UCHAR>(raster32, r_r, r_g, r_b, r_m, g_r, g_g, g_b, g_m, b_r, b_g, b_b, b_m, m_r, m_g, m_b, m_m);
+		doChannelMixer<TPixel32, UCHAR>(raster32, r_r, r_g, r_b, r_m, g_r, g_g, g_b, g_m, b_r, b_g,
+										b_b, b_m, m_r, m_g, m_b, m_m);
 	else {
 		TRaster64P raster64 = tile.getRaster();
 		if (raster64)
-			doChannelMixer<TPixel64, USHORT>(raster64, r_r, r_g, r_b, r_m, g_r, g_g, g_b, g_m, b_r, b_g, b_b, b_m, m_r, m_g, m_b, m_m);
+			doChannelMixer<TPixel64, USHORT>(raster64, r_r, r_g, r_b, r_m, g_r, g_g, g_b, g_m, b_r,
+											 b_g, b_b, b_m, m_r, m_g, m_b, m_m);
 		else
 			throw TException("Brightness&Contrast: unsupported Pixel Type");
 	}

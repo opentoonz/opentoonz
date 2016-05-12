@@ -21,14 +21,14 @@ namespace image_ops
 //**************************************************************************
 
 template <typename PtrIn, typename PtrOut, typename PixSum>
-void _flatFilterLine(PtrIn in, PtrOut out, int lx, int addIn, int addOut,
-					 int radius, PixSum *sums)
+void _flatFilterLine(PtrIn in, PtrOut out, int lx, int addIn, int addOut, int radius, PixSum *sums)
 {
 	typedef typename std::iterator_traits<PtrIn> trIn;
 	typedef typename trIn::value_type pixIn_type;
 
 	struct locals {
-		inline static void fillSums(int lx, int radius, PtrIn lineIn, PixSum *pixsum, int addIn, int addSum)
+		inline static void fillSums(int lx, int radius, PtrIn lineIn, PixSum *pixsum, int addIn,
+									int addSum)
 		{
 			using namespace pixel_ops;
 
@@ -44,7 +44,8 @@ void _flatFilterLine(PtrIn in, PtrOut out, int lx, int addIn, int addOut,
 
 			// Store sums AND add new pixels. Observe that the current pixel value is decreased
 			// BEFORE storage. This makes this function "strict" in calculating the sums.
-			for (x = 0; xNew != lx; ++x, ++xNew, lineIn += addIn, newPixIn += addIn, pixsum += addSum) {
+			for (x = 0; xNew != lx;
+				 ++x, ++xNew, lineIn += addIn, newPixIn += addIn, pixsum += addSum) {
 				sum = (sum + *newPixIn) - *lineIn;
 				*pixsum = *pixsum + sum;
 			}
@@ -60,7 +61,7 @@ void _flatFilterLine(PtrIn in, PtrOut out, int lx, int addIn, int addOut,
 	memset(sums, 0, lx * sizeof(PixSum));
 
 	// Add *strict* halves of the convolution sums
-	locals::fillSums(lx, radius, in, sums, addIn, 1);								// Right part of the convolution
+	locals::fillSums(lx, radius, in, sums, addIn, 1); // Right part of the convolution
 	locals::fillSums(lx, radius, in + addIn * (lx - 1), sums + lx - 1, -addIn, -1); // Left   ...
 
 	// Normalize sums
@@ -79,8 +80,8 @@ void _flatFilterLine(PtrIn in, PtrOut out, int lx, int addIn, int addOut,
 //----------------------------------------------------------------------
 
 template <typename PtrIn, typename PtrOut, typename PixSum, typename SelectorFunc>
-void _flatFilterLine(PtrIn in, PtrOut out, int lx, int addIn, int addOut,
-					 SelectorFunc selector, int radius, PixSum *sums, int *counts)
+void _flatFilterLine(PtrIn in, PtrOut out, int lx, int addIn, int addOut, SelectorFunc selector,
+					 int radius, PixSum *sums, int *counts)
 {
 	typedef typename std::iterator_traits<PtrIn> trIn;
 	typedef typename trIn::value_type pixIn_type;
@@ -137,8 +138,8 @@ void _flatFilterLine(PtrIn in, PtrOut out, int lx, int addIn, int addOut,
 
 	// Add *strict* halves of the convolution sums
 	locals::fillSums(lx, radius, in, sums, counts, addIn, 1, selector);
-	locals::fillSums(lx, radius, in + addIn * (lx - 1), sums + lx - 1, counts + lx - 1,
-					 -addIn, -1, selector);
+	locals::fillSums(lx, radius, in + addIn * (lx - 1), sums + lx - 1, counts + lx - 1, -addIn, -1,
+					 selector);
 
 	// Normalize sums
 	for (int x = 0; x != lx; ++x, in += addIn, out += addOut, ++sums, ++counts) {
@@ -267,7 +268,8 @@ void blurCols(const ImgIn &imgIn, ImgOut &imgOut, int radius, SelectorFunc selec
 		PtrIn lineIn = image_traits<ImgIn>::pixel(imgIn, x, 0);
 		PtrOut lineOut = image_traits<ImgOut>::pixel(imgOut, x, 0);
 
-		_flatFilterLine(lineIn, lineOut, inLy, inWrap, outWrap, selector, radius, sums.get(), counts.get());
+		_flatFilterLine(lineIn, lineOut, inLy, inWrap, outWrap, selector, radius, sums.get(),
+						counts.get());
 	}
 }
 

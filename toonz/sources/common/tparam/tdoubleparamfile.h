@@ -23,7 +23,7 @@ class DVAPI TDoubleParamFileData
 
 	void read();
 
-public:
+  public:
 	TDoubleParamFileData();
 	~TDoubleParamFileData();
 

@@ -6,7 +6,7 @@
 
 QThread *MainThread = QThread::currentThread();
 
-TThreadMessageDispatcher *Dispatcher; //MUST BE CREATED  in the main thread!!!!!!
+TThreadMessageDispatcher *Dispatcher; // MUST BE CREATED  in the main thread!!!!!!
 
 //------------------------------------------------------------------------------
 
@@ -20,7 +20,8 @@ bool TThread::isMainThread()
 TThreadMessageDispatcher::TThreadMessageDispatcher()
 {
 	connect(this, SIGNAL(signaled(TThread::Message *)), this, SLOT(onSignal(TThread::Message *)));
-	connect(this, SIGNAL(blockingSignaled(TThread::Message *)), this, SLOT(onSignal(TThread::Message *)), Qt::BlockingQueuedConnection);
+	connect(this, SIGNAL(blockingSignaled(TThread::Message *)), this,
+			SLOT(onSignal(TThread::Message *)), Qt::BlockingQueuedConnection);
 }
 
 //------------------------------------------------------------------------------

@@ -23,9 +23,12 @@ class ino_hls_noise : public TStandardRasterFx
 	TBoolParamP m_anti_alias;
 	TIntEnumParamP m_ref_mode;
 
-public:
+  public:
 	ino_hls_noise()
-		: m_hue(0.025 * ino::param_range()), m_lig(0.035 * ino::param_range()), m_sat(0.0 * ino::param_range()), m_mat(0.0 * ino::param_range()), m_random_seed(1), m_near_blur(1.0 * ino::param_range()), m_term_effective(0.0 * ino::param_range()), m_term_center(ino::param_range() / 2.0), m_term_type(new TIntEnumParam(0, "Keep Noise"))
+		: m_hue(0.025 * ino::param_range()), m_lig(0.035 * ino::param_range()),
+		  m_sat(0.0 * ino::param_range()), m_mat(0.0 * ino::param_range()), m_random_seed(1),
+		  m_near_blur(1.0 * ino::param_range()), m_term_effective(0.0 * ino::param_range()),
+		  m_term_center(ino::param_range() / 2.0), m_term_type(new TIntEnumParam(0, "Keep Noise"))
 
 		  ,
 		  m_anti_alias(true), m_ref_mode(new TIntEnumParam(0, "Red"))
@@ -46,23 +49,15 @@ public:
 		bindParam(this, "anti_alias", this->m_anti_alias);
 		bindParam(this, "reference", this->m_ref_mode);
 
-		this->m_hue->setValueRange(
-			0.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_lig->setValueRange(
-			0.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_sat->setValueRange(
-			0.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_mat->setValueRange(
-			0.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_hue->setValueRange(0.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_lig->setValueRange(0.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_sat->setValueRange(0.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_mat->setValueRange(0.0 * ino::param_range(), 1.0 * ino::param_range());
 
-		this->m_random_seed->setValueRange(
-			0, std::numeric_limits<unsigned long>::max());
-		this->m_near_blur->setValueRange(
-			0.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_term_effective->setValueRange(
-			0.0 * ino::param_range(), 1.0 * ino::param_range());
-		this->m_term_center->setValueRange(
-			0.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_random_seed->setValueRange(0, std::numeric_limits<unsigned long>::max());
+		this->m_near_blur->setValueRange(0.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_term_effective->setValueRange(0.0 * ino::param_range(), 1.0 * ino::param_range());
+		this->m_term_center->setValueRange(0.0 * ino::param_range(), 1.0 * ino::param_range());
 		this->m_term_type->addItem(1, "Keep Contrast");
 
 		this->m_ref_mode->addItem(1, "Green");
@@ -71,8 +66,7 @@ public:
 		this->m_ref_mode->addItem(4, "Luminance");
 		this->m_ref_mode->addItem(-1, "Nothing");
 	}
-	bool doGetBBox(
-		double frame, TRectD &bBox, const TRenderSettings &info)
+	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 	{
 		if (this->m_input.isConnected()) {
 			return this->m_input->doGetBBox(frame, bBox, info);
@@ -83,7 +77,7 @@ public:
 	}
 	bool canHandle(const TRenderSettings &info, double frame)
 	{
-		//return true;
+		// return true;
 		/* trueだと素材がスライドして現れるときノイズパターン
 		が変わってしまう 2013-4-5からtoonz上で変更した */
 		/* でなく、
@@ -98,23 +92,24 @@ public:
 		2013-11-08 */
 		return false;
 	}
-	void doCompute(
-		TTile &tile, double frame, const TRenderSettings &rend_sets);
+	void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
 };
 FX_PLUGIN_IDENTIFIER(ino_hls_noise, "inohlsNoiseFx");
 //------------------------------------------------------------
 #include "igs_hls_noise.h"
 namespace
 {
-void fx_(
-	TRasterP in_ras, const TRasterP refer_ras, const int ref_mode
+void fx_(TRasterP in_ras, const TRasterP refer_ras, const int ref_mode
 
-	,
-	double hue_range, double lig_range, double sat_range, double alp_range, unsigned long random_seed, double near_blur, double effective, double center, int type, const int camera_x, const int camera_y, const int camera_w, const int camera_h, const bool anti_alias_sw)
+		 ,
+		 double hue_range, double lig_range, double sat_range, double alp_range,
+		 unsigned long random_seed, double near_blur, double effective, double center, int type,
+		 const int camera_x, const int camera_y, const int camera_w, const int camera_h,
+		 const bool anti_alias_sw)
 {
-	TRasterGR8P in_gr8(
-		in_ras->getLy(), in_ras->getLx() * ino::channels() *
-							 ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
+	TRasterGR8P in_gr8(in_ras->getLy(),
+					   in_ras->getLx() * ino::channels() *
+						   ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
 	in_gr8->lock();
 	ino::ras_to_arr(in_ras, ino::channels(), in_gr8->getRawData());
 
@@ -129,7 +124,7 @@ void fx_(
 		ino::channels(), ino::bits(in_ras)
 
 							 ,
-		(((0 <= ref_mode) && (0 != refer_ras)) ? refer_ras->getRawData() : 0) //BGRA
+		(((0 <= ref_mode) && (0 != refer_ras)) ? refer_ras->getRawData() : 0) // BGRA
 		,
 		(((0 <= ref_mode) && (0 != refer_ras)) ? ino::bits(refer_ras) : 0), ref_mode
 
@@ -137,15 +132,15 @@ void fx_(
 		camera_x, camera_y, camera_w, camera_h
 
 		,
-		hue_range, lig_range, sat_range, alp_range, random_seed, near_blur, effective, center, type, effective, center, type, effective, center, type, anti_alias_sw);
+		hue_range, lig_range, sat_range, alp_range, random_seed, near_blur, effective, center, type,
+		effective, center, type, effective, center, type, anti_alias_sw);
 
 	ino::arr_to_ras(in_gr8->getRawData(), ino::channels(), in_ras, 0);
 	in_gr8->unlock();
 }
 }
 //------------------------------------------------------------
-void ino_hls_noise::doCompute(
-	TTile &tile, double frame, const TRenderSettings &rend_sets)
+void ino_hls_noise::doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets)
 {
 	/* ------ 接続していなければ処理しない -------------------- */
 	if (!this->m_input.isConnected()) {
@@ -154,24 +149,18 @@ void ino_hls_noise::doCompute(
 	}
 
 	/* ------ サポートしていないPixelタイプはエラーを投げる --- */
-	if (!((TRaster32P)tile.getRaster()) &&
-		!((TRaster64P)tile.getRaster())) {
+	if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
 		throw TRopException("unsupported input pixel type");
 	}
 
 	/* ------ 動作パラメータを得る ---------------------------- */
-	const double hue_range = this->m_hue->getValue(frame) /
-							 ino::param_range();
-	const double lig_range = this->m_lig->getValue(frame) /
-							 ino::param_range();
-	const double sat_range = this->m_sat->getValue(frame) /
-							 ino::param_range();
-	const double mat_range = this->m_mat->getValue(frame) /
-							 ino::param_range();
-	const unsigned long random_seed = static_cast<unsigned long>(
-		this->m_random_seed->getValue(frame));
-	const double near_blur = this->m_near_blur->getValue(frame) /
-							 ino::param_range() / 2.0;
+	const double hue_range = this->m_hue->getValue(frame) / ino::param_range();
+	const double lig_range = this->m_lig->getValue(frame) / ino::param_range();
+	const double sat_range = this->m_sat->getValue(frame) / ino::param_range();
+	const double mat_range = this->m_mat->getValue(frame) / ino::param_range();
+	const unsigned long random_seed =
+		static_cast<unsigned long>(this->m_random_seed->getValue(frame));
+	const double near_blur = this->m_near_blur->getValue(frame) / ino::param_range() / 2.0;
 	int term_type = -1;
 	switch (this->m_term_type->getValue()) {
 	case 0:
@@ -181,11 +170,8 @@ void ino_hls_noise::doCompute(
 		term_type = 3;
 		break;
 	}
-	const double term_center = this->m_term_center->getValue(frame) /
-							   ino::param_range();
-	const double term_effective =
-		this->m_term_effective->getValue(frame) /
-		ino::param_range();
+	const double term_center = this->m_term_center->getValue(frame) / ino::param_range();
+	const double term_effective = this->m_term_effective->getValue(frame) / ino::param_range();
 	const bool anti_alias_sw = this->m_anti_alias->getValue();
 	const int ref_mode = this->m_ref_mode->getValue();
 
@@ -222,8 +208,9 @@ void ino_hls_noise::doCompute(
 	if (this->m_refer.isConnected()) {
 		reference_sw = true;
 		this->m_refer->allocateAndCompute(
-			reference_tile, tile.m_pos, TDimensionI(/* Pixel単位 */
-													tile.getRaster()->getLx(), tile.getRaster()->getLy()),
+			reference_tile, tile.m_pos,
+			TDimensionI(/* Pixel単位 */
+						tile.getRaster()->getLx(), tile.getRaster()->getLy()),
 			tile.getRaster(), frame, rend_sets);
 	}
 	/* ------ (app_begin)log記憶 ------------------------------ */
@@ -232,44 +219,31 @@ void ino_hls_noise::doCompute(
 	if (log_sw) {
 		std::ostringstream os;
 		os << "params"
-		   << "  h " << hue_range
-		   << "  l " << lig_range
-		   << "  s " << sat_range
-		   << "  a " << mat_range
-		   << "  seed " << random_seed
-		   << "  nblur " << near_blur
-		   << "  effective " << term_effective
-		   << "  center " << term_center
-		   << "  type " << term_type
-		   << "  frame " << frame
-		   << "  anti_alias " << anti_alias_sw
-		   << "  reference " << ref_mode
-		   << "  pixbits " << ino::pixel_bits(tile.getRaster())
-		   << "  tile.m_pos " << tile.m_pos
-		   << "  tile_getLx " << tile.getRaster()->getLx()
-		   << "  y " << tile.getRaster()->getLy()
-		   << "  rend_sets.m_cameraBox " << rend_sets.m_cameraBox
-		   << "  rend_sets.m_affine " << rend_sets.m_affine
-		   << "  camera x " << camera_x
-		   << "  y " << camera_y
-		   << "  w " << camera_w
-		   << "  h " << camera_h;
+		   << "  h " << hue_range << "  l " << lig_range << "  s " << sat_range << "  a "
+		   << mat_range << "  seed " << random_seed << "  nblur " << near_blur << "  effective "
+		   << term_effective << "  center " << term_center << "  type " << term_type << "  frame "
+		   << frame << "  anti_alias " << anti_alias_sw << "  reference " << ref_mode
+		   << "  pixbits " << ino::pixel_bits(tile.getRaster()) << "  tile.m_pos " << tile.m_pos
+		   << "  tile_getLx " << tile.getRaster()->getLx() << "  y " << tile.getRaster()->getLy()
+		   << "  rend_sets.m_cameraBox " << rend_sets.m_cameraBox << "  rend_sets.m_affine "
+		   << rend_sets.m_affine << "  camera x " << camera_x << "  y " << camera_y << "  w "
+		   << camera_w << "  h " << camera_h;
 		if (reference_sw) {
-			os
-				<< "  reference_tile.m_pos " << reference_tile.m_pos
-				<< "  reference_tile_getLx " << reference_tile.getRaster()->getLx()
-				<< "  y " << reference_tile.getRaster()->getLy();
+			os << "  reference_tile.m_pos " << reference_tile.m_pos << "  reference_tile_getLx "
+			   << reference_tile.getRaster()->getLx() << "  y "
+			   << reference_tile.getRaster()->getLy();
 		}
 	}
 	/* ------ fx処理 ------------------------------------------ */
 	try {
 		tile.getRaster()->lock();
 		reference_tile.getRaster()->lock();
-		fx_(
-			tile.getRaster(), reference_tile.getRaster(), ref_mode
+		fx_(tile.getRaster(), reference_tile.getRaster(), ref_mode
 
 			,
-			hue_range, lig_range, sat_range, mat_range, random_seed, near_blur, term_effective, term_center, term_type, camera_x, camera_y, camera_w, camera_h, anti_alias_sw // --> add_blend_sw, default is true
+			hue_range, lig_range, sat_range, mat_range, random_seed, near_blur, term_effective,
+			term_center, term_type, camera_x, camera_y, camera_w, camera_h,
+			anti_alias_sw // --> add_blend_sw, default is true
 			);
 		reference_tile.getRaster()->unlock();
 		tile.getRaster()->unlock();

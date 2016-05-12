@@ -11,17 +11,16 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#define MAXNBCI 4096 //512
+#define MAXNBCI 4096 // 512
 
 class CCIL
 {
 	bool isRange(const char *s) const;
 	int getRangeBegin(const char *s) const;
 	int getRangeEnd(const char *s) const;
-	void strToColorIndex(const char *s, CCIL &cil,
-						 const int maxIndex);
+	void strToColorIndex(const char *s, CCIL &cil, const int maxIndex);
 
-public:
+  public:
 	int m_nb;
 	int m_ci[MAXNBCI];
 

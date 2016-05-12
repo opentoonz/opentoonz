@@ -21,7 +21,7 @@
 
 class DVAPI NameBuilder
 {
-public:
+  public:
 	virtual ~NameBuilder() {}
 	virtual std::wstring getNext() = 0;
 
@@ -38,7 +38,7 @@ class DVAPI NameCreator : public NameBuilder
 {
 	std::vector<int> m_s;
 
-public:
+  public:
 	NameCreator() {}
 	std::wstring getNext();
 };
@@ -50,7 +50,7 @@ class DVAPI NameModifier : public NameBuilder
 	std::wstring m_nameBase;
 	int m_index;
 
-public:
+  public:
 	NameModifier(std::wstring name);
 	std::wstring getNext();
 };

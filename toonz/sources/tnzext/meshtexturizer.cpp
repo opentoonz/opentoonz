@@ -15,9 +15,9 @@
 #include "tcg/tcg_list.h"
 #include "tcg/tcg_misc.h"
 
-#define COPIED_BORDER 1								 // Amount of tile border from the original image
-#define TRANSP_BORDER 1								 // Amount of transparent tile border
-#define NONPREM_BORDER 1							 // Amount of nonpremultiplied copied transparent border
+#define COPIED_BORDER 1  // Amount of tile border from the original image
+#define TRANSP_BORDER 1  // Amount of transparent tile border
+#define NONPREM_BORDER 1 // Amount of nonpremultiplied copied transparent border
 #define TOTAL_BORDER (COPIED_BORDER + TRANSP_BORDER) // Overall border to texture tiles above
 #define TOTAL_BORDER_2 (2 * TOTAL_BORDER)			 // Twice the above
 
@@ -33,21 +33,19 @@ class MeshTexturizer::Imp
 {
 	typedef MeshTexturizer::TextureData TextureData;
 
-public:
-	QReadWriteLock m_lock;									  //!< Lock for synchronized access
+  public:
+	QReadWriteLock m_lock;									//!< Lock for synchronized access
 	tcg::list<std::shared_ptr<TextureData>> m_textureDatas; //!< Pool of texture datas
 
-public:
+  public:
 	Imp() : m_lock(QReadWriteLock::Recursive) {}
 
 	bool testTextureAlloc(int lx, int ly);
-	GLuint textureAlloc(const TRaster32P &ras, const TRaster32P &aux,
-						int x, int y, int textureLx, int textureLy,
-						bool premultiplied);
+	GLuint textureAlloc(const TRaster32P &ras, const TRaster32P &aux, int x, int y, int textureLx,
+						int textureLy, bool premultiplied);
 
-	void allocateTextures(int groupIdx, const TRaster32P &ras, const TRaster32P &aux,
-						  int x, int y, int textureLx, int textureLy,
-						  bool premultiplied);
+	void allocateTextures(int groupIdx, const TRaster32P &ras, const TRaster32P &aux, int x, int y,
+						  int textureLx, int textureLy, bool premultiplied);
 
 	TextureData *getTextureData(int groupIdx);
 };
@@ -76,9 +74,8 @@ bool MeshTexturizer::Imp::testTextureAlloc(int lx, int ly)
 
 //---------------------------------------------------------------------------------
 
-GLuint MeshTexturizer::Imp::textureAlloc(const TRaster32P &ras, const TRaster32P &aux,
-										 int x, int y, int textureLx, int textureLy,
-										 bool premultiplied)
+GLuint MeshTexturizer::Imp::textureAlloc(const TRaster32P &ras, const TRaster32P &aux, int x, int y,
+										 int textureLx, int textureLy, bool premultiplied)
 {
 	struct locals {
 		static void clearMatte(const TRaster32P &ras, int xBegin, int yBegin, int xEnd, int yEnd)
@@ -97,16 +94,19 @@ GLuint MeshTexturizer::Imp::textureAlloc(const TRaster32P &ras, const TRaster32P
 
 			// Horizontal
 			clearMatte(ras, border0, border0, ras->getLx() - border0, border1);
-			clearMatte(ras, border0, ras->getLy() - border1, ras->getLx() - border0, ras->getLy() - border0);
+			clearMatte(ras, border0, ras->getLy() - border1, ras->getLx() - border0,
+					   ras->getLy() - border0);
 
 			// Vertical
 			clearMatte(ras, border0, border1, border1, ras->getLy() - border1);
-			clearMatte(ras, ras->getLx() - border1, border1, ras->getLx() - border0, ras->getLy() - border1);
+			clearMatte(ras, ras->getLx() - border1, border1, ras->getLx() - border0,
+					   ras->getLy() - border1);
 		}
 	}; // locals
 
 	// Prepare the texture tile
-	assert(aux->getLx() >= textureLx + TOTAL_BORDER_2 && aux->getLy() >= textureLy + TOTAL_BORDER_2);
+	assert(aux->getLx() >= textureLx + TOTAL_BORDER_2 &&
+		   aux->getLy() >= textureLy + TOTAL_BORDER_2);
 
 	TRect rasRect(x, y, x + textureLx - 1, y + textureLy - 1);
 	rasRect = rasRect.enlarge(premultiplied ? COPIED_BORDER : COPIED_BORDER + NONPREM_BORDER);
@@ -115,7 +115,8 @@ GLuint MeshTexturizer::Imp::textureAlloc(const TRaster32P &ras, const TRaster32P
 	TRect auxRect(rasRect - TPoint(x - TOTAL_BORDER, y - TOTAL_BORDER));
 
 	// An auxiliary raster must be used to supply the transparent border
-	TRaster32P tex(aux->extract(0, 0, textureLx + TOTAL_BORDER_2 - 1, textureLy + TOTAL_BORDER_2 - 1));
+	TRaster32P tex(
+		aux->extract(0, 0, textureLx + TOTAL_BORDER_2 - 1, textureLy + TOTAL_BORDER_2 - 1));
 	tex->clear();
 	aux->extract(auxRect)->copy(ras->extract(rasRect));
 
@@ -127,9 +128,12 @@ GLuint MeshTexturizer::Imp::textureAlloc(const TRaster32P &ras, const TRaster32P
 	glGenTextures(1, &texId);
 	glBindTexture(GL_TEXTURE_2D, texId);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);	  // These must be used on a bound texture,
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);	  // and are remembered in the OpenGL context.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // They can be set here, no need for
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+					GL_CLAMP); // These must be used on a bound texture,
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+					GL_CLAMP); // and are remembered in the OpenGL context.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+					GL_LINEAR); // They can be set here, no need for
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // the user to do it.
 
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, tex->getWrap());
@@ -150,9 +154,9 @@ GLuint MeshTexturizer::Imp::textureAlloc(const TRaster32P &ras, const TRaster32P
 
 //---------------------------------------------------------------------------------
 
-void MeshTexturizer::Imp::allocateTextures(int groupIdx, const TRaster32P &ras, const TRaster32P &aux,
-										   int x, int y, int textureLx, int textureLy,
-										   bool premultiplied)
+void MeshTexturizer::Imp::allocateTextures(int groupIdx, const TRaster32P &ras,
+										   const TRaster32P &aux, int x, int y, int textureLx,
+										   int textureLy, bool premultiplied)
 {
 	TextureData *data = m_textureDatas[groupIdx].get();
 
@@ -160,11 +164,10 @@ void MeshTexturizer::Imp::allocateTextures(int groupIdx, const TRaster32P &ras, 
 	if (testTextureAlloc(textureLx, textureLy)) {
 		TPointD scale(data->m_geom.getLx() / (double)ras->getLx(),
 					  data->m_geom.getLy() / (double)ras->getLy());
-		TRectD tileGeom(
-			TRectD(
-				scale.x * (x - TOTAL_BORDER), scale.y * (y - TOTAL_BORDER),
-				scale.x * (x + textureLx + TOTAL_BORDER), scale.y * (y + textureLy + TOTAL_BORDER)) +
-			data->m_geom.getP00());
+		TRectD tileGeom(TRectD(scale.x * (x - TOTAL_BORDER), scale.y * (y - TOTAL_BORDER),
+							   scale.x * (x + textureLx + TOTAL_BORDER),
+							   scale.y * (y + textureLy + TOTAL_BORDER)) +
+						data->m_geom.getP00());
 
 		GLuint texId = textureAlloc(ras, aux, x, y, textureLx, textureLy, premultiplied);
 
@@ -181,11 +184,13 @@ void MeshTexturizer::Imp::allocateTextures(int groupIdx, const TRaster32P &ras, 
 	if (textureLx > textureLy) {
 		int textureLx_2 = textureLx >> 1;
 		allocateTextures(groupIdx, ras, aux, x, y, textureLx_2, textureLy, premultiplied);
-		allocateTextures(groupIdx, ras, aux, x + textureLx_2, y, textureLx_2, textureLy, premultiplied);
+		allocateTextures(groupIdx, ras, aux, x + textureLx_2, y, textureLx_2, textureLy,
+						 premultiplied);
 	} else {
 		int textureLy_2 = textureLy >> 1;
 		allocateTextures(groupIdx, ras, aux, x, y, textureLx, textureLy_2, premultiplied);
-		allocateTextures(groupIdx, ras, aux, x, y + textureLy_2, textureLx, textureLy_2, premultiplied);
+		allocateTextures(groupIdx, ras, aux, x, y + textureLy_2, textureLx, textureLy_2,
+						 premultiplied);
 	}
 }
 
@@ -203,8 +208,7 @@ MeshTexturizer::TextureData *MeshTexturizer::Imp::getTextureData(int groupIdx)
 //    MeshTexturizer  implementation
 //******************************************************************************************
 
-MeshTexturizer::MeshTexturizer()
-	: m_imp(new Imp)
+MeshTexturizer::MeshTexturizer() : m_imp(new Imp)
 {
 }
 
@@ -246,12 +250,16 @@ int MeshTexturizer::bindTexture(const TRaster32P &ras, const TRectD &geom,
 	// the raster can be completely included in just one tile
 
 	int lx = ras->getLx(), ly = ras->getLy();
-	int tileLx = textureLx - TOTAL_BORDER_2, tileLy = textureLy - TOTAL_BORDER_2; // Texture size without border
+	int tileLx = textureLx - TOTAL_BORDER_2,
+		tileLy = textureLy - TOTAL_BORDER_2; // Texture size without border
 
-	int xEntireCells = (lx - 1) / tileLx, yEntireCells = (ly - 1) / tileLy; // +1 so in case l == tileL, we get the remainder case
+	int xEntireCells = (lx - 1) / tileLx,
+		yEntireCells = (ly - 1) / tileLy; // +1 so in case l == tileL, we get the remainder case
 
-	int lastTexLx = tcg::numeric_ops::GE_2Power((unsigned int)(lx - xEntireCells * tileLx + TOTAL_BORDER_2));
-	int lastTexLy = tcg::numeric_ops::GE_2Power((unsigned int)(ly - yEntireCells * tileLy + TOTAL_BORDER_2));
+	int lastTexLx =
+		tcg::numeric_ops::GE_2Power((unsigned int)(lx - xEntireCells * tileLx + TOTAL_BORDER_2));
+	int lastTexLy =
+		tcg::numeric_ops::GE_2Power((unsigned int)(ly - yEntireCells * tileLy + TOTAL_BORDER_2));
 
 	int lastTileLx = lastTexLx - TOTAL_BORDER_2, lastTileLy = lastTexLy - TOTAL_BORDER_2;
 
@@ -261,15 +269,19 @@ int MeshTexturizer::bindTexture(const TRaster32P &ras, const TRectD &geom,
 	for (i = 0; i < yEntireCells; ++i) {
 		for (j = 0; j < xEntireCells; ++j)
 			// Perform a (possibly subdividing) allocation of the specified tile
-			m_imp->allocateTextures(dataIdx, ras, tex, j * tileLx, i * tileLy, tileLx, tileLy, premultiplied);
+			m_imp->allocateTextures(dataIdx, ras, tex, j * tileLx, i * tileLy, tileLx, tileLy,
+									premultiplied);
 
-		m_imp->allocateTextures(dataIdx, ras, tex, j * tileLx, i * tileLy, lastTileLx, tileLy, premultiplied);
+		m_imp->allocateTextures(dataIdx, ras, tex, j * tileLx, i * tileLy, lastTileLx, tileLy,
+								premultiplied);
 	}
 
 	for (j = 0; j < xEntireCells; ++j)
-		m_imp->allocateTextures(dataIdx, ras, tex, j * tileLx, i * tileLy, tileLx, lastTileLy, premultiplied);
+		m_imp->allocateTextures(dataIdx, ras, tex, j * tileLx, i * tileLy, tileLx, lastTileLy,
+								premultiplied);
 
-	m_imp->allocateTextures(dataIdx, ras, tex, j * tileLx, i * tileLy, lastTileLx, lastTileLy, premultiplied);
+	m_imp->allocateTextures(dataIdx, ras, tex, j * tileLx, i * tileLy, lastTileLx, lastTileLy,
+							premultiplied);
 
 	// Restore OpenGL variables
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, row_length);

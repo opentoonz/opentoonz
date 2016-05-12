@@ -32,7 +32,7 @@ class TFrameHandle;
 
 class ColumnToCurveMapper
 {
-public:
+  public:
 	virtual TDoubleParam *getCurve(int columnIndex) const = 0;
 };
 
@@ -59,7 +59,7 @@ class FunctionSelection : public QObject, public TSelection
 	int touchCurveIndex(TDoubleParam *curve);
 	// as getCurve(); if curve not found then add it
 
-public:
+  public:
 	FunctionSelection();
 	~FunctionSelection();
 
@@ -79,11 +79,16 @@ public:
 	void selectNone();
 	void select(TDoubleParam *curve, int k);
 	bool isSelected(TDoubleParam *curve, int k) const;
-	void selectSegment(TDoubleParam *, int k, QRect selectedCells = QRect()); // note: if a segment is selected then also the segment ends are selected
+	void selectSegment(TDoubleParam *, int k, QRect selectedCells = QRect()); // note: if a segment
+																			  // is selected then
+																			  // also the segment
+																			  // ends are selected
 	int getSelectedKeyframeCount() const;
-	QPair<TDoubleParam *, int> getSelectedKeyframe(int index) const; // if index<0 || index>=getSelectedKeyframeCount() returns (0,-1)
+	QPair<TDoubleParam *, int> getSelectedKeyframe(
+		int index) const; // if index<0 || index>=getSelectedKeyframeCount() returns (0,-1)
 
-	QPair<TDoubleParam *, int> getSelectedSegment() const; // if no segment is selected returns (0,-1)
+	QPair<TDoubleParam *, int>
+	getSelectedSegment() const; // if no segment is selected returns (0,-1)
 	bool isSegmentSelected(TDoubleParam *, int k) const;
 
 	void setColumnToCurveMapper(ColumnToCurveMapper *mapper); // gets ownership
@@ -101,7 +106,7 @@ public:
 	void doDelete();
 	void insertCells();
 
-signals:
+  signals:
 	void selectionChanged();
 };
 
@@ -109,7 +114,7 @@ signals:
 
 class FunctionKeyframesData : public DvMimeData
 {
-public:
+  public:
 	FunctionKeyframesData();
 	~FunctionKeyframesData();
 
@@ -129,7 +134,7 @@ public:
 
 	bool isCircularReferenceFree(int columnIndex, TDoubleParam *curve) const;
 
-private:
+  private:
 	std::vector<Keyframes> m_keyframes;
 };
 

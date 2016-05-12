@@ -16,7 +16,7 @@ namespace Tiio
 
 class TgaWriterProperties : public TPropertyGroup
 {
-public:
+  public:
 	TEnumProperty m_pixelSize; // 16,24,32
 	TBoolProperty m_compressed;
 

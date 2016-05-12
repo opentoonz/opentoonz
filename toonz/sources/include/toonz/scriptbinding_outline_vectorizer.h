@@ -16,7 +16,7 @@ class DVAPI OutlineVectorizer : public Wrapper
 	Q_OBJECT
 	NewOutlineConfiguration *m_parameters;
 
-public:
+  public:
 	OutlineVectorizer();
 	~OutlineVectorizer();
 

@@ -90,11 +90,11 @@ class FullColorBrushUndo : public ToolUtils::TFullColorRasterUndo
 	TPoint m_offset;
 	QString m_id;
 
-public:
-	FullColorBrushUndo(TTileSetFullColor *tileSet,
-					   TXshSimpleLevel *level, const TFrameId &frameId, bool isFrameCreated,
-					   const TRasterP &ras, const TPoint &offset)
-		: ToolUtils::TFullColorRasterUndo(tileSet, level, frameId, isFrameCreated, false, 0), m_offset(offset)
+  public:
+	FullColorBrushUndo(TTileSetFullColor *tileSet, TXshSimpleLevel *level, const TFrameId &frameId,
+					   bool isFrameCreated, const TRasterP &ras, const TPoint &offset)
+		: ToolUtils::TFullColorRasterUndo(tileSet, level, frameId, isFrameCreated, false, 0),
+		  m_offset(offset)
 	{
 		static int counter = 0;
 
@@ -102,10 +102,7 @@ public:
 		TImageCache::instance()->add(m_id.toStdString(), TRasterImageP(ras));
 	}
 
-	~FullColorBrushUndo()
-	{
-		TImageCache::instance()->remove(m_id);
-	}
+	~FullColorBrushUndo() { TImageCache::instance()->remove(m_id); }
 
 	void redo() const
 	{
@@ -121,19 +118,10 @@ public:
 		notifyImageChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this) + ToolUtils::TFullColorRasterUndo::getSize();
-	}
+	int getSize() const { return sizeof(*this) + ToolUtils::TFullColorRasterUndo::getSize(); }
 
-	virtual QString getToolName()
-	{
-		return QString("Raster Brush Tool");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::BrushTool;
-	}
+	virtual QString getToolName() { return QString("Raster Brush Tool"); }
+	int getHistoryType() { return HistoryType::BrushTool; }
 };
 
 } // namespace
@@ -143,7 +131,11 @@ public:
 //************************************************************************
 
 FullColorBrushTool::FullColorBrushTool(std::string name)
-	: TTool(name), m_thickness("Thickness", 1, 100, 1, 5, false), m_pressure("Pressure Sensitivity", true), m_opacity("Opacity:", 0, 100, 100, 100, true), m_hardness("Hardness:", 0, 100, 100), m_preset("Preset:"), m_styleId(0), m_oldOpacity(1), m_brush(0), m_tileSet(0), m_tileSaver(0), m_notifier(0), m_presetsLoaded(false), m_firstTime(true)
+	: TTool(name), m_thickness("Thickness", 1, 100, 1, 5, false),
+	  m_pressure("Pressure Sensitivity", true), m_opacity("Opacity:", 0, 100, 100, 100, true),
+	  m_hardness("Hardness:", 0, 100, 100), m_preset("Preset:"), m_styleId(0), m_oldOpacity(1),
+	  m_brush(0), m_tileSet(0), m_tileSaver(0), m_notifier(0), m_presetsLoaded(false),
+	  m_firstTime(true)
 {
 	bind(TTool::RasterImage | TTool::EmptyTarget);
 
@@ -159,7 +151,8 @@ FullColorBrushTool::FullColorBrushTool(std::string name)
 
 ToolOptionsBox *FullColorBrushTool::createOptionsBox()
 {
-	TPaletteHandle *currPalette = TTool::getApplication()->getPaletteController()->getCurrentLevelPalette();
+	TPaletteHandle *currPalette =
+		TTool::getApplication()->getPaletteController()->getCurrentLevelPalette();
 	ToolHandle *currTool = TTool::getApplication()->getCurrentTool();
 	return new BrushToolOptionsBox(0, this, currPalette, currTool);
 }
@@ -213,7 +206,8 @@ void FullColorBrushTool::onActivate()
 		m_hardness.setValue(FullcolorBrushHardness);
 	}
 
-	m_brushPad = ToolUtils::getBrushPad(m_thickness.getValue().second, m_hardness.getValue() * 0.01);
+	m_brushPad =
+		ToolUtils::getBrushPad(m_thickness.getValue().second, m_hardness.getValue() * 0.01);
 	setWorkAndBackupImages();
 }
 
@@ -292,8 +286,11 @@ void FullColorBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e
 	m_workRaster->lock();
 
 	double maxThick = m_thickness.getValue().second;
-	double thickness = m_pressure.getValue() ? computeThickness(e.m_pressure, m_thickness) : maxThick;
-	double opacity = (m_pressure.getValue() ? computeThickness(e.m_pressure, m_opacity) : m_opacity.getValue().second) * 0.01;
+	double thickness =
+		m_pressure.getValue() ? computeThickness(e.m_pressure, m_thickness) : maxThick;
+	double opacity = (m_pressure.getValue() ? computeThickness(e.m_pressure, m_opacity)
+											: m_opacity.getValue().second) *
+					 0.01;
 	TPointD rasCenter = TPointD(dim.lx * 0.5, dim.ly * 0.5);
 	TThickPoint point(pos + rasCenter, thickness);
 	TPointD halfThick(maxThick * 0.5, maxThick * 0.5);
@@ -311,7 +308,8 @@ void FullColorBrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e
 	updateWorkAndBackupRasters(m_strokeRect);
 	m_tileSaver->save(m_strokeRect);
 	m_brush->addPoint(point, opacity);
-	m_brush->updateDrawing(ras, m_backUpRas, m_currentColor, m_strokeRect, m_opacity.getValue().second * 0.01);
+	m_brush->updateDrawing(ras, m_backUpRas, m_currentColor, m_strokeRect,
+						   m_opacity.getValue().second * 0.01);
 	m_oldOpacity = opacity;
 	m_lastRect = m_strokeRect;
 
@@ -329,8 +327,11 @@ void FullColorBrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e
 		return;
 
 	double maxThickness = m_thickness.getValue().second;
-	double thickness = m_pressure.getValue() ? computeThickness(e.m_pressure, m_thickness) : maxThickness;
-	double opacity = (m_pressure.getValue() ? computeThickness(e.m_pressure, m_opacity) : m_opacity.getValue().second) * 0.01;
+	double thickness =
+		m_pressure.getValue() ? computeThickness(e.m_pressure, m_thickness) : maxThickness;
+	double opacity = (m_pressure.getValue() ? computeThickness(e.m_pressure, m_opacity)
+											: m_opacity.getValue().second) *
+					 0.01;
 	TDimension size = m_workRaster->getSize();
 	TPointD rasCenter = TPointD(size.lx * 0.5, size.ly * 0.5);
 	TThickPoint point(pos + rasCenter, thickness);
@@ -372,7 +373,8 @@ void FullColorBrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e
 		m_lastRect += bbox;
 	}
 	m_oldOpacity = opacity;
-	m_brush->updateDrawing(ri->getRaster(), m_backUpRas, m_currentColor, bbox, m_opacity.getValue().second * 0.01);
+	m_brush->updateDrawing(ri->getRaster(), m_backUpRas, m_currentColor, bbox,
+						   m_opacity.getValue().second * 0.01);
 	invalidate(invalidateRect.enlarge(2) - rasCenter);
 	m_strokeRect += bbox;
 }
@@ -389,8 +391,11 @@ void FullColorBrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 
 	if (m_points.size() != 1) {
 		double maxThickness = m_thickness.getValue().second;
-		double thickness = m_pressure.getValue() ? computeThickness(e.m_pressure, m_thickness) : maxThickness;
-		double opacity = (m_pressure.getValue() ? computeThickness(e.m_pressure, m_opacity) : m_opacity.getValue().second) * 0.01;
+		double thickness =
+			m_pressure.getValue() ? computeThickness(e.m_pressure, m_thickness) : maxThickness;
+		double opacity = (m_pressure.getValue() ? computeThickness(e.m_pressure, m_opacity)
+												: m_opacity.getValue().second) *
+						 0.01;
 		TPointD rasCenter = ri->getRaster()->getCenterD();
 		TThickPoint point(pos + rasCenter, thickness);
 		m_points.push_back(point);
@@ -403,7 +408,8 @@ void FullColorBrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 		updateWorkAndBackupRasters(bbox);
 		m_tileSaver->save(bbox);
 		m_brush->addArc(points[0], points[1], points[2], m_oldOpacity, opacity);
-		m_brush->updateDrawing(ri->getRaster(), m_backUpRas, m_currentColor, bbox, m_opacity.getValue().second * 0.01);
+		m_brush->updateDrawing(ri->getRaster(), m_backUpRas, m_currentColor, bbox,
+							   m_opacity.getValue().second * 0.01);
 		TRectD invalidateRect = ToolUtils::getBounds(points, maxThickness);
 		invalidate(invalidateRect.enlarge(2) - rasCenter);
 		m_strokeRect += bbox;
@@ -424,8 +430,9 @@ void FullColorBrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 		TXshSimpleLevelP simLevel = level->getSimpleLevel();
 		TFrameId frameId = getCurrentFid();
 		TRasterP ras = ri->getRaster()->extract(m_strokeRect)->clone();
-		TUndoManager::manager()->add(new FullColorBrushUndo(m_tileSet, simLevel.getPointer(), frameId,
-															m_isFrameCreated, ras, m_strokeRect.getP00()));
+		TUndoManager::manager()->add(new FullColorBrushUndo(m_tileSet, simLevel.getPointer(),
+															frameId, m_isFrameCreated, ras,
+															m_strokeRect.getP00()));
 	}
 
 	notifyImageChanged();
@@ -461,7 +468,9 @@ void FullColorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 	} locals = {this};
 
 	switch (e.getModifiersMask()) {
-	/*-- Altキー+マウス移動で、ブラシサイズ（Min/Maxとも）を変える（CtrlやShiftでは誤操作の恐れがある） --*/
+	/*--
+	 * Altキー+マウス移動で、ブラシサイズ（Min/Maxとも）を変える（CtrlやShiftでは誤操作の恐れがある）
+	 * --*/
 	case TMouseEvent::ALT_KEY: {
 		// User wants to alter the minimum brush size
 		const TPointD &diff = pos - m_mousePos;
@@ -577,13 +586,14 @@ bool FullColorBrushTool::onPropertyChanged(std::string propertyName)
 	m_minThick = m_thickness.getValue().first;
 	m_maxThick = m_thickness.getValue().second;
 	if (propertyName == "Hardness:" || propertyName == "Thickness") {
-		m_brushPad = ToolUtils::getBrushPad(m_thickness.getValue().second, m_hardness.getValue() * 0.01);
+		m_brushPad =
+			ToolUtils::getBrushPad(m_thickness.getValue().second, m_hardness.getValue() * 0.01);
 		TRectD rect(m_brushPos - TPointD(m_maxThick + 2, m_maxThick + 2),
 					m_brushPos + TPointD(m_maxThick + 2, m_maxThick + 2));
 		invalidate(rect);
 	}
 	/*if(propertyName == "Hardness:" || propertyName == "Opacity:")
-    setWorkAndBackupImages();*/
+	setWorkAndBackupImages();*/
 	FullcolorBrushMinSize = m_minThick;
 	FullcolorBrushMaxSize = m_maxThick;
 	FullcolorPressureSensibility = m_pressure.getValue();
@@ -610,12 +620,12 @@ bool FullColorBrushTool::onPropertyChanged(std::string propertyName)
 void FullColorBrushTool::initPresets()
 {
 	if (!m_presetsLoaded) {
-		//If necessary, load the presets from file
+		// If necessary, load the presets from file
 		m_presetsLoaded = true;
 		m_presetsManager.load(TEnv::getConfigDir() + "brush_raster.txt");
 	}
 
-	//Rebuild the presets property entries
+	// Rebuild the presets property entries
 	const std::set<BrushData> &presets = m_presetsManager.presets();
 
 	m_preset.deleteAllValues();
@@ -639,7 +649,7 @@ void FullColorBrushTool::loadPreset()
 
 	const BrushData &preset = *it;
 
-	try //Don't bother with RangeErrors
+	try // Don't bother with RangeErrors
 	{
 		m_thickness.setValue(TIntPairProperty::Value(tmax((int)preset.m_min, 1), preset.m_max));
 		m_brushPad = ToolUtils::getBrushPad(preset.m_max, preset.m_hardness * 0.01);
@@ -654,7 +664,7 @@ void FullColorBrushTool::loadPreset()
 
 void FullColorBrushTool::addPreset(QString name)
 {
-	//Build the preset
+	// Build the preset
 	BrushData preset(name.toStdWString());
 
 	preset.m_min = m_thickness.getValue().first;
@@ -664,13 +674,13 @@ void FullColorBrushTool::addPreset(QString name)
 	preset.m_opacityMax = m_opacity.getValue().second;
 	preset.m_pressure = m_pressure.getValue();
 
-	//Pass the preset to the manager
+	// Pass the preset to the manager
 	m_presetsManager.addPreset(preset);
 
-	//Reinitialize the associated preset enum
+	// Reinitialize the associated preset enum
 	initPresets();
 
-	//Set the value to the specified one
+	// Set the value to the specified one
 	m_preset.setValue(preset.m_name);
 }
 
@@ -685,14 +695,13 @@ void FullColorBrushTool::removePreset()
 	m_presetsManager.removePreset(name);
 	initPresets();
 
-	//No parameter change, and set the preset value to custom
+	// No parameter change, and set the preset value to custom
 	m_preset.setValue(CUSTOM_WSTR);
 }
 
 //==========================================================================================================
 
-FullColorBrushToolNotifier::FullColorBrushToolNotifier(FullColorBrushTool *tool)
-	: m_tool(tool)
+FullColorBrushToolNotifier::FullColorBrushToolNotifier(FullColorBrushTool *tool) : m_tool(tool)
 {
 	TTool::Application *app = m_tool->getApplication();
 	TXshLevelHandle *levelHandle;
@@ -700,7 +709,8 @@ FullColorBrushToolNotifier::FullColorBrushToolNotifier(FullColorBrushTool *tool)
 		levelHandle = app->getCurrentLevel();
 	bool ret = false;
 	if (levelHandle) {
-		bool ret = connect(levelHandle, SIGNAL(xshCanvasSizeChanged()), this, SLOT(onCanvasSizeChanged()));
+		bool ret =
+			connect(levelHandle, SIGNAL(xshCanvasSizeChanged()), this, SLOT(onCanvasSizeChanged()));
 		assert(ret);
 	}
 }

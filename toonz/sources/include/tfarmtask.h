@@ -26,25 +26,11 @@
 
 const int cPortNumber = 51005;
 
-enum TaskState {
-	Suspended,
-	Waiting,
-	Running,
-	Completed,
-	Aborted,
-	TaskUnknown
-};
+enum TaskState { Suspended, Waiting, Running, Completed, Aborted, TaskUnknown };
 
-enum FrameState {
-	FrameDone,
-	FrameFailed
-};
+enum FrameState { FrameDone, FrameFailed };
 
-enum OverwriteBehavior {
-	Overwrite_All = 0,
-	Overwrite_NoPaint,
-	Overwrite_Off
-};
+enum OverwriteBehavior { Overwrite_All = 0, Overwrite_NoPaint, Overwrite_Off };
 
 #define RENDER_LICENSE_NOT_FOUND 888
 
@@ -52,12 +38,12 @@ enum OverwriteBehavior {
 
 class TFARMAPI TFarmTask : public TPersist
 {
-public:
+  public:
 	typedef QString Id;
 
 	class TFARMAPI Dependencies
 	{
-	public:
+	  public:
 		Dependencies();
 		~Dependencies();
 
@@ -73,12 +59,12 @@ public:
 		int getTaskCount() const;
 		QString getTaskId(int i) const;
 
-	private:
+	  private:
 		class Data;
 		Data *m_data;
 	};
 
-public:
+  public:
 	Id m_id;	   //!< Internal task identifier
 	Id m_parentId; //!< Task id of the parent task (if any)
 
@@ -119,20 +105,17 @@ public:
 
 	Dependencies *m_dependencies;
 
-public:
+  public:
 	TFarmTask(const QString &name = "");
 
-	TFarmTask(const QString &id, const QString &name, const QString &cmdline,
-			  const QString &user, const QString &host, int stepCount, int priority);
+	TFarmTask(const QString &id, const QString &name, const QString &cmdline, const QString &user,
+			  const QString &host, int stepCount, int priority);
 
-	TFarmTask(
-		const QString &id, const QString &name, bool composerTask,
-		const QString &user, const QString &host,
-		int stepCount, int priority, const TFilePath &taskFilePath,
-		const TFilePath &outputPath,
-		int from, int to, int step, int shrink, int multimedia, int chunksize,
-		int threadsIndex, int maxTileSizeIndex,
-		OverwriteBehavior overwrite, bool onlyvisible);
+	TFarmTask(const QString &id, const QString &name, bool composerTask, const QString &user,
+			  const QString &host, int stepCount, int priority, const TFilePath &taskFilePath,
+			  const TFilePath &outputPath, int from, int to, int step, int shrink, int multimedia,
+			  int chunksize, int threadsIndex, int maxTileSizeIndex, OverwriteBehavior overwrite,
+			  bool onlyvisible);
 
 	virtual ~TFarmTask() { delete m_dependencies; }
 
@@ -158,22 +141,17 @@ public:
 
 class TFARMAPI TFarmTaskGroup : public TFarmTask
 {
-public:
+  public:
 	TFarmTaskGroup();
 
-	TFarmTaskGroup(
-		const QString &id, const QString &name,
-		const QString &user,
-		const QString &host, int stepCount, int priority, const TFilePath &taskFilePath,
-		const TFilePath &outputPath,
-		int from, int to, int step, int shrink, int multimedia, int chunksize,
-		int threadsIndex, int maxTileSizeIndex);
+	TFarmTaskGroup(const QString &id, const QString &name, const QString &user, const QString &host,
+				   int stepCount, int priority, const TFilePath &taskFilePath,
+				   const TFilePath &outputPath, int from, int to, int step, int shrink,
+				   int multimedia, int chunksize, int threadsIndex, int maxTileSizeIndex);
 
-	TFarmTaskGroup(
-		const QString &id, const QString &name,
-		const QString &user,
-		const QString &host, int stepCount, int priority, const TFilePath &taskFilePath,
-		OverwriteBehavior overwrite, bool onlyvisible);
+	TFarmTaskGroup(const QString &id, const QString &name, const QString &user, const QString &host,
+				   int stepCount, int priority, const TFilePath &taskFilePath,
+				   OverwriteBehavior overwrite, bool onlyvisible);
 
 	TFarmTaskGroup(const QString &id, const QString &name, const QString &cmdline,
 				   const QString &user, const QString &host, int stepCount, int priority);
@@ -194,7 +172,7 @@ public:
 	void saveData(TOStream &os);
 	const TPersistDeclaration *getDeclaration() const;
 
-private:
+  private:
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 };

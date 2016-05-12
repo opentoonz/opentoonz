@@ -56,18 +56,19 @@ class SVNUpdateDialog : public DVGui::Dialog
 	// If there is some missing .tnz files don't display "Get Scene Contents" checkbox.
 	bool m_someSceneIsMissing;
 
-private:
+  private:
 	void updateFiles();
 
 	void checkFiles();
 
 	void switchToCloseButton();
 
-public:
-	SVNUpdateDialog(QWidget *parent, const QString &workingDir,
-					const QStringList &filesToUpdate, int sceneIconsCount, bool isFolderOnly, bool updateToRevision, bool nonRecursive);
+  public:
+	SVNUpdateDialog(QWidget *parent, const QString &workingDir, const QStringList &filesToUpdate,
+					int sceneIconsCount, bool isFolderOnly, bool updateToRevision,
+					bool nonRecursive);
 
-protected slots:
+  protected slots:
 
 	void onError(const QString &);
 
@@ -89,7 +90,7 @@ protected slots:
 
 	void onUpdateSceneContentsToggled(bool);
 
-signals:
+  signals:
 	void done(const QStringList &);
 };
 

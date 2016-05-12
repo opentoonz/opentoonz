@@ -17,7 +17,7 @@
 #endif
 
 //=============================================================================
-//!The TXshCell class provides a cell of xsheet, this structure contains a level frame.
+//! The TXshCell class provides a cell of xsheet, this structure contains a level frame.
 /*!TXshCell is composed by a pointer to level \b TXshLevelP and a \b TFrameId that
    identifies right frame in level.
 
@@ -32,30 +32,31 @@
 
 class DVAPI TXshCell
 {
-public:
+  public:
 	TXshLevelP m_level;
 	TFrameId m_frameId;
 
 	/*!
-    Constructs TXshCell with default value.
+	Constructs TXshCell with default value.
   */
 	TXshCell() : m_level(), m_frameId() {}
 
 	/*!
-    Constructs a TXshCell with simple level \a level,
-    and a frame identification \a frameId
+	Constructs a TXshCell with simple level \a level,
+	and a frame identification \a frameId
   */
-	TXshCell(const TXshLevelP &level, const TFrameId &frameId)
-		: m_level(level), m_frameId(frameId) {}
+	TXshCell(const TXshLevelP &level, const TFrameId &frameId) : m_level(level), m_frameId(frameId)
+	{
+	}
 
 	/*!
-    Destroys the TLevelSet object.
+	Destroys the TLevelSet object.
   */
 	~TXshCell() {}
 
 	/*!
-    Returns true if cell \a c and this cell have the same simple level
-    and the same frameId; otherwise returns false.
+	Returns true if cell \a c and this cell have the same simple level
+	and the same frameId; otherwise returns false.
   */
 	bool operator==(const TXshCell &c) const
 	{
@@ -63,8 +64,8 @@ public:
 	}
 
 	/*!
-    Returns true if cell \a c and this cell have different simple level
-    or different frameId; otherwise returns false.
+	Returns true if cell \a c and this cell have different simple level
+	or different frameId; otherwise returns false.
   */
 	bool operator!=(const TXshCell &c) const
 	{
@@ -72,54 +73,54 @@ public:
 	}
 
 	/*!
-    Returns true if level is equal to zero.
+	Returns true if level is equal to zero.
   */
 	bool isEmpty() const { return !m_level; }
 
 	/*!
-    Returns the \b TImageP in the current cell.
+	Returns the \b TImageP in the current cell.
   \n
-    If bool \b toBeModified is true the image can be modified.
+	If bool \b toBeModified is true the image can be modified.
   */
 	TImageP getImage(bool toBeModified, int subsampling = 0) const;
 
 	/*!
-    Returns the \b TXshSimpleLevel to which cell belongs.
+	Returns the \b TXshSimpleLevel to which cell belongs.
   */
 	TXshSimpleLevel *getSimpleLevel() const;
 
 	/*!
-    Return the \b TXshSoundLevel to which cell belongs.
+	Return the \b TXshSoundLevel to which cell belongs.
   */
 	TXshSoundLevel *getSoundLevel() const;
 
 	/*!
-    Return the \b TXshSoundTextLevel to which cell belongs.
+	Return the \b TXshSoundTextLevel to which cell belongs.
   */
 	TXshSoundTextLevel *getSoundTextLevel() const;
 
 	/*!
-    Return the \b TXshZeraryFxLevel to which cell belongs.
+	Return the \b TXshZeraryFxLevel to which cell belongs.
   */
 	TXshZeraryFxLevel *getZeraryFxLevel() const;
 
 	/*!
-    Return the \b TXshPaletteLevel to which cell belongs.
+	Return the \b TXshPaletteLevel to which cell belongs.
   */
 	TXshPaletteLevel *getPaletteLevel() const;
 
 	/*!
-    Return the \b TXshChildLevel to which cell belongs.
+	Return the \b TXshChildLevel to which cell belongs.
   */
 	TXshChildLevel *getChildLevel() const;
 
 	/*!
-    Returns the \b TFrameId correspondent to cell.
+	Returns the \b TFrameId correspondent to cell.
   */
 	TFrameId getFrameId() const { return m_frameId; }
 
 	/*!
-    Returns the TPalette associated with current cell, if any.
+	Returns the TPalette associated with current cell, if any.
   */
 	TPalette *getPalette() const;
 };

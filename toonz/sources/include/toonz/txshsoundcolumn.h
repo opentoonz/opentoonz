@@ -21,12 +21,13 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TFilePath;
 class ColumnLevel;
 
 //=============================================================================
-//!The TXshSoundColumn class provides a sound column in xsheet and allows its management through cell concept.
+//! The TXshSoundColumn class provides a sound column in xsheet and allows its management through
+//! cell concept.
 /*!Inherits \b TXshCellColumn. */
 //=============================================================================
 
@@ -48,7 +49,7 @@ class DVAPI TXshSoundColumn : public QObject, public TXshCellColumn
 
 	QTimer m_timer;
 
-public:
+  public:
 	TXshSoundColumn();
 	~TXshSoundColumn();
 
@@ -86,19 +87,21 @@ public:
 	void clearCells(int row, int rowCount);
 	void removeCells(int row, int rowCount);
 
-	/*! Check if frames from \b row to \b row+rowCount are in sequence and collapse level if it is true. */
+	/*! Check if frames from \b row to \b row+rowCount are in sequence and collapse level if it is
+	 * true. */
 	void updateCells(int row, int rowCount);
 
 	/*! Modify range of level sound in row. Return new range value of the level in row.
-      N.B. Row must be the first or last cell of a sound level. */
+	  N.B. Row must be the first or last cell of a sound level. */
 	int modifyCellRange(int row, int delta, bool modifyStartValue);
 
 	bool isCellEmpty(int row) const;
 	/*! r0 : min row not empty of level in row, r1 : max row not empty of level in row.
-      Return true if level range is not empty.*/
+	  Return true if level range is not empty.*/
 	bool getLevelRange(int row, int &r0, int &r1) const;
-	/*! r0 : min possible (without offset) row of level in row, r1 : max possible (without offset) row of level in row.
-      Return true if level range is not empty.*/
+	/*! r0 : min possible (without offset) row of level in row, r1 : max possible (without offset)
+	  row of level in row.
+	  Return true if level range is not empty.*/
 	bool getLevelRangeWithoutOffset(int row, int &r0, int &r1) const;
 
 	/*! Only debug. */
@@ -117,7 +120,7 @@ public:
 	//! s0 and s1 are samples
 	void play(TSoundTrackP soundtrack, int s0, int s1, bool loop);
 	/*! Play the whole soundSequence, currentFrame it is used to compute an offset
-      when the user play a single level and hence the audio behind..*/
+	  when the user play a single level and hence the audio behind..*/
 	void play(ColumnLevel *ss, int currentFrame);
 	void play(int currentFrame = 0);
 	void stop();
@@ -126,17 +129,20 @@ public:
 
 	void scrub(int fromFrame, int toFrame);
 
-	TSoundTrackP getOverallSoundTrack(int fromFrame = -1, int toFram = -1, double fps = -1, TSoundTrackFormat format = TSoundTrackFormat());
+	TSoundTrackP getOverallSoundTrack(int fromFrame = -1, int toFram = -1, double fps = -1,
+									  TSoundTrackFormat format = TSoundTrackFormat());
 
-	TSoundTrackP mixingTogether(const std::vector<TXshSoundColumn *> &vect, int fromFrame = -1, int toFram = -1, double fps = -1);
+	TSoundTrackP mixingTogether(const std::vector<TXshSoundColumn *> &vect, int fromFrame = -1,
+								int toFram = -1, double fps = -1);
 
-protected:
+  protected:
 	bool setCell(int row, const TXshCell &cell, bool updateSequence);
 	void removeCells(int row, int rowCount, bool shift);
 
 	void setCellInEmptyFrame(int row, const TXshCell &cell);
 
-	/*! If index == -1 insert soundColumnLevel at last and than order soundColumnLevel by startFrame. */
+	/*! If index == -1 insert soundColumnLevel at last and than order soundColumnLevel by
+	 * startFrame. */
 	void insertColumnLevel(ColumnLevel *columnLevel, int index = -1);
 	void removeColumnLevel(ColumnLevel *columnLevel);
 
@@ -145,7 +151,7 @@ protected:
 	int getColumnLevelIndex(ColumnLevel *ss) const;
 	void clear();
 
-protected slots:
+  protected slots:
 	void onTimerOut();
 };
 

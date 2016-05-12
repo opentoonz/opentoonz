@@ -47,18 +47,20 @@ class FileBrowserPopup : public QDialog
 {
 	Q_OBJECT
 
-public:
-	enum Options //! Various options used to customize the popup's behavior.
-	{
-		STANDARD = 0x0,			//!< Standard options.
-		CUSTOM_LAYOUT = 0x1,	//!< Prevents standard layout organization at construction, surrendering it
-								//!  to the user. Observe that sub-widgets creation is still enforced.
-		MULTISELECTION = 0x2,   //!< Enable multiple selection in the browser widget.
-		WITH_APPLY_BUTTON = 0x4 //!< Enable if the filebrowser has an apply button next to the OK button
+  public:
+	enum Options	  //! Various options used to customize the popup's behavior.
+	{ STANDARD = 0x0, //!< Standard options.
+	  CUSTOM_LAYOUT =
+		  0x1, //!< Prevents standard layout organization at construction, surrendering it
+			   //!  to the user. Observe that sub-widgets creation is still enforced.
+	  MULTISELECTION = 0x2, //!< Enable multiple selection in the browser widget.
+	  WITH_APPLY_BUTTON =
+		  0x4 //!< Enable if the filebrowser has an apply button next to the OK button
 	};
 
-public:
-	FileBrowserPopup(const QString &windowTitle, Options options = STANDARD, QString applyButtonTxt = "", QWidget *customWidget = 0);
+  public:
+	FileBrowserPopup(const QString &windowTitle, Options options = STANDARD,
+					 QString applyButtonTxt = "", QWidget *customWidget = 0);
 	virtual ~FileBrowserPopup() {}
 
 	void setOkText(const QString &text);
@@ -71,16 +73,16 @@ public:
 
 	virtual void initFolder() {}
 
-signals:
+  signals:
 
 	void filePathClicked(const TFilePath &);
 
-public slots:
+  public slots:
 
 	void onOkPressed();
 	void onApplyPressed();
 
-protected:
+  protected:
 	std::set<TFilePath> m_selectedPaths; //!< Paths in the active selection.
 	TFilePath m_currentProjectPath;		 //!< Path of current project.
 										 //!  \deprecated  Should not be cached...
@@ -91,16 +93,15 @@ protected:
 	QLabel *m_nameFieldLabel;
 	DVGui::LineEdit *m_nameField;
 
-	//QLabel*               m_fromFrameLabel;
-	//LineEdit*	            m_fromFrame;
-	//QLabel*               m_toFrameLabel;
-	//LineEdit*             m_toFrame;
+	// QLabel*               m_fromFrameLabel;
+	// LineEdit*	            m_fromFrame;
+	// QLabel*               m_toFrameLabel;
+	// LineEdit*             m_toFrame;
 
-	QPushButton *m_okButton,
-		*m_cancelButton;
+	QPushButton *m_okButton, *m_cancelButton;
 
 	bool m_isDirectoryOnly;
-	//bool                  m_checkFrameRange;
+	// bool                  m_checkFrameRange;
 	bool m_multiSelectionEnabled;
 
 	QSize m_dialogSize;
@@ -113,10 +114,7 @@ protected:
 		else
 			return *m_selectedPaths.begin();
 	}
-	std::set<TFilePath> getCurrentPathSet()
-	{
-		return m_selectedPaths;
-	}
+	std::set<TFilePath> getCurrentPathSet() { return m_selectedPaths; }
 
 	std::vector<TFrameId> getCurrentFIds()
 	{
@@ -127,31 +125,26 @@ protected:
 		else
 			return *m_currentFIdsSet.begin();
 	}
-	std::list<std::vector<TFrameId>> getCurrentFIdsSet()
-	{
-		return m_currentFIdsSet;
-	}
+	std::list<std::vector<TFrameId>> getCurrentFIdsSet() { return m_currentFIdsSet; }
 
-protected:
+  protected:
 	/*!
-    Performs some action on m_paths and returns whether the action was
-    successful (accepted) - in which case the popup closes.
+	Performs some action on m_paths and returns whether the action was
+	successful (accepted) - in which case the popup closes.
   */
 	virtual bool execute() = 0;
 
 	// change the "Apply" button for the browser in flipbook to "Append"
-	virtual bool executeApply()
-	{
-		return execute();
-	}
+	virtual bool executeApply() { return execute(); }
 
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-protected slots:
+  protected slots:
 
 	void onFilePathClicked(const TFilePath &);
-	virtual void onFilePathsSelected(const std::set<TFilePath> &paths, const std::list<std::vector<TFrameId>> &fIds);
+	virtual void onFilePathsSelected(const std::set<TFilePath> &paths,
+									 const std::list<std::vector<TFrameId>> &fIds);
 };
 
 //********************************************************************************
@@ -162,17 +155,17 @@ protected slots:
 //! asks the user for \a single file to be loaded from disk.
 class GenericLoadFilePopup : public FileBrowserPopup
 {
-public:
+  public:
 	GenericLoadFilePopup(const QString &title);
 
 	/*!
-    This function shows the popup and blocks until an \a existing
-    file has been selected - if the returned path is empty, the action
-    was explicitly aborted by the user.
+	This function shows the popup and blocks until an \a existing
+	file has been selected - if the returned path is empty, the action
+	was explicitly aborted by the user.
   */
 	TFilePath getPath();
 
-protected:
+  protected:
 	bool execute();
 };
 
@@ -182,20 +175,20 @@ protected:
 //! asks the user for a \a single file path to save something to.
 class GenericSaveFilePopup : public FileBrowserPopup
 {
-public:
+  public:
 	GenericSaveFilePopup(const QString &title);
 
 	/*!
-    This function shows the popup and blocks until a suitable
-    path has been selected - if the returned path is empty, the
-    action was explicitly aborted by the user.
+	This function shows the popup and blocks until a suitable
+	path has been selected - if the returned path is empty, the
+	action was explicitly aborted by the user.
 
-    \note The popup \a does ask for user consent to overwrite existing
-          files.
+	\note The popup \a does ask for user consent to overwrite existing
+		  files.
   */
 	TFilePath getPath();
 
-protected:
+  protected:
 	bool execute();
 };
 
@@ -205,7 +198,7 @@ class LoadScenePopup : public FileBrowserPopup
 {
 	Q_OBJECT
 
-public:
+  public:
 	LoadScenePopup();
 
 	bool execute();
@@ -214,7 +207,7 @@ public:
 	// change the initial path according to the current room
 	void setInitialFolderByCurrentRoom();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 };
 
@@ -224,13 +217,13 @@ class LoadSubScenePopup : public FileBrowserPopup
 {
 	Q_OBJECT
 
-public:
+  public:
 	LoadSubScenePopup();
 
 	bool execute();
 	void initFolder();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 };
 
@@ -240,12 +233,11 @@ class SaveSceneAsPopup : public FileBrowserPopup
 {
 	Q_OBJECT
 
-public:
+  public:
 	SaveSceneAsPopup();
 
 	bool execute();
 	void initFolder();
-
 };
 
 //-----------------------------------------------------------------------------
@@ -254,7 +246,7 @@ class SaveSubSceneAsPopup : public FileBrowserPopup
 {
 	Q_OBJECT
 
-public:
+  public:
 	SaveSubSceneAsPopup();
 
 	bool execute();
@@ -283,35 +275,36 @@ class LoadLevelPopup : public FileBrowserPopup
 	QLabel *m_notExistLabel;
 	QComboBox *m_loadTlvBehaviorComboBox;
 
-public:
+  public:
 	LoadLevelPopup();
 
 	bool execute();
 	void initFolder();
 
-protected:
-	//reflect the current frame to GUI
+  protected:
+	// reflect the current frame to GUI
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-public slots:
-	void onFilePathsSelected(const std::set<TFilePath> &paths, const std::list<std::vector<TFrameId>> &fIds);
-	//if the frame switched, then move m_posFrom
+  public slots:
+	void onFilePathsSelected(const std::set<TFilePath> &paths,
+							 const std::list<std::vector<TFrameId>> &fIds);
+	// if the frame switched, then move m_posFrom
 	void onFrameSwitched();
-	//if the from/to values in the subsequent box are changed, then reflect them to m_xFrom/m_xTo
+	// if the from/to values in the subsequent box are changed, then reflect them to m_xFrom/m_xTo
 	void onSubsequentFrameChanged();
-	//update m_posTo
+	// update m_posTo
 	void updatePosTo();
-	//called when the file name is typed directly
+	// called when the file name is typed directly
 	void onNameSetEditted(void);
-	//if the x-sheet cells are selected, load levels at the upper-left corner of the selection
+	// if the x-sheet cells are selected, load levels at the upper-left corner of the selection
 	void onSelectionChanged(TSelection *selection);
 
-private:
-	//update the fields acording to the current Path
+  private:
+	// update the fields acording to the current Path
 	void updateBottomGUI(void);
-	//if some option in the preferences is selected, load the level with removing
-	//six letters of the scene name from the level name
+	// if some option in the preferences is selected, load the level with removing
+	// six letters of the scene name from the level name
 	QString getLevelNameWithoutSceneNumber(std::string orgName);
 };
 
@@ -321,12 +314,11 @@ class SaveLevelAsPopup : public FileBrowserPopup
 {
 	Q_OBJECT
 
-public:
+  public:
 	SaveLevelAsPopup();
 
 	bool execute();
 	void initFolder();
-
 };
 
 //-----------------------------------------------------------------------------
@@ -339,7 +331,7 @@ class ReplaceLevelPopup : public FileBrowserPopup
 	bool m_replaceCells; // true : cell selection, false : column selection
 	std::set<int> m_columnRange;
 
-public:
+  public:
 	ReplaceLevelPopup();
 
 	bool execute();
@@ -347,7 +339,7 @@ public:
 
 	void initFolder();
 
-protected slots:
+  protected slots:
 	void onSelectionChanged(TSelection *selection);
 };
 
@@ -357,7 +349,7 @@ class SavePaletteAsPopup : public FileBrowserPopup
 {
 	Q_OBJECT
 
-public:
+  public:
 	SavePaletteAsPopup();
 
 	bool execute();
@@ -372,15 +364,15 @@ class LoadColorModelPopup : public FileBrowserPopup
 
 	DVGui::LineEdit *m_paletteFrame;
 
-public:
+  public:
 	LoadColorModelPopup();
 
 	bool execute();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 
-protected slots:
+  protected slots:
 
 	void onFilePathsSelected(const std::set<TFilePath> &paths);
 };
@@ -391,13 +383,13 @@ class ImportMagpieFilePopup : public FileBrowserPopup
 {
 	Q_OBJECT
 
-public:
+  public:
 	ImportMagpieFilePopup();
 
 	bool execute();
 	void initFolder();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 };
 
@@ -411,7 +403,7 @@ class ReplaceParentDirectoryPopup : public FileBrowserPopup
 	bool m_replaceCells; // true : cell selection, false : column selection
 	std::set<int> m_columnRange;
 
-public:
+  public:
 	ReplaceParentDirectoryPopup();
 	void show();
 	bool execute();
@@ -426,7 +418,7 @@ class BrowserPopup : public FileBrowserPopup
 
 	TFilePath m_path;
 
-public:
+  public:
 	BrowserPopup();
 
 	const TFilePath &getPath() { return m_path; }
@@ -444,7 +436,7 @@ class BrowserPopupController : public QObject, public DVGui::FileField::BrowserP
 	BrowserPopup *m_browserPopup;
 	bool m_isExecute;
 
-public:
+  public:
 	BrowserPopupController();
 
 	bool isExecute() { return m_isExecute; }
@@ -452,4 +444,4 @@ public:
 	QString getPath();
 };
 
-#endif //FILEBROWSERPOPUP_H
+#endif // FILEBROWSERPOPUP_H

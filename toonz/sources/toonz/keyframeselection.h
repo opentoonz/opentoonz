@@ -13,26 +13,24 @@
 class TKeyframeSelection : public TSelection
 {
 
-public:
+  public:
 	typedef std::pair<int, int> Position; // row, col
 
-public:
+  public:
 	std::set<Position> m_positions;
 
-	TKeyframeSelection(std::set<Position> positions)
-		: m_positions(positions) {}
+	TKeyframeSelection(std::set<Position> positions) : m_positions(positions) {}
 
 	TKeyframeSelection() {}
 
 	void enableCommands();
-/* FIXME: clang でテンポラリオブジェクトをアドレッシングしたとエラーになっていたので参照を返すようにしたが、元の意図が不明なので注意 */
+/* FIXME: clang
+ * でテンポラリオブジェクトをアドレッシングしたとエラーになっていたので参照を返すようにしたが、元の意図が不明なので注意
+ */
 #if 0
   std::set<Position> getSelection(){ return m_positions; }
 #else
-	std::set<Position> &getSelection()
-	{
-		return m_positions;
-	}
+	std::set<Position> &getSelection() { return m_positions; }
 #endif
 	void select(std::set<Position> positions)
 	{
@@ -42,40 +40,22 @@ public:
 			select(it->first, it->second);
 	}
 
-	void clear()
-	{
-		m_positions.clear();
-	}
+	void clear() { m_positions.clear(); }
 
-	void selectNone()
-	{
-		m_positions.clear();
-	}
+	void selectNone() { m_positions.clear(); }
 
-	void select(int row, int col)
-	{
-		m_positions.insert(std::make_pair(row, col));
-	}
+	void select(int row, int col) { m_positions.insert(std::make_pair(row, col)); }
 
-	void unselect(int row, int col)
-	{
-		m_positions.erase(std::make_pair(row, col));
-	}
+	void unselect(int row, int col) { m_positions.erase(std::make_pair(row, col)); }
 
 	bool isSelected(int row, int col) const
 	{
 		return m_positions.find(std::make_pair(row, col)) != m_positions.end();
 	}
 
-	bool isEmpty() const
-	{
-		return m_positions.empty();
-	}
+	bool isEmpty() const { return m_positions.empty(); }
 
-	TSelection *clone() const
-	{
-		return new TKeyframeSelection(m_positions);
-	}
+	TSelection *clone() const { return new TKeyframeSelection(m_positions); }
 
 	int getFirstRow() const;
 
@@ -93,4 +73,4 @@ public:
 	void deleteKeyframesWithShift(int r0, int r1, int c0, int c1);
 };
 
-#endif //TKEYFRAMESELECTION_H
+#endif // TKEYFRAMESELECTION_H

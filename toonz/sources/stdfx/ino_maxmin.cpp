@@ -22,7 +22,7 @@ class ino_maxmin : public TStandardRasterFx
 
 	TIntEnumParamP m_ref_mode;
 
-public:
+  public:
 	ino_maxmin()
 		: m_max_min_select(new TIntEnumParam(0, "Max")), m_radius(1.0)
 		  /*	1mmにしたければ 1.0 * 640. / 12. / 25.4 とする
@@ -45,17 +45,14 @@ public:
 		bindParam(this, "radius", this->m_radius);
 		bindParam(this, "polygon_number", this->m_polygon_number);
 		bindParam(this, "degree", this->m_degree);
-		bindParam(this, "alpha_rendering",
-				  this->m_alpha_rendering);
+		bindParam(this, "alpha_rendering", this->m_alpha_rendering);
 
 		bindParam(this, "reference", this->m_ref_mode);
 
 		this->m_max_min_select->addItem(1, "Min");
 		this->m_radius->setValueRange(0.0, 100.0);
 		this->m_polygon_number->setValueRange(2.0, 16.0);
-		this->m_degree->setValueRange(
-			0.0,
-			std::numeric_limits<double>::max());
+		this->m_degree->setValueRange(0.0, std::numeric_limits<double>::max());
 
 		this->m_ref_mode->addItem(0, "Red");
 		this->m_ref_mode->addItem(1, "Green");
@@ -70,8 +67,8 @@ public:
 	{
 		if (this->m_input.isConnected()) {
 			const bool ret = this->m_input->doGetBBox(frame, bBox, info);
-			const double margin = ceil(
-				ino::pixel_per_mm() * (this->m_radius->getValue(frame) + smoothing_edge_));
+			const double margin =
+				ceil(ino::pixel_per_mm() * (this->m_radius->getValue(frame) + smoothing_edge_));
 			if (0.0 < margin) {
 				bBox = bBox.enlarge(margin);
 			}
@@ -81,77 +78,69 @@ public:
 			return false;
 		}
 	}
-	bool canHandle(const TRenderSettings &info, double frame)
+	bool canHandle(const TRenderSettings &info, double frame) { return true; }
+	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
 	{
-		return true;
+		const double radius = (this->m_radius->getValue(frame) + smoothing_edge_) *
+							  ino::pixel_per_mm() * sqrt(fabs(info.m_affine.det())) /
+							  ((info.m_shrinkX + info.m_shrinkY) / 2.0);
+		return TRasterFx::memorySize(rect.enlarge(ceil(radius) + 0.5), info.m_bpp);
 	}
-	int getMemoryRequirement(
-		const TRectD &rect, double frame, const TRenderSettings &info)
-	{
-		const double radius =
-			(this->m_radius->getValue(frame) + smoothing_edge_) * ino::pixel_per_mm() * sqrt(fabs(info.m_affine.det())) / ((info.m_shrinkX + info.m_shrinkY) / 2.0);
-		return TRasterFx::memorySize(
-			rect.enlarge(ceil(radius) + 0.5), info.m_bpp);
-	}
-	void doCompute(
-		TTile &tile, double frame, const TRenderSettings &rend_sets);
+	void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
 };
 FX_PLUGIN_IDENTIFIER(ino_maxmin, "inoMaxMinFx");
 //------------------------------------------------------------
 #include "igs_maxmin.h"
 namespace
 {
-void fx_(
-	const TRasterP in_ras // with margin
-	,
-	const int margin, TRasterP out_ras // no margin
+void fx_(const TRasterP in_ras // with margin
+		 ,
+		 const int margin, TRasterP out_ras // no margin
 
-	,
-	const TRasterP refer_ras, const int ref_mode
+		 ,
+		 const TRasterP refer_ras, const int ref_mode
 
-	,
-	const int min_sw, const double radius, const double smoothing_edge, const int npolygon, const double degree, const bool alp_rend_sw
+		 ,
+		 const int min_sw, const double radius, const double smoothing_edge, const int npolygon,
+		 const double degree, const bool alp_rend_sw
 
-	,
-	const int nthread)
+		 ,
+		 const int nthread)
 {
-	TRasterGR8P out_gr8(
-		in_ras->getLy(), in_ras->getLx() * ino::channels() *
-							 ((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
+	TRasterGR8P out_gr8(in_ras->getLy(),
+						in_ras->getLx() * ino::channels() *
+							((TRaster64P)in_ras ? sizeof(unsigned short) : sizeof(unsigned char)));
 	out_gr8->lock();
 
-	igs::maxmin::convert(
-		in_ras->getRawData() // BGRA
-		,
-		out_gr8->getRawData()
+	igs::maxmin::convert(in_ras->getRawData() // BGRA
+						 ,
+						 out_gr8->getRawData()
 
-			,
-		in_ras->getLy(), in_ras->getLx(), ino::channels(), ino::bits(in_ras)
+							 ,
+						 in_ras->getLy(), in_ras->getLx(), ino::channels(), ino::bits(in_ras)
 
-															   ,
-		(((0 <= ref_mode) && refer_ras) ? refer_ras->getRawData() : 0) // BGRA
-		,
-		(((0 <= ref_mode) && refer_ras) ? ino::bits(refer_ras) : 0), ref_mode
+																				,
+						 (((0 <= ref_mode) && refer_ras) ? refer_ras->getRawData() : 0) // BGRA
+						 ,
+						 (((0 <= ref_mode) && refer_ras) ? ino::bits(refer_ras) : 0), ref_mode
 
-		,
-		radius, smoothing_edge // smooth_outer_range
-		,
-		npolygon, degree + 180.0
+						 ,
+						 radius, smoothing_edge // smooth_outer_range
+						 ,
+						 npolygon, degree + 180.0
 
-		,
-		min_sw, alp_rend_sw, false
+						 ,
+						 min_sw, alp_rend_sw, false
 
-		,
-		nthread);
+						 ,
+						 nthread);
 
-	ino::arr_to_ras(
-		out_gr8->getRawData(), ino::channels(), out_ras, margin);
+	ino::arr_to_ras(out_gr8->getRawData(), ino::channels(), out_ras, margin);
 	out_gr8->unlock();
 }
 }
 //------------------------------------------------------------
-void ino_maxmin::doCompute(
-	TTile &tile, double frame, const TRenderSettings &rend_sets)
+void ino_maxmin::doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets)
 {
 	/* ------ 接続していなければ処理しない -------------------- */
 	if (!this->m_input.isConnected()) {
@@ -160,19 +149,18 @@ void ino_maxmin::doCompute(
 	}
 
 	/* ------ サポートしていないPixelタイプはエラーを投げる --- */
-	if (!((TRaster32P)tile.getRaster()) &&
-		!((TRaster64P)tile.getRaster())) {
+	if (!((TRaster32P)tile.getRaster()) && !((TRaster64P)tile.getRaster())) {
 		throw TRopException("unsupported input pixel type");
 	}
 
 	/* ------ Pixel単位で動作パラメータを得る ----------------- */
-	const double mm2scale_shrink_pixel =
-		ino::pixel_per_mm() * sqrt(fabs(rend_sets.m_affine.det())) / ((rend_sets.m_shrinkX + rend_sets.m_shrinkY) / 2.0);
+	const double mm2scale_shrink_pixel = ino::pixel_per_mm() *
+										 sqrt(fabs(rend_sets.m_affine.det())) /
+										 ((rend_sets.m_shrinkX + rend_sets.m_shrinkY) / 2.0);
 
 	/* 動作パラメータを得る */
 	const int min_sw = this->m_max_min_select->getValue(); // 0,1
-	const double radius = this->m_radius->getValue(frame) *
-						  mm2scale_shrink_pixel;
+	const double radius = this->m_radius->getValue(frame) * mm2scale_shrink_pixel;
 	const int npolygon = this->m_polygon_number->getValue(frame);
 	const double degree = this->m_degree->getValue(frame);
 	const bool alp_rend_sw = this->m_alpha_rendering->getValue();
@@ -196,18 +184,17 @@ void ino_maxmin::doCompute(
 			, y1(bottomLeft.y+d.ly)
 		{}
 	*/
-	TRectD enlarge_rect = TRectD(
-		tile.m_pos /* TPointD */
-		,
-		TDimensionD(/* int --> doubleにしてセット */
-					tile.getRaster()->getLx(), tile.getRaster()->getLy()));
+	TRectD enlarge_rect = TRectD(tile.m_pos /* TPointD */
+								 ,
+								 TDimensionD(/* int --> doubleにしてセット */
+											 tile.getRaster()->getLx(), tile.getRaster()->getLy()));
 	/* BBoxの拡大 Pixel単位 */
 	const int enlarge_pixel = (int)(ceil(radius + smoothing_edge_) + 0.5);
 	enlarge_rect = enlarge_rect.enlarge(enlarge_pixel);
 
 	/*	void TRasterFx::allocateAndCompute(
-			TTile &tile, 
-			const TPointD &pos, const TDimension &size, 
+			TTile &tile,
+			const TPointD &pos, const TDimension &size,
 			const TRasterP &templateRas, double frame,
 			const TRenderSettings &info
 		) {
@@ -222,8 +209,9 @@ void ino_maxmin::doCompute(
 	*/
 	TTile enlarge_tile;
 	this->m_input->allocateAndCompute(
-		enlarge_tile, enlarge_rect.getP00(), TDimensionI(/* Pixel単位のdouble -> intにしてセット */
-														 (int)(enlarge_rect.getLx() + 0.5), (int)(enlarge_rect.getLy() + 0.5)),
+		enlarge_tile, enlarge_rect.getP00(),
+		TDimensionI(/* Pixel単位のdouble -> intにしてセット */
+					(int)(enlarge_rect.getLx() + 0.5), (int)(enlarge_rect.getLy() + 0.5)),
 		tile.getRaster(), frame, rend_sets);
 
 	/*------ 参照画像生成 --------------------------------------*/
@@ -232,8 +220,9 @@ void ino_maxmin::doCompute(
 	if (this->m_refer.isConnected()) {
 		ref_sw = true;
 		this->m_refer->allocateAndCompute(
-			ref_tile, enlarge_tile.m_pos, TDimensionI(/* Pixel単位 */
-													  enlarge_tile.getRaster()->getLx(), enlarge_tile.getRaster()->getLy()),
+			ref_tile, enlarge_tile.m_pos,
+			TDimensionI(/* Pixel単位 */
+						enlarge_tile.getRaster()->getLx(), enlarge_tile.getRaster()->getLy()),
 			enlarge_tile.getRaster(), frame, rend_sets);
 	}
 	/* ------ 保存すべき画像メモリを塗りつぶしクリア ---------- */
@@ -245,34 +234,23 @@ void ino_maxmin::doCompute(
 	if (log_sw) {
 		std::ostringstream os;
 		os << "params"
-		   << "  min_sw " << min_sw
-		   << "  radius " << radius
-		   << "  npolygon " << npolygon
-		   << "  degree " << degree
-		   << "  alp_rend_sw " << alp_rend_sw
-		   << "  smoothing_edge " << smoothing_edge_
-		   << "  nthread " << nthread
-		   << "  ref_mode " << ref_mode
-		   << "   tile w " << tile.getRaster()->getLx()
-		   << "  h " << tile.getRaster()->getLy()
-		   << "  pixbits " << ino::pixel_bits(tile.getRaster())
-		   << "   frame " << frame
-		   << "   rand_sets affine_det " << rend_sets.m_affine.det()
-		   << "  shrink x " << rend_sets.m_shrinkX
-		   << "  y " << rend_sets.m_shrinkY;
+		   << "  min_sw " << min_sw << "  radius " << radius << "  npolygon " << npolygon
+		   << "  degree " << degree << "  alp_rend_sw " << alp_rend_sw << "  smoothing_edge "
+		   << smoothing_edge_ << "  nthread " << nthread << "  ref_mode " << ref_mode
+		   << "   tile w " << tile.getRaster()->getLx() << "  h " << tile.getRaster()->getLy()
+		   << "  pixbits " << ino::pixel_bits(tile.getRaster()) << "   frame " << frame
+		   << "   rand_sets affine_det " << rend_sets.m_affine.det() << "  shrink x "
+		   << rend_sets.m_shrinkX << "  y " << rend_sets.m_shrinkY;
 		if (ref_sw) {
-			os
-				<< "  ref_tile.m_pos " << ref_tile.m_pos
-				<< "  ref_tile_getLx " << ref_tile.getRaster()->getLx()
-				<< "  y " << ref_tile.getRaster()->getLy();
+			os << "  ref_tile.m_pos " << ref_tile.m_pos << "  ref_tile_getLx "
+			   << ref_tile.getRaster()->getLx() << "  y " << ref_tile.getRaster()->getLy();
 		}
 	}
 	/* ------ fx処理 ------------------------------------------ */
 	try {
 		tile.getRaster()->lock();
 		const TRasterP refer_ras = (ref_sw ? ref_tile.getRaster() : nullptr);
-		fx_(
-			enlarge_tile.getRaster() // in with margin
+		fx_(enlarge_tile.getRaster() // in with margin
 			,
 			enlarge_pixel // margin
 			,

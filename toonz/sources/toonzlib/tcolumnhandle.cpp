@@ -8,8 +8,7 @@
 // TColumnHandle
 //-----------------------------------------------------------------------------
 
-TColumnHandle::TColumnHandle()
-	: m_columnIndex(-1), m_column(0)
+TColumnHandle::TColumnHandle() : m_columnIndex(-1), m_column(0)
 {
 }
 

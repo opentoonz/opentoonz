@@ -81,7 +81,7 @@ TFilePath CurrentSettingsFile = TFilePath();
 
 void loadSettings(const TFilePath &settingsFile, CleanupParameters *cp)
 {
-	if (CurrentSettingsFile == TFilePath()) //the parameters were global ...I store them
+	if (CurrentSettingsFile == TFilePath()) // the parameters were global ...I store them
 		GlobalParameters.assign(cp);
 
 	CurrentSettingsFile = settingsFile;
@@ -90,7 +90,7 @@ void loadSettings(const TFilePath &settingsFile, CleanupParameters *cp)
 	int minor, major;
 	string tagName;
 
-	//Extract file version if any
+	// Extract file version if any
 	is->matchTag(tagName);
 	if (tagName == "version") {
 		*is >> major >> minor;
@@ -111,13 +111,13 @@ void loadSettings(const TFilePath &settingsFile, CleanupParameters *cp)
 void restoreGlobalSettings(CleanupParameters *cp)
 {
 	if (CurrentSettingsFile == TFilePath())
-		return; //already global!
+		return; // already global!
 
 	cp->assign(&GlobalParameters);
 	CurrentSettingsFile = TFilePath();
 }
 
-} //namespace
+} // namespace
 
 //========================================================================
 //
@@ -130,7 +130,7 @@ void fatalError(string msg)
 #ifdef _WIN32
 	msg = "Application can't start:\n" + msg;
 	DVGui::error(QString::fromStdString(msg));
-	//MessageBox(0,msg.c_str(),"Fatal error",MB_ICONERROR);
+	// MessageBox(0,msg.c_str(),"Fatal error",MB_ICONERROR);
 	exit(1);
 #else
 	// TODO: Come si fa ad aggiungere un messaggio di errore qui?
@@ -199,7 +199,7 @@ TFilePath setToonzFolder(const TFilePath &filename, std::string toonzVar)
 		while (isBlank(*s))
 			s++;
 		if (*s == '\0')
-			continue; //errore: dst vuoto
+			continue; // errore: dst vuoto
 		t = s;
 		while (*t)
 			t++;
@@ -228,15 +228,15 @@ void prepareToCleanup(TXshSimpleLevel *xl, TPalette *cleanupPalette)
 	}
 
 	/* int ltype = xl->getType();
-    if(ltype != TZP_XSHLEVEL) 
-    xl->makeTlv(xl->getScene()->getDefaultParentDir(TZP_XSHLEVEL));
+	if(ltype != TZP_XSHLEVEL)
+	xl->makeTlv(xl->getScene()->getDefaultParentDir(TZP_XSHLEVEL));
   if(xl->getPalette()==0)
-    {
-    //PaletteController* pc = TApp::instance()->getPaletteController();
+	{
+	//PaletteController* pc = TApp::instance()->getPaletteController();
 		xl->setPalette(cleanupPalette);
 		//if(xl == TApp::instance()->getCurrentLevel()->getLevel())
 		//	pc->getCurrentLevelPalette()->setPalette(xl->getPalette());
-    }*/
+	}*/
 }
 
 //==============================================================================================
@@ -265,10 +265,8 @@ string TaskId;
 //
 //------------------------------------------------------------------------
 
-void searchLevelsToCleanup(
-	std::vector<std::pair<TXshSimpleLevel *, std::set<TFrameId>>> &levels,
-	TXsheet *xsh,
-	bool selectedOnly)
+void searchLevelsToCleanup(std::vector<std::pair<TXshSimpleLevel *, std::set<TFrameId>>> &levels,
+						   TXsheet *xsh, bool selectedOnly)
 {
 	std::map<wstring, TXshSimpleLevel *> levelTable;
 	std::map<wstring, std::set<TFrameId>> framesTable;
@@ -284,7 +282,7 @@ void searchLevelsToCleanup(
 			TXshColumn *column = xsh->getColumn(c);
 			if (!column || column->isEmpty())
 				continue;
-			//if(selectedOnly && !column->isPreviewVisible()) continue;
+			// if(selectedOnly && !column->isPreviewVisible()) continue;
 			int r0 = 0, r1 = -1;
 			xsh->getCellRange(c, r0, r1);
 			for (int r = r0; r <= r1; r++) {
@@ -292,16 +290,18 @@ void searchLevelsToCleanup(
 				if (cell.isEmpty())
 					continue;
 				if (TXshSimpleLevel *sl = cell.m_level->getSimpleLevel()) {
-					if (selectedOnly && !column->isPreviewVisible()) //pezza: se questo "if" veniva fatto sopra(riga commentata)
-																	 // quando si fa save della Scene alla fine della cleanuppata,
-																	 //venivano backuppate le tif non processate e cancellati gli originali!
-																	 //Deliri del levelUPdater; evito di mettere le mani in quel pattume. vinz
+					if (selectedOnly && !column->isPreviewVisible()) // pezza: se questo "if" veniva
+																	 // fatto sopra(riga commentata)
+					// quando si fa save della Scene alla fine della cleanuppata,
+					// venivano backuppate le tif non processate e cancellati gli originali!
+					// Deliri del levelUPdater; evito di mettere le mani in quel pattume. vinz
 					{
 						sl->setDirtyFlag(false);
 						continue;
 					}
 					int ltype = sl->getType();
-					if (ltype == TZP_XSHLEVEL && sl->getScannedPath() != TFilePath() || ltype == OVL_XSHLEVEL || ltype == TZI_XSHLEVEL) {
+					if (ltype == TZP_XSHLEVEL && sl->getScannedPath() != TFilePath() ||
+						ltype == OVL_XSHLEVEL || ltype == TZI_XSHLEVEL) {
 						wstring levelName = sl->getName();
 						levelTable[levelName] = sl;
 						framesTable[levelName].insert(cell.m_frameId);
@@ -332,7 +332,8 @@ void addCleanupDefaultPalette(TXshSimpleLevel *sl)
 	TFileStatus pfs(palettePath);
 
 	if (!pfs.doesExist() || !pfs.isReadable()) {
-		wcout << L"CleanupDefaultPalette file: " << palettePath.getWideString() << L" is not found!" << endl;
+		wcout << L"CleanupDefaultPalette file: " << palettePath.getWideString() << L" is not found!"
+			  << endl;
 		return;
 	}
 
@@ -397,11 +398,12 @@ void addCleanupDefaultPalette(TXshSimpleLevel *sl)
 //
 //------------------------------------------------------------------------
 
-void cleanupLevel(TXshSimpleLevel *xl, std::set<TFrameId> fidsInXsheet,
-				  ToonzScene *scene, bool overwrite, TUserLogAppend &m_userLog)
+void cleanupLevel(TXshSimpleLevel *xl, std::set<TFrameId> fidsInXsheet, ToonzScene *scene,
+				  bool overwrite, TUserLogAppend &m_userLog)
 {
 
-	prepareToCleanup(xl, scene->getProperties()->getCleanupParameters()->m_cleanupPalette.getPointer());
+	prepareToCleanup(xl,
+					 scene->getProperties()->getCleanupParameters()->m_cleanupPalette.getPointer());
 
 	TCleanupper *cl = TCleanupper::instance();
 
@@ -505,7 +507,7 @@ int main(int argc, char *argv[])
 	TEnv::setSystemVarPrefix(systemVarPrefix);
 	TSystem::hasMainLoop(false);
 	int i;
-	for (i = 0; i < argc; i++) //tmsg must be set as soon as it's possible
+	for (i = 0; i < argc; i++) // tmsg must be set as soon as it's possible
 	{
 		QString str = argv[i];
 		if (str == "-tmsg")
@@ -518,7 +520,7 @@ int main(int argc, char *argv[])
 	if (i == argc)
 		TMsgCore::instance()->connectTo("");
 
-//TThread::init();  //For the ImageManager construction
+// TThread::init();  //For the ImageManager construction
 // controllo se la xxxroot e' definita e corrisponde ad un file esistente
 #ifdef MACOSX
 	// StuffDir
@@ -529,9 +531,11 @@ int main(int argc, char *argv[])
 
 	TFilePath fproot = TEnv::getStuffDir();
 	if (fproot == TFilePath())
-		fatalError(string("Undefined: \"") + toString(TEnv::getRootVarPath().getWideString()) + "\"");
+		fatalError(string("Undefined: \"") + toString(TEnv::getRootVarPath().getWideString()) +
+				   "\"");
 	if (!TFileStatus(fproot).isDirectory())
-		fatalError(string("Directory \"") + toString(fproot.getWideString()) + "\" not found or not readable");
+		fatalError(string("Directory \"") + toString(fproot.getWideString()) +
+				   "\" not found or not readable");
 
 	TFilePath lRootDir = TEnv::getStuffDir() + "toonzfarm";
 	TFilePath logFilePath = lRootDir + "tcleanup.log";
@@ -556,13 +560,15 @@ int main(int argc, char *argv[])
 	SimpleQualifier selectedOnlyOption("-onlyvisible", "Selected column only");
 
 	SimpleQualifier overwriteAllOption("-overwriteAll", "Overwrite all already cleanupped frames");
-	SimpleQualifier overwriteNoPaintOption("-overwriteNoPaint", "Overwrite only no-paint levels of already cleanupped frames");
+	SimpleQualifier overwriteNoPaintOption(
+		"-overwriteNoPaint", "Overwrite only no-paint levels of already cleanupped frames");
 
 	StringQualifier farmData("-farm data", "TFarm Controller");
 	StringQualifier idq("-id n", "id");
 	StringQualifier tmsg("-tmsg n", "Internal use only");
 	Usage usage(argv[0]);
-	usage.add(srcName + selectedOnlyOption + overwriteAllOption + overwriteNoPaintOption + farmData + idq + tmsg);
+	usage.add(srcName + selectedOnlyOption + overwriteAllOption + overwriteNoPaintOption +
+			  farmData + idq + tmsg);
 	if (!usage.parse(argc, argv))
 		exit(1);
 
@@ -583,7 +589,8 @@ int main(int argc, char *argv[])
 
 	if (UseRenderFarm) {
 		TFarmControllerFactory factory;
-		factory.create(QString::fromStdString(FarmControllerName), FarmControllerPort, &FarmController);
+		factory.create(QString::fromStdString(FarmControllerName), FarmControllerPort,
+					   &FarmController);
 	}
 
 	/*- 画像Read/Writeの関数を登録 -*/
@@ -636,7 +643,8 @@ int main(int argc, char *argv[])
 			/*- 無ければ、連番画像がソースである可能性がある。tifImagePathを連番に差し替える -*/
 			if (!TFileStatus(tifImagePath).doesExist()) {
 				tifImagePath = tifImagePath.getParentDir() + (tifImagePath.getName() + "..tif");
-				std::wcout << "change the source path to : " << tifImagePath.getWideString() << std::endl;
+				std::wcout << "change the source path to : " << tifImagePath.getWideString()
+						   << std::endl;
 			} else
 				std::cout << "tif single image found" << std::endl;
 
@@ -656,7 +664,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	//Levels contiene i livelli e i rispettivi frames prsenti nell'xsheet.
+	// Levels contiene i livelli e i rispettivi frames prsenti nell'xsheet.
 	std::vector<std::pair<TXshSimpleLevel *, std::set<TFrameId>>> levels;
 
 	/*- XsheetからCleanupするLevelのリストを得る -*/
@@ -672,11 +680,13 @@ int main(int argc, char *argv[])
 			continue;
 
 		/*- CLNファイルパスを取得 -*/
-		TFilePath settingsFile = xl->getScannedPath().isEmpty() ? xl->getPath() : xl->getScannedPath();
+		TFilePath settingsFile =
+			xl->getScannedPath().isEmpty() ? xl->getPath() : xl->getScannedPath();
 		settingsFile = scene->decodeFilePath(settingsFile).withNoFrame().withType("cln");
 
 		/*- CLNファイルがあればそれを用いる。無ければGlobal設定を読み込む -*/
-		//TFilePath settingsFile = scene->decodeFilePath(xl->getPath()).withNoFrame().withType("cln");
+		// TFilePath settingsFile =
+		// scene->decodeFilePath(xl->getPath()).withNoFrame().withType("cln");
 		if (TFileStatus(settingsFile).doesExist())
 			loadSettings(settingsFile, params);
 		else
@@ -693,19 +703,17 @@ int main(int argc, char *argv[])
 		TFilePath targetPath = xl->getPath();
 		if (ltype != TZP_XSHLEVEL) {
 			if (lineProcessing)
-				targetPath =
-					targetPath
-						.withParentDir(params->getPath(scene)) // scene->getDefaultParentDir(TZP_XSHLEVEL))
-						.withNoFrame()
-						.withType("tlv");
+				targetPath = targetPath.withParentDir(
+										   params->getPath(
+											   scene)) // scene->getDefaultParentDir(TZP_XSHLEVEL))
+								 .withNoFrame()
+								 .withType("tlv");
 			else
-				targetPath =
-					targetPath
-						.withParentDir(params->getPath(scene)); // scene->getDefaultParentDir(TZP_XSHLEVEL));
+				targetPath = targetPath.withParentDir(
+					params->getPath(scene)); // scene->getDefaultParentDir(TZP_XSHLEVEL));
 		} else {
-			targetPath =
-				targetPath
-					.withParentDir(params->getPath(scene)); // scene->getDefaultParentDir(TZP_XSHLEVEL));
+			targetPath = targetPath.withParentDir(
+				params->getPath(scene)); // scene->getDefaultParentDir(TZP_XSHLEVEL));
 		}
 
 		/*- NoPaintを作る設定のとき、NoPaintの方だけにOverwriteするようにする -*/
@@ -717,7 +725,8 @@ int main(int argc, char *argv[])
 
 		TFilePath actualTargetPath = scene->decodeFilePath(targetPath);
 		/*- すでにLevelがある場合 -*/
-		if (TSystem::doesExistFileOrLevel(actualTargetPath) && Preferences::instance()->isSaveUnpaintedInCleanupEnable() && overwriteNoPaintOption) {
+		if (TSystem::doesExistFileOrLevel(actualTargetPath) &&
+			Preferences::instance()->isSaveUnpaintedInCleanupEnable() && overwriteNoPaintOption) {
 			overwrite = true;
 			originalLevelPath = scene->codeFilePath(targetPath);
 			/*- パスを書き換え、再Cleanupのフラグを立てる -*/
@@ -732,7 +741,8 @@ int main(int argc, char *argv[])
 				}
 			}
 			/*- 保存先のパスをnopaintの方にする -*/
-			targetPath = targetPath.getParentDir() + "nopaint\\" + TFilePath(targetPath.getName() + "_np." + targetPath.getType());
+			targetPath = targetPath.getParentDir() + "nopaint\\" +
+						 TFilePath(targetPath.getName() + "_np." + targetPath.getType());
 		}
 		std::wcout << L"targetPath = " << targetPath.getWideString() << std::endl;
 
@@ -756,7 +766,8 @@ int main(int argc, char *argv[])
 		cleanupLevel(xl, fidsInXsheet, scene, overwrite, m_userLog);
 
 		/*- Cleanup完了後、Nopaintをnopaintフォルダに保存する -*/
-		if (Preferences::instance()->isSaveUnpaintedInCleanupEnable() && !isReCleanup) /*-- 再Cleanupのときはnopaintを作らない --*/
+		if (Preferences::instance()->isSaveUnpaintedInCleanupEnable() &&
+			!isReCleanup) /*-- 再Cleanupのときはnopaintを作らない --*/
 		{
 			/*- nopaintフォルダの作成 -*/
 			TFilePath nopaintDir = actualTargetPath.getParentDir() + "nopaint";
@@ -770,19 +781,26 @@ int main(int argc, char *argv[])
 				}
 			}
 
-			//Se sono nell'ultimo frame del livello salvo il livello cleanuppato
-			//in un file chiamato nome-unpainted (file di backup del cleanup).
+			// Se sono nell'ultimo frame del livello salvo il livello cleanuppato
+			// in un file chiamato nome-unpainted (file di backup del cleanup).
 
 			/*- 保存先 -*/
-			TFilePath unpaintedLevelPath = actualTargetPath.getParentDir() + "nopaint\\" + TFilePath(targetPath.getName() + "_np." + targetPath.getType());
+			TFilePath unpaintedLevelPath =
+				actualTargetPath.getParentDir() + "nopaint\\" +
+				TFilePath(targetPath.getName() + "_np." + targetPath.getType());
 
-			if (TFileStatus(actualTargetPath).doesExist() && (!TFileStatus(unpaintedLevelPath).doesExist() || overwriteAllOption) /*- 全て上書きなら既存のNoPaintに上書きする -*/
+			if (TFileStatus(actualTargetPath).doesExist() &&
+				(!TFileStatus(unpaintedLevelPath).doesExist() ||
+				 overwriteAllOption) /*- 全て上書きなら既存のNoPaintに上書きする -*/
 				&& xl) {
 				/*- GUI上でCleanupするときと同様に、Cleanup結果をコピーして作る -*/
 				TSystem::copyFile(unpaintedLevelPath, actualTargetPath);
 				/*- パレットのコピー -*/
-				TFilePath levelPalettePath = actualTargetPath.getParentDir() + TFilePath(actualTargetPath.getName() + ".tpl");
-				TFilePath unpaintedLevelPalettePath = levelPalettePath.getParentDir() + "nopaint\\" + TFilePath(levelPalettePath.getName() + "_np." + levelPalettePath.getType());
+				TFilePath levelPalettePath = actualTargetPath.getParentDir() +
+											 TFilePath(actualTargetPath.getName() + ".tpl");
+				TFilePath unpaintedLevelPalettePath =
+					levelPalettePath.getParentDir() + "nopaint\\" +
+					TFilePath(levelPalettePath.getName() + "_np." + levelPalettePath.getType());
 				TSystem::copyFile(unpaintedLevelPalettePath, levelPalettePath);
 			}
 		}

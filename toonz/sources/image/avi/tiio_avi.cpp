@@ -39,15 +39,25 @@ void WideChar2Char(LPCWSTR wideCharStr, char *str, int strBuffSize)
 std::string buildAVIExceptionString(int rc)
 {
 	switch (rc) {
-	case AVIERR_BADFORMAT : return "The file couldn't be read, indicating a corrupt file or an unrecognized format.";
-	case AVIERR_MEMORY : return "The file could not be opened because of insufficient memory.";
-	case AVIERR_FILEREAD : return "A disk error occurred while reading the file.";
-	case AVIERR_FILEOPEN : return "A disk error occurred while opening the file.";
-	case REGDB_E_CLASSNOTREG : return "According to the registry, the type of file specified in m_aviFileOpen does not have a handler to process it.";
-	case AVIERR_UNSUPPORTED : return "Format unsupported";
-	case AVIERR_INTERNAL : return "Internal error";
-	case AVIERR_NODATA : return "No data";
-	default: return "Unable to create avi.";
+	case AVIERR_BADFORMAT:
+		return "The file couldn't be read, indicating a corrupt file or an unrecognized format.";
+	case AVIERR_MEMORY:
+		return "The file could not be opened because of insufficient memory.";
+	case AVIERR_FILEREAD:
+		return "A disk error occurred while reading the file.";
+	case AVIERR_FILEOPEN:
+		return "A disk error occurred while opening the file.";
+	case REGDB_E_CLASSNOTREG:
+		return "According to the registry, the type of file specified in m_aviFileOpen does not "
+			   "have a handler to process it.";
+	case AVIERR_UNSUPPORTED:
+		return "Format unsupported";
+	case AVIERR_INTERNAL:
+		return "Internal error";
+	case AVIERR_NODATA:
+		return "No data";
+	default:
+		return "Unable to create avi.";
 	}
 }
 
@@ -72,11 +82,11 @@ TRaster32P DIBToRaster(UCHAR *pDIBImage, int width, int height)
 	if (!pDIBImage)
 		return TRaster32P();
 
-	//BITMAPINFOHEADER *bihdr = reinterpret_cast<BITMAPINFOHEADER *>(pDIBImage);
+	// BITMAPINFOHEADER *bihdr = reinterpret_cast<BITMAPINFOHEADER *>(pDIBImage);
 	UCHAR *rawData = pDIBImage;
 
 	TRaster32P rasOut32(width, height);
-	//ULONG imgSize = bihdr->biSizeImage;
+	// ULONG imgSize = bihdr->biSizeImage;
 
 	int ly = rasOut32->getLy();
 	int n = 0;
@@ -93,7 +103,7 @@ TRaster32P DIBToRaster(UCHAR *pDIBImage, int width, int height)
 			rawData++;
 			pix->m = 255;
 			++pix;
-			//rawData += 3;
+			// rawData += 3;
 		}
 		++n;
 	}
@@ -115,7 +125,7 @@ bool isAKeyFrame(PAVISTREAM videoStream, int index)
 	return index == getPrevKeyFrame(videoStream, index);
 }
 
-}; //end of namespace
+}; // end of namespace
 
 //===========================================================
 //
@@ -126,7 +136,7 @@ bool isAKeyFrame(PAVISTREAM videoStream, int index)
 class TImageWriterAvi : public TImageWriter
 {
 
-public:
+  public:
 	int m_frameIndex;
 
 	TImageWriterAvi(const TFilePath &path, int frameIndex, TLevelWriterAvi *lwa)
@@ -139,10 +149,10 @@ public:
 	bool is64bitOutputSupported() { return false; }
 	void save(const TImageP &img) { m_lwa->save(img, m_frameIndex); }
 
-private:
+  private:
 	TLevelWriterAvi *m_lwa;
 
-	//not implemented
+	// not implemented
 	TImageWriterAvi(const TImageWriterAvi &);
 	TImageWriterAvi &operator=(const TImageWriterAvi &src);
 };
@@ -156,7 +166,9 @@ private:
 #ifdef _WIN32
 
 TLevelWriterAvi::TLevelWriterAvi(const TFilePath &path, TPropertyGroup *winfo)
-	: TLevelWriter(path, winfo), m_aviFile(0), m_videoStream(0), m_audioStream(0), m_bitmapinfo(0), m_outputFmt(0), m_hic(0), m_initDone(false), IOError(0), m_st(0), m_bpp(32), m_maxDataSize(0), m_buffer(0), m_firstframe(-1)
+	: TLevelWriter(path, winfo), m_aviFile(0), m_videoStream(0), m_audioStream(0), m_bitmapinfo(0),
+	  m_outputFmt(0), m_hic(0), m_initDone(false), IOError(0), m_st(0), m_bpp(32), m_maxDataSize(0),
+	  m_buffer(0), m_firstframe(-1)
 {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
@@ -177,7 +189,7 @@ TLevelWriterAvi::TLevelWriterAvi(const TFilePath &path, TPropertyGroup *winfo)
 
 TLevelWriterAvi::~TLevelWriterAvi()
 {
-	//controllo che non ci siano ancora dei frame in coda nel codec (alcuni codec sono asincroni!)
+	// controllo che non ci siano ancora dei frame in coda nel codec (alcuni codec sono asincroni!)
 	while (!m_delayedFrames.empty()) {
 		LONG lSampWritten, lBytesWritten;
 		int frameIndex = m_delayedFrames.front();
@@ -191,9 +203,7 @@ TLevelWriterAvi::~TLevelWriterAvi()
 				_aligned_free(bufferOut);
 			break;
 		}
-		if (AVIStreamWrite(m_videoStream, frameIndex, 1, bufferOut,
-						   outHeader.biSizeImage,
-						   flagsOut,
+		if (AVIStreamWrite(m_videoStream, frameIndex, 1, bufferOut, outHeader.biSizeImage, flagsOut,
 						   &lSampWritten, &lBytesWritten)) {
 			if (bufferOut)
 				_aligned_free(bufferOut);
@@ -231,7 +241,8 @@ TLevelWriterAvi::~TLevelWriterAvi()
 	AVIFileExit();
 	CoUninitialize();
 	if (!m_delayedFrames.empty())
-		throw TImageException(getFilePath(), "error compressing frame " + toString(m_delayedFrames.front()));
+		throw TImageException(getFilePath(),
+							  "error compressing frame " + toString(m_delayedFrames.front()));
 }
 
 //-----------------------------------------------------------
@@ -274,7 +285,8 @@ void TLevelWriterAvi::searchForCodec()
 				WideChar2Char(icinfo.szName, name, sizeof(name));
 
 				std::string compressorName;
-				compressorName = std::string(name) + " '" + toString(bpp) + "' " + std::string(descr);
+				compressorName =
+					std::string(name) + " '" + toString(bpp) + "' " + std::string(descr);
 
 				if (hic) {
 					if (ICCompressQuery(hic, &inFmt, NULL) != ICERR_OK) {
@@ -380,7 +392,8 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex)
 			throw TImageException(getFilePath(), "Unable to create video stream");
 
 		if (!m_hic) {
-			if (AVIStreamSetFormat(m_videoStream, 0, &m_bitmapinfo->bmiHeader, m_bitmapinfo->bmiHeader.biSize))
+			if (AVIStreamSetFormat(m_videoStream, 0, &m_bitmapinfo->bmiHeader,
+								   m_bitmapinfo->bmiHeader.biSize))
 				throw TImageException(getFilePath(), "unable to set format");
 		} else {
 			m_outputFmt = (BITMAPINFO *)calloc(1, sizeof(BITMAPINFOHEADER) + 255 * sizeof(RGBQUAD));
@@ -388,8 +401,7 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex)
 
 			rc = ICCompressGetFormat(m_hic, m_bitmapinfo, m_outputFmt);
 			if (rc != ICERR_OK)
-				throw TImageException(getFilePath(),
-									  "Error codec (ec = " + toString(rc) + ")");
+				throw TImageException(getFilePath(), "Error codec (ec = " + toString(rc) + ")");
 
 			ICCOMPRESSFRAMES icf;
 			memset(&icf, 0, sizeof icf);
@@ -411,7 +423,8 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex)
 				throw TImageException(getFilePath(),
 									  "Error starting codec (ec = " + toString(rc) + ")");
 
-			if (AVIStreamSetFormat(m_videoStream, 0, &m_outputFmt->bmiHeader, m_outputFmt->bmiHeader.biSize))
+			if (AVIStreamSetFormat(m_videoStream, 0, &m_outputFmt->bmiHeader,
+								   m_outputFmt->bmiHeader.biSize))
 				throw TImageException(getFilePath(), "unable to set format");
 		}
 		m_initDone = true;
@@ -427,7 +440,7 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex)
 		int newlx = lx * 3;
 		raux = TRasterGR8P(newlx, ly);
 		raux->lock();
-		UCHAR *buffout24 = (UCHAR *)raux->getRawData(); //new UCHAR[newlx*ly];
+		UCHAR *buffout24 = (UCHAR *)raux->getRawData(); // new UCHAR[newlx*ly];
 		TPixel *buffin32 = (TPixel *)buffin;
 		buffin = buffout24;
 		for (int i = 0; i < ly; i++) {
@@ -450,10 +463,8 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex)
 	lBytesWritten = 0;
 
 	if (!m_hic) {
-		if (AVIStreamWrite(m_videoStream, index, 1, m_buffer,
-						   m_bitmapinfo->bmiHeader.biSizeImage,
-						   AVIIF_KEYFRAME,
-						   &lSampWritten, &lBytesWritten)) {
+		if (AVIStreamWrite(m_videoStream, index, 1, m_buffer, m_bitmapinfo->bmiHeader.biSizeImage,
+						   AVIIF_KEYFRAME, &lSampWritten, &lBytesWritten)) {
 			throw TImageException(getFilePath(), "error writing frame");
 		}
 	} else {
@@ -469,10 +480,8 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex)
 			throw TImageException(getFilePath(), "error compressing frame " + toString(index));
 		}
 
-		if (outHeader.biCompression == '05xd' ||
-			outHeader.biCompression == '05XD' ||
-			outHeader.biCompression == 'divx' ||
-			outHeader.biCompression == 'DIVX')
+		if (outHeader.biCompression == '05xd' || outHeader.biCompression == '05XD' ||
+			outHeader.biCompression == 'divx' || outHeader.biCompression == 'DIVX')
 			if (outHeader.biSizeImage == 1 && *(char *)bufferOut == 0x7f) {
 				m_delayedFrames.push_back(index);
 				if (bufferOut)
@@ -484,10 +493,8 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex)
 			index = m_delayedFrames.front();
 			m_delayedFrames.pop_front();
 		}
-		if (AVIStreamWrite(m_videoStream, index, 1, bufferOut,
-						   outHeader.biSizeImage,
-						   !index ? flagsOut : 0,
-						   &lSampWritten, &lBytesWritten)) {
+		if (AVIStreamWrite(m_videoStream, index, 1, bufferOut, outHeader.biSizeImage,
+						   !index ? flagsOut : 0, &lSampWritten, &lBytesWritten)) {
 			if (bufferOut)
 				_aligned_free(bufferOut);
 			throw TImageException(getFilePath(), "error writing frame");
@@ -499,36 +506,36 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex)
 
 //-----------------------------------------------------------
 
-int TLevelWriterAvi::compressFrame(BITMAPINFOHEADER *outHeader, void **bufferOut,
-								   int frameIndex, DWORD flagsIn, DWORD &flagsOut)
+int TLevelWriterAvi::compressFrame(BITMAPINFOHEADER *outHeader, void **bufferOut, int frameIndex,
+								   DWORD flagsIn, DWORD &flagsOut)
 {
 	*bufferOut = _aligned_malloc(m_maxDataSize, 128);
 	*outHeader = m_outputFmt->bmiHeader;
 	DWORD chunkId = 0;
 	if (flagsIn)
 		flagsOut = AVIIF_KEYFRAME;
-	int res = ICCompress(m_hic, flagsIn,
-						 outHeader, *bufferOut,
-						 &m_bitmapinfo->bmiHeader, m_buffer,
-						 &chunkId, &flagsOut,
-						 frameIndex, frameIndex ? 0 : 0xFFFFFF,
-						 0, NULL, NULL);
+	int res = ICCompress(m_hic, flagsIn, outHeader, *bufferOut, &m_bitmapinfo->bmiHeader, m_buffer,
+						 &chunkId, &flagsOut, frameIndex, frameIndex ? 0 : 0xFFFFFF, 0, NULL, NULL);
 	return res;
 }
 
 #else
 
-TLevelWriterAvi::TLevelWriterAvi(const TFilePath &path)
-	: TLevelWriter(path)
+TLevelWriterAvi::TLevelWriterAvi(const TFilePath &path) : TLevelWriter(path)
 {
 }
-TLevelWriterAvi::~TLevelWriterAvi() {}
+TLevelWriterAvi::~TLevelWriterAvi()
+{
+}
 TImageWriterP TLevelWriterAvi::getFrameWriter(TFrameId)
 {
 	throw TImageException(getFilePath(), "not supported");
 	return TImageWriterP(iwa);
 }
-void TImageWriterAvi::save(const TImageP &) { throw TImageException(m_path, "AVI file format not supported"); }
+void TImageWriterAvi::save(const TImageP &)
+{
+	throw TImageException(m_path, "AVI file format not supported");
+}
 
 #endif
 
@@ -583,7 +590,7 @@ void TLevelWriterAvi::doSaveSoundTrack()
 	audioStreamInfo.dwFormatChangeCount = 0;
 	audioStreamInfo.szName[0] = 0;
 
-	waveinfo.wFormatTag = WAVE_FORMAT_PCM; //WAVE_FORMAT_DRM
+	waveinfo.wFormatTag = WAVE_FORMAT_PCM; // WAVE_FORMAT_DRM
 	waveinfo.nChannels = m_st->getChannelCount();
 	waveinfo.nSamplesPerSec = m_st->getSampleRate();
 	waveinfo.wBitsPerSample = m_st->getBitPerSample();
@@ -616,7 +623,7 @@ void TLevelWriterAvi::doSaveSoundTrack()
 class TImageReaderAvi : public TImageReader
 {
 
-public:
+  public:
 	int m_frameIndex;
 
 	TImageReaderAvi(const TFilePath &path, int index, TLevelReaderAvi *lra)
@@ -630,10 +637,10 @@ public:
 	TDimension getSize() const { return m_lra->getSize(); }
 	TRect getBBox() const { return TRect(); }
 
-private:
+  private:
 	TLevelReaderAvi *m_lra;
 
-	//not implemented
+	// not implemented
 	TImageReaderAvi(const TImageReaderAvi &);
 	TImageReaderAvi &operator=(const TImageReaderAvi &src);
 };
@@ -649,14 +656,16 @@ TLevelReaderAvi::TLevelReaderAvi(const TFilePath &path)
 	: TLevelReader(path)
 #ifdef _WIN32
 	  ,
-	  m_srcBitmapInfo(0), m_dstBitmapInfo(0), m_hic(0), IOError(0), m_prevFrame(-1), m_decompressedBuffer(0)
+	  m_srcBitmapInfo(0), m_dstBitmapInfo(0), m_hic(0), IOError(0), m_prevFrame(-1),
+	  m_decompressedBuffer(0)
 #endif
 {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
 	AVIFileInit();
 
-	int rc = AVIStreamOpenFromFileW(&m_videoStream, path.getWideString().c_str(), streamtypeVIDEO, 0, OF_READ, 0);
+	int rc = AVIStreamOpenFromFileW(&m_videoStream, path.getWideString().c_str(), streamtypeVIDEO,
+									0, OF_READ, 0);
 	if (rc != 0) {
 		IOError = rc;
 		throw TImageException(m_path, buildAVIExceptionString(IOError));
@@ -701,7 +710,7 @@ TLevelReaderAvi::TLevelReaderAvi(const TFilePath &path)
 	case 16: {
 		m_info->m_bitsPerSample = 8;
 		m_info->m_samplePerPixel = 2;
-		//chiedo al decoder di decomprimerla in un'immagine a 24 bit (sperando che lo permetta)
+		// chiedo al decoder di decomprimerla in un'immagine a 24 bit (sperando che lo permetta)
 		m_dstBitmapInfo->bmiHeader.biBitCount = 24;
 		m_dstBitmapInfo->bmiHeader.biSizeImage =
 			m_dstBitmapInfo->bmiHeader.biWidth * m_dstBitmapInfo->bmiHeader.biHeight * 3;
@@ -716,7 +725,7 @@ TLevelReaderAvi::TLevelReaderAvi(const TFilePath &path)
 	m_info->m_properties = prop;
 
 	if (m_srcBitmapInfo->bmiHeader.biCompression != 0) {
-		//ci sono dei codec (es. Xvid) che non decomprimono bene dentro immagini a 32 bit.
+		// ci sono dei codec (es. Xvid) che non decomprimono bene dentro immagini a 32 bit.
 		m_dstBitmapInfo->bmiHeader.biBitCount = 24;
 		m_dstBitmapInfo->bmiHeader.biSizeImage =
 			m_dstBitmapInfo->bmiHeader.biWidth * m_dstBitmapInfo->bmiHeader.biHeight * 3;
@@ -728,7 +737,8 @@ TLevelReaderAvi::TLevelReaderAvi(const TFilePath &path)
 		if (!m_hic) {
 			m_hic = findCandidateDecompressor();
 			if (!m_hic)
-				throw TImageException(getFilePath(), "unable to find a decompressor for this format");
+				throw TImageException(getFilePath(),
+									  "unable to find a decompressor for this format");
 		}
 
 		DWORD result = ICDecompressQuery(m_hic, m_srcBitmapInfo, m_dstBitmapInfo);
@@ -744,7 +754,9 @@ TLevelReaderAvi::TLevelReaderAvi(const TFilePath &path)
 		WideChar2Char(icinfo.szDescription, descr, sizeof(descr));
 		WideChar2Char(icinfo.szName, name, sizeof(name));
 		std::string compressorName;
-		compressorName = std::string(name) + " '" + toString(m_dstBitmapInfo->bmiHeader.biBitCount) + "' " + std::string(descr);
+		compressorName = std::string(name) + " '" +
+						 toString(m_dstBitmapInfo->bmiHeader.biBitCount) + "' " +
+						 std::string(descr);
 		TEnumProperty *p = (TEnumProperty *)m_info->m_properties->getProperty("Codec");
 		p->setValue(toWideString(compressorName));
 		m_decompressedBuffer = _aligned_malloc(m_dstBitmapInfo->bmiHeader.biSizeImage, 128);
@@ -801,18 +813,9 @@ HIC TLevelReaderAvi::findCandidateDecompressor()
 			//
 			// (general idea from Raymond Chen's blog)
 
-			BITMAPINFOHEADER testSrc = {// note: can't be static const since IsBadWritePtr() will get called on it
-										sizeof(BITMAPINFOHEADER),
-										320,
-										240,
-										1,
-										24,
-										0x2E532E42,
-										320 * 240 * 3,
-										0,
-										0,
-										0,
-										0};
+			BITMAPINFOHEADER testSrc = {
+				// note: can't be static const since IsBadWritePtr() will get called on it
+				sizeof(BITMAPINFOHEADER), 320, 240, 1, 24, 0x2E532E42, 320 * 240 * 3, 0, 0, 0, 0};
 
 			DWORD res = ICDecompressQuery(hic, &testSrc, NULL);
 
@@ -820,26 +823,28 @@ HIC TLevelReaderAvi::findCandidateDecompressor()
 				ICINFO info = {sizeof(ICINFO)};
 				ICGetInfo(hic, &info, sizeof info);
 
-				// Okay, let's give the codec a chance to redeem itself. Reformat the input format into
-				// a plain 24-bit RGB image, and ask it what the compressed format is. If it produces
+				// Okay, let's give the codec a chance to redeem itself. Reformat the input format
+				// into
+				// a plain 24-bit RGB image, and ask it what the compressed format is. If it
+				// produces
 				// a FOURCC that matches, allow it to handle the format. This should allow at least
 				// the codec's primary format to work. Otherwise, drop it on the ground.
 
 				if (m_srcBitmapInfo) {
-					BITMAPINFOHEADER unpackedSrc = {
-						sizeof(BITMAPINFOHEADER),
-						m_srcBitmapInfo->bmiHeader.biWidth,
-						m_srcBitmapInfo->bmiHeader.biHeight,
-						1,
-						24,
-						BI_RGB,
-						0,
-						0,
-						0,
-						0,
-						0};
+					BITMAPINFOHEADER unpackedSrc = {sizeof(BITMAPINFOHEADER),
+													m_srcBitmapInfo->bmiHeader.biWidth,
+													m_srcBitmapInfo->bmiHeader.biHeight,
+													1,
+													24,
+													BI_RGB,
+													0,
+													0,
+													0,
+													0,
+													0};
 
-					unpackedSrc.biSizeImage = ((unpackedSrc.biWidth * 3 + 3) & ~3) * abs(unpackedSrc.biHeight);
+					unpackedSrc.biSizeImage =
+						((unpackedSrc.biWidth * 3 + 3) & ~3) * abs(unpackedSrc.biHeight);
 
 					LONG size = ICCompressGetFormatSize(hic, &unpackedSrc);
 
@@ -910,20 +915,24 @@ TImageP TLevelReaderAvi::load(int frameIndex)
 	if (!m_hic) {
 		rc = readFrameFromStream(m_decompressedBuffer, si.dwSuggestedBufferSize, frameIndex);
 		if (rc) {
-			throw TImageException(m_path, "unable read frame " + toString(frameIndex) + "from video stream.");
+			throw TImageException(m_path, "unable read frame " + toString(frameIndex) +
+											  "from video stream.");
 		}
 	} else {
-		int prevKeyFrame = m_prevFrame == frameIndex - 1 ? frameIndex : getPrevKeyFrame(m_videoStream, frameIndex);
+		int prevKeyFrame =
+			m_prevFrame == frameIndex - 1 ? frameIndex : getPrevKeyFrame(m_videoStream, frameIndex);
 		while (prevKeyFrame <= frameIndex) {
 			bufferOut = _aligned_malloc(si.dwSuggestedBufferSize, 128);
 			DWORD bytesRead = si.dwSuggestedBufferSize;
 			rc = readFrameFromStream(bufferOut, bytesRead, prevKeyFrame);
 			if (rc) {
 				_aligned_free(bufferOut);
-				throw TImageException(m_path, "unable read frame " + toString(frameIndex) + "from video stream.");
+				throw TImageException(m_path, "unable read frame " + toString(frameIndex) +
+												  "from video stream.");
 			}
 
-			DWORD res = decompressFrame(bufferOut, bytesRead, m_decompressedBuffer, prevKeyFrame, frameIndex);
+			DWORD res = decompressFrame(bufferOut, bytesRead, m_decompressedBuffer, prevKeyFrame,
+										frameIndex);
 
 			_aligned_free(bufferOut);
 			if (res != ICERR_OK) {
@@ -966,17 +975,12 @@ int TLevelReaderAvi::readFrameFromStream(void *bufferOut, DWORD &bufferSize, int
 	LONG bytesReaded = 0;
 	LONG samplesReaded = 0;
 
-	int rc = AVIStreamRead(m_videoStream,
-						   frameIndex,
-						   1,
-						   bufferOut,
-						   bufferSize,
-						   &bytesReaded,
+	int rc = AVIStreamRead(m_videoStream, frameIndex, 1, bufferOut, bufferSize, &bytesReaded,
 						   &samplesReaded);
 	if (!rc) {
-		assert(samplesReaded == 1);				 //deve aver letto un frame!!!
-		assert(bytesReaded <= (LONG)bufferSize); //deve aver letto un numero di byte
-												 //minore o uguale di quello che ci aspettiamo
+		assert(samplesReaded == 1); // deve aver letto un frame!!!
+		assert(bytesReaded <= (LONG)bufferSize); // deve aver letto un numero di byte
+		// minore o uguale di quello che ci aspettiamo
 		bufferSize = bytesReaded;
 	}
 	return rc;
@@ -984,7 +988,8 @@ int TLevelReaderAvi::readFrameFromStream(void *bufferOut, DWORD &bufferSize, int
 
 //------------------------------------------------
 
-DWORD TLevelReaderAvi::decompressFrame(void *srcBuffer, int srcSize, void *dstBuffer, int currentFrame, int desiredFrame)
+DWORD TLevelReaderAvi::decompressFrame(void *srcBuffer, int srcSize, void *dstBuffer,
+									   int currentFrame, int desiredFrame)
 {
 	BITMAPINFOHEADER srcHeader = m_srcBitmapInfo->bmiHeader;
 	BITMAPINFOHEADER dstHeader = m_dstBitmapInfo->bmiHeader;
@@ -997,11 +1002,7 @@ DWORD TLevelReaderAvi::decompressFrame(void *srcBuffer, int srcSize, void *dstBu
 	if (currentFrame < desiredFrame)
 		dwFlags |= ICDECOMPRESS_PREROLL;
 
-	DWORD res = ICDecompress(m_hic, dwFlags,
-							 &srcHeader,
-							 srcBuffer,
-							 &dstHeader,
-							 dstBuffer);
+	DWORD res = ICDecompress(m_hic, dwFlags, &srcHeader, srcBuffer, &dstHeader, dstBuffer);
 	return res;
 }
 
@@ -1009,14 +1010,22 @@ DWORD TLevelReaderAvi::decompressFrame(void *srcBuffer, int srcSize, void *dstBu
 TLevelReaderAvi::TLevelReaderAvi(const TFilePath &path)::TLevelReader(path)
 {
 }
-TLevelReaderAvi::~TLevelReaderAvi() {}
-TLevelP TLevelReaderAvi::loadInfo() { return TLevelP(); }
+TLevelReaderAvi::~TLevelReaderAvi()
+{
+}
+TLevelP TLevelReaderAvi::loadInfo()
+{
+	return TLevelP();
+}
 TImageReaderP TLevelReaderAvi::getFrameReader(TFrameId fid)
 {
 	throw TImageException(m_path, "AVI not supported");
 	return TImageReaderP(0);
 }
-TDimension TLevelReaderAvi::getSize() { return TDimension(); }
+TDimension TLevelReaderAvi::getSize()
+{
+	return TDimension();
+}
 TImageP TLevelReaderAvi::load(int frameIndex)
 {
 	throw TImageException(m_path, "AVI not supported");
@@ -1031,8 +1040,7 @@ TImageP TLevelReaderAvi::load(int frameIndex)
 //===========================================================
 
 #ifdef _WIN32
-Tiio::AviWriterProperties::AviWriterProperties()
-	: m_codec("Codec")
+Tiio::AviWriterProperties::AviWriterProperties() : m_codec("Codec")
 {
 	if (m_defaultCodec.getRange().empty()) {
 		char descr[2048], name[2048];
@@ -1057,7 +1065,7 @@ Tiio::AviWriterProperties::AviWriterProperties()
 					break;
 				HIC hic = 0;
 #ifdef _MSC_VER
-				[&](){
+				[&]() {
 					__try {
 						hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_QUERY);
 					} __except (EXCEPTION_EXECUTE_HANDLER) {
@@ -1070,7 +1078,8 @@ Tiio::AviWriterProperties::AviWriterProperties()
 				}
 #endif
 				if (hic) {
-					if (ICGetInfo(hic, &icinfo, sizeof(ICINFO)) == 0) // Find out the compressor name
+					if (ICGetInfo(hic, &icinfo, sizeof(ICINFO)) ==
+						0) // Find out the compressor name
 					{
 						ICClose(hic);
 						continue;
@@ -1083,9 +1092,11 @@ Tiio::AviWriterProperties::AviWriterProperties()
 					}
 
 					std::string compressorName;
-					compressorName = std::string(name) + " '" + toString(bpp) + "' " + std::string(descr);
+					compressorName =
+						std::string(name) + " '" + toString(bpp) + "' " + std::string(descr);
 
-					if (std::string(compressorName).find("Indeo") != -1) // per il momento togliamo i codec indeo
+					if (std::string(compressorName).find("Indeo") !=
+						-1) // per il momento togliamo i codec indeo
 					{
 						ICClose(hic);
 						continue;

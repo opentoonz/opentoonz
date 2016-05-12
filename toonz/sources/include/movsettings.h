@@ -71,7 +71,7 @@
 void DVAPI fromPropertiesToAtoms(TPropertyGroup &pg, QTAtomContainer &atoms);
 void DVAPI fromAtomsToProperties(const QTAtomContainer &atoms, TPropertyGroup &pg);
 
-#endif //!64 bit
+#endif //! 64 bit
 
 void DVAPI openMovSettingsPopup(TPropertyGroup *props, bool macBringToFront = false);
 

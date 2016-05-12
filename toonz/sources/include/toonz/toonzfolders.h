@@ -42,20 +42,20 @@ DVAPI TFilePath getProfileFolder();
 class DVAPI FolderListenerManager
 { // singleton
 
-public:
+  public:
 	class Listener
 	{
-	public:
+	  public:
 		virtual void onFolderChanged(const TFilePath &path) = 0;
 		virtual ~Listener() {}
 	};
 
-private:
+  private:
 	std::set<Listener *> m_listeners;
 
 	FolderListenerManager();
 
-public:
+  public:
 	static FolderListenerManager *instance();
 
 	~FolderListenerManager();

@@ -35,8 +35,8 @@
 
 /*
   TODO: Some parts of the following render-tree building procedure should be revised. In particular,
-        there is scarce support for frame-shifting fxs, whenever the frame-shift can be resolved
-        only during rendering (as is the case for ParticlesFx).
+		there is scarce support for frame-shifting fxs, whenever the frame-shift can be resolved
+		only during rendering (as is the case for ParticlesFx).
 */
 
 //***************************************************************************************************
@@ -57,12 +57,12 @@ class TimeShuffleFx : public TRasterFx
 {
 	FX_DECLARATION(TimeShuffleFx)
 
-private:
+  private:
 	int m_frame;				//!< Frame this fx redirects to
 	TFxTimeRegion m_timeRegion; //!< Input (outer) valid column frame range
 	TRasterFxPort m_port;		//!< Input port
 
-public:
+  public:
 	TimeShuffleFx() : TRasterFx(), m_frame(0), m_timeRegion() { addInputPort("source", m_port); }
 	~TimeShuffleFx() {}
 
@@ -119,15 +119,13 @@ public:
 		return TRasterFx::getAlias(m_frame, info);
 	}
 
-	void doDryCompute(TRectD &rect,
-					  double frame,
-					  const TRenderSettings &info)
+	void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info)
 	{
 		if (m_port.isConnected())
 			TRasterFxP(m_port.getFx())->dryCompute(rect, m_frame, info);
 	}
 
-private:
+  private:
 	// not implemented
 	TimeShuffleFx(const TimeShuffleFx &);
 	TimeShuffleFx &operator=(const TimeShuffleFx &);
@@ -139,7 +137,8 @@ FX_IDENTIFIER_IS_HIDDEN(TimeShuffleFx, "timeShuffleFx")
 //    AffineFx  definition
 //***************************************************************************************************
 
-//! AffineFx is a specialization of TGeometryFx which implements animated or stage-controlled affines
+//! AffineFx is a specialization of TGeometryFx which implements animated or stage-controlled
+//! affines
 /*!
   This specific implementation of TGeometryFx is needed to deal with those affines which are best
   \b not resolved during the rendering-tree expansion procedure.
@@ -149,19 +148,18 @@ class AffineFx : public TGeometryFx
 {
 	FX_DECLARATION(AffineFx)
 
-private:
+  private:
 	TXsheet *m_xsheet;			 //!< Xsheet owning m_stageObject
 	TStageObject *m_stageObject; //!< The stage object this AffineFx refers to
 	TRasterFxPort m_input;		 //!< The input port
 
-public:
+  public:
 	AffineFx() : m_xsheet(0), m_stageObject(0)
 	{
 		addInputPort("source", m_input);
 		setName(L"AffineFx");
 	}
-	AffineFx(TXsheet *xsh, TStageObject *pegbar)
-		: m_xsheet(xsh), m_stageObject(pegbar)
+	AffineFx(TXsheet *xsh, TStageObject *pegbar) : m_xsheet(xsh), m_stageObject(pegbar)
 	{
 		addInputPort("source", m_input);
 		setName(L"AffineFx");
@@ -192,9 +190,8 @@ public:
 		double cameraZ = camera->getZ(frame);
 
 		TAffine aff;
-		bool isVisible = TStageObject::perspective(aff,
-												   cameraAff, cameraZ,
-												   objAff, objZ, objNoScaleZ);
+		bool isVisible =
+			TStageObject::perspective(aff, cameraAff, cameraZ, objAff, objZ, objNoScaleZ);
 
 		if (!isVisible)
 			return TAffine(); // uh oh
@@ -206,7 +203,7 @@ public:
 
 	std::string getPluginId() const { return std::string(); }
 
-private:
+  private:
 	// not implemented
 	AffineFx(const AffineFx &);
 	AffineFx &operator=(const AffineFx &);
@@ -221,7 +218,7 @@ FX_IDENTIFIER_IS_HIDDEN(AffineFx, "affineFx")
 //! PlacedFx is the enriched form of a TRasterFx during render-tree building.
 class PlacedFx
 {
-public:
+  public:
 	double m_z;		   //!< Z value for this fx's column
 	double m_so;	   //!< Same as above, for stacking order
 	int m_columnIndex; //!< This fx's column index
@@ -231,14 +228,22 @@ public:
 
 	TFxPort *m_leftXsheetPort;
 
-public:
+  public:
 	PlacedFx() : m_z(0), m_so(0), m_columnIndex(-1), m_fx(0), m_aff(), m_leftXsheetPort(0) {}
 	explicit PlacedFx(const TFxP &fx)
-		: m_z(0), m_so(0), m_columnIndex(-1), m_fx(fx), m_aff(), m_leftXsheetPort(0) {}
+		: m_z(0), m_so(0), m_columnIndex(-1), m_fx(fx), m_aff(), m_leftXsheetPort(0)
+	{
+	}
 
 	bool operator<(const PlacedFx &pf) const
 	{
-		return (m_z < pf.m_z) ? true : (m_z > pf.m_z) ? false : (m_so < pf.m_so) ? true : (m_so > pf.m_so) ? false : (m_columnIndex < pf.m_columnIndex);
+		return (m_z < pf.m_z) ? true : (m_z > pf.m_z)
+										   ? false
+										   : (m_so < pf.m_so)
+												 ? true
+												 : (m_so > pf.m_so)
+													   ? false
+													   : (m_columnIndex < pf.m_columnIndex);
 	}
 
 	TFxP makeFx()
@@ -290,11 +295,7 @@ bool getColumnPlacement(TAffine &aff, TXsheet *xsh, double row, int col, bool is
 	TAffine cameraAff = camera->getPlacement(row);
 	double cameraZ = camera->getZ(row);
 
-	bool isVisible = TStageObject::perspective(
-		aff,
-		cameraAff, cameraZ,
-		objAff, objZ,
-		noScaleZ);
+	bool isVisible = TStageObject::perspective(aff, cameraAff, cameraZ, objAff, objZ, noScaleZ);
 
 	return isVisible;
 }
@@ -319,18 +320,16 @@ bool getColumnPlacement(PlacedFx &pf, TXsheet *xsh, double row, int col, bool is
 	TAffine cameraAff = camera->getPlacement(row);
 	double cameraZ = camera->getZ(row);
 
-	bool isVisible = TStageObject::perspective(
-		pf.m_aff,
-		cameraAff, cameraZ,
-		objAff, pf.m_z,
-		pegbar->getGlobalNoScaleZ());
+	bool isVisible = TStageObject::perspective(pf.m_aff, cameraAff, cameraZ, objAff, pf.m_z,
+											   pegbar->getGlobalNoScaleZ());
 
 	return isVisible;
 }
 
 //-------------------------------------------------------------------
 /*-- Objectの位置を得る --*/
-bool getStageObjectPlacement(TAffine &aff, TXsheet *xsh, double row, TStageObjectId &id, bool isPreview)
+bool getStageObjectPlacement(TAffine &aff, TXsheet *xsh, double row, TStageObjectId &id,
+							 bool isPreview)
 {
 	TStageObject *pegbar = xsh->getStageObjectTree()->getStageObject(id, false);
 	if (!pegbar)
@@ -349,11 +348,7 @@ bool getStageObjectPlacement(TAffine &aff, TXsheet *xsh, double row, TStageObjec
 	TAffine cameraAff = camera->getPlacement(row);
 	double cameraZ = camera->getZ(row);
 
-	bool isVisible = TStageObject::perspective(
-		aff,
-		cameraAff, cameraZ,
-		objAff, objZ,
-		noScaleZ);
+	bool isVisible = TStageObject::perspective(aff, cameraAff, cameraZ, objAff, objZ, noScaleZ);
 
 	return isVisible;
 }
@@ -421,10 +416,11 @@ TPointD getColumnSpeed(TXsheet *xsh, double row, int col, bool isPreview)
 
 //-------------------------------------------------------------------
 /*-- オブジェクトの軌跡を、基準点との差分で得る
-	objectId: 移動の参考にするオブジェクト。自分自身の場合はNoneId 
+	objectId: 移動の参考にするオブジェクト。自分自身の場合はNoneId
 --*/
-QList<TPointD> getColumnMotionPoints(TXsheet *xsh, double row, int col, TStageObjectId &objectId, bool isPreview,
-									 double shutterStart, double shutterEnd, int traceResolution)
+QList<TPointD> getColumnMotionPoints(TXsheet *xsh, double row, int col, TStageObjectId &objectId,
+									 bool isPreview, double shutterStart, double shutterEnd,
+									 int traceResolution)
 {
 	/*-- 前後フレームが共に０なら空のリストを返す --*/
 	if (shutterStart == 0.0 && shutterEnd == 0.0)
@@ -490,7 +486,7 @@ QList<TPointD> getColumnMotionPoints(TXsheet *xsh, double row, int col, TStageOb
 
 class FxBuilder
 {
-public:
+  public:
 	ToonzScene *m_scene;
 	TXsheet *m_xsh;
 	TAffine m_cameraAff;
@@ -504,7 +500,7 @@ public:
 	// (at least) of a particle Fx
 	int m_particleDescendentCount;
 
-public:
+  public:
 	FxBuilder(ToonzScene *scene, TXsheet *xsh, double frame, int whichLevels,
 			  bool isPreview = false, bool expandXSheet = true);
 
@@ -526,9 +522,10 @@ public:
 
 //===================================================================
 
-FxBuilder::FxBuilder(ToonzScene *scene, TXsheet *xsh, double frame, int whichLevels,
-					 bool isPreview, bool expandXSheet)
-	: m_scene(scene), m_xsh(xsh), m_frame(frame), m_whichLevels(whichLevels), m_isPreview(isPreview), m_expandXSheet(expandXSheet), m_particleDescendentCount(0)
+FxBuilder::FxBuilder(ToonzScene *scene, TXsheet *xsh, double frame, int whichLevels, bool isPreview,
+					 bool expandXSheet)
+	: m_scene(scene), m_xsh(xsh), m_frame(frame), m_whichLevels(whichLevels),
+	  m_isPreview(isPreview), m_expandXSheet(expandXSheet), m_particleDescendentCount(0)
 {
 	TStageObjectId cameraId;
 	if (m_isPreview)
@@ -546,9 +543,7 @@ FxBuilder::FxBuilder(ToonzScene *scene, TXsheet *xsh, double frame, int whichLev
 TFxP FxBuilder::buildFx()
 {
 	TFx *outputFx = m_xsh->getFxDag()->getOutputFx(0);
-	if (!outputFx ||
-		outputFx->getInputPortCount() != 1 ||
-		outputFx->getInputPort(0)->getFx() == 0)
+	if (!outputFx || outputFx->getInputPortCount() != 1 || outputFx->getInputPort(0)->getFx() == 0)
 		return TFxP();
 
 	outputFx->setName(L"OutputFx");
@@ -676,7 +671,8 @@ PlacedFx FxBuilder::makePF(TXsheetFx *fx)
 		pfs[i] = makePF(fx); // Builds the sub-render-trees here
 	}
 
-	/*--  Xsheetに複数ノードが繋がっていた場合、PlacedFxの条件に従ってOverノードの付く順番を決める --*/
+	/*--  Xsheetに複数ノードが繋がっていた場合、PlacedFxの条件に従ってOverノードの付く順番を決める
+	 * --*/
 	std::sort(pfs.begin(), pfs.end()); // Sort each terminal depending on Z/SO/Column index
 
 	// Compose them in a cascade of overs (or affines 'leftXsheetPort' cases)
@@ -684,8 +680,10 @@ PlacedFx FxBuilder::makePF(TXsheetFx *fx)
 	for (i = 1; i < m; i++) {
 		TFxP fx = pfs[i].makeFx(); // See above
 		if (pfs[i].m_leftXsheetPort) {
-			// LeftXsheetPort cases happen for those fxs like Add, Multiply, etc that declare an xsheet-like input port.
-			// That is, all terminal fxs below ours are attached COMPOSED to enter the fx's leftXsheet input port.
+			// LeftXsheetPort cases happen for those fxs like Add, Multiply, etc that declare an
+			// xsheet-like input port.
+			// That is, all terminal fxs below ours are attached COMPOSED to enter the fx's
+			// leftXsheet input port.
 
 			TFxP inputFx = currentFx;
 			inputFx = TFxUtil::makeAffine(inputFx, pfs[i].m_aff.inv());
@@ -709,7 +707,7 @@ PlacedFx FxBuilder::makePF(TXsheetFx *fx)
   Fxs under a ParticlesFx node seem to have special treatment - that is,
   empty column cells are still attached to a not-empty PlacedFx.
 
-  This must be a remnant of old Toonz code, that should no longer remain here - 
+  This must be a remnant of old Toonz code, that should no longer remain here -
   in fact, well, you can only extract an empty render from an empty column!
   So why bother?
 */
@@ -721,8 +719,9 @@ PlacedFx FxBuilder::makePF(TLevelColumnFx *lcfx)
 	if (!lcfx || !lcfx->getColumn())
 		return PlacedFx();
 
-	if (!lcfx->getColumn()->isPreviewVisible()) // This is the 'eye' icon property in the column header interface
-		return PlacedFx();						// that disables rendering of this particular column
+	if (!lcfx->getColumn()
+			 ->isPreviewVisible()) // This is the 'eye' icon property in the column header interface
+		return PlacedFx();		   // that disables rendering of this particular column
 
 	// Retrieve the corresponding xsheet cell to build up
 	/*-- 現在のフレームのセルを取得 --*/
@@ -734,7 +733,8 @@ PlacedFx FxBuilder::makePF(TLevelColumnFx *lcfx)
 		return PlacedFx();
 
 	if (m_whichLevels == TOutputProperties::AnimatedOnly) {
-		// In case only 'animated levels' are selected to be rendered, exclude all 'backgrounds' - that is,
+		// In case only 'animated levels' are selected to be rendered, exclude all 'backgrounds' -
+		// that is,
 		// fullcolor levels...
 
 		// Still, I wonder if this is still used in Toonz. I don't remember seeing it anywhere :\ ?
@@ -743,13 +743,14 @@ PlacedFx FxBuilder::makePF(TLevelColumnFx *lcfx)
 
 		/*-- ParticleFxのTextureポートに繋がっていない場合 --*/
 		if (m_particleDescendentCount == 0) {
-			if (!xl || xl->getType() != PLI_XSHLEVEL && xl->getType() != TZP_XSHLEVEL && xl->getType() != CHILD_XSHLEVEL)
+			if (!xl ||
+				xl->getType() != PLI_XSHLEVEL && xl->getType() != TZP_XSHLEVEL &&
+					xl->getType() != CHILD_XSHLEVEL)
 				return PlacedFx();
 		}
 		/*-- ParticleFxのTextureポートに繋がっている場合 --*/
 		else {
-			if (xl && xl->getType() != PLI_XSHLEVEL &&
-				xl->getType() != TZP_XSHLEVEL &&
+			if (xl && xl->getType() != PLI_XSHLEVEL && xl->getType() != TZP_XSHLEVEL &&
 				xl->getType() != CHILD_XSHLEVEL)
 				return PlacedFx();
 		}
@@ -774,7 +775,8 @@ PlacedFx FxBuilder::makePF(TLevelColumnFx *lcfx)
 		// Then, add the TimeShuffleFx
 		pf.m_fx = timeShuffle(builder.buildFx(), levelFrame, lcfx->getTimeRegion());
 		pf.m_fx->setIdentifier(lcfx->getIdentifier());
-		pf.m_fx->getAttributes()->passiveCacheDataIdx() = lcfx->getAttributes()->passiveCacheDataIdx();
+		pf.m_fx->getAttributes()->passiveCacheDataIdx() =
+			lcfx->getAttributes()->passiveCacheDataIdx();
 
 		// If the level should sustain a Plastic deformation, add the corresponding fx
 		addPlasticDeformerFx(pf);
@@ -787,23 +789,28 @@ PlacedFx FxBuilder::makePF(TLevelColumnFx *lcfx)
 			// If the level should sustain a Plastic deformation, add the corresponding fx
 			if (!addPlasticDeformerFx(pf)) {
 				// Common (image) level case - add an NaAffineFx to compensate for the image's dpi
-				TAffine dpiAff = ::getDpiAffine(sl, cell.m_frameId, true); // true stands for 'force full-sampling'
+				TAffine dpiAff = ::getDpiAffine(sl, cell.m_frameId,
+												true); // true stands for 'force full-sampling'
 				pf.m_fx = TFxUtil::makeAffine(pf.m_fx, dpiAff);
 				if (pf.m_fx)
 					pf.m_fx->setName(L"LevelColumn AffineFx");
 			}
 		} else {
-			// Okay, weird code ensues. This is what happens on non-common image cases, which should be:
+			// Okay, weird code ensues. This is what happens on non-common image cases, which should
+			// be:
 
 			//  1. Sub-Xsheet cases - and it really shouldn't
-			//  2. Empty cell cases - with m_particles_blabla > 0; and again I don't get why on earth this should happen...
+			//  2. Empty cell cases - with m_particles_blabla > 0; and again I don't get why on
+			//  earth this should happen...
 
-			// Please, note that (1) is a bug, although it happens when inserting a common level and a sub-xsh
+			// Please, note that (1) is a bug, although it happens when inserting a common level and
+			// a sub-xsh
 			// level in the same column...
 
-			//when a cell not exists, there is no way to keep the dpi of the image!
-			//in this case it is kept the dpi of the first cell not empty in the column!
-			/*-- 空セルのとき、Dpiアフィン変換には、その素材が入っている一番上のセルのものを使う --*/
+			// when a cell not exists, there is no way to keep the dpi of the image!
+			// in this case it is kept the dpi of the first cell not empty in the column!
+			/*-- 空セルのとき、Dpiアフィン変換には、その素材が入っている一番上のセルのものを使う
+			 * --*/
 			TXshLevelColumn *column = lcfx->getColumn();
 			int i;
 			for (i = 0; i < column->getRowCount(); i++) {
@@ -860,7 +867,8 @@ PlacedFx FxBuilder::makePF(TZeraryColumnFx *zcfx)
 		return PlacedFx();
 
 	TFx *fx = zcfx->getZeraryFx();
-	if (!fx || !fx->getAttributes()->isEnabled()) // ... Perhaps these shouldn't be tested altogether? Only 1 truly works !
+	if (!fx || !fx->getAttributes()->isEnabled()) // ... Perhaps these shouldn't be tested
+												  // altogether? Only 1 truly works !
 		return PlacedFx();
 
 	TXshCell cell = zcfx->getColumn()->getCell(tfloor(m_frame));
@@ -879,8 +887,8 @@ PlacedFx FxBuilder::makePF(TZeraryColumnFx *zcfx)
 		if (TFxP inputFx = fx->getInputPort(i)->getFx()) {
 			PlacedFx inputPF;
 
-			//if the effect is a particle fx, it is necessary to consider also empty cells
-			//this causes a connection with the effect and a level also with empty cells.
+			// if the effect is a particle fx, it is necessary to consider also empty cells
+			// this causes a connection with the effect and a level also with empty cells.
 			if (fx->getFxType() == "STD_particlesFx" ||
 				fx->getFxType() == "STD_iwa_TiledParticlesFx" ||
 				fx->getFxType() == "STD_tiledParticlesFx") {
@@ -927,10 +935,13 @@ PlacedFx FxBuilder::makePFfromUnaryFx(TFx *fx)
 		// Fx is enabled, so insert it in the render-tree
 
 		// Clone this fx necessary
-		if (pf.m_fx.getPointer() != inputFx ||	 // As in an earlier makePF, clone whenever input connections have changed
-			fx->getAttributes()->isSpeedAware() || // In the 'speedAware' case, we'll alter the fx's attributes (see below)
-			dynamic_cast<TMacroFx *>(fx))		   // As for macros... I'm not sure. Not even who wrote this *understood*
-												   // why - it just solved a bug  X( . Investigate!
+		if (pf.m_fx.getPointer() !=
+				inputFx || // As in an earlier makePF, clone whenever input connections have changed
+			fx->getAttributes()->isSpeedAware() || // In the 'speedAware' case, we'll alter the fx's
+												   // attributes (see below)
+			dynamic_cast<TMacroFx *>(
+				fx)) // As for macros... I'm not sure. Not even who wrote this *understood*
+					 // why - it just solved a bug  X( . Investigate!
 		{
 			fx = fx->clone(false);
 			if (!fx->connect(fx->getInputPortName(0), pf.m_fx.getPointer()))
@@ -950,8 +961,9 @@ PlacedFx FxBuilder::makePFfromUnaryFx(TFx *fx)
 				MotionObjectType type = mabfx->getMotionObjectType();
 				int index = mabfx->getMotionObjectIndex()->getValue();
 				TStageObjectId objectId = getMotionObjectId(type, index);
-				fx->getAttributes()->setMotionPoints(getColumnMotionPoints(m_xsh, m_frame, pf.m_columnIndex, objectId, m_isPreview,
-																		   shutterStart, shutterEnd, traceResolution));
+				fx->getAttributes()->setMotionPoints(
+					getColumnMotionPoints(m_xsh, m_frame, pf.m_columnIndex, objectId, m_isPreview,
+										  shutterStart, shutterEnd, traceResolution));
 			} else {
 				TPointD speed = getColumnSpeed(m_xsh, m_frame, pf.m_columnIndex, m_isPreview);
 				fx->getAttributes()->setSpeed(speed);
@@ -982,7 +994,8 @@ PlacedFx FxBuilder::makePFfromGenericFx(TFx *fx)
 		return pf;
 	}
 
-	// Multi-input fxs are always cloned - since at least one of its input ports will have an NaAffineFx
+	// Multi-input fxs are always cloned - since at least one of its input ports will have an
+	// NaAffineFx
 	// injected just before its actual input fx.
 	pf.m_fx = fx->clone(false);
 
@@ -1016,8 +1029,9 @@ PlacedFx FxBuilder::makePFfromGenericFx(TFx *fx)
 						MotionObjectType type = mabfx->getMotionObjectType();
 						int index = mabfx->getMotionObjectIndex()->getValue();
 						TStageObjectId objectId = getMotionObjectId(type, index);
-						fx->getAttributes()->setMotionPoints(getColumnMotionPoints(m_xsh, m_frame, pf.m_columnIndex, objectId, m_isPreview,
-																				   shutterStart, shutterEnd, traceResolution));
+						fx->getAttributes()->setMotionPoints(getColumnMotionPoints(
+							m_xsh, m_frame, pf.m_columnIndex, objectId, m_isPreview, shutterStart,
+							shutterEnd, traceResolution));
 					}
 				}
 
@@ -1044,7 +1058,8 @@ PlacedFx FxBuilder::makePFfromGenericFx(TFx *fx)
 //    Exported  Render-Tree building  functions
 //***************************************************************************************************
 
-TFxP buildSceneFx(ToonzScene *scene, TXsheet *xsh, double row, int whichLevels, int shrink, bool isPreview)
+TFxP buildSceneFx(ToonzScene *scene, TXsheet *xsh, double row, int whichLevels, int shrink,
+				  bool isPreview)
 {
 	FxBuilder builder(scene, xsh, row, whichLevels, isPreview);
 	TFxP fx = builder.buildFx();
@@ -1061,16 +1076,15 @@ TFxP buildSceneFx(ToonzScene *scene, TXsheet *xsh, double row, int whichLevels, 
 	TAffine aff = getDpiAffine(camera).inv();
 	if (shrink > 1) {
 		double fac = 0.5 * (1.0 / shrink - 1.0);
-		aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) * TScale(1.0 / shrink) * aff;
+		aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) *
+			  TScale(1.0 / shrink) * aff;
 	}
 
 	fx = TFxUtil::makeAffine(fx, aff);
 	if (fx)
 		fx->setName(L"CameraDPI and Shrink NAffineFx");
 
-	fx = TFxUtil::makeOver(
-		TFxUtil::makeColorCard(scene->getProperties()->getBgColor()),
-		fx);
+	fx = TFxUtil::makeOver(TFxUtil::makeColorCard(scene->getProperties()->getBgColor()), fx);
 	return fx;
 }
 
@@ -1078,8 +1092,7 @@ TFxP buildSceneFx(ToonzScene *scene, TXsheet *xsh, double row, int whichLevels, 
 
 TFxP buildSceneFx(ToonzScene *scene, TXsheet *xsh, double row, int shrink, bool isPreview)
 {
-	int whichLevels =
-		scene->getProperties()->getOutputProperties()->getWhichLevels();
+	int whichLevels = scene->getProperties()->getOutputProperties()->getWhichLevels();
 	return buildSceneFx(scene, xsh, row, whichLevels, shrink, isPreview);
 }
 
@@ -1094,8 +1107,7 @@ TFxP buildSceneFx(ToonzScene *scene, double row, int shrink, bool isPreview)
 
 TFxP buildSceneFx(ToonzScene *scene, TXsheet *xsh, double row, const TFxP &root, bool isPreview)
 {
-	int whichLevels =
-		scene->getProperties()->getOutputProperties()->getWhichLevels();
+	int whichLevels = scene->getProperties()->getOutputProperties()->getWhichLevels();
 	FxBuilder builder(scene, xsh, row, whichLevels, isPreview);
 	return builder.buildFx(root, BSFX_NO_TR);
 }
@@ -1109,12 +1121,13 @@ TFxP buildSceneFx(ToonzScene *scene, double row, const TFxP &root, bool isPrevie
 
 //===================================================================
 
-//!Similar to buildSceneFx(ToonzScene *scene, double row, const TFxP &root, bool isPreview) method, build the sceneFx
+//! Similar to buildSceneFx(ToonzScene *scene, double row, const TFxP &root, bool isPreview) method,
+//! build the sceneFx
 //! adding also camera transformations. Used for Preview Fx function.
-DVAPI TFxP buildPartialSceneFx(ToonzScene *scene, double row, const TFxP &root, int shrink, bool isPreview)
+DVAPI TFxP buildPartialSceneFx(ToonzScene *scene, double row, const TFxP &root, int shrink,
+							   bool isPreview)
 {
-	int whichLevels =
-		scene->getProperties()->getOutputProperties()->getWhichLevels();
+	int whichLevels = scene->getProperties()->getOutputProperties()->getWhichLevels();
 	FxBuilder builder(scene, scene->getXsheet(), row, whichLevels, isPreview);
 	TFxP fx = builder.buildFx(root, BSFX_Transforms_Enum(BSFX_CAMERA_TR | BSFX_COLUMN_TR));
 
@@ -1133,7 +1146,8 @@ DVAPI TFxP buildPartialSceneFx(ToonzScene *scene, double row, const TFxP &root, 
 	if (shrink > 1) {
 		double fac = 0.5 * (1.0 / shrink - 1.0);
 
-		aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) * TScale(1.0 / shrink) * aff;
+		aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) *
+			  TScale(1.0 / shrink) * aff;
 	}
 
 	fx = TFxUtil::makeAffine(fx, aff);
@@ -1142,10 +1156,10 @@ DVAPI TFxP buildPartialSceneFx(ToonzScene *scene, double row, const TFxP &root, 
 
 //===================================================================
 
-DVAPI TFxP buildPartialSceneFx(ToonzScene *scene, TXsheet *xsheet, double row, const TFxP &root, int shrink, bool isPreview)
+DVAPI TFxP buildPartialSceneFx(ToonzScene *scene, TXsheet *xsheet, double row, const TFxP &root,
+							   int shrink, bool isPreview)
 {
-	int whichLevels =
-		scene->getProperties()->getOutputProperties()->getWhichLevels();
+	int whichLevels = scene->getProperties()->getOutputProperties()->getWhichLevels();
 	FxBuilder builder(scene, xsheet, row, whichLevels, isPreview);
 	TFxP fx = builder.buildFx(root, BSFX_Transforms_Enum(BSFX_CAMERA_TR | BSFX_COLUMN_TR));
 
@@ -1163,7 +1177,8 @@ DVAPI TFxP buildPartialSceneFx(ToonzScene *scene, TXsheet *xsheet, double row, c
 	if (shrink > 1) {
 		double fac = 0.5 * (1.0 / shrink - 1.0);
 
-		aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) * TScale(1.0 / shrink) * aff;
+		aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) *
+			  TScale(1.0 / shrink) * aff;
 	}
 
 	fx = TFxUtil::makeAffine(fx, aff);
@@ -1182,14 +1197,14 @@ DVAPI TFxP buildPartialSceneFx(ToonzScene *scene, TXsheet *xsheet, double row, c
 */
 DVAPI TFxP buildPostSceneFx(ToonzScene *scene, double frame, int shrink, bool isPreview)
 {
-	//NOTE: Should whichLevels access output AND PREVIEW settings?
+	// NOTE: Should whichLevels access output AND PREVIEW settings?
 	int whichLevels = scene->getProperties()->getOutputProperties()->getWhichLevels();
 
 	TXsheet *xsh = scene->getXsheet();
 	if (!xsh)
 		xsh = scene->getXsheet();
 
-	//Do not expand the xsheet node
+	// Do not expand the xsheet node
 	FxBuilder builder(scene, xsh, frame, whichLevels, isPreview, false);
 
 	TFxP fx = builder.buildFx();
@@ -1208,7 +1223,8 @@ DVAPI TFxP buildPostSceneFx(ToonzScene *scene, double frame, int shrink, bool is
 
 	if (shrink > 1) {
 		double fac = 0.5 * (1.0 / shrink - 1.0);
-		aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) * TScale(1.0 / shrink) * aff;
+		aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) *
+			  TScale(1.0 / shrink) * aff;
 	}
 
 	if (!aff.isIdentity())
@@ -1220,8 +1236,8 @@ DVAPI TFxP buildPostSceneFx(ToonzScene *scene, double frame, int shrink, bool is
 //===================================================================
 
 DVAPI TFxP buildSceneFx(ToonzScene *scene, double frame, TXsheet *xsh, const TFxP &root,
-						BSFX_Transforms_Enum transforms,
-						bool isPreview, int whichLevels, int shrink)
+						BSFX_Transforms_Enum transforms, bool isPreview, int whichLevels,
+						int shrink)
 {
 	// NOTE: Should whichLevels access output AND PREVIEW settings?
 	if (whichLevels == -1)
@@ -1232,12 +1248,10 @@ DVAPI TFxP buildSceneFx(ToonzScene *scene, double frame, TXsheet *xsh, const TFx
 
 	FxBuilder builder(scene, xsh, frame, whichLevels, isPreview);
 
-	TFxP fx = root ? builder.buildFx(root, transforms)
-				   : builder.buildFx();
+	TFxP fx = root ? builder.buildFx(root, transforms) : builder.buildFx();
 
-	TStageObjectId cameraId =
-		isPreview ? xsh->getStageObjectTree()->getCurrentPreviewCameraId()
-				  : xsh->getStageObjectTree()->getCurrentCameraId();
+	TStageObjectId cameraId = isPreview ? xsh->getStageObjectTree()->getCurrentPreviewCameraId()
+										: xsh->getStageObjectTree()->getCurrentCameraId();
 
 	TStageObject *cameraPegbar = xsh->getStageObject(cameraId);
 	assert(cameraPegbar);
@@ -1251,7 +1265,8 @@ DVAPI TFxP buildSceneFx(ToonzScene *scene, double frame, TXsheet *xsh, const TFx
 
 	if (shrink > 1) {
 		double fac = 0.5 * (1.0 / shrink - 1.0);
-		aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) * TScale(1.0 / shrink) * aff;
+		aff = TTranslation(fac * camera->getRes().lx, fac * camera->getRes().ly) *
+			  TScale(1.0 / shrink) * aff;
 	}
 
 	if (!aff.isIdentity())

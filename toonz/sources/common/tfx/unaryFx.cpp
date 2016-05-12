@@ -27,10 +27,7 @@ void TGeometryFx::compute(TFlash &flash, int frame)
 
 //---------------------------------------------------------------
 
-void TGeometryFx::doCompute(
-	TTile &tile,
-	double frame,
-	const TRenderSettings &ri)
+void TGeometryFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 {
 	TRasterFxPort *input = dynamic_cast<TRasterFxPort *>(getInputPort(0));
 	assert(input);
@@ -99,8 +96,7 @@ std::string TGeometryFx::getAlias(double frame, const TRenderSettings &info) con
 		alias += ",";
 	}
 
-	return alias +
-		   (areAlmostEqual(affine.a11, 0) ? "0" : ::toString(affine.a11, 5)) + "," +
+	return alias + (areAlmostEqual(affine.a11, 0) ? "0" : ::toString(affine.a11, 5)) + "," +
 		   (areAlmostEqual(affine.a12, 0) ? "0" : ::toString(affine.a12, 5)) + "," +
 		   (areAlmostEqual(affine.a13, 0) ? "0" : ::toString(affine.a13, 5)) + "," +
 		   (areAlmostEqual(affine.a21, 0) ? "0" : ::toString(affine.a21, 5)) + "," +
@@ -110,11 +106,8 @@ std::string TGeometryFx::getAlias(double frame, const TRenderSettings &info) con
 
 //--------------------------------------------------
 
-void TGeometryFx::transform(double frame,
-							int port,
-							const TRectD &rectOnOutput,
-							const TRenderSettings &infoOnOutput,
-							TRectD &rectOnInput,
+void TGeometryFx::transform(double frame, int port, const TRectD &rectOnOutput,
+							const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
 							TRenderSettings &infoOnInput)
 {
 	rectOnInput = rectOnOutput;
@@ -126,8 +119,7 @@ void TGeometryFx::transform(double frame,
 
 //==================================================
 
-NaAffineFx::NaAffineFx(bool isDpiAffine)
-	: m_aff(TAffine()), m_isDpiAffine(isDpiAffine)
+NaAffineFx::NaAffineFx(bool isDpiAffine) : m_aff(TAffine()), m_isDpiAffine(isDpiAffine)
 {
 	addInputPort("source", m_port);
 	setName(L"Geometry-NaAffineFx");
@@ -186,7 +178,7 @@ class InvertFx : public TBaseRasterFx
 	TRasterFxPort m_input;
 	TBoolParamP m_redChan, m_greenChan, m_blueChan, m_alphaChan;
 
-public:
+  public:
 	InvertFx() : m_redChan(true), m_greenChan(true), m_blueChan(true), m_alphaChan(false)
 	{
 		addInputPort("source", m_input);
@@ -219,7 +211,8 @@ public:
 
 		m_input->compute(tile, frame, ri);
 
-		TRop::invert(tile.getRaster(), m_redChan->getValue(), m_greenChan->getValue(), m_blueChan->getValue(), m_alphaChan->getValue());
+		TRop::invert(tile.getRaster(), m_redChan->getValue(), m_greenChan->getValue(),
+					 m_blueChan->getValue(), m_alphaChan->getValue());
 	}
 };
 
@@ -232,16 +225,16 @@ public:
 //===
 
 // Geometric
-//FX_IDENTIFIER(ScaleFx,       "scaleFx")
-//FX_IDENTIFIER(MoveFx,        "moveFx")
-//FX_IDENTIFIER(AffineFx,      "affineFx")
-//FX_IDENTIFIER(CropFx,        "cropFx")
+// FX_IDENTIFIER(ScaleFx,       "scaleFx")
+// FX_IDENTIFIER(MoveFx,        "moveFx")
+// FX_IDENTIFIER(AffineFx,      "affineFx")
+// FX_IDENTIFIER(CropFx,        "cropFx")
 
 // Color
 FX_IDENTIFIER(InvertFx, "invertFx")
 
 // Video
-//FX_IDENTIFIER(FieldFx,       "fieldFx")
-//FX_IDENTIFIER(SwapFieldsFx,  "swapFieldsFx")
-//FX_IDENTIFIER(DeInterlaceFx, "deInterlaceFx")
-//FX_IDENTIFIER(InterlaceFx,   "interlaceFx")
+// FX_IDENTIFIER(FieldFx,       "fieldFx")
+// FX_IDENTIFIER(SwapFieldsFx,  "swapFieldsFx")
+// FX_IDENTIFIER(DeInterlaceFx, "deInterlaceFx")
+// FX_IDENTIFIER(InterlaceFx,   "interlaceFx")

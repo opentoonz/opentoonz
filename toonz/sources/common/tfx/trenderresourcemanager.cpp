@@ -20,7 +20,7 @@ class RenderInstanceManagersBuilder : public TRenderResourceManager
 	typedef std::vector<TRenderResourceManager *> ManagersVector;
 	std::map<unsigned long, ManagersVector> m_managersMap;
 
-public:
+  public:
 	RenderInstanceManagersBuilder() {}
 	~RenderInstanceManagersBuilder() {}
 
@@ -38,14 +38,12 @@ public:
 
 class RenderInstanceManagersBuilderGenerator : public TRenderResourceManagerGenerator
 {
-public:
-	TRenderResourceManager *operator()(void)
-	{
-		return RenderInstanceManagersBuilder::instance();
-	}
+  public:
+	TRenderResourceManager *operator()(void) { return RenderInstanceManagersBuilder::instance(); }
 };
 
-MANAGER_FILESCOPE_DECLARATION(RenderInstanceManagersBuilder, RenderInstanceManagersBuilderGenerator);
+MANAGER_FILESCOPE_DECLARATION(RenderInstanceManagersBuilder,
+							  RenderInstanceManagersBuilderGenerator);
 
 //***********************************************************************************************
 //    Stub managers and generators
@@ -61,9 +59,8 @@ class InstanceResourceManagerStub : public TRenderResourceManager
 {
 	TRenderResourceManagerGenerator *m_generator;
 
-public:
-	InstanceResourceManagerStub(TRenderResourceManagerGenerator *generator)
-		: m_generator(generator)
+  public:
+	InstanceResourceManagerStub(TRenderResourceManagerGenerator *generator) : m_generator(generator)
 	{
 	}
 
@@ -83,16 +80,10 @@ class StubGenerator : public TRenderResourceManagerGenerator
 {
 	TRenderResourceManagerGenerator *m_generator;
 
-public:
-	StubGenerator(TRenderResourceManagerGenerator *generator)
-		: m_generator(generator)
-	{
-	}
+  public:
+	StubGenerator(TRenderResourceManagerGenerator *generator) : m_generator(generator) {}
 
-	TRenderResourceManager *operator()()
-	{
-		return new InstanceResourceManagerStub(m_generator);
-	}
+	TRenderResourceManager *operator()() { return new InstanceResourceManagerStub(m_generator); }
 };
 
 //***********************************************************************************************
@@ -107,7 +98,8 @@ std::vector<TRenderResourceManagerGenerator *> &TRenderResourceManagerGenerator:
 
 //-------------------------------------------------------------------------
 
-std::vector<TRenderResourceManagerGenerator *> &TRenderResourceManagerGenerator::generators(bool instanceScope)
+std::vector<TRenderResourceManagerGenerator *> &
+TRenderResourceManagerGenerator::generators(bool instanceScope)
 {
 	static std::vector<TRenderResourceManagerGenerator *> generatorsInstance;
 	static std::vector<TRenderResourceManagerGenerator *> generatorsRenderer;
@@ -119,9 +111,9 @@ std::vector<TRenderResourceManagerGenerator *> &TRenderResourceManagerGenerator:
 TRenderResourceManagerGenerator::TRenderResourceManagerGenerator(bool renderInstanceScope)
 	: m_instanceScope(renderInstanceScope)
 {
-	//In case this has a renderInstanceScope, build a stub generator
+	// In case this has a renderInstanceScope, build a stub generator
 	if (renderInstanceScope) {
-		RenderInstanceManagersBuilder::gen(); //Stubs depend on this manager
+		RenderInstanceManagersBuilder::gen(); // Stubs depend on this manager
 
 		static std::vector<TRenderResourceManagerGenerator *> stubGenerators;
 		stubGenerators.push_back(new StubGenerator(this));
@@ -147,7 +139,9 @@ TRenderResourceManager *TRenderResourceManagerGenerator::getManager(const TRende
 
 TRenderResourceManager *TRenderResourceManagerGenerator::getManager(unsigned long renderId) const
 {
-	return m_instanceScope ? RenderInstanceManagersBuilder::instance()->getManager(renderId, m_managerIndex) : 0;
+	return m_instanceScope
+			   ? RenderInstanceManagersBuilder::instance()->getManager(renderId, m_managerIndex)
+			   : 0;
 }
 
 //***********************************************************************************************
@@ -162,8 +156,8 @@ RenderInstanceManagersBuilder *RenderInstanceManagersBuilder::instance()
 
 //-------------------------------------------------------------------------
 
-inline TRenderResourceManager *RenderInstanceManagersBuilder::
-	getManager(unsigned long renderId, unsigned int idx) const
+inline TRenderResourceManager *RenderInstanceManagersBuilder::getManager(unsigned long renderId,
+																		 unsigned int idx) const
 {
 	std::map<unsigned long, ManagersVector>::const_iterator it = m_managersMap.find(renderId);
 	return it == m_managersMap.end() ? 0 : it->second[idx];
@@ -173,7 +167,7 @@ inline TRenderResourceManager *RenderInstanceManagersBuilder::
 
 void RenderInstanceManagersBuilder::onRenderInstanceStart(unsigned long id)
 {
-	//Build the instance managers
+	// Build the instance managers
 	std::map<unsigned long, ManagersVector>::iterator it =
 		m_managersMap.insert(std::make_pair(id, ManagersVector())).first;
 
@@ -189,9 +183,8 @@ void RenderInstanceManagersBuilder::onRenderInstanceStart(unsigned long id)
 
 void RenderInstanceManagersBuilder::onRenderInstanceEnd(unsigned long id)
 {
-	//Delete the instance managers
-	std::map<unsigned long, ManagersVector>::iterator it =
-		m_managersMap.find(id);
+	// Delete the instance managers
+	std::map<unsigned long, ManagersVector>::iterator it = m_managersMap.find(id);
 
 	assert(it != m_managersMap.end());
 
@@ -208,8 +201,8 @@ void RenderInstanceManagersBuilder::onRenderInstanceEnd(unsigned long id)
 
 void InstanceResourceManagerStub::onRenderInstanceStart(unsigned long id)
 {
-	RenderInstanceManagersBuilder::instance()->getManager(id,
-														  m_generator->getGeneratorIndex())
+	RenderInstanceManagersBuilder::instance()
+		->getManager(id, m_generator->getGeneratorIndex())
 		->onRenderInstanceStart(id);
 }
 
@@ -217,8 +210,8 @@ void InstanceResourceManagerStub::onRenderInstanceStart(unsigned long id)
 
 void InstanceResourceManagerStub::onRenderInstanceEnd(unsigned long id)
 {
-	RenderInstanceManagersBuilder::instance()->getManager(id,
-														  m_generator->getGeneratorIndex())
+	RenderInstanceManagersBuilder::instance()
+		->getManager(id, m_generator->getGeneratorIndex())
 		->onRenderInstanceEnd(id);
 }
 
@@ -226,9 +219,8 @@ void InstanceResourceManagerStub::onRenderInstanceEnd(unsigned long id)
 
 void InstanceResourceManagerStub::onRenderFrameStart(double f)
 {
-	RenderInstanceManagersBuilder::instance()->getManager(
-												 TRenderer::renderId(),
-												 m_generator->getGeneratorIndex())
+	RenderInstanceManagersBuilder::instance()
+		->getManager(TRenderer::renderId(), m_generator->getGeneratorIndex())
 		->onRenderFrameStart(f);
 }
 
@@ -236,9 +228,8 @@ void InstanceResourceManagerStub::onRenderFrameStart(double f)
 
 void InstanceResourceManagerStub::onRenderFrameEnd(double f)
 {
-	RenderInstanceManagersBuilder::instance()->getManager(
-												 TRenderer::renderId(),
-												 m_generator->getGeneratorIndex())
+	RenderInstanceManagersBuilder::instance()
+		->getManager(TRenderer::renderId(), m_generator->getGeneratorIndex())
 		->onRenderFrameEnd(f);
 }
 
@@ -246,9 +237,8 @@ void InstanceResourceManagerStub::onRenderFrameEnd(double f)
 
 void InstanceResourceManagerStub::onRenderStatusStart(int renderStatus)
 {
-	RenderInstanceManagersBuilder::instance()->getManager(
-												 TRenderer::renderId(),
-												 m_generator->getGeneratorIndex())
+	RenderInstanceManagersBuilder::instance()
+		->getManager(TRenderer::renderId(), m_generator->getGeneratorIndex())
 		->onRenderStatusStart(renderStatus);
 }
 
@@ -256,8 +246,7 @@ void InstanceResourceManagerStub::onRenderStatusStart(int renderStatus)
 
 void InstanceResourceManagerStub::onRenderStatusEnd(int renderStatus)
 {
-	RenderInstanceManagersBuilder::instance()->getManager(
-												 TRenderer::renderId(),
-												 m_generator->getGeneratorIndex())
+	RenderInstanceManagersBuilder::instance()
+		->getManager(TRenderer::renderId(), m_generator->getGeneratorIndex())
 		->onRenderStatusEnd(renderStatus);
 }

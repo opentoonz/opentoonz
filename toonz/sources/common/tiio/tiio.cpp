@@ -26,21 +26,16 @@ namespace
 
 class TiioTable
 { // singleton
-public:
-	typedef std::map<std::string, Tiio::ReaderMaker *>
-		ReaderTable;
+  public:
+	typedef std::map<std::string, Tiio::ReaderMaker *> ReaderTable;
 
-	typedef std::map<std::string, std::pair<Tiio::WriterMaker *, bool>>
-		WriterTable;
+	typedef std::map<std::string, std::pair<Tiio::WriterMaker *, bool>> WriterTable;
 
-	typedef std::map<std::string, Tiio::VectorReaderMaker *>
-		VectorReaderTable;
+	typedef std::map<std::string, Tiio::VectorReaderMaker *> VectorReaderTable;
 
-	typedef std::map<std::string, std::pair<Tiio::VectorWriterMaker *, bool>>
-		VectorWriterTable;
+	typedef std::map<std::string, std::pair<Tiio::VectorWriterMaker *, bool>> VectorWriterTable;
 
-	typedef std::map<std::string, TPropertyGroup *>
-		PropertiesTable;
+	typedef std::map<std::string, TPropertyGroup *> PropertiesTable;
 
 	ReaderTable m_readers;
 	WriterTable m_writers;
@@ -62,18 +57,12 @@ public:
 			delete it->second;
 	}
 
-	void add(std::string ext, Tiio::ReaderMaker *fn)
-	{
-		m_readers[ext] = fn;
-	}
+	void add(std::string ext, Tiio::ReaderMaker *fn) { m_readers[ext] = fn; }
 	void add(std::string ext, Tiio::WriterMaker *fn, bool isRenderFormat)
 	{
 		m_writers[ext] = std::pair<Tiio::WriterMaker *, bool>(fn, isRenderFormat);
 	}
-	void add(std::string ext, Tiio::VectorReaderMaker *fn)
-	{
-		m_vectorReaders[ext] = fn;
-	}
+	void add(std::string ext, Tiio::VectorReaderMaker *fn) { m_vectorReaders[ext] = fn; }
 	void add(std::string ext, Tiio::VectorWriterMaker *fn, bool isRenderFormat)
 	{
 		m_vectorWriters[ext] = std::pair<Tiio::VectorWriterMaker *, bool>(fn, isRenderFormat);
@@ -194,7 +183,8 @@ void Tiio::defineVectorReaderMaker(const char *ext, Tiio::VectorReaderMaker *fn)
 	TiioTable::instance()->add(ext, fn);
 }
 
-void Tiio::defineVectorWriterMaker(const char *ext, Tiio::VectorWriterMaker *fn, bool isRenderFormat)
+void Tiio::defineVectorWriterMaker(const char *ext, Tiio::VectorWriterMaker *fn,
+								   bool isRenderFormat)
 {
 	TiioTable::instance()->add(ext, fn, isRenderFormat);
 }
@@ -210,21 +200,21 @@ int Tiio::openForReading(char *fn)
 {
   int fd = _open(fn, _O_BINARY|_O_RDONLY);
   if(fd == -1)
-    {
-     fprintf(stderr, "File not found\n");
-     exit(1);
-    }
-  return fd;  
+	{
+	 fprintf(stderr, "File not found\n");
+	 exit(1);
+	}
+  return fd;
 }
 
 void* Tiio::openForReading2(char *fn)
 {
   FILE *chan = fopen(fn, "rb");
   if(!chan)
-    {
-     fprintf(stderr, "File not found\n");
-     exit(1);
-    }
+	{
+	 fprintf(stderr, "File not found\n");
+	 exit(1);
+	}
   return (void*)chan;
 }
 
@@ -232,15 +222,15 @@ void* Tiio::openForReading2(char *fn)
 int Tiio::openForWriting(char *fn)
 {
   int fd = _open(
-      fn, 
-      _O_BINARY | _O_WRONLY | _O_CREAT | _O_TRUNC,
-      _S_IREAD | _S_IWRITE);
+	  fn,
+	  _O_BINARY | _O_WRONLY | _O_CREAT | _O_TRUNC,
+	  _S_IREAD | _S_IWRITE);
   if(fd == -1)
-    {
-     fprintf(stderr, "Can't open file\n");
-     exit(1);
-    }
-  return fd;  
+	{
+	 fprintf(stderr, "Can't open file\n");
+	 exit(1);
+	}
+  return fd;
 }
 
 #endif
@@ -256,8 +246,7 @@ Tiio::Reader::~Reader()
 
 int Tiio::Writer::m_bwThreshold = 128;
 
-Tiio::Writer::Writer()
-	: m_properties(0)
+Tiio::Writer::Writer() : m_properties(0)
 {
 }
 
@@ -267,8 +256,10 @@ Tiio::Writer::~Writer()
 
 void Tiio::Writer::getSupportedFormats(QStringList &formats, bool onlyRenderFormats)
 {
-	TiioTable::VectorWriterTable::const_iterator vit = TiioTable::instance()->m_vectorWriters.begin();
-	TiioTable::VectorWriterTable::const_iterator vit_e = TiioTable::instance()->m_vectorWriters.end();
+	TiioTable::VectorWriterTable::const_iterator vit =
+		TiioTable::instance()->m_vectorWriters.begin();
+	TiioTable::VectorWriterTable::const_iterator vit_e =
+		TiioTable::instance()->m_vectorWriters.end();
 	for (; vit != vit_e; ++vit)
 		if (onlyRenderFormats && vit->second.second)
 			formats.push_back(QString::fromStdString(vit->first));

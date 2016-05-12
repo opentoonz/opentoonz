@@ -25,7 +25,7 @@
 #include "toonzqt/icongenerator.h"
 #include "toonzqt/gutil.h"
 #include "toonzqt/pluginloader.h"
-//iwsw commented out temporarily
+// iwsw commented out temporarily
 //#include "toonzqt/ghibli_3dlut_util.h"
 
 // TnzStdfx includes
@@ -114,13 +114,15 @@ void postThreadMsg(TThread::Message *)
 void qt_mac_set_menubar_merge(bool enable);
 #endif
 
-//Modifica per toonz (non servono questo tipo di licenze)
+// Modifica per toonz (non servono questo tipo di licenze)
 #define NO_LICENSE
 //-----------------------------------------------------------------------------
 
 void fatalError(QString msg)
 {
-	DVGui::MsgBoxInPopup(CRITICAL, msg + "\n" + QObject::tr("Installing %1 again could fix the problem.").arg(applicationFullName));
+	DVGui::MsgBoxInPopup(CRITICAL, msg + "\n" +
+									   QObject::tr("Installing %1 again could fix the problem.")
+										   .arg(applicationFullName));
 	exit(0);
 }
 //-----------------------------------------------------------------------------
@@ -128,7 +130,7 @@ void fatalError(QString msg)
 void lastWarningError(QString msg)
 {
 	DVGui::error(msg);
-	//exit(0);
+	// exit(0);
 }
 //-----------------------------------------------------------------------------
 
@@ -137,8 +139,10 @@ void toonzRunOutOfContMemHandler(unsigned long size)
 #ifdef _WIN32
 	static bool firstTime = true;
 	if (firstTime) {
-		MessageBox(NULL, (LPCWSTR)L"Run out of contiguous physical memory: please save all and restart Toonz!",
-				   (LPCWSTR)L"Warning", MB_OK | MB_SYSTEMMODAL);
+		MessageBox(
+			NULL,
+			(LPCWSTR)L"Run out of contiguous physical memory: please save all and restart Toonz!",
+			(LPCWSTR)L"Warning", MB_OK | MB_SYSTEMMODAL);
 		firstTime = false;
 	}
 #endif
@@ -154,8 +158,8 @@ DV_IMPORT_API void initColorFx();
 
 //! Inizializzaza l'Environment di Toonz
 /*! In particolare imposta la projectRoot e
-    la stuffDir, controlla se la directory di outputs esiste (e provvede a
-    crearla in caso contrario) verifica inoltre che stuffDir esista.
+	la stuffDir, controlla se la directory di outputs esiste (e provvede a
+	crearla in caso contrario) verifica inoltre che stuffDir esista.
 */
 void initToonzEnv()
 {
@@ -185,8 +189,8 @@ void initToonzEnv()
 
 	//! Inizializzazione Librerie di Toonz.
 	/*! Inizializza le plugins di toonz, imposta la rootDir per
-    ImagePatternStrokeStyle e per ImageCache, setta i folder del progetto,
-    imposta lo Stencil Buffer Context (QT), e l'offlineGL da utilizzare
+	ImagePatternStrokeStyle e per ImageCache, setta i folder del progetto,
+	imposta lo Stencil Buffer Context (QT), e l'offlineGL da utilizzare
 */
 
 	Tiio::defineStd();
@@ -209,11 +213,12 @@ void initToonzEnv()
 	TPalette::setRootDir(library);
 	TImageStyle::setLibraryDir(library);
 
-	//TProjectManager::instance()->enableTabMode(true);
+	// TProjectManager::instance()->enableTabMode(true);
 
 	TProjectManager *projectManager = TProjectManager::instance();
 
-	/*-- TOONZPROJECTSのパスセットを取得する。（TOONZPROJECTSはセミコロンで区切って複数設定可能） --*/
+	/*-- TOONZPROJECTSのパスセットを取得する。（TOONZPROJECTSはセミコロンで区切って複数設定可能）
+	 * --*/
 	TFilePathSet projectsRoots = ToonzFolder::getProjectsFolders();
 	TFilePathSet::iterator it;
 	for (it = projectsRoots.begin(); it != projectsRoots.end(); ++it)
@@ -245,7 +250,8 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	/*-- "-layout [レイアウト設定ファイル名]" で、必要なモジュールのPageだけのレイアウトで起動することを可能にする --*/
+	/*-- "-layout [レイアウト設定ファイル名]"
+	 * で、必要なモジュールのPageだけのレイアウトで起動することを可能にする --*/
 	QString argumentLayoutFileName = "";
 	TFilePath loadScenePath;
 	if (argc > 1) {
@@ -266,36 +272,42 @@ int main(int argc, char *argv[])
 	a.setAttribute(Qt::AA_UseDesktopOpenGL, true);
 #endif
 
-	// Some Qt objects are destroyed badly withouth a living qApp. So, we must enforce a way to either
+	// Some Qt objects are destroyed badly withouth a living qApp. So, we must enforce a way to
+	// either
 	// postpone the application destruction until the very end, OR ensure that sensible objects are
 	// destroyed before.
 
-	// Using a static QApplication only worked on Windows, and in any case C++ respects the statics destruction
+	// Using a static QApplication only worked on Windows, and in any case C++ respects the statics
+	// destruction
 	// order ONLY within the same library. On MAC, it made the app crash on exit o_o. So, nope.
 
-	std::auto_ptr<QObject> mainScope(new QObject(&a)); // A QObject destroyed before the qApp is therefore explicitly
-	mainScope->setObjectName("mainScope");			   // provided. It can be accessed by looking in the qApp's children.
+	std::auto_ptr<QObject> mainScope(
+		new QObject(&a)); // A QObject destroyed before the qApp is therefore explicitly
+	mainScope->setObjectName(
+		"mainScope"); // provided. It can be accessed by looking in the qApp's children.
 
 #ifdef _WIN32
 #ifndef x64
-	//Store the floating point control word. It will be re-set before Toonz initialization
-	//has ended.
+	// Store the floating point control word. It will be re-set before Toonz initialization
+	// has ended.
 	unsigned int fpWord = 0;
 	_controlfp_s(&fpWord, 0, 0);
 #endif
 #endif
 
 #ifdef _WIN32
-	//At least on windows, Qt's 4.5.2 native windows feature tend to create
-	//weird flickering effects when dragging panel separators.
+	// At least on windows, Qt's 4.5.2 native windows feature tend to create
+	// weird flickering effects when dragging panel separators.
 	a.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
-	//Set the app's locale for numeric stuff to standard C. This is important for atof() and similar
-	//calls that are locale-dependant.
+	// Set the app's locale for numeric stuff to standard C. This is important for atof() and
+	// similar
+	// calls that are locale-dependant.
 	setlocale(LC_NUMERIC, "C");
 
-// Set current directory to the bundle/application path - this is needed to have correct relative paths
+// Set current directory to the bundle/application path - this is needed to have correct relative
+// paths
 #ifdef MACOSX
 	{
 		QDir appDir(QApplication::applicationDirPath());
@@ -337,10 +349,11 @@ int main(int argc, char *argv[])
 	glutInit(&argc, argv);
 #endif
 
-	splash.showMessage(offsetStr + "Initializing Toonz environment ...", Qt::AlignCenter, Qt::white);
+	splash.showMessage(offsetStr + "Initializing Toonz environment ...", Qt::AlignCenter,
+					   Qt::white);
 	a.processEvents();
 
-	//Install run out of contiguous memory callback
+	// Install run out of contiguous memory callback
 	TBigMemoryManager::instance()->setRunOutOfContiguousMemoryHandler(&toonzRunOutOfContMemHandler);
 
 	// Toonz environment
@@ -351,7 +364,8 @@ int main(int argc, char *argv[])
 
 	TProjectManager *projectManager = TProjectManager::instance();
 	if (Preferences::instance()->isSVNEnabled()) {
-		// Read Version Control repositories and add it to project manager as "special" svn project root
+		// Read Version Control repositories and add it to project manager as "special" svn project
+		// root
 		VersionControl::instance()->init();
 		QList<SVNRepository> repositories = VersionControl::instance()->getRepositories();
 		int count = repositories.size();
@@ -372,13 +386,13 @@ int main(int argc, char *argv[])
 
 #if defined(MACOSX) && defined(__LP64__)
 
-	//Load the shared memory settings
+	// Load the shared memory settings
 	int shmmax = Preferences::instance()->getShmMax();
 	int shmseg = Preferences::instance()->getShmSeg();
 	int shmall = Preferences::instance()->getShmAll();
 	int shmmni = Preferences::instance()->getShmMni();
 
-	if (shmall < 0) //Make sure that at least 100 MB of shared memory are available
+	if (shmall < 0) // Make sure that at least 100 MB of shared memory are available
 		shmall = (tipc::shm_maxSharedPages() < (100 << 8)) ? (100 << 8) : -1;
 
 	tipc::shm_set(shmmax, shmseg, shmall, shmmni);
@@ -394,8 +408,9 @@ int main(int argc, char *argv[])
 	// Carico la traduzione contenuta in toonz.qm (se ï¿½ presente)
 	QString languagePathString = QString::fromStdString(toString(TEnv::getConfigDir() + "loc"));
 #ifndef WIN32
-	//the merge of menu on osx can cause problems with different languages with the Preferences menu
-	//qt_mac_set_menubar_merge(false);
+	// the merge of menu on osx can cause problems with different languages with the Preferences
+	// menu
+	// qt_mac_set_menubar_merge(false);
 	languagePathString += "/" + Preferences::instance()->getCurrentLanguage();
 #else
 	languagePathString += "\\" + Preferences::instance()->getCurrentLanguage();
@@ -450,13 +465,14 @@ int main(int argc, char *argv[])
 
 	loadShaderInterfaces(ToonzFolder::getLibraryFolder() + TFilePath("shaders"));
 
-	splash.showMessage(offsetStr + "Initializing Toonz application ...", Qt::AlignCenter, Qt::white);
+	splash.showMessage(offsetStr + "Initializing Toonz application ...", Qt::AlignCenter,
+					   Qt::white);
 	a.processEvents();
 
 	TTool::setApplication(TApp::instance());
 	TApp::instance()->init();
 
-//iwsw commented out temporarily
+// iwsw commented out temporarily
 #if 0 
   QStringList monitorNames;
   /*-- 接続モニタがPVM-2541の場合のみLUTを読み込む --*/
@@ -484,8 +500,9 @@ int main(int argc, char *argv[])
 
 	splash.showMessage(offsetStr + "Loading Plugins...", Qt::AlignCenter, Qt::white);
 	a.processEvents();
-	/* poll the thread ends: 
-	 絶対に必要なわけではないが PluginLoader は中で setup ハンドラが常に固有のスレッドで呼ばれるよう main thread queue の blocking をしているので
+	/* poll the thread ends:
+	 絶対に必要なわけではないが PluginLoader は中で setup ハンドラが常に固有のスレッドで呼ばれるよう
+	 main thread queue の blocking をしているので
 	 processEvents を行う必要がある
    */
 	while (!PluginLoader::load_entries("")) {
@@ -516,11 +533,15 @@ int main(int argc, char *argv[])
 	w.restoreGeometry(settings.value("MainWindowGeometry").toByteArray());
 
 #ifndef MACOSX
-	//Workaround for the maximized window case: Qt delivers two resize events, one in the normal geometry, before
-	//maximizing (why!?), the second afterwards - all inside the following show() call. This makes troublesome for
-	//the docking system to correctly restore the saved geometry. Fortunately, MainWindow::showEvent(..) gets called
-	//just between the two, so we can disable the currentRoom layout right before showing and re-enable it after
-	//the normal resize has happened.
+	// Workaround for the maximized window case: Qt delivers two resize events, one in the normal
+	// geometry, before
+	// maximizing (why!?), the second afterwards - all inside the following show() call. This makes
+	// troublesome for
+	// the docking system to correctly restore the saved geometry. Fortunately,
+	// MainWindow::showEvent(..) gets called
+	// just between the two, so we can disable the currentRoom layout right before showing and
+	// re-enable it after
+	// the normal resize has happened.
 	if (w.isMaximized())
 		w.getCurrentRoom()->layout()->setEnabled(false);
 #endif
@@ -534,12 +555,13 @@ int main(int argc, char *argv[])
 
 	w.show();
 
-	//Show floating panels only after the main window has been shown
+	// Show floating panels only after the main window has been shown
 	w.startupFloatingPanels();
 
 	CommandManager::instance()->execute(T_Hand);
 	if (!loadScenePath.isEmpty()) {
-		splash.showMessage(QString("Loading file '") + loadScenePath.getQString() + "'...", Qt::AlignCenter, Qt::white);
+		splash.showMessage(QString("Loading file '") + loadScenePath.getQString() + "'...",
+						   Qt::AlignCenter, Qt::white);
 
 		loadScenePath = loadScenePath.withType("tnz");
 		if (TFileStatus(loadScenePath).doesExist())
@@ -562,21 +584,21 @@ int main(int argc, char *argv[])
 
 	QAction *action = CommandManager::instance()->getAction("MI_OpenTMessage");
 	if (action)
-		QObject::connect(TMessageRepository::instance(), SIGNAL(openMessageCenter()), action, SLOT(trigger()));
+		QObject::connect(TMessageRepository::instance(), SIGNAL(openMessageCenter()), action,
+						 SLOT(trigger()));
 
-	QObject::connect(
-		TUndoManager::manager(), SIGNAL(somethingChanged()),
-		TApp::instance()->getCurrentScene(), SLOT(setDirtyFlag()));
+	QObject::connect(TUndoManager::manager(), SIGNAL(somethingChanged()),
+					 TApp::instance()->getCurrentScene(), SLOT(setDirtyFlag()));
 
 #ifdef _WIN32
 #ifndef x64
-	//On 32-bit architecture, there could be cases in which initialization could alter the
-	//FPU floating point control word. I've seen this happen when loading some AVI coded (VFAPI),
-	//where 80-bit internal precision was used instead of the standard 64-bit (much faster and
-	//sufficient - especially considering that x86 truncates to 64-bit representation anyway).
-	//IN ANY CASE, revert to the original control word.
-	//In the x64 case these precision changes simply should not take place up to _controlfp_s
-	//documentation.
+	// On 32-bit architecture, there could be cases in which initialization could alter the
+	// FPU floating point control word. I've seen this happen when loading some AVI coded (VFAPI),
+	// where 80-bit internal precision was used instead of the standard 64-bit (much faster and
+	// sufficient - especially considering that x86 truncates to 64-bit representation anyway).
+	// IN ANY CASE, revert to the original control word.
+	// In the x64 case these precision changes simply should not take place up to _controlfp_s
+	// documentation.
 	_controlfp_s(0, fpWord, -1);
 #endif
 #endif

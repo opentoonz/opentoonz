@@ -52,7 +52,7 @@ class SVNCommitDialog : public DVGui::Dialog
 
 	QCheckBox *m_commitSceneContentsCheckBox;
 
-	//QList<SVNStatus> m_filesOutOfDate;
+	// QList<SVNStatus> m_filesOutOfDate;
 
 	QString m_workingDir;
 	QStringList m_files;
@@ -69,14 +69,13 @@ class SVNCommitDialog : public DVGui::Dialog
 	int m_sceneIconAdded;
 	int m_folderAdded; // Used only to display the right number on the label
 
-public:
-	SVNCommitDialog(QWidget *parent,
-					const QString &workingDir, const QStringList &files, bool folderOnly = false,
-					int m_sceneIconAdded = 0);
+  public:
+	SVNCommitDialog(QWidget *parent, const QString &workingDir, const QStringList &files,
+					bool folderOnly = false, int m_sceneIconAdded = 0);
 
 	void checkFiles(bool isExternalFiles = false);
 
-private:
+  private:
 	void addFiles();
 	void commitFiles();
 	void setPropertyFiles();
@@ -92,7 +91,7 @@ private:
 
 	void initTreeWidget();
 
-protected slots:
+  protected slots:
 
 	void onCommitButtonClicked();
 
@@ -111,7 +110,7 @@ protected slots:
 
 	void onCommiSceneContentsToggled(bool);
 
-signals:
+  signals:
 	void done(const QStringList &);
 };
 
@@ -151,14 +150,13 @@ class SVNCommitFrameRangeDialog : public DVGui::Dialog
 
 	bool m_isOVLLevel;
 
-public:
-	SVNCommitFrameRangeDialog(QWidget *parent, const QString &workingDir,
-							  const QString &file);
+  public:
+	SVNCommitFrameRangeDialog(QWidget *parent, const QString &workingDir, const QString &file);
 
-private:
+  private:
 	void switchToCloseButton();
 
-protected slots:
+  protected slots:
 	void onError(const QString &);
 	void onPropGetDone(const QString &);
 	void onPropSetDone();
@@ -173,7 +171,7 @@ protected slots:
 	void onUpdateDone();
 	void onLockDone();
 
-signals:
+  signals:
 	void done(const QStringList &);
 };
 

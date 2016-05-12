@@ -36,12 +36,10 @@ class DVAPI KeyframeSetter
 		double y = p.y * m_pixelRatio;
 		return sqrt(p.x * p.x + y * y);
 	}
-	void getRotatingSpeedHandles(
-		std::vector<std::pair<double, int>> &rotatingSpeeds,
-		TDoubleParam *param,
-		int kIndex) const;
+	void getRotatingSpeedHandles(std::vector<std::pair<double, int>> &rotatingSpeeds,
+								 TDoubleParam *param, int kIndex) const;
 
-public:
+  public:
 	KeyframeSetter(TDoubleParam *param, int kIndex = -1, bool enableUndo = true);
 	~KeyframeSetter();
 
@@ -85,14 +83,9 @@ public:
 	void setEaseOut(double easeOut);
 
 	// set the curve params adaptively by clicking apply button
-	void setAllParams(int step,
-					  TDoubleKeyframe::Type comboType,
-					  const TPointD &speedIn,
-					  const TPointD &speedOut,
-					  std::string expressionText,
-					  std::string unitName,
-					  const TDoubleKeyframe::FileParams &fileParam,
-					  double similarShapeOffset);
+	void setAllParams(int step, TDoubleKeyframe::Type comboType, const TPointD &speedIn,
+					  const TPointD &speedOut, std::string expressionText, std::string unitName,
+					  const TDoubleKeyframe::FileParams &fileParam, double similarShapeOffset);
 
 	// addUndo is called automatically (if needed) in the dtor.
 	// it is also possible to call it explictly.

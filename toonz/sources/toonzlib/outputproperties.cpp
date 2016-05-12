@@ -28,7 +28,9 @@ inline void deleteValue(const std::pair<std::string, TPropertyGroup *> &p)
 //**********************************************************************************
 
 TOutputProperties::TOutputProperties()
-	: m_path(TFilePath("+outputs") + ".tif"), m_renderSettings(), m_frameRate(24), m_from(0), m_to(-1), m_offset(0), m_step(1), m_whichLevels(false), m_multimediaRendering(0), m_maxTileSizeIndex(0), m_threadIndex(2), m_subcameraPreview(false)
+	: m_path(TFilePath("+outputs") + ".tif"), m_renderSettings(), m_frameRate(24), m_from(0),
+	  m_to(-1), m_offset(0), m_step(1), m_whichLevels(false), m_multimediaRendering(0),
+	  m_maxTileSizeIndex(0), m_threadIndex(2), m_subcameraPreview(false)
 {
 	m_renderSettings = new TRenderSettings();
 }
@@ -36,7 +38,12 @@ TOutputProperties::TOutputProperties()
 //-------------------------------------------------------------------
 
 TOutputProperties::TOutputProperties(const TOutputProperties &src)
-	: m_path(src.m_path), m_formatProperties(src.m_formatProperties), m_renderSettings(new TRenderSettings(*src.m_renderSettings)), m_frameRate(src.m_frameRate), m_from(src.m_from), m_to(src.m_to), m_whichLevels(src.m_whichLevels), m_offset(src.m_offset), m_step(src.m_step), m_multimediaRendering(src.m_multimediaRendering), m_maxTileSizeIndex(src.m_maxTileSizeIndex), m_threadIndex(src.m_threadIndex), m_subcameraPreview(src.m_subcameraPreview)
+	: m_path(src.m_path), m_formatProperties(src.m_formatProperties),
+	  m_renderSettings(new TRenderSettings(*src.m_renderSettings)), m_frameRate(src.m_frameRate),
+	  m_from(src.m_from), m_to(src.m_to), m_whichLevels(src.m_whichLevels), m_offset(src.m_offset),
+	  m_step(src.m_step), m_multimediaRendering(src.m_multimediaRendering),
+	  m_maxTileSizeIndex(src.m_maxTileSizeIndex), m_threadIndex(src.m_threadIndex),
+	  m_subcameraPreview(src.m_subcameraPreview)
 {
 	std::map<std::string, TPropertyGroup *>::iterator ft, fEnd = m_formatProperties.end();
 	for (ft = m_formatProperties.begin(); ft != fEnd; ++ft) {
@@ -51,8 +58,7 @@ TOutputProperties::~TOutputProperties()
 {
 	delete m_renderSettings;
 
-	std::for_each(m_formatProperties.begin(), m_formatProperties.end(),
-				  ::deleteValue);
+	std::for_each(m_formatProperties.begin(), m_formatProperties.end(), ::deleteValue);
 }
 
 //-------------------------------------------------------------------
@@ -75,10 +81,10 @@ TOutputProperties &TOutputProperties::operator=(const TOutputProperties &src)
 	delete m_renderSettings;
 	m_renderSettings = new TRenderSettings(*src.m_renderSettings);
 
-	std::for_each(m_formatProperties.begin(), m_formatProperties.end(),
-				  ::deleteValue);
+	std::for_each(m_formatProperties.begin(), m_formatProperties.end(), ::deleteValue);
 
-	std::map<std::string, TPropertyGroup *>::const_iterator sft, sfEnd = src.m_formatProperties.end();
+	std::map<std::string, TPropertyGroup *>::const_iterator sft,
+		sfEnd = src.m_formatProperties.end();
 	for (sft = src.m_formatProperties.end(); sft != sfEnd; ++sft)
 		m_formatProperties[sft->first] = sft->second->clone();
 

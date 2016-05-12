@@ -54,8 +54,7 @@ TFont::~TFont()
 
 //-----------------------------------------------------------------------------
 
-TFont::Impl::Impl(const LOGFONTW &logfont, HDC hdc)
-	: m_hdc(hdc)
+TFont::Impl::Impl(const LOGFONTW &logfont, HDC hdc) : m_hdc(hdc)
 {
 	m_font = CreateFontIndirectW(&logfont);
 
@@ -75,7 +74,8 @@ TFont::Impl::Impl(const LOGFONTW &logfont, HDC hdc)
 		std::unique_ptr<KERNINGPAIR[]> tempKernPairs(new KERNINGPAIR[pairsCount]);
 		GetKerningPairsW(hdc, pairsCount, tempKernPairs.get());
 		for (UINT i = 0; i < pairsCount; i++) {
-			pair<unsigned short, unsigned short> key = make_pair(tempKernPairs[i].wFirst, tempKernPairs[i].wSecond);
+			pair<unsigned short, unsigned short> key =
+				make_pair(tempKernPairs[i].wFirst, tempKernPairs[i].wSecond);
 			m_kerningPairs[key] = tempKernPairs[i].iKernAmount;
 		}
 	} else
@@ -88,7 +88,7 @@ TFont::Impl::Impl(const LOGFONTW &logfont, HDC hdc)
 
 TFont::Impl::~Impl()
 {
-	//delete m_advances;
+	// delete m_advances;
 	DeleteObject(m_font);
 }
 
@@ -133,7 +133,8 @@ TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode, wchar_t nextCharC
 
 	std::unique_ptr<char[]> lpvBuffer(new char[charMemorySize]);
 
-	charMemorySize = GetGlyphOutlineW(m_pimpl->m_hdc, charcode, GGO_NATIVE, &gm, charMemorySize, lpvBuffer.get(), &mat2);
+	charMemorySize = GetGlyphOutlineW(m_pimpl->m_hdc, charcode, GGO_NATIVE, &gm, charMemorySize,
+									  lpvBuffer.get(), &mat2);
 	if (charMemorySize == GDI_ERROR) {
 		assert(0);
 		return TPoint();
@@ -241,7 +242,8 @@ TPoint appDrawChar(TRasterGR8P &outImage, HDC hdc, wchar_t charcode)
 	appImage->clear();
 	outImage = appImage->extract(0, 0, lx - 1, ly - 1);
 	outImage->lock();
-	GetGlyphOutlineW(hdc, charcode, GGO_GRAY8_BITMAP, &gm, wrap * ly, outImage->getRawData(), &mat2);
+	GetGlyphOutlineW(hdc, charcode, GGO_GRAY8_BITMAP, &gm, wrap * ly, outImage->getRawData(),
+					 &mat2);
 	outImage->unlock();
 	TPoint glyphOrig;
 	glyphOrig.x = gm.gmptGlyphOrigin.x;
@@ -251,9 +253,10 @@ TPoint appDrawChar(TRasterGR8P &outImage, HDC hdc, wchar_t charcode)
 }
 
 //-----------------------------------------------------------------------------
-//valori compresi tra 0 e 64 (si si, proprio 64 e non 63: sono 65 valori)
+// valori compresi tra 0 e 64 (si si, proprio 64 e non 63: sono 65 valori)
 
-TPoint TFont::drawChar(TRasterGR8P &outImage, TPoint &glyphOrigin, wchar_t charcode, wchar_t nextCharCode) const
+TPoint TFont::drawChar(TRasterGR8P &outImage, TPoint &glyphOrigin, wchar_t charcode,
+					   wchar_t nextCharCode) const
 {
 	TRasterGR8P grayAppImage;
 
@@ -312,7 +315,8 @@ TPoint TFont::drawChar(TRasterGR8P &outImage, TPoint &glyphOrigin, wchar_t charc
 
 //-----------------------------------------------------------------------------
 
-TPoint TFont::drawChar(TRasterCM32P &outImage, TPoint &glyphOrigin, int inkId, wchar_t charcode, wchar_t nextCharCode) const
+TPoint TFont::drawChar(TRasterCM32P &outImage, TPoint &glyphOrigin, int inkId, wchar_t charcode,
+					   wchar_t nextCharCode) const
 {
 	TRasterGR8P grayAppImage;
 	TPoint glyphOrig = appDrawChar(grayAppImage, m_pimpl->m_hdc, charcode);
@@ -454,10 +458,7 @@ struct TFontManager::Impl {
 	// has the @-version, the library use it.
 	bool m_vertical;
 
-	TFontManager::Impl()
-		: m_loaded(false), m_currentFont(0), m_vertical(false)
-	{
-	}
+	TFontManager::Impl() : m_loaded(false), m_currentFont(0), m_vertical(false) {}
 };
 
 //---------------------------------------------------------
@@ -486,11 +487,8 @@ TFontManager *TFontManager::instance()
 
 namespace
 {
-BOOL CALLBACK EnumFamCallBack(
-	CONST LOGFONTW *lplf,
-	CONST TEXTMETRICW *,
-	DWORD FontType,
-	LPARAM data)
+BOOL CALLBACK EnumFamCallBack(CONST LOGFONTW *lplf, CONST TEXTMETRICW *, DWORD FontType,
+							  LPARAM data)
 {
 	if (FontType & TRUETYPE_FONTTYPE) {
 		LOGFONTW newLplf = *lplf;
@@ -514,9 +512,7 @@ void TFontManager::loadFontNames()
 	HDC hdc = CreateCompatibleDC(NULL);
 	if (!hdc)
 		throw TFontLibraryLoadingError();
-	EnumFontFamiliesW(hdc,
-					  (LPCWSTR)NULL,
-					  (FONTENUMPROCW)EnumFamCallBack,
+	EnumFontFamiliesW(hdc, (LPCWSTR)NULL, (FONTENUMPROCW)EnumFamCallBack,
 					  (LPARAM) & (m_pimpl->m_families));
 	DeleteDC(hdc);
 	hdc = 0;
@@ -532,7 +528,8 @@ void TFontManager::setFamily(const wstring family)
 {
 
 	wstring userFamilyName = ((family.c_str())[0] == L'@') ? wstring(family.c_str() + 1) : family;
-	wstring realFamilyName = (m_pimpl->m_vertical && (family.c_str())[0] != L'@') ? L"@" + family : family;
+	wstring realFamilyName =
+		(m_pimpl->m_vertical && (family.c_str())[0] != L'@') ? L"@" + family : family;
 
 	wstring currentFamilyName = wstring(m_pimpl->m_currentLogFont.lfFaceName);
 
@@ -584,14 +581,8 @@ void TFontManager::setFamily(const wstring family)
 void TFontManager::setTypeface(const wstring typeface)
 {
 	LOGFONTW logfont = m_pimpl->m_currentLogFont;
-	logfont.lfItalic = (typeface == L"Italic" ||
-						typeface == L"Bold Italic")
-						   ? TRUE
-						   : FALSE;
-	logfont.lfWeight = (typeface == L"Bold" ||
-						typeface == L"Bold Italic")
-						   ? 700
-						   : 400;
+	logfont.lfItalic = (typeface == L"Italic" || typeface == L"Bold Italic") ? TRUE : FALSE;
+	logfont.lfWeight = (typeface == L"Bold" || typeface == L"Bold Italic") ? 700 : 400;
 
 	try {
 		HDC hdc = CreateCompatibleDC(NULL);
@@ -625,7 +616,9 @@ void TFontManager::setSize(int size)
 
 wstring TFontManager::getCurrentFamily() const
 {
-	wstring currentFamilyName = (m_pimpl->m_currentLogFont.lfFaceName[0] == L'@') ? wstring(m_pimpl->m_currentLogFont.lfFaceName + 1) : wstring(m_pimpl->m_currentLogFont.lfFaceName);
+	wstring currentFamilyName = (m_pimpl->m_currentLogFont.lfFaceName[0] == L'@')
+									? wstring(m_pimpl->m_currentLogFont.lfFaceName + 1)
+									: wstring(m_pimpl->m_currentLogFont.lfFaceName);
 	return currentFamilyName;
 }
 
@@ -694,7 +687,9 @@ void TFontManager::setVertical(bool vertical)
 		return;
 	m_pimpl->m_vertical = vertical;
 
-	wstring currentFamilyName = (m_pimpl->m_currentLogFont.lfFaceName[0] == L'@') ? wstring(m_pimpl->m_currentLogFont.lfFaceName + 1) : wstring(m_pimpl->m_currentLogFont.lfFaceName);
+	wstring currentFamilyName = (m_pimpl->m_currentLogFont.lfFaceName[0] == L'@')
+									? wstring(m_pimpl->m_currentLogFont.lfFaceName + 1)
+									: wstring(m_pimpl->m_currentLogFont.lfFaceName);
 	if (vertical)
 		currentFamilyName = L'@' + currentFamilyName;
 	setFamily(currentFamilyName);

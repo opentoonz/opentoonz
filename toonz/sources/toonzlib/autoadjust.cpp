@@ -9,20 +9,19 @@ write_lut_image ??? quando ?
 #include "autoadjust.h"
 #include "cleanupcommon.h"
 
-#define TO_ABS(x)       \
-	{                   \
-		if ((x) < 0)    \
-			(x) = -(x); \
+#define TO_ABS(x)                                                                                  \
+	{                                                                                              \
+		if ((x) < 0)                                                                               \
+			(x) = -(x);                                                                            \
 	}
 
 typedef struct big {
 	UINT lo, hi;
 } BIG;
 #define CLEAR_BIG(B) ((B).lo = 0, (B).hi = 0, (B))
-#define ADD_BIG(B, X) ((B).lo += (UINT)(X), \
-					   (B).hi += (B).lo >> 30, (B).lo &= 0x3fffffff, (B))
-#define ADD_BIG_BIG(B1, B2) ((B1).lo += (B2).lo, (B1).hi += (B2).hi, \
-							 (B1).hi += (B1).lo >> 30, (B1).lo &= 0x3fffffff, (B1))
+#define ADD_BIG(B, X) ((B).lo += (UINT)(X), (B).hi += (B).lo >> 30, (B).lo &= 0x3fffffff, (B))
+#define ADD_BIG_BIG(B1, B2)                                                                        \
+	((B1).lo += (B2).lo, (B1).hi += (B2).hi, (B1).hi += (B1).lo >> 30, (B1).lo &= 0x3fffffff, (B1))
 #define BIG_TO_DOUBLE(B) ((double)(B).hi * (double)0x40000000 + (double)(B).lo)
 
 static int Black = 0;
@@ -92,8 +91,7 @@ void set_autoadjust_window(int x0, int y0, int x1, int y1)
 
 /*---------------------------------------------------------------------------*/
 
-static void get_virtual_buffer(const TRasterImageP &image,
-							   int *p_lx, int *p_ly, int *p_wrap,
+static void get_virtual_buffer(const TRasterImageP &image, int *p_lx, int *p_ly, int *p_wrap,
 							   UCHAR **p_buffer)
 {
 	int x0, y0, x1, y1;
@@ -167,19 +165,24 @@ void black_eq_algo(const TRasterImageP &image)
 		north = pix + wrap;
 		south = pix - wrap;
 		for (x = 1; x < lx - 1; x++, pix++, north++, south++) {
-			m = 2 * ((int)north[0] + (int)pix[-1] + 2 * (int)pix[0] + (int)pix[1] + (int)south[0]) + (int)north[-1] + (int)north[1] + (int)south[-1] + (int)south[1];
+			m = 2 * ((int)north[0] + (int)pix[-1] + 2 * (int)pix[0] + (int)pix[1] + (int)south[0]) +
+				(int)north[-1] + (int)north[1] + (int)south[-1] + (int)south[1];
 			m = (m + 8) >> 4;
-			d = (int)north[-1] + (int)north[0] * 2 + (int)north[1] - (int)south[-1] - (int)south[0] * 2 - (int)south[1];
+			d = (int)north[-1] + (int)north[0] * 2 + (int)north[1] - (int)south[-1] -
+				(int)south[0] * 2 - (int)south[1];
 			TO_ABS(d)
-			dd = (int)north[-1] + (int)pix[-1] * 2 + (int)south[-1] - (int)north[1] - (int)pix[1] * 2 - (int)south[1];
+			dd = (int)north[-1] + (int)pix[-1] * 2 + (int)south[-1] - (int)north[1] -
+				 (int)pix[1] * 2 - (int)south[1];
 			TO_ABS(dd)
 			if (dd > d)
 				d = dd;
-			dd = (int)pix[-1] + (int)north[-1] * 2 + (int)north[0] - (int)pix[1] - (int)south[1] * 2 - (int)south[0];
+			dd = (int)pix[-1] + (int)north[-1] * 2 + (int)north[0] - (int)pix[1] -
+				 (int)south[1] * 2 - (int)south[0];
 			TO_ABS(dd)
 			if (dd > d)
 				d = dd;
-			dd = (int)pix[1] + (int)north[1] * 2 + (int)north[0] - (int)pix[-1] - (int)south[-1] * 2 - (int)south[0];
+			dd = (int)pix[1] + (int)north[1] * 2 + (int)north[0] - (int)pix[-1] -
+				 (int)south[-1] * 2 - (int)south[0];
 			TO_ABS(dd)
 			if (dd > d)
 				d = dd;
@@ -286,7 +289,7 @@ void build_lw(const TRasterImageP &image, float lw[256])
 		for (grey = 0; grey < 256; grey++) {
 			delete[] y_start[grey];
 			y_start[grey] = new int[lx];
-			//TREALLOC (y_start[grey], lx);
+			// TREALLOC (y_start[grey], lx);
 		}
 		y_start_alloc = lx;
 	}
@@ -306,17 +309,21 @@ void build_lw(const TRasterImageP &image, float lw[256])
 		north = pix + wrap;
 		south = pix - wrap;
 		for (x = 1; x < lx - 1; x++, pix++, north++, south++) {
-			d = (int)north[-1] + (int)north[0] * 2 + (int)north[1] - (int)south[-1] - (int)south[0] * 2 - (int)south[1];
+			d = (int)north[-1] + (int)north[0] * 2 + (int)north[1] - (int)south[-1] -
+				(int)south[0] * 2 - (int)south[1];
 			TO_ABS(d)
-			dd = (int)north[-1] + (int)pix[-1] * 2 + (int)south[-1] - (int)north[1] - (int)pix[1] * 2 - (int)south[1];
+			dd = (int)north[-1] + (int)pix[-1] * 2 + (int)south[-1] - (int)north[1] -
+				 (int)pix[1] * 2 - (int)south[1];
 			TO_ABS(dd)
 			if (dd > d)
 				d = dd;
-			dd = (int)pix[-1] + (int)north[-1] * 2 + (int)north[0] - (int)pix[1] - (int)south[1] * 2 - (int)south[0];
+			dd = (int)pix[-1] + (int)north[-1] * 2 + (int)north[0] - (int)pix[1] -
+				 (int)south[1] * 2 - (int)south[0];
 			TO_ABS(dd)
 			if (dd > d)
 				d = dd;
-			dd = (int)pix[1] + (int)north[1] * 2 + (int)north[0] - (int)pix[-1] - (int)south[-1] * 2 - (int)south[0];
+			dd = (int)pix[1] + (int)north[1] * 2 + (int)north[0] - (int)pix[-1] -
+				 (int)south[-1] * 2 - (int)south[0];
 			TO_ABS(dd)
 			if (dd > d)
 				d = dd;
@@ -557,264 +564,263 @@ struct edge_config {
 	int val;
 };
 
-static struct edge_config Edge_base[] =
-	{
-		{"     "
-		 "  X  "
-		 "     ",
-		 0},
+static struct edge_config Edge_base[] = {
+	{"     "
+	 "  X  "
+	 "     ",
+	 0},
 
-		{"X    "
-		 "  X  "
-		 "     ",
-		 0},
+	{"X    "
+	 "  X  "
+	 "     ",
+	 0},
 
-		{"  X  "
-		 "  X  "
-		 "     ",
-		 0},
+	{"  X  "
+	 "  X  "
+	 "     ",
+	 0},
 
-		{"X X  "
-		 "  X  "
-		 "     ",
-		 5},
+	{"X X  "
+	 "  X  "
+	 "     ",
+	 5},
 
-		{"X   X"
-		 "  X  "
-		 "     ",
-		 20},
+	{"X   X"
+	 "  X  "
+	 "     ",
+	 20},
 
-		{"X    "
-		 "  X X"
-		 "     ",
-		 24},
+	{"X    "
+	 "  X X"
+	 "     ",
+	 24},
 
-		{"X    "
-		 "  X  "
-		 "    X",
-		 28},
+	{"X    "
+	 "  X  "
+	 "    X",
+	 28},
 
-		{"  X  "
-		 "  X X"
-		 "     ",
-		 7},
+	{"  X  "
+	 "  X X"
+	 "     ",
+	 7},
 
-		{"  X  "
-		 "  X  "
-		 "  X  ",
-		 20},
+	{"  X  "
+	 "  X  "
+	 "  X  ",
+	 20},
 
-		{"X X X"
-		 "  X  "
-		 "     ",
-		 10},
+	{"X X X"
+	 "  X  "
+	 "     ",
+	 10},
 
-		{"X X  "
-		 "  X X"
-		 "     ",
-		 12},
+	{"X X  "
+	 "  X X"
+	 "     ",
+	 12},
 
-		{"X X  "
-		 "  X  "
-		 "    X",
-		 26},
+	{"X X  "
+	 "  X  "
+	 "    X",
+	 26},
 
-		{"X X  "
-		 "  X  "
-		 "  X  ",
-		 22},
+	{"X X  "
+	 "  X  "
+	 "  X  ",
+	 22},
 
-		{"X X  "
-		 "  X  "
-		 "X    ",
-		 22},
+	{"X X  "
+	 "  X  "
+	 "X    ",
+	 22},
 
-		{"X X  "
-		 "X X  "
-		 "     ",
-		 5},
+	{"X X  "
+	 "X X  "
+	 "     ",
+	 5},
 
-		{"X   X"
-		 "  X  "
-		 "    X",
-		 34},
+	{"X   X"
+	 "  X  "
+	 "    X",
+	 34},
 
-		{"X   X"
-		 "  X  "
-		 "  X  ",
-		 34},
+	{"X   X"
+	 "  X  "
+	 "  X  ",
+	 34},
 
-		{"X    "
-		 "  X X"
-		 "  X  ",
-		 24},
+	{"X    "
+	 "  X X"
+	 "  X  ",
+	 24},
 
-		{"  X  "
-		 "  X X"
-		 "  X  ",
-		 10},
+	{"  X  "
+	 "  X X"
+	 "  X  ",
+	 10},
 
-		{"X X X"
-		 "  X X"
-		 "     ",
-		 12},
+	{"X X X"
+	 "  X X"
+	 "     ",
+	 12},
 
-		{"X X X"
-		 "  X  "
-		 "    X",
-		 24},
+	{"X X X"
+	 "  X  "
+	 "    X",
+	 24},
 
-		{"X X X"
-		 "  X  "
-		 "  X  ",
-		 24},
+	{"X X X"
+	 "  X  "
+	 "  X  ",
+	 24},
 
-		{"X X  "
-		 "  X X"
-		 "    X",
-		 14},
+	{"X X  "
+	 "  X X"
+	 "    X",
+	 14},
 
-		{"X X  "
-		 "  X X"
-		 "  X  ",
-		 12},
+	{"X X  "
+	 "  X X"
+	 "  X  ",
+	 12},
 
-		{"X X  "
-		 "  X X"
-		 "X    ",
-		 22},
+	{"X X  "
+	 "  X X"
+	 "X    ",
+	 22},
 
-		{"X X  "
-		 "X X X"
-		 "     ",
-		 10},
+	{"X X  "
+	 "X X X"
+	 "     ",
+	 10},
 
-		{"X X  "
-		 "  X  "
-		 "  X X",
-		 24},
+	{"X X  "
+	 "  X  "
+	 "  X X",
+	 24},
 
-		{"X X  "
-		 "  X  "
-		 "X   X",
-		 32},
+	{"X X  "
+	 "  X  "
+	 "X   X",
+	 32},
 
-		{"X X  "
-		 "X X  "
-		 "    X",
-		 24},
+	{"X X  "
+	 "X X  "
+	 "    X",
+	 24},
 
-		{"X X  "
-		 "  X  "
-		 "X X  ",
-		 20},
+	{"X X  "
+	 "  X  "
+	 "X X  ",
+	 20},
 
-		{"X   X"
-		 "  X  "
-		 "X   X",
-		 40},
+	{"X   X"
+	 "  X  "
+	 "X   X",
+	 40},
 
-		{"  X  "
-		 "X X X"
-		 "  X  ",
-		 0},
+	{"  X  "
+	 "X X X"
+	 "  X  ",
+	 0},
 
-		{"X X X"
-		 "X X X"
-		 "     ",
-		 10},
+	{"X X X"
+	 "X X X"
+	 "     ",
+	 10},
 
-		{"X X X"
-		 "X X  "
-		 "    X",
-		 22},
+	{"X X X"
+	 "X X  "
+	 "    X",
+	 22},
 
-		{"X X  "
-		 "X X X"
-		 "    X",
-		 12},
+	{"X X  "
+	 "X X X"
+	 "    X",
+	 12},
 
-		{"X   X"
-		 "X X X"
-		 "    X",
-		 22},
+	{"X   X"
+	 "X X X"
+	 "    X",
+	 22},
 
-		{"  X X"
-		 "X X X"
-		 "    X",
-		 12},
+	{"  X X"
+	 "X X X"
+	 "    X",
+	 12},
 
-		{"X X X"
-		 "  X X"
-		 "    X",
-		 14},
+	{"X X X"
+	 "  X X"
+	 "    X",
+	 14},
 
-		{"X X  "
-		 "X X X"
-		 "  X  ",
-		 0},
+	{"X X  "
+	 "X X X"
+	 "  X  ",
+	 0},
 
-		{"X   X"
-		 "X X X"
-		 "  X  ",
-		 10},
+	{"X   X"
+	 "X X X"
+	 "  X  ",
+	 10},
 
-		{"X   X"
-		 "X X  "
-		 "  X X",
-		 20},
+	{"X   X"
+	 "X X  "
+	 "  X X",
+	 20},
 
-		{"X   X"
-		 "X X  "
-		 "X   X",
-		 30},
+	{"X   X"
+	 "X X  "
+	 "X   X",
+	 30},
 
-		{"X X X"
-		 "X X X"
-		 "    X",
-		 12},
+	{"X X X"
+	 "X X X"
+	 "    X",
+	 12},
 
-		{"X X X"
-		 "X X X"
-		 "  X  ",
-		 0},
+	{"X X X"
+	 "X X X"
+	 "  X  ",
+	 0},
 
-		{"X X X"
-		 "X X  "
-		 "  X X",
-		 10},
+	{"X X X"
+	 "X X  "
+	 "  X X",
+	 10},
 
-		{"  X X"
-		 "X X X"
-		 "X X  ",
-		 0},
+	{"  X X"
+	 "X X X"
+	 "X X  ",
+	 0},
 
-		{"X X X"
-		 "X X  "
-		 "X   X",
-		 20},
+	{"X X X"
+	 "X X  "
+	 "X   X",
+	 20},
 
-		{"X   X"
-		 "X X X"
-		 "X   X",
-		 20},
+	{"X   X"
+	 "X X X"
+	 "X   X",
+	 20},
 
-		{"X X X"
-		 "X X X"
-		 "  X X",
-		 0},
+	{"X X X"
+	 "X X X"
+	 "  X X",
+	 0},
 
-		{"X X X"
-		 "X X X"
-		 "X   X",
-		 10},
+	{"X X X"
+	 "X X X"
+	 "X   X",
+	 10},
 
-		{"X X X"
-		 "X X X"
-		 "X X X",
-		 0},
+	{"X X X"
+	 "X X X"
+	 "X X X",
+	 0},
 
-		{0, 0},
+	{0, 0},
 };
 
 static int Edge_value[256];
@@ -869,14 +875,8 @@ static void edge_init(void)
 
 static int edge_int(const char x[8])
 {
-	return (x[0] != ' ') << 7 |
-		   (x[1] != ' ') << 6 |
-		   (x[2] != ' ') << 5 |
-		   (x[3] != ' ') << 4 |
-		   (x[4] != ' ') << 3 |
-		   (x[5] != ' ') << 2 |
-		   (x[6] != ' ') << 1 |
-		   (x[7] != ' ');
+	return (x[0] != ' ') << 7 | (x[1] != ' ') << 6 | (x[2] != ' ') << 5 | (x[3] != ' ') << 4 |
+		   (x[4] != ' ') << 3 | (x[5] != ' ') << 2 | (x[6] != ' ') << 1 | (x[7] != ' ');
 }
 
 /*---------------------------------------------------------------------------*/
@@ -951,19 +951,24 @@ void histo_l_algo(const TRasterImageP &image, int reference)
 		north = pix + wrap;
 		south = pix - wrap;
 		for (x = 1; x < lx - 1; x++, pix++, north++, south++) {
-			m = 2 * ((int)north[0] + (int)pix[-1] + 2 * (int)pix[0] + (int)pix[1] + (int)south[0]) + (int)north[-1] + (int)north[1] + (int)south[-1] + (int)south[1];
+			m = 2 * ((int)north[0] + (int)pix[-1] + 2 * (int)pix[0] + (int)pix[1] + (int)south[0]) +
+				(int)north[-1] + (int)north[1] + (int)south[-1] + (int)south[1];
 			m = (m + 8) >> 4;
-			d = (int)north[-1] + (int)north[0] * 2 + (int)north[1] - (int)south[-1] - (int)south[0] * 2 - (int)south[1];
+			d = (int)north[-1] + (int)north[0] * 2 + (int)north[1] - (int)south[-1] -
+				(int)south[0] * 2 - (int)south[1];
 			TO_ABS(d)
-			dd = (int)north[-1] + (int)pix[-1] * 2 + (int)south[-1] - (int)north[1] - (int)pix[1] * 2 - (int)south[1];
+			dd = (int)north[-1] + (int)pix[-1] * 2 + (int)south[-1] - (int)north[1] -
+				 (int)pix[1] * 2 - (int)south[1];
 			TO_ABS(dd)
 			if (dd > d)
 				d = dd;
-			dd = (int)pix[-1] + (int)north[-1] * 2 + (int)north[0] - (int)pix[1] - (int)south[1] * 2 - (int)south[0];
+			dd = (int)pix[-1] + (int)north[-1] * 2 + (int)north[0] - (int)pix[1] -
+				 (int)south[1] * 2 - (int)south[0];
 			TO_ABS(dd)
 			if (dd > d)
 				d = dd;
-			dd = (int)pix[1] + (int)north[1] * 2 + (int)north[0] - (int)pix[-1] - (int)south[-1] * 2 - (int)south[0];
+			dd = (int)pix[1] + (int)north[1] * 2 + (int)north[0] - (int)pix[-1] -
+				 (int)south[-1] * 2 - (int)south[0];
 			TO_ABS(dd)
 			if (dd > d)
 				d = dd;
@@ -1010,19 +1015,13 @@ void histo_l_algo(const TRasterImageP &image, int reference)
 			if (pix[0] <= max_d_grey) {
 				if (conf >= 0) {
 					conf = ((conf << 1) & ((1 << 7) | (1 << 6) | (1 << 2) | (1 << 1))) |
-						   ((north[1] <= max_d_grey) << 5) |
-						   ((1) << 4) |
-						   ((pix[1] <= max_d_grey) << 3) |
-						   ((south[1] <= max_d_grey));
+						   ((north[1] <= max_d_grey) << 5) | ((1) << 4) |
+						   ((pix[1] <= max_d_grey) << 3) | ((south[1] <= max_d_grey));
 				} else {
-					conf = ((north[-1] <= max_d_grey) << 7) |
-						   ((north[0] <= max_d_grey) << 6) |
-						   ((north[1] <= max_d_grey) << 5) |
-						   ((pix[-1] <= max_d_grey) << 4) |
-						   ((pix[1] <= max_d_grey) << 3) |
-						   ((south[-1] <= max_d_grey) << 2) |
-						   ((south[0] <= max_d_grey) << 1) |
-						   ((south[1] <= max_d_grey));
+					conf = ((north[-1] <= max_d_grey) << 7) | ((north[0] <= max_d_grey) << 6) |
+						   ((north[1] <= max_d_grey) << 5) | ((pix[-1] <= max_d_grey) << 4) |
+						   ((pix[1] <= max_d_grey) << 3) | ((south[-1] <= max_d_grey) << 2) |
+						   ((south[0] <= max_d_grey) << 1) | ((south[1] <= max_d_grey));
 				}
 				edgelen += Edge_value[conf];
 			} else
@@ -1173,7 +1172,7 @@ static int build_th_histo(const TRasterImageP &image, int histo[256 >> 1][MAX_WI
 #endif
 /*---------------------------------------------------------------------------*/
 #ifdef DAFARE
-//SEMBRA NON ESSERE UTILIZZATO!
+// SEMBRA NON ESSERE UTILIZZATO!
 int eval_image_th(const TRasterImageP &image, int *threshold, float *linewidth)
 {
 #define MIN_COUNT 100
@@ -1196,8 +1195,7 @@ int eval_image_th(const TRasterImageP &image, int *threshold, float *linewidth)
 		TERROR("image is not RAS_GR8");
 		return 0;
 	}
-	if (!(*threshold != 0 && *linewidth == 0 ||
-		  *threshold == 0 && *linewidth != 0))
+	if (!(*threshold != 0 && *linewidth == 0 || *threshold == 0 && *linewidth != 0))
 		return 0;
 
 	build_th_histo(image, histo);
@@ -1341,8 +1339,8 @@ chain_start_found:
 #endif
 /*---------------------------------------------------------------------------*/
 #ifdef DAFARE
-//capire che cosa fa !?? chi la usa ?
-//sembra prendere una gr8, modificare il buffer e cambiare il tipo in BW
+// capire che cosa fa !?? chi la usa ?
+// sembra prendere una gr8, modificare il buffer e cambiare il tipo in BW
 void thresh_image(const TRasterImageP &image, int threshold, int oversample_factor)
 {
 	UCHAR *buffer, *cur, *xnext, *ynext, *xynext;
@@ -1368,8 +1366,7 @@ void thresh_image(const TRasterImageP &image, int threshold, int oversample_fact
 
 	switch (oversample_factor) {
 	case 1:
-		for (y = 0; y < ly; y++)
-		{
+		for (y = 0; y < ly; y++) {
 			cur = buffer + y * wrap;
 			out = y == 0 ? bigline : buffer + y * outwrap_bytes;
 			tmp = 0;
@@ -1392,8 +1389,7 @@ void thresh_image(const TRasterImageP &image, int threshold, int oversample_fact
 		break;
 
 	case 2:
-		for (y = 0; y < ly; y++)
-		{
+		for (y = 0; y < ly; y++) {
 			cur = buffer + y * wrap;
 			xnext = cur + 1;
 			out = y == 0 ? bigline : buffer + y * 2 * outwrap_bytes;

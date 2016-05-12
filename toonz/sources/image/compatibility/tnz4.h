@@ -74,37 +74,35 @@ typedef struct IMAGE {
 #define TOONZRGB (1234)
 #define TOONZRGB64 (4567)
 
-#define TMALLOC(ptr, elem) \
-	(ptr) = (void *)malloc((elem) * sizeof(*(ptr)));
-#define TCALLOC(ptr, elem) \
-	(ptr) = (void *)calloc((elem), sizeof(*(ptr)));
-#define TREALLOC(ptr, elem)                                          \
-	{                                                                \
-		if (ptr)                                                     \
-			(ptr) = (void *)realloc((ptr), (elem) * sizeof(*(ptr))); \
-		else                                                         \
-			(ptr) = (void *)malloc((elem) * sizeof(*(ptr)));         \
+#define TMALLOC(ptr, elem) (ptr) = (void *)malloc((elem) * sizeof(*(ptr)));
+#define TCALLOC(ptr, elem) (ptr) = (void *)calloc((elem), sizeof(*(ptr)));
+#define TREALLOC(ptr, elem)                                                                        \
+	{                                                                                              \
+		if (ptr)                                                                                   \
+			(ptr) = (void *)realloc((ptr), (elem) * sizeof(*(ptr)));                               \
+		else                                                                                       \
+			(ptr) = (void *)malloc((elem) * sizeof(*(ptr)));                                       \
 	}
-#define TFREE(ptr)     \
-	{                  \
-		if (ptr) {     \
-			free(ptr); \
-			ptr = NIL; \
-		}              \
+#define TFREE(ptr)                                                                                 \
+	{                                                                                              \
+		if (ptr) {                                                                                 \
+			free(ptr);                                                                             \
+			ptr = NIL;                                                                             \
+		}                                                                                          \
 	}
 
 #define MAX(A, B) ((A) > (B) ? (A) : (B))
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 
-#define NOT_LESS_THAN(MIN, X) \
-	{                         \
-		if ((X) < (MIN))      \
-			(X) = (MIN);      \
+#define NOT_LESS_THAN(MIN, X)                                                                      \
+	{                                                                                              \
+		if ((X) < (MIN))                                                                           \
+			(X) = (MIN);                                                                           \
 	}
-#define NOT_MORE_THAN(MAX, X) \
-	{                         \
-		if ((X) > (MAX))      \
-			(X) = (MAX);      \
+#define NOT_MORE_THAN(MAX, X)                                                                      \
+	{                                                                                              \
+		if ((X) > (MAX))                                                                           \
+			(X) = (MAX);                                                                           \
 	}
 
 #define CROP(X, MIN, MAX) (X < MIN ? MIN : (X > MAX ? MAX : X))
@@ -115,26 +113,22 @@ typedef struct IMAGE {
 #if TNZ_LITTLE_ENDIAN
 #define LPIXEL_TO_BGRM(X) (((TUINT32)(X) >> 8) | ((TUINT32)(X) << 24))
 /*
-    #define BGRM_TO_LPIXEL(X)  (((TUINT32)(X)<<8) | ((TUINT32)(X)>>24))
+	#define BGRM_TO_LPIXEL(X)  (((TUINT32)(X)<<8) | ((TUINT32)(X)>>24))
 */
 #else
 #define LPIXEL_TO_BGRM(X) (((TUINT32)(X) << 8) | ((TUINT32)(X) >> 24))
 /*
-    #define BGRM_TO_LPIXEL(X)  (((TUINT32)(X)>>8) | ((TUINT32)(X)<<24))
+	#define BGRM_TO_LPIXEL(X)  (((TUINT32)(X)>>8) | ((TUINT32)(X)<<24))
 */
 #endif
 #endif
 
 #define BYTE_FROM_USHORT_MAGICFAC (256U * 255U + 1U)
 #define PIX_USHORT_FROM_BYTE(X) ((X) | ((X) << 8))
-#define PIX_BYTE_FROM_USHORT(X) \
-	((((X)*BYTE_FROM_USHORT_MAGICFAC) + (1 << 23)) >> 24)
+#define PIX_BYTE_FROM_USHORT(X) ((((X)*BYTE_FROM_USHORT_MAGICFAC) + (1 << 23)) >> 24)
 
-#define PIX_DITHER_BYTE_FROM_USHORT(X, R)         \
-	(((((X)*BYTE_FROM_USHORT_MAGICFAC) -          \
-	   (((X)*BYTE_FROM_USHORT_MAGICFAC) >> 24)) + \
-	  (R)) >>                                     \
-	 24)
+#define PIX_DITHER_BYTE_FROM_USHORT(X, R)                                                          \
+	(((((X)*BYTE_FROM_USHORT_MAGICFAC) - (((X)*BYTE_FROM_USHORT_MAGICFAC) >> 24)) + (R)) >> 24)
 
 /*---------------------------------------------------------------------------*/
 
@@ -148,7 +142,7 @@ USHORT swap_ushort(USHORT x);
 
 /*---------------------------------------------------------------------------*/
 
-/*! These functions are implemented in .cpp files, and allocate any buffer 
+/*! These functions are implemented in .cpp files, and allocate any buffer
 using new operator, so it's safe return img->buffer to .cpp units */
 
 IMAGE *new_img();

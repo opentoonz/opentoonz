@@ -30,20 +30,12 @@ class TFilePath;
 
 //------------------------------------------------------------------------------
 
-enum ServerState {
-	Ready,
-	Busy,
-	NotResponding,
-	Down,
-	Offline,
-	ServerUnknown
-};
+enum ServerState { Ready, Busy, NotResponding, Down, Offline, ServerUnknown };
 
 class ServerIdentity
 {
-public:
-	ServerIdentity(const QString &id, const QString &name)
-		: m_id(id), m_name(name) {}
+  public:
+	ServerIdentity(const QString &id, const QString &name) : m_id(id), m_name(name) {}
 
 	QString m_id;
 	QString m_name;
@@ -51,7 +43,7 @@ public:
 
 class ServerInfo
 {
-public:
+  public:
 	QString m_name;
 	QString m_ipAddress;
 	QString m_portNumber;
@@ -74,9 +66,11 @@ public:
 
 class TaskShortInfo
 {
-public:
+  public:
 	TaskShortInfo(const QString &id, const QString &name, TaskState status)
-		: m_id(id), m_name(name), m_status(status) {}
+		: m_id(id), m_name(name), m_status(status)
+	{
+	}
 
 	QString m_id;
 	QString m_name;
@@ -87,7 +81,7 @@ public:
 
 class TFARMAPI TFarmController
 {
-public:
+  public:
 	virtual ~TFarmController() {}
 
 	virtual QString addTask(const TFarmTask &task, bool suspended) = 0;
@@ -103,11 +97,8 @@ public:
 
 	virtual void queryTaskInfo(const QString &id, TFarmTask &task) = 0;
 
-	virtual void queryTaskShortInfo(
-		const QString &id,
-		QString &parentId,
-		QString &name,
-		TaskState &status) = 0;
+	virtual void queryTaskShortInfo(const QString &id, QString &parentId, QString &name,
+									TaskState &status) = 0;
 
 	// used (by a server) to notify a server start
 	virtual void attachServer(const QString &name, const QString &addr, int port) = 0;
@@ -119,12 +110,8 @@ public:
 	virtual void taskSubmissionError(const QString &taskId, int errCode) = 0;
 
 	// used by a server to notify a task progress
-	virtual void taskProgress(
-		const QString &taskId,
-		int step,
-		int stepCount,
-		int frameNumber,
-		FrameState state) = 0;
+	virtual void taskProgress(const QString &taskId, int step, int stepCount, int frameNumber,
+							  FrameState state) = 0;
 
 	// used by a server to notify a task completion
 	virtual void taskCompleted(const QString &taskId, int exitCode) = 0;
@@ -150,7 +137,7 @@ public:
 
 class TFARMAPI ControllerData
 {
-public:
+  public:
 	ControllerData(const QString &hostName = "", const QString &ipAddr = "", int port = 0)
 		: m_hostName(hostName), m_ipAddress(ipAddr), m_port(port)
 	{
@@ -158,8 +145,7 @@ public:
 
 	bool operator==(const ControllerData &rhs)
 	{
-		return m_hostName == rhs.m_hostName &&
-			   m_ipAddress == rhs.m_ipAddress &&
+		return m_hostName == rhs.m_hostName && m_ipAddress == rhs.m_ipAddress &&
 			   m_port == rhs.m_port;
 	}
 
@@ -172,7 +158,7 @@ public:
 
 class TFARMAPI TFarmControllerFactory
 {
-public:
+  public:
 	TFarmControllerFactory();
 	int create(const ControllerData &data, TFarmController **controller);
 	int create(const QString &hostname, int port, TFarmController **controller);

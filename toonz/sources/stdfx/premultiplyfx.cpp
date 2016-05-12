@@ -10,7 +10,7 @@ class PremultiplyFx : public TStandardRasterFx
 	FX_PLUGIN_DECLARATION(PremultiplyFx)
 	TRasterFxPort m_input;
 
-public:
+  public:
 	PremultiplyFx() { addInputPort("Source", m_input); }
 	~PremultiplyFx(){};
 
@@ -30,8 +30,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-void PremultiplyFx::doCompute(TTile &tile, double frame,
-							  const TRenderSettings &ri)
+void PremultiplyFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 {
 	if (!m_input.isConnected())
 		return;

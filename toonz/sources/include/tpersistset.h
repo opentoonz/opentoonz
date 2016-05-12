@@ -6,7 +6,7 @@
 // TnzCore includes
 #include "tpersist.h"
 
-//STD includes
+// STD includes
 #include <vector>
 
 #include <memory>
@@ -31,7 +31,7 @@ class DVAPI TPersistSet : public TPersist
 
 	std::vector<TPersist *> m_objects; //!< #owned# Stored objects.
 
-public:
+  public:
 	~TPersistSet(); //!< Destroys the stored objects.
 
 	const std::vector<TPersist *> &objects() const
@@ -41,7 +41,7 @@ public:
 
 	void insert(std::auto_ptr<TPersist> object); //!< Overwrites an object type instance with
 												 //!  the supplied one.
-public:
+  public:
 	void saveData(TOStream &os); //!< Saves data to stream
 	void loadData(TIStream &is); //!< Loads data from stream
 };

@@ -20,7 +20,7 @@
 //=------------------------------------------------------------------------------------------------------------------------------
 //=------------------------------------------------------------------------------------------------------------------------------
 
-namespace //svg_parser
+namespace // svg_parser
 {
 
 struct NSVGpath {
@@ -49,7 +49,8 @@ struct NSVGimage {
 };
 
 #define NSVG_PI 3.14159265358979323846264338327f
-#define NSVG_KAPPA90 0.5522847493f // Lenght proportional to radius of a cubic bezier handle for 90deg arcs.
+#define NSVG_KAPPA90                                                                               \
+	0.5522847493f // Lenght proportional to radius of a cubic bezier handle for 90deg arcs.
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4996) // Switch off security warnings
@@ -78,7 +79,10 @@ int nsvg__isnum(char c)
 	return strchr("0123456789+-.eE", c) != 0;
 }
 
-NSVG_INLINE float nsvg__maxf(float a, float b) { return a > b ? a : b; }
+NSVG_INLINE float nsvg__maxf(float a, float b)
+{
+	return a > b ? a : b;
+}
 
 // Simple XML parser
 
@@ -86,9 +90,7 @@ NSVG_INLINE float nsvg__maxf(float a, float b) { return a > b ? a : b; }
 #define NSVG_XML_CONTENT 2
 #define NSVG_XML_MAX_ATTRIBS 256
 
-void nsvg__parseContent(char *s,
-						void (*contentCb)(void *ud, const char *s),
-						void *ud)
+void nsvg__parseContent(char *s, void (*contentCb)(void *ud, const char *s), void *ud)
 {
 	// Trim start white spaces
 	while (*s && nsvg__isspace(*s))
@@ -100,10 +102,8 @@ void nsvg__parseContent(char *s,
 		(*contentCb)(ud, s);
 }
 
-void nsvg__parseElement(char *s,
-						void (*startelCb)(void *ud, const char *el, const char **attr),
-						void (*endelCb)(void *ud, const char *el),
-						void *ud)
+void nsvg__parseElement(char *s, void (*startelCb)(void *ud, const char *el, const char **attr),
+						void (*endelCb)(void *ud, const char *el), void *ud)
 {
 	const char *attr[NSVG_XML_MAX_ATTRIBS];
 	int nattr = 0;
@@ -179,11 +179,9 @@ void nsvg__parseElement(char *s,
 		(*endelCb)(ud, name);
 }
 
-int nsvg__parseXML(char *input,
-				   void (*startelCb)(void *ud, const char *el, const char **attr),
+int nsvg__parseXML(char *input, void (*startelCb)(void *ud, const char *el, const char **attr),
 				   void (*endelCb)(void *ud, const char *el),
-				   void (*contentCb)(void *ud, const char *s),
-				   void *ud)
+				   void (*contentCb)(void *ud, const char *s), void *ud)
 {
 	char *s = input;
 	char *mark = s;
@@ -441,7 +439,8 @@ void nsvg__lineTo(struct NSVGParser *p, float x, float y)
 	}
 }
 
-void nsvg__cubicBezTo(struct NSVGParser *p, float cpx1, float cpy1, float cpx2, float cpy2, float x, float y)
+void nsvg__cubicBezTo(struct NSVGParser *p, float cpx1, float cpy1, float cpx2, float cpy2, float x,
+					  float y)
 {
 	nsvg__addPoint(p, cpx1, cpy1);
 	nsvg__addPoint(p, cpx2, cpy2);
@@ -541,7 +540,8 @@ void nsvg__addPath(struct NSVGParser *p, char closed)
 
 	// Transform path.
 	for (i = 0; i < p->npts; ++i)
-		nsvg__xformPoint(&path->pts[i * 2], &path->pts[i * 2 + 1], p->pts[i * 2], p->pts[i * 2 + 1], attr->xform);
+		nsvg__xformPoint(&path->pts[i * 2], &path->pts[i * 2 + 1], p->pts[i * 2], p->pts[i * 2 + 1],
+						 attr->xform);
 
 	path->next = p->plist;
 	p->plist = path;
@@ -1167,8 +1167,8 @@ void nsvg__pathVLineTo(struct NSVGParser *p, float *cpx, float *cpy, float *args
 	nsvg__lineTo(p, *cpx, *cpy);
 }
 
-void nsvg__pathCubicBezTo(struct NSVGParser *p, float *cpx, float *cpy,
-						  float *cpx2, float *cpy2, float *args, int rel)
+void nsvg__pathCubicBezTo(struct NSVGParser *p, float *cpx, float *cpy, float *cpx2, float *cpy2,
+						  float *args, int rel)
 {
 	float x1, y1, x2, y2, cx1, cy1, cx2, cy2;
 
@@ -1198,8 +1198,8 @@ void nsvg__pathCubicBezTo(struct NSVGParser *p, float *cpx, float *cpy,
 	*cpy = y2;
 }
 
-void nsvg__pathCubicBezShortTo(struct NSVGParser *p, float *cpx, float *cpy,
-							   float *cpx2, float *cpy2, float *args, int rel)
+void nsvg__pathCubicBezShortTo(struct NSVGParser *p, float *cpx, float *cpy, float *cpx2,
+							   float *cpy2, float *args, int rel)
 {
 	float x1, y1, x2, y2, cx1, cy1, cx2, cy2;
 
@@ -1228,8 +1228,8 @@ void nsvg__pathCubicBezShortTo(struct NSVGParser *p, float *cpx, float *cpy,
 	*cpy = y2;
 }
 
-void nsvg__pathQuadBezTo(struct NSVGParser *p, float *cpx, float *cpy,
-						 float *cpx2, float *cpy2, float *args, int rel)
+void nsvg__pathQuadBezTo(struct NSVGParser *p, float *cpx, float *cpy, float *cpx2, float *cpy2,
+						 float *args, int rel)
 {
 	float x1, y1, x2, y2, cx, cy;
 	float cx1, cy1, cx2, cy2;
@@ -1261,8 +1261,8 @@ void nsvg__pathQuadBezTo(struct NSVGParser *p, float *cpx, float *cpy,
 	*cpy = y2;
 }
 
-void nsvg__pathQuadBezShortTo(struct NSVGParser *p, float *cpx, float *cpy,
-							  float *cpx2, float *cpy2, float *args, int rel)
+void nsvg__pathQuadBezShortTo(struct NSVGParser *p, float *cpx, float *cpy, float *cpx2,
+							  float *cpy2, float *args, int rel)
 {
 	float x1, y1, x2, y2, cx, cy;
 	float cx1, cy1, cx2, cy2;
@@ -1293,8 +1293,14 @@ void nsvg__pathQuadBezShortTo(struct NSVGParser *p, float *cpx, float *cpy,
 	*cpy = y2;
 }
 
-float nsvg__sqr(float x) { return x * x; }
-float nsvg__vmag(float x, float y) { return sqrtf(x * x + y * y); }
+float nsvg__sqr(float x)
+{
+	return x * x;
+}
+float nsvg__vmag(float x, float y)
+{
+	return sqrtf(x * x + y * y);
+}
 
 float nsvg__vecrat(float ux, float uy, float vx, float vy)
 {
@@ -1366,7 +1372,8 @@ void nsvg__pathArcTo(struct NSVGParser *p, float *cpx, float *cpy, float *args, 
 	}
 	// 2) Compute cx', cy'
 	s = 0.0f;
-	sa = nsvg__sqr(rx) * nsvg__sqr(ry) - nsvg__sqr(rx) * nsvg__sqr(y1p) - nsvg__sqr(ry) * nsvg__sqr(x1p);
+	sa = nsvg__sqr(rx) * nsvg__sqr(ry) - nsvg__sqr(rx) * nsvg__sqr(y1p) -
+		 nsvg__sqr(ry) * nsvg__sqr(x1p);
 	sb = nsvg__sqr(rx) * nsvg__sqr(y1p) + nsvg__sqr(ry) * nsvg__sqr(x1p);
 	if (sa < 0.0f)
 		sa = 0.0f;
@@ -1487,19 +1494,23 @@ void nsvg__parsePath(struct NSVGParser *p, const char **attr)
 							break;
 						case 'C':
 						case 'c':
-							nsvg__pathCubicBezTo(p, &cpx, &cpy, &cpx2, &cpy2, args, cmd == 'c' ? 1 : 0);
+							nsvg__pathCubicBezTo(p, &cpx, &cpy, &cpx2, &cpy2, args,
+												 cmd == 'c' ? 1 : 0);
 							break;
 						case 'S':
 						case 's':
-							nsvg__pathCubicBezShortTo(p, &cpx, &cpy, &cpx2, &cpy2, args, cmd == 's' ? 1 : 0);
+							nsvg__pathCubicBezShortTo(p, &cpx, &cpy, &cpx2, &cpy2, args,
+													  cmd == 's' ? 1 : 0);
 							break;
 						case 'Q':
 						case 'q':
-							nsvg__pathQuadBezTo(p, &cpx, &cpy, &cpx2, &cpy2, args, cmd == 'q' ? 1 : 0);
+							nsvg__pathQuadBezTo(p, &cpx, &cpy, &cpx2, &cpy2, args,
+												cmd == 'q' ? 1 : 0);
 							break;
 						case 'T':
 						case 't':
-							nsvg__pathQuadBezShortTo(p, &cpx, &cpy, &cpx2, &cpy2, args, cmd == 's' ? 1 : 0);
+							nsvg__pathQuadBezShortTo(p, &cpx, &cpy, &cpx2, &cpy2, args,
+													 cmd == 's' ? 1 : 0);
 							break;
 						case 'A':
 						case 'a':
@@ -1604,13 +1615,17 @@ void nsvg__parseRect(struct NSVGParser *p, const char **attr)
 			// Rounded rectangle
 			nsvg__moveTo(p, x + rx, y);
 			nsvg__lineTo(p, x + w - rx, y);
-			nsvg__cubicBezTo(p, x + w - rx * (1 - NSVG_KAPPA90), y, x + w, y + ry * (1 - NSVG_KAPPA90), x + w, y + ry);
+			nsvg__cubicBezTo(p, x + w - rx * (1 - NSVG_KAPPA90), y, x + w,
+							 y + ry * (1 - NSVG_KAPPA90), x + w, y + ry);
 			nsvg__lineTo(p, x + w, y + h - ry);
-			nsvg__cubicBezTo(p, x + w, y + h - ry * (1 - NSVG_KAPPA90), x + w - rx * (1 - NSVG_KAPPA90), y + h, x + w - rx, y + h);
+			nsvg__cubicBezTo(p, x + w, y + h - ry * (1 - NSVG_KAPPA90),
+							 x + w - rx * (1 - NSVG_KAPPA90), y + h, x + w - rx, y + h);
 			nsvg__lineTo(p, x + rx, y + h);
-			nsvg__cubicBezTo(p, x + rx * (1 - NSVG_KAPPA90), y + h, x, y + h - ry * (1 - NSVG_KAPPA90), x, y + h - ry);
+			nsvg__cubicBezTo(p, x + rx * (1 - NSVG_KAPPA90), y + h, x,
+							 y + h - ry * (1 - NSVG_KAPPA90), x, y + h - ry);
 			nsvg__lineTo(p, x, y + ry);
-			nsvg__cubicBezTo(p, x, y + ry * (1 - NSVG_KAPPA90), x + rx * (1 - NSVG_KAPPA90), y, x + rx, y);
+			nsvg__cubicBezTo(p, x, y + ry * (1 - NSVG_KAPPA90), x + rx * (1 - NSVG_KAPPA90), y,
+							 x + rx, y);
 		}
 
 		nsvg__addPath(p, 1);
@@ -1641,10 +1656,14 @@ void nsvg__parseCircle(struct NSVGParser *p, const char **attr)
 		nsvg__resetPath(p);
 
 		nsvg__moveTo(p, cx + r, cy);
-		nsvg__cubicBezTo(p, cx + r, cy + r * NSVG_KAPPA90, cx + r * NSVG_KAPPA90, cy + r, cx, cy + r);
-		nsvg__cubicBezTo(p, cx - r * NSVG_KAPPA90, cy + r, cx - r, cy + r * NSVG_KAPPA90, cx - r, cy);
-		nsvg__cubicBezTo(p, cx - r, cy - r * NSVG_KAPPA90, cx - r * NSVG_KAPPA90, cy - r, cx, cy - r);
-		nsvg__cubicBezTo(p, cx + r * NSVG_KAPPA90, cy - r, cx + r, cy - r * NSVG_KAPPA90, cx + r, cy);
+		nsvg__cubicBezTo(p, cx + r, cy + r * NSVG_KAPPA90, cx + r * NSVG_KAPPA90, cy + r, cx,
+						 cy + r);
+		nsvg__cubicBezTo(p, cx - r * NSVG_KAPPA90, cy + r, cx - r, cy + r * NSVG_KAPPA90, cx - r,
+						 cy);
+		nsvg__cubicBezTo(p, cx - r, cy - r * NSVG_KAPPA90, cx - r * NSVG_KAPPA90, cy - r, cx,
+						 cy - r);
+		nsvg__cubicBezTo(p, cx + r * NSVG_KAPPA90, cy - r, cx + r, cy - r * NSVG_KAPPA90, cx + r,
+						 cy);
 
 		nsvg__addPath(p, 1);
 
@@ -1678,10 +1697,14 @@ void nsvg__parseEllipse(struct NSVGParser *p, const char **attr)
 		nsvg__resetPath(p);
 
 		nsvg__moveTo(p, cx + rx, cy);
-		nsvg__cubicBezTo(p, cx + rx, cy + ry * NSVG_KAPPA90, cx + rx * NSVG_KAPPA90, cy + ry, cx, cy + ry);
-		nsvg__cubicBezTo(p, cx - rx * NSVG_KAPPA90, cy + ry, cx - rx, cy + ry * NSVG_KAPPA90, cx - rx, cy);
-		nsvg__cubicBezTo(p, cx - rx, cy - ry * NSVG_KAPPA90, cx - rx * NSVG_KAPPA90, cy - ry, cx, cy - ry);
-		nsvg__cubicBezTo(p, cx + rx * NSVG_KAPPA90, cy - ry, cx + rx, cy - ry * NSVG_KAPPA90, cx + rx, cy);
+		nsvg__cubicBezTo(p, cx + rx, cy + ry * NSVG_KAPPA90, cx + rx * NSVG_KAPPA90, cy + ry, cx,
+						 cy + ry);
+		nsvg__cubicBezTo(p, cx - rx * NSVG_KAPPA90, cy + ry, cx - rx, cy + ry * NSVG_KAPPA90,
+						 cx - rx, cy);
+		nsvg__cubicBezTo(p, cx - rx, cy - ry * NSVG_KAPPA90, cx - rx * NSVG_KAPPA90, cy - ry, cx,
+						 cy - ry);
+		nsvg__cubicBezTo(p, cx + rx * NSVG_KAPPA90, cy - ry, cx + rx, cy - ry * NSVG_KAPPA90,
+						 cx + rx, cy);
 
 		nsvg__addPath(p, 1);
 
@@ -1909,7 +1932,7 @@ error:
 	return NULL;
 }
 
-} //namespace svg_parser
+} // namespace svg_parser
 
 //=------------------------------------------------------------------------------------------------------------------------------
 //=------------------------------------------------------------------------------------------------------------------------------
@@ -1918,17 +1941,17 @@ error:
 
 class TImageWriterSvg : public TImageWriter
 {
-public:
+  public:
 	TImageWriterSvg(const TFilePath &, TPropertyGroup *);
 	~TImageWriterSvg() {}
 
-private:
-	//double m_maxThickness;
-	//not implemented
+  private:
+	// double m_maxThickness;
+	// not implemented
 	TImageWriterSvg(const TImageWriterSvg &);
 	TImageWriterSvg &operator=(const TImageWriterSvg &src);
 
-public:
+  public:
 	void save(const TImageP &);
 };
 
@@ -1937,7 +1960,7 @@ class TImageReaderSvg : public TImageReader
 {
 	TLevelP m_level;
 
-public:
+  public:
 	TImageReaderSvg(const TFilePath &path, TLevelP &level) : TImageReader(path), m_level(level) {}
 	virtual TImageP load();
 };
@@ -1950,8 +1973,7 @@ TImageWriterP TLevelWriterSvg::getFrameWriter(TFrameId fid)
 }
 
 //-----------------------------------------------------------------------------
-TImageWriterSvg::TImageWriterSvg(const TFilePath &f, TPropertyGroup *prop)
-	: TImageWriter(f)
+TImageWriterSvg::TImageWriterSvg(const TFilePath &f, TPropertyGroup *prop) : TImageWriter(f)
 //, m_maxThickness(0)
 {
 	setProperties(prop);
@@ -2023,7 +2045,8 @@ void writeRegion(TRegion *r, TPalette *plt, QTextStream &out, double ly)
 	out << "d=\"M " << quadsOutline[0]->getP0().x << " " << ly - quadsOutline[0]->getP0().y << "\n";
 
 	for (int i = 0; i < quadsOutline.size(); i++)
-		out << "Q " << quadsOutline[i]->getP1().x << "," << ly - quadsOutline[i]->getP1().y << "," << quadsOutline[i]->getP2().x << "," << ly - quadsOutline[i]->getP2().y << "\n";
+		out << "Q " << quadsOutline[i]->getP1().x << "," << ly - quadsOutline[i]->getP1().y << ","
+			<< quadsOutline[i]->getP2().x << "," << ly - quadsOutline[i]->getP2().y << "\n";
 	out << " \" /> \n";
 	for (int i = 0; i < (int)r->getSubregionCount(); i++)
 		writeRegion(r->getSubregion(i), plt, out, ly);
@@ -2050,7 +2073,8 @@ void writeOutlineStroke(TStroke *s, TPalette *plt, QTextStream &out, double ly, 
 	out << "d=\"M " << quadsOutline[0]->getP0().x << " " << ly - quadsOutline[0]->getP0().y << "\n";
 
 	for (int i = 0; i < quadsOutline.size(); i++)
-		out << "Q " << quadsOutline[i]->getP1().x << "," << ly - quadsOutline[i]->getP1().y << "," << quadsOutline[i]->getP2().x << "," << ly - quadsOutline[i]->getP2().y << "\n";
+		out << "Q " << quadsOutline[i]->getP1().x << "," << ly - quadsOutline[i]->getP1().y << ","
+			<< quadsOutline[i]->getP2().x << "," << ly - quadsOutline[i]->getP2().y << "\n";
 	out << " \" /> \n";
 }
 
@@ -2087,11 +2111,13 @@ void writeCenterlineStroke(TStroke *s, TPalette *plt, QTextStream &out, double l
 	out << "<path  \n";
 	TPixel32 col = plt->getStyle(s->getStyle())->getMainColor();
 
-	out << "style=\"stroke:rgb(" << col.r << "," << col.g << "," << col.b << ")\" stroke-width=\"" << thick << " \"  \n";
+	out << "style=\"stroke:rgb(" << col.r << "," << col.g << "," << col.b << ")\" stroke-width=\""
+		<< thick << " \"  \n";
 	out << "d=\"M " << s->getChunk(0)->getP0().x << " " << ly - s->getChunk(0)->getP0().y << "\n";
 
 	for (int i = 0; i < s->getChunkCount(); i++)
-		out << "Q " << s->getChunk(i)->getP1().x << "," << ly - s->getChunk(i)->getP1().y << "," << s->getChunk(i)->getP2().x << "," << ly - s->getChunk(i)->getP2().y << "\n";
+		out << "Q " << s->getChunk(i)->getP1().x << "," << ly - s->getChunk(i)->getP1().y << ","
+			<< s->getChunk(i)->getP2().x << "," << ly - s->getChunk(i)->getP2().y << "\n";
 	out << " \" /> \n";
 }
 
@@ -2111,7 +2137,7 @@ Tiio::SvgWriterProperties::SvgWriterProperties()
 
 //----------------------------------------------------------------------------
 
-//void writeSvg(QString path, TVectorImageP v)
+// void writeSvg(QString path, TVectorImageP v)
 void TImageWriterSvg::save(const TImageP &img)
 {
 	const TVectorImageP v = (const TVectorImageP)img;
@@ -2133,18 +2159,22 @@ void TImageWriterSvg::save(const TImageP &img)
 	out.setRealNumberNotation(QTextStream::FixedNotation);
 
 	out << "<?xml version=\"1.0\"?>\n";
-	out << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
+	out << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" "
+		   "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
 	out << "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">\n";
 
-	out << "<g transform=\"translate(" << -r.getP00().x << "," << -r.getP00().y << ")\" stroke-width=\"0\" fill=\"none\" >\n";
+	out << "<g transform=\"translate(" << -r.getP00().x << "," << -r.getP00().y
+		<< ")\" stroke-width=\"0\" fill=\"none\" >\n";
 
-	bool isCenterline = ((TEnumProperty *)(m_properties->getProperty("Stroke Mode")))->getValue() == L"Centerline";
+	bool isCenterline =
+		((TEnumProperty *)(m_properties->getProperty("Stroke Mode")))->getValue() == L"Centerline";
 	double quality = 1;
 
 	if (!isCenterline) {
 		if (((TEnumProperty *)(m_properties->getProperty("Outline Quality")))->getValue() == L"Low")
 			quality = 200;
-		else if (((TEnumProperty *)(m_properties->getProperty("Outline Quality")))->getValue() == L"Medium")
+		else if (((TEnumProperty *)(m_properties->getProperty("Outline Quality")))->getValue() ==
+				 L"Medium")
 			quality = 10;
 	}
 
@@ -2172,7 +2202,7 @@ int addColorToPalette(TPalette *plt, unsigned int _color)
 			return i;
 	TPalette::Page *page = plt->getPage(0);
 	int index = page->addStyle(color);
-	return index; //plt->addStyle(color);
+	return index; // plt->addStyle(color);
 }
 
 int findColor(TPalette *plt, unsigned int _color)
@@ -2199,10 +2229,10 @@ TStroke *buildStroke(NSVGpath *path, float width)
 	for (int i = 1; i < path->npts; i += 3) {
 		std::vector<TThickQuadratic *> chunkArray;
 
-		computeQuadraticsFromCubic(p0,
-								   TThickPoint(path->pts[2 * i], -path->pts[2 * i + 1], width),
+		computeQuadraticsFromCubic(p0, TThickPoint(path->pts[2 * i], -path->pts[2 * i + 1], width),
 								   TThickPoint(path->pts[2 * i + 2], -path->pts[2 * i + 3], width),
-								   TThickPoint(path->pts[2 * i + 4], -path->pts[2 * i + 5], width), 0.01, chunkArray);
+								   TThickPoint(path->pts[2 * i + 4], -path->pts[2 * i + 5], width),
+								   0.01, chunkArray);
 
 		for (int j = 0; j < chunkArray.size(); j++) {
 			points.push_back(chunkArray[j]->getP1());
@@ -2229,7 +2259,7 @@ TStroke *buildStroke(NSVGpath *path, float width)
 	return s;
 }
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------
 
@@ -2251,11 +2281,12 @@ TImageP TImageReaderSvg::load()
 		if (!path)
 			continue;
 
-		//TVectorImageP vapp = new TVectorImage();
-		//TPalette* appPlt = new TPalette();
-		//vapp->setPalette(appPlt);
+		// TVectorImageP vapp = new TVectorImage();
+		// TPalette* appPlt = new TPalette();
+		// vapp->setPalette(appPlt);
 
-		TPixel color(shape->fillColor & 0xFF, (shape->fillColor >> 8) & 0xFF, shape->fillColor >> 16);
+		TPixel color(shape->fillColor & 0xFF, (shape->fillColor >> 8) & 0xFF,
+					 shape->fillColor >> 16);
 		if (!shape->hasFill) {
 			assert(color == TPixel::Black);
 			shape->hasFill = true;
@@ -2266,7 +2297,7 @@ TImageP TImageReaderSvg::load()
 		if (shape->hasFill)
 			paintIndex = findColor(plt, shape->fillColor);
 
-		//vapp->setPalette(plt.getPointer());
+		// vapp->setPalette(plt.getPointer());
 		int startStrokeIndex = vimage->getStrokeCount();
 		for (; path; path = path->next) {
 			TStroke *s = buildStroke(path, shape->hasStroke ? shape->strokeWidth : 0);
@@ -2281,31 +2312,31 @@ TImageP TImageReaderSvg::load()
 		vimage->group(startStrokeIndex, vimage->getStrokeCount() - startStrokeIndex);
 		if (shape->hasFill) {
 			vimage->enterGroup(startStrokeIndex);
-			vimage->selectFill(TRectD(-9999999, -9999999, 9999999, 9999999), 0, paintIndex, true, true, false);
+			vimage->selectFill(TRectD(-9999999, -9999999, 9999999, 9999999), 0, paintIndex, true,
+							   true, false);
 			vimage->exitGroup();
 		}
 
 		/* vapp->findRegions();
   if (paintIndex!=-1)
-    for (int i=0; i<(int)vapp->getRegionCount(); i++)
-      vapp->getRegion(i)->setStyle(paintIndex);
+	for (int i=0; i<(int)vapp->getRegionCount(); i++)
+	  vapp->getRegion(i)->setStyle(paintIndex);
   std::vector<int> indexes(vapp->getStrokeCount());
   for (int i=0; i<(int)vapp->getStrokeCount() ;i++)
-    indexes[i] = vimage->getStrokeCount()+i;
+	indexes[i] = vimage->getStrokeCount()+i;
   vimage->insertImage(vapp, indexes);*/
-		//delete appPlt;
+		// delete appPlt;
 	}
 
 	nsvgDelete(svgImg);
-	//if (m_level)
+	// if (m_level)
 	// m_level->setPalette(plt);
 	return TImageP(vimage);
 }
 
 //-----------------------------------------------------
 
-TLevelReaderSvg::TLevelReaderSvg(const TFilePath &path)
-	: TLevelReader(path)
+TLevelReaderSvg::TLevelReaderSvg(const TFilePath &path) : TLevelReader(path)
 {
 }
 
@@ -2325,7 +2356,8 @@ TLevelP TLevelReaderSvg::loadInfo()
 	TLevel::Iterator it = m_level->begin();
 
 	for (; it != m_level->end(); ++it) {
-		NSVGimage *svgImg = nsvgParseFromFile(m_path.withFrame(it->first).getQString().toStdString().c_str());
+		NSVGimage *svgImg =
+			nsvgParseFromFile(m_path.withFrame(it->first).getQString().toStdString().c_str());
 		if (!svgImg)
 			continue;
 

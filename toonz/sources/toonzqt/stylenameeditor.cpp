@@ -12,8 +12,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 
-StyleNameEditor::StyleNameEditor(QWidget *parent)
-	: QDialog(parent), m_paletteHandle(0)
+StyleNameEditor::StyleNameEditor(QWidget *parent) : QDialog(parent), m_paletteHandle(0)
 {
 	setWindowTitle(tr("Name Editor"));
 
@@ -82,7 +81,7 @@ void StyleNameEditor::showEvent(QShowEvent *e)
 		connect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this, SLOT(onStyleSwitched()));
 		connect(m_paletteHandle, SIGNAL(paletteSwitched()), this, SLOT(onStyleSwitched()));
 	}
-	//update view
+	// update view
 	onStyleSwitched();
 }
 
@@ -130,7 +129,7 @@ void StyleNameEditor::onCancelPressed()
 	close();
 }
 
-//focus when the mouse enters
+// focus when the mouse enters
 void StyleNameEditor::enterEvent(QEvent *e)
 {
 	activateWindow();

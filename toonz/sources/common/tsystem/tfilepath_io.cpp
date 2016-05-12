@@ -30,8 +30,7 @@ FILE *fopen(const TFilePath &fp, string mode)
 	return pFile;
 }
 
-Tifstream::Tifstream(const TFilePath &fp)
-	: ifstream(m_file = fopen(fp, "rb"))
+Tifstream::Tifstream(const TFilePath &fp) : ifstream(m_file = fopen(fp, "rb"))
 {
 }
 
@@ -94,8 +93,8 @@ FILE *fopen(const TFilePath &fp, string mode)
 
 Tifstream::Tifstream(const TFilePath &fp)
 	: ifstream(QString::fromStdWString(fp.getWideString()).toUtf8().data(), ios::binary)
-/*: ifstream(openFileForReading(fp), ios::binary) 
-NO! Questo costruttore non e' standard, anche se e' presente 
+/*: ifstream(openFileForReading(fp), ios::binary)
+NO! Questo costruttore non e' standard, anche se e' presente
 in molte versioni. Nel MAC non c'e e fa un cast a char*
 sperando che sia il nome del file => compila ma non funziona
 */
@@ -110,7 +109,8 @@ Tifstream::~Tifstream()
 }
 
 Tofstream::Tofstream(const TFilePath &fp, bool append_existing)
-	: ofstream(QString::fromStdWString(fp.getWideString()).toUtf8().data(), ios::binary | (append_existing ? ios_base::app : ios_base::trunc))
+	: ofstream(QString::fromStdWString(fp.getWideString()).toUtf8().data(),
+			   ios::binary | (append_existing ? ios_base::app : ios_base::trunc))
 {
 }
 

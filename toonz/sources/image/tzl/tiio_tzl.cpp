@@ -160,14 +160,15 @@ bool readVersion(FILE *chan, int &version)
 }
 
 bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable, TzlOffsetMap &iconOffsTable,
-						  TDimension &res, int &version, QString &creator, TINT32 *_frameCount, TINT32 *_offsetTablePos, TINT32 *_iconOffsetTablePos, TLevelP level)
+						  TDimension &res, int &version, QString &creator, TINT32 *_frameCount,
+						  TINT32 *_offsetTablePos, TINT32 *_iconOffsetTablePos, TLevelP level)
 {
 	TINT32 hdrSize;
 	TINT32 lx = 0, ly = 0, frameCount = 0;
 	char codec[4];
 	TINT32 offsetTablePos;
 	TINT32 iconOffsetTablePos;
-	//char magic[8];
+	// char magic[8];
 
 	assert(frameOffsTable.empty());
 	assert(iconOffsTable.empty());
@@ -208,7 +209,7 @@ bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable, TzlOffsetMap
 	assert(0 < frameCount && frameCount < 60000);
 
 	if (version > 10 && offsetTablePos != 0 && iconOffsetTablePos != 0) {
-		//assert(offsetTablePos>0);
+		// assert(offsetTablePos>0);
 		assert(frameCount > 0);
 
 		fseek(chan, offsetTablePos, SEEK_SET);
@@ -228,10 +229,11 @@ bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable, TzlOffsetMap
 			if (version == 12)
 				length = swapTINT32(length);
 #endif
-			//		std::cout << "#" << i << std::hex << " n 0x" << number << " l 0x" << letter << " o 0x" << offs << std::dec << std::endl;
+			//		std::cout << "#" << i << std::hex << " n 0x" << number << " l 0x" << letter << " o
+			//0x" << offs << std::dec << std::endl;
 
 			TFrameId fid(number, letter);
-			//assert(i==0 || oldFid<fid);
+			// assert(i==0 || oldFid<fid);
 
 			if (version >= 12) {
 				frameOffsTable[fid] = TzlChunk(offs, length);
@@ -272,7 +274,7 @@ bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable, TzlOffsetMap
 			}
 		}
 	} else {
-		//m_frameOffsTable.resize(frameCount);
+		// m_frameOffsTable.resize(frameCount);
 		frameOffsTable[TFrameId(1)] = TzlChunk(ftell(chan), 0);
 		iconOffsTable[TFrameId(1)] = TzlChunk(ftell(chan), 0);
 		int i;
@@ -309,7 +311,8 @@ bool adjustIconAspectRatio(TDimension &outDimension, TDimension inDimension, TDi
 	int lx = imageRes.lx;
 	int ly = imageRes.ly;
 
-	if (tmax(double(lx) / inDimension.lx, double(ly) / inDimension.ly) == double(ly) / inDimension.ly)
+	if (tmax(double(lx) / inDimension.lx, double(ly) / inDimension.ly) ==
+		double(ly) / inDimension.ly)
 		iconLx = tround((double(lx) * inDimension.ly) / ly);
 	else
 		iconLy = tround((double(ly) * inDimension.lx) / lx);
@@ -339,11 +342,11 @@ void getThumbnail(TRasterP ras, int shrink, TRasterP &thumbnail)
 
 class TImageReaderTzl : public TImageReader
 {
-public:
+  public:
 	TImageReaderTzl(const TFilePath &f, const TFrameId &fid, TLevelReaderTzl *);
 	~TImageReaderTzl() {}
 
-private:
+  private:
 	// not implemented
 	TImageReaderTzl(const TImageReaderTzl &);
 	TImageReaderTzl &operator=(const TImageReaderTzl &src);
@@ -354,7 +357,7 @@ private:
 	const TImageInfo *getImageInfo10() const;
 	const TImageInfo *getImageInfo11() const; // vale anche le versioni > di 11
 
-public:
+  public:
 	//! Indice del frame del livello
 	TFrameId m_fid;
 	TImageP load();
@@ -365,12 +368,12 @@ public:
 	}
 	const TImageInfo *getImageInfo() const;
 
-	//TImageP doLoad();
+	// TImageP doLoad();
 
 	TDimension getSize() const;
 	TRect getBBox() const;
 
-private:
+  private:
 	//! Size of image
 	int m_lx, m_ly;
 	bool m_isIcon;
@@ -390,18 +393,21 @@ class TImageWriterTzl : public TImageWriter
 	TLevelWriterTzl *m_lwp;
 	TFrameId m_fid;
 	TDimension m_iconSize; // Dimensioni dell'iconcina salvata all'interno del file tlv
-						   //	In genere questo parametro viene settato come quello impostato dall'utente
-						   // nelle preferenze.
-public:
-	TImageWriterTzl(TLevelWriterTzl *lw, TFrameId fid) : TImageWriter(TFilePath()), m_lwp(lw), m_fid(fid), m_iconSize(TDimension(80, 60)) {}
+	//	In genere questo parametro viene settato come quello impostato dall'utente
+	// nelle preferenze.
+  public:
+	TImageWriterTzl(TLevelWriterTzl *lw, TFrameId fid)
+		: TImageWriter(TFilePath()), m_lwp(lw), m_fid(fid), m_iconSize(TDimension(80, 60))
+	{
+	}
 	~TImageWriterTzl() {}
 
-private:
+  private:
 	// not implemented
 	TImageWriterTzl(const TImageWriterTzl &);
 	TImageWriterTzl &operator=(const TImageWriterTzl &src);
 
-public:
+  public:
 	void save(const TImageP &img) { m_lwp->save(img, m_fid); }
 };
 /*
@@ -412,16 +418,16 @@ public:
 //-------------------------------------------------------------------
 
 
-TWriterInfo *TWriterInfoTzl::create(const std::string &ext) 
-{ 
-  return new TWriterInfoTzl(); 
+TWriterInfo *TWriterInfoTzl::create(const std::string &ext)
+{
+  return new TWriterInfoTzl();
 }
 
 //-------------------------------------------------------------------
 
-TWriterInfo *TWriterInfoTzl::clone() const 
+TWriterInfo *TWriterInfoTzl::clone() const
 {
-  return new TWriterInfoTzl(*this); 
+  return new TWriterInfoTzl(*this);
 }
 
 //-------------------------------------------------------------------
@@ -431,14 +437,8 @@ namespace
 
 class Header
 {
-public:
-	enum RasType {
-		Raster32RGBM,
-		Raster64RGBM,
-		Raster32CM,
-		RasterGR8,
-		RasterUnknown
-	};
+  public:
+	enum RasType { Raster32RGBM, Raster64RGBM, Raster32CM, RasterGR8, RasterUnknown };
 
 	int m_lx;
 	int m_ly;
@@ -455,7 +455,8 @@ void TLevelWriterTzl::buildFreeChunksTable()
 {
 	std::set<TzlChunk> occupiedChunks;
 	TzlOffsetMap::const_iterator it1 = m_frameOffsTable.begin();
-	TINT32 lastOccupiedPos = 0; // ultima posizione all'interno del file occupata dall'ultima immagine(grande o icona)
+	TINT32 lastOccupiedPos =
+		0; // ultima posizione all'interno del file occupata dall'ultima immagine(grande o icona)
 
 	while (it1 != m_frameOffsTable.end()) {
 		occupiedChunks.insert(TzlChunk(it1->second.m_offs, it1->second.m_length));
@@ -472,11 +473,13 @@ void TLevelWriterTzl::buildFreeChunksTable()
 	}
 
 	std::set<TzlChunk>::const_iterator it2 = occupiedChunks.begin();
-	TINT32 curPos; // prima posizione utile nel file in cui vengono memorizzati i dati relativi alle immagini
+	TINT32 curPos; // prima posizione utile nel file in cui vengono memorizzati i dati relativi alle
+				   // immagini
 	if (m_version == 13)
 		curPos = 6 * sizeof(TINT32) + 4 * sizeof(char) + 8 * sizeof(char);
 	else if (m_version == 14)
-		curPos = 6 * sizeof(TINT32) + 4 * sizeof(char) + 8 * sizeof(char) + CREATOR_LENGTH * sizeof(char);
+		curPos = 6 * sizeof(TINT32) + 4 * sizeof(char) + 8 * sizeof(char) +
+				 CREATOR_LENGTH * sizeof(char);
 	else
 		curPos = it2->m_offs;
 
@@ -499,7 +502,11 @@ void TLevelWriterTzl::buildFreeChunksTable()
 //-------------------------------------------------------------------
 
 TLevelWriterTzl::TLevelWriterTzl(const TFilePath &path, TPropertyGroup *info)
-	: TLevelWriter(path, info), m_headerWritten(false), m_creatorWritten(false), m_chan(0), m_frameCountPos(0), m_frameCount(0), m_palette(0), m_res(0, 0), m_exists(false), m_version(CURRENT_VERSION), m_updatedIconsSize(false), m_currentIconSize(0, 0), m_iconSize(TDimension(80, 60)), m_userIconSize(TDimension(80, 60)), m_adjustRatio(false), m_codec(new TRasterCodecLZO("LZO", true)), m_overwritePaletteFlag(true)
+	: TLevelWriter(path, info), m_headerWritten(false), m_creatorWritten(false), m_chan(0),
+	  m_frameCountPos(0), m_frameCount(0), m_palette(0), m_res(0, 0), m_exists(false),
+	  m_version(CURRENT_VERSION), m_updatedIconsSize(false), m_currentIconSize(0, 0),
+	  m_iconSize(TDimension(80, 60)), m_userIconSize(TDimension(80, 60)), m_adjustRatio(false),
+	  m_codec(new TRasterCodecLZO("LZO", true)), m_overwritePaletteFlag(true)
 {
 	m_path = path;
 	m_palettePath = path.withNoFrame().withType("tpl");
@@ -513,23 +520,16 @@ TLevelWriterTzl::TLevelWriterTzl(const TFilePath &path, TPropertyGroup *info)
 	// version TLV15B1a: add creator string (fixed size = CREATOR_LENGTH char)
 
 	if (fs.doesExist()) {
-		//if (!fs.isWritable())
+		// if (!fs.isWritable())
 		m_chan = fopen(path, "rb+");
 		/*--- 誰かが開いている、または権限が無いとき ---*/
 		if (!m_chan) {
 			throw TSystemException(path, "can't fopen.");
 		}
 		/*--- TLVファイルのヘッダが正しく読めなかった場合 ---*/
-		if (!readHeaderAndOffsets(m_chan,
-								  m_frameOffsTable,
-								  m_iconOffsTable,
-								  m_res,
-								  m_version,
-								  m_creator,
-								  &m_frameCount,
-								  &m_offsetTablePos,
-								  &m_iconOffsetTablePos,
-								  0)) {
+		if (!readHeaderAndOffsets(m_chan, m_frameOffsTable, m_iconOffsTable, m_res, m_version,
+								  m_creator, &m_frameCount, &m_offsetTablePos,
+								  &m_iconOffsetTablePos, 0)) {
 			throw TSystemException(path, "can't readHeaderAndOffsets.");
 		} else {
 			if (m_version >= 12)
@@ -621,7 +621,8 @@ TLevelWriterTzl::~TLevelWriterTzl()
 	fclose(m_chan);
 	m_chan = 0;
 
-	if (m_palette && m_overwritePaletteFlag && (m_palette->getDirtyFlag() || !TSystem::doesExistFileOrLevel(m_palettePath))) {
+	if (m_palette && m_overwritePaletteFlag &&
+		(m_palette->getDirtyFlag() || !TSystem::doesExistFileOrLevel(m_palettePath))) {
 		TOStream os(m_palettePath);
 		os << m_palette;
 		m_palette->release();
@@ -637,7 +638,8 @@ TLevelWriterTzl::~TLevelWriterTzl()
 		}
 	}
 	// Se lo spazio libero (cioè la somma di tutti i buchi che si sono creati tra i frame)
-	// è maggiore di una certa soglia oppure è stato rimosso almeno un frame allora ottimizzo il file
+	// è maggiore di una certa soglia oppure è stato rimosso almeno un frame allora ottimizzo il
+	// file
 	// (in pratica risalvo il file da capo senza buchi).
 	if (getFreeSpace() > 0.3 || erasedFrame)
 		optimize();
@@ -667,12 +669,15 @@ void TLevelWriterTzl::writeHeader(const TDimension &size)
 
 	assert(m_frameCountPos == 8 + CREATOR_LENGTH + 3 * sizeof(TINT32));
 
-	//I put the place for the frameCount, which I will write in this position at the end  (see in the distructor)
+	// I put the place for the frameCount, which I will write in this position at the end  (see in
+	// the distructor)
 	tfwrite(&intval, 1, m_chan);
-	//I put the place for the offsetTableOffset, which I will write in this position at the end  (see in the distructor)
+	// I put the place for the offsetTableOffset, which I will write in this position at the end
+	// (see in the distructor)
 	intval = 0;
 	tfwrite(&intval, 1, m_chan);
-	//I put the place for the iconOffsetTableOffset, which I will write in this position at the end  (see in the distructor)
+	// I put the place for the iconOffsetTableOffset, which I will write in this position at the end
+	// (see in the distructor)
 	tfwrite(&intval, 1, m_chan);
 	tfwrite(codec, codecLen, m_chan);
 }
@@ -683,22 +688,22 @@ void TLevelWriterTzl::addFreeChunk(TINT32 offs, TINT32 length)
 {
 	std::set<TzlChunk>::iterator it = m_freeChunks.begin();
 	while (it != m_freeChunks.end()) {
-		//if (it->m_offs>offs+length+1)
+		// if (it->m_offs>offs+length+1)
 		//  break;
 
-		if (it->m_offs + it->m_length == offs) //accorpo due chunks in uno
+		if (it->m_offs + it->m_length == offs) // accorpo due chunks in uno
 		{
 			TzlChunk chunk(it->m_offs, it->m_length + length);
 			m_freeChunks.erase(it);
 			m_freeChunks.insert(chunk);
-			//it->m_length += length;
+			// it->m_length += length;
 			return;
 		} else if (offs + length == it->m_offs) {
 			TzlChunk chunk(offs, it->m_length + length);
 			m_freeChunks.erase(it);
 			m_freeChunks.insert(chunk);
-			//it->m_offs = offs;
-			//it->m_length += length;
+			// it->m_offs = offs;
+			// it->m_length += length;
 			return;
 		}
 		it++;
@@ -711,7 +716,7 @@ void TLevelWriterTzl::addFreeChunk(TINT32 offs, TINT32 length)
 TINT32 TLevelWriterTzl::findSavingChunk(const TFrameId &fid, TINT32 length, bool isIcon)
 {
 	TzlOffsetMap::iterator it;
-	//prima libero il chunk del fid, se c'e'. accorpo con altro chunk se trovo uno contiguo.
+	// prima libero il chunk del fid, se c'e'. accorpo con altro chunk se trovo uno contiguo.
 	if (!isIcon) {
 		if ((it = m_frameOffsTable.find(fid)) != m_frameOffsTable.end()) {
 			addFreeChunk(it->second.m_offs, it->second.m_length);
@@ -725,14 +730,13 @@ TINT32 TLevelWriterTzl::findSavingChunk(const TFrameId &fid, TINT32 length, bool
 		}
 	}
 
-	//ora cerco un cioncone libero con la piu' piccola memoria sufficiente
+	// ora cerco un cioncone libero con la piu' piccola memoria sufficiente
 	std::set<TzlChunk>::iterator it1 = m_freeChunks.begin(), found = m_freeChunks.end();
 	for (; it1 != m_freeChunks.end(); it1++) {
 		//   TINT32 _length = it1->m_length;
 
 		if (it1->m_length >= length &&
-			(found == m_freeChunks.end() ||
-			 found->m_length > it1->m_length))
+			(found == m_freeChunks.end() || found->m_length > it1->m_length))
 			found = it1;
 	}
 
@@ -742,8 +746,8 @@ TINT32 TLevelWriterTzl::findSavingChunk(const TFrameId &fid, TINT32 length, bool
 		if (found->m_length > length) {
 			TzlChunk chunk(found->m_offs + length, found->m_length - length);
 			m_freeChunks.insert(chunk);
-			//found->m_offs+=length;
-			//found->m_length-=length;
+			// found->m_offs+=length;
+			// found->m_length-=length;
 		} else
 			assert(found->m_length == length);
 		m_freeChunks.erase(found);
@@ -854,13 +858,15 @@ bool TLevelWriterTzl::convertToLatestVersion()
 		TOStream os(m_palettePath);
 		os << m_palette;
 	}
-	//else
+	// else
 	//	m_palette = 0;
 
 	m_chan = fopen(m_path, "rb+");
 	if (!m_chan)
 		return false;
-	if (!readHeaderAndOffsets(m_chan, m_frameOffsTable, m_iconOffsTable, m_res, m_version, m_creator, &m_frameCount, &m_offsetTablePos, &m_iconOffsetTablePos, 0))
+	if (!readHeaderAndOffsets(m_chan, m_frameOffsTable, m_iconOffsTable, m_res, m_version,
+							  m_creator, &m_frameCount, &m_offsetTablePos, &m_iconOffsetTablePos,
+							  0))
 		return false;
 	m_freeChunks.clear();
 	buildFreeChunksTable();
@@ -943,7 +949,7 @@ void TLevelWriterTzl::saveImage(const TImageP &img, const TFrameId &_fid, bool i
 		static bool firstTime = true;
 		if (firstTime) {
 			firstTime = false;
-			//MessageBox( NULL, "Cannot save level, out of memory!", "Warning!", MB_OK);
+			// MessageBox( NULL, "Cannot save level, out of memory!", "Warning!", MB_OK);
 		}
 		return;
 	}
@@ -1001,9 +1007,13 @@ void TLevelWriterTzl::saveImage(const TImageP &img, const TFrameId &_fid, bool i
 	if (fid == TFrameId()) {
 		assert(!m_exists);
 		if (m_frameOffsTable.empty())
-			fid = (m_frameOffsTable.empty()) ? TFrameId(1, 0) : TFrameId(m_frameOffsTable.rbegin()->first.getNumber() + 1, 0);
+			fid = (m_frameOffsTable.empty())
+					  ? TFrameId(1, 0)
+					  : TFrameId(m_frameOffsTable.rbegin()->first.getNumber() + 1, 0);
 		if (m_iconOffsTable.empty())
-			fid = (m_iconOffsTable.empty()) ? TFrameId(1, 0) : TFrameId(m_iconOffsTable.rbegin()->first.getNumber() + 1, 0);
+			fid = (m_iconOffsTable.empty())
+					  ? TFrameId(1, 0)
+					  : TFrameId(m_iconOffsTable.rbegin()->first.getNumber() + 1, 0);
 	}
 
 	if (!m_exists) {
@@ -1042,7 +1052,7 @@ void TLevelWriterTzl::saveImage(const TImageP &img, const TFrameId &_fid, bool i
 	rCompressed->unlock();
 
 	//#if !TNZ_LITTLE_ENDIAN
-	//delete [] buff;
+	// delete [] buff;
 	//#endif
 }
 
@@ -1129,14 +1139,14 @@ void TLevelWriterTzl::renumberFids(const std::map<TFrameId, TFrameId> &renumberT
 	m_iconOffsTable.clear();
 	m_iconOffsTable = iconOffsTable;
 	m_frameCount = m_frameOffsTable.size();
-	//buildFreeChunksTable();
+	// buildFreeChunksTable();
 }
 
 //-------------------------------------------------------------------
 
 void TLevelWriterTzl::createIcon(const TImageP &imgIn, TImageP &imgOut)
 {
-	//Creo iconcina e poi la salvo
+	// Creo iconcina e poi la salvo
 	TToonzImageP ti = imgIn;
 	if (!ti)
 		return;
@@ -1180,12 +1190,13 @@ void TLevelWriterTzl::createIcon(const TImageP &imgIn, TImageP &imgOut)
 		savebox = tmp_savebox;
 	}
 
-	if (!TRect(m_iconSize).contains(savebox)) //it should be better to use tfloor instead of tround in the previous lines:
-											  //sometimes, for rounding problems, the savebox is outside 1 pixel the raster size.
-											  //the best solution should be to replace tround with tfloor here
-											  //and in the icon reading of tzl 1.4 (method load14),
-											  //but this way the old 1.4 tzl are not readed correctly (crash!)
-											  //so, this 'if' is a patch. vinz
+	if (!TRect(m_iconSize).contains(savebox)) // it should be better to use tfloor instead of tround
+											  // in the previous lines:
+		// sometimes, for rounding problems, the savebox is outside 1 pixel the raster size.
+		// the best solution should be to replace tround with tfloor here
+		// and in the icon reading of tzl 1.4 (method load14),
+		// but this way the old 1.4 tzl are not readed correctly (crash!)
+		// so, this 'if' is a patch. vinz
 		savebox = savebox * TRect(m_iconSize);
 	thumbnailRas->clearOutside(savebox);
 	TToonzImageP ticon(thumbnailRas, savebox);
@@ -1205,7 +1216,7 @@ void TLevelWriterTzl::remove(const TFrameId &fid)
 	if (it == m_frameOffsTable.end())
 		return;
 	// aggiungo spazio vuoto
-	//m_freeChunks.insert(TzlChunk(it->second.m_offs, it->second.m_length));
+	// m_freeChunks.insert(TzlChunk(it->second.m_offs, it->second.m_length));
 	addFreeChunk(it->second.m_offs, it->second.m_length);
 	// cancello l'immagine dalla tabella
 	m_frameOffsTable.erase(it);
@@ -1217,7 +1228,7 @@ void TLevelWriterTzl::remove(const TFrameId &fid)
 		if (iconIt == m_iconOffsTable.end())
 			return;
 		// aggiungo spazio vuoto
-		//m_freeChunks.insert(TzlChunk(iconIt->second.m_offs, iconIt->second.m_length));
+		// m_freeChunks.insert(TzlChunk(iconIt->second.m_offs, iconIt->second.m_length));
 		addFreeChunk(iconIt->second.m_offs, iconIt->second.m_length);
 		// Cancello la relativa icona
 		m_iconOffsTable.erase(iconIt);
@@ -1233,14 +1244,15 @@ void TLevelWriterTzl::setIconSize(TDimension iconSize)
 
 	m_iconSize = TDimension(iconSize.lx, iconSize.ly);
 	m_userIconSize = TDimension(iconSize.lx, iconSize.ly); // Used in TLevelWriterTzl::optimize().
-														   // Observe that m_iconSize may change below.
+	// Observe that m_iconSize may change below.
 	if (m_version >= 13 && m_exists) {
 		// A supported level file already exists at the specified path
 
 		// Check whether icons stored in the file already
 		// have the required size
-		if (!m_updatedIconsSize)							// m_updatedIconsSize tells whether
-			m_updatedIconsSize = checkIconSize(m_iconSize); // icon sizes in the file match m_iconSize
+		if (!m_updatedIconsSize) // m_updatedIconsSize tells whether
+			m_updatedIconsSize =
+				checkIconSize(m_iconSize); // icon sizes in the file match m_iconSize
 
 		if (!m_updatedIconsSize) {
 			// Icons in the stored file mismatch with the
@@ -1255,19 +1267,16 @@ void TLevelWriterTzl::setIconSize(TDimension iconSize)
 
 /*!
   \brief    Checks the icons size stored inside an already existing level
-            file, and compares it with the specified newSize.
+			file, and compares it with the specified newSize.
   \return   Whether the specified newSize \a matches the icons size in
-            the level file.
+			the level file.
 */
 
 bool TLevelWriterTzl::checkIconSize(const TDimension &newSize)
 {
 	assert(m_version >= 13);
 
-	if (!m_exists ||
-		m_iconOffsTable.empty() ||
-		!m_chan ||
-		m_version < 13)
+	if (!m_exists || m_iconOffsTable.empty() || !m_chan || m_version < 13)
 		return false;
 
 	// Read the size of icons in the file
@@ -1289,9 +1298,10 @@ bool TLevelWriterTzl::checkIconSize(const TDimension &newSize)
 	if (iconLx <= 0 || iconLy <= 0 || iconLx > m_res.lx || iconLy > m_res.ly)
 		return false;
 
-	m_currentIconSize = TDimension(iconLx, iconLy); // This is not performed if the above pre-emptive
-													// bailout kicks in. BTW, m_currentIconSize
-													// is currently UNUSED! Should be cleaned up...
+	m_currentIconSize =
+		TDimension(iconLx, iconLy); // This is not performed if the above pre-emptive
+									// bailout kicks in. BTW, m_currentIconSize
+									// is currently UNUSED! Should be cleaned up...
 	// Compare newSize against read icon size in the file
 	return (m_currentIconSize == newSize);
 }
@@ -1338,12 +1348,12 @@ bool TLevelWriterTzl::resizeIcons(const TDimension &newSize)
 		for(TLevel::Iterator it=level->begin(); it != level->end(); ++it)
 		{
 			TImageReaderP ir = lr->getFrameReader(it->first);
-			
+
 			// carico l'iconcina
 		  TImageP img = ir->loadIcon();
 			TImageP icon;
 			createIcon(img,icon);
-			saveIcon(icon,it->first);			
+			saveIcon(icon,it->first);
 		}
 	}
 	else
@@ -1378,9 +1388,11 @@ float TLevelWriterTzl::getFreeSpace()
 
 		TINT32 totalSpace = 0;
 		if (m_version == 13)
-			totalSpace = m_offsetTablePos - 6 * sizeof(TINT32) - 4 * sizeof(char) - 8 * sizeof(char);
+			totalSpace =
+				m_offsetTablePos - 6 * sizeof(TINT32) - 4 * sizeof(char) - 8 * sizeof(char);
 		else if (m_version == 14)
-			totalSpace = m_offsetTablePos - 6 * sizeof(TINT32) - 4 * sizeof(char) - 8 * sizeof(char) - CREATOR_LENGTH * sizeof(char);
+			totalSpace = m_offsetTablePos - 6 * sizeof(TINT32) - 4 * sizeof(char) -
+						 8 * sizeof(char) - CREATOR_LENGTH * sizeof(char);
 		assert(totalSpace > 0);
 		return (float)freeSpace / totalSpace;
 	}
@@ -1464,7 +1476,8 @@ void TLevelReaderTzl::readPalette()
 //---------------------------------------------------
 
 TLevelReaderTzl::TLevelReaderTzl(const TFilePath &path)
-	: TLevelReader(path), m_chan(0), m_res(0, 0), m_xDpi(0), m_yDpi(0), m_version(0), m_frameOffsTable(), m_iconOffsTable(), m_level(), m_readPalette(true)
+	: TLevelReader(path), m_chan(0), m_res(0, 0), m_xDpi(0), m_yDpi(0), m_version(0),
+	  m_frameOffsTable(), m_iconOffsTable(), m_level(), m_readPalette(true)
 {
 
 	m_chan = fopen(path, "rb");
@@ -1472,7 +1485,8 @@ TLevelReaderTzl::TLevelReaderTzl(const TFilePath &path)
 	if (!m_chan)
 		return;
 
-	if (!readHeaderAndOffsets(m_chan, m_frameOffsTable, m_iconOffsTable, m_res, m_version, m_creator, 0, 0, 0, m_level))
+	if (!readHeaderAndOffsets(m_chan, m_frameOffsTable, m_iconOffsTable, m_res, m_version,
+							  m_creator, 0, 0, 0, m_level))
 		return;
 
 	TFilePath historyFp = path.withNoFrame().withType("hst");
@@ -1570,11 +1584,9 @@ bool TLevelReaderTzl::getIconSize(TDimension &iconSize)
 //
 //-------------------------------------------------------------------
 
-TImageReaderTzl::TImageReaderTzl(
-	const TFilePath &f,
-	const TFrameId &fid,
-	TLevelReaderTzl *lr)
-	: TImageReader(f), m_fid(fid), m_lrp(lr), m_lx(lr->m_res.lx), m_ly(lr->m_res.ly), m_isIcon(false)
+TImageReaderTzl::TImageReaderTzl(const TFilePath &f, const TFrameId &fid, TLevelReaderTzl *lr)
+	: TImageReader(f), m_fid(fid), m_lrp(lr), m_lx(lr->m_res.lx), m_ly(lr->m_res.ly),
+	  m_isIcon(false)
 {
 }
 
@@ -1594,12 +1606,12 @@ TImageP TImageReaderTzl::load10()
 	TINT32 imgBuffSize = 0;
 	UCHAR *imgBuff = 0;
 	int frameIndex = m_fid.getNumber();
-	//int pos = ftell(chan);
+	// int pos = ftell(chan);
 	/*if(m_lrp->m_frameIndex>=m_frameIndex)
-    {
-     fseek(chan, m_lrp->m_framesOffset, SEEK_SET);
-     m_lrp->m_frameIndex = 0;
-    }
+	{
+	 fseek(chan, m_lrp->m_framesOffset, SEEK_SET);
+	 m_lrp->m_frameIndex = 0;
+	}
   int k = m_lrp->m_frameIndex + 1;
   m_lrp->m_frameIndex = m_frameIndex;*/
 
@@ -1643,9 +1655,9 @@ TImageP TImageReaderTzl::load10()
 
 		delete[] imgBuff;
 		imgBuff = new UCHAR[imgBuffSize];
-		//int ret =
+		// int ret =
 		fread(imgBuff, actualBuffSize, 1, chan);
-		//assert(ret==1);
+		// assert(ret==1);
 	}
 
 	Header *header = (Header *)imgBuff;
@@ -1703,11 +1715,11 @@ TImageP TImageReaderTzl::load10()
 	ti->setDpi(xdpi, ydpi);
 	// m_lrp->m_level->setFrame(TFrameId(m_frameIndex+1), ti);
 	ti->setPalette(m_lrp->m_level->getPalette());
-	//delete [] imgBuff;
-	//imgBuff = 0;
+	// delete [] imgBuff;
+	// imgBuff = 0;
 	return ti;
 
-	//ToonzImageUtils::updateRas32(ti);
+	// ToonzImageUtils::updateRas32(ti);
 }
 
 //-------------------------------------------------------------------
@@ -1728,12 +1740,12 @@ TImageP TImageReaderTzl::load11()
 
 	assert(!m_lrp->m_frameOffsTable.empty());
 
-	//int pos = ftell(chan);
+	// int pos = ftell(chan);
 	/*if(m_lrp->m_frameIndex>=m_frameIndex)
-    {
-     fseek(chan, m_lrp->m_framesOffset, SEEK_SET);
-     m_lrp->m_frameIndex = 0;
-    }
+	{
+	 fseek(chan, m_lrp->m_framesOffset, SEEK_SET);
+	 m_lrp->m_frameIndex = 0;
+	}
   int k = m_lrp->m_frameIndex + 1;
   m_lrp->m_frameIndex = m_frameIndex;*/
 
@@ -1767,9 +1779,9 @@ TImageP TImageReaderTzl::load11()
 	assert(actualBuffSize <= imgBuffSize);
 
 	imgBuff = new UCHAR[imgBuffSize];
-	//int ret =
+	// int ret =
 	fread(imgBuff, actualBuffSize, 1, chan);
-	//assert(ret==1);
+	// assert(ret==1);
 
 	Header *header = (Header *)imgBuff;
 
@@ -1827,11 +1839,11 @@ TImageP TImageReaderTzl::load11()
 	ti->setDpi(xdpi, ydpi);
 	// m_lrp->m_level->setFrame(TFrameId(m_frameIndex+1), ti);
 	ti->setPalette(m_lrp->m_level->getPalette());
-	//delete [] imgBuff;
-	//imgBuff = 0;
+	// delete [] imgBuff;
+	// imgBuff = 0;
 	return ti;
 
-	//ToonzImageUtils::updateRas32(ti);
+	// ToonzImageUtils::updateRas32(ti);
 }
 
 //-------------------------------------------------------------------
@@ -1918,21 +1930,22 @@ TImageP TImageReaderTzl::load13()
 
 		/*
 			TINT32 iconsbx0 = tround((double)iconLx*sbx0/m_lrp->m_res.lx);
-			TINT32 iconsby0 = tround((double)iconLy*sby0/m_lrp->m_res.ly); 
+			TINT32 iconsby0 = tround((double)iconLy*sby0/m_lrp->m_res.ly);
 			TRect savebox(TPoint(iconsbx0,iconsby0), TDimension(ras->getLx(),ras->getLy()));
 			 */
 
 		// Compute savebox
 
 		TINT32 iconsbx0 = tround((double)iconLx * sbx0 / m_lrp->m_res.lx);
-		TINT32 iconsby0 = tround((double)iconLy * sby0 / m_lrp->m_res.ly); //+tround((double)(iconLy-ly)/2);
+		TINT32 iconsby0 =
+			tround((double)iconLy * sby0 / m_lrp->m_res.ly); //+tround((double)(iconLy-ly)/2);
 		TINT32 iconsblx = tround((double)iconLx * sblx / m_lrp->m_res.lx);
 		TINT32 iconsbly = tround((double)iconLy * sbly / m_lrp->m_res.ly);
 		TRect savebox(TPoint(iconsbx0, iconsby0), TDimension(iconsblx, iconsbly));
 
-		//int ly = tround((double)m_lrp->m_res.ly*iconLx/m_lrp->m_res.lx);
-		//TRect rect(TPoint(0,tround((double)(iconLy-ly)/2)),TDimension(iconLx,ly));
-		//TPixelCM32 bgColorRect(1,0,100);
+		// int ly = tround((double)m_lrp->m_res.ly*iconLx/m_lrp->m_res.lx);
+		// TRect rect(TPoint(0,tround((double)(iconLy-ly)/2)),TDimension(iconLx,ly));
+		// TPixelCM32 bgColorRect(1,0,100);
 
 		TDimension imgSize(iconLx, iconLy);
 		assert(TRect(imgSize).contains(savebox));
@@ -1944,7 +1957,7 @@ TImageP TImageReaderTzl::load13()
 
 			fullRas->fillOutside(savebox, bgColor);
 
-			//fullRas->extractT(rect)->fill(bgColorRect);
+			// fullRas->extractT(rect)->fill(bgColorRect);
 			assert(savebox.getSize() == ras->getSize());
 			fullRas->extractT(savebox)->copy(ras);
 			ras = fullRas;
@@ -1958,15 +1971,15 @@ TImageP TImageReaderTzl::load13()
 
 	TRasterCM32P raux = TRasterCM32P(m_lx, m_ly);
 	raux->lock();
-	imgBuff = (UCHAR *)raux->getRawData(); //new UCHAR[imgBuffSize];
-	//imgBuff = new UCHAR[imgBuffSize];
-	//imgBuffSize = m_lx*m_ly*sizeof(TPixelCM32);
-	//assert(actualBuffSize <= imgBuffSize);
+	imgBuff = (UCHAR *)raux->getRawData(); // new UCHAR[imgBuffSize];
+	// imgBuff = new UCHAR[imgBuffSize];
+	// imgBuffSize = m_lx*m_ly*sizeof(TPixelCM32);
+	// assert(actualBuffSize <= imgBuffSize);
 
-	//imgBuff = new UCHAR[imgBuffSize];
-	//int ret =
+	// imgBuff = new UCHAR[imgBuffSize];
+	// int ret =
 	fread(imgBuff, actualBuffSize, 1, chan);
-	//assert(ret==1);
+	// assert(ret==1);
 
 	Header *header = (Header *)imgBuff;
 
@@ -2015,7 +2028,7 @@ TImageP TImageReaderTzl::load13()
 	raux->unlock();
 	raux = TRasterCM32P();
 
-	//delete [] imgBuff;
+	// delete [] imgBuff;
 
 	// codec.decompress(m_compressedBuffer, m_compressedBufferSize, ras);
 
@@ -2026,11 +2039,11 @@ TImageP TImageReaderTzl::load13()
 	ti->setDpi(xdpi, ydpi);
 	// m_lrp->m_level->setFrame(TFrameId(m_frameIndex+1), ti);
 	ti->setPalette(m_lrp->m_level->getPalette());
-	//delete [] imgBuff;
-	//imgBuff = 0;
+	// delete [] imgBuff;
+	// imgBuff = 0;
 	return ti;
 
-	//ToonzImageUtils::updateRas32(ti);
+	// ToonzImageUtils::updateRas32(ti);
 }
 
 // Restituisce la regione del raster shrinkata e la relativa savebox.
@@ -2048,8 +2061,10 @@ TRect applyShrinkAndRegion(TRasterP &ras, int shrink, TRect region, TRect savebo
 	savebox *= region;
 	if (savebox == TRect() || savebox.getLx() <= 0 || savebox.getLy() <= 0)
 		return TRect();
-	int firstColIndexOfLayer = (savebox.x0 - region.x0) - 1 + shrink - (abs(savebox.x0 - region.x0 - 1) % shrink);
-	int firstRowIndexOfLayer = (savebox.y0 - region.y0) - 1 + shrink - (abs(savebox.y0 - region.y0 - 1) % shrink);
+	int firstColIndexOfLayer =
+		(savebox.x0 - region.x0) - 1 + shrink - (abs(savebox.x0 - region.x0 - 1) % shrink);
+	int firstRowIndexOfLayer =
+		(savebox.y0 - region.y0) - 1 + shrink - (abs(savebox.y0 - region.y0 - 1) % shrink);
 	savebox.x0 = (firstColIndexOfLayer) / shrink;
 	savebox.y0 = (firstRowIndexOfLayer) / shrink;
 	savebox.x1 = savebox.x0 + (savebox.getLx()) / shrink - 1;
@@ -2069,7 +2084,7 @@ TImageP TImageReaderTzl::load14()
 	TINT32 sbx0 = 0, sby0 = 0, sblx, sbly;
 	TINT32 actualBuffSize;
 	double xdpi = 1, ydpi = 1;
-	//TINT32 imgBuffSize = 0;
+	// TINT32 imgBuffSize = 0;
 	UCHAR *imgBuff = 0;
 	TINT32 iconLx = 0, iconLy = 0;
 	assert(!m_lrp->m_frameOffsTable.empty());
@@ -2124,7 +2139,7 @@ TImageP TImageReaderTzl::load14()
 		if (!raux)
 			return TImageP();
 		raux->lock();
-		imgBuff = (UCHAR *)raux->getRawData(); //new UCHAR[imgBuffSize];
+		imgBuff = (UCHAR *)raux->getRawData(); // new UCHAR[imgBuffSize];
 		fread(imgBuff, actualBuffSize, 1, chan);
 
 #if !TNZ_LITTLE_ENDIAN
@@ -2158,7 +2173,7 @@ TImageP TImageReaderTzl::load14()
 
 		/*
 			TINT32 iconsbx0 = tround((double)iconLx*sbx0/m_lrp->m_res.lx);
-			TINT32 iconsby0 = tround((double)iconLy*sby0/m_lrp->m_res.ly); 
+			TINT32 iconsby0 = tround((double)iconLy*sby0/m_lrp->m_res.ly);
 			TRect savebox(TPoint(iconsbx0,iconsby0), TDimension(ras->getLx(),ras->getLy()));
 			 */
 		if (m_lrp->m_res.lx == 0 || m_lrp->m_res.ly == 0)
@@ -2179,17 +2194,20 @@ TImageP TImageReaderTzl::load14()
 		} else {
 			TINT32 iconsbx0 = tfloor((double)iconLx * sbx0 / m_lrp->m_res.lx);
 			TINT32 iconsby0 = tfloor((double)iconLy * sby0 / m_lrp->m_res.ly);
-			savebox = TRect(TPoint(iconsbx0, iconsby0), TDimension(tmp_savebox.getLx(), tmp_savebox.getLy()));
+			savebox = TRect(TPoint(iconsbx0, iconsby0),
+							TDimension(tmp_savebox.getLx(), tmp_savebox.getLy()));
 		}
 
-		//int ly = tround((double)m_lrp->m_res.ly*iconLx/m_lrp->m_res.lx);
-		//TRect rect(TPoint(0,tround((double)(iconLy-ly)/2)),TDimension(iconLx,ly));
-		//TPixelCM32 bgColorRect(1,0,100);
+		// int ly = tround((double)m_lrp->m_res.ly*iconLx/m_lrp->m_res.lx);
+		// TRect rect(TPoint(0,tround((double)(iconLy-ly)/2)),TDimension(iconLx,ly));
+		// TPixelCM32 bgColorRect(1,0,100);
 
 		TDimension imgSize(iconLx, iconLy);
-		if (!TRect(imgSize).contains(savebox)) //for this 'if', see comment in createIcon method. vinz
+		if (!TRect(imgSize)
+				 .contains(savebox)) // for this 'if', see comment in createIcon method. vinz
 			savebox = savebox * TRect(imgSize);
-		//if(!TRect(imgSize).contains(savebox)) throw TException("Loading tlv: bad icon savebox size.");
+		// if(!TRect(imgSize).contains(savebox)) throw TException("Loading tlv: bad icon savebox
+		// size.");
 
 		if (imgSize != savebox.getSize()) {
 			TRasterCM32P fullRas(imgSize);
@@ -2197,8 +2215,8 @@ TImageP TImageReaderTzl::load14()
 
 			fullRas->fillOutside(savebox, bgColor);
 
-			//fullRas->extractT(rect)->fill(bgColorRect);
-			//assert(savebox.getSize() == ras->getSize());
+			// fullRas->extractT(rect)->fill(bgColorRect);
+			// assert(savebox.getSize() == ras->getSize());
 			if (savebox.getSize() != ras->getSize())
 				throw TException("Loading tlv: bad icon savebox size.");
 			fullRas->extractT(savebox)->copy(ras);
@@ -2217,14 +2235,14 @@ TImageP TImageReaderTzl::load14()
 
 	TRasterCM32P raux = TRasterCM32P(m_lx, m_ly);
 
-	//imgBuffSize = m_lx*m_ly*sizeof(TPixelCM32);
+	// imgBuffSize = m_lx*m_ly*sizeof(TPixelCM32);
 
 	raux->lock();
-	imgBuff = (UCHAR *)raux->getRawData(); //new UCHAR[imgBuffSize];
-										   //int ret =
+	imgBuff = (UCHAR *)raux->getRawData(); // new UCHAR[imgBuffSize];
+	// int ret =
 
 	fread(imgBuff, actualBuffSize, 1, chan);
-	//assert(ret==1);
+	// assert(ret==1);
 
 	Header *header = (Header *)imgBuff;
 
@@ -2288,11 +2306,11 @@ TImageP TImageReaderTzl::load14()
 	ti->setDpi(xdpi, ydpi);
 	// m_lrp->m_level->setFrame(TFrameId(m_frameIndex+1), ti);
 	ti->setPalette(m_lrp->m_level->getPalette());
-	//delete [] imgBuff;
-	//imgBuff = 0;
+	// delete [] imgBuff;
+	// imgBuff = 0;
 	return ti;
 
-	//ToonzImageUtils::updateRas32(ti);
+	// ToonzImageUtils::updateRas32(ti);
 }
 
 //-------------------------------------------------------------------
@@ -2332,7 +2350,8 @@ TImageP TImageReaderTzl::load()
 		TRect savebox = ti->getSavebox();
 		if (m_region != TRect() && m_region.getLx() > 0 && m_region.getLy() > 0) {
 			m_region *= TRect(0, 0, ti->getSize().lx, ti->getSize().ly);
-			if (m_region.isEmpty() || m_region == TRect() || m_region.getLx() <= 0 || m_region.getLy() <= 0)
+			if (m_region.isEmpty() || m_region == TRect() || m_region.getLx() <= 0 ||
+				m_region.getLy() <= 0)
 				return TImageP();
 		}
 		savebox = applyShrinkAndRegion(ras, m_shrink, m_region, savebox);
@@ -2342,7 +2361,7 @@ TImageP TImageReaderTzl::load()
 				ras->clear();
 				savebox = m_region;
 			} else {
-				//se sia la savebox che la regione sono vuote non faccio nulla
+				// se sia la savebox che la regione sono vuote non faccio nulla
 			}
 		}
 		ti->setCMapped(ras);
@@ -2373,7 +2392,7 @@ const TImageInfo *TImageReaderTzl::getImageInfo11() const
 	double xdpi = 1, ydpi = 1;
 	//  TINT32 imgBuffSize = 0;
 
-	//int pos = ftell(chan);
+	// int pos = ftell(chan);
 
 	fread(&sbx0, sizeof(TINT32), 1, chan);
 	fread(&sby0, sizeof(TINT32), 1, chan);
@@ -2404,7 +2423,7 @@ const TImageInfo *TImageReaderTzl::getImageInfo11() const
 	info.m_dpix = xdpi;
 	info.m_dpiy = ydpi;
 
-	//m_lrp->m_frameIndex = m_frameIndex;
+	// m_lrp->m_frameIndex = m_frameIndex;
 	return &info;
 }
 
@@ -2424,7 +2443,7 @@ const TImageInfo *TImageReaderTzl::getImageInfo10() const
 	UCHAR *imgBuff = 0;
 	int frameIndex = m_fid.getNumber();
 
-	//int pos = ftell(chan);
+	// int pos = ftell(chan);
 	assert(m_lrp->m_frameOffsTable[TFrameId(1)].m_offs > 0);
 	int k;
 	if (m_lrp->m_frameOffsTable[TFrameId(frameIndex)].m_offs == 0) {
@@ -2489,7 +2508,7 @@ const TImageInfo *TImageReaderTzl::getImageInfo10() const
 	info.m_dpix = xdpi;
 	info.m_dpiy = ydpi;
 
-	//m_lrp->m_frameIndex = m_frameIndex;
+	// m_lrp->m_frameIndex = m_frameIndex;
 	return &info;
 }
 
@@ -2516,4 +2535,3 @@ TRect TImageReaderTzl::getBBox() const
 {
 	return TRect(getSize());
 }
-

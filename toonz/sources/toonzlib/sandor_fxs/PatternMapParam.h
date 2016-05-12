@@ -15,7 +15,7 @@
 
 class CPatternMapParam
 {
-public:
+  public:
 	char m_patternFn[1024];
 	CCIL m_ink;
 	bool m_isKeepContour;
@@ -26,8 +26,7 @@ public:
 	double m_density, m_minDist, m_maxDist;
 
 	CPatternMapParam();
-	CPatternMapParam(const int argc, const char *argv[],
-					 const int shrink);
+	CPatternMapParam(const int argc, const char *argv[], const int shrink);
 	virtual ~CPatternMapParam();
 
 	void null();

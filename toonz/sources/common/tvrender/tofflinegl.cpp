@@ -28,16 +28,16 @@
 #include "tofflinegl.h"
 
 #ifndef checkErrorsByGL
-#define checkErrorsByGL                      \
-	{                                        \
-		GLenum err = glGetError();           \
-		assert(err != GL_INVALID_ENUM);      \
-		assert(err != GL_INVALID_VALUE);     \
-		assert(err != GL_INVALID_OPERATION); \
-		assert(err != GL_STACK_OVERFLOW);    \
-		assert(err != GL_STACK_UNDERFLOW);   \
-		assert(err != GL_OUT_OF_MEMORY);     \
-		assert(err == GL_NO_ERROR);          \
+#define checkErrorsByGL                                                                            \
+	{                                                                                              \
+		GLenum err = glGetError();                                                                 \
+		assert(err != GL_INVALID_ENUM);                                                            \
+		assert(err != GL_INVALID_VALUE);                                                           \
+		assert(err != GL_INVALID_OPERATION);                                                       \
+		assert(err != GL_STACK_OVERFLOW);                                                          \
+		assert(err != GL_STACK_UNDERFLOW);                                                         \
+		assert(err != GL_OUT_OF_MEMORY);                                                           \
+		assert(err == GL_NO_ERROR);                                                                \
 	}
 #endif
 
@@ -63,10 +63,10 @@ void TOfflineGL::setContextManager(TGLContextManager *contextManager)
 
 namespace
 {
-//We found out that our implementation of win32 opengl contexts can be someway
-//not thread-safe. Deadlocks and errors could happen for wgl* and GDI functions
-//on particular configurations (notably, Windows 7). So we mutex them as
-//a temporary workaround.
+// We found out that our implementation of win32 opengl contexts can be someway
+// not thread-safe. Deadlocks and errors could happen for wgl* and GDI functions
+// on particular configurations (notably, Windows 7). So we mutex them as
+// a temporary workaround.
 static QMutex win32ImpMutex;
 }
 
@@ -74,7 +74,7 @@ static QMutex win32ImpMutex;
 
 class WIN32Implementation : public TOfflineGL::Imp
 {
-public:
+  public:
 	HDC m_offDC;
 	HGDIOBJ m_oldobj;
 	HGLRC m_hglRC;
@@ -87,12 +87,12 @@ public:
 		: TOfflineGL::Imp(rasterSize.lx, rasterSize.ly)
 	{
 		m_offData = 0;
-		createContext(rasterSize, std::move(shared)); //makeCurrent is called at the end of this
+		createContext(rasterSize, std::move(shared)); // makeCurrent is called at the end of this
 
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		doneCurrent(); //doneCurrent must therefore be called here
+		doneCurrent(); // doneCurrent must therefore be called here
 	}
 
 	//-----------------------------------------------------------------------------
@@ -183,25 +183,27 @@ public:
 
 		m_oldobj = SelectObject(m_offDC, m_offDIB); // select BIB to write
 
-		static PIXELFORMATDESCRIPTOR pfd =
-			{
-				sizeof(PIXELFORMATDESCRIPTOR),																						 // size of this pfd
-				1,																													 // version number
-				0 | (false ? (PFD_DRAW_TO_WINDOW | PFD_DOUBLEBUFFER) : (PFD_DRAW_TO_BITMAP | PFD_SUPPORT_GDI)) | PFD_SUPPORT_OPENGL, // support OpenGL
-				PFD_TYPE_RGBA,																										 // RGBA type
-				32,																													 // 32-bit color depth
-				0, 0, 0, 0, 0, 0,																									 // color bits ignored
-				8,																													 // no alpha buffer /*===*/
-				0,																													 // shift bit ignored
-				0,																													 // no accumulation buffer
-				0, 0, 0, 0,																											 // accum bits ignored
-				32,																													 // 32-bit z-buffer
-				32,																													 // max stencil buffer
-				0,																													 // no auxiliary buffer
-				PFD_MAIN_PLANE,																										 // main layer
-				0,																													 // reserved
-				0, 0, 0																												 // layer masks ignored
-			};
+		static PIXELFORMATDESCRIPTOR pfd = {
+			sizeof(PIXELFORMATDESCRIPTOR), // size of this pfd
+			1,							   // version number
+			0 | (false ? (PFD_DRAW_TO_WINDOW | PFD_DOUBLEBUFFER)
+					   : (PFD_DRAW_TO_BITMAP | PFD_SUPPORT_GDI)) |
+				PFD_SUPPORT_OPENGL, // support OpenGL
+			PFD_TYPE_RGBA,			// RGBA type
+			32,						// 32-bit color depth
+			0,
+			0, 0, 0, 0, 0,  // color bits ignored
+			8,				// no alpha buffer /*===*/
+			0,				// shift bit ignored
+			0,				// no accumulation buffer
+			0, 0, 0, 0,		// accum bits ignored
+			32,				// 32-bit z-buffer
+			32,				// max stencil buffer
+			0,				// no auxiliary buffer
+			PFD_MAIN_PLANE, // main layer
+			0,				// reserved
+			0, 0, 0			// layer masks ignored
+		};
 
 		// get the best available match of pixel format for the device context
 		int iPixelFormat = ChoosePixelFormat(m_offDC, &pfd);
@@ -221,7 +223,8 @@ public:
 
 		if (shared) {
 			// Share shared's display lists
-			const WIN32Implementation *sharedImp = dynamic_cast<const WIN32Implementation *>(shared.get());
+			const WIN32Implementation *sharedImp =
+				dynamic_cast<const WIN32Implementation *>(shared.get());
 			assert(sharedImp);
 
 			bool ok = wglShareLists(sharedImp->m_hglRC, m_hglRC);
@@ -234,7 +237,8 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	void swapRedBlueChannels(void *buffer, int bufferSize) // Flips The Red And Blue Bytes (WidthxHeight)
+	void swapRedBlueChannels(void *buffer,
+							 int bufferSize) // Flips The Red And Blue Bytes (WidthxHeight)
 	{
 		void *b = buffer; // Pointer To The Buffer
 
@@ -252,12 +256,12 @@ public:
 /*unsigned long ebx = (unsigned long)b;
 	  while(size>0)
 	  {
-	    unsigned char al =__readgsbyte(ebx);
+		unsigned char al =__readgsbyte(ebx);
 		unsigned char ah =__readgsbyte(ebx+2);
 		__writegsbyte(ebx+2,al);
 		__writegsbyte(ebx,ah);
 		ebx+=4;
-	    size--;
+		size--;
 	  }*/
 #else
 		__asm		  // Assembler Code To Follow
@@ -288,9 +292,7 @@ public:
 		int ly = raster->getLy();
 
 		raster->lock();
-		glReadPixels(0, 0, lx, ly,
-					 GL_RGBA /*GL_BGRA_EXT*/, GL_UNSIGNED_BYTE,
-					 raster->getRawData());
+		glReadPixels(0, 0, lx, ly, GL_RGBA /*GL_BGRA_EXT*/, GL_UNSIGNED_BYTE, raster->getRawData());
 
 		swapRedBlueChannels(raster->getRawData(), lx * ly);
 		raster->unlock();
@@ -298,7 +300,8 @@ public:
 };
 
 // default imp generator
-std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(const TDimension &dim, std::shared_ptr<TOfflineGL::Imp> shared)
+std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(const TDimension &dim,
+														   std::shared_ptr<TOfflineGL::Imp> shared)
 {
 	return std::make_shared<WIN32Implementation>(dim, shared);
 }
@@ -311,7 +314,7 @@ std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(const TDimension &dim
 
 class XImplementation : public TOfflineGL::Imp
 {
-public:
+  public:
 	Display *m_dpy;
 	GLXContext m_context;
 	GLXPixmap m_pixmap;
@@ -347,7 +350,8 @@ public:
 		QMutexLocker sl(&mutex);
 		pthread_t self = pthread_self();
 		std::map<pthread_t, GLXContext>::iterator it = m_glxContext.find(self);
-		if (((it != m_glxContext.end()) && (it->second != m_context)) || (it == m_glxContext.end())) {
+		if (((it != m_glxContext.end()) && (it->second != m_context)) ||
+			(it == m_glxContext.end())) {
 			//	cout << "calling GLXMakeCurrent " << self << " " << m_context << endl;
 			Bool ret;
 			if (!isDtor)
@@ -365,7 +369,7 @@ public:
 	{
 		XScopedLock xsl;
 
-		//Bool ret = glXMakeCurrent(m_dpy,m_pixmap,m_context);
+		// Bool ret = glXMakeCurrent(m_dpy,m_pixmap,m_context);
 
 		Bool ret = safeGlXMakeCurrent();
 		assert(ret == True);
@@ -375,9 +379,7 @@ public:
 
 	// DA IMPLEMENTARE !!!
 
-	void doneCurrent()
-	{
-	}
+	void doneCurrent() {}
 
 	//-----------------------------------------------------------------------------
 
@@ -385,25 +387,16 @@ public:
 	{
 		m_dpy = XOpenDisplay(NULL);
 		Window win = DefaultRootWindow(m_dpy);
-		int attribList[] = {
-			GLX_RGBA,
-			GLX_RED_SIZE, 1,
-			GLX_GREEN_SIZE, 1,
-			GLX_BLUE_SIZE, 1,
-			//    			GLX_ALPHA_SIZE,  1,
-			GLX_STENCIL_SIZE, 8,
+		int attribList[] = {GLX_RGBA, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1,
+							//    			GLX_ALPHA_SIZE,  1,
+							GLX_STENCIL_SIZE, 8,
 
-			//			GLX_DEPTH_SIZE,  24,
+							//			GLX_DEPTH_SIZE,  24,
 
-			None};
+							None};
 
-		int dbAttrib[] = {GLX_RGBA,
-						  GLX_RED_SIZE, 1,
-						  GLX_GREEN_SIZE, 1,
-						  GLX_BLUE_SIZE, 1,
-						  GLX_STENCIL_SIZE, 8,
-						  GLX_DOUBLEBUFFER,
-						  None};
+		int dbAttrib[] = {GLX_RGBA, GLX_RED_SIZE,	 1, GLX_GREEN_SIZE,   1,   GLX_BLUE_SIZE,
+						  1,		GLX_STENCIL_SIZE, 8, GLX_DOUBLEBUFFER, None};
 
 		int w = rasterSize.lx;
 		int h = rasterSize.ly;
@@ -416,7 +409,8 @@ public:
 		}
 
 		m_context = glXCreateContext(m_dpy, vis, 0, False);
-		//    std::cout << "Direct rendering: " << (glXIsDirect(m_dpy, m_context) ? "Yes" : "No" )<< std::endl;
+		//    std::cout << "Direct rendering: " << (glXIsDirect(m_dpy, m_context) ? "Yes" : "No" )<<
+		//    std::endl;
 
 		if (!m_context)
 			assert("not m_context" && false);
@@ -430,9 +424,9 @@ public:
 		if (!m_pixmap)
 			assert("not m_pixmap" && m_pixmap);
 		/*
-    Bool ret = glXMakeCurrent(m_dpy, 
-			      m_pixmap, 
-			      m_context);
+	Bool ret = glXMakeCurrent(m_dpy,
+				  m_pixmap,
+				  m_context);
 */
 		Bool ret = safeGlXMakeCurrent();
 		assert(ret);
@@ -475,8 +469,7 @@ public:
 		int lx = m_raster->getLx();
 		int ly = m_raster->getLy();
 		m_raster->lock();
-		glReadPixels(0, 0, lx, ly,
-					 GL_RGBA /*GL_BGRA_EXT*/, GL_UNSIGNED_BYTE,
+		glReadPixels(0, 0, lx, ly, GL_RGBA /*GL_BGRA_EXT*/, GL_UNSIGNED_BYTE,
 					 m_raster->getRawData());
 
 #if defined(MACOSX)
@@ -489,27 +482,23 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	int getLx() const
-	{
-		return m_raster->getLx();
-	}
+	int getLx() const { return m_raster->getLx(); }
 
 	//-----------------------------------------------------------------------------
 
-	int getLy() const
-	{
-		return m_raster->getLy();
-	}
+	int getLy() const { return m_raster->getLy(); }
 };
 
-std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(const TDimension &dim, std::shared_ptr<TOfflineGL::Imp> shared)
+std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(const TDimension &dim,
+														   std::shared_ptr<TOfflineGL::Imp> shared)
 {
 	return std::make_shared<XImplementation>(dim);
 }
 
 #elif MACOSX
 
-std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(const TDimension &dim, std::shared_ptr<TOfflineGL::Imp> shared)
+std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(const TDimension &dim,
+														   std::shared_ptr<TOfflineGL::Imp> shared)
 {
 	return std::make_shared<QtOfflineGL>(dim, shared);
 }
@@ -530,7 +519,7 @@ TOfflineGL::ImpGenerator *currentImpGenerator = defaultOfflineGLGenerator;
 // TOfflineGL
 //-----------------------------------------------------------------------------
 
-//namespace {
+// namespace {
 
 class MessageCreateContext : public TThread::Message
 {
@@ -540,19 +529,16 @@ class MessageCreateContext : public TThread::Message
 	TDimension m_size;
 	std::shared_ptr<TOfflineGL::Imp> m_shared;
 
-public:
-	MessageCreateContext(TOfflineGL *ogl, const TDimension &size, std::shared_ptr<TOfflineGL::Imp> shared)
-		: m_ogl(ogl), m_size(size), m_shared(std::move(shared)) {}
-
-	void onDeliver()
+  public:
+	MessageCreateContext(TOfflineGL *ogl, const TDimension &size,
+						 std::shared_ptr<TOfflineGL::Imp> shared)
+		: m_ogl(ogl), m_size(size), m_shared(std::move(shared))
 	{
-		m_ogl->m_imp = currentImpGenerator(m_size, m_shared);
 	}
 
-	TThread::Message *clone() const
-	{
-		return new MessageCreateContext(*this);
-	}
+	void onDeliver() { m_ogl->m_imp = currentImpGenerator(m_size, m_shared); }
+
+	TThread::Message *clone() const { return new MessageCreateContext(*this); }
 };
 
 //} // namespace
@@ -568,7 +554,9 @@ TOfflineGL::TOfflineGL(TDimension dim, const TOfflineGL *shared)
 	std::shared_ptr<Imp> sharedImp = shared ? shared->m_imp : 0;
 
 	/*
-	元のコードは(別スレッドから呼び出すための) offline renderer を作って main thread に dispatch するという訳のわからないことをしていたが Q*GLContext は thread context を超えられないので直接生成してこのコンテキストで閉じる.
+	元のコードは(別スレッドから呼び出すための) offline renderer を作って main thread に dispatch
+	するという訳のわからないことをしていたが Q*GLContext は thread context
+	を超えられないので直接生成してこのコンテキストで閉じる.
 	別スレッドには dispatch しない.
    */
 	m_imp = currentImpGenerator(dim, std::move(sharedImp));
@@ -590,7 +578,8 @@ TOfflineGL::TOfflineGL(const TRaster32P &raster, const TOfflineGL *shared)
 
 	glRasterPos2d(0, 0);
 	raster->lock();
-	glDrawPixels(raster->getLx(), raster->getLy(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, raster->getRawData());
+	glDrawPixels(raster->getLx(), raster->getLy(), GL_BGRA_EXT, GL_UNSIGNED_BYTE,
+				 raster->getRawData());
 	raster->unlock();
 }
 
@@ -643,22 +632,22 @@ void TOfflineGL::initMatrix()
 	gluOrtho2D(0, m_imp->getLx(), 0, m_imp->getLy());
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	//glTranslatef(0.375, 0.375, 0.0);    //WRONG
+	// glTranslatef(0.375, 0.375, 0.0);    //WRONG
 
 	/*  (From Daniele)
 
 Quoting from the aforementioned source:
 
-"An optimum compromise that allows all primitives to be specified at integer 
-positions, while still ensuring predictable rasterization, is to translate x 
-and y by 0.375, as shown in the following code sample. Such a translation 
-keeps polygon and pixel image edges safely away from the centers of pixels, 
+"An optimum compromise that allows all primitives to be specified at integer
+positions, while still ensuring predictable rasterization, is to translate x
+and y by 0.375, as shown in the following code sample. Such a translation
+keeps polygon and pixel image edges safely away from the centers of pixels,
 while moving line vertices close enough to the pixel centers"
 
-    NOTE: This is not an acceptable excuse in our case - as we're NOT USING
-          INTEGER COORDINATES ONLY. OpenGL has all the rights to render pixels
-          at integer coordinates across the neighbouring 4 pixels - and their
-          (0.5, 0.5) translations at the EXACT screen pixel.
+	NOTE: This is not an acceptable excuse in our case - as we're NOT USING
+		  INTEGER COORDINATES ONLY. OpenGL has all the rights to render pixels
+		  at integer coordinates across the neighbouring 4 pixels - and their
+		  (0.5, 0.5) translations at the EXACT screen pixel.
   */
 }
 
@@ -668,11 +657,8 @@ void TOfflineGL::clear(TPixel32 color)
 {
 	const double maxValue = 255.0;
 	makeCurrent();
-	glClearColor(
-		(double)color.r / maxValue,
-		(double)color.g / maxValue,
-		(double)color.b / maxValue,
-		(double)color.m / maxValue);
+	glClearColor((double)color.r / maxValue, (double)color.g / maxValue, (double)color.b / maxValue,
+				 (double)color.m / maxValue);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
@@ -727,9 +713,7 @@ void TOfflineGL::draw(TRasterImageP ri, const TAffine &aff, bool doInitMatrix)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	glTexEnvf(GL_TEXTURE_ENV,
-			  GL_TEXTURE_ENV_MODE,
-			  GL_DECAL);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
 	glEnable(GL_TEXTURE_2D);
 
@@ -762,21 +746,19 @@ void TOfflineGL::draw(TRasterImageP ri, const TAffine &aff, bool doInitMatrix)
 
 	glBindTexture(GL_TEXTURE_2D, texId);
 
-	glPixelStorei(GL_UNPACK_ROW_LENGTH,
-				  ras32->getWrap() != ras32->getLx() ? ras32->getWrap() : 0);
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, ras32->getWrap() != ras32->getLx() ? ras32->getWrap() : 0);
 
 	ras32->lock();
 
-	glTexImage2D(
-		GL_TEXTURE_2D, // target (is a 2D texture)
-		0,			   // is one level only
-		GL_RGB,		   //  number of component of a pixel
-		lx,			   // size width
-		ly,			   //      height
-		0,			   // size of a border
-		fmt,
-		GL_UNSIGNED_BYTE, //
-		ras32->getRawData());
+	glTexImage2D(GL_TEXTURE_2D, // target (is a 2D texture)
+				 0,				// is one level only
+				 GL_RGB,		//  number of component of a pixel
+				 lx,			// size width
+				 ly,			//      height
+				 0,				// size of a border
+				 fmt,
+				 GL_UNSIGNED_BYTE, //
+				 ras32->getRawData());
 
 	ras32->unlock();
 
@@ -829,11 +811,14 @@ void TOfflineGL::getRaster(TRaster32P raster)
 	if (raster->getWrap() == raster->getLx()) {
 		m_imp->getRaster(raster);
 	} else {
-		//There are 2 possible solutions: use glReadPixels multiple times for each row of input raster,
-		//OR allocate a new contiguous buffer, use glReadPixels once, and then memcpy each row.
-		//It actually seems that the *latter* is actually the fastest solution, although it requires
-		//allocating a temporary buffer of the same size of the requested raster...
-		//I also could not actually manage to make the former work - the code seemed right but results were weird...
+		// There are 2 possible solutions: use glReadPixels multiple times for each row of input
+		// raster,
+		// OR allocate a new contiguous buffer, use glReadPixels once, and then memcpy each row.
+		// It actually seems that the *latter* is actually the fastest solution, although it
+		// requires
+		// allocating a temporary buffer of the same size of the requested raster...
+		// I also could not actually manage to make the former work - the code seemed right but
+		// results were weird...
 		TRaster32P ras32(raster->getSize());
 		m_imp->getRaster(ras32);
 		TRop::copy(raster, ras32);
@@ -902,16 +887,16 @@ class OglStock
 
 	OglStock() {}
 
-public:
+  public:
 	~OglStock()
 	{
 		/*  // PER ADESSO, LASCIAMO IL MEMORY LEAK DATO CHE ALTRIMENTI VA IN CRASH
-    ContextMap::iterator it = m_table.begin();
-    for(; it!=m_table.end(); ++it)
-    {
-      delete it->second;
-    }
-    */
+	ContextMap::iterator it = m_table.begin();
+	for(; it!=m_table.end(); ++it)
+	{
+	  delete it->second;
+	}
+	*/
 	}
 
 	TOfflineGL *get(const TDimension &d)
@@ -920,7 +905,8 @@ public:
 		if (it == m_table.end()) {
 			TOfflineGL *glContext;
 			glContext = new TOfflineGL(d);
-			pair<ContextMap::iterator, bool> result = m_table.insert(ContextMap::value_type(d, glContext));
+			pair<ContextMap::iterator, bool> result =
+				m_table.insert(ContextMap::value_type(d, glContext));
 			assert(result.second);
 			assert(m_table.size() < 15);
 			return glContext;

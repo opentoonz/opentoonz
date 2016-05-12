@@ -2,33 +2,40 @@
 #include "igs_motion_wind_table.h"
 #include "igs_motion_wind_pixel.h"
 
-igs::motion_wind::pixel::pixel(
-	const bool blow_dark_sw, const bool blow_alpha_sw
+igs::motion_wind::pixel::pixel(const bool blow_dark_sw, const bool blow_alpha_sw
 
-	,
-	const unsigned long length_random_seed, const double length_min, const double length_max, const double length_bias, const bool length_ref_sw
+							   ,
+							   const unsigned long length_random_seed, const double length_min,
+							   const double length_max, const double length_bias,
+							   const bool length_ref_sw
 
-	,
-	const unsigned long force_random_seed, const double force_min, const double force_max, const double force_bias, const bool force_ref_sw
+							   ,
+							   const unsigned long force_random_seed, const double force_min,
+							   const double force_max, const double force_bias,
+							   const bool force_ref_sw
 
-	,
-	const unsigned long density_random_seed, const double density_min, const double density_max, const double density_bias, const bool density_ref_sw)
+							   ,
+							   const unsigned long density_random_seed, const double density_min,
+							   const double density_max, const double density_bias,
+							   const bool density_ref_sw)
 	: blow_dark_sw_(blow_dark_sw), blow_alpha_sw_(blow_alpha_sw)
 
 	  ,
-	  length_min_(length_min), length_max_(length_max), length_bias_(length_bias), length_ref_sw_(length_ref_sw)
+	  length_min_(length_min), length_max_(length_max), length_bias_(length_bias),
+	  length_ref_sw_(length_ref_sw)
 
 	  ,
-	  force_min_(force_min), force_max_(force_max), force_bias_(force_bias), force_ref_sw_(force_ref_sw)
+	  force_min_(force_min), force_max_(force_max), force_bias_(force_bias),
+	  force_ref_sw_(force_ref_sw)
 
 	  ,
-	  density_min_(density_min), density_max_(density_max), density_bias_(density_bias), density_ref_sw_(density_ref_sw)
+	  density_min_(density_min), density_max_(density_max), density_bias_(density_bias),
+	  density_ref_sw_(density_ref_sw)
 
 	  ,
 	  key_lightness_(0), table_len_(0), table_pos_(0), table_array_(0)
 {
-	this->table_.resize(
-		igs::motion_wind::table_size(length_min, length_max));
+	this->table_.resize(igs::motion_wind::table_size(length_min, length_max));
 	this->length_random_.seed(length_random_seed);
 	this->force_random_.seed(force_random_seed);
 	this->density_random_.seed(density_random_seed);
@@ -40,43 +47,41 @@ void igs::motion_wind::pixel::clear(void)
 //----------------------------------------------------------------------
 namespace
 {
-void wind_rgba_(
-	const double key, const double alp, const double ratio, bool &sw, double &tgt)
+void wind_rgba_(const double key, const double alp, const double ratio, bool &sw, double &tgt)
 {
 	if (tgt < key) {
 		tgt += ratio * (key - tgt) * alp;
-		tgt = (tgt < 0.0) ? 0.0 : ((1.0 < tgt) ? 1.0 : tgt); //limit
+		tgt = (tgt < 0.0) ? 0.0 : ((1.0 < tgt) ? 1.0 : tgt); // limit
 		sw = true;
 	}
 }
-void wind_rgb_(
-	const double key, const double ratio, bool &sw, double &tgt)
+void wind_rgb_(const double key, const double ratio, bool &sw, double &tgt)
 {
 	if (tgt < key) {
 		// std::cout << "(R" << ratio << ",K" << key << ",T" << tgt;
 		tgt += ratio * (key - tgt);
 		// std::cout << ">" << tgt << ")\n";
-		tgt = (tgt < 0.0) ? 0.0 : ((1.0 < tgt) ? 1.0 : tgt); //limit
+		tgt = (tgt < 0.0) ? 0.0 : ((1.0 < tgt) ? 1.0 : tgt); // limit
 		sw = true;
 	}
 }
-void wind_a_(
-	const double key /* alpha値 */
-	,
-	const double ratio, const bool sw, double &tgt /* alpha値 */
-	)
+void wind_a_(const double key /* alpha値 */
+			 ,
+			 const double ratio, const bool sw, double &tgt /* alpha値 */
+			 )
 {
 	if ((tgt < key) || sw) {
 		double val = tgt + (ratio * (key - tgt));
 		if (tgt < val) { /* 元より明るいときのみ変化 */
 			tgt = val;
-			tgt = (tgt < 0.0) ? 0.0 : ((1.0 < tgt) ? 1.0 : tgt); //limit
+			tgt = (tgt < 0.0) ? 0.0 : ((1.0 < tgt) ? 1.0 : tgt); // limit
 		}
 	}
 }
 //-----------------------------------------------------------
 void blow_wind_(/* 風の影響による値の変化 */
-				const int channels, const double *key, const double *tbl_a, const int tbl_p, const bool blow_alpha_sw, double *tgt)
+				const int channels, const double *key, const double *tbl_a, const int tbl_p,
+				const bool blow_alpha_sw, double *tgt)
 {
 	bool sw = false; /* rgb風を実行したか否かを示す */
 
@@ -101,8 +106,7 @@ void blow_wind_(/* 風の影響による値の変化 */
 		}
 	}
 }
-void invert_pixel_(
-	const int channels, double *pixel)
+void invert_pixel_(const int channels, double *pixel)
 {
 	if (igs::image::rgba::siz == channels) { /* Alphaがある */
 		using namespace igs::image::rgba;
@@ -121,30 +125,25 @@ void invert_pixel_(
 		}
 	}
 }
-void rgb_to_lightness_(
-	const double re, const double gr, const double bl, double &li)
+void rgb_to_lightness_(const double re, const double gr, const double bl, double &li)
 {
-	li = ((re < gr) ? ((gr < bl) ? bl : gr) : ((re < bl) ? bl : re) +
-													  (gr < re)
+	li = ((re < gr) ? ((gr < bl) ? bl : gr) : ((re < bl) ? bl : re) + (gr < re)
 												  ? ((bl < gr) ? bl : gr)
 												  : ((bl < re) ? bl : re)) /
 		 2.0;
 }
-double get_lightness_(
-	const int channels, const double *pixel
-	// , const bool blow_dark_sw
-	)
+double get_lightness_(const int channels, const double *pixel
+					  // , const bool blow_dark_sw
+					  )
 {
 	double lightness;
 
 	if (igs::image::rgba::siz == channels) {
 		using namespace igs::image::rgba;
-		rgb_to_lightness_(
-			pixel[red], pixel[gre], pixel[blu], lightness);
+		rgb_to_lightness_(pixel[red], pixel[gre], pixel[blu], lightness);
 	} else if (igs::image::rgb::siz == channels) {
 		using namespace igs::image::rgb;
-		rgb_to_lightness_(
-			pixel[red], pixel[gre], pixel[blu], lightness);
+		rgb_to_lightness_(pixel[red], pixel[gre], pixel[blu], lightness);
 	} else {
 		lightness = pixel[0];
 	}
@@ -154,16 +153,15 @@ double get_lightness_(
 }
 }
 //------------------------------------------------------------
-int igs::motion_wind::pixel::change(
-	const bool key_reset_sw
+int igs::motion_wind::pixel::change(const bool key_reset_sw
 
-	/***, const int ref_channel
-	, const double *ref_pixel***/
+									/***, const int ref_channel
+									, const double *ref_pixel***/
 
-	,
-	const double ref_val /* ゼロ以上なら有効値、マイナスなら無効 */
-	,
-	const int channels, double *pixel_tgt)
+									,
+									const double ref_val /* ゼロ以上なら有効値、マイナスなら無効 */
+									,
+									const int channels, double *pixel_tgt)
 {
 	/* 指定があるなら白黒反転、
 	このプログラム内ではすべて明るさで処理する */
@@ -172,9 +170,8 @@ int igs::motion_wind::pixel::change(
 	}
 
 	/* 現位置の明るさを求める */
-	const double crnt_lightness = get_lightness_(
-		channels, pixel_tgt // , this->blow_dark_sw_
-		);
+	const double crnt_lightness = get_lightness_(channels, pixel_tgt // , this->blow_dark_sw_
+												 );
 
 	/* スキャンラインの始点のではkey pixel値のreset */
 	if (key_reset_sw) {
@@ -211,8 +208,7 @@ int igs::motion_wind::pixel::change(
 			double ref_value = ref_val;
 			/* 参照画像から取らないときは自画像から強弱を得る */
 			if (ref_value < 0.0) {
-				ref_value = get_lightness_(
-					channels, pixel_tgt);
+				ref_value = get_lightness_(channels, pixel_tgt);
 			}
 
 			if (this->length_ref_sw_) {
@@ -237,7 +233,9 @@ int igs::motion_wind::pixel::change(
 ;***/
 			/* 更新した、風データを、カレントにセットする */
 			this->table_len_ = igs::motion_wind::make_table(
-				this->table_, this->length_random_, this->force_random_, this->density_random_, length_min, length_max, length_bias, force_min, force_max, force_bias, density_min, density_max, density_bias);
+				this->table_, this->length_random_, this->force_random_, this->density_random_,
+				length_min, length_max, length_bias, force_min, force_max, force_bias, density_min,
+				density_max, density_bias);
 			this->table_array_ = &this->table_.at(0);
 			this->table_pos_ = 1;
 			/***for (int ii=0;ii<this->table_len_;++ii) {
@@ -251,8 +249,8 @@ std::cout << this->table_array_[ii] << "\n";
 		/* 風に影響された値を出力値にいれる */
 		if (this->table_pos_ < this->table_len_) {
 			/* 風の計算 */
-			blow_wind_(
-				channels, this->pixel_key_, this->table_array_, this->table_pos_, this->blow_alpha_sw_, pixel_tgt);
+			blow_wind_(channels, this->pixel_key_, this->table_array_, this->table_pos_,
+					   this->blow_alpha_sw_, pixel_tgt);
 			++this->table_pos_;
 
 			/* 保存すべき値となったので白黒反転を戻す */

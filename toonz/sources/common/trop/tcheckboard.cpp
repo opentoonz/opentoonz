@@ -14,7 +14,7 @@ inline bool isInFirstColor(const TDimensionD &dim,int x, int y,const TPointD &of
   offX = offset.x>=0 ? (int)offset.x : (int)(lx-offset.x);
   offY = offset.y>=0 ? (int)offset.y : (int)(ly-offset.y);
   if ((( ((int)(offX+x))/lx + ((int)(offY+y))/ly )%2 ) == 0)
-    return false;
+	return false;
   return true;
 }
 */
@@ -74,14 +74,14 @@ void do_checkBoard(TRasterPT<PIXEL> rout, const PIXEL &pix1, const PIXEL &pix2,
 	}
 }
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------
 
 void TRop::checkBoard(TRasterP rout, const TPixel32 &pix1, const TPixel32 &pix2,
 					  const TDimensionD &dim, const TPointD &offset)
 {
-	//assert(offset.x<=dim.lx && offset.y<=dim.ly);
+	// assert(offset.x<=dim.lx && offset.y<=dim.ly);
 
 	TRaster32P rout32 = rout;
 	if (rout32)

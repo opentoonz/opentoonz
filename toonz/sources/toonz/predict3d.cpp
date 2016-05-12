@@ -14,10 +14,10 @@
  * e possibilmente l'immagine subisce uno zoom.
  * A seguito di questa trasformazione, viene rilevata la posizione sul
  * piano-immagine di un sottoinsieme dei k punti iniziali.
- * Con questi dati, si vuole predire la posizione corrente sul 
+ * Con questi dati, si vuole predire la posizione corrente sul
  * piano-immagine dei rimanenti punti.
  * L'algoritmo richiede le seguenti precondizioni:
- *       - i punti tridimensionali giacciono sullo stesso piano, 
+ *       - i punti tridimensionali giacciono sullo stesso piano,
  *         non necessariamente parallelo al piano-immagine
  *       - il piano dei punti tridimensionali non degenera in una
  *         retta se osservato dal punto di vista della camera
@@ -53,7 +53,7 @@ using namespace MetNum;
  * 			possibili sono:
  * 			   - k < 4
  * 			   - il numero di punti visibili e' < 4
- *			   - i punti visibili sono allineati	
+ *			   - i punti visibili sono allineati
  ----------------------------------------------------------------------------*/
 bool Predict3D::Predict(int k, Point initial[], Point current[], bool visible[])
 {

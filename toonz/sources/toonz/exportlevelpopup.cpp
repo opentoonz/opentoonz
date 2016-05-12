@@ -72,7 +72,9 @@ struct MultiExportOverwriteCB : public IoCmd::OverwriteCallbacks {
 		if (m_stopped)
 			return false;
 
-		int ret = DVGui::MsgBox(QObject::tr("Warning: file %1 already exists.").arg(toQString(fp)), QObject::tr("Continue Exporting"), QObject::tr("Continue to All"), QObject::tr("Stop Exporting"), 1);
+		int ret = DVGui::MsgBox(QObject::tr("Warning: file %1 already exists.").arg(toQString(fp)),
+								QObject::tr("Continue Exporting"), QObject::tr("Continue to All"),
+								QObject::tr("Stop Exporting"), 1);
 
 		m_yesToAll = (ret == 2);
 		m_stopped = (ret == 0) || (ret == 3);
@@ -86,7 +88,7 @@ struct MultiExportProgressCB : public IoCmd::ProgressCallbacks {
 	QString m_processedName;
 	DVGui::ProgressDialog m_pb;
 
-public:
+  public:
 	MultiExportProgressCB() : m_pb("", QObject::tr("Cancel"), 0, 0) { m_pb.show(); }
 	static QString msg() { return QObject::tr("Exporting level of %1 frames in %2"); }
 
@@ -112,13 +114,13 @@ public:
 
 class ExportLevelPopup::Swatch : public PlaneViewer
 {
-public:
+  public:
 	Swatch(QWidget *parent = 0) : PlaneViewer(parent) {}
 
 	TImageP image() const { return m_img; }
 	TImageP &image() { return m_img; }
 
-protected:
+  protected:
 	void showEvent(QShowEvent *se);
 	void keyPressEvent(QKeyEvent *ke);
 	void keyPressEvent(QShowEvent *se);
@@ -126,12 +128,11 @@ protected:
 
 	void setActualPixelSize();
 
-private:
+  private:
 	struct ShortcutZoomer : public ImageUtils::ShortcutZoomer {
-		ShortcutZoomer(Swatch *swatch)
-			: ImageUtils::ShortcutZoomer(swatch) {}
+		ShortcutZoomer(Swatch *swatch) : ImageUtils::ShortcutZoomer(swatch) {}
 
-	private:
+	  private:
 		bool zoom(bool zoomin, bool resetZoom) { return false; } // Already covered by PlaneViewer
 		bool setActualPixelSize()
 		{
@@ -140,7 +141,7 @@ private:
 		}
 	};
 
-private:
+  private:
 	TImageP m_img; //!< Image shown in the swatch.
 };
 
@@ -212,8 +213,7 @@ void ExportLevelPopup::Swatch::setActualPixelSize()
 //    ExportLevelPopup  implementation
 //********************************************************************************
 
-ExportLevelPopup::ExportLevelPopup()
-	: FileBrowserPopup(tr("Export Level"), Options(CUSTOM_LAYOUT))
+ExportLevelPopup::ExportLevelPopup() : FileBrowserPopup(tr("Export Level"), Options(CUSTOM_LAYOUT))
 {
 	setOkText(tr("Export"));
 
@@ -246,7 +246,8 @@ ExportLevelPopup::ExportLevelPopup()
 	tabBar->setDrawBase(false);
 	tabBar->setExpanding(false);
 
-	splitter->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	splitter->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 
 	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	scrollArea->setWidgetResizable(true);
@@ -257,8 +258,9 @@ ExportLevelPopup::ExportLevelPopup()
 
 	static const int toolbarHeight = 22;
 	frameNavigator->setFixedHeight(toolbarHeight);
-	m_levelFrameIndexHandle.setFrame(0);					  // Due to TFrameHandle's initialization, the initial frame
-	frameNavigator->setFrameHandle(&m_levelFrameIndexHandle); // is -1. Don't ask me why. Patching to 0.
+	m_levelFrameIndexHandle.setFrame(0); // Due to TFrameHandle's initialization, the initial frame
+	frameNavigator->setFrameHandle(
+		&m_levelFrameIndexHandle); // is -1. Don't ask me why. Patching to 0.
 
 	formatLabel->setFixedHeight(DVGui::WidgetHeight);
 	m_format->setFixedHeight(DVGui::WidgetHeight);
@@ -276,7 +278,7 @@ ExportLevelPopup::ExportLevelPopup()
 	m_retas->setMinimumHeight(DVGui::WidgetHeight);
 	m_formatOptions->setMinimumSize(60, 25);
 
-	//layout
+	// layout
 	QVBoxLayout *mainLayout = new QVBoxLayout();
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(3);
@@ -298,7 +300,7 @@ ExportLevelPopup::ExportLevelPopup()
 		eoPageLayout->setMargin(0);
 		eoPageLayout->setSpacing(0);
 		{
-			//top area - options
+			// top area - options
 			QVBoxLayout *topVLayout = new QVBoxLayout(topWidget); // Needed to justify at top
 			{
 				topVLayout->addWidget(m_exportOptions);
@@ -309,13 +311,13 @@ ExportLevelPopup::ExportLevelPopup()
 			scrollArea->setWidget(topWidget);
 			splitter->addWidget(scrollArea);
 
-			//bottom area - swatch
+			// bottom area - swatch
 			splitter->addWidget(m_swatch);
 			splitter->setStretchFactor(0, 1);
 
 			eoPageLayout->addWidget(splitter, 1);
 
-			//toolbar
+			// toolbar
 			QHBoxLayout *toolbarLayout = new QHBoxLayout;
 			{
 				toolbarLayout->addStretch(1);
@@ -360,7 +362,9 @@ ExportLevelPopup::ExportLevelPopup()
 	// Establish connections
 	bool ret = true;
 	ret = connect(tabBar, SIGNAL(currentChanged(int)), stackedWidget, SLOT(setCurrentIndex(int)));
-	ret = connect(m_format, SIGNAL(currentIndexChanged(const QString &)), SLOT(onformatChanged(const QString &))) && ret;
+	ret = connect(m_format, SIGNAL(currentIndexChanged(const QString &)),
+				  SLOT(onformatChanged(const QString &))) &&
+		  ret;
 	ret = connect(m_retas, SIGNAL(stateChanged(int)), SLOT(onRetas(int))) && ret;
 	ret = connect(m_formatOptions, SIGNAL(clicked()), SLOT(onOptionsClicked())) && ret;
 	ret = connect(&m_levelFrameIndexHandle, SIGNAL(frameSwitched()), SLOT(updatePreview())) && ret;
@@ -409,11 +413,11 @@ void ExportLevelPopup::showEvent(QShowEvent *se)
 					  SLOT(updateOnSelection())) &&
 			  ret;
 
-		ret = connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)),
-					  this, SLOT(updatePreview())) &&
+		ret = connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+					  SLOT(updatePreview())) &&
 			  ret;
-		ret = connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()),
-					  this, SLOT(updatePreview())) &&
+		ret = connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), this,
+					  SLOT(updatePreview())) &&
 			  ret;
 	}
 	assert(ret);
@@ -590,7 +594,8 @@ void ExportLevelPopup::updatePreview()
 	const IoCmd::ExportLevelOptions &opts = getOptions(ext);
 
 	// Update displayed image in the preview
-	m_swatch->image() = sl ? IoCmd::exportedImage(ext, *sl, sl->index2fid(frameIdx), opts) : TImageP();
+	m_swatch->image() =
+		sl ? IoCmd::exportedImage(ext, *sl, sl->index2fid(frameIdx), opts) : TImageP();
 
 	m_swatch->update();
 }
@@ -630,20 +635,21 @@ bool ExportLevelPopup::execute()
 			int r0, r1, c = *it;
 			xsh->getCellRange(c, r0, r1);
 
-			if (r1 >= r0) //There exists a not-empty cell
+			if (r1 >= r0) // There exists a not-empty cell
 			{
 				TXshSimpleLevel *sl = xsh->getCell(r0, c).getSimpleLevel();
 				assert(sl);
 
-				ret = ret && IoCmd::exportLevel(fp.withName(sl->getName()),
-												sl, opts, &overwriteCB, &progressCB);
+				ret = ret && IoCmd::exportLevel(fp.withName(sl->getName()), sl, opts, &overwriteCB,
+												&progressCB);
 			}
 		}
 
 		return ret;
 	} else {
 		if (!isValidFileName(QString::fromStdString(fp.getName()))) {
-			DVGui::error(tr("The file name cannot be empty or contain any of the following characters:(new line)  \\ / : * ? \"  |"));
+			DVGui::error(tr("The file name cannot be empty or contain any of the following "
+							"characters:(new line)  \\ / : * ? \"  |"));
 			return false;
 		}
 
@@ -674,8 +680,7 @@ void ExportLevelPopup::initFolder()
 //    ExportLevelPopup::ExportOptions  implementation
 //********************************************************************************
 
-ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
-	: QFrame(parent)
+ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent) : QFrame(parent)
 {
 	struct locals {
 		static inline QGridLayout *newGridLayout()
@@ -689,8 +694,7 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
 		}
 	};
 
-	static const double dmax = (std::numeric_limits<double>::max)(),
-						dmin = -dmax;
+	static const double dmax = (std::numeric_limits<double>::max)(), dmin = -dmax;
 
 	QGridLayout *layout = locals::newGridLayout();
 	setLayout(layout);
@@ -784,8 +788,9 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
 					m_thicknessTransformMode = new QComboBox;
 					thicknessModeLayout->addWidget(m_thicknessTransformMode);
 
-					m_thicknessTransformMode->addItems(
-						QStringList() << tr("Scale Thickness") << tr("Add Thickness") << tr("Constant Thickness"));
+					m_thicknessTransformMode->addItems(QStringList() << tr("Scale Thickness")
+																	 << tr("Add Thickness")
+																	 << tr("Constant Thickness"));
 
 					thicknessModeLayout->addStretch(1);
 				}
@@ -835,8 +840,10 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
 	{
 		ret = connect(m_widthFld, SIGNAL(editingFinished()), SLOT(updateXRes())) && ret;
 		ret = connect(m_heightFld, SIGNAL(editingFinished()), SLOT(updateYRes())) && ret;
-		ret = connect(m_hResFld, SIGNAL(editingFinished()), SLOT(updateYRes())) && ret; // Note that x and y here
-		ret = connect(m_vResFld, SIGNAL(editingFinished()), SLOT(updateXRes())) && ret; // are exchanged
+		ret = connect(m_hResFld, SIGNAL(editingFinished()), SLOT(updateYRes())) &&
+			  ret; // Note that x and y here
+		ret = connect(m_vResFld, SIGNAL(editingFinished()), SLOT(updateXRes())) &&
+			  ret; // are exchanged
 		ret = connect(m_resScale, SIGNAL(editingFinished()), SLOT(scaleRes())) && ret;
 
 		ret = connect(m_thicknessTransformMode, SIGNAL(currentIndexChanged(int)),
@@ -849,20 +856,35 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
 			  ret;
 		ret = connect(m_noAntialias, SIGNAL(clicked(bool)), SIGNAL(optionsChanged())) && ret;
 
-		// Queued connections for camera fields, to guarantee that whenever signals editingFinished()
-		// and valueChanged() are emitted at the same time, the former takes precedence (applies value corrections)
-		ret = connect(m_widthFld, SIGNAL(valueChanged()), SIGNAL(optionsChanged()), Qt::QueuedConnection) && ret;
-		ret = connect(m_heightFld, SIGNAL(valueChanged()), SIGNAL(optionsChanged()), Qt::QueuedConnection) && ret;
-		ret = connect(m_hResFld, SIGNAL(textChanged(const QString &)), SIGNAL(optionsChanged()), Qt::QueuedConnection) && ret;
-		ret = connect(m_vResFld, SIGNAL(textChanged(const QString &)), SIGNAL(optionsChanged()), Qt::QueuedConnection) && ret;
+		// Queued connections for camera fields, to guarantee that whenever signals
+		// editingFinished()
+		// and valueChanged() are emitted at the same time, the former takes precedence (applies
+		// value corrections)
+		ret = connect(m_widthFld, SIGNAL(valueChanged()), SIGNAL(optionsChanged()),
+					  Qt::QueuedConnection) &&
+			  ret;
+		ret = connect(m_heightFld, SIGNAL(valueChanged()), SIGNAL(optionsChanged()),
+					  Qt::QueuedConnection) &&
+			  ret;
+		ret = connect(m_hResFld, SIGNAL(textChanged(const QString &)), SIGNAL(optionsChanged()),
+					  Qt::QueuedConnection) &&
+			  ret;
+		ret = connect(m_vResFld, SIGNAL(textChanged(const QString &)), SIGNAL(optionsChanged()),
+					  Qt::QueuedConnection) &&
+			  ret;
 
 		ret = connect(m_thicknessTransformMode, SIGNAL(currentIndexChanged(int)),
 					  SIGNAL(optionsChanged())) &&
 			  ret;
-		ret = connect(m_fromThicknessScale, SIGNAL(valueChanged()), SIGNAL(optionsChanged())) && ret;
-		ret = connect(m_fromThicknessDisplacement, SIGNAL(valueChanged()), SIGNAL(optionsChanged())) && ret;
+		ret =
+			connect(m_fromThicknessScale, SIGNAL(valueChanged()), SIGNAL(optionsChanged())) && ret;
+		ret = connect(m_fromThicknessDisplacement, SIGNAL(valueChanged()),
+					  SIGNAL(optionsChanged())) &&
+			  ret;
 		ret = connect(m_toThicknessScale, SIGNAL(valueChanged()), SIGNAL(optionsChanged())) && ret;
-		ret = connect(m_toThicknessDisplacement, SIGNAL(valueChanged()), SIGNAL(optionsChanged())) && ret;
+		ret =
+			connect(m_toThicknessDisplacement, SIGNAL(valueChanged()), SIGNAL(optionsChanged())) &&
+			ret;
 	}
 	assert(ret);
 
@@ -935,7 +957,7 @@ void ExportLevelPopup::ExportOptions::updateOnSelection()
 			int r0, r1, c = *it;
 			xsh->getCellRange(c, r0, r1);
 
-			if (r0 <= r1) //There exists a not-empty cell
+			if (r0 <= r1) // There exists a not-empty cell
 			{
 				TXshSimpleLevel *sl = xsh->getCell(r0, c).getSimpleLevel();
 				assert(sl);
@@ -949,7 +971,8 @@ void ExportLevelPopup::ExportOptions::updateOnSelection()
 	}
 
 	TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
-	m_pliOptions->setEnabled(sl && (sl->getType() != TZP_XSHLEVEL && sl->getType() != OVL_XSHLEVEL));
+	m_pliOptions->setEnabled(sl &&
+							 (sl->getType() != TZP_XSHLEVEL && sl->getType() != OVL_XSHLEVEL));
 }
 
 //-----------------------------------------------------------------------------
@@ -981,9 +1004,7 @@ void ExportLevelPopup::ExportOptions::updateCameraDefault()
 
 void ExportLevelPopup::ExportOptions::updateXRes()
 {
-	double ly = m_heightFld->getValue(),
-		   yres = m_vResFld->getValue(),
-		   dpi = ly > 0 ? yres / ly : 0;
+	double ly = m_heightFld->getValue(), yres = m_vResFld->getValue(), dpi = ly > 0 ? yres / ly : 0;
 
 	m_hResFld->setValue(tround(m_widthFld->getValue() * dpi));
 	updateDpi();
@@ -993,9 +1014,7 @@ void ExportLevelPopup::ExportOptions::updateXRes()
 
 void ExportLevelPopup::ExportOptions::updateYRes()
 {
-	double lx = m_widthFld->getValue(),
-		   xres = m_hResFld->getValue(),
-		   dpi = lx > 0 ? xres / lx : 0;
+	double lx = m_widthFld->getValue(), xres = m_hResFld->getValue(), dpi = lx > 0 ? xres / lx : 0;
 
 	m_vResFld->setValue(tround(m_heightFld->getValue() * dpi));
 	updateDpi();
@@ -1015,9 +1034,7 @@ void ExportLevelPopup::ExportOptions::scaleRes()
 
 void ExportLevelPopup::ExportOptions::updateDpi()
 {
-	double lx = m_widthFld->getValue(),
-		   xres = m_hResFld->getValue(),
-		   xdpi = lx > 0 ? xres / lx : 0;
+	double lx = m_widthFld->getValue(), xres = m_hResFld->getValue(), xdpi = lx > 0 ? xres / lx : 0;
 
 	m_dpiLabel->setText(tr("DPI: ") + QString::number(xdpi, 'g', 4));
 }

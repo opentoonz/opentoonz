@@ -19,20 +19,21 @@ DEFINE_CLASS_CODE(TRaster, 1)
 //------------------------------------------------------------
 
 TRaster::TRaster(int lx, int ly, int pixelSize)
-	: TSmartObject(m_classCode), m_pixelSize(pixelSize), m_lx(lx), m_ly(ly), m_wrap(lx), m_parent(0), m_bufferOwner(true), m_buffer(0), m_lockCount(0)
+	: TSmartObject(m_classCode), m_pixelSize(pixelSize), m_lx(lx), m_ly(ly), m_wrap(lx),
+	  m_parent(0), m_bufferOwner(true), m_buffer(0), m_lockCount(0)
 #ifdef _DEBUG
 	  ,
 	  m_cashed(false)
 #endif
 
 {
-	//try
+	// try
 	{
 		assert(pixelSize > 0);
 		assert(lx > 0 && ly > 0);
 		TBigMemoryManager::instance()->putRaster(this);
 
-		//m_buffer = new UCHAR[lx*ly*pixelSize];
+		// m_buffer = new UCHAR[lx*ly*pixelSize];
 
 		if (!m_buffer) {
 #ifdef _WIN32
@@ -49,25 +50,27 @@ TRaster::TRaster(int lx, int ly, int pixelSize)
 
 		// TBigMemoryManager::instance()->checkConsistency();
 
-		//m_totalMemory += ((lx*ly*pixelSize)>>10);
+		// m_totalMemory += ((lx*ly*pixelSize)>>10);
 	}
-	/* catch(...) 
-    {
-    TImageCache::instance()->putAllOnDisk();
-    m_buffer = BigMemoryManager.getMemoryChunk(lx*ly*pixelSize, this);
-    //m_buffer = new UCHAR[lx*ly*pixelSize];
-    m_totalMemory += ((lx*ly*pixelSize)>>10);
-    #ifdef _WIN32
-    MessageBox( NULL, "Run out of contiguos phisical memory: please save all and restart toonz!", "Warning", MB_OK);
-    #endif
-    }*/
+	/* catch(...)
+	{
+	TImageCache::instance()->putAllOnDisk();
+	m_buffer = BigMemoryManager.getMemoryChunk(lx*ly*pixelSize, this);
+	//m_buffer = new UCHAR[lx*ly*pixelSize];
+	m_totalMemory += ((lx*ly*pixelSize)>>10);
+	#ifdef _WIN32
+	MessageBox( NULL, "Run out of contiguos phisical memory: please save all and restart toonz!",
+	"Warning", MB_OK);
+	#endif
+	}*/
 }
 
 //------------------------------------------------------------
 
-TRaster::TRaster(int lx, int ly, int pixelSize,
-				 int wrap, UCHAR *buffer, TRaster *parent, bool bufferOwner)
-	: TSmartObject(m_classCode), m_pixelSize(pixelSize), m_lx(lx), m_ly(ly), m_wrap(wrap), m_buffer(buffer), m_bufferOwner(bufferOwner), m_lockCount(0)
+TRaster::TRaster(int lx, int ly, int pixelSize, int wrap, UCHAR *buffer, TRaster *parent,
+				 bool bufferOwner)
+	: TSmartObject(m_classCode), m_pixelSize(pixelSize), m_lx(lx), m_ly(ly), m_wrap(wrap),
+	  m_buffer(buffer), m_bufferOwner(bufferOwner), m_lockCount(0)
 #ifdef _DEBUG
 	  ,
 	  m_cashed(false)
@@ -91,7 +94,7 @@ TRaster::TRaster(int lx, int ly, int pixelSize,
 	assert(lx > 0 && ly > 0);
 	assert(wrap >= lx);
 	assert(m_buffer);
-	//if (parent)
+	// if (parent)
 	TBigMemoryManager::instance()->putRaster(this);
 
 	//  TBigMemoryManager::instance()->checkConsistency();
@@ -99,11 +102,11 @@ TRaster::TRaster(int lx, int ly, int pixelSize,
 
 //------------------------------------------------------------
 
-//TAtomicVar TRaster::m_totalMemory;
+// TAtomicVar TRaster::m_totalMemory;
 
 //------------------------------------------------------------
 
-//unsigned long TRaster::getTotalMemoryInKB(){ return m_totalMemory;}
+// unsigned long TRaster::getTotalMemoryInKB(){ return m_totalMemory;}
 
 //------------------------------------------------------------
 
@@ -111,12 +114,12 @@ TRaster::~TRaster()
 {
 	bool parent = false;
 #ifdef _DEBUG
-//TBigMemoryManager::instance()->checkConsistency();
+// TBigMemoryManager::instance()->checkConsistency();
 #endif
-	//bool ret =
+	// bool ret =
 	TBigMemoryManager::instance()->releaseRaster(this);
 #ifdef _DEBUG
-//TBigMemoryManager::instance()->checkConsistency();
+// TBigMemoryManager::instance()->checkConsistency();
 #endif
 	if (m_parent) {
 		assert(!m_bufferOwner);
@@ -125,17 +128,17 @@ TRaster::~TRaster()
 		parent = true;
 	}
 
-	//if(m_buffer && m_bufferOwner)
+	// if(m_buffer && m_bufferOwner)
 	//  {
-	//delete [] m_buffer;
-	//m_totalMemory += -((m_lx*m_ly*m_pixelSize)>>10);
-	//assert(m_totalMemory>=0);
+	// delete [] m_buffer;
+	// m_totalMemory += -((m_lx*m_ly*m_pixelSize)>>10);
+	// assert(m_totalMemory>=0);
 	//  }
 	//  UCHAR* aux = m_buffer;
 	m_buffer = 0;
 
 #ifdef _DEBUG
-//TBigMemoryManager::instance()->checkConsistency();
+// TBigMemoryManager::instance()->checkConsistency();
 #endif
 }
 
@@ -151,22 +154,22 @@ void TRaster::endRemapping()
 }
 
 /*
- void TRaster::lock() 
+ void TRaster::lock()
    {
    if (m_parent) m_parent->lock();
    else  ++m_lockCount;
    //TBigMemoryManager::instance()->lock(m_parent?(m_parent->m_buffer):m_buffer);
    }
-   
+
  void TRaster::unlock()
    {
    if (m_parent) m_parent->unlock();
-   else  
-     {
-     assert(m_lockCount>0);
-     --m_lockCount;
-     }
-     
+   else
+	 {
+	 assert(m_lockCount>0);
+	 --m_lockCount;
+	 }
+
    //TBigMemoryManager::instance()->unlock(m_parent?(m_parent->m_buffer):m_buffer);
    }
 */
@@ -177,9 +180,9 @@ template<class T>
 
   // utilizzo di un raster preesistente
   template<class T>
-  TRasterT<T>::TRasterT<T>(int lx, int ly, int wrap, T *buffer, TRasterT<T> *parent) 
-     : TRaster(lx,ly,sizeof(T), wrap
-     , reinterpret_cast<UCHAR*>(buffer), parent) {}
+  TRasterT<T>::TRasterT<T>(int lx, int ly, int wrap, T *buffer, TRasterT<T> *parent)
+	 : TRaster(lx,ly,sizeof(T), wrap
+	 , reinterpret_cast<UCHAR*>(buffer), parent) {}
 */
 //------------------------------------------------------------
 
@@ -195,8 +198,7 @@ void TRaster::fillRawData(const UCHAR *color)
 	UCHAR *buf1 = m_parent ? m_parent->m_buffer : m_buffer;
 	lock();
 	unsigned char *firstPixel = getRawData();
-	const unsigned char *lastPixel = firstPixel +
-									 wrapSize * (m_ly - 1) + m_pixelSize * (m_lx - 1);
+	const unsigned char *lastPixel = firstPixel + wrapSize * (m_ly - 1) + m_pixelSize * (m_lx - 1);
 
 	// riempio la prima riga
 	unsigned char *pixel = firstPixel;
@@ -265,7 +267,7 @@ void TRaster::copy(const TRasterP &src0, const TPoint &offset)
 	TRasterP dst = extract(rect);
 	TRect r(rect);
 	r -= offset;
-	//TRasterP src = src0->extract(rect - offset);
+	// TRasterP src = src0->extract(rect - offset);
 	TRasterP src = src0->extract(r);
 	assert(dst->getSize() == src->getSize());
 	dst->lock();
@@ -337,7 +339,7 @@ void TRaster::xMirror()
 
 void TRaster::rotate180()
 {
-	//const int rowSize = m_lx * m_pixelSize;
+	// const int rowSize = m_lx * m_pixelSize;
 	const int wrapSize = m_wrap * m_pixelSize;
 	std::unique_ptr<UCHAR[]> auxBuf(new UCHAR[m_pixelSize]);
 	lock();
@@ -375,16 +377,16 @@ void TRaster::rotate90()
 	/*
 	UCHAR *auxBuf= new UCHAR[m_pixelSize];
 
-  
+
   for(int y=m_ly;y>0;y--)
   {
 	UCHAR *a = getRawData() + wrapSize * (y-1) + m_pixelSize * (m_lx-1);
-    for (int x=m_lx-1;x>=0;x--)
+	for (int x=m_lx-1;x>=0;x--)
 	{
 	  UCHAR *b = a - (m_ly-1)*m_pixelSize *(m_lx-x);
 	  ::memcpy(auxBuf,  a,   m_pixelSize);
 	  ::memcpy(a,       b,   m_pixelSize);
-	  ::memcpy(b,    auxBuf, m_pixelSize); 
+	  ::memcpy(b,    auxBuf, m_pixelSize);
 	  a-=m_pixelSize;
 	}
 
@@ -427,7 +429,7 @@ void TRaster::remap(UCHAR *newLocation)
 		int offset = (int)(m_buffer - m_parent->m_buffer);
 		assert(offset >= 0);
 
-		//m_parent->remap(newLocation);
+		// m_parent->remap(newLocation);
 		m_buffer = newLocation + offset;
 	} else {
 		assert(m_buffer > newLocation);

@@ -20,9 +20,9 @@ class TargetSpotFx : public TStandardZeraryFx
 	TDoubleParamP m_sizey;
 	TPixelParamP m_color;
 
-public:
+  public:
 	TargetSpotFx()
-		: m_z(100) //args, "Z")
+		: m_z(100) // args, "Z")
 		  ,
 		  m_angle(10) // args, "Angle")
 		  ,
@@ -32,7 +32,7 @@ public:
 		  ,
 		  m_sizey(1) // args, "sizeY")
 		  ,
-		  m_color(TPixel::White) //args, "Color")
+		  m_color(TPixel::White) // args, "Color")
 	{
 		bindParam(this, "z", m_z);
 		bindParam(this, "angle", m_angle);
@@ -60,8 +60,8 @@ public:
 };
 
 template <typename PIXEL>
-void doTargetSpot(const TRasterPT<PIXEL> &ras, TPixel32 m_color0, double sizex, double sizey, double angle,
-				  double decay, double z, TPointD tilepos)
+void doTargetSpot(const TRasterPT<PIXEL> &ras, TPixel32 m_color0, double sizex, double sizey,
+				  double angle, double decay, double z, TPointD tilepos)
 {
 
 	PIXEL color1 = PIXEL::Black;
@@ -93,9 +93,11 @@ void doTargetSpot(const TRasterPT<PIXEL> &ras, TPixel32 m_color0, double sizex, 
 			if (norm < 0)
 				norm *= -1;
 			if (dist < 0 && (-ttan * pos.x + z) > 0) {
-				*pix++ = blend(color0, color1, norm * decay > 1 ? 1 : (norm * decay < 0 ? 0 : norm * decay));
+				*pix++ = blend(color0, color1,
+							   norm * decay > 1 ? 1 : (norm * decay < 0 ? 0 : norm * decay));
 			} else if (dist < reference && ztmp > 0) {
-				PIXEL tmp = blend(color0, color1, norm * decay > 1 ? 1 : (norm * decay < 0 ? 0 : norm * decay));
+				PIXEL tmp = blend(color0, color1,
+								  norm * decay > 1 ? 1 : (norm * decay < 0 ? 0 : norm * decay));
 				*pix++ = blend(tmp, color1, dist / (reference));
 			} else
 				*pix++ = color1;

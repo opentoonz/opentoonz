@@ -36,17 +36,9 @@
 #include <QMenu>
 
 #ifndef USE_QPAINTER
-GLshort vertices[] = {
-	0, 1, 0,
-	0, 0, 0,
-	1, 0, 0,
-	1, 1, 0};
+GLshort vertices[] = {0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0};
 
-GLshort coords[] = {
-	0, 1,
-	0, 0,
-	1, 0,
-	1, 1};
+GLshort coords[] = {0, 1, 0, 0, 1, 0, 1, 1};
 
 // function pointers for PBO Extension
 // Windows needs to get function pointers from ICD OpenGL drivers,
@@ -70,15 +62,15 @@ PFNGLUNMAPBUFFERARBPROC pglUnmapBufferARB = 0;					 // unmap VBO procedure
 #define glUnmapBufferARB pglUnmapBufferARB
 #endif
 
-#endif //USE_QPAINTER
+#endif // USE_QPAINTER
 
 //-----------------------------------------------------------------------------
 namespace
 {
 //-----------------------------------------------------------------------------
 
-void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
-					int widgetHeight, double pressure, bool isTablet)
+void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event, int widgetHeight, double pressure,
+					bool isTablet)
 {
 	toonzEvent.m_pos = TPoint(event->pos().x(), widgetHeight - 1 - event->pos().y());
 	toonzEvent.setModifiers(event->modifiers() & Qt::ShiftModifier,
@@ -95,7 +87,7 @@ void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
 
 class ViewerZoomer : public ImageUtils::ShortcutZoomer
 {
-public:
+  public:
 	ViewerZoomer(QWidget *parent) : ShortcutZoomer(parent) {}
 	void zoom(bool zoomin, bool resetZoom)
 	{
@@ -115,7 +107,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 // definito - per ora - in tapp.cpp
@@ -131,7 +123,7 @@ LineTestViewer::LineTestViewer(QWidget *parent)
 #else
 	: QGLWidget(parent)
 //, m_pboSupported(false)
-#endif //USE_QPAINTER
+#endif // USE_QPAINTER
 	  ,
 	  m_pos(), m_mouseButton(Qt::NoButton), m_viewAffine()
 {
@@ -145,7 +137,7 @@ LineTestViewer::~LineTestViewer()
 {
 	//#ifndef USE_QPAINTER
 	// clean up PBO
-	//if(m_pboSupported)
+	// if(m_pboSupported)
 	//	glDeleteBuffersARB(1, &m_pboId);
 	//#endif //USE_QPAINTER
 }
@@ -154,7 +146,8 @@ LineTestViewer::~LineTestViewer()
 
 TPointD LineTestViewer::winToWorld(const QPoint &pos) const
 {
-	// coordinate window (origine in alto a sinistra) -> coordinate colonna (origine al centro dell'immagine)
+	// coordinate window (origine in alto a sinistra) -> coordinate colonna (origine al centro
+	// dell'immagine)
 	TPointD pp(pos.x() - width() * 0.5, -pos.y() + height() * 0.5);
 	return getViewMatrix().inv() * pp;
 }
@@ -198,7 +191,8 @@ void LineTestViewer::paintEvent(QPaintEvent *)
 	p.fillRect(visibleRegion().boundingRect(), QBrush(QColor(Qt::white)));
 	TPixel32 cameraBgColor = scene->getProperties()->getBgColor();
 	TPixel32 viewerBgColor = scene->getProperties()->getViewerBgColor();
-	p.fillRect(visibleRegion().boundingRect(), QBrush(QColor(viewerBgColor.r, viewerBgColor.g, viewerBgColor.b, viewerBgColor.m)));
+	p.fillRect(visibleRegion().boundingRect(),
+			   QBrush(QColor(viewerBgColor.r, viewerBgColor.g, viewerBgColor.b, viewerBgColor.m)));
 
 	int h = height();
 	int w = width();
@@ -212,11 +206,8 @@ void LineTestViewer::paintEvent(QPaintEvent *)
 
 	TFrameHandle *frameHandle = app->getCurrentFrame();
 	if (app->getCurrentFrame()->isEditingLevel()) {
-		Stage::visit(stagePainter,
-					 app->getCurrentLevel()->getLevel(),
-					 app->getCurrentFrame()->getFid(),
-					 OnionSkinMask(),
-					 frameHandle->isPlaying());
+		Stage::visit(stagePainter, app->getCurrentLevel()->getLevel(),
+					 app->getCurrentFrame()->getFid(), OnionSkinMask(), frameHandle->isPlaying());
 	} else {
 		int xsheetLevel = 0;
 		TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
@@ -236,19 +227,21 @@ void LineTestViewer::paintEvent(QPaintEvent *)
 		Stage::visit(stagePainter, args);
 	}
 
-	//Draw camera rect and mask
+	// Draw camera rect and mask
 	TRectD rect = ViewerDraw::getCameraRect();
 	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 	TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
 	int row = app->getCurrentFrame()->getFrameIndex();
 	double cameraZ = xsh->getZ(cameraId, row);
 	TAffine aff = xsh->getPlacement(cameraId, row) * TScale((1000 + cameraZ) / 1000);
-	aff = TAffine(1, 0, 0, 0, -1, viewerSize.ly) * TTranslation(viewerSize.lx * 0.5, viewerSize.ly * 0.5) * viewAff * aff;
+	aff = TAffine(1, 0, 0, 0, -1, viewerSize.ly) *
+		  TTranslation(viewerSize.lx * 0.5, viewerSize.ly * 0.5) * viewAff * aff;
 	QMatrix matrix(aff.a11, aff.a21, aff.a12, aff.a22, aff.a13, aff.a23);
 	QPolygon cameraPolygon(QRect(rect.getP00().x, rect.getP00().y, rect.getLx(), rect.getLy()));
 	cameraPolygon = cameraPolygon * matrix;
 
-	p.fillRect(cameraPolygon.boundingRect(), QBrush(QColor(cameraBgColor.r, cameraBgColor.g, cameraBgColor.b, cameraBgColor.m)));
+	p.fillRect(cameraPolygon.boundingRect(),
+			   QBrush(QColor(cameraBgColor.r, cameraBgColor.g, cameraBgColor.b, cameraBgColor.m)));
 	stagePainter.drawRasterImages(p, cameraPolygon);
 
 	p.end();
@@ -264,10 +257,10 @@ void LineTestViewer::initializeGL()
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // 4-byte pixel alignment
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
-	//checkPBOSupport();
+	// checkPBOSupport();
 
 	// Generater pbuffer
-	//if(m_pboSupported)
+	// if(m_pboSupported)
 	//  glGenBuffersARB(1, &m_pboId);
 }
 
@@ -291,10 +284,10 @@ void LineTestViewer::resizeGL(int width, int height)
 
 void LineTestViewer::paintRaster(TRasterP ras)
 {
-	//TStopWatch timer;
-	//TStopWatch timer2;
-	//timer.start();
-	//timer2.start();
+	// TStopWatch timer;
+	// TStopWatch timer2;
+	// timer.start();
+	// timer2.start();
 
 	int w = ras->getLx();
 	int h = ras->getLy();
@@ -306,19 +299,22 @@ void LineTestViewer::paintRaster(TRasterP ras)
 
 	int dataSize = w * h * 4;
 
-	//timer.stop();
-	//timer2.stop();
-	//qDebug("time 1: %d",timer.getTotalTime());
-	//timer.start(true);
-	//timer2.start();
+	// timer.stop();
+	// timer2.stop();
+	// qDebug("time 1: %d",timer.getTotalTime());
+	// timer.start(true);
+	// timer2.start();
 
-	/**************************************************************************************** 
-     ATTENZIONE!!! Qeesto codice potrebbe dare problemi!!!!!
-     quando si utilizzano le texture le loro dimensioni dovrebbero essere potenze di dur...
-     le nuove schede grafiche sembrerebbero funzionare lo stesso ma le vecchie a volte danno problemi!!!
-     Inoltre non viene fatto il controllo se le dimenzioni dei raster da disegnare superano le dimenzioni 
-     supportate dalla scheda grafica... se cio' accade bisognerebbe spezzare il raster in due... 
-     Questo codice sembra essere meolto veloce (cosa di cui abbiamo bisogno) ma puo' dare seri problemi!!!!
+	/****************************************************************************************
+	 ATTENZIONE!!! Qeesto codice potrebbe dare problemi!!!!!
+	 quando si utilizzano le texture le loro dimensioni dovrebbero essere potenze di dur...
+	 le nuove schede grafiche sembrerebbero funzionare lo stesso ma le vecchie a volte danno
+  problemi!!!
+	 Inoltre non viene fatto il controllo se le dimenzioni dei raster da disegnare superano le
+  dimenzioni
+	 supportate dalla scheda grafica... se cio' accade bisognerebbe spezzare il raster in due...
+	 Questo codice sembra essere meolto veloce (cosa di cui abbiamo bisogno) ma puo' dare seri
+  problemi!!!!
   *****************************************************************************************/
 
 	ras->lock();
@@ -333,11 +329,12 @@ void LineTestViewer::paintRaster(TRasterP ras)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)0);
 	else if (pixelSize == 1) {
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, (GLvoid *)0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE,
+					 (GLvoid *)0);
 	} else
 		return;
 
-	//if(m_pboSupported)
+	// if(m_pboSupported)
 	// {
 	//   // bind PBO to update pixel values
 	//   glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, m_pboId);
@@ -377,9 +374,11 @@ void LineTestViewer::paintRaster(TRasterP ras)
 	// start to copy pixels from system memory to textrure object
 	glBindTexture(GL_TEXTURE_2D, m_textureId);
 	if (pixelSize == 4)
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)ras->getRawData());
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_BGRA, GL_UNSIGNED_BYTE,
+						(GLvoid *)ras->getRawData());
 	else if (pixelSize == 1)
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_LUMINANCE, GL_UNSIGNED_BYTE, (GLvoid *)ras->getRawData());
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_LUMINANCE, GL_UNSIGNED_BYTE,
+						(GLvoid *)ras->getRawData());
 	else
 		return;
 	ras->unlock();
@@ -398,10 +397,10 @@ void LineTestViewer::paintRaster(TRasterP ras)
 	// clean up texture
 	glDeleteTextures(1, &m_textureId);
 
-	//timer.stop();
-	//timer2.stop();
-	//qDebug("time 2: %d",timer.getTotalTime());
-	//qDebug("total time: %d",timer2.getTotalTime());
+	// timer.stop();
+	// timer2.stop();
+	// qDebug("time 2: %d",timer.getTotalTime());
+	// qDebug("total time: %d",timer2.getTotalTime());
 }
 
 //-----------------------------------------------------------------------------
@@ -413,14 +412,15 @@ void LineTestViewer::paintGL()
 
 	TPixel32 cameraBgColor = scene->getProperties()->getBgColor();
 	TPixel32 viewerBgColor = scene->getProperties()->getViewerBgColor();
-	glClearColor(viewerBgColor.r / 255.0, viewerBgColor.g / 255.0, viewerBgColor.b / 255.0, viewerBgColor.m / 255.0);
+	glClearColor(viewerBgColor.r / 255.0, viewerBgColor.g / 255.0, viewerBgColor.b / 255.0,
+				 viewerBgColor.m / 255.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	int h = height();
 	int w = width();
 	TDimension viewerSize(w, h);
 	TRect clipRect(viewerSize);
-	//clipRect -= TPoint(viewerSize.lx*0.5,viewerSize.ly*0.5);
+	// clipRect -= TPoint(viewerSize.lx*0.5,viewerSize.ly*0.5);
 
 	TAffine viewAff = getViewMatrix();
 
@@ -429,11 +429,8 @@ void LineTestViewer::paintGL()
 	TFrameHandle *frameHandle = app->getCurrentFrame();
 	int frame = frameHandle->getFrame();
 	if (app->getCurrentFrame()->isEditingLevel()) {
-		Stage::visit(stagePainter,
-					 app->getCurrentLevel()->getLevel(),
-					 frameHandle->getFid(),
-					 OnionSkinMask(),
-					 frameHandle->isPlaying());
+		Stage::visit(stagePainter, app->getCurrentLevel()->getLevel(), frameHandle->getFid(),
+					 OnionSkinMask(), frameHandle->isPlaying());
 	} else {
 		int xsheetLevel = 0;
 		TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
@@ -452,7 +449,7 @@ void LineTestViewer::paintGL()
 		Stage::visit(stagePainter, args);
 	}
 
-	//Draw camera rect and mask
+	// Draw camera rect and mask
 	TRectD cameraRect = ViewerDraw::getCameraRect();
 	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 	TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
@@ -461,7 +458,8 @@ void LineTestViewer::paintGL()
 	TAffine aff = xsh->getPlacement(cameraId, row) * TScale((1000 + cameraZ) / 1000);
 	aff = TTranslation(viewerSize.lx * 0.5, viewerSize.ly * 0.5) * viewAff * aff;
 	QMatrix matrix(aff.a11, aff.a21, aff.a12, aff.a22, aff.a13, aff.a23);
-	QPolygon cameraPolygon(QRect(cameraRect.getP00().x, cameraRect.getP00().y, cameraRect.getLx(), cameraRect.getLy()));
+	QPolygon cameraPolygon(QRect(cameraRect.getP00().x, cameraRect.getP00().y, cameraRect.getLx(),
+								 cameraRect.getLy()));
 	cameraPolygon = cameraPolygon * matrix;
 
 	tglColor(cameraBgColor);
@@ -485,9 +483,9 @@ void LineTestViewer::paintGL()
 	int i;
 	GLfloat mat[4][4];
 	QMatrix mtx;
-	//GLubyte *pbo;
-	//TRaster32P pboRaster;
-	//if(m_pboSupported)
+	// GLubyte *pbo;
+	// TRaster32P pboRaster;
+	// if(m_pboSupported)
 	//{
 	//	glGenTextures(1, &m_textureId);
 	//	glBindTexture(GL_TEXTURE_2D, m_textureId);
@@ -495,13 +493,15 @@ void LineTestViewer::paintGL()
 	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, cameraWidth, cameraHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)0);
+	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, cameraWidth, cameraHeight, 0, GL_BGRA,
+	//GL_UNSIGNED_BYTE, (GLvoid*)0);
 
 	//	glBindTexture(GL_TEXTURE_2D, m_textureId);
 	//  glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, m_pboId);
 	//   // copy pixels from PBO to texture object
 	//   // Use offset instead of ponter.
-	//   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, cameraWidth, cameraHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+	//   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, cameraWidth, cameraHeight, GL_BGRA,
+	//   GL_UNSIGNED_BYTE, 0);
 
 	//	// bind PBO to update pixel values
 	//	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, m_pboId);
@@ -514,7 +514,8 @@ void LineTestViewer::paintGL()
 	//	// If you do that, the previous data in PBO will be discarded and
 	//	// glMapBufferARB() returns a new allocated pointer immediately
 	//	// even if GPU is still working with the previous data.
-	//	glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, cameraWidth * cameraHeight * 4, 0, GL_STREAM_DRAW_ARB);
+	//	glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, cameraWidth * cameraHeight * 4, 0,
+	//GL_STREAM_DRAW_ARB);
 	//	pbo = (GLubyte*)glMapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 
 	//	pboRaster = TRaster32P(cameraWidth, cameraHeight,cameraWidth, (TPixelRGBM32*) pbo, false);
@@ -524,7 +525,7 @@ void LineTestViewer::paintGL()
 	glScissor(cameraPolygon.at(0).x(), cameraPolygon.at(0).y(), cameraWidth, cameraHeight);
 	glEnable(GL_SCISSOR_TEST);
 
-	//if(!m_pboSupported)
+	// if(!m_pboSupported)
 	glPushMatrix();
 	for (i = 0; i < nodesSize; i++) {
 
@@ -532,9 +533,9 @@ void LineTestViewer::paintGL()
 		if (!ras.getPointer())
 			continue;
 
-		//if(!m_pboSupported)
+		// if(!m_pboSupported)
 		//{
-		//Matrix tranformation
+		// Matrix tranformation
 		mat[0][0] = mtx.m11();
 		mat[0][1] = mtx.m12();
 		mat[0][2] = 0;
@@ -555,22 +556,22 @@ void LineTestViewer::paintGL()
 		mat[3][2] = 0;
 		mat[3][3] = 1;
 
-		//Draw Raster
+		// Draw Raster
 		// CASO NON PBO
 		glLoadMatrixf(&mat[0][0]);
 		paintRaster(ras);
 		//}
-		//else
+		// else
 		//{
 		//	TAffine aff;// (mtx.m11(),mtx.m12(),mtx.dx(),mtx.m21(),mtx.m22(),mtx.dy());
 		//	//TRop::quickPut(pboRaster, ras, aff);
 		//}
 	}
-	//if(!m_pboSupported)
+	// if(!m_pboSupported)
 	glPopMatrix();
 
 	// Convert PBO to texture and draw it
-	//if(m_pboSupported)
+	// if(m_pboSupported)
 	//{
 	//	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 
@@ -607,7 +608,7 @@ void LineTestViewer::paintGL()
 	stagePainter.clearNodes();
 }
 
-#endif //USE_QPAINTER
+#endif // USE_QPAINTER
 
 //-----------------------------------------------------------------------------
 
@@ -617,12 +618,16 @@ void LineTestViewer::showEvent(QShowEvent *)
 
 	bool ret = true;
 
-	ret = ret && connect(TApp::instance()->getCurrentObject(), SIGNAL(objectSwitched()), this, SLOT(update()));
-	ret = ret && connect(TApp::instance()->getCurrentObject(), SIGNAL(objectChanged(bool)), this, SLOT(update()));
+	ret = ret && connect(TApp::instance()->getCurrentObject(), SIGNAL(objectSwitched()), this,
+						 SLOT(update()));
+	ret = ret && connect(TApp::instance()->getCurrentObject(), SIGNAL(objectChanged(bool)), this,
+						 SLOT(update()));
 
-	ret = ret && connect(TApp::instance()->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
+	ret = ret && connect(TApp::instance()->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()),
+						 this, SLOT(update()));
 
-	ret = ret && connect(TApp::instance()->getCurrentLevel(), SIGNAL(xshLevelChanged()), this, SLOT(update()));
+	ret = ret && connect(TApp::instance()->getCurrentLevel(), SIGNAL(xshLevelChanged()), this,
+						 SLOT(update()));
 
 	TFrameHandle *frameHandle = app->getCurrentFrame();
 	ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(update()));
@@ -635,7 +640,8 @@ void LineTestViewer::showEvent(QShowEvent *)
 	ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(onSceneSwitched()));
 	ret = ret && connect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(update()));
 
-	ret = ret && connect(TApp::instance()->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
+	ret = ret && connect(TApp::instance()->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()),
+						 this, SLOT(update()));
 
 	assert(ret);
 }
@@ -646,12 +652,16 @@ void LineTestViewer::hideEvent(QHideEvent *e)
 {
 	TApp *app = TApp::instance();
 
-	disconnect(TApp::instance()->getCurrentObject(), SIGNAL(objectSwitched()), this, SLOT(update()));
-	disconnect(TApp::instance()->getCurrentObject(), SIGNAL(objectChanged(bool)), this, SLOT(update()));
+	disconnect(TApp::instance()->getCurrentObject(), SIGNAL(objectSwitched()), this,
+			   SLOT(update()));
+	disconnect(TApp::instance()->getCurrentObject(), SIGNAL(objectChanged(bool)), this,
+			   SLOT(update()));
 
-	disconnect(TApp::instance()->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
+	disconnect(TApp::instance()->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
+			   SLOT(update()));
 
-	disconnect(TApp::instance()->getCurrentLevel(), SIGNAL(xshLevelChanged()), this, SLOT(update()));
+	disconnect(TApp::instance()->getCurrentLevel(), SIGNAL(xshLevelChanged()), this,
+			   SLOT(update()));
 
 	TFrameHandle *frameHandle = app->getCurrentFrame();
 	disconnect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(update()));
@@ -664,7 +674,8 @@ void LineTestViewer::hideEvent(QHideEvent *e)
 	disconnect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(onSceneSwitched()));
 	disconnect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(update()));
 
-	disconnect(TApp::instance()->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
+	disconnect(TApp::instance()->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
+			   SLOT(update()));
 
 	QWidget::hideEvent(e);
 }
@@ -673,7 +684,7 @@ void LineTestViewer::hideEvent(QHideEvent *e)
 
 void LineTestViewer::leaveEvent(QEvent *)
 {
-	//update();
+	// update();
 	QApplication::restoreOverrideCursor();
 }
 
@@ -682,7 +693,7 @@ void LineTestViewer::leaveEvent(QEvent *)
 void LineTestViewer::enterEvent(QEvent *)
 {
 	QApplication::setOverrideCursor(Qt::ForbiddenCursor);
-	//update();
+	// update();
 	setFocus();
 }
 
@@ -691,7 +702,7 @@ void LineTestViewer::enterEvent(QEvent *)
 void LineTestViewer::mouseMoveEvent(QMouseEvent *event)
 {
 	if (m_mouseButton == Qt::MidButton) {
-		//panning
+		// panning
 		QPoint curPos = event->pos();
 		panQt(curPos - m_pos);
 		m_pos = curPos;
@@ -778,7 +789,8 @@ void LineTestViewer::zoomQt(bool forward, bool reset)
 	double scale2 = m_viewAffine.det();
 	if (reset || ((scale2 < 256 || !forward) && (scale2 > 0.001 * 0.05 || forward))) {
 		double oldZoomScale = sqrt(scale2);
-		double zoomScale = reset ? 1 : ImageUtils::getQuantizedZoomFactor(oldZoomScale / normalZoom, forward);
+		double zoomScale =
+			reset ? 1 : ImageUtils::getQuantizedZoomFactor(oldZoomScale / normalZoom, forward);
 		m_viewAffine = TScale(zoomScale * normalZoom / oldZoomScale) * m_viewAffine;
 	}
 	update();

@@ -83,26 +83,26 @@ typedef struct avl_path PATH;
 #define CORRECT(u) ((long)(u) + MINLONG)
 
 #ifdef VAX
-#define SET_STRCMP(cmp, str1, str2)                                   \
-	{                                                                 \
-		char *p1, *p2;                                       \
-		for (p1 = (str1), p2 = (str2); *p1 && *p1 == *p2; p1++, p2++) \
-			;                                                         \
-		(cmp) = *(unsigned char *)p1 - *(unsigned char *)p2;          \
+#define SET_STRCMP(cmp, str1, str2)                                                                \
+	{                                                                                              \
+		char *p1, *p2;                                                                             \
+		for (p1 = (str1), p2 = (str2); *p1 && *p1 == *p2; p1++, p2++)                              \
+			;                                                                                      \
+		(cmp) = *(unsigned char *)p1 - *(unsigned char *)p2;                                       \
 	}
 #else
-#define SET_STRCMP(cmp, str1, str2)     \
-	{                                   \
-		(cmp) = strcmp((str1), (str2)); \
+#define SET_STRCMP(cmp, str1, str2)                                                                \
+	{                                                                                              \
+		(cmp) = strcmp((str1), (str2));                                                            \
 	}
 #endif
 
-#define SET_PTRCMP(cmp, usrcmp, ptr1, ptr2)                   \
-	{                                                         \
-		if (usrcmp)                                           \
-			(cmp) = (*(usrcmp))((ptr1), (ptr2));              \
-		else                                                  \
-			SET_STRCMP((cmp), (char *)(ptr1), (char *)(ptr2)) \
+#define SET_PTRCMP(cmp, usrcmp, ptr1, ptr2)                                                        \
+	{                                                                                              \
+		if (usrcmp)                                                                                \
+			(cmp) = (*(usrcmp))((ptr1), (ptr2));                                                   \
+		else                                                                                       \
+			SET_STRCMP((cmp), (char *)(ptr1), (char *)(ptr2))                                      \
 	}
 
 #define ERROR (-1)
@@ -165,22 +165,21 @@ static void *new_memory(uint size)
 
 /*---------------------------------------------------------------------------*/
 
-#define ALLOC_OBJ(ptr, ptr_type, size, list)          \
-	{                                                 \
-		if (Free_List[list]) {                        \
-			(ptr) = (ptr_type)Free_List[list];        \
-			Free_List[list] = *(void **)(ptr);        \
-		} else if (Avail_Size >= size)                \
-			(ptr) = (ptr_type)(Avail_Base +           \
-							   (Avail_Size -= size)); \
-		else                                          \
-			(ptr) = (ptr_type)new_memory(size);       \
+#define ALLOC_OBJ(ptr, ptr_type, size, list)                                                       \
+	{                                                                                              \
+		if (Free_List[list]) {                                                                     \
+			(ptr) = (ptr_type)Free_List[list];                                                     \
+			Free_List[list] = *(void **)(ptr);                                                     \
+		} else if (Avail_Size >= size)                                                             \
+			(ptr) = (ptr_type)(Avail_Base + (Avail_Size -= size));                                 \
+		else                                                                                       \
+			(ptr) = (ptr_type)new_memory(size);                                                    \
 	}
 
-#define FREE_OBJ(ptr, list)                \
-	{                                      \
-		*(void **)(ptr) = Free_List[list]; \
-		Free_List[list] = (void *)(ptr);   \
+#define FREE_OBJ(ptr, list)                                                                        \
+	{                                                                                              \
+		*(void **)(ptr) = Free_List[list];                                                         \
+		Free_List[list] = (void *)(ptr);                                                           \
 	}
 
 #define ALLOC_NODE(node) ALLOC_OBJ(node, NODE *, SIZEOF_NODE, NODE_LIST)
@@ -200,16 +199,46 @@ TREE *avl__tree(int treetype, uint keyoffs, int (*usrcmp)(void *, void *))
 
 	keyinfo = treetype << 2;
 	switch (treetype) {
-	case AVL_NODUP_MBR: case AVL_DUP_MBR: keyinfo |= USR_CMP; break;
-	case AVL_NODUP_PTR: case AVL_DUP_PTR: keyinfo |= USR_CMP; break;
-	case AVL_NODUP_STR: case AVL_DUP_STR: keyinfo |= STR_CMP; break;
-	case AVL_NODUP_LNG: case AVL_DUP_LNG: keyinfo |= VAL_CMP; break;
-	case AVL_NODUP_INT: case AVL_DUP_INT: keyinfo |= VAL_CMP; break;
-	case AVL_NODUP_SHT: case AVL_DUP_SHT: keyinfo |= VAL_CMP; break;
-	case AVL_NODUP_ULN: case AVL_DUP_ULN: keyinfo |= COR_CMP; break;
-	case AVL_NODUP_UIN: case AVL_DUP_UIN: keyinfo |= COR_CMP; break;
-	case AVL_NODUP_USH: case AVL_DUP_USH: keyinfo |= VAL_CMP; break;
-	case AVL_NODUP_CHR: case AVL_DUP_CHR: keyinfo |= VAL_CMP; break;
+	case AVL_NODUP_MBR:
+	case AVL_DUP_MBR:
+		keyinfo |= USR_CMP;
+		break;
+	case AVL_NODUP_PTR:
+	case AVL_DUP_PTR:
+		keyinfo |= USR_CMP;
+		break;
+	case AVL_NODUP_STR:
+	case AVL_DUP_STR:
+		keyinfo |= STR_CMP;
+		break;
+	case AVL_NODUP_LNG:
+	case AVL_DUP_LNG:
+		keyinfo |= VAL_CMP;
+		break;
+	case AVL_NODUP_INT:
+	case AVL_DUP_INT:
+		keyinfo |= VAL_CMP;
+		break;
+	case AVL_NODUP_SHT:
+	case AVL_DUP_SHT:
+		keyinfo |= VAL_CMP;
+		break;
+	case AVL_NODUP_ULN:
+	case AVL_DUP_ULN:
+		keyinfo |= COR_CMP;
+		break;
+	case AVL_NODUP_UIN:
+	case AVL_DUP_UIN:
+		keyinfo |= COR_CMP;
+		break;
+	case AVL_NODUP_USH:
+	case AVL_DUP_USH:
+		keyinfo |= VAL_CMP;
+		break;
+	case AVL_NODUP_CHR:
+	case AVL_DUP_CHR:
+		keyinfo |= VAL_CMP;
+		break;
 	default:
 		return NIL;
 	}
@@ -335,8 +364,7 @@ static int rebalance(NODE **rootaddr)
 
 /*===========================================================================*/
 
-static int insert_ptr(NODE **rootaddr,
-					  NODE *node, int (*usrcmp)(void *, void *), int dup)
+static int insert_ptr(NODE **rootaddr, NODE *node, int (*usrcmp)(void *, void *), int dup)
 {
 	NODE *root = *rootaddr;
 	int cmp;
@@ -435,8 +463,7 @@ static int insert_val(NODE **rootaddr, NODE *node, int dup)
 	} else if (node->key.val > root->key.val || dup) {
 		if (root->right) {
 			ins = insert_val(&root->right, node, dup);
-		}
-		else {
+		} else {
 			root->right = node;
 			ins = DEEPER;
 		}
@@ -554,86 +581,86 @@ int avl_insert(TREE *tree, void *data)
 
 /*===========================================================================*/
 
-#define SELECT_EQ_NODUP(node, val, this) \
-	{                                    \
-		if (this < val)                  \
-			node = node->right;          \
-		else if (val < this)             \
-			node = node->left;           \
-		else                             \
-			return node->data;           \
+#define SELECT_EQ_NODUP(node, val, this)                                                           \
+	{                                                                                              \
+		if (this < val)                                                                            \
+			node = node->right;                                                                    \
+		else if (val < this)                                                                       \
+			node = node->left;                                                                     \
+		else                                                                                       \
+			return node->data;                                                                     \
 	}
 
-#define SELECT_EQ_DUP(node, val, this, save) \
-	{                                        \
-		if (this < val)                      \
-			node = node->right;              \
-		else if (val < this)                 \
-			node = node->left;               \
-		else {                               \
-			save = node;                     \
-			node = node->left;               \
-		}                                    \
+#define SELECT_EQ_DUP(node, val, this, save)                                                       \
+	{                                                                                              \
+		if (this < val)                                                                            \
+			node = node->right;                                                                    \
+		else if (val < this)                                                                       \
+			node = node->left;                                                                     \
+		else {                                                                                     \
+			save = node;                                                                           \
+			node = node->left;                                                                     \
+		}                                                                                          \
 	}
 
-#define SELECT_GE_NODUP(node, val, this, save) \
-	{                                          \
-		if (val < this) {                      \
-			save = node;                       \
-			node = node->left;                 \
-		} else if (this < val)                 \
-			node = node->right;                \
-		else                                   \
-			return node->data;                 \
+#define SELECT_GE_NODUP(node, val, this, save)                                                     \
+	{                                                                                              \
+		if (val < this) {                                                                          \
+			save = node;                                                                           \
+			node = node->left;                                                                     \
+		} else if (this < val)                                                                     \
+			node = node->right;                                                                    \
+		else                                                                                       \
+			return node->data;                                                                     \
 	}
 
-#define SELECT_GE_DUP(node, val, this, save) \
-	{                                        \
-		if (this < val)                      \
-			node = node->right;              \
-		else {                               \
-			save = node;                     \
-			node = node->left;               \
-		}                                    \
+#define SELECT_GE_DUP(node, val, this, save)                                                       \
+	{                                                                                              \
+		if (this < val)                                                                            \
+			node = node->right;                                                                    \
+		else {                                                                                     \
+			save = node;                                                                           \
+			node = node->left;                                                                     \
+		}                                                                                          \
 	}
 
-#define SELECT_GT(node, val, this, save) \
-	{                                    \
-		if (val < this) {                \
-			save = node;                 \
-			node = node->left;           \
-		} else                           \
-			node = node->right;          \
+#define SELECT_GT(node, val, this, save)                                                           \
+	{                                                                                              \
+		if (val < this) {                                                                          \
+			save = node;                                                                           \
+			node = node->left;                                                                     \
+		} else                                                                                     \
+			node = node->right;                                                                    \
 	}
 
-#define SELECT_LE_NODUP(node, val, this, save) \
-	{                                          \
-		if (this < val) {                      \
-			save = node;                       \
-			node = node->right;                \
-		} else if (val < this)                 \
-			node = node->left;                 \
-		else                                   \
-			return node->data;                 \
+#define SELECT_LE_NODUP(node, val, this, save)                                                     \
+	{                                                                                              \
+		if (this < val) {                                                                          \
+			save = node;                                                                           \
+			node = node->right;                                                                    \
+		} else if (val < this)                                                                     \
+			node = node->left;                                                                     \
+		else                                                                                       \
+			return node->data;                                                                     \
 	}
 
-#define SELECT_LE_DUP(node, val, this, save) \
-	{                                        \
-		if (val < this)                      \
-			node = node->left;               \
-		else {                               \
-			save = node;                     \
-			node = node->right;              \
-		}                                    \
+#define SELECT_LE_DUP(node, val, this, save)                                                       \
+	{                                                                                              \
+		if (val < this)                                                                            \
+			node = node->left;                                                                     \
+		else {                                                                                     \
+			save = node;                                                                           \
+			node = node->right;                                                                    \
+		}                                                                                          \
 	}
 
-#define SELECT_LT(node, val, this, save) \
-	{                                    \
-		if (this < val) {                \
-			save = node;                 \
-			node = node->right;          \
-		} else                           \
-			node = node->left;           \
+#define SELECT_LT(node, val, this, save)                                                           \
+	{                                                                                              \
+		if (this < val) {                                                                          \
+			save = node;                                                                           \
+			node = node->right;                                                                    \
+		} else                                                                                     \
+			node = node->left;                                                                     \
 	}
 
 /*---------------------------------------------------------------------------*/
@@ -662,7 +689,7 @@ void *avl__locate(TREE *tree, long keyval)
 		break;
 	case COR_NODUP:
 		keyval = CORRECT(keyval);
-		// fallthrough
+	// fallthrough
 	case VAL_NODUP:
 		while (node) {
 			SELECT_EQ_NODUP(node, keyval, node->key.val);
@@ -691,7 +718,7 @@ void *avl__locate(TREE *tree, long keyval)
 		break;
 	case COR_DUP:
 		keyval = CORRECT(keyval);
-		// fallthrough
+	// fallthrough
 	case VAL_DUP:
 		save = NIL;
 		while (node) {
@@ -732,7 +759,7 @@ void *avl__locate_ge(TREE *tree, long keyval)
 		break;
 	case COR_NODUP:
 		keyval = CORRECT(keyval);
-		// fallthrough
+	// fallthrough
 	case VAL_NODUP:
 		while (node) {
 			SELECT_GE_NODUP(node, keyval, node->key.val, save);
@@ -753,7 +780,7 @@ void *avl__locate_ge(TREE *tree, long keyval)
 		break;
 	case COR_DUP:
 		keyval = CORRECT(keyval);
-		// fallthrough
+	// fallthrough
 	case VAL_DUP:
 		while (node) {
 			SELECT_GE_DUP(node, keyval, node->key.val, save);
@@ -790,7 +817,7 @@ void *avl__locate_gt(TREE *tree, long keyval)
 		break;
 	case COR_CMP:
 		keyval = CORRECT(keyval);
-		// fallthrough
+	// fallthrough
 	case VAL_CMP:
 		while (node) {
 			SELECT_GT(node, keyval, node->key.val, save);
@@ -827,7 +854,7 @@ void *avl__locate_le(TREE *tree, long keyval)
 		break;
 	case COR_NODUP:
 		keyval = CORRECT(keyval);
-		// fallthrough
+	// fallthrough
 	case VAL_NODUP:
 		while (node) {
 			SELECT_LE_NODUP(node, keyval, node->key.val, save);
@@ -848,7 +875,7 @@ void *avl__locate_le(TREE *tree, long keyval)
 		break;
 	case COR_DUP:
 		keyval = CORRECT(keyval);
-		// fallthrough
+	// fallthrough
 	case VAL_DUP:
 		while (node) {
 			SELECT_LE_DUP(node, keyval, node->key.val, save);
@@ -885,7 +912,7 @@ void *avl__locate_lt(TREE *tree, long keyval)
 		break;
 	case COR_CMP:
 		keyval = CORRECT(keyval);
-		// fallthrough
+	// fallthrough
 	case VAL_CMP:
 		while (node) {
 			SELECT_LT(node, keyval, node->key.val, save);
@@ -961,8 +988,7 @@ static NODE *leftmost(NODE **rootaddr)
 
 /*---------------------------------------------------------------------------*/
 
-static NODE *remove_ptr(NODE **rootaddr,
-						void *keyptr, int (*usrcmp)(void *, void *), int dup)
+static NODE *remove_ptr(NODE **rootaddr, void *keyptr, int (*usrcmp)(void *, void *), int dup)
 {
 	NODE *root = *rootaddr;
 	NODE *node;
@@ -1189,7 +1215,7 @@ void *avl__remove(TREE *tree, long keyval)
 			break;
 		case COR_NODUP:
 			keyval = CORRECT(keyval);
-			// fallthrough
+		// fallthrough
 		case VAL_NODUP:
 			node = remove_val(&tree->root, keyval, NODUP);
 			break;
@@ -1201,7 +1227,7 @@ void *avl__remove(TREE *tree, long keyval)
 			break;
 		case COR_DUP:
 			keyval = CORRECT(keyval);
-			// fallthrough
+		// fallthrough
 		case VAL_DUP:
 			node = remove_val(&tree->root, keyval, DUP);
 			break;
@@ -1326,29 +1352,29 @@ void *avl_last(TREE *tree)
 
 /*---------------------------------------------------------------------------*/
 
-#define DOWN_RIGHT_OR_BREAK(node, pathright, pathnode) \
-	{                                                  \
-		if (node = node->right) {                      \
-			*++pathright = TRUE;                       \
-			*++pathnode = node;                        \
-		} else                                         \
-			break;                                     \
+#define DOWN_RIGHT_OR_BREAK(node, pathright, pathnode)                                             \
+	{                                                                                              \
+		if (node = node->right) {                                                                  \
+			*++pathright = TRUE;                                                                   \
+			*++pathnode = node;                                                                    \
+		} else                                                                                     \
+			break;                                                                                 \
 	}
 
-#define DOWN_LEFT_OR_BREAK(node, pathright, pathnode) \
-	{                                                 \
-		if (node = node->left) {                      \
-			*++pathright = FALSE;                     \
-			*++pathnode = node;                       \
-		} else                                        \
-			break;                                    \
+#define DOWN_LEFT_OR_BREAK(node, pathright, pathnode)                                              \
+	{                                                                                              \
+		if (node = node->left) {                                                                   \
+			*++pathright = FALSE;                                                                  \
+			*++pathnode = node;                                                                    \
+		} else                                                                                     \
+			break;                                                                                 \
 	}
 
-#define START_OK_AND_RETURN(path, _pathright, _pathnode) \
-	{                                                    \
-		path->pathright = _pathright;                    \
-		path->pathnode = _pathnode;                      \
-		return (*_pathnode)->data;                       \
+#define START_OK_AND_RETURN(path, _pathright, _pathnode)                                           \
+	{                                                                                              \
+		path->pathright = _pathright;                                                              \
+		path->pathnode = _pathnode;                                                                \
+		return (*_pathnode)->data;                                                                 \
 	}
 
 /*---------------------------------------------------------------------------*/
@@ -1394,35 +1420,30 @@ void *avl__start(TREE *tree, long keyval, int back)
 					saveright = pathright;
 					savenode = pathnode;
 					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
-				}
-				else if (cmp < 0) {
+				} else if (cmp < 0) {
 					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
-				}
-				else {
+				} else {
 					START_OK_AND_RETURN(path, pathright, pathnode);
 				}
 			}
-		}
-		else {
+		} else {
 			for (;;) {
 				SET_PTRCMP(cmp, usrcmp, (void *)keyval, node->key.ptr);
 				if (cmp < 0) {
 					saveright = pathright;
 					savenode = pathnode;
 					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
-				}
-				else if (cmp > 0) {
+				} else if (cmp > 0) {
 					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
-				}
-				else {
+				} else {
 					START_OK_AND_RETURN(path, pathright, pathnode);
 				}
 			}
 		}
 		break;
 	case COR_NODUP:
-			keyval = CORRECT(keyval);
-			// fallthrough
+		keyval = CORRECT(keyval);
+	// fallthrough
 	case VAL_NODUP:
 		if (back) {
 			for (;;) {
@@ -1430,26 +1451,21 @@ void *avl__start(TREE *tree, long keyval, int back)
 					saveright = pathright;
 					savenode = pathnode;
 					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
-				}
-				else if (keyval < node->key.val) {
+				} else if (keyval < node->key.val) {
 					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
-				}
-				else {
+				} else {
 					START_OK_AND_RETURN(path, pathright, pathnode);
 				}
 			}
-		}
-		else {
+		} else {
 			for (;;) {
 				if (keyval < node->key.val) {
 					saveright = pathright;
 					savenode = pathnode;
 					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
-				}
-				else if (keyval > node->key.val) {
+				} else if (keyval > node->key.val) {
 					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
-				}
-				else {
+				} else {
 					START_OK_AND_RETURN(path, pathright, pathnode);
 				}
 			}
@@ -1466,21 +1482,18 @@ void *avl__start(TREE *tree, long keyval, int back)
 					saveright = pathright;
 					savenode = pathnode;
 					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
-				}
-				else {
+				} else {
 					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
 				}
 			}
-		}
-		else {
+		} else {
 			for (;;) {
 				SET_PTRCMP(cmp, usrcmp, (void *)keyval, node->key.ptr);
 				if (cmp <= 0) {
 					saveright = pathright;
 					savenode = pathnode;
 					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
-				}
-				else {
+				} else {
 					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
 				}
 			}
@@ -1488,7 +1501,7 @@ void *avl__start(TREE *tree, long keyval, int back)
 		break;
 	case COR_DUP:
 		keyval = CORRECT(keyval);
-		// fallthrough
+	// fallthrough
 	case VAL_DUP:
 		if (back) {
 			for (;;) {
@@ -1496,20 +1509,17 @@ void *avl__start(TREE *tree, long keyval, int back)
 					saveright = pathright;
 					savenode = pathnode;
 					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
-				}
-				else {
+				} else {
 					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
 				}
 			}
-		}
-		else {
+		} else {
 			for (;;) {
 				if (keyval <= node->key.val) {
 					saveright = pathright;
 					savenode = pathnode;
 					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
-				}
-				else {
+				} else {
 					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
 				}
 			}
@@ -1889,37 +1899,33 @@ int avl_porting_problems(void)
 #endif
 //-----------------------------------------------------------------------------------------------
 
-#define CDB_TCALLOC(ptr, elem)                          \
-	{                                                   \
-		(ptr) = (void *)calloc((elem), sizeof(*(ptr))); \
+#define CDB_TCALLOC(ptr, elem)                                                                     \
+	{                                                                                              \
+		(ptr) = (void *)calloc((elem), sizeof(*(ptr)));                                            \
 	}
-#define CDB_TMALLOC(ptr, elem)                           \
-	{                                                    \
-		(ptr) = (void *)malloc((elem) * sizeof(*(ptr))); \
+#define CDB_TMALLOC(ptr, elem)                                                                     \
+	{                                                                                              \
+		(ptr) = (void *)malloc((elem) * sizeof(*(ptr)));                                           \
 	}
-#define CDB_TREALLOC(ptr, elem)                                  \
-	{                                                            \
-		(ptr) = (void *)realloc((ptr), (elem) * sizeof(*(ptr))); \
+#define CDB_TREALLOC(ptr, elem)                                                                    \
+	{                                                                                              \
+		(ptr) = (void *)realloc((ptr), (elem) * sizeof(*(ptr)));                                   \
 	}
 
-#define GET_STRING_FIELD(P, FIELD) \
-	(P ? (P->FIELD ? P->FIELD : "") : "")
+#define GET_STRING_FIELD(P, FIELD) (P ? (P->FIELD ? P->FIELD : "") : "")
 
 #define AVL_FOR(tree, p) for ((p) = avl_first(tree); (p); (p) = avl_next(tree))
-typedef struct
-	{
+typedef struct {
 	int index;
 	char *name;
 } COLOR_NAME;
 
-typedef struct
-	{
+typedef struct {
 	char *name;
 	char *value;
 } CDB_PARAM;
 
-typedef struct
-	{
+typedef struct {
 	char *name;
 	int num_params;
 	CDB_PARAM *param;
@@ -1967,9 +1973,9 @@ TREE *cdb_decode_all(char *names_in_plt_file, TCM_INFO tcm)
 	for (i = 0; i < tcm.n_colors + tcm.n_pencils; i++) {
 		CDB_TCALLOC(item, 1)
 		item->index = i;
-		//if (i < tcm.n_colors)
+		// if (i < tcm.n_colors)
 		//  item->index = TCM_COLOR_INDEX (tcm, i);
-		//else
+		// else
 		//  item->index = TCM_PENCIL_INDEX (tcm, i - tcm.n_colors);
 
 		endcol = strchr(c1, '|');

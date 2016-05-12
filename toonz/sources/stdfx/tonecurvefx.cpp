@@ -100,9 +100,8 @@ class ToneCurveFx : public TStandardRasterFx
 	TRasterFxPort m_input;
 	TToneCurveParamP m_toneCurve;
 
-public:
-	ToneCurveFx()
-		: m_toneCurve(new TToneCurveParam())
+  public:
+	ToneCurveFx() : m_toneCurve(new TToneCurveParam())
 	{
 		bindParam(this, "curve", m_toneCurve);
 		addInputPort("Source", m_input);
@@ -163,7 +162,8 @@ void doToneCurveFx(TRasterPT<PIXEL> ras, double frame, const TToneCurveParam *to
 	QList<QList<TPointD>> pointsList;
 	int e;
 	for (e = 0; e < 6; e++) {
-		TParamSet *paramSet = toneCurveParam->getParamSet(TToneCurveParam::ToneChannel(e)).getPointer();
+		TParamSet *paramSet =
+			toneCurveParam->getParamSet(TToneCurveParam::ToneChannel(e)).getPointer();
 		QList<TPointD> points = getParamSetPoints(paramSet, frame);
 		pointsList.push_back(points);
 	}

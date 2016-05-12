@@ -13,7 +13,7 @@ class DVAPI Image : public Wrapper
 	Q_OBJECT
 	TImageP m_img;
 
-public:
+  public:
 	Image();
 	Image(const TImageP img);
 	Image(TImage *img);

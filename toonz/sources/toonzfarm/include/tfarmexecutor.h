@@ -28,17 +28,17 @@ using std::string;
 
 class TFARMAPI TFarmExecutor : public TTcpIpServer
 {
-public:
+  public:
 	TFarmExecutor(int port);
 	virtual ~TFarmExecutor() {}
 
 	// TTcpIpServer overrides
 	void onReceive(int socket, const QString &data);
 
-protected:
+  protected:
 	virtual QString execute(const std::vector<QString> &argv) = 0;
 
-private:
+  private:
 	TTcpIpServer *m_tcpipServer;
 };
 

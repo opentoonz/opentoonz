@@ -18,33 +18,25 @@
 
 //-------------------------------------------------------------------
 
-//!Toonz5.0 color-map, 12+12+8 bits (ink,paint,tone)
+//! Toonz5.0 color-map, 12+12+8 bits (ink,paint,tone)
 class DVAPI TPixelCM32
 {
 	TUINT32 m_value;
 
-public:
+  public:
 	TPixelCM32() : m_value(255) {}
 	explicit TPixelCM32(TUINT32 v) : m_value(v) {}
-	TPixelCM32(int ink, int paint, int tone)
-		: m_value(ink << 20 | paint << 8 | tone)
+	TPixelCM32(int ink, int paint, int tone) : m_value(ink << 20 | paint << 8 | tone)
 	{
 		assert(0 <= ink && ink < 4096);
 		assert(0 <= paint && paint < 4096);
 		assert(0 <= tone && tone < 256);
 	}
-	TPixelCM32(const TPixelCM32 &pix)
-		: m_value(pix.m_value){};
+	TPixelCM32(const TPixelCM32 &pix) : m_value(pix.m_value){};
 
-	inline bool operator==(const TPixelCM32 &p) const
-	{
-		return m_value == p.m_value;
-	};
+	inline bool operator==(const TPixelCM32 &p) const { return m_value == p.m_value; };
 
-	inline bool operator<(const TPixelCM32 &p) const
-	{
-		return m_value < p.m_value;
-	};
+	inline bool operator<(const TPixelCM32 &p) const { return m_value < p.m_value; };
 
 	TUINT32 getValue() const { return m_value; }
 
@@ -76,8 +68,8 @@ public:
 	inline static int getPaintMask() { return 0xfff00; }
 	inline static int getInkMask() { return 0xfff00000; }
 
-	//inline bool isInk()   const {return getTone()<64;} queste funzioni erano folli!
-	//inline bool isPaint() const {return getTone()>192;}
+	// inline bool isInk()   const {return getTone()<64;} queste funzioni erano folli!
+	// inline bool isPaint() const {return getTone()>192;}
 
 	inline bool isPureInk() const { return getTone() == 0; }
 	inline bool isPurePaint() const { return getTone() == getMaxTone(); }

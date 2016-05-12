@@ -45,14 +45,11 @@ class ArrangeStylesUndo : public TUndo
 	int m_srcPageIndex;
 	std::set<int> m_srcIndicesInPage;
 
-public:
-	ArrangeStylesUndo(
-		TPalette *palette,
-		int dstPageIndex,
-		int dstIndexInPage,
-		int srcPageIndex,
-		const std::set<int> &srcIndicesInPage)
-		: m_palette(palette), m_dstPageIndex(dstPageIndex), m_dstIndexInPage(dstIndexInPage), m_srcPageIndex(srcPageIndex), m_srcIndicesInPage(srcIndicesInPage)
+  public:
+	ArrangeStylesUndo(TPalette *palette, int dstPageIndex, int dstIndexInPage, int srcPageIndex,
+					  const std::set<int> &srcIndicesInPage)
+		: m_palette(palette), m_dstPageIndex(dstPageIndex), m_dstIndexInPage(dstIndexInPage),
+		  m_srcPageIndex(srcPageIndex), m_srcIndicesInPage(srcIndicesInPage)
 	{
 		assert(m_palette);
 		assert(0 <= dstPageIndex && dstPageIndex < m_palette->getPageCount());
@@ -63,7 +60,8 @@ public:
 		assert(!srcIndicesInPage.empty());
 		TPalette::Page *srcPage = m_palette->getPage(srcPageIndex);
 		assert(srcPage);
-		assert(0 <= *srcIndicesInPage.begin() && *srcIndicesInPage.rbegin() < srcPage->getStyleCount());
+		assert(0 <= *srcIndicesInPage.begin() &&
+			   *srcIndicesInPage.rbegin() < srcPage->getStyleCount());
 	}
 	void undo() const
 	{
@@ -115,13 +113,13 @@ public:
 		TApp::instance()->getCurrentPalette()->notifyPaletteChanged();
 
 		/*
-    if(TStyleSelection *sl = dynamic_cast<TStyleSelection *>(TSelection::getCurrent())) 
-      {
-       sl->selectNone();
-       for(int h = 0; h<(int)styles.size(); h++)        
-         sl->select(m_palette, m_dstPageIndex, k+h, true);
-      }
-      */
+	if(TStyleSelection *sl = dynamic_cast<TStyleSelection *>(TSelection::getCurrent()))
+	  {
+	   sl->selectNone();
+	   for(int h = 0; h<(int)styles.size(); h++)
+		 sl->select(m_palette, m_dstPageIndex, k+h, true);
+	  }
+	  */
 	}
 	int getSize() const { return sizeof *this + m_srcIndicesInPage.size() * sizeof(int); }
 };
@@ -130,26 +128,17 @@ public:
 
 //-----------------------------------------------------------------------------
 
-void PaletteCmd::arrangeStyles(
-	TPalette *palette,
-	int dstPageIndex,
-	int dstIndexInPage,
-	int srcPageIndex,
-	const std::set<int> &srcIndicesInPage)
+void PaletteCmd::arrangeStyles(TPalette *palette, int dstPageIndex, int dstIndexInPage,
+							   int srcPageIndex, const std::set<int> &srcIndicesInPage)
 {
-	ArrangeStylesUndo *undo =
-		new ArrangeStylesUndo(
-			palette,
-			dstPageIndex,
-			dstIndexInPage,
-			srcPageIndex,
-			srcIndicesInPage);
+	ArrangeStylesUndo *undo = new ArrangeStylesUndo(palette, dstPageIndex, dstIndexInPage,
+													srcPageIndex, srcIndicesInPage);
 	undo->redo();
 	TUndoManager::manager()->add(undo);
 }
 
 //=============================================================================
-//CreateStyle
+// CreateStyle
 //-----------------------------------------------------------------------------
 namespace
 {
@@ -161,11 +150,8 @@ class CreateStyleUndo : public TUndo
 	int m_pageIndex;
 	int m_styleId;
 
-public:
-	CreateStyleUndo(
-		const TPaletteP &palette,
-		int pageIndex,
-		int styleId)
+  public:
+	CreateStyleUndo(const TPaletteP &palette, int pageIndex, int styleId)
 		: m_palette(palette), m_pageIndex(pageIndex), m_styleId(styleId)
 	{
 		assert(m_palette);
@@ -196,9 +182,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-void PaletteCmd::createStyle(
-	TPalette *palette,
-	TPalette::Page *page)
+void PaletteCmd::createStyle(TPalette *palette, TPalette::Page *page)
 {
 	int index = TApp::instance()->getCurrentPalette()->getStyleIndex();
 	int newIndex;
@@ -214,13 +198,15 @@ void PaletteCmd::createStyle(
 	else
 		TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 
-	TStyleSelection *styleSelection = dynamic_cast<TStyleSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
+	TStyleSelection *styleSelection =
+		dynamic_cast<TStyleSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
 	if (!styleSelection)
 		styleSelection = new TStyleSelection();
 	styleSelection->select(palette, page->getIndex(), newIndex, true);
 	TApp::instance()->getCurrentPalette()->setStyleIndex(page->getStyleId(newIndex));
 	TApp::instance()->getCurrentPalette()->notifyPaletteChanged();
-	TUndoManager::manager()->add(new CreateStyleUndo(palette, page->getIndex(), page->getStyleId(newIndex)));
+	TUndoManager::manager()->add(
+		new CreateStyleUndo(palette, page->getIndex(), page->getStyleId(newIndex)));
 }
 
 //=============================================================================
@@ -237,12 +223,9 @@ class AddPageUndo : public TUndo
 	wstring m_pageName;
 	std::vector<std::pair<TColorStyle *, int>> m_styles;
 
-public:
+  public:
 	// creare DOPO l'inserimento
-	AddPageUndo(
-		const TPaletteP &palette,
-		int pageIndex,
-		wstring pageName)
+	AddPageUndo(const TPaletteP &palette, int pageIndex, wstring pageName)
 		: m_palette(palette), m_pageIndex(pageIndex), m_pageName(pageName)
 	{
 		assert(m_palette);
@@ -315,7 +298,7 @@ class DestroyPageUndo : public TUndo
 	wstring m_pageName;
 	std::vector<int> m_styles;
 
-public:
+  public:
 	DestroyPageUndo(const TPaletteP &palette, int pageIndex)
 		: m_palette(palette), m_pageIndex(pageIndex)
 	{
@@ -349,9 +332,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-void PaletteCmd::destroyPage(
-	TPalette *palette,
-	int pageIndex)
+void PaletteCmd::destroyPage(TPalette *palette, int pageIndex)
 {
 	assert(0 <= pageIndex && pageIndex < palette->getPageCount());
 	TUndoManager::manager()->add(new DestroyPageUndo(palette, pageIndex));
@@ -376,13 +357,9 @@ class AddStylesUndo : public TUndo
 	int m_indexInPage;
 	std::vector<std::pair<TColorStyle *, int>> m_styles;
 
-public:
+  public:
 	// creare DOPO l'inserimento
-	AddStylesUndo(
-		const TPaletteP &palette,
-		int pageIndex,
-		int indexInPage,
-		int count)
+	AddStylesUndo(const TPaletteP &palette, int pageIndex, int indexInPage, int count)
 		: m_palette(palette), m_pageIndex(pageIndex), m_indexInPage(indexInPage)
 	{
 		assert(m_palette);
@@ -429,9 +406,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-void PaletteCmd::addStyles(const TPaletteP &palette,
-						   int pageIndex,
-						   int indexInPage,
+void PaletteCmd::addStyles(const TPaletteP &palette, int pageIndex, int indexInPage,
 						   const std::vector<TColorStyle *> &styles)
 {
 	assert(0 <= pageIndex && pageIndex < palette->getPageCount());
@@ -460,27 +435,12 @@ class SetReferenceImageUndo : public TUndo
 	TPaletteP m_palette;
 	TPaletteP m_oldPalette, m_newPalette;
 
-public:
-	SetReferenceImageUndo(TPaletteP palette)
-		: m_palette(palette), m_oldPalette(palette->clone())
-	{
-	}
-	void onAdd()
-	{
-		m_newPalette = m_palette->clone();
-	}
-	void undo() const
-	{
-		m_palette->assign(m_oldPalette.getPointer());
-	}
-	void redo() const
-	{
-		m_palette->assign(m_newPalette.getPointer());
-	}
-	int getSize() const
-	{
-		return sizeof(*this) + sizeof(TPalette) * 2;
-	}
+  public:
+	SetReferenceImageUndo(TPaletteP palette) : m_palette(palette), m_oldPalette(palette->clone()) {}
+	void onAdd() { m_newPalette = m_palette->clone(); }
+	void undo() const { m_palette->assign(m_oldPalette.getPointer()); }
+	void redo() const { m_palette->assign(m_newPalette.getPointer()); }
+	int getSize() const { return sizeof(*this) + sizeof(TPalette) * 2; }
 };
 
 //===================================================================
@@ -526,7 +486,8 @@ int loadRefImage(TPaletteP levelPalette, const TFilePath &_fp, int &index)
 					if (paletteAlreadyLoaded || level->getPalette() != 0)
 						img->setPalette(level->getPalette());
 					else if ((fp.getType() == "tzp" || fp.getType() == "tzu"))
-						img->setPalette(ToonzImageUtils::loadTzPalette(fp.withType("plt").withNoFrame()));
+						img->setPalette(
+							ToonzImageUtils::loadTzPalette(fp.withType("plt").withNoFrame()));
 				}
 			}
 		} else
@@ -556,7 +517,7 @@ int loadRefImage(TPaletteP levelPalette, const TFilePath &_fp, int &index)
 				std::set<TPixel32> colors;
 				int colorCount = 256;
 				TColorUtils::buildPalette(colors, raster, colorCount);
-				colors.erase(TPixel::Black); //il nero viene messo dal costruttore della TPalette
+				colors.erase(TPixel::Black); // il nero viene messo dal costruttore della TPalette
 				imagePalette = new TPalette();
 				std::set<TPixel32>::const_iterator it = colors.begin();
 				for (; it != colors.end(); ++it)
@@ -583,7 +544,7 @@ int loadRefImage(TPaletteP levelPalette, const TFilePath &_fp, int &index)
 	levelPalette->setRefImg(img);
 	levelPalette->setRefImgPath(fp);
 
-	//DAFARE ovviamente non e' la notifica corretta,
+	// DAFARE ovviamente non e' la notifica corretta,
 	//			 ma senza non aggiorna il palette viewer della studio palette e crash!
 	TApp *app = TApp::instance();
 	app->getCurrentPalette()->notifyPaletteChanged();
@@ -601,7 +562,9 @@ int loadRefImage(TPaletteP levelPalette, const TFilePath &_fp, int &index)
 
 int PaletteCmd::loadReferenceImage(const TFilePath &_fp, int &index)
 {
-	TPaletteP levelPalette = TApp::instance()->getCurrentPalette()->getPalette(); //ColorController::instance()->getLevelPalette();
+	TPaletteP levelPalette = TApp::instance()
+								 ->getCurrentPalette()
+								 ->getPalette(); // ColorController::instance()->getLevelPalette();
 	if (!levelPalette)
 		return 2;
 
@@ -621,13 +584,14 @@ int PaletteCmd::loadReferenceImage(const TFilePath &_fp, int &index)
 // loadReferenceImageInStdPlt
 //-------------------------------------------------------------------
 
-//DA FARE: togli una volta sistemata la studiopalette corrente.
+// DA FARE: togli una volta sistemata la studiopalette corrente.
 #include "studiopaletteviewer.h"
 #include "toonz/studiopalette.h"
 int PaletteCmd::loadReferenceImageInStdPlt(const TFilePath &_fp, int &index)
 {
-	//DAFARE
-	TPaletteP levelPalette = DAFARE::getCurrentStudioPalette(); //TApp::instance()->getCurrentPalette()->getPalette();//ColorController::instance()->getLevelPalette();
+	// DAFARE
+	TPaletteP levelPalette = DAFARE::
+		getCurrentStudioPalette(); // TApp::instance()->getCurrentPalette()->getPalette();//ColorController::instance()->getLevelPalette();
 	if (!levelPalette)
 		return 2;
 
@@ -648,7 +612,9 @@ int PaletteCmd::loadReferenceImageInStdPlt(const TFilePath &_fp, int &index)
 
 void PaletteCmd::removeReferenceImage()
 {
-	TPaletteP levelPalette = TApp::instance()->getCurrentPalette()->getPalette(); //ColorController::instance()->getLevelPalette();
+	TPaletteP levelPalette = TApp::instance()
+								 ->getCurrentPalette()
+								 ->getPalette(); // ColorController::instance()->getLevelPalette();
 	if (!levelPalette)
 		return;
 	TUndo *undo = new SetReferenceImageUndo(levelPalette);

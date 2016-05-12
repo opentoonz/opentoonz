@@ -22,7 +22,7 @@
 
 /*============================================================================================
 
-    Explanation
+	Explanation
 
   Despeckling is a noise-removal procedure which aims at eliminating small blots of color
   from an image.
@@ -52,11 +52,11 @@ namespace
 
 class InkSelectorCM32
 {
-public:
+  public:
 	typedef TPixelCM32 pixel_type;
 	typedef TUINT32 value_type;
 
-public:
+  public:
 	InkSelectorCM32() {}
 
 	value_type transparent() const { return 0; }
@@ -70,16 +70,15 @@ public:
 
 //------------------------------------------------------------------------------------------
 
-template <typename PIXEL, typename CHANNEL>
-class InkSelectorRGBM
+template <typename PIXEL, typename CHANNEL> class InkSelectorRGBM
 {
 	bool m_transparentIsWhite;
 
-public:
+  public:
 	typedef PIXEL pixel_type;
 	typedef CHANNEL value_type;
 
-public:
+  public:
 	InkSelectorRGBM(bool transparentIsWhite) : m_transparentIsWhite(transparentIsWhite) {}
 
 	value_type transparent() const { return 0; }
@@ -99,20 +98,22 @@ public:
 
 //------------------------------------------------------------------------------------------
 
-template <typename PIXEL, typename CHANNEL>
-class InkSelectorGR
+template <typename PIXEL, typename CHANNEL> class InkSelectorGR
 {
-public:
+  public:
 	typedef PIXEL pixel_type;
 	typedef CHANNEL value_type;
 
-public:
+  public:
 	InkSelectorGR() {}
 
 	value_type transparent() const { return PIXEL::maxChannelValue; }
 	bool transparent(const pixel_type &pix) const { return value(pix) == 0; }
 
-	value_type value(const pixel_type &pix) const { return (pix.value == PIXEL::maxChannelValue) ? 0 : 1; }
+	value_type value(const pixel_type &pix) const
+	{
+		return (pix.value == PIXEL::maxChannelValue) ? 0 : 1;
+	}
 	bool equal(const pixel_type &a, const pixel_type &b) const { return value(a) == value(b); }
 
 	bool skip(const value_type &prevLeftValue, const value_type &leftValue) const { return true; }
@@ -130,7 +131,7 @@ struct Border {
 
 	void addPoint(const TPoint &p)
 	{
-		//Update the region box
+		// Update the region box
 		if (p.x < m_x0)
 			m_x0 = p.x;
 		if (p.x > m_x1)
@@ -140,7 +141,7 @@ struct Border {
 		if (p.y > m_y1)
 			m_y1 = p.y;
 
-		//Add the vertex
+		// Add the vertex
 		m_points.push_back(p);
 	}
 
@@ -159,17 +160,16 @@ struct Border {
 //    Borders Painter
 //========================================================================
 
-template <typename Pix>
-class BordersPainter
+template <typename Pix> class BordersPainter
 {
-public:
+  public:
 	typedef Pix pixel_type;
 
-protected:
+  protected:
 	TRasterPT<pixel_type> m_ras;
 	RunsMapP m_runsMap;
 
-public:
+  public:
 	BordersPainter(const TRasterPT<pixel_type> &ras) : m_ras(ras) {}
 
 	const TRasterPT<pixel_type> &ras() { return m_ras; }
@@ -184,14 +184,13 @@ public:
 			paintBorder(*borders[i]);
 	}
 
-protected:
+  protected:
 	virtual void paintPixel(pixel_type *pix) const = 0;
 };
 
 //---------------------------------------------------------------------------------------------
 
-template <typename Pix>
-void BordersPainter<Pix>::paintBorder(const Border &border) const
+template <typename Pix> void BordersPainter<Pix>::paintBorder(const Border &border) const
 {
 	const std::vector<TPoint> &points = border.m_points;
 
@@ -205,8 +204,7 @@ void BordersPainter<Pix>::paintBorder(const Border &border) const
 
 //---------------------------------------------------------------------------------------------
 
-template <typename Pix>
-void BordersPainter<Pix>::paintLine(int x, int y0, int y1) const
+template <typename Pix> void BordersPainter<Pix>::paintLine(int x, int y0, int y1) const
 {
 	for (int j = y0; j < y1; ++j) {
 		TPixelGR8 *runPix = m_runsMap->pixels(j) + x;
@@ -216,7 +214,7 @@ void BordersPainter<Pix>::paintLine(int x, int y0, int y1) const
 			if (runPix->value & TRop::borders::_HIERARCHY_INCREASE)
 				++hierarchy;
 
-			//Update vars
+			// Update vars
 			runLength += l = m_runsMap->runLength(runPix);
 			runPix += l;
 
@@ -237,21 +235,20 @@ void BordersPainter<Pix>::paintLine(int x, int y0, int y1) const
 
 class DespecklingReader
 {
-protected:
+  protected:
 	std::deque<Border *> m_borders;
 	Border m_border;
 
 	int m_sizeTol;
 
-public:
+  public:
 	DespecklingReader(int sizeTol) : m_sizeTol(sizeTol) {}
 	~DespecklingReader();
 
 	int sizeTol() const { return m_sizeTol; }
 	bool isSpeckle(const Border &border)
 	{
-		return border.m_x1 - border.m_x0 <= m_sizeTol &&
-			   border.m_y1 - border.m_y0 <= m_sizeTol;
+		return border.m_x1 - border.m_x0 <= m_sizeTol && border.m_y1 - border.m_y0 <= m_sizeTol;
 	}
 
 	void openContainer(const TPoint &pos);
@@ -300,16 +297,20 @@ void DespecklingReader::closeContainer()
 //    Replace Painters
 //========================================================================
 
-template <typename Pix>
-class ReplacePainter : public BordersPainter<Pix>
+template <typename Pix> class ReplacePainter : public BordersPainter<Pix>
 {
 	typename ReplacePainter::pixel_type m_color;
 
-public:
+  public:
 	ReplacePainter(const TRasterPT<typename ReplacePainter::pixel_type> &ras)
-		: BordersPainter<Pix>(ras) {}
-	ReplacePainter(const TRasterPT<typename ReplacePainter::pixel_type> &ras, const typename ReplacePainter::pixel_type &color)
-		: BordersPainter<Pix>(ras), m_color(color) {}
+		: BordersPainter<Pix>(ras)
+	{
+	}
+	ReplacePainter(const TRasterPT<typename ReplacePainter::pixel_type> &ras,
+				   const typename ReplacePainter::pixel_type &color)
+		: BordersPainter<Pix>(ras), m_color(color)
+	{
+	}
 
 	const typename ReplacePainter::pixel_type &color() const { return m_color; }
 	typename ReplacePainter::pixel_type &color() { return m_color; }
@@ -319,17 +320,20 @@ public:
 
 //---------------------------------------------------------------------------------------------
 
-template <>
-class ReplacePainter<TPixelCM32> : public BordersPainter<TPixelCM32>
+template <> class ReplacePainter<TPixelCM32> : public BordersPainter<TPixelCM32>
 {
 	TUINT32 m_value;
 	TUINT32 m_keepMask;
 
-public:
+  public:
 	ReplacePainter(const TRasterPT<pixel_type> &ras)
-		: BordersPainter<TPixelCM32>(ras), m_value(0), m_keepMask(0) {}
+		: BordersPainter<TPixelCM32>(ras), m_value(0), m_keepMask(0)
+	{
+	}
 	ReplacePainter(const TRasterPT<pixel_type> &ras, TUINT32 value, TUINT32 keepMask)
-		: BordersPainter<TPixelCM32>(ras), m_value(value), m_keepMask(keepMask) {}
+		: BordersPainter<TPixelCM32>(ras), m_value(value), m_keepMask(keepMask)
+	{
+	}
 
 	const TUINT32 &value() const { return m_value; }
 	TUINT32 &value() { return m_value; }
@@ -337,25 +341,27 @@ public:
 	const TUINT32 &keepMask() const { return m_keepMask; }
 	TUINT32 &keepMask() { return m_keepMask; }
 
-	void paintPixel(pixel_type *pix) const { *pix = TPixelCM32(m_value | (pix->getValue() & m_keepMask)); }
+	void paintPixel(pixel_type *pix) const
+	{
+		*pix = TPixelCM32(m_value | (pix->getValue() & m_keepMask));
+	}
 };
 
 //========================================================================
 //    Isolated Despeckling
 //========================================================================
 
-template <typename PixelSelector>
-class IsolatedReader : public DespecklingReader
+template <typename PixelSelector> class IsolatedReader : public DespecklingReader
 {
-public:
+  public:
 	typedef typename PixelSelector::pixel_type pixel_type;
 	typedef typename PixelSelector::value_type value_type;
 
-private:
+  private:
 	const PixelSelector &m_selector;
 	bool m_ok;
 
-public:
+  public:
 	IsolatedReader(const PixelSelector &selector, int sizeTol);
 
 	void openContainer(const RasterEdgeIterator<PixelSelector> &it);
@@ -399,14 +405,13 @@ void IsolatedReader<PixelSelector>::addElement(const RasterEdgeIterator<PixelSel
 
 //---------------------------------------------------------------------------------------------
 
-template <typename PixelSelector>
-void IsolatedReader<PixelSelector>::closeContainer()
+template <typename PixelSelector> void IsolatedReader<PixelSelector>::closeContainer()
 {
 	if (m_ok)
 		DespecklingReader::closeContainer();
 }
 
-} //namespace
+} // namespace
 
 //*********************************************************************************************************
 //    Despeckling Mains
@@ -449,8 +454,9 @@ void doDespeckleCM32(const TRasterPT<TPixelCM32> &ras, int sizeThreshold, bool c
 
 	InkSelectorCM32 selector;
 	IsolatedReader<InkSelectorCM32> reader(selector, sizeThreshold);
-	ReplacePainter<TPixelCM32> painter(rasCM, check ? 0xffffff00 : 0x000000ff, 0); // 0xffffff00 is a special non-mapped full ink pixel
-																				   // 0x000000ff is a full transparent paint pixel
+	ReplacePainter<TPixelCM32> painter(rasCM, check ? 0xffffff00 : 0x000000ff,
+									   0); // 0xffffff00 is a special non-mapped full ink pixel
+										   // 0x000000ff is a full transparent paint pixel
 	TRop::borders::readBorders(rasCM, selector, reader, &painter.runsMap());
 	painter.paintBorders(reader.borders());
 
@@ -505,19 +511,20 @@ void TRop::despeckle(const TRasterP &rout, const TRasterP &rin, int sizeThreshol
 namespace
 {
 
-template <typename PixelSelector>
-class FillingReader : public DespecklingReader
+template <typename PixelSelector> class FillingReader : public DespecklingReader
 {
-public:
+  public:
 	typedef typename PixelSelector::pixel_type pixel_type;
 	typedef typename PixelSelector::value_type value_type;
 
-private:
+  private:
 	ReplacePainter<TPixelGR8> m_painter;
 
-public:
+  public:
 	FillingReader(const TRasterGR8P &rasGR, int sizeTol)
-		: DespecklingReader(sizeTol), m_painter(rasGR, TPixelGR8::Black) {}
+		: DespecklingReader(sizeTol), m_painter(rasGR, TPixelGR8::Black)
+	{
+	}
 
 	void openContainer(const RasterEdgeIterator<PixelSelector> &it);
 	void addElement(const RasterEdgeIterator<PixelSelector> &it);
@@ -544,8 +551,7 @@ void FillingReader<PixelSelector>::addElement(const RasterEdgeIterator<PixelSele
 
 //---------------------------------------------------------------------------------------------
 
-template <typename PixelSelector>
-void FillingReader<PixelSelector>::closeContainer()
+template <typename PixelSelector> void FillingReader<PixelSelector>::closeContainer()
 {
 	if (isSpeckle(m_border))
 		m_painter.paintBorder(m_border);
@@ -557,20 +563,18 @@ void FillingReader<PixelSelector>::closeContainer()
 
 inline TPoint direction(const TPoint &a, const TPoint &b)
 {
-	return TPoint((b.x > a.x) ? 1 : (b.x < a.x) ? -1 : 0,
-				  (b.y > a.y) ? 1 : (b.y < a.y) ? -1 : 0);
+	return TPoint((b.x > a.x) ? 1 : (b.x < a.x) ? -1 : 0, (b.y > a.y) ? 1 : (b.y < a.y) ? -1 : 0);
 }
 
 //---------------------------------------------------------------------------------------------
 
 template <typename Pixel, typename PixelSelector>
-bool majority(const TRasterPT<Pixel> ras, const TRasterGR8P &rasGR,
-			  const PixelSelector &selector, const Border &border,
-			  typename PixelSelector::value_type &color)
+bool majority(const TRasterPT<Pixel> ras, const TRasterGR8P &rasGR, const PixelSelector &selector,
+			  const Border &border, typename PixelSelector::value_type &color)
 {
 	typedef typename PixelSelector::value_type value_type;
 
-	//Build a histogram of all found colors around the border
+	// Build a histogram of all found colors around the border
 	std::map<value_type, int> histogram;
 
 	Pixel *pix, *basePix = ras->pixels(0);
@@ -580,11 +584,11 @@ bool majority(const TRasterPT<Pixel> ras, const TRasterGR8P &rasGR,
 
 	assert(border.m_points[1].y > border.m_points[0].y);
 
-	//Iterate the raster along the border
+	// Iterate the raster along the border
 	const std::vector<TPoint> &points = border.m_points;
 
-	RasterEdgeIterator<PixelSelector>
-		start(ras, selector, points[0], direction(points[0], points[1])),
+	RasterEdgeIterator<PixelSelector> start(ras, selector, points[0],
+											direction(points[0], points[1])),
 		it(start);
 
 	size_t next = 1, size = points.size();
@@ -609,7 +613,7 @@ bool majority(const TRasterPT<Pixel> ras, const TRasterGR8P &rasGR,
 	} while (it != start);
 
 	if (!histogram.empty()) {
-		//Return the most found color
+		// Return the most found color
 		color = histogram.begin()->first;
 		return true;
 	}
@@ -619,8 +623,7 @@ bool majority(const TRasterPT<Pixel> ras, const TRasterGR8P &rasGR,
 
 //---------------------------------------------------------------------------------------------
 
-template <typename Pix>
-void majorityDespeckle(const TRasterPT<Pix> &ras, int sizeThreshold)
+template <typename Pix> void majorityDespeckle(const TRasterPT<Pix> &ras, int sizeThreshold)
 {
 	typedef typename TRop::borders::PixelSelector<Pix> pixel_selector;
 	typedef typename pixel_selector::pixel_type pixel_type;
@@ -628,30 +631,30 @@ void majorityDespeckle(const TRasterPT<Pix> &ras, int sizeThreshold)
 
 	ras->lock();
 
-	//Use a temporary bitmap (well, a bytemap - for now?) to store the found speckles
+	// Use a temporary bitmap (well, a bytemap - for now?) to store the found speckles
 	TRasterGR8P rasGR(ras->getSize());
 	rasGR->fill(TPixelGR8::White);
 
-	//Find the speckles and draw them on the bitmap
+	// Find the speckles and draw them on the bitmap
 	pixel_selector selector;
 	FillingReader<pixel_selector> reader(rasGR, sizeThreshold);
 
 	TRop::borders::readBorders(ras, selector, reader, &reader.runsMap());
 
-	//Now, operate each speckle. Try to apply a majority color to the speckle
+	// Now, operate each speckle. Try to apply a majority color to the speckle
 	ReplacePainter<pixel_type> painter(ras);
 	painter.runsMap() = reader.runsMap();
 
 	ReplacePainter<TPixelGR8> painterGR(rasGR, TPixelGR8::White);
 	painterGR.runsMap() = reader.runsMap();
 
-	std::deque<Border *> borders = reader.borders(); //Note that the DEEP copy is NEEDED
+	std::deque<Border *> borders = reader.borders(); // Note that the DEEP copy is NEEDED
 
 	int processedCount = 1;
 	while (processedCount > 0 && !borders.empty()) {
 		processedCount = 0;
 
-		//Traverse the speckles list. Try to apply majority.
+		// Traverse the speckles list. Try to apply majority.
 		Border *current, *last = borders.back();
 
 		do {
@@ -671,7 +674,7 @@ void majorityDespeckle(const TRasterPT<Pix> &ras, int sizeThreshold)
 		} while (current != last);
 	}
 
-	//Speckles may remain. In this case, fill with transparent.
+	// Speckles may remain. In this case, fill with transparent.
 	painter.color() = selector.transparent();
 	while (!borders.empty()) {
 		Border *current = borders.front();
@@ -682,7 +685,7 @@ void majorityDespeckle(const TRasterPT<Pix> &ras, int sizeThreshold)
 	ras->unlock();
 }
 
-} //namespace
+} // namespace
 
 //================================================================================================
 
@@ -714,7 +717,7 @@ void TRop::majorityDespeckle(const TRasterP &ras, int sizeThreshold)
 
 	TRasterCM32P rasCM32(ras);
 	if (rasCM32) {
-		//Not yet implemented
+		// Not yet implemented
 		assert(false);
 
 		//::majorityDespeckleCM(rasCM32, sizeThreshold, toneTol);

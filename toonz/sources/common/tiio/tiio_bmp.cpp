@@ -19,8 +19,7 @@ namespace
 
 //=========================================================
 
-typedef struct
-	{
+typedef struct {
 	UINT bfSize;
 	UINT bfOffBits;
 	UINT biSize;
@@ -50,8 +49,7 @@ const int BMP_BI_RLE4 = 2;
 
 UINT getshort(FILE *fp)
 {
-	int c = getc(fp),
-		c1 = getc(fp);
+	int c = getc(fp), c1 = getc(fp);
 
 	return ((UINT)c) + (((UINT)c1) << 8);
 }
@@ -60,23 +58,16 @@ UINT getshort(FILE *fp)
 
 UINT getint(FILE *fp)
 {
-	int c = getc(fp),
-		c1 = getc(fp),
-		c2 = getc(fp),
-		c3 = getc(fp);
+	int c = getc(fp), c1 = getc(fp), c2 = getc(fp), c3 = getc(fp);
 
-	return (((UINT)c) << 0) +
-		   (((UINT)c1) << 8) +
-		   (((UINT)c2) << 16) +
-		   (((UINT)c3) << 24);
+	return (((UINT)c) << 0) + (((UINT)c1) << 8) + (((UINT)c2) << 16) + (((UINT)c3) << 24);
 }
 
 //---------------------------------------------------------
 
 void putshort(FILE *fp, int i)
 {
-	int c = (((UINT)i)) & 0xff,
-		c1 = (((UINT)i) >> 8) & 0xff;
+	int c = (((UINT)i)) & 0xff, c1 = (((UINT)i) >> 8) & 0xff;
 
 	putc(c, fp);
 	putc(c1, fp);
@@ -86,9 +77,7 @@ void putshort(FILE *fp, int i)
 
 void putint(FILE *fp, int i)
 {
-	int c = ((UINT)i) & 0xff,
-		c1 = (((UINT)i) >> 8) & 0xff,
-		c2 = (((UINT)i) >> 16) & 0xff,
+	int c = ((UINT)i) & 0xff, c1 = (((UINT)i) >> 8) & 0xff, c2 = (((UINT)i) >> 16) & 0xff,
 		c3 = (((UINT)i) >> 24) & 0xff;
 
 	putc(c, fp);
@@ -114,7 +103,7 @@ class BmpReader : public Tiio::Reader
 	typedef int (BmpReader::*ReadLineMethod)(char *buffer, int x0, int x1, int shrink);
 	ReadLineMethod m_readLineMethod;
 
-public:
+  public:
 	BmpReader();
 	~BmpReader();
 
@@ -124,7 +113,7 @@ public:
 
 	void skipBytes(int count)
 	{
-		//fseek(m_chan, count, SEEK_CUR);	//inefficiente se count è piccolo
+		// fseek(m_chan, count, SEEK_CUR);	//inefficiente se count è piccolo
 		for (int i = 0; i < count; i++) {
 			getc(m_chan);
 		}
@@ -148,16 +137,13 @@ public:
 		return lineCount;
 	}
 
-private:
+  private:
 	void readHeader();
 };
 
 //---------------------------------------------------------
 
-BmpReader::BmpReader()
-	: m_chan(0)
-	, m_corrupted(false)
-	, m_readLineMethod(&BmpReader::readNoLine)
+BmpReader::BmpReader() : m_chan(0), m_corrupted(false), m_readLineMethod(&BmpReader::readNoLine)
 {
 	memset(&m_header, 0, sizeof m_header);
 }
@@ -205,8 +191,7 @@ void BmpReader::readHeader()
 	m_header.bfOffBits = getint(m_chan);
 	m_header.biSize = getint(m_chan);
 
-	if ((int)m_header.biSize == BMP_WIN_SIZE ||
-		(int)m_header.biSize == BMP_OS2_SIZE) {
+	if ((int)m_header.biSize == BMP_WIN_SIZE || (int)m_header.biSize == BMP_OS2_SIZE) {
 		m_header.biWidth = getint(m_chan);
 		m_header.biHeight = getint(m_chan);
 		m_header.biPlanes = getshort(m_chan);
@@ -226,11 +211,8 @@ void BmpReader::readHeader()
 
 		/* Not in old versions so have to compute them */
 		m_header.biSizeImage =
-			(((m_header.biPlanes * m_header.biBitCount *
-			   m_header.biWidth) +
-			  31) /
-			 32) *
-			4 * m_header.biHeight;
+			(((m_header.biPlanes * m_header.biBitCount * m_header.biWidth) + 31) / 32) * 4 *
+			m_header.biHeight;
 
 		m_header.biCompression = BMP_BI_RGB;
 		m_header.biXPelsPerMeter = 0;
@@ -245,22 +227,20 @@ void BmpReader::readHeader()
 
 	/*
   BMP_HEADER *hd = m_header;
-  if ((int)hd->biSize != BMP_WIN_OS2_OLD) 
+  if ((int)hd->biSize != BMP_WIN_OS2_OLD)
    {
-     // skip ahead to colormap, using biSize 
-     int c = hd->biSize - 40;  // 40 bytes read from biSize to biClrImportant
-     for (int i=0; i<c; i++) getc(m_chan);
-     hd->biPad = hd->bfOffBits - (hd->biSize + 14);
+	 // skip ahead to colormap, using biSize
+	 int c = hd->biSize - 40;  // 40 bytes read from biSize to biClrImportant
+	 for (int i=0; i<c; i++) getc(m_chan);
+	 hd->biPad = hd->bfOffBits - (hd->biSize + 14);
    }
   else
-    hd->biPad = 0;
+	hd->biPad = 0;
 */
 
 	// load up colormap, if any
 	if (m_header.biBitCount < 16) {
-		int cmaplen = (m_header.biClrUsed)
-						  ? m_header.biClrUsed
-						  : 1 << m_header.biBitCount;
+		int cmaplen = (m_header.biClrUsed) ? m_header.biClrUsed : 1 << m_header.biBitCount;
 		assert(cmaplen <= 256);
 		m_cmap.reset(new TPixel[256]);
 		TPixel32 *pix = m_cmap.get();
@@ -275,22 +255,23 @@ void BmpReader::readHeader()
 	}
 
 	/*
-  if (hd->biSize != BMP_WIN_OS2_OLD) 
+  if (hd->biSize != BMP_WIN_OS2_OLD)
    {
-     // Waste any unused bytes between the colour map (if present)
-     // and the start of the actual bitmap data. 
-     while (hd->biPad > 0) 
-      {
-        (void) getc(m_chan);
-        hd->biPad--;
-      }
+	 // Waste any unused bytes between the colour map (if present)
+	 // and the start of the actual bitmap data.
+	 while (hd->biPad > 0)
+	  {
+		(void) getc(m_chan);
+		hd->biPad--;
+	  }
    }
   */
 	// get information about the portion of the image to load
-	//get_info_region(&info, x1, y1, x2, y2, scale,
+	// get_info_region(&info, x1, y1, x2, y2, scale,
 	//		  (int)hd->biWidth,   (int)hd->biHeight, TNZ_BOTLEFT);
 
-	//   skip_bmp_lines(fp, hd->biWidth, (unsigned int)(info.startScanRow-1), (unsigned int)SEEK_CUR, subtype);
+	//   skip_bmp_lines(fp, hd->biWidth, (unsigned int)(info.startScanRow-1), (unsigned
+	//   int)SEEK_CUR, subtype);
 
 	int lx = m_info.m_lx;
 
@@ -367,7 +348,7 @@ int BmpReader::read1Line(char *buffer, int x0, int x1, int shrink)
 {
 	TPixel32 *pix = (TPixel32 *)buffer;
 
-	//pix += x0;
+	// pix += x0;
 	if (x0 > 0)
 		skipBytes(x0 / 8);
 
@@ -406,14 +387,14 @@ int BmpReader::read1Line(char *buffer, int x0, int x1, int shrink)
 	 pix +=8*shrink;
 	 if(shrink>1) value = getc(m_chan);
    //pix+=8*shrink;
-	 //if(pix+8<endPix && shrink>1) skipBytes(shrink-1); 
-  }			
+	 //if(pix+8<endPix && shrink>1) skipBytes(shrink-1);
+  }
   if(pix<endPix)
   {
    value = getc(m_chan);
    assert(pix+8>=endPix);
    for(int j=0; pix+j<endPix; j++)
-     pix[j] = m_cmap[(value>>(7-j))&1];
+	 pix[j] = m_cmap[(value>>(7-j))&1];
   }		*/
 	if ((m_info.m_lx - x1) / 8 > 0) {
 		skipBytes((m_info.m_lx - x1) / 8);
@@ -440,9 +421,9 @@ int BmpReader::read4Line(char *buffer, int x0, int x1, int shrink)
 		value = getc(m_chan);
 		pix[0] = m_cmap[value & 0xF];
 		pix[1] = m_cmap[(value >> 4) & 0xF];
-		//pix+=2*shrink;
+		// pix+=2*shrink;
 		pix++;
-		//if(pix+2<=endPix && shrink>1) skipBytes(shrink-1);
+		// if(pix+2<=endPix && shrink>1) skipBytes(shrink-1);
 	}
 	if (pix < endPix) {
 		value = getc(m_chan);
@@ -529,7 +510,7 @@ int BmpReader::read8LineRle(char *buffer, int x0, int x1, int shrink)
 	if (m_lineSize - m_info.m_lx > 0)
 		skipBytes(m_lineSize - m_info.m_lx);
 	int val = getc(m_chan);
-	assert(val == 0); //end scanline or end bmp
+	assert(val == 0); // end scanline or end bmp
 	val = getc(m_chan);
 	assert(val == 0 || val == 1);
 	return 0;
@@ -657,7 +638,7 @@ class BmpWriter : public Tiio::Writer
 	int m_bitPerPixel;
 	int m_compression;
 
-public:
+  public:
 	BmpWriter();
 	~BmpWriter();
 
@@ -670,8 +651,7 @@ public:
 
 //---------------------------------------------------------
 
-BmpWriter::BmpWriter()
-	: m_chan(0)
+BmpWriter::BmpWriter() : m_chan(0)
 {
 }
 
@@ -704,7 +684,8 @@ void BmpWriter::open(FILE *file, const TImageInfo &info)
 	std::vector<TPixel> *colormap = 0;
 
 	if (m_bitPerPixel == 8) {
-		TPointerProperty *colormapProp = (TPointerProperty *)(m_properties->getProperty("Colormap"));
+		TPointerProperty *colormapProp =
+			(TPointerProperty *)(m_properties->getProperty("Colormap"));
 		if (colormapProp) {
 			colormap = (std::vector<TPixel> *)colormapProp->getValue();
 			cmapSize = colormap->size();
@@ -716,11 +697,10 @@ void BmpWriter::open(FILE *file, const TImageInfo &info)
 
 	int bytePerLine = ((lx * m_bitPerPixel + 31) / 32) * (m_bitPerPixel == 8 ? 1 : 4);
 
-	int fileSize =
-		14				   // file header
-		+ 40			   // info header
-		+ cmapSize * 4	 // colormap size
-		+ bytePerLine * ly // image size
+	int fileSize = 14				  // file header
+				   + 40				  // info header
+				   + cmapSize * 4	 // colormap size
+				   + bytePerLine * ly // image size
 		;
 	int offset = 14 + 40 + cmapSize * 4;
 	int compression = 0;
@@ -755,7 +735,7 @@ void BmpWriter::open(FILE *file, const TImageInfo &info)
 			putc(0, m_chan);
 		}
 	else
-		for (int i = 0; i < cmapSize; i++) //palette!!
+		for (int i = 0; i < cmapSize; i++) // palette!!
 		{
 			putc(i, m_chan);
 			putc(i, m_chan);
@@ -822,8 +802,7 @@ Tiio::Writer *Tiio::makeBmpWriter()
 
 //=========================================================
 
-Tiio::BmpWriterProperties::BmpWriterProperties()
-	: m_pixelSize("Bits Per Pixel")
+Tiio::BmpWriterProperties::BmpWriterProperties() : m_pixelSize("Bits Per Pixel")
 {
 	m_pixelSize.addValue(L"24 bits");
 	m_pixelSize.addValue(L"8 bits (Greyscale)");

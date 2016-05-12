@@ -23,7 +23,7 @@
 /*!
   The TSegmentAdjuster minimizes the distance between
 
-     stroke0->getPoint(w0) and stroke1->getPoint(w1)
+	 stroke0->getPoint(w0) and stroke1->getPoint(w1)
 
   changing the values of w0 and w1 (in a defined range).
 
@@ -48,17 +48,19 @@
 
 class DVAPI TSegmentAdjuster
 {
-public:
+  public:
 	class End
 	{
-	public:
+	  public:
 		TStroke *m_stroke;
 		double m_w;
 		double m_wmin, m_wmax;
 		End() : m_stroke(0), m_w(0), m_wmin(0), m_wmax(1) {}
 		End(TStroke *stroke, double w) : m_stroke(stroke), m_w(w), m_wmin(0), m_wmax(1) {}
 		End(TStroke *stroke, double w, double wmin, double wmax)
-			: m_stroke(stroke), m_w(w), m_wmin(wmin), m_wmax(wmax) {}
+			: m_stroke(stroke), m_w(w), m_wmin(wmin), m_wmax(wmax)
+		{
+		}
 		TPointD getPoint() const { return m_stroke->getPoint(m_w); }
 		TPointD getSpeed() const { return m_stroke->getSpeed(m_w); }
 	};
@@ -72,7 +74,7 @@ public:
 
 	void compute(End &a, End &b);
 
-private:
+  private:
 	End m_a, m_b, m_c, m_d;
 	std::vector<std::pair<TPointD, TPointD>> m_links;
 	bool m_traceEnabled;

@@ -49,16 +49,13 @@ class TifReader : public Tiio::Reader
 	bool m_isTzi;
 	TRasterGR8P m_tmpRas;
 
-public:
+  public:
 	TifReader(bool isTzi);
 	~TifReader();
 
 	void open(FILE *file);
 
-	Tiio::RowOrder getRowOrder() const
-	{
-		return m_rowOrder;
-	}
+	Tiio::RowOrder getRowOrder() const { return m_rowOrder; }
 
 	virtual bool read16BitIsEnabled() const { return false; }
 	virtual void enable16BitRead(bool enabled) { is16bitEnabled = enabled; }
@@ -74,7 +71,8 @@ TifReader::TifReader(bool isTzi)
 	: m_tiff(0), m_row(0), m_rowsPerStrip(0), m_stripIndex(-1)
 	  //, m_stripBuffer(0)
 	  ,
-	  m_rowLength(0), m_xdpi(0), m_ydpi(0), m_rowOrder(Tiio::TOP2BOTTOM), is16bitEnabled(true), m_isTzi(isTzi), m_tmpRas(0)
+	  m_rowLength(0), m_xdpi(0), m_ydpi(0), m_rowOrder(Tiio::TOP2BOTTOM), is16bitEnabled(true),
+	  m_isTzi(isTzi), m_tmpRas(0)
 {
 	TIFFSetWarningHandler(0);
 }
@@ -111,17 +109,17 @@ void TifReader::open(FILE *file)
 	uint16 bps = 0, spp = 0;
 	uint32 tileWidth = 0, tileLength = 0;
 
-	//TIFFSetDirectory(m_tiff,1);
-	//TIFFGetField(m_tiff, TIFFTAG_PAGENUMBER, &pn);
-	//int pn = TIFFNumberOfDirectories(m_tiff);
-	//TIFFSetDirectory(m_tiff,1);
+	// TIFFSetDirectory(m_tiff,1);
+	// TIFFGetField(m_tiff, TIFFTAG_PAGENUMBER, &pn);
+	// int pn = TIFFNumberOfDirectories(m_tiff);
+	// TIFFSetDirectory(m_tiff,1);
 	TIFFGetField(m_tiff, TIFFTAG_IMAGEWIDTH, &w);
 	TIFFGetField(m_tiff, TIFFTAG_IMAGELENGTH, &h);
 	TIFFGetField(m_tiff, TIFFTAG_BITSPERSAMPLE, &bps);
 	TIFFGetField(m_tiff, TIFFTAG_SAMPLESPERPIXEL, &spp);
 	TIFFGetField(m_tiff, TIFFTAG_ROWSPERSTRIP, &rps);
-	//int stripCount = TIFFNumberOfStrips(m_tiff);
-	//int tileCount = TIFFNumberOfTiles(m_tiff);
+	// int stripCount = TIFFNumberOfStrips(m_tiff);
+	// int tileCount = TIFFNumberOfTiles(m_tiff);
 	TIFFGetField(m_tiff, TIFFTAG_TILEWIDTH, &tileWidth);
 	TIFFGetField(m_tiff, TIFFTAG_TILELENGTH, &tileLength);
 	Tiio::TifWriterProperties *prop = new Tiio::TifWriterProperties();
@@ -212,8 +210,8 @@ void TifReader::open(FILE *file)
 		prop->m_compressionType.setValue(TNZ_INFO_COMPRESS_DEFLATE);
 		break;
 	/*default :
-      prop->m_compressionType.setValue(TNZ_INFO_COMPRESS_UNKNOWN);
-      break;*/
+	  prop->m_compressionType.setValue(TNZ_INFO_COMPRESS_UNKNOWN);
+	  break;*/
 	default:
 		assert(0);
 	}
@@ -239,20 +237,20 @@ void TifReader::open(FILE *file)
 	m_info.m_samplePerPixel = spp;
 
 	if (bps == 64 && spp == 3)
-		bps = 16; //immagine con bpp = 192
+		bps = 16; // immagine con bpp = 192
 
-	uint16 photometric; //codice di controllo
+	uint16 photometric; // codice di controllo
 	TIFFGetField(m_tiff, TIFFTAG_PHOTOMETRIC, &photometric);
-	if (photometric == 3 && (bps == 2 || bps == 4)) //immagini con PHOTOMATRIC_PALETTE
+	if (photometric == 3 && (bps == 2 || bps == 4)) // immagini con PHOTOMATRIC_PALETTE
 		bps = 8;
 
 	if (photometric == 1 && (bps == 12 || bps == 24))
 		bps = 16;
 
 	if (bps == 6)
-		bps = 4; //immagini con bps = 6
+		bps = 4; // immagini con bps = 6
 
-	if (bps == 10 || bps == 12 || bps == 14) //immagini con bps = 10 , 12 , 14 , 24 , 32
+	if (bps == 10 || bps == 12 || bps == 14) // immagini con bps = 10 , 12 , 14 , 24 , 32
 		bps = 8;
 	if (bps == 24 || bps == 32)
 		bps = 16;
@@ -274,7 +272,7 @@ void TifReader::open(FILE *file)
 	else if (bps == 16)
 		switch (spp) {
 		case 1: /* row 0 top, col 0 lhs */
-			//prop->m_bitsPerPixel.setValue(L"16(GREYTONES)");
+			// prop->m_bitsPerPixel.setValue(L"16(GREYTONES)");
 			break;
 		case 3: /* row 0 top, col 0 lhs */
 			prop->m_bitsPerPixel.setValue(L"48(RGB)");
@@ -332,7 +330,7 @@ void TifReader::open(FILE *file)
 	if (TIFFIsTiled(m_tiff)) {
 		m_rowsPerStrip = tileLength;
 		int tilesPerRow = (w + tileWidth - 1) / tileWidth;
-		//m_rowLength = tileWidth * tilesPerRow;
+		// m_rowLength = tileWidth * tilesPerRow;
 		m_rowLength = m_info.m_lx;
 		int pixelSize = bps == 16 ? 8 : 4;
 		int stripSize = m_rowsPerStrip * m_rowLength * pixelSize;
@@ -343,9 +341,9 @@ void TifReader::open(FILE *file)
 		m_stripBuffer = m_tmpRas->getRawData();
 	} else {
 		m_rowsPerStrip = rps;
-		//if(m_rowsPerStrip<=0) m_rowsPerStrip = 1;			//potrei mettere qualsiasi valore
-		//purchè sia lo stesso in tif_getimage.c linea 2512
-		//if(m_rowsPerStrip==-1) assert(0);
+		// if(m_rowsPerStrip<=0) m_rowsPerStrip = 1;			//potrei mettere qualsiasi valore
+		// purchè sia lo stesso in tif_getimage.c linea 2512
+		// if(m_rowsPerStrip==-1) assert(0);
 
 		if (m_rowsPerStrip <= 0)
 			m_rowsPerStrip = m_info.m_ly;
@@ -360,35 +358,36 @@ void TifReader::open(FILE *file)
 
 		m_stripBuffer = m_tmpRas->getRawData();
 
-		m_rowLength = m_info.m_lx; //w;
+		m_rowLength = m_info.m_lx; // w;
 	}
 
-	/* 
+	/*
   int TIFFTileRowSize(m_tiff);
 
   m_rowsPerStrip = 0;
   if(TIFFGetField(m_tiff, TIFFTAG_ROWSPERSTRIP, &rps) )
-    {
-     int stripSize = TIFFStripSize(m_tiff);
-     if(stripSize>0)
-       {
-       }
-    }
-    */
+	{
+	 int stripSize = TIFFStripSize(m_tiff);
+	 if(stripSize>0)
+	   {
+	   }
+	}
+	*/
 	if (m_isTzi) {
 		USHORT risCount = 0;
 		USHORT *risArray = 0;
 
 		if (TIFFGetField(m_tiff, TIFFTAG_TOONZWINDOW, &risCount, &risArray)) {
-			if (m_info.m_lx == risArray[2] && m_info.m_ly == risArray[3]) //se sono diverse, la lettura tif crasha....
+			if (m_info.m_lx == risArray[2] &&
+				m_info.m_ly == risArray[3]) // se sono diverse, la lettura tif crasha....
 			{
-				//m_info.m_lx = risArray[2];
-				//m_info.m_ly = risArray[3];
+				// m_info.m_lx = risArray[2];
+				// m_info.m_ly = risArray[3];
 				m_info.m_x0 = risArray[0];
 				m_info.m_y0 = risArray[1];
 			}
 			//      USHORT extraMask = risArray[4];
-			//bool isEduFile = risArray[TOONZWINDOW_COUNT - 1] & 1;
+			// bool isEduFile = risArray[TOONZWINDOW_COUNT - 1] & 1;
 		} else {
 			m_info.m_x0 = 0;
 			m_info.m_y0 = 0;
@@ -465,10 +464,8 @@ void TifReader::readLine(short *buffer, int x0, int x1, int shrink)
 
 				// Copy the tile rows in the corresponding output strip rows
 				for (int ty = 0; ty < lastTy; ++ty) {
-					memcpy(
-						m_stripBuffer + (ty * m_rowLength + x) * pixelSize,
-						(UCHAR *)tile.get() + ty * tileWidth * pixelSize,
-						tileRowSize);
+					memcpy(m_stripBuffer + (ty * m_rowLength + x) * pixelSize,
+						   (UCHAR *)tile.get() + ty * tileWidth * pixelSize, tileRowSize);
 				}
 
 				x += tileWidth;
@@ -592,10 +589,8 @@ void TifReader::readLine(char *buffer, int x0, int x1, int shrink)
 				int tileRowSize = tmin((int)tileWidth, (int)(m_info.m_lx - x)) * pixelSize;
 
 				for (int ty = 0; ty < lastTy; ++ty) {
-					memcpy(
-						m_stripBuffer + (ty * m_rowLength + x) * pixelSize,
-						(UCHAR *)tile.get() + ty * tileWidth * pixelSize,
-						tileRowSize);
+					memcpy(m_stripBuffer + (ty * m_rowLength + x) * pixelSize,
+						   (UCHAR *)tile.get() + ty * tileWidth * pixelSize, tileRowSize);
 				}
 
 				x += tileWidth;
@@ -660,7 +655,8 @@ void TifReader::readLine(char *buffer, int x0, int x1, int shrink)
 //============================================================
 
 Tiio::TifWriterProperties::TifWriterProperties()
-	: m_byteOrdering("Byte Ordering"), m_compressionType("Compression Type"), m_bitsPerPixel("Bits Per Pixel"), m_orientation("Orientation")
+	: m_byteOrdering("Byte Ordering"), m_compressionType("Compression Type"),
+	  m_bitsPerPixel("Bits Per Pixel"), m_orientation("Orientation")
 {
 	m_byteOrdering.addValue(L"IBM PC");
 	m_byteOrdering.addValue(L"Mac");
@@ -689,9 +685,10 @@ Tiio::TifWriterProperties::TifWriterProperties()
 
 	m_bitsPerPixel.addValue(L"24(RGB)");
 	m_bitsPerPixel.addValue(L"48(RGB)");
-	m_bitsPerPixel.addValue(L" 1(BW)");		   // WATCH OUT! If you reorder this remember to look for
-	m_bitsPerPixel.addValue(L" 8(GREYTONES)"); // TRasterImage::isScanBW() usage that bpp choice index
-	//m_bitsPerPixel.addValue(L"16(GREYTONES)");                  // is HARDCODED nearby...                   -.-'
+	m_bitsPerPixel.addValue(L" 1(BW)"); // WATCH OUT! If you reorder this remember to look for
+	m_bitsPerPixel.addValue(
+		L" 8(GREYTONES)"); // TRasterImage::isScanBW() usage that bpp choice index
+	// m_bitsPerPixel.addValue(L"16(GREYTONES)");                  // is HARDCODED nearby... -.-'
 	m_bitsPerPixel.addValue(L"32(RGBM)");
 	m_bitsPerPixel.addValue(L"64(RGBM)");
 
@@ -706,7 +703,7 @@ Tiio::TifWriterProperties::TifWriterProperties()
 	m_orientation.addValue(TNZ_INFO_ORIENT_RIGHTBOT);
 	m_orientation.addValue(TNZ_INFO_ORIENT_LEFTBOT);
 
-	//m_orientation.setValue(TNZ_INFO_ORIENT_TOPLEFT);
+	// m_orientation.setValue(TNZ_INFO_ORIENT_TOPLEFT);
 
 	bind(m_byteOrdering);
 	bind(m_compressionType);
@@ -721,14 +718,14 @@ class TifWriter : public Tiio::Writer
 
 	TIFF *m_tiff;
 	int m_row;
-	//Tiio::TifWriterProperties m_properties;
+	// Tiio::TifWriterProperties m_properties;
 	unsigned char *m_lineBuffer;
 	Tiio::RowOrder m_rowOrder;
 	int m_bpp;
 	int m_RightToLeft;
 	void fillBits(UCHAR *bufout, UCHAR *bufin, int lx, int incr);
 
-public:
+  public:
 	TifWriter();
 	~TifWriter();
 
@@ -738,16 +735,12 @@ public:
 
 	void flush();
 
-	Tiio::RowOrder getRowOrder() const
-	{
-		return m_rowOrder;
-	}
+	Tiio::RowOrder getRowOrder() const { return m_rowOrder; }
 };
 
 //------------------------------------------------------------
 
-TifWriter::TifWriter()
-	: m_tiff(0), m_row(-1), m_lineBuffer(0), m_RightToLeft(false)
+TifWriter::TifWriter() : m_tiff(0), m_row(-1), m_lineBuffer(0), m_RightToLeft(false)
 {
 	TIFFSetWarningHandler(0);
 }
@@ -773,7 +766,8 @@ void TifWriter::open(FILE *file, const TImageInfo &info)
 	if (!m_properties)
 		m_properties = new Tiio::TifWriterProperties();
 
-	std::wstring byteOrdering = ((TEnumProperty *)(m_properties->getProperty("Byte Ordering")))->getValue();
+	std::wstring byteOrdering =
+		((TEnumProperty *)(m_properties->getProperty("Byte Ordering")))->getValue();
 	if (byteOrdering == L"IBM PC")
 		mode += "l";
 	else
@@ -782,9 +776,10 @@ void TifWriter::open(FILE *file, const TImageInfo &info)
 	TEnumProperty *p = (TEnumProperty *)(m_properties->getProperty("Bits Per Pixel"));
 	assert(p);
 	std::string str = toString(p->getValue());
-	//const char* str = toString(p->getValue()).c_str();
+	// const char* str = toString(p->getValue()).c_str();
 	m_bpp = atoi(str.c_str());
-	assert(m_bpp == 1 || m_bpp == 8 || m_bpp == 16 || m_bpp == 24 || m_bpp == 32 || m_bpp == 48 || m_bpp == 64);
+	assert(m_bpp == 1 || m_bpp == 8 || m_bpp == 16 || m_bpp == 24 || m_bpp == 32 || m_bpp == 48 ||
+		   m_bpp == 64);
 
 	int fd = fileno(file);
 #if 0
@@ -795,7 +790,8 @@ void TifWriter::open(FILE *file, const TImageInfo &info)
 	if (!m_tiff)
 		return;
 
-	std::wstring worientation = ((TEnumProperty *)(m_properties->getProperty("Orientation")))->getValue();
+	std::wstring worientation =
+		((TEnumProperty *)(m_properties->getProperty("Orientation")))->getValue();
 
 	int orientation;
 	if (worientation == TNZ_INFO_ORIENT_TOPLEFT)
@@ -863,7 +859,8 @@ void TifWriter::open(FILE *file, const TImageInfo &info)
 	if (m_bpp == 1)
 		TIFFSetField(m_tiff, TIFFTAG_COMPRESSION, COMPRESSION_CCITTFAX4);
 	else {
-		std::wstring compressionType = ((TEnumProperty *)(m_properties->getProperty("Compression Type")))->getValue();
+		std::wstring compressionType =
+			((TEnumProperty *)(m_properties->getProperty("Compression Type")))->getValue();
 		if (compressionType == TNZ_INFO_COMPRESS_LZW)
 			TIFFSetField(m_tiff, TIFFTAG_COMPRESSION, COMPRESSION_LZW);
 		else if (compressionType == TNZ_INFO_COMPRESS_PACKBITS)
@@ -890,7 +887,8 @@ void TifWriter::open(FILE *file, const TImageInfo &info)
 			assert(false);
 	}
 	TIFFSetField(m_tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-	TIFFSetField(m_tiff, TIFFTAG_PHOTOMETRIC, (m_bpp == 8 || m_bpp == 1) ? PHOTOMETRIC_MINISBLACK : PHOTOMETRIC_RGB);
+	TIFFSetField(m_tiff, TIFFTAG_PHOTOMETRIC,
+				 (m_bpp == 8 || m_bpp == 1) ? PHOTOMETRIC_MINISBLACK : PHOTOMETRIC_RGB);
 	TIFFSetField(m_tiff, TIFFTAG_XRESOLUTION, m_info.m_dpix);
 	TIFFSetField(m_tiff, TIFFTAG_YRESOLUTION, m_info.m_dpiy);
 	TIFFSetField(m_tiff, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
@@ -1017,8 +1015,7 @@ void TifWriter::writeLine(char *buffer)
 /* Error & Waring Handler per debug */
 
 extern "C" {
-static void
-MyWarningHandler(const char *module, const char *fmt, va_list ap)
+static void MyWarningHandler(const char *module, const char *fmt, va_list ap)
 {
 	std::string outMsg;
 	char msg[2048];
@@ -1034,15 +1031,14 @@ MyWarningHandler(const char *module, const char *fmt, va_list ap)
 	TSystem::outputDebug(outMsg);
 }
 
-static void
-MyErrorHandler(const char *module, const char *fmt, va_list ap)
+static void MyErrorHandler(const char *module, const char *fmt, va_list ap)
 {
 	std::string outMsg;
 	char msg[2048];
 	msg[0] = 0;
 	if (module != NULL)
 		outMsg = std::string(module);
-	//outMsg += "Warning, ";
+	// outMsg += "Warning, ";
 
 	_vsnprintf(msg, 2048, fmt, ap);
 	strcat(msg, ".\n");

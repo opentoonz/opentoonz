@@ -52,8 +52,8 @@ const int l_dragThreshold = 10; //!< Distance, in pixels, the user has to
 namespace
 {
 
-FourPoints getFourPointsFromVectorImage(
-	const TVectorImageP &img, const std::set<int> &styleIds, double &maxThickness)
+FourPoints getFourPointsFromVectorImage(const TVectorImageP &img, const std::set<int> &styleIds,
+										double &maxThickness)
 {
 	FourPoints p;
 
@@ -97,7 +97,8 @@ FourPoints getFourPointsFromVectorImage(
 
 //-----------------------------------------------------------------------------
 
-bool getStrokeIndexFromPos(UINT &index, const TVectorImageP &vi, const TPointD &pos, double pixelSize)
+bool getStrokeIndexFromPos(UINT &index, const TVectorImageP &vi, const TPointD &pos,
+						   double pixelSize)
 {
 	if (!vi)
 		return false;
@@ -112,7 +113,8 @@ bool getStrokeIndexFromPos(UINT &index, const TVectorImageP &vi, const TPointD &
 
 static bool currentOrNotSelected(const VectorSelectionTool &tool, const TFrameId &fid)
 {
-	return (tool.getCurrentFid() == fid || (tool.isSelectedFramesType() && tool.getSelectedFrames().count(fid) == 0));
+	return (tool.getCurrentFid() == fid ||
+			(tool.isSelectedFramesType() && tool.getSelectedFrames().count(fid) == 0));
 }
 
 //-----------------------------------------------------------------------------
@@ -129,7 +131,8 @@ inline void notifySelectionChanged()
 //********************************************************************************
 
 VectorFreeDeformer::VectorFreeDeformer(TVectorImageP vi, std::set<int> strokeIndexes)
-	: FreeDeformer(), m_vi(vi), m_strokeIndexes(strokeIndexes), m_preserveThickness(false), m_computeRegion(false), m_flip(false)
+	: FreeDeformer(), m_vi(vi), m_strokeIndexes(strokeIndexes), m_preserveThickness(false),
+	  m_computeRegion(false), m_flip(false)
 {
 	TRectD r;
 
@@ -185,7 +188,8 @@ void VectorFreeDeformer::setPoint(int index, const TPointD &p)
 
 //-----------------------------------------------------------------------------
 
-void VectorFreeDeformer::setPoints(const TPointD &p0, const TPointD &p1, const TPointD &p2, const TPointD &p3)
+void VectorFreeDeformer::setPoints(const TPointD &p0, const TPointD &p1, const TPointD &p2,
+								   const TPointD &p3)
 {
 	m_newPoints[0] = p0;
 	m_newPoints[1] = p1;
@@ -200,8 +204,7 @@ void VectorFreeDeformer::deformRegions()
 	if (m_strokeIndexes.empty() || !m_computeRegion)
 		return;
 
-	std::vector<int> selectedIndexes(
-		m_strokeIndexes.begin(), m_strokeIndexes.end());
+	std::vector<int> selectedIndexes(m_strokeIndexes.begin(), m_strokeIndexes.end());
 
 	m_vi->notifyChangedStrokes(selectedIndexes, m_originalStrokes, m_flip);
 	m_computeRegion = false;
@@ -274,12 +277,15 @@ TThickPoint VectorFreeDeformer::deform(TThickPoint point)
 //    UndoChangeStrokes  implementation
 //********************************************************************************
 
-DragSelectionTool::UndoChangeStrokes::UndoChangeStrokes(
-	TXshSimpleLevel *level, const TFrameId &frameId, VectorSelectionTool *tool,
-	const StrokeSelection &selection)
-	: ToolUtils::TToolUndo(level, frameId), m_tool(tool), m_selectionCount(tool->getSelectionCount()) // Not related to selection
+DragSelectionTool::UndoChangeStrokes::UndoChangeStrokes(TXshSimpleLevel *level,
+														const TFrameId &frameId,
+														VectorSelectionTool *tool,
+														const StrokeSelection &selection)
+	: ToolUtils::TToolUndo(level, frameId), m_tool(tool),
+	  m_selectionCount(tool->getSelectionCount()) // Not related to selection
 	  ,
-	  m_oldBBox(tool->getBBox()), m_oldCenter(tool->getCenter()), m_oldDeformValues(tool->m_deformValues), m_newDeformValues(), m_flip(false)
+	  m_oldBBox(tool->getBBox()), m_oldCenter(tool->getCenter()),
+	  m_oldDeformValues(tool->m_deformValues), m_newDeformValues(), m_flip(false)
 {
 	TVectorImageP vi = m_level->getFrame(m_frameId, false);
 	if (!vi) {
@@ -295,12 +301,15 @@ DragSelectionTool::UndoChangeStrokes::UndoChangeStrokes(
 
 //-----------------------------------------------------------------------------
 
-DragSelectionTool::UndoChangeStrokes::UndoChangeStrokes(
-	TXshSimpleLevel *level, const TFrameId &frameId, VectorSelectionTool *tool,
-	const LevelSelection &selection)
-	: ToolUtils::TToolUndo(level, frameId), m_tool(tool), m_selectionCount(tool->getSelectionCount()) // Not related to selection
+DragSelectionTool::UndoChangeStrokes::UndoChangeStrokes(TXshSimpleLevel *level,
+														const TFrameId &frameId,
+														VectorSelectionTool *tool,
+														const LevelSelection &selection)
+	: ToolUtils::TToolUndo(level, frameId), m_tool(tool),
+	  m_selectionCount(tool->getSelectionCount()) // Not related to selection
 	  ,
-	  m_oldBBox(tool->getBBox()), m_oldCenter(tool->getCenter()), m_oldDeformValues(tool->m_deformValues), m_newDeformValues(), m_flip(false)
+	  m_oldBBox(tool->getBBox()), m_oldCenter(tool->getCenter()),
+	  m_oldDeformValues(tool->m_deformValues), m_newDeformValues(), m_flip(false)
 {
 	TVectorImageP vi = m_level->getFrame(m_frameId, false);
 	if (!vi) {
@@ -331,8 +340,7 @@ void DragSelectionTool::UndoChangeStrokes::registerStrokes(bool beforeModify)
 		return;
 	}
 
-	std::vector<TStroke *> &strokes = beforeModify ? m_oldStrokes
-												   : m_newStrokes;
+	std::vector<TStroke *> &strokes = beforeModify ? m_oldStrokes : m_newStrokes;
 
 	TRectD bbox;
 
@@ -345,8 +353,7 @@ void DragSelectionTool::UndoChangeStrokes::registerStrokes(bool beforeModify)
 	}
 
 	if (beforeModify && !bbox.isEmpty()) {
-		ImageUtils::getFillingInformationOverlappingArea(
-			vi, m_regionsData, bbox);
+		ImageUtils::getFillingInformationOverlappingArea(vi, m_regionsData, bbox);
 	} else {
 		m_newBBox = m_tool->getBBox();
 		m_newCenter = m_tool->getCenter();
@@ -357,8 +364,8 @@ void DragSelectionTool::UndoChangeStrokes::registerStrokes(bool beforeModify)
 //-----------------------------------------------------------------------------
 
 void DragSelectionTool::UndoChangeStrokes::transform(
-	const std::vector<TStroke *> &strokes, FourPoints bbox,
-	TPointD center, DragSelectionTool::DeformValues deformValues) const
+	const std::vector<TStroke *> &strokes, FourPoints bbox, TPointD center,
+	DragSelectionTool::DeformValues deformValues) const
 {
 	TVectorImageP image = m_level->getFrame(m_frameId, true);
 	if (!image) {
@@ -370,8 +377,7 @@ void DragSelectionTool::UndoChangeStrokes::transform(
 	for (s = 0; s != sCount; ++s) {
 		int index = m_indexes[s];
 
-		TStroke *sourcesStroke = strokes[s],
-				*stroke = image->getStroke(index);
+		TStroke *sourcesStroke = strokes[s], *stroke = image->getStroke(index);
 
 		int cp, cpCount = stroke->getControlPointCount();
 		for (cp = 0; cp != cpCount; ++cp)
@@ -439,8 +445,9 @@ class UndoChangeOutlineStyle : public ToolUtils::TToolUndo
 	std::vector<int> m_indexes;
 	int m_selectionCount;
 
-public:
-	UndoChangeOutlineStyle(TXshSimpleLevel *level, const TFrameId &frameId, VectorSelectionTool *tool);
+  public:
+	UndoChangeOutlineStyle(TXshSimpleLevel *level, const TFrameId &frameId,
+						   VectorSelectionTool *tool);
 	~UndoChangeOutlineStyle() {}
 	void registerStrokes(bool beforeModify = false);
 	void transform(const std::vector<TStroke::OutlineOptions> &options, FourPoints bbox) const;
@@ -451,8 +458,10 @@ public:
 
 //-----------------------------------------------------------------------------
 
-UndoChangeOutlineStyle::UndoChangeOutlineStyle(TXshSimpleLevel *level, const TFrameId &frameId, VectorSelectionTool *tool)
-	: ToolUtils::TToolUndo(level, frameId), m_tool(tool), m_oldBBox(tool->getBBox()), m_selectionCount(tool->getSelectionCount())
+UndoChangeOutlineStyle::UndoChangeOutlineStyle(TXshSimpleLevel *level, const TFrameId &frameId,
+											   VectorSelectionTool *tool)
+	: ToolUtils::TToolUndo(level, frameId), m_tool(tool), m_oldBBox(tool->getBBox()),
+	  m_selectionCount(tool->getSelectionCount())
 {
 	TVectorImageP image = m_level->getFrame(m_frameId, false);
 	assert(!!image);
@@ -461,7 +470,8 @@ UndoChangeOutlineStyle::UndoChangeOutlineStyle(TXshSimpleLevel *level, const TFr
 	StrokeSelection *strokeSelection = dynamic_cast<StrokeSelection *>(tool->getSelection());
 	int i;
 	for (i = 0; i < (int)image->getStrokeCount(); i++) {
-		if (!strokeSelection->isSelected(i) && !m_tool->isLevelType() && !m_tool->isSelectedFramesType())
+		if (!strokeSelection->isSelected(i) && !m_tool->isLevelType() &&
+			!m_tool->isSelectedFramesType())
 			continue;
 		m_indexes.push_back(i);
 	}
@@ -489,7 +499,8 @@ void UndoChangeOutlineStyle::registerStrokes(bool beforeModify)
 
 //-----------------------------------------------------------------------------
 
-void UndoChangeOutlineStyle::transform(const std::vector<TStroke::OutlineOptions> &options, FourPoints bbox) const
+void UndoChangeOutlineStyle::transform(const std::vector<TStroke::OutlineOptions> &options,
+									   FourPoints bbox) const
 {
 	TVectorImageP image = m_level->getFrame(m_frameId, true);
 	assert(!!image);
@@ -529,8 +540,8 @@ void UndoChangeOutlineStyle::redo() const
 
 int UndoChangeOutlineStyle::getSize() const
 {
-	//NOTE: This is definitely wrong... sizeof(vector) DOES NOT correspond to its
-	//actual size - as it is internally allocated with new!!
+	// NOTE: This is definitely wrong... sizeof(vector) DOES NOT correspond to its
+	// actual size - as it is internally allocated with new!!
 	return sizeof(*this) + sizeof(*m_tool);
 }
 
@@ -540,13 +551,10 @@ int UndoChangeOutlineStyle::getSize() const
 
 struct VectorDeformTool::VFDScopedBlock //! Type bounding the scope of free deformers in the tool.
 	{
-	VFDScopedBlock(SelectionTool *tool) : m_tool(tool)
-	{
-		m_tool->setNewFreeDeformer();
-	}
+	VFDScopedBlock(SelectionTool *tool) : m_tool(tool) { m_tool->setNewFreeDeformer(); }
 	~VFDScopedBlock() { m_tool->clearDeformers(); }
 
-private:
+  private:
 	SelectionTool *m_tool; //!< [\p external]  Tool owning the deformers.
 };
 
@@ -558,8 +566,9 @@ DragSelectionTool::VectorDeformTool::VectorDeformTool(VectorSelectionTool *tool)
 	: DeformTool(tool), m_undo()
 {
 	if (!TTool::getApplication()->getCurrentObject()->isSpline()) {
-		m_undo.reset(new UndoChangeStrokes(TTool::getApplication()->getCurrentLevel()->getSimpleLevel(),
-										   tool->getCurrentFid(), tool, tool->strokeSelection()));
+		m_undo.reset(
+			new UndoChangeStrokes(TTool::getApplication()->getCurrentLevel()->getSimpleLevel(),
+								  tool->getCurrentFid(), tool, tool->strokeSelection()));
 	}
 }
 
@@ -578,7 +587,8 @@ void DragSelectionTool::VectorDeformTool::applyTransform(FourPoints bbox)
 
 	tcg::unique_ptr<VFDScopedBlock> localVfdScopedBlock;
 	if (!m_vfdScopedBlock.get()) {
-		tcg::unique_ptr<VFDScopedBlock> &vfdScopedBlock = m_isDragging ? m_vfdScopedBlock : localVfdScopedBlock;
+		tcg::unique_ptr<VFDScopedBlock> &vfdScopedBlock =
+			m_isDragging ? m_vfdScopedBlock : localVfdScopedBlock;
 
 		vfdScopedBlock.reset(new VFDScopedBlock(tool));
 	}
@@ -610,7 +620,8 @@ void DragSelectionTool::VectorDeformTool::applyTransform(FourPoints bbox)
 void DragSelectionTool::VectorDeformTool::addTransformUndo()
 {
 	if (TTool::getApplication()->getCurrentObject()->isSpline())
-		TUndoManager::manager()->add(new UndoPath(getTool()->getXsheet()->getStageObject(getTool()->getObjectId())->getSpline()));
+		TUndoManager::manager()->add(new UndoPath(
+			getTool()->getXsheet()->getStageObject(getTool()->getObjectId())->getSpline()));
 	else if (m_undo.get()) {
 		m_undo->registerStrokes();
 		TUndoManager::manager()->add(m_undo.release());
@@ -632,8 +643,8 @@ void DragSelectionTool::VectorDeformTool::transformWholeLevel()
 	level->getFids(fids);
 
 	// Remove unwanted fids
-	fids.erase(std::remove_if(fids.begin(), fids.end(), boost::bind(
-															::currentOrNotSelected, boost::cref(*tool), _1)),
+	fids.erase(std::remove_if(fids.begin(), fids.end(),
+							  boost::bind(::currentOrNotSelected, boost::cref(*tool), _1)),
 			   fids.end());
 
 	TUndoManager::manager()->beginBlock();
@@ -646,15 +657,16 @@ void DragSelectionTool::VectorDeformTool::transformWholeLevel()
 			int t = f + 1; // Current frame's data is always at index 0
 						   // The others are thus shifted by 1
 			// Skip nonselected frames
-			if (tool->getCurrentFid() == fid || (tool->isSelectedFramesType() && tool->getSelectedFrames().count(fid) == 0))
+			if (tool->getCurrentFid() == fid ||
+				(tool->isSelectedFramesType() && tool->getSelectedFrames().count(fid) == 0))
 				continue;
 
 			TVectorImageP vi = level->getFrame(fid, true);
 			if (!vi)
 				continue;
 
-			tcg::unique_ptr<UndoChangeStrokes> undo(new UndoChangeStrokes(
-				level, fid, tool, tool->levelSelection()));
+			tcg::unique_ptr<UndoChangeStrokes> undo(
+				new UndoChangeStrokes(level, fid, tool, tool->levelSelection()));
 
 			std::set<int> strokesIndices;
 
@@ -663,8 +675,10 @@ void DragSelectionTool::VectorDeformTool::transformWholeLevel()
 
 			FourPoints bbox = tool->getBBox(t);
 
-			VectorFreeDeformer *freeDeformer = static_cast<VectorFreeDeformer *>(tool->getFreeDeformer(t));
-			freeDeformer->setPoints(bbox.getPoint(0), bbox.getPoint(1), bbox.getPoint(2), bbox.getPoint(3));
+			VectorFreeDeformer *freeDeformer =
+				static_cast<VectorFreeDeformer *>(tool->getFreeDeformer(t));
+			freeDeformer->setPoints(bbox.getPoint(0), bbox.getPoint(1), bbox.getPoint(2),
+									bbox.getPoint(3));
 			freeDeformer->setComputeRegion(true);
 			freeDeformer->setPreserveThickness(tool->isConstantThickness());
 			freeDeformer->setFlip(isFlip());
@@ -678,12 +692,16 @@ void DragSelectionTool::VectorDeformTool::transformWholeLevel()
 	TUndoManager::manager()->endBlock();
 
 	// Finally, notify changed frames
-	std::for_each(fids.begin(), fids.end(), boost::bind(								  // NOTE: current frame is not here - it should be,
-												&TTool::notifyImageChanged, m_tool, _1)); //       but it's currently unnecessary, in fact...
+	std::for_each(fids.begin(), fids.end(),
+				  boost::bind( // NOTE: current frame is not here - it should be,
+					  &TTool::notifyImageChanged, m_tool,
+					  _1)); //       but it's currently unnecessary, in fact...
 
-	// notifyImageChanged(fid) must be invoked OUTSIDE of the loop - since it seems to imply notifyImageChanged()
+	// notifyImageChanged(fid) must be invoked OUTSIDE of the loop - since it seems to imply
+	// notifyImageChanged()
 	// on CURRENT image - which seems wrong, but it's too low-level and I'm not changing it.
-	// This reasonably leads to computeBBox(), but bboxes are taken as INPUT to this transformation...            >:(
+	// This reasonably leads to computeBBox(), but bboxes are taken as INPUT to this
+	// transformation...            >:(
 }
 
 //-----------------------------------------------------------------------------
@@ -768,7 +786,8 @@ DragSelectionTool::VectorFreeDeformTool::VectorFreeDeformTool(VectorSelectionToo
 
 //-----------------------------------------------------------------------------
 
-void DragSelectionTool::VectorFreeDeformTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
+void DragSelectionTool::VectorFreeDeformTool::leftButtonDrag(const TPointD &pos,
+															 const TMouseEvent &e)
 {
 	m_freeDeform->leftButtonDrag(pos, e);
 }
@@ -796,7 +815,8 @@ void DragSelectionTool::VectorMoveSelectionTool::transform(TAffine aff)
 
 //-----------------------------------------------------------------------------
 
-void DragSelectionTool::VectorMoveSelectionTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
+void DragSelectionTool::VectorMoveSelectionTool::leftButtonDown(const TPointD &pos,
+																const TMouseEvent &e)
 {
 	m_moveSelection->leftButtonDown(pos, e);
 	VectorDeformTool::leftButtonDown(pos, e);
@@ -804,7 +824,8 @@ void DragSelectionTool::VectorMoveSelectionTool::leftButtonDown(const TPointD &p
 
 //-----------------------------------------------------------------------------
 
-void DragSelectionTool::VectorMoveSelectionTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
+void DragSelectionTool::VectorMoveSelectionTool::leftButtonDrag(const TPointD &pos,
+																const TMouseEvent &e)
 {
 	if (norm2(pos - getStartPos()) > l_dragThreshold * getTool()->getPixelSize())
 		m_moveSelection->leftButtonDrag(pos, e);
@@ -828,12 +849,13 @@ TPointD DragSelectionTool::VectorScaleTool::transform(int index, TPointD newPos)
 
 	std::vector<FourPoints> startBboxs = m_scale->getStartBboxs();
 	TPointD center = m_scale->getStartCenter();
-	FourPoints bbox = m_scale->bboxScaleInCenter(index, startBboxs[0], newPos, scaleValue, center, true);
+	FourPoints bbox =
+		m_scale->bboxScaleInCenter(index, startBboxs[0], newPos, scaleValue, center, true);
 	if (bbox == startBboxs[0])
 		return scaleValue;
 
 	bool scaleInCenter = m_scale->scaleInCenter();
-	//Se non ho scalato rispetto al centro calcolo la posizione del nuovo centro
+	// Se non ho scalato rispetto al centro calcolo la posizione del nuovo centro
 	if (!scaleInCenter)
 		tool->setCenter(m_scale->getNewCenter(index, startBboxs[0], scaleValue));
 
@@ -841,9 +863,11 @@ TPointD DragSelectionTool::VectorScaleTool::transform(int index, TPointD newPos)
 		int i;
 		for (i = 1; i < (int)tool->getBBoxsCount(); i++) {
 			FourPoints oldBbox = startBboxs[i];
-			TPointD frameCenter = scaleInCenter ? center : oldBbox.getPoint(getSimmetricPointIndex(index));
+			TPointD frameCenter =
+				scaleInCenter ? center : oldBbox.getPoint(getSimmetricPointIndex(index));
 			TPointD newp = m_scale->getScaledPoint(index, oldBbox, scaleValue, frameCenter);
-			FourPoints newBbox = m_scale->bboxScaleInCenter(index, oldBbox, newp, scaleValue, frameCenter, false);
+			FourPoints newBbox =
+				m_scale->bboxScaleInCenter(index, oldBbox, newp, scaleValue, frameCenter, false);
 			tool->setBBox(newBbox, i);
 			if (!scaleInCenter)
 				tool->setCenter(m_scale->getNewCenter(index, oldBbox, scaleValue), i);
@@ -882,8 +906,8 @@ DragSelectionTool::VectorChangeThicknessTool::VectorChangeThicknessTool(VectorSe
 	setStrokesThickness(*vi);
 
 	TXshSimpleLevel *level = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
-	m_undo.reset(new UndoChangeStrokes(level, tool->getCurrentFid(), tool,
-									   tool->strokeSelection()));
+	m_undo.reset(
+		new UndoChangeStrokes(level, tool->getCurrentFid(), tool, tool->strokeSelection()));
 }
 
 //-----------------------------------------------------------------------------
@@ -912,8 +936,7 @@ void DragSelectionTool::VectorChangeThicknessTool::setStrokesThickness(TVectorIm
 {
 	struct locals {
 
-		static void setThickness(
-			const SetStrokeThickness::Data &data, int s)
+		static void setThickness(const SetStrokeThickness::Data &data, int s)
 		{
 			const TStroke &stroke = *data.m_vi.getStroke(s);
 
@@ -966,22 +989,20 @@ struct Data {
 }
 }
 
-void DragSelectionTool::VectorChangeThicknessTool::changeImageThickness(TVectorImage &vi, double newThickness)
+void DragSelectionTool::VectorChangeThicknessTool::changeImageThickness(TVectorImage &vi,
+																		double newThickness)
 {
 	struct locals {
 
-		static void changeThickness(
-			const ChangeImageThickness::Data &data, int s)
+		static void changeThickness(const ChangeImageThickness::Data &data, int s)
 		{
 			TStroke &stroke = *data.m_vi.getStroke(s);
 
 			for (int cp = 0; cp < (int)stroke.getControlPointCount(); ++cp) {
-				double thickness = tcrop(
-					data.m_tool.m_strokesThickness[s][cp] + data.m_newThickness,
-					0.0, 255.0);
+				double thickness =
+					tcrop(data.m_tool.m_strokesThickness[s][cp] + data.m_newThickness, 0.0, 255.0);
 
-				TThickPoint point(TPointD(stroke.getControlPoint(cp)),
-								  thickness);
+				TThickPoint point(TPointD(stroke.getControlPoint(cp)), thickness);
 
 				stroke.setControlPoint(cp, point);
 			}
@@ -1030,8 +1051,8 @@ void DragSelectionTool::VectorChangeThicknessTool::addUndo()
 		level->getFids(fids);
 
 		// Remove unwanted frames
-		fids.erase(std::remove_if(fids.begin(), fids.end(), boost::bind(
-																::currentOrNotSelected, boost::cref(*vtool), _1)),
+		fids.erase(std::remove_if(fids.begin(), fids.end(),
+								  boost::bind(::currentOrNotSelected, boost::cref(*vtool), _1)),
 				   fids.end());
 
 		TUndoManager::manager()->beginBlock();
@@ -1051,8 +1072,8 @@ void DragSelectionTool::VectorChangeThicknessTool::addUndo()
 				}
 
 				// Transform fid's selection
-				tcg::unique_ptr<UndoChangeStrokes> undo(new UndoChangeStrokes(
-					level, fid, vtool, vtool->levelSelection()));
+				tcg::unique_ptr<UndoChangeStrokes> undo(
+					new UndoChangeStrokes(level, fid, vtool, vtool->levelSelection()));
 
 				setStrokesThickness(*vi);
 				changeImageThickness(*vi, m_thicknessChange);
@@ -1066,15 +1087,17 @@ void DragSelectionTool::VectorChangeThicknessTool::addUndo()
 		TUndoManager::manager()->endBlock();
 
 		// Finally, notify changed frames
-		std::for_each(fids.begin(), fids.end(), boost::bind(								  // NOTE: current frame is not here - it was
-													&TTool::notifyImageChanged, m_tool, _1)); //       aldready notified
+		std::for_each(fids.begin(), fids.end(),
+					  boost::bind( // NOTE: current frame is not here - it was
+						  &TTool::notifyImageChanged, m_tool, _1)); //       aldready notified
 	} else
 		TUndoManager::manager()->add(m_undo.release()); // Outside any undo block
 }
 
 //-----------------------------------------------------------------------------
 
-void DragSelectionTool::VectorChangeThicknessTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
+void DragSelectionTool::VectorChangeThicknessTool::leftButtonDown(const TPointD &pos,
+																  const TMouseEvent &e)
 {
 	m_curPos = pos;
 	m_firstPos = pos;
@@ -1082,7 +1105,8 @@ void DragSelectionTool::VectorChangeThicknessTool::leftButtonDown(const TPointD 
 
 //-----------------------------------------------------------------------------
 
-void DragSelectionTool::VectorChangeThicknessTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
+void DragSelectionTool::VectorChangeThicknessTool::leftButtonDrag(const TPointD &pos,
+																  const TMouseEvent &e)
 {
 	TAffine aff;
 	TPointD delta = pos - m_curPos;
@@ -1101,7 +1125,8 @@ void DragSelectionTool::VectorChangeThicknessTool::leftButtonDrag(const TPointD 
 
 //-----------------------------------------------------------------------------
 
-void DragSelectionTool::VectorChangeThicknessTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
+void DragSelectionTool::VectorChangeThicknessTool::leftButtonUp(const TPointD &pos,
+																const TMouseEvent &e)
 {
 	TVectorImageP curVi = getTool()->getImage(true);
 	if (!curVi)
@@ -1140,11 +1165,8 @@ class UndoEnterGroup : public TUndo
 	int m_strokeIndex;
 	TVectorImageP m_vi;
 
-public:
-	UndoEnterGroup(TVectorImageP vi, int strokeIndex)
-		: m_vi(vi), m_strokeIndex(strokeIndex)
-	{
-	}
+  public:
+	UndoEnterGroup(TVectorImageP vi, int strokeIndex) : m_vi(vi), m_strokeIndex(strokeIndex) {}
 	void undo() const
 	{
 		m_vi->exitGroup();
@@ -1167,11 +1189,8 @@ class UndoExitGroup : public TUndo
 	int m_strokeIndex;
 	TVectorImageP m_vi;
 
-public:
-	UndoExitGroup(TVectorImageP vi, int strokeIndex)
-		: m_vi(vi), m_strokeIndex(strokeIndex)
-	{
-	}
+  public:
+	UndoExitGroup(TVectorImageP vi, int strokeIndex) : m_vi(vi), m_strokeIndex(strokeIndex) {}
 	void undo() const
 	{
 		m_vi->enterGroup(m_strokeIndex);
@@ -1186,14 +1205,17 @@ public:
 	int getSize() const { return sizeof(*this); }
 };
 
-} //namespace
+} // namespace
 
 //=============================================================================
 // VectorSelectionTool
 //-----------------------------------------------------------------------------
 
 VectorSelectionTool::VectorSelectionTool(int targetType)
-	: SelectionTool(targetType), m_selectionTarget("Mode:"), m_constantThickness("Preserve Thickness", false), m_levelSelection(m_strokeSelection), m_capStyle("Cap"), m_joinStyle("Join"), m_miterJoinLimit("Miter:", 0, 100, 4), m_selectionCount(0), m_canEnterGroup(true)
+	: SelectionTool(targetType), m_selectionTarget("Mode:"),
+	  m_constantThickness("Preserve Thickness", false), m_levelSelection(m_strokeSelection),
+	  m_capStyle("Cap"), m_joinStyle("Join"), m_miterJoinLimit("Miter:", 0, 100, 4),
+	  m_selectionCount(0), m_canEnterGroup(true)
 {
 	if (targetType == TTool::Vectors) {
 		m_prop.bind(m_selectionTarget);
@@ -1252,14 +1274,15 @@ void VectorSelectionTool::setNewFreeDeformer()
 		std::vector<TFrameId> fids;
 		level->getFids(fids);
 
-		fids.erase(std::remove_if(fids.begin(), fids.end(), boost::bind(
-																::currentOrNotSelected, boost::cref(*this), _1)),
+		fids.erase(std::remove_if(fids.begin(), fids.end(),
+								  boost::bind(::currentOrNotSelected, boost::cref(*this), _1)),
 				   fids.end());
 
 		std::vector<TFrameId>::iterator ft, fEnd = fids.end();
 		for (ft = fids.begin(); ft != fEnd; ++ft) {
 			if (TVectorImageP levelVi = level->getFrame(*ft, false)) {
-				const std::vector<int> &selectedStrokeIdxs = ::getSelectedStrokes(*levelVi, m_levelSelection);
+				const std::vector<int> &selectedStrokeIdxs =
+					::getSelectedStrokes(*levelVi, m_levelSelection);
 				std::set<int> strokesIndices(selectedStrokeIdxs.begin(), selectedStrokeIdxs.end());
 
 				m_freeDeformers.push_back(new VectorFreeDeformer(levelVi, strokesIndices));
@@ -1293,7 +1316,8 @@ bool VectorSelectionTool::isSameStyleType() const
 
 bool VectorSelectionTool::isModifiableSelectionType() const
 {
-	return (m_levelSelection.isEmpty() || m_levelSelection.filter() == LevelSelection::SELECTED_STYLES);
+	return (m_levelSelection.isEmpty() ||
+			m_levelSelection.filter() == LevelSelection::SELECTED_STYLES);
 }
 
 //-----------------------------------------------------------------------------
@@ -1314,7 +1338,7 @@ void VectorSelectionTool::updateSelectionTarget()
 {
 	// Make the correct selection current
 	if (m_selectionTarget.getIndex() == NORMAL_TYPE_IDX) {
-		std::set<int> selectedStrokes;							// Retain previously selected strokes across
+		std::set<int> selectedStrokes; // Retain previously selected strokes across
 		selectedStrokes.swap(m_strokeSelection.getSelection()); // current selection change
 
 		m_strokeSelection.makeCurrent(); // Empties any (different) previously current
@@ -1413,7 +1437,8 @@ void VectorSelectionTool::clearSelectedStrokes()
 
 //-----------------------------------------------------------------------------
 
-void VectorSelectionTool::modifySelectionOnClick(TImageP image, const TPointD &pos, const TMouseEvent &e)
+void VectorSelectionTool::modifySelectionOnClick(TImageP image, const TPointD &pos,
+												 const TMouseEvent &e)
 {
 	TVectorImageP vi = TVectorImageP(image);
 	assert(m_strokeSelection.getImage() == vi);
@@ -1438,10 +1463,12 @@ void VectorSelectionTool::modifySelectionOnClick(TImageP image, const TPointD &p
 		 addStroke = strokeAtPos && !m_strokeSelection.isSelected(index),
 		 toggleStroke = strokeAtPos && e.isShiftPressed();
 
-	m_selecting = (modifiableSel && !strokeAtPos									   // There must be no stroke under cursor
-				   && (e.isShiftPressed()											   // and either the user is explicitly performing additional selection
-					   || (m_strokeSelectionType.getIndex() != POLYLINE_SELECTION_IDX) // or the tool support immediate selection on clear
-					   || m_strokeSelection.isEmpty()));							   // or the strokes list was already cleared
+	m_selecting =
+		(modifiableSel && !strokeAtPos // There must be no stroke under cursor
+		 && (e.isShiftPressed() // and either the user is explicitly performing additional selection
+			 || (m_strokeSelectionType.getIndex() !=
+				 POLYLINE_SELECTION_IDX)	   // or the tool support immediate selection on clear
+			 || m_strokeSelection.isEmpty())); // or the strokes list was already cleared
 
 	bool clearTargets = !(strokeAtPos || e.isShiftPressed() || m_selecting),
 		 clearSelection = (addStroke || !strokeAtPos) && !e.isShiftPressed(),
@@ -1478,8 +1505,7 @@ void VectorSelectionTool::leftButtonDoubleClick(const TPointD &pos, const TMouse
 	if (!vi)
 		return;
 
-	if (m_strokeSelectionType.getIndex() == POLYLINE_SELECTION_IDX &&
-		!m_polyline.empty()) {
+	if (m_strokeSelectionType.getIndex() == POLYLINE_SELECTION_IDX && !m_polyline.empty()) {
 		closePolyline(pos);
 		selectRegionVectorImage();
 
@@ -1519,7 +1545,8 @@ void VectorSelectionTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &
 
 	double pixelSize = getPixelSize();
 	TTool::Application *app = TTool::getApplication();
-	if (!app || m_justSelected || !m_selecting || tdistance2(pos, m_curPos) < 9.0 * pixelSize * pixelSize)
+	if (!app || m_justSelected || !m_selecting ||
+		tdistance2(pos, m_curPos) < 9.0 * pixelSize * pixelSize)
 		return;
 
 	m_curPos = pos;
@@ -1554,7 +1581,8 @@ void VectorSelectionTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &
 			if (m_strokeSelection.isSelected(s))
 				continue;
 
-			bool inSelection = selectOverlappingStroke ? rect.overlaps(stroke->getBBox()) : rect.contains(stroke->getBBox());
+			bool inSelection = selectOverlappingStroke ? rect.overlaps(stroke->getBBox())
+													   : rect.contains(stroke->getBBox());
 
 			if (inSelection || (m_shiftPressed && oldSelection.count(s)))
 				selectionChanged = (selectStroke(s, false) || selectionChanged);
@@ -1780,7 +1808,8 @@ void VectorSelectionTool::computeBBox()
 			level->getFids(fids);
 
 			for (int i = 0; i < (int)fids.size(); ++i) {
-				if (getCurrentFid() == fids[i] || (isSelectedFramesType() && m_selectedFrames.count(fids[i]) == 0))
+				if (getCurrentFid() == fids[i] ||
+					(isSelectedFramesType() && m_selectedFrames.count(fids[i]) == 0))
 					continue;
 
 				TVectorImageP vi = level->getFrame(fids[i], false);
@@ -1836,8 +1865,7 @@ bool VectorSelectionTool::selectStroke(int index, bool toggle)
 	if (index < 0 || index >= int(vi->getStrokeCount())) // Should be asserted...
 		return false;
 
-	bool wasSelected = m_strokeSelection.isSelected(index),
-		 selectState = !(wasSelected && toggle);
+	bool wasSelected = m_strokeSelection.isSelected(index), selectState = !(wasSelected && toggle);
 
 	// (De)Select additional strokes related to ours
 	std::set<int> &selectedStyles = this->selectedStyles();
@@ -2074,7 +2102,7 @@ bool VectorSelectionTool::onPropertyChanged(std::string propertyName)
 
 void VectorSelectionTool::selectionOutlineStyle(int &capStyle, int &joinStyle)
 {
-	//Check the selection's outline style group validity
+	// Check the selection's outline style group validity
 	const std::set<int> &selection = m_strokeSelection.getSelection();
 	if (selection.empty()) {
 		capStyle = joinStyle = -1;
@@ -2118,8 +2146,7 @@ void VectorSelectionTool::selectRegionVectorImage()
 	selectImg.addStroke(new TStroke(*m_stroke));
 	selectImg.findRegions();
 
-	int sCount = int(vi->getStrokeCount()),
-		rCount = int(selectImg.getRegionCount());
+	int sCount = int(vi->getStrokeCount()), rCount = int(selectImg.getRegionCount());
 
 	bool selectionChanged = false;
 
@@ -2158,10 +2185,10 @@ void VectorSelectionTool::updateAction(TPointD pos, const TMouseEvent &e)
 	UINT index = 0;
 
 	if ((isLevelType() && bbox.contains(pos)) // What about isSelectedFramesType()??
-		|| (getStrokeIndexFromPos(index, vi, pos, getPixelSize()) && m_strokeSelection.isSelected(index))) {
+		|| (getStrokeIndexFromPos(index, vi, pos, getPixelSize()) &&
+			m_strokeSelection.isSelected(index))) {
 		m_what = Inside;
-		m_cursorId = isLevelType() ? ToolCursor::LevelSelectCursor
-								   : ToolCursor::MoveCursor;
+		m_cursorId = isLevelType() ? ToolCursor::LevelSelectCursor : ToolCursor::MoveCursor;
 	}
 }
 

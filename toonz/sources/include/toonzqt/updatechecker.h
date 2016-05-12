@@ -27,15 +27,15 @@ class DVAPI UpdateChecker : public QObject
 
 	QString m_latestVersion;
 
-public:
-	UpdateChecker(QUrl const& updateUrl);
+  public:
+	UpdateChecker(QUrl const &updateUrl);
 
 	QString getLatestVersion() const { return m_latestVersion; }
 
-protected slots:
+  protected slots:
 	void httpRequestFinished(QNetworkReply *);
 
-signals:
+  signals:
 	void done(bool error);
 };
 

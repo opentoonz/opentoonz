@@ -13,9 +13,8 @@ class Bright_ContFx : public TStandardRasterFx, public TDoubleParamObserver
 	TDoubleParamP m_bright;
 	TDoubleParamP m_contrast;
 
-public:
-	Bright_ContFx()
-		: m_bright(127.5), m_contrast(50.0)
+  public:
+	Bright_ContFx() : m_bright(127.5), m_contrast(50.0)
 	{
 		addParam("brightness", m_bright);
 		addParam("contrast", m_contrast);
@@ -26,11 +25,8 @@ public:
 
 	~Bright_ContFx(){};
 
-	//TParamObserver method
-	void onChange(const TParamChange &change)
-	{
-		notify(TFxParamChange(change));
-	}
+	// TParamObserver method
+	void onChange(const TParamChange &change) { notify(TFxParamChange(change)); }
 
 	bool getBBox(double frame, TRectD &bBox, TPixel32 &bgColor)
 	{

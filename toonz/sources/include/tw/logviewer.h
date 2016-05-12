@@ -20,7 +20,7 @@ class DVAPI TLogViewer : public TWidget
 	class Data;
 	Data *m_data;
 
-public:
+  public:
 	TLogViewer(TWidget *parent, string name = "logViewer");
 	~TLogViewer();
 
@@ -34,7 +34,7 @@ class DVAPI TLogViewerPopup : public TPopup
 {
 	TLogViewer *m_viewer;
 
-public:
+  public:
 	TLogViewerPopup(TWidget *parent, string name = "logViewerPopup");
 	~TLogViewerPopup();
 

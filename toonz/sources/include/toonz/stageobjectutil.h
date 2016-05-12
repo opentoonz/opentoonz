@@ -43,7 +43,7 @@ class DVAPI TStageObjectValues
 	{
 		double m_value;
 
-	public:
+	  public:
 		TStageObject::Channel m_actionId;
 		//    bool m_isKeyframe;
 		Channel(TStageObject::Channel actionId);
@@ -51,14 +51,15 @@ class DVAPI TStageObjectValues
 		double getValue() const { return m_value; }
 	};
 
-	TXsheetHandle *m_xsheetHandle; //Sbagliato: viene usato per l'update ma anche per prendere l'xsheet corrente in applyValues e in setGlobalKeyFrame
-	TObjectHandle *m_objectHandle; //Viene usato per l'update dei parametri.
-	TFrameHandle *m_frameHandle;   //Viene usato per l'update dei parametri.
+	TXsheetHandle *m_xsheetHandle; // Sbagliato: viene usato per l'update ma anche per prendere
+								   // l'xsheet corrente in applyValues e in setGlobalKeyFrame
+	TObjectHandle *m_objectHandle; // Viene usato per l'update dei parametri.
+	TFrameHandle *m_frameHandle; // Viene usato per l'update dei parametri.
 	TStageObjectId m_objectId;
 	int m_frame;
 	std::vector<Channel> m_channels;
 
-public:
+  public:
 	TStageObjectValues();
 	TStageObjectValues(TStageObjectId id, TStageObject::Channel a0);
 	TStageObjectValues(TStageObjectId id, TStageObject::Channel a0, TStageObject::Channel a1);
@@ -106,7 +107,7 @@ class DVAPI UndoSetKeyFrame : public TUndo
 
 	TStageObject::Keyframe m_key;
 
-public:
+  public:
 	UndoSetKeyFrame(TStageObjectId objectId, int frame, TXsheetHandle *xsheetHandle);
 
 	void setXsheetHandle(TXsheetHandle *xsheetHandle) { m_xsheetHandle = xsheetHandle; }
@@ -119,7 +120,9 @@ public:
 
 	QString getHistoryString()
 	{
-		return QObject::tr("Set Keyframe   %1 at frame %2").arg(QString::fromStdString(m_objId.toString())).arg(m_frame+1);
+		return QObject::tr("Set Keyframe   %1 at frame %2")
+			.arg(QString::fromStdString(m_objId.toString()))
+			.arg(m_frame + 1);
 	}
 };
 
@@ -138,13 +141,15 @@ class DVAPI UndoRemoveKeyFrame : public TUndo
 	TStageObjectId m_objId;
 	int m_frame;
 
-	TXsheetHandle *m_xsheetHandle; //Sbagliato: viene usato per prendere l'xsheet corrente nell'undo
-	TObjectHandle *m_objectHandle; //OK: viene usato per notificare i cambiamenti!
+	TXsheetHandle *m_xsheetHandle; // Sbagliato: viene usato per prendere l'xsheet corrente
+								   // nell'undo
+	TObjectHandle *m_objectHandle; // OK: viene usato per notificare i cambiamenti!
 
 	TStageObject::Keyframe m_key;
 
-public:
-	UndoRemoveKeyFrame(TStageObjectId objectId, int frame, TStageObject::Keyframe key, TXsheetHandle *xsheetHandle);
+  public:
+	UndoRemoveKeyFrame(TStageObjectId objectId, int frame, TStageObject::Keyframe key,
+					   TXsheetHandle *xsheetHandle);
 
 	void setXsheetHandle(TXsheetHandle *xsheetHandle) { m_xsheetHandle = xsheetHandle; }
 	void setObjectHandle(TObjectHandle *objectHandle) { m_objectHandle = objectHandle; }
@@ -156,7 +161,9 @@ public:
 
 	QString getHistoryString()
 	{
-		return QObject::tr("Remove Keyframe   %1 at frame %2").arg(QString::fromStdString(m_objId.toString())).arg(m_frame);
+		return QObject::tr("Remove Keyframe   %1 at frame %2")
+			.arg(QString::fromStdString(m_objId.toString()))
+			.arg(m_frame);
 	}
 };
 
@@ -169,13 +176,13 @@ class DVAPI UndoStageObjectCenterMove : public TUndo
 	TStageObjectId m_pid;
 	int m_frame;
 	TPointD m_before, m_after;
-	TXsheetHandle *m_xsheetHandle; //Sbagliato: viene usato per prendere l'xsheet corrente nell'undo
-	TObjectHandle *m_objectHandle; //OK: viene usato per notificare i cambiamenti!
+	TXsheetHandle *m_xsheetHandle; // Sbagliato: viene usato per prendere l'xsheet corrente
+								   // nell'undo
+	TObjectHandle *m_objectHandle; // OK: viene usato per notificare i cambiamenti!
 
-public:
-	UndoStageObjectCenterMove(
-		const TStageObjectId &id, int frame,
-		const TPointD &before, const TPointD &after);
+  public:
+	UndoStageObjectCenterMove(const TStageObjectId &id, int frame, const TPointD &before,
+							  const TPointD &after);
 
 	void setXsheetHandle(TXsheetHandle *xsheetHandle) { m_xsheetHandle = xsheetHandle; }
 	void setObjectHandle(TObjectHandle *objectHandle) { m_objectHandle = objectHandle; }
@@ -186,12 +193,11 @@ public:
 
 	QString getHistoryString()
 	{
-		return QObject::tr("Move Center   %1  Frame %2").arg(QString::fromStdString(m_pid.toString())).arg(m_frame + 1);
+		return QObject::tr("Move Center   %1  Frame %2")
+			.arg(QString::fromStdString(m_pid.toString()))
+			.arg(m_frame + 1);
 	}
-	int getHistoryType()
-	{
-		return HistoryType::EditTool_Move;
-	}
+	int getHistoryType() { return HistoryType::EditTool_Move; }
 };
 
 //=============================================================================
@@ -201,9 +207,9 @@ public:
 class DVAPI UndoStageObjectMove : public TUndo
 {
 	TStageObjectValues m_before, m_after;
-	TObjectHandle *m_objectHandle; //OK: viene usato per notificare i cambiamenti!
+	TObjectHandle *m_objectHandle; // OK: viene usato per notificare i cambiamenti!
 
-public:
+  public:
 	UndoStageObjectMove(const TStageObjectValues &before, const TStageObjectValues &after);
 
 	void setObjectHandle(TObjectHandle *objectHandle) { m_objectHandle = objectHandle; }
@@ -212,14 +218,8 @@ public:
 	void redo() const;
 	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return m_before.getStringForHistory();
-	}
-	int getHistoryType()
-	{
-		return HistoryType::EditTool_Move;
-	}
+	QString getHistoryString() { return m_before.getStringForHistory(); }
+	int getHistoryType() { return HistoryType::EditTool_Move; }
 };
 
 //=============================================================================
@@ -231,13 +231,13 @@ class DVAPI UndoStageObjectPinned : public TUndo
 	TStageObjectId m_pid;
 	int m_frame;
 	bool m_before, m_after;
-	TXsheetHandle *m_xsheetHandle; //Sbagliato: viene usato per prendere l'xsheet corrente nell'undo
-	TObjectHandle *m_objectHandle; //OK: viene usato per notificare i cambiamenti!
+	TXsheetHandle *m_xsheetHandle; // Sbagliato: viene usato per prendere l'xsheet corrente
+								   // nell'undo
+	TObjectHandle *m_objectHandle; // OK: viene usato per notificare i cambiamenti!
 
-public:
-	UndoStageObjectPinned(
-		const TStageObjectId &id, int frame,
-		const bool &before, const bool &after);
+  public:
+	UndoStageObjectPinned(const TStageObjectId &id, int frame, const bool &before,
+						  const bool &after);
 
 	void setXsheetHandle(TXsheetHandle *xsheetHandle) { m_xsheetHandle = xsheetHandle; }
 	void setObjectHandle(TObjectHandle *objectHandle) { m_objectHandle = objectHandle; }

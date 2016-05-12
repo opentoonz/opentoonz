@@ -8,7 +8,7 @@
 #ifndef _SDEF_H_
 #define _SDEF_H_
 
-//typedef   signed char  SCHAR;
+// typedef   signed char  SCHAR;
 typedef unsigned char UCHAR;
 /*typedef unsigned short USHORT;
 typedef unsigned int   UINT;
@@ -25,23 +25,23 @@ typedef struct _I_PIXEL {
 	int b, g, r, m;
 } I_PIXEL;
 
-#define ASSIGN_PIXEL(d, s) \
-	{                      \
-		(d)->r = (s)->r;   \
-		(d)->g = (s)->g;   \
-		(d)->b = (s)->b;   \
-		(d)->m = (s)->m;   \
+#define ASSIGN_PIXEL(d, s)                                                                         \
+	{                                                                                              \
+		(d)->r = (s)->r;                                                                           \
+		(d)->g = (s)->g;                                                                           \
+		(d)->b = (s)->b;                                                                           \
+		(d)->m = (s)->m;                                                                           \
 	}
-#define NULL_PIXEL(d)                          \
-	{                                          \
-		(d)->r = (d)->g = (d)->b = (d)->m = 0; \
+#define NULL_PIXEL(d)                                                                              \
+	{                                                                                              \
+		(d)->r = (d)->g = (d)->b = (d)->m = 0;                                                     \
 	}
-#define COLOR_PIXEL(d, r, g, b, m) \
-	{                              \
-		(d)->r = (r);              \
-		(d)->g = (g);              \
-		(d)->b = (b);              \
-		(d)->m = (m);              \
+#define COLOR_PIXEL(d, r, g, b, m)                                                                 \
+	{                                                                                              \
+		(d)->r = (r);                                                                              \
+		(d)->g = (g);                                                                              \
+		(d)->b = (b);                                                                              \
+		(d)->m = (m);                                                                              \
 	}
 
 typedef struct {

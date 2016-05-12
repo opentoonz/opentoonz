@@ -39,7 +39,7 @@ class DVAPI TabBar : public QTabBar
 
 	std::vector<QPixmap> m_pixmaps;
 
-public:
+  public:
 	TabBar(QWidget *parent = 0);
 	~TabBar();
 
@@ -47,12 +47,12 @@ public:
 	void addSimpleTab(const QString &text);
 	void clearTabBar();
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
 #endif // TABBAR_H

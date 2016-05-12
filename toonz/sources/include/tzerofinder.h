@@ -6,13 +6,7 @@
 #include <cmath>
 #include <assert.h>
 
-enum {
-	FZ_OK = 0,
-	FZ_FTOL = 1,
-	FZ_XTOL = 2,
-	FZ_MAX_ITER = 3,
-	FZ_NOT_ZERO = 4
-};
+enum { FZ_OK = 0, FZ_FTOL = 1, FZ_XTOL = 2, FZ_MAX_ITER = 3, FZ_NOT_ZERO = 4 };
 
 /*
 
@@ -21,72 +15,72 @@ enum {
 //  bisecate the interval... (I suppose it has never been used much :) )
 
 template< class  unaryOp        ,
-          class  unaryOpDerivate>
+		  class  unaryOpDerivate>
 bool  findZero_Newton ( double          x0      ,
-                        double          x1      ,
-                        unaryOp         f       ,
-                        unaryOpDerivate fd1     ,
-                        double          xtol    ,
-                        double          ftol    ,
-                        int             maxIter ,
-                        double          &x      ,
-                        int             &err    )
+						double          x1      ,
+						unaryOp         f       ,
+						unaryOpDerivate fd1     ,
+						double          xtol    ,
+						double          ftol    ,
+						int             maxIter ,
+						double          &x      ,
+						int             &err    )
 {
   double  f_x_n_plus_1  = 0.0   ;
   double  f_x_n         = f(x1) ;
   double  f_x_n_minus_1 = f(x0) ;
-  
-  if( f_x_n*f_x_n_minus_1 > 0 ) 
+
+  if( f_x_n*f_x_n_minus_1 > 0 )
   {
-    err = FZ_NOT_ZERO;
-    return  false;
+	err = FZ_NOT_ZERO;
+	return  false;
   }
 
   int i;
   err=FZ_OK;
 
   if( f_x_n         == 0  ||
-      f_x_n_minus_1 == 0    )  
+	  f_x_n_minus_1 == 0    )
   {
-    x   = (f_x_n == 0.0) ? x1 : x0;
-    err = FZ_OK; 
-    return true;
+	x   = (f_x_n == 0.0) ? x1 : x0;
+	err = FZ_OK;
+	return true;
   }
 
   double  x_n_plus_1  ;
   double  x_n         ;
   double  x_n_minus_1 ;
-  
-  x_n         = x1;   
+
+  x_n         = x1;
   x_n_minus_1 = x0;
 
   for(i=0;i<maxIter;++i)
   {
-    // the firts time x_n = x1
-    double  fd1_x_n = fd1(x_n);
-    assert( fd1_x_n != 0.0 );
+	// the firts time x_n = x1
+	double  fd1_x_n = fd1(x_n);
+	assert( fd1_x_n != 0.0 );
 
-    x_n_plus_1 = x_n - f_x_n / fd1_x_n;
-    if( fabs(x_n - x_n_plus_1) < xtol )
-    {  
-      err=FZ_XTOL;
-      break;
-    }
-    
-    f_x_n_plus_1 = f(x_n_plus_1);
-    if( fabs(f_x_n_plus_1) < ftol )
-    {  
-      err=FZ_FTOL;
-      break;
-    }
+	x_n_plus_1 = x_n - f_x_n / fd1_x_n;
+	if( fabs(x_n - x_n_plus_1) < xtol )
+	{
+	  err=FZ_XTOL;
+	  break;
+	}
 
-    x_n_minus_1   = x_n;
-    x_n           = x_n_plus_1;
-    f_x_n         = f_x_n_plus_1;
+	f_x_n_plus_1 = f(x_n_plus_1);
+	if( fabs(f_x_n_plus_1) < ftol )
+	{
+	  err=FZ_FTOL;
+	  break;
+	}
+
+	x_n_minus_1   = x_n;
+	x_n           = x_n_plus_1;
+	f_x_n         = f_x_n_plus_1;
   }
-  
+
   x=x_n_plus_1;
-  err = (i == maxIter ? FZ_MAX_ITER : err); 
+  err = (i == maxIter ? FZ_MAX_ITER : err);
   return true;
 }
 */
@@ -99,25 +93,20 @@ bool  findZero_Newton ( double          x0      ,
   Get an object and a method of object class.
   x1 and x2 are extremes of test and xtol
   is the accuracy.
-  
-    Return:
-    the minimum or,
-    -2  if min it's unreacheable.
-    -1  if min does not exist
-    Remark:
-    Max iterations numbers is fixed to 100 in in maxIter.
-    This value fix the accuracy to 2e-100.
-    
-      From Numerical Recipes.
+
+	Return:
+	the minimum or,
+	-2  if min it's unreacheable.
+	-1  if min does not exist
+	Remark:
+	Max iterations numbers is fixed to 100 in in maxIter.
+	This value fix the accuracy to 2e-100.
+
+	  From Numerical Recipes.
 */
 
 template <class unaryOp>
-bool findZero_bisection(double x0,
-						double x1,
-						unaryOp f,
-						double xtol,
-						int maxIter,
-						double &x,
+bool findZero_bisection(double x0, double x1, unaryOp f, double xtol, int maxIter, double &x,
 						int &err)
 {
 	int i;
@@ -132,8 +121,7 @@ bool findZero_bisection(double x0,
 		return false;
 	}
 
-	if (fx0 == 0 ||
-		fmid == 0) {
+	if (fx0 == 0 || fmid == 0) {
 		x = (fmid == 0.0) ? x1 : x0;
 		err = FZ_OK;
 		return true;
@@ -156,18 +144,10 @@ bool findZero_bisection(double x0,
 }
 
 template <class unaryOp>
-bool findZero_secant(double x0,
-					 double x1,
-					 unaryOp f,
-					 double xtol,
-					 double ftol,
-					 int maxIter,
-					 double &x,
-					 int &err)
+bool findZero_secant(double x0, double x1, unaryOp f, double xtol, double ftol, int maxIter,
+					 double &x, int &err)
 {
-	double f_x_n_plus_1 = 0.0,
-		   f_x_n = f(x1),
-		   f_x_n_minus_1 = f(x0);
+	double f_x_n_plus_1 = 0.0, f_x_n = f(x1), f_x_n_minus_1 = f(x0);
 
 	if (f_x_n * f_x_n_minus_1 > 0) {
 		err = FZ_NOT_ZERO;
@@ -177,15 +157,12 @@ bool findZero_secant(double x0,
 	int i;
 	err = FZ_OK;
 
-	if (f_x_n == 0 ||
-		f_x_n_minus_1 == 0) {
+	if (f_x_n == 0 || f_x_n_minus_1 == 0) {
 		x = (f_x_n == 0.0) ? x1 : x0;
 		return true;
 	}
 
-	double x_n_plus_1 = x1,
-		   x_n = x1,
-		   x_n_minus_1 = x0;
+	double x_n_plus_1 = x1, x_n = x1, x_n_minus_1 = x0;
 
 	for (i = 0; i < maxIter; ++i) {
 		double den = f_x_n - f_x_n_minus_1;
@@ -220,15 +197,8 @@ bool findZero_secant(double x0,
 }
 
 template <class unaryOp1, class unaryOp2>
-bool findZero_Newton(double x0,
-					 double x1,
-					 unaryOp1 f,
-					 unaryOp2 f1,
-					 double xtol,
-					 double ftol,
-					 int maxIter,
-					 double &x,
-					 int &err)
+bool findZero_Newton(double x0, double x1, unaryOp1 f, unaryOp2 f1, double xtol, double ftol,
+					 int maxIter, double &x, int &err)
 {
 	double f_0 = f(x0);
 	double f_1 = f(x1);
@@ -246,8 +216,7 @@ bool findZero_Newton(double x0,
 	int i;
 	err = FZ_OK;
 
-	if (f_0 == 0 ||
-		f_1 == 0) {
+	if (f_0 == 0 || f_1 == 0) {
 		x = (f_1 == 0.0) ? x1 : x0;
 		return true;
 	}

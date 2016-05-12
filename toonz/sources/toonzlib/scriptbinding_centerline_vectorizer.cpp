@@ -55,7 +55,8 @@ QScriptValue CenterlineVectorizer::vectorizeImage(const TImageP &src, TPalette *
 	m_parameters->m_affine = dpiAff * TTranslation(-center);
 	m_parameters->m_thickScale = factor;
 
-	palette->addRef(); // if there are no other references the vectorize() method below can destroy the palette
+	palette->addRef(); // if there are no other references the vectorize() method below can destroy
+					   // the palette
 					   // BEFORE assigning it to the vector image
 	TVectorImageP vi = vc.vectorize(src, *m_parameters, palette);
 	vi->setPalette(palette);
@@ -86,7 +87,8 @@ QScriptValue CenterlineVectorizer::vectorize(QScriptValue arg)
 			palette = ti->getPalette();
 		}
 	} else {
-		return context()->throwError(tr("Bad argument (%1): should be an Image or a Level").arg(arg.toString()));
+		return context()->throwError(
+			tr("Bad argument (%1): should be an Image or a Level").arg(arg.toString()));
 	}
 	if (palette == 0)
 		palette = new TPalette();
@@ -98,7 +100,8 @@ QScriptValue CenterlineVectorizer::vectorize(QScriptValue arg)
 		level->getFrameIds(fids);
 		foreach (TFrameId fid, fids) {
 			TImageP srcImg = level->getImg(fid);
-			if (srcImg && (srcImg->getType() == TImage::RASTER || srcImg->getType() == TImage::TOONZ_RASTER)) {
+			if (srcImg && (srcImg->getType() == TImage::RASTER ||
+						   srcImg->getType() == TImage::TOONZ_RASTER)) {
 				QScriptValue newFrame = vectorizeImage(srcImg, palette);
 				if (newFrame.isError()) {
 					return newFrame;

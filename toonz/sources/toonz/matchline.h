@@ -34,12 +34,12 @@ class MergeCmappedDialog : public DVGui::Dialog
 	DVGui::LineEdit *m_fileNameFld;
 	TFilePath &m_levelPath;
 
-public:
+  public:
 	MergeCmappedDialog(TFilePath &);
 
 	void accept();
 
-protected slots:
+  protected slots:
 
 	void onPathChanged() {}
 	void onNameChanged() {}
@@ -62,17 +62,17 @@ class MatchlinesDialog : public DVGui::Dialog
 	QPushButton *m_rup_gapButton;
 	TXsheet *m_currentXsheet;
 
-protected slots:
+  protected slots:
 
 	void onChooseInkClicked(bool value);
 	void onLineStackButtonPressed(int id);
 	void onInkPrevalenceChanged(bool isDragging);
 	void accept();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *e);
 
-public:
+  public:
 	MatchlinesDialog();
 
 	int exec(TPalette *plt);
@@ -89,7 +89,7 @@ class DeleteInkDialog : public DVGui::Dialog
 	DVGui::LineEdit *m_inkIndex;
 	DVGui::LineEdit *m_frames;
 
-public:
+  public:
 	DeleteInkDialog(const QString &str, int inkIndex);
 
 	void setRange(const QString &str);
@@ -104,6 +104,7 @@ void deleteMatchlines(TXshSimpleLevel *sl, const std::set<TFrameId> &fids);
 void deleteInk(TXshSimpleLevel *sl, const std::set<TFrameId> &fids);
 void mergeColumns(int dstColumn, int srcColumn, bool isRedo);
 void mergeColumns(const std::set<int> &columns);
-void doMatchlines(int column, int mColumn, int index, int inkPrevalence, int MatchlineSessionId = 0);
+void doMatchlines(int column, int mColumn, int index, int inkPrevalence,
+				  int MatchlineSessionId = 0);
 void mergeCmapped(int dstColumn, int srcColumn, const QString &fullpath, bool isRedo);
 std::vector<int> string2Indexes(const QString &values);

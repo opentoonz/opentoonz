@@ -61,7 +61,7 @@ class DVAPI PinchTool : public TTool
 	int updateCursor() const;
 	TStroke *getClosestStroke(const TPointD &pos, double &w) const;
 
-public:
+  public:
 	PinchTool();
 	virtual ~PinchTool();
 
@@ -76,25 +76,19 @@ public:
 
 	void draw();
 
-	void leftButtonDown(const TPointD &pos,
-						const TMouseEvent &);
+	void leftButtonDown(const TPointD &pos, const TMouseEvent &);
 
-	void leftButtonDrag(const TPointD &pos,
-						const TMouseEvent &e);
+	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
 
-	void leftButtonUp(const TPointD &pos,
-					  const TMouseEvent &e);
+	void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
 
 	void invalidateCursorArea();
 
-	void mouseMove(const TPointD &pos,
-				   const TMouseEvent &e);
+	void mouseMove(const TPointD &pos, const TMouseEvent &e);
 
 	bool moveCursor(const TPointD &pos);
 
-	bool keyDown(int key,
-				 TUINT32 flags,
-				 const TPoint &pos);
+	bool keyDown(int key, TUINT32 flags, const TPoint &pos);
 
 	void onActivate();
 	void onDeactivate();
@@ -108,4 +102,4 @@ public:
 	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 };
 
-#endif //PINCHTOOL_H
+#endif // PINCHTOOL_H

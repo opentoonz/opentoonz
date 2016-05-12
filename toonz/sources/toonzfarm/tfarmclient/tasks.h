@@ -16,7 +16,7 @@ using namespace std;
 
 class SubmitPageTask
 {
-public:
+  public:
 	virtual ~SubmitPageTask() {}
 
 	virtual void setFileArg(const string &fp) = 0;
@@ -35,7 +35,7 @@ public:
 
 	static SubmitPageTask *create(const string &type);
 
-protected:
+  protected:
 	string m_filePath;
 	string m_name;
 	map<string, string> m_depTasks;
@@ -45,7 +45,7 @@ protected:
 
 class CasmTask2 : public SubmitPageTask
 {
-public:
+  public:
 	CasmTask2();
 	CasmTask2(const string &s, const string &setupFilePath);
 
@@ -58,19 +58,9 @@ public:
 
 	void setDefaultValue();
 
-	enum moveType {
-		M_NONE = 0,
-		M_BG_FRACMOVE,
-		M_INTMOVE,
-		M_FRACMOVE
-	};
+	enum moveType { M_NONE = 0, M_BG_FRACMOVE, M_INTMOVE, M_FRACMOVE };
 
-	enum resType {
-		RES_TYPE_NONE = 0,
-		RES_TYPE_STANDARD,
-		RES_TYPE_IMPROVED,
-		RES_TYPE_HIGH
-	};
+	enum resType { RES_TYPE_NONE = 0, RES_TYPE_STANDARD, RES_TYPE_IMPROVED, RES_TYPE_HIGH };
 
 	int m_taskChunksize;
 	int m_start;
@@ -107,7 +97,7 @@ public:
 
 class ScriptTask : public SubmitPageTask
 {
-public:
+  public:
 	ScriptTask();
 	ScriptTask(const string &s, const string &setupFilePath);
 

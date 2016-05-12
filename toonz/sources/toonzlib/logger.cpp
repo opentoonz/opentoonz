@@ -45,7 +45,6 @@ void Logger::addListener(Listener *listener)
 
 void Logger::removeListener(Listener *listener)
 {
-	m_listeners.erase(
-		std::remove(m_listeners.begin(), m_listeners.end(), listener),
-		m_listeners.end());
+	m_listeners.erase(std::remove(m_listeners.begin(), m_listeners.end(), listener),
+					  m_listeners.end());
 }

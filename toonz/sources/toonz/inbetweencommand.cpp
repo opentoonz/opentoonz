@@ -41,7 +41,7 @@ class MyInbetweener
 {
 	TVectorImageP m_vi0, m_vi1;
 
-public:
+  public:
 	MyInbetweener(const TVectorImageP &vi0, const TVectorImageP &vi1);
 	TVectorImageP tween(double t);
 	void stabilizeSegments(TVectorImageP &image);
@@ -74,9 +74,7 @@ void MyInbetweener::stabilizeSegments(TStroke *stroke)
 		TPointD v = normalize(p4 - p0);
 		TPointD u = rotate90(v);
 		double eps = tdistance(p0, p4) * 0.1;
-		if (fabs(u * (p2 - p0)) < eps &&
-			fabs(u * (p1 - p0)) < eps &&
-			fabs(u * (p3 - p0)) < eps) {
+		if (fabs(u * (p2 - p0)) < eps && fabs(u * (p1 - p0)) < eps && fabs(u * (p3 - p0)) < eps) {
 			double e = 0.001;
 			double d2 = norm2(p4 - p0);
 			if (e * e * 6 * 6 > d2)
@@ -105,20 +103,20 @@ TVectorImageP MyInbetweener::tween(double t)
 			stroke->setControlPoint(j, p);
 		}
 		/*
-    for(int j=2;j+2<m;j+=2)
-    {
-      TThickPoint p0 = stroke0->getControlPoint(j-2);
-      TThickPoint p1 = stroke0->getControlPoint(j-1);
-      TThickPoint p2 = stroke0->getControlPoint(j);
-      TThickPoint p3 = stroke0->getControlPoint(j+1);
-      TThickPoint p4 = stroke0->getControlPoint(j+2);
-      if(tdistance2(p0,p1)<0.001 && tdistance2(p3,p4)<0.001)
-      {
-        p2 = 0.5*(p1+p2);
-        stroke->setControlPoint(j,p2);
-      }
-    }
-    */
+	for(int j=2;j+2<m;j+=2)
+	{
+	  TThickPoint p0 = stroke0->getControlPoint(j-2);
+	  TThickPoint p1 = stroke0->getControlPoint(j-1);
+	  TThickPoint p2 = stroke0->getControlPoint(j);
+	  TThickPoint p3 = stroke0->getControlPoint(j+1);
+	  TThickPoint p4 = stroke0->getControlPoint(j+2);
+	  if(tdistance2(p0,p1)<0.001 && tdistance2(p3,p4)<0.001)
+	  {
+		p2 = 0.5*(p1+p2);
+		stroke->setControlPoint(j,p2);
+	  }
+	}
+	*/
 	}
 	return vi;
 }
@@ -137,17 +135,17 @@ class UndoInbetween : public TUndo
 	vector<TVectorImageP> m_images;
 	FilmstripCmd::InbetweenInterpolation m_interpolation;
 
-public:
-	UndoInbetween(
-		TXshSimpleLevel *xl,
-		std::vector<TFrameId> fids,
-		FilmstripCmd::InbetweenInterpolation interpolation)
+  public:
+	UndoInbetween(TXshSimpleLevel *xl, std::vector<TFrameId> fids,
+				  FilmstripCmd::InbetweenInterpolation interpolation)
 		: m_level(xl), m_fids(fids), m_interpolation(interpolation)
 	{
 		std::vector<TFrameId>::iterator it = fids.begin();
-		//mi salvo tutte le immagine
+		// mi salvo tutte le immagine
 		for (; it != fids.end(); ++it)
-			m_images.push_back(m_level->getFrame(*it, false)); //non si fa clone perche' il livello subito dopo rilascia queste immagini a causa dell'inbetweener
+			m_images.push_back(m_level->getFrame(*it, false)); // non si fa clone perche' il livello
+															   // subito dopo rilascia queste
+															   // immagini a causa dell'inbetweener
 	}
 
 	void undo() const
@@ -176,14 +174,13 @@ public:
 	}
 };
 
-} //namespace
+} // namespace
 
 //=============================================================================
 // inbetween
 //-----------------------------------------------------------------------------
 
-void FilmstripCmd::inbetweenWithoutUndo(TXshSimpleLevel *sl,
-										const TFrameId &fid0,
+void FilmstripCmd::inbetweenWithoutUndo(TXshSimpleLevel *sl, const TFrameId &fid0,
 										const TFrameId &fid1,
 										FilmstripCmd::InbetweenInterpolation interpolation)
 {
@@ -237,9 +234,7 @@ void FilmstripCmd::inbetweenWithoutUndo(TXshSimpleLevel *sl,
 
 //-----------------------------------------------------------------------------
 
-void FilmstripCmd::inbetween(TXshSimpleLevel *sl,
-							 const TFrameId &fid0,
-							 const TFrameId &fid1,
+void FilmstripCmd::inbetween(TXshSimpleLevel *sl, const TFrameId &fid0, const TFrameId &fid1,
 							 FilmstripCmd::InbetweenInterpolation interpolation)
 {
 	std::vector<TFrameId> fids;

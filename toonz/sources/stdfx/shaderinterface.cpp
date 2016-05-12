@@ -47,31 +47,32 @@ const static QString l_typeNames[ShaderInterface::TYPESCOUNT] = {
 	"", "bool", "float", "vec2", "vec3", "vec4", "int", "ivec2", "ivec3", "ivec4", "rgba", "rgb"};
 
 const static QString l_conceptNames[ShaderInterface::CONCEPTSCOUNT] = {
-	"none", "percent", "length", "angle", "point", "radius_ui", "width_ui",
-	"angle_ui", "point_ui", "xy_ui", "vector_ui", "polar_ui", "size_ui", "quad_ui",
-	"rect_ui"};
+	"none",		"percent", "length",	"angle",	"point",   "radius_ui", "width_ui", "angle_ui",
+	"point_ui", "xy_ui",   "vector_ui", "polar_ui", "size_ui", "quad_ui",   "rect_ui"};
 
-const static QString l_hwtNames[ShaderInterface::HWTCOUNT] = {
-	"none", "any", "isotropic"};
+const static QString l_hwtNames[ShaderInterface::HWTCOUNT] = {"none", "any", "isotropic"};
 
-enum Names { MAIN_PROGRAM,
-			 INPUT_PORTS,
-			 INPUT_PORT,
-			 PORTS_PROGRAM,
-			 PARAMETERS,
-			 PARAMETER,
-			 NAME,
-			 PROGRAM_FILE,
-			 CONCEPT,
-			 DEFAULT_,
-			 RANGE,
-			 HANDLED_WORLD_TRANSFORMS,
-			 BBOX_PROGRAM,
-			 NAMESCOUNT };
+enum Names {
+	MAIN_PROGRAM,
+	INPUT_PORTS,
+	INPUT_PORT,
+	PORTS_PROGRAM,
+	PARAMETERS,
+	PARAMETER,
+	NAME,
+	PROGRAM_FILE,
+	CONCEPT,
+	DEFAULT_,
+	RANGE,
+	HANDLED_WORLD_TRANSFORMS,
+	BBOX_PROGRAM,
+	NAMESCOUNT
+};
 
 const static std::string l_names[NAMESCOUNT] = {
-	"MainProgram", "InputPorts", "InputPort", "PortsProgram", "Parameters", "Parameter",
-	"Name", "ProgramFile", "Concept", "Default", "Range", "HandledWorldTransforms",
+	"MainProgram", "InputPorts", "InputPort", "PortsProgram",
+	"Parameters",  "Parameter",  "Name",	  "ProgramFile",
+	"Concept",	 "Default",	"Range",	 "HandledWorldTransforms",
 	"BBoxProgram"};
 
 // Filescope functions
@@ -85,24 +86,21 @@ inline bool loadShader(QGLShader::ShaderType type, const TFilePath &fp, Compiled
 	QFileInfo shaderFileInfo(qfp);
 	cs.second = shaderFileInfo.lastModified();
 
-	return shader->compileSourceFile(qfp) &&
-		   cs.first->addShader(shader);
+	return shader->compileSourceFile(qfp) && cs.first->addShader(shader);
 }
 
 void dumpError(TIStream &is, const std::wstring &err = std::wstring())
 {
-	DVGui::info(
-		"Error reading " + QString::fromStdWString(is.getFilePath().getLevelNameW()) +
-		" (line " + QString::number(is.getLine()) + ")" +
-		(err.empty() ? QString() : QString::fromStdWString(L": " + err)));
+	DVGui::info("Error reading " + QString::fromStdWString(is.getFilePath().getLevelNameW()) +
+				" (line " + QString::number(is.getLine()) + ")" +
+				(err.empty() ? QString() : QString::fromStdWString(L": " + err)));
 }
 
 void skipTag(TIStream &is, const std::string &tagName)
 {
-	DVGui::info(
-		"Error reading " + QString::fromStdWString(is.getFilePath().getLevelNameW()) +
-		" (line " + QString::number(is.getLine()) +
-		"): Unknown tag '<" + QString::fromStdString(tagName) + ">'");
+	DVGui::info("Error reading " + QString::fromStdWString(is.getFilePath().getLevelNameW()) +
+				" (line " + QString::number(is.getLine()) + "): Unknown tag '<" +
+				QString::fromStdString(tagName) + ">'");
 
 	is.skipCurrentTag();
 }
@@ -113,8 +111,7 @@ void skipTag(TIStream &is, const std::string &tagName)
 //    ShaderInterface  implementation
 //**********************************************************************
 
-ShaderInterface::ShaderInterface()
-	: m_hwt(ANY)
+ShaderInterface::ShaderInterface() : m_hwt(ANY)
 {
 }
 
@@ -135,8 +132,7 @@ bool ShaderInterface::isValid() const
 
 //---------------------------------------------------------
 
-const std::vector<ShaderInterface::Parameter> &
-ShaderInterface::parameters() const
+const std::vector<ShaderInterface::Parameter> &ShaderInterface::parameters() const
 {
 	return m_parameters;
 }
@@ -179,8 +175,8 @@ ShaderInterface::HandledWorldTransformsType ShaderInterface::hwtType() const
 //---------------------------------------------------------
 
 std::pair<QGLShaderProgram *, QDateTime>
-ShaderInterface::makeProgram(const ShaderData &sd,
-							 int varyingsCount, const GLchar **varyingNames) const
+ShaderInterface::makeProgram(const ShaderData &sd, int varyingsCount,
+							 const GLchar **varyingNames) const
 {
 	CompiledShader result;
 
@@ -192,8 +188,10 @@ ShaderInterface::makeProgram(const ShaderData &sd,
 	::loadShader(sd.m_type, sd.m_path, result);
 
 	if (varyingsCount > 0)
-		glTransformFeedbackVaryings(result.first->programId(), varyingsCount, varyingNames, GL_INTERLEAVED_ATTRIBS);
-	// NOTE: Since we'll be drawing a single vertex, GL_INTERLEAVED_ATTRIBS is less restrictive than GL_SEPARATE_ATTRIBS.
+		glTransformFeedbackVaryings(result.first->programId(), varyingsCount, varyingNames,
+									GL_INTERLEAVED_ATTRIBS);
+	// NOTE: Since we'll be drawing a single vertex, GL_INTERLEAVED_ATTRIBS is less restrictive than
+	// GL_SEPARATE_ATTRIBS.
 
 	result.first->link();
 
@@ -208,7 +206,8 @@ void ShaderInterface::saveData(TOStream &os)
 		inline static TFilePath getRelativePath(const TFilePath &file, const TFilePath &relTo)
 		{
 			QDir relToDir(QString::fromStdWString(relTo.getParentDir().getWideString()));
-			QString relFileStr(relToDir.relativeFilePath(QString::fromStdWString(file.getWideString())));
+			QString relFileStr(
+				relToDir.relativeFilePath(QString::fromStdWString(file.getWideString())));
 			return TFilePath(relFileStr.toStdWString());
 		}
 	};
@@ -270,7 +269,8 @@ void ShaderInterface::loadData(TIStream &is)
 		inline static TFilePath getAbsolutePath(const TFilePath &file, const TFilePath &relTo)
 		{
 			QDir relToDir(QString::fromStdWString(relTo.getParentDir().getWideString()));
-			QString absFileStr(relToDir.absoluteFilePath(QString::fromStdWString(file.getWideString())));
+			QString absFileStr(
+				relToDir.absoluteFilePath(QString::fromStdWString(file.getWideString())));
 			return TFilePath(absFileStr.toStdWString());
 		}
 
@@ -314,13 +314,14 @@ void ShaderInterface::loadData(TIStream &is)
 				QString hwtName;
 				is >> hwtName;
 
-				m_hwt = HandledWorldTransformsType(std::find_if(
-													   l_hwtNames, l_hwtNames + HWTCOUNT, ::CaselessCompare(hwtName)) -
-												   l_hwtNames);
+				m_hwt = HandledWorldTransformsType(
+					std::find_if(l_hwtNames, l_hwtNames + HWTCOUNT, ::CaselessCompare(hwtName)) -
+					l_hwtNames);
 
 				if (m_hwt == HWTCOUNT) {
 					m_hwt = HWT_UNKNOWN;
-					::dumpError(is, L"Unrecognized HandledWorldTransforms type '" + hwtName.toStdWString() + L"'");
+					::dumpError(is, L"Unrecognized HandledWorldTransforms type '" +
+										hwtName.toStdWString() + L"'");
 				}
 
 				is.closeChild();
@@ -367,7 +368,8 @@ void ShaderInterface::ShaderData::saveData(TOStream &os)
 		inline static TFilePath getRelativePath(const TFilePath &file, const TFilePath &relTo)
 		{
 			QDir relToDir(QString::fromStdWString(relTo.getParentDir().getWideString()));
-			QString relFileStr(relToDir.relativeFilePath(QString::fromStdWString(file.getWideString())));
+			QString relFileStr(
+				relToDir.relativeFilePath(QString::fromStdWString(file.getWideString())));
 			return TFilePath(relFileStr.toStdWString());
 		}
 	};
@@ -389,7 +391,8 @@ void ShaderInterface::ShaderData::loadData(TIStream &is)
 		inline static TFilePath getAbsolutePath(const TFilePath &file, const TFilePath &relTo)
 		{
 			QDir relToDir(QString::fromStdWString(relTo.getParentDir().getWideString()));
-			QString absFileStr(relToDir.absoluteFilePath(QString::fromStdWString(file.getWideString())));
+			QString absFileStr(
+				relToDir.absoluteFilePath(QString::fromStdWString(file.getWideString())));
 			return TFilePath(absFileStr.toStdWString());
 		}
 	};
@@ -438,8 +441,8 @@ void ShaderInterface::ParameterConcept::loadData(TIStream &is)
 	QString conceptName;
 	is >> conceptName;
 
-	m_type = ParameterConceptType(std::find_if(
-									  l_conceptNames, l_conceptNames + CONCEPTSCOUNT, ::CaselessCompare(conceptName)) -
+	m_type = ParameterConceptType(std::find_if(l_conceptNames, l_conceptNames + CONCEPTSCOUNT,
+											   ::CaselessCompare(conceptName)) -
 								  l_conceptNames);
 
 	if (m_type == CONCEPTSCOUNT) {
@@ -491,12 +494,11 @@ void ShaderInterface::Parameter::saveData(TOStream &os)
 		break;
 	case VEC3:
 		os << (double)m_default.m_vec3[0] << (double)m_default.m_vec3[1]
-			<< (double)m_default.m_vec3[2];
+		   << (double)m_default.m_vec3[2];
 		break;
 	case VEC4:
 		os << (double)m_default.m_vec4[0] << (double)m_default.m_vec4[1]
-			<< (double)m_default.m_vec4[2]
-			<< (double)m_default.m_vec4[3];
+		   << (double)m_default.m_vec4[2] << (double)m_default.m_vec4[3];
 		break;
 	case INT:
 		os << m_default.m_int;
@@ -505,22 +507,18 @@ void ShaderInterface::Parameter::saveData(TOStream &os)
 		os << m_default.m_ivec2[0] << m_default.m_ivec2[1];
 		break;
 	case IVEC3:
-		os << m_default.m_ivec3[0] << m_default.m_ivec3[1]
-			<< m_default.m_ivec3[2];
+		os << m_default.m_ivec3[0] << m_default.m_ivec3[1] << m_default.m_ivec3[2];
 		break;
 	case IVEC4:
-		os << m_default.m_ivec4[0] << m_default.m_ivec4[1]
-			<< m_default.m_ivec4[2]
-			<< m_default.m_ivec4[3];
+		os << m_default.m_ivec4[0] << m_default.m_ivec4[1] << m_default.m_ivec4[2]
+		   << m_default.m_ivec4[3];
 		break;
 	case RGBA:
-		os << (int)m_default.m_rgba[0] << (int)m_default.m_rgba[1]
-			<< (int)m_default.m_rgba[2]
-			<< (int)m_default.m_rgba[3];
+		os << (int)m_default.m_rgba[0] << (int)m_default.m_rgba[1] << (int)m_default.m_rgba[2]
+		   << (int)m_default.m_rgba[3];
 		break;
 	case RGB:
-		os << (int)m_default.m_rgb[0] << (int)m_default.m_rgb[1]
-			<< (int)m_default.m_rgb[2];
+		os << (int)m_default.m_rgb[0] << (int)m_default.m_rgb[1] << (int)m_default.m_rgb[2];
 		break;
 	}
 
@@ -534,48 +532,34 @@ void ShaderInterface::Parameter::saveData(TOStream &os)
 		break;
 	case VEC2:
 		os << (double)m_range[0].m_vec2[0] << (double)m_range[1].m_vec2[0]
-					  << (double)m_range[0].m_vec2[1]
-					  << (double)m_range[1].m_vec2[1];
+		   << (double)m_range[0].m_vec2[1] << (double)m_range[1].m_vec2[1];
 		break;
 	case VEC3:
 		os << (double)m_range[0].m_vec3[0] << (double)m_range[1].m_vec3[0]
-					   << (double)m_range[0].m_vec3[1]
-					   << (double)m_range[1].m_vec3[1]
-					   << (double)m_range[0].m_vec3[2]
-					   << (double)m_range[1].m_vec3[2];
+		   << (double)m_range[0].m_vec3[1] << (double)m_range[1].m_vec3[1]
+		   << (double)m_range[0].m_vec3[2] << (double)m_range[1].m_vec3[2];
 		break;
 	case VEC4:
 		os << (double)m_range[0].m_vec4[0] << (double)m_range[1].m_vec4[0]
-					  << (double)m_range[0].m_vec4[1]
-					  << (double)m_range[1].m_vec4[1]
-					  << (double)m_range[0].m_vec4[2]
-					  << (double)m_range[1].m_vec4[2]
-					  << (double)m_range[0].m_vec4[3]
-					  << (double)m_range[1].m_vec4[3];
+		   << (double)m_range[0].m_vec4[1] << (double)m_range[1].m_vec4[1]
+		   << (double)m_range[0].m_vec4[2] << (double)m_range[1].m_vec4[2]
+		   << (double)m_range[0].m_vec4[3] << (double)m_range[1].m_vec4[3];
 		break;
 	case INT:
 		os << m_range[0].m_int << m_range[1].m_int;
 		break;
 	case IVEC2:
-		os << m_range[0].m_ivec2[0] << m_range[1].m_ivec2[0]
-						<< m_range[0].m_ivec2[1]
-						<< m_range[1].m_ivec2[1];
+		os << m_range[0].m_ivec2[0] << m_range[1].m_ivec2[0] << m_range[0].m_ivec2[1]
+		   << m_range[1].m_ivec2[1];
 		break;
 	case IVEC3:
-		os << m_range[0].m_ivec3[0] << m_range[1].m_ivec3[0]
-						<< m_range[0].m_ivec3[1]
-						<< m_range[1].m_ivec3[1]
-						<< m_range[0].m_ivec3[2]
-						<< m_range[1].m_ivec3[2];
+		os << m_range[0].m_ivec3[0] << m_range[1].m_ivec3[0] << m_range[0].m_ivec3[1]
+		   << m_range[1].m_ivec3[1] << m_range[0].m_ivec3[2] << m_range[1].m_ivec3[2];
 		break;
 	case IVEC4:
-		os << m_range[0].m_ivec4[0] << m_range[1].m_ivec4[0]
-						<< m_range[0].m_ivec4[1]
-						<< m_range[1].m_ivec4[1]
-						<< m_range[0].m_ivec4[2]
-						<< m_range[1].m_ivec4[2]
-						<< m_range[0].m_ivec4[3]
-						<< m_range[1].m_ivec4[3];
+		os << m_range[0].m_ivec4[0] << m_range[1].m_ivec4[0] << m_range[0].m_ivec4[1]
+		   << m_range[1].m_ivec4[1] << m_range[0].m_ivec4[2] << m_range[1].m_ivec4[2]
+		   << m_range[0].m_ivec4[3] << m_range[1].m_ivec4[3];
 		break;
 	}
 
@@ -591,9 +575,9 @@ void ShaderInterface::Parameter::loadData(TIStream &is)
 	QString typeName;
 	is >> typeName >> m_name;
 
-	m_type = ShaderInterface::ParameterType(std::find_if(
-												l_typeNames, l_typeNames + TYPESCOUNT, ::CaselessCompare(typeName)) -
-											l_typeNames);
+	m_type = ShaderInterface::ParameterType(
+		std::find_if(l_typeNames, l_typeNames + TYPESCOUNT, ::CaselessCompare(typeName)) -
+		l_typeNames);
 
 	if (m_type == TYPESCOUNT)
 		throw TException(L"Unrecognized parameter type '" + typeName.toStdWString() + L"'");
@@ -620,16 +604,17 @@ void ShaderInterface::Parameter::loadData(TIStream &is)
 		break;
 	case VEC3:
 		m_default.m_vec3[0] = m_default.m_vec3[1] = m_default.m_vec3[1] = 0.0;
-		m_range[0].m_vec3[0] = m_range[0].m_vec3[1] = m_range[0].m_vec3[2] = -(std::numeric_limits<GLfloat>::max)();
-		m_range[1].m_vec3[0] = m_range[1].m_vec3[1] = m_range[1].m_vec3[2] = (std::numeric_limits<GLfloat>::max)();
+		m_range[0].m_vec3[0] = m_range[0].m_vec3[1] = m_range[0].m_vec3[2] =
+			-(std::numeric_limits<GLfloat>::max)();
+		m_range[1].m_vec3[0] = m_range[1].m_vec3[1] = m_range[1].m_vec3[2] =
+			(std::numeric_limits<GLfloat>::max)();
 		break;
 	case VEC4:
-		m_default.m_vec4[0] = m_default.m_vec4[1] =
-			m_default.m_vec4[1] = m_default.m_vec4[1] = 0.0;
-		m_range[0].m_vec4[0] = m_range[0].m_vec4[1] =
-			m_range[0].m_vec4[2] = m_range[0].m_vec4[3] = -(std::numeric_limits<GLfloat>::max)();
-		m_range[1].m_vec4[0] = m_range[1].m_vec4[1] =
-			m_range[1].m_vec4[2] = m_range[1].m_vec4[3] = (std::numeric_limits<GLfloat>::max)();
+		m_default.m_vec4[0] = m_default.m_vec4[1] = m_default.m_vec4[1] = m_default.m_vec4[1] = 0.0;
+		m_range[0].m_vec4[0] = m_range[0].m_vec4[1] = m_range[0].m_vec4[2] = m_range[0].m_vec4[3] =
+			-(std::numeric_limits<GLfloat>::max)();
+		m_range[1].m_vec4[0] = m_range[1].m_vec4[1] = m_range[1].m_vec4[2] = m_range[1].m_vec4[3] =
+			(std::numeric_limits<GLfloat>::max)();
 		break;
 	case INT:
 		m_default.m_int = 0;
@@ -643,24 +628,24 @@ void ShaderInterface::Parameter::loadData(TIStream &is)
 		break;
 	case IVEC3:
 		m_default.m_ivec3[0] = m_default.m_ivec3[1] = m_default.m_ivec3[1] = 0;
-		m_range[0].m_ivec3[0] = m_range[0].m_ivec3[1] = m_range[0].m_ivec3[2] = -(std::numeric_limits<GLint>::max)();
-		m_range[1].m_ivec3[0] = m_range[1].m_ivec3[1] = m_range[1].m_ivec3[2] = (std::numeric_limits<GLint>::max)();
+		m_range[0].m_ivec3[0] = m_range[0].m_ivec3[1] = m_range[0].m_ivec3[2] =
+			-(std::numeric_limits<GLint>::max)();
+		m_range[1].m_ivec3[0] = m_range[1].m_ivec3[1] = m_range[1].m_ivec3[2] =
+			(std::numeric_limits<GLint>::max)();
 		break;
 	case IVEC4:
-		m_default.m_ivec4[0] = m_default.m_ivec4[1] =
-			m_default.m_ivec4[1] = m_default.m_ivec4[1] = 0;
-		m_range[0].m_ivec4[0] = m_range[0].m_ivec4[1] =
-			m_range[0].m_ivec4[2] = m_range[0].m_ivec4[3] = -(std::numeric_limits<GLint>::max)();
-		m_range[1].m_ivec4[0] = m_range[1].m_ivec4[1] =
-			m_range[1].m_ivec4[2] = m_range[1].m_ivec4[3] = (std::numeric_limits<GLint>::max)();
+		m_default.m_ivec4[0] = m_default.m_ivec4[1] = m_default.m_ivec4[1] = m_default.m_ivec4[1] =
+			0;
+		m_range[0].m_ivec4[0] = m_range[0].m_ivec4[1] = m_range[0].m_ivec4[2] =
+			m_range[0].m_ivec4[3] = -(std::numeric_limits<GLint>::max)();
+		m_range[1].m_ivec4[0] = m_range[1].m_ivec4[1] = m_range[1].m_ivec4[2] =
+			m_range[1].m_ivec4[3] = (std::numeric_limits<GLint>::max)();
 		break;
 	case RGBA:
-		m_default.m_rgba[0] = m_default.m_rgba[1] =
-			m_default.m_rgba[2] = m_default.m_rgba[3] = 255;
+		m_default.m_rgba[0] = m_default.m_rgba[1] = m_default.m_rgba[2] = m_default.m_rgba[3] = 255;
 		break;
 	case RGB:
-		m_default.m_rgb[0] = m_default.m_rgb[1] =
-			m_default.m_rgb[2] = 255;
+		m_default.m_rgb[0] = m_default.m_rgb[1] = m_default.m_rgb[2] = 255;
 		break;
 	}
 
@@ -719,7 +704,8 @@ void ShaderInterface::Parameter::loadData(TIStream &is)
 				break;
 
 			case IVEC4:
-				is >> m_default.m_ivec4[0] >> m_default.m_ivec4[1] >> m_default.m_ivec4[2] >> m_default.m_ivec4[3];
+				is >> m_default.m_ivec4[0] >> m_default.m_ivec4[1] >> m_default.m_ivec4[2] >>
+					m_default.m_ivec4[3];
 				break;
 
 			case RGBA: {
@@ -788,21 +774,19 @@ void ShaderInterface::Parameter::loadData(TIStream &is)
 				break;
 
 			case IVEC2:
-				is >> m_range[0].m_ivec2[0] >> m_range[1].m_ivec2[0]
-					>> m_range[0].m_ivec2[1] >> m_range[1].m_ivec2[1];
+				is >> m_range[0].m_ivec2[0] >> m_range[1].m_ivec2[0] >> m_range[0].m_ivec2[1] >>
+					m_range[1].m_ivec2[1];
 				break;
 
 			case IVEC3:
-				is >> m_range[0].m_ivec3[0] >> m_range[1].m_ivec3[0]
-					>> m_range[0].m_ivec3[1] >> m_range[1].m_ivec3[1]
-					>> m_range[0].m_ivec3[2] >> m_range[1].m_ivec3[2];
+				is >> m_range[0].m_ivec3[0] >> m_range[1].m_ivec3[0] >> m_range[0].m_ivec3[1] >>
+					m_range[1].m_ivec3[1] >> m_range[0].m_ivec3[2] >> m_range[1].m_ivec3[2];
 				break;
 
 			case IVEC4:
-				is >> m_range[0].m_ivec4[0] >> m_range[1].m_ivec4[0]
-					>> m_range[0].m_ivec4[1] >> m_range[1].m_ivec4[1]
-					>> m_range[0].m_ivec4[2] >> m_range[1].m_ivec4[2]
-					>> m_range[0].m_ivec4[3] >> m_range[1].m_ivec4[3];
+				is >> m_range[0].m_ivec4[0] >> m_range[1].m_ivec4[0] >> m_range[0].m_ivec4[1] >>
+					m_range[1].m_ivec4[1] >> m_range[0].m_ivec4[2] >> m_range[1].m_ivec4[2] >>
+					m_range[0].m_ivec4[3] >> m_range[1].m_ivec4[3];
 				break;
 			}
 

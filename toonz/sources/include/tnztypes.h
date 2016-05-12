@@ -20,8 +20,8 @@ typedef uint64_t TUINT64;
 
 #elif defined(__LP64__) && (!defined(LINUX))
 
-#define TINT32 \
-	;          \
+#define TINT32                                                                                     \
+	;                                                                                              \
 	__int32
 typedef unsigned __int32 TSINT32;
 typedef __int64 TINT64;

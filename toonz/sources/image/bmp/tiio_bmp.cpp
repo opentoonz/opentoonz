@@ -26,7 +26,7 @@ string buildBMPExceptionString(int retCode)
 	}
 }
 
-} //namespace
+} // namespace
 //------------------------------------------------------------
 
 TImageP TImageReaderBmp::load()
@@ -53,7 +53,7 @@ TImageP TImageReaderBmp::load()
 
 /*
 void TImageReaderBmp::load(const TRasterP &ras, const TPoint &pos,
-                              int shrinkX, int shrinkY)
+							  int shrinkX, int shrinkY)
 {
 void *buff;
 int x0 = pos.x;
@@ -62,7 +62,7 @@ int x1 = x0 + ras->getLx() * shrinkX - 1;
 int y1 = y0 + ras->getLy() * shrinkY - 1;
 
 int retCode = readbmpregion(m_path.getFullPath().c_str(), &buff, x0, y0, x1, y1, shrinkX);
-if (retCode!= OK) 
+if (retCode!= OK)
   throw TImageException(getFilePath().getFullPath(), buildBMPExceptionString(retCode));
 memcpy(ras->getRawData(), buff, ras->getLx() * ras->getLy() * 4);
 delete [] buff;
@@ -85,7 +85,8 @@ TDimension TImageReaderBmp::getSize() const
 TRect TImageReaderBmp::getBBox() const
 {
 	TRect r;
-	int retCode = readbmp_bbox(getFilePath().getWideString().c_str(), &(r.x0), &(r.y0), &(r.x1), &(r.y1));
+	int retCode =
+		readbmp_bbox(getFilePath().getWideString().c_str(), &(r.x0), &(r.y0), &(r.x1), &(r.y1));
 	if (retCode != OK)
 		throw TImageException(getFilePath(), buildBMPExceptionString(retCode));
 	return r;

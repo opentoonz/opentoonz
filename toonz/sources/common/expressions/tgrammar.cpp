@@ -24,8 +24,14 @@
 #include "tgrammar.h"
 
 const double PI = 4 * atan(1.0);
-const double toDeg(double rad) { return rad * 180.0 / PI; }
-const double toRad(double deg) { return deg / 180.0 * PI; }
+const double toDeg(double rad)
+{
+	return rad * 180.0 / PI;
+}
+const double toRad(double deg)
+{
+	return deg / 180.0 * PI;
+}
 
 namespace TSyntax
 {
@@ -43,7 +49,7 @@ class RandomSequence
 	TRandom m_rnd;
 	std::vector<double> m_values;
 
-public:
+  public:
 	RandomSequence(UINT seed) : m_rnd(seed) {}
 	double getValue(int i)
 	{
@@ -64,7 +70,7 @@ class RandomManager
 	typedef std::map<UINT, RandomSequence *> Table;
 	Table m_table;
 	RandomManager() {}
-public:
+  public:
 	~RandomManager()
 	{
 		for (Table::iterator i = m_table.begin(); i != m_table.end(); ++i)
@@ -98,8 +104,7 @@ public:
 // Calculator
 //-------------------------------------------------------------------
 
-Calculator::Calculator()
-	: m_rootNode(0), m_param(0), m_unit(0)
+Calculator::Calculator() : m_rootNode(0), m_param(0), m_unit(0)
 {
 }
 
@@ -124,12 +129,10 @@ void Calculator::setRootNode(CalculatorNode *node)
 // Nodes
 //-------------------------------------------------------------------
 
-template <class Op>
-class Op0Node : public CalculatorNode
+template <class Op> class Op0Node : public CalculatorNode
 {
-public:
-	Op0Node(Calculator *calc)
-		: CalculatorNode(calc) {}
+  public:
+	Op0Node(Calculator *calc) : CalculatorNode(calc) {}
 
 	double compute(double vars[3]) const
 	{
@@ -140,15 +143,13 @@ public:
 
 //-------------------------------------------------------------------
 
-template <class Op>
-class Op1Node : public CalculatorNode
+template <class Op> class Op1Node : public CalculatorNode
 {
-protected:
+  protected:
 	std::auto_ptr<CalculatorNode> m_a;
 
-public:
-	Op1Node(Calculator *calc, CalculatorNode *a)
-		: CalculatorNode(calc), m_a(a) {}
+  public:
+	Op1Node(Calculator *calc, CalculatorNode *a) : CalculatorNode(calc), m_a(a) {}
 
 	double compute(double vars[3]) const
 	{
@@ -161,15 +162,16 @@ public:
 
 //-------------------------------------------------------------------
 
-template <class Op>
-class Op2Node : public CalculatorNode
+template <class Op> class Op2Node : public CalculatorNode
 {
-protected:
+  protected:
 	std::auto_ptr<CalculatorNode> m_a, m_b;
 
-public:
+  public:
 	Op2Node(Calculator *calc, CalculatorNode *a, CalculatorNode *b)
-		: CalculatorNode(calc), m_a(a), m_b(b) {}
+		: CalculatorNode(calc), m_a(a), m_b(b)
+	{
+	}
 
 	double compute(double vars[3]) const
 	{
@@ -177,23 +179,21 @@ public:
 		return op(m_a->compute(vars), m_b->compute(vars));
 	}
 
-	void accept(CalculatorNodeVisitor &visitor)
-	{
-		m_a->accept(visitor), m_b->accept(visitor);
-	}
+	void accept(CalculatorNodeVisitor &visitor) { m_a->accept(visitor), m_b->accept(visitor); }
 };
 
 //-------------------------------------------------------------------
 
-template <class Op>
-class Op3Node : public CalculatorNode
+template <class Op> class Op3Node : public CalculatorNode
 {
-protected:
+  protected:
 	std::auto_ptr<CalculatorNode> m_a, m_b, m_c;
 
-public:
+  public:
 	Op3Node(Calculator *calc, CalculatorNode *a, CalculatorNode *b, CalculatorNode *c)
-		: CalculatorNode(calc), m_a(a), m_b(b), m_c(c) {}
+		: CalculatorNode(calc), m_a(a), m_b(b), m_c(c)
+	{
+	}
 
 	double compute(double vars[3]) const
 	{
@@ -213,7 +213,7 @@ class ChsNode : public CalculatorNode
 {
 	std::auto_ptr<CalculatorNode> m_a;
 
-public:
+  public:
 	ChsNode(Calculator *calc, CalculatorNode *a) : CalculatorNode(calc), m_a(a) {}
 
 	double compute(double vars[3]) const { return -m_a->compute(vars); }
@@ -226,9 +226,11 @@ class QuestionNode : public CalculatorNode
 {
 	std::auto_ptr<CalculatorNode> m_a, m_b, m_c;
 
-public:
+  public:
 	QuestionNode(Calculator *calc, CalculatorNode *a, CalculatorNode *b, CalculatorNode *c)
-		: CalculatorNode(calc), m_a(a), m_b(b), m_c(c) {}
+		: CalculatorNode(calc), m_a(a), m_b(b), m_c(c)
+	{
+	}
 
 	double compute(double vars[3]) const
 	{
@@ -247,7 +249,7 @@ class NotNode : public CalculatorNode
 {
 	std::auto_ptr<CalculatorNode> m_a;
 
-public:
+  public:
 	NotNode(Calculator *calc, CalculatorNode *a) : CalculatorNode(calc), m_a(a) {}
 
 	double compute(double vars[3]) const { return m_a->compute(vars) == 0; }
@@ -259,7 +261,7 @@ class CycleNode : public CalculatorNode
 {
 	std::auto_ptr<CalculatorNode> m_a;
 
-public:
+  public:
 	CycleNode(Calculator *calc, CalculatorNode *a) : CalculatorNode(calc), m_a(a) {}
 
 	double compute(double vars[3]) const
@@ -269,7 +271,8 @@ public:
 			{
 				if (param.getKeyframeCount() >= 2 && f < param.keyframeIndexToFrame(0)) {
 					TDoubleKeyframe kf = param.getKeyframe(0);
-					if (kf.m_type == TDoubleKeyframe::Expression || kf.m_type == TDoubleKeyframe::SimilarShape)
+					if (kf.m_type == TDoubleKeyframe::Expression ||
+						kf.m_type == TDoubleKeyframe::SimilarShape)
 						return param.getDefaultValue();
 				}
 
@@ -300,7 +303,7 @@ class RandomNode : public CalculatorNode
 {
 	std::auto_ptr<CalculatorNode> m_seed, m_min, m_max, m_arg;
 
-public:
+  public:
 	RandomNode(Calculator *calc) : CalculatorNode(calc), m_seed(0), m_min(0), m_max(0)
 	{
 		m_arg.reset(new VariableNode(calc, CalculatorNode::FRAME));
@@ -362,7 +365,7 @@ CalculatorNode *Pattern::popNode(std::vector<CalculatorNode *> &stack) const
 
 class NumberPattern : public Pattern
 {
-public:
+  public:
 	bool matchToken(const std::vector<Token> &previousTokens, const Token &token) const
 	{
 		return previousTokens.empty() && token.getType() == Token::Number;
@@ -375,10 +378,8 @@ public:
 	{
 		return Number;
 	}
-	void createNode(
-		Calculator *calc,
-		std::vector<CalculatorNode *> &stack,
-		const std::vector<Token> &tokens) const
+	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
+					const std::vector<Token> &tokens) const
 	{
 		assert(tokens.size() == 1);
 		assert(tokens[0].getType() == Token::Number);
@@ -393,7 +394,7 @@ class ConstantPattern : public Pattern
 	std::string m_constantName;
 	double m_value;
 
-public:
+  public:
 	ConstantPattern(std::string constantName, double value, std::string description = "")
 		: m_constantName(constantName), m_value(value)
 	{
@@ -414,10 +415,8 @@ public:
 		return Constant;
 	}
 
-	void createNode(
-		Calculator *calc,
-		std::vector<CalculatorNode *> &stack,
-		const std::vector<Token> &tokens) const
+	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
+					const std::vector<Token> &tokens) const
 	{
 		assert(tokens.size() == 1);
 		stack.push_back(new NumberNode(calc, m_value));
@@ -431,7 +430,7 @@ class VariablePattern : public Pattern
 	std::string m_variableName;
 	int m_varIdx;
 
-public:
+  public:
 	VariablePattern(std::string variableName, int varIdx, std::string description = "")
 		: m_variableName(variableName), m_varIdx(varIdx)
 	{
@@ -452,10 +451,8 @@ public:
 		return Variable;
 	}
 
-	void createNode(
-		Calculator *calc,
-		std::vector<CalculatorNode *> &stack,
-		const std::vector<Token> &tokens) const
+	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
+					const std::vector<Token> &tokens) const
 	{
 		assert(tokens.size() == 1);
 		assert(tokens[0].getText() == m_variableName);
@@ -465,15 +462,13 @@ public:
 
 //-------------------------------------------------------------------
 
-template <class Op>
-class Op2Pattern : public Pattern
+template <class Op> class Op2Pattern : public Pattern
 {
 	std::string m_opName;
 	int m_priority;
 
-public:
-	Op2Pattern(std::string opName, int priority)
-		: m_opName(opName), m_priority(priority) {}
+  public:
+	Op2Pattern(std::string opName, int priority) : m_opName(opName), m_priority(priority) {}
 	int getPriority() const { return m_priority; }
 	std::string getFirstKeyword() const { return m_opName; }
 	bool expressionExpected(const std::vector<Token> &previousTokens) const
@@ -492,10 +487,8 @@ public:
 	{
 		return previousTokens.size() == 1 ? Operator : InternalError;
 	}
-	void createNode(
-		Calculator *calc,
-		std::vector<CalculatorNode *> &stack,
-		const std::vector<Token> &tokens) const
+	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
+					const std::vector<Token> &tokens) const
 	{
 		assert(tokens.size() == 3);
 		assert(tokens[1].getText() == m_opName);
@@ -509,7 +502,7 @@ public:
 
 class UnaryMinusPattern : public Pattern
 {
-public:
+  public:
 	UnaryMinusPattern() {}
 	int getPriority() const { return 50; }
 	std::string getFirstKeyword() const { return "-"; }
@@ -531,10 +524,8 @@ public:
 		return Operator;
 	}
 
-	void createNode(
-		Calculator *calc,
-		std::vector<CalculatorNode *> &stack,
-		const std::vector<Token> &tokens) const
+	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
+					const std::vector<Token> &tokens) const
 	{
 		assert(tokens.size() == 2);
 		assert(tokens[0].getText() == "-");
@@ -548,7 +539,7 @@ class NotPattern : public Pattern
 {
 	std::string m_prefix;
 
-public:
+  public:
 	NotPattern(std::string prefix, std::string description) : m_prefix(prefix)
 	{
 		setDescription(description);
@@ -572,10 +563,8 @@ public:
 	{
 		return Operator;
 	}
-	void createNode(
-		Calculator *calc,
-		std::vector<CalculatorNode *> &stack,
-		const std::vector<Token> &tokens) const
+	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
+					const std::vector<Token> &tokens) const
 	{
 		assert(tokens.size() == 2);
 		assert(tokens[0].getText() == m_prefix);
@@ -587,7 +576,7 @@ public:
 
 class QuestionTernaryPattern : public Pattern
 {
-public:
+  public:
 	QuestionTernaryPattern() {}
 	int getPriority() const { return 5; }
 	std::string getFirstKeyword() const { return "?"; }
@@ -611,10 +600,8 @@ public:
 		int i = (int)previousTokens.size();
 		return (i == 1 || i == 3) ? Operator : InternalError;
 	}
-	void createNode(
-		Calculator *calc,
-		std::vector<CalculatorNode *> &stack,
-		const std::vector<Token> &tokens) const
+	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
+					const std::vector<Token> &tokens) const
 	{
 		CalculatorNode *node1 = popNode(stack);
 		CalculatorNode *node2 = popNode(stack);
@@ -626,7 +613,7 @@ public:
 
 class BraketPattern : public Pattern
 {
-public:
+  public:
 	BraketPattern() {}
 	int getPriority() const { return 5; }
 	std::string getFirstKeyword() const { return "("; }
@@ -648,10 +635,8 @@ public:
 	{
 		return previousTokens.size() != 1 ? Parenthesis : InternalError;
 	}
-	void createNode(
-		Calculator *calc,
-		std::vector<CalculatorNode *> &stack,
-		const std::vector<Token> &tokens) const
+	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
+					const std::vector<Token> &tokens) const
 	{
 		assert(tokens.size() == 3);
 		assert(tokens[0].getText() == "(");
@@ -663,7 +648,7 @@ public:
 
 class FunctionPattern : public Pattern
 {
-protected:
+  protected:
 	std::string m_functionName;
 	bool m_implicitArgAllowed;
 	// if m_implicitArgAllowed == true then the first argument is the frame number
@@ -673,7 +658,7 @@ protected:
 	int m_minArgCount;
 	std::vector<double> m_optionalArgDefaults;
 
-public:
+  public:
 	FunctionPattern(std::string functionName, int minArgCount)
 		: m_functionName(functionName), m_implicitArgAllowed(false), m_minArgCount(minArgCount)
 	{
@@ -736,13 +721,12 @@ public:
 			return InternalError;
 	}
 
-	void getArgs(
-		std::vector<CalculatorNode *> &nodes,
-		Calculator *calc, std::vector<CalculatorNode *> &stack,
-		const std::vector<Token> &tokens) const
+	void getArgs(std::vector<CalculatorNode *> &nodes, Calculator *calc,
+				 std::vector<CalculatorNode *> &stack, const std::vector<Token> &tokens) const
 	{
 
-		bool implicitArgUsed = m_implicitArgAllowed && tokens.size() > 3 && tokens[3].getText() == ";";
+		bool implicitArgUsed =
+			m_implicitArgAllowed && tokens.size() > 3 && tokens[3].getText() == ";";
 
 		// n = number of arguments to provide (mandatory + optional + implicit)
 		int n = m_minArgCount + (int)m_optionalArgDefaults.size() + (m_implicitArgAllowed ? 1 : 0);
@@ -777,10 +761,9 @@ public:
 
 //-------------------------------------------------------------------
 
-template <class Function>
-class F0Pattern : public FunctionPattern
+template <class Function> class F0Pattern : public FunctionPattern
 {
-public:
+  public:
 	F0Pattern(std::string functionName) : FunctionPattern(functionName, 0) {}
 	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
 					const std::vector<Token> &tokens) const
@@ -791,11 +774,13 @@ public:
 
 //-------------------------------------------------------------------
 
-template <class Function>
-class F1Pattern : public FunctionPattern
+template <class Function> class F1Pattern : public FunctionPattern
 {
-public:
-	F1Pattern(std::string functionName, std::string descr = "") : FunctionPattern(functionName, 1) { setDescription(descr); }
+  public:
+	F1Pattern(std::string functionName, std::string descr = "") : FunctionPattern(functionName, 1)
+	{
+		setDescription(descr);
+	}
 	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
 					const std::vector<Token> &tokens) const
 	{
@@ -805,11 +790,13 @@ public:
 
 //-------------------------------------------------------------------
 
-template <class Function>
-class F2Pattern : public FunctionPattern
+template <class Function> class F2Pattern : public FunctionPattern
 {
-public:
-	F2Pattern(std::string functionName, std::string descr = "") : FunctionPattern(functionName, 2) { setDescription(descr); }
+  public:
+	F2Pattern(std::string functionName, std::string descr = "") : FunctionPattern(functionName, 2)
+	{
+		setDescription(descr);
+	}
 	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
 					const std::vector<Token> &tokens) const
 	{
@@ -821,11 +808,13 @@ public:
 
 //-------------------------------------------------------------------
 
-template <class Function>
-class F3Pattern : public FunctionPattern
+template <class Function> class F3Pattern : public FunctionPattern
 {
-public:
-	F3Pattern(std::string functionName, std::string descr = "") : FunctionPattern(functionName, 3) { setDescription(descr); }
+  public:
+	F3Pattern(std::string functionName, std::string descr = "") : FunctionPattern(functionName, 3)
+	{
+		setDescription(descr);
+	}
 	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
 					const std::vector<Token> &tokens) const
 	{
@@ -838,12 +827,10 @@ public:
 
 //-------------------------------------------------------------------
 
-template <class Function>
-class Fs2Pattern : public FunctionPattern
+template <class Function> class Fs2Pattern : public FunctionPattern
 {
-public:
-	Fs2Pattern(std::string functionName, std::string description)
-		: FunctionPattern(functionName, 1)
+  public:
+	Fs2Pattern(std::string functionName, std::string description) : FunctionPattern(functionName, 1)
 	{
 		allowImplicitArg(true);
 		setDescription(description);
@@ -860,10 +847,9 @@ public:
 
 //-------------------------------------------------------------------
 
-template <class Function>
-class Fs3Pattern : public FunctionPattern
+template <class Function> class Fs3Pattern : public FunctionPattern
 {
-public:
+  public:
 	Fs3Pattern(std::string functionName, double defVal, std::string descr)
 		: FunctionPattern(functionName, 1)
 	{
@@ -885,10 +871,11 @@ public:
 
 class CyclePattern : public FunctionPattern
 {
-public:
+  public:
 	CyclePattern(std::string functionName) : FunctionPattern(functionName, 1)
 	{
-		setDescription("cycle(period)\nCycles the transitions of the period previous frames to the selected range");
+		setDescription("cycle(period)\nCycles the transitions of the period previous frames to the "
+					   "selected range");
 	}
 	void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
 					const std::vector<Token> &tokens) const
@@ -904,7 +891,7 @@ class RandomPattern : public FunctionPattern
 {
 	bool m_seed;
 
-public:
+  public:
 	RandomPattern(std::string functionName, bool seed, std::string description)
 		: FunctionPattern(functionName, seed ? 1 : 0), m_seed(seed)
 	{
@@ -939,18 +926,15 @@ class PatternTable
 	std::vector<Pattern *> m_uTable;
 	Grammar::Position m_position;
 
-public:
+  public:
 	PatternTable(Grammar::Position position) : m_position(position) {}
 
 	~PatternTable()
 	{
-		for (std::map<std::string, Pattern *>::iterator
-				 it = m_kTable.begin();
-			 it != m_kTable.end(); ++it)
+		for (std::map<std::string, Pattern *>::iterator it = m_kTable.begin(); it != m_kTable.end();
+			 ++it)
 			delete it->second;
-		for (std::vector<Pattern *>::iterator
-				 it = m_uTable.begin();
-			 it != m_uTable.end(); ++it)
+		for (std::vector<Pattern *>::iterator it = m_uTable.begin(); it != m_uTable.end(); ++it)
 			delete *it;
 	}
 
@@ -1012,109 +996,109 @@ public:
 
 class Pow
 {
-public:
+  public:
 	double operator()(double x, double y) const { return pow(x, y); }
 };
 // class Mod   {public: double operator()(double x, double y) const {return (int)x % (int)y;} };
 class Sin
 {
-public:
+  public:
 	double operator()(double x) const { return sin(toRad(x)); }
 };
 class Cos
 {
-public:
+  public:
 	double operator()(double x) const { return cos(toRad(x)); }
 };
 class Tan
 {
-public:
+  public:
 	double operator()(double x) const { return tan(toRad(x)); }
 };
 class Sinh
 {
-public:
+  public:
 	double operator()(double x) const { return sinh(toRad(x)); }
 };
 class Cosh
 {
-public:
+  public:
 	double operator()(double x) const { return cosh(toRad(x)); }
 };
 class Tanh
 {
-public:
+  public:
 	double operator()(double x) const { return tanh(toRad(x)); }
 };
 class Atan
 {
-public:
+  public:
 	double operator()(double x) const { return toDeg(atan(x)); }
 };
 class Atan2
 {
-public:
+  public:
 	double operator()(double x, double y) const { return toDeg(atan2(x, y)); }
 };
 class Log
 {
-public:
+  public:
 	double operator()(double x) const { return log(x); }
 };
 class Exp
 {
-public:
+  public:
 	double operator()(double x) const { return exp(x); }
 };
 class Floor
 {
-public:
+  public:
 	double operator()(double x) const { return tfloor(x); }
 };
 class Ceil
 {
-public:
+  public:
 	double operator()(double x) const { return tceil(x); }
 };
 class Round
 {
-public:
+  public:
 	double operator()(double x) const { return tround(x); }
 };
 class Abs
 {
-public:
+  public:
 	double operator()(double x) const { return fabs(x); }
 };
 class Sign
 {
-public:
+  public:
 	double operator()(double x) const { return x > 0 ? 1 : x < 0 ? -1 : 0; }
 };
 class Sqrt
 {
-public:
+  public:
 	double operator()(double x) const { return x >= 0.0 ? sqrt(x) : 0; }
 };
 class Sqr
 {
-public:
+  public:
 	double operator()(double x) const { return x * x; }
 };
 class Crop
 {
-public:
+  public:
 	double operator()(double x, double a, double b) const { return tcrop(x, a, b); }
 };
 class Step
 {
-public:
+  public:
 	double operator()(double x, double y) const { return x < y ? 0 : 1; }
 };
 
 class Mod
 {
-public:
+  public:
 	double operator()(double x, double y) const
 	{
 		if (y == 0.0)
@@ -1125,64 +1109,64 @@ public:
 
 class Min
 {
-public:
+  public:
 	double operator()(double x, double y) const { return x < y ? x : y; }
 };
 class Max
 {
-public:
+  public:
 	double operator()(double x, double y) const { return x > y ? x : y; }
 };
 
 class Gt
 {
-public:
+  public:
 	double operator()(double x, double y) const { return x > y ? 1 : 0; }
 };
 class Ge
 {
-public:
+  public:
 	double operator()(double x, double y) const { return x >= y ? 1 : 0; }
 };
 class Lt
 {
-public:
+  public:
 	double operator()(double x, double y) const { return x < y ? 1 : 0; }
 };
 class Le
 {
-public:
+  public:
 	double operator()(double x, double y) const { return x <= y ? 1 : 0; }
 };
 class Ne
 {
-public:
+  public:
 	double operator()(double x, double y) const { return x != y ? 1 : 0; }
 };
 class Eq
 {
-public:
+  public:
 	double operator()(double x, double y) const { return x == y ? 1 : 0; }
 };
 class And
 {
-public:
+  public:
 	double operator()(double x, double y) const { return (x != 0) && (y != 0) ? 1 : 0; }
 };
 class Or
 {
-public:
+  public:
 	double operator()(double x, double y) const { return (x != 0) || (y != 0) ? 1 : 0; }
 };
 class Not
 {
-public:
+  public:
 	double operator()(double x) const { return x == 0; }
 };
 
 class Smoothstep
 {
-public:
+  public:
 	double operator()(double v, double min, double max) const
 	{
 		if (v <= min)
@@ -1195,7 +1179,7 @@ public:
 };
 class Pulse
 {
-public:
+  public:
 	double operator()(double x, double x0, double length) const
 	{
 		// double length=5.0;
@@ -1206,7 +1190,7 @@ public:
 };
 class Saw
 {
-public:
+  public:
 	double operator()(double x, double length, double height) const
 	{
 		if (length <= 0.0)
@@ -1219,7 +1203,7 @@ public:
 };
 class Wave
 {
-public:
+  public:
 	double operator()(double x, double length) const
 	{
 		if (length <= 0.0)
@@ -1232,22 +1216,19 @@ public:
 
 class Grammar::Imp
 {
-public:
+  public:
 	PatternTable m_prePatterns, m_postPatterns;
 
-	Imp()
-		: m_prePatterns(Grammar::ExpressionStart), m_postPatterns(Grammar::ExpressionEnd)
-	{
-	}
+	Imp() : m_prePatterns(Grammar::ExpressionStart), m_postPatterns(Grammar::ExpressionEnd) {}
 	~Imp() {}
 };
 
-Grammar::Grammar()
-	: m_imp(new Imp())
+Grammar::Grammar() : m_imp(new Imp())
 {
 	addPattern(new NumberPattern());
 	addPattern(new ConstantPattern("pi", PI, "3.14159265..."));
-	addPattern(new VariablePattern("t", CalculatorNode::T, "ranges from 0.0 to 1.0 along the transition"));
+	addPattern(
+		new VariablePattern("t", CalculatorNode::T, "ranges from 0.0 to 1.0 along the transition"));
 	const std::string f_desc = "the current frame number";
 	addPattern(new VariablePattern("f", CalculatorNode::FRAME, f_desc));
 	addPattern(new VariablePattern("frame", CalculatorNode::FRAME, f_desc));
@@ -1282,7 +1263,9 @@ Grammar::Grammar()
 	addPattern(new F1Pattern<Cosh>("cosh", "cosh(degree)\nHyperbolic cosine"));
 	addPattern(new F1Pattern<Tanh>("tanh", "tanh(degree)\nHyperbolic tangent"));
 	addPattern(new F1Pattern<Atan>("atan", "atan(x)\nArctangent : the inverse of tan()"));
-	addPattern(new F2Pattern<Atan2>("atan2", "atan2(y,x)\nThe counter-clockwise angle in degree between the x-axis and the point(x,y)"));
+	addPattern(new F2Pattern<Atan2>(
+		"atan2",
+		"atan2(y,x)\nThe counter-clockwise angle in degree between the x-axis and the point(x,y)"));
 	addPattern(new F1Pattern<Log>("log", "log(x)\nThe natural logarithm of x (base e)"));
 	addPattern(new F1Pattern<Exp>("exp", "exp(x)\nThe base-e exponential of x"));
 	addPattern(new F1Pattern<Floor>("floor", "floor(x)\nThe greatest integer <= x"));
@@ -1300,20 +1283,41 @@ Grammar::Grammar()
 	addPattern(new F2Pattern<Min>("min", "min(a,b)"));
 	addPattern(new F2Pattern<Max>("max", "max(a,b)"));
 	addPattern(new F2Pattern<Step>("step", "min(x,x0)\n0 if x<x0, 1 if x>=x0"));
-	addPattern(new F3Pattern<Smoothstep>("smoothstep", "smoothstep(x,x0)\n0 if x<x0, 1 if x>=x0\nas step, but with smooth transition"));
+	addPattern(new F3Pattern<Smoothstep>(
+		"smoothstep",
+		"smoothstep(x,x0)\n0 if x<x0, 1 if x>=x0\nas step, but with smooth transition"));
 	const std::string pulse_desc = "Generates a bump ranging from 0.0 to 1.0 set at position pos";
-	addPattern(new Fs3Pattern<Pulse>("pulse", 0.5, "pulse(pos)\npulse(pos,length)\npulse(arg; pos)\npulse(arg;pos,length)\n" + pulse_desc));
-	addPattern(new Fs3Pattern<Pulse>("bump", 0.5, "bump(pos)\nbump(pos,length)\nbump(arg; pos)\nbump(arg;pos,length)\n" + pulse_desc));
+	addPattern(new Fs3Pattern<Pulse>(
+		"pulse", 0.5,
+		"pulse(pos)\npulse(pos,length)\npulse(arg; pos)\npulse(arg;pos,length)\n" + pulse_desc));
+	addPattern(new Fs3Pattern<Pulse>(
+		"bump", 0.5,
+		"bump(pos)\nbump(pos,length)\nbump(arg; pos)\nbump(arg;pos,length)\n" + pulse_desc));
 	const std::string saw_desc = "Generates a periodic sawtooth shaped curve";
-	addPattern(new Fs3Pattern<Saw>("sawtooth", 0.0, "sawtooth(length)\nsawtooth(length, height)\nsawtooth(arg; length)\nsawtooth(arg; length, height)\n" + saw_desc));
-	addPattern(new Fs3Pattern<Saw>("saw", 0.0, "saw(length)\nsaw(length, height)\nsaw(arg; length)\nsaw(arg; length, height)\n" + saw_desc));
-	addPattern(new Fs2Pattern<Wave>("wave", "wave(_length)\nwave(_arg;_length)\nsame as sin(f*180/length)"));
+	addPattern(new Fs3Pattern<Saw>("sawtooth", 0.0, "sawtooth(length)\nsawtooth(length, "
+													"height)\nsawtooth(arg; length)\nsawtooth(arg; "
+													"length, height)\n" +
+														saw_desc));
+	addPattern(new Fs3Pattern<Saw>(
+		"saw", 0.0,
+		"saw(length)\nsaw(length, height)\nsaw(arg; length)\nsaw(arg; length, height)\n" +
+			saw_desc));
+	addPattern(new Fs2Pattern<Wave>(
+		"wave", "wave(_length)\nwave(_arg;_length)\nsame as sin(f*180/length)"));
 	const std::string rnd_desc = "Generates random number between min and max";
-	addPattern(new RandomPattern("random", false, "random = random(0,1)\nrandom(max) = random(0,max)\nrandom(min,max)\n" + rnd_desc));
-	addPattern(new RandomPattern("rnd", false, "rnd = rnd(0,1)\nrnd(max) = rnd(0,max)\nrnd(min,max)\n" + rnd_desc));
+	addPattern(new RandomPattern(
+		"random", false,
+		"random = random(0,1)\nrandom(max) = random(0,max)\nrandom(min,max)\n" + rnd_desc));
+	addPattern(new RandomPattern(
+		"rnd", false, "rnd = rnd(0,1)\nrnd(max) = rnd(0,max)\nrnd(min,max)\n" + rnd_desc));
 	const std::string rnd_s_desc = rnd_desc + "; seed select different random sequences";
-	addPattern(new RandomPattern("random_s", true, "random_s(seed) = random_s(seed, 0,1)\nrandom_s(seed,max) = random_s(seed, 0,max)\nrandom_s(seed,min,max)\n" + rnd_s_desc));
-	addPattern(new RandomPattern("rnd_s", true, "rnd_s(seed) = rnd_s(seed, 0,1)\nrnd_s(seed,max) = rnd_s(seed, 0,max)\nrnd_s(seed,min,max)\n" + rnd_s_desc));
+	addPattern(new RandomPattern("random_s", true, "random_s(seed) = random_s(seed, "
+												   "0,1)\nrandom_s(seed,max) = random_s(seed, "
+												   "0,max)\nrandom_s(seed,min,max)\n" +
+													   rnd_s_desc));
+	addPattern(new RandomPattern("rnd_s", true, "rnd_s(seed) = rnd_s(seed, 0,1)\nrnd_s(seed,max) = "
+												"rnd_s(seed, 0,max)\nrnd_s(seed,min,max)\n" +
+													rnd_s_desc));
 
 	addPattern(new CyclePattern("cycle"));
 }

@@ -7,29 +7,21 @@
 
 #include "tparamuiconcept.h"
 
-enum FILTER_TYPE {
-	Linear = 0,
-	Gaussian,
-	Flat
-};
+enum FILTER_TYPE { Linear = 0, Gaussian, Flat };
 
 /*------------------------------------------------------------
  参照画像の輝度を０〜１に正規化してホストメモリに読み込む
 ------------------------------------------------------------*/
 
 template <typename RASTER, typename PIXEL>
-void Iwa_DirectionalBlurFx::setReferenceRaster(const RASTER srcRas,
-											   float *dstMem,
-											   TDimensionI dim)
+void Iwa_DirectionalBlurFx::setReferenceRaster(const RASTER srcRas, float *dstMem, TDimensionI dim)
 {
 	float *dst_p = dstMem;
 
 	for (int j = 0; j < dim.ly; j++) {
 		PIXEL *pix = srcRas->pixels(j);
 		for (int i = 0; i < dim.lx; i++, pix++, dst_p++) {
-			(*dst_p) = ((float)pix->r * 0.3f +
-						(float)pix->g * 0.59f +
-						(float)pix->b * 0.11f) /
+			(*dst_p) = ((float)pix->r * 0.3f + (float)pix->g * 0.59f + (float)pix->b * 0.11f) /
 					   (float)PIXEL::maxChannelValue;
 		}
 	}
@@ -40,9 +32,7 @@ void Iwa_DirectionalBlurFx::setReferenceRaster(const RASTER srcRas,
 ------------------------------------------------------------*/
 
 template <typename RASTER, typename PIXEL>
-void Iwa_DirectionalBlurFx::setSourceRaster(const RASTER srcRas,
-											float4 *dstMem,
-											TDimensionI dim)
+void Iwa_DirectionalBlurFx::setSourceRaster(const RASTER srcRas, float4 *dstMem, TDimensionI dim)
 {
 	float4 *chann_p = dstMem;
 
@@ -61,9 +51,7 @@ void Iwa_DirectionalBlurFx::setSourceRaster(const RASTER srcRas,
  出力結果をChannel値に変換してタイルに格納
 ------------------------------------------------------------*/
 template <typename RASTER, typename PIXEL>
-void Iwa_DirectionalBlurFx::setOutputRaster(float4 *srcMem,
-											const RASTER dstRas,
-											TDimensionI dim,
+void Iwa_DirectionalBlurFx::setOutputRaster(float4 *srcMem, const RASTER dstRas, TDimensionI dim,
 											int2 margin)
 {
 	int out_j = 0;
@@ -74,13 +62,17 @@ void Iwa_DirectionalBlurFx::setOutputRaster(float4 *srcMem,
 		for (int i = 0; i < dstRas->getLx(); i++, pix++, chan_p++) {
 			float val;
 			val = (*chan_p).x * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->r = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->r = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chan_p).y * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->g = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->g = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chan_p).z * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->b = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->b = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chan_p).w * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->m = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->m = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 		}
 	}
 }
@@ -88,7 +80,8 @@ void Iwa_DirectionalBlurFx::setOutputRaster(float4 *srcMem,
 //------------------------------------
 
 Iwa_DirectionalBlurFx::Iwa_DirectionalBlurFx()
-	: m_angle(0.0), m_intensity(10.0), m_bidirectional(false), m_filterType(new TIntEnumParam(Linear, "Linear"))
+	: m_angle(0.0), m_intensity(10.0), m_bidirectional(false),
+	  m_filterType(new TIntEnumParam(Linear, "Linear"))
 {
 	m_intensity->setMeasureName("fxLength");
 	m_angle->setMeasureName("angle");
@@ -108,9 +101,7 @@ Iwa_DirectionalBlurFx::Iwa_DirectionalBlurFx()
 
 //------------------------------------
 
-void Iwa_DirectionalBlurFx::doCompute(TTile &tile,
-									  double frame,
-									  const TRenderSettings &settings)
+void Iwa_DirectionalBlurFx::doCompute(TTile &tile, double frame, const TRenderSettings &settings)
 {
 	/*- 接続していない場合は処理しない -*/
 	if (!m_input.isConnected()) {
@@ -142,11 +133,10 @@ void Iwa_DirectionalBlurFx::doCompute(TTile &tile,
 	}
 
 	/*-  表示の範囲を得る -*/
-	TRectD bBox = TRectD(
-		tile.m_pos /*- Render画像上(Pixel単位)の位置  -*/
-		,
-		TDimensionD(/*- Render画像上(Pixel単位)のサイズ  -*/
-					tile.getRaster()->getLx(), tile.getRaster()->getLy()));
+	TRectD bBox = TRectD(tile.m_pos /*- Render画像上(Pixel単位)の位置  -*/
+						 ,
+						 TDimensionD(/*- Render画像上(Pixel単位)のサイズ  -*/
+									 tile.getRaster()->getLx(), tile.getRaster()->getLy()));
 	/*- 上下左右のマージンを得る -*/
 	double minX, maxX, minY, maxY;
 	if (blur.x > 0.0) /*- X成分が正の場合 -*/
@@ -173,27 +163,26 @@ void Iwa_DirectionalBlurFx::doCompute(TTile &tile,
 	int marginBottom = (int)ceil(abs(minY));
 
 	/*- マージンは、フィルタの上下左右を反転した寸法になる -*/
-	TRectD enlargedBBox(bBox.x0 - (double)marginRight,
-						bBox.y0 - (double)marginTop,
-						bBox.x1 + (double)marginLeft,
-						bBox.y1 + (double)marginBottom);
+	TRectD enlargedBBox(bBox.x0 - (double)marginRight, bBox.y0 - (double)marginTop,
+						bBox.x1 + (double)marginLeft, bBox.y1 + (double)marginBottom);
 
-	std::cout << "Margin Left:" << marginLeft << " Right:" << marginRight << " Bottom:" << marginBottom << " Top:" << marginTop << std::endl;
+	std::cout << "Margin Left:" << marginLeft << " Right:" << marginRight
+			  << " Bottom:" << marginBottom << " Top:" << marginTop << std::endl;
 
 	TDimensionI enlargedDimIn(/*- Pixel単位に四捨五入 -*/
 							  (int)(enlargedBBox.getLx() + 0.5), (int)(enlargedBBox.getLy() + 0.5));
 
 	TTile enlarge_tile;
-	m_input->allocateAndCompute(
-		enlarge_tile, enlargedBBox.getP00(), enlargedDimIn, tile.getRaster(), frame, settings);
+	m_input->allocateAndCompute(enlarge_tile, enlargedBBox.getP00(), enlargedDimIn,
+								tile.getRaster(), frame, settings);
 
 	/*- 参照画像が有ったら、メモリに取り込む -*/
 	float *reference_host = 0;
 	TRasterGR8P reference_host_ras;
 	if (m_reference.isConnected()) {
 		TTile reference_tile;
-		m_reference->allocateAndCompute(
-			reference_tile, enlargedBBox.getP00(), enlargedDimIn, tile.getRaster(), frame, settings);
+		m_reference->allocateAndCompute(reference_tile, enlargedBBox.getP00(), enlargedDimIn,
+										tile.getRaster(), frame, settings);
 		/*- ホストのメモリ確保 -*/
 		reference_host_ras = TRasterGR8P(sizeof(float) * enlargedDimIn.lx, enlargedDimIn.ly);
 		reference_host_ras->lock();
@@ -212,16 +201,8 @@ void Iwa_DirectionalBlurFx::doCompute(TTile &tile,
 	TDimensionI dimOut(tile.getRaster()->getLx(), tile.getRaster()->getLy());
 	TDimensionI filterDim(marginLeft + marginRight + 1, marginTop + marginBottom + 1);
 
-	doCompute_CPU(tile, frame, settings,
-				  blur,
-				  bidirectional,
-				  marginLeft, marginRight,
-				  marginTop, marginBottom,
-				  enlargedDimIn,
-				  enlarge_tile,
-				  dimOut,
-				  filterDim,
-				  reference_host);
+	doCompute_CPU(tile, frame, settings, blur, bidirectional, marginLeft, marginRight, marginTop,
+				  marginBottom, enlargedDimIn, enlarge_tile, dimOut, filterDim, reference_host);
 
 	/*-  参照画像が刺さっている場合、メモリを解放する -*/
 	if (reference_host) {
@@ -232,18 +213,10 @@ void Iwa_DirectionalBlurFx::doCompute(TTile &tile,
 
 //------------------------------------
 
-void Iwa_DirectionalBlurFx::doCompute_CPU(TTile &tile,
-										  double frame,
-										  const TRenderSettings &settings,
-										  TPointD &blur,
-										  bool bidirectional,
-										  int marginLeft, int marginRight,
-										  int marginTop, int marginBottom,
-										  TDimensionI &enlargedDimIn,
-										  TTile &enlarge_tile,
-										  TDimensionI &dimOut,
-										  TDimensionI &filterDim,
-										  float *reference_host)
+void Iwa_DirectionalBlurFx::doCompute_CPU(
+	TTile &tile, double frame, const TRenderSettings &settings, TPointD &blur, bool bidirectional,
+	int marginLeft, int marginRight, int marginTop, int marginBottom, TDimensionI &enlargedDimIn,
+	TTile &enlarge_tile, TDimensionI &dimOut, TDimensionI &filterDim, float *reference_host)
 {
 	/*- メモリ確保 -*/
 	TRasterGR8P in_ras(sizeof(float4) * enlargedDimIn.lx, enlargedDimIn.ly);
@@ -267,8 +240,8 @@ void Iwa_DirectionalBlurFx::doCompute_CPU(TTile &tile,
 		setSourceRaster<TRaster64P, TPixel64>(ras64, in, enlargedDimIn);
 
 	/*- フィルタ作る -*/
-	makeDirectionalBlurFilter_CPU(filter, blur, bidirectional,
-								  marginLeft, marginRight, marginTop, marginBottom, filterDim);
+	makeDirectionalBlurFilter_CPU(filter, blur, bidirectional, marginLeft, marginRight, marginTop,
+								  marginBottom, filterDim);
 
 	if (reference_host) /*- 参照画像がある場合 -*/
 	{
@@ -298,7 +271,8 @@ void Iwa_DirectionalBlurFx::doCompute_CPU(TTile &tile,
 						int2 samplePos = {x + marginLeft, y - fily};
 						int sampleIndex = samplePos.y * enlargedDimIn.lx + samplePos.x;
 
-						for (int filx = -marginLeft; filx < filterDim.lx - marginLeft; filx++, filter_p++, sampleIndex--) {
+						for (int filx = -marginLeft; filx < filterDim.lx - marginLeft;
+							 filx++, filter_p++, sampleIndex--) {
 							/*- フィルター値が０またはサンプルピクセルが透明ならcontinue -*/
 							if ((*filter_p) == 0.0f || in[sampleIndex].w == 0.0f)
 								continue;
@@ -311,7 +285,8 @@ void Iwa_DirectionalBlurFx::doCompute_CPU(TTile &tile,
 					}
 				} else {
 					for (int fily = -marginBottom; fily < filterDim.ly - marginBottom; fily++) {
-						for (int filx = -marginLeft; filx < filterDim.lx - marginLeft; filx++, filter_p++) {
+						for (int filx = -marginLeft; filx < filterDim.lx - marginLeft;
+							 filx++, filter_p++) {
 							/*- フィルター値が０ならcontinue -*/
 							if ((*filter_p) == 0.0f)
 								continue;
@@ -357,7 +332,8 @@ void Iwa_DirectionalBlurFx::doCompute_CPU(TTile &tile,
 					int2 samplePos = {x + marginLeft, y - fily};
 					int sampleIndex = samplePos.y * enlargedDimIn.lx + samplePos.x;
 
-					for (int filx = -marginLeft; filx < filterDim.lx - marginLeft; filx++, filterIndex++, sampleIndex--) {
+					for (int filx = -marginLeft; filx < filterDim.lx - marginLeft;
+						 filx++, filterIndex++, sampleIndex--) {
 						/*- フィルター値が０またはサンプルピクセルが透明ならcontinue -*/
 						if (filter[filterIndex] == 0.0f || in[sampleIndex].w == 0.0f)
 							continue;
@@ -394,12 +370,10 @@ void Iwa_DirectionalBlurFx::doCompute_CPU(TTile &tile,
 
 //------------------------------------
 
-void Iwa_DirectionalBlurFx::makeDirectionalBlurFilter_CPU(float *filter,
-														  TPointD &blur,
-														  bool bidirectional,
-														  int marginLeft, int marginRight,
-														  int marginTop, int marginBottom,
-														  TDimensionI &filterDim)
+void Iwa_DirectionalBlurFx::makeDirectionalBlurFilter_CPU(float *filter, TPointD &blur,
+														  bool bidirectional, int marginLeft,
+														  int marginRight, int marginTop,
+														  int marginBottom, TDimensionI &filterDim)
 {
 	/*- 必要なら、ガウスフィルタを前計算 -*/
 	FILTER_TYPE filterType = (FILTER_TYPE)m_filterType->getValue();
@@ -408,7 +382,7 @@ void Iwa_DirectionalBlurFx::makeDirectionalBlurFilter_CPU(float *filter,
 		gaussian.reserve(101);
 		for (int g = 0; g < 101; g++) {
 			float x = (float)g / 100.0f;
-			//sigma == 0.25
+			// sigma == 0.25
 			gaussian.push_back(exp(-x * x / 0.125f));
 		}
 	}
@@ -416,8 +390,7 @@ void Iwa_DirectionalBlurFx::makeDirectionalBlurFilter_CPU(float *filter,
 	/*- フィルタを作る -*/
 	TPointD p0 = (bidirectional) ? TPointD(-blur.x, -blur.y) : TPointD(0.0f, 0.0f);
 	TPointD p1 = blur;
-	float2 vec_p0_p1 = {static_cast<float>(p1.x - p0.x),
-						static_cast<float>(p1.y - p0.y)};
+	float2 vec_p0_p1 = {static_cast<float>(p1.x - p0.x), static_cast<float>(p1.y - p0.y)};
 
 	float *fil_p = filter;
 	float intensity_sum = 0.0f;
@@ -426,27 +399,23 @@ void Iwa_DirectionalBlurFx::makeDirectionalBlurFilter_CPU(float *filter,
 		for (int fx = -marginLeft; fx <= marginRight; fx++, fil_p++) {
 			/*- 現在の座標とブラー直線の距離を求める -*/
 			/*- P0->サンプル点とP0->P1の内積を求める -*/
-			float2 vec_p0_sample = {static_cast<float>(fx - p0.x),
-									static_cast<float>(fy - p0.y)};
-			float dot = vec_p0_sample.x * vec_p0_p1.x +
-						vec_p0_sample.y * vec_p0_p1.y;
+			float2 vec_p0_sample = {static_cast<float>(fx - p0.x), static_cast<float>(fy - p0.y)};
+			float dot = vec_p0_sample.x * vec_p0_p1.x + vec_p0_sample.y * vec_p0_p1.y;
 			/*- 軌跡ベクトルの長さの２乗を計算する -*/
-			float length2 = vec_p0_p1.x * vec_p0_p1.x +
-							vec_p0_p1.y * vec_p0_p1.y;
+			float length2 = vec_p0_p1.x * vec_p0_p1.x + vec_p0_p1.y * vec_p0_p1.y;
 
 			/*- 距離の2乗を求める -*/
 			float dist2;
 			float framePosRatio;
 			/*- P0より手前にある場合 -*/
 			if (dot <= 0.0f) {
-				dist2 = vec_p0_sample.x * vec_p0_sample.x +
-						vec_p0_sample.y * vec_p0_sample.y;
+				dist2 = vec_p0_sample.x * vec_p0_sample.x + vec_p0_sample.y * vec_p0_sample.y;
 				framePosRatio = 0.0f;
 			} else {
 				/*- P0〜P1間にある場合 -*/
 				if (dot < length2) {
-					float p0_sample_dist2 = vec_p0_sample.x * vec_p0_sample.x +
-											vec_p0_sample.y * vec_p0_sample.y;
+					float p0_sample_dist2 =
+						vec_p0_sample.x * vec_p0_sample.x + vec_p0_sample.y * vec_p0_sample.y;
 					dist2 = p0_sample_dist2 - dot * dot / length2;
 					framePosRatio = dot / length2;
 				}
@@ -454,8 +423,7 @@ void Iwa_DirectionalBlurFx::makeDirectionalBlurFilter_CPU(float *filter,
 				else {
 					float2 vec_p1_sample = {static_cast<float>(fx - p1.x),
 											static_cast<float>(fy - p1.y)};
-					dist2 = vec_p1_sample.x * vec_p1_sample.x +
-							vec_p1_sample.y * vec_p1_sample.y;
+					dist2 = vec_p1_sample.x * vec_p1_sample.x + vec_p1_sample.y * vec_p1_sample.y;
 					framePosRatio = 1.0f;
 				}
 			}
@@ -478,8 +446,7 @@ void Iwa_DirectionalBlurFx::makeDirectionalBlurFilter_CPU(float *filter,
 
 					float2 vec_p0_sub = {static_cast<float>(subPosX - p0.x),
 										 static_cast<float>(subPosY - p0.y)};
-					float sub_dot = vec_p0_sub.x * vec_p0_p1.x +
-									vec_p0_sub.y * vec_p0_p1.y;
+					float sub_dot = vec_p0_sub.x * vec_p0_p1.x + vec_p0_sub.y * vec_p0_p1.y;
 					/*- 距離の2乗を求める -*/
 					float dist2;
 					/*- P0より手前にある場合 -*/
@@ -488,16 +455,15 @@ void Iwa_DirectionalBlurFx::makeDirectionalBlurFilter_CPU(float *filter,
 					else {
 						/*- P0〜P1間にある場合 -*/
 						if (sub_dot < length2) {
-							float p0_sub_dist2 = vec_p0_sub.x * vec_p0_sub.x +
-												 vec_p0_sub.y * vec_p0_sub.y;
+							float p0_sub_dist2 =
+								vec_p0_sub.x * vec_p0_sub.x + vec_p0_sub.y * vec_p0_sub.y;
 							dist2 = p0_sub_dist2 - sub_dot * sub_dot / length2;
 						}
 						/*-  P1より先にある場合 -*/
 						else {
 							float2 vec_p1_sub = {static_cast<float>(subPosX - p1.x),
 												 static_cast<float>(subPosY - p1.y)};
-							dist2 = vec_p1_sub.x * vec_p1_sub.x +
-									vec_p1_sub.y * vec_p1_sub.y;
+							dist2 = vec_p1_sub.x * vec_p1_sub.x + vec_p1_sub.y * vec_p1_sub.y;
 						}
 					}
 					/*- 距離の２乗が0.25より近ければカウントをインクリメント -*/
@@ -552,9 +518,7 @@ void Iwa_DirectionalBlurFx::makeDirectionalBlurFilter_CPU(float *filter,
 
 //------------------------------------
 
-bool Iwa_DirectionalBlurFx::doGetBBox(double frame,
-									  TRectD &bBox,
-									  const TRenderSettings &info)
+bool Iwa_DirectionalBlurFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 {
 	if (false == this->m_input.isConnected()) {
 		bBox = TRectD();
@@ -599,10 +563,8 @@ bool Iwa_DirectionalBlurFx::doGetBBox(double frame,
 	int marginTop = (int)ceil(abs(maxY));
 	int marginBottom = (int)ceil(abs(minY));
 
-	TRectD enlargedBBox(bBox.x0 - (double)marginLeft,
-						bBox.y0 - (double)marginBottom,
-						bBox.x1 + (double)marginRight,
-						bBox.y1 + (double)marginTop);
+	TRectD enlargedBBox(bBox.x0 - (double)marginLeft, bBox.y0 - (double)marginBottom,
+						bBox.x1 + (double)marginRight, bBox.y1 + (double)marginTop);
 
 	bBox = enlargedBBox;
 
@@ -611,16 +573,14 @@ bool Iwa_DirectionalBlurFx::doGetBBox(double frame,
 
 //------------------------------------
 
-bool Iwa_DirectionalBlurFx::canHandle(const TRenderSettings &info,
-									  double frame)
+bool Iwa_DirectionalBlurFx::canHandle(const TRenderSettings &info, double frame)
 {
 	return isAlmostIsotropic(info.m_affine) || m_intensity->getValue(frame) == 0;
 }
 
 //------------------------------------
 
-void Iwa_DirectionalBlurFx::getParamUIs(TParamUIConcept *&concepts,
-										int &length)
+void Iwa_DirectionalBlurFx::getParamUIs(TParamUIConcept *&concepts, int &length)
 {
 	concepts = new TParamUIConcept[length = 1];
 

@@ -21,10 +21,10 @@ class SVNCleanupDialog : public DVGui::Dialog
 
 	VersionControlThread m_thread;
 
-public:
+  public:
 	SVNCleanupDialog(QWidget *parent, const QString &workingDir);
 
-protected slots:
+  protected slots:
 	void onCleanupDone();
 	void onError(const QString &);
 };

@@ -124,7 +124,8 @@ inline void tglDrawFaces(const TMeshImage &meshImage, const PlasticDeformerDataG
 
 		mesh->faceVertices(f, v0, v1, v2);
 
-		const double *d0 = dstCoords + (v0 << 1), *d1 = dstCoords + (v1 << 1), *d2 = dstCoords + (v2 << 1);
+		const double *d0 = dstCoords + (v0 << 1), *d1 = dstCoords + (v1 << 1),
+					 *d2 = dstCoords + (v2 << 1);
 
 		colorFunction.faceColor(f, m);
 
@@ -199,7 +200,7 @@ namespace
 struct LinearColorFunction {
 	typedef double (*ValueFunc)(const LinearColorFunction *cf, int m, int primitive);
 
-public:
+  public:
 	const TMeshImage &m_meshImg;
 	const PlasticDeformerDataGroup *m_group;
 
@@ -211,45 +212,38 @@ public:
 
 	ValueFunc m_func;
 
-public:
-	LinearColorFunction(const TMeshImage &meshImg,
-						const PlasticDeformerDataGroup *group,
-						double min, double max,
-						double *cMin, double *cMax,
-						ValueFunc func)
-		: m_meshImg(meshImg), m_group(group), m_min(min), m_max(max), m_cMin(cMin), m_cMax(cMax), m_dt(max - min), m_degenerate(m_dt < 1e-4), m_func(func)
+  public:
+	LinearColorFunction(const TMeshImage &meshImg, const PlasticDeformerDataGroup *group,
+						double min, double max, double *cMin, double *cMax, ValueFunc func)
+		: m_meshImg(meshImg), m_group(group), m_min(min), m_max(max), m_cMin(cMin), m_cMax(cMax),
+		  m_dt(max - min), m_degenerate(m_dt < 1e-4), m_func(func)
 	{
 	}
 
 	void operator()(int primitive, int m)
 	{
 		if (m_degenerate) {
-			glColor4d(0.5 * (m_cMin[0] + m_cMax[0]),
-					  0.5 * (m_cMin[1] + m_cMax[1]),
-					  0.5 * (m_cMin[2] + m_cMax[2]),
-					  0.5 * (m_cMin[3] + m_cMax[3]));
+			glColor4d(0.5 * (m_cMin[0] + m_cMax[0]), 0.5 * (m_cMin[1] + m_cMax[1]),
+					  0.5 * (m_cMin[2] + m_cMax[2]), 0.5 * (m_cMin[3] + m_cMax[3]));
 			return;
 		}
 
 		double val = m_func(this, m, primitive);
 		double t = (val - m_min) / m_dt, one_t = (m_max - val) / m_dt;
 
-		glColor4d(one_t * m_cMin[0] + t * m_cMax[0],
-				  one_t * m_cMin[1] + t * m_cMax[1],
-				  one_t * m_cMin[2] + t * m_cMax[2],
-				  one_t * m_cMin[3] + t * m_cMax[3]);
+		glColor4d(one_t * m_cMin[0] + t * m_cMax[0], one_t * m_cMin[1] + t * m_cMax[1],
+				  one_t * m_cMin[2] + t * m_cMax[2], one_t * m_cMin[3] + t * m_cMax[3]);
 	}
 };
 
 //-------------------------------------------------------------------------------
 
 struct LinearVertexColorFunction : public LinearColorFunction, public NoColorFunction {
-	LinearVertexColorFunction(const TMeshImage &meshImg,
-							  const PlasticDeformerDataGroup *group,
-							  double min, double max,
-							  double *cMin, double *cMax,
-							  ValueFunc func)
-		: LinearColorFunction(meshImg, group, min, max, cMin, cMax, func) {}
+	LinearVertexColorFunction(const TMeshImage &meshImg, const PlasticDeformerDataGroup *group,
+							  double min, double max, double *cMin, double *cMax, ValueFunc func)
+		: LinearColorFunction(meshImg, group, min, max, cMin, cMax, func)
+	{
+	}
 
 	void vertexColor(int v, int m) { operator()(v, m); }
 };
@@ -257,12 +251,11 @@ struct LinearVertexColorFunction : public LinearColorFunction, public NoColorFun
 //-------------------------------------------------------------------------------
 
 struct LinearFaceColorFunction : public LinearColorFunction, public NoColorFunction {
-	LinearFaceColorFunction(const TMeshImage &meshImg,
-							const PlasticDeformerDataGroup *group,
-							double min, double max,
-							double *cMin, double *cMax,
-							ValueFunc func)
-		: LinearColorFunction(meshImg, group, min, max, cMin, cMax, func) {}
+	LinearFaceColorFunction(const TMeshImage &meshImg, const PlasticDeformerDataGroup *group,
+							double min, double max, double *cMin, double *cMax, ValueFunc func)
+		: LinearColorFunction(meshImg, group, min, max, cMin, cMax, func)
+	{
+	}
 
 	void faceColor(int v, int m) { operator()(v, m); }
 };
@@ -285,7 +278,8 @@ void tglDrawSO(const TMeshImage &image, double minColor[4], double maxColor[4],
 	if (group)
 		min = group->m_soMin, max = group->m_soMax;
 
-	LinearFaceColorFunction colorFunction(image, group, min, max, minColor, maxColor, locals::returnSO);
+	LinearFaceColorFunction colorFunction(image, group, min, max, minColor, maxColor,
+										  locals::returnSO);
 
 	if (group && deformedDomain)
 		tglDrawFaces(image, group, colorFunction);
@@ -305,8 +299,8 @@ void tglDrawRigidity(const TMeshImage &image, double minColor[4], double maxColo
 		}
 	};
 
-	LinearVertexColorFunction colorFunction(image, group,
-											1.0, 1e4, minColor, maxColor, locals::returnRigidity);
+	LinearVertexColorFunction colorFunction(image, group, 1.0, 1e4, minColor, maxColor,
+											locals::returnRigidity);
 
 	if (group && deformedDomain)
 		tglDrawFaces(image, group, colorFunction);
@@ -318,9 +312,8 @@ void tglDrawRigidity(const TMeshImage &image, double minColor[4], double maxColo
 //    Texturized drawing  implementation
 //***********************************************************************************************
 
-void tglDraw(const TMeshImage &meshImage,
-			 const DrawableTextureData &texData, const TAffine &meshToTexAff,
-			 const PlasticDeformerDataGroup &group)
+void tglDraw(const TMeshImage &meshImage, const DrawableTextureData &texData,
+			 const TAffine &meshToTexAff, const PlasticDeformerDataGroup &group)
 {
 	typedef MeshTexturizer::TextureData::TileData TileData;
 
@@ -358,8 +351,7 @@ void tglDraw(const TMeshImage &meshImage,
 		const TRectD &tileRect = tileData.m_tileGeometry;
 
 		tileAff[t] = TScale(1.0 / (tileRect.x1 - tileRect.x0), 1.0 / (tileRect.y1 - tileRect.y0)) *
-					 TTranslation(-tileRect.x0, -tileRect.y0) *
-					 meshToTexAff;
+					 TTranslation(-tileRect.x0, -tileRect.y0) * meshToTexAff;
 	}
 
 	// Draw each face individually, according to the group's sorted faces list.
@@ -380,8 +372,7 @@ void tglDraw(const TMeshImage &meshImage,
 		// Draw each face
 		const TTextureMesh::face_type &fc = mesh->face(f);
 
-		const TTextureMesh::edge_type &ed0 = mesh->edge(fc.edge(0)),
-									  &ed1 = mesh->edge(fc.edge(1)),
+		const TTextureMesh::edge_type &ed0 = mesh->edge(fc.edge(0)), &ed1 = mesh->edge(fc.edge(1)),
 									  &ed2 = mesh->edge(fc.edge(2));
 
 		{
@@ -389,11 +380,13 @@ void tglDraw(const TMeshImage &meshImage,
 			v1 = ed0.vertex(1);
 			v2 = ed1.vertex((ed1.vertex(0) == v0) | (ed1.vertex(0) == v1));
 
-			e1ovi = (ed1.vertex(0) == v1) | (ed1.vertex(1) == v1); // ed1 and ed2 will refer to vertexes
-			e2ovi = 1 - e1ovi;									   // with index 2 and these.
+			e1ovi =
+				(ed1.vertex(0) == v1) | (ed1.vertex(1) == v1); // ed1 and ed2 will refer to vertexes
+			e2ovi = 1 - e1ovi;								   // with index 2 and these.
 		}
 
-		const TPointD &p0 = mesh->vertex(v0).P(), &p1 = mesh->vertex(v1).P(), &p2 = mesh->vertex(v2).P();
+		const TPointD &p0 = mesh->vertex(v0).P(), &p1 = mesh->vertex(v1).P(),
+					  &p2 = mesh->vertex(v2).P();
 
 		for (t = 0; t != tCount; ++t) {
 			// Draw face against tile
@@ -403,10 +396,8 @@ void tglDraw(const TMeshImage &meshImage,
 			TPointD s[3] = {tileAff[t] * p0, tileAff[t] * p1, tileAff[t] * p2};
 
 			// Test the face bbox - tile intersection
-			if (tmin(s[0].x, s[1].x, s[2].x) > 1.0 ||
-				tmin(s[0].y, s[1].y, s[2].y) > 1.0 ||
-				tmax(s[0].x, s[1].x, s[2].x) < 0.0 ||
-				tmax(s[0].y, s[1].y, s[2].y) < 0.0)
+			if (tmin(s[0].x, s[1].x, s[2].x) > 1.0 || tmin(s[0].y, s[1].y, s[2].y) > 1.0 ||
+				tmax(s[0].x, s[1].x, s[2].x) < 0.0 || tmax(s[0].y, s[1].y, s[2].y) < 0.0)
 				continue;
 
 			// If the tile has changed, interrupt the glBegin/glEnd block and bind the
@@ -414,31 +405,30 @@ void tglDraw(const TMeshImage &meshImage,
 			if (tileData.m_textureId != texId) {
 				texId = tileData.m_textureId;
 
-				glBindTexture(GL_TEXTURE_2D, tileData.m_textureId); // This must be OUTSIDE a glBegin/glEnd block
+				glBindTexture(GL_TEXTURE_2D,
+							  tileData.m_textureId); // This must be OUTSIDE a glBegin/glEnd block
 			}
 
-			const double *d[3] = {dstCoords + (v0 << 1),
-								  dstCoords + (v1 << 1),
+			const double *d[3] = {dstCoords + (v0 << 1), dstCoords + (v1 << 1),
 								  dstCoords + (v2 << 1)};
 
 			/*
-        Now, draw primitives. A note about pixel arithmetic, here.
-        
-        Since line antialiasing in OpenGL just manipulates output fragments' alpha components,
-        we must require that the input texture is NONPREMULTIPLIED.
+		Now, draw primitives. A note about pixel arithmetic, here.
 
-        Furthermore, this function does not rely on the assumption that the output alpha component
-        is discarded (as it happens when drawing on screen). This means that just using a simple
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) is not an option, since this way THE INPUT
-        SRC ALPHA GETS MULTIPLIED BY ITSELF - see glBlendFunc's docs - and that shows.
+		Since line antialiasing in OpenGL just manipulates output fragments' alpha components,
+		we must require that the input texture is NONPREMULTIPLIED.
 
-        The solution is to separate the rendering of RGB and M components - the formers use
-        GL_SRC_ALPHA, while the latter uses GL_ONE. The result is a PREMULTIPLIED image.
-      */
+		Furthermore, this function does not rely on the assumption that the output alpha component
+		is discarded (as it happens when drawing on screen). This means that just using a simple
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) is not an option, since this way THE INPUT
+		SRC ALPHA GETS MULTIPLIED BY ITSELF - see glBlendFunc's docs - and that shows.
+
+		The solution is to separate the rendering of RGB and M components - the formers use
+		GL_SRC_ALPHA, while the latter uses GL_ONE. The result is a PREMULTIPLIED image.
+	  */
 
 			// First, draw antialiased face edges on the mesh border.
-			bool drawEd0 = (ed0.facesCount() < 2),
-				 drawEd1 = (ed1.facesCount() < 2),
+			bool drawEd0 = (ed0.facesCount() < 2), drawEd1 = (ed1.facesCount() < 2),
 				 drawEd2 = (ed2.facesCount() < 2);
 
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

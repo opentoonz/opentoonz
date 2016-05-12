@@ -35,9 +35,10 @@ class CalligraphicFx : public TStandardRasterFx
 	TDoubleParamP m_accuracy;
 	TDoubleParamP m_noise;
 
-public:
+  public:
 	CalligraphicFx()
-		: m_colorIndex(L"1,2,3"), m_thickness(5.0), m_horizontal(100.0), m_upWDiagonal(50.0), m_vertical(0.0), m_doWDiagonal(50.0), m_accuracy(50.0), m_noise(0.0)
+		: m_colorIndex(L"1,2,3"), m_thickness(5.0), m_horizontal(100.0), m_upWDiagonal(50.0),
+		  m_vertical(0.0), m_doWDiagonal(50.0), m_accuracy(50.0), m_noise(0.0)
 	{
 		m_thickness->setMeasureName("fxLength");
 		addInputPort("Source", m_input);
@@ -70,7 +71,8 @@ public:
 			const char *argv[8];
 			argv[0] = strsave(toString(m_colorIndex->getValue()).c_str());
 			getValues(argv, argc, frame);
-			SandorFxRenderData *calligraphicData = new SandorFxRenderData(Calligraphic, argc, argv, 0, shrink);
+			SandorFxRenderData *calligraphicData =
+				new SandorFxRenderData(Calligraphic, argc, argv, 0, shrink);
 			CalligraphicParams &params = calligraphicData->m_callParams;
 			params.m_accuracy = m_accuracy->getValue(frame);
 			params.m_horizontal = m_horizontal->getValue(frame);
@@ -93,7 +95,7 @@ public:
 
 	bool allowUserCacheOnPort(int port) { return false; }
 
-private:
+  private:
 	void getValues(const char *argv[], int argc, double frame)
 	{
 		double values[8];
@@ -138,7 +140,8 @@ private:
 		argv[0] = strsave(toString(m_colorIndex->getValue()).c_str());
 		getValues(argv, argc, frame);
 		TRenderSettings ri2(ri);
-		SandorFxRenderData *calligraphicData = new SandorFxRenderData(Calligraphic, argc, argv, 0, shrink);
+		SandorFxRenderData *calligraphicData =
+			new SandorFxRenderData(Calligraphic, argc, argv, 0, shrink);
 		CalligraphicParams &params = calligraphicData->m_callParams;
 		params.m_accuracy = m_accuracy->getValue(frame);
 		params.m_horizontal = m_horizontal->getValue(frame);
@@ -153,11 +156,8 @@ private:
 		m_input->compute(tile, frame, ri2);
 	}
 
-	void transform(double frame,
-				   int port,
-				   const TRectD &rectOnOutput,
-				   const TRenderSettings &infoOnOutput,
-				   TRectD &rectOnInput,
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
 				   TRenderSettings &infoOnInput)
 	{
 		rectOnInput = rectOnOutput;
@@ -168,7 +168,8 @@ private:
 		const char *argv[8];
 		argv[0] = strsave(toString(m_colorIndex->getValue()).c_str());
 		getValues(argv, argc, frame);
-		SandorFxRenderData *calligraphicData = new SandorFxRenderData(Calligraphic, argc, argv, 0, shrink);
+		SandorFxRenderData *calligraphicData =
+			new SandorFxRenderData(Calligraphic, argc, argv, 0, shrink);
 		CalligraphicParams &params = calligraphicData->m_callParams;
 		params.m_accuracy = m_accuracy->getValue(frame);
 		params.m_horizontal = m_horizontal->getValue(frame);
@@ -198,9 +199,10 @@ class OutBorderFx : public TStandardRasterFx
 	TDoubleParamP m_accuracy;
 	TDoubleParamP m_noise;
 
-public:
+  public:
 	OutBorderFx()
-		: m_thickness(5.0), m_horizontal(100.0), m_upWDiagonal(100.0), m_vertical(100.0), m_doWDiagonal(100.0), m_accuracy(50.0), m_noise(0.0)
+		: m_thickness(5.0), m_horizontal(100.0), m_upWDiagonal(100.0), m_vertical(100.0),
+		  m_doWDiagonal(100.0), m_accuracy(50.0), m_noise(0.0)
 	{
 		m_thickness->setMeasureName("fxLength");
 		addInputPort("Source", m_input);
@@ -232,7 +234,8 @@ public:
 			const char *argv[8];
 			argv[0] = strsave(toString(L"-1").c_str());
 			getValues(argv, argc, frame);
-			SandorFxRenderData *outBorderData = new SandorFxRenderData(OutBorder, argc, argv, 0, shrink);
+			SandorFxRenderData *outBorderData =
+				new SandorFxRenderData(OutBorder, argc, argv, 0, shrink);
 			CalligraphicParams &params = outBorderData->m_callParams;
 			params.m_accuracy = m_accuracy->getValue(frame);
 			params.m_horizontal = m_horizontal->getValue(frame);
@@ -253,7 +256,7 @@ public:
 
 	bool canHandle(const TRenderSettings &info, double frame) { return true; }
 
-private:
+  private:
 	void getValues(const char *argv[], int argc, double frame)
 	{
 		double values[8];
@@ -298,7 +301,8 @@ private:
 		argv[0] = strsave(toString(L"-1").c_str());
 		getValues(argv, argc, frame);
 		TRenderSettings ri2(ri);
-		SandorFxRenderData *outBorderData = new SandorFxRenderData(OutBorder, argc, argv, 0, shrink);
+		SandorFxRenderData *outBorderData =
+			new SandorFxRenderData(OutBorder, argc, argv, 0, shrink);
 		CalligraphicParams &params = outBorderData->m_callParams;
 		params.m_accuracy = m_accuracy->getValue(frame);
 		params.m_horizontal = m_horizontal->getValue(frame);
@@ -312,11 +316,8 @@ private:
 		m_input->compute(tile, frame, ri2);
 	}
 
-	void transform(double frame,
-				   int port,
-				   const TRectD &rectOnOutput,
-				   const TRenderSettings &infoOnOutput,
-				   TRectD &rectOnInput,
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
 				   TRenderSettings &infoOnInput)
 	{
 		rectOnInput = rectOnOutput;
@@ -327,7 +328,8 @@ private:
 		const char *argv[8];
 		argv[0] = strsave(toString(L"-1").c_str());
 		getValues(argv, argc, frame);
-		SandorFxRenderData *outBorderData = new SandorFxRenderData(OutBorder, argc, argv, 0, shrink);
+		SandorFxRenderData *outBorderData =
+			new SandorFxRenderData(OutBorder, argc, argv, 0, shrink);
 		CalligraphicParams &params = outBorderData->m_callParams;
 		params.m_accuracy = m_accuracy->getValue(frame);
 		params.m_horizontal = m_horizontal->getValue(frame);

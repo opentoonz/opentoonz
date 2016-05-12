@@ -43,14 +43,13 @@ class Viewer;
 
 class TChangeObserver
 {
-public:
+  public:
 	virtual ~TChangeObserver() {}
 };
 
-template <class T>
-class TChangeObserverT
+template <class T> class TChangeObserverT
 {
-public:
+  public:
 	virtual ~TChangeObserverT() {}
 	virtual void update(const T &) = 0;
 };
@@ -59,7 +58,7 @@ public:
 
 class TObserverList
 {
-public:
+  public:
 	virtual ~TObserverList() {}
 	virtual void attach(TChangeObserver *observer) = 0;
 	virtual void detach(TChangeObserver *observer) = 0;
@@ -67,12 +66,11 @@ public:
 
 //-------------------------------------------------------------------
 
-template <class T>
-class TObserverListT : public TObserverList
+template <class T> class TObserverListT : public TObserverList
 {
 	friend class TNotifier;
 
-public:
+  public:
 	TObserverListT() {}
 	~TObserverListT() {}
 	typedef TChangeObserverT<T> Observer;
@@ -85,9 +83,8 @@ public:
 	void detach(TChangeObserver *observer)
 	{
 		if (Observer *o = dynamic_cast<Observer *>(observer))
-			m_observers.erase(
-				std::remove(m_observers.begin(), m_observers.end(), o),
-				m_observers.end());
+			m_observers.erase(std::remove(m_observers.begin(), m_observers.end(), o),
+							  m_observers.end());
 	}
 	void notify(const T &change)
 	{
@@ -97,7 +94,7 @@ public:
 			(*it)->update(change);
 	}
 
-private:
+  private:
 	std::vector<Observer *> m_observers;
 };
 
@@ -105,14 +102,12 @@ private:
 
 class TFrameChange
 {
-public:
+  public:
 	int m_frame;
 	int m_oldFrame;
 	TFrameId m_fid;
-	TFrameChange(int frame, int oldFrame)
-		: m_frame(frame), m_oldFrame(oldFrame), m_fid(0) {}
-	TFrameChange(const TFrameId &fid)
-		: m_frame(-1), m_fid(fid) {}
+	TFrameChange(int frame, int oldFrame) : m_frame(frame), m_oldFrame(oldFrame), m_fid(0) {}
+	TFrameChange(const TFrameId &fid) : m_frame(-1), m_fid(fid) {}
 };
 typedef TChangeObserverT<TFrameChange> TFrameObserver;
 
@@ -120,10 +115,9 @@ typedef TChangeObserverT<TFrameChange> TFrameObserver;
 
 class TColumnChange
 {
-public:
+  public:
 	int m_columnIndex;
-	TColumnChange(int columnIndex)
-		: m_columnIndex(columnIndex) {}
+	TColumnChange(int columnIndex) : m_columnIndex(columnIndex) {}
 };
 typedef TChangeObserverT<TColumnChange> TColumnObserver;
 
@@ -131,7 +125,7 @@ typedef TChangeObserverT<TColumnChange> TColumnObserver;
 
 class TCurrentFxChange
 {
-public:
+  public:
 	TCurrentFxChange() {}
 };
 typedef TChangeObserverT<TCurrentFxChange> TCurrentFxObserver;
@@ -142,7 +136,7 @@ class TGlobalChange
 {
 	bool m_sceneChanged;
 
-public:
+  public:
 	TGlobalChange(bool sceneChanged = false) : m_sceneChanged(sceneChanged) {}
 	bool isSceneChanged() const { return m_sceneChanged; }
 };
@@ -152,7 +146,7 @@ typedef TChangeObserverT<TGlobalChange> TGlobalObserver;
 
 class TSceneNameChange
 {
-public:
+  public:
 	TSceneNameChange() {}
 };
 typedef TChangeObserverT<TSceneNameChange> TSceneNameObserver;
@@ -163,7 +157,7 @@ class TDirectoryChange
 {
 	TFilePath m_path;
 
-public:
+  public:
 	TDirectoryChange(const TFilePath &path) : m_path(path) {}
 	TFilePath getPath() const { return m_path; }
 };
@@ -173,7 +167,7 @@ typedef TChangeObserverT<TDirectoryChange> TDirectoryObserver;
 
 class TStageChange
 {
-public:
+  public:
 	TRectD m_rect;
 
 	TStageChange() : m_rect(0, 0, 0, 0) {}
@@ -186,7 +180,7 @@ typedef TChangeObserverT<TStageChange> TStageObserver;
 
 class TColumnHeadChange
 {
-public:
+  public:
 	int m_columnIndex;
 	TColumnHeadChange() : m_columnIndex(-2) {}
 	TColumnHeadChange(int index) : m_columnIndex(index) {}
@@ -200,7 +194,7 @@ class TXshLevel;
 
 class TDrawingChange
 {
-public:
+  public:
 	TXshLevel *m_xl;
 	TFrameId m_fid;
 	bool m_wholeLevel;
@@ -215,7 +209,7 @@ typedef TChangeObserverT<TDrawingChange> TDrawingObserver;
 
 class TXsheetChange
 {
-public:
+  public:
 };
 
 typedef TChangeObserverT<TXsheetChange> TXsheetObserver;
@@ -224,7 +218,7 @@ typedef TChangeObserverT<TXsheetChange> TXsheetObserver;
 
 class TLevelChange
 {
-public:
+  public:
 	TLevelChange() {}
 };
 
@@ -234,7 +228,7 @@ typedef TChangeObserverT<TLevelChange> TLevelObserver;
 
 class TPatternStrokeStylesChange
 {
-public:
+  public:
 };
 
 typedef TChangeObserverT<TPatternStrokeStylesChange> TPatternStrokeStyleObserver;
@@ -243,7 +237,7 @@ typedef TChangeObserverT<TPatternStrokeStylesChange> TPatternStrokeStyleObserver
 
 class TStageObjectChange
 {
-public:
+  public:
 	TStageObjectChange() {}
 };
 
@@ -253,7 +247,7 @@ typedef TChangeObserverT<TStageObjectChange> TStageObjectObserver;
 
 class TKeyFrameChange
 {
-public:
+  public:
 	TKeyFrameChange() {}
 };
 
@@ -263,7 +257,7 @@ typedef TChangeObserverT<TKeyFrameChange> TKeyFrameObserver;
 
 class TColorStyleChange
 {
-public:
+  public:
 	TColorStyleChange() {}
 };
 
@@ -275,7 +269,7 @@ class TPaletteChange
 {
 	bool m_isCleanup;
 
-public:
+  public:
 	TPaletteChange(bool isCleanup = false) : m_isCleanup(isCleanup) {}
 	bool isCleanup() const { return m_isCleanup; }
 };
@@ -286,7 +280,7 @@ typedef TChangeObserverT<TPaletteChange> TPaletteObserver;
 
 class TToolChange
 {
-public:
+  public:
 	TToolChange() {}
 };
 
@@ -296,7 +290,7 @@ typedef TChangeObserverT<TToolChange> TToolObserver;
 
 class TCastChange
 {
-public:
+  public:
 	TCastChange() {}
 };
 
@@ -308,7 +302,7 @@ class TDagViewerChange
 {
 	DagViewer::Viewer *m_viewer;
 
-public:
+  public:
 	TDagViewerChange(DagViewer::Viewer *viewer) : m_viewer(viewer) {}
 	const DagViewer::Viewer *getViewer() const { return m_viewer; }
 };
@@ -318,7 +312,7 @@ typedef TChangeObserverT<TDagViewerChange> TDagViewerObserver;
 
 class TFxDagChange
 {
-public:
+  public:
 	TFxDagChange() {}
 };
 
@@ -340,8 +334,7 @@ class DVAPI TNotifier
 	TObserverListT<TFrameChange> m_frameObs;
 	TObserverListT<TCurrentFxChange> m_currentFxObs;
 	TObserverListT<TStageObjectChange> m_stageObjectObs;
-	TObserverListT<TPatternStrokeStylesChange>
-		m_patternStrokeStylesObs;
+	TObserverListT<TPatternStrokeStylesChange> m_patternStrokeStylesObs;
 	TObserverListT<TKeyFrameChange> m_keyFrameObs;
 	TObserverListT<TColorStyleChange> m_colorStyleObs;
 	TObserverListT<TPaletteChange> m_paletteObs;
@@ -378,7 +371,7 @@ class DVAPI TNotifier
 		m_obsList.push_back(&m_fxDagObs);
 	}
 
-public:
+  public:
 	static TNotifier *instance();
 
 	// void attach(TChangeObserver*observer);
@@ -409,10 +402,7 @@ public:
 		m_xsheetObs.notify(c);
 		m_dirtyFlag = true;
 	}
-	void notify(const TPatternStrokeStylesChange &c)
-	{
-		m_patternStrokeStylesObs.notify(c);
-	}
+	void notify(const TPatternStrokeStylesChange &c) { m_patternStrokeStylesObs.notify(c); }
 	void notify(const TFrameChange &c) { m_frameObs.notify(c); }
 	void notify(const TCurrentFxChange &c) { m_currentFxObs.notify(c); }
 	void notify(const TStageObjectChange &c) { m_stageObjectObs.notify(c); }

@@ -69,7 +69,8 @@ TestPanel::TestPanel(QWidget *parent, Qt::WFlags flags)
 	layout->addWidget(intFld, 1);
 
 	ColorField *colorFld = new ColorField(0, true, TPixel32(0, 0, 255, 255), 50);
-	connect(colorFld, SIGNAL(colorChanged(const TPixel32 &, bool)), SLOT(onColorValueChanged(const TPixel32 &, bool)));
+	connect(colorFld, SIGNAL(colorChanged(const TPixel32 &, bool)),
+			SLOT(onColorValueChanged(const TPixel32 &, bool)));
 	layout->addWidget(colorFld, 1, Qt::AlignCenter);
 
 	SpectrumField *spectrumFld = new SpectrumField(0, TPixel32(0, 0, 255));
@@ -119,7 +120,7 @@ void TestPanel::onColorValueChanged(const TPixel32 &, bool isDragging)
 
 class OpenFloatingTestPanel : public MenuItemHandler
 {
-public:
+  public:
 	OpenFloatingTestPanel() : MenuItemHandler(MI_OpenTest) {}
 	void execute()
 	{

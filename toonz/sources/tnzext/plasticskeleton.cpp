@@ -27,14 +27,18 @@ DEFINE_CLASS_CODE(PlasticSkeleton, 122)
 //************************************************************************************
 
 PlasticSkeletonVertex::PlasticSkeletonVertex()
-	: tcg::Vertex<TPointD>(), m_number(-1), m_parent(-1), m_minAngle(-(std::numeric_limits<double>::max)()), m_maxAngle((std::numeric_limits<double>::max)()), m_interpolate(true)
+	: tcg::Vertex<TPointD>(), m_number(-1), m_parent(-1),
+	  m_minAngle(-(std::numeric_limits<double>::max)()),
+	  m_maxAngle((std::numeric_limits<double>::max)()), m_interpolate(true)
 {
 }
 
 //-------------------------------------------------------------------------------
 
 PlasticSkeletonVertex::PlasticSkeletonVertex(const TPointD &pos)
-	: tcg::Vertex<TPointD>(pos), m_number(-1), m_parent(-1), m_minAngle(-(std::numeric_limits<double>::max)()), m_maxAngle((std::numeric_limits<double>::max)()), m_interpolate(true)
+	: tcg::Vertex<TPointD>(pos), m_number(-1), m_parent(-1),
+	  m_minAngle(-(std::numeric_limits<double>::max)()),
+	  m_maxAngle((std::numeric_limits<double>::max)()), m_interpolate(true)
 {
 }
 
@@ -94,11 +98,12 @@ void PlasticSkeletonVertex::loadData(TIStream &is)
 
 class PlasticSkeleton::Imp
 {
-public:
-	std::set<PlasticSkeletonDeformation *> m_deformations; //!< Registered deformations for this skeleton (not owned)
-	tcg::indices_pool<int> m_numbersPool;				   //!< Vertex numbers pool (used for naming vertices only)
+  public:
+	std::set<PlasticSkeletonDeformation *>
+		m_deformations;					  //!< Registered deformations for this skeleton (not owned)
+	tcg::indices_pool<int> m_numbersPool; //!< Vertex numbers pool (used for naming vertices only)
 
-public:
+  public:
 	Imp() {}
 	Imp(const Imp &other);
 	Imp &operator=(const Imp &other);
@@ -109,8 +114,7 @@ public:
 
 //===============================================================================
 
-PlasticSkeleton::Imp::Imp(const Imp &other)
-	: m_numbersPool(other.m_numbersPool)
+PlasticSkeleton::Imp::Imp(const Imp &other) : m_numbersPool(other.m_numbersPool)
 {
 }
 
@@ -123,8 +127,7 @@ PlasticSkeleton::Imp &PlasticSkeleton::Imp::operator=(const Imp &other)
 }
 
 //-------------------------------------------------------------------------------
-PlasticSkeleton::Imp::Imp(Imp &&other)
-	: m_numbersPool(std::move(other.m_numbersPool))
+PlasticSkeleton::Imp::Imp(Imp &&other) : m_numbersPool(std::move(other.m_numbersPool))
 {
 }
 
@@ -140,8 +143,7 @@ PlasticSkeleton::Imp &PlasticSkeleton::Imp::operator=(Imp &&other)
 //    PlasticSkeleton  implementation
 //************************************************************************************
 
-PlasticSkeleton::PlasticSkeleton()
-	: m_imp(new Imp)
+PlasticSkeleton::PlasticSkeleton() : m_imp(new Imp)
 {
 }
 
@@ -249,7 +251,8 @@ int PlasticSkeleton::addVertex(const PlasticSkeletonVertex &vx, int parent)
 	// Assign a name to the vertex in case none was given
 	QString name(vx.name());
 	if (name.isEmpty())
-		name = (v == 0) ? QString("Root") : "Vertex " + QString::number(vx_.m_number).rightJustified(3, '_');
+		name = (v == 0) ? QString("Root")
+						: "Vertex " + QString::number(vx_.m_number).rightJustified(3, '_');
 
 	// Ensure the name is unique
 	while (!setVertexName(v, name))
@@ -272,8 +275,8 @@ int PlasticSkeleton::addVertex(const PlasticSkeletonVertex &vx, int parent)
 
 //-------------------------------------------------------------------------------
 
-int PlasticSkeleton::insertVertex(const PlasticSkeletonVertex &vx,
-								  int parent, const std::vector<int> &children)
+int PlasticSkeleton::insertVertex(const PlasticSkeletonVertex &vx, int parent,
+								  const std::vector<int> &children)
 {
 	assert(parent >= 0);
 
@@ -349,7 +352,7 @@ void PlasticSkeleton::removeVertex(int v)
 		// to ensure that deformations update vertex deformations correctly.
 
 		PlasticSkeletonVertex vx(vertex(v)); // Note the COPY - not referencing. It's best since
-											 // we'll be iterating and erasing vx's edges at the same time
+		// we'll be iterating and erasing vx's edges at the same time
 		int parent = vx.m_parent;
 		if (parent < 0) {
 			// Root case - clear the whole skeleton
@@ -374,7 +377,8 @@ void PlasticSkeleton::removeVertex(int v)
 		vNumber = vx.m_number;
 	}
 
-	// Notify deformations BEFORE removing the vertex, so the vertex deformations are still accessible.
+	// Notify deformations BEFORE removing the vertex, so the vertex deformations are still
+	// accessible.
 	std::set<PlasticSkeletonDeformation *>::iterator dt, dEnd(m_imp->m_deformations.end());
 	for (dt = m_imp->m_deformations.begin(); dt != dEnd; ++dt)
 		(*dt)->deleteVertex(this, v);
@@ -452,8 +456,7 @@ void PlasticSkeleton::saveData(TOStream &os)
 	// the lists' internal linking could have been altered to mismatch the
 	// natural indexing referred to by primitives' data.
 
-	if (m_vertices.size() != m_vertices.nodesCount() ||
-		m_edges.size() != m_edges.nodesCount()) {
+	if (m_vertices.size() != m_vertices.nodesCount() || m_edges.size() != m_edges.nodesCount()) {
 		// Ensure that there are no holes in the representation
 		PlasticSkeleton skel(*this);
 
@@ -525,8 +528,8 @@ void PlasticSkeleton::loadData(TIStream &is)
 					assert(false), is.skipCurrentTag();
 			}
 
-			m_imp->m_numbersPool = tcg::indices_pool<int>(
-				acquiredVertexNumbers.begin(), acquiredVertexNumbers.end());
+			m_imp->m_numbersPool =
+				tcg::indices_pool<int>(acquiredVertexNumbers.begin(), acquiredVertexNumbers.end());
 
 			is.matchEndTag();
 		} else if (str == "E") {
@@ -607,7 +610,6 @@ std::vector<PlasticHandle> PlasticSkeleton::verticesToHandles() const
 	typedef tcg::function < PlasticHandle (PlasticSkeletonVertex::*)() const,
 		&PlasticSkeletonVertex::operator PlasticHandle> Func;
 
-	return std::vector<PlasticHandle>(
-		tcg::make_cast_it(m_vertices.begin(), Func()),
-		tcg::make_cast_it(m_vertices.end(), Func()));
+	return std::vector<PlasticHandle>(tcg::make_cast_it(m_vertices.begin(), Func()),
+									  tcg::make_cast_it(m_vertices.end(), Func()));
 }

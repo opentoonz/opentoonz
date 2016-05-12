@@ -22,11 +22,12 @@
 // SVNUpdateAndLockDialog
 //-----------------------------------------------------------------------------
 
-SVNUpdateAndLockDialog::SVNUpdateAndLockDialog(QWidget *parent,
-											   const QString &workingDir, const QStringList &files,
-											   int workingRevision,
+SVNUpdateAndLockDialog::SVNUpdateAndLockDialog(QWidget *parent, const QString &workingDir,
+											   const QStringList &files, int workingRevision,
 											   int sceneIconAdded)
-	: Dialog(TApp::instance()->getMainWindow(), true, false), m_editSceneContentsCheckBox(0), m_workingDir(workingDir), m_files(files), m_workingRevision(workingRevision), m_hasError(false), m_sceneIconAdded(sceneIconAdded), m_updateWorkingRevisionNeeded(false)
+	: Dialog(TApp::instance()->getMainWindow(), true, false), m_editSceneContentsCheckBox(0),
+	  m_workingDir(workingDir), m_files(files), m_workingRevision(workingRevision),
+	  m_hasError(false), m_sceneIconAdded(sceneIconAdded), m_updateWorkingRevisionNeeded(false)
 {
 	setModal(false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
@@ -83,7 +84,8 @@ SVNUpdateAndLockDialog::SVNUpdateAndLockDialog(QWidget *parent,
 
 	m_editSceneContentsCheckBox->hide();
 
-	connect(m_editSceneContentsCheckBox, SIGNAL(toggled(bool)), this, SLOT(onEditSceneContentsToggled(bool)));
+	connect(m_editSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+			SLOT(onEditSceneContentsToggled(bool)));
 
 	int fileSize = m_files.size();
 	for (int i = 0; i < fileSize; i++) {
@@ -125,7 +127,8 @@ SVNUpdateAndLockDialog::SVNUpdateAndLockDialog(QWidget *parent,
 	connect(&m_thread, SIGNAL(error(const QString &)), this, SLOT(onError(const QString &)));
 
 	// 1. Getting status
-	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this, SLOT(onStatusRetrieved(const QString &)));
+	connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+			SLOT(onStatusRetrieved(const QString &)));
 	m_thread.getSVNStatus(m_workingDir);
 }
 
@@ -243,7 +246,9 @@ void SVNUpdateAndLockDialog::updateCommand()
 {
 	m_commentLabel->hide();
 	m_commentTextEdit->hide();
-	m_textLabel->setText(tr("Updating %1 items...").arg(m_filesToEdit.size() + m_sceneResources.size() - m_sceneIconAdded));
+	m_textLabel->setText(
+		tr("Updating %1 items...")
+			.arg(m_filesToEdit.size() + m_sceneResources.size() - m_sceneIconAdded));
 	m_waitingLabel->show();
 	// Step 1: update
 	QStringList args;
@@ -269,8 +274,8 @@ void SVNUpdateAndLockDialog::onUpdateDone()
 	// Check the status of sceneResources
 	if (!m_sceneResources.empty()) {
 		m_thread.disconnect(SIGNAL(done(const QString &)));
-		connect(&m_thread, SIGNAL(statusRetrieved(const QString &)),
-				this, SLOT(onSceneResourcesStatusRetrieved(const QString &)));
+		connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+				SLOT(onSceneResourcesStatusRetrieved(const QString &)));
 		m_thread.getSVNStatus(m_workingDir, m_sceneResources);
 		return;
 	} else
@@ -292,9 +297,11 @@ void SVNUpdateAndLockDialog::lockCommand()
 		args << m_filesToEdit.at(i);
 
 	if (!m_commentTextEdit->toPlainText().isEmpty())
-		args << QString("-m").append(TSystem::getHostName() + ":" + m_commentTextEdit->toPlainText());
+		args << QString("-m")
+					.append(TSystem::getHostName() + ":" + m_commentTextEdit->toPlainText());
 	else
-		args << QString("-m").append(TSystem::getHostName() + ":" + VersionControl::instance()->getUserName() + " edit files.");
+		args << QString("-m").append(TSystem::getHostName() + ":" +
+									 VersionControl::instance()->getUserName() + " edit files.");
 
 	m_thread.disconnect(SIGNAL(done(const QString &)));
 	connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onLockDone()));
@@ -359,5 +366,7 @@ void SVNUpdateAndLockDialog::onEditSceneContentsToggled(bool checked)
 		}
 	}
 
-	m_textLabel->setText(tr("%1 items to edit.").arg(m_filesToEdit.size() + m_sceneResources.size() - m_sceneIconAdded));
+	m_textLabel->setText(
+		tr("%1 items to edit.")
+			.arg(m_filesToEdit.size() + m_sceneResources.size() - m_sceneIconAdded));
 }

@@ -75,7 +75,7 @@ class RenderLocker
 {
 	bool &m_rendering;
 
-public:
+  public:
 	RenderLocker(bool &rendering) : m_rendering(rendering) { m_rendering = true; }
 	~RenderLocker() { m_rendering = false; }
 };
@@ -84,7 +84,8 @@ public:
 //
 //-----------------------------------------------------------------------------
 RenderController::RenderController()
-	: m_progressDialog(0), m_frame(0), m_rendering(false), m_cancelled(false), m_properties(0), m_movieExt("mov"), m_useMarkers(false)
+	: m_progressDialog(0), m_frame(0), m_rendering(false), m_cancelled(false), m_properties(0),
+	  m_movieExt("mov"), m_useMarkers(false)
 {
 	m_properties = new TOutputProperties();
 }
@@ -149,7 +150,8 @@ bool RenderController::onFrameCompleted(int frameCount)
 
 //-----------------------------------------------------------------------------
 
-int RenderController::computeClipFrameCount(const TFilePath &clipPath, bool useMarkers, int *frameOffset)
+int RenderController::computeClipFrameCount(const TFilePath &clipPath, bool useMarkers,
+											int *frameOffset)
 {
 	if (frameOffset)
 		*frameOffset = 0;
@@ -170,7 +172,8 @@ int RenderController::computeClipFrameCount(const TFilePath &clipPath, bool useM
 
 //-----------------------------------------------------------------------------
 
-int RenderController::computeTotalFrameCount(const std::vector<TFilePath> &clipList, bool useMarkers)
+int RenderController::computeTotalFrameCount(const std::vector<TFilePath> &clipList,
+											 bool useMarkers)
 {
 	int count = 0;
 	int i;
@@ -195,7 +198,7 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 	if (m_clipList.empty())
 		return;
 
-	//verifico che il "generatore" sia libero.
+	// verifico che il "generatore" sia libero.
 	if (m_rendering)
 		return;
 	m_cancelled = false;
@@ -209,7 +212,7 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 	if (sceneCount < 1)
 		return; // non dovrebbe succedere mai
 
-	//Risoluzione e Settings
+	// Risoluzione e Settings
 	TDimension resolution(0, 0);
 	TFilePath fp;
 	TFilePath firstClipPath = fp = m_clipList[0];
@@ -224,10 +227,11 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 			getMovieProperties(fp, testResolution);
 			if (testResolution != resolution) {
 				/*wstring text = L"The ";
-        text += fp.getLevelNameW();
-        text += L" scene has a different resolution from the ";
-        text += firstClipPath.getLevelNameW();
-        text += L" scene.\nThe output result may differ from what you expect. What do you want to do?";*/
+		text += fp.getLevelNameW();
+		text += L" scene has a different resolution from the ";
+		text += firstClipPath.getLevelNameW();
+		text += L" scene.\nThe output result may differ from what you expect. What do you want to
+		do?";*/
 				QString text = tr("The %1  scene has a different resolution from the %2 scene.\n \
                           The output result may differ from what you expect. What do you want to do?")
 								   .arg(QString::fromStdWString(fp.getLevelNameW()))
@@ -239,21 +243,25 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 					break;
 			}
 		}
-	} catch (TException const& e) {
+	} catch (TException const &e) {
 		QString msg;
-		msg = QObject::tr("There were problems loading the scene %1.\n Some files may be missing.").arg(QString::fromStdWString(fp.getWideString()));
+		msg = QObject::tr("There were problems loading the scene %1.\n Some files may be missing.")
+				  .arg(QString::fromStdWString(fp.getWideString()));
 
 		DVGui::warning(msg);
 		return;
 	} catch (...) {
-		QString msg = QObject::tr("There were problems loading the scene %1.\n Some files may be missing.").arg(QString::fromStdWString(fp.getWideString()));
+		QString msg =
+			QObject::tr("There were problems loading the scene %1.\n Some files may be missing.")
+				.arg(QString::fromStdWString(fp.getWideString()));
 
 		DVGui::warning(msg);
 		return;
 	}
 
-	//Inizializzo la progressBar
-	DVGui::ProgressDialog progress(tr("Exporting ..."), tr("Abort"), 0, 1, TApp::instance()->getMainWindow());
+	// Inizializzo la progressBar
+	DVGui::ProgressDialog progress(tr("Exporting ..."), tr("Abort"), 0, 1,
+								   TApp::instance()->getMainWindow());
 	progress.setWindowModality(Qt::WindowModal);
 	progress.setWindowTitle(tr("Exporting"));
 	progress.setValue(0);
@@ -267,16 +275,17 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 	progress.setMaximum(totalFrameCount);
 
 	try {
-		//Inizializzo il movieGenerator
+		// Inizializzo il movieGenerator
 		MovieGenerator movieGenerator(outPath, resolution, *m_properties, m_useMarkers);
 		movieGenerator.setListener(this);
 
 		OnionSkinMask osMask; // = app->getOnionSkinMask(false);
 		if (!osMask.isEmpty() && osMask.isEnabled())
-			movieGenerator.setOnionSkin(TApp::instance()->getCurrentColumn()->getColumnIndex(), osMask);
+			movieGenerator.setOnionSkin(TApp::instance()->getCurrentColumn()->getColumnIndex(),
+										osMask);
 		movieGenerator.setSceneCount(sceneCount);
 
-		//Aggiungo i soundtrack al movieGenerator
+		// Aggiungo i soundtrack al movieGenerator
 		for (sceneIndex = 0; sceneIndex < sceneCount; sceneIndex++) {
 			TFilePath fp = m_clipList[sceneIndex];
 			int frameOffset;
@@ -287,13 +296,17 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 			scene.load(fp);
 			try {
 				movieGenerator.addSoundtrack(scene, frameOffset, sceneFrames);
-			} catch (const TException&) {
-				QString text = tr("The %1 scene contains an audio file with different characteristics from the one used in the first exported scene.\nThe audio file will not be included in the rendered clip.").arg(QString::fromStdWString(fp.getLevelNameW()));
+			} catch (const TException &) {
+				QString text =
+					tr("The %1 scene contains an audio file with different characteristics from "
+					   "the one used in the first exported scene.\nThe audio file will not be "
+					   "included in the rendered clip.")
+						.arg(QString::fromStdWString(fp.getLevelNameW()));
 				DVGui::warning(text);
 			}
 		}
 
-		//Aggiungo le scene al movieGenerator
+		// Aggiungo le scene al movieGenerator
 		for (sceneIndex = 0; sceneIndex < sceneCount; sceneIndex++) {
 			TFilePath fp = m_clipList[sceneIndex];
 			int sceneFrames = computeClipFrameCount(fp, m_useMarkers);
@@ -307,11 +320,15 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 		movieGenerator.close();
 		if (m_frame >= totalFrameCount && Preferences::instance()->isGeneratedMovieViewEnabled()) {
 			if (Preferences::instance()->isDefaultViewerEnabled() &&
-				(outPath.getType() == "mov" || outPath.getType() == "avi" || outPath.getType() == "3gp")) {
+				(outPath.getType() == "mov" || outPath.getType() == "avi" ||
+				 outPath.getType() == "3gp")) {
 				QString name = QString::fromStdString(outPath.getName());
 
 				if (!TSystem::showDocument(outPath)) {
-					QString msg(QObject::tr("It is not possible to display the file %1: no player associated with its format").arg(QString::fromStdWString(outPath.withoutParentDir().getWideString())));
+					QString msg(QObject::tr("It is not possible to display the file %1: no player "
+											"associated with its format")
+									.arg(QString::fromStdWString(
+										outPath.withoutParentDir().getWideString())));
 					DVGui::warning(msg);
 				}
 			} else {
@@ -327,7 +344,8 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 
 				TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
 				prop->m_frameRate = m_properties->getFrameRate();
-				TSoundTrack *snd = TApp::instance()->getCurrentXsheet()->getXsheet()->makeSound(prop);
+				TSoundTrack *snd =
+					TApp::instance()->getCurrentXsheet()->getXsheet()->makeSound(prop);
 
 				::viewFile(outPath, 1, totalFrameCount, step, rs.m_shrinkX, snd, 0);
 			}
@@ -346,9 +364,7 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 
 //-----------------------------------------------------------------------------
 
-void RenderController::getMovieProperties(
-	const TFilePath &scenePath,
-	TDimension &resolution)
+void RenderController::getMovieProperties(const TFilePath &scenePath, TDimension &resolution)
 {
 	if (scenePath == TFilePath())
 		return;
@@ -752,7 +768,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(0);
 	mainLayout->setAlignment(Qt::AlignTop);
-//ClipList
+	// ClipList
 	m_clipListViewer = new ClipListViewer(box);
 	m_clipListViewer->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
 
@@ -773,7 +789,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 	std::wstring sceneName = scene->getSceneName();
 	TFilePath scenePath = scene->getProperties()->getOutputProperties()->getPath().getParentDir();
 
-	//Label + saveInFileFld
+	// Label + saveInFileFld
 	QHBoxLayout *saveIn = new QHBoxLayout;
 	saveIn->setMargin(0);
 	saveIn->setSpacing(5);
@@ -785,7 +801,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 	saveIn->addWidget(dirLabel);
 	saveIn->addWidget(m_saveInFileFld);
 
-	//Label + m_fileNameFld
+	// Label + m_fileNameFld
 	QHBoxLayout *fileNname = new QHBoxLayout;
 	fileNname->setMargin(0);
 	fileNname->setSpacing(5);
@@ -796,7 +812,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 	fileNname->addWidget(nameLabel);
 	fileNname->addWidget(m_fileNameFld);
 
-	//file formats
+	// file formats
 	QHBoxLayout *fileFormatLayout = new QHBoxLayout();
 	m_fileFormat = new QComboBox();
 	QStringList formats;
@@ -822,7 +838,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 	fileFormatLayout->addWidget(m_fileFormat);
 	fileFormatLayout->addWidget(fileFormatButton);
 
-// Use Marker checkbox
+	// Use Marker checkbox
 	m_useMarker = new QCheckBox(tr("Use Markers"), settingsBox);
 	m_useMarker->setMinimumHeight(30);
 	m_useMarker->setChecked(false);
@@ -934,7 +950,10 @@ void ExportPanel::generateMovie()
 	QString path = m_saveInFileFld->getPath();
 	TFilePath outPath(path.toStdWString());
 	outPath = (outPath + m_fileNameFld->text().toStdWString()).withType(ext);
-	if (TFileType::getInfo(outPath) == TFileType::RASTER_IMAGE || outPath.getType() == "pct" || outPath.getType() == "pic" || outPath.getType() == "pict") //pct e' un formato"livello" (ha i settings di quicktime) ma fatto di diversi frames
+	if (TFileType::getInfo(outPath) == TFileType::RASTER_IMAGE || outPath.getType() == "pct" ||
+		outPath.getType() == "pic" || outPath.getType() == "pict") // pct e' un formato"livello" (ha
+																   // i settings di quicktime) ma
+																   // fatto di diversi frames
 		outPath = outPath.withFrame(TFrameId::EMPTY_FRAME);
 	RenderController::instance()->generateMovie(scene->decodeFilePath(outPath));
 }
@@ -976,7 +995,7 @@ void ExportPanel::openSettingsPopup()
 
 	TOutputProperties *outProps = RenderController::instance()->getOutputPropertites();
 	if (!outProps) {
-		//non dovrebbe mai capitare!
+		// non dovrebbe mai capitare!
 		assert(0);
 		outProps = new TOutputProperties();
 		RenderController::instance()->setOutputPropertites(outProps);

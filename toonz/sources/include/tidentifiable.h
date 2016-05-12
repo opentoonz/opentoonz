@@ -21,7 +21,7 @@ class DVAPI TIdentifiable
 {
 	unsigned long m_id;
 
-public:
+  public:
 	TIdentifiable();
 	virtual ~TIdentifiable();
 	TIdentifiable(const TIdentifiable &);

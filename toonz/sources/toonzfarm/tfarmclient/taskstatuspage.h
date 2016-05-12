@@ -10,7 +10,7 @@ class TaskStatusPage : public TabPage
 	class Data;
 	Data *m_data;
 
-public:
+  public:
 	TaskStatusPage(TWidget *parent);
 	~TaskStatusPage();
 

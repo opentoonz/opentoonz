@@ -52,7 +52,7 @@ class FunctionPanel : public QDialog
 	Q_PROPERTY(QColor SubColor READ getSubColor WRITE setSubColor)
 	Q_PROPERTY(QColor SelectedColor READ getSelectedColor WRITE setSelectedColor)
 
-public:
+  public:
 	class DragTool;
 	enum Handle {
 		None,
@@ -66,11 +66,12 @@ public:
 		EaseOutPercentage
 	};
 
-private:
+  private:
 	QTransform m_viewTransform; // world -> window
 	int m_valueAxisX, m_frameAxisY, m_graphViewportY;
-	QPoint m_origin;			 // axes origin (window coords)
-	QPoint m_startPos, m_oldPos; // mouse click position, last mouse click/drag position (window coords)
+	QPoint m_origin; // axes origin (window coords)
+	QPoint m_startPos,
+		m_oldPos; // mouse click position, last mouse click/drag position (window coords)
 
 	struct Gadget {
 		Handle m_handle;
@@ -109,10 +110,10 @@ private:
 
 	enum CURVE_SHAPE {
 		SMOOTH = 0,
-		FRAME_BASED //curves with the connected polylines of integer frames
+		FRAME_BASED // curves with the connected polylines of integer frames
 	} m_curveShape;
 
-public:
+  public:
 	FunctionPanel(QWidget *parent);
 	~FunctionPanel();
 
@@ -120,7 +121,10 @@ public:
 	FunctionTreeModel *getModel() const { return m_functionTreeModel; }
 
 	FunctionSelection *getSelection() const { return m_selection; }
-	void setSelection(FunctionSelection *selection) { m_selection = selection; } // does NOT get ownership
+	void setSelection(FunctionSelection *selection)
+	{
+		m_selection = selection;
+	} // does NOT get ownership
 
 	void setFrameHandle(TFrameHandle *frameHandle);
 	TFrameHandle *getFrameHandle() const { return m_frameHandle; }
@@ -160,7 +164,8 @@ public:
 	FunctionTreeModel::Channel *findClosestChannel(const QPoint &winPos, int maxWinDistance);
 
 	// returns the keyframe index (-1 if no keyframe found)
-	//int findClosestKeyframe(TDoubleParam* curve, const QPoint &winPos, Handle &handle, int maxWinDistance);
+	// int findClosestKeyframe(TDoubleParam* curve, const QPoint &winPos, Handle &handle, int
+	// maxWinDistance);
 
 	int findClosestGadget(const QPoint &winPos, Handle &handle, int maxWinDistance);
 
@@ -190,7 +195,7 @@ public:
 	void setSelectedColor(const QColor &color) { m_selectedColor = color; }
 	QColor getSelectedColor() const { return m_selectedColor; }
 
-protected:
+  protected:
 	void updateGadgets(TDoubleParam *curve);
 
 	void drawCurrentFrame(QPainter &);
@@ -214,10 +219,10 @@ protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-public slots:
+  public slots:
 	void onFrameSwitched();
 
-signals:
+  signals:
 	// void segmentSelected(TDoubleParam *curve, int segmentIndex);
 	void keyframeSelected(double frame);
 };

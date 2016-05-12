@@ -27,7 +27,7 @@ class TScrollbar;
 
 class DVAPI TFilmStripPanel : public TWidget
 {
-protected:
+  protected:
 	TPoint m_lastPos;
 	int m_offset;
 	TScrollbar *m_scrollbar;
@@ -41,12 +41,12 @@ protected:
 
 	friend class FilmStripLoader;
 
-public:
+  public:
 	static const int m_xsize;
 	static const int m_ysize;
 	static const int m_frameHeight;
 
-public:
+  public:
 	TFilmStripPanel(TWidget *parent, string name = "FilmStripPanel");
 	~TFilmStripPanel();
 
@@ -74,7 +74,7 @@ class DVAPI TFilmStrip : public TWidget
 	TFilmStripPanel *m_panel;
 	TScrollbar *m_scrollbar;
 
-public:
+  public:
 	TFilmStrip(TWidget *parent, string name = "FilmStrip");
 
 	void configureNotify(const TDimension &d);

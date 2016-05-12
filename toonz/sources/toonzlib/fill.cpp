@@ -59,7 +59,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb, int paint
 		oldtone = tone;
 	}
 	if (tone == 0) {
-		tmp_limit = pix + 10; //edge stop fill == 10 per default
+		tmp_limit = pix + 10; // edge stop fill == 10 per default
 		if (limit > tmp_limit)
 			limit = tmp_limit;
 		for (; pix <= limit; pix++) {
@@ -111,8 +111,10 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb, int paint
 			if (palette && pix->isPurePaint()) {
 				TPoint pInk = nearestInkNotDiagonal(r, TPoint(xa + n, p.y));
 				if (pInk != TPoint(-1, -1)) {
-					TPixelCM32 *pixInk = (TPixelCM32 *)r->getRawData() + (pInk.y * r->getWrap() + pInk.x);
-					if (pixInk->getInk() != paint && palette->getStyle(pixInk->getInk())->getFlags() != 0)
+					TPixelCM32 *pixInk =
+						(TPixelCM32 *)r->getRawData() + (pInk.y * r->getWrap() + pInk.x);
+					if (pixInk->getInk() != paint &&
+						palette->getStyle(pixInk->getInk())->getFlags() != 0)
 						inkFill(r, pInk, paint, 0, saver);
 				}
 			}
@@ -146,7 +148,7 @@ void findSegment(const TRaster32P &r, const TPoint &p, int &xa, int &xb, const T
 		oldmatte = matte;
 	}
 	if (matte == 0) {
-		tmp_limit = pix + 10; //edge stop fill == 10 per default
+		tmp_limit = pix + 10; // edge stop fill == 10 per default
 		if (limit > tmp_limit)
 			limit = tmp_limit;
 		for (; pix <= limit; pix++) {
@@ -189,11 +191,10 @@ void findSegment(const TRaster32P &r, const TPoint &p, int &xa, int &xb, const T
 
 class FillSeed
 {
-public:
+  public:
 	int m_xa, m_xb;
 	int m_y, m_dy;
-	FillSeed(int xa, int xb, int y, int dy)
-		: m_xa(xa), m_xb(xb), m_y(y), m_dy(dy) {}
+	FillSeed(int xa, int xb, int y, int dy) : m_xa(xa), m_xb(xb), m_y(y), m_dy(dy) {}
 };
 
 //-----------------------------------------------------------------------------
@@ -241,7 +242,7 @@ void insertSegment(std::vector<std::pair<int, int>> &segments, const std::pair<i
 }
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 /*-- 戻り値はsaveBoxが更新されたかどうか --*/
 bool fill(const TRasterCM32P &r, const FillParameters &params, TTileSaverCM32 *saver)
@@ -361,7 +362,8 @@ bool fill(const TRasterCM32P &r, const FillParameters &params, TTileSaverCM32 *s
 
 //-----------------------------------------------------------------------------
 
-void fill(const TRaster32P &ras, const TRaster32P &ref, const FillParameters &params, TTileSaverFullColor *saver)
+void fill(const TRaster32P &ras, const TRaster32P &ref, const FillParameters &params,
+		  TTileSaverFullColor *saver)
 {
 	TPixel32 *pix, *limit, *pix0, *oldpix;
 	int oldy, xa, xb, xc, xd, dy;
@@ -382,22 +384,24 @@ void fill(const TRaster32P &ras, const TRaster32P &ref, const FillParameters &pa
 	assert(fillDepth >= 0 && fillDepth < 16);
 	fillDepth = ((15 - fillDepth) << 4) | (15 - fillDepth);
 
-	//looking for any  pure transparent pixel along the border; if after filling that pixel will be changed,
-	//it means that I filled the bg and the savebox needs to be recomputed!
+	// looking for any  pure transparent pixel along the border; if after filling that pixel will be
+	// changed,
+	// it means that I filled the bg and the savebox needs to be recomputed!
 	TPixel32 borderIndex;
 	TPixel32 *borderPix = 0;
 	pix = workRas->pixels(0);
 	int i;
-	for (i = 0; i < workRas->getLx(); i++, pix++) //border down
+	for (i = 0; i < workRas->getLx(); i++, pix++) // border down
 		if (pix->m == 0) {
 			borderIndex = *pix;
 			borderPix = pix;
 			break;
 		}
-	if (borderPix == 0) //not found in border down...try border up (avoid left and right borders...so unlikely)
+	if (borderPix ==
+		0) // not found in border down...try border up (avoid left and right borders...so unlikely)
 	{
 		pix = workRas->pixels(workRas->getLy() - 1);
-		for (i = 0; i < workRas->getLx(); i++, pix++) //border up
+		for (i = 0; i < workRas->getLx(); i++, pix++) // border up
 			if (pix->m == 0) {
 				borderIndex = *pix;
 				borderPix = pix;
@@ -408,7 +412,7 @@ void fill(const TRaster32P &ras, const TRaster32P &ref, const FillParameters &pa
 	std::stack<FillSeed> seeds;
 	std::map<int, std::vector<std::pair<int, int>>> segments;
 
-	//fillRow(r, params.m_p, xa, xb, color ,saver);
+	// fillRow(r, params.m_p, xa, xb, color ,saver);
 	findSegment(workRas, params.m_p, xa, xb, color);
 	segments[y].push_back(std::pair<int, int>(xa, xb));
 	seeds.push(FillSeed(xa, xb, y, 1));
@@ -439,7 +443,7 @@ void fill(const TRaster32P &ras, const TRaster32P &ref, const FillParameters &pa
 				test = isPixelInSegment(segments[y], x);
 			if (*pix != color && !test && matte >= oldMatte && matte != 255) {
 				findSegment(workRas, TPoint(x, y), xc, xd, color);
-				//segments[y].push_back(std::pair<int,int>(xc, xd));
+				// segments[y].push_back(std::pair<int,int>(xc, xd));
 				insertSegment(segments[y], std::pair<int, int>(xc, xd));
 				if (xc < xa)
 					seeds.push(FillSeed(xc, xa - 1, y, -dy));
@@ -523,8 +527,8 @@ void inkFill(const TRasterCM32P &r, const TPoint &pin, int ink, int searchRay,
 	int oldInk;
 	TPoint p = pin;
 
-	if ((pixels + p.y * r->getWrap() + p.x)->isPurePaint() && (searchRay == 0 ||
-															   (p = nearestInk(r, p, searchRay)) == TPoint(-1, -1))) {
+	if ((pixels + p.y * r->getWrap() + p.x)->isPurePaint() &&
+		(searchRay == 0 || (p = nearestInk(r, p, searchRay)) == TPoint(-1, -1))) {
 		r->unlock();
 		return;
 	}

@@ -28,9 +28,7 @@ Thumbnail::Thumbnail(const TDimension &size)
 {
 	m_raster = TRaster32P(m_size);
 	m_raster->fill(TPixel32(100, 100, 100));
-	m_raster->extractT(
-				m_raster->getBounds().enlarge(-20))
-		->fill(TPixel32(80, 90, 100));
+	m_raster->extractT(m_raster->getBounds().enlarge(-20))->fill(TPixel32(80, 90, 100));
 }
 
 //-------------------------------------------------------------------
@@ -88,7 +86,7 @@ class PliThumbnail : public FileThumbnail
 	TLevelReaderP m_lr;
 	TPaletteP m_palette;
 
-public:
+  public:
 	PliThumbnail(const TDimension &size, const TFilePath &fp);
 
 	void loadIcon();
@@ -97,7 +95,7 @@ public:
 
 	Type getType() const { return LEVEL; };
 
-private:
+  private:
 	// not implemented
 	PliThumbnail(const PliThumbnail &);
 	PliThumbnail &operator=(const PliThumbnail &);
@@ -130,8 +128,7 @@ void PliThumbnail::loadIcon()
 
 namespace
 {
-void doRender(const TVectorImageP &vi, const TVectorRenderData &rd,
-			  const TRaster32P &ras)
+void doRender(const TVectorImageP &vi, const TVectorRenderData &rd, const TRaster32P &ras)
 {
 	TOfflineGL *glContext = TOfflineGL::getStock(ras->getSize());
 	glContext->getRaster()->copy(ras);
@@ -147,19 +144,16 @@ void PliThumbnail::loadFrame(int index)
 		m_lr = TLevelReaderP(m_filepath);
 		m_lr->loadInfo();
 	}
-	TVectorImageP vi =
-		m_lr->getFrameReader(m_frames[index]->m_fid)->load();
+	TVectorImageP vi = m_lr->getFrameReader(m_frames[index]->m_fid)->load();
 	TRaster32P &raster = m_frames[index]->m_raster;
 	raster = TRaster32P(m_size);
 	if (vi) {
 		raster->fill(TPixel32::White);
 		TDimension cameraSize(640, 480);
-		const TVectorRenderData rd(
-			getAffine(cameraSize),
-			TRect(), //raster->getBounds(),
-			m_palette.getPointer(),
-			0);
-		//vi->render(rd,raster);
+		const TVectorRenderData rd(getAffine(cameraSize),
+								   TRect(), // raster->getBounds(),
+								   m_palette.getPointer(), 0);
+		// vi->render(rd,raster);
 		doRender(vi, rd, raster);
 	} else {
 		raster->fill(TPixel32(255, 0, 0));
@@ -190,7 +184,7 @@ class RasterThumbnail : public FileThumbnail
 
 	TLevelReaderP m_lr;
 
-public:
+  public:
 	RasterThumbnail(const TDimension &size, const TFilePath &fp);
 
 	void loadIcon();
@@ -199,7 +193,7 @@ public:
 
 	Type getType() const { return LEVEL; };
 
-private:
+  private:
 	// not implemented
 	RasterThumbnail(const RasterThumbnail &);
 	RasterThumbnail &operator=(const RasterThumbnail &);
@@ -251,8 +245,7 @@ void RasterThumbnail::loadFrame(int index)
 		m_lr = TLevelReaderP(m_filepath);
 		m_lr->loadInfo();
 	}
-	TRasterImageP ri =
-		m_lr->getFrameReader(m_frames[index]->m_fid)->load();
+	TRasterImageP ri = m_lr->getFrameReader(m_frames[index]->m_fid)->load();
 	TRaster32P &raster = m_frames[index]->m_raster;
 	raster = TRaster32P(m_size);
 	TRaster32P inputRaster;
@@ -291,7 +284,7 @@ void RasterThumbnail::setPlaying(bool on)
 
 class SoundtrackThumbnail : public FileThumbnail
 {
-public:
+  public:
 	SoundtrackThumbnail(const TDimension &size, const TFilePath &fp);
 
 	void loadIcon();
@@ -300,7 +293,7 @@ public:
 
 	Type getType() const { return LEVEL; };
 
-private:
+  private:
 	// not implemented
 	SoundtrackThumbnail(const SoundtrackThumbnail &);
 	SoundtrackThumbnail &operator=(const SoundtrackThumbnail &);
@@ -335,9 +328,9 @@ void SoundtrackThumbnail::setPlaying(bool on)
 	m_playing = on;
 	/*
   if(!m_playing)
-    {   
-     m_lr = TLevelReaderP();
-    }
+	{
+	 m_lr = TLevelReaderP();
+	}
 */
 }
 
@@ -349,7 +342,7 @@ void SoundtrackThumbnail::setPlaying(bool on)
 
 class CasmThumbnail : public FileThumbnail
 {
-public:
+  public:
 	CasmThumbnail(const TDimension &size, const TFilePath &fp);
 
 	void loadIcon();
@@ -358,7 +351,7 @@ public:
 
 	Type getType() const { return LEVEL; };
 
-private:
+  private:
 	// not implemented
 	CasmThumbnail(const CasmThumbnail &);
 	CasmThumbnail &operator=(const CasmThumbnail &);
@@ -366,8 +359,7 @@ private:
 
 //============================================================
 
-CasmThumbnail::CasmThumbnail(const TDimension &size, const TFilePath &fp)
-	: FileThumbnail(size, fp)
+CasmThumbnail::CasmThumbnail(const TDimension &size, const TFilePath &fp) : FileThumbnail(size, fp)
 {
 }
 
@@ -403,9 +395,9 @@ void CasmThumbnail::setPlaying(bool on)
 	m_playing = on;
 	/*
   if(!m_playing)
-    {   
-     m_lr = TLevelReaderP();
-    }
+	{
+	 m_lr = TLevelReaderP();
+	}
 */
 }
 
@@ -417,7 +409,7 @@ void CasmThumbnail::setPlaying(bool on)
 
 class SetupThumbnail : public FileThumbnail
 {
-public:
+  public:
 	SetupThumbnail(const TDimension &size, const TFilePath &fp);
 
 	void loadIcon();
@@ -426,7 +418,7 @@ public:
 
 	Type getType() const { return LEVEL; };
 
-private:
+  private:
 	// not implemented
 	SetupThumbnail(const SetupThumbnail &);
 	SetupThumbnail &operator=(const SetupThumbnail &);
@@ -471,9 +463,9 @@ void SetupThumbnail::setPlaying(bool on)
 	m_playing = on;
 	/*
   if(!m_playing)
-    {   
-     m_lr = TLevelReaderP();
-    }
+	{
+	 m_lr = TLevelReaderP();
+	}
 */
 }
 
@@ -485,7 +477,7 @@ void SetupThumbnail::setPlaying(bool on)
 
 class TxtThumbnail : public FileThumbnail
 {
-public:
+  public:
 	TxtThumbnail(const TDimension &size, const TFilePath &fp);
 
 	void loadIcon();
@@ -494,7 +486,7 @@ public:
 
 	Type getType() const { return LEVEL; };
 
-private:
+  private:
 	// not implemented
 	TxtThumbnail(const TxtThumbnail &);
 	TxtThumbnail &operator=(const TxtThumbnail &);
@@ -502,8 +494,7 @@ private:
 
 //============================================================
 
-TxtThumbnail::TxtThumbnail(const TDimension &size, const TFilePath &fp)
-	: FileThumbnail(size, fp)
+TxtThumbnail::TxtThumbnail(const TDimension &size, const TFilePath &fp) : FileThumbnail(size, fp)
 {
 }
 
@@ -529,9 +520,9 @@ void TxtThumbnail::setPlaying(bool on)
 	m_playing = on;
 	/*
   if(!m_playing)
-    {   
-     m_lr = TLevelReaderP();
-    }
+	{
+	 m_lr = TLevelReaderP();
+	}
 */
 }
 
@@ -543,7 +534,7 @@ void TxtThumbnail::setPlaying(bool on)
 
 class ScriptThumbnail : public FileThumbnail
 {
-public:
+  public:
 	ScriptThumbnail(const TDimension &size, const TFilePath &fp);
 
 	void loadIcon();
@@ -552,7 +543,7 @@ public:
 
 	Type getType() const { return LEVEL; };
 
-private:
+  private:
 	// not implemented
 	ScriptThumbnail(const ScriptThumbnail &);
 	ScriptThumbnail &operator=(const ScriptThumbnail &);
@@ -597,9 +588,9 @@ void ScriptThumbnail::setPlaying(bool on)
 	m_playing = on;
 	/*
   if(!m_playing)
-    {   
-     m_lr = TLevelReaderP();
-    }
+	{
+	 m_lr = TLevelReaderP();
+	}
 */
 }
 
@@ -611,7 +602,7 @@ void ScriptThumbnail::setPlaying(bool on)
 
 class ZSceneThumbnail : public FileThumbnail
 {
-public:
+  public:
 	ZSceneThumbnail(const TDimension &size, const TFilePath &fp);
 
 	void loadIcon();
@@ -622,7 +613,7 @@ public:
 
 	Type getType() const { return SCENE; };
 
-private:
+  private:
 	// not implemented
 	ZSceneThumbnail(const ZSceneThumbnail &);
 	ZSceneThumbnail &operator=(const ZSceneThumbnail &);
@@ -677,14 +668,14 @@ void ZSceneThumbnail::setPlaying(bool on)
 	m_playing = on;
 	/*
   if(on)
-    {
-     if(m_frames.empty()) loadXsheet();
-    }
+	{
+	 if(m_frames.empty()) loadXsheet();
+	}
   else
-    {
-     m_xsh = TXsheetP();
-     m_palette = TPaletteP();    
-    }
+	{
+	 m_xsh = TXsheetP();
+	 m_palette = TPaletteP();
+	}
   */
 }
 
@@ -754,7 +745,7 @@ FileThumbnail *FileThumbnail::create(const TDimension &size, const TFilePath &pa
 		return new ScriptThumbnail(size, path);
 	/*
   else if (type == ZComp::getApplication()->getSceneFileExt())
-    return new ZSceneThumbnail(size,path);
+	return new ZSceneThumbnail(size,path);
 */
 	else if (std::find(soundTypes.begin(), soundTypes.end(), type) != soundTypes.end())
 		return new SoundtrackThumbnail(size, path);

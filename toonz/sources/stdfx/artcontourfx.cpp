@@ -25,9 +25,11 @@ class ArtContourFx : public TStandardRasterFx
 	TRangeParamP m_orientation;
 	TRangeParamP m_size;
 
-public:
+  public:
 	ArtContourFx()
-		: m_colorIndex(L"1,2,3"), m_keepColor(false), m_keepLine(false), m_includeAlpha(true), m_density(0.0), m_distance(DoublePair(30.0, 30.0)), m_randomness(true), m_orientation(DoublePair(0.0, 180.0)), m_size(DoublePair(30.0, 30.0))
+		: m_colorIndex(L"1,2,3"), m_keepColor(false), m_keepLine(false), m_includeAlpha(true),
+		  m_density(0.0), m_distance(DoublePair(30.0, 30.0)), m_randomness(true),
+		  m_orientation(DoublePair(0.0, 180.0)), m_size(DoublePair(30.0, 30.0))
 	{
 		bindParam(this, "Color_Index", m_colorIndex);
 		bindParam(this, "Keep_color", m_keepColor);
@@ -51,9 +53,7 @@ public:
 		m_size->getMax()->setValueRange(0.0, 1000.0);
 	}
 
-	~ArtContourFx()
-	{
-	}
+	~ArtContourFx() {}
 
 	//----------------------------------------------------------------------------
 
@@ -65,8 +65,8 @@ public:
 		argv[0] = strsave(toString(m_colorIndex->getValue()).c_str());
 		getValues(argv, argc, frame);
 
-		SandorFxRenderData *artContourData = new SandorFxRenderData(ArtAtContour, argc, argv,
-																	0, shrink, controlBox);
+		SandorFxRenderData *artContourData =
+			new SandorFxRenderData(ArtAtContour, argc, argv, 0, shrink, controlBox);
 		ArtAtContourParams &params = artContourData->m_contourParams;
 		params.m_density = m_density->getValue(frame) / 100;
 		params.m_colorIndex = m_colorIndex->getValue();
@@ -100,7 +100,7 @@ public:
 			TRenderSettings ri3(ri);
 
 			int shrink = tround((ri.m_shrinkX + ri.m_shrinkY) / 2.0);
-			//Should be there no need for the alias...
+			// Should be there no need for the alias...
 			SandorFxRenderData *artContourData = buildRenderData(frame, shrink, controlBox, "");
 			ri3.m_data.push_back(artContourData);
 
@@ -115,10 +115,7 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	bool canHandle(const TRenderSettings &info, double frame)
-	{
-		return true;
-	}
+	bool canHandle(const TRenderSettings &info, double frame) { return true; }
 
 	//-----------------------------------------------------------------------------
 
@@ -134,7 +131,7 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-private:
+  private:
 	void getValues(const char *argv[], int argc, double frame)
 	{
 		double values[12];
@@ -231,15 +228,15 @@ void ArtContourFx::doCompute(TTile &tile, double frame, const TRenderSettings &r
 
 	TRenderSettings ri3(ri);
 
-	//Build the render data
+	// Build the render data
 	int shrink = tround((ri.m_shrinkX + ri.m_shrinkY) / 2.0);
 	std::string controlAlias = m_controller->getAlias(frame, ri2);
 	SandorFxRenderData *artContourData = buildRenderData(frame, shrink, controlBox, controlAlias);
 
-	//Add the controller raster
+	// Add the controller raster
 	artContourData->m_controller = ctrTile.getRaster();
 
-	//Push the data among the others
+	// Push the data among the others
 	ri3.m_data.push_back(artContourData);
 	ri3.m_userCachable = false;
 

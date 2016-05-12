@@ -8,7 +8,7 @@
  ** exportpanel.h
  **
  ** comprende:
- ** - ClipListViewer che controlla l'elenco delle scene di cui fare il 
+ ** - ClipListViewer che controlla l'elenco delle scene di cui fare il
  **   rendering
  ** - OutputIconViewer che visualizza l'icona del file generato
  **
@@ -47,7 +47,7 @@ class ClipListViewer : public DvItemViewer, public DvItemListModel
 
 	bool m_loadSceneFromExportPanel;
 
-public:
+  public:
 	ClipListViewer(QWidget *parent = 0);
 
 	RenderController *getController() const;
@@ -67,13 +67,13 @@ public:
 
 	void draw(QPainter &);
 
-protected:
+  protected:
 	void dragEnterEvent(QDragEnterEvent *event);
 	void dragMoveEvent(QDragMoveEvent *event);
 	void dropEvent(QDropEvent *event);
 	void dragLeaveEvent(QDragLeaveEvent *event);
 
-public slots:
+  public slots:
 	void resetList();
 	void loadScene();
 };
@@ -90,7 +90,7 @@ class ExportPanel : public TPanel
 	QComboBox *m_fileFormat;
 	QCheckBox *m_useMarker;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	ExportPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -100,7 +100,7 @@ public:
 	void loadExportSettings();
 	void saveExportSettings();
 
-public slots:
+  public slots:
 	void generateMovie();
 	void onUseMarkerToggled(bool toggled);
 	void onSceneSwitched();
@@ -121,13 +121,13 @@ class RenderController : public QObject, public MovieGenerator::Listener
 	TOutputProperties *m_properties;
 	std::vector<TFilePath> m_clipList;
 
-protected slots:
+  protected slots:
 	void myCancel();
 
-signals:
+  signals:
 	void movieGenerated();
 
-public:
+  public:
 	RenderController();
 	~RenderController();
 
@@ -158,11 +158,13 @@ public:
 
 	void generateMovie(TFilePath outPath, bool emitSignal = true);
 
-	static int computeClipFrameCount(const TFilePath &clipPath, bool useMarkers, int *frameOffset = 0);
-	static int computeTotalFrameCount(const std::vector<TFilePath> &clipList, bool useMarkers = false);
+	static int computeClipFrameCount(const TFilePath &clipPath, bool useMarkers,
+									 int *frameOffset = 0);
+	static int computeTotalFrameCount(const std::vector<TFilePath> &clipList,
+									  bool useMarkers = false);
 	bool addScene(MovieGenerator &g, ToonzScene *scene);
 	bool onFrameCompleted(int frameCount);
 	void getMovieProperties(const TFilePath &scenePath, TDimension &resolution);
 };
 
-#endif //EXPORTPANEL_H
+#endif // EXPORTPANEL_H

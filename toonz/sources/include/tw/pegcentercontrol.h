@@ -21,8 +21,8 @@ class DVAPI TPegCenterControl : public TWidget
 	int m_clickPos;
 	bool m_dragging;
 
-protected:
-public:
+  protected:
+  public:
 	TPegCenterControl(TWidget *parent, string name = "canvas");
 	~TPegCenterControl();
 

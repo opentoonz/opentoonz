@@ -11,11 +11,7 @@ namespace image
 {
 namespace rgba
 {
-enum num { blu = 0,
-		   gre,
-		   red,
-		   alp,
-		   siz };
+enum num { blu = 0, gre, red, alp, siz };
 }
 }
 }
@@ -24,9 +20,7 @@ namespace
 {
 // T is TPixel32 or TPixel64
 // U is unsigned char or unsigned short
-template <class T, class U>
-void ras_to_arr_(
-	const TRasterPT<T> ras, U *arr, const int channels)
+template <class T, class U> void ras_to_arr_(const TRasterPT<T> ras, U *arr, const int channels)
 {
 	using namespace igs::image::rgba;
 
@@ -49,12 +43,11 @@ void ras_to_arr_(
 	}
 }
 template <class U, class T>
-void arr_to_ras_(
-	const U *arr, const int channels, TRasterPT<T> ras, const int margin // default is 0
-	)
+void arr_to_ras_(const U *arr, const int channels, TRasterPT<T> ras,
+				 const int margin // default is 0
+				 )
 {
-	arr += (ras->getLx() + margin + margin) * margin * channels +
-		   margin * channels;
+	arr += (ras->getLx() + margin + margin) * margin * channels + margin * channels;
 
 	using namespace igs::image::rgba;
 
@@ -79,40 +72,35 @@ void arr_to_ras_(
 }
 }
 //--------------------
-void ino::ras_to_arr(
-	const TRasterP in_ras, const int channels, unsigned char *out_arr)
+void ino::ras_to_arr(const TRasterP in_ras, const int channels, unsigned char *out_arr)
 {
 	if ((TRaster32P)in_ras) {
-		ras_to_arr_<TPixel32, unsigned char>(
-			in_ras, out_arr, channels);
+		ras_to_arr_<TPixel32, unsigned char>(in_ras, out_arr, channels);
 	} else if ((TRaster64P)in_ras) {
-		ras_to_arr_<TPixel64, unsigned short>(
-			in_ras, reinterpret_cast<unsigned short *>(out_arr), channels);
+		ras_to_arr_<TPixel64, unsigned short>(in_ras, reinterpret_cast<unsigned short *>(out_arr),
+											  channels);
 	}
 }
-void ino::arr_to_ras(
-	const unsigned char *in_arr, const int channels, TRasterP out_ras, const int margin)
+void ino::arr_to_ras(const unsigned char *in_arr, const int channels, TRasterP out_ras,
+					 const int margin)
 {
 	if ((TRaster32P)out_ras) {
-		arr_to_ras_<unsigned char, TPixel32>(
-			in_arr, channels, out_ras, margin);
+		arr_to_ras_<unsigned char, TPixel32>(in_arr, channels, out_ras, margin);
 	} else if ((TRaster64P)out_ras) {
-		arr_to_ras_<unsigned short, TPixel64>(
-			reinterpret_cast<const unsigned short *>(in_arr), channels, out_ras, margin);
+		arr_to_ras_<unsigned short, TPixel64>(reinterpret_cast<const unsigned short *>(in_arr),
+											  channels, out_ras, margin);
 	}
 }
 //--------------------
-void ino::ras_to_vec(
-	const TRasterP in_ras, const int channels, std::vector<unsigned char> &out_vec)
+void ino::ras_to_vec(const TRasterP in_ras, const int channels, std::vector<unsigned char> &out_vec)
 {
-	out_vec.resize(
-		in_ras->getLy() * in_ras->getLx() * channels *
-		(((TRaster64P)in_ras) ? sizeof(unsigned short) : sizeof(unsigned char)));
+	out_vec.resize(in_ras->getLy() * in_ras->getLx() * channels *
+				   (((TRaster64P)in_ras) ? sizeof(unsigned short) : sizeof(unsigned char)));
 	ino::ras_to_arr(in_ras, channels, &out_vec.at(0));
 }
-void ino::vec_to_ras(
-	std::vector<unsigned char> &in_vec, const int channels, TRasterP out_ras, const int margin // default is 0
-	)
+void ino::vec_to_ras(std::vector<unsigned char> &in_vec, const int channels, TRasterP out_ras,
+					 const int margin // default is 0
+					 )
 {
 	ino::arr_to_ras(&in_vec.at(0), channels, out_ras, margin);
 	in_vec.clear();

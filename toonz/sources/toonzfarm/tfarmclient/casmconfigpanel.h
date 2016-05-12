@@ -22,7 +22,7 @@ class TCheckBox;
 
 class CasmTask
 {
-public:
+  public:
 	CasmTask();
 	CasmTask(const string &s, const string &setupFilePath);
 
@@ -30,19 +30,9 @@ public:
 	void setCommandLine(const string &cmdLine);
 	void setdefaultValue();
 
-	enum moveType {
-		M_NONE = 0,
-		M_BG_FRACMOVE,
-		M_INTMOVE,
-		M_FRACMOVE
-	};
+	enum moveType { M_NONE = 0, M_BG_FRACMOVE, M_INTMOVE, M_FRACMOVE };
 
-	enum resType {
-		RES_TYPE_NONE = 0,
-		RES_TYPE_STANDARD,
-		RES_TYPE_IMPROVED,
-		RES_TYPE_HIGH
-	};
+	enum resType { RES_TYPE_NONE = 0, RES_TYPE_STANDARD, RES_TYPE_IMPROVED, RES_TYPE_HIGH };
 
 	int m_taskChunksize;
 	int m_start;
@@ -80,7 +70,7 @@ public:
 
 class CasmConfigPanel : public TWidget
 {
-public:
+  public:
 	CasmConfigPanel(TWidget *parent);
 
 	void configureNotify(const TDimension &d);
@@ -92,7 +82,7 @@ public:
 	void onNumField(double v, int type);
 	void onColumnField(std::wstring value);
 
-private:
+  private:
 	CasmTask *m_task;
 
 	TLabel *m_setupLabel;

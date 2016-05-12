@@ -13,23 +13,23 @@ namespace
 
 /*---------------------------------------------------------------------------*/
 
-#define SKIP_BLANKS(s)                                                  \
-	{                                                                   \
-		while (*s && (*s == ' ' || *s == '\t') && *s != 10 && *s != 13) \
-			s++;                                                        \
+#define SKIP_BLANKS(s)                                                                             \
+	{                                                                                              \
+		while (*s && (*s == ' ' || *s == '\t') && *s != 10 && *s != 13)                            \
+			s++;                                                                                   \
 	}
 
-#define GET_WORD(s, p)                                                \
-	{                                                                 \
-		while (*s && *s != ' ' && *s != '\t' && *s != 10 && *s != 13) \
-			*(p++) = *(s++);                                          \
-		*p = '\0';                                                    \
+#define GET_WORD(s, p)                                                                             \
+	{                                                                                              \
+		while (*s && *s != ' ' && *s != '\t' && *s != 10 && *s != 13)                              \
+			*(p++) = *(s++);                                                                       \
+		*p = '\0';                                                                                 \
 	}
 
-#define SKIP_WORD(s)                                                  \
-	{                                                                 \
-		while (*s && *s != ' ' && *s != '\t' && *s != 10 && *s != 13) \
-			s++;                                                      \
+#define SKIP_WORD(s)                                                                               \
+	{                                                                                              \
+		while (*s && *s != ' ' && *s != '\t' && *s != 10 && *s != 13)                              \
+			s++;                                                                                   \
 	}
 
 /*------------------------------------------------------------------------*/
@@ -117,8 +117,7 @@ int compute_casm_range(const char *filename, int &start, int &end, bool &interla
 
 //==============================================================================
 
-CasmFileInfo::CasmFileInfo(const TFilePath &fp)
-	: m_fp(fp)
+CasmFileInfo::CasmFileInfo(const TFilePath &fp) : m_fp(fp)
 {
 }
 
@@ -126,7 +125,6 @@ CasmFileInfo::CasmFileInfo(const TFilePath &fp)
 
 void CasmFileInfo::getFrameRange(int &startFrame, int &endFrame, bool &interlaced)
 {
-	int rc = compute_casm_range(
-		toString(m_fp.getWideString()).c_str(),
-		startFrame, endFrame, interlaced);
+	int rc = compute_casm_range(toString(m_fp.getWideString()).c_str(), startFrame, endFrame,
+								interlaced);
 }

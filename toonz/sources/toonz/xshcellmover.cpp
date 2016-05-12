@@ -42,7 +42,8 @@
 //=============================================================================
 
 CellsMover::CellsMover()
-	: m_rowCount(0), m_colCount(0), m_pos(0, 0), m_startPos(0, 0), m_columnsData(0), m_qualifiers(0), m_uffa(0)
+	: m_rowCount(0), m_colCount(0), m_pos(0, 0), m_startPos(0, 0), m_columnsData(0),
+	  m_qualifiers(0), m_uffa(0)
 {
 }
 
@@ -131,8 +132,7 @@ void CellsMover::moveCells(const TPoint &pos) const
 		for (int i = 0; i < m_colCount; i++) {
 			TXshColumn *column = xsh->getColumn(c + i);
 			if (column) {
-				if (column->getCellColumn() == 0 ||
-					column->isLocked())
+				if (column->getCellColumn() == 0 || column->isLocked())
 					continue;
 				xsh->insertCells(r, c + i, m_rowCount);
 			}
@@ -181,8 +181,7 @@ bool CellsMover::canMoveCells(const TPoint &pos)
 		if (count == 0)
 			return false;
 	}
-	if ((m_qualifiers & CellsMover::eInsertCells) ||
-		(m_qualifiers & CellsMover::eOverwriteCells))
+	if ((m_qualifiers & CellsMover::eInsertCells) || (m_qualifiers & CellsMover::eOverwriteCells))
 		return true;
 	int count = 0;
 	for (int i = 0; i < m_colCount; i++) {
@@ -208,8 +207,10 @@ void CellsMover::getColumnsData(int c0, int c1)
 	std::set<int> ii;
 	for (int i = 0; i < colCount; i++)
 		ii.insert(c0 + i);
-	m_columnsData->storeColumns(ii, xsh, StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
-	m_columnsData->storeColumnFxs(ii, xsh, StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
+	m_columnsData->storeColumns(ii, xsh, StageObjectsData::eDoClone |
+											 StageObjectsData::eResetFxDagPositions);
+	m_columnsData->storeColumnFxs(ii, xsh, StageObjectsData::eDoClone |
+											   StageObjectsData::eResetFxDagPositions);
 }
 
 //
@@ -227,7 +228,9 @@ void CellsMover::restoreColumns(int c) const
 	for (int i = 0; i < m_colCount; i++)
 		xsh->removeColumn(c);
 	std::list<int> restoredSplineIds;
-	m_columnsData->restoreObjects(ii, restoredSplineIds, xsh, StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
+	m_columnsData->restoreObjects(ii, restoredSplineIds, xsh,
+								  StageObjectsData::eDoClone |
+									  StageObjectsData::eResetFxDagPositions);
 	for (int i = 0; i < m_colCount; i++) {
 		TXshColumn *column = xsh->getColumn(c + i);
 		if (!column)
@@ -269,7 +272,7 @@ class LevelMoverUndo : public TUndo
 {
 	CellsMover m_cellsMover;
 
-public:
+  public:
 	LevelMoverUndo() {}
 
 	std::vector<int> m_columnsChanges;
@@ -312,7 +315,8 @@ public:
 		if ((m_cellsMover.getQualifiers() & CellsMover::eCopyCells) == 0 &&
 			(m_cellsMover.getQualifiers() & CellsMover::eOverwriteCells) == 0)
 			m_cellsMover.undoMoveCells(m_cellsMover.getStartPos());
-		if (m_cellsMover.getQualifiers() & CellsMover::eOverwriteCells) { //rimuove le celle vecchie
+		if (m_cellsMover.getQualifiers() & CellsMover::eOverwriteCells) { // rimuove le celle
+																		  // vecchie
 			int c, ra = m_cellsMover.getStartPos().y, rowCount = m_cellsMover.getRowCount();
 			TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 			for (c = ca; c < ca + colCount; c++)
@@ -326,25 +330,17 @@ public:
 			TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Move Level");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::Xsheet;
-	}
+	QString getHistoryString() { return QObject::tr("Move Level"); }
+	int getHistoryType() { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
 
 LevelMoverTool::LevelMoverTool(XsheetViewer *viewer)
-	: XsheetGUI::DragTool(viewer), m_range(0, 0), m_qualifiers(0), m_validPos(false), m_undo(0), m_moved(false), m_columnsMoved(false)
+	: XsheetGUI::DragTool(viewer), m_range(0, 0), m_qualifiers(0), m_validPos(false), m_undo(0),
+	  m_moved(false), m_columnsMoved(false)
 {
 }
 
@@ -400,14 +396,13 @@ bool LevelMoverTool::canMoveColumns(const TPoint &pos)
 			if (srcType == TXshColumn::eZeraryFxType)
 				return false;
 			/*
-      qDebug() << "check: " << srcIndex << ":" << 
-        (srcColumn ? QString::number(srcType) : "empty") <<
-        " => " << dstIndex << ":" << 
-        (dstColumn ? QString::number(dstColumn->getColumnType()) : "empty");
-        */
+	  qDebug() << "check: " << srcIndex << ":" <<
+		(srcColumn ? QString::number(srcType) : "empty") <<
+		" => " << dstIndex << ":" <<
+		(dstColumn ? QString::number(dstColumn->getColumnType()) : "empty");
+		*/
 
-			if (dstColumn && !dstColumn->isEmpty() &&
-				dstColumn->getColumnType() != srcType) {
+			if (dstColumn && !dstColumn->isEmpty() && dstColumn->getColumnType() != srcType) {
 				return false;
 			}
 			if (!dstColumn || dstColumn->isLocked() == false) {
@@ -537,10 +532,12 @@ void LevelMoverTool::onCellChange(int row, int col)
 				if (pos.x == m_startPos.x)
 					m_undo->getCellsMover()->m_uffa &= ~1; // first column(s) has/have been restored
 				else
-					m_undo->getCellsMover()->m_uffa |= 2; // columns data have been copied on the current position
+					m_undo->getCellsMover()->m_uffa |=
+						2; // columns data have been copied on the current position
 				cellsMover->restoreColumns(pos.x);
 			} else {
-				m_undo->getCellsMover()->m_uffa &= ~2; // no columns data have been copied on the current position
+				m_undo->getCellsMover()->m_uffa &=
+					~2; // no columns data have been copied on the current position
 			}
 		}
 
@@ -560,9 +557,8 @@ void LevelMoverTool::onCellChange(int row, int col)
 	if (cellsMover->getColumnTypeFromCell(0) == TXshColumn::eSoundType)
 		TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
 	TRect selection(m_aimedPos, m_range);
-	getViewer()->getCellSelection()->selectCells(
-		selection.y0, selection.x0,
-		selection.y1, selection.x1);
+	getViewer()->getCellSelection()->selectCells(selection.y0, selection.x0, selection.y1,
+												 selection.x1);
 }
 
 void LevelMoverTool::onDrag(const QMouseEvent *e)
@@ -605,9 +601,7 @@ void LevelMoverTool::drawCellsArea(QPainter &p)
 	y1 = getViewer()->rowToY(rect.y1 + 1);
 	int x = x1 - x0;
 	int y = y1 - y0;
-	p.setPen((m_aimedPos == m_lastPos && m_validPos)
-				 ? QColor(190, 220, 255)
-				 : QColor(255, 0, 0));
+	p.setPen((m_aimedPos == m_lastPos && m_validPos) ? QColor(190, 220, 255) : QColor(255, 0, 0));
 	int i;
 	for (i = 0; i < 3; i++)
 		p.drawRect(x0 + i, y0 + i, x - 2 * i, y - 2 * i);

@@ -16,8 +16,8 @@ inline double gauss(double x, double y, double x0, double y0, double s)
 
 //------------------------------------------------------------------------------
 
-double integ_gauss(double xmin, double ymin, double xmax, double ymax,
-				   double x0, double y0, double s)
+double integ_gauss(double xmin, double ymin, double xmax, double ymax, double x0, double y0,
+				   double s)
 {
 	int i, j, n;
 	double x1, y1, x2, y2, xstep, ystep, area;
@@ -33,10 +33,8 @@ double integ_gauss(double xmin, double ymin, double xmax, double ymax,
 			y1 = ymin + ystep * i;
 			x2 = x1 + xstep;
 			y2 = y1 + ystep;
-			sum += area * (gauss(x1, y1, x0, y0, s) +
-						   gauss(x1, y2, x0, y0, s) +
-						   gauss(x2, y2, x0, y0, s) +
-						   gauss(x2, y1, x0, y0, s)) /
+			sum += area * (gauss(x1, y1, x0, y0, s) + gauss(x1, y2, x0, y0, s) +
+						   gauss(x2, y2, x0, y0, s) + gauss(x2, y1, x0, y0, s)) /
 				   4;
 		}
 	return sum;
@@ -73,8 +71,8 @@ void build_filter(double h[], double x0, double y0, double s)
 
 void TRop::fracmove(TRasterP rout, TRasterP rin, double dx, double dy)
 {
-	//Using a bilinear filter is best - consider that only 4 pixels should contribute
-	//to a fractionarily shifted one, with weights proportional to the intersection areas.
+	// Using a bilinear filter is best - consider that only 4 pixels should contribute
+	// to a fractionarily shifted one, with weights proportional to the intersection areas.
 	double w[4] = {1, 0, 0, 0};
 	double sum = 0;
 

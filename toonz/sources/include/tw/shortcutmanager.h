@@ -15,7 +15,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-//forward declarations
+// forward declarations
 class TKeyListener;
 class TFilePath;
 //
@@ -27,7 +27,7 @@ class DVAPI TShortcut
 	wstring m_name;
 	TKeyListener *m_listener;
 
-public:
+  public:
 	TShortcut(string id);
 	virtual ~TShortcut();
 
@@ -44,7 +44,7 @@ public:
 
 	virtual string getType() const = 0;
 
-private:
+  private:
 	// not implemented
 	TShortcut(const TShortcut &);
 	TShortcut &operator=(const TShortcut &);
@@ -61,7 +61,7 @@ class DVAPI TShortcutManager
 
 	TShortcutManager();
 
-public:
+  public:
 	~TShortcutManager();
 	static TShortcutManager *instance();
 

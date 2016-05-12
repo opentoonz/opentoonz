@@ -6,7 +6,8 @@ int set_parameter_pages(void *, int num, toonz_param_page_t *params);
 int set_parameter_pages_with_error(void *, int num, toonz_param_page_t *params, int *, void **);
 }
 
-int set_parameter_pages_with_error(void *host, int num, toonz_param_page_t *params, int *err, void **position)
+int set_parameter_pages_with_error(void *host, int num, toonz_param_page_t *params, int *err,
+								   void **position)
 {
 	if (!host)
 		return TOONZ_ERROR_NULL;

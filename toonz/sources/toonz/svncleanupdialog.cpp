@@ -15,8 +15,7 @@
 // SVNCleanupDialog
 //-----------------------------------------------------------------------------
 
-SVNCleanupDialog::SVNCleanupDialog(QWidget *parent,
-								   const QString &workingDir)
+SVNCleanupDialog::SVNCleanupDialog(QWidget *parent, const QString &workingDir)
 	: Dialog(TApp::instance()->getMainWindow(), true, false, "SvnCleanup")
 {
 	setModal(false);

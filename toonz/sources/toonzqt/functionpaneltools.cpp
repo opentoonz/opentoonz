@@ -64,7 +64,7 @@ void ZoomDragTool::drag(QMouseEvent *e)
 	QPoint delta = e->pos() - m_oldPos;
 	m_oldPos = e->pos();
 	double sx = 1, sy = 1;
-	//reflect horizontal drag for frame zoom
+	// reflect horizontal drag for frame zoom
 	double zoomFactor = exp(-0.0075 * ((m_zoomType == FrameZoom) ? -delta.x() : delta.y()));
 	if (m_zoomType == FrameZoom)
 		sx = zoomFactor;
@@ -117,10 +117,9 @@ void RectSelectTool::draw(QPainter &painter)
 
 //=============================================================================
 
-MovePointDragTool::MovePointDragTool(
-	FunctionPanel *panel,
-	TDoubleParam *curve)
-	: m_panel(panel), m_deltaFrame(0), m_speed0Length(0), m_speed0Index(-1), m_speed1Length(0), m_speed1Index(-1), m_groupEnabled(false), m_selection(0)
+MovePointDragTool::MovePointDragTool(FunctionPanel *panel, TDoubleParam *curve)
+	: m_panel(panel), m_deltaFrame(0), m_speed0Length(0), m_speed0Index(-1), m_speed1Length(0),
+	  m_speed1Index(-1), m_groupEnabled(false), m_selection(0)
 {
 	TUndoManager::manager()->beginBlock();
 
@@ -257,9 +256,7 @@ void MovePointDragTool::drag(QMouseEvent *e)
 	m_oldPos = pos;
 
 	// compute frame increment. it must be an integer
-	double totalDFrame = tround(
-		m_panel->xToFrame(pos.x()) -
-		m_panel->xToFrame(m_startPos.x()));
+	double totalDFrame = tround(m_panel->xToFrame(pos.x()) - m_panel->xToFrame(m_startPos.x()));
 	double dFrame = totalDFrame - m_deltaFrame;
 	m_deltaFrame = totalDFrame;
 
@@ -268,9 +265,7 @@ void MovePointDragTool::drag(QMouseEvent *e)
 		TDoubleParam *curve = setter->getCurve();
 
 		// compute value increment
-		double dValue =
-			m_panel->yToValue(curve, pos.y()) -
-			m_panel->yToValue(curve, oldPos.y());
+		double dValue = m_panel->yToValue(curve, pos.y()) - m_panel->yToValue(curve, oldPos.y());
 
 		setter->moveKeyframes(dFrame, dValue);
 	}
@@ -294,12 +289,10 @@ void MovePointDragTool::release(QMouseEvent *e)
 
 //=============================================================================
 
-MoveHandleDragTool::MoveHandleDragTool(
-	FunctionPanel *panel,
-	TDoubleParam *curve,
-	int kIndex,
-	Handle handle)
-	: m_panel(panel), m_curve(curve), m_kIndex(kIndex), m_handle(handle), m_deltaFrame(0), m_setter(curve, kIndex), m_segmentWidth(0), m_channelGroup(0)
+MoveHandleDragTool::MoveHandleDragTool(FunctionPanel *panel, TDoubleParam *curve, int kIndex,
+									   Handle handle)
+	: m_panel(panel), m_curve(curve), m_kIndex(kIndex), m_handle(handle), m_deltaFrame(0),
+	  m_setter(curve, kIndex), m_segmentWidth(0), m_channelGroup(0)
 {
 }
 
@@ -330,17 +323,21 @@ void MoveHandleDragTool::click(QMouseEvent *e)
 		double previousFrame = m_curve->keyframeIndexToFrame(m_kIndex - 1);
 		m_segmentWidth = m_keyframe.m_frame - previousFrame;
 	}
-	if (m_handle == FunctionPanel::EaseOutPercentage && m_kIndex + 1 < m_curve->getKeyframeCount()) {
+	if (m_handle == FunctionPanel::EaseOutPercentage &&
+		m_kIndex + 1 < m_curve->getKeyframeCount()) {
 		double nextFrame = m_curve->keyframeIndexToFrame(m_kIndex + 1);
 		m_segmentWidth = nextFrame - m_keyframe.m_frame;
 	}
 	TPointD speed;
 
 	if (m_keyframe.m_linkedHandles) {
-		if (m_handle == FunctionPanel::SpeedIn && m_kIndex + 1 < m_curve->getKeyframeCount() && (m_keyframe.m_type != TDoubleKeyframe::SpeedInOut && (m_keyframe.m_type != TDoubleKeyframe::Expression ||
-																																					  m_keyframe.m_expressionText.find("cycle") == std::string::npos)))
+		if (m_handle == FunctionPanel::SpeedIn && m_kIndex + 1 < m_curve->getKeyframeCount() &&
+			(m_keyframe.m_type != TDoubleKeyframe::SpeedInOut &&
+			 (m_keyframe.m_type != TDoubleKeyframe::Expression ||
+			  m_keyframe.m_expressionText.find("cycle") == std::string::npos)))
 			speed = m_curve->getSpeedIn(m_kIndex);
-		else if (m_handle == FunctionPanel::SpeedOut && m_keyframe.m_prevType != TDoubleKeyframe::SpeedInOut && m_kIndex > 0)
+		else if (m_handle == FunctionPanel::SpeedOut &&
+				 m_keyframe.m_prevType != TDoubleKeyframe::SpeedInOut && m_kIndex > 0)
 			speed = m_curve->getSpeedOut(m_kIndex);
 	}
 	if (norm2(speed) > 0.001) {
@@ -356,7 +353,7 @@ void MoveHandleDragTool::click(QMouseEvent *e)
 
 void MoveHandleDragTool::drag(QMouseEvent *e)
 {
-	//need ctrl modifier
+	// need ctrl modifier
 	if (0 == (e->modifiers() & Qt::ControlModifier))
 		return;
 
@@ -373,8 +370,8 @@ void MoveHandleDragTool::drag(QMouseEvent *e)
 			pos.setX(m_startPos.x());
 	}
 
-	//QPoint oldPos = m_oldPos;
-	//m_oldPos = pos;
+	// QPoint oldPos = m_oldPos;
+	// m_oldPos = pos;
 
 	QPointF p0 = m_panel->getWinPos(m_curve, m_keyframe);
 	QPointF posF(pos);
@@ -382,10 +379,12 @@ void MoveHandleDragTool::drag(QMouseEvent *e)
 	if (m_nSpeed != QPointF(0, 0)) {
 		QPointF delta = posF - p0;
 		posF -= m_nSpeed * (delta.x() * m_nSpeed.x() + delta.y() * m_nSpeed.y());
-		if ((m_handle == FunctionPanel::SpeedIn && posF.x() > p0.x()) || (m_handle == FunctionPanel::SpeedOut && posF.x() < p0.x()))
+		if ((m_handle == FunctionPanel::SpeedIn && posF.x() > p0.x()) ||
+			(m_handle == FunctionPanel::SpeedOut && posF.x() < p0.x()))
 			posF = p0;
 	} else {
-		if ((m_handle == FunctionPanel::SpeedIn && posF.x() > p0.x()) || (m_handle == FunctionPanel::SpeedOut && posF.x() < p0.x()))
+		if ((m_handle == FunctionPanel::SpeedIn && posF.x() > p0.x()) ||
+			(m_handle == FunctionPanel::SpeedOut && posF.x() < p0.x()))
 			posF.setX(p0.x());
 	}
 
@@ -435,10 +434,8 @@ void MoveHandleDragTool::release(QMouseEvent *e)
 
 //-----------------------------------------------------------------------------
 
-MoveGroupHandleDragTool::MoveGroupHandleDragTool(
-	FunctionPanel *panel,
-	double keyframePosition,
-	Handle handle)
+MoveGroupHandleDragTool::MoveGroupHandleDragTool(FunctionPanel *panel, double keyframePosition,
+												 Handle handle)
 	: m_panel(panel), m_keyframePosition(keyframePosition), m_handle(handle)
 {
 	TUndoManager::manager()->beginBlock();
@@ -487,17 +484,17 @@ void MoveGroupHandleDragTool::drag(QMouseEvent *e)
 	/*
   if(m_nSpeed != QPointF(0,0))
   {
-    QPointF delta = posF-p0;
-    posF -= m_nSpeed*(delta.x()*m_nSpeed.x()+delta.y()*m_nSpeed.y());
-    if(  m_handle == FunctionPanel::SpeedIn && posF.x()>p0.x() 
-      || m_handle == FunctionPanel::SpeedOut && posF.x()<p0.x())
-      posF = p0;   
+	QPointF delta = posF-p0;
+	posF -= m_nSpeed*(delta.x()*m_nSpeed.x()+delta.y()*m_nSpeed.y());
+	if(  m_handle == FunctionPanel::SpeedIn && posF.x()>p0.x()
+	  || m_handle == FunctionPanel::SpeedOut && posF.x()<p0.x())
+	  posF = p0;
   }
   else
   {
-    if(  m_handle == FunctionPanel::SpeedIn && posF.x()>p0.x() 
-      || m_handle == FunctionPanel::SpeedOut && posF.x()<p0.x())
-      posF.setX(p0.x());   
+	if(  m_handle == FunctionPanel::SpeedIn && posF.x()>p0.x()
+	  || m_handle == FunctionPanel::SpeedOut && posF.x()<p0.x())
+	  posF.setX(p0.x());
   }
 */
 
@@ -544,27 +541,27 @@ void MoveGroupHandleDragTool::drag(QMouseEvent *e)
 
 
   case FunctionPanel::SpeedIn:
-    if(m_keyframe.m_type != TDoubleKeyframe::SpeedInOut)
-    {
+	if(m_keyframe.m_type != TDoubleKeyframe::SpeedInOut)
+	{
 
-    }
-    m_setter.setSpeedIn(handlePos); 
-    break;
+	}
+	m_setter.setSpeedIn(handlePos);
+	break;
   case FunctionPanel::SpeedOut:m_setter.setSpeedOut(handlePos); break;
   case FunctionPanel::EaseIn:m_setter.setEaseIn(handlePos.x); break;
   case FunctionPanel::EaseOut:m_setter.setEaseOut(handlePos.x); break;
   case FunctionPanel::EaseInPercentage:
-    if(m_segmentWidth>0) 
-      m_setter.setEaseIn(100.0*handlePos.x/m_segmentWidth); 
-    break;
+	if(m_segmentWidth>0)
+	  m_setter.setEaseIn(100.0*handlePos.x/m_segmentWidth);
+	break;
   case FunctionPanel::EaseOutPercentage:
-    if(m_segmentWidth>0) 
-      m_setter.setEaseOut(100.0*handlePos.x/m_segmentWidth); 
-    break;
+	if(m_segmentWidth>0)
+	  m_setter.setEaseOut(100.0*handlePos.x/m_segmentWidth);
+	break;
   case 100:
   case 101:
   case 102:
-    break;
+	break;
   default:assert(0);
   }
   */

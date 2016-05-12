@@ -34,8 +34,7 @@ struct PolygonVertex {
 	double m_pos[3];
 	int m_idx;
 
-	PolygonVertex(const TPoint &p)
-		: m_idx(-1) { m_pos[0] = p.x, m_pos[1] = p.y, m_pos[2] = 0.0; }
+	PolygonVertex(const TPoint &p) : m_idx(-1) { m_pos[0] = p.x, m_pos[1] = p.y, m_pos[2] = 0.0; }
 };
 
 } // namespace
@@ -47,8 +46,7 @@ struct PolygonVertex {
 namespace tcg
 {
 
-template <>
-struct traits<TTextureMeshP> {
+template <> struct traits<TTextureMeshP> {
 	typedef TTextureMeshP *pointer_type;
 	typedef TTextureMeshP *&reference_type;
 	typedef TTextureMesh pointed_type;
@@ -56,8 +54,7 @@ struct traits<TTextureMeshP> {
 
 //--------------------------------------------------------------------------
 
-template <>
-struct point_traits<PolygonVertex> {
+template <> struct point_traits<PolygonVertex> {
 	typedef PolygonVertex point_type;
 	typedef double value_type;
 	typedef double float_type;
@@ -134,26 +131,24 @@ TRasterGR8P thresholdRaster(const TRasterP &ras, const MeshBuilderOptions &opts)
 		switch (ras->getPixelSize()) {
 		case 1: {
 			TRasterGR8P rasGR8(ras);
-			thresholdRasterGr(rasGR8, binaryRas, TPixelGR8::from(toPixel32(opts.m_transparentColor)));
+			thresholdRasterGr(rasGR8, binaryRas,
+							  TPixelGR8::from(toPixel32(opts.m_transparentColor)));
 			break;
 		}
 
-		case 2:
-		{
+		case 2: {
 			TRasterGR16P rasGR16(ras);
 			thresholdRasterGr(rasGR16, binaryRas, TPixelGR16::from(opts.m_transparentColor));
 			break;
 		}
 
-		case 4:
-		{
+		case 4: {
 			TRaster32P ras32(ras);
 			thresholdRaster(ras32, binaryRas, toPixel32(opts.m_transparentColor));
 			break;
 		}
 
-		case 8:
-		{
+		case 8: {
 			TRaster64P ras64(ras);
 			thresholdRaster(ras64, binaryRas, opts.m_transparentColor);
 			break;
@@ -161,7 +156,7 @@ TRasterGR8P thresholdRaster(const TRasterP &ras, const MeshBuilderOptions &opts)
 
 		default:
 			assert(false);
-	}
+		}
 
 	// Build an enlarged ras to preserve borders. 5 pixels should be fine.
 	TRasterGR8P result(ras->getLx(), ras->getLy());
@@ -180,11 +175,12 @@ using namespace TRop::borders;
 
 //--------------------------------------------------------------------------
 
-template <typename T>
-inline void delete_(T t) { delete t; }
+template <typename T> inline void delete_(T t)
+{
+	delete t;
+}
 
-template <typename T>
-struct Vector : public std::vector<T> {
+template <typename T> struct Vector : public std::vector<T> {
 
 	Vector() : std::vector<T>() {}
 	~Vector() { std::for_each(this->begin(), this->end(), delete_<T>); }
@@ -202,10 +198,10 @@ typedef Vector<Family *> Tribe;
 struct PolygonReader {
 	Polygon *m_polygon;
 
-public:
+  public:
 	typedef tcg::cyclic_iterator<RasterBorder::iterator> cyclic_iter;
 
-public:
+  public:
 	PolygonReader() : m_polygon(0) {}
 
 	void openContainer(const cyclic_iter &ct)
@@ -223,13 +219,14 @@ public:
 
 class BordersReader : public ImageMeshesReaderT<TPixelGR8>
 {
-public:
+  public:
 	Vector<RasterBorder *> m_borders;
 	RasterBorder *m_current;
 
-public:
-	BordersReader()
-		: ImageMeshesReaderT<TPixelGR8>(PixelSelector<TPixelGR8>(false)), m_current(0) {}
+  public:
+	BordersReader() : ImageMeshesReaderT<TPixelGR8>(PixelSelector<TPixelGR8>(false)), m_current(0)
+	{
+	}
 
 	void openFace(ImageMesh *mesh, int faceIdx, const TPixelGR8 &color)
 	{
@@ -251,10 +248,7 @@ public:
 
 	//--------------------------------------------------------------------------
 
-	void addVertex(const raster_edge_iterator &it)
-	{
-		m_current->push_back(it.pos());
-	}
+	void addVertex(const raster_edge_iterator &it) { m_current->push_back(it.pos()); }
 
 	//--------------------------------------------------------------------------
 
@@ -279,11 +273,10 @@ Polygon *reduceBorder(RasterBorder *border)
 
 	iter b(border->begin()), e(border->end());
 
-	cyclic_iter cBegin(b, b, e - 1, 0),
-		cEnd(b + 1, b, e - 1, 1);
+	cyclic_iter cBegin(b, b, e - 1, 0), cEnd(b + 1, b, e - 1, 1);
 
-	RasterEdgeEvaluator<cyclic_iter> eval(
-		cBegin - 1, cEnd + 1, 2.0, (std::numeric_limits<double>::max)());
+	RasterEdgeEvaluator<cyclic_iter> eval(cBegin - 1, cEnd + 1, 2.0,
+										  (std::numeric_limits<double>::max)());
 
 	PolygonReader reader;
 	tcg::sequence_ops::minimalPath(cBegin, cEnd, eval, reader);
@@ -293,10 +286,12 @@ Polygon *reduceBorder(RasterBorder *border)
 
 //--------------------------------------------------------------------------
 
-void reduceBorders(Tribe *tribe, const ImageMeshesReader &reader, const Vector<RasterBorder *> &borders,
-				   int meshIdx, const ImageMesh::face_type &fc)
+void reduceBorders(Tribe *tribe, const ImageMeshesReader &reader,
+				   const Vector<RasterBorder *> &borders, int meshIdx,
+				   const ImageMesh::face_type &fc)
 {
-	// Traverse the image structure. Each time a black face is encountered, add its associated family to the
+	// Traverse the image structure. Each time a black face is encountered, add its associated
+	// family to the
 	// resulting tribe.
 
 	const tcg::list<ImageMeshP> &meshes = reader.meshes();
@@ -407,7 +402,8 @@ void refineMeshes(const TMeshImageP &mi, const MeshBuilderOptions &options)
 	for (m = 0; m < mCount; ++m) {
 		const TTextureMeshP &mesh = meshes[m];
 
-		tcg::TriMeshStuff::DefaultEvaluator<TTextureMesh> eval(0.0, (std::numeric_limits<double>::max)());
+		tcg::TriMeshStuff::DefaultEvaluator<TTextureMesh> eval(
+			0.0, (std::numeric_limits<double>::max)());
 
 		// First, perform edge swaps alone. This is useful since results from gluTriangulate
 		// tend to be unbalanced to vertical - this is a good correction.
@@ -416,7 +412,7 @@ void refineMeshes(const TMeshImageP &mi, const MeshBuilderOptions &options)
 		// Now, launch a full-scale, finishing simplification
 		eval.m_collapseValue = targetLength * 0.6;
 		eval.m_splitValue = targetLength * 1.4;
-		tcg::refineMesh(*mesh, eval, 20000); //Max 10000 iterations - to avoid loops
+		tcg::refineMesh(*mesh, eval, 20000); // Max 10000 iterations - to avoid loops
 
 		// Since we stopped at a max number of iterations, separate collapses from splits
 		// and simplify until the procedure stops.

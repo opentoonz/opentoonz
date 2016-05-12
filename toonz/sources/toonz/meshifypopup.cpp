@@ -92,8 +92,7 @@ struct MeshifyOptions //!  Available options for the meshification process.
 namespace
 {
 
-TRaster32P render(const TVectorImageP &vi, double &rasDpi, int margin,
-				  TPointD &worldOriginPos)
+TRaster32P render(const TVectorImageP &vi, double &rasDpi, int margin, TPointD &worldOriginPos)
 {
 	// Extract vi's bbox
 	TRectD bboxD(vi->getBBox());
@@ -117,8 +116,7 @@ TRaster32P render(const TVectorImageP &vi, double &rasDpi, int margin,
 	//  2. A margin enlargement is enforced by the MeshBuilder.
 	bboxD = bboxD.enlarge(margin + 1);
 
-	TRect bbox(tfloor(bboxD.x0), tfloor(bboxD.y0),
-			   tceil(bboxD.x1) - 1, tceil(bboxD.y1) - 1);
+	TRect bbox(tfloor(bboxD.x0), tfloor(bboxD.y0), tceil(bboxD.x1) - 1, tceil(bboxD.y1) - 1);
 
 	worldOriginPos = -convert(bbox.getP00());
 	rasDpi = scale * Stage::inch;
@@ -137,8 +135,7 @@ TRaster32P render(const TVectorImageP &vi, double &rasDpi, int margin,
 
 //-----------------------------------------------------------------------
 
-TRaster32P render(const TXsheet *xsh, int row, double &rasDpi, int margin,
-				  TPointD &worldOriginPos)
+TRaster32P render(const TXsheet *xsh, int row, double &rasDpi, int margin, TPointD &worldOriginPos)
 {
 	// Extract xsh's bbox
 	TRectD bbox(xsh->getBBox(row));
@@ -146,7 +143,8 @@ TRaster32P render(const TXsheet *xsh, int row, double &rasDpi, int margin,
 		return TRaster32P();
 
 	// Since xsh represents a sub-xsheet, its camera affine must be applied
-	const TAffine &cameraAff = xsh->getPlacement(xsh->getStageObjectTree()->getCurrentCameraId(), row);
+	const TAffine &cameraAff =
+		xsh->getPlacement(xsh->getStageObjectTree()->getCurrentCameraId(), row);
 	bbox = cameraAff.inv() * bbox;
 
 	// Build the scale factor from scene's to specified dpi
@@ -166,8 +164,7 @@ TRaster32P render(const TXsheet *xsh, int row, double &rasDpi, int margin,
 	//  2. A margin enlargement is enforced by the MeshBuilder.
 	bbox = bbox.enlarge(margin + 1);
 
-	bbox = TRectD(tfloor(bbox.x0), tfloor(bbox.y0),
-				  tceil(bbox.x1), tceil(bbox.y1));
+	bbox = TRectD(tfloor(bbox.x0), tfloor(bbox.y0), tceil(bbox.x1), tceil(bbox.y1));
 
 	worldOriginPos = -bbox.getP00();
 	rasDpi = scale * Stage::inch;
@@ -196,9 +193,8 @@ inline void xshPos(int &r, int &c)
 inline const TXshCell &xshCell()
 {
 	TApp *app = TApp::instance();
-	return app->getCurrentXsheet()->getXsheet()->getCell(
-		app->getCurrentFrame()->getFrame(),
-		app->getCurrentColumn()->getColumnIndex());
+	return app->getCurrentXsheet()->getXsheet()->getCell(app->getCurrentFrame()->getFrame(),
+														 app->getCurrentColumn()->getColumnIndex());
 }
 
 //-----------------------------------------------------------------------
@@ -252,7 +248,8 @@ TXshSimpleLevel *createMeshLevel(TXshLevel *texturesLevel)
 
 		codedOrigPath = texturesLevel->getPath();
 		if (dynamic_cast<TXshChildLevel *>(texturesLevel)) // Sub-xsheets do not have a suitable
-			codedOrigPath = TFilePath("+drawings/a");	  // parent directory. Store them in "+drawings".
+			codedOrigPath =
+				TFilePath("+drawings/a"); // parent directory. Store them in "+drawings".
 
 		codedOrigPath = codedDstPath =
 			codedOrigPath.withName(pathName).withType("mesh").withFrame(TFrameId::EMPTY_FRAME);
@@ -266,35 +263,37 @@ TXshSimpleLevel *createMeshLevel(TXshLevel *texturesLevel)
 				   scene->getLevelSet()->hasLevel(*scene, codedDstPath)) {
 				pathName = nameBuilder->getNext();
 
-				codedDstPath = origPath.withName(pathName).withType("mesh").withFrame(TFrameId::EMPTY_FRAME);
+				codedDstPath =
+					origPath.withName(pathName).withType("mesh").withFrame(TFrameId::EMPTY_FRAME);
 				dstPath = scene->decodeFilePath(codedDstPath);
 			}
 
 			delete nameBuilder;
 		}
 
-		origSl = dynamic_cast<TXshSimpleLevel *>(
-			scene->getLevelSet()->getLevel(*scene, codedOrigPath));
+		origSl =
+			dynamic_cast<TXshSimpleLevel *>(scene->getLevelSet()->getLevel(*scene, codedOrigPath));
 	}
 
 	// In case the preferred mesh path is already occupied, ask the user what to do
 	if (codedOrigPath != codedDstPath) {
 		// Prompt for an answer
-		enum { CANCEL = 0,
-			   DELETE_OLD,
-			   OVERWRITE_OLD,
-			   KEEP_OLD };
+		enum { CANCEL = 0, DELETE_OLD, OVERWRITE_OLD, KEEP_OLD };
 
 		int answer = -1;
 		{
-			QString question(MeshifyPopup::tr("A level with the preferred path \"%1\" already exists.\nWhat do you want to do?").arg(QString::fromStdWString(codedOrigPath.getWideString())));
+			QString question(MeshifyPopup::tr("A level with the preferred path \"%1\" already "
+											  "exists.\nWhat do you want to do?")
+								 .arg(QString::fromStdWString(codedOrigPath.getWideString())));
 
 			QStringList optionsList;
 			optionsList << MeshifyPopup::tr("Delete the old level entirely")
 						<< MeshifyPopup::tr("Keep the old level and overwrite processed frames")
-						<< MeshifyPopup::tr("Choose a different path (%1)").arg(QString::fromStdWString(codedDstPath.getWideString()));
+						<< MeshifyPopup::tr("Choose a different path (%1)")
+							   .arg(QString::fromStdWString(codedDstPath.getWideString()));
 
-			answer = DVGui::RadioButtonMsgBox(DVGui::QUESTION, question, optionsList, TApp::instance()->getMainWindow());
+			answer = DVGui::RadioButtonMsgBox(DVGui::QUESTION, question, optionsList,
+											  TApp::instance()->getMainWindow());
 		}
 
 		// Apply decision
@@ -377,7 +376,8 @@ TStageObjectId firstChildLevelColumn(const TXsheet &xsh, const TStageObject &obj
 	std::list<TStageObject *>::const_iterator ct, cEnd(children.end());
 	for (ct = children.begin(); ct != cEnd; ++ct) {
 		const TStageObjectId &id = (*ct)->getId();
-		if (!id.isColumn() || xsh.getColumn(id.getIndex())->getColumnType() != TXshColumn::eLevelType)
+		if (!id.isColumn() ||
+			xsh.getColumn(id.getIndex())->getColumnType() != TXshColumn::eLevelType)
 			continue;
 
 		if (!result.isColumn() || id < result)
@@ -433,9 +433,8 @@ TXshLevel *levelToMeshify()
 //-----------------------------------------------------------------------
 
 TMeshImageP meshify(const TXshCell &cell, const MeshifyOptions &options);
-TMeshImageP meshify(const TRasterP &ras, const TPointD &rasDpi,
-					const TPointD &worldOriginPos, const TPointD &meshDpi,
-					const MeshBuilderOptions &options);
+TMeshImageP meshify(const TRasterP &ras, const TPointD &rasDpi, const TPointD &worldOriginPos,
+					const TPointD &meshDpi, const MeshBuilderOptions &options);
 
 bool meshifySelection(const MeshifyOptions &options);
 
@@ -448,8 +447,7 @@ bool meshifySelection(const MeshifyOptions &options);
 namespace
 {
 
-void getRaster(const TImageP &img, TPointD &imgDpi,
-			   TRasterP &ras, TPointD &rasDpi,
+void getRaster(const TImageP &img, TPointD &imgDpi, TRasterP &ras, TPointD &rasDpi,
 			   TPointD &worldOriginPos, int margin)
 {
 	TRasterImageP ri(img);
@@ -482,9 +480,8 @@ void getRaster(const TImageP &img, TPointD &imgDpi,
 
 //-----------------------------------------------------------------------
 
-void getRaster(const TXsheet *xsh, int row,
-			   TRasterP &ras, TPointD &rasDpi,
-			   TPointD &worldOriginPos, int margin)
+void getRaster(const TXsheet *xsh, int row, TRasterP &ras, TPointD &rasDpi, TPointD &worldOriginPos,
+			   int margin)
 {
 	ras = render(xsh, row, rasDpi.x, margin, worldOriginPos);
 	rasDpi.y = rasDpi.x;
@@ -498,7 +495,7 @@ void getRaster(const TXsheet *xsh, int row,
 
 class MeshifyPopup::Swatch : public PlaneViewer
 {
-public:
+  public:
 	TImageP m_img; //!< The eventual image to be meshified
 
 	TXsheetP m_xsh; //!< The eventual sub-xsheet to be meshified...
@@ -506,13 +503,10 @@ public:
 
 	TMeshImageP m_meshImg; //!< The mesh image preview
 
-public:
+  public:
 	Swatch(QWidget *parent = 0) : PlaneViewer(parent), m_row(-1) {}
 
-	void clear()
-	{
-		m_img = TImageP(), m_xsh = TXsheetP(), m_row = -1, m_meshImg = TMeshImageP();
-	}
+	void clear() { m_img = TImageP(), m_xsh = TXsheetP(), m_row = -1, m_meshImg = TMeshImageP(); }
 
 	void paintGL()
 	{
@@ -542,10 +536,12 @@ public:
 			// from world coordinates to the OpenGL viewport, where (0,0) corresponds to the
 			// viewport center.
 
-			const TAffine &cameraAff = m_xsh->getPlacement(m_xsh->getStageObjectTree()->getCurrentCameraId(), m_row);
+			const TAffine &cameraAff =
+				m_xsh->getPlacement(m_xsh->getStageObjectTree()->getCurrentCameraId(), m_row);
 
 			TTranslation centeredWidgetToWidgetAff(0.5 * width(), 0.5 * height());
-			const TAffine &worldToCenteredWigetAff = centeredWidgetToWidgetAff.inv() * viewAff() * cameraAff.inv();
+			const TAffine &worldToCenteredWigetAff =
+				centeredWidgetToWidgetAff.inv() * viewAff() * cameraAff.inv();
 
 			glPushMatrix();
 			tglMultMatrix(centeredWidgetToWidgetAff);
@@ -555,7 +551,8 @@ public:
 			ImagePainter::VisualSettings vs;
 
 			TDimension viewerSize(width(), height());
-			Stage::RasterPainter painter(viewerSize, worldToCenteredWigetAff, TRect(viewerSize), vs, false);
+			Stage::RasterPainter painter(viewerSize, worldToCenteredWigetAff, TRect(viewerSize), vs,
+										 false);
 
 			ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 			Stage::visit(painter, scene, m_xsh.getPointer(), m_row);
@@ -597,7 +594,8 @@ public:
 //********************************************************************************************
 
 MeshifyPopup::MeshifyPopup()
-	: DVGui::Dialog(TApp::instance()->getMainWindow(), true, false, "MeshifyPopup"), m_r(-1), m_c(-1)
+	: DVGui::Dialog(TApp::instance()->getMainWindow(), true, false, "MeshifyPopup"), m_r(-1),
+	  m_c(-1)
 {
 	setWindowTitle(tr("Create Mesh"));
 	setLabelWidth(0);
@@ -609,7 +607,8 @@ MeshifyPopup::MeshifyPopup()
 	beginVLayout();
 
 	QSplitter *splitter = new QSplitter(Qt::Vertical);
-	splitter->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	splitter->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 	addWidget(splitter);
 
 	endVLayout();
@@ -748,7 +747,8 @@ void MeshifyPopup::acquirePreview()
 
 	if (sl = m_cell.getSimpleLevel()) {
 		// Standard image case
-		m_viewer->m_img = sl->getFullsampledFrame(m_cell.getFrameId(), ImageManager::dontPutInCache);
+		m_viewer->m_img =
+			sl->getFullsampledFrame(m_cell.getFrameId(), ImageManager::dontPutInCache);
 
 		enabled = true;
 	} else if (TXshChildLevel *cl = m_cell.getChildLevel()) {
@@ -772,7 +772,8 @@ void MeshifyPopup::acquirePreview()
 void MeshifyPopup::updateMeshPreview()
 {
 	// Meshify
-	MeshifyOptions options = {m_edgesLength->getValue(), m_rasterizationDpi->getValue(), m_margin->getValue()};
+	MeshifyOptions options = {m_edgesLength->getValue(), m_rasterizationDpi->getValue(),
+							  m_margin->getValue()};
 	TMeshImageP meshImg(::meshify(m_cell, options));
 
 	// Update the swatch
@@ -810,7 +811,8 @@ void MeshifyPopup::onParamsChanged(bool dragging)
 
 void MeshifyPopup::apply()
 {
-	MeshifyOptions options = {m_edgesLength->getValue(), m_rasterizationDpi->getValue(), m_margin->getValue()};
+	MeshifyOptions options = {m_edgesLength->getValue(), m_rasterizationDpi->getValue(),
+							  m_margin->getValue()};
 
 	if (meshifySelection(options)) // Meshify invocation
 	{
@@ -860,7 +862,8 @@ TMeshImageP meshify(const TXshCell &cell, const MeshifyOptions &options)
 		// image to be meshed is rendered at imageDpi anyway.
 		shownDpi = (sl->getType() == PLI_XSHLEVEL) ? rasDpi : slDpi;
 
-		opts.m_transparentColor = sl->getProperties()->whiteTransp() ? TPixel64::White : TPixel64::Transparent;
+		opts.m_transparentColor =
+			sl->getProperties()->whiteTransp() ? TPixel64::White : TPixel64::Transparent;
 	} else if (TXshChildLevel *cl = cell.getChildLevel()) {
 		TXsheet *xsh = cl->getXsheet();
 		int row = cell.getFrameId().getNumber() - 1;
@@ -885,16 +888,15 @@ TMeshImageP meshify(const TXshCell &cell, const MeshifyOptions &options)
 
 //------------------------------------------------------------------------------
 
-TMeshImageP meshify(const TRasterP &ras, const TPointD &rasDpi,
-					const TPointD &worldOriginPos, const TPointD &meshDpi,
-					const MeshBuilderOptions &opts)
+TMeshImageP meshify(const TRasterP &ras, const TPointD &rasDpi, const TPointD &worldOriginPos,
+					const TPointD &meshDpi, const MeshBuilderOptions &opts)
 {
 	// Meshify the image
 	TMeshImageP meshImg = buildMesh(ras, opts);
 
 	// Transform it to have the correct image reference (origin at center, dpi scale)
-	transform(meshImg, TScale(meshDpi.x / rasDpi.x, meshDpi.y / rasDpi.y) *
-						   TTranslation(-worldOriginPos));
+	transform(meshImg,
+			  TScale(meshDpi.x / rasDpi.x, meshDpi.y / rasDpi.y) * TTranslation(-worldOriginPos));
 
 	meshImg->setDpi(meshDpi.x, meshDpi.y);
 
@@ -985,8 +987,7 @@ void createMeshifiedLevels(std::map<TXshLevel *, TXshSimpleLevel *> &meshLevels,
 
 //------------------------------------------------------------------------------
 
-void createMeshifiedColumns(int r0, int c0, int r1, int c1,
-							const MeshifyOptions &options)
+void createMeshifiedColumns(int r0, int c0, int r1, int c1, const MeshifyOptions &options)
 {
 	struct locals {
 
@@ -1053,9 +1054,10 @@ void createMeshifiedColumns(int r0, int c0, int r1, int c1,
 
 			if (lt != meshLevels.end()) {
 				if (meshColIdx < 0) {
-					meshColIdx = locals::meshColumnIdx(*xsh, r0, r1, c); // Attempt retrieval of an existing mesh column
-					if (meshColIdx < 0)									 // first - if not found, then make a new one
-						::makeMeshColumn(*xsh, c, meshColIdx = c + 1);   // right after current one.
+					meshColIdx = locals::meshColumnIdx(
+						*xsh, r0, r1, c); // Attempt retrieval of an existing mesh column
+					if (meshColIdx < 0)   // first - if not found, then make a new one
+						::makeMeshColumn(*xsh, c, meshColIdx = c + 1); // right after current one.
 				}
 
 				TXshCell dstCell(lt->second, srcCell.m_frameId);
@@ -1072,8 +1074,7 @@ void createMeshifiedColumns(int r0, int c0, int r1, int c1,
 
 //------------------------------------------------------------------------------
 
-void updateMeshifiedColumns(int r0, int c0, int r1, int c1,
-							const MeshifyOptions &options)
+void updateMeshifiedColumns(int r0, int c0, int r1, int c1, const MeshifyOptions &options)
 {
 	typedef std::map<std::pair<TXshLevel *, TFrameId>, TXshCell> MeshesMap;
 
@@ -1140,19 +1141,19 @@ void updateMeshifiedColumns(int r0, int c0, int r1, int c1,
 	// that the TThread::Executor waits until the control loop returns before starting the
 	// icon threads... well - better safe than sorry :)
 	for (ct = meshToUpdate.begin(); ct != cEnd; ++ct)
-		IconGenerator::instance()->invalidate(ct->first.first, ct->first.second); // Yep, this is still manual...
+		IconGenerator::instance()->invalidate(ct->first.first,
+											  ct->first.second); // Yep, this is still manual...
 }
 
 //------------------------------------------------------------------------------
 
 template <typename Func>
-void meshifySelection(Func func,
-					  TSelection *selection,
-					  const MeshifyOptions &options)
+void meshifySelection(Func func, TSelection *selection, const MeshifyOptions &options)
 {
 	bool emptySelection = selection ? selection->isEmpty() : true;
 
-	if (TCellSelection *cellSelection = emptySelection ? (TCellSelection *)0 : dynamic_cast<TCellSelection *>(selection)) {
+	if (TCellSelection *cellSelection =
+			emptySelection ? (TCellSelection *)0 : dynamic_cast<TCellSelection *>(selection)) {
 		int r0, c0, r1, c1;
 		cellSelection->getSelectedCells(r0, c0, r1, c1);
 
@@ -1160,7 +1161,8 @@ void meshifySelection(Func func,
 		return;
 	}
 
-	if (TColumnSelection *colSelection = emptySelection ? (TColumnSelection *)0 : dynamic_cast<TColumnSelection *>(selection)) {
+	if (TColumnSelection *colSelection =
+			emptySelection ? (TColumnSelection *)0 : dynamic_cast<TColumnSelection *>(selection)) {
 		TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 		const std::set<int> &indices = colSelection->getIndices();
 
@@ -1190,8 +1192,7 @@ void meshifySelection(Func func,
 
 //------------------------------------------------------------------------------
 
-enum ColumnEnum { HAS_LEVEL_COLUMNS = 0x1,
-				  HAS_MESH_COLUMNS = 0x2 };
+enum ColumnEnum { HAS_LEVEL_COLUMNS = 0x1, HAS_MESH_COLUMNS = 0x2 };
 
 //------------------------------------------------------------------------------
 
@@ -1246,8 +1247,10 @@ bool meshifySelection(const MeshifyOptions &options)
 	TSelection *selection = TSelection::getCurrent();
 	bool emptySelection = selection ? selection->isEmpty() : true;
 
-	TCellSelection *cellSelection = emptySelection ? (TCellSelection *)0 : dynamic_cast<TCellSelection *>(selection);
-	TColumnSelection *colSelection = emptySelection ? (TColumnSelection *)0 : dynamic_cast<TColumnSelection *>(selection);
+	TCellSelection *cellSelection =
+		emptySelection ? (TCellSelection *)0 : dynamic_cast<TCellSelection *>(selection);
+	TColumnSelection *colSelection =
+		emptySelection ? (TColumnSelection *)0 : dynamic_cast<TColumnSelection *>(selection);
 
 	int r0, c0, r1, c1;
 	if (cellSelection)
@@ -1261,7 +1264,8 @@ bool meshifySelection(const MeshifyOptions &options)
 	// Decide action. Dismiss mixed selections containing both mesh AND simple levels.
 	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 
-	int cTypes = colSelection ? columnTypes(xsh, colSelection->getIndices()) : columnTypes(xsh, c0, c1);
+	int cTypes =
+		colSelection ? columnTypes(xsh, colSelection->getIndices()) : columnTypes(xsh, c0, c1);
 
 	switch (cTypes) {
 	case HAS_LEVEL_COLUMNS:
@@ -1275,7 +1279,8 @@ bool meshifySelection(const MeshifyOptions &options)
 		break;
 	case HAS_LEVEL_COLUMNS | HAS_MESH_COLUMNS:
 		// Error message
-		DVGui::error(MeshifyPopup::tr("Current selection contains mixed image and mesh level types"));
+		DVGui::error(
+			MeshifyPopup::tr("Current selection contains mixed image and mesh level types"));
 		return false;
 	default:
 		// Error message
@@ -1299,7 +1304,7 @@ bool meshifySelection(const MeshifyOptions &options)
 
 class MeshifyCommand : public MenuItemHandler
 {
-public:
+  public:
 	MeshifyCommand() : MenuItemHandler("A_ToolOption_Meshify") {}
 
 	void execute()

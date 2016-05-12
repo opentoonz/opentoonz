@@ -40,14 +40,14 @@ class AdjustThicknessPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
-public:
+  public:
 	AdjustThicknessPopup();
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-public:
+  public:
 	class Swatch;
 
 	struct FrameData //!  Xsheet frame data used as processing input.
@@ -55,17 +55,14 @@ public:
 		TXshSimpleLevelP m_sl; //!< Referenced level.
 		int m_frameIdx;		   //!< Index of the referenced level frame index.
 
-	public:
+	  public:
 		FrameData();
 		FrameData(const TXshSimpleLevelP &sl, int frameIdx);
 
 		static FrameData getCurrent();
 
 		bool operator==(const FrameData &other) const;
-		bool operator!=(const FrameData &other) const
-		{
-			return !operator==(other);
-		}
+		bool operator!=(const FrameData &other) const { return !operator==(other); }
 
 		TVectorImageP image() const;
 	};
@@ -73,24 +70,22 @@ public:
 	struct SelectionData //!  Selection-related data used as processing input.
 	{
 		enum ContentType //!  Type of content in the selection.
-		{
-			NONE,		//!< Empty / invalid selection.
-			IMAGE,		//!< Selection of entire images, each frame.
-			STYLES,		//!< Selection of strokes with specific styles, each frame.
-			BOUNDARIES, //!< Selection of boundary strokes.
-			STROKES,	//!< Selection of a specific set of strokes, on a
-			//!  <I>single image</I>.
+		{ NONE,			 //!< Empty / invalid selection.
+		  IMAGE,		 //!< Selection of entire images, each frame.
+		  STYLES,		 //!< Selection of strokes with specific styles, each frame.
+		  BOUNDARIES,	//!< Selection of boundary strokes.
+		  STROKES,		 //!< Selection of a specific set of strokes, on a
+						 //!  <I>single image</I>.
 		};
 
-		enum FramesType //!  Selection type for frames in the level.
-		{
-			ALL_FRAMES,		 //!< All frames in the level.
-			SELECTED_FRAMES, //!< Frames selected in SelectionData::m_frameIdxs.
+		enum FramesType	//!  Selection type for frames in the level.
+		{ ALL_FRAMES,	  //!< All frames in the level.
+		  SELECTED_FRAMES, //!< Frames selected in SelectionData::m_frameIdxs.
 		};
 
-	public:
+	  public:
 		/*! \remark  Value STROKES restricts m_framesType to SELECTED_FRAMES, and
-                 m_frameIdxs to a sigle element.                                    */
+				 m_frameIdxs to a sigle element.                                    */
 		ContentType m_contentType; //!< Content type of the selection.
 		FramesType m_framesType;   //!< Frames type of the selection.
 
@@ -102,11 +97,11 @@ public:
 		// Additional selected data
 
 		/*! \details    Type values for which m_idxs has a meaning are:
-                      \li  STROKES yields selected stroke indexes
-                      \li  STYLES  yields selected style indexes                    */
+					  \li  STROKES yields selected stroke indexes
+					  \li  STYLES  yields selected style indexes                    */
 		std::vector<int> m_idxs; //!< Selection of \a sorted indexes whose meaning depends
 								 //!  on m_type.
-	public:
+	  public:
 		SelectionData();
 		SelectionData(const TSelection *s);
 		SelectionData(const FrameData &fd);
@@ -116,10 +111,10 @@ public:
 		operator bool() const;
 	};
 
-private:
+  private:
 	// Widgets
 
-	QComboBox *m_thicknessMode;				 //!< Thickness mode (scale thickness, add thickness, constant).
+	QComboBox *m_thicknessMode; //!< Thickness mode (scale thickness, add thickness, constant).
 	DVGui::MeasuredDoubleField *m_fromScale, //!< Starting thickness scale.
 		*m_fromDisplacement,				 //!< Starting thickness displacement.
 		*m_toScale,							 //!< Ending thickness scale.
@@ -137,17 +132,18 @@ private:
 	FrameData m_previewedFrameData; //!< Currently previewed frame data.
 	bool m_validPreview;			//!< Preview validity flag.
 
-private:
-	void getTransformParameters(double(&fromTransform)[2],
-								double(&toTransform)[2]); //!< Retrieves transform parameters at the end of
-														  //!  the selected frames range.
-	void updateSelectionData();							  //!< Rebuilds m_selectionData.
-	void updateCurrentFrameData();						  //!< Rebuilds m_currentFrameData.
-	void updateSelectionGui();							  //!< Updates the popup's GUI according to current
-														  //!  level selection.
-	void schedulePreviewUpdate();						  //!< Delayed, coalesced updatePreview() invoker.
+  private:
+	void getTransformParameters(
+		double(&fromTransform)[2],
+		double(&toTransform)[2]);  //!< Retrieves transform parameters at the end of
+								   //!  the selected frames range.
+	void updateSelectionData();	//!< Rebuilds m_selectionData.
+	void updateCurrentFrameData(); //!< Rebuilds m_currentFrameData.
+	void updateSelectionGui();	 //!< Updates the popup's GUI according to current
+								   //!  level selection.
+	void schedulePreviewUpdate();  //!< Delayed, coalesced updatePreview() invoker.
 
-private slots:
+  private slots:
 
 	void onXsheetChanged();	//!< Reactions to xsheet changes.
 	void onSelectionChanged(); //!< Reactions to current selection changes.

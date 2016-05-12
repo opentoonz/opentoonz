@@ -29,10 +29,9 @@ inline bool myIsEmpty(const TRectD &r)
 
 class FreeDistortBaseFx : public TStandardRasterFx
 {
-	enum { PERSPECTIVE,
-		   BILINEAR };
+	enum { PERSPECTIVE, BILINEAR };
 
-public:
+  public:
 	FreeDistortBaseFx(bool isCastShadow);
 	~FreeDistortBaseFx();
 
@@ -44,25 +43,17 @@ public:
 	bool canHandle(const TRenderSettings &info, double frame);
 	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info);
 
-	void transform(double frame,
-				   int port,
-				   const TRectD &rectOnOutput,
-				   const TRenderSettings &infoOnOutput,
-				   TRectD &rectOnInput,
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
 				   TRenderSettings &infoOnInput);
 
-	void safeTransform(
-		double frame,
-		int port,
-		const TRectD &rectOnOutput,
-		const TRenderSettings &infoOnOutput,
-		TRectD &rectOnInput,
-		TRenderSettings &infoOnInput,
-		TRectD &inBBox);
+	void safeTransform(double frame, int port, const TRectD &rectOnOutput,
+					   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+					   TRenderSettings &infoOnInput, TRectD &inBBox);
 
 	void getParamUIs(TParamUIConcept *&concepts, int &length);
 
-private:
+  private:
 	bool m_isCastShadow;
 	TRasterFxPort m_input;
 
@@ -90,23 +81,23 @@ class FreeDistortFx : public FreeDistortBaseFx
 {
 	FX_PLUGIN_DECLARATION(FreeDistortFx)
 
-public:
+  public:
 	FreeDistortFx() : FreeDistortBaseFx(false) {}
 };
 
 class CastShadowFx : public FreeDistortBaseFx
 {
 	FX_PLUGIN_DECLARATION(CastShadowFx)
-public:
-	CastShadowFx() : FreeDistortBaseFx(true)
-	{
-	}
+  public:
+	CastShadowFx() : FreeDistortBaseFx(true) {}
 };
 
 //==============================================================================
 
 FreeDistortBaseFx::FreeDistortBaseFx(bool isCastShadow)
-	: m_deactivate(false), m_color(TPixel32::Black), m_fade(0.0), m_upTransp(0.0), m_downTransp(0.0), m_upBlur(0.0), m_downBlur(0.0), m_isCastShadow(isCastShadow), m_distortType(new TIntEnumParam(PERSPECTIVE, "Perspective"))
+	: m_deactivate(false), m_color(TPixel32::Black), m_fade(0.0), m_upTransp(0.0),
+	  m_downTransp(0.0), m_upBlur(0.0), m_downBlur(0.0), m_isCastShadow(isCastShadow),
+	  m_distortType(new TIntEnumParam(PERSPECTIVE, "Perspective"))
 {
 	m_upBlur->setMeasureName("fxLength");
 	m_downBlur->setMeasureName("fxLength");
@@ -210,7 +201,7 @@ FreeDistortBaseFx::~FreeDistortBaseFx()
 
 bool FreeDistortBaseFx::canHandle(const TRenderSettings &info, double frame)
 {
-	//Blurs cant deal with anisotropic affines, so these are retained above
+	// Blurs cant deal with anisotropic affines, so these are retained above
 	return m_upBlur->getValue(frame) == 0 && m_downBlur->getValue(frame) == 0;
 }
 
@@ -219,68 +210,68 @@ bool FreeDistortBaseFx::canHandle(const TRenderSettings &info, double frame)
 bool FreeDistortBaseFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 {
 	if (m_input.isConnected()) {
-		//We'll treat this fx like a zerary one. The idea is, since
-		//the task of taking images and pre-images of rects through
-		//these kind of distortions is definitely non-trivial, we'll
-		//simply avoid doing so...
+		// We'll treat this fx like a zerary one. The idea is, since
+		// the task of taking images and pre-images of rects through
+		// these kind of distortions is definitely non-trivial, we'll
+		// simply avoid doing so...
 		bBox = TConsts::infiniteRectD;
 		return true;
 
 		/*
-    bool ret = m_input->doGetBBox(frame, bBox);
+	bool ret = m_input->doGetBBox(frame, bBox);
 
-    if(m_deactivate->getValue())
-      return ret;
+	if(m_deactivate->getValue())
+	  return ret;
 
-    TPointD p00_a = m_p00_a->getValue(frame);
-    TPointD p00_b = m_p00_b->getValue(frame);
-    TPointD p10_a = m_p10_a->getValue(frame);
-    TPointD p10_b = m_p10_b->getValue(frame);
-    TPointD p01_a = m_p01_a->getValue(frame);
-    TPointD p01_b = m_p01_b->getValue(frame);
-    TPointD p11_a = m_p11_a->getValue(frame);
-    TPointD p11_b = m_p11_b->getValue(frame);
+	TPointD p00_a = m_p00_a->getValue(frame);
+	TPointD p00_b = m_p00_b->getValue(frame);
+	TPointD p10_a = m_p10_a->getValue(frame);
+	TPointD p10_b = m_p10_b->getValue(frame);
+	TPointD p01_a = m_p01_a->getValue(frame);
+	TPointD p01_b = m_p01_b->getValue(frame);
+	TPointD p11_a = m_p11_a->getValue(frame);
+	TPointD p11_b = m_p11_b->getValue(frame);
 
 		if (m_isCastShadow)
-    {
+	{
 			tswap(p00_a, p01_a);
-      tswap(p10_a, p11_a);
+	  tswap(p10_a, p11_a);
 		}*/
 
 		/*TRectD source;
-    source.x0 = tmin(p00_b.x, p10_b.x, p01_b.x, p11_b.x);
-    source.y0 = tmin(p00_b.y, p10_b.y, p01_b.y, p11_b.y);
-    source.x1 = tmax(p00_b.x, p10_b.x, p01_b.x, p11_b.x);
-    source.y1 = tmax(p00_b.y, p10_b.y, p01_b.y, p11_b.y);
-    bBox *= source;
-    
-    int distortType = m_distortType->getValue();
-    if(distortType == PERSPECTIVE)
-    {
-      PerspectiveDistorter distorter(
-          p00_b, p10_b, p01_b, p11_b,
-          p00_a, p10_a, p01_a, p11_a
-      );
-      bBox = distorter.map(bBox);
-    }
-    else if(distortType == BILINEAR)
-    {
-      BilinearDistorter distorter(
-        p00_b, p10_b, p01_b, p11_b,
-        p00_a, p10_a, p01_a, p11_a
-      );
-      bBox = distorter.map(bBox);
-    }
-    else assert(0);*/
+	source.x0 = tmin(p00_b.x, p10_b.x, p01_b.x, p11_b.x);
+	source.y0 = tmin(p00_b.y, p10_b.y, p01_b.y, p11_b.y);
+	source.x1 = tmax(p00_b.x, p10_b.x, p01_b.x, p11_b.x);
+	source.y1 = tmax(p00_b.y, p10_b.y, p01_b.y, p11_b.y);
+	bBox *= source;
 
-		//Further, we will also avoid the assumption that the bbox
-		//is defined by that of destination points...
+	int distortType = m_distortType->getValue();
+	if(distortType == PERSPECTIVE)
+	{
+	  PerspectiveDistorter distorter(
+		  p00_b, p10_b, p01_b, p11_b,
+		  p00_a, p10_a, p01_a, p11_a
+	  );
+	  bBox = distorter.map(bBox);
+	}
+	else if(distortType == BILINEAR)
+	{
+	  BilinearDistorter distorter(
+		p00_b, p10_b, p01_b, p11_b,
+		p00_a, p10_a, p01_a, p11_a
+	  );
+	  bBox = distorter.map(bBox);
+	}
+	else assert(0);*/
+
+		// Further, we will also avoid the assumption that the bbox
+		// is defined by that of destination points...
 		/*TRectD result;
-    result.x0 = tmin(p00_a.x, p10_a.x, p01_a.x, p11_a.x);
-    result.y0 = tmin(p00_a.y, p10_a.y, p01_a.y, p11_a.y);
-    result.x1 = tmax(p00_a.x, p10_a.x, p01_a.x, p11_a.x);
-    result.y1 = tmax(p00_a.y, p10_a.y, p01_a.y, p11_a.y);
-    bBox = result;    //bBox *= result;*/
+	result.x0 = tmin(p00_a.x, p10_a.x, p01_a.x, p11_a.x);
+	result.y0 = tmin(p00_a.y, p10_a.y, p01_a.y, p11_a.y);
+	result.x1 = tmax(p00_a.x, p10_a.x, p01_a.x, p11_a.x);
+	result.y1 = tmax(p00_a.y, p10_a.y, p01_a.y, p11_a.y);
+	bBox = result;    //bBox *= result;*/
 	} else {
 		bBox = TRectD();
 		return false;
@@ -299,13 +290,9 @@ bool FreeDistortBaseFx::doGetBBox(double frame, TRectD &bBox, const TRenderSetti
 
 // ------------------------------------------------------------------------
 
-void FreeDistortBaseFx::transform(
-	double frame,
-	int port,
-	const TRectD &rectOnOutput,
-	const TRenderSettings &infoOnOutput,
-	TRectD &rectOnInput,
-	TRenderSettings &infoOnInput)
+void FreeDistortBaseFx::transform(double frame, int port, const TRectD &rectOnOutput,
+								  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+								  TRenderSettings &infoOnInput)
 {
 	TPointD p00_b = m_p00_b->getValue(frame);
 	TPointD p10_b = m_p10_b->getValue(frame);
@@ -318,12 +305,12 @@ void FreeDistortBaseFx::transform(
 	TPointD p11_a = m_p11_a->getValue(frame);
 
 	if (m_isCastShadow) {
-		//Shadows are mirrored
+		// Shadows are mirrored
 		tswap(p00_a, p01_a);
 		tswap(p10_a, p11_a);
 	}
 
-	//Build the input affine
+	// Build the input affine
 	infoOnInput = infoOnOutput;
 
 	double scale = 0;
@@ -335,16 +322,16 @@ void FreeDistortBaseFx::transform(
 	scale *= sqrt(fabs(infoOnInput.m_affine.det()));
 
 	if (infoOnOutput.m_isSwatch) {
-		//Swatch viewers work out a lite version of the distort: only contractions
-		//are passed below in the schematic - so that input memory load is always at minimum.
-		//This is allowed in order to make fx adjusts the less frustrating as possible.
+		// Swatch viewers work out a lite version of the distort: only contractions
+		// are passed below in the schematic - so that input memory load is always at minimum.
+		// This is allowed in order to make fx adjusts the less frustrating as possible.
 		if (scale > 1)
 			scale = 1;
 	}
 
 	infoOnInput.m_affine = TScale(scale);
 
-	//Build rectOnInput
+	// Build rectOnInput
 	p00_a = infoOnOutput.m_affine * p00_a;
 	p10_a = infoOnOutput.m_affine * p10_a;
 	p01_a = infoOnOutput.m_affine * p01_a;
@@ -356,15 +343,11 @@ void FreeDistortBaseFx::transform(
 	p11_b = infoOnInput.m_affine * p11_b;
 
 	if (m_distortType->getValue() == PERSPECTIVE) {
-		PerspectiveDistorter pd(
-			p00_b, p10_b, p01_b, p11_b,
-			p00_a, p10_a, p01_a, p11_a);
+		PerspectiveDistorter pd(p00_b, p10_b, p01_b, p11_b, p00_a, p10_a, p01_a, p11_a);
 
 		rectOnInput = ((TQuadDistorter *)&pd)->invMap(rectOnOutput);
 	} else {
-		BilinearDistorter bd(
-			p00_b, p10_b, p01_b, p11_b,
-			p00_a, p10_a, p01_a, p11_a);
+		BilinearDistorter bd(p00_b, p10_b, p01_b, p11_b, p00_a, p10_a, p01_a, p11_a);
 
 		rectOnInput = ((TQuadDistorter *)&bd)->invMap(rectOnOutput);
 	}
@@ -381,14 +364,9 @@ void FreeDistortBaseFx::transform(
 
 // ------------------------------------------------------------------------
 
-void FreeDistortBaseFx::safeTransform(
-	double frame,
-	int port,
-	const TRectD &rectOnOutput,
-	const TRenderSettings &infoOnOutput,
-	TRectD &rectOnInput,
-	TRenderSettings &infoOnInput,
-	TRectD &inBBox)
+void FreeDistortBaseFx::safeTransform(double frame, int port, const TRectD &rectOnOutput,
+									  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+									  TRenderSettings &infoOnInput, TRectD &inBBox)
 {
 	assert(port == 0 && m_input.isConnected());
 
@@ -399,7 +377,7 @@ void FreeDistortBaseFx::safeTransform(
 		return;
 	}
 
-	//Avoid the singular matrix cases
+	// Avoid the singular matrix cases
 	if (fabs(infoOnOutput.m_affine.det()) < 1.e-3) {
 		infoOnInput = infoOnOutput;
 		rectOnInput.empty();
@@ -411,7 +389,8 @@ void FreeDistortBaseFx::safeTransform(
 
 	m_input->getBBox(frame, inBBox, infoOnInput);
 
-	//In case inBBox is infinite, such as with gradients, also intersect with the input quadrilateral's bbox
+	// In case inBBox is infinite, such as with gradients, also intersect with the input
+	// quadrilateral's bbox
 	if (inBBox == TConsts::infiniteRectD) {
 		TPointD affP00_b(infoOnInput.m_affine * m_p00_b->getValue(frame));
 		TPointD affP10_b(infoOnInput.m_affine * m_p10_b->getValue(frame));
@@ -500,8 +479,7 @@ void FreeDistortBaseFx::getParamUIs(TParamUIConcept *&concepts, int &length)
 namespace
 {
 
-template <typename PIX>
-void doFade(TRasterPT<PIX> &ras, PIX col, double intensity)
+template <typename PIX> void doFade(TRasterPT<PIX> &ras, PIX col, double intensity)
 {
 	double maxChannelValueD = PIX::maxChannelValue;
 
@@ -614,9 +592,7 @@ inline void filterPixel(PIX *bufin, int wrap, PIX *bufout, double blur, int coor
 /*----------------------------------------------------------------------------*/
 
 template <typename PIX>
-void doBlur(TRasterPT<PIX> &r,
-			double blur0, double blur1,
-			double transp0, double transp1,
+void doBlur(TRasterPT<PIX> &r, double blur0, double blur1, double transp0, double transp1,
 			double y0, double y1)
 {
 	int lx, ly, wrap;
@@ -630,7 +606,7 @@ void doBlur(TRasterPT<PIX> &r,
 	blur_max = (int)tmax(blur0, blur1);
 	brad = tceil(blur_max);
 
-	//assert(y0 <= brad && y1 >= r->getLy()-1 - 2 * brad + y0);
+	// assert(y0 <= brad && y1 >= r->getLy()-1 - 2 * brad + y0);
 
 	double den = y1 - y0;
 
@@ -640,9 +616,9 @@ void doBlur(TRasterPT<PIX> &r,
 	row = new PIX[tmax(lx, ly)];
 	r->lock();
 	bufin = r->pixels(0);
-	for (i = 0, cur_blur = blur0 + (blur1 - blur0) * (i - y0) / den, 0.0, actual_blur = tmax(cur_blur, 0.0);
-		 i < ly;
-		 i++, bufin += wrap, cur_blur += blur_incr, actual_blur = tmax(cur_blur, 0.0)) {
+	for (i = 0, cur_blur = blur0 + (blur1 - blur0) * (i - y0) / den, 0.0,
+		actual_blur = tmax(cur_blur, 0.0);
+		 i < ly; i++, bufin += wrap, cur_blur += blur_incr, actual_blur = tmax(cur_blur, 0.0)) {
 		pixin = bufin;
 		for (j = 0; j < lx; j++, pixin++) {
 			if (cur_blur > 1.0)
@@ -660,9 +636,9 @@ void doBlur(TRasterPT<PIX> &r,
 		pixin = bufin;
 		pixout = bufout;
 
-		for (j = 0, cur_blur = blur0 + (blur1 - blur0) * (j - y0) / den, actual_blur = tmax(cur_blur, 0.0);
-			 j < ly;
-			 j++, pixin += wrap, cur_blur += blur_incr, actual_blur = tmax(cur_blur, 0.0)) {
+		for (j = 0, cur_blur = blur0 + (blur1 - blur0) * (j - y0) / den,
+			actual_blur = tmax(cur_blur, 0.0);
+			 j < ly; j++, pixin += wrap, cur_blur += blur_incr, actual_blur = tmax(cur_blur, 0.0)) {
 			if (cur_blur > 1.0)
 				filterPixel(pixin, wrap, row + j, actual_blur, j, ly);
 			else
@@ -670,9 +646,10 @@ void doBlur(TRasterPT<PIX> &r,
 		}
 
 		if (transp0 > 0 || transp1 > 0)
-			for (j = 0, cur_transp = 1 - transp0 + (transp0 - transp1) * (j - y0) / den, actual_transp = tmax(cur_transp, 0.0);
-				 j < ly;
-				 j++, pixout += wrap, cur_transp += transp_incr, actual_transp = tmax(cur_transp, 0.0)) {
+			for (j = 0, cur_transp = 1 - transp0 + (transp0 - transp1) * (j - y0) / den,
+				actual_transp = tmax(cur_transp, 0.0);
+				 j < ly; j++, pixout += wrap, cur_transp += transp_incr,
+				actual_transp = tmax(cur_transp, 0.0)) {
 				pixout->r = troundp(row[j].r * actual_transp);
 				pixout->g = troundp(row[j].g * actual_transp);
 				pixout->b = troundp(row[j].b * actual_transp);
@@ -722,42 +699,42 @@ void FreeDistortBaseFx::doCompute(TTile &tile, double frame, const TRenderSettin
 	if (!m_input.isConnected())
 		return;
 
-	//Upon deactivation, this fx does nothing.
+	// Upon deactivation, this fx does nothing.
 	if (m_deactivate->getValue()) {
 		m_input->compute(tile, frame, ri);
 		return;
 	}
 
-	//Get the source quad
+	// Get the source quad
 	TPointD p00_b = m_p00_b->getValue(frame);
 	TPointD p10_b = m_p10_b->getValue(frame);
 	TPointD p01_b = m_p01_b->getValue(frame);
 	TPointD p11_b = m_p11_b->getValue(frame);
 
-	//Get destination quad
+	// Get destination quad
 	TPointD p00_a = m_p00_a->getValue(frame);
 	TPointD p10_a = m_p10_a->getValue(frame);
 	TPointD p01_a = m_p01_a->getValue(frame);
 	TPointD p11_a = m_p11_a->getValue(frame);
 
 	if (m_isCastShadow) {
-		//Shadows are mirrored
+		// Shadows are mirrored
 		tswap(p00_a, p01_a);
 		tswap(p10_a, p11_a);
 	}
 
-	//Get requested tile's geometry
+	// Get requested tile's geometry
 	TRasterP tileRas(tile.getRaster());
 	TRectD tileRect(convert(tileRas->getBounds()) + tile.m_pos);
 
-	//Call transform to get the minimal rectOnInput
+	// Call transform to get the minimal rectOnInput
 	TRectD inRect;
 	TRenderSettings riNew;
 	TRectD inBBox;
 
 	safeTransform(frame, 0, tileRect, ri, inRect, riNew, inBBox);
 
-	//Intersect with the bbox
+	// Intersect with the bbox
 	inRect *= inBBox;
 
 	if (myIsEmpty(inRect))
@@ -778,7 +755,7 @@ void FreeDistortBaseFx::doCompute(TTile &tile, double frame, const TRenderSettin
 
 	TPointD inTilePosRi = inTile.m_pos;
 
-	//Update quads by the scale factors
+	// Update quads by the scale factors
 	p00_b = riNew.m_affine * p00_b;
 	p10_b = riNew.m_affine * p10_b;
 	p01_b = riNew.m_affine * p01_b;
@@ -789,13 +766,12 @@ void FreeDistortBaseFx::doCompute(TTile &tile, double frame, const TRenderSettin
 	p01_a = ri.m_affine * p01_a;
 	p11_a = ri.m_affine * p11_a;
 
-	PerspectiveDistorter perpDistorter(
-		p00_b - inTile.m_pos, p10_b - inTile.m_pos, p01_b - inTile.m_pos, p11_b - inTile.m_pos,
-		p00_a, p10_a, p01_a, p11_a);
+	PerspectiveDistorter perpDistorter(p00_b - inTile.m_pos, p10_b - inTile.m_pos,
+									   p01_b - inTile.m_pos, p11_b - inTile.m_pos, p00_a, p10_a,
+									   p01_a, p11_a);
 
-	BilinearDistorter bilDistorter(
-		p00_b - inTile.m_pos, p10_b - inTile.m_pos, p01_b - inTile.m_pos, p11_b - inTile.m_pos,
-		p00_a, p10_a, p01_a, p11_a);
+	BilinearDistorter bilDistorter(p00_b - inTile.m_pos, p10_b - inTile.m_pos, p01_b - inTile.m_pos,
+								   p11_b - inTile.m_pos, p00_a, p10_a, p01_a, p11_a);
 
 	TQuadDistorter *distorter;
 	if (m_distortType->getValue() == PERSPECTIVE)
@@ -813,22 +789,24 @@ void FreeDistortBaseFx::doCompute(TTile &tile, double frame, const TRenderSettin
 			if (m_fade->getValue(frame) > 0)
 				doFade(ras32, m_color->getValue(frame), m_fade->getValue(frame) / 100.0);
 			if (brad > 0)
-				doBlur(ras32, upBlur, downBlur,
-					   m_upTransp->getValue(frame) / 100.0, m_downTransp->getValue(frame) / 100.0,
-					   inBBox.y0 - inTile.m_pos.y, inBBox.y1 - inTile.m_pos.y);
+				doBlur(ras32, upBlur, downBlur, m_upTransp->getValue(frame) / 100.0,
+					   m_downTransp->getValue(frame) / 100.0, inBBox.y0 - inTile.m_pos.y,
+					   inBBox.y1 - inTile.m_pos.y);
 			else if (m_upTransp->getValue(frame) > 0 || m_downTransp->getValue(frame) > 0)
-				doTransparency(ras32, m_upTransp->getValue(frame) / 100.0, m_downTransp->getValue(frame) / 100.0,
-							   inBBox.y0 - inTile.m_pos.y, inBBox.y1 - inTile.m_pos.y);
+				doTransparency(ras32, m_upTransp->getValue(frame) / 100.0,
+							   m_downTransp->getValue(frame) / 100.0, inBBox.y0 - inTile.m_pos.y,
+							   inBBox.y1 - inTile.m_pos.y);
 		} else if (ras64) {
 			if (m_fade->getValue(frame) > 0)
 				doFade(ras64, toPixel64(m_color->getValue(frame)), m_fade->getValue(frame) / 100.0);
 			if (brad > 0)
-				doBlur(ras64, upBlur, downBlur,
-					   m_upTransp->getValue(frame) / 100.0, m_downTransp->getValue(frame) / 100.0,
-					   inBBox.y0 - inTile.m_pos.y, inBBox.y1 - inTile.m_pos.y);
+				doBlur(ras64, upBlur, downBlur, m_upTransp->getValue(frame) / 100.0,
+					   m_downTransp->getValue(frame) / 100.0, inBBox.y0 - inTile.m_pos.y,
+					   inBBox.y1 - inTile.m_pos.y);
 			else if (m_upTransp->getValue(frame) > 0 || m_downTransp->getValue(frame) > 0)
-				doTransparency(ras64, m_upTransp->getValue(frame) / 100.0, m_downTransp->getValue(frame) / 100.0,
-							   inBBox.y0 - inTile.m_pos.y, inBBox.y1 - inTile.m_pos.y);
+				doTransparency(ras64, m_upTransp->getValue(frame) / 100.0,
+							   m_downTransp->getValue(frame) / 100.0, inBBox.y0 - inTile.m_pos.y,
+							   inBBox.y1 - inTile.m_pos.y);
 		} else
 			assert(false);
 	}
@@ -838,7 +816,8 @@ void FreeDistortBaseFx::doCompute(TTile &tile, double frame, const TRenderSettin
 
 //-------------------------------------------------------------------------
 
-int FreeDistortBaseFx::getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
+int FreeDistortBaseFx::getMemoryRequirement(const TRectD &rect, double frame,
+											const TRenderSettings &info)
 {
 	if (!m_input.isConnected())
 		return 0;

@@ -16,16 +16,16 @@
 #include <QString>
 
 /*=====================================================================
-  
-This include file defines classes needed for parsing of the PLI format 
+
+This include file defines classes needed for parsing of the PLI format
 designed for use in the paperless consortium.
-The classes are designed in reference of the file format as described 
+The classes are designed in reference of the file format as described
 in the related paperless document.
 
 ====================================================================*/
 
 /*=====================================================================
-these headers contains definition for the pixel types, 
+these headers contains definition for the pixel types,
 and for the different curves used (segments, quadratics, cubics)
 =====================================================================*/
 
@@ -33,7 +33,7 @@ and for the different curves used (segments, quadratics, cubics)
 #include "tcurves.h"
 
 /*=====================================================================
-utility macro used to export classes from the dll 
+utility macro used to export classes from the dll
 (DVAPI: Digital Video Application Progam Interface)
 =====================================================================*/
 
@@ -41,15 +41,15 @@ utility macro used to export classes from the dll
 Base class for the generic PLI tag
 =====================================================================*/
 /*!
-  This is the base class for the different tags that form the PLI format. 
+  This is the base class for the different tags that form the PLI format.
   For an explanation of each one of them, refer to the documentation
-  The different tags can be extracted fronm the class ParsedPli, 
+  The different tags can be extracted fronm the class ParsedPli,
   using methods getFirstTag and getNextTag.
   The tag type is stored in m_type member.
  */
 class PliTag
 {
-public:
+  public:
 	enum Type {
 		NONE = -1,
 		END_CNTRL = 0,
@@ -87,14 +87,14 @@ public:
 	PliTag();
 	PliTag(const Type type);
 	virtual ~PliTag(){};
-	//PliTag(const PliTag &tag);
+	// PliTag(const PliTag &tag);
 };
 
 //=====================================================================
 
 class TStyleParam
 {
-public:
+  public:
 	enum Type {
 		SP_NONE = 0,
 		SP_BYTE,
@@ -110,42 +110,22 @@ public:
 	TRaster32P m_r;
 	std::string m_string;
 
-	TStyleParam()
-		: m_type(SP_NONE), m_numericVal(0), m_r(), m_string()
-	{
-	}
+	TStyleParam() : m_type(SP_NONE), m_numericVal(0), m_r(), m_string() {}
 
 	TStyleParam(const TStyleParam &styleParam)
-		: m_type(styleParam.m_type), m_numericVal(styleParam.m_numericVal), m_r(styleParam.m_r), m_string(styleParam.m_string)
+		: m_type(styleParam.m_type), m_numericVal(styleParam.m_numericVal), m_r(styleParam.m_r),
+		  m_string(styleParam.m_string)
 	{
 	}
 
-	TStyleParam(double x)
-		: m_type(SP_DOUBLE), m_numericVal(x), m_r(), m_string()
-	{
-	}
-	TStyleParam(int x)
-		: m_type(SP_INT), m_numericVal(x), m_r(), m_string()
-	{
-	}
-	TStyleParam(BYTE x)
-		: m_type(SP_BYTE), m_numericVal(x), m_r(), m_string()
-	{
-	}
-	TStyleParam(USHORT x)
-		: m_type(SP_USHORT), m_numericVal(x), m_r(), m_string()
-	{
-	}
+	TStyleParam(double x) : m_type(SP_DOUBLE), m_numericVal(x), m_r(), m_string() {}
+	TStyleParam(int x) : m_type(SP_INT), m_numericVal(x), m_r(), m_string() {}
+	TStyleParam(BYTE x) : m_type(SP_BYTE), m_numericVal(x), m_r(), m_string() {}
+	TStyleParam(USHORT x) : m_type(SP_USHORT), m_numericVal(x), m_r(), m_string() {}
 
-	TStyleParam(const TRaster32P &x)
-		: m_type(SP_RASTER), m_numericVal(0), m_r(x), m_string()
-	{
-	}
+	TStyleParam(const TRaster32P &x) : m_type(SP_RASTER), m_numericVal(0), m_r(x), m_string() {}
 
-	TStyleParam(const std::string &x)
-		: m_type(SP_STRING), m_numericVal(0), m_r(), m_string(x)
-	{
-	}
+	TStyleParam(const std::string &x) : m_type(SP_STRING), m_numericVal(0), m_r(), m_string(x) {}
 
 	UINT getSize();
 };
@@ -158,7 +138,7 @@ Subclasses useful to a ierarchical structure of the tags
 
 class PliObjectTag : public PliTag
 {
-protected:
+  protected:
 	PliObjectTag();
 	PliObjectTag(const Type type);
 };
@@ -167,19 +147,19 @@ protected:
 
 class PliGeometricTag : public PliObjectTag
 {
-protected:
+  protected:
 	PliGeometricTag();
 	PliGeometricTag(const Type type);
 };
 
 /*=====================================================================
-real tags; their structures resembles the structure in the PLI file and 
+real tags; their structures resembles the structure in the PLI file and
 the description in the PLI specific document
 =====================================================================*/
 
 class TextTag : public PliObjectTag
 {
-public:
+  public:
 	std::string m_text;
 
 	TextTag();
@@ -192,7 +172,7 @@ public:
  */
 class PaletteTag : public PliTag
 {
-public:
+  public:
 	TUINT32 m_numColors;
 	TPixelRGBM32 *m_color;
 
@@ -209,7 +189,7 @@ public:
  */
 class PaletteWithAlphaTag : public PliTag
 {
-public:
+  public:
 	TUINT32 m_numColors;
 	TPixelRGBM32 *m_color;
 
@@ -224,14 +204,14 @@ public:
 
 //=====================================================================
 /*!
-All the geometric tags that contains curve informations are 
+All the geometric tags that contains curve informations are
 instantiations of this template class
  */
 
 class ThickQuadraticChainTag : public PliGeometricTag
 {
 
-public:
+  public:
 	TUINT32 m_numCurves;
 	std::unique_ptr<TThickQuadratic[]> m_curve;
 	bool m_isLoop;
@@ -239,16 +219,13 @@ public:
 	TStroke::OutlineOptions m_outlineOptions;
 
 	ThickQuadraticChainTag()
-		: PliGeometricTag(THICK_QUADRATIC_CHAIN_GOBJ)
-		, m_numCurves(0)
-		, m_maxThickness(1)
+		: PliGeometricTag(THICK_QUADRATIC_CHAIN_GOBJ), m_numCurves(0), m_maxThickness(1)
 	{
 	}
 
 	ThickQuadraticChainTag(TUINT32 numCurves, const TThickQuadratic *curve, double maxThickness)
-		: PliGeometricTag(THICK_QUADRATIC_CHAIN_GOBJ)
-		, m_numCurves(numCurves)
-		, m_maxThickness(maxThickness <= 0 ? 1 : maxThickness)
+		: PliGeometricTag(THICK_QUADRATIC_CHAIN_GOBJ), m_numCurves(numCurves),
+		  m_maxThickness(maxThickness <= 0 ? 1 : maxThickness)
 	{
 		if (m_numCurves > 0) {
 			m_curve.reset(new TThickQuadratic[m_numCurves]);
@@ -259,9 +236,8 @@ public:
 	}
 
 	ThickQuadraticChainTag(const ThickQuadraticChainTag &chainTag)
-		: PliGeometricTag(THICK_QUADRATIC_CHAIN_GOBJ)
-		, m_numCurves(chainTag.m_numCurves)
-		, m_maxThickness(chainTag.m_maxThickness)
+		: PliGeometricTag(THICK_QUADRATIC_CHAIN_GOBJ), m_numCurves(chainTag.m_numCurves),
+		  m_maxThickness(chainTag.m_maxThickness)
 	{
 		if (m_numCurves > 0) {
 			m_curve.reset(new TThickQuadratic[m_numCurves]);
@@ -271,7 +247,7 @@ public:
 		}
 	}
 
-private:
+  private:
 	// not implemented
 	const ThickQuadraticChainTag &operator=(const ThickQuadraticChainTag &chainTag) = delete;
 };
@@ -284,12 +260,8 @@ Not yet implemented
 */
 class BitmapTag : public PliGeometricTag
 {
-public:
-	enum compressionType {
-		NONE = 0,
-		RLE,
-		HOW_MANY_COMPRESSION
-	};
+  public:
+	enum compressionType { NONE = 0, RLE, HOW_MANY_COMPRESSION };
 
 	TRaster32P m_r;
 
@@ -306,14 +278,8 @@ Not yet implemented
 
 class ColorTag : public PliObjectTag
 {
-public:
-	enum styleType {
-		STYLE_NONE = 0,
-		SOLID,
-		LINEAR_GRADIENT,
-		RADIAL_GRADIENT,
-		STYLE_HOW_MANY
-	};
+  public:
+	enum styleType { STYLE_NONE = 0, SOLID, LINEAR_GRADIENT, RADIAL_GRADIENT, STYLE_HOW_MANY };
 	enum attributeType {
 		ATTRIBUTE_NONE = 0,
 		EVENODD_LOOP_FILL,
@@ -331,7 +297,8 @@ public:
 	std::unique_ptr<TUINT32[]> m_color;
 
 	ColorTag();
-	ColorTag(styleType style, attributeType attribute, TUINT32 numColors, std::unique_ptr<TUINT32[]> color);
+	ColorTag(styleType style, attributeType attribute, TUINT32 numColors,
+			 std::unique_ptr<TUINT32[]> color);
 	ColorTag(const ColorTag &colorTag);
 	~ColorTag();
 };
@@ -340,7 +307,7 @@ public:
 
 class StyleTag : public PliObjectTag
 {
-public:
+  public:
 	USHORT m_id;
 	USHORT m_pageIndex;
 	int m_numParams;
@@ -356,7 +323,7 @@ public:
 
 class GeometricTransformationTag : public PliGeometricTag
 {
-public:
+  public:
 	TAffine m_affine;
 	PliGeometricTag *m_object;
 
@@ -370,7 +337,7 @@ public:
 
 class GroupTag : public PliObjectTag
 {
-public:
+  public:
 	enum {
 		NONE = 0,
 		STROKE,
@@ -383,11 +350,11 @@ public:
 
 	UCHAR m_type;
 	TUINT32 m_numObjects;
-	std::unique_ptr<PliObjectTag*[]> m_object;
+	std::unique_ptr<PliObjectTag *[]> m_object;
 
 	GroupTag();
-	GroupTag(UCHAR type, TUINT32 numObjects, PliObjectTag** object);
-	GroupTag(UCHAR type, TUINT32 numObjects, std::unique_ptr<PliObjectTag*[]> object);
+	GroupTag(UCHAR type, TUINT32 numObjects, PliObjectTag **object);
+	GroupTag(UCHAR type, TUINT32 numObjects, std::unique_ptr<PliObjectTag *[]> object);
 	GroupTag(const GroupTag &groupTag);
 	~GroupTag();
 };
@@ -396,15 +363,15 @@ public:
 
 class ImageTag : public PliObjectTag
 {
-public:
+  public:
 	TFrameId m_numFrame;
 
 	TUINT32 m_numObjects;
-	std::unique_ptr<PliObjectTag*[]> m_object;
+	std::unique_ptr<PliObjectTag *[]> m_object;
 
-	//ImageTag();
-	ImageTag(const TFrameId &numFrame, TUINT32 numObjects, PliObjectTag** object);
-	ImageTag(const TFrameId &frameId, TUINT32 numObjects, std::unique_ptr<PliObjectTag*[]> object);
+	// ImageTag();
+	ImageTag(const TFrameId &numFrame, TUINT32 numObjects, PliObjectTag **object);
+	ImageTag(const TFrameId &frameId, TUINT32 numObjects, std::unique_ptr<PliObjectTag *[]> object);
 	ImageTag(const ImageTag &imageTag);
 	~ImageTag();
 };
@@ -413,7 +380,7 @@ public:
 
 class DoublePairTag : public PliObjectTag
 {
-public:
+  public:
 	double m_first, m_second;
 
 	DoublePairTag();
@@ -426,12 +393,13 @@ public:
 
 class IntersectionDataTag : public PliObjectTag
 {
-public:
+  public:
 	UINT m_branchCount;
 	std::unique_ptr<TVectorImage::IntersectionBranch[]> m_branchArray;
 
 	IntersectionDataTag();
-	IntersectionDataTag(UINT branchCount, std::unique_ptr<TVectorImage::IntersectionBranch[]> branchArray);
+	IntersectionDataTag(UINT branchCount,
+						std::unique_ptr<TVectorImage::IntersectionBranch[]> branchArray);
 	IntersectionDataTag(const IntersectionDataTag &tag);
 
 	~IntersectionDataTag();
@@ -441,7 +409,7 @@ public:
 
 class StrokeOutlineOptionsTag : public PliObjectTag
 {
-public:
+  public:
 	TStroke::OutlineOptions m_options;
 
 	StrokeOutlineOptionsTag();
@@ -452,7 +420,7 @@ public:
 
 class PrecisionScaleTag : public PliObjectTag
 {
-public:
+  public:
 	int m_precisionScale;
 
 	PrecisionScaleTag();
@@ -462,7 +430,7 @@ public:
 //=====================================================================
 
 /*!
-The class which will store the parsed info in reading. 
+The class which will store the parsed info in reading.
 (reading is realized by means of the constructor)
 and that must be filled up in writing(using writePli).
 Notice that implementation is opaque at this level (by means class ParsedPliImp).
@@ -475,10 +443,10 @@ class TContentHistory;
 class ParsedPli
 {
 
-protected:
+  protected:
 	ParsedPliImp *imp;
 
-public:
+  public:
 	void setFrameCount(int);
 
 	ParsedPli();
@@ -503,9 +471,9 @@ public:
 	void setMaxThickness(double maxThickness);
 	double getAutocloseTolerance() const;
 	int &precisionScale();
-	//aggiuti questi 2 membri per salvare la paletta globale
+	// aggiuti questi 2 membri per salvare la paletta globale
 
-	//vector<bool> m_idWrittenColorsArray;
+	// vector<bool> m_idWrittenColorsArray;
 	std::vector<PliObjectTag *> m_palette_tags;
 	// these two functions are used to browse the tag list,
 	// code example:   for (PliTag *tag = getFirstTag(); tag; tag = getNextTag()) {}

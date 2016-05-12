@@ -19,10 +19,7 @@ namespace ToonzExt
    *@brief This class mantains interal data for Dragger manipulator.
    */
 
-StrokeStatus::StrokeStatus(TStroke *stroke2change,
-						   unsigned int n,
-						   double w,
-						   double strokeLength)
+StrokeStatus::StrokeStatus(TStroke *stroke2change, unsigned int n, double w, double strokeLength)
 	: stroke2change_(stroke2change), n_(n), w_(w), strokeLength_(strokeLength)
 {
 }
@@ -39,26 +36,22 @@ StrokeStatus::~StrokeStatus()
 
 //---------------------------------------------------------------------------
 
-TStroke *
-StrokeStatus::getItself() const
+TStroke *StrokeStatus::getItself() const
 {
 	return stroke2change_;
 }
 
-double
-StrokeStatus::getW() const
+double StrokeStatus::getW() const
 {
 	return w_;
 }
 
-unsigned int
-StrokeStatus::getId() const
+unsigned int StrokeStatus::getId() const
 {
 	return n_;
 }
 
-double
-StrokeStatus::getLength() const
+double StrokeStatus::getLength() const
 {
 	return strokeLength_;
 }

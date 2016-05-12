@@ -15,7 +15,7 @@ class TColumnSelection : public TSelection
 {
 	std::set<int> m_indices;
 
-public:
+  public:
 	TColumnSelection();
 	~TColumnSelection();
 
@@ -49,4 +49,4 @@ public:
 	void reframe4Cells() { reframeCells(4); }
 };
 
-#endif //TCELLSELECTION_H
+#endif // TCELLSELECTION_H

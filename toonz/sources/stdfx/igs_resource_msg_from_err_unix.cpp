@@ -1,5 +1,5 @@
 #include <cerrno>
-#include <cstring>			/* memset */
+#include <cstring> /* memset */
 #include <vector>
 #include <stdexcept> // std::domain_error(-)
 #include <locale>
@@ -64,8 +64,7 @@ g++ tes82.cxx -L/usr/X11R6/lib/ -lX11
 */
 #endif //------
 /*------ マルチバイト文字列 --> ワイド文字文字列 ------*/
-void igs::resource::mbs_to_wcs(
-	const std::string &mbs, std::wstring &wcs)
+void igs::resource::mbs_to_wcs(const std::string &mbs, std::wstring &wcs)
 {
 	size_t length = 0;
 	{
@@ -74,38 +73,33 @@ void igs::resource::mbs_to_wcs(
 		::memset(&ss, 0, sizeof(ss));
 		length = ::mbsrtowcs(NULL, &src_ptr, 0, &ss);
 		if (length == (size_t)(-1)) { /* 不正なマルチバイト列に遭遇した */
-			throw std::domain_error(
-				"mbstowcs(-) got bad multi byte character,when size");
+			throw std::domain_error("mbstowcs(-) got bad multi byte character,when size");
 		}
 		if (length <= 0) {
 			return;
 		} /* 文字がないなら何もしない */
 		++length;
 	}
-	//std::vector<wchar_t> dst(length);
+	// std::vector<wchar_t> dst(length);
 	wcs.resize(length);
 	{
 		const char *src_ptr = mbs.c_str();
 		mbstate_t ss;
 		::memset(&ss, 0, sizeof(ss));
-		//length = ::mbsrtowcs(&dst.at(0) ,&src_ptr ,length ,&ss);
-		length = ::mbsrtowcs(
-			const_cast<wchar_t *>(wcs.c_str()), &src_ptr, length, &ss);
+		// length = ::mbsrtowcs(&dst.at(0) ,&src_ptr ,length ,&ss);
+		length = ::mbsrtowcs(const_cast<wchar_t *>(wcs.c_str()), &src_ptr, length, &ss);
 		if (length == (size_t)(-1)) { /* 不正なマルチバイト列に遭遇した */
-			throw std::domain_error(
-				"mbstowcs(-) got bad multi byte character,when conv");
+			throw std::domain_error("mbstowcs(-) got bad multi byte character,when conv");
 		}
 		if (length <= 0) {
-			throw std::domain_error(
-				"mbstowcs(-) got zero or under equal -2 ");
+			throw std::domain_error("mbstowcs(-) got zero or under equal -2 ");
 		}
 	}
-	//wcs = std::wstring(dst.begin() ,dst.end()-1);/* 終端以外を */
+	// wcs = std::wstring(dst.begin() ,dst.end()-1);/* 終端以外を */
 	wcs.erase(wcs.end() - 1); /* 終端文字を消す */
 }
 /*------ ワイド文字文字列 --> マルチバイト文字列 ------*/
-void igs::resource::wcs_to_mbs(
-	const std::wstring &wcs, std::string &mbs)
+void igs::resource::wcs_to_mbs(const std::wstring &wcs, std::string &mbs)
 {
 	size_t length = 0;
 	{
@@ -118,26 +112,23 @@ void igs::resource::wcs_to_mbs(
 		} /* 文字がないなら何もしない */
 		++length;
 	}
-	//std::vector<char> dst(length);
+	// std::vector<char> dst(length);
 	mbs.resize(length);
 	{
 		const wchar_t *src_ptr = wcs.c_str();
 		mbstate_t ss;
 		::memset(&ss, 0, sizeof(ss));
-		//length = ::wcsrtombs(&dst.at(0) ,&src_ptr ,length ,&ss);
-		length = ::wcsrtombs(
-			const_cast<char *>(mbs.c_str()), &src_ptr, length, &ss);
+		// length = ::wcsrtombs(&dst.at(0) ,&src_ptr ,length ,&ss);
+		length = ::wcsrtombs(const_cast<char *>(mbs.c_str()), &src_ptr, length, &ss);
 		if (length <= 0) {
-			throw std::domain_error(
-				"wcstombs(-) got bad wide character");
+			throw std::domain_error("wcstombs(-) got bad wide character");
 		}
 	}
-	//mbs = std::string(dst.begin() ,dst.end()-1);/* 終端以外を */
+	// mbs = std::string(dst.begin() ,dst.end()-1);/* 終端以外を */
 	mbs.erase(mbs.end() - 1); /* 終端文字を消す */
 }
 /*------ UNICODE宣言ならマルチバイト文字列をワイド文字文字列に変換 ------*/
-const std::basic_string<TCHAR> igs::resource::ts_from_mbs(
-	const std::string &mbs)
+const std::basic_string<TCHAR> igs::resource::ts_from_mbs(const std::string &mbs)
 {
 #if defined UNICODE
 	std::wstring wcs;
@@ -149,8 +140,7 @@ const std::basic_string<TCHAR> igs::resource::ts_from_mbs(
 #endif
 }
 /*------ UNICODE宣言ならワイド文字文字列をマルチバイト文字列に変換 ------*/
-const std::string igs::resource::mbs_from_ts(
-	const std::basic_string<TCHAR> &ts)
+const std::string igs::resource::mbs_from_ts(const std::basic_string<TCHAR> &ts)
 {
 #if defined UNICODE
 	std::string mbs;
@@ -164,13 +154,11 @@ const std::string igs::resource::mbs_from_ts(
 /*------ cp932を含む文字列をutf-8に変換(マルチバイト文字列) ------*/
 namespace
 {
-const std::string iconv_to_from_(
-	const std::string &text, const char *tocode, const char *fromcode)
+const std::string iconv_to_from_(const std::string &text, const char *tocode, const char *fromcode)
 {
 	iconv_t icd = ::iconv_open(tocode, fromcode); // "iconv --list"
 	if (reinterpret_cast<iconv_t>(-1) == icd) {
-		throw std::domain_error(
-			igs_resource_msg_from_err(TEXT("iconv_open(-)"), errno));
+		throw std::domain_error(igs_resource_msg_from_err(TEXT("iconv_open(-)"), errno));
 	}
 
 	std::vector<char> dst(text.size() * 4);
@@ -178,8 +166,7 @@ const std::string iconv_to_from_(
 	char *outbuf = &dst.at(0);
 	size_t inbytesleft = text.size();
 	size_t outbytesleft = dst.size();
-	size_t ret = ::iconv(
-		icd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
+	size_t ret = ::iconv(icd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
 	*outbuf = '\0';
 
 	/*
@@ -188,16 +175,14 @@ const std::string iconv_to_from_(
 	*/
 	ret = dst.size() - outbytesleft;
 	if (ret <= 0) {
-		//if (static_cast<size_t>(-1) == ret) {
+		// if (static_cast<size_t>(-1) == ret) {
 		::iconv_close(icd);
 
-		throw std::domain_error(
-			igs_resource_msg_from_err(TEXT("iconv(-)"), errno));
+		throw std::domain_error(igs_resource_msg_from_err(TEXT("iconv(-)"), errno));
 	}
 
 	if (-1 == ::iconv_close(icd)) {
-		throw std::domain_error(
-			igs_resource_msg_from_err(TEXT("iconv_close(-)"), errno));
+		throw std::domain_error(igs_resource_msg_from_err(TEXT("iconv_close(-)"), errno));
 	}
 
 	std::string mbs(std::string(dst.begin(), dst.begin() + ret));
@@ -219,7 +204,10 @@ const std::string igs::resource::cp932_from_utf8_mb(const std::string &text)
 #include "igs_resource_msg_from_err.h"
 
 const std::string igs::resource::msg_from_err_(
-	const std::basic_string<TCHAR> &tit, const int erno, const std::string &file, const std::string &line, const std::string &pretty_function, const std::string &comp_type, const std::string &gnuc, const std::string &gnuc_minor, const std::string &gnuc_patchlevel, const std::string &gnuc_rh_release, const std::string &date, const std::string &time)
+	const std::basic_string<TCHAR> &tit, const int erno, const std::string &file,
+	const std::string &line, const std::string &pretty_function, const std::string &comp_type,
+	const std::string &gnuc, const std::string &gnuc_minor, const std::string &gnuc_patchlevel,
+	const std::string &gnuc_rh_release, const std::string &date, const std::string &time)
 {
 	std::string errmsg;
 	errmsg += '\"';
@@ -273,7 +261,7 @@ const std::string igs::resource::msg_from_err_(
 		errmsg += ':';
 
 #if defined __HP_aCC
-		/* 
+		/*
 	HP-UX(v11.23)では、strerror_r()をサポートしない。
 	注意::strerror()はThread SafeではなくMulti Threadでは正常動作しない
 	*/
@@ -291,27 +279,23 @@ const std::string igs::resource::msg_from_err_(
 			swtich(errno)
 			{
 			case EINVAL:
-				errmsg +=
-					"strerror_r() gets Error : The value of errnum is not a "
-					"valid error number.";
+				errmsg += "strerror_r() gets Error : The value of errnum is not a "
+						  "valid error number.";
 				/* errnum の値が有効なエラー番号ではない */
 				break;
 			case ERANGE:
-				errmsg +=
-					"strerror_r() gets Error : Insufficient storage was "
-					"supplied via strerrbuf and buflen  to contain the "
-					"generated message string.";
+				errmsg += "strerror_r() gets Error : Insufficient storage was "
+						  "supplied via strerrbuf and buflen  to contain the "
+						  "generated message string.";
 				/* エラーコードを説明する文字列のために、
 			充分な領域が確保できな かった */
 				break;
 			deatult:
-				errmsg +=
-					"strerror_r() gets Error and Returns bad errno";
+				errmsg += "strerror_r() gets Error and Returns bad errno";
 				break;
 			}
 		} else {
-			errmsg +=
-				"strerror_r() returns bad value";
+			errmsg += "strerror_r() returns bad value";
 		}
 #elif defined(__APPLE__)
 		char buff[4096];

@@ -82,19 +82,19 @@ TFilePath adjustTypeAndFrame(int levelType, TFilePath fp)
 {
   switch(levelType)
   {
-    case TZI_XSHLEVEL:
-      if(fp.getType()=="") fp=fp.withType("tif");
-      return fp.withFrame(TFrameId::EMPTY_FRAME);
-    case PLI_XSHLEVEL:
-      return fp.withFrame(TFrameId::NO_FRAME)
-               .withType("pli");
-    case TZP_XSHLEVEL:
-      return fp.withFrame(TFrameId::NO_FRAME)
-               .withType("tlv");
-    case OVL_XSHLEVEL:
-    default:
-      if(fp.getType()=="") fp=fp.withType("png");
-      return fp;
+	case TZI_XSHLEVEL:
+	  if(fp.getType()=="") fp=fp.withType("tif");
+	  return fp.withFrame(TFrameId::EMPTY_FRAME);
+	case PLI_XSHLEVEL:
+	  return fp.withFrame(TFrameId::NO_FRAME)
+			   .withType("pli");
+	case TZP_XSHLEVEL:
+	  return fp.withFrame(TFrameId::NO_FRAME)
+			   .withType("tlv");
+	case OVL_XSHLEVEL:
+	default:
+	  if(fp.getType()=="") fp=fp.withType("png");
+	  return fp;
   }
 }
 */
@@ -157,8 +157,7 @@ void deleteUntitledScene(const TFilePath &fp)
 {
 	if (TFileStatus(fp).isDirectory()) {
 		TFilePath tempDir = getUntitledScenesDir();
-		if (TFileStatus(tempDir).isDirectory() &&
-			tempDir.isAncestorOf(fp)) // per sicurezza
+		if (TFileStatus(tempDir).isDirectory() && tempDir.isAncestorOf(fp)) // per sicurezza
 		{
 			try {
 				TSystem::rmDirTree(fp);
@@ -180,57 +179,57 @@ void saveBackup(const TFilePath &fp)
   TFilePath bckDir = fp.getParentDir() + "backups" + sceneName;
   if(!TFileStatus(bckDir).doesExist())
   {
-    try {TSystem::mkDir(bckDir);}
-    catch(...) {return;}
+	try {TSystem::mkDir(bckDir);}
+	catch(...) {return;}
   }
 
   std::map<int, TFilePath> oldBackups;
   TFilePathSet lst = TSystem::readDirectory(bckDir);
   for(TFilePathSet::iterator it = lst.begin(); it != lst.end(); ++it)
   {
-    TFilePath fp2 = *it;
-    if(fp2.getType() != "tnz" && fp2.getType() != "tab") continue;
-    wstring name = fp2.getWideName();
-    if(name.find_first_of(L"0123456789") == wstring::npos) continue;
+	TFilePath fp2 = *it;
+	if(fp2.getType() != "tnz" && fp2.getType() != "tab") continue;
+	wstring name = fp2.getWideName();
+	if(name.find_first_of(L"0123456789") == wstring::npos) continue;
 		int i = name.find(sceneName);
 		if(i != wstring::npos)
 			name = name.substr(sceneName.size()+1);
-    if(name == L"" || name.find_first_not_of(L"0123456789") != wstring::npos)
-      continue;
-    int index = toInt(name);
-    assert(0<index);
-    assert(oldBackups.count(index)==0);
-    oldBackups[index] = fp2;
+	if(name == L"" || name.find_first_not_of(L"0123456789") != wstring::npos)
+	  continue;
+	int index = toInt(name);
+	assert(0<index);
+	assert(oldBackups.count(index)==0);
+	oldBackups[index] = fp2;
   }
 
   int m = 3;
   if((int)oldBackups.size()>m)
   {
-    std::map<int, TFilePath>::iterator it = oldBackups.begin();
-    for(int i=0;i+m<(int)oldBackups.size();i++)
-    {
-      assert(it != oldBackups.end());
-      TFilePath toKill = it->second;
-      try {TSystem::deleteFile(toKill); } catch(...) {}
-      ++it;
-    }
+	std::map<int, TFilePath>::iterator it = oldBackups.begin();
+	for(int i=0;i+m<(int)oldBackups.size();i++)
+	{
+	  assert(it != oldBackups.end());
+	  TFilePath toKill = it->second;
+	  try {TSystem::deleteFile(toKill); } catch(...) {}
+	  ++it;
+	}
   }
-  
+
   TFilePath bckFp;
   if(oldBackups.empty())
   {
-    if(fp.getType() == "tnz")
-      bckFp = bckDir + TFilePath(sceneName + L"_1.tnz");
-    else if(fp.getType() == "tab")
-      bckFp = bckDir + TFilePath(sceneName + L"_1.tab");
+	if(fp.getType() == "tnz")
+	  bckFp = bckDir + TFilePath(sceneName + L"_1.tnz");
+	else if(fp.getType() == "tab")
+	  bckFp = bckDir + TFilePath(sceneName + L"_1.tab");
   }
   else
   {
-    int id = oldBackups.rbegin()->first + 1;
-    if(fp.getType() == "tnz")
-      bckFp = bckDir + TFilePath(sceneName + L"_" + toWideString(id) + L".tnz");
-    else if(fp.getType() == "tab")
-      bckFp = bckDir + TFilePath(sceneName + L"_" + toWideString(id) + L".tab");
+	int id = oldBackups.rbegin()->first + 1;
+	if(fp.getType() == "tnz")
+	  bckFp = bckDir + TFilePath(sceneName + L"_" + toWideString(id) + L".tnz");
+	else if(fp.getType() == "tab")
+	  bckFp = bckDir + TFilePath(sceneName + L"_" + toWideString(id) + L".tab");
   }
 
   TSystem::renameFile(bckFp, fp);
@@ -318,8 +317,7 @@ void deleteAllUntitledScenes()
 //=============================================================================
 // ToonzScene
 
-ToonzScene::ToonzScene()
-	: m_contentHistory(0), m_isUntitled(true)
+ToonzScene::ToonzScene() : m_contentHistory(0), m_isUntitled(true)
 {
 	m_childStack = new ChildStack(this);
 	m_properties = new TSceneProperties();
@@ -414,15 +412,15 @@ void ToonzScene::load(const TFilePath &path, bool withProgressDialog)
 
 //-----------------------------------------------------------------------------
 
-//Funzioncina veloce per trovare il numero di frame di una scena senza caricare
-//nulla. (implementato per Toonz 6.0 beta 1)
+// Funzioncina veloce per trovare il numero di frame di una scena senza caricare
+// nulla. (implementato per Toonz 6.0 beta 1)
 int ToonzScene::loadFrameCount(const TFilePath &fp)
 {
 	TIStream is(fp);
 	if (!is)
 		throw TException(fp.getWideString() + L": Can't open file");
 	try {
-		//Leggo il primo tag (<tnz/tab>) ed estraggo il framecount (se c'e')
+		// Leggo il primo tag (<tnz/tab>) ed estraggo il framecount (se c'e')
 		std::string tagName = "";
 		if (!is.matchTag(tagName))
 			throw TException("Bad file format");
@@ -462,16 +460,18 @@ void ToonzScene::loadNoResources(const TFilePath &fp)
 }
 
 //-----------------------------------------------------------------------------
-/*-- プログレスダイアログをGUIからの実行時でのみ表示させる。tcomposerから実行の場合は表示させない --*/
+/*-- プログレスダイアログをGUIからの実行時でのみ表示させる。tcomposerから実行の場合は表示させない
+ * --*/
 void ToonzScene::loadResources(bool withProgressDialog)
 {
 	/*--- m_levelSet->getLevelCount()が10個以上のとき表示させる　---*/
 	QProgressDialog *progressDialog = 0;
 	if (withProgressDialog && m_levelSet->getLevelCount() >= 10) {
-		progressDialog = new QProgressDialog("Loading Scene Resources", "", 0, m_levelSet->getLevelCount());
+		progressDialog =
+			new QProgressDialog("Loading Scene Resources", "", 0, m_levelSet->getLevelCount());
 		progressDialog->setModal(true);
-		progressDialog->setAutoReset(true);						  /*--maximumに到達したら自動でresetを呼ぶ--*/
-		progressDialog->setAutoClose(true);						  /*--resetが呼ばれたら自動で閉じる--*/
+		progressDialog->setAutoReset(true); /*--maximumに到達したら自動でresetを呼ぶ--*/
+		progressDialog->setAutoClose(true); /*--resetが呼ばれたら自動で閉じる--*/
 		progressDialog->setAttribute(Qt::WA_DeleteOnClose, true); /*--閉じたら自動でDeleteされる--*/
 		progressDialog->setCancelButton(0);
 		progressDialog->setValue(0);
@@ -621,16 +621,15 @@ void ToonzScene::setUntitled()
 
 //-----------------------------------------------------------------------------
 
-//When saving as sub-xsheet, the sub becomes top. So, its cameras must be
-//associated to the scene properties.
+// When saving as sub-xsheet, the sub becomes top. So, its cameras must be
+// associated to the scene properties.
 class CameraRedirection
 {
 	ToonzScene *m_scene;
 	TXsheet *m_xsh;
 
-public:
-	CameraRedirection(ToonzScene *scene, TXsheet *xsh)
-		: m_scene(scene), m_xsh(xsh)
+  public:
+	CameraRedirection(ToonzScene *scene, TXsheet *xsh) : m_scene(scene), m_xsh(xsh)
 	{
 		if (!xsh)
 			xsh = m_scene->getTopXsheet();
@@ -641,7 +640,8 @@ public:
 	~CameraRedirection()
 	{
 		if (m_xsh)
-			m_scene->getProperties()->cloneCamerasFrom(m_scene->getTopXsheet()->getStageObjectTree());
+			m_scene->getProperties()->cloneCamerasFrom(
+				m_scene->getTopXsheet()->getStageObjectTree());
 	}
 };
 
@@ -660,16 +660,18 @@ void ToonzScene::save(const TFilePath &fp, TXsheet *subxsh)
 
 	TFileStatus fs(newScenePath);
 	if (fs.doesExist() && !fs.isWritable())
-		throw TSystemException(newScenePath, "The scene cannot be saved: it is a read only scene.\n All resources have been saved.");
+		throw TSystemException(
+			newScenePath,
+			"The scene cannot be saved: it is a read only scene.\n All resources have been saved.");
 
 	TFilePath scenePath = decodeFilePath(fp);
 
-	//if(TFileStatus(scenePath).doesExist()) saveBackup(scenePath);
+	// if(TFileStatus(scenePath).doesExist()) saveBackup(scenePath);
 
 	TSystem::touchFile(scenePath);
 	makeSceneIcon(this);
 
-	//TOStream os(scenePath, compressionEnabled);
+	// TOStream os(scenePath, compressionEnabled);
 	TOStream os(scenePath, false);
 	if (!os.checkStatus())
 		throw TException("Could not open file");
@@ -679,13 +681,16 @@ void ToonzScene::save(const TFilePath &fp, TXsheet *subxsh)
 		xsh = m_childStack->getTopXsheet();
 
 	std::map<std::string, std::string> attr;
-	attr["version"] = (QString::number(l_currentVersion.first) + "." // From now on, version numbers in saved files will have
-					   + QString::number(l_currentVersion.second))   // the signature "MAJOR.MINOR", where:
-						  .toStdString();							 //
-	attr["framecount"] = QString::number(							 //    MAJOR = Toonz version number * 10 (eg 7.0 => 70)
-							 xsh->getFrameCount())
-							 .toStdString(); //    MINOR = Reset to 0 after each major increment, and
-											 //            advancing on its own when fixing bugs.
+	attr["version"] =
+		(QString::number(l_currentVersion.first) +
+		 "." // From now on, version numbers in saved files will have
+		 + QString::number(l_currentVersion.second)) // the signature "MAJOR.MINOR", where:
+			.toStdString();							 //
+	attr["framecount"] =
+		QString::number( //    MAJOR = Toonz version number * 10 (eg 7.0 => 70)
+			xsh->getFrameCount())
+			.toStdString(); //    MINOR = Reset to 0 after each major increment, and
+							//            advancing on its own when fixing bugs.
 	os.openChild("tnz", attr);
 
 	os.child("generator") << TEnv::getApplicationFullName();
@@ -748,7 +753,8 @@ int ToonzScene::getFrameCount() const
 
 //-----------------------------------------------------------------------------
 
-void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh, bool checkFlags) const
+void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
+							 bool checkFlags) const
 {
 	if (xsh == 0)
 		xsh = getXsheet();
@@ -762,7 +768,8 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
 	double sy = (double)ras->getLy() / (double)cameraSize.ly;
 	double sc = (sx < sy) ? sx : sy;
 
-	const TAffine &cameraAff = xsh->getPlacement(xsh->getStageObjectTree()->getCurrentCameraId(), row);
+	const TAffine &cameraAff =
+		xsh->getPlacement(xsh->getStageObjectTree()->getCurrentCameraId(), row);
 	const TAffine &viewAff = TScale(sc / Stage::inch) * cameraAff.inv();
 
 	TRect clipRect(ras->getBounds());
@@ -802,9 +809,11 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
 	// Build reference change affines
 	const TAffine &placedToOglRefAff =
 		TScale(ras->getLx() / placedRect.getLx(), ras->getLy() / placedRect.getLy()) *
-		TTranslation(-0.5 * (placedRect.x0 + placedRect.x1), -0.5 * (placedRect.y0 + placedRect.y1));
+		TTranslation(-0.5 * (placedRect.x0 + placedRect.x1),
+					 -0.5 * (placedRect.y0 + placedRect.y1));
 
-	const TAffine &cameraAff = xsh->getPlacement(xsh->getStageObjectTree()->getCurrentCameraId(), row);
+	const TAffine &cameraAff =
+		xsh->getPlacement(xsh->getStageObjectTree()->getCurrentCameraId(), row);
 
 	const TAffine &worldToOglRefAff = placedToOglRefAff * worldToPlacedAff * cameraAff.inv();
 
@@ -838,7 +847,8 @@ void ToonzScene::renderFrame(const TRaster32P &ras, int row, const TXsheet *xsh,
 
 //-----------------------------------------------------------------------------
 
-TXshLevel *ToonzScene::createNewLevel(int type, std::wstring levelName, const TDimension &dim, double dpi, TFilePath fp)
+TXshLevel *ToonzScene::createNewLevel(int type, std::wstring levelName, const TDimension &dim,
+									  double dpi, TFilePath fp)
 {
 	TLevelSet *levelSet = getLevelSet();
 
@@ -864,7 +874,8 @@ TXshLevel *ToonzScene::createNewLevel(int type, std::wstring levelName, const TD
 					fp = getDefaultLevelPath(type, levelName);
 				TFilePath actualFp = decodeFilePath(fp);
 
-				if (TSystem::doesExistFileOrLevel(actualFp)) // if(TFileStatus(actualFp).doesExist()) continue;
+				if (TSystem::doesExistFileOrLevel(
+						actualFp)) // if(TFileStatus(actualFp).doesExist()) continue;
 				{
 					fp = TFilePath();
 					continue;
@@ -1044,11 +1055,10 @@ TFilePath ToonzScene::getImportedLevelPath(const TFilePath path) const
 		return path;
 
 	const std::wstring &levelName = path.getWideName();
-	const std::string &ext = path.getType(),
-					  &dots = path.getDots();
+	const std::string &ext = path.getType(), &dots = path.getDots();
 
-	TFilePath importedLevelPath =
-		getDefaultLevelPath(ltype.m_ltype, levelName).getParentDir() + (levelName + toWideString(dots + ext));
+	TFilePath importedLevelPath = getDefaultLevelPath(ltype.m_ltype, levelName).getParentDir() +
+								  (levelName + toWideString(dots + ext));
 
 	if (dots == "..")
 		importedLevelPath = importedLevelPath.withFrame(TFrameId::EMPTY_FRAME);
@@ -1077,8 +1087,7 @@ bool ToonzScene::convertLevelIfNeeded(TFilePath &levelPath)
 		if (!inLevel || inLevel->getFrameCount() == 0)
 			return false;
 		TLevelP outLevel;
-		for (TLevel::Iterator it = inLevel->begin();
-			 it != inLevel->end(); ++it) {
+		for (TLevel::Iterator it = inLevel->begin(); it != inLevel->end(); ++it) {
 			TVectorImageP img = lr->getFrameReader(it->first)->load();
 			if (!img)
 				continue;
@@ -1087,10 +1096,12 @@ bool ToonzScene::convertLevelIfNeeded(TFilePath &levelPath)
 	} else if (ltype.m_oldLevelFlag) {
 		TLevelP outLevel;
 		// livello Toonz 4.6
-		levelPath = TFilePath(levelPath.getParentDir().getWideString() + L"\\" + levelPath.getWideName() + L".tlv");
+		levelPath = TFilePath(levelPath.getParentDir().getWideString() + L"\\" +
+							  levelPath.getWideName() + L".tlv");
 		if (TSystem::doesExistFileOrLevel(levelPath))
 			TSystem::removeFileOrLevel(levelPath);
-		TFilePath pltPath = TFilePath(levelPath.getParentDir().getWideString() + L"\\" + levelPath.getWideName() + L".tpl");
+		TFilePath pltPath = TFilePath(levelPath.getParentDir().getWideString() + L"\\" +
+									  levelPath.getWideName() + L".tpl");
 		if (TSystem::doesExistFileOrLevel(pltPath))
 			TSystem::removeFileOrLevel(pltPath);
 
@@ -1113,7 +1124,7 @@ bool ToonzScene::convertLevelIfNeeded(TFilePath &levelPath)
 				lw->getFrameWriter(it->first)->save(img);
 			}
 		} catch (TException &e) {
-			//devo buttare il tlv che stavo salvando!
+			// devo buttare il tlv che stavo salvando!
 			QString msg = QString::fromStdWString(e.getMessage());
 			if (msg == QString("Old 4.1 Palette")) {
 				lw = TLevelWriterP();
@@ -1122,18 +1133,16 @@ bool ToonzScene::convertLevelIfNeeded(TFilePath &levelPath)
 				throw e;
 			}
 		}
-		lw = TLevelWriterP(); //bisogna liberare prima lw di outLevel,
-							  // altrimenti la paletta che lw vuole scrivere e' gia' stata loutLeveliberata.
+		lw = TLevelWriterP(); // bisogna liberare prima lw di outLevel,
+		// altrimenti la paletta che lw vuole scrivere e' gia' stata loutLeveliberata.
 	}
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 
-TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
-								 const LevelOptions *levelOptions,
-								 std::wstring levelName,
-								 const std::vector<TFrameId> &fIds)
+TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath, const LevelOptions *levelOptions,
+								 std::wstring levelName, const std::vector<TFrameId> &fIds)
 {
 	LevelType ltype = getLevelType(actualPath);
 	if (ltype.m_ltype == UNKNOWN_XSHLEVEL)
@@ -1199,8 +1208,9 @@ TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
 			lp->options() = *levelOptions;
 		else {
 			const Preferences &prefs = *Preferences::instance();
-			int formatIdx = prefs.matchLevelFormat(levelPath); // Should I use actualPath here? It's mostly
-															   // irrelevant anyway, it's for old tzp/tzu...
+			int formatIdx =
+				prefs.matchLevelFormat(levelPath); // Should I use actualPath here? It's mostly
+												   // irrelevant anyway, it's for old tzp/tzu...
 			if (formatIdx >= 0)
 				lp->options() = prefs.levelFormat(formatIdx).m_options;
 			else {
@@ -1252,15 +1262,11 @@ TFilePath ToonzScene::decodeFilePath(const TFilePath &path) const
 	std::wstring s;
 	if (head != L"" && head[0] == L'+') {
 		if (TProjectManager::instance()->isTabModeEnabled()) {
-			return m_scenePath.getParentDir() +
-				   (m_scenePath.getWideName() + L"_files") +
-				   tail;
+			return m_scenePath.getParentDir() + (m_scenePath.getWideName() + L"_files") + tail;
 		}
 
 		if (TProjectManager::instance()->isTabKidsModeEnabled()) {
-			return m_scenePath.getParentDir() +
-				   m_scenePath.getWideName() +
-				   tail;
+			return m_scenePath.getParentDir() + m_scenePath.getWideName() + tail;
 		}
 
 		if (projectIsEmpty) {
@@ -1284,8 +1290,7 @@ TFilePath ToonzScene::decodeFilePath(const TFilePath &path) const
 		// dipende dalla scena (o perche' l'espansione contiene
 		// $scenename, $scenepath o perche' si usa il savepath)
 		if (m_isUntitled &&
-			(s.find(L"$scene") != std::wstring::npos ||
-			 project->getUseScenePath(h) ||
+			(s.find(L"$scene") != std::wstring::npos || project->getUseScenePath(h) ||
 			 fp.getParentDir().getName() == getScenePath().getName())) {
 			TFilePath parentDir = getScenePath().getParentDir();
 			fp = parentDir + head.substr(1) + tail;
@@ -1408,8 +1413,7 @@ TFilePath ToonzScene::codeSavePath(TFilePath path) const
 	TFilePath head;
 	if (!checkTail(path, savePath, head))
 		return originalPath;
-	if (head.getParentDir() != TFilePath() ||
-		head == TFilePath() ||
+	if (head.getParentDir() != TFilePath() || head == TFilePath() ||
 		head.getWideString()[0] != L'+')
 		return originalPath;
 	std::string folderName = toString(head.getWideString().substr(1));
@@ -1581,14 +1585,14 @@ std::wstring ToonzScene::getLevelNameWithoutSceneNumber(std::wstring orgName)
 
 	QString orgNameQstr = QString::fromStdWString(orgName);
 
-	//do nothing if the file name has less than 7 letters
+	// do nothing if the file name has less than 7 letters
 	if (orgNameQstr.size() <= 6)
 		return orgName;
 
 	QString sceneName = QString::fromStdWString(getSceneName()).left(5);
 
-	//check if the first 5 letters of the level name is the same as the scene name.
-	//note that we must consider following both cases; "c0001_hogehoge.tif" and "c0001A_####.tif"
+	// check if the first 5 letters of the level name is the same as the scene name.
+	// note that we must consider following both cases; "c0001_hogehoge.tif" and "c0001A_####.tif"
 	if (!orgNameQstr.startsWith(sceneName))
 		return orgName;
 

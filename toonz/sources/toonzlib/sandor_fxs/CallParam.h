@@ -15,15 +15,14 @@
 
 class CCallParam
 {
-public:
+  public:
 	double m_thickness;
 	double m_rH, m_rLR, m_rV, m_rRL;
 	double m_accuracy, m_randomness;
 	CCIL m_ink, m_paint;
 
 	CCallParam();
-	CCallParam(const int argc, const char *argv[],
-			   const int shrink);
+	CCallParam(const int argc, const char *argv[], const int shrink);
 	virtual ~CCallParam();
 	bool isOK();
 };

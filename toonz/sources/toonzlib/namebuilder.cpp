@@ -42,13 +42,10 @@ std::wstring NameCreator::getNext()
 
 //-------------------------------------------------------------------
 
-NameModifier::NameModifier(std::wstring name)
-	: m_nameBase(name), m_index(0)
+NameModifier::NameModifier(std::wstring name) : m_nameBase(name), m_index(0)
 {
 	int j = name.find_last_not_of(L"0123456789");
-	if (j != (int)std::wstring::npos &&
-		j + 1 < (int)name.length() &&
-		name[j] == '_') {
+	if (j != (int)std::wstring::npos && j + 1 < (int)name.length() && name[j] == '_') {
 		m_index = toInt(name.substr(j + 1));
 		m_nameBase = name.substr(0, j);
 	}

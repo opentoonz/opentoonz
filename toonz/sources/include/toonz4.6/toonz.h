@@ -54,8 +54,8 @@ typedef enum {
 
 	TOONZ_DIR_HOW_MANY
 } TOONZ_DIRECTORY;
-/* 
-  NON FARE 'free' del puntatore ritornato 
+/*
+  NON FARE 'free' del puntatore ritornato
   CONTROLLARE sempre la validita' del puntatore ritornato (!=NIL)
 
   TOONZ_TMP e TOONZ_VARTMP possono coincidere
@@ -118,7 +118,7 @@ typedef enum {
 /*---------------------------------------------------------------------------*/
 /* Prototipi delle funzioni contenute nella libreria common */
 
-//TNZAPI char  *strsave (const char *str);
+// TNZAPI char  *strsave (const char *str);
 TNZAPI char *strnsave(const char *str, int n);
 
 TNZAPI int tnz_filestrcmp(const char *str1, const char *str2);

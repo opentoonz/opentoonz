@@ -13,7 +13,7 @@
   \file     algorithm.h
 
   \brief    This file contains useful algorithms complementary to those
-            in the standard \p \<algorithm\> and in \p boost::algorithm.
+			in the standard \p \<algorithm\> and in \p boost::algorithm.
 */
 
 namespace tcg
@@ -25,10 +25,10 @@ namespace tcg
 
 /*!
   \brief    Performs a binary search for the a value in a <I>sorted,
-            random access</I> iterators range, and returns its position.
+			random access</I> iterators range, and returns its position.
 
   \return   The \a first range position whose value is \a equivalent to
-            the specified one.
+			the specified one.
 */
 template <typename RanIt, typename T>
 RanIt binary_find(RanIt begin,	//!< Start of the sorted range.
@@ -43,10 +43,10 @@ RanIt binary_find(RanIt begin,	//!< Start of the sorted range.
 
 /*!
   \brief    Performs a binary search for the a value in a <I>sorted,
-            random access</I> iterators range, and returns its position.
+			random access</I> iterators range, and returns its position.
 
   \return   The \a first range position whose value is \a equivalent to
-            the specified one.
+			the specified one.
 */
 template <typename RanIt, typename T, typename Compare>
 RanIt binary_find(RanIt begin,	//!< Start of the sorted range.
@@ -64,16 +64,16 @@ RanIt binary_find(RanIt begin,	//!< Start of the sorted range.
 
 /*!
   \brief    Calculates the minimal transformed element from the
-            input iterators range.
+			input iterators range.
 
   \return   The position of the minimal transform.
 
   \details  This function is similar to std::min_element(), but
-            operating a unary transforming function on dereferenced
-            objects.
+			operating a unary transforming function on dereferenced
+			objects.
 
-            Furthermore, the minimal transformed value is cached
-            during computation.
+			Furthermore, the minimal transformed value is cached
+			during computation.
 */
 template <typename ForIt, typename Func, typename Comp>
 ForIt min_transform(ForIt begin, //!< Start of the input iterators range.
@@ -104,12 +104,12 @@ ForIt min_transform(ForIt begin, //!< Start of the input iterators range.
 
 /*!
   \brief    Calculates the minimal transformed element from the
-            input iterators range.
+			input iterators range.
 
   \return   The position of the minimal transform.
 
   \remark   This variation uses \p operator< as comparator for the
-            transformed values.
+			transformed values.
 */
 template <typename ForIt, typename Func>
 ForIt min_transform(ForIt begin, //!< Start of the input iterators range.
@@ -126,7 +126,7 @@ ForIt min_transform(ForIt begin, //!< Start of the input iterators range.
 
 /*!
   \brief    Calculates the maximal transformed element from the
-            input iterators range.
+			input iterators range.
 
   \return   The position of the maximal transform.
 
@@ -161,7 +161,7 @@ ForIt max_transform(ForIt begin, //!< Start of the input iterators range.
 
 /*!
   \brief    Calculates the maximal transformed element from the
-            input iterators range.
+			input iterators range.
 
   \return   The position of the maximal transform.
 

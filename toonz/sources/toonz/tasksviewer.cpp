@@ -51,12 +51,15 @@ const std::vector<QAction *> &TasksViewer::getActions() const
 
 //----------------------------------------------------------------------
 
-void TasksViewer::add(const QString &iconName, QString text, QToolBar *toolBar, const char *slot, QString iconText)
+void TasksViewer::add(const QString &iconName, QString text, QToolBar *toolBar, const char *slot,
+					  QString iconText)
 {
 #if QT_VERSION >= 0x050500
-	QAction *action = new QAction(createQIconOnOffPNG(iconName.toLatin1().constData(), false), text, this);
+	QAction *action =
+		new QAction(createQIconOnOffPNG(iconName.toLatin1().constData(), false), text, this);
 #else
-	QAction *action = new QAction(createQIconOnOffPNG(iconName.toAscii().constData(), false), text, this);
+	QAction *action =
+		new QAction(createQIconOnOffPNG(iconName.toAscii().constData(), false), text, this);
 #endif
 	action->setIconText(iconText);
 	bool ret = connect(action, SIGNAL(triggered(bool)), (TaskTreeModel *)m_treeView->model(), slot);
@@ -83,7 +86,7 @@ void TasksViewer::hideEvent(QHideEvent *)
 
 QWidget *TasksViewer::createToolBar()
 {
-	//Create toolbar. It is an horizontal layout with three internal toolbar.
+	// Create toolbar. It is an horizontal layout with three internal toolbar.
 	QWidget *toolBarWidget = new QWidget(this);
 	QToolBar *cmdToolbar = new QToolBar(toolBarWidget);
 	cmdToolbar->setIconSize(QSize(21, 17));
@@ -92,8 +95,10 @@ QWidget *TasksViewer::createToolBar()
 	add("start", tr("&Start"), cmdToolbar, SLOT(start(bool)), tr("Start"));
 	add("stop", tr("&Stop"), cmdToolbar, SLOT(stop(bool)), tr("Stop"));
 	cmdToolbar->addSeparator();
-	add("addrender", tr("&Add Render Task"), cmdToolbar, SLOT(addRenderTask(bool)), tr("Add Render"));
-	add("addcleanup", tr("&Add Cleanup Task"), cmdToolbar, SLOT(addCleanupTask(bool)), tr("Add Cleanup"));
+	add("addrender", tr("&Add Render Task"), cmdToolbar, SLOT(addRenderTask(bool)),
+		tr("Add Render"));
+	add("addcleanup", tr("&Add Cleanup Task"), cmdToolbar, SLOT(addCleanupTask(bool)),
+		tr("Add Cleanup"));
 
 	QToolBar *saveToolbar = new QToolBar(toolBarWidget);
 	saveToolbar->setIconSize(QSize(21, 17));
@@ -240,16 +245,18 @@ bool containsTask(const TFarmTask::Dependencies &dependencies, TFarmTask::Id id)
 	return false;
 }
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------
 
 class DependencyItem : public QListWidgetItem
 {
-public:
+  public:
 	TFarmTask *m_task;
 
-	DependencyItem(TFarmTask *task, QListWidget *w) : QListWidgetItem(task->m_name, w), m_task(task) {}
+	DependencyItem(TFarmTask *task, QListWidget *w) : QListWidgetItem(task->m_name, w), m_task(task)
+	{
+	}
 };
 
 //-----------------------------------------------------------------------------
@@ -500,12 +507,8 @@ void inline create(CheckBox *&ret, QGridLayout *layout, QString name, int row)
 //-----------------------------------------------------------------------------
 
 template <typename A, typename B>
-void inline create(
-	A *&ret1, B *&ret2,
-	QGridLayout *layout,
-	QString name1, QString name2,
-	QFlags<Qt::AlignmentFlag> align1, QFlags<Qt::AlignmentFlag> align2,
-	int row)
+void inline create(A *&ret1, B *&ret2, QGridLayout *layout, QString name1, QString name2,
+				   QFlags<Qt::AlignmentFlag> align1, QFlags<Qt::AlignmentFlag> align2, int row)
 {
 	ret1 = new A();
 	ret2 = new B();
@@ -521,7 +524,7 @@ void inline create(
 	layout->addWidget(ret2, row, 4, 1, 1, Qt::AlignLeft);
 }
 
-} //namespace
+} // namespace
 
 //-----------------------------------------------------------------------------
 
@@ -659,7 +662,7 @@ void TaskSheet::setShrink()
 		m_commandLine->setText(m_task->getCommandLine());
 		BatchesController::instance()->setDirtyFlag(true);
 
-		//Update children tasks, if present.
+		// Update children tasks, if present.
 		TFarmTaskGroup *taskGroup = dynamic_cast<TFarmTaskGroup *>(m_task);
 		if (taskGroup) {
 			for (int i = 0; i < taskGroup->getTaskCount(); ++i)
@@ -689,7 +692,7 @@ void TaskSheet::setStep()
 		m_commandLine->setText(m_task->getCommandLine());
 		BatchesController::instance()->setDirtyFlag(true);
 
-		//Update children tasks, if present.
+		// Update children tasks, if present.
 		TFarmTaskGroup *taskGroup = dynamic_cast<TFarmTaskGroup *>(m_task);
 		if (taskGroup) {
 			for (int i = 0; i < taskGroup->getTaskCount(); ++i)
@@ -762,7 +765,7 @@ void TaskSheet::setMultimedia(int)
 	m_commandLine->setText(m_task->getCommandLine());
 	BatchesController::instance()->setDirtyFlag(true);
 
-	//Update children tasks, if present.
+	// Update children tasks, if present.
 	TFarmTaskGroup *taskGroup = dynamic_cast<TFarmTaskGroup *>(m_task);
 	if (taskGroup) {
 		for (int i = 0; i < taskGroup->getTaskCount(); ++i)
@@ -789,7 +792,7 @@ void TaskSheet::setThreadsCombo(int)
 	m_commandLine->setText(m_task->getCommandLine());
 	BatchesController::instance()->setDirtyFlag(true);
 
-	//Update children tasks, if present.
+	// Update children tasks, if present.
 	TFarmTaskGroup *taskGroup = dynamic_cast<TFarmTaskGroup *>(m_task);
 	if (taskGroup) {
 		for (int i = 0; i < taskGroup->getTaskCount(); ++i)
@@ -816,7 +819,7 @@ void TaskSheet::setGranularityCombo(int)
 	m_commandLine->setText(m_task->getCommandLine());
 	BatchesController::instance()->setDirtyFlag(true);
 
-	//Update children tasks, if present.
+	// Update children tasks, if present.
 	TFarmTaskGroup *taskGroup = dynamic_cast<TFarmTaskGroup *>(m_task);
 	if (taskGroup) {
 		for (int i = 0; i < taskGroup->getTaskCount(); ++i)
@@ -845,12 +848,12 @@ void TaskSheet::setOutput()
 
 	TFarmTaskGroup *taskGroup = dynamic_cast<TFarmTaskGroup *>(m_task);
 
-	//Check chunk size consistency
+	// Check chunk size consistency
 	if (taskGroup && !isMovieType(m_task->m_outputPath.getType())) {
 		m_chunkSize->setEnabled(true);
 		m_chunkSize->setText(QString::number(m_task->m_chunkSize));
 
-		//Update children outputPaths
+		// Update children outputPaths
 		for (int i = 0; i < taskGroup->getTaskCount(); ++i)
 			taskGroup->getTask(i)->m_outputPath = taskGroup->m_outputPath;
 	} else {
@@ -866,8 +869,7 @@ void TaskSheet::setOutput()
 
 //-----------------------------------------------------------------------------
 
-TaskSheet::TaskSheet(TasksViewer *owner)
-	: QScrollArea(owner)
+TaskSheet::TaskSheet(TasksViewer *owner) : QScrollArea(owner)
 {
 	QFrame *contentWidget = new QFrame(this);
 	contentWidget->setMinimumWidth(300);
@@ -901,9 +903,9 @@ TaskSheet::TaskSheet(TasksViewer *owner)
 	::create(m_startDate, layout, tr("Start Date:"), row++);
 	::create(m_complDate, layout, tr("Completion Date:"), row++);
 	::create(m_duration, layout, tr("Duration:"), row++);
-	//m_duration->setMaximumWidth(38);
+	// m_duration->setMaximumWidth(38);
 	::create(m_stepCount, layout, tr("Step Count:"), row++);
-	//m_stepCount->setMaximumWidth(38);
+	// m_stepCount->setMaximumWidth(38);
 	::create(m_failedSteps, layout, tr("Failed Steps:"), row++);
 	// m_failedSteps->setMaximumWidth(38);
 	::create(m_succSteps, layout, tr("Successful Steps:"), row++);
@@ -930,10 +932,10 @@ TaskSheet::TaskSheet(TasksViewer *owner)
 
 	::create(m_chunkSize, m_multimedia, layout1, tr("Frames per Chunk:"), tr("Multimedia:"),
 			 Qt::AlignRight | Qt::AlignTop, Qt::AlignLeft | Qt::AlignTop, row1++);
-	::create(m_from, m_to, layout1, tr("From:"), tr("To:"),
-			 Qt::AlignRight | Qt::AlignTop, Qt::AlignRight | Qt::AlignTop, row1++);
-	::create(m_step, m_shrink, layout1, tr("Step:"), tr("Shrink:"),
-			 Qt::AlignRight | Qt::AlignTop, Qt::AlignRight | Qt::AlignTop, row1++);
+	::create(m_from, m_to, layout1, tr("From:"), tr("To:"), Qt::AlignRight | Qt::AlignTop,
+			 Qt::AlignRight | Qt::AlignTop, row1++);
+	::create(m_step, m_shrink, layout1, tr("Step:"), tr("Shrink:"), Qt::AlignRight | Qt::AlignTop,
+			 Qt::AlignRight | Qt::AlignTop, row1++);
 
 	layout1->setColumnMinimumWidth(2, 40);
 	QStringList multimediaTypes;
@@ -961,7 +963,7 @@ TaskSheet::TaskSheet(TasksViewer *owner)
 
 	layout->addWidget(m_boxComposer, row++, 0, 1, 6 /*, Qt::AlignLeft|Qt::AlignTop*/);
 
-	//tcleanupper Box
+	// tcleanupper Box
 	m_boxCleanup = new QFrame(contentWidget);
 	QGridLayout *layout2 = new QGridLayout(m_boxCleanup);
 	layout2->setMargin(0);
@@ -1023,24 +1025,30 @@ TaskSheet::TaskSheet(TasksViewer *owner)
 	ret = ret && connect(m_chunkSize, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
 	ret = ret && connect(m_priority, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
 
-	ret = ret && connect(m_multimedia, SIGNAL(currentIndexChanged(int)), this, SLOT(setMultimedia(int)));
+	ret = ret &&
+		  connect(m_multimedia, SIGNAL(currentIndexChanged(int)), this, SLOT(setMultimedia(int)));
 	ret = ret && connect(m_visible, SIGNAL(stateChanged(int)), this, SLOT(setVisible(int)));
 
-	ret = ret && connect(m_overwrite, SIGNAL(currentIndexChanged(int)), this, SLOT(setOverwrite(int)));
+	ret = ret &&
+		  connect(m_overwrite, SIGNAL(currentIndexChanged(int)), this, SLOT(setOverwrite(int)));
 
-	ret = ret && connect(m_addedBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(onRemovedItemDoubleClicked(QListWidgetItem *)));
-	ret = ret && connect(m_notAddedBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(onAddedItemDoubleClicked(QListWidgetItem *)));
+	ret = ret && connect(m_addedBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this,
+						 SLOT(onRemovedItemDoubleClicked(QListWidgetItem *)));
+	ret = ret && connect(m_notAddedBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this,
+						 SLOT(onAddedItemDoubleClicked(QListWidgetItem *)));
 
 	ret = ret && connect(removeBtn, SIGNAL(clicked(bool)), this, SLOT(onRemoved(bool)));
 	ret = ret && connect(addBtn, SIGNAL(clicked(bool)), this, SLOT(onAdded(bool)));
 
-	ret = ret && connect(m_threadsCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setThreadsCombo(int)));
-	ret = ret && connect(m_rasterGranularityCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setGranularityCombo(int)));
+	ret = ret && connect(m_threadsCombo, SIGNAL(currentIndexChanged(int)), this,
+						 SLOT(setThreadsCombo(int)));
+	ret = ret && connect(m_rasterGranularityCombo, SIGNAL(currentIndexChanged(int)), this,
+						 SLOT(setGranularityCombo(int)));
 
 	assert(ret);
 
-	//The following instruction is needed in order to prevent contentWidget from shrinking
-	//beyond the tolerable size for its grid layout.
+	// The following instruction is needed in order to prevent contentWidget from shrinking
+	// beyond the tolerable size for its grid layout.
 	contentWidget->setMinimumSize(layout->minimumSize());
 
 	widget()->hide();
@@ -1069,11 +1077,12 @@ TaskTreeView::TaskTreeView(TasksViewer *parent, TaskTreeModel *treeModel)
 	setModel(treeModel);
 	setObjectName("taskeditortree");
 
-	//connect(this, SIGNAL(pressed      (const QModelIndex &) ), this, SLOT(onActivated(const QModelIndex &)));
+	// connect(this, SIGNAL(pressed      (const QModelIndex &) ), this, SLOT(onActivated(const
+	// QModelIndex &)));
 }
 
 //----------------------------------------------------------------------------------------------------------------
-/*  
+/*
 void TaskTreeView::mousePressEvent ( QMouseEvent * event )
 {
 QTreeView::mousePressEvent(event);
@@ -1087,7 +1096,7 @@ m_mainViewer->setSelected(((TaskTreeModel::Item*)index.internalPointer())->getTa
 
 if (event->button()==Qt::RightButton)
   ((TaskTreeModel*)model())->openContextMenu(event->globalPos());
- 
+
 }
 */
 
@@ -1102,7 +1111,7 @@ void TaskTreeView::openContextMenu(TreeModel::Item *gItem, const QPoint &globalP
 {
 	TaskTreeModel::Item *item = static_cast<TaskTreeModel::Item *>(gItem);
 	TaskTreeModel *m = static_cast<TaskTreeModel *>(model());
-	//m->setSelected(item->createIndex());
+	// m->setSelected(item->createIndex());
 	if (item->getDepth() == 1) {
 		static QMenu globalMenu;
 		if (globalMenu.isEmpty()) {
@@ -1143,7 +1152,7 @@ void TaskTreeView::openContextMenu(TreeModel::Item *gItem, const QPoint &globalP
  {
  if (!index.isValid())
    return;
- 
+
 if (!isExpanded(index))
   {
   setExpanded(index, true);
@@ -1156,8 +1165,7 @@ if (!isExpanded(index))
 
 //----------------------------------------------------------------------------------------------------------------
 
-TaskTreeModel::TaskTreeModel(TaskTreeView *parent)
-	: TreeModel(parent), m_view(parent)
+TaskTreeModel::TaskTreeModel(TaskTreeView *parent) : TreeModel(parent), m_view(parent)
 {
 	setupModelData();
 	emit layoutChanged();
@@ -1184,16 +1192,31 @@ QVariant TaskTreeModel::data(const QModelIndex &index, int role) const
 			bool sourceFileIsCLN = (t->m_taskFilePath.getType() == "cln");
 			switch (t->m_status) {
 			case Suspended:
-				return QIcon(t->m_isComposerTask ? ":Resources/render_suspended.png" : (sourceFileIsCLN ? ":Resources/cln_suspended.png" : ":Resources/cleanup_suspended.png"));
+				return QIcon(t->m_isComposerTask
+								 ? ":Resources/render_suspended.png"
+								 : (sourceFileIsCLN ? ":Resources/cln_suspended.png"
+													: ":Resources/cleanup_suspended.png"));
 			case Waiting:
-				return QIcon(t->m_isComposerTask ? ":Resources/render_done_with_errors.png" : (sourceFileIsCLN ? ":Resources/cln_done_with_errors.png" : ":Resources/cleanup_done_with_errors.png"));
+				return QIcon(t->m_isComposerTask
+								 ? ":Resources/render_done_with_errors.png"
+								 : (sourceFileIsCLN ? ":Resources/cln_done_with_errors.png"
+													: ":Resources/cleanup_done_with_errors.png"));
 			case Running:
-				return QIcon(t->m_isComposerTask ? ":Resources/render_computing.png" : (sourceFileIsCLN ? ":Resources/cln_computing.png" : ":Resources/cleanup_computing.png"));
+				return QIcon(t->m_isComposerTask
+								 ? ":Resources/render_computing.png"
+								 : (sourceFileIsCLN ? ":Resources/cln_computing.png"
+													: ":Resources/cleanup_computing.png"));
 			case Completed:
-				return QIcon(t->m_isComposerTask ? ":Resources/render_done.png" : (sourceFileIsCLN ? ":Resources/cln_done.png" : ":Resources/cleanup_done.png"));
+				return QIcon(t->m_isComposerTask
+								 ? ":Resources/render_done.png"
+								 : (sourceFileIsCLN ? ":Resources/cln_done.png"
+													: ":Resources/cleanup_done.png"));
 			case Aborted:
 			case TaskUnknown:
-				return QIcon(t->m_isComposerTask ? ":Resources/render_failed.png" : (sourceFileIsCLN ? ":Resources/cln_failed.png" : ":Resources/cleanup_failed.png"));
+				return QIcon(t->m_isComposerTask
+								 ? ":Resources/render_failed.png"
+								 : (sourceFileIsCLN ? ":Resources/cln_failed.png"
+													: ":Resources/cleanup_failed.png"));
 			default:
 				assert(false);
 			}
@@ -1210,7 +1233,7 @@ QVariant TaskTreeModel::data(const QModelIndex &index, int role) const
 void TaskTreeModel::save(bool)
 {
 	BatchesController::instance()->save();
-	//SaveTaskListPopup popup;
+	// SaveTaskListPopup popup;
 }
 
 //------------------------------------------------------------------------------------------------------------------
@@ -1258,7 +1281,7 @@ void TaskTreeModel::start(bool)
 				if (!modelIndex.isValid())
 					continue;
 				TaskTreeModel::Item *item = (Item *)modelIndex.internalPointer();
-				if (item->getDepth() == 1) //significa che ho selezionato la radice!
+				if (item->getDepth() == 1) // significa che ho selezionato la radice!
 				{
 					assert(indexList.size() == 1);
 					BatchesController::instance()->startAll();
@@ -1292,7 +1315,7 @@ void TaskTreeModel::stop(bool)
 				if (!modelIndex.isValid())
 					continue;
 				TaskTreeModel::Item *item = (Item *)modelIndex.internalPointer();
-				if (item->getDepth() == 1) //significa che ho selezionato la radice!
+				if (item->getDepth() == 1) // significa che ho selezionato la radice!
 				{
 					assert(indexList.size() == 1);
 					BatchesController::instance()->stopAll();
@@ -1318,7 +1341,8 @@ void TaskTreeModel::remove(bool)
 	int i;
 
 	if (indexList.size() == 0) {
-		if (DVGui::MsgBox(tr("Are you sure you want to remove ALL tasks?"), tr("Remove All"), tr("Cancel")) > 1)
+		if (DVGui::MsgBox(tr("Are you sure you want to remove ALL tasks?"), tr("Remove All"),
+						  tr("Cancel")) > 1)
 			return;
 
 		BatchesController::instance()->removeAllTasks();
@@ -1328,7 +1352,7 @@ void TaskTreeModel::remove(bool)
 			if (!modelIndex.isValid())
 				continue;
 			TaskTreeModel::Item *item = (Item *)modelIndex.internalPointer();
-			if (item->getDepth() == 1) //significa che ho selezionato la radice!
+			if (item->getDepth() == 1) // significa che ho selezionato la radice!
 			{
 				assert(indexList.size() == 1);
 				BatchesController::instance()->removeAllTasks();
@@ -1357,7 +1381,7 @@ void TaskTreeModel::remove(bool)
 
 void TaskTreeModel::update()
 {
-	//assert(0);
+	// assert(0);
 	emit layoutChanged();
 }
 
@@ -1390,8 +1414,7 @@ void TaskTreeModel::setupModelData()
 	int i, j;
 	QList<TreeModel::Item *> tasks;
 	for (i = 0; i < controller->getTaskCount(); i++) {
-		TFarmTaskGroup *group =
-			dynamic_cast<TFarmTaskGroup *>(controller->getTask(i));
+		TFarmTaskGroup *group = dynamic_cast<TFarmTaskGroup *>(controller->getTask(i));
 		if (group)
 			tasks.push_back(new Item(group));
 	}
@@ -1401,8 +1424,7 @@ void TaskTreeModel::setupModelData()
 	// the list of sub-tasks
 	for (i = 0; i < taskList->getChildCount(); i++) {
 		TreeModel::Item *item = taskList->getChild(i);
-		TFarmTaskGroup *group =
-			static_cast<TFarmTaskGroup *>(item->getInternalPointer());
+		TFarmTaskGroup *group = static_cast<TFarmTaskGroup *>(item->getInternalPointer());
 		QList<TreeModel::Item *> subTasks;
 		for (j = 0; j < group->getTaskCount(); j++)
 			subTasks.push_back(new Item(group->getTask(j)));
@@ -1414,8 +1436,7 @@ void TaskTreeModel::setupModelData()
 
 //------------------------------------------------------------------------------------------------------------------
 
-TaskTreeModel::Item::Item(const QString &name)
-	: TreeModel::Item(), m_name(name), m_task(0)
+TaskTreeModel::Item::Item(const QString &name) : TreeModel::Item(), m_name(name), m_task(0)
 {
 	assert(!m_name.isEmpty());
 }
@@ -1425,8 +1446,7 @@ TaskTreeModel::Item::Item(const QString &name)
   if (group = dynamic_cast<TFarmTaskGroup*>(t))
 */
 
-TaskTreeModel::Item::Item(TFarmTask *task)
-	: TreeModel::Item(), m_name(), m_task(task)
+TaskTreeModel::Item::Item(TFarmTask *task) : TreeModel::Item(), m_name(), m_task(task)
 {
 	assert(m_task);
 }

@@ -16,7 +16,7 @@ namespace
 
 class User
 {
-public:
+  public:
 	std::string m_name;
 	std::vector<std::string> m_svnUsernames;
 	std::vector<std::string> m_svnPasswords;
@@ -46,14 +46,13 @@ public:
 
 class PermissionsManager::Imp
 {
-public:
+  public:
 	std::map<std::string, User *> m_users;
 
 	// utente corrente
 	User *m_user;
 
-	Imp()
-		: m_user(0)
+	Imp() : m_user(0)
 	{
 		loadPermissions();
 		m_user = findUser(TSystem::getUserName().toStdString(), false);
@@ -63,8 +62,7 @@ public:
 
 	~Imp()
 	{
-		for (std::map<std::string, User *>::iterator u = m_users.begin();
-			 u != m_users.end(); ++u)
+		for (std::map<std::string, User *>::iterator u = m_users.begin(); u != m_users.end(); ++u)
 			delete u->second;
 	}
 
@@ -100,10 +98,7 @@ public:
 		return user->getSvnPassword(index);
 	}
 
-	TFilePath getPermissionFile()
-	{
-		return TEnv::getConfigDir() + "permissions.xml";
-	}
+	TFilePath getPermissionFile() { return TEnv::getConfigDir() + "permissions.xml"; }
 	void loadPermissions();
 };
 
@@ -160,8 +155,7 @@ void PermissionsManager::Imp::loadPermissions()
 
 //=========================================================
 
-PermissionsManager::PermissionsManager()
-	: m_imp(new Imp())
+PermissionsManager::PermissionsManager() : m_imp(new Imp())
 {
 }
 

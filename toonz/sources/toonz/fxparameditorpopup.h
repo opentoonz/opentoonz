@@ -13,7 +13,7 @@ class FxParamEditorPopup : public QDialog
 {
 	Q_OBJECT
 
-public:
+  public:
 	FxParamEditorPopup();
 };
 

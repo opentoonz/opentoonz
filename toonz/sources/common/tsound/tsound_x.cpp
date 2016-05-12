@@ -10,7 +10,7 @@
 #include <queue>
 #include <set>
 
-//forward declaration
+// forward declaration
 namespace
 {
 bool isInterfaceSupported(int deviceType, int interfaceType);
@@ -22,7 +22,7 @@ bool isChangeOutput(ULONG sampleRate);
 
 class TSoundOutputDeviceImp
 {
-public:
+  public:
 	ALport m_port;
 	bool m_stopped;
 	bool m_isPlaying;
@@ -35,7 +35,8 @@ public:
 	TThread::Mutex m_mutex;
 
 	TSoundOutputDeviceImp()
-		: m_stopped(false), m_isPlaying(false), m_looped(false), m_port(NULL), m_queuedSoundTracks(), m_supportedRate(){};
+		: m_stopped(false), m_isPlaying(false), m_looped(false), m_port(NULL),
+		  m_queuedSoundTracks(), m_supportedRate(){};
 
 	~TSoundOutputDeviceImp(){};
 
@@ -58,14 +59,14 @@ bool TSoundOutputDeviceImp::doOpenDevice(const TSoundTrackFormat &format)
 	pvbuf[1].param = AL_MONITOR_CTL;
 	if (alGetParams(AL_DEFAULT_OUTPUT, pvbuf, 2) < 0)
 		if (oserror() == AL_BAD_DEVICE_ACCESS)
-			return false; //throw TException("Could not access audio hardware.");
+			return false; // throw TException("Could not access audio hardware.");
 
 	if (!isInterfaceSupported(AL_DEFAULT_OUTPUT, AL_SPEAKER_IF_TYPE))
-		return false; //throw TException("Speakers are not supported");
+		return false; // throw TException("Speakers are not supported");
 
 	int dev = alGetResourceByName(AL_SYSTEM, (char *)"Headphone/Speaker", AL_DEVICE_TYPE);
 	if (!dev)
-		return false; //throw TException("invalid device speakers");
+		return false; // throw TException("invalid device speakers");
 
 	pvbuf[0].param = AL_DEFAULT_OUTPUT;
 	pvbuf[0].value.i = dev;
@@ -85,10 +86,10 @@ bool TSoundOutputDeviceImp::doOpenDevice(const TSoundTrackFormat &format)
 
 	if (alSetParams(AL_DEFAULT_OUTPUT, pvbuf, 3) < 0)
 		return false;
-	//throw TException("Unable to set params for output device");
+	// throw TException("Unable to set params for output device");
 
 	if (alSetChannels(config, format.m_channelCount) == -1)
-		return false; //throw TException("Error to setting audio hardware.");
+		return false; // throw TException("Error to setting audio hardware.");
 
 	int bytePerSample = format.m_bitPerSample >> 3;
 	switch (bytePerSample) {
@@ -100,17 +101,17 @@ bool TSoundOutputDeviceImp::doOpenDevice(const TSoundTrackFormat &format)
 	}
 
 	if (alSetWidth(config, bytePerSample) == -1)
-		return false; //throw TException("Error to setting audio hardware.");
+		return false; // throw TException("Error to setting audio hardware.");
 
 	if (alSetSampFmt(config, AL_SAMPFMT_TWOSCOMP) == -1)
-		return false; //throw TException("Error to setting audio hardware.");
+		return false; // throw TException("Error to setting audio hardware.");
 
 	if (alSetQueueSize(config, (TINT32)format.m_sampleRate) == -1)
-		return false; //throw TException("Error to setting audio hardware.");
+		return false; // throw TException("Error to setting audio hardware.");
 
 	m_port = alOpenPort("AudioOutput", "w", config);
 	if (!m_port)
-		return false; //throw TException("Could not open audio port.");
+		return false; // throw TException("Could not open audio port.");
 
 	alFreeConfig(config);
 	return true;
@@ -133,7 +134,7 @@ void TSoundOutputDeviceImp::insertAllRate()
 
 bool TSoundOutputDeviceImp::verifyRate()
 {
-	//Sample Rate
+	// Sample Rate
 	ALparamInfo pinfo;
 	int ret = alGetParamInfo(AL_DEFAULT_OUTPUT, AL_RATE, &pinfo);
 	if (ret != -1 && pinfo.elementType == AL_FIXED_ELEM) {
@@ -157,7 +158,7 @@ bool TSoundOutputDeviceImp::verifyRate()
 
 class PlayTask : public TThread::Runnable
 {
-public:
+  public:
 	TSoundOutputDeviceImp *m_devImp;
 	TSoundTrackP m_sndtrack;
 
@@ -174,8 +175,7 @@ void PlayTask::run()
 	int leftToPlay = m_sndtrack->getSampleCount();
 	int i = 0;
 
-	if (!m_devImp->m_port ||
-		(m_devImp->m_currentFormat != m_sndtrack->getFormat()) ||
+	if (!m_devImp->m_port || (m_devImp->m_currentFormat != m_sndtrack->getFormat()) ||
 		isChangeOutput(m_sndtrack->getSampleRate()))
 		if (!m_devImp->doOpenDevice(m_sndtrack->getFormat()))
 			return;
@@ -225,8 +225,8 @@ void PlayTask::run()
 TSoundOutputDevice::TSoundOutputDevice() : m_imp(new TSoundOutputDeviceImp)
 {
 	if (!setDefaultOutput())
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableSetDevice, "Speaker not supported");
+		throw TSoundDeviceException(TSoundDeviceException::UnableSetDevice,
+									"Speaker not supported");
 	try {
 		supportsVolume();
 	} catch (TSoundDeviceException &e) {
@@ -257,9 +257,8 @@ bool TSoundOutputDevice::installed()
 bool TSoundOutputDevice::open(const TSoundTrackP &st)
 {
 	if (!m_imp->doOpenDevice(st->getFormat()))
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableOpenDevice,
-			"Problem to open the output device or set some params");
+		throw TSoundDeviceException(TSoundDeviceException::UnableOpenDevice,
+									"Problem to open the output device or set some params");
 	return true;
 }
 
@@ -277,7 +276,8 @@ bool TSoundOutputDevice::close()
 
 //------------------------------------------------------------------------------
 
-void TSoundOutputDevice::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool loop, bool scrubbing)
+void TSoundOutputDevice::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool loop,
+							  bool scrubbing)
 {
 	if (!st->getSampleCount())
 		return;
@@ -298,20 +298,17 @@ void TSoundOutputDevice::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool
 	try {
 		fmt = getPreferredFormat(st->getFormat());
 		if (fmt != st->getFormat()) {
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnsupportedFormat,
-				"Unsupported Format");
+			throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+										"Unsupported Format");
 		}
 	} catch (TSoundDeviceException &e) {
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnsupportedFormat,
-			e.getMessage());
+		throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat, e.getMessage());
 	}
 
 	assert(s1 >= s0);
 	TSoundTrackP subTrack = st->extract(s0, s1);
 
-	//far partire il thread
+	// far partire il thread
 	if (m_imp->m_queuedSoundTracks.empty()) {
 		m_imp->m_queuedSoundTracks.push(subTrack);
 
@@ -392,12 +389,11 @@ bool TSoundOutputDevice::supportsVolume()
 	if ((ret != -1) && (min != max) && (max != 0.0))
 		return true;
 	else if ((ret == AL_BAD_PARAM) || ((min == max) && (max == 0.0)))
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"It is impossible to chamge setting of volume");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"It is impossible to chamge setting of volume");
 	else
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer, "Output device is not accessible");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Output device is not accessible");
 }
 
 //------------------------------------------------------------------------------
@@ -425,30 +421,25 @@ void TSoundOutputDevice::setLooping(bool loop)
 
 //------------------------------------------------------------------------------
 
-TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
-	ULONG sampleRate, int channelCount, int bitPerSample)
+TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(ULONG sampleRate, int channelCount,
+														 int bitPerSample)
 {
 	TSoundTrackFormat fmt;
 	int ret;
 
 	if (!m_imp->verifyRate())
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnsupportedFormat,
-			"There isn't any support rate");
+		throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+									"There isn't any support rate");
 
-	if (m_imp->m_supportedRate.find((int)sampleRate) ==
-		m_imp->m_supportedRate.end()) {
-		std::set<int>::iterator it =
-			m_imp->m_supportedRate.lower_bound((int)sampleRate);
+	if (m_imp->m_supportedRate.find((int)sampleRate) == m_imp->m_supportedRate.end()) {
+		std::set<int>::iterator it = m_imp->m_supportedRate.lower_bound((int)sampleRate);
 		if (it == m_imp->m_supportedRate.end()) {
-			it = std::max_element(m_imp->m_supportedRate.begin(),
-								  m_imp->m_supportedRate.end());
+			it = std::max_element(m_imp->m_supportedRate.begin(), m_imp->m_supportedRate.end());
 			if (it != m_imp->m_supportedRate.end())
 				sampleRate = *(m_imp->m_supportedRate.rbegin());
 			else
-				throw TSoundDeviceException(
-					TSoundDeviceException::UnsupportedFormat,
-					"There isn't a supported rate");
+				throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+											"There isn't a supported rate");
 		} else
 			sampleRate = *it;
 	}
@@ -463,9 +454,8 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
 			TSoundDeviceException::NoMixer,
 			"It is impossible ask for the max numbers of channels supported");
 	else
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"It is impossibile information about ouput device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"It is impossibile information about ouput device");
 
 	if (value > 2)
 		value = 2;
@@ -494,8 +484,8 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
 TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(const TSoundTrackFormat &format)
 {
 	try {
-		return getPreferredFormat(
-			format.m_sampleRate, format.m_channelCount, format.m_bitPerSample);
+		return getPreferredFormat(format.m_sampleRate, format.m_channelCount,
+								  format.m_bitPerSample);
 	} catch (TSoundDeviceException &e) {
 		throw TSoundDeviceException(e.getType(), e.getMessage());
 	}
@@ -509,7 +499,7 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(const TSoundTrackFormat
 
 class TSoundInputDeviceImp
 {
-public:
+  public:
 	ALport m_port;
 	bool m_stopped;
 	bool m_isRecording;
@@ -526,12 +516,13 @@ public:
 	TThread::Executor m_executor;
 
 	TSoundInputDeviceImp()
-		: m_stopped(false), m_isRecording(false), m_port(NULL), m_recordedBlocks(), m_samplePerBlocks(), m_recordedSampleCount(0), m_oneShotRecording(false), m_st(0), m_supportedRate(){};
+		: m_stopped(false), m_isRecording(false), m_port(NULL), m_recordedBlocks(),
+		  m_samplePerBlocks(), m_recordedSampleCount(0), m_oneShotRecording(false), m_st(0),
+		  m_supportedRate(){};
 
 	~TSoundInputDeviceImp(){};
 
-	bool doOpenDevice(const TSoundTrackFormat &format,
-					  TSoundInputDevice::Source devType);
+	bool doOpenDevice(const TSoundTrackFormat &format, TSoundInputDevice::Source devType);
 	void insertAllRate();
 	bool verifyRate();
 };
@@ -549,12 +540,12 @@ bool TSoundInputDeviceImp::doOpenDevice(const TSoundTrackFormat &format,
 	pvbuf[1].param = AL_MONITOR_CTL;
 	if (alGetParams(AL_DEFAULT_INPUT, pvbuf, 2) < 0)
 		if (oserror() == AL_BAD_DEVICE_ACCESS)
-			return false; //throw TException("Could not access audio hardware.");
+			return false; // throw TException("Could not access audio hardware.");
 
 	config = alNewConfig();
 
 	if (!setDefaultInput(devType))
-		return false; //throw TException("Could not set the input device specified");
+		return false; // throw TException("Could not set the input device specified");
 
 	pvbuf[0].param = AL_RATE;
 	pvbuf[0].value.ll = alDoubleToFixed(format.m_sampleRate);
@@ -565,10 +556,10 @@ bool TSoundInputDeviceImp::doOpenDevice(const TSoundTrackFormat &format,
 	pvbuf[1].sizeIn = 8;
 
 	if (alSetParams(AL_DEFAULT_INPUT, pvbuf, 2) < 0)
-		return false; //throw TException("Problem to set params ");
+		return false; // throw TException("Problem to set params ");
 
 	if (alSetChannels(config, format.m_channelCount) == -1)
-		return false; //throw TException("Error to setting audio hardware.");
+		return false; // throw TException("Error to setting audio hardware.");
 
 	int bytePerSample = format.m_bitPerSample >> 3;
 	switch (bytePerSample) {
@@ -579,19 +570,19 @@ bool TSoundInputDeviceImp::doOpenDevice(const TSoundTrackFormat &format,
 		break;
 	}
 	if (alSetWidth(config, bytePerSample) == -1)
-		return false; //throw TException("Error to setting audio hardware.");
+		return false; // throw TException("Error to setting audio hardware.");
 
 	if (alSetSampFmt(config, AL_SAMPFMT_TWOSCOMP) == -1)
-		return false; //throw TException("Error to setting audio hardware.");
+		return false; // throw TException("Error to setting audio hardware.");
 
 	if (alSetQueueSize(config, (TINT32)format.m_sampleRate) == -1)
-		return false; //throw TException("Error to setting audio hardware.");
+		return false; // throw TException("Error to setting audio hardware.");
 
 	alSetDevice(config, AL_DEFAULT_INPUT);
 
 	m_port = alOpenPort("AudioInput", "r", config);
 	if (!m_port)
-		return false; //throw TException("Could not open audio port.");
+		return false; // throw TException("Could not open audio port.");
 
 	alFreeConfig(config);
 	return true;
@@ -614,7 +605,7 @@ void TSoundInputDeviceImp::insertAllRate()
 
 bool TSoundInputDeviceImp::verifyRate()
 {
-	//Sample Rate
+	// Sample Rate
 	ALparamInfo pinfo;
 	int ret = alGetParamInfo(AL_DEFAULT_INPUT, AL_RATE, &pinfo);
 	if (ret != -1 && pinfo.elementType == AL_FIXED_ELEM) {
@@ -638,7 +629,7 @@ bool TSoundInputDeviceImp::verifyRate()
 
 class RecordTask : public TThread::Runnable
 {
-public:
+  public:
 	TSoundInputDeviceImp *m_devImp;
 	int m_ByteToSample;
 
@@ -665,7 +656,8 @@ void RecordTask::run()
 			sampleSize = (m_devImp->m_currentFormat.m_bitPerSample >> 3);
 
 		sampleSize *= m_devImp->m_currentFormat.m_channelCount;
-		while ((byteRecordedSample <= (m_ByteToSample - filled * sampleSize)) && m_devImp->m_isRecording) {
+		while ((byteRecordedSample <= (m_ByteToSample - filled * sampleSize)) &&
+			   m_devImp->m_isRecording) {
 			alReadFrames(m_devImp->m_port, (void *)(rawData + byteRecordedSample), filled);
 			byteRecordedSample += filled * sampleSize;
 			filled = alGetFilled(m_devImp->m_port);
@@ -726,20 +718,18 @@ bool TSoundInputDevice::installed()
 void TSoundInputDevice::record(const TSoundTrackFormat &format, TSoundInputDevice::Source type)
 {
 	if (m_imp->m_isRecording == true)
-		throw TSoundDeviceException(
-			TSoundDeviceException::Busy,
-			"Just another recoding is in progress");
+		throw TSoundDeviceException(TSoundDeviceException::Busy,
+									"Just another recoding is in progress");
 
 	m_imp->m_recordedBlocks.clear();
 	m_imp->m_samplePerBlocks.clear();
 
-	//registra creando una nuova traccia
+	// registra creando una nuova traccia
 	m_imp->m_oneShotRecording = false;
 
 	if (!setDefaultInput(type))
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableSetDevice,
-			"Error to set the input device");
+		throw TSoundDeviceException(TSoundDeviceException::UnableSetDevice,
+									"Error to set the input device");
 
 	m_imp->insertAllRate();
 	TSoundTrackFormat fmt;
@@ -747,14 +737,11 @@ void TSoundInputDevice::record(const TSoundTrackFormat &format, TSoundInputDevic
 	try {
 		fmt = getPreferredFormat(format);
 		if (fmt != format) {
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnsupportedFormat,
-				"Unsupported Format");
+			throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+										"Unsupported Format");
 		}
 	} catch (TSoundDeviceException &e) {
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnsupportedFormat,
-			e.getMessage());
+		throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat, e.getMessage());
 	}
 
 	if (!m_imp->m_port)
@@ -775,15 +762,15 @@ void TSoundInputDevice::record(const TSoundTrackFormat &format, TSoundInputDevic
 	}
 	bytePerSample *= format.m_channelCount;
 
-	//far partire il thread
+	// far partire il thread
 	/*TRecordThread *recordThread = new TRecordThread(m_imp, bytePerSample);
 	if (!recordThread)
 	{
-  	m_imp->m_isRecording = false;
-  	m_imp->m_stopped = true;
-    throw TSoundDeviceException(
-      TSoundDeviceException::UnablePrepare,
-      "Unable to create the recording thread");	
+	m_imp->m_isRecording = false;
+	m_imp->m_stopped = true;
+	throw TSoundDeviceException(
+	  TSoundDeviceException::UnablePrepare,
+	  "Unable to create the recording thread");
 	}
   recordThread->start();*/
 	m_imp->m_executor.addTask(new RecordTask(m_imp, bytePerSample));
@@ -794,17 +781,15 @@ void TSoundInputDevice::record(const TSoundTrackFormat &format, TSoundInputDevic
 void TSoundInputDevice::record(const TSoundTrackP &st, TSoundInputDevice::Source type)
 {
 	if (m_imp->m_isRecording == true)
-		throw TSoundDeviceException(
-			TSoundDeviceException::Busy,
-			"Just another recoding is in progress");
+		throw TSoundDeviceException(TSoundDeviceException::Busy,
+									"Just another recoding is in progress");
 
 	m_imp->m_recordedBlocks.clear();
 	m_imp->m_samplePerBlocks.clear();
 
 	if (!setDefaultInput(type))
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableSetDevice,
-			"Error to set the input device");
+		throw TSoundDeviceException(TSoundDeviceException::UnableSetDevice,
+									"Error to set the input device");
 
 	m_imp->insertAllRate();
 	TSoundTrackFormat fmt;
@@ -812,23 +797,19 @@ void TSoundInputDevice::record(const TSoundTrackP &st, TSoundInputDevice::Source
 	try {
 		fmt = getPreferredFormat(st->getFormat());
 		if (fmt != st->getFormat()) {
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnsupportedFormat,
-				"Unsupported Format");
+			throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+										"Unsupported Format");
 		}
 	} catch (TSoundDeviceException &e) {
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnsupportedFormat,
-			e.getMessage());
+		throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat, e.getMessage());
 	}
 
 	if (!m_imp->m_port)
 		if (!m_imp->doOpenDevice(st->getFormat(), type))
-			throw TSoundDeviceException(
-				TSoundDeviceException::UnableOpenDevice,
-				"Unable to open input device");
+			throw TSoundDeviceException(TSoundDeviceException::UnableOpenDevice,
+										"Unable to open input device");
 
-	//Sovrascive un'intera o parte di traccia gia' esistente
+	// Sovrascive un'intera o parte di traccia gia' esistente
 	m_imp->m_oneShotRecording = true;
 	m_imp->m_currentFormat = st->getFormat();
 	m_imp->m_isRecording = true;
@@ -840,15 +821,15 @@ void TSoundInputDevice::record(const TSoundTrackP &st, TSoundInputDevice::Source
 
 	int totByteToSample = st->getSampleCount() * st->getSampleSize();
 
-	//far partire il thread
+	// far partire il thread
 	/*TRecordThread *recordThread = new TRecordThread(m_imp, totByteToSample);
 	if (!recordThread)
 	{
-  	m_imp->m_isRecording = false;
-  	m_imp->m_stopped = true;
-    throw TSoundDeviceException(
-      TSoundDeviceException::UnablePrepare,
-      "Unable to create the recording thread");
+	m_imp->m_isRecording = false;
+	m_imp->m_stopped = true;
+	throw TSoundDeviceException(
+	  TSoundDeviceException::UnablePrepare,
+	  "Unable to create the recording thread");
 	}
   recordThread->start();*/
 	m_imp->m_executor.addTask(new RecordTask(m_imp, totByteToSample));
@@ -861,9 +842,8 @@ TSoundTrackP TSoundInputDevice::stop()
 	TSoundTrackP st;
 
 	if (!m_imp->m_isRecording)
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnablePrepare,
-			"No recording process is in execution");
+		throw TSoundDeviceException(TSoundDeviceException::UnablePrepare,
+									"No recording process is in execution");
 
 	m_imp->m_isRecording = false;
 
@@ -879,10 +859,8 @@ TSoundTrackP TSoundInputDevice::stop()
 		TINT32 bytesCopied = 0;
 
 		for (int i = 0; i < (int)m_imp->m_recordedBlocks.size(); ++i) {
-			memcpy(
-				(void *)(st->getRawData() + bytesCopied),
-				m_imp->m_recordedBlocks[i],
-				m_imp->m_samplePerBlocks[i]);
+			memcpy((void *)(st->getRawData() + bytesCopied), m_imp->m_recordedBlocks[i],
+				   m_imp->m_samplePerBlocks[i]);
 
 			delete[] m_imp->m_recordedBlocks[i];
 
@@ -952,40 +930,34 @@ bool TSoundInputDevice::supportsVolume()
 	if ((ret != -1) && (min != max) && (max != 0.0))
 		return true;
 	else if ((ret == AL_BAD_PARAM) || ((min == max) && (max == 0.0)))
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"It is impossible to chamge setting of volume");
+		throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+									"It is impossible to chamge setting of volume");
 	else
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer, "Output device is not accessible");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"Output device is not accessible");
 }
 
 //------------------------------------------------------------------------------
 
-TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
-	ULONG sampleRate, int channelCount, int bitPerSample)
+TSoundTrackFormat TSoundInputDevice::getPreferredFormat(ULONG sampleRate, int channelCount,
+														int bitPerSample)
 {
 	TSoundTrackFormat fmt;
 	int ret;
 
 	if (!m_imp->verifyRate())
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnsupportedFormat,
-			"There isn't any support rate");
+		throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+									"There isn't any support rate");
 
-	if (m_imp->m_supportedRate.find((int)sampleRate) ==
-		m_imp->m_supportedRate.end()) {
-		std::set<int>::iterator it =
-			m_imp->m_supportedRate.lower_bound((int)sampleRate);
+	if (m_imp->m_supportedRate.find((int)sampleRate) == m_imp->m_supportedRate.end()) {
+		std::set<int>::iterator it = m_imp->m_supportedRate.lower_bound((int)sampleRate);
 		if (it == m_imp->m_supportedRate.end()) {
-			it = std::max_element(m_imp->m_supportedRate.begin(),
-								  m_imp->m_supportedRate.end());
+			it = std::max_element(m_imp->m_supportedRate.begin(), m_imp->m_supportedRate.end());
 			if (it != m_imp->m_supportedRate.end())
 				sampleRate = *(m_imp->m_supportedRate.rbegin());
 			else
-				throw TSoundDeviceException(
-					TSoundDeviceException::UnsupportedFormat,
-					"There isn't a supported rate");
+				throw TSoundDeviceException(TSoundDeviceException::UnsupportedFormat,
+											"There isn't a supported rate");
 		} else
 			sampleRate = *it;
 	}
@@ -1000,9 +972,8 @@ TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
 			TSoundDeviceException::NoMixer,
 			"It is impossible ask for the max nembers of channels supported");
 	else
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer,
-			"It is impossibile information about ouput device");
+		throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+									"It is impossibile information about ouput device");
 
 	if (value > 2)
 		value = 2;
@@ -1031,8 +1002,8 @@ TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
 TSoundTrackFormat TSoundInputDevice::getPreferredFormat(const TSoundTrackFormat &format)
 {
 	try {
-		return getPreferredFormat(
-			format.m_sampleRate, format.m_channelCount, format.m_bitPerSample);
+		return getPreferredFormat(format.m_sampleRate, format.m_channelCount,
+								  format.m_bitPerSample);
 	} catch (TSoundDeviceException &e) {
 		throw TSoundDeviceException(e.getType(), e.getMessage());
 	}
@@ -1089,7 +1060,7 @@ bool setDefaultInput(TSoundInputDevice::Source type)
 
 	int dev = alGetResourceByName(AL_SYSTEM, (char *)label.c_str(), AL_DEVICE_TYPE);
 	if (!dev)
-		return false; //throw TException("Error to set input device");
+		return false; // throw TException("Error to set input device");
 	int itf;
 	if (itf = alGetResourceByName(AL_SYSTEM, (char *)label.c_str(), AL_INTERFACE_TYPE)) {
 		ALpv p;
@@ -1097,7 +1068,7 @@ bool setDefaultInput(TSoundInputDevice::Source type)
 		p.param = AL_INTERFACE;
 		p.value.i = itf;
 		if (alSetParams(dev, &p, 1) < 0 || p.sizeOut < 0)
-			return false; //throw TException("Error to set input device");
+			return false; // throw TException("Error to set input device");
 	}
 
 	ALpv param;
@@ -1105,7 +1076,7 @@ bool setDefaultInput(TSoundInputDevice::Source type)
 	param.param = AL_DEFAULT_INPUT;
 	param.value.i = dev;
 	if (alSetParams(AL_SYSTEM, &param, 1) < 0)
-		return false; //throw TException("Error to set input device");
+		return false; // throw TException("Error to set input device");
 
 	return true;
 }
@@ -1117,11 +1088,11 @@ bool setDefaultOutput()
 	ALpv pvbuf[1];
 
 	if (!isInterfaceSupported(AL_DEFAULT_OUTPUT, AL_SPEAKER_IF_TYPE))
-		return false; //throw TException("Speakers are not supported");
+		return false; // throw TException("Speakers are not supported");
 
 	int dev = alGetResourceByName(AL_SYSTEM, (char *)"Headphone/Speaker", AL_DEVICE_TYPE);
 	if (!dev)
-		return false; //throw TException("invalid device speakers");
+		return false; // throw TException("invalid device speakers");
 
 	pvbuf[0].param = AL_DEFAULT_OUTPUT;
 	pvbuf[0].value.i = dev;
@@ -1139,7 +1110,7 @@ bool setDefaultOutput()
 
 //------------------------------------------------------------------------------
 
-//return the indexes of all input device of a particular type
+// return the indexes of all input device of a particular type
 list<int> getInputDevice(int deviceType)
 {
 	ALvalue vals[16];
@@ -1167,7 +1138,7 @@ list<int> getInputDevice(int deviceType)
 
 //------------------------------------------------------------------------------
 
-//return the indexes of all input device of a particular type and interface
+// return the indexes of all input device of a particular type and interface
 list<int> getInputDevice(int deviceType, int itfType)
 {
 	ALvalue vals[16];

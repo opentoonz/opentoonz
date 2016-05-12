@@ -23,10 +23,10 @@ class AddFilmstripFramesPopup : public DVGui::Dialog
 
 	DVGui::IntLineEdit *m_startFld, *m_endFld, *m_stepFld;
 
-public slots:
+  public slots:
 	void onOk();
 
-public:
+  public:
 	AddFilmstripFramesPopup();
 
 	// void configureNotify(const TDimension &size);

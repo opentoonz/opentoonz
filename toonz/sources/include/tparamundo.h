@@ -17,11 +17,11 @@
 
 class DVAPI TParamUndoManager : public TParamObserver
 { // singleton
-protected:
+  protected:
 	TParamUndoManager() {}
 	virtual ~TParamUndoManager(){};
 
-public:
+  public:
 	static TParamUndoManager *instance();
 };
 

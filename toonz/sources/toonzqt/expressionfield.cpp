@@ -26,15 +26,13 @@ class ExpressionField::SyntaxHighlighter : public QSyntaxHighlighter
 {
 	const Grammar *m_grammar;
 
-public:
+  public:
 	bool m_open;
 	SyntaxHighlighter(QTextDocument *parent)
 		: QSyntaxHighlighter(parent), m_grammar(0), m_open(true)
 	{
 	}
-	~SyntaxHighlighter()
-	{
-	}
+	~SyntaxHighlighter() {}
 
 	void setGrammar(const Grammar *grammar) { m_grammar = grammar; }
 
@@ -106,7 +104,7 @@ class MyListView : public QListView
 {
 	QLabel *m_tooltip;
 
-public:
+  public:
 	MyListView() : QListView()
 	{
 		setObjectName("SuggestionPopup");
@@ -114,7 +112,7 @@ public:
 		setWindowFlags(Qt::Popup);
 		setMouseTracking(true);
 		m_tooltip = new QLabel(0, Qt::ToolTip);
-		//Stesso stile del popuop che lo contiene.
+		// Stesso stile del popuop che lo contiene.
 		m_tooltip->hide();
 
 		m_tooltip->setObjectName("helpTooltip");
@@ -122,14 +120,8 @@ public:
 		m_tooltip->setIndent(1);
 		m_tooltip->setWordWrap(false);
 	}
-	void showEvent(QShowEvent *)
-	{
-		showToolTip(currentIndex());
-	}
-	void hideEvent(QHideEvent *)
-	{
-		m_tooltip->hide();
-	}
+	void showEvent(QShowEvent *) { showToolTip(currentIndex()); }
+	void hideEvent(QHideEvent *) { m_tooltip->hide(); }
 	void currentChanged(const QModelIndex &current, const QModelIndex &previous)
 	{
 		showToolTip(current);
@@ -153,7 +145,7 @@ public:
 		m_tooltip->show();
 	}
 
-protected:
+  protected:
 	void resizeEvent(QResizeEvent *e)
 	{
 		QListView::resizeEvent(e);
@@ -165,7 +157,8 @@ protected:
 //=============================================================================
 
 ExpressionField::ExpressionField(QWidget *parent)
-	: QTextEdit(parent), m_editing(false), m_grammar(0), m_syntaxHighlighter(0), m_completerPopup(0), m_completerStartPos(0)
+	: QTextEdit(parent), m_editing(false), m_grammar(0), m_syntaxHighlighter(0),
+	  m_completerPopup(0), m_completerStartPos(0)
 {
 	setFrameStyle(QFrame::StyledPanel);
 	setObjectName("ExpressionField");
@@ -188,9 +181,8 @@ ExpressionField::ExpressionField(QWidget *parent)
 	m_completerPopup->setFocusPolicy(Qt::NoFocus);
 	m_completerPopup->setFocusProxy(this);
 	m_completerPopup->installEventFilter(this);
-	connect(
-		m_completerPopup, SIGNAL(clicked(const QModelIndex &)),
-		this, SLOT(insertCompletion(const QModelIndex &)));
+	connect(m_completerPopup, SIGNAL(clicked(const QModelIndex &)), this,
+			SLOT(insertCompletion(const QModelIndex &)));
 
 	m_syntaxHighlighter = new SyntaxHighlighter(document());
 }
@@ -230,7 +222,7 @@ bool ExpressionField::event(QEvent *e)
 		e->accept();
 		return true;
 	}
-	//else
+	// else
 	return QTextEdit::event(e);
 }
 
@@ -261,7 +253,8 @@ void ExpressionField::keyPressEvent(QKeyEvent *e)
 		QTextEdit::keyPressEvent(e);
 		if (m_completerPopup->isVisible()) {
 			updateCompleterPopup();
-		} else if (Qt::Key_A <= e->key() && e->key() <= Qt::Key_Z || std::string("+&|!*/=?,:-").find(e->key()) != std::string::npos) {
+		} else if (Qt::Key_A <= e->key() && e->key() <= Qt::Key_Z ||
+				   std::string("+&|!*/=?,:-").find(e->key()) != std::string::npos) {
 			openCompleterPopup();
 		}
 		setFocus();
@@ -382,7 +375,8 @@ bool ExpressionField::updateCompleterPopup()
 	cursor.setPosition(m_completerStartPos);
 	QRect cr = cursorRect(cursor);
 
-	int w = m_completerPopup->sizeHintForColumn(0) + m_completerPopup->verticalScrollBar()->sizeHint().width() + 5;
+	int w = m_completerPopup->sizeHintForColumn(0) +
+			m_completerPopup->verticalScrollBar()->sizeHint().width() + 5;
 	int h = (m_completerPopup->sizeHintForRow(0) * qMin(7, model->rowCount()) + 3) + 3;
 
 	QSize size(w, h);
@@ -403,7 +397,9 @@ int ExpressionField::computeSuggestions()
 		start--;
 		while (start > 0) {
 			char c = text[start - 1];
-			if (isascii(c) && isalpha(c) || c == '_' || c == '.' && (start - 2 < 0 || isascii(text[start - 2]) && isalpha(text[start - 2]))) {
+			if (isascii(c) && isalpha(c) || c == '_' ||
+				c == '.' &&
+					(start - 2 < 0 || isascii(text[start - 2]) && isalpha(text[start - 2]))) {
 			} else
 				break;
 			start--;

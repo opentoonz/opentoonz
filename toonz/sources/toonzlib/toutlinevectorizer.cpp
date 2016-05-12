@@ -28,14 +28,8 @@
 struct ControlPoint {
 	TStroke *m_stroke;
 	int m_index;
-	ControlPoint(TStroke *stroke, int index)
-		: m_stroke(stroke), m_index(index)
-	{
-	}
-	TPointD getPoint() const
-	{
-		return m_stroke->getControlPoint(m_index);
-	}
+	ControlPoint(TStroke *stroke, int index) : m_stroke(stroke), m_index(index) {}
+	TPointD getPoint() const { return m_stroke->getControlPoint(m_index); }
 	void setPoint(const TPointD &p)
 	{
 		TThickPoint point = m_stroke->getControlPoint(m_index);
@@ -51,7 +45,7 @@ class Node;
 
 class DataPixel
 {
-public:
+  public:
 	TPoint m_pos;
 	int m_value;
 	bool m_ink;
@@ -70,7 +64,7 @@ class Junction;
 
 class Node
 {
-public:
+  public:
 	Node *m_other;
 	DataPixel *m_pixel;
 	Node *m_prev, *m_next;
@@ -80,10 +74,7 @@ public:
 #endif
 	bool m_visited;
 	Node()
-		: m_pixel(0),
-		  m_prev(0),
-		  m_next(0),
-		  m_junction(0),
+		: m_pixel(0), m_prev(0), m_next(0), m_junction(0),
 #ifdef DEBUG
 		  m_flag(false),
 #endif
@@ -98,14 +89,13 @@ class ProtoStroke;
 
 class Junction
 {
-public:
+  public:
 	TThickPoint m_center;
 	std::deque<Node *> m_nodes;
 	int m_junctionOrder;
 	std::vector<ProtoStroke *> m_protoStrokes;
 	bool m_locked;
-	Junction()
-		: m_center(), m_nodes(), m_junctionOrder(0), m_protoStrokes(), m_locked(false) {}
+	Junction() : m_center(), m_nodes(), m_junctionOrder(0), m_protoStrokes(), m_locked(false) {}
 	bool isConvex();
 };
 
@@ -113,15 +103,19 @@ public:
 
 class ProtoStroke
 {
-public:
+  public:
 	TPointD m_startDirection, m_endDirection;
 	Junction *m_startJunction, *m_endJunction;
 	std::deque<TThickPoint> m_points;
 	ProtoStroke()
-		: m_points(), m_startDirection(), m_endDirection(), m_startJunction(0), m_endJunction(0) {}
-	ProtoStroke(std::deque<TThickPoint>::iterator it_b,
-				std::deque<TThickPoint>::iterator it_e)
-		: m_points(it_b, it_e), m_startDirection(), m_endDirection(), m_startJunction(0), m_endJunction(0) {}
+		: m_points(), m_startDirection(), m_endDirection(), m_startJunction(0), m_endJunction(0)
+	{
+	}
+	ProtoStroke(std::deque<TThickPoint>::iterator it_b, std::deque<TThickPoint>::iterator it_e)
+		: m_points(it_b, it_e), m_startDirection(), m_endDirection(), m_startJunction(0),
+		  m_endJunction(0)
+	{
+	}
 };
 
 //---------------------------------------------------------
@@ -184,7 +178,7 @@ class OutlineVectorizer
 {
 	TPalette *m_palette;
 
-public:
+  public:
 	TRasterP m_src;
 
 	OutlineConfiguration m_configuration;
@@ -197,7 +191,9 @@ public:
 	std::vector<Junction *> m_junctions;
 
 	OutlineVectorizer(const OutlineConfiguration &configuration, TPalette *palette)
-		: m_configuration(configuration), m_palette(palette) {}
+		: m_configuration(configuration), m_palette(palette)
+	{
+	}
 
 	~OutlineVectorizer();
 
@@ -240,7 +236,7 @@ public:
 		return g;
 	}
 
-private:
+  private:
 	// not implemented
 	OutlineVectorizer(const OutlineVectorizer &);
 	OutlineVectorizer &operator=(const OutlineVectorizer &);
@@ -271,8 +267,7 @@ void OutlineVectorizer::init()
 		pix++;
 		for (pix++; pix < endPix; ++pix) {
 			if ((pix->m_ink == false) ||
-				(pix[-wrap].m_ink && pix[wrap].m_ink &&
-				 pix[-1].m_ink && pix[1].m_ink))
+				(pix[-wrap].m_ink && pix[wrap].m_ink && pix[-1].m_ink && pix[1].m_ink))
 				continue;
 			int i;
 			for (i = 0; i < 8; i++)
@@ -340,10 +335,7 @@ void OutlineVectorizer::clearJunctions()
 
 //---------------------------------------------------------
 
-void OutlineVectorizer::link(
-	DataPixel *pix,
-	DataPixel *srcPix,
-	DataPixel *dstPix)
+void OutlineVectorizer::link(DataPixel *pix, DataPixel *srcPix, DataPixel *dstPix)
 {
 	Node *srcNode = 0, *dstNode = 0, *node = 0;
 	Node *tmp;
@@ -539,7 +531,7 @@ void OutlineVectorizer::createOutlineStrokes()
 			if (it_outlines->size() > 10) {
 				it = it_outlines->begin() + 1;
 				for (;;) {
-					//Baco: Ricontrolla l'if seguente - in alcuni casi va fuori bounds...
+					// Baco: Ricontrolla l'if seguente - in alcuni casi va fuori bounds...
 					if ((int)it_outlines->size() <= m_configuration.m_smoothness + 1)
 						break;
 					if (it >= it_outlines->end() - (m_configuration.m_smoothness + 1))
@@ -575,7 +567,8 @@ void OutlineVectorizer::createOutlineStrokes()
 
 inline int colorDistance2(const TPixel32 &c0, const TPixel32 &c1)
 {
-	return ((c0.r - c1.r) * (c0.r - c1.r) + (c0.g - c1.g) * (c0.g - c1.g) + (c0.b - c1.b) * (c0.b - c1.b));
+	return ((c0.r - c1.r) * (c0.r - c1.r) + (c0.g - c1.g) * (c0.g - c1.g) +
+			(c0.b - c1.b) * (c0.b - c1.b));
 }
 
 //---------------------------------------------------------
@@ -598,7 +591,8 @@ void OutlineVectorizer::makeDataRaster(const TRasterP &src)
 	TRasterCM32P srcCM = (TRasterCM32P)m_src;
 	TRasterGR8P srcGR = (TRasterGR8P)m_src;
 
-	// Inizializzo DataRasterP per i casi in cui si ha un TRaster32P, un TRasterGR8P o un TRasterCM32P molto grande
+	// Inizializzo DataRasterP per i casi in cui si ha un TRaster32P, un TRasterGR8P o un
+	// TRasterCM32P molto grande
 	DataRasterP dataRaster(m_src->getSize().lx + 2, m_src->getSize().ly + 2);
 	if (srcRGBM || srcGR || (srcCM && srcCM->getLx() * srcCM->getLy() > 5000000)) {
 		int ly = dataRaster->getLy();
@@ -648,7 +642,8 @@ void OutlineVectorizer::makeDataRaster(const TRasterP &src)
 				*dataPix = DataPixel();
 				int distance2 = colorDistance2(m_configuration.m_inkColor, *inPix);
 
-				if (y == 0 || y == m_src->getLy() - 1 || x == 0 || x == m_src->getLx() - 1 || inPix->m == 0) {
+				if (y == 0 || y == m_src->getLy() - 1 || x == 0 || x == m_src->getLx() - 1 ||
+					inPix->m == 0) {
 					dataPix->m_value = 255;
 					dataPix->m_ink = false;
 				} else {
@@ -767,7 +762,7 @@ void OutlineVectorizer::makeDataRaster(const TRasterP &src)
 					dataPix0->m_node = dataPix1->m_node = 0;
 				}
 
-				int threshold = m_configuration.m_threshold; //tolerance: 1->MAX thresh: 1-255
+				int threshold = m_configuration.m_threshold; // tolerance: 1->MAX thresh: 1-255
 				currInk = nextInk;
 				nextInk = 0;
 				m_dataRasterArray.push_back(std::pair<int, DataRasterP>(currInk, dataRaster));
@@ -818,7 +813,9 @@ void OutlineVectorizer::makeDataRaster(const TRasterP &src)
 
 //---------------------------------------------------------
 
-TVectorImageP VectorizerCore::outlineVectorize(const TImageP &image, const OutlineConfiguration &configuration, TPalette *palette)
+TVectorImageP VectorizerCore::outlineVectorize(const TImageP &image,
+											   const OutlineConfiguration &configuration,
+											   TPalette *palette)
 {
 	TVectorImageP out;
 
@@ -971,11 +968,11 @@ inline bool isBright(const TPixel32 &pix, int threshold)
 	return tmax(pix.r, tmax(pix.g, pix.b)) >= threshold * (pix.m / 255.0);
 
 	// Using Lightness in HSL color model
-	//return (max(pix.r,max(pix.g,pix.b)) + min(pix.r,min(pix.g,pix.b))) / 2.0
+	// return (max(pix.r,max(pix.g,pix.b)) + min(pix.r,min(pix.g,pix.b))) / 2.0
 	//  >= threshold * (pix.m / 255.0);
 
 	// Using (relative) Luminance
-	//return 0.2126 * pix.r + 0.7152 * pix.g + 0.0722 * pix.b >= threshold * (pix.m / 255.0);
+	// return 0.2126 * pix.r + 0.7152 * pix.g + 0.0722 * pix.b >= threshold * (pix.m / 255.0);
 }
 
 //------------------------------------------------------
@@ -998,9 +995,8 @@ inline bool isDark(const TPixelRGBM32 &pix, int threshold)
 //------------------------------------------------------
 
 template <typename Pix, typename Selector>
-bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
-					  const TAffine &inverse, const VectorizerConfiguration &c,
-					  const TRegion *region, TPointD &p)
+bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel, const TAffine &inverse,
+					  const VectorizerConfiguration &c, const TRegion *region, TPointD &p)
 {
 	struct Locals {
 		const TRasterPT<Pix> &m_ras;
@@ -1029,8 +1025,7 @@ bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
 		}
 
 		// Subdivide the output scanline in even intervals, and sample each's midpoint
-		bool sampleMidpoints(TPointD &p,
-							 double x0, double x1, double y, int intervalsCount)
+		bool sampleMidpoints(TPointD &p, double x0, double x1, double y, int intervalsCount)
 		{
 			const double iCountD = intervalsCount;
 
@@ -1061,7 +1056,8 @@ bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
 		bool inRaster(const TPointD &point)
 		{
 			const TPoint &pRas = toRaster(point);
-			return (pRas.x >= 0 && pRas.x < m_ras->getLx() && pRas.y >= 0 && pRas.y < m_ras->getLy());
+			return (pRas.x >= 0 && pRas.x < m_ras->getLx() && pRas.y >= 0 &&
+					pRas.y < m_ras->getLy());
 		}
 
 		bool selected(const TPointD &point)
@@ -1106,8 +1102,7 @@ bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
 			return inRaster(newP) ? (p = newP, true) : false;
 		}
 
-		void isolateBorderX(double &xIn, double &xOut, double y, int iCount,
-							const double tol)
+		void isolateBorderX(double &xIn, double &xOut, double y, int iCount, const double tol)
 		{
 			assert(scanlineIntersectionsBefore(xIn, y, true) == iCount);
 
@@ -1125,8 +1120,7 @@ bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
 			}
 		}
 
-		void isolateBorderY(double x, double &yIn, double &yOut, int iCount,
-							const double tol)
+		void isolateBorderY(double x, double &yIn, double &yOut, int iCount, const double tol)
 		{
 			assert(scanlineIntersectionsBefore(x, yIn, false) == iCount);
 
@@ -1162,9 +1156,10 @@ bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
 	const TRectD &regionBBox = region->getBBox();
 	double regionMidY = 0.5 * (regionBBox.y0 + regionBBox.y1);
 
-	int ic, icEnd = tceil((regionBBox.x1 - regionBBox.x0) / c.m_thickScale) + 1; // Say you have 4 pixels, in [0, 4]. We want to
-																				 // have at least 4 intervals where midpoints are
-																				 // taken - so end intervals count is 5.
+	int ic, icEnd = tceil((regionBBox.x1 - regionBBox.x0) / c.m_thickScale) +
+					1; // Say you have 4 pixels, in [0, 4]. We want to
+					   // have at least 4 intervals where midpoints are
+					   // taken - so end intervals count is 5.
 	for (ic = 1; ic < icEnd; ic *= 2) {
 		if (locals.sampleMidpoints(p, regionBBox.x0, regionBBox.x1, regionMidY, ic))
 			return true;
@@ -1177,17 +1172,18 @@ bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
 
 //(Daniele)
 
-//Taking lone, unchecked points is dangerous - they could lie inside
-//region r and still have a wrong color (for example, if they lie
+// Taking lone, unchecked points is dangerous - they could lie inside
+// region r and still have a wrong color (for example, if they lie
 //*on* a boundary stroke).
-//Plus, over-threshold regions should always be considered black.
+// Plus, over-threshold regions should always be considered black.
 
-//In order to improve this, we search a 4way-local-brightest
-//neighbour of p. Observe that, however, it may still lie outside r;
-//would that happen, p was not significative in the first place.
+// In order to improve this, we search a 4way-local-brightest
+// neighbour of p. Observe that, however, it may still lie outside r;
+// would that happen, p was not significative in the first place.
 //---------------------------------------------------------------
 
-inline TPixel32 takeLocalBrightest(const TRaster32P rr, TRegion *r, const VectorizerConfiguration &c, TPoint &p)
+inline TPixel32 takeLocalBrightest(const TRaster32P rr, TRegion *r,
+								   const VectorizerConfiguration &c, TPoint &p)
 {
 	TPoint pMax;
 
@@ -1216,7 +1212,8 @@ inline TPixel32 takeLocalBrightest(const TRaster32P rr, TRegion *r, const Vector
 
 //------------------------------------------------------
 
-inline TPixel32 takeLocalBrightest(const TRasterGR8P rgr, TRegion *r, const VectorizerConfiguration &c, TPoint &p)
+inline TPixel32 takeLocalBrightest(const TRasterGR8P rgr, TRegion *r,
+								   const VectorizerConfiguration &c, TPoint &p)
 {
 	TPoint pMax;
 
@@ -1247,11 +1244,12 @@ inline TPixel32 takeLocalBrightest(const TRasterGR8P rgr, TRegion *r, const Vect
 
 //---------------------------------------------------------------
 
-inline TPixel32 takeLocalDarkest(const TRaster32P rr, TRegion *r, const VectorizerConfiguration &c, TPoint &p)
+inline TPixel32 takeLocalDarkest(const TRaster32P rr, TRegion *r, const VectorizerConfiguration &c,
+								 TPoint &p)
 {
 	TPoint pMax;
 
-	while (r->contains(c.m_affine * convert(p))) //1
+	while (r->contains(c.m_affine * convert(p))) // 1
 	{
 		pMax = p;
 		if (p.x > 0 && rr->pixels(p.y)[p.x - 1] < rr->pixels(pMax.y)[pMax.x])
@@ -1274,7 +1272,8 @@ inline TPixel32 takeLocalDarkest(const TRaster32P rr, TRegion *r, const Vectoriz
 
 //------------------------------------------------------
 
-inline TPixel32 takeLocalDarkest(const TRasterGR8P rgr, TRegion *r, const VectorizerConfiguration &c, TPoint &p)
+inline TPixel32 takeLocalDarkest(const TRasterGR8P rgr, TRegion *r,
+								 const VectorizerConfiguration &c, TPoint &p)
 {
 	TPoint pMax;
 
@@ -1340,12 +1339,24 @@ void VectorizerCore::applyFillColors(TRegion *r, const TRasterP &ras, TPalette *
 	typedef bool (*rgbm_func)(const TPixelRGBM32 &, int);
 	typedef bool (*gr_func)(const TPixelGR8 &, int);
 
-	bool tookPoint = isBrightRegion ? rt ? getInternalPoint(rt, tcg::bind2nd(cm_func(isBright), c.m_threshold), inverse, c, r, pd) || // If no bright pixel could be found,
-											   getInternalPoint(rt, locals::alwaysTrue, inverse, c, r, pd)
-										 :																								   // then any pixel inside the region
-										  rr ? getInternalPoint(rr, tcg::bind2nd(rgbm_func(isBright), c.m_threshold), inverse, c, r, pd) : // must suffice.
-											  getInternalPoint(rgr, tcg::bind2nd(gr_func(isBright), c.m_threshold), inverse, c, r, pd)
-									: rt ? getInternalPoint(rt, tcg::bind2nd(cm_func(isDark), c.m_threshold), inverse, c, r, pd) : rr ? getInternalPoint(rr, tcg::bind2nd(rgbm_func(isDark), c.m_threshold), inverse, c, r, pd) : getInternalPoint(rgr, tcg::bind2nd(gr_func(isDark), c.m_threshold), inverse, c, r, pd);
+	bool tookPoint =
+		isBrightRegion
+			? rt
+				  ? getInternalPoint(rt, tcg::bind2nd(cm_func(isBright), c.m_threshold), inverse, c,
+									 r, pd) || // If no bright pixel could be found,
+						getInternalPoint(rt, locals::alwaysTrue, inverse, c, r, pd)
+				  : // then any pixel inside the region
+				  rr ? getInternalPoint(rr, tcg::bind2nd(rgbm_func(isBright), c.m_threshold),
+										inverse, c, r, pd)
+					 : // must suffice.
+					  getInternalPoint(rgr, tcg::bind2nd(gr_func(isBright), c.m_threshold), inverse,
+									   c, r, pd)
+			: rt ? getInternalPoint(rt, tcg::bind2nd(cm_func(isDark), c.m_threshold), inverse, c, r,
+									pd)
+				 : rr ? getInternalPoint(rr, tcg::bind2nd(rgbm_func(isDark), c.m_threshold),
+										 inverse, c, r, pd)
+					  : getInternalPoint(rgr, tcg::bind2nd(gr_func(isDark), c.m_threshold), inverse,
+										 c, r, pd);
 
 	if (tookPoint) {
 		pd = inverse * pd;
@@ -1356,16 +1367,19 @@ void VectorizerCore::applyFillColors(TRegion *r, const TRasterP &ras, TPalette *
 
 			if (rt) {
 				TPixelCM32 col = rt->pixels(p.y)[p.x];
-				styleId = isBrightRegion ? col.getPaint() : col.getInk(); // Only paint colors with centerline
-			}															  // vectorization
+				styleId = isBrightRegion ? col.getPaint()
+										 : col.getInk(); // Only paint colors with centerline
+			}											 // vectorization
 			else {
 				TPixel32 color;
 
 				// Update color found to local brightness-extremals
 				if (rr) {
-					color = isBrightRegion ? takeLocalBrightest(rr, r, c, p) : takeLocalDarkest(rr, r, c, p);
+					color = isBrightRegion ? takeLocalBrightest(rr, r, c, p)
+										   : takeLocalDarkest(rr, r, c, p);
 				} else {
-					color = isBrightRegion ? takeLocalBrightest(rgr, r, c, p) : takeLocalDarkest(rgr, r, c, p);
+					color = isBrightRegion ? takeLocalBrightest(rgr, r, c, p)
+										   : takeLocalDarkest(rgr, r, c, p);
 				}
 
 				if (color.m != 0) {
@@ -1402,8 +1416,7 @@ void VectorizerCore::applyFillColors(TRegion *r, const TRasterP &ras, TPalette *
 	assert(rt || rr || rgr);
 
 	TAffine inverse = c.m_affine.inv();
-	bool doInks = !c.m_ignoreInkColors,
-		 doPaints = !c.m_leaveUnpainted;
+	bool doInks = !c.m_ignoreInkColors, doPaints = !c.m_leaveUnpainted;
 
 	// Retrieve a point inside the specified region
 	TPointD pd;
@@ -1431,7 +1444,8 @@ void VectorizerCore::applyFillColors(TRegion *r, const TRasterP &ras, TPalette *
 
 						if (isNearestInkOrPaintInRegion(true, rt, r, c.m_affine, p))
 							styleId = doInks ? col.getInk() : 1;
-						else if (doPaints && isNearestInkOrPaintInRegion(false, rt, r, c.m_affine, p))
+						else if (doPaints &&
+								 isNearestInkOrPaintInRegion(false, rt, r, c.m_affine, p))
 							styleId = col.getPaint();
 					} else {
 						// Whenever regionCount is even, paint is checked first
@@ -1451,7 +1465,8 @@ void VectorizerCore::applyFillColors(TRegion *r, const TRasterP &ras, TPalette *
 					color = (val < 80) ? TPixel32::Black : TPixel32::White;
 				}
 
-				if ((color.m != 0) && ((!c.m_leaveUnpainted) || (c.m_leaveUnpainted && color == c.m_inkColor))) {
+				if ((color.m != 0) &&
+					((!c.m_leaveUnpainted) || (c.m_leaveUnpainted && color == c.m_inkColor))) {
 					styleId = palette->getClosestStyle(color);
 					TPixel32 oldColor = palette->getStyle(styleId)->getMainColor();
 
@@ -1482,7 +1497,7 @@ void VectorizerCore::applyFillColors(TVectorImageP vi, const TImageP &img, TPale
 	const CenterlineConfiguration &centConf = static_cast<const CenterlineConfiguration &>(c);
 	const OutlineConfiguration &outConf = static_cast<const OutlineConfiguration &>(c);
 
-	//If configuration is not set for color fill at all, quit.
+	// If configuration is not set for color fill at all, quit.
 	if (c.m_leaveUnpainted && (!c.m_outline || outConf.m_ignoreInkColors))
 		return;
 
@@ -1500,7 +1515,7 @@ void VectorizerCore::applyFillColors(TVectorImageP vi, const TImageP &img, TPale
 			applyFillColors(vi->getRegion(r), ras, palette, outConf, 1);
 	} else {
 		for (r = 0; r < regionsCount; ++r)
-			applyFillColors(vi->getRegion(r), ras, palette, centConf, 1); //1 - c.m_makeFrame;
+			applyFillColors(vi->getRegion(r), ras, palette, centConf, 1); // 1 - c.m_makeFrame;
 
 		clearInkRegionFlags(vi);
 	}
@@ -1508,7 +1523,8 @@ void VectorizerCore::applyFillColors(TVectorImageP vi, const TImageP &img, TPale
 
 //=================================================================
 
-TVectorImageP VectorizerCore::vectorize(const TImageP &img, const VectorizerConfiguration &c, TPalette *plt)
+TVectorImageP VectorizerCore::vectorize(const TImageP &img, const VectorizerConfiguration &c,
+										TPalette *plt)
 {
 	TVectorImageP vi;
 

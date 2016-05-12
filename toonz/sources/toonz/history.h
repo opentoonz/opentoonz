@@ -11,21 +11,18 @@
 
 class History
 { // singleton
-public:
+  public:
 	class Item
 	{
-	public:
+	  public:
 		TFilePath m_filePath;
 		Item(const TFilePath &fp) : m_filePath(fp) {}
-		bool operator<(const Item &item) const
-		{
-			return m_filePath < item.m_filePath;
-		}
+		bool operator<(const Item &item) const { return m_filePath < item.m_filePath; }
 	};
 
 	class Day
 	{
-	public:
+	  public:
 		QDate m_timeStamp;
 		std::string getDate() const;
 		std::set<Item> m_items;
@@ -44,7 +41,7 @@ public:
 	// nota. ritorna il giorno (se c'e') che ha un timeStamp IDENTICO a time
 	void addItem(const TFilePath &fp);
 
-private:
+  private:
 	std::vector<Day *> m_days;
 
 	History();

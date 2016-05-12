@@ -18,7 +18,7 @@ class DragTool;
 // RowArea
 //-----------------------------------------------------------------------------
 
-//!La classe si occupa della visualizzazione dell'area che gestisce le righe.
+//! La classe si occupa della visualizzazione dell'area che gestisce le righe.
 class RowArea : public QWidget
 {
 	Q_OBJECT
@@ -26,12 +26,11 @@ class RowArea : public QWidget
 	int m_xa;
 	int m_row;
 
-	enum ShowOnionToSetFlag
-	{
+	enum ShowOnionToSetFlag {
 		None = 0,
 		Fos,
 		Mos
-	}m_showOnionToSet;//TODO:明日はこれをFos,Mosどちらをハイライトしているのか判定させる！！！！
+	} m_showOnionToSet; // TODO:明日はこれをFos,Mosどちらをハイライトしているのか判定させる！！！！
 
 	// Play ranges
 	int m_r0;
@@ -42,7 +41,7 @@ class RowArea : public QWidget
 	int m_mousePressRow;
 	QString m_tooltip;
 
-	//panning by middle-drag
+	// panning by middle-drag
 	bool m_isPanning;
 
 	void drawRows(QPainter &p, int r0, int r1);
@@ -53,7 +52,7 @@ class RowArea : public QWidget
 	DragTool *getDragTool() const;
 	void setDragTool(DragTool *dragTool);
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	RowArea(XsheetViewer *parent, Qt::WindowFlags flags = 0);
 #else
@@ -61,25 +60,25 @@ public:
 #endif
 	~RowArea();
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 	void contextMenuEvent(QContextMenuEvent *event);
-	void mouseDoubleClickEvent(QMouseEvent* event);
+	void mouseDoubleClickEvent(QMouseEvent *event);
 	bool event(QEvent *event);
 
 	void setMarker(int index);
 
-protected slots:
+  protected slots:
 
 	void onSetStartMarker();
 	void onSetStopMarker();
 	void onRemoveMarkers();
 
-	//set both the from and to markers at the specified row
+	// set both the from and to markers at the specified row
 	void onPreviewThis();
 };
 

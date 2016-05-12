@@ -65,13 +65,18 @@ bool isInStudioPalette(TFilePath path)
 		return true;
 	if (isInStudioPaletteFolder(path, studioPlt->getCleanupPalettesRoot()))
 		return true;
-	if (isInStudioPaletteFolder(path, TFilePath("C:\\Toonz 6.0 stuff\\projects\\Project Palettes"))) //DAFARE studioPlt->getProjectPalettesRoot(); Per ora lo fisso))
+	if (isInStudioPaletteFolder(
+			path,
+			TFilePath(
+				"C:\\Toonz 6.0 stuff\\projects\\Project Palettes"))) // DAFARE
+																	 // studioPlt->getProjectPalettesRoot();
+																	 // Per ora lo fisso))
 		return true;
 	return false;
 }
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -88,7 +93,8 @@ bool isInStudioPalette(TFilePath path)
 */
 /*!	\fn void StudioPaletteTreeViewer::onStudioPaletteTreeChange()
 		Overriden from StudioPalette::Listener.
-		\fn void StudioPaletteTreeViewer::onStudioPaletteMove(const TFilePath &dstPath, const TFilePath &srcPath)
+		\fn void StudioPaletteTreeViewer::onStudioPaletteMove(const TFilePath &dstPath, const
+   TFilePath &srcPath)
 		Overriden from StudioPalette::Listener.
 		\fn void StudioPaletteTreeViewer::onStudioPaletteChange(const TFilePath &palette)
 		Overriden from StudioPalette::Listener.
@@ -96,44 +102,46 @@ bool isInStudioPalette(TFilePath path)
 StudioPaletteTreeViewer::StudioPaletteTreeViewer(QWidget *parent,
 												 TPaletteHandle *studioPaletteHandle,
 												 TPaletteHandle *levelPaletteHandle)
-	: QTreeWidget(parent), m_dropItem(0), m_stdPltHandle(studioPaletteHandle), m_levelPltHandle(levelPaletteHandle), m_sceneHandle(0), m_levelHandle(0)
+	: QTreeWidget(parent), m_dropItem(0), m_stdPltHandle(studioPaletteHandle),
+	  m_levelPltHandle(levelPaletteHandle), m_sceneHandle(0), m_levelHandle(0)
 {
 	header()->close();
 	setIconSize(QSize(20, 20));
 
-	//Da sistemare le icone dei tre folder principali
+	// Da sistemare le icone dei tre folder principali
 	static QPixmap PaletteIconPxmp(":Resources/icon.png");
 
 	QList<QTreeWidgetItem *> paletteItems;
 
 	StudioPalette *studioPlt = StudioPalette::instance();
 
-	//static QPixmap PaletteLevelIconPxmp(":Resources/studio_plt_toonz.png");
+	// static QPixmap PaletteLevelIconPxmp(":Resources/studio_plt_toonz.png");
 	TFilePath levelPltPath = studioPlt->getLevelPalettesRoot();
 	paletteItems.append(createRootItem(levelPltPath, PaletteIconPxmp));
 
-	//static QPixmap PaletteCleanupIconPxmp(":Resources/studio_plt_cleanup.png");
+	// static QPixmap PaletteCleanupIconPxmp(":Resources/studio_plt_cleanup.png");
 	TFilePath cleanupPltPath = studioPlt->getCleanupPalettesRoot();
 	paletteItems.append(createRootItem(cleanupPltPath, PaletteIconPxmp));
 
-	//DAFARE
-	//Oss.: se il folder non c'e' non fa nulla, non si aprono neanche i menu' da tasto destro!
-	//static QPixmap PaletteProjectIconPxmp(":Resources/studio_plt_project.png");
-	TFilePath projectPltPath = TFilePath("C:\\Toonz 6.0 stuff\\projects\\Project Palettes"); //studioPlt->getProjectPalettesRoot(); Per ora lo fisso
+	// DAFARE
+	// Oss.: se il folder non c'e' non fa nulla, non si aprono neanche i menu' da tasto destro!
+	// static QPixmap PaletteProjectIconPxmp(":Resources/studio_plt_project.png");
+	TFilePath projectPltPath = TFilePath(
+		"C:\\Toonz 6.0 stuff\\projects\\Project Palettes"); // studioPlt->getProjectPalettesRoot();
+															// Per ora lo fisso
 	paletteItems.append(createRootItem(projectPltPath, PaletteIconPxmp));
 
 	insertTopLevelItems(0, paletteItems);
 
-	connect(this, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-			this, SLOT(onItemChanged(QTreeWidgetItem *, int)));
+	connect(this, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this,
+			SLOT(onItemChanged(QTreeWidgetItem *, int)));
 
-	connect(this, SIGNAL(itemExpanded(QTreeWidgetItem *)),
-			this, SLOT(onItemExpanded(QTreeWidgetItem *)));
-	connect(this, SIGNAL(itemCollapsed(QTreeWidgetItem *)),
-			this, SLOT(onItemCollapsed(QTreeWidgetItem *)));
+	connect(this, SIGNAL(itemExpanded(QTreeWidgetItem *)), this,
+			SLOT(onItemExpanded(QTreeWidgetItem *)));
+	connect(this, SIGNAL(itemCollapsed(QTreeWidgetItem *)), this,
+			SLOT(onItemCollapsed(QTreeWidgetItem *)));
 
-	connect(this, SIGNAL(itemSelectionChanged()),
-			this, SLOT(onItemSelectionChanged()));
+	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(onItemSelectionChanged()));
 
 	m_palettesScanPopup = new PalettesScanPopup();
 	setAcceptDrops(true);
@@ -196,15 +204,16 @@ bool StudioPaletteTreeViewer::isRootItem(QTreeWidgetItem *item)
 	assert(item);
 	TFilePath path = getFolderPath(item);
 
-	//DAFARE
-	//Oss.: se il folder non c'e' non fa nulla, non si aprono neanche i menu' da tasto destro!
-	//static QPixmap PaletteProjectIconPxmp(":Resources/studio_plt_project.png");
-	TFilePath projectPltPath = TFilePath("C:\\Toonz 6.0 stuff\\projects\\Project Palettes"); //studioPlt->getProjectPalettesRoot(); Per ora lo fisso
+	// DAFARE
+	// Oss.: se il folder non c'e' non fa nulla, non si aprono neanche i menu' da tasto destro!
+	// static QPixmap PaletteProjectIconPxmp(":Resources/studio_plt_project.png");
+	TFilePath projectPltPath = TFilePath(
+		"C:\\Toonz 6.0 stuff\\projects\\Project Palettes"); // studioPlt->getProjectPalettesRoot();
+															// Per ora lo fisso
 
 	StudioPalette *stdPalette = StudioPalette::instance();
 	if (path == stdPalette->getCleanupPalettesRoot() ||
-		path == stdPalette->getLevelPalettesRoot() ||
-		path == projectPltPath)
+		path == stdPalette->getLevelPalettesRoot() || path == projectPltPath)
 		return true;
 
 	return false;
@@ -238,8 +247,8 @@ QTreeWidgetItem *StudioPaletteTreeViewer::createItem(const TFilePath path)
 */
 TFilePath StudioPaletteTreeViewer::getFolderPath(QTreeWidgetItem *item)
 {
-	TFilePath path = (item) ? TFilePath(item->data(1, Qt::UserRole).toString().toStdWString())
-							: TFilePath();
+	TFilePath path =
+		(item) ? TFilePath(item->data(1, Qt::UserRole).toString().toStdWString()) : TFilePath();
 	return path;
 }
 
@@ -276,7 +285,8 @@ QTreeWidgetItem *StudioPaletteTreeViewer::getItem(const TFilePath path)
 //-----------------------------------------------------------------------------
 /*! Return item child of \b parent identified by \b path; if it doesn't exist return 0.
 */
-QTreeWidgetItem *StudioPaletteTreeViewer::getFolderItem(QTreeWidgetItem *parent, const TFilePath path)
+QTreeWidgetItem *StudioPaletteTreeViewer::getFolderItem(QTreeWidgetItem *parent,
+														const TFilePath path)
 {
 	int childrenCount = parent->childCount();
 	int i;
@@ -306,8 +316,10 @@ void StudioPaletteTreeViewer::refresh()
 	TFilePath cleanupPltPath = studioPlt->getCleanupPalettesRoot();
 	refreshItem(getItem(cleanupPltPath));
 
-	//DAFARE
-	TFilePath projectPltPath = TFilePath("C:\\Toonz 6.0 stuff\\projects\\Project Palettes"); //studioPlt->getProjectPalettesRoot(); Per ora lo fisso
+	// DAFARE
+	TFilePath projectPltPath = TFilePath(
+		"C:\\Toonz 6.0 stuff\\projects\\Project Palettes"); // studioPlt->getProjectPalettesRoot();
+															// Per ora lo fisso
 	refreshItem(getItem(projectPltPath));
 }
 
@@ -334,15 +346,15 @@ void StudioPaletteTreeViewer::refreshItem(QTreeWidgetItem *item)
 	int pathIndex = 0;
 	while (itemIndex < currentChildCount || pathIndex < childrenPathCount) {
 		TFilePath path = (pathIndex < childrenPathCount) ? childrenPath[pathIndex] : TFilePath();
-		QTreeWidgetItem *currentItem = (itemIndex < currentChildCount) ? currentChildren[itemIndex] : 0;
+		QTreeWidgetItem *currentItem =
+			(itemIndex < currentChildCount) ? currentChildren[itemIndex] : 0;
 		TFilePath currentItemPath = getFolderPath(currentItem);
 
 		if (path == currentItemPath) {
 			itemIndex++;
 			pathIndex++;
 			refreshItem(currentItem);
-		} else if ((!path.isEmpty() && path < currentItemPath) ||
-				   currentItemPath.isEmpty()) {
+		} else if ((!path.isEmpty() && path < currentItemPath) || currentItemPath.isEmpty()) {
 			currentItem = createItem(path);
 			item->insertChild(pathIndex, currentItem);
 			refreshItem(currentItem);
@@ -413,7 +425,8 @@ void StudioPaletteTreeViewer::onItemSelectionChanged()
 		QString question;
 		question = "Current Studio Palette has been modified.\n"
 				   "Do you want to save your changes?";
-		int ret = MsgBox(0, question, QObject::tr("Save"), QObject::tr("Don't Save"), QObject::tr("Cancel"), 0);
+		int ret = MsgBox(0, question, QObject::tr("Save"), QObject::tr("Don't Save"),
+						 QObject::tr("Cancel"), 0);
 
 		TPaletteP oldPalette = m_stdPltHandle->getPalette();
 		TFilePath oldPath = StudioPalette::instance()->getPalettePath(oldPalette->getGlobalName());
@@ -532,7 +545,8 @@ void StudioPaletteTreeViewer::searchForPlt()
 */
 void StudioPaletteTreeViewer::loadInCurrentCleanupPlt()
 {
-	StudioPaletteCmd::loadIntoCleanupPalette(m_levelPltHandle, m_sceneHandle, getCurrentFolderPath());
+	StudioPaletteCmd::loadIntoCleanupPalette(m_levelPltHandle, m_sceneHandle,
+											 getCurrentFolderPath());
 }
 
 //-----------------------------------------------------------------------------
@@ -540,8 +554,8 @@ void StudioPaletteTreeViewer::loadInCurrentCleanupPlt()
 */
 void StudioPaletteTreeViewer::replaceCurrentCleanupPlt()
 {
-	StudioPaletteCmd::replaceWithCleanupPalette(m_levelPltHandle, m_stdPltHandle,
-												m_sceneHandle, getCurrentFolderPath());
+	StudioPaletteCmd::replaceWithCleanupPalette(m_levelPltHandle, m_stdPltHandle, m_sceneHandle,
+												getCurrentFolderPath());
 }
 
 //-----------------------------------------------------------------------------
@@ -558,8 +572,8 @@ void StudioPaletteTreeViewer::loadInCurrentPlt()
 */
 void StudioPaletteTreeViewer::replaceCurrentPlt()
 {
-	StudioPaletteCmd::replaceWithCurrentPalette(m_levelPltHandle, m_stdPltHandle,
-												m_sceneHandle, getCurrentFolderPath());
+	StudioPaletteCmd::replaceWithCurrentPalette(m_levelPltHandle, m_stdPltHandle, m_sceneHandle,
+												getCurrentFolderPath());
 }
 
 //-----------------------------------------------------------------------------
@@ -609,17 +623,19 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event)
 		createMenuAction(menu, tr("New Folder"), "addNewFolder()");
 	}
 
-	if (studioPlt->isFolder(path) &&
-		studioPlt->getLevelPalettesRoot() != path &&
+	if (studioPlt->isFolder(path) && studioPlt->getLevelPalettesRoot() != path &&
 		studioPlt->getCleanupPalettesRoot() != path &&
-		TFilePath("C:\\Toonz 6.0 stuff\\projects\\Project Palettes") != path) //DAFARE studioPlt->getProjectPalettesRoot(); Per ora lo fisso)
+		TFilePath("C:\\Toonz 6.0 stuff\\projects\\Project Palettes") !=
+			path) // DAFARE studioPlt->getProjectPalettesRoot(); Per ora lo fisso)
 	{
 		menu.addSeparator();
 		createMenuAction(menu, tr("Delete Folder"), "deleteItem()");
 	} else if (studioPlt->isPalette(path)) {
 		if (studioPlt->isCleanupPalette(path)) {
-			createMenuAction(menu, tr("Load into Current Cleaunp Palette"), "loadInCurrentCleanupPlt()");
-			createMenuAction(menu, tr("Replace with Current Cleaunp Palette"), "replaceCurrentCleanupPlt()");
+			createMenuAction(menu, tr("Load into Current Cleaunp Palette"),
+							 "loadInCurrentCleanupPlt()");
+			createMenuAction(menu, tr("Replace with Current Cleaunp Palette"),
+							 "replaceCurrentCleanupPlt()");
 			menu.addSeparator();
 		} else if (m_stdPltHandle->getPalette()) {
 			createMenuAction(menu, tr("Load into Current Palette"), "loadInCurrentPlt()");
@@ -639,7 +655,7 @@ void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event)
 }
 
 //-----------------------------------------------------------------------------
-/*! Add an action to menu \b menu; the action has text \b name and its 
+/*! Add an action to menu \b menu; the action has text \b name and its
 		\b triggered() signal is connetted with \b slot.
 */
 void StudioPaletteTreeViewer::createMenuAction(QMenu &menu, QString name, const char *slot)
@@ -667,9 +683,8 @@ void StudioPaletteTreeViewer::mouseMoveEvent(QMouseEvent *event)
 void StudioPaletteTreeViewer::startDragDrop()
 {
 	TFilePath path = getCurrentFolderPath();
-	if (!path.isEmpty() &&
-		(path.getType() == "tpl" || path.getType() == "pli" ||
-		 path.getType() == "tlv" || path.getType() == "tnz")) {
+	if (!path.isEmpty() && (path.getType() == "tpl" || path.getType() == "pli" ||
+							path.getType() == "tlv" || path.getType() == "tnz")) {
 		QDrag *drag = new QDrag(this);
 		QMimeData *mimeData = new QMimeData;
 		QList<QUrl> urls;
@@ -696,9 +711,8 @@ void StudioPaletteTreeViewer::dragEnterEvent(QDragEnterEvent *event)
 			return;
 		QUrl url = mimeData->urls()[0];
 		TFilePath path(url.toLocalFile().toStdWString());
-		if (path.isEmpty() ||
-			(path.getType() != "tpl" && path.getType() != "pli" &&
-			 path.getType() != "tlv" && path.getType() != "tnz"))
+		if (path.isEmpty() || (path.getType() != "tpl" && path.getType() != "pli" &&
+							   path.getType() != "tlv" && path.getType() != "tnz"))
 			return;
 		event->acceptProposedAction();
 	} else if (paletteData && !paletteData->hasStyleIndeces())
@@ -761,7 +775,8 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event)
 		}
 	} else {
 		TPalette *palette = studioPlt->getPalette(path);
-		//Se non trova palette sto importando: - la palette del livello corrente o - la cleanupPalette!
+		// Se non trova palette sto importando: - la palette del livello corrente o - la
+		// cleanupPalette!
 		if (!palette) {
 			if (path.getType() == "pli" || path.getType() == "tlv") {
 				TXshLevel *level = m_levelHandle->getLevel();
@@ -823,11 +838,9 @@ void StudioPaletteTreeViewer::showEvent(QShowEvent *event)
 		\b PaletteViewer is set to fixed view type: \b PaletteViewerGUI::STUDIO_PALETTE
 		allows to show and modify current studio palette selected in tree.
 */
-StudioPaletteViewer::StudioPaletteViewer(QWidget *parent,
-										 TPaletteHandle *studioPaletteHandle,
+StudioPaletteViewer::StudioPaletteViewer(QWidget *parent, TPaletteHandle *studioPaletteHandle,
 										 TPaletteHandle *levelPaletteHandle,
-										 TSceneHandle *sceneHandle,
-										 TXshLevelHandle *levelHandle,
+										 TSceneHandle *sceneHandle, TXshLevelHandle *levelHandle,
 										 TFrameHandle *frameHandle)
 	: QFrame(parent)
 {
@@ -840,20 +853,19 @@ StudioPaletteViewer::StudioPaletteViewer(QWidget *parent,
 	QSplitter *splitter = new QSplitter(this);
 	splitter->setOrientation(Qt::Vertical);
 
-	//First Splitter Widget
+	// First Splitter Widget
 	QWidget *treeWidget = new QWidget(this);
 	QVBoxLayout *treeVLayout = new QVBoxLayout(treeWidget);
 	treeVLayout->setMargin(0);
 	treeVLayout->setSpacing(0);
 
-	StudioPaletteTreeViewer *studioPltTreeViewer = new StudioPaletteTreeViewer(treeWidget,
-																			   studioPaletteHandle,
-																			   levelPaletteHandle);
+	StudioPaletteTreeViewer *studioPltTreeViewer =
+		new StudioPaletteTreeViewer(treeWidget, studioPaletteHandle, levelPaletteHandle);
 	studioPltTreeViewer->setSceneHandle(sceneHandle);
 	studioPltTreeViewer->setLevelHandle(levelHandle);
 	treeVLayout->addWidget(studioPltTreeViewer);
 
-	//Create toolbar. It is an horizontal layout with three internal toolbar.
+	// Create toolbar. It is an horizontal layout with three internal toolbar.
 	QWidget *treeToolbarWidget = new QWidget(this);
 	treeToolbarWidget->setFixedHeight(22);
 	QHBoxLayout *treeToolbarLayout = new QHBoxLayout(treeToolbarWidget);
@@ -861,12 +873,12 @@ StudioPaletteViewer::StudioPaletteViewer(QWidget *parent,
 	treeToolbarLayout->setSpacing(0);
 
 	QToolBar *newToolbar = new QToolBar(treeToolbarWidget);
-	//New folder action
+	// New folder action
 	QIcon newFolderIcon = createQIconPNG("newfolder");
 	QAction *addFolder = new QAction(newFolderIcon, tr("&New Folder"), newToolbar);
 	connect(addFolder, SIGNAL(triggered()), studioPltTreeViewer, SLOT(addNewFolder()));
 	newToolbar->addAction(addFolder);
-	//New palette action
+	// New palette action
 	QIcon newPaletteIcon = createQIconPNG("newpalette");
 	QAction *addPalette = new QAction(newPaletteIcon, tr("&New Palette"), newToolbar);
 	connect(addPalette, SIGNAL(triggered()), studioPltTreeViewer, SLOT(addNewPlt()));
@@ -877,7 +889,7 @@ StudioPaletteViewer::StudioPaletteViewer(QWidget *parent,
 	spacingToolBar->setMinimumHeight(22);
 
 	QToolBar *deleteToolbar = new QToolBar(treeToolbarWidget);
-	//Delete folder and palette action
+	// Delete folder and palette action
 	QIcon deleteFolderIcon = createQIconPNG("delete");
 	QAction *deleteFolder = new QAction(deleteFolderIcon, tr("&Delete"), deleteToolbar);
 	connect(deleteFolder, SIGNAL(triggered()), studioPltTreeViewer, SLOT(deleteItem()));
@@ -892,7 +904,7 @@ StudioPaletteViewer::StudioPaletteViewer(QWidget *parent,
 	treeVLayout->addWidget(treeToolbarWidget);
 	treeWidget->setLayout(treeVLayout);
 
-	//Second Splitter Widget
+	// Second Splitter Widget
 	PaletteViewer *studioPltViewer = new PaletteViewer(this, PaletteViewerGUI::STUDIO_PALETTE);
 	studioPltViewer->setPaletteHandle(studioPaletteHandle);
 	studioPltViewer->setFrameHandle(frameHandle);
@@ -913,6 +925,5 @@ StudioPaletteViewer::~StudioPaletteViewer()
 
 //=============================================================================
 
-OpenFloatingPanel openStudioPaletteCommand("MI_OpenStudioPalette",
-										   "StudioPalette",
+OpenFloatingPanel openStudioPaletteCommand("MI_OpenStudioPalette", "StudioPalette",
 										   "Studio Palette");

@@ -21,7 +21,7 @@ class RasterFreeDeformer : public FreeDeformer
 	TRasterP m_newRas;
 	bool m_noAntialiasing;
 
-public:
+  public:
 	RasterFreeDeformer(TRasterP ras);
 	~RasterFreeDeformer();
 
@@ -59,7 +59,7 @@ class UndoRasterDeform : public TUndo
 	TDimension m_dim;
 	int m_pixelSize;
 
-public:
+  public:
 	UndoRasterDeform(RasterSelectionTool *tool);
 	~UndoRasterDeform();
 
@@ -70,10 +70,7 @@ public:
 
 	int getSize() const;
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Deform Raster");
-	}
+	QString getHistoryString() { return QObject::tr("Deform Raster"); }
 };
 
 //=============================================================================
@@ -88,7 +85,7 @@ class UndoRasterTransform : public TUndo
 	FourPoints m_oldBbox, m_newBbox;
 	DragSelectionTool::DeformValues m_oldDeformValues, m_newDeformValues;
 
-public:
+  public:
 	UndoRasterTransform(RasterSelectionTool *tool);
 	void setChangedValues();
 	void undo() const;
@@ -96,10 +93,7 @@ public:
 
 	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Transform Raster");
-	}
+	QString getHistoryString() { return QObject::tr("Transform Raster"); }
 };
 
 //=============================================================================
@@ -108,12 +102,12 @@ public:
 
 class RasterDeformTool : public DeformTool
 {
-protected:
+  protected:
 	TAffine m_transform;
 	UndoRasterTransform *m_transformUndo;
 	UndoRasterDeform *m_deformUndo;
 
-	//!It's true when use RasterFreeDeformer
+	//! It's true when use RasterFreeDeformer
 	bool m_isFreeDeformer;
 
 	void applyTransform(FourPoints bbox);
@@ -123,7 +117,7 @@ protected:
 	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e){};
 	void draw(){};
 
-public:
+  public:
 	RasterDeformTool(RasterSelectionTool *tool, bool freeDeformer);
 };
 
@@ -135,7 +129,7 @@ class RasterRotationTool : public RasterDeformTool
 {
 	Rotation *m_rotation;
 
-public:
+  public:
 	RasterRotationTool(RasterSelectionTool *tool);
 	void transform(TAffine aff, double angle);
 	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
@@ -150,7 +144,7 @@ class RasterFreeDeformTool : public RasterDeformTool
 {
 	FreeDeform *m_freeDeform;
 
-public:
+  public:
 	RasterFreeDeformTool(RasterSelectionTool *tool);
 	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
 };
@@ -163,7 +157,7 @@ class RasterMoveSelectionTool : public RasterDeformTool
 {
 	MoveSelection *m_moveSelection;
 
-public:
+  public:
 	RasterMoveSelectionTool(RasterSelectionTool *tool);
 	void transform(TAffine aff);
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
@@ -178,7 +172,7 @@ class RasterScaleTool : public RasterDeformTool
 {
 	Scale *m_scale;
 
-public:
+  public:
 	RasterScaleTool(RasterSelectionTool *tool, int type);
 	/*! Return scale value. */
 	TPointD transform(int index, TPointD newPos);
@@ -186,7 +180,7 @@ public:
 	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
 };
 
-} //namespace DragSelectionTool
+} // namespace DragSelectionTool
 
 //=============================================================================
 // RasterSelectionTool
@@ -199,19 +193,19 @@ class RasterSelectionTool : public SelectionTool
 	RasterSelection m_rasterSelection;
 	int m_transformationCount;
 
-	//!Used in ToonzRasterImage to switch from selection tool to modify savebox tool.
+	//! Used in ToonzRasterImage to switch from selection tool to modify savebox tool.
 	TBoolProperty m_modifySavebox;
 	SetSaveboxTool *m_setSaveboxTool;
 	TBoolProperty m_noAntialiasing;
 
-	//!Used to deform bbox strokes.
+	//! Used to deform bbox strokes.
 	VectorFreeDeformer *m_selectionFreeDeformer;
 
 	void modifySelectionOnClick(TImageP image, const TPointD &pos, const TMouseEvent &e);
 
 	void drawFloatingSelection();
 
-public:
+  public:
 	RasterSelectionTool(int targetType);
 
 	void setBBox(const DragSelectionTool::FourPoints &points, int index = 0);
@@ -254,8 +248,8 @@ public:
 	bool onPropertyChanged(std::string propertyName);
 	bool getNoAntialiasingValue() { return m_noAntialiasing.getValue(); }
 
-protected:
+  protected:
 	void updateTranslation();
 };
 
-#endif //RASTERSELECTIONTOOL_INCLUDED
+#endif // RASTERSELECTIONTOOL_INCLUDED

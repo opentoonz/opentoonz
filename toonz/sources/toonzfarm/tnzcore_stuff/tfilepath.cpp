@@ -14,7 +14,7 @@ const char auxslash = '\\';
 
 //=============================================================================
 
-//TFrameId::operator string() const
+// TFrameId::operator string() const
 string TFrameId::expand(FrameFormat format) const
 {
 	if (m_frame == EMPTY_FRAME)
@@ -92,7 +92,7 @@ void TFilePath::setPath(string path)
 			m_path.append(1, slash);
 	}
 #ifdef WIN32
-	else //se si tratta di un path in formato UNC e' del tipo "\\\\MachineName"
+	else // se si tratta di un path in formato UNC e' del tipo "\\\\MachineName"
 		if (path.length() >= 3 && path[0] == '\\' && path[1] == '\\' && isalpha(path[2])) {
 		isUncName = true;
 		m_path.append(path, 0, 3);
@@ -134,16 +134,14 @@ void TFilePath::setPath(string path)
 
 //-----------------------------------------------------------------------------
 
-TFilePath::TFilePath(string path)
-	: m_path("")
+TFilePath::TFilePath(string path) : m_path("")
 {
 	setPath(path);
 }
 
 //-----------------------------------------------------------------------------
 
-TFilePath::TFilePath(const char *path)
-	: m_path("")
+TFilePath::TFilePath(const char *path) : m_path("")
 {
 	setPath(string(path));
 }
@@ -185,8 +183,8 @@ bool TFilePath::operator<(const TFilePath &fp) const
 	while (i2 != -1 || j2 != -1) {
 		iName = m_path.substr(i1, i2 - i1);
 		jName = fp.m_path.substr(j1, j2 - j1);
-//se le due parti di path, conpresi tra slash sono uguali
-//itero il processo di confronto altrimenti ritorno
+// se le due parti di path, conpresi tra slash sono uguali
+// itero il processo di confronto altrimenti ritorno
 #ifdef WIN32
 		char differ;
 		differ = stricmp(iName.c_str(), jName.c_str());
@@ -242,9 +240,9 @@ TFilePath TFilePath::operator+ (const TFilePath &fp) const
 assert(!fp.isAbsolute());
 if(fp.isEmpty()) return *this;
 else if(isEmpty()) return fp;
-else if(m_path.length()!=1 || m_path[0] != slash) 
+else if(m_path.length()!=1 || m_path[0] != slash)
   return TFilePath(m_path + slash + fp.m_path);
-else 
+else
   return TFilePath(m_path + fp.m_path);
 }
 */
@@ -314,7 +312,7 @@ string TFilePath::getUndottedType() const // ritorna l'estensione senza PUNTO
 
 string TFilePath::getName() const // noDot! noSlash!
 {
-	int i = getLastSlash(m_path); //cerco l'ultimo slash
+	int i = getLastSlash(m_path); // cerco l'ultimo slash
 	string str = m_path.substr(i + 1);
 	i = str.rfind(".");
 	if (i == string::npos)
@@ -329,15 +327,15 @@ string TFilePath::getName() const // noDot! noSlash!
 // es. TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
 string TFilePath::getLevelName() const
 {
-	int i = getLastSlash(m_path);	  //cerco l'ultimo slash
+	int i = getLastSlash(m_path); // cerco l'ultimo slash
 	string str = m_path.substr(i + 1); // str e' m_path senza directory
 	i = str.find(".");				   // posizione del primo punto di str
 	if (i == string::npos)
-		return str;			  // no frame; no type
-	int j = str.rfind(".");   // str[j..] = ".type"
-	if (j == i || j - i == 1) //prova.tif o prova..tif
+		return str;			// no frame; no type
+	int j = str.rfind("."); // str[j..] = ".type"
+	if (j == i || j - i == 1) // prova.tif o prova..tif
 		return str;
-	else //prova.0001.tif
+	else // prova.0001.tif
 		return str.erase(i + 1, j - i - 1);
 }
 
@@ -345,9 +343,11 @@ string TFilePath::getLevelName() const
 
 TFilePath TFilePath::getParentDir() const // noSlash!
 {
-	int i = getLastSlash(m_path); //cerco l'ultimo slash
+	int i = getLastSlash(m_path); // cerco l'ultimo slash
 	if (i < 0) {
-		if (m_path.length() >= 2 && ('a' <= m_path[0] && m_path[0] <= 'z' || 'A' <= m_path[0] && m_path[0] <= 'Z') && m_path[1] == ':')
+		if (m_path.length() >= 2 &&
+			('a' <= m_path[0] && m_path[0] <= 'z' || 'A' <= m_path[0] && m_path[0] <= 'Z') &&
+			m_path[1] == ':')
 			return TFilePath(m_path.substr(0, 2));
 		else
 			return TFilePath("");
@@ -361,7 +361,7 @@ TFilePath TFilePath::getParentDir() const // noSlash!
 
 TFrameId TFilePath::getFrame() const
 {
-	int i = getLastSlash(m_path);	  //cerco l'ultimo slash
+	int i = getLastSlash(m_path); // cerco l'ultimo slash
 	string str = m_path.substr(i + 1); // str e' il path senza parentdir
 	i = str.rfind('.');
 	if (i == string::npos || str == "." || str == "..")
@@ -389,7 +389,7 @@ TFilePath TFilePath::withType(const string &type) const
 {
 	const string dotDot = "..";
 	assert(type.length() < 2 || type.substr(0, 2) != dotDot);
-	int i = getLastSlash(m_path);	  //cerco l'ultimo slash
+	int i = getLastSlash(m_path); // cerco l'ultimo slash
 	string str = m_path.substr(i + 1); // str e' il path senza parentdir
 	int j = str.rfind('.');
 	if (j == string::npos || str == dotDot)
@@ -417,7 +417,7 @@ TFilePath TFilePath::withType(const string &type) const
 
 TFilePath TFilePath::withName(const string &name) const
 {
-	int i = getLastSlash(m_path);	  //cerco l'ultimo slash
+	int i = getLastSlash(m_path); // cerco l'ultimo slash
 	string str = m_path.substr(i + 1); // str e' il path senza parentdir
 	int j = str.rfind('.');
 	if (j == string::npos)
@@ -432,7 +432,7 @@ TFilePath TFilePath::withName(const string &name) const
 
 TFilePath TFilePath::withParentDir(const TFilePath &dir) const
 {
-	int i = getLastSlash(m_path); //cerco l'ultimo slash
+	int i = getLastSlash(m_path); // cerco l'ultimo slash
 	return dir + TFilePath(m_path.substr(i + 1));
 }
 
@@ -441,7 +441,7 @@ TFilePath TFilePath::withParentDir(const TFilePath &dir) const
 TFilePath TFilePath::withFrame(const TFrameId &frame, TFrameId::FrameFormat format) const
 {
 	const string dot = ".", dotDot = "..";
-	int i = getLastSlash(m_path);	  //cerco l'ultimo slash
+	int i = getLastSlash(m_path); // cerco l'ultimo slash
 	string str = m_path.substr(i + 1); // str e' il path senza parentdir
 	assert(str != dot && str != dotDot);
 	int j = str.rfind('.');
@@ -511,10 +511,8 @@ TFilePath TFilePath::operator-(const TFilePath &fp) const
 
 bool TFilePath::match(const TFilePath &fp) const
 {
-	return getParentDir() == fp.getParentDir() &&
-		   getName() == fp.getName() &&
-		   getFrame() == fp.getFrame() &&
-		   getType() == fp.getType();
+	return getParentDir() == fp.getParentDir() && getName() == fp.getName() &&
+		   getFrame() == fp.getFrame() && getType() == fp.getType();
 }
 
 //-----------------------------------------------------------------------------

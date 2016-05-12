@@ -40,8 +40,7 @@ class CSDirection
 	UCHAR equalizeDir_GTE50(UCHAR *sel, const int xx, const int yy, const int d);
 	UCHAR equalizeDir_LT50(UCHAR *sel, const int xx, const int yy, const int d);
 	void equalizeDir(UCHAR *sel, const int d);
-	double adjustAngle(const short sum[4], const int Ima,
-					   const int Im45, const int Ip45);
+	double adjustAngle(const short sum[4], const int Ima, const int Im45, const int Ip45);
 	double getAngle(const short sum[4], short ma);
 	UCHAR blurRadius(UCHAR *sel, const int xx, const int yy, const int dBlur);
 	void blurRadius(const int dBlur);
@@ -49,15 +48,15 @@ class CSDirection
 	bool isContourBorder(const int xx, const int yy, const int border);
 	void setContourBorder(const int border);
 
-public:
+  public:
 	CSDirection();
 	CSDirection(const int lX, const int lY, const UCHAR *sel, const int sens);
 	CSDirection(const int lX, const int lY, const UCHAR *sel, const int sens, const int border);
 	virtual ~CSDirection();
 
 	void doDir();
-	void doRadius(const double rH, const double rLR,
-				  const double rV, const double rRL, const int dBlur);
+	void doRadius(const double rH, const double rLR, const double rV, const double rRL,
+				  const int dBlur);
 	void getResult(UCHAR *sel);
 };
 

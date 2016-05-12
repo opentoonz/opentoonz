@@ -26,7 +26,7 @@ class TPopupMenuItem;
 
 class DVAPI TPopupMenuListener
 {
-public:
+  public:
 	TPopupMenuListener() {}
 	virtual ~TPopupMenuListener() {}
 
@@ -40,7 +40,7 @@ class DVAPI TPopupMenuItem : public TButton
 	wstring m_title;
 	bool m_selected;
 
-public:
+  public:
 	TPopupMenuItem(TPopupMenu *parent, string name);
 	void repaint();
 
@@ -65,7 +65,7 @@ public:
 class DVAPI TPopupMenuSeparator : public TWidget
 {
 
-public:
+  public:
 	TPopupMenuSeparator(TPopupMenu *parent);
 	void repaint();
 };
@@ -85,7 +85,7 @@ class DVAPI TPopupMenu : public TPopup
 	int m_visibleItemCount;
 	bool m_leftAlignment;
 
-public:
+  public:
 	TPopupMenu(TWidget *parent, string name = "popupMenu");
 	void draw();
 	void configureNotify(const TDimension &);
@@ -101,12 +101,9 @@ public:
 
 	static TPopupMenu *getCurrentMenu();
 
-	void setLeftAlignment(bool a)
-	{
-		m_leftAlignment = a;
-	}
+	void setLeftAlignment(bool a) { m_leftAlignment = a; }
 
-private:
+  private:
 	void updateItemsVisibility();
 	void updateSize();
 	void computeSize(TPoint &pos, int maxY);
@@ -130,14 +127,14 @@ private:
 //
 
 /*---- Example 1 (position indipendent) ----
-   
+
    void Pluto::rightButtonUp(const TMouseEvent &e) {
-     TContextMenu *menu = new TContextMenu(this);
-     menu->addCommand("MI_Cut");
-     menu->addCommand("MI_Copy");
-     menu->addCommand("MI_Paste");
-     menu->addCommand("MI_Clear");
-     TContextMenu::open(menu, e.m_pos);
+	 TContextMenu *menu = new TContextMenu(this);
+	 menu->addCommand("MI_Cut");
+	 menu->addCommand("MI_Copy");
+	 menu->addCommand("MI_Paste");
+	 menu->addCommand("MI_Clear");
+	 TContextMenu::open(menu, e.m_pos);
    }
 
 
@@ -145,31 +142,31 @@ private:
 
 
    class MyContextMenu : public TContextMenu {
-     int m_myValue;
+	 int m_myValue;
    public:
-     MyContextMenu(TWidget*parent, int myValue) 
-     : TContextMenu(parent), m_myValue(myValue), m_col(col) {
-        tconnect(this, "foo",  this, &CellContextMenu::onFoo);
-        tconnect(this, "bar",  this, &CellContextMenu::onBar);
-     }
-     void onFoo() { ... }
-     void onBar() { ... }
+	 MyContextMenu(TWidget*parent, int myValue)
+	 : TContextMenu(parent), m_myValue(myValue), m_col(col) {
+		tconnect(this, "foo",  this, &CellContextMenu::onFoo);
+		tconnect(this, "bar",  this, &CellContextMenu::onBar);
+	 }
+	 void onFoo() { ... }
+	 void onBar() { ... }
    };
 
    void Pluto::rightButtonUp(const TMouseEvent &e) {
-     int row = ....
-     int col = ....
-     TContextMenu::open(new CellContextMenu(this, row, col), e.m_pos);
+	 int row = ....
+	 int col = ....
+	 TContextMenu::open(new CellContextMenu(this, row, col), e.m_pos);
    }
 
   -----------------------------------------*/
 
 class DVAPI TContextMenu : public TPopupMenu
 {
-public:
+  public:
 	class CommandFilter
 	{
-	public:
+	  public:
 		virtual bool check(string cmdName) const = 0;
 		virtual ~CommandFilter() {}
 	};
@@ -185,7 +182,7 @@ public:
 	/*
   template <class T>
   inline void addCommand(string cmdName, T*target, void (T::*method)()) {
-    //addCommand(cmdName, new TCommandAction<T>(target, method));
+	//addCommand(cmdName, new TCommandAction<T>(target, method));
   }
 */
 	static void open(TContextMenu *menu, const TPoint &pos);
@@ -202,9 +199,7 @@ inline void tconnect(TContextMenu *menu, string cmdName, T *target, void (T::*me
 }
 
 template <class T, class Arg>
-inline void tconnect(
-	TContextMenu *menu, string cmdName,
-	T *target, void (T::*method)(Arg), Arg arg)
+inline void tconnect(TContextMenu *menu, string cmdName, T *target, void (T::*method)(Arg), Arg arg)
 {
 	menu->addCommand(cmdName, new TCommandAction1<T, Arg>(target, method, arg));
 }

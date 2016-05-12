@@ -9,8 +9,7 @@
 namespace tcg
 {
 
-template <typename E>
-struct edge_traits {
+template <typename E> struct edge_traits {
 	typedef typename E::vertices_const_iterator vertices_const_iterator;
 	typedef typename E::vertices_iterator vertices_iterator;
 
@@ -22,19 +21,19 @@ struct edge_traits {
 
 class Edge
 {
-public:
+  public:
 	typedef const int *vertices_const_iterator;
 	typedef int *vertices_iterator;
 
 	typedef const int *faces_const_iterator;
 	typedef int *faces_iterator;
 
-protected:
+  protected:
 	int m_v[2];
 	int m_f[2];
 	int m_index;
 
-public:
+  public:
 	Edge() : m_index(-1)
 	{
 		m_v[0] = -1, m_v[1] = -1;

@@ -20,9 +20,7 @@ string convertToUncString(const TFilePath &fp)
 	UNIVERSAL_NAME_INFO *puni = (UNIVERSAL_NAME_INFO *)&szBuff;
 
 	DWORD dwResult = WNetGetUniversalName(toString(fp.getWideString()).c_str(),
-										  UNIVERSAL_NAME_INFO_LEVEL,
-										  (LPVOID)&szBuff,
-										  &cbBuff);
+										  UNIVERSAL_NAME_INFO_LEVEL, (LPVOID)&szBuff, &cbBuff);
 
 	switch (dwResult) {
 	case NO_ERROR:

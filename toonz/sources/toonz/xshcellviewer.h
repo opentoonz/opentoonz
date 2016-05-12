@@ -25,19 +25,19 @@ class RenameCellField : public QLineEdit
 	int m_col;
 	XsheetViewer *m_viewer;
 
-public:
+  public:
 	RenameCellField(QWidget *parent, XsheetViewer *viewer);
 	~RenameCellField() {}
 
 	void showInRowCol(int row, int col);
 
-protected:
+  protected:
 	void focusOutEvent(QFocusEvent *);
 	void keyPressEvent(QKeyEvent *event);
 
 	void renameCell();
 
-protected slots:
+  protected slots:
 	void onReturnPressed();
 };
 
@@ -45,15 +45,15 @@ protected slots:
 // CellArea
 //-----------------------------------------------------------------------------
 
-//!La classe si occupa della visualizzazione delle celle nel viewer.
+//! La classe si occupa della visualizzazione delle celle nel viewer.
 class CellArea : public QWidget
 {
 	Q_OBJECT
 
 	XsheetViewer *m_viewer;
-	//smart tab
+	// smart tab
 	QRect m_levelExtenderRect;
-	//upper-directional smart tab
+	// upper-directional smart tab
 	QRect m_upperLevelExtenderRect;
 	QList<QRect> m_soundLevelModifyRects;
 
@@ -64,7 +64,7 @@ class CellArea : public QWidget
 	QString m_tooltip;
 
 	RenameCellField *m_renameCell;
-	
+
 	void drawCells(QPainter &p, const QRect toBeUpdated);
 	void drawLevelCell(QPainter &p, int row, int col, bool isReference = false);
 	void drawSoundTextCell(QPainter &p, int row, int col);
@@ -73,13 +73,13 @@ class CellArea : public QWidget
 	void drawKeyframe(QPainter &p, const QRect toBeUpdated);
 	void drawNotes(QPainter &p, const QRect toBeUpdated);
 
-	//Restistusce true
+	// Restistusce true
 	bool getEaseHandles(int r0, int r1, double e0, double e1, int &rh0, int &rh1);
 
 	DragTool *getDragTool() const;
 	void setDragTool(DragTool *dragTool);
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	CellArea(XsheetViewer *parent, Qt::WindowFlags flags = 0);
 #else
@@ -94,7 +94,7 @@ public:
 
 	//	void keyUpDownPressed(int newRow);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 
 	void mousePressEvent(QMouseEvent *event);
@@ -108,22 +108,22 @@ protected:
 	bool event(QEvent *event);
 
 	/*!Crea il menu' del tasto destro che si visualizza quando si clicca sulla cella,
-      distinguendo i due casi: cella piena, cella vuota.*/
+	  distinguendo i due casi: cella piena, cella vuota.*/
 	void createCellMenu(QMenu &menu, bool isCellSelected);
-	//!Crea il menu' del tasto destro che si visualizza si clicca su un key frame.
+	//! Crea il menu' del tasto destro che si visualizza si clicca su un key frame.
 	void createKeyMenu(QMenu &menu);
-	//!Crea il menu' del tasto destro che si visualizza quando si clicca sulla linea tre due key frame.
+	//! Crea il menu' del tasto destro che si visualizza quando si clicca sulla linea tre due key
+	//! frame.
 	void createKeyLineMenu(QMenu &menu, int row, int col);
-	//!Crea il menu' del tasto destro che si visualizza quando si sopra una nota.
+	//! Crea il menu' del tasto destro che si visualizza quando si sopra una nota.
 	void createNoteMenu(QMenu &menu);
 
-protected slots:
+  protected slots:
 	void openNote();
 	void deleteNote();
 	void onStepChanged(QAction *);
 	// replace level with another level in the cast
 	void onReplaceByCastedLevel(QAction *action);
-
 };
 
 } // namespace XsheetGUI

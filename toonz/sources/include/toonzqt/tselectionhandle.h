@@ -35,7 +35,7 @@ class DVAPI TSelectionHandle : public QObject
 	std::vector<TSelection *> m_selectionStack;
 	std::vector<std::string> m_enabledCommandIds;
 
-public:
+  public:
 	TSelectionHandle();
 	~TSelectionHandle();
 
@@ -52,9 +52,9 @@ public:
 
 	static TSelectionHandle *getCurrent();
 
-signals:
+  signals:
 	void selectionSwitched(TSelection *oldSelection, TSelection *newSelection);
 	void selectionChanged(TSelection *selection);
 };
 
-#endif //TSELECTIONHANDLE_H
+#endif // TSELECTIONHANDLE_H

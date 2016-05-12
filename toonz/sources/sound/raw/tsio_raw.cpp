@@ -8,8 +8,7 @@ using namespace std;
 
 //==============================================================================
 
-TSoundTrackReaderRaw::TSoundTrackReaderRaw(const TFilePath &fp)
-	: TSoundTrackReader(fp)
+TSoundTrackReaderRaw::TSoundTrackReaderRaw(const TFilePath &fp) : TSoundTrackReader(fp)
 {
 }
 
@@ -20,8 +19,8 @@ TSoundTrackP TSoundTrackReaderRaw::load()
 	Tifstream is(m_path);
 
 	if (!is)
-		throw TException(L"Unable to load the RAW file " +
-						 m_path.getWideString() + L" : doesn't exist");
+		throw TException(L"Unable to load the RAW file " + m_path.getWideString() +
+						 L" : doesn't exist");
 
 	is.seekg(0, ios_base::end);
 	long sampleCount = is.tellg() / 2;
@@ -34,8 +33,7 @@ TSoundTrackP TSoundTrackReaderRaw::load()
 
 //==============================================================================
 
-TSoundTrackWriterRaw::TSoundTrackWriterRaw(const TFilePath &fp)
-	: TSoundTrackWriter(fp)
+TSoundTrackWriterRaw::TSoundTrackWriterRaw(const TFilePath &fp) : TSoundTrackWriter(fp)
 {
 }
 
@@ -46,12 +44,12 @@ bool TSoundTrackWriterRaw::save(const TSoundTrackP &track)
 
 	TFileStatus fs(m_path);
 	if (fs.doesExist() && !fs.isWritable())
-		throw TException(L"Unable to save the soundtrack: " +
-						 m_path.getWideString() + L" is read-only");
+		throw TException(L"Unable to save the soundtrack: " + m_path.getWideString() +
+						 L" is read-only");
 
 	Tofstream os(m_path);
 
-	//inserisco i dati nell'output stream
+	// inserisco i dati nell'output stream
 
 	// os << (ULONG) (track->getSampleCount()) << " ";
 

@@ -40,16 +40,9 @@ class DVAPI TToneCurveParam : public TParam
 
 	TBoolParamP m_isLinear;
 
-	enum ToneChannel {
-		RGBA = 0,
-		RGB,
-		Red,
-		Green,
-		Blue,
-		Alpha
-	} m_toneChannel;
+	enum ToneChannel { RGBA = 0, RGB, Red, Green, Blue, Alpha } m_toneChannel;
 
-public:
+  public:
 	TToneCurveParam();
 	TToneCurveParam(const TToneCurveParam &src);
 	~TToneCurveParam() {}
@@ -86,8 +79,8 @@ public:
 	bool isKeyframe(double frame) const;
 	void deleteKeyframe(double frame);
 	void clearKeyframes();
-	void assignKeyframe(double frame, const TSmartPointerT<TParam> &src,
-						double srcFrame, bool changedOnly = false);
+	void assignKeyframe(double frame, const TSmartPointerT<TParam> &src, double srcFrame,
+						bool changedOnly = false);
 
 	void getKeyframes(std::set<double> &frames) const;
 	bool hasKeyframes() const;
@@ -106,7 +99,7 @@ template class DVAPI TDerivedSmartPointerT<TToneCurveParam, TParam>;
 
 class DVAPI TToneCurveParamP : public TDerivedSmartPointerT<TToneCurveParam, TParam>
 {
-public:
+  public:
 	TToneCurveParamP() {}
 	TToneCurveParamP(TToneCurveParam *p) : TDerivedSmartPointerT<TToneCurveParam, TParam>(p) {}
 	TToneCurveParamP(const TParamP &p) : TDerivedSmartPointerT<TToneCurveParam, TParam>(p) {}

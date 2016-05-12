@@ -32,12 +32,11 @@ void storeFloat(unsigned char *buffer, TUINT32 value);
 
 class TAIFFChunk
 {
-public:
+  public:
 	string m_name;
 	TINT32 m_length; // lunghezza del chunk in byte
 
-	TAIFFChunk(string name, TINT32 length)
-		: m_name(name), m_length(length) {}
+	TAIFFChunk(string name, TINT32 length) : m_name(name), m_length(length) {}
 
 	virtual ~TAIFFChunk() {}
 
@@ -47,10 +46,7 @@ public:
 		return true;
 	}
 
-	void skip(ifstream &is)
-	{
-		is.seekg((TINT32)is.tellg() + (TINT32)m_length);
-	}
+	void skip(ifstream &is) { is.seekg((TINT32)is.tellg() + (TINT32)m_length); }
 
 	static bool readHeader(ifstream &is, string &name, TINT32 &length)
 	{
@@ -83,14 +79,13 @@ public:
 
 class TCOMMChunk : public TAIFFChunk
 {
-public:
+  public:
 	USHORT m_chans;   // numero di canali
 	TUINT32 m_frames; // numero di campioni
 	USHORT m_bitPerSample;
 	TUINT32 m_sampleRate;
 
-	TCOMMChunk(string name, TINT32 length)
-		: TAIFFChunk(name, length) {}
+	TCOMMChunk(string name, TINT32 length) : TAIFFChunk(name, length) {}
 
 	virtual bool read(ifstream &is)
 	{
@@ -131,7 +126,7 @@ public:
 		UCHAR sampleRateBuffer[10];
 		storeFloat(sampleRateBuffer, sampleRate);
 
-		//assert(convertToLong(sampleRateBuffer) == sampleRate);
+		// assert(convertToLong(sampleRateBuffer) == sampleRate);
 
 		os.write((char *)"COMM", 4);
 		os.write((char *)&length, sizeof(TINT32));
@@ -166,13 +161,12 @@ ostream &operator<<(ostream &os, const TCOMMChunk &commChunk)
 
 class TSSNDChunk : public TAIFFChunk
 {
-public:
-	TUINT32 m_offset; //dall'inizio dei sample frames tra i wavedata
+  public:
+	TUINT32 m_offset; // dall'inizio dei sample frames tra i wavedata
 	TUINT32 m_blockSize;
 	std::unique_ptr<UCHAR[]> m_waveData;
 
-	TSSNDChunk(string name, TINT32 length)
-		: TAIFFChunk(name, length) {}
+	TSSNDChunk(string name, TINT32 length) : TAIFFChunk(name, length) {}
 
 	bool read(ifstream &is)
 	{
@@ -263,7 +257,7 @@ TUINT32 convertToLong(UCHAR *buffer)
 	UCHAR exp;
 
 	if (TNZ_LITTLE_ENDIAN) {
-		//flipLong((TUINT32 *) (buffer+2));
+		// flipLong((TUINT32 *) (buffer+2));
 		flipLong(buffer + 2);
 	}
 
@@ -314,15 +308,14 @@ void storeFloat(unsigned char *buffer, TUINT32 value)
 	buffer[0] = 0x40;
 
 	if (TNZ_LITTLE_ENDIAN) {
-		//flipLong((TUINT32*) (buffer+2));
+		// flipLong((TUINT32*) (buffer+2));
 		flipLong(buffer + 2);
 	}
 }
 
 //==============================================================================
 
-TSoundTrackReaderAiff::TSoundTrackReaderAiff(const TFilePath &fp)
-	: TSoundTrackReader(fp)
+TSoundTrackReaderAiff::TSoundTrackReaderAiff(const TFilePath &fp) : TSoundTrackReader(fp)
 {
 }
 
@@ -337,8 +330,8 @@ TSoundTrackP TSoundTrackReaderAiff::load()
 	Tifstream is(m_path);
 
 	if (!is)
-		throw TException(L"Unable to load the AIFF file " +
-						 m_path.getWideString() + L" : doesn't exist");
+		throw TException(L"Unable to load the AIFF file " + m_path.getWideString() +
+						 L" : doesn't exist");
 
 	// legge il chunk ID
 	is.read((char *)&ckID, sizeof(ckID) - 1);
@@ -411,55 +404,47 @@ TSoundTrackP TSoundTrackReaderAiff::load()
 		switch (commChunk->m_bitPerSample) {
 		case 8:
 			if (commChunk->m_chans == 1)
-				track = new TSoundTrackMono8Signed(
-					commChunk->m_sampleRate,
-					1, (TINT32)commChunk->m_frames);
+				track = new TSoundTrackMono8Signed(commChunk->m_sampleRate, 1,
+												   (TINT32)commChunk->m_frames);
 			else
-				track = new TSoundTrackStereo8Signed(
-					commChunk->m_sampleRate,
-					2, (TINT32)commChunk->m_frames);
+				track = new TSoundTrackStereo8Signed(commChunk->m_sampleRate, 2,
+													 (TINT32)commChunk->m_frames);
 
-			memcpy(
-				(void *)track->getRawData(),
-				(void *)(ssndChunk->m_waveData.get() + ssndChunk->m_offset),
-				commChunk->m_frames * commChunk->m_chans);
+			memcpy((void *)track->getRawData(),
+				   (void *)(ssndChunk->m_waveData.get() + ssndChunk->m_offset),
+				   commChunk->m_frames * commChunk->m_chans);
 			break;
 
 		case 16:
 			if (commChunk->m_chans == 1)
-				track = new TSoundTrackMono16(
-					commChunk->m_sampleRate,
-					1, (TINT32)commChunk->m_frames);
+				track =
+					new TSoundTrackMono16(commChunk->m_sampleRate, 1, (TINT32)commChunk->m_frames);
 			else // due canali
-				track = new TSoundTrackStereo16(
-					commChunk->m_sampleRate,
-					2, (TINT32)commChunk->m_frames);
+				track = new TSoundTrackStereo16(commChunk->m_sampleRate, 2,
+												(TINT32)commChunk->m_frames);
 
 			if (!TNZ_LITTLE_ENDIAN)
-				memcpy(
-					(void *)track->getRawData(),
-					(void *)(ssndChunk->m_waveData.get() + ssndChunk->m_offset),
-					commChunk->m_frames * track->getSampleSize());
+				memcpy((void *)track->getRawData(),
+					   (void *)(ssndChunk->m_waveData.get() + ssndChunk->m_offset),
+					   commChunk->m_frames * track->getSampleSize());
 			else
-				swapAndCopySamples(
-					(short *)(ssndChunk->m_waveData.get() + ssndChunk->m_offset),
-					(short *)track->getRawData(),
-					(TINT32)(commChunk->m_frames * commChunk->m_chans));
+				swapAndCopySamples((short *)(ssndChunk->m_waveData.get() + ssndChunk->m_offset),
+								   (short *)track->getRawData(),
+								   (TINT32)(commChunk->m_frames * commChunk->m_chans));
 			break;
 
 		case 24:
 			if (commChunk->m_chans == 1)
-				track = new TSoundTrackMono24(
-					commChunk->m_sampleRate,
-					1, (TINT32)commChunk->m_frames);
+				track =
+					new TSoundTrackMono24(commChunk->m_sampleRate, 1, (TINT32)commChunk->m_frames);
 			else // due canali
-				track = new TSoundTrackStereo24(
-					commChunk->m_sampleRate,
-					2, (TINT32)commChunk->m_frames);
+				track = new TSoundTrackStereo24(commChunk->m_sampleRate, 2,
+												(TINT32)commChunk->m_frames);
 
 			if (!TNZ_LITTLE_ENDIAN) {
 				UCHAR *begin = (UCHAR *)track->getRawData();
-				for (int i = 0; i < (int)(commChunk->m_frames * commChunk->m_chans); ++i) { //dovrebbe andare bene anche adesso
+				for (int i = 0; i < (int)(commChunk->m_frames * commChunk->m_chans);
+					 ++i) { // dovrebbe andare bene anche adesso
 					*(begin + 4 * i) = 0;
 					*(begin + 4 * i + 1) =
 						*(ssndChunk->m_waveData.get() + ssndChunk->m_offset + 3 * i);
@@ -480,16 +465,16 @@ TSoundTrackP TSoundTrackReaderAiff::load()
 					*(begin + 4 * i + 3) = 0;
 
 					/*
-            *(begin + 4*i) = 0;
-            *(begin + 4*i + 3) =
-              *(ssndChunk->m_waveData+ssndChunk->m_offset + 3*i + 2);
-            
-            // sono i due byte che vengono invertiti
-            *(begin + 4*i + 1) = 
-              *(ssndChunk->m_waveData+ssndChunk->m_offset + 3*i + 1);
-            *(begin + 4*i + 2) = 
-              *(ssndChunk->m_waveData+ssndChunk->m_offset + 3*i);
-            */
+			*(begin + 4*i) = 0;
+			*(begin + 4*i + 3) =
+			  *(ssndChunk->m_waveData+ssndChunk->m_offset + 3*i + 2);
+
+			// sono i due byte che vengono invertiti
+			*(begin + 4*i + 1) =
+			  *(ssndChunk->m_waveData+ssndChunk->m_offset + 3*i + 1);
+			*(begin + 4*i + 2) =
+			  *(ssndChunk->m_waveData+ssndChunk->m_offset + 3*i);
+			*/
 				}
 			}
 			break;
@@ -506,8 +491,7 @@ TSoundTrackP TSoundTrackReaderAiff::load()
 
 //==============================================================================
 
-TSoundTrackWriterAiff::TSoundTrackWriterAiff(const TFilePath &fp)
-	: TSoundTrackWriter(fp)
+TSoundTrackWriterAiff::TSoundTrackWriterAiff(const TFilePath &fp) : TSoundTrackWriter(fp)
 {
 }
 
@@ -530,15 +514,15 @@ bool TSoundTrackWriterAiff::save(const TSoundTrackP &st)
 
 	TFileStatus fs(m_path);
 	if (fs.doesExist() && !fs.isWritable())
-		throw TException(L"Unable to save the soundtrack: " +
-						 m_path.getWideString() + L" is read-only");
+		throw TException(L"Unable to save the soundtrack: " + m_path.getWideString() +
+						 L" is read-only");
 
 	Tofstream os(m_path);
 
 	TCOMMChunk commChunk("COMM", 18);
 	commChunk.m_chans = sndtrack->getChannelCount();
 	commChunk.m_frames = sndtrack->getSampleCount();
-	commChunk.m_bitPerSample = sndtrack->getBitPerSample(); //assumendo che non ci siano 12 bit
+	commChunk.m_bitPerSample = sndtrack->getBitPerSample(); // assumendo che non ci siano 12 bit
 	commChunk.m_sampleRate = sndtrack->getSampleRate();
 
 	TSSNDChunk ssndChunk("SSND", soundDataCount + OFFSETBLOCSIZE_NBYTE);
@@ -551,10 +535,8 @@ bool TSoundTrackWriterAiff::save(const TSoundTrackP &st)
 		postHeadData = swapTINT32(postHeadData);
 
 		if (commChunk.m_bitPerSample == 16) {
-			swapAndCopySamples(
-				(short *)sndtrack->getRawData(),
-				(short *)waveData.get(),
-				(TINT32)(commChunk.m_frames * commChunk.m_chans));
+			swapAndCopySamples((short *)sndtrack->getRawData(), (short *)waveData.get(),
+							   (TINT32)(commChunk.m_frames * commChunk.m_chans));
 		} else if (commChunk.m_bitPerSample == 24) {
 			UCHAR *begin = (UCHAR *)sndtrack->getRawData();
 			for (int i = 0; i < (int)commChunk.m_frames * commChunk.m_chans; ++i) {
@@ -563,24 +545,18 @@ bool TSoundTrackWriterAiff::save(const TSoundTrackP &st)
 				*(waveData.get() + 3 * i + 2) = *(begin + 4 * i);
 
 				/*
-        *(waveData + 3*i + 2) = *(begin + 4*i + 3);
-        
-        // posiziona in modo corretto i due byte prima invertiti
-        *(waveData + 3*i) = *(begin + 4*i + 2);
-        *(waveData + 3*i + 1) = *(begin + 4*i + 1);
-        */
+		*(waveData + 3*i + 2) = *(begin + 4*i + 3);
+
+		// posiziona in modo corretto i due byte prima invertiti
+		*(waveData + 3*i) = *(begin + 4*i + 2);
+		*(waveData + 3*i + 1) = *(begin + 4*i + 1);
+		*/
 			}
 		} else
-			memcpy(
-				(void *)waveData.get(),
-				(void *)sndtrack->getRawData(),
-				soundDataCount);
+			memcpy((void *)waveData.get(), (void *)sndtrack->getRawData(), soundDataCount);
 	} else {
 		if (commChunk.m_bitPerSample != 24)
-			memcpy(
-				(void *)waveData.get(),
-				(void *)sndtrack->getRawData(),
-				soundDataCount);
+			memcpy((void *)waveData.get(), (void *)sndtrack->getRawData(), soundDataCount);
 		else {
 			UCHAR *begin = (UCHAR *)sndtrack->getRawData();
 			for (int i = 0; i < (int)commChunk.m_frames * commChunk.m_chans; ++i) {

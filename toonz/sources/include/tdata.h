@@ -31,10 +31,10 @@ class DVAPI TData : public TSmartObject
 
 	DECLARE_CLASS_CODE
 
-protected:
+  protected:
 	TData() : TSmartObject(m_classCode) {}
 
-public:
+  public:
 	virtual TDataP clone() const = 0;
 };
 
@@ -44,7 +44,7 @@ class DVAPI TTextData : public TData
 {
 	TString m_text;
 
-public:
+  public:
 	TTextData(TString text) : m_text(text) {}
 	TTextData(std::string text);
 
@@ -64,7 +64,7 @@ class DVAPI TFilePathListData : public TData
 {
 	std::vector<TFilePath> m_filePaths;
 
-public:
+  public:
 	TFilePathListData(const std::vector<TFilePath> &filePaths) : m_filePaths(filePaths) {}
 	TDataP clone() const;
 

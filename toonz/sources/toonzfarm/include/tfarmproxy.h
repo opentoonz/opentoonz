@@ -28,7 +28,7 @@ using std::vector;
 
 class TFARMAPI TFarmProxy
 {
-public:
+  public:
 	TFarmProxy(const QString &hostName, const QString &addr, int port)
 		: m_hostName(hostName), m_addr(addr), m_port(port)
 	{
@@ -39,7 +39,7 @@ public:
 	QString sendToStub(const QString &data);
 	static int extractArgs(const QString &s, vector<QString> &argv);
 
-protected:
+  protected:
 	QString m_hostName;
 	QString m_addr;
 	int m_port;
@@ -49,30 +49,19 @@ protected:
 
 class TFARMAPI TFarmProxyException : public TException
 {
-public:
-	TFarmProxyException(
-		const QString &hostname,
-		const QString &addr,
-		int port,
-		const QString &msg)
-		: TException(msg.toStdString()), m_hostName(hostname), m_address(addr), m_port(port) {}
-
-	QString getHostName() const
+  public:
+	TFarmProxyException(const QString &hostname, const QString &addr, int port, const QString &msg)
+		: TException(msg.toStdString()), m_hostName(hostname), m_address(addr), m_port(port)
 	{
-		return m_hostName;
 	}
 
-	QString getAddress() const
-	{
-		return m_address;
-	}
+	QString getHostName() const { return m_hostName; }
 
-	int getPort() const
-	{
-		return m_port;
-	}
+	QString getAddress() const { return m_address; }
 
-protected:
+	int getPort() const { return m_port; }
+
+  protected:
 	QString m_hostName;
 	QString m_address;
 	int m_port;
@@ -82,11 +71,11 @@ protected:
 
 class CantConnectToStub : public TFarmProxyException
 {
-public:
-	CantConnectToStub(
-		const QString &hostname,
-		const QString &addr,
-		int port) : TFarmProxyException(hostname, addr, port, "") {}
+  public:
+	CantConnectToStub(const QString &hostname, const QString &addr, int port)
+		: TFarmProxyException(hostname, addr, port, "")
+	{
+	}
 
 	TString getMessage() const;
 };

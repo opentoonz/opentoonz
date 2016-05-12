@@ -26,7 +26,7 @@ class DVAPI TCleanupStyle : public TSolidColorStyle
 	bool m_contrastEnable;
 	bool m_canUpdate;
 
-public:
+  public:
 	TCleanupStyle(const TPixel32 &color = TPixel32::Black);
 	TCleanupStyle(const TCleanupStyle &);
 	~TCleanupStyle();
@@ -55,11 +55,11 @@ public:
 
 	void makeIcon(const TDimension &size);
 
-protected:
+  protected:
 	void loadData(TInputStreamInterface &);
 	void saveData(TOutputStreamInterface &) const;
 
-private:
+  private:
 	// not implemented
 	TCleanupStyle &operator=(const TCleanupStyle &);
 
@@ -73,7 +73,7 @@ class DVAPI TColorCleanupStyle : public TCleanupStyle
 	double m_hRange;
 	double m_lineWidth;
 
-public:
+  public:
 	TColorCleanupStyle(const TPixel32 &color = TPixel32::Black);
 
 	TColorStyle *clone() const;
@@ -92,11 +92,11 @@ public:
 	double getLineWidth() const { return m_lineWidth; }
 	void setLineWidth(double lineWidth);
 
-protected:
+  protected:
 	void loadData(TInputStreamInterface &);
 	void saveData(TOutputStreamInterface &) const;
 
-private:
+  private:
 	// not implemented
 	TColorCleanupStyle &operator=(const TColorCleanupStyle &);
 };
@@ -107,7 +107,7 @@ class DVAPI TBlackCleanupStyle : public TCleanupStyle
 {
 	double m_colorThreshold, m_whiteThreshold;
 
-public:
+  public:
 	TBlackCleanupStyle(const TPixel32 &color = TPixel32::Black);
 
 	TColorStyle *clone() const;
@@ -125,11 +125,11 @@ public:
 	double getWhiteThreshold() const { return m_whiteThreshold; }
 	void setWhiteThreshold(double t);
 
-protected:
+  protected:
 	void loadData(TInputStreamInterface &);
 	void saveData(TOutputStreamInterface &) const;
 
-private:
+  private:
 	// not implemented
 	TBlackCleanupStyle &operator=(const TBlackCleanupStyle &);
 };

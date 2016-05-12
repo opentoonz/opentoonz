@@ -51,15 +51,15 @@ class DVAPI FileField : public QWidget
 	QFileDialog::FileMode m_fileMode;
 	QString m_windowTitle;
 
-protected: //used in the child class for CleanupSettings
+  protected: // used in the child class for CleanupSettings
 	QPushButton *m_fileBrowseButton;
 	QString m_lastSelectedPath;
 
-public:
+  public:
 	/* N.B. Vedi il commento della classe BrowserPopupController in filebrowserpopup.cpp*/
 	class BrowserPopupController
 	{
-	public:
+	  public:
 		BrowserPopupController() {}
 		virtual ~BrowserPopupController() {}
 		virtual bool isExecute() { return true; };
@@ -74,7 +74,8 @@ public:
 
 	/*! Set what the user may select in the file dialog:
 			\li QFileDialog::DirectoryOnly show only directory.
-			\li QFileDialog::AnyFile, QFileDialog::ExistingFile, QFileDialog::Directory, QFileDialog::ExistingFiles
+			\li QFileDialog::AnyFile, QFileDialog::ExistingFile, QFileDialog::Directory,
+	   QFileDialog::ExistingFiles
 					show directory and file. */
 	void setFileMode(const QFileDialog::FileMode &fileMode);
 	/*! Set file type in dialog popup. */
@@ -86,20 +87,20 @@ public:
 	static void setBrowserPopupController(BrowserPopupController *controller);
 	static BrowserPopupController *getBrowserPopupController();
 
-protected slots:
+  protected slots:
 	/*! Open a static file dialog popup to browse and choose directories. If a
 			directory is seleceted and choose, set field to this directory. */
-	//reimplemented in the "save in" filefield in CleanupSettings
+	// reimplemented in the "save in" filefield in CleanupSettings
 	virtual void browseDirectory();
 
-signals:
+  signals:
 	/*!	This signal is emitted when path in field change, or by field edit or by
 			browse popup. */
 	void pathChanged();
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+} // namespace DVGui
 //-----------------------------------------------------------------------------
 
 #endif // FILEFIELD_H

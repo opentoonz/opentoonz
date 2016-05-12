@@ -16,12 +16,12 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TXsheet;
 class TXshZeraryFxColumn;
 
 //=============================================================================
-//!The TXshZeraryFxLevel class provides a zerary fx level of xsheet and allows its management.
+//! The TXshZeraryFxLevel class provides a zerary fx level of xsheet and allows its management.
 /*!Inherits \b TXshLevel.
  */
 //=============================================================================
@@ -33,12 +33,12 @@ class DVAPI TXshZeraryFxLevel : public TXshLevel
 	TXshZeraryFxColumn *m_zeraryFxColumn;
 
 	DECLARE_CLASS_CODE
-public:
+  public:
 	TXshZeraryFxLevel();
 	~TXshZeraryFxLevel();
 
 	/*!
-    Return the \b TXshZeraryFxLevel zerary fx level.
+	Return the \b TXshZeraryFxLevel zerary fx level.
   */
 	TXshZeraryFxLevel *getZeraryFxLevel() { return this; }
 
@@ -51,7 +51,7 @@ public:
 	void load();
 	void save();
 
-private:
+  private:
 	// not implemented
 	TXshZeraryFxLevel(const TXshZeraryFxLevel &);
 	TXshZeraryFxLevel &operator=(const TXshZeraryFxLevel &);

@@ -15,7 +15,8 @@ extern "C" {
 extern int TTWAIN_MessageHook(void *lpmsg);
 
 OSErr CPSSetProcessName(ProcessSerialNumber *psn, char *processname);
-OSErr CPSEnableForegroundOperation(ProcessSerialNumber *psn, UInt32 _arg2, UInt32 _arg3, UInt32 _arg4, UInt32 _arg5);
+OSErr CPSEnableForegroundOperation(ProcessSerialNumber *psn, UInt32 _arg2, UInt32 _arg3,
+								   UInt32 _arg4, UInt32 _arg5);
 
 int ScanDone = 0;
 
@@ -49,12 +50,8 @@ void unregisterTwainCallback(void)
 
 /*---------------------------------------------------------------------------*/
 
-TW_UINT16 twainCallback(pTW_IDENTITY pOrigin,
-						pTW_IDENTITY pDest,
-						TW_UINT32 DG,
-						TW_UINT16 DAT,
-						TW_UINT16 MSG,
-						TW_MEMREF pData)
+TW_UINT16 twainCallback(pTW_IDENTITY pOrigin, pTW_IDENTITY pDest, TW_UINT32 DG, TW_UINT16 DAT,
+						TW_UINT16 MSG, TW_MEMREF pData)
 {
 	PRINTF("%s msg=0x%x\n", __PRETTY_FUNCTION__, MSG);
 	TTWAIN_MessageHook((void *)MSG);
@@ -82,7 +79,7 @@ too fast purging the queue.
 	sleep(2);
 #endif
 	printf("calling QuitApplicationEventLoop\n");
-	//QuitApplicationEventLoop();
+	// QuitApplicationEventLoop();
 
 	unregisterTwainCallback();
 	return 0;
@@ -93,7 +90,7 @@ too fast purging the queue.
 static void myEventLoopTimer()
 {
 	printf("my event loop timer ScanDone = %d\n", ScanDone);
-	//if (ScanDone)
+	// if (ScanDone)
 	// QuitApplicationEventLoop ();
 }
 
@@ -113,20 +110,20 @@ void setupUI(void)
 /* We end up with the ugly console dock icon; let's override it */
 /*char *iconfile = "/tmp/image.png";
   CFURLRef url = CFURLCreateFromFileSystemRepresentation (kCFAllocatorDefault,
-                                                          (UInt8 *)iconfile,
-                                                          strlen (iconfile),
-                                                          FALSE);
+														  (UInt8 *)iconfile,
+														  strlen (iconfile),
+														  FALSE);
 
   CGDataProviderRef png = CGDataProviderCreateWithURL (url);
   CGImageRef icon = CGImageCreateWithPNGDataProvider (png, NULL, TRUE,
-                                             kCGRenderingIntentDefault);
+											 kCGRenderingIntentDefault);
 
   /* Voodoo magic fix inspired by java_swt launcher */
 /* Without this the icon setting doesn't work about half the time. */
-//CGrafPtr p = BeginQDContextForApplicationDockTile();
-//EndQDContextForApplicationDockTile(p);
+// CGrafPtr p = BeginQDContextForApplicationDockTile();
+// EndQDContextForApplicationDockTile(p);
 
-//SetApplicationDockTileImage (icon);
+// SetApplicationDockTileImage (icon);
 #else
 	int numComponents = 4;
 	int bitsPerPixelChannel = 8;
@@ -142,7 +139,8 @@ void setupUI(void)
 	context = BeginCGContextForApplicationDockTile();
 	provider = CGDataProviderCreateWithData(0, buffer, (bytesPerRow * h), 0);
 	colorSpace = CGColorSpaceCreateDeviceRGB();
-	image = CGImageCreate(w, h, bitsPerPixelChannel, totalBitsPerPixel, bytesPerRow, colorSpace, kCGImageAlphaFirst, provider, 0, 0, kCGRenderingIntentDefault);
+	image = CGImageCreate(w, h, bitsPerPixelChannel, totalBitsPerPixel, bytesPerRow, colorSpace,
+						  kCGImageAlphaFirst, provider, 0, 0, kCGRenderingIntentDefault);
 	CGDataProviderRelease(provider);
 	CGColorSpaceRelease(colorSpace);
 	SetApplicationDockTileImage(image);
@@ -185,20 +183,20 @@ void registerTwainCallback(void)
 processed = TTWAIN_DS(DG_CONTROL, DAT_CALLBACK, MSG_REGISTER_CALLBACK,  (TW_MEMREF) &callback);
 */
 
-		rc = TTwainData.resultCode = (*TTwainData.DSM_Entry)(&TTwainData.appId,
-															 0,
-															 DG_CONTROL, DAT_CALLBACK, MSG_REGISTER_CALLBACK, (TW_MEMREF)&callback);
+		rc = TTwainData.resultCode =
+			(*TTwainData.DSM_Entry)(&TTwainData.appId, 0, DG_CONTROL, DAT_CALLBACK,
+									MSG_REGISTER_CALLBACK, (TW_MEMREF)&callback);
 
-		//NSRunLoop* runLoop = [NSRunLoop currentRunLoop];
+		// NSRunLoop* runLoop = [NSRunLoop currentRunLoop];
 
-		//EventLoopTimerRef timer;
+		// EventLoopTimerRef timer;
 		/*OSStatus err;
 
   // Set this up to run once the event loop is started
   err = InstallEventLoopTimer (GetMainEventLoop (),
-                               0, 0, // Immediately, once only
-                               NewEventLoopTimerUPP (myEventLoopTimer),
-                               0, &timer);*/
+							   0, 0, // Immediately, once only
+							   NewEventLoopTimerUPP (myEventLoopTimer),
+							   0, &timer);*/
 		CallbackRegistered = 1;
 	} else {
 		PRINTF("%s already registered!, don't register\n", __FUNCTION__);
@@ -219,7 +217,7 @@ void TTWAIN_ModalEventLoopPD(void)
 {
 	printf("%s\n", __PRETTY_FUNCTION__);
 	registerTwainCallback();
-	//RunApplicationEventLoop();
+	// RunApplicationEventLoop();
 	return;
 
 	TTwainData.breakModalLoop = FALSE;

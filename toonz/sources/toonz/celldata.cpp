@@ -13,8 +13,7 @@
 
 //-----------------------------------------------------------------------------
 
-TCellData::TCellData()
-	: m_rowCount(0), m_colCount(0)
+TCellData::TCellData() : m_rowCount(0), m_colCount(0)
 {
 }
 
@@ -68,7 +67,8 @@ void TCellData::setCells(TXsheet *xsh, int r0, int c0, int r1, int c1)
 //-----------------------------------------------------------------------------
 
 // data -> xsh
-bool TCellData::getCells(TXsheet *xsh, int r0, int c0, int &r1, int &c1, bool insert, bool doZeraryClone) const
+bool TCellData::getCells(TXsheet *xsh, int r0, int c0, int &r1, int &c1, bool insert,
+						 bool doZeraryClone) const
 {
 	int c;
 	r1 = r0 + m_rowCount - 1;
@@ -88,7 +88,7 @@ bool TCellData::getCells(TXsheet *xsh, int r0, int c0, int &r1, int &c1, bool in
 			while (cellIndex < (index + 1) * m_rowCount && m_cells[cellIndex].isEmpty())
 				++cellIndex;
 			/*- 選択範囲の終端 -*/
-			if ((int)m_cells.size() <= cellIndex) //Celle vuote.
+			if ((int)m_cells.size() <= cellIndex) // Celle vuote.
 				return cellSet;
 			/*- カラムが変更不可なら次のカラムへ -*/
 			if (!canChange(column, index))
@@ -138,7 +138,7 @@ bool TCellData::canChange(TXshColumn *column, int index) const
 	assert(cellColumn);
 	int i;
 	for (i = index * m_rowCount; i < (index * m_rowCount) + m_rowCount; i++)
-		//for(i = 0; i < m_cells.size(); i++)
+		// for(i = 0; i < m_cells.size(); i++)
 		if (!cellColumn->canSetCell(m_cells[i]))
 			return false;
 	return true;

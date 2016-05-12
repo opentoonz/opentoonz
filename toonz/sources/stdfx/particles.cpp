@@ -11,8 +11,7 @@
 #include "tofflinegl.h"
 
 /*-----------------------------------------------------------------*/
-void Particle::create_Animation(const particles_values &values,
-								int first, int last)
+void Particle::create_Animation(const particles_values &values, int first, int last)
 {
 	switch (values.animation_val) {
 	case ParticlesFx::ANIM_CYCLE:
@@ -33,11 +32,11 @@ void Particle::create_Animation(const particles_values &values,
 }
 
 //------------------------------------------------------------------
-Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles, const particles_values &values,
-				   const particles_ranges &ranges, std::vector<std::vector<TPointD>> &myregions,
-				   int howmany, int first, int level, int last,
-					 std::vector<std::vector<int>> &myHistogram,
-					 std::vector<float> &myWeight)
+Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles,
+				   const particles_values &values, const particles_ranges &ranges,
+				   std::vector<std::vector<TPointD>> &myregions, int howmany, int first, int level,
+				   int last, std::vector<std::vector<int>> &myHistogram,
+				   std::vector<float> &myWeight)
 {
 	double random_s_a_range, random_speed;
 	std::map<int, double> imagereferences;
@@ -45,14 +44,13 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles, c
 	double randomxreference = 0.0;
 	double randomyreference = 0.0;
 	create_Animation(values, 0, last);
-	//lifetime=values.lifetime_val.first+ranges.lifetime_range*random->getFloat();
+	// lifetime=values.lifetime_val.first+ranges.lifetime_range*random->getFloat();
 
 	this->level = level;
 
 	/*- 初期座標値をつくる -*/
 	/*-- Perspective DistributionがONかつ、SizeのControlImageが刺さっている場合	--*/
-	if (myregions.size() &&
-		values.scale_ctrl_val != ParticlesFx::CTRL_NONE &&
+	if (myregions.size() && values.scale_ctrl_val != ParticlesFx::CTRL_NONE &&
 		values.perspective_distribution_val) {
 		float size = myWeight[255];
 		/*- 候補の中のIndex -*/
@@ -110,11 +108,8 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles, c
 	}
 
 	for (std::map<int, TTile *>::iterator it = porttiles.begin(); it != porttiles.end(); ++it) {
-		if (
-			(values.lifetime_ctrl_val == it->first ||
-			 values.speed_ctrl_val == it->first ||
-			 values.scale_ctrl_val == it->first ||
-			 values.rot_ctrl_val == it->first
+		if ((values.lifetime_ctrl_val == it->first || values.speed_ctrl_val == it->first ||
+			 values.scale_ctrl_val == it->first || values.rot_ctrl_val == it->first
 			 /*-  Speed Angleを明るさでコントロールする場合 -*/
 			 || (values.speeda_ctrl_val == it->first && !values.speeda_use_gradient_val)) &&
 			it->second->getRaster()) {
@@ -130,7 +125,7 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles, c
 	} else
 		lifetime = g_lifetime;
 
-	//lifetime=g_lifetime;
+	// lifetime=g_lifetime;
 	genlifetime = lifetime;
 	if (values.speed_ctrl_val && (porttiles.find(values.speed_ctrl_val) != porttiles.end())) {
 		double speedreference = 0.0;
@@ -168,7 +163,8 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles, c
 		scalereference = imagereferences[values.scale_ctrl_val];
 		scale = values.scale_val.first + (ranges.scale_range) * scalereference;
 	} else {
-		/*- ONのとき、かつ、ScaleにControlが無い場合、粒子サイズが小さいほど(遠くにあるので)多く分布するようになる。-*/
+		/*-
+		 * ONのとき、かつ、ScaleにControlが無い場合、粒子サイズが小さいほど(遠くにあるので)多く分布するようになる。-*/
 		if (values.perspective_distribution_val) {
 			scale = (values.scale_val.first * values.scale_val.second) /
 					(values.scale_val.second - (ranges.scale_range) * random.getFloat());
@@ -186,7 +182,7 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles, c
 		randomxreference = imagereferences[values.randomx_ctrl_val];
 	if (values.randomy_ctrl_val)
 		randomyreference = imagereferences[values.randomy_ctrl_val];
-	//if(check_Swing(values))
+	// if(check_Swing(values))
 	create_Swing(values, ranges, randomxreference, randomyreference);
 
 	create_Colors(values, ranges, porttiles);
@@ -198,15 +194,13 @@ Particle::Particle(int g_lifetime, int seed, std::map<int, TTile *> porttiles, c
 //------------------------------------------------------------------
 int Particle::check_Swing(const particles_values &values)
 {
-	return (values.randomx_val.first || values.randomx_val.second ||
-			values.randomy_val.first || values.randomy_val.second ||
-			values.rotsca_val.first || values.rotsca_val.second);
+	return (values.randomx_val.first || values.randomx_val.second || values.randomy_val.first ||
+			values.randomy_val.second || values.rotsca_val.first || values.rotsca_val.second);
 }
 
 /*-----------------------------------------------------------------*/
 
-void Particle::create_Swing(const particles_values &values,
-							const particles_ranges &ranges,
+void Particle::create_Swing(const particles_values &values, const particles_ranges &ranges,
 							double randomxreference, double randomyreference)
 {
 	changesignx = (int)(values.swing_val.first + random.getFloat() * (ranges.swing_range));
@@ -214,13 +208,17 @@ void Particle::create_Swing(const particles_values &values,
 	changesigna = (int)(values.rotswing_val.first + random.getFloat() * (ranges.rotswing_range));
 	if (values.swingmode_val == ParticlesFx::SWING_SMOOTH) {
 		if (values.randomx_ctrl_val)
-			smswingx = abs((int)values.randomx_val.first) + randomxreference * (ranges.randomx_range);
+			smswingx =
+				abs((int)values.randomx_val.first) + randomxreference * (ranges.randomx_range);
 		else
-			smswingx = abs((int)values.randomx_val.first) + random.getFloat() * (ranges.randomx_range);
+			smswingx =
+				abs((int)values.randomx_val.first) + random.getFloat() * (ranges.randomx_range);
 		if (values.randomy_ctrl_val)
-			smswingy = abs((int)values.randomy_val.first) + randomyreference * (ranges.randomy_range);
+			smswingy =
+				abs((int)values.randomy_val.first) + randomyreference * (ranges.randomy_range);
 		else
-			smswingy = abs((int)values.randomy_val.first) + random.getFloat() * (ranges.randomy_range);
+			smswingy =
+				abs((int)values.randomy_val.first) + random.getFloat() * (ranges.randomy_range);
 		smperiodx = changesignx;
 		smperiody = changesigny;
 	}
@@ -235,11 +233,10 @@ void Particle::create_Swing(const particles_values &values,
 
 /*-----------------------------------------------------------------*/
 
-void Particle::create_Colors(const particles_values &values,
-							 const particles_ranges &ranges,
+void Particle::create_Colors(const particles_values &values, const particles_ranges &ranges,
 							 std::map<int, TTile *> porttiles)
 {
-	//TPixel32 color;
+	// TPixel32 color;
 
 	if (values.genfadecol_val) {
 		TPixel32 color;
@@ -297,11 +294,10 @@ void Particle::create_Colors(const particles_values &values,
 void Particle::modify_colors(TPixel32 &color, double &intensity)
 {
 	float percent = 0;
-	if ((gencol.fadecol || fincol.fadecol) &&
-		(genlifetime - lifetime) <= fincol.rangecol) {
+	if ((gencol.fadecol || fincol.fadecol) && (genlifetime - lifetime) <= fincol.rangecol) {
 		if (fincol.rangecol)
 			percent = (genlifetime - lifetime) / (float)(fincol.rangecol);
-		//color=gencol.col+percent*(fincol.col-gencol.col);
+		// color=gencol.col+percent*(fincol.col-gencol.col);
 		color = blend(gencol.col, fincol.col, percent);
 		intensity = gencol.fadecol + percent * (fincol.fadecol - gencol.fadecol);
 	} else if (foutcol.fadecol && lifetime <= foutcol.rangecol) {
@@ -327,8 +323,8 @@ void Particle::modify_colors(TPixel32 &color, double &intensity)
 
 /*-----------------------------------------------------------------*/
 /*- do_render から呼ばれる。各粒子の描画の直前に色を決める -*/
-void Particle::modify_colors_and_opacity(const particles_values &values,
-										 float curr_opacity, int dist_frame, TRaster32P raster32)
+void Particle::modify_colors_and_opacity(const particles_values &values, float curr_opacity,
+										 int dist_frame, TRaster32P raster32)
 {
 
 	double intensity = 0;
@@ -350,7 +346,7 @@ void Particle::modify_colors_and_opacity(const particles_values &values,
 			}
 		}
 		raster32->unlock();
-		//pop_rgbfade(pars, 0, 0, raster, raster, 1);
+		// pop_rgbfade(pars, 0, 0, raster, raster, 1);
 	}
 
 	if (curr_opacity != 1.0)
@@ -358,8 +354,7 @@ void Particle::modify_colors_and_opacity(const particles_values &values,
 }
 
 /*-----------------------------------------------------------------*/
-void Particle::update_Animation(const particles_values &values,
-								int first, int last, int keep)
+void Particle::update_Animation(const particles_values &values, int first, int last, int keep)
 {
 	switch (values.animation_val) {
 	case ParticlesFx::ANIM_RANDOM:
@@ -391,10 +386,9 @@ void Particle::update_Animation(const particles_values &values,
 }
 
 /*-----------------------------------------------------------------*/
-void Particle::update_Swing(const particles_values &values,
-							const particles_ranges &ranges,
-							struct pos_dummy &dummy,
-							double randomxreference, double randomyreference)
+void Particle::update_Swing(const particles_values &values, const particles_ranges &ranges,
+							struct pos_dummy &dummy, double randomxreference,
+							double randomyreference)
 {
 
 	if (values.swingmode_val == ParticlesFx::SWING_SMOOTH) {
@@ -441,7 +435,8 @@ void Particle::update_Swing(const particles_values &values,
 	if (changesignx <= 0) {
 		//  if(random->getFloat()<0.5);
 		signx *= -1;
-		changesignx = abs((int)(values.swing_val.first) + (int)(random.getFloat() * (ranges.swing_range)));
+		changesignx =
+			abs((int)(values.swing_val.first) + (int)(random.getFloat() * (ranges.swing_range)));
 		if (values.swingmode_val == ParticlesFx::SWING_SMOOTH) {
 			smperiodx = changesignx;
 			if (values.randomx_ctrl_val)
@@ -453,7 +448,8 @@ void Particle::update_Swing(const particles_values &values,
 	if (changesigny <= 0) {
 		//  if(random->getFloat()<0.5);
 		signy *= -1;
-		changesigny = abs((int)(values.swing_val.first) + (int)(random.getFloat() * (ranges.swing_range)));
+		changesigny =
+			abs((int)(values.swing_val.first) + (int)(random.getFloat() * (ranges.swing_range)));
 		if (values.swingmode_val == ParticlesFx::SWING_SMOOTH) {
 			smperiody = changesigny;
 			if (values.randomy_ctrl_val)
@@ -464,7 +460,8 @@ void Particle::update_Swing(const particles_values &values,
 	}
 	if (changesigna <= 0) {
 		signa *= -1;
-		changesigna = abs((int)(values.rotswing_val.first) + (int)(random.getFloat() * (ranges.rotswing_range)));
+		changesigna = abs((int)(values.rotswing_val.first) +
+						  (int)(random.getFloat() * (ranges.rotswing_range)));
 		if (values.rotswingmode_val == ParticlesFx::SWING_SMOOTH) {
 			smperioda = changesigna;
 			smswinga = values.rotsca_val.first + random.getFloat() * (ranges.rotsca_range);
@@ -472,9 +469,8 @@ void Particle::update_Swing(const particles_values &values,
 	}
 }
 /*-----------------------------------------------------------------*/
-void Particle::update_Scale(const particles_values &values,
-							const particles_ranges &ranges, double scalereference,
-							double scalestepreference)
+void Particle::update_Scale(const particles_values &values, const particles_ranges &ranges,
+							double scalereference, double scalestepreference)
 {
 	double scalestep;
 
@@ -503,14 +499,16 @@ void Particle::get_image_reference(TTile *ctrl, const particles_values &values,
 	raster32->lock();
 	switch (type) {
 	case ParticlesFx::GRAY_REF:
-		if (raster32 && tmp.x >= 0 && tmp.x < raster32->getLx() && tmp.y >= 0 && troundp(tmp.y) < raster32->getLy()) {
+		if (raster32 && tmp.x >= 0 && tmp.x < raster32->getLx() && tmp.y >= 0 &&
+			troundp(tmp.y) < raster32->getLy()) {
 			TPixel32 pix = raster32->pixels(troundp(tmp.y))[(int)tmp.x];
 			imagereference = TPixelGR8::from(pix).value / (double)TPixelGR8::maxChannelValue;
 		}
 		break;
 
 	case ParticlesFx::H_REF:
-		if (raster32 && tmp.x >= 0 && tmp.x < raster32->getLx() && tmp.y >= 0 && tround(tmp.y) < raster32->getLy()) {
+		if (raster32 && tmp.x >= 0 && tmp.x < raster32->getLx() && tmp.y >= 0 &&
+			tround(tmp.y) < raster32->getLy()) {
 			double aux = (double)TPixel32::maxChannelValue;
 			double h, s, v;
 			TPixel32 pix = raster32->pixels(troundp(tmp.y))[(int)tmp.x];
@@ -523,8 +521,7 @@ void Particle::get_image_reference(TTile *ctrl, const particles_values &values,
 }
 
 /*-----------------------------------------------------------------*/
-void Particle::get_image_gravity(TTile *ctrl1, const particles_values &values,
-								 float &gx, float &gy)
+void Particle::get_image_gravity(TTile *ctrl1, const particles_values &values, float &gx, float &gy)
 {
 	TRaster32P raster32 = ctrl1->getRaster();
 	TPointD tmp(x, y);
@@ -540,7 +537,8 @@ void Particle::get_image_gravity(TTile *ctrl1, const particles_values &values,
 #ifdef OLDSTUFF
 	if (!values.gravity_radius_val) {
 		radius = 4;
-		if (raster32 && tmp.x >= radius && tmp.x < raster32->getLx() - radius && tmp.y >= radius && tmp.y < raster32->getLy() - radius) {
+		if (raster32 && tmp.x >= radius && tmp.x < raster32->getLx() - radius && tmp.y >= radius &&
+			tmp.y < raster32->getLy() - radius) {
 			TPixel32 *pix = &(raster32->pixels(troundp(tmp.y))[(int)tmp.x]);
 			double norm = 1 / ((double)TPixelGR8::maxChannelValue);
 			for (i = 1; i < radius; i++) {
@@ -555,7 +553,8 @@ void Particle::get_image_gravity(TTile *ctrl1, const particles_values &values,
 	} else {
 #endif
 		radius = 2;
-		if (raster32 && tmp.x >= radius && tmp.x < raster32->getLx() - radius && tmp.y >= radius && tmp.y < raster32->getLy() - radius) {
+		if (raster32 && tmp.x >= radius && tmp.x < raster32->getLx() - radius && tmp.y >= radius &&
+			tmp.y < raster32->getLy() - radius) {
 			TPixel32 *pix = &(raster32->pixels(troundp(tmp.y))[(int)tmp.x]);
 
 			gx += 2 * TPixelGR8::from(*(pix + 1)).value;
@@ -588,14 +587,14 @@ void Particle::get_image_gravity(TTile *ctrl1, const particles_values &values,
 }
 
 /*-----------------------------------------------------------------*/
-void Particle::get_image_reference(TTile *ctrl1, const particles_values &values,
-								   TPixel32 &color)
+void Particle::get_image_reference(TTile *ctrl1, const particles_values &values, TPixel32 &color)
 {
 	TRaster32P raster32 = ctrl1->getRaster();
 	TPointD tmp(x, y);
 	tmp -= ctrl1->m_pos;
 
-	if (raster32 && tmp.x >= 0 && tmp.x < raster32->getLx() && tmp.y >= 0 && troundp(tmp.y) < raster32->getLy()) {
+	if (raster32 && tmp.x >= 0 && tmp.x < raster32->getLx() && tmp.y >= 0 &&
+		troundp(tmp.y) < raster32->getLy()) {
 		color = raster32->pixels(troundp(tmp.y))[(int)tmp.x];
 	}
 	/*-- 参照画像のBBoxの外側では、粒子を透明にする --*/
@@ -615,14 +614,13 @@ void Particle::spread_color(TPixel32 &color, double range)
 }
 /*-----------------------------------------------------------------*/
 
-void Particle::move(std::map<int, TTile *> porttiles, const particles_values &values, const particles_ranges &ranges,
-					float windx,
-					float windy, float xgravity, float ygravity,
-					float dpicorr, int lastframe)
+void Particle::move(std::map<int, TTile *> porttiles, const particles_values &values,
+					const particles_ranges &ranges, float windx, float windy, float xgravity,
+					float ygravity, float dpicorr, int lastframe)
 {
 	struct pos_dummy dummy;
 	float frictx, fricty;
-	//int time;
+	// int time;
 	std::map<int, double> imagereferences;
 	dummy.x = dummy.y = dummy.a = 0.0;
 	frictx = fricty = 0.0;
@@ -634,11 +632,8 @@ void Particle::move(std::map<int, TTile *> porttiles, const particles_values &va
 	double randomyreference = 1;
 
 	for (std::map<int, TTile *>::iterator it = porttiles.begin(); it != porttiles.end(); ++it) {
-		if (
-			(values.friction_ctrl_val == it->first ||
-			 values.scale_ctrl_val == it->first ||
-			 values.scalestep_ctrl_val == it->first ||
-			 values.randomx_ctrl_val == it->first ||
+		if ((values.friction_ctrl_val == it->first || values.scale_ctrl_val == it->first ||
+			 values.scalestep_ctrl_val == it->first || values.randomx_ctrl_val == it->first ||
 			 values.randomy_ctrl_val == it->first) &&
 			it->second->getRaster()) {
 			double tmpvalue;
@@ -665,8 +660,8 @@ void Particle::move(std::map<int, TTile *> porttiles, const particles_values &va
 	lifetime--;
 	oldx = x;
 	oldy = y;
-	//time=genlifetime-lifetime-1;
-	//if(time<0) time=0;
+	// time=genlifetime-lifetime-1;
+	// if(time<0) time=0;
 	if (values.gravity_ctrl_val && (porttiles.find(values.gravity_ctrl_val) != porttiles.end())) {
 		get_image_gravity(porttiles[values.gravity_ctrl_val], values, xgravity, ygravity);
 		xgravity *= values.gravity_val;
@@ -675,7 +670,8 @@ void Particle::move(std::map<int, TTile *> porttiles, const particles_values &va
 
 	if (values.friction_val * frictreference) {
 		if (vx) {
-			frictx = vx * (1 + values.friction_val * frictreference) + (10 / vx) * values.friction_val * frictreference;
+			frictx = vx * (1 + values.friction_val * frictreference) +
+					 (10 / vx) * values.friction_val * frictreference;
 			if ((frictx / vx) < 0)
 				frictx = 0;
 			vx = frictx;
@@ -688,7 +684,8 @@ void Particle::move(std::map<int, TTile *> porttiles, const particles_values &va
 		}
 
 		if (vy) {
-			fricty = vy * (1 + values.friction_val * frictreference) + (10 / vy) * values.friction_val * frictreference;
+			fricty = vy * (1 + values.friction_val * frictreference) +
+					 (10 / vy) * values.friction_val * frictreference;
 			if ((fricty / vy) < 0)
 				fricty = 0;
 			vy = fricty;
@@ -721,8 +718,8 @@ void Particle::move(std::map<int, TTile *> porttiles, const particles_values &va
 }
 
 /*-----------------------------------------------------------------*/
-double Particle::set_Opacity(std::map<int, TTile *> porttiles,
-							 const particles_values &values, float opacity_range, double dist_frame)
+double Particle::set_Opacity(std::map<int, TTile *> porttiles, const particles_values &values,
+							 float opacity_range, double dist_frame)
 {
 	double opacity = 1.0, trailcorr;
 
@@ -732,12 +729,15 @@ double Particle::set_Opacity(std::map<int, TTile *> porttiles,
 		opacity *= (lifetime) / values.fadeout_val;
 
 	if (trail) {
-		trailcorr = values.trailopacity_val.first + (values.trailopacity_val.second - values.trailopacity_val.first) * (1 - (dist_frame) / trail);
+		trailcorr = values.trailopacity_val.first +
+					(values.trailopacity_val.second - values.trailopacity_val.first) *
+						(1 - (dist_frame) / trail);
 		opacity *= trailcorr;
 	}
 	if (values.opacity_ctrl_val && (porttiles.find(values.opacity_ctrl_val) != porttiles.end())) {
 		double opacityreference = 0.0;
-		get_image_reference(porttiles[values.opacity_ctrl_val], values, opacityreference, ParticlesFx::GRAY_REF);
+		get_image_reference(porttiles[values.opacity_ctrl_val], values, opacityreference,
+							ParticlesFx::GRAY_REF);
 		opacity = values.opacity_val.first + (opacity_range)*opacityreference * opacity;
 	} else
 		opacity = values.opacity_val.first + opacity_range * opacity;

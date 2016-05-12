@@ -36,7 +36,7 @@
 
 //--------------------------------------------------------------------------
 
-//Reduces strokes of image by currConfig->m_reduceThicknessRatio/100
+// Reduces strokes of image by currConfig->m_reduceThicknessRatio/100
 inline void reduceThickness(TVectorImageP image, double thicknessRatio)
 {
 	thicknessRatio *= 0.01;
@@ -54,7 +54,7 @@ inline void reduceThickness(TVectorImageP image, double thicknessRatio)
 
 //========================================================================
 
-//Delete Skeleton graphs and list
+// Delete Skeleton graphs and list
 inline void deleteSkeletonList(SkeletonList *skeleton)
 {
 	unsigned int i;
@@ -92,7 +92,7 @@ inline TThickPoint randomized(const TThickPoint &P)
 
 //------------------------------------------------------------------------
 
-//Give stroke extremities a random shake. May help for region computing.
+// Give stroke extremities a random shake. May help for region computing.
 void randomizeExtremities(TVectorImageP vi)
 {
 	unsigned int i;
@@ -107,7 +107,7 @@ void randomizeExtremities(TVectorImageP vi)
 
 //========================================================================
 
-//Looped frame
+// Looped frame
 inline void addFrameStrokes(TVectorImageP vi, TRasterP ras, TPalette *palette)
 {
 	const double epsThick = 1.0;
@@ -138,13 +138,13 @@ inline void addFrameStrokes(TVectorImageP vi, TRasterP ras, TPalette *palette)
 
 //========================================================================
 
-//Returns if input stroke is edge boundary of an ink-filled region
+// Returns if input stroke is edge boundary of an ink-filled region
 bool VectorizerCore::isInkRegionEdge(TStroke *stroke)
 {
 	return stroke->getFlag(SkeletonArc::SS_OUTLINE);
 }
 
-//Similar as above
+// Similar as above
 bool VectorizerCore::isInkRegionEdgeReversed(TStroke *stroke)
 {
 	return stroke->getFlag(SkeletonArc::SS_OUTLINE_REVERSED);
@@ -165,8 +165,9 @@ void VectorizerCore::clearInkRegionFlags(TVectorImageP vi)
 
 //--------------------------------------------------------------------------
 
-TVectorImageP VectorizerCore::centerlineVectorize(
-	TImageP &image, const CenterlineConfiguration &configuration, TPalette *palette)
+TVectorImageP VectorizerCore::centerlineVectorize(TImageP &image,
+												  const CenterlineConfiguration &configuration,
+												  TPalette *palette)
 {
 	TRasterImageP ri = image;
 	TToonzImageP ti = image;
@@ -202,11 +203,11 @@ TVectorImageP VectorizerCore::centerlineVectorize(
 	Contours polygons;
 	polygonize(ras, polygons, globals);
 
-	//Most time-consuming part of vectorization, 'this' is passed to inform of partial progresses
+	// Most time-consuming part of vectorization, 'this' is passed to inform of partial progresses
 	SkeletonList *skeletons = skeletonize(polygons, this, globals);
 
 	if (isCanceled()) {
-		//Clean and return 0 at cancel command
+		// Clean and return 0 at cancel command
 		deleteSkeletonList(skeletons);
 
 		return TVectorImageP();
@@ -214,17 +215,18 @@ TVectorImageP VectorizerCore::centerlineVectorize(
 
 	organizeGraphs(skeletons, globals);
 
-	//junctionRecovery(polygons);   //Da' problemi per maxThickness<inf... sarebbe da rendere compatibile
+	// junctionRecovery(polygons);   //Da' problemi per maxThickness<inf... sarebbe da rendere
+	// compatibile
 
 	std::vector<TStroke *> sortibleResult;
 	TVectorImageP result;
 
-	calculateSequenceColors(ras, globals); //Extract stroke colors here
+	calculateSequenceColors(ras, globals); // Extract stroke colors here
 	conversionToStrokes(sortibleResult, globals);
-	applyStrokeColors(sortibleResult, ras, palette, globals); //Strokes get sorted here
+	applyStrokeColors(sortibleResult, ras, palette, globals); // Strokes get sorted here
 	result = copyStrokes(sortibleResult);
 
-	//Further misc adjustments
+	// Further misc adjustments
 	if (globals.currConfig->m_thicknessRatio < 100)
 		reduceThickness(result, configuration.m_thicknessRatio);
 	if (globals.currConfig->m_maxThickness == 0.0)
@@ -232,7 +234,7 @@ TVectorImageP VectorizerCore::centerlineVectorize(
 			result->getStroke(i)->setSelfLoop(true);
 	if (globals.currConfig->m_makeFrame)
 		addFrameStrokes(result, ras, palette);
-	//randomizeExtremities(result);   //Cuccio random - non serve...
+	// randomizeExtremities(result);   //Cuccio random - non serve...
 
 	deleteSkeletonList(skeletons);
 

@@ -21,7 +21,7 @@ class DVAPI TLabel : public TWidget
 	bool m_border;
 	Alignment m_alignment;
 
-public:
+  public:
 	TLabel(TWidget *parent, string name = "label");
 	void draw();
 

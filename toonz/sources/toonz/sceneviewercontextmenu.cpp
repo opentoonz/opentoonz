@@ -46,7 +46,8 @@ void addShowHideStageObjectCmd(QMenu *menu, const TStageObjectId &id, bool isSho
 	if (id.isCamera())
 		cmdStr = (isShow ? "Show " : "Hide ") + QString::fromStdString(pegbar->getName());
 	else
-		cmdStr = (isShow ? "Show Column" : "Hide Column") + QString::fromStdString(pegbar->getName());
+		cmdStr =
+			(isShow ? "Show Column" : "Hide Column") + QString::fromStdString(pegbar->getName());
 	QAction *showHideAction = new QAction(cmdStr, menu);
 	showHideAction->setData((int)id.getCode());
 	menu->addAction(showHideAction);
@@ -61,7 +62,10 @@ void onShowHideSelectObject(QAction *action)
 		return;
 	if (action->text().startsWith("Show ") || action->text().startsWith("Hide ")) {
 		if (id.isColumn()) {
-			app->getCurrentXsheet()->getXsheet()->getColumn(id.getIndex())->setCamstandVisible(action->text().startsWith("Show "));
+			app->getCurrentXsheet()
+				->getXsheet()
+				->getColumn(id.getIndex())
+				->setCamstandVisible(action->text().startsWith("Show "));
 			TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 		}
 	} else if (action->text().startsWith("Select ")) {
@@ -82,7 +86,8 @@ int addShowHideStageObjectCmds(const std::vector<int> &columnIndexes, QMenu *men
 
 	for (ii = columnIndexes.size() - 1; ii >= 0; ii--) {
 		TStageObjectId id = TStageObjectId::ColumnId(columnIndexes[ii]);
-		TXshColumn *col = TApp::instance()->getCurrentXsheet()->getXsheet()->getColumn(columnIndexes[ii]);
+		TXshColumn *col =
+			TApp::instance()->getCurrentXsheet()->getXsheet()->getColumn(columnIndexes[ii]);
 		if (!col)
 			continue;
 		if (!isShow && col->isCamstandVisible()) {
@@ -132,7 +137,8 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
 
 		action = commandManager->createAction(V_ShowHideFullScreen, this, !isFullScreen);
 		addAction(action);
-		ret = ret && parent->connect(action, SIGNAL(triggered()), fsWidget, SLOT(toggleFullScreen()));
+		ret =
+			ret && parent->connect(action, SIGNAL(triggered()), fsWidget, SLOT(toggleFullScreen()));
 	}
 
 	// swap compared
@@ -158,7 +164,7 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
 	addAction(action);
 	ret = ret && parent->connect(action, SIGNAL(triggered()), SLOT(setActualPixelSize()));
 
-// onion skin
+	// onion skin
 	if (Preferences::instance()->isOnionSkinEnabled() && !parent->isPreviewEnabled())
 		OnioniSkinMaskGUI::addOnionSkinCommand(this);
 
@@ -168,17 +174,21 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
 
 		// save previewed frames
 		action = addAction(tr("Save Previewed Frames"));
-		action->setShortcut(QKeySequence(CommandManager::instance()->getKeyFromId(MI_SavePreviewedFrames)));
-		ret = ret && parent->connect(action, SIGNAL(triggered()), this, SLOT(savePreviewedFrames()));
+		action->setShortcut(
+			QKeySequence(CommandManager::instance()->getKeyFromId(MI_SavePreviewedFrames)));
+		ret =
+			ret && parent->connect(action, SIGNAL(triggered()), this, SLOT(savePreviewedFrames()));
 
 		// regenerate preview
 		action = addAction(tr("Regenerate Preview"));
-		action->setShortcut(QKeySequence(CommandManager::instance()->getKeyFromId(MI_RegeneratePreview)));
+		action->setShortcut(
+			QKeySequence(CommandManager::instance()->getKeyFromId(MI_RegeneratePreview)));
 		ret = ret && parent->connect(action, SIGNAL(triggered()), SLOT(regeneratePreview()));
 
 		// regenerate frame preview
 		action = addAction(tr("Regenerate Frame Preview"));
-		action->setShortcut(QKeySequence(CommandManager::instance()->getKeyFromId(MI_RegenerateFramePr)));
+		action->setShortcut(
+			QKeySequence(CommandManager::instance()->getKeyFromId(MI_RegenerateFramePr)));
 		ret = ret && parent->connect(action, SIGNAL(triggered()), SLOT(regeneratePreviewFrame()));
 	}
 
@@ -274,14 +284,14 @@ void SceneViewerContextMenu::addLevelCommands(std::vector<int> &indices)
 		addSeparator();
 	}
 
-// selection
-/*
-  if(selectableColumns.size()==1)
-  {
-    addSelectCommand(this, TStageObjectId::ColumnId(selectableColumns[0]->getIndex()));
-  }
-  else
-  */
+	// selection
+	/*
+	  if(selectableColumns.size()==1)
+	  {
+		addSelectCommand(this, TStageObjectId::ColumnId(selectableColumns[0]->getIndex()));
+	  }
+	  else
+	  */
 
 	/*-- Scene内の全Objectを選択可能にする --*/
 	TStageObjectId id;
@@ -312,7 +322,6 @@ void SceneViewerContextMenu::addLevelCommands(std::vector<int> &indices)
 	/*- カラムがひとつも無かったらDisable -*/
 	if (!flag)
 		columnMenu->setEnabled(false);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -322,7 +331,7 @@ void SceneViewerContextMenu::enterVectorImageGroup()
 	if (m_groupIndexToBeEntered == -1)
 		return;
 
-	TVectorImageP vi = (TVectorImageP)TTool::getImage(false); //getCurrentImage();
+	TVectorImageP vi = (TVectorImageP)TTool::getImage(false); // getCurrentImage();
 	if (!vi)
 		return;
 	vi->enterGroup(m_groupIndexToBeEntered);
@@ -336,7 +345,7 @@ void SceneViewerContextMenu::enterVectorImageGroup()
 
 void SceneViewerContextMenu::exitVectorImageGroup()
 {
-	TVectorImageP vi = (TVectorImageP)TTool::getImage(false); //getCurrentImage();
+	TVectorImageP vi = (TVectorImageP)TTool::getImage(false); // getCurrentImage();
 	if (!vi)
 		return;
 	vi->exitGroup();
@@ -375,5 +384,6 @@ void SceneViewerContextMenu::onSetCurrent()
 
 void SceneViewerContextMenu::savePreviewedFrames()
 {
-	Previewer::instance(m_viewer->getPreviewMode() == SceneViewer::SUBCAMERA_PREVIEW)->saveRenderedFrames();
+	Previewer::instance(m_viewer->getPreviewMode() == SceneViewer::SUBCAMERA_PREVIEW)
+		->saveRenderedFrames();
 }

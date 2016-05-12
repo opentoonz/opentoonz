@@ -89,8 +89,7 @@ bool testCollapseEdge(const TTextureMesh &mesh, int e)
 		{
 			// Must not join two non-adjacent boundary vertices
 			return (!borderVertex(m_mesh, m_ed.vertex(0)) ||
-					!borderVertex(m_mesh, m_ed.vertex(1)) ||
-					borderEdge(m_mesh, m_e));
+					!borderVertex(m_mesh, m_ed.vertex(1)) || borderEdge(m_mesh, m_e));
 		}
 
 		bool testAdjacency()
@@ -124,9 +123,7 @@ bool testCollapseEdge(const TTextureMesh &mesh, int e)
 		}
 	} locals = {mesh, e, mesh.edge(e)};
 
-	return (locals.testTrianglesCount() &&
-			locals.testBoundary() &&
-			locals.testAdjacency());
+	return (locals.testTrianglesCount() && locals.testBoundary() && locals.testAdjacency());
 }
 
 } // namespace
@@ -155,14 +152,12 @@ struct Closer {
 		return sq(tcg::point_ops::segDist<TPointD>(avx0.P(), avx1.P(), m_pos));
 	}
 
-	bool operator()(const TTextureMesh::vertex_type &a,
-					const TTextureMesh::vertex_type &b)
+	bool operator()(const TTextureMesh::vertex_type &a, const TTextureMesh::vertex_type &b)
 	{
 		return (dist2(a) < dist2(b));
 	}
 
-	bool operator()(const TTextureMesh::edge_type &a,
-					const TTextureMesh::edge_type &b)
+	bool operator()(const TTextureMesh::edge_type &a, const TTextureMesh::edge_type &b)
 	{
 		return (dist2(a) < dist2(b));
 	}
@@ -173,7 +168,8 @@ struct Closer {
 std::pair<double, int> closestVertex(const TTextureMesh &mesh, const TPointD &pos)
 {
 	Closer closer = {mesh, pos};
-	int vIdx = int(std::min_element(mesh.vertices().begin(), mesh.vertices().end(), closer).index());
+	int vIdx =
+		int(std::min_element(mesh.vertices().begin(), mesh.vertices().end(), closer).index());
 
 	return std::make_pair(closer.dist2(mesh.vertex(vIdx)), vIdx);
 }
@@ -200,8 +196,8 @@ std::pair<double, MeshIndex> closestVertex(const TMeshImage &mi, const TPointD &
 	for (mt = meshes.begin(); mt != mEnd; ++mt) {
 		const std::pair<double, int> &candidateIdx = closestVertex(**mt, pos);
 
-		std::pair<double, MeshIndex> candidate(
-			candidateIdx.first, MeshIndex(mt - meshes.begin(), candidateIdx.second));
+		std::pair<double, MeshIndex> candidate(candidateIdx.first,
+											   MeshIndex(mt - meshes.begin(), candidateIdx.second));
 
 		if (candidate < closest)
 			closest = candidate;
@@ -222,8 +218,8 @@ std::pair<double, MeshIndex> closestEdge(const TMeshImage &mi, const TPointD &po
 	for (mt = meshes.begin(); mt != mEnd; ++mt) {
 		const std::pair<double, int> &candidateIdx = closestEdge(**mt, pos);
 
-		std::pair<double, MeshIndex> candidate(
-			candidateIdx.first, MeshIndex(mt - meshes.begin(), candidateIdx.second));
+		std::pair<double, MeshIndex> candidate(candidateIdx.first,
+											   MeshIndex(mt - meshes.begin(), candidateIdx.second));
 
 		if (candidate < closest)
 			closest = candidate;
@@ -245,8 +241,7 @@ struct EdgeCut {
 	int m_vIdx; //!< Vertex index to cut from.
 	int m_eIdx; //!< Edge index to cut.
 
-	EdgeCut(int vIdx, int eIdx)
-		: m_vIdx(vIdx), m_eIdx(eIdx) {}
+	EdgeCut(int vIdx, int eIdx) : m_vIdx(vIdx), m_eIdx(eIdx) {}
 };
 
 struct VertexOccurrence {
@@ -273,14 +268,13 @@ bool buildEdgeCuts(const TMeshImage &mi, const PlasticTool::MeshSelection &edges
 		static int testSingleMesh(const edges_container &edges)
 		{
 			assert(!edges.empty());
-			return (std::find_if(
-						edges.begin(), edges.end(), tcg::bind2nd(&differentMesh, edges.front())) == edges.end())
+			return (std::find_if(edges.begin(), edges.end(),
+								 tcg::bind2nd(&differentMesh, edges.front())) == edges.end())
 					   ? edges.front().m_meshIdx
 					   : -1;
 		}
 
-		static bool testNoBoundaryEdge(
-			const TTextureMesh &mesh, const edges_container &edges)
+		static bool testNoBoundaryEdge(const TTextureMesh &mesh, const edges_container &edges)
 		{
 			edges_container::const_iterator et, eEnd = edges.end();
 			for (et = edges.begin(); et != eEnd; ++et)
@@ -290,9 +284,8 @@ bool buildEdgeCuts(const TMeshImage &mi, const PlasticTool::MeshSelection &edges
 			return true;
 		}
 
-		static bool buildVertexOccurrences(
-			const TTextureMesh &mesh, const edges_container &edges,
-			VertexOccurrencesMap &vertexOccurrences)
+		static bool buildVertexOccurrences(const TTextureMesh &mesh, const edges_container &edges,
+										   VertexOccurrencesMap &vertexOccurrences)
 		{
 			// Calculate vertex occurrences as edge endpoints
 			edges_container::const_iterator et, eEnd = edges.end();
@@ -300,22 +293,20 @@ bool buildEdgeCuts(const TMeshImage &mi, const PlasticTool::MeshSelection &edges
 				const edge_type &ed = mesh.edge(et->m_idx);
 				int v0 = ed.vertex(0), v1 = ed.vertex(1);
 
-				VertexOccurrence &vo0 = vertexOccurrences[v0],
-								 &vo1 = vertexOccurrences[v1];
+				VertexOccurrence &vo0 = vertexOccurrences[v0], &vo1 = vertexOccurrences[v1];
 
 				if (vo0.m_count > 1 || vo1.m_count > 1)
 					return false;
 
-				vo0.m_adjacentEdgeIdx[vo0.m_count++] =
-					vo1.m_adjacentEdgeIdx[vo1.m_count++] = et->m_idx;
+				vo0.m_adjacentEdgeIdx[vo0.m_count++] = vo1.m_adjacentEdgeIdx[vo1.m_count++] =
+					et->m_idx;
 			}
 
 			return true;
 		}
 
-		static bool buildEdgeCuts(
-			const TTextureMesh &mesh, const edges_container &edges,
-			std::vector<EdgeCut> &edgeCuts)
+		static bool buildEdgeCuts(const TTextureMesh &mesh, const edges_container &edges,
+								  std::vector<EdgeCut> &edgeCuts)
 		{
 			VertexOccurrencesMap vertexOccurrences;
 			if (!buildVertexOccurrences(mesh, edges, vertexOccurrences))
@@ -421,14 +412,15 @@ void slitMesh(TTextureMesh &mesh, int e) //! Opens a slit along the specified ed
 	// Alter the face to host the duplicate
 	TTextureMesh::face_type &fc = mesh.face(f);
 
-	(fc.edge(0) == e) ? fc.setEdge(0, eDup) : (fc.edge(1) == e) ? fc.setEdge(1, eDup) : fc.setEdge(2, eDup);
+	(fc.edge(0) == e) ? fc.setEdge(0, eDup) : (fc.edge(1) == e) ? fc.setEdge(1, eDup)
+																: fc.setEdge(2, eDup);
 }
 
 //------------------------------------------------------------------------
 
 /*!
   \brief    Duplicates a mesh edge-vertex pair (the 'cut') and separates their
-            connections to adjacent mesh primitives.
+			connections to adjacent mesh primitives.
 
   \remark   The starting vertex is supposed to be on the mesh boundary.
   \remark   Edges with a single neighbouring face can be duplicated, too.
@@ -437,13 +429,11 @@ void cutEdge(TTextureMesh &mesh, const EdgeCut &edgeCut)
 {
 	struct locals {
 
-		static void transferEdge(
-			TTextureMesh &mesh, int e, int vFrom, int vTo)
+		static void transferEdge(TTextureMesh &mesh, int e, int vFrom, int vTo)
 		{
 			edge_type &ed = mesh.edge(e);
 
-			vertex_type &vxFrom = mesh.vertex(vFrom),
-						&vxTo = mesh.vertex(vTo);
+			vertex_type &vxFrom = mesh.vertex(vFrom), &vxTo = mesh.vertex(vTo);
 
 			(ed.vertex(0) == vFrom) ? ed.setVertex(0, vTo) : ed.setVertex(1, vTo);
 
@@ -451,17 +441,17 @@ void cutEdge(TTextureMesh &mesh, const EdgeCut &edgeCut)
 			vxFrom.eraseEdge(std::find(vxFrom.edges().begin(), vxFrom.edges().end(), e));
 		}
 
-		static void transferFace(
-			TTextureMesh &mesh, int eFrom, int eTo)
+		static void transferFace(TTextureMesh &mesh, int eFrom, int eTo)
 		{
-			edge_type &edFrom = mesh.edge(eFrom),
-					  &edTo = mesh.edge(eTo);
+			edge_type &edFrom = mesh.edge(eFrom), &edTo = mesh.edge(eTo);
 
 			int f = mesh.edge(eFrom).face(1);
 			{
 				face_type &fc = mesh.face(f);
 
-				(fc.edge(0) == eFrom) ? fc.setEdge(0, eTo) : (fc.edge(1) == eFrom) ? fc.setEdge(1, eTo) : fc.setEdge(2, eTo);
+				(fc.edge(0) == eFrom) ? fc.setEdge(0, eTo) : (fc.edge(1) == eFrom)
+																 ? fc.setEdge(1, eTo)
+																 : fc.setEdge(2, eTo);
 
 				edTo.addFace(f);
 				edFrom.eraseFace(edFrom.facesBegin() + 1);
@@ -470,8 +460,7 @@ void cutEdge(TTextureMesh &mesh, const EdgeCut &edgeCut)
 
 	}; // locals
 
-	int vOrig = edgeCut.m_vIdx,
-		eOrig = edgeCut.m_eIdx;
+	int vOrig = edgeCut.m_vIdx, eOrig = edgeCut.m_eIdx;
 
 	// Create a new vertex at the same position of the original
 	int vDup = mesh.addVertex(vertex_type(mesh.vertex(vOrig).P()));
@@ -520,17 +509,16 @@ struct VertexesRecorder // copy constructors.
 	{
 	boost::unordered_set<int> &m_examinedVertexes;
 
-public:
+  public:
 	typedef boost::on_examine_vertex event_filter;
 
-public:
+  public:
 	VertexesRecorder(boost::unordered_set<int> &examinedVertexes)
-		: m_examinedVertexes(examinedVertexes) {}
-
-	void operator()(int v, const TTextureMesh &)
+		: m_examinedVertexes(examinedVertexes)
 	{
-		m_examinedVertexes.insert(v);
 	}
+
+	void operator()(int v, const TTextureMesh &) { m_examinedVertexes.insert(v); }
 };
 }
 namespace
@@ -539,8 +527,8 @@ namespace
 void splitUnconnectedMesh(TMeshImage &mi, int meshIdx)
 {
 	struct locals {
-		static void buildConnectedComponent(
-			const TTextureMesh &mesh, boost::unordered_set<int> &vertexes)
+		static void buildConnectedComponent(const TTextureMesh &mesh,
+											boost::unordered_set<int> &vertexes)
 		{
 			// Prepare BFS algorithm
 			tcg::unique_ptr<UCHAR, tcg::freer> colorMapP(
@@ -550,8 +538,8 @@ void splitUnconnectedMesh(TMeshImage &mi, int meshIdx)
 			std::stack<int> verticesQueue;
 
 			// Launch it
-			boost::breadth_first_visit(mesh, int(mesh.vertices().begin().index()),
-									   verticesQueue, boost::make_bfs_visitor(vertexesRecorder), colorMapP.get());
+			boost::breadth_first_visit(mesh, int(mesh.vertices().begin().index()), verticesQueue,
+									   boost::make_bfs_visitor(vertexesRecorder), colorMapP.get());
 		}
 	}; // locals
 
@@ -621,15 +609,13 @@ bool cutMesh(TMeshImage &mi, const PlasticTool::MeshSelection &edgesSelection)
 {
 	struct locals {
 
-		static int lastVertex(
-			const TTextureMesh &mesh, const std::vector<EdgeCut> &edgeCuts)
+		static int lastVertex(const TTextureMesh &mesh, const std::vector<EdgeCut> &edgeCuts)
 		{
-			return mesh.edge(edgeCuts.back().m_eIdx)
-				.otherVertex(edgeCuts.back().m_vIdx);
+			return mesh.edge(edgeCuts.back().m_eIdx).otherVertex(edgeCuts.back().m_vIdx);
 		}
 
-		static int lastBoundaryVertex(
-			const TTextureMesh &mesh, const std::vector<EdgeCut> &edgeCuts)
+		static int lastBoundaryVertex(const TTextureMesh &mesh,
+									  const std::vector<EdgeCut> &edgeCuts)
 		{
 			int v = lastVertex(mesh, edgeCuts);
 			return ::borderVertex(mesh, v) ? v : -1;
@@ -657,8 +643,7 @@ bool cutMesh(TMeshImage &mi, const PlasticTool::MeshSelection &edgesSelection)
 	}
 
 	// Cut edges, in the order specified by edgeCuts
-	std::for_each(ecBegin, edgeCuts.end(),
-				  tcg::bind1st(&cutEdge, mesh));
+	std::for_each(ecBegin, edgeCuts.end(), tcg::bind1st(&cutEdge, mesh));
 
 	// Finally, the mesh could have been split in 2 - we need to separate
 	// the pieces if needed
@@ -685,17 +670,19 @@ class MoveVertexUndo_Mesh : public TUndo
 	std::vector<TPointD> m_origVxsPos; //!< Original vertex positions
 	TPointD m_posShift;				   //!< Vertex positions shift
 
-public:
-	MoveVertexUndo_Mesh(
-		const std::vector<MeshIndex> &vIdxs,
-		const std::vector<TPointD> &origVxsPos,
-		const TPointD &posShift)
-		: m_row(::row()), m_col(::column()), m_vIdxs(vIdxs), m_origVxsPos(origVxsPos), m_posShift(posShift)
+  public:
+	MoveVertexUndo_Mesh(const std::vector<MeshIndex> &vIdxs, const std::vector<TPointD> &origVxsPos,
+						const TPointD &posShift)
+		: m_row(::row()), m_col(::column()), m_vIdxs(vIdxs), m_origVxsPos(origVxsPos),
+		  m_posShift(posShift)
 	{
 		assert(m_vIdxs.size() == m_origVxsPos.size());
 	}
 
-	int getSize() const { return int(sizeof(*this) + m_vIdxs.size() * (sizeof(int) + 2 * sizeof(TPointD))); }
+	int getSize() const
+	{
+		return int(sizeof(*this) + m_vIdxs.size() * (sizeof(int) + 2 * sizeof(TPointD)));
+	}
 
 	void redo() const
 	{
@@ -727,9 +714,10 @@ class SwapEdgeUndo : public TUndo
 	int m_row, m_col;			 //!< Xsheet coordinates
 	mutable MeshIndex m_edgeIdx; //!< Edge index
 
-public:
-	SwapEdgeUndo(const MeshIndex &edgeIdx)
-		: m_row(::row()), m_col(::column()), m_edgeIdx(edgeIdx) {}
+  public:
+	SwapEdgeUndo(const MeshIndex &edgeIdx) : m_row(::row()), m_col(::column()), m_edgeIdx(edgeIdx)
+	{
+	}
 
 	int getSize() const { return sizeof(*this); }
 
@@ -764,15 +752,14 @@ public:
 
 class TTextureMeshUndo : public TUndo
 {
-protected:
+  protected:
 	int m_row, m_col; //!< Xsheet coordinates
 
 	int m_meshIdx;					 //!< Mesh index in the image at stored xsheet coords
 	mutable TTextureMesh m_origMesh; //!< Copy of the original mesh
 
-public:
-	TTextureMeshUndo(int meshIdx)
-		: m_row(::row()), m_col(::column()), m_meshIdx(meshIdx) {}
+  public:
+	TTextureMeshUndo(int meshIdx) : m_row(::row()), m_col(::column()), m_meshIdx(meshIdx) {}
 
 	// Let's say 1MB each - storing the mesh is costly
 	int getSize() const { return 1 << 20; }
@@ -792,9 +779,11 @@ class CollapseEdgeUndo : public TTextureMeshUndo
 {
 	int m_eIdx; //!< Collapsed edge index
 
-public:
+  public:
 	CollapseEdgeUndo(const MeshIndex &edgeIdx)
-		: TTextureMeshUndo(edgeIdx.m_meshIdx), m_eIdx(edgeIdx.m_idx) {}
+		: TTextureMeshUndo(edgeIdx.m_meshIdx), m_eIdx(edgeIdx.m_idx)
+	{
+	}
 
 	void redo() const
 	{
@@ -846,9 +835,11 @@ class SplitEdgeUndo : public TTextureMeshUndo
 {
 	int m_eIdx; //!< Split edge index
 
-public:
+  public:
 	SplitEdgeUndo(const MeshIndex &edgeIdx)
-		: TTextureMeshUndo(edgeIdx.m_meshIdx), m_eIdx(edgeIdx.m_idx) {}
+		: TTextureMeshUndo(edgeIdx.m_meshIdx), m_eIdx(edgeIdx.m_idx)
+	{
+	}
 
 	void redo() const
 	{
@@ -862,7 +853,8 @@ public:
 
 		// Split
 		mesh.splitEdge(m_eIdx);
-		//mesh.squeeze();                                                     // There should be no need to squeeze
+		// mesh.squeeze();                                                     // There should be no
+		// need to squeeze
 
 		assert(mesh.vertices().size() == mesh.vertices().nodesCount()); //
 		assert(mesh.edges().size() == mesh.edges().nodesCount());		//
@@ -905,9 +897,12 @@ class CutEdgesUndo : public TUndo
 
 	PlasticTool::MeshSelection m_edgesSelection; //!< Selection to operate on
 
-public:
+  public:
 	CutEdgesUndo(const PlasticTool::MeshSelection &edgesSelection)
-		: m_row(::row()), m_col(::column()), m_origImage(TTool::getImage(false)->cloneImage()), m_edgesSelection(edgesSelection) {}
+		: m_row(::row()), m_col(::column()), m_origImage(TTool::getImage(false)->cloneImage()),
+		  m_edgesSelection(edgesSelection)
+	{
+	}
 
 	int getSize() const { return 1 << 20; }
 
@@ -1003,15 +998,11 @@ void PlasticTool::toggleMeshSelection(MeshSelection &target, const MeshSelection
 	objects_container selectedIdxs;
 
 	if (target.contains(addition)) {
-		std::set_difference(
-			storedIdxs.begin(), storedIdxs.end(),
-			addedIdxs.begin(), addedIdxs.end(),
-			std::back_inserter(selectedIdxs));
+		std::set_difference(storedIdxs.begin(), storedIdxs.end(), addedIdxs.begin(),
+							addedIdxs.end(), std::back_inserter(selectedIdxs));
 	} else {
-		std::set_union(
-			storedIdxs.begin(), storedIdxs.end(),
-			addedIdxs.begin(), addedIdxs.end(),
-			std::back_inserter(selectedIdxs));
+		std::set_union(storedIdxs.begin(), storedIdxs.end(), addedIdxs.begin(), addedIdxs.end(),
+					   std::back_inserter(selectedIdxs));
 	}
 
 	setMeshSelection(target, selectedIdxs);
@@ -1155,8 +1146,8 @@ void PlasticTool::leftButtonUp_mesh(const TPointD &pos, const TMouseEvent &me)
 	m_pos = pos;
 
 	if (m_dragged && !m_mvSel.isEmpty()) {
-		TUndoManager::manager()->add(new MoveVertexUndo_Mesh(
-			m_mvSel.objects(), m_pressedVxsPos, pos - m_pressedPos));
+		TUndoManager::manager()->add(
+			new MoveVertexUndo_Mesh(m_mvSel.objects(), m_pressedVxsPos, pos - m_pressedPos));
 
 		invalidate();
 		notifyImageChanged(); // Sets the level's dirty flag      -.-'
@@ -1176,21 +1167,25 @@ void PlasticTool::addContextMenuActions_mesh(QMenu *menu)
 
 			if (::testSwapEdge(mesh, mIdx.m_idx)) {
 				QAction *swapEdge = menu->addAction(tr("Swap Edge"));
-				ret = ret && connect(swapEdge, SIGNAL(triggered()), &l_plasticTool, SLOT(swapEdge_mesh_undo()));
+				ret = ret && connect(swapEdge, SIGNAL(triggered()), &l_plasticTool,
+									 SLOT(swapEdge_mesh_undo()));
 			}
 
 			if (::testCollapseEdge(mesh, mIdx.m_idx)) {
 				QAction *collapseEdge = menu->addAction(tr("Collapse Edge"));
-				ret = ret && connect(collapseEdge, SIGNAL(triggered()), &l_plasticTool, SLOT(collapseEdge_mesh_undo()));
+				ret = ret && connect(collapseEdge, SIGNAL(triggered()), &l_plasticTool,
+									 SLOT(collapseEdge_mesh_undo()));
 			}
 
 			QAction *splitEdge = menu->addAction(tr("Split Edge"));
-			ret = ret && connect(splitEdge, SIGNAL(triggered()), &l_plasticTool, SLOT(splitEdge_mesh_undo()));
+			ret = ret && connect(splitEdge, SIGNAL(triggered()), &l_plasticTool,
+								 SLOT(splitEdge_mesh_undo()));
 		}
 
 		if (::testCutMesh(*m_mi, m_meSel)) {
 			QAction *cutEdges = menu->addAction(tr("Cut Mesh"));
-			ret = ret && connect(cutEdges, SIGNAL(triggered()), &l_plasticTool, SLOT(cutEdges_mesh_undo()));
+			ret = ret && connect(cutEdges, SIGNAL(triggered()), &l_plasticTool,
+								 SLOT(cutEdges_mesh_undo()));
 		}
 
 		menu->addSeparator();
@@ -1201,8 +1196,7 @@ void PlasticTool::addContextMenuActions_mesh(QMenu *menu)
 
 //------------------------------------------------------------------------
 
-void PlasticTool::moveVertex_mesh(
-	const std::vector<TPointD> &origVxsPos, const TPointD &posShift)
+void PlasticTool::moveVertex_mesh(const std::vector<TPointD> &origVxsPos, const TPointD &posShift)
 {
 	if (m_mvSel.isEmpty() || !m_mi)
 		return;
@@ -1222,8 +1216,8 @@ void PlasticTool::moveVertex_mesh(
 	}
 
 	// Mesh must be recompiled
-	PlasticDeformerStorage::instance()->invalidateMeshImage(
-		mi.getPointer(), PlasticDeformerStorage::MESH);
+	PlasticDeformerStorage::instance()->invalidateMeshImage(mi.getPointer(),
+															PlasticDeformerStorage::MESH);
 }
 
 //------------------------------------------------------------------------
@@ -1324,8 +1318,7 @@ void PlasticTool::draw_mesh()
 
 			objects_container::const_iterator vt, vEnd = objects.end();
 			for (vt = objects.begin(); vt != vEnd; ++vt) {
-				const TTextureVertex &vx = m_this->m_mi->meshes()[vt->m_meshIdx]
-											   ->vertex(vt->m_idx);
+				const TTextureVertex &vx = m_this->m_mi->meshes()[vt->m_meshIdx]->vertex(vt->m_idx);
 
 				::drawFullSquare(vx.P(), hSize);
 			}
@@ -1343,9 +1336,10 @@ void PlasticTool::draw_mesh()
 
 			objects_container::const_iterator et, eEnd = objects.end();
 			for (et = objects.begin(); et != eEnd; ++et) {
-				const TTextureVertex
-					&vx0 = m_this->m_mi->meshes()[et->m_meshIdx]->edgeVertex(et->m_idx, 0),
-					&vx1 = m_this->m_mi->meshes()[et->m_meshIdx]->edgeVertex(et->m_idx, 1);
+				const TTextureVertex &vx0 = m_this->m_mi->meshes()[et->m_meshIdx]->edgeVertex(
+										 et->m_idx, 0),
+									 &vx1 = m_this->m_mi->meshes()[et->m_meshIdx]->edgeVertex(
+										 et->m_idx, 1);
 
 				drawLine(vx0.P(), vx1.P());
 			}

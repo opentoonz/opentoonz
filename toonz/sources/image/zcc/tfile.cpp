@@ -11,8 +11,7 @@ namespace {
 */
 using namespace TFileConsts;
 
-TFile::TFile(const TFilePath &fname, uint32 flags)
-	: m_hFile(NULL), m_ec(0)
+TFile::TFile(const TFilePath &fname, uint32 flags) : m_hFile(NULL), m_ec(0)
 {
 	open_internal(fname, /*NULL,*/ flags);
 }
@@ -99,13 +98,15 @@ bool TFile::open_internal(const TFilePath &fname, /*const wchar_t *pwszFilename,
 if (pwszFilename && !IsWindowsNT())
 	pszFilename = VDFastTextWToA(pwszFilename);
 */
-	//if (pszFilename)
-	m_hFile = CreateFileW(fname.getWideString().c_str(), dwDesiredAccess, dwShareMode, NULL, dwCreationDisposition, dwAttributes, NULL);
+	// if (pszFilename)
+	m_hFile = CreateFileW(fname.getWideString().c_str(), dwDesiredAccess, dwShareMode, NULL,
+						  dwCreationDisposition, dwAttributes, NULL);
 	/*
 else
-	m_hFile = CreateFileW(pwszFilename, dwDesiredAccess, dwShareMode, NULL, dwCreationDisposition, dwAttributes, NULL);
+	m_hFile = CreateFileW(pwszFilename, dwDesiredAccess, dwShareMode, NULL, dwCreationDisposition,
+dwAttributes, NULL);
 */
-	//VDFastTextFree();
+	// VDFastTextFree();
 
 	// INVALID_HANDLE_VALUE isn't NULL.  *sigh*
 
@@ -121,7 +122,8 @@ else
 			return false;
 
 		/*
-  VDStringA fname(TFileSplitPathRight(pszFilename?VDString(pszFilename):VDTextWToA(VDStringW(pwszFilename))));
+  VDStringA
+  fname(TFileSplitPathRight(pszFilename?VDString(pszFilename):VDTextWToA(VDStringW(pwszFilename))));
 
 	throw MyWin32Error("Cannot open file \"%s\":\n%%s", err, fname.c_str());
   */
@@ -255,7 +257,7 @@ TINT64 TFile::size()
 	DWORD err;
 
 	if (u.l[0] == (DWORD)-1L && (err = GetLastError()) != NO_ERROR)
-	//throw MyWin32Error("Error retrieving file size: %%s", err);
+	// throw MyWin32Error("Error retrieving file size: %%s", err);
 	{
 		m_ec = GetLastError();
 		return (TINT64)(-1);
@@ -282,16 +284,10 @@ bool TFile::isOpen()
 string TFile::getLastError()
 {
 	LPVOID lpMsgBuf;
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,
-		m_ec,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-		(LPTSTR)&lpMsgBuf,
-		0,
-		NULL);
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+					  FORMAT_MESSAGE_IGNORE_INSERTS,
+				  NULL, m_ec, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+				  (LPTSTR)&lpMsgBuf, 0, NULL);
 	string s = string(reinterpret_cast<char *>(lpMsgBuf));
 	LocalFree(lpMsgBuf);
 	return s;

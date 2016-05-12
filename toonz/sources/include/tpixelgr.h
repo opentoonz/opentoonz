@@ -29,12 +29,12 @@ class TPixelGR8;
 class TPixelGR16;
 
 //-----------------------------------------------------------------------------
-/*! grey tones, 8 bits 
+/*! grey tones, 8 bits
    A set of predefined colors are included as well.
 */
 class DVAPI TPixelGR8
 {
-public:
+  public:
 	static const int maxChannelValue;
 	typedef UCHAR Channel;
 
@@ -51,18 +51,20 @@ public:
 
 	inline void setValue(int _value) { value = (UCHAR)_value; }
 
-	//!In this conversion instead of truncating values fron 16 to 8 a randomic dithering is performed.
+	//! In this conversion instead of truncating values fron 16 to 8 a randomic dithering is
+	//! performed.
 	//    randomNumber is an unsigned int random value
 	static inline TPixelGR8 from(const TPixelGR16 &pix, TUINT32 randomNumber); // per il dithering
-	//!In this conversion instead of truncating values fron 64 to 8 a randomic dithering is performed.
+	//! In this conversion instead of truncating values fron 64 to 8 a randomic dithering is
+	//! performed.
 	//    randomNumber is an unsigned int random value
 
 	static TPixelGR8 from(const TPixelRGBM64 &pix, TUINT32 randomNumber); // per il dithering
-	//!Converts TPixelRGBM32 into TPixelGR8
+	//! Converts TPixelRGBM32 into TPixelGR8
 	static TPixelGR8 from(const TPixelRGBM32 &pix);
-	//!Converts TPixelGR16 into TPixelGR8
+	//! Converts TPixelGR16 into TPixelGR8
 	static inline TPixelGR8 from(const TPixelGR16 &pix);
-	//!Converts TPixelD into TPixelGR8
+	//! Converts TPixelD into TPixelGR8
 	static TPixelGR8 from(const TPixelD &pix);
 
 	static const TPixelGR8 White;
@@ -74,7 +76,7 @@ public:
 /*!grey tones, 16 bits */
 class DVAPI TPixelGR16
 {
-public:
+  public:
 	static const int maxChannelValue;
 	typedef USHORT Channel;
 
@@ -102,7 +104,7 @@ public:
 
 class DVAPI TPixelGRD
 {
-public:
+  public:
 	typedef double Channel;
 
 	double value;

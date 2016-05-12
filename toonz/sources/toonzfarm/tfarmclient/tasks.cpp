@@ -81,8 +81,7 @@ CasmTask2::CasmTask2()
 
 //------------------------------------------------------------------------------
 
-CasmTask2::CasmTask2(const string &s, const string &setupFilePath)
-	: m_setupFile(setupFilePath)
+CasmTask2::CasmTask2(const string &s, const string &setupFilePath) : m_setupFile(setupFilePath)
 {
 	setCommandLine(s);
 }
@@ -202,8 +201,7 @@ string CasmTask2::getCommandLine() const
 		qualifiers += " -ac " + m_acScript + " ";
 
 	if (m_outputScript != "") {
-		bool outputToDdr = (m_outputScript ==
-							DDR_OUTPUTSCRIPT_FILENAME);
+		bool outputToDdr = (m_outputScript == DDR_OUTPUTSCRIPT_FILENAME);
 
 		if (!outputToDdr)
 			qualifiers += " -ac " + m_outputScript + " ";
@@ -216,7 +214,7 @@ string CasmTask2::getCommandLine() const
 				parity = "even";
 				entry_point[i - 1] = '\0';
 			}
-			//convert_timecode_to_frame (entry_point);//??????
+			// convert_timecode_to_frame (entry_point);//??????
 			if (outputToDdr)
 				qualifiers += " -ddr " + entry_point + " ";
 			else {
@@ -250,7 +248,7 @@ string CasmTask2::getCommandLine() const
 	if (m_start > m_firstFrame || m_end < m_lastFrame)
 		qualifiers += " -range " + toString(m_start) + " " + toString(m_end) + " ";
 
-	//qualifiers += " -chunk "+toString(m_taskChunksize)+" ";
+	// qualifiers += " -chunk "+toString(m_taskChunksize)+" ";
 
 	return qualifiers;
 }
@@ -356,11 +354,11 @@ void CasmTask2::setCommandLine(const string &cmdLine)
 			m_moveType = M_INTMOVE;
 		}
 		/*     else
-     if (STR_EQ(word, "-64bit"))
-        task->prec = 64;
-     else 
-     if (STR_EQ(word, "-32bit"))
-        task->prec = 32;*/
+	 if (STR_EQ(word, "-64bit"))
+		task->prec = 64;
+	 else
+	 if (STR_EQ(word, "-32bit"))
+		task->prec = 32;*/
 		else if (word == "-tile") {
 			s = cpy_word(word, s);
 			if (is_num(word))
@@ -406,59 +404,59 @@ void CasmTask2::setCommandLine(const string &cmdLine)
 			s = cpy_word(word, s);
 			m_outputScript = word;
 		} else if (word == "-ac_args") { /*
-       char output_script_argument[1024];
-       s = cpy_word(word, s);
-       if(parse_ac_args(output_script_argument, word))
-         task->output_script_argument = strsave(output_script_argument);*/
+	   char output_script_argument[1024];
+	   s = cpy_word(word, s);
+	   if(parse_ac_args(output_script_argument, word))
+		 task->output_script_argument = strsave(output_script_argument);*/
 		} else if (word == "-logfile") {
 			s = cpy_word(word, s);
 			m_logfile = true;
 		}
 		/*     else
-     if (!word.compare("-range"))
-      {
+	 if (!word.compare("-range"))
+	  {
 	s = cpy_word(word, s);
-        if (is_num(word))
+		if (is_num(word))
 	   task->start = atoi(word);
 	else
-         {
-           delete_job((TASK *)task);
-           return NULL;
-         }
-       s = cpy_word(word, s);
-       if (is_num(word))
-          task->end = atoi(word);
-       else
-        {
-          delete_job((TASK *)task);
-          return NULL;
-        }
-      }*/
+		 {
+		   delete_job((TASK *)task);
+		   return NULL;
+		 }
+	   s = cpy_word(word, s);
+	   if (is_num(word))
+		  task->end = atoi(word);
+	   else
+		{
+		  delete_job((TASK *)task);
+		  return NULL;
+		}
+	  }*/
 		/*     else
-     if (*word!='\n' && *word!='\0')
-      {
-        t = tim_get_type(word);
-        if (*t == '.') t++;
-        if (FILESTR_NE(t, "casm")) 
-         {
-           delete_job((TASK *)task);
+	 if (*word!='\n' && *word!='\0')
+	  {
+		t = tim_get_type(word);
+		if (*t == '.') t++;
+		if (FILESTR_NE(t, "casm"))
+		 {
+		   delete_job((TASK *)task);
 //           return NULL;
-         }
-        else
-         {
+		 }
+		else
+		 {
 	   TCALLOC(task->casm_file, strlen(word)+1);
 	   strcpy(task->casm_file, word);
-	   compute_casm_range(task->casm_file, &(task->first_frame), &(task->last_frame), &dummy); 
-	   if (task->start<task->first_frame) 
-	      task->start=task->first_frame;
-	   if (task->end>task->last_frame) 
-	      task->end=task->last_frame;
-           task->xsize = task->ysize = 0;
-           casm_camera_size(task->casm_file, &task->xsize, &task->ysize);
-  
+	   compute_casm_range(task->casm_file, &(task->first_frame), &(task->last_frame), &dummy);
+	   if (task->start<task->first_frame)
+		  task->start=task->first_frame;
+	   if (task->end>task->last_frame)
+		  task->end=task->last_frame;
+		   task->xsize = task->ysize = 0;
+		   casm_camera_size(task->casm_file, &task->xsize, &task->ysize);
 
-         }
-      }*/
+
+		 }
+	  }*/
 		it = s.begin();
 	}
 }
@@ -494,8 +492,7 @@ ScriptTask::ScriptTask()
 
 //------------------------------------------------------------------------------
 
-ScriptTask::ScriptTask(const string &s, const string &setupFilePath)
-	: m_setupFile(setupFilePath)
+ScriptTask::ScriptTask(const string &s, const string &setupFilePath) : m_setupFile(setupFilePath)
 {
 	setCommandLine(s);
 }
@@ -520,10 +517,10 @@ string ScriptTask::getCommandLine() const
 #ifdef WIN32
 	/*
   if (is_fg)
-    cmdLine = m_filePath;
+	cmdLine = m_filePath;
   else
   */
-	//viene sempre fatto girare in background
+	// viene sempre fatto girare in background
 	cmdLine = "CALL " + m_filePath + " ";
 #else
 	cmdLine = m_filePath;
@@ -552,29 +549,29 @@ void ScriptTask::setCommandLine(const string &cmdLine)
 	string word;
 	if (s == "") {
 		s = cpy_word(word, s);
-		//if (word == "")
+		// if (word == "")
 		m_arg1 = word;
-		//else
-		//m_arg1 = "";
+		// else
+		// m_arg1 = "";
 	}
 	if (s == "") {
 		s = cpy_word(word, s);
-		//if (word == "")
+		// if (word == "")
 		m_arg2 = word;
 	}
 	if (s == "") {
 		s = cpy_word(word, s);
-		//if (word == "")
+		// if (word == "")
 		m_arg3 = word;
 	}
 	if (s == "") {
 		s = cpy_word(word, s);
-		//if (word == "")
+		// if (word == "")
 		m_arg4 = word;
 	}
 	if (s == "") {
 		s = cpy_word(word, s);
-		//if (word == "")
+		// if (word == "")
 		m_arg5 = word;
 	}
 }

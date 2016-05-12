@@ -36,16 +36,13 @@ class TzpReader : public Tiio::Reader
 	bool m_isBigEndian;
 	bool m_isFirstLineRead;
 
-public:
+  public:
 	TzpReader();
 	~TzpReader();
 
 	void open(FILE *file);
 
-	Tiio::RowOrder getRowOrder() const
-	{
-		return Tiio::BOTTOM2TOP;
-	}
+	Tiio::RowOrder getRowOrder() const { return Tiio::BOTTOM2TOP; }
 
 	int skipLines(int lineCount);
 	void readLine(char *buffer, int x0, int x1, int shrink);
@@ -54,7 +51,9 @@ public:
 //------------------------------------------------------------
 
 TzpReader::TzpReader()
-	: m_tiff(0), m_row(0), m_rowsPerStrip(0), m_stripIndex(-1), m_stripBuffer(0), m_rowLength(0), m_x(0), m_y(0), m_lx(0), m_ly(0), m_isCmap24(false), m_nColor(0), m_nPencil(0), m_isBigEndian(false), m_isFirstLineRead(true)
+	: m_tiff(0), m_row(0), m_rowsPerStrip(0), m_stripIndex(-1), m_stripBuffer(0), m_rowLength(0),
+	  m_x(0), m_y(0), m_lx(0), m_ly(0), m_isCmap24(false), m_nColor(0), m_nPencil(0),
+	  m_isBigEndian(false), m_isFirstLineRead(true)
 {
 }
 
@@ -157,7 +156,7 @@ void TzpReader::open(FILE *file)
 	uint16 planarconfig;
 	TIFFGetField(m_tiff, TIFFTAG_PLANARCONFIG, &planarconfig);
 	if (planarconfig == PLANARCONFIG_SEPARATE) {
-		//tmsg_error("separate buffer image not supported yet in .tz(up) files");
+		// tmsg_error("separate buffer image not supported yet in .tz(up) files");
 	}
 }
 
@@ -165,13 +164,13 @@ void TzpReader::open(FILE *file)
 
 int TzpReader::skipLines(int lineCount)
 {
-	//m_row += lineCount;
+	// m_row += lineCount;
 	return 0;
 }
 
 //------------------------------------------------------------
 
-extern int ComboInkIndex[]; //a bad patch....
+extern int ComboInkIndex[]; // a bad patch....
 
 void TzpReader::readLine(char *buffer, int x0, int x1, int shrink)
 {
@@ -219,7 +218,7 @@ void TzpReader::readLine(char *buffer, int x0, int x1, int shrink)
 			pix += m_x;
 			static std::set<int> table;
 
-			///per le tzp che vengono da Irix
+			/// per le tzp che vengono da Irix
 			bool bigEndian = (m_tiff->tif_header.classic.tiff_magic == TIFF_BIGENDIAN);
 
 			for (int i = 0; i < m_lx; i++) {

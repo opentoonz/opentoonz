@@ -29,8 +29,7 @@ struct indexed_pixel_tag {
 template <typename Pix, typename pixel_category = typename Pix::pixel_category>
 struct pixel_traits_types;
 
-template <typename Pix>
-struct pixel_traits_types<Pix, grayscale_pixel_tag> {
+template <typename Pix> struct pixel_traits_types<Pix, grayscale_pixel_tag> {
 	typedef Pix pixel_type;
 	typedef grayscale_pixel_tag pixel_category;
 	typedef typename Pix::channel_type channel_type;
@@ -38,8 +37,7 @@ struct pixel_traits_types<Pix, grayscale_pixel_tag> {
 	enum { channels_count = 1 };
 };
 
-template <typename Pix>
-struct pixel_traits_types<Pix, rgb_pixel_tag> {
+template <typename Pix> struct pixel_traits_types<Pix, rgb_pixel_tag> {
 	typedef Pix pixel_type;
 	typedef rgb_pixel_tag pixel_category;
 	typedef typename Pix::channel_type channel_type;
@@ -48,8 +46,7 @@ struct pixel_traits_types<Pix, rgb_pixel_tag> {
 };
 
 template <typename Pix>
-struct pixel_traits_types<Pix, rgbm_pixel_tag>
-	: public pixel_traits_types<Pix, rgb_pixel_tag> {
+struct pixel_traits_types<Pix, rgbm_pixel_tag> : public pixel_traits_types<Pix, rgb_pixel_tag> {
 	typedef Pix pixel_type;
 	typedef rgbm_pixel_tag pixel_category;
 	typedef typename Pix::channel_type channel_type;
@@ -57,8 +54,7 @@ struct pixel_traits_types<Pix, rgbm_pixel_tag>
 	enum { channels_count = 4 };
 };
 
-template <typename Pix>
-struct pixel_traits_types<Pix, indexed_pixel_tag> {
+template <typename Pix> struct pixel_traits_types<Pix, indexed_pixel_tag> {
 	typedef Pix pixel_type;
 	typedef indexed_pixel_tag pixel_category;
 	typedef typename Pix::index_type index_type;
@@ -68,26 +64,24 @@ struct pixel_traits_types<Pix, indexed_pixel_tag> {
 //    Pixel Traits
 //**************************************************************************
 
-template <typename Pix, typename pixel_category = typename Pix::pixel_category>
-struct pixel_traits;
+template <typename Pix, typename pixel_category = typename Pix::pixel_category> struct pixel_traits;
 
 template <typename Pix>
 struct pixel_traits<Pix, grayscale_pixel_tag>
 	: public pixel_traits_types<Pix, grayscale_pixel_tag> {
 	typedef pixel_traits_types<Pix, grayscale_pixel_tag> tr;
 
-public:
+  public:
 	static typename tr::channel_type max_channel_value();
 
 	static typename tr::channel_type l(const typename tr::pixel_type &pix);
 	static typename tr::channel_type &l(typename tr::pixel_type &pix);
 };
 
-template <typename Pix>
-struct pixel_traits<Pix, rgb_pixel_tag> {
+template <typename Pix> struct pixel_traits<Pix, rgb_pixel_tag> {
 	typedef pixel_traits_types<Pix, rgb_pixel_tag> tr;
 
-public:
+  public:
 	static typename tr::channel_type max_channel_value();
 
 	static typename tr::channel_type r(const typename tr::pixel_type &pix);
@@ -104,18 +98,17 @@ template <typename Pix>
 struct pixel_traits<Pix, rgbm_pixel_tag> : public pixel_traits<Pix, rgb_pixel_tag> {
 	typedef pixel_traits_types<Pix, rgbm_pixel_tag> tr;
 
-public:
+  public:
 	static typename tr::channel_type m(const typename tr::pixel_type &pix);
 	static typename tr::channel_type &m(typename tr::pixel_type &pix);
 };
 
-template <typename Pix>
-struct pixel_traits<Pix, indexed_pixel_tag> {
+template <typename Pix> struct pixel_traits<Pix, indexed_pixel_tag> {
 	typedef pixel_traits_types<Pix, indexed_pixel_tag> tr;
 	typedef typename tr::pixel_type pixel_type;
 	typedef typename tr::index_type index_type;
 
-public:
+  public:
 	static typename tr::index_type index(const typename tr::pixel_type &pix);
 	static typename tr::index_type &index(typename tr::pixel_type &pix);
 };
@@ -133,21 +126,19 @@ inline PixOut _cast(const PixIn &pix, grayscale_pixel_tag)
 	return PixOut(pixel_traits<PixIn>::l(pix));
 }
 
-template <typename PixIn, typename PixOut>
-inline PixOut _cast(const PixIn &pix, rgb_pixel_tag)
+template <typename PixIn, typename PixOut> inline PixOut _cast(const PixIn &pix, rgb_pixel_tag)
 {
-	return PixOut(pixel_traits<PixIn>::r(pix), pixel_traits<PixIn>::g(pix), pixel_traits<PixIn>::b(pix));
+	return PixOut(pixel_traits<PixIn>::r(pix), pixel_traits<PixIn>::g(pix),
+				  pixel_traits<PixIn>::b(pix));
 }
 
-template <typename PixIn, typename PixOut>
-inline PixOut _cast(const PixIn &pix, rgbm_pixel_tag)
+template <typename PixIn, typename PixOut> inline PixOut _cast(const PixIn &pix, rgbm_pixel_tag)
 {
-	return PixOut(pixel_traits<PixIn>::r(pix), pixel_traits<PixIn>::g(pix), pixel_traits<PixIn>::b(pix),
-				  pixel_traits<PixIn>::m(pix));
+	return PixOut(pixel_traits<PixIn>::r(pix), pixel_traits<PixIn>::g(pix),
+				  pixel_traits<PixIn>::b(pix), pixel_traits<PixIn>::m(pix));
 }
 
-template <typename PixIn, typename PixOut>
-inline PixOut cast(const PixIn &pix)
+template <typename PixIn, typename PixOut> inline PixOut cast(const PixIn &pix)
 {
 	return _cast<PixIn, PixOut>(pix, typename pixel_traits<PixIn>::pixel_category());
 }
@@ -177,8 +168,7 @@ inline void _assign(PixOut &pixout, const PixIn &pixin, rgbm_pixel_tag)
 	pixel_traits<PixOut>::m(pixout) = pixel_traits<PixIn>::m(pixin);
 }
 
-template <typename PixIn, typename PixOut>
-inline void assign(PixOut &pixout, const PixIn &pixin)
+template <typename PixIn, typename PixOut> inline void assign(PixOut &pixout, const PixIn &pixin)
 {
 	_assign<PixIn, PixOut>(pixout, pixin, typename pixel_traits<PixIn>::pixel_category());
 }
@@ -208,8 +198,7 @@ inline Pix1 _sum(const Pix1 &a, const Pix2 &b, rgbm_pixel_tag)
 				pixel_traits<Pix1>::m(a) + pixel_traits<Pix2>::m(b));
 }
 
-template <typename Pix1, typename Pix2>
-inline Pix1 operator+(const Pix1 &a, const Pix2 &b)
+template <typename Pix1, typename Pix2> inline Pix1 operator+(const Pix1 &a, const Pix2 &b)
 {
 	return _sum(a, b, typename pixel_traits<Pix2>::pixel_category());
 }
@@ -239,8 +228,7 @@ inline Pix1 _sub(const Pix1 &a, const Pix2 &b, rgbm_pixel_tag)
 				pixel_traits<Pix1>::m(a) - pixel_traits<Pix2>::m(b));
 }
 
-template <typename Pix1, typename Pix2>
-inline Pix1 operator-(const Pix1 &a, const Pix2 &b)
+template <typename Pix1, typename Pix2> inline Pix1 operator-(const Pix1 &a, const Pix2 &b)
 {
 	return _sub(a, b, typename pixel_traits<Pix2>::pixel_category());
 }
@@ -253,25 +241,19 @@ inline Pix _mult(const Pix &a, Scalar k, grayscale_pixel_tag)
 	return Pix(pixel_traits<Pix>::l(a) * k);
 }
 
-template <typename Pix, typename Scalar>
-inline Pix _mult(const Pix &a, Scalar k, rgb_pixel_tag)
+template <typename Pix, typename Scalar> inline Pix _mult(const Pix &a, Scalar k, rgb_pixel_tag)
 {
-	return Pix(pixel_traits<Pix>::r(a) * k,
-			   pixel_traits<Pix>::g(a) * k,
+	return Pix(pixel_traits<Pix>::r(a) * k, pixel_traits<Pix>::g(a) * k,
 			   pixel_traits<Pix>::b(a) * k);
 }
 
-template <typename Pix, typename Scalar>
-inline Pix _mult(const Pix &a, Scalar k, rgbm_pixel_tag)
+template <typename Pix, typename Scalar> inline Pix _mult(const Pix &a, Scalar k, rgbm_pixel_tag)
 {
-	return Pix(pixel_traits<Pix>::r(a) * k,
-			   pixel_traits<Pix>::g(a) * k,
-			   pixel_traits<Pix>::b(a) * k,
-			   pixel_traits<Pix>::m(a) * k);
+	return Pix(pixel_traits<Pix>::r(a) * k, pixel_traits<Pix>::g(a) * k,
+			   pixel_traits<Pix>::b(a) * k, pixel_traits<Pix>::m(a) * k);
 }
 
-template <typename Pix, typename Scalar>
-inline Pix operator*(Scalar k, const Pix &pix)
+template <typename Pix, typename Scalar> inline Pix operator*(Scalar k, const Pix &pix)
 {
 	return _mult(pix, k, typename pixel_traits<Pix>::pixel_category());
 }
@@ -284,33 +266,26 @@ inline Pix _div(const Pix &a, Scalar k, grayscale_pixel_tag)
 	return Pix(pixel_traits<Pix>::l(a) / k);
 }
 
-template <typename Pix, typename Scalar>
-inline Pix _div(const Pix &a, Scalar k, rgb_pixel_tag)
+template <typename Pix, typename Scalar> inline Pix _div(const Pix &a, Scalar k, rgb_pixel_tag)
 {
-	return Pix(pixel_traits<Pix>::r(a) / k,
-			   pixel_traits<Pix>::g(a) / k,
+	return Pix(pixel_traits<Pix>::r(a) / k, pixel_traits<Pix>::g(a) / k,
 			   pixel_traits<Pix>::b(a) / k);
 }
 
-template <typename Pix, typename Scalar>
-inline Pix _div(const Pix &a, Scalar k, rgbm_pixel_tag)
+template <typename Pix, typename Scalar> inline Pix _div(const Pix &a, Scalar k, rgbm_pixel_tag)
 {
-	return Pix(pixel_traits<Pix>::r(a) / k,
-			   pixel_traits<Pix>::g(a) / k,
-			   pixel_traits<Pix>::b(a) / k,
-			   pixel_traits<Pix>::m(a) / k);
+	return Pix(pixel_traits<Pix>::r(a) / k, pixel_traits<Pix>::g(a) / k,
+			   pixel_traits<Pix>::b(a) / k, pixel_traits<Pix>::m(a) / k);
 }
 
-template <typename Pix, typename Scalar>
-inline Pix operator/(const Pix &pix, Scalar k)
+template <typename Pix, typename Scalar> inline Pix operator/(const Pix &pix, Scalar k)
 {
 	return _div(pix, k, typename pixel_traits<Pix>::pixel_category());
 }
 
 //------------------------------------------------------------------
 
-template <typename Pix, typename Scalar>
-inline void premultiply(Pix &pix, Scalar = 0)
+template <typename Pix, typename Scalar> inline void premultiply(Pix &pix, Scalar = 0)
 {
 	Scalar factor = pixel_traits<Pix>::m(pix) / Scalar(pixel_traits<Pix>::max_channel_value);
 
@@ -321,8 +296,7 @@ inline void premultiply(Pix &pix, Scalar = 0)
 
 //------------------------------------------------------------------
 
-template <typename Pix, typename Scalar>
-inline void depremultiply(Pix &pix, Scalar = 0)
+template <typename Pix, typename Scalar> inline void depremultiply(Pix &pix, Scalar = 0)
 {
 	if (pixel_traits<Pix>::channel_type m = pixel_traits<Pix>::m(pix)) {
 		Scalar factor = pixel_traits<Pix>::max_channel_value / Scalar(m);
@@ -347,10 +321,9 @@ template <typename Pix, typename Scalar>
 inline Pix _blend(const Pix &p0, const Pix &p1, Scalar t, rgb_pixel_tag)
 {
 	Scalar one_t = 1 - t;
-	return Pix(
-		one_t * pixel_traits<Pix>::r(p0) + t * pixel_traits<Pix>::r(p1),
-		one_t * pixel_traits<Pix>::g(p0) + t * pixel_traits<Pix>::g(p1),
-		one_t * pixel_traits<Pix>::m(p0) + t * pixel_traits<Pix>::b(p1));
+	return Pix(one_t * pixel_traits<Pix>::r(p0) + t * pixel_traits<Pix>::r(p1),
+			   one_t * pixel_traits<Pix>::g(p0) + t * pixel_traits<Pix>::g(p1),
+			   one_t * pixel_traits<Pix>::m(p0) + t * pixel_traits<Pix>::b(p1));
 }
 
 //------------------------------------------------------------------
@@ -359,17 +332,15 @@ template <typename Pix, typename Scalar>
 inline Pix _blend(const Pix &p0, const Pix &p1, Scalar t, rgbm_pixel_tag)
 {
 	Scalar one_t = 1 - t;
-	return Pix(
-		one_t * pixel_traits<Pix>::r(p0) + t * pixel_traits<Pix>::r(p1),
-		one_t * pixel_traits<Pix>::g(p0) + t * pixel_traits<Pix>::g(p1),
-		one_t * pixel_traits<Pix>::b(p0) + t * pixel_traits<Pix>::b(p1),
-		one_t * pixel_traits<Pix>::m(p0) + t * pixel_traits<Pix>::m(p1));
+	return Pix(one_t * pixel_traits<Pix>::r(p0) + t * pixel_traits<Pix>::r(p1),
+			   one_t * pixel_traits<Pix>::g(p0) + t * pixel_traits<Pix>::g(p1),
+			   one_t * pixel_traits<Pix>::b(p0) + t * pixel_traits<Pix>::b(p1),
+			   one_t * pixel_traits<Pix>::m(p0) + t * pixel_traits<Pix>::m(p1));
 }
 
 //------------------------------------------------------------------
 
-template <typename Pix, typename Scalar>
-inline Pix blend(const Pix &p0, const Pix &p1, Scalar t)
+template <typename Pix, typename Scalar> inline Pix blend(const Pix &p0, const Pix &p1, Scalar t)
 {
 	return _blend(p0, p1, t, pixel_traits<Pix>::pixel_category());
 }
@@ -389,8 +360,7 @@ inline void over_premult(Pix &down, const Pix &up, Scalar = 0)
 
 //------------------------------------------------------------------
 
-template <typename Pix, typename Scalar>
-inline void over(Pix &down, const Pix &up, Scalar = 0)
+template <typename Pix, typename Scalar> inline void over(Pix &down, const Pix &up, Scalar = 0)
 {
 	Scalar t = (1 - pixel_traits<Pix>::m(up) / Scalar(pixel_traits<Pix>::max_channel_value)) *
 			   pixel_traits<Pix>::m(down);
@@ -399,9 +369,12 @@ inline void over(Pix &down, const Pix &up, Scalar = 0)
 	Scalar up_fac = pixel_traits<Pix>::m(up) / m;
 	Scalar dn_fac = t / m;
 
-	pixel_traits<Pix>::r(down) = up_fac * pixel_traits<Pix>::r(up) + dn_fac * pixel_traits<Pix>::r(down);
-	pixel_traits<Pix>::g(down) = up_fac * pixel_traits<Pix>::g(up) + dn_fac * pixel_traits<Pix>::g(down);
-	pixel_traits<Pix>::b(down) = up_fac * pixel_traits<Pix>::b(up) + dn_fac * pixel_traits<Pix>::b(down);
+	pixel_traits<Pix>::r(down) =
+		up_fac * pixel_traits<Pix>::r(up) + dn_fac * pixel_traits<Pix>::r(down);
+	pixel_traits<Pix>::g(down) =
+		up_fac * pixel_traits<Pix>::g(up) + dn_fac * pixel_traits<Pix>::g(down);
+	pixel_traits<Pix>::b(down) =
+		up_fac * pixel_traits<Pix>::b(up) + dn_fac * pixel_traits<Pix>::b(down);
 	pixel_traits<Pix>::m(down) = m;
 }
 }

@@ -38,7 +38,7 @@
 
 class ImpPD
 {
-public:
+  public:
 	ImpPD(const TFilePath &fn)
 		: m_fname(fn), m_chunkSize(0), m_currentFileSize(0), m_fileMapAddress(0), m_mapOffset(0)
 	{
@@ -70,7 +70,7 @@ TINT64 ImpPD::m_defaultFileSize(100 * 1024 * 1024);
 
 class TDiskCachePersist::Imp
 {
-public:
+  public:
 	Imp(const TFilePath &fp);
 	~Imp();
 
@@ -80,7 +80,7 @@ public:
 	void setCurrentView(int frame)
 	{
 		if (!m_force && ((m_lowFrame <= frame) && (frame < m_hiFrame)))
-			return; //la vista corrente gia' copre il frame
+			return; // la vista corrente gia' copre il frame
 		m_force = false;
 		m_impPD->setCurrentView(frame, m_lowFrame, m_hiFrame);
 	}
@@ -96,22 +96,16 @@ public:
 #ifdef WIN32
 class ImpPDW : public ImpPD
 {
-private:
+  private:
 	string getLastErrorMessage()
 	{
 		LPVOID lpMsgBuf;
 
 		DWORD err = GetLastError();
-		FormatMessage(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-				FORMAT_MESSAGE_FROM_SYSTEM |
-				FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			err,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-			(LPTSTR)&lpMsgBuf,
-			0,
-			NULL);
+		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+						  FORMAT_MESSAGE_IGNORE_INSERTS,
+					  NULL, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+					  (LPTSTR)&lpMsgBuf, 0, NULL);
 
 		string msg((LPCTSTR)lpMsgBuf);
 
@@ -120,13 +114,13 @@ private:
 		return msg;
 	}
 
-public:
+  public:
 	ImpPDW(const TFilePath &fp);
 	~ImpPDW();
 	void openFile(const TFilePath &fname, TINT64 fileSize);
 	void setCurrentView(int pos, int &newLowPos, int &newHiPos);
 
-private:
+  private:
 	HANDLE m_hFile;
 	HANDLE m_hMap;
 
@@ -137,7 +131,7 @@ private:
 
 class ImpPDX : public ImpPD
 {
-private:
+  private:
 	class TCachedLevelException : public TException
 	{
 		static string msgFromErrorCode(int errorCode)
@@ -147,16 +141,19 @@ private:
 				return " fd is not a valid file descriptor  (and  MAP_ANONY­MOUS was not set).";
 				break;
 			/*
-    case EACCES_MAP_PRIVATE:
-      return "Map private was requested, but fd is not open for reading. Or MAP_SHARED was requested and PROT_WRITE is set, but fd is not open in read/write O_RDWR) mode.";
-    break;
+	case EACCES_MAP_PRIVATE:
+	  return "Map private was requested, but fd is not open for reading. Or MAP_SHARED was requested
+	and PROT_WRITE is set, but fd is not open in read/write O_RDWR) mode.";
+	break;
 */
 			case EINVAL:
-				return "We don't like start or length  or  offset.   (E.g., they  are  too  large, or not aligned on a PAGESIZE boundary.)";
+				return "We don't like start or length  or  offset.   (E.g., they  are  too  large, "
+					   "or not aligned on a PAGESIZE boundary.)";
 				break;
 
 			case ETXTBSY:
-				return "MAP_DENYWRITE was set but the object  specified  by fd is open for writing.";
+				return "MAP_DENYWRITE was set but the object  specified  by fd is open for "
+					   "writing.";
 				break;
 
 			case EAGAIN:
@@ -178,21 +175,18 @@ private:
 			return "";
 		}
 
-	public:
-		TCachedLevelException(int errorCode)
-			: TException(msgFromErrorCode(errorCode))
-		{
-		}
+	  public:
+		TCachedLevelException(int errorCode) : TException(msgFromErrorCode(errorCode)) {}
 		~TCachedLevelException() {}
 	};
 
-public:
+  public:
 	ImpPDX(const TFilePath &fp);
 	~ImpPDX();
 	void openFile(const TFilePath &fname, TINT64 fileSize);
 	void setCurrentView(int pos, int &newLowPos, int &newHiPos);
 
-private:
+  private:
 	int m_fd;
 	size_t m_pageSize;
 };
@@ -265,15 +259,15 @@ UCHAR *TDiskCachePersist::getRawData(int frame, TINT32 &size, int &lx, int &ly)
 
 //------------------------------------------------------------------------------
 // MEDIUM
-TDiskCachePersist::Imp::Imp(const TFilePath &fp)
-	: m_impPD(0)
+TDiskCachePersist::Imp::Imp(const TFilePath &fp) : m_impPD(0)
 {
 #ifdef WIN32
 	m_impPD = new ImpPDW(fp);
 #else
 	m_impPD = new ImpPDX(fp);
 #endif
-	m_impPD->m_currentFileSize = TFileStatus(fp).doesExist() ? TFileStatus(fp).getSize() : 0; // per gli arrotondamenti...
+	m_impPD->m_currentFileSize =
+		TFileStatus(fp).doesExist() ? TFileStatus(fp).getSize() : 0; // per gli arrotondamenti...
 }
 
 //------------------------------------------------------------------------------
@@ -286,8 +280,7 @@ TDiskCachePersist::Imp::~Imp()
 // LOW
 
 #ifdef WIN32
-ImpPDW::ImpPDW(const TFilePath &fp)
-	: ImpPD(fp), m_hFile(0), m_hMap(0)
+ImpPDW::ImpPDW(const TFilePath &fp) : ImpPD(fp), m_hFile(0), m_hMap(0)
 {
 	GetSystemInfo(&m_systemInfo);
 
@@ -339,24 +332,24 @@ void ImpPDW::openFile(const TFilePath &fname, TINT64 fileSize)
 	// ereditato da processi figli
 	LPSECURITY_ATTRIBUTES lpSecurityAttributes = NULL;
 
-	DWORD dwCreationDisposition = OPEN_ALWAYS;				//CREATE_ALWAYS;
-	DWORD dwFlagsAndAttributes = FILE_FLAG_SEQUENTIAL_SCAN; //FILE_ATTRIBUTE_NORMAL;//
+	DWORD dwCreationDisposition = OPEN_ALWAYS; // CREATE_ALWAYS;
+	DWORD dwFlagsAndAttributes = FILE_FLAG_SEQUENTIAL_SCAN; // FILE_ATTRIBUTE_NORMAL;//
 
 	HANDLE hTemplateFile = NULL;
 
-	m_hFile = CreateFileW(
-		fname.getWideString().c_str(), // file name
-		dwDesiredAccess,			   // access mode
-		dwShareMode,				   // share mode
-		NULL,						   // SD
-		dwCreationDisposition,		   // how to create
-		dwFlagsAndAttributes,		   // file attributes
-		hTemplateFile				   // handle to template file
-		);
+	m_hFile = CreateFileW(fname.getWideString().c_str(), // file name
+						  dwDesiredAccess,				 // access mode
+						  dwShareMode,					 // share mode
+						  NULL,							 // SD
+						  dwCreationDisposition,		 // how to create
+						  dwFlagsAndAttributes,			 // file attributes
+						  hTemplateFile					 // handle to template file
+						  );
 
 	if (m_hFile == INVALID_HANDLE_VALUE) {
 		string errMsg = getLastErrorMessage();
-		throw TException(wstring(L"Unable to open cache file: ") + fname.getWideString() + L"\n" + toWideString(errMsg));
+		throw TException(wstring(L"Unable to open cache file: ") + fname.getWideString() + L"\n" +
+						 toWideString(errMsg));
 	}
 
 	DWORD flProtect = PAGE_READWRITE;
@@ -364,14 +357,13 @@ void ImpPDW::openFile(const TFilePath &fname, TINT64 fileSize)
 	DWORD dwMaximumSizeLow = DWORDLONG_LO_DWORD(fileSize);
 	LPCTSTR lpName = NULL; // l'oggetto non ha nome
 
-	m_hMap = CreateFileMapping(
-		m_hFile,		   // handle to file
-		NULL,			   // security
-		flProtect,		   // protection
-		dwMaximumSizeHigh, // high-order DWORD of size
-		dwMaximumSizeLow,  // low-order DWORD of size
-		lpName			   // object name
-		);
+	m_hMap = CreateFileMapping(m_hFile,			  // handle to file
+							   NULL,			  // security
+							   flProtect,		  // protection
+							   dwMaximumSizeHigh, // high-order DWORD of size
+							   dwMaximumSizeLow,  // low-order DWORD of size
+							   lpName			  // object name
+							   );
 
 	if (m_hMap == NULL) {
 		string errMsg = getLastErrorMessage();
@@ -417,11 +409,12 @@ void ImpPDW::setCurrentView(int frame, int &newLowFrame, int &newHiFrame)
 	}
 
 	DWORD dwDesiredAccess = FILE_MAP_WRITE;
-	m_fileMapAddress = MapViewOfFile(m_hMap,						 // handle to file-mapping object
-									 dwDesiredAccess,				 // access mode: Write permission
-									 DWORDLONG_HI_DWORD(viewOffset), // high-order DWORD of offset: Max. object size.
-									 DWORDLONG_LO_DWORD(viewOffset), // low-order DWORD of offset: Size of hFile.
-									 m_viewSize);					 // number of bytes to map
+	m_fileMapAddress = MapViewOfFile(
+		m_hMap,							// handle to file-mapping object
+		dwDesiredAccess,				// access mode: Write permission
+		DWORDLONG_HI_DWORD(viewOffset), // high-order DWORD of offset: Max. object size.
+		DWORDLONG_LO_DWORD(viewOffset), // low-order DWORD of offset: Size of hFile.
+		m_viewSize);					// number of bytes to map
 
 	if (m_fileMapAddress == NULL) {
 		string errMsg = getLastErrorMessage();
@@ -435,10 +428,9 @@ void ImpPDW::setCurrentView(int frame, int &newLowFrame, int &newHiFrame)
 }
 #else
 
-ImpPDX::ImpPDX(const TFilePath &fp)
-	: ImpPD(fp), m_fd(-1)
+ImpPDX::ImpPDX(const TFilePath &fp) : ImpPD(fp), m_fd(-1)
 {
-	//std::cout << "cache file " << toString(m_fname.getFullPath()) << std::endl;
+	// std::cout << "cache file " << toString(m_fname.getFullPath()) << std::endl;
 	m_pageSize = getpagesize();
 	openFile(m_fname, 0);
 	assert(m_fd >= 0);
@@ -473,7 +465,7 @@ void ImpPDX::setCurrentView(int pos, int &newLowPos, int &newHiPos)
 	newHiPos = newLowPos + (m_viewSize / m_chunkSize);
 
 	assert(m_fd >= 0);
-	if (m_fileMapAddress) //previous view...
+	if (m_fileMapAddress) // previous view...
 		if (munmap(m_fileMapAddress, m_viewSize) != 0)
 			throw TCachedLevelException(errno);
 	void *start = 0;
@@ -482,13 +474,15 @@ void ImpPDX::setCurrentView(int pos, int &newLowPos, int &newHiPos)
 	m_mapOffset = newLowPos * m_chunkSize - viewOffset;
 
 	assert(!"controllare le dimensioni");
-	unsigned long lastByte = (unsigned long)(((newHiPos * m_chunkSize) / (double)m_pageSize + 0.5) * m_pageSize);
+	unsigned long lastByte =
+		(unsigned long)(((newHiPos * m_chunkSize) / (double)m_pageSize + 0.5) * m_pageSize);
 
 	if (lastByte > m_currentFileSize) // devo riallocare!
 	{
-		unsigned long bu = (unsigned long)((lastByte / (double)m_reallocSize + 0.5) * m_reallocSize);
+		unsigned long bu =
+			(unsigned long)((lastByte / (double)m_reallocSize + 0.5) * m_reallocSize);
 		bu = (unsigned long)((bu / (double)m_pageSize + 0.5) * m_pageSize);
-		//m_maxFileSize = tmax(m_maxFileSize + m_reallocFileSize, lastByte);
+		// m_maxFileSize = tmax(m_maxFileSize + m_reallocFileSize, lastByte);
 		m_currentFileSize += bu;
 
 		std::cout << "new cache size " << m_currentFileSize << std::endl;
@@ -547,16 +541,17 @@ UCHAR *TDiskCachePersist::Imp::get(int pos, TUINT32 *size)
 
 class TRasterCache::Data
 {
-public:
+  public:
 	Data(TCachePersist *cp)
-		: m_cp(cp), m_size(0, 0), m_prefetchEnabled(false), m_prefetchedFrame(-1), m_frameToPrefetch(-1), m_preLoader(1, true)
+		: m_cp(cp), m_size(0, 0), m_prefetchEnabled(false), m_prefetchedFrame(-1),
+		  m_frameToPrefetch(-1), m_preLoader(1, true)
 	{
 	}
 	~Data() {}
 
 	class FrameData
 	{
-	public:
+	  public:
 		bool m_valid;
 		//  int m_size; // dimensione in byte del raster codificato
 		~FrameData() {}
@@ -596,13 +591,16 @@ namespace
 
 class Load : public TThread::Runnable
 {
-public:
+  public:
 	Load(int frameToPrefetch, TCachePersist *cp, int &prefetchedFrame, TRasterP &prefetchedRas)
-		: m_frame(frameToPrefetch), m_cp(cp), m_prefetchedFrame(prefetchedFrame), m_prefetchedRas(prefetchedRas) {}
+		: m_frame(frameToPrefetch), m_cp(cp), m_prefetchedFrame(prefetchedFrame),
+		  m_prefetchedRas(prefetchedRas)
+	{
+	}
 
 	void run();
 
-private:
+  private:
 	int m_frame;
 	TCachePersist *m_cp;
 	int &m_prefetchedFrame;
@@ -618,8 +616,7 @@ void Load::run()
 
 //==============================================================================
 
-TRasterCache::TRasterCache(TCachePersist *cp)
-	: m_data(new Data(cp))
+TRasterCache::TRasterCache(TCachePersist *cp) : m_data(new Data(cp))
 {
 }
 
@@ -658,13 +655,13 @@ TRasterP TRasterCache::getRaster(int frame) const
 
 	if (m_data->m_prefetchEnabled) {
 		/*
-    if (frame == m_data->m_frameToPrefetch)
-      m_data->m_preLoader.wait();
-    else
+	if (frame == m_data->m_frameToPrefetch)
+	  m_data->m_preLoader.wait();
+	else
   */
 		{
 			m_data->m_preLoader.clear();
-			//m_data->m_preLoader.cancel();
+			// m_data->m_preLoader.cancel();
 		}
 
 		TRasterP ras;
@@ -677,9 +674,9 @@ TRasterP TRasterCache::getRaster(int frame) const
 			// il frame successivo a quello richiesto e' nella cache
 			// -> avvia il prefetch di tale raster
 			m_data->m_frameToPrefetch = frame + 1;
-			m_data->m_preLoader.addTask(
-				new Load(m_data->m_frameToPrefetch, m_data->m_cp,
-						 m_data->m_prefetchedFrame, m_data->m_prefetchedRas));
+			m_data->m_preLoader.addTask(new Load(m_data->m_frameToPrefetch, m_data->m_cp,
+												 m_data->m_prefetchedFrame,
+												 m_data->m_prefetchedRas));
 		}
 
 		return ras;
@@ -805,11 +802,8 @@ class TRamCachePersist::Imp
 {
 	friend class TRamCachePersist;
 
-public:
-	Imp()
-		: m_cacheSize(0), m_chunks()
-	{
-	}
+  public:
+	Imp() : m_cacheSize(0), m_chunks() {}
 	~Imp()
 	{
 		for (CompressedChunks::iterator it = m_chunks.begin(); it != m_chunks.end(); ++it) {
@@ -824,12 +818,9 @@ public:
 
 	class CompressedChunk
 	{
-	public:
+	  public:
 		CompressedChunk(UCHAR *buffer, int size) : m_buffer(buffer), m_size(size) {}
-		~CompressedChunk()
-		{
-			delete[] m_buffer;
-		}
+		~CompressedChunk() { delete[] m_buffer; }
 		UCHAR *m_buffer;
 		int m_size;
 	};
@@ -839,8 +830,7 @@ public:
 	TUINT64 m_cacheSize;
 };
 
-TRamCachePersist::TRamCachePersist(TRasterCodec *codec)
-	: TCachePersist(codec), m_imp(new Imp)
+TRamCachePersist::TRamCachePersist(TRasterCodec *codec) : TCachePersist(codec), m_imp(new Imp)
 {
 }
 
@@ -854,7 +844,7 @@ TRamCachePersist::~TRamCachePersist()
 //------------------------------------------------------------------------------
 
 TRasterP TRamCachePersist::doGetRaster(int frame)
-//void TRamCachePersist::doGetRaster(int frame, const TRasterP &ras)
+// void TRamCachePersist::doGetRaster(int frame, const TRasterP &ras)
 {
 	Imp::CompressedChunks::const_iterator it = m_imp->m_chunks.find(frame);
 	if (it == m_imp->m_chunks.end())
@@ -904,8 +894,7 @@ bool TRamCachePersist::doPutRaster(int frame, const TRasterP &ras)
 
 void TRamCachePersist::onInvalidate()
 {
-	for (Imp::CompressedChunks::iterator it = m_imp->m_chunks.begin();
-		 it != m_imp->m_chunks.end();
+	for (Imp::CompressedChunks::iterator it = m_imp->m_chunks.begin(); it != m_imp->m_chunks.end();
 		 ++it) {
 		Imp::CompressedChunk *cc = it->second;
 		m_imp->m_cacheSize -= cc->m_size;
@@ -954,14 +943,14 @@ TUINT64 TRamCachePersist::getUsedSpace()
 
 void TDiskCachePersist::onInvalidate()
 {
-	//m_imp->m_chunkSize = 0;
+	// m_imp->m_chunkSize = 0;
 }
 
 //------------------------------------------------------------------------------
 
 void TDiskCachePersist::onInvalidate(int startFrame, int endFrame)
 {
-	//m_imp->m_chunkSize = 0;
+	// m_imp->m_chunkSize = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -985,7 +974,7 @@ namespace
 
 class ZFile
 {
-public:
+  public:
 	ZFile(const TFilePath &fp, bool directIO, bool asyncIO);
 	~ZFile();
 
@@ -996,22 +985,14 @@ public:
 
 	void waitForAsyncIOCompletion() const;
 
-	TFilePath getFilePath() const
-	{
-		return m_filepath;
-	}
+	TFilePath getFilePath() const { return m_filepath; }
 
-	int getBytesPerSector() const
-	{
-		return m_bytesPerSector;
-	}
+	int getBytesPerSector() const { return m_bytesPerSector; }
 
-	static void CALLBACK FileIOCompletionRoutine(
-		DWORD errCode,
-		DWORD byteTransferred,
-		LPOVERLAPPED overlapped);
+	static void CALLBACK FileIOCompletionRoutine(DWORD errCode, DWORD byteTransferred,
+												 LPOVERLAPPED overlapped);
 
-private:
+  private:
 	TFilePath m_filepath;
 	bool m_directIO;
 	bool m_asyncIO;
@@ -1024,7 +1005,8 @@ private:
 //-----------------------------------------------------------------------------
 
 ZFile::ZFile(const TFilePath &fp, bool directIO, bool asyncIO)
-	: m_filepath(fp), m_directIO(directIO), m_asyncIO(asyncIO), m_fileHandle(0), m_writeNotPending(0)
+	: m_filepath(fp), m_directIO(directIO), m_asyncIO(asyncIO), m_fileHandle(0),
+	  m_writeNotPending(0)
 {
 	DWORD sectorsPerCluster;
 	DWORD numberOfFreeClusters;
@@ -1036,13 +1018,12 @@ ZFile::ZFile(const TFilePath &fp, bool directIO, bool asyncIO)
 	while (std::find(disks.begin(), disks.end(), disk) == disks.end())
 		disk = disk.getParentDir();
 
-	BOOL ret = GetDiskFreeSpaceW(
-		disk.getWideString().c_str(), // root path
-		&sectorsPerCluster,			  // sectors per cluster
-		&m_bytesPerSector,			  // bytes per sector
-		&numberOfFreeClusters,		  // free clusters
-		&totalNumberOfClusters		  // total clusters
-		);
+	BOOL ret = GetDiskFreeSpaceW(disk.getWideString().c_str(), // root path
+								 &sectorsPerCluster,		   // sectors per cluster
+								 &m_bytesPerSector,			   // bytes per sector
+								 &numberOfFreeClusters,		   // free clusters
+								 &totalNumberOfClusters		   // total clusters
+								 );
 
 	if (m_asyncIO)
 		m_writeNotPending = CreateEvent(NULL, TRUE, TRUE, NULL);
@@ -1072,7 +1053,7 @@ void ZFile::open()
 							   GENERIC_READ | GENERIC_WRITE, // Read/Write access
 							   0,							 // no sharing allowed
 							   NULL,						 // no security
-							   OPEN_ALWAYS,					 // open it or create new if it doesn't exist
+							   OPEN_ALWAYS, // open it or create new if it doesn't exist
 							   flagsAndAttributes,
 							   NULL); // ignored
 
@@ -1111,23 +1092,21 @@ int ZFile::read(BYTE buf[], int size, TINT64 qwOffset) const
 	overLapped.OffsetHigh = DWORDLONG_HI_DWORD(qwOffset);
 
 	if (m_asyncIO) {
-		overLapped.hEvent = CreateEvent(
-			NULL,  // SD
-			TRUE,  // manual reset
-			FALSE, // initial state is not signaled
-			NULL); // object name
+		overLapped.hEvent = CreateEvent(NULL,  // SD
+										TRUE,  // manual reset
+										FALSE, // initial state is not signaled
+										NULL); // object name
 	} else
 		overLapped.hEvent = NULL;
 
 	bytesToRead = size;
 
 	// Read a bunch of bytes and store in buf
-	int result = ReadFile(
-		m_fileHandle, // file handle
-		(void *)buf,  // buffer to store data
-		bytesToRead,  // num bytes to read
-		&bytesRead,   // bytes read
-		&overLapped); // stucture for file offsets
+	int result = ReadFile(m_fileHandle, // file handle
+						  (void *)buf,  // buffer to store data
+						  bytesToRead,  // num bytes to read
+						  &bytesRead,   // bytes read
+						  &overLapped); // stucture for file offsets
 
 	if (!result) {
 		DWORD error = GetLastError();
@@ -1175,12 +1154,11 @@ int ZFile::write(BYTE buf[], int size, TINT64 qwOffset) const
 
 		bytesToWrite = size;
 
-		result = WriteFileEx(
-			m_fileHandle, // file handle
-			(void *)buf,  // data buffer
-			bytesToWrite, // num bytes to write
-			overLapped,   // stucture for file offsets
-			&ZFile::FileIOCompletionRoutine);
+		result = WriteFileEx(m_fileHandle, // file handle
+							 (void *)buf,  // data buffer
+							 bytesToWrite, // num bytes to write
+							 overLapped,   // stucture for file offsets
+							 &ZFile::FileIOCompletionRoutine);
 
 		ResetEvent(m_writeNotPending);
 	} else {
@@ -1194,12 +1172,11 @@ int ZFile::write(BYTE buf[], int size, TINT64 qwOffset) const
 
 		bytesToWrite = size;
 
-		result = WriteFile(
-			m_fileHandle,  // file handle
-			(void *)buf,   // data buffer
-			bytesToWrite,  // num bytes to read
-			&bytesWritten, // bytes read
-			&overLapped);  // stucture for file offsets
+		result = WriteFile(m_fileHandle,  // file handle
+						   (void *)buf,   // data buffer
+						   bytesToWrite,  // num bytes to read
+						   &bytesWritten, // bytes read
+						   &overLapped);  // stucture for file offsets
 	}
 
 	if (!result) {
@@ -1226,10 +1203,8 @@ void ZFile::waitForAsyncIOCompletion() const
 
 //------------------------------------------------------------------------------
 
-void CALLBACK ZFile::FileIOCompletionRoutine(
-	DWORD errCode,
-	DWORD byteTransferred,
-	LPOVERLAPPED overlapped)
+void CALLBACK ZFile::FileIOCompletionRoutine(DWORD errCode, DWORD byteTransferred,
+											 LPOVERLAPPED overlapped)
 {
 	delete overlapped;
 }
@@ -1239,10 +1214,10 @@ void CALLBACK ZFile::FileIOCompletionRoutine(
 
 class BufferQueue
 {
-public:
+  public:
 	class Item
 	{
-	public:
+	  public:
 		Item(int frame, UCHAR *buffer, int bufferSize, int chunkSize)
 			: m_frame(frame), m_buffer(buffer), m_bufferSize(bufferSize), m_chunkSize(chunkSize)
 		{
@@ -1255,7 +1230,8 @@ public:
 	};
 
 	BufferQueue(int capacity, int allocUnit)
-		: m_capacity(capacity), m_allocUnit(allocUnit), m_notEmpty(), m_notFull(), m_mutex(), m_bufferCount(0), m_nextPutItem(0), m_nextGetItem(0)
+		: m_capacity(capacity), m_allocUnit(allocUnit), m_notEmpty(), m_notFull(), m_mutex(),
+		  m_bufferCount(0), m_nextPutItem(0), m_nextGetItem(0)
 	{
 		for (int i = 0; i < m_capacity; ++i)
 			m_items.push_back(Item(-1, (UCHAR *)0, 0, 0));
@@ -1333,7 +1309,7 @@ public:
 		return m_bufferCount;
 	}
 
-private:
+  private:
 	int m_capacity;
 	int m_allocUnit;
 
@@ -1353,7 +1329,7 @@ private:
 
 class WriteBufferTask : public TThread::Runnable
 {
-public:
+  public:
 	WriteBufferTask(ZFile *file, BufferQueue *bufferQueue)
 		: m_file(file), m_bufferQueue(bufferQueue)
 	{
@@ -1388,9 +1364,10 @@ void WriteBufferTask::run()
 
 class TDiskCachePersist2::Imp
 {
-public:
+  public:
 	Imp(const TFilePath &fp, bool asyncWrite)
-		: m_chunkSize(0), m_readBuffer(0), m_file(new ZFile(fp, true, asyncWrite)), m_asyncWrite(asyncWrite), m_executor(0), m_bufferQueue(0)
+		: m_chunkSize(0), m_readBuffer(0), m_file(new ZFile(fp, true, asyncWrite)),
+		  m_asyncWrite(asyncWrite), m_executor(0), m_bufferQueue(0)
 	{
 		m_file->open();
 		m_allocUnit = m_file->getBytesPerSector();
@@ -1670,4 +1647,4 @@ TUINT64 TDiskCachePersist2::getUsedSpace()
 }
 
 //------------------------------------------------------------------------------
-#endif //WIN32
+#endif // WIN32

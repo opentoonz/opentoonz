@@ -42,14 +42,14 @@ class CleanupPaletteViewer : public QWidget
 	bool m_greyMode;
 	bool m_contrastEnabled;
 
-public:
+  public:
 	CleanupPaletteViewer(QWidget *parent);
 
 	void setMode(bool greyMode);
 	void updateColors();
 	void setContrastEnabled(bool enable);
 
-protected slots:
+  protected slots:
 
 	void buildGUI();
 	void onColorStyleChanged();
@@ -59,4 +59,4 @@ protected slots:
 	void onRemoveClicked(bool);
 };
 
-#endif //CLEANUP_PALETTE_VIEWER_H
+#endif // CLEANUP_PALETTE_VIEWER_H

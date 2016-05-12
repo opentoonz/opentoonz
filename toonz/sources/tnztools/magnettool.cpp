@@ -33,9 +33,7 @@ namespace
  fissare un contatore in modo da prendere le stroke
  alternativamente (interne/esterne).
 */
-void selectStrokeToMove(const ArrayOfStroke &v,
-						const TPointD &center,
-						double radius,
+void selectStrokeToMove(const ArrayOfStroke &v, const TPointD &center, double radius,
 						ArrayOfStroke &toMove)
 {
 	if (v.empty())
@@ -55,13 +53,14 @@ void selectStrokeToMove(const ArrayOfStroke &v,
 //=============================================================================
 /*
 inline  double computeStep(const TQuadratic& quad, double invOfPixelSize)
-{  
+{
   double step = std::numeric_limits<double>::max();
-  
-  TPointD A = quad.getP0() - 2.0*quad.getP1() + quad.getP2(); // 2*A is the acceleration of the curve
+
+  TPointD A = quad.getP0() - 2.0*quad.getP1() + quad.getP2(); // 2*A is the acceleration of the
+curve
   double  A_len = norm(A);
-  if (A_len > 0)  step = TConsts::sqrt2 * sqrt(invOfPixelSize/A_len); 
-  
+  if (A_len > 0)  step = TConsts::sqrt2 * sqrt(invOfPixelSize/A_len);
+
   return  step;
 }
 */
@@ -117,13 +116,9 @@ class MagnetTool : public TTool
 
 	bool m_active;
 
-	TPointD
-		m_startingPos;
+	TPointD m_startingPos;
 
-	TPointD
-		m_oldPos,
-		m_pointAtMouseDown,
-		m_pointAtMove;
+	TPointD m_oldPos, m_pointAtMouseDown, m_pointAtMove;
 
 	DoublePair m_extremes;
 	int m_cursorId;
@@ -138,7 +133,7 @@ class MagnetTool : public TTool
 	} strokeCollection;
 
 	std::vector<strokeCollection> m_strokeToModify;
-	//vector<StrokeInfo>  m_info;
+	// vector<StrokeInfo>  m_info;
 	std::vector<TStroke *> m_strokeHit, m_oldStrokesArray;
 
 	std::vector<int> m_changedStrokes;
@@ -148,9 +143,10 @@ class MagnetTool : public TTool
 	TDoubleProperty m_toolSize;
 	TPropertyGroup m_prop;
 
-public:
+  public:
 	MagnetTool()
-		: TTool("T_Magnet"), m_active(false), m_pointSize(-1), m_oldStrokesArray(), m_toolSize("Size:", 0, 100, 20) // W_ToolOptions_MagnetTool
+		: TTool("T_Magnet"), m_active(false), m_pointSize(-1), m_oldStrokesArray(),
+		  m_toolSize("Size:", 0, 100, 20) // W_ToolOptions_MagnetTool
 	{
 		bind(TTool::Vectors);
 		m_prop.bind(m_toolSize);
@@ -158,10 +154,7 @@ public:
 
 	ToolType getToolType() const { return TTool::LevelWriteTool; }
 
-	void updateTranslation()
-	{
-		m_toolSize.setQStringName(tr("Size:"));
-	}
+	void updateTranslation() { m_toolSize.setQStringName(tr("Size:")); }
 
 	void onEnter()
 	{
@@ -181,10 +174,7 @@ public:
 		m_pointSize = (x - minRange) / (maxRange - minRange) * (maxSize - minSize) + minSize;
 	}
 
-	void onLeave()
-	{
-		m_pointSize = -1;
-	}
+	void onLeave() { m_pointSize = -1; }
 
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &e)
 	{
@@ -225,8 +215,7 @@ public:
 			intersect(*ref, p, m_pointSize, intersections);
 
 			if (intersections.empty()) {
-				if (increaseControlPoints(*ref,
-										  TStrokePointDeformation(p, m_pointSize))) {
+				if (increaseControlPoints(*ref, TStrokePointDeformation(p, m_pointSize))) {
 					m_changedStrokes.push_back(i);
 					m_strokeHit.push_back(ref);
 
@@ -249,13 +238,11 @@ public:
 
 				splitStroke(*sc.m_parent, intersections, sc.m_splitted);
 
-				selectStrokeToMove(sc.m_splitted,
-								   p,
-								   m_pointSize,
-								   sc.m_splittedToMove);
+				selectStrokeToMove(sc.m_splitted, p, m_pointSize, sc.m_splittedToMove);
 				for (UINT ii = 0; ii < sc.m_splittedToMove.size(); ++ii) {
 					TStroke *temp = sc.m_splittedToMove[ii];
-					bool test = increaseControlPoints(*temp, TStrokePointDeformation(p, m_pointSize));
+					bool test =
+						increaseControlPoints(*temp, TStrokePointDeformation(p, m_pointSize));
 					assert(test);
 
 					std::vector<int> *corners = new std::vector<int>;
@@ -303,31 +290,31 @@ public:
 		m_oldPos = p;
 		m_pointAtMouseDown = p;
 
-		//double sc = exp(0.001 * (double)dx);
+		// double sc = exp(0.001 * (double)dx);
 		TVectorImageP vi = TImageP(getImage(true));
 		if (!vi)
 			return;
 		QMutexLocker lock(vi->getMutex());
-		TPointD
-			offset = p - m_pointAtMove;
+		TPointD offset = p - m_pointAtMove;
 
 		/*
-      if( tdistance2(m_pointAtMouseDown, p ) > sq(m_pointSize * 0.5) ) // reincremento
-      {
-      leftButtonUp(p);
-      lefrightButtonDown(p);
-      }
-    */
+	  if( tdistance2(m_pointAtMouseDown, p ) > sq(m_pointSize * 0.5) ) // reincremento
+	  {
+	  leftButtonUp(p);
+	  lefrightButtonDown(p);
+	  }
+	*/
 		UINT i, j;
 
 		for (i = 0; i < m_strokeHit.size(); ++i)
-			modifyControlPoints(*m_strokeHit[i],
-								TStrokePointDeformation(offset, m_pointAtMouseDown, m_pointSize * 0.7));
+			modifyControlPoints(*m_strokeHit[i], TStrokePointDeformation(offset, m_pointAtMouseDown,
+																		 m_pointSize * 0.7));
 
 		for (i = 0; i < m_strokeToModify.size(); ++i)
 			for (j = 0; j < m_strokeToModify[i].m_splittedToMove.size(); ++j) {
 				TStroke *temp = m_strokeToModify[i].m_splittedToMove[j];
-				modifyControlPoints(*temp, TStrokePointDeformation(offset, m_pointAtMouseDown, m_pointSize * 0.7));
+				modifyControlPoints(
+					*temp, TStrokePointDeformation(offset, m_pointAtMouseDown, m_pointSize * 0.7));
 			}
 
 		m_pointAtMove = p;
@@ -365,7 +352,8 @@ public:
 		for (i = 0; i < m_strokeHit.size(); ++i) {
 			ref = m_strokeHit[i];
 			ref->enableComputeOfCaches();
-			ref->reduceControlPoints(getPixelSize() * ReduceControlPointCorrection, *(m_hitStrokeCorners[i]));
+			ref->reduceControlPoints(getPixelSize() * ReduceControlPointCorrection,
+									 *(m_hitStrokeCorners[i]));
 			// vi->validateRegionEdges(ref, false);
 		}
 		clearPointerContainer(m_hitStrokeCorners);
@@ -379,7 +367,8 @@ public:
 			for (j = 0; j < sc.m_splittedToMove.size(); ++j) {
 				ref = sc.m_splittedToMove[j];
 				ref->enableComputeOfCaches();
-				ref->reduceControlPoints(getPixelSize() * ReduceControlPointCorrection, *(m_strokeToModifyCorners[count++]));
+				ref->reduceControlPoints(getPixelSize() * ReduceControlPointCorrection,
+										 *(m_strokeToModifyCorners[count++]));
 			}
 
 			// ricostruisco una stroke con quella data
@@ -427,9 +416,9 @@ public:
 		if (!vi)
 			return;
 
-		//TAffine viewMatrix = getViewer()->getViewMatrix();
-		//glPushMatrix();
-		//tglMultMatrix(viewMatrix);
+		// TAffine viewMatrix = getViewer()->getViewMatrix();
+		// glPushMatrix();
+		// tglMultMatrix(viewMatrix);
 
 		if (m_pointSize > 0) {
 			tglColor(TPixel32::Red);
@@ -437,14 +426,14 @@ public:
 		}
 
 		if (!m_active) {
-			//glPopMatrix();
+			// glPopMatrix();
 			return;
 		}
 
 		TPointD delta = m_pointAtMouseDown - m_startingPos;
 
 		//    glPushMatrix();
-		//tglMultMatrix(m_referenceMatrix);
+		// tglMultMatrix(m_referenceMatrix);
 
 		if (!m_strokeHit.empty())
 			for (UINT i = 0; i < m_strokeHit.size(); ++i)
@@ -460,7 +449,7 @@ public:
 			}
 
 		//    glPopMatrix();
-		//glPopMatrix();
+		// glPopMatrix();
 	}
 
 	void onActivate()
@@ -468,13 +457,10 @@ public:
 		//        getApplication()->editImageOrSpline();
 	}
 
-	TPropertyGroup *getProperties(int targetType)
-	{
-		return &m_prop;
-	}
+	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
 	int getCursorId() const { return m_cursorId; }
 
 } magnetTool;
 
-//TTool *getMagnetTool() {return &magnetTool;}
+// TTool *getMagnetTool() {return &magnetTool;}

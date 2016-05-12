@@ -56,7 +56,7 @@ class DVAPI ChennelCurveEditor : public QWidget
 
 	bool m_isLinear;
 
-public:
+  public:
 	ChennelCurveEditor(QWidget *parent = 0, HistogramView *histogramView = 0);
 
 	void setPoints(QList<TPointD> points);
@@ -71,7 +71,7 @@ public:
 
 	void setLinear(bool isLinear);
 
-protected:
+  protected:
 	QPointF strokeToViewPoint(const TPointD p);
 	TPointD viewToStrokePoint(const QPointF &p);
 	int getClosestPointIndex(const QPointF &pos, double &minDistance2) const;
@@ -106,7 +106,7 @@ protected:
 	void focusInEvent(QFocusEvent *fe);
 	void focusOutEvent(QFocusEvent *fe);
 
-signals:
+  signals:
 	void focusOut();
 	void controlPointChanged(bool isDragging);
 	void controlPointAdded(int index);
@@ -128,7 +128,7 @@ class DVAPI ToneCurveField : public QWidget
 	QComboBox *m_channelListChooser;
 	CheckBox *m_isLinearCheckBox;
 
-public:
+  public:
 	ToneCurveField(QWidget *parent = 0, FxHistogramRender *fxHistogramRender = 0);
 
 	void setCurrentChannel(int currentChannel);
@@ -140,16 +140,16 @@ public:
 
 	void setIsLinearCheckBox(bool isChecked);
 
-protected slots:
+  protected slots:
 	void sliderValueChanged(bool);
 	void onFirstLastXPostionChanged(int, int);
 
-public slots:
+  public slots:
 	void setLinear(bool);
 
 	void setLinearManually(bool);
 
-signals:
+  signals:
 	void currentChannelIndexChanged(int);
 	void isLinearChanged(bool);
 };

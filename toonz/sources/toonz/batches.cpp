@@ -34,18 +34,12 @@ namespace
 class NotifyMessage : public TThread::Message
 {
 
-public:
+  public:
 	NotifyMessage() {}
 
-	void onDeliver()
-	{
-		BatchesController::instance()->update();
-	}
+	void onDeliver() { BatchesController::instance()->update(); }
 
-	TThread::Message *clone() const
-	{
-		return new NotifyMessage(*this);
-	}
+	TThread::Message *clone() const { return new NotifyMessage(*this); }
 };
 
 } // namespace
@@ -55,8 +49,7 @@ public:
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 
-LoadTaskListPopup::LoadTaskListPopup()
-	: FileBrowserPopup(tr("Load Task List"))
+LoadTaskListPopup::LoadTaskListPopup() : FileBrowserPopup(tr("Load Task List"))
 {
 	addFilterType("tnzbat");
 	setOkText(tr("Load"));
@@ -83,8 +76,7 @@ bool LoadTaskListPopup::execute()
 
 //----------------------------------------------------------------------------------------------------------------
 
-LoadTaskPopup::LoadTaskPopup()
-	: FileBrowserPopup(""), m_isRenderTask(true)
+LoadTaskPopup::LoadTaskPopup() : FileBrowserPopup(""), m_isRenderTask(true)
 {
 	addFilterType("tnz");
 	setOkText(tr("Add"));
@@ -93,7 +85,8 @@ LoadTaskPopup::LoadTaskPopup()
 void LoadTaskPopup::open(bool isRenderTask)
 {
 	m_isRenderTask = isRenderTask;
-	setWindowTitle(isRenderTask ? tr("Add Render Task to Batch List") : tr("Add Cleanup Task to Batch List"));
+	setWindowTitle(isRenderTask ? tr("Add Render Task to Batch List")
+								: tr("Add Cleanup Task to Batch List"));
 
 	if (isRenderTask)
 		removeFilterType("cln");
@@ -131,8 +124,7 @@ bool LoadTaskPopup::execute()
 
 //=============================================================================
 
-SaveTaskListPopup::SaveTaskListPopup()
-	: FileBrowserPopup(tr("Save Task List"))
+SaveTaskListPopup::SaveTaskListPopup() : FileBrowserPopup(tr("Save Task List"))
 {
 	setOkText(tr("Save"));
 }
@@ -154,9 +146,11 @@ map<QString, QProcess *> RunningTasks;
 
 class TaskRunner : public TThread::Runnable
 {
-public:
+  public:
 	TaskRunner(TFarmTask *task, int localControllerPort)
-		: m_task(task), m_localControllerPort(localControllerPort) {}
+		: m_task(task), m_localControllerPort(localControllerPort)
+	{
+	}
 
 	void run();
 
@@ -177,8 +171,8 @@ void TaskRunner::run()
 
 int TaskRunner::taskLoad()
 {
-	//We assume that CPU control is under the user's responsibility about
-	//tcomposer tasks - so they don't figure in CPU consumption calculations.
+	// We assume that CPU control is under the user's responsibility about
+	// tcomposer tasks - so they don't figure in CPU consumption calculations.
 	return 0;
 }
 
@@ -197,7 +191,7 @@ else return  "127.0.0.1"; //localHost
 
 void TaskRunner::doRun(TFarmTask *task)
 {
-	//Suspended tasks are not executed. (Should only waiting ones be executed?)
+	// Suspended tasks are not executed. (Should only waiting ones be executed?)
 	if (task->m_status == Suspended)
 		return;
 
@@ -224,7 +218,7 @@ void TaskRunner::doRun(TFarmTask *task)
 
 	int count = task->getTaskCount();
 	if (count > 1) {
-		//Launch each subtask
+		// Launch each subtask
 		for (int i = 0; i < task->getTaskCount(); i++) {
 			if (task->m_status == Suspended)
 				break;
@@ -232,7 +226,7 @@ void TaskRunner::doRun(TFarmTask *task)
 			doRun(task->getTask(i));
 		}
 
-		//Check their status
+		// Check their status
 		task->m_status = Completed;
 		task->m_successfullSteps = task->m_to - task->m_from + 1;
 		task->m_completionDate = QDateTime::currentDateTime();
@@ -246,10 +240,10 @@ void TaskRunner::doRun(TFarmTask *task)
 		return;
 	}
 
-	//int exitCode;
+	// int exitCode;
 
 	/*QString commandline = task->getCommandLine();
-  
+
   commandline += " -farm ";
   commandline += QString::number(m_localControllerPort) + "@localhost";
   commandline += " -id " + task->m_id;*/
@@ -274,7 +268,7 @@ void TaskRunner::doRun(TFarmTask *task)
 		QMutexLocker sl(&TasksMutex);
 		RunningTasks.erase(task->m_id);
 	}
-	//exitCode = QProcess::execute(task->getCommandLine());
+	// exitCode = QProcess::execute(task->getCommandLine());
 
 	int error = process->error();
 	bool statusOK = (error == QProcess::UnknownError) &&
@@ -334,19 +328,20 @@ void BatchesController::addCleanupTask(const TFilePath &taskFilePath)
 	while (BatchesController::instance()->getTask(id))
 		id = QString::number(TaskCounter++);
 
-	TFarmTaskGroup *taskGroup = new TFarmTaskGroup(id,											   //id
-												   QString::fromStdString(taskFilePath.getName()), //name
-												   TSystem::getUserName(),						   //user
-												   TSystem::getHostName(),						   //host
-												   1,											   //stepCount
-												   50,											   //priority
-												   taskFilePath,								   //taskFilePath
-												   Overwrite_Off,								   //Overwrite
-												   false);										   //onlyvisible
+	TFarmTaskGroup *taskGroup =
+		new TFarmTaskGroup(id, // id
+						   QString::fromStdString(taskFilePath.getName()), // name
+						   TSystem::getUserName(), // user
+						   TSystem::getHostName(), // host
+						   1, // stepCount
+						   50, // priority
+						   taskFilePath, // taskFilePath
+						   Overwrite_Off, // Overwrite
+						   false); // onlyvisible
 
 	try {
 		BatchesController::instance()->addTask(id, taskGroup);
-	} catch (TException&) {
+	} catch (TException &) {
 	}
 }
 
@@ -409,25 +404,18 @@ void BatchesController::addComposerTask(const TFilePath &_taskFilePath)
 	while (BatchesController::instance()->getTask(id))
 		id = QString::number(TaskCounter++);
 
-	TFarmTaskGroup *taskGroup = new TFarmTaskGroup(id,
-												   name,
-												   TSystem::getUserName(),
-												   TSystem::getHostName(),
-												   sceneFrameCount,
-												   50,
-												   taskFilePath,
-												   outputPath,
-												   r0, r1,
-												   step, shrink, multimedia, taskChunkSize,
-												   threadsIndex, maxTileSizeIndex);
+	TFarmTaskGroup *taskGroup =
+		new TFarmTaskGroup(id, name, TSystem::getUserName(), TSystem::getHostName(),
+						   sceneFrameCount, 50, taskFilePath, outputPath, r0, r1, step, shrink,
+						   multimedia, taskChunkSize, threadsIndex, maxTileSizeIndex);
 
 	try {
 		BatchesController::instance()->addTask(id, taskGroup);
-	} catch (TException&) {
-		//TMessage::error(toString(e.getMessage()));
+	} catch (TException &) {
+		// TMessage::error(toString(e.getMessage()));
 	}
-	//m_data->m_scene.setProject( mainprogramProj);
-	//TModalPopup::closePopup();
+	// m_data->m_scene.setProject( mainprogramProj);
+	// TModalPopup::closePopup();
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -437,7 +425,7 @@ void BatchesController::addTask(const QString &id, TFarmTask *task, bool doUpdat
 {
 #ifdef _DEBUG
 	std::map<QString, TFarmTask *>::iterator it = m_tasks.find(id);
-//assert(it == m_tasks.end());
+// assert(it == m_tasks.end());
 #endif
 	if (task->m_id.isEmpty())
 		task->m_id = id;
@@ -464,7 +452,8 @@ void BatchesController::addTask(const QString &id, TFarmTask *task, bool doUpdat
 
 QString BatchesController::taskBusyStr()
 {
-	return tr("The %1 task is currently active.\nStop it or wait for its completion before removing it.");
+	return tr(
+		"The %1 task is currently active.\nStop it or wait for its completion before removing it.");
 }
 
 //------------------------------------------------------------------------------
@@ -582,7 +571,8 @@ TFarmTask *BatchesController::getTask(const QString &id) const
 
 //------------------------------------------------------------------------------
 
-bool BatchesController::getTaskInfo(const QString &id, QString &parent, QString &name, TaskState &status)
+bool BatchesController::getTaskInfo(const QString &id, QString &parent, QString &name,
+									TaskState &status)
 {
 	TFarmTask *task = getTask(id);
 	if (task) {
@@ -611,7 +601,8 @@ void BatchesController::setDirtyFlag(bool state)
 
 	if (FirstTime) {
 		FirstTime = false;
-		bool ret = connect(TApp::instance()->getMainWindow(), SIGNAL(exit(bool &)), SLOT(onExit(bool &)));
+		bool ret =
+			connect(TApp::instance()->getMainWindow(), SIGNAL(exit(bool &)), SLOT(onExit(bool &)));
 		assert(ret);
 	}
 
@@ -645,7 +636,8 @@ void BatchesController::startAll()
 		std::multimap<int, TFarmTask *> tasksByPriority;
 
 		std::map<QString, TFarmTask *>::reverse_iterator it = m_tasks.rbegin();
-		//uso il reverse iterator anche qui altrimenti se ho task con priorita' uguale li esegue dall'ultimo al primo
+		// uso il reverse iterator anche qui altrimenti se ho task con priorita' uguale li esegue
+		// dall'ultimo al primo
 		for (; it != m_tasks.rend(); ++it) {
 			TFarmTask *task = it->second;
 			tasksByPriority.insert(std::make_pair(task->m_priority, task));
@@ -748,22 +740,22 @@ void BatchesController::stop(const QString &taskId)
 	TFarmTask *task = it->second;
 	assert(task);
 
-	//Update the task status
+	// Update the task status
 	if (task->m_status == Waiting)
 		task->m_status = Suspended;
 
-	//Local farm <==> m_controller != 0
+	// Local farm <==> m_controller != 0
 	if (!m_controller) {
 		QMutexLocker sl(&TasksMutex);
 		std::map<QString, QProcess *>::iterator it;
 
-		//Kill the associated process if any
+		// Kill the associated process if any
 		if ((it = RunningTasks.find(task->m_id)) != RunningTasks.end()) {
 			it->second->kill();
 			RunningTasks.erase(task->m_id);
 		}
 
-		//Do the same for child tasks
+		// Do the same for child tasks
 		int count = task->getTaskCount();
 		if (count > 1) {
 			for (int i = 0; i < count; ++i) {
@@ -791,7 +783,7 @@ void BatchesController::stop(const QString &taskId)
 void BatchesController::stopAll()
 {
 	if (!m_controller) {
-		//Stop all running QProcesses
+		// Stop all running QProcesses
 		QMutexLocker sl(&TasksMutex);
 
 		std::map<QString, QProcess *>::iterator it;
@@ -801,7 +793,7 @@ void BatchesController::stopAll()
 		RunningTasks.clear();
 		m_localExecutor.cancelAll();
 	} else {
-		//Suspend all farmIds
+		// Suspend all farmIds
 		std::map<QString, QString>::iterator it;
 		for (it = m_farmIdsTable.begin(); it != m_farmIdsTable.end(); ++it) {
 			QString farmId = it->second;
@@ -809,7 +801,7 @@ void BatchesController::stopAll()
 		}
 	}
 
-	//Update all waiting task status
+	// Update all waiting task status
 	std::map<QString, TFarmTask *>::iterator jt;
 	for (jt = m_tasks.begin(); jt != m_tasks.end(); ++jt) {
 		if (jt->second->m_status == Waiting)
@@ -826,7 +818,10 @@ void BatchesController::onExit(bool &ret)
 	int answer = 0;
 
 	if (m_dirtyFlag)
-		answer = DVGui::MsgBox(QString(tr("The current task list has been modified.\nDo you want to save your changes?")), tr("Save"), tr("Discard"), tr("Cancel"), 1);
+		answer = DVGui::MsgBox(
+			QString(
+				tr("The current task list has been modified.\nDo you want to save your changes?")),
+			tr("Save"), tr("Discard"), tr("Cancel"), 1);
 
 	ret = true;
 	if (answer == 3)
@@ -858,7 +853,10 @@ void BatchesController::loadTask(bool isRenderTask)
 void BatchesController::doLoad(const TFilePath &fp)
 {
 	if (m_dirtyFlag) {
-		int ret = DVGui::MsgBox(QString(tr("The current task list has been modified.\nDo you want to save your changes?")), tr("Save"), tr("Discard"), tr("Cancel"));
+		int ret = DVGui::MsgBox(
+			QString(
+				tr("The current task list has been modified.\nDo you want to save your changes?")),
+			tr("Save"), tr("Discard"), tr("Cancel"));
 		if (ret == 1)
 			save();
 		else if (ret == 3 || ret == 0)
@@ -921,7 +919,8 @@ void BatchesController::doLoad(const TFilePath &fp)
 
 QString BatchesController::getListName() const
 {
-	QString str = (m_filepath == TFilePath() ? tr("Tasks") : QString::fromStdString(m_filepath.getName()));
+	QString str =
+		(m_filepath == TFilePath() ? tr("Tasks") : QString::fromStdString(m_filepath.getName()));
 	return str + (m_dirtyFlag ? "*" : "");
 }
 
@@ -1031,18 +1030,15 @@ namespace
 
 class ControllerFailureMsg : public TThread::Message
 {
-public:
+  public:
 	ControllerFailureMsg(const TException &e) : m_e(e) {}
 
 	void onDeliver()
 	{
-		//throw m_e;
+		// throw m_e;
 	}
 
-	TThread::Message *clone() const
-	{
-		return new ControllerFailureMsg(m_e);
-	}
+	TThread::Message *clone() const { return new ControllerFailureMsg(m_e); }
 
 	TException m_e;
 };
@@ -1113,10 +1109,8 @@ namespace
 
 class MyLocalController : public TFarmController, public TFarmExecutor
 {
-public:
-	MyLocalController(int port) : TFarmExecutor(port)
-	{
-	}
+  public:
+	MyLocalController(int port) : TFarmExecutor(port) {}
 
 	QString execute(const std::vector<QString> &argv);
 
@@ -1132,40 +1126,20 @@ public:
 
 	void queryTaskInfo(const QString &id, TFarmTask &task);
 
-	void queryTaskShortInfo(
-		const QString &id,
-		QString &parentId,
-		QString &name,
-		TaskState &status);
+	void queryTaskShortInfo(const QString &id, QString &parentId, QString &name, TaskState &status);
 
-	void attachServer(const QString &name, const QString &addr, int port)
-	{
-		assert(false);
-	}
+	void attachServer(const QString &name, const QString &addr, int port) { assert(false); }
 
-	void detachServer(const QString &name, const QString &addr, int port)
-	{
-		assert(false);
-	}
+	void detachServer(const QString &name, const QString &addr, int port) { assert(false); }
 
-	void taskSubmissionError(const QString &taskId, int errCode)
-	{
-		assert(false);
-	}
+	void taskSubmissionError(const QString &taskId, int errCode) { assert(false); }
 
-	void taskProgress(
-		const QString &taskId,
-		int step,
-		int stepCount,
-		int frameNumber,
-		FrameState state);
+	void taskProgress(const QString &taskId, int step, int stepCount, int frameNumber,
+					  FrameState state);
 
 	void taskCompleted(const QString &taskId, int exitCode);
 
-	void getServers(vector<ServerIdentity> &servers)
-	{
-		assert(false);
-	}
+	void getServers(vector<ServerIdentity> &servers) { assert(false); }
 
 	ServerState queryServerState2(const QString &id)
 	{
@@ -1173,22 +1147,13 @@ public:
 		return ServerUnknown;
 	}
 
-	void queryServerInfo(const QString &id, ServerInfo &info)
-	{
-		assert(false);
-	}
+	void queryServerInfo(const QString &id, ServerInfo &info) { assert(false); }
 
-	void activateServer(const QString &id)
-	{
-		assert(false);
-	}
+	void activateServer(const QString &id) { assert(false); }
 
-	void deactivateServer(const QString &id, bool completeRunningTasks)
-	{
-		assert(false);
-	}
+	void deactivateServer(const QString &id, bool completeRunningTasks) { assert(false); }
 
-private:
+  private:
 	std::map<QString, TFarmTask> m_tasks;
 };
 
@@ -1263,21 +1228,14 @@ void MyLocalController::queryTaskInfo(const QString &id, TFarmTask &task)
 	assert(false);
 }
 
-void MyLocalController::queryTaskShortInfo(
-	const QString &id,
-	QString &parentId,
-	QString &name,
-	TaskState &status)
+void MyLocalController::queryTaskShortInfo(const QString &id, QString &parentId, QString &name,
+										   TaskState &status)
 {
 	assert(false);
 }
 
-void MyLocalController::taskProgress(
-	const QString &taskId,
-	int step,
-	int stepCount,
-	int frameNumber,
-	FrameState state)
+void MyLocalController::taskProgress(const QString &taskId, int step, int stepCount,
+									 int frameNumber, FrameState state)
 {
 	TFarmTask *task = BatchesController::instance()->getTask(taskId);
 	assert(task);
@@ -1308,27 +1266,22 @@ class MyLocalControllerController : public TThread::Runnable
 
 	MyLocalController *m_controller;
 
-public:
-	MyLocalControllerController(int port)
-		: m_controller(new MyLocalController(port))
+  public:
+	MyLocalControllerController(int port) : m_controller(new MyLocalController(port))
 	{
 		TThread::Executor executor;
 		executor.addTask(this);
-		connect(this, SIGNAL(finished(TThread::RunnableP)), this, SLOT(onFinished(TThread::RunnableP)));
-		connect(this, SIGNAL(exception(TThread::RunnableP)), this, SLOT(onFinished(TThread::RunnableP)));
+		connect(this, SIGNAL(finished(TThread::RunnableP)), this,
+				SLOT(onFinished(TThread::RunnableP)));
+		connect(this, SIGNAL(exception(TThread::RunnableP)), this,
+				SLOT(onFinished(TThread::RunnableP)));
 	}
 
-	void run()
-	{
-		m_controller->run();
-	}
+	void run() { m_controller->run(); }
 
-public slots:
+  public slots:
 
-	void onFinished(TThread::RunnableP thisTask)
-	{
-		BatchesController::instance()->notify();
-	}
+	void onFinished(TThread::RunnableP thisTask) { BatchesController::instance()->notify(); }
 };
 
 } // anonymous namespace

@@ -27,7 +27,8 @@
 //    TGLDisplayListsProxy  declaration
 //**************************************************************************************************
 
-//! TGLDisplayListsProxy is a wrapper to a dummy OpenGL context attached to a specific display lists space.
+//! TGLDisplayListsProxy is a wrapper to a dummy OpenGL context attached to a specific display lists
+//! space.
 /*!
   TGLDisplayListsProxy implements the basic functionalities necessary to address a display lists
   space without having to access any actual associated OpenGL context. This is equivalent to
@@ -40,7 +41,7 @@ class TGLDisplayListsProxy
 {
 	QMutex m_mutex;
 
-public:
+  public:
 	virtual ~TGLDisplayListsProxy() {}
 
 	virtual void makeCurrent() = 0;
@@ -53,12 +54,11 @@ public:
 //    TGLDisplayListsProxy  template specializations
 //**************************************************************************************************
 
-template <typename Context>
-class TGLDisplayListsProxyT : public TGLDisplayListsProxy
+template <typename Context> class TGLDisplayListsProxyT : public TGLDisplayListsProxy
 {
 	Context *m_proxy;
 
-public:
+  public:
 	TGLDisplayListsProxyT(Context *proxy) : m_proxy(proxy) {}
 	~TGLDisplayListsProxyT() { delete m_proxy; }
 
@@ -94,27 +94,33 @@ public:
   the user by accessing the proxy's built-in mutex.
 
   \warning TGLDisplayListsManager relies on the user to attach a context to the \b correct
-           display lists id.
+		   display lists id.
 */
 
 class DVAPI TGLDisplayListsManager : public tcg::notifier<>
 {
-public:
+  public:
 	struct Observer : public tcg::observer<TGLDisplayListsManager> {
 		virtual void onDisplayListDestroyed(int dlSpaceId) = 0;
 	};
 
-public:
+  public:
 	static TGLDisplayListsManager *instance();
 
-	int storeProxy(TGLDisplayListsProxy *proxy);		   //!< Stores the specified proxy, returning its associated display
-														   //!< lists id. Context attaches should follow.
-	void attachContext(int dlSpaceId, TGlContext context); //!< Attaches the specified context to a display lists space
-	void releaseContext(TGlContext context);			   //!< Releases a context reference to its display lists space
-	int displayListsSpaceId(TGlContext context);		   //!< Returns the display lists space id of a known context, or
-														   //!< -1 if it did not attach to any known space.
-	TGLDisplayListsProxy *dlProxy(int dlSpaceId);		   //!< Returns the display lists space proxy associated to the
-														   //!< specified id.
+	int storeProxy(TGLDisplayListsProxy
+					   *proxy); //!< Stores the specified proxy, returning its associated display
+								//!< lists id. Context attaches should follow.
+	void
+	attachContext(int dlSpaceId,
+				  TGlContext context); //!< Attaches the specified context to a display lists space
+	void
+	releaseContext(TGlContext context); //!< Releases a context reference to its display lists space
+	int displayListsSpaceId(
+		TGlContext context); //!< Returns the display lists space id of a known context, or
+							 //!< -1 if it did not attach to any known space.
+	TGLDisplayListsProxy *
+	dlProxy(int dlSpaceId); //!< Returns the display lists space proxy associated to the
+							//!< specified id.
 };
 
 #endif // TGLDISPLAYLISTSMANAGER_H

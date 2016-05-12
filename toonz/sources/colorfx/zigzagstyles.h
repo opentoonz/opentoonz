@@ -12,7 +12,7 @@ class TZigzagStrokeStyle : public TStrokeStyle
 	TPixel32 m_color;
 	double m_density;
 
-public:
+  public:
 	TZigzagStrokeStyle(const TPixel32 &color);
 	TZigzagStrokeStyle();
 
@@ -43,7 +43,7 @@ class TImageBasedZigzagStrokeStyle : public TStrokeStyle
 	double m_textScale;
 	TRaster32P m_texture;
 
-public:
+  public:
 	TImageBasedZigzagStrokeStyle(const TPixel32 &color);
 	TImageBasedZigzagStrokeStyle();
 	TImageBasedZigzagStrokeStyle(const TRaster32P texture);

@@ -13,19 +13,15 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CCallParam::CCallParam() : m_thickness(0.0),
-						   m_rH(0.0), m_rV(0.0), m_rLR(0.0), m_rRL(0.0),
-						   m_accuracy(0.0), m_randomness(0.0),
-						   m_ink(), m_paint()
+CCallParam::CCallParam()
+	: m_thickness(0.0), m_rH(0.0), m_rV(0.0), m_rLR(0.0), m_rRL(0.0), m_accuracy(0.0),
+	  m_randomness(0.0), m_ink(), m_paint()
 {
 }
 
-CCallParam::CCallParam(const int argc, const char *argv[],
-					   const int shrink)
-	: m_thickness(0.0),
-	  m_rH(0.0), m_rV(0.0), m_rLR(0.0), m_rRL(0.0),
-	  m_accuracy(0.0), m_randomness(0.0),
-	  m_ink(), m_paint()
+CCallParam::CCallParam(const int argc, const char *argv[], const int shrink)
+	: m_thickness(0.0), m_rH(0.0), m_rV(0.0), m_rLR(0.0), m_rRL(0.0), m_accuracy(0.0),
+	  m_randomness(0.0), m_ink(), m_paint()
 {
 	if (argc == 8) {
 		int i = 7;

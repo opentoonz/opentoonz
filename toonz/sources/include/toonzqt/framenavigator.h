@@ -37,14 +37,14 @@ class TFrameHandle;
 
 /*!
   \brief    The FrameNavigator is a simple toolbar widget showing a numerical
-            representation of an integer timeline.
+			representation of an integer timeline.
 
   \details  A FrameNavigator is a TFrameHandle viewer composed of a line edit
-            widget showing the current frame number, and a pair of directional
-            arrow buttons that move to adjacent frames.
+			widget showing the current frame number, and a pair of directional
+			arrow buttons that move to adjacent frames.
 
   \remark   The text field actually visualizes the internal integer \p m_frame \a +1
-            (e.g. when \p m_frame is 0 then 1 is visualized).
+			(e.g. when \p m_frame is 0 then 1 is visualized).
 */
 
 class DVAPI FrameNavigator : public QToolBar
@@ -56,37 +56,38 @@ class DVAPI FrameNavigator : public QToolBar
 	int m_frame;
 	DVGui::IntLineEdit *m_lineEdit;
 
-public:
+  public:
 	FrameNavigator(QWidget *parent = 0);
 	~FrameNavigator() {}
 
 	int getFrame() const { return m_frame; }
 
 	void setFrameHandle(TFrameHandle *); //!< Attaches the navigator to the specified frameHandle.
-										 //!  \remark    Detaches from any previously attached frame handle.
+	//!  \remark    Detaches from any previously attached frame handle.
 
 	bool anyWidgetHasFocus();
-signals:
+  signals:
 
 	void frameSwitched();
 
-public slots:
+  public slots:
 
 	void setFrame(int frame, bool notifyFrameHandler); //!< Sets the navigator's current frame.
 													   //!  \deprecated  Remove the bool.
 	void prevFrame() { setFrame(m_frame - 1, true); }  //!< Move to previous frame.
 	void nextFrame() { setFrame(m_frame + 1, true); }  //!< Move to next frame.
 
-protected:
+  protected:
 	void showEvent(QShowEvent *);
 	void hideEvent(QHideEvent *);
 
-	void updateFrame(int frame); //!< Changes frame without emitting any signal and notifying the frameHandle.
+	void updateFrame(
+		int frame); //!< Changes frame without emitting any signal and notifying the frameHandle.
 
-protected slots:
+  protected slots:
 
 	/*!
-    \details  Copies the value in the frame's line edit widget to the internal current frame value.
+	\details  Copies the value in the frame's line edit widget to the internal current frame value.
   */
 	void onEditingFinished(); //!< Slot invoked whenever current frame's text editing is finished.
 	void onFrameSwitched();

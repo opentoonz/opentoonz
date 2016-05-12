@@ -10,10 +10,8 @@ class HalfCord
 	std::unique_ptr<int[]> m_array;
 	int m_radius;
 
-public:
-	HalfCord(int radius)
-		: m_radius(radius)
-		, m_array(new int[radius + 1])
+  public:
+	HalfCord(int radius) : m_radius(radius), m_array(new int[radius + 1])
 	{
 		assert(radius >= 0);
 		memset(m_array.get(), 0, (m_radius + 1) * sizeof(int));
@@ -41,7 +39,7 @@ public:
 		return m_array[x];
 	};
 
-private:
+  private:
 	// not implemented
 	HalfCord(const HalfCord &);
 	HalfCord &operator=(const HalfCord &);
@@ -49,12 +47,8 @@ private:
 
 //=======================================================================
 
-void TRop::brush(
-	TRaster32P ras,
-	const TPoint &aa,
-	const TPoint &bb,
-	int radius,
-	const TPixel32 &col)
+void TRop::brush(TRaster32P ras, const TPoint &aa, const TPoint &bb, int radius,
+				 const TPixel32 &col)
 {
 
 	TPoint a = aa;
@@ -86,7 +80,7 @@ void TRop::brush(
 		if (dx > 0) {
 			m = dy / (double)dx;
 		}
-		//double length = sqrt(dx*dx + dy*dy);
+		// double length = sqrt(dx*dx + dy*dy);
 		const int alpha = dy, beta = -dx;
 		const int incE = alpha;
 		const int incNE = alpha + beta;
@@ -112,7 +106,7 @@ void TRop::brush(
 
 			int dSegm = tfloor(alpha * (segm.x + 1) + beta * (segm.y + 0.5));
 			while (segm.y <= yMax) {
-				int count = 0;					  //  i trati orizzontali di segm vengono disegnati in "blocco"
+				int count = 0; //  i trati orizzontali di segm vengono disegnati in "blocco"
 				while (dSegm < 0 && segm.x <= dx) //  Est:  segm.x<=dx evita il ciclo
 				{								  //  infinito quando m=0 (incE=0)
 					dSegm = dSegm + incE;
@@ -126,8 +120,9 @@ void TRop::brush(
 					xMax = tmin(a.x + segm.x, b.x, lx - 1);	//  coordinate "di schermo"
 
 				} else {
-					xMin = tmax(a.x - segm.x, a.x - dx, 0);			//  clipping x + riflessione + ritorno
-					xMax = tmin(a.x - segm.x + count, a.x, lx - 1); //  alle  coordinate "di schermo"
+					xMin = tmax(a.x - segm.x, a.x - dx, 0); //  clipping x + riflessione + ritorno
+					xMax =
+						tmin(a.x - segm.x + count, a.x, lx - 1); //  alle  coordinate "di schermo"
 				}
 
 				TPixel32 *p = ras->pixels(segm.y + a.y) + xMin;
@@ -266,10 +261,10 @@ void TRop::brush(
 	double length = sqrt((double)(dx * dx + dy * dy));
 	const double m = dy / (double)dx;
 
-	//punto di tangenza superiore nel sistema di riferimento del cerchio
+	// punto di tangenza superiore nel sistema di riferimento del cerchio
 	TPointD up(-radius * dy / length, radius * dx / length);
 
-	//semi-ampiezza orizzontale delle "calotte" circolari
+	// semi-ampiezza orizzontale delle "calotte" circolari
 	int halfAmplCap = tfloor(-up.x);
 
 	//  A meno di intersezioni relative tra le diverse zone:
@@ -286,7 +281,7 @@ void TRop::brush(
 	TPointD rightDown;
 	TPointD leftUp;
 	TPointD leftDown;
-	double mParall; //coeff. angolare parallelogramma
+	double mParall; // coeff. angolare parallelogramma
 
 	//  NOTA BENE:  halfAmplCap=0 <=> (radius=0 (caso a parte) , 1)
 	if (radius > 1) {
@@ -305,7 +300,7 @@ void TRop::brush(
 	} else //  N.B. cutExt != cutIn solo quando radius=1
 	{
 		cutExt = radius; //  radius=1 => halfAmplCap=0 (non ci sono mai le "calotte" circolari)
-		cutIn = 0;		 //  anche per radius=1 il limite "interno" dei trapezoidi circolari e' < radius
+		cutIn = 0; //  anche per radius=1 il limite "interno" dei trapezoidi circolari e' < radius
 		rightUp.x = dx - up.x;
 		rightUp.y = dy - up.y;
 		rightDown.x = -up.x;
@@ -348,10 +343,12 @@ void TRop::brush(
 	// coordinate "di schermo")
 
 	//  limite destro assoluto delle scanline trapezoide:
-	int xSegmMax = tround(dx - up.x); //  coordinata x del punto di tangenza inferiore sul cerchio superiore
+	int xSegmMax =
+		tround(dx - up.x); //  coordinata x del punto di tangenza inferiore sul cerchio superiore
 
 	//  limite sinistro assoluto delle scanline:
-	int xSegmMin = tround(up.x); //  coordinata x del punto di tangenza superiore sul cerchio inferiore
+	int xSegmMin =
+		tround(up.x); //  coordinata x del punto di tangenza superiore sul cerchio inferiore
 
 	// -----  riempie trapezoide inferiore
 
@@ -372,7 +369,8 @@ void TRop::brush(
 		//  midpoint algorithm; le scanline vengono disegnate solo
 		//  sul NordEst. L'ultima scanline non viene disegnata
 		TPoint segmRight(tceil((yMin + 0.5 - rightDown.y) / mParall + rightDown.x) - 1, yMin);
-		int dSegmRight = tfloor(alpha * (segmRight.x + 1) + beta * (segmRight.y + 0.5) + gammaRight);
+		int dSegmRight =
+			tfloor(alpha * (segmRight.x + 1) + beta * (segmRight.y + 0.5) + gammaRight);
 		while (segmRight.y <= yMax) {
 			if (dSegmRight < 0) //  Est
 			{
@@ -385,8 +383,9 @@ void TRop::brush(
 					xMin = tmax(a.x - halfCord.getCord(abs(segmRight.y)), 0); //  clipping x
 					xMax = tmin(a.x + tmin(segmRight.x, xSegmMax), lx - 1);   //  clipping x
 				} else {
-					xMin = tmax(a.x - tmin(segmRight.x, xSegmMax), 0);			   //  clipping x + ritorno alle
-					xMax = tmin(a.x + halfCord.getCord(abs(segmRight.y)), lx - 1); //   coordinate "di schermo"
+					xMin = tmax(a.x - tmin(segmRight.x, xSegmMax), 0); //  clipping x + ritorno alle
+					xMax = tmin(a.x + halfCord.getCord(abs(segmRight.y)),
+								lx - 1); //   coordinate "di schermo"
 				}
 				TPixel32 *p = ras->pixels(segmRight.y + a.y) + xMin;
 				TPixel32 *q = p + (xMax - xMin);
@@ -402,14 +401,15 @@ void TRop::brush(
 	{
 		//  midpoint algorithm; le scanline vengono disegnate sempre
 		TPoint segmRight(tround((yMin - rightDown.y) / mParall + rightDown.x), yMin);
-		int dSegmRight = tfloor(alpha * (segmRight.x + 0.5) + beta * (segmRight.y + 1) + gammaRight);
+		int dSegmRight =
+			tfloor(alpha * (segmRight.x + 0.5) + beta * (segmRight.y + 1) + gammaRight);
 		while (segmRight.y <= yMax) {
 			int xMin, xMax;
 			if (k > 0) {
 				xMin = tmax(a.x - halfCord.getCord(abs(segmRight.y)), 0); //  clipping x
 				xMax = tmin(a.x + segmRight.x, lx - 1);					  //  clipping x
 			} else {
-				xMin = tmax(a.x - segmRight.x, 0);							   //  clipping x + ritorno alle coordinate
+				xMin = tmax(a.x - segmRight.x, 0); //  clipping x + ritorno alle coordinate
 				xMax = tmin(a.x + halfCord.getCord(abs(segmRight.y)), lx - 1); //  "di schermo"
 			}
 			TPixel32 *p = ras->pixels(segmRight.y + a.y) + xMin;
@@ -450,8 +450,10 @@ void TRop::brush(
 				xMin = tmax(b.x + tmax(segmLeft.x, xSegmMin - dx), 0);		  //  clipping x
 				xMax = tmin(b.x + halfCord.getCord(abs(segmLeft.y)), lx - 1); //  clipping x
 			} else {
-				xMin = tmax(b.x - halfCord.getCord(abs(segmLeft.y)), 0);	//  clipping x + ritorno alle
-				xMax = tmin(b.x - tmax(segmLeft.x, xSegmMin - dx), lx - 1); //   coordinate "di schermo"
+				xMin =
+					tmax(b.x - halfCord.getCord(abs(segmLeft.y)), 0); //  clipping x + ritorno alle
+				xMax = tmin(b.x - tmax(segmLeft.x, xSegmMin - dx),
+							lx - 1); //   coordinate "di schermo"
 			}
 			TPixel32 *p = ras->pixels(segmLeft.y + b.y) + xMin;
 			TPixel32 *q = p + (xMax - xMin);
@@ -477,8 +479,9 @@ void TRop::brush(
 				xMin = tmax(b.x + segmLeft.x, 0);							  //  clipping x
 				xMax = tmin(b.x + halfCord.getCord(abs(segmLeft.y)), lx - 1); //  clipping x
 			} else {
-				xMin = tmax(b.x - halfCord.getCord(abs(segmLeft.y)), 0); //  clipping x + ritorno alle
-				xMax = tmin(b.x - segmLeft.x, lx - 1);					 //   coordinate "di schermo"
+				xMin =
+					tmax(b.x - halfCord.getCord(abs(segmLeft.y)), 0); //  clipping x + ritorno alle
+				xMax = tmin(b.x - segmLeft.x, lx - 1);				  //   coordinate "di schermo"
 			}
 			TPixel32 *p = ras->pixels(segmLeft.y + b.y) + xMin;
 			TPixel32 *q = p + (xMax - xMin);
@@ -506,14 +509,15 @@ void TRop::brush(
 	//  retta destra di equaz.   alpha * x + beta * y + gammaRight = 0
 	//  retta sinistra di equaz. alpha * x + beta * y + gammaLeft = 0
 
-	yMin = tmax(a.y + cutIn + 1, 0) - a.y;		//clipping y
-	yMax = tmin(b.y - cutIn - 1, ly - 1) - a.y; //clipping y
+	yMin = tmax(a.y + cutIn + 1, 0) - a.y; // clipping y
+	yMax = tmin(b.y - cutIn - 1, ly - 1) - a.y; // clipping y
 	if (m <= 1) {
 		//  midpoint algorithm; le scanline vengono disegnate solo
 		//  sul NordEst. L'ultima scanline non viene disegnata
 		TPoint segmRight(tceil((yMin + 0.5 - rightDown.y) / mParall + rightDown.x) - 1, yMin);
 		TPoint segmLeft = TPoint(tceil((yMin - 0.5 - leftDown.y) / mParall + leftDown.x), yMin);
-		int dSegmRight = tfloor(alpha * (segmRight.x + 1) + beta * (segmRight.y + 0.5) + gammaRight);
+		int dSegmRight =
+			tfloor(alpha * (segmRight.x + 1) + beta * (segmRight.y + 0.5) + gammaRight);
 		int dSegmLeft = tfloor(alpha * (segmLeft.x + 1) + beta * (segmLeft.y + 0.5) + gammaLeft);
 		while (segmRight.y <= yMax) {
 			if (dSegmRight < 0) //  segmRight a Est
@@ -527,8 +531,9 @@ void TRop::brush(
 					xMin = tmax(a.x + tmax(segmLeft.x, xSegmMin), 0);		//  clipping x
 					xMax = tmin(a.x + tmin(segmRight.x, xSegmMax), lx - 1); //  clipping x
 				} else {
-					xMin = tmax(a.x - tmin(segmRight.x, xSegmMax), 0);	 //  clipping x + ritorno alle
-					xMax = tmin(a.x - tmax(segmLeft.x, xSegmMin), lx - 1); //   coordinate "di schermo"
+					xMin = tmax(a.x - tmin(segmRight.x, xSegmMax), 0); //  clipping x + ritorno alle
+					xMax =
+						tmin(a.x - tmax(segmLeft.x, xSegmMin), lx - 1); //   coordinate "di schermo"
 				}
 
 				TPixel32 *p = ras->pixels(segmRight.y + a.y) + xMin;
@@ -557,7 +562,8 @@ void TRop::brush(
 		//  midpoint algorithm; le scanline vengono disegnate sempre
 		TPoint segmRight(tround((yMin - rightDown.y) / mParall + rightDown.x), yMin);
 		TPoint segmLeft(tround((yMin - leftDown.y) / mParall + leftDown.x), yMin);
-		int dSegmRight = tfloor(alpha * (segmRight.x + 0.5) + beta * (segmRight.y + 1) + gammaRight);
+		int dSegmRight =
+			tfloor(alpha * (segmRight.x + 0.5) + beta * (segmRight.y + 1) + gammaRight);
 		int dSegmLeft = tfloor(alpha * (segmLeft.x + 0.5) + beta * (segmLeft.y + 1) + gammaLeft);
 		while (segmRight.y <= yMax) {
 			int xMin, xMax;

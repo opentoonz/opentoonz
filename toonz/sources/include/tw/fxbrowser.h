@@ -25,7 +25,7 @@ class TFilePath;
 
 class FxBuilder
 {
-public:
+  public:
 	virtual ~FxBuilder() {}
 	virtual TFx *create() = 0;
 };
@@ -34,10 +34,10 @@ public:
 
 class DVAPI TFxBrowser : public TTreeView
 {
-public:
+  public:
 	class DoubleClickListener
 	{
-	public:
+	  public:
 		virtual void onDoubleClick() = 0;
 		virtual ~DoubleClickListener() {}
 	};
@@ -45,18 +45,15 @@ public:
 	class FxLoader;
 	class MacroFxFolderItem;
 
-private:
+  private:
 	string m_selectedFxId;
 	DoubleClickListener *m_doubleClickListener;
 	FxLoader *m_fxLoader;
 	MacroFxFolderItem *m_macroFxFolderItem;
 
-public:
-	TFxBrowser(
-		TWidget *parent,
-		const TFilePath &fxListPath,
-		const TFilePath &fxPresetFolder,
-		string name = "fxBrowser");
+  public:
+	TFxBrowser(TWidget *parent, const TFilePath &fxListPath, const TFilePath &fxPresetFolder,
+			   string name = "fxBrowser");
 
 	~TFxBrowser();
 

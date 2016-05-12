@@ -14,22 +14,22 @@
 class ChangeBlock {
 public:
   ChangeBlock()
-      : m_firstAffectedFrame ( TParamChange::m_maxFrame)
-      , m_lastAffectedFrame  ( TParamChange::m_minFrame)
-    {
-    }
+	  : m_firstAffectedFrame ( TParamChange::m_maxFrame)
+	  , m_lastAffectedFrame  ( TParamChange::m_minFrame)
+	{
+	}
 
   ~ChangeBlock()
-    {
-    }
+	{
+	}
 
   void add(const TParamChange &change)
-    {
-    m_firstAffectedFrame = tmin(m_firstAffectedFrame, change.m_firstAffectedFrame);
-    m_lastAffectedFrame  = tmax(m_lastAffectedFrame , change.m_lastAffectedFrame);
+	{
+	m_firstAffectedFrame = tmin(m_firstAffectedFrame, change.m_firstAffectedFrame);
+	m_lastAffectedFrame  = tmax(m_lastAffectedFrame , change.m_lastAffectedFrame);
 
-    m_changes.push_back(change.clone());
-    }
+	m_changes.push_back(change.clone());
+	}
   vector<TParamChange*> m_changes;
 double m_firstAffectedFrame;
 double m_lastAffectedFrame;
@@ -54,64 +54,57 @@ class TParamSetImp : public TParamObserver
 	// ChangeBlock *m_changeBlock;
 	bool m_draggingEnabled, m_notificationEnabled;
 
-public:
-	TParamSetImp(TParamSet *param) : m_param(param)
-									 //, m_changeBlock(0)
-									 ,
-									 m_draggingEnabled(false), m_notificationEnabled(true)
+  public:
+	TParamSetImp(TParamSet *param)
+		: m_param(param)
+		  //, m_changeBlock(0)
+		  ,
+		  m_draggingEnabled(false), m_notificationEnabled(true)
 	{
 	}
 
-	~TParamSetImp()
-	{
-		std::for_each(m_params.begin(), m_params.end(), doRelease);
-	}
+	~TParamSetImp() { std::for_each(m_params.begin(), m_params.end(), doRelease); }
 	// std::set<TParamSetObserver*> m_observers;
 	std::set<TParamObserver *> m_paramObservers;
 
-	template <typename T>
-	void notify(const T &change);
+	template <typename T> void notify(const T &change);
 
 	void onChange(const TParamChange &change)
 	{
 
 		/*
-    if (!m_changeBlock)  // se non stiamo modificando un blocco di parametri, invio la notifica
-      {
-      vector<TParam*> params; 
-      params.push_back(change.m_param);
+	if (!m_changeBlock)  // se non stiamo modificando un blocco di parametri, invio la notifica
+	  {
+	  vector<TParam*> params;
+	  params.push_back(change.m_param);
 
-      TParamSetChange psChange(m_param, change.m_firstAffectedFrame, change.m_lastAffectedFrame, 
-                               params, change.m_undoing);
-      notify(psChange);
-      }
-    else
-      notify(change);
+	  TParamSetChange psChange(m_param, change.m_firstAffectedFrame, change.m_lastAffectedFrame,
+							   params, change.m_undoing);
+	  notify(psChange);
+	  }
+	else
+	  notify(change);
 
-    if (!m_changeBlock)  // se non stiamo modificando un blocco di parametri, invio la notifica
-      notify(change);
-    else
-      {
-      //metto da parte la TParamChange, per poi alla fine notificare una TParamSetChange
-      m_changeBlock->add(change);
-      }
-      */
+	if (!m_changeBlock)  // se non stiamo modificando un blocco di parametri, invio la notifica
+	  notify(change);
+	else
+	  {
+	  //metto da parte la TParamChange, per poi alla fine notificare una TParamSetChange
+	  m_changeBlock->add(change);
+	  }
+	  */
 	}
 };
 
 //---------------------------------------------------------
 
-TParamSet::TParamSet(std::string name)
-	: TParam(name)
-	, m_imp(new TParamSetImp(this))
+TParamSet::TParamSet(std::string name) : TParam(name), m_imp(new TParamSetImp(this))
 {
 }
 
 //---------------------------------------------------------
 
-TParamSet::TParamSet(const TParamSet &src)
-	: TParam(src.getName())
-	, m_imp(new TParamSetImp(this))
+TParamSet::TParamSet(const TParamSet &src) : TParam(src.getName()), m_imp(new TParamSetImp(this))
 {
 }
 
@@ -133,8 +126,8 @@ public:
   MyBackInsertIterator(Container &c) : container(c) {}
   MyBackInsertIterator<Container > &operator=(const typename Container::value_type &value)
   {
-    container.push_back(value);
-    return *this;
+	container.push_back(value);
+	return *this;
   }
   MyBackInsertIterator<Container>&operator*()
   {
@@ -157,11 +150,11 @@ void TParamSet::beginParameterChange()
 {
 	//  assert(0);
 
-	//std::set<TParamSetObserver*>::iterator it = m_imp->m_observers.begin();
-	//for (;it != m_imp->m_observers.end(); ++it)
+	// std::set<TParamSetObserver*>::iterator it = m_imp->m_observers.begin();
+	// for (;it != m_imp->m_observers.end(); ++it)
 	//  (*it)->onBeginChangeBlock(this);
 
-	//assert(!m_imp->m_changeBlock);
+	// assert(!m_imp->m_changeBlock);
 
 	std::vector<TParam *> params;
 
@@ -180,11 +173,11 @@ copy(m_imp->m_params.begin(), m_imp->m_params.end(), myIterator);
 
 void TParamSet::endParameterChange(){
 	//  assert(0);
-	//assert(m_imp->m_changeBlock);
+	// assert(m_imp->m_changeBlock);
 	/*
-TParamSetChange change(this, m_imp->m_changeBlock->m_firstAffectedFrame, 
-                             m_imp->m_changeBlock->m_lastAffectedFrame, 
-                             m_imp->m_changeBlock->m_changes, false);
+TParamSetChange change(this, m_imp->m_changeBlock->m_firstAffectedFrame,
+							 m_imp->m_changeBlock->m_lastAffectedFrame,
+							 m_imp->m_changeBlock->m_changes, false);
 
 change.m_dragging = m_imp->m_draggingEnabled;
 
@@ -212,10 +205,10 @@ void TParamSet::addParam(const TParamP &param, const std::string &name)
 		param->addRef();
 		param->addObserver(m_imp);
 		m_imp->m_params.push_back(paramToInsert);
-		//TParamSetParamAdded psParamAdded(this, param.getPointer(), name, false);
+		// TParamSetParamAdded psParamAdded(this, param.getPointer(), name, false);
 		if (param->getName().empty())
 			param->setName(name);
-		//m_imp->notify(psParamAdded);
+		// m_imp->notify(psParamAdded);
 	}
 }
 
@@ -248,7 +241,7 @@ class matchesParam
 {
 	TParamP m_param;
 
-public:
+  public:
 	matchesParam(const TParamP &param) : m_param(param) {}
 	bool operator()(const std::pair<TParam *, std::string> &param)
 	{
@@ -266,8 +259,8 @@ void TParamSet::removeParam(const TParamP &param)
 	if (it != m_imp->m_params.end()) {
 		param->removeObserver(m_imp);
 
-		//TParamSetParamRemoved psParamRemoved(this, param.getPointer(), it->second, false);
-		//m_imp->notify(psParamRemoved);
+		// TParamSetParamRemoved psParamRemoved(this, param.getPointer(), it->second, false);
+		// m_imp->notify(psParamRemoved);
 
 		param->release();
 		m_imp->m_params.erase(it);
@@ -345,17 +338,16 @@ void TParamSet::getAnimatableParams(std::vector<TParamP> &params, bool recursive
 
 void TParamSet::addObserver(TParamObserver *observer)
 {
-	//TParamSetObserver *obs = dynamic_cast<TParamSetObserver *>(observer);
-	//if (obs)
+	// TParamSetObserver *obs = dynamic_cast<TParamSetObserver *>(observer);
+	// if (obs)
 	//  m_imp->m_observers.insert(obs);
-	//else
+	// else
 	m_imp->m_paramObservers.insert(observer);
 }
 
 //---------------------------------------------------------
 
-template <typename T>
-void TParamSetImp::notify(const T &change)
+template <typename T> void TParamSetImp::notify(const T &change)
 {
 	if (m_notificationEnabled) {
 		//  for (std::set<TParamSetObserver*>::iterator it = m_observers.begin();
@@ -363,8 +355,7 @@ void TParamSetImp::notify(const T &change)
 		//                                              ++it)
 		//    (*it)->onChange(change);
 		for (std::set<TParamObserver *>::iterator paramIt = m_paramObservers.begin();
-			 paramIt != m_paramObservers.end();
-			 ++paramIt)
+			 paramIt != m_paramObservers.end(); ++paramIt)
 			(*paramIt)->onChange(change);
 	}
 }
@@ -373,10 +364,10 @@ void TParamSetImp::notify(const T &change)
 
 void TParamSet::removeObserver(TParamObserver *observer)
 {
-	//TParamSetObserver *obs = dynamic_cast<TParamSetObserver *>(observer);
-	//if (obs)
+	// TParamSetObserver *obs = dynamic_cast<TParamSetObserver *>(observer);
+	// if (obs)
 	//  m_imp->m_observers.erase(obs);
-	//else
+	// else
 	m_imp->m_paramObservers.erase(observer);
 }
 
@@ -387,7 +378,7 @@ void TParamSet::enableDragging(bool on)
 	std::vector<std::pair<TParam *, std::string>>::iterator it = m_imp->m_params.begin();
 	for (; it != m_imp->m_params.end(); ++it) {
 		TDoubleParamP dparam(it->first);
-		//if (dparam)
+		// if (dparam)
 		//  dparam->enableDragging(on);
 	}
 
@@ -402,9 +393,9 @@ class DoEnableNotification : public std::binary_function {
 public:
   DoEnableNotification() {}
 
-  void operator() (const pair<TParam*, string> &param, bool on) 
+  void operator() (const pair<TParam*, string> &param, bool on)
   {
-    return param->first->enableNotification(on);
+	return param->first->enableNotification(on);
   }
 };
 }
@@ -413,7 +404,8 @@ public:
 
 void TParamSet::enableNotification(bool on)
 {
-	//  std::for_each(m_imp->m_params.begin(), m_imp->m_params.end(), std::bind2nd(DoEnableNotification, on));
+	//  std::for_each(m_imp->m_params.begin(), m_imp->m_params.end(),
+	//  std::bind2nd(DoEnableNotification, on));
 
 	std::vector<std::pair<TParam *, std::string>>::iterator it = m_imp->m_params.begin();
 	for (; it != m_imp->m_params.end(); ++it) {
@@ -525,10 +517,7 @@ void TParamSet::clearKeyframes()
 
 //---------------------------------------------------------
 
-void TParamSet::assignKeyframe(
-	double frame,
-	const TParamP &src, double srcFrame,
-	bool changedOnly)
+void TParamSet::assignKeyframe(double frame, const TParamP &src, double srcFrame, bool changedOnly)
 {
 	TParamSetP paramSetSrc = src;
 	if (!paramSetSrc)
@@ -536,8 +525,7 @@ void TParamSet::assignKeyframe(
 	if (getParamCount() != paramSetSrc->getParamCount())
 		return;
 	for (int i = 0; i < getParamCount(); i++)
-		getParam(i)->assignKeyframe(
-			frame, paramSetSrc->getParam(i), srcFrame, changedOnly);
+		getParam(i)->assignKeyframe(frame, paramSetSrc->getParam(i), srcFrame, changedOnly);
 }
 
 //---------------------------------------------------------
@@ -591,7 +579,7 @@ void TParamSet::saveData(TOStream &os)
 	std::vector<std::pair<TParam *, std::string>>::iterator end = m_imp->m_params.end();
 	while (it != end) {
 		os.openChild(it->second);
-		//it->first->saveData(os);
+		// it->first->saveData(os);
 		os << it->first;
 		os.closeChild();
 		++it;

@@ -11,7 +11,7 @@ using namespace SkeletonLut;
 
 class TAutocloser::Imp
 {
-public:
+  public:
 	struct Seed {
 		UCHAR *m_ptr;
 		UCHAR m_preseed;
@@ -34,8 +34,10 @@ public:
 
 	double m_csp, m_snp, m_csm, m_snm, m_csa, m_sna, m_csb, m_snb;
 
-	Imp(const TRasterP &r, int distance = 10, double angle = (180 * TConsts::pi) / 360.0, int index = 0, int opacity = 0)
-		: m_raster(r), m_spotAngle(angle), m_closingDistance(distance), m_inkIndex(index), m_opacity(opacity)
+	Imp(const TRasterP &r, int distance = 10, double angle = (180 * TConsts::pi) / 360.0,
+		int index = 0, int opacity = 0)
+		: m_raster(r), m_spotAngle(angle), m_closingDistance(distance), m_inkIndex(index),
+		  m_opacity(opacity)
 	{
 	}
 
@@ -54,9 +56,8 @@ public:
 	UCHAR inline sePix(UCHAR *br) { return (*(br - m_bWrap + 1)); }
 	UCHAR inline neighboursCode(UCHAR *seed)
 	{
-		return ((swPix(seed) & 0x1) | ((sPix(seed) & 0x1) << 1) |
-				((sePix(seed) & 0x1) << 2) | ((wPix(seed) & 0x1) << 3) |
-				((ePix(seed) & 0x1) << 4) | ((nwPix(seed) & 0x1) << 5) |
+		return ((swPix(seed) & 0x1) | ((sPix(seed) & 0x1) << 1) | ((sePix(seed) & 0x1) << 2) |
+				((wPix(seed) & 0x1) << 3) | ((ePix(seed) & 0x1) << 4) | ((nwPix(seed) & 0x1) << 5) |
 				((nPix(seed) & 0x1) << 6) | ((nePix(seed) & 0x1) << 7));
 	}
 
@@ -64,7 +65,8 @@ public:
 
 	inline bool notMarkedBorderInk(UCHAR *br)
 	{
-		return ((((*br) & 0x5) == 1) && (ePix(br) == 0 || wPix(br) == 0 || nPix(br) == 0 || sPix(br) == 0));
+		return ((((*br) & 0x5) == 1) &&
+				(ePix(br) == 0 || wPix(br) == 0 || nPix(br) == 0 || sPix(br) == 0));
 	}
 
 	//.......................
@@ -90,8 +92,10 @@ public:
 	bool circuitAndCancel(UCHAR *seed, UCHAR preseed, std::vector<TPoint> &endpoints);
 	void findMeetingPoints(std::vector<TPoint> &endpoints, std::vector<Segment> &closingSegments);
 	void calculateWeightAndDirection(std::vector<Segment> &orientedEndpoints);
-	bool spotResearchTwoPoints(std::vector<Segment> &endpoints, std::vector<Segment> &closingSegments);
-	bool spotResearchOnePoint(std::vector<Segment> &endpoints, std::vector<Segment> &closingSegments);
+	bool spotResearchTwoPoints(std::vector<Segment> &endpoints,
+							   std::vector<Segment> &closingSegments);
+	bool spotResearchOnePoint(std::vector<Segment> &endpoints,
+							  std::vector<Segment> &closingSegments);
 
 	void copy(const TRasterGR8P &braux, TRaster32P &raux);
 	int exploreTwoSpots(const TAutocloser::Segment &s0, const TAutocloser::Segment &s1);
@@ -109,36 +113,36 @@ public:
 
 /*------------------------------------------------------------------------*/
 
-#define DRAW_SEGMENT(a, b, da, db, istr1, istr2, block) \
-	{                                                   \
-		d = 2 * db - da;                                \
-		incr_1 = 2 * db;                                \
-		incr_2 = 2 * (db - da);                         \
-		while (a < da) {                                \
-			if (d <= 0) {                               \
-				d += incr_1;                            \
-				a++;                                    \
-				istr1;                                  \
-			} else {                                    \
-				d += incr_2;                            \
-				a++;                                    \
-				b++;                                    \
-				istr2;                                  \
-			}                                           \
-			block;                                      \
-		}                                               \
+#define DRAW_SEGMENT(a, b, da, db, istr1, istr2, block)                                            \
+	{                                                                                              \
+		d = 2 * db - da;                                                                           \
+		incr_1 = 2 * db;                                                                           \
+		incr_2 = 2 * (db - da);                                                                    \
+		while (a < da) {                                                                           \
+			if (d <= 0) {                                                                          \
+				d += incr_1;                                                                       \
+				a++;                                                                               \
+				istr1;                                                                             \
+			} else {                                                                               \
+				d += incr_2;                                                                       \
+				a++;                                                                               \
+				b++;                                                                               \
+				istr2;                                                                             \
+			}                                                                                      \
+			block;                                                                                 \
+		}                                                                                          \
 	}
 
 /*------------------------------------------------------------------------*/
 
-#define EXPLORE_RAY_ISTR(istr)                                              \
-	if (!inside_ink) {                                                      \
-		if (((*br) & 0x1) && !((*br) & 0x80)) {                             \
-			p.x = istr;                                                     \
-			p.y = (s.first.y < s.second.y) ? s.first.y + y : s.first.y - y; \
-			return true;                                                    \
-		}                                                                   \
-	} else if (inside_ink && !((*br) & 0x1))                                \
+#define EXPLORE_RAY_ISTR(istr)                                                                     \
+	if (!inside_ink) {                                                                             \
+		if (((*br) & 0x1) && !((*br) & 0x80)) {                                                    \
+			p.x = istr;                                                                            \
+			p.y = (s.first.y < s.second.y) ? s.first.y + y : s.first.y - y;                        \
+			return true;                                                                           \
+		}                                                                                          \
+	} else if (inside_ink && !((*br) & 0x1))                                                       \
 		inside_ink = 0;
 
 /*------------------------------------------------------------------------*/
@@ -160,7 +164,7 @@ TRasterGR8P fillByteRaster(const TRasterCM32P &r, TRasterGR8P &bRaster)
 	int i, j;
 	int lx = r->getLx();
 	int ly = r->getLy();
-	//bRaster->create(lx+4, ly+4);
+	// bRaster->create(lx+4, ly+4);
 	UCHAR *br = bRaster->getRawData();
 
 	for (i = 0; i < lx + 4; i++)
@@ -194,8 +198,8 @@ TRasterGR8P fillByteRaster(const TRasterCM32P &r, TRasterGR8P &bRaster)
 
 /*------------------------------------------------------------------------*/
 
-#define SET_INK                              \
-	if (buf->getTone() == buf->getMaxTone()) \
+#define SET_INK                                                                                    \
+	if (buf->getTone() == buf->getMaxTone())                                                       \
 		*buf = TPixelCM32(inkIndex, 0, 255 - opacity);
 
 void drawSegment(TRasterCM32P &r, const TAutocloser::Segment &s, USHORT inkIndex, USHORT opacity)
@@ -207,7 +211,7 @@ int i, j;
 for (i=0; i<r->getLy();i++)
   {
 	for (j=0; j<r->getLx();j++, buf++)
-    *buf = (1<<4)|0xf;
+	*buf = (1<<4)|0xf;
   buf += wrap-r->getLx();
 	}
 return;
@@ -248,7 +252,7 @@ return;
 
 /*------------------------------------------------------------------------*/
 
-} //namespace
+} // namespace
 /*------------------------------------------------------------------------*/
 
 void TAutocloser::Imp::compute(std::vector<Segment> &closingSegmentArray)
@@ -266,8 +270,8 @@ void TAutocloser::Imp::compute(std::vector<Segment> &closingSegmentArray)
 		if (m_raster->getLx() == 0 || m_raster->getLy() == 0)
 			throw TException("Autoclose error: bad image size");
 
-		//Lx = r->lx;
-		//Ly = r->ly;
+		// Lx = r->lx;
+		// Ly = r->ly;
 
 		TRasterGR8P braux(raux->getLx() + 4, raux->getLy() + 4);
 		braux->lock();
@@ -290,7 +294,7 @@ void TAutocloser::Imp::compute(std::vector<Segment> &closingSegmentArray)
 		skeletonize(endpoints);
 
 		findMeetingPoints(endpoints, closingSegmentArray);
-		//copy(m_bRaster, raux);
+		// copy(m_bRaster, raux);
 		braux->unlock();
 
 	}
@@ -368,7 +372,8 @@ inline int distance2(const TPoint p0, const TPoint p1)
 
 /*=============================================================================*/
 
-int closerPoint(const std::vector<TAutocloser::Segment> &points, std::vector<bool> &marks, int index)
+int closerPoint(const std::vector<TAutocloser::Segment> &points, std::vector<bool> &marks,
+				int index)
 {
 	assert(points.size() == marks.size());
 
@@ -393,8 +398,8 @@ int closerPoint(const std::vector<TAutocloser::Segment> &points, std::vector<boo
 
 /*------------------------------------------------------------------------*/
 
-int intersect_triangle(int x1a, int y1a, int x2a, int y2a, int x3a, int y3a,
-					   int x1b, int y1b, int x2b, int y2b, int x3b, int y3b)
+int intersect_triangle(int x1a, int y1a, int x2a, int y2a, int x3a, int y3a, int x1b, int y1b,
+					   int x2b, int y2b, int x3b, int y3b)
 {
 	int minx, maxx, miny, maxy, i;
 	double xamin, xamax, xbmin, xbmax, val;
@@ -450,7 +455,7 @@ int intersect_triangle(int x1a, int y1a, int x2a, int y2a, int x3a, int y3a,
 
 /*------------------------------------------------------------------------*/
 
-} //namespace
+} // namespace
 
 /*------------------------------------------------------------------------*/
 
@@ -478,13 +483,15 @@ int TAutocloser::Imp::notInsidePath(const TPoint &p, const TPoint &q)
 		if (dy <= dx)
 			DRAW_SEGMENT(x, y, dx, dy, (br++), (br += m_bWrap + 1), if (!((*br) & 0x2)) return true)
 		else
-			DRAW_SEGMENT(y, x, dy, dx, (br += m_bWrap), (br += m_bWrap + 1), if (!((*br) & 0x2)) return true)
+			DRAW_SEGMENT(y, x, dy, dx, (br += m_bWrap), (br += m_bWrap + 1),
+						 if (!((*br) & 0x2)) return true)
 	} else {
 		dy = -dy;
 		if (dy <= dx)
 			DRAW_SEGMENT(x, y, dx, dy, (br++), (br -= m_bWrap - 1), if (!((*br) & 0x2)) return true)
 		else
-			DRAW_SEGMENT(y, x, dy, dx, (br -= m_bWrap), (br -= m_bWrap - 1), if (!((*br) & 0x2)) return true)
+			DRAW_SEGMENT(y, x, dy, dx, (br -= m_bWrap), (br -= m_bWrap - 1),
+						 if (!((*br) & 0x2)) return true)
 	}
 
 	return 0;
@@ -492,7 +499,8 @@ int TAutocloser::Imp::notInsidePath(const TPoint &p, const TPoint &q)
 
 /*------------------------------------------------------------------------*/
 
-int TAutocloser::Imp::exploreTwoSpots(const TAutocloser::Segment &s0, const TAutocloser::Segment &s1)
+int TAutocloser::Imp::exploreTwoSpots(const TAutocloser::Segment &s0,
+									  const TAutocloser::Segment &s1)
 {
 	int x1a, y1a, x2a, y2a, x3a, y3a, x1b, y1b, x2b, y2b, x3b, y3b;
 
@@ -519,19 +527,20 @@ int TAutocloser::Imp::exploreTwoSpots(const TAutocloser::Segment &s0, const TAut
 	x3b = tround(x1b + (p1aux.x - x1b) * m_csm - (p1aux.y - y1b) * m_snm);
 	y3b = tround(y1b + (p1aux.x - x1b) * m_snm + (p1aux.y - y1b) * m_csm);
 
-	return (intersect_triangle(x1a, y1a, p0aux.x, p0aux.y, x2a, y2a,
-							   x1b, y1b, p1aux.x, p1aux.y, x2b, y2b) ||
-			intersect_triangle(x1a, y1a, p0aux.x, p0aux.y, x3a, y3a,
-							   x1b, y1b, p1aux.x, p1aux.y, x2b, y2b) ||
-			intersect_triangle(x1a, y1a, p0aux.x, p0aux.y, x2a, y2a,
-							   x1b, y1b, p1aux.x, p1aux.y, x3b, y3b) ||
-			intersect_triangle(x1a, y1a, p0aux.x, p0aux.y, x3a, y3a,
-							   x1b, y1b, p1aux.x, p1aux.y, x3b, y3b));
+	return (intersect_triangle(x1a, y1a, p0aux.x, p0aux.y, x2a, y2a, x1b, y1b, p1aux.x, p1aux.y,
+							   x2b, y2b) ||
+			intersect_triangle(x1a, y1a, p0aux.x, p0aux.y, x3a, y3a, x1b, y1b, p1aux.x, p1aux.y,
+							   x2b, y2b) ||
+			intersect_triangle(x1a, y1a, p0aux.x, p0aux.y, x2a, y2a, x1b, y1b, p1aux.x, p1aux.y,
+							   x3b, y3b) ||
+			intersect_triangle(x1a, y1a, p0aux.x, p0aux.y, x3a, y3a, x1b, y1b, p1aux.x, p1aux.y,
+							   x3b, y3b));
 }
 
 /*------------------------------------------------------------------------*/
 
-void TAutocloser::Imp::findMeetingPoints(std::vector<TPoint> &endpoints, std::vector<Segment> &closingSegments)
+void TAutocloser::Imp::findMeetingPoints(std::vector<TPoint> &endpoints,
+										 std::vector<Segment> &closingSegments)
 {
 	int i;
 	double alfa;
@@ -577,7 +586,8 @@ bool allMarked(const std::vector<bool> &marks, int index)
 
 /*------------------------------------------------------------------------*/
 
-bool TAutocloser::Imp::spotResearchTwoPoints(std::vector<Segment> &endpoints, std::vector<Segment> &closingSegments)
+bool TAutocloser::Imp::spotResearchTwoPoints(std::vector<Segment> &endpoints,
+											 std::vector<Segment> &closingSegments)
 {
 	int i, distance, current = 0, closerIndex;
 	int sqrDistance = m_closingDistance * m_closingDistance;
@@ -595,7 +605,8 @@ bool TAutocloser::Imp::spotResearchTwoPoints(std::vector<Segment> &endpoints, st
 			if (exploreTwoSpots(endpoints[current], endpoints[closerIndex]) &&
 				notInsidePath(endpoints[current].first, endpoints[closerIndex].first)) {
 				drawInByteRaster(endpoints[current].first, endpoints[closerIndex].first);
-				closingSegments.push_back(Segment(endpoints[current].first, endpoints[closerIndex].first));
+				closingSegments.push_back(
+					Segment(endpoints[current].first, endpoints[closerIndex].first));
 
 				if (!EndpointTable[neighboursCode(getPtr(endpoints[closerIndex].first))]) {
 					std::vector<Segment>::iterator it = endpoints.begin();
@@ -649,7 +660,7 @@ return 0;
 
 void TAutocloser::Imp::calculateWeightAndDirection(std::vector<Segment> &orientedEndpoints)
 {
-	//UCHAR *br;
+	// UCHAR *br;
 	int lx = m_raster->getLx();
 	int ly = m_raster->getLy();
 
@@ -659,18 +670,19 @@ void TAutocloser::Imp::calculateWeightAndDirection(std::vector<Segment> &oriente
 		TPoint p0 = it->first;
 		TPoint &p1 = it->second;
 
-		//br = (UCHAR *)m_bRaster->pixels(p0.y)+p0.x;
-		//code = neighboursCode(br);
+		// br = (UCHAR *)m_bRaster->pixels(p0.y)+p0.x;
+		// code = neighboursCode(br);
 		/*if (!EndpointTable[code])
 	  {
 	  it = orientedEndpoints.erase(it);
-    continue;
-    }*/
+	continue;
+	}*/
 		TPoint displAverage = visitEndpoint(getPtr(p0));
 
 		p1 = p0 - displAverage;
 
-		/*if ((point->x2<0 && point->y2<0) || (point->x2>Lx && point->y2>Ly)) printf("che palle!!!!!!\n");*/
+		/*if ((point->x2<0 && point->y2<0) || (point->x2>Lx && point->y2>Ly)) printf("che
+		 * palle!!!!!!\n");*/
 
 		if (p1.x < 0) {
 			p1.y = tround(p0.y - (float)((p0.y - p1.y) * p0.x) / (p0.x - p1.x));
@@ -693,7 +705,8 @@ void TAutocloser::Imp::calculateWeightAndDirection(std::vector<Segment> &oriente
 
 /*------------------------------------------------------------------------*/
 
-bool TAutocloser::Imp::spotResearchOnePoint(std::vector<Segment> &endpoints, std::vector<Segment> &closingSegments)
+bool TAutocloser::Imp::spotResearchOnePoint(std::vector<Segment> &endpoints,
+											std::vector<Segment> &closingSegments)
 {
 	int count = 0;
 	bool ret = false;
@@ -703,7 +716,8 @@ bool TAutocloser::Imp::spotResearchOnePoint(std::vector<Segment> &endpoints, std
 
 		if (exploreSpot(endpoints[count], p)) {
 			Segment segment(endpoints[count].first, p);
-			std::vector<Segment>::iterator it = std::find(closingSegments.begin(), closingSegments.end(), segment);
+			std::vector<Segment>::iterator it =
+				std::find(closingSegments.begin(), closingSegments.end(), segment);
 			if (it == closingSegments.end()) {
 				ret = true;
 				drawInByteRaster(endpoints[count].first, p);
@@ -752,7 +766,8 @@ bool TAutocloser::Imp::exploreSpot(const Segment &s, TPoint &p)
 		x3 = tround(xnewa);
 		y3 = tround(ynewa);
 		if ((x3 != tround(x2a) || y3 != tround(y2a)) && x3 > 0 && x3 < lx && y3 > 0 && y3 < ly &&
-			exploreRay(getPtr(x1, y1), Segment(TPoint(x1, y1), TPoint(tround(xnewa), tround(ynewa))), p))
+			exploreRay(getPtr(x1, y1),
+					   Segment(TPoint(x1, y1), TPoint(tround(xnewa), tround(ynewa))), p))
 			return true;
 
 		x2a = xnewa;
@@ -763,7 +778,8 @@ bool TAutocloser::Imp::exploreSpot(const Segment &s, TPoint &p)
 		x3 = tround(xnewb);
 		y3 = tround(ynewb);
 		if ((x3 != tround(x2b) || y3 != tround(y2b)) && x3 > 0 && x3 < lx && y3 > 0 && y3 < ly &&
-			exploreRay(getPtr(x1, y1), Segment(TPoint(x1, y1), TPoint(tround(xnewb), tround(ynewb))), p))
+			exploreRay(getPtr(x1, y1),
+					   Segment(TPoint(x1, y1), TPoint(tround(xnewb), tround(ynewb))), p))
 			return true;
 
 		x2b = xnewb;
@@ -991,7 +1007,7 @@ void TAutocloser::Imp::circuitAndMark(UCHAR *seed, UCHAR preseed)
 	*seed |= 0x4;
 
 	displ = NextPointTable[(neighboursCode(seed) << 3) | preseed];
-	//assert(displ>=0 && displ<8);
+	// assert(displ>=0 && displ<8);
 
 	walker = seed + m_displaceVector[displ];
 	prewalker = displ ^ 0x7;
@@ -1056,7 +1072,7 @@ bool TAutocloser::Imp::circuitAndCancel(UCHAR *seed, UCHAR preseed, std::vector<
 	bool ret = false;
 
 	displ = NextPointTable[(neighboursCode(seed) << 3) | preseed];
-	//assert(displ>=0 && displ<8);
+	// assert(displ>=0 && displ<8);
 
 	if ((displ == preseed) && !((*seed) & 0x8)) {
 		endpoints.push_back(getCoordinates(seed));

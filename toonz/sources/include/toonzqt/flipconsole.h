@@ -54,7 +54,7 @@ class PlaybackExecutor : public QThread
 	int m_fps;
 	bool m_abort;
 
-public:
+  public:
 	PlaybackExecutor();
 
 	void resetFps(int fps);
@@ -64,13 +64,13 @@ public:
 
 	void emitNextFrame(int fps) { emit nextFrame(fps); }
 
-signals:
+  signals:
 	void nextFrame(int fps); // Must be connect with Qt::BlockingQueuedConnection connection type.
 };
 
 //-----------------------------------------------------------------------------
 
-//Implements a flipbook slider with a progress bar in background.
+// Implements a flipbook slider with a progress bar in background.
 class FlipSlider : public QAbstractSlider
 {
 	Q_OBJECT
@@ -96,31 +96,23 @@ class FlipSlider : public QAbstractSlider
 	bool m_enabled;
 	const std::vector<UCHAR> *m_progressBarStatus;
 
-public:
-	enum { PBFrameNotStarted,
-		   PBFrameStarted,
-		   PBFrameFinished };
+  public:
+	enum { PBFrameNotStarted, PBFrameStarted, PBFrameFinished };
 
 	FlipSlider(QWidget *parent);
 	~FlipSlider() {}
 
-	void setProgressBarEnabled(bool enabled)
-	{
-		m_enabled = enabled;
-	}
+	void setProgressBarEnabled(bool enabled) { m_enabled = enabled; }
 
 	void setProgressBarStatus(const std::vector<UCHAR> *pbStatus)
 	{
 		m_progressBarStatus = pbStatus;
 	}
 
-	const std::vector<UCHAR> *getProgressBarStatus() const
-	{
-		return m_progressBarStatus;
-	}
+	const std::vector<UCHAR> *getProgressBarStatus() const { return m_progressBarStatus; }
 
-public:
-	//Properties setters-getters
+  public:
+	// Properties setters-getters
 
 	int getPBHeight() const;
 	void setPBHeight(int height);
@@ -161,19 +153,19 @@ public:
 	QColor getFinishedColor() const;
 	void setFinishedColor(const QColor &color);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *ev);
 
 	void mousePressEvent(QMouseEvent *me);
 	void mouseMoveEvent(QMouseEvent *me);
 	void mouseReleaseEvent(QMouseEvent *me);
 
-private:
+  private:
 	int sliderPositionFromValue(int min, int max, int pos, int span);
 	int sliderValueFromPosition(int min, int max, int step, int pos, int span);
 	int pageStepVal(int val);
 
-signals:
+  signals:
 	void flipSliderReleased();
 	void flipSliderPressed();
 };
@@ -184,7 +176,7 @@ class DVAPI FlipConsole : public QWidget
 {
 	Q_OBJECT
 
-public:
+  public:
 	enum EGadget {
 		eBegin = 0,
 		ePlay = 0x1,
@@ -213,7 +205,7 @@ public:
 		eCustomize = 0x800000,
 		eSave = 0x1000000,
 		eDefineSubCamera = 0x2000000,
-		eFilledRaster = 0x4000000, //Used only in LineTest
+		eFilledRaster = 0x4000000, // Used only in LineTest
 		eDefineLoadBox = 0x8000000,
 		eUseLoadBox = 0x10000000,
 		eEnd = 0x20000000
@@ -229,20 +221,23 @@ public:
 	static bool m_isLinkedPlaying;
 	static bool m_areLinked;
 
-	//blanksEnabled==true->at begin of each loop a number of blank frames are drawn (according to rpeferences settings)
-	FlipConsole(QVBoxLayout *layout,
-				UINT gadgetsMask,
-				bool isLinkable,
-				QWidget *customWidget,
+	// blanksEnabled==true->at begin of each loop a number of blank frames are drawn (according to
+	// rpeferences settings)
+	FlipConsole(QVBoxLayout *layout, UINT gadgetsMask, bool isLinkable, QWidget *customWidget,
 				const QString &customizeId,
-				FlipConsoleOwner *consoleOwner, //call consoleOwner->onDrawFrame() intead of emitting drawFrame signal
+				FlipConsoleOwner *consoleOwner, // call consoleOwner->onDrawFrame() intead of
+												// emitting drawFrame signal
 				bool enableBlanks = false);
 	void enableBlanks(bool state);
 
-	void setFrameRange(int from, int to, int step, int current = -1); //if current==-1, current position will be ==from
-	void getFrameRange(int &from, int &to, int &step) const { from = m_from, to = m_to, step = m_step; }
+	void setFrameRange(int from, int to, int step,
+					   int current = -1); // if current==-1, current position will be ==from
+	void getFrameRange(int &from, int &to, int &step) const
+	{
+		from = m_from, to = m_to, step = m_step;
+	}
 	void setFrameRate(int rate);
-	//if doShowHide==true, applies set visible, otherwise applies setEnabled
+	// if doShowHide==true, applies set visible, otherwise applies setEnabled
 	void enableButton(UINT button, bool enable, bool doShowHide = true);
 	void showCurrentFrame();
 	int getCurrentFrame() const { return m_currentFrame; }
@@ -286,22 +281,20 @@ public:
 	void playNextFrame();
 	void updateCurrentFPS(int val);
 
-signals:
+  signals:
 
 	void buttonPressed(FlipConsole::EGadget button);
 
 	void playStateChanged(bool isPlaying);
 	void sliderReleased();
 
-private:
+  private:
 	UINT m_customizeMask;
 	QString m_customizeId;
 	QAction *m_customAction;
 	PlaybackExecutor m_playbackExecutor;
 
-	QAction
-		*m_customSep,
-		*m_rateSep, *m_histoSep, *m_bgSep, *m_vcrSep, *m_compareSep, *m_saveSep,
+	QAction *m_customSep, *m_rateSep, *m_histoSep, *m_bgSep, *m_vcrSep, *m_compareSep, *m_saveSep,
 		*m_colorFilterSep, *m_soundSep, *m_subcamSep, *m_filledRasterSep;
 
 	QToolBar *m_playToolBar;
@@ -338,11 +331,16 @@ private:
 
 	void createCustomizeMenu(bool withCustomWidget);
 	void addMenuItem(UINT id, const QString &text, QMenu *menu);
-	void createButton(UINT buttonMask, const char *iconStr, const QString &tip, bool checkable, QActionGroup *groupIt = 0);
-	QAction *createCheckedButtonWithBorderImage(UINT buttonMask, const char *iconStr, const QString &tip, bool checkable, QActionGroup *groupIt = 0, const char *cmdId = 0);
-	void createOnOffButton(UINT buttonMask, const char *iconStr, const QString &tip, QActionGroup *group);
-	QAction *createDoubleButton(UINT buttonMask1, UINT buttonMask2, const char *iconStr1, const char *iconStr2,
-								const QString &tip1, const QString &tip2, QActionGroup *group, DoubleButton *&w);
+	void createButton(UINT buttonMask, const char *iconStr, const QString &tip, bool checkable,
+					  QActionGroup *groupIt = 0);
+	QAction *createCheckedButtonWithBorderImage(UINT buttonMask, const char *iconStr,
+												const QString &tip, bool checkable,
+												QActionGroup *groupIt = 0, const char *cmdId = 0);
+	void createOnOffButton(UINT buttonMask, const char *iconStr, const QString &tip,
+						   QActionGroup *group);
+	QAction *createDoubleButton(UINT buttonMask1, UINT buttonMask2, const char *iconStr1,
+								const char *iconStr2, const QString &tip1, const QString &tip2,
+								QActionGroup *group, DoubleButton *&w);
 
 	QFrame *createFrameSlider();
 	void createPlayToolBar(bool withCustomWidget);
@@ -359,7 +357,7 @@ private:
 	FlipConsoleOwner *m_consoleOwner;
 	TFrameHandle *m_frameHandle;
 
-protected slots:
+  protected slots:
 
 	void OnSetCurrentFrame();
 	void OnFrameSliderRelease();
@@ -377,10 +375,10 @@ protected slots:
 
 	void onFPSEdited();
 
-public slots:
+  public slots:
 	void onPreferenceChanged();
 
-private:
+  private:
 	friend class PlaybackExecutor;
 	PlaybackExecutor &playbackExecutor() { return m_playbackExecutor; }
 };

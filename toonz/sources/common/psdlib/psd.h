@@ -108,7 +108,7 @@ struct TPSDLayerInfo {
 	float fxShadowAngle;
 	float fxShadowDistance;
 
-	//my tags
+	// my tags
 	bool isFolder;
 };
 
@@ -131,7 +131,7 @@ struct TPSDHeaderInfo {
 	bool linfoBlockEmpty;
 	TPSDLayerInfo *linfo;	 // array of layer info
 	psdByte lmistart, lmilen; // set by doLayerAndMaskInfo()
-	psdByte layerDataPos;	 //set by doInfo
+	psdByte layerDataPos; // set by doInfo
 };
 
 struct dictentry {
@@ -153,7 +153,7 @@ class DVAPI TPSDReader
 	int m_shrinkY;
 	TRect m_region;
 
-public:
+  public:
 	TPSDReader(const TFilePath &path);
 	~TPSDReader();
 	TImageReaderP getFrameReader(TFilePath path);
@@ -179,7 +179,7 @@ public:
 	int getShrinkY() { return m_shrinkY; }
 	TRect getRegion() { return m_region; }
 
-private:
+  private:
 	std::map<int, TRect> m_layersSavebox;
 
 	bool doInfo();
@@ -190,11 +190,11 @@ private:
 	bool doLayersInfo();
 	bool readLayerInfo(int index);
 
-	//void doImage(unsigned char *rasP, TPSDLayerInfo *li);
+	// void doImage(unsigned char *rasP, TPSDLayerInfo *li);
 	void doImage(TRasterP &rasP, int layerId);
 
-	void readImageData(TRasterP &rasP, TPSDLayerInfo *li, TPSDChannelInfo *chan,
-					   int chancount, psdPixel rows, psdPixel cols);
+	void readImageData(TRasterP &rasP, TPSDLayerInfo *li, TPSDChannelInfo *chan, int chancount,
+					   psdPixel rows, psdPixel cols);
 	int m_error;
 	TThread::Mutex m_mutex;
 	int openFile();
@@ -210,13 +210,15 @@ class DVAPI TPSDParser
 
 	class Level
 	{
-	public:
-		Level(std::string nm = "Unknown", int lid = 0, bool is_folder = false) : name(nm),
-																			layerId(lid),
-																			folder(is_folder)
+	  public:
+		Level(std::string nm = "Unknown", int lid = 0, bool is_folder = false)
+			: name(nm), layerId(lid), folder(is_folder)
 		{
 		}
-		void addFrame(int layerId, bool isFolder = false) { framesId.push_back(Frame(layerId, isFolder)); }
+		void addFrame(int layerId, bool isFolder = false)
+		{
+			framesId.push_back(Frame(layerId, isFolder));
+		}
 		int getFrameCount() { return (int)framesId.size(); }
 		std::string getName() { return name; }
 		int getLayerId() { return layerId; }
@@ -235,16 +237,14 @@ class DVAPI TPSDParser
 		}
 		// return true if the level is built from a psd folder
 		bool isFolder() { return folder; }
-	private:
+	  private:
 		struct Frame {
 			int layerId; // psd layerId
 			bool isFolder;
-			Frame(int layId, bool folder) : layerId(layId), isFolder(folder)
-			{
-			}
+			Frame(int layId, bool folder) : layerId(layId), isFolder(folder) {}
 		};
 
-		std::string name;				 // psd name
+		std::string name;			 // psd name
 		int layerId;				 // psd layer id
 		std::vector<Frame> framesId; // array of layer ID as frame
 		bool folder;
@@ -252,13 +252,14 @@ class DVAPI TPSDParser
 
 	TFilePath m_path;
 	std::vector<Level> m_levels; // layers id
-	TPSDReader *m_psdreader;	 //lib
-public:
+	TPSDReader *m_psdreader; // lib
+  public:
 	// path define levels construction method
 	// if path = :
 	//  filename.psd                    flat image so LevelsCount = 1;
 	//  filename#LAYERID.psd            each psd layer as a tlevel
-	//  filename#LAYERID#frames.psd     each psd layer as a frame so there is only one tlevel with 1 or more frames;
+	//  filename#LAYERID#frames.psd     each psd layer as a frame so there is only one tlevel with 1
+	//  or more frames;
 	//  filename#LAYERID#folder.psd     each psd layer is a tlevel and
 	//                                  each folder is a tlevel such as the psd layers
 	//                                  contained into folder are frames of tlevel
@@ -282,9 +283,13 @@ public:
 		return m_levels[levelIndex].isFolder();
 	}
 	int getLevelIndexById(int levelId);
-	// Returns layerID by name. Note that the layer name is not unique, so it return the first layer id found.
+	// Returns layerID by name. Note that the layer name is not unique, so it return the first layer
+	// id found.
 	int getLevelIdByName(std::string levelName);
-	int getFrameId(int layerId, int frameIndex) { return m_levels[getLevelIndexById(layerId)].getFrameId(frameIndex); }
+	int getFrameId(int layerId, int frameIndex)
+	{
+		return m_levels[getLevelIndexById(layerId)].getFrameId(frameIndex);
+	}
 	int getFramesCount(int levelId);
 	bool isSubFolder(int levelIndex, int frameIndex)
 	{
@@ -297,8 +302,8 @@ public:
 	// returns levelname, levelname__2, etc
 	std::string getLevelNameWithCounter(int levelId);
 
-private:
+  private:
 	void doLevels(); // do m_levels
 };
 
-#endif //TIIO_PSD_H
+#endif // TIIO_PSD_H

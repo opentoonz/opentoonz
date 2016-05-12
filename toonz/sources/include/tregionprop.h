@@ -20,7 +20,7 @@
 
 //============================================================================//
 
-//forward declarations
+// forward declarations
 
 class TColorStyle;
 class TRegion;
@@ -30,8 +30,7 @@ class TOutputStreamInterface;
 
 class TFlash;
 
-template <class T>
-class TRasterPT;
+template <class T> class TRasterPT;
 class TPixelRGBM32;
 
 typedef TPixelRGBM32 TPixel32;
@@ -45,11 +44,11 @@ class TRegionProp
 {
 	const TRegion *const m_region;
 
-protected:
+  protected:
 	bool m_regionChanged;
 	int m_styleVersionNumber;
 
-public:
+  public:
 	TRegionProp(const TRegion *region);
 
 	virtual ~TRegionProp() {}
@@ -67,7 +66,7 @@ public:
 
 	virtual TRegionProp *clone(const TRegion *region) const = 0;
 
-private:
+  private:
 	// not implemented
 	TRegionProp(const TRegionProp &);
 	TRegionProp &operator=(const TRegionProp &);
@@ -87,7 +86,7 @@ class OutlineRegionProp : public TRegionProp
 
 	void computeRegionOutline();
 
-public:
+  public:
 	OutlineRegionProp(const TRegion *region, const TOutlineStyleP regionStyle);
 
 	void draw(const TVectorRenderData &rd);

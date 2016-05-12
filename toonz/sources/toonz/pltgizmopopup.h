@@ -18,7 +18,7 @@ class ValueAdjuster : public QWidget
 
 	DVGui::DoubleLineEdit *m_valueLineEdit;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	ValueAdjuster(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -26,11 +26,11 @@ public:
 #endif
 	~ValueAdjuster();
 
-protected slots:
+  protected slots:
 	void onClickedPlus();
 	void onClickedMinus();
 
-signals:
+  signals:
 	void adjust(double factor);
 };
 
@@ -44,7 +44,7 @@ class ValueShifter : public QWidget
 
 	DVGui::DoubleLineEdit *m_valueLineEdit;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	ValueShifter(bool isHue, QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -52,11 +52,11 @@ public:
 #endif
 	~ValueShifter();
 
-protected slots:
+  protected slots:
 	void onClickedPlus();
 	void onClickedMinus();
 
-signals:
+  signals:
 	void adjust(double factor);
 };
 
@@ -72,7 +72,7 @@ class ColorFader : public QWidget
 
 	DVGui::DoubleLineEdit *m_valueLineEdit;
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	ColorFader(QString name = "", QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -80,10 +80,10 @@ public:
 #endif
 	~ColorFader();
 
-protected slots:
+  protected slots:
 	void onClicked();
 
-signals:
+  signals:
 	void valueChanged(double factor);
 };
 
@@ -97,12 +97,12 @@ class PltGizmoPopup : public DVGui::Dialog
 
 	DVGui::ColorField *m_colorFld;
 
-public:
+  public:
 	PltGizmoPopup();
 
 	~PltGizmoPopup();
 
-public slots:
+  public slots:
 
 	void adjustV(double p);
 	void adjustS(double p);

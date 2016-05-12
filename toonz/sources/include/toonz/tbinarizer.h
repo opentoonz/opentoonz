@@ -19,8 +19,8 @@ class DVAPI TBinarizer
 {
 	bool m_alphaEnabled;
 
-private:
-public:
+  private:
+  public:
 	TBinarizer();
 	void process(const TRaster32P &ras);
 

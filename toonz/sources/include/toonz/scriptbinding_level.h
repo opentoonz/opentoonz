@@ -20,7 +20,7 @@ class DVAPI Level : public Wrapper
 	bool m_sceneOwner;
 	int m_type;
 
-public:
+  public:
 	Level();
 	Level(TXshSimpleLevel *);
 	~Level();
@@ -28,8 +28,9 @@ public:
 	WRAPPER_STD_METHODS(Image)
 	Q_INVOKABLE QScriptValue toString();
 
-	//QScriptValue toScriptValue(QScriptEngine *engine) { return create(engine, this); }
-	//static QScriptValue toScriptValue(QScriptEngine *engine, TXshSimpleLevel *sl) { return (new Level(sl))->toScriptValue(engine); }
+	// QScriptValue toScriptValue(QScriptEngine *engine) { return create(engine, this); }
+	// static QScriptValue toScriptValue(QScriptEngine *engine, TXshSimpleLevel *sl) { return (new
+	// Level(sl))->toScriptValue(engine); }
 
 	Q_PROPERTY(QString type READ getType)
 	QString getType() const;

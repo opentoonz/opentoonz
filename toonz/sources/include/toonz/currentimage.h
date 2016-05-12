@@ -15,7 +15,7 @@
 
 class CurrentImageListener
 {
-public:
+  public:
 	virtual void onImageChange() = 0;
 	virtual ~CurrentImageListener() {}
 };

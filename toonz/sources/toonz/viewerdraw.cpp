@@ -61,7 +61,8 @@ void getSafeAreaSizeList(QList<QList<double>> &_sizeList)
 
 		std::string safeAreaFileName = "safeArea.ini";
 
-		while (!TFileStatus(fp + safeAreaFileName).doesExist() && !fp.isRoot() && fp.getParentDir() != TFilePath())
+		while (!TFileStatus(fp + safeAreaFileName).doesExist() && !fp.isRoot() &&
+			   fp.getParentDir() != TFilePath())
 			fp = fp.getParentDir();
 
 		fp = fp + safeAreaFileName;
@@ -75,19 +76,20 @@ void getSafeAreaSizeList(QList<QList<double>> &_sizeList)
 				settings.beginGroup(groups.at(g));
 				// If found, get the safe area setting values
 				if (safeAreaName == settings.value("name", "").toString()) {
-					//enter area group
+					// enter area group
 					settings.beginGroup("area");
 
 					QStringList keys = settings.childKeys();
 					for (int i = 0; i < keys.size(); i++) {
-						QList<QVariant> tmp = settings.value(keys.at(i), QList<QVariant>()).toList();
+						QList<QVariant> tmp =
+							settings.value(keys.at(i), QList<QVariant>()).toList();
 						QList<double> val_list;
 						for (int j = 0; j < tmp.size(); j++)
 							val_list.push_back(tmp.at(j).toDouble());
 						sizeList.push_back(val_list);
 					}
 
-					//close area group
+					// close area group
 					settings.endGroup();
 
 					settings.endGroup();
@@ -95,7 +97,7 @@ void getSafeAreaSizeList(QList<QList<double>> &_sizeList)
 				}
 				settings.endGroup();
 			}
-			//If not found, then put some temporal values..
+			// If not found, then put some temporal values..
 			if (sizeList.isEmpty()) {
 				QList<double> tmpList0, tmpList1;
 				tmpList0 << 80.0 << 80.0;
@@ -161,8 +163,8 @@ void getCameraSection(T3DPointD points[4], int row, double z)
   double camZ = xsh->getZ(cameraId, row);
   TAffine camAff = xsh->getPlacement(cameraId, row);
 
-  TRectD cameraRect = 
-    TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera()->getStageRect();
+  TRectD cameraRect =
+	TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera()->getStageRect();
 
   TPointD p[4];
   p[0] = camAff * cameraRect.getP00();
@@ -175,7 +177,7 @@ void getCameraSection(T3DPointD points[4], int row, double z)
   double sc = 1+(camZ-z)/f;
 
   for(int i=0;i<4;i++)
-    points[i] = make3dPoint(center+sc*(p[i]-center), z);
+	points[i] = make3dPoint(center+sc*(p[i]-center), z);
 
 }
 */
@@ -202,17 +204,15 @@ void ViewerDraw::drawCameraMask(SceneViewer *viewer)
 
 	GLfloat modelView[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX, modelView);
-	TAffine modelViewAff(
-		modelView[0], modelView[4], modelView[12],
-		modelView[1], modelView[5], modelView[13]);
+	TAffine modelViewAff(modelView[0], modelView[4], modelView[12], modelView[1], modelView[5],
+						 modelView[13]);
 
 	TRectD cameraRect = getCameraRect();
 
-	TPointD clipCorner[] = {
-		modelViewAff.inv() * TPointD(clipRect.x0, clipRect.y0),
-		modelViewAff.inv() * TPointD(clipRect.x1, clipRect.y0),
-		modelViewAff.inv() * TPointD(clipRect.x1, clipRect.y1),
-		modelViewAff.inv() * TPointD(clipRect.x0, clipRect.y1)};
+	TPointD clipCorner[] = {modelViewAff.inv() * TPointD(clipRect.x0, clipRect.y0),
+							modelViewAff.inv() * TPointD(clipRect.x1, clipRect.y0),
+							modelViewAff.inv() * TPointD(clipRect.x1, clipRect.y1),
+							modelViewAff.inv() * TPointD(clipRect.x0, clipRect.y1)};
 
 	// bounds: nel sistema di riferimento "corrente" bounds e' il piu' piccolo
 	// rettangolo che copre completamente tutto il viewer
@@ -266,11 +266,8 @@ void ViewerDraw::drawCameraMask(SceneViewer *viewer)
 
 //-----------------------------------------------------------------------------
 
-void ViewerDraw::drawGridAndGuides(
-	SceneViewer *viewer,
-	double sc,
-	Ruler *vr, Ruler *hr,
-	bool gridEnabled)
+void ViewerDraw::drawGridAndGuides(SceneViewer *viewer, double sc, Ruler *vr, Ruler *hr,
+								   bool gridEnabled)
 {
 	int vGuideCount = 0;
 	int hGuideCount = 0;
@@ -385,9 +382,11 @@ void ViewerDraw::drawColorcard(UCHAR channel)
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	TRectD rect = getCameraRect();
 
-	TPixel color = (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg) ? TPixel::Black : scene->getProperties()->getBgColor();
+	TPixel color = (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
+					   ? TPixel::Black
+					   : scene->getProperties()->getBgColor();
 	if (channel == 0)
-		color.m = 255; //fondamentale: senno' non si vedono i fill con le texture in camera stand!
+		color.m = 255; // fondamentale: senno' non si vedono i fill con le texture in camera stand!
 	else {
 		if (channel == TRop::MChan) {
 			switch (channel) {
@@ -434,11 +433,8 @@ void ViewerDraw::draw3DCamera(unsigned long flags, double zmin, double phi)
 
 	double znear = 1000 + zcam - 100;
 
-	TPointD cameraCorners[4] = {
-		camAff * rect.getP00(),
-		camAff * rect.getP10(),
-		camAff * rect.getP11(),
-		camAff * rect.getP01()};
+	TPointD cameraCorners[4] = {camAff * rect.getP00(), camAff * rect.getP10(),
+								camAff * rect.getP11(), camAff * rect.getP01()};
 	TPointD cameraCenter = 0.5 * (cameraCorners[0] + cameraCorners[2]);
 
 	T3DPointD cage[4][4];
@@ -523,11 +519,11 @@ void ViewerDraw::draw3DCamera(unsigned long flags, double zmin, double phi)
 
   if(objId != cameraId)
   {
-    glColor3d(1.0,0.0,1.0);
-    glBegin(GL_LINE_STRIP);
-    for(j=0;j<4;j++) glVertex(currentRect[j]);
-    glVertex(currentRect[0]);
-    glEnd();
+	glColor3d(1.0,0.0,1.0);
+	glBegin(GL_LINE_STRIP);
+	for(j=0;j<4;j++) glVertex(currentRect[j]);
+	glVertex(currentRect[0]);
+	glEnd();
   }
 */
 
@@ -545,7 +541,12 @@ void ViewerDraw::draw3DCamera(unsigned long flags, double zmin, double phi)
 TRectD ViewerDraw::getCameraRect()
 {
 	if (CleanupPreviewCheck::instance()->isEnabled() || CameraTestCheck::instance()->isEnabled())
-		return TApp::instance()->getCurrentScene()->getScene()->getProperties()->getCleanupParameters()->m_camera.getStageRect();
+		return TApp::instance()
+			->getCurrentScene()
+			->getScene()
+			->getProperties()
+			->getCleanupParameters()
+			->m_camera.getStageRect();
 	else
 		return TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera()->getStageRect();
 }
@@ -638,7 +639,7 @@ void ViewerDraw::drawCamera(unsigned long flags, double pixelSize)
 		glPopMatrix();
 	}
 
-	//draw preview sub-camera
+	// draw preview sub-camera
 	if (!CleanupPreviewCheck::instance()->isEnabled() && subcamera) {
 		PreviewSubCameraManager *inst = PreviewSubCameraManager::instance();
 		TRect previewSubRect(inst->getEditingCameraInterestRect());

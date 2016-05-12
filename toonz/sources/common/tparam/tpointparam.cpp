@@ -10,15 +10,9 @@
 
 class TPointParamImp
 {
-public:
-	TPointParamImp(const TPointD &p)
-		: m_x(new TDoubleParam(p.x)), m_y(new TDoubleParam(p.y))
-	{
-	}
-	TPointParamImp(const TPointParamImp &src)
-		: m_x(src.m_x->clone()), m_y(src.m_y->clone())
-	{
-	}
+  public:
+	TPointParamImp(const TPointD &p) : m_x(new TDoubleParam(p.x)), m_y(new TDoubleParam(p.y)) {}
+	TPointParamImp(const TPointParamImp &src) : m_x(src.m_x->clone()), m_y(src.m_y->clone()) {}
 	~TPointParamImp() {}
 	TDoubleParamP m_x, m_y;
 };
@@ -37,7 +31,8 @@ TPointParam::TPointParam(const TPointD &p, bool from_plugin)
 //---------------------------------------------------------
 
 TPointParam::TPointParam(const TPointParam &src)
-	: TParamSet(src.getName()), m_data(new TPointParamImp(*src.m_data)), m_from_plugin(src.m_from_plugin)
+	: TParamSet(src.getName()), m_data(new TPointParamImp(*src.m_data)),
+	  m_from_plugin(src.m_from_plugin)
 {
 	addParam(m_data->m_x, "x");
 	addParam(m_data->m_y, "y");

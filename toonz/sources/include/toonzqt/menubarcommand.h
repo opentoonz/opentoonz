@@ -31,7 +31,7 @@ class QAction;
 //
 class DVAPI CommandHandlerInterface
 {
-public:
+  public:
 	virtual ~CommandHandlerInterface() {}
 	virtual void execute() = 0;
 };
@@ -68,7 +68,7 @@ enum CommandType {
 
 class AuxActionsCreator
 {
-public:
+  public:
 	AuxActionsCreator();
 	virtual ~AuxActionsCreator(){};
 	virtual void createActions(QObject *parent) = 0;
@@ -82,7 +82,7 @@ class AuxActionsCreatorManager
 	std::vector<AuxActionsCreator *> m_auxActionsCreators;
 	AuxActionsCreatorManager();
 
-public:
+  public:
 	static AuxActionsCreatorManager *instance();
 	void addAuxActionsCreator(AuxActionsCreator *auxActionsCreator);
 	void createAuxActions(QObject *parent);
@@ -101,7 +101,7 @@ class DVAPI CommandManager
 
 	class Node
 	{
-	public:
+	  public:
 		std::string m_id;
 		CommandType m_type;
 		QAction *m_qaction;
@@ -110,7 +110,9 @@ class DVAPI CommandManager
 		QString m_onText, m_offText; // for toggle commands. e.g. show/hide something
 
 		Node(CommandId id)
-			: m_id(id), m_type(UndefinedCommandType), m_qaction(0), m_handler(0), m_enabled(true) {}
+			: m_id(id), m_type(UndefinedCommandType), m_qaction(0), m_handler(0), m_enabled(true)
+		{
+		}
 
 		~Node()
 		{
@@ -129,17 +131,13 @@ class DVAPI CommandManager
 	void setShortcut(CommandId id, QAction *action, std::string shortcutString);
 	void createAuxActions();
 
-public:
+  public:
 	static CommandManager *instance();
 	~CommandManager();
 
 	void setHandler(CommandId id, CommandHandlerInterface *handler);
 
-	void define(
-		CommandId id,
-		CommandType type,
-		std::string defaultShortcutString,
-		QAction *action);
+	void define(CommandId id, CommandType type, std::string defaultShortcutString, QAction *action);
 
 	QAction *createAction(const char *id, const char *name, const char *defaultShortcut);
 
@@ -159,7 +157,8 @@ public:
 	QAction *createAction(CommandId id, QObject *parent = 0, bool state = true);
 
 	void execute(QAction *action);
-	/*! If action is defined in m_qactionTable recall \b execute(action), otherwise recall execute(menuAction).*/
+	/*! If action is defined in m_qactionTable recall \b execute(action), otherwise recall
+	 * execute(menuAction).*/
 	void execute(QAction *action, QAction *menuAction);
 	void execute(CommandId id);
 	void enable(CommandId id, bool enabled);
@@ -168,10 +167,11 @@ public:
 	// note: this will trigger any associated handler
 	void setChecked(CommandId id, bool checked);
 
-	// use setToggleTexts for toggle commands that have two names according to the current status. e.g. show/hide something
+	// use setToggleTexts for toggle commands that have two names according to the current status.
+	// e.g. show/hide something
 	void setToggleTexts(CommandId id, const QString &onText, const QString &offText);
 
-	std::string getIdFromAction(QAction* action);
+	std::string getIdFromAction(QAction *action);
 };
 
 //-----------------------------------------------------------------------------
@@ -180,28 +180,23 @@ public:
 // CommandHandlerHelper = target + method
 //
 
-template <class T>
-class CommandHandlerHelper : public CommandHandlerInterface
+template <class T> class CommandHandlerHelper : public CommandHandlerInterface
 {
 	T *m_target;
 	void (T::*m_method)();
 
-public:
-	CommandHandlerHelper(T *target, void (T::*method)())
-		: m_target(target), m_method(method)
-	{
-	}
+  public:
+	CommandHandlerHelper(T *target, void (T::*method)()) : m_target(target), m_method(method) {}
 	void execute() { (m_target->*m_method)(); }
 };
 
-template <class T, typename R>
-class CommandHandlerHelper2 : public CommandHandlerInterface
+template <class T, typename R> class CommandHandlerHelper2 : public CommandHandlerInterface
 {
 	T *m_target;
 	void (T::*m_method)(R value);
 	R m_value;
 
-public:
+  public:
 	CommandHandlerHelper2(T *target, void (T::*method)(R), R value)
 		: m_target(target), m_method(method), m_value(value)
 	{
@@ -211,8 +206,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-template <class T>
-inline void setCommandHandler(CommandId id, T *target, void (T::*method)())
+template <class T> inline void setCommandHandler(CommandId id, T *target, void (T::*method)())
 {
 	CommandManager::instance()->setHandler(id, new CommandHandlerHelper<T>(target, method));
 }
@@ -222,23 +216,19 @@ inline void setCommandHandler(CommandId id, T *target, void (T::*method)())
 class DVAPI MenuItemHandler : public QObject
 {
 	Q_OBJECT
-public:
+  public:
 	MenuItemHandler(CommandId cmdId);
 	virtual ~MenuItemHandler(){};
 	virtual void execute() = 0;
 };
 
-template <class T>
-class OpenPopupCommandHandler : public MenuItemHandler
+template <class T> class OpenPopupCommandHandler : public MenuItemHandler
 {
 	T *m_popup;
 	CommandId m_id;
 
-public:
-	OpenPopupCommandHandler(CommandId cmdId)
-		: MenuItemHandler(cmdId), m_popup(0)
-	{
-	}
+  public:
+	OpenPopupCommandHandler(CommandId cmdId) : MenuItemHandler(cmdId), m_popup(0) {}
 
 	void execute()
 	{
@@ -255,11 +245,11 @@ public:
 class DVAPI DVAction : public QAction
 {
 	Q_OBJECT
-public:
+  public:
 	DVAction(const QString &text, QObject *parent);
 	DVAction(const QIcon &icon, const QString &text, QObject *parent);
 
-public slots:
+  public slots:
 	void onTriggered();
 };
 
@@ -271,13 +261,13 @@ class DVAPI DVMenuAction : public QMenu
 
 	int m_triggeredActionIndex;
 
-public:
+  public:
 	DVMenuAction(const QString &text, QWidget *parent, QList<QString> actions);
 	void setActions(QList<QString> actions);
 
 	int getTriggeredActionIndex() { return m_triggeredActionIndex; }
 
-public slots:
+  public slots:
 	void onTriggered(QAction *action);
 };
 

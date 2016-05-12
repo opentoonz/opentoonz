@@ -21,7 +21,7 @@
 
 class DVAPI TDoubleStepParam : public TDoubleParam
 {
-public:
+  public:
 	TDoubleStepParam(double v = 0.0);
 	TDoubleStepParam(const TDoubleParam &src);
 	~TDoubleStepParam();

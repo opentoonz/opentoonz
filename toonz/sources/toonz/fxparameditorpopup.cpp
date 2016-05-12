@@ -29,8 +29,7 @@ using namespace DVGui;
 */
 //-----------------------------------------------------------------------------
 
-FxParamEditorPopup::FxParamEditorPopup()
-	: QDialog(TApp::instance()->getMainWindow())
+FxParamEditorPopup::FxParamEditorPopup() : QDialog(TApp::instance()->getMainWindow())
 {
 	setWindowTitle(tr("Fx Settings"));
 	setMinimumSize(20, 20);

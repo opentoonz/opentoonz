@@ -13,7 +13,7 @@
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/flipconsole.h"
-//iwsw commented out temporarily
+// iwsw commented out temporarily
 //#include "toonzqt/ghibli_3dlut_util.h"
 
 // TnzTools includes
@@ -45,11 +45,11 @@ class ToggleCommandHandler : public MenuItemHandler
 {
 	int m_status;
 
-public:
+  public:
 	ToggleCommandHandler(CommandId id, bool startStatus);
 
 	bool getStatus() const { return m_status; }
-	//For reproducing the UI toggle when launch
+	// For reproducing the UI toggle when launch
 	void setStatus(bool status) { m_status = status; }
 	void execute();
 };
@@ -69,7 +69,7 @@ class SceneViewer : public QGLWidget, public TTool::Viewer, public Previewer::Li
 
 	bool m_foregroundDrawing;
 	bool m_tabletEvent;
-	//used to handle wrong mouse drag events!
+	// used to handle wrong mouse drag events!
 	bool m_buttonClicked;
 
 	int m_referenceMode;
@@ -106,7 +106,7 @@ class SceneViewer : public QGLWidget, public TTool::Viewer, public Previewer::Li
 
 	TPointD m_dpiScale;
 
-	int m_tableDLId; //To compute table DisplayList only if necessary.
+	int m_tableDLId; // To compute table DisplayList only if necessary.
 
 	int m_groupIndexToBeEntered;
 
@@ -134,11 +134,11 @@ class SceneViewer : public QGLWidget, public TTool::Viewer, public Previewer::Li
 		TOP_3D,
 	} m_current3DDevice;
 
-	//iwsw commented out temporarily
-	//Ghibli3DLutUtil * m_ghibli3DLutUtil;
-public:
-	//iwsw commented out temporarily
-	//Ghibli3DLutUtil* get3DLutUtil(){ return m_ghibli3DLutUtil; }
+	// iwsw commented out temporarily
+	// Ghibli3DLutUtil * m_ghibli3DLutUtil;
+  public:
+	// iwsw commented out temporarily
+	// Ghibli3DLutUtil* get3DLutUtil(){ return m_ghibli3DLutUtil; }
 	enum ReferenceMode {
 		NORMAL_REFERENCE = 1,
 		CAMERA3D_REFERENCE = 2,
@@ -147,16 +147,9 @@ public:
 	};
 
 	// Zoom/Pan matrices are selected by ViewMode
-	enum ViewMode {
-		SCENE_VIEWMODE = 0,
-		LEVEL_VIEWMODE = 1
-	};
+	enum ViewMode { SCENE_VIEWMODE = 0, LEVEL_VIEWMODE = 1 };
 
-	enum PreviewMode {
-		NO_PREVIEW = 0,
-		FULL_PREVIEW = 1,
-		SUBCAMERA_PREVIEW = 2
-	};
+	enum PreviewMode { NO_PREVIEW = 0, FULL_PREVIEW = 1, SUBCAMERA_PREVIEW = 2 };
 
 	SceneViewer(ImageUtils::FullScreenWidget *parent);
 	~SceneViewer();
@@ -180,7 +173,8 @@ public:
 
 	//! Return the view matrix.
 	//! The view matrix is a matrix contained in \b m_viewAff; if the SceneViewer in showing images
-	//! in Camera view Mode (m_referenceMode = CAMERA_REFERENCE) the returned affine is composed with camera
+	//! in Camera view Mode (m_referenceMode = CAMERA_REFERENCE) the returned affine is composed
+	//! with camera
 	//! transformation.
 	TAffine getViewMatrix() const;
 	//! Return the view matrix.
@@ -232,15 +226,15 @@ public:
 
 	void setFocus(Qt::FocusReason reason) { QWidget::setFocus(reason); };
 
-public:
-	//SceneViewer's gadget public functions
+  public:
+	// SceneViewer's gadget public functions
 	TPointD winToWorld(const QPoint &pos) const;
 	TPointD winToWorld(const TPoint &winPos) const;
 
 	TPoint worldToPos(const TPointD &worldPos) const;
 
-protected:
-	//Paint vars
+  protected:
+	// Paint vars
 	TAffine m_drawCameraAff;
 	TAffine m_drawTableAff;
 	bool m_draw3DMode;
@@ -249,7 +243,7 @@ protected:
 	bool m_drawEditingLevel;
 	TRect m_actualClipRect;
 
-	//Paint methods
+	// Paint methods
 	void drawBuildVars();
 	void drawEnableScissor();
 	void drawDisableScissor();
@@ -261,7 +255,7 @@ protected:
 	void drawScene();
 	void drawToolGadgets();
 
-protected:
+  protected:
 	void mult3DMatrix();
 
 	void initializeGL();
@@ -294,10 +288,7 @@ protected:
 	void zoomQt(const QPoint &center, double scaleFactor);
 
 	// overriden from TTool::Viewer
-	void pan(const TPoint &delta)
-	{
-		panQt(QPoint(delta.x, delta.y));
-	}
+	void pan(const TPoint &delta) { panQt(QPoint(delta.x, delta.y)); }
 
 	// overriden from TTool::Viewer
 	void zoom(const TPointD &center, double factor);
@@ -314,7 +305,8 @@ protected:
 	//! return the column indexes of the drawings intersecting point \b p
 	//! (window coordinate, pixels, bottom-left origin)
 	int posToColumnIndex(const TPoint &p, double distance, bool includeInvisible = true) const;
-	void posToColumnIndexes(const TPoint &p, std::vector<int> &indexes, double distance, bool includeInvisible = true) const;
+	void posToColumnIndexes(const TPoint &p, std::vector<int> &indexes, double distance,
+							bool includeInvisible = true) const;
 
 	//! return the row of the drawings intersecting point \b p (used with onion skins)
 	//! (window coordinate, pixels, bottom-left origin)
@@ -331,7 +323,7 @@ protected:
 
 	void setFocus() { QWidget::setFocus(); };
 
-public slots:
+  public slots:
 
 	void resetSceneViewer();
 	void setActualPixelSize();
@@ -342,7 +334,8 @@ public slots:
 	void onToolSwitched();
 	void onSceneChanged();
 	void onLevelChanged();
-	// when level is switched, update m_dpiScale in order to show white background for Ink&Paint work properly
+	// when level is switched, update m_dpiScale in order to show white background for Ink&Paint
+	// work properly
 	void onLevelSwitched();
 	void onFrameSwitched();
 
@@ -359,7 +352,7 @@ public slots:
 	// delete preview-subcamera executed from context menu
 	void doDeleteSubCamera();
 
-signals:
+  signals:
 
 	void onZoomChanged();
 	void freezeStateChanged(bool);

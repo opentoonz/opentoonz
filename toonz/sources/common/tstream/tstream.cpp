@@ -90,12 +90,10 @@ void readCompressedFile(string &str, TFilePath src)
 namespace
 {
 // TODO: Unify with tcodec.cpp's version
-bool lz4decompress(LZ4F_decompressionContext_t lz4dctx,
-				   char *out, size_t *out_len_res,
+bool lz4decompress(LZ4F_decompressionContext_t lz4dctx, char *out, size_t *out_len_res,
 				   const char *in, size_t in_len)
 {
-	size_t out_len = *out_len_res,
-		   in_read, out_written;
+	size_t out_len = *out_len_res, in_read, out_written;
 
 	*out_len_res = 0;
 
@@ -103,8 +101,8 @@ bool lz4decompress(LZ4F_decompressionContext_t lz4dctx,
 		out_written = out_len;
 		in_read = in_len;
 
-		size_t res = LZ4F_decompress(
-			lz4dctx, (void *)out, &out_written, (const void *)in, &in_read, NULL);
+		size_t res =
+			LZ4F_decompress(lz4dctx, (void *)out, &out_written, (const void *)in, &in_read, NULL);
 
 		if (LZ4F_isError(res))
 			return false;
@@ -126,12 +124,10 @@ bool lz4decompress(LZ4F_decompressionContext_t lz4dctx,
 
 class StreamTag
 {
-public:
+  public:
 	string m_name;
 	std::map<std::string, string> m_attributes;
-	enum Type { BeginTag,
-				EndTag,
-				BeginEndTag };
+	enum Type { BeginTag, EndTag, BeginEndTag };
 	Type m_type;
 	StreamTag() : m_type(BeginTag) {}
 
@@ -172,17 +168,14 @@ class TPersistFactory
 	Table m_table;
 	TPersistFactory() {}
 
-public:
+  public:
 	static TPersistFactory *instance()
 	{
 		if (!m_factory)
 			m_factory = new TPersistFactory;
 		return m_factory;
 	}
-	void add(string name, TPersistDeclaration *decl)
-	{
-		m_table[name] = decl;
-	}
+	void add(string name, TPersistDeclaration *decl) { m_table[name] = decl; }
 	TPersist *create(string name)
 	{
 		Table::iterator it = m_table.find(name);
@@ -201,8 +194,7 @@ TPersistFactory *TPersistFactory::m_factory = 0;
 
 //--------------------------------
 
-TPersistDeclaration::TPersistDeclaration(const std::string &id)
-	: m_id(id)
+TPersistDeclaration::TPersistDeclaration(const std::string &id) : m_id(id)
 {
 	TPersistFactory::instance()->add(id, this);
 }
@@ -218,7 +210,7 @@ TPersist *TPersist::create(const std::string &name)
 
 class TOStream::Imp
 {
-public:
+  public:
 	ostream *m_os;
 	bool m_chanOwner;
 	bool m_compressed;
@@ -232,13 +224,16 @@ public:
 	int m_maxId;
 	TFilePath m_filepath;
 
-	Imp() : m_os(0), m_chanOwner(false), m_tab(0), m_justStarted(true), m_maxId(0), m_compressed(false) {}
+	Imp()
+		: m_os(0), m_chanOwner(false), m_tab(0), m_justStarted(true), m_maxId(0),
+		  m_compressed(false)
+	{
+	}
 };
 
 //---------------------------------------------------------------
 
-TOStream::TOStream(const TFilePath &fp, bool compressed)
-	: m_imp(new Imp)
+TOStream::TOStream(const TFilePath &fp, bool compressed) : m_imp(new Imp)
 {
 	m_imp->m_filepath = fp;
 
@@ -257,8 +252,7 @@ TOStream::TOStream(const TFilePath &fp, bool compressed)
 
 //---------------------------------------------------------------
 
-TOStream::TOStream(std::shared_ptr<Imp> imp)
-	: m_imp(std::move(imp))
+TOStream::TOStream(std::shared_ptr<Imp> imp) : m_imp(std::move(imp))
 {
 	assert(!m_imp->m_tagStack.empty());
 	ostream &os = *m_imp->m_os;
@@ -270,12 +264,11 @@ TOStream::TOStream(std::shared_ptr<Imp> imp)
 	m_imp->m_justStarted = true;
 }
 
-TOStream::TOStream(TOStream&& that)
-	: m_imp(std::move(that.m_imp))
+TOStream::TOStream(TOStream &&that) : m_imp(std::move(that.m_imp))
 {
 }
 
-TOStream& TOStream::operator = (TOStream && that)
+TOStream &TOStream::operator=(TOStream &&that)
 {
 	if (this != &that) {
 		this->m_imp = std::move(that.m_imp);
@@ -364,7 +357,7 @@ TOStream &TOStream::operator<<(int v)
 
 TOStream &TOStream::operator<<(double v)
 {
-	if (areAlmostEqual(v, 0)) //con valori molto piccoli (es. 1.4e-310) non riesce a rileggerli!
+	if (areAlmostEqual(v, 0)) // con valori molto piccoli (es. 1.4e-310) non riesce a rileggerli!
 		v = 0;
 
 	*(m_imp->m_os) << v << " ";
@@ -434,35 +427,35 @@ TOStream &TOStream::operator<<(std::wstring v)
   int len = v.length();
   if(len==0)
   {
-    os << "\"" << "\"" << " "; 
-    m_imp->m_justStarted = false;
-    return *this;
+	os << "\"" << "\"" << " ";
+	m_imp->m_justStarted = false;
+	return *this;
   }
   int i;
   for(i=0;i<len;i++)
-    if(!iswalnum(v[i]) && v[i]!=L'_')
-      break;
+	if(!iswalnum(v[i]) && v[i]!=L'_')
+	  break;
   if(i==len)
-    {
-     os << v;
-     os << " ";
-    }
+	{
+	 os << v;
+	 os << " ";
+	}
   else
-    {
-     os.put('"');
-     for(i=0;i<len;i++)
-       if(iswalnum(v[i]))
-         os.put((char)v[i]);
-       else if(v[i]=='"')
-         os << "\\\"";
-       else if(v[i]=='\n')
-         os << "\\n";
-       else if(iswprint(v[i]))
-         os << v[i];
-       else 
-         {os.put('\\'); os << (int)v[i];}
-     os << "\" ";
-    }
+	{
+	 os.put('"');
+	 for(i=0;i<len;i++)
+	   if(iswalnum(v[i]))
+		 os.put((char)v[i]);
+	   else if(v[i]=='"')
+		 os << "\\\"";
+	   else if(v[i]=='\n')
+		 os << "\\n";
+	   else if(iswprint(v[i]))
+		 os << v[i];
+	   else
+		 {os.put('\\'); os << (int)v[i];}
+	 os << "\" ";
+	}
   m_imp->m_justStarted = false;
   return *this;
 */
@@ -545,8 +538,7 @@ void TOStream::openChild(string tagName, const map<std::string, string> &attribu
 	*(m_imp->m_os) << "<" << m_imp->m_tagStack.back();
 	for (std::map<std::string, string>::const_iterator it = attributes.begin();
 		 it != attributes.end(); ++it) {
-		*(m_imp->m_os) << " " << it->first
-					   << "=\"" << escape(it->second) << "\"";
+		*(m_imp->m_os) << " " << it->first << "=\"" << escape(it->second) << "\"";
 	}
 	*(m_imp->m_os) << ">";
 	m_imp->m_tab++;
@@ -562,7 +554,7 @@ void TOStream::closeChild()
 	string tagName = m_imp->m_tagStack.back();
 	m_imp->m_tagStack.pop_back();
 	assert(tagName != "");
-	//ostream &os = *m_imp->m_os; //os non e' usato
+	// ostream &os = *m_imp->m_os; //os non e' usato
 	m_imp->m_tab--;
 	if (!m_imp->m_justStarted)
 		cr();
@@ -582,11 +574,10 @@ void TOStream::openCloseChild(string tagName, const map<std::string, string> &at
 	*(m_imp->m_os) << "<" << tagName;
 	for (std::map<std::string, string>::const_iterator it = attributes.begin();
 		 it != attributes.end(); ++it) {
-		*(m_imp->m_os) << " " << it->first
-					   << "=\"" << escape(it->second) << "\"";
+		*(m_imp->m_os) << " " << it->first << "=\"" << escape(it->second) << "\"";
 	}
 	*(m_imp->m_os) << "/>";
-	//m_imp->m_tab++;
+	// m_imp->m_tab++;
 	cr();
 	m_imp->m_justStarted = true;
 }
@@ -634,13 +625,13 @@ bool TOStream::checkStatus() const
 }
 
 //===============================================================
-/*! 
+/*!
 	This class contains TIStream's attributes.
 	It is created by memory allocation in the TIStream's constructor.
 */
 class TIStream::Imp
 {
-public:
+  public:
 	istream *m_is;
 	bool m_chanOwner;
 	int m_line;
@@ -856,7 +847,7 @@ void TIStream::Imp::skipCurrentTag()
 	int c;
 	for (;;) {
 		if (is.eof())
-			break; //unexpected eof
+			break; // unexpected eof
 		c = is.peek();
 		if (c != '<') {
 			getNextChar();
@@ -878,7 +869,7 @@ void TIStream::Imp::skipCurrentTag()
 				c = getNextChar();
 			while (c >= 0 && c != '>');
 			if (c < 0)
-				break; //unexpected eof
+				break; // unexpected eof
 			if (--level <= 0) {
 				// m_currentTag.m_type = StreamTag::EndTag;
 				m_tagStack.pop_back();
@@ -893,7 +884,7 @@ void TIStream::Imp::skipCurrentTag()
 				c = getNextChar();
 			} while (c >= 0 && c != '>');
 			if (c < 0)
-				break; //unexpected eof
+				break; // unexpected eof
 			if (oldC != '/')
 				level++;
 		}
@@ -902,8 +893,7 @@ void TIStream::Imp::skipCurrentTag()
 
 //---------------------------------------------------------------
 
-TIStream::TIStream(const TFilePath &fp)
-	: m_imp(new Imp)
+TIStream::TIStream(const TFilePath &fp) : m_imp(new Imp)
 {
 	m_imp->m_filepath = fp;
 	m_imp->m_is = new Tifstream(fp);
@@ -945,7 +935,8 @@ TIStream::TIStream(const TFilePath &fp)
 		} else
 			throw TException("Bad magic number");
 
-		if (in_len <= 0 || in_len > 100000000) // 100M di tnzfile (compresso) sembrano proprio esagerati
+		if (in_len <= 0 ||
+			in_len > 100000000) // 100M di tnzfile (compresso) sembrano proprio esagerati
 			throw TException("Corrupted file");
 
 		LZ4F_decompressionContext_t lz4dctx;
@@ -962,7 +953,7 @@ TIStream::TIStream(const TFilePath &fp)
 
 		size_t check_len = out_len;
 
-		//size_t remaining = LZ4F_decompress(lz4dctx, out, &out_len, in, &in_len, NULL);
+		// size_t remaining = LZ4F_decompress(lz4dctx, out, &out_len, in, &in_len, NULL);
 		bool ok = lz4decompress(lz4dctx, out, &out_len, in, in_len);
 		LZ4F_freeDecompressionContext(lz4dctx);
 
@@ -984,7 +975,7 @@ TIStream::TIStream(const TFilePath &fp)
 
 /*
 TIStream::TIStream(istream &is)
-         : m_imp(new Imp)
+		 : m_imp(new Imp)
 {
   m_imp->m_is = &is;
 }
@@ -1025,28 +1016,28 @@ TIStream &TIStream::operator>>(std::wstring &v)
 	/*
   int len = s.length();
   for(int i=0;i<len;)
-    {
-     if(s[i] != '&')
-       {v.append(1, (wchar_t)s[i]);i++;}
-     else if(s.substr(i, 5) == "&amp;")
-       {v.append(1, L'&');i+=5;}
-     else if(i+1<len && s[i+1]=='#')
-       {
-        int c = 0;
-        i+=2;
-        while(i<len && '0'<=s[i] && s[i]<='9')
-          {
-           c = c*10+s[i]-'0';
-           i++;
-          }
-        if(i<len && s[i]==';') i++;
-        v.append(1, (wchar_t)c);
-       }
-     else
-       {
-        i++;
-       }
-    }
+	{
+	 if(s[i] != '&')
+	   {v.append(1, (wchar_t)s[i]);i++;}
+	 else if(s.substr(i, 5) == "&amp;")
+	   {v.append(1, L'&');i+=5;}
+	 else if(i+1<len && s[i+1]=='#')
+	   {
+		int c = 0;
+		i+=2;
+		while(i<len && '0'<=s[i] && s[i]<='9')
+		  {
+		   c = c*10+s[i]-'0';
+		   i++;
+		  }
+		if(i<len && s[i]==';') i++;
+		v.append(1, (wchar_t)c);
+	   }
+	 else
+	   {
+		i++;
+	   }
+	}
   return *this;
 */
 }
@@ -1083,7 +1074,8 @@ TIStream &TIStream::operator>>(string &v)
 		}
 	} else {
 		v.append(1, c);
-		while (c = is.peek(), isalnum(c) || c == '_' || c == '&' || c == '#' || c == ';' || c == '%') {
+		while (c = is.peek(),
+			   isalnum(c) || c == '_' || c == '&' || c == '#' || c == ';' || c == '%') {
 			is.get(c);
 			v.append(1, c);
 		}
@@ -1124,7 +1116,8 @@ TIStream &TIStream::operator>>(QString &v)
 		}
 	} else {
 		v.append(c);
-		while (c = is.peek(), isalnum(c) || c == '_' || c == '&' || c == '#' || c == ';' || c == '%') {
+		while (c = is.peek(),
+			   isalnum(c) || c == '_' || c == '&' || c == '#' || c == ';' || c == '%') {
 			is.get(c);
 			v.append(c);
 		}
@@ -1196,7 +1189,7 @@ TIStream &TIStream::operator>>(TFilePath &v)
 	if (c == '"') {
 		is.get(c);
 		while (is && c != '"') {
-			//if(c=='\\')
+			// if(c=='\\')
 			//   is.get(c);
 			s.append(1, c);
 			is.get(c);
@@ -1229,8 +1222,7 @@ TIStream &TIStream::operator>>(TPersist &v)
 
 TIStream &TIStream::operator>>(TPersist *&v)
 {
-	if (!m_imp->matchTag() ||
-		m_imp->m_currentTag.m_type == StreamTag::EndTag) {
+	if (!m_imp->matchTag() || m_imp->m_currentTag.m_type == StreamTag::EndTag) {
 		throw TException("expected begin tag");
 	}
 	StreamTag tag = m_imp->m_currentTag;
@@ -1241,7 +1233,7 @@ TIStream &TIStream::operator>>(TPersist *&v)
 	it = tag.m_attributes.find("id");
 	if (it != tag.m_attributes.end())
 		id = atoi(it->second.c_str());
-	//cout << "tagname = " << tagName << " id = " << id << endl;
+	// cout << "tagname = " << tagName << " id = " << id << endl;
 
 	Imp::PersistTable::iterator pit = m_imp->m_table.find(id);
 	if (pit == m_imp->m_table.end()) {
@@ -1254,8 +1246,7 @@ TIStream &TIStream::operator>>(TPersist *&v)
 		m_imp->m_tagStack.push_back(tag.m_name);
 		v->loadData(*this);
 		m_imp->matchTag();
-		if (!m_imp->m_currentTag ||
-			m_imp->m_currentTag.m_type != StreamTag::EndTag)
+		if (!m_imp->m_currentTag || m_imp->m_currentTag.m_type != StreamTag::EndTag)
 			throw TException("expected end tag");
 		if (m_imp->m_currentTag.m_name != m_imp->m_tagStack.back())
 			throw TException("end tag mismatch");

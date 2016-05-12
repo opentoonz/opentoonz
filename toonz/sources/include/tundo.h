@@ -26,10 +26,10 @@
 
 class DVAPI TUndo
 {
-public:
+  public:
 	bool m_isLastInBlock;
 
-public:
+  public:
 	TUndo() {}
 	virtual ~TUndo() {}
 
@@ -42,9 +42,9 @@ public:
 
 	// for history viewer panel
 	virtual QString getHistoryString() { return QObject::tr("Unidentified Action"); }
-	virtual int getHistoryType() { return 0; } //HistoryType::Unidentified
+	virtual int getHistoryType() { return 0; } // HistoryType::Unidentified
 
-private:
+  private:
 	// Noncopyable
 	TUndo(const TUndo &undo);
 	TUndo &operator=(const TUndo &undo);
@@ -58,7 +58,7 @@ class DVAPI TUndoManager : public QObject
 {
 	Q_OBJECT
 
-public:
+  public:
 	TUndoManager();
 	~TUndoManager();
 
@@ -75,8 +75,8 @@ public:
 	void reset();
 
 	/*!If forward = false remove n elements in the stack before m_imp->m_current;
-    else if forward = true remove n elements in the stack after m_imp->m_current.
-    If n = -1 remove all elements before or after m_imp->m_current.*/
+	else if forward = true remove n elements in the stack after m_imp->m_current.
+	If n = -1 remove all elements before or after m_imp->m_current.*/
 
 	void popUndo(int n = -1, bool forward = false);
 
@@ -101,11 +101,11 @@ public:
 
 	void somethingChanged();
 
-private:
+  private:
 	struct TUndoManagerImp;
 	std::unique_ptr<TUndoManagerImp> m_imp;
 
-private:
+  private:
 	// Noncopyable
 	TUndoManager(const TUndoManager &);
 	TUndoManager &operator=(const TUndoManager &);
@@ -119,7 +119,7 @@ struct TUndoScopedBlock {
 	TUndoScopedBlock() { TUndoManager::manager()->beginBlock(); }
 	~TUndoScopedBlock() { TUndoManager::manager()->endBlock(); }
 
-private:
+  private:
 	// Noncopyable
 	TUndoScopedBlock(const TUndoScopedBlock &);
 	TUndoScopedBlock &operator=(const TUndoScopedBlock &);

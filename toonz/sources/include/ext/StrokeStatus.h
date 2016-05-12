@@ -24,59 +24,41 @@
 
 namespace ToonzExt
 {
-class DVAPI
-	StrokeStatus
-	: public CompositeStatus
+class DVAPI StrokeStatus : public CompositeStatus
 {
 	// cached information
-	TStroke
-		*stroke2change_;
+	TStroke *stroke2change_;
 
 	// stroke number in vimage
-	unsigned int
-		n_;
+	unsigned int n_;
 
 	// parameter of selected stroke
-	double
-		w_;
+	double w_;
 
 	// lenght of selected stroke
-	double
-		strokeLength_;
+	double strokeLength_;
 
-public:
+  public:
 	StrokeStatus();
 
-	StrokeStatus(TStroke *stroke2change,
-				 unsigned int n,
-				 double w,
-				 double strokeLength);
+	StrokeStatus(TStroke *stroke2change, unsigned int n, double w, double strokeLength);
 
 	virtual ~StrokeStatus();
 
-	void
-	init();
+	void init();
 
-	TStroke *
-	getItself() const;
-	void
-	setItself(TStroke *);
+	TStroke *getItself() const;
+	void setItself(TStroke *);
 
-	double
-	getW() const;
-	void
-	setW(double w);
+	double getW() const;
+	void setW(double w);
 
-	unsigned int
-	getId() const;
+	unsigned int getId() const;
 
-	void
-	setId(unsigned int);
+	void setId(unsigned int);
 
-	double
-	getLength() const;
-	void
-	setLength(double l);
+	double getLength() const;
+	void setLength(double l);
 };
 
 //---------------------------------------------------------------------------

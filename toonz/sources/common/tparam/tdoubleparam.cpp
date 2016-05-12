@@ -26,12 +26,14 @@ using namespace std;
 
 class TActualDoubleKeyframe : public TDoubleKeyframe
 {
-public:
+  public:
 	mutable TExpression m_expression;
 	mutable TDoubleParamFileData m_fileData;
 
 	TActualDoubleKeyframe(double frame = 0, double value = 0)
-		: TDoubleKeyframe(frame, value), m_unit(0) {}
+		: TDoubleKeyframe(frame, value), m_unit(0)
+	{
+	}
 	explicit TActualDoubleKeyframe(const TDoubleKeyframe &src) : m_unit(0)
 	{
 		TDoubleKeyframe::operator=(src);
@@ -87,7 +89,7 @@ public:
 		return value;
 	}
 
-private:
+  private:
 	mutable const TUnit *m_unit;
 };
 
@@ -95,23 +97,18 @@ typedef vector<TActualDoubleKeyframe> DoubleKeyframeVector;
 
 //===================================================================
 
-inline double getConstantValue(
-	const TActualDoubleKeyframe &k0,
-	const TActualDoubleKeyframe &k1,
-	double f)
+inline double getConstantValue(const TActualDoubleKeyframe &k0, const TActualDoubleKeyframe &k1,
+							   double f)
 {
 	return (f == k1.m_frame) ? k1.m_value : k0.m_value;
 }
 
 //---------------------------------------------------------
 
-inline double getLinearValue(
-	const TActualDoubleKeyframe &k0,
-	const TActualDoubleKeyframe &k1,
-	double f)
+inline double getLinearValue(const TActualDoubleKeyframe &k0, const TActualDoubleKeyframe &k1,
+							 double f)
 {
-	return k0.m_value +
-		   (f - k0.m_frame) * (k1.m_value - k0.m_value) / (k1.m_frame - k0.m_frame);
+	return k0.m_value + (f - k0.m_frame) * (k1.m_value - k0.m_value) / (k1.m_frame - k0.m_frame);
 }
 
 //---------------------------------------------------------
@@ -139,12 +136,8 @@ void truncateSpeeds(double aFrame, double bFrame, TPointD &aSpeedTrunc, TPointD 
 
 //---------------------------------------------------------
 
-inline double getSpeedInOutValue(
-	const TActualDoubleKeyframe &k0,
-	const TActualDoubleKeyframe &k1,
-	const TPointD &speed0,
-	const TPointD &speed1,
-	double frame)
+inline double getSpeedInOutValue(const TActualDoubleKeyframe &k0, const TActualDoubleKeyframe &k1,
+								 const TPointD &speed0, const TPointD &speed1, double frame)
 {
 
 	double aFrame = k0.m_frame;
@@ -162,19 +155,14 @@ inline double getSpeedInOutValue(
 	TPointD bSpeedTrunc = speed1;
 	truncateSpeeds(aFrame, bFrame, aSpeedTrunc, bSpeedTrunc);
 
-	return getCubicBezierY(frame,
-						   TPointD(aFrame, aValue),
-						   aSpeedTrunc,
-						   bSpeedTrunc,
+	return getCubicBezierY(frame, TPointD(aFrame, aValue), aSpeedTrunc, bSpeedTrunc,
 						   TPointD(bFrame, bValue));
 }
 
 //---------------------------------------------------------
 
-DV_EXPORT_API void splitSpeedInOutSegment(
-	TDoubleKeyframe &k,
-	TDoubleKeyframe &k0,
-	TDoubleKeyframe &k1)
+DV_EXPORT_API void splitSpeedInOutSegment(TDoubleKeyframe &k, TDoubleKeyframe &k0,
+										  TDoubleKeyframe &k1)
 {
 	if (k.m_frame <= k0.m_frame) {
 		k = k0;
@@ -215,11 +203,8 @@ DV_EXPORT_API void splitSpeedInOutSegment(
 
 //---------------------------------------------------------
 
-inline double getEaseInOutValue(
-	const TActualDoubleKeyframe &k0,
-	const TActualDoubleKeyframe &k1,
-	double frame,
-	bool percentage)
+inline double getEaseInOutValue(const TActualDoubleKeyframe &k0, const TActualDoubleKeyframe &k1,
+								double frame, bool percentage)
 {
 	double x3 = k1.m_frame - k0.m_frame;
 	if (x3 <= 0.0)
@@ -261,10 +246,8 @@ inline double getEaseInOutValue(
 
 //---------------------------------------------------------
 
-inline double getExponentialValue(
-	const TActualDoubleKeyframe &k0,
-	const TActualDoubleKeyframe &k1,
-	double frame)
+inline double getExponentialValue(const TActualDoubleKeyframe &k0, const TActualDoubleKeyframe &k1,
+								  double frame)
 {
 	double aFrame = k0.m_frame;
 	double bFrame = k1.m_frame;
@@ -289,11 +272,8 @@ inline double getExponentialValue(
 
 //---------------------------------------------------------
 
-inline double getExpressionValue(
-	const TActualDoubleKeyframe &k0,
-	const TActualDoubleKeyframe &k1,
-	double frame,
-	const TMeasure *measure)
+inline double getExpressionValue(const TActualDoubleKeyframe &k0, const TActualDoubleKeyframe &k1,
+								 double frame, const TMeasure *measure)
 {
 	double t = 0, rframe = frame - k0.m_frame;
 	if (k1.m_frame > k0.m_frame)
@@ -310,11 +290,8 @@ inline double getExpressionValue(
 
 //---------------------------------------------------------
 
-inline double getSimilarShapeValue(
-	const TActualDoubleKeyframe &k0,
-	const TActualDoubleKeyframe &k1,
-	double frame,
-	const TMeasure *measure)
+inline double getSimilarShapeValue(const TActualDoubleKeyframe &k0, const TActualDoubleKeyframe &k1,
+								   double frame, const TMeasure *measure)
 {
 	double offset = k0.m_similarShapeOffset;
 	double rv0 = getExpressionValue(k0, k1, k0.m_frame + offset, measure);
@@ -334,7 +311,7 @@ inline double getSimilarShapeValue(
 
 class TDoubleParam::Imp
 {
-public:
+  public:
 	const TSyntax::Grammar *m_grammar;
 	string m_measureName;
 	TMeasure *m_measure;
@@ -345,13 +322,15 @@ public:
 	std::set<TParamObserver *> m_observers;
 
 	Imp(double v = 0.0)
-		: m_grammar(0), m_measureName(), m_measure(0), m_defaultValue(v), m_minValue(-(std::numeric_limits<double>::max)()), m_maxValue((std::numeric_limits<double>::max)()), m_cycleEnabled(false)
+		: m_grammar(0), m_measureName(), m_measure(0), m_defaultValue(v),
+		  m_minValue(-(std::numeric_limits<double>::max)()),
+		  m_maxValue((std::numeric_limits<double>::max)()), m_cycleEnabled(false)
 	{
 	}
 
 	~Imp() {}
 
-	void copy(std::unique_ptr<Imp> const& src)
+	void copy(std::unique_ptr<Imp> const &src)
 	{
 		m_grammar = src->m_grammar;
 		m_measureName = src->m_measureName;
@@ -394,7 +373,8 @@ double TDoubleParam::Imp::getValue(int segmentIndex, double frame)
 		value = getLinearValue(k0, k1, frame);
 		break;
 	case TDoubleKeyframe::SpeedInOut:
-		value = getSpeedInOutValue(k0, k1, getSpeedOut(segmentIndex), getSpeedIn(segmentIndex + 1), frame);
+		value = getSpeedInOutValue(k0, k1, getSpeedOut(segmentIndex), getSpeedIn(segmentIndex + 1),
+								   frame);
 		break;
 	case TDoubleKeyframe::EaseInOut:
 		value = getEaseInOutValue(k0, k1, frame, false);
@@ -477,8 +457,14 @@ TPointD TDoubleParam::Imp::getSpeedOut(int kIndex)
 
 //---------------------------------------------------------
 
-TPointD TDoubleParam::getSpeedIn(int kIndex) const { return m_imp->getSpeedIn(kIndex); }
-TPointD TDoubleParam::getSpeedOut(int kIndex) const { return m_imp->getSpeedOut(kIndex); }
+TPointD TDoubleParam::getSpeedIn(int kIndex) const
+{
+	return m_imp->getSpeedIn(kIndex);
+}
+TPointD TDoubleParam::getSpeedOut(int kIndex) const
+{
+	return m_imp->getSpeedOut(kIndex);
+}
 
 //=========================================================
 
@@ -486,8 +472,7 @@ PERSIST_IDENTIFIER(TDoubleParam, "doubleParam")
 
 //---------------------------------------------------------
 
-TDoubleParam::TDoubleParam(double v)
-	: m_imp(new TDoubleParam::Imp(v))
+TDoubleParam::TDoubleParam(double v) : m_imp(new TDoubleParam::Imp(v))
 {
 }
 
@@ -713,7 +698,7 @@ double TDoubleParam::getValue(double frame, bool leftmost) const
 			value = a->convertFrom(m_imp->m_measure, value);
 	}
 
-	//if (cropped)
+	// if (cropped)
 	//  value = tcrop(value, m_imp->m_minValue, m_imp->m_maxValue);
 	return value;
 }
@@ -774,7 +759,8 @@ bool TDoubleParam::setValue(double frame, double value)
 		created = true;
 	}
 	assert(0 == index || keyframes[index - 1].m_frame < keyframes[index].m_frame);
-	assert(getKeyframeCount() - 1 == index || keyframes[index + 1].m_frame > keyframes[index].m_frame);
+	assert(getKeyframeCount() - 1 == index ||
+		   keyframes[index + 1].m_frame > keyframes[index].m_frame);
 
 	return created;
 }
@@ -800,7 +786,8 @@ void TDoubleParam::setKeyframe(int index, const TDoubleKeyframe &k)
 	m_imp->notify(TParamChange(this, 0, 0, true, false, false));
 
 	assert(0 == index || keyframes[index - 1].m_frame < keyframes[index].m_frame);
-	assert(getKeyframeCount() - 1 == index || keyframes[index + 1].m_frame > keyframes[index].m_frame);
+	assert(getKeyframeCount() - 1 == index ||
+		   keyframes[index + 1].m_frame > keyframes[index].m_frame);
 	if (index == 0)
 		dst.m_prevType = TDoubleKeyframe::None;
 	else
@@ -824,7 +811,8 @@ void TDoubleParam::setKeyframes(const std::map<int, TDoubleKeyframe> &ks)
 		(TDoubleKeyframe &)dst = it->second;
 		dst.updateUnit(m_imp->m_measure);
 
-		if (dst.m_type == TDoubleKeyframe::Expression || dst.m_type == TDoubleKeyframe::SimilarShape)
+		if (dst.m_type == TDoubleKeyframe::Expression ||
+			dst.m_type == TDoubleKeyframe::SimilarShape)
 			dst.m_expression.setText(dst.m_expressionText);
 		if (dst.m_type == TDoubleKeyframe::File)
 			dst.m_fileData.setParams(dst.m_fileParams);
@@ -859,7 +847,7 @@ void TDoubleParam::setKeyframe(const TDoubleKeyframe &k)
 	} else {
 		it = keyframes.insert(it, TActualDoubleKeyframe(k));
 		// int index = std::distance(keyframes.begin(), it);
-		//TDoubleKeyframe oldKeyframe = *it;
+		// TDoubleKeyframe oldKeyframe = *it;
 		it->m_expression.setGrammar(m_imp->m_grammar);
 		it->m_expression.setOwnerParameter(this);
 		it->updateUnit(m_imp->m_measure);
@@ -961,10 +949,8 @@ const TDoubleKeyframe &TDoubleParam::getKeyframeAt(double frame) const
 
 bool TDoubleParam::isKeyframe(double frame) const
 {
-	return std::binary_search(
-		m_imp->m_keyframes.begin(),
-		m_imp->m_keyframes.end(),
-		TDoubleKeyframe(frame));
+	return std::binary_search(m_imp->m_keyframes.begin(), m_imp->m_keyframes.end(),
+							  TDoubleKeyframe(frame));
 }
 
 //---------------------------------------------------------
@@ -973,8 +959,7 @@ void TDoubleParam::deleteKeyframe(double frame)
 {
 	DoubleKeyframeVector &keyframes = m_imp->m_keyframes;
 	DoubleKeyframeVector::iterator it;
-	it = std::lower_bound(keyframes.begin(), keyframes.end(),
-						  TDoubleKeyframe(frame));
+	it = std::lower_bound(keyframes.begin(), keyframes.end(), TDoubleKeyframe(frame));
 	if (it == keyframes.end() || it->m_frame != frame)
 		return;
 
@@ -996,10 +981,8 @@ void TDoubleParam::clearKeyframes()
 
 //---------------------------------------------------------
 
-void TDoubleParam::assignKeyframe(
-	double frame,
-	const TParamP &src, double srcFrame,
-	bool changedOnly)
+void TDoubleParam::assignKeyframe(double frame, const TParamP &src, double srcFrame,
+								  bool changedOnly)
 {
 	TDoubleParamP dp = src;
 	if (!dp)
@@ -1015,8 +998,7 @@ int TDoubleParam::getClosestKeyframe(double frame) const
 {
 	DoubleKeyframeVector &keyframes = m_imp->m_keyframes;
 	typedef DoubleKeyframeVector::iterator Iterator;
-	Iterator it = std::lower_bound(keyframes.begin(), keyframes.end(),
-								   TDoubleKeyframe(frame));
+	Iterator it = std::lower_bound(keyframes.begin(), keyframes.end(), TDoubleKeyframe(frame));
 	if (it == keyframes.end()) {
 		// frame > k.m_frame per qualsiasi k.
 		// ritorna l'indice dell'ultimo keyframe (o -1 se l'array e' vuoto)
@@ -1100,28 +1082,28 @@ void TDoubleParam::loadData(TIStream &is)
 	string tagName;
 	/*
   if(is.matchTag(tagName))
-    {
-     // nuovo formato (29 agosto 2005)
-     if(tagName!="type") throw TException("expected <type>");
-     int type = 0;
-     is >> type;
-     // m_imp->m_type = TDoubleParam::Type(type);
-     if(!is.matchEndTag()) throw TException(tagName + " : missing endtag");
+	{
+	 // nuovo formato (29 agosto 2005)
+	 if(tagName!="type") throw TException("expected <type>");
+	 int type = 0;
+	 is >> type;
+	 // m_imp->m_type = TDoubleParam::Type(type);
+	 if(!is.matchEndTag()) throw TException(tagName + " : missing endtag");
 
 
-     //if(!is.matchTag(tagName) || tagName != "default") throw TException("expected <default>");
-     //is >> m_imp->m_defaultValue;
-     //if(!is.matchEndTag()) throw TException(tagName + " : missing endtag");                 
-     //if(!is.matchTag(tagName) || tagName != "default") throw TException("expected <default>");
-     
+	 //if(!is.matchTag(tagName) || tagName != "default") throw TException("expected <default>");
+	 //is >> m_imp->m_defaultValue;
+	 //if(!is.matchEndTag()) throw TException(tagName + " : missing endtag");
+	 //if(!is.matchTag(tagName) || tagName != "default") throw TException("expected <default>");
 
-    }
+
+	}
   else
-    {
-     // vecchio formato
-     is >> m_imp->m_defaultValue;
-    }
-    */
+	{
+	 // vecchio formato
+	 is >> m_imp->m_defaultValue;
+	}
+	*/
 
 	m_imp->m_keyframes.clear();
 	int oldType = -1;
@@ -1135,14 +1117,15 @@ void TDoubleParam::loadData(TIStream &is)
 			string dummy;
 			is >> dummy;
 			m_imp->m_cycleEnabled = true;
-			//setExtrapolationAfter(Loop);
+			// setExtrapolationAfter(Loop);
 		} else if (tagName == "k") {
 			// vecchio formato
 			if (oldType != 0)
 				continue;
 			int linkStatus = 0;
 			TActualDoubleKeyframe k;
-			is >> k.m_frame >> k.m_value >> k.m_speedIn.x >> k.m_speedIn.y >> k.m_speedOut.x >> k.m_speedOut.y >> linkStatus;
+			is >> k.m_frame >> k.m_value >> k.m_speedIn.x >> k.m_speedIn.y >> k.m_speedOut.x >>
+				k.m_speedOut.y >> linkStatus;
 
 			k.m_isKeyframe = true;
 			k.m_linkedHandles = (linkStatus & 1) != 0;
@@ -1155,7 +1138,8 @@ void TDoubleParam::loadData(TIStream &is)
 				k.m_type = TDoubleKeyframe::Linear;
 			k.m_expression.setGrammar(m_imp->m_grammar);
 			k.m_expression.setOwnerParameter(this);
-			k.m_prevType = m_imp->m_keyframes.empty() ? TDoubleKeyframe::None : m_imp->m_keyframes.back().m_type;
+			k.m_prevType = m_imp->m_keyframes.empty() ? TDoubleKeyframe::None
+													  : m_imp->m_keyframes.back().m_type;
 			m_imp->m_keyframes.push_back(k);
 		} else if (tagName == "expr") {
 			// vecchio formato
@@ -1176,10 +1160,12 @@ void TDoubleParam::loadData(TIStream &is)
 			TActualDoubleKeyframe k2(kk2);
 			k1.m_expression.setGrammar(m_imp->m_grammar);
 			k1.m_expression.setOwnerParameter(this);
-			k1.m_prevType = m_imp->m_keyframes.empty() ? TDoubleKeyframe::None : m_imp->m_keyframes.back().m_type;
+			k1.m_prevType = m_imp->m_keyframes.empty() ? TDoubleKeyframe::None
+													   : m_imp->m_keyframes.back().m_type;
 			k2.m_expression.setGrammar(m_imp->m_grammar);
 			k2.m_expression.setOwnerParameter(this);
-			k2.m_prevType = m_imp->m_keyframes.empty() ? TDoubleKeyframe::None : m_imp->m_keyframes.back().m_type;
+			k2.m_prevType = m_imp->m_keyframes.empty() ? TDoubleKeyframe::None
+													   : m_imp->m_keyframes.back().m_type;
 			m_imp->m_keyframes.push_back(k1);
 			m_imp->m_keyframes.push_back(k2);
 			continue;
@@ -1201,17 +1187,19 @@ void TDoubleParam::loadData(TIStream &is)
 			k2.m_type = TDoubleKeyframe::File;
 			k1.m_expression.setGrammar(m_imp->m_grammar);
 			k1.m_expression.setOwnerParameter(this);
-			k1.m_prevType = m_imp->m_keyframes.empty() ? TDoubleKeyframe::None : m_imp->m_keyframes.back().m_type;
+			k1.m_prevType = m_imp->m_keyframes.empty() ? TDoubleKeyframe::None
+													   : m_imp->m_keyframes.back().m_type;
 			k2.m_expression.setGrammar(m_imp->m_grammar);
 			k2.m_expression.setOwnerParameter(this);
-			k2.m_prevType = m_imp->m_keyframes.empty() ? TDoubleKeyframe::None : m_imp->m_keyframes.back().m_type;
+			k2.m_prevType = m_imp->m_keyframes.empty() ? TDoubleKeyframe::None
+													   : m_imp->m_keyframes.back().m_type;
 			m_imp->m_keyframes.push_back(k1);
 			m_imp->m_keyframes.push_back(k2);
 			continue;
 		} else if (tagName == "step") {
 			int step = 0;
 			is >> step;
-			//if(step>1)
+			// if(step>1)
 			//  m_imp->m_frameStep = step;
 		} else if (tagName == "keyframes") {
 			while (!is.eos()) {
@@ -1220,7 +1208,8 @@ void TDoubleParam::loadData(TIStream &is)
 				TActualDoubleKeyframe k(kk);
 				k.m_expression.setGrammar(m_imp->m_grammar);
 				k.m_expression.setOwnerParameter(this);
-				k.m_prevType = m_imp->m_keyframes.empty() ? TDoubleKeyframe::None : m_imp->m_keyframes.back().m_type;
+				k.m_prevType = m_imp->m_keyframes.empty() ? TDoubleKeyframe::None
+														  : m_imp->m_keyframes.back().m_type;
 				m_imp->m_keyframes.push_back(k);
 			}
 		} else {
@@ -1254,7 +1243,7 @@ void TDoubleParam::saveData(TOStream &os)
 	os.child("default") << m_imp->m_defaultValue;
 	if (isCycleEnabled())
 		os.child("cycle") << std::string("enabled");
-	//if(getExtrapolationAfter() == Loop)
+	// if(getExtrapolationAfter() == Loop)
 	//  os.child("cycle") << string("loop");
 	if (!m_imp->m_keyframes.empty()) {
 		os.openChild("keyframes");
@@ -1300,7 +1289,8 @@ const TSyntax::Grammar *TDoubleParam::getGrammar() const
 void TDoubleParam::accept(TSyntax::CalculatorNodeVisitor &visitor)
 {
 	for (int i = 0; i < (int)m_imp->m_keyframes.size(); i++)
-		if (m_imp->m_keyframes[i].m_type == TDoubleKeyframe::Expression || m_imp->m_keyframes[i].m_type == TDoubleKeyframe::SimilarShape)
+		if (m_imp->m_keyframes[i].m_type == TDoubleKeyframe::Expression ||
+			m_imp->m_keyframes[i].m_type == TDoubleKeyframe::SimilarShape)
 			m_imp->m_keyframes[i].m_expression.accept(visitor);
 }
 

@@ -52,7 +52,7 @@ struct timespec {int tv_sec; TLong tv_nsec;};
 #endif
 
 #ifdef __cplusplus
-extern "C" 
+extern "C"
 #endif
 int nanosleep(struct timespec *, int);
 */
@@ -90,55 +90,63 @@ typedef unsigned int UINT;
 typedef unsigned char BYTE;
 #endif
 
-template <class T>
-inline T tmin(T a, T b)
+template <class T> inline T tmin(T a, T b)
 {
 	return a < b ? a : b;
 }
-template <class T>
-inline T tmax(T a, T b) { return a > b ? a : b; }
-template <class T>
-inline T tmin(T a, T b, T c) { return tmin(tmin(a, b), c); }
-template <class T>
-inline T tmax(T a, T b, T c) { return tmax(tmax(a, b), c); }
-template <class T>
-inline T tmin(T a, T b, T c, T d) { return tmin(tmin(a, b), tmin(c, d)); }
-template <class T>
-inline T tmax(T a, T b, T c, T d) { return tmax(tmax(a, b), tmax(c, d)); }
+template <class T> inline T tmax(T a, T b)
+{
+	return a > b ? a : b;
+}
+template <class T> inline T tmin(T a, T b, T c)
+{
+	return tmin(tmin(a, b), c);
+}
+template <class T> inline T tmax(T a, T b, T c)
+{
+	return tmax(tmax(a, b), c);
+}
+template <class T> inline T tmin(T a, T b, T c, T d)
+{
+	return tmin(tmin(a, b), tmin(c, d));
+}
+template <class T> inline T tmax(T a, T b, T c, T d)
+{
+	return tmax(tmax(a, b), tmax(c, d));
+}
 
-template <class T>
-inline void tswap(T &a, T &b)
+template <class T> inline void tswap(T &a, T &b)
 {
 	T tmp = a;
 	a = b;
 	b = tmp;
 }
-template <class T>
-inline T tcrop(T x, T a, T b) { return tmin(tmax(x, a), b); }
-template <class T>
-inline void notLessThan(T threshold, T &x)
+template <class T> inline T tcrop(T x, T a, T b)
+{
+	return tmin(tmax(x, a), b);
+}
+template <class T> inline void notLessThan(T threshold, T &x)
 {
 	if (x < threshold)
 		x = threshold;
 }
-template <class T>
-inline void notMoreThan(T threshold, T &x)
+template <class T> inline void notMoreThan(T threshold, T &x)
 {
 	if (x > threshold)
 		x = threshold;
 }
 
-/*! round(x) returns the nearest integer to x. 
-    Works well for x<0, but is slower than roundp()
-    /sa roundp() */
+/*! round(x) returns the nearest integer to x.
+	Works well for x<0, but is slower than roundp()
+	/sa roundp() */
 inline int tround(double x)
 {
 	return ((int)(((int)(-0.9) == 0 && x < 0.0) ? (x - 0.5) : (x + 0.5)));
-	//return ((int)(((int)(-0.9F) == 0 && x<0.0F) ? (x - 0.5F) : (x + 0.5F)));
+	// return ((int)(((int)(-0.9F) == 0 && x<0.0F) ? (x - 0.5F) : (x + 0.5F)));
 }
 
-/*! roundp(x) is like round(x), but the result if x<0 is 
-    platform dependent 
+/*! roundp(x) is like round(x), but the result if x<0 is
+	platform dependent
 	/sa round() */
 inline int troundp(double x)
 {
@@ -147,7 +155,7 @@ inline int troundp(double x)
 
 /* li metto dopo
    equivalenti a (int)floor() e (int)ceil() (ma piu' veloci)
-   solo se la risoluzione dell'argomento e' inferiore ad 1 
+   solo se la risoluzione dell'argomento e' inferiore ad 1
 #define FLOOR(x) ((int)(x) > (x) ? (int)(x)-1 : (int)(x))
 #define CEIL(x)  ((int)(x) < (x) ? (int)(x)+1 : (int)(x))
 */
@@ -159,15 +167,12 @@ inline UCHAR byteFromUshort(USHORT u)
 }
 
 /*! ditheredByteFromUshort(u) is like byteFromUshort().
-    It is used in dithering ... 
+	It is used in dithering ...
  */
 
 inline UCHAR ditheredByteFromUshort(USHORT u, int r)
 {
-	return ((((u * (256U * 255U + 1U)) -
-			  ((u * (256U * 255U + 1U)) >> 24)) +
-			 r) >>
-			24);
+	return ((((u * (256U * 255U + 1U)) - ((u * (256U * 255U + 1U)) >> 24)) + r) >> 24);
 }
 
 /*! ushortFromByte(u) converts integer from [0..255] to  [0..65535]*/
@@ -216,7 +221,10 @@ inline TINT32 swapTINT32(TINT32 val)
 	aux = (aux | aux1);
 	return aux;
 }
-inline USHORT swapUshort(USHORT val) { return val >> 8 | val << 8; }
+inline USHORT swapUshort(USHORT val)
+{
+	return val >> 8 | val << 8;
+}
 
 inline std::ostream &operator<<(std::ostream &out, const std::string &s)
 {

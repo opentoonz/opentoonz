@@ -19,10 +19,9 @@
 #include "toonz/txshleveltypes.h"
 
 //=============================================================================
-//TXshCellColumn
+// TXshCellColumn
 
-TXshCellColumn::TXshCellColumn()
-	: m_first(0)
+TXshCellColumn::TXshCellColumn() : m_first(0)
 {
 }
 
@@ -90,8 +89,7 @@ int TXshCellColumn::getFirstRow() const
 const TXshCell &TXshCellColumn::getCell(int row) const
 {
 	static TXshCell emptyCell;
-	if (row < 0 || row < m_first ||
-		row >= m_first + (int)m_cells.size())
+	if (row < 0 || row < m_first || row >= m_first + (int)m_cells.size())
 		return emptyCell;
 	return m_cells[row - m_first];
 }
@@ -137,8 +135,7 @@ void TXshCellColumn::getCells(int row, int rowCount, TXshCell cells[])
 	int first = m_first;
 	int i;
 	int cellCount = m_cells.size();
-	if (row < 0 || row + rowCount - 1 < first ||
-		row >= first + cellCount) {
+	if (row < 0 || row + rowCount - 1 < first || row >= first + cellCount) {
 		for (i = 0; i < rowCount; i++)
 			cells[i] = emptyCell;
 		return;
@@ -150,7 +147,7 @@ void TXshCellColumn::getCells(int row, int rowCount, TXshCell cells[])
 	if (delta < 0) { // le celle cominciano PRIMA della zona da leggere
 		dst = 0;
 		src = -delta;
-	} else { //le celle cominciano DOPO della zona da leggere
+	} else { // le celle cominciano DOPO della zona da leggere
 		dst = delta;
 		src = 0;
 		n -= delta;
@@ -180,12 +177,12 @@ bool TXshCellColumn::setCell(int row, const TXshCell &cell)
 #ifndef NDEBUG
 	checkColumn();
 #endif
-	if (m_cells.empty()) //se la colonna e' vuota
+	if (m_cells.empty()) // se la colonna e' vuota
 	{
 		if (!cell.isEmpty()) {
 			m_cells.push_back(cell);
 			m_first = row;
-			//updateIcon();
+			// updateIcon();
 		}
 		return true;
 	}
@@ -194,26 +191,26 @@ bool TXshCellColumn::setCell(int row, const TXshCell &cell)
 	assert(oldCellCount > 0);
 	int lastRow = m_first + oldCellCount - 1;
 
-	if (row < m_first) //prima
+	if (row < m_first) // prima
 	{
 		if (cell.isEmpty())
-			return false; //non faccio nulla
+			return false; // non faccio nulla
 		int delta = m_first - row;
 		assert(delta > 0);
-		m_cells.insert(m_cells.begin(), delta - 1, TXshCell()); //celle vuote
-		m_cells.insert(m_cells.begin(), cell);					//devo settare la prima comp. del vettore
-		m_first = row;											//row 'e la nuova firstrow
-//updateIcon();
+		m_cells.insert(m_cells.begin(), delta - 1, TXshCell()); // celle vuote
+		m_cells.insert(m_cells.begin(), cell); // devo settare la prima comp. del vettore
+		m_first = row; // row 'e la nuova firstrow
+// updateIcon();
 #ifndef NDEBUG
 		checkColumn();
 #endif
 		return true;
-	} else if (row > lastRow) //dopo
+	} else if (row > lastRow) // dopo
 	{
 		if (cell.isEmpty())
-			return false; //non faccio nulla
+			return false; // non faccio nulla
 		int count = row - lastRow - 1;
-		//se necessario, inserisco celle vuote
+		// se necessario, inserisco celle vuote
 		for (int i = 0; i < count; ++i)
 			m_cells.push_back(TXshCell());
 		m_cells.push_back(cell);
@@ -226,7 +223,7 @@ bool TXshCellColumn::setCell(int row, const TXshCell &cell)
 	int index = row - m_first;
 	assert(0 <= index && index < (int)m_cells.size());
 	m_cells[index] = cell;
-	//if(index == 0) updateIcon();
+	// if(index == 0) updateIcon();
 	if (cell.isEmpty()) {
 		if (row == lastRow) {
 			// verifico la presenza di celle bianche alla fine
@@ -265,16 +262,16 @@ bool TXshCellColumn::setCells(int row, int rowCount, const TXshCell cells[])
 	// le celle non vuote sono [c_ra, c_rb]
 	int c_rb = m_first + oldCellCount - 1;
 
-	if (row > c_rb) //sono oltre l'ultima riga
+	if (row > c_rb) // sono oltre l'ultima riga
 	{
 		if (oldCellCount == 0)
-			m_first = row; //row 'e la nuova firstrow
+			m_first = row; // row 'e la nuova firstrow
 		int newCellCount = row - m_first + rowCount;
 		m_cells.resize(newCellCount);
 	} else if (row < m_first) {
 		int delta = m_first - row;
 		m_cells.insert(m_cells.begin(), delta, TXshCell());
-		m_first = row; //row e' la nuova firstrow
+		m_first = row; // row e' la nuova firstrow
 	}
 	if (rb > c_rb) {
 		for (int i = 0; i < rb - c_rb; ++i)
@@ -299,7 +296,7 @@ bool TXshCellColumn::setCells(int row, int rowCount, const TXshCell cells[])
 	if (m_cells.empty()) {
 		m_first = 0;
 	}
-	//updateIcon();
+	// updateIcon();
 	return true;
 }
 
@@ -308,14 +305,14 @@ bool TXshCellColumn::setCells(int row, int rowCount, const TXshCell cells[])
 void TXshCellColumn::insertEmptyCells(int row, int rowCount)
 {
 	if (m_cells.empty())
-		return; //se la colonna e' vuota non devo inserire celle
+		return; // se la colonna e' vuota non devo inserire celle
 
 	if (row >= m_first + (int)m_cells.size())
-		return;			//dopo:non inserisco nulla
-	if (row <= m_first) //prima
+		return; // dopo:non inserisco nulla
+	if (row <= m_first) // prima
 	{
 		m_first += rowCount;
-	} else //in mezzo
+	} else // in mezzo
 	{
 		int delta = row - m_first;
 		std::vector<TXshCell>::iterator it = m_cells.begin();
@@ -331,7 +328,7 @@ void TXshCellColumn::clearCells(int row, int rowCount)
 	if (rowCount <= 0)
 		return;
 	if (m_cells.empty())
-		return; //se la colonna e' vuota
+		return; // se la colonna e' vuota
 
 	// le celle da cancellare sono [ra, rb]
 	int ra = row;
@@ -366,7 +363,7 @@ void TXshCellColumn::clearCells(int row, int rowCount)
 	} else {
 		assert(ra - c_ra < (int)m_cells.size());
 		assert(ra - c_ra + n <= (int)m_cells.size());
-		//std::fill_n(&m_cells[ra-c_ra],n, TXshCell());
+		// std::fill_n(&m_cells[ra-c_ra],n, TXshCell());
 		int i;
 		for (i = 0; i < n; i++)
 			m_cells[ra - c_ra + i] = TXshCell();
@@ -386,7 +383,7 @@ void TXshCellColumn::clearCells(int row, int rowCount)
 			}
 		}
 	}
-	//updateIcon();
+	// updateIcon();
 }
 
 //-----------------------------------------------------------------------------
@@ -397,12 +394,12 @@ void TXshCellColumn::removeCells(int row, int rowCount)
 	if (rowCount <= 0)
 		return;
 	if (m_cells.empty())
-		return; //se la colonna e' vuota
+		return; // se la colonna e' vuota
 
 	int cellCount = m_cells.size();
 
 	if (row >= m_first + cellCount)
-		return; //sono "sotto" l'ultima cella
+		return; // sono "sotto" l'ultima cella
 	if (row < m_first) {
 		if (row + rowCount <= m_first) //"sono sopra la prima cella"
 		{							   // aggiorno solo m_first
@@ -421,7 +418,7 @@ void TXshCellColumn::removeCells(int row, int rowCount)
 		return;
 
 	if (row == m_first) {
-		//cancello all'inizio
+		// cancello all'inizio
 		assert(rowCount <= cellCount);
 		std::vector<TXshCell>::iterator it = m_cells.begin();
 		std::vector<TXshCell>::iterator it2 = m_cells.begin();
@@ -451,7 +448,7 @@ void TXshCellColumn::removeCells(int row, int rowCount)
 	if (m_cells.empty()) {
 		m_first = 0;
 	}
-	//updateIcon();
+	// updateIcon();
 }
 
 //-----------------------------------------------------------------------------
@@ -470,7 +467,7 @@ bool TXshCellColumn::getLevelRange(int row, int &r0, int &r1) const
 }
 
 //=============================================================================
-//TXshColumn
+// TXshColumn
 
 void TXshColumn::setStatusWord(int status)
 {
@@ -482,11 +479,16 @@ void TXshColumn::setStatusWord(int status)
 TXshColumn *TXshColumn::createEmpty(int type)
 {
 	switch (type) {
-	case eSoundType    : return new TXshSoundColumn;
-	case eZeraryFxType : return new TXshZeraryFxColumn(0);
-	case ePaletteType  : return new TXshPaletteColumn;
-	case eSoundTextType: return new TXshSoundTextColumn;
-	case eMeshType     : return new TXshMeshColumn;
+	case eSoundType:
+		return new TXshSoundColumn;
+	case eZeraryFxType:
+		return new TXshZeraryFxColumn(0);
+	case ePaletteType:
+		return new TXshPaletteColumn;
+	case eSoundTextType:
+		return new TXshSoundTextColumn;
+	case eMeshType:
+		return new TXshMeshColumn;
 	}
 
 	assert(type == eLevelType);
@@ -551,9 +553,9 @@ bool TXshColumn::isControl() const
   if(getXsheet()->getFxDag()->getTerminalFxs()->containsFx(getFx())) return false;
   for(int i=0;i<fx->getOutputConnectionCount();i++)
   {
-    TFxPort *port = fx->getOutputConnection(i);
-    if(port->getOwnerFx()->getInputPort(0) != port)
-      return true;
+	TFxPort *port = fx->getOutputConnection(i);
+	if(port->getOwnerFx()->getInputPort(0) != port)
+	  return true;
   }
   return false;
   */
@@ -602,7 +604,7 @@ bool TXshColumn::isCamstandTransparent() const
 void TXshColumn::setCamstandTransparent(bool on)
 {
   const int mask = eCamstandTransparent;
-  if(!on) m_status&=~mask; else m_status|=mask; 
+  if(!on) m_status&=~mask; else m_status|=mask;
 }
 */
 

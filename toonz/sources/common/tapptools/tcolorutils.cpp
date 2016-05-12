@@ -26,7 +26,7 @@ extern "C" int isnan(double);
 
 class ClusterStatistic
 {
-public:
+  public:
 	KEYER_FLOAT sumComponents[3]; // vettore 3x1
 	unsigned int elemsCount;
 	KEYER_FLOAT matrixR[9]; // matrice 3x3 = somma(x * trasposta(x))
@@ -46,14 +46,11 @@ public:
 
 class ClusterElem
 {
-public:
-	ClusterElem(unsigned char _r,
-				unsigned char _g,
-				unsigned char _b,
-				KEYER_FLOAT _a,
-				unsigned int _x = 0,
-				unsigned int _y = 0)
-		: r(toDouble(_r)), g(toDouble(_g)), b(toDouble(_b)), a(_a), x(_x), y(_y), pix32(TPixel32(_r, _g, _b))
+  public:
+	ClusterElem(unsigned char _r, unsigned char _g, unsigned char _b, KEYER_FLOAT _a,
+				unsigned int _x = 0, unsigned int _y = 0)
+		: r(toDouble(_r)), g(toDouble(_g)), b(toDouble(_b)), a(_a), x(_x), y(_y),
+		  pix32(TPixel32(_r, _g, _b))
 	{
 	}
 
@@ -89,7 +86,7 @@ typedef std::vector<ClusterElem *> ClusterElemContainer;
 
 class Cluster
 {
-public:
+  public:
 	Cluster();
 	Cluster(const Cluster &rhs);
 
@@ -106,7 +103,7 @@ public:
 	KEYER_FLOAT eigenVector[3];
 	KEYER_FLOAT eigenValue;
 
-private:
+  private:
 	void operator=(const Cluster &);
 };
 
@@ -116,14 +113,10 @@ typedef std::vector<Cluster *> ClusterContainer;
 
 //----------------------------------------------------------------------------
 
-void chooseLeafToClusterize(ClusterContainer::iterator &itRet,
-							KEYER_FLOAT &eigenValue,
-							KEYER_FLOAT eigenVector[3],
-							ClusterContainer &clusters);
+void chooseLeafToClusterize(ClusterContainer::iterator &itRet, KEYER_FLOAT &eigenValue,
+							KEYER_FLOAT eigenVector[3], ClusterContainer &clusters);
 
-void split(Cluster *subcluster1,
-		   Cluster *subcluster2,
-		   KEYER_FLOAT eigenVector[3],
+void split(Cluster *subcluster1, Cluster *subcluster2, KEYER_FLOAT eigenVector[3],
 		   Cluster *cluster);
 
 void SolveCubic(KEYER_FLOAT a,   /* coefficient of x^3 */
@@ -138,10 +131,7 @@ unsigned short int calcCovarianceEigenValues(const KEYER_FLOAT covariance[9],
 
 //----------------------------------------------------------------------------
 
-void split(Cluster *subcluster1,
-		   Cluster *subcluster2,
-		   KEYER_FLOAT eigenVector[3],
-		   Cluster *cluster)
+void split(Cluster *subcluster1, Cluster *subcluster2, KEYER_FLOAT eigenVector[3], Cluster *cluster)
 {
 	KEYER_FLOAT n = (KEYER_FLOAT)cluster->statistic.elemsCount;
 
@@ -158,7 +148,7 @@ void split(Cluster *subcluster1,
 		KEYER_FLOAT g = (KEYER_FLOAT)elem->g;
 		KEYER_FLOAT b = (KEYER_FLOAT)elem->b;
 
-		//cluster->data.erase(it);
+		// cluster->data.erase(it);
 
 		if (eigenVector[0] * r + eigenVector[1] * g + eigenVector[2] * b <=
 			eigenVector[0] * mean[0] + eigenVector[1] * mean[1] + eigenVector[2] * mean[2])
@@ -170,10 +160,8 @@ void split(Cluster *subcluster1,
 
 //----------------------------------------------------------------------------
 
-void chooseLeafToClusterize(ClusterContainer::iterator &itRet,
-							KEYER_FLOAT &eigenValue,
-							KEYER_FLOAT eigenVector[3],
-							ClusterContainer &clusters)
+void chooseLeafToClusterize(ClusterContainer::iterator &itRet, KEYER_FLOAT &eigenValue,
+							KEYER_FLOAT eigenVector[3], ClusterContainer &clusters)
 {
 	itRet = clusters.end();
 
@@ -336,15 +324,15 @@ void chooseLeafToClusterize(ClusterContainer::iterator &itRet,
 
 		// normalizzazione dell'autovettore calcolato
 		/*
-      KEYER_FLOAT eigenVectorMagnitude = sqrt(eigenVector[0]*eigenVector[0] +
-                                         eigenVector[1]*eigenVector[1] +
-                                         eigenVector[2]*eigenVector[2]);
-      assert(eigenVectorMagnitude > 0);
+	  KEYER_FLOAT eigenVectorMagnitude = sqrt(eigenVector[0]*eigenVector[0] +
+										 eigenVector[1]*eigenVector[1] +
+										 eigenVector[2]*eigenVector[2]);
+	  assert(eigenVectorMagnitude > 0);
 
-      eigenVector[0] /= eigenVectorMagnitude;
-      eigenVector[1] /= eigenVectorMagnitude;
-      eigenVector[2] /= eigenVectorMagnitude;
-      */
+	  eigenVector[0] /= eigenVectorMagnitude;
+	  eigenVector[1] /= eigenVectorMagnitude;
+	  eigenVector[2] /= eigenVectorMagnitude;
+	  */
 
 		clusterFound->eigenVector[0] = eigenVector[0];
 		clusterFound->eigenVector[1] = eigenVector[1];
@@ -370,10 +358,11 @@ unsigned short int calcCovarianceEigenValues(const KEYER_FLOAT clusterCovariance
 	KEYER_FLOAT a23 = clusterCovariance[5];
 	KEYER_FLOAT a33 = clusterCovariance[8];
 
-	KEYER_FLOAT c0 =
-		(KEYER_FLOAT)(a11 * a22 * a33 + 2.0 * a12 * a13 * a23 - a11 * a23 * a23 - a22 * a13 * a13 - a33 * a12 * a12);
+	KEYER_FLOAT c0 = (KEYER_FLOAT)(a11 * a22 * a33 + 2.0 * a12 * a13 * a23 - a11 * a23 * a23 -
+								   a22 * a13 * a13 - a33 * a12 * a12);
 
-	KEYER_FLOAT c1 = (KEYER_FLOAT)(a11 * a22 - a12 * a12 + a11 * a33 - a13 * a13 + a22 * a33 - a23 * a23);
+	KEYER_FLOAT c1 =
+		(KEYER_FLOAT)(a11 * a22 - a12 * a12 + a11 * a33 - a13 * a13 + a22 * a33 - a23 * a23);
 
 	KEYER_FLOAT c2 = (KEYER_FLOAT)(a11 + a22 + a33);
 
@@ -401,7 +390,7 @@ void SolveCubic(KEYER_FLOAT a,  /* coefficient of x^3 */
 {
 	static const KEYER_FLOAT epsilon = (KEYER_FLOAT)0.0001;
 	if (a != 0 && fabs(b - 0.0) <= epsilon && fabs(c - 0.0) <= epsilon && fabs(d - 0.0) <= epsilon)
-	//if(a != 0 && b == 0 && c == 0 && d == 0)
+	// if(a != 0 && b == 0 && c == 0 && d == 0)
 	{
 		*solutions = 1;
 		x[0] = x[1] = x[2] = 0.0;
@@ -428,14 +417,14 @@ void SolveCubic(KEYER_FLOAT a,  /* coefficient of x^3 */
 		assert(!ISNAN(x[2]));
 
 		/*
-            long KEYER_FLOAT v;
-            v = x[0];
-            assert(areAlmostEqual(a*v*v*v+b*v*v+c*v+d, 0.0));
-            v = x[1];
-            assert(areAlmostEqual(a*v*v*v+b*v*v+c*v+d, 0.0));
-            v = x[2];
-            assert(areAlmostEqual(a*v*v*v+b*v*v+c*v+d, 0.0));
-            */
+			long KEYER_FLOAT v;
+			v = x[0];
+			assert(areAlmostEqual(a*v*v*v+b*v*v+c*v+d, 0.0));
+			v = x[1];
+			assert(areAlmostEqual(a*v*v*v+b*v*v+c*v+d, 0.0));
+			v = x[2];
+			assert(areAlmostEqual(a*v*v*v+b*v*v+c*v+d, 0.0));
+			*/
 	} else {
 		*solutions = 1;
 		x[0] = (KEYER_FLOAT)pow((float)(sqrt(R2_Q3) + fabs(R)), (float)(1 / 3.0));
@@ -446,10 +435,10 @@ void SolveCubic(KEYER_FLOAT a,  /* coefficient of x^3 */
 		assert(!ISNAN(x[0]));
 
 		/*
-            long KEYER_FLOAT v;
-            v = x[0];
-            assert(areAlmostEqual(a*v*v*v+b*v*v+c*v+d, 0.0));
-            */
+			long KEYER_FLOAT v;
+			v = x[0];
+			assert(areAlmostEqual(a*v*v*v+b*v*v+c*v+d, 0.0));
+			*/
 	}
 }
 
@@ -478,10 +467,7 @@ void clusterize(ClusterContainer &clusters, int clustersCount)
 		KEYER_FLOAT eigenVector[3] = {0.0, 0.0, 0.0};
 		ClusterContainer::iterator itChoosedCluster;
 
-		chooseLeafToClusterize(itChoosedCluster,
-							   eigenValue,
-							   eigenVector,
-							   clusters);
+		chooseLeafToClusterize(itChoosedCluster, eigenValue, eigenVector, clusters);
 
 		assert(itChoosedCluster != clusters.end());
 		Cluster *choosedCluster = *itChoosedCluster;
@@ -512,8 +498,7 @@ void clusterize(ClusterContainer &clusters, int clustersCount)
 		split(subcluster1, subcluster2, eigenVector, choosedCluster);
 		assert(subcluster1);
 		assert(subcluster2);
-		if ((subcluster1->data.size() == 0) ||
-			(subcluster2->data.size() == 0))
+		if ((subcluster1->data.size() == 0) || (subcluster2->data.size() == 0))
 			break;
 
 		// calcola la nuova statistica per subcluster1
@@ -522,35 +507,29 @@ void clusterize(ClusterContainer &clusters, int clustersCount)
 		// calcola la nuova statistica per subcluster2
 		int j = 0;
 		for (; j < 3; ++j) {
-			subcluster2->statistic.sumComponents[j] =
-				choosedCluster->statistic.sumComponents[j] -
-				subcluster1->statistic.sumComponents[j];
+			subcluster2->statistic.sumComponents[j] = choosedCluster->statistic.sumComponents[j] -
+													  subcluster1->statistic.sumComponents[j];
 		}
 
 		subcluster2->statistic.sumCoords.x =
-			choosedCluster->statistic.sumCoords.x -
-			subcluster1->statistic.sumCoords.x;
+			choosedCluster->statistic.sumCoords.x - subcluster1->statistic.sumCoords.x;
 
 		subcluster2->statistic.sumCoords.y =
-			choosedCluster->statistic.sumCoords.y -
-			subcluster1->statistic.sumCoords.y;
+			choosedCluster->statistic.sumCoords.y - subcluster1->statistic.sumCoords.y;
 
 		subcluster2->statistic.elemsCount =
-			choosedCluster->statistic.elemsCount -
-			subcluster1->statistic.elemsCount;
+			choosedCluster->statistic.elemsCount - subcluster1->statistic.elemsCount;
 
 #ifdef WITH_ALPHA_IN_STATISTICS
 
 		subcluster2->statistic.sumAlpha =
-			choosedCluster->statistic.sumAlpha -
-			subcluster1->statistic.sumAlpha;
+			choosedCluster->statistic.sumAlpha - subcluster1->statistic.sumAlpha;
 
 #endif
 
 		for (j = 0; j < 9; ++j)
 			subcluster2->statistic.matrixR[j] =
-				choosedCluster->statistic.matrixR[j] -
-				subcluster1->statistic.matrixR[j];
+				choosedCluster->statistic.matrixR[j] - subcluster1->statistic.matrixR[j];
 
 		subcluster2->computeCovariance();
 
@@ -562,7 +541,7 @@ void clusterize(ClusterContainer &clusters, int clustersCount)
 		Cluster *cluster = *itChoosedCluster;
 		assert(cluster);
 		cluster->data.clear();
-		//clearPointerContainer(cluster->data);
+		// clearPointerContainer(cluster->data);
 		assert(cluster->data.size() == 0);
 		delete cluster;
 		clusters.erase(itChoosedCluster);
@@ -580,8 +559,7 @@ Cluster::Cluster()
 
 //------------------------------------------------------------------------------
 
-Cluster::Cluster(const Cluster &rhs)
-	: statistic(rhs.statistic)
+Cluster::Cluster(const Cluster &rhs) : statistic(rhs.statistic)
 {
 	ClusterElemContainer::const_iterator it = rhs.data.begin();
 	for (; it != rhs.data.end(); ++it)
@@ -621,10 +599,9 @@ void Cluster::computeCovariance()
 	assert(n > 0);
 	int i = 0;
 	for (; i < 9; ++i) {
-		statistic.covariance[i] =
-			statistic.matrixR[i] - sumComponentsMatrix[i] / n;
+		statistic.covariance[i] = statistic.matrixR[i] - sumComponentsMatrix[i] / n;
 		assert(!ISNAN(statistic.matrixR[i]));
-		//assert(statistic.covariance[i] >= 0.0);
+		// assert(statistic.covariance[i] >= 0.0);
 		// instabilita' numerica ???
 		if (statistic.covariance[i] < 0.0)
 			statistic.covariance[i] = 0.0;
@@ -766,7 +743,8 @@ void Cluster::getMeanAxis(KEYER_FLOAT axis[3])
 
 //#define METODO_USATO_SU_TOONZ46
 
-void buildPaletteForBlendedImages(std::set<TPixel32> &palette, const TRaster32P &raster, int maxColorCount)
+void buildPaletteForBlendedImages(std::set<TPixel32> &palette, const TRaster32P &raster,
+								  int maxColorCount)
 {
 	int lx = raster->getLx();
 	int ly = raster->getLy();
@@ -789,14 +767,13 @@ void buildPaletteForBlendedImages(std::set<TPixel32> &palette, const TRaster32P 
 	clusterize(clusters, maxColorCount);
 
 	palette.clear();
-	//palette.reserve( clusters.size());
+	// palette.reserve( clusters.size());
 
 	for (UINT i = 0; i < clusters.size(); ++i) {
 		ClusterStatistic &stat = clusters[i]->statistic;
 		TPixel32 col((int)(stat.sumComponents[0] / stat.elemsCount * 255),
 					 (int)(stat.sumComponents[1] / stat.elemsCount * 255),
-					 (int)(stat.sumComponents[2] / stat.elemsCount * 255),
-					 255);
+					 (int)(stat.sumComponents[2] / stat.elemsCount * 255), 255);
 		palette.insert(col);
 
 		clearPointerContainer(clusters[i]->data);
@@ -838,10 +815,11 @@ bool find(const std::set<TPixel32> &palette, const TPixel &color)
 	return false;
 }
 
-} //namespace
+} // namespace
 
 /*-- 似ている色をまとめて1つのStyleにする --*/
-void TColorUtils::buildPalette(std::set<TPixel32> &palette, const TRaster32P &raster, int maxColorCount)
+void TColorUtils::buildPalette(std::set<TPixel32> &palette, const TRaster32P &raster,
+							   int maxColorCount)
 {
 	int lx = raster->getLx();
 	int ly = raster->getLy();
@@ -879,7 +857,8 @@ void TColorUtils::buildPalette(std::set<TPixel32> &palette, const TRaster32P &ra
 }
 
 /*-- 全ての異なるピクセルの色を別のStyleにする --*/
-void TColorUtils::buildPrecisePalette(std::set<TPixel32> &palette, const TRaster32P &raster, int maxColorCount)
+void TColorUtils::buildPrecisePalette(std::set<TPixel32> &palette, const TRaster32P &raster,
+									  int maxColorCount)
 {
 	int lx = raster->getLx();
 	int ly = raster->getLy();

@@ -10,7 +10,7 @@
 #include <tfx.h>
 #include <set>
 
-//forward declaration
+// forward declaration
 class FxSchematicNode;
 class TFxHandle;
 class FxSelection;
@@ -42,7 +42,7 @@ class FxSchematicScene : public SchematicScene
 		QList<SchematicLink *> m_inputs;
 		QList<SchematicLink *> m_outputs;
 
-	public:
+	  public:
 		SupportLinks() {}
 
 		void addBridgeLink(SchematicLink *link);
@@ -102,7 +102,7 @@ class FxSchematicScene : public SchematicScene
 
 	QMap<TFx *, QList<FxSchematicNode *>> m_nodesToPlace;
 
-public:
+  public:
 	FxSchematicScene(QWidget *parent);
 	~FxSchematicScene();
 
@@ -127,35 +127,36 @@ public:
 	QAction *getAgainAction(int commands) { return m_addFxContextMenu.getAgainCommand(commands); }
 
 	FxSelection *getFxSelection() const { return m_selection; }
-	//!Disconnects or connects selected item from the rest of the graph.
-	//!Selection must be a connected subgraph. If \b disconnect is true, the selection is disconnected; connected otherwise.
+	//! Disconnects or connects selected item from the rest of the graph.
+	//! Selection must be a connected subgraph. If \b disconnect is true, the selection is
+	//! disconnected; connected otherwise.
 	void simulateDisconnectSelection(bool disconnect);
 
-	//!Updates all Group Editors containing fx.
-	//!Each fx is only in one group, but each gruop can contains othe group. All nested Groups must be updated.
+	//! Updates all Group Editors containing fx.
+	//! Each fx is only in one group, but each gruop can contains othe group. All nested Groups must
+	//! be updated.
 	void updateNestedGroupEditors(FxSchematicNode *node, const QPointF &newPos);
 	void closeInnerMacroEditor(int groupId);
 	void resizeNodes(bool maximizedNode);
 
-	void initCursorScenePos()
-	{
-		m_addFxContextMenu.setCurrentCursorScenePos(QPointF(0, 0));
-	}
+	void initCursorScenePos() { m_addFxContextMenu.setCurrentCursorScenePos(QPointF(0, 0)); }
 	void selectNodes(QList<TFxP> &fxs);
 	bool isLargeScaled() { return m_isLargeScaled; }
 
-protected:
+  protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme);
 	void mousePressEvent(QGraphicsSceneMouseEvent *me);
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *me);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *me);
 	bool event(QEvent *e);
 
-private:
+  private:
 	FxSchematicNode *addFxSchematicNode(TFx *fx);
 	FxSchematicNode *addGroupedFxSchematicNode(int groupId, const QList<TFxP> &groupedFxs);
-	FxSchematicGroupEditor *addEditedGroupedFxSchematicNode(int groupId, const QList<SchematicNode *> &groupedFxs);
-	FxSchematicMacroEditor *addEditedMacroFxSchematicNode(TMacroFx *macro, const QList<SchematicNode *> &groupedFxs);
+	FxSchematicGroupEditor *
+	addEditedGroupedFxSchematicNode(int groupId, const QList<SchematicNode *> &groupedFxs);
+	FxSchematicMacroEditor *addEditedMacroFxSchematicNode(TMacroFx *macro,
+														  const QList<SchematicNode *> &groupedFxs);
 	FxSchematicNode *createFxSchematicNode(TFx *fx);
 	void placeNode(FxSchematicNode *node);
 	void updateLink();
@@ -172,18 +173,18 @@ private:
 	void updatePositionOnResize(TFx *fx, bool maximizedNode);
 	void removeRetroLinks(TFx *fx, double &maxX);
 
-signals:
+  signals:
 	void showPreview(TFxP);
 	void cacheFx(TFxP);
 	void doCollapse(const QList<TFxP> &);
 	void doExplodeChild(const QList<TFxP> &);
 	void editObject();
 
-protected slots:
+  protected slots:
 	void onSelectionSwitched(TSelection *oldSel, TSelection *newSel);
 	void onSelectionChanged();
 
-	//void onOutputFxAdded();
+	// void onOutputFxAdded();
 	void onDisconnectFromXSheet();
 	void onConnectToXSheet();
 	void onDeleteFx();
@@ -215,7 +216,7 @@ protected slots:
 	void onAltModifierChanged(bool);
 	void onEditGroup();
 
-private:
+  private:
 	void setEnableCache(bool toggle);
 
 	// not implemented
@@ -223,4 +224,4 @@ private:
 	const FxSchematicScene &operator=(const FxSchematicScene &);
 };
 
-#endif //FXSCHEMATIC_H
+#endif // FXSCHEMATIC_H

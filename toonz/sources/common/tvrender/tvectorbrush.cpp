@@ -17,11 +17,11 @@ using namespace tellipticbrush;
 
 /*! \file tellipticbrush.cpp
 \brief This code performs the outlinization of a \a brush stroke with respect to a
-       secondary \a path stroke. This is used to draw Adobe Illustrator-like
-       vectors whose brush is itself a custom vector (and by extension, a complex
-       vector image).
+	   secondary \a path stroke. This is used to draw Adobe Illustrator-like
+	   vectors whose brush is itself a custom vector (and by extension, a complex
+	   vector image).
 
-       Generalization: Introduce a repeat % and a superposition % in the algorithm
+	   Generalization: Introduce a repeat % and a superposition % in the algorithm
 */
 
 /* TECHNICAL:
@@ -77,7 +77,7 @@ void getHRange(const TThickQuadratic &ttq, double &x0, double &x1)
 	const TPointD &P1 = ttq.getP1();
 	const TPointD &P2 = ttq.getP2();
 
-	//Get the horizontal range of the chunk
+	// Get the horizontal range of the chunk
 	x0 = tmin(x0, P0.x, P2.x), x1 = tmax(x1, P0.x, P2.x);
 
 	double t = (P0.x - P1.x) / (P0.x + P2.x - 2.0 * P1.x);
@@ -96,7 +96,7 @@ void getHRange(const TThickQuadratic &ttq, double t0, double t1, double &x0, dou
 	double x0_ = getX(P0, P1, P2, t0);
 	double x1_ = getX(P0, P1, P2, t1);
 
-	//Get the horizontal range of the chunk
+	// Get the horizontal range of the chunk
 	x0 = tmin(x0, x0_, x1_), x1 = tmax(x1, x0_, x1_);
 
 	double t = (P0.x - P1.x) / (P0.x + P2.x - 2.0 * P1.x);
@@ -121,19 +121,21 @@ struct StrokeOutlinizationData : public tellipticbrush::OutlinizationData {
 	double m_x0, m_x1, m_xRange;
 	double m_y0, m_yScale;
 
-public:
-	StrokeOutlinizationData()
-		: OutlinizationData() {}
+  public:
+	StrokeOutlinizationData() : OutlinizationData() {}
 
 	StrokeOutlinizationData(const TStroke &stroke, const TRectD &strokeBox,
 							const TOutlineUtil::OutlineParameter &options)
-		: OutlinizationData(options), m_x0(strokeBox.x0), m_x1(strokeBox.x1), m_xRange(m_x1 - m_x0), m_y0(0.5 * (strokeBox.y0 + strokeBox.y1)), m_yScale(1.0 / (strokeBox.y1 - strokeBox.y0)) {}
+		: OutlinizationData(options), m_x0(strokeBox.x0), m_x1(strokeBox.x1), m_xRange(m_x1 - m_x0),
+		  m_y0(0.5 * (strokeBox.y0 + strokeBox.y1)), m_yScale(1.0 / (strokeBox.y1 - strokeBox.y0))
+	{
+	}
 
 	void buildPoint(const CenterlinePoint &p, bool isNextD, CenterlinePoint &ref, bool isRefNextD,
 					CenterlinePoint &out);
 	int buildPoints(const CenterlinePoint &p, CenterlinePoint &ref, CenterlinePoint *out);
-	int buildPoints(const TStroke &stroke, const TStroke &path,
-					CenterlinePoint &cp, CenterlinePoint *out);
+	int buildPoints(const TStroke &stroke, const TStroke &path, CenterlinePoint &cp,
+					CenterlinePoint *out);
 
 	bool getChunkAndT_param(const TStroke &path, double x, int &chunk, double &t);
 	bool getChunkAndT_length(const TStroke &path, double x, int &chunk, double &t);
@@ -150,7 +152,8 @@ double StrokeOutlinizationData::toW(double x)
 
 //--------------------------------------------------------------------------------------------
 
-bool StrokeOutlinizationData::getChunkAndT_param(const TStroke &path, double x, int &chunk, double &t)
+bool StrokeOutlinizationData::getChunkAndT_param(const TStroke &path, double x, int &chunk,
+												 double &t)
 {
 	double w = toW(x);
 	return !path.getChunkAndT(w, chunk, t);
@@ -158,7 +161,8 @@ bool StrokeOutlinizationData::getChunkAndT_param(const TStroke &path, double x, 
 
 //--------------------------------------------------------------------------------------------
 
-bool StrokeOutlinizationData::getChunkAndT_length(const TStroke &path, double x, int &chunk, double &t)
+bool StrokeOutlinizationData::getChunkAndT_length(const TStroke &path, double x, int &chunk,
+												  double &t)
 {
 	double s = toW(x) * path.getLength();
 	return !path.getChunkAndTAtLength(s, chunk, t);
@@ -167,8 +171,7 @@ bool StrokeOutlinizationData::getChunkAndT_length(const TStroke &path, double x,
 //--------------------------------------------------------------------------------------------
 
 void StrokeOutlinizationData::buildPoint(const CenterlinePoint &p, bool pNextD,
-										 CenterlinePoint &ref, bool refNextD,
-										 CenterlinePoint &out)
+										 CenterlinePoint &ref, bool refNextD, CenterlinePoint &out)
 {
 	TThickPoint &refD = refNextD ? ref.m_nextD : ref.m_prevD;
 
@@ -185,7 +188,7 @@ void StrokeOutlinizationData::buildPoint(const CenterlinePoint &p, bool pNextD,
 		outHasD = &out.m_hasPrevD;
 	}
 
-	//Build position
+	// Build position
 	refD = (1.0 / norm(refD)) * refD;
 	TPointD normalDirection(-refD.y, refD.x);
 
@@ -193,18 +196,14 @@ void StrokeOutlinizationData::buildPoint(const CenterlinePoint &p, bool pNextD,
 	double yRelative = yPercentage * ref.m_p.thick;
 	double yFactor = ref.m_p.thick * m_yScale;
 
-	out.m_p = TThickPoint(
-		ref.m_p.x + yRelative * normalDirection.x,
-		ref.m_p.y + yRelative * normalDirection.y,
-		p.m_p.thick * yFactor);
+	out.m_p = TThickPoint(ref.m_p.x + yRelative * normalDirection.x,
+						  ref.m_p.y + yRelative * normalDirection.y, p.m_p.thick * yFactor);
 
-	//Build direction
+	// Build direction
 	double stretchedDY = pD->x * yPercentage * refD.thick + pD->y * yFactor;
 
-	*outD = TThickPoint(
-		refD.x * pD->x - refD.y * stretchedDY,
-		refD.y * pD->x + refD.x * stretchedDY,
-		pD->thick * (1.0 + refD.thick));
+	*outD = TThickPoint(refD.x * pD->x - refD.y * stretchedDY,
+						refD.y * pD->x + refD.x * stretchedDY, pD->thick * (1.0 + refD.thick));
 
 	bool covered = (sq(outD->x) + sq(outD->y) < sq(outD->thick) + tolPar);
 	out.m_covered = out.m_covered && covered;
@@ -216,15 +215,15 @@ void StrokeOutlinizationData::buildPoint(const CenterlinePoint &p, bool pNextD,
 
 /*    EXPLANATION:
 
-        \ _   \         The path stroke with centerline point C has 2 outward
-     \      \  \        directions (prevD and nextD), which may be different.
-      \      |* \       Therefore, there may also be 2 different envelope directions
-       \   * .   \      from C (the *s in the drawing).
-        C    .    |     When the brush stroke 'hits' one envelope direction, it
-       /   * .   /      transfers on the other e.d., and continues on that side.
-      /   _ / * /
-     /  /      /
-       |      /
+		\ _   \         The path stroke with centerline point C has 2 outward
+	 \      \  \        directions (prevD and nextD), which may be different.
+	  \      |* \       Therefore, there may also be 2 different envelope directions
+	   \   * .   \      from C (the *s in the drawing).
+		C    .    |     When the brush stroke 'hits' one envelope direction, it
+	   /   * .   /      transfers on the other e.d., and continues on that side.
+	  /   _ / * /
+	 /  /      /
+	   |      /
 */
 
 //! Build points resulting from the association between p (must have pos and dirs
@@ -233,12 +232,12 @@ int StrokeOutlinizationData::buildPoints(const CenterlinePoint &p, CenterlinePoi
 										 CenterlinePoint *out)
 {
 	out[0] = out[1] = p;
-	out[0].m_covered = out[1].m_covered = true; //Coverage is rebuilt
+	out[0].m_covered = out[1].m_covered = true; // Coverage is rebuilt
 
 	bool refSymmetric = ref.m_hasPrevD && ref.m_hasNextD && ref.m_nextD == ref.m_prevD;
 	bool pSymmetric = p.m_hasPrevD && p.m_hasNextD && p.m_nextD == p.m_prevD;
 
-	//Build prev
+	// Build prev
 	bool prevSideIsNext = (p.m_prevD.x < 0) ? true : (p.m_prevD.x > 0) ? false : ref.m_hasNextD;
 	bool hasPrev = p.m_hasPrevD && (prevSideIsNext ? ref.m_hasNextD : ref.m_hasPrevD);
 	int prevIdx = hasPrev ? 0 : -1;
@@ -249,7 +248,7 @@ int StrokeOutlinizationData::buildPoints(const CenterlinePoint &p, CenterlinePoi
 	}
 
 	if (refSymmetric && pSymmetric) {
-		//Copy prev to next
+		// Copy prev to next
 		if (hasPrev) {
 			CenterlinePoint &outPoint = out[prevIdx];
 
@@ -262,7 +261,7 @@ int StrokeOutlinizationData::buildPoints(const CenterlinePoint &p, CenterlinePoi
 		return 0;
 	}
 
-	//Build next
+	// Build next
 	bool nextSideIsNext = (p.m_nextD.x > 0) ? true : (p.m_nextD.x < 0) ? false : ref.m_hasNextD;
 	bool hasNext = p.m_hasNextD && (nextSideIsNext ? ref.m_hasNextD : ref.m_hasPrevD);
 	int nextIdx = hasNext ? hasPrev ? ((int)prevSideIsNext != nextSideIsNext) : 0 : -1;
@@ -272,13 +271,13 @@ int StrokeOutlinizationData::buildPoints(const CenterlinePoint &p, CenterlinePoi
 		buildPoint(p, true, ref, nextSideIsNext, outPoint);
 	}
 
-	//Fill in unbuilt directions if necessary
+	// Fill in unbuilt directions if necessary
 	if (hasPrev && hasNext && prevIdx != nextIdx) {
 		CenterlinePoint &outPrev = out[prevIdx];
 		CenterlinePoint &outNext = out[nextIdx];
 
 		if (dist(outPrev.m_p, outNext.m_p) > 1e-4) {
-			//If there are 2 full output points, make their unbuilt directions match
+			// If there are 2 full output points, make their unbuilt directions match
 			outPrev.m_nextD = outNext.m_prevD = 0.5 * (outNext.m_p - outPrev.m_p);
 			bool covered = (sq(outPrev.m_nextD.x) + sq(outPrev.m_nextD.y) <
 							sq(outPrev.m_nextD.thick) + tolPar);
@@ -287,7 +286,7 @@ int StrokeOutlinizationData::buildPoints(const CenterlinePoint &p, CenterlinePoi
 			outPrev.m_covered = outPrev.m_covered && covered;
 			outNext.m_covered = outNext.m_covered && covered;
 		} else {
-			//Merge the 2 existing ones
+			// Merge the 2 existing ones
 			nextIdx = prevIdx;
 
 			outPrev.m_nextD = outNext.m_nextD;
@@ -337,12 +336,13 @@ int StrokeOutlinizationData::buildPoints(const TStroke &stroke, const TStroke &p
 
 class ReferenceLinearizator : public tellipticbrush::StrokeLinearizator
 {
-protected:
+  protected:
 	const TStroke *m_path;
 	StrokeOutlinizationData m_data;
 
-public:
-	ReferenceLinearizator(const TStroke *stroke, const TStroke *path, const StrokeOutlinizationData &data);
+  public:
+	ReferenceLinearizator(const TStroke *stroke, const TStroke *path,
+						  const StrokeOutlinizationData &data);
 
 	virtual void linearize(std::vector<CenterlinePoint> &cPoints, int chunk, double t1) = 0;
 };
@@ -363,33 +363,35 @@ class ReferenceChunksLinearizator : public ReferenceLinearizator
 {
 	double m_w0, m_w1;
 
-public:
+  public:
 	ReferenceChunksLinearizator(const TStroke *stroke, const TStroke *path,
 								const StrokeOutlinizationData &data)
-		: ReferenceLinearizator(stroke, path, data) {}
+		: ReferenceLinearizator(stroke, path, data)
+	{
+	}
 
 	void linearize(std::vector<CenterlinePoint> &cPoints, int chunk);
 	void linearize(std::vector<CenterlinePoint> &cPoints, int chunk, double t1);
 
-	void addCenterlinePoints(std::vector<CenterlinePoint> &cPoints,
-							 int brushChunk, double x0, double x1);
-	void addCenterlinePoints(std::vector<CenterlinePoint> &cPoints,
-							 int strokeChunk, double strokeT, int refChunk);
+	void addCenterlinePoints(std::vector<CenterlinePoint> &cPoints, int brushChunk, double x0,
+							 double x1);
+	void addCenterlinePoints(std::vector<CenterlinePoint> &cPoints, int strokeChunk, double strokeT,
+							 int refChunk);
 };
 
 //--------------------------------------------------------------------------------------------
 
 void ReferenceChunksLinearizator::linearize(std::vector<CenterlinePoint> &cPoints, int chunk)
 {
-	//Get the stroke chunk
+	// Get the stroke chunk
 	const TThickQuadratic &ttq = *this->m_stroke->getChunk(chunk);
 
-	//Get the chunk's horizontal range
+	// Get the chunk's horizontal range
 	double x0 = (std::numeric_limits<double>::max)(), x1 = -x0;
 	getHRange(ttq, x0, x1);
 
-	//Now, we have to add all points corresponding to the intersections between the relative
-	//vertical projection of path's chunk endpoints, and the stroke
+	// Now, we have to add all points corresponding to the intersections between the relative
+	// vertical projection of path's chunk endpoints, and the stroke
 	addCenterlinePoints(cPoints, chunk, x0, x1);
 }
 
@@ -401,15 +403,15 @@ void ReferenceChunksLinearizator::linearize(std::vector<CenterlinePoint> &cPoint
 	if (cPoints.empty())
 		return;
 
-	//Get the stroke chunk
+	// Get the stroke chunk
 	const TThickQuadratic &ttq = *this->m_stroke->getChunk(chunk);
 
-	//Get the chunk's horizontal range
+	// Get the chunk's horizontal range
 	double x0 = (std::numeric_limits<double>::max)(), x1 = -x0;
 	getHRange(ttq, cPoints[0].m_t, t1, x0, x1);
 
-	//Now, we have to add all points corresponding to the intersections between the relative
-	//vertical projection of path's chunk endpoints, and the stroke
+	// Now, we have to add all points corresponding to the intersections between the relative
+	// vertical projection of path's chunk endpoints, and the stroke
 
 	addCenterlinePoints(cPoints, chunk, x0, x1);
 }
@@ -457,28 +459,28 @@ void ReferenceChunksLinearizator::addCenterlinePoints(std::vector<CenterlinePoin
 		if (delta < 0)
 			continue;
 
-		//Add first solution
+		// Add first solution
 		double t = (sqrt(delta) - B) / A;
-		if (t > 0.0 && t < 1.0) //0 and 1 are dealt outside
+		if (t > 0.0 && t < 1.0) // 0 and 1 are dealt outside
 			addCenterlinePoints(cPoints, chunk, t, i);
 
 		if (delta < tolPar)
 			continue;
 
-		//Add second solution
+		// Add second solution
 		t = -(sqrt(delta) + B) / A;
 		if (t > 0.0 && t < 1.0)
 			addCenterlinePoints(cPoints, chunk, t, i);
 	}
 
-	//As points may be mixed (by parameter), sort them.
+	// As points may be mixed (by parameter), sort them.
 	std::sort(cPoints.begin() + initialSize, cPoints.end());
 }
 
 //--------------------------------------------------------------------------------------------
 
-void ReferenceChunksLinearizator::addCenterlinePoints(
-	std::vector<CenterlinePoint> &cPoints, int strokeChunk, double strokeT, int refChunk)
+void ReferenceChunksLinearizator::addCenterlinePoints(std::vector<CenterlinePoint> &cPoints,
+													  int strokeChunk, double strokeT, int refChunk)
 {
 	CenterlinePoint p(strokeChunk, strokeT);
 	CenterlinePoint ref(refChunk, 1.0);
@@ -501,39 +503,41 @@ void ReferenceChunksLinearizator::addCenterlinePoints(
 
 class RecursiveReferenceLinearizator : public ReferenceLinearizator
 {
-public:
-	typedef void (RecursiveReferenceLinearizator::*SubdivisorFuncPtr)(std::vector<CenterlinePoint> &cPoints,
-																	  CenterlinePoint &cp0, CenterlinePoint &cp1);
+  public:
+	typedef void (RecursiveReferenceLinearizator::*SubdivisorFuncPtr)(
+		std::vector<CenterlinePoint> &cPoints, CenterlinePoint &cp0, CenterlinePoint &cp1);
 
 	SubdivisorFuncPtr m_subdivisor;
 
-public:
+  public:
 	void linearize(std::vector<CenterlinePoint> &cPoints, int chunk);
 	void linearize(std::vector<CenterlinePoint> &cPoints, int chunk, double t1);
 
-	void subdivide(std::vector<CenterlinePoint> &cPoints,
-				   CenterlinePoint &cp0, CenterlinePoint &cp1);
-	void subdivideCenterline(std::vector<CenterlinePoint> &cPoints,
-							 CenterlinePoint &cp0, CenterlinePoint &cp1);
+	void subdivide(std::vector<CenterlinePoint> &cPoints, CenterlinePoint &cp0,
+				   CenterlinePoint &cp1);
+	void subdivideCenterline(std::vector<CenterlinePoint> &cPoints, CenterlinePoint &cp0,
+							 CenterlinePoint &cp1);
 
-public:
+  public:
 	RecursiveReferenceLinearizator(const TStroke *stroke, const TStroke *path,
 								   const StrokeOutlinizationData &data)
-		: ReferenceLinearizator(stroke, path, data), m_subdivisor(&RecursiveReferenceLinearizator::subdivide) {}
+		: ReferenceLinearizator(stroke, path, data),
+		  m_subdivisor(&RecursiveReferenceLinearizator::subdivide)
+	{
+	}
 };
 
 //--------------------------------------------------------------------------------------------
 
-void RecursiveReferenceLinearizator::linearize(
-	std::vector<CenterlinePoint> &cPoints, int chunk)
+void RecursiveReferenceLinearizator::linearize(std::vector<CenterlinePoint> &cPoints, int chunk)
 {
 	linearize(cPoints, chunk, 1.0);
 }
 
 //--------------------------------------------------------------------------------------------
 
-void RecursiveReferenceLinearizator::linearize(
-	std::vector<CenterlinePoint> &cPoints, int chunk, double t1)
+void RecursiveReferenceLinearizator::linearize(std::vector<CenterlinePoint> &cPoints, int chunk,
+											   double t1)
 {
 	if (cPoints.empty())
 		return;
@@ -543,7 +547,7 @@ void RecursiveReferenceLinearizator::linearize(
 
 	const TStroke &path = *this->m_path;
 
-	//Sort the interval (SHOULD BE DONE OUTSIDE?)
+	// Sort the interval (SHOULD BE DONE OUTSIDE?)
 	std::stable_sort(cPoints.begin(), cPoints.end());
 
 	std::vector<CenterlinePoint> addedPoints;
@@ -575,7 +579,7 @@ void RecursiveReferenceLinearizator::linearize(
 		refCp.buildDirs(*m_path);
 
 		int count = m_data.buildPoints(strokeCpEnd, refCp, newPoints);
-		if (count == 1) //Otherwise, this is either impossible, or already covered
+		if (count == 1) // Otherwise, this is either impossible, or already covered
 			(this->*m_subdivisor)(addedPoints, cPoints[size_1], newPoints[0]);
 	}
 
@@ -584,8 +588,8 @@ void RecursiveReferenceLinearizator::linearize(
 
 //--------------------------------------------------------------------------------------------
 
-void RecursiveReferenceLinearizator::subdivide(
-	std::vector<CenterlinePoint> &cPoints, CenterlinePoint &cp0, CenterlinePoint &cp1)
+void RecursiveReferenceLinearizator::subdivide(std::vector<CenterlinePoint> &cPoints,
+											   CenterlinePoint &cp0, CenterlinePoint &cp1)
 {
 	if (!(cp0.m_hasNextD && cp1.m_hasPrevD))
 		return;
@@ -595,26 +599,24 @@ void RecursiveReferenceLinearizator::subdivide(
 
 	const TStroke &path = *this->m_path;
 
-	//Build the distance of next from the outline of cp's 'envelope extension'
+	// Build the distance of next from the outline of cp's 'envelope extension'
 
 	TPointD envDirL0, envDirR0, envDirL1, envDirR1;
 	buildEnvelopeDirections(cp0.m_p, cp0.m_nextD, envDirL0, envDirR0);
 	buildEnvelopeDirections(cp1.m_p, cp1.m_prevD, envDirL1, envDirR1);
 
 	TPointD diff(convert(cp1.m_p) - convert(cp0.m_p));
-	double d = tmax(
-		fabs(envDirL0 * (diff + cp1.m_p.thick * envDirL1 - cp0.m_p.thick * envDirL0)),
-		fabs(envDirR0 * (diff + cp1.m_p.thick * envDirR1 - cp0.m_p.thick * envDirR0)));
+	double d = tmax(fabs(envDirL0 * (diff + cp1.m_p.thick * envDirL1 - cp0.m_p.thick * envDirL0)),
+					fabs(envDirR0 * (diff + cp1.m_p.thick * envDirR1 - cp0.m_p.thick * envDirR0)));
 
-	if (d > m_data.m_pixSize &&
-		cp1.m_t - cp0.m_t > 1e-4) {
+	if (d > m_data.m_pixSize && cp1.m_t - cp0.m_t > 1e-4) {
 		CenterlinePoint strokeMidPoint(cp0.m_chunkIdx, 0.5 * (cp0.m_t + cp1.m_t));
 		CenterlinePoint newPoints[2];
 
 		int count = m_data.buildPoints(*this->m_stroke, *this->m_path, strokeMidPoint, newPoints);
-		if (count == 1) //Otherwise, this is either impossible, or already covered
+		if (count == 1) // Otherwise, this is either impossible, or already covered
 		{
-			subdivide(cPoints, cp0, newPoints[0]); //should I use strokeMidPoint(Prev) here ?
+			subdivide(cPoints, cp0, newPoints[0]); // should I use strokeMidPoint(Prev) here ?
 			subdivide(cPoints, newPoints[0], cp1);
 
 			cPoints.push_back(newPoints[0]);
@@ -624,28 +626,26 @@ void RecursiveReferenceLinearizator::subdivide(
 
 //--------------------------------------------------------------------------------------------
 
-void RecursiveReferenceLinearizator::subdivideCenterline(
-	std::vector<CenterlinePoint> &cPoints,
-	CenterlinePoint &cp0, CenterlinePoint &cp1)
+void RecursiveReferenceLinearizator::subdivideCenterline(std::vector<CenterlinePoint> &cPoints,
+														 CenterlinePoint &cp0, CenterlinePoint &cp1)
 {
 	if (cp0.m_covered || !cp0.m_hasNextD)
 		return;
 
-	//Build the distance of next from cp's 'direction extension'
+	// Build the distance of next from cp's 'direction extension'
 	TPointD dir((1.0 / norm(cp0.m_nextD)) * cp0.m_nextD);
 	TPointD diff(convert(cp1.m_p) - convert(cp0.m_p));
 
 	double d = fabs(dir.x * diff.y - dir.y * diff.x);
 
-	if (d > m_data.m_pixSize &&
-		cp1.m_t - cp0.m_t > 1e-4) {
+	if (d > m_data.m_pixSize && cp1.m_t - cp0.m_t > 1e-4) {
 		CenterlinePoint strokeMidPoint(cp0.m_chunkIdx, 0.5 * (cp0.m_t + cp1.m_t));
 		CenterlinePoint newPoints[2];
 
 		int count = m_data.buildPoints(*this->m_stroke, *this->m_path, strokeMidPoint, newPoints);
-		if (count == 1) //Otherwise, this is either impossible, or already covered
+		if (count == 1) // Otherwise, this is either impossible, or already covered
 		{
-			subdivide(cPoints, cp0, newPoints[0]); //should I use strokeMidPoint(Prev) here ?
+			subdivide(cPoints, cp0, newPoints[0]); // should I use strokeMidPoint(Prev) here ?
 			subdivide(cPoints, newPoints[0], cp1);
 
 			cPoints.push_back(newPoints[0]);
@@ -675,10 +675,11 @@ struct LinearizatorsSet {
 
 	ReferenceLinearizator *m_linearizatorPtrs[nLinearizators];
 
-public:
+  public:
 	LinearizatorsSet(const TStroke &stroke, const TStroke &path,
 					 const StrokeOutlinizationData &data)
-		: m_refChunksLinearizator(&stroke, &path, data), m_recursiveRefLinearizator(&stroke, &path, data)
+		: m_refChunksLinearizator(&stroke, &path, data),
+		  m_recursiveRefLinearizator(&stroke, &path, data)
 	{
 		m_linearizatorPtrs[0] = &m_refChunksLinearizator;
 		m_linearizatorPtrs[1] = &m_recursiveRefLinearizator;
@@ -688,18 +689,18 @@ public:
 	const int size() const { return nLinearizators; }
 };
 
-} //namespace
+} // namespace
 
 //============================================================================================
 
-void TOutlineUtil::makeOutline(const TStroke &path, const TStroke &stroke,
-							   const TRectD &strokeBox, TStrokeOutline &outline,
+void TOutlineUtil::makeOutline(const TStroke &path, const TStroke &stroke, const TRectD &strokeBox,
+							   TStrokeOutline &outline,
 							   const TOutlineUtil::OutlineParameter &options)
 {
-	//Build outlinization data
+	// Build outlinization data
 	StrokeOutlinizationData data(stroke, strokeBox, options);
 
-	//Build a set of linearizators for the specified stroke
+	// Build a set of linearizators for the specified stroke
 	LinearizatorsSet linearizators(stroke, path, data);
 	CenterlinePoint newPoints[2];
 
@@ -719,26 +720,26 @@ void TOutlineUtil::makeOutline(const TStroke &path, const TStroke &stroke,
 			linearizator->linearize(chunkPoints, i);
 		}
 
-		//These points are just PUSH_BACK'd to the vector. A sorting must be performed
-		//before storing them in the overall centerline points vector
+		// These points are just PUSH_BACK'd to the vector. A sorting must be performed
+		// before storing them in the overall centerline points vector
 		std::stable_sort(chunkPoints.begin(), chunkPoints.end());
 
 		cPoints.insert(cPoints.end(), chunkPoints.begin(), chunkPoints.end());
 	}
 
-	//Build the final point.
+	// Build the final point.
 	CenterlinePoint cPoint(chunksCount - 1, 1.0);
 
 	int count = data.buildPoints(stroke, path, cPoint, newPoints);
 	for (i = 0; i < count; ++i)
 		cPoints.push_back(newPoints[i]);
 
-	//If no centerline point was built, no outline point can, too.
-	//This specifically happens when the supplied path is a point.
+	// If no centerline point was built, no outline point can, too.
+	// This specifically happens when the supplied path is a point.
 	if (cPoints.empty())
 		return;
 
-	//In the selfLoop case, use its info to modify the initial point.
+	// In the selfLoop case, use its info to modify the initial point.
 	if (stroke.isSelfLoop()) {
 		CenterlinePoint &lastCp = cPoints[cPoints.size() - 1];
 
@@ -750,23 +751,22 @@ void TOutlineUtil::makeOutline(const TStroke &path, const TStroke &stroke,
 
 #ifdef DEBUG_DRAW_TANGENTS
 	{
-		//Debug - draw centerline directions (derivatives)
+		// Debug - draw centerline directions (derivatives)
 		glBegin(GL_LINES);
 		glColor3d(1.0, 0.0, 0.0);
 
 		unsigned int i, size = cPoints.size();
 		for (i = 0; i < size; ++i) {
 			glVertex2d(cPoints[i].m_p.x, cPoints[i].m_p.y);
-			glVertex2d(
-				cPoints[i].m_p.x + cPoints[i].m_nextD.x * cPoints[i].m_p.thick,
-				cPoints[i].m_p.y + cPoints[i].m_nextD.y * cPoints[i].m_p.thick);
+			glVertex2d(cPoints[i].m_p.x + cPoints[i].m_nextD.x * cPoints[i].m_p.thick,
+					   cPoints[i].m_p.y + cPoints[i].m_nextD.y * cPoints[i].m_p.thick);
 		}
 
 		glEnd();
 	}
 #endif
 
-	//Now, build the outline associated to the linearized centerline
+	// Now, build the outline associated to the linearized centerline
 	buildOutline(stroke, cPoints, outline, data);
 }
 
@@ -782,18 +782,18 @@ TRectD TOutlineUtil::computeBBox(const TStroke &stroke, const TStroke& path)
   const OOpts& oOptions(stroke.outlineOptions());
 
   if(oOptions.m_capStyle != OOpts::PROJECTING_CAP && oOptions.m_joinStyle != OOpts::MITER_JOIN)
-    return roundBBox;
+	return roundBBox;
 
   //Build interesting centerline points (in this case, junction points)
   std::vector<CenterlinePoint> cPoints;
   int i, chunksCount = stroke.getChunkCount();
   for(i=0; i<chunksCount; ++i)
   {
-    CenterlinePoint cPoint(i, 0.0);
+	CenterlinePoint cPoint(i, 0.0);
 
-    cPoint.buildPos(stroke);
-    cPoint.buildDirs(stroke);
-    cPoints.push_back(cPoint);
+	cPoint.buildPos(stroke);
+	cPoint.buildDirs(stroke);
+	cPoints.push_back(cPoint);
   }
 
   //Build the final point.
@@ -805,10 +805,10 @@ TRectD TOutlineUtil::computeBBox(const TStroke &stroke, const TStroke& path)
   //In the selfLoop case, use its info to modify the initial point.
   if(stroke.isSelfLoop())
   {
-    cPoints[0].m_prevD = cPoint.m_prevD;
-    cPoints[0].m_hasPrevD = true;
-    cPoint.m_nextD = cPoint.m_prevD;
-    cPoint.m_hasNextD = true;
+	cPoints[0].m_prevD = cPoint.m_prevD;
+	cPoints[0].m_hasPrevD = true;
+	cPoint.m_nextD = cPoint.m_prevD;
+	cPoint.m_hasNextD = true;
   }
 
   cPoints.push_back(cPoint);
@@ -816,24 +816,24 @@ TRectD TOutlineUtil::computeBBox(const TStroke &stroke, const TStroke& path)
   //Now, add the associated 'extending' outline points
   OutlineBuilder outBuilder(OutlinizationData(), stroke);
   TRectD extensionBBox(
-    (std::numeric_limits<double>::max)(),
-    (std::numeric_limits<double>::max)(),
-    -(std::numeric_limits<double>::max)(),
-    -(std::numeric_limits<double>::max)()
+	(std::numeric_limits<double>::max)(),
+	(std::numeric_limits<double>::max)(),
+	-(std::numeric_limits<double>::max)(),
+	-(std::numeric_limits<double>::max)()
   );
 
   unsigned int j, cPointsCount = cPoints.size();
   for(j=0; ; ++j)
   {
-    //Search the next uncovered point
-    for(; j < cPointsCount && cPoints[j].m_covered; ++j)
-      ;
+	//Search the next uncovered point
+	for(; j < cPointsCount && cPoints[j].m_covered; ++j)
+	  ;
 
-    if(j >= cPointsCount)
-      break;
+	if(j >= cPointsCount)
+	  break;
 
-    //Build the associated outline points
-    outBuilder.buildOutlineExtensions(extensionBBox, cPoints[j]);
+	//Build the associated outline points
+	outBuilder.buildOutlineExtensions(extensionBBox, cPoints[j]);
   }
 
   //Finally, merge the 2 bboxes
@@ -859,10 +859,10 @@ void makeCenterline(const TStroke &path, const TEdge &edge, const TRectD &region
 	if (reversed)
 		w0 = edge.m_w1, w1 = edge.m_w0;
 
-	//Build outlinization data
+	// Build outlinization data
 	StrokeOutlinizationData data(stroke, regionBox, options);
 
-	//Build a set of linearizators for the specified stroke
+	// Build a set of linearizators for the specified stroke
 	LinearizatorsSet linearizators(stroke, path, data);
 	CenterlinePoint newPoints[2];
 
@@ -894,8 +894,8 @@ void makeCenterline(const TStroke &path, const TEdge &edge, const TRectD &region
 			linearizator->linearize(chunkPoints, i, 1.0);
 		}
 
-		//These points are just PUSH_BACK'd to the vector. A sorting must be performed
-		//before storing them in the overall centerline points vector
+		// These points are just PUSH_BACK'd to the vector. A sorting must be performed
+		// before storing them in the overall centerline points vector
 		std::stable_sort(chunkPoints.begin(), chunkPoints.end());
 
 		int size = chunkPoints.size();
@@ -907,7 +907,7 @@ void makeCenterline(const TStroke &path, const TEdge &edge, const TRectD &region
 		}
 	}
 
-	//The last one with t1 as endpoint
+	// The last one with t1 as endpoint
 	{
 		chunkPoints.clear();
 
@@ -933,7 +933,7 @@ void makeCenterline(const TStroke &path, const TEdge &edge, const TRectD &region
 		}
 	}
 
-	//Finally, add the endpoint
+	// Finally, add the endpoint
 	CenterlinePoint cp(chunk1, t1);
 	int j, count = data.buildPoints(stroke, path, cp, newPoints);
 	for (j = 0; j < count; ++j) {
@@ -941,7 +941,7 @@ void makeCenterline(const TStroke &path, const TEdge &edge, const TRectD &region
 		outline.push_back(T3DPointD(point.x, point.y, 0.0));
 	}
 
-	//Eventually, reverse the output
+	// Eventually, reverse the output
 	if (reversed)
 		std::reverse(outline.begin() + initialOutlineSize, outline.end());
 }
@@ -951,13 +951,13 @@ void makeCenterline(const TStroke &path, const TEdge &edge, const TRectD &region
 void makeOutlineRaw(const TStroke &path, const TRegion &region, const TRectD &regionBox,
 					std::vector<T3DPointD> &outline)
 {
-	//Deal with each edge independently
+	// Deal with each edge independently
 	int e, edgesCount = region.getEdgeCount();
 	for (e = 0; e < edgesCount; ++e)
 		makeCenterline(path, *region.getEdge(e), regionBox, outline);
 }
 
-} //namespace
+} // namespace
 
 //--------------------------------------------------------------------------------------------
 
@@ -966,7 +966,7 @@ void TOutlineUtil::makeOutline(const TStroke &path, const TRegion &region, const
 {
 	outline.m_doAntialiasing = true;
 
-	//Build the external boundary
+	// Build the external boundary
 	{
 		outline.m_exterior.resize(1);
 		outline.m_exterior[0].clear();
@@ -974,7 +974,7 @@ void TOutlineUtil::makeOutline(const TStroke &path, const TRegion &region, const
 		makeOutlineRaw(path, region, regionBox, outline.m_exterior[0]);
 	}
 
-	//Build internal boundaries
+	// Build internal boundaries
 	{
 		outline.m_interior.clear();
 

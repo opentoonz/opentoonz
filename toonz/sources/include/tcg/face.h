@@ -9,8 +9,7 @@
 namespace tcg
 {
 
-template <typename F>
-struct face_traits {
+template <typename F> struct face_traits {
 	typedef typename F::edges_const_iterator edges_const_iterator;
 	typedef typename F::edges_iterator edges_iterator;
 };
@@ -19,15 +18,15 @@ struct face_traits {
 
 class Face
 {
-protected:
+  protected:
 	int m_index;
 	tcg::list<int> m_edges;
 
-public:
+  public:
 	typedef tcg::list<int>::const_iterator edges_const_iterator;
 	typedef tcg::list<int>::iterator edges_iterator;
 
-public:
+  public:
 	Face() : m_index(-1) {}
 	~Face() {}
 
@@ -49,22 +48,18 @@ public:
 
 //-------------------------------------------------------------------------------
 
-template <int N>
-class FaceN
+template <int N> class FaceN
 {
-public:
+  public:
 	typedef const int *edges_const_iterator;
 	typedef int *edges_iterator;
 
-protected:
+  protected:
 	int m_e[N], m_count;
 	int m_index;
 
-public:
-	FaceN() : m_index(-1), m_count(0)
-	{
-		std::fill(m_e, m_e + N, -1);
-	}
+  public:
+	FaceN() : m_index(-1), m_count(0) { std::fill(m_e, m_e + N, -1); }
 	FaceN(int(&edges)[N]) : m_index(-1), m_count(0)
 	{
 		std::copy(edges, edges + N, m_e), m_count = N;

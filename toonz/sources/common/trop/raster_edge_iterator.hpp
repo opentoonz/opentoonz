@@ -10,10 +10,13 @@ namespace borders
 {
 
 template <typename PixelSelector>
-RasterEdgeIterator<PixelSelector>::RasterEdgeIterator(
-	const raster_typeP &rin, const selector_type &selector,
-	const TPoint &pos, const TPoint &dir, int adherence)
-	: m_ras(rin), m_lx_1(rin->getLx() - 1), m_ly_1(rin->getLy() - 1), m_wrap(rin->getWrap()), m_selector(selector), m_pos(pos), m_dir(dir), m_elbowColor(selector.transparent()), m_rightSide(adherence == RIGHT), m_turn(UNKNOWN)
+RasterEdgeIterator<PixelSelector>::RasterEdgeIterator(const raster_typeP &rin,
+													  const selector_type &selector,
+													  const TPoint &pos, const TPoint &dir,
+													  int adherence)
+	: m_ras(rin), m_lx_1(rin->getLx() - 1), m_ly_1(rin->getLy() - 1), m_wrap(rin->getWrap()),
+	  m_selector(selector), m_pos(pos), m_dir(dir), m_elbowColor(selector.transparent()),
+	  m_rightSide(adherence == RIGHT), m_turn(UNKNOWN)
 {
 	pixels(m_leftPix, m_rightPix);
 	colors(m_leftColor, m_rightColor);
@@ -32,8 +35,7 @@ void RasterEdgeIterator<PixelSelector>::setEdge(const TPoint &pos, const TPoint 
 //---------------------------------------------------------------------------------------------
 
 template <typename PixelSelector>
-inline void RasterEdgeIterator<PixelSelector>::pixels(
-	pixel_type *&pixLeft, pixel_type *&pixRight)
+inline void RasterEdgeIterator<PixelSelector>::pixels(pixel_type *&pixLeft, pixel_type *&pixRight)
 {
 	pixel_type *pix = m_ras->pixels(0) + m_pos.y * m_wrap + m_pos.x;
 	if (m_dir.y)
@@ -50,8 +52,7 @@ inline void RasterEdgeIterator<PixelSelector>::pixels(
 //---------------------------------------------------------------------------------------------
 
 template <typename PixelSelector>
-inline void RasterEdgeIterator<PixelSelector>::colors(
-	value_type &leftColor, value_type &rightColor)
+inline void RasterEdgeIterator<PixelSelector>::colors(value_type &leftColor, value_type &rightColor)
 {
 	if (m_dir.y)
 		if (m_dir.y > 0) {
@@ -59,21 +60,25 @@ inline void RasterEdgeIterator<PixelSelector>::colors(
 				leftColor = rightColor = m_selector.transparent();
 			else {
 				leftColor = (m_pos.x > 0) ? m_selector.value(*m_leftPix) : m_selector.transparent();
-				rightColor = (m_pos.x <= m_lx_1) ? m_selector.value(*m_rightPix) : m_selector.transparent();
+				rightColor =
+					(m_pos.x <= m_lx_1) ? m_selector.value(*m_rightPix) : m_selector.transparent();
 			}
 		} else {
 			if (m_pos.y < 1)
 				leftColor = rightColor = m_selector.transparent();
 			else {
-				leftColor = (m_pos.x <= m_lx_1) ? m_selector.value(*m_leftPix) : m_selector.transparent();
-				rightColor = (m_pos.x > 0) ? m_selector.value(*m_rightPix) : m_selector.transparent();
+				leftColor =
+					(m_pos.x <= m_lx_1) ? m_selector.value(*m_leftPix) : m_selector.transparent();
+				rightColor =
+					(m_pos.x > 0) ? m_selector.value(*m_rightPix) : m_selector.transparent();
 			}
 		}
 	else if (m_dir.x > 0) {
 		if (m_pos.x > m_lx_1)
 			leftColor = rightColor = m_selector.transparent();
 		else {
-			leftColor = (m_pos.y <= m_ly_1) ? m_selector.value(*m_leftPix) : m_selector.transparent();
+			leftColor =
+				(m_pos.y <= m_ly_1) ? m_selector.value(*m_leftPix) : m_selector.transparent();
 			rightColor = (m_pos.y > 0) ? m_selector.value(*m_rightPix) : m_selector.transparent();
 		}
 	} else {
@@ -81,7 +86,8 @@ inline void RasterEdgeIterator<PixelSelector>::colors(
 			leftColor = rightColor = m_selector.transparent();
 		else {
 			leftColor = (m_pos.y > 0) ? m_selector.value(*m_leftPix) : m_selector.transparent();
-			rightColor = (m_pos.y <= m_ly_1) ? m_selector.value(*m_rightPix) : m_selector.transparent();
+			rightColor =
+				(m_pos.y <= m_ly_1) ? m_selector.value(*m_rightPix) : m_selector.transparent();
 		}
 	}
 }
@@ -89,7 +95,8 @@ inline void RasterEdgeIterator<PixelSelector>::colors(
 //---------------------------------------------------------------------------------------------
 
 template <typename PixelSelector>
-inline void RasterEdgeIterator<PixelSelector>::turn(const value_type &newLeftColor, const value_type &newRightColor)
+inline void RasterEdgeIterator<PixelSelector>::turn(const value_type &newLeftColor,
+													const value_type &newRightColor)
 {
 	if (m_rightSide) {
 		if (newLeftColor == m_rightColor) {
@@ -127,8 +134,8 @@ inline void RasterEdgeIterator<PixelSelector>::turn(const value_type &newLeftCol
 //---------------------------------------------------------------------------------------------
 
 template <typename PixelSelector>
-inline void RasterEdgeIterator<PixelSelector>::turnAmbiguous(
-	const value_type &newLeftColor, const value_type &newRightColor)
+inline void RasterEdgeIterator<PixelSelector>::turnAmbiguous(const value_type &newLeftColor,
+															 const value_type &newRightColor)
 {
 	pixel_type *pix = m_ras->pixels(0) + m_pos.y * m_wrap + m_pos.x;
 	UCHAR count1 = 0, count2 = 0;

@@ -20,8 +20,7 @@ using namespace DVGui;
 // MixAudioThread
 //-----------------------------------------------------------------------------
 
-MixAudioThread::MixAudioThread(QObject *parent)
-	: QThread(parent), m_abort(false), m_restart(false)
+MixAudioThread::MixAudioThread(QObject *parent) : QThread(parent), m_abort(false), m_restart(false)
 {
 }
 
@@ -91,7 +90,9 @@ void MixAudioThread::computeBuffer(int fromFrame, int toFrame)
 //-----------------------------------------------------------------------------
 
 LineTestPane::LineTestPane(QWidget *parent, Qt::WFlags flags)
-	: TPanel(parent), m_flipConsole(0), m_keyFrameButton(0), m_mainTrack(0), m_startTrack(0), m_player(0), m_trackStartFrame(0), m_startPlayRange(-1), m_endPlayRange(0), m_bufferSize(0), m_nextBufferSize(0)
+	: TPanel(parent), m_flipConsole(0), m_keyFrameButton(0), m_mainTrack(0), m_startTrack(0),
+	  m_player(0), m_trackStartFrame(0), m_startPlayRange(-1), m_endPlayRange(0), m_bufferSize(0),
+	  m_nextBufferSize(0)
 {
 	bool ret = true;
 	QFrame *hbox = new QFrame(this);
@@ -102,7 +103,7 @@ LineTestPane::LineTestPane(QWidget *parent, Qt::WFlags flags)
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(0);
 
-	//Viewer
+	// Viewer
 	m_stackedWidget = new QStackedWidget(this);
 	m_sceneViewer = new SceneViewer(this);
 	m_stackedWidget->addWidget(m_sceneViewer);
@@ -138,18 +139,25 @@ LineTestPane::LineTestPane(QWidget *parent, Qt::WFlags flags)
 	buttons &= (~FlipConsole::eDefineLoadBox);
 	buttons &= (~FlipConsole::eUseLoadBox);
 
-	m_flipConsole = new FlipConsole(mainLayout, buttons, false, m_keyFrameButton, "SceneViewerConsole");
+	m_flipConsole =
+		new FlipConsole(mainLayout, buttons, false, m_keyFrameButton, "SceneViewerConsole");
 
 	ret = ret && connect(m_sceneViewer, SIGNAL(onZoomChanged()), SLOT(changeWindowTitle()));
 	ret = ret && connect(m_lineTestViewer, SIGNAL(onZoomChanged()), SLOT(changeWindowTitle()));
 
-	ret = connect(m_flipConsole, SIGNAL(drawFrame(int, const ImagePainter::VisualSettings &)), this, SLOT(onDrawFrame(int, const ImagePainter::VisualSettings &)));
-	ret = ret && connect(m_flipConsole, SIGNAL(playStateChanged(bool)), this, SLOT(onPlayStateChanged(bool)));
-	ret = ret && connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)), m_lineTestViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
-	ret = ret && connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)), m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
-	ret = ret && connect(m_flipConsole, SIGNAL(sliderReleased()), this, SLOT(onFlipSliderReleased()));
+	ret = connect(m_flipConsole, SIGNAL(drawFrame(int, const ImagePainter::VisualSettings &)), this,
+				  SLOT(onDrawFrame(int, const ImagePainter::VisualSettings &)));
+	ret = ret && connect(m_flipConsole, SIGNAL(playStateChanged(bool)), this,
+						 SLOT(onPlayStateChanged(bool)));
+	ret = ret && connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
+						 m_lineTestViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
+	ret = ret && connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)), m_sceneViewer,
+						 SLOT(onButtonPressed(FlipConsole::EGadget)));
+	ret =
+		ret && connect(m_flipConsole, SIGNAL(sliderReleased()), this, SLOT(onFlipSliderReleased()));
 
-	m_flipConsole->setFrameRate(app->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate());
+	m_flipConsole->setFrameRate(
+		app->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate());
 
 	hbox->setLayout(mainLayout);
 
@@ -157,9 +165,11 @@ LineTestPane::LineTestPane(QWidget *parent, Qt::WFlags flags)
 
 	initializeTitleBar(getTitleBar());
 
-	ret = ret && connect(&m_mixAudioThread, SIGNAL(computedBuffer()), this, SLOT(onComputedBuffer()), Qt::DirectConnection);
+	ret = ret && connect(&m_mixAudioThread, SIGNAL(computedBuffer()), this,
+						 SLOT(onComputedBuffer()), Qt::DirectConnection);
 
-	ret = ret && connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this, SLOT(onSceneSwitched()));
+	ret = ret &&
+		  connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this, SLOT(onSceneSwitched()));
 
 	assert(ret);
 	setCurrentViewType(0);
@@ -191,9 +201,11 @@ void LineTestPane::showEvent(QShowEvent *)
 	ret = ret && connect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
 	ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this, SLOT(changeWindowTitle()));
 
-	ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this, SLOT(onXshLevelSwitched(TXshLevel *)));
+	ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+						 SLOT(onXshLevelSwitched(TXshLevel *)));
 	ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(changeWindowTitle()));
-	ret = ret && connect(levelHandle, SIGNAL(xshLevelTitleChanged()), this, SLOT(changeWindowTitle()));
+	ret = ret &&
+		  connect(levelHandle, SIGNAL(xshLevelTitleChanged()), this, SLOT(changeWindowTitle()));
 	ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(updateFrameRange()));
 
 	ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(changeWindowTitle()));
@@ -202,7 +214,7 @@ void LineTestPane::showEvent(QShowEvent *)
 
 	assert(ret);
 
-	//Aggiorno FPS al valore definito nel viewer corrente.
+	// Aggiorno FPS al valore definito nel viewer corrente.
 	m_flipConsole->setActive(true);
 }
 
@@ -222,7 +234,8 @@ void LineTestPane::hideEvent(QHideEvent *)
 	disconnect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
 	disconnect(sceneHandle, SIGNAL(nameSceneChanged()), this, SLOT(changeWindowTitle()));
 
-	disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this, SLOT(onXshLevelSwitched(TXshLevel *)));
+	disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+			   SLOT(onXshLevelSwitched(TXshLevel *)));
 	disconnect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(changeWindowTitle()));
 	disconnect(levelHandle, SIGNAL(xshLevelTitleChanged()), this, SLOT(changeWindowTitle()));
 	disconnect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(updateFrameRange()));
@@ -253,11 +266,11 @@ int LineTestPane::computeBufferSize(int frame)
 			time = time * 0.5;
 	}
 	bufferSize = tfloor(frameRate * time) + 1;
-	//qDebug("BUFFER SIZE: %d", bufferSize);
+	// qDebug("BUFFER SIZE: %d", bufferSize);
 
 	if (frame + bufferSize > m_endPlayRange) {
 		bufferSize = m_endPlayRange - frame + 1;
-		//qDebug("\n BUFFER SIZE: %d \n", bufferSize);
+		// qDebug("\n BUFFER SIZE: %d \n", bufferSize);
 	}
 
 	return bufferSize;
@@ -269,12 +282,12 @@ void LineTestPane::computeBuffer(int frame)
 {
 	int startFrame = m_trackStartFrame + m_bufferSize;
 	if (startFrame >= m_endPlayRange) {
-		//qDebug("\n OPS \n");
+		// qDebug("\n OPS \n");
 		return;
 	}
-	//qDebug("COMPUTE BUFFER SIZE AT FRAME: %d", startFrame);
+	// qDebug("COMPUTE BUFFER SIZE AT FRAME: %d", startFrame);
 	m_nextBufferSize = computeBufferSize(startFrame);
-	//qDebug("start frame: %d, start next buffer size: %d", startFrame, m_nextBufferSize);
+	// qDebug("start frame: %d, start next buffer size: %d", startFrame, m_nextBufferSize);
 	m_mixAudioThread.computeBuffer(startFrame, startFrame + m_nextBufferSize);
 }
 
@@ -297,10 +310,10 @@ void LineTestPane::initSound()
 	}
 
 	m_bufferSize = computeBufferSize(m_trackStartFrame);
-	//qDebug("initSound()");
-	//qDebug("m_startPlayRange: %d", m_startPlayRange);
-	//qDebug("m_endPlayRange: %d", m_endPlayRange);
-	//qDebug("start frame: %d, start bufferSize: %d", m_trackStartFrame, m_bufferSize);
+	// qDebug("initSound()");
+	// qDebug("m_startPlayRange: %d", m_startPlayRange);
+	// qDebug("m_endPlayRange: %d", m_endPlayRange);
+	// qDebug("start frame: %d, start bufferSize: %d", m_trackStartFrame, m_bufferSize);
 
 	if (xsh) {
 		if (!m_player)
@@ -311,10 +324,10 @@ void LineTestPane::initSound()
 		prop->m_toFrame = m_trackStartFrame + m_bufferSize;
 		m_mainTrack = xsh->makeSound(prop);
 		if (m_trackStartFrame == m_startPlayRange) {
-			//qDebug("set start track");
+			// qDebug("set start track");
 			m_startTrack = m_mainTrack;
 			m_startBufferSize = m_bufferSize;
-		} else //compute start track (it's necessary to avoid async in loop)
+		} else // compute start track (it's necessary to avoid async in loop)
 		{
 			m_startBufferSize = computeBufferSize(m_startPlayRange);
 			TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
@@ -336,10 +349,11 @@ void LineTestPane::playSound()
 	if (m_player && m_mainTrack) {
 		try {
 			int currentFrame = TApp::instance()->getCurrentFrame()->getFrame();
-			double t0 = (double)(currentFrame - m_trackStartFrame) / (double)(m_mainTrack->getSampleRate());
+			double t0 =
+				(double)(currentFrame - m_trackStartFrame) / (double)(m_mainTrack->getSampleRate());
 			// Pay attention at don't call play everytime (there is a big leak otherwise !)
 			double trackDuration = m_mainTrack->getDuration();
-			//qDebug("trackDuration: %f", trackDuration);
+			// qDebug("trackDuration: %f", trackDuration);
 			if (m_mainTrack && trackDuration != 0)
 				if (trackDuration > t0)
 					m_player->play(m_mainTrack, t0, trackDuration);
@@ -360,8 +374,9 @@ void LineTestPane::initializeTitleBar(TPanelTitleBar *titleBar)
 	int iconWidth = 17;
 	TPanelTitleBarButton *button;
 
-	m_cameraStandButton = new TPanelTitleBarButton(titleBar, ":Resources/standard.png",
-												   ":Resources/standard_over.png", ":Resources/standard_on.png");
+	m_cameraStandButton =
+		new TPanelTitleBarButton(titleBar, ":Resources/standard.png",
+								 ":Resources/standard_over.png", ":Resources/standard_on.png");
 	m_cameraStandButton->setToolTip("Camera Stand View");
 	x += 18 + iconWidth;
 	titleBar->add(QPoint(x, 2), m_cameraStandButton);
@@ -369,13 +384,15 @@ void LineTestPane::initializeTitleBar(TPanelTitleBar *titleBar)
 	m_cameraStandButton->setPressed(true);
 
 	m_previewButton = new TPanelTitleBarButton(titleBar, ":Resources/viewpreview.png",
-											   ":Resources/viewpreview_over.png", ":Resources/viewpreview_on.png");
+											   ":Resources/viewpreview_over.png",
+											   ":Resources/viewpreview_on.png");
 	m_previewButton->setToolTip(tr("Preview"));
 	x += 5 + iconWidth;
 	titleBar->add(QPoint(x, 2), m_previewButton);
 	m_previewButton->setButtonSet(viewModeButtonSet, 1);
 
-	ret = ret && connect(viewModeButtonSet, SIGNAL(selected(int)), this, SLOT(setCurrentViewType(int)));
+	ret = ret &&
+		  connect(viewModeButtonSet, SIGNAL(selected(int)), this, SLOT(setCurrentViewType(int)));
 	assert(ret);
 }
 
@@ -424,7 +441,8 @@ void LineTestPane::changeWindowTitle()
 		TXshLevel *level = app->getCurrentLevel()->getLevel();
 		if (level) {
 			TFilePath fp(level->getName());
-			QString imageName = QString::fromStdWString(fp.withFrame(app->getCurrentFrame()->getFid()).getWideString());
+			QString imageName = QString::fromStdWString(
+				fp.withFrame(app->getCurrentFrame()->getFid()).getWideString());
 			name = name + tr("Level: ") + imageName;
 		}
 	}
@@ -432,7 +450,8 @@ void LineTestPane::changeWindowTitle()
 		TAffine aff = m_sceneViewer->getViewMatrix() * m_sceneViewer->getNormalZoomScale().inv();
 		name = name + "  ::  Zoom : " + QString::number(tround(100.0 * sqrt(aff.det()))) + "%";
 	} else {
-		TAffine aff = m_lineTestViewer->getViewMatrix() * m_lineTestViewer->getNormalZoomScale().inv();
+		TAffine aff =
+			m_lineTestViewer->getViewMatrix() * m_lineTestViewer->getNormalZoomScale().inv();
 		name = name + "  ::  Zoom : " + QString::number(tround(100.0 * sqrt(aff.det()))) + "%";
 	}
 
@@ -504,22 +523,24 @@ void LineTestPane::onDrawFrame(int frame, const ImagePainter::VisualSettings &se
 	if (frame != frameHandle->getFrameIndex() + 1) {
 		int oldFrame = frameHandle->getFrame();
 		frameHandle->setCurrentFrame(frame);
-		if (!m_mainTrack && !frameHandle->isPlaying() && !frameHandle->isEditingLevel() && oldFrame != frameHandle->getFrame())
-			frameHandle->scrubXsheet(frame - 1, frame - 1, TApp::instance()->getCurrentXsheet()->getXsheet());
+		if (!m_mainTrack && !frameHandle->isPlaying() && !frameHandle->isEditingLevel() &&
+			oldFrame != frameHandle->getFrame())
+			frameHandle->scrubXsheet(frame - 1, frame - 1,
+									 TApp::instance()->getCurrentXsheet()->getXsheet());
 
-		//qDebug("frame: %d",frame);
+		// qDebug("frame: %d",frame);
 		if (m_mainTrack && frameHandle->isPlaying() && !frameHandle->isEditingLevel()) {
 			if (frame == m_startPlayRange + 1) {
 				if (m_startTrack) {
 					m_mainTrack = m_startTrack;
 					m_trackStartFrame = frame;
-					//qDebug("1. play at m_trackStartFrame: %d", m_trackStartFrame);
+					// qDebug("1. play at m_trackStartFrame: %d", m_trackStartFrame);
 					playSound();
 
 					m_bufferSize = m_startBufferSize;
 					computeBuffer(frame);
 				} else {
-					//qDebug("2. play at m_trackStartFrame: %d", m_trackStartFrame);
+					// qDebug("2. play at m_trackStartFrame: %d", m_trackStartFrame);
 					assert(0);
 					initSound();
 				}
@@ -530,10 +551,10 @@ void LineTestPane::onDrawFrame(int frame, const ImagePainter::VisualSettings &se
 					m_mainTrack = m_buffer->clone();
 
 				m_trackStartFrame = frame;
-				//qDebug("PLAY SOUND AT FRAME: %d", frame);
+				// qDebug("PLAY SOUND AT FRAME: %d", frame);
 				playSound();
 
-				//qDebug("3. play at m_trackStartFrame: %d", m_trackStartFrame);
+				// qDebug("3. play at m_trackStartFrame: %d", m_trackStartFrame);
 				m_bufferSize = m_nextBufferSize;
 				computeBuffer(frame);
 			}
@@ -603,7 +624,12 @@ void LineTestPane::onSceneSwitched()
 {
 	if (!isHidden())
 		onSceneChanged();
-	m_flipConsole->setFrameRate(TApp::instance()->getCurrentScene()->getScene()->getProperties()->getOutputProperties()->getFrameRate());
+	m_flipConsole->setFrameRate(TApp::instance()
+									->getCurrentScene()
+									->getScene()
+									->getProperties()
+									->getOutputProperties()
+									->getFrameRate());
 }
 
 //-----------------------------------------------------------------------------

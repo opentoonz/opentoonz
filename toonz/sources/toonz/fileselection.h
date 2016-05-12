@@ -18,7 +18,7 @@ class FileSelection : public DvItemSelection
 	QList<InfoViewer *> m_infoViewers;
 	ExportScenePopup *m_exportScenePopup;
 
-public:
+  public:
 	FileSelection();
 	~FileSelection();
 
@@ -47,4 +47,4 @@ public:
 	void selectAll();
 };
 
-#endif //FILESELECTION_H
+#endif // FILESELECTION_H

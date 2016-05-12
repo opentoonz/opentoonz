@@ -16,7 +16,7 @@ class DVAPI CenterlineVectorizer : public Wrapper
 	Q_OBJECT
 	CenterlineConfiguration *m_parameters;
 
-public:
+  public:
 	CenterlineVectorizer();
 	~CenterlineVectorizer();
 
@@ -41,7 +41,8 @@ public:
 	double getMaxThickness() const;
 	void setMaxThickness(double v);
 
-	Q_PROPERTY(double thicknessCalibration READ getThicknessCalibration WRITE setThicknessCalibration)
+	Q_PROPERTY(
+		double thicknessCalibration READ getThicknessCalibration WRITE setThicknessCalibration)
 	double getThicknessCalibration() const;
 	void setThicknessCalibration(double v);
 
@@ -57,7 +58,7 @@ public:
 	bool getEir() const;
 	void setEir(bool v);
 
-private:
+  private:
 	QScriptValue vectorizeImage(const TImageP &src1, TPalette *palette);
 };
 

@@ -110,7 +110,8 @@ void setMaxMatte(TRasterP r)
 char *strsave(const char *t)
 {
 	char *s;
-	s = (char *)malloc(strlen(t) + 1); // I'm almost sure that this malloc is LEAKED! Please, check that !
+	s = (char *)malloc(strlen(t) +
+					   1); // I'm almost sure that this malloc is LEAKED! Please, check that !
 	strcpy(s, t);
 	return s;
 }
@@ -149,19 +150,18 @@ inline QString traduce(const TRectD &rect, const TRenderSettings &info)
 {
 	return "[" + QString::number(rect.x0) + " " + QString::number(rect.y0) + " " +
 		   QString::number(rect.x1) + " " + QString::number(rect.y1) + "]; aff = (" +
-		   QString::number(info.m_affine.a11, 'f') + " " +
-		   QString::number(info.m_affine.a12, 'f') + " " +
-		   QString::number(info.m_affine.a13, 'f') + " " +
-		   QString::number(info.m_affine.a21, 'f') + " " +
-		   QString::number(info.m_affine.a22, 'f') + " " +
-		   QString::number(info.m_affine.a23, 'f') + ")";
+		   QString::number(info.m_affine.a11, 'f') + " " + QString::number(info.m_affine.a12, 'f') +
+		   " " + QString::number(info.m_affine.a13, 'f') + " " +
+		   QString::number(info.m_affine.a21, 'f') + " " + QString::number(info.m_affine.a22, 'f') +
+		   " " + QString::number(info.m_affine.a23, 'f') + ")";
 }
 
 //-------------------------------------------------------------------
 
 inline int colorDistance(const TPixel32 &c0, const TPixel32 &c1)
 {
-	return (c0.r - c1.r) * (c0.r - c1.r) + (c0.g - c1.g) * (c0.g - c1.g) + (c0.b - c1.b) * (c0.b - c1.b);
+	return (c0.r - c1.r) * (c0.r - c1.r) + (c0.g - c1.g) * (c0.g - c1.g) +
+		   (c0.b - c1.b) * (c0.b - c1.b);
 }
 
 //-------------------------------------------------------------------
@@ -171,7 +171,7 @@ std::string getAlias(TXsheet *xsh, double frame, const TRenderSettings &info)
 	TFxSet *fxs = xsh->getFxDag()->getTerminalFxs();
 	std::string alias;
 
-	//Add the alias for each
+	// Add the alias for each
 	for (int i = 0; i < fxs->getFxCount(); ++i) {
 		TRasterFx *fx = dynamic_cast<TRasterFx *>(fxs->getFx(i));
 		assert(fx);
@@ -194,25 +194,30 @@ bool vectorMustApplyCmappedFx(const std::vector<TRasterFxRenderDataP> &fxs)
 {
 	std::vector<TRasterFxRenderDataP>::const_iterator ft, fEnd(fxs.end());
 	for (ft = fxs.begin(); ft != fEnd; ++ft) {
-		PaletteFilterFxRenderData *paletteFilterData = dynamic_cast<PaletteFilterFxRenderData *>(ft->getPointer());
+		PaletteFilterFxRenderData *paletteFilterData =
+			dynamic_cast<PaletteFilterFxRenderData *>(ft->getPointer());
 		SandorFxRenderData *sandorData = dynamic_cast<SandorFxRenderData *>(ft->getPointer());
 
-		// (Daniele) Sandor fxs perform on raster colormaps *only* - while texture fxs use palette filters to work.
-		// In the latter case, vector-to-colormap conversion makes sure that regions are not rendered under full ink
+		// (Daniele) Sandor fxs perform on raster colormaps *only* - while texture fxs use palette
+		// filters to work.
+		// In the latter case, vector-to-colormap conversion makes sure that regions are not
+		// rendered under full ink
 		// pixels (which causes problems**).
-		if (sandorData || (paletteFilterData && paletteFilterData->m_type != ::eApplyToInksAndPaints))
+		if (sandorData ||
+			(paletteFilterData && paletteFilterData->m_type != ::eApplyToInksAndPaints))
 			return true;
 
 		/*
-      (Daniele) Disregarding the above reasons - palette filter fxs do not forcibly return true.
-      
-      Err... ok, my fault - when I wrote that, I forgot to specify WHICH problems** occurred. Whops!
+	  (Daniele) Disregarding the above reasons - palette filter fxs do not forcibly return true.
 
-      Now, it happens that if palette filters DO NOT convert to colormapped forcedly, special styles can be
-      retained... so, let's see what happens.
-      
-      Will have to inquire further, though...
-    */
+	  Err... ok, my fault - when I wrote that, I forgot to specify WHICH problems** occurred. Whops!
+
+	  Now, it happens that if palette filters DO NOT convert to colormapped forcedly, special styles
+	  can be
+	  retained... so, let's see what happens.
+
+	  Will have to inquire further, though...
+	*/
 	}
 
 	return false;
@@ -245,15 +250,16 @@ int getEnlargement(const std::vector<TRasterFxRenderDataP> &fxs, double scale)
 		if (sandorData) {
 			switch (sandorData->m_type) {
 			case BlendTz: {
-				//Nothing happen, unless we have color 0 among the blended ones. In such case,
-				//we have to enlarge the bbox proportionally to the amount param.
+				// Nothing happen, unless we have color 0 among the blended ones. In such case,
+				// we have to enlarge the bbox proportionally to the amount param.
 				std::vector<std::string> items;
 				std::string indexes = std::string(sandorData->m_argv[0]);
 				parseIndexes(indexes, items);
 				PaletteFilterFxRenderData paletteFilterData;
 				insertIndexes(items, &paletteFilterData);
 
-				if (!paletteFilterData.m_colors.empty() && *paletteFilterData.m_colors.begin() == 0) {
+				if (!paletteFilterData.m_colors.empty() &&
+					*paletteFilterData.m_colors.begin() == 0) {
 					BlendTzParams &params = sandorData->m_blendParams;
 					enlargement = params.m_amount * scale;
 				}
@@ -262,23 +268,21 @@ int getEnlargement(const std::vector<TRasterFxRenderDataP> &fxs, double scale)
 			}
 
 			case Calligraphic:
-			case OutBorder:
-				{
-					CalligraphicParams &params = sandorData->m_callParams;
-					enlargement = params.m_thickness * scale;
+			case OutBorder: {
+				CalligraphicParams &params = sandorData->m_callParams;
+				enlargement = params.m_thickness * scale;
 
-					break;
-				}
+				break;
+			}
 
-			case ArtAtContour:
-				{
-					ArtAtContourParams &params = sandorData->m_contourParams;
-					enlargement =
-						tmax(tceil(sandorData->m_controllerBBox.getLx()), tceil(sandorData->m_controllerBBox.getLy())) *
-						params.m_maxSize;
+			case ArtAtContour: {
+				ArtAtContourParams &params = sandorData->m_contourParams;
+				enlargement = tmax(tceil(sandorData->m_controllerBBox.getLx()),
+								   tceil(sandorData->m_controllerBBox.getLy())) *
+							  params.m_maxSize;
 
-					break;
-				}
+				break;
+			}
 			}
 		}
 	}
@@ -337,10 +341,8 @@ inline bool fxLess(TRasterFxRenderDataP a, TRasterFxRenderDataP b)
 	if (!sandorDataB)
 		return true;
 
-	int aIndex =
-		sandorDataA->m_type == OutBorder ? 2 : sandorDataA->m_type == BlendTz ? 1 : 0;
-	int bIndex =
-		sandorDataB->m_type == OutBorder ? 2 : sandorDataB->m_type == BlendTz ? 1 : 0;
+	int aIndex = sandorDataA->m_type == OutBorder ? 2 : sandorDataA->m_type == BlendTz ? 1 : 0;
+	int bIndex = sandorDataB->m_type == OutBorder ? 2 : sandorDataB->m_type == BlendTz ? 1 : 0;
 
 	return aIndex < bIndex;
 }
@@ -382,31 +384,34 @@ std::vector<int> getAllBut(std::vector<int> &colorIds)
 //! necessary informations before calling it - however, since the intent was that of
 //! optimizing memory usage, please avoid copying the entire image buffer...
 
-TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP> &fxs, int frame, double scale)
+TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP> &fxs, int frame,
+					   double scale)
 {
 	TImageP result = ti;
-	TTile resultTile; //Just a quick wrapper to the ImageCache
+	TTile resultTile; // Just a quick wrapper to the ImageCache
 	TPalette *inPalette, *tempPlt;
 	TPaletteP filteredPalette;
 	TRasterCM32P copyRas;
 	std::string cmRasCacheId;
 
-	//Retrieve the image dpi
+	// Retrieve the image dpi
 	double dpiX, dpiY;
 	ti->getDpi(dpiX, dpiY);
 	double dpi = (dpiX > 0) ? dpiX / Stage::inch : 1.0;
 
-	//First, sort the fxs.
+	// First, sort the fxs.
 	std::vector<TRasterFxRenderDataP> fxsCopy = fxs;
 	sortCmappedFxs(fxsCopy);
 
-	//First, let's deal with all fxs working on palettes
+	// First, let's deal with all fxs working on palettes
 	inPalette = ti->getPalette();
 
 	std::vector<TRasterFxRenderDataP>::reverse_iterator it;
 	for (it = fxsCopy.rbegin(); it != fxsCopy.rend(); ++it) {
-		ExternalPaletteFxRenderData *extpltData = dynamic_cast<ExternalPaletteFxRenderData *>((*it).getPointer());
-		PaletteFilterFxRenderData *PaletteFilterData = dynamic_cast<PaletteFilterFxRenderData *>((*it).getPointer());
+		ExternalPaletteFxRenderData *extpltData =
+			dynamic_cast<ExternalPaletteFxRenderData *>((*it).getPointer());
+		PaletteFilterFxRenderData *PaletteFilterData =
+			dynamic_cast<PaletteFilterFxRenderData *>((*it).getPointer());
 		if (extpltData && extpltData->m_palette) {
 			filteredPalette = extpltData->m_palette->clone();
 			filteredPalette->setFrame(frame);
@@ -416,7 +421,7 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 			set<int> colors;
 			colors.insert(PaletteFilterData->m_colors.begin(), PaletteFilterData->m_colors.end());
 
-			//Apply the palette filters
+			// Apply the palette filters
 			tempPlt = filteredPalette.getPointer();
 			applyPaletteFilter(tempPlt, keep, colors, inPalette);
 			filteredPalette = tempPlt;
@@ -426,22 +431,23 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 	}
 
 	if (filteredPalette) {
-		//result= ti = ti->clone();   //Is copying truly necessary??
+		// result= ti = ti->clone();   //Is copying truly necessary??
 		result = ti = TToonzImageP(ti->getRaster(), ti->getSavebox());
 		filteredPalette->setFrame(frame);
 		ti->setPalette(filteredPalette.getPointer());
 	}
 
-	//Next, deal with fxs working on colormaps themselves
+	// Next, deal with fxs working on colormaps themselves
 	bool firstSandorFx = true;
 	TRasterCM32P cmRas = ti->getRaster();
 	TRect tiSaveBox(ti->getSavebox());
 	TPaletteP tiPalette(ti->getPalette());
-	ti = 0; //Release the reference to colormap
+	ti = 0; // Release the reference to colormap
 
-	//Now, apply cmapped->cmapped fxs
+	// Now, apply cmapped->cmapped fxs
 	for (it = fxsCopy.rbegin(); it != fxsCopy.rend(); ++it) {
-		PaletteFilterFxRenderData *PaletteFilterData = dynamic_cast<PaletteFilterFxRenderData *>(it->getPointer());
+		PaletteFilterFxRenderData *PaletteFilterData =
+			dynamic_cast<PaletteFilterFxRenderData *>(it->getPointer());
 		if (PaletteFilterData && PaletteFilterData->m_type != eApplyToInksAndPaints) {
 			std::vector<int> indexes;
 			indexes.resize(PaletteFilterData->m_colors.size());
@@ -451,19 +457,29 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 				indexes[j] = *jt;
 
 			if (copyRas == TRasterCM32P())
-				copyRas = cmRas->clone(); //Pixels are literally cleared on a copy buffer
+				copyRas = cmRas->clone(); // Pixels are literally cleared on a copy buffer
 
 			/*-- 処理するIndexを反転 --*/
 			if (PaletteFilterData->m_keep)
 				indexes = getAllBut(indexes);
 
 			/*-- Paintの消去（"Lines Including All Areas"のみ、Areaに何も操作をしない） --*/
-			if (PaletteFilterData->m_type != eApplyToInksKeepingAllPaints) //se non e' eApplyToInksKeepingAllPaints, sicuramente devo cancellare dei paint
-				TRop::eraseColors(copyRas, PaletteFilterData->m_type == eApplyToInksDeletingAllPaints ? 0 : &indexes, false);
+			if (PaletteFilterData->m_type !=
+				eApplyToInksKeepingAllPaints) // se non e' eApplyToInksKeepingAllPaints, sicuramente
+											  // devo cancellare dei paint
+				TRop::eraseColors(
+					copyRas,
+					PaletteFilterData->m_type == eApplyToInksDeletingAllPaints ? 0 : &indexes,
+					false);
 
 			/*-- Inkの消去 --*/
-			if (PaletteFilterData->m_type != eApplyToPaintsKeepingAllInks) //se non e' eApplyToPaintsKeepingAllInks, sicuramente devo cancellare degli ink
-				TRop::eraseColors(copyRas, PaletteFilterData->m_type == eApplyToPaintsDeletingAllInks ? 0 : &indexes, true);
+			if (PaletteFilterData->m_type !=
+				eApplyToPaintsKeepingAllInks) // se non e' eApplyToPaintsKeepingAllInks, sicuramente
+											  // devo cancellare degli ink
+				TRop::eraseColors(
+					copyRas,
+					PaletteFilterData->m_type == eApplyToPaintsDeletingAllInks ? 0 : &indexes,
+					true);
 		}
 	}
 
@@ -473,9 +489,9 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 		result->setPalette(tiPalette.getPointer());
 	}
 
-	//Finally, apply cmapped->fullcolor fxs
+	// Finally, apply cmapped->fullcolor fxs
 
-	//Prefetch all Blend fxs
+	// Prefetch all Blend fxs
 	std::vector<BlendParam> blendParams;
 	for (it = fxsCopy.rbegin(); it != fxsCopy.rend(); ++it) {
 		SandorFxRenderData *sandorData = dynamic_cast<SandorFxRenderData *>(it->getPointer());
@@ -488,7 +504,7 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 
 			param.superSampling = sandorData->m_blendParams.m_superSampling;
 
-			//Build the color indexes
+			// Build the color indexes
 			std::vector<std::string> items;
 			std::string indexes = std::string(sandorData->m_argv[0]);
 			parseIndexes(indexes, items);
@@ -498,28 +514,30 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 			param.colorsIndexes.reserve(paletteFilterData.m_colors.size());
 
 			std::set<int>::iterator it;
-			for (it = paletteFilterData.m_colors.begin(); it != paletteFilterData.m_colors.end(); ++it)
+			for (it = paletteFilterData.m_colors.begin(); it != paletteFilterData.m_colors.end();
+				 ++it)
 				param.colorsIndexes.push_back(*it);
 
 			blendParams.push_back(param);
 		}
 	}
 
-	//Apply each sandor
+	// Apply each sandor
 	for (it = fxsCopy.rbegin(); it != fxsCopy.rend(); ++it) {
 		SandorFxRenderData *sandorData = dynamic_cast<SandorFxRenderData *>(it->getPointer());
 
 		if (sandorData) {
-			//Avoid dealing with specific cases
+			// Avoid dealing with specific cases
 			if ((sandorData->m_type == BlendTz && blendParams.empty()) ||
 				(sandorData->m_type == OutBorder && !firstSandorFx))
 				continue;
 
 			if (!firstSandorFx) {
-				//Retrieve the colormap from cache
+				// Retrieve the colormap from cache
 				cmRas = TToonzImageP(TImageCache::instance()->get(cmRasCacheId, true))->getRaster();
 
-				//Apply a palette filter in order to keep only the colors specified in the sandor argv
+				// Apply a palette filter in order to keep only the colors specified in the sandor
+				// argv
 				std::vector<std::string> items;
 				std::string indexes = std::string(sandorData->m_argv[0]);
 				parseIndexes(indexes, items);
@@ -527,19 +545,22 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 				insertIndexes(items, &paletteFilterData);
 
 				filteredPalette = tempPlt = 0;
-				applyPaletteFilter(tempPlt, true, paletteFilterData.m_colors, tiPalette.getPointer());
+				applyPaletteFilter(tempPlt, true, paletteFilterData.m_colors,
+								   tiPalette.getPointer());
 				filteredPalette = tempPlt;
 			} else {
-				//Pass the input colormap to the cache and release its reference as final result
+				// Pass the input colormap to the cache and release its reference as final result
 				cmRasCacheId = TImageCache::instance()->getUniqueId();
 				TImageCache::instance()->add(cmRasCacheId, TToonzImageP(cmRas, tiSaveBox));
 				result = 0;
 			}
 
-			//Convert current smart pointers to a 4.6 'fashion'. The former ones are released - so they
-			//do not occupy smart object references.
+			// Convert current smart pointers to a 4.6 'fashion'. The former ones are released - so
+			// they
+			// do not occupy smart object references.
 			RASTER *oldRasterIn, *oldRasterOut;
-			oldRasterIn = TRop::convertRaster50to46(cmRas, filteredPalette ? filteredPalette : tiPalette.getPointer());
+			oldRasterIn = TRop::convertRaster50to46(
+				cmRas, filteredPalette ? filteredPalette : tiPalette.getPointer());
 			cmRas = TRasterCM32P(0);
 			{
 				TRaster32P rasterOut(TDimension(oldRasterIn->lx, oldRasterIn->ly));
@@ -551,13 +572,15 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 				if (blendParams.empty())
 					continue;
 
-				//Retrieve the colormap from cache
+				// Retrieve the colormap from cache
 				cmRas = TToonzImageP(TImageCache::instance()->get(cmRasCacheId, true))->getRaster();
 
 				TToonzImageP ti(cmRas, tiSaveBox);
-				ti->setPalette(filteredPalette ? filteredPalette.getPointer() : tiPalette.getPointer());
+				ti->setPalette(filteredPalette ? filteredPalette.getPointer()
+											   : tiPalette.getPointer());
 
-				TRasterImageP riOut(TImageCache::instance()->get(std::string(oldRasterOut->cacheId, oldRasterOut->cacheIdLength), true));
+				TRasterImageP riOut(TImageCache::instance()->get(
+					std::string(oldRasterOut->cacheId, oldRasterOut->cacheIdLength), true));
 				TRaster32P rasterOut = riOut->getRaster();
 
 				blend(ti, rasterOut, blendParams);
@@ -568,46 +591,47 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 
 			case Calligraphic:
 			case OutBorder: {
-					if (sandorData->m_type == OutBorder && !firstSandorFx)
-						continue;
+				if (sandorData->m_type == OutBorder && !firstSandorFx)
+					continue;
 
-					const char *argv[12];
-					memcpy(argv, sandorData->m_argv, 12 * sizeof(const char *));
+				const char *argv[12];
+				memcpy(argv, sandorData->m_argv, 12 * sizeof(const char *));
 
-					double thickness = toDouble(std::string(sandorData->m_argv[7])) * scale * dpi;
-					argv[7] = strsave(toString(thickness).c_str());
+				double thickness = toDouble(std::string(sandorData->m_argv[7])) * scale * dpi;
+				argv[7] = strsave(toString(thickness).c_str());
 
-					calligraph(oldRasterIn, oldRasterOut, sandorData->m_border, sandorData->m_argc,
-							   argv, sandorData->m_shrink, sandorData->m_type == OutBorder);
+				calligraph(oldRasterIn, oldRasterOut, sandorData->m_border, sandorData->m_argc,
+						   argv, sandorData->m_shrink, sandorData->m_type == OutBorder);
 
-					break;
-				}
+				break;
+			}
 			case ArtAtContour: {
-					const char *argv[12];
-					memcpy(argv, sandorData->m_argv, 12 * sizeof(const char *));
+				const char *argv[12];
+				memcpy(argv, sandorData->m_argv, 12 * sizeof(const char *));
 
-					double distance = toDouble(std::string(sandorData->m_argv[6])) * scale * dpi;
-					argv[6] = strsave(toString(distance).c_str());
-					distance = toDouble(std::string(sandorData->m_argv[7])) * scale * dpi;
-					argv[7] = strsave(toString(distance).c_str());
-					double density = toDouble(std::string(sandorData->m_argv[8])) / sq(scale * dpi);
-					argv[8] = strsave(toString(density).c_str());
-					double size = toDouble(std::string(sandorData->m_argv[1])) * scale * dpi;
-					argv[1] = strsave(toString(size).c_str());
-					size = toDouble(std::string(sandorData->m_argv[2])) * scale * dpi;
-					argv[2] = strsave(toString(size).c_str());
-					RASTER *imgContour = TRop::convertRaster50to46(sandorData->m_controller, 0);
-					patternmap(oldRasterIn, oldRasterOut, sandorData->m_border, sandorData->m_argc,
-							   argv, sandorData->m_shrink, imgContour);
-					TRop::releaseRaster46(imgContour);
+				double distance = toDouble(std::string(sandorData->m_argv[6])) * scale * dpi;
+				argv[6] = strsave(toString(distance).c_str());
+				distance = toDouble(std::string(sandorData->m_argv[7])) * scale * dpi;
+				argv[7] = strsave(toString(distance).c_str());
+				double density = toDouble(std::string(sandorData->m_argv[8])) / sq(scale * dpi);
+				argv[8] = strsave(toString(density).c_str());
+				double size = toDouble(std::string(sandorData->m_argv[1])) * scale * dpi;
+				argv[1] = strsave(toString(size).c_str());
+				size = toDouble(std::string(sandorData->m_argv[2])) * scale * dpi;
+				argv[2] = strsave(toString(size).c_str());
+				RASTER *imgContour = TRop::convertRaster50to46(sandorData->m_controller, 0);
+				patternmap(oldRasterIn, oldRasterOut, sandorData->m_border, sandorData->m_argc,
+						   argv, sandorData->m_shrink, imgContour);
+				TRop::releaseRaster46(imgContour);
 
-					break;
-				}
+				break;
+			}
 			default:
 				assert(false);
 			}
 
-			TRasterImageP riOut(TImageCache::instance()->get(std::string(oldRasterOut->cacheId, oldRasterOut->cacheIdLength), true));
+			TRasterImageP riOut(TImageCache::instance()->get(
+				std::string(oldRasterOut->cacheId, oldRasterOut->cacheIdLength), true));
 			TRaster32P rasterOut = riOut->getRaster();
 
 			TRop::releaseRaster46(oldRasterIn);
@@ -621,7 +645,7 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 		}
 	}
 
-	//Release cmRas cache identifier if any
+	// Release cmRas cache identifier if any
 	TImageCache::instance()->remove(cmRasCacheId);
 
 	if (!result)
@@ -640,15 +664,18 @@ void applyCmappedFx(TVectorImageP &vi, const std::vector<TRasterFxRenderDataP> &
 	set<int> colors;
 	std::vector<TRasterFxRenderDataP>::const_iterator it = fxs.begin();
 
-	//prima tutti gli effetti che agiscono sulla paletta....
+	// prima tutti gli effetti che agiscono sulla paletta....
 	for (; it != fxs.end(); ++it) {
-		ExternalPaletteFxRenderData *extpltData = dynamic_cast<ExternalPaletteFxRenderData *>((*it).getPointer());
-		PaletteFilterFxRenderData *pltFilterData = dynamic_cast<PaletteFilterFxRenderData *>((*it).getPointer());
+		ExternalPaletteFxRenderData *extpltData =
+			dynamic_cast<ExternalPaletteFxRenderData *>((*it).getPointer());
+		PaletteFilterFxRenderData *pltFilterData =
+			dynamic_cast<PaletteFilterFxRenderData *>((*it).getPointer());
 
 		if (extpltData && extpltData->m_palette)
 			modPalette = extpltData->m_palette->clone();
 		else if (pltFilterData) {
-			assert(pltFilterData->m_type == eApplyToInksAndPaints); // Must have been converted to CM32 otherwise
+			assert(pltFilterData->m_type ==
+				   eApplyToInksAndPaints); // Must have been converted to CM32 otherwise
 
 			keep = pltFilterData->m_keep;
 			colors.insert(pltFilterData->m_colors.begin(), pltFilterData->m_colors.end());
@@ -681,19 +708,19 @@ class LevelFxBuilder : public ResourceBuilder
 
 	TRect m_rasBounds;
 
-public:
+  public:
 	LevelFxBuilder(const std::string &resourceName, double frame, const TRenderSettings &rs,
 				   TXshSimpleLevel *sl, TFrameId fid)
-		: ResourceBuilder(resourceName, 0, frame, rs), m_loadedRas(), m_palette(), m_sl(sl), m_fid(fid), m_64bit(rs.m_bpp == 64) {}
-
-	void setRasBounds(const TRect &rasBounds)
+		: ResourceBuilder(resourceName, 0, frame, rs), m_loadedRas(), m_palette(), m_sl(sl),
+		  m_fid(fid), m_64bit(rs.m_bpp == 64)
 	{
-		m_rasBounds = rasBounds;
 	}
+
+	void setRasBounds(const TRect &rasBounds) { m_rasBounds = rasBounds; }
 
 	void compute(const TRectD &tileRect)
 	{
-		//Load the image
+		// Load the image
 		TImageP img(m_sl->getFullsampledFrame(m_fid, (m_64bit ? ImageManager::is64bitEnabled : 0) |
 														 ImageManager::dontPutInCache));
 
@@ -703,7 +730,8 @@ public:
 		TRasterImageP rimg(img);
 		TToonzImageP timg(img);
 
-		m_loadedRas = rimg ? (TRasterP)rimg->getRaster() : timg ? (TRasterP)timg->getRaster() : TRasterP();
+		m_loadedRas =
+			rimg ? (TRasterP)rimg->getRaster() : timg ? (TRasterP)timg->getRaster() : TRasterP();
 		assert(m_loadedRas);
 
 		if (timg)
@@ -724,12 +752,12 @@ public:
 
 	bool download(TCacheResourceP &resource)
 	{
-		//If the image has been loaded in this builder, just use it
+		// If the image has been loaded in this builder, just use it
 		if (m_loadedRas)
 			return true;
 
-		//If the image has yet to be loaded by this builder, skip without
-		//allocating anything
+		// If the image has yet to be loaded by this builder, skip without
+		// allocating anything
 		if (resource->canDownloadAll(m_rasBounds)) {
 			m_loadedRas = resource->buildCompatibleRaster(m_rasBounds.getSize());
 			resource->downloadPalette(m_palette);
@@ -745,7 +773,8 @@ public:
 
 		TRasterCM32P cm(m_loadedRas);
 
-		TImageP result(cm ? TImageP(TToonzImageP(cm, cm->getBounds())) : TImageP(TRasterImageP(m_loadedRas)));
+		TImageP result(cm ? TImageP(TToonzImageP(cm, cm->getBounds()))
+						  : TImageP(TRasterImageP(m_loadedRas)));
 		if (m_palette)
 			result->setPalette(m_palette.getPointer());
 
@@ -775,9 +804,9 @@ TLevelColumnFx::~TLevelColumnFx()
 
 bool TLevelColumnFx::canHandle(const TRenderSettings &info, double frame)
 {
-	//NOTE 1: Currently, it is necessary that level columns return FALSE for
-	//raster levels - just a quick way to tell the cache functions that they
-	//have to be cached.
+	// NOTE 1: Currently, it is necessary that level columns return FALSE for
+	// raster levels - just a quick way to tell the cache functions that they
+	// have to be cached.
 
 	if (!m_levelColumn)
 		return true;
@@ -809,7 +838,8 @@ TAffine TLevelColumnFx::handledAffine(const TRenderSettings &info, double frame)
 		return TAffine();
 
 	if (sl->getType() == PLI_XSHLEVEL)
-		return vectorMustApplyCmappedFx(info.m_data) ? TRasterFx::handledAffine(info, frame) : info.m_affine;
+		return vectorMustApplyCmappedFx(info.m_data) ? TRasterFx::handledAffine(info, frame)
+													 : info.m_affine;
 
 	// Accept any translation consistent with the image's pixels geometry
 	TImageInfo imageInfo;
@@ -900,8 +930,8 @@ void TLevelColumnFx::doDryCompute(TRectD &rect, double frame, const TRenderSetti
 	if (!sl)
 		return;
 
-	//In case this is a vector level, the image is renderized quickly and directly at the
-	//correct resolution. Caching is disabled in such case, at the moment.
+	// In case this is a vector level, the image is renderized quickly and directly at the
+	// correct resolution. Caching is disabled in such case, at the moment.
 	if (sl->getType() == PLI_XSHLEVEL)
 		return;
 
@@ -964,8 +994,7 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame, const TRenderSettings 
 	// Now, fetch the image
 	if (sl->getType() != PLI_XSHLEVEL) {
 		// Raster case
-		LevelFxBuilder builder(getAlias(frame, TRenderSettings()) + "_image",
-							   frame, info, sl, fid);
+		LevelFxBuilder builder(getAlias(frame, TRenderSettings()) + "_image", frame, info, sl, fid);
 
 		getImageInfo(imageInfo, sl, fid);
 		TRectD imgRect(0, 0, imageInfo.m_lx, imageInfo.m_ly);
@@ -977,16 +1006,18 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame, const TRenderSettings 
 	} else {
 		// Vector case (loading is immediate)
 		if (!img) {
-			img = sl->getFullsampledFrame(fid, ((info.m_bpp == 64) ? ImageManager::is64bitEnabled : 0) |
-												   ImageManager::dontPutInCache);
+			img = sl->getFullsampledFrame(fid,
+										  ((info.m_bpp == 64) ? ImageManager::is64bitEnabled : 0) |
+											  ImageManager::dontPutInCache);
 		}
 	}
 
-	//Extract the required geometry
+	// Extract the required geometry
 	TRect tileBounds(tile.getRaster()->getBounds());
-	TRectD tileRectD = TRectD(tileBounds.x0, tileBounds.y0, tileBounds.x1 + 1, tileBounds.y1 + 1) + tile.m_pos;
+	TRectD tileRectD =
+		TRectD(tileBounds.x0, tileBounds.y0, tileBounds.x1 + 1, tileBounds.y1 + 1) + tile.m_pos;
 
-	//To be sure, if there is no image, return.
+	// To be sure, if there is no image, return.
 	if (!img)
 		return;
 
@@ -1004,10 +1035,8 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame, const TRenderSettings 
 			bBox = info.m_affine * vectorImage->getBBox();
 			TDimension size(tile.getRaster()->getSize());
 
-			TAffine aff =
-				TTranslation(-tile.m_pos.x, -tile.m_pos.y) *
-				TScale(1.0 / info.m_shrinkX, 1.0 / info.m_shrinkY) *
-				info.m_affine;
+			TAffine aff = TTranslation(-tile.m_pos.x, -tile.m_pos.y) *
+						  TScale(1.0 / info.m_shrinkX, 1.0 / info.m_shrinkY) * info.m_affine;
 
 			applyCmappedFx(vectorImage, info.m_data, (int)frame);
 			TPalette *vpalette = vectorImage->getPalette();
@@ -1015,10 +1044,11 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame, const TRenderSettings 
 			m_isCachable = !vpalette->isAnimated();
 			int oldFrame = vpalette->getFrame();
 
-			TVectorRenderData rd(TVectorRenderData::ProductionSettings(),
-								 aff, TRect(size), vpalette);
+			TVectorRenderData rd(TVectorRenderData::ProductionSettings(), aff, TRect(size),
+								 vpalette);
 
-			if (!m_offlineContext || m_offlineContext->getLx() < size.lx || m_offlineContext->getLy() < size.ly) {
+			if (!m_offlineContext || m_offlineContext->getLx() < size.lx ||
+				m_offlineContext->getLy() < size.ly) {
 				if (m_offlineContext)
 					delete m_offlineContext;
 				m_offlineContext = new TOfflineGL(size);
@@ -1027,8 +1057,8 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame, const TRenderSettings 
 			m_offlineContext->makeCurrent();
 			m_offlineContext->clear(TPixel32(0, 0, 0, 0));
 
-			//If level has animated palette, it is necessary to lock palette's color against
-			//concurrents TPalette::setFrame.
+			// If level has animated palette, it is necessary to lock palette's color against
+			// concurrents TPalette::setFrame.
 			if (!m_isCachable)
 				vpalette->mutex()->lock();
 
@@ -1061,8 +1091,8 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame, const TRenderSettings 
 			TRaster32P ras32(ras);
 			TRaster64P ras64(ras);
 
-			//Ensure that ras is either a 32 or 64 fullcolor.
-			//Otherwise, we have to convert it.
+			// Ensure that ras is either a 32 or 64 fullcolor.
+			// Otherwise, we have to convert it.
 			if (!ras32 && !ras64) {
 				TRasterP tileRas(tile.getRaster());
 				TRaster32P tileRas32(tileRas);
@@ -1083,7 +1113,8 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame, const TRenderSettings 
 			TXsheet *txsh = sl->getScene()->getTopXsheet();
 
 			LevelProperties *levelProp = sl->getProperties();
-			if (Preferences::instance()->isIgnoreAlphaonColumn1Enabled() && m_levelColumn->getIndex() == 0 && isSubsheetChainOnColumn0(txsh, xsh, frame)) {
+			if (Preferences::instance()->isIgnoreAlphaonColumn1Enabled() &&
+				m_levelColumn->getIndex() == 0 && isSubsheetChainOnColumn0(txsh, xsh, frame)) {
 				TRasterP appRas(ras->clone());
 				setMaxMatte(appRas);
 				ras = appRas;
@@ -1120,7 +1151,7 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame, const TRenderSettings 
 		} else if (ti) {
 			// Colormap case
 
-			//Use the imageInfo's dpi
+			// Use the imageInfo's dpi
 			ti->setDpi(imageInfo.m_dpix, imageInfo.m_dpiy);
 
 			TImageP newImg = applyTzpFxs(ti, frame, info);
@@ -1150,34 +1181,37 @@ void TLevelColumnFx::doCompute(TTile &tile, double frame, const TRenderSettings 
 			assert(info.m_affine.isTranslation());
 			infoAux.m_data.clear();
 
-			//Place the output rect in the image's reference
+			// Place the output rect in the image's reference
 			tileRectD += TPointD(lx_2 - info.m_affine.a13, ly_2 - info.m_affine.a23);
 
-			//Then, retrieve loaded image's interesting region
+			// Then, retrieve loaded image's interesting region
 			TRectD inTileRectD;
 			if (ti) {
 				TRect saveBox(ti->getSavebox());
 				inTileRectD = TRectD(saveBox.x0, saveBox.y0, saveBox.x1 + 1, saveBox.y1 + 1);
 			} else {
 				TRect rasBounds(ras->getBounds());
-				inTileRectD = TRectD(rasBounds.x0, rasBounds.y0, rasBounds.x1 + 1, rasBounds.y1 + 1);
+				inTileRectD =
+					TRectD(rasBounds.x0, rasBounds.y0, rasBounds.x1 + 1, rasBounds.y1 + 1);
 			}
 
-			//And intersect the two
+			// And intersect the two
 			inTileRectD *= tileRectD;
 
-			//Should the intersection be void, return
+			// Should the intersection be void, return
 			if (inTileRectD.x0 >= inTileRectD.x1 || inTileRectD.y0 >= inTileRectD.y1)
 				return;
 
-			//Output that intersection in the requested tile
-			TRect inTileRect(tround(inTileRectD.x0), tround(inTileRectD.y0), tround(inTileRectD.x1) - 1, tround(inTileRectD.y1) - 1);
+			// Output that intersection in the requested tile
+			TRect inTileRect(tround(inTileRectD.x0), tround(inTileRectD.y0),
+							 tround(inTileRectD.x1) - 1, tround(inTileRectD.y1) - 1);
 			TTile inTile(ras->extract(inTileRect), inTileRectD.getP00() + TPointD(-lx_2, -ly_2));
 
-			//Observe that inTile is in the standard reference, ie image's minus the center coordinates
+			// Observe that inTile is in the standard reference, ie image's minus the center
+			// coordinates
 
 			if (ti) {
-				//In the colormapped case, we have to convert the cmap to fullcolor
+				// In the colormapped case, we have to convert the cmap to fullcolor
 				TPalette *palette = ti->getPalette();
 
 				if (!m_isCachable)
@@ -1226,28 +1260,28 @@ TImageP TLevelColumnFx::applyTzpFxs(TToonzImageP &ti, double frame, const TRende
 
 //-------------------------------------------------------------------
 
-void TLevelColumnFx::applyTzpFxsOnVector(
-	const TVectorImageP &vi,
-	TTile &tile, double frame, const TRenderSettings &info)
+void TLevelColumnFx::applyTzpFxsOnVector(const TVectorImageP &vi, TTile &tile, double frame,
+										 const TRenderSettings &info)
 {
 	TRect tileBounds(tile.getRaster()->getBounds());
-	TRectD tileRectD = TRectD(tileBounds.x0, tileBounds.y0, tileBounds.x1 + 1, tileBounds.y1 + 1) + tile.m_pos;
+	TRectD tileRectD =
+		TRectD(tileBounds.x0, tileBounds.y0, tileBounds.x1 + 1, tileBounds.y1 + 1) + tile.m_pos;
 
-	//Info's affine is not the identity only in case the loaded image is a vector one.
+	// Info's affine is not the identity only in case the loaded image is a vector one.
 	double scale = sqrt(fabs(info.m_affine.det()));
 	int enlargement = getEnlargement(info.m_data, scale);
 
-	//Extract the vector image's groups
+	// Extract the vector image's groups
 	std::vector<TVectorImageP> groupsList;
 	getGroupsList(vi, groupsList);
 
-	//For each group, apply the tzp fxs stored in info. The result is immediately converted
-	//to a raster image if necessary.
+	// For each group, apply the tzp fxs stored in info. The result is immediately converted
+	// to a raster image if necessary.
 	unsigned int i;
 	for (i = 0; i < groupsList.size(); ++i) {
 		TVectorImageP &groupVi = groupsList[i];
 
-		//Extract the group's bbox.
+		// Extract the group's bbox.
 		TRectD groupBBox(info.m_affine * groupVi->getBBox());
 		if (!mustApplySandorFx(info.m_data))
 			groupBBox *= tileRectD;
@@ -1257,7 +1291,7 @@ void TLevelColumnFx::applyTzpFxsOnVector(
 		if (groupBBox.x0 >= groupBBox.x1 || groupBBox.y0 >= groupBBox.y1)
 			continue;
 
-		//Ensure that groupBBox and tile have the same integer geometry
+		// Ensure that groupBBox and tile have the same integer geometry
 		groupBBox -= tile.m_pos;
 		groupBBox.x0 = tfloor(groupBBox.x0);
 		groupBBox.y0 = tfloor(groupBBox.y0);
@@ -1265,19 +1299,18 @@ void TLevelColumnFx::applyTzpFxsOnVector(
 		groupBBox.y1 = tceil(groupBBox.y1);
 		groupBBox += tile.m_pos;
 
-		//Build groupBBox's relative position to the tile
+		// Build groupBBox's relative position to the tile
 		TPoint groupRelativePosToTile(groupBBox.x0 - tile.m_pos.x, groupBBox.y0 - tile.m_pos.y);
 
-		//Convert the group to a strictly sufficient Toonz image
+		// Convert the group to a strictly sufficient Toonz image
 		TToonzImageP groupTi = ToonzImageUtils::vectorToToonzImage(
-			groupVi, info.m_affine, groupVi->getPalette(),
-			groupBBox.getP00(), TDimension(groupBBox.getLx(), groupBBox.getLy()),
-			&info.m_data, true);
+			groupVi, info.m_affine, groupVi->getPalette(), groupBBox.getP00(),
+			TDimension(groupBBox.getLx(), groupBBox.getLy()), &info.m_data, true);
 
-		//Apply the tzp fxs to the converted Toonz image
+		// Apply the tzp fxs to the converted Toonz image
 		TImageP groupResult = applyTzpFxs(groupTi, frame, info);
 
-		//If necessary, convert the result to fullcolor
+		// If necessary, convert the result to fullcolor
 		TRasterImageP groupRi = groupResult;
 		if (!groupRi) {
 			groupTi = groupResult;
@@ -1290,7 +1323,7 @@ void TLevelColumnFx::applyTzpFxsOnVector(
 			TRop::convert(tempRas, groupTiRas, groupTi->getPalette());
 		}
 
-		//Over the group image on the output
+		// Over the group image on the output
 		TRasterP tileRas(tile.getRaster());
 		TRop::over(tileRas, groupRi->getRaster(), groupRelativePosToTile);
 	}
@@ -1298,9 +1331,10 @@ void TLevelColumnFx::applyTzpFxsOnVector(
 
 //-------------------------------------------------------------------
 
-int TLevelColumnFx::getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
+int TLevelColumnFx::getMemoryRequirement(const TRectD &rect, double frame,
+										 const TRenderSettings &info)
 {
-	//Sandor fxs are currently considered *VERY* inefficient upon tile subdivision
+	// Sandor fxs are currently considered *VERY* inefficient upon tile subdivision
 	if (mustApplySandorFx(info.m_data)) {
 		return -1;
 	}
@@ -1318,10 +1352,11 @@ void TLevelColumnFx::getImageInfo(TImageInfo &info, TXshSimpleLevel *sl, TFrameI
 
 	std::string imageId = sl->getImageId(frameId);
 
-	const TImageInfo *storedInfo = ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
+	const TImageInfo *storedInfo =
+		ImageManager::instance()->getInfo(imageId, ImageManager::none, 0);
 
-	if (!storedInfo) //sulle pict caricate info era nullo, ma l'immagine c'e'!
-					 // con la getFullSampleFrame riprendo   l'immagine e ricalcolo la savebox...
+	if (!storedInfo) // sulle pict caricate info era nullo, ma l'immagine c'e'!
+	// con la getFullSampleFrame riprendo   l'immagine e ricalcolo la savebox...
 	{
 		TImageP img;
 		if (!(img = sl->getFullsampledFrame(frameId, ImageManager::dontPutInCache))) {
@@ -1342,7 +1377,7 @@ void TLevelColumnFx::getImageInfo(TImageInfo &info, TXshSimpleLevel *sl, TFrameI
 
 bool TLevelColumnFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 {
-	//Usual preliminaries (make sure a level/cell exists, etc...)
+	// Usual preliminaries (make sure a level/cell exists, etc...)
 	if (!m_levelColumn)
 		return false;
 
@@ -1361,7 +1396,7 @@ bool TLevelColumnFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings
 
 	double dpi = 1.0;
 
-	//Discriminate for level type
+	// Discriminate for level type
 	int type = xshl->getType();
 	if (type != PLI_XSHLEVEL) {
 		TImageInfo imageInfo;
@@ -1384,7 +1419,7 @@ bool TLevelColumnFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings
 		bBox = img->getBBox();
 	}
 
-	//Add the enlargement of the bbox due to Tzp render datas
+	// Add the enlargement of the bbox due to Tzp render datas
 	if (info.m_data.size()) {
 		TRectD imageBBox(bBox);
 		for (unsigned int i = 0; i < info.m_data.size(); ++i) {
@@ -1447,7 +1482,8 @@ std::wstring TLevelColumnFx::getColumnName() const
 	if (!m_levelColumn)
 		return L"";
 	int idx = getColumnIndex();
-	return toWideString(m_levelColumn->getXsheet()->getStageObject(TStageObjectId::ColumnId(idx))->getName());
+	return toWideString(
+		m_levelColumn->getXsheet()->getStageObject(TStageObjectId::ColumnId(idx))->getName());
 }
 
 //-------------------------------------------------------------------
@@ -1463,7 +1499,7 @@ std::string TLevelColumnFx::getAlias(double frame, const TRenderSettings &info) 
 	TXshSimpleLevel *sl = cell.getSimpleLevel();
 
 	if (!sl) {
-		//Try with the sub-xsheet case
+		// Try with the sub-xsheet case
 		TXshChildLevel *childLevel = cell.m_level->getChildLevel();
 		if (childLevel)
 			return ::getAlias(childLevel->getXsheet(), frame, info);
@@ -1575,8 +1611,7 @@ void TLevelColumnFx::loadData(TIStream &is)
 //    TPaletteColumnFx  implementation
 //****************************************************************************************
 
-TPaletteColumnFx::TPaletteColumnFx()
-	: m_paletteColumn(0)
+TPaletteColumnFx::TPaletteColumnFx() : m_paletteColumn(0)
 {
 }
 
@@ -1726,8 +1761,7 @@ TXshColumn *TPaletteColumnFx::getXshColumn() const
 //    TZeraryColumnFx  implementation
 //****************************************************************************************
 
-TZeraryColumnFx::TZeraryColumnFx()
-	: m_zeraryFxColumn(0), m_fx(0)
+TZeraryColumnFx::TZeraryColumnFx() : m_zeraryFxColumn(0), m_fx(0)
 {
 	setName(L"ZeraryColumn");
 }
@@ -1896,8 +1930,7 @@ const TPersistDeclaration *TXsheetFx::getDeclaration() const
 
 //-------------------------------------------------------------------
 
-TXsheetFx::TXsheetFx()
-	: m_fxDag(0)
+TXsheetFx::TXsheetFx() : m_fxDag(0)
 {
 	setName(L"Xsheet");
 }
@@ -1929,7 +1962,7 @@ std::string TXsheetFx::getAlias(double frame, const TRenderSettings &info) const
 	std::string alias = getFxType();
 	alias += "[";
 
-	//Add each terminal fx's alias
+	// Add each terminal fx's alias
 	TFxSet *terminalFxs = m_fxDag->getTerminalFxs();
 	int i, fxsCount = terminalFxs->getFxCount();
 	for (i = 0; i < fxsCount; ++i) {

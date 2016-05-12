@@ -26,7 +26,7 @@ class DVAPI TTileSaverCM32
 	std::vector<int> m_savedTiles;
 	void saveTile(int row, int col);
 
-public:
+  public:
 	TTileSaverCM32(const TRasterCM32P &raster, TTileSetCM32 *tileSet);
 
 	void save(TRect rect);
@@ -45,7 +45,7 @@ class DVAPI TTileSaverFullColor
 	std::vector<int> m_savedTiles;
 	void saveTile(int row, int col);
 
-public:
+  public:
 	TTileSaverFullColor(const TRasterP &raster, TTileSetFullColor *tileSet);
 
 	void save(TRect rect);

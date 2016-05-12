@@ -43,7 +43,9 @@ TFilePath importScene(TFilePath scenePath)
 	try {
 		ret = IoCmd::loadScene(scene, scenePath, true);
 	} catch (TException &e) {
-		DVGui::error(QObject::tr("Error loading scene %1 :%2").arg(toQString(scenePath)).arg(QString::fromStdWString(e.getMessage())));
+		DVGui::error(QObject::tr("Error loading scene %1 :%2")
+						 .arg(toQString(scenePath))
+						 .arg(QString::fromStdWString(e.getMessage())));
 
 		return TFilePath();
 	} catch (...) {
@@ -52,14 +54,17 @@ TFilePath importScene(TFilePath scenePath)
 	}
 
 	if (!ret) {
-		DVGui::error(QObject::tr("It is not possible to export the scene %1 because it does not belong to any project.").arg(toQString(scenePath)));
+		DVGui::error(QObject::tr("It is not possible to export the scene %1 because it does not "
+								 "belong to any project.")
+						 .arg(toQString(scenePath)));
 
 		return TFilePath();
 	}
 
 	TFilePath path = scene.getScenePath();
 	scene.save(scene.getScenePath());
-	DvDirModel::instance()->refreshFolder(TProjectManager::instance()->getCurrentProjectPath().getParentDir());
+	DvDirModel::instance()->refreshFolder(
+		TProjectManager::instance()->getCurrentProjectPath().getParentDir());
 	return path;
 }
 
@@ -80,7 +85,7 @@ int collectAssets(TFilePath scenePath)
 }
 
 //------------------------------------------------------------------------
-} //namespace
+} // namespace
 //------------------------------------------------------------------------
 
 //=============================================================================
@@ -93,7 +98,9 @@ DvDirModelNode *ExportSceneDvDirModelFileFolderNode::makeChild(std::wstring name
 
 //-----------------------------------------------------------------------------
 
-DvDirModelFileFolderNode *ExportSceneDvDirModelFileFolderNode::createExposeSceneNode(DvDirModelNode *parent, const TFilePath &path)
+DvDirModelFileFolderNode *
+ExportSceneDvDirModelFileFolderNode::createExposeSceneNode(DvDirModelNode *parent,
+														   const TFilePath &path)
 {
 	DvDirModelFileFolderNode *node;
 	if (path.getType() == "tnz")
@@ -120,8 +127,7 @@ QPixmap ExportSceneDvDirModelProjectNode::getPixmap(bool isOpen) const
 //=============================================================================
 // ExportSceneDvDirModelRootNode [Root]
 
-ExportSceneDvDirModelRootNode::ExportSceneDvDirModelRootNode()
-	: DvDirModelNode(0, L"Root")
+ExportSceneDvDirModelRootNode::ExportSceneDvDirModelRootNode() : DvDirModelNode(0, L"Root")
 {
 	m_nodeType = "Root";
 }
@@ -141,7 +147,7 @@ void ExportSceneDvDirModelRootNode::refreshChildren()
 {
 	m_childrenValid = true;
 	m_children.clear();
-	//if(m_children.empty())
+	// if(m_children.empty())
 	//{
 	TProjectManager *pm = TProjectManager::instance();
 	std::vector<TFilePath> projectRoots;
@@ -158,8 +164,7 @@ void ExportSceneDvDirModelRootNode::refreshChildren()
 	}
 
 	TFilePath sandboxProjectPath = pm->getSandboxProjectFolder();
-	m_sandboxProjectNode =
-		new ExportSceneDvDirModelProjectNode(this, sandboxProjectPath);
+	m_sandboxProjectNode = new ExportSceneDvDirModelProjectNode(this, sandboxProjectPath);
 	addChild(m_sandboxProjectNode);
 
 	// SVN Repository
@@ -169,7 +174,8 @@ void ExportSceneDvDirModelRootNode::refreshChildren()
 		SVNRepository repo = repositories.at(i);
 
 		ExportSceneDvDirModelSpecialFileFolderNode *node =
-			new ExportSceneDvDirModelSpecialFileFolderNode(this, repo.m_name.toStdWString(), TFilePath(repo.m_localPath.toStdWString()));
+			new ExportSceneDvDirModelSpecialFileFolderNode(
+				this, repo.m_name.toStdWString(), TFilePath(repo.m_localPath.toStdWString()));
 		node->setPixmap(QPixmap(":Resources/vcroot.png"));
 		addChild(node);
 	}
@@ -260,7 +266,8 @@ QModelIndex ExportSceneDvDirModel::parent(const QModelIndex &index) const
 
 //-----------------------------------------------------------------------------
 
-QModelIndex ExportSceneDvDirModel::childByName(const QModelIndex &parent, const std::wstring &name) const
+QModelIndex ExportSceneDvDirModel::childByName(const QModelIndex &parent,
+											   const std::wstring &name) const
 {
 	if (!parent.isValid())
 		return QModelIndex();
@@ -376,7 +383,8 @@ ExportSceneTreeViewDelegate::~ExportSceneTreeViewDelegate()
 
 //-----------------------------------------------------------------------------
 
-void ExportSceneTreeViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void ExportSceneTreeViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
+										const QModelIndex &index) const
 {
 	QRect rect = option.rect;
 	DvDirModelNode *node = DvDirModel::instance()->getNode(index);
@@ -432,8 +440,7 @@ QSize ExportSceneTreeViewDelegate::sizeHint(const QStyleOptionViewItem &option,
 //=============================================================================
 // ExportSceneTreeView
 
-ExportSceneTreeView::ExportSceneTreeView(QWidget *parent)
-	: QTreeView(parent)
+ExportSceneTreeView::ExportSceneTreeView(QWidget *parent) : QTreeView(parent)
 {
 	setStyleSheet("border:1px solid rgb(120,120,120);");
 	m_model = new ExportSceneDvDirModel();
@@ -442,8 +449,8 @@ ExportSceneTreeView::ExportSceneTreeView(QWidget *parent)
 	setItemDelegate(new ExportSceneTreeViewDelegate(this));
 	setSelectionMode(QAbstractItemView::SingleSelection);
 
-	//Connect all possible changes that can alter the
-	//bottom horizontal scrollbar to resize contents...
+	// Connect all possible changes that can alter the
+	// bottom horizontal scrollbar to resize contents...
 	bool ret = connect(this, SIGNAL(expanded(const QModelIndex &)), this, SLOT(resizeToConts()));
 	ret = ret && connect(this, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(resizeToConts()));
 	ret = ret && connect(this->model(), SIGNAL(layoutChanged()), this, SLOT(resizeToConts()));
@@ -501,7 +508,8 @@ void ExportSceneTreeView::focusInEvent(QFocusEvent *event)
 // ExportScenePopup
 
 ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
-	: Dialog(TApp::instance()->getMainWindow(), true, false, "ExportScene"), m_scenes(scenes), m_createNewProject(false)
+	: Dialog(TApp::instance()->getMainWindow(), true, false, "ExportScene"), m_scenes(scenes),
+	  m_createNewProject(false)
 {
 	setWindowTitle(tr("Export Scene"));
 
@@ -515,7 +523,7 @@ ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
 	QButtonGroup *group = new QButtonGroup(this);
 	group->setExclusive(true);
 
-	//Choose Project
+	// Choose Project
 	QWidget *chooseProjectWidget = new QWidget(this);
 	QVBoxLayout *chooseProjectLayout = new QVBoxLayout(chooseProjectWidget);
 
@@ -526,13 +534,14 @@ ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
 
 	m_projectTreeView = new ExportSceneTreeView(chooseProjectWidget);
 	m_projectTreeView->setMinimumWidth(200);
-	ret = ret && connect(m_projectTreeView, SIGNAL(focusIn()), this, SLOT(onProjectTreeViweFocusIn()));
+	ret = ret &&
+		  connect(m_projectTreeView, SIGNAL(focusIn()), this, SLOT(onProjectTreeViweFocusIn()));
 	chooseProjectLayout->addWidget(m_projectTreeView);
 
 	chooseProjectWidget->setLayout(chooseProjectLayout);
 	layout->addWidget(chooseProjectWidget, 5);
 
-	//New Project
+	// New Project
 	QWidget *newProjectWidget = new QWidget(this);
 	QGridLayout *newProjectLayout = new QGridLayout(newProjectWidget);
 
@@ -573,15 +582,15 @@ ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
 
 void ExportScenePopup::switchMode(int id)
 {
-	if (id == 0) //choose Existing Project
+	if (id == 0) // choose Existing Project
 	{
 		m_createNewProject = false;
-		//m_projectTreeView->setEnabled(true);
-	} else //create new project
+		// m_projectTreeView->setEnabled(true);
+	} else // create new project
 	{
 		assert(id == 1);
 		m_createNewProject = true;
-		//m_projectTreeView->setEnabled(false);
+		// m_projectTreeView->setEnabled(false);
 	}
 }
 
@@ -610,7 +619,8 @@ void ExportScenePopup::onExport()
 	TFilePath oldProjectPath = pm->getCurrentProjectPath();
 	TFilePath projectPath;
 	if (!m_createNewProject) {
-		DvDirModelFileFolderNode *node = (DvDirModelFileFolderNode *)m_projectTreeView->getCurrentNode();
+		DvDirModelFileFolderNode *node =
+			(DvDirModelFileFolderNode *)m_projectTreeView->getCurrentNode();
 		if (!node || !pm->isProject(node->getPath())) {
 			QApplication::restoreOverrideCursor();
 			DVGui::warning(tr("The folder you selected is not a project."));
@@ -618,7 +628,7 @@ void ExportScenePopup::onExport()
 		}
 		projectPath = pm->projectFolderToProjectPath(node->getPath());
 		assert(projectPath != TFilePath());
-	} else //Create project
+	} else // Create project
 	{
 		projectPath = createNewProject();
 		if (projectPath == TFilePath()) {
@@ -656,12 +666,14 @@ TFilePath ExportScenePopup::createNewProject()
 	TProjectManager *pm = TProjectManager::instance();
 	TFilePath projectName(m_newProjectName->text().toStdWString());
 	if (projectName == TFilePath()) {
-		DVGui::warning(tr("The project name cannot be empty or contain any of the following characters:(new line)   \\ / : * ? \"  |"));
+		DVGui::warning(tr("The project name cannot be empty or contain any of the following "
+						  "characters:(new line)   \\ / : * ? \"  |"));
 		return TFilePath();
 	}
 	if (projectName.isAbsolute()) {
 		// bad project name
-		DVGui::warning(tr("The project name cannot be empty or contain any of the following characters:(new line)   \\ / : * ? \"  |"));
+		DVGui::warning(tr("The project name cannot be empty or contain any of the following "
+						  "characters:(new line)   \\ / : * ? \"  |"));
 		return TFilePath();
 	}
 	if (pm->getProjectPathByName(projectName) != TFilePath()) {
@@ -671,7 +683,8 @@ TFilePath ExportScenePopup::createNewProject()
 	}
 
 	TFilePath currentProjectRoot;
-	DvDirModelFileFolderNode *node = dynamic_cast<DvDirModelFileFolderNode *>(m_projectTreeView->getCurrentNode());
+	DvDirModelFileFolderNode *node =
+		dynamic_cast<DvDirModelFileFolderNode *>(m_projectTreeView->getCurrentNode());
 	if (node)
 		currentProjectRoot = node->getPath();
 	else
@@ -696,11 +709,12 @@ TFilePath ExportScenePopup::createNewProject()
 void ExportScenePopup::updateCommandLabel()
 {
   if(m_scenes.empty())
-    return;
+	return;
   int sceneCount= m_scenes.size();
   if(sceneCount==1)
-    m_command->setText(tr("Stai esportando la scena selezionata nel seguente progetto:"));
+	m_command->setText(tr("Stai esportando la scena selezionata nel seguente progetto:"));
   else
-    m_command->setText(tr("Stai esportando ") + QString::number(sceneCount) + tr(" scene nel seguente progetto:"));
+	m_command->setText(tr("Stai esportando ") + QString::number(sceneCount) + tr(" scene nel
+seguente progetto:"));
 }
 */

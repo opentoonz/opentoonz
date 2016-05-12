@@ -26,9 +26,9 @@ template <typename RanIt>
 StandardDeviationEvaluator<RanIt>::StandardDeviationEvaluator(const RanIt &begin, const RanIt &end)
 	: m_begin(begin), m_end(end)
 {
-	//Let m_sum[i] and m_sum2[i] be respectively the sums of vertex coordinates
+	// Let m_sum[i] and m_sum2[i] be respectively the sums of vertex coordinates
 	//(relative to begin is sufficient) from 0 to i, and the sums of their squares;
-	//m_sumsMix contain sums of xy terms.
+	// m_sumsMix contain sums of xy terms.
 
 	diff_type i, n = m_end - m_begin;
 	diff_type n2 = n * 2;
@@ -41,7 +41,7 @@ StandardDeviationEvaluator<RanIt>::StandardDeviationEvaluator(const RanIt &begin
 
 	m_sums_x[0] = m_sums_y[0] = m_sums2_x[0] = m_sums2_y[0] = m_sums_xy[0] = 0.0;
 
-	//Build sums following the path
+	// Build sums following the path
 
 	point_type posToBegin;
 	i = 0;
@@ -67,7 +67,7 @@ StandardDeviationEvaluator<RanIt>::penalty(const iterator_type &a, const iterato
 	diff_type aIdx = a - m_begin, bIdx = b - m_begin;
 	point_type v(b->x - a->x, b->y - a->y), a_(a->x - m_begin->x, a->y - m_begin->y);
 
-	double n = b - a; //Needs to be of higher precision than diff_type
+	double n = b - a; // Needs to be of higher precision than diff_type
 	double sumX = m_sums_x[bIdx] - m_sums_x[aIdx];
 	double sumY = m_sums_y[bIdx] - m_sums_y[aIdx];
 	double sum2X = m_sums2_x[bIdx] - m_sums2_x[aIdx];
@@ -96,21 +96,20 @@ StandardDeviationEvaluator<RanIt>::penalty(const iterator_type &a, const iterato
 //    Quadratics approximation Evaluator
 //***********************************************************************************
 
-template <typename Point>
-class _QuadraticsEdgeEvaluator
+template <typename Point> class _QuadraticsEdgeEvaluator
 {
-public:
+  public:
 	typedef Point point_type;
 	typedef typename tcg::point_traits<point_type>::value_type value_type;
 	typedef typename std::vector<Point>::iterator cp_iterator;
 	typedef typename tcg::step_iterator<cp_iterator> quad_iterator;
 	typedef double penalty_type;
 
-private:
+  private:
 	quad_iterator m_begin, m_end;
 	penalty_type m_tol;
 
-public:
+  public:
 	_QuadraticsEdgeEvaluator(const quad_iterator &begin, const quad_iterator &end,
 							 penalty_type tol);
 
@@ -121,8 +120,9 @@ public:
 //---------------------------------------------------------------------------
 
 template <typename Point>
-_QuadraticsEdgeEvaluator<Point>::_QuadraticsEdgeEvaluator(
-	const quad_iterator &begin, const quad_iterator &end, penalty_type tol)
+_QuadraticsEdgeEvaluator<Point>::_QuadraticsEdgeEvaluator(const quad_iterator &begin,
+														  const quad_iterator &end,
+														  penalty_type tol)
 	: m_begin(begin), m_end(end), m_tol(tol)
 {
 }
@@ -136,36 +136,36 @@ _QuadraticsEdgeEvaluator<Point>::furthestFrom(const quad_iterator &at)
 	const point_type &A = *at;
 	const point_type &A1 = *(at.it() + 1);
 
-	//Build at (opposite) side
+	// Build at (opposite) side
 	int atSide_ = -tcg::numeric_ops::sign(cross(A - A1, *(at + 1) - A1));
 	bool atSideNotZero = (atSide_ != 0);
 
-	quad_iterator bt, last = this->m_end - 1; //Don't do the last (it's a dummy quad)
-	for (bt = at + 1; bt != last; ++bt)		  //Always allow 1 step
+	quad_iterator bt, last = this->m_end - 1; // Don't do the last (it's a dummy quad)
+	for (bt = at + 1; bt != last; ++bt) // Always allow 1 step
 	{
-		//Trying to reach (bt + 1) from at
+		// Trying to reach (bt + 1) from at
 		const point_type &C = *(bt + 1);
 		const point_type &C1 = *(bt.it() + 1);
 
-		//Ensure that bt is not a corner
+		// Ensure that bt is not a corner
 		if (abs(tcg::point_ops::cross(*(bt.it() - 1) - *bt, *(bt.it() + 1) - *bt)) > 1e-3)
 			break;
 
-		//Ensure there is no sign inversion
+		// Ensure there is no sign inversion
 		int btSide = tcg::numeric_ops::sign(tcg::point_ops::cross(*bt - C1, C - C1));
 		if (atSideNotZero && btSide != 0 && btSide == atSide_)
 			break;
 
-		//Build the approximating new quad if any
+		// Build the approximating new quad if any
 		value_type s, t;
 		tcg::point_ops::intersectionSegCoords(A, A1, C, C1, s, t, 1e-4);
 		if (s == tcg::numeric_ops::NaN<value_type>()) {
-			//A-A1 and C1-C are parallel. There are 2 cases:
+			// A-A1 and C1-C are parallel. There are 2 cases:
 			if ((A1 - A) * (C - C1) >= 0)
-				//Either we're still on a straight line
+				// Either we're still on a straight line
 				continue;
 			else
-				//Or, we just can't build the new quad
+				// Or, we just can't build the new quad
 				break;
 		}
 
@@ -174,8 +174,8 @@ _QuadraticsEdgeEvaluator<Point>::furthestFrom(const quad_iterator &at)
 		point_type A_B(A - B);
 		point_type AC_2B(A_B + C - B);
 
-		//Now, for each quadratic between at and bt, build the 'distance' from our new
-		//approximating quad (ABC)
+		// Now, for each quadratic between at and bt, build the 'distance' from our new
+		// approximating quad (ABC)
 
 		quad_iterator qt, end = bt + 1;
 		for (qt = at; qt != end; ++qt) {
@@ -183,8 +183,8 @@ _QuadraticsEdgeEvaluator<Point>::furthestFrom(const quad_iterator &at)
 			const point_type &Q_B(*(qt.it() + 1));
 			const point_type &Q_C(*(qt + 1));
 
-			//Check the distance of Q_B from the ABC tangent whose direction
-			//is the same as Q'_B - ie, Q_A -> Q_C.
+			// Check the distance of Q_B from the ABC tangent whose direction
+			// is the same as Q'_B - ie, Q_A -> Q_C.
 
 			point_type dir(Q_C - Q_A);
 			value_type dirNorm = tcg::point_ops::norm(dir);
@@ -212,13 +212,13 @@ _QuadraticsEdgeEvaluator<Point>::furthestFrom(const quad_iterator &at)
 			if (pos < 0.0 || pos > dirNorm)
 				break;
 			/*if(pos < -m_tol || pos > dirNorm + m_tol)     //Should this be relaxed too?
-        break;*/
+		break;*/
 
 			if (qt == bt)
 				continue;
 
-			//Check the distance of Q_C from the ABC tangent whose direction
-			//is the same as Q'_C.
+			// Check the distance of Q_C from the ABC tangent whose direction
+			// is the same as Q'_C.
 
 			dir = tcg::point_ops::direction(Q_B, Q_C);
 
@@ -238,7 +238,7 @@ _QuadraticsEdgeEvaluator<Point>::furthestFrom(const quad_iterator &at)
 		}
 
 		if (qt != end)
-			break; //Constraints were violated
+			break; // Constraints were violated
 	}
 
 	return std::min(bt, this->m_end - 1);
@@ -260,7 +260,7 @@ _QuadraticsEdgeEvaluator<Point>::penalty(const quad_iterator &at, const quad_ite
 	const point_type &C(*bt);
 	const point_type &C1(*(bt.it() - 1));
 
-	//Build B
+	// Build B
 	value_type s, t;
 	tcg::point_ops::intersectionSegCoords(A, A1, C, C1, s, t, 1e-4);
 	if (s == tcg::numeric_ops::NaN<value_type>())
@@ -268,7 +268,7 @@ _QuadraticsEdgeEvaluator<Point>::penalty(const quad_iterator &at, const quad_ite
 
 	point_type B(A + s * (A1 - A));
 
-	//Iterate and build penalties
+	// Iterate and build penalties
 	point_type A_B(A - B);
 	point_type AC_2B(A_B + C - B);
 
@@ -278,7 +278,7 @@ _QuadraticsEdgeEvaluator<Point>::penalty(const quad_iterator &at, const quad_ite
 		const point_type &Q_B(*(qt.it() + 1));
 		const point_type &Q_C(*(qt + 1));
 
-		//point_type dir(tcg::point_ops::direction(Q_A, Q_C));
+		// point_type dir(tcg::point_ops::direction(Q_A, Q_C));
 		point_type dir(Q_C - Q_A);
 		dir = dir / tcg::point_ops::norm(dir);
 
@@ -312,20 +312,19 @@ _QuadraticsEdgeEvaluator<Point>::penalty(const quad_iterator &at, const quad_ite
 //    Conversion to Quadratics functions
 //***********************************************************************************
 
-template <typename cps_reader>
-class _QuadReader
+template <typename cps_reader> class _QuadReader
 {
-public:
+  public:
 	typedef typename cps_reader::value_type point_type;
 	typedef typename tcg::point_traits<point_type>::value_type value_type;
 	typedef typename std::vector<point_type>::iterator cps_iterator;
 	typedef typename tcg::step_iterator<cps_iterator> quad_iterator;
 
-private:
+  private:
 	cps_reader &m_reader;
 	quad_iterator m_it;
 
-public:
+  public:
 	_QuadReader(cps_reader &reader) : m_reader(reader) {}
 
 	void openContainer(const quad_iterator &it)
@@ -345,10 +344,11 @@ public:
 			const point_type &C(*it);
 			const point_type &C1(*(it.it() - 1));
 
-			//Build B
+			// Build B
 			value_type s, t;
 			tcg::point_ops::intersectionSegCoords(A, A1, C, C1, s, t, 1e-4);
-			point_type B((s == tcg::numeric_ops::NaN<value_type>()) ? 0.5 * (A + C) : A + s * (A1 - A));
+			point_type B((s == tcg::numeric_ops::NaN<value_type>()) ? 0.5 * (A + C)
+																	: A + s * (A1 - A));
 
 			m_reader.addElement(B);
 			m_reader.addElement(C);
@@ -363,8 +363,8 @@ public:
 //---------------------------------------------------------------------------
 
 template <typename iter_type, typename Reader, typename tripleToQuadsFunc>
-void _naiveQuadraticConversion(const iter_type &begin, const iter_type &end,
-							   Reader &reader, tripleToQuadsFunc &tripleToQuadsF)
+void _naiveQuadraticConversion(const iter_type &begin, const iter_type &end, Reader &reader,
+							   tripleToQuadsFunc &tripleToQuadsF)
 {
 	typedef typename std::iterator_traits<iter_type>::value_type point_type;
 
@@ -383,7 +383,7 @@ void _naiveQuadraticConversion(const iter_type &begin, const iter_type &end,
 		reader.addElement(0.5 * (*begin + a));
 		reader.addElement(a);
 
-		//Work out each quadratic
+		// Work out each quadratic
 		for (++(jt = it); jt != end; it = jt, ++jt) {
 			c = 0.5 * (*it + *jt);
 			tripleToQuadsF(a, it, c, reader);
@@ -414,8 +414,8 @@ void _naiveQuadraticConversion(const iter_type &begin, const iter_type &end,
 //---------------------------------------------------------------------------
 
 template <typename iter_type, typename containers_reader, typename toQuadsFunc>
-void toQuadratics(iter_type begin, iter_type end, containers_reader &output,
-				  toQuadsFunc &toQuadsF, double reductionTol)
+void toQuadratics(iter_type begin, iter_type end, containers_reader &output, toQuadsFunc &toQuadsF,
+				  double reductionTol)
 {
 	typedef typename std::iterator_traits<iter_type>::difference_type diff_type;
 	typedef typename std::iterator_traits<iter_type>::value_type point_type;
@@ -426,7 +426,7 @@ void toQuadratics(iter_type begin, iter_type end, containers_reader &output,
 
 	diff_type count = std::distance(begin, end);
 	if (count < 2) {
-		//Single point - add 2 points on top of it and quit.
+		// Single point - add 2 points on top of it and quit.
 		output.openContainer(*begin);
 		output.addElement(*begin), output.addElement(*begin);
 		output.closeContainer();
@@ -434,7 +434,7 @@ void toQuadratics(iter_type begin, iter_type end, containers_reader &output,
 	}
 
 	if (count == 2) {
-		//Segment case
+		// Segment case
 		iter_type it = begin;
 		++it;
 
@@ -444,8 +444,8 @@ void toQuadratics(iter_type begin, iter_type end, containers_reader &output,
 		return;
 	}
 
-	//Build an intermediate vector of points containing the naive quadratic
-	//conversion.
+	// Build an intermediate vector of points containing the naive quadratic
+	// conversion.
 
 	std::vector<point_type> cps;
 	tcg::sequential_reader<std::vector<point_type>> cpsReader(&cps);
@@ -455,7 +455,7 @@ void toQuadratics(iter_type begin, iter_type end, containers_reader &output,
 	if (reductionTol <= 0) {
 		output.openContainer(*cps.begin());
 
-		//Directly output the naive conversion
+		// Directly output the naive conversion
 		typename std::vector<point_type>::iterator it, end = cps.end();
 		for (it = ++cps.begin(); it != end; ++it)
 			output.addElement(*it);
@@ -464,12 +464,12 @@ void toQuadratics(iter_type begin, iter_type end, containers_reader &output,
 		return;
 	}
 
-	//Resize the cps to cover a multiple of 2
+	// Resize the cps to cover a multiple of 2
 	cps.resize(cps.size() + 2 - (cps.size() % 2));
 
-	//Now, launch the quadratics reduction procedure
-	tcg::step_iterator<typename std::vector<point_type>::iterator>
-		bt(cps.begin(), 2), et(cps.end(), 2);
+	// Now, launch the quadratics reduction procedure
+	tcg::step_iterator<typename std::vector<point_type>::iterator> bt(cps.begin(), 2),
+		et(cps.end(), 2);
 
 	_QuadraticsEdgeEvaluator<point_type> eval(bt, et, reductionTol);
 	_QuadReader<containers_reader> quadReader(output);

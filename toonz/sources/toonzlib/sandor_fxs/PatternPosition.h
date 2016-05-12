@@ -21,29 +21,28 @@
 class CPatternPosition
 {
 	bool isInSet(const int nbSet, const int *set, const int val);
-	void makeRandomPositions(const int nbPat, const int nbPixel,
-							 const int lX, const int lY, const UCHAR *sel);
-	void makeDDPositions(const int lX, const int lY, UCHAR *sel,
-						 const double minD, const double maxD);
-	void getPosAroundThis(const int lX, const int lY, const UCHAR *lSel,
-						  const int xx, const int yy,
+	void makeRandomPositions(const int nbPat, const int nbPixel, const int lX, const int lY,
+							 const UCHAR *sel);
+	void makeDDPositions(const int lX, const int lY, UCHAR *sel, const double minD,
+						 const double maxD);
+	void getPosAroundThis(const int lX, const int lY, const UCHAR *lSel, const int xx, const int yy,
 						  int &xPos, int &yPos);
-	bool findEmptyPos(const int lX, const int lY, const UCHAR *lSel,
-					  int &xPos, int &yPos, SRECT &bb);
-	void eraseCurrentArea(const int lX, const int lY, UCHAR *lSel,
-						  std::vector<SPOINT> &ddc, const int xx, const int yy);
+	bool findEmptyPos(const int lX, const int lY, const UCHAR *lSel, int &xPos, int &yPos,
+					  SRECT &bb);
+	void eraseCurrentArea(const int lX, const int lY, UCHAR *lSel, std::vector<SPOINT> &ddc,
+						  const int xx, const int yy);
 	void sel0255To01(const int lX, const int lY, UCHAR *sel, SRECT &bb);
 	void prepareCircle(std::vector<SPOINT> &v, const double r);
 
-public:
+  public:
 	std::vector<SPOINT> m_pos;
 
 	CPatternPosition() : m_pos(0){};
 	virtual ~CPatternPosition();
 
 	template <class P>
-	CPatternPosition(CSTColSelPic<P> &p, const int nbPixel, const double dens,
-					 const double minD, const double maxD)
+	CPatternPosition(CSTColSelPic<P> &p, const int nbPixel, const double dens, const double minD,
+					 const double maxD)
 	{
 		try {
 			m_pos.clear();
@@ -63,12 +62,9 @@ public:
 		}
 	}
 
-	template <class P>
-	void drawTest(CSTColSelPic<P> &pic)
+	template <class P> void drawTest(CSTColSelPic<P> &pic)
 	{
-		for (std::vector<SPOINT>::iterator pv = m_pos.begin();
-			 pv != m_pos.end();
-			 pv++) {
+		for (std::vector<SPOINT>::iterator pv = m_pos.begin(); pv != m_pos.end(); pv++) {
 			int xx = pv->x;
 			int yy = pv->y;
 			for (int y = yy - 1; y <= (yy + 1); y++)

@@ -35,7 +35,7 @@ class DVAPI JpgReader : public Tiio::Reader
 	JSAMPARRAY m_buffer;
 	bool m_isOpen;
 
-public:
+  public:
 	JpgReader();
 	~JpgReader();
 
@@ -52,14 +52,13 @@ DVAPI Tiio::WriterMaker makeJpgWriter;
 
 class DVAPI JpgWriterProperties : public TPropertyGroup
 {
-public:
+  public:
 	TIntProperty m_quality;
 	TIntProperty m_smoothing;
 
 	static const std::string QUALITY;
 
-	JpgWriterProperties()
-		: m_quality(QUALITY, 0, 100, 90), m_smoothing("Smoothing", 0, 100, 0)
+	JpgWriterProperties() : m_quality(QUALITY, 0, 100, 90), m_smoothing("Smoothing", 0, 100, 0)
 	{
 		bind(m_quality);
 		bind(m_smoothing);

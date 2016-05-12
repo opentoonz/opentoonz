@@ -31,23 +31,24 @@ bool isCuspPoint(const TPointD &p0, const TPointD &p1, const TPointD &p2)
 	TPointD p0_p1(p0 - p1), p2_p1(p2 - p1);
 	double n1 = norm(p0_p1), n2 = norm(p2_p1);
 
-	//Partial linear points are ALWAYS cusps (since directions from them are
-	//determined by neighbours, not by the points themselves)
+	// Partial linear points are ALWAYS cusps (since directions from them are
+	// determined by neighbours, not by the points themselves)
 	if ((n1 < 0.02) || (n2 < 0.02))
 		return true;
 
 	p0_p1 = p0_p1 * (1.0 / n1);
 	p2_p1 = p2_p1 * (1.0 / n2);
 
-	return (p0_p1 * p2_p1 > 0) || (fabs(cross(p0_p1, p2_p1)) > 0.09); //more than 5° is yes
+	return (p0_p1 * p2_p1 > 0) || (fabs(cross(p0_p1, p2_p1)) > 0.09); // more than 5° is yes
 
-	//Distance-based check. Unscalable...
-	//return !areAlmostEqual(tdistance(p0,p2),tdistance(p0,p1)+tdistance(p1,p2),2);
+	// Distance-based check. Unscalable...
+	// return !areAlmostEqual(tdistance(p0,p2),tdistance(p0,p1)+tdistance(p1,p2),2);
 }
 
 //-----------------------------------------------------------------------------
 
-TThickPoint computeLinearPoint(const TThickPoint &p1, const TThickPoint &p2, double factor, bool isIn)
+TThickPoint computeLinearPoint(const TThickPoint &p1, const TThickPoint &p2, double factor,
+							   bool isIn)
 {
 	TThickPoint p = p2 - p1;
 	TThickPoint v = p * (1 / norm(p));
@@ -68,7 +69,7 @@ void insertPoint(TStroke *stroke, int indexA, int indexB)
 	double length = 0;
 	double firstW, lastW;
 	for (j = indexA; j < indexB; j++) {
-		//cerco il chunk piu' lungo
+		// cerco il chunk piu' lungo
 		double w0 = stroke->getW(stroke->getChunk(j)->getP0());
 		double w1;
 		if (j == stroke->getChunkCount() - 1)
@@ -86,7 +87,7 @@ void insertPoint(TStroke *stroke, int indexA, int indexB)
 	stroke->insertControlPoints((firstW + lastW) * 0.5);
 }
 
-} //namespace
+} // namespace
 
 //=============================================================================
 // ControlPointEditorStroke
@@ -168,7 +169,7 @@ void ControlPointEditorStroke::resetControlPoints()
 	int cpCount = stroke->getControlPointCount();
 	if (cpCount == 3) {
 		const TThickQuadratic *chunk = stroke->getChunk(0);
-		if (chunk->getP0() == chunk->getP1() && chunk->getP0() == chunk->getP2()) //E' un punto
+		if (chunk->getP0() == chunk->getP1() && chunk->getP0() == chunk->getP2()) // E' un punto
 		{
 			m_controlPoints.push_back(ControlPoint(0, TPointD(0.0, 0.0), TPointD(0.0, 0.0), true));
 			return;
@@ -180,23 +181,25 @@ void ControlPointEditorStroke::resetControlPoints()
 		TThickPoint p = stroke->getControlPoint(i);
 		TThickPoint precP = stroke->getControlPoint(i - 1);
 		TThickPoint nextP = stroke->getControlPoint(i + 1);
-		if (0 < i && i < cpCount - 1) //calcola speedIn e speedOut
+		if (0 < i && i < cpCount - 1) // calcola speedIn e speedOut
 		{
 			speedIn = p - precP;
 			speedOut = nextP - p;
 		}
-		if (i == 0) //calcola solo lo speedOut
+		if (i == 0) // calcola solo lo speedOut
 		{
 			speedOut = nextP - p;
 			if (isSelfLoop())
 				speedIn = p - stroke->getControlPoint(cpCount - 2);
 		}
-		if (i == cpCount - 1) //calcola solo lo speedIn
+		if (i == cpCount - 1) // calcola solo lo speedIn
 			speedIn = p - precP;
 		if (i == cpCount - 1 && isSelfLoop())
 			break; // Se lo stroke e' selfLoop inserisco solo il primo dei due punti coincidenti
 
-		bool isCusp = ((i != 0 && i != cpCount - 1) || (isSelfLoop() && i == 0)) ? isCuspPoint(precP, p, nextP) : true;
+		bool isCusp = ((i != 0 && i != cpCount - 1) || (isSelfLoop() && i == 0))
+						  ? isCuspPoint(precP, p, nextP)
+						  : true;
 		m_controlPoints.push_back(ControlPoint(i, speedIn, speedOut, isCusp));
 	}
 }
@@ -225,7 +228,7 @@ TThickPoint ControlPointEditorStroke::getPureDependentPoint(int index) const
 
 	return TThickPoint((1 - t) * nextSpeedInPoint + t * speedOutPoint, oldP.thick);
 
-	//return TThickPoint(0.5 * (speedOutPoint + nextSpeedInPoint), oldThick);
+	// return TThickPoint(0.5 * (speedOutPoint + nextSpeedInPoint), oldThick);
 }
 
 //-----------------------------------------------------------------------------
@@ -238,11 +241,11 @@ void ControlPointEditorStroke::getDependentPoints(
 		return;
 
 	int cpCount = m_controlPoints.size();
-	if (index == cpCount && isSelfLoop()) //strange, but was treated...
+	if (index == cpCount && isSelfLoop()) // strange, but was treated...
 		index = 0;
 
 	if (index == 0 && cpCount == 1) {
-		//Single point case
+		// Single point case
 		TStroke *stroke = getStroke();
 		TThickPoint pos(stroke->getControlPoint(m_controlPoints[0].m_pointIndex));
 
@@ -280,18 +283,18 @@ void ControlPointEditorStroke::updatePoints()
 	if (!stroke)
 		return;
 	bool selfLoop = isSelfLoop();
-	//Se e' rimasto un unico punto non ha senso che la stroke sia selfloop
+	// Se e' rimasto un unico punto non ha senso che la stroke sia selfloop
 	if (selfLoop && m_controlPoints.size() == 1) {
 		stroke->setSelfLoop(false);
 		selfLoop = false;
 	}
 
-	//Se e' self loop  devo aggiungere un punto in piu' al cpCount
+	// Se e' self loop  devo aggiungere un punto in piu' al cpCount
 	std::vector<TThickPoint> points;
 
 	int cpCount = selfLoop ? m_controlPoints.size() + 1 : m_controlPoints.size();
 	if (cpCount == 1)
-		//Single point case
+		// Single point case
 		points.resize(3, getControlPoint(0));
 	else {
 		std::vector<std::pair<int, TThickPoint>> dependentPoints;
@@ -305,13 +308,15 @@ void ControlPointEditorStroke::updatePoints()
 			int index = isLastSelfLoopPoint ? 0 : i;
 
 			TThickPoint p = getControlPoint(index);
-			pointIndex = isLastSelfLoopPoint ? getStroke()->getControlPointCount() : m_controlPoints[index].m_pointIndex;
+			pointIndex = isLastSelfLoopPoint ? getStroke()->getControlPointCount()
+											 : m_controlPoints[index].m_pointIndex;
 
 			dependentPoints.clear();
 			getDependentPoints(index, dependentPoints);
 
 			int j;
-			for (j = 0; j < (int)dependentPoints.size() && dependentPoints[j].first < pointIndex; j++) {
+			for (j = 0; j < (int)dependentPoints.size() && dependentPoints[j].first < pointIndex;
+				 j++) {
 				if (currPointIndex < dependentPoints[j].first) {
 					currPointIndex = dependentPoints[j].first;
 					points.push_back(dependentPoints[j].second);
@@ -359,27 +364,28 @@ void ControlPointEditorStroke::moveSpeedOut(int index, const TPointD &delta, dou
 	if (!stroke)
 		return;
 
-	//If the next cp has linear speed in, it must be recomputed
+	// If the next cp has linear speed in, it must be recomputed
 	bool selfLoop = isSelfLoop();
 	int cpCount = selfLoop ? m_controlPoints.size() + 1 : m_controlPoints.size();
 	int nextIndex = (selfLoop && index == cpCount - 2) ? 0 : index + 1;
 	if (m_controlPoints[nextIndex].m_isCusp && isSpeedInLinear(nextIndex))
 		setLinearSpeedIn(nextIndex, true, false);
 
-	//Update the speedOut
+	// Update the speedOut
 	m_controlPoints[index].m_speedOut += delta;
 	TPointD newP = m_controlPoints[index].m_speedOut;
-	if (areAlmostEqual(newP.x, 0, minDistance) && areAlmostEqual(newP.y, 0, minDistance)) //Setto a linear
+	if (areAlmostEqual(newP.x, 0, minDistance) &&
+		areAlmostEqual(newP.y, 0, minDistance)) // Setto a linear
 	{
 		setLinearSpeedOut(index);
 		return;
 	}
 	if (!m_controlPoints[index].m_isCusp && !isSpeedInLinear(index)) {
-		//Devo ricalcolare lo SpeedIn
-		TPointD v(m_controlPoints[index].m_speedOut * (1.0 / norm(m_controlPoints[index].m_speedOut)));
-		m_controlPoints[index].m_speedIn = TThickPoint(
-			v * norm(m_controlPoints[index].m_speedIn),
-			m_controlPoints[index].m_speedIn.thick);
+		// Devo ricalcolare lo SpeedIn
+		TPointD v(m_controlPoints[index].m_speedOut *
+				  (1.0 / norm(m_controlPoints[index].m_speedOut)));
+		m_controlPoints[index].m_speedIn = TThickPoint(v * norm(m_controlPoints[index].m_speedIn),
+													   m_controlPoints[index].m_speedIn.thick);
 	}
 }
 
@@ -391,27 +397,28 @@ void ControlPointEditorStroke::moveSpeedIn(int index, const TPointD &delta, doub
 	if (!stroke)
 		return;
 
-	//If the prev cp has linear speed out, it must be recomputed
+	// If the prev cp has linear speed out, it must be recomputed
 	bool selfLoop = isSelfLoop();
 	int cpCount = selfLoop ? m_controlPoints.size() + 1 : m_controlPoints.size();
 	int prevIndex = (selfLoop && index == 0) ? cpCount - 2 : index - 1;
 	if (m_controlPoints[prevIndex].m_isCusp && isSpeedOutLinear(prevIndex))
 		setLinearSpeedOut(prevIndex, true, false);
 
-	//Update the speedOut
+	// Update the speedOut
 	m_controlPoints[index].m_speedIn -= delta;
 	TPointD newP = m_controlPoints[index].m_speedIn;
-	if (areAlmostEqual(newP.x, 0, minDistance) && areAlmostEqual(newP.y, 0, minDistance)) //Setto a linear
+	if (areAlmostEqual(newP.x, 0, minDistance) &&
+		areAlmostEqual(newP.y, 0, minDistance)) // Setto a linear
 	{
 		setLinearSpeedIn(index);
 		return;
 	}
 	if (!m_controlPoints[index].m_isCusp && !isSpeedOutLinear(index)) {
-		//Devo ricalcolare lo SpeedOut
-		TPointD v(m_controlPoints[index].m_speedIn * (1.0 / norm(m_controlPoints[index].m_speedIn)));
-		m_controlPoints[index].m_speedOut = TThickPoint(
-			v * norm(m_controlPoints[index].m_speedOut),
-			m_controlPoints[index].m_speedOut.thick);
+		// Devo ricalcolare lo SpeedOut
+		TPointD v(m_controlPoints[index].m_speedIn *
+				  (1.0 / norm(m_controlPoints[index].m_speedIn)));
+		m_controlPoints[index].m_speedOut = TThickPoint(v * norm(m_controlPoints[index].m_speedOut),
+														m_controlPoints[index].m_speedOut.thick);
 	}
 }
 
@@ -435,12 +442,12 @@ void ControlPointEditorStroke::moveSingleControlPoint(int index, const TPointD &
 	if (pointIndex == 0 && selfLoop)
 		stroke->setControlPoint(stroke->getControlPointCount() - 1, p);
 
-	//Directions must be recalculated in the linear cases
+	// Directions must be recalculated in the linear cases
 	if ((selfLoop || index > 0) && isSpeedInLinear(index)) {
 		setLinearSpeedIn(index, true, false);
 
-		//Furthermore, if the NEIGHBOUR point is linear, it has to be
-		//recalculated too
+		// Furthermore, if the NEIGHBOUR point is linear, it has to be
+		// recalculated too
 		int prevIndex = (selfLoop && index == 0) ? cpCount - 2 : index - 1;
 		if (m_controlPoints[prevIndex].m_isCusp && isSpeedOutLinear(prevIndex))
 			setLinearSpeedOut(prevIndex, true, false);
@@ -466,7 +473,8 @@ void ControlPointEditorStroke::setStroke(const TVectorImageP &vi, int strokeInde
 	}
 	TStroke *stroke = getStroke();
 	const TThickQuadratic *chunk = stroke->getChunk(0);
-	if (stroke->getControlPointCount() == 3 && chunk->getP0() == chunk->getP1() && chunk->getP0() == chunk->getP2()) {
+	if (stroke->getControlPointCount() == 3 && chunk->getP0() == chunk->getP1() &&
+		chunk->getP0() == chunk->getP2()) {
 		resetControlPoints();
 		return;
 	}
@@ -536,7 +544,8 @@ void ControlPointEditorStroke::setCusp(int index, bool isCusp, bool setSpeedIn)
 bool ControlPointEditorStroke::isSpeedInLinear(int index) const
 {
 	assert(index < (int)m_controlPoints.size());
-	return (fabs(m_controlPoints[index].m_speedIn.x) <= 0.02) && (fabs(m_controlPoints[index].m_speedIn.y) <= 0.02);
+	return (fabs(m_controlPoints[index].m_speedIn.x) <= 0.02) &&
+		   (fabs(m_controlPoints[index].m_speedIn.y) <= 0.02);
 }
 
 //-----------------------------------------------------------------------------
@@ -544,7 +553,8 @@ bool ControlPointEditorStroke::isSpeedInLinear(int index) const
 bool ControlPointEditorStroke::isSpeedOutLinear(int index) const
 {
 	assert(index < (int)m_controlPoints.size());
-	return (fabs(m_controlPoints[index].m_speedOut.x) <= 0.02) && (fabs(m_controlPoints[index].m_speedOut.y) <= 0.02);
+	return (fabs(m_controlPoints[index].m_speedOut.x) <= 0.02) &&
+		   (fabs(m_controlPoints[index].m_speedOut.y) <= 0.02);
 }
 
 //-----------------------------------------------------------------------------
@@ -564,7 +574,8 @@ void ControlPointEditorStroke::setLinearSpeedIn(int index, bool linear, bool upd
 	int precIndex = (index == 0 && isSelfLoop()) ? m_controlPoints.size() - 1 : index - 1;
 
 	TThickPoint point = stroke->getControlPoint(pointIndex);
-	TThickPoint precPoint = (pointIndex > 2) ? stroke->getControlPoint(pointIndex - 3) : TThickPoint();
+	TThickPoint precPoint =
+		(pointIndex > 2) ? stroke->getControlPoint(pointIndex - 3) : TThickPoint();
 
 	if (linear) {
 		TThickPoint p(point - precPoint);
@@ -598,7 +609,8 @@ void ControlPointEditorStroke::setLinearSpeedOut(int index, bool linear, bool up
 	int nextIndex = (index == m_controlPoints.size() - 1 && isSelfLoop()) ? 0 : index + 1;
 
 	TThickPoint point = stroke->getControlPoint(pointIndex);
-	TThickPoint nextPoint = (pointIndex < cpCount - 3) ? stroke->getControlPoint(pointIndex + 3) : TThickPoint();
+	TThickPoint nextPoint =
+		(pointIndex < cpCount - 3) ? stroke->getControlPoint(pointIndex + 3) : TThickPoint();
 
 	if (linear) {
 		TThickPoint p(nextPoint - point);
@@ -670,7 +682,7 @@ int ControlPointEditorStroke::addControlPoint(const TPointD &pos)
 	double d = 0.01;
 	int indexAtPos;
 	int cpCount = stroke->getControlPointCount();
-	if (cpCount <= 3) //e' un unico chunk e in questo caso rappresenta un punto
+	if (cpCount <= 3) // e' un unico chunk e in questo caso rappresenta un punto
 	{
 		getPointTypeAt(pos, d, indexAtPos);
 		return indexAtPos;
@@ -695,12 +707,14 @@ int ControlPointEditorStroke::addControlPoint(const TPointD &pos)
 	std::vector<TThickPoint> points;
 
 	for (i = 0; i < cpCount; i++) {
-		if (i != precCp.m_pointIndex + 1 && i != precCp.m_pointIndex + 2 && i != precCp.m_pointIndex + 3)
+		if (i != precCp.m_pointIndex + 1 && i != precCp.m_pointIndex + 2 &&
+			i != precCp.m_pointIndex + 3)
 			points.push_back(stroke->getControlPoint(i));
 		if (i == precCp.m_pointIndex + 2) {
 			bool isBeforePointLinear = isSpeedOutLinear(index);
 			int nextIndex = (isSelfLoop() && index == m_controlPoints.size() - 1) ? 0 : index + 1;
-			bool isNextPointLinear = nextIndex < (int)m_controlPoints.size() && isSpeedInLinear(nextIndex);
+			bool isNextPointLinear =
+				nextIndex < (int)m_controlPoints.size() && isSpeedInLinear(nextIndex);
 
 			TThickPoint a0 = stroke->getControlPoint(precCp.m_pointIndex);
 			TThickPoint a1 = stroke->getControlPoint(precCp.m_pointIndex + 1);
@@ -715,8 +729,8 @@ int ControlPointEditorStroke::addControlPoint(const TPointD &pos)
 				d0 = a1;
 				d3 = stroke->getThickPoint(w);
 				d6 = a3;
-				d2 = computeLinearPoint(d0, d3, 0.01, true);  //SpeedIn
-				d4 = computeLinearPoint(d3, d6, 0.01, false); //SpeedOut
+				d2 = computeLinearPoint(d0, d3, 0.01, true); // SpeedIn
+				d4 = computeLinearPoint(d3, d6, 0.01, false); // SpeedOut
 				d1 = 0.5 * (d0 + d2);
 				d5 = 0.5 * (d4 + d6);
 			} else if (dist2 < 32) {
@@ -745,16 +759,23 @@ int ControlPointEditorStroke::addControlPoint(const TPointD &pos)
 					isInFirstChunk = false;
 				}
 
-				double w0 = (isSelfLoop() && precCp.m_pointIndex + 4 == cpCount - 1 && !isInFirstChunk) ? 1 : stroke->getW(a0);
+				double w0 =
+					(isSelfLoop() && precCp.m_pointIndex + 4 == cpCount - 1 && !isInFirstChunk)
+						? 1
+						: stroke->getW(a0);
 				double w1 = stroke->getW(a2);
 				double t = (w - w0) / (w1 - w0);
 
 				TThickPoint p = stroke->getThickPoint(w);
-				TThickPoint b0 = TThickPoint((1 - t) * a0 + t * a1, (1 - t) * a0.thick + t * a1.thick);
-				TThickPoint b1 = TThickPoint((1 - t) * a1 + t * a2, (1 - t) * a1.thick + t * a2.thick);
-				TThickPoint c0 = TThickPoint(0.5 * a0 + 0.5 * b0, (1 - t) * a0.thick + t * b0.thick);
+				TThickPoint b0 =
+					TThickPoint((1 - t) * a0 + t * a1, (1 - t) * a0.thick + t * a1.thick);
+				TThickPoint b1 =
+					TThickPoint((1 - t) * a1 + t * a2, (1 - t) * a1.thick + t * a2.thick);
+				TThickPoint c0 =
+					TThickPoint(0.5 * a0 + 0.5 * b0, (1 - t) * a0.thick + t * b0.thick);
 				TThickPoint c1 = TThickPoint(0.5 * b0 + 0.5 * p, (1 - t) * b0.thick + t * p.thick);
-				TThickPoint c2 = TThickPoint(0.5 * c0 + 0.5 * c1, (1 - t) * c0.thick + t * c1.thick);
+				TThickPoint c2 =
+					TThickPoint(0.5 * c0 + 0.5 * c1, (1 - t) * c0.thick + t * c1.thick);
 
 				d0 = (isInFirstChunk) ? c0 : a3;
 				d1 = (isInFirstChunk) ? c2 : a2;
@@ -794,8 +815,9 @@ void ControlPointEditorStroke::deleteControlPoint(int index)
 		return;
 
 	assert(stroke && 0 <= index && index < (int)getControlPointCount());
-	//E' un unico chunk e in questo caso rappresenta un punto
-	if (stroke->getControlPointCount() <= 3 || (isSelfLoop() && stroke->getControlPointCount() <= 5)) {
+	// E' un unico chunk e in questo caso rappresenta un punto
+	if (stroke->getControlPointCount() <= 3 ||
+		(isSelfLoop() && stroke->getControlPointCount() <= 5)) {
 		m_controlPoints.clear();
 		m_vi->deleteStroke(m_strokeIndex);
 		return;
@@ -809,7 +831,7 @@ void ControlPointEditorStroke::deleteControlPoint(int index)
 	m_controlPoints.removeAt(index);
 	updatePoints();
 
-	//Aggiorno gli indici dei punti nella stroke
+	// Aggiorno gli indici dei punti nella stroke
 	assert((int)newPointsIndex.size() == (int)getControlPointCount());
 	for (i = 0; i < (int)getControlPointCount(); i++)
 		m_controlPoints[i].m_pointIndex = newPointsIndex.at(i);
@@ -827,7 +849,8 @@ void ControlPointEditorStroke::deleteControlPoint(int index)
 
 //-----------------------------------------------------------------------------
 
-void ControlPointEditorStroke::moveSpeed(int index, const TPointD &delta, bool isIn, double minDistance)
+void ControlPointEditorStroke::moveSpeed(int index, const TPointD &delta, bool isIn,
+										 double minDistance)
 {
 	if (!isIn)
 		moveSpeedOut(index, delta, minDistance);
@@ -839,19 +862,21 @@ void ControlPointEditorStroke::moveSpeed(int index, const TPointD &delta, bool i
 
 //-----------------------------------------------------------------------------
 
-void ControlPointEditorStroke::moveSegment(int beforeIndex, int nextIndex, const TPointD &delta, const TPointD &pos)
+void ControlPointEditorStroke::moveSegment(int beforeIndex, int nextIndex, const TPointD &delta,
+										   const TPointD &pos)
 {
 	TStroke *stroke = getStroke();
 	if (!stroke)
 		return;
 
 	int cpCount = getControlPointCount();
-	//Verifiche per il caso in cui lo stroke e' selfLoop
+	// Verifiche per il caso in cui lo stroke e' selfLoop
 	if (isSelfLoop() && beforeIndex == 0 && nextIndex == cpCount - 1)
 		tswap(beforeIndex, nextIndex);
 
 	int beforePointIndex = m_controlPoints[beforeIndex].m_pointIndex;
-	int nextPointIndex = (isSelfLoop() && nextIndex == 0) ? stroke->getControlPointCount() - 1 : m_controlPoints[nextIndex].m_pointIndex;
+	int nextPointIndex = (isSelfLoop() && nextIndex == 0) ? stroke->getControlPointCount() - 1
+														  : m_controlPoints[nextIndex].m_pointIndex;
 	double w = stroke->getW(pos);
 	double w0 = stroke->getParameterAtControlPoint(beforePointIndex);
 	double w4 = stroke->getParameterAtControlPoint(nextPointIndex);
@@ -861,17 +886,22 @@ void ControlPointEditorStroke::moveSegment(int beforeIndex, int nextIndex, const
 	double s = 1;
 
 	if (isSpeedOutLinear(beforeIndex)) {
-		m_controlPoints[beforeIndex].m_speedOut = (stroke->getControlPoint(nextPointIndex) - stroke->getControlPoint(beforePointIndex)) * 0.3;
+		m_controlPoints[beforeIndex].m_speedOut =
+			(stroke->getControlPoint(nextPointIndex) - stroke->getControlPoint(beforePointIndex)) *
+			0.3;
 		if (!isSpeedInLinear(beforeIndex))
 			m_controlPoints[beforeIndex].m_isCusp = true;
-	} else if (!isSpeedOutLinear(beforeIndex) && !isSpeedInLinear(beforeIndex) && !isCusp(beforeIndex)) {
+	} else if (!isSpeedOutLinear(beforeIndex) && !isSpeedInLinear(beforeIndex) &&
+			   !isCusp(beforeIndex)) {
 		t = 1 - abs(w - w0) / abs(w4 - w0);
 		moveSingleControlPoint(beforeIndex, t * delta);
 		t = 1 - t;
 	}
 
 	if (isSpeedInLinear(nextIndex)) {
-		m_controlPoints[nextIndex].m_speedIn = (stroke->getControlPoint(nextPointIndex) - stroke->getControlPoint(beforePointIndex)) * 0.3;
+		m_controlPoints[nextIndex].m_speedIn =
+			(stroke->getControlPoint(nextPointIndex) - stroke->getControlPoint(beforePointIndex)) *
+			0.3;
 		if (!isSpeedOutLinear(nextIndex))
 			m_controlPoints[nextIndex].m_isCusp = true;
 	} else if (!isSpeedInLinear(nextIndex) && !isSpeedOutLinear(nextIndex) && !isCusp(nextIndex)) {
@@ -881,17 +911,17 @@ void ControlPointEditorStroke::moveSegment(int beforeIndex, int nextIndex, const
 	}
 
 	moveSpeedOut(beforeIndex, delta * s, 0);
-	//updateDependentPoint(beforeIndex);
+	// updateDependentPoint(beforeIndex);
 	moveSpeedIn(nextIndex, delta * t, 0);
-	//updateDependentPoint(nextIndex);
+	// updateDependentPoint(nextIndex);
 
 	updatePoints();
 }
 
 //-----------------------------------------------------------------------------
 
-ControlPointEditorStroke::PointType ControlPointEditorStroke::getPointTypeAt(const TPointD &pos,
-																			 double &distance2, int &index) const
+ControlPointEditorStroke::PointType
+ControlPointEditorStroke::getPointTypeAt(const TPointD &pos, double &distance2, int &index) const
 {
 	TStroke *stroke = getStroke();
 	if (!stroke)
@@ -911,22 +941,27 @@ ControlPointEditorStroke::PointType ControlPointEditorStroke::getPointTypeAt(con
 		ControlPoint cPoint = m_controlPoints[i];
 		TPointD point = stroke->getControlPoint(cPoint.m_pointIndex);
 		double cpDistance2 = tdistance2(pos, point);
-		double distanceIn2 = !isSpeedInLinear(i) ? tdistance2(pos, point - cPoint.m_speedIn) : cpDistance2 + 1;
-		double distanceOut2 = !isSpeedOutLinear(i) ? tdistance2(pos, point + cPoint.m_speedOut) : cpDistance2 + 1;
+		double distanceIn2 =
+			!isSpeedInLinear(i) ? tdistance2(pos, point - cPoint.m_speedIn) : cpDistance2 + 1;
+		double distanceOut2 =
+			!isSpeedOutLinear(i) ? tdistance2(pos, point + cPoint.m_speedOut) : cpDistance2 + 1;
 		if (i == 0 && !isSelfLoop())
 			distanceIn2 = tmax(cpDistance2, distanceOut2) + 1;
 		if (i == cpCount - 1 && !isSelfLoop())
 			distanceOut2 = tmax(cpDistance2, distanceIn2) + 1;
 
-		if (cpDistance2 < distanceIn2 && cpDistance2 < distanceOut2 && (cpDistance2 < minDistance2 || index < 0)) {
+		if (cpDistance2 < distanceIn2 && cpDistance2 < distanceOut2 &&
+			(cpDistance2 < minDistance2 || index < 0)) {
 			minDistance2 = cpDistance2;
 			index = i;
 			type = CONTROL_POINT;
-		} else if (distanceIn2 < cpDistance2 && distanceIn2 < distanceOut2 && (distanceIn2 < minDistance2 || index < 0)) {
+		} else if (distanceIn2 < cpDistance2 && distanceIn2 < distanceOut2 &&
+				   (distanceIn2 < minDistance2 || index < 0)) {
 			minDistance2 = distanceIn2;
 			index = i;
 			type = SPEED_IN;
-		} else if (distanceOut2 < cpDistance2 && distanceOut2 < distanceIn2 && (distanceOut2 < minDistance2 || index < 0)) {
+		} else if (distanceOut2 < cpDistance2 && distanceOut2 < distanceIn2 &&
+				   (distanceOut2 < minDistance2 || index < 0)) {
 			minDistance2 = distanceOut2;
 			index = i;
 			type = SPEED_OUT;
@@ -1010,7 +1045,8 @@ void ControlPointSelection::setLinear()
 		undo = new UndoPath(tool->getXsheet()->getStageObject(tool->getObjectId())->getSpline());
 	else {
 		TXshSimpleLevel *level = tool->getApplication()->getCurrentLevel()->getSimpleLevel();
-		UndoControlPointEditor *cpEditorUndo = new UndoControlPointEditor(level, tool->getCurrentFid());
+		UndoControlPointEditor *cpEditorUndo =
+			new UndoControlPointEditor(level, tool->getCurrentFid());
 		cpEditorUndo->addOldStroke(currentStrokeIndex, vi->getVIStroke(currentStrokeIndex));
 		undo = cpEditorUndo;
 	}
@@ -1040,7 +1076,8 @@ void ControlPointSelection::setUnlinear()
 		undo = new UndoPath(tool->getXsheet()->getStageObject(tool->getObjectId())->getSpline());
 	else {
 		TXshSimpleLevel *level = tool->getApplication()->getCurrentLevel()->getSimpleLevel();
-		UndoControlPointEditor *cpEditorUndo = new UndoControlPointEditor(level, tool->getCurrentFid());
+		UndoControlPointEditor *cpEditorUndo =
+			new UndoControlPointEditor(level, tool->getCurrentFid());
 		cpEditorUndo->addOldStroke(currentStrokeIndex, vi->getVIStroke(currentStrokeIndex));
 		undo = cpEditorUndo;
 	}
@@ -1065,14 +1102,15 @@ void ControlPointSelection::deleteControlPoints()
 	if (!vi || isEmpty() || currentStrokeIndex == -1)
 		return;
 
-	//Inizializzo l'UNDO
+	// Inizializzo l'UNDO
 	TUndo *undo;
 	bool isCurrentObjectSpline = tool->getApplication()->getCurrentObject()->isSpline();
 	if (isCurrentObjectSpline)
 		undo = new UndoPath(tool->getXsheet()->getStageObject(tool->getObjectId())->getSpline());
 	else {
 		TXshSimpleLevel *level = tool->getApplication()->getCurrentLevel()->getSimpleLevel();
-		UndoControlPointEditor *cpEditorUndo = new UndoControlPointEditor(level, tool->getCurrentFid());
+		UndoControlPointEditor *cpEditorUndo =
+			new UndoControlPointEditor(level, tool->getCurrentFid());
 		cpEditorUndo->addOldStroke(currentStrokeIndex, vi->getVIStroke(currentStrokeIndex));
 		undo = cpEditorUndo;
 	}
@@ -1091,7 +1129,7 @@ void ControlPointSelection::deleteControlPoints()
 		}
 	}
 
-	//La spline non puo' essere cancellata completamente!!!
+	// La spline non puo' essere cancellata completamente!!!
 	if (vi->getStrokeCount() == 0) {
 		if (TTool::getApplication()->getCurrentObject()->isSpline()) {
 			std::vector<TPointD> points;
@@ -1106,7 +1144,7 @@ void ControlPointSelection::deleteControlPoints()
 	}
 	tool->notifyImageChanged();
 	selectNone();
-	//Registro l'UNDO
+	// Registro l'UNDO
 	TUndoManager::manager()->add(undo);
 }
 

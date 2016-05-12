@@ -59,7 +59,8 @@ double average(std::vector<double> &values, double range = 2.5)
 
 //--------------------------------------------------------------------------------------
 
-double weightedAverage(std::vector<double> &values, std::vector<double> &weights, double range = 2.5)
+double weightedAverage(std::vector<double> &values, std::vector<double> &weights,
+					   double range = 2.5)
 {
 	UINT size = values.size();
 	if (size == 0)
@@ -136,9 +137,9 @@ inline bool isTooComplex(UINT n1, UINT n2, UINT maxSubsetNumber = 100)
 	/*
 
   n*(n-1)* ...(n-r+1) < n^r that must be <= 2^(num bits of UINT)-1
-  
+
   s:=sizeof(UINT)*8
-    
+
   if
   n <= 2^( (s-1)/r)   =>
 
@@ -149,14 +150,14 @@ inline bool isTooComplex(UINT n1, UINT n2, UINT maxSubsetNumber = 100)
   log n^r <= log 2^(s-1)   =>
 
   n^r <= 2^(s-1) <  (2^s)-1
-    
+
   */
 
 	const UINT one = 1;
 	if (n > (one << ((sizeof(UINT) * 8 - 1) / r)))
 		return true;
 
-	UINT product1 = n; //product1 = n*(n-1)* ...(n-r+1)
+	UINT product1 = n; // product1 = n*(n-1)* ...(n-r+1)
 	for (UINT i = 1; i < r; i++)
 		product1 *= --n;
 
@@ -166,7 +167,7 @@ inline bool isTooComplex(UINT n1, UINT n2, UINT maxSubsetNumber = 100)
 		rFact *= --r;
 
 	return (product1 / rFact > maxSubsetNumber);
-	//product1/rFact is number of combination
+	// product1/rFact is number of combination
 	//  ( n )
 	//  ( r )
 }
@@ -186,7 +187,7 @@ void eraseSmallAngles(std::vector<std::pair<int, double>> &corners, double angle
 }
 
 //--------------------------------------------------------------------------------------
-//output:
+// output:
 // min is the minimum angle greater or equal to minDegree (i.e the minimum angle of the corners)
 // max is tha maximum angle greater or equal to minDegree
 
@@ -253,7 +254,10 @@ void detectCorners(const TStroke *stroke, double minDegree,
 			continue;
 		}
 
-		if (j - 2 >= 0 && (corners.empty() || it == corners.begin() || j - 1 != (*(it - 1)).first) && j + 1 < (int)quadCount1 && (corners.empty() || it == corners.end() || j + 1 != (*it).first)) {
+		if (j - 2 >= 0 &&
+			(corners.empty() || it == corners.begin() || j - 1 != (*(it - 1)).first) &&
+			j + 1 < (int)quadCount1 &&
+			(corners.empty() || it == corners.end() || j + 1 != (*it).first)) {
 			speed1 = stroke->getChunk(j - 2)->getSpeed(1);
 			speed2 = stroke->getChunk(j + 1)->getSpeed(0);
 			if (!(speed1 == TPointD() || speed2 == TPointD())) {
@@ -264,11 +268,14 @@ void detectCorners(const TStroke *stroke, double minDegree,
 				if (tan1 * tan2 < 0) {
 					angle = 180 - asin(tcrop(vectorialProduct, -1.0, 1.0)) * TConsts::invOf_pi_180;
 
-					metaCornerLen = ratioLen * (stroke->getChunk(j - 1)->getLength() + stroke->getChunk(j)->getLength());
+					metaCornerLen = ratioLen * (stroke->getChunk(j - 1)->getLength() +
+												stroke->getChunk(j)->getLength());
 					partialLen = 0;
 					bool goodAngle = false;
 
-					for (int i = j - 3; i >= 0 && (corners.empty() || it == corners.begin() || i + 1 != (*(it - 1)).first); i--) {
+					for (int i = j - 3; i >= 0 && (corners.empty() || it == corners.begin() ||
+												   i + 1 != (*(it - 1)).first);
+						 i--) {
 						tan1 = stroke->getChunk(i)->getSpeed(1);
 						if (tan1 == TPointD())
 							continue;
@@ -280,7 +287,8 @@ void detectCorners(const TStroke *stroke, double minDegree,
 						tan2 = normalize(tan2);
 
 						vectorialProduct = fabs(cross(tan1, tan2));
-						double nearAngle = asin(tcrop(vectorialProduct, -1.0, 1.0)) * TConsts::invOf_pi_180;
+						double nearAngle =
+							asin(tcrop(vectorialProduct, -1.0, 1.0)) * TConsts::invOf_pi_180;
 						if (tan1 * tan2 < 0)
 							nearAngle = 180 - nearAngle;
 
@@ -295,7 +303,10 @@ void detectCorners(const TStroke *stroke, double minDegree,
 					}
 					if (goodAngle) {
 						partialLen = 0;
-						for (int i = j + 2; i + 1 < (int)quadCount1 && (corners.empty() || it == corners.end() || i + 1 != (*it).first); i++) {
+						for (int i = j + 2;
+							 i + 1 < (int)quadCount1 &&
+							 (corners.empty() || it == corners.end() || i + 1 != (*it).first);
+							 i++) {
 							tan1 = stroke->getChunk(i)->getSpeed(0);
 							if (tan1 == TPointD())
 								continue;
@@ -307,7 +318,8 @@ void detectCorners(const TStroke *stroke, double minDegree,
 							tan2 = normalize(tan2);
 
 							vectorialProduct = fabs(cross(tan1, tan2));
-							double nearAngle = asin(tcrop(vectorialProduct, -1.0, 1.0)) * TConsts::invOf_pi_180;
+							double nearAngle =
+								asin(tcrop(vectorialProduct, -1.0, 1.0)) * TConsts::invOf_pi_180;
 							if (tan1 * tan2 < 0)
 								nearAngle = 180 - nearAngle;
 
@@ -323,7 +335,7 @@ void detectCorners(const TStroke *stroke, double minDegree,
 					}
 
 					if (goodAngle) {
-						//l'angolo viene un po' declassato in quanto meta
+						// l'angolo viene un po' declassato in quanto meta
 						it = corners.insert(it, std::make_pair(j, angle * 0.7)) + 1;
 						if (min > angle)
 							min = angle;
@@ -367,9 +379,8 @@ double variance(std::vector<double> &values)
 
 void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
 					  std::pair<int, double> *partialAngles1, UINT partialAngles1Size,
-					  const std::vector<std::pair<int, double>> &angles2,
-					  UINT r, std::list<std::pair<int, double>> &partialSolution,
-					  double &bestValue,
+					  const std::vector<std::pair<int, double>> &angles2, UINT r,
+					  std::list<std::pair<int, double>> &partialSolution, double &bestValue,
 					  std::vector<int> &bestVector)
 {
 	//-------------------------------------------------------------------
@@ -392,7 +403,8 @@ void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
 		std::vector<double> ratioX, ratioY;
 
 		for (j = 0; j < angles1Size; j++) {
-			rationAngles[j] = fabs(angles1[j].second - angles2[j].second) / (angles1[j].second + angles2[j].second);
+			rationAngles[j] = fabs(angles1[j].second - angles2[j].second) /
+							  (angles1[j].second + angles2[j].second);
 		}
 
 		UINT firstQuad1 = 0;
@@ -421,7 +433,8 @@ void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
 				nextQuad2 = stroke2->getChunkCount();
 			}
 
-			ratioLength[j] = fabs(stroke1->getLengthAtControlPoint(nextQuad1 * 2) * invTotalLen1 - stroke2->getLengthAtControlPoint(nextQuad2 * 2) * invTotalLen2);
+			ratioLength[j] = fabs(stroke1->getLengthAtControlPoint(nextQuad1 * 2) * invTotalLen1 -
+								  stroke2->getLengthAtControlPoint(nextQuad2 * 2) * invTotalLen2);
 
 			TPointD p1(stroke1->getChunk(nextQuad1 - 1)->getP2() -
 					   stroke1->getChunk(firstQuad1)->getP0());
@@ -455,27 +468,27 @@ void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
 		varAng = average(rationAngles);
 
 		double estimate = varX + varY + varAng + varLen;
-		/*    
-    #ifdef _DEBUG
-    for(UINT dI=0; dI<angles1Size; dI++)
-    {
-      TDebugMessage::getStream() << angles1[dI].first<<"  ";      
-    }
-    TDebugMessage::flush();
+		/*
+	#ifdef _DEBUG
+	for(UINT dI=0; dI<angles1Size; dI++)
+	{
+	  TDebugMessage::getStream() << angles1[dI].first<<"  ";
+	}
+	TDebugMessage::flush();
 
-    TDebugMessage::getStream() <<"estimate "<< estimate<<"=" ;
-    TDebugMessage::flush();
-    TDebugMessage::getStream()<<varAng <<"+" ;
-    TDebugMessage::flush();
-    TDebugMessage::getStream()<<varX <<"+" ;
-    TDebugMessage::flush();
-    TDebugMessage::getStream()<<varY<<"+";
-    TDebugMessage::flush();
-    TDebugMessage::getStream()<<varLen;
-    TDebugMessage::flush();
+	TDebugMessage::getStream() <<"estimate "<< estimate<<"=" ;
+	TDebugMessage::flush();
+	TDebugMessage::getStream()<<varAng <<"+" ;
+	TDebugMessage::flush();
+	TDebugMessage::getStream()<<varX <<"+" ;
+	TDebugMessage::flush();
+	TDebugMessage::getStream()<<varY<<"+";
+	TDebugMessage::flush();
+	TDebugMessage::getStream()<<varLen;
+	TDebugMessage::flush();
 
-    #endif
-    */
+	#endif
+	*/
 
 		if (estimate < bestValue) {
 			bestValue = estimate;
@@ -496,58 +509,41 @@ void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
 
 	if (r == 1) {
 		for (UINT i = 0; i < partialAngles1Size; i++) {
-			findBestSolution(stroke1, stroke2,
-							 partialAngles1 + i, 1,
-							 angles2,
-							 1, partialSolution,
-							 bestValue,
-							 bestVector);
+			findBestSolution(stroke1, stroke2, partialAngles1 + i, 1, angles2, 1, partialSolution,
+							 bestValue, bestVector);
 		}
 		return;
 	}
 
 	partialSolution.push_back(partialAngles1[0]);
-	findBestSolution(stroke1, stroke2,
-					 partialAngles1 + 1, partialAngles1Size - 1,
-					 angles2,
-					 r - 1, partialSolution,
-					 bestValue,
-					 bestVector);
+	findBestSolution(stroke1, stroke2, partialAngles1 + 1, partialAngles1Size - 1, angles2, r - 1,
+					 partialSolution, bestValue, bestVector);
 
 	partialSolution.pop_back();
-	findBestSolution(stroke1, stroke2,
-					 partialAngles1 + 1, partialAngles1Size - 1,
-					 angles2,
-					 r, partialSolution,
-					 bestValue,
-					 bestVector);
+	findBestSolution(stroke1, stroke2, partialAngles1 + 1, partialAngles1Size - 1, angles2, r,
+					 partialSolution, bestValue, bestVector);
 }
 
 //--------------------------------------------------------------------------------------
 
 void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
 					  std::vector<std::pair<int, double>> &angles1,
-					  const std::vector<std::pair<int, double>> &angles2,
-					  double &bestValue,
+					  const std::vector<std::pair<int, double>> &angles2, double &bestValue,
 					  std::vector<int> &bestVector)
 {
 	assert(angles1.size() > angles2.size());
 
 	std::list<std::pair<int, double>> partialSolution;
 
-	findBestSolution(stroke1, stroke2,
-					 &(angles1[0]), angles1.size(),
-					 angles2,
-					 angles2.size(), partialSolution,
-					 bestValue, bestVector);
+	findBestSolution(stroke1, stroke2, &(angles1[0]), angles1.size(), angles2, angles2.size(),
+					 partialSolution, bestValue, bestVector);
 }
 
 //--------------------------------------------------------------------------------------
 
 void trivialSolution(const TStroke *stroke1, const TStroke *stroke2,
 					 const std::vector<std::pair<int, double>> &angles1,
-					 const std::vector<std::pair<int, double>> &angles2,
-					 std::vector<int> &solution)
+					 const std::vector<std::pair<int, double>> &angles2, std::vector<int> &solution)
 {
 	assert(angles1.size() > angles2.size());
 
@@ -592,7 +588,8 @@ void trivialSolution(const TStroke *stroke1, const TStroke *stroke2,
 				}
 				count++;
 				if (angles2.size() < count)
-					subStrokeRatio2 = stroke2->getLengthAtControlPoint(angles2[count].first * 2) * invTotalLen2;
+					subStrokeRatio2 =
+						stroke2->getLengthAtControlPoint(angles2[count].first * 2) * invTotalLen2;
 				else
 					subStrokeRatio2 = 1;
 			} else {
@@ -657,15 +654,11 @@ void sample(const TStroke *stroke, int samplingSize, std::vector<TPointD> &sampl
 class TInbetween::Imp
 {
 
-public:
+  public:
 	//----------------------
 
 	struct StrokeTransform {
-		typedef enum {
-			EQUAL,
-			POINT,
-			GENERAL
-		} TransformationType;
+		typedef enum { EQUAL, POINT, GENERAL } TransformationType;
 
 		TPointD m_translate;
 		TPointD m_rotationAndScaleCenter;
@@ -673,7 +666,7 @@ public:
 
 		TransformationType m_type;
 
-		//saved for optimization
+		// saved for optimization
 		TAffine m_inverse;
 
 		std::vector<int> m_firstStrokeCornerIndexes;
@@ -721,7 +714,8 @@ void TInbetween::Imp::computeTransformation()
 	StrokeTransform transform;
 	double cs, sn, totalLen1, totalLen2, constK, constQ, constB, constD, constA;
 	UINT cpCount1, cpCount2;
-	TPointD stroke1Centroid, stroke2Centroid, stroke1Begin, stroke2Begin, stroke1End, stroke2End, versor1, versor2;
+	TPointD stroke1Centroid, stroke2Centroid, stroke1Begin, stroke2Begin, stroke1End, stroke2End,
+		versor1, versor2;
 	std::vector<TPointD> samplingPoint1(samplingPointNumber), samplingPoint2(samplingPointNumber);
 	TStroke *stroke1, *stroke2;
 	std::vector<double> ratioSampling, weigths, subStrokeXScaling, subStrokeYScaling;
@@ -742,7 +736,7 @@ void TInbetween::Imp::computeTransformation()
 		stroke1 = m_firstImage->getStroke(i);
 		stroke2 = m_lastImage->getStroke(i);
 
-		//check if the strokes are equal
+		// check if the strokes are equal
 		cpCount1 = stroke1->getControlPointCount();
 		cpCount2 = stroke2->getControlPointCount();
 
@@ -814,10 +808,10 @@ void TInbetween::Imp::computeTransformation()
 					angles1.clear();
 
 				/*
-        debugStream.open("c:\\temp\\inbetween.txt", ios_base::out);
-        debugStream <<"num angoli 1: "<< angles1.size() << endl;
-        debugStream <<"num angoli 2: "<< angles2.size() << endl;
-        */
+		debugStream.open("c:\\temp\\inbetween.txt", ios_base::out);
+		debugStream <<"num angoli 1: "<< angles1.size() << endl;
+		debugStream <<"num angoli 2: "<< angles2.size() << endl;
+		*/
 
 				double bestValue = (std::numeric_limits<double>::max)();
 
@@ -827,9 +821,11 @@ void TInbetween::Imp::computeTransformation()
 					//--------------------------------------------------------------------------
 
 					if (isTooComplex(angles1.size(), angles2.size(), maxSubSetNum)) {
-						//debugStream <<"is too complex" << endl;
-						int firstAngle = (int)((angles1.size() < angles2.size()) ? minAngle2 : minAngle1);
-						int lastAngle = (int)((angles1.size() < angles2.size()) ? maxAngle1 : maxAngle2);
+						// debugStream <<"is too complex" << endl;
+						int firstAngle =
+							(int)((angles1.size() < angles2.size()) ? minAngle2 : minAngle1);
+						int lastAngle =
+							(int)((angles1.size() < angles2.size()) ? maxAngle1 : maxAngle2);
 						int bestAngle = (int)startMinAngle;
 
 						if ((int)(angles1.size() + angles2.size()) < lastAngle - firstAngle + 1) {
@@ -847,20 +843,26 @@ void TInbetween::Imp::computeTransformation()
 								if (tempAngle >= firstAngle && tempAngle <= lastAngle)
 									sortedAngles2.push_back(tempAngle);
 							}
-							std::vector<double> sortedAngles(sortedAngles1.size() + sortedAngles2.size());
+							std::vector<double> sortedAngles(sortedAngles1.size() +
+															 sortedAngles2.size());
 
 							std::sort(sortedAngles1.begin(), sortedAngles1.end());
 							std::sort(sortedAngles2.begin(), sortedAngles2.end());
-							std::merge(sortedAngles1.begin(), sortedAngles1.end(), sortedAngles2.begin(), sortedAngles2.end(), sortedAngles.begin());
+							std::merge(sortedAngles1.begin(), sortedAngles1.end(),
+									   sortedAngles2.begin(), sortedAngles2.end(),
+									   sortedAngles.begin());
 
 							for (j = 0; j < sortedAngles.size(); j++) {
 								int numAng1 = angleNumber(angles1, sortedAngles[j]);
 								int numAng2 = angleNumber(angles2, sortedAngles[j]);
-								double val = (numAng1 == numAng2) ? 0 : fabs((float)(numAng1 - numAng2)) / (numAng1 + numAng2);
+								double val =
+									(numAng1 == numAng2) ? 0 : fabs((float)(numAng1 - numAng2)) /
+																   (numAng1 + numAng2);
 								if (val < bestValue) {
 									bestValue = val;
 									bestAngle = (int)(sortedAngles[j]);
-									if (bestValue == 0 || !isTooComplex(numAng1, numAng2, maxSubSetNum))
+									if (bestValue == 0 ||
+										!isTooComplex(numAng1, numAng2, maxSubSetNum))
 										break;
 								}
 							}
@@ -870,11 +872,14 @@ void TInbetween::Imp::computeTransformation()
 							for (int angle = firstAngle; angle <= lastAngle; angle++) {
 								int numAng1 = angleNumber(angles1, angle);
 								int numAng2 = angleNumber(angles2, angle);
-								double val = (numAng1 == numAng2) ? 0 : fabs((float)(numAng1 - numAng2)) / (numAng1 + numAng2);
+								double val =
+									(numAng1 == numAng2) ? 0 : fabs((float)(numAng1 - numAng2)) /
+																   (numAng1 + numAng2);
 								if (val < bestValue) {
 									bestValue = val;
 									bestAngle = angle;
-									if (bestValue == 0 || !isTooComplex(numAng1, numAng2, maxSubSetNum))
+									if (bestValue == 0 ||
+										!isTooComplex(numAng1, numAng2, maxSubSetNum))
 										break;
 								}
 							}
@@ -884,10 +889,10 @@ void TInbetween::Imp::computeTransformation()
 						eraseSmallAngles(angles2, bestAngle);
 
 						/*
-            debugStream <<"bestAngle: "<< bestAngle << endl;
-            debugStream <<"num angoli 1: "<< angles1.size() << endl;
-            debugStream <<"num angoli 2: "<< angles2.size() << endl;
-            */
+			debugStream <<"bestAngle: "<< bestAngle << endl;
+			debugStream <<"num angoli 1: "<< angles1.size() << endl;
+			debugStream <<"num angoli 2: "<< angles2.size() << endl;
+			*/
 					}
 					//--------------------------------------------------------------------------
 
@@ -907,46 +912,66 @@ void TInbetween::Imp::computeTransformation()
 						if (isTooComplex(angles1.size(), angles2.size(), maxSubSetNum)) {
 							if (angles1.size() > angles2.size()) {
 								transform.m_firstStrokeCornerIndexes.resize(angles2.size());
-								trivialSolution(stroke1, stroke2, angles1, angles2, transform.m_firstStrokeCornerIndexes);
-								transform.m_firstStrokeCornerIndexes.insert(transform.m_firstStrokeCornerIndexes.begin(), 0);
-								transform.m_firstStrokeCornerIndexes.push_back(stroke1->getChunkCount());
+								trivialSolution(stroke1, stroke2, angles1, angles2,
+												transform.m_firstStrokeCornerIndexes);
+								transform.m_firstStrokeCornerIndexes.insert(
+									transform.m_firstStrokeCornerIndexes.begin(), 0);
+								transform.m_firstStrokeCornerIndexes.push_back(
+									stroke1->getChunkCount());
 
 								transform.m_secondStrokeCornerIndexes.push_back(0);
 								for (j = 0; j < angles2.size(); j++)
-									transform.m_secondStrokeCornerIndexes.push_back(angles2[j].first);
-								transform.m_secondStrokeCornerIndexes.push_back(stroke2->getChunkCount());
+									transform.m_secondStrokeCornerIndexes.push_back(
+										angles2[j].first);
+								transform.m_secondStrokeCornerIndexes.push_back(
+									stroke2->getChunkCount());
 							} else {
 								transform.m_firstStrokeCornerIndexes.push_back(0);
 								for (j = 0; j < angles1.size(); j++)
-									transform.m_firstStrokeCornerIndexes.push_back(angles1[j].first);
-								transform.m_firstStrokeCornerIndexes.push_back(stroke1->getChunkCount());
+									transform.m_firstStrokeCornerIndexes.push_back(
+										angles1[j].first);
+								transform.m_firstStrokeCornerIndexes.push_back(
+									stroke1->getChunkCount());
 
 								transform.m_secondStrokeCornerIndexes.resize(angles1.size());
-								trivialSolution(stroke2, stroke1, angles2, angles1, transform.m_secondStrokeCornerIndexes);
-								transform.m_secondStrokeCornerIndexes.insert(transform.m_secondStrokeCornerIndexes.begin(), 0);
-								transform.m_secondStrokeCornerIndexes.push_back(stroke2->getChunkCount());
+								trivialSolution(stroke2, stroke1, angles2, angles1,
+												transform.m_secondStrokeCornerIndexes);
+								transform.m_secondStrokeCornerIndexes.insert(
+									transform.m_secondStrokeCornerIndexes.begin(), 0);
+								transform.m_secondStrokeCornerIndexes.push_back(
+									stroke2->getChunkCount());
 							}
 						} else {
 							if (angles1.size() > angles2.size()) {
 								transform.m_firstStrokeCornerIndexes.resize(angles2.size());
-								findBestSolution(stroke1, stroke2, angles1, angles2, bestValue, transform.m_firstStrokeCornerIndexes);
-								transform.m_firstStrokeCornerIndexes.insert(transform.m_firstStrokeCornerIndexes.begin(), 0);
-								transform.m_firstStrokeCornerIndexes.push_back(stroke1->getChunkCount());
+								findBestSolution(stroke1, stroke2, angles1, angles2, bestValue,
+												 transform.m_firstStrokeCornerIndexes);
+								transform.m_firstStrokeCornerIndexes.insert(
+									transform.m_firstStrokeCornerIndexes.begin(), 0);
+								transform.m_firstStrokeCornerIndexes.push_back(
+									stroke1->getChunkCount());
 
 								transform.m_secondStrokeCornerIndexes.push_back(0);
 								for (j = 0; j < angles2.size(); j++)
-									transform.m_secondStrokeCornerIndexes.push_back(angles2[j].first);
-								transform.m_secondStrokeCornerIndexes.push_back(stroke2->getChunkCount());
+									transform.m_secondStrokeCornerIndexes.push_back(
+										angles2[j].first);
+								transform.m_secondStrokeCornerIndexes.push_back(
+									stroke2->getChunkCount());
 							} else {
 								transform.m_firstStrokeCornerIndexes.push_back(0);
 								for (j = 0; j < angles1.size(); j++)
-									transform.m_firstStrokeCornerIndexes.push_back(angles1[j].first);
-								transform.m_firstStrokeCornerIndexes.push_back(stroke1->getChunkCount());
+									transform.m_firstStrokeCornerIndexes.push_back(
+										angles1[j].first);
+								transform.m_firstStrokeCornerIndexes.push_back(
+									stroke1->getChunkCount());
 
 								transform.m_secondStrokeCornerIndexes.resize(angles1.size());
-								findBestSolution(stroke2, stroke1, angles2, angles1, bestValue, transform.m_secondStrokeCornerIndexes);
-								transform.m_secondStrokeCornerIndexes.insert(transform.m_secondStrokeCornerIndexes.begin(), 0);
-								transform.m_secondStrokeCornerIndexes.push_back(stroke2->getChunkCount());
+								findBestSolution(stroke2, stroke1, angles2, angles1, bestValue,
+												 transform.m_secondStrokeCornerIndexes);
+								transform.m_secondStrokeCornerIndexes.insert(
+									transform.m_secondStrokeCornerIndexes.begin(), 0);
+								transform.m_secondStrokeCornerIndexes.push_back(
+									stroke2->getChunkCount());
 							}
 						}
 					}
@@ -977,11 +1002,15 @@ void TInbetween::Imp::computeTransformation()
 #ifdef _DEBUG
 				assert(transform.m_firstStrokeCornerIndexes[0] == 0);
 				assert(transform.m_secondStrokeCornerIndexes[0] == 0);
-				assert(transform.m_firstStrokeCornerIndexes[cornerSize - 1] == stroke1->getChunkCount());
-				assert(transform.m_secondStrokeCornerIndexes[cornerSize - 1] == stroke2->getChunkCount());
+				assert(transform.m_firstStrokeCornerIndexes[cornerSize - 1] ==
+					   stroke1->getChunkCount());
+				assert(transform.m_secondStrokeCornerIndexes[cornerSize - 1] ==
+					   stroke2->getChunkCount());
 				for (j = 0; j < cornerSize - 1; j++) {
-					assert(transform.m_firstStrokeCornerIndexes[j] < transform.m_firstStrokeCornerIndexes[j + 1]);
-					assert(transform.m_secondStrokeCornerIndexes[j] < transform.m_secondStrokeCornerIndexes[j + 1]);
+					assert(transform.m_firstStrokeCornerIndexes[j] <
+						   transform.m_firstStrokeCornerIndexes[j + 1]);
+					assert(transform.m_secondStrokeCornerIndexes[j] <
+						   transform.m_secondStrokeCornerIndexes[j + 1]);
 
 					assert(transform.m_firstStrokeCornerIndexes[j] < stroke1->getChunkCount());
 					assert(transform.m_secondStrokeCornerIndexes[j] < stroke2->getChunkCount());
@@ -991,9 +1020,11 @@ void TInbetween::Imp::computeTransformation()
 				for (j = 0; j < cornerSize - 1; j++) {
 					///////////////////////////////////////// sampling
 
-					subStroke1 = extract(stroke1, transform.m_firstStrokeCornerIndexes[j], transform.m_firstStrokeCornerIndexes[j + 1] - 1);
+					subStroke1 = extract(stroke1, transform.m_firstStrokeCornerIndexes[j],
+										 transform.m_firstStrokeCornerIndexes[j + 1] - 1);
 					sample(subStroke1, samplingPointNumber, samplingPoint1);
-					subStroke2 = extract(stroke2, transform.m_secondStrokeCornerIndexes[j], transform.m_secondStrokeCornerIndexes[j + 1] - 1);
+					subStroke2 = extract(stroke2, transform.m_secondStrokeCornerIndexes[j],
+										 transform.m_secondStrokeCornerIndexes[j + 1] - 1);
 					sample(subStroke2, samplingPointNumber, samplingPoint2);
 
 					///////////////////////////////////////// compute Rotation
@@ -1015,7 +1046,8 @@ void TInbetween::Imp::computeTransformation()
 							continue;
 						versor1 = normalize(pOld - stroke1Centroid);
 						versor2 = normalize(pNew - stroke2Centroid);
-						weigths.push_back(tdistance(pOld, stroke1Centroid) + tdistance(pNew, stroke2Centroid));
+						weigths.push_back(tdistance(pOld, stroke1Centroid) +
+										  tdistance(pNew, stroke2Centroid));
 						cs = versor1 * versor2;
 						sn = cross(versor1, versor2);
 						double v = atan2(sn, cs);
@@ -1055,9 +1087,11 @@ void TInbetween::Imp::computeTransformation()
 					for (j = 0; j < cornerSize - 1; j++) {
 						///////////////////////////////////////// sampling
 
-						subStroke1 = extract(stroke1, transform.m_firstStrokeCornerIndexes[j], transform.m_firstStrokeCornerIndexes[j + 1] - 1);
+						subStroke1 = extract(stroke1, transform.m_firstStrokeCornerIndexes[j],
+											 transform.m_firstStrokeCornerIndexes[j + 1] - 1);
 						sample(subStroke1, samplingPointNumber, samplingPoint1);
-						subStroke2 = extract(stroke2, transform.m_secondStrokeCornerIndexes[j], transform.m_secondStrokeCornerIndexes[j + 1] - 1);
+						subStroke2 = extract(stroke2, transform.m_secondStrokeCornerIndexes[j],
+											 transform.m_secondStrokeCornerIndexes[j + 1] - 1);
 						sample(subStroke2, samplingPointNumber, samplingPoint2);
 
 						///////////////////////////////////////// compute X Scale
@@ -1104,7 +1138,8 @@ void TInbetween::Imp::computeTransformation()
 							for (p = 0; p < samplingPointNumber; p++) {
 								appX = fabs(samplingPoint1[p].x - stroke1Centroid.x);
 								if (appX)
-									ratioSampling.push_back(fabs(samplingPoint2[p].x - stroke2Centroid.x) / appX);
+									ratioSampling.push_back(
+										fabs(samplingPoint2[p].x - stroke2Centroid.x) / appX);
 							}
 
 							if (!ratioSampling.empty()) {
@@ -1135,7 +1170,8 @@ void TInbetween::Imp::computeTransformation()
 							for (p = 0; p < samplingPointNumber; p++) {
 								appY = fabs(samplingPoint1[p].y - stroke1Centroid.y);
 								if (appY)
-									ratioSampling.push_back(fabs(samplingPoint2[p].y - stroke2Centroid.y) / appY);
+									ratioSampling.push_back(
+										fabs(samplingPoint2[p].y - stroke2Centroid.y) / appY);
 							}
 
 							if (!ratioSampling.empty()) {
@@ -1165,13 +1201,13 @@ void TInbetween::Imp::computeTransformation()
 							transform.m_scaleY = 1.0;
 					}
 					/*
-         #ifdef _DEBUG
-              
-          TDebugMessage::getStream()<<"x scale "<< transform.m_scaleX ;
-          TDebugMessage::flush();
-          TDebugMessage::getStream()<<"y scale "<< transform.m_scaleY ;
-          TDebugMessage::flush();
-        #endif
+		 #ifdef _DEBUG
+
+		  TDebugMessage::getStream()<<"x scale "<< transform.m_scaleX ;
+		  TDebugMessage::flush();
+		  TDebugMessage::getStream()<<"y scale "<< transform.m_scaleY ;
+		  TDebugMessage::flush();
+		#endif
 */
 				} else {
 					subStrokeXScaling.clear();
@@ -1180,9 +1216,11 @@ void TInbetween::Imp::computeTransformation()
 					for (j = 0; j < cornerSize - 1; j++) {
 						///////////////////////////////////////// sampling
 
-						subStroke1 = extract(stroke1, transform.m_firstStrokeCornerIndexes[j], transform.m_firstStrokeCornerIndexes[j + 1] - 1);
+						subStroke1 = extract(stroke1, transform.m_firstStrokeCornerIndexes[j],
+											 transform.m_firstStrokeCornerIndexes[j + 1] - 1);
 						sample(subStroke1, samplingPointNumber, samplingPoint1);
-						subStroke2 = extract(stroke2, transform.m_secondStrokeCornerIndexes[j], transform.m_secondStrokeCornerIndexes[j + 1] - 1);
+						subStroke2 = extract(stroke2, transform.m_secondStrokeCornerIndexes[j],
+											 transform.m_secondStrokeCornerIndexes[j + 1] - 1);
 						sample(subStroke2, samplingPointNumber, samplingPoint2);
 
 						///////////////////////////////////////// compute Scale
@@ -1193,7 +1231,8 @@ void TInbetween::Imp::computeTransformation()
 						TRectD bbox1 = subStroke1->getBBox();
 						double app = tdistance2(bbox1.getP00(), bbox1.getP11());
 						if (app) {
-							TRectD bbox2 = TRotation(transform.m_rotation).inv() * subStroke2->getBBox();
+							TRectD bbox2 =
+								TRotation(transform.m_rotation).inv() * subStroke2->getBBox();
 							app = sqrt(tdistance2(bbox2.getP00(), bbox2.getP11()) / app);
 
 							for (UINT tms = 0; tms < bboxSamplingWeight; tms++)
@@ -1203,7 +1242,8 @@ void TInbetween::Imp::computeTransformation()
 							for (p = 0; p < samplingPointNumber; p++) {
 								app = tdistance(samplingPoint1[p], stroke1Centroid);
 								if (app) {
-									ratioSampling.push_back(tdistance(samplingPoint2[p], stroke2Centroid) / app);
+									ratioSampling.push_back(
+										tdistance(samplingPoint2[p], stroke2Centroid) / app);
 								}
 							}
 						}
@@ -1224,12 +1264,12 @@ void TInbetween::Imp::computeTransformation()
 						if (isAlmostZero(transform.m_scaleX - 1.0, 0.00001))
 							transform.m_scaleX = transform.m_scaleY = 1.0;
 					}
-					/*          
-         #ifdef _DEBUG
-              
-          TDebugMessage::getStream()<<"scale "<< transform.m_scaleX ;
-          TDebugMessage::flush();
-         #endif
+					/*
+		 #ifdef _DEBUG
+
+		  TDebugMessage::getStream()<<"scale "<< transform.m_scaleX ;
+		  TDebugMessage::flush();
+		 #endif
 */
 				}
 
@@ -1263,9 +1303,12 @@ void TInbetween::Imp::computeTransformation()
 							for (j = 0; j < cornerSize; j++) {
 								pOld = vpOld[j];
 								pNew = vpNew[j];
-								transform.m_rotationAndScaleCenter.x += (transform.m_scaleX * pOld.x - pNew.x) / (transform.m_scaleX - 1.0);
+								transform.m_rotationAndScaleCenter.x +=
+									(transform.m_scaleX * pOld.x - pNew.x) /
+									(transform.m_scaleX - 1.0);
 							}
-							transform.m_rotationAndScaleCenter.x = transform.m_rotationAndScaleCenter.x / cornerSize;
+							transform.m_rotationAndScaleCenter.x =
+								transform.m_rotationAndScaleCenter.x / cornerSize;
 							transform.m_translate.x = 0;
 						}
 
@@ -1282,9 +1325,12 @@ void TInbetween::Imp::computeTransformation()
 							for (j = 0; j < cornerSize; j++) {
 								pOld = vpOld[j];
 								pNew = vpNew[j];
-								transform.m_rotationAndScaleCenter.y += (transform.m_scaleY * pOld.y - pNew.y) / (transform.m_scaleY - 1.0);
+								transform.m_rotationAndScaleCenter.y +=
+									(transform.m_scaleY * pOld.y - pNew.y) /
+									(transform.m_scaleY - 1.0);
 							}
-							transform.m_rotationAndScaleCenter.y = transform.m_rotationAndScaleCenter.y / cornerSize;
+							transform.m_rotationAndScaleCenter.y =
+								transform.m_rotationAndScaleCenter.y / cornerSize;
 							transform.m_translate.y = 0;
 						}
 					}
@@ -1295,9 +1341,11 @@ void TInbetween::Imp::computeTransformation()
 					cs = transform.m_scaleX * cos(totalRadRotation);
 					sn = transform.m_scaleX * sin(totalRadRotation);
 
-					// scelgo punti da usare come vincolo, per ottenere la translazione, dato un centro di rotazione
+					// scelgo punti da usare come vincolo, per ottenere la translazione, dato un
+					// centro di rotazione
 
-					// dato il punto pOld e pNew si calcola analiticamnete il punto di rotazione e scala
+					// dato il punto pOld e pNew si calcola analiticamnete il punto di rotazione e
+					// scala
 					// che minimizza la traslazione aggiuntiva e la traslazione stessa
 
 					for (j = 0; j < cornerSize; j++) {
@@ -1314,21 +1362,27 @@ void TInbetween::Imp::computeTransformation()
 						transform.m_rotationAndScaleCenter.y += -constD * constA;
 					}
 
-					transform.m_rotationAndScaleCenter = transform.m_rotationAndScaleCenter * (1.0 / (double)cornerSize);
+					transform.m_rotationAndScaleCenter =
+						transform.m_rotationAndScaleCenter * (1.0 / (double)cornerSize);
 
-					transform.m_translate.x = (cs - 1.0) * transform.m_rotationAndScaleCenter.x - sn * transform.m_rotationAndScaleCenter.y + constK;
+					transform.m_translate.x = (cs - 1.0) * transform.m_rotationAndScaleCenter.x -
+											  sn * transform.m_rotationAndScaleCenter.y + constK;
 
-					transform.m_translate.y = sn * transform.m_rotationAndScaleCenter.x + (cs - 1.0) * transform.m_rotationAndScaleCenter.y + constQ;
+					transform.m_translate.y = sn * transform.m_rotationAndScaleCenter.x +
+											  (cs - 1.0) * transform.m_rotationAndScaleCenter.y +
+											  constQ;
 				}
 
 				/////////////////////////////////////////
 
-				transform.m_inverse = (TTranslation(transform.m_translate) *
-									   TScale(transform.m_rotationAndScaleCenter, transform.m_scaleX, transform.m_scaleY) *
-									   TRotation(transform.m_rotationAndScaleCenter, transform.m_rotation))
-										  .inv();
+				transform.m_inverse =
+					(TTranslation(transform.m_translate) *
+					 TScale(transform.m_rotationAndScaleCenter, transform.m_scaleX,
+							transform.m_scaleY) *
+					 TRotation(transform.m_rotationAndScaleCenter, transform.m_rotation))
+						.inv();
 
-				//debugStream.close();
+				// debugStream.close();
 			} // end if !isPoint
 
 		} // end if !isEqual
@@ -1395,8 +1449,11 @@ TVectorImageP TInbetween::Imp::tween(double t) const
 				mt = (m_transformation[i].m_inverse.isIdentity())
 						 ? TAffine()
 						 : TTranslation(m_transformation[i].m_translate * t) *
-							   TScale(m_transformation[i].m_rotationAndScaleCenter, (1 - t) + t * m_transformation[i].m_scaleX, (1 - t) + t * m_transformation[i].m_scaleY) *
-							   TRotation(m_transformation[i].m_rotationAndScaleCenter, m_transformation[i].m_rotation * t);
+							   TScale(m_transformation[i].m_rotationAndScaleCenter,
+									  (1 - t) + t * m_transformation[i].m_scaleX,
+									  (1 - t) + t * m_transformation[i].m_scaleY) *
+							   TRotation(m_transformation[i].m_rotationAndScaleCenter,
+										 m_transformation[i].m_rotation * t);
 
 				UINT cornerSize = m_transformation[i].m_firstStrokeCornerIndexes.size();
 				assert(cornerSize == m_transformation[i].m_secondStrokeCornerIndexes.size());
@@ -1407,13 +1464,17 @@ TVectorImageP TInbetween::Imp::tween(double t) const
 
 				std::vector<TThickPoint> controlPoints;
 
-				//if not m_transformation[i].m_findCorners => detect corner return different size =>cornerSize==2
+				// if not m_transformation[i].m_findCorners => detect corner return different size
+				// =>cornerSize==2
 				// assert(!m_transformation[i].m_findCorners || cornerSize==2);
 
 				for (j = 0; j < cornerSize - 1; j++) {
 					points.clear();
-					subStroke1 = extract(stroke1, m_transformation[i].m_firstStrokeCornerIndexes[j], m_transformation[i].m_firstStrokeCornerIndexes[j + 1] - 1);
-					subStroke2 = extract(stroke2, m_transformation[i].m_secondStrokeCornerIndexes[j], m_transformation[i].m_secondStrokeCornerIndexes[j + 1] - 1);
+					subStroke1 = extract(stroke1, m_transformation[i].m_firstStrokeCornerIndexes[j],
+										 m_transformation[i].m_firstStrokeCornerIndexes[j + 1] - 1);
+					subStroke2 =
+						extract(stroke2, m_transformation[i].m_secondStrokeCornerIndexes[j],
+								m_transformation[i].m_secondStrokeCornerIndexes[j + 1] - 1);
 
 					totalLen1 = subStroke1->getLength();
 					totalLen2 = subStroke2->getLength();
@@ -1431,7 +1492,9 @@ TVectorImageP TInbetween::Imp::tween(double t) const
 
 					while (len1 <= totalLen1 && len2 <= totalLen2) {
 						point2 = subStroke2->getThickPointAtLength(len2);
-						point2 = TThickPoint(m_transformation[i].m_inverse * subStroke2->getThickPointAtLength(len2), point2.thick);
+						point2 = TThickPoint(m_transformation[i].m_inverse *
+												 subStroke2->getThickPointAtLength(len2),
+											 point2.thick);
 						finalPoint = subStroke1->getThickPointAtLength(len1) * (1 - t) + t * point2;
 
 						points.push_back(TThickPoint(mt * (finalPoint), finalPoint.thick));
@@ -1439,8 +1502,11 @@ TVectorImageP TInbetween::Imp::tween(double t) const
 						len2 += step2;
 					}
 					point2 = subStroke2->getThickPointAtLength(totalLen2);
-					point2 = TThickPoint(m_transformation[i].m_inverse * subStroke2->getThickPointAtLength(totalLen2), point2.thick);
-					finalPoint = subStroke1->getThickPointAtLength(totalLen1) * (1 - t) + t * point2;
+					point2 = TThickPoint(m_transformation[i].m_inverse *
+											 subStroke2->getThickPointAtLength(totalLen2),
+										 point2.thick);
+					finalPoint =
+						subStroke1->getThickPointAtLength(totalLen1) * (1 - t) + t * point2;
 
 					points.push_back(TThickPoint(mt * (finalPoint), finalPoint.thick));
 
@@ -1450,7 +1516,8 @@ TVectorImageP TInbetween::Imp::tween(double t) const
 					if (j == 0)
 						controlPoints.push_back(stroke->getControlPoint(0));
 					else
-						controlPoints.back() = (controlPoints.back() + stroke->getControlPoint(0)) * 0.5;
+						controlPoints.back() =
+							(controlPoints.back() + stroke->getControlPoint(0)) * 0.5;
 
 					cpSize = stroke->getControlPointCount();
 					for (cp = 1; cp < cpSize; cp++) {
@@ -1477,7 +1544,7 @@ TVectorImageP TInbetween::Imp::tween(double t) const
 		VIStroke *vs = new VIStroke(stroke, m_firstImage->getVIStroke(i)->m_groupId);
 		vi->m_imp->m_strokes.push_back(vs);
 
-	} //end for each stroke
+	} // end for each stroke
 
 	if (m_firstImage->isComputedRegionAlmostOnce())
 		transferColor(vi);

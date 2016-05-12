@@ -21,8 +21,7 @@
 // MagpieInfo
 //-----------------------------------------------------------------------------
 
-MagpieInfo::MagpieInfo(TFilePath path)
-	: m_fileName(QString::fromStdWString(path.getWideName()))
+MagpieInfo::MagpieInfo(TFilePath path) : m_fileName(QString::fromStdWString(path.getWideName()))
 {
 	QFile file(QString::fromStdWString(path.getWideString()));
 	if (!file.open(QFile::ReadOnly))
@@ -31,7 +30,7 @@ MagpieInfo::MagpieInfo(TFilePath path)
 	QString line;
 	do {
 		line = textStream.readLine();
-		//E' la prima riga
+		// E' la prima riga
 		if (line == QString("Toonz"))
 			continue;
 		if (!line.contains(L'|')) {
@@ -51,7 +50,8 @@ MagpieInfo::MagpieInfo(TFilePath path)
 //-----------------------------------------------------------------------------
 
 MagpieFileImportPopup::MagpieFileImportPopup()
-	: Dialog(TApp::instance()->getMainWindow(), true, true, "MagPieFileImport"), m_levelField(0), m_fromField(0), m_toField(0), m_flipbook(0), m_levelPath()
+	: Dialog(TApp::instance()->getMainWindow(), true, true, "MagPieFileImport"), m_levelField(0),
+	  m_fromField(0), m_toField(0), m_flipbook(0), m_levelPath()
 {
 	setWindowTitle(tr("Import Magpie File"));
 
@@ -109,7 +109,17 @@ MagpieFileImportPopup::MagpieFileImportPopup()
 	QVBoxLayout *frameLayout = new QVBoxLayout(frame);
 	frameLayout->setMargin(0);
 	frameLayout->setSpacing(0);
-	UINT buttonMask = FlipConsole::cFullConsole & (~(FlipConsole::eRate | FlipConsole::eSound | FlipConsole::eSaveImg | FlipConsole::eHisto | FlipConsole::eCompare | FlipConsole::eCustomize | FlipConsole::eSave | FlipConsole::eBegin | FlipConsole::eEnd | FlipConsole::eFirst | FlipConsole::eNext | FlipConsole::ePause | FlipConsole::ePlay | FlipConsole::ePrev | FlipConsole::eRate | FlipConsole::eWhiteBg | FlipConsole::eCheckBg | FlipConsole::eBlackBg | FlipConsole::eNext | FlipConsole::eLast | FlipConsole::eLoop | FlipConsole::eGRed | FlipConsole::eGGreen | FlipConsole::eGBlue | FlipConsole::eRed | FlipConsole::eGreen | FlipConsole::eBlue | FlipConsole::eMatte | FlipConsole::eDefineSubCamera | FlipConsole::eDefineLoadBox | FlipConsole::eUseLoadBox | FlipConsole::eFilledRaster));
+	UINT buttonMask =
+		FlipConsole::cFullConsole &
+		(~(FlipConsole::eRate | FlipConsole::eSound | FlipConsole::eSaveImg | FlipConsole::eHisto |
+		   FlipConsole::eCompare | FlipConsole::eCustomize | FlipConsole::eSave |
+		   FlipConsole::eBegin | FlipConsole::eEnd | FlipConsole::eFirst | FlipConsole::eNext |
+		   FlipConsole::ePause | FlipConsole::ePlay | FlipConsole::ePrev | FlipConsole::eRate |
+		   FlipConsole::eWhiteBg | FlipConsole::eCheckBg | FlipConsole::eBlackBg |
+		   FlipConsole::eNext | FlipConsole::eLast | FlipConsole::eLoop | FlipConsole::eGRed |
+		   FlipConsole::eGGreen | FlipConsole::eGBlue | FlipConsole::eRed | FlipConsole::eGreen |
+		   FlipConsole::eBlue | FlipConsole::eMatte | FlipConsole::eDefineSubCamera |
+		   FlipConsole::eDefineLoadBox | FlipConsole::eUseLoadBox | FlipConsole::eFilledRaster));
 	m_flipbook = new FlipBook(this, tr("Import Magpie File"), buttonMask);
 	m_flipbook->setFixedHeight(250);
 	frameLayout->addWidget(m_flipbook);
@@ -172,7 +182,7 @@ void MagpieFileImportPopup::showEvent(QShowEvent *)
 
 void MagpieFileImportPopup::hideEvent(QHideEvent *)
 {
-	//Devo svuotare il flibook
+	// Devo svuotare il flibook
 	emit closeButtonPressed();
 }
 
@@ -183,7 +193,8 @@ void MagpieFileImportPopup::onLevelPathChanged()
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	TFilePath levelPath(m_levelField->getPath().toStdWString());
 	levelPath = scene->decodeFilePath(levelPath);
-	if (levelPath.isEmpty() || levelPath.getUndottedType().empty() || !TSystem::doesExistFileOrLevel(levelPath)) {
+	if (levelPath.isEmpty() || levelPath.getUndottedType().empty() ||
+		!TSystem::doesExistFileOrLevel(levelPath)) {
 		DVGui::error(tr("The file path is missing."));
 		return;
 	}
@@ -210,7 +221,8 @@ void MagpieFileImportPopup::onLevelPathChanged()
 
 void MagpieFileImportPopup::onOkPressed()
 {
-	if (m_levelPath.isEmpty() || m_levelPath.getUndottedType().empty() || !TSystem::doesExistFileOrLevel(m_levelPath)) {
+	if (m_levelPath.isEmpty() || m_levelPath.getUndottedType().empty() ||
+		!TSystem::doesExistFileOrLevel(m_levelPath)) {
 		DVGui::error(tr("The file path is missing."));
 		return;
 	}

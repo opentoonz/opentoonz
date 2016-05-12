@@ -78,8 +78,8 @@ void CCallCircle::print()
 */
 }
 
-void CCallCircle::draw(UCHAR *drawB, const int lX, const int lY,
-					   const int xx, const int yy, const double r)
+void CCallCircle::draw(UCHAR *drawB, const int lX, const int lY, const int xx, const int yy,
+					   const double r)
 {
 	double aa = 2.0 * r / 3.0; // Size of antialising
 

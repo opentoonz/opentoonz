@@ -1,18 +1,18 @@
 
-//ToonzCore includes
+// ToonzCore includes
 #include "tmsgcore.h"
 
-//ToonzLib includes
+// ToonzLib includes
 #include "toonz/txshlevelhandle.h"
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/toonzfolders.h"
 
-//ToonzQt includes
+// ToonzQt includes
 #include "toonzqt/gutil.h"
 #include "toonzqt/doublefield.h"
 
-//Toonz includes
+// Toonz includes
 #include "tapp.h"
 #include "cleanupsettingsmodel.h"
 #include "cleanuppaletteviewer.h"
@@ -20,7 +20,7 @@
 #include "menubarcommandids.h"
 #include "floatingpanelcommand.h"
 
-//Qt includes
+// Qt includes
 #include <QComboBox>
 #include <QCheckBox>
 #include <QLabel>
@@ -55,8 +55,10 @@ void CleanupSaveInField::browseDirectory()
 		if (parentCSP) {
 			TFilePath lastSelectedPath = parentCSP->getLastSelectedPath();
 			if (!lastSelectedPath.isEmpty()) {
-				/*---- 親Widgetのm_lastSelectedPathが、CLNファイルの見込み所在地なので、その１つ上のフォルダを初期フォルダにする。---*/
-				initialFolder = QString::fromStdWString(lastSelectedPath.getParentDir().getParentDir().getWideString());
+				/*----
+				 * 親Widgetのm_lastSelectedPathが、CLNファイルの見込み所在地なので、その１つ上のフォルダを初期フォルダにする。---*/
+				initialFolder = QString::fromStdWString(
+					lastSelectedPath.getParentDir().getParentDir().getWideString());
 			}
 		}
 	}
@@ -77,18 +79,17 @@ void CleanupSaveInField::browseDirectory()
 // CleanupSettingsPane
 //-----------------------------------------------------------------------------
 
-CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
-	: QFrame(parent), m_attached(false)
+CleanupSettingsPane::CleanupSettingsPane(QWidget *parent) : QFrame(parent), m_attached(false)
 {
-	//Rotate&Flip
+	// Rotate&Flip
 	QFrame *rotFlipFrame = new QFrame(this);
 	m_rotateOm = new QComboBox(this);
 	m_flipX = new QCheckBox(tr("Horizontal"), this);
 	m_flipY = new QCheckBox(tr("Vertical"), this);
-	//Camera
+	// Camera
 	QFrame *cameraFrame = new QFrame(this);
 	m_cameraWidget = new CleanupCameraSettingsWidget();
-	//LineProcessing
+	// LineProcessing
 	QFrame *lineProcFrame = new QFrame(this);
 	m_antialias = new QComboBox(this);
 	m_sharpness = new DoubleField(this);
@@ -103,7 +104,7 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 	QPushButton *loadBtn = new QPushButton(tr("Load"));
 	QPushButton *resetBtn = new QPushButton(tr("Reset"));
 
-	//Rotate&Flip
+	// Rotate&Flip
 	rotFlipFrame->setObjectName("CleanupSettingsFrame");
 	QStringList rotate;
 	rotate << "0"
@@ -111,10 +112,10 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 		   << "180"
 		   << "270";
 	m_rotateOm->addItems(rotate);
-	//Camera
+	// Camera
 	cameraFrame->setObjectName("CleanupSettingsFrame");
 	m_cameraWidget->setCameraPresetListFile(ToonzFolder::getReslistPath(true));
-	//LineProcessing
+	// LineProcessing
 	lineProcFrame->setObjectName("CleanupSettingsFrame");
 	QStringList items;
 	items << tr("Standard") << tr("None") << tr("Morphological");
@@ -137,12 +138,13 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 	mainLay->setSpacing(2);
 	mainLay->setMargin(5);
 	{
-		//Rotate&Flip
+		// Rotate&Flip
 		QGridLayout *rotFlipLay = new QGridLayout();
 		rotFlipLay->setMargin(5);
 		rotFlipLay->setSpacing(3);
 		{
-			rotFlipLay->addWidget(new QLabel(tr("Rotate")), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+			rotFlipLay->addWidget(new QLabel(tr("Rotate")), 0, 0,
+								  Qt::AlignRight | Qt::AlignVCenter);
 			rotFlipLay->addWidget(m_rotateOm, 0, 1, 1, 2);
 			rotFlipLay->addWidget(new QLabel(tr("Flip")), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
 			rotFlipLay->addWidget(m_flipX, 1, 1);
@@ -154,7 +156,7 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 		rotFlipFrame->setLayout(rotFlipLay);
 		mainLay->addWidget(rotFlipFrame, 0);
 
-		//Camera
+		// Camera
 		QVBoxLayout *cleanupCameraFrameLay = new QVBoxLayout();
 		cleanupCameraFrameLay->setMargin(0);
 		cleanupCameraFrameLay->setSpacing(0);
@@ -164,18 +166,22 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 		cameraFrame->setLayout(cleanupCameraFrameLay);
 		mainLay->addWidget(cameraFrame, 0);
 
-		//Cleanup Palette
+		// Cleanup Palette
 		QGridLayout *lineProcLay = new QGridLayout();
 		lineProcLay->setMargin(5);
 		lineProcLay->setSpacing(3);
 		{
-			lineProcLay->addWidget(new QLabel(tr("Line Processing:")), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+			lineProcLay->addWidget(new QLabel(tr("Line Processing:")), 0, 0,
+								   Qt::AlignRight | Qt::AlignVCenter);
 			lineProcLay->addWidget(m_lineProcessing, 0, 1);
-			lineProcLay->addWidget(new QLabel(tr("Antialias:")), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+			lineProcLay->addWidget(new QLabel(tr("Antialias:")), 1, 0,
+								   Qt::AlignRight | Qt::AlignVCenter);
 			lineProcLay->addWidget(m_antialias, 1, 1);
-			lineProcLay->addWidget(new QLabel(tr("Sharpness:")), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
+			lineProcLay->addWidget(new QLabel(tr("Sharpness:")), 2, 0,
+								   Qt::AlignRight | Qt::AlignVCenter);
 			lineProcLay->addWidget(m_sharpness, 2, 1);
-			lineProcLay->addWidget(new QLabel(tr("Despeckling:")), 3, 0, Qt::AlignRight | Qt::AlignVCenter);
+			lineProcLay->addWidget(new QLabel(tr("Despeckling:")), 3, 0,
+								   Qt::AlignRight | Qt::AlignVCenter);
 			lineProcLay->addWidget(m_despeckling, 3, 1);
 			lineProcLay->addWidget(m_aaValueLabel, 4, 0, Qt::AlignRight | Qt::AlignVCenter);
 			lineProcLay->addWidget(m_aaValue, 4, 1);
@@ -195,7 +201,7 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 
 		mainLay->addWidget(lineProcFrame, 100);
 
-		//Bottom Parts
+		// Bottom Parts
 		QHBoxLayout *pathLay = new QHBoxLayout();
 		pathLay->setMargin(0);
 		pathLay->setSpacing(3);
@@ -228,11 +234,13 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 	ret = ret && connect(m_sharpness, SIGNAL(valueChanged(bool)), SLOT(onSharpnessChange(bool)));
 	ret = ret && connect(m_antialias, SIGNAL(activated(int)), SLOT(onGenericSettingsChange()));
 	ret = ret && connect(m_lineProcessing, SIGNAL(activated(int)), SLOT(onGenericSettingsChange()));
-	ret = ret && connect(m_despeckling, SIGNAL(valueChanged(bool)), SLOT(onGenericSettingsChange()));
+	ret =
+		ret && connect(m_despeckling, SIGNAL(valueChanged(bool)), SLOT(onGenericSettingsChange()));
 	ret = ret && connect(m_aaValue, SIGNAL(valueChanged(bool)), SLOT(onGenericSettingsChange()));
-	ret = ret && connect(TApp::instance()->getCurrentLevel(),
-						 SIGNAL(xshLevelSwitched(TXshLevel *)), SLOT(onLevelSwitched()));
-	ret = ret && connect(m_cameraWidget, SIGNAL(cleanupSettingsChanged()), SLOT(onGenericSettingsChange()));
+	ret = ret && connect(TApp::instance()->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)),
+						 SLOT(onLevelSwitched()));
+	ret = ret && connect(m_cameraWidget, SIGNAL(cleanupSettingsChanged()),
+						 SLOT(onGenericSettingsChange()));
 
 	ret = ret && connect(saveBtn, SIGNAL(pressed()), this, SLOT(onSaveSettings()));
 
@@ -251,7 +259,7 @@ void CleanupSettingsPane::showEvent(QShowEvent *se)
 	if (!m_attached) {
 
 		m_attached = true;
-		//Should ensure that swatch is off...
+		// Should ensure that swatch is off...
 		CleanupSettingsModel *model = CleanupSettingsModel::instance();
 
 		model->attach(CleanupSettingsModel::LISTENER);
@@ -280,7 +288,7 @@ void CleanupSettingsPane::hideEvent(QHideEvent *he)
 
 	if (m_attached) {
 		m_attached = false;
-		//Should put swatch to off...
+		// Should put swatch to off...
 		CleanupSettingsModel *model = CleanupSettingsModel::instance();
 
 		model->detach(CleanupSettingsModel::LISTENER);
@@ -358,7 +366,8 @@ void CleanupSettingsPane::updateImageInfo()
 	model->getCleanupFrame(sl, fid);
 
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	TFilePath outputPath(sl ? scene->decodeFilePath(model->getOutputPath(sl, params)) : TFilePath());
+	TFilePath outputPath(sl ? scene->decodeFilePath(model->getOutputPath(sl, params))
+							: TFilePath());
 
 	m_cameraWidget->setImageInfo(outputPath);
 
@@ -368,7 +377,8 @@ void CleanupSettingsPane::updateImageInfo()
 	if (model->clnPath().isEmpty())
 		parentWidget()->setWindowTitle("Cleanup Settings (Global)");
 	else
-		parentWidget()->setWindowTitle("Cleanup Settings: " + toQString(model->clnPath().withoutParentDir()));
+		parentWidget()->setWindowTitle("Cleanup Settings: " +
+									   toQString(model->clnPath().withoutParentDir()));
 }
 
 //-----------------------------------------------------------------------------
@@ -411,7 +421,7 @@ void CleanupSettingsPane::onPreviewDataChanged()
 
 void CleanupSettingsPane::postProcess()
 {
-	//m_swatch->updateCleanupped();
+	// m_swatch->updateCleanupped();
 }
 
 //-----------------------------------------------------------------------------
@@ -448,7 +458,8 @@ void CleanupSettingsPane::onGenericSettingsChange()
 
 	//------
 
-	params->m_lineProcessingMode = (int)((m_lineProcessing->currentIndex() == 0) ? lpGrey : lpColor);
+	params->m_lineProcessingMode =
+		(int)((m_lineProcessing->currentIndex() == 0) ? lpGrey : lpColor);
 	params->m_noAntialias = (m_antialias->currentIndex() > 0);
 	params->m_postAntialias = (m_antialias->currentIndex() == 2);
 	params->m_despeckling = m_despeckling->getValue();

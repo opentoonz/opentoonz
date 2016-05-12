@@ -21,7 +21,7 @@
 class DVAPI TMenubar : public TWidget
 {
 
-public:
+  public:
 	TMenubar(TWidget *parent, string name = "menubar");
 	void configureNotify(const TDimension &);
 	void draw();
@@ -37,13 +37,11 @@ class DVAPI TMenubarItem : public TWidget, public TPopupMenuListener
 	TPopupMenu *m_popupMenu;
 	wstring m_title;
 
-protected:
+  protected:
 	/*virtual*/ void create();
 
-public:
-	TMenubarItem(
-		TMenubar *menubar,
-		string name);
+  public:
+	TMenubarItem(TMenubar *menubar, string name);
 
 	void draw();
 	void enter(const TPoint &p);

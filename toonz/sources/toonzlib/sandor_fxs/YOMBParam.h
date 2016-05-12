@@ -24,7 +24,7 @@
 
 class CYOMBParam
 {
-public:
+  public:
 	bool m_isRandomSampling;
 	bool m_isShowSelection;
 	bool m_isStopAtContour;
@@ -40,27 +40,19 @@ public:
 	// for CMAP color indides
 	COLOR_INDEX_LIST m_ink, m_paint;
 
-	CYOMBParam() : m_isRandomSampling(false), m_isShowSelection(false),
-				   m_isStopAtContour(false), m_isBlurOnPair(false),
-				   m_dSample(0.0), m_nbSample(0),
-				   m_dA(0.0), m_dAB(0.0), m_name(""),
-				   m_isCM(false),
-				   m_color(0)
+	CYOMBParam()
+		: m_isRandomSampling(false), m_isShowSelection(false), m_isStopAtContour(false),
+		  m_isBlurOnPair(false), m_dSample(0.0), m_nbSample(0), m_dA(0.0), m_dAB(0.0), m_name(""),
+		  m_isCM(false), m_color(0)
 	{
 		m_ink.nb = m_paint.nb = 0;
 	};
 
-	CYOMBParam(const CYOMBParam &bp) : m_color(bp.m_color),
-									   m_isRandomSampling(bp.m_isRandomSampling),
-									   m_isShowSelection(bp.m_isShowSelection),
-									   m_isStopAtContour(bp.m_isStopAtContour),
-									   m_isBlurOnPair(bp.m_isBlurOnPair),
-									   m_dSample(bp.m_dSample),
-									   m_nbSample(bp.m_nbSample),
-									   m_dA(bp.m_dA),
-									   m_dAB(bp.m_dAB),
-									   m_name(bp.m_name),
-									   m_isCM(bp.m_isCM)
+	CYOMBParam(const CYOMBParam &bp)
+		: m_color(bp.m_color), m_isRandomSampling(bp.m_isRandomSampling),
+		  m_isShowSelection(bp.m_isShowSelection), m_isStopAtContour(bp.m_isStopAtContour),
+		  m_isBlurOnPair(bp.m_isBlurOnPair), m_dSample(bp.m_dSample), m_nbSample(bp.m_nbSample),
+		  m_dA(bp.m_dA), m_dAB(bp.m_dAB), m_name(bp.m_name), m_isCM(bp.m_isCM)
 	{
 		if (m_isCM) {
 			m_ink.nb = bp.m_ink.nb;
@@ -97,8 +89,7 @@ public:
 	int getColorIndex(const UCHAR c);
 	void scale(const double d);
 
-	template <class P>
-	void addPixel(I_PIXEL &p, const P *pic)
+	template <class P> void addPixel(I_PIXEL &p, const P *pic)
 	{
 		p.r += ((int)pic->r);
 		p.g += ((int)pic->g);
@@ -108,13 +99,10 @@ public:
 
 	// Checks the path from blurred pixel to the sample pixel.
 	template <class P>
-	bool isContourOnPath(const int xx, const int yy,
-						 std::vector<BLURSECTION>::const_iterator pBS,
+	bool isContourOnPath(const int xx, const int yy, std::vector<BLURSECTION>::const_iterator pBS,
 						 CSTColSelPic<P> &pic)
 	{
-		for (std::vector<SXYD>::const_iterator p = pBS->begin();
-			 p != pBS->end();
-			 ++p) {
+		for (std::vector<SXYD>::const_iterator p = pBS->begin(); p != pBS->end(); ++p) {
 			int x = xx + p->x;
 			int y = yy + p->y;
 			int xy = y * pic.m_lX + x;
@@ -126,8 +114,7 @@ public:
 	}
 
 	template <class P>
-	void addPixel(I_PIXEL &ip, const CSTColSelPic<P> &pic,
-				  const int xxyy, const int xy)
+	void addPixel(I_PIXEL &ip, const CSTColSelPic<P> &pic, const int xxyy, const int xy)
 	{
 		if (!m_isBlurOnPair) {
 			addPixel(ip, pic.m_pic + xy);
@@ -155,16 +142,15 @@ public:
 	}
 
 	template <class P>
-	void blurPixel(CSTColSelPic<P> &pic, const int xx, const int yy,
-				   const CBlurMatrix &bm, I_PIXEL &col, const int iBm)
+	void blurPixel(CSTColSelPic<P> &pic, const int xx, const int yy, const CBlurMatrix &bm,
+				   I_PIXEL &col, const int iBm)
 	{
 		I_PIXEL p = {0, 0, 0, 0};
 		int nb = 0;
 
 		int xxyy = yy * pic.m_lX + xx;
 		for (std::vector<BLURSECTION>::const_iterator pBS = bm.m_m[iBm].begin();
-			 pBS != bm.m_m[iBm].end();
-			 ++pBS) {
+			 pBS != bm.m_m[iBm].end(); ++pBS) {
 
 			//		const SXYD* xyd=pBS->begin();
 			BLURSECTION::const_iterator xyd = pBS->begin();
@@ -205,12 +191,11 @@ public:
 	}
 
 	template <class P>
-	bool isRealMixture(CSTColSelPic<P> &pic, const int xx, const int yy,
-					   const CBlurMatrix &bm, const int iBm, const UCHAR osel) const
+	bool isRealMixture(CSTColSelPic<P> &pic, const int xx, const int yy, const CBlurMatrix &bm,
+					   const int iBm, const UCHAR osel) const
 	{
 		for (std::vector<BLURSECTION>::const_iterator pBS = bm.m_m[iBm].begin();
-			 pBS != bm.m_m[iBm].end();
-			 ++pBS) {
+			 pBS != bm.m_m[iBm].end(); ++pBS) {
 			//		const SXYD* xyd= pBS->begin();
 			BLURSECTION::const_iterator xyd = pBS->begin();
 			int x = xx + xyd->x;
@@ -225,8 +210,7 @@ public:
 		return false;
 	}
 
-	template <class P>
-	void doIt(CSTColSelPic<P> &ipic, CSTColSelPic<P> &opic)
+	template <class P> void doIt(CSTColSelPic<P> &ipic, CSTColSelPic<P> &opic)
 	{
 		CBlurMatrix bm(m_dSample, m_nbSample, m_isStopAtContour, m_isRandomSampling);
 		UCHAR *pSel = ipic.m_sel;

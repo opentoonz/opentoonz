@@ -53,8 +53,7 @@ bool strokeIsConnected(const TStroke &s, double toll = TConsts::epsilon)
 		const TThickQuadratic *refTQ = s.getChunk(0);
 
 		for (int i = 1; i < count; ++i) {
-			if (out &&
-				tdistance2(refTQ->getP2(), s.getChunk(i)->getP0()) > toll2)
+			if (out && tdistance2(refTQ->getP2(), s.getChunk(i)->getP0()) > toll2)
 				out = false;
 		}
 	}
@@ -128,7 +127,7 @@ void clearPointerMap(std::map<TStroke *, std::vector<int> *> &corners)
 class BenderTool : public TTool
 {
 
-private:
+  private:
 	TUndo *m_undo;
 	bool m_atLeastOneIsChanged;
 
@@ -138,20 +137,14 @@ private:
 	void increaseCP(TStroke *, int);
 	bool m_active;
 	int m_cursor;
-	enum PNT_SELECTED {
-		BNDR_NULL = 0,
-		BNDR_P0 = 1,
-		BNDR_P1 = 2
-	};
+	enum PNT_SELECTED { BNDR_NULL = 0, BNDR_P0 = 1, BNDR_P1 = 2 };
 
 	struct benderStrokeInfo {
 		TStroke *m_stroke;
 		DoublePair m_extremes;
 		int m_isBeginEndOrAll;
 
-		benderStrokeInfo(TStroke *stroke,
-						 DoublePair &info,
-						 int isBeginEndOrAll)
+		benderStrokeInfo(TStroke *stroke, DoublePair &info, int isBeginEndOrAll)
 		{
 			m_stroke = stroke;
 			m_extremes = info;
@@ -187,10 +180,9 @@ private:
 
 	void findCurves(TVectorImageP &);
 	void findVersus(const TPointD &p);
-	double computeRotationVersus(const TPointD &,
-								 const TPointD &);
+	double computeRotationVersus(const TPointD &, const TPointD &);
 
-public:
+  public:
 	void initBenderAction(TVectorImageP &, const TPointD &);
 	// BenderTool(TVectorImageP  vimage, GLTestWidget* ref );
 	BenderTool();
@@ -222,7 +214,8 @@ public:
 //-----------------------------------------------------------------------------
 
 BenderTool::BenderTool()
-	: TTool("T_Bender"), m_showTangents(false), m_buttonDownCounter(1), m_rotationVersus(0.0), m_enableDragSelection(false), m_undo(0), m_cursor(ToolCursor::BenderCursor)
+	: TTool("T_Bender"), m_showTangents(false), m_buttonDownCounter(1), m_rotationVersus(0.0),
+	  m_enableDragSelection(false), m_undo(0), m_cursor(ToolCursor::BenderCursor)
 {
 	bind(TTool::Vectors);
 	m_prevPoint = TConsts::napd;
@@ -273,7 +266,7 @@ void BenderTool::leftButtonUp(const TPointD &pos, const TMouseEvent &)
 		m_benderSegment.setP1(TConsts::napd);
 
 		typedef std::map<TStroke *, ArrayOfStroke>::iterator itAATS;
-		//UINT count=0;
+		// UINT count=0;
 
 		for (itAATS it1 = m_metaStroke.begin(); it1 != m_metaStroke.end(); ++it1) {
 			UINT i;
@@ -385,8 +378,7 @@ void BenderTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &)
 
 	TPointD p = pos;
 
-	TPointD
-		vc(p - m_benderSegment.getP0()),		   // current vector
+	TPointD vc(p - m_benderSegment.getP0()),	   // current vector
 		vp(m_prevPoint - m_benderSegment.getP0()); // previous vector
 
 	TPointD s2v = m_benderSegment.getSpeed();
@@ -397,9 +389,7 @@ void BenderTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &)
 	double norm2PreviousVect = norm2(vp);
 
 	// invalid segments
-	if (0.0 == norm2BenderSeg ||
-		0.0 == norm2PreviousVect ||
-		0.0 == norm2CurrentVect)
+	if (0.0 == norm2BenderSeg || 0.0 == norm2PreviousVect || 0.0 == norm2CurrentVect)
 		return;
 
 	// invalid rotation versus
@@ -422,20 +412,17 @@ void BenderTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &)
 
 		// DoublePair  &extr   = m_info[i].m_extremes;
 		double strokeLength = ref.getLength();
-		double initLength = retrieveInitLength(strokeLength, m_info[i].m_isBeginEndOrAll); // ? 0.0 : strokeLength;
+		double initLength =
+			retrieveInitLength(strokeLength, m_info[i].m_isBeginEndOrAll); // ? 0.0 : strokeLength;
 
 		if (MY_ERROR == initLength)
 			return;
 
-		int innerOrOuter = m_info[i].m_isBeginEndOrAll == IS_ALL ? TStrokeBenderDeformation::OUTER : TStrokeBenderDeformation::INNER;
+		int innerOrOuter = m_info[i].m_isBeginEndOrAll == IS_ALL ? TStrokeBenderDeformation::OUTER
+																 : TStrokeBenderDeformation::INNER;
 
-		TStrokeBenderDeformation
-			def(&ref,
-				m_benderSegment.getP0(),
-				diff,
-				initLength,
-				innerOrOuter,
-				strokeLength);
+		TStrokeBenderDeformation def(&ref, m_benderSegment.getP0(), diff, initLength, innerOrOuter,
+									 strokeLength);
 
 		modifyControlPoints(ref, def);
 	}
@@ -473,24 +460,22 @@ void BenderTool::leftButtonDown(const TPointD &p, const TMouseEvent &)
 		m_enableDragSelection = true;
 		break;
 		/*
-    case 3: // third buttonDown      
-    // initBenderAction( vi, p );
-    break;
-    */
+	case 3: // third buttonDown
+	// initBenderAction( vi, p );
+	break;
+	*/
 	}
 
 	++m_buttonDownCounter;
 	invalidate();
-	//vi->validateRegionEdges(vi->getStroke( m_strokeIndex ), true);
+	// vi->validateRegionEdges(vi->getStroke( m_strokeIndex ), true);
 }
 
 //-----------------------------------------------------------------------------
 
 void BenderTool::findVersus(const TPointD &p)
 {
-	TPointD
-		v1 = m_benderSegment.getSpeed(),
-		v2 = p - m_benderSegment.getP0();
+	TPointD v1 = m_benderSegment.getSpeed(), v2 = p - m_benderSegment.getP0();
 
 	// fix rotation versus
 	m_rotationVersus = tsign(cross(v1, v2));
@@ -529,7 +514,7 @@ void BenderTool::findCurves(TVectorImageP &vi)
 
 		if (intersect(*s, m_benderSegment, pair_intersection)) {
 			if (s->isSelfLoop()) {
-				//make the semgnet longer
+				// make the semgnet longer
 				// such as the points are just a littleBit
 				// outside the stroke bbox
 				const double littleBit = 0.1;
@@ -598,7 +583,7 @@ void BenderTool::findCurves(TVectorImageP &vi)
 				intersect(*s, segment, pair_intersection);
 				assert(isEven(pair_intersection.size()));
 				assert(!pair_intersection.empty());
-				if (pair_intersection.empty()) //non dovrebbe accadere
+				if (pair_intersection.empty()) // non dovrebbe accadere
 					continue;
 			}
 			//-----------------------------------------------------------------------------
@@ -623,7 +608,7 @@ void BenderTool::findCurves(TVectorImageP &vi)
 			normalToBenderSeg = m_rotationVersus * rotate90(m_benderSegment.getSpeed());
 
 			m_atLeastOneIsChanged = false;
-			//m_directionIsChanged = false;
+			// m_directionIsChanged = false;
 			if (tsign(v * normalToBenderSeg) < 0) {
 				m_atLeastOneIsChanged = true;
 				m_directionIsChanged.push_back(true);
@@ -720,9 +705,9 @@ void BenderTool::increaseCP(TStroke *tmpStroke, int beginEndOrAll)
 void BenderTool::draw()
 {
 
-	//TAffine viewMatrix = getViewer()->getViewMatrix();
-	//glPushMatrix();
-	//tglMultMatrix(viewMatrix);
+	// TAffine viewMatrix = getViewer()->getViewMatrix();
+	// glPushMatrix();
+	// tglMultMatrix(viewMatrix);
 
 	double pixelSize = getPixelSize();
 
@@ -732,7 +717,7 @@ void BenderTool::draw()
 		tglColor(TPixel32::Red);
 		for (citAS cit2 = tmp.begin(); cit2 != tmp.end(); ++cit2)
 			drawStrokeCenterline(**cit2, pixelSize);
-		//drawStroke(**cit2, TRect(0,0,1000,1000), TAffine() );
+		// drawStroke(**cit2, TRect(0,0,1000,1000), TAffine() );
 	}
 
 	double length = m_benderSegment.getLength();
@@ -770,7 +755,7 @@ void BenderTool::draw()
 	TPointD vDir = m_benderSegment.getSpeed();
 	double length2 = norm2(vDir);
 	if (length2 == 0.0) {
-		//glPopMatrix();
+		// glPopMatrix();
 		return;
 	}
 	TPointD vUp = 15.0 * normalize(rotate90(vDir));
@@ -779,7 +764,7 @@ void BenderTool::draw()
 	TPointD middlePnt = 0.5 * (m_benderSegment.getP0() + m_benderSegment.getP1());
 	drawArrow(TSegment(middlePnt, m_rotationVersus * vUp + middlePnt), pixelSize);
 
-	//glPopMatrix();
+	// glPopMatrix();
 }
 
 //-----------------------------------------------------------------------------
@@ -792,8 +777,7 @@ void BenderTool::initBenderAction(TVectorImageP &vi, const TPointD &p)
 	// Versus of bender segment depends from
 	//  point selected to do rotation
 	// P0 is always center of rotation
-	if (tdistance2(p, m_benderSegment.getP0()) <
-		tdistance2(p, m_benderSegment.getP1())) {
+	if (tdistance2(p, m_benderSegment.getP0()) < tdistance2(p, m_benderSegment.getP1())) {
 		TPointD tmpPnt = m_benderSegment.getP1();
 
 		m_benderSegment.setP1(m_benderSegment.getP0());
@@ -813,7 +797,7 @@ void BenderTool::initBenderAction(TVectorImageP &vi, const TPointD &p)
 }
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //-----------------------------------------------------------------------------
 
-//TTool *getBenderTool() {return &BenderTool;}
+// TTool *getBenderTool() {return &BenderTool;}

@@ -1,87 +1,87 @@
 /* ======================================================================== *\
 
-  Copyright (C) 2007 TWAIN Working Group: Adobe Systems Incorporated, 
-  AnyDoc Software Inc., Eastman Kodak Company, Fujitsu Computer Products 
-  of America, JFL Peripheral Solutions Inc., Ricoh Corporation, and 
+  Copyright (C) 2007 TWAIN Working Group: Adobe Systems Incorporated,
+  AnyDoc Software Inc., Eastman Kodak Company, Fujitsu Computer Products
+  of America, JFL Peripheral Solutions Inc., Ricoh Corporation, and
   Xerox Corporation.  All rights reserved.
 
   Copyright (C) 1991, 1992 TWAIN Working Group: Aldus, Caere, Eastman-Kodak,
   Hewlett-Packard and Logitech Corporations.  All rights reserved.
 
-  Copyright (C) 1997 TWAIN Working Group: Bell+Howell, Canon, DocuMagix, 
+  Copyright (C) 1997 TWAIN Working Group: Bell+Howell, Canon, DocuMagix,
   Fujitsu, Genoa Technology, Hewlett-Packard, Kofax Imaging Products, and
   Ricoh Corporation.  All rights reserved.
- 
-  Copyright © 1998 TWAIN Working Group: Adobe Systems Incorporated, 
-  Canon Information Systems, Eastman Kodak Company, 
-  Fujitsu Computer Products of America, Genoa Technology, 
-  Hewlett-Packard Company, Intel Corporation, Kofax Image Products, 
-  JFL Peripheral Solutions Inc., Ricoh Corporation, and Xerox Corporation.  
+
+  Copyright © 1998 TWAIN Working Group: Adobe Systems Incorporated,
+  Canon Information Systems, Eastman Kodak Company,
+  Fujitsu Computer Products of America, Genoa Technology,
+  Hewlett-Packard Company, Intel Corporation, Kofax Image Products,
+  JFL Peripheral Solutions Inc., Ricoh Corporation, and Xerox Corporation.
   All rights reserved.
 
-  Copyright © 2000 TWAIN Working Group: Adobe Systems Incorporated, 
-  Canon Information Systems, Digimarc Corporation, Eastman Kodak Company, 
-  Fujitsu Computer Products of America, Hewlett-Packard Company, 
-  JFL Peripheral Solutions Inc., Ricoh Corporation, and Xerox Corporation.  
+  Copyright © 2000 TWAIN Working Group: Adobe Systems Incorporated,
+  Canon Information Systems, Digimarc Corporation, Eastman Kodak Company,
+  Fujitsu Computer Products of America, Hewlett-Packard Company,
+  JFL Peripheral Solutions Inc., Ricoh Corporation, and Xerox Corporation.
   All rights reserved.
 
 
   TWAIN.h -  This is the definitive include file for applications and
-          data sources written to the TWAIN specification.
-          It defines constants, data structures, messages etc.
-          for the public interface to TWAIN.
- 
+		  data sources written to the TWAIN specification.
+		  It defines constants, data structures, messages etc.
+		  for the public interface to TWAIN.
+
   Revision History:
-    version 1.0, March 6, 1992.  TWAIN 1.0.
-    version 1.1, January 1993.   Tech Notes 1.1
-    version 1.5, June 1993.      Specification Update 1.5
-                                 Change DC to TW 
-                                 Change filename from DC.H to TWAIN.H
-    version 1.5, July 1993.      Remove spaces from country identifiers
- 
-    version 1.7, July 1997       Added Capabilities and data structure for 
-                                 document imaging and digital cameras.
-                                 KHL.
-    version 1.7, July 1997       Inserted Borland compatibile structure packing
-                                 directives provided by Mentor.  JMH
-    version 1.7, Aug 1997        Expanded file tabs to spaces.  
-                                 NOTE: future authors should be sure to have 
-                                 their editors set to automatically expand tabs 
-                                 to spaces (original tab setting was 4 spaces).
-    version 1.7, Sept 1997       Added job control values
-                                 Added return codes
-    version 1.7, Sept 1997       changed definition of pRGBRESPONSE to 
-                                 pTW_RGBRESPONSE
-    version 1.7  Aug 1998        Added missing TWEI_BARCODEROTATION values
-                                 TWBCOR_ types JMH
-    version 1.8  August 1998     Added new types and definitions required
-                                 for 1.8 Specification JMH
-    version 1.8  January 1999    Changed search mode from SRCH_ to TWBD_ as
-                                 in 1.8 Specification, added TWBT_MAXICODE JMH
-    version 1.8  January 1999    Removed undocumented duplicate AUTO<cap> JMH
-    version 1.8  March 1999      Removed undocumented 1.8 caps:
-                                 CAP_FILESYSTEM
-                                 CAP_PAPERBINDING
-                                 CAP_PASSTHRU
-                                 CAP_POWERDOWNTIME
-                                 ICAP_AUTODISCARDBLANKPAGES
-                               * CAP_PAGEMULTIPLEACQUIRE - is CAP_REACQUIREALLOWED,
-                               requires spec change.  JMH
-                                 Added Mac structure packing modifications JMH
-    version 1.9  March 2000  Added new types and definations required
-                             for 1.9 Specification MLM
-    version 1.9  March 2000  Added ICAP_JPEGQUALITY, TWJQ_ values,
-                                 updated TWON_PROTOCOLMINOR for Release v1.9 MN
-    version 1.91 August 2007     Added new types and definitions required
-                                 for 1.91 Specification MLM
-    version 2.0  Sept 2007       Added new types and definitions required
-                                 for 2.0 Specification FHH
-    version 2.0  Mar 2008        Depreciated ICAP_PIXELTYPEs TWPT_SRGB64, TWPT_BGR, 
-                                 TWPT_CIELAB, TWPT_CIELUV, and TWPT_YCBCR  JMW
-    version 2.0  Mar 2008        Added missing new 2.0 CAP_ definitions JMW
-    version 2.0  Dec 2008        Updated TW_INFO structure for 64bit JMW
-    version 2.1  Mar 2009        Added new types and definitions required
-                                 for 2.1 Specification JMW
+	version 1.0, March 6, 1992.  TWAIN 1.0.
+	version 1.1, January 1993.   Tech Notes 1.1
+	version 1.5, June 1993.      Specification Update 1.5
+								 Change DC to TW
+								 Change filename from DC.H to TWAIN.H
+	version 1.5, July 1993.      Remove spaces from country identifiers
+
+	version 1.7, July 1997       Added Capabilities and data structure for
+								 document imaging and digital cameras.
+								 KHL.
+	version 1.7, July 1997       Inserted Borland compatibile structure packing
+								 directives provided by Mentor.  JMH
+	version 1.7, Aug 1997        Expanded file tabs to spaces.
+								 NOTE: future authors should be sure to have
+								 their editors set to automatically expand tabs
+								 to spaces (original tab setting was 4 spaces).
+	version 1.7, Sept 1997       Added job control values
+								 Added return codes
+	version 1.7, Sept 1997       changed definition of pRGBRESPONSE to
+								 pTW_RGBRESPONSE
+	version 1.7  Aug 1998        Added missing TWEI_BARCODEROTATION values
+								 TWBCOR_ types JMH
+	version 1.8  August 1998     Added new types and definitions required
+								 for 1.8 Specification JMH
+	version 1.8  January 1999    Changed search mode from SRCH_ to TWBD_ as
+								 in 1.8 Specification, added TWBT_MAXICODE JMH
+	version 1.8  January 1999    Removed undocumented duplicate AUTO<cap> JMH
+	version 1.8  March 1999      Removed undocumented 1.8 caps:
+								 CAP_FILESYSTEM
+								 CAP_PAPERBINDING
+								 CAP_PASSTHRU
+								 CAP_POWERDOWNTIME
+								 ICAP_AUTODISCARDBLANKPAGES
+							   * CAP_PAGEMULTIPLEACQUIRE - is CAP_REACQUIREALLOWED,
+							   requires spec change.  JMH
+								 Added Mac structure packing modifications JMH
+	version 1.9  March 2000  Added new types and definations required
+							 for 1.9 Specification MLM
+	version 1.9  March 2000  Added ICAP_JPEGQUALITY, TWJQ_ values,
+								 updated TWON_PROTOCOLMINOR for Release v1.9 MN
+	version 1.91 August 2007     Added new types and definitions required
+								 for 1.91 Specification MLM
+	version 2.0  Sept 2007       Added new types and definitions required
+								 for 2.0 Specification FHH
+	version 2.0  Mar 2008        Depreciated ICAP_PIXELTYPEs TWPT_SRGB64, TWPT_BGR,
+								 TWPT_CIELAB, TWPT_CIELUV, and TWPT_YCBCR  JMW
+	version 2.0  Mar 2008        Added missing new 2.0 CAP_ definitions JMW
+	version 2.0  Dec 2008        Updated TW_INFO structure for 64bit JMW
+	version 2.1  Mar 2009        Added new types and definitions required
+								 for 2.1 Specification JMW
 \* ======================================================================== */
 
 #ifndef TWAIN
@@ -119,7 +119,8 @@
 /* GNU C/C++ Compiler */
 #elif defined(__GNUC__)
 #define TWH_CMP_GNU
-#if defined(__alpha__) || defined(__ia64__) || defined(__ppc64__) || defined(__s390x__) || defined(__x86_64__)
+#if defined(__alpha__) || defined(__ia64__) || defined(__ppc64__) || defined(__s390x__) ||         \
+	defined(__x86_64__)
 #define TWH_64BIT
 #else
 #define TWH_32BIT
@@ -150,10 +151,10 @@ typedef Handle TW_HANDLE;
 typedef char *TW_MEMREF;
 
 #ifdef TWH_32BIT
-//32 bit GNU
+// 32 bit GNU
 typedef unsigned long TW_UINTPTR;
 #else
-//64 bit GNU
+// 64 bit GNU
 typedef unsigned long long TW_UINTPTR;
 #endif
 
@@ -166,10 +167,10 @@ typedef void *TW_MEMREF;
 typedef unsigned char BYTE;
 
 #ifdef TWH_32BIT
-//32 bit GNU
+// 32 bit GNU
 typedef unsigned long TW_UINTPTR;
 #else
-//64 bit GNU
+// 64 bit GNU
 typedef unsigned long long TW_UINTPTR;
 #endif
 #endif
@@ -375,7 +376,8 @@ typedef struct {
 	TW_INT32 NewImageSize;		/* estimate of the amount of space a new image would take up */
 	TW_UINT32 NumberOfFiles;	/* number of files, depends on FileType */
 	TW_UINT32 NumberOfSnippets; /* number of audio snippets */
-	TW_UINT32 DeviceGroupMask;  /* used to group cameras (ex: front/rear bitonal, front/rear grayscale...) */
+	TW_UINT32 DeviceGroupMask;  /* used to group cameras (ex: front/rear bitonal, front/rear
+								   grayscale...) */
 	char Reserved[508];			/**/
 } TW_FILESYSTEM, FAR *pTW_FILESYSTEM;
 
@@ -475,11 +477,11 @@ typedef struct {
 
 /* DAT_PASSTHRU, device dependant data to pass through Data Source */
 typedef struct {
-	TW_MEMREF pCommand;		   /* Pointer to Command buffer */
-	TW_UINT32 CommandBytes;	/* Number of bytes in Command buffer */
-	TW_INT32 Direction;		   /* One of the TWDR_xxxx values.  Defines the direction of data flow */
-	TW_MEMREF pData;		   /* Pointer to Data buffer */
-	TW_UINT32 DataBytes;	   /* Number of bytes in Data buffer */
+	TW_MEMREF pCommand;		/* Pointer to Command buffer */
+	TW_UINT32 CommandBytes; /* Number of bytes in Command buffer */
+	TW_INT32 Direction;		/* One of the TWDR_xxxx values.  Defines the direction of data flow */
+	TW_MEMREF pData;		/* Pointer to Data buffer */
+	TW_UINT32 DataBytes;	/* Number of bytes in Data buffer */
 	TW_UINT32 DataBytesXfered; /* Number of bytes successfully transferred */
 } TW_PASSTHRU, FAR *pTW_PASSTHRU;
 
@@ -530,11 +532,17 @@ typedef struct {
 	};
 } TW_STATUS, FAR *pTW_STATUS;
 
-/* DAT_STATUSUTF8. Application gets detailed UTF8 status info from a data source with this.  Added 2.1 */
+/* DAT_STATUSUTF8. Application gets detailed UTF8 status info from a data source with this.  Added
+ * 2.1 */
 typedef struct {
-	TW_STATUS Status;	 /* input  TW_STATUS data received from a previous call to DG_CONTROL / DAT_STATUS / MSG_GET. */
-	TW_UINT32 Size;		  /* output Total number of bytes in the UTF8string, plus the terminating NUL byte.  This is not the same as the total number of characters in the string. */
-	TW_HANDLE UTF8string; /* output TW_HANDLE to a UTF-8 encoded localized string (based on TW_IDENTITY.Language or CAP_LANGUAGE).  The Source allocates it, the Application frees it. */
+	TW_STATUS Status; /* input  TW_STATUS data received from a previous call to DG_CONTROL /
+						 DAT_STATUS / MSG_GET. */
+	TW_UINT32
+		Size; /* output Total number of bytes in the UTF8string, plus the terminating NUL byte.
+				 This is not the same as the total number of characters in the string. */
+	TW_HANDLE UTF8string; /* output TW_HANDLE to a UTF-8 encoded localized string (based on
+							 TW_IDENTITY.Language or CAP_LANGUAGE).  The Source allocates it, the
+							 Application frees it. */
 } TW_STATUSUTF8, FAR *pTW_STATUSUTF8;
 
 /* DAT_USERINTERFACE. Coordinates UI between application and data source. */
@@ -1410,11 +1418,13 @@ typedef struct {
  *       to support backward capability the App and DS will not use the fields
  */
 #define DF_DSM2 0x10000000L /* added to the identity by the DSM  */
-#define DF_APP2 0x20000000L /* Set by the App to indicate it would \
-							   prefer to use DSM2 */
-#define DF_DS2 0x40000000L  /* Set by the DS to indicate it would \
-							   prefer to use DSM2 */
-#define DG_MASK 0xFFFFL		/* all Data Groups limited to 16 bit.  Added for 2.1  */
+#define DF_APP2                                                                                    \
+	0x20000000L /* Set by the App to indicate it would                                             \
+				   prefer to use DSM2 */
+#define DF_DS2                                                                                     \
+	0x40000000L			/* Set by the DS to indicate it would                                      \
+						   prefer to use DSM2 */
+#define DG_MASK 0xFFFFL /* all Data Groups limited to 16 bit.  Added for 2.1  */
 
 /****************************************************************************
  *                                                        *
@@ -1459,9 +1469,15 @@ typedef struct {
 #define DAT_AUDIONATIVEXFER 0x0203 /* TW_UINT32 handle to WAV, (AIFF Mac) Added 1.8 */
 
 /* misplaced */
-#define DAT_ICCPROFILE 0x0401		/* TW_MEMORY        Added 1.91  This Data Argument is misplaced but belongs to the DG_IMAGE Data Group */
-#define DAT_IMAGEMEMFILEXFER 0x0402 /* TW_IMAGEMEMXFER  Added 1.91  This Data Argument is misplaced but belongs to the DG_IMAGE Data Group */
-#define DAT_ENTRYPOINT 0x0403		/* TW_ENTRYPOINT    Added 2.0   This Data Argument is misplaced but belongs to the DG_CONTROL Data Group */
+#define DAT_ICCPROFILE                                                                             \
+	0x0401 /* TW_MEMORY        Added 1.91  This Data Argument is misplaced but belongs to the      \
+			  DG_IMAGE Data Group */
+#define DAT_IMAGEMEMFILEXFER                                                                       \
+	0x0402 /* TW_IMAGEMEMXFER  Added 1.91  This Data Argument is misplaced but belongs to the      \
+			  DG_IMAGE Data Group */
+#define DAT_ENTRYPOINT                                                                             \
+	0x0403 /* TW_ENTRYPOINT    Added 2.0   This Data Argument is misplaced but belongs to the      \
+			  DG_CONTROL Data Group */
 
 /****************************************************************************
  * Messages                                                                 *
@@ -1802,34 +1818,37 @@ typedef struct {
 /* Condition Codes: Application gets these by doing DG_CONTROL DAT_STATUS MSG_GET.  */
 #define TWCC_CUSTOMBASE 0x8000
 
-#define TWCC_SUCCESS 0			  /* It worked!                                */
-#define TWCC_BUMMER 1			  /* Failure due to unknown causes             */
-#define TWCC_LOWMEMORY 2		  /* Not enough memory to perform operation    */
-#define TWCC_NODS 3				  /* No Data Source                            */
-#define TWCC_MAXCONNECTIONS 4	 /* DS is connected to max possible applications      */
-#define TWCC_OPERATIONERROR 5	 /* DS or DSM reported error, application shouldn't   */
-#define TWCC_BADCAP 6			  /* Unknown capability                        */
-#define TWCC_BADPROTOCOL 9		  /* Unrecognized MSG DG DAT combination       */
-#define TWCC_BADVALUE 10		  /* Data parameter out of range              */
-#define TWCC_SEQERROR 11		  /* DG DAT MSG out of expected sequence      */
-#define TWCC_BADDEST 12			  /* Unknown destination Application/Source in DSM_Entry */
-#define TWCC_CAPUNSUPPORTED 13	/* Capability not supported by source            */
-#define TWCC_CAPBADOPERATION 14   /* Operation not supported by capability         */
-#define TWCC_CAPSEQERROR 15		  /* Capability has dependancy on other capability */
-#define TWCC_DENIED 16			  /* File System operation is denied (file is protected) Added 1.8 */
-#define TWCC_FILEEXISTS 17		  /* Operation failed because file already exists.       Added 1.8 */
-#define TWCC_FILENOTFOUND 18	  /* File not found                                      Added 1.8 */
-#define TWCC_NOTEMPTY 19		  /* Operation failed because directory is not empty     Added 1.8 */
-#define TWCC_PAPERJAM 20		  /* The feeder is jammed                                Added 1.8 */
-#define TWCC_PAPERDOUBLEFEED 21   /* The feeder detected multiple pages                  Added 1.8 */
-#define TWCC_FILEWRITEERROR 22	/* Error writing the file (meant for things like disk full conditions)Added 1.8 */
-#define TWCC_CHECKDEVICEONLINE 23 /* The device went offline prior to or during this operation Added 1.8 */
-#define TWCC_INTERLOCK 24		  /* Added 2.0 */
-#define TWCC_DAMAGEDCORNER 25	 /* Added 2.0 */
-#define TWCC_FOCUSERROR 26		  /* Added 2.0 */
-#define TWCC_DOCTOOLIGHT 27		  /* Added 2.0 */
-#define TWCC_DOCTOODARK 28		  /* Added 2.0 */
-#define TWCC_NOMEDIA 29			  /* Added 2.1 */
+#define TWCC_SUCCESS 0			/* It worked!                                */
+#define TWCC_BUMMER 1			/* Failure due to unknown causes             */
+#define TWCC_LOWMEMORY 2		/* Not enough memory to perform operation    */
+#define TWCC_NODS 3				/* No Data Source                            */
+#define TWCC_MAXCONNECTIONS 4   /* DS is connected to max possible applications      */
+#define TWCC_OPERATIONERROR 5   /* DS or DSM reported error, application shouldn't   */
+#define TWCC_BADCAP 6			/* Unknown capability                        */
+#define TWCC_BADPROTOCOL 9		/* Unrecognized MSG DG DAT combination       */
+#define TWCC_BADVALUE 10		/* Data parameter out of range              */
+#define TWCC_SEQERROR 11		/* DG DAT MSG out of expected sequence      */
+#define TWCC_BADDEST 12			/* Unknown destination Application/Source in DSM_Entry */
+#define TWCC_CAPUNSUPPORTED 13  /* Capability not supported by source            */
+#define TWCC_CAPBADOPERATION 14 /* Operation not supported by capability         */
+#define TWCC_CAPSEQERROR 15		/* Capability has dependancy on other capability */
+#define TWCC_DENIED 16			/* File System operation is denied (file is protected) Added 1.8 */
+#define TWCC_FILEEXISTS 17		/* Operation failed because file already exists.       Added 1.8 */
+#define TWCC_FILENOTFOUND 18	/* File not found                                      Added 1.8 */
+#define TWCC_NOTEMPTY 19		/* Operation failed because directory is not empty     Added 1.8 */
+#define TWCC_PAPERJAM 20		/* The feeder is jammed                                Added 1.8 */
+#define TWCC_PAPERDOUBLEFEED 21 /* The feeder detected multiple pages                  Added 1.8   \
+								   */
+#define TWCC_FILEWRITEERROR                                                                        \
+	22 /* Error writing the file (meant for things like disk full conditions)Added 1.8 */
+#define TWCC_CHECKDEVICEONLINE                                                                     \
+	23					  /* The device went offline prior to or during this operation Added 1.8 */
+#define TWCC_INTERLOCK 24 /* Added 2.0 */
+#define TWCC_DAMAGEDCORNER 25 /* Added 2.0 */
+#define TWCC_FOCUSERROR 26	/* Added 2.0 */
+#define TWCC_DOCTOOLIGHT 27   /* Added 2.0 */
+#define TWCC_DOCTOODARK 28	/* Added 2.0 */
+#define TWCC_NOMEDIA 29		  /* Added 2.1 */
 
 /* bit patterns: for query the operation that are supported by the data source on a capability */
 /* Application gets these through DG_CONTROL/DAT_CAPABILITY/MSG_QUERYSUPPORT */
@@ -1865,16 +1884,19 @@ typedef wchar_t TW_UNI512[512], FAR *pTW_UNI512;
 
 #define TWFF_JPN 12 /* 1.91 */
 
-#define DAT_TWUNKIDENTITY 0x000b  /* Additional message required for thunker to request the special identity information. */
-#define DAT_SETUPFILEXFER2 0x0301 /* Data transfer via a file. deprecated - use DAT_SETUPFILEXFER instead*/
+#define DAT_TWUNKIDENTITY                                                                          \
+	0x000b /* Additional message required for thunker to request the special identity information. \
+			  */
+#define DAT_SETUPFILEXFER2                                                                         \
+	0x0301 /* Data transfer via a file. deprecated - use DAT_SETUPFILEXFER instead*/
 
 #define CAP_SUPPORTEDCAPSEXT 0x100c
-#define CAP_FILESYSTEM							 //0x????
-#define CAP_PAGEMULTIPLEACQUIRE 0x1023			 /* Added 1.8 */
-#define CAP_PAPERBINDING 0x102f					 /* Added 1.8 */
-#define CAP_PASSTHRU 0x1031						 /* Added 1.8 */
-#define CAP_POWERDOWNTIME 0x1034 /* Added 1.8 */ //0x1034 is reused by CAP_CAMERASIDE
-#define ACAP_AUDIOFILEFORMAT 0x1201				 /* Added 1.8 */
+#define CAP_FILESYSTEM // 0x????
+#define CAP_PAGEMULTIPLEACQUIRE 0x1023 /* Added 1.8 */
+#define CAP_PAPERBINDING 0x102f		   /* Added 1.8 */
+#define CAP_PASSTHRU 0x1031			   /* Added 1.8 */
+#define CAP_POWERDOWNTIME 0x1034 /* Added 1.8 */ // 0x1034 is reused by CAP_CAMERASIDE
+#define ACAP_AUDIOFILEFORMAT 0x1201 /* Added 1.8 */
 
 #define MSG_CHECKSTATUS 0x0201 /* Get status information - use MSG_GET instead */
 
@@ -1952,8 +1974,7 @@ typedef struct {
 /*  2) Any applications which use the custom capabailites are not supported */
 /*     under thunking since we have no way of knowing what size data (if    */
 /*     any) is being passed.                                                */
-typedef struct
-	{
+typedef struct {
 	TW_INT8 destFlag;	 /* TRUE if dest is not NULL                 */
 	TW_IDENTITY dest;	 /* Identity of data source (if used)        */
 	TW_INT32 dataGroup;   /* DSM_Entry dataGroup parameter            */
@@ -1968,22 +1989,20 @@ typedef struct
 
 /* SDH - 03/21/95 - TWUNK */
 /* Provides DS_Entry results over thunk link. */
-typedef struct
-	{
+typedef struct {
 	TW_UINT16 returnCode;	/* Thunker DsEntry return code.             */
 	TW_UINT16 conditionCode; /* Thunker DsEntry condition code.          */
 	TW_INT32 pDataSize;		 /* Size of pData (0 if NULL)                */
-							 //  TW_MEMREF   pData;      /* Based on implementation specifics, a     */
-							 /* pData parameter makes no sense in this   */
-							 /* structure, but data (if provided) will be*/
-							 /* appended in the data block.              */
+	//  TW_MEMREF   pData;      /* Based on implementation specifics, a     */
+	/* pData parameter makes no sense in this   */
+	/* structure, but data (if provided) will be*/
+	/* appended in the data block.              */
 } TW_TWUNKDSENTRYRETURN, FAR *pTW_TWUNKDSENTRYRETURN;
 
 /* WJD - 950818 */
 /* Added for 1.6 Specification */
 /* TWAIN 1.6 CAP_SUPPORTEDCAPSEXT structure */
-typedef struct
-	{
+typedef struct {
 	TW_UINT16 Cap;		  /* Which CAP/ICAP info is relevant to */
 	TW_UINT16 Properties; /* Messages this CAP/ICAP supports */
 } TW_CAPEXT, FAR *pTW_CAPEXT;
@@ -2010,21 +2029,21 @@ typedef struct {
  *          This could identify an application or a data source.
  *          If this is NULL, the message goes to the Source Manager.
  *
- *  DG      The Data Group. 
+ *  DG      The Data Group.
  *          Example: DG_IMAGE.
  *
  *  DAT     The Data Attribute Type.
  *          Example: DAT_IMAGEMEMXFER.
- *    
+ *
  *  MSG     The message.  Messages are interpreted by the destination module
- *          with respect to the Data Group and the Data Attribute Type.  
+ *          with respect to the Data Group and the Data Attribute Type.
  *          Example: MSG_GET.
  *
- *  pData   A pointer to the data structure or variable identified 
+ *  pData   A pointer to the data structure or variable identified
  *          by the Data Attribute Type.
  *          Example: (TW_MEMREF)&ImageMemXfer
  *                   where ImageMemXfer is a TW_IMAGEMEMXFER structure.
- *                    
+ *
  * Returns:
  *  ReturnCode
  *         Example: TWRC_SUCCESS.
@@ -2038,35 +2057,19 @@ extern "C" {
 
 #ifdef TWH_CMP_MSC
 
-TW_UINT16 FAR PASCAL DSM_Entry(pTW_IDENTITY pOrigin,
-							   pTW_IDENTITY pDest,
-							   TW_UINT32 DG,
-							   TW_UINT16 DAT,
-							   TW_UINT16 MSG,
-							   TW_MEMREF pData);
+TW_UINT16 FAR PASCAL DSM_Entry(pTW_IDENTITY pOrigin, pTW_IDENTITY pDest, TW_UINT32 DG,
+							   TW_UINT16 DAT, TW_UINT16 MSG, TW_MEMREF pData);
 
-typedef TW_UINT16(FAR PASCAL *DSMENTRYPROC)(pTW_IDENTITY pOrigin,
-											pTW_IDENTITY pDest,
-											TW_UINT32 DG,
-											TW_UINT16 DAT,
-											TW_UINT16 MSG,
-											TW_MEMREF pData);
+typedef TW_UINT16(FAR PASCAL *DSMENTRYPROC)(pTW_IDENTITY pOrigin, pTW_IDENTITY pDest, TW_UINT32 DG,
+											TW_UINT16 DAT, TW_UINT16 MSG, TW_MEMREF pData);
 
 #else
 
-FAR PASCAL TW_UINT16 DSM_Entry(pTW_IDENTITY pOrigin,
-							   pTW_IDENTITY pDest,
-							   TW_UINT32 DG,
-							   TW_UINT16 DAT,
-							   TW_UINT16 MSG,
-							   TW_MEMREF pData);
+FAR PASCAL TW_UINT16 DSM_Entry(pTW_IDENTITY pOrigin, pTW_IDENTITY pDest, TW_UINT32 DG,
+							   TW_UINT16 DAT, TW_UINT16 MSG, TW_MEMREF pData);
 
-typedef TW_UINT16 (*DSMENTRYPROC)(pTW_IDENTITY pOrigin,
-								  pTW_IDENTITY pDest,
-								  TW_UINT32 DG,
-								  TW_UINT16 DAT,
-								  TW_UINT16 MSG,
-								  TW_MEMREF pData);
+typedef TW_UINT16 (*DSMENTRYPROC)(pTW_IDENTITY pOrigin, pTW_IDENTITY pDest, TW_UINT32 DG,
+								  TW_UINT16 DAT, TW_UINT16 MSG, TW_MEMREF pData);
 
 #endif /* TWH_CMP_MSC */
 
@@ -2081,21 +2084,21 @@ typedef TW_UINT16 (*DSMENTRYPROC)(pTW_IDENTITY pOrigin,
  *  pOrigin Identifies the source module of the message. This could
  *          identify an application or the Data Source Manager.
  *
- *  DG      The Data Group. 
+ *  DG      The Data Group.
  *          Example: DG_IMAGE.
- *           
+ *
  *  DAT     The Data Attribute Type.
  *          Example: DAT_IMAGEMEMXFER.
- *    
+ *
  *  MSG     The message.  Messages are interpreted by the data source
  *          with respect to the Data Group and the Data Attribute Type.
  *          Example: MSG_GET.
  *
- *  pData   A pointer to the data structure or variable identified 
+ *  pData   A pointer to the data structure or variable identified
  *          by the Data Attribute Type.
  *          Example: (TW_MEMREF)&ImageMemXfer
  *                   where ImageMemXfer is a TW_IMAGEMEMXFER structure.
- *                    
+ *
  * Returns:
  *  ReturnCode
  *          Example: TWRC_SUCCESS.
@@ -2112,30 +2115,18 @@ extern "C" {
 
 #ifdef TWH_CMP_MSC
 
-TW_UINT16 FAR PASCAL DS_Entry(pTW_IDENTITY pOrigin,
-							  TW_UINT32 DG,
-							  TW_UINT16 DAT,
-							  TW_UINT16 MSG,
+TW_UINT16 FAR PASCAL DS_Entry(pTW_IDENTITY pOrigin, TW_UINT32 DG, TW_UINT16 DAT, TW_UINT16 MSG,
 							  TW_MEMREF pData);
 
-typedef TW_UINT16(FAR PASCAL *DSENTRYPROC)(pTW_IDENTITY pOrigin,
-										   TW_UINT32 DG,
-										   TW_UINT16 DAT,
-										   TW_UINT16 MSG,
-										   TW_MEMREF pData);
+typedef TW_UINT16(FAR PASCAL *DSENTRYPROC)(pTW_IDENTITY pOrigin, TW_UINT32 DG, TW_UINT16 DAT,
+										   TW_UINT16 MSG, TW_MEMREF pData);
 
 #else
 
-FAR PASCAL TW_UINT16 DS_Entry(pTW_IDENTITY pOrigin,
-							  TW_UINT32 DG,
-							  TW_UINT16 DAT,
-							  TW_UINT16 MSG,
+FAR PASCAL TW_UINT16 DS_Entry(pTW_IDENTITY pOrigin, TW_UINT32 DG, TW_UINT16 DAT, TW_UINT16 MSG,
 							  TW_MEMREF pData);
 
-typedef TW_UINT16 (*DSENTRYPROC)(pTW_IDENTITY pOrigin,
-								 TW_UINT32 DG,
-								 TW_UINT16 DAT,
-								 TW_UINT16 MSG,
+typedef TW_UINT16 (*DSENTRYPROC)(pTW_IDENTITY pOrigin, TW_UINT32 DG, TW_UINT16 DAT, TW_UINT16 MSG,
 								 TW_MEMREF pData);
 
 #endif /* TWH_CMP_MSC */

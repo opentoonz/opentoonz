@@ -52,7 +52,7 @@ void resetMarksBar(MarksBar *marksBar)
 
 //--------------------------------------------------------------
 
-//Get the exact range for specified value
+// Get the exact range for specified value
 void getRange(const QVector<int> &values, int &min, int &max)
 {
 	int size = values.size();
@@ -70,16 +70,16 @@ void getRange(const QVector<int> &values, int &min, int &max)
 
 //--------------------------------------------------------------
 
-//Get the threshold-permissive range for values.
+// Get the threshold-permissive range for values.
 void getRange(const QVector<int> &values, int threshold, int &min, int &max)
 {
 	int val, size = values.size(), count;
 
-	count = values[0]; //Always Consent 1 value cut
+	count = values[0]; // Always Consent 1 value cut
 	for (min = 1; min < size; ++min) {
 		val = values[min];
 		count += val;
-		if (val && count > threshold) //Then, stop before a positive value when thresh is exceeded
+		if (val && count > threshold) // Then, stop before a positive value when thresh is exceeded
 			break;
 	}
 
@@ -92,7 +92,7 @@ void getRange(const QVector<int> &values, int threshold, int &min, int &max)
 	}
 }
 
-} //namespace
+} // namespace
 
 //**************************************************************************
 //    Adjust Levels Swatch
@@ -102,7 +102,7 @@ class AdjustLevelsPopup::Swatch : public PlaneViewer
 {
 	TRasterP m_ras;
 
-public:
+  public:
 	Swatch(QWidget *parent = 0) : PlaneViewer(parent)
 	{
 		setBgColor(TPixel32::White, TPixel32::White);
@@ -119,10 +119,10 @@ public:
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-			//Note GL_ONE instead of GL_SRC_ALPHA: it's needed since the input
-			//image is supposedly premultiplied - and it works because the
-			//viewer's background is opaque.
-			//See tpixelutils.h's overPixT function for comparison.
+			// Note GL_ONE instead of GL_SRC_ALPHA: it's needed since the input
+			// image is supposedly premultiplied - and it works because the
+			// viewer's background is opaque.
+			// See tpixelutils.h's overPixT function for comparison.
 
 			pushGLWorldCoordinates();
 			draw(m_ras);
@@ -137,20 +137,19 @@ public:
 //    EditableMarksBar implementation
 //**************************************************************************
 
-EditableMarksBar::EditableMarksBar(QWidget *parent)
-	: QFrame(parent)
+EditableMarksBar::EditableMarksBar(QWidget *parent) : QFrame(parent)
 {
 	QVBoxLayout *layout = new QVBoxLayout;
 	layout->setMargin(0);
 	layout->setSpacing(2);
 	setLayout(layout);
 
-	//Add MarksBar
+	// Add MarksBar
 	m_marksBar = new MarksBar;
 	m_marksBar->setContentsMargins(5, 0, 6, 0);
 	layout->addWidget(m_marksBar);
 
-	//Customize it
+	// Customize it
 	m_marksBar->setRange(0, 256, 2);
 
 	QVector<int> &values = m_marksBar->values();
@@ -160,11 +159,11 @@ EditableMarksBar::EditableMarksBar(QWidget *parent)
 	QVector<QColor> &colors = m_marksBar->colors();
 	colors.fill(Qt::black, 2);
 
-	//MarksBar dominates values change notifications
+	// MarksBar dominates values change notifications
 	bool ret = connect(m_marksBar, SIGNAL(marksUpdated()), this, SLOT(updateFields()));
 	ret = ret && connect(m_marksBar, SIGNAL(marksUpdated()), this, SIGNAL(paramsChanged()));
 
-	//Add fields layout
+	// Add fields layout
 	QHBoxLayout *hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
 	hLayout->setContentsMargins(4, 0, 5, 0);
@@ -209,7 +208,7 @@ void EditableMarksBar::updateFields()
 	m_fields[0]->setValue(values[0]);
 	m_fields[1]->setValue(values[1] - 1);
 
-	//No emission - as it's the marksbar that dominate signal emission
+	// No emission - as it's the marksbar that dominate signal emission
 }
 
 //--------------------------------------------------------------
@@ -218,7 +217,7 @@ void EditableMarksBar::onFieldEdited()
 {
 	QVector<int> &values = m_marksBar->values();
 
-	//Copy the values to the marksBar
+	// Copy the values to the marksBar
 	values[0] = m_fields[0]->getValue();
 	values[1] = m_fields[1]->getValue() + 1;
 
@@ -232,7 +231,8 @@ void EditableMarksBar::onFieldEdited()
 //**************************************************************************
 
 AdjustLevelsPopup::AdjustLevelsPopup()
-	: DVGui::Dialog(TApp::instance()->getMainWindow(), true, false, "AdjustLevels"), m_thresholdD(0.005) //0.5% of the image size
+	: DVGui::Dialog(TApp::instance()->getMainWindow(), true, false, "AdjustLevels"),
+	  m_thresholdD(0.005) // 0.5% of the image size
 {
 	int i, j;
 
@@ -246,7 +246,8 @@ AdjustLevelsPopup::AdjustLevelsPopup()
 	beginVLayout();
 
 	QSplitter *splitter = new QSplitter(Qt::Vertical);
-	splitter->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	splitter->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 	addWidget(splitter);
 
 	endVLayout();
@@ -263,7 +264,7 @@ AdjustLevelsPopup::AdjustLevelsPopup()
 	QFrame *topWidget = new QFrame(scrollArea);
 	scrollArea->setWidget(topWidget);
 
-	QVBoxLayout *topVLayout = new QVBoxLayout(topWidget); //Needed to justify at top
+	QVBoxLayout *topVLayout = new QVBoxLayout(topWidget); // Needed to justify at top
 	topWidget->setLayout(topVLayout);
 
 	QHBoxLayout *topLayout = new QHBoxLayout(topWidget);
@@ -283,14 +284,14 @@ AdjustLevelsPopup::AdjustLevelsPopup()
 		HistogramView *view = m_histogram->getHistograms()->getHistogramView(i);
 		histogramViewLayout = static_cast<QVBoxLayout *>(view->layout());
 
-		//Don't draw channel numbers
+		// Don't draw channel numbers
 		view->channelBar()->setDrawNumbers(false);
 
 		for (j = 0; j < 2; ++j) {
 			EditableMarksBar *editableMarksBar = m_marksBar[j + (i << 1)] = new EditableMarksBar;
 			MarksBar *marksBar = editableMarksBar->marksBar();
 
-			//Set margins up to cover the histogram
+			// Set margins up to cover the histogram
 			editableMarksBar->layout()->setContentsMargins(6, 0, 5, 0);
 			connect(editableMarksBar, SIGNAL(paramsChanged()), this, SLOT(onParamsChanged()));
 
@@ -300,8 +301,8 @@ AdjustLevelsPopup::AdjustLevelsPopup()
 
 	//------------------------- View Widget -------------------------
 
-	//NOTE: It's IMPORTANT that parent widget is supplied. It's somewhat
-	//used by QSplitter to decide the initial widget sizes...
+	// NOTE: It's IMPORTANT that parent widget is supplied. It's somewhat
+	// used by QSplitter to decide the initial widget sizes...
 
 	m_viewer = new Swatch(splitter);
 	m_viewer->setMinimumHeight(150);
@@ -337,7 +338,7 @@ AdjustLevelsPopup::AdjustLevelsPopup()
 
 	connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
 
-	//Finally, acquire current selection
+	// Finally, acquire current selection
 	acquireRaster();
 
 	m_viewer->resize(0, 350);
@@ -349,8 +350,8 @@ AdjustLevelsPopup::AdjustLevelsPopup()
 void AdjustLevelsPopup::showEvent(QShowEvent *se)
 {
 	TSelectionHandle *selectionHandle = TApp::instance()->getCurrentSelection();
-	connect(selectionHandle, SIGNAL(selectionChanged(TSelection *)),
-			this, SLOT(onSelectionChanged()));
+	connect(selectionHandle, SIGNAL(selectionChanged(TSelection *)), this,
+			SLOT(onSelectionChanged()));
 
 	acquireRaster();
 }
@@ -362,8 +363,8 @@ void AdjustLevelsPopup::hideEvent(QHideEvent *he)
 	Dialog::hideEvent(he);
 
 	TSelectionHandle *selectionHandle = TApp::instance()->getCurrentSelection();
-	disconnect(selectionHandle, SIGNAL(selectionChanged(TSelection *)),
-			   this, SLOT(onSelectionChanged()));
+	disconnect(selectionHandle, SIGNAL(selectionChanged(TSelection *)), this,
+			   SLOT(onSelectionChanged()));
 
 	m_inputRas = TRasterP();
 	m_viewer->raster() = TRasterP();
@@ -373,24 +374,26 @@ void AdjustLevelsPopup::hideEvent(QHideEvent *he)
 
 void AdjustLevelsPopup::acquireRaster()
 {
-	//Retrieve current selection
+	// Retrieve current selection
 	TApp *app = TApp::instance();
 	TSelection *selection = app->getCurrentSelection()->getSelection();
 	TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(selection);
 	TFilmstripSelection *filmstripSelection = dynamic_cast<TFilmstripSelection *>(selection);
 
-	//Retrieve the input raster
+	// Retrieve the input raster
 	m_inputRas = TRasterP();
 	if (cellSelection) {
 		TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
-		TXshCell cell = xsh->getCell(app->getCurrentFrame()->getFrameIndex(), app->getCurrentColumn()->getColumnIndex());
+		TXshCell cell = xsh->getCell(app->getCurrentFrame()->getFrameIndex(),
+									 app->getCurrentColumn()->getColumnIndex());
 		TRasterImageP rasImage = cell.getImage(true);
 		if (rasImage && rasImage->getRaster())
 			m_inputRas = rasImage->getRaster();
 	} else if (filmstripSelection) {
 		TXshSimpleLevel *simpleLevel = app->getCurrentLevel()->getSimpleLevel();
 		if (simpleLevel) {
-			TRasterImageP rasImage = (TRasterImageP)simpleLevel->getFrame(app->getCurrentFrame()->getFid(), true);
+			TRasterImageP rasImage =
+				(TRasterImageP)simpleLevel->getFrame(app->getCurrentFrame()->getFid(), true);
 			if (rasImage && rasImage->getRaster())
 				m_inputRas = rasImage->getRaster();
 		}
@@ -404,10 +407,10 @@ void AdjustLevelsPopup::acquireRaster()
 		m_okBtn->setEnabled(false);
 	}
 
-	//Build histograms
+	// Build histograms
 	m_histogram->setRaster(m_inputRas);
 
-	//Update the corresponding processed image in the viewer
+	// Update the corresponding processed image in the viewer
 	updateProcessedImage();
 }
 
@@ -446,20 +449,19 @@ void AdjustLevelsPopup::updateProcessedImage()
 		return;
 	}
 
-	//Allocate a conformant output, if necessary
+	// Allocate a conformant output, if necessary
 	TRasterP &outRas = m_viewer->raster();
-	if (!outRas ||
-		outRas->getPixelSize() != m_inputRas->getPixelSize() ||
+	if (!outRas || outRas->getPixelSize() != m_inputRas->getPixelSize() ||
 		outRas->getSize() != m_inputRas->getSize())
 		outRas = m_inputRas->create(m_inputRas->getLx(), m_inputRas->getLy());
 
-	//Perform the operation preview
+	// Perform the operation preview
 	int in0[5], in1[5], out0[5], out1[5];
 	getParameters(in0, in1, out0, out1);
 
 	TRop::rgbmAdjust(outRas, m_inputRas, in0, in1, out0, out1);
 
-	//Update the swatch
+	// Update the swatch
 	m_viewer->update();
 }
 
@@ -472,7 +474,7 @@ void AdjustLevelsPopup::onSelectionChanged()
 
 //--------------------------------------------------------------
 
-//Params were changed. Content must be updated.
+// Params were changed. Content must be updated.
 void AdjustLevelsPopup::onParamsChanged()
 {
 	updateProcessedImage();
@@ -480,7 +482,7 @@ void AdjustLevelsPopup::onParamsChanged()
 
 //--------------------------------------------------------------
 
-//Reset ALL channels
+// Reset ALL channels
 void AdjustLevelsPopup::reset()
 {
 	int i;
@@ -512,7 +514,7 @@ void AdjustLevelsPopup::clampRange()
 
 	int min, max;
 
-	//Clamp histogram
+	// Clamp histogram
 	const QVector<int> &values = histograms->getHistogramView(channelIdx)->values();
 	::getRange(values, min, max);
 
@@ -542,7 +544,7 @@ void AdjustLevelsPopup::autoAdjust()
 
 	int min, max;
 
-	//Clamp histogram
+	// Clamp histogram
 	const QVector<int> &values = histograms->getHistogramView(channelIdx)->values();
 	if (channelIdx == 0) {
 		int minR, maxR, minG, maxG, minB, maxB;
@@ -579,7 +581,7 @@ class AdjustLevelsUndo : public TUndo
 	QString m_rasId;
 	int m_rasSize;
 
-public:
+  public:
 	AdjustLevelsUndo(int *in0, int *in1, int *out0, int *out1, int r, int c, TRasterP ras);
 	~AdjustLevelsUndo();
 
@@ -591,8 +593,8 @@ public:
 
 //--------------------------------------------------------------
 
-AdjustLevelsUndo::AdjustLevelsUndo(int *in0, int *in1, int *out0, int *out1,
-								   int r, int c, TRasterP ras)
+AdjustLevelsUndo::AdjustLevelsUndo(int *in0, int *in1, int *out0, int *out1, int r, int c,
+								   TRasterP ras)
 	: m_r(r), m_c(c), m_rasSize(ras->getLx() * ras->getLy() * ras->getPixelSize())
 {
 	memcpy(m_in0, in0, sizeof(m_in0));
@@ -624,7 +626,8 @@ void AdjustLevelsUndo::undo() const
 	if (!rasImage)
 		return; //...Should never happen, though...
 
-	rasImage->setRaster(((TRasterImageP)TImageCache::instance()->get(m_rasId, true))->getRaster()->clone());
+	rasImage->setRaster(
+		((TRasterImageP)TImageCache::instance()->get(m_rasId, true))->getRaster()->clone());
 
 	TXshSimpleLevel *simpleLevel = cell.getSimpleLevel();
 	assert(simpleLevel);
@@ -669,14 +672,14 @@ void AdjustLevelsUndo::redo() const
 
 void AdjustLevelsPopup::apply()
 {
-	//Retrieve parameters
+	// Retrieve parameters
 	int in0[5], in1[5], out0[5], out1[5];
 	getParameters(in0, in1, out0, out1);
 
-	//Operate depending on the selection kind
+	// Operate depending on the selection kind
 	TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(TSelection::getCurrent());
 	if (cellSelection) {
-		std::set<TRasterImage *> images; //Multiple cells may yield the same image...
+		std::set<TRasterImage *> images; // Multiple cells may yield the same image...
 
 		int r0, c0, r1, c1;
 		cellSelection->getSelectedCells(r0, c0, r1, c1);
@@ -704,7 +707,8 @@ void AdjustLevelsPopup::apply()
 					images.insert(rasImage.getPointer());
 					oneImageChanged = true;
 
-					TUndoManager::manager()->add(new AdjustLevelsUndo(in0, in1, out0, out1, r, c, ras->clone()));
+					TUndoManager::manager()->add(
+						new AdjustLevelsUndo(in0, in1, out0, out1, r, c, ras->clone()));
 					TRop::rgbmAdjust(ras, ras, in0, in1, out0, out1);
 
 					TXshSimpleLevel *simpleLevel = cell.getSimpleLevel();
@@ -724,7 +728,8 @@ void AdjustLevelsPopup::apply()
 		}
 	}
 
-	TFilmstripSelection *filmstripSelection = dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
+	TFilmstripSelection *filmstripSelection =
+		dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
 	if (filmstripSelection) {
 		TXshSimpleLevel *simpleLevel = TApp::instance()->getCurrentLevel()->getSimpleLevel();
 		if (simpleLevel) {

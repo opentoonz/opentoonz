@@ -55,8 +55,10 @@ struct toonz_param_interface_t_ {
 	int (*get_type)(toonz_param_handle_t param, double frame, int *type, int *counts);
 	int (*get_value)(toonz_param_handle_t param, double frame, int *pcounts, void *pvalue);
 	int (*set_value)(toonz_param_handle_t param, double frame, int counts, const void *pvalue);
-	int (*get_string_value)(toonz_param_handle_t param, int *wholesize, int rcvbufsize, char *pvalue);
-	int (*get_spectrum_value)(toonz_param_handle_t param, double frame, double x, toonz_param_spectrum_t *pvalue);
+	int (*get_string_value)(toonz_param_handle_t param, int *wholesize, int rcvbufsize,
+							char *pvalue);
+	int (*get_spectrum_value)(toonz_param_handle_t param, double frame, double x,
+							  toonz_param_spectrum_t *pvalue);
 } TOONZ_PACK;
 
 typedef toonz_param_interface_t_ toonz_param_interface_t;
@@ -80,7 +82,8 @@ struct toonz_tile_interface_t_ {
 	int (*get_raw_address_unsafe)(toonz_tile_handle_t handle, void **);
 	int (*get_raw_stride)(toonz_tile_handle_t handle, int *stride);
 	int (*get_element_type)(toonz_tile_handle_t handle, int *element);
-	int (*copy_rect)(toonz_tile_handle_t handle, int left, int top, int width, int height, void *dst, int dststride);
+	int (*copy_rect)(toonz_tile_handle_t handle, int left, int top, int width, int height,
+					 void *dst, int dststride);
 
 	int (*create_from)(toonz_tile_handle_t handle, toonz_tile_handle_t *newhandle);
 	int (*create)(toonz_tile_handle_t *newhandle);
@@ -182,10 +185,13 @@ typedef toonz_rendering_setting_t_ toonz_rendering_setting_t;
 
 struct toonz_nodal_rasterfx_handler_t_ {
 	toonz_if_version_t ver;
-	void (*do_compute)(toonz_node_handle_t node, const toonz_rendering_setting_t *, double frame, toonz_tile_handle_t tile);
-	int (*do_get_bbox)(toonz_node_handle_t node, const toonz_rendering_setting_t *, double frame, toonz_rect_t *rect);
+	void (*do_compute)(toonz_node_handle_t node, const toonz_rendering_setting_t *, double frame,
+					   toonz_tile_handle_t tile);
+	int (*do_get_bbox)(toonz_node_handle_t node, const toonz_rendering_setting_t *, double frame,
+					   toonz_rect_t *rect);
 	int (*can_handle)(toonz_node_handle_t node, const toonz_rendering_setting_t *, double frame);
-	size_t (*get_memory_requirement)(toonz_node_handle_t node, const toonz_rendering_setting_t *, double frame, const toonz_rect_t *rect);
+	size_t (*get_memory_requirement)(toonz_node_handle_t node, const toonz_rendering_setting_t *,
+									 double frame, const toonz_rect_t *rect);
 
 	void (*on_new_frame)(toonz_node_handle_t node, const toonz_rendering_setting_t *, double frame);
 	void (*on_end_frame)(toonz_node_handle_t node, const toonz_rendering_setting_t *, double frame);
@@ -204,12 +210,16 @@ typedef toonz_nodal_rasterfx_handler_t_ toonz_nodal_rasterfx_handler_t;
 struct toonz_fxnode_interface_t_ {
 	toonz_if_version_t ver;
 	/* TRasterFx の振る舞い */
-	int (*get_bbox)(toonz_fxnode_handle_t fxnode, const toonz_rendering_setting_t *, double frame, toonz_rect_t *rect, int *get_bbox);
-	int (*can_handle)(toonz_fxnode_handle_t fxnode, const toonz_rendering_setting_t *, double frame, int *can_handle);
+	int (*get_bbox)(toonz_fxnode_handle_t fxnode, const toonz_rendering_setting_t *, double frame,
+					toonz_rect_t *rect, int *get_bbox);
+	int (*can_handle)(toonz_fxnode_handle_t fxnode, const toonz_rendering_setting_t *, double frame,
+					  int *can_handle);
 	/* TFx の振る舞い */
 	int (*get_input_port_count)(toonz_fxnode_handle_t fxnode, int *count);
 	int (*get_input_port)(toonz_fxnode_handle_t fxnode, int index, toonz_port_handle_t *port);
-	int (*compute_to_tile)(toonz_fxnode_handle_t fxnode, const toonz_rendering_setting_t *, double frame, const toonz_rect_t *rect, toonz_tile_handle_t intile, toonz_tile_handle_t outtile);
+	int (*compute_to_tile)(toonz_fxnode_handle_t fxnode, const toonz_rendering_setting_t *,
+						   double frame, const toonz_rect_t *rect, toonz_tile_handle_t intile,
+						   toonz_tile_handle_t outtile);
 } TOONZ_PACK;
 
 typedef struct toonz_fxnode_interface_t_ toonz_fxnode_interface_t;
@@ -217,7 +227,8 @@ typedef struct toonz_fxnode_interface_t_ toonz_fxnode_interface_t;
 struct toonz_setup_interface_t_ {
 	toonz_if_version_t ver;
 	int (*set_parameter_pages)(toonz_node_handle_t node, int num, toonz_param_page_t *pages);
-	int (*set_parameter_pages_with_error)(toonz_node_handle_t node, int num, toonz_param_page_t *pages, int *reason, void **position);
+	int (*set_parameter_pages_with_error)(toonz_node_handle_t node, int num,
+										  toonz_param_page_t *pages, int *reason, void **position);
 	int (*add_input_port)(toonz_node_handle_t node, const char *name, int type);
 
 } TOONZ_PACK;

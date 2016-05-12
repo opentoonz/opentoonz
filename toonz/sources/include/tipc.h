@@ -3,16 +3,16 @@
 #ifndef TIPC_H
 #define TIPC_H
 
-//Qt includes
+// Qt includes
 #include <QDataStream>
 #include <QByteArray>
 #include <QLocalSocket>
 #include <QEventLoop>
 
-//STL includes
+// STL includes
 #include <limits>
 
-//Toonz includes
+// Toonz includes
 #include "tcommon.h"
 
 #undef DVAPI
@@ -88,7 +88,7 @@ class Message
 	QByteArray m_ba;
 	QDataStream m_ds;
 
-public:
+  public:
 	Message() : m_ba(), m_ds(&m_ba, QIODevice::ReadWrite) {}
 	~Message() {}
 
@@ -98,15 +98,13 @@ public:
 	const QDataStream &ds() const { return m_ds; }
 	QDataStream &ds() { return m_ds; }
 
-	template <typename Type>
-	Message &operator<<(const Type &data)
+	template <typename Type> Message &operator<<(const Type &data)
 	{
 		m_ds << data;
 		return *this;
 	}
 
-	template <typename Type>
-	Message &operator>>(Type &data)
+	template <typename Type> Message &operator>>(Type &data)
 	{
 		m_ds >> data;
 		return *this;
@@ -131,7 +129,7 @@ class DVAPI Stream : public QDataStream
 {
 	QLocalSocket *m_socket;
 
-public:
+  public:
 	Stream(QLocalSocket *socket) : QDataStream(socket), m_socket(socket) {}
 
 	QLocalSocket *socket() { return m_socket; }
@@ -150,7 +148,7 @@ public:
 	bool flush(int msecs = -1);
 };
 
-} //namespace tipc
+} // namespace tipc
 
 //********************************************************
 //    tipc Stream Operators
@@ -190,7 +188,7 @@ inline Message &reset(Message &msg)
 	return msg;
 }
 
-} //namespace tipc
+} // namespace tipc
 
 //********************************************************
 //    tipc Utility Functions
@@ -226,26 +224,25 @@ DVAPI int create(QSharedMemory &shmem, int size, bool strictSize = false);
 
 class ShMemReader
 {
-public:
+  public:
 	virtual int read(const char *srcBuf, int len) = 0;
 };
 class ShMemWriter
 {
-public:
+  public:
 	virtual int write(char *dstBuf, int len) = 0;
 };
 
 DVAPI bool readShMemBuffer(Stream &stream, Message &msg, ShMemReader *dataReader);
 DVAPI bool writeShMemBuffer(Stream &stream, Message &msg, int bufSize, ShMemWriter *dataWriter);
 
-} //namespace tipc
+} // namespace tipc
 
 //********************************************************
 //    STL compatibility Stream operators
 //********************************************************
 
-template <typename T>
-QDataStream &operator<<(QDataStream &ds, const std::vector<T> &vec)
+template <typename T> QDataStream &operator<<(QDataStream &ds, const std::vector<T> &vec)
 {
 	unsigned int i, size = vec.size();
 
@@ -256,14 +253,12 @@ QDataStream &operator<<(QDataStream &ds, const std::vector<T> &vec)
 	return ds;
 }
 
-template <typename T>
-QDataStream &operator>>(QDataStream &ds, T &vec)
+template <typename T> QDataStream &operator>>(QDataStream &ds, T &vec)
 {
 	return ds >> vec;
 }
 
-template <typename T>
-QDataStream &operator>>(QDataStream &ds, std::vector<T> &vec)
+template <typename T> QDataStream &operator>>(QDataStream &ds, std::vector<T> &vec)
 {
 	unsigned int i, size;
 	T val;
@@ -317,4 +312,4 @@ inline QDataStream &operator>>(QDataStream &ds, wchar_t &ch)
 	return ds;
 }
 
-#endif //TIPC_H
+#endif // TIPC_H

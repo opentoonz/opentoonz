@@ -21,27 +21,28 @@ class TPalette;
 
 //! This is an abstract class representing an image.
 /*!
-		
+
 	*/
 class DVAPI TImage : public TSmartObject
 {
 	DECLARE_CLASS_CODE
 	TPalette *m_palette;
 
-public:
+  public:
 	/*!
 		This class represents an interface to a generic image object.
 		An image can be:
 	\li raster, i.e. a data structure representing a generally rectangular grid of pixels,
 		or points of color or a vector image,
-    \li vector, i.e. an image represented by geometrical primitives such as points, lines, curves, and shapes or polygon(s), 
-	    which are all based upon mathematical equations 
+	\li vector, i.e. an image represented by geometrical primitives such as points, lines, curves,
+	and shapes or polygon(s),
+		which are all based upon mathematical equations
 	*/
 	TImage();
 	virtual ~TImage();
 
 	/*!
-	This enum 
+	This enum
   */
 	enum Type {
 		NONE = 0,		  //!< Not a recognized image (should never happen).
@@ -61,13 +62,13 @@ public:
   */
 	virtual TRectD getBBox() const = 0;
 	/*!
-		This method must return a pointer to a newly created image that is a clone of \e this. 
+		This method must return a pointer to a newly created image that is a clone of \e this.
 	*/
 	virtual TImage *cloneImage() const = 0;
 	/*!
-		Returns a pointer to the palette associated to this image. A palette is a 
+		Returns a pointer to the palette associated to this image. A palette is a
 		limited set of colors, identified by indexes and composed by a combination of
-		primitive colors, i.e. RGB color. 
+		primitive colors, i.e. RGB color.
 	*/
 
 	virtual TRasterP raster() const { return TRasterP(); }
@@ -78,7 +79,7 @@ public:
 	*/
 	virtual void setPalette(TPalette *palette);
 
-private:
+  private:
 	// not implemented
 	TImage(const TImage &);
 	TImage &operator=(const TImage &);

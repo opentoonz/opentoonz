@@ -11,8 +11,7 @@
 // TXshLevelHandle
 //-----------------------------------------------------------------------------
 
-TXshLevelHandle::TXshLevelHandle()
-	: m_level(0)
+TXshLevelHandle::TXshLevelHandle() : m_level(0)
 {
 }
 

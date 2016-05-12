@@ -21,8 +21,7 @@ struct TStageObject::Keyframe {
 	bool m_isKeyframe;			//!< False, in case each channel value was interpolated
 	double m_easeIn, m_easeOut; //!< Uniform Ease parameters, <0 in case the
 								//!< parameters have different eases
-	Keyframe()
-		: m_isKeyframe(false), m_easeIn(0), m_easeOut(0) {}
+	Keyframe() : m_isKeyframe(false), m_easeIn(0), m_easeOut(0) {}
 };
 
 #endif // T_STAGE_OBJECT_KEYFRAME_INCLUDED

@@ -18,7 +18,7 @@
 
 class DVAPI TTileSet
 {
-public:
+  public:
 	// per adesso, facciamo che comprime sempre,
 	// appena costruisce l'oggetto. Poi potremmo dare la scelta,
 	// anche per decidere se farlo subito o meno.
@@ -27,7 +27,7 @@ public:
 		TDimension m_dim;
 		int m_pixelSize;
 
-	public:
+	  public:
 		TRect m_rasterBounds;
 
 		Tile();
@@ -37,24 +37,22 @@ public:
 
 		virtual Tile *clone() const = 0;
 
-		//expressed in byte
+		// expressed in byte
 		int getSize() { return m_dim.lx * m_dim.ly * m_pixelSize; }
 
-	private:
+	  private:
 		Tile(const Tile &tile);
 		Tile &operator=(const Tile &tile);
 	};
 
-protected:
+  protected:
 	TDimension m_srcImageSize;
 
 	typedef std::vector<Tile *> Tiles;
 	Tiles m_tiles;
 
-public:
-	TTileSet(const TDimension &dim) : m_srcImageSize(dim)
-	{
-	}
+  public:
+	TTileSet(const TDimension &dim) : m_srcImageSize(dim) {}
 	~TTileSet();
 
 	int getMemorySize() const;
@@ -79,42 +77,33 @@ public:
 
 class DVAPI TTileSetCM32 : public TTileSet
 {
-public:
+  public:
 	// per adesso, facciamo che comprime sempre,
 	// appena costruisce l'oggetto. Poi potremmo dare la scelta,
 	// anche per decidere se farlo subito o meno.
 	class DVAPI Tile : public TTileSet::Tile
 	{
-	public:
+	  public:
 		Tile();
 		Tile(const TRasterCM32P &ras, const TPoint &p);
 		~Tile();
 #ifdef __LP64__
-		QString id() const
-		{
-			return "TileCM" + QString::number((unsigned long)this);
-		}
+		QString id() const { return "TileCM" + QString::number((unsigned long)this); }
 #else
-		QString id() const
-		{
-			return "TileCM" + QString::number((UINT) this);
-		}
+		QString id() const { return "TileCM" + QString::number((UINT) this); }
 #endif
 
 		Tile *clone() const;
 
 		void getRaster(TRasterCM32P &ras) const;
 
-	private:
+	  private:
 		Tile(const Tile &tile);
 		Tile &operator=(const Tile &tile);
 	};
 
-public:
-	TTileSetCM32(const TDimension &dim)
-		: TTileSet(dim)
-	{
-	}
+  public:
+	TTileSetCM32(const TDimension &dim) : TTileSet(dim) {}
 	~TTileSetCM32();
 
 	// crea un tile estraendo rect*ras->getBounds() da ras.
@@ -132,42 +121,33 @@ public:
 
 class DVAPI TTileSetFullColor : public TTileSet
 {
-public:
+  public:
 	// per adesso, facciamo che comprime sempre,
 	// appena costruisce l'oggetto. Poi potremmo dare la scelta,
 	// anche per decidere se farlo subito o meno.
 	class DVAPI Tile : public TTileSet::Tile
 	{
-	public:
+	  public:
 		Tile();
 		Tile(const TRasterP &ras, const TPoint &p);
 		~Tile();
 #ifdef __LP64__
-		QString id() const
-		{
-			return "TTileSet32::Tile" + QString::number((unsigned long)this);
-		}
+		QString id() const { return "TTileSet32::Tile" + QString::number((unsigned long)this); }
 #else
-		QString id() const
-		{
-			return "TTileSet32::Tile" + QString::number((UINT) this);
-		}
+		QString id() const { return "TTileSet32::Tile" + QString::number((UINT) this); }
 #endif
 
 		Tile *clone() const;
 
 		void getRaster(TRasterP &ras) const;
 
-	private:
+	  private:
 		Tile(const Tile &tile);
 		Tile &operator=(const Tile &tile);
 	};
 
-public:
-	TTileSetFullColor(const TDimension &dim)
-		: TTileSet(dim)
-	{
-	}
+  public:
+	TTileSetFullColor(const TDimension &dim) : TTileSet(dim) {}
 	~TTileSetFullColor();
 
 	// crea un tile estraendo rect*ras->getBounds() da ras.

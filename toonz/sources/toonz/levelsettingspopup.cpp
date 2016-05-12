@@ -92,7 +92,7 @@ TPointD getCurrentCameraDpi()
 }
 
 //-----------------------------------------------------------------------------
-} //anonymous namespace
+} // anonymous namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -105,18 +105,19 @@ TPointD getCurrentCameraDpi()
 //-----------------------------------------------------------------------------
 
 LevelSettingsPopup::LevelSettingsPopup()
-	: Dialog(TApp::instance()->getMainWindow(), false, false, "LevelSettings"), m_whiteTransp(0), m_scanPathLabel(0), m_scanPathFld(0)
+	: Dialog(TApp::instance()->getMainWindow(), false, false, "LevelSettings"), m_whiteTransp(0),
+	  m_scanPathLabel(0), m_scanPathFld(0)
 {
 	setWindowTitle(tr("Level Settings"));
 
 	m_nameFld = new LineEdit();
-	m_pathFld = new FileField(); //Path
+	m_pathFld = new FileField(); // Path
 	m_scanPathLabel = new QLabel(tr("Scan Path:"));
-	m_scanPathFld = new FileField(); //ScanPath
-	m_typeLabel = new QLabel();		 //Level Type
-	//Type
+	m_scanPathFld = new FileField(); // ScanPath
+	m_typeLabel = new QLabel(); // Level Type
+	// Type
 	m_dpiTypeOm = new QComboBox();
-	//DPI
+	// DPI
 	m_dpiLabel = new QLabel(tr("DPI:"));
 	m_dpiFld = new DoubleLineEdit();
 	m_squarePixCB = new CheckBox(tr("Forced Squared Pixel"));
@@ -125,16 +126,16 @@ LevelSettingsPopup::LevelSettingsPopup()
 	m_widthFld = new MeasuredDoubleLineEdit();
 	m_heightLabel = new QLabel(tr("Height:"));
 	m_heightFld = new MeasuredDoubleLineEdit();
-	//Use Camera Dpi
+	// Use Camera Dpi
 	m_useCameraDpiBtn = new QPushButton(tr("Use Camera DPI"));
 
 	m_cameraDpiLabel = new QLabel(tr(""));
 	m_imageDpiLabel = new QLabel(tr(""));
 	m_imageResLabel = new QLabel(tr(""));
 
-	//subsampling
+	// subsampling
 	m_subsamplingLabel = new QLabel(tr("Subsampling:"));
-	m_subsamplingFld = new DVGui::IntLineEdit(this,1,1);
+	m_subsamplingFld = new DVGui::IntLineEdit(this, 1, 1);
 
 	m_doPremultiply = new CheckBox(tr("Premultiply"), this);
 
@@ -176,9 +177,11 @@ LevelSettingsPopup::LevelSettingsPopup()
 		nameLayout->setMargin(5);
 		nameLayout->setSpacing(5);
 		{
-			nameLayout->addWidget(new QLabel(tr("Name:"), this), 0, 0, Qt::AlignRight | Qt::AlignVCenter);
+			nameLayout->addWidget(new QLabel(tr("Name:"), this), 0, 0,
+								  Qt::AlignRight | Qt::AlignVCenter);
 			nameLayout->addWidget(m_nameFld, 0, 1);
-			nameLayout->addWidget(new QLabel(tr("Path:"), this), 1, 0, Qt::AlignRight | Qt::AlignVCenter);
+			nameLayout->addWidget(new QLabel(tr("Path:"), this), 1, 0,
+								  Qt::AlignRight | Qt::AlignVCenter);
 			nameLayout->addWidget(m_pathFld, 1, 1);
 			nameLayout->addWidget(m_scanPathLabel, 2, 0, Qt::AlignRight | Qt::AlignVCenter);
 			nameLayout->addWidget(m_scanPathFld, 2, 1);
@@ -205,11 +208,14 @@ LevelSettingsPopup::LevelSettingsPopup()
 			dpiLayout->addWidget(m_heightLabel, 2, 2, Qt::AlignRight | Qt::AlignVCenter);
 			dpiLayout->addWidget(m_heightFld, 2, 3);
 			dpiLayout->addWidget(m_useCameraDpiBtn, 3, 1, 1, 3);
-			dpiLayout->addWidget(new QLabel(tr("Camera DPI:"), this), 4, 0, Qt::AlignRight | Qt::AlignVCenter);
+			dpiLayout->addWidget(new QLabel(tr("Camera DPI:"), this), 4, 0,
+								 Qt::AlignRight | Qt::AlignVCenter);
 			dpiLayout->addWidget(m_cameraDpiLabel, 4, 1, 1, 3);
-			dpiLayout->addWidget(new QLabel(tr("Image DPI:"), this), 5, 0, Qt::AlignRight | Qt::AlignVCenter);
+			dpiLayout->addWidget(new QLabel(tr("Image DPI:"), this), 5, 0,
+								 Qt::AlignRight | Qt::AlignVCenter);
 			dpiLayout->addWidget(m_imageDpiLabel, 5, 1, 1, 3);
-			dpiLayout->addWidget(new QLabel(tr("Resolution:"), this), 6, 0, Qt::AlignRight | Qt::AlignVCenter);
+			dpiLayout->addWidget(new QLabel(tr("Resolution:"), this), 6, 0,
+								 Qt::AlignRight | Qt::AlignVCenter);
 			dpiLayout->addWidget(m_imageResLabel, 6, 1, 1, 3);
 		}
 		dpiLayout->setColumnStretch(0, 0);
@@ -272,15 +278,21 @@ LevelSettingsPopup::LevelSettingsPopup()
 
 void LevelSettingsPopup::showEvent(QShowEvent *e)
 {
-	bool ret = connect(TApp::instance()->getCurrentSelection(), SIGNAL(selectionSwitched(TSelection *, TSelection *)), this, SLOT(onSelectionSwitched(TSelection *, TSelection *)));
-	ret = ret && connect(TApp::instance()->getCurrentSelection(), SIGNAL(selectionChanged(TSelection *)), SLOT(updateLevelSettings()));
+	bool ret = connect(TApp::instance()->getCurrentSelection(),
+					   SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
+					   SLOT(onSelectionSwitched(TSelection *, TSelection *)));
+	ret = ret && connect(TApp::instance()->getCurrentSelection(),
+						 SIGNAL(selectionChanged(TSelection *)), SLOT(updateLevelSettings()));
 
-	CastSelection *castSelection = dynamic_cast<CastSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
+	CastSelection *castSelection =
+		dynamic_cast<CastSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
 	if (castSelection)
-		ret = ret && connect(castSelection, SIGNAL(itemSelectionChanged()), this, SLOT(onCastSelectionChanged()));
+		ret = ret && connect(castSelection, SIGNAL(itemSelectionChanged()), this,
+							 SLOT(onCastSelectionChanged()));
 
 	/*--- Cleanupが行われたときに表示を更新するため ---*/
-	ret = ret && connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneChanged()), SLOT(onSceneChanged()));
+	ret = ret && connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneChanged()),
+						 SLOT(onSceneChanged()));
 
 	assert(ret);
 	updateLevelSettings();
@@ -290,14 +302,21 @@ void LevelSettingsPopup::showEvent(QShowEvent *e)
 
 void LevelSettingsPopup::hideEvent(QHideEvent *e)
 {
-	bool ret = disconnect(TApp::instance()->getCurrentSelection(), SIGNAL(selectionSwitched(TSelection *, TSelection *)), this, SLOT(onSelectionSwitched(TSelection *, TSelection *)));
-	ret = ret && disconnect(TApp::instance()->getCurrentSelection(), SIGNAL(selectionChanged(TSelection *)), this, SLOT(updateLevelSettings()));
+	bool ret = disconnect(TApp::instance()->getCurrentSelection(),
+						  SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
+						  SLOT(onSelectionSwitched(TSelection *, TSelection *)));
+	ret = ret &&
+		  disconnect(TApp::instance()->getCurrentSelection(),
+					 SIGNAL(selectionChanged(TSelection *)), this, SLOT(updateLevelSettings()));
 
-	CastSelection *castSelection = dynamic_cast<CastSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
+	CastSelection *castSelection =
+		dynamic_cast<CastSelection *>(TApp::instance()->getCurrentSelection()->getSelection());
 	if (castSelection)
-		ret = ret && disconnect(castSelection, SIGNAL(itemSelectionChanged()), this, SLOT(onCastSelectionChanged()));
+		ret = ret && disconnect(castSelection, SIGNAL(itemSelectionChanged()), this,
+								SLOT(onCastSelectionChanged()));
 
-	ret = ret && disconnect(TApp::instance()->getCurrentScene(), SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
+	ret = ret && disconnect(TApp::instance()->getCurrentScene(), SIGNAL(sceneChanged()), this,
+							SLOT(onSceneChanged()));
 
 	assert(ret);
 	Dialog::hideEvent(e);
@@ -325,7 +344,8 @@ void LevelSettingsPopup::onSelectionSwitched(TSelection *oldSelection, TSelectio
 	if (!castSelection) {
 		CastSelection *oldCastSelection = dynamic_cast<CastSelection *>(oldSelection);
 		if (oldCastSelection)
-			disconnect(oldCastSelection, SIGNAL(itemSelectionChanged()), this, SLOT(onCastSelectionChanged()));
+			disconnect(oldCastSelection, SIGNAL(itemSelectionChanged()), this,
+					   SLOT(onCastSelectionChanged()));
 		return;
 	}
 	connect(castSelection, SIGNAL(itemSelectionChanged()), this, SLOT(onCastSelectionChanged()));
@@ -339,10 +359,14 @@ void LevelSettingsPopup::updateLevelSettings()
 {
 	TApp *app = TApp::instance();
 	TXshLevelP selectedLevel;
-	CastSelection *castSelection = dynamic_cast<CastSelection *>(app->getCurrentSelection()->getSelection());
-	TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(app->getCurrentSelection()->getSelection());
-	TColumnSelection *columnSelection = dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
-	FxSelection *fxSelection = dynamic_cast<FxSelection *>(app->getCurrentSelection()->getSelection());
+	CastSelection *castSelection =
+		dynamic_cast<CastSelection *>(app->getCurrentSelection()->getSelection());
+	TCellSelection *cellSelection =
+		dynamic_cast<TCellSelection *>(app->getCurrentSelection()->getSelection());
+	TColumnSelection *columnSelection =
+		dynamic_cast<TColumnSelection *>(app->getCurrentSelection()->getSelection());
+	FxSelection *fxSelection =
+		dynamic_cast<FxSelection *>(app->getCurrentSelection()->getSelection());
 
 	/*--セル選択の場合--*/
 	if (cellSelection) {
@@ -402,10 +426,12 @@ void LevelSettingsPopup::updateLevelSettings()
 		QList<TFxP> selectedFxs = fxSelection->getFxs();
 		if (currentXsheet && !selectedFxs.isEmpty()) {
 			for (int f = 0; f < selectedFxs.size(); f++) {
-				TLevelColumnFx *lcfx = dynamic_cast<TLevelColumnFx *>(selectedFxs.at(f).getPointer());
+				TLevelColumnFx *lcfx =
+					dynamic_cast<TLevelColumnFx *>(selectedFxs.at(f).getPointer());
 				if (lcfx) {
 					int firstRow = lcfx->getXshColumn()->getCellColumn()->getFirstRow();
-					TXshLevelP levelP = lcfx->getXshColumn()->getCellColumn()->getCell(firstRow).m_level;
+					TXshLevelP levelP =
+						lcfx->getXshColumn()->getCellColumn()->getCell(firstRow).m_level;
 					if (levelP) {
 						selectedLevel = levelP;
 						break;
@@ -416,7 +442,7 @@ void LevelSettingsPopup::updateLevelSettings()
 				selectedLevel = app->getCurrentLevel()->getLevel();
 		} else
 			selectedLevel = app->getCurrentLevel()->getLevel();
-		//std::cout<<"fxSelection is current!"<<std::endl;
+		// std::cout<<"fxSelection is current!"<<std::endl;
 	} else
 		selectedLevel = app->getCurrentLevel()->getLevel();
 
@@ -522,12 +548,13 @@ void LevelSettingsPopup::updateLevelSettings()
 
 			// image res
 			TDimension imageRes = m_sl->getResolution();
-			m_imageResLabel->setText(QString::number(imageRes.lx) + "x" + QString::number(imageRes.ly));
+			m_imageResLabel->setText(QString::number(imageRes.lx) + "x" +
+									 QString::number(imageRes.ly));
 
 			// subsampling
 			m_subsamplingFld->setValue(m_sl->getProperties()->getSubsampling());
 
-			//doPremultiply
+			// doPremultiply
 			m_doPremultiply->setChecked(m_sl->getProperties()->doPremultiply());
 			if (m_whiteTransp)
 				m_whiteTransp->setChecked(m_sl->getProperties()->whiteTransp());
@@ -571,10 +598,9 @@ void LevelSettingsPopup::updateLevelSettings()
 	m_heightLabel->setEnabled(isRasterLevel);
 	m_heightFld->setEnabled(isRasterLevel);
 	m_useCameraDpiBtn->setEnabled(hasDpiEditing);
-	m_subsamplingLabel->setEnabled((isRasterLevel && m_sl &&
-									!m_sl->getProperties()->getDirtyFlag()));
-	m_subsamplingFld->setEnabled((isRasterLevel && m_sl &&
-								  !m_sl->getProperties()->getDirtyFlag()));
+	m_subsamplingLabel->setEnabled(
+		(isRasterLevel && m_sl && !m_sl->getProperties()->getDirtyFlag()));
+	m_subsamplingFld->setEnabled((isRasterLevel && m_sl && !m_sl->getProperties()->getDirtyFlag()));
 	m_doPremultiply->setEnabled(m_sl && isRasterLevel && !isTzpLevel);
 	m_doAntialias->setEnabled(m_sl && isRasterLevel);
 	if (m_whiteTransp)
@@ -627,7 +653,7 @@ void LevelSettingsPopup::onPathChanged()
 	newPath = TApp::instance()->getCurrentScene()->getScene()->codeFilePath(newPath);
 	m_pathFld->setPath(QString::fromStdWString(newPath.getWideString()));
 	if (!m_sl && !!m_sdl) {
-		//old level is a sound level
+		// old level is a sound level
 		TFileType::Type levelType = TFileType::getInfo(newPath);
 		if (levelType == TFileType::AUDIO_LEVEL) {
 			TFilePath oldPath = m_sdl->getPath();
@@ -638,7 +664,8 @@ void LevelSettingsPopup::onPathChanged()
 			TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 			TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
 		} else {
-			error(tr("The file %1 is not a sound level.").arg(QString::fromStdWString(newPath.getLevelNameW())));
+			error(tr("The file %1 is not a sound level.")
+					  .arg(QString::fromStdWString(newPath.getLevelNameW())));
 			updateLevelSettings();
 		}
 		return;
@@ -670,8 +697,10 @@ void LevelSettingsPopup::onPathChanged()
 	if (sl) {
 		QString question;
 
-		question = "The path you entered for the level " + QString(toString(sl->getName()).c_str()) +
-				   "is already used: this may generate some conflicts in the file management.\nAre you sure you want to assign the same path to two different levels?";
+		question = "The path you entered for the level " +
+				   QString(toString(sl->getName()).c_str()) +
+				   "is already used: this may generate some conflicts in the file management.\nAre "
+				   "you sure you want to assign the same path to two different levels?";
 		int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
 		if (ret == 0 || ret == 2) {
 			m_pathFld->setPath(toQString(m_sl->getPath()));
@@ -682,8 +711,7 @@ void LevelSettingsPopup::onPathChanged()
 	TFileType::Type oldType = TFileType::getInfo(oldPath);
 	TFileType::Type newType = TFileType::getInfo(newPath);
 
-	if (m_sl->getType() == TZP_XSHLEVEL &&
-		m_sl->getScannedPath() != TFilePath()) {
+	if (m_sl->getType() == TZP_XSHLEVEL && m_sl->getScannedPath() != TFilePath()) {
 		if (newPath == TFilePath() || newPath == m_sl->getScannedPath()) {
 			newPath = m_sl->getScannedPath();
 			m_sl->setType(OVL_XSHLEVEL);
@@ -702,8 +730,7 @@ void LevelSettingsPopup::onPathChanged()
 		}
 	}
 
-	if (oldType != newType ||
-		m_sl->getType() == TZP_XSHLEVEL && newPath.getType() != "tlv" ||
+	if (oldType != newType || m_sl->getType() == TZP_XSHLEVEL && newPath.getType() != "tlv" ||
 		m_sl->getType() != TZP_XSHLEVEL && newPath.getType() == "tlv") {
 		error("Wrong path");
 		m_pathFld->setPath(toQString(m_sl->getPath()));
@@ -711,7 +738,8 @@ void LevelSettingsPopup::onPathChanged()
 	}
 	/*-- ここでPathを更新 --*/
 	m_sl->setPath(newPath);
-	TApp::instance()->getPaletteController()->getCurrentLevelPalette()->setPalette(m_sl->getPalette());
+	TApp::instance()->getPaletteController()->getCurrentLevelPalette()->setPalette(
+		m_sl->getPalette());
 
 	TApp::instance()->getCurrentLevel()->notifyLevelChange();
 	TApp::instance()->getCurrentScene()->notifySceneChanged();
@@ -733,8 +761,10 @@ void LevelSettingsPopup::onScanPathChanged()
 	TFilePath newScanPath(text.toStdWString());
 
 	/*--対応する拡張子で無い場合は、表示を元に戻してreturn--*/
-	/* TODO: 他のFormatはDPI情報が無いため省いているが、ラスタ画像なら問題ないか？後で検討のこと 2016/1/30 shun_iwasawa */
-	if (newScanPath.getType() != "tif" && newScanPath.getType() != "tiff" && newScanPath.getType() != "tzi") {
+	/* TODO: 他のFormatはDPI情報が無いため省いているが、ラスタ画像なら問題ないか？後で検討のこと
+	 * 2016/1/30 shun_iwasawa */
+	if (newScanPath.getType() != "tif" && newScanPath.getType() != "tiff" &&
+		newScanPath.getType() != "tzi") {
 		m_scanPathFld->setPath(toQString(m_sl->getScannedPath()));
 		return;
 	}
@@ -758,7 +788,9 @@ void LevelSettingsPopup::onScanPathChanged()
 		TFilePath cleanupLevelPath;
 		std::string tagName;
 		while (is.matchTag(tagName)) {
-			if (tagName == "cleanupPalette" || tagName == "cleanupCamera" || tagName == "autoCenter" || tagName == "transform" || tagName == "lineProcessing" || tagName == "closestField" || tagName == "fdg") {
+			if (tagName == "cleanupPalette" || tagName == "cleanupCamera" ||
+				tagName == "autoCenter" || tagName == "transform" || tagName == "lineProcessing" ||
+				tagName == "closestField" || tagName == "fdg") {
 				is.skipCurrentTag();
 			} else if (tagName == "path") {
 				is >> cleanupLevelPath;
@@ -768,8 +800,10 @@ void LevelSettingsPopup::onScanPathChanged()
 		}
 
 		if (cleanupLevelPath != TFilePath()) {
-			TFilePath codedCleanupLevelPath = TApp::instance()->getCurrentScene()->getScene()->codeFilePath(cleanupLevelPath);
-			if (m_sl->getPath().getParentDir() != cleanupLevelPath && m_sl->getPath().getParentDir() != codedCleanupLevelPath)
+			TFilePath codedCleanupLevelPath =
+				TApp::instance()->getCurrentScene()->getScene()->codeFilePath(cleanupLevelPath);
+			if (m_sl->getPath().getParentDir() != cleanupLevelPath &&
+				m_sl->getPath().getParentDir() != codedCleanupLevelPath)
 				DVGui::warning("\"Save In\" path of the Cleanup Settings does not match.");
 		} else
 			DVGui::warning("Loading Cleanup Settings failed.");
@@ -792,9 +826,8 @@ void LevelSettingsPopup::onDpiTypeChanged(const QString &dpiPolicyStr)
 	LevelProperties *prop = m_sl->getProperties();
 
 	// dpiPolicyStr ==> dpiPolicy
-	LevelProperties::DpiPolicy dpiPolicy = dpiPolicyStr == CustomDpi
-											   ? LevelProperties::DP_CustomDpi
-											   : LevelProperties::DP_ImageDpi;
+	LevelProperties::DpiPolicy dpiPolicy =
+		dpiPolicyStr == CustomDpi ? LevelProperties::DP_CustomDpi : LevelProperties::DP_ImageDpi;
 	// se ImageDpi, ma l'immagine non ha dpi -> CustomDpi
 	assert(dpiPolicy == LevelProperties::DP_CustomDpi ||
 		   m_sl->getImageDpi().x > 0.0 && m_sl->getImageDpi().y > 0.0);
@@ -999,7 +1032,8 @@ void LevelSettingsPopup::onDoPremultiplyChanged(int value)
 
 void LevelSettingsPopup::onAntialiasSoftnessChanged()
 {
-	m_sl->getProperties()->setDoAntialias(m_doAntialias->isChecked() ? m_antialiasSoftness->getValue() : 0);
+	m_sl->getProperties()->setDoAntialias(
+		m_doAntialias->isChecked() ? m_antialiasSoftness->getValue() : 0);
 	TApp::instance()->getCurrentLevel()->notifyLevelChange();
 }
 
@@ -1037,10 +1071,8 @@ OpenPopupCommandHandler<LevelSettingsPopup> openLevelSettingsPopup(MI_LevelSetti
 
 class ViewLevelFileInfoHandler : public MenuItemHandler
 {
-public:
-	ViewLevelFileInfoHandler(CommandId cmdId) : MenuItemHandler(cmdId)
-	{
-	}
+  public:
+	ViewLevelFileInfoHandler(CommandId cmdId) : MenuItemHandler(cmdId) {}
 
 	void execute()
 	{
@@ -1063,7 +1095,8 @@ public:
 					TXshLevel *lv = xsh->getCell(r, c).getSimpleLevel();
 					if (!lv)
 						continue;
-					std::vector<TXshLevel *>::iterator lvIt = find(selectedLevels.begin(), selectedLevels.end(), lv);
+					std::vector<TXshLevel *>::iterator lvIt =
+						find(selectedLevels.begin(), selectedLevels.end(), lv);
 					if (lvIt == selectedLevels.end())
 						selectedLevels.push_back(lv);
 				}
@@ -1077,8 +1110,7 @@ public:
 			return;
 
 		for (int i = 0; i < selectedLevels.size(); ++i) {
-			if (selectedLevels[i]->getSimpleLevel() ||
-				selectedLevels[i]->getSoundLevel()) {
+			if (selectedLevels[i]->getSimpleLevel() || selectedLevels[i]->getSoundLevel()) {
 				TFilePath path = selectedLevels[i]->getPath();
 				path = selectedLevels[i]->getScene()->decodeFilePath(path);
 
@@ -1097,10 +1129,8 @@ public:
 
 class ViewLevelHandler : public MenuItemHandler
 {
-public:
-	ViewLevelHandler(CommandId cmdId) : MenuItemHandler(cmdId)
-	{
-	}
+  public:
+	ViewLevelHandler(CommandId cmdId) : MenuItemHandler(cmdId) {}
 
 	void execute()
 	{
@@ -1125,7 +1155,8 @@ public:
 					TXshSimpleLevel *lv = currentXsheet->getCell(r, c).getSimpleLevel();
 					if (!lv)
 						continue;
-					std::vector<TXshSimpleLevel *>::iterator lvIt = find(simpleLevels.begin(), simpleLevels.end(), lv);
+					std::vector<TXshSimpleLevel *>::iterator lvIt =
+						find(simpleLevels.begin(), simpleLevels.end(), lv);
 					if (lvIt == simpleLevels.end())
 						simpleLevels.push_back(lv);
 				}

@@ -6,13 +6,13 @@ extern "C" {
 #endif
 
 #ifdef NOTE
-ConvertOneValue2Enum()
-		potrebbe essere fonte di errore se DCItemSize[one_value.ItemType] > DCItemSize[TW_INT8] e si utilizzano i bit piu significativi di one_value.Item
-																			ConvertEnumeration2Range()
-																				potrebbe restituire valori di StepSize non appropriati se
-																			enumeration.ItemType e TW_FIX32
-																			potrebbe restituire valori MinValue non corretti se DCItemSize[xxx.ItemType] > DCItemSize[TW_INT8] e si utilizzano i bit piu significativi di xxx.Item
-																																						   ConvertEnum2OneValue ritorna(ovviamente) solo il valore corrente
+ConvertOneValue2Enum() potrebbe essere fonte di errore se DCItemSize[one_value.ItemType] >
+	DCItemSize[TW_INT8] e si utilizzano i bit piu significativi di one_value.Item
+	ConvertEnumeration2Range() potrebbe restituire valori di StepSize non appropriati se
+	enumeration.ItemType e TW_FIX32 potrebbe restituire valori MinValue non corretti se
+	DCItemSize[xxx.ItemType] >
+	DCItemSize[TW_INT8] e si utilizzano i bit piu significativi di xxx.Item ConvertEnum2OneValue
+	ritorna(ovviamente) solo il valore corrente
 #endif
 
 #include <assert.h>
@@ -25,22 +25,11 @@ ConvertOneValue2Enum()
 
 #include "ttwain_global_def.h"
 
-/*---------------------------------------------------------------------------*/
-static const size_t DCItemSize[13] =
-	{
-		sizeof(TW_INT8),
-		sizeof(TW_INT16),
-		sizeof(TW_INT32),
-		sizeof(TW_UINT8),
-		sizeof(TW_UINT16),
-		sizeof(TW_UINT32),
-		sizeof(TW_BOOL),
-		sizeof(TW_FIX32),
-		sizeof(TW_FRAME),
-		sizeof(TW_STR32),
-		sizeof(TW_STR64),
-		sizeof(TW_STR128),
-		sizeof(TW_STR255),
+	/*---------------------------------------------------------------------------*/
+	static const size_t DCItemSize[13] = {
+	sizeof(TW_INT8),   sizeof(TW_INT16),  sizeof(TW_INT32),  sizeof(TW_UINT8), sizeof(TW_UINT16),
+	sizeof(TW_UINT32), sizeof(TW_BOOL),   sizeof(TW_FIX32),  sizeof(TW_FRAME), sizeof(TW_STR32),
+	sizeof(TW_STR64),  sizeof(TW_STR128), sizeof(TW_STR255),
 }; /* see twain.h */
 
 /*---------------------------------------------------------------------------*/
@@ -56,14 +45,12 @@ static TUINT32 GetContainerSize(int nFormat, unsigned twty, TW_UINT32 nItems);
 static int TTWAIN_GetCapability(TW_INT16 msgType, TW_UINT16 cap_id, TW_UINT16 conType, void *data,
 								TUINT32 *cont_size);
 /*------------------------------------------------------------------------*/
-int TTWAIN_GetCap(TW_UINT16 cap_id, TW_UINT16 conType, void *data,
-				  TUINT32 *cont_size)
+int TTWAIN_GetCap(TW_UINT16 cap_id, TW_UINT16 conType, void *data, TUINT32 *cont_size)
 {
 	return TTWAIN_GetCapability(MSG_GET, cap_id, conType, data, cont_size);
 }
 /*------------------------------------------------------------------------*/
-int TTWAIN_GetCapCurrent(TW_UINT16 cap_id, TW_UINT16 conType, void *data,
-						 TUINT32 *cont_size)
+int TTWAIN_GetCapCurrent(TW_UINT16 cap_id, TW_UINT16 conType, void *data, TUINT32 *cont_size)
 {
 	return TTWAIN_GetCapability(MSG_GETCURRENT, cap_id, conType, data, cont_size);
 }
@@ -135,7 +122,8 @@ static int TTWAIN_GetCapability(TW_INT16 msgType, TW_UINT16 cap_id, TW_UINT16 co
 			*cont_size = GetContainerSize(TWON_ARRAY, my_enum->ItemType, my_enum->NumItems);
 			break;
 		default:
-			/*      tmsg_error("Unable to convert type %d to %d (cap 0x%x)\n", cap.ConType, conType,cap_id);*/
+			/*      tmsg_error("Unable to convert type %d to %d (cap 0x%x)\n", cap.ConType,
+			 * conType,cap_id);*/
 			assert(0);
 			GLOBAL_UNLOCK(cap.hContainer);
 			GLOBAL_FREE(cap.hContainer);
@@ -260,8 +248,7 @@ static int ConvertEnum2Array(TW_ENUMERATION tw_enum, TW_ARRAY *array)
 /*---------------------------------------------------------------------------*/
 /*	      SET CAP							     */
 /*---------------------------------------------------------------------------*/
-int TTWAIN_SetCap(TW_UINT16 cap_id, TW_UINT16 conType, TW_UINT16 itemType,
-				  TW_UINT32 *value)
+int TTWAIN_SetCap(TW_UINT16 cap_id, TW_UINT16 conType, TW_UINT16 itemType, TW_UINT32 *value)
 {
 	int rc = FALSE;
 	TUINT32 size;

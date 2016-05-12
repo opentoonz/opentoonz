@@ -17,7 +17,7 @@ namespace
 
 enum Status {
 	StatusGood = 0,
-	OutOfTime = 1 << 1, //Non utilizzato
+	OutOfTime = 1 << 1, // Non utilizzato
 	Port0NotConnected = 1 << 2,
 	Port1NotConnected = 1 << 3,
 	NoPortsConnected = Port0NotConnected | Port1NotConnected
@@ -106,13 +106,14 @@ void drawCheckboard(TRaster32P &raster)
 {
 	int lx = raster->getLx();
 	int ly = raster->getLy();
-	//int chessSize = 4;
+	// int chessSize = 4;
 	int x, y;
 	raster->lock();
 	for (y = 0; y < ly; ++y) {
 		TPixel32 *pix = raster->pixels(y);
 		for (x = 0; x < lx; ++x, ++pix) {
-			pix->r = pix->g = pix->b = troundp(255.0 * func(x, y, lx, ly) / func(lx - 1, ly - 1, lx, ly));
+			pix->r = pix->g = pix->b =
+				troundp(255.0 * func(x, y, lx, ly) / func(lx - 1, ly - 1, lx, ly));
 			pix->m = 255;
 		}
 	}
@@ -125,13 +126,12 @@ void drawCheckboard(TRaster32P &raster)
 class LocalTransparencyFx : public TStandardRasterFx
 {
 	FX_PLUGIN_DECLARATION(LocalTransparencyFx)
-protected:
+  protected:
 	TRasterFxPort m_src, m_ref;
 	TDoubleParamP m_value;
 
-public:
-	LocalTransparencyFx()
-		: m_value(100)
+  public:
+	LocalTransparencyFx() : m_value(100)
 	{
 		addInputPort("Source", m_src);
 		addInputPort("Reference", m_ref);
@@ -155,21 +155,24 @@ public:
 		if (!checkBeforeCompute(tile, frame, ri))
 			return;
 		TTile srcTile;
-		m_src->allocateAndCompute(srcTile, tile.m_pos, tile.getRaster()->getSize(), tile.getRaster(), frame, ri);
-		//TTile refTile = tile;
+		m_src->allocateAndCompute(srcTile, tile.m_pos, tile.getRaster()->getSize(),
+								  tile.getRaster(), frame, ri);
+		// TTile refTile = tile;
 		m_ref->compute(tile, frame, ri);
 
-		//TRaster32P ref32 (refTile.getRaster());
+		// TRaster32P ref32 (refTile.getRaster());
 		TRaster32P out32(tile.getRaster());
 		TRaster32P src32(srcTile.getRaster());
 		if (out32 && src32)
-			doLocalTransparency<TPixelRGBM32, TPixelGR8, UCHAR>(out32, src32, out32, m_value->getValue(frame) / 100.);
+			doLocalTransparency<TPixelRGBM32, TPixelGR8, UCHAR>(out32, src32, out32,
+																m_value->getValue(frame) / 100.);
 		else {
-			//TRaster64P ref64(refTile.getRaster());
+			// TRaster64P ref64(refTile.getRaster());
 			TRaster64P out64(tile.getRaster());
 			TRaster64P src64(srcTile.getRaster());
 			if (out64 && src64)
-				doLocalTransparency<TPixelRGBM64, TPixelGR16, USHORT>(out64, src64, out64, m_value->getValue(frame) / 100.);
+				doLocalTransparency<TPixelRGBM64, TPixelGR16, USHORT>(
+					out64, src64, out64, m_value->getValue(frame) / 100.);
 			else
 				throw TException("LocalTransparencyFx: unsupported raster type");
 		}

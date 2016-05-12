@@ -57,8 +57,9 @@ using namespace DVGui;
 namespace
 {
 
-//Se il widget del cast viewer viene spostato in toonzqt (e quindi fatto dipendere dallo sceneHandle)
-//questo undo puo' essere spostato in un nuovo file levelsetcommand in toonzlib.
+// Se il widget del cast viewer viene spostato in toonzqt (e quindi fatto dipendere dallo
+// sceneHandle)
+// questo undo puo' essere spostato in un nuovo file levelsetcommand in toonzlib.
 class MoveLevelToFolderUndo : public TUndo
 {
 	TLevelSet *m_levelSet;
@@ -66,7 +67,7 @@ class MoveLevelToFolderUndo : public TUndo
 	TFilePath m_oldFolder;
 	TFilePath m_newFolder;
 
-public:
+  public:
 	MoveLevelToFolderUndo(TLevelSet *levelSet, std::wstring levelName, TFilePath newFolder)
 		: m_levelSet(levelSet), m_levelName(levelName), m_newFolder(newFolder)
 	{
@@ -88,15 +89,9 @@ public:
 		TApp::instance()->getCurrentScene()->notifyCastChange();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+	int getSize() const { return sizeof(*this); }
 
-	QString getHistoryString()
-	{
-		return QObject::tr("Move Level to Cast Folder");
-	}
+	QString getHistoryString() { return QObject::tr("Move Level to Cast Folder"); }
 };
 }
 
@@ -106,12 +101,12 @@ public:
 //
 //-----------------------------------------------------------------------------
 
-CastTreeViewer::CastTreeViewer(QWidget *parent)
-	: QTreeWidget(parent), m_dropTargetItem(0)
+CastTreeViewer::CastTreeViewer(QWidget *parent) : QTreeWidget(parent), m_dropTargetItem(0)
 {
 	setObjectName("OnePixelMarginFrame");
-	//setObjectName("BrowserTreeView");
-	//setStyleSheet("#BrowserTreeView {border: 0px; margin: 1px; qproperty-autoFillBackground: true;}");
+	// setObjectName("BrowserTreeView");
+	// setStyleSheet("#BrowserTreeView {border: 0px; margin: 1px; qproperty-autoFillBackground:
+	// true;}");
 
 	header()->close();
 	setIconSize(QSize(21, 17));
@@ -119,43 +114,32 @@ CastTreeViewer::CastTreeViewer(QWidget *parent)
 	// m_treeViewer->setColumnCount(1);
 
 	setAcceptDrops(true);
-	connect(
-		this, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-		this, SLOT(onItemChanged(QTreeWidgetItem *, int)));
-	connect(
-		this, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-		this, SLOT(onFolderChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
-	connect(
-		TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()),
-		this, SLOT(rebuildCastTree()));
-	connect(
-		TApp::instance()->getCurrentScene(), SIGNAL(castFolderAdded(const TFilePath &)),
-		this, SLOT(onCastFolderAdded(const TFilePath &)));
+	connect(this, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this,
+			SLOT(onItemChanged(QTreeWidgetItem *, int)));
+	connect(this, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this,
+			SLOT(onFolderChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
+	connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()), this,
+			SLOT(rebuildCastTree()));
+	connect(TApp::instance()->getCurrentScene(), SIGNAL(castFolderAdded(const TFilePath &)), this,
+			SLOT(onCastFolderAdded(const TFilePath &)));
 
-	connect(
-		TApp::instance()->getCurrentScene(), SIGNAL(nameSceneChanged()),
-		this, SLOT(onSceneNameChanged()));
+	connect(TApp::instance()->getCurrentScene(), SIGNAL(nameSceneChanged()), this,
+			SLOT(onSceneNameChanged()));
 
-	//Connect all possible changes that can alter the
-	//bottom horizontal scrollbar to resize contents...
-	connect(
-		this, SIGNAL(expanded(const QModelIndex &)),
-		this, SLOT(resizeToConts()));
+	// Connect all possible changes that can alter the
+	// bottom horizontal scrollbar to resize contents...
+	connect(this, SIGNAL(expanded(const QModelIndex &)), this, SLOT(resizeToConts()));
 
-	connect(
-		this, SIGNAL(collapsed(const QModelIndex &)),
-		this, SLOT(resizeToConts()));
+	connect(this, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(resizeToConts()));
 
-	connect(
-		this->model(), SIGNAL(layoutChanged()),
-		this, SLOT(resizeToConts()));
+	connect(this->model(), SIGNAL(layoutChanged()), this, SLOT(resizeToConts()));
 
 	rebuildCastTree();
 }
 
 //-----------------------------------------------------------------------------
 
-//!Resizes viewport to contents
+//! Resizes viewport to contents
 void CastTreeViewer::resizeToConts(void)
 {
 	resizeColumnToContents(0);
@@ -203,7 +187,8 @@ void CastTreeViewer::populateFolder(QTreeWidgetItem *folder)
 		TFilePath fp = folders[i];
 		QString fpQstr = QString::fromStdWString(fp.getWideString());
 		QString name = QString::fromStdWString(fp.withoutParentDir().getWideString());
-		QTreeWidgetItem *child = new QTreeWidgetItem((QTreeWidgetItem *)0, QStringList(name) << fpQstr);
+		QTreeWidgetItem *child =
+			new QTreeWidgetItem((QTreeWidgetItem *)0, QStringList(name) << fpQstr);
 		if (name != AudioFolderName)
 			child->setFlags(child->flags() | Qt::ItemIsEditable);
 		folder->addChild(child);
@@ -232,7 +217,8 @@ void CastTreeViewer::onSceneNameChanged()
 void CastTreeViewer::onCastFolderAdded(const TFilePath &path)
 {
 	QTreeWidgetItem *root = topLevelItem(0)->child(0);
-	assert(root->data(1, Qt::DisplayRole).toString() == toQString(getLevelSet()->getDefaultFolder()));
+	assert(root->data(1, Qt::DisplayRole).toString() ==
+		   toQString(getLevelSet()->getDefaultFolder()));
 	QString childName = QString::fromStdWString(path.getWideName());
 	QString childPathQstr = QString::fromStdWString(path.getWideString());
 	QTreeWidgetItem *childItem = new QTreeWidgetItem(root, QStringList(childName) << childPathQstr);
@@ -297,7 +283,8 @@ void CastTreeViewer::dragEnterEvent(QDragEnterEvent *e)
 	if (!e->mimeData()->hasFormat("application/vnd.toonz.levels") && m_dropFilePath == TFilePath())
 		return;
 	m_dropTargetItem = itemAt(e->pos());
-	if (m_dropTargetItem && m_dropTargetItem->data(0, Qt::DisplayRole).toString() == AudioFolderName)
+	if (m_dropTargetItem &&
+		m_dropTargetItem->data(0, Qt::DisplayRole).toString() == AudioFolderName)
 		m_dropTargetItem = 0;
 
 	e->acceptProposedAction();
@@ -308,7 +295,8 @@ void CastTreeViewer::dragEnterEvent(QDragEnterEvent *e)
 
 void CastTreeViewer::dragMoveEvent(QDragMoveEvent *event)
 {
-	if (!event->mimeData()->hasFormat("application/vnd.toonz.levels") || m_dropFilePath != TFilePath())
+	if (!event->mimeData()->hasFormat("application/vnd.toonz.levels") ||
+		m_dropFilePath != TFilePath())
 		return;
 
 	m_dropTargetItem = itemAt(event->pos());
@@ -318,8 +306,10 @@ void CastTreeViewer::dragMoveEvent(QDragMoveEvent *event)
 		std::wstring name = (scene->isUntitled()) ? L"Untitled" : scene->getSceneName();
 		rootName = rootName.fromStdWString(name);
 	}
-	if (m_dropTargetItem && m_dropTargetItem->data(0, Qt::DisplayRole).toString() == AudioFolderName ||
-		m_dropFilePath != TFilePath() && m_dropTargetItem->data(0, Qt::DisplayRole).toString() == rootName)
+	if (m_dropTargetItem &&
+			m_dropTargetItem->data(0, Qt::DisplayRole).toString() == AudioFolderName ||
+		m_dropFilePath != TFilePath() &&
+			m_dropTargetItem->data(0, Qt::DisplayRole).toString() == rootName)
 		m_dropTargetItem = 0;
 
 	if (!m_dropTargetItem)
@@ -370,7 +360,8 @@ void CastTreeViewer::dropEvent(QDropEvent *event)
 		if (LevelCastItem *li = dynamic_cast<LevelCastItem *>(item)) {
 			TXshLevel *level = li->getLevel();
 			std::wstring levelName = level->getName();
-			MoveLevelToFolderUndo *undo = new MoveLevelToFolderUndo(levelSet, levelName, folderPath);
+			MoveLevelToFolderUndo *undo =
+				new MoveLevelToFolderUndo(levelSet, levelName, folderPath);
 			levelSet->moveLevelToFolder(folderPath, level);
 			TUndoManager::manager()->add(undo);
 		} else if (SoundCastItem *si = dynamic_cast<SoundCastItem *>(item)) {
@@ -434,11 +425,13 @@ void CastTreeViewer::newFolder()
 	if (parentName == AudioFolderName)
 		return;
 
-	TFilePath parentPath = TFilePath(parentItem->data(1, Qt::DisplayRole).toString().toStdWString());
+	TFilePath parentPath =
+		TFilePath(parentItem->data(1, Qt::DisplayRole).toString().toStdWString());
 	QString childName("New Folder");
 	TFilePath childPath = parentPath + childName.toStdWString();
 	QString childPathQstr = QString::fromStdWString(childPath.getWideString());
-	QTreeWidgetItem *childItem = new QTreeWidgetItem(parentItem, QStringList(childName) << childPathQstr);
+	QTreeWidgetItem *childItem =
+		new QTreeWidgetItem(parentItem, QStringList(childName) << childPathQstr);
 	childItem->setFlags(childItem->flags() | Qt::ItemIsEditable);
 	parentItem->addChild(childItem);
 	setCurrentItem(childItem);
@@ -483,11 +476,8 @@ CastBrowser::CastBrowser(QWidget *parent, Qt::WindowFlags flags)
 #else
 CastBrowser::CastBrowser(QWidget *parent, Qt::WFlags flags)
 #endif
-	: QSplitter(parent)
-	, m_treeViewer(0)
-	, m_folderName(0)
-	, m_itemViewer(0)
-	, m_castItems(new CastItems())
+	: QSplitter(parent), m_treeViewer(0), m_folderName(0), m_itemViewer(0),
+	  m_castItems(new CastItems())
 {
 	// style sheet
 	setObjectName("CastBrowser");
@@ -517,7 +507,7 @@ CastBrowser::CastBrowser(QWidget *parent, Qt::WFlags flags)
 	m_itemViewer->setModel(this);
 
 	DvItemViewerTitleBar *titleBar = new DvItemViewerTitleBar(m_itemViewer, box);
-	//titleBar->hide();
+	// titleBar->hide();
 	DvItemViewerButtonBar *buttonBar = new DvItemViewerButtonBar(m_itemViewer, box);
 
 	boxLayout->addWidget(m_folderName);
@@ -535,12 +525,8 @@ CastBrowser::CastBrowser(QWidget *parent, Qt::WFlags flags)
 
 	TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
 
-	connect(
-		sceneHandle, SIGNAL(sceneSwitched()),
-		this, SLOT(refresh()));
-	connect(
-		sceneHandle, SIGNAL(castChanged()),
-		this, SLOT(refresh()));
+	connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(refresh()));
+	connect(sceneHandle, SIGNAL(castChanged()), this, SLOT(refresh()));
 
 	TXsheetHandle *xhseetHandle = TApp::instance()->getCurrentXsheet();
 	connect(xhseetHandle, SIGNAL(xsheetChanged()), m_itemViewer, SLOT(update()));
@@ -548,11 +534,10 @@ CastBrowser::CastBrowser(QWidget *parent, Qt::WFlags flags)
 	connect(buttonBar, SIGNAL(folderUp()), m_treeViewer, SLOT(folderUp()));
 	connect(buttonBar, SIGNAL(newFolder()), m_treeViewer, SLOT(newFolder()));
 
-	connect(m_treeViewer, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-			this, SLOT(folderChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
+	connect(m_treeViewer, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this,
+			SLOT(folderChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
 
-	connect(m_treeViewer, SIGNAL(itemMovedToFolder()),
-			this, SLOT(refresh()));
+	connect(m_treeViewer, SIGNAL(itemMovedToFolder()), this, SLOT(refresh()));
 }
 
 //-----------------------------------------------------------------------------
@@ -566,7 +551,7 @@ CastBrowser::~CastBrowser()
 void CastBrowser::sortByDataModel(DataType dataType, bool isDiscendent)
 {
 	if (dataType != getCurrentOrderType()) {
-		//Sort by another dataType
+		// Sort by another dataType
 		int i;
 		for (i = 1; i < m_castItems->getItemCount(); i++) {
 			int index = i;
@@ -578,7 +563,7 @@ void CastBrowser::sortByDataModel(DataType dataType, bool isDiscendent)
 		setIsDiscendentOrder(true);
 		setOrderType(dataType);
 	}
-	//Sort by order (invert current)
+	// Sort by order (invert current)
 	if (isDiscendentOrder() != isDiscendent) {
 		setIsDiscendentOrder(isDiscendent);
 		std::vector<CastItem *> items;
@@ -619,9 +604,9 @@ void CastBrowser::getLevels(std::vector<TXshLevel*> &levels) const
   TLevelSet *levelSet = CastTreeViewer::getLevelSet();
   TFilePath folder = m_treeViewer->getCurrentFolder();
   if(folder != TFilePath())
-    levelSet->listLevels(levels, folder);
+	levelSet->listLevels(levels, folder);
   else
-    levelSet->listLevels(levels);
+	levelSet->listLevels(levels);
 }
 */
 
@@ -642,7 +627,8 @@ void CastBrowser::refreshData()
 	int i;
 	for (i = 0; i < (int)levels.size(); i++) {
 		if (levels[i]->getSimpleLevel())
-			m_castItems->addItem(new LevelCastItem(levels[i], m_itemViewer->getPanel()->getIconSize()));
+			m_castItems->addItem(
+				new LevelCastItem(levels[i], m_itemViewer->getPanel()->getIconSize()));
 		else if (levels[i]->getPaletteLevel())
 			m_castItems->addItem(new PaletteCastItem(levels[i]->getPaletteLevel(),
 													 m_itemViewer->getPanel()->getIconSize()));
@@ -805,7 +791,8 @@ QMenu *CastBrowser::getContextMenu(QWidget *parent, int index)
 	if (audioSelected && !paletteSelected && !vectorLevelSelected && !otherFileSelected)
 		return menu;
 
-	// MI_EditLevel solo se e' stato selezionato un singolo diverso da livelli palette a livelli audio
+	// MI_EditLevel solo se e' stato selezionato un singolo diverso da livelli palette a livelli
+	// audio
 	if (indices.size() == 1 && !audioSelected && !paletteSelected)
 		menu->addAction(cm->getAction(MI_EditLevel));
 	if (!paletteSelected)
@@ -886,12 +873,15 @@ void CastBrowser::showFolderContents()
 		filePath = scene->decodeFilePath(filePath);
 
 		if (!TSystem::doesExistFileOrLevel(filePath)) {
-			error(tr("It is not possible to show the folder containing the selected file, as the file has not been saved yet."));
+			error(tr("It is not possible to show the folder containing the selected file, as the "
+					 "file has not been saved yet."));
 		} else {
 			if (TSystem::isUNC(folderPath))
-				QDesktopServices::openUrl(QUrl(QString::fromStdWString(folderPath.getWideString())));
+				QDesktopServices::openUrl(
+					QUrl(QString::fromStdWString(folderPath.getWideString())));
 			else
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(folderPath.getWideString())));
+				QDesktopServices::openUrl(
+					QUrl::fromLocalFile(QString::fromStdWString(folderPath.getWideString())));
 		}
 	}
 }
@@ -914,13 +904,15 @@ void CastBrowser::viewFile()
 
 		filePath = scene->decodeFilePath(filePath);
 		if (!TSystem::doesExistFileOrLevel(filePath)) {
-			error(tr("It is not possible to view the selected file, as the file has not been saved yet."));
+			error(tr("It is not possible to view the selected file, as the file has not been saved "
+					 "yet."));
 		} else {
 			if (!TFileType::isViewable(TFileType::getInfo(filePath)))
 				return;
 
 			if (Preferences::instance()->isDefaultViewerEnabled() &&
-				(filePath.getType() == "mov" || filePath.getType() == "avi" || filePath.getType() == "3gp"))
+				(filePath.getType() == "mov" || filePath.getType() == "avi" ||
+				 filePath.getType() == "3gp"))
 				QDesktopServices::openUrl(QUrl("file:///" + toQString(filePath)));
 			else
 				::viewFile(filePath);
@@ -949,7 +941,8 @@ void CastBrowser::viewFileInfo()
 
 			filePath = scene->decodeFilePath(filePath);
 			if (!TSystem::doesExistFileOrLevel(filePath)) {
-				error(tr("It is not possible to show the info of the selected file, as the file has not been saved yet."));
+				error(tr("It is not possible to show the info of the selected file, as the file "
+						 "has not been saved yet."));
 			} else {
 				InfoViewer *infoViewer = 0;
 				infoViewer = new InfoViewer(this);

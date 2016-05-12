@@ -51,7 +51,7 @@ void TSelectionHandle::setSelection(TSelection *selection)
 
 void TSelectionHandle::pushSelection()
 {
-	//NOTE
+	// NOTE
 	//  We push 0, and NOT a copy of the last item. I think this is done on purpose,
 	//  as having it copied and then selecting a different one invokes selectNone()
 	//  on the former.

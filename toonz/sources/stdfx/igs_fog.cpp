@@ -10,25 +10,24 @@
 
 namespace
 { //---------------------------------------------------------
-void sl_track_render_dark_(
-	double *in_out /* RorGorBorA元かつ結果値(0...1) */
-	,
-	const double *alpha /* Alpha元値(0...1) */
-	,
-	const int width /* 画像幅 */
+void sl_track_render_dark_(double *in_out /* RorGorBorA元かつ結果値(0...1) */
+						   ,
+						   const double *alpha /* Alpha元値(0...1) */
+						   ,
+						   const int width /* 画像幅 */
 
-	,
-	double **lens /* lensの外周の左開始位置ポインタ配列 */
-	,
-	double **track /* 参照画外周の左開始位置ポインタ配列 */
-	,
-	const int *sizes /* lens及び参照scanline毎の長さ配列 */
-	,
-	const int size /* lens及び参照scanline数 */
+						   ,
+						   double **lens /* lensの外周の左開始位置ポインタ配列 */
+						   ,
+						   double **track /* 参照画外周の左開始位置ポインタ配列 */
+						   ,
+						   const int *sizes /* lens及び参照scanline毎の長さ配列 */
+						   ,
+						   const int size /* lens及び参照scanline数 */
 
-	,
-	const double power = 1.0 /* 0無  0...1散暗  1強暗  1...2最強暗 */
-	)
+						   ,
+						   const double power = 1.0 /* 0無  0...1散暗  1強暗  1...2最強暗 */
+						   )
 {
 	for (int xx = 0; xx < width; ++xx) { /* 画像のScanlineループ */
 		/* Alphaがないか、Alpha値ゼロより大きいと処理しRGB変化 */
@@ -116,29 +115,28 @@ void sl_track_render_light_( // = fog = default
 		}
 	}
 }
-void sl_track_render_threshold_(
-	double *in_out /* RorGorBorA元かつ結果値(0...1) */
-	,
-	const double *alpha /* Alpha元値(0...1) */
-	,
-	const int width /* 画像幅 */
+void sl_track_render_threshold_(double *in_out /* RorGorBorA元かつ結果値(0...1) */
+								,
+								const double *alpha /* Alpha元値(0...1) */
+								,
+								const int width /* 画像幅 */
 
-	,
-	double **lens /* lensの外周の左開始位置ポインタ配列 */
-	,
-	double **track /* 参照画外周の左開始位置ポインタ配列 */
-	,
-	double **thres /* 影響画外周の左開始位置ポインタ配列 */
-	,
-	const int *sizes /* lens及び参照scanline毎の長さ配列 */
-	,
-	const int size /* lens及び参照scanline数 */
+								,
+								double **lens /* lensの外周の左開始位置ポインタ配列 */
+								,
+								double **track /* 参照画外周の左開始位置ポインタ配列 */
+								,
+								double **thres /* 影響画外周の左開始位置ポインタ配列 */
+								,
+								const int *sizes /* lens及び参照scanline毎の長さ配列 */
+								,
+								const int size /* lens及び参照scanline数 */
 
-	,
-	const double power = 1.0 /* 0無  0...1散光  1強光  1...2最強光 */
-	,
-	const double threshold_min = 0.0 /* 0Cut無 0...1部分 1.01全Cut */
-	)
+								,
+								const double power = 1.0 /* 0無  0...1散光  1強光  1...2最強光 */
+								,
+								const double threshold_min = 0.0 /* 0Cut無 0...1部分 1.01全Cut */
+								)
 {
 	for (int xx = 0; xx < width; ++xx) { /* 画像のScanlineループ */
 		/* Alphaがないか、Alpha値ゼロより大きいと処理しRGB変化 */
@@ -146,8 +144,7 @@ void sl_track_render_threshold_(
 			double total = 0.0;
 			for (int y2 = 0; y2 < size; ++y2) {
 				for (int x2 = 0; x2 < sizes[y2]; ++x2) {
-					if ((in_out[xx] < track[y2][x2]) &&
-						(threshold_min <= thres[y2][x2])) {
+					if ((in_out[xx] < track[y2][x2]) && (threshold_min <= thres[y2][x2])) {
 						/* より明るいpixelにのみ明るさの影響を受ける */
 						total += lens[y2][x2] * track[y2][x2];
 					} else {
@@ -175,31 +172,30 @@ void sl_track_render_threshold_(
 		}
 	}
 }
-void sl_track_render_thrminmax_(
-	double *in_out /* RorGorBorA元かつ結果値(0...1) */
-	,
-	const double *alpha /* Alpha元値(0...1) */
-	,
-	const int width /* 画像幅 */
+void sl_track_render_thrminmax_(double *in_out /* RorGorBorA元かつ結果値(0...1) */
+								,
+								const double *alpha /* Alpha元値(0...1) */
+								,
+								const int width /* 画像幅 */
 
-	,
-	double **lens /* lensの外周の左開始位置ポインタ配列 */
-	,
-	double **track /* 参照画外周の左開始位置ポインタ配列 */
-	,
-	double **thres /* 影響画外周の左開始位置ポインタ配列 */
-	,
-	const int *sizes /* lens及び参照scanline毎の長さ配列 */
-	,
-	const int size /* lens及び参照scanline数 */
+								,
+								double **lens /* lensの外周の左開始位置ポインタ配列 */
+								,
+								double **track /* 参照画外周の左開始位置ポインタ配列 */
+								,
+								double **thres /* 影響画外周の左開始位置ポインタ配列 */
+								,
+								const int *sizes /* lens及び参照scanline毎の長さ配列 */
+								,
+								const int size /* lens及び参照scanline数 */
 
-	,
-	const double power = 1.0 /* 0無  0...1散光  1強光  1...2最強光 */
-	,
-	const double threshold_min = 0.0 /* 0Cut無 0...1部分 1.01全Cut */
-	,
-	const double threshold_max = 0.0 /* 0Cut無 0...1部分 1.01全Cut */
-	)
+								,
+								const double power = 1.0 /* 0無  0...1散光  1強光  1...2最強光 */
+								,
+								const double threshold_min = 0.0 /* 0Cut無 0...1部分 1.01全Cut */
+								,
+								const double threshold_max = 0.0 /* 0Cut無 0...1部分 1.01全Cut */
+								)
 {
 	const double thr_range = threshold_max - threshold_min;
 	for (int xx = 0; xx < width; ++xx) { /* 画像のScanlineループ */
@@ -208,15 +204,15 @@ void sl_track_render_thrminmax_(
 			double total = 0.0;
 			for (int y2 = 0; y2 < size; ++y2) {
 				for (int x2 = 0; x2 < sizes[y2]; ++x2) {
-					if ((in_out[xx] < track[y2][x2]) &&
-						(threshold_min <= thres[y2][x2])) {
+					if ((in_out[xx] < track[y2][x2]) && (threshold_min <= thres[y2][x2])) {
 						/* より明るくかつminより大きい値のpixelにのみ
 			明るさの影響を受ける */
 						if (thres[y2][x2] < threshold_max) {
 							/* maxよりは小さい値のpixelは比で影響する */
-							total += lens[y2][x2] * (in_out[xx] +
-													 (track[y2][x2] - in_out[xx]) *
-														 (thres[y2][x2] - threshold_min) / thr_range);
+							total +=
+								lens[y2][x2] * (in_out[xx] +
+												(track[y2][x2] - in_out[xx]) *
+													(thres[y2][x2] - threshold_min) / thr_range);
 						} else {
 							/* maxより大きい値のpixelは明るさ影響を受ける */
 							total += lens[y2][x2] * track[y2][x2];
@@ -250,8 +246,11 @@ void sl_track_render_thrminmax_(
 }
 namespace
 { //---------------------------------------------------------
-void sl_track_resize_(
-	const int odd_diameter, const int width, std::vector<std::vector<double>> &pixe_tracks, const bool thr_sw, std::vector<std::vector<double>> &thre_tracks, std::vector<double *> &pixe_starts, std::vector<double *> &thre_starts, std::vector<double> &result, std::vector<double> &alpha_ref)
+void sl_track_resize_(const int odd_diameter, const int width,
+					  std::vector<std::vector<double>> &pixe_tracks, const bool thr_sw,
+					  std::vector<std::vector<double>> &thre_tracks,
+					  std::vector<double *> &pixe_starts, std::vector<double *> &thre_starts,
+					  std::vector<double> &result, std::vector<double> &alpha_ref)
 {
 	pixe_tracks.resize(odd_diameter);
 	for (int yy = 0; yy < odd_diameter; ++yy) {
@@ -269,11 +268,13 @@ void sl_track_resize_(
 	alpha_ref.clear(); /* 今はクリア!!!あとで使うとき確保!!! */
 }
 void sl_track_render_(
-	//std::vector< std::vector<double> >&lens_matrix
+	// std::vector< std::vector<double> >&lens_matrix
 	std::vector<int> &lens_offsets, std::vector<double *> &lens_starts, std::vector<int> &lens_sizes
 
 	,
-	std::vector<std::vector<double>> &pixe_tracks, std::vector<std::vector<double>> &thre_tracks, const std::vector<double> &alpha_ref, std::vector<double> &result, std::vector<double *> &pixe_starts, std::vector<double *> &thre_starts
+	std::vector<std::vector<double>> &pixe_tracks, std::vector<std::vector<double>> &thre_tracks,
+	const std::vector<double> &alpha_ref, std::vector<double> &result,
+	std::vector<double *> &pixe_starts, std::vector<double *> &thre_starts
 
 	,
 	const double power, const double threshold_min, const double threshold_max)
@@ -283,8 +284,7 @@ void sl_track_render_(
 		if (lens_offsets.at(yy) < 0) {
 			pixe_starts.at(yy) = 0;
 		} else {
-			pixe_starts.at(yy) =
-				&pixe_tracks.at(yy).at(lens_offsets.at(yy));
+			pixe_starts.at(yy) = &pixe_tracks.at(yy).at(lens_offsets.at(yy));
 		}
 	}
 	if (0 < thre_tracks.size()) {
@@ -292,69 +292,76 @@ void sl_track_render_(
 			if (lens_offsets.at(yy) < 0) {
 				thre_starts.at(yy) = 0;
 			} else {
-				thre_starts.at(yy) =
-					&thre_tracks.at(yy).at(lens_offsets.at(yy));
+				thre_starts.at(yy) = &thre_tracks.at(yy).at(lens_offsets.at(yy));
 			}
 		}
 	}
 	/*--- 自分より暗いpixelから収光 ---*/
 	if (power < 0.0) {
-		sl_track_render_dark_(
-			&result.at(0), ((0 < alpha_ref.size()) ? &alpha_ref.at(0) : 0), static_cast<int>(result.size())
+		sl_track_render_dark_(&result.at(0), ((0 < alpha_ref.size()) ? &alpha_ref.at(0) : 0),
+							  static_cast<int>(result.size())
 
-																				,
-			&lens_starts.at(0), &pixe_starts.at(0), &lens_sizes.at(0), static_cast<int>(lens_sizes.size())
+								  ,
+							  &lens_starts.at(0), &pixe_starts.at(0), &lens_sizes.at(0),
+							  static_cast<int>(lens_sizes.size())
 
-																		   ,
-			-power);
+								  ,
+							  -power);
 		return;
 	}
 	/*--- 自分より明るいpixelから収光し光量によってfogが変化 ---*/
 	if ((0.0 < threshold_min) || (0.0 < threshold_max)) {
 		if (threshold_min < threshold_max) {
-			sl_track_render_thrminmax_(
-				&result.at(0), ((0 < alpha_ref.size()) ? &alpha_ref.at(0) : 0), static_cast<int>(result.size())
+			sl_track_render_thrminmax_(&result.at(0),
+									   ((0 < alpha_ref.size()) ? &alpha_ref.at(0) : 0),
+									   static_cast<int>(result.size())
 
-																					,
-				&lens_starts.at(0), &pixe_starts.at(0), &thre_starts.at(0), &lens_sizes.at(0), static_cast<int>(lens_sizes.size())
+										   ,
+									   &lens_starts.at(0), &pixe_starts.at(0), &thre_starts.at(0),
+									   &lens_sizes.at(0), static_cast<int>(lens_sizes.size())
 
-																								   ,
-				power, threshold_min, threshold_max);
+															  ,
+									   power, threshold_min, threshold_max);
 			return;
 		} else {
 			/*--- 自分より明るいpixelから収光し、
 		ある光量以上からいきなりfogがかかる ---*/
-			sl_track_render_threshold_(
-				&result.at(0), ((0 < alpha_ref.size()) ? &alpha_ref.at(0) : 0), static_cast<int>(result.size())
+			sl_track_render_threshold_(&result.at(0),
+									   ((0 < alpha_ref.size()) ? &alpha_ref.at(0) : 0),
+									   static_cast<int>(result.size())
 
-																					,
-				&lens_starts.at(0), &pixe_starts.at(0), &thre_starts.at(0), &lens_sizes.at(0), static_cast<int>(lens_sizes.size())
+										   ,
+									   &lens_starts.at(0), &pixe_starts.at(0), &thre_starts.at(0),
+									   &lens_sizes.at(0), static_cast<int>(lens_sizes.size())
 
-																								   ,
-				power, threshold_min);
+															  ,
+									   power, threshold_min);
 			return;
 		}
 	}
 	/*--- 自分より明るいpixelから収光 ---*/
-	sl_track_render_light_(
-		&result.at(0), ((0 < alpha_ref.size()) ? &alpha_ref.at(0) : 0), static_cast<int>(result.size())
+	sl_track_render_light_(&result.at(0), ((0 < alpha_ref.size()) ? &alpha_ref.at(0) : 0),
+						   static_cast<int>(result.size())
 
-																			,
-		&lens_starts.at(0), &pixe_starts.at(0), &lens_sizes.at(0), static_cast<int>(lens_sizes.size())
+							   ,
+						   &lens_starts.at(0), &pixe_starts.at(0), &lens_sizes.at(0),
+						   static_cast<int>(lens_sizes.size())
 
-																	   ,
-		power);
+							   ,
+						   power);
 }
-void sl_track_shift_(
-	std::vector<std::vector<double>> &pixe_tracks, std::vector<std::vector<double>> &thre_tracks)
+void sl_track_shift_(std::vector<std::vector<double>> &pixe_tracks,
+					 std::vector<std::vector<double>> &thre_tracks)
 {
 	std::rotate(pixe_tracks.begin(), pixe_tracks.end() - 1, pixe_tracks.end());
 	if (0 < thre_tracks.size()) {
 		std::rotate(thre_tracks.begin(), thre_tracks.end() - 1, thre_tracks.end());
 	}
 }
-void sl_track_clear_(
-	std::vector<std::vector<double>> &pixe_tracks, std::vector<std::vector<double>> &thre_tracks, std::vector<double *> &pixe_starts, std::vector<double *> &thre_starts, std::vector<double> &result, std::vector<double> &alpha_ref)
+void sl_track_clear_(std::vector<std::vector<double>> &pixe_tracks,
+					 std::vector<std::vector<double>> &thre_tracks,
+					 std::vector<double *> &pixe_starts, std::vector<double *> &thre_starts,
+					 std::vector<double> &result, std::vector<double> &alpha_ref)
 {
 	if (!alpha_ref.empty()) {
 		alpha_ref.clear();
@@ -379,15 +386,10 @@ void sl_track_clear_(
 namespace
 { //--------------------------------------------------------
 template <class T>
-void rgb_to_lightness_image_(
-	const T *image,
-	const int height,
-	const int width,
-	const int channels,
-	double *lightness)
+void rgb_to_lightness_image_(const T *image, const int height, const int width, const int channels,
+							 double *lightness)
 {
-	const double val_max = static_cast<double>(
-		std::numeric_limits<T>::max());
+	const double val_max = static_cast<double>(std::numeric_limits<T>::max());
 	for (int yy = 0; yy < height; ++yy) {
 		for (int xx = 0; xx < width; ++xx, image += channels, ++lightness) {
 			if (1 == channels) {
@@ -397,9 +399,8 @@ void rgb_to_lightness_image_(
 				const double gre = static_cast<double>(image[1]) / val_max;
 				const double blu = static_cast<double>(image[2]) / val_max;
 				/* rgb --> hls のl(明度(lightness))のみの計算 */
-				*lightness = (std::max(std::max(red, gre), blu) +
-							  std::min(std::min(red, gre), blu)) /
-							 2.0;
+				*lightness =
+					(std::max(std::max(red, gre), blu) + std::min(std::min(red, gre), blu)) / 2.0;
 			}
 		}
 	}
@@ -407,13 +408,12 @@ void rgb_to_lightness_image_(
 }
 namespace
 { //--------------------------------------------------------
-/*
-	画像配列の高さ位置を、実際の範囲内にclampし、scanlineの先頭を返す
-	TP is 'unsigned char *' or 'unsigned short *'
-  */
+  /*
+	  画像配列の高さ位置を、実際の範囲内にclampし、scanlineの先頭を返す
+	  TP is 'unsigned char *' or 'unsigned short *'
+	*/
 template <class TP>
-TP sl_top_clamped_in_h_(
-	TP sl, const int height, const int width, const int channels, const int yy)
+TP sl_top_clamped_in_h_(TP sl, const int height, const int width, const int channels, const int yy)
 {
 	if (height <= yy) {
 		return sl + (channels * width * (height - 1));
@@ -425,9 +425,7 @@ TP sl_top_clamped_in_h_(
 /*
 	trackの左右の余白を画像の端の色で塗りつぶす
   */
-template <class T>
-void paint_margin_(
-	const int width, const int margin, std::vector<T> &track)
+template <class T> void paint_margin_(const int width, const int margin, std::vector<T> &track)
 {
 	if (width <= (margin * 2)) {
 		return;
@@ -442,32 +440,32 @@ void paint_margin_(
 }
 namespace
 { //--------------------------------------------------------
-/*
-	T is 'unsigned char' or 'unsigned short'
-	alphaは先に処理して結果(out_image_array)に入れ、
-		その後rgbのために参照する
-  */
+  /*
+	  T is 'unsigned char' or 'unsigned short'
+	  alphaは先に処理して結果(out_image_array)に入れ、
+		  その後rgbのために参照する
+	*/
 template <class T>
-void get_first_sl_ch_(
-	const T *in_image_array, const T *out_image_array /* 処理結果alpha値の参照のため必要 */
-	,
-	const double *ref_thres_array /* threshold値の参照のため必要 */
-	,
-	const int hh, const int ww, const int ch, const int yy, const int zz, const int margin, std::vector<std::vector<double>> &pixe_tracks, std::vector<std::vector<double>> &thre_tracks, std::vector<double> &result, std::vector<double> &alpha_ref)
+void get_first_sl_ch_(const T *in_image_array,
+					  const T *out_image_array /* 処理結果alpha値の参照のため必要 */
+					  ,
+					  const double *ref_thres_array /* threshold値の参照のため必要 */
+					  ,
+					  const int hh, const int ww, const int ch, const int yy, const int zz,
+					  const int margin, std::vector<std::vector<double>> &pixe_tracks,
+					  std::vector<std::vector<double>> &thre_tracks, std::vector<double> &result,
+					  std::vector<double> &alpha_ref)
 {
-	const double val_max = static_cast<double>(
-		std::numeric_limits<T>::max());
+	const double val_max = static_cast<double>(std::numeric_limits<T>::max());
 	/*--- 入力画像を(マージン含めた1scanline分)得る ---*/
 	{
 		int yp = -margin + yy;
 		int ii = margin * 2;
 		for (; yp <= margin + yy; ++yp, --ii) {
-			const T *
-				ss = sl_top_clamped_in_h_(in_image_array, hh, ww, ch, yp) + zz;
+			const T *ss = sl_top_clamped_in_h_(in_image_array, hh, ww, ch, yp) + zz;
 			std::vector<double> &track = pixe_tracks.at(ii);
 			for (int xx = 0; xx < ww; ++xx) {
-				track.at(margin + xx) =
-					static_cast<double>(ss[xx * ch]) / val_max;
+				track.at(margin + xx) = static_cast<double>(ss[xx * ch]) / val_max;
 			}
 			paint_margin_(ww, margin, track);
 		}
@@ -477,8 +475,7 @@ void get_first_sl_ch_(
 		int yp = -margin + yy;
 		int ii = margin * 2;
 		for (; yp <= margin + yy; ++yp, --ii) {
-			const double *
-				ss = sl_top_clamped_in_h_(ref_thres_array, hh, ww, 1, yp);
+			const double *ss = sl_top_clamped_in_h_(ref_thres_array, hh, ww, 1, yp);
 			std::vector<double> &track = thre_tracks.at(ii);
 			for (int xx = 0; xx < ww; ++xx) {
 				track.at(margin + xx) = ss[xx * 1];
@@ -487,8 +484,7 @@ void get_first_sl_ch_(
 		}
 	}
 	/*--- 入力画像を保存画像エリアに1scanline分入れる ---*/
-	const T *
-		ss = sl_top_clamped_in_h_(in_image_array, hh, ww, ch, yy) + zz;
+	const T *ss = sl_top_clamped_in_h_(in_image_array, hh, ww, ch, yy) + zz;
 	for (int xx = 0; xx < ww; ++xx) {
 		result.at(xx) = static_cast<double>(ss[xx * ch]) / val_max;
 	}
@@ -496,37 +492,35 @@ void get_first_sl_ch_(
 	if ((alpha_ref.size() <= 0) || (ch < 4)) {
 		return;
 	}
-	const T *
-		dd = sl_top_clamped_in_h_(out_image_array, hh, ww, ch, yy) + 3;
+	const T *dd = sl_top_clamped_in_h_(out_image_array, hh, ww, ch, yy) + 3;
 	for (int xx = 0; xx < ww; ++xx) {
 		alpha_ref.at(xx) = static_cast<double>(dd[xx * ch]) / val_max;
 	}
 }
 template <class T>
-void get_next_sl_ch_(
-	const T *in_image_array, const T *out_image_array /* 処理結果alpha値の参照のため必要 */
-	,
-	const double *ref_thres_array /* threshold値の参照のため必要 */
-	,
-	const int hh, const int ww, const int ch, const int yy, const int zz, const int margin, std::vector<std::vector<double>> &pixe_tracks, std::vector<std::vector<double>> &thre_tracks, std::vector<double> &result, std::vector<double> &alpha_ref)
+void get_next_sl_ch_(const T *in_image_array,
+					 const T *out_image_array /* 処理結果alpha値の参照のため必要 */
+					 ,
+					 const double *ref_thres_array /* threshold値の参照のため必要 */
+					 ,
+					 const int hh, const int ww, const int ch, const int yy, const int zz,
+					 const int margin, std::vector<std::vector<double>> &pixe_tracks,
+					 std::vector<std::vector<double>> &thre_tracks, std::vector<double> &result,
+					 std::vector<double> &alpha_ref)
 {
-	const double val_max = static_cast<double>(
-		std::numeric_limits<T>::max());
+	const double val_max = static_cast<double>(std::numeric_limits<T>::max());
 	/*--- 入力画像を(1scanline分)得る ---*/
 	{
-		const T *
-			mm = sl_top_clamped_in_h_(in_image_array, hh, ww, ch, yy + margin) + zz;
+		const T *mm = sl_top_clamped_in_h_(in_image_array, hh, ww, ch, yy + margin) + zz;
 		std::vector<double> &track = pixe_tracks.at(0);
 		for (int xx = 0; xx < ww; ++xx) {
-			track.at(margin + xx) =
-				static_cast<double>(mm[xx * ch]) / val_max;
+			track.at(margin + xx) = static_cast<double>(mm[xx * ch]) / val_max;
 		}
 		paint_margin_(ww, margin, track);
 	}
 	/*--- (閾値として)参照する画像を(1scanline分)得る --*/
 	if ((0 != ref_thres_array) && (0 < thre_tracks.size())) {
-		const double *
-			mm = sl_top_clamped_in_h_(ref_thres_array, hh, ww, 1, yy + margin);
+		const double *mm = sl_top_clamped_in_h_(ref_thres_array, hh, ww, 1, yy + margin);
 		std::vector<double> &track = thre_tracks.at(0);
 		for (int xx = 0; xx < ww; ++xx) {
 			track.at(margin + xx) = mm[xx * 1];
@@ -534,8 +528,7 @@ void get_next_sl_ch_(
 		paint_margin_(ww, margin, track);
 	}
 	/*--- 入力画像を保存画像エリアに1scanline分入れる ---*/
-	const T *
-		ss = sl_top_clamped_in_h_(in_image_array, hh, ww, ch, yy) + zz;
+	const T *ss = sl_top_clamped_in_h_(in_image_array, hh, ww, ch, yy) + zz;
 	for (int xx = 0; xx < ww; ++xx) {
 		result.at(xx) = static_cast<double>(ss[xx * ch]) / val_max;
 	}
@@ -543,15 +536,14 @@ void get_next_sl_ch_(
 	if ((alpha_ref.size() <= 0) || (ch < 4)) {
 		return;
 	}
-	const T *
-		dd = sl_top_clamped_in_h_(out_image_array, hh, ww, ch, yy) + 3;
+	const T *dd = sl_top_clamped_in_h_(out_image_array, hh, ww, ch, yy) + 3;
 	for (int xx = 0; xx < ww; ++xx) {
 		alpha_ref.at(xx) = static_cast<double>(dd[xx * ch]) / val_max;
 	}
 }
 template <class TP>
-void copy_sl_ch_(
-	const TP in_image_array, TP out_image_array, const int hh, const int ww, const int ch, const int yy, const int zz)
+void copy_sl_ch_(const TP in_image_array, TP out_image_array, const int hh, const int ww,
+				 const int ch, const int yy, const int zz)
 {
 	const TP ss = sl_top_clamped_in_h_(in_image_array, hh, ww, ch, yy) + zz;
 	TP dd = sl_top_clamped_in_h_(out_image_array, hh, ww, ch, yy) + zz;
@@ -560,40 +552,38 @@ void copy_sl_ch_(
 	}
 }
 template <class T>
-void put_sl_ch_(
-	std::vector<double> &result, const int hh, const int ww, const int ch, const int yy, const int zz, T *out_image_array)
+void put_sl_ch_(std::vector<double> &result, const int hh, const int ww, const int ch, const int yy,
+				const int zz, T *out_image_array)
 {
-	const double val_max = static_cast<double>(
-		std::numeric_limits<T>::max());
+	const double val_max = static_cast<double>(std::numeric_limits<T>::max());
 	T *dd = sl_top_clamped_in_h_(out_image_array, hh, ww, ch, yy) + zz;
 	for (int xx = 0; xx < ww; ++xx) {
-		dd[ch * xx] =
-			static_cast<T>(result.at(xx) * (val_max + 0.999999));
+		dd[ch * xx] = static_cast<T>(result.at(xx) * (val_max + 0.999999));
 	}
 }
 }
 namespace
 { //--------------------------------------------------------
-template <class T>
-class one_thread_ : public igs::resource::thread_execute_interface
+template <class T> class one_thread_ : public igs::resource::thread_execute_interface
 { /* thread単位の実行設定 */
-public:
+  public:
 	one_thread_() {}
-	void setup(
-		T in_image, T out_image, double *ref_thresh
+	void setup(T in_image, T out_image, double *ref_thresh
 
-		,
-		const int height, const int width, const int channels
+			   ,
+			   const int height, const int width, const int channels
 
-		,
-		const int y_begin, const int y_end
+			   ,
+			   const int y_begin, const int y_end
 
-		// , std::vector< std::vector<double> > *lens_matrix_p
-		,
-		std::vector<int> *lens_offsets_p, std::vector<double *> *lens_starts_p, std::vector<int> *lens_sizes_p
+			   // , std::vector< std::vector<double> > *lens_matrix_p
+			   ,
+			   std::vector<int> *lens_offsets_p, std::vector<double *> *lens_starts_p,
+			   std::vector<int> *lens_sizes_p
 
-		,
-		const double power, const double threshold_min, const double threshold_max, const bool alpha_rendering_sw)
+			   ,
+			   const double power, const double threshold_min, const double threshold_max,
+			   const bool alpha_rendering_sw)
 	{
 		this->in_image_ = in_image;
 		this->out_image_ = out_image;
@@ -616,8 +606,9 @@ public:
 		this->threshold_max_ = threshold_max;
 		this->alpha_rendering_sw_ = alpha_rendering_sw;
 
-		sl_track_resize_(
-			static_cast<int>(this->lens_offsets_p_->size()), this->width_, this->pixe_tracks_, ((0 == ref_thresh) ? false : true), this->thre_tracks_, this->pixe_starts_, this->thre_starts_, this->result_, this->alpha_ref_);
+		sl_track_resize_(static_cast<int>(this->lens_offsets_p_->size()), this->width_,
+						 this->pixe_tracks_, ((0 == ref_thresh) ? false : true), this->thre_tracks_,
+						 this->pixe_starts_, this->thre_starts_, this->result_, this->alpha_ref_);
 	}
 	void run(void)
 	{
@@ -668,11 +659,11 @@ public:
 	}
 	void clear(void)
 	{
-		sl_track_clear_(
-			this->pixe_tracks_, this->thre_tracks_, this->pixe_starts_, this->thre_starts_, this->result_, this->alpha_ref_);
+		sl_track_clear_(this->pixe_tracks_, this->thre_tracks_, this->pixe_starts_,
+						this->thre_starts_, this->result_, this->alpha_ref_);
 	}
 
-private:
+  private:
 	T in_image_;
 	T out_image_;
 	double *ref_thresh_;
@@ -704,46 +695,21 @@ private:
 	void rendering_sl_ch_(int yy, int zz, bool rendering_sw)
 	{
 		if (!rendering_sw) {
-			copy_sl_ch_(
-				this->in_image_,
-				this->out_image_,
-				this->height_,
-				this->width_,
-				this->channels_,
-				yy, zz);
+			copy_sl_ch_(this->in_image_, this->out_image_, this->height_, this->width_,
+						this->channels_, yy, zz);
 			return;
 		}
 		if (yy == this->y_begin_) {
-			get_first_sl_ch_(
-				this->in_image_,
-				this->out_image_,
-				this->ref_thresh_,
-				this->height_,
-				this->width_,
-				this->channels_,
-				yy, zz,
-				static_cast<int>(this->pixe_tracks_.size() / 2),
-				this->pixe_tracks_,
-				this->thre_tracks_,
-				this->result_,
-				this->alpha_ref_);
+			get_first_sl_ch_(this->in_image_, this->out_image_, this->ref_thresh_, this->height_,
+							 this->width_, this->channels_, yy, zz,
+							 static_cast<int>(this->pixe_tracks_.size() / 2), this->pixe_tracks_,
+							 this->thre_tracks_, this->result_, this->alpha_ref_);
 		} else {
-			sl_track_shift_(
-				this->pixe_tracks_,
-				this->thre_tracks_);
-			get_next_sl_ch_(
-				this->in_image_,
-				this->out_image_,
-				this->ref_thresh_,
-				this->height_,
-				this->width_,
-				this->channels_,
-				yy, zz,
-				static_cast<int>(this->pixe_tracks_.size() / 2),
-				this->pixe_tracks_,
-				this->thre_tracks_,
-				this->result_,
-				this->alpha_ref_);
+			sl_track_shift_(this->pixe_tracks_, this->thre_tracks_);
+			get_next_sl_ch_(this->in_image_, this->out_image_, this->ref_thresh_, this->height_,
+							this->width_, this->channels_, yy, zz,
+							static_cast<int>(this->pixe_tracks_.size() / 2), this->pixe_tracks_,
+							this->thre_tracks_, this->result_, this->alpha_ref_);
 		}
 		sl_track_render_(
 			//  *(this->lens_matrix_p_)
@@ -760,46 +726,40 @@ private:
 
 			,
 			this->power_, this->threshold_min_, this->threshold_max_);
-		put_sl_ch_(
-			this->result_,
-			this->height_,
-			this->width_,
-			this->channels_,
-			yy, zz,
-			this->out_image_);
+		put_sl_ch_(this->result_, this->height_, this->width_, this->channels_, yy, zz,
+				   this->out_image_);
 	}
 };
 }
 namespace
 { //--------------------------------------------------------
-template <class T>
-class multi_thread_
+template <class T> class multi_thread_
 {
-public:
-	multi_thread_(
-		T in_image, T out_image, double *ref_thres, const int height, const int width, const int channels
+  public:
+	multi_thread_(T in_image, T out_image, double *ref_thres, const int height, const int width,
+				  const int channels
 
-		,
-		const int number_of_thread // 1 ... INT_MAX
+				  ,
+				  const int number_of_thread // 1 ... INT_MAX
 
-		,
-		const double radius // 25.0(0...100(DOUBLE_MAX))
-		,
-		const double curve // 1.00(0.01 ... 100)
-		,
-		const int polygon_number // 2(2 ... 16(INT_MAX))
-		,
-		const double degree // 0(0 ... DOUBLE_MAX)
+				  ,
+				  const double radius // 25.0(0...100(DOUBLE_MAX))
+				  ,
+				  const double curve // 1.00(0.01 ... 100)
+				  ,
+				  const int polygon_number // 2(2 ... 16(INT_MAX))
+				  ,
+				  const double degree // 0(0 ... DOUBLE_MAX)
 
-		,
-		const double power // 1.00(-2.00 ... 2.00)
-		,
-		const double threshold_min // 0.00(0.00 ... 1.01)
-		,
-		const double threshold_max // 0.00(0.00 ... 1.01)
-		,
-		const bool alpha_rendering_sw // false(true,false)
-		)
+				  ,
+				  const double power // 1.00(-2.00 ... 2.00)
+				  ,
+				  const double threshold_min // 0.00(0.00 ... 1.01)
+				  ,
+				  const double threshold_max // 0.00(0.00 ... 1.01)
+				  ,
+				  const bool alpha_rendering_sw // false(true,false)
+				  )
 	{
 		/*--------------スレッド数の設定--------------------*/
 		int thread_num = number_of_thread;
@@ -808,12 +768,13 @@ public:
 		} /* ゼロ以下か、高さより多い */
 		/*--------------メモリ確保--------------------------*/
 		int odd_diameter = 0;
-		attenuation_distribution_(
-			this->lens_matrix_, this->lens_offsets_, this->lens_starts_, this->lens_sizes_, odd_diameter, radius /* 直径(radiusの2倍)1以下ならエラーthrow */
-			,
-			curve /* curveがゼロならエラーthrow */
-			,
-			polygon_number, degree);
+		attenuation_distribution_(this->lens_matrix_, this->lens_offsets_, this->lens_starts_,
+								  this->lens_sizes_, odd_diameter,
+								  radius /* 直径(radiusの2倍)1以下ならエラーthrow */
+								  ,
+								  curve /* curveがゼロならエラーthrow */
+								  ,
+								  polygon_number, degree);
 		this->threads_.resize(thread_num);
 		/*-------スレッド毎の処理指定-----------------------*/
 		int h_sub = height / thread_num;
@@ -830,31 +791,28 @@ public:
 			if (height < (yy + h_sub)) {
 				h_sub = height - yy;
 			}
-			this->threads_.at(ii).setup(
-				in_image, out_image, ref_thres
+			this->threads_.at(ii).setup(in_image, out_image, ref_thres
 
-				,
-				height, width, channels
+										,
+										height, width, channels
 
-				,
-				yy, yy + h_sub - 1
+										,
+										yy, yy + h_sub - 1
 
-				// , &(this->lens_matrix_)
-				,
-				&(this->lens_offsets_), &(this->lens_starts_), &(this->lens_sizes_)
+										// , &(this->lens_matrix_)
+										,
+										&(this->lens_offsets_), &(this->lens_starts_),
+										&(this->lens_sizes_)
 
-																   ,
-				power, threshold_min, threshold_max, alpha_rendering_sw);
+											,
+										power, threshold_min, threshold_max, alpha_rendering_sw);
 		}
 		/*------スレッド毎のスレッド指定------*/
 		for (int ii = 0; ii < thread_num; ++ii) {
 			this->mthread_.add(&(this->threads_.at(ii)));
 		}
 	}
-	void run(void)
-	{
-		this->mthread_.run();
-	}
+	void run(void) { this->mthread_.run(); }
 	void clear()
 	{
 		this->mthread_.clear();
@@ -865,7 +823,7 @@ public:
 		this->lens_matrix_.clear();
 	}
 
-private:
+  private:
 	std::vector<std::vector<double>> lens_matrix_;
 	std::vector<int> lens_offsets_;
 	std::vector<double *> lens_starts_;
@@ -877,61 +835,57 @@ private:
 //--------------------------------------------------------------------
 /* パラメータの指定を見て、画像に変化の無い場合、
 呼び出し側で、fog処理するか判断する。fog処理しないときの処理も忘れずに */
-bool igs::fog::have_change(
-	const double radius // 25.0(0 ... 100(DOUBLE_MAX))
-	,
-	const double power // 1.00(-2.00 ... 2.00)
-	,
-	const double threshold_min // 0.00(0.00 ... 1.01)
-	)
+bool igs::fog::have_change(const double radius // 25.0(0 ... 100(DOUBLE_MAX))
+						   ,
+						   const double power // 1.00(-2.00 ... 2.00)
+						   ,
+						   const double threshold_min // 0.00(0.00 ... 1.01)
+						   )
 {
 	/* 収光(変化)しない
 		場合1  直径が1以下
 		場合2  powerがゼロ(マイナスは有効としている)
 		場合3  powerがプラスで、threshold_minが1よりも大きい
 	*/
-	if ((static_cast<int>(ceil(radius * 2.0)) <= 1) ||
-		(0.0 == power) ||
+	if ((static_cast<int>(ceil(radius * 2.0)) <= 1) || (0.0 == power) ||
 		((0.0 < power) && (1.0 < threshold_min))) {
 		return false;
 	}
 	return true;
 }
 /* fog処理する */
-void igs::fog::convert(
-	void *in // no margin
-	,
-	void *out // no margin
-	,
-	double *buffer // no margin
+void igs::fog::convert(void *in // no margin
+					   ,
+					   void *out // no margin
+					   ,
+					   double *buffer // no margin
 
-	,
-	const int height, const int width, const int channels, const int bits
+					   ,
+					   const int height, const int width, const int channels, const int bits
 
-	,
-	const int number_of_thread // 1 ... INT_MAX
+					   ,
+					   const int number_of_thread // 1 ... INT_MAX
 
-	,
-	const double radius // 25.0(0 ... 100(DOUBLE_MAX))
-	,
-	const double curve // 1.00(0.01 ... 100)
-	,
-	const int polygon_number // 2(2 ... 16(INT_MAX))
-	,
-	const double degree // 0(0 ... DOUBLE_MAX)
+					   ,
+					   const double radius // 25.0(0 ... 100(DOUBLE_MAX))
+					   ,
+					   const double curve // 1.00(0.01 ... 100)
+					   ,
+					   const int polygon_number // 2(2 ... 16(INT_MAX))
+					   ,
+					   const double degree // 0(0 ... DOUBLE_MAX)
 
-	,
-	const double power // 1.00(-2.00 ... 2.00)
-	,
-	const double threshold_min // 0.00(0.00 ... 1.01)
-	,
-	const double threshold_max // 0.00(0.00 ... 1.01)
-	,
-	const bool alpha_rendering_sw // false(true,false)
-	)
+					   ,
+					   const double power // 1.00(-2.00 ... 2.00)
+					   ,
+					   const double threshold_min // 0.00(0.00 ... 1.01)
+					   ,
+					   const double threshold_max // 0.00(0.00 ... 1.01)
+					   ,
+					   const bool alpha_rendering_sw // false(true,false)
+					   )
 {
-	if ((igs::image::rgba::siz != channels) &&
-		(igs::image::rgb::siz != channels) &&
+	if ((igs::image::rgba::siz != channels) && (igs::image::rgb::siz != channels) &&
 		(1 != channels) /* grayscale */
 		) {
 		throw std::domain_error("Bad channels,Not rgba/rgb/grayscale");
@@ -939,20 +893,24 @@ void igs::fog::convert(
 
 	if (std::numeric_limits<unsigned char>::digits == bits) {
 		if (0 != buffer) {
-			rgb_to_lightness_image_(
-				static_cast<const unsigned char *>(in), height, width, channels, buffer);
+			rgb_to_lightness_image_(static_cast<const unsigned char *>(in), height, width, channels,
+									buffer);
 		}
 		multi_thread_<unsigned char *> mthread(
-			static_cast<unsigned char *>(in), static_cast<unsigned char *>(out), buffer, height, width, channels, number_of_thread, radius, curve, polygon_number, degree, power, threshold_min, threshold_max, alpha_rendering_sw);
+			static_cast<unsigned char *>(in), static_cast<unsigned char *>(out), buffer, height,
+			width, channels, number_of_thread, radius, curve, polygon_number, degree, power,
+			threshold_min, threshold_max, alpha_rendering_sw);
 		mthread.run();
 		mthread.clear();
 	} else if (std::numeric_limits<unsigned short>::digits == bits) {
 		if (0 != buffer) {
-			rgb_to_lightness_image_(
-				static_cast<const unsigned short *>(in), height, width, channels, buffer);
+			rgb_to_lightness_image_(static_cast<const unsigned short *>(in), height, width,
+									channels, buffer);
 		}
 		multi_thread_<unsigned short *> mthread(
-			static_cast<unsigned short *>(in), static_cast<unsigned short *>(out), buffer, height, width, channels, number_of_thread, radius, curve, polygon_number, degree, power, threshold_min, threshold_max, alpha_rendering_sw);
+			static_cast<unsigned short *>(in), static_cast<unsigned short *>(out), buffer, height,
+			width, channels, number_of_thread, radius, curve, polygon_number, degree, power,
+			threshold_min, threshold_max, alpha_rendering_sw);
 		mthread.run();
 		mthread.clear();
 	} else {

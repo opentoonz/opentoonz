@@ -29,19 +29,18 @@ class TDockDecoAllocator : public DockDecoAllocator
 //    TMainWindow
 //-----------------------
 
-TMainWindow::TMainWindow(QWidget *parent, Qt::WindowFlags flags)
-	: QWidget(parent, flags)
+TMainWindow::TMainWindow(QWidget *parent, Qt::WindowFlags flags) : QWidget(parent, flags)
 {
-	//Delete on close
+	// Delete on close
 	setAttribute(Qt::WidgetAttribute(Qt::WA_DeleteOnClose));
 
-	//Set a vertical layout to include menu bars
+	// Set a vertical layout to include menu bars
 	QVBoxLayout *vlayout = new QVBoxLayout;
 	vlayout->setMargin(0);
 	vlayout->setSpacing(4);
 	setLayout(vlayout);
 
-	//Allocate the dock layout
+	// Allocate the dock layout
 	m_layout = new DockLayout;
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setSpacing(8);
@@ -49,8 +48,9 @@ TMainWindow::TMainWindow(QWidget *parent, Qt::WindowFlags flags)
 	vlayout->addLayout(m_layout);
 	vlayout->setAlignment(m_layout, Qt::AlignTop);
 
-	show(); //NOTA: E' NECESSARIO MOSTRARE LA FINESTRA, prima di dockare qualcosa (altrimenti non viene fatto
-			//l'update della geometria della main window, e il contentsRect del layout viene sballato!!).
+	show(); // NOTA: E' NECESSARIO MOSTRARE LA FINESTRA, prima di dockare qualcosa (altrimenti non
+			// viene fatto
+	// l'update della geometria della main window, e il contentsRect del layout viene sballato!!).
 }
 
 //----------------------------------------
@@ -61,8 +61,8 @@ TMainWindow::~TMainWindow()
 
 //----------------------------------------
 
-//!Adds input \b item to this TMainWindow. If item was already
-//!assigned to \b this TMainWindow, nothing happens.
+//! Adds input \b item to this TMainWindow. If item was already
+//! assigned to \b this TMainWindow, nothing happens.
 void TMainWindow::addDockWidget(TDockWidget *item)
 {
 	if (!m_layout->find(item))
@@ -78,14 +78,14 @@ void TMainWindow::removeDockWidget(TDockWidget *item)
 
 //----------------------------------------
 
-//NOTE: Unlike QMainWindow::addToolBar, we only allow one
-//fixed-size undockable menu bar at top of the dock layout.
+// NOTE: Unlike QMainWindow::addToolBar, we only allow one
+// fixed-size undockable menu bar at top of the dock layout.
 void TMainWindow::setMenuWidget(QWidget *menubar)
 {
 	if (menubar) {
 		QVBoxLayout *vlayout = static_cast<QVBoxLayout *>(layout());
 
-		//If necessary, remove current menu bar
+		// If necessary, remove current menu bar
 		if (m_menu && m_menu != menubar)
 			vlayout->removeWidget(m_menu);
 
@@ -102,7 +102,7 @@ void TMainWindow::setDecoAllocator(DockDecoAllocator *allocator)
 
 //----------------------------------------
 
-//!Sets global thickness of separators between dock widget.
+//! Sets global thickness of separators between dock widget.
 void TMainWindow::setSeparatorsThickness(int thick)
 {
 	if (thick > 0) {
@@ -124,20 +124,20 @@ void TMainWindow::resizeEvent(QResizeEvent *event)
 //    TDockWidget
 //-------------------
 
-//!Constructs a TDockWidget with given parent and window flags. If parent is
-//!a TMainWindow, then the constructed dock widget is assigned to it (addDockWidget'd).
-//!TDockWidgets are always floating at construction.
+//! Constructs a TDockWidget with given parent and window flags. If parent is
+//! a TMainWindow, then the constructed dock widget is assigned to it (addDockWidget'd).
+//! TDockWidgets are always floating at construction.
 TDockWidget::TDockWidget(QWidget *parent, Qt::WindowFlags flags)
 	: DockWidget(parent, flags), m_widget(0), m_titlebar(0), m_margin(5)
 {
 	setAutoFillBackground(false);
-	//setFrameStyle(QFrame::StyledPanel);
+	// setFrameStyle(QFrame::StyledPanel);
 
 	QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom);
 	layout->setSpacing(0);
 	setLayout(layout);
 
-	//Check if parent is a TMainWindow class
+	// Check if parent is a TMainWindow class
 	TMainWindow *parentMain = qobject_cast<TMainWindow *>(parent);
 	if (parentMain)
 		parentMain->addDockWidget(this);
@@ -168,8 +168,9 @@ void TDockWidget::setTitleBarWidget(QWidget *titlebar)
 			boxLayout->removeWidget(m_titlebar);
 
 		boxLayout->insertWidget(0, titlebar);
-		//Set top/left-aligned
-		boxLayout->setAlignment(titlebar, getOrientation() == vertical ? Qt::AlignTop : Qt::AlignLeft);
+		// Set top/left-aligned
+		boxLayout->setAlignment(titlebar,
+								getOrientation() == vertical ? Qt::AlignTop : Qt::AlignLeft);
 
 		m_titlebar = titlebar;
 		if (m_floating)
@@ -207,19 +208,19 @@ void TDockWidget::setWidget(QWidget *widget)
 void TDockWidget::setFloatingAppearance()
 {
 	if (m_titlebar) {
-		//If has a custom title bar, impose a margin to the layout
-		//to provide a frame.
+		// If has a custom title bar, impose a margin to the layout
+		// to provide a frame.
 		layout()->setMargin(m_margin);
 
-		if (!m_floating) //was docked
+		if (!m_floating) // was docked
 		{
-			//Adding margin to extremal sizes
+			// Adding margin to extremal sizes
 			int addition = 2 * m_margin;
 			setMinimumSize(QSize(minimumWidth() + addition, minimumHeight() + addition));
 			setMaximumSize(QSize(maximumWidth() + addition, maximumHeight() + addition));
 		}
 	}
-	//else
+	// else
 	//  setWindowFlags(Qt::Tool);
 }
 
@@ -227,12 +228,12 @@ void TDockWidget::setFloatingAppearance()
 
 void TDockWidget::setDockedAppearance()
 {
-	//No layout margin is visible when docked
+	// No layout margin is visible when docked
 	layout()->setMargin(0);
 
-	if (m_floating) //was floating
+	if (m_floating) // was floating
 	{
-		//Removing margin from extremal sizes
+		// Removing margin from extremal sizes
 		int addition = 2 * m_margin;
 		setMinimumSize(QSize(minimumWidth() - addition, minimumHeight() - addition));
 		setMaximumSize(QSize(maximumWidth() - addition, maximumHeight() - addition));
@@ -277,10 +278,10 @@ int TDockWidget::isResizeGrip(QPoint p)
 
 //----------------------------------------
 
-//!Currently working only for \b status = true. If you need to
-//!dock a TDockWidget, you \b must specify a dock location by either
-//!choosing a placeholder or identifying the Region and insertion index,
-//!and then running 'parentLayout()->dockItem(..)'.
+//! Currently working only for \b status = true. If you need to
+//! dock a TDockWidget, you \b must specify a dock location by either
+//! choosing a placeholder or identifying the Region and insertion index,
+//! and then running 'parentLayout()->dockItem(..)'.
 void TDockWidget::setFloating(bool status)
 {
 	if (status) {
@@ -292,11 +293,11 @@ void TDockWidget::setFloating(bool status)
 
 //----------------------------------------
 
-//!Specifies the orientation of the dock widget. It can
-//!be either \b vertical (default) or \b horizontal, meaning that
-//!the titlebar is laid respectively at the top or left side of
-//!content widget. Directly speaking, it is equivalent to setting the
-//!Qt's QDockWidget::DockWidgetVerticalTitleBar feature.
+//! Specifies the orientation of the dock widget. It can
+//! be either \b vertical (default) or \b horizontal, meaning that
+//! the titlebar is laid respectively at the top or left side of
+//! content widget. Directly speaking, it is equivalent to setting the
+//! Qt's QDockWidget::DockWidgetVerticalTitleBar feature.
 void TDockWidget::setOrientation(bool direction)
 {
 	QBoxLayout *boxLayout = static_cast<QBoxLayout *>(layout());
@@ -324,7 +325,7 @@ bool TDockWidget::getOrientation() const
 
 //----------------------------------------
 
-//!Maximizes \b this TDockWidget, if docked.
+//! Maximizes \b this TDockWidget, if docked.
 void TDockWidget::setMaximized(bool status)
 {
 	parentLayout()->setMaximized(this, status);
@@ -354,9 +355,11 @@ QSize TDockWidget::getDockedMaximumSize()
 
 class TDockSeparator : public DockSeparator
 {
-public:
+  public:
 	TDockSeparator(DockLayout *owner, bool orientation, Region *parentRegion)
-		: DockSeparator(owner, orientation, parentRegion) {}
+		: DockSeparator(owner, orientation, parentRegion)
+	{
+	}
 
 	void paintEvent(QPaintEvent *pe);
 };
@@ -367,7 +370,7 @@ class TDockPlaceholder : public DockPlaceholder
 {
 	QWidget *m_associated[3];
 
-public:
+  public:
 	TDockPlaceholder(DockWidget *owner, Region *r, int idx, int attributes);
 	~TDockPlaceholder();
 
@@ -407,7 +410,7 @@ inline void TDockPlaceholder::buildGeometry()
 	DockPlaceholder::buildGeometry();
 
 	if (isRoot()) {
-		//Solution 2: Set associated widgets
+		// Solution 2: Set associated widgets
 		QRect geom(geometry());
 		QSize horSize(geom.width(), 6);
 		QSize vertSize(6, geom.height() + 12);
@@ -430,7 +433,7 @@ inline void TDockPlaceholder::buildGeometry()
 void TDockPlaceholder::showEvent(QShowEvent *se)
 {
 	if (isRoot()) {
-		//Show associated widgets
+		// Show associated widgets
 		m_associated[0]->show();
 		m_associated[1]->show();
 		m_associated[2]->show();
@@ -442,7 +445,7 @@ void TDockPlaceholder::showEvent(QShowEvent *se)
 void TDockPlaceholder::hideEvent(QHideEvent *he)
 {
 	if (isRoot()) {
-		//Show associated widgets
+		// Show associated widgets
 		m_associated[0]->hide();
 		m_associated[1]->hide();
 		m_associated[2]->hide();
@@ -455,14 +458,15 @@ void TDockSeparator::paintEvent(QPaintEvent *pe)
 {
 	QPainter p(this);
 	QStyleOption opt(0);
-	opt.state = (getOrientation() == Region::horizontal) ? QStyle::State_None : QStyle::State_Horizontal;
+	opt.state =
+		(getOrientation() == Region::horizontal) ? QStyle::State_None : QStyle::State_Horizontal;
 
 	/*if (w->isEnabled())
-      opt.state |= QStyle::State_Enabled;
+	  opt.state |= QStyle::State_Enabled;
   if (o != Qt::Horizontal)
-      opt.state |= QStyle::State_Horizontal;
+	  opt.state |= QStyle::State_Horizontal;
   if (mouse_over)
-      opt.state |= QStyle::State_MouseOver;*/
+	  opt.state |= QStyle::State_MouseOver;*/
 
 	opt.rect = QRect(QPoint(0, 0), QSize(geometry().size()));
 	opt.palette = palette();
@@ -474,14 +478,16 @@ void TDockSeparator::paintEvent(QPaintEvent *pe)
 
 //-------------------------------------
 
-DockSeparator *TDockDecoAllocator::newSeparator(DockLayout *owner, bool orientation, Region *parentRegion)
+DockSeparator *TDockDecoAllocator::newSeparator(DockLayout *owner, bool orientation,
+												Region *parentRegion)
 {
 	return new TDockSeparator(owner, orientation, parentRegion);
 }
 
 //-------------------------------------
 
-DockPlaceholder *TDockDecoAllocator::newPlaceholder(DockWidget *owner, Region *r, int idx, int attributes)
+DockPlaceholder *TDockDecoAllocator::newPlaceholder(DockWidget *owner, Region *r, int idx,
+													int attributes)
 {
 	return new TDockPlaceholder(owner, r, idx, attributes);
 }

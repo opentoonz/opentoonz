@@ -23,15 +23,13 @@
 #include "toonzqt/icongenerator.h"
 //---------------------------------------------------------
 
-ScanListFrame::ScanListFrame()
-	: m_xl(0)
+ScanListFrame::ScanListFrame() : m_xl(0)
 {
 }
 
 //---------------------------------------------------------
 
-ScanListFrame::ScanListFrame(TXshSimpleLevel *xl, const TFrameId &fid)
-	: m_xl(xl), m_fid(fid)
+ScanListFrame::ScanListFrame(TXshSimpleLevel *xl, const TFrameId &fid) : m_xl(xl), m_fid(fid)
 {
 	if (m_xl)
 		m_xl->addRef();
@@ -47,8 +45,7 @@ ScanListFrame::~ScanListFrame()
 
 //---------------------------------------------------------
 
-ScanListFrame::ScanListFrame(const ScanListFrame &src)
-	: m_xl(src.m_xl), m_fid(src.m_fid)
+ScanListFrame::ScanListFrame(const ScanListFrame &src) : m_xl(src.m_xl), m_fid(src.m_fid)
 {
 	if (m_xl)
 		m_xl->addRef();
@@ -211,8 +208,7 @@ void getCells(Cells &cells, Levels &levels, bool includeScannedFrames)
 	TApp *app = TApp::instance();
 	ToonzScene *scene = app->getCurrentScene()->getScene();
 	TXsheet *xsh = scene->getXsheet();
-	TCellSelection *selection =
-		dynamic_cast<TCellSelection *>(TSelection::getCurrent());
+	TCellSelection *selection = dynamic_cast<TCellSelection *>(TSelection::getCurrent());
 	if (!selection)
 		return;
 	int r0, c0, r1, c1;
@@ -225,7 +221,8 @@ void getCells(Cells &cells, Levels &levels, bool includeScannedFrames)
 			TXshCell cell = xsh->getCell(r, c);
 			TXshSimpleLevel *xl = cell.getSimpleLevel();
 			if (xl) {
-				if (xl->getType() != TZI_XSHLEVEL && xl->getType() != OVL_XSHLEVEL && xl->getType() != TZP_XSHLEVEL)
+				if (xl->getType() != TZI_XSHLEVEL && xl->getType() != OVL_XSHLEVEL &&
+					xl->getType() != TZP_XSHLEVEL)
 					continue;
 				if (!visitedlevel.count(xl)) {
 					visitedlevel.insert(xl);

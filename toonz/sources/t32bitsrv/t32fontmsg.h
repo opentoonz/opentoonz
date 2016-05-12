@@ -27,10 +27,10 @@ void addParsers(tipc::Server *srv);
 
 class LoadFontNamesParser : public tipc::MessageParser
 {
-	//Syntax : $FNTloadFontNames
-	//Reply: ok | err
+	// Syntax : $FNTloadFontNames
+	// Reply: ok | err
 
-public:
+  public:
 	QString header() const { return "$FNTloadFontNames"; }
 	void operator()(Message &stream);
 };
@@ -39,10 +39,10 @@ public:
 
 class GetAllFamiliesParser : public tipc::MessageParser
 {
-	//Syntax : $FNTgetAllFamilies
-	//Reply: ok <families vector> | err
+	// Syntax : $FNTgetAllFamilies
+	// Reply: ok <families vector> | err
 
-public:
+  public:
 	QString header() const { return "$FNTgetAllFamilies"; }
 	void operator()(Message &stream);
 };
@@ -51,10 +51,10 @@ public:
 
 class GetAllTypefacesParser : public tipc::MessageParser
 {
-	//Syntax : $FNTgetAllTypefaces
-	//Reply: ok <typefaces vector> | err
+	// Syntax : $FNTgetAllTypefaces
+	// Reply: ok <typefaces vector> | err
 
-public:
+  public:
 	QString header() const { return "$FNTgetAllTypefaces"; }
 	void operator()(Message &stream);
 };
@@ -65,10 +65,10 @@ public:
 
 class SetFamilyParser : public tipc::MessageParser
 {
-	//Syntax: $FNTsetFamily <family>
-	//Reply: ok | err
+	// Syntax: $FNTsetFamily <family>
+	// Reply: ok | err
 
-public:
+  public:
 	QString header() const { return "$FNTsetFamily"; }
 	void operator()(Message &stream);
 };
@@ -77,10 +77,10 @@ public:
 
 class SetTypefaceParser : public tipc::MessageParser
 {
-	//Syntax: $FNTsetTypeface <typeface>
-	//Reply: ok <ascender> <descender> | err
+	// Syntax: $FNTsetTypeface <typeface>
+	// Reply: ok <ascender> <descender> | err
 
-public:
+  public:
 	QString header() const { return "$FNTsetTypeface"; }
 	void operator()(Message &stream);
 };
@@ -89,10 +89,10 @@ public:
 
 class SetSizeParser : public tipc::MessageParser
 {
-	//Syntax: $FNTsetSize <size>
-	//Reply: ok <ascender> <descender> | err
+	// Syntax: $FNTsetSize <size>
+	// Reply: ok <ascender> <descender> | err
 
-public:
+  public:
 	QString header() const { return "$FNTsetSize"; }
 	void operator()(Message &stream);
 };
@@ -103,10 +103,10 @@ public:
 
 class GetCurrentFamilyParser : public tipc::MessageParser
 {
-	//Syntax: $FNTgetCurrentFamily
-	//Reply: ok <family name> | err
+	// Syntax: $FNTgetCurrentFamily
+	// Reply: ok <family name> | err
 
-public:
+  public:
 	QString header() const { return "$FNTgetCurrentFamily"; }
 	void operator()(Message &stream);
 };
@@ -115,10 +115,10 @@ public:
 
 class GetCurrentTypefaceParser : public tipc::MessageParser
 {
-	//Syntax: $FNTgetCurrentTypeface
-	//Reply: ok <typeface name> | err
+	// Syntax: $FNTgetCurrentTypeface
+	// Reply: ok <typeface name> | err
 
-public:
+  public:
 	QString header() const { return "$FNTgetCurrentTypeface"; }
 	void operator()(Message &stream);
 };
@@ -127,10 +127,10 @@ public:
 
 class GetDistanceParser : public tipc::MessageParser
 {
-	//Syntax: $FNTgetDistance <firstChar> <secondChar>
-	//Reply: ok <x> <y> | err
+	// Syntax: $FNTgetDistance <firstChar> <secondChar>
+	// Reply: ok <x> <y> | err
 
-public:
+  public:
 	QString header() const { return "$FNTgetDistance"; }
 	void operator()(Message &stream);
 };
@@ -141,10 +141,10 @@ public:
 
 class DrawCharVIParser : public tipc::MessageParser
 {
-	//Syntax: $FNTdrawCharVI <char> <nextChar>
-	//Reply: ok <x> <y> <strokes vector> | err
+	// Syntax: $FNTdrawCharVI <char> <nextChar>
+	// Reply: ok <x> <y> <strokes vector> | err
 
-public:
+  public:
 	QString header() const { return "$FNTdrawCharVI"; }
 	void operator()(Message &stream);
 };
@@ -153,10 +153,10 @@ public:
 
 class DrawCharGRParser : public tipc::MessageParser
 {
-	//Syntax: $FNTdrawCharGR <shmem-id> <char> <nextChar>
-	//Reply: ok <lx> <ly> <x> <y> | err
+	// Syntax: $FNTdrawCharGR <shmem-id> <char> <nextChar>
+	// Reply: ok <lx> <ly> <x> <y> | err
 
-public:
+  public:
 	QString header() const { return "$FNTdrawCharGR"; }
 	void operator()(Message &stream);
 };
@@ -165,14 +165,14 @@ public:
 
 class DrawCharCMParser : public tipc::MessageParser
 {
-	//Syntax: $FNTdrawCharCM <ink> <shmem-id> <char> <nextChar>
-	//Reply: ok <lx> <ly> <x> <y> | err
+	// Syntax: $FNTdrawCharCM <ink> <shmem-id> <char> <nextChar>
+	// Reply: ok <lx> <ly> <x> <y> | err
 
-public:
+  public:
 	QString header() const { return "$FNTdrawCharCM"; }
 	void operator()(Message &stream);
 };
 
-} //namespace tlevelwriter_mov
+} // namespace tlevelwriter_mov
 
 #endif

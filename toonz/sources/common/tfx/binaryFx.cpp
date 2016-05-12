@@ -37,11 +37,11 @@ class TImageCombinationFx : public TBaseRasterFx
 {
 	TFxPortDG m_group;
 
-public:
+  public:
 	TImageCombinationFx();
 	virtual ~TImageCombinationFx() {}
 
-public:
+  public:
 	// Virtual interface for heirs
 
 	//! The raster processing function that must be reimplemented to perform the fx
@@ -52,7 +52,7 @@ public:
 	//! function affects 'down' pixels when the 'up's are fully transparent.
 	virtual bool requiresFullRect() { return false; }
 
-public:
+  public:
 	// Low-level TRasterFx-related functions
 
 	int dynamicPortGroupsCount() const { return 1; }
@@ -81,8 +81,7 @@ public:
 //    TImageCombinationFx  implementation
 //******************************************************************************************
 
-TImageCombinationFx::TImageCombinationFx()
-	: m_group("Source", 2)
+TImageCombinationFx::TImageCombinationFx() : m_group("Source", 2)
 {
 	addInputPort("Source1", new TRasterFxPort, 0);
 	addInputPort("Source2", new TRasterFxPort, 0);
@@ -100,7 +99,8 @@ bool TImageCombinationFx::doGetBBox(double frame, TRectD &bBox, const TRenderSet
 		TRasterFxPort *port = static_cast<TRasterFxPort *>(getInputPort(p));
 		TRectD inputBBox;
 
-		bool hasInput = (port && port->isConnected()) ? (*port)->doGetBBox(frame, inputBBox, info) : false;
+		bool hasInput =
+			(port && port->isConnected()) ? (*port)->doGetBBox(frame, inputBBox, info) : false;
 
 		if (hasInput)
 			bBox += inputBBox;
@@ -156,15 +156,16 @@ void TImageCombinationFx::doCompute(TTile &tile, double frame, const TRenderSett
 
 			computeRect *= inBBox;
 
-			makeRectCoherent(computeRect, tile.m_pos); // Make it coherent with tile's pixel geometry
+			makeRectCoherent(computeRect,
+							 tile.m_pos); // Make it coherent with tile's pixel geometry
 		}
 
 		// Calculate the input port and perform processing
 		TDimension computeSize(tround(computeRect.getLx()), tround(computeRect.getLy()));
 		if ((computeSize.lx > 0) && (computeSize.ly > 0)) {
 			TTile inTile; // Observe its locality - not incidental
-			(*port)->allocateAndCompute(inTile, computeRect.getP00(), computeSize,
-										tile.getRaster(), frame, info);
+			(*port)->allocateAndCompute(inTile, computeRect.getP00(), computeSize, tile.getRaster(),
+										frame, info);
 
 			// Invoke process() to deal with the actual fx processing
 			TRasterP up(inTile.getRaster()), down(tile.getRaster());
@@ -184,8 +185,7 @@ void TImageCombinationFx::doCompute(TTile &tile, double frame, const TRenderSett
 
 //-------------------------------------------------------------------------------------
 
-void TImageCombinationFx::doDryCompute(
-	TRectD &rect, double frame, const TRenderSettings &info)
+void TImageCombinationFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings &info)
 {
 	// Mere copy of doCompute(), stripped of the actual computations
 
@@ -247,16 +247,10 @@ class OverFx : public TImageCombinationFx
 
 	FX_DECLARATION(OverFx)
 
-public:
-	OverFx()
-	{
-		setName(L"OverFx");
-	}
+  public:
+	OverFx() { setName(L"OverFx"); }
 
-	void process(const TRasterP &up, const TRasterP &down, double frame)
-	{
-		TRop::over(down, up);
-	}
+	void process(const TRasterP &up, const TRasterP &down, double frame) { TRop::over(down, up); }
 };
 
 //==================================================================
@@ -267,11 +261,8 @@ class AddFx : public TImageCombinationFx
 
 	TDoubleParamP m_value;
 
-public:
-	AddFx() : m_value(100.0)
-	{
-		bindParam(this, "value", m_value);
-	}
+  public:
+	AddFx() : m_value(100.0) { bindParam(this, "value", m_value); }
 
 	void process(const TRasterP &up, const TRasterP &down, double frame)
 	{
@@ -283,10 +274,7 @@ public:
 			TRop::add(up, down, down);
 	}
 
-	TFxPort *getXsheetPort() const
-	{
-		return getInputPort(1);
-	}
+	TFxPort *getXsheetPort() const { return getInputPort(1); }
 };
 
 //==================================================================
@@ -295,16 +283,13 @@ class ColorDodgeFx : public TImageCombinationFx
 {
 	FX_DECLARATION(AddFx)
 
-public:
+  public:
 	void process(const TRasterP &up, const TRasterP &down, double frame)
 	{
 		TRop::colordodge(up, down, down);
 	}
 
-	TFxPort *getXsheetPort() const
-	{
-		return getInputPort(1);
-	}
+	TFxPort *getXsheetPort() const { return getInputPort(1); }
 };
 
 //==================================================================
@@ -313,16 +298,13 @@ class ColorBurnFx : public TImageCombinationFx
 {
 	FX_DECLARATION(AddFx)
 
-public:
+  public:
 	void process(const TRasterP &up, const TRasterP &down, double frame)
 	{
 		TRop::colorburn(up, down, down);
 	}
 
-	TFxPort *getXsheetPort() const
-	{
-		return getInputPort(1);
-	}
+	TFxPort *getXsheetPort() const { return getInputPort(1); }
 };
 
 //==================================================================
@@ -331,7 +313,7 @@ class ScreenFx : public TImageCombinationFx
 {
 	FX_DECLARATION(AddFx)
 
-public:
+  public:
 	bool requiresFullRect() { return true; }
 
 	void process(const TRasterP &up, const TRasterP &down, double frame)
@@ -339,10 +321,7 @@ public:
 		TRop::screen(up, down, down);
 	}
 
-	TFxPort *getXsheetPort() const
-	{
-		return getInputPort(1);
-	}
+	TFxPort *getXsheetPort() const { return getInputPort(1); }
 };
 
 //==================================================================
@@ -353,21 +332,15 @@ class SubFx : public TImageCombinationFx
 
 	TBoolParamP m_matte;
 
-public:
-	SubFx() : m_matte(false)
-	{
-		bindParam(this, "matte", m_matte);
-	}
+  public:
+	SubFx() : m_matte(false) { bindParam(this, "matte", m_matte); }
 
 	void process(const TRasterP &up, const TRasterP &down, double frame)
 	{
 		TRop::sub(up, down, down, m_matte->getValue());
 	}
 
-	TFxPort *getXsheetPort() const
-	{
-		return getInputPort(1);
-	}
+	TFxPort *getXsheetPort() const { return getInputPort(1); }
 };
 
 //==================================================================
@@ -379,7 +352,7 @@ class MultFx : public TImageCombinationFx
 	TDoubleParamP m_value;
 	TBoolParamP m_matte;
 
-public:
+  public:
 	MultFx() : m_value(0.0), m_matte(false)
 	{
 		bindParam(this, "value", m_value);
@@ -393,10 +366,7 @@ public:
 		TRop::mult(up, down, down, m_value->getValue(frame), m_matte->getValue());
 	}
 
-	TFxPort *getXsheetPort() const
-	{
-		return getInputPort(1);
-	}
+	TFxPort *getXsheetPort() const { return getInputPort(1); }
 };
 
 //==================================================================
@@ -407,11 +377,8 @@ class MinFx : public TImageCombinationFx
 
 	TBoolParamP m_matte;
 
-public:
-	MinFx() : m_matte(true)
-	{
-		bindParam(this, "matte", m_matte);
-	}
+  public:
+	MinFx() : m_matte(true) { bindParam(this, "matte", m_matte); }
 
 	bool requiresFullRect() { return true; }
 
@@ -420,10 +387,7 @@ public:
 		TRop::ropmin(up, down, down, m_matte->getValue());
 	}
 
-	TFxPort *getXsheetPort() const
-	{
-		return getInputPort(1);
-	}
+	TFxPort *getXsheetPort() const { return getInputPort(1); }
 };
 
 //==================================================================
@@ -432,16 +396,13 @@ class MaxFx : public TImageCombinationFx
 {
 	FX_DECLARATION(MaxFx)
 
-public:
+  public:
 	void process(const TRasterP &up, const TRasterP &down, double frame)
 	{
 		TRop::ropmax(up, down, down);
 	}
 
-	TFxPort *getXsheetPort() const
-	{
-		return getInputPort(1);
-	}
+	TFxPort *getXsheetPort() const { return getInputPort(1); }
 };
 
 //==================================================================
@@ -450,26 +411,23 @@ class LinearBurnFx : public TImageCombinationFx
 {
 	FX_DECLARATION(LinearBurnFx)
 
-public:
+  public:
 	void process(const TRasterP &up, const TRasterP &down, double frame)
 	{
 		TRop::linearburn(up, down, down);
 	}
 
-	TFxPort *getXsheetPort() const
-	{
-		return getInputPort(1);
-	}
+	TFxPort *getXsheetPort() const { return getInputPort(1); }
 };
 
 //==================================================================
 
-//This Fx is probably unused...!
+// This Fx is probably unused...!
 class OverlayFx : public TImageCombinationFx
 {
 	FX_DECLARATION(OverlayFx)
 
-public:
+  public:
 	OverlayFx() {}
 	~OverlayFx() {}
 
@@ -487,7 +445,7 @@ class BlendFx : public TImageCombinationFx
 
 	TDoubleParamP m_value;
 
-public:
+  public:
 	BlendFx() : m_value(0.0)
 	{
 		bindParam(this, "value", m_value);
@@ -504,10 +462,7 @@ public:
 		TRop::crossDissolve(up, down, down, matteValue);
 	}
 
-	TFxPort *getXsheetPort() const
-	{
-		return getInputPort(1);
-	}
+	TFxPort *getXsheetPort() const { return getInputPort(1); }
 };
 
 //******************************************************************************************
@@ -520,7 +475,7 @@ class InFx : public TBaseRasterFx
 
 	TRasterFxPort m_source, m_matte;
 
-public:
+  public:
 	InFx()
 	{
 		addInputPort("Source", m_source);
@@ -548,22 +503,21 @@ public:
 
 	void doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 	{
-		//This fx is not visible if either the source or the matte tiles are empty.
-		//It's because only source is visible, and only where matte is opaque.
+		// This fx is not visible if either the source or the matte tiles are empty.
+		// It's because only source is visible, and only where matte is opaque.
 		if (!(m_source.isConnected() && m_matte.isConnected()))
 			return;
 
 		TTile srcTile;
-		m_source->allocateAndCompute(srcTile, tile.m_pos, tile.getRaster()->getSize(), tile.getRaster(), frame, ri);
+		m_source->allocateAndCompute(srcTile, tile.m_pos, tile.getRaster()->getSize(),
+									 tile.getRaster(), frame, ri);
 
 		m_matte->compute(tile, frame, ri);
 
 		TRop::ropin(srcTile.getRaster(), tile.getRaster(), tile.getRaster());
 	}
 
-	void doDryCompute(TRectD &rect,
-					  double frame,
-					  const TRenderSettings &info)
+	void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info)
 	{
 		if (!(m_source.isConnected() && m_matte.isConnected()))
 			return;
@@ -605,7 +559,7 @@ class OutFx : public TBaseRasterFx
 
 	TRasterFxPort m_source, m_matte;
 
-public:
+  public:
 	OutFx()
 	{
 		addInputPort("Source", m_source);
@@ -639,16 +593,15 @@ public:
 		}
 
 		TTile srcTile;
-		m_source->allocateAndCompute(srcTile, tile.m_pos, tile.getRaster()->getSize(), tile.getRaster(), frame, ri);
+		m_source->allocateAndCompute(srcTile, tile.m_pos, tile.getRaster()->getSize(),
+									 tile.getRaster(), frame, ri);
 
 		m_matte->compute(tile, frame, ri);
 
 		TRop::ropout(srcTile.getRaster(), tile.getRaster(), tile.getRaster());
 	}
 
-	void doDryCompute(TRectD &rect,
-					  double frame,
-					  const TRenderSettings &info)
+	void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info)
 	{
 		if (!m_source.isConnected())
 			return;
@@ -676,7 +629,7 @@ class AtopFx : public TBaseRasterFx
 
 	TRasterFxPort m_up, m_dn;
 
-public:
+  public:
 	AtopFx()
 	{
 		addInputPort("Up", m_up);
@@ -721,16 +674,15 @@ public:
 		}
 
 		TTile upTile;
-		m_up->allocateAndCompute(upTile, tile.m_pos, tile.getRaster()->getSize(), tile.getRaster(), frame, ri);
+		m_up->allocateAndCompute(upTile, tile.m_pos, tile.getRaster()->getSize(), tile.getRaster(),
+								 frame, ri);
 
 		m_dn->compute(tile, frame, ri);
 
 		TRop::atop(upTile.getRaster(), tile.getRaster(), tile.getRaster());
 	}
 
-	void doDryCompute(TRectD &rect,
-					  double frame,
-					  const TRenderSettings &info)
+	void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info)
 	{
 		if (!m_dn.isConnected())
 			return;
@@ -763,7 +715,7 @@ FX_IDENTIFIER(MultFx, "multFx")
 FX_IDENTIFIER(InFx, "inFx")
 FX_IDENTIFIER(OutFx, "outFx")
 FX_IDENTIFIER(AtopFx, "atopFx")
-//FX_IDENTIFIER(XorFx,       "xorFx")
+// FX_IDENTIFIER(XorFx,       "xorFx")
 FX_IDENTIFIER(MinFx, "minFx")
 FX_IDENTIFIER(MaxFx, "maxFx")
 FX_IDENTIFIER(LinearBurnFx, "linearBurnFx")

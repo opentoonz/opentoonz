@@ -19,8 +19,7 @@
 // Toolbar
 //-----------------------------------------------------------------------------
 
-Toolbar::Toolbar(QWidget *parent, bool isVertical)
-	: QToolBar(parent)
+Toolbar::Toolbar(QWidget *parent, bool isVertical) : QToolBar(parent)
 {
 	// Fondamentale per lo style sheet
 	setObjectName("toolBar");
@@ -59,7 +58,8 @@ Toolbar::Toolbar(QWidget *parent, bool isVertical)
 	if (actionAdded)
 		addSeparator();
 	actionAdded = false;
-	actionAdded = addAction(CommandManager::instance()->getAction(T_ControlPointEditor)) || actionAdded;
+	actionAdded =
+		addAction(CommandManager::instance()->getAction(T_ControlPointEditor)) || actionAdded;
 	actionAdded = addAction(CommandManager::instance()->getAction(T_Pinch)) || actionAdded;
 	actionAdded = addAction(CommandManager::instance()->getAction(T_Pump)) || actionAdded;
 	actionAdded = addAction(CommandManager::instance()->getAction(T_Magnet)) || actionAdded;
@@ -89,7 +89,7 @@ Toolbar::Toolbar(QWidget *parent, bool isVertical)
 
 	addWidget(m_expandButton);
 
-	//toolbar is shrinked at the beginning
+	// toolbar is shrinked at the beginning
 	updateToolbar(false);
 
 	connect(m_expandButton, SIGNAL(toggled(bool)), this, SLOT(updateToolbar(bool)));
@@ -105,18 +105,15 @@ void Toolbar::updateToolbar(bool expand)
 					 CommandManager::instance()->getAction(T_Type));
 		insertAction(CommandManager::instance()->getAction(T_Hand),
 					 CommandManager::instance()->getAction(T_Rotate));
-		insertAction(m_sep2,
-					 CommandManager::instance()->getAction(T_Plastic));
+		insertAction(m_sep2, CommandManager::instance()->getAction(T_Plastic));
 		insertAction(CommandManager::instance()->getAction(T_Plastic),
 					 CommandManager::instance()->getAction(T_Hook));
 		insertAction(CommandManager::instance()->getAction(T_Hook),
 					 CommandManager::instance()->getAction(T_Tracker));
 		insertAction(CommandManager::instance()->getAction(T_Tracker),
 					 CommandManager::instance()->getAction(T_Skeleton));
-		insertAction(CommandManager::instance()->getAction(T_Skeleton),
-					 m_sep1);
-		insertAction(m_sep1,
-					 CommandManager::instance()->getAction(T_Cutter));
+		insertAction(CommandManager::instance()->getAction(T_Skeleton), m_sep1);
+		insertAction(m_sep1, CommandManager::instance()->getAction(T_Cutter));
 		insertAction(CommandManager::instance()->getAction(T_Cutter),
 					 CommandManager::instance()->getAction(T_Iron));
 		insertAction(CommandManager::instance()->getAction(T_Iron),
@@ -144,7 +141,8 @@ void Toolbar::updateToolbar(bool expand)
 		removeAction(CommandManager::instance()->getAction(T_Plastic));
 		removeAction(CommandManager::instance()->getAction(T_Rotate));
 		removeAction(m_sep1);
-		m_expandButton->setArrowType((orientation() == Qt::Vertical) ? Qt::DownArrow : Qt::RightArrow);
+		m_expandButton->setArrowType((orientation() == Qt::Vertical) ? Qt::DownArrow
+																	 : Qt::RightArrow);
 	}
 	update();
 }
@@ -176,7 +174,8 @@ void Toolbar::showEvent(QShowEvent *e)
 
 void Toolbar::hideEvent(QHideEvent *e)
 {
-	disconnect(TApp::instance()->getCurrentTool(), SIGNAL(toolSwitched()), this, SLOT(onToolChanged()));
+	disconnect(TApp::instance()->getCurrentTool(), SIGNAL(toolSwitched()), this,
+			   SLOT(onToolChanged()));
 }
 
 //-----------------------------------------------------------------------------

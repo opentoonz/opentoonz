@@ -17,7 +17,7 @@
 
 class DVAPI TMouseEvent
 {
-public:
+  public:
 	TPoint m_pos;
 	int m_pressure;
 	int m_status;
@@ -27,13 +27,14 @@ public:
 #ifdef MACOSX
 	bool isLockPressed() const;
 #endif
-	TMouseEvent() : m_pos(), m_pressure(0), m_status(0)
-	{
-	}
+	TMouseEvent() : m_pos(), m_pressure(0), m_status(0) {}
 	TMouseEvent(int x, int y) : m_pos(x, y), m_pressure(0), m_status(0) {}
 	TMouseEvent(const TPoint &p) : m_pos(p), m_pressure(0), m_status(0) {}
 
-	TMouseEvent(const TPoint &p, int pressure, int status) : m_pos(p), m_pressure(pressure), m_status(status) {}
+	TMouseEvent(const TPoint &p, int pressure, int status)
+		: m_pos(p), m_pressure(pressure), m_status(status)
+	{
+	}
 };
 
 #endif

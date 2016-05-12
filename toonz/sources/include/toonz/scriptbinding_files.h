@@ -16,7 +16,7 @@ class DVAPI FilePath : public Wrapper
 	Q_OBJECT
 	QString m_filePath;
 
-public:
+  public:
 	FilePath(const QString &filePath = "");
 	FilePath(const TFilePath &filePath);
 	~FilePath();
@@ -60,7 +60,8 @@ public:
 // helper functions
 
 // convert a string or a FilePath object into a TFilePath
-// if no conversion is possible it returns an error object, else it returns QScriptValue() and assign the conversion result to fp
+// if no conversion is possible it returns an error object, else it returns QScriptValue() and
+// assign the conversion result to fp
 QScriptValue checkFilePath(QScriptContext *context, const QScriptValue &value, TFilePath &fp);
 
 } // namespace TScriptBinding

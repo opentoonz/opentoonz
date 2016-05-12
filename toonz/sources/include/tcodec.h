@@ -19,20 +19,22 @@
 
 class DVAPI TRasterCodec
 {
-public:
+  public:
 	TRasterCodec(const std::string &name) : m_name(name) {}
 	virtual ~TRasterCodec() {}
 
-	//virtual int getMaxCompressionSize(int size) = 0;
-	//virtual void compress  (const TRasterP &inRas, int allocUnit, UCHAR** outData, TINT32 &outDataSize) = 0;
-	//virtual void decompress(const UCHAR* inData, TINT32 inDataSize, TRasterP &outRas) = 0;
+	// virtual int getMaxCompressionSize(int size) = 0;
+	// virtual void compress  (const TRasterP &inRas, int allocUnit, UCHAR** outData, TINT32
+	// &outDataSize) = 0;
+	// virtual void decompress(const UCHAR* inData, TINT32 inDataSize, TRasterP &outRas) = 0;
 
-	//virtual int getHeaderSize() = 0;
-	//virtual UCHAR *removeHeader(const UCHAR* inData, TINT32 inDataSize, TINT32 &outDataSize, int &lx, int &ly) = 0;
+	// virtual int getHeaderSize() = 0;
+	// virtual UCHAR *removeHeader(const UCHAR* inData, TINT32 inDataSize, TINT32 &outDataSize, int
+	// &lx, int &ly) = 0;
 
 	static TRasterCodec *create(const std::string &name);
 
-private:
+  private:
 	std::string m_name;
 };
 
@@ -41,19 +43,20 @@ private:
 class DVAPI TRasterCodecDummy : public TRasterCodec
 {
 
-public:
+  public:
 	TRasterCodecDummy(const std::string &name) : TRasterCodec(name) {}
 	~TRasterCodecDummy() {}
 
-	//int getMaxCompressionSize(int size);
-	//void compress(const TRasterP &inRas, int allocUnit, UCHAR** outData, TINT32 &outDataSize);
-	//void decompress(const UCHAR* inData, TINT32 inDataSize, TRasterP &outRas);
+	// int getMaxCompressionSize(int size);
+	// void compress(const TRasterP &inRas, int allocUnit, UCHAR** outData, TINT32 &outDataSize);
+	// void decompress(const UCHAR* inData, TINT32 inDataSize, TRasterP &outRas);
 
-	//int getHeaderSize();
+	// int getHeaderSize();
 
-	//UCHAR *removeHeader(const UCHAR* inData, TINT32 inDataSize, TINT32 &outDataSize, int &lx, int &ly);
+	// UCHAR *removeHeader(const UCHAR* inData, TINT32 inDataSize, TINT32 &outDataSize, int &lx, int
+	// &ly);
 
-	//static TRasterCodec *create(const std::string &name);
+	// static TRasterCodec *create(const std::string &name);
 };
 
 //------------------------------------------------------------------------------
@@ -61,19 +64,20 @@ public:
 class DVAPI TRasterCodecQTL : public TRasterCodec
 {
 
-public:
+  public:
 	TRasterCodecQTL(const std::string &name) : TRasterCodec(name) {}
 	~TRasterCodecQTL() {}
 
-	//int getMaxCompressionSize(int size);
-	//void compress  (const TRasterP &inRas, int allocUnit, UCHAR** outData, TINT32 &outDataSize);
-	//void decompress(const UCHAR* inData, TINT32 inDataSize, TRasterP &outRas);
+	// int getMaxCompressionSize(int size);
+	// void compress  (const TRasterP &inRas, int allocUnit, UCHAR** outData, TINT32 &outDataSize);
+	// void decompress(const UCHAR* inData, TINT32 inDataSize, TRasterP &outRas);
 
-	//UCHAR *removeHeader(const UCHAR* inData, TINT32 inDataSize, TINT32 &outDataSize, int &lx, int &ly);
+	// UCHAR *removeHeader(const UCHAR* inData, TINT32 inDataSize, TINT32 &outDataSize, int &lx, int
+	// &ly);
 
-	//int getHeaderSize();
+	// int getHeaderSize();
 
-	//static TRasterCodec *create(const std::string &name);
+	// static TRasterCodec *create(const std::string &name);
 };
 
 //------------------------------------------------------------------------------
@@ -106,7 +110,7 @@ private:
 
 class DVAPI TRasterCodecLz4 : public TRasterCodec
 {
-public:
+  public:
 	TRasterCodecLz4(const std::string &name, bool useCache);
 	~TRasterCodecLz4();
 
@@ -121,12 +125,12 @@ public:
 		m_raster = TRasterGR8P();
 	}
 
-private:
+  private:
 	TRasterGR8P m_raster;
 	std::string m_cacheId;
 	bool m_useCache;
 
-private:
+  private:
 	UINT doCompress(const TRasterP &inRas, int allocUnit, TRasterGR8P &outRas);
 };
 
@@ -134,7 +138,7 @@ private:
 
 class DVAPI TRasterCodecLZO : public TRasterCodec
 {
-public:
+  public:
 	TRasterCodecLZO(const std::string &name, bool useCache);
 	~TRasterCodecLZO();
 
@@ -149,12 +153,12 @@ public:
 		m_raster = TRasterGR8P();
 	}
 
-private:
+  private:
 	TRasterGR8P m_raster;
 	std::string m_cacheId;
 	bool m_useCache;
 
-private:
+  private:
 	UINT doCompress(const TRasterP &inRas, int allocUnit, TRasterGR8P &outRas);
 };
 

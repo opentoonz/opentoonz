@@ -20,7 +20,7 @@ inline unsigned short fgetUSHORT(FILE *chan)
 }
 
 /*
-inline unsigned short fgetULONG(FILE *chan) 
+inline unsigned short fgetULONG(FILE *chan)
 {
   int a = fgetc(chan);
   int b = fgetc(chan);
@@ -121,9 +121,10 @@ class TgaReader : public Tiio::Reader
 	typedef int (TgaReader::*SkipLineProc)(int count);
 	SkipLineProc m_skipLineProc;
 
-public:
+  public:
 	TgaReader()
-		: m_chan(0), m_readLineProc(&TgaReader::readNoLine), m_skipLineProc(&TgaReader::skipLines0), m_palette(0)
+		: m_chan(0), m_readLineProc(&TgaReader::readNoLine), m_skipLineProc(&TgaReader::skipLines0),
+		  m_palette(0)
 	{
 	}
 
@@ -140,7 +141,7 @@ public:
 	int skipNoLines(int count) { return 0; };
 	void skipBytes(int count)
 	{
-		//fseek(m_chan, count, SEEK_CUR); //inefficiente se count è piccolo
+		// fseek(m_chan, count, SEEK_CUR); //inefficiente se count è piccolo
 		for (int i = 0; i < count; i++)
 			getc(m_chan);
 	}
@@ -194,19 +195,14 @@ public:
 
 	Tiio::RowOrder getRowOrder() const
 	{
-		return ((m_header.ImageDescriptor >> 5) & 1) == 0
-				   ? Tiio::BOTTOM2TOP
-				   : Tiio::TOP2BOTTOM;
+		return ((m_header.ImageDescriptor >> 5) & 1) == 0 ? Tiio::BOTTOM2TOP : Tiio::TOP2BOTTOM;
 	}
 
 	void readLine(char *buffer, int x0, int x1, int shrink)
 	{
 		(this->*m_readLineProc)(buffer, x0, x1, shrink);
 	}
-	int skipLines(int count)
-	{
-		return (this->*m_skipLineProc)(count);
-	}
+	int skipLines(int count) { return (this->*m_skipLineProc)(count); }
 	void readPalette();
 
 	void readNoLine(char *buffer, int x0, int x1, int shrink) {}
@@ -258,15 +254,15 @@ void TgaReader::open(FILE *file)
 		prop->m_compressed.setValue(false);
 		switch (m_header.ImageTypeCode) {
 		case 0:
-			//cout << "NO IMAGE" << endl;
+			// cout << "NO IMAGE" << endl;
 			break;
 		case 1:
-			//cout << "Uncompressed Cmapped; pixelsize=" << m_header.ImagePixelSize << endl;
+			// cout << "Uncompressed Cmapped; pixelsize=" << m_header.ImagePixelSize << endl;
 			m_readLineProc = &TgaReader::readLineCmapped;
 			m_info.m_samplePerPixel = 4;
 			break;
 		case 2:
-			//cout << "Uncompressed RGB; pixelsize=" << m_header.ImagePixelSize << endl;
+			// cout << "Uncompressed RGB; pixelsize=" << m_header.ImagePixelSize << endl;
 			m_info.m_samplePerPixel = 4;
 			if (m_header.ImagePixelSize == 32) {
 				m_readLineProc = &TgaReader::readLineRGB32;
@@ -285,13 +281,13 @@ void TgaReader::open(FILE *file)
 			m_readLineProc = &TgaReader::readLineGR8;
 			break;
 		case 9:
-			//cout << "Compressed Cmapped; pixelsize=" << m_header.ImagePixelSize << endl;
+			// cout << "Compressed Cmapped; pixelsize=" << m_header.ImagePixelSize << endl;
 			prop->m_compressed.setValue(true);
 			m_readLineProc = &TgaReader::readLineCmappedRle;
 			m_info.m_samplePerPixel = 4;
 			break;
 		case 10:
-			//cout << "Compressed RGB; pixelsize=" << m_header.ImagePixelSize << endl;
+			// cout << "Compressed RGB; pixelsize=" << m_header.ImagePixelSize << endl;
 			prop->m_compressed.setValue(true);
 			m_info.m_samplePerPixel = 4;
 			if (m_header.ImagePixelSize == 32) {
@@ -311,7 +307,7 @@ void TgaReader::open(FILE *file)
 			m_readLineProc = &TgaReader::readLineGR8rle;
 			break;
 		default:;
-			//cout << "***Unknown***" << endl;
+			// cout << "***Unknown***" << endl;
 		}
 	}
 }
@@ -576,11 +572,8 @@ class TgaWriter : public Tiio::Writer
 	typedef void (TgaWriter::*WriteLineProc)(char *buffer);
 	WriteLineProc m_writeLineProc;
 
-public:
-	TgaWriter()
-		: m_chan(0), m_writeLineProc(&TgaWriter::writeNoLine)
-	{
-	}
+  public:
+	TgaWriter() : m_chan(0), m_writeLineProc(&TgaWriter::writeNoLine) {}
 
 	void open(FILE *file, const TImageInfo &info)
 	{
@@ -600,35 +593,25 @@ public:
 		m_header.Width = m_info.m_lx;
 		m_header.Height = m_info.m_ly;
 
-		std::wstring pixelSizeW = ((TEnumProperty *)(m_properties->getProperty("Bits Per Pixel")))->getValue().substr(0, 2);
+		std::wstring pixelSizeW = ((TEnumProperty *)(m_properties->getProperty("Bits Per Pixel")))
+									  ->getValue()
+									  .substr(0, 2);
 		if (pixelSizeW == L"16") {
 			m_header.ImagePixelSize = 16;
-			m_writeLineProc = compressed
-								  ? &TgaWriter::writeLine16rle
-								  : &TgaWriter::writeLine16;
+			m_writeLineProc = compressed ? &TgaWriter::writeLine16rle : &TgaWriter::writeLine16;
 		} else if (pixelSizeW == L"24") {
 			m_header.ImagePixelSize = 24;
-			m_writeLineProc = compressed
-								  ? &TgaWriter::writeLine24rle
-								  : &TgaWriter::writeLine24;
+			m_writeLineProc = compressed ? &TgaWriter::writeLine24rle : &TgaWriter::writeLine24;
 		} else {
 			m_header.ImagePixelSize = 32;
-			m_writeLineProc = compressed
-								  ? &TgaWriter::writeLine32rle
-								  : &TgaWriter::writeLine32;
+			m_writeLineProc = compressed ? &TgaWriter::writeLine32rle : &TgaWriter::writeLine32;
 		}
 		writeTgaHeader(m_header, m_chan);
 	}
 
-	void flush()
-	{
-		fflush(m_chan);
-	}
+	void flush() { fflush(m_chan); }
 
-	~TgaWriter()
-	{
-		delete m_properties;
-	}
+	~TgaWriter() { delete m_properties; }
 
 	inline void fputPixel32(const TPixel32 &pix, FILE *chan)
 	{
@@ -660,10 +643,7 @@ public:
 	void writeLine24rle(char *buffer);
 	void writeLine32rle(char *buffer);
 
-	void writeLine(char *buffer)
-	{
-		(this->*m_writeLineProc)(buffer);
-	}
+	void writeLine(char *buffer) { (this->*m_writeLineProc)(buffer); }
 };
 
 //------------------------------------------------------------

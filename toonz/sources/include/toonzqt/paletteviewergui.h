@@ -54,7 +54,7 @@ namespace PaletteViewerGUI
 // class for managing the palette's default style chip size
 class DVAPI ChipSizeManager
 {
-public:
+  public:
 	int chipSize_Palette;
 	int chipSize_Cleanup;
 	int chipSize_Studio;
@@ -64,50 +64,42 @@ public:
 		return &_instance;
 	}
 
-private:
-	ChipSizeManager() : chipSize_Palette(2),
-						chipSize_Cleanup(2),
-						chipSize_Studio(2)
-	{
-	}
+  private:
+	ChipSizeManager() : chipSize_Palette(2), chipSize_Cleanup(2), chipSize_Studio(2) {}
 };
 
 enum PaletteViewType //! Possible palette contents of a Palette Viewer.
-{
-	LEVEL_PALETTE,   //!< Content palette is from a level.
-	CLEANUP_PALETTE, //!< Content palette is from cleanup settings.
-	STUDIO_PALETTE   //!< Content palette is from a Studio Palette panel.
+{ LEVEL_PALETTE,	 //!< Content palette is from a level.
+  CLEANUP_PALETTE,   //!< Content palette is from cleanup settings.
+  STUDIO_PALETTE	 //!< Content palette is from a Studio Palette panel.
 };
 
 //****************************************************************************
 //    PageViewer  declaration
 //****************************************************************************
 
-class DVAPI PageViewer : public QFrame,
-						 public TSelection::View
+class DVAPI PageViewer : public QFrame, public TSelection::View
 {
 	Q_OBJECT
 
-	QColor m_textColor; //text color used for list view
+	QColor m_textColor; // text color used for list view
 	Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
 
-public:
-	enum ViewMode //! Possible view modes for a Palette Viewer.
-	{
-		SmallChips,		   //!< Small icons.
-		MediumChips,	   //!< Medium icons.
-		LargeChips,		   //!< Large icons with style names.
-		List,			   //!< Top-down list of all icons.
-		SmallChipsWithName //!< Small icons with overlayed style names (if user-defined).
+  public:
+	enum ViewMode		 //! Possible view modes for a Palette Viewer.
+	{ SmallChips,		 //!< Small icons.
+	  MediumChips,		 //!< Medium icons.
+	  LargeChips,		 //!< Large icons with style names.
+	  List,				 //!< Top-down list of all icons.
+	  SmallChipsWithName //!< Small icons with overlayed style names (if user-defined).
 	};
 
 	// for displaying the linked style name from studio palette
-	enum NameDisplayMode { Style,
-						   Original,
-						   StyleAndOriginal };
+	enum NameDisplayMode { Style, Original, StyleAndOriginal };
 
-public:
-	PageViewer(QWidget *parent = 0, PaletteViewType viewType = LEVEL_PALETTE, bool hasPasteColors = true);
+  public:
+	PageViewer(QWidget *parent = 0, PaletteViewType viewType = LEVEL_PALETTE,
+			   bool hasPasteColors = true);
 	~PageViewer();
 
 	void setPaletteHandle(TPaletteHandle *paletteHandle);
@@ -128,7 +120,10 @@ public:
 	void setPage(TPalette::Page *page);
 	TPalette::Page *getPage() const { return m_page; }
 
-	void setChangeStyleCommand(ChangeStyleCommand *changeStyleCommand) { m_changeStyleCommand = changeStyleCommand; };
+	void setChangeStyleCommand(ChangeStyleCommand *changeStyleCommand)
+	{
+		m_changeStyleCommand = changeStyleCommand;
+	};
 	ChangeStyleCommand *getChangeStyleCommand() const { return m_changeStyleCommand; }
 
 	int getChipCount() const;
@@ -152,13 +147,14 @@ public:
 	TStyleSelection *getSelection() const { return m_styleSelection; }
 	void clearSelection();
 
-	// update the "lock"s for commands when the StyleSelection becomes current and when the current palettte changed
+	// update the "lock"s for commands when the StyleSelection becomes current and when the current
+	// palettte changed
 	void updateCommandLocks();
 
 	void setTextColor(const QColor &color) { m_textColor = color; }
 	QColor getTextColor() const { return m_textColor; }
 
-public slots:
+  public slots:
 
 	void computeSize();
 	void onFrameChanged();
@@ -167,7 +163,7 @@ public slots:
 	void addNewColor();
 	void addNewPage();
 
-protected:
+  protected:
 	QSize getChipSize() const;
 	void drawColorChip(QPainter &p, QRect &chipRect, TColorStyle *style);
 	void drawColorName(QPainter &p, QRect &nameRect, TColorStyle *style, int styleIndex);
@@ -202,13 +198,13 @@ protected:
 	void zoomInChip();
 	void zoomOutChip();
 
-protected slots:
+  protected slots:
 
 	void toggleLink();
 	void eraseToggleLink();
 	void removeLink();
 
-private:
+  private:
 	DVGui::LineEdit *m_renameTextField;
 	QPoint m_dragStartPosition;
 
@@ -232,7 +228,7 @@ private:
 	QShortcut *m_zoomOutShortCut;
 	StyleNameEditor *m_styleNameEditor;
 
-signals:
+  signals:
 	void changeWindowTitleSignal();
 };
 
@@ -244,24 +240,21 @@ class DVAPI PaletteTabBar : public QTabBar
 {
 	Q_OBJECT
 
-public:
+  public:
 	PaletteTabBar(QWidget *parent, bool hasPageCommand);
 
-	void setPageViewer(PageViewer *pageViewer)
-	{
-		m_pageViewer = pageViewer;
-	}
+	void setPageViewer(PageViewer *pageViewer) { m_pageViewer = pageViewer; }
 
-public slots:
+  public slots:
 
 	void updateTabName();
 
-signals:
+  signals:
 
 	void tabTextChanged(int index);
 	void movePage(int srcIndex, int dstIndex);
 
-protected:
+  protected:
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseDoubleClickEvent(QMouseEvent *event);
@@ -269,7 +262,7 @@ protected:
 	void dragMoveEvent(QDragMoveEvent *event);
 	void dropEvent(QDropEvent *event);
 
-private:
+  private:
 	DVGui::LineEdit *m_renameTextField;
 	int m_renameTabIndex;
 	PageViewer *m_pageViewer;
@@ -294,7 +287,7 @@ class DVAPI PaletteIconWidget : public QWidget
 {
 	Q_OBJECT
 
-public:
+  public:
 #if QT_VERSION >= 0x050500
 	PaletteIconWidget(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
@@ -302,11 +295,11 @@ public:
 #endif
 	~PaletteIconWidget();
 
-signals:
+  signals:
 
 	void startDrag(); //!< Emitted \a once whenever the icon is sensibly dragged
 					  //!  by the user.
-protected:
+  protected:
 	void paintEvent(QPaintEvent *);
 
 	void enterEvent(QEvent *event);
@@ -315,7 +308,7 @@ protected:
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 
-private:
+  private:
 	QPoint m_mousePressPos; //!< Mouse position at mouse press.
 	bool m_isOver,			//!< Whether mouse is hovering on this widget.
 		m_dragged;			//!< Whether user has started a drag operation on the icon.

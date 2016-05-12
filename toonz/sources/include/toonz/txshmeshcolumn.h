@@ -23,7 +23,7 @@ class DVAPI TXshMeshColumn : public TXshCellColumn
 {
 	PERSIST_DECLARATION(TXshMeshColumn)
 
-public:
+  public:
 	TXshMeshColumn();
 
 	TXshColumn::ColumnType getColumnType() const { return eMeshType; }
@@ -36,7 +36,7 @@ public:
 	void loadData(TIStream &is);
 	void saveData(TOStream &is);
 
-private:
+  private:
 	// Not copiable
 	TXshMeshColumn(const TXshMeshColumn &);
 	TXshMeshColumn &operator=(const TXshMeshColumn &);

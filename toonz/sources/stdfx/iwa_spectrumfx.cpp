@@ -38,8 +38,7 @@ void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame)
 	float refractiveIndex = (float)m_refractiveIndex->getValue(frame);
 	float thickMax = (float)m_thickMax->getValue(frame);
 	float thickMin = (float)m_thickMin->getValue(frame);
-	float rgbGamma[3] = {(float)m_RGamma->getValue(frame),
-						 (float)m_GGamma->getValue(frame),
+	float rgbGamma[3] = {(float)m_RGamma->getValue(frame), (float)m_GGamma->getValue(frame),
 						 (float)m_BGamma->getValue(frame)};
 	float lensFactor = (float)m_lensFactor->getValue(frame);
 
@@ -119,7 +118,8 @@ void Iwa_SpectrumFx::calcBubbleMap(float3 *bubbleColor, double frame)
 
 //------------------------------------
 Iwa_SpectrumFx::Iwa_SpectrumFx()
-	: m_intensity(1.0), m_refractiveIndex(1.25), m_thickMax(1.0), m_thickMin(0.0), m_RGamma(1.0), m_GGamma(1.0), m_BGamma(1.0), m_lensFactor(1.0), m_lightThres(1.0), m_lightIntensity(1.0)
+	: m_intensity(1.0), m_refractiveIndex(1.25), m_thickMax(1.0), m_thickMin(0.0), m_RGamma(1.0),
+	  m_GGamma(1.0), m_BGamma(1.0), m_lensFactor(1.0), m_lightThres(1.0), m_lightIntensity(1.0)
 {
 	addInputPort("Source", m_input);
 	addInputPort("Light", m_light);
@@ -147,9 +147,7 @@ Iwa_SpectrumFx::Iwa_SpectrumFx()
 }
 
 //------------------------------------
-void Iwa_SpectrumFx::doCompute(TTile &tile,
-							   double frame,
-							   const TRenderSettings &settings)
+void Iwa_SpectrumFx::doCompute(TTile &tile, double frame, const TRenderSettings &settings)
 {
 	if (!m_input.isConnected())
 		return;
@@ -187,29 +185,23 @@ void Iwa_SpectrumFx::doCompute(TTile &tile,
 	{
 		if (ras32) {
 			if (lightRas)
-				convertRasterWithLight<TRaster32P, TPixel32>(ras32,
-															 dim,
-															 bubbleColor,
-															 (TRaster32P)lightRas,
-															 (float)m_lightThres->getValue(frame),
-															 (float)m_lightIntensity->getValue(frame));
+				convertRasterWithLight<TRaster32P, TPixel32>(
+					ras32, dim, bubbleColor, (TRaster32P)lightRas,
+					(float)m_lightThres->getValue(frame), (float)m_lightIntensity->getValue(frame));
 			else
 				convertRaster<TRaster32P, TPixel32>(ras32, dim, bubbleColor);
 		} else if (ras64) {
 			if (lightRas)
-				convertRasterWithLight<TRaster64P, TPixel64>(ras64,
-															 dim,
-															 bubbleColor,
-															 (TRaster64P)lightRas,
-															 (float)m_lightThres->getValue(frame),
-															 (float)m_lightIntensity->getValue(frame));
+				convertRasterWithLight<TRaster64P, TPixel64>(
+					ras64, dim, bubbleColor, (TRaster64P)lightRas,
+					(float)m_lightThres->getValue(frame), (float)m_lightIntensity->getValue(frame));
 			else
 				convertRaster<TRaster64P, TPixel64>(ras64, dim, bubbleColor);
 		}
 	}
 
 	//メモリ解放
-	//brightness_ras->unlock();
+	// brightness_ras->unlock();
 	bubbleColor_ras->unlock();
 	if (lightRas)
 		lightRas->unlock();
@@ -217,9 +209,7 @@ void Iwa_SpectrumFx::doCompute(TTile &tile,
 
 //------------------------------------
 template <typename RASTER, typename PIXEL>
-void Iwa_SpectrumFx::convertRaster(const RASTER ras,
-								   TDimensionI dim,
-								   float3 *bubbleColor)
+void Iwa_SpectrumFx::convertRaster(const RASTER ras, TDimensionI dim, float3 *bubbleColor)
 {
 	float rr, gg, bb, aa;
 	float spec_r, spec_g, spec_b;
@@ -251,12 +241,9 @@ void Iwa_SpectrumFx::convertRaster(const RASTER ras,
 				int index = (int)(brightness * 255.0f);
 				float ratio = brightness * 255.0f - (float)index;
 
-				spec_r = bubbleColor[index].x * (1.0f - ratio) +
-						 bubbleColor[index + 1].x * ratio;
-				spec_g = bubbleColor[index].y * (1.0f - ratio) +
-						 bubbleColor[index + 1].y * ratio;
-				spec_b = bubbleColor[index].z * (1.0f - ratio) +
-						 bubbleColor[index + 1].z * ratio;
+				spec_r = bubbleColor[index].x * (1.0f - ratio) + bubbleColor[index + 1].x * ratio;
+				spec_g = bubbleColor[index].y * (1.0f - ratio) + bubbleColor[index + 1].y * ratio;
+				spec_b = bubbleColor[index].z * (1.0f - ratio) + bubbleColor[index + 1].z * ratio;
 				spec_r *= aa;
 				spec_g *= aa;
 				spec_b *= aa;
@@ -265,11 +252,14 @@ void Iwa_SpectrumFx::convertRaster(const RASTER ras,
 			float val;
 			/*- チャンネル範囲にクランプ -*/
 			val = spec_r * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->r = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->r = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = spec_g * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->g = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->g = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = spec_b * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->b = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->b = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 
 			pix++;
 		}
@@ -278,11 +268,8 @@ void Iwa_SpectrumFx::convertRaster(const RASTER ras,
 
 //------------------------------------
 template <typename RASTER, typename PIXEL>
-void Iwa_SpectrumFx::convertRasterWithLight(const RASTER ras,
-											TDimensionI dim,
-											float3 *bubbleColor,
-											const RASTER lightRas,
-											float lightThres,
+void Iwa_SpectrumFx::convertRasterWithLight(const RASTER ras, TDimensionI dim, float3 *bubbleColor,
+											const RASTER lightRas, float lightThres,
 											float lightIntensity)
 {
 	float rr, gg, bb, aa;
@@ -318,18 +305,14 @@ void Iwa_SpectrumFx::convertRasterWithLight(const RASTER ras,
 				int index = (int)(brightness * 255.0f);
 				float ratio = brightness * 255.0f - (float)index;
 
-				spec_r = bubbleColor[index].x * (1.0f - ratio) +
-						 bubbleColor[index + 1].x * ratio;
-				spec_g = bubbleColor[index].y * (1.0f - ratio) +
-						 bubbleColor[index + 1].y * ratio;
-				spec_b = bubbleColor[index].z * (1.0f - ratio) +
-						 bubbleColor[index + 1].z * ratio;
+				spec_r = bubbleColor[index].x * (1.0f - ratio) + bubbleColor[index + 1].x * ratio;
+				spec_g = bubbleColor[index].y * (1.0f - ratio) + bubbleColor[index + 1].y * ratio;
+				spec_b = bubbleColor[index].z * (1.0f - ratio) + bubbleColor[index + 1].z * ratio;
 			}
 
 			/*- ここで、Light画像とのスクリーン合成を行う -*/
 			float HDR_Factor;
-			if (aa <= lightThres ||
-				lightThres == 1.0f)
+			if (aa <= lightThres || lightThres == 1.0f)
 				HDR_Factor = 0.0;
 			else
 				HDR_Factor = lightIntensity * (aa - lightThres) / (1.0 - lightThres);
@@ -338,12 +321,12 @@ void Iwa_SpectrumFx::convertRasterWithLight(const RASTER ras,
 			float light_g = (float)light_pix->g / (float)PIXEL::maxChannelValue;
 			float light_b = (float)light_pix->b / (float)PIXEL::maxChannelValue;
 			/*- スクリーン合成結果と虹色をHDR_Factorで混ぜる -*/
-			spec_r = (1.0f - HDR_Factor) * spec_r +
-					 HDR_Factor * (spec_r + light_r - spec_r * light_r);
-			spec_g = (1.0f - HDR_Factor) * spec_g +
-					 HDR_Factor * (spec_g + light_g - spec_g * light_g);
-			spec_b = (1.0f - HDR_Factor) * spec_b +
-					 HDR_Factor * (spec_b + light_b - spec_b * light_b);
+			spec_r =
+				(1.0f - HDR_Factor) * spec_r + HDR_Factor * (spec_r + light_r - spec_r * light_r);
+			spec_g =
+				(1.0f - HDR_Factor) * spec_g + HDR_Factor * (spec_g + light_g - spec_g * light_g);
+			spec_b =
+				(1.0f - HDR_Factor) * spec_b + HDR_Factor * (spec_b + light_b - spec_b * light_b);
 
 			spec_r *= aa;
 			spec_g *= aa;
@@ -353,11 +336,14 @@ void Iwa_SpectrumFx::convertRasterWithLight(const RASTER ras,
 			float val;
 			/*- チャンネル範囲にクランプ -*/
 			val = spec_r * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->r = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->r = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = spec_g * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->g = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->g = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = spec_b * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->b = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->b = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 
 			pix->m = light_pix->m;
 
@@ -371,13 +357,9 @@ void Iwa_SpectrumFx::convertRasterWithLight(const RASTER ras,
  素材タイルを０〜１に正規化して格納
 ------------------------------------*/
 template <typename RASTER, typename PIXEL>
-void Iwa_SpectrumFx::setSourceRasters(
-	const RASTER ras,
-	float4 *in_out_tile_host,
-	const RASTER light_ras,
-	float4 *light_host,
-	TDimensionI dim,
-	bool useLight)
+void Iwa_SpectrumFx::setSourceRasters(const RASTER ras, float4 *in_out_tile_host,
+									  const RASTER light_ras, float4 *light_host, TDimensionI dim,
+									  bool useLight)
 {
 
 	float4 *chann_p = in_out_tile_host;
@@ -410,9 +392,7 @@ void Iwa_SpectrumFx::setSourceRasters(
  出力結果をChannel値に変換してタイルに格納
 ------------------------------------*/
 template <typename RASTER, typename PIXEL>
-void Iwa_SpectrumFx::outputRasters(const RASTER outRas,
-								   float4 *in_out_tile_host,
-								   TDimensionI dim)
+void Iwa_SpectrumFx::outputRasters(const RASTER outRas, float4 *in_out_tile_host, TDimensionI dim)
 {
 	float4 *chann_p = in_out_tile_host;
 	for (int j = 0; j < dim.ly; j++) {
@@ -420,13 +400,17 @@ void Iwa_SpectrumFx::outputRasters(const RASTER outRas,
 		for (int i = 0; i < dim.lx; i++) {
 			float val;
 			val = (*chann_p).x * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->r = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->r = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chann_p).y * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->g = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->g = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chann_p).z * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->b = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->b = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			val = (*chann_p).w * (float)PIXEL::maxChannelValue + 0.5f;
-			pix->m = (typename PIXEL::Channel)((val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
+			pix->m = (typename PIXEL::Channel)(
+				(val > (float)PIXEL::maxChannelValue) ? (float)PIXEL::maxChannelValue : val);
 			pix++;
 			chann_p++;
 		}
@@ -435,9 +419,7 @@ void Iwa_SpectrumFx::outputRasters(const RASTER outRas,
 
 //------------------------------------
 
-bool Iwa_SpectrumFx::doGetBBox(double frame,
-							   TRectD &bBox,
-							   const TRenderSettings &info)
+bool Iwa_SpectrumFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 {
 	if (!m_input.isConnected()) {
 		bBox = TRectD();
@@ -448,8 +430,7 @@ bool Iwa_SpectrumFx::doGetBBox(double frame,
 
 //------------------------------------
 
-bool Iwa_SpectrumFx::canHandle(const TRenderSettings &info,
-							   double frame)
+bool Iwa_SpectrumFx::canHandle(const TRenderSettings &info, double frame)
 {
 	return true;
 }

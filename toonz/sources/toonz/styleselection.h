@@ -20,10 +20,11 @@ class TStyleSelection : public TSelection
 	int m_pageIndex;
 	std::set<int> m_styleIndicesInPage;
 
-public:
+  public:
 	TStyleSelection();
 	TStyleSelection(TStyleSelection *styleSelection)
-		: m_palette(styleSelection->getPalette()), m_pageIndex(styleSelection->getPageIndex()), m_styleIndicesInPage(styleSelection->getIndicesInPage())
+		: m_palette(styleSelection->getPalette()), m_pageIndex(styleSelection->getPageIndex()),
+		  m_styleIndicesInPage(styleSelection->getIndicesInPage())
 	{
 	}
 	~TStyleSelection();
@@ -35,18 +36,9 @@ public:
 	void selectNone();
 	bool isEmpty() const;
 	int getStyleCount() const;
-	const TPaletteP &getPalette() const
-	{
-		return m_palette;
-	}
-	int getPageIndex() const
-	{
-		return m_pageIndex;
-	}
-	const std::set<int> &getIndicesInPage() const
-	{
-		return m_styleIndicesInPage;
-	}
+	const TPaletteP &getPalette() const { return m_palette; }
+	int getPageIndex() const { return m_pageIndex; }
+	const std::set<int> &getIndicesInPage() const { return m_styleIndicesInPage; }
 
 	// commands
 	void cutStyles();
@@ -60,14 +52,11 @@ public:
 	void enableCommands();
 
 	// pageIndex, indicesInPage, paletteGlobalName --> byte array
-	static QByteArray toByteArray(int pageIndex,
-								  const std::set<int> &indicesInPage,
+	static QByteArray toByteArray(int pageIndex, const std::set<int> &indicesInPage,
 								  const QString paletteGlobalName);
 
 	// pageIndex, indicesInPage, paletteGlobalName <-- byte array
-	static void fromByteArray(QByteArray &byteArray,
-							  int &pageIndex,
-							  std::set<int> &indicesInPage,
+	static void fromByteArray(QByteArray &byteArray, int &pageIndex, std::set<int> &indicesInPage,
 							  QString &paletteGlobalName);
 
 	// selection (pageIndex, indicesInPage) -> byte array
@@ -76,4 +65,4 @@ public:
 	static const char *getMimeType();
 };
 
-#endif //STYLESELECTION_INCLUDED
+#endif // STYLESELECTION_INCLUDED

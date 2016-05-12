@@ -12,7 +12,7 @@
 #include <QSet>
 #include <set>
 
-//forward declaration
+// forward declaration
 class TXsheetHandle;
 class TFxHandle;
 class SchematicLink;
@@ -41,7 +41,7 @@ class FxSelection : public QObject, public TSelection
 
 	FxSchematicScene *m_schematicScene;
 
-public:
+  public:
 	FxSelection();
 	FxSelection(const FxSelection &src);
 	~FxSelection();
@@ -53,7 +53,10 @@ public:
 	void enableCommands();
 
 	//! Return true if the selection is empty
-	bool isEmpty() const { return m_selectedFxs.empty() && m_selectedLinks.empty() && m_selectedColIndexes.isEmpty(); }
+	bool isEmpty() const
+	{
+		return m_selectedFxs.empty() && m_selectedLinks.empty() && m_selectedColIndexes.isEmpty();
+	}
 
 	//! Empty the selection
 	void selectNone()
@@ -82,7 +85,8 @@ public:
 	bool isSelected(TFxP fx) const;
 	//! Returns true if the given \b columnIndex is selected.
 	bool isSelected(int columnIndex) const;
-	//! Returns true if the QPair<TFxP,TFxP> of the fxs that bounds the given \b link is contained in the
+	//! Returns true if the QPair<TFxP,TFxP> of the fxs that bounds the given \b link is contained
+	//! in the
 	//! m_selectedLinks container.
 	bool isSelected(SchematicLink *link);
 
@@ -96,7 +100,7 @@ public:
 	//! The size is the number of fxs and link selected.
 	int size() { return m_selectedFxs.size() + m_selectedLinks.size(); }
 
-	//Commands
+	// Commands
 
 	//! Calls the TFxCommand::deleteSelection() to remove selected links or fxs.
 	void deleteSelection();
@@ -105,19 +109,23 @@ public:
 	//! Copy selected fxs in the clipboard and alls the TFxCommand::deleteSelection()
 	//! to remove selected links or fxs.
 	void cutSelection();
-	//! Get fxs from the clipboards and calls the TFxCommand::pasteFxs(const QList<TFxP> &fxs, TXsheetHandle*)
+	//! Get fxs from the clipboards and calls the TFxCommand::pasteFxs(const QList<TFxP> &fxs,
+	//! TXsheetHandle*)
 	//! to insert fxs in the scene.
 	void pasteSelection();
 
-	//! Get fxs from the clipboards and calls the TFxCommand::insertPasteFxs(const QList<TFxP> &fxs, TXsheetHandle*)
+	//! Get fxs from the clipboards and calls the TFxCommand::insertPasteFxs(const QList<TFxP> &fxs,
+	//! TXsheetHandle*)
 	//! to insert fxs in the scene.
 	//! Fxs are pasted only if they are connected!
 	bool insertPasteSelection();
-	//! Get fxs from the clipboards and calls the TFxCommand::addPasteFxs(const QList<TFxP> &fxs, TXsheetHandle*)
+	//! Get fxs from the clipboards and calls the TFxCommand::addPasteFxs(const QList<TFxP> &fxs,
+	//! TXsheetHandle*)
 	//! to insert fxs in the scene.
 	//! Fxs are pasted only if they are connected!
 	bool addPasteSelection();
-	//! Get fxs from the clipboards and calls the TFxCommand::replacePasteFxs(const QList<TFxP> &fxs, TXsheetHandle*)
+	//! Get fxs from the clipboards and calls the TFxCommand::replacePasteFxs(const QList<TFxP>
+	//! &fxs, TXsheetHandle*)
 	//! to insert fxs in the scene.
 	//! Fxs are pasted only if they are connected!
 	bool replacePasteSelection();
@@ -132,9 +140,12 @@ public:
 	//! A selection is connected if nodes and links selected create a connected graph
 	bool isConnected();
 
-	void setFxSchematicScene(FxSchematicScene *schematicScene) { m_schematicScene = schematicScene; }
+	void setFxSchematicScene(FxSchematicScene *schematicScene)
+	{
+		m_schematicScene = schematicScene;
+	}
 
-private:
+  private:
 	// not implemented
 	FxSelection &operator=(const FxSelection &);
 
@@ -143,7 +154,7 @@ private:
 	void visitFx(TFx *fx, QList<TFx *> &visitedFxs);
 	bool areLinked(TFx *outFx, TFx *inFx);
 
-signals:
+  signals:
 	void doCollapse(const QList<TFxP> &);
 	void doExplodeChild(const QList<TFxP> &);
 };

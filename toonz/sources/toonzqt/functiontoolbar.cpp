@@ -23,18 +23,18 @@
 /*
    * two states: curve_defined / curve_not_defined
 
-   * three widgets: value_fld, frame_nav, keyframe_nav 
-                    (if curve_not_defined only keyframe_nav is visible)
+   * three widgets: value_fld, frame_nav, keyframe_nav
+					(if curve_not_defined only keyframe_nav is visible)
 
    * user actions
 
-     - value_fld changed / keyframe_nav changed (key icon) => modify current curve
-     - frame_nav changed / keyframe_nav changed (arrows) => modify the 'extern' frame
+	 - value_fld changed / keyframe_nav changed (key icon) => modify current curve
+	 - frame_nav changed / keyframe_nav changed (arrows) => modify the 'extern' frame
 
    * 'extern' events:
 
-     - 'extern' frame changed => update fields
-     - curve selected => update fields (and possibly change status)
+	 - 'extern' frame changed => update fields
+	 - curve selected => update fields (and possibly change status)
 */
 
 //=========================================================================
@@ -84,7 +84,8 @@ FunctionToolbar::FunctionToolbar(QWidget *parent)
 	addAction(toggleAction);
 
 	bool ret = connect(m_valueFld, SIGNAL(valueChanged()), this, SLOT(onValueFieldChanged()));
-	ret = ret && connect(m_frameNavigator, SIGNAL(frameSwitched()), this, SLOT(onNavFrameSwitched()));
+	ret =
+		ret && connect(m_frameNavigator, SIGNAL(frameSwitched()), this, SLOT(onNavFrameSwitched()));
 	ret = ret && connect(toggleAction, SIGNAL(triggered()), this, SIGNAL(numericalColumnToggled()));
 
 	m_valueFldAction->setVisible(false);
@@ -106,11 +107,8 @@ FunctionToolbar::~FunctionToolbar()
 
 bool FunctionToolbar::anyWidgetHasFocus()
 {
-	return hasFocus() ||
-		   m_valueToolbar->hasFocus() ||
-		   m_keyframeToolbar->hasFocus() ||
-		   m_valueFld->hasFocus() ||
-		   m_frameNavigator->anyWidgetHasFocus() ||
+	return hasFocus() || m_valueToolbar->hasFocus() || m_keyframeToolbar->hasFocus() ||
+		   m_valueFld->hasFocus() || m_frameNavigator->anyWidgetHasFocus() ||
 		   m_keyframeNavigator->hasFocus();
 }
 

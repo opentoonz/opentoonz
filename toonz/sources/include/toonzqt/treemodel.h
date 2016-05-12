@@ -32,10 +32,10 @@ class DVAPI TreeModel : public QAbstractItemModel
 {
 	Q_OBJECT
 
-public:
+  public:
 	class DVAPI Item
 	{
-	public:
+	  public:
 		Item();
 		virtual ~Item();
 
@@ -82,7 +82,7 @@ public:
 
 		QModelIndex createIndex();
 
-	private:
+	  private:
 		// update children data (e.g.: parent, model, depth and row)
 		void updateChild(Item *child, int row);
 		void updateChildren(); // Note: is not ricursive, i.e. doesn't call itself on children
@@ -94,9 +94,10 @@ public:
 		int m_row;
 		bool m_opened;
 
-	public:
-		// int index() const {return (m_parent)?m_parent->m_childItems.indexOf(const_cast<Item*>(this)):0;}
-	}; //class Item
+	  public:
+		// int index() const {return
+		// (m_parent)?m_parent->m_childItems.indexOf(const_cast<Item*>(this)):0;}
+	}; // class Item
 
 	TreeModel(TreeView *parent = 0);
 	virtual ~TreeModel();
@@ -105,11 +106,11 @@ public:
 
 	TreeView *getView() { return m_view; }
 
-public slots:
+  public slots:
 	virtual void onExpanded(const QModelIndex &index);
 	virtual void onCollapsed(const QModelIndex &index);
 
-	//!to update the model:
+	//! to update the model:
 	//!   beginRefresh(),
 	//!   Item::setChildren() and/or Item::appendChild() and/or setRootItem(),
 	//!   endRefresh().
@@ -127,15 +128,15 @@ public slots:
 
 	void setRowHidden(int row, const QModelIndex &parent, bool hide);
 
-protected:
+  protected:
 	void setRootItem(Item *rootItem);
 	Item *getRootItem() const { return m_rootItem; }
 
-private:
+  private:
 	Item *m_rootItem;
 	QList<Item *> m_itemsToDelete;
 
-protected:
+  protected:
 	TreeView *m_view;
 };
 
@@ -146,24 +147,26 @@ class DVAPI TreeView : public QTreeView
 	Q_OBJECT
 	bool m_dragging;
 
-public:
+  public:
 	TreeView(QWidget *parent);
 
-protected:
+  protected:
 	/*
   class Delegate : public QItemDelegate
-  { 
-  public: 
-    Delegate(TreeView *parent) : QItemDelegate(parent), m_treeView(parent) {}
-    bool editorEvent(QEvent *e, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
+  {
+  public:
+	Delegate(TreeView *parent) : QItemDelegate(parent), m_treeView(parent) {}
+	bool editorEvent(QEvent *e, QAbstractItemModel *model, const QStyleOptionViewItem &option, const
+  QModelIndex &index);
   private:
-    TreeView *m_treeView;
+	TreeView *m_treeView;
 
   };
   friend Delegate;
 */
 
-	// virtual void onClick(TreeModel::Item *item, const QPoint &pos, const QStyleOptionViewItem &option) {}
+	// virtual void onClick(TreeModel::Item *item, const QPoint &pos, const QStyleOptionViewItem
+	// &option) {}
 	void mouseDoubleClickEvent(QMouseEvent *);
 	void mousePressEvent(QMouseEvent *);
 	void mouseReleaseEvent(QMouseEvent *);
@@ -179,7 +182,7 @@ protected:
 
 	virtual void openContextMenu(TreeModel::Item *item, const QPoint &globalPos) {}
 
-public slots:
+  public slots:
 	void resizeToConts(void);
 };
 

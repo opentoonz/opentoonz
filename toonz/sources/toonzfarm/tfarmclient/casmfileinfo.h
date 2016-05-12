@@ -9,11 +9,11 @@
 
 class CasmFileInfo
 {
-public:
+  public:
 	CasmFileInfo(const TFilePath &fp);
 	void getFrameRange(int &startFrame, int &endFrame, bool &interlaced);
 
-private:
+  private:
 	TFilePath m_fp;
 };
 

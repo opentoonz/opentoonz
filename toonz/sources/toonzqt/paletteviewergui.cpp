@@ -89,7 +89,11 @@ using namespace DVGui;
 		Update current page view.
 		*/
 PageViewer::PageViewer(QWidget *parent, PaletteViewType viewType, bool hasPasteColors)
-	: QFrame(parent), m_page(0), m_chipsOrigin(2, 2), m_chipPerRow(0), m_viewMode(SmallChips), m_styleSelection(new TStyleSelection()), m_frameHandle(0), m_renameTextField(new LineEdit(this)), m_dropPositionIndex(-1), m_dropPageCreated(false), m_startDrag(false), m_viewType(viewType), m_nameDisplayMode(Style), m_hasPasteColors(hasPasteColors), m_changeStyleCommand(0)
+	: QFrame(parent), m_page(0), m_chipsOrigin(2, 2), m_chipPerRow(0), m_viewMode(SmallChips),
+	  m_styleSelection(new TStyleSelection()), m_frameHandle(0),
+	  m_renameTextField(new LineEdit(this)), m_dropPositionIndex(-1), m_dropPageCreated(false),
+	  m_startDrag(false), m_viewType(viewType), m_nameDisplayMode(Style),
+	  m_hasPasteColors(hasPasteColors), m_changeStyleCommand(0)
 {
 	setFrameStyle(QFrame::StyledPanel);
 	setObjectName("PageViewer");
@@ -240,7 +244,7 @@ void PageViewer::setViewMode(ViewMode viewMode)
 	computeSize();
 	update();
 
-	//keep new view mode for reproducing the same mode when a new palette is made
+	// keep new view mode for reproducing the same mode when a new palette is made
 	switch (m_viewType) {
 	case LEVEL_PALETTE:
 		ChipSizeManager::instance()->chipSize_Palette = (int)m_viewMode;
@@ -350,7 +354,7 @@ void PageViewer::drop(int dstIndexInPage, const QMimeData *mimeData)
 	std::set<int> srcIndicesInPage = paletteData->getIndicesInPage();
 
 	if (m_dropPageCreated) {
-		//Rimuovo e reinserisco la pagina inizializzando l'undo.
+		// Rimuovo e reinserisco la pagina inizializzando l'undo.
 		palette->setDirtyFlag(true);
 		int pageIndex = palette->getPageCount() - 1;
 		palette->erasePage(pageIndex);
@@ -362,9 +366,10 @@ void PageViewer::drop(int dstIndexInPage, const QMimeData *mimeData)
 		getPaletteHandle()->notifyPaletteChanged();
 	}
 	if (srcPalette == palette) {
-		PaletteCmd::arrangeStyles(getPaletteHandle(), dstPageIndex, dstIndexInPage, srcPageIndex, srcIndicesInPage);
+		PaletteCmd::arrangeStyles(getPaletteHandle(), dstPageIndex, dstIndexInPage, srcPageIndex,
+								  srcIndicesInPage);
 
-		//seleziono gli stili spostati
+		// seleziono gli stili spostati
 		clearSelection();
 		std::set<int>::const_reverse_iterator i;
 		int k = 0;
@@ -376,7 +381,7 @@ void PageViewer::drop(int dstIndexInPage, const QMimeData *mimeData)
 				index = dstIndexInPage + k;
 			m_styleSelection->select(dstPageIndex, index, true);
 		}
-	} else //when dropping the style into another palette
+	} else // when dropping the style into another palette
 	{
 		std::vector<TColorStyle *> styles;
 		std::set<int>::iterator it;
@@ -530,8 +535,7 @@ void PageViewer::drawColorName(QPainter &p, QRect &nameRect, TColorStyle *style,
 void PageViewer::drawToggleLink(QPainter &p, QRect &chipRect, TColorStyle *style)
 {
 	std::wstring globalName = style->getGlobalName();
-	if (globalName != L"" &&
-		(globalName[0] == L'-' || globalName[0] == L'+')) {
+	if (globalName != L"" && (globalName[0] == L'-' || globalName[0] == L'+')) {
 		TPixel32 c = style->getMainColor();
 		int x = chipRect.topRight().x() - 6;
 		int y = chipRect.topRight().y();
@@ -630,28 +634,30 @@ void PageViewer::paintEvent(QPaintEvent *e)
 			TColorStyle *style = m_page->getStyle(i);
 			int styleIndex = m_page->getStyleId(i);
 
-			//draw white frame if the style is selected or current
-			if (m_styleSelection->isSelected(m_page->getIndex(), i) || currentStyleIndex == styleIndex) {
+			// draw white frame if the style is selected or current
+			if (m_styleSelection->isSelected(m_page->getIndex(), i) ||
+				currentStyleIndex == styleIndex) {
 				QRect itemRect = getItemRect(i).adjusted(-1, -2, 1, 2);
 				p.setPen(Qt::NoPen);
 				p.setBrush(Qt::white);
 				p.drawRoundRect(itemRect, 7, 25);
 			}
-			//paint style
+			// paint style
 			QRect chipRect = getItemRect(i).adjusted(4, 4, -5, -5);
 
-			QColor styleColor((int)style->getMainColor().r,
-							  (int)style->getMainColor().g,
+			QColor styleColor((int)style->getMainColor().r, (int)style->getMainColor().g,
 							  (int)style->getMainColor().b);
-			// draw with MainColor for TSolidColorStyle(3), TColorCleanupStyle(2001) and TBlackCleanupStyle(2002)
+			// draw with MainColor for TSolidColorStyle(3), TColorCleanupStyle(2001) and
+			// TBlackCleanupStyle(2002)
 			if (style->getTagId() == 3 || style->getTagId() == 2001 || style->getTagId() == 2002) {
-				//iwsw commented out temporaly
-				//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+				// iwsw commented out temporaly
+				// if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
 				//	Ghibli3DLutConverter::instance()->convert(styleColor);
 
 				p.fillRect(chipRect, QBrush(styleColor));
 
-				// if the style is not 100% opac, draw the bottom part of the chip with the pixmap with alpha
+				// if the style is not 100% opac, draw the bottom part of the chip with the pixmap
+				// with alpha
 				if ((int)style->getMainColor().m != (int)style->getMainColor().maxChannelValue) {
 					QRect bottomRect = chipRect;
 					if (m_viewMode == LargeChips) {
@@ -662,9 +668,8 @@ void PageViewer::paintEvent(QPaintEvent *e)
 					TRaster32P icon = style->getIcon(qsize2Dimension(bottomRect.size()));
 					p.drawPixmap(bottomRect.left(), bottomRect.top(), rasterToQPixmap(icon));
 				}
-				//Use white line for dark color. Use black line for light color.
-				int val = (int)style->getMainColor().r * 30 +
-						  (int)style->getMainColor().g * 59 +
+				// Use white line for dark color. Use black line for light color.
+				int val = (int)style->getMainColor().r * 30 + (int)style->getMainColor().g * 59 +
 						  (int)style->getMainColor().b * 11;
 				if (val < 12800)
 					p.setPen(Qt::white);
@@ -685,24 +690,25 @@ void PageViewer::paintEvent(QPaintEvent *e)
 			}
 			p.setBrush(Qt::NoBrush);
 
-			//diagonal line indicates that the style color is changed after linked from studio palette
+			// diagonal line indicates that the style color is changed after linked from studio
+			// palette
 			if (style->getIsEditedFlag()) {
-				//draw diagonal line
+				// draw diagonal line
 				p.drawLine(chipRect.topRight(), chipRect.bottomLeft());
 
-				//keep center blank for style name
+				// keep center blank for style name
 				if (m_viewMode != SmallChips) {
 					QRect colorNameRect = chipRect;
 					if (m_viewMode == MediumChips)
 						colorNameRect.adjust(2, 9, -2, -8);
-					else //LargeChip
+					else // LargeChip
 						colorNameRect.adjust(2, 16, -2, -13);
 
 					p.fillRect(colorNameRect, QBrush(styleColor));
 				}
 			}
 
-			//draw style name
+			// draw style name
 			QFont preFont = p.font();
 			QFont tmpFont = p.font();
 
@@ -719,7 +725,8 @@ void PageViewer::paintEvent(QPaintEvent *e)
 				std::wstring name = style->getName();
 				std::wstring origName = style->getOriginalName();
 
-				//display the name (style name and original name) according to the name display mode
+				// display the name (style name and original name) according to the name display
+				// mode
 				if (m_nameDisplayMode == Style)
 					p.drawText(chipRect, Qt::AlignCenter, QString::fromStdWString(name));
 				else if (m_nameDisplayMode == Original) {
@@ -728,22 +735,25 @@ void PageViewer::paintEvent(QPaintEvent *e)
 						p.setFont(tmpFont);
 						p.drawText(chipRect, Qt::AlignCenter, QString::fromStdWString(origName));
 					} else // if there is no original name, then display the style name in brackets
-						p.drawText(chipRect, Qt::AlignCenter, QString::fromStdWString(L"( " + name + L" )"));
+						p.drawText(chipRect, Qt::AlignCenter,
+								   QString::fromStdWString(L"( " + name + L" )"));
 				} else if (m_nameDisplayMode == StyleAndOriginal) {
 					p.drawText(chipRect, Qt::AlignCenter, QString::fromStdWString(name));
 
-					//display original name only whne LargeChip view
+					// display original name only whne LargeChip view
 					if (m_viewMode == LargeChips && origName != L"") {
 						tmpFont.setItalic(true);
 						tmpFont.setPixelSize(tmpFont.pixelSize() - 3);
 						p.setFont(tmpFont);
-						p.drawText(chipRect.adjusted(4, 4, -4, -4), Qt::AlignLeft | Qt::AlignTop, QString::fromStdWString(origName));
+						p.drawText(chipRect.adjusted(4, 4, -4, -4), Qt::AlignLeft | Qt::AlignTop,
+								   QString::fromStdWString(origName));
 					}
 				}
 			}
 
 			// draw the frame border if the style is selected or current
-			if (m_styleSelection->isSelected(m_page->getIndex(), i) || currentStyleIndex == styleIndex) {
+			if (m_styleSelection->isSelected(m_page->getIndex(), i) ||
+				currentStyleIndex == styleIndex) {
 				p.setBrush(Qt::NoBrush);
 				p.drawRect(chipRect.adjusted(3, 3, -3, -3));
 			}
@@ -758,7 +768,8 @@ void PageViewer::paintEvent(QPaintEvent *e)
 			tmpFont.setItalic(false);
 			p.setFont(tmpFont);
 			int indexWidth = fontMetrics().width(QString().setNum(styleIndex)) + 4;
-			QRect indexRect(chipRect.bottomRight() + QPoint(-indexWidth, -14), chipRect.bottomRight());
+			QRect indexRect(chipRect.bottomRight() + QPoint(-indexWidth, -14),
+							chipRect.bottomRight());
 			p.setPen(Qt::black);
 			p.setBrush(Qt::white);
 			p.drawRect(indexRect);
@@ -768,7 +779,7 @@ void PageViewer::paintEvent(QPaintEvent *e)
 			// revert brush
 			p.setBrush(Qt::NoBrush);
 
-			//draw link indicator
+			// draw link indicator
 			drawToggleLink(p, chipRect, style);
 		}
 	}
@@ -812,17 +823,18 @@ void PageViewer::mousePressEvent(QMouseEvent *event)
 		return;
 	int pageIndex = m_page->getIndex();
 
-	// disable style selection in the cleanup palette in order to avoid editing the styles by mistake.
+	// disable style selection in the cleanup palette in order to avoid editing the styles by
+	// mistake.
 	if (m_viewType == CLEANUP_PALETTE) {
 		if (0 <= indexInPage && indexInPage < getChipCount()) {
-			//Right-click is available
+			// Right-click is available
 			if (event->button() == Qt::RightButton) {
 				m_styleSelection->makeCurrent();
 				m_styleSelection->selectNone();
 				m_styleSelection->select(pageIndex);
 				m_styleSelection->select(pageIndex, indexInPage, true);
 			}
-			//Changing the current style is still available
+			// Changing the current style is still available
 			setCurrentStyleIndex(m_page->getStyleId(indexInPage));
 		}
 		update();
@@ -831,21 +843,21 @@ void PageViewer::mousePressEvent(QMouseEvent *event)
 
 	if (event->button() == Qt::RightButton) {
 		m_styleSelection->makeCurrent();
-		//if you are clicking on the color chip
+		// if you are clicking on the color chip
 		if (0 <= indexInPage && indexInPage < getChipCount()) {
-			//Se pageIndex non e' selezionato lo seleziono
+			// Se pageIndex non e' selezionato lo seleziono
 			if (!m_styleSelection->isSelected(pageIndex, indexInPage)) {
 				m_styleSelection->select(pageIndex);
 				m_styleSelection->select(pageIndex, indexInPage, true);
 			}
-			//Cambio l'indice corrente
+			// Cambio l'indice corrente
 			setCurrentStyleIndex(m_page->getStyleId(indexInPage));
 		} else {
 			m_styleSelection->selectNone();
 			m_styleSelection->select(pageIndex);
 		}
 		update();
-		//update locks when the styleSelection becomes current
+		// update locks when the styleSelection becomes current
 		updateCommandLocks();
 		return;
 	}
@@ -857,14 +869,13 @@ void PageViewer::mousePressEvent(QMouseEvent *event)
 		m_styleSelection->makeCurrent();
 
 		update();
-		//update locks when the styleSelection becomes current
+		// update locks when the styleSelection becomes current
 		updateCommandLocks();
 		return;
 	} else {
-		//O si sta selezonando un nuovo item O si vuole iniziare un drag
+		// O si sta selezonando un nuovo item O si vuole iniziare un drag
 		if (m_styleSelection->isSelected(pageIndex, indexInPage) &&
-			event->modifiers() == Qt::ControlModifier &&
-			!m_page->getPalette()->isLocked())
+			event->modifiers() == Qt::ControlModifier && !m_page->getPalette()->isLocked())
 			m_startDrag = true;
 		else
 			select(indexInPage, event);
@@ -888,10 +899,9 @@ void PageViewer::mouseMoveEvent(QMouseEvent *event)
 	if (m_page->getPalette()->isLocked())
 		return;
 
-	// Se spingo ctrl mentre mi sto muovendo con almeno un item selezionato abilito la possibilita' di fare drag.
-	if (!m_startDrag &&
-		event->modifiers() == Qt::ControlModifier &&
-		!m_styleSelection->isEmpty() &&
+	// Se spingo ctrl mentre mi sto muovendo con almeno un item selezionato abilito la possibilita'
+	// di fare drag.
+	if (!m_startDrag && event->modifiers() == Qt::ControlModifier && !m_styleSelection->isEmpty() &&
 		(event->pos() - m_dragStartPosition).manhattanLength() > 12)
 		m_startDrag = true;
 	// faccio partire il drag&drop solo se mi sono mosso di una certa quantita'
@@ -1011,30 +1021,34 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event)
 	QAction *openStyleControlAct = cmd->getAction("MI_OpenStyleControl");
 	menu.addAction(openStyleControlAct);
 
-	//Verifica se lo stile e' link.
-	//Abilita e disabilita le voci di menu' in base a dove si e' cliccato.
+	// Verifica se lo stile e' link.
+	// Abilita e disabilita le voci di menu' in base a dove si e' cliccato.
 	int index = posToIndex(event->pos());
 	int indexPage = m_page ? m_page->getIndex() : -1;
 
 	bool isLocked = m_page ? m_page->getPalette()->isLocked() : false;
 
-	//remove links from studio palette
-	if (m_viewType == LEVEL_PALETTE && m_styleSelection && !m_styleSelection->isEmpty() && !isLocked) {
+	// remove links from studio palette
+	if (m_viewType == LEVEL_PALETTE && m_styleSelection && !m_styleSelection->isEmpty() &&
+		!isLocked) {
 		menu.addSeparator();
 		QAction *removeLinkAct = menu.addAction(tr("Remove Links"));
 		connect(removeLinkAct, SIGNAL(triggered()), this, SLOT(removeLink()));
 	}
 
-	if (((indexPage == 0 && index > 0) || (indexPage > 0 && index >= 0)) && index < getChipCount() && !isLocked) {
-		//iwsw commented out temporarly
+	if (((indexPage == 0 && index > 0) || (indexPage > 0 && index >= 0)) &&
+		index < getChipCount() && !isLocked) {
+		// iwsw commented out temporarly
 		/*
 		wstring globalName = m_page->getStyle(index)->getGlobalName();
 		if (m_viewType != STUDIO_PALETTE &&
 			globalName != L"" &&
 			(globalName[0] == L'-' || globalName[0] == L'+'))
 		{
-			createMenuAction(menu, "MI_ToggleLinkToStudioPalette", tr("Toggle Link to Studio Palette"), "toggleLink()");
-			createMenuAction(menu, "MI_RemoveReferenceToStudioPalette", tr("Remove Reference to Studio Palette"), "eraseToggleLink()");
+			createMenuAction(menu, "MI_ToggleLinkToStudioPalette", tr("Toggle Link to Studio
+		Palette"), "toggleLink()");
+			createMenuAction(menu, "MI_RemoveReferenceToStudioPalette", tr("Remove Reference to
+		Studio Palette"), "eraseToggleLink()");
 		}
 		*/
 		if (pasteValueAct)
@@ -1059,13 +1073,14 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event)
 	}
 
 	// get color from the original studio palette
-	if (m_viewType == LEVEL_PALETTE && m_styleSelection && !m_styleSelection->isEmpty() && !isLocked) {
+	if (m_viewType == LEVEL_PALETTE && m_styleSelection && !m_styleSelection->isEmpty() &&
+		!isLocked) {
 		menu.addSeparator();
 		QAction *getBackOriginalAct = cmd->getAction("MI_GetColorFromStudioPalette");
 		menu.addAction(getBackOriginalAct);
 	}
 
-	//iwsw commented out temporarly
+	// iwsw commented out temporarly
 	/*
 	if (m_viewType != STUDIO_PALETTE)
 	{
@@ -1073,8 +1088,7 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event)
 		menu.addAction(cmd->getAction(MI_EraseUnusedStyles));
 	}
 	*/
-	if (m_page)
-	{
+	if (m_page) {
 		QAction *newStyle = menu.addAction(tr("New Style"));
 		connect(newStyle, SIGNAL(triggered()), SLOT(addNewColor()));
 		QAction *newPage = menu.addAction(tr("New Page"));
@@ -1197,12 +1211,12 @@ void PageViewer::keyPressEvent(QKeyEvent *e)
 {
 	int key = e->key();
 
-	if (key == Qt::Key_Up) { //Row = frame precedente a quello settato
+	if (key == Qt::Key_Up) { // Row = frame precedente a quello settato
 		int frameIndex = m_frameHandle->getFrameIndex() - 1;
 		if (frameIndex < 0)
 			return;
 		m_frameHandle->setFrameIndex(frameIndex);
-	} else if (key == Qt::Key_Down) { //Row = frame successivo a quello settato
+	} else if (key == Qt::Key_Down) { // Row = frame successivo a quello settato
 		int frameIndex = m_frameHandle->getFrameIndex() + 1;
 		m_frameHandle->setFrameIndex(frameIndex);
 	} else {
@@ -1251,11 +1265,13 @@ bool PageViewer::event(QEvent *e)
 			TColorStyle *style = m_page->getStyle(indexInPage);
 			if (style) {
 				int styleIndex = m_page->getStyleId(indexInPage);
-				toolTip = "#" + QString::number(styleIndex) + " " + QString::fromStdWString(style->getName());
+				toolTip = "#" + QString::number(styleIndex) + " " +
+						  QString::fromStdWString(style->getName());
 
 				int shortcutKey = m_page->getPalette()->getStyleShortcut(styleIndex);
 				if (shortcutKey > 0)
-					toolTip += QString::fromStdWString(std::wstring(L" (") + (wchar_t)shortcutKey + L")");
+					toolTip +=
+						QString::fromStdWString(std::wstring(L" (") + (wchar_t)shortcutKey + L")");
 			}
 		}
 		if (toolTip != "")
@@ -1286,7 +1302,8 @@ void PageViewer::select(int indexInPage, QMouseEvent *event)
 	else if (event->modifiers() == Qt::CTRL && wasSelected)
 		on = false;
 	else if (event->modifiers() == Qt::SHIFT && !m_styleSelection->isEmpty()) {
-		// premuto shift. la selezione si estende fino ai piu' vicini colori selezionati (prima e dopo)
+		// premuto shift. la selezione si estende fino ai piu' vicini colori selezionati (prima e
+		// dopo)
 		// a e' b diventeranno gli estremi della selezione
 		int a = -1, b = -1, i = 0;
 		for (i = 0; i < m_page->getStyleCount(); i++)
@@ -1370,7 +1387,7 @@ void PageViewer::onFrameChanged()
 //-----------------------------------------------------------------------------
 /*! Rename current style and update its view in current page.
 */
-//recall from m_renameTextField
+// recall from m_renameTextField
 void PageViewer::onStyleRenamed()
 {
 	m_renameTextField->hide();
@@ -1420,7 +1437,8 @@ void PageViewer::eraseToggleLink()
 		This signal is emitted to notify tab position change.
 		*/
 PaletteTabBar::PaletteTabBar(QWidget *parent, bool hasPageCommand)
-	: QTabBar(parent), m_renameTextField(new LineEdit(this)), m_renameTabIndex(-1), m_pageViewer(0), m_hasPageCommand(hasPageCommand)
+	: QTabBar(parent), m_renameTextField(new LineEdit(this)), m_renameTabIndex(-1), m_pageViewer(0),
+	  m_hasPageCommand(hasPageCommand)
 {
 	setObjectName("PaletteTabBar");
 	setDrawBase(false);
@@ -1447,7 +1465,8 @@ void PaletteTabBar::mousePressEvent(QMouseEvent *event)
 		*/
 void PaletteTabBar::mouseMoveEvent(QMouseEvent *event)
 {
-	if (event->buttons() == Qt::LeftButton && event->modifiers() == Qt::ControlModifier && !m_pageViewer->getPage()->getPalette()->isLocked()) {
+	if (event->buttons() == Qt::LeftButton && event->modifiers() == Qt::ControlModifier &&
+		!m_pageViewer->getPage()->getPalette()->isLocked()) {
 		int srcIndex = currentIndex();
 		int dstIndex = tabAt(event->pos());
 		if (dstIndex >= 0 && dstIndex < count() && dstIndex != srcIndex) {
@@ -1493,8 +1512,10 @@ void PaletteTabBar::dragEnterEvent(QDragEnterEvent *event)
 	const PaletteData *paletteData = dynamic_cast<const PaletteData *>(event->mimeData());
 	if (!paletteData)
 		return;
-	if ((m_pageViewer->getViewType() == CLEANUP_PALETTE && !paletteData->getPalette()->isCleanupPalette()) ||
-		(m_pageViewer->getViewType() == LEVEL_PALETTE && paletteData->getPalette()->isCleanupPalette())) {
+	if ((m_pageViewer->getViewType() == CLEANUP_PALETTE &&
+		 !paletteData->getPalette()->isCleanupPalette()) ||
+		(m_pageViewer->getViewType() == LEVEL_PALETTE &&
+		 paletteData->getPalette()->isCleanupPalette())) {
 		event->ignore();
 		return;
 	}
@@ -1512,7 +1533,8 @@ void PaletteTabBar::dragMoveEvent(QDragMoveEvent *event)
 	const PaletteData *paletteData = dynamic_cast<const PaletteData *>(event->mimeData());
 	if (!paletteData)
 		return;
-	if (paletteData->getPalette() == m_pageViewer->getPage()->getPalette() && paletteData->hasOnlyPalette())
+	if (paletteData->getPalette() == m_pageViewer->getPage()->getPalette() &&
+		paletteData->hasOnlyPalette())
 		return;
 	int tabIndex = tabAt(event->pos());
 	if (0 <= tabIndex && tabIndex < count())
@@ -1610,8 +1632,7 @@ void PaletteIconWidget::mousePressEvent(QMouseEvent *me)
 
 void PaletteIconWidget::mouseMoveEvent(QMouseEvent *me)
 {
-	if ((me->pos() - m_mousePressPos).manhattanLength() > 20 &&
-		!m_dragged) {
+	if ((me->pos() - m_mousePressPos).manhattanLength() > 20 && !m_dragged) {
 		m_dragged = true;
 		emit startDrag();
 	}
@@ -1674,7 +1695,7 @@ void PageViewer::updateCommandLocks()
 {
 	if (!m_page)
 		return;
-	//iwasawa
+	// iwasawa
 
 	bool isLocked = m_page->getPalette()->isLocked();
 

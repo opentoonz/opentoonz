@@ -18,25 +18,18 @@ const double s_length = 15;
 const double s_square_size = 5;
 const double s_arrow_ratio = 2.5;
 
-void drawArrow(const TPointD &from,
-			   const TPointD &direction,
-			   double length,
-			   const TPointD &arrowDirection = TPointD(0.0, -1.0),
-			   double arrowLength = 0.0)
+void drawArrow(const TPointD &from, const TPointD &direction, double length,
+			   const TPointD &arrowDirection = TPointD(0.0, -1.0), double arrowLength = 0.0)
 {
-	if (length <= 0 ||
-		arrowLength < 0)
+	if (length <= 0 || arrowLength < 0)
 		return;
 
 	if (arrowLength == 0.0)
 		arrowLength = 0.2 * length;
 
-	TPointD
-		pnt(from),
-		myDir = normalize(direction);
+	TPointD pnt(from), myDir = normalize(direction);
 
-	TPointD
-		myArrowDirection(arrowDirection);
+	TPointD myArrowDirection(arrowDirection);
 
 	if (arrowDirection.y <= 0.0)
 		myArrowDirection = normalize(TPointD(-0.5, 0.8));
@@ -53,14 +46,12 @@ void drawArrow(const TPointD &from,
 	tglVertex(pnt);
 	glEnd();
 	glBegin(GL_TRIANGLES);
-	TPointD
-		up = myDir + myArrowDirection;
+	TPointD up = myDir + myArrowDirection;
 	tglVertex(from + up);
-	//tglVertex(pnt);
+	// tglVertex(pnt);
 	tglVertex(pnt);
 	myArrowDirection.y = -myArrowDirection.y;
-	TPointD
-		down = myDir + myArrowDirection;
+	TPointD down = myDir + myArrowDirection;
 	tglVertex(from + down);
 	glEnd();
 }
@@ -68,9 +59,7 @@ void drawArrow(const TPointD &from,
 
 //-----------------------------------------------------------------------------
 
-Selector::Selector(double stroke_length,
-				   double min_val,
-				   double max_val)
+Selector::Selector(double stroke_length, double min_val, double max_val)
 {
 	original_stroke_length_ = stroke_length;
 	range_ = TPointD(min_val, max_val);
@@ -97,23 +86,16 @@ Selector::~Selector()
 
 //-----------------------------------------------------------------------------
 
-TPointD
-Selector::getUp() const
+TPointD Selector::getUp() const
 {
 	if (!strokeRef_)
 		return TPointD();
 
-	TThickPoint
-		pnt = strokeRef_->getPoint(w_);
+	TThickPoint pnt = strokeRef_->getPoint(w_);
 
-	TPointD
-		p = convert(pnt),
-		p1;
+	TPointD p = convert(pnt), p1;
 
-	TPointD
-		v0,
-		v1,
-		v = normalize(rotate90(strokeRef_->getSpeed(w_)));
+	TPointD v0, v1, v = normalize(rotate90(strokeRef_->getSpeed(w_)));
 
 	const double delta = TConsts::epsilon;
 
@@ -127,8 +109,7 @@ Selector::getUp() const
 	else
 		v1 = rotate90(strokeRef_->getSpeed(1.0));
 
-	if (!isAlmostZero(v * v0) ||
-		!isAlmostZero(v * v1))
+	if (!isAlmostZero(v * v0) || !isAlmostZero(v * v1))
 		v = normalize(v1 + v0);
 
 	return v;
@@ -138,25 +119,18 @@ Selector::getUp() const
 
 void Selector::draw(Designer *designer)
 {
-	if (!strokeRef_ ||
-		!isVisible_)
+	if (!strokeRef_ || !isVisible_)
 		return;
 
 	pixel_size_ = designer ? sqrt(designer->getPixelSize2()) : 1.0;
 
-	TPointD
-		v = this->getUp(),
-		n = normalize(rotate90(v));
+	TPointD v = this->getUp(), n = normalize(rotate90(v));
 
-	TThickPoint
-		pnt = strokeRef_->getThickPoint(w_);
+	TThickPoint pnt = strokeRef_->getThickPoint(w_);
 
 	height_ = (pnt.thick + s_over_size) * pixel_size_;
 
-	TPointD
-		p(pnt.x, pnt.y),
-		up = p + v * height_,
-		down = p - v * height_;
+	TPointD p(pnt.x, pnt.y), up = p + v * height_, down = p - v * height_;
 
 	glColor3fv(s_normalColor);
 	glBegin(GL_LINES);
@@ -169,15 +143,12 @@ void Selector::draw(Designer *designer)
 	else
 		glColor3fv(s_normalColor);
 
-	double
-		radius = s_radius * pixel_size_;
+	double radius = s_radius * pixel_size_;
 
 	if (isSelected_ == POSITION)
-		tglDrawDisk(up + v * radius,
-					radius);
+		tglDrawDisk(up + v * radius, radius);
 
-	tglDrawCircle(up + v * radius,
-				  radius);
+	tglDrawCircle(up + v * radius, radius);
 
 	if (isSelected_ == LENGTH)
 		glColor3fv(s_highlightedColor);
@@ -186,22 +157,15 @@ void Selector::draw(Designer *designer)
 
 	{
 		// the circle center is in
-		TPointD
-			down = -this->getUp(),
-			center = pnt + down * (height_);
-		const double
-			length = s_square_size * 0.5 * pixel_size_;
+		TPointD down = -this->getUp(), center = pnt + down * (height_);
+		const double length = s_square_size * 0.5 * pixel_size_;
 
 		TPointD
 			//  offset(length, 0.0),
-			offset(length,
-				   length),
-			bottom_left = center - offset,
-			top_rigth = center + offset;
+			offset(length, length),
+			bottom_left = center - offset, top_rigth = center + offset;
 
-		TRectD
-			rectangle(bottom_left,
-					  top_rigth);
+		TRectD rectangle(bottom_left, top_rigth);
 
 		if (isSelected_ == LENGTH)
 			tglFillRect(rectangle);
@@ -210,31 +174,30 @@ void Selector::draw(Designer *designer)
 	}
 	/*
   TPointD
-    arrowDirection(-0.5,0.8);
-  
+	arrowDirection(-0.5,0.8);
+
   if( signum_ < 0.0 )
-    arrowDirection.x = -arrowDirection.x;
+	arrowDirection.x = -arrowDirection.x;
   const double
-    length = s_length  * pixel_size_,
-    arrow_length = length/s_arrow_ratio;
+	length = s_length  * pixel_size_,
+	arrow_length = length/s_arrow_ratio;
 
   drawArrow(down,
-            TPointD(1,0),
-            length,
-            arrowDirection,
-            arrow_length);
+			TPointD(1,0),
+			length,
+			arrowDirection,
+			arrow_length);
   drawArrow(down,
-            TPointD(-1,0),
-            length,
-            arrowDirection,
-            arrow_length);
+			TPointD(-1,0),
+			length,
+			arrowDirection,
+			arrow_length);
   */
 	// draw stroke related information
-	if (designer &&
-		this->isSelected())
+	if (designer && this->isSelected())
 		designer->draw(this);
 
-#if 0 //def  _DEBUG
+#if 0 // def  _DEBUG
   {
   TThickPoint
     pnt = strokeRef_->getThickPoint(w_);
@@ -279,13 +242,10 @@ void Selector::draw(Designer *designer)
 
 void Selector::mouseDown(const TPointD &pos)
 {
-	click_ =
-		curr_ =
-			pos;
+	click_ = curr_ = pos;
 	if (!strokeRef_)
 		return;
-	stroke_length_ =
-		original_stroke_length_;
+	stroke_length_ = original_stroke_length_;
 	prev_ = curr_;
 }
 
@@ -296,8 +256,7 @@ void Selector::mouseUp(const TPointD &pos)
 	curr_ = pos;
 	if (!strokeRef_)
 		return;
-	original_stroke_length_ =
-		stroke_length_;
+	original_stroke_length_ = stroke_length_;
 	prev_ = curr_;
 }
 
@@ -321,17 +280,13 @@ void Selector::mouseDrag(const TPointD &pos)
 	if (!strokeRef_)
 		return;
 
-	double
-		val = original_stroke_length_;
+	double val = original_stroke_length_;
 
-	const double
-		stroke_length = strokeRef_->getLength();
+	const double stroke_length = strokeRef_->getLength();
 
-	double
-		max_val = std::min(stroke_length, range_.y);
+	double max_val = std::min(stroke_length, range_.y);
 
-	TPointD
-		v = curr_ - prev_;
+	TPointD v = curr_ - prev_;
 
 	signum_ = 1.0;
 
@@ -354,10 +309,10 @@ void Selector::mouseDrag(const TPointD &pos)
 
 void Selector::setStroke(const TStroke *ref)
 {
-	//if(strokeRef_  &&
+	// if(strokeRef_  &&
 	//   strokeRef_ != ref )
 	//  w_=strokeRef_->getParameterAtLength( strokeRef_->getLength()*0.5);
-	//else
+	// else
 	//  w_=0.5;
 	this->init();
 	strokeRef_ = ref;
@@ -365,26 +320,19 @@ void Selector::setStroke(const TStroke *ref)
 
 //-----------------------------------------------------------------------------
 
-Selector::Selection
-Selector::getSelection(const TPointD &pos)
+Selector::Selection Selector::getSelection(const TPointD &pos)
 {
-	if (!strokeRef_ ||
-		!isVisible_)
+	if (!strokeRef_ || !isVisible_)
 		return NONE;
 
-	TThickPoint
-		pnt = strokeRef_->getThickPoint(w_);
+	TThickPoint pnt = strokeRef_->getThickPoint(w_);
 
-	TPointD
-		up = this->getUp(),
-		down = -up;
+	TPointD up = this->getUp(), down = -up;
 
-	double
-		radius = s_radius * pixel_size_;
+	double radius = s_radius * pixel_size_;
 
 	// the circle center is in
-	TPointD
-		center = pnt + up * (height_ + radius);
+	TPointD center = pnt + up * (height_ + radius);
 
 	// one pixel of tolerance
 	if (tdistance2(center, pos) <= sq(radius + pixel_size_))
@@ -397,14 +345,10 @@ Selector::getSelection(const TPointD &pos)
 
 	TPointD
 		//  offset(length, 0.0),
-		offset(length,
-			   length),
-		bottom_left = center - offset,
-		top_rigth = center + offset;
+		offset(length, length),
+		bottom_left = center - offset, top_rigth = center + offset;
 
-	TRectD
-		rectangle(bottom_left,
-				  top_rigth);
+	TRectD rectangle(bottom_left, top_rigth);
 
 	rectangle = rectangle.enlarge(2.0 * pixel_size_);
 
@@ -416,8 +360,7 @@ Selector::getSelection(const TPointD &pos)
 
 //-----------------------------------------------------------------------------
 
-double
-Selector::getLength() const
+double Selector::getLength() const
 {
 	return stroke_length_;
 }
@@ -426,8 +369,7 @@ Selector::getLength() const
 
 void Selector::setLength(double length)
 {
-	stroke_length_ =
-		original_stroke_length_ = length;
+	stroke_length_ = original_stroke_length_ = length;
 }
 
 //-----------------------------------------------------------------------------

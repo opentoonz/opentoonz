@@ -13,8 +13,7 @@ Transform::Transform()
 {
 }
 
-Transform::Transform(const TAffine &aff)
-	: m_affine(aff)
+Transform::Transform(const TAffine &aff) : m_affine(aff)
 {
 }
 
@@ -90,8 +89,7 @@ QScriptValue Transform::scale(double sx, double sy)
 
 //=============================================================================
 
-ImageBuilder::ImageBuilder()
-	: m_width(0), m_height(0)
+ImageBuilder::ImageBuilder() : m_width(0), m_height(0)
 {
 }
 
@@ -114,7 +112,9 @@ QScriptValue ImageBuilder::ctor(QScriptContext *context, QScriptEngine *engine)
 			if (context->argument(2).isString())
 				type = context->argument(2).toString();
 			if (type != "Raster" && type != "ToonzRaster")
-				return context->throwError(tr("Bad argument (%1): should be 'Raster' or ToonzRaster'").arg(context->argument(2).toString()));
+				return context->throwError(
+					tr("Bad argument (%1): should be 'Raster' or ToonzRaster'")
+						.arg(context->argument(2).toString()));
 		}
 		imageBuilder = new ImageBuilder();
 		imageBuilder->m_width = width;
@@ -122,14 +122,17 @@ QScriptValue ImageBuilder::ctor(QScriptContext *context, QScriptEngine *engine)
 		if (type == "Raster")
 			imageBuilder->m_img = new TRasterImage(TRaster32P(width, height));
 		else if (type == "ToonzRaster") {
-			imageBuilder->m_img = new TToonzImage(TRasterCM32P(width, height), TRect(0, 0, width, height));
+			imageBuilder->m_img =
+				new TToonzImage(TRasterCM32P(width, height), TRect(0, 0, width, height));
 		}
 	} else {
 		if (context->argumentCount() != 0)
 			return context->throwError("Bad argument count. expected: width,height[,type]");
 		imageBuilder = new ImageBuilder();
 	}
-	QScriptValue obj = engine->newQObject(imageBuilder, QScriptEngine::AutoOwnership, QScriptEngine::ExcludeSuperClassContents | QScriptEngine::ExcludeSuperClassMethods);
+	QScriptValue obj = engine->newQObject(imageBuilder, QScriptEngine::AutoOwnership,
+										  QScriptEngine::ExcludeSuperClassContents |
+											  QScriptEngine::ExcludeSuperClassMethods);
 	return obj;
 }
 
@@ -248,22 +251,22 @@ QString ImageBuilder::add(const TImageP &img, const TAffine &aff)
   TImageP srcImg = img->getImg();
   if(srcImg->getType()==TImage::RASTER || srcImg->getType()==TImage::TOONZ_RASTER)
   {
-    TRasterP in = srcImg->raster();
-    TRasterP out = in->create();
-    TPointD center = in->getCenterD();
-    TAffine aff1 = TTranslation(center) * aff * TTranslation(-center);
-    TRop::resample(out,in,aff1,TRop::Mitchell);
-    m_img = TRasterImageP(out);
+	TRasterP in = srcImg->raster();
+	TRasterP out = in->create();
+	TPointD center = in->getCenterD();
+	TAffine aff1 = TTranslation(center) * aff * TTranslation(-center);
+	TRop::resample(out,in,aff1,TRop::Mitchell);
+	m_img = TRasterImageP(out);
   }
   else if(srcImg->getType()==TImage::VECTOR)
   {
-    TVectorImageP vi = srcImg->cloneImage();
-    vi->transform(aff);
-    m_img = vi;
+	TVectorImageP vi = srcImg->cloneImage();
+	vi->transform(aff);
+	m_img = vi;
   }
   else
   {
-    return context()->throwError(tr("Bad image type"));
+	return context()->throwError(tr("Bad image type"));
   }
   return context()->thisObject();
   */
@@ -289,7 +292,8 @@ QScriptValue ImageBuilder::add(QScriptValue imgArg, QScriptValue transformationA
 		return err;
 	Transform *transformation = qscriptvalue_cast<Transform *>(transformationArg);
 	if (!transformation) {
-		return context()->throwError(tr("Bad argument (%1): should be a Transformation").arg(transformationArg.toString()));
+		return context()->throwError(
+			tr("Bad argument (%1): should be a Transformation").arg(transformationArg.toString()));
 	}
 	TAffine aff = transformation->getAffine();
 	QString errStr = add(simg->getImg(), aff);

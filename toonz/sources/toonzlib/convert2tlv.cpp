@@ -50,7 +50,8 @@ inline TPixel unmultiply(const TPixel &in)
 
 inline int distance(const TPixel &c1, const TPixel &c2)
 {
-	return (c1.r - c2.r) * (c1.r - c2.r) + (c1.g - c2.g) * (c1.g - c2.g) + (c1.b - c2.b) * (c1.b - c2.b);
+	return (c1.r - c2.r) * (c1.r - c2.r) + (c1.g - c2.g) * (c1.g - c2.g) +
+		   (c1.b - c2.b) * (c1.b - c2.b);
 }
 
 //----------------------------------------------
@@ -73,15 +74,15 @@ int findClosest(const std::map<TPixel, int> &colorMap, TPixel &curPixColor)
 
 //----------------------------------------------
 
-#define CHECKCOLOR(r, x, y, tone)                               \
-	{                                                           \
-		TPixelCM32 color = *((TPixelCM32 *)r->pixels(y) + (x)); \
-		if (color.getTone() == tone /*&& color.getPaint()!=0*/) \
-			return TPoint(x, y);                                \
+#define CHECKCOLOR(r, x, y, tone)                                                                  \
+	{                                                                                              \
+		TPixelCM32 color = *((TPixelCM32 *)r->pixels(y) + (x));                                    \
+		if (color.getTone() == tone /*&& color.getPaint()!=0*/)                                    \
+			return TPoint(x, y);                                                                   \
 	}
 
-//cerca in quadrati concentrici di raggio rad intorno al pixel in  (x, y)
-//il primo pixel di paint puro e ritorna il suo indice di paint
+// cerca in quadrati concentrici di raggio rad intorno al pixel in  (x, y)
+// il primo pixel di paint puro e ritorna il suo indice di paint
 
 TPoint getClosestToneValue(const TRasterCM32P &r, int y, int x, int tone)
 {
@@ -139,7 +140,7 @@ bool firstIsUnpainted(const TRaster32P &r1, const TRaster32P &r2)
 }
 
 //----------------------------------------------
-//ritorna -1 se non ha il canale di matte (tutti i pixel a 255)
+// ritorna -1 se non ha il canale di matte (tutti i pixel a 255)
 
 int getMaxMatte(const TRaster32P &r)
 {
@@ -193,14 +194,14 @@ int getFramesCount(const TLevelP &l, int from, int to)
 	return count;
 }
 }
-//namespace
+// namespace
 
 std::map<TPixel, int>::const_iterator Convert2Tlv::findNearestColor(const TPixel &color)
 {
-	//assert((int)colorMap.size()>toIndex);
-	//assert((int)colorMap.size()>fromIndex);
+	// assert((int)colorMap.size()>toIndex);
+	// assert((int)colorMap.size()>fromIndex);
 	std::map<TPixel, int>::const_iterator ret = m_colorMap.end(), it = m_colorMap.begin();
-	//std::advance(it, fromIndex);
+	// std::advance(it, fromIndex);
 
 	int mindist = 1000;
 	for (; it != m_colorMap.end(); ++it) {
@@ -232,7 +233,7 @@ void Convert2Tlv::buildInks(TRasterCM32P &rout, const TRaster32P &rin)
 	int i, j;
 	int curIndex;
 
-	//prima passata: identifico i colori di inchiostro e metto in rout i pixel di inchiostro puro
+	// prima passata: identifico i colori di inchiostro e metto in rout i pixel di inchiostro puro
 	for (i = 0; i < rin->getLy(); i++) {
 		TPixel *pixin = rin->pixels(i);
 		TPixelCM32 *pixout = rout->pixels(i);
@@ -247,8 +248,9 @@ void Convert2Tlv::buildInks(TRasterCM32P &rout, const TRaster32P &rin)
 				if ((it = m_colorMap.find(curColor)) == m_colorMap.end()) {
 					if (m_colorTolerance > 0)
 						it = findNearestColor(curColor);
-					//if (it==colorMap.end() && (int)colorMap.size()>origColorCount)
-					//	it  = findNearestColor(curColor, colorMap, colorTolerance, origColorCount, colorMap.size()-1);
+					// if (it==colorMap.end() && (int)colorMap.size()>origColorCount)
+					//	it  = findNearestColor(curColor, colorMap, colorTolerance, origColorCount,
+					//colorMap.size()-1);
 					if (it == m_colorMap.end() && m_lastIndex < 4095) {
 						m_colorMap[curColor] = ++m_lastIndex;
 						curIndex = m_lastIndex;
@@ -263,7 +265,7 @@ void Convert2Tlv::buildInks(TRasterCM32P &rout, const TRaster32P &rin)
 		}
 	}
 
-	//seconda  passata: metto gli inchiostri di antialiasing
+	// seconda  passata: metto gli inchiostri di antialiasing
 	curColor = TPixel::Transparent;
 
 	for (i = 0; i < rin->getLy(); i++) {
@@ -271,12 +273,12 @@ void Convert2Tlv::buildInks(TRasterCM32P &rout, const TRaster32P &rin)
 		TPixelCM32 *pixout = rout->pixels(i);
 		for (j = 0; j < rin->getLx(); j++, pixin++, pixout++) {
 			TPixel colorIn;
-			if (pixin->m == 255) //gia' messo nel ciclo precedente
+			if (pixin->m == 255) // gia' messo nel ciclo precedente
 				continue;
 			if (pixin->m == 0)
 				continue;
 
-			colorIn = unmultiply(*pixin); //findClosestOpaque(rin, i, j);
+			colorIn = unmultiply(*pixin); // findClosestOpaque(rin, i, j);
 
 			if (curColor != colorIn) {
 				curColor = colorIn;
@@ -299,7 +301,7 @@ void Convert2Tlv::removeAntialias(TRasterCM32P &r)
 	for (int i = 0; i < r->getLy(); i++) {
 		TPixelCM32 *pix = r->pixels(i);
 		for (int j = 0; j < r->getLx(); j++, pix++)
-			if ((tone = pix->getTone()) != 0xff) //tone==ff e tone==0 non vanno toccati mai
+			if ((tone = pix->getTone()) != 0xff) // tone==ff e tone==0 non vanno toccati mai
 				pix->setTone(tone > threshold ? 0xff : 0);
 	}
 }
@@ -337,7 +339,7 @@ void Convert2Tlv::buildInksForNAAImage(TRasterCM32P &rout, const TRaster32P &rin
 	int i, j;
 	int curIndex;
 
-	//prima passata: identifico i colori di inchiostro e metto in rout i pixel di inchiostro puro
+	// prima passata: identifico i colori di inchiostro e metto in rout i pixel di inchiostro puro
 	for (i = 0; i < rin->getLy(); i++) {
 		TPixel *pixin = rin->pixels(i);
 		TPixelCM32 *pixout = rout->pixels(i);
@@ -371,7 +373,8 @@ void Convert2Tlv::buildInksForNAAImage(TRasterCM32P &rout, const TRaster32P &rin
 
 void Convert2Tlv::doFill(TRasterCM32P &rout, const TRaster32P &rin)
 {
-	//prima passata: si filla  solo partendo da pixel senza inchiostro, senza antialiasing(tone==255)
+	// prima passata: si filla  solo partendo da pixel senza inchiostro, senza
+	// antialiasing(tone==255)
 	for (int i = 0; i < rin->getLy(); i++) {
 		TPixel *pixin = rin->pixels(i);
 		TPixelCM32 *pixout = rout->pixels(i);
@@ -384,8 +387,11 @@ void Convert2Tlv::doFill(TRasterCM32P &rout, const TRaster32P &rin)
 			if ((it = m_colorMap.find(*pixin)) == m_colorMap.end()) {
 				if (m_colorTolerance > 0)
 					it = findNearestColor(*pixin);
-				// if (it==colorMap.end() && (int)colorMap.size()>origColorCount) //se non l'ho trovato tra i colori origari, lo cerco in quelli nuovi, ma in questo caso deve essere esattamente uguale(tolerance = 0)
-				//	 it  = findNearestColor(*pixin, colorMap, colorTolerance, origColorCount, colorMap.size()-1);
+				// if (it==colorMap.end() && (int)colorMap.size()>origColorCount) //se non l'ho
+				// trovato tra i colori origari, lo cerco in quelli nuovi, ma in questo caso deve
+				// essere esattamente uguale(tolerance = 0)
+				//	 it  = findNearestColor(*pixin, colorMap, colorTolerance, origColorCount,
+				//colorMap.size()-1);
 
 				if (it == m_colorMap.end() && m_lastIndex < 4096) {
 					m_colorMap[*pixin] = ++m_lastIndex;
@@ -401,26 +407,28 @@ void Convert2Tlv::doFill(TRasterCM32P &rout, const TRaster32P &rin)
 			params.m_styleId = paintIndex;
 			params.m_emptyOnly = true;
 			fill(rout, params);
-			//if (*((ULONG *)rout->getRawData())!=0xff)
+			// if (*((ULONG *)rout->getRawData())!=0xff)
 			//  {
 			//  int cavolo=0;
 			//  }
 		}
 	}
 
-	//seconda passata: se son rimasti pixel antialiasati non fillati, si fillano, cercando nelle vicinanze un pixel di paint puro per capire il colore da usare
+	// seconda passata: se son rimasti pixel antialiasati non fillati, si fillano, cercando nelle
+	// vicinanze un pixel di paint puro per capire il colore da usare
 	for (int i = 0; i < rin->getLy(); i++) {
 		TPixel *pixin = rin->pixels(i);
 		TPixelCM32 *pixout = rout->pixels(i);
 		for (int j = 0; j < rin->getLx(); j++, pixin++, pixout++) {
-			if (!(pixout->getTone() > 0 && pixout->getTone() < 255 && pixout->getPaint() == 0 && pixin->m == 255))
+			if (!(pixout->getTone() > 0 && pixout->getTone() < 255 && pixout->getPaint() == 0 &&
+				  pixin->m == 255))
 				continue;
 
 			TPoint p = getClosestPurePaint(rout, i, j);
 			if (p.x == -1)
 				continue;
 
-			//pixout->setPaint( paintIndex);
+			// pixout->setPaint( paintIndex);
 			FillParameters params;
 			params.m_p = TPoint(j, i);
 			params.m_styleId = (rout->pixels(p.y) + p.x)->getPaint();
@@ -430,7 +438,8 @@ void Convert2Tlv::doFill(TRasterCM32P &rout, const TRaster32P &rin)
 		}
 	}
 
-	//infine, si filla di trasparente lo sfondo, percorrendo il bordo, nel caso di trasbordamenti di colore
+	// infine, si filla di trasparente lo sfondo, percorrendo il bordo, nel caso di trasbordamenti
+	// di colore
 	TPixelCM32 *pixCm;
 	TPixel *pix;
 
@@ -537,9 +546,9 @@ void Convert2Tlv::buildToonzRaster(TRasterCM32P &rout, const TRasterP &rin1, con
 		std::cout << "      computing paints...\n";
 		doFill(r, rP);
 	}
-	if (m_antialiasType == 2) //remove antialias
+	if (m_antialiasType == 2) // remove antialias
 		removeAntialias(r);
-	else if (m_antialiasType == 1) //add antialias
+	else if (m_antialiasType == 1) // add antialias
 	{
 		TRasterCM32P raux(r->getSize());
 		TRop::antialias(r, raux, 10, m_antialiasValue);
@@ -557,7 +566,7 @@ TPalette *Convert2Tlv::buildPalette()
 	QList<int> stylesToBeAddedToPage;
 
 	for (; it != m_colorMap.end(); ++it) {
-		if (it->second > m_maxPaletteIndex) //colore nuovo da aggiungere alla paletta)
+		if (it->second > m_maxPaletteIndex) // colore nuovo da aggiungere alla paletta)
 		{
 			if (m_palette->getStyleCount() > it->second)
 				m_palette->setStyle(it->second, it->first);
@@ -634,17 +643,24 @@ TPalette *Convert2Tlv::buildPalette()
 
 //------------------------------------------------------------------------------
 
-Convert2Tlv::Convert2Tlv(const TFilePath &filepath1, const TFilePath &filepath2, const TFilePath &outFolder, const QString &outName,
-						 int from, int to, bool doAutoclose, const TFilePath &palettePath, int colorTolerance,
+Convert2Tlv::Convert2Tlv(const TFilePath &filepath1, const TFilePath &filepath2,
+						 const TFilePath &outFolder, const QString &outName, int from, int to,
+						 bool doAutoclose, const TFilePath &palettePath, int colorTolerance,
 						 int antialiasType, int antialiasValue, bool isUnpaintedFromNAA)
-	: m_size(0, 0), m_level1(), m_levelIn1(), m_levelIn2(), m_levelOut(), m_autoclose(doAutoclose), m_premultiply(false), m_count(0), m_from(from), m_to(to), m_palettePath(palettePath), m_colorTolerance(colorTolerance), m_palette(0), m_antialiasType(antialiasType), m_antialiasValue(antialiasValue), m_isUnpaintedFromNAA(isUnpaintedFromNAA)
+	: m_size(0, 0), m_level1(), m_levelIn1(), m_levelIn2(), m_levelOut(), m_autoclose(doAutoclose),
+	  m_premultiply(false), m_count(0), m_from(from), m_to(to), m_palettePath(palettePath),
+	  m_colorTolerance(colorTolerance), m_palette(0), m_antialiasType(antialiasType),
+	  m_antialiasValue(antialiasValue), m_isUnpaintedFromNAA(isUnpaintedFromNAA)
 {
 	if (filepath1 != TFilePath()) {
 		m_levelIn1 = filepath1.getParentDir() + filepath1.getLevelName();
 		if (outFolder != TFilePath())
 			m_levelOut = m_levelIn1.withParentDir(outFolder).withNoFrame().withType("tlv");
 		else
-			m_levelOut = m_levelIn1.withNoFrame().withType("tlv"); //filePaths[0].getParentDir() + TFilePath(filePaths[0].getWideName() + L".tlv");
+			m_levelOut =
+				m_levelIn1.withNoFrame().withType("tlv"); // filePaths[0].getParentDir() +
+														  // TFilePath(filePaths[0].getWideName() +
+														  // L".tlv");
 
 		if (outName != "")
 			m_levelOut = m_levelOut.withName(outName.toStdString());
@@ -659,7 +675,7 @@ Convert2Tlv::Convert2Tlv(const TFilePath &filepath1, const TFilePath &filepath2,
 int Convert2Tlv::getFramesToConvertCount()
 {
 	if (m_level1 && m_level1->getFrameCount() > 0)
-		return getFramesCount(m_level1, m_from, m_to); //m_level1->getFrameCount();
+		return getFramesCount(m_level1, m_from, m_to); // m_level1->getFrameCount();
 	else {
 		try {
 			TLevelReaderP lr = TLevelReaderP(m_levelIn1);
@@ -734,7 +750,8 @@ bool Convert2Tlv::init(std::string &errorMessage)
 		TImageReaderP ir1 = m_lr1->getFrameReader(m_it->first);
 		const TImageInfo *info1 = ir1->getImageInfo();
 		if (!info1) {
-			errorMessage = "Error: can't read frame " + toString(m_it->first.getNumber()) + " of level  " + toString(m_levelIn1.getWideString());
+			errorMessage = "Error: can't read frame " + toString(m_it->first.getNumber()) +
+						   " of level  " + toString(m_levelIn1.getWideString());
 			return false;
 		}
 
@@ -751,13 +768,15 @@ bool Convert2Tlv::init(std::string &errorMessage)
 			if (ir2) {
 				const TImageInfo *info2 = ir2->getImageInfo();
 				if (!info1) {
-					errorMessage = "Error: can't read frame " + toString(it2->first.getNumber()) + " of level  " + toString(m_levelIn2.getWideString());
+					errorMessage = "Error: can't read frame " + toString(it2->first.getNumber()) +
+								   " of level  " + toString(m_levelIn2.getWideString());
 					;
 					return false;
 				}
 
 				if (info1->m_lx != info2->m_lx || info1->m_ly != info2->m_ly) {
-					errorMessage = "Error: painted frames must have same resolution of matching unpainted frames!\n";
+					errorMessage = "Error: painted frames must have same resolution of matching "
+								   "unpainted frames!\n";
 					return false;
 				}
 				if (info2->m_bitsPerSample != 8) {
@@ -810,12 +829,14 @@ bool Convert2Tlv::convertNext(std::string &errorMessage)
 		while (m_it != m_level1->end() && m_it->first.getNumber() < m_from)
 			m_it++;
 
-	std::cout << "Processing image " << ++m_count << " of " << getFramesCount(m_level1, m_from, m_to) << "...\n";
+	std::cout << "Processing image " << ++m_count << " of "
+			  << getFramesCount(m_level1, m_from, m_to) << "...\n";
 	std::cout << "      Loading frame " << m_it->first.getNumber() << "...\n";
 	TImageReaderP ir1 = m_lr1->getFrameReader(m_it->first);
 	TRasterImageP imgIn1 = (TRasterImageP)ir1->load();
 	if (!imgIn1) {
-		errorMessage = "Error: cannot read frame" + toString(m_it->first.getNumber()) + " of " + toString(m_levelIn1.getWideString()) + "!";
+		errorMessage = "Error: cannot read frame" + toString(m_it->first.getNumber()) + " of " +
+					   toString(m_levelIn1.getWideString()) + "!";
 		return false;
 	}
 	TRasterP rin1 = imgIn1->getRaster();
@@ -829,7 +850,8 @@ bool Convert2Tlv::convertNext(std::string &errorMessage)
 		TImageReaderP ir2 = m_lr2->getFrameReader(m_it->first);
 		imgIn2 = (TRasterImageP)ir2->load();
 		if (!imgIn2) {
-			errorMessage = "Error: cannot read frame " + toString(m_it->first.getNumber()) + " of " + toString(m_levelIn2.getWideString()) + "!";
+			errorMessage = "Error: cannot read frame " + toString(m_it->first.getNumber()) +
+						   " of " + toString(m_levelIn2.getWideString()) + "!";
 			return false;
 		}
 		rin2 = imgIn2->getRaster();
@@ -928,7 +950,8 @@ TRasterCM32P RasterToToonzRasterConverter::convert(const TRasterP &inputRaster)
 	return rout;
 }
 
-TRasterCM32P RasterToToonzRasterConverter::convert(const TRasterP &inksInputRaster, const TRasterP &paintInputRaster)
+TRasterCM32P RasterToToonzRasterConverter::convert(const TRasterP &inksInputRaster,
+												   const TRasterP &paintInputRaster)
 {
 	return TRasterCM32P();
 }

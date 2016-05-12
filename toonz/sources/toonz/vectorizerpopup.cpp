@@ -76,17 +76,16 @@ struct Param {
 	QString m_name;
 	int m_bit;
 
-	Param(const QString &name, int bit)
-		: m_name(name), m_bit(bit) {}
+	Param(const QString &name, int bit) : m_name(name), m_bit(bit) {}
 };
 
 struct ParamGroup {
-	int m_startRow,
-		m_separatorRow;
+	int m_startRow, m_separatorRow;
 	std::vector<Param> m_params;
 
-	ParamGroup(int startRow, int separatorRow)
-		: m_startRow(startRow), m_separatorRow(separatorRow) {}
+	ParamGroup(int startRow, int separatorRow) : m_startRow(startRow), m_separatorRow(separatorRow)
+	{
+	}
 };
 
 } // namespace
@@ -107,13 +106,16 @@ bool l_quitLoop = false;
 
 VectorizerParameters *getCurrentVectorizerParameters()
 {
-	return TApp::instance()->getCurrentScene()->getScene()->getProperties()->getVectorizerParameters();
+	return TApp::instance()
+		->getCurrentScene()
+		->getScene()
+		->getProperties()
+		->getVectorizerParameters();
 }
 
 //-----------------------------------------------------------------------------
 
-bool getSelectedLevels(std::set<TXshLevel *> &levels,
-					   int &r0, int &c0, int &r1, int &c1)
+bool getSelectedLevels(std::set<TXshLevel *> &levels, int &r0, int &c0, int &r1, int &c1)
 {
 	TXsheet *xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
 
@@ -164,14 +166,14 @@ TFilePath getSelectedLevelPath()
 {
 	TXshLevel *level = getSelectedLevel();
 
-	return level ? TApp::instance()->getCurrentScene()->getScene()->decodeFilePath(level->getPath()) : TFilePath();
+	return level ? TApp::instance()->getCurrentScene()->getScene()->decodeFilePath(level->getPath())
+				 : TFilePath();
 }
 
 //-----------------------------------------------------------------------------
 
-void getSelectedFids(std::vector<TFrameId> &fids,
-					 TXshSimpleLevel *level,
-					 int r0, int c0, int r1, int c1)
+void getSelectedFids(std::vector<TFrameId> &fids, TXshSimpleLevel *level, int r0, int c0, int r1,
+					 int c1)
 {
 	TXsheet *xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
 
@@ -199,8 +201,7 @@ void getSelectedFids(std::vector<TFrameId> &fids,
 //    Vectorizer implementation
 //*****************************************************************************
 
-Vectorizer::Vectorizer()
-	: m_dialog(new OverwriteDialog), m_isCanceled(false), m_dialogShown(false)
+Vectorizer::Vectorizer() : m_dialog(new OverwriteDialog), m_isCanceled(false), m_dialogShown(false)
 {
 }
 
@@ -213,8 +214,8 @@ Vectorizer::~Vectorizer()
 
 //-----------------------------------------------------------------------------
 
-TVectorImageP Vectorizer::doVectorize(
-	TImageP img, TPalette *palette, const VectorizerConfiguration &conf)
+TVectorImageP Vectorizer::doVectorize(TImageP img, TPalette *palette,
+									  const VectorizerConfiguration &conf)
 {
 	TToonzImageP ti = img;
 	TRasterImageP ri = img;
@@ -236,7 +237,7 @@ void Vectorizer::setLevel(const TXshSimpleLevelP &level)
 {
 	m_level = level;
 
-	//Creo il livello pli
+	// Creo il livello pli
 	TXshSimpleLevel *sl = m_level.getPointer();
 	if (!sl)
 		return;
@@ -330,7 +331,9 @@ int Vectorizer::doVectorize()
 
 	} locals = {this};
 
-	VectorizerConfiguration &configuration = m_params.m_isOutline ? static_cast<VectorizerConfiguration &>(locals.m_oConf) : static_cast<VectorizerConfiguration &>(locals.m_cConf);
+	VectorizerConfiguration &configuration =
+		m_params.m_isOutline ? static_cast<VectorizerConfiguration &>(locals.m_oConf)
+							 : static_cast<VectorizerConfiguration &>(locals.m_cConf);
 
 	if (!m_vLevel)
 		return 0;
@@ -346,7 +349,8 @@ int Vectorizer::doVectorize()
 	if (rowCount <= 0 || sl->isEmpty())
 		return 0;
 
-	double frameRange[2] = {static_cast<double>(m_fids.front().getNumber()) - 1, static_cast<double>(m_fids.back().getNumber()) - 1};
+	double frameRange[2] = {static_cast<double>(m_fids.front().getNumber()) - 1,
+							static_cast<double>(m_fids.back().getNumber()) - 1};
 
 	int count = 0;
 
@@ -354,8 +358,7 @@ int Vectorizer::doVectorize()
 	for (ft = m_fids.begin(); ft != fEnd; ++ft) {
 		// Retrieve the image to be vectorized
 		TImageP img;
-		if (sl->getType() == OVL_XSHLEVEL ||
-			sl->getType() == TZP_XSHLEVEL ||
+		if (sl->getType() == OVL_XSHLEVEL || sl->getType() == TZP_XSHLEVEL ||
 			sl->getType() == TZI_XSHLEVEL)
 			img = sl->getFullsampledFrame(*ft, ImageManager::dontPutInCache);
 
@@ -373,7 +376,8 @@ int Vectorizer::doVectorize()
 			center = ri->getRaster()->getCenterD();
 
 		// Build vectorizer configuration
-		double weight = (ft->getNumber() - 1 - frameRange[0]) / tmax(frameRange[1] - frameRange[0], 1.0);
+		double weight =
+			(ft->getNumber() - 1 - frameRange[0]) / tmax(frameRange[1] - frameRange[0], 1.0);
 		weight = tcrop(weight, 0.0, 1.0);
 
 		locals.updateConfig(weight); // TEMPORARY
@@ -427,16 +431,16 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WindowFlags flags)
 #else
 VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 #endif
-	: Dialog(TApp::instance()->getMainWindow(), true, false, "Vectorizer"), m_sceneHandle(TApp::instance()->getCurrentScene())
+	: Dialog(TApp::instance()->getMainWindow(), true, false, "Vectorizer"),
+	  m_sceneHandle(TApp::instance()->getCurrentScene())
 {
 	struct Locals {
 		int m_bit;
 
 		Locals() : m_bit() {}
 
-		static void addParameterGroup(
-			std::vector<ParamGroup> &paramGroups,
-			int group, int startRow, int separatorRow = -1)
+		static void addParameterGroup(std::vector<ParamGroup> &paramGroups, int group, int startRow,
+									  int separatorRow = -1)
 		{
 			assert(group <= paramGroups.size());
 
@@ -444,9 +448,7 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 				paramGroups.push_back(ParamGroup(startRow, separatorRow));
 		}
 
-		void addParameter(
-			std::vector<ParamGroup> &paramGroups,
-			const QString &paramName)
+		void addParameter(std::vector<ParamGroup> &paramGroups, const QString &paramName)
 		{
 			paramGroups.back().m_params.push_back(Param(paramName, m_bit++));
 		}
@@ -466,11 +468,11 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 	beginVLayout();
 
 	QSplitter *splitter = new QSplitter(Qt::Vertical, this);
-	splitter->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+	splitter->setSizePolicy(
+		QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 	addWidget(splitter);
 
-	QToolBar *leftToolBar = new QToolBar,
-			 *rightToolBar = new QToolBar;
+	QToolBar *leftToolBar = new QToolBar, *rightToolBar = new QToolBar;
 	{
 		QWidget *toolbarsContainer = new QWidget(this);
 		toolbarsContainer->setFixedHeight(22);
@@ -482,8 +484,9 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 		toolbarsLayout->setMargin(0);
 		toolbarsLayout->setSpacing(0);
 
-		QToolBar *spacingToolBar = new QToolBar(toolbarsContainer); // The spacer object must be a toolbar.
-		spacingToolBar->setFixedHeight(22);							// It's related to qss choices... I know it's stinky
+		QToolBar *spacingToolBar =
+			new QToolBar(toolbarsContainer); // The spacer object must be a toolbar.
+		spacingToolBar->setFixedHeight(22);  // It's related to qss choices... I know it's stinky
 
 		toolbarsLayout->addWidget(leftToolBar, 0, Qt::AlignLeft);
 		toolbarsLayout->addWidget(spacingToolBar, 1);
@@ -517,7 +520,8 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 	formats << tr("Centerline") << tr("Outline");
 	m_typeMenu->addItems(formats);
 	m_typeMenu->setMinimumHeight(WidgetHeight);
-	bool isOutline = m_sceneHandle->getScene()->getProperties()->getVectorizerParameters()->m_isOutline;
+	bool isOutline =
+		m_sceneHandle->getScene()->getProperties()->getVectorizerParameters()->m_isOutline;
 	m_typeMenu->setCurrentIndex(isOutline ? 1 : 0);
 	connect(m_typeMenu, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeChange(int)));
 
@@ -637,7 +641,7 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 	group = 1;
 	locals.addParameterGroup(l_outlineParamGroups, group++, row);
 
-	//Accuracy
+	// Accuracy
 	m_oAccuracyLabel = new QLabel(tr("Accuracy"));
 	m_oAccuracy = new IntField(this);
 
@@ -646,7 +650,7 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 
 	locals.addParameter(l_outlineParamGroups, tr("Accuracy"));
 
-	//Despeckling
+	// Despeckling
 	m_oDespecklingLabel = new QLabel(tr("Despeckling"));
 	m_oDespeckling = new IntField(this);
 
@@ -655,7 +659,7 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 
 	locals.addParameter(l_outlineParamGroups, tr("Despeckling"));
 
-	//Paint Fill
+	// Paint Fill
 	{
 		static const QString name = tr("Preserve Painted Areas");
 		locals.addParameter(l_outlineParamGroups, name);
@@ -670,7 +674,7 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 	m_oCornersSeparator = new Separator(tr("Corners"));
 	m_paramsLayout->addWidget(m_oCornersSeparator, row++, 0, 1, 2);
 
-	//Adherence
+	// Adherence
 	m_oAdherenceLabel = new QLabel(tr("Adherence"));
 	m_oAdherence = new IntField(this);
 
@@ -679,7 +683,7 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 
 	locals.addParameter(l_outlineParamGroups, tr("Adherence"));
 
-	//Angle
+	// Angle
 	m_oAngleLabel = new QLabel(tr("Angle"));
 	m_oAngle = new IntField(this);
 
@@ -688,7 +692,7 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 
 	locals.addParameter(l_outlineParamGroups, tr("Angle"));
 
-	//Relative
+	// Relative
 	m_oRelativeLabel = new QLabel(tr("Curve Radius"));
 	m_oRelative = new IntField(this);
 
@@ -702,7 +706,7 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 	m_oFullColorSeparator = new Separator(tr("Raster Levels"));
 	m_paramsLayout->addWidget(m_oFullColorSeparator, row++, 0, 1, 2);
 
-	//Max Colors
+	// Max Colors
 	m_oMaxColorsLabel = new QLabel(tr("Max Colors"));
 	m_oMaxColors = new IntField(this);
 
@@ -711,7 +715,7 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 
 	locals.addParameter(l_outlineParamGroups, tr("Max Colors"));
 
-	//Transparent Color
+	// Transparent Color
 	m_oTransparentColorLabel = new QLabel(tr("Transparent Color"), this);
 	m_oTransparentColor = new ColorField(this, true, TPixel32::Transparent, 48);
 	m_paramsLayout->addWidget(m_oTransparentColorLabel, row, 0, Qt::AlignRight);
@@ -724,7 +728,7 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 	m_oTlvSeparator = new Separator(tr("TLV Levels"));
 	m_paramsLayout->addWidget(m_oTlvSeparator, row++, 0, 1, 2);
 
-	//Tone Threshold
+	// Tone Threshold
 	m_oToneThresholdLabel = new QLabel(tr("Tone Threshold"));
 	m_oToneThreshold = new IntField(this);
 
@@ -739,17 +743,19 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 
 	m_swatchArea = new VectorizerSwatchArea(this);
 	splitter->addWidget(m_swatchArea);
-	m_swatchArea->setEnabled(false); //Initally not enabled
+	m_swatchArea->setEnabled(false); // Initally not enabled
 
 	connect(this, SIGNAL(valuesChanged()), m_swatchArea, SLOT(invalidateContents()));
 
 	//---------------------- Toolbar --------------------------
 
-	QAction *swatchAct = new QAction(createQIconOnOffPNG("preview", true), tr("Toggle Swatch Preview"), this);
+	QAction *swatchAct =
+		new QAction(createQIconOnOffPNG("preview", true), tr("Toggle Swatch Preview"), this);
 	swatchAct->setCheckable(true);
 	leftToolBar->addAction(swatchAct);
 
-	QAction *centerlineAct = new QAction(createQIconOnOffPNG("opacitycheck", true), tr("Toggle Centerlines Check"), this);
+	QAction *centerlineAct = new QAction(createQIconOnOffPNG("opacitycheck", true),
+										 tr("Toggle Centerlines Check"), this);
 	centerlineAct->setCheckable(true);
 	leftToolBar->addAction(centerlineAct);
 
@@ -769,11 +775,13 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 	rightToolBar->addAction(loadAct);
 	rightToolBar->addSeparator();
 
-	QAction *resetAct = new QAction(createQIconOnOffPNG("resetsize", false), tr("Reset Settings"), this);
+	QAction *resetAct =
+		new QAction(createQIconOnOffPNG("resetsize", false), tr("Reset Settings"), this);
 	rightToolBar->addAction(resetAct);
 
 	connect(swatchAct, SIGNAL(triggered(bool)), m_swatchArea, SLOT(enablePreview(bool)));
-	connect(centerlineAct, SIGNAL(triggered(bool)), m_swatchArea, SLOT(enableDrawCenterlines(bool)));
+	connect(centerlineAct, SIGNAL(triggered(bool)), m_swatchArea,
+			SLOT(enableDrawCenterlines(bool)));
 	connect(visibilityMenu, SIGNAL(aboutToShow()), this, SLOT(populateVisibilityMenu()));
 	connect(saveAct, SIGNAL(triggered()), this, SLOT(saveParameters()));
 	connect(loadAct, SIGNAL(triggered()), this, SLOT(loadParameters()));
@@ -781,23 +789,24 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 
 	//------------------- Convert Button ----------------------
 
-	//Convert Button
+	// Convert Button
 	m_okBtn = new QPushButton(QString(tr("Convert")), this);
 	connect(m_okBtn, SIGNAL(clicked()), this, SLOT(onOk()));
 
 	addButtonBarWidget(m_okBtn);
 
-	//All detailed signals convey to the unique valuesChanged() signal. That makes it easier
-	//to disconnect update notifications whenever we loadConfiguration(..).
+	// All detailed signals convey to the unique valuesChanged() signal. That makes it easier
+	// to disconnect update notifications whenever we loadConfiguration(..).
 	connect(this, SIGNAL(valuesChanged()), this, SLOT(updateSceneSettings()));
 
-	//Connect value changes to update the global VectorizerPopUpSettingsContainer.
-	//connect(m_typeMenu,SIGNAL(currentIndexChanged(const QString &)),this,SLOT(updateSceneSettings()));
+	// Connect value changes to update the global VectorizerPopUpSettingsContainer.
+	// connect(m_typeMenu,SIGNAL(currentIndexChanged(const QString
+	// &)),this,SLOT(updateSceneSettings()));
 	connect(m_cThreshold, SIGNAL(valueChanged(bool)), this, SLOT(onValueEdited(bool)));
 	connect(m_cAccuracy, SIGNAL(valueChanged(bool)), this, SLOT(onValueEdited(bool)));
 	connect(m_cDespeckling, SIGNAL(valueChanged(bool)), this, SLOT(onValueEdited(bool)));
 	connect(m_cMaxThickness, SIGNAL(valueChanged(bool)), this, SLOT(onValueEdited(bool)));
-	//connect(m_cThicknessRatio,SIGNAL(valueChanged(bool)),this,SLOT(onValueEdited(bool)));
+	// connect(m_cThicknessRatio,SIGNAL(valueChanged(bool)),this,SLOT(onValueEdited(bool)));
 	connect(m_cThicknessRatioFirst, SIGNAL(valueChanged()), this, SLOT(onValueEdited()));
 	connect(m_cThicknessRatioLast, SIGNAL(valueChanged()), this, SLOT(onValueEdited()));
 	connect(m_cMakeFrame, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
@@ -812,13 +821,13 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
 	connect(m_oRelative, SIGNAL(valueChanged(bool)), this, SLOT(onValueEdited(bool)));
 	connect(m_oDespeckling, SIGNAL(valueChanged(bool)), this, SLOT(onValueEdited(bool)));
 	connect(m_oMaxColors, SIGNAL(valueChanged(bool)), this, SLOT(onValueEdited(bool)));
-	connect(m_oTransparentColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
-			this, SLOT(onValueEdited(const TPixel32 &, bool)));
+	connect(m_oTransparentColor, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+			SLOT(onValueEdited(const TPixel32 &, bool)));
 	connect(m_oToneThreshold, SIGNAL(valueChanged(bool)), this, SLOT(onValueEdited(bool)));
 
 	refreshPopup();
 
-	//Non e' corretto: manca la possibilita' di aggiornare la selezione del livello corrente
+	// Non e' corretto: manca la possibilita' di aggiornare la selezione del livello corrente
 	//  connect(TApp::instance()->getCurrentLevel(), SIGNAL(xshLevelChanged()),
 	//                                         this, SLOT(updateValues()));
 }
@@ -884,32 +893,39 @@ bool VectorizerPopup::apply()
 		return false;
 	}
 
-	//Initialize Progress bar
+	// Initialize Progress bar
 	m_progressDialog = new DVGui::ProgressDialog("", "Cancel", 0, 1);
-	m_progressDialog->setWindowFlags(Qt::Dialog | Qt::WindowTitleHint); //Don't show ? and X buttons
+	m_progressDialog->setWindowFlags(Qt::Dialog | Qt::WindowTitleHint); // Don't show ? and X
+																		// buttons
 	m_progressDialog->setWindowTitle(QString("Convert To Vector..."));
 	m_progressDialog->setAttribute(Qt::WA_DeleteOnClose);
-	m_progressDialog->setWindowModality(Qt::WindowModal); //No user interaction is allowed during vectorization
+	m_progressDialog->setWindowModality(
+		Qt::WindowModal); // No user interaction is allowed during vectorization
 	m_progressDialog->setFixedSize(200, 100);
 
-	//Initialize vectorizer
+	// Initialize vectorizer
 	m_vectorizer = new Vectorizer;
 
 	m_vectorizer->setParameters(*vectorizerParameters);
 
-	connect(m_vectorizer, SIGNAL(frameName(QString)), this, SLOT(onFrameName(QString)), Qt::QueuedConnection);
-	connect(m_vectorizer, SIGNAL(frameDone(int)), this, SLOT(onFrameDone(int)), Qt::QueuedConnection);
-	connect(m_vectorizer, SIGNAL(partialDone(int, int)), this, SLOT(onPartialDone(int, int)), Qt::QueuedConnection);
-	//We DON'T want the progress bar to be hidden at cancel press - since its modal
-	//behavior prevents the user to interfere with a possibly still active vectorization.
+	connect(m_vectorizer, SIGNAL(frameName(QString)), this, SLOT(onFrameName(QString)),
+			Qt::QueuedConnection);
+	connect(m_vectorizer, SIGNAL(frameDone(int)), this, SLOT(onFrameDone(int)),
+			Qt::QueuedConnection);
+	connect(m_vectorizer, SIGNAL(partialDone(int, int)), this, SLOT(onPartialDone(int, int)),
+			Qt::QueuedConnection);
+	// We DON'T want the progress bar to be hidden at cancel press - since its modal
+	// behavior prevents the user to interfere with a possibly still active vectorization.
 	disconnect(m_progressDialog, SIGNAL(canceled()), m_progressDialog, SLOT(onCancel()));
-	//We first inform the vectorizer of a cancel press;
+	// We first inform the vectorizer of a cancel press;
 	bool ret = connect(m_progressDialog, SIGNAL(canceled()), m_vectorizer, SLOT(cancel()));
-	//which eventually transmits the command to vectorization core, allowing full-time cancels
-	ret = ret && connect(m_progressDialog, SIGNAL(canceled()), m_vectorizer, SIGNAL(transmitCancel()));
-	//Only after the vectorizer has terminated its process - or got cancelled, we are allowed
-	//to proceed here.
-	ret = ret && connect(m_vectorizer, SIGNAL(finished()), this, SLOT(onFinished()), Qt::QueuedConnection);
+	// which eventually transmits the command to vectorization core, allowing full-time cancels
+	ret = ret &&
+		  connect(m_progressDialog, SIGNAL(canceled()), m_vectorizer, SIGNAL(transmitCancel()));
+	// Only after the vectorizer has terminated its process - or got cancelled, we are allowed
+	// to proceed here.
+	ret = ret &&
+		  connect(m_vectorizer, SIGNAL(finished()), this, SLOT(onFinished()), Qt::QueuedConnection);
 	assert(ret);
 
 	int newIndexColumn = c1 + 1;
@@ -962,8 +978,7 @@ bool VectorizerPopup::apply()
 			for (c = c0; c <= c1; c++) {
 				for (r = r0; r <= r1; r++) {
 					TXshCell cell = xsheet->getCell(r, c);
-					TXshSimpleLevel *level = (!cell.isEmpty()) ? cell.getSimpleLevel()
-															   : 0;
+					TXshSimpleLevel *level = (!cell.isEmpty()) ? cell.getSimpleLevel() : 0;
 					if (level != sl)
 						continue;
 					TFrameId curFid = cell.getFrameId();
@@ -972,8 +987,9 @@ bool VectorizerPopup::apply()
 					std::vector<TFrameId>::iterator it1 = newFids.begin();
 					for (it1; it1 != newFids.end(); it1++) {
 						TFrameId id = *it1;
-						if (id.getNumber() == curFid.getNumber() ||			   // Hanno stesso numero di frame
-							(id.getNumber() == 1 && curFid.getNumber() == -2)) // La vecchia cella non ha numero di frame
+						if (id.getNumber() == curFid.getNumber() || // Hanno stesso numero di frame
+							(id.getNumber() == 1 &&
+							 curFid.getNumber() == -2)) // La vecchia cella non ha numero di frame
 							xsheet->setCell(r, newIndexColumn, TXshCell(vl, id));
 					}
 				}
@@ -981,7 +997,8 @@ bool VectorizerPopup::apply()
 			newIndexColumn += 1;
 		} else if (vl) {
 			std::vector<TFrameId> gomi;
-			scene->getXsheet()->exposeLevel(0, scene->getXsheet()->getFirstFreeColumnIndex(), vl, gomi);
+			scene->getXsheet()->exposeLevel(0, scene->getXsheet()->getFirstFreeColumnIndex(), vl,
+											gomi);
 		}
 
 		if (m_vectorizer->isCanceled())
@@ -1016,7 +1033,7 @@ void VectorizerPopup::onFrameName(QString frameName)
 
 void VectorizerPopup::onFrameDone(int frameCount)
 {
-	m_progressDialog->setValue(frameCount * 100); //100 multiplier stands for partial progresses
+	m_progressDialog->setValue(frameCount * 100); // 100 multiplier stands for partial progresses
 	m_currFrame = frameCount;
 }
 
@@ -1026,17 +1043,21 @@ void VectorizerPopup::onPartialDone(int partial, int total)
 {
 	int value = (m_currFrame + partial / (double)total) * 100.0;
 
-	//NOTA: Puo' essere che la seguente non sia vera - dipende dall'ordine di esecuzione dei segnali
-	//onFrameDone e onPartialDone - se i primi si fanno in massa prima... Puo' generare uno stack overflow...
-	//NOTA: Non va ancora bene. Cosi' si attenua largamente il problema, ma a volte puo' ancora succedere.
+	// NOTA: Puo' essere che la seguente non sia vera - dipende dall'ordine di esecuzione dei
+	// segnali
+	// onFrameDone e onPartialDone - se i primi si fanno in massa prima... Puo' generare uno stack
+	// overflow...
+	// NOTA: Non va ancora bene. Cosi' si attenua largamente il problema, ma a volte puo' ancora
+	// succedere.
 	if (value > m_progressDialog->value() + 5 && value < m_progressDialog->maximum()) {
-		//qDebug("Partial %d of %d;  Value %d of %d", partial, total, value, m_progressDialog->maximum());
+		// qDebug("Partial %d of %d;  Value %d of %d", partial, total, value,
+		// m_progressDialog->maximum());
 		m_progressDialog->setValue(value);
 	}
 	/*else
   {
-    if(value != m_progressDialog->value())
-      qDebug("ERRORE: VALORE PB= %d; Valore: %d",m_progressDialog->value(),value);
+	if(value != m_progressDialog->value())
+	  qDebug("ERRORE: VALORE PB= %d; Valore: %d",m_progressDialog->value(),value);
   }*/
 }
 
@@ -1115,8 +1136,7 @@ void VectorizerPopup::updateVisibility()
 				setVisible(m_paramsLayout->itemAtPosition(row, c), visible);
 		}
 
-		void setVisible(const std::vector<ParamGroup> &paramGroups,
-						int visibilityBits)
+		void setVisible(const std::vector<ParamGroup> &paramGroups, int visibilityBits)
 		{
 			// Iterate parameter groups
 			std::vector<ParamGroup>::const_iterator pgt, pgEnd = paramGroups.end();
@@ -1177,7 +1197,7 @@ void VectorizerPopup::setType(bool outline)
 {
 	disconnect(m_typeMenu, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeChange(int)));
 
-	//Setting child visibility alot invokes several layout updates - causing extensive flickering
+	// Setting child visibility alot invokes several layout updates - causing extensive flickering
 	m_paramsWidget->layout()->setEnabled(false);
 
 	bool centerline = !outline;
@@ -1191,7 +1211,7 @@ void VectorizerPopup::setType(bool outline)
 	m_cDespeckling->setVisible(centerline);
 	m_cMaxThicknessLabel->setVisible(centerline);
 	m_cMaxThickness->setVisible(centerline);
-	//m_cThicknessRatio->setVisible(centerline);
+	// m_cThicknessRatio->setVisible(centerline);
 	m_cThicknessRatioLabel->setVisible(centerline);
 	m_cThicknessRatioFirstLabel->setVisible(centerline);
 	m_cThicknessRatioFirst->setVisible(centerline);
@@ -1235,10 +1255,10 @@ void VectorizerPopup::setType(bool outline)
 
 //-----------------------------------------------------------------------------
 
-//This is essentially the inverse of the previous one.
+// This is essentially the inverse of the previous one.
 void VectorizerPopup::loadConfiguration(bool isOutline)
 {
-	disconnect(SIGNAL(valuesChanged())); //Avoid notifications for value changes
+	disconnect(SIGNAL(valuesChanged())); // Avoid notifications for value changes
 
 	ToonzScene *scene = m_sceneHandle->getScene();
 	assert(scene);
@@ -1269,12 +1289,12 @@ void VectorizerPopup::loadConfiguration(bool isOutline)
 		m_cNaaSource->setChecked(vParams->m_cNaaSource);
 		m_cMaxThickness->setValue(vParams->m_cMaxThickness);
 		m_cAccuracy->setValue(vParams->m_cAccuracy);
-		//m_cThicknessRatio->setValue(vParams->m_cThicknessRatio);
+		// m_cThicknessRatio->setValue(vParams->m_cThicknessRatio);
 		m_cThicknessRatioFirst->setValue(vParams->m_cThicknessRatioFirst / 100.0);
 		m_cThicknessRatioLast->setValue(vParams->m_cThicknessRatioLast / 100.0);
 	}
 
-	//Reconnect changes update
+	// Reconnect changes update
 	connect(this, SIGNAL(valuesChanged()), this, SLOT(updateSceneSettings()));
 	connect(this, SIGNAL(valuesChanged()), m_swatchArea, SLOT(invalidateContents()));
 
@@ -1298,7 +1318,7 @@ void VectorizerPopup::loadRanges(int outline)
 		m_cAccuracy->setRange(1, 10);
 		m_cDespeckling->setRange(1, 10);
 		m_cMaxThickness->setRange(0, (std::numeric_limits<int>::max)());
-		//m_cThicknessRatio->setRange(0,100);
+		// m_cThicknessRatio->setRange(0,100);
 		m_cThicknessRatioFirst->setRange(0, 1.0);
 		m_cThicknessRatioLast->setRange(0, 1.0);
 	}
@@ -1328,8 +1348,7 @@ void VectorizerPopup::populateVisibilityMenu()
 	struct Locals {
 		VectorizerPopup *m_this;
 
-		void addActions(QMenu *menu, const std::vector<ParamGroup> &paramGroups,
-						int visibilityBits)
+		void addActions(QMenu *menu, const std::vector<ParamGroup> &paramGroups, int visibilityBits)
 		{
 			std::vector<ParamGroup>::const_iterator gt, gEnd = paramGroups.end();
 
@@ -1344,7 +1363,8 @@ void VectorizerPopup::populateVisibilityMenu()
 					visibleParam->setChecked(visibilityBits & (1 << pt->m_bit));
 					visibleParam->setData(pt->m_bit);
 
-					bool ret = connect(visibleParam, SIGNAL(toggled(bool)), m_this, SLOT(visibilityToggled()));
+					bool ret = connect(visibleParam, SIGNAL(toggled(bool)), m_this,
+									   SLOT(visibilityToggled()));
 					assert(ret);
 				}
 			}
@@ -1356,8 +1376,7 @@ void VectorizerPopup::populateVisibilityMenu()
 	menu->clear();
 
 	VectorizerParameters *vParams = getParameters();
-	locals.addActions(menu,
-					  vParams->m_isOutline ? l_outlineParamGroups : l_centerlineParamGroups,
+	locals.addActions(menu, vParams->m_isOutline ? l_outlineParamGroups : l_centerlineParamGroups,
 					  vParams->m_visibilityBits);
 }
 
@@ -1432,8 +1451,7 @@ void VectorizerPopup::saveParameters()
 	}
 
 	// Open save popup with defaulted path
-	static GenericSaveFilePopup *popup = new GenericSaveFilePopup(
-		tr("Save Vectorizer Parameters"));
+	static GenericSaveFilePopup *popup = new GenericSaveFilePopup(tr("Save Vectorizer Parameters"));
 
 	popup->setFilterTypes(QStringList("tnzsettings"));
 	popup->setFolder(folder);
@@ -1487,8 +1505,7 @@ void VectorizerPopup::loadParameters()
 	}
 
 	// Open load popup with defaulted path
-	static GenericLoadFilePopup *popup = new GenericLoadFilePopup(
-		tr("Load Vectorizer Parameters"));
+	static GenericLoadFilePopup *popup = new GenericLoadFilePopup(tr("Load Vectorizer Parameters"));
 
 	popup->setFilterTypes(QStringList("tnzsettings"));
 	popup->setFolder(folder);

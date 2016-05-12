@@ -51,7 +51,8 @@ void Writer::write(const TRaster32P &ras, Processor *processor)
 	}
 	glRasterPos2d(0, 0);
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0); // ras->getWrap());
-	glReadPixels(0, 0, m_raster->getLx(), m_raster->getLy(), TGL_FMT, TGL_TYPE, m_raster->getRawData());
+	glReadPixels(0, 0, m_raster->getLx(), m_raster->getLy(), TGL_FMT, TGL_TYPE,
+				 m_raster->getRawData());
 
 	TImageP img = TRasterImageP(m_raster);
 	m_levelWriter->getFrameWriter(++m_frameCount)->save(img);

@@ -37,7 +37,7 @@ namespace
 
 /*
   Find the number of slices in function of radius size.
-  \par radius of circle 
+  \par radius of circle
   \par size of pixel
   \ret number of division to obtain a circle
   */
@@ -149,10 +149,7 @@ void tglDrawCircle(const TPointD &center, double radius)
 	double step = TConsts::pi / slices;
 	double step2 = 2.0 * step;
 
-	double
-		cos_t,
-		sin_t,
-		cos_ts, sin_ts, t;
+	double cos_t, sin_t, cos_ts, sin_ts, t;
 
 	glPushMatrix();
 	glTranslated(center.x, center.y, 0.0);
@@ -302,9 +299,7 @@ void tglMultColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean 
 {
 	GLboolean channels[4];
 	glGetBooleanv(GL_COLOR_WRITEMASK, &channels[0]);
-	glColorMask(red && channels[0],
-				green && channels[1],
-				blue && channels[2],
+	glColorMask(red && channels[0], green && channels[1], blue && channels[2],
 				alpha && channels[3]);
 }
 
@@ -318,7 +313,7 @@ class GlFontManager
 {
 	GlFontManager();
 
-public:
+  public:
 	~GlFontManager();
 	static GlFontManager *instance();
 	bool setFont(void *font = GLUT_BITMAP_TIMES_ROMAN_10);
@@ -326,7 +321,7 @@ public:
 				  std::wstring wtext /*,
                 TDimensionD scale = TDimensionD(1.0, 1.0)*/);
 
-private:
+  private:
 	static GlFontManager *m_instance;
 
 	//       font    font_height
@@ -344,8 +339,7 @@ GlFontManager *GlFontManager::m_instance = 0L;
 
 //----------------------------------------------------------------------------
 
-GlFontManager::GlFontManager()
-	: m_currentFont(0L), m_base(0)
+GlFontManager::GlFontManager() : m_currentFont(0L), m_base(0)
 {
 	m_fonts.insert(std::make_pair(GLUT_BITMAP_8_BY_13, 13.0));
 	m_fonts.insert(std::make_pair(GLUT_BITMAP_9_BY_15, 15.0));
@@ -380,8 +374,7 @@ GlFontManager *GlFontManager::instance()
 bool GlFontManager::setFont(void *font)
 {
 	// cerca il font scelto nella mappa dei fonts conosciuti
-	std::map<void *, double>::iterator it =
-		m_fonts.find(font);
+	std::map<void *, double>::iterator it = m_fonts.find(font);
 
 	// se e' stato trovato
 	if (it != m_fonts.end()) {
@@ -395,7 +388,7 @@ bool GlFontManager::setFont(void *font)
 		for (; i < 256; ++i) {
 			glNewList(m_base + i, GL_COMPILE);
 			glutStrokeCharacter(GLUT_STROKE_ROMAN, i);
-			//glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, i);
+			// glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, i);
 			glEndList();
 		}
 		glPopAttrib();
@@ -467,9 +460,7 @@ void tglDraw(const TCubic &cubic, int precision, GLenum pointOrLine)
 
 //-----------------------------------------------------------------------------
 
-void tglDraw(const TRectD &rect,
-			 const std::vector<TRaster32P> &textures,
-			 bool blending)
+void tglDraw(const TRectD &rect, const std::vector<TRaster32P> &textures, bool blending)
 {
 	double pixelSize2 = tglGetPixelSize2();
 	// level e' la minore potenza di 2 maggiore di sqrt(pixelSize2)
@@ -513,8 +504,7 @@ void tglDraw(const TRectD &rect, const TRaster32P &tex, bool blending)
 	unsigned int texLx = (unsigned int)tex->getLx();
 	unsigned int texLy = (unsigned int)tex->getLy();
 
-	if (texWidth != texLx ||
-		texHeight != texLy) {
+	if (texWidth != texLx || texHeight != texLy) {
 		texture = TRaster32P(texWidth, texHeight);
 		texture->fill(TPixel32(0, 0, 0, 0));
 		texture->copy(tex);
@@ -549,13 +539,7 @@ void tglDraw(const TRectD &rect, const TRaster32P &tex, bool blending)
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->getWrap());
 
 	texture->lock();
-	glTexImage2D(GL_TEXTURE_2D,
-				 0,
-				 4,
-				 texWidth,
-				 texHeight,
-				 0,
-				 fmt,
+	glTexImage2D(GL_TEXTURE_2D, 0, 4, texWidth, texHeight, 0, fmt,
 #ifdef TNZ_MACHINE_CHANNEL_ORDER_MRGB
 				 GL_UNSIGNED_INT_8_8_8_8_REV,
 #else
@@ -610,8 +594,7 @@ void tglDraw(const TRectD &rect, const TRaster32P &tex, bool blending)
 
 //-----------------------------------------------------------------------------
 
-void tglBuildMipmaps(std::vector<TRaster32P> &rasters,
-					 const TFilePath &filepath)
+void tglBuildMipmaps(std::vector<TRaster32P> &rasters, const TFilePath &filepath)
 {
 	assert(rasters.size() > 0);
 	TRop::ResampleFilterType resampleFilter = TRop::ClosestPixel;
@@ -635,8 +618,8 @@ void tglBuildMipmaps(std::vector<TRaster32P> &rasters,
 	TRop::resample(ras2, ras, TScale(sx, sy), resampleFilter);
 #else
 	ras->lock();
-	gluScaleImage(GL_RGBA, ras->getLx(), ras->getLy(), GL_UNSIGNED_BYTE, ras->getRawData(),
-				  lx, ly, GL_UNSIGNED_BYTE, ras2->getRawData());
+	gluScaleImage(GL_RGBA, ras->getLx(), ras->getLy(), GL_UNSIGNED_BYTE, ras->getRawData(), lx, ly,
+				  GL_UNSIGNED_BYTE, ras2->getRawData());
 	ras->unlock();
 #endif
 
@@ -658,15 +641,15 @@ void tglBuildMipmaps(std::vector<TRaster32P> &rasters,
 		TRop::resample(rasters[i], ras2, TScale(sx, sy), resampleFilter);
 #else
 		ras2->lock();
-		gluScaleImage(GL_RGBA, ras->getLx(), ras->getLy(), GL_UNSIGNED_BYTE, ras2->getRawData(),
-					  lx, ly, GL_UNSIGNED_BYTE, rasters[i]->getRawData());
+		gluScaleImage(GL_RGBA, ras->getLx(), ras->getLy(), GL_UNSIGNED_BYTE, ras2->getRawData(), lx,
+					  ly, GL_UNSIGNED_BYTE, rasters[i]->getRawData());
 		ras2->unlock();
 #endif
 	}
 }
 
 //-----------------------------------------------------------------------------
-//Forse si potrebbe togliere l'ifdef ed usare QT
+// Forse si potrebbe togliere l'ifdef ed usare QT
 #if defined(_WIN32)
 
 TGlContext tglGetCurrentContext()
@@ -688,8 +671,7 @@ void tglDoneCurrent(TGlContext)
 
 TGlContext tglGetCurrentContext()
 {
-	return reinterpret_cast<TGlContext>(
-		const_cast<QGLContext *>(QGLContext::currentContext()));
+	return reinterpret_cast<TGlContext>(const_cast<QGLContext *>(QGLContext::currentContext()));
 
 	// (Daniele) I'm not sure why QGLContext::currentContext() returns
 	// const. I think it shouldn't, and guess (hope) this is safe...

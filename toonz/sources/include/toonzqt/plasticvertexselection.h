@@ -24,8 +24,8 @@
   \brief    Represents a selection of vertices from the Plastic tool.
 
   \details  A Plastic vertex selection is a particular case of
-            IndexesSelection that also stores the id of the
-            skeleton containing the indexed vertexes.
+			IndexesSelection that also stores the id of the
+			skeleton containing the indexed vertexes.
 */
 
 class DVAPI PlasticVertexSelection : public MultipleSelection<int>
@@ -34,18 +34,20 @@ class DVAPI PlasticVertexSelection : public MultipleSelection<int>
 
 	int m_skelId; //!< Skeleton Id containing the vertex
 
-public:
-	PlasticVertexSelection(int vIdx = -1, int skelId = -1)
-		: m_skelId(skelId)
+  public:
+	PlasticVertexSelection(int vIdx = -1, int skelId = -1) : m_skelId(skelId)
 	{
 		if (vIdx >= 0)
 			m_objects.push_back(vIdx);
 	}
 
 	//! Constructs from a list of vertex indices
-	//! \warning The user is responsible for ensuring that the list #does not contain negative indices#
+	//! \warning The user is responsible for ensuring that the list #does not contain negative
+	//! indices#
 	PlasticVertexSelection(const std::vector<int> &vIdxs, int skelId = -1)
-		: base_type(vIdxs), m_skelId(skelId) {}
+		: base_type(vIdxs), m_skelId(skelId)
+	{
+	}
 
 	void selectNone()
 	{
@@ -53,10 +55,7 @@ public:
 		base_type::selectNone();
 	}
 
-	operator int() const
-	{
-		return (objects().size() == 1) ? objects().front() : -1;
-	}
+	operator int() const { return (objects().size() == 1) ? objects().front() : -1; }
 
 	int skeletonId() const { return m_skelId; }
 	int &skeletonId() { return m_skelId; }

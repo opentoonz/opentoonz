@@ -51,7 +51,8 @@
 
 namespace
 {
-void drawCamera(QPainter *painter, const QColor &color, const QPen &pen, double width, double height)
+void drawCamera(QPainter *painter, const QColor &color, const QPen &pen, double width,
+				double height)
 {
 	QPointF points[3];
 	points[0] = QPointF(width, height);
@@ -70,15 +71,16 @@ void drawCamera(QPainter *painter, const QColor &color, const QPen &pen, double 
 	painter->setBrush(QColor(235, 235, 235, 255));
 	painter->drawRect(0, -14, width, 14);
 }
-} //namespace
+} // namespace
 
 //========================================================
 //
-//ColumnPainter
+// ColumnPainter
 //
 //========================================================
 
-ColumnPainter::ColumnPainter(StageSchematicColumnNode *parent, double width, double height, const QString &name)
+ColumnPainter::ColumnPainter(StageSchematicColumnNode *parent, double width, double height,
+							 const QString &name)
 	: QGraphicsItem(parent), m_parent(parent), m_width(width), m_height(height), m_name(name)
 {
 	setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -113,7 +115,7 @@ ColumnPainter::~ColumnPainter()
 
 QRectF ColumnPainter::boundingRect() const
 {
-	//iwasawa
+	// iwasawa
 	if (m_parent->isOpened())
 		return QRectF(-5, -54, m_width + 10, m_height + 59);
 	else
@@ -122,12 +124,13 @@ QRectF ColumnPainter::boundingRect() const
 
 //--------------------------------------------------------
 
-void ColumnPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void ColumnPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+						  QWidget *widget)
 {
 	StageSchematicScene *stageScene = dynamic_cast<StageSchematicScene *>(scene());
 	if (!stageScene)
 		return;
-	//obtain level name and type
+	// obtain level name and type
 	int levelType;
 	QString levelName;
 	m_parent->getLevelTypeAndName(levelType, levelName);
@@ -141,7 +144,7 @@ void ColumnPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 	else
 		painter->drawRect(0, 0, m_width, m_height);
 
-	//draw palette icon for palette node
+	// draw palette icon for palette node
 	if (levelType == PLT_XSHLEVEL) {
 		QPixmap palettePm = QPixmap(":Resources/schematic_palette.png");
 		QRect paletteRect(-3, -1, 20, 16);
@@ -149,10 +152,11 @@ void ColumnPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 	}
 
 	if (m_parent->isOpened()) {
-		//Draw the pixmap
+		// Draw the pixmap
 		painter->setBrush(Qt::NoBrush);
 		painter->setPen(QColor(0, 0, 0, 255));
-		QPixmap pixmap = scalePixmapKeepingAspectRatio(m_parent->getPixmap(), QSize(m_width, 49), Qt::transparent);
+		QPixmap pixmap = scalePixmapKeepingAspectRatio(m_parent->getPixmap(), QSize(m_width, 49),
+													   Qt::transparent);
 		if (!pixmap.isNull()) {
 			painter->drawPixmap(QPointF(0, -pixmap.height()), pixmap);
 		} else {
@@ -169,7 +173,7 @@ void ColumnPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 		if (!stageScene)
 			return;
 
-		//if this is current object
+		// if this is current object
 		if (stageScene->getCurrentObject() == m_parent->getStageObject()->getId())
 			painter->setPen(Qt::yellow);
 		QRectF columnNameRect(18, 2, 54, 14);
@@ -330,11 +334,12 @@ void ColumnPainter::onIconGenerated()
 
 //========================================================
 //
-//GroupPainter
+// GroupPainter
 //
 //========================================================
 
-GroupPainter::GroupPainter(StageSchematicGroupNode *parent, double width, double height, const QString &name)
+GroupPainter::GroupPainter(StageSchematicGroupNode *parent, double width, double height,
+						   const QString &name)
 	: QGraphicsItem(parent), m_parent(parent), m_width(width), m_height(height), m_name(name)
 {
 	setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -424,12 +429,12 @@ void GroupPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme)
 
 //========================================================
 //
-//PegbarPainter
+// PegbarPainter
 //
 //========================================================
 
-PegbarPainter::PegbarPainter(StageSchematicPegbarNode *parent, double width,
-							 double height, const QString &name)
+PegbarPainter::PegbarPainter(StageSchematicPegbarNode *parent, double width, double height,
+							 const QString &name)
 	: QGraphicsItem(parent), m_width(width), m_height(height), m_parent(parent), m_name(name)
 {
 }
@@ -449,7 +454,8 @@ QRectF PegbarPainter::boundingRect() const
 
 //--------------------------------------------------------
 
-void PegbarPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void PegbarPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+						  QWidget *widget)
 {
 	QLinearGradient pegLinearGrad(QPointF(0, 0), QPointF(0, 18));
 	pegLinearGrad.setColorAt(0, QColor(223, 184, 115));
@@ -471,7 +477,7 @@ void PegbarPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 			painter->setPen(Qt::yellow);
 		else
 			painter->setPen(Qt::white);
-		//Draw the name
+		// Draw the name
 		QRectF rect(18, 0, 54, 18);
 		QString elidedName = elideText(m_name, painter->font(), rect.width());
 		painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
@@ -508,16 +514,18 @@ void PegbarPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme)
 
 //========================================================
 //
-//CameraPainter
+// CameraPainter
 //
 //========================================================
 
-CameraPainter::CameraPainter(StageSchematicCameraNode *parent, double width, double height, const QString &name)
+CameraPainter::CameraPainter(StageSchematicCameraNode *parent, double width, double height,
+							 const QString &name)
 	: QGraphicsItem(parent), m_width(width), m_height(height), m_parent(parent), m_name(name)
 {
 	StageSchematicScene *stageScene = dynamic_cast<StageSchematicScene *>(scene());
 	TXsheet *xsh = stageScene->getXsheet();
-	m_isActive = xsh->getStageObjectTree()->getCurrentCameraId() == parent->getStageObject()->getId();
+	m_isActive =
+		xsh->getStageObjectTree()->getCurrentCameraId() == parent->getStageObject()->getId();
 }
 
 //--------------------------------------------------------
@@ -535,7 +543,8 @@ QRectF CameraPainter::boundingRect() const
 
 //--------------------------------------------------------
 
-void CameraPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CameraPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+						  QWidget *widget)
 {
 	QLinearGradient camLinearGrad(QPointF(0, 0), QPointF(0, 18));
 	if (m_isActive) {
@@ -566,7 +575,7 @@ void CameraPainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 			painter->setPen(Qt::yellow);
 		else
 			painter->setPen(Qt::white);
-		//Draw the name
+		// Draw the name
 		QRectF rect(18, 0, 54, 18);
 		QString elidedName = elideText(m_name, painter->font(), rect.width());
 		painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
@@ -593,7 +602,8 @@ void CameraPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme)
 	QAction *cut = CommandManager::instance()->getAction("MI_Cut");
 	QAction *paste = CommandManager::instance()->getAction("MI_Paste");
 
-	bool isDeactivated = m_parent->getStageObject()->getId() != stageScene->getXsheet()->getStageObjectTree()->getCurrentCameraId();
+	bool isDeactivated = m_parent->getStageObject()->getId() !=
+						 stageScene->getXsheet()->getStageObjectTree()->getCurrentCameraId();
 
 	if (isDeactivated)
 		menu.addAction(activate);
@@ -612,7 +622,7 @@ void CameraPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme)
 
 //========================================================
 //
-//TablePainter
+// TablePainter
 //
 //========================================================
 
@@ -664,7 +674,7 @@ void TablePainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 	else
 		painter->setPen(Qt::white);
 
-	//Draw the name
+	// Draw the name
 	QRectF rect(30, 0, 42, 18);
 	painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, QString("Table"));
 }
@@ -685,7 +695,7 @@ void TablePainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme)
 
 //========================================================
 //
-//SplinePainter
+// SplinePainter
 //
 //========================================================
 
@@ -713,7 +723,8 @@ QRectF SplinePainter::boundingRect() const
 
 //--------------------------------------------------------
 
-void SplinePainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SplinePainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+						  QWidget *widget)
 {
 
 	QLinearGradient pegLinearGrad(QPointF(0, 0), QPointF(0, 18));
@@ -728,10 +739,11 @@ void SplinePainter::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 	painter->setPen(Qt::NoPen);
 	painter->drawRoundRect(QRectF(0, 0, m_width, m_height), 20, 99);
 	if (m_parent->isOpened()) {
-		//Draw the pixmap
+		// Draw the pixmap
 		painter->setBrush(Qt::NoBrush);
 		painter->setPen(QColor(0, 0, 0, 255));
-		QPixmap pixmap = scalePixmapKeepingAspectRatio(m_parent->getPixmap(), QSize(m_width, 49), Qt::transparent);
+		QPixmap pixmap = scalePixmapKeepingAspectRatio(m_parent->getPixmap(), QSize(m_width, 49),
+													   Qt::transparent);
 		if (!pixmap.isNull()) {
 			painter->drawPixmap(QPointF(0, 18), pixmap);
 		} else {
@@ -782,7 +794,7 @@ void SplinePainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme)
 
 //========================================================
 //
-//StageSchematicNodePort
+// StageSchematicNodePort
 //
 //========================================================
 
@@ -811,27 +823,26 @@ QRectF StageSchematicNodePort::boundingRect() const
 
 //--------------------------------------------------------
 
-void StageSchematicNodePort::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StageSchematicNodePort::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+								   QWidget *widget)
 {
-	//StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(getNode());
-	StageSchematicScene* scene = dynamic_cast<StageSchematicScene*>(this->scene());
-	if (scene && scene->isShowLetterOnPortFlagEnabled())
-	{
+	// StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(getNode());
+	StageSchematicScene *scene = dynamic_cast<StageSchematicScene *>(this->scene());
+	if (scene && scene->isShowLetterOnPortFlagEnabled()) {
 		painter->setBrush(QColor(255, 255, 255, 255));
 		painter->setPen(QColor(180, 180, 180, 255));
 		painter->drawRect(boundingRect());
-		if (m_type == 103 || m_type == 104 || m_type == 105) return;
+		if (m_type == 103 || m_type == 104 || m_type == 105)
+			return;
 		painter->setPen(QColor(0, 0, 0, 255));
 		QFont font("Verdana", 8);
 		painter->setFont(font);
 		QTextOption textOption(Qt::AlignCenter);
 		QString text = m_handle;
-		if (text.size()>1 && text.at(0) == 'H')
+		if (text.size() > 1 && text.at(0) == 'H')
 			text.remove("H");
 		painter->drawText(boundingRect(), text, textOption);
-	}
-	else
-	{
+	} else {
 		QPixmap redPm = QPixmap(":Resources/port_red.png");
 		QPixmap redPm_HL = QPixmap(":Resources/port_red_highlight.png");
 		QPixmap bluePm = QPixmap(":Resources/port_blue.png");
@@ -881,8 +892,8 @@ bool StageSchematicNodePort::linkTo(SchematicPort *port, bool checkOnly)
 		return false;
 	if (pegbar->getId().isTable())
 		return false;
-	if (pegbar->getId().isPegbar() &&
-		!parentPegbar->getId().isTable() && !parentPegbar->getId().isPegbar() && !parentPegbar->getId().isCamera())
+	if (pegbar->getId().isPegbar() && !parentPegbar->getId().isTable() &&
+		!parentPegbar->getId().isPegbar() && !parentPegbar->getId().isCamera())
 		return false;
 
 	if (parentPegbar == pegbar || parentPegbar->isAncestor(pegbar))
@@ -923,9 +934,11 @@ void StageSchematicNodePort::hideSnappedLinks()
 {
 	if (!m_linkingTo)
 		return;
-	if (getType() == eStageChildPort && m_linkingTo->getType() == eStageParentPort && m_linkingTo->getLinkCount() == 1)
+	if (getType() == eStageChildPort && m_linkingTo->getType() == eStageParentPort &&
+		m_linkingTo->getLinkCount() == 1)
 		m_linkingTo->getLink(0)->hide();
-	if (getType() == eStageParentPort && m_linkingTo->getType() == eStageChildPort && getLinkCount() == 1)
+	if (getType() == eStageParentPort && m_linkingTo->getType() == eStageChildPort &&
+		getLinkCount() == 1)
 		getLink(0)->hide();
 }
 
@@ -935,12 +948,14 @@ void StageSchematicNodePort::showSnappedLinks()
 {
 	if (!m_linkingTo)
 		return;
-	if (getType() == eStageChildPort && m_linkingTo->getType() == eStageParentPort && m_linkingTo->getLinkCount() == 1) {
+	if (getType() == eStageChildPort && m_linkingTo->getType() == eStageParentPort &&
+		m_linkingTo->getLinkCount() == 1) {
 		m_linkingTo->getLink(0)->show();
 		m_linkingTo->highLight(true);
 		m_linkingTo->update();
 	}
-	if (getType() == eStageParentPort && m_linkingTo->getType() == eStageChildPort && getLinkCount() == 1) {
+	if (getType() == eStageParentPort && m_linkingTo->getType() == eStageChildPort &&
+		getLinkCount() == 1) {
 		getLink(0)->show();
 		m_linkingTo->highLight(true);
 		m_linkingTo->update();
@@ -949,7 +964,7 @@ void StageSchematicNodePort::showSnappedLinks()
 
 //========================================================
 //
-//StageSchematicSplinePort
+// StageSchematicSplinePort
 //
 //========================================================
 
@@ -980,12 +995,13 @@ QRectF StageSchematicSplinePort::boundingRect() const
 
 //--------------------------------------------------------
 
-void StageSchematicSplinePort::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StageSchematicSplinePort::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+									 QWidget *widget)
 {
-	//ChildPm : connected to the pegbar
+	// ChildPm : connected to the pegbar
 	QPixmap childPm = QPixmap(":Resources/spline_child_port.png");
 	QPixmap childPm_disconnect = QPixmap(":Resources/spline_child_port_disconnect.png");
-	//ParentPm : connected to the spline
+	// ParentPm : connected to the spline
 	QPixmap parentPm = QPixmap(":Resources/spline_parent_port.png");
 
 	QRect rect(2, 0, 12, 6);
@@ -1008,12 +1024,14 @@ bool StageSchematicSplinePort::linkTo(SchematicPort *port, bool checkOnly)
 	StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(getNode());
 	StageSchematicSplineNode *splineNode = dynamic_cast<StageSchematicSplineNode *>(getNode());
 	if (node) {
-		StageSchematicSplineNode *targetSplineNode = dynamic_cast<StageSchematicSplineNode *>(port->getNode());
+		StageSchematicSplineNode *targetSplineNode =
+			dynamic_cast<StageSchematicSplineNode *>(port->getNode());
 		if (!targetSplineNode && port != this)
 			return false;
 		if (!checkOnly && targetSplineNode) {
 			TStageObjectSpline *spline = targetSplineNode->getSpline();
-			TStageObjectCmd::setSplineParent(spline, node->getStageObject(), stageScene->getXsheetHandle());
+			TStageObjectCmd::setSplineParent(spline, node->getStageObject(),
+											 stageScene->getXsheetHandle());
 		} else if (!checkOnly && port == this)
 			node->getStageObject()->setSpline(0);
 		return true;
@@ -1023,7 +1041,8 @@ bool StageSchematicSplinePort::linkTo(SchematicPort *port, bool checkOnly)
 			return false;
 		if (!checkOnly) {
 			TStageObjectSpline *spline = splineNode->getSpline();
-			TStageObjectCmd::setSplineParent(spline, targetNode->getStageObject(), stageScene->getXsheetHandle());
+			TStageObjectCmd::setSplineParent(spline, targetNode->getStageObject(),
+											 stageScene->getXsheetHandle());
 		}
 		return true;
 	}
@@ -1074,7 +1093,7 @@ void StageSchematicSplinePort::showSnappedLinks()
 
 //========================================================
 //
-//class SplineAimChanger
+// class SplineAimChanger
 //
 //========================================================
 
@@ -1123,7 +1142,7 @@ void SplineAimChanger::mouseReleaseEvent(QGraphicsSceneMouseEvent *me)
 
 //========================================================
 //
-//class StageSchematicNodeDock
+// class StageSchematicNodeDock
 //
 //========================================================
 
@@ -1136,16 +1155,14 @@ StageSchematicNodeDock::StageSchematicNodeDock(StageSchematicNode *parent, bool 
 	m_port = new StageSchematicNodePort(this, type);
 
 	m_handleSpinBox = new SchematicHandleSpinBox(this);
-	
+
 	m_port->setPos(0, 0);
-	if (isParentPort)
-	{
-		StageSchematicScene* stageScene = dynamic_cast<StageSchematicScene*>(scene());
+	if (isParentPort) {
+		StageSchematicScene *stageScene = dynamic_cast<StageSchematicScene *>(scene());
 		if (stageScene && stageScene->isShowLetterOnPortFlagEnabled())
 			m_port->setPos(m_handleSpinBox->boundingRect().width(), 0);
 		m_handleSpinBox->setPos(0, 1);
-	}
-	else
+	} else
 		m_handleSpinBox->setPos(m_port->boundingRect().width(), 1);
 
 	m_handleSpinBox->hide();
@@ -1156,7 +1173,8 @@ StageSchematicNodeDock::StageSchematicNodeDock(StageSchematicNode *parent, bool 
 	connect(this, SIGNAL(sceneChanged()), parent, SIGNAL(sceneChanged()));
 
 	connect(m_port, SIGNAL(isClicked()), this, SLOT(onPortClicked()));
-	connect(m_port, SIGNAL(isReleased(const QPointF &)), this, SLOT(onPortReleased(const QPointF &)));
+	connect(m_port, SIGNAL(isReleased(const QPointF &)), this,
+			SLOT(onPortReleased(const QPointF &)));
 
 	m_timer = new QTimer(this);
 	m_timer->setInterval(200);
@@ -1172,7 +1190,6 @@ StageSchematicNodeDock::StageSchematicNodeDock(StageSchematicNode *parent, bool 
 #else
 	setAcceptsHoverEvents(true);
 #endif
-	
 }
 
 //--------------------------------------------------------
@@ -1185,11 +1202,10 @@ StageSchematicNodeDock::~StageSchematicNodeDock()
 
 QRectF StageSchematicNodeDock::boundingRect() const
 {
-	StageSchematicScene* stageScene = dynamic_cast<StageSchematicScene*>(scene());
+	StageSchematicScene *stageScene = dynamic_cast<StageSchematicScene *>(scene());
 	QRectF portRect = m_port->boundingRect();
 	portRect.moveTopLeft(QPointF(0, 0));
-	if (stageScene && stageScene->isShowLetterOnPortFlagEnabled())
-	{
+	if (stageScene && stageScene->isShowLetterOnPortFlagEnabled()) {
 		QRectF handleRect = m_handleSpinBox->boundingRect();
 		handleRect.moveTopLeft(QPointF(portRect.width(), handleRect.topLeft().y()));
 #if QT_VERSION >= 0x050000
@@ -1203,8 +1219,8 @@ QRectF StageSchematicNodeDock::boundingRect() const
 
 //--------------------------------------------------------
 
-void StageSchematicNodeDock::paint(QPainter *painter,
-								   const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StageSchematicNodeDock::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+								   QWidget *widget)
 {
 }
 
@@ -1212,31 +1228,33 @@ void StageSchematicNodeDock::paint(QPainter *painter,
 
 void StageSchematicNodeDock::onModifyHandle(int increase)
 {
-	StageSchematicScene* stageScene = dynamic_cast<StageSchematicScene*>(scene());
+	StageSchematicScene *stageScene = dynamic_cast<StageSchematicScene *>(scene());
 	std::string handle(getPort()->getHandle().toStdString());
 
 	int index;
-	if (handle[0] == 'H' && handle.length()>1)
+	if (handle[0] == 'H' && handle.length() > 1)
 		index = -(toInt(handle.substr(1)));
 	else
 		index = handle[0] - 'A';
-	index += -increase;//==1 ? -1 : 1;
+	index += -increase; //==1 ? -1 : 1;
 
 	int min = (getNode()->getStageObject()->getId().isColumn()) ? -HookSet::maxHooksCount : 0;
 	index = tcrop(index, min, 25);
 
-	if (index >= 0) handle = std::string(1, (char)('A' + index));
-	else handle = "H" + toString(-index);
+	if (index >= 0)
+		handle = std::string(1, (char)('A' + index));
+	else
+		handle = "H" + toString(-index);
 
 	if (m_isParentPort)
-		TStageObjectCmd::setHandle(getNode()->getStageObject()->getId(), handle, stageScene->getXsheetHandle());
-	else
-	{
+		TStageObjectCmd::setHandle(getNode()->getStageObject()->getId(), handle,
+								   stageScene->getXsheetHandle());
+	else {
 		int i, linkCount = getPort()->getLinkCount();
 		std::vector<TStageObjectId> ids;
-		for (i = 0; i<linkCount; i++)
-		{
-			StageSchematicNode* node = dynamic_cast<StageSchematicNode*>(getPort()->getLinkedNode(i));
+		for (i = 0; i < linkCount; i++) {
+			StageSchematicNode *node =
+				dynamic_cast<StageSchematicNode *>(getPort()->getLinkedNode(i));
 			if (node)
 				ids.push_back(node->getStageObject()->getId());
 		}
@@ -1312,7 +1330,7 @@ void StageSchematicNodeDock::onPortReleased(const QPointF &pos)
 
 void StageSchematicNodeDock::onTimeOut()
 {
-	StageSchematicScene* stageScene = dynamic_cast<StageSchematicScene*>(scene());
+	StageSchematicScene *stageScene = dynamic_cast<StageSchematicScene *>(scene());
 	if (stageScene && stageScene->isShowLetterOnPortFlagEnabled())
 		m_handleSpinBox->show();
 	StageSchematicNodePort *port = getPort();
@@ -1341,7 +1359,7 @@ void StageSchematicNodeDock::onTimeOut()
 
 //========================================================
 //
-//class StageSchematicSplineDock
+// class StageSchematicSplineDock
 //
 //========================================================
 
@@ -1380,18 +1398,19 @@ QRectF StageSchematicSplineDock::boundingRect() const
 
 //--------------------------------------------------------
 
-void StageSchematicSplineDock::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StageSchematicSplineDock::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+									 QWidget *widget)
 {
 }
 
 //========================================================
 //
-//class StageSchematicNode
+// class StageSchematicNode
 //
 //========================================================
 
-StageSchematicNode::StageSchematicNode(StageSchematicScene *scene, TStageObject *obj,
-									   int width, int height, bool isGroup)
+StageSchematicNode::StageSchematicNode(StageSchematicScene *scene, TStageObject *obj, int width,
+									   int height, bool isGroup)
 	: SchematicNode(scene), m_stageObject(obj), m_isGroup(isGroup)
 {
 	m_stageObject->addRef();
@@ -1409,13 +1428,11 @@ StageSchematicNode::StageSchematicNode(StageSchematicScene *scene, TStageObject 
 	addPort(-1, m_splineDock->getPort());
 	m_splineDock->setPos(x, m_height);
 
-	m_pathToggle = new SchematicToggle_SplineOptions(this,
-													 QPixmap(":Resources/schematic_spline_aim_rhomb.svg"),
-													 QPixmap(":Resources/schematic_spline_aim_square.svg"),
-													 0);
-	m_cpToggle = new SchematicToggle_SplineOptions(this,
-												   QPixmap(":Resources/schematic_spline_cp.svg"),
-												   0);
+	m_pathToggle = new SchematicToggle_SplineOptions(
+		this, QPixmap(":Resources/schematic_spline_aim_rhomb.svg"),
+		QPixmap(":Resources/schematic_spline_aim_square.svg"), 0);
+	m_cpToggle =
+		new SchematicToggle_SplineOptions(this, QPixmap(":Resources/schematic_spline_cp.svg"), 0);
 	m_pathToggle->setSize(7, 7);
 	m_cpToggle->setSize(7, 7);
 	m_cpToggle->setPos(m_splineDock->pos() - QPointF(7, 0));
@@ -1436,7 +1453,7 @@ StageSchematicNode::StageSchematicNode(StageSchematicScene *scene, TStageObject 
 		m_pathToggle->hide();
 		m_cpToggle->hide();
 	}
-	
+
 	if (m_isGroup)
 		m_parentDock = new StageSchematicNodeDock(this, true, eStageParentGroupPort);
 	else
@@ -1476,7 +1493,8 @@ void StageSchematicNode::setSchematicNodePos(const QPointF &pos) const
 	if (!m_stageObject->isGrouped() || m_stageObject->isGroupEditing())
 		m_stageObject->setDagNodePos(TPointD(pos.x(), pos.y()));
 	else {
-		const StageSchematicGroupNode *groupNode = dynamic_cast<const StageSchematicGroupNode *>(this);
+		const StageSchematicGroupNode *groupNode =
+			dynamic_cast<const StageSchematicGroupNode *>(this);
 		assert(groupNode);
 		groupNode->updateObjsDagPosition(TPointD(pos.x(), pos.y()));
 	}
@@ -1506,10 +1524,9 @@ StageSchematicNodePort *StageSchematicNode::makeChildPort(const QString &label)
 		if (j == n)
 			break;
 	}
-	StageSchematicScene* stageScene = dynamic_cast<StageSchematicScene*>(scene());
-	if (stageScene && stageScene->isShowLetterOnPortFlagEnabled())
-	{
-		StageSchematicNodeDock* newDock;
+	StageSchematicScene *stageScene = dynamic_cast<StageSchematicScene *>(scene());
+	if (stageScene && stageScene->isShowLetterOnPortFlagEnabled()) {
+		StageSchematicNodeDock *newDock;
 		if (m_isGroup)
 			newDock = new StageSchematicNodeDock(this, false, eStageChildGroupPort);
 		else
@@ -1548,19 +1565,16 @@ void StageSchematicNode::updateChildDockPositions()
 {
 	int i, size = m_childDocks.size();
 	StageSchematicScene *stageScene = dynamic_cast<StageSchematicScene *>(scene());
-	if (stageScene && stageScene->isShowLetterOnPortFlagEnabled())
-	{
+	if (stageScene && stageScene->isShowLetterOnPortFlagEnabled()) {
 		double portHeight = m_childDocks.at(0)->getPort()->boundingRect().height();
 		double height = size * portHeight;
-		double y = (m_height - 15 - portHeight*0.5) + height * 0.5;
+		double y = (m_height - 15 - portHeight * 0.5) + height * 0.5;
 		for (i = 0; i < size; i++) {
 			m_childDocks[i]->setPos(m_width, y);
 			m_childDocks[i]->getPort()->updateLinksGeometry();
 			y -= portHeight;
 		}
-	}
-	else
-	{
+	} else {
 		double y = 18;
 		for (i = 0; i < size; i++) {
 			m_childDocks[i]->setPos(m_width - 18, m_height - y);
@@ -1655,7 +1669,7 @@ void StageSchematicNode::onHandleReleased()
 
 //========================================================
 //
-//class StageSchematicPegbarNode
+// class StageSchematicPegbarNode
 //
 //========================================================
 
@@ -1694,7 +1708,8 @@ QRectF StageSchematicPegbarNode::boundingRect() const
 
 //--------------------------------------------------------
 
-void StageSchematicPegbarNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StageSchematicPegbarNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+									 QWidget *widget)
 {
 	StageSchematicNode::paint(painter, option, widget);
 }
@@ -1735,7 +1750,7 @@ void StageSchematicPegbarNode::onNameChanged()
 
 //========================================================
 //
-//class StageSchematicTableNode
+// class StageSchematicTableNode
 //
 //========================================================
 
@@ -1765,7 +1780,8 @@ QRectF StageSchematicTableNode::boundingRect() const
 
 //--------------------------------------------------------
 
-void StageSchematicTableNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StageSchematicTableNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+									QWidget *widget)
 {
 	StageSchematicNode::paint(painter, option, widget);
 }
@@ -1774,7 +1790,7 @@ void StageSchematicTableNode::paint(QPainter *painter, const QStyleOptionGraphic
 
 //========================================================
 //
-//class StageSchematicColumnNode
+// class StageSchematicColumnNode
 //
 //========================================================
 
@@ -1799,8 +1815,10 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene, T
 	ret = ret && connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
 	m_nameItem->hide();
 
-	m_renderToggle = new SchematicToggle(this, QPixmap(":Resources/schematic_prev_eye.png"), SchematicToggle::eIsParentColumn);
-	ret = ret && connect(m_renderToggle, SIGNAL(toggled(bool)), this, SLOT(onRenderToggleClicked(bool)));
+	m_renderToggle = new SchematicToggle(this, QPixmap(":Resources/schematic_prev_eye.png"),
+										 SchematicToggle::eIsParentColumn);
+	ret = ret &&
+		  connect(m_renderToggle, SIGNAL(toggled(bool)), this, SLOT(onRenderToggleClicked(bool)));
 	if (scene) {
 		TXshColumn *column = scene->getXsheet()->getColumn(pegbar->getId().getIndex());
 		if (column)
@@ -1809,13 +1827,15 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene, T
 		m_renderToggle->setPos(72, 0);
 		m_renderToggle->setZValue(2);
 
-		m_cameraStandToggle = new SchematicToggle(this,
-												  QPixmap(":Resources/schematic_table_view.png"),
-												  QPixmap(":Resources/schematic_table_view_transp.png"),
-												  SchematicToggle::eIsParentColumn | SchematicToggle::eEnableNullState);
-		ret = ret && connect(m_cameraStandToggle, SIGNAL(stateChanged(int)), this, SLOT(onCameraStandToggleClicked(int)));
+		m_cameraStandToggle = new SchematicToggle(
+			this, QPixmap(":Resources/schematic_table_view.png"),
+			QPixmap(":Resources/schematic_table_view_transp.png"),
+			SchematicToggle::eIsParentColumn | SchematicToggle::eEnableNullState);
+		ret = ret && connect(m_cameraStandToggle, SIGNAL(stateChanged(int)), this,
+							 SLOT(onCameraStandToggleClicked(int)));
 		if (column)
-			m_cameraStandToggle->setState(column->isCamstandVisible() ? (column->getOpacity() < 255 ? 2 : 1) : 0);
+			m_cameraStandToggle->setState(
+				column->isCamstandVisible() ? (column->getOpacity() < 255 ? 2 : 1) : 0);
 
 		m_cameraStandToggle->setPos(72, 7);
 		m_cameraStandToggle->setZValue(2);
@@ -1850,7 +1870,7 @@ StageSchematicColumnNode::~StageSchematicColumnNode()
 
 QRectF StageSchematicColumnNode::boundingRect() const
 {
-	//iwasawa
+	// iwasawa
 	if (m_isOpened)
 		return QRectF(-5, -54, m_width + 10, m_height + 59);
 	else
@@ -1859,7 +1879,8 @@ QRectF StageSchematicColumnNode::boundingRect() const
 
 //--------------------------------------------------------
 
-void StageSchematicColumnNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StageSchematicColumnNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+									 QWidget *widget)
 {
 	StageSchematicNode::paint(painter, option, widget);
 	TStageObjectId id = m_stageObject->getId();
@@ -1894,7 +1915,8 @@ QPixmap StageSchematicColumnNode::getPixmap()
 			TXshLevel *xl = cell.m_level.getPointer();
 			if (xl) {
 				bool onDemand = false;
-				if (Preferences::instance()->getColumnIconLoadingPolicy() == Preferences::LoadOnDemand)
+				if (Preferences::instance()->getColumnIconLoadingPolicy() ==
+					Preferences::LoadOnDemand)
 					onDemand = stageScene->getColumnHandle()->getColumnIndex() != columnIndex;
 				return IconGenerator::instance()->getIcon(xl, cell.m_frameId, false, onDemand);
 			}
@@ -1983,7 +2005,7 @@ void StageSchematicColumnNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *m
 	if (!stageScene)
 		return;
 
-	//do nothing for double-clicking a zerary Fx node
+	// do nothing for double-clicking a zerary Fx node
 	TStageObjectId id = m_stageObject->getId();
 	TXshColumn *column = stageScene->getXsheet()->getColumn(id.getIndex());
 	TXshZeraryFxColumn *fxColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
@@ -2025,7 +2047,8 @@ void StageSchematicColumnNode::onNameChanged()
 	TXshColumn *column = stageScene->getXsheet()->getColumn(id.getIndex());
 	TXshZeraryFxColumn *fxColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
 	if (fxColumn)
-		TFxCommand::renameFx(fxColumn->getZeraryColumnFx(), m_name.toStdWString(), stageScene->getXsheetHandle());
+		TFxCommand::renameFx(fxColumn->getZeraryColumnFx(), m_name.toStdWString(),
+							 stageScene->getXsheetHandle());
 	else {
 		TStageObjectCmd::rename(id, m_name.toStdString(), stageScene->getXsheetHandle());
 		update();
@@ -2056,7 +2079,7 @@ void StageSchematicColumnNode::onCameraStandToggleClicked(int state)
 		return;
 	TXshColumn *column = stageScene->getXsheet()->getColumn(m_stageObject->getId().getIndex());
 	if (column) {
-		//column->setCamstandNextState();
+		// column->setCamstandNextState();
 		column->setCamstandVisible(!column->isCamstandVisible());
 		emit sceneChanged();
 		emit xsheetChanged();
@@ -2065,7 +2088,7 @@ void StageSchematicColumnNode::onCameraStandToggleClicked(int state)
 
 //========================================================
 //
-//class StageSchematicCameraNode
+// class StageSchematicCameraNode
 //
 //========================================================
 
@@ -2083,7 +2106,7 @@ StageSchematicCameraNode::StageSchematicCameraNode(StageSchematicScene *scene, T
 	connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
 	m_nameItem->hide();
 	m_nameItem->setZValue(2);
-	
+
 	m_cameraPainter = new CameraPainter(this, m_width, m_height, m_name);
 	m_cameraPainter->setZValue(1);
 
@@ -2105,7 +2128,8 @@ QRectF StageSchematicCameraNode::boundingRect() const
 
 //--------------------------------------------------------
 
-void StageSchematicCameraNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StageSchematicCameraNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+									 QWidget *widget)
 {
 	StageSchematicNode::paint(painter, option, widget);
 }
@@ -2145,11 +2169,12 @@ void StageSchematicCameraNode::onNameChanged()
 
 //========================================================
 //
-//class StageSchematicSplineNode
+// class StageSchematicSplineNode
 //
 //========================================================
 
-StageSchematicSplineNode::StageSchematicSplineNode(StageSchematicScene *scene, TStageObjectSpline *spline)
+StageSchematicSplineNode::StageSchematicSplineNode(StageSchematicScene *scene,
+												   TStageObjectSpline *spline)
 	: SchematicNode(scene), m_spline(spline), m_isOpened(false)
 {
 	m_width = 90;
@@ -2200,7 +2225,8 @@ QRectF StageSchematicSplineNode::boundingRect() const
 
 //--------------------------------------------------------
 
-void StageSchematicSplineNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StageSchematicSplineNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+									 QWidget *widget)
 {
 	SchematicNode::paint(painter, option, widget);
 }
@@ -2210,7 +2236,8 @@ void StageSchematicSplineNode::paint(QPainter *painter, const QStyleOptionGraphi
 void StageSchematicSplineNode::onClicked()
 {
 	if (m_dock->getPort()->getLinkCount() > 0) {
-		StageSchematicNode *parentNode = dynamic_cast<StageSchematicNode *>(m_dock->getPort()->getLinkedNode(0));
+		StageSchematicNode *parentNode =
+			dynamic_cast<StageSchematicNode *>(m_dock->getPort()->getLinkedNode(0));
 		TStageObjectId parentId = parentNode->getStageObject()->getId();
 		emit currentObjectChanged(parentId, true);
 	}
@@ -2279,7 +2306,7 @@ void StageSchematicSplineNode::onChangedSize(bool expanded)
 
 //========================================================
 //
-//class StageSchematicSplineNode
+// class StageSchematicSplineNode
 //
 //========================================================
 
@@ -2301,8 +2328,8 @@ StageSchematicGroupNode::StageSchematicGroupNode(StageSchematicScene *scene, TSt
 	ret = ret && connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
 	m_nameItem->hide();
 
-	//m_childDocks[0]->setPos(m_width - 18, 0);
-	//m_parentDock->setPos(0, 0);
+	// m_childDocks[0]->setPos(m_width - 18, 0);
+	// m_parentDock->setPos(0, 0);
 
 	m_painter = new GroupPainter(this, m_width, m_height, m_name);
 	m_painter->setZValue(1);
@@ -2330,7 +2357,8 @@ QRectF StageSchematicGroupNode::boundingRect() const
 
 //--------------------------------------------------------
 
-void StageSchematicGroupNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StageSchematicGroupNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+									QWidget *widget)
 {
 }
 
@@ -2361,7 +2389,8 @@ void StageSchematicGroupNode::onNameChanged()
 	setToolTip(m_name);
 	setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-	TStageObjectCmd::renameGroup(m_groupedObj, m_name.toStdWString(), false, stageScene->getXsheetHandle());
+	TStageObjectCmd::renameGroup(m_groupedObj, m_name.toStdWString(), false,
+								 stageScene->getXsheetHandle());
 	update();
 }
 

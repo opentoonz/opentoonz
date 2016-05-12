@@ -90,7 +90,7 @@ class DVAPI TCacheResource
 		CellData() : m_refsCount(0), m_modified(false), m_referenced(false) {}
 	};
 
-private:
+  private:
 	std::map<std::string, TCacheResource *>::iterator m_pos;
 	TFilePath m_path;
 	unsigned long m_id;
@@ -113,7 +113,7 @@ private:
 	friend class TCacheResourcePool;
 	friend class THDCacheResourcePool;
 
-private:
+  private:
 	TCacheResource();
 	~TCacheResource();
 
@@ -121,15 +121,12 @@ private:
 	inline void addRef() { ++m_refCount; }
 	void release();
 
-public:
+  public:
 	const std::string &getName() const { return m_pos->first; }
 
 	QMutex *getMutex() { return &m_mutex; }
 
-	enum Type { NONE,
-				RGBM32,
-				RGBM64,
-				CM32 };
+	enum Type { NONE, RGBM32, RGBM64, CM32 };
 	int getRasterType() const { return m_tileType; }
 	TRasterP buildCompatibleRaster(const TDimension &size);
 
@@ -168,7 +165,7 @@ public:
 
 	void save(const TFilePath &fp);
 
-private:
+  private:
 	bool checkRasterType(const TRasterP &ras, int &rasType) const;
 	bool checkTile(const TTile &tile) const;
 
@@ -184,7 +181,7 @@ private:
 	inline std::string getCellCacheId(const TPoint &cellPos) const;
 	inline std::string getCellCacheId(int idxX, int idxY) const;
 
-private:
+  private:
 	void setPath(const TFilePath &path);
 	const TFilePath &getPath() const;
 
@@ -228,7 +225,7 @@ class DVAPI TCacheResourceP
 {
 	TCacheResource *m_pointer;
 
-public:
+  public:
 	TCacheResourceP() : m_pointer(0) {}
 
 	TCacheResourceP(const TCacheResourceP &src) : m_pointer(src.m_pointer)
@@ -265,27 +262,15 @@ public:
 
 	TCacheResource *getPointer() const { return m_pointer; }
 
-	bool operator!() const
-	{
-		return m_pointer == 0;
-	}
+	bool operator!() const { return m_pointer == 0; }
 
-	operator bool() const
-	{
-		return m_pointer != 0;
-	}
+	operator bool() const { return m_pointer != 0; }
 
 	bool operator<(const TCacheResourceP &res) const { return m_pointer < res.m_pointer; }
 
-	bool operator==(const TCacheResourceP &p) const
-	{
-		return m_pointer == p.m_pointer;
-	}
+	bool operator==(const TCacheResourceP &p) const { return m_pointer == p.m_pointer; }
 
-	bool operator!=(const TCacheResourceP &p) const
-	{
-		return !(operator==(p));
-	}
+	bool operator!=(const TCacheResourceP &p) const { return !(operator==(p)); }
 };
 
-#endif //TCACHERESOURCE_INCLUDED
+#endif // TCACHERESOURCE_INCLUDED

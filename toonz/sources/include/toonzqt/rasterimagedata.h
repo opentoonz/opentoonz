@@ -32,7 +32,7 @@ class ToonzScene;
 
 class RasterImageData : public DvMimeData
 {
-protected:
+  protected:
 	double m_dpiX, m_dpiY;
 	std::vector<TRectD> m_rects;
 	std::vector<TStroke> m_strokes;
@@ -40,24 +40,27 @@ protected:
 	TAffine m_transformation;
 	TDimension m_dim;
 
-public:
+  public:
 	RasterImageData();
 	~RasterImageData();
 
-	virtual void setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX, double dpiY, const TDimension &dim,
-						 const std::vector<TRectD> &rects, const std::vector<TStroke> &strokes, const std::vector<TStroke> &originalStrokes,
+	virtual void setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX,
+						 double dpiY, const TDimension &dim, const std::vector<TRectD> &rects,
+						 const std::vector<TStroke> &strokes,
+						 const std::vector<TStroke> &originalStrokes,
 						 const TAffine &transformation) = 0;
 
 	virtual void getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
-						 std::vector<TRectD> &rects, std::vector<TStroke> &strokes, std::vector<TStroke> &originalStrokes,
-						 TAffine &transformation, TPalette *targetPalette) const = 0;
+						 std::vector<TRectD> &rects, std::vector<TStroke> &strokes,
+						 std::vector<TStroke> &originalStrokes, TAffine &transformation,
+						 TPalette *targetPalette) const = 0;
 
 	virtual StrokesData *toStrokesData(ToonzScene *scene) const = 0;
 	virtual TPointD getDpi() const = 0;
 	TDimension getDim() const { return m_dim; }
 	virtual RasterImageData *clone() const = 0;
 
-	//Necessary for undo purpose!!!!
+	// Necessary for undo purpose!!!!
 	virtual int getMemorySize() const = 0;
 };
 
@@ -72,18 +75,19 @@ class DVAPI ToonzImageData : public RasterImageData
 
 	std::set<int> m_usedStyles;
 
-public:
+  public:
 	ToonzImageData();
 	ToonzImageData(const ToonzImageData &);
 	~ToonzImageData();
 	// data <- floating ti;
-	void setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX, double dpiY, const TDimension &dim,
-				 const std::vector<TRectD> &rects, const std::vector<TStroke> &strokes, const std::vector<TStroke> &originalStrokes,
+	void setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX, double dpiY,
+				 const TDimension &dim, const std::vector<TRectD> &rects,
+				 const std::vector<TStroke> &strokes, const std::vector<TStroke> &originalStrokes,
 				 const TAffine &transformation);
 
 	// floating ti <- data;
-	void getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
-				 std::vector<TRectD> &rects, std::vector<TStroke> &strokes, std::vector<TStroke> &originalStrokes,
+	void getData(TRasterP &copiedRaster, double &dpiX, double &dpiY, std::vector<TRectD> &rects,
+				 std::vector<TStroke> &strokes, std::vector<TStroke> &originalStrokes,
 				 TAffine &transformation, TPalette *targetPalette) const;
 
 	StrokesData *toStrokesData(ToonzScene *scene) const;
@@ -102,19 +106,20 @@ class DVAPI FullColorImageData : public RasterImageData
 	TRasterP m_copiedRaster;
 	TPaletteP m_palette;
 
-public:
+  public:
 	FullColorImageData();
 	FullColorImageData(const FullColorImageData &);
 	~FullColorImageData();
 
 	// data <- floating ti;
-	void setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX, double dpiY, const TDimension &dim,
-				 const std::vector<TRectD> &rects, const std::vector<TStroke> &strokes, const std::vector<TStroke> &originalStrokes,
+	void setData(const TRasterP &copiedRaster, const TPaletteP &palette, double dpiX, double dpiY,
+				 const TDimension &dim, const std::vector<TRectD> &rects,
+				 const std::vector<TStroke> &strokes, const std::vector<TStroke> &originalStrokes,
 				 const TAffine &transformation);
 
 	// floating ti <- data;
-	void getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
-				 std::vector<TRectD> &rects, std::vector<TStroke> &strokes, std::vector<TStroke> &originalStrokes,
+	void getData(TRasterP &copiedRaster, double &dpiX, double &dpiY, std::vector<TRectD> &rects,
+				 std::vector<TStroke> &strokes, std::vector<TStroke> &originalStrokes,
 				 TAffine &transformation, TPalette *targetPalette) const;
 
 	StrokesData *toStrokesData(ToonzScene *scene) const;

@@ -39,8 +39,7 @@ const int maxStyleIndex = 32765;
 //
 //-------------------------------------------------------------------
 
-TPalette::Page::Page(std::wstring name)
-	: m_name(name), m_index(-1), m_palette(0)
+TPalette::Page::Page(std::wstring name) : m_name(name), m_index(-1), m_palette(0)
 {
 }
 
@@ -159,8 +158,7 @@ void TPalette::Page::removeStyle(int indexInPage)
 
 int TPalette::Page::search(int styleId) const
 {
-	std::vector<int>::const_iterator it =
-		std::find(m_styleIds.begin(), m_styleIds.end(), styleId);
+	std::vector<int>::const_iterator it = std::find(m_styleIds.begin(), m_styleIds.end(), styleId);
 	if (it == m_styleIds.end())
 		return -1;
 	else
@@ -186,7 +184,8 @@ int TPalette::Page::search(TColorStyle *style) const
 //-------------------------------------------------------------------
 
 TPalette::TPalette()
-	: m_version(0), m_isCleanupPalette(false), m_currentFrame(-1), m_dirtyFlag(false), m_mutex(QMutex::Recursive), m_isLocked(false), m_askOverwriteFlag(false)
+	: m_version(0), m_isCleanupPalette(false), m_currentFrame(-1), m_dirtyFlag(false),
+	  m_mutex(QMutex::Recursive), m_isLocked(false), m_askOverwriteFlag(false)
 {
 	QString tempName(QObject::tr("colors"));
 	std::wstring pageName = tempName.toStdWString();
@@ -257,17 +256,18 @@ int TPalette::getFirstUnpagedStyle() const
 }
 
 //-------------------------------------------------------------------
-/*! Adding style with new styleId. Even if there are deleted styles in the palette, the new style will be appended to the end of the list.
+/*! Adding style with new styleId. Even if there are deleted styles in the palette, the new style
+ * will be appended to the end of the list.
 */
 int TPalette::addStyle(TColorStyle *style)
 {
-	//limit the number of cleanup style to 7
+	// limit the number of cleanup style to 7
 	if (isCleanupPalette() && getStyleInPagesCount() >= 8)
 		return -1;
 
 	int styleId = int(m_styles.size());
 	if (styleId < 4096) {
-		//checking if the style is overlapped
+		// checking if the style is overlapped
 		int i = 0;
 		for (i = 0; i < styleId; i++)
 			if (getStyle(i) == style)
@@ -412,7 +412,8 @@ int TPalette::getClosestStyle(const TPixel32 &color) const
 	struct locals {
 		static inline int getDistance2(const TPixel32 &a, const TPixel32 &b)
 		{
-			return (a.r - b.r) * (a.r - b.r) + (a.g - b.g) * (a.g - b.g) + (a.b - b.b) * (a.b - b.b) + (a.m - b.m) * (a.m - b.m);
+			return (a.r - b.r) * (a.r - b.r) + (a.g - b.g) * (a.g - b.g) +
+				   (a.b - b.b) * (a.b - b.b) + (a.m - b.m) * (a.m - b.m);
 		}
 	}; // locals
 
@@ -469,11 +470,9 @@ class StyleWriter : public TOutputStreamInterface
 	TOStream &m_os;
 	int m_index;
 
-public:
+  public:
 	static TFilePath m_rootDir;
-	StyleWriter(TOStream &os, int index) : m_os(os), m_index(index)
-	{
-	}
+	StyleWriter(TOStream &os, int index) : m_os(os), m_index(index) {}
 	static void setRootDir(const TFilePath &fp) { m_rootDir = fp; }
 
 	TOutputStreamInterface &operator<<(double x)
@@ -512,8 +511,7 @@ public:
 
 		std::string name = "texture_" + toString(m_index);
 		m_os << name;
-		TFilePath filename =
-			((m_rootDir + "textures") + name).withType("bmp");
+		TFilePath filename = ((m_rootDir + "textures") + name).withType("bmp");
 		if (!TFileStatus(m_rootDir + "textures").doesExist()) {
 			try {
 				TSystem::mkDir(m_rootDir + "textures");
@@ -533,12 +531,11 @@ class StyleReader : public TInputStreamInterface
 	TIStream &m_is;			 //!< Wrapped input stream.
 	VersionNumber m_version; //!< Palette version number (overrides m_is's one).
 
-public:
+  public:
 	static TFilePath m_rootDir;
 
-public:
-	StyleReader(TIStream &is, const VersionNumber &version)
-		: m_is(is), m_version(version) {}
+  public:
+	StyleReader(TIStream &is, const VersionNumber &version) : m_is(is), m_version(version) {}
 
 	static void setRootDir(const TFilePath &fp) { m_rootDir = fp; }
 
@@ -576,8 +573,7 @@ public:
 		assert(m_rootDir != TFilePath());
 		std::string name;
 		m_is >> name;
-		TFilePath filename =
-			((m_rootDir + "textures") + name).withType("bmp");
+		TFilePath filename = ((m_rootDir + "textures") + name).withType("bmp");
 		TRasterP ras;
 		if (TImageReader::load(filename, ras)) {
 			x = ras;
@@ -591,9 +587,9 @@ public:
 	}
 
 	/*!
-    \details  Explicitly ovverrides the stream's version, returning m_version.
-              This is necessary since palettes have their \a own version number,
-              which is \a not the TIStream's file one.
+	\details  Explicitly ovverrides the stream's version, returning m_version.
+			  This is necessary since palettes have their \a own version number,
+			  which is \a not the TIStream's file one.
   */
 	virtual VersionNumber versionNumber() const
 	{
@@ -736,9 +732,10 @@ void TPalette::loadData(TIStream &is)
 			if (version > VersionNumber(71, 0))
 				throw TException("palette, unsupported version number");
 		} else if (tagName == "styles") {
-			while (!is.eos())										   // I think while(is.openChild(tagName))
-			{														   // would be better. However, I don't trust
-				if (!is.openChild(tagName) || tagName != "style")	  // TIStream's implementation very much. Keeping it
+			while (!is.eos()) // I think while(is.openChild(tagName))
+			{				  // would be better. However, I don't trust
+				if (!is.openChild(tagName) ||
+					tagName != "style") // TIStream's implementation very much. Keeping it
 					throw TException("palette, expected tag <style>"); // like this for now.
 				{
 					StyleReader r(is, version);
@@ -800,7 +797,8 @@ void TPalette::loadData(TIStream &is)
 
 						if (tagName == "keycolor") {
 							if (!is.getTagParam("frame", frame))
-								throw TException("palette, missing frame attribute in tag <keycolor>");
+								throw TException(
+									"palette, missing frame attribute in tag <keycolor>");
 
 							TPixel32 color;
 							is >> color;
@@ -809,7 +807,8 @@ void TPalette::loadData(TIStream &is)
 							cs->setMainColor(color);
 						} else if (tagName == "keyframe") {
 							if (!is.getTagParam("frame", frame))
-								throw TException("palette, missing frame attribute in tag <keyframe>");
+								throw TException(
+									"palette, missing frame attribute in tag <keyframe>");
 
 							StyleReader r(is, version);
 							cs = TColorStyle::load(r);
@@ -853,7 +852,7 @@ void TPalette::loadData(TIStream &is)
 
 //===================================================================
 
-/*! if the palette is copied from studio palette, this function will modify the original names. 
+/*! if the palette is copied from studio palette, this function will modify the original names.
 */
 void TPalette::assign(const TPalette *src, bool isFromStudioPalette)
 {
@@ -861,7 +860,7 @@ void TPalette::assign(const TPalette *src, bool isFromStudioPalette)
 		return;
 	int i;
 	m_isCleanupPalette = src->isCleanupPalette();
-	//for(i=0;i<getStyleCount();i++) delete getStyle(i);
+	// for(i=0;i<getStyleCount();i++) delete getStyle(i);
 	m_styles.clear();
 	clearPointerContainer(m_pages);
 
@@ -871,12 +870,13 @@ void TPalette::assign(const TPalette *src, bool isFromStudioPalette)
 		dstStyle->setName(srcStyle->getName());				// per un baco del TColorStyle::clone()
 		dstStyle->setGlobalName(srcStyle->getGlobalName()); // per un baco del TColorStyle::clone()
 
-		//if the style is copied from studio palette, put its name to the original name.
-		//check if the style has the global name (i.e. it comes from studio palette)
+		// if the style is copied from studio palette, put its name to the original name.
+		// check if the style has the global name (i.e. it comes from studio palette)
 		if (isFromStudioPalette && srcStyle->getGlobalName() != L"") {
-			//If the original style has no original name (i.e. if the style is copied from the studio palette)
+			// If the original style has no original name (i.e. if the style is copied from the
+			// studio palette)
 			if (srcStyle->getOriginalName() == L"") {
-				//put the original style name to the "original name" of the pasted style.
+				// put the original style name to the "original name" of the pasted style.
 				dstStyle->setOriginalName(srcStyle->getName());
 			}
 		}
@@ -896,16 +896,14 @@ void TPalette::assign(const TPalette *src, bool isFromStudioPalette)
 
 	StyleAnimationTable::iterator it;
 	StyleAnimation::iterator j;
-	for (it = m_styleAnimationTable.begin();
-		 it != m_styleAnimationTable.end(); ++it) {
-		//for(j = it->second.begin(); j != it->second.end(); ++j)
+	for (it = m_styleAnimationTable.begin(); it != m_styleAnimationTable.end(); ++it) {
+		// for(j = it->second.begin(); j != it->second.end(); ++j)
 		//   delete j->second;
 		it->second.clear();
 	}
 	m_styleAnimationTable.clear();
 	StyleAnimationTable::const_iterator cit;
-	for (cit = src->m_styleAnimationTable.begin();
-		 cit != src->m_styleAnimationTable.end(); ++cit) {
+	for (cit = src->m_styleAnimationTable.begin(); cit != src->m_styleAnimationTable.end(); ++cit) {
 		StyleAnimation animation = cit->second;
 		for (j = animation.begin(); j != animation.end(); j++)
 			j->second = j->second->clone();
@@ -914,11 +912,11 @@ void TPalette::assign(const TPalette *src, bool isFromStudioPalette)
 	m_globalName = src->getGlobalName();
 	m_shortcuts = src->m_shortcuts;
 	m_currentFrame = src->m_currentFrame;
-	//setDirtyFlag(true);
+	// setDirtyFlag(true);
 }
 
 //-------------------------------------------------------------------
-/*!if the palette is merged from studio palette, this function will modify the original names. 
+/*!if the palette is merged from studio palette, this function will modify the original names.
 */
 void TPalette::merge(const TPalette *src, bool isFromStudioPalette)
 {
@@ -930,12 +928,13 @@ void TPalette::merge(const TPalette *src, bool isFromStudioPalette)
 		dstStyle->setName(srcStyle->getName());
 		dstStyle->setGlobalName(srcStyle->getGlobalName());
 
-		//if the style is copied from studio palette, put its name to the original name.
-		//check if the style has the global name (i.e. it comes from studio palette)
+		// if the style is copied from studio palette, put its name to the original name.
+		// check if the style has the global name (i.e. it comes from studio palette)
 		if (isFromStudioPalette && srcStyle->getGlobalName() != L"") {
-			//If the original style has no original name (i.e. if the style is copied from the studio palette)
+			// If the original style has no original name (i.e. if the style is copied from the
+			// studio palette)
 			if (srcStyle->getOriginalName() == L"") {
-				//put the original style name to the "original name" of the pasted style.
+				// put the original style name to the "original name" of the pasted style.
 				dstStyle->setOriginalName(srcStyle->getName());
 			}
 		}
@@ -1026,8 +1025,7 @@ void TPalette::setFrame(int frame)
 	m_currentFrame = frame;
 
 	StyleAnimationTable::iterator sat, saEnd = m_styleAnimationTable.end();
-	for (sat = m_styleAnimationTable.begin();
-		 sat != saEnd; ++sat) {
+	for (sat = m_styleAnimationTable.begin(); sat != saEnd; ++sat) {
 		StyleAnimation &animation = sat->second;
 		assert(!animation.empty());
 
@@ -1064,8 +1062,7 @@ void TPalette::setFrame(int frame)
 
 bool TPalette::isKeyframe(int styleId, int frame) const
 {
-	StyleAnimationTable::const_iterator it =
-		m_styleAnimationTable.find(styleId);
+	StyleAnimationTable::const_iterator it = m_styleAnimationTable.find(styleId);
 	if (it == m_styleAnimationTable.end())
 		return false;
 	return it->second.count(frame) > 0;
@@ -1075,8 +1072,7 @@ bool TPalette::isKeyframe(int styleId, int frame) const
 
 int TPalette::getKeyframeCount(int styleId) const
 {
-	StyleAnimationTable::const_iterator it =
-		m_styleAnimationTable.find(styleId);
+	StyleAnimationTable::const_iterator it = m_styleAnimationTable.find(styleId);
 	if (it == m_styleAnimationTable.end())
 		return 0;
 	return int(it->second.size());
@@ -1086,8 +1082,7 @@ int TPalette::getKeyframeCount(int styleId) const
 
 int TPalette::getKeyframe(int styleId, int index) const
 {
-	StyleAnimationTable::const_iterator it =
-		m_styleAnimationTable.find(styleId);
+	StyleAnimationTable::const_iterator it = m_styleAnimationTable.find(styleId);
 	if (it == m_styleAnimationTable.end())
 		return -1;
 	const StyleAnimation &animation = it->second;
@@ -1105,8 +1100,7 @@ void TPalette::setKeyframe(int styleId, int frame)
 	assert(styleId >= 0 && styleId < getStyleCount());
 	assert(frame >= 0);
 
-	StyleAnimationTable::iterator sat =
-		m_styleAnimationTable.find(styleId);
+	StyleAnimationTable::iterator sat = m_styleAnimationTable.find(styleId);
 
 	if (sat == m_styleAnimationTable.end())
 		sat = m_styleAnimationTable.insert(std::make_pair(styleId, StyleAnimation())).first;
@@ -1123,15 +1117,14 @@ void TPalette::clearKeyframe(int styleId, int frame)
 {
 	assert(0 <= styleId && styleId < getStyleCount());
 	assert(0 <= frame);
-	StyleAnimationTable::iterator it =
-		m_styleAnimationTable.find(styleId);
+	StyleAnimationTable::iterator it = m_styleAnimationTable.find(styleId);
 	if (it == m_styleAnimationTable.end())
 		return;
 	StyleAnimation &animation = it->second;
 	StyleAnimation::iterator j = animation.find(frame);
 	if (j == animation.end())
 		return;
-	//j->second->release();
+	// j->second->release();
 	animation.erase(j);
 	if (animation.empty()) {
 		m_styleAnimationTable.erase(styleId);
@@ -1148,9 +1141,7 @@ int TPalette::getShortcutValue(int key) const
 	if (it == m_shortcuts.end())
 		return -1;
 	int styleId = it->second;
-	return 0 <= styleId && styleId < getStyleCount()
-			   ? styleId
-			   : -1;
+	return 0 <= styleId && styleId < getStyleCount() ? styleId : -1;
 }
 
 //-------------------------------------------------------------------
@@ -1159,8 +1150,7 @@ int TPalette::getStyleShortcut(int styleId) const
 {
 	assert(0 <= styleId && styleId < getStyleCount());
 	std::map<int, int>::const_iterator it;
-	for (it = m_shortcuts.begin();
-		 it != m_shortcuts.end(); ++it)
+	for (it = m_shortcuts.begin(); it != m_shortcuts.end(); ++it)
 		if (it->second == styleId)
 			return it->first;
 	return -1;
@@ -1171,14 +1161,12 @@ int TPalette::getStyleShortcut(int styleId) const
 void TPalette::setShortcutValue(int key, int styleId)
 {
 	assert('0' <= key && key <= '9');
-	assert(styleId == -1 ||
-		   0 <= styleId && styleId < getStyleCount());
+	assert(styleId == -1 || 0 <= styleId && styleId < getStyleCount());
 	if (styleId == -1)
 		m_shortcuts.erase(key);
 	else {
 		std::map<int, int>::iterator it;
-		for (it = m_shortcuts.begin();
-			 it != m_shortcuts.end(); ++it)
+		for (it = m_shortcuts.begin(); it != m_shortcuts.end(); ++it)
 			if (it->second == styleId) {
 				m_shortcuts.erase(it);
 				break;

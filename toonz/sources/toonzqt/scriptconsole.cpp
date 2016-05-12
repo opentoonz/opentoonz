@@ -7,8 +7,7 @@
 #include <QUrl>
 #include <QMimeData>
 
-ScriptConsole::ScriptConsole(QWidget *parent)
-	: QTextEdit(parent), m_commandIndex(0)
+ScriptConsole::ScriptConsole(QWidget *parent) : QTextEdit(parent), m_commandIndex(0)
 {
 	m_prompt = ">> ";
 
@@ -17,7 +16,8 @@ ScriptConsole::ScriptConsole(QWidget *parent)
 
 	m_engine = new ScriptEngine();
 	connect(m_engine, SIGNAL(evaluationDone()), this, SLOT(onEvaluationDone()));
-	connect(m_engine, SIGNAL(output(int, const QString &)), this, SLOT(output(int, const QString &)));
+	connect(m_engine, SIGNAL(output(int, const QString &)), this,
+			SLOT(output(int, const QString &)));
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
 }
 

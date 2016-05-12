@@ -20,7 +20,7 @@ class DVAPI TControlPanel : public TWidget
 	class Layout;
 	Layout *m_layout;
 
-public:
+  public:
 	TControlPanel(TWidget *parent, string name = "control panel");
 	~TControlPanel();
 

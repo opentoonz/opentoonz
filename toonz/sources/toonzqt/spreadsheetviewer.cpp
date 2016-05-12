@@ -153,14 +153,14 @@ void PanTool::click(int row, int col, QMouseEvent *e)
 void PanTool::drag(int row, int col, QMouseEvent *e)
 {
 	QPoint pos = e->pos(); // m_panel->mapToGlobal(e->pos());
-	//QPoint delta = p - m_lastPos;
-	//m_lastPos = p;
+	// QPoint delta = p - m_lastPos;
+	// m_lastPos = p;
 	// QToolTip::showText(p,"delta="+QString::number(delta.x())+","+QString::number(delta.y()));
 	m_viewer->scroll(m_lastPos - pos);
 }
 void PanTool::release(int row, int col, QMouseEvent *e)
 {
-	//QToolTip::hideText();
+	// QToolTip::hideText();
 }
 
 //=============================================================================
@@ -265,8 +265,7 @@ void GenericPanel::mouseMoveEvent(QMouseEvent *e)
 
 //=============================================================================
 
-RowPanel::RowPanel(SpreadsheetViewer *viewer)
-	: GenericPanel(viewer), m_xa(12)
+RowPanel::RowPanel(SpreadsheetViewer *viewer) : GenericPanel(viewer), m_xa(12)
 {
 }
 
@@ -301,12 +300,13 @@ void RowPanel::drawRows(QPainter &p, int r0, int r1)
 	int r;
 	for (r = r0; r <= r1; r++) {
 		int y = getViewer()->rowToY(r);
-		//draw horizontal line
-		QColor color = (getViewer()->isMarkRow(r)) ? getViewer()->getMarkerLineColor() : getViewer()->getLightLineColor();
+		// draw horizontal line
+		QColor color = (getViewer()->isMarkRow(r)) ? getViewer()->getMarkerLineColor()
+												   : getViewer()->getLightLineColor();
 		p.setPen(color);
 		p.drawLine(x0, y, x1, y);
 
-		//draw numbers
+		// draw numbers
 		p.setPen(getViewer()->getTextColor());
 
 		QString number = QString::number(r + 1);
@@ -350,15 +350,13 @@ void RowPanel::paintEvent(QPaintEvent *e)
 
 //=============================================================================
 
-ColumnPanel::ColumnPanel(SpreadsheetViewer *viewer)
-	: GenericPanel(viewer)
+ColumnPanel::ColumnPanel(SpreadsheetViewer *viewer) : GenericPanel(viewer)
 {
 }
 
 //=============================================================================
 
-CellPanel::CellPanel(SpreadsheetViewer *viewer)
-	: GenericPanel(viewer)
+CellPanel::CellPanel(SpreadsheetViewer *viewer) : GenericPanel(viewer)
 {
 }
 
@@ -391,17 +389,17 @@ void CellPanel::paintEvent(QPaintEvent *e)
 	// cambia colore alle celle prima di rowCount()
 	int rowCount = getViewer()->getRowCount();
 
-	//fill with bg color
+	// fill with bg color
 	painter.fillRect(toBeUpdated, getViewer()->getLightLightBGColor());
 
-	//scene range bg
+	// scene range bg
 	int yLast = getViewer()->rowToY(rowCount);
 	if (yLast < y1)
 		painter.fillRect(x0, y0, x1 - x0, yLast - y0, getViewer()->getBGColor());
 	else
 		painter.fillRect(toBeUpdated, getViewer()->getBGColor());
 
-	//draw cells
+	// draw cells
 	drawCells(painter, r0, c0, r1, c1);
 
 	// draw columns
@@ -415,7 +413,8 @@ void CellPanel::paintEvent(QPaintEvent *e)
 	int currentRow = getViewer()->getCurrentRow();
 	for (int r = r0; r <= r1; r++) {
 		int y = getViewer()->rowToY(r);
-		QColor color = getViewer()->isMarkRow(r) ? getViewer()->getMarkerLineColor() : getViewer()->getLightLineColor();
+		QColor color = getViewer()->isMarkRow(r) ? getViewer()->getMarkerLineColor()
+												 : getViewer()->getLightLineColor();
 		painter.setPen(color);
 		painter.drawLine(x0, y, x1, y);
 	}
@@ -429,28 +428,31 @@ void CellPanel::paintEvent(QPaintEvent *e)
 //=============================================================================
 
 SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
-	: QFrame(parent), m_columnScrollArea(0), m_rowScrollArea(0), m_cellScrollArea(0), m_frameHandle(0), m_columnWidth(50), m_rowHeight(20), m_timerId(0), m_autoPanSpeed(0, 0), m_lastAutoPanPos(0, 0), m_rowCount(0), m_columnCount(0), m_currentRow(0), m_markRowDistance(6), m_markRowOffset(0), m_isComputingSize(false)
+	: QFrame(parent), m_columnScrollArea(0), m_rowScrollArea(0), m_cellScrollArea(0),
+	  m_frameHandle(0), m_columnWidth(50), m_rowHeight(20), m_timerId(0), m_autoPanSpeed(0, 0),
+	  m_lastAutoPanPos(0, 0), m_rowCount(0), m_columnCount(0), m_currentRow(0),
+	  m_markRowDistance(6), m_markRowOffset(0), m_isComputingSize(false)
 {
 	setFocusPolicy(Qt::NoFocus);
 
 	setFrameStyle(QFrame::StyledPanel);
 	setObjectName("Viewer");
 
-	//column header
+	// column header
 	m_columnScrollArea = new Spreadsheet::ScrollArea;
 	m_columnScrollArea->setObjectName("ScrollArea");
 	m_columnScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_columnScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_columnScrollArea->setFocusPolicy(Qt::NoFocus);
 
-	//row area
+	// row area
 	m_rowScrollArea = new Spreadsheet::ScrollArea;
 	m_rowScrollArea->setObjectName("ScrollArea");
 	m_rowScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_rowScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_rowScrollArea->setFocusPolicy(Qt::NoFocus);
 
-	//cell area
+	// cell area
 	m_cellScrollArea = new Spreadsheet::ScrollArea;
 	m_cellScrollArea->setObjectName("ScrollArea");
 	m_cellScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -464,7 +466,7 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
 
 	m_rowScrollArea->setFixedWidth(30);
 	m_columnScrollArea->setFixedHeight(m_rowHeight * 3 - 3);
-	//m_columnScrollArea->setFixedHeight(m_rowHeight * 3 + 60 - 63);
+	// m_columnScrollArea->setFixedHeight(m_rowHeight * 3 + 60 - 63);
 
 	//---- layout
 	QGridLayout *layout = new QGridLayout();
@@ -475,12 +477,12 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
 		layout->addWidget(m_rowScrollArea, 1, 0);
 		layout->addWidget(m_cellScrollArea, 1, 1, 2, 2);
 
-		//upper-right
+		// upper-right
 		QWidget *w = new QWidget(this);
 		w->setFixedSize(QSize(20, m_rowHeight * 3 + 60 - 63));
 		layout->addWidget(w, 0, 2);
 
-		//lower-left
+		// lower-left
 		w = new QWidget(this);
 		w->setFixedSize(QSize(30, 20));
 		layout->addWidget(w, 2, 0);
@@ -585,7 +587,7 @@ void SpreadsheetViewer::scroll(QPoint delta)
 	else if (notUpdateSizeH && !notUpdateSizeV)
 		refreshContentSize(0, y);
 	else if (!notUpdateSizeH && notUpdateSizeV)
-	  refreshContentSize(x, 0);
+		refreshContentSize(x, 0);
 
 	if (valueH > maxValueH && x > 0)
 		valueH = hSc->maximum();
@@ -595,7 +597,6 @@ void SpreadsheetViewer::scroll(QPoint delta)
 
 	hSc->setValue(valueH);
 	vSc->setValue(valueV);
-
 }
 
 void SpreadsheetViewer::setAutoPanSpeed(const QPoint &speed)
@@ -681,12 +682,10 @@ bool SpreadsheetViewer::refreshContentSize(int scrollDx, int scrollDy)
 	else {
 		m_isComputingSize = true;
 		m_cellScrollArea->widget()->setFixedSize(actualSize);
-		m_rowScrollArea->widget()->setFixedSize(
-			m_rowScrollArea->viewport()->width(),
-			actualSize.height());
-		m_columnScrollArea->widget()->setFixedSize(
-			actualSize.width(),
-			m_columnScrollArea->viewport()->height());
+		m_rowScrollArea->widget()->setFixedSize(m_rowScrollArea->viewport()->width(),
+												actualSize.height());
+		m_columnScrollArea->widget()->setFixedSize(actualSize.width(),
+												   m_columnScrollArea->viewport()->height());
 		m_isComputingSize = false;
 		return true;
 	}
@@ -740,26 +739,26 @@ void SpreadsheetViewer::resizeEvent(QResizeEvent *e)
 
 void SpreadsheetViewer::wheelEvent(QWheelEvent *event)
 {
-	switch(event->source()){
+	switch (event->source()) {
 
-	case Qt::MouseEventNotSynthesized:
-	{
-		if (event->angleDelta().x() == 0){ //vertical scroll
-			int scrollPixels =(event->angleDelta().y()>0 ? 1 : -1) *m_markRowDistance *m_rowHeight;
+	case Qt::MouseEventNotSynthesized: {
+		if (event->angleDelta().x() == 0) { // vertical scroll
+			int scrollPixels =
+				(event->angleDelta().y() > 0 ? 1 : -1) * m_markRowDistance * m_rowHeight;
 			scroll(QPoint(0, -scrollPixels));
-		}else{                             //horizontal scroll
-			int scrollPixels =(event->angleDelta().x()>0 ? 1 : -1) *m_columnWidth;
+		} else { // horizontal scroll
+			int scrollPixels = (event->angleDelta().x() > 0 ? 1 : -1) * m_columnWidth;
 			scroll(QPoint(-scrollPixels, 0));
 		}
 		break;
 	}
 
-	case Qt::MouseEventSynthesizedBySystem: //macbook touch-pad
+	case Qt::MouseEventSynthesizedBySystem: // macbook touch-pad
 	{
 		QPoint numPixels = event->pixelDelta();
 		QPoint numDegrees = event->angleDelta() / 8;
 		if (!numPixels.isNull()) {
- 			scroll(-numPixels);
+			scroll(-numPixels);
 		} else if (!numDegrees.isNull()) {
 			QPoint numSteps = numDegrees / 15;
 			scroll(-numSteps);
@@ -767,14 +766,15 @@ void SpreadsheetViewer::wheelEvent(QWheelEvent *event)
 		break;
 	}
 
-	default: //Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication
+	default: // Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication
 	{
-		std::cout << "not supported wheelEvent.source(): Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication" << std::endl;
+		std::cout << "not supported wheelEvent.source(): Qt::MouseEventSynthesizedByQt, "
+					 "Qt::MouseEventSynthesizedByApplication"
+				  << std::endl;
 		break;
 	}
 
- 	}// end switch
-
+	} // end switch
 }
 
 void SpreadsheetViewer::timerEvent(QTimerEvent *e)
@@ -786,8 +786,8 @@ void SpreadsheetViewer::timerEvent(QTimerEvent *e)
 	/*
   if(m_dragTool)
   {
-    QMouseEvent mouseEvent(QEvent::MouseMove, m_lastAutoPanPos, Qt::NoButton, 0, 0);
-    m_dragTool->onDrag(&mouseEvent);
+	QMouseEvent mouseEvent(QEvent::MouseMove, m_lastAutoPanPos, Qt::NoButton, 0, 0);
+	m_dragTool->onDrag(&mouseEvent);
   }
   */
 }
@@ -797,10 +797,10 @@ void SpreadsheetViewer::keyPressEvent(QKeyEvent *e)
 	int frameCount = m_rowCount;
 	int row = m_frameHandle->getFrame();
 
-	if (e->key() == Qt::Key_Up && row > 0) { //Row = frame precedente a quello settato
+	if (e->key() == Qt::Key_Up && row > 0) { // Row = frame precedente a quello settato
 		m_frameHandle->setFrame(row - 1);
 		return;
-	} else if (e->key() == Qt::Key_Down) { //Row = frame successivo a quello settato
+	} else if (e->key() == Qt::Key_Down) { // Row = frame successivo a quello settato
 		m_frameHandle->setFrame(row + 1);
 		return;
 	} else if (e->key() == '0') {
@@ -822,9 +822,9 @@ void SpreadsheetViewer::keyPressEvent(QKeyEvent *e)
 	int y = 0;
 	QRect visibleRect = m_cellScrollArea->widget()->visibleRegion().boundingRect();
 	int visibleRowCount = visibleRect.height() / m_rowHeight;
-	if (e->key() == Qt::Key_PageUp) //Setto la visualizzazione della pagina precedente
+	if (e->key() == Qt::Key_PageUp) // Setto la visualizzazione della pagina precedente
 		y = visibleRect.top() - (visibleRowCount + 1) * m_rowHeight;
-	else if (e->key() == Qt::Key_PageDown) //Setto la visualizzazione della pagina successiva
+	else if (e->key() == Qt::Key_PageDown) // Setto la visualizzazione della pagina successiva
 		y = visibleRect.bottom() + (visibleRowCount + 1) * m_rowHeight;
 	else if (e->key() == Qt::Key_Home)
 		y = 0;
@@ -872,10 +872,10 @@ void SpreadsheetViewer::onVSliderChanged(int)
   QScrollBar *vSc = m_cellScrollArea->verticalScrollBar();
   int h = qMax(vSc->value() + m_cellScrollArea->height(), rowToY(getRowCount()));
   if(m_cellScrollArea->widget())
-    m_cellScrollArea->widget()->setFixedHeight(h);
+	m_cellScrollArea->widget()->setFixedHeight(h);
   if(m_rowScrollArea->widget())
-    m_rowScrollArea->widget()->setFixedHeight(h);
-    */
+	m_rowScrollArea->widget()->setFixedHeight(h);
+	*/
 
 	/*
   int viewportHeight = m_cellScrollArea->height();

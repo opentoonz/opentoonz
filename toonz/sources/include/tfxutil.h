@@ -28,17 +28,13 @@ DVAPI TFxP makeBlur(const TFxP &arg, double value);
 
 DVAPI TFxP makeRadialGradient(/*TPixel32 color*/);
 
-enum { NO_KEYFRAMES = 0,
-	   ALL_KEYFRAMES = 1,
-	   SOME_KEYFRAMES = -1 };
+enum { NO_KEYFRAMES = 0, ALL_KEYFRAMES = 1, SOME_KEYFRAMES = -1 };
 
 DVAPI int getKeyframeStatus(const TFxP &fx, int frame);
 DVAPI void deleteKeyframes(const TFxP &fx, int frame);
 
-DVAPI void setKeyframe(
-	const TFxP &dstFx, int dstFrame,
-	const TFxP &srcFx, int srcFrame,
-	bool changedOnly = false);
+DVAPI void setKeyframe(const TFxP &dstFx, int dstFrame, const TFxP &srcFx, int srcFrame,
+					   bool changedOnly = false);
 }
 
 #endif

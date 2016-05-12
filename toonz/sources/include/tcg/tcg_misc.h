@@ -7,7 +7,7 @@
   \file         tcg_misc.h
 
   \deprecated   This file contains the includes for tcg constants, numeric, polynomial
-                and point operations.
+				and point operations.
 */
 
 // tcg includes

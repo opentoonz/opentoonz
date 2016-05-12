@@ -14,7 +14,7 @@ class BlurFx : public TStandardRasterFx
 	TDoubleParamP m_value;
 	TBoolParamP m_useSSE;
 
-public:
+  public:
 	BlurFx() : m_value(20), m_useSSE(true)
 	{
 		m_value->setMeasureName("fxLength");
@@ -45,13 +45,9 @@ public:
 
 	void enlarge(const TRectD &bbox, TRectD &requestedRect, int blur);
 
-	void transform(
-		double frame,
-		int port,
-		const TRectD &rectOnOutput,
-		const TRenderSettings &infoOnOutput,
-		TRectD &rectOnInput,
-		TRenderSettings &infoOnInput);
+	void transform(double frame, int port, const TRectD &rectOnOutput,
+				   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+				   TRenderSettings &infoOnInput);
 
 	void doCompute(TTile &tile, double frame, const TRenderSettings &);
 
@@ -69,8 +65,8 @@ FX_PLUGIN_IDENTIFIER(BlurFx, "blurFx")
 
 //-------------------------------------------------------------------
 
-//!Calculates the geometry we need for this node computation, given
-//!the known input data (bbox), the requested output (requestedRect) and the blur factor.
+//! Calculates the geometry we need for this node computation, given
+//! the known input data (bbox), the requested output (requestedRect) and the blur factor.
 void BlurFx::enlarge(const TRectD &bbox, TRectD &requestedRect, int blur)
 {
 	if (bbox.isEmpty() || requestedRect.isEmpty()) {
@@ -78,8 +74,8 @@ void BlurFx::enlarge(const TRectD &bbox, TRectD &requestedRect, int blur)
 		return;
 	}
 
-	//We are to find out the geometry that is useful for the fx computation.
-	//There are some rules to follow:
+	// We are to find out the geometry that is useful for the fx computation.
+	// There are some rules to follow:
 	//  a) First, the interesting output we can generate is bounded by both
 	//     the requestedRect and the blurred bbox (i.e. enlarged by the blur radius).
 	//  b) Pixels contributing to any output are necessarily part of bbox - and only
@@ -92,7 +88,7 @@ void BlurFx::enlarge(const TRectD &bbox, TRectD &requestedRect, int blur)
 	TPointD originalP00(requestedRect.getP00());
 	requestedRect = (enlargedOut * bbox) + (enlargedBBox * requestedRect);
 
-	//Finally, make sure that the result is coherent with the original P00
+	// Finally, make sure that the result is coherent with the original P00
 	requestedRect -= originalP00;
 	requestedRect.x0 = tfloor(requestedRect.x0);
 	requestedRect.y0 = tfloor(requestedRect.y0);
@@ -103,13 +99,9 @@ void BlurFx::enlarge(const TRectD &bbox, TRectD &requestedRect, int blur)
 
 //-------------------------------------------------------------------
 
-void BlurFx::transform(
-	double frame,
-	int port,
-	const TRectD &rectOnOutput,
-	const TRenderSettings &infoOnOutput,
-	TRectD &rectOnInput,
-	TRenderSettings &infoOnInput)
+void BlurFx::transform(double frame, int port, const TRectD &rectOnOutput,
+					   const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
+					   TRenderSettings &infoOnInput)
 {
 	infoOnInput = infoOnOutput;
 	rectOnInput = rectOnOutput;
@@ -138,17 +130,14 @@ int BlurFx::getMemoryRequirement(const TRectD &rect, double frame, const TRender
 
 	int brad = tceil(blurValue);
 
-	//Trop::blur is quite inefficient at the moment - it has to allocate a whole
-	//raster of the same size of the input/output made of FLOAT QUADRUPLES...!
+	// Trop::blur is quite inefficient at the moment - it has to allocate a whole
+	// raster of the same size of the input/output made of FLOAT QUADRUPLES...!
 	return TRasterFx::memorySize(rect.enlarge(brad), sizeof(float) << 5);
 }
 
 //-------------------------------------------------------------------
 
-void BlurFx::doCompute(
-	TTile &tile,
-	double frame,
-	const TRenderSettings &renderSettings)
+void BlurFx::doCompute(TTile &tile, double frame, const TRenderSettings &renderSettings)
 {
 	if (!m_input.isConnected())
 		return;
@@ -156,23 +145,23 @@ void BlurFx::doCompute(
 	double shrink = 0.5 * (renderSettings.m_shrinkX + renderSettings.m_shrinkY);
 	// Note: shrink is obsolete. It should be always = 1
 
-	double blurValue = fabs(m_value->getValue(frame) * sqrt(fabs(renderSettings.m_affine.det())) / shrink);
+	double blurValue =
+		fabs(m_value->getValue(frame) * sqrt(fabs(renderSettings.m_affine.det())) / shrink);
 
 	if (blurValue == 0) {
-		//No blur will be done. The underlying fx may pass by.
+		// No blur will be done. The underlying fx may pass by.
 		m_input->compute(tile, frame, renderSettings);
 		return;
 	}
 
 	int brad = tceil(blurValue);
 
-	//Get the requested tile's geometry
+	// Get the requested tile's geometry
 	TRectD rectIn, rectOut;
-	rectOut = TRectD(
-		tile.m_pos, TDimensionD(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
+	rectOut = TRectD(tile.m_pos, TDimensionD(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
 
-	//Retrieve the input interesting geometry - and ensure that something actually has
-	//to be computed
+	// Retrieve the input interesting geometry - and ensure that something actually has
+	// to be computed
 	if (!m_input->getBBox(frame, rectIn, renderSettings) || rectOut.isEmpty())
 		return;
 
@@ -181,12 +170,13 @@ void BlurFx::doCompute(
 	if (rectOut.isEmpty())
 		return;
 
-	//Finally, allocate and compute the blur argument
+	// Finally, allocate and compute the blur argument
 	TTile tileIn;
-	m_input->allocateAndCompute(
-		tileIn, rectOut.getP00(), TDimension(rectOut.getLx(), rectOut.getLy()),
-		tile.getRaster(), frame, renderSettings);
+	m_input->allocateAndCompute(tileIn, rectOut.getP00(),
+								TDimension(rectOut.getLx(), rectOut.getLy()), tile.getRaster(),
+								frame, renderSettings);
 
 	TPointD displacement(rectOut.getP00() - tile.m_pos);
-	TRop::blur(tile.getRaster(), tileIn.getRaster(), blurValue, displacement.x, displacement.y, false);
+	TRop::blur(tile.getRaster(), tileIn.getRaster(), blurValue, displacement.x, displacement.y,
+			   false);
 }

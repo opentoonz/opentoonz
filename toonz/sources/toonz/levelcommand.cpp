@@ -40,7 +40,7 @@ class DeleteLevelUndo : public TUndo
 {
 	TXshLevelP m_xl;
 
-public:
+  public:
 	DeleteLevelUndo(TXshLevel *xl) : m_xl(xl) {}
 
 	void undo() const
@@ -56,19 +56,15 @@ public:
 		TApp::instance()->getCurrentScene()->notifyCastChange();
 	}
 
-	int getSize() const
-	{
-		return sizeof *this + 100;
-	}
+	int getSize() const { return sizeof *this + 100; }
 
 	QString getHistoryString()
 	{
-		return QObject::tr("Delete Level  : %1")
-			.arg(QString::fromStdWString(m_xl->getName()));
+		return QObject::tr("Delete Level  : %1").arg(QString::fromStdWString(m_xl->getName()));
 	}
 };
 
-} //namespace
+} // namespace
 
 //=============================================================================
 // RemoveUnusedLevelCommand
@@ -76,10 +72,8 @@ public:
 
 class RemoveUnusedLevelsCommand : public MenuItemHandler
 {
-public:
-	RemoveUnusedLevelsCommand() : MenuItemHandler(MI_RemoveUnused)
-	{
-	}
+  public:
+	RemoveUnusedLevelsCommand() : MenuItemHandler(MI_RemoveUnused) {}
 
 	void execute()
 	{
@@ -123,17 +117,17 @@ public:
 
 class RemoveLevelCommand : public MenuItemHandler
 {
-public:
-	RemoveLevelCommand() : MenuItemHandler(MI_RemoveLevel)
-	{
-	}
+  public:
+	RemoveLevelCommand() : MenuItemHandler(MI_RemoveLevel) {}
 
 	bool removeLevel(TXshLevel *level)
 	{
 		TApp *app = TApp::instance();
 		ToonzScene *scene = app->getCurrentScene()->getScene();
 		if (scene->getChildStack()->getTopXsheet()->isLevelUsed(level))
-			DVGui::error(QObject::tr("It is not possible to delete the used level %1.").arg(QString::fromStdWString(level->getName()))); //"E_CantDeleteUsedLevel_%1"
+			DVGui::error(
+				QObject::tr("It is not possible to delete the used level %1.")
+					.arg(QString::fromStdWString(level->getName()))); //"E_CantDeleteUsedLevel_%1"
 		else {
 			TUndoManager *um = TUndoManager::manager();
 			um->add(new DeleteLevelUndo(level));
@@ -152,7 +146,7 @@ public:
 		std::vector<TXshLevel *> levels;
 		castSelection->getSelectedLevels(levels);
 		if (levels.empty()) {
-			DVGui::error("No level selected"); //E_NoSelectedLevel
+			DVGui::error("No level selected"); // E_NoSelectedLevel
 			return;
 		}
 		int count = 0;
@@ -184,7 +178,8 @@ TFilePath getUnpaintedLevelPath(TXshSimpleLevel *simpleLevel)
 
 //-----------------------------------------------------------------------------
 
-void getLevelSelectedFids(std::set<TFrameId> &fids, TXshSimpleLevel *level, int r0, int c0, int r1, int c1)
+void getLevelSelectedFids(std::set<TFrameId> &fids, TXshSimpleLevel *level, int r0, int c0, int r1,
+						  int c1)
 {
 	TXsheet *xsheet = TApp::instance()->getCurrentXsheet()->getXsheet();
 	int c, r;
@@ -208,7 +203,7 @@ bool loadFids(const TFilePath &path, TXshSimpleLevel *sl, const std::set<TFrameI
 	if (!levelReader.getPointer())
 		return false;
 
-	//Carico il livello e sostituisco i frames.
+	// Carico il livello e sostituisco i frames.
 	TLevelP level = levelReader->loadInfo();
 	if (!level || level->getFrameCount() == 0)
 		return false;
@@ -272,7 +267,7 @@ class RevertToCommandUndo : public TUndo
 	std::set<TFrameId> m_selectedFids;
 	bool m_isCleanedUp;
 
-public:
+  public:
 	RevertToCommandUndo(TXshSimpleLevel *sl, std::set<TFrameId> &selectedFids, bool isCleanedUp)
 		: m_sl(sl), m_selectedFids(selectedFids), m_isCleanedUp(isCleanedUp)
 	{
@@ -284,7 +279,8 @@ public:
 				continue;
 			TImageP image = sl->getFrame(fid, false);
 			assert(image);
-			QString newImageId = "RevertToUndo" + QString::number(revertToCommandCount) + "-" + QString::number(fid.getNumber());
+			QString newImageId = "RevertToUndo" + QString::number(revertToCommandCount) + "-" +
+								 QString::number(fid.getNumber());
 			TImageCache::instance()->add(newImageId, image->cloneImage());
 			m_replacedImgsId.push_back(newImageId);
 		}
@@ -324,10 +320,7 @@ public:
 		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 	}
 
-	int getSize() const
-	{
-		return sizeof(*this) + m_selectedFids.size() * sizeof(TFrameId);
-	}
+	int getSize() const { return sizeof(*this) + m_selectedFids.size() * sizeof(TFrameId); }
 
 	QString getHistoryString()
 	{
@@ -345,7 +338,8 @@ void revertTo(bool isCleanedUp)
 {
 	TApp *app = TApp::instance();
 
-	TFilmstripSelection *filmstripSelection = dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
+	TFilmstripSelection *filmstripSelection =
+		dynamic_cast<TFilmstripSelection *>(TSelection::getCurrent());
 	TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(TSelection::getCurrent());
 
 	/*-- FilmStrip選択の場合 --*/
@@ -376,7 +370,7 @@ void revertTo(bool isCleanedUp)
 		int r0, r1, c0, c1;
 		cellSelection->getSelectedCells(r0, c0, r1, c1);
 		TXsheet *xsheet = app->getCurrentXsheet()->getXsheet();
-		//Cerco tutti i livelli, con estensensione "tlv", contenuti nella selezione
+		// Cerco tutti i livelli, con estensensione "tlv", contenuti nella selezione
 		bool selectionContainLevel = false;
 		/*-- セル選択範囲の各セルについて --*/
 		int c, r;
@@ -390,16 +384,18 @@ void revertTo(bool isCleanedUp)
 				int type = level->getType();
 				/*-- Revert可能なLevelタイプの条件 --*/
 				if ((isCleanedUp && type == TZP_XSHLEVEL) ||
-					(!isCleanedUp && (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL || (type == OVL_XSHLEVEL && ext != "psd")))) {
+					(!isCleanedUp && (type == TZP_XSHLEVEL || type == PLI_XSHLEVEL ||
+									  (type == OVL_XSHLEVEL && ext != "psd")))) {
 					levels.insert(level);
 					selectionContainLevel = true;
 				}
 			}
 		if (levels.empty() || !selectionContainLevel) {
-			DVGui::error(QObject::tr("The Revert to Last Saved command is not supported for the current selection."));
+			DVGui::error(QObject::tr(
+				"The Revert to Last Saved command is not supported for the current selection."));
 			return;
 		}
-		//Per ogni livello trovo i TFrameId contenuti nella selezione e richiamo loadLastSaveFids.
+		// Per ogni livello trovo i TFrameId contenuti nella selezione e richiamo loadLastSaveFids.
 		TUndoManager::manager()->beginBlock();
 		std::set<TXshSimpleLevel *>::iterator it = levels.begin();
 		/*-- Revert対象の各レベルについて --*/
@@ -430,7 +426,7 @@ void revertTo(bool isCleanedUp)
 }
 
 //-----------------------------------------------------------------------------
-} //namespace
+} // namespace
 //=============================================================================
 
 //=============================================================================
@@ -439,13 +435,10 @@ void revertTo(bool isCleanedUp)
 
 class RevertToCleanedUpCommand : public MenuItemHandler
 {
-public:
+  public:
 	RevertToCleanedUpCommand() : MenuItemHandler(MI_RevertToCleanedUp) {}
 
-	void execute()
-	{
-		revertTo(true);
-	}
+	void execute() { revertTo(true); }
 
 } revertToCleanedUpCommand;
 
@@ -455,12 +448,9 @@ public:
 
 class RevertToLastSaveCommand : public MenuItemHandler
 {
-public:
+  public:
 	RevertToLastSaveCommand() : MenuItemHandler(MI_RevertToLastSaved) {}
 
-	void execute()
-	{
-		revertTo(false);
-	}
+	void execute() { revertTo(false); }
 
 } revertToLastSaveCommand;

@@ -31,7 +31,7 @@ class TaskTreeModel;
 class BatchesController : public QObject
 { // singleton
 	Q_OBJECT
-public:
+  public:
 	static BatchesController *instance();
 
 	void setDirtyFlag(bool state);
@@ -69,7 +69,7 @@ public:
 
 	class Observer
 	{
-	public:
+	  public:
 		virtual ~Observer();
 		virtual void update() = 0;
 	};
@@ -82,10 +82,10 @@ public:
 	TFarmController *getController() const;
 	void update(); // aggiorna lo stato del Batch interrogando il FarmController
 
-public slots:
+  public slots:
 	void onExit(bool &);
 
-protected:
+  protected:
 	BatchesController();
 	~BatchesController();
 
@@ -93,7 +93,7 @@ protected:
 	BatchesController(const BatchesController &);
 	void operator=(const BatchesController &);
 
-private:
+  private:
 	bool m_dirtyFlag;
 	TFilePath m_filepath;
 	std::map<QString, TFarmTask *> m_tasks;
@@ -106,13 +106,13 @@ private:
 
 	static BatchesController *m_instance;
 
-private:
+  private:
 	static inline QString taskBusyStr();
 };
 //-----------------------------------------------------------------------------
 class LoadTaskListPopup : public FileBrowserPopup
 {
-public:
+  public:
 	LoadTaskListPopup();
 
 	bool execute();
@@ -126,7 +126,7 @@ class LoadTaskPopup : public FileBrowserPopup
 
 	bool m_isRenderTask;
 
-public:
+  public:
 	LoadTaskPopup();
 
 	bool execute();
@@ -139,7 +139,7 @@ class SaveTaskListPopup : public FileBrowserPopup
 {
 	Q_OBJECT
 
-public:
+  public:
 	SaveTaskListPopup();
 
 	bool execute();

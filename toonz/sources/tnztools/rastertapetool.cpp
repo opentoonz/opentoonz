@@ -50,14 +50,11 @@ namespace
 
 class AutocloseParameters
 {
-public:
+  public:
 	int m_closingDistance, m_inkIndex, m_opacity;
 	double m_spotAngle;
 
-	AutocloseParameters()
-		: m_closingDistance(0), m_inkIndex(0), m_spotAngle(0), m_opacity(1)
-	{
-	}
+	AutocloseParameters() : m_closingDistance(0), m_inkIndex(0), m_spotAngle(0), m_opacity(1) {}
 };
 
 //============================================================
@@ -67,13 +64,12 @@ class RasterAutocloseUndo : public TRasterUndo
 	AutocloseParameters m_params;
 	std::vector<TAutocloser::Segment> m_segments;
 
-public:
-	RasterAutocloseUndo(
-		TTileSetCM32 *tileSet,
-		const AutocloseParameters &params,
-		const std::vector<TAutocloser::Segment> &segments,
-		TXshSimpleLevel *level, const TFrameId &frameId)
-		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_segments(segments), m_params(params)
+  public:
+	RasterAutocloseUndo(TTileSetCM32 *tileSet, const AutocloseParameters &params,
+						const std::vector<TAutocloser::Segment> &segments, TXshSimpleLevel *level,
+						const TFrameId &frameId)
+		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_segments(segments),
+		  m_params(params)
 	{
 	}
 
@@ -84,7 +80,8 @@ public:
 		TToonzImageP image = getImage();
 		if (!image)
 			return;
-		TAutocloser ac(image->getRaster(), m_params.m_closingDistance, m_params.m_spotAngle, m_params.m_inkIndex, m_params.m_opacity);
+		TAutocloser ac(image->getRaster(), m_params.m_closingDistance, m_params.m_spotAngle,
+					   m_params.m_inkIndex, m_params.m_opacity);
 
 		ac.draw(m_segments);
 		ToolUtils::updateSaveBox();
@@ -95,19 +92,10 @@ public:
 
 	//-------------------------------------------------------------------
 
-	int getSize() const
-	{
-		return sizeof(*this) + TRasterUndo::getSize();
-	}
+	int getSize() const { return sizeof(*this) + TRasterUndo::getSize(); }
 
-	QString getToolName()
-	{
-		return QString("Autoclose Tool");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::AutocloseTool;
-	}
+	QString getToolName() { return QString("Autoclose Tool"); }
+	int getHistoryType() { return HistoryType::AutocloseTool; }
 };
 
 } // namespace
@@ -126,7 +114,7 @@ class RasterTapeTool : public TTool
 	bool m_firstFrameSelected;
 	TXshSimpleLevelP m_level;
 
-	//TBoolProperty  m_isRect;
+	// TBoolProperty  m_isRect;
 	TEnumProperty m_closeType;
 	TDoubleProperty m_distance;
 	TDoubleProperty m_angle;
@@ -138,7 +126,7 @@ class RasterTapeTool : public TTool
 	bool m_isXsheetCell;
 	std::pair<int, int> m_currCell;
 
-	//Aggiunte per disegnare il lazzo a la polyline
+	// Aggiunte per disegnare il lazzo a la polyline
 	StrokeGenerator m_track;
 	TPointD m_firstPos;
 	TPointD m_mousePosition;
@@ -148,19 +136,22 @@ class RasterTapeTool : public TTool
 	std::vector<TPointD> m_polyline;
 	bool m_firstTime;
 
-public:
+  public:
 	RasterTapeTool()
-		: TTool("T_Tape"), m_closeType("Type:") //W_ToolOptions_CloseType
+		: TTool("T_Tape"), m_closeType("Type:") // W_ToolOptions_CloseType
 		  ,
-		  m_distance("Distance:", 1, 100, 10) //W_ToolOptions_Distance
+		  m_distance("Distance:", 1, 100, 10) // W_ToolOptions_Distance
 		  ,
-		  m_angle("Angle:", 1, 180, 60) //W_ToolOptions_Angle
+		  m_angle("Angle:", 1, 180, 60) // W_ToolOptions_Angle
 		  ,
-		  m_inkIndex("Style Index:", L"current") //W_ToolOptions_InkIndex
+		  m_inkIndex("Style Index:", L"current") // W_ToolOptions_InkIndex
 		  ,
-		  m_opacity("Opacity:", 1, 255, 255), m_multi("Frame Range", false) //W_ToolOptions_FrameRange
+		  m_opacity("Opacity:", 1, 255, 255),
+		  m_multi("Frame Range", false) // W_ToolOptions_FrameRange
 		  ,
-		  m_selecting(false), m_selectingRect(), m_firstRect(), m_level(0), m_firstFrameSelected(false), m_isXsheetCell(false), m_currCell(-1, -1), m_firstPos(), m_mousePosition(), m_thick(0.5), m_stroke(0), m_firstStroke(0), m_firstTime(true)
+		  m_selecting(false), m_selectingRect(), m_firstRect(), m_level(0),
+		  m_firstFrameSelected(false), m_isXsheetCell(false), m_currCell(-1, -1), m_firstPos(),
+		  m_mousePosition(), m_thick(0.5), m_stroke(0), m_firstStroke(0), m_firstTime(true)
 	{
 		bind(TTool::ToonzImage);
 		m_prop.bind(m_closeType);
@@ -210,19 +201,20 @@ public:
 
 	//------------------------------------------------------------
 	/*--  AutoCloseが実行されたらtrue,実行されなければfalseを返す --*/
-	bool applyAutoclose(const TToonzImageP &ti,
-						const TRectD &selRect = TRectD(),
+	bool applyAutoclose(const TToonzImageP &ti, const TRectD &selRect = TRectD(),
 						TStroke *stroke = 0)
 	{
 		if (!ti)
 			return false;
-		//inizializzo gli AutocloseParameters
+		// inizializzo gli AutocloseParameters
 		AutocloseParameters params;
 		params.m_closingDistance = (int)(m_distance.getValue());
 		params.m_spotAngle = (int)(m_angle.getValue());
 		params.m_opacity = m_opacity.getValue();
 		std::string inkString = toString(m_inkIndex.getValue());
-		int inkIndex = TTool::getApplication()->getCurrentLevelStyleIndex(); //TApp::instance()->getCurrentPalette()->getStyleIndex();
+		int inkIndex =
+			TTool::getApplication()
+				->getCurrentLevelStyleIndex(); // TApp::instance()->getCurrentPalette()->getStyleIndex();
 		if (isInt(inkString))
 			inkIndex = toInt(inkString);
 		params.m_inkIndex = inkIndex;
@@ -242,7 +234,8 @@ public:
 			TRect myRect(ToonzImageUtils::convertWorldToRaster(selArea, ti));
 			ras = raux->extract(myRect);
 			delta = myRect.getP00();
-		} else if ((m_closeType.getValue() == FREEHAND_CLOSE || m_closeType.getValue() == POLYLINE_CLOSE) &&
+		} else if ((m_closeType.getValue() == FREEHAND_CLOSE ||
+					m_closeType.getValue() == POLYLINE_CLOSE) &&
 				   stroke) {
 			TRectD selArea = stroke->getBBox();
 			TRect myRect(ToonzImageUtils::convertWorldToRaster(selArea, ti));
@@ -253,12 +246,14 @@ public:
 		if (!ras)
 			return false;
 
-		TAutocloser ac(ras, params.m_closingDistance, params.m_spotAngle, params.m_inkIndex, params.m_opacity);
+		TAutocloser ac(ras, params.m_closingDistance, params.m_spotAngle, params.m_inkIndex,
+					   params.m_opacity);
 
 		std::vector<TAutocloser::Segment> segments;
 		ac.compute(segments);
 
-		if ((m_closeType.getValue() == FREEHAND_CLOSE || m_closeType.getValue() == POLYLINE_CLOSE) &&
+		if ((m_closeType.getValue() == FREEHAND_CLOSE ||
+			 m_closeType.getValue() == POLYLINE_CLOSE) &&
 			stroke)
 			checkSegments(segments, stroke, raux, delta);
 
@@ -300,8 +295,7 @@ public:
 
 	//============================================================
 
-	void multiApplyAutoclose(TFrameId firstFid, TFrameId lastFid,
-							 TRectD firstRect, TRectD lastRect,
+	void multiApplyAutoclose(TFrameId firstFid, TFrameId lastFid, TRectD firstRect, TRectD lastRect,
 							 TStroke *firstStroke = 0, TStroke *lastStroke = 0)
 	{
 		bool backward = false;
@@ -328,7 +322,8 @@ public:
 
 		TVectorImageP firstImage;
 		TVectorImageP lastImage;
-		if ((m_closeType.getValue() == FREEHAND_CLOSE || m_closeType.getValue() == POLYLINE_CLOSE) &&
+		if ((m_closeType.getValue() == FREEHAND_CLOSE ||
+			 m_closeType.getValue() == POLYLINE_CLOSE) &&
 			firstStroke && lastStroke) {
 			TStroke *first = new TStroke(*firstStroke);
 			TStroke *last = new TStroke(*lastStroke);
@@ -347,7 +342,8 @@ public:
 			double t = m > 1 ? (double)i / (double)(m - 1) : 0.5;
 			if (m_closeType.getValue() == RECT_CLOSE)
 				applyAutoclose(img, interpolateRect(firstRect, lastRect, t));
-			else if ((m_closeType.getValue() == FREEHAND_CLOSE || m_closeType.getValue() == POLYLINE_CLOSE) &&
+			else if ((m_closeType.getValue() == FREEHAND_CLOSE ||
+					  m_closeType.getValue() == POLYLINE_CLOSE) &&
 					 firstStroke && lastStroke)
 				doClose(t, img, firstImage, lastImage);
 			m_level->getProperties()->setDirtyFlag(true);
@@ -424,7 +420,7 @@ public:
 					}
 				} else {
 					m_isXsheetCell = app->getCurrentFrame()->isEditingScene();
-					//if (m_isXsheetCell)
+					// if (m_isXsheetCell)
 					m_currCell = std::pair<int, int>(getColumnIndex(), this->getFrame());
 				}
 				return;
@@ -463,20 +459,28 @@ public:
 		double pixelSize2 = getPixelSize() * getPixelSize();
 		m_thick = sqrt(pixelSize2) / 2.0;
 		if (m_closeType.getValue() == RECT_CLOSE) {
-			TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+			TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
+							   ? TPixel32::White
+							   : TPixel32::Black;
 			if (m_multi.getValue() && m_firstFrameSelected)
 				drawRect(m_firstRect, color, 0x3F33, true);
 
 			if (m_selecting || (m_multi.getValue() && !m_firstFrameSelected))
 				drawRect(m_selectingRect, color, 0x3F33, true);
 		}
-		if ((m_closeType.getValue() == FREEHAND_CLOSE || m_closeType.getValue() == POLYLINE_CLOSE) && m_multi.getValue() && m_firstStroke) {
-			TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+		if ((m_closeType.getValue() == FREEHAND_CLOSE ||
+			 m_closeType.getValue() == POLYLINE_CLOSE) &&
+			m_multi.getValue() && m_firstStroke) {
+			TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
+							   ? TPixel32::White
+							   : TPixel32::Black;
 			tglColor(color);
 			drawStrokeCenterline(*m_firstStroke, 1);
 		}
 		if (m_closeType.getValue() == POLYLINE_CLOSE && !m_polyline.empty()) {
-			TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+			TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
+							   ? TPixel32::White
+							   : TPixel32::Black;
 			tglColor(color);
 			tglDrawCircle(m_polyline[0], 2);
 			glBegin(GL_LINE_STRIP);
@@ -545,12 +549,16 @@ public:
 		if (app->getCurrentLevel()->getLevel())
 			xshl = app->getCurrentLevel()->getSimpleLevel();
 
-		if (!xshl || m_level.getPointer() != xshl || (m_closeType.getValue() == RECT_CLOSE && m_selectingRect.isEmpty()) ||
-			((m_closeType.getValue() == FREEHAND_CLOSE || m_closeType.getValue() == POLYLINE_CLOSE) && !m_firstStroke))
+		if (!xshl || m_level.getPointer() != xshl ||
+			(m_closeType.getValue() == RECT_CLOSE && m_selectingRect.isEmpty()) ||
+			((m_closeType.getValue() == FREEHAND_CLOSE ||
+			  m_closeType.getValue() == POLYLINE_CLOSE) &&
+			 !m_firstStroke))
 			resetMulti();
 		else if (m_firstFrameId == getFrameId())
-			m_firstFrameSelected = false; //nel caso sono passato allo stato 1 e torno all'immagine iniziale, torno allo stato iniziale
-		else {							  //cambio stato.
+			m_firstFrameSelected = false; // nel caso sono passato allo stato 1 e torno all'immagine
+										  // iniziale, torno allo stato iniziale
+		else { // cambio stato.
 			m_firstFrameSelected = true;
 			if (m_closeType.getValue() == RECT_CLOSE) {
 				assert(!m_selectingRect.isEmpty());
@@ -594,7 +602,7 @@ public:
 					resetMulti();
 				} else {
 					m_isXsheetCell = app->getCurrentFrame()->isEditingScene();
-					//if (m_isXsheetCell)
+					// if (m_isXsheetCell)
 					m_currCell = std::pair<int, int>(getColumnIndex(), getFrame());
 					m_firstFrameSelected = true;
 					m_firstPoint = pos;
@@ -658,10 +666,7 @@ public:
 
 	//----------------------------------------------------------------------
 
-	TPropertyGroup *getProperties(int targetType)
-	{
-		return &m_prop;
-	}
+	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
 	//----------------------------------------------------------------------
 
@@ -681,9 +686,7 @@ public:
 
 	//----------------------------------------------------------------------
 
-	void onDeactivate()
-	{
-	}
+	void onDeactivate() {}
 
 	//----------------------------------------------------------------------
 
@@ -697,7 +700,8 @@ public:
 
 	//----------------------------------------------------------------------
 
-	//!Viene aggiunto \b pos a \b m_track e disegnato il primo pezzetto del lazzo. Viene inizializzato \b m_firstPos
+	//! Viene aggiunto \b pos a \b m_track e disegnato il primo pezzetto del lazzo. Viene
+	//! inizializzato \b m_firstPos
 	void startFreehand(const TPointD &pos)
 	{
 		m_track.clear();
@@ -706,10 +710,11 @@ public:
 		m_track.add(TThickPoint(pos, m_thick), pixelSize2);
 		TPointD dpiScale = m_viewer->getDpiScale();
 #if defined(MACOSX)
-//getViewer()->prepareForegroundDrawing();
+// getViewer()->prepareForegroundDrawing();
 #endif
 		//			getViewer()->makeCurrent();
-		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																				  : TPixel32::Black;
 		tglColor(color);
 		m_viewer->startForegroundDrawing();
 		glPushMatrix();
@@ -721,15 +726,16 @@ public:
 
 	//------------------------------------------------------------------
 
-	//!Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del lazzo.
+	//! Viene aggiunto \b pos a \b m_track e disegnato un altro pezzetto del lazzo.
 	void freehandDrag(const TPointD &pos)
 	{
 #if defined(MACOSX)
-//getViewer()->enableRedraw(false);
+// getViewer()->enableRedraw(false);
 #endif
 
 		getViewer()->startForegroundDrawing();
-		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																				  : TPixel32::Black;
 		tglColor(color);
 		glPushMatrix();
 		tglMultMatrix(getMatrix());
@@ -744,11 +750,12 @@ public:
 
 	//------------------------------------------------------------------
 
-	//!Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene creato lo stroke rappresentante il lazzo.
+	//! Viene chiuso il lazzo (si aggiunge l'ultimo punto ad m_track) e viene creato lo stroke
+	//! rappresentante il lazzo.
 	void closeFreehand(const TPointD &pos)
 	{
 #if defined(MACOSX)
-//getViewer()->enableRedraw(true);
+// getViewer()->enableRedraw(true);
 #endif
 		if (m_track.isEmpty())
 			return;
@@ -762,24 +769,25 @@ public:
 
 	//------------------------------------------------------------------
 
-	//!Viene aggiunto un punto al vettore m_polyline.
+	//! Viene aggiunto un punto al vettore m_polyline.
 	void addPointPolyline(const TPointD &pos)
 	{
 		m_firstPos = pos;
-		//m_mousePosition = pos;
+		// m_mousePosition = pos;
 
 		TPointD dpiScale = m_viewer->getDpiScale();
 
 #if defined(MACOSX)
-//getViewer()->prepareForegroundDrawing();
+// getViewer()->prepareForegroundDrawing();
 #endif
 		//				getViewer()->makeCurrent();
-		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White : TPixel32::Black;
+		TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg ? TPixel32::White
+																				  : TPixel32::Black;
 		tglColor(color);
 		getViewer()->startForegroundDrawing();
 
 #if defined(MACOSX)
-//getViewer()->enableRedraw(m_closeType.getValue() == POLYLINE_CLOSE);
+// getViewer()->enableRedraw(m_closeType.getValue() == POLYLINE_CLOSE);
 #endif
 
 		glPushMatrix();
@@ -791,7 +799,8 @@ public:
 
 	//------------------------------------------------------------------
 
-	//!Agginge l'ultimo pos a \b m_polyline e chiude la spezzata (aggiunge \b m_polyline.front() alla fine del vettore)
+	//! Agginge l'ultimo pos a \b m_polyline e chiude la spezzata (aggiunge \b m_polyline.front()
+	//! alla fine del vettore)
 	void closePolyline(const TPointD &pos)
 	{
 		if (m_polyline.size() <= 1)
@@ -824,7 +833,8 @@ public:
 			bool isContained = false;
 			for (i = 0; i < (int)vi.getRegionCount(); i++) {
 				TRegion *reg = vi.getRegion(i);
-				if (reg->contains(convert(it->first + delta)) && reg->contains(convert(it->second + delta))) {
+				if (reg->contains(convert(it->first + delta)) &&
+					reg->contains(convert(it->second + delta))) {
 					isContained = true;
 					break;
 				}
@@ -845,8 +855,8 @@ public:
 	{
 		TTool::Application *app = TTool::getApplication();
 		if (m_firstStroke) {
-			multiApplyAutoclose(m_firstFrameId, getFrameId(),
-								TRectD(), TRectD(), m_firstStroke, stroke);
+			multiApplyAutoclose(m_firstFrameId, getFrameId(), TRectD(), TRectD(), m_firstStroke,
+								stroke);
 			invalidate();
 			if (e.isShiftPressed()) {
 				delete m_firstStroke;
@@ -862,7 +872,7 @@ public:
 			}
 		} else {
 			m_isXsheetCell = app->getCurrentFrame()->isEditingScene();
-			//if (m_isXsheetCell)
+			// if (m_isXsheetCell)
 			m_currCell = std::pair<int, int>(getColumnIndex(), getFrame());
 			m_firstStroke = new TStroke(*stroke);
 		}
@@ -871,8 +881,7 @@ public:
 
 	//------------------------------------------------------------------------
 
-	void doClose(double t, const TImageP &img,
-				 const TVectorImageP &firstImage,
+	void doClose(double t, const TImageP &img, const TVectorImageP &firstImage,
 				 const TVectorImageP &lastImage)
 	{
 		if (t == 0)

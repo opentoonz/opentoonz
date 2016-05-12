@@ -70,7 +70,10 @@ JpgReader::~JpgReader()
 	}
 }
 
-Tiio::RowOrder JpgReader::getRowOrder() const { return Tiio::TOP2BOTTOM; }
+Tiio::RowOrder JpgReader::getRowOrder() const
+{
+	return Tiio::TOP2BOTTOM;
+}
 
 void JpgReader::open(FILE *file)
 {
@@ -159,11 +162,8 @@ class JpgWriter : public Tiio::Writer
 	JSAMPARRAY m_buffer;
 	bool m_headerWritten;
 
-public:
-	JpgWriter()
-		: m_chan(0), m_headerWritten(false)
-	{
-	}
+  public:
+	JpgWriter() : m_chan(0), m_headerWritten(false) {}
 
 	void open(FILE *file, const TImageInfo &info)
 	{
@@ -179,8 +179,10 @@ public:
 		if (!m_properties)
 			m_properties = new Tiio::JpgWriterProperties();
 
-		jpeg_set_quality(&m_cinfo, ((TIntProperty *)(m_properties->getProperty("Quality")))->getValue(), TRUE);
-		m_cinfo.smoothing_factor = ((TIntProperty *)(m_properties->getProperty("Smoothing")))->getValue();
+		jpeg_set_quality(
+			&m_cinfo, ((TIntProperty *)(m_properties->getProperty("Quality")))->getValue(), TRUE);
+		m_cinfo.smoothing_factor =
+			((TIntProperty *)(m_properties->getProperty("Smoothing")))->getValue();
 
 		int row_stride = m_cinfo.image_width * m_cinfo.input_components;
 		m_buffer = (*m_cinfo.mem->alloc_sarray)((j_common_ptr)&m_cinfo, JPOOL_IMAGE, row_stride, 1);
@@ -196,10 +198,7 @@ public:
 		delete m_properties;
 	}
 
-	void flush()
-	{
-		fflush(m_chan);
-	}
+	void flush() { fflush(m_chan); }
 
 	Tiio::RowOrder getRowOrder() const { return Tiio::TOP2BOTTOM; }
 

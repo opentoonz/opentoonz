@@ -35,13 +35,12 @@ class FxGadgetUndo : public TUndo
 		bool m_wasKeyframe;
 	};
 
-private:
+  private:
 	std::vector<ParamData> m_params;
 	int m_frame;
 
-public:
-	FxGadgetUndo(const std::vector<TDoubleParamP> &params, int frame)
-		: m_frame(frame)
+  public:
+	FxGadgetUndo(const std::vector<TDoubleParamP> &params, int frame) : m_frame(frame)
 	{
 		m_params.resize(params.size());
 		for (int i = 0; i < (int)params.size(); i++) {
@@ -91,10 +90,7 @@ public:
 		return str;
 	}
 
-	int getHistoryType()
-	{
-		return HistoryType::Fx;
-	}
+	int getHistoryType() { return HistoryType::Fx; }
 };
 
 //*************************************************************************************
@@ -106,9 +102,11 @@ class GadgetDragTool : public DragTool
 	FxGadgetController *m_controller;
 	FxGadget *m_gadget;
 
-public:
+  public:
 	GadgetDragTool(FxGadgetController *controller, FxGadget *gadget)
-		: m_controller(controller), m_gadget(gadget) {}
+		: m_controller(controller), m_gadget(gadget)
+	{
+	}
 
 	TAffine getMatrix() const { return m_controller->getMatrix().inv(); }
 
@@ -135,7 +133,8 @@ public:
 //*************************************************************************************
 
 FxGadget::FxGadget(FxGadgetController *controller)
-	: m_id(-1), m_selected(false), m_controller(controller), m_pixelSize(1), m_undo(0), m_scaleFactor(1)
+	: m_id(-1), m_selected(false), m_controller(controller), m_pixelSize(1), m_undo(0),
+	  m_scaleFactor(1)
 {
 	controller->assignId(this);
 }
@@ -245,7 +244,7 @@ class PointFxGadget : public FxGadget
 	TPointD m_pos;
 	TDoubleParamP m_xParam, m_yParam;
 
-public:
+  public:
 	PointFxGadget(FxGadgetController *controller, const TPointParamP &param)
 		: FxGadget(controller), m_xParam(param->getX()), m_yParam(param->getY())
 	{
@@ -253,7 +252,8 @@ public:
 		addParam(m_yParam);
 	}
 
-	PointFxGadget(FxGadgetController *controller, const TDoubleParamP &xParam, const TDoubleParamP &yParam)
+	PointFxGadget(FxGadgetController *controller, const TDoubleParamP &xParam,
+				  const TDoubleParamP &yParam)
 		: FxGadget(controller), m_xParam(xParam), m_yParam(yParam)
 	{
 		addParam(m_xParam);
@@ -333,11 +333,9 @@ class RadiusFxGadget : public FxGadget
 	TDoubleParamP m_radius;
 	TPointParamP m_center;
 
-public:
-	RadiusFxGadget(
-		FxGadgetController *controller,
-		const TDoubleParamP &radius,
-		const TPointParamP &center)
+  public:
+	RadiusFxGadget(FxGadgetController *controller, const TDoubleParamP &radius,
+				   const TPointParamP &center)
 		: FxGadget(controller), m_radius(radius), m_center(center)
 	{
 		addParam(radius);
@@ -413,11 +411,9 @@ class DistanceFxGadget : public FxGadget
 	TDoubleParamP m_distance, m_angle;
 	int m_grabPos;
 
-public:
-	DistanceFxGadget(
-		FxGadgetController *controller,
-		const TDoubleParamP &distance,
-		const TDoubleParamP &angle)
+  public:
+	DistanceFxGadget(FxGadgetController *controller, const TDoubleParamP &distance,
+					 const TDoubleParamP &angle)
 		: FxGadget(controller), m_distance(distance), m_angle(angle), m_grabPos(1)
 	{
 		addParam(distance);
@@ -507,7 +503,7 @@ class AngleFxGadget : public FxGadget
 	TDoubleParamP m_param;
 	TPointD m_pos;
 
-public:
+  public:
 	AngleFxGadget(FxGadgetController *controller, const TDoubleParamP &param, const TPointD &pos);
 
 	void draw(bool picking);
@@ -519,7 +515,8 @@ public:
 
 //---------------------------------------------------------------------------
 
-AngleFxGadget::AngleFxGadget(FxGadgetController *controller, const TDoubleParamP &param, const TPointD &pos)
+AngleFxGadget::AngleFxGadget(FxGadgetController *controller, const TDoubleParamP &param,
+							 const TPointD &pos)
 	: FxGadget(controller), m_param(param), m_pos(pos)
 {
 	addParam(param);
@@ -585,7 +582,7 @@ class DiamondFxGadget : public FxGadget
 {
 	TDoubleParamP m_param;
 
-public:
+  public:
 	DiamondFxGadget(FxGadgetController *controller, const TDoubleParamP &param)
 		: FxGadget(controller), m_param(param)
 	{
@@ -654,7 +651,7 @@ class SizeFxGadget : public FxGadget
 {
 	TDoubleParamP m_lx, m_ly;
 
-public:
+  public:
 	SizeFxGadget(FxGadgetController *controller, const TDoubleParamP &lx, const TDoubleParamP &ly)
 		: FxGadget(controller), m_lx(lx), m_ly(ly)
 	{
@@ -725,17 +722,12 @@ class RectFxGadget : public FxGadget
 
 	int m_picked;
 
-public:
-	enum { None,
-		   Corner,
-		   HorizontalSide,
-		   VerticalSide };
+  public:
+	enum { None, Corner, HorizontalSide, VerticalSide };
 
-public:
-	RectFxGadget(FxGadgetController *controller,
-				 const TDoubleParamP &width,
-				 const TDoubleParamP &height,
-				 const TPointParamP &center)
+  public:
+	RectFxGadget(FxGadgetController *controller, const TDoubleParamP &width,
+				 const TDoubleParamP &height, const TPointParamP &center)
 		: FxGadget(controller), m_width(width), m_height(height), m_center(center), m_picked(None)
 	{
 		addParam(width);
@@ -832,12 +824,9 @@ class PolarFxGadget : public FxGadget
 	TPointD m_pos;
 	TDoubleParamP m_phiParam, m_lengthParam;
 
-public:
-	PolarFxGadget(
-		FxGadgetController *controller,
-		const TPointD &pos,
-		const TDoubleParamP &phiParam,
-		const TDoubleParamP &lengthParam)
+  public:
+	PolarFxGadget(FxGadgetController *controller, const TPointD &pos, const TDoubleParamP &phiParam,
+				  const TDoubleParamP &lengthParam)
 		: FxGadget(controller), m_pos(pos), m_phiParam(phiParam), m_lengthParam(lengthParam)
 	{
 		addParam(phiParam);
@@ -908,11 +897,8 @@ class VectorFxGadget : public FxGadget
 	TPointParamP m_pa, m_pb;
 	int m_selected;
 
-public:
-	VectorFxGadget(
-		FxGadgetController *controller,
-		const TPointParamP &pa,
-		const TPointParamP &pb)
+  public:
+	VectorFxGadget(FxGadgetController *controller, const TPointParamP &pa, const TPointParamP &pb)
 		: FxGadget(controller), m_pa(pa), m_pb(pb), m_selected(0)
 	{
 		addParam(pa->getX());
@@ -969,13 +955,9 @@ class QuadFxGadget : public FxGadget
 {
 	TPointParamP m_pa, m_pb, m_pc, m_pd;
 
-public:
-	QuadFxGadget(
-		FxGadgetController *controller,
-		const TPointParamP &pa,
-		const TPointParamP &pb,
-		const TPointParamP &pc,
-		const TPointParamP &pd)
+  public:
+	QuadFxGadget(FxGadgetController *controller, const TPointParamP &pa, const TPointParamP &pb,
+				 const TPointParamP &pc, const TPointParamP &pd)
 		: FxGadget(controller), m_pa(pa), m_pb(pb), m_pc(pc), m_pd(pd)
 	{
 		addParam(pa->getX());
@@ -995,7 +977,7 @@ public:
 			glColor3dv(m_selectedColor);
 		else
 			glColor3d(0, 0, 1);
-		//glPushName(getId());
+		// glPushName(getId());
 		double pixelSize = getPixelSize();
 		TPointD pa = getValue(m_pa);
 		TPointD pb = getValue(m_pb);
@@ -1011,7 +993,7 @@ public:
 		tglVertex(pa);
 		glEnd();
 		glDisable(GL_LINE_STIPPLE);
-		//glPopName();
+		// glPopName();
 	}
 
 	void leftButtonDown(const TPointD &pos, const TMouseEvent &) {}
@@ -1024,13 +1006,13 @@ public:
 //*************************************************************************************
 
 FxGadgetController::FxGadgetController(TTool *tool)
-	: m_tool(tool), m_fxHandle(tool->getApplication()->getCurrentFx()), m_idBase(0), m_nextId(0), m_selectedGadget(0), m_editingNonZeraryFx(false)
+	: m_tool(tool), m_fxHandle(tool->getApplication()->getCurrentFx()), m_idBase(0), m_nextId(0),
+	  m_selectedGadget(0), m_editingNonZeraryFx(false)
 {
 	m_idBase = m_nextId = 5000;
 	connect(m_fxHandle, SIGNAL(fxSwitched()), this, SLOT(onFxSwitched()));
-	connect(
-		tool->getApplication()->getCurrentXsheet(), SIGNAL(xsheetChanged()),
-		this, SLOT(onFxSwitched()));
+	connect(tool->getApplication()->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
+			SLOT(onFxSwitched()));
 	onFxSwitched();
 }
 
@@ -1108,89 +1090,83 @@ FxGadget *FxGadgetController::allocateGadget(const TParamUIConcept &uiConcept)
 	case TParamUIConcept::RADIUS: {
 		assert(uiConcept.m_params.size() >= 1 && uiConcept.m_params.size() <= 2);
 
-		TPointParamP center((uiConcept.m_params.size() >= 2) ? (TPointParamP)uiConcept.m_params[1] : TPointParamP());
+		TPointParamP center((uiConcept.m_params.size() >= 2) ? (TPointParamP)uiConcept.m_params[1]
+															 : TPointParamP());
 		gadget = new RadiusFxGadget(this, uiConcept.m_params[0], center);
 
 		break;
 	}
 
-	case TParamUIConcept::WIDTH:
-		{
-			assert(uiConcept.m_params.size() >= 1 && uiConcept.m_params.size() <= 2);
+	case TParamUIConcept::WIDTH: {
+		assert(uiConcept.m_params.size() >= 1 && uiConcept.m_params.size() <= 2);
 
-			TDoubleParamP angle((uiConcept.m_params.size() >= 2) ? (TDoubleParamP)uiConcept.m_params[1] : TDoubleParamP());
-			gadget = new DistanceFxGadget(this, uiConcept.m_params[0], angle);
-			break;
-		}
+		TDoubleParamP angle((uiConcept.m_params.size() >= 2) ? (TDoubleParamP)uiConcept.m_params[1]
+															 : TDoubleParamP());
+		gadget = new DistanceFxGadget(this, uiConcept.m_params[0], angle);
+		break;
+	}
 
-	case TParamUIConcept::ANGLE:
-		{
-			assert(uiConcept.m_params.size() == 1);
-			gadget = new AngleFxGadget(this, uiConcept.m_params[0], TPointD());
-			break;
-		}
+	case TParamUIConcept::ANGLE: {
+		assert(uiConcept.m_params.size() == 1);
+		gadget = new AngleFxGadget(this, uiConcept.m_params[0], TPointD());
+		break;
+	}
 
-	case TParamUIConcept::POINT:
-		{
-			assert(uiConcept.m_params.size() == 1);
-			gadget = new PointFxGadget(this, uiConcept.m_params[0]);
-			break;
-		}
+	case TParamUIConcept::POINT: {
+		assert(uiConcept.m_params.size() == 1);
+		gadget = new PointFxGadget(this, uiConcept.m_params[0]);
+		break;
+	}
 
-	case TParamUIConcept::POINT_2:
-		{
-			assert(uiConcept.m_params.size() == 2);
-			gadget = new PointFxGadget(this, uiConcept.m_params[0], uiConcept.m_params[1]);
-			break;
-		}
+	case TParamUIConcept::POINT_2: {
+		assert(uiConcept.m_params.size() == 2);
+		gadget = new PointFxGadget(this, uiConcept.m_params[0], uiConcept.m_params[1]);
+		break;
+	}
 
-	case TParamUIConcept::VECTOR:
-		{
-			assert(uiConcept.m_params.size() == 2);
-			gadget = new VectorFxGadget(this, uiConcept.m_params[0], uiConcept.m_params[1]);
-			break;
-		}
+	case TParamUIConcept::VECTOR: {
+		assert(uiConcept.m_params.size() == 2);
+		gadget = new VectorFxGadget(this, uiConcept.m_params[0], uiConcept.m_params[1]);
+		break;
+	}
 
-	case TParamUIConcept::POLAR:
-		{
-			assert(uiConcept.m_params.size() == 2);
-			gadget = new PolarFxGadget(this, TPointD(), uiConcept.m_params[0], uiConcept.m_params[1]);
-			break;
-		}
+	case TParamUIConcept::POLAR: {
+		assert(uiConcept.m_params.size() == 2);
+		gadget = new PolarFxGadget(this, TPointD(), uiConcept.m_params[0], uiConcept.m_params[1]);
+		break;
+	}
 
-	case TParamUIConcept::SIZE:
-		{
-			assert(uiConcept.m_params.size() >= 1 && uiConcept.m_params.size() <= 2);
+	case TParamUIConcept::SIZE: {
+		assert(uiConcept.m_params.size() >= 1 && uiConcept.m_params.size() <= 2);
 
-			TDoubleParamP y((uiConcept.m_params.size() >= 2) ? (TDoubleParamP)uiConcept.m_params[1] : TDoubleParamP());
-			gadget = new SizeFxGadget(this, uiConcept.m_params[0], y);
-			break;
-		}
+		TDoubleParamP y((uiConcept.m_params.size() >= 2) ? (TDoubleParamP)uiConcept.m_params[1]
+														 : TDoubleParamP());
+		gadget = new SizeFxGadget(this, uiConcept.m_params[0], y);
+		break;
+	}
 
-	case TParamUIConcept::QUAD:
-		{
-			assert(uiConcept.m_params.size() == 4);
-			gadget = new QuadFxGadget(this,
-									  uiConcept.m_params[0], uiConcept.m_params[1], uiConcept.m_params[2], uiConcept.m_params[3]);
-			break;
-		}
+	case TParamUIConcept::QUAD: {
+		assert(uiConcept.m_params.size() == 4);
+		gadget = new QuadFxGadget(this, uiConcept.m_params[0], uiConcept.m_params[1],
+								  uiConcept.m_params[2], uiConcept.m_params[3]);
+		break;
+	}
 
-	case TParamUIConcept::RECT:
-		{
-			assert(uiConcept.m_params.size() >= 2 && uiConcept.m_params.size() <= 3);
+	case TParamUIConcept::RECT: {
+		assert(uiConcept.m_params.size() >= 2 && uiConcept.m_params.size() <= 3);
 
-			TPointParamP center((uiConcept.m_params.size() >= 3) ? (TPointParamP)uiConcept.m_params[2] : TPointParamP());
-			gadget = new RectFxGadget(this, uiConcept.m_params[0], uiConcept.m_params[1], center);
+		TPointParamP center((uiConcept.m_params.size() >= 3) ? (TPointParamP)uiConcept.m_params[2]
+															 : TPointParamP());
+		gadget = new RectFxGadget(this, uiConcept.m_params[0], uiConcept.m_params[1], center);
 
-			break;
-		}
+		break;
+	}
 
-	case TParamUIConcept::DIAMOND:
-		{
-			assert(uiConcept.m_params.size() == 1);
-			gadget = new DiamondFxGadget(this, uiConcept.m_params[0]);
-			break;
-		}
+	case TParamUIConcept::DIAMOND: {
+		assert(uiConcept.m_params.size() == 1);
+		gadget = new DiamondFxGadget(this, uiConcept.m_params[0]);
+		break;
+	}
 	}
 
 	if (gadget)
@@ -1221,7 +1197,8 @@ void FxGadgetController::onFxSwitched()
 		m_editingNonZeraryFx = true;
 		TZeraryColumnFx *zfx = 0;
 		if ((zfx = dynamic_cast<TZeraryColumnFx *>(fx)) || dynamic_cast<TLevelColumnFx *>(fx))
-		//WARNING! quick patch for huge bug:  I added the || with TLevelColumnFx; before, the levels were considered as nonZeraryFx and the edit tool gadget was not displayed! Vinz
+		// WARNING! quick patch for huge bug:  I added the || with TLevelColumnFx; before, the
+		// levels were considered as nonZeraryFx and the edit tool gadget was not displayed! Vinz
 		{
 			if (zfx)
 				fx = zfx->getZeraryFx();

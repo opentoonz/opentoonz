@@ -52,7 +52,10 @@ const std::wstring TFlash::MixedLines = L"Medium: Mixed Thickness";
 const std::wstring TFlash::VariableLines = L"High: Variable Thickness";
 
 Tiio::SwfWriterProperties::SwfWriterProperties()
-	: m_lineQuality("Curve Quality"), m_isCompressed("File Compression", true), m_autoplay("Autoplay", true), m_looping("Looping", true), m_jpgQuality("Jpg Quality", 0, 100, 90), m_url("URL", std::wstring()), m_preloader("Insert Preloader", false)
+	: m_lineQuality("Curve Quality"), m_isCompressed("File Compression", true),
+	  m_autoplay("Autoplay", true), m_looping("Looping", true),
+	  m_jpgQuality("Jpg Quality", 0, 100, 90), m_url("URL", std::wstring()),
+	  m_preloader("Insert Preloader", false)
 {
 	m_lineQuality.addValue(TFlash::MixedLines);
 	m_lineQuality.addValue(TFlash::ConstantLines);
@@ -71,33 +74,32 @@ Tiio::SwfWriterProperties::SwfWriterProperties()
 
 //-------------------------------------------------------------------
 
-enum PolyType { None,
-				Centerline,
-				Solid,
-				Texture,
-				LinearGradient,
-				RadialGradient };
+enum PolyType { None, Centerline, Solid, Texture, LinearGradient, RadialGradient };
 
 class PolyStyle
 {
-public:
+  public:
 	PolyType m_type;
-	TPixel32 m_color1;	//only if type!=Texture
-	TPixel32 m_color2;	//only if type==LinearGradient || type==RadialGradient
-	double m_smooth;	  //only if type==RadialGradient
-	double m_thickness;   //only if type==Centerline
-	TAffine m_matrix;	 //only if type==Texture
-	TRaster32P m_texture; //only if type==Texture
-	//bool m_isRegion;            //only if type!=Centerline
-	//bool m_isHole;              //only if type!=Centerline && m_isRegion==true
-	PolyStyle() : m_type(None), m_color1(), m_color2(), m_smooth(0), m_thickness(0), m_matrix(), m_texture() /*, m_isRegion(false), m_isHole(false)*/ {}
+	TPixel32 m_color1; // only if type!=Texture
+	TPixel32 m_color2; // only if type==LinearGradient || type==RadialGradient
+	double m_smooth; // only if type==RadialGradient
+	double m_thickness; // only if type==Centerline
+	TAffine m_matrix; // only if type==Texture
+	TRaster32P m_texture; // only if type==Texture
+	// bool m_isRegion;            //only if type!=Centerline
+	// bool m_isHole;              //only if type!=Centerline && m_isRegion==true
+	PolyStyle()
+		: m_type(None), m_color1(), m_color2(), m_smooth(0), m_thickness(0), m_matrix(),
+		  m_texture() /*, m_isRegion(false), m_isHole(false)*/
+	{
+	}
 	bool operator==(const PolyStyle &p) const;
 	bool operator<(const PolyStyle &p) const;
 };
 
 class FlashPolyline
 {
-public:
+  public:
 	UINT m_depth;
 	bool m_skip;
 	bool m_toBeDeleted;
@@ -106,14 +108,18 @@ public:
 	PolyStyle m_fillStyle1;
 	PolyStyle m_fillStyle2;
 	PolyStyle m_lineStyle;
-	//PolyStyle m_bgStyle;
-	FlashPolyline() : m_depth(0), m_skip(false), m_toBeDeleted(false), m_isPoint(false), m_fillStyle1(), m_fillStyle2(), m_lineStyle() {}
+	// PolyStyle m_bgStyle;
+	FlashPolyline()
+		: m_depth(0), m_skip(false), m_toBeDeleted(false), m_isPoint(false), m_fillStyle1(),
+		  m_fillStyle2(), m_lineStyle()
+	{
+	}
 	bool operator<(const FlashPolyline &p) const { return m_depth < p.m_depth; }
 };
 
 class biPoint
 {
-public:
+  public:
 	TPointD p0, p1;
 
 	biPoint(TPointD _p0, TPointD _p1) : p0(_p0), p1(_p1) {}
@@ -126,14 +132,18 @@ public:
 		aux.p1.x = areTwEqual(p1.x, b.p1.x) ? p1.x : b.p1.x;
 		aux.p1.y = areTwEqual(p1.y, b.p1.y) ? p1.y : b.p1.y;
 
-		return (p0.x == aux.p0.x) ? ((p0.y == aux.p0.y) ? ((p1.x == aux.p1.x) ? (p1.y < aux.p1.y) : (p1.x < aux.p1.x)) : (p0.y < aux.p0.y)) : p0.x < aux.p0.x;
+		return (p0.x == aux.p0.x)
+				   ? ((p0.y == aux.p0.y)
+						  ? ((p1.x == aux.p1.x) ? (p1.y < aux.p1.y) : (p1.x < aux.p1.x))
+						  : (p0.y < aux.p0.y))
+				   : p0.x < aux.p0.x;
 	}
 	void revert() { tswap(p0, p1); }
 };
 
 class wChunk
 {
-public:
+  public:
 	double w0, w1;
 	wChunk(double _w0, double _w1) : w0(_w0), w1(_w1) {}
 	bool operator<(const wChunk &b) const { return (w1 < b.w0); }
@@ -145,13 +155,13 @@ const int c_soundRate = 5512; //  5512; //11025
 const int c_soundBps = 16;
 const bool c_soundIsSigned = false;
 const int c_soundChannelNum = 1;
-const int c_soundCompression = 3; //per compatibilita' con MAC!!!
+const int c_soundCompression = 3; // per compatibilita' con MAC!!!
 
 //-------------------------------------------------------------------
 
 class FlashImageData
 {
-public:
+  public:
 	FlashImageData(TAffine aff, TImageP img, const TColorFunction *cf, bool isMask, bool isMasked)
 		: m_aff(aff), m_img(img), m_cf(cf), m_isMask(isMask), m_isMasked(isMasked)
 	{
@@ -198,7 +208,8 @@ void putquads(const TStroke *s, double w0, double w1, std::vector<TQuadratic *> 
 
 //-------------------------------------------------------------------
 
-void computeOutlineBoundary(std::vector<TStroke *> &outlines, std::list<FlashPolyline> &polylinesArray, const TPixel &color)
+void computeOutlineBoundary(std::vector<TStroke *> &outlines,
+							std::list<FlashPolyline> &polylinesArray, const TPixel &color)
 {
 	UINT size = polylinesArray.size();
 
@@ -248,7 +259,8 @@ bool PolyStyle::operator==(const PolyStyle &p) const
 		return m_matrix == p.m_matrix && m_texture.getPointer() == p.m_texture.getPointer();
 	case LinearGradient:
 	case RadialGradient:
-		return m_color1 == p.m_color1 && m_color2 == p.m_color2 && m_matrix == p.m_matrix && m_smooth == p.m_smooth;
+		return m_color1 == p.m_color1 && m_color2 == p.m_color2 && m_matrix == p.m_matrix &&
+			   m_smooth == p.m_smooth;
 	default:
 		assert(false);
 		return false;
@@ -284,14 +296,20 @@ bool PolyStyle::operator<(const PolyStyle &p) const
 	if (m_type == p.m_type)
 		switch (m_type) {
 		case Centerline:
-			return (m_thickness == p.m_thickness) ? m_color1 < p.m_color1 : m_thickness < p.m_thickness;
+			return (m_thickness == p.m_thickness) ? m_color1 < p.m_color1
+												  : m_thickness < p.m_thickness;
 		case Solid:
 			return m_color1 < p.m_color1;
 		case Texture:
-			return m_texture.getPointer() < p.m_texture.getPointer(); //ignoro la matrice!!!!
+			return m_texture.getPointer() < p.m_texture.getPointer(); // ignoro la matrice!!!!
 		case LinearGradient:
 		case RadialGradient:
-			return (m_smooth == p.m_smooth) ? ((m_color1 == p.m_color1) ? ((m_color2 == p.m_color2) ? affineMinorThen(m_matrix, p.m_matrix) : m_color2 < p.m_color2) : m_color1 < p.m_color1) : m_smooth < p.m_smooth;
+			return (m_smooth == p.m_smooth)
+					   ? ((m_color1 == p.m_color1)
+							  ? ((m_color2 == p.m_color2) ? affineMinorThen(m_matrix, p.m_matrix)
+														  : m_color2 < p.m_color2)
+							  : m_color1 < p.m_color1)
+					   : m_smooth < p.m_smooth;
 		default:
 			assert(false);
 			return false;
@@ -302,8 +320,8 @@ bool PolyStyle::operator<(const PolyStyle &p) const
 
 //-------------------------------------------------------------------
 
-void computeQuadChain(const TEdge &e,
-					  std::vector<TQuadratic *> &quadArray, std::vector<TQuadratic *> &toBeDeleted)
+void computeQuadChain(const TEdge &e, std::vector<TQuadratic *> &quadArray,
+					  std::vector<TQuadratic *> &toBeDeleted)
 {
 	int chunk_b, chunk_e, chunk = -1;
 	double t_b, t_e, w0, w1;
@@ -386,5 +404,3 @@ void computeQuadChain(const TEdge &e,
 }
 
 //-------------------------------------------------------------------
-
-

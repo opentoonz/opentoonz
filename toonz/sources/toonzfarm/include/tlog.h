@@ -34,7 +34,7 @@ TFARMAPI void info(const QString &msg);
 
 class TFARMAPI TUserLog
 {
-public:
+  public:
 	TUserLog(); // used to redirect log messages to the console
 	TUserLog(const TFilePath &fp);
 	~TUserLog();
@@ -43,7 +43,7 @@ public:
 	void error(const QString &msg);
 	void info(const QString &msg);
 
-private:
+  private:
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 };

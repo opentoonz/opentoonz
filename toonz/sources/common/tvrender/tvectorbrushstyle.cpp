@@ -34,7 +34,7 @@ class VectorBrushProp : public TStrokeProp
 	std::vector<TRegionOutline> m_regionOutlines;
 	double m_pixelSize;
 
-public:
+  public:
 	VectorBrushProp(const TStroke *stroke, TVectorBrushStyle *style);
 
 	TStrokeProp *clone(const TStroke *stroke) const;
@@ -44,7 +44,7 @@ public:
 
 	const TColorStyle *getColorStyle() const;
 
-private:
+  private:
 	// not implemented
 	VectorBrushProp(const VectorBrushProp &);
 	VectorBrushProp &operator=(const VectorBrushProp &);
@@ -55,7 +55,8 @@ private:
 //**********************************************************************
 
 VectorBrushProp::VectorBrushProp(const TStroke *stroke, TVectorBrushStyle *style)
-	: TStrokeProp(stroke), m_style(style), m_brush(style->getImage()), m_brushBox(m_brush->getBBox()), m_pixelSize(.0)
+	: TStrokeProp(stroke), m_style(style), m_brush(style->getImage()),
+	  m_brushBox(m_brush->getBBox()), m_pixelSize(.0)
 {
 }
 
@@ -70,7 +71,7 @@ TStrokeProp *VectorBrushProp::clone(const TStroke *stroke) const
 
 void VectorBrushProp::draw(const TVectorRenderData &rd)
 {
-	//Ensure that the stroke overlaps our clipping rect
+	// Ensure that the stroke overlaps our clipping rect
 	if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
 		!convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
 		return;
@@ -79,16 +80,16 @@ void VectorBrushProp::draw(const TVectorRenderData &rd)
 	if (!palette)
 		return;
 
-	static TOutlineUtil::OutlineParameter param; //unused, but requested
+	static TOutlineUtil::OutlineParameter param; // unused, but requested
 
-	//Build a solid color style to draw each m_vi's stroke with.
+	// Build a solid color style to draw each m_vi's stroke with.
 	TSolidColorStyle colorStyle;
 
-	//Push the specified rd affine before drawing
+	// Push the specified rd affine before drawing
 	glPushMatrix();
 	tglMultMatrix(rd.m_aff);
 
-	//1. If necessary, build the outlines
+	// 1. If necessary, build the outlines
 	double currentPixelSize = sqrt(tglGetPixelSize2());
 	bool differentPixelSize = !isAlmostZero(currentPixelSize - m_pixelSize, 1e-5);
 	m_pixelSize = currentPixelSize;
@@ -97,20 +98,19 @@ void VectorBrushProp::draw(const TVectorRenderData &rd)
 	if (differentPixelSize || m_strokeChanged) {
 		m_strokeChanged = false;
 
-		//1a. First, the regions
+		// 1a. First, the regions
 		m_regionOutlines.resize(viRegionsCount);
 
 		for (i = 0; i < viRegionsCount; ++i) {
 			TRegionOutline &outline = m_regionOutlines[i];
 			const TRegion *brushRegion = m_brush->getRegion(i);
 
-			//Build the outline
+			// Build the outline
 			outline.clear();
-			TOutlineUtil::makeOutline(*getStroke(), *brushRegion, m_brushBox,
-									  outline);
+			TOutlineUtil::makeOutline(*getStroke(), *brushRegion, m_brushBox, outline);
 		}
 
-		//1b. Then, the strokes
+		// 1b. Then, the strokes
 		m_strokeOutlines.resize(viStrokesCount);
 
 		for (i = 0; i < viStrokesCount; ++i) {
@@ -118,45 +118,41 @@ void VectorBrushProp::draw(const TVectorRenderData &rd)
 			const TStroke *brushStroke = m_brush->getStroke(i);
 
 			outline.getArray().clear();
-			TOutlineUtil::makeOutline(*getStroke(), *brushStroke, m_brushBox,
-									  outline, param);
+			TOutlineUtil::makeOutline(*getStroke(), *brushStroke, m_brushBox, outline, param);
 		}
 	}
 
-	//2. Draw the outlines
+	// 2. Draw the outlines
 
-	UINT s, t, r,
-		strokesCount = m_brush->getStrokeCount(),
-		regionCount = m_brush->getRegionCount();
+	UINT s, t, r, strokesCount = m_brush->getStrokeCount(), regionCount = m_brush->getRegionCount();
 
-	for (s = 0; s < strokesCount; s = t) //Each cycle draws a group
+	for (s = 0; s < strokesCount; s = t) // Each cycle draws a group
 	{
-		//A vector image stores group strokes with consecutive indices.
+		// A vector image stores group strokes with consecutive indices.
 
-		//2a. First, draw regions in the strokeIdx-th stroke's group
+		// 2a. First, draw regions in the strokeIdx-th stroke's group
 		for (r = 0; r < regionCount; ++r) {
 			if (m_brush->sameGroupStrokeAndRegion(s, r)) {
 				const TRegion *brushRegion = m_brush->getRegion(r);
-				const TColorStyle *brushStyle =
-					palette->getStyle(brushRegion->getStyle());
+				const TColorStyle *brushStyle = palette->getStyle(brushRegion->getStyle());
 				assert(brushStyle);
 
-				//Draw the outline
+				// Draw the outline
 				colorStyle.setMainColor(brushStyle->getMainColor());
 				colorStyle.drawRegion(0, false, m_regionOutlines[r]);
 			}
 		}
 
-		//2b. Then, draw all strokes in strokeIdx-th stroke's group
+		// 2b. Then, draw all strokes in strokeIdx-th stroke's group
 		for (t = s; t < strokesCount && m_brush->sameGroup(s, t); ++t) {
 			const TStroke *brushStroke = m_brush->getStroke(t);
-			const TColorStyle *brushStyle =
-				palette->getStyle(brushStroke->getStyle());
+			const TColorStyle *brushStyle = palette->getStyle(brushStroke->getStyle());
 			if (!brushStyle)
 				continue;
 
 			colorStyle.setMainColor(brushStyle->getMainColor());
-			colorStyle.drawStroke(0, &m_strokeOutlines[t], brushStroke); //brushStroke unused but requested
+			colorStyle.drawStroke(0, &m_strokeOutlines[t],
+								  brushStroke); // brushStroke unused but requested
 		}
 	}
 
@@ -174,15 +170,13 @@ const TColorStyle *VectorBrushProp::getColorStyle() const
 //    Vector Brush Style  implementation
 //**********************************************************************
 
-TVectorBrushStyle::TVectorBrushStyle()
-	: m_colorCount(0)
+TVectorBrushStyle::TVectorBrushStyle() : m_colorCount(0)
 {
 }
 
 //-----------------------------------------------------------------
 
-TVectorBrushStyle::TVectorBrushStyle(const std::string &brushName, TVectorImageP vi)
-	: m_brush(vi)
+TVectorBrushStyle::TVectorBrushStyle(const std::string &brushName, TVectorImageP vi) : m_brush(vi)
 {
 	loadBrush(brushName);
 }
@@ -204,7 +198,7 @@ void TVectorBrushStyle::loadBrush(const std::string &brushName)
 		return;
 
 	if (!m_brush) {
-		//Load the image associated with fp
+		// Load the image associated with fp
 		TFilePath fp(m_rootDir + TFilePath(brushName + ".pli"));
 
 		TLevelReaderP lr(fp);
@@ -218,7 +212,7 @@ void TVectorBrushStyle::loadBrush(const std::string &brushName)
 	}
 
 	assert(m_brush);
-	m_colorCount = m_brush->getPalette()->getStyleInPagesCount() - 1; //No transparent
+	m_colorCount = m_brush->getPalette()->getStyleInPagesCount() - 1; // No transparent
 }
 
 //-----------------------------------------------------------------
@@ -227,8 +221,8 @@ TColorStyle *TVectorBrushStyle::clone() const
 {
 	TVectorImageP brush;
 	if (m_brush) {
-		//Clone m_brush and its palette
-		brush = m_brush->clone(); //NOTE: This does NOT clone the palette, too.
+		// Clone m_brush and its palette
+		brush = m_brush->clone(); // NOTE: This does NOT clone the palette, too.
 		brush->setPalette(m_brush->getPalette()->clone());
 	}
 
@@ -259,7 +253,7 @@ void TVectorBrushStyle::saveData(TOutputStreamInterface &osi) const
 {
 	osi << m_brushName;
 
-	//Save palette
+	// Save palette
 	osi << m_colorCount;
 
 	TPalette *pal = m_brush->getPalette();
@@ -289,11 +283,11 @@ void TVectorBrushStyle::loadData(TInputStreamInterface &isi)
 	isi >> colorCount;
 
 	if (colorCount != m_colorCount)
-		return; //Palette mismatch! Just skip palette loading...
+		return; // Palette mismatch! Just skip palette loading...
 
-	//WARNING: Is it needed to read all colors nonetheless?
+	// WARNING: Is it needed to read all colors nonetheless?
 
-	//Load palette colors
+	// Load palette colors
 	TPalette *pal = m_brush->getPalette();
 	assert(pal);
 
@@ -318,7 +312,7 @@ int TVectorBrushStyle::getColorStyleId(int index) const
 	if (index < 0)
 		return 1;
 
-	++index; //Skipping transparent
+	++index; // Skipping transparent
 
 	TPalette *pal = m_brush->getPalette();
 	assert(pal);

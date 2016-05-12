@@ -23,7 +23,7 @@
 class DVAPI DvMimeData : public QMimeData
 {
 
-public:
+  public:
 	DvMimeData();
 	virtual ~DvMimeData();
 
@@ -33,4 +33,4 @@ public:
 
 DVAPI QMimeData *cloneData(const QMimeData *data);
 
-#endif //DVMIMEDATA_INCLUDED
+#endif // DVMIMEDATA_INCLUDED

@@ -44,24 +44,25 @@ void doConvolve_row_9_i(PIXOUT *pixout, int n, PIXIN *pixarr[], long w[])
 	p8 = pixarr[7];
 	p9 = pixarr[8];
 
-	int rightShift = 16 + ((int)sizeof(typename PIXIN::Channel) - (int)sizeof(typename PIXOUT::Channel)) * 8;
+	int rightShift =
+		16 + ((int)sizeof(typename PIXIN::Channel) - (int)sizeof(typename PIXOUT::Channel)) * 8;
 
 	while (n-- > 0) {
-		pixout->r = (typename PIXOUT::Channel)((p1->r * w1 + p2->r * w2 + p3->r * w3 +
-												p4->r * w4 + p5->r * w5 + p6->r * w6 +
-												p7->r * w7 + p8->r * w8 + p9->r * w9 + (1 << 15)) >>
+		pixout->r = (typename PIXOUT::Channel)((p1->r * w1 + p2->r * w2 + p3->r * w3 + p4->r * w4 +
+												p5->r * w5 + p6->r * w6 + p7->r * w7 + p8->r * w8 +
+												p9->r * w9 + (1 << 15)) >>
 											   rightShift);
-		pixout->g = (typename PIXOUT::Channel)((p1->g * w1 + p2->g * w2 + p3->g * w3 +
-												p4->g * w4 + p5->g * w5 + p6->g * w6 +
-												p7->g * w7 + p8->g * w8 + p9->g * w9 + (1 << 15)) >>
+		pixout->g = (typename PIXOUT::Channel)((p1->g * w1 + p2->g * w2 + p3->g * w3 + p4->g * w4 +
+												p5->g * w5 + p6->g * w6 + p7->g * w7 + p8->g * w8 +
+												p9->g * w9 + (1 << 15)) >>
 											   rightShift);
-		pixout->b = (typename PIXOUT::Channel)((p1->b * w1 + p2->b * w2 + p3->b * w3 +
-												p4->b * w4 + p5->b * w5 + p6->b * w6 +
-												p7->b * w7 + p8->b * w8 + p9->b * w9 + (1 << 15)) >>
+		pixout->b = (typename PIXOUT::Channel)((p1->b * w1 + p2->b * w2 + p3->b * w3 + p4->b * w4 +
+												p5->b * w5 + p6->b * w6 + p7->b * w7 + p8->b * w8 +
+												p9->b * w9 + (1 << 15)) >>
 											   rightShift);
-		pixout->m = (typename PIXOUT::Channel)((p1->m * w1 + p2->m * w2 + p3->m * w3 +
-												p4->m * w4 + p5->m * w5 + p6->m * w6 +
-												p7->m * w7 + p8->m * w8 + p9->m * w9 + (1 << 15)) >>
+		pixout->m = (typename PIXOUT::Channel)((p1->m * w1 + p2->m * w2 + p3->m * w3 + p4->m * w4 +
+												p5->m * w5 + p6->m * w6 + p7->m * w7 + p8->m * w8 +
+												p9->m * w9 + (1 << 15)) >>
 											   rightShift);
 
 		p1++;
@@ -80,10 +81,8 @@ void doConvolve_row_9_i(PIXOUT *pixout, int n, PIXIN *pixarr[], long w[])
 //------------------------------------------------------------------------------
 
 template <class PIXOUT>
-void doConvolve_cm32_row_9_i(PIXOUT *pixout, int n,
-							 TPixelCM32 *pixarr[], long w[],
-							 const std::vector<TPixel32> &paints,
-							 const std::vector<TPixel32> &inks)
+void doConvolve_cm32_row_9_i(PIXOUT *pixout, int n, TPixelCM32 *pixarr[], long w[],
+							 const std::vector<TPixel32> &paints, const std::vector<TPixel32> &inks)
 {
 	long w1, w2, w3, w4, w5, w6, w7, w8, w9;
 	TPixelCM32 *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9;
@@ -120,22 +119,22 @@ void doConvolve_cm32_row_9_i(PIXOUT *pixout, int n,
 				val[i] = blend(inks[ink], paints[paint], tone, TPixelCM32::getMaxTone());
 		}
 
-		pixout->r = (typename PIXOUT::Channel)((val[1].r * w1 + val[2].r * w2 + val[3].r * w3 +
-												val[4].r * w4 + val[5].r * w5 + val[6].r * w6 +
-												val[7].r * w7 + val[8].r * w8 + val[9].r * w9 + (1 << 15)) >>
-											   16);
-		pixout->g = (typename PIXOUT::Channel)((val[1].g * w1 + val[2].g * w2 + val[3].g * w3 +
-												val[4].g * w4 + val[5].g * w5 + val[6].g * w6 +
-												val[7].g * w7 + val[8].g * w8 + val[9].g * w9 + (1 << 15)) >>
-											   16);
-		pixout->b = (typename PIXOUT::Channel)((val[1].b * w1 + val[2].b * w2 + val[3].b * w3 +
-												val[4].b * w4 + val[5].b * w5 + val[6].b * w6 +
-												val[7].b * w7 + val[8].b * w8 + val[9].b * w9 + (1 << 15)) >>
-											   16);
-		pixout->m = (typename PIXOUT::Channel)((val[1].m * w1 + val[2].m * w2 + val[3].m * w3 +
-												val[4].m * w4 + val[5].m * w5 + val[6].m * w6 +
-												val[7].m * w7 + val[8].m * w8 + val[9].m * w9 + (1 << 15)) >>
-											   16);
+		pixout->r = (typename PIXOUT::Channel)(
+			(val[1].r * w1 + val[2].r * w2 + val[3].r * w3 + val[4].r * w4 + val[5].r * w5 +
+			 val[6].r * w6 + val[7].r * w7 + val[8].r * w8 + val[9].r * w9 + (1 << 15)) >>
+			16);
+		pixout->g = (typename PIXOUT::Channel)(
+			(val[1].g * w1 + val[2].g * w2 + val[3].g * w3 + val[4].g * w4 + val[5].g * w5 +
+			 val[6].g * w6 + val[7].g * w7 + val[8].g * w8 + val[9].g * w9 + (1 << 15)) >>
+			16);
+		pixout->b = (typename PIXOUT::Channel)(
+			(val[1].b * w1 + val[2].b * w2 + val[3].b * w3 + val[4].b * w4 + val[5].b * w5 +
+			 val[6].b * w6 + val[7].b * w7 + val[8].b * w8 + val[9].b * w9 + (1 << 15)) >>
+			16);
+		pixout->m = (typename PIXOUT::Channel)(
+			(val[1].m * w1 + val[2].m * w2 + val[3].m * w3 + val[4].m * w4 + val[5].m * w5 +
+			 val[6].m * w6 + val[7].m * w7 + val[8].m * w8 + val[9].m * w9 + (1 << 15)) >>
+			16);
 		p1++;
 		p2++;
 		p3++;
@@ -152,13 +151,13 @@ void doConvolve_cm32_row_9_i(PIXOUT *pixout, int n,
 //------------------------------------------------------------------------------
 
 template <class PIXOUT, class PIXIN>
-void doConvolve_row_i(PIXOUT *pixout, int n,
-					  PIXIN *pixarr[], long w[], int pixn)
+void doConvolve_row_i(PIXOUT *pixout, int n, PIXIN *pixarr[], long w[], int pixn)
 {
 	long ar, ag, ab, am;
 	int i;
 
-	int rightShift = 16 + ((int)sizeof(typename PIXIN::Channel) - (int)sizeof(typename PIXOUT::Channel)) * 8;
+	int rightShift =
+		16 + ((int)sizeof(typename PIXIN::Channel) - (int)sizeof(typename PIXOUT::Channel)) * 8;
 
 	while (n-- > 0) {
 		ar = ag = ab = am = 0;
@@ -181,10 +180,8 @@ void doConvolve_row_i(PIXOUT *pixout, int n,
 //------------------------------------------------------------------------------
 
 template <class PIXOUT>
-void doConvolve_cm32_row_i(PIXOUT *pixout, int n,
-						   TPixelCM32 *pixarr[], long w[], int pixn,
-						   const std::vector<TPixel32> &paints,
-						   const std::vector<TPixel32> &inks)
+void doConvolve_cm32_row_i(PIXOUT *pixout, int n, TPixelCM32 *pixarr[], long w[], int pixn,
+						   const std::vector<TPixel32> &paints, const std::vector<TPixel32> &inks)
 {
 	long ar, ag, ab, am;
 	int i;
@@ -220,10 +217,7 @@ void doConvolve_cm32_row_i(PIXOUT *pixout, int n,
 //------------------------------------------------------------------------------
 
 template <class PIXOUT, class PIXIN>
-void doConvolve_3_i(TRasterPT<PIXOUT> rout,
-					TRasterPT<PIXIN> rin,
-					int dx, int dy,
-					double conv[])
+void doConvolve_3_i(TRasterPT<PIXOUT> rout, TRasterPT<PIXIN> rin, int dx, int dy, double conv[])
 {
 	PIXIN *bufferin;
 	PIXOUT *bufferout;
@@ -295,10 +289,8 @@ void doConvolve_3_i(TRasterPT<PIXOUT> rout,
 //------------------------------------------------------------------------------
 
 template <class PIXOUT, class PIXIN>
-void doConvolve_i(TRasterPT<PIXOUT> rout,
-				  TRasterPT<PIXIN> rin,
-				  int dx, int dy,
-				  double conv[], int radius)
+void doConvolve_i(TRasterPT<PIXOUT> rout, TRasterPT<PIXIN> rin, int dx, int dy, double conv[],
+				  int radius)
 {
 	PIXIN *bufferin;
 	PIXOUT *bufferout;
@@ -306,7 +298,7 @@ void doConvolve_i(TRasterPT<PIXOUT> rout,
 	PIXOUT *pixout;
 
 	int radiusSquare = sq(radius);
-	std::unique_ptr<PIXIN*[]> pixarr(new PIXIN *[radiusSquare]);
+	std::unique_ptr<PIXIN *[]> pixarr(new PIXIN *[radiusSquare]);
 	std::unique_ptr<long[]> w(new long[radiusSquare]);
 	int pixn;
 	int wrapin, wrapout;
@@ -373,11 +365,8 @@ void doConvolve_i(TRasterPT<PIXOUT> rout,
 //------------------------------------------------------------------------------
 
 template <class PIXOUT>
-void doConvolve_cm32_3_i(TRasterPT<PIXOUT> rout,
-						 TRasterCM32P rin,
-						 const TPaletteP &palette,
-						 int dx, int dy,
-						 double conv[])
+void doConvolve_cm32_3_i(TRasterPT<PIXOUT> rout, TRasterCM32P rin, const TPaletteP &palette, int dx,
+						 int dy, double conv[])
 {
 	TPixelCM32 *pixin;
 	PIXOUT *pixout;
@@ -455,16 +444,13 @@ void doConvolve_cm32_3_i(TRasterPT<PIXOUT> rout,
 //------------------------------------------------------------------------------
 
 template <class PIXOUT>
-void doConvolve_cm32_i(TRasterPT<PIXOUT> rout,
-					   TRasterCM32P rin,
-					   const TPaletteP &palette,
-					   int dx, int dy,
-					   double conv[], int radius)
+void doConvolve_cm32_i(TRasterPT<PIXOUT> rout, TRasterCM32P rin, const TPaletteP &palette, int dx,
+					   int dy, double conv[], int radius)
 {
 	TPixelCM32 *pixin;
 	PIXOUT *pixout;
 	int radiusSquare = sq(radius);
-	std::unique_ptr<TPixelCM32*[]> pixarr(new TPixelCM32*[radiusSquare]);
+	std::unique_ptr<TPixelCM32 *[]> pixarr(new TPixelCM32 *[radiusSquare]);
 	std::unique_ptr<long[]> w(new long[radiusSquare]);
 	int pixn;
 	int wrapin, wrapout;
@@ -579,8 +565,8 @@ void TRop::convolve_3_i(TRasterP rout, TRasterP rin, int dx, int dy, double conv
 
 //------------------------------------------------------------------------------
 
-void TRop::convolve_3_i(TRasterP rout, TRasterCM32P rin, const TPaletteP &palette,
-						int dx, int dy, double conv[])
+void TRop::convolve_3_i(TRasterP rout, TRasterCM32P rin, const TPaletteP &palette, int dx, int dy,
+						double conv[])
 {
 	TRaster32P rout32 = rout;
 
@@ -638,8 +624,8 @@ void TRop::convolve_i(TRasterP rout, TRasterP rin, int dx, int dy, double conv[]
 
 //------------------------------------------------------------------------------
 
-void TRop::convolve_i(TRasterP rout, TRasterCM32P rin, const TPaletteP &palette,
-					  int dx, int dy, double conv[], int radius)
+void TRop::convolve_i(TRasterP rout, TRasterCM32P rin, const TPaletteP &palette, int dx, int dy,
+					  double conv[], int radius)
 {
 	TRaster32P rout32 = rout;
 

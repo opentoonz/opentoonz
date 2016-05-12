@@ -29,12 +29,15 @@
 
 class TFARMAPI TFarmServer
 {
-public:
+  public:
 	class HwInfo
 	{
-	public:
+	  public:
 		HwInfo()
-			: m_cpuCount(0), m_totPhysMem(0), m_availPhysMem(0), m_totVirtMem(0), m_availVirtMem(0), m_type(NoPlatform) {}
+			: m_cpuCount(0), m_totPhysMem(0), m_availPhysMem(0), m_totVirtMem(0), m_availVirtMem(0),
+			  m_type(NoPlatform)
+		{
+		}
 
 		int m_cpuCount;
 		unsigned int m_totPhysMem;
@@ -63,7 +66,7 @@ public:
 
 class TFARMAPI TFarmServerFactory
 {
-public:
+  public:
 	TFarmServerFactory();
 	~TFarmServerFactory();
 
@@ -74,7 +77,7 @@ public:
 
 class TFARMAPI TFarmServerStub
 {
-public:
+  public:
 	TFarmServerStub(TFarmServer *farmServer, int port);
 	~TFarmServerStub();
 
@@ -83,7 +86,7 @@ public:
 
 	int getPort() const;
 
-private:
+  private:
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 };

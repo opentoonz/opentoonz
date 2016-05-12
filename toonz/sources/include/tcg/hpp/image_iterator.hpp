@@ -15,9 +15,12 @@ namespace tcg
 
 template <typename It, _iei_adherence_policy _adherence>
 template <typename Img>
-image_edge_iterator<It, _adherence>::image_edge_iterator(
-	const Img &img, int x, int y, int dirX, int dirY)
-	: m_lx_1(image_traits<Img>::width(img) - 1), m_ly_1(image_traits<Img>::height(img) - 1), m_wrap(image_traits<Img>::wrap(img)), m_pos(x, y), m_dir(dirX, dirY), m_outsideColor(image_traits<Img>::outsideColor(img)), m_elbowColor(m_outsideColor), m_pix(image_traits<Img>::pixel(img, x, y)), m_turn(UNKNOWN)
+image_edge_iterator<It, _adherence>::image_edge_iterator(const Img &img, int x, int y, int dirX,
+														 int dirY)
+	: m_lx_1(image_traits<Img>::width(img) - 1), m_ly_1(image_traits<Img>::height(img) - 1),
+	  m_wrap(image_traits<Img>::wrap(img)), m_pos(x, y), m_dir(dirX, dirY),
+	  m_outsideColor(image_traits<Img>::outsideColor(img)), m_elbowColor(m_outsideColor),
+	  m_pix(image_traits<Img>::pixel(img, x, y)), m_turn(UNKNOWN)
 {
 	pixels(m_leftPix, m_rightPix);
 	colors(m_leftColor, m_rightColor);
@@ -26,8 +29,7 @@ image_edge_iterator<It, _adherence>::image_edge_iterator(
 //---------------------------------------------------------------------------------------------
 
 template <typename It, _iei_adherence_policy _adherence>
-inline void image_edge_iterator<It, _adherence>::pixels(
-	iter pixLeft, iter pixRight)
+inline void image_edge_iterator<It, _adherence>::pixels(iter pixLeft, iter pixRight)
 {
 	if (m_dir.y)
 		if (m_dir.y > 0)
@@ -43,8 +45,8 @@ inline void image_edge_iterator<It, _adherence>::pixels(
 //---------------------------------------------------------------------------------------------
 
 template <typename It, _iei_adherence_policy _adherence>
-inline void image_edge_iterator<It, _adherence>::colors(
-	value_type &leftColor, value_type &rightColor)
+inline void image_edge_iterator<It, _adherence>::colors(value_type &leftColor,
+														value_type &rightColor)
 {
 	if (m_dir.y)
 		if (m_dir.y > 0) {
@@ -82,9 +84,9 @@ inline void image_edge_iterator<It, _adherence>::colors(
 //---------------------------------------------------------------------------------------------
 
 template <typename It, _iei_adherence_policy _adherence>
-inline void image_edge_iterator<It, _adherence>::turn(
-	const value_type &newLeftColor, const value_type &newRightColor,
-	policy<RIGHT_ADHERENCE>)
+inline void image_edge_iterator<It, _adherence>::turn(const value_type &newLeftColor,
+													  const value_type &newRightColor,
+													  policy<RIGHT_ADHERENCE>)
 {
 	if (newLeftColor == m_rightColor) {
 		if (newRightColor == m_leftColor)
@@ -106,9 +108,9 @@ inline void image_edge_iterator<It, _adherence>::turn(
 //---------------------------------------------------------------------------------------------
 
 template <typename It, _iei_adherence_policy _adherence>
-inline void image_edge_iterator<It, _adherence>::turn(
-	const value_type &newLeftColor, const value_type &newRightColor,
-	policy<LEFT_ADHERENCE>)
+inline void image_edge_iterator<It, _adherence>::turn(const value_type &newLeftColor,
+													  const value_type &newRightColor,
+													  policy<LEFT_ADHERENCE>)
 {
 	if (newRightColor == m_leftColor) {
 		if (newLeftColor == m_rightColor)
@@ -130,8 +132,8 @@ inline void image_edge_iterator<It, _adherence>::turn(
 //---------------------------------------------------------------------------------------------
 
 template <typename It, _iei_adherence_policy _adherence>
-inline void image_edge_iterator<It, _adherence>::turnAmbiguous(
-	const value_type &newLeftColor, const value_type &newRightColor)
+inline void image_edge_iterator<It, _adherence>::turnAmbiguous(const value_type &newLeftColor,
+															   const value_type &newRightColor)
 {
 	UCHAR count1 = 0, count2 = 0;
 

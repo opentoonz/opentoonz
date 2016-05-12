@@ -23,7 +23,8 @@
 //===================================================================
 
 FxDag::FxDag()
-	: m_internalFxs(new TFxSet()), m_terminalFxs(new TFxSet()), m_groupIdCount(0), m_dagGridDimension(eSmall)
+	: m_internalFxs(new TFxSet()), m_terminalFxs(new TFxSet()), m_groupIdCount(0),
+	  m_dagGridDimension(eSmall)
 {
 	TXsheetFx *xsheetFx = new TXsheetFx;
 	xsheetFx->setFxDag(this);
@@ -68,9 +69,7 @@ void FxDag::removeOutputFx(TOutputFx *fx)
 		return;
 	if (std::find(m_outputFxs.begin(), m_outputFxs.end(), fx) == m_outputFxs.end())
 		return;
-	m_outputFxs.erase(
-		std::remove(m_outputFxs.begin(), m_outputFxs.end(), fx),
-		m_outputFxs.end());
+	m_outputFxs.erase(std::remove(m_outputFxs.begin(), m_outputFxs.end(), fx), m_outputFxs.end());
 	fx->release();
 }
 
@@ -314,7 +313,8 @@ void FxDag::loadData(TIStream &is)
 			int i;
 			for (i = 0; i < fxSet->getFxCount(); i++) {
 				TFx *fx = fxSet->getFx(i);
-				if (fx->getAttributes()->isGrouped() && m_groupIdCount < fx->getAttributes()->getGroupId())
+				if (fx->getAttributes()->isGrouped() &&
+					m_groupIdCount < fx->getAttributes()->getGroupId())
 					m_groupIdCount = fx->getAttributes()->getGroupId();
 				if (TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(fx))
 					fx = zfx->getZeraryFx();
@@ -346,7 +346,8 @@ void FxDag::loadData(TIStream &is)
 			int i;
 			for (i = 0; i < fxSet->getFxCount(); i++) {
 				TFx *fx = fxSet->getFx(i);
-				if (fx->getAttributes()->isGrouped() && m_groupIdCount < fx->getAttributes()->getGroupId())
+				if (fx->getAttributes()->isGrouped() &&
+					m_groupIdCount < fx->getAttributes()->getGroupId())
 					m_groupIdCount = fx->getAttributes()->getGroupId();
 				if (TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(fx))
 					fx = zfx->getZeraryFx();

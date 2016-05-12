@@ -23,9 +23,8 @@ class ErodeDilateFx : public TStandardRasterFx
 	TIntEnumParamP m_type;
 	TDoubleParamP m_radius;
 
-public:
-	ErodeDilateFx()
-		: m_type(new TIntEnumParam(0, "Square")), m_radius(0.0)
+  public:
+	ErodeDilateFx() : m_type(new TIntEnumParam(0, "Square")), m_radius(0.0)
 	{
 		addInputPort("Source", m_input);
 
@@ -52,9 +51,9 @@ public:
 
 bool ErodeDilateFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
 {
-	//Remember: info.m_affine MUST NOT BE CONSIDERED in doGetBBox's implementation
+	// Remember: info.m_affine MUST NOT BE CONSIDERED in doGetBBox's implementation
 
-	//Retrieve the input bbox without applied affines.
+	// Retrieve the input bbox without applied affines.
 
 	if (!m_input.getFx())
 		return false;
@@ -90,12 +89,14 @@ void ErodeDilateFx::doCompute(TTile &tile, double frame, const TRenderSettings &
 		int radI = tceil(fabs(radius));
 
 		const TDimension &tileSize = tile.getRaster()->getSize();
-		const TRectD &enlargedRect = TRectD(tile.m_pos, TDimensionD(tileSize.lx, tileSize.ly)).enlarge(radI);
+		const TRectD &enlargedRect =
+			TRectD(tile.m_pos, TDimensionD(tileSize.lx, tileSize.ly)).enlarge(radI);
 
 		TDimension enlargedSize(tround(enlargedRect.getLx()), tround(enlargedRect.getLy()));
 
 		TTile inTile;
-		m_input->allocateAndCompute(inTile, enlargedRect.getP00(), enlargedSize, tile.getRaster(), frame, info);
+		m_input->allocateAndCompute(inTile, enlargedRect.getP00(), enlargedSize, tile.getRaster(),
+									frame, info);
 
 		const TRasterP &inRas = inTile.getRaster();
 		TRop::erodilate(inRas, inRas, radius, type);
@@ -126,7 +127,8 @@ void ErodeDilateFx::doDryCompute(TRectD &rect, double frame, const TRenderSettin
 
 //------------------------------------------------------------------
 
-int ErodeDilateFx::getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info)
+int ErodeDilateFx::getMemoryRequirement(const TRectD &rect, double frame,
+										const TRenderSettings &info)
 {
 	return (m_type->getValue() == 0) ? TRasterFx::memorySize(rect, 8) : // One additional greymaps
 			   2 * TRasterFx::memorySize(rect, 8);						// Two additional greymaps

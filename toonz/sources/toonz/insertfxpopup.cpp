@@ -99,7 +99,7 @@ TFx *createMacroFxByPath(TFilePath path)
 	if (!fx)
 		return 0;
 	fx->setName(path.getWideName());
-	//Assign a unic ID to each fx in the macro!
+	// Assign a unic ID to each fx in the macro!
 	TApp *app = TApp::instance();
 	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 	if (!xsh)
@@ -119,7 +119,7 @@ TFx *createMacroFxByPath(TFilePath path)
 
 	QStack<QPair<std::string, TFxPort *>> newPortNames;
 
-	//Devo cambiare il nome alle porte: contengono l'id dei vecchi effetti
+	// Devo cambiare il nome alle porte: contengono l'id dei vecchi effetti
 	for (i = fx->getInputPortCount() - 1; i >= 0; i--) {
 		std::string oldPortName = fx->getInputPortName(i);
 		std::string inFxOldId = oldPortName;
@@ -140,7 +140,7 @@ TFx *createMacroFxByPath(TFilePath path)
 	return fx;
 }
 
-} //anonymous namespace
+} // anonymous namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -151,7 +151,8 @@ TFx *createMacroFxByPath(TFilePath path)
 		Inherits \b Dialog.
 */
 InsertFxPopup::InsertFxPopup()
-	: Dialog(TApp::instance()->getMainWindow(), true, false, "InsertFx"), m_folderIcon(QIcon()), m_presetIcon(QIcon()), m_fxIcon(QIcon())
+	: Dialog(TApp::instance()->getMainWindow(), true, false, "InsertFx"), m_folderIcon(QIcon()),
+	  m_presetIcon(QIcon()), m_fxIcon(QIcon())
 {
 	setWindowTitle(tr("FX Browser"));
 
@@ -200,9 +201,7 @@ InsertFxPopup::InsertFxPopup()
 			plugins->addChild(firstlevel_item);
 			firstlevel_item->setIcon(0, m_folderIcon);
 		},
-		[&](QTreeWidgetItem *secondlevel_item) {
-			secondlevel_item->setIcon(0, m_fxIcon);
-		});
+		[&](QTreeWidgetItem *secondlevel_item) { secondlevel_item->setIcon(0, m_fxIcon); });
 
 	m_fxTree->insertTopLevelItems(0, fxItems);
 	connect(m_fxTree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
@@ -250,7 +249,8 @@ void InsertFxPopup::loadFolder(QTreeWidgetItem *parent)
 			// Found a sub-folder
 			QString folderName = QString::fromStdString(tagName);
 
-			std::auto_ptr<QTreeWidgetItem> folder(new QTreeWidgetItem((QTreeWidget *)0, QStringList(folderName)));
+			std::auto_ptr<QTreeWidgetItem> folder(
+				new QTreeWidgetItem((QTreeWidget *)0, QStringList(folderName)));
 			folder->setIcon(0, m_folderIcon);
 
 			loadFolder(folder.get());
@@ -310,7 +310,8 @@ bool InsertFxPopup::loadPreset(QTreeWidgetItem *item)
 			for (TFilePathSet::iterator it2 = presets.begin(); it2 != presets.end(); ++it2) {
 				TFilePath presetPath = *it2;
 				QString name(presetPath.getName().c_str());
-				QTreeWidgetItem *presetItem = new QTreeWidgetItem((QTreeWidget *)0, QStringList(name));
+				QTreeWidgetItem *presetItem =
+					new QTreeWidgetItem((QTreeWidget *)0, QStringList(name));
 				presetItem->setData(0, Qt::UserRole, QVariant(toQString(presetPath)));
 				item->addChild(presetItem);
 				presetItem->setIcon(0, m_fxIcon);
@@ -334,14 +335,16 @@ void InsertFxPopup::loadMacro()
 			if (macros.empty())
 				return;
 
-			QTreeWidgetItem *macroFolder = new QTreeWidgetItem((QTreeWidget *)0, QStringList(tr("Macro")));
+			QTreeWidgetItem *macroFolder =
+				new QTreeWidgetItem((QTreeWidget *)0, QStringList(tr("Macro")));
 			macroFolder->setData(0, Qt::UserRole, QVariant(toQString(fp)));
 			macroFolder->setIcon(0, m_folderIcon);
 			m_fxTree->addTopLevelItem(macroFolder);
 			for (TFilePathSet::iterator it = macros.begin(); it != macros.end(); ++it) {
 				TFilePath macroPath = *it;
 				QString name(macroPath.getName().c_str());
-				QTreeWidgetItem *macroItem = new QTreeWidgetItem((QTreeWidget *)0, QStringList(name));
+				QTreeWidgetItem *macroItem =
+					new QTreeWidgetItem((QTreeWidget *)0, QStringList(name));
 				macroItem->setData(0, Qt::UserRole, QVariant(toQString(macroPath)));
 				macroItem->setIcon(0, m_fxIcon);
 				macroFolder->addChild(macroItem);
@@ -355,7 +358,7 @@ void InsertFxPopup::loadMacro()
 
 void InsertFxPopup::onItemDoubleClicked(QTreeWidgetItem *w, int c)
 {
-	if (w->childCount() == 0) //E' una foglia
+	if (w->childCount() == 0) // E' una foglia
 		onInsert();
 }
 
@@ -369,13 +372,13 @@ void InsertFxPopup::onInsert()
 		TXsheetHandle *xshHandle = app->getCurrentXsheet();
 		QList<TFxP> fxs;
 		QList<TFxCommand::Link> links;
-		FxSelection *selection = dynamic_cast<FxSelection *>(app->getCurrentSelection()->getSelection());
+		FxSelection *selection =
+			dynamic_cast<FxSelection *>(app->getCurrentSelection()->getSelection());
 		if (selection) {
 			fxs = selection->getFxs();
 			links = selection->getLinks();
 		}
-		TFxCommand::insertFx(fx, fxs, links, app,
-							 app->getCurrentColumn()->getColumnIndex(),
+		TFxCommand::insertFx(fx, fxs, links, app, app->getCurrentColumn()->getColumnIndex(),
 							 app->getCurrentFrame()->getFrameIndex());
 		xshHandle->notifyXsheetChanged();
 	}
@@ -390,11 +393,11 @@ void InsertFxPopup::onAdd()
 		TApp *app = TApp::instance();
 		TXsheetHandle *xshHandle = app->getCurrentXsheet();
 		QList<TFxP> fxs;
-		FxSelection *selection = dynamic_cast<FxSelection *>(app->getCurrentSelection()->getSelection());
+		FxSelection *selection =
+			dynamic_cast<FxSelection *>(app->getCurrentSelection()->getSelection());
 		if (selection)
 			fxs = selection->getFxs();
-		TFxCommand::addFx(fx, fxs, app,
-						  app->getCurrentColumn()->getColumnIndex(),
+		TFxCommand::addFx(fx, fxs, app, app->getCurrentColumn()->getColumnIndex(),
 						  app->getCurrentFrame()->getFrameIndex());
 		xshHandle->notifyXsheetChanged();
 	}
@@ -409,7 +412,8 @@ void InsertFxPopup::onReplace()
 		TApp *app = TApp::instance();
 		TXsheetHandle *xshHandle = app->getCurrentXsheet();
 		QList<TFxP> fxs;
-		FxSelection *selection = dynamic_cast<FxSelection *>(app->getCurrentSelection()->getSelection());
+		FxSelection *selection =
+			dynamic_cast<FxSelection *>(app->getCurrentSelection()->getSelection());
 		if (selection)
 			fxs = selection->getFxs();
 		TFxCommand::replaceFx(fx, fxs, app->getCurrentXsheet(), app->getCurrentFx());
@@ -437,12 +441,12 @@ TFx *InsertFxPopup::createFx()
 
 	if (TFileStatus(path).doesExist() && TFileStatus(path.getParentDir()).isDirectory()) {
 		std::string folder = path.getParentDir().getName();
-		if (folder == "macroFx") //Devo caricare una macro
+		if (folder == "macroFx") // Devo caricare una macro
 			fx = createMacroFxByPath(path);
-		else //Verifico se devo caricare un preset
+		else // Verifico se devo caricare un preset
 		{
 			folder = path.getParentDir().getParentDir().getName();
-			if (folder == "presets") //Devo caricare un preset
+			if (folder == "presets") // Devo caricare un preset
 				fx = createPresetFxByName(path);
 		}
 	} else
@@ -466,7 +470,8 @@ void InsertFxPopup::showEvent(QShowEvent *)
 
 void InsertFxPopup::hideEvent(QHideEvent *e)
 {
-	disconnect(TApp::instance()->getCurrentFx(), SIGNAL(fxPresetSaved()), this, SLOT(updatePresets()));
+	disconnect(TApp::instance()->getCurrentFx(), SIGNAL(fxPresetSaved()), this,
+			   SLOT(updatePresets()));
 	Dialog::hideEvent(e);
 }
 
@@ -481,15 +486,15 @@ void InsertFxPopup::contextMenuEvent(QContextMenuEvent *event)
 	if (TFileStatus(path).doesExist() && TFileStatus(path.getParentDir()).isDirectory()) {
 		QMenu *menu = new QMenu(this);
 		std::string folder = path.getParentDir().getName();
-		if (folder == "macroFx") //Menu' macro
+		if (folder == "macroFx") // Menu' macro
 		{
 			QAction *remove = new QAction(tr("Remove Macro FX"), menu);
 			connect(remove, SIGNAL(triggered()), this, SLOT(removePreset()));
 			menu->addAction(remove);
-		} else //Verifico se devo caricare un preset
+		} else // Verifico se devo caricare un preset
 		{
 			folder = path.getParentDir().getParentDir().getName();
-			if (folder == "presets") //Menu' preset
+			if (folder == "presets") // Menu' preset
 			{
 				QAction *remove = new QAction(tr("Remove Preset"), menu);
 				connect(remove, SIGNAL(triggered()), this, SLOT(removePreset()));
@@ -542,7 +547,8 @@ void InsertFxPopup::removePreset()
 
 	TFilePath path = TFilePath(itemRole.toStdWString());
 
-	QString question = QString(tr("Are you sure you want to delete %1?").arg(path.getName().c_str()));
+	QString question =
+		QString(tr("Are you sure you want to delete %1?").arg(path.getName().c_str()));
 	int ret = DVGui::MsgBox(question, tr("Yes"), tr("No"), 1);
 	if (ret == 2 || ret == 0)
 		return;

@@ -5,8 +5,7 @@
 
 namespace
 {
-template <typename T, typename PIXEL>
-void prepare_lut(int levels, std::vector<T> &lut)
+template <typename T, typename PIXEL> void prepare_lut(int levels, std::vector<T> &lut)
 {
 	int i, j;
 	int valuestep = PIXEL::maxChannelValue / (levels - 1);
@@ -26,9 +25,8 @@ class PosterizeFx : public TStandardRasterFx
 	TRasterFxPort m_input;
 	TDoubleParamP m_levels;
 
-public:
-	PosterizeFx()
-		: m_levels(7.0)
+  public:
+	PosterizeFx() : m_levels(7.0)
 	{
 		bindParam(this, "levels", m_levels);
 		addInputPort("Source", m_input);
@@ -55,8 +53,7 @@ public:
 
 //-------------------------------------------------------------------
 
-template <typename PIXEL, typename CHANNEL_TYPE>
-void doPosterize(TRasterPT<PIXEL> ras, int levels)
+template <typename PIXEL, typename CHANNEL_TYPE> void doPosterize(TRasterPT<PIXEL> ras, int levels)
 {
 	std::vector<CHANNEL_TYPE> solarize_lut(PIXEL::maxChannelValue + 1);
 

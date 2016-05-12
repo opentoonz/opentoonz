@@ -23,7 +23,7 @@ namespace TFarmStuff
 
 class TFarmPage : public TWidget
 {
-public:
+  public:
 	TFarmPage(TWidget *parent, const std::string &name) : TWidget(parent, name) {}
 	virtual ~TFarmPage() {}
 
@@ -37,7 +37,7 @@ public:
 
 class TaskInfoPage : public TFarmPage
 {
-public:
+  public:
 	TaskInfoPage(TWidget *parent);
 	~TaskInfoPage();
 
@@ -50,7 +50,7 @@ public:
 
 	void showTaskInfo(const std::string &id);
 
-private:
+  private:
 	class Data;
 	Data *m_data;
 };
@@ -59,7 +59,7 @@ private:
 
 class SubmitPageTask
 {
-public:
+  public:
 	virtual ~SubmitPageTask() {}
 
 	/*
@@ -70,25 +70,13 @@ public:
 
 	virtual std::string getCommandLine() const = 0;
 
-	virtual std::string getFilePath()
-	{
-		return m_filePath;
-	}
+	virtual std::string getFilePath() { return m_filePath; }
 
-	virtual void setFilePath(const std::string &filePath)
-	{
-		m_filePath = filePath;
-	}
+	virtual void setFilePath(const std::string &filePath) { m_filePath = filePath; }
 
-	virtual std::string getName()
-	{
-		return m_name;
-	}
+	virtual std::string getName() { return m_name; }
 
-	virtual void setName(const std::string &name)
-	{
-		m_name = name;
-	}
+	virtual void setName(const std::string &name) { m_name = name; }
 
 	/*
   virtual map<std::string, string> getDependencies();
@@ -96,7 +84,7 @@ public:
 */
 	static SubmitPageTask *create(const std::string &type);
 
-protected:
+  protected:
 	std::string m_filePath;
 	std::string m_name;
 	std::map<std::string, std::string> m_depTasks;
@@ -106,7 +94,7 @@ protected:
 
 class SubmitPage : public TFarmPage
 {
-public:
+  public:
 	SubmitPage(TWidget *parent);
 	~SubmitPage();
 
@@ -127,7 +115,7 @@ public:
 
 class TaskConfigPanel : public TWidget
 {
-public:
+  public:
 	TaskConfigPanel(TWidget *parent) : TWidget(parent) {}
 
 	virtual void setTask(SubmitPageTask *task) = 0;
@@ -138,7 +126,7 @@ public:
 
 class SubmitRenderPopup : public TModalPopup
 {
-public:
+  public:
 	SubmitRenderPopup(TWidget *parent, std::string name);
 	~SubmitRenderPopup();
 
@@ -153,7 +141,7 @@ public:
 	void onIntFieldChange(const TNumField::Event &e);
 	void draw();
 
-private:
+  private:
 	class Data;
 	Data *m_data;
 };
@@ -162,7 +150,7 @@ private:
 
 class SubmitCleanupPopup : public TModalPopup
 {
-public:
+  public:
 	SubmitCleanupPopup(TWidget *parent, std::string name);
 	~SubmitCleanupPopup();
 
@@ -177,7 +165,7 @@ public:
 	void onIntFieldChange(const TNumField::Event &e);
 	void draw();
 
-private:
+  private:
 	class Data;
 	Data *m_data;
 };
@@ -186,7 +174,7 @@ private:
 
 class GRootEnvVarPopup : public TModalPopup
 {
-public:
+  public:
 	GRootEnvVarPopup(TWidget *parent, std::string name);
 	~GRootEnvVarPopup();
 
@@ -197,14 +185,11 @@ public:
 	void configureNotify(const TDimension &d);
 	void draw();
 
-	//bool onNcPaint(bool is_active, const TDimension &size, const TRect &titlebar);
+	// bool onNcPaint(bool is_active, const TDimension &size, const TRect &titlebar);
 
 	void popup(const TPoint &p, bool missingvar);
 
-	bool canceled()
-	{
-		return m_canceled;
-	}
+	bool canceled() { return m_canceled; }
 
 	TLabel *m_grootVarLabel;
 	TTextField *m_grootVar;
@@ -231,7 +216,7 @@ void getControllerData(QString &hostName, QString &ipAddr, int &port);
 
 class TMissingGRootFolder : public TException
 {
-public:
+  public:
 	TMissingGRootFolder() : TException() {}
 };
 
@@ -239,7 +224,7 @@ public:
 
 class TMissingGRootEnvironmentVariable : public TException
 {
-public:
+  public:
 	TMissingGRootEnvironmentVariable() : TException() {}
 };
 

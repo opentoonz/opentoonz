@@ -24,7 +24,7 @@ class FullColorBrushTool : public TTool
 {
 	Q_DECLARE_TR_FUNCTIONS(FullColorBrushTool)
 
-public:
+  public:
 	FullColorBrushTool(std::string name);
 
 	ToolType getToolType() const { return TTool::LevelWriteTool; }
@@ -63,7 +63,7 @@ public:
 
 	void onCanvasSizeChanged();
 
-protected:
+  protected:
 	TPropertyGroup m_prop;
 
 	TIntPairProperty m_thickness;
@@ -73,9 +73,7 @@ protected:
 	TEnumProperty m_preset;
 
 	TPixel32 m_currentColor;
-	int m_styleId,
-		m_minThick,
-		m_maxThick;
+	int m_styleId, m_minThick, m_maxThick;
 
 	double m_oldOpacity;
 
@@ -86,8 +84,7 @@ protected:
 	TRasterP m_backUpRas;
 	TRaster32P m_workRaster;
 
-	TRect m_strokeRect,
-		m_lastRect;
+	TRect m_strokeRect, m_lastRect;
 
 	QRadialGradient m_brushPad;
 
@@ -112,12 +109,12 @@ class FullColorBrushToolNotifier : public QObject
 
 	FullColorBrushTool *m_tool;
 
-public:
+  public:
 	FullColorBrushToolNotifier(FullColorBrushTool *tool);
 
-protected slots:
+  protected slots:
 
 	void onCanvasSizeChanged() { m_tool->onCanvasSizeChanged(); }
 };
 
-#endif //FULLCOLORBRUSHTOOL_H
+#endif // FULLCOLORBRUSHTOOL_H

@@ -16,11 +16,11 @@ class TextureFx : public TStandardRasterFx
 	TRasterFxPort m_texture;
 	TStringParamP m_string;
 	TIntEnumParamP m_keep;
-	//TIntEnumParamP m_type;
+	// TIntEnumParamP m_type;
 	TIntEnumParamP m_mode;
 	TDoubleParamP m_value;
 
-public:
+  public:
 	TextureFx()
 		: m_string(L"1,2,3"), m_keep(new TIntEnumParam(0, "Delete"))
 		  //, m_type(new TIntEnumParam(0, "Lines & Areas"))
@@ -32,12 +32,12 @@ public:
 		bindParam(this, "indexes", m_string);
 		bindParam(this, "keep", m_keep);
 		bindParam(this, "mode", m_mode);
-		//bindParam(this,"type",  m_type);
+		// bindParam(this,"type",  m_type);
 		bindParam(this, "value", m_value);
 		m_value->setValueRange(0, 100);
 		m_keep->addItem(1, "Keep");
-		//m_type->addItem(1, "Lines");
-		//m_type->addItem(2, "Areas");
+		// m_type->addItem(1, "Lines");
+		// m_type->addItem(2, "Areas");
 		m_mode->addItem(PATTERNTYPE, "Pattern");
 		m_mode->addItem(ADD, "Add");
 		m_mode->addItem(SUBTRACT, "Subtract");
@@ -86,7 +86,7 @@ void TextureFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings &
 	ri2.m_data.push_back(PaletteFilterData);
 	ri2.m_userCachable = false;
 
-	//First child compute: part of output that IS NOT texturized
+	// First child compute: part of output that IS NOT texturized
 	m_input->dryCompute(rect, frame, ri2);
 
 	if (!m_texture.isConnected())
@@ -97,10 +97,10 @@ void TextureFx::doDryCompute(TRectD &rect, double frame, const TRenderSettings &
 		ri2.m_isSwatch = false;
 	PaletteFilterData->m_keep = !(m_keep->getValue());
 
-	//Second child compute: part of output that IS to be texturized
+	// Second child compute: part of output that IS to be texturized
 	m_input->dryCompute(rect, frame, ri2);
 
-	//Third child compute: texture
+	// Third child compute: texture
 	m_texture->dryCompute(rect, frame, info);
 }
 
@@ -113,13 +113,13 @@ void TextureFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 
 	TTile invertMaskTile;
 
-	//carico il vettore items con gli indici dei colori
+	// carico il vettore items con gli indici dei colori
 	std::vector<std::string> items;
 	std::string indexes = toString(m_string->getValue());
 	parseIndexes(indexes, items);
 
-	//genero il tile il cui raster contiene l'immagine in input a cui sono stati tolti i pixel
-	//colorati con gli indici contenuti nel vettore items
+	// genero il tile il cui raster contiene l'immagine in input a cui sono stati tolti i pixel
+	// colorati con gli indici contenuti nel vettore items
 	TRenderSettings ri2(ri);
 	PaletteFilterFxRenderData *PaletteFilterData = new PaletteFilterFxRenderData;
 	PaletteFilterData->m_keep = !!(m_keep->getValue());
@@ -136,8 +136,8 @@ void TextureFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 		return;
 	}
 
-	//genero il tile il cui raster contiene l'immagine in input a cui sono stati tolti i pixel
-	//colorati con indici diversi da quelli contenuti nel vettore items
+	// genero il tile il cui raster contiene l'immagine in input a cui sono stati tolti i pixel
+	// colorati con indici diversi da quelli contenuti nel vettore items
 	bool isSwatch = ri2.m_isSwatch;
 	if (isSwatch)
 		ri2.m_isSwatch = false;
@@ -146,21 +146,21 @@ void TextureFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 	if (isSwatch)
 		ri2.m_isSwatch = true;
 
-	//controllo se ho ottenuto quaclosa su cui si possa lavorare.
+	// controllo se ho ottenuto quaclosa su cui si possa lavorare.
 	TRect box;
 	TRop::computeBBox(tile.getRaster(), box);
 	if (box.isEmpty()) {
-		m_input->compute(tile, frame, ri); //Could the invertMask be copied??
+		m_input->compute(tile, frame, ri); // Could the invertMask be copied??
 		return;
 	}
 
-	//Then, generate the texture tile
+	// Then, generate the texture tile
 	TTile textureTile;
 	TDimension size = tile.getRaster()->getSize();
 	TPointD pos = tile.m_pos;
 	m_texture->allocateAndCompute(textureTile, pos, size, tile.getRaster(), frame, ri);
 
-	//And copy the part corresponding to mask tile
+	// And copy the part corresponding to mask tile
 	/*TDimension dim = tile.getRaster()->getSize();
   TRasterP appRas = tile.getRaster()->create(dim.lx,dim.ly);
 	appRas->clear();
@@ -195,7 +195,8 @@ void TextureFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 		case DARKEN:
 			myOver32(tile.getRaster(), textureTile.getRaster(), &textureDarken<TPixel32>, v);
 			break;
-		case LIGHTEN : myOver32(tile.getRaster(), textureTile.getRaster(), &textureLighten<TPixel32>, v);
+		case LIGHTEN:
+			myOver32(tile.getRaster(), textureTile.getRaster(), &textureLighten<TPixel32>, v);
 			break;
 		default:
 			assert(0);

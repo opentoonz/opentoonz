@@ -63,21 +63,24 @@
 /*
 questo file gestisce il salvataggio in un .tnz e il caricamento dei setting dei mov.
 viene usato il popup fornito da quicktime, con tutti i suoi setting e i sotto settings.
-i setting sono memorizzati da quicktime in un componentInstance. Da qui, possono essere convertiti in un atomContainer, 
+i setting sono memorizzati da quicktime in un componentInstance. Da qui, possono essere convertiti
+in un atomContainer,
 che e' una struttura simile alla nostra propertyGroup, ma con gli atomi strutturati ad albero.
 sono state scritte due funzioni di conversione da atomContainer a propertygroup e viceversa
-ogni atom ha un type, id, e numero figli. se numero figli=0 allora l'atomo e'una foglia, 
+ogni atom ha un type, id, e numero figli. se numero figli=0 allora l'atomo e'una foglia,
 e quindi ha un buffer di dati di valori char.
 
-ogni atomo viene trasformato in una stringProperty. il nome della stringProperty e' 
+ogni atomo viene trasformato in una stringProperty. il nome della stringProperty e'
 "type id numeroFigli"
-se numerofigli>0, allora la stringProperty ha un valore nullo, e le prossime 
-numerofigli property contengono i figli; 
-se numerofigli==0, allora il valore della property contiene il buffer di dati, 
+se numerofigli>0, allora la stringProperty ha un valore nullo, e le prossime
+numerofigli property contengono i figli;
+se numerofigli==0, allora il valore della property contiene il buffer di dati,
 convertito in stringa.
 ecco coem viene convertito il buffer in stringa:
-se ad esempio il buffer e' composto di 3 bytes, buf[0] = 13 buf[1]=0 buf[2]=231 allora la strnga valore sara' "13 0 231"
-se ci sono piu 0 consecutivi, vengono memorizzati per salvare spazio come "z count" in cui count e' il numero di 0.
+se ad esempio il buffer e' composto di 3 bytes, buf[0] = 13 buf[1]=0 buf[2]=231 allora la strnga
+valore sara' "13 0 231"
+se ci sono piu 0 consecutivi, vengono memorizzati per salvare spazio come "z count" in cui count e'
+il numero di 0.
 esempio:  buf[0] = 13 buf[1]=0 buf[2]=0 buf[3]=0 buf[4]=0 buf5]=231
 allora str = "13 z 4 231"
 */
@@ -136,9 +139,9 @@ void visitAtoms(const QTAtomContainer &atoms, const QTAtom &parent, TPropertyGro
 				strapp = strapp + string(num) + " ";
 			}
 
-			//unsigned short*buffer = new unsigned short[size];
-			//buffer[size]=0;
-			//for (i=0; i<size; i++)
+			// unsigned short*buffer = new unsigned short[size];
+			// buffer[size]=0;
+			// for (i=0; i<size; i++)
 			//  buffer[i] = atomData[i]+1;
 
 			wstring data = toWideString(strapp);
@@ -151,7 +154,8 @@ void visitAtoms(const QTAtomContainer &atoms, const QTAtom &parent, TPropertyGro
 //------------------------------------------------
 namespace
 {
-void compareAtoms(const QTAtomContainer &atoms1, QTAtom parent1, const QTAtomContainer &atoms2, QTAtom parent2)
+void compareAtoms(const QTAtomContainer &atoms1, QTAtom parent1, const QTAtomContainer &atoms2,
+				  QTAtom parent2)
 {
 	QTAtom curr1 = 0, curr2 = 0;
 
@@ -237,9 +241,9 @@ void visitprops(TPropertyGroup &pg, int &index, QTAtomContainer &atoms, QTAtom p
 					buf.push_back(val);
 				}
 			}
-			//const unsigned short*bufs = str1.c_str();
-			//UCHAR *bufc = new UCHAR[size];
-			//for (int i=0; i<size; i++)
+			// const unsigned short*bufs = str1.c_str();
+			// UCHAR *bufc = new UCHAR[size];
+			// for (int i=0; i<size; i++)
 			// {
 			//	assert(bufs[i]<257);
 			//	bufc[i] = (UCHAR)(bufs[i]-1);
@@ -248,11 +252,10 @@ void visitprops(TPropertyGroup &pg, int &index, QTAtomContainer &atoms, QTAtom p
 			if (buf.size() != 0) {
 				ptr = &(buf[0]);
 			}
-			QTInsertChild(atoms, parent, (QTAtomType)atomType, (QTAtomID)id, 0,
-						  buf.size(), (void *)ptr, 0);
+			QTInsertChild(atoms, parent, (QTAtomType)atomType, (QTAtomID)id, 0, buf.size(),
+						  (void *)ptr, 0);
 		} else {
-			QTInsertChild(atoms, parent, (QTAtomType)atomType, (QTAtomID)id,
-						  0, 0, 0, &newAtom);
+			QTInsertChild(atoms, parent, (QTAtomType)atomType, (QTAtomID)id, 0, 0, 0, &newAtom);
 			visitprops(pg, index, atoms, newAtom);
 		}
 	}
@@ -272,9 +275,9 @@ void fromPropertiesToAtoms(TPropertyGroup &pg, QTAtomContainer &atoms)
 
 SCExtendedProcs gProcStruct, ptr;
 
-static Boolean QTCmpr_FilterProc 
-      (DialogPtr theDialog, EventRecord *theEvent, 
-                                    short *theItemHit, long theRefCon)
+static Boolean QTCmpr_FilterProc
+	  (DialogPtr theDialog, EventRecord *theEvent,
+									short *theItemHit, long theRefCon)
 {
 #pragma unused(theItemHit, theRefCon)
    Boolean         myEventHandled = false;
@@ -284,18 +287,18 @@ static Boolean QTCmpr_FilterProc
    myDialogWindow = GetDialogWindow(theDialog);
 
    switch (theEvent->what) {
-      case updateEvt:
-        myEventWindow = (WindowRef)theEvent->message;
+	  case updateEvt:
+		myEventWindow = (WindowRef)theEvent->message;
 		// Change the window class
-        HIWindowChangeClass(myEventWindow,kUtilityWindowClass);
+		HIWindowChangeClass(myEventWindow,kUtilityWindowClass);
 		// Activate the window scope
 		SetWindowActivationScope(myEventWindow,kWindowActivationScopeAll);
 		// Set the brushed metal theme on the window
 		SetThemeWindowBackground(myEventWindow,kThemeBrushUtilityWindowBackgroundActive,true);
-	
+
 		break;
    }
-   
+
    return(myEventHandled);
 }
 
@@ -310,7 +313,8 @@ void openMovSettingsPopup(TPropertyGroup *props, bool macBringToFront)
 		return;
 #endif
 
-	ComponentInstance ci = OpenDefaultComponent(StandardCompressionType, StandardCompressionSubType);
+	ComponentInstance ci =
+		OpenDefaultComponent(StandardCompressionType, StandardCompressionSubType);
 
 	QTAtomContainer atoms;
 	QTNewAtomContainer(&atoms);
@@ -337,7 +341,7 @@ gProcStruct.filterProc = NewSCModalFilterUPP(QTCmpr_FilterProc);
 // I don't install any hook
 gProcStruct.hookProc = NULL;
 gProcStruct.customName[0] = 0;
-// I don't use refcon 
+// I don't use refcon
 gProcStruct.refcon = 0;
 
 // set the current extended procs
@@ -346,7 +350,7 @@ SCSetInfo(ci, scExtendedProcsType, &gProcStruct);
 #endif
 
 	err = SCRequestSequenceSettings(ci);
-	//assert(err==noErr);
+	// assert(err==noErr);
 	QTAtomContainer atomsOut;
 
 	if (SCGetSettingsAsAtomContainer(ci, &atomsOut) != noErr)
@@ -357,8 +361,8 @@ SCSetInfo(ci, scExtendedProcsType, &gProcStruct);
 	QTDisposeAtomContainer(atomsOut);
 	CloseComponent(ci);
 
-	//int dataSize=0, numChildren = 0, numLevels=0;
-	//retrieveData(settings, kParentAtomIsContainer, dataSize, numChildren, numLevels);
+	// int dataSize=0, numChildren = 0, numLevels=0;
+	// retrieveData(settings, kParentAtomIsContainer, dataSize, numChildren, numLevels);
 }
 
 bool Tiio::isQuicktimeInstalled()
@@ -376,21 +380,21 @@ bool Tiio::isQuicktimeInstalled()
 #endif
 }
 
-#else //x64
+#else // x64
 
 //*******************************************************************************
 //    64-bit proxied version
 //*******************************************************************************
 
-//Toonz includes
+// Toonz includes
 #include "tfilepath.h"
 #include "tstream.h"
 
-//tipc includes
+// tipc includes
 #include "tipc.h"
 #include "t32bitsrv_wrap.h"
 
-//MAC-Specific includes
+// MAC-Specific includes
 #ifdef MACOSX
 #include <ApplicationServices/ApplicationServices.h>
 #endif
@@ -399,18 +403,19 @@ bool Tiio::isQuicktimeInstalled()
 
 //---------------------------------------------------------------------------
 
-//Using 32-bit background server correspondence to achieve the same result
+// Using 32-bit background server correspondence to achieve the same result
 void openMovSettingsPopup(TPropertyGroup *props, bool unused)
 {
 	QLocalSocket socket;
-	if (!tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), 3000, t32bitsrv::srvCmdline(), "_main"))
+	if (!tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), 3000, t32bitsrv::srvCmdline(),
+									"_main"))
 		return;
 
-	//Send the appropriate commands to the server
+	// Send the appropriate commands to the server
 	tipc::Stream stream(&socket);
 	tipc::Message msg;
 
-	//We'll communicate through temporary files.
+	// We'll communicate through temporary files.
 	stream << (msg << QString("$tmpfile_request") << QString("openMovSets"));
 	QString res(tipc::readMessage(stream, msg));
 
@@ -420,32 +425,32 @@ void openMovSettingsPopup(TPropertyGroup *props, bool unused)
 
 	TFilePath tfp(fp.toStdWString());
 	{
-		//Save the input props to the temporary file
+		// Save the input props to the temporary file
 		TOStream os(tfp);
 		props->saveData(os);
 	}
 
-	//Invoke the settings popup
+	// Invoke the settings popup
 	stream << (msg << tipc::clr << QString("$openMovSettingsPopup") << fp);
 	res = tipc::readMessageNB(stream, msg, -1, QEventLoop::ExcludeUserInputEvents);
 	assert(res == "ok");
 
 #ifdef MACOSX
 
-	//Bring this application back to front
+	// Bring this application back to front
 	ProcessSerialNumber psn = {0, kCurrentProcess};
 	SetFrontProcess(&psn);
 
-#endif //MACOSX
+#endif // MACOSX
 
 	props->clear();
 	{
-		//Save the input props to the temporary file
+		// Save the input props to the temporary file
 		TIStream is(tfp);
 		props->loadData(is);
 	}
 
-	//Release the temporary file
+	// Release the temporary file
 	stream << (msg << tipc::clr << QString("$tmpfile_release") << QString("openMovSets"));
 	res = tipc::readMessage(stream, msg);
 	assert(res == "ok");
@@ -455,13 +460,13 @@ void openMovSettingsPopup(TPropertyGroup *props, bool unused)
 
 bool Tiio::isQuicktimeInstalled()
 {
-	//NOTE: This is *NOT* the same function as IsQuickTimeInstalled(), which is
-	//implemented locally in the image lib and used there. This function here is
-	//actually NEVER USED throughout Toonz, so we're placing a dummy
-	//implementation here.
+	// NOTE: This is *NOT* the same function as IsQuickTimeInstalled(), which is
+	// implemented locally in the image lib and used there. This function here is
+	// actually NEVER USED throughout Toonz, so we're placing a dummy
+	// implementation here.
 
 	assert(false);
 	return false;
 }
 
-#endif //else
+#endif // else

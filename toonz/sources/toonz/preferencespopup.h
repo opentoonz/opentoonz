@@ -34,68 +34,41 @@ class PreferencesPopup : public QDialog
 {
 	Q_OBJECT
 
-public:
+  public:
 	PreferencesPopup();
 
-private:
+  private:
 	class FormatProperties;
 
-private:
+  private:
 	Preferences *m_pref;
 
 	FormatProperties *m_formatProperties;
 
-	DVGui::ColorField *m_blankColor,
-		*m_frontOnionColor,
-		*m_backOnionColor,
-		*m_transpCheckBgColor,
-		*m_transpCheckInkColor,
-		*m_transpCheckPaintColor,
-		*m_viewerBgColorFld,
-		*m_previewBgColorFld,
-		*m_chessboardColor1Fld,
-		*m_chessboardColor2Fld;
+	DVGui::ColorField *m_blankColor, *m_frontOnionColor, *m_backOnionColor, *m_transpCheckBgColor,
+		*m_transpCheckInkColor, *m_transpCheckPaintColor, *m_viewerBgColorFld, *m_previewBgColorFld,
+		*m_chessboardColor1Fld, *m_chessboardColor2Fld;
 
-	QComboBox *m_keyframeType,
-		*m_cellsDragBehaviour,
-		*m_defScanLevelType,
-		*m_defLevelType,
-		*m_autocreationType,
-		*m_levelFormatNames,
-		*m_columnIconOm;
+	QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType, *m_defLevelType,
+		*m_autocreationType, *m_levelFormatNames, *m_columnIconOm;
 
-	DVGui::MeasuredDoubleLineEdit
-		*m_defLevelWidth,
-		*m_defLevelHeight;
+	DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
 	DVGui::DoubleLineEdit *m_defLevelDpi;
 
-	DVGui::IntLineEdit *m_minuteFld,
-		*m_chunkSizeFld,
-		*m_iconSizeLx,
-		*m_iconSizeLy,
-		*m_viewShrink,
-		*m_viewStep,
-		*m_blanksCount,
-		*m_onionPaperThickness,
-		*m_animationStepField,
-		*m_undoMemorySize,
-		*m_xsheetStep;
+	DVGui::IntLineEdit *m_minuteFld, *m_chunkSizeFld, *m_iconSizeLx, *m_iconSizeLy, *m_viewShrink,
+		*m_viewStep, *m_blanksCount, *m_onionPaperThickness, *m_animationStepField,
+		*m_undoMemorySize, *m_xsheetStep;
 
-	QPushButton *m_addLevelFormat,
-		*m_removeLevelFormat,
-		*m_editLevelFormat;
+	QPushButton *m_addLevelFormat, *m_removeLevelFormat, *m_editLevelFormat;
 
-	DVGui::CheckBox *m_inksOnly,
-		*m_enableVersionControl,
-		*m_levelsBackup,
-		*m_onionSkinVisibility;
+	DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup, *m_onionSkinVisibility;
 
-private:
-	//QWidget* create(const QString& lbl, bool def, const char* slot);
+  private:
+	// QWidget* create(const QString& lbl, bool def, const char* slot);
 	void rebuildFormatsList();
 
-private slots:
+  private slots:
 
 	void onUnitChanged(int index);
 	void onCameraUnitChanged(int index);
@@ -178,29 +151,24 @@ class PreferencesPopup::FormatProperties : public DVGui::Dialog
 {
 	Q_OBJECT
 
-public:
+  public:
 	FormatProperties(PreferencesPopup *parent);
 
 	void setLevelFormat(const Preferences::LevelFormat &lf);
 	Preferences::LevelFormat levelFormat() const;
 
-private:
+  private:
 	QComboBox *m_dpiPolicy;
 
-	DVGui::LineEdit *m_name,
-		*m_regExp;
+	DVGui::LineEdit *m_name, *m_regExp;
 
 	DVGui::DoubleLineEdit *m_dpi;
 
-	DVGui::IntLineEdit *m_priority,
-		*m_subsampling,
-		*m_antialias;
+	DVGui::IntLineEdit *m_priority, *m_subsampling, *m_antialias;
 
-	DVGui::CheckBox *m_premultiply,
-		*m_whiteTransp,
-		*m_doAntialias;
+	DVGui::CheckBox *m_premultiply, *m_whiteTransp, *m_doAntialias;
 
-private slots:
+  private slots:
 
 	void updateEnabledStatus();
 };

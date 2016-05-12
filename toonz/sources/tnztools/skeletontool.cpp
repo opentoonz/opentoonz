@@ -79,7 +79,8 @@ inline std::string removeTrailingH(std::string handle)
 //
 //------------------------------------------------------------
 
-// return true iff column ancestorIndex is column descentIndex or its parent or the parent of the parent, etc.
+// return true iff column ancestorIndex is column descentIndex or its parent or the parent of the
+// parent, etc.
 bool isAncestorOf(int ancestorIndex, int descendentIndex)
 {
 	TStageObjectId ancestorId = TStageObjectId::ColumnId(ancestorIndex);
@@ -167,7 +168,8 @@ void getConnectedColumns(std::set<int> &connectedColumns, TXsheet *xsh, int col)
 bool canShowBone(Skeleton::Bone *bone, TXsheet *xsh, int row)
 {
 	TStageObjectId id = bone->getStageObject()->getId();
-	if (!xsh->getCell(row, id.getIndex()).isEmpty() && xsh->getColumn(id.getIndex())->isCamstandVisible())
+	if (!xsh->getCell(row, id.getIndex()).isEmpty() &&
+		xsh->getColumn(id.getIndex())->isCamstandVisible())
 		return true;
 	int i;
 	for (i = 0; i < bone->getChildCount(); i++) {
@@ -228,7 +230,11 @@ SkeletonTool skeletonTool;
 //-------------------------------------------------------------------
 
 SkeletonTool::SkeletonTool()
-	: TTool("T_Skeleton"), m_active(false), m_device(TD_None), m_mode("Mode:"), m_showOnlyActiveSkeleton("Show Only Active Skeleton", false), m_globalKeyframes("Global Key", false), m_dragTool(0), m_firstTime(true), m_currentFrame(-1), m_parentProbe(), m_parentProbeEnabled(false), m_otherColumn(-1), m_otherColumnBBoxAff(), m_otherColumnBBox(), m_labelPos(0, 0), m_label("")
+	: TTool("T_Skeleton"), m_active(false), m_device(TD_None), m_mode("Mode:"),
+	  m_showOnlyActiveSkeleton("Show Only Active Skeleton", false),
+	  m_globalKeyframes("Global Key", false), m_dragTool(0), m_firstTime(true), m_currentFrame(-1),
+	  m_parentProbe(), m_parentProbeEnabled(false), m_otherColumn(-1), m_otherColumnBBoxAff(),
+	  m_otherColumnBBox(), m_labelPos(0, 0), m_label("")
 {
 	bind(TTool::CommonLevels);
 	m_prop.bind(m_mode);
@@ -332,8 +338,7 @@ void SkeletonTool::leftButtonDown(const TPointD &ppos, const TMouseEvent &e)
 	int selectedDevice = pick(e.m_pos);
 
 	// cambio drawing
-	if (selectedDevice == TD_ChangeDrawing ||
-		selectedDevice == TD_IncrementDrawing ||
+	if (selectedDevice == TD_ChangeDrawing || selectedDevice == TD_IncrementDrawing ||
 		selectedDevice == TD_DecrementDrawing) {
 		int d = 0;
 		if (selectedDevice == TD_IncrementDrawing)
@@ -358,7 +363,8 @@ void SkeletonTool::leftButtonDown(const TPointD &ppos, const TMouseEvent &e)
 	}
 
 	// magic link
-	if (TD_MagicLink <= selectedDevice && selectedDevice < TD_MagicLink + (int)m_magicLinks.size()) {
+	if (TD_MagicLink <= selectedDevice &&
+		selectedDevice < TD_MagicLink + (int)m_magicLinks.size()) {
 		magicLink(selectedDevice - TD_MagicLink);
 		app->getCurrentXsheet()->notifyXsheetChanged();
 		return;
@@ -458,9 +464,11 @@ void SkeletonTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 		m_dragTool = 0;
 
 		TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
-		TTool::getApplication()->getCurrentObject()->notifyObjectIdChanged(false); // Keyframes navigator reads this
+		TTool::getApplication()->getCurrentObject()->notifyObjectIdChanged(
+			false); // Keyframes navigator reads this
 	}
-	if (m_device == TD_IncrementDrawing || m_device == TD_DecrementDrawing || m_device == TD_ChangeDrawing)
+	if (m_device == TD_IncrementDrawing || m_device == TD_DecrementDrawing ||
+		m_device == TD_ChangeDrawing)
 		m_device = pick(e.m_pos);
 	else
 		m_device = -1;
@@ -495,9 +503,10 @@ class TogglePinnedStatusUndo : public TUndo
 	std::vector<std::pair<TStageObjectId, TStageObject::Keyframe>> m_keyframes;
 	int m_frame;
 
-public:
+  public:
 	TogglePinnedStatusUndo(SkeletonTool *tool, int frame)
-		: m_tool(tool), m_oldTemp(), m_newTemp(), m_columnIndex(-1), m_oldColumnIndex(-1), m_newRange(0, -1), m_oldRange(0, -1), m_frame(frame)
+		: m_tool(tool), m_oldTemp(), m_newTemp(), m_columnIndex(-1), m_oldColumnIndex(-1),
+		  m_newRange(0, -1), m_oldRange(0, -1), m_frame(frame)
 	{
 	}
 
@@ -527,10 +536,8 @@ public:
 
 	TStageObject *getStageObject(int columnIndex) const
 	{
-		return TTool::getApplication()
-			->getCurrentXsheet()
-			->getXsheet()
-			->getStageObject(TStageObjectId::ColumnId(columnIndex));
+		return TTool::getApplication()->getCurrentXsheet()->getXsheet()->getStageObject(
+			TStageObjectId::ColumnId(columnIndex));
 	}
 
 	TPinnedRangeSet *getRangeSet(int columnIndex) const
@@ -538,10 +545,7 @@ public:
 		return getStageObject(columnIndex)->getPinnedRangeSet();
 	}
 
-	TXsheet *getXsheet() const
-	{
-		return TTool::getApplication()->getCurrentXsheet()->getXsheet();
-	}
+	TXsheet *getXsheet() const { return TTool::getApplication()->getCurrentXsheet()->getXsheet(); }
 
 	void notify() const
 	{
@@ -604,10 +608,7 @@ public:
 		}
 		notify();
 	}
-	int getSize() const
-	{
-		return sizeof *this;
-	}
+	int getSize() const { return sizeof *this; }
 };
 
 //-------------------------------------------------------------------
@@ -674,7 +675,8 @@ void SkeletonTool::togglePinnedStatus(int columnIndex, int frame, bool shiftPres
 			} else {
 				for (int i = 0; i < skeleton.getBoneCount(); i++) {
 					TStageObject *obj = skeleton.getBone(i)->getStageObject();
-					const TPinnedRangeSet::Range *range = obj->getPinnedRangeSet()->getNextRange(frame);
+					const TPinnedRangeSet::Range *range =
+						obj->getPinnedRangeSet()->getNextRange(frame);
 					if (range) {
 						assert(range->first > frame);
 						if (range->first - 1 < lastFrame)
@@ -782,9 +784,8 @@ void SkeletonTool::drawSkeleton(const Skeleton &skeleton, int row)
 	for (i = 0; i < (int)showBoneIndex.size(); i++) {
 		Skeleton::Bone *bone = skeleton.getBone(showBoneIndex[i]);
 		if (!m_showOnlyActiveSkeleton.getValue() || bone->isSelected())
-			drawJoint(bone->getCenter(),
-					  currentObjectId == bone->getStageObject()->getId() &&
-						  currentHandle.find("H") != 0);
+			drawJoint(bone->getCenter(), currentObjectId == bone->getStageObject()->getId() &&
+											 currentHandle.find("H") != 0);
 	}
 }
 
@@ -803,7 +804,8 @@ void SkeletonTool::getImageBoundingBox(TRectD &bbox, TAffine &aff, int frame, in
 		if (cell.m_level->getSimpleLevel())
 			imageDpiAff = getDpiAffine(cell.m_level->getSimpleLevel(), cell.m_frameId, true);
 		aff = columnAff * imageDpiAff;
-		bbox = ToonzImageUtils::convertRasterToWorld(convert(ti->getBBox()), ti) * ti->getSubsampling();
+		bbox = ToonzImageUtils::convertRasterToWorld(convert(ti->getBBox()), ti) *
+			   ti->getSubsampling();
 		ToolUtils::drawRect(bbox * ti->getSubsampling(), TPixel32(200, 200, 200), 0x5555);
 	} else if (vi) {
 		bbox = vi->getBBox();
@@ -899,7 +901,8 @@ void SkeletonTool::drawJoint(const TPointD &pos, bool current)
 			glColor4d(0.9 * alpha, 0.8 * alpha, 0.2 * alpha, alpha);
 			r0 *= 1.5;
 		} else {
-			glColor4d(((255.0 / 255.0) - ialpha) / alpha, ((200.0 / 255.0) - ialpha) / alpha, ((48.0 / 255.0) - ialpha) / alpha, alpha);
+			glColor4d(((255.0 / 255.0) - ialpha) / alpha, ((200.0 / 255.0) - ialpha) / alpha,
+					  ((48.0 / 255.0) - ialpha) / alpha, alpha);
 		}
 		tglDrawDisk(pos, r0);
 		glColor3d(0.2, 0.1, 0.05);
@@ -973,7 +976,7 @@ void SkeletonTool::drawIKBone(const TPointD &a, const TPointD &b)
 
 void SkeletonTool::computeMagicLinks()
 {
-	//TODO: spostare qui il calcolo dei magic link
+	// TODO: spostare qui il calcolo dei magic link
 }
 
 //-------------------------------------------------------------------
@@ -981,11 +984,11 @@ void SkeletonTool::computeMagicLinks()
 void SkeletonTool::drawHooks()
 {
 	// camera stand reference system
-	//glColor3d(0,0,1);
-	//tglDrawRect(3,3,97,97);
+	// glColor3d(0,0,1);
+	// tglDrawRect(3,3,97,97);
 
-	//glColor3d(0,1,1);
-	//tglDrawRect(0,100,Stage::inch,110);
+	// glColor3d(0,1,1);
+	// tglDrawRect(0,100,Stage::inch,110);
 
 	QTime time;
 	time.start();
@@ -1061,10 +1064,10 @@ void SkeletonTool::drawHooks()
   qDebug("  time=%dms", time.elapsed());
   qDebug("  %d hooks (current column)", currentColumnHooks.size());
   for(int i=0;i<(int)currentColumnHooks.size();i++)
-    qDebug("    %d,%d",currentColumnHooks[i].m_columnIndex,currentColumnHooks[i].m_hookId);
+	qDebug("    %d,%d",currentColumnHooks[i].m_columnIndex,currentColumnHooks[i].m_hookId);
   qDebug("  %d hooks (other columns)", otherColumnsHooks.size());
   for(int i=0;i<(int)otherColumnsHooks.size();i++)
-    qDebug("    %d,%d",otherColumnsHooks[i].m_columnIndex,otherColumnsHooks[i].m_hookId);
+	qDebug("    %d,%d",otherColumnsHooks[i].m_columnIndex,otherColumnsHooks[i].m_hookId);
 */
 
 	std::vector<TRectD> balloons;
@@ -1105,15 +1108,12 @@ void SkeletonTool::drawHooks()
 				if (currentColumnHooks[i].m_hookId == 0 || otherColumnsHooks[j].m_hookId == 0)
 					continue;
 				if (dist2 < snapRadius2bis) {
-					m_magicLinks.push_back(MagicLink(currentColumnHooks[i], otherColumnsHooks[j], dist2));
+					m_magicLinks.push_back(
+						MagicLink(currentColumnHooks[i], otherColumnsHooks[j], dist2));
 
-					qDebug("  magic link_a %d (%d,%d) %d (%d,%d); dist=%f",
-						   i,
-						   currentColumnHooks[i].m_columnIndex,
-						   currentColumnHooks[i].m_hookId,
-						   j,
-						   otherColumnsHooks[j].m_columnIndex,
-						   otherColumnsHooks[j].m_hookId,
+					qDebug("  magic link_a %d (%d,%d) %d (%d,%d); dist=%f", i,
+						   currentColumnHooks[i].m_columnIndex, currentColumnHooks[i].m_hookId, j,
+						   otherColumnsHooks[j].m_columnIndex, otherColumnsHooks[j].m_hookId,
 						   dist2);
 				}
 			}
@@ -1145,25 +1145,25 @@ void SkeletonTool::drawHooks()
 			glPushMatrix();
 			tglMultMatrix(m_otherColumnBBoxAff);
 			ToolUtils::drawRect(m_otherColumnBBox, TPixel32(188, 202, 191), 0xF0F0);
-			//tglDrawRect(img->getBBox());
+			// tglDrawRect(img->getBBox());
 			glPopMatrix();
 		}
 
 		/*
-    TXshCell cell = xsh->getCell(row, otherColumn);
-    //TAffine aff = xsh->getPlacement(TStageObjectId::ColumnId(otherColumn),row);
-    //m_otherColumnAff = aff;
-    TImageP img = cell.getImage(false);
-    if(img)
-    {
-      getImageBoundingBox(m_otherColumnBBox, m_otherColumnBBoxAff, row, otherColumn);
-      //glColor3d(188.0/255.0, 202.0/255.0, 191.0/255.0);
-      glPushMatrix();
-      tglMultMatrix(aff * imageDpiAff);
-      ToolUtils::drawRect(img->getBBox(), TPixel32(188,202,191), 0xF0F0);
-      //tglDrawRect(img->getBBox());
-      glPopMatrix();
-    }
+	TXshCell cell = xsh->getCell(row, otherColumn);
+	//TAffine aff = xsh->getPlacement(TStageObjectId::ColumnId(otherColumn),row);
+	//m_otherColumnAff = aff;
+	TImageP img = cell.getImage(false);
+	if(img)
+	{
+	  getImageBoundingBox(m_otherColumnBBox, m_otherColumnBBoxAff, row, otherColumn);
+	  //glColor3d(188.0/255.0, 202.0/255.0, 191.0/255.0);
+	  glPushMatrix();
+	  tglMultMatrix(aff * imageDpiAff);
+	  ToolUtils::drawRect(img->getBBox(), TPixel32(188,202,191), 0xF0F0);
+	  //tglDrawRect(img->getBBox());
+	  glPopMatrix();
+	}
 */
 		// search for the closest hook of the picked column
 		int i = -1, j = -1;
@@ -1182,14 +1182,11 @@ void SkeletonTool::drawHooks()
 		if (0 <= j && j < (int)otherColumnsHooks.size()) {
 			// I want to get a specific color when overlaying the label on white
 			int alfa = 100, ialfa = 255 - alfa;
-			TPixel32 color(255 * (188 - ialfa) / alfa, 255 * (202 - ialfa) / alfa, 255 * (191 - ialfa) / alfa, alfa);
-			ToolUtils::drawBalloon(
-				otherColumnsHooks[j].m_pos,
-				otherColumnsHooks[j].m_name, // getHandle(),
-				color,
-				TPoint(20, 20),
-				false,
-				&balloons);
+			TPixel32 color(255 * (188 - ialfa) / alfa, 255 * (202 - ialfa) / alfa,
+						   255 * (191 - ialfa) / alfa, alfa);
+			ToolUtils::drawBalloon(otherColumnsHooks[j].m_pos,
+								   otherColumnsHooks[j].m_name, // getHandle(),
+								   color, TPoint(20, 20), false, &balloons);
 
 			HookData baseHook = currentColumnHooks[0];
 			baseHook.m_pos = otherColumnsHooks[j].m_pos;
@@ -1205,15 +1202,17 @@ void SkeletonTool::drawHooks()
 		const MagicLink &magicLink = m_magicLinks[i];
 		const HookData &h1 = magicLink.m_h1;
 		std::string name;
-		name = (m_parentProbeEnabled ? "Linking " : "Link ") + removeTrailingH(magicLink.m_h0.getHandle()) +
-			   " to Col " + toString(h1.m_columnIndex + 1) + "/" + removeTrailingH(h1.getHandle());
+		name = (m_parentProbeEnabled ? "Linking " : "Link ") +
+			   removeTrailingH(magicLink.m_h0.getHandle()) + " to Col " +
+			   toString(h1.m_columnIndex + 1) + "/" + removeTrailingH(h1.getHandle());
 
 		int code = TD_MagicLink + i;
 		glPushName(code);
 		TPixel32 color(100, 255, 100, 100);
 		if (code == m_device)
 			color = TPixel32(185, 255, 255);
-		ToolUtils::drawBalloon(magicLink.m_h0.m_pos, name, color, TPoint(20, -20), isPicking(), &balloons);
+		ToolUtils::drawBalloon(magicLink.m_h0.m_pos, name, color, TPoint(20, -20), isPicking(),
+							   &balloons);
 		glPopName();
 	}
 }
@@ -1226,7 +1225,8 @@ void SkeletonTool::drawDrawingBrowser(const TXshCell &cell, const TPointD &cente
 		return;
 	double pixelSize = getPixelSize();
 
-	std::string name = toString(cell.m_level->getName()) + "." + toString(cell.m_frameId.getNumber());
+	std::string name =
+		toString(cell.m_level->getName()) + "." + toString(cell.m_frameId.getNumber());
 
 	QString qText = QString::fromStdString(name);
 	QFont font("Arial", 10); // ,QFont::Bold);
@@ -1272,14 +1272,15 @@ void SkeletonTool::drawDrawingBrowser(const TXshCell &cell, const TPointD &cente
 	} else {
 
 		assert(glGetError() == 0);
-		bool active = m_device == TD_ChangeDrawing || m_device == TD_IncrementDrawing || m_device == TD_DecrementDrawing;
+		bool active = m_device == TD_ChangeDrawing || m_device == TD_IncrementDrawing ||
+					  m_device == TD_DecrementDrawing;
 		QImage img(totalSize.width(), totalSize.height(), QImage::Format_ARGB32);
 		img.fill(Qt::transparent);
 		QPainter imgPainter(&img);
 		imgPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
 
-		//imgPainter.setPen(Qt::black);
-		//imgPainter.drawRect(0,0,totalSize.width(),totalSize.height());
+		// imgPainter.setPen(Qt::black);
+		// imgPainter.drawRect(0,0,totalSize.width(),totalSize.height());
 
 		imgPainter.setPen(Qt::NoPen);
 		imgPainter.setBrush(QColor(200, 200, 200, 200));
@@ -1306,9 +1307,11 @@ void SkeletonTool::drawDrawingBrowser(const TXshCell &cell, const TPointD &cente
 			dnArrow.lineTo(x, y);
 
 			imgPainter.setPen(Qt::NoPen);
-			imgPainter.setBrush(m_device == TD_DecrementDrawing ? QColor(255, 0, 0) : QColor(200, 100, 100));
+			imgPainter.setBrush(m_device == TD_DecrementDrawing ? QColor(255, 0, 0)
+																: QColor(200, 100, 100));
 			imgPainter.drawPath(upArrow);
-			imgPainter.setBrush(m_device == TD_IncrementDrawing ? QColor(255, 0, 0) : QColor(200, 100, 100));
+			imgPainter.setBrush(m_device == TD_IncrementDrawing ? QColor(255, 0, 0)
+																: QColor(200, 100, 100));
 			imgPainter.drawPath(dnArrow);
 		}
 
@@ -1391,8 +1394,8 @@ void SkeletonTool::drawMainGadget(const TPointD &center)
 void SkeletonTool::draw()
 {
 	// parent object reference system
-	//glColor3d(1,0,0);
-	//tglDrawRect(0,0,100,100);
+	// glColor3d(1,0,0);
+	// tglDrawRect(0,0,100,100);
 
 	if (m_label != "")
 		ToolUtils::drawBalloon(m_labelPos, m_label, TPixel32::Red, TPoint(20, -20), false);
@@ -1430,8 +1433,8 @@ void SkeletonTool::draw()
 	tglMultMatrix(aff.inv());
 
 	// camera stand reference system
-	//glColor3d(0,1,0);
-	//tglDrawRect(0,0,100,100);
+	// glColor3d(0,1,0);
+	// tglDrawRect(0,0,100,100);
 
 	bool changingParent = dynamic_cast<ParentChangeTool *>(m_dragTool) != 0;
 
@@ -1502,8 +1505,8 @@ void SkeletonTool::onActivate()
 
 void SkeletonTool::onDeactivate()
 {
-	//m_selection.selectNone();
-	//TSelection::setCurrent(0);
+	// m_selection.selectNone();
+	// TSelection::setCurrent(0);
 }
 
 //-------------------------------------------------------------------
@@ -1539,11 +1542,11 @@ void SkeletonTool::magicLink(int index)
 		handle = h0.getHandle();
 	}
 
-	//TUndoManager *undoManager = TUndoManager::manager();
-	//undoManager->beginBlock();
+	// TUndoManager *undoManager = TUndoManager::manager();
+	// undoManager->beginBlock();
 	TStageObjectCmd::setHandle(id, handle, app->getCurrentXsheet());
 	TStageObjectCmd::setParent(id, parentId, parentHandle, app->getCurrentXsheet());
-	//undoManager->endBlock();
+	// undoManager->endBlock();
 }
 
 //-------------------------------------------------------------------
@@ -1579,9 +1582,8 @@ void SkeletonTool::addContextMenuItems(QMenu *menu)
 			m_commandHandler->setSkeleton(skeleton);
 			QAction *rp = menu->addAction(tr("Reset Pinned Center"));
 			menu->addSeparator();
-			bool ret = QObject::connect(
-				rp, SIGNAL(triggered()),
-				m_commandHandler, SLOT(clearPinnedRanges()));
+			bool ret = QObject::connect(rp, SIGNAL(triggered()), m_commandHandler,
+										SLOT(clearPinnedRanges()));
 			assert(ret);
 		} else
 			delete skeleton;

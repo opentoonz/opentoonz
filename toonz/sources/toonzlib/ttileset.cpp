@@ -7,8 +7,7 @@
 #include "trasterimage.h"
 //------------------------------------------------------------------------------------------
 
-TTileSet::Tile::Tile()
-	: m_rasterBounds(TRect()), m_dim(), m_pixelSize(0)
+TTileSet::Tile::Tile() : m_rasterBounds(TRect()), m_dim(), m_pixelSize(0)
 {
 }
 
@@ -74,8 +73,7 @@ int TTileSet::getMemorySize() const
 
 //******************************************************************************************
 
-TTileSetCM32::Tile::Tile()
-	: TTileSet::Tile()
+TTileSetCM32::Tile::Tile() : TTileSet::Tile()
 {
 }
 
@@ -170,15 +168,13 @@ TTileSetCM32 *TTileSetCM32::clone() const
 
 //******************************************************************************************
 
-TTileSetFullColor::Tile::Tile()
-	: TTileSet::Tile()
+TTileSetFullColor::Tile::Tile() : TTileSet::Tile()
 {
 }
 
 //------------------------------------------------------------------------------------------
 
-TTileSetFullColor::Tile::Tile(const TRasterP &ras, const TPoint &p)
-	: TTileSet::Tile(ras, p)
+TTileSetFullColor::Tile::Tile(const TRasterP &ras, const TPoint &p) : TTileSet::Tile(ras, p)
 {
 	TImageCache::instance()->add(id(), TRasterImageP(ras));
 }

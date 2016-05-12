@@ -24,7 +24,7 @@ TThread::Mutex MutexOut;
 
 class TSoundOutputDeviceImp : public std::enable_shared_from_this<TSoundOutputDeviceImp>
 {
-public:
+  public:
 	bool m_isPlaying;
 	bool m_looped;
 	TSoundTrackFormat m_currentFormat;
@@ -68,15 +68,8 @@ struct MyData {
 	std::shared_ptr<TSoundOutputDeviceImp> imp;
 	bool isLooping;
 	MyData()
-		: entireFileBuffer(0)
-		, totalPacketCount(0)
-		, fileByteCount(0)
-		, maxPacketSize(0)
-		, packetOffset(0)
-		, byteOffset(0)
-		, sourceBuffer(0)
-		, isLooping(false)
-		, m_doNotify(true)
+		: entireFileBuffer(0), totalPacketCount(0), fileByteCount(0), maxPacketSize(0),
+		  packetOffset(0), byteOffset(0), sourceBuffer(0), isLooping(false), m_doNotify(true)
 	{
 	}
 };
@@ -86,16 +79,10 @@ class PlayCompletedMsg : public TThread::Message
 	std::set<TSoundOutputDeviceListener *> m_listeners;
 	MyData *m_data;
 
-public:
-	PlayCompletedMsg(MyData *data)
-		: m_data(data)
-	{
-	}
+  public:
+	PlayCompletedMsg(MyData *data) : m_data(data) {}
 
-	TThread::Message *clone() const
-	{
-		return new PlayCompletedMsg(*this);
-	}
+	TThread::Message *clone() const { return new PlayCompletedMsg(*this); }
 
 	void onDeliver()
 	{
@@ -113,19 +100,19 @@ public:
 };
 }
 
-#define checkStatus(err)                                                  \
-	if (err) {                                                            \
-		printf("Error: 0x%x ->  %s: %d\n", (int)err, __FILE__, __LINE__); \
-		fflush(stdout);                                                   \
+#define checkStatus(err)                                                                           \
+	if (err) {                                                                                     \
+		printf("Error: 0x%x ->  %s: %d\n", (int)err, __FILE__, __LINE__);                          \
+		fflush(stdout);                                                                            \
 	}
 
 extern "C" {
-//This is an example of a Input Procedure from a call to AudioConverterFillComplexBuffer.
-//The total amount of data needed is "ioNumberDataPackets" when this method is first called.
-//On exit, "ioNumberDataPackets" must be set to the actual amount of data obtained.
-//Upon completion, all new input data must point to the AudioBufferList in the parameter ( "ioData" )
-OSStatus MyACComplexInputProc(AudioConverterRef inAudioConverter,
-							  UInt32 *ioNumberDataPackets,
+// This is an example of a Input Procedure from a call to AudioConverterFillComplexBuffer.
+// The total amount of data needed is "ioNumberDataPackets" when this method is first called.
+// On exit, "ioNumberDataPackets" must be set to the actual amount of data obtained.
+// Upon completion, all new input data must point to the AudioBufferList in the parameter ( "ioData"
+// )
+OSStatus MyACComplexInputProc(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets,
 							  AudioBufferList *ioData,
 							  AudioStreamPacketDescription **outDataPacketDescription,
 							  void *inUserData)
@@ -140,7 +127,7 @@ OSStatus MyACComplexInputProc(AudioConverterRef inAudioConverter,
 	ioData->mBuffers[0].mDataByteSize = 0;
 
 	{
-		//TThread::ScopedLock sl(MutexOut);
+		// TThread::ScopedLock sl(MutexOut);
 		if (myData->imp->m_isPlaying == false)
 			return noErr;
 	}
@@ -156,19 +143,21 @@ OSStatus MyACComplexInputProc(AudioConverterRef inAudioConverter,
 			myData->sourceBuffer = NULL;
 		}
 
-		//the total amount of data requested by the AudioConverter
+		// the total amount of data requested by the AudioConverter
 		bytesCopied = *ioNumberDataPackets * myData->maxPacketSize;
-		//alloc a small buffer for the AudioConverter to use.
+		// alloc a small buffer for the AudioConverter to use.
 		myData->sourceBuffer = (void *)calloc(1, bytesCopied);
-		//copy the amount of data needed (bytesCopied) from buffer of audio file
+		// copy the amount of data needed (bytesCopied) from buffer of audio file
 		memcpy(myData->sourceBuffer, myData->entireFileBuffer + myData->byteOffset, bytesCopied);
 
 		// keep track of where we want to read from next time
 		myData->byteOffset += *ioNumberDataPackets * myData->maxPacketSize;
 		myData->packetOffset += *ioNumberDataPackets;
 
-		ioData->mBuffers[0].mData = myData->sourceBuffer; // tell the Audio Converter where it's source data is
-		ioData->mBuffers[0].mDataByteSize = bytesCopied;  // tell the Audio Converter how much data in each buffer
+		ioData->mBuffers[0].mData =
+			myData->sourceBuffer; // tell the Audio Converter where it's source data is
+		ioData->mBuffers[0].mDataByteSize =
+			bytesCopied; // tell the Audio Converter how much data in each buffer
 	} else {
 		// there aren't any more packets to read.
 		// Set the amount of data read (mDataByteSize) to zero
@@ -193,34 +182,37 @@ OSStatus MyACComplexInputProc(AudioConverterRef inAudioConverter,
 }
 
 OSStatus MyFileRenderProc(void *inRefCon, AudioUnitRenderActionFlags *inActionFlags,
-						  const AudioTimeStamp *inTimeStamp,
-						  UInt32 inBusNumber, UInt32 inNumFrames, AudioBufferList *ioData)
+						  const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumFrames,
+						  AudioBufferList *ioData)
 {
 	MyData *myData = static_cast<MyData *>(inRefCon);
 	OSStatus err = noErr;
 	void *inInputDataProcUserData = inRefCon;
 	AudioStreamPacketDescription *outPacketDescription = NULL;
-	//To obtain a data buffer of converted data from a complex input source(compressed files, etc.)
-	//use AudioConverterFillComplexBuffer.  The total amount of data requested is "inNumFrames" and
-	//on return is set to the actual amount of data recieved.
-	//All converted data is returned to "ioData" (AudioBufferList).
-	err = AudioConverterFillComplexBuffer(myData->converter, MyACComplexInputProc, inInputDataProcUserData, &inNumFrames, ioData, outPacketDescription);
+	// To obtain a data buffer of converted data from a complex input source(compressed files, etc.)
+	// use AudioConverterFillComplexBuffer.  The total amount of data requested is "inNumFrames" and
+	// on return is set to the actual amount of data recieved.
+	// All converted data is returned to "ioData" (AudioBufferList).
+	err = AudioConverterFillComplexBuffer(myData->converter, MyACComplexInputProc,
+										  inInputDataProcUserData, &inNumFrames, ioData,
+										  outPacketDescription);
 
 	/*Parameters for AudioConverterFillComplexBuffer()
 converter - the converter being used
 ACComplexInputProc() - input procedure to supply data to the Audio Converter
-inInputDataProcUserData - Used to hold any data that needs to be passed on.  Not needed in this example.
+inInputDataProcUserData - Used to hold any data that needs to be passed on.  Not needed in this
+example.
 inNumFrames - The amount of requested data.  On output, this
 number is the amount actually received.
 ioData - Buffer of the converted data recieved on return
 outPacketDescription - contains the format of the returned data.  Not used in this example.
 */
 
-	//checkStatus(err);
+	// checkStatus(err);
 	return err;
 }
 
-} //extern "C"
+} // extern "C"
 
 void PrintStreamDesc(AudioStreamBasicDescription *inDesc)
 {
@@ -250,39 +242,32 @@ bool TSoundOutputDeviceImp::doOpenDevice()
 
 	desc.componentType = kAudioUnitType_Output;
 	desc.componentSubType = kAudioUnitSubType_DefaultOutput;
-	//all Audio Units in AUComponent.h must use "kAudioUnitManufacturer_Apple" as the Manufacturer
+	// all Audio Units in AUComponent.h must use "kAudioUnitManufacturer_Apple" as the Manufacturer
 	desc.componentManufacturer = kAudioUnitManufacturer_Apple;
 	desc.componentFlags = 0;
 	desc.componentFlagsMask = 0;
 
-	comp = FindNextComponent(NULL, &desc); //Finds an component that meets the desc spec's
+	comp = FindNextComponent(NULL, &desc); // Finds an component that meets the desc spec's
 	if (comp == NULL)
 		return false;
-	err = OpenAComponent(comp, &theOutputUnit); //gains access to the services provided by the component
+	err = OpenAComponent(comp,
+						 &theOutputUnit); // gains access to the services provided by the component
 	if (err)
 		return false;
 
 	UInt32 size;
 	Boolean outWritable;
 	UInt32 theInputBus = 0;
-	//Gets the size of the Stream Format Property and if it is writable
-	err = AudioUnitGetPropertyInfo(theOutputUnit,
-								   kAudioUnitProperty_StreamFormat,
-								   kAudioUnitScope_Output,
-								   0, &size, &outWritable);
-	//Get the current stream format of the output
-	err = AudioUnitGetProperty(theOutputUnit,
-							   kAudioUnitProperty_StreamFormat,
-							   kAudioUnitScope_Output,
-							   0, &outputASBD, &size);
+	// Gets the size of the Stream Format Property and if it is writable
+	err = AudioUnitGetPropertyInfo(theOutputUnit, kAudioUnitProperty_StreamFormat,
+								   kAudioUnitScope_Output, 0, &size, &outWritable);
+	// Get the current stream format of the output
+	err = AudioUnitGetProperty(theOutputUnit, kAudioUnitProperty_StreamFormat,
+							   kAudioUnitScope_Output, 0, &outputASBD, &size);
 	checkStatus(err);
-	//Set the stream format of the output to match the input
-	err = AudioUnitSetProperty(theOutputUnit,
-							   kAudioUnitProperty_StreamFormat,
-							   kAudioUnitScope_Input,
-							   theInputBus,
-							   &outputASBD,
-							   size);
+	// Set the stream format of the output to match the input
+	err = AudioUnitSetProperty(theOutputUnit, kAudioUnitProperty_StreamFormat,
+							   kAudioUnitScope_Input, theInputBus, &outputASBD, size);
 	checkStatus(err);
 
 	// Initialize AudioUnit, alloc mem buffers for processing
@@ -304,7 +289,7 @@ bool TSoundOutputDeviceImp::doSetStreamFormat(const TSoundTrackFormat &format)
 	fileASBD.mFormatID = kAudioFormatLinearPCM;
 	fileASBD.mFormatFlags = 14;
 	/*
-Standard flags: kAudioFormatFlagIsFloat = (1L << 0) 
+Standard flags: kAudioFormatFlagIsFloat = (1L << 0)
 kAudioFormatFlagIsBigEndian = (1L << 1)
 kAudioFormatFlagIsSignedInteger = (1L << 2)
 kAudioFormatFlagIsPacked = (1L << 3)
@@ -312,14 +297,14 @@ kAudioFormatFlagIsAlignedHigh = (1L << 4)
 kAudioFormatFlagIsNonInterleaved = (1L << 5)
 kAudioFormatFlagsAreAllClear = (1L << 31)
 
-Linear PCM flags: 
+Linear PCM flags:
 kLinearPCMFormatFlagIsFloat = kAudioFormatFlagIsFloat
 kLinearPCMFormatFlagIsBigEndian = kAudioFormatFlagIsBigEndian
 kLinearPCMFormatFlagIsSignedInteger = kAudioFormatFlagIsSignedInteger
 kLinearPCMFormatFlagIsPacked = kAudioFormatFlagIsPacked
 kLinearPCMFormatFlagIsAlignedHigh = kAudioFormatFlagIsAlignedHigh
 kLinearPCMFormatFlagIsNonInterleaved = kAudioFormatFlagIsNonInterleaved
-kLinearPCMFormatFlagsAreAllClear = kAudioFormatFlagsAreAllClear 
+kLinearPCMFormatFlagsAreAllClear = kAudioFormatFlagsAreAllClear
 */
 	fileASBD.mBytesPerPacket = (format.m_bitPerSample >> 3) * format.m_channelCount;
 	fileASBD.mFramesPerPacket = 1;
@@ -327,7 +312,7 @@ kLinearPCMFormatFlagsAreAllClear = kAudioFormatFlagsAreAllClear
 	fileASBD.mChannelsPerFrame = format.m_channelCount;
 	fileASBD.mBitsPerChannel = format.m_bitPerSample;
 	fileASBD.mReserved = 0;
-	//PrintStreamDesc(&fileASBD);
+	// PrintStreamDesc(&fileASBD);
 	m_opened = true;
 	return true;
 }
@@ -363,13 +348,11 @@ bool TSoundOutputDevice::installed()
 bool TSoundOutputDevice::open(const TSoundTrackP &st)
 {
 	if (!m_imp->doOpenDevice())
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableOpenDevice,
-			"Problem to open the output device");
+		throw TSoundDeviceException(TSoundDeviceException::UnableOpenDevice,
+									"Problem to open the output device");
 	if (!m_imp->doSetStreamFormat(st->getFormat()))
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableOpenDevice,
-			"Problem to open the output device setting some params");
+		throw TSoundDeviceException(TSoundDeviceException::UnableOpenDevice,
+									"Problem to open the output device setting some params");
 	return true;
 }
 
@@ -379,16 +362,18 @@ bool TSoundOutputDevice::close()
 {
 	stop();
 	m_imp->m_opened = false;
-	AudioUnitUninitialize(m_imp->theOutputUnit); //release resources without closing the component
-	CloseComponent(m_imp->theOutputUnit);		 //Terminates your application's access to the services provided
+	AudioUnitUninitialize(m_imp->theOutputUnit); // release resources without closing the component
+	CloseComponent(
+		m_imp->theOutputUnit); // Terminates your application's access to the services provided
 	return true;
 }
 
 //------------------------------------------------------------------------------
 
-void TSoundOutputDevice::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool loop, bool scrubbing)
+void TSoundOutputDevice::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool loop,
+							  bool scrubbing)
 {
-	//TThread::ScopedLock sl(MutexOut);
+	// TThread::ScopedLock sl(MutexOut);
 	int lastSample = st->getSampleCount() - 1;
 	notLessThan(0, s0);
 	notLessThan(0, s1);
@@ -414,7 +399,8 @@ void TSoundOutputDevice::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool
 
 //------------------------------------------------------------------------------
 
-void TSoundOutputDeviceImp::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool loop, bool scrubbing)
+void TSoundOutputDeviceImp::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, bool loop,
+								 bool scrubbing)
 {
 	if (!doSetStreamFormat(st->getFormat()))
 		return;
@@ -424,35 +410,30 @@ void TSoundOutputDeviceImp::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, b
 
 	myData->imp = shared_from_this();
 	UInt32 magicCookieSize = 0;
-	//PrintStreamDesc(&outputASBD);
+	// PrintStreamDesc(&outputASBD);
 	err = AudioConverterNew(&fileASBD, &outputASBD, &converter);
 	checkStatus(err);
-	err = AudioFileGetPropertyInfo(musicFileID,
-								   kAudioFilePropertyMagicCookieData,
-								   &magicCookieSize,
+	err = AudioFileGetPropertyInfo(musicFileID, kAudioFilePropertyMagicCookieData, &magicCookieSize,
 								   NULL);
 
 	if (err == noErr) {
 		void *magicCookie = calloc(1, magicCookieSize);
 		if (magicCookie) {
-			//Get Magic Cookie data from Audio File
-			err = AudioFileGetProperty(musicFileID,
-									   kAudioFilePropertyMagicCookieData,
-									   &magicCookieSize,
-									   magicCookie);
+			// Get Magic Cookie data from Audio File
+			err = AudioFileGetProperty(musicFileID, kAudioFilePropertyMagicCookieData,
+									   &magicCookieSize, magicCookie);
 
 			// Give the AudioConverter the magic cookie decompression params if there are any
 			if (err == noErr) {
 				err = AudioConverterSetProperty(myData->converter,
 												kAudioConverterDecompressionMagicCookie,
-												magicCookieSize,
-												magicCookie);
+												magicCookieSize, magicCookie);
 			}
 			err = noErr;
 			if (magicCookie)
 				free(magicCookie);
 		}
-	} else //this is OK because some audio data doesn't need magic cookie data
+	} else // this is OK because some audio data doesn't need magic cookie data
 		err = noErr;
 
 	checkStatus(err);
@@ -470,20 +451,22 @@ void TSoundOutputDeviceImp::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, b
 		for (i = 0; i < myData->fileByteCount / 2; i++)
 			*dst++ = swapUshort(*src++);
 	} else
-		memcpy(myData->entireFileBuffer, st->getRawData() + s0 * st->getSampleSize(), myData->fileByteCount);
+		memcpy(myData->entireFileBuffer, st->getRawData() + s0 * st->getSampleSize(),
+			   myData->fileByteCount);
 #else
-	memcpy(myData->entireFileBuffer, st->getRawData() + s0 * st->getSampleSize(), myData->fileByteCount);
+	memcpy(myData->entireFileBuffer, st->getRawData() + s0 * st->getSampleSize(),
+		   myData->fileByteCount);
 #endif
 
 	myData->maxPacketSize = fileASBD.mFramesPerPacket * fileASBD.mBytesPerFrame;
 	{
-		//TThread::ScopedLock sl(MutexOut);
+		// TThread::ScopedLock sl(MutexOut);
 		m_isPlaying = true;
 	}
 	myData->isLooping = loop;
 
-	//cout << "total packet count = " << myData->totalPacketCount <<endl;
-	//cout << "filebytecount " << myData->fileByteCount << endl;
+	// cout << "total packet count = " << myData->totalPacketCount <<endl;
+	// cout << "filebytecount " << myData->fileByteCount << endl;
 
 	AURenderCallbackStruct renderCallback;
 	memset(&renderCallback, 0, sizeof(AURenderCallbackStruct));
@@ -491,11 +474,9 @@ void TSoundOutputDeviceImp::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, b
 	renderCallback.inputProc = MyFileRenderProc;
 	renderCallback.inputProcRefCon = myData;
 
-	//Sets the callback for the Audio Unit to the renderCallback
-	err = AudioUnitSetProperty(theOutputUnit,
-							   kAudioUnitProperty_SetRenderCallback,
-							   kAudioUnitScope_Input,
-							   0, &renderCallback,
+	// Sets the callback for the Audio Unit to the renderCallback
+	err = AudioUnitSetProperty(theOutputUnit, kAudioUnitProperty_SetRenderCallback,
+							   kAudioUnitScope_Input, 0, &renderCallback,
 							   sizeof(AURenderCallbackStruct));
 
 	checkStatus(err);
@@ -510,8 +491,8 @@ void TSoundOutputDeviceImp::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1, b
 bool TSoundOutputDeviceImp::doStopDevice()
 {
 	m_isPlaying = false;
-	AudioOutputUnitStop(theOutputUnit); //you must stop the audio unit from processing
-	AudioConverterDispose(converter);   //deallocates the memory used by inAudioConverter
+	AudioOutputUnitStop(theOutputUnit); // you must stop the audio unit from processing
+	AudioConverterDispose(converter); // deallocates the memory used by inAudioConverter
 	return true;
 }
 
@@ -519,11 +500,11 @@ bool TSoundOutputDeviceImp::doStopDevice()
 
 void TSoundOutputDevice::stop()
 {
-	//TThread::ScopedLock sl(MutexOut);
+	// TThread::ScopedLock sl(MutexOut);
 	if (m_imp->m_opened == false)
 		return;
 
-	//TThread::ScopedLock sl(MutexOut);
+	// TThread::ScopedLock sl(MutexOut);
 	m_imp->doStopDevice();
 }
 
@@ -549,19 +530,11 @@ double TSoundOutputDevice::getVolume()
 		m_imp->doOpenDevice();
 
 	Float32 leftVol, rightVol;
-	AudioUnitGetParameter(
-		m_imp->theOutputUnit,
-		kHALOutputParam_Volume,
-		kAudioUnitScope_Output,
-		0,
-		&leftVol);
+	AudioUnitGetParameter(m_imp->theOutputUnit, kHALOutputParam_Volume, kAudioUnitScope_Output, 0,
+						  &leftVol);
 
-	AudioUnitGetParameter(
-		m_imp->theOutputUnit,
-		kHALOutputParam_Volume,
-		kAudioUnitScope_Output,
-		0,
-		&rightVol);
+	AudioUnitGetParameter(m_imp->theOutputUnit, kHALOutputParam_Volume, kAudioUnitScope_Output, 0,
+						  &rightVol);
 	double vol = (leftVol + rightVol) / 2;
 
 	return (vol < 0. ? 0. : vol);
@@ -572,21 +545,11 @@ double TSoundOutputDevice::getVolume()
 bool TSoundOutputDevice::setVolume(double volume)
 {
 	Float32 vol = volume;
-	AudioUnitSetParameter(
-		m_imp->theOutputUnit,
-		kHALOutputParam_Volume,
-		kAudioUnitScope_Output,
-		0,
-		vol,
-		0);
+	AudioUnitSetParameter(m_imp->theOutputUnit, kHALOutputParam_Volume, kAudioUnitScope_Output, 0,
+						  vol, 0);
 
-	AudioUnitSetParameter(
-		m_imp->theOutputUnit,
-		kHALOutputParam_Volume,
-		kAudioUnitScope_Output,
-		0,
-		vol,
-		0);
+	AudioUnitSetParameter(m_imp->theOutputUnit, kHALOutputParam_Volume, kAudioUnitScope_Output, 0,
+						  vol, 0);
 	return true;
 }
 
@@ -609,7 +572,7 @@ bool TSoundOutputDevice::isPlaying() const
 
 bool TSoundOutputDevice::isLooping()
 {
-	//TThread::ScopedLock sl(MutexOut);
+	// TThread::ScopedLock sl(MutexOut);
 	return m_imp->m_looped;
 }
 
@@ -617,20 +580,16 @@ bool TSoundOutputDevice::isLooping()
 
 void TSoundOutputDevice::setLooping(bool loop)
 {
-	//TThread::ScopedLock sl(MutexOut);
+	// TThread::ScopedLock sl(MutexOut);
 	m_imp->m_looped = loop;
 }
 
 //------------------------------------------------------------------------------
 
-TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
-	TUINT32 sampleRate, int channelCount, int bitPerSample)
+TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(TUINT32 sampleRate, int channelCount,
+														 int bitPerSample)
 {
-	TSoundTrackFormat fmt(
-		sampleRate,
-		bitPerSample,
-		channelCount,
-		true);
+	TSoundTrackFormat fmt(sampleRate, bitPerSample, channelCount, true);
 	return fmt;
 }
 
@@ -639,11 +598,10 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(
 TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(const TSoundTrackFormat &format)
 {
 	// try {
-	return getPreferredFormat(
-		format.m_sampleRate, format.m_channelCount, format.m_bitPerSample);
+	return getPreferredFormat(format.m_sampleRate, format.m_channelCount, format.m_bitPerSample);
 	/*}
   catch (TSoundDeviceException &e) {
-    throw TSoundDeviceException( e.getType(), e.getMessage());
+	throw TSoundDeviceException( e.getType(), e.getMessage());
   }*/
 }
 
@@ -655,8 +613,8 @@ TSoundTrackFormat TSoundOutputDevice::getPreferredFormat(const TSoundTrackFormat
 
 class TSoundInputDeviceImp
 {
-public:
-	//ALport m_port;
+  public:
+	// ALport m_port;
 	bool m_stopped;
 	bool m_isRecording;
 	bool m_oneShotRecording;
@@ -677,8 +635,7 @@ public:
 
 	~TSoundInputDeviceImp(){};
 
-	bool doOpenDevice(const TSoundTrackFormat &format,
-					  TSoundInputDevice::Source devType);
+	bool doOpenDevice(const TSoundTrackFormat &format, TSoundInputDevice::Source devType);
 };
 
 bool TSoundInputDeviceImp::doOpenDevice(const TSoundTrackFormat &format,
@@ -691,7 +648,7 @@ bool TSoundInputDeviceImp::doOpenDevice(const TSoundTrackFormat &format,
 
 class RecordTask : public TThread::Runnable
 {
-public:
+  public:
 	TSoundInputDeviceImp *m_devImp;
 	int m_ByteToSample;
 
@@ -725,8 +682,8 @@ bool TSoundInputDevice::installed()
 {
 	/*
 	if (alQueryValues(AL_SYSTEM, AL_DEFAULT_INPUT, 0, 0, 0, 0) <=0)
-    return false;
-    */
+	return false;
+	*/
 	return true;
 }
 
@@ -773,8 +730,8 @@ bool TSoundInputDevice::supportsVolume()
 
 //------------------------------------------------------------------------------
 
-TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
-	TUINT32 sampleRate, int channelCount, int bitPerSample)
+TSoundTrackFormat TSoundInputDevice::getPreferredFormat(TUINT32 sampleRate, int channelCount,
+														int bitPerSample)
 {
 	TSoundTrackFormat fmt;
 	return fmt;
@@ -787,12 +744,11 @@ TSoundTrackFormat TSoundInputDevice::getPreferredFormat(const TSoundTrackFormat 
 	/*
   try {
   */
-	return getPreferredFormat(
-		format.m_sampleRate, format.m_channelCount, format.m_bitPerSample);
+	return getPreferredFormat(format.m_sampleRate, format.m_channelCount, format.m_bitPerSample);
 	/*}
-  
+
   catch (TSoundDeviceException &e) {
-    throw TSoundDeviceException( e.getType(), e.getMessage());
+	throw TSoundDeviceException( e.getType(), e.getMessage());
   }
   */
 }

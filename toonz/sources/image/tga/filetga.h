@@ -45,8 +45,7 @@ typedef unsigned __int32 uint32_t;
 #endif /* endianness */
 
 /* Targa image and header fields -------------------------------------------*/
-typedef struct
-	{
+typedef struct {
 	/* Note that Targa is stored in little-endian order */
 	uint8_t image_id_length;
 
@@ -78,10 +77,10 @@ typedef struct
 
 	uint8_t image_descriptor;
 /* bits 0,1,2,3 - attribute bits per pixel
-     * bit  4       - set if image is stored right-to-left
-     * bit  5       - set if image is stored top-to-bottom
-     * bits 6,7     - unused (must be set to zero)
-     */
+	 * bit  4       - set if image is stored right-to-left
+	 * bit  5       - set if image is stored top-to-bottom
+	 * bits 6,7     - unused (must be set to zero)
+	 */
 #define TGA_ATTRIB_BITS (uint8_t)(BIT(0) | BIT(1) | BIT(2) | BIT(3))
 #define TGA_R_TO_L_BIT (uint8_t) BIT(4)
 #define TGA_T_TO_B_BIT (uint8_t) BIT(5)
@@ -90,21 +89,21 @@ typedef struct
 
 	uint8_t *image_id;
 	/* The length of this field is given in image_id_length, it's read raw
-     * from the file so it's not not guaranteed to be zero-terminated.  If
-     * it's not NULL, it needs to be deallocated.  see: tga_free_buffers()
-     */
+	 * from the file so it's not not guaranteed to be zero-terminated.  If
+	 * it's not NULL, it needs to be deallocated.  see: tga_free_buffers()
+	 */
 
 	uint8_t *color_map_data;
 	/* See the "color map specification" fields above.  If not NULL, this
-     * field needs to be deallocated.  see: tga_free_buffers()
-     */
+	 * field needs to be deallocated.  see: tga_free_buffers()
+	 */
 
 	uint8_t *image_data;
 	/* Follows image specification fields (see above) */
 
 	/* Extension area and developer area are silently ignored.  The Targa 2.0
-     * spec says we're not required to read or write them.
-     */
+	 * spec says we're not required to read or write them.
+	 */
 
 } tga_image;
 
@@ -147,24 +146,24 @@ tga_result tga_write(const char *filename, const tga_image *src);
 tga_result tga_write_to_FILE(FILE *fp, const tga_image *src);
 
 /* Convenient writing functions --------------------------------------------*/
-tga_result tga_write_mono(const char *filename, uint8_t *image,
-						  const uint16_t width, const uint16_t height);
+tga_result tga_write_mono(const char *filename, uint8_t *image, const uint16_t width,
+						  const uint16_t height);
 
-tga_result tga_write_mono_rle(const char *filename, uint8_t *image,
-							  const uint16_t width, const uint16_t height);
+tga_result tga_write_mono_rle(const char *filename, uint8_t *image, const uint16_t width,
+							  const uint16_t height);
 
-tga_result tga_write_bgr(const char *filename, uint8_t *image,
-						 const uint16_t width, const uint16_t height, const uint8_t depth);
+tga_result tga_write_bgr(const char *filename, uint8_t *image, const uint16_t width,
+						 const uint16_t height, const uint8_t depth);
 
-tga_result tga_write_bgr_rle(const char *filename, uint8_t *image,
-							 const uint16_t width, const uint16_t height, const uint8_t depth);
+tga_result tga_write_bgr_rle(const char *filename, uint8_t *image, const uint16_t width,
+							 const uint16_t height, const uint8_t depth);
 
 /* These functions will use tga_swap_red_blue to MODIFY your image data */
-tga_result tga_write_rgb(const char *filename, uint8_t *image,
-						 const uint16_t width, const uint16_t height, const uint8_t depth);
+tga_result tga_write_rgb(const char *filename, uint8_t *image, const uint16_t width,
+						 const uint16_t height, const uint8_t depth);
 
-tga_result tga_write_rgb_rle(const char *filename, uint8_t *image,
-							 const uint16_t width, const uint16_t height, const uint8_t depth);
+tga_result tga_write_rgb_rle(const char *filename, uint8_t *image, const uint16_t width,
+							 const uint16_t height, const uint8_t depth);
 
 /* Manipulation ------------------------------------------------------------*/
 tga_result tga_flip_horiz(tga_image *img);
@@ -172,13 +171,12 @@ tga_result tga_flip_vert(tga_image *img);
 tga_result tga_color_unmap(tga_image *img);
 
 uint8_t *tga_find_pixel(const tga_image *img, uint16_t x, uint16_t y);
-tga_result tga_unpack_pixel(const uint8_t *src, const uint8_t bits,
-							uint8_t *b, uint8_t *g, uint8_t *r, uint8_t *a);
-tga_result tga_pack_pixel(uint8_t *dest, const uint8_t bits,
-						  const uint8_t b, const uint8_t g, const uint8_t r, const uint8_t a);
+tga_result tga_unpack_pixel(const uint8_t *src, const uint8_t bits, uint8_t *b, uint8_t *g,
+							uint8_t *r, uint8_t *a);
+tga_result tga_pack_pixel(uint8_t *dest, const uint8_t bits, const uint8_t b, const uint8_t g,
+						  const uint8_t r, const uint8_t a);
 
-tga_result tga_desaturate(tga_image *img,
-						  const int cr, const int cg, const int cb, const int dv);
+tga_result tga_desaturate(tga_image *img, const int cr, const int cg, const int cb, const int dv);
 tga_result tga_desaturate_rec_601_1(tga_image *img);
 tga_result tga_desaturate_rec_709(tga_image *img);
 tga_result tga_desaturate_itu(tga_image *img);

@@ -31,10 +31,10 @@ class TXshSoundLevel;
 class TXshSoundTextLevel;
 
 //=============================================================================
-//!The TXshLevel class is the base class of level managers in xsheet.
+//! The TXshLevel class is the base class of level managers in xsheet.
 /*!Inherits \b TSmartObject and \b TPersist.
 \n This is an abstract base class inherited by the concrete classes
-   \b TXshChildLevel, \b TXshSimpleLevel and \b TXshZeraryFxLevel. 
+   \b TXshChildLevel, \b TXshSimpleLevel and \b TXshZeraryFxLevel.
 
    The class contains all features about a generic level and gives all methods
    to access to these informations.
@@ -49,12 +49,12 @@ class TXshSoundTextLevel;
 class DVAPI TXshLevel : public QObject, public TSmartObject, public TPersist
 {
 	Q_OBJECT
-protected:
+  protected:
 	std::wstring m_name;
 	std::wstring m_shortName;
 
 	/*!
-    Identify level types defined in \b txshleveltypes.h
+	Identify level types defined in \b txshleveltypes.h
   */
 	int m_type;
 	HookSet *m_hookSet;
@@ -63,14 +63,14 @@ protected:
 	//! create shortname from the level name
 	void updateShortName();
 
-public:
+  public:
 	/*!
-    Constructs a TXshLevel with \b TXshLevel name \b name
+	Constructs a TXshLevel with \b TXshLevel name \b name
   */
 	TXshLevel(ClassCode classCode, std::wstring name);
 
 	/*!
-    Destroys the TXshLevel object.
+	Destroys the TXshLevel object.
   */
 	virtual ~TXshLevel();
 
@@ -85,8 +85,8 @@ public:
 	//! Return the \b ToonzScene the level belongs to; \sa setScene()
 	ToonzScene *getScene() const { return m_scene; }
 	/*!
-    Set scene to which level belongs to \b scene.
-    \sa getScene()
+	Set scene to which level belongs to \b scene.
+	\sa getScene()
   */
 	virtual void setScene(ToonzScene *scene);
 
@@ -133,14 +133,14 @@ public:
 	virtual void save() = 0;
 
 	/*!
-    Return \b HookSet.
+	Return \b HookSet.
   */
 	HookSet *getHookSet() const { return m_hookSet; }
 
 	//! Mark the level as "modified"
 	virtual void setDirtyFlag(bool on) {}
 
-private:
+  private:
 	// not implemented
 	TXshLevel(const TXshLevel &);
 	TXshLevel &operator=(const TXshLevel &);

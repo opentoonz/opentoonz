@@ -69,18 +69,13 @@ TRaster32P DVAPI rasterFromQPixmap(QPixmap pixmap, bool premultiply = true, bool
 
 //-----------------------------------------------------------------------------
 
-void DVAPI drawPolygon(QPainter &p,
-					   const std::vector<QPointF> &points,
-					   bool fill = false,
-					   const QColor colorFill = Qt::white,
-					   const QColor colorLine = Qt::black);
+void DVAPI drawPolygon(QPainter &p, const std::vector<QPointF> &points, bool fill = false,
+					   const QColor colorFill = Qt::white, const QColor colorLine = Qt::black);
 
 //-----------------------------------------------------------------------------
 
-void DVAPI drawArrow(QPainter &p,
-					 const QPointF a, const QPointF b, const QPointF c,
-					 bool fill = false,
-					 const QColor colorFill = Qt::white,
+void DVAPI drawArrow(QPainter &p, const QPointF a, const QPointF b, const QPointF c,
+					 bool fill = false, const QColor colorFill = Qt::white,
 					 const QColor colorLine = Qt::black);
 
 //-----------------------------------------------------------------------------
@@ -93,15 +88,22 @@ QIcon DVAPI createQIconPNG(const char *iconPNGName);
 QIcon DVAPI createQIconOnOff(const char *iconSVGName, bool withOver = true);
 QIcon DVAPI createQIconOnOffPNG(const char *iconPNGName, bool withOver = true);
 
-inline QSize DVAPI dimension2QSize(const TDimension &sz) { return QSize(sz.lx, sz.ly); }
-inline TDimension DVAPI qsize2Dimension(const QSize &sz) { return TDimension(sz.width(), sz.height()); }
+inline QSize DVAPI dimension2QSize(const TDimension &sz)
+{
+	return QSize(sz.lx, sz.ly);
+}
+inline TDimension DVAPI qsize2Dimension(const QSize &sz)
+{
+	return TDimension(sz.width(), sz.height());
+}
 QString DVAPI toQString(const TFilePath &path);
 bool DVAPI isSpaceString(const QString &str);
 bool DVAPI isValidFileName(const QString &fileName);
 bool DVAPI isValidFileName_message(const QString &fileName);
 
 QString DVAPI elideText(const QString &columnName, const QFont &font, int width);
-QString DVAPI elideText(const QString &columnName, const QFontMetrics &fm, int width, const QString &elideSymbol);
+QString DVAPI elideText(const QString &columnName, const QFontMetrics &fm, int width,
+						const QString &elideSymbol);
 QUrl DVAPI pathToUrl(const TFilePath &path);
 
 bool DVAPI isResource(const QString &path);
@@ -111,19 +113,55 @@ bool DVAPI isResourceOrFolder(const QUrl &url);
 bool DVAPI acceptResourceDrop(const QList<QUrl> &urls);
 bool DVAPI acceptResourceOrFolderDrop(const QList<QUrl> &urls);
 
-inline QPointF DVAPI toQPointF(const TPointD &p) { return QPointF(p.x, p.y); }
-inline QPointF DVAPI toQPointF(const TPoint &p) { return QPointF(p.x, p.y); }
-inline QPoint DVAPI toQPoint(const TPoint &p) { return QPoint(p.x, p.y); }
-inline TPointD DVAPI toTPointD(const QPointF &p) { return TPointD(p.x(), p.y()); }
-inline TPointD DVAPI toTPointD(const QPoint &p) { return TPointD(p.x(), p.y()); }
-inline TPoint DVAPI toTPoint(const QPoint &p) { return TPoint(p.x(), p.y()); }
+inline QPointF DVAPI toQPointF(const TPointD &p)
+{
+	return QPointF(p.x, p.y);
+}
+inline QPointF DVAPI toQPointF(const TPoint &p)
+{
+	return QPointF(p.x, p.y);
+}
+inline QPoint DVAPI toQPoint(const TPoint &p)
+{
+	return QPoint(p.x, p.y);
+}
+inline TPointD DVAPI toTPointD(const QPointF &p)
+{
+	return TPointD(p.x(), p.y());
+}
+inline TPointD DVAPI toTPointD(const QPoint &p)
+{
+	return TPointD(p.x(), p.y());
+}
+inline TPoint DVAPI toTPoint(const QPoint &p)
+{
+	return TPoint(p.x(), p.y());
+}
 
-inline QRect DVAPI toQRect(const TRect &r) { return QRect(r.x0, r.y0, r.getLx(), r.getLy()); }
-inline QRectF DVAPI toQRectF(const TRectD &r) { return QRectF(r.x0, r.y0, r.getLx(), r.getLy()); }
-inline QRectF DVAPI toQRectF(const TRect &r) { return QRectF(r.x0, r.y0, r.getLx(), r.getLy()); }
-inline TRect DVAPI toTRect(const QRect &r) { return TRect(r.left(), r.top(), r.right(), r.bottom()); }
-inline TRectD DVAPI toTRectD(const QRectF &r) { return TRectD(r.left(), r.top(), r.right(), r.bottom()); }
-inline TRectD DVAPI toTRectD(const QRect &r) { return TRectD(r.left(), r.top(), r.right() + 1, r.bottom() + 1); }
+inline QRect DVAPI toQRect(const TRect &r)
+{
+	return QRect(r.x0, r.y0, r.getLx(), r.getLy());
+}
+inline QRectF DVAPI toQRectF(const TRectD &r)
+{
+	return QRectF(r.x0, r.y0, r.getLx(), r.getLy());
+}
+inline QRectF DVAPI toQRectF(const TRect &r)
+{
+	return QRectF(r.x0, r.y0, r.getLx(), r.getLy());
+}
+inline TRect DVAPI toTRect(const QRect &r)
+{
+	return TRect(r.left(), r.top(), r.right(), r.bottom());
+}
+inline TRectD DVAPI toTRectD(const QRectF &r)
+{
+	return TRectD(r.left(), r.top(), r.right(), r.bottom());
+}
+inline TRectD DVAPI toTRectD(const QRect &r)
+{
+	return TRectD(r.left(), r.top(), r.right() + 1, r.bottom() + 1);
+}
 
 QPainterPath DVAPI strokeToPainterPath(TStroke *stroke);
 
@@ -134,10 +172,10 @@ QPainterPath DVAPI strokeToPainterPath(TStroke *stroke);
 
 class DVAPI TabBarContainter : public QFrame
 {
-public:
+  public:
 	TabBarContainter(QWidget *parent = 0);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 };
 
@@ -147,13 +185,13 @@ protected:
 
 class DVAPI ToolBarContainer : public QFrame
 {
-public:
+  public:
 	ToolBarContainer(QWidget *parent = 0);
 
-protected:
+  protected:
 	void paintEvent(QPaintEvent *event);
 };
 
 QString DVAPI operator+(const QString &a, const TFilePath &fp);
 
-#endif //GUTIL_H
+#endif // GUTIL_H

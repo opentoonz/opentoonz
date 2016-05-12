@@ -20,33 +20,33 @@ class VIStroke;
 class TGroupId
 {
 
-public:
-	std::vector<int> m_id; //m_id[i-1] e' parent di m_id[i]
-	TGroupId()
-		: m_id() {}
+  public:
+	std::vector<int> m_id; // m_id[i-1] e' parent di m_id[i]
+	TGroupId() : m_id() {}
 
-	//ghost group sono i gruppi impliciti: tutti gli stroke che non fanno parte di nessun gruppo ma
-	//che stanno tra due gruppi fanno parte di un gruppo implicito. per convenzione un ghostGroup ha id<0
+	// ghost group sono i gruppi impliciti: tutti gli stroke che non fanno parte di nessun gruppo ma
+	// che stanno tra due gruppi fanno parte di un gruppo implicito. per convenzione un ghostGroup
+	// ha id<0
 
 	TGroupId(TVectorImage *vi, bool isGhost);
 
 	TGroupId(const TGroupId &strokeGroup) : m_id(strokeGroup.m_id){};
 
-	//costruisce un gruppo partendo da un parent e da un id esistente.
+	// costruisce un gruppo partendo da un parent e da un id esistente.
 	TGroupId(const TGroupId &parent, const TGroupId &id);
 
 	bool operator==(const TGroupId &id) const;
 	bool operator!=(const TGroupId &id) const { return !(*this == id); }
 
-	//TGroupId makeGroup(vector<VIStroke*> strokes, bool recomputeRegions=false);
-	//void unmakeGroup(vector<VIStroke*> strokes);
+	// TGroupId makeGroup(vector<VIStroke*> strokes, bool recomputeRegions=false);
+	// void unmakeGroup(vector<VIStroke*> strokes);
 
-	//ritrona la depth del gruppo. (0->not grouped)
+	// ritrona la depth del gruppo. (0->not grouped)
 	int isGrouped(bool implicit = false) const;
 
-	//toglie il parent;  se nera gruppo semplice, gli assegna il parametro id.
+	// toglie il parent;  se nera gruppo semplice, gli assegna il parametro id.
 	void ungroup(const TGroupId &id);
-	//bool sameParent(const TGroupId& id) const;
+	// bool sameParent(const TGroupId& id) const;
 
 	bool operator!() const { return m_id.empty() || m_id[0] == 0; };
 	bool operator<(const TGroupId &id) const;
@@ -60,7 +60,7 @@ public:
 
 class VIStroke
 {
-public:
+  public:
 	TStroke *m_s;
 	bool m_isPoint;
 	bool m_isNewForFill;
@@ -100,19 +100,20 @@ public:
 //-----------------------------------------------------------------------------
 class IntersectionData;
 class Intersection;
-//class IntersectStroke;
+// class IntersectStroke;
 
 #ifdef LEVO
 
 class TAutocloseEdge : public TGeneralEdge
 {
-public:
+  public:
 	TSegment m_segment;
 	int m_nextStrokeIndex;
 	double m_nextStrokeW;
 
 	TAutocloseEdge(const TSegment &segment, int nextStrokeIndex, double nextStrokeW)
-		: TGeneralEdge(eAutoclose), m_segment(segment), m_nextStrokeIndex(nextStrokeIndex), m_nextStrokeW(nextStrokeW)
+		: TGeneralEdge(eAutoclose), m_segment(segment), m_nextStrokeIndex(nextStrokeIndex),
+		  m_nextStrokeW(nextStrokeW)
 	{
 	}
 };
@@ -126,7 +127,7 @@ class TVectorImage::Imp
 {
 	TVectorImage *m_vi;
 
-public:
+  public:
 	int m_maxGroupId;
 	int m_maxGhostGroupId;
 
@@ -151,7 +152,8 @@ public:
 	TRegion *getRegion(const TPointD &p);
 
 	int fill(const TPointD &p, int styleId);
-	bool selectFill(const TRectD &selectArea, TStroke *s, int styleId, bool onlyUnfilled, bool fillAreas, bool fillLines);
+	bool selectFill(const TRectD &selectArea, TStroke *s, int styleId, bool onlyUnfilled,
+					bool fillAreas, bool fillLines);
 
 	void addStrokeRegionRef(UINT strokeIndex, TRegion *region);
 
@@ -163,9 +165,11 @@ public:
 	void cloneRegions(TVectorImage::Imp &out, bool doComputeRegions = true);
 
 	void eraseIntersection(int index);
-	UINT getFillData(std::unique_ptr<TVectorImage::IntersectionBranch[]>& v);
-	void setFillData(std::unique_ptr<TVectorImage::IntersectionBranch[]> const& v, UINT branchCount, bool doComputeRegions = true);
-	void notifyChangedStrokes(const std::vector<int> &strokeIndexArray, const std::vector<TStroke *> &oldVectorStrokeArray, bool areFlipped);
+	UINT getFillData(std::unique_ptr<TVectorImage::IntersectionBranch[]> &v);
+	void setFillData(std::unique_ptr<TVectorImage::IntersectionBranch[]> const &v, UINT branchCount,
+					 bool doComputeRegions = true);
+	void notifyChangedStrokes(const std::vector<int> &strokeIndexArray,
+							  const std::vector<TStroke *> &oldVectorStrokeArray, bool areFlipped);
 	void insertStrokeAt(VIStroke *stroke, int strokeIndex, bool recomputeRegions = true);
 	void moveStroke(int fromIndex, int toIndex);
 	void autoFill(int styleId, bool oddLevel);
@@ -204,42 +208,49 @@ public:
 	void resetRegionFinder();
 #endif
 
-private:
+  private:
 	void findRegions(const TRectD &rect);
 	int computeIntersections();
 	void findIntersections();
 
 	int computeEndpointsIntersections();
-	//Imp(const TVectorImage::Imp &);
-	//Imp &  operator=(const TVectorImage::Imp &);
+	// Imp(const TVectorImage::Imp &);
+	// Imp &  operator=(const TVectorImage::Imp &);
 	void eraseDeadIntersections();
 	IntersectedStroke *eraseBranch(Intersection *in, IntersectedStroke *is);
 	void doEraseIntersection(int index, std::vector<int> *toBeDeleted = 0);
 	void eraseEdgeFromStroke(IntersectedStroke *is);
 	bool areWholeGroups(const std::vector<int> &indexes) const;
-	//accorpa tutti i gruppi ghost adiacenti in uno solo, e rinomina gruppi ghost separati con lo stesso id; si usa questa funzione dopo ula creazione di un gruppo o il move di strokes
+	// accorpa tutti i gruppi ghost adiacenti in uno solo, e rinomina gruppi ghost separati con lo
+	// stesso id; si usa questa funzione dopo ula creazione di un gruppo o il move di strokes
 
 	//--------------------NUOVO CALCOLO REGIONI------------------------------------------------
 
-public:
+  public:
 #ifdef LEVO
 	vector<TRegion *> existingRegions;
 	TRegion *findRegionFromStroke(const IntersectStroke &stroke, const TPointD &p);
 	bool findNextStrokes(const TEdge &currEdge, std::multimap<double, TGeneralEdge *> &nextEdges);
-	bool addNextEdge(TEdge &edge, TRegion &region, TRegion *&existingRegion, bool isStartingEdge = false);
+	bool addNextEdge(TEdge &edge, TRegion &region, TRegion *&existingRegion,
+					 bool isStartingEdge = false);
 	bool addNextEdge(TAutocloseEdge &edge, TRegion &region, TRegion *&existingRegion);
 	bool storeRegion(TRegion *region, const TPointD &p);
 
-	bool exploreAndAddNextEdge(TEdge &edge, TEdge &nextEdge, TRegion &region, TRegion *&existingRegion);
-	bool addNextAutocloseEdge(TEdge &edge, TAutocloseEdge &nextEdge, TRegion &region, TRegion *&existingRegion);
-	bool addNextAutocloseEdge(TAutocloseEdge &edge, TEdge &nextEdge, TRegion &region, TRegion *&existingRegion);
-	void computeAutocloseSegments(const TEdge &currEdge, int strokeIndex, std::multimap<double, TAutocloseEdge> &segments);
-	void computeAutocloseSegmentsSameStroke(const TEdge &currEdge, std::multimap<double, TAutocloseEdge> &segments);
+	bool exploreAndAddNextEdge(TEdge &edge, TEdge &nextEdge, TRegion &region,
+							   TRegion *&existingRegion);
+	bool addNextAutocloseEdge(TEdge &edge, TAutocloseEdge &nextEdge, TRegion &region,
+							  TRegion *&existingRegion);
+	bool addNextAutocloseEdge(TAutocloseEdge &edge, TEdge &nextEdge, TRegion &region,
+							  TRegion *&existingRegion);
+	void computeAutocloseSegments(const TEdge &currEdge, int strokeIndex,
+								  std::multimap<double, TAutocloseEdge> &segments);
+	void computeAutocloseSegmentsSameStroke(const TEdge &currEdge,
+											std::multimap<double, TAutocloseEdge> &segments);
 #endif
 
 	//--------------------------------------------------------------------------------------
 
-private:
+  private:
 	// not implemented
 	Imp(const Imp &);
 	Imp &operator=(const Imp &);

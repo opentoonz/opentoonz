@@ -28,7 +28,7 @@ void info(const std::string &msg);
 
 class DVAPI TUserLogAppend
 {
-public:
+  public:
 	TUserLogAppend(); // used to redirect log messages to the console
 	TUserLogAppend(const TFilePath &fp);
 	~TUserLogAppend();
@@ -37,7 +37,7 @@ public:
 	void error(const std::string &msg);
 	void info(const std::string &msg);
 
-private:
+  private:
 	class Imp;
 	std::unique_ptr<Imp> m_imp;
 };

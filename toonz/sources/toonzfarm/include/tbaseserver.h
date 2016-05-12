@@ -10,7 +10,7 @@
 
 class TBaseServer
 {
-public:
+  public:
 	TBaseServer(int port);
 	virtual ~TBaseServer();
 
@@ -19,7 +19,7 @@ public:
 
 	virtual std::string exec(int argc, char *argv[]) = 0;
 
-private:
+  private:
 	int extractArgs(char *s, char *argv[]);
 
 	int m_port;

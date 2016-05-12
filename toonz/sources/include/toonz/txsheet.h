@@ -52,7 +52,7 @@ class TFrameId;
 //****************************************************************************************
 
 //! This is the base class for an xsheet. An Xsheet is composed of colums of frames.
-/*! 
+/*!
 Inherits \b TSmartObject and \b TPersist.
 
 		The class provides a collection of functions that returns xsheet elements, defined in
@@ -77,7 +77,8 @@ Inherits \b TSmartObject and \b TPersist.
 		Also there are functions to manipulate cells reverseCells(), swingCells(),
 		incrementCells(), duplicateCells(), int upTo, stepCells(), eachCells().
 
-		About \b pegbar \b tree \b TStageObjectTree, it's possible to manage it through the stage object's 
+		About \b pegbar \b tree \b TStageObjectTree, it's possible to manage it through the stage
+object's
 		related functions.
 
 		The \b fx \b dag \b FxDag getFxDag() is not managed with direct functions but is always
@@ -95,10 +96,10 @@ class DVAPI TXsheet : public TSmartObject, public TPersist
 {
 	PERSIST_DECLARATION(TXsheet)
 
-public:
+  public:
 	class DVAPI SoundProperties
 	{
-	public:
+	  public:
 		int m_fromFrame;
 		int m_toFrame;
 		int m_frameRate;
@@ -111,7 +112,7 @@ public:
 		inline bool operator!=(const SoundProperties &c) const;
 	};
 
-private:
+  private:
 	TSoundOutputDevice *m_player;
 
 	/*!	\struct TXsheet::TXsheetImp
@@ -124,7 +125,7 @@ private:
 
 	DECLARE_CLASS_CODE
 
-public:
+  public:
 	TXsheet();
 	~TXsheet();
 
@@ -146,26 +147,29 @@ public:
 	const TXshCell &getCell(int row, int col) const;
 
 	bool setCell(int row, int col, const TXshCell &cell);
-	/*! Set \b \e cells[] to \b \e rowCount cells of column identified by index \b \e col starting from
+	/*! Set \b \e cells[] to \b \e rowCount cells of column identified by index \b \e col starting
+	   from
 		row identified by index \b \e row. If column is empty or is not a \b TXshCellColumn
 		set \b \e cells[] to \b \e rowCount empty cells.
 		\sa getCells(), setCells(), getCell()
-    */
+	*/
 	void getCells(int row, int col, int rowCount, TXshCell cells[]) const;
 	/*! If column identified by index \b \e col is a \b TXshCellColumn or is empty and is not
-		locked, this method sets to \b \e cells[] the given \b \e rowCount cells of column \b \e col starting from
+		locked, this method sets to \b \e cells[] the given \b \e rowCount cells of column \b \e col
+	starting from
 		row \b \e row. If column in \b \e col is empty it creates a new column recalling
 		\b TColumnSetT::touchColumn() and sets the new cells to \b \e cells[], and on creating a new
 		column it adds it to fx dag \b FxDag.
 		If cells in \b \e row and \b \e col are not empty recalls \b TXshCellColumn::setCells(),
 		insert the new cells \b \e cells[] in \b \e row \b \e col and shift old cells.
 		If xsheet change it updates xsheet's frame count.
-    Return false if cannot set cells.
+	Return false if cannot set cells.
 		\sa getCells(), setCell(), getCell()
 	*/
 	bool setCells(int row, int col, int rowCount, const TXshCell cells[]);
 	/*! If column identified by index \b \e col is not empty, is a \b \e TXshCellColumn and is not
-		locked this method inserts in row identified by index \b \e row \b \e rowCount empty cells, it calls
+		locked this method inserts in row identified by index \b \e row \b \e rowCount empty cells,
+	   it calls
 		TXshCellColumn::insertEmptyCells(). An update of xsheet's frame count is performed.
 		\sa setCells(), removeCells()
 	*/
@@ -183,17 +187,21 @@ public:
 		locked, clear \b \e rowCount cells starting from \b \e row and it recalls TXshCellColumn::clearCells().
 		Clears cells and it shifts remaining cells. Xsheet's frame count is updated.
 		\sa removeCells(), insertCells()
-*/ void clearCells(int row, int col, int rowCount = 1);
-	/*! Clears xsheet. It sets to default values all xsheet elements contained in struct \b TXsheetImp.
+*/ void
+	clearCells(int row, int col, int rowCount = 1);
+	/*! Clears xsheet. It sets to default values all xsheet elements contained in struct \b
+	 * TXsheetImp.
 	*/
 	void clearAll();
 	/*! Returns cell range of column identified by index \b \e col and set \b \e r0 and \b \e r1
-		respectively to first and last not empty cell, it then recalls \b TXshCellColumn::getRange().
+		respectively to first and last not empty cell, it then recalls \b
+	   TXshCellColumn::getRange().
 		If column is empty or is not a \b TXshCellColumn this method returns zero and sets
 		\b \e r0 to 0 and \b \e r1 to -1.
 	*/
 	int getCellRange(int col, int &r0, int &r1) const;
-	/*! Returns the max frame number of xsheet column identified by \b \e col and calls \b TXshColumn::getMaxFrame().
+	/*! Returns the max frame number of xsheet column identified by \b \e col and calls \b
+	   TXshColumn::getMaxFrame().
 		\sa getFrameCount()
 	*/
 	int getMaxFrame(int col) const;
@@ -220,47 +228,55 @@ public:
 	*/
 	TStageObjectTree *getStageObjectTree() const;
 	/*! Returns transformation matrix \b TAffine related to pegbar \b TStageObject with \b \e id
-		\b TStageObjectId specialization in frame \b \e frame, it calls \b TStageObject::getPlacement().
+		\b TStageObjectId specialization in frame \b \e frame, it calls \b
+	   TStageObject::getPlacement().
 		\sa getParentPlacement()
 	*/
 	TAffine getPlacement(const TStageObjectId &id, int frame) const;
-	/*! Returns z value related to pegbar \b TStageObject with \b \e id specialization \b TStageObjectId
+	/*! Returns z value related to pegbar \b TStageObject with \b \e id specialization \b
+	   TStageObjectId
 		in frame \b \e frame, it calls \b TStageObject::getZ().
 	*/
 	double getZ(const TStageObjectId &id, int frame) const;
 
 	double getNoScaleZ(const TStageObjectId &id) const;
 	/*! Returns transformation matrix \b TAffine related to parent of pegbar \b TStageObject with
-		\b \e id \b TStageObjectId specialization in frame \b \e frame, it calls \b TStageObject::getParentPlacement().
+		\b \e id \b TStageObjectId specialization in frame \b \e frame, it calls \b
+	   TStageObject::getParentPlacement().
 		\sa getPlacement()
 	*/
 	TAffine getParentPlacement(const TStageObjectId &id, int frame) const;
-	/*! Returns the center related to pegbar \b TStageObject with \b \e id TStageObjectId specialization
+	/*! Returns the center related to pegbar \b TStageObject with \b \e id TStageObjectId
+	   specialization
 		in frame \b \e frame; it calls \b TStageObject::getCenter().
 		\sa setCenter()
 	*/
 	TPointD getCenter(const TStageObjectId &id, int frame) const;
-	/*! Sets the center of pegbar \b TStageObject with \b \e id TStageObjectId specialization in frame
+	/*! Sets the center of pegbar \b TStageObject with \b \e id TStageObjectId specialization in
+	   frame
 		\b \e frame, to \b \e center; it calls \b TStageObject::setCenter().
 		\sa getCenter()
 	*/
 	void setCenter(const TStageObjectId &id, int frame, const TPointD &center);
-	/*! Returns parent related to pegbar \b TStageObject with \b \e id TStageObjectId specialization;
+	/*! Returns parent related to pegbar \b TStageObject with \b \e id TStageObjectId
+	   specialization;
 		it calls \b TStageObject::getParent().
 		\sa setStageObjectParent()
 	*/
 	TStageObjectId getStageObjectParent(const TStageObjectId &id);
-	/*! Sets parent of pegbar \b TStageObject with \b \e id TStageObjectId specialization to \b \e parentId;
+	/*! Sets parent of pegbar \b TStageObject with \b \e id TStageObjectId specialization to \b \e
+	   parentId;
 		it calls \b TStageObject::setParent().
 		\sa getStageObjectParent()
 	*/
 	void setStageObjectParent(const TStageObjectId &id, const TStageObjectId &parentId);
-	/*! Returns true if pegbar \b TStageObject with \b \e id TStageObjectId specialization has children,
+	/*! Returns true if pegbar \b TStageObject with \b \e id TStageObjectId specialization has
+	   children,
 		that is if pegbar is a parent of another pegbar; it calls \b TStageObject::hasChildren().
 		\sa getStageObjectParent() and setStageObjectParent()
 	*/
 	bool hasChildren(const TStageObjectId &id) const;
-	/*! Returns current camera's transformation matrix \b TAffine related to frame \b \e frame, 
+	/*! Returns current camera's transformation matrix \b TAffine related to frame \b \e frame,
 		inclusive of zdepth. It Doesn't take care of transformation matrix related to pegbar
 		linked to camera.
 		\note Used only in tab code, "the Tab" has just one camera while "Toonz 5.2 Harlequin"
@@ -282,7 +298,8 @@ public:
 		\b TFrameId number equal to 2 and 5, the result will be four cells: a cell with
 		\b TFrameId number equal to 2 repeated three times and one cell with \b TFrameId
 		number equal to 5.
-	\n	This method inserts in \b \e forUndo vector all the inserted cells, it is useful for the undo process.
+	\n	This method inserts in \b \e forUndo vector all the inserted cells, it is useful for the
+	undo process.
 	*/
 	bool incrementCells(int r0, int c0, int r1, int c1,
 						std::vector<std::pair<TRect, TXshCell>> &forUndo);
@@ -296,17 +313,19 @@ public:
 		cells will be inserted by shifting the other down.
 	*/
 	void stepCells(int r0, int c0, int r1, int c1, int type);
-	/*! For each sequenze of frame with same number, contained in rect delimited by first row \b \e r0, last row \b \e r1 and
+	/*! For each sequenze of frame with same number, contained in rect delimited by first row \b \e
+	   r0, last row \b \e r1 and
 		first column \b \e c0, a frame with same number is inserted.
   */
 	void increaseStepCells(int r0, int c0, int &r1, int c1);
 	/*!
-    For each sequenze of frame with same number, contained in rect delimited by first row \b \e r0, last row \b \e r1 and
+	For each sequenze of frame with same number, contained in rect delimited by first row \b \e r0,
+	last row \b \e r1 and
 		first column \b \e c0, a frame with same number is removed.
   */
 	void decreaseStepCells(int r0, int c0, int &r1, int c1);
 	/*!
-    The cells, contained in rect delimited by first row \b \e r0, last row \b \e r1 and
+	The cells, contained in rect delimited by first row \b \e r0, last row \b \e r1 and
 		first column \b \e c0, are resetted in order to have no sequential frame duplication.
   */
 	void resetStepCells(int r0, int c0, int r1, int c1);
@@ -327,19 +346,13 @@ public:
 	*/
 	int exposeLevel(int row, int col, TXshLevel *xl, bool overwrite = false);
 
-	//cutomized exposseLevel used from LoadLevel command
-	int exposeLevel(int row,
-					int col,
-					TXshLevel *xl,
-					std::vector<TFrameId> &fIds_,
-					int xFrom = -1,
-					int xTo = -1,
-					int step = -1,
-					int inc = -1,
-					int frameCount = -1,
+	// cutomized exposseLevel used from LoadLevel command
+	int exposeLevel(int row, int col, TXshLevel *xl, std::vector<TFrameId> &fIds_, int xFrom = -1,
+					int xTo = -1, int step = -1, int inc = -1, int frameCount = -1,
 					bool doesFileActuallyExist = true);
 
-	/*! Exposes level \b \e xl \b \e fids in xsheet starting from cell identified by \b \e row and \b \e col.
+	/*! Exposes level \b \e xl \b \e fids in xsheet starting from cell identified by \b \e row and
+	 * \b \e col.
 	*/
 	void exposeLevel(int row, int col, TXshLevel *xl, std::vector<TFrameId> fids, bool overwrite);
 	/*! Updates xsheet frame count, find max frame count between all
@@ -364,13 +377,13 @@ public:
 		\sa removeColumn()
 	*/
 	void insertColumn(int index, TXshColumn *column); // becomes owner
-													  /*! Removes column identified by \b \e index from xsheet column. If column in \b \e index
-		is not empty and it has a \b TFx fx, removes column from fx dag, calls
-		FxDag::removeFromXsheet() and disconnects fx column from all output fx \b TFx,
-		than removes column from column set and from pegbarTree \b TStageObjectTree contained
-		in TXsheetImp.
-		\sa insertColumn()
-	*/
+	/*! Removes column identified by \b \e index from xsheet column. If column in \b \e index
+is not empty and it has a \b TFx fx, removes column from fx dag, calls
+FxDag::removeFromXsheet() and disconnects fx column from all output fx \b TFx,
+than removes column from column set and from pegbarTree \b TStageObjectTree contained
+in TXsheetImp.
+\sa insertColumn()
+*/
 	void removeColumn(int index);
 	/*! Moves column from xsheet column index \b \e srcIndex to \b \e dstIndex,
 			columns between \b \e srcIndex+1 and \b \e dstIndex (included) are shifted of -1.
@@ -426,12 +439,14 @@ public:
 	TXshNoteSet *getNotes() const { return m_notes; }
 
 	//! Returns true if the \b cellCandidate creates a circular reference.
-	//! A circular reference is obtained when \b cellCandidate is a subXsheet cell and contains or matches
+	//! A circular reference is obtained when \b cellCandidate is a subXsheet cell and contains or
+	//! matches
 	//! with this XSheet.
 	bool checkCircularReferences(const TXshCell &cellCandidate);
 
 	//! Returns true if the \b columnCandidate creates a circular reference.
-	//! A circular reference is obtained when \b columnCandidate is a subXsheet column and contains or matches
+	//! A circular reference is obtained when \b columnCandidate is a subXsheet column and contains
+	//! or matches
 	//! with this XSheet.
 	bool checkCircularReferences(TXshColumn *columnCandidate);
 
@@ -440,16 +455,16 @@ public:
 	//! Returns the xsheet content's \a camstand bbox at the specified row.
 	TRectD getBBox(int row) const;
 
-protected:
+  protected:
 	bool checkCircularReferences(TXsheet *childCandidate);
 
-private:
+  private:
 	// Not copiable
 	TXsheet(const TXsheet &);
 	TXsheet &operator=(const TXsheet &);
 
 	/*! Return column in index if exists, overwise create a new column;
-      if column exist and is empty check \b isSoundColumn and return right type.
+	  if column exist and is empty check \b isSoundColumn and return right type.
   */
 	TXshColumn *touchColumn(int index, TXshColumn::ColumnType = TXshColumn::eLevelType);
 };

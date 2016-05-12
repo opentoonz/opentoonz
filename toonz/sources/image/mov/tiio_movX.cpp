@@ -6,14 +6,14 @@
 #include "tsound.h"
 
 #ifdef NOTE
-Supportato solo RGBM32, sotto NT sarebbe possibile supportare anche 1bpp, ma
-																			  mancano i TRaster opportuni...
+Supportato solo RGBM32, sotto NT sarebbe possibile supportare anche 1bpp,
+	ma mancano i TRaster opportuni...
 
 	viene supportata
 	solo(LA PRIMA) traccia video !!!!
 #endif
 
-	//namespace {
+	// namespace {
 	enum QTLibError {
 		QTNoError = 0x0000,
 
@@ -46,21 +46,21 @@ string buildQTErrorString(int ec)
 class TImageWriterMov : public TImageWriter
 {
 
-public:
+  public:
 	TImageWriterMov(const TFilePath &, int frameIndex, TLevelWriterMov *);
 	~TImageWriterMov() {}
 	bool is64bitOutputSupported() { return false; }
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageWriterMov(const TImageWriterMov &);
 	TImageWriterMov &operator=(const TImageWriterMov &src);
 
-public:
+  public:
 	void save(const TImageP &);
 	int m_frameIndex;
 
-private:
+  private:
 	TLevelWriterMov *m_lwm;
 };
 
@@ -70,23 +70,23 @@ private:
 class TImageReaderMov : public TImageReader
 {
 
-public:
+  public:
 	TImageReaderMov(const TFilePath &, int frameIndex, TLevelReaderMov *);
 	~TImageReaderMov() {}
 
-private:
-	//not implemented
+  private:
+	// not implemented
 	TImageReaderMov(const TImageReaderMov &);
 	TImageReaderMov &operator=(const TImageReaderMov &src);
 
-public:
+  public:
 	TImageP load();
 	int m_frameIndex;
 
 	TDimension getSize() const { return TDimension(m_lrm->m_lx, m_lrm->m_ly); }
 	TRect getBBox() const { return TRect(0, 0, m_lrm->m_lx - 1, m_lrm->m_ly - 1); }
 
-private:
+  private:
 	TLevelReaderMov *m_lrm;
 };
 
@@ -123,27 +123,32 @@ void TImageWriterMov::save(const TImageP &img)
 			throw TImageException(m_lwm->getFilePath(), "Unable to set image defaults");
 		}
 
-		if (dmParamsSetFloat(imageTrackParams, DM_IMAGE_RATE, (double)m_lwm->m_rate) != DM_SUCCESS) {
+		if (dmParamsSetFloat(imageTrackParams, DM_IMAGE_RATE, (double)m_lwm->m_rate) !=
+			DM_SUCCESS) {
 			dmParamsDestroy(imageTrackParams);
 			throw TImageException(m_lwm->getFilePath(), "Unable to set frame rate");
 		}
 
-		if (dmParamsSetEnum(imageTrackParams, DM_IMAGE_ORIENTATION, DM_TOP_TO_BOTTOM) != DM_SUCCESS) {
+		if (dmParamsSetEnum(imageTrackParams, DM_IMAGE_ORIENTATION, DM_TOP_TO_BOTTOM) !=
+			DM_SUCCESS) {
 			dmParamsDestroy(imageTrackParams);
 			throw TImageException(m_lwm->getFilePath(), "Unable to set frame rate");
 		}
 
-		if (dmParamsSetFloat(imageTrackParams, DM_IMAGE_QUALITY_SPATIAL, m_lwm->quality) != DM_SUCCESS) {
+		if (dmParamsSetFloat(imageTrackParams, DM_IMAGE_QUALITY_SPATIAL, m_lwm->quality) !=
+			DM_SUCCESS) {
 			dmParamsDestroy(imageTrackParams);
 			throw TImageException(m_lwm->getFilePath(), "Unable to set quality");
 		}
 
-		if (dmParamsSetString(imageTrackParams, DM_IMAGE_COMPRESSION, m_lwm->compression) != DM_SUCCESS) {
+		if (dmParamsSetString(imageTrackParams, DM_IMAGE_COMPRESSION, m_lwm->compression) !=
+			DM_SUCCESS) {
 			dmParamsDestroy(imageTrackParams);
 			throw TImageException(m_lwm->getFilePath(), "Unable to set compression");
 		}
 
-		if (mvAddTrack(m_lwm->id, DM_IMAGE, imageTrackParams, NULL, &(m_lwm->imageTrack)) == DM_FAILURE) {
+		if (mvAddTrack(m_lwm->id, DM_IMAGE, imageTrackParams, NULL, &(m_lwm->imageTrack)) ==
+			DM_FAILURE) {
 			dmParamsDestroy(imageTrackParams);
 			throw TImageException(m_lwm->getFilePath(), "Unable to add image track to movie");
 		}
@@ -152,8 +157,8 @@ void TImageWriterMov::save(const TImageP &img)
 		m_lwm->m_initDone = true;
 	}
 
-	if (mvInsertFrames(m_lwm->imageTrack, m_frameIndex, 1,
-					   lx * ly * pixSize, buffer) != DM_SUCCESS) {
+	if (mvInsertFrames(m_lwm->imageTrack, m_frameIndex, 1, lx * ly * pixSize, buffer) !=
+		DM_SUCCESS) {
 		throw TImageException(m_lwm->getFilePath(), "Unable to write image to movie");
 	}
 }
@@ -164,16 +169,18 @@ void TImageWriterMov::save(const TImageP &img)
 
 class TWriterInfoMov : public TWriterInfo
 {
-public:
+  public:
 	TWriterInfoMov() : TWriterInfo() { assert(!"Not implemented"); }
 	~TWriterInfoMov() {}
-private:
+  private:
 };
 
 //-----------------------------------------------------------
 
 TLevelWriterMov::TLevelWriterMov(const TFilePath &path)
-	: TLevelWriter(path), m_initDone(false), m_rate(25), m_IOError(QTNoError), quality(DM_IMAGE_QUALITY_NORMAL), compression(DM_IMAGE_QT_ANIM), m_writerInfo(new TWriterInfoMov())
+	: TLevelWriter(path), m_initDone(false), m_rate(25), m_IOError(QTNoError),
+	  quality(DM_IMAGE_QUALITY_NORMAL), compression(DM_IMAGE_QT_ANIM),
+	  m_writerInfo(new TWriterInfoMov())
 {
 	DMparams *movieParams;
 
@@ -187,8 +194,7 @@ TLevelWriterMov::TLevelWriterMov(const TFilePath &path)
 		m_IOError = QTCantCreateParams;
 		return;
 	}
-	if (mvCreateFile(path.getFullPath().c_str(),
-					 movieParams, NULL, &id) == DM_FAILURE) {
+	if (mvCreateFile(path.getFullPath().c_str(), movieParams, NULL, &id) == DM_FAILURE) {
 		static char m[1024];
 		dmParamsDestroy(movieParams);
 		m_IOError = QTCheckLibError;
@@ -216,7 +222,7 @@ TWriterInfo *TLevelWriterMov::getWriterInfo() const
 TLevelWriterMov::~TLevelWriterMov()
 {
 	bool rc = (mvClose(id) == DM_SUCCESS);
-	//if (!rc)
+	// if (!rc)
 	//  throw TImageException(getFilePath(), "Error closing mov file");
 }
 
@@ -236,8 +242,7 @@ TImageWriterP TLevelWriterMov::getFrameWriter(TFrameId fid)
 
 //-----------------------------------------------------------
 
-TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
-	: TLevelReader(path), IOError(QTNoError)
+TLevelReaderMov::TLevelReaderMov(const TFilePath &path) : TLevelReader(path), IOError(QTNoError)
 
 {
 	m_status = mvOpenFile(path.getFullPath().c_str(), O_RDONLY, &movie);
@@ -303,7 +308,8 @@ TImageP TImageReaderMov::load()
 {
 	TRaster32P ret(m_lrm->m_lx, m_lrm->m_ly);
 
-	DMstatus status = mvReadFrames(m_lrm->track, m_frameIndex, 1, m_lrm->m_lx * m_lrm->m_ly * 4, ret->getRawData());
+	DMstatus status = mvReadFrames(m_lrm->track, m_frameIndex, 1, m_lrm->m_lx * m_lrm->m_ly * 4,
+								   ret->getRawData());
 	if (status != DM_SUCCESS) {
 		throw TImageException(getFilePath().getFullPath().c_str(), mvGetErrorStr(mvGetErrno()));
 	}

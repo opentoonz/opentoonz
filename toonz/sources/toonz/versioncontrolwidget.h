@@ -24,25 +24,22 @@ class DateChooserWidget : public QWidget
 
 	int m_selectedRadioIndex;
 
-	QRadioButton *m_timeRadioButton,
-		*m_dayRadioButton,
-		*m_weekRadioButton,
-		*m_dateRadioButton;
+	QRadioButton *m_timeRadioButton, *m_dayRadioButton, *m_weekRadioButton, *m_dateRadioButton;
 
 	QTimeEdit *m_timeEdit;
 	QSpinBox *m_dayEdit;
 	QSpinBox *m_weekEdit;
 	QDateTimeEdit *m_dateTimeEdit;
 
-public:
+  public:
 	DateChooserWidget(QWidget *parent = 0);
 
 	QString getRevisionString() const;
 
-private:
+  private:
 	void disableAllWidgets();
 
-protected slots:
+  protected slots:
 	void onRadioButtonClicked();
 };
 
@@ -58,7 +55,7 @@ class ConflictWidget : public QWidget
 	QString m_button1Text;
 	QString m_button2Text;
 
-public:
+  public:
 	ConflictWidget(QWidget *parent = 0);
 	void setFiles(const QStringList &files);
 
@@ -67,10 +64,10 @@ public:
 	void setButton1Text(const QString &b1text) { m_button1Text = b1text; }
 	void setButton2Text(const QString &b2text) { m_button2Text = b2text; }
 
-protected slots:
+  protected slots:
 	void onRadioValueChanged();
 
-signals:
+  signals:
 	void allConflictSetted();
 };
 
@@ -84,16 +81,15 @@ class DoubleRadioWidget : public QWidget
 	QRadioButton *m_firstButton;
 	QRadioButton *m_secondButton;
 
-public:
-	DoubleRadioWidget(const QString &button1Text,
-					  const QString &button2Text,
-					  const QString &text, QWidget *parent = 0);
+  public:
+	DoubleRadioWidget(const QString &button1Text, const QString &button2Text, const QString &text,
+					  QWidget *parent = 0);
 
 	// -1 No button checked, 0 firstButton, 1 secondButton
 	int getValue() const;
 	QString getText() const;
 
-signals:
+  signals:
 	void valueChanged();
 };
 

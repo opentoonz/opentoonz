@@ -49,18 +49,18 @@ class SVNLockDialog : public DVGui::Dialog
 
 	QFile *m_targetTempFile;
 
-public:
-	SVNLockDialog(QWidget *parent, const QString &workingDir,
-				  const QStringList &filesToEdit, bool lock, int sceneIconAdded);
+  public:
+	SVNLockDialog(QWidget *parent, const QString &workingDir, const QStringList &filesToEdit,
+				  bool lock, int sceneIconAdded);
 
-private:
+  private:
 	void switchToCloseButton();
 	void checkFiles();
 
 	void initTreeWidget();
 	void executeCommand();
 
-protected slots:
+  protected slots:
 
 	void onStatusRetrieved(const QString &);
 	void onError(const QString &);
@@ -71,7 +71,7 @@ protected slots:
 
 	void onEditSceneContentsToggled(bool checked);
 
-signals:
+  signals:
 	void done(const QStringList &);
 };
 
@@ -82,7 +82,7 @@ class SVNLockInfoDialog : public DVGui::Dialog
 	Q_OBJECT
 	SVNStatus m_status;
 
-public:
+  public:
 	SVNLockInfoDialog(QWidget *parent, const SVNStatus &status);
 };
 

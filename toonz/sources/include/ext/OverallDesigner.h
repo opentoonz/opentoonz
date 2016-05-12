@@ -24,23 +24,15 @@
 
 namespace ToonzExt
 {
-class DVAPI
-	OverallDesigner
-	: public Designer
+class DVAPI OverallDesigner : public Designer
 {
-	int
-		x_,
-		y_;
-	double
-		scale_,
-		pixelSize_;
+	int x_, y_;
+	double scale_, pixelSize_;
 
-	void
-	setPosition();
+	void setPosition();
 
-public:
-	OverallDesigner(int x,
-					int y);
+  public:
+	OverallDesigner(int x, int y);
 	virtual ~OverallDesigner();
 	void draw(SmoothDeformation *);
 	void draw(CornerDeformation *);

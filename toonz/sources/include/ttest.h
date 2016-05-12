@@ -28,7 +28,7 @@ class DVAPI TTest
 	int m_paramInstanceCount;
 	int m_fxInstanceCount;
 
-public:
+  public:
 	TTest(const std::string &testName);
 	virtual ~TTest();
 
@@ -42,7 +42,7 @@ public:
 	static void runTests(std::string filename);
 };
 
-//Utility
+// Utility
 
 DVAPI TFilePath getTestFile(std::string name);
 

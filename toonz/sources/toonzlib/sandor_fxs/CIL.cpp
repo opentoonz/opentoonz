@@ -54,8 +54,7 @@ int CCIL::getRangeEnd(const char *s) const
 	return atoi(ss);
 }
 
-void CCIL::strToColorIndex(const char *s, CCIL &cil,
-						   const int maxIndex)
+void CCIL::strToColorIndex(const char *s, CCIL &cil, const int maxIndex)
 {
 	/* If s=="-1", all of the indices are put into the ColorIndexList
 */

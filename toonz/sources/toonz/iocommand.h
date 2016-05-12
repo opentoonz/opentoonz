@@ -38,7 +38,7 @@ class ProgressDialog;
 //====================================================
 
 /*! \file       iocommand.h
-    \brief      Contains command functions related to Toonz I/O.          */
+	\brief      Contains command functions related to Toonz I/O.          */
 
 /*! \brief      Contains command functions related to Toonz I/O.          */
 
@@ -47,31 +47,32 @@ namespace IoCmd
 
 /*!
   \brief    Composite data used describing a group of Toonz resources
-            to be loaded.
+			to be loaded.
 
   \details  A Toonz resource can refer to either a level, audio
-            file, or Toonz scene to be loaded as sub-xsheet.
+			file, or Toonz scene to be loaded as sub-xsheet.
 
   \sa       The loadResources() function.
 */
 
 struct LoadResourceArguments {
 	/*! \details    A loading ScopedBlock represents a monolithic loading
-                  procedure, with integrated progress dialog and undo block.        */
+				  procedure, with integrated progress dialog and undo block.        */
 
 	struct ScopedBlock : private TUndoScopedBlock //!  Scope variable hosting a loading process.
 	{
 		struct Data;
 
-	public:
+	  public:
 		ScopedBlock();
-		~ScopedBlock();								   //!< Invokes all necessary Toonz updates before control is returned,
-													   //!  included posting of the embedded undo block.
-		DVGui::ProgressDialog &progressDialog() const; //!< Progress dialog shown on multiple resource loads.
+		~ScopedBlock(); //!< Invokes all necessary Toonz updates before control is returned,
+						//!  included posting of the embedded undo block.
+		DVGui::ProgressDialog &
+		progressDialog() const; //!< Progress dialog shown on multiple resource loads.
 
 		Data &data() const { return *m_data; } //!< Internal data used by the loading procedure.
 
-	private:
+	  private:
 		std::unique_ptr<Data> m_data;
 	};
 
@@ -82,20 +83,18 @@ struct LoadResourceArguments {
 		boost::optional<LevelOptions>
 			m_options; //!< User-defined properties to be applied as a level.
 
-	public:
+	  public:
 		ResourceData() {}
-		ResourceData(const TFilePath &path)
-			: m_path(path) {}
+		ResourceData(const TFilePath &path) : m_path(path) {}
 	};
 
 	enum ImportPolicy //!  Policy adopted for resources external to current scene.
-	{
-		ASK_USER, //!< User is prompted for a resolution.
-		IMPORT,   //!< Resources are copied to scene folders (\a overwrites).
-		LOAD,	 //!< Resources are loaded from their original paths.
+	{ ASK_USER,		  //!< User is prompted for a resolution.
+	  IMPORT,		  //!< Resources are copied to scene folders (\a overwrites).
+	  LOAD,			  //!< Resources are loaded from their original paths.
 	};
 
-public:
+  public:
 	std::vector<ResourceData> resourceDatas; //!< [\p In/Out]  Data identifying a single resource.
 
 	// reuse TFrameIds retrieved by FileBrowser
@@ -108,13 +107,17 @@ public:
 		row1, //!< [\p Out]     Ending xsheet row where resources have been inserted (included).
 		col1; //!< [\p Out]     Ending xsheet column where resources have been inserted (included).
 
-	ImportPolicy importPolicy; //!< [\p In]      Policy adopted for resources external to current scene.
-	bool expose;			   //!< [\p In]      Whether resources must be exposed in the xsheet.
+	ImportPolicy
+		importPolicy; //!< [\p In]      Policy adopted for resources external to current scene.
+	bool expose;	  //!< [\p In]      Whether resources must be exposed in the xsheet.
 
-	std::vector<TXshLevel *> loadedLevels; //!< [\p Out]     Levels loaded by resource loading procedures. Multiple
-										   //!               levels \a may be loaded for a single resource data.
-public:
-	/*- Resourceは常にLoadするように変更（ファイルをプロジェクトフォルダにコピー（=Import）したい場合は、ユーザが手動で行う） -*/
+	std::vector<TXshLevel *>
+		loadedLevels; //!< [\p Out]     Levels loaded by resource loading procedures. Multiple
+					  //!               levels \a may be loaded for a single resource data.
+  public:
+	/*-
+	 * Resourceは常にLoadするように変更（ファイルをプロジェクトフォルダにコピー（=Import）したい場合は、ユーザが手動で行う）
+	 * -*/
 	LoadResourceArguments()
 		: row0(-1), col0(-1), row1(-1), col1(-1)
 		  //, importPolicy(ASK_USER)
@@ -137,7 +140,7 @@ public:
 
 class ConvertingPopup : public QDialog
 {
-public:
+  public:
 	ConvertingPopup(QWidget *parent, QString fileName);
 	~ConvertingPopup();
 };
@@ -147,8 +150,8 @@ public:
 void newScene();
 
 bool loadScene(ToonzScene &scene, const TFilePath &scenePath, bool import);
-bool loadScene(const TFilePath &scenePath,
-			   bool updateRecentFile = true, bool checkSaveOldScene = true);
+bool loadScene(const TFilePath &scenePath, bool updateRecentFile = true,
+			   bool checkSaveOldScene = true);
 bool loadScene();
 
 bool loadSubScene();
@@ -181,7 +184,7 @@ bool saveSound(TXshSoundLevel *sc);
 bool loadColorModel(const TFilePath &fp, int paletteFrame = 0);
 
 /*! \note     Will fallback to loadResourceFolders() in case all
-              argument paths are folders.                                 */
+			  argument paths are folders.                                 */
 
 enum CacheTlvBehavior {
 	ON_DEMAND = 0,		 // image data will be loaded when needed
@@ -190,41 +193,38 @@ enum CacheTlvBehavior {
 };
 
 int loadResources(
-	LoadResourceArguments &args,				//!< Resources to be loaded.
-	bool updateRecentFiles = true,				//!< Whether Toonz's <I>Recent Files</I> list must be updated.
-	LoadResourceArguments::ScopedBlock *sb = 0, //!< Load block. May be nonzero in order to extend block data
-												//!  access and finalization.
-												//!< Loads a group of resources by path.
-												//!  \return  The actually loaded levels count.
+	LoadResourceArguments &args,   //!< Resources to be loaded.
+	bool updateRecentFiles = true, //!< Whether Toonz's <I>Recent Files</I> list must be updated.
+	LoadResourceArguments::ScopedBlock *sb =
+		0, //!< Load block. May be nonzero in order to extend block data
+		   //!  access and finalization.
+		   //!< Loads a group of resources by path.
+		   //!  \return  The actually loaded levels count.
 	int xFrom = -1,
-	int xTo = -1,
-	std::wstring levelName = L"",
-	int step = -1,
-	int inc = -1,
-	int frameCount = -1,
-	bool doesFileActuallyExist = true,
-	CacheTlvBehavior cachingBehavior = ON_DEMAND);
+	int xTo = -1, std::wstring levelName = L"", int step = -1, int inc = -1, int frameCount = -1,
+	bool doesFileActuallyExist = true, CacheTlvBehavior cachingBehavior = ON_DEMAND);
 
-int loadResourceFolders(
-	LoadResourceArguments &args,			   //!< Resource folders to be loaded.
-	LoadResourceArguments::ScopedBlock *sb = 0 //!< Load block. May be nonzero in order to extend block data
-											   //!  access and finalization.
-	);										   //!< Loads the specified folders in current xsheet.
-											   //!  \return  The actually loaded levels count.
-bool exposeLevel(TXshSimpleLevel *sl, int row, int col,
-				 bool insert = false, bool overWrite = false);
-bool exposeLevel(TXshSimpleLevel *sl, int row, int col,
-				 const std::vector<TFrameId> &fids,
+int loadResourceFolders(LoadResourceArguments &args, //!< Resource folders to be loaded.
+						LoadResourceArguments::ScopedBlock *sb =
+							0 //!< Load block. May be nonzero in order to extend block data
+							  //!  access and finalization.
+						);	//!< Loads the specified folders in current xsheet.
+							  //!  \return  The actually loaded levels count.
+bool exposeLevel(TXshSimpleLevel *sl, int row, int col, bool insert = false,
+				 bool overWrite = false);
+bool exposeLevel(TXshSimpleLevel *sl, int row, int col, const std::vector<TFrameId> &fids,
 				 bool insert = false, bool overWrite = false);
 
 // se e' necessario salvare la scena chiede il permesso all'utente (save,discard,cancel).
-// Ritorna false se l'utente ha risposto Cancel o se il salvataggio della scena e' fallito per qualche motivo
+// Ritorna false se l'utente ha risposto Cancel o se il salvataggio della scena e' fallito per
+// qualche motivo
 bool saveSceneIfNeeded(QString msg);
 
 //! Create and expose column with comment in \b commentList.
 bool exposeComment(int row, int &col, QList<QString> commentList, QString fileName);
 
-bool importLipSync(TFilePath levelPath, QList<TFrameId> frameList, QList<QString> commentList, QString fileName);
+bool importLipSync(TFilePath levelPath, QList<TFrameId> frameList, QList<QString> commentList,
+				   QString fileName);
 
 } // namespace IoCmd
 
