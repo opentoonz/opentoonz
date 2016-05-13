@@ -2050,7 +2050,7 @@ QString BrowserPopupController::getPath()
 	TFilePath fp = m_browserPopup->getPath();
 	if (scene)
 		fp = scene->codeFilePath(fp);
-	std::cout << toString(fp.getWideString()) << std::endl;
+	std::cout << ::to_string(fp) << std::endl;
 	return toQString(fp);
 }
 

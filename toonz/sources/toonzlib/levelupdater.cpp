@@ -47,12 +47,12 @@ void enforceBpp(TPropertyGroup *pg, int bpp, bool upgradeOnly)
 		int idx = bppProp->getIndex();
 
 		// Search for a suitable 32-bit or 64-bit value
-		int currentBpp = upgradeOnly ? atoi(bppProp->getValueAsString().c_str()) : 0;
+		int currentBpp = upgradeOnly ? std::stoi(bppProp->getValueAsString()) : 0;
 		int targetBpp = (std::numeric_limits<int>::max)(), targetIdx = -1;
 
 		int i, count = (int)range.size();
 		for (i = 0; i < count; ++i) {
-			int bppEntry = atoi(toString(range[i]).c_str());
+			int bppEntry = std::stoi(range[i]);
 			if ((bppEntry % bpp == 0) && currentBpp <= bppEntry && bppEntry < targetBpp)
 				targetBpp = bppEntry, targetIdx = i;
 		}
@@ -313,7 +313,7 @@ TFilePath LevelUpdater::getNewTemporaryFilePath(const TFilePath &fp)
 	int count = 1;
 
 	for (;;) {
-		fp2 = fp.withName(fp.getWideName() + L"__" + toWideString(count++));
+		fp2 = fp.withName(fp.getWideName() + L"__" + std::to_wstring(count++));
 		if (!TSystem::doesExistFileOrLevel(fp2))
 			break;
 	}

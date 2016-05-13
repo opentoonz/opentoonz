@@ -859,7 +859,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	}
 
 	TFilePath gRootDir = getGlobalRoot();
-	if (toString(gRootDir.getWideString()) == "") {
+	if (::to_string(gRootDir) == "") {
 		std::string errMsg("Unable to get TFARMGLOBALROOT environment variable");
 		addToMessageLog(errMsg);
 
@@ -877,7 +877,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	if (!gRootDirExists) {
 		std::string errMsg("Unable to start the Server");
 		errMsg += "\n";
-		errMsg += "The directory " + toString(gRootDir.getWideString()) + " specified as Global Root does not exist";
+		errMsg += "The directory " + ::to_string(gRootDir) + " specified as Global Root does not exist";
 		;
 
 		addToMessageLog(errMsg);
@@ -902,7 +902,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	} catch (TException &e) {
 		std::string errMsg("Unable to start the Server");
 		errMsg += "\n";
-		errMsg += toString(e.getMessage());
+		errMsg += ::to_string(e.getMessage());
 		addToMessageLog(errMsg);
 		setStatus(TService::Stopped, NO_ERROR, 0); // exit the program
 	}
@@ -1071,7 +1071,7 @@ void FarmServerService::loadDiskMountingPoints(const TFilePath &fp)
 {
 	Tifstream is(fp);
 	if (!is)
-		throw std::string("File " + toString(fp.getWideString()) + " not found");
+		throw std::string("File " + ::to_string(fp) + " not found");
 	char buffer[1024];
 	while (is.getline(buffer, sizeof(buffer))) {
 		char *s = buffer;

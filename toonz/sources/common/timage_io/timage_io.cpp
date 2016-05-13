@@ -589,7 +589,7 @@ void TImageWriter::save(const TImageP &img)
 			p->setValue(range[2]); // Horrible. See tiio_tif.cpp (732 or near)     -.-'
 		}
 
-		int bpp = p ? atoi((toString(p->getValue()).c_str())) : 32;
+		int bpp = p ? std::stoi(p->getValue()) : 32;
 
 		//  bpp       1  8  16 24 32 40  48 56  64
 		int spp[] = {1, 1, 1, 4, 4, 0, 4, 0, 4};	// 0s are for pixel sizes which are normally unsupported

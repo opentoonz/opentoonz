@@ -392,7 +392,7 @@ int main(int argc, char *argv[])
 	a.processEvents();
 
 	// Carico la traduzione contenuta in toonz.qm (se ï¿½ presente)
-	QString languagePathString = QString::fromStdString(toString(TEnv::getConfigDir() + "loc"));
+	QString languagePathString = QString::fromStdString(::to_string(TEnv::getConfigDir() + "loc"));
 #ifndef WIN32
 	//the merge of menu on osx can cause problems with different languages with the Preferences menu
 	//qt_mac_set_menubar_merge(false);

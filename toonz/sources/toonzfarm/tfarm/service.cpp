@@ -445,7 +445,7 @@ void TService::install(const std::string &name, const std::string &displayName, 
 			SERVICE_WIN32_OWN_PROCESS,				   // service type
 			SERVICE_DEMAND_START,					   // start type
 			SERVICE_ERROR_NORMAL,					   // error control type
-			toString(appPath.getWideString()).c_str(), // service's binary
+			::to_string(appPath.getWideString()).c_str(), // service's binary
 			NULL,									   // no load ordering group
 			NULL,									   // no tag identifier
 			TEXT(SZDEPENDENCIES),					   // dependencies

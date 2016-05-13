@@ -414,7 +414,7 @@ void GlFontManager::drawText(/*const TRectD bBox,*/
 	if (!m_currentFont)
 		return;
 
-	std::string text = toString(wtext);
+	std::string text = ::to_string(wtext);
 	const char *textString = text.c_str();
 	glListBase(m_base);
 	/*

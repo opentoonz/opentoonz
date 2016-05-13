@@ -917,7 +917,7 @@ bool VectorizerPopup::apply()
 	for (it; it != levels.end(); it++) {
 		TXshSimpleLevel *sl = dynamic_cast<TXshSimpleLevel *>(*it);
 		if (!sl || !sl->getSimpleLevel() || !isLevelToConvert(sl)) {
-			QString levelName = tr(toString(sl->getName()).c_str());
+			QString levelName = tr(::to_string(sl->getName()).c_str());
 			QString errorMsg = tr("Cannot convert to vector the current selection.") + levelName;
 			error(errorMsg);
 			continue;

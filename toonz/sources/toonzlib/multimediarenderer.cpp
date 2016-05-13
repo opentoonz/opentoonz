@@ -371,7 +371,6 @@ void MultimediaRenderer::Imp::start()
 		std::wstring fpName = m_fp.getWideName() +
 						 L"_" + columnName + (columnId == columnName ? L"" : L"(" + columnId + L")") +
 						 (fxId.empty() ? L"" : L"_" + fxName + (fxId == fxNameNoSpaces ? L"" : L"(" + fxId + L")"));
-		//+ modeStr + toWideString(columnIndex+1);
 		TFilePath movieFp(m_fp.withName(fpName));
 
 		//Initialize a MovieRenderer with our infos

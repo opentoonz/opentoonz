@@ -463,13 +463,13 @@ bool TSpectrumParam::isNotificationEnabled() const
 namespace
 {
 
-inline std::string toString(const TPixel32 &color)
+inline std::string to_string(const TPixel32 &color)
 {
 	std::string alias = "(";
-	alias += ::toString(color.r) + ",";
-	alias += ::toString(color.g) + ",";
-	alias += ::toString(color.b) + ",";
-	alias += ::toString(color.m);
+	alias += std::to_string(color.r) + ",";
+	alias += std::to_string(color.g) + ",";
+	alias += std::to_string(color.b) + ",";
+	alias += std::to_string(color.m);
 	alias += ")";
 	return alias;
 }
@@ -477,8 +477,8 @@ inline std::string toString(const TPixel32 &color)
 inline std::string toString(const TSpectrum::ColorKey &key, int precision)
 {
 	std::string alias = "(";
-	alias += ::toString(key.first, precision) + ",";
-	alias += toString(key.second);
+	alias += ::to_string(key.first, precision) + ",";
+	alias += to_string(key.second);
 	alias += ")";
 	return alias;
 }

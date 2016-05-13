@@ -75,7 +75,7 @@ bool makePathUnique(ToonzScene *scene, TFilePath &path)
 	bool ret = false;
 	while (TSystem::doesExistFileOrLevel(scene->decodeFilePath(path))) {
 		ret = true;
-		path = path.withName(name + L"_" + toWideString(id));
+		path = path.withName(name + L"_" + std::to_wstring(id));
 		id++;
 	}
 	return ret;

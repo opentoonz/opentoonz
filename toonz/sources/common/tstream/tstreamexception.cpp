@@ -12,7 +12,7 @@ namespace
 {
 	return L"File: " +
 		   is.getFilePath().getWideString() +
-		   L":" + toWideString(is.getLine());
+		   L":" + std::to_wstring(is.getLine());
 }
 
 std::wstring message(TIStream &is, std::wstring msg)
@@ -22,7 +22,7 @@ std::wstring message(TIStream &is, std::wstring msg)
 
 std::wstring message(TIStream &is, std::string msg)
 {
-	return message(is, toWideString(msg));
+	return message(is, ::to_wstring(msg));
 }
 
 } // namespace

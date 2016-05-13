@@ -967,7 +967,7 @@ void doFill(const TImageP &img,
 
 		if (tileSaver.getTileSet()->getTileCount() != 0) {
 			static int count = 0;
-			TSystem::outputDebug("FILL" + toString(count++) + "\n");
+			TSystem::outputDebug("FILL" + std::to_string(count++) + "\n");
 			if (offs != TPoint())
 				for (int i = 0; i < tileSet->getTileCount(); i++) {
 					TTileSet::Tile *t = tileSet->editTile(i);
@@ -2059,7 +2059,7 @@ void FillTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
 				invalidate();
 				return;
 			}
-			TSystem::outputDebug("ok. pix=" + toString(pix.getTone()) + "," + toString(pix.getPaint()) + "\n");
+			TSystem::outputDebug("ok. pix=" + std::to_string(pix.getTone()) + "," + std::to_string(pix.getPaint()) + "\n");
 		} else
 			return;
 		doFill(img, pos, params, e.isShiftPressed(), m_level.getPointer(), getCurrentFid());
@@ -2116,7 +2116,7 @@ bool FillTool::onPropertyChanged(std::string propertyName)
 
 	//Areas, Lines etc.
 	if (propertyName == m_colorType.getName()) {
-		FillColorType = toString(m_colorType.getValue());
+		FillColorType = ::to_string(m_colorType.getValue());
 		rectPropChangedflag = true;
 
 		/*--- ColorModelのCursor更新のためにSIGNALを出す ---*/
@@ -2131,13 +2131,13 @@ bool FillTool::onPropertyChanged(std::string propertyName)
 			FillOnion = (int)(m_onion.getValue());
 			FillSegment = (int)(m_segment.getValue());
 		}
-		FillType = toString(m_fillType.getValue());
+		FillType = ::to_string(m_fillType.getValue());
 		rectPropChangedflag = true;
 	}
 	// Onion Skin
 	else if (propertyName == m_onion.getName()) {
 		if (m_onion.getValue())
-			FillType = toString(m_fillType.getValue());
+			FillType = ::to_string(m_fillType.getValue());
 		FillOnion = (int)(m_onion.getValue());
 	}
 	// Frame Range
@@ -2158,7 +2158,7 @@ bool FillTool::onPropertyChanged(std::string propertyName)
 	// Segment
 	else if (propertyName == m_segment.getName()) {
 		if (m_segment.getValue())
-			FillType = toString(m_fillType.getValue());
+			FillType = ::to_string(m_fillType.getValue());
 		FillSegment = (int)(m_segment.getValue());
 	}
 
@@ -2300,8 +2300,8 @@ void FillTool::onActivate()
 	*/
 	if (m_firstTime) {
 		m_fillDepth.setValue(TDoublePairProperty::Value(MinFillDepth, MaxFillDepth));
-		m_fillType.setValue(toWideString((FillType.getValue())));
-		m_colorType.setValue(toWideString((FillColorType.getValue())));
+		m_fillType.setValue(::to_wstring(FillType.getValue()));
+		m_colorType.setValue(::to_wstring(FillColorType.getValue()));
 		//		m_onlyEmpty.setValue(FillSelective ? 1 :0);
 		m_onion.setValue(FillOnion ? 1 : 0);
 		m_segment.setValue(FillSegment ? 1 : 0);

@@ -8,7 +8,7 @@
 using TConsts::epsilon;
 
 TMathException::TMathException(std::string msg)
-	: m_msg(toWideString(msg))
+	: m_msg(::to_wstring(msg))
 {
 }
 

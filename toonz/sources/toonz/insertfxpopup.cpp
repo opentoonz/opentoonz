@@ -124,8 +124,8 @@ TFx *createMacroFxByPath(TFilePath path)
 		std::string oldPortName = fx->getInputPortName(i);
 		std::string inFxOldId = oldPortName;
 		inFxOldId.erase(0, inFxOldId.find_last_of("_") + 1);
-		assert(oldNewId.contains(toWideString(inFxOldId)));
-		std::string inFxNewId = toString(oldNewId[toWideString(inFxOldId)]);
+		assert(oldNewId.contains(::to_wstring(inFxOldId)));
+		std::string inFxNewId = ::to_string(oldNewId[::to_wstring(inFxOldId)]);
 		std::string newPortName = oldPortName;
 		newPortName.erase(newPortName.find_last_of("_") + 1, newPortName.size() - 1);
 		newPortName.append(inFxNewId);

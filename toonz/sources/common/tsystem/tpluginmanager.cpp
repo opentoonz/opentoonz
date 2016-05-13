@@ -144,7 +144,7 @@ void TPluginManager::loadPlugin(const TFilePath &fp)
 		TLogger::warning() << "Unable to load " << fp;
 #ifdef _WIN32
 		std::wstring getFormattedMessage(DWORD lastError);
-		TLogger::warning() << toString(getFormattedMessage(GetLastError()));
+		TLogger::warning() << ::to_string(getFormattedMessage(GetLastError()));
 #else
 		TLogger::warning() << dlerror();
 #endif

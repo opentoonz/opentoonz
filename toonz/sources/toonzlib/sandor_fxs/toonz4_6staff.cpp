@@ -45,7 +45,7 @@ void convertParam(double param[], const char *cParam[], int cParamLen)
 {
 	std::string app;
 	for (int i = 1; i < 12; i++) {
-		app = toString(param[i]);
+		app = std::to_string(param[i]);
 		cParam[i] = strsave(app.c_str());
 	}
 }

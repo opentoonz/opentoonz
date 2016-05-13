@@ -688,12 +688,12 @@ bool Convert2Tlv::init(std::string &errorMessage)
 		if (m_lr1)
 			m_level1 = m_lr1->loadInfo();
 	} catch (...) {
-		errorMessage = "Error: can't read level " + toString(m_levelIn1.getWideString());
+		errorMessage = "Error: can't read level " + ::to_string(m_levelIn1.getWideString());
 		return false;
 	}
 
 	if (m_level1->getFrameCount() == 0) {
-		errorMessage = "Error: can't find level " + toString(m_levelIn1.getWideString());
+		errorMessage = "Error: can't find level " + ::to_string(m_levelIn1.getWideString());
 		return false;
 	}
 
@@ -705,12 +705,12 @@ bool Convert2Tlv::init(std::string &errorMessage)
 			if (m_lr2)
 				level2 = m_lr2->loadInfo();
 		} catch (...) {
-			errorMessage = "Error: can't read level " + toString(m_levelIn2.getWideString());
+			errorMessage = "Error: can't read level " + ::to_string(m_levelIn2.getWideString());
 			return false;
 		}
 
 		if (level2->getFrameCount() == 0) {
-			errorMessage = "Error: can't find level " + toString(m_levelIn2.getWideString());
+			errorMessage = "Error: can't find level " + ::to_string(m_levelIn2.getWideString());
 			return false;
 		}
 
@@ -734,7 +734,7 @@ bool Convert2Tlv::init(std::string &errorMessage)
 		TImageReaderP ir1 = m_lr1->getFrameReader(m_it->first);
 		const TImageInfo *info1 = ir1->getImageInfo();
 		if (!info1) {
-			errorMessage = "Error: can't read frame " + toString(m_it->first.getNumber()) + " of level  " + toString(m_levelIn1.getWideString());
+			errorMessage = "Error: can't read frame " + std::to_string(m_it->first.getNumber()) + " of level  " + ::to_string(m_levelIn1.getWideString());
 			return false;
 		}
 
@@ -751,7 +751,7 @@ bool Convert2Tlv::init(std::string &errorMessage)
 			if (ir2) {
 				const TImageInfo *info2 = ir2->getImageInfo();
 				if (!info1) {
-					errorMessage = "Error: can't read frame " + toString(it2->first.getNumber()) + " of level  " + toString(m_levelIn2.getWideString());
+					errorMessage = "Error: can't read frame " + std::to_string(it2->first.getNumber()) + " of level  " + ::to_string(m_levelIn2.getWideString());
 					;
 					return false;
 				}
@@ -815,7 +815,7 @@ bool Convert2Tlv::convertNext(std::string &errorMessage)
 	TImageReaderP ir1 = m_lr1->getFrameReader(m_it->first);
 	TRasterImageP imgIn1 = (TRasterImageP)ir1->load();
 	if (!imgIn1) {
-		errorMessage = "Error: cannot read frame" + toString(m_it->first.getNumber()) + " of " + toString(m_levelIn1.getWideString()) + "!";
+		errorMessage = "Error: cannot read frame" + std::to_string(m_it->first.getNumber()) + " of " + ::to_string(m_levelIn1.getWideString()) + "!";
 		return false;
 	}
 	TRasterP rin1 = imgIn1->getRaster();
@@ -829,7 +829,7 @@ bool Convert2Tlv::convertNext(std::string &errorMessage)
 		TImageReaderP ir2 = m_lr2->getFrameReader(m_it->first);
 		imgIn2 = (TRasterImageP)ir2->load();
 		if (!imgIn2) {
-			errorMessage = "Error: cannot read frame " + toString(m_it->first.getNumber()) + " of " + toString(m_levelIn2.getWideString()) + "!";
+			errorMessage = "Error: cannot read frame " + std::to_string(m_it->first.getNumber()) + " of " + ::to_string(m_levelIn2.getWideString()) + "!";
 			return false;
 		}
 		rin2 = imgIn2->getRaster();

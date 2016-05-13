@@ -407,14 +407,14 @@ public:
 	{
 		int id = style->getTagId();
 		if (m_table.find(id) != m_table.end()) {
-			throw TException("Duplicate color style declaration. id = " + toString(id));
+			throw TException("Duplicate color style declaration. id = " + std::to_string(id));
 		}
 		m_table.insert(std::make_pair(id, Item(style)));
 		std::vector<int> ids;
 		style->getObsoleteTagIds(ids);
 		for (std::vector<int>::iterator it = ids.begin(); it != ids.end(); ++it) {
 			if (m_table.find(*it) != m_table.end()) {
-				throw TException("Duplicate color style declaration for obsolete style. id = " + toString(*it));
+				throw TException("Duplicate color style declaration for obsolete style. id = " + std::to_string(*it));
 			}
 			m_table.insert(std::make_pair(*it, Item(style->clone(), true)));
 		}
@@ -424,7 +424,7 @@ public:
 	{
 		Table::iterator it = m_table.find(id);
 		if (it == m_table.end())
-			throw TException("Unknown color style id; id = " + toString(id));
+			throw TException("Unknown color style id; id = " + std::to_string(id));
 
 		isObsolete = it->second.m_isObsolete;
 
@@ -548,19 +548,19 @@ void TColorStyle::save(TOutputStreamInterface &os) const
 	std::wstring origName = getOriginalName();
 
 	if (gname != L"") {
-		os << toString(L"|" + gname);
+		os << ::to_string(L"|" + gname);
 
 		//save the original name from studio palette
 		if (origName != L"") {
 			//write two "@"s if the edited flag is ON
-			os << toString(((m_isEditedFromOriginal) ? L"@@" : L"@") + origName);
+			os << ::to_string(((m_isEditedFromOriginal) ? L"@@" : L"@") + origName);
 		}
 	}
 
 	if (numberedName)
 		name.insert(0, L"_");
 
-	os << toString(name) << (int)getTagId();
+	os << ::to_string(name) << getTagId();
 	saveData(os);
 }
 
@@ -580,7 +580,7 @@ TColorStyle *TColorStyle::load(TInputStreamInterface &is)
 		is >> name;
 	}
 	if (name.length() > 0 && name[0] == '|') {
-		gname = toWideString(name.substr(1));
+		gname = ::to_wstring(name.substr(1));
 		is >> name;
 
 		//If the style is copied from studio palette, original name is here
@@ -588,16 +588,16 @@ TColorStyle *TColorStyle::load(TInputStreamInterface &is)
 			//if there are two "@"s, then activate the edited flag
 			if (name[1] == '@') {
 				isEdited = true;
-				origName = toWideString(name.substr(2));
+				origName = ::to_wstring(name.substr(2));
 			} else {
-				origName = toWideString(name.substr(1));
+				origName = ::to_wstring(name.substr(1));
 			}
 			is >> name;
 		}
 	}
 	int id = 0;
 	if (!name.empty() && '0' <= name[0] && name[0] <= '9') {
-		id = toInt(name);
+		id = std::stoi(name);
 		name = "color";
 	} else {
 		if (!name.empty() && name[0] == '_')
@@ -612,7 +612,7 @@ TColorStyle *TColorStyle::load(TInputStreamInterface &is)
 		style->loadData(id, is);
 	else
 		style->loadData(is);
-	style->setName(toWideString(name));
+	style->setName(::to_wstring(name));
 	style->setGlobalName(gname);
 	style->setOriginalName(origName);
 	style->setIsEditedFlag(isEdited);

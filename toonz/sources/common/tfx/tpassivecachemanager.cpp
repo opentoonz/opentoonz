@@ -512,7 +512,7 @@ void TPassiveCacheManager::setContextName(unsigned long renderId, const std::str
 		it = m_contextNames.insert(std::make_pair(name, 0)).first;
 
 	it->second = !it->second;
-	m_contextNamesByRenderId.insert(std::make_pair(renderId, name + "%" + ::toString(it->second)));
+	m_contextNamesByRenderId.insert(std::make_pair(renderId, name + "%" + std::to_string(it->second)));
 }
 
 //-------------------------------------------------------------------------

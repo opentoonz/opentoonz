@@ -90,7 +90,7 @@ DragSelectionTool::UndoRasterDeform::UndoRasterDeform(RasterSelectionTool *tool)
 {
 	RasterSelection *selection = (RasterSelection *)tool->getSelection();
 	m_oldStrokes = selection->getStrokes();
-	m_oldFloatingImageId = "UndoRasterDeform_old_floating_" + toString(m_id++);
+	m_oldFloatingImageId = "UndoRasterDeform_old_floating_" + std::to_string(m_id++);
 	TRasterP floatingRas = selection->getFloatingSelection();
 	TImageP floatingImage;
 	if (TRasterCM32P toonzRas = (TRasterCM32P)(floatingRas)) {
@@ -127,7 +127,7 @@ void DragSelectionTool::UndoRasterDeform::registerRasterDeformation()
 {
 	RasterSelection *selection = (RasterSelection *)m_tool->getSelection();
 	m_newStrokes = selection->getStrokes();
-	m_newFloatingImageId = "UndoRasterDeform_new_floating_" + toString(m_id);
+	m_newFloatingImageId = "UndoRasterDeform_new_floating_" + std::to_string(m_id);
 	TRasterP floatingRas = selection->getFloatingSelection();
 	TImageP floatingImage;
 	if (TRasterCM32P toonzRas = (TRasterCM32P)(floatingRas))

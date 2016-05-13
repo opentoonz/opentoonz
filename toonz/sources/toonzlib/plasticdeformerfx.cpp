@@ -42,12 +42,12 @@ std::string toString(const TAffine &aff)
 	return
 		//Observe that toString distinguishes + and - 0. That is a problem
 		//when comparing aliases - so near 0 values are explicitly rounded to 0.
-		(areAlmostEqual(aff.a11, 0.0) ? "0" : ::toString(aff.a11, 5)) + "," +
-		(areAlmostEqual(aff.a12, 0.0) ? "0" : ::toString(aff.a12, 5)) + "," +
-		(areAlmostEqual(aff.a13, 0.0) ? "0" : ::toString(aff.a13, 5)) + "," +
-		(areAlmostEqual(aff.a21, 0.0) ? "0" : ::toString(aff.a21, 5)) + "," +
-		(areAlmostEqual(aff.a22, 0.0) ? "0" : ::toString(aff.a22, 5)) + "," +
-		(areAlmostEqual(aff.a23, 0.0) ? "0" : ::toString(aff.a23, 5));
+		(areAlmostEqual(aff.a11, 0.0) ? "0" : ::to_string(aff.a11, 5)) + "," +
+		(areAlmostEqual(aff.a12, 0.0) ? "0" : ::to_string(aff.a12, 5)) + "," +
+		(areAlmostEqual(aff.a13, 0.0) ? "0" : ::to_string(aff.a13, 5)) + "," +
+		(areAlmostEqual(aff.a21, 0.0) ? "0" : ::to_string(aff.a21, 5)) + "," +
+		(areAlmostEqual(aff.a22, 0.0) ? "0" : ::to_string(aff.a22, 5)) + "," +
+		(areAlmostEqual(aff.a23, 0.0) ? "0" : ::to_string(aff.a23, 5));
 }
 
 //-----------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ std::string toString(SkVD *vd, double sdFrame)
 	std::string result;
 
 	for (int p = 0; p < SkVD::PARAMS_COUNT; ++p)
-		result += ::toString(vd->m_params[p]->getValue(sdFrame), 5) + " ";
+		result += ::to_string(vd->m_params[p]->getValue(sdFrame), 5) + " ";
 
 	return result;
 }
@@ -67,7 +67,7 @@ std::string toString(SkVD *vd, double sdFrame)
 std::string toString(const PlasticSkeleton::vertex_type &vx)
 {
 	// TODO: Add z and rigidity
-	return ::toString(vx.P().x, 5) + " " + ::toString(vx.P().y, 5);
+	return ::to_string(vx.P().x, 5) + " " + ::to_string(vx.P().y, 5);
 }
 
 //-----------------------------------------------------------------------------------
@@ -349,7 +349,7 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame, const TRenderSettin
 		TRop::depremultiply(tex); // Textures must be stored depremultiplied.
 								  // See docs about the tglDraw() below.
 		static TAtomicVar var;
-		const std::string &texId = "render_tex " + ::toString((int)++var);
+		const std::string &texId = "render_tex " + std::to_string(++var);
 
 		// Prepare an OpenGL context
 		std::auto_ptr<TOfflineGL> context(new TOfflineGL(tile.getRaster()->getSize()));

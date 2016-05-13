@@ -105,7 +105,7 @@ std::string ExternalPaletteFx::getAlias(double frame, const TRenderSettings &inf
 		TFx *fx = m_expalette.getFx();
 		TPaletteP plt(getPalette(fx, frame));
 		if (plt && plt->isAnimated())
-			alias += toString(frame);
+			alias += std::to_string(frame);
 	}
 
 	return alias;
@@ -124,7 +124,7 @@ void ExternalPaletteFx::doDryCompute(TRectD &rect, double frame, const TRenderSe
 
 		TPaletteP palette(getPalette(fx, frame));
 		if (palette && palette->isAnimated())
-			pltAlias += toString(frame);
+			pltAlias += std::to_string(frame);
 
 		TRenderSettings ri2(ri);
 		ExternalPaletteFxRenderData *data =
@@ -150,7 +150,7 @@ void ExternalPaletteFx::doCompute(TTile &tile, double frame, const TRenderSettin
 
 		TPaletteP palette(getPalette(fx, frame));
 		if (palette && palette->isAnimated())
-			pltAlias += toString(frame);
+			pltAlias += std::to_string(frame);
 
 		TRenderSettings ri2(ri);
 		ExternalPaletteFxRenderData *data =

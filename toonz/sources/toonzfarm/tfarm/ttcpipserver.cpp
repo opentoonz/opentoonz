@@ -94,7 +94,7 @@ int TTcpIpServerImp::readData(int sock, QString &data)
 	for (int i = x1; i < x2; ++i)
 		ssize.push_back(buff[i]);
 
-	int dataSize = toInt(ssize);
+	int dataSize = std::stoi(ssize);
 
 	unsigned long size = dataSize;
 	data = QString(buff + x2 + sizeof("#$#THE") - 1);

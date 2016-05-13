@@ -5900,7 +5900,7 @@ void OutlineViewerStyle::loadData(TInputStreamInterface &is)
 	is >> m_enumPar;
 	std::string str;
 	is >> str;
-	m_pathPar = TFilePath(toWideString(str));
+	m_pathPar = TFilePath(::to_wstring(str));
 }
 
 //-----------------------------------------------------------------------------
@@ -5916,7 +5916,7 @@ void OutlineViewerStyle::saveData(TOutputStreamInterface &os) const
 	os << int(m_boolPar);
 	os << m_intPar;
 	os << m_enumPar;
-	os << toString(m_pathPar.getWideString());
+	os << ::to_string(m_pathPar.getWideString());
 }
 
 //-----------------------------------------------------------------------------

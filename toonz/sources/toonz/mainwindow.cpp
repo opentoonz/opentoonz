@@ -177,7 +177,7 @@ void makePrivate(Room *room)
 	if (roomPath == TFilePath() || roomPath.getParentDir() != layoutDir) {
 		int count = 1;
 		for (;;) {
-			roomPath = layoutDir + ("room" + toString(count++) + ".ini");
+			roomPath = layoutDir + ("room" + std::to_string(count++) + ".ini");
 			if (!TFileStatus(roomPath).doesExist())
 				break;
 		}

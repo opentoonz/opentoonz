@@ -510,7 +510,7 @@ public:
 	{
 		assert(m_rootDir != TFilePath());
 
-		std::string name = "texture_" + toString(m_index);
+		std::string name = "texture_" + std::to_string(m_index);
 		m_os << name;
 		TFilePath filename =
 			((m_rootDir + "textures") + name).withType("bmp");
@@ -667,7 +667,7 @@ void TPalette::saveData(TOStream &os)
 				StyleAnimation &animation = sat->second;
 
 				std::map<std::string, std::string> attributes;
-				attributes["id"] = toString(styleId);
+				attributes["id"] = std::to_string(styleId);
 
 				os.openChild("style", attributes);
 				{
@@ -679,7 +679,7 @@ void TPalette::saveData(TOStream &os)
 						assert(cs);
 
 						attributes.clear();
-						attributes["frame"] = toString(frame);
+						attributes["frame"] = std::to_string(frame);
 
 						/*os.openChild("keycolor", attributes);                       // Up to Toonz 7.0, animations saved
               os << cs->getMainColor();                                   // the main color only

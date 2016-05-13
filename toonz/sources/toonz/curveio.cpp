@@ -203,7 +203,7 @@ bool ExportCurvePopup::execute()
 		TSystem::touchParentDir(fp);
 		Tofstream os(fp);
 		os << "# RELEASE:      5.0" << std::endl;
-		os << "# FILE NAME:    " << toString(fp.getWideString()) << std::endl;
+		os << "# FILE NAME:    " << ::to_string(fp) << std::endl;
 		os << "# COMPOSED BY:  " << TSystem::getUserName().toStdString() << std::endl;
 		os << "# MACHINE NAME: " << TSystem::getHostName().toStdString() << std::endl;
 		// os << "# DATE:         " << TSystem::getCurrentTime() << endl;

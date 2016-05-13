@@ -351,7 +351,7 @@ void TrackerTool::draw()
 		TPointD p1 = hook->getBPos(fid);
 		bool linked = p0 == p1;
 		drawHook(p0, linked ? ToolUtils::NormalHook : ToolUtils::PassHookA, m_hookSelectedIndex == i);
-		std::string hookName = toString(i + 1);
+		std::string hookName = std::to_string(i + 1);
 		TPixel32 balloonColor(200, 220, 205, 200);
 		TPoint balloonOffset(20, 20);
 		drawBalloon(p0, hookName, balloonColor, balloonOffset, false, &balloons);

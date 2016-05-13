@@ -398,7 +398,7 @@ std::pair<bool, int> MovieRenderer::Imp::saveFrame(double frame, const std::pair
 					imgA->setRaster(aux);
 				}
 
-				TImageCache::instance()->add(m_renderCacheId + toString(fid.getNumber()), imgA);
+				TImageCache::instance()->add(m_renderCacheId + std::to_string(fid.getNumber()), imgA);
 			}
 
 			success = true;
@@ -527,7 +527,7 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData)
 				getRange(m_scene, false, from, to); // It's ok since cancels can only happen from Toonz...
 
 				for (int i = from; i < to; i++)
-					TImageCache::instance()->remove(m_renderCacheId + toString(i + 1));
+					TImageCache::instance()->remove(m_renderCacheId + std::to_string(i + 1));
 			}
 
 			m_renderer.stopRendering();

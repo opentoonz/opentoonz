@@ -429,7 +429,7 @@ void FullColorEraserTool::onActivate()
 		m_size.setValue(FullcolorEraseSize);
 		m_opacity.setValue(FullcolorEraserOpacity);
 		m_hardness.setValue(FullcolorEraseHardness);
-		m_eraseType.setValue(toWideString(FullcolorEraserType.getValue()));
+		m_eraseType.setValue(::to_wstring(FullcolorEraserType.getValue()));
 		m_invertOption.setValue((bool)FullcolorEraserInvert);
 		m_multi.setValue((bool)FullcolorEraserRange);
 		m_firstTime = false;
@@ -957,7 +957,7 @@ bool FullColorEraserTool::onPropertyChanged(std::string propertyName)
 	FullcolorEraseSize = m_size.getValue();
 	FullcolorEraseHardness = m_hardness.getValue();
 	FullcolorEraserOpacity = m_opacity.getValue();
-	FullcolorEraserType = toString(m_eraseType.getValue());
+	FullcolorEraserType = ::to_string(m_eraseType.getValue());
 	FullcolorEraserInvert = (int)m_invertOption.getValue();
 	FullcolorEraserRange = (int)m_multi.getValue();
 	if (propertyName == "Hardness:" || propertyName == "Size:") {

@@ -738,7 +738,7 @@ void ViewerDraw::drawFieldGuide()
 	glEnd();
 	for (i = 1; i <= n; i++) {
 		TPointD delta = 0.03 * TPointD(ux, uy);
-		std::string s = toString(i);
+		std::string s = std::to_string(i);
 		tglDrawText(TPointD(0, i * uy) + delta, s);
 		tglDrawText(TPointD(0, -i * uy) + delta, s);
 		tglDrawText(TPointD(-i * ux, 0) + delta, s);

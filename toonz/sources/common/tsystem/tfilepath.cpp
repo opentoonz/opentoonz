@@ -259,14 +259,14 @@ void TFilePath::setPath(std::wstring path)
 
 TFilePath::TFilePath(const char *path)
 {
-	setPath(toWideString(path));
+	setPath(::to_wstring(path));
 }
 
 //-----------------------------------------------------------------------------
 
 TFilePath::TFilePath(const std::string &path)
 {
-	setPath(toWideString(path));
+	setPath(::to_wstring(path));
 }
 
 //-----------------------------------------------------------------------------
@@ -471,7 +471,7 @@ QString TFilePath::getQString() const
 std::ostream &operator<<(std::ostream &out, const TFilePath &path)
 {
 	std::wstring w = path.getWideString();
-	return out << toString(w) << " ";
+	return out << ::to_string(w) << " ";
 	//  string w = path.getString();
 	//  return out << w << " ";
 }
@@ -542,7 +542,7 @@ std::string TFilePath::getDottedType() const // ritorna l'estensione con PUNTO (
 	if (i == (int)std::wstring::npos)
 		return "";
 
-	return toLower(toString(str.substr(i)));
+	return toLower(::to_string(str.substr(i)));
 }
 
 //-----------------------------------------------------------------------------
@@ -554,7 +554,7 @@ std::string TFilePath::getUndottedType() const // ritorna l'estensione senza PUN
 	i = str.rfind(L".");
 	if (i == std::wstring::npos || i == str.length() - 1)
 		return "";
-	return toLower(toString(str.substr(i + 1)));
+	return toLower(::to_string(str.substr(i + 1)));
 }
 
 //-----------------------------------------------------------------------------
@@ -581,14 +581,14 @@ std::wstring TFilePath::getWideName() const // noDot! noSlash!
 
 std::string TFilePath::getName() const // noDot! noSlash!
 {
-	return toString(getWideName());
+	return ::to_string(getWideName());
 }
 
 //-----------------------------------------------------------------------------
 // es. TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
 std::string TFilePath::getLevelName() const
 {
-	return toString(getLevelNameW());
+	return ::to_string(getLevelNameW());
 }
 
 //-----------------------------------------------------------------------------
@@ -674,7 +674,7 @@ TFrameId TFilePath::getFrame() const
 		letter = str[k++] + ('a' - L'a');
 
 	if (number == 0 || k < i) // || letter!='\0')
-		throw(toString(m_path) + ": malformed frame name.");
+		throw(::to_string(m_path) + ": malformed frame name.");
 	return TFrameId(number, letter);
 }
 
@@ -692,18 +692,18 @@ TFilePath TFilePath::withType(const std::string &type) const
 		if (type == "")
 			return *this;
 		else if (type[0] == '.')
-			return TFilePath(m_path + toWideString(type));
+			return TFilePath(m_path + ::to_wstring(type));
 		else
-			return TFilePath(m_path + toWideString("." + type));
+			return TFilePath(m_path + ::to_wstring("." + type));
 	} else
 	// il path originale ha gia' il tipo
 	{
 		if (type == "")
 			return TFilePath(m_path.substr(0, i + j + 1));
 		else if (type[0] == '.')
-			return TFilePath(m_path.substr(0, i + j + 1) + toWideString(type));
+			return TFilePath(m_path.substr(0, i + j + 1) + ::to_wstring(type));
 		else
-			return TFilePath(m_path.substr(0, i + j + 2) + toWideString(type));
+			return TFilePath(m_path.substr(0, i + j + 2) + ::to_wstring(type));
 	}
 }
 
@@ -711,7 +711,7 @@ TFilePath TFilePath::withType(const std::string &type) const
 
 TFilePath TFilePath::withName(const std::string &name) const
 {
-	return withName(toWideString(name));
+	return withName(::to_wstring(name));
 }
 
 //-----------------------------------------------------------------------------
@@ -770,7 +770,7 @@ TFilePath TFilePath::withFrame(const TFrameId &frame, TFrameId::FrameFormat form
 		if (frame.isEmptyFrame() || frame.isNoFrame())
 			return *this;
 		else
-			return TFilePath(m_path + toWideString(ch + frame.expand(format)));
+			return TFilePath(m_path + ::to_wstring(ch + frame.expand(format)));
 	}
 
 	std::string frameString;
@@ -782,14 +782,14 @@ TFilePath TFilePath::withFrame(const TFrameId &frame, TFrameId::FrameFormat form
 	int k = str.substr(0, j).rfind(L'.');
 
 	if (k != (int)std::wstring::npos)
-		return TFilePath(m_path.substr(0, k + i + 1) + toWideString(frameString) + str.substr(j));
+		return TFilePath(m_path.substr(0, k + i + 1) + ::to_wstring(frameString) + str.substr(j));
 	else if (m_underscoreFormatAllowed) {
 		k = str.substr(0, j).rfind(L'_');
 		if (k != (int)std::wstring::npos &&
 			(k == j - 1 || isNumbers(str, k, j))) /*-- "_." の並びか、"_[数字]."の並びのとき --*/
-			return TFilePath(m_path.substr(0, k + i + 1) + ((frame.isNoFrame()) ? L"" : toWideString("_" + frame.expand(format))) + str.substr(j));
+			return TFilePath(m_path.substr(0, k + i + 1) + ((frame.isNoFrame()) ? L"" : ::to_wstring("_" + frame.expand(format))) + str.substr(j));
 	}
-	return TFilePath(m_path.substr(0, j + i + 1) + toWideString(frameString) + str.substr(j));
+	return TFilePath(m_path.substr(0, j + i + 1) + ::to_wstring(frameString) + str.substr(j));
 }
 
 //-----------------------------------------------------------------------------

@@ -121,7 +121,7 @@ public:
 
 		bool isPreview = (m_fp.getType() == "noext");
 
-		TImageCache::instance()->remove(toString(m_fp.getWideString() + L".0"));
+		TImageCache::instance()->remove(::to_string(m_fp.getWideString() + L".0"));
 		TNotifier::instance()->notify(TSceneNameChange());
 
 		if (Preferences::instance()->isGeneratedMovieViewEnabled()) {
@@ -265,7 +265,7 @@ bool RenderCommand::init(bool isPreview)
 			TSystem::mkDir(parent);
 			DvDirModel::instance()->refreshFolder(parent.getParentDir());
 		} catch (TException &e) {
-			DVGui::warning(QObject::tr("It is not possible to create folder : %1").arg(QString::fromStdString(toString(e.getMessage()))));
+			DVGui::warning(QObject::tr("It is not possible to create folder : %1").arg(QString::fromStdString(::to_string(e.getMessage()))));
 			return false;
 		} catch (...) {
 			DVGui::warning(QObject::tr("It is not possible to create a folder."));
@@ -348,7 +348,7 @@ void RenderCommand::flashRender()
 	TSystem::showDocument(m_fp);
 	//QDesktopServices::openUrl(QUrl(toQString(m_fp)));
 
-	TImageCache::instance()->remove(toString(m_fp.getWideString() + L".0"));
+	TImageCache::instance()->remove(::to_string(m_fp.getWideString() + L".0"));
 	TNotifier::instance()->notify(TSceneNameChange());
 }
 
@@ -444,7 +444,7 @@ void RenderCommand::rasterRender(bool isPreview)
 		TPropertyGroup *props = scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
 		std::string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
-		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
+		if (!AviCodecRestrictions::canWriteMovie(::to_wstring(codecName), res)) {
 			QString msg(QObject::tr("The resolution of the output camera does not fit with the options chosen for the output file format."));
 			DVGui::warning(msg);
 			return;
@@ -651,7 +651,7 @@ void RenderCommand::multimediaRender()
 		TPropertyGroup *props = scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
 		std::string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
-		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
+		if (!AviCodecRestrictions::canWriteMovie(::to_wstring(codecName), res)) {
 			QString msg(QObject::tr("The resolution of the output camera does not fit with the options chosen for the output file format."));
 			DVGui::warning(msg);
 			return;
@@ -767,7 +767,7 @@ void RenderCommand::doRender(bool isPreview)
 			/*-- 通常のRendering --*/
 			rasterRender(isPreview);
 	} catch (TException &e) {
-		DVGui::warning(QString::fromStdString(toString(e.getMessage())));
+		DVGui::warning(QString::fromStdString(::to_string(e.getMessage())));
 	} catch (...) {
 		DVGui::warning(QObject::tr("It is not possible to complete the rendering."));
 	}
