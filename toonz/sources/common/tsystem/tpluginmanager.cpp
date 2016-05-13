@@ -136,8 +136,7 @@ void TPluginManager::loadPlugin(const TFilePath &fp)
 #ifdef _WIN32
 	Plugin::Handle handle = LoadLibraryW(fp.getWideString().c_str());
 #else
-	std::wstring str_fp = fp.getWideString();
-	Plugin::Handle handle = dlopen(toString(str_fp).c_str(), RTLD_NOW); // RTLD_LAZY
+	Plugin::Handle handle = dlopen(::to_string(fp).c_str(), RTLD_NOW); // RTLD_LAZY
 #endif
 	if (!handle) {
 		// non riesce a caricare la libreria;
