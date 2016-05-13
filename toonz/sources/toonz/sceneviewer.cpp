@@ -1634,7 +1634,6 @@ void SceneViewer::drawScene()
 
 void SceneViewer::mult3DMatrix()
 {
-	assert(is3DView());
 	glTranslated(m_pan3D.x, m_pan3D.y, 0);
 	glScaled(m_zoomScale3D, m_zoomScale3D, 1);
 	glRotated(m_theta3D, 1, 0, 0);
@@ -1854,7 +1853,7 @@ void SceneViewer::zoomQt(bool forward, bool reset)
 }
 
 //-----------------------------------------------------------------------------
-/*! a factor for getting pixel-based zoom ratio 
+/*! a factor for getting pixel-based zoom ratio
 */
 double SceneViewer::getDpiFactor()
 {
@@ -1900,7 +1899,7 @@ double SceneViewer::getDpiFactor()
 }
 
 //-----------------------------------------------------------------------------
-/*! when showing the viewer with full-screen mode, 
+/*! when showing the viewer with full-screen mode,
 	add a zoom factor which can show image fitting with the screen size
 */
 
@@ -2329,15 +2328,15 @@ void SceneViewer::posToColumnIndexes(const TPoint &p, std::vector<int> &indexes,
 	args.m_onlyVisible = includeInvisible;
 
 	Stage::visit(picker, args); /*
-    picker, 
+    picker,
     scene,
     xsh,
     frame,
     currentColumnIndex,
     osm,
     false,
-    0, 
-    false, 
+    0,
+    false,
     includeInvisible);
     */
 
