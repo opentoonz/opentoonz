@@ -875,9 +875,7 @@ void ParamsPageSet::createControls(const TFxP &fx, int index)
 
 			while (!is.matchEndTag())
 				createPage(is, fx, index);
-		} catch (TException &) {
-			//			TMessage::error("Error loading %1:%2, %3",
-			//			fp, toString(is.getLine()), e.getMessage());
+		} catch (TException const&) {
 		}
 	}
 	// else createEmptyPage();

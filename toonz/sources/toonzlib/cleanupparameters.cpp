@@ -323,7 +323,6 @@ void CleanupParameters::saveData(TOStream &os) const
 		attr.clear();
 		attr["type"] = std::to_string(m_autocenterType);
 		attr["pegHoles"] = std::to_string(m_pegSide);
-		//attr["fieldGuide"] = toString((int)m_pegSide);
 		os.openCloseChild("autoCenter", attr);
 	}
 
@@ -335,7 +334,6 @@ void CleanupParameters::saveData(TOStream &os) const
 			attr["flip"] = flip;
 		if (m_rotate != 0)
 			attr["rotate"] = std::to_string(m_rotate);
-		//if(m_scale!=1) attr["scale"] = toString(m_scale);
 		if (m_offx != 0.0)
 			attr["xoff"] = std::to_string(m_offx);
 		if (m_offy != 0.0)
@@ -373,14 +371,6 @@ void CleanupParameters::saveData(TOStream &os) const
 	attr.clear();
 	if (m_path != TFilePath())
 		os.child("path") << m_path;
-
-	// attr["path"] = toString(m_path.getWideString());
-	// os.openCloseChild("path", attr);
-
-	//m_closestField = param->m_closestField;
-	//m_autoAdjustMode = param->m_autoAdjustMode;
-	//m_sharpness = param->m_sharpness;
-	//m_transparencyCheckEnabled = param->m_transparencyCheckEnabled;
 }
 
 //---------------------------------------------------------
