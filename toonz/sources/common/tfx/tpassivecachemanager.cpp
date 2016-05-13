@@ -94,38 +94,6 @@ CONSIDERATIONS:
 */
 
 //*****************************************************************************************
-//    Debug stuff
-//*****************************************************************************************
-
-/*
-#define DIAGNOSTICS
-#include "diagnostics.h"
-
-namespace
-{
-  QString prefix("#Passive.txt | STACK | ");
-
-  //--------------------------------------------------------------------------------------------------
-
-  inline std::string traduce(const TRectD& rect)
-  {
-    return "[" + toString(rect.x0) + " " + toString(rect.y0) + " " +
-      toString(rect.x1) + " " + toString(rect.y1) + "]";
-  }
-
-  //--------------------------------------------------------------------------------------------------
-
-  inline std::string traduce(const TAffine& aff)
-  {
-    return "(" + 
-      toString(aff.a11) + " " + toString(aff.a12) + " " +
-      toString(aff.a13) + " " + toString(aff.a21) + " " +
-      toString(aff.a22) + " " + toString(aff.a23) + ")";
-  }
-}
-*/
-
-//*****************************************************************************************
 //    Preliminaries
 //*****************************************************************************************
 
@@ -512,7 +480,7 @@ void TPassiveCacheManager::setContextName(unsigned long renderId, const std::str
 		it = m_contextNames.insert(std::make_pair(name, 0)).first;
 
 	it->second = !it->second;
-	m_contextNamesByRenderId.insert(std::make_pair(renderId, name + "%" + ::toString(it->second)));
+	m_contextNamesByRenderId.insert(std::make_pair(renderId, name + "%" + std::to_string(it->second)));
 }
 
 //-------------------------------------------------------------------------

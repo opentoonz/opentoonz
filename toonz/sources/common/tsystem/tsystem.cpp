@@ -943,7 +943,7 @@ bool TSystem::showDocument(const TFilePath &path)
 	return true;
 #else
 	string cmd = "open ";
-	string thePath(toString(path.getWideString()));
+	string thePath(::to_string(path));
 	UINT pos = 0, count = 0;
 	//string newPath;
 	char newPath[2048];
@@ -1001,7 +1001,7 @@ TSystemException::TSystemException(const TFilePath &fname, int err)
 //--------------------------------------------------------------
 
 TSystemException::TSystemException(const TFilePath &fname, const std::string &msg)
-	: m_fname(fname), m_err(-1), m_msg(toWideString(msg))
+	: m_fname(fname), m_err(-1), m_msg(::to_wstring(msg))
 {
 }
 //--------------------------------------------------------------
@@ -1014,7 +1014,7 @@ TSystemException::TSystemException(const TFilePath &fname, const wstring &msg)
 //--------------------------------------------------------------
 
 TSystemException::TSystemException(const std::string &msg)
-	: m_fname(""), m_err(-1), m_msg(toWideString(msg))
+	: m_fname(""), m_err(-1), m_msg(::to_wstring(msg))
 {
 }
 //--------------------------------------------------------------

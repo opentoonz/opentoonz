@@ -127,18 +127,18 @@ TLogger::Stream &TLogger::Stream::operator<<(std::string v)
 
 TLogger::Stream &TLogger::Stream::operator<<(int v)
 {
-	m_text += toString(v);
+	m_text += std::to_string(v);
 	return *this;
 }
 
 TLogger::Stream &TLogger::Stream::operator<<(double v)
 {
-	m_text += toString(v);
+	m_text += std::to_string(v);
 	return *this;
 }
 
 TLogger::Stream &TLogger::Stream::operator<<(const TFilePath &v)
 {
-	m_text += toString(v.getWideString());
+	m_text += v.getQString().toStdString();
 	return *this;
 }

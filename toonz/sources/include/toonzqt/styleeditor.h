@@ -595,10 +595,8 @@ class DVAPI StyleEditor : public QWidget
 	DVGui::StyleSample *m_newColor; //!< New style viewer (lower-right panel side).
 	DVGui::StyleSample *m_oldColor; //!< Old style viewer (lower-right panel side).
 
-#ifndef STUDENT
 	QPushButton *m_autoButton;  //!< "Auto Apply" checkbox on the right panel side.
 	QPushButton *m_applyButton; //!< "Apply" button on the right panel side.
-#endif
 
 	QToolBar *m_toolBar;							  //!< Lower toolbar.
 	ColorParameterSelector *m_colorParameterSelector; //!< Secondary color parameter selector in the lower toolbar.

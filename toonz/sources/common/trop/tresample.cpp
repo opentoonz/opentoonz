@@ -2947,7 +2947,7 @@ TAffine aff_0, inv_0;
 	minmax(negradx_ - rad_x, negrady_ - rad_y, posradx_ + rad_x, posrady_ + rad_y, inv_0,
 		   negradu_, negradv_, posradu_, posradv_);
 
-	//free_nocalc (coln);
+	/////////////////////////////////////////////////////////
 	if (coln)
 		delete (coln);
 	//free_nocalc (rown);

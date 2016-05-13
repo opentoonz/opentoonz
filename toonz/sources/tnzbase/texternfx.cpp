@@ -220,7 +220,7 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 	if (!ras)
 		return;
 	std::string args = m_args;
-	std::string executablePath = toString(m_executablePath.getWideString());
+	std::string executablePath = ::to_string(m_executablePath);
 	std::map<std::string, TFilePath> tmpFiles; // portname --> file
 	TFilePath outputTmpFile;
 
@@ -271,13 +271,13 @@ void TExternalProgramFx::doCompute(TTile &tile, double frame, const TRenderSetti
 		if (it != tmpFiles.end()) {
 			// e' una porta. il valore e' il nome del
 			// file temporaneo
-			value = "\"" + toString(it->second.getWideString()) + "\"";
+			value = "\"" + ::to_string(it->second.getWideString()) + "\"";
 		} else {
 			// e' un parametro
 			// se il nome non viene riconosciuto sostituisco la stringa nulla
 			TDoubleParamP param = TParamP(getParams()->getParam(name));
 			if (param)
-				value = toString(param->getValue(frame));
+				value = std::to_string(param->getValue(frame));
 		}
 
 		args.replace(i, m + 1, value);

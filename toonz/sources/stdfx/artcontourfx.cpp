@@ -62,7 +62,7 @@ public:
 	{
 		int argc = 12;
 		const char *argv[12];
-		argv[0] = strsave(toString(m_colorIndex->getValue()).c_str());
+		argv[0] = strsave(::to_string(m_colorIndex->getValue()).c_str());
 		getValues(argv, argc, frame);
 
 		SandorFxRenderData *artContourData = new SandorFxRenderData(ArtAtContour, argc, argv,
@@ -167,7 +167,7 @@ private:
 	{
 		std::string app;
 		for (int i = 1; i <= 11; i++) {
-			app = toString(param[i]);
+			app = std::to_string(param[i]);
 			cParam[i] = strsave(app.c_str());
 		}
 	}

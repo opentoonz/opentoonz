@@ -137,9 +137,9 @@ public:
 		std::map<std::string, std::string> attr;
 		attr["type"] = "double";
 		attr["name"] = p->getName();
-		attr["min"] = toString(p->getRange().first);
-		attr["max"] = toString(p->getRange().second);
-		attr["value"] = toString(p->getValue());
+		attr["min"] = std::to_string(p->getRange().first);
+		attr["max"] = std::to_string(p->getRange().second);
+		attr["value"] = std::to_string(p->getValue());
 		m_os.openCloseChild("property", attr);
 	}
 	void visit(TDoublePairProperty *p)
@@ -147,10 +147,10 @@ public:
 		std::map<std::string, std::string> attr;
 		attr["type"] = "pair";
 		attr["name"] = p->getName();
-		attr["min"] = toString(p->getRange().first);
-		attr["max"] = toString(p->getRange().second);
+		attr["min"] = std::to_string(p->getRange().first);
+		attr["max"] = std::to_string(p->getRange().second);
 		TDoublePairProperty::Value value = p->getValue();
-		attr["value"] = toString(value.first) + " " + toString(value.second);
+		attr["value"] = std::to_string(value.first) + " " + std::to_string(value.second);
 		m_os.openCloseChild("property", attr);
 	}
 	void visit(TIntPairProperty *p)
@@ -158,10 +158,10 @@ public:
 		std::map<std::string, std::string> attr;
 		attr["type"] = "pair";
 		attr["name"] = p->getName();
-		attr["min"] = toString(p->getRange().first);
-		attr["max"] = toString(p->getRange().second);
+		attr["min"] = std::to_string(p->getRange().first);
+		attr["max"] = std::to_string(p->getRange().second);
 		TIntPairProperty::Value value = p->getValue();
-		attr["value"] = toString(value.first) + " " + toString(value.second);
+		attr["value"] = std::to_string(value.first) + " " + std::to_string(value.second);
 		m_os.openCloseChild("property", attr);
 	}
 	void visit(TIntProperty *p)
@@ -169,9 +169,9 @@ public:
 		std::map<std::string, std::string> attr;
 		attr["type"] = "int";
 		attr["name"] = p->getName();
-		attr["min"] = toString(p->getRange().first);
-		attr["max"] = toString(p->getRange().second);
-		attr["value"] = toString(p->getValue());
+		attr["min"] = std::to_string(p->getRange().first);
+		attr["max"] = std::to_string(p->getRange().second);
+		attr["value"] = std::to_string(p->getValue());
 		m_os.openCloseChild("property", attr);
 	}
 	void visit(TBoolProperty *p)
@@ -187,7 +187,7 @@ public:
 		std::map<std::string, std::string> attr;
 		attr["type"] = "string";
 		attr["name"] = p->getName();
-		attr["value"] = toString(p->getValue());
+		attr["value"] = ::to_string(p->getValue());
 		m_os.openCloseChild("property", attr);
 	}
 
@@ -205,13 +205,13 @@ public:
 		std::map<std::string, std::string> attr;
 		attr["type"] = "enum";
 		attr["name"] = p->getName();
-		attr["value"] = toString(p->getValue());
+		attr["value"] = ::to_string(p->getValue());
 		if (TEnumProperty::isRangeSavingEnabled()) {
 			m_os.openChild("property", attr);
 			std::vector<std::wstring> range = p->getRange();
 			for (int i = 0; i < (int)range.size(); i++) {
 				attr.clear();
-				attr["value"] = toString(range[i]);
+				attr["value"] = ::to_string(range[i]);
 				m_os.openCloseChild("item", attr);
 			}
 			m_os.closeChild();
@@ -249,45 +249,45 @@ void TPropertyGroup::loadData(TIStream &is)
 			if (type != "string" && svalue == "")
 				throw TException("missing property value");
 			if (type == "double") {
-				double min = toDouble(is.getTagAttribute("min"));
-				double max = toDouble(is.getTagAttribute("max"));
-				add(new TDoubleProperty(name, min, max, toDouble(svalue)));
+				double min = std::stod(is.getTagAttribute("min"));
+				double max = std::stod(is.getTagAttribute("max"));
+				add(new TDoubleProperty(name, min, max, std::stod(svalue)));
 			}
 			if (type == "pair") {
-				double min = toDouble(is.getTagAttribute("min"));
-				double max = toDouble(is.getTagAttribute("max"));
+				double min = std::stod(is.getTagAttribute("min"));
+				double max = std::stod(is.getTagAttribute("max"));
 				TDoublePairProperty::Value v(0, 0);
 				int i = svalue.find(' ');
 				if (i != (int)std::string::npos) {
-					v.first = toDouble(svalue.substr(0, i));
-					v.second = toDouble(svalue.substr(i + 1));
+					v.first = std::stod(svalue.substr(0, i));
+					v.second = std::stod(svalue.substr(i + 1));
 				}
 				add(new TDoublePairProperty(name, min, max, v.first, v.second));
 			} else if (type == "int") {
-				int min = toInt(is.getTagAttribute("min"));
-				int max = toInt(is.getTagAttribute("max"));
-				add(new TIntProperty(name, min, max, toInt(svalue)));
+				int min = std::stoi(is.getTagAttribute("min"));
+				int max = std::stoi(is.getTagAttribute("max"));
+				add(new TIntProperty(name, min, max, std::stoi(svalue)));
 			} else if (type == "bool") {
 				if (svalue != "true" && svalue != "false")
 					throw TException("bad boolean property value");
 				add(new TBoolProperty(name, svalue == "true" ? true : false));
 			} else if (type == "string") {
-				add(new TStringProperty(name, toWideString(svalue)));
+				add(new TStringProperty(name, ::to_wstring(svalue)));
 			} else if (type == "enum") {
 				TEnumProperty *p = new TEnumProperty(name);
 				if (is.isBeginEndTag())
-					p->addValue(toWideString(svalue));
+					p->addValue(::to_wstring(svalue));
 				else {
 					while (is.matchTag(tagName)) {
 						if (tagName == "item") {
 							std::string item = is.getTagAttribute("value");
-							p->addValue(toWideString(item));
+							p->addValue(::to_wstring(item));
 						} else
 							throw TException("expected range property <item>");
 					}
 					is.closeChild();
 				}
-				p->setValue(toWideString(svalue));
+				p->setValue(::to_wstring(svalue));
 				add(p);
 			} else
 				throw TException("unrecognized property type : " + type);

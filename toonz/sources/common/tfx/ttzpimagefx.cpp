@@ -49,13 +49,13 @@ void insertIndexes(std::vector<std::string> items, PaletteFilterFxRenderData *t)
 		endtoken = strtok_s(NULL, subseps, &context);
 		if (!endtoken && isInt(starttoken)) {
 			int index;
-			index = toInt(starttoken);
+			index = std::stoi(starttoken);
 			t->m_colors.insert(index);
 		} else {
 			if (isInt(starttoken) && isInt(endtoken)) {
 				int start, end;
-				start = toInt(starttoken);
-				end = toInt(endtoken);
+				start = std::stoi(starttoken);
+				end = std::stoi(endtoken);
 				for (int i = start; i <= end; i++)
 					t->m_colors.insert(i);
 			}
@@ -70,13 +70,13 @@ void insertIndexes(std::vector<std::string> items, PaletteFilterFxRenderData *t)
 		endtoken = strtok(NULL, subseps);
 		if (!endtoken && isInt(starttoken)) {
 			int index;
-			index = toInt(starttoken);
+			index = std::stoi(starttoken);
 			t->m_colors.insert(index);
 		} else {
 			if (isInt(starttoken) && isInt(endtoken)) {
 				int start, end;
-				start = toInt(starttoken);
-				end = toInt(endtoken);
+				start = std::stoi(starttoken);
+				end = std::stoi(endtoken);
 				for (int i = start; i <= end; i++)
 					t->m_colors.insert(i);
 			}
@@ -136,9 +136,9 @@ std::string PaletteFilterFxRenderData::toString() const
 	std::string alias;
 	std::set<int>::const_iterator it = m_colors.begin();
 	for (; it != m_colors.end(); ++it)
-		alias += ::toString(*it);
-	alias += "keep=" + ::toString((int)m_keep);
-	alias += "type=" + ::toString(m_type);
+		alias += std::to_string(*it);
+	alias += "keep=" + std::to_string(m_keep);
+	alias += "type=" + std::to_string(m_type);
 	return alias;
 }
 
@@ -202,38 +202,38 @@ std::string SandorFxRenderData::toString() const
 {
 	std::string alias;
 	if (m_type == BlendTz) {
-		alias += ::toString(m_blendParams.m_colorIndex) + " ";
-		alias += ::toString(m_blendParams.m_smoothness) + " ";
-		alias += ::toString(m_blendParams.m_amount) + " ";
-		alias += ::toString(m_blendParams.m_noBlending);
+		alias += ::to_string(m_blendParams.m_colorIndex) + " ";
+		alias += std::to_string(m_blendParams.m_smoothness) + " ";
+		alias += std::to_string(m_blendParams.m_amount) + " ";
+		alias += std::to_string(m_blendParams.m_noBlending);
 		return alias;
 	}
 
 	if (m_type == Calligraphic || m_type == OutBorder) {
-		alias += ::toString(m_callParams.m_colorIndex) + " ";
-		alias += ::toString(m_callParams.m_noise) + " ";
-		alias += ::toString(m_callParams.m_accuracy) + " ";
-		alias += ::toString(m_callParams.m_upWDiagonal) + " ";
-		alias += ::toString(m_callParams.m_vertical) + " ";
-		alias += ::toString(m_callParams.m_upWDiagonal) + " ";
-		alias += ::toString(m_callParams.m_horizontal) + " ";
-		alias += ::toString(m_callParams.m_thickness);
+		alias += ::to_string(m_callParams.m_colorIndex) + " ";
+		alias += std::to_string(m_callParams.m_noise) + " ";
+		alias += std::to_string(m_callParams.m_accuracy) + " ";
+		alias += std::to_string(m_callParams.m_upWDiagonal) + " ";
+		alias += std::to_string(m_callParams.m_vertical) + " ";
+		alias += std::to_string(m_callParams.m_upWDiagonal) + " ";
+		alias += std::to_string(m_callParams.m_horizontal) + " ";
+		alias += std::to_string(m_callParams.m_thickness);
 		return alias;
 	}
 
 	if (m_type == ArtAtContour) {
-		alias += ::toString(m_contourParams.m_maxSize) + " ";
-		alias += ::toString(m_contourParams.m_minSize) + " ";
-		alias += ::toString(m_contourParams.m_maxOrientation) + " ";
-		alias += ::toString(m_contourParams.m_minOrientation) + " ";
-		alias += ::toString(m_contourParams.m_randomness) + " ";
-		alias += ::toString(m_contourParams.m_maxDistance) + " ";
-		alias += ::toString(m_contourParams.m_minDistance) + " ";
-		alias += ::toString(m_contourParams.m_density) + " ";
-		alias += ::toString(m_contourParams.m_keepLine) + " ";
-		alias += ::toString(m_contourParams.m_keepColor) + " ";
-		alias += ::toString(m_contourParams.m_includeAlpha) + " ";
-		alias += ::toString(m_contourParams.m_colorIndex) + " ";
+		alias += std::to_string(m_contourParams.m_maxSize) + " ";
+		alias += std::to_string(m_contourParams.m_minSize) + " ";
+		alias += std::to_string(m_contourParams.m_maxOrientation) + " ";
+		alias += std::to_string(m_contourParams.m_minOrientation) + " ";
+		alias += std::to_string(m_contourParams.m_randomness) + " ";
+		alias += std::to_string(m_contourParams.m_maxDistance) + " ";
+		alias += std::to_string(m_contourParams.m_minDistance) + " ";
+		alias += std::to_string(m_contourParams.m_density) + " ";
+		alias += std::to_string(m_contourParams.m_keepLine) + " ";
+		alias += std::to_string(m_contourParams.m_keepColor) + " ";
+		alias += std::to_string(m_contourParams.m_includeAlpha) + " ";
+		alias += ::to_string(m_contourParams.m_colorIndex) + " ";
 		alias += m_controllerAlias;
 		return alias;
 	}

@@ -1334,7 +1334,7 @@ bool EraserTool::onPropertyChanged(std::string propertyName)
 		/*--- polylineにした時、前回のpolyline選択をクリアする ---*/
 		if (m_eraseType.getValue() == POLYLINEERASE && !m_polyline.empty())
 			m_polyline.clear();
-		EraseType = toString(m_eraseType.getValue());
+		EraseType = ::to_string(m_eraseType.getValue());
 	}
 
 	else if (propertyName == m_toolSize.getName()) {
@@ -1361,7 +1361,7 @@ bool EraserTool::onPropertyChanged(std::string propertyName)
 	}
 
 	else if (propertyName == m_colorType.getName()) {
-		EraseColorType = toString(m_colorType.getValue());
+		EraseColorType = ::to_string(m_colorType.getValue());
 		/*-- ColorModelのCursor更新のためにSIGNALを出す --*/
 		TTool::getApplication()->getCurrentTool()->notifyToolChanged();
 	}
@@ -1439,10 +1439,10 @@ void EraserTool::onEnter()
 		return;
 	if (m_firstTime) {
 		m_toolSize.setValue(EraseSize);
-		m_eraseType.setValue(toWideString(EraseType.getValue()));
+		m_eraseType.setValue(::to_wstring(EraseType.getValue()));
 		m_currentStyle.setValue(EraseSelective ? 1 : 0);
 		m_invertOption.setValue(EraseInvert ? 1 : 0);
-		m_colorType.setValue(toWideString(EraseColorType.getValue()));
+		m_colorType.setValue(::to_wstring(EraseColorType.getValue()));
 		m_multi.setValue(EraseRange ? 1 : 0);
 		m_hardness.setValue(EraseHardness);
 		m_pencil.setValue(ErasePencil);

@@ -919,7 +919,7 @@ public:
 
 	static std::string getId(TXshChildLevel *level, int row)
 	{
-		return "sub:" + toString(level->getName()) + toString(row);
+		return "sub:" + ::to_string(level->getName()) + std::to_string(row);
 	}
 
 	TRaster32P generateRaster(const TDimension &iconSize) const;
@@ -991,7 +991,7 @@ std::string FileIconRenderer::getId(const TFilePath &path, const TFrameId &fid)
 		std::string fidNumber;
 		if (fid != TFrameId::NO_FRAME)
 			fidNumber = "frame:" + fid.expand(TFrameId::NO_PAD);
-		return "$:" + toString(path) + fidNumber;
+		return "$:" + ::to_string(path) + fidNumber;
 	}
 
 	//All the other types whose icon is the same for file type, get the same id per type.

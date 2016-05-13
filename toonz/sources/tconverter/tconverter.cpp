@@ -143,7 +143,7 @@ void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 				iw->save(rasImage);
 			}
 		} catch (...) {
-			string msg = "Frame " + toString(frames[i].getNumber()) + ": conversion failed!";
+			string msg = "Frame " + std::to_string(frames[i].getNumber()) + ": conversion failed!";
 			cout << msg << endl;
 		}
 	}
@@ -165,7 +165,7 @@ void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWr
 			images.push_back(img);
 			maxBbox += img->getBBox();
 		} catch (...) {
-			string msg = "Frame " + toString(frames[i].getNumber()) + ": conversion failed!";
+			string msg = "Frame " + std::to_string(frames[i].getNumber()) + ": conversion failed!";
 			cout << msg << endl;
 		}
 	}
@@ -393,7 +393,7 @@ int main(int argc, char *argv[])
 		string ext = dstFilePath.getType();
 		//controllo che ci sia un'estensione
 		if (ext == "") {
-			ext = toString(dstFilePath.getWideString());
+			ext = ::to_string(dstFilePath);
 			if (ext == "") {
 				msg = "Invalid extension!";
 				cout << msg << endl;
@@ -418,7 +418,7 @@ int main(int argc, char *argv[])
 				scene->loadTnzFile(tnzFilePath);
 			} catch (...) {
 				string msg;
-				msg = "There were problems loading the scene " + toString(srcFilePath.getWideString()) +
+				msg = "There were problems loading the scene " + ::to_string(srcFilePath) +
 					  ".\n Some files may be missing.";
 				cout << msg << endl;
 				//return false;
@@ -442,7 +442,7 @@ int main(int argc, char *argv[])
 			exit(1);
 		}
 	} catch (TException &e) {
-		msg = "Untrapped exception: " + toString(e.getMessage());
+		msg = "Untrapped exception: " + ::to_string(e.getMessage());
 		cout << msg << endl;
 		return -1;
 	}

@@ -781,8 +781,7 @@ void TifWriter::open(FILE *file, const TImageInfo &info)
 
 	TEnumProperty *p = (TEnumProperty *)(m_properties->getProperty("Bits Per Pixel"));
 	assert(p);
-	std::string str = toString(p->getValue());
-	//const char* str = toString(p->getValue()).c_str();
+	std::string str = ::to_string(p->getValue());
 	m_bpp = atoi(str.c_str());
 	assert(m_bpp == 1 || m_bpp == 8 || m_bpp == 16 || m_bpp == 24 || m_bpp == 32 || m_bpp == 48 || m_bpp == 64);
 

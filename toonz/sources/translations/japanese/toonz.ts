@@ -6084,12 +6084,6 @@ What do you want to do?</source>
         <translation>Toonzを次回起動するとき、ワークスペースが初期化されます。</translation>
     </message>
     <message>
-        <source>The license validation process was not able to confirm the right to use this software on this computer.
- Please contact [ support@toonz.com ] for assistance.</source>
-        <translation>ライセンス確認プロセスは、このコンピュータ上で本ソフトウェアを使用する権利を確認できませんでした。
-support@toonz.com に連絡してください。</translation>
-    </message>
-    <message>
         <source>Saving previewed frames....</source>
         <translation>プレビューしたフレームを保存中...</translation>
     </message>

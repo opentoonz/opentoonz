@@ -31,7 +31,7 @@ bool parseDouble(double &value, char *&s)
 		}
 	}
 	std::string w(t, s - t);
-	value = toDouble(w);
+	value = std::stod(w);
 	return true;
 }
 

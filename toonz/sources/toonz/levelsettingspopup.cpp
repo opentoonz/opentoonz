@@ -138,9 +138,7 @@ LevelSettingsPopup::LevelSettingsPopup()
 
 	m_doPremultiply = new CheckBox(tr("Premultiply"), this);
 
-#ifndef LINETEST
 	m_whiteTransp = new CheckBox(tr("White As Transparent"), this);
-#endif
 
 	m_doAntialias = new CheckBox(tr("Add Antialiasing"), this);
 	m_antialiasSoftness = new DVGui::IntLineEdit(0, 10, 0, 100);
@@ -165,9 +163,7 @@ LevelSettingsPopup::LevelSettingsPopup()
 	m_doAntialias->setChecked(false);
 	m_antialiasSoftness->setEnabled(false);
 
-#ifndef LINETEST
 	m_whiteTransp->setChecked(false);
-#endif
 
 	//----layout
 
@@ -226,9 +222,7 @@ LevelSettingsPopup::LevelSettingsPopup()
 
 		m_topLayout->addWidget(m_doPremultiply);
 
-#ifndef LINETEST
 		m_topLayout->addWidget(m_whiteTransp);
-#endif
 
 		m_topLayout->addWidget(m_doAntialias);
 
@@ -269,9 +263,7 @@ LevelSettingsPopup::LevelSettingsPopup()
 	connect(m_doAntialias, SIGNAL(stateChanged(int)), SLOT(onDoAntialiasChanged(int)));
 	connect(m_antialiasSoftness, SIGNAL(editingFinished()), SLOT(onAntialiasSoftnessChanged()));
 
-#ifndef LINETEST
 	connect(m_whiteTransp, SIGNAL(stateChanged(int)), SLOT(onWhiteTranspChanged(int)));
-#endif
 
 	updateLevelSettings();
 }
@@ -443,7 +435,7 @@ void LevelSettingsPopup::updateLevelSettings()
 
 	// name
 	if (selectedLevel) {
-		m_nameFld->setText(toString(selectedLevel->getName()).c_str());
+		m_nameFld->setText(::to_string(selectedLevel->getName()).c_str());
 		m_nameFld->setEnabled(true);
 	} else {
 		m_nameFld->setText(tr(""));
@@ -678,7 +670,7 @@ void LevelSettingsPopup::onPathChanged()
 	if (sl) {
 		QString question;
 
-		question = "The path you entered for the level " + QString(toString(sl->getName()).c_str()) +
+		question = "The path you entered for the level " + QString(::to_string(sl->getName()).c_str()) +
 				   "is already used: this may generate some conflicts in the file management.\nAre you sure you want to assign the same path to two different levels?";
 		int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
 		if (ret == 0 || ret == 2) {
@@ -839,7 +831,7 @@ void LevelSettingsPopup::onDpiFieldChanged()
 			j++;
 	}
 	if (i < j) {
-		dpi.x = toDouble(s.substr(i, j - i));
+		dpi.x = std::stod(s.substr(i, j - i));
 		i = j;
 		while (i < len && s[i] == ' ')
 			i++;
@@ -847,7 +839,7 @@ void LevelSettingsPopup::onDpiFieldChanged()
 			i++;
 			while (i < len && s[i] == ' ')
 				i++;
-			dpi.y = toDouble(s.substr(i));
+			dpi.y = std::stod(s.substr(i));
 		}
 	}
 

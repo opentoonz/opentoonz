@@ -271,7 +271,7 @@ void ChannelField::onSliderChanged(int value)
 	assert(0 <= value && value <= m_maxValue);
 	if (m_channelEdit->getValue() == value)
 		return;
-	m_channelEdit->setText(QString(toString(value).c_str()));
+	m_channelEdit->setText(QString(std::to_string(value).c_str()));
 	emit valueChanged(value, true);
 }
 

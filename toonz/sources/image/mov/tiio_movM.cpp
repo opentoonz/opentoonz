@@ -267,7 +267,7 @@ string buildQTErrorString(int ec)
 		return "unable to set movie box";
 
 	default: {
-		return "unknown error ('" + toString(ec) + "')";
+		return "unknown error ('" + std::to_string(ec) + "')";
 	}
 	}
 }
@@ -557,11 +557,6 @@ void TLevelWriterMov::save(const TImageP &img, int frameIndex)
 
 	Tiio::MovWriterProperties *prop = (Tiio::MovWriterProperties *)(m_properties);
 
-	/*
-const char* codec = toString(prop->m_codec.getValue()).c_str();
-const char* qual = toString(prop->m_quality.getValue()).c_str();
-*/
-
 	//CodecType codecType;
 	//try {
 	//codecType = prop->getCurrentCodec();
@@ -754,12 +749,8 @@ TLevelWriterMov::TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo)
 		throw TImageException(m_path, buildQTErrorString(m_IOError));
 	}
 
-	//  const char *pStr = toString(m_path.getWideString()).c_str();
 	QString qStr = QString::fromStdWString(m_path.getWideString());
 	const char *pStr = qStr.toUtf8().data();
-
-	//   std::cout << "TLevelWriterMov costruttore FP: " << toString(m_path.getWideString()) << std::endl;
-	//   std::cout << "TLevelWriterMov costruttore char: " << pStr << std::endl;
 
 	if (!getFSSpecFromPosixPath(pStr, &fspec, true)) {
 		m_IOError = QTUnableToOpenFile;
@@ -1048,7 +1039,6 @@ TLevelWriterMov::~TLevelWriterMov()
 
 /**************************************************************************************/
 #ifdef PROVA3GP
-	//  char *inputFileName = toString(m_path.getWideString()).c_str();
 	QString qStr = QString::fromStdWString(m_path.getWideString());
 	char *inputFileName = qStr.toUtf8().data();
 
@@ -1130,8 +1120,6 @@ TImageWriterP TLevelWriterMov::getFrameWriter(TFrameId fid)
 TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
 	: TLevelReader(path), m_IOError(QTNoError), m_track(0), m_movie(0), m_depth(0), m_readAsToonzOutput(false)
 {
-
-	//std::cout << "MOVIE PATH : " << toString(path) << std::endl;
 	FSSpec fspec;
 	QDErr err;
 	Boolean dataRefWasChanged;
@@ -1140,11 +1128,9 @@ TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
 		return;
 	}
 
-	//	const char *pStr = toString(m_path.getWideString()).c_str();
 	QString qStr = QString::fromStdWString(m_path.getWideString());
 	char *pStr = qStr.toUtf8().data();
 
-	//FSMakeFSSpec(0, 0,(const unsigned char*)pStr , &fspec);
 	getFSSpecFromPosixPath(pStr, &fspec, false);
 	pStr = 0;
 

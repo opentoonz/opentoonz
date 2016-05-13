@@ -875,7 +875,7 @@ void TImageCache::Imp::doCompress()
 			if (newItem->getSize() == 0) ///non c'era memoria sufficiente per il buffer compresso....
 			{
 				assert(m_rootDir != TFilePath());
-				TFilePath fp = m_rootDir + TFilePath(toString(TImageCache::Imp::m_fileid++));
+				TFilePath fp = m_rootDir + TFilePath(std::to_string(TImageCache::Imp::m_fileid++));
 				newItem = new UncompressedOnDiskCacheItem(fp, item->getImage());
 			}
 			m_compressedItems[id] = newItem;
@@ -902,7 +902,7 @@ void TImageCache::Imp::doCompress()
 		CompressedOnMemoryCacheItemP citem = itc->second;
 		if (citem) {
 			assert(m_rootDir != TFilePath());
-			TFilePath fp = m_rootDir + TFilePath(toString(TImageCache::Imp::m_fileid++));
+			TFilePath fp = m_rootDir + TFilePath(std::to_string(TImageCache::Imp::m_fileid++));
 
 			CacheItemP newItem = new CompressedOnDiskCacheItem(fp, citem->m_compressedRas,
 															   citem->m_builder->clone(), citem->m_imageInfo->clone());
@@ -964,7 +964,7 @@ void TImageCache::Imp::doCompress(std::string id)
 	if (newItem->getSize() == 0)											///non c'era memoria sufficiente per il buffer compresso....
 	{
 		assert(m_rootDir != TFilePath());
-		TFilePath fp = m_rootDir + TFilePath(toString(TImageCache::Imp::m_fileid++));
+		TFilePath fp = m_rootDir + TFilePath(std::to_string(TImageCache::Imp::m_fileid++));
 		newItem = new UncompressedOnDiskCacheItem(fp, item->getImage());
 	}
 	m_compressedItems[id] = newItem;
@@ -1037,7 +1037,7 @@ UCHAR *TImageCache::Imp::compressAndMalloc(TUINT32 size)
 			//if (newItem->getSize()==0)
 			//  {
 			assert(m_rootDir != TFilePath());
-			TFilePath fp = m_rootDir + TFilePath(toString(TImageCache::Imp::m_fileid++));
+			TFilePath fp = m_rootDir + TFilePath(std::to_string(TImageCache::Imp::m_fileid++));
 			newItem = new UncompressedOnDiskCacheItem(fp, item->getImage());
 			//  }
 
@@ -1072,7 +1072,7 @@ UCHAR *TImageCache::Imp::compressAndMalloc(TUINT32 size)
 		CompressedOnMemoryCacheItemP citem = itc->second;
 		if (citem) {
 			assert(m_rootDir != TFilePath());
-			TFilePath fp = m_rootDir + TFilePath(toString(TImageCache::Imp::m_fileid++));
+			TFilePath fp = m_rootDir + TFilePath(std::to_string(TImageCache::Imp::m_fileid++));
 
 			CacheItemP newItem = new CompressedOnDiskCacheItem(
 				fp, citem->m_compressedRas,
@@ -1170,7 +1170,7 @@ void TImageCache::setRootDir(const TFilePath &cacheDir)
 	if (m_imp->m_rootDir != TFilePath())
 		return;
 
-	m_imp->m_rootDir = cacheDir + TFilePath(toString(TSystem::getProcessId()));
+	m_imp->m_rootDir = cacheDir + TFilePath(std::to_string(TSystem::getProcessId()));
 
 #ifndef TNZCORE_LIGHT
 	TFileStatus fs1(m_imp->m_rootDir);
@@ -1955,17 +1955,17 @@ void TImageCache::Imp::outputMap(UINT chunkRequested, std::string filename)
 
 	os << "************************************************************\n";
 
-	os << "***requested memory: " + toString((int)chunkRequested / 1048576.0) + " MB\n";
-	//os<<"*** memory in rasters: " + toString((int)TRaster::getTotalMemoryInKB()/1024.0) + " MB\n";
-	//os<<"***virtualmem " + toString((int)currVirtualMemoryAvail) + " MB\n";
-	os << "***phismem " + toString((int)currPhisMemoryAvail) + " MB; percent of tot:" + toString((int)((currPhisMemoryAvail * 100) / m_reservedMemory)) + "\n";
-	//os<<"***bigmem available" + toString((int)TBigMemoryManager::instance()->getAvailableMemoryinKb());
-	os << "***uncompressed NOT compressable(refcount>1)   " + toString(umcount1) + " " + toString(umsize1 / 1024.0) + " MB\n";
-	os << "***uncompressed NOT compressable(cantCompress)   " + toString(umcount2) + " " + toString(umsize2 / 1024.0) + " MB\n";
-	os << "***uncompressed compressable   " + toString(umcount3) + " " + toString(umsize3 / 1024.0) + " MB\n";
-	os << "***compressed on mem  " + toString(cmcount) + " " + toString((int)cmsize / 1048576.0) + " MB\n";
-	os << "***compressed on disk " + toString(cdcount) + " " + toString((int)cdsize / 1048576.0) + " MB\n";
-	os << "***uncompressed on disk " + toString(udcount) + " " + toString((int)udsize / 1048576.0) + " MB\n";
+	os << "***requested memory: " + std::to_string((int)chunkRequested / 1048576.0) + " MB\n";
+	//os<<"*** memory in rasters: " + std::to_string((int)TRaster::getTotalMemoryInKB()/1024.0) + " MB\n";
+	//os<<"***virtualmem " + std::to_string((int)currVirtualMemoryAvail) + " MB\n";
+	os << "***phismem " + std::to_string((int)currPhisMemoryAvail) + " MB; percent of tot:" + std::to_string((int)((currPhisMemoryAvail * 100) / m_reservedMemory)) + "\n";
+	//os<<"***bigmem available" + std::to_string((int)TBigMemoryManager::instance()->getAvailableMemoryinKb());
+	os << "***uncompressed NOT compressable(refcount>1)   " + std::to_string(umcount1) + " " + std::to_string(umsize1 / 1024.0) + " MB\n";
+	os << "***uncompressed NOT compressable(cantCompress)   " + std::to_string(umcount2) + " " + std::to_string(umsize2 / 1024.0) + " MB\n";
+	os << "***uncompressed compressable   " + std::to_string(umcount3) + " " + std::to_string(umsize3 / 1024.0) + " MB\n";
+	os << "***compressed on mem  " + std::to_string(cmcount) + " " + std::to_string((int)cmsize / 1048576.0) + " MB\n";
+	os << "***compressed on disk " + std::to_string(cdcount) + " " + std::to_string((int)cdsize / 1048576.0) + " MB\n";
+	os << "***uncompressed on disk " + std::to_string(udcount) + " " + std::to_string((int)udsize / 1048576.0) + " MB\n";
 
 	//TBigMemoryManager::instance()->printMap();
 

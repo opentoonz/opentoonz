@@ -358,7 +358,7 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName)
 	else if (propertyName == m_onlyEmptyAreas.getName()) {
 		if (m_onlyEmptyAreas.getValue() && m_colorType.getValue() == LINES) {
 			m_colorType.setValue(AREAS);
-			PaintBrushColorType = toString(m_colorType.getValue());
+			PaintBrushColorType = ::to_string(m_colorType.getValue());
 		}
 		PaintBrushSelective = (int)(m_onlyEmptyAreas.getValue());
 	}
@@ -368,7 +368,7 @@ bool PaintBrushTool::onPropertyChanged(std::string propertyName)
 		if (m_colorType.getValue() == LINES) {
 			PaintBrushSelective = (int)(m_onlyEmptyAreas.getValue());
 		}
-		PaintBrushColorType = toString(m_colorType.getValue());
+		PaintBrushColorType = ::to_string(m_colorType.getValue());
 		/*--- ColorModelのCursor更新のためにSIGNALを出す ---*/
 		TTool::getApplication()->getCurrentTool()->notifyToolChanged();
 	}
@@ -460,7 +460,7 @@ void PaintBrushTool::onEnter()
 {
 	if (m_firstTime) {
 		m_onlyEmptyAreas.setValue(PaintBrushSelective ? 1 : 0);
-		m_colorType.setValue(toWideString((PaintBrushColorType.getValue())));
+		m_colorType.setValue(::to_wstring(PaintBrushColorType.getValue()));
 		m_toolSize.setValue(PaintBrushSize);
 		m_firstTime = false;
 	}

@@ -1154,7 +1154,7 @@ void XsheetViewer::changeWindowTitle()
 		sceneName += QString("*");
 	QString name = tr("Scene: ") + sceneName;
 	int frameCount = scene->getFrameCount();
-	name = name + "   ::   " + tr(toString(frameCount).c_str()) + tr(" Frames");
+	name = name + "   ::   " + tr(std::to_string(frameCount).c_str()) + tr(" Frames");
 
 	// subXsheet or not
 	ChildStack *childStack = scene->getChildStack();

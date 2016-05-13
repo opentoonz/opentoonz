@@ -49,7 +49,7 @@ NameModifier::NameModifier(std::wstring name)
 	if (j != (int)std::wstring::npos &&
 		j + 1 < (int)name.length() &&
 		name[j] == '_') {
-		m_index = toInt(name.substr(j + 1));
+		m_index = std::stoi(name.substr(j + 1));
 		m_nameBase = name.substr(0, j);
 	}
 }
@@ -62,5 +62,5 @@ std::wstring NameModifier::getNext()
 	if (index < 1)
 		return m_nameBase;
 	else
-		return m_nameBase + L"_" + toWideString(index);
+		return m_nameBase + L"_" + std::to_wstring(index);
 }

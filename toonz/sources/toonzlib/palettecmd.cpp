@@ -405,7 +405,7 @@ void PaletteCmd::createStyle(
 	/*-  StudioPalette上でStyleを追加した場合、GlobalNameを自動で割り振る -*/
 	if (palette->getGlobalName() != L"") {
 		TColorStyle *cs = palette->getStyle(newStyleId);
-		std::wstring gname = L"-" + palette->getGlobalName() + L"-" + toWideString(newStyleId);
+		std::wstring gname = L"-" + palette->getGlobalName() + L"-" + std::to_wstring(newStyleId);
 		cs->setGlobalName(gname);
 	}
 
@@ -731,7 +731,7 @@ void PaletteCmd::addPage(TPaletteHandle *paletteHandle, std::wstring name, bool 
 {
 	TPalette *palette = paletteHandle->getPalette();
 	if (name == L"")
-		name = L"page " + toWideString(palette->getPageCount() + 1);
+		name = L"page " + std::to_wstring(palette->getPageCount() + 1);
 	TPalette::Page *page = palette->addPage(name);
 
 	palette->setDirtyFlag(true);

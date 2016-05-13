@@ -124,7 +124,7 @@ void ScanListFrame::setRasterImage(const TRasterImageP &ras, bool isBW) const
 			prop->setValue(range[2]);
 		else {
 			for (int i = 0; i < (int)range.size(); i++) {
-				int bpp = atoi(toString(range[i]).substr(0, 2).c_str());
+				int bpp = std::stoi(::to_string(range[i]).substr(0, 2));
 
 #ifdef LINETEST
 				if (bpp == ps * 8)

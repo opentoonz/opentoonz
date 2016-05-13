@@ -36,14 +36,14 @@ HIC getCodec(const std::wstring &codecName, int &bpp)
 			WideCharToMultiByte(CP_ACP, 0, icinfo.szName, -1, name, sizeof(name), 0, 0);
 
 			std::string compressorName;
-			compressorName = std::string(name) + " '" + toString(bpp) + "' " + std::string(descr);
+			compressorName = std::string(name) + " '" + std::to_string(bpp) + "' " + std::string(descr);
 
 			if (hic) {
 				if (ICCompressQuery(hic, &inFmt, NULL) != ICERR_OK) {
 					ICClose(hic);
 					continue; // Skip this compressor if it can't handle the format.
 				}
-				if (toWideString(compressorName) == codecName) {
+				if (::to_wstring(compressorName) == codecName) {
 					found = true;
 					break;
 				}
@@ -229,7 +229,7 @@ QMap<std::wstring, bool> AviCodecRestrictions::getUsableCodecs(const TDimension 
 			WideCharToMultiByte(CP_ACP, 0, icinfo.szName, -1, name, sizeof(name), 0, 0);
 
 			std::wstring compressorName;
-			compressorName = toWideString(std::string(name) + " '" + toString(bpp) + "' " + std::string(descr));
+			compressorName = ::to_wstring(std::string(name) + " '" + std::to_string(bpp) + "' " + std::string(descr));
 
 			if (hic) {
 				if (ICCompressQuery(hic, &inFmt, NULL) != ICERR_OK) {

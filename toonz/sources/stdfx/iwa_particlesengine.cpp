@@ -27,6 +27,8 @@
 #include <QMutex>
 #include <QMutexLocker>
 
+#include <strstream>
+
 namespace
 {
 QMutex mutex;

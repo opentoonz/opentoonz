@@ -141,7 +141,7 @@ void visitAtoms(const QTAtomContainer &atoms, const QTAtom &parent, TPropertyGro
 			//for (i=0; i<size; i++)
 			//  buffer[i] = atomData[i]+1;
 
-			wstring data = toWideString(strapp);
+			wstring data = ::to_wstring(strapp);
 
 			pg.add(new TStringProperty(str, data));
 		}

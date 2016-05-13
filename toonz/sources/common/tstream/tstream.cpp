@@ -15,6 +15,7 @@
 
 #include <sstream>
 #include <memory>
+#include <strstream>
 
 using namespace std;
 
@@ -428,7 +429,7 @@ TOStream &TOStream::operator<<(QString _v)
 
 TOStream &TOStream::operator<<(std::wstring v)
 {
-	return operator<<(toString(v));
+	return operator<<(::to_string(v));
 	/*
   ostream &os = *(m_imp->m_os);
   int len = v.length();
@@ -1019,36 +1020,8 @@ TIStream &TIStream::operator>>(std::wstring &v)
 {
 	string s;
 	operator>>(s);
-	v = toWideString(s);
+	v = ::to_wstring(s);
 	return *this;
-
-	/*
-  int len = s.length();
-  for(int i=0;i<len;)
-    {
-     if(s[i] != '&')
-       {v.append(1, (wchar_t)s[i]);i++;}
-     else if(s.substr(i, 5) == "&amp;")
-       {v.append(1, L'&');i+=5;}
-     else if(i+1<len && s[i+1]=='#')
-       {
-        int c = 0;
-        i+=2;
-        while(i<len && '0'<=s[i] && s[i]<='9')
-          {
-           c = c*10+s[i]-'0';
-           i++;
-          }
-        if(i<len && s[i]==';') i++;
-        v.append(1, (wchar_t)c);
-       }
-     else
-       {
-        i++;
-       }
-    }
-  return *this;
-*/
 }
 
 //---------------------------------------------------------------

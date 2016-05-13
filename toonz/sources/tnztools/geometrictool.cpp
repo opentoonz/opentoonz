@@ -750,7 +750,7 @@ public:
 	void addPrimitive(Primitive *p)
 	{
 		// TODO: aggiungere il controllo per evitare nomi ripetuti
-		std::wstring name = toWideString(p->getName());
+		std::wstring name = ::to_wstring(p->getName());
 		//wstring name = TStringTable::translate(p->getName());
 
 		m_primitiveTable[name] = p;
@@ -838,9 +838,9 @@ public:
 			m_param.m_selective.setValue(GeometricSelective ? 1 : 0);
 			m_param.m_autogroup.setValue(GeometricGroupIt ? 1 : 0);
 			m_param.m_autofill.setValue(GeometricAutofill ? 1 : 0);
-			std::wstring typeCode = toWideString((GeometricType.getValue()));
+			std::wstring typeCode = ::to_wstring(GeometricType.getValue());
 			m_param.m_type.setValue(typeCode);
-			GeometricType = toString(typeCode);
+			GeometricType = ::to_string(typeCode);
 			m_typeCode = typeCode;
 			changeType(typeCode);
 			m_param.m_edgeCount.setValue(GeometricEdgeCount);
@@ -900,7 +900,7 @@ public:
 				GeometricSize = m_param.m_toolSize.getValue();
 		} else if (propertyName == m_param.m_type.getName()) {
 			std::wstring typeCode = m_param.m_type.getValue();
-			GeometricType = toString(typeCode);
+			GeometricType = ::to_string(typeCode);
 			if (typeCode != m_typeCode) {
 				m_typeCode = typeCode;
 				changeType(typeCode);
@@ -2082,7 +2082,7 @@ void PolygonPrimitive::draw()
 		return;
 	tglColor(m_isEditing ? m_color : TPixel32::Green);
 
-	int edgeCount = atoi(toString(m_param->m_edgeCount.getValue()).c_str());
+	int edgeCount = m_param->m_edgeCount.getValue();
 	if (edgeCount == 0)
 		return;
 
@@ -2141,7 +2141,7 @@ TStroke *PolygonPrimitive::makeStroke() const
 {
 	double thick = getThickness();
 
-	int edgeCount = atoi(toString(m_param->m_edgeCount.getValue()).c_str());
+	int edgeCount = m_param->m_edgeCount.getValue();
 	if (edgeCount == 0)
 		return 0;
 

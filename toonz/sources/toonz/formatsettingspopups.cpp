@@ -178,7 +178,7 @@ void FormatSettingsPopup::buildPropertyLineEdit(int index, TPropertyGroup *props
 
 	DVGui::PropertyLineEdit *lineEdit = new DVGui::PropertyLineEdit(this, prop);
 	m_widgets[prop->getName()] = lineEdit;
-	lineEdit->setText(tr(toString(prop->getValue()).c_str()));
+	lineEdit->setText(tr(::to_string(prop->getValue()).c_str()));
 
 	int row = m_mainLayout->rowCount();
 	m_mainLayout->addWidget(new QLabel(tr(prop->getName().c_str()) + ":", this), row, 0, Qt::AlignRight | Qt::AlignVCenter);

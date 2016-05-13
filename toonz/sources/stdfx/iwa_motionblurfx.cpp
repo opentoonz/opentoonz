@@ -989,7 +989,7 @@ std::string Iwa_MotionBlurCompFx::getAlias(double frame, const TRenderSettings &
 		paramalias += param->getName() + "=" + param->getValueAlias(frame, 3);
 	}
 	unsigned long id = getIdentifier();
-	return alias + toString(frame) + "," + toString(id) + paramalias + "]";
+	return alias + std::to_string(frame) + "," + std::to_string(id) + paramalias + "]";
 }
 
 FX_PLUGIN_IDENTIFIER(Iwa_MotionBlurCompFx, "iwa_MotionBlurCompFx")

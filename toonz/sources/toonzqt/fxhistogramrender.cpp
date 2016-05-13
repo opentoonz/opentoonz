@@ -110,7 +110,7 @@ void FxHistogramRender::computeHistogram(TFxP fx, int frame)
 	if (!rasterFx)
 		return;
 	std::string alias = rasterFx->getAlias(frame, rs);
-	if (!TImageCache::instance()->isCached(alias + ".noext" + toString(frame))) {
+	if (!TImageCache::instance()->isCached(alias + ".noext" + std::to_string(frame))) {
 		TDimension size = m_scene->getCurrentCamera()->getRes();
 		TRectD area(TPointD(-0.5 * size.lx, -0.5 * size.ly), TDimensionD(size.lx, size.ly));
 		m_renderPort->setRenderArea(area);
@@ -124,7 +124,7 @@ void FxHistogramRender::computeHistogram(TFxP fx, int frame)
 		m_lastFrameInfo.m_fx = fx;
 		m_lastFrameInfo.m_fxAlias = alias;
 	} else {
-		std::string id = toString(fx->getIdentifier()) + ".noext" + toString(frame);
+		std::string id = std::to_string(fx->getIdentifier()) + ".noext" + std::to_string(frame);
 		TRasterImageP img = TImageCache::instance()->get(id, false);
 		m_histograms->setRaster(img->getRaster());
 	}
@@ -157,7 +157,7 @@ void FxHistogramRender::updateRenderer(int frame)
 
 	int i;
 	for (i = 0; i < m_scene->getFrameCount(); i++) {
-		std::string id = toString(m_lastFrameInfo.m_fx->getIdentifier()) + ".noext" + toString(i);
+		std::string id = std::to_string(m_lastFrameInfo.m_fx->getIdentifier()) + ".noext" + std::to_string(i);
 		TImageCache::instance()->remove(id);
 	}
 	m_lastFrameInfo.m_frame = frame;
@@ -203,7 +203,7 @@ void FxHistogramRender::onRenderCompleted(const TRasterP &raster, UINT renderId)
 
 	QMutexLocker sl(&m_mutex);
 	TRasterImageP img(raster);
-	std::string id = toString(m_lastFrameInfo.m_fx->getIdentifier()) + ".noext" + toString(m_lastFrameInfo.m_frame);
+	std::string id = std::to_string(m_lastFrameInfo.m_fx->getIdentifier()) + ".noext" + std::to_string(m_lastFrameInfo.m_frame);
 	TImageCache::instance()->add(id, img, true);
 
 	m_histograms->setRaster(raster);

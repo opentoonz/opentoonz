@@ -473,7 +473,7 @@ ToolUtils::TToolUndo::TToolUndo(TXshSimpleLevel *level, const TFrameId &frameId,
 		}
 	}
 	if (createdFrame) {
-		m_imageId = "TToolUndo" + toString(m_idCount++);
+		m_imageId = "TToolUndo" + std::to_string(m_idCount++);
 		TImageCache::instance()->add(m_imageId, level->getFrame(frameId, false), false);
 	}
 }

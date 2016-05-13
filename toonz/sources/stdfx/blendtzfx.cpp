@@ -98,7 +98,7 @@ private:
 	{
 		std::string app;
 		for (int i = 2; i < cParamLen - 1; i++) {
-			app = toString(param[i]);
+			app = std::to_string(param[i]);
 			cParam[i] = strsave(app.c_str());
 		}
 	}
@@ -126,7 +126,7 @@ private:
 		int shrink = tround((ri.m_shrinkX + ri.m_shrinkY) / 2.0);
 		int argc = 6;
 		const char *argv[6];
-		argv[0] = strsave(toString(m_colorIndex->getValue()).c_str());
+		argv[0] = strsave(::to_string(m_colorIndex->getValue()).c_str());
 		argv[1] = argv[0];
 		argv[5] = "1";
 		getValues(argv, argc, frame);

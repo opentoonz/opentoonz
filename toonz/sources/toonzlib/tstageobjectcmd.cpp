@@ -679,7 +679,7 @@ public:
 			TStageObject *obj = pegTree->getStageObject(m_ids[i], false);
 			if (obj) {
 				obj->setGroupId(m_groupId, m_positions[i]);
-				obj->setGroupName(L"Group " + toWideString(m_groupId), m_positions[i]);
+				obj->setGroupName(L"Group " + std::to_wstring(m_groupId), m_positions[i]);
 			}
 		}
 		m_xshHandle->notifyXsheetChanged();
@@ -1690,7 +1690,7 @@ void TStageObjectCmd::group(const QList<TStageObjectId> ids, TXsheetHandle *xshH
 		TStageObject *obj = pegTree->getStageObject(ids[i], false);
 		if (obj) {
 			int position = obj->setGroupId(groupId);
-			obj->setGroupName(L"Group " + toWideString(groupId));
+			obj->setGroupName(L"Group " + std::to_wstring(groupId));
 			positions.append(position);
 		}
 	}

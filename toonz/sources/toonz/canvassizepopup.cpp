@@ -55,8 +55,8 @@ public:
 					 const TDimension &oldDim, const TDimension &newDim)
 		: TUndo(), m_level(level), m_fid(fid), m_oldDim(oldDim), m_newDim(newDim)
 	{
-		m_oldImageId = "ResizeCanvasUndo_oldImage_" + toString(m_idCount);
-		m_newImageId = "ResizeCanvasUnd_newImage_" + toString(m_idCount++);
+		m_oldImageId = "ResizeCanvasUndo_oldImage_" + std::to_string(m_idCount);
+		m_newImageId = "ResizeCanvasUnd_newImage_" + std::to_string(m_idCount++);
 
 		TImageCache::instance()->add(m_oldImageId, oldImage);
 		TImageCache::instance()->add(m_newImageId, newImage);

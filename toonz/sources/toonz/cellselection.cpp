@@ -1212,16 +1212,13 @@ void TCellSelection::enableCommands()
 	enableCommand(this, MI_Reverse, &TCellSelection::reverseCells);
 	enableCommand(this, MI_Swing, &TCellSelection::swingCells);
 	enableCommand(this, MI_Random, &TCellSelection::randomCells);
-#ifndef STUDENT
 	enableCommand(this, MI_Increment, &TCellSelection::incrementCells);
-#endif
 	enableCommand(this, MI_ResetStep, &TCellSelection::resetStepCells);
 	enableCommand(this, MI_IncreaseStep, &TCellSelection::increaseStepCells);
 	enableCommand(this, MI_DecreaseStep, &TCellSelection::decreaseStepCells);
 	enableCommand(this, MI_Step2, &TCellSelection::step2Cells);
 	enableCommand(this, MI_Step3, &TCellSelection::step3Cells);
 	enableCommand(this, MI_Step4, &TCellSelection::step4Cells);
-#ifndef STUDENT
 	enableCommand(this, MI_Each2, &TCellSelection::each2Cells);
 	enableCommand(this, MI_Each3, &TCellSelection::each3Cells);
 	enableCommand(this, MI_Each4, &TCellSelection::each4Cells);
@@ -1230,7 +1227,6 @@ void TCellSelection::enableCommands()
 	enableCommand(this, MI_Rolldown, &TCellSelection::rolldownCells);
 
 	enableCommand(this, MI_TimeStretch, &TCellSelection::openTimeStretchPopup);
-#endif
 	enableCommand(this, MI_CloneLevel, &TCellSelection::cloneLevel);
 	enableCommand(this, MI_SetKeyframes, &TCellSelection::setKeyframes);
 
@@ -1496,11 +1492,7 @@ void TCellSelection::pasteCells()
 		//Se la selezione e' vuota e l'objectId e' quello della camera sono nella
 		// colonna di camera quindi devo selezionare la row corrente e -1.
 		{
-#ifdef LINETESTAA
-			(Daniele)L'else sotto e' cambiato - controllare che il copy / paste delle chiavi funzioni correttamente verso la colonna di camera !
-#endif
-
-													int row = TApp::instance()->getCurrentFrame()->getFrame();
+			int row = TApp::instance()->getCurrentFrame()->getFrame();
 			selection.select(row, -1);
 		} else {
 			//Retrieves all keyframe positions from mime data and translates them by (r0,c0)
@@ -1692,11 +1684,7 @@ void TCellSelection::pasteKeyframesInto()
 		//Se la selezione e' vuota e l'objectId e' quello della camera sono nella
 		// colonna di camera quindi devo selezionare la row corrente e -1.
 		{
-#ifdef LINETESTAA
-			(Daniele)L'else sotto e' cambiato - controllare che il copy / paste delle chiavi funzioni correttamente verso la colonna di camera !
-#endif
-
-													int row = TApp::instance()->getCurrentFrame()->getFrame();
+			int row = TApp::instance()->getCurrentFrame()->getFrame();
 			selection.select(row, -1);
 		} else {
 			//Retrieves all keyframe positions from mime data and translates them by (r0,c0)

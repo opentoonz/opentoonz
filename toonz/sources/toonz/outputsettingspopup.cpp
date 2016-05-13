@@ -135,16 +135,12 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 		m_cameraSettings = new CameraSettingsPopup();
 		cameraParametersBox = new QFrame(this);
 	}
-#ifndef LINETEST
 	//Output Camera
 	m_outputCameraOm = new QComboBox();
 //m_outputCameraOm->hide();
-#endif
 	if (isPreview) {
-#ifndef LINETEST
 		//Subcamera checkbox
 		m_subcameraChk = new DVGui::CheckBox(tr("Use Sub-Camera"));
-#endif
 	}
 
 	//Frame Start-End
@@ -270,11 +266,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 
 		//Multimedia rendering enum
 		QStringList multimediaTypes;
-#ifndef LINETEST
 		multimediaTypes << tr("None") << tr("Fx Schematic Flows") << tr("Fx Schematic Terminal Nodes");
-#else
-		multimediaTypes << tr("None") << tr("Columns");
-#endif
 		m_multimediaOm->addItems(multimediaTypes);
 
 		showCameraSettingsButton->setObjectName("OutputSettingsShowButton");
@@ -520,10 +512,8 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 							 SLOT(onFormatChanged(const QString &)));
 		ret = ret && connect(m_fileFormatButton, SIGNAL(pressed()), this, SLOT(openSettingsPopup()));
 	}
-#ifndef LINETEST
 	ret = ret && connect(m_outputCameraOm, SIGNAL(currentIndexChanged(const QString &)),
 						 SLOT(onCameraChanged(const QString &)));
-#endif
 	ret = ret && connect(m_startFld, SIGNAL(editingFinished()), SLOT(onFrameFldEditFinished()));
 	ret = ret && connect(m_endFld, SIGNAL(editingFinished()), SLOT(onFrameFldEditFinished()));
 	ret = ret && connect(m_stepFld, SIGNAL(editingFinished()), SLOT(onFrameFldEditFinished()));
@@ -812,11 +802,9 @@ void OutputSettingsPopup::updateField()
 	if (m_isPreviewSettings)
 		return;
 
-#ifndef BRAVOEXPRESS
 	m_doStereoscopy->setChecked(renderSettings.m_stereoscopic);
 	m_stereoShift->setValue(renderSettings.m_stereoscopicShift);
 	m_stereoShift->setEnabled(renderSettings.m_stereoscopic);
-#endif
 
 	// gamma
 	m_gammaFld->setValue(renderSettings.m_gamma);
@@ -1195,10 +1183,8 @@ void OutputSettingsPopup::onDominantFieldChanged(int type)
 		rs.m_fieldPrevalence = TRenderSettings::EvenField;
 	else
 		rs.m_fieldPrevalence = TRenderSettings::NoField;
-#ifndef BRAVOEXPRESS
 	m_doStereoscopy->setEnabled(rs.m_fieldPrevalence == TRenderSettings::NoField);
 	m_stereoShift->setEnabled(rs.m_fieldPrevalence == TRenderSettings::NoField);
-#endif
 	prop->setRenderSettings(rs);
 	TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 }

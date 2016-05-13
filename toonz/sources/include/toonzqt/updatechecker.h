@@ -1,5 +1,3 @@
-
-
 #ifndef UPDATE_CHECKER_H
 #define UPDATE_CHECKER_H
 
@@ -7,14 +5,9 @@
 #include <QObject>
 #include "tcommon.h"
 
-#if QT_VERSION >= 0x050000
 #include <QNetworkAccessManager>
-#else
-#include <QHttp>
-#endif
 #include <QUrl>
 #include <QString>
-#include <QDate>
 
 #undef DVAPI
 #undef DVVAR
@@ -26,37 +19,24 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI UpdateChecker
-#if QT_VERSION < 0x050000
-	: public QHttp
-#else
-	: public QObject
-#endif
+class DVAPI UpdateChecker : public QObject
 {
 	Q_OBJECT
-	bool m_httpRequestAborted;
-	int m_httpGetId;
 
-	QDate m_updateDate;
-	QUrl m_webPageUrl;
+	QSharedPointer<QNetworkAccessManager> manager_;
+
+	QString m_latestVersion;
 
 public:
-	UpdateChecker(const QString &requestToServer);
+	UpdateChecker(QUrl const& updateUrl);
 
-	QDate getUpdateDate() const { return m_updateDate; }
-	QUrl getWebPageUrl() const { return m_webPageUrl; }
+	QString getLatestVersion() const { return m_latestVersion; }
 
 protected slots:
-	void httpRequestStarted(int requestId) {}
-#if QT_VERSION >= 0x050000
 	void httpRequestFinished(QNetworkReply *);
-#else
-	void httpRequestFinished(int requestId, bool error);
-	void readyReadExec(const QHttpResponseHeader &head) {}
-	void readResponseHeader(const QHttpResponseHeader &responseHeader);
-#endif
-	void slotAuthenticationRequired(const QString &hostName, quint16, QAuthenticator *authenticator);
-	void httpStateChanged(int state);
+
+signals:
+	void done(bool error);
 };
 
 #endif // UPDATE_CHECKER_H

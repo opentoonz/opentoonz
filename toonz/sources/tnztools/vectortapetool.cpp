@@ -244,11 +244,11 @@ public:
 
 	bool onPropertyChanged(std::string propertyName)
 	{
-		TapeMode = toString(m_mode.getValue());
+		TapeMode = ::to_string(m_mode.getValue());
 		TapeSmooth = (int)(m_smooth.getValue());
 		std::wstring s = m_type.getValue();
 		if (!s.empty())
-			TapeType = toString(s);
+			TapeType = ::to_string(s);
 		TapeJoinStrokes = (int)(m_joinStrokes.getValue());
 		AutocloseFactor = (double)(m_autocloseFactor.getValue());
 		m_selectionRect = TRectD();
@@ -734,10 +734,10 @@ public:
 		if (!m_firstTime)
 			return;
 
-		std::wstring s = toWideString(TapeMode.getValue());
+		std::wstring s = ::to_wstring(TapeMode.getValue());
 		if (s != L"")
 			m_mode.setValue(s);
-		s = toWideString(TapeType.getValue());
+		s = ::to_wstring(TapeType.getValue());
 		if (s != L"")
 			m_type.setValue(s);
 		m_autocloseFactor.setValue(AutocloseFactor);

@@ -114,7 +114,7 @@ string buildQTErrorString(int ec)
 		return "unable to set movie box";
 
 	default: {
-		return "unknown error ('" + toString(ec) + "')";
+		return "unknown error ('" + std::to_string(ec) + "')";
 	}
 	}
 }

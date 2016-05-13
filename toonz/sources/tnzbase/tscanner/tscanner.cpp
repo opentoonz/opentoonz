@@ -232,25 +232,25 @@ void TScannerParameters::saveData(TOStream &os) const
 
 	if (m_dpi.m_supported) {
 		attr.clear();
-		attr["value"] = toString(m_dpi.m_value);
+		attr["value"] = std::to_string(m_dpi.m_value);
 		os.openCloseChild("dpi", attr);
 	}
 
 	if (m_brightness.m_supported) {
 		attr.clear();
-		attr["value"] = toString(m_brightness.m_value);
+		attr["value"] = std::to_string(m_brightness.m_value);
 		os.openCloseChild("brightness", attr);
 	}
 
 	if (m_contrast.m_supported) {
 		attr.clear();
-		attr["value"] = toString(m_contrast.m_value);
+		attr["value"] = std::to_string(m_contrast.m_value);
 		os.openCloseChild("contrast", attr);
 	}
 
 	if (m_threshold.m_supported) {
 		attr.clear();
-		attr["value"] = toString(m_threshold.m_value);
+		attr["value"] = std::to_string(m_threshold.m_value);
 		os.openCloseChild("threshold", attr);
 	}
 }
@@ -264,19 +264,19 @@ void TScannerParameters::loadData(TIStream &is)
 		if (tagName == "dpi") {
 			std::string s = is.getTagAttribute("value");
 			if (isDouble(s))
-				m_dpi.m_value = (float)toDouble(s);
+				m_dpi.m_value = std::stof(s);
 		} else if (tagName == "brightness") {
 			std::string s = is.getTagAttribute("value");
 			if (isDouble(s))
-				m_brightness.m_value = (float)toDouble(s);
+				m_brightness.m_value = std::stof(s);
 		} else if (tagName == "threshold") {
 			std::string s = is.getTagAttribute("value");
 			if (isDouble(s))
-				m_threshold.m_value = (float)toDouble(s);
+				m_threshold.m_value = std::stof(s);
 		} else if (tagName == "contrast") {
 			std::string s = is.getTagAttribute("value");
 			if (isDouble(s))
-				m_contrast.m_value = (float)toDouble(s);
+				m_contrast.m_value = std::stof(s);
 		} else if (tagName == "autoFeeder") {
 			m_paperFeeder.m_value = 1.0;
 		} else if (tagName == "reverseOrder") {
@@ -582,10 +582,10 @@ void TPaperFormatManager::readPaperFormat(const TFilePath &path)
 				name = value;
 		} else if (std::string(buffer).find("WIDTH") == 0) {
 			if (isDouble(value))
-				size.lx = toDouble(value);
+				size.lx = std::stod(value);
 		} else if (std::string(buffer).find("LENGTH") == 0) {
 			if (isDouble(value))
-				size.ly = toDouble(value);
+				size.ly = std::stod(value);
 		}
 	}
 	if (name == "" || size.lx == 0 || size.ly == 0) {
