@@ -218,10 +218,10 @@ inline int threshMatte(int matte, int fillDepth)
 
 //-----------------------------------------------------------------------------
 
-bool isPixelInSegment(const vector<pair<int, int>> &segments, int x)
+bool isPixelInSegment(const std::vector<std::pair<int, int>> &segments, int x)
 {
 	for (int i = 0; i < (int)segments.size(); i++) {
-		pair<int, int> segment = segments[i];
+		std::pair<int, int> segment = segments[i];
 		if (segment.first <= x && x <= segment.second)
 			return true;
 	}
@@ -230,10 +230,10 @@ bool isPixelInSegment(const vector<pair<int, int>> &segments, int x)
 
 //-----------------------------------------------------------------------------
 
-void insertSegment(vector<pair<int, int>> &segments, const pair<int, int> segment)
+void insertSegment(std::vector<std::pair<int, int>> &segments, const std::pair<int, int> segment)
 {
 	for (int i = segments.size() - 1; i >= 0; i--) {
-		pair<int, int> app = segments[i];
+		std::pair<int, int> app = segments[i];
 		if (segment.first <= app.first && app.second <= segment.second)
 			segments.erase(segments.begin() + i);
 	}
@@ -403,7 +403,7 @@ void fill(const TRaster32P &ras, const TRaster32P &ref, const FillParameters &pa
 	}
 
 	std::stack<FillSeed> seeds;
-	std::map<int, vector<std::pair<int, int>>> segments;
+	std::map<int, std::vector<std::pair<int, int>>> segments;
 
 	//fillRow(r, params.m_p, xa, xb, color ,saver);
 	findSegment(workRas, params.m_p, xa, xb, color);
@@ -437,7 +437,7 @@ void fill(const TRaster32P &ras, const TRaster32P &ref, const FillParameters &pa
 			if (*pix != color && !test && matte >= oldMatte && matte != 255) {
 				findSegment(workRas, TPoint(x, y), xc, xd, color);
 				//segments[y].push_back(std::pair<int,int>(xc, xd));
-				insertSegment(segments[y], pair<int, int>(xc, xd));
+				insertSegment(segments[y], std::pair<int, int>(xc, xd));
 				if (xc < xa)
 					seeds.push(FillSeed(xc, xa - 1, y, -dy));
 				if (xd > xb)
@@ -462,14 +462,14 @@ void fill(const TRaster32P &ras, const TRaster32P &ref, const FillParameters &pa
 			seeds.push(FillSeed(oldxc, oldxd, y, dy));
 	}
 
-	std::map<int, vector<std::pair<int, int>>>::iterator it;
+	std::map<int, std::vector<std::pair<int, int>>>::iterator it;
 	for (it = segments.begin(); it != segments.end(); it++) {
 		TPixel32 *line = ras->pixels(it->first);
 		TPixel32 *refLine = 0;
 		TPixel32 *refPix;
 		if (ref)
 			refLine = ref->pixels(it->first);
-		vector<std::pair<int, int>> segmentVector = it->second;
+		std::vector<std::pair<int, int>> segmentVector = it->second;
 		for (int i = 0; i < (int)segmentVector.size(); i++) {
 			std::pair<int, int> segment = segmentVector[i];
 			if (segment.second >= segment.first) {

@@ -22,7 +22,7 @@ extern "C" {
 #include "toonz4.6/raster.h"
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 #define USE_SSE2
 #endif
 
@@ -78,7 +78,7 @@ void TRop::convert(const TRaster32P &rasOut,
 
 	rasOut->lock();
 	rasIn->lock();
-#ifdef WIN32
+#ifdef _WIN32
 	if (TSystem::getCPUExtensions() & TSystem::CpuSupportsSse2) {
 		__m128i zeros = _mm_setzero_si128();
 		TPixelFloat *paints = (TPixelFloat *)_aligned_malloc(count2 * sizeof(TPixelFloat), 16);
@@ -171,7 +171,7 @@ void TRop::convert(const TRaster32P &rasOut,
 		_aligned_free(inks);
 
 	} else // SSE2 not supported
-#endif	 // WIN32
+#endif	 // _WIN32
 	{
 
 		std::vector<TPixel32> paints(count2, TPixel32(255, 0, 0));
@@ -438,7 +438,7 @@ TRasterP putSingleInkInRasterRGBM(TRasterCM32P &rasIn, int inkId)
 //filename!!
 //interactive!!
 
-bool computePaletteFx(const vector<pair<TColorStyle *, int>> &fx,
+bool computePaletteFx(const std::vector<std::pair<TColorStyle *, int>> &fx,
 					  const TTile &tileOut, const TTile &tileIn, const TPaletteP plt)
 {
 	int i;
@@ -448,8 +448,8 @@ bool computePaletteFx(const vector<pair<TColorStyle *, int>> &fx,
 
 	int frame = plt->getFrame();
 
-	vector<TRasterP> paintLayers(fx.size());
-	vector<TRasterP> inkLayers(fx.size());
+	std::vector<TRasterP> paintLayers(fx.size());
+	std::vector<TRasterP> inkLayers(fx.size());
 
 	//tolgo dal raster d'ingresso gli ink e i paint con gli effetti, mettendoli in dei raster layer
 	for (i = 0; i < (int)fx.size(); i++) {
@@ -514,11 +514,11 @@ bool renderRas32(const TTile &tileOut, const TTile &tileIn, const TPaletteP pale
 	/* mark up are made apart */
 	//computeMarkup(rasIn, palette);
 
-	vector<pair<TColorStyle *, int>> fxArray;
+	std::vector<std::pair<TColorStyle *, int>> fxArray;
 
 	for (int i = 0; i < palette->getStyleCount(); i++)
 		if (palette->getStyle(i)->isRasterStyle())
-			fxArray.push_back(pair<TColorStyle *, int>(palette->getStyle(i), i));
+			fxArray.push_back(std::pair<TColorStyle *, int>(palette->getStyle(i), i));
 
 	if (fxArray.empty())
 		return false;
@@ -732,7 +732,7 @@ void TRop::eraseColors(TRasterCM32P ras, vector<int> &colorIds, bool eraseInks, 
 
 /*------------------------------------------------------------------------*/
 
-void TRop::eraseColors(TRasterCM32P ras, vector<int> *colorIds, bool eraseInks)
+void TRop::eraseColors(TRasterCM32P ras, std::vector<int> *colorIds, bool eraseInks)
 {
 	if (colorIds)
 		std::sort(colorIds->begin(), colorIds->end());
@@ -783,7 +783,7 @@ void TRop::applyMatchLines(TRasterCM32P rasOut, const TRasterCM32P &rasUp, const
 
 /*------------------------------------------------------------------------*/
 
-void TRop::eraseStyleIds(TToonzImage *image, const vector<int> styleIds)
+void TRop::eraseStyleIds(TToonzImage *image, const std::vector<int> styleIds)
 {
 	assert(image);
 	TRasterCM32P ras = image->getRaster();

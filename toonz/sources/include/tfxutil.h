@@ -10,8 +10,8 @@ class TImage;
 namespace TFxUtil
 {
 
-DVAPI void setParam(const TFxP &fx, string paramName, double value);
-DVAPI void setParam(const TFxP &fx, string paramName, TPixel32 value);
+DVAPI void setParam(const TFxP &fx, std::string paramName, double value);
+DVAPI void setParam(const TFxP &fx, std::string paramName, TPixel32 value);
 
 DVAPI TFxP makeColorCard(TPixel32 color);
 

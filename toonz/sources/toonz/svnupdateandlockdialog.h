@@ -8,8 +8,6 @@
 
 #include <QList>
 
-using namespace DVGui;
-
 class QLabel;
 class QPushButton;
 class QPlainTextEdit;
@@ -17,7 +15,7 @@ class QCheckBox;
 
 //-----------------------------------------------------------------------------
 
-class SVNUpdateAndLockDialog : public Dialog
+class SVNUpdateAndLockDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 

@@ -200,7 +200,7 @@ int KeyframeSetter::createKeyframe(double frame)
 				m_undo->addKeyframe(m_kIndex + 1);
 				m_param->setKeyframes(keyframes);
 			} else if (segmentType == TDoubleKeyframe::Expression || segmentType == TDoubleKeyframe::SimilarShape) {
-				string expressionText = ka.m_expressionText;
+				std::string expressionText = ka.m_expressionText;
 
 				setExpression(expressionText);
 				setType(ka.m_type);
@@ -623,7 +623,7 @@ void KeyframeSetter::setSpeedIn(const TPointD &speedIn)
 		double outNorm = getNorm(m_keyframe.m_speedOut);
 		if (m_kIndex + 1 == m_param->getKeyframeCount() ||
 			isSpeedInOut(m_kIndex) ||
-			(m_keyframe.m_type == TDoubleKeyframe::Expression && m_keyframe.m_expressionText.find("cycle") != string::npos)) {
+			(m_keyframe.m_type == TDoubleKeyframe::Expression && m_keyframe.m_expressionText.find("cycle") != std::string::npos)) {
 			// update next segment speed vector
 			double inNorm = getNorm(m_keyframe.m_speedIn);
 			if (inNorm < eps)

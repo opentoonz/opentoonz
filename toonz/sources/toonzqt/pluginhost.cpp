@@ -1,6 +1,3 @@
-#ifdef _MSC_VER
-#define NOMINMAX
-#endif
 #include <sstream>
 #include <string>
 #include <utility>
@@ -13,7 +10,7 @@
 #else
 #include <dlfcn.h>
 #endif
-#include <string.h>
+#include <string>
 #include <map>
 #include <type_traits>
 #include <functional>
@@ -132,7 +129,6 @@ PluginInformation::~PluginInformation()
 			fin_();
 		}
 	}
-	delete[] param_pages_;
 }
 
 void PluginInformation::add_ref()
@@ -818,7 +814,7 @@ bool RasterFxPluginHost::setParamStructure(int n, toonz_param_page_t *p, int &er
 
 		param_resources.clear();
 
-		toonz_param_page_t *origin_pages = new toonz_param_page_t[n];
+		std::unique_ptr<toonz_param_page_t[]> origin_pages(new toonz_param_page_t[n]);
 		for (int i = 0; i < n; i++) {
 			toonz_param_page_t &dst_page = origin_pages[i];
 			const toonz_param_page_t &src_page = p[i];
@@ -876,7 +872,7 @@ bool RasterFxPluginHost::setParamStructure(int n, toonz_param_page_t *p, int &er
 		}
 
 		pi_->param_page_num_ = n;
-		pi_->param_pages_ = origin_pages;
+		pi_->param_pages_ = std::move(origin_pages);
 		return true;
 	}
 	return false;

@@ -124,12 +124,12 @@ class RectFullColorUndo : public TFullColorRasterUndo
 {
 	TRectD m_modifyArea;
 	TStroke *m_stroke;
-	wstring m_eraseType;
+	std::wstring m_eraseType;
 	bool m_invert;
 
 public:
 	RectFullColorUndo(TTileSetFullColor *tileSet, const TRectD &modifyArea, TStroke stroke,
-					  wstring eraseType,
+					  std::wstring eraseType,
 					  TXshSimpleLevel *level, bool invert,
 					  const TFrameId &frameId)
 		: TFullColorRasterUndo(tileSet, level, frameId, false, false, 0), m_modifyArea(modifyArea), m_eraseType(eraseType), m_invert(invert)
@@ -187,14 +187,14 @@ public:
 
 class FullColorEraserUndo : public TFullColorRasterUndo
 {
-	vector<TThickPoint> m_points;
+	std::vector<TThickPoint> m_points;
 	int m_size;
 	double m_hardness;
 	double m_opacity;
 
 public:
 	FullColorEraserUndo(TTileSetFullColor *tileSet,
-						const vector<TThickPoint> &points,
+						const std::vector<TThickPoint> &points,
 						TXshSimpleLevel *level, const TFrameId &frameId,
 						int size, double hardness, double opacity)
 		: TFullColorRasterUndo(tileSet, level, frameId, false, false, 0), m_points(points), m_size(size), m_hardness(hardness), m_opacity(opacity) {}
@@ -211,7 +211,7 @@ public:
 		workRaster->clear();
 
 		BluredBrush brush(workRaster, m_size, brushPad, false);
-		vector<TThickPoint> points;
+		std::vector<TThickPoint> points;
 		points.push_back(m_points[0]);
 		TRect bbox = brush.getBoundFromPoints(points);
 		brush.addPoint(m_points[0], 1);
@@ -256,7 +256,7 @@ public:
 
 //----------------------------------------------------------------------------------
 
-void eraseStroke(const TRasterImageP &ri, TStroke *stroke, wstring eraseType,
+void eraseStroke(const TRasterImageP &ri, TStroke *stroke, std::wstring eraseType,
 				 bool invert, const TXshSimpleLevelP &level, const TFrameId &frameId)
 {
 	assert(stroke);
@@ -294,7 +294,7 @@ class FullColorEraserTool : public TTool
 	Q_DECLARE_TR_FUNCTIONS(FullColorEraserTool)
 
 public:
-	FullColorEraserTool(string name);
+	FullColorEraserTool(std::string name);
 	~FullColorEraserTool();
 
 	ToolType getToolType() const { return TTool::LevelWriteTool; }
@@ -316,7 +316,7 @@ public:
 
 	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 	void onImageChanged();
 	void onEnter();
 
@@ -355,14 +355,14 @@ private:
 
 	QRadialGradient m_brushPad;
 
-	vector<TThickPoint> m_points;
+	std::vector<TThickPoint> m_points;
 	BluredBrush *m_brush;
 
 	TTileSetFullColor *m_tileSet;
 	TTileSaverFullColor *m_tileSaver;
 
 	StrokeGenerator m_track;
-	vector<TPointD> m_polyline;
+	std::vector<TPointD> m_polyline;
 	TStroke *m_firstStroke;
 
 	TRectD m_selectingRect,
@@ -383,7 +383,7 @@ private:
 
 //===================================================================================================
 
-FullColorEraserTool::FullColorEraserTool(string name)
+FullColorEraserTool::FullColorEraserTool(std::string name)
 	: TTool(name), m_size("Size:", 1, 100, 5, false), m_opacity("Opacity:", 0, 100, 100), m_hardness("Hardness:", 0, 100, 100), m_eraseType("Type:"), m_invertOption("Invert", false), m_multi("Frame Range", false), m_currCell(-1, -1), m_brush(0), m_tileSet(0), m_tileSaver(0), m_thick(0.5), m_firstTime(true), m_selecting(false), m_firstFrameSelected(false), m_isXsheetCell(false)
 {
 	bind(TTool::RasterImage);
@@ -556,14 +556,14 @@ void FullColorEraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &
 		double opacity = m_opacity.getValue() * 0.01;
 
 		TThickPoint pa = m_points.front();
-		vector<TThickPoint> points;
+		std::vector<TThickPoint> points;
 		points.push_back(pa);
 		points.push_back(mid);
 		TRect bbox;
 		TRectD invalidateRect;
 		if (m == 3) {
 			TThickPoint pa = m_points.front();
-			vector<TThickPoint> points;
+			std::vector<TThickPoint> points;
 			points.push_back(pa);
 			points.push_back(mid);
 			invalidateRect = ToolUtils::getBounds(points, thickness);
@@ -571,7 +571,7 @@ void FullColorEraserTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &
 			m_tileSaver->save(bbox);
 			m_brush->addArc(pa, (mid + pa) * 0.5, mid, 1, 1);
 		} else {
-			vector<TThickPoint> points;
+			std::vector<TThickPoint> points;
 			points.push_back(m_points[m - 4]);
 			points.push_back(old);
 			points.push_back(mid);
@@ -629,7 +629,7 @@ void FullColorEraserTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e)
 			TThickPoint point(pos + rasCenter, m_size.getValue());
 			m_points.push_back(point);
 			int m = m_points.size();
-			vector<TThickPoint> points;
+			std::vector<TThickPoint> points;
 			points.push_back(m_points[m - 3]);
 			points.push_back(m_points[m - 2]);
 			points.push_back(m_points[m - 1]);
@@ -813,7 +813,7 @@ void FullColorEraserTool::leftButtonDoubleClick(const TPointD &pos, const TMouse
 		m_polyline.push_back(pos);
 	if (m_polyline.back() != m_polyline.front())
 		m_polyline.push_back(m_polyline.front());
-	vector<TThickPoint> strokePoints;
+	std::vector<TThickPoint> strokePoints;
 	for (UINT i = 0; i < m_polyline.size() - 1; i++) {
 		strokePoints.push_back(TThickPoint(m_polyline[i], 1));
 		strokePoints.push_back(TThickPoint(0.5 * (m_polyline[i] + m_polyline[i + 1]), 1));
@@ -950,7 +950,7 @@ void FullColorEraserTool::draw()
 
 //----------------------------------------------------------------------------------------------------------
 
-bool FullColorEraserTool::onPropertyChanged(string propertyName)
+bool FullColorEraserTool::onPropertyChanged(std::string propertyName)
 {
 	FullcolorEraseSize = m_size.getValue();
 	FullcolorEraseHardness = m_hardness.getValue();
@@ -1051,7 +1051,7 @@ void FullColorEraserTool::multiUpdate(const TRectD firstRect, const TRectD lastR
 		backward = true;
 	}
 	assert(firstFid <= lastFid);
-	vector<TFrameId> allFids;
+	std::vector<TFrameId> allFids;
 	m_level->getFids(allFids);
 
 	std::vector<TFrameId>::iterator i0 = allFids.begin();
@@ -1063,7 +1063,7 @@ void FullColorEraserTool::multiUpdate(const TRectD firstRect, const TRectD lastR
 	while (i1 != allFids.end() && *i1 <= lastFid)
 		i1++;
 	assert(i0 < i1);
-	vector<TFrameId> fids(i0, i1);
+	std::vector<TFrameId> fids(i0, i1);
 	int m = fids.size();
 	assert(m > 0);
 
@@ -1126,7 +1126,7 @@ void FullColorEraserTool::multiAreaEraser(TFrameId &firstFid, TFrameId &lastFid,
 		backward = true;
 	}
 	assert(firstFid <= lastFid);
-	vector<TFrameId> allFids;
+	std::vector<TFrameId> allFids;
 	m_level->getFids(allFids);
 
 	std::vector<TFrameId>::iterator i0 = allFids.begin();
@@ -1138,7 +1138,7 @@ void FullColorEraserTool::multiAreaEraser(TFrameId &firstFid, TFrameId &lastFid,
 	while (i1 != allFids.end() && *i1 <= lastFid)
 		i1++;
 	assert(i0 < i1);
-	vector<TFrameId> fids(i0, i1);
+	std::vector<TFrameId> fids(i0, i1);
 	int m = fids.size();
 	assert(m > 0);
 	TUndoManager::manager()->beginBlock();

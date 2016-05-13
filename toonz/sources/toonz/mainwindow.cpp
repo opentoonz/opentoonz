@@ -92,8 +92,8 @@ namespace
 {
 //=============================================================================
 
-const string layoutsFileName = "layouts.txt";
-const string currentRoomFileName = "currentRoom.txt";
+const std::string layoutsFileName = "layouts.txt";
+const std::string currentRoomFileName = "currentRoom.txt";
 bool scrambledRooms = false;
 
 //=============================================================================
@@ -108,7 +108,7 @@ bool readRoomList(std::vector<TFilePath> &roomPaths,
 	if (!argumentLayoutFileName.isEmpty()) {
 		fp = ToonzFolder::getModuleFile(argumentLayoutFileName.toStdString());
 		if (!TFileStatus(fp).doesExist()) {
-			MsgBox(WARNING, "Room layout file " + argumentLayoutFileName + " not found!");
+			DVGui::warning("Room layout file " + argumentLayoutFileName + " not found!");
 			fp = ToonzFolder::getModuleFile(layoutsFileName);
 			if (!TFileStatus(fp).doesExist())
 				return false;
@@ -176,6 +176,7 @@ void makePrivate(Room *room)
 {
 	TFilePath layoutDir = ToonzFolder::getMyModuleDir();
 	TFilePath roomPath = room->getPath();
+	std::string mbSrcFileName = roomPath.getName() + "_menubar.xml";
 	if (roomPath == TFilePath() || roomPath.getParentDir() != layoutDir) {
 		int count = 1;
 		for (;;) {
@@ -186,6 +187,23 @@ void makePrivate(Room *room)
 		room->setPath(roomPath);
 		TSystem::touchParentDir(roomPath);
 		room->save();
+	}
+	/*- create private menubar settings if not exists -*/
+	std::string mbDstFileName = roomPath.getName() + "_menubar.xml";
+	TFilePath myMBPath = layoutDir + mbDstFileName;
+	if (!TFileStatus(myMBPath).isReadable())
+	{
+		TFilePath templateRoomMBPath = ToonzFolder::getTemplateModuleDir() + mbSrcFileName;
+		if (TFileStatus(templateRoomMBPath).doesExist())
+			TSystem::copyFile(myMBPath, templateRoomMBPath);
+		else
+		{
+			TFilePath templateFullMBPath = ToonzFolder::getTemplateModuleDir() + "menubar_template.xml";
+			if (TFileStatus(templateFullMBPath).doesExist())
+				TSystem::copyFile(myMBPath, templateFullMBPath);
+			else
+				DVGui::warning(QObject::tr("Cannot open menubar settings template file. Re-installing Toonz will solve this problem."));
+		}
 	}
 }
 
@@ -370,10 +388,10 @@ MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent, Q
 	changeWindowTitle();
 
 	//Connetto i comandi che sono in RoomTabWidget
-	//connect(roomTabWidget, SIGNAL(indexSwapped(int , int )), SLOT(onIndexSwapped(int ,int )));
-	//connect(roomTabWidget, SIGNAL(insertNewTabRoom()), SLOT(insertNewRoom()));
-	//connect(roomTabWidget, SIGNAL(deleteTabRoom(int)), SLOT(deleteRoom(int)));
-	//connect(roomTabWidget, SIGNAL(renameTabRoom(int, const QString)), SLOT(renameRoom(int, const QString)));
+	connect(roomTabWidget, SIGNAL(indexSwapped(int , int )), SLOT(onIndexSwapped(int ,int )));
+	connect(roomTabWidget, SIGNAL(insertNewTabRoom()), SLOT(insertNewRoom()));
+	connect(roomTabWidget, SIGNAL(deleteTabRoom(int)), SLOT(deleteRoom(int)));
+	connect(roomTabWidget, SIGNAL(renameTabRoom(int, const QString)), SLOT(renameRoom(int, const QString)));
 
 	setCommandHandler("MI_Quit", this, &MainWindow::onQuit);
 	setCommandHandler("MI_Undo", this, &MainWindow::onUndo);
@@ -518,7 +536,9 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 			m_stackedWidget->addWidget(room);
 			roomTabWidget->addTab(room->getName());
 
-			stackedMenuBar->createMenuBarByName(room->getName());
+			/*- ここでMenuBarファイルをロードする -*/
+			std::string mbFileName = roomPath.getName() + "_menubar.xml";
+			stackedMenuBar->loadAndAddMenubar(ToonzFolder::getModuleFile(mbFileName));
 
 			//room->setDockOptions(QMainWindow::DockOptions(
 			//  (QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks) & ~QMainWindow::AllowTabbedDocks));
@@ -529,6 +549,7 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 	//Read the flipbook history
 	FlipBookPool::instance()->load(ToonzFolder::getMyModuleDir() + TFilePath("fliphistory.ini"));
 
+	/*- レイアウト設定ファイルが見つからなかった場合、初期Roomの生成 -*/
 	//Se leggendo i settings non ho inizializzato le stanze lo faccio ora.
 	// Puo' accadere se si buttano i file di inizializzazione.
 	if (rooms.empty()) {
@@ -567,15 +588,16 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 		m_stackedWidget->addWidget(browserRoom);
 		rooms.push_back(browserRoom);
 		stackedMenuBar->createMenuBarByName(browserRoom->getName());
-
-		makePrivate(rooms);
-		writeRoomList(rooms);
 	}
 
+	/*- If the layout files were loaded from template, then save them as private ones -*/
+	makePrivate(rooms);
+	writeRoomList(rooms);
+	
 	// Imposto la stanza corrente
 	fp = ToonzFolder::getModuleFile(currentRoomFileName);
 	Tifstream is(fp);
-	string currentRoomName;
+	std::string currentRoomName;
 	is >> currentRoomName;
 	if (currentRoomName != "") {
 		int count = m_stackedWidget->count();
@@ -651,6 +673,7 @@ void MainWindow::writeSettings()
 		rooms.push_back(room);
 		room->save();
 	}
+	writeRoomList(rooms);
 
 	//Current room settings
 	Tofstream os(ToonzFolder::getMyModuleDir() + currentRoomFileName);
@@ -1006,6 +1029,7 @@ void MainWindow::onAbout()
 	dialog->setWindowTitle(tr("About OpenToonz"));
 	dialog->setTopMargin(0);
 	dialog->addWidget(label);
+	dialog->addWidget(new QLabel("OpenToonz (built " __DATE__ " " __TIME__ ")"));
 
 	QPushButton *button = new QPushButton(tr("Close"), dialog);
 	button->setDefault(true);
@@ -1050,7 +1074,7 @@ void MainWindow::resetRoomsLayout()
 		}
 	}
 
-	MsgBox(INFORMATION, QObject::tr("The rooms will be reset the next time you run Toonz."));
+	DVGui::info(QObject::tr("The rooms will be reset the next time you run Toonz."));
 }
 
 //-----------------------------------------------------------------------------
@@ -1122,6 +1146,11 @@ void MainWindow::deleteRoom(int index)
 		m_topBar->getRoomTabWidget()->insertTab(index, room->getName());
 		return;
 	}
+
+	/*- delete menubar settings file as well -*/
+	std::string mbFileName = fp.getName() + "_menubar.xml";
+	TFilePath mbFp = fp.getParentDir() + mbFileName;
+	TSystem::deleteFile(mbFp);
 
 	//The old room index must be updated if index < of it
 	if (index < m_oldRoomIndex)
@@ -1269,7 +1298,7 @@ void MainWindow::onUpdateCheckerDone(bool error)
 				std::vector<QString> buttons;
 				buttons.push_back(QString(tr("Visit Web Site")));
 				buttons.push_back(QString(tr("Cancel")));
-				int ret = MsgBox(INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
+				int ret = DVGui::MsgBox(DVGui::INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
 				if (ret == 1)
 					QDesktopServices::openUrl(webPageUrl);
 
@@ -1296,8 +1325,7 @@ void MainWindow::onLicenseCheckerDone(bool error)
 {
 	if (!error) {
 		if (!m_licenseChecker->isLicenseValid()) {
-			MsgBox(CRITICAL,
-				   QObject::tr("The license validation process was not able to confirm the right to use this software on this computer.\n Please contact [ support@toonz.com ] for assistance."));
+			DVGui::error(QObject::tr("The license validation process was not able to confirm the right to use this software on this computer.\n Please contact [ support@toonz.com ] for assistance."));
 			qApp->exit(0);
 		}
 	}
@@ -1322,7 +1350,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 #ifdef BRAVODEMO
 	QString question;
 	question = "Quit: are you sure you want to quit?";
-	int ret = MsgBox(question, QObject::tr("Quit"), QObject::tr("Cancel"), 0);
+	int ret = DVGui::MsgBox(question, QObject::tr("Quit"), QObject::tr("Cancel"), 0);
 	if (ret == 0 || ret == 2) {
 		event->ignore();
 		return;
@@ -1552,6 +1580,7 @@ void MainWindow::defineActions()
 	createMenuFileAction(MI_LoadScene, tr("&Load Scene..."), "Ctrl+L");
 	createMenuFileAction(MI_SaveScene, tr("&Save Scene"), "Ctrl+S");
 	createMenuFileAction(MI_SaveSceneAs, tr("&Save Scene As..."), "Ctrl+Shift+S");
+    createMenuFileAction(MI_SaveAll, tr("&Save All"), "");
 	createMenuFileAction(MI_RevertScene, tr("&Revert Scene"), "");
 
 	QAction *act = CommandManager::instance()->getAction(MI_RevertScene);
@@ -1582,7 +1611,7 @@ void MainWindow::defineActions()
 	createMenuFileAction(MI_OutputSettings, tr("&Output Settings..."), "");
 	createMenuFileAction(MI_PreviewSettings, tr("&Preview Settings..."), "");
 	createMenuFileAction(MI_Render, tr("&Render"), "");
-	createMenuFileAction(MI_Preview, tr("&Preview"), "");
+	createMenuFileAction(MI_Preview, tr("&Preview"), "Ctrl+R");
 #ifndef BRAVODEMO
 	createRightClickMenuAction(MI_SavePreviewedFrames, tr("&Save Previewed Frames"), "");
 #endif
@@ -1624,14 +1653,14 @@ void MainWindow::defineActions()
 	createRightClickMenuAction(MI_PasteColors, tr("Paste Color"), "");
 	createRightClickMenuAction(MI_PasteNames, tr("Paste Name"), "");
 	createRightClickMenuAction(MI_GetColorFromStudioPalette, tr("Get Color from Studio Palette"), "");
-	createMenuEditAction(MI_Clear, tr("&Delete"), "");
+	createMenuEditAction(MI_Clear, tr("&Delete"), "Delete");
 	createMenuEditAction(MI_Insert, tr("&Insert"), "Ins");
-	createMenuEditAction(MI_Group, tr("&Group"), "");
+	createMenuEditAction(MI_Group, tr("&Group"), "Ctrl+G");
 	createMenuEditAction(MI_Ungroup, tr("&Ungroup"), "");
-	createMenuEditAction(MI_BringToFront, tr("&Bring to Front"), "");
-	createMenuEditAction(MI_BringForward, tr("&Bring Forward"), "");
-	createMenuEditAction(MI_SendBack, tr("&Send Back"), "");
-	createMenuEditAction(MI_SendBackward, tr("&Send Backward"), "");
+	createMenuEditAction(MI_BringToFront, tr("&Bring to Front"), "Ctrl+]");
+	createMenuEditAction(MI_BringForward, tr("&Bring Forward"), "]");
+	createMenuEditAction(MI_SendBack, tr("&Send Back"), "Ctrl+[");
+	createMenuEditAction(MI_SendBackward, tr("&Send Backward"), "[");
 	createMenuEditAction(MI_EnterGroup, tr("&Enter Group"), "");
 	createMenuEditAction(MI_ExitGroup, tr("&Exit Group"), "");
 	createMenuEditAction(MI_RemoveEndpoints, tr("&Remove Vector Overflow"), "");
@@ -1659,7 +1688,7 @@ void MainWindow::defineActions()
 	toggle = createToggle(MI_CameraTest, tr("&Camera Test"), "", 0, MenuScanCleanupCommandType);
 	CameraTestCheck::instance()->setToggle(toggle);
 
-	createToggle(MI_OpacityCheck, tr("&Opacity Check"), "", false, MenuScanCleanupCommandType);
+	createToggle(MI_OpacityCheck, tr("&Opacity Check"), "1", false, MenuScanCleanupCommandType);
 
 	createMenuScanCleanupAction(MI_Cleanup, tr("&Cleanup"), "");
 	createMenuLevelAction(MI_AddFrames, tr("&Add Frames..."), "");
@@ -1734,7 +1763,7 @@ void MainWindow::defineActions()
 	createMenuCellsAction(MI_Rollup, tr("&Roll Up"), "");
 	createMenuCellsAction(MI_Rolldown, tr("&Roll Down"), "");
 	createMenuCellsAction(MI_TimeStretch, tr("&Time Stretch..."), "");
-	createMenuCellsAction(MI_Duplicate, tr("&Duplicate Drawing  "), "");
+	createMenuCellsAction(MI_Duplicate, tr("&Duplicate Drawing  "), "D");
 	createMenuCellsAction(MI_Autorenumber, tr("&Autorenumber"), "");
 	createMenuCellsAction(MI_CloneLevel, tr("&Clone"), "");
 
@@ -1790,11 +1819,11 @@ void MainWindow::defineActions()
 	createPlaybackAction(MI_Pause, tr("Pause"), "");
 	createPlaybackAction(MI_FirstFrame, tr("First Frame"), "");
 	createPlaybackAction(MI_LastFrame, tr("Last Frame"), "");
-	createPlaybackAction(MI_PrevFrame, tr("Previous Frame"), "");
-	createPlaybackAction(MI_NextFrame, tr("Next Frame"), "");
+	createPlaybackAction(MI_PrevFrame, tr("Previous Frame"), "Shift+A");
+	createPlaybackAction(MI_NextFrame, tr("Next Frame"), "Shift+S");
 
-	createAction(MI_NextDrawing, tr("Next Drawing"), "", PlaybackCommandType);
-	createAction(MI_PrevDrawing, tr("Prev Drawing"), "", PlaybackCommandType);
+	createAction(MI_NextDrawing, tr("Next Drawing"), "Shift+X", PlaybackCommandType);
+	createAction(MI_PrevDrawing, tr("Prev Drawing"), "Shift+Z", PlaybackCommandType);
 	createAction(MI_NextStep, tr("Next Step"), "", PlaybackCommandType);
 	createAction(MI_PrevStep, tr("Prev Step"), "", PlaybackCommandType);
 
@@ -1913,19 +1942,19 @@ void MainWindow::defineActions()
 	/*-- カレントカラムの右側のカラムを全て非表示にするコマンド --*/
 	createRightClickMenuAction(MI_DeactivateUpperColumns, "Hide Upper Columns", "");
 
-	createToolAction(T_Edit, "edit", tr("Edit Tool"), "");
-	createToolAction(T_Selection, "selection", tr("Selection Tool"), "");
-	createToolAction(T_Brush, "brush", tr("Brush Tool"), "");
-	createToolAction(T_Geometric, "geometric", tr("Geometric Tool"), "");
-	createToolAction(T_Type, "type", tr("Type Tool"), "");
-	createToolAction(T_Fill, "fill", tr("Fill Tool"), "");
+	createToolAction(T_Edit, "edit", tr("Edit Tool"), "E");
+	createToolAction(T_Selection, "selection", tr("Selection Tool"), "S");
+	createToolAction(T_Brush, "brush", tr("Brush Tool"), "B");
+	createToolAction(T_Geometric, "geometric", tr("Geometric Tool"), "G");
+	createToolAction(T_Type, "type", tr("Type Tool"), "Y");
+	createToolAction(T_Fill, "fill", tr("Fill Tool"), "F");
 	createToolAction(T_PaintBrush, "paintbrush", tr("Paint Brush Tool"), "");
-	createToolAction(T_Eraser, "eraser", tr("Eraser Tool"), "");
-	createToolAction(T_Tape, "tape", tr("Tape Tool"), "");
-	createToolAction(T_StylePicker, "stylepicker", tr("Style Picker Tool"), "");
+	createToolAction(T_Eraser, "eraser", tr("Eraser Tool"), "A");
+	createToolAction(T_Tape, "tape", tr("Tape Tool"), "T");
+	createToolAction(T_StylePicker, "stylepicker", tr("Style Picker Tool"), "K");
 	createToolAction(T_RGBPicker, "RGBpicker", tr("RGB Picker Tool"), "");
-	createToolAction(T_ControlPointEditor, "controlpointeditor", tr("Control Point Editor Tool"), "");
-	createToolAction(T_Pinch, "pinch", tr("Pinch Tool"), "");
+	createToolAction(T_ControlPointEditor, "controlpointeditor", tr("Control Point Editor Tool"), "C");
+	createToolAction(T_Pinch, "pinch", tr("Pinch Tool"), "P");
 	createToolAction(T_Pump, "pump", tr("Pump Tool"), "");
 	createToolAction(T_Magnet, "magnet", tr("Magnet Tool"), "");
 	createToolAction(T_Bender, "bender", tr("Bender Tool"), "");
@@ -1934,18 +1963,18 @@ void MainWindow::defineActions()
 	createToolAction(T_Skeleton, "skeleton", tr("Skeleton Tool"), "");
 	createToolAction(T_Tracker, "tracker", tr("Tracker Tool"), "");
 	createToolAction(T_Hook, "hook", tr("Hook Tool"), "");
-	createToolAction(T_Zoom, "zoom", tr("Zoom Tool"), "");
-	createToolAction(T_Rotate, "rotate", tr("Rotate Tool"), "");
-	createToolAction(T_Hand, "hand", tr("Hand Tool"), "");
+	createToolAction(T_Zoom, "zoom", tr("Zoom Tool"), "Shift+Space");
+	createToolAction(T_Rotate, "rotate", tr("Rotate Tool"), "Ctrl+Space");
+	createToolAction(T_Hand, "hand", tr("Hand Tool"), "Space");
 	createToolAction(T_Plastic, "plastic", tr("Plastic Tool"), "");
 	createToolAction(T_Ruler, "ruler", tr("Ruler Tool"), "");
 	createToolAction(T_Finger, "finger", tr("Finger Tool"), "");
 
-	createViewerAction(V_ZoomIn, tr("Zoom In"), "");
-	createViewerAction(V_ZoomOut, tr("Zoom Out"), "");
-	createViewerAction(V_ZoomReset, tr("Reset View"), "");
+	createViewerAction(V_ZoomIn, tr("Zoom In"), "+");
+	createViewerAction(V_ZoomOut, tr("Zoom Out"), "-");
+	createViewerAction(V_ZoomReset, tr("Reset View"), "0");
 	createViewerAction(V_ZoomFit, tr("Fit to Window"), "");
-	createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "");
+	createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "N");
 	createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"), "");
 	CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen, tr("Full Screen Mode"), tr("Exit Full Screen Mode"));
 
@@ -1963,7 +1992,7 @@ void MainWindow::defineActions()
 
 	createToolOptionsAction("A_ToolOption_AutoGroup", tr("Auto Group"), "");
 	createToolOptionsAction("A_ToolOption_BreakSharpAngles", tr("Break sharp angles"), "");
-	createToolOptionsAction("A_ToolOption_FrameRange", tr("Frame range"), "");
+	createToolOptionsAction("A_ToolOption_FrameRange", tr("Frame range"), "F6");
 	createToolOptionsAction("A_ToolOption_IK", tr("Inverse kinematics"), "");
 	createToolOptionsAction("A_ToolOption_Invert", tr("Invert"), "");
 	createToolOptionsAction("A_ToolOption_Manual", tr("Manual"), "");
@@ -1972,8 +2001,8 @@ void MainWindow::defineActions()
 	createToolOptionsAction("A_ToolOption_PencilMode", tr("Pencil Mode"), "");
 	createToolOptionsAction("A_ToolOption_PreserveThickness", tr("Preserve Thickness"), "");
 	createToolOptionsAction("A_ToolOption_PressureSensibility", tr("Pressure sensibility"), "");
-	createToolOptionsAction("A_ToolOption_SegmentInk", tr("Segment Ink"), "");
-	createToolOptionsAction("A_ToolOption_Selective", tr("Selective"), "");
+	createToolOptionsAction("A_ToolOption_SegmentInk", tr("Segment Ink"), "F8");
+	createToolOptionsAction("A_ToolOption_Selective", tr("Selective"), "F7");
 	createToolOptionsAction("A_ToolOption_Smooth", tr("Smooth"), "");
 	createToolOptionsAction("A_ToolOption_Snap", tr("Snap"), "");
 	createToolOptionsAction("A_ToolOption_AutoSelectDrawing", tr("Auto Select Drawing"), "");
@@ -1991,7 +2020,7 @@ void MainWindow::defineActions()
 	createToolOptionsAction("A_ToolOption_Mode:Lines & Areas", tr("Mode - Lines & Areas"), "");
 	createToolOptionsAction("A_ToolOption_Type", tr("Type"), "");
 	createToolOptionsAction("A_ToolOption_Type:Normal", tr("Type - Normal"), "");
-	createToolOptionsAction("A_ToolOption_Type:Rectangular", tr("Type - Rectangular"), "");
+	createToolOptionsAction("A_ToolOption_Type:Rectangular", tr("Type - Rectangular"), "F5");
 	createToolOptionsAction("A_ToolOption_Type:Freehand", tr("Type - Freehand"), "");
 	createToolOptionsAction("A_ToolOption_Type:Polyline", tr("Type - Polyline"), "");
 	createToolOptionsAction("A_ToolOption_TypeFont", tr("TypeTool Font"), "");

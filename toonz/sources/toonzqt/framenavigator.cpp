@@ -25,7 +25,7 @@ FrameNavigator::FrameNavigator(QWidget *parent)
 	connect(prevButton, SIGNAL(triggered()), this, SLOT(prevFrame()));
 	addAction(prevButton);
 
-	m_lineEdit = new IntLineEdit(this);
+	m_lineEdit = new DVGui::IntLineEdit(this);
 
 	m_lineEdit->setFixedHeight(16);
 	bool ret = connect(m_lineEdit, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));

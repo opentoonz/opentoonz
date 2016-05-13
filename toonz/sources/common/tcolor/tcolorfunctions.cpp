@@ -1,5 +1,5 @@
 
-
+#include <cstring>
 #include "tcolorfunctions.h"
 #include "tpixelutils.h"
 

@@ -6,7 +6,7 @@
 
 //-----------------------------------------------------------------------------
 
-TXshLevel::TXshLevel(ClassCode code, wstring name)
+TXshLevel::TXshLevel(ClassCode code, std::wstring name)
 	: TSmartObject(code), m_name(name), m_type(UNKNOWN_XSHLEVEL), m_hookSet(new HookSet()), m_scene(0)
 {
 	updateShortName();
@@ -28,7 +28,7 @@ void TXshLevel::setScene(ToonzScene *scene)
 
 //-----------------------------------------------------------------------------
 
-void TXshLevel::setName(wstring name)
+void TXshLevel::setName(std::wstring name)
 {
 	m_name = name;
 	updateShortName();

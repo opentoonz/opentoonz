@@ -66,7 +66,7 @@ ScanListFrame &ScanListFrame::operator=(const ScanListFrame &src)
 
 //---------------------------------------------------------
 
-wstring ScanListFrame::getName() const
+std::wstring ScanListFrame::getName() const
 {
 	if (!m_xl)
 		return L"";
@@ -76,7 +76,7 @@ wstring ScanListFrame::getName() const
 
 //---------------------------------------------------------
 
-wstring ScanListFrame::getLevelName() const
+std::wstring ScanListFrame::getLevelName() const
 {
 	return m_xl ? m_xl->getName() : L"";
 }
@@ -117,9 +117,9 @@ void ScanListFrame::setRasterImage(const TRasterImageP &ras, bool isBW) const
 	TPropertyGroup *pg = Tiio::makeWriterProperties(path.getType());
 	TEnumProperty *prop = (TEnumProperty *)(pg->getProperty("Bits Per Pixel"));
 	if (prop) {
-		wstring pixelSizeW = prop->getValue().substr(0, 2);
+		std::wstring pixelSizeW = prop->getValue().substr(0, 2);
 		int ps = ras->getRaster()->getPixelSize();
-		const vector<wstring> &range = prop->getRange();
+		const std::vector<std::wstring> &range = prop->getRange();
 		if (isBW)
 			prop->setValue(range[2]);
 		else {
@@ -144,7 +144,7 @@ void ScanListFrame::setRasterImage(const TRasterImageP &ras, bool isBW) const
 
 	if (m_xl->getScannedPath() != TFilePath())
 		m_xl->setFrameStatus(m_fid, TXshSimpleLevel::Scanned);
-	string imageId = m_xl->getImageId(m_fid);
+	std::string imageId = m_xl->getImageId(m_fid);
 	TImageCache::instance()->remove(imageId);
 	m_xl->setFrame(m_fid, ras.getPointer());
 

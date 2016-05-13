@@ -482,7 +482,7 @@ void StudioPaletteTreeViewer::onCurrentItemChanged(QTreeWidgetItem *current, QTr
 		wstring gname = m_currentPalette->getGlobalName();
 		QString question;
 		question = "The current palette " + QString::fromStdWString(oldPath.getWideString()) + " \nin the studio palette has been modified. Do you want to save your changes?";
-		int ret = MsgBox(question, QObject::tr("Save"), QObject::tr("Discard"), QObject::tr("Cancel"), 0);
+		int ret = DVGui::MsgBox(question, QObject::tr("Save"), QObject::tr("Discard"), QObject::tr("Cancel"), 0);
 		if (ret == 3) {
 			setCurrentItem(getItem(oldPath));
 			return;
@@ -564,7 +564,7 @@ void StudioPaletteTreeViewer::convertToStudioPalette()
 
 		QString question;
 		question = QString::fromStdWString(L"Convert " + path.getWideString() + L" to Studio Palette and Overwrite. \nAre you sure ?");
-		int ret = MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
+		int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
 		if (ret == 0 || ret == 2)
 			return;
 
@@ -594,7 +594,7 @@ void StudioPaletteTreeViewer::deleteItem(QTreeWidgetItem *item)
 	if (item->childCount() > 0) {
 		QString question;
 		question = tr("This folder is not empty. Delete anyway?");
-		int ret = MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
+		int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
 		if (ret == 0 || ret == 2)
 			return;
 	}
@@ -688,7 +688,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class AdjustPaletteDialog : public Dialog
+class AdjustPaletteDialog : public DVGui::Dialog
 {
 private:
 	IntField *m_tolerance;
@@ -771,7 +771,7 @@ void StudioPaletteTreeViewer::loadInCurrentPalette()
 		return;
 
 	if (palette->isLocked()) {
-		MsgBox(WARNING, "Palette is Locked!");
+		DVGui::warning("Palette is Locked!");
 		return;
 	}
 
@@ -828,7 +828,7 @@ void StudioPaletteTreeViewer::replaceCurrentPalette()
 		label = QString::fromStdWString(L"Replacing the palette \"" + dstPalette->getPaletteName() + L"\" with the palette \"" + current->getPaletteName() + L"\". \nAre you sure ?");
 	}
 
-	int ret = MsgBox(label, QObject::tr("Replace"), QObject::tr("Cancel"), 1);
+	int ret = DVGui::MsgBox(label, QObject::tr("Replace"), QObject::tr("Cancel"), 1);
 	if (ret == 0 || ret == 2)
 		return;
 

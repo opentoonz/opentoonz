@@ -1,5 +1,7 @@
 
 
+#include <cstring>
+
 #include "tsop.h"
 #include "tsound_t.h"
 

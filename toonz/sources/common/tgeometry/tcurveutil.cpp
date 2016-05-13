@@ -249,8 +249,8 @@ int intersect(const TQuadratic &c0,
 	double A = (a * a + d * d) * coeff * coeff;
 	double aux = A * c2 + (a * b + d * e) * coeff;
 
-	vector<double> t;
-	vector<double> solutions;
+	std::vector<double> t;
+	std::vector<double> solutions;
 
 	t.push_back(aux * c2 + a * c + d * f - k * a - d * q);
 	aux += A * c2;
@@ -403,14 +403,14 @@ int intersect(const TQuadratic &q,
 			return intersect(s, TSegment(q.getP0(), q.getP2()), intersections);
 	}
 
-	vector<TPointD> bez, pol;
+	std::vector<TPointD> bez, pol;
 	bez.push_back(q.getP0());
 	bez.push_back(q.getP1());
 	bez.push_back(q.getP2());
 
 	bezier2poly(bez, pol);
 
-	vector<double> poly_1(3, 0), sol;
+	std::vector<double> poly_1(3, 0), sol;
 
 	poly_1[0] = a * pol[0].x + b * pol[0].y + c;
 	poly_1[1] = a * pol[1].x + b * pol[1].y;

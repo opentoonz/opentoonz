@@ -127,7 +127,7 @@ void DVAPI assignFillingInformation(
 
 void DVAPI getStrokeStyleInformationInArea(
 	const TVectorImageP &vi,
-	std::vector<pair<int, int>> &strokesInfo, // pair:strokeIndex, styleIndex
+	std::vector<std::pair<int, int>> &strokesInfo, // pair:strokeIndex, styleIndex
 	const TRectD &area);
 
 //*********************************************************************************************

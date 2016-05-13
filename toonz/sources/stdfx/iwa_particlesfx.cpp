@@ -308,9 +308,9 @@ bool Iwa_TiledParticlesFx::doGetBBox(double frame, TRectD &bBox, const TRenderSe
 
 //------------------------------------------------------------------
 
-string Iwa_TiledParticlesFx::getAlias(double frame, const TRenderSettings &info) const
+std::string Iwa_TiledParticlesFx::getAlias(double frame, const TRenderSettings &info) const
 {
-	string alias = getFxType();
+	std::string alias = getFxType();
 	alias += "[";
 
 	// alias degli effetti connessi alle porte di input separati da virgole
@@ -325,7 +325,7 @@ string Iwa_TiledParticlesFx::getAlias(double frame, const TRenderSettings &info)
 		alias += ",";
 	}
 
-	string paramalias("");
+	std::string paramalias("");
 	for (int i = 0; i < getParams()->getParamCount(); ++i) {
 		TParam *param = getParams()->getParam(i);
 		paramalias += param->getName() + "=" + param->getValueAlias(frame, 3);
@@ -339,8 +339,8 @@ string Iwa_TiledParticlesFx::getAlias(double frame, const TRenderSettings &info)
 bool Iwa_TiledParticlesFx::allowUserCacheOnPort(int portNum)
 {
 	// Only control port are currently allowed to cache upon explicit user's request
-	string tmpName = getInputPortName(portNum);
-	return tmpName.find("Control") != string::npos;
+	std::string tmpName = getInputPortName(portNum);
+	return tmpName.find("Control") != std::string::npos;
 }
 
 //------------------------------------------------------------------
@@ -365,7 +365,7 @@ void Iwa_TiledParticlesFx::doDryCompute(TRectD &rect, double frame, const TRende
 
 		for (j = 0; j < inputPortCount; ++j) {
 			TFxPort *port = getInputPort(j);
-			string tmpName = getInputPortName(j);
+			std::string tmpName = getInputPortName(j);
 			if (port->isConnected()) {
 				TRasterFxP fx = port->getFx();
 
@@ -393,19 +393,19 @@ void Iwa_TiledParticlesFx::doDryCompute(TRectD &rect, double frame, const TRende
 
 void Iwa_TiledParticlesFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 {
-	vector<int> lastframe;
-	vector<TLevelP> partLevel;
+	std::vector<int> lastframe;
+	std::vector<TLevelP> partLevel;
 
 	TPointD p_offset;
 	TDimension p_size(0, 0);
 
 	/*- 参照画像ポートの取得 -*/
-	vector<TRasterFxPort *> part_ports;   /*- テクスチャ素材画像のポート -*/
-	map<int, TRasterFxPort *> ctrl_ports; /*- コントロール画像のポート番号／ポート -*/
+	std::vector<TRasterFxPort *> part_ports;   /*- テクスチャ素材画像のポート -*/
+	std::map<int, TRasterFxPort *> ctrl_ports; /*- コントロール画像のポート番号／ポート -*/
 	int portsCount = this->getInputPortCount();
 
 	for (int i = 0; i < portsCount; ++i) {
-		string tmpName = this->getInputPortName(i);
+		std::string tmpName = this->getInputPortName(i);
 		QString portName = QString::fromStdString(tmpName);
 
 		if (portName.startsWith("T")) {

@@ -18,17 +18,15 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-using namespace DVGui;
-
 //=============================================================================
 // PalettesScanPopup
 //-----------------------------------------------------------------------------
 
-class DVAPI PalettesScanPopup : public Dialog
+class DVAPI PalettesScanPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
-	FileField *m_field;
+	DVGui::FileField *m_field;
 	QLabel *m_label;
 
 	TFilePath m_folderPath;

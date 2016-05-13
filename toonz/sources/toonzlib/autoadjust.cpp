@@ -553,7 +553,7 @@ void build_gr_lut(int ref_cum[256], int cum[256], UCHAR lut[256])
 /*===========================================================================*/
 
 struct edge_config {
-	char *str;
+	const char *str;
 	int val;
 };
 
@@ -820,7 +820,7 @@ static struct edge_config Edge_base[] =
 static int Edge_value[256];
 static int Edge_init_done = 0;
 
-static int edge_int(char x[8]);
+static int edge_int(const char x[8]);
 static void edge_rotate(char x[8]);
 static void edge_mirror(char x[8]);
 
@@ -829,7 +829,7 @@ static void edge_mirror(char x[8]);
 static void edge_init(void)
 {
 	int b;
-	char *str;
+	const char *str;
 	int val;
 	char x[8];
 
@@ -867,7 +867,7 @@ static void edge_init(void)
 
 /*---------------------------------------------------------------------------*/
 
-static int edge_int(char x[8])
+static int edge_int(const char x[8])
 {
 	return (x[0] != ' ') << 7 |
 		   (x[1] != ' ') << 6 |

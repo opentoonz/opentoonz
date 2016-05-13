@@ -12,7 +12,7 @@ Logger *Logger::instance()
 	return &_instance;
 }
 
-void Logger::add(wstring s)
+void Logger::add(std::wstring s)
 {
 	m_rows.push_back(s);
 	for (int i = 0; i < (int)m_listeners.size(); i++)
@@ -29,7 +29,7 @@ int Logger::getRowCount() const
 	return m_rows.size();
 }
 
-wstring Logger::getRow(int i) const
+std::wstring Logger::getRow(int i) const
 {
 	if (0 <= i && i < (int)m_rows.size())
 		return m_rows[i];

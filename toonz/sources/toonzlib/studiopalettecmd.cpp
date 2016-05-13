@@ -342,7 +342,7 @@ class AdjustIntoCurrentPaletteUndo : public TUndo
 	TPaletteHandle *m_paletteHandle;
 	TPaletteP m_oldPalette, m_newPalette;
 	TFrameId m_fid;
-	string m_oldImageId;
+	std::string m_oldImageId;
 	static int m_idCount;
 	int m_undoSize;
 	int m_tolerance;
@@ -415,11 +415,11 @@ void StudioPaletteCmd::loadIntoCurrentPalette(TPaletteHandle *paletteHandle,
 namespace
 {
 
-map<TPixel, int> ToleranceMap;
+std::map<TPixel, int> ToleranceMap;
 
-int findClosest(const TPixel &color, map<TPixel, int> &colorMap, int tolerance)
+int findClosest(const TPixel &color, std::map<TPixel, int> &colorMap, int tolerance)
 {
-	map<TPixel, int>::const_iterator it;
+	std::map<TPixel, int>::const_iterator it;
 	it = ToleranceMap.find(color);
 	if (it != ToleranceMap.end())
 		return it->second;
@@ -450,9 +450,9 @@ int findClosest(const TPixel &color, map<TPixel, int> &colorMap, int tolerance)
 
 //--------------------------------------------------------------------------------------
 
-int getIndex(const TPixel &color, map<TPixel, int> &colorMap, TPalette *plt, int tolerance)
+int getIndex(const TPixel &color, std::map<TPixel, int> &colorMap, TPalette *plt, int tolerance)
 {
-	map<TPixel, int>::const_iterator it;
+	std::map<TPixel, int>::const_iterator it;
 	it = colorMap.find(color);
 	if (it != colorMap.end())
 		return it->second;
@@ -471,7 +471,7 @@ int getIndex(const TPixel &color, map<TPixel, int> &colorMap, TPalette *plt, int
 
 //-------------------------------------------
 
-void adaptIndexes(TToonzImageP timg, map<TPixel, int> &colorMap, TPalette *plt, int tolerance)
+void adaptIndexes(TToonzImageP timg, std::map<TPixel, int> &colorMap, TPalette *plt, int tolerance)
 {
 	TPalette *origPlt = timg->getPalette();
 	TRasterCM32P r = timg->getRaster();
@@ -515,13 +515,13 @@ void adaptLevelToPalette(TXshLevelHandle *currentLevelHandle, TPaletteHandle *pa
 
 	ToleranceMap.clear();
 
-	map<TPixel, int> colorMap;
+	std::map<TPixel, int> colorMap;
 	for (int i = 0; i < plt->getStyleCount(); i++) {
 		if (!plt->getStylePage(i))
 			continue;
 		colorMap[plt->getStyle(i)->getMainColor()] = i;
 	}
-	vector<TFrameId> fids;
+	std::vector<TFrameId> fids;
 
 	sl->getFids(fids);
 	for (int i = 0; i < (int)fids.size(); i++) {
@@ -693,7 +693,7 @@ void StudioPaletteCmd::updateAllLinkedStyles(TPaletteHandle *paletteHandle, TXsh
 				std::vector<TFrameId>::iterator it;
 				for (it = fids.begin(); it != fids.end(); ++it) {
 					TFrameId fid = *it;
-					string id = sl->getImageId(fid);
+					std::string id = sl->getImageId(fid);
 				}
 			}
 		}
@@ -731,7 +731,7 @@ void StudioPaletteCmd::movePalette(const TFilePath &dstPath, const TFilePath &sr
 		If there are any problems send an error message.
 */
 TFilePath StudioPaletteCmd::createPalette(const TFilePath &folderName,
-										  string paletteName,
+										  std::string paletteName,
 										  const TPalette *palette)
 {
 	TFilePath palettePath;

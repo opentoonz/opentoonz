@@ -7,14 +7,14 @@
 #include "tproperty.h"
 #include "tiio.h"
 
-#if !(defined(x64) || defined(__LP64__))
+#if !(defined(x64) || defined(__LP64__) || defined(LINUX))
 
 //*******************************************************************************
 //    32-bit version
 //*******************************************************************************
 
-#ifdef WIN32
-#ifdef WIN32
+#ifdef _WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #endif
 
@@ -22,6 +22,9 @@
 #define map Map
 #define iterator Iterator
 #define float_t Float_t
+#define int_fast8_t QT_int_fast8_t
+#define int_fast16_t QT_int_fast16_t
+#define uint_fast16_t QT_uint_fast16_t
 
 #include "QTML.h"
 #include "Movies.h"
@@ -36,6 +39,9 @@
 #undef map
 #undef iterator
 #undef float_t
+#undef QT_int_fast8_t
+#undef QT_int_fast16_t
+#undef QT_uint_fast16_t
 
 #else
 
@@ -299,7 +305,7 @@ static Boolean QTCmpr_FilterProc
 
 void openMovSettingsPopup(TPropertyGroup *props, bool macBringToFront)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	if (InitializeQTML(0) != noErr)
 		return;
 #endif

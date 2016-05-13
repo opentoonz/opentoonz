@@ -22,9 +22,8 @@
 
 #include "tthread.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <iostream>
-using namespace std;
 #else
 #include <sys/param.h>
 #include <unistd.h>
@@ -33,7 +32,7 @@ using namespace std;
 
 //#define REDIRECT_OUPUT
 
-#ifdef WIN32
+#ifdef _WIN32
 #define QUOTE_STR "\""
 #define CASMPMETER "casmpmeter.exe"
 #else
@@ -41,7 +40,7 @@ using namespace std;
 #define CASMPMETER "casmpmeter"
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
 #define NO_ERROR 0
 #endif
 
@@ -66,7 +65,7 @@ TFilePath getGlobalRoot()
 {
 	TFilePath rootDir;
 
-#ifdef WIN32
+#ifdef _WIN32
 	TFilePath name(L"SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\FARMROOT");
 	rootDir = TFilePath(TSystem::getSystemValue(name).toStdString());
 #else
@@ -85,7 +84,7 @@ TFilePath getGlobalRoot()
 			while (*t)
 				t++;
 
-			string pathName(s, t - 1);
+			std::string pathName(s, t - 1);
 
 			rootDir = TFilePath(pathName);
 		}
@@ -101,7 +100,7 @@ TFilePath getLocalRoot()
 {
 	TFilePath lroot;
 
-#ifdef WIN32
+#ifdef _WIN32
 	TFilePath name("SOFTWARE\\OpenToonz\\OpenToonz\\1.0\\TOONZROOT");
 	lroot = TFilePath(TSystem::getSystemValue(name).toStdString()) + TFilePath("toonzfarm");
 #else
@@ -118,7 +117,7 @@ TFilePath getLocalRoot()
 			while (*t)
 				t++;
 
-			string pathName(s, t - 1);
+			std::string pathName(s, t - 1);
 
 			lroot = TFilePath(pathName);
 		}
@@ -140,7 +139,7 @@ TFilePath getAppsCfgFilePath()
 
 TFilePath getBinRoot()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	return TSystem::getBinDir();
 #else
 	return getLocalRoot() + "bin";
@@ -151,7 +150,7 @@ TFilePath getBinRoot()
 /*
 string myGetHostName()
 {
-#ifdef WIN32
+#ifdef _WIN32
   return TSystem::getHostName();
 #else
   char hostName[MAXHOSTNAMELEN];
@@ -165,7 +164,7 @@ string myGetHostName()
 bool dirExists(const TFilePath &dirFp)
 {
 	bool exists = false;
-#ifdef WIN32
+#ifdef _WIN32
 	TFileStatus fs(dirFp);
 	exists = fs.isDirectory();
 #else
@@ -180,7 +179,7 @@ bool dirExists(const TFilePath &dirFp)
 bool myDoesExists(const TFilePath &fp)
 {
 	bool exists = false;
-#ifdef WIN32
+#ifdef _WIN32
 	TFileStatus fs(fp);
 	exists = fs.doesExist();
 #else
@@ -217,14 +216,14 @@ public:
 	void onStop();
 
 	void loadControllerData(QString &hostName, string &ipAddr, int &port);
-#ifdef WIN32
+#ifdef _WIN32
 	void loadDiskMountingPoints(const TFilePath &fp);
 
 	void mountDisks();
 	void unmountDisks();
 
-	std::map<string, string> m_disks;
-	vector<string> m_disksMounted;
+	std::map<std::string, std::string> m_disks;
+	vector<std::string> m_disksMounted;
 #endif
 
 	int m_port;
@@ -421,7 +420,7 @@ void Task::run()
 
 // ===========
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (m_cmdline.contains("runcasm"))
 		service.mountDisks();
 #endif
@@ -517,11 +516,11 @@ FarmServer::~FarmServer()
 
 //------------------------------------------------------------------------------
 
-inline string toString(unsigned long value)
+inline std::string toString(unsigned long value)
 {
-	ostrstream ss;
+	std::ostrstream ss;
 	ss << value << '\0';
-	string s = ss.str();
+	std::string s = ss.str();
 	ss.freeze(false);
 	return s;
 }
@@ -648,7 +647,7 @@ int FarmServer::addTask(const QString &id, const QString &cmdline)
 
 int FarmServer::terminateTask(const QString &taskid)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	HANDLE hJob = OpenJobObject(
 		MAXIMUM_ALLOWED, // access right
 		TRUE,			 // inheritance state
@@ -681,7 +680,7 @@ int FarmServer::getTasks(vector<QString> &tasks)
 
 void FarmServer::queryHwInfo(HwInfo &hwInfo)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	MEMORYSTATUS buff;
 	GlobalMemoryStatus(&buff);
 
@@ -756,9 +755,9 @@ void FarmServer::removeTask(const QString &id)
 namespace
 {
 
-string getLine(std::istream &is)
+std::string getLine(std::istream &is)
 {
-	string out;
+	std::string out;
 	char c;
 
 	while (!is.eof()) {
@@ -790,7 +789,7 @@ bool loadServerData(const QString &hostname, QString &addr, int &port)
 
 	TFilePath fp = rootDir + "config" + "servers.txt";
 
-#ifndef WIN32
+#ifndef _WIN32
 	int acc = access(toString(fp.getWideString()).c_str(), 00); // 00 == solo esistenza
 	bool fileExists = acc != -1;
 	if (!fileExists)
@@ -805,8 +804,8 @@ bool loadServerData(const QString &hostname, QString &addr, int &port)
     char line[256];
     is.getline(line, 256);
     */
-		string line = getLine(is);
-		istrstream iss(line.c_str());
+		std::string line = getLine(is);
+		std::istrstream iss(line.c_str());
 
 		char name[80];
 		char ipAddress[80];
@@ -834,7 +833,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	// Initialize thread components
 	TThread::init();
 
-#ifdef WIN32
+#ifdef _WIN32
 //  DebugBreak();
 #endif
 
@@ -843,7 +842,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	bool lRootDirExists = fs.isDirectory();
 
 	if (!lRootDirExists) {
-		string errMsg("Unable to start the Server");
+		std::string errMsg("Unable to start the Server");
 		errMsg += "\n";
 		errMsg += "The directory specified as Local Root does not exist";
 		errMsg += "\n";
@@ -861,7 +860,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 
 	TFilePath gRootDir = getGlobalRoot();
 	if (toString(gRootDir.getWideString()) == "") {
-		string errMsg("Unable to get TFARMGLOBALROOT environment variable");
+		std::string errMsg("Unable to get TFARMGLOBALROOT environment variable");
 		addToMessageLog(errMsg);
 
 // DEBUG MAC SERVIZIO (DA TOGLIERE)
@@ -876,7 +875,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	bool gRootDirExists = dirExists(gRootDir);
 	;
 	if (!gRootDirExists) {
-		string errMsg("Unable to start the Server");
+		std::string errMsg("Unable to start the Server");
 		errMsg += "\n";
 		errMsg += "The directory " + toString(gRootDir.getWideString()) + " specified as Global Root does not exist";
 		;
@@ -901,7 +900,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	try {
 		::loadControllerData(fp, controllerData);
 	} catch (TException &e) {
-		string errMsg("Unable to start the Server");
+		std::string errMsg("Unable to start the Server");
 		errMsg += "\n";
 		errMsg += toString(e.getMessage());
 		addToMessageLog(errMsg);
@@ -950,7 +949,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	} catch (TException & /*e*/) {
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	TFilePath diskMountingsFilePath = lRootDir + "config" + "diskmap.cfg";
 	if (myDoesExists(diskMountingsFilePath)) {
 		loadDiskMountingPoints(diskMountingsFilePath);
@@ -976,7 +975,7 @@ void FarmServerService::onStart(int argc, char *argv[])
     std::cout << "Error: " << appsCfgFile << endl;
   while (!isAppCfgFile.eof())
   {
-    string line = getLine(isAppCfgFile);
+    std::string line = getLine(isAppCfgFile);
     istrstream iss(line.c_str());
     TFilePath appPath = TFilePath(line);
     appPaths.push_back(appPath);
@@ -1005,10 +1004,10 @@ void FarmServerService::onStart(int argc, char *argv[])
 #endif
 
 	if (rc != 0) {
-		string msg("An error occurred starting the ToonzFarm Server");
+		std::string msg("An error occurred starting the ToonzFarm Server");
 		msg += "\n";
 
-#ifdef WIN32
+#ifdef _WIN32
 		LPVOID lpMsgBuf;
 		FormatMessage(
 			FORMAT_MESSAGE_ALLOCATE_BUFFER |
@@ -1021,7 +1020,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 			0,
 			NULL);
 
-		msg += string((char *)lpMsgBuf);
+		msg += std::string((char *)lpMsgBuf);
 
 		// Free the buffer.
 		LocalFree(lpMsgBuf);
@@ -1033,7 +1032,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 		setStatus(TService::Stopped, NO_ERROR, 0);
 	}
 
-	string msg("Exiting with code ");
+	std::string msg("Exiting with code ");
 	msg += toString(ret);
 	msg += "\n";
 	m_userLog->info(QString::fromStdString(msg));
@@ -1051,7 +1050,7 @@ void FarmServerService::onStop()
 // i dischi vengono montati al primo task di tipo "runcasm"
 // e smontati allo stop del servizio
 
-#ifdef WIN32
+#ifdef _WIN32
 	unmountDisks();
 #endif
 
@@ -1064,7 +1063,7 @@ void FarmServerService::onStop()
 	}
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 
 //------------------------------------------------------------------------------
 
@@ -1072,7 +1071,7 @@ void FarmServerService::loadDiskMountingPoints(const TFilePath &fp)
 {
 	Tifstream is(fp);
 	if (!is)
-		throw string("File " + toString(fp.getWideString()) + " not found");
+		throw std::string("File " + toString(fp.getWideString()) + " not found");
 	char buffer[1024];
 	while (is.getline(buffer, sizeof(buffer))) {
 		char *s = buffer;
@@ -1092,7 +1091,7 @@ void FarmServerService::loadDiskMountingPoints(const TFilePath &fp)
 			q--;
 		if (q == s)
 			continue; // non dovrebbe succedere mai: prima di '=' tutti blanks
-		string from(s, q - s);
+		std::string from(s, q - s);
 		s = t + 1;
 		while (isBlank(*s))
 			s++;
@@ -1114,10 +1113,10 @@ void FarmServerService::loadDiskMountingPoints(const TFilePath &fp)
 
 void FarmServerService::mountDisks()
 {
-	std::map<string, string>::iterator it = m_disks.begin();
+	std::map<std::string, std::string>::iterator it = m_disks.begin();
 	for (; it != m_disks.end(); ++it) {
-		string drive = it->first;
-		string remoteName = it->second;
+		std::string drive = it->first;
+		std::string remoteName = it->second;
 
 		NETRESOURCE NetResource;
 		NetResource.dwType = RESOURCETYPE_DISK;
@@ -1152,7 +1151,7 @@ void FarmServerService::mountDisks()
 				nameBuf,		  // buffer for provider name
 				sizeof(nameBuf)); // size of provider name buffer
 
-			string errorMessage("Unable to map ");
+			std::string errorMessage("Unable to map ");
 			errorMessage += NetResource.lpRemoteName;
 			errorMessage += " to logic volume ";
 			errorMessage += NetResource.lpLocalName;
@@ -1166,9 +1165,9 @@ void FarmServerService::mountDisks()
 
 void FarmServerService::unmountDisks()
 {
-	vector<string>::iterator it = m_disksMounted.begin();
+	vector<std::string>::iterator it = m_disksMounted.begin();
 	for (; it != m_disksMounted.end(); ++it) {
-		string drive = *it;
+		std::string drive = *it;
 
 		DWORD res = WNetCancelConnection2(
 			drive.c_str(),			// resource name
@@ -1176,7 +1175,7 @@ void FarmServerService::unmountDisks()
 			TRUE);					// unconditional disconnect option
 
 		if (res != NO_ERROR && res != ERROR_NOT_CONNECTED) {
-			string errorMessage("Unable to unmap ");
+			std::string errorMessage("Unable to unmap ");
 			errorMessage += drive.c_str();
 			addToMessageLog(errorMessage);
 		}
@@ -1198,8 +1197,8 @@ int main(int argc, char **argv)
 	bool console = false;
 
 	if (argc > 1) {
-		string serviceName("ToonzFarmServer"); //Must be the same of the installer's
-		string serviceDisplayName = serviceName;
+		std::string serviceName("ToonzFarmServer"); //Must be the same of the installer's
+		std::string serviceDisplayName = serviceName;
 
 		TCli::SimpleQualifier consoleQualifier("-console", "Run as console app");
 		TCli::StringQualifier installQualifier("-install name", "Install service as 'name'");
@@ -1210,7 +1209,7 @@ int main(int argc, char **argv)
 		if (!usage.parse(argc, argv))
 			exit(1);
 
-#ifdef WIN32
+#ifdef _WIN32
 		if (installQualifier.isSelected()) {
 			char szPath[512];
 

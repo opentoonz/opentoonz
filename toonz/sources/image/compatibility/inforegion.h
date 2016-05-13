@@ -42,7 +42,7 @@ int get_info_region(EXT_INFO_REGION *region,
 					int width_in, int height_in, int orientation);
 
 void getInfoRegion(
-	register INFO_REGION *region,
+	INFO_REGION *region,
 	int x1_out,
 	int y1_out,
 	int x2_out,

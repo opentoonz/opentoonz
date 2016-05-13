@@ -210,12 +210,12 @@ void ExpressionField::hideEvent(QHideEvent *e)
 	QTextEdit::hideEvent(e);
 }
 
-void ExpressionField::setExpression(string expression)
+void ExpressionField::setExpression(std::string expression)
 {
 	setPlainText(QString::fromStdString(expression));
 }
 
-string ExpressionField::getExpression() const
+std::string ExpressionField::getExpression() const
 {
 	return toPlainText().toStdString();
 }
@@ -261,7 +261,7 @@ void ExpressionField::keyPressEvent(QKeyEvent *e)
 		QTextEdit::keyPressEvent(e);
 		if (m_completerPopup->isVisible()) {
 			updateCompleterPopup();
-		} else if (Qt::Key_A <= e->key() && e->key() <= Qt::Key_Z || string("+&|!*/=?,:-").find(e->key()) != string::npos) {
+		} else if (Qt::Key_A <= e->key() && e->key() <= Qt::Key_Z || std::string("+&|!*/=?,:-").find(e->key()) != std::string::npos) {
 			openCompleterPopup();
 		}
 		setFocus();
@@ -348,7 +348,7 @@ bool ExpressionField::updateCompleterPopup()
 {
 	int start = m_completerStartPos;
 	int pos = textCursor().position();
-	string text = getExpression();
+	std::string text = getExpression();
 	if (m_suggestions.empty() || start < 0 || start > pos || pos > (int)text.length()) {
 		if (m_completerPopup->isVisible())
 			m_completerPopup->hide();
@@ -356,11 +356,11 @@ bool ExpressionField::updateCompleterPopup()
 	}
 
 	QStandardItemModel *model = new QStandardItemModel();
-	string prefix = toLower(text.substr(start, pos - start));
+	std::string prefix = toLower(text.substr(start, pos - start));
 	int prefixLength = prefix.length();
 	int count = 0;
 	for (int i = 0; i < (int)m_suggestions.size(); i++) {
-		string item = m_suggestions[i].first;
+		std::string item = m_suggestions[i].first;
 		if ((int)item.length() >= prefixLength && toLower(item.substr(0, prefixLength)) == prefix) {
 			QStandardItem *item = new QStandardItem();
 			item->setData(QString::fromStdString(m_suggestions[i].first), Qt::EditRole);
@@ -396,7 +396,7 @@ int ExpressionField::computeSuggestions()
 	m_completerStartPos = -1;
 	m_suggestions.clear();
 
-	string text = getExpression();
+	std::string text = getExpression();
 	int pos = textCursor().position();
 	int start = pos;
 	if (start > 0) {

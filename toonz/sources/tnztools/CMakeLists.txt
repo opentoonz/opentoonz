@@ -101,9 +101,9 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 add_library(tnztools SHARED ${HEADERS} ${SOURCES} ${RESOURCES})
 add_definitions(-DTNZTOOLS_EXPORTS)
 
-if (APPLE)
+if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnztools.dylib")
-endif (APPLE)
+endif()
 
 message("subdir: tnztools")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})

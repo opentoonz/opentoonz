@@ -13,7 +13,7 @@
 //#include "tparamset.h"
 #include "tgl.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif

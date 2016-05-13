@@ -1,7 +1,7 @@
-
-
 #ifndef TGRAMMAR_INCLUDED
 #define TGRAMMAR_INCLUDED
+
+#include <memory>
 
 // TnzCore includes
 #include "tcommon.h"
@@ -166,13 +166,13 @@ enum TokenType {
 
 class DVAPI Pattern
 {
-	string m_description;
+	std::string m_description;
 
 public:
 	Pattern() {}
 	virtual ~Pattern() {}
 
-	virtual string getFirstKeyword() const { return ""; }
+	virtual std::string getFirstKeyword() const { return ""; }
 	virtual void getAcceptableKeywords(std::vector<std::string> &keywords) const {}
 	virtual int getPriority() const { return 0; }
 	virtual bool expressionExpected(const std::vector<Token> &previousTokens) const { return false; }
@@ -186,8 +186,8 @@ public:
 		std::vector<CalculatorNode *> &stack,
 		const std::vector<Token> &tokens) const = 0;
 
-	string getDescription() const { return m_description; }
-	void setDescription(string description) { m_description = description; }
+	std::string getDescription() const { return m_description; }
+	void setDescription(std::string description) { m_description = description; }
 
 	// helper methods
 	CalculatorNode *popNode(std::vector<CalculatorNode *> &stack) const;
@@ -198,7 +198,7 @@ public:
 class DVAPI Grammar
 {
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	Grammar();
@@ -213,7 +213,7 @@ public:
 	const Pattern *getPattern(Position position, const Token &token) const;
 
 	// returns matching <keywords, comment>
-	typedef std::vector<std::pair<string, string>> Suggestions;
+	typedef std::vector<std::pair<std::string, std::string>> Suggestions;
 	void getSuggestions(Suggestions &suggetsions, Position position) const;
 
 private:

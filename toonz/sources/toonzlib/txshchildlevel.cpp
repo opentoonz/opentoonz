@@ -20,7 +20,7 @@ PERSIST_IDENTIFIER(TXshChildLevel, "childLevel")
 //=============================================================================
 // TXshChildLevel
 
-TXshChildLevel::TXshChildLevel(wstring name)
+TXshChildLevel::TXshChildLevel(std::wstring name)
 	: TXshLevel(m_classCode, name), m_xsheet(new TXsheet()), m_iconId()
 {
 	m_xsheet->addRef();
@@ -49,10 +49,10 @@ void TXshChildLevel::loadData(TIStream &is)
 	m_xsheet = 0;
 	is >> m_xsheet;
 	m_xsheet->addRef();
-	string tagName;
+	std::string tagName;
 	if (is.matchTag(tagName)) {
 		if (tagName == "name") {
-			wstring name;
+			std::wstring name;
 			is >> name;
 			setName(name);
 		}

@@ -39,7 +39,7 @@ public:
 	std::string m_name;
 
 public:
-	ExternalPaletteFxRenderData(TPaletteP palette, const string &name);
+	ExternalPaletteFxRenderData(TPaletteP palette, const std::string &name);
 
 	float typeIndex() const { return 0.0f; }
 
@@ -78,8 +78,8 @@ public:
 
 //------------------------------------------------------------------------------
 
-void DVAPI insertIndexes(std::vector<string> items, PaletteFilterFxRenderData *t);
-void DVAPI parseIndexes(std::string indexes, std::vector<string> &items);
+void DVAPI insertIndexes(std::vector<std::string> items, PaletteFilterFxRenderData *t);
+void DVAPI parseIndexes(std::string indexes, std::vector<std::string> &items);
 
 //**********************************************************************************************
 //    SandorFxRenderData  (possible) parameters

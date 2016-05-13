@@ -3,7 +3,7 @@
 #ifndef FXSETTINGS_H
 #define FXSETTINGS_H
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4251)
 #endif
 
@@ -49,8 +49,6 @@ class TSceneHandle;
 class TXshLevelHandle;
 class TObjectHandle;
 class ToonzScene;
-
-using namespace DVGui;
 
 //=============================================================================
 /*! \brief ParamsPage. View a page with fx params.
@@ -132,7 +130,7 @@ class DVAPI ParamsPageSet : public QWidget
 	Q_OBJECT
 
 	TabBarContainter *m_tabBarContainer;
-	TabBar *m_tabBar;
+	DVGui::TabBar *m_tabBar;
 	QStackedWidget *m_pagesList;
 
 	ParamViewer *m_parent;
@@ -195,7 +193,7 @@ class DVAPI ParamViewer : public QFrame
 	TFxP m_fx;
 
 	QStackedWidget *m_tablePageSet;
-	QMap<string, int> m_tableFxIndex;
+	QMap<std::string, int> m_tableFxIndex;
 
 public:
 #if QT_VERSION >= 0x050500

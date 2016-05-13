@@ -24,8 +24,6 @@ class QComboBox;
 class InbetweenDialog;
 class TXshLevel;
 
-using namespace DVGui;
-
 const int fs_leftMargin = 2;
 const int fs_rightMargin = 3;
 const int fs_frameSpacing = 6;
@@ -237,7 +235,7 @@ private:
 // inbetweenDialog
 //-----------------------------------------------------------------------------
 
-class InbetweenDialog : public Dialog
+class InbetweenDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 	QComboBox *m_comboBox;

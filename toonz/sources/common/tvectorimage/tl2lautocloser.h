@@ -1,7 +1,7 @@
-
-
 #ifndef T_L2LAUTOCLOSER_H
 #define T_L2LAUTOCLOSER_H
+
+#include <memory>
 
 #include "tgeometry.h"
 
@@ -15,7 +15,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4251)
 #endif
 
@@ -28,7 +28,7 @@ class TStroke;
 class DVAPI TL2LAutocloser
 {
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	TL2LAutocloser();

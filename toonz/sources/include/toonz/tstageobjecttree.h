@@ -1,7 +1,7 @@
-
-
 #ifndef T_STAGE_OBJECT_TREE_INCLUDED
 #define T_STAGE_OBJECT_TREE_INCLUDED
+
+#include <memory>
 
 #include "toonz/tstageobject.h"
 
@@ -70,7 +70,7 @@ class DVAPI TStageObjectTree : public TPersist
 {
 	PERSIST_DECLARATION(TStageObjectTree)
 	struct TStageObjectTreeImp;
-	TStageObjectTreeImp *m_imp;
+	std::unique_ptr<TStageObjectTreeImp> m_imp;
 
 	//  usato solo sotto #ifndef NDEBUG
 	void checkIntegrity();
@@ -168,7 +168,7 @@ public:
 		If an Handle Manager has not been implemented this method returns a point of coordinates (0,0). 
 		\sa setHandleManager().
 	*/
-	TPointD getHandlePos(const TStageObjectId &id, string handle, int row) const;
+	TPointD getHandlePos(const TStageObjectId &id, std::string handle, int row) const;
 	/*!
 		Returns the number of the spline's objects in the tree.
 	*/

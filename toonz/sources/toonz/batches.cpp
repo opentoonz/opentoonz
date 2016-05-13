@@ -1,6 +1,6 @@
 
 
-#ifdef WIN32
+#ifdef _WIN32
 #define _WIN32_WINNT 0x0500 // per CreateJobObject e affini
 #endif
 
@@ -114,10 +114,10 @@ bool LoadTaskPopup::execute()
 		DVGui::error(toQString(fp) + tr(" does not exist."));
 		return false;
 	} else if (m_isRenderTask && fp.getType() != "tnz") {
-		error(toQString(fp) + tr(" you can load only TNZ files for render task."));
+		DVGui::error(toQString(fp) + tr(" you can load only TNZ files for render task."));
 		return false;
 	} else if (!m_isRenderTask && fp.getType() != "tnz" && fp.getType() != "cln") {
-		error(toQString(fp) + tr(" you can load only TNZ or CLN files for cleanup task."));
+		DVGui::error(toQString(fp) + tr(" you can load only TNZ or CLN files for cleanup task."));
 		return false;
 	}
 
@@ -255,7 +255,7 @@ void TaskRunner::doRun(TFarmTask *task)
   commandline += " -id " + task->m_id;*/
 
 	QProcess *process = new QProcess();
-	map<QString, QProcess *>::iterator it;
+	std::map<QString, QProcess *>::iterator it;
 
 	{
 		QMutexLocker sl(&TasksMutex);
@@ -478,7 +478,7 @@ void BatchesController::removeTask(const QString &id)
 
 	TFarmTask *task = it->second;
 	if (task->m_status == Running || task->m_status == Waiting) {
-		MsgBox(WARNING, taskBusyStr().arg(task->m_name));
+		DVGui::warning(taskBusyStr().arg(task->m_name));
 		return;
 	}
 
@@ -531,7 +531,7 @@ void BatchesController::removeAllTasks()
 	for (tt = m_tasks.begin(); tt != tEnd; ++tt) {
 		TFarmTask *task = tt->second;
 		if (task->m_status == Running || task->m_status == Waiting) {
-			MsgBox(WARNING, taskBusyStr().arg(task->m_name));
+			DVGui::warning(taskBusyStr().arg(task->m_name));
 			return;
 		}
 	}
@@ -624,7 +624,7 @@ void BatchesController::setDirtyFlag(bool state)
 
 //------------------------------------------------------------------------------
 
-void BatchesController::getTasks(const QString &parentId, vector<QString> &tasks) const
+void BatchesController::getTasks(const QString &parentId, std::vector<QString> &tasks) const
 {
 	std::map<QString, TFarmTask *>::const_iterator it = m_tasks.begin();
 	for (; it != m_tasks.end(); ++it) {
@@ -707,7 +707,7 @@ void BatchesController::start(const QString &taskId)
 			m_controller->restartTask(farmTaskId);
 
 			if (dynamic_cast<TFarmTaskGroup *>(task)) {
-				vector<QString> subtasks;
+				std::vector<QString> subtasks;
 				m_controller->getTasks(farmTaskId, subtasks);
 
 				if (!subtasks.empty()) {
@@ -724,7 +724,7 @@ void BatchesController::start(const QString &taskId)
 			m_farmIdsTable.insert(std::make_pair(task->m_id, id));
 
 			if (dynamic_cast<TFarmTaskGroup *>(task)) {
-				vector<QString> subtasks;
+				std::vector<QString> subtasks;
 				m_controller->getTasks(id, subtasks);
 				assert((int)subtasks.size() == task->getTaskCount());
 
@@ -826,7 +826,7 @@ void BatchesController::onExit(bool &ret)
 	int answer = 0;
 
 	if (m_dirtyFlag)
-		answer = MsgBox(QString(tr("The current task list has been modified.\nDo you want to save your changes?")), tr("Save"), tr("Discard"), tr("Cancel"), 1);
+		answer = DVGui::MsgBox(QString(tr("The current task list has been modified.\nDo you want to save your changes?")), tr("Save"), tr("Discard"), tr("Cancel"), 1);
 
 	ret = true;
 	if (answer == 3)
@@ -858,7 +858,7 @@ void BatchesController::loadTask(bool isRenderTask)
 void BatchesController::doLoad(const TFilePath &fp)
 {
 	if (m_dirtyFlag) {
-		int ret = MsgBox(QString(tr("The current task list has been modified.\nDo you want to save your changes?")), tr("Save"), tr("Discard"), tr("Cancel"));
+		int ret = DVGui::MsgBox(QString(tr("The current task list has been modified.\nDo you want to save your changes?")), tr("Save"), tr("Discard"), tr("Cancel"));
 		if (ret == 1)
 			save();
 		else if (ret == 3 || ret == 0)
@@ -878,16 +878,16 @@ void BatchesController::doLoad(const TFilePath &fp)
 
 		m_filepath = fp;
 
-		string tagName = "";
+		std::string tagName = "";
 		if (!is.matchTag(tagName))
 			throw TException("Bad file format");
 
 		if (tagName == "tnzbatches") {
-			string rootTagName = tagName;
-			string v = is.getTagAttribute("version");
+			std::string rootTagName = tagName;
+			std::string v = is.getTagAttribute("version");
 			while (is.matchTag(tagName)) {
 				if (tagName == "generator") {
-					string program = is.getString();
+					std::string program = is.getString();
 				} else if (tagName == "batch") {
 					while (!is.eos()) {
 						TPersist *p = 0;
@@ -930,7 +930,7 @@ QString BatchesController::getListName() const
 void BatchesController::saveas()
 {
 	if (getTaskCount() == 0) {
-		MsgBox(WARNING, tr("The Task List is empty!"));
+		DVGui::warning(tr("The Task List is empty!"));
 		return;
 	}
 
@@ -961,7 +961,7 @@ void BatchesController::doSave(const TFilePath &_fp)
 
 	TOStream os(fp);
 
-	map<string, string> attr;
+	std::map<std::string, string> attr;
 	attr["version"] = "1.0";
 
 	os.openChild("tnzbatches", attr);
@@ -1118,7 +1118,7 @@ public:
 	{
 	}
 
-	QString execute(const vector<QString> &argv);
+	QString execute(const std::vector<QString> &argv);
 
 	QString addTask(const TFarmTask &task, bool suspended);
 	void removeTask(const QString &id);
@@ -1127,8 +1127,8 @@ public:
 	void restartTask(const QString &id);
 
 	void getTasks(vector<QString> &tasks);
-	void getTasks(const QString &parentId, vector<QString> &tasks);
-	void getTasks(const QString &parentId, vector<TaskShortInfo> &tasks);
+	void getTasks(const QString &parentId, std::vector<QString> &tasks);
+	void getTasks(const QString &parentId, std::vector<TaskShortInfo> &tasks);
 
 	void queryTaskInfo(const QString &id, TFarmTask &task);
 
@@ -1189,10 +1189,10 @@ public:
 	}
 
 private:
-	map<QString, TFarmTask> m_tasks;
+	std::map<QString, TFarmTask> m_tasks;
 };
 
-QString MyLocalController::execute(const vector<QString> &argv)
+QString MyLocalController::execute(const std::vector<QString> &argv)
 {
 	if (argv.size() > 5 && argv[0] == "taskProgress") {
 		int step, stepCount, frameNumber;
@@ -1248,12 +1248,12 @@ void MyLocalController::getTasks(vector<QString> &tasks)
 	assert(false);
 }
 
-void MyLocalController::getTasks(const QString &parentId, vector<QString> &tasks)
+void MyLocalController::getTasks(const QString &parentId, std::vector<QString> &tasks)
 {
 	assert(false);
 }
 
-void MyLocalController::getTasks(const QString &parentId, vector<TaskShortInfo> &tasks)
+void MyLocalController::getTasks(const QString &parentId, std::vector<TaskShortInfo> &tasks)
 {
 	assert(false);
 }

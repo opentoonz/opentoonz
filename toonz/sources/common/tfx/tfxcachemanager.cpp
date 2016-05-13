@@ -162,8 +162,6 @@ TFxCacheManager::~TFxCacheManager()
 	std::set<std::string>::iterator it;
 	for (it = m_staticCacheIds.begin(); it != m_staticCacheIds.end(); ++it)
 		TImageCache::instance()->remove(*it);
-
-	delete m_imp;
 }
 
 //-----------------------------------------------------------------------------------
@@ -240,7 +238,7 @@ void TFxCacheManager::notifyPredictedRelease(const TCacheResourceP& resource)
 //****************************************************************************************************
 
 void TFxCacheManager::declareResource(
-	const string &alias, const TFxP &fx,
+	const std::string &alias, const TFxP &fx,
 	const TRectD &rect, double frame, const TRenderSettings &rs,
 	bool subtileable)
 {
@@ -263,7 +261,7 @@ void TFxCacheManager::declareResource(
 //-----------------------------------------------------------------------------------
 
 ResourceData TFxCacheManager::getResource(
-	const string &alias,
+	const std::string &alias,
 	const TFxP &fx, double frame, const TRenderSettings &rs)
 {
 	TCacheResourceP result, temp;
@@ -501,7 +499,7 @@ ResourceBuilder::ResourceBuilder(
 //-----------------------------------------------------------------------------------
 
 void ResourceBuilder::declareResource(
-	const string &alias, const TFxP &fx,
+	const std::string &alias, const TFxP &fx,
 	const TRectD &rect, double frame, const TRenderSettings &rs,
 	bool subtileable)
 {

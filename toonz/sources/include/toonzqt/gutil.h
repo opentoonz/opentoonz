@@ -47,11 +47,11 @@ class TFilePath;
 class QPainterPath;
 class TStroke;
 
-//-----------------------------------------------------------------------------\
+//-----------------------------------------------------------------------------
 
 QString DVAPI fileSizeString(qint64 size, int precision = 2);
 
-//-----------------------------------------------------------------------------\
+//-----------------------------------------------------------------------------
 
 QImage DVAPI rasterToQImage(const TRasterP &ras, bool premultiplied = true, bool mirrored = true);
 

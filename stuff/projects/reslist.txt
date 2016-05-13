@@ -76,16 +76,16 @@ Academy Projection1 4K, 3656x1976, 1.85
 
 Academy Projection2 4K, 4096x2214, 1.85
 
-Anamorphic Pre-squeezed, 1K 914x774, 1.18
+Anamorphic Pre-squeezed 1K, 914x774, 1.18
 
-Anamorphic Pre-squeezed, 2K 1828x1550, 1.18
+Anamorphic Pre-squeezed 2K, 1828x1550, 1.18
 
-Anamorphic Pre-squeezed, 4K 3656x3098, 1.18
+Anamorphic Pre-squeezed 4K, 3656x3098, 1.18
 
-Anamorphic Un-squeezed, 1K 914x388, 2.35
+Anamorphic Un-squeezed 1K, 914x388, 2.35
 
-Anamorphic Un-squeezed, 2K 1828x778, 2.35
+Anamorphic Un-squeezed 2K, 1828x778, 2.35
 
-Anamorphic Un-squeezed, 4K 3656x1556, 2.35
+Anamorphic Un-squeezed 4K, 3656x1556, 2.35
 
 

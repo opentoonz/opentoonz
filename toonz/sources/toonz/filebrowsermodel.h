@@ -23,21 +23,21 @@ class DvDirModelNode
 	bool m_renameEnabled;
 
 protected:
-	wstring m_name;
-	wstring m_oldName; // Used for temporary Name
-	string m_nodeType;
+	std::wstring m_name;
+	std::wstring m_oldName; // Used for temporary Name
+	std::string m_nodeType;
 	std::vector<DvDirModelNode *> m_children;
 	bool m_childrenValid;
 
 public:
-	DvDirModelNode(DvDirModelNode *parent, wstring name);
+	DvDirModelNode(DvDirModelNode *parent, std::wstring name);
 	virtual ~DvDirModelNode();
 
 	DvDirModelNode *getParent() const { return m_parent; }
-	wstring getName() const { return m_name; }
-	virtual bool setName(wstring newName) { return false; }
+	std::wstring getName() const { return m_name; }
+	virtual bool setName(std::wstring newName) { return false; }
 
-	void setTemporaryName(const wstring &newName);
+	void setTemporaryName(const std::wstring &newName);
 	void restoreName();
 
 	int getRow() const { return m_row; }
@@ -55,7 +55,7 @@ public:
 	virtual void refreshChildren() = 0;
 	virtual bool hasChildren();
 
-	virtual int rowByName(const wstring &name) const { return -1; } // ?????????????
+	virtual int rowByName(const std::wstring &name) const { return -1; } // ?????????????
 
 	void enableRename(bool enabled) { m_renameEnabled = enabled; }
 	bool isRenameEnabled() const { return m_renameEnabled; }
@@ -65,7 +65,7 @@ public:
 
 	bool areChildrenValid() const { return m_childrenValid; } // ?????????????
 
-	string getNodeType() const { return m_nodeType; }
+	std::string getNodeType() const { return m_nodeType; }
 
 	virtual DvDirModelNode *getNodeByPath(const TFilePath &path) { return 0; }
 
@@ -85,7 +85,7 @@ protected:
 	bool m_peeks;					//!< Whether this folder allows peeking (typically
 									//!< to gather additional data on sub-folders existence)
 public:
-	DvDirModelFileFolderNode(DvDirModelNode *parent, wstring name, const TFilePath &path);
+	DvDirModelFileFolderNode(DvDirModelNode *parent, std::wstring name, const TFilePath &path);
 	DvDirModelFileFolderNode(DvDirModelNode *parent, const TFilePath &path);
 
 	QPixmap getPixmap(bool isOpen) const;
@@ -94,11 +94,11 @@ public:
 
 	virtual void refreshChildren();
 	virtual bool hasChildren();
-	virtual void getChildrenNames(std::vector<wstring> &names) const;
-	virtual DvDirModelNode *makeChild(wstring name);
-	int rowByName(const wstring &name) const; //?????
+	virtual void getChildrenNames(std::vector<std::wstring> &names) const;
+	virtual DvDirModelNode *makeChild(std::wstring name);
+	int rowByName(const std::wstring &name) const; //?????
 
-	bool setName(wstring newName); // chiamarlo rename ????
+	bool setName(std::wstring newName); // chiamarlo rename ????
 	bool isFolder(const TFilePath &folderPath) const { return folderPath == m_path; }
 	bool isFolder() const { return !m_path.isEmpty(); }
 
@@ -120,19 +120,19 @@ public:
 
 class DvDirModelSceneFolderNode : public DvDirModelFileFolderNode
 {
-	std::map<wstring, TFilePath> m_folders;
+	std::map<std::wstring, TFilePath> m_folders;
 
 public:
-	DvDirModelSceneFolderNode(DvDirModelNode *parent, wstring name, const TFilePath &scenePath);
+	DvDirModelSceneFolderNode(DvDirModelNode *parent, std::wstring name, const TFilePath &scenePath);
 	DvDirModelSceneFolderNode(DvDirModelNode *parent, const TFilePath &path);
 	~DvDirModelSceneFolderNode();
-	bool setName(wstring newName);
+	bool setName(std::wstring newName);
 	QPixmap getPixmap(bool isOpen) const;
-	DvDirModelNode *makeChild(wstring name);
-	void getChildrenNames(std::vector<wstring> &names) const;
+	DvDirModelNode *makeChild(std::wstring name);
+	void getChildrenNames(std::vector<std::wstring> &names) const;
 	void refreshChildren();
 	static DvDirModelFileFolderNode *createNode(DvDirModelNode *parent, const TFilePath &path);
-	int rowByName(const wstring &name);
+	int rowByName(const std::wstring &name);
 };
 
 //-----------------------------------------------------------------------------
@@ -142,7 +142,7 @@ class DvDirModelSpecialFileFolderNode : public DvDirModelFileFolderNode
 	QPixmap m_pixmap;
 
 public:
-	DvDirModelSpecialFileFolderNode(DvDirModelNode *parent, wstring name, const TFilePath &localPath);
+	DvDirModelSpecialFileFolderNode(DvDirModelNode *parent, std::wstring name, const TFilePath &localPath);
 	QPixmap getPixmap(bool isOpen) const;
 	void setPixmap(const QPixmap &pixmap);
 };
@@ -160,15 +160,15 @@ private:
 	// items contained in the folder: Filename, Version Control Status
 	QMap<QString, SVNStatus> m_statusMap;
 
-	wstring m_oldName;
+	std::wstring m_oldName;
 
 public:
-	DvDirVersionControlNode(DvDirModelNode *parent, wstring name, const TFilePath &path);
+	DvDirVersionControlNode(DvDirModelNode *parent, std::wstring name, const TFilePath &path);
 
-	DvDirModelNode *makeChild(wstring name);
+	DvDirModelNode *makeChild(std::wstring name);
 	QPixmap getPixmap(bool isOpen) const;
 
-	void getChildrenNames(std::vector<wstring> &names) const;
+	void getChildrenNames(std::vector<std::wstring> &names) const;
 
 	QList<TFilePath> getMissingFiles() const;
 	QStringList getMissingFiles(const QRegExp &filter) const;
@@ -206,7 +206,7 @@ class DvDirVersionControlRootNode : public DvDirVersionControlNode
 	std::wstring m_password;
 
 public:
-	DvDirVersionControlRootNode(DvDirModelNode *parent, wstring name, const TFilePath &localPath);
+	DvDirVersionControlRootNode(DvDirModelNode *parent, std::wstring name, const TFilePath &localPath);
 	void refreshChildren();
 
 	QPixmap getPixmap(bool isOpen) const { return m_pixmap; }
@@ -232,14 +232,14 @@ class DvDirVersionControlProjectNode : public DvDirVersionControlNode
 {
 
 public:
-	DvDirVersionControlProjectNode(DvDirModelNode *parent, wstring name, const TFilePath &path);
+	DvDirVersionControlProjectNode(DvDirModelNode *parent, std::wstring name, const TFilePath &path);
 	TFilePath getProjectPath() const;
 	bool isCurrent() const;
 	void makeCurrent();
 	QPixmap getPixmap(bool isOpen) const;
 	void refreshChildren();
-	void getChildrenNames(std::vector<wstring> &names) const;
-	//DvDirModelNode *makeChild(wstring name);
+	void getChildrenNames(std::vector<std::wstring> &names) const;
+	//DvDirModelNode *makeChild(std::wstring name);
 };
 
 //-----------------------------------------------------------------------------
@@ -253,18 +253,18 @@ public:
 	void makeCurrent();
 	QPixmap getPixmap(bool isOpen) const;
 	void refreshChildren();
-	void getChildrenNames(std::vector<wstring> &names) const;
-	DvDirModelNode *makeChild(wstring name);
+	void getChildrenNames(std::vector<std::wstring> &names) const;
+	DvDirModelNode *makeChild(std::wstring name);
 };
 
 //-----------------------------------------------------------------------------
 
 class DvDirModelDayNode : public DvDirModelNode
 {
-	string m_dayDateString;
+	std::string m_dayDateString;
 
 public:
-	DvDirModelDayNode(DvDirModelNode *parent, wstring dayDateString);
+	DvDirModelDayNode(DvDirModelNode *parent, std::wstring dayDateString);
 	void refreshChildren() {}
 	void visualizeContent(FileBrowser *browser); //??????????????????
 	QPixmap getPixmap(bool isOpen) const;
@@ -314,7 +314,7 @@ class DvDirModelRootNode : public DvDirModelNode
 	DvDirModelNetworkNode *m_networkNode;
 	DvDirModelProjectNode *m_sandboxProjectNode;
 
-	void add(wstring name, const TFilePath &path);
+	void add(std::wstring name, const TFilePath &path);
 
 public:
 	DvDirModelRootNode();
@@ -348,7 +348,7 @@ public:
 	QModelIndex getIndexByPath(const TFilePath &path) const;
 	QModelIndex getIndexByNode(DvDirModelNode *node) const;
 
-	QModelIndex childByName(const QModelIndex &parent, const wstring &name) const;
+	QModelIndex childByName(const QModelIndex &parent, const std::wstring &name) const;
 
 	int columnCount(const QModelIndex &parent) const { return 1; }
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;

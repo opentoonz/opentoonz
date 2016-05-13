@@ -1,7 +1,7 @@
-
-
 #ifndef TXSHSIMPLELEVEL_INCLUDED
 #define TXSHSIMPLELEVEL_INCLUDED
+
+#include <memory>
 
 // TnzLib includes
 #include "toonz/txshlevel.h"
@@ -17,7 +17,6 @@
 #include <QStringList>
 
 // boost includes
-#include <boost/scoped_ptr.hpp>
 #include <boost/container/flat_set.hpp>
 #include <boost/container/flat_map.hpp>
 
@@ -52,7 +51,7 @@ class TContentHistory;
 /*!
   \brief    The \p TXshLevel specialization for image levels.
 
-  \todo     Substitute m_frames with a sorted std::vector or
+  \todo     Substitute m_frames with a sorted vector or
             a boost flat_set.
 */
 
@@ -194,10 +193,10 @@ public:
     Set the range of frame that can be edited and saved.
     Editable range is contained in \b m_editableRange.
   */
-	void setEditableRange(unsigned int from, unsigned int to, const wstring &userName);
+	void setEditableRange(unsigned int from, unsigned int to, const std::wstring &userName);
 	void mergeTemporaryHookFile(unsigned int from, unsigned int to, const TFilePath &hookFile);
 	void clearEditableRange();
-	wstring getEditableFileName();
+	std::wstring getEditableFileName();
 
 	std::set<TFrameId> getEditableRange(); //!< Returns the set of editable frames.
 
@@ -322,10 +321,8 @@ private:
 	typedef boost::container::flat_set<TFrameId> FramesSet;
 
 private:
-	boost::
-		scoped_ptr<LevelProperties> m_properties;
-	boost::
-		scoped_ptr<TContentHistory> m_contentHistory;
+	std::unique_ptr<LevelProperties> m_properties;
+	std::unique_ptr<TContentHistory> m_contentHistory;
 
 	TPalette *m_palette;
 
@@ -364,7 +361,7 @@ private:
 
 //=====================================================================================
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DV_EXPORT_API TSmartPointerT<TXshSimpleLevel>;
 #endif
 typedef TSmartPointerT<TXshSimpleLevel> TXshSimpleLevelP;

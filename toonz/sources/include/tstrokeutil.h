@@ -57,11 +57,11 @@ DVAPI void modifyControlPoints(TStroke &stroke,
 
 DVAPI void modifyControlPoints(TStroke &stroke,
 							   const TStrokeDeformation &deformer,
-							   vector<double> &controlPointLen);
+								 std::vector<double> &controlPointLen);
 
 DVAPI void modifyThickness(TStroke &stroke,
 						   const TStrokeDeformation &deformer,
-						   vector<double> &controlPointLen,
+							 std::vector<double> &controlPointLen,
 						   bool exponentially = false);
 
 //-----------------------------------------------------------------------------

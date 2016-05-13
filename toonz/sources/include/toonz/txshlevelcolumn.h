@@ -34,7 +34,7 @@ class DVAPI TXshLevelColumn : public TXshCellColumn
 {
 	PERSIST_DECLARATION(TXshLevelColumn)
 	TLevelColumnFx *m_fx;
-	string m_iconId;
+	std::string m_iconId;
 
 	bool m_iconVisible;
 
@@ -90,7 +90,7 @@ private:
 	TXshLevelColumn &operator=(const TXshLevelColumn &);
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DV_EXPORT_API TSmartPointerT<TXshLevelColumn>;
 #endif
 

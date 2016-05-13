@@ -1,10 +1,10 @@
-
-
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef UNICODE
 #define UNICODE
 #endif
 #endif
+
+#include <memory>
 
 #include "tsystem.h"
 //#include "tunicode.h"
@@ -21,7 +21,7 @@
 
 #undef PLATFORM
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #define PLATFORM WIN32
 #include <process.h>
@@ -102,7 +102,7 @@ PLATFORM_NOT_SUPPORTED
 
 using namespace std;
 
-#ifdef WIN32
+#ifdef _WIN32
 
 wstring getFormattedMessage(DWORD lastError)
 {
@@ -122,12 +122,11 @@ wstring getFormattedMessage(DWORD lastError)
 	if (!wSize)
 		return wstring();
 
-	wchar_t *wBuffer = new wchar_t[wSize + 1];
-	MultiByteToWideChar(0, 0, (char *)lpMsgBuf, -1, wBuffer, wSize);
+	std::unique_ptr<wchar_t[]> wBuffer(new wchar_t[wSize + 1]);
+	MultiByteToWideChar(0, 0, (char *)lpMsgBuf, -1, wBuffer.get(), wSize);
 	wBuffer[wSize] = '\0';
-	wstring wmsg(wBuffer);
+	wstring wmsg(wBuffer.get());
 
-	delete[] wBuffer;
 	LocalFree(lpMsgBuf);
 	return wmsg;
 }
@@ -138,7 +137,7 @@ wstring getFormattedMessage(DWORD lastError)
 void TSystem::outputDebug(string s)
 {
 #ifdef TNZCORE_LIGHT
-#ifdef WIN32
+#ifdef _WIN32
 	OutputDebugString((LPCWSTR)s.c_str());
 #else
 	cerr << s << endl;
@@ -159,7 +158,7 @@ int TSystem::getProcessId()
 
 bool TSystem::memoryShortage()
 {
-#ifdef WIN32
+#ifdef _WIN32
 
 	MEMORYSTATUSEX memStatus;
 	memStatus.dwLength = sizeof(MEMORYSTATUSEX);
@@ -205,7 +204,7 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory)
 
 	TINT64 totalFree = 0;
 
-#ifdef WIN32
+#ifdef _WIN32
 
 	MEMORYSTATUSEX buff;
 	buff.dwLength = sizeof(MEMORYSTATUSEX);
@@ -263,7 +262,7 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhisicalMemory)
 	@ @ @ERROR : PLATFORM NOT SUPPORTED
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
 #else
 #endif
 
@@ -287,7 +286,7 @@ TINT64 TSystem::getDiskSize(const TFilePath &diskName)
 		assert(0);
 		return 0;
 	}
-#ifndef WIN32
+#ifndef _WIN32
 	struct statfs buf;
 	wstring str_diskname = diskName.getWideString();
 #ifdef __sgi
@@ -327,7 +326,7 @@ TINT64 TSystem::getFreeDiskSize(const TFilePath &diskName)
 		assert(0);
 		return 0;
 	}
-#ifndef WIN32
+#ifndef _WIN32
 	struct statfs buf;
 	wstring str_diskname = diskName.getWideString();
 #ifdef __sgi
@@ -361,7 +360,7 @@ TINT64 TSystem::getFreeDiskSize(const TFilePath &diskName)
 
 TINT64 TSystem::getMemorySize(bool onlyPhisicalMemory)
 {
-#ifdef WIN32
+#ifdef _WIN32
 
 	MEMORYSTATUS buff;
 	GlobalMemoryStatus(&buff);
@@ -400,7 +399,7 @@ TINT64 TSystem::getMemorySize(bool onlyPhisicalMemory)
 	@ @ @ERROR : PLATFORM NOT SUPPORTED
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
 #else
 #endif
 }
@@ -409,7 +408,7 @@ TINT64 TSystem::getMemorySize(bool onlyPhisicalMemory)
 
 void TSystem::moveFileToRecycleBin(const TFilePath &fp)
 {
-#if defined(WIN32)
+#if defined(_WIN32)
 	//
 	// from http://msdn.microsoft.com/msdnmag/issues/01/04/c/default.aspx
 	//
@@ -497,7 +496,7 @@ TString TSystemException::getMessage() const
 	DEFAULT:
 		msg = L": Unknown error";
 
-#ifndef WIN32
+#ifndef _WIN32
 		CASE ELOOP : msg = L": Too many symbolic links were encountered in translating path.";
 #ifndef MACOSX
 		CASE EMULTIHOP : msg = L": Components of path require hopping to multiple remote machines and the file system does not allow it.";

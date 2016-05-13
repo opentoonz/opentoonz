@@ -3,7 +3,7 @@
 #include "ttcpip.h"
 #include "tconvert.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <Winsock2.h>
 #else
 #include <errno.h> /* obligatory includes */
@@ -19,7 +19,7 @@
 
 #include "tthreadmessage.h"
 #include "tthread.h"
-#ifndef WIN32
+#ifndef _WIN32
 #define SOCKET_ERROR -1
 #endif
 
@@ -62,7 +62,7 @@ int TTcpIpServerImp::readData(int sock, QString &data)
 	char buff[1025];
 	memset(buff, 0, sizeof(buff));
 
-#ifdef WIN32
+#ifdef _WIN32
 	if ((cnt = recv(sock, buff, sizeof(buff) - 1, 0)) < 0) {
 		int err = WSAGetLastError();
 		// GESTIRE L'ERRORE SPECIFICO
@@ -103,7 +103,7 @@ int TTcpIpServerImp::readData(int sock, QString &data)
 	while (size > 0) {
 		memset(buff, 0, sizeof(buff));
 
-#ifdef WIN32
+#ifdef _WIN32
 		if ((cnt = recv(sock, buff, sizeof(buff) - 1, 0)) < 0) {
 			int err = WSAGetLastError();
 			// GESTIRE L'ERRORE SPECIFICO
@@ -161,7 +161,7 @@ int TTcpIpServerImp::readData(int sock, string &data)
   {
     memset (buff,0,sizeof(buff));
 
-#ifdef WIN32
+#ifdef _WIN32
     if (( cnt = recv(sock, buff, sizeof(buff), 0)) < 0 )
     {
       int err = WSAGetLastError();
@@ -202,7 +202,7 @@ int TTcpIpServerImp::readData(int sock, string &data)
 	do {
 		memset(buff, 0, sizeof(buff));
 
-#ifdef WIN32
+#ifdef _WIN32
 		if ((cnt = recv(sock, buff, sizeof(buff), 0)) < 0) {
 			int err = WSAGetLastError();
 			// GESTIRE L'ERRORE SPECIFICO
@@ -246,7 +246,7 @@ TTcpIpServer::TTcpIpServer(int port)
 {
 	m_imp->m_server = this;
 
-#ifdef WIN32
+#ifdef _WIN32
 	// Windows Socket startup
 	WSADATA wsaData;
 	WORD wVersionRequested = MAKEWORD(1, 1);
@@ -261,14 +261,13 @@ TTcpIpServer::TTcpIpServer(int port)
 TTcpIpServer::~TTcpIpServer()
 {
 	if (m_imp->m_s != -1)
-#ifdef WIN32
+#ifdef _WIN32
 		closesocket(m_imp->m_s);
 	WSACleanup();
 #else
 		std::cout << "closing socket" << std::endl;
 	close(m_imp->m_s);
 #endif
-	delete m_imp;
 }
 
 //---------------------------------------------------------------------
@@ -290,14 +289,13 @@ static void shutdown_cb(int)
 class DataReader : public TThread::Runnable
 {
 public:
-	DataReader(int clientSocket, TTcpIpServer *server, TTcpIpServerImp *serverImp)
-		: m_clientSocket(clientSocket), m_server(server), m_serverImp(serverImp) {}
+	DataReader(int clientSocket, std::shared_ptr<TTcpIpServerImp> serverImp)
+		: m_clientSocket(clientSocket), m_serverImp(std::move(serverImp)) {}
 
 	void run();
 
 	int m_clientSocket;
-	TTcpIpServer *m_server;
-	TTcpIpServerImp *m_serverImp;
+	std::shared_ptr<TTcpIpServerImp> m_serverImp;
 };
 
 void DataReader::run()
@@ -309,7 +307,7 @@ void DataReader::run()
 			Sthutdown = true;
 		else
 			m_serverImp->onReceive(m_clientSocket, data);
-#ifdef WIN32
+#ifdef _WIN32
 		closesocket(m_clientSocket);
 #else
 		close(m_clientSocket);
@@ -322,15 +320,14 @@ void DataReader::run()
 class DataReceiver : public TThread::Runnable
 {
 public:
-	DataReceiver(int clientSocket, const QString &data, TTcpIpServer *server, TTcpIpServerImp *serverImp)
-		: m_clientSocket(clientSocket), m_data(data), m_server(server), m_serverImp(serverImp) {}
+	DataReceiver(int clientSocket, const QString &data, std::shared_ptr<TTcpIpServerImp> serverImp)
+		: m_clientSocket(clientSocket), m_data(data), m_serverImp(std::move(serverImp)) {}
 
 	void run();
 
 	int m_clientSocket;
 	QString m_data;
-	TTcpIpServer *m_server;
-	TTcpIpServerImp *m_serverImp;
+	std::shared_ptr<TTcpIpServerImp> m_serverImp;
 };
 
 //---------------------------------------------------------------------
@@ -338,7 +335,7 @@ public:
 void DataReceiver::run()
 {
 	m_serverImp->onReceive(m_clientSocket, m_data);
-#ifdef WIN32
+#ifdef _WIN32
 	closesocket(m_clientSocket);
 #else
 	close(m_clientSocket);
@@ -350,7 +347,7 @@ void DataReceiver::run()
 void TTcpIpServer::run()
 {
 	try {
-#ifdef WIN32
+#ifdef _WIN32
 
 		int err = establish(m_imp->m_port, m_imp->m_s);
 		if (!err && m_imp->m_s != -1) {
@@ -374,7 +371,7 @@ void TTcpIpServer::run()
 					} else {
 						// creo un nuovo thread per la gestione dei dati ricevuti
 						TThread::Executor executor;
-						executor.addTask(new DataReceiver(t, data, this, m_imp));
+						executor.addTask(new DataReceiver(t, data, m_imp));
 					}
 				} else {
 					::shutdown(t, 1);
@@ -385,7 +382,7 @@ void TTcpIpServer::run()
 			return;
 		}
 
-#else // !WIN32
+#else // !_WIN32
 
 		int err = establish(m_imp->m_port, m_imp->m_s);
 		if (!err && m_imp->m_s != -1) {
@@ -413,14 +410,14 @@ void TTcpIpServer::run()
 				}
 
 				TThread::Executor executor;
-				executor.addTask(new DataReader(t, this, m_imp));
+				executor.addTask(new DataReader(t, m_imp));
 			}
 		} else {
 			m_exitCode = err;
 			return;
 		}
 
-#endif // WIN32
+#endif // _WIN32
 	} catch (...) {
 		m_exitCode = 2000;
 		return;
@@ -453,7 +450,7 @@ void TTcpIpServer::sendReply(int socket, const QString &reply)
 	int nLeft = packet.size();
 	int idx = 0;
 	while (nLeft > 0) {
-#ifdef WIN32
+#ifdef _WIN32
 		int ret = send(socket, packet.c_str() + idx, nLeft, 0);
 #else
 		int ret = write(socket, packet.c_str() + idx, nLeft);
@@ -488,7 +485,7 @@ int establish(unsigned short portnum, int &sock)
 	sa.sin_port = htons(portnum);					  /* this is our port number */
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) /* create socket */
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		int err = WSAGetLastError();
 		return err;
 #else
@@ -497,7 +494,7 @@ int establish(unsigned short portnum, int &sock)
 	}
 
 	if (::bind(sock, (struct sockaddr *)&sa, sizeof(struct sockaddr_in)) < 0) {
-#ifdef WIN32
+#ifdef _WIN32
 		int err = WSAGetLastError();
 		closesocket(sock);
 		return err;
@@ -522,7 +519,7 @@ int get_connection(int s)
 	return (t);
 }
 
-#ifndef WIN32
+#ifndef _WIN32
 //-----------------------------------------------------------------------
 /* as children die we should get catch their returns or else we get
  * zombies, A Bad Thing.  fireman() catches falling children.

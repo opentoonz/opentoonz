@@ -1,7 +1,7 @@
-
-
 #ifndef PERMISSIONSMANAGER_INCLUDED
 #define PERMISSIONSMANAGER_INCLUDED
+
+#include <memory>
 
 // TnzCore includes
 #include "tcommon.h"
@@ -31,7 +31,7 @@ public:
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 private:
 	PermissionsManager();

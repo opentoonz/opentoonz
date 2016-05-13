@@ -1,6 +1,6 @@
 
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #endif
 
@@ -128,7 +128,7 @@ void TTWAIN_RecordError(void)
 	}
 
 	if (TTwainData.ErrRC == TWRC_FAILURE && TTwainData.ErrCC == TWCC_OPERATIONERROR) {
-#ifdef WIN32
+#ifdef _WIN32
 		OutputDebugString(Msg_out);
 #else
 #ifdef TOONZDEBUG

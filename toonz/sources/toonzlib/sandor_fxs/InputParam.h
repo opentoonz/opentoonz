@@ -11,20 +11,18 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "Windows.h"
 #endif
 #include <algorithm>
 #include <string>
-
-using namespace std;
 
 class CInputParam
 {
 public:
 	double m_scale;
 	bool m_isEconf;
-	basic_string<char> m_econfFN;
+	std::basic_string<char> m_econfFN;
 
 	CInputParam() : m_scale(0), m_isEconf(false), m_econfFN(""){};
 	CInputParam(const CInputParam &p) : m_scale(p.m_scale), m_isEconf(p.m_isEconf),

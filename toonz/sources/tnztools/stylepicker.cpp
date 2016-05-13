@@ -183,7 +183,7 @@ TPixel32 getAverageColor(const TRect &rect)
 #error	"unknown channel order!"
 #endif
 	UINT r = 0, g = 0, b = 0, m = 0;
-	vector<TPixel32> buffer(rect.getLx() * rect.getLy());
+	std::vector<TPixel32> buffer(rect.getLx() * rect.getLy());
 	glReadPixels(rect.x0, rect.y0, rect.getLx(), rect.getLy(), fmt, GL_UNSIGNED_BYTE, &buffer[0]);
 	int size = rect.getLx() * rect.getLy();
 	for (int i = 0; i < size; i++) {
@@ -216,7 +216,7 @@ TPixel32 getAverageColor(TStroke *stroke)
 	//leggo il buffer e mi prendo i pixels
 	UINT r = 0, g = 0, b = 0, m = 0;
 	TRect rect = convert(stroke->getBBox());
-	vector<TPixel32> buffer(rect.getLx() * rect.getLy());
+	std::vector<TPixel32> buffer(rect.getLx() * rect.getLy());
 	glReadPixels(rect.x0, rect.y0, rect.getLx(), rect.getLy(), fmt, GL_UNSIGNED_BYTE, &buffer[0]);
 
 	//calcolo le regioni dello stroke
@@ -231,7 +231,7 @@ TPixel32 getAverageColor(TStroke *stroke)
 		TRegion *reg = aux.getRegion(j);
 		TRect regRect = convert(reg->getBBox());
 		for (int y = regRect.y0; y < regRect.y1; y++) {
-			vector<double> intersections;
+			std::vector<double> intersections;
 			reg->computeScanlineIntersections(y, intersections);
 			assert(!(intersections.size() & 0x1));
 			for (UINT i = 0; i < intersections.size(); i += 2) {

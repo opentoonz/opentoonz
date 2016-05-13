@@ -17,7 +17,7 @@
 #include "tcurves.h"
 #include "tstrokeoutline.h"
 
-#ifndef WIN32
+#ifndef _WIN32
 #define CALLBACK
 #endif
 

@@ -134,13 +134,13 @@ private:
 	DVGui::ProgressDialog *m_progressDialog;
 
 	std::vector<TFilePath> m_srcFilePaths;
-	static QMap<string,
+	static QMap<std::string,
 				TPropertyGroup *> m_formatProperties;
 
 	bool m_isConverting;
 
 private:
-	TPropertyGroup *getFormatProperties(const string &ext);
+	TPropertyGroup *getFormatProperties(const std::string &ext);
 	QFrame *createTlvSettings();
 	QFrame *createSvgSettings();
 

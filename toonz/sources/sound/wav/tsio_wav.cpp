@@ -1,4 +1,4 @@
-
+#include <memory>
 
 #include "tmachine.h"
 #include "tsio_wav.h"
@@ -163,25 +163,19 @@ class TDATAChunk : public TWAVChunk
 {
 
 public:
-	UCHAR *m_samples;
+	std::unique_ptr<UCHAR[]> m_samples;
 
 	TDATAChunk(TINT32 length)
 		: TWAVChunk("data", length) {}
-
-	~TDATAChunk()
-	{
-		if (m_samples)
-			delete[] m_samples;
-	}
 
 	bool read(Tifstream &is)
 	{
 
 		// alloca il buffer dei campioni
-		m_samples = new UCHAR[m_length];
+		m_samples.reset(new UCHAR[m_length]);
 		if (!m_samples)
 			return false;
-		is.read((char *)m_samples, m_length);
+		is.read((char *)m_samples.get(), m_length);
 		return true;
 	}
 
@@ -196,7 +190,7 @@ public:
 
 		os.write((char *)"data", 4);
 		os.write((char *)&length, sizeof(length));
-		os.write((char *)m_samples, m_length);
+		os.write((char *)m_samples.get(), m_length);
 		return true;
 	}
 };
@@ -300,19 +294,19 @@ TSoundTrackP TSoundTrackReaderWav::load()
 			case 8:
 				memcpy(
 					(void *)track->getRawData(),
-					(void *)(dataChunk->m_samples),
+					(void *)(dataChunk->m_samples.get()),
 					sampleCount * fmtChunk->m_bytesPerSample);
 				break;
 			case 16:
 				if (!TNZ_LITTLE_ENDIAN)
 					swapAndCopySamples(
-						(short *)dataChunk->m_samples,
+						(short *)dataChunk->m_samples.get(),
 						(short *)track->getRawData(),
 						sampleCount * fmtChunk->m_chans);
 				else
 					memcpy(
 						(void *)track->getRawData(),
-						(void *)(dataChunk->m_samples),
+						(void *)(dataChunk->m_samples.get()),
 						sampleCount * fmtChunk->m_bytesPerSample);
 				//#endif
 				break;
@@ -322,18 +316,18 @@ TSoundTrackP TSoundTrackReaderWav::load()
 					for (int i = 0; i < (int)(sampleCount * fmtChunk->m_chans); ++i) {
 						*(begin + 4 * i) = 0;
 						*(begin + 4 * i + 1) =
-							*(dataChunk->m_samples + 3 * i + 2);
+							*(dataChunk->m_samples.get() + 3 * i + 2);
 						*(begin + 4 * i + 2) =
-							*(dataChunk->m_samples + 3 * i + 1);
+							*(dataChunk->m_samples.get() + 3 * i + 1);
 						*(begin + 4 * i + 3) =
-							*(dataChunk->m_samples + 3 * i);
+							*(dataChunk->m_samples.get() + 3 * i);
 					}
 				} else {
 					UCHAR *begin = (UCHAR *)track->getRawData();
 					for (int i = 0; i < (int)(sampleCount * fmtChunk->m_chans); ++i) {
 						memcpy(
 							(void *)(begin + 4 * i),
-							(void *)(dataChunk->m_samples + 3 * i), 3);
+							(void *)(dataChunk->m_samples.get() + 3 * i), 3);
 						*(begin + 4 * i + 3) = 0;
 					}
 				}
@@ -413,7 +407,7 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack)
 
 	TDATAChunk dataChunk(soundDataLenght);
 
-	UCHAR *waveData = new UCHAR[soundDataLenght];
+	std::unique_ptr<UCHAR[]> waveData(new UCHAR[soundDataLenght]);
 
 	if (!TNZ_LITTLE_ENDIAN)
 		RIFFChunkLength = swapTINT32(RIFFChunkLength);
@@ -444,20 +438,20 @@ bool TSoundTrackWriterWav::save(const TSoundTrackP &sndtrack)
 	{
 		if (fmtChunk.m_bitPerSample != 24)
 			memcpy(
-				(void *)waveData,
+				(void *)waveData.get(),
 				(void *)sndtrack->getRawData(),
 				soundDataLenght);
 		else { //togliere quarto byte
 			UCHAR *begin = (UCHAR *)sndtrack->getRawData();
 			for (int i = 0; i < (int)sndtrack->getSampleCount() * fmtChunk.m_chans; ++i) {
-				*(waveData + 3 * i) = *(begin + 4 * i);
-				*(waveData + 3 * i + 1) = *(begin + 4 * i + 1);
-				*(waveData + 3 * i + 2) = *(begin + 4 * i + 2);
+				*(waveData.get() + 3 * i) = *(begin + 4 * i);
+				*(waveData.get() + 3 * i + 1) = *(begin + 4 * i + 1);
+				*(waveData.get() + 3 * i + 2) = *(begin + 4 * i + 2);
 			}
 		}
 	}
 #endif
-	dataChunk.m_samples = waveData;
+	dataChunk.m_samples = std::move(waveData);
 
 	os.write("RIFF", 4);
 	os.write((char *)&RIFFChunkLength, sizeof(TINT32));

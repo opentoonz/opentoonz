@@ -86,7 +86,7 @@ public:
 	void (*fin_)(void);
 	int ref_count_;
 	int param_page_num_;
-	toonz_param_page_t *param_pages_;
+	std::unique_ptr<toonz_param_page_t[]> param_pages_;
 
 	std::vector<UIPage *> ui_pages_;
 	std::vector<ParamView *> param_views_;
@@ -96,7 +96,7 @@ public:
 	std::vector<std::shared_ptr<std::string>> param_string_tbl_; /* shared_ptr< void > では non-virtual destructor が呼ばれないので  */
 
 public:
-	PluginInformation() : desc_(NULL), library_(NULL), handler_(NULL), host_(NULL), ini_(NULL), fin_(NULL), ref_count_(1), param_page_num_(0), param_pages_(NULL)
+	PluginInformation() : desc_(NULL), library_(NULL), handler_(NULL), host_(NULL), ini_(NULL), fin_(NULL), ref_count_(1), param_page_num_(0)
 	{
 	}
 

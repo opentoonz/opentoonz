@@ -69,7 +69,7 @@ public:
 	TINT64 tell();
 
 	bool isOpen();
-	string getLastError();
+	std::string getLastError();
 
 protected:
 	bool open_internal(const TFilePath &fname, /* const wchar_t *pwszFilename, */ uint32 flags);

@@ -53,7 +53,7 @@ typedef enum {
 template <class P>
 class CSTPic
 {
-	string m_cacheId;
+	std::string m_cacheId;
 	TRasterImageP m_picP;
 
 public:

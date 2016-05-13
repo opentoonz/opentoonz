@@ -22,7 +22,7 @@ class RGBPickerTool : public TTool
 	TEnumProperty m_pickType;
 
 	TBoolProperty m_passivePick;
-	vector<RGBPickerToolOptionsBox *> m_toolOptionsBox;
+	std::vector<RGBPickerToolOptionsBox *> m_toolOptionsBox;
 
 	//Aggiunte per disegnare il lazzo a la polyline
 	StrokeGenerator m_drawingTrack;
@@ -32,8 +32,8 @@ class RGBPickerTool : public TTool
 	double m_thick;
 	TStroke *m_stroke;
 	TStroke *m_firstStroke;
-	vector<TPointD> m_drawingPolyline;
-	vector<TPointD> m_workingPolyline;
+	std::vector<TPointD> m_drawingPolyline;
+	std::vector<TPointD> m_workingPolyline;
 	bool m_makePick;
 
 public:
@@ -71,7 +71,7 @@ public:
 
 	void pickStroke();
 
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 
 	void onActivate();
 

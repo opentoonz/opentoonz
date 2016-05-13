@@ -47,7 +47,7 @@ class HooksData : public DvMimeData
 			: m_id(id), m_aPos(aPos), m_bPos(bPos) {}
 	};
 
-	vector<HookPosition> m_hookPositions;
+	std::vector<HookPosition> m_hookPositions;
 	TXshLevelP m_level;
 
 public:
@@ -55,7 +55,7 @@ public:
 	~HooksData();
 
 	HooksData *clone() const;
-	void storeHookPositions(const vector<int> &ids);
+	void storeHookPositions(const std::vector<int> &ids);
 	void restoreHookPositions() const;
 };
 

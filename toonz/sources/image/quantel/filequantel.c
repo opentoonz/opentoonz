@@ -16,7 +16,7 @@
 #include "filequantel.h"
 #include "filequantelP.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #define STAT_BUF struct _stat
 #else
 #define STAT_BUF struct stat

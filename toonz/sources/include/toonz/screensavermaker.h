@@ -18,7 +18,7 @@
 void DVAPI makeScreenSaver(
 	TFilePath scr,
 	TFilePath swf,
-	string screenSaverName);
+	std::string screenSaverName);
 
 void DVAPI previewScreenSaver(
 	TFilePath scr);

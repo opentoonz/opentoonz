@@ -183,7 +183,7 @@ ChannelField::ChannelField(QWidget *parent,
 	assert(0 <= value && value <= m_maxValue);
 
 	QLabel *channelName = new QLabel(string, this);
-	m_channelEdit = new IntLineEdit(this, value, 0, maxValue);
+	m_channelEdit = new DVGui::IntLineEdit(this, value, 0, maxValue);
 	m_channelSlider = new QSlider(Qt::Horizontal, this);
 
 	channelName->setAlignment(Qt::AlignRight | Qt::AlignVCenter);

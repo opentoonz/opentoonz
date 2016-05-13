@@ -10,7 +10,7 @@
 #include "tconvert.h"
 #include "trop.h"
 #include <fstream>
-
+#include <memory>
 #include "TScannerIO/TUSBScannerIO.h"
 
 using namespace TScannerUtil;
@@ -24,7 +24,7 @@ int scsi_maxlen()
 
 #define BW_USES_GRAYTONES
 
-#ifndef WIN32
+#ifndef _WIN32
 #define SWAPIT
 #endif
 
@@ -78,13 +78,13 @@ class TScannerExpection : public TException
 	TString m_scannerMsg;
 
 public:
-	TScannerExpection(const vector<string> &notFatal, const string &fatal)
+	TScannerExpection(const std::vector<std::string> &notFatal, const std::string &fatal)
 		: TException("Scanner Expection")
 	{
 		m_scannerMsg = toWideString(fatal);
 		for (int i = notFatal.size(); i; i--)
 			m_scannerMsg += toWideString("\n") + toWideString(notFatal[i - 1]);
-		log(string("Exception created: ") + toString(m_scannerMsg));
+		log(std::string("Exception created: ") + toString(m_scannerMsg));
 	}
 	TString getMessage() const { return m_scannerMsg; }
 };
@@ -133,7 +133,7 @@ TScannerEpson::~TScannerEpson()
 
 void TScannerEpson::selectDevice()
 {
-	log(string("selectDevice; isOpened=") + (m_isOpened ? "true" : "false"));
+	log(std::string("selectDevice; isOpened=") + (m_isOpened ? "true" : "false"));
 	if (!m_scannerIO->open()) {
 		log("open() failed");
 		throw TException("unable to get handle to scanner");
@@ -322,12 +322,12 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 
 			bytes_to_read = lines * counter;
 			if (stx != 0x02) {
-				ostrstream os;
+				std::ostrstream os;
 				os << "header corrupted (" << std::hex << stx << ")" << '\0';
 				throw TException(os.str());
 			}
 			unsigned long reqBytes = bytes_to_read;
-			unsigned char *readBuffer = ESCI_read_data2(reqBytes);
+			std::unique_ptr<unsigned char[]> readBuffer = ESCI_read_data2(reqBytes);
 			if (!readBuffer)
 				throw TException("Error reading image data");
 
@@ -339,8 +339,7 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
           readBuffer[i] = ~readBuffer[i];
       }
       */
-			memcpy(buffer + bytes_read, readBuffer, reqBytes);
-			delete[] readBuffer;
+			memcpy(buffer + bytes_read, readBuffer.get(), reqBytes);
 			bytes_read += reqBytes;
 			nTimes++;
 			if (bytes_read == bytes)
@@ -422,7 +421,7 @@ void TScannerEpson::acquire(const TScannerParameters &params, int paperCount)
 
 	if ((m_settingsMode == NEW_STYLE) && params.m_paperFeeder.m_supported && (params.m_paperFeeder.m_value == 1.)) {
 		if (!ESCI_command_1b('e', 1, true)) {
-			vector<string> notFatal;
+			std::vector<std::string> notFatal;
 			throw TScannerExpection(notFatal, "Scanner error (un)loading paper");
 		}
 		unsigned char p = 0x0C;
@@ -452,7 +451,7 @@ void TScannerEpson::doSettings(const TScannerParameters &params, bool firstSheet
 {
 	log("doSettings");
 	int retryCount = 3;
-	vector<string> notFatal;
+	std::vector<std::string> notFatal;
 
 	while (retryCount--) {
 		if (m_settingsMode == NEW_STYLE) {
@@ -625,7 +624,6 @@ void TScannerEpson::collectInformation(char *lev0, char *lev1, unsigned short *l
 {
 	log("collectInformation");
 	unsigned char stx;
-	unsigned char *buffer;
 	int pos = 0;
 	unsigned short counter;
 	unsigned char status;
@@ -638,11 +636,11 @@ if (!resetScanner())
 		throw TException("Unable to get scanner info. Is it off ?");
 
 	unsigned long s = 4; // 4 bytes cfr Identity Data Block on ESCI Manual!!!
-	unsigned char *buffer2 = ESCI_read_data2(s);
+	std::unique_ptr<unsigned char[]> buffer2 = ESCI_read_data2(s);
 	if (!buffer2 || (s != 4))
 		throw TException("Error reading scanner info");
 
-	memcpy(&stx, buffer2, 1);
+	memcpy(&stx, buffer2.get(), 1);
 	memcpy(&counter, &(buffer2[2]), 2);
 
 #ifdef SWAPIT
@@ -651,17 +649,14 @@ if (!resetScanner())
 
 #ifdef _DEBUG
 	memcpy(&status, &(buffer2[1]), 1);
-	ostrstream os;
+	std::ostrstream os;
 	os.freeze(false);
 	os << "stx = " << stx << " status = " << status << " counter=" << counter << '\n' << '\0';
 #endif
 
-	delete[] buffer2;
-	buffer2 = 0;
-
 	s = counter;
-	buffer = ESCI_read_data2(s);
-	int len = strlen((const char *)buffer);
+	std::unique_ptr<unsigned char[]> buffer = ESCI_read_data2(s);
+	int len = strlen((const char *)buffer.get());
 
 	/*printf("Level %c%c", buffer[0], buffer[1]);*/
 	if (len > 1) {
@@ -677,7 +672,6 @@ if (!resetScanner())
 		*hiRes = 0;
 		*vMax = 0;
 		*hMax = 0;
-		delete[] buffer;
 		throw TException("unable to get information from scanner");
 	}
 
@@ -697,14 +691,11 @@ if (!resetScanner())
 		*hiRes = 0;
 		*vMax = 0;
 		*hMax = 0;
-		delete[] buffer;
 		throw TException("unable to get information from scanner");
 	}
 
 	*hMax = (buffer[pos + 2] * 256) + buffer[pos + 1];
 	*vMax = (buffer[pos + 4] * 256) + buffer[pos + 3];
-
-	delete[] buffer;
 
 	ESCI_command('f', false);
 
@@ -715,7 +706,7 @@ if (!resetScanner())
 	s = counter;
 	buffer = ESCI_read_data2(s);
 	//name buffer+1A
-	const char *name = (const char *)(buffer + 0x1A);
+	const char *name = (const char *)(buffer.get() + 0x1A);
 	if (strncmp(name, "Perfection1640", strlen("Perfection1640"))) {
 		m_settingsMode = NEW_STYLE;
 	} else {
@@ -738,7 +729,6 @@ scsi_b77(1, "adf_installed",0);
 /**/
 #endif
 	m_hasADF = !!(buffer[1] & 0x80);
-	delete[] buffer;
 	log("collectInformation:OK");
 }
 
@@ -748,7 +738,7 @@ bool TScannerEpson::resetScanner()
 {
 	log("resetScanner");
 	bool ret = ESCI_command('@', true);
-	log(string("resetScanner: ") + (ret ? "OK" : "FAILED"));
+	log(std::string("resetScanner: ") + (ret ? "OK" : "FAILED"));
 	return ret;
 }
 
@@ -777,13 +767,13 @@ bool TScannerEpson::expectACK()
 
 #ifdef _DEBUG
 	if (ack != ACK) {
-		ostrstream os;
+		std::ostrstream os;
 		os.freeze(false);
 		os << "ack fails ret = 0x" << std::hex << (int)ack << '\n' << '\0';
 		TSystem::outputDebug(os.str());
 	}
 #endif
-	log(string("expectACK: ") + (ack == ACK ? "ACK" : "FAILED"));
+	log(std::string("expectACK: ") + (ack == ACK ? "ACK" : "FAILED"));
 
 	return (ack == ACK);
 }
@@ -883,12 +873,12 @@ bool TScannerEpson::ESCI_command_4w(char cmd, unsigned short p0, unsigned short 
 	return status;
 }
 
-unsigned char *TScannerEpson::ESCI_read_data2(unsigned long &size)
+std::unique_ptr<unsigned char[]> TScannerEpson::ESCI_read_data2(unsigned long &size)
 {
-	unsigned char *buffer = new unsigned char[size];
-	memset(buffer, 0, size);
+	std::unique_ptr<unsigned char[]> buffer(new unsigned char[size]);
+	memset(buffer.get(), 0, size);
 	unsigned long bytesToRead = size;
-	size = receive(buffer, bytesToRead);
+	size = receive(buffer.get(), bytesToRead);
 	return buffer;
 }
 
@@ -929,27 +919,27 @@ void TScannerEpson::scanArea2pix(const TScannerParameters &params, unsigned shor
 void TScannerEpson::ESCI_readLineData(unsigned char &stx, unsigned char &status, unsigned short &counter, unsigned short &lines, bool &areaEnd)
 {
 	unsigned long s = 6;
-	unsigned char *buffer = ESCI_read_data2(s);
+	std::unique_ptr<unsigned char[]> buffer = ESCI_read_data2(s);
 	if (!buffer)
 		throw TException("Error reading scanner info");
 	/* PACKET DATA LEN = 6
-  type offs  descr
-  byte  0    STX
-  b77   1    fatal_error
-  b66   1    not_ready
-  b55   1    area_end
-  b44   1    option_unit
-  b33   1    col_attrib_bit_3
-  b22   1    col_attrib_bit_2
-  b11   1    extended_commands
-  drow  2,   counter
-  drow  4    lines 
-*/
+	type offs  descr
+	byte  0    STX
+	b77   1    fatal_error
+	b66   1    not_ready
+	b55   1    area_end
+	b44   1    option_unit
+	b33   1    col_attrib_bit_3
+	b22   1    col_attrib_bit_2
+	b11   1    extended_commands
+	drow  2,   counter
+	drow  4    lines
+	*/
 	bool fatalError = !!(buffer[1] & 0x80);
 	bool notReady = !!(buffer[1] & 0x40);
 	areaEnd = !!(buffer[1] & 0x20);
 
-	memcpy(&stx, buffer, 1);
+	memcpy(&stx, buffer.get(), 1);
 	memcpy(&counter, &(buffer[2]), 2);
 
 #ifdef SWAPIT
@@ -963,7 +953,7 @@ void TScannerEpson::ESCI_readLineData(unsigned char &stx, unsigned char &status,
 	status = buffer[1];
 
 #ifdef _DEBUG
-	ostrstream os;
+	std::ostrstream os;
 	os.freeze(false);
 
 	os << "fatal=" << fatalError;
@@ -977,20 +967,18 @@ void TScannerEpson::ESCI_readLineData(unsigned char &stx, unsigned char &status,
 
 	TSystem::outputDebug(os.str());
 #endif
-
-	delete[] buffer;
 }
 
 void TScannerEpson::ESCI_readLineData2(unsigned char &stx, unsigned char &status, unsigned short &counter)
 {
 	unsigned long s = 4;
-	unsigned char *buffer = ESCI_read_data2(s);
+	std::unique_ptr<unsigned char[]> buffer = ESCI_read_data2(s);
 	if (!buffer)
 		throw TException("Error reading scanner info");
 	bool fatalError = !!(buffer[1] & 0x80);
 	bool notReady = !!(buffer[1] & 0x40);
 
-	memcpy(&stx, buffer, 1);
+	memcpy(&stx, buffer.get(), 1);
 	memcpy(&counter, &(buffer[2]), 2);
 #ifdef SWAPIT
 	counter = swapUshort(counter);
@@ -999,7 +987,7 @@ void TScannerEpson::ESCI_readLineData2(unsigned char &stx, unsigned char &status
 	status = buffer[1];
 
 #ifdef _DEBUG
-	ostrstream os;
+	std::ostrstream os;
 	os.freeze(false);
 
 	os << "fatal=" << fatalError;
@@ -1011,6 +999,5 @@ void TScannerEpson::ESCI_readLineData2(unsigned char &stx, unsigned char &status
 
 	TSystem::outputDebug(os.str());
 #endif
-
-	delete[] buffer;
 }
+

@@ -107,11 +107,11 @@ public:
 
 //---------------------------------------------------------------------------------------------
 
-int match(vector<MatchingProbs> &probsVector, int &from, int &to)
+int match(std::vector<MatchingProbs> &probsVector, int &from, int &to)
 {
 	int i = 0, maxProb = 0;
 	bool overlappingArea = false;
-	vector<MatchingProbs>::iterator it, matchedProbs;
+	std::vector<MatchingProbs>::iterator it, matchedProbs;
 	for (it = probsVector.begin(); it != probsVector.end(); it++) {
 		MatchingProbs probs = *it;
 		if (probs.m_matched)
@@ -133,7 +133,7 @@ int match(vector<MatchingProbs> &probsVector, int &from, int &to)
 
 //---------------------------------------------------------------------------------------------
 
-void assignProbs(vector<MatchingProbs> &probVector, const Region &reference, const Region &work,
+void assignProbs(std::vector<MatchingProbs> &probVector, const Region &reference, const Region &work,
 				 int from, int to)
 {
 	double delta_posx1, delta_posy1, delta_posx2, delta_posy2;
@@ -338,7 +338,7 @@ bool rect_autofill_apply(const TVectorImageP &imgToApply, const TRectD &rect, bo
 
 	workB = TPointD(pbx / totalArea, pby / totalArea);
 
-	vector<MatchingProbs> probVector;
+	std::vector<MatchingProbs> probVector;
 
 	RegionDataList::Iterator refIt, workIt;
 	for (refIt = regionsReference.begin(); refIt != regionsReference.end(); refIt++)
@@ -469,7 +469,7 @@ bool stroke_autofill_apply(const TVectorImageP &imgToApply, TStroke *stroke, boo
 
 	workB = TPointD(pbx / totalArea, pby / totalArea);
 
-	vector<MatchingProbs> probVector;
+	std::vector<MatchingProbs> probVector;
 
 	RegionDataList::Iterator refIt, workIt;
 	for (refIt = regionsReference.begin(); refIt != regionsReference.end(); refIt++)

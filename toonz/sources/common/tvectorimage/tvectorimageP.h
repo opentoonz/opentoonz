@@ -7,7 +7,6 @@
 #include "tvectorimage.h"
 #include "tregion.h"
 #include "tcurves.h"
-using namespace std;
 
 //-----------------------------------------------------------------------------
 
@@ -22,7 +21,7 @@ class TGroupId
 {
 
 public:
-	vector<int> m_id; //m_id[i-1] e' parent di m_id[i]
+	std::vector<int> m_id; //m_id[i-1] e' parent di m_id[i]
 	TGroupId()
 		: m_id() {}
 
@@ -65,7 +64,7 @@ public:
 	TStroke *m_s;
 	bool m_isPoint;
 	bool m_isNewForFill;
-	list<TEdge *> m_edgeList;
+	std::list<TEdge *> m_edgeList;
 	TGroupId m_groupId;
 
 	VIStroke(TStroke *s, const TGroupId &StrokeId)
@@ -77,7 +76,7 @@ public:
 	{
 		delete m_s;
 
-		list<TEdge *>::iterator it, it_b = m_edgeList.begin(), it_e = m_edgeList.end();
+		std::list<TEdge *>::iterator it, it_b = m_edgeList.begin(), it_e = m_edgeList.end();
 		for (it = it_b; it != it_e; ++it)
 			if ((*it)->m_toBeDeleted)
 				delete *it;
@@ -87,7 +86,7 @@ public:
 
 	bool inline removeEdge(TEdge *e)
 	{
-		list<TEdge *>::iterator it = m_edgeList.begin();
+		std::list<TEdge *>::iterator it = m_edgeList.begin();
 		while (it != m_edgeList.end() && *it != e)
 			it++;
 		if (*it == e) {
@@ -138,10 +137,10 @@ public:
 	bool m_notIntersectingStrokes, m_computeRegions;
 	TGroupId m_insideGroup;
 
-	vector<VIStroke *> m_strokes;
+	std::vector<VIStroke *> m_strokes;
 	double m_autocloseTolerance;
 	IntersectionData *m_intersectionData;
-	vector<TRegion *> m_regions;
+	std::vector<TRegion *> m_regions;
 	TThread::Mutex *m_mutex;
 	Imp(TVectorImage *vi);
 	~Imp();
@@ -158,15 +157,15 @@ public:
 
 	int computeRegions();
 	void reindexEdges(UINT strokeIndex);
-	void reindexEdges(const vector<int> &indexes, bool areAdded);
+	void reindexEdges(const std::vector<int> &indexes, bool areAdded);
 
 	void checkRegionDbConsistency();
 	void cloneRegions(TVectorImage::Imp &out, bool doComputeRegions = true);
 
 	void eraseIntersection(int index);
-	UINT getFillData(TVectorImage::IntersectionBranch *&v);
-	void setFillData(TVectorImage::IntersectionBranch *v, UINT branchCount, bool doComputeRegions = true);
-	void notifyChangedStrokes(const vector<int> &strokeIndexArray, const vector<TStroke *> &oldVectorStrokeArray, bool areFlipped);
+	UINT getFillData(std::unique_ptr<TVectorImage::IntersectionBranch[]>& v);
+	void setFillData(std::unique_ptr<TVectorImage::IntersectionBranch[]> const& v, UINT branchCount, bool doComputeRegions = true);
+	void notifyChangedStrokes(const std::vector<int> &strokeIndexArray, const std::vector<TStroke *> &oldVectorStrokeArray, bool areFlipped);
 	void insertStrokeAt(VIStroke *stroke, int strokeIndex, bool recomputeRegions = true);
 	void moveStroke(int fromIndex, int toIndex);
 	void autoFill(int styleId, bool oddLevel);
@@ -177,9 +176,9 @@ public:
 	VIStroke *joinStrokeSmoothly(int index1, int index2, int cpIndex1, int cpIndex2);
 	VIStroke *extendStroke(int index, const TThickPoint &p, int cpIndex);
 	VIStroke *extendStrokeSmoothly(int index, const TThickPoint &p, int cpIndex);
-	void removeStrokes(const vector<int> &toBeRemoved, bool deleteThem, bool recomputeRegions);
+	void removeStrokes(const std::vector<int> &toBeRemoved, bool deleteThem, bool recomputeRegions);
 	TStroke *removeStroke(int index, bool doComputeRegions);
-	void splitStroke(int strokeIndex, const vector<DoublePair> &sortedWRanges);
+	void splitStroke(int strokeIndex, const std::vector<DoublePair> &sortedWRanges);
 	void moveStrokes(int fromIndex, int count, int moveBefore, bool regroup);
 
 	TStroke *removeEndpoints(int strokeIndex);
@@ -189,13 +188,13 @@ public:
 	void rearrangeMultiGroup();
 	void reindexGroups(Imp &img);
 	void addRegion(TRegion *region);
-	void regroupGhosts(vector<int> &changedStrokes);
+	void regroupGhosts(std::vector<int> &changedStrokes);
 	bool inCurrentGroup(int strokeIndex) const;
 	bool canMoveStrokes(int strokeIndex, int count, int moveBefore) const;
 #ifdef _DEBUG
 	void checkIntersections();
-	void checkRegions(const vector<TRegion *> &regions);
-	void printStrokes(ofstream &os);
+	void checkRegions(const std::vector<TRegion *> &regions);
+	void printStrokes(std::ofstream &os);
 	void checkGroups();
 
 #endif
@@ -215,9 +214,9 @@ private:
 	//Imp &  operator=(const TVectorImage::Imp &);
 	void eraseDeadIntersections();
 	IntersectedStroke *eraseBranch(Intersection *in, IntersectedStroke *is);
-	void doEraseIntersection(int index, vector<int> *toBeDeleted = 0);
+	void doEraseIntersection(int index, std::vector<int> *toBeDeleted = 0);
 	void eraseEdgeFromStroke(IntersectedStroke *is);
-	bool areWholeGroups(const vector<int> &indexes) const;
+	bool areWholeGroups(const std::vector<int> &indexes) const;
 	//accorpa tutti i gruppi ghost adiacenti in uno solo, e rinomina gruppi ghost separati con lo stesso id; si usa questa funzione dopo ula creazione di un gruppo o il move di strokes
 
 	//--------------------NUOVO CALCOLO REGIONI------------------------------------------------
@@ -226,7 +225,7 @@ public:
 #ifdef LEVO
 	vector<TRegion *> existingRegions;
 	TRegion *findRegionFromStroke(const IntersectStroke &stroke, const TPointD &p);
-	bool findNextStrokes(const TEdge &currEdge, multimap<double, TGeneralEdge *> &nextEdges);
+	bool findNextStrokes(const TEdge &currEdge, std::multimap<double, TGeneralEdge *> &nextEdges);
 	bool addNextEdge(TEdge &edge, TRegion &region, TRegion *&existingRegion, bool isStartingEdge = false);
 	bool addNextEdge(TAutocloseEdge &edge, TRegion &region, TRegion *&existingRegion);
 	bool storeRegion(TRegion *region, const TPointD &p);
@@ -234,8 +233,8 @@ public:
 	bool exploreAndAddNextEdge(TEdge &edge, TEdge &nextEdge, TRegion &region, TRegion *&existingRegion);
 	bool addNextAutocloseEdge(TEdge &edge, TAutocloseEdge &nextEdge, TRegion &region, TRegion *&existingRegion);
 	bool addNextAutocloseEdge(TAutocloseEdge &edge, TEdge &nextEdge, TRegion &region, TRegion *&existingRegion);
-	void computeAutocloseSegments(const TEdge &currEdge, int strokeIndex, multimap<double, TAutocloseEdge> &segments);
-	void computeAutocloseSegmentsSameStroke(const TEdge &currEdge, multimap<double, TAutocloseEdge> &segments);
+	void computeAutocloseSegments(const TEdge &currEdge, int strokeIndex, std::multimap<double, TAutocloseEdge> &segments);
+	void computeAutocloseSegmentsSameStroke(const TEdge &currEdge, std::multimap<double, TAutocloseEdge> &segments);
 #endif
 
 	//--------------------------------------------------------------------------------------
@@ -246,7 +245,7 @@ private:
 	Imp &operator=(const Imp &);
 };
 
-void addRegion(vector<TRegion *> &regionArray, TRegion *region);
+void addRegion(std::vector<TRegion *> &regionArray, TRegion *region);
 //=============================================================================
 
 #endif

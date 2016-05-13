@@ -208,7 +208,7 @@ void SkVD::saveData(TOStream &os)
 
 void SkVD::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 
 	while (is.matchTag(tagName)) {
 		int p;
@@ -644,8 +644,6 @@ PlasticSkeletonDeformation::~PlasticSkeletonDeformation()
 	SkeletonSet::iterator st, sEnd(m_imp->m_skeletons.end());
 	for (st = m_imp->m_skeletons.begin(); st != sEnd; ++st)
 		st->get_right()->removeListener(this);
-
-	delete m_imp;
 }
 
 //------------------------------------------------------------------

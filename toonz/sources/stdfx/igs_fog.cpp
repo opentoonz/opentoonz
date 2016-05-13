@@ -3,9 +3,6 @@
 #include <limits>	// std::numeric_limits
 #include <stdexcept> // std::domain_error()
 #include <algorithm> // std::max(),std::rotate()
-#if defined _WIN32 && !defined NOMINMAX
-#define NOMINMAX // cancel max(-)
-#endif
 #include "igs_resource_multithread.h"
 #include "igs_ifx_common.h"
 #include "igs_fog.h"

@@ -32,40 +32,25 @@ namespace
 {
 
 struct Sums {
-	TUINT64 *m_sumsIX_r; //!< m_sumsIX1[i+1] = m_sumsIX1[i] + i * pix.r
-	TUINT64 *m_sumsIX_g;
-	TUINT64 *m_sumsIX_b;
-	TUINT64 *m_sumsIX_m;
-	TUINT64 *m_sumsX_r; //!< m_sumsX[i+1] = m_sumsX[i] + pix.r
-	TUINT64 *m_sumsX_g;
-	TUINT64 *m_sumsX_b;
-	TUINT64 *m_sumsX_m;
+	std::unique_ptr<TUINT64[]> m_sumsIX_r; //!< m_sumsIX1[i+1] = m_sumsIX1[i] + i * pix.r
+	std::unique_ptr<TUINT64[]> m_sumsIX_g;
+	std::unique_ptr<TUINT64[]> m_sumsIX_b;
+	std::unique_ptr<TUINT64[]> m_sumsIX_m;
+	std::unique_ptr<TUINT64[]> m_sumsX_r; //!< m_sumsX[i+1] = m_sumsX[i] + pix.r
+	std::unique_ptr<TUINT64[]> m_sumsX_g;
+	std::unique_ptr<TUINT64[]> m_sumsX_b;
+	std::unique_ptr<TUINT64[]> m_sumsX_m;
 
 	Sums(int length)
+		: m_sumsIX_r(new TUINT64[length + 1])
+		, m_sumsIX_g(new TUINT64[length + 1])
+		, m_sumsIX_b(new TUINT64[length + 1])
+		, m_sumsIX_m(new TUINT64[length + 1])
+		, m_sumsX_r(new TUINT64[length + 1])
+		, m_sumsX_g(new TUINT64[length + 1])
+		, m_sumsX_b(new TUINT64[length + 1])
+		, m_sumsX_m(new TUINT64[length + 1])
 	{
-		++length;
-		m_sumsIX_r = new TUINT64[length];
-		m_sumsIX_g = new TUINT64[length];
-		m_sumsIX_b = new TUINT64[length];
-		m_sumsIX_m = new TUINT64[length];
-
-		m_sumsX_r = new TUINT64[length];
-		m_sumsX_g = new TUINT64[length];
-		m_sumsX_b = new TUINT64[length];
-		m_sumsX_m = new TUINT64[length];
-	}
-
-	~Sums()
-	{
-		delete[] m_sumsIX_r;
-		delete[] m_sumsIX_g;
-		delete[] m_sumsIX_b;
-		delete[] m_sumsIX_m;
-
-		delete[] m_sumsX_r;
-		delete[] m_sumsX_g;
-		delete[] m_sumsX_b;
-		delete[] m_sumsX_m;
 	}
 
 	template <typename Pix>

@@ -1,12 +1,11 @@
 # ビルド手順（Windows）
 
-Visual Studio 2013とQt 5.5でビルドできることを確認しています。
+Visual Studio 2013とQt 5.6でビルドできることを確認しています。
 
 ## 必要なソフトウェアの導入
 
 ### Visual Studio Express 2013 for Windows Desktop
 - https://www.microsoft.com/ja-jp/download/details.aspx?id=44914
-- Qt 5.5がVisual Studio 2015に対応していないため、2013を使う必要があります
 - Express版はターゲットプラットフォームごとにバージョンが分かれています。「for Windows」ではなく「for Windows Desktop」を使用します
 - Community版やProfessional版などでも構いません
 
@@ -24,11 +23,11 @@ Visual Studio 2013とQt 5.5でビルドできることを確認しています�
 サイズの大きいライブラリはこのリポジトリには含めていないので、別途インストールする必要があります。
 
 ### Qt
-- http://download.qt.io/official_releases/qt/5.5/5.5.1/
+- http://download.qt.io/official_releases/qt/5.6/5.6.0/
 - クロスプラットフォームのGUIフレームワークです
 - 現在はQt 5.6には対応していません
 - 上記のURLから以下のファイルをダウンロードして適当なフォルダにインストールします
-  - qt-opensource-windows-x86-msvc2013_64-5.5.1.exe
+  - qt-opensource-windows-x86-msvc2013_64-5.6.0.exe
 
 ### boost
 - http://www.boost.org/users/history/version_1_55_0.html
@@ -89,9 +88,9 @@ OpenToonz_1.0.exeを実行して動作すれば成功です。おめでとうご
 OpenToonzはQuickTime SDKを用いてmov形式などへ対応しています。QuickTime SDKは32ビット版しかないため、`t32bitsrv.exe`という32ビット版の実行可能ファイルにQuickTime SDKを組み込み、64ビット版のOpenToonzは`t32bitsrv.exe`を経由してQuickTime SDKの機能を使用しています。以下の手順では`t32bitsrv.exe`などと合わせて、32ビット版のOpenToonzも生成されます。
 
 ### Qt
-- http://download.qt.io/official_releases/qt/5.5/5.5.1/
+- http://download.qt.io/official_releases/qt/5.6/5.6.0/
 - 上記のURLから以下のファイルをダウンロードして適当なフォルダにインストールします
-  - qt-opensource-windows-x86-msvc2013-5.5.1.exe
+  - qt-opensource-windows-x86-msvc2013-5.6.0.exe
 
 ### QuickTime SDK
 1. Appleの開発者登録をして下記のURLから`QuickTime 7.3 SDK for Windows.zip`をダウンロードします

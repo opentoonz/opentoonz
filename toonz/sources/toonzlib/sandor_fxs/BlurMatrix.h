@@ -16,17 +16,15 @@
 #include "SError.h"
 #include "SDef.h"
 
-using namespace std;
-
 #define NBRS 10 //  Number of Random Samples
-typedef vector<SXYD> BLURSECTION;
+typedef std::vector<SXYD> BLURSECTION;
 
 class CBlurMatrix
 {
 public:
 	bool m_isSAC; // Stop At Contour
 	bool m_isRS;  // Random Sampling
-	vector<BLURSECTION> m_m[NBRS];
+	std::vector<BLURSECTION> m_m[NBRS];
 
 	CBlurMatrix() : m_isSAC(false), m_isRS(false){};
 	CBlurMatrix(const CBlurMatrix &m); //throw(SBlurMatrixError);
@@ -36,10 +34,10 @@ public:
 
 	void createRandom(const double d, const int nb); // throw(SBlurMatrixError);
 	void createEqual(const double d, const int nb);  // throw(SBlurMatrixError);
-	void addPath(vector<BLURSECTION>::iterator pBS); // throw(exception);
+	void addPath(std::vector<BLURSECTION>::iterator pBS); // throw(exception);
 	void addPath();									 // throw(SBlurMatrixError);
 	void print() const;
-	bool isIn(const vector<BLURSECTION> &m, const SXYD &xyd) const;
+	bool isIn(const std::vector<BLURSECTION> &m, const SXYD &xyd) const;
 };
 
 #endif // !defined(AFX_BLURMATRIX_H__8298C171_0035_11D6_B94F_0040F674BE6A__INCLUDED_)

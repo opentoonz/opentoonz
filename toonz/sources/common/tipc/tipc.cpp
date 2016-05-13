@@ -13,7 +13,7 @@
 #include <QTimer>
 
 //System-specific includes
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #elif MACOSX
 #include <sys/sysctl.h>
@@ -270,7 +270,7 @@ QString tipc::applicationSpecificServerName(QString srvName)
 
 bool tipc::startBackgroundProcess(QString cmdline)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	QProcess *proc = new QProcess;
 	proc->start(cmdline);
 	if (proc->state() == QProcess::NotRunning) {
@@ -317,7 +317,7 @@ bool tipc::startSlaveServer(QString srvName, QString cmdline)
 	//Wait up to msecs until the socket is connecting. Wait a small amount of time
 	//until the server is up and listening to connection (there is no other way to tell).
 	while (dummySock->state() == QLocalSocket::UnconnectedState) {
-#ifdef WIN32
+#ifdef _WIN32
 		Sleep(10);
 #else
 		usleep(10 << 10); //10.24 msecs

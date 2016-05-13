@@ -156,7 +156,7 @@ public:
 		m_bgColor = TPixel32(255, 255, 255, 0);
 		TPointD center(0.5 * cameraSize.lx, 0.5 * cameraSize.ly);
 		m_viewAff = TTranslation(center);
-		string ext = fp.getType();
+		std::string ext = fp.getType();
 		m_isFrames = ext != "avi" && ext != "mov" && ext != "3gp";
 		m_fileOptions = properties.getFileFormatProperties(ext);
 	}
@@ -458,12 +458,11 @@ MovieGenerator::MovieGenerator(
 	const TDimension &resolution,
 	TOutputProperties &outputProperties,
 	bool useMarkers)
-	: m_imp(0)
 {
 	if (path.getType() == "swf" || path.getType() == "scr")
-		m_imp = new FlashMovieGenerator(path, resolution, outputProperties);
+		m_imp.reset(new FlashMovieGenerator(path, resolution, outputProperties));
 	else
-		m_imp = new RasterMovieGenerator(path, resolution, outputProperties);
+		m_imp.reset(new RasterMovieGenerator(path, resolution, outputProperties));
 	m_imp->m_useMarkers = useMarkers;
 }
 
@@ -471,7 +470,6 @@ MovieGenerator::MovieGenerator(
 
 MovieGenerator::~MovieGenerator()
 {
-	delete m_imp;
 }
 
 //-------------------------------------------------------------------
@@ -508,7 +506,7 @@ bool MovieGenerator::addSoundtrack(const ToonzScene &scene, int frameOffset, int
 bool MovieGenerator::addScene(ToonzScene &scene, int r0, int r1)
 {
 	TApp *app = TApp::instance();
-	RasterMovieGenerator *imp = dynamic_cast<RasterMovieGenerator *>(m_imp);
+	RasterMovieGenerator *imp = dynamic_cast<RasterMovieGenerator *>(m_imp.get());
 	if (imp)
 		imp->m_alphaEnabled = true;
 	m_imp->m_renderRange = std::make_pair(r0, r1);

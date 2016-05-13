@@ -443,7 +443,7 @@ void FxSchematicScene::updateScene()
 			groupedFxs[fx->getAttributes()->getGroupId()].push_back(fx);
 			continue;
 		} else if (macro && macro->isEditing()) {
-			vector<TFxP> fxs = macro->getFxs();
+			std::vector<TFxP> fxs = macro->getFxs();
 			int j;
 			for (j = 0; j < (int)fxs.size(); j++) {
 				SchematicNode *node = addFxSchematicNode(fxs[j].getPointer());
@@ -552,7 +552,7 @@ FxSchematicNode *FxSchematicScene::addGroupedFxSchematicNode(int groupId, const 
 	QList<TFxP> roots = getRoots(groupedFxs, terminals);
 	if (roots.isEmpty())
 		return 0;
-	wstring name = roots[0]->getAttributes()->getGroupName(false);
+	std::wstring name = roots[0]->getAttributes()->getGroupName(false);
 	FxGroupNode *node = new FxGroupNode(this, groupedFxs, roots, groupId, name);
 	if (!node)
 		return 0;
@@ -856,7 +856,7 @@ void FxSchematicScene::updateLink()
 			TFx *outFx = outConnection->getOwnerFx();
 			TMacroFx *outMacroFx = dynamic_cast<TMacroFx *>(outFx);
 			if (outMacroFx && outMacroFx->isEditing()) {
-				vector<TFxP> fxs = outMacroFx->getFxs();
+				std::vector<TFxP> fxs = outMacroFx->getFxs();
 				int k;
 				for (k = 0; k < (int)fxs.size(); k++) {
 					TFx *fx = fxs[k].getPointer();
@@ -1792,7 +1792,7 @@ void FxSchematicScene::onEditGroup()
 			fxs[i]->getAttributes()->editGroup();
 			TMacroFx *macro = dynamic_cast<TMacroFx *>(fxs[i].getPointer());
 			if (macro) {
-				vector<TFxP> macroFxs = macro->getFxs();
+				std::vector<TFxP> macroFxs = macro->getFxs();
 				int j;
 				for (j = 0; j < (int)macroFxs.size(); j++)
 					macroFxs[j]->getAttributes()->editGroup();

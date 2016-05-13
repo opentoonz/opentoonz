@@ -109,8 +109,8 @@ DuplicatePopup::DuplicatePopup()
 {
 	setWindowTitle(tr("Repeat"));
 
-	m_countFld = new IntLineEdit(this);
-	m_upToFld = new IntLineEdit(this);
+	m_countFld = new DVGui::IntLineEdit(this);
+	m_upToFld = new DVGui::IntLineEdit(this);
 
 	m_okBtn = new QPushButton(tr("Repeat"), this);
 	m_cancelBtn = new QPushButton(tr("Close"), this);
@@ -182,7 +182,7 @@ void DuplicatePopup::onApplyPressed()
 		TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
 	} catch (...) {
-		error(("Cannot duplicate"));
+		DVGui::error(("Cannot duplicate"));
 	}
 }
 

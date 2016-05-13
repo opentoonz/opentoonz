@@ -26,8 +26,11 @@
 #include "toonz/fill.h"
 
 // Qt includes
-#include <QGLContext>
-#include <QGLPixelBuffer>
+#include <QImage>
+#include <QThread>
+#include <QOpenGLContext>
+#include <QOffscreenSurface>
+#include <QOpenGLFramebufferObject>
 
 #include "imagebuilders.h"
 
@@ -36,20 +39,6 @@
 //***************************************************************************************
 
 extern TOfflineGL *currentOfflineGL;
-
-//-----------------------------------------------------------------------------
-
-QGLPixelBuffer *imageRasterizerPixelBuffer = 0;
-
-void DV_EXPORT_API initializeImageRasterizer()
-{
-	assert(QGLPixelBuffer::hasOpenGLPbuffers());
-	if (!QGLPixelBuffer::hasOpenGLPbuffers()) {
-		imageRasterizerPixelBuffer = 0;
-	} else {
-		imageRasterizerPixelBuffer = new QGLPixelBuffer(QSize(1024, 1024));
-	}
-}
 
 //***************************************************************************************
 //    ImageLoader  implementation
@@ -281,54 +270,75 @@ TImageP ImageRasterizer::build(int imFlags, void *extData)
 
 			TGlContext oldContext = tglGetCurrentContext();
 
-			if (imageRasterizerPixelBuffer == 0) {
+			// this is too slow.
+			{
+				QSurfaceFormat format;
+				format.setProfile(QSurfaceFormat::CompatibilityProfile);
+
+				std::unique_ptr<QOffscreenSurface> surface(new QOffscreenSurface());
+				surface->setFormat(format);
+				surface->create();
+
+				std::unique_ptr<QOpenGLContext> context(new QOpenGLContext());
+				context->create();
+				context->makeCurrent(surface.get());
+
 				TRaster32P ras(d);
-				TRasterImageP ri(ras);
+
+				glPushAttrib(GL_ALL_ATTRIB_BITS);
+				glMatrixMode(GL_MODELVIEW), glPushMatrix();
+				glMatrixMode(GL_PROJECTION), glPushMatrix();
+				{
+					std::unique_ptr<QOpenGLFramebufferObject> fb(new QOpenGLFramebufferObject(d.lx, d.ly));
+
+					fb->bind();
+					assert(glGetError() == 0);
+
+					glViewport(0, 0, d.lx, d.ly);
+					glClearColor(0, 0, 0, 0);
+					glClear(GL_COLOR_BUFFER_BIT);
+
+					glMatrixMode(GL_PROJECTION);
+					glLoadIdentity();
+					gluOrtho2D(0, d.lx, 0, d.ly);
+
+					glMatrixMode(GL_MODELVIEW);
+					glLoadIdentity();
+					glTranslatef(0.375, 0.375, 0.0);
+
+					assert(glGetError() == 0);
+					tglDraw(rd, vi.getPointer());
+					assert(glGetError() == 0);
+
+					assert(glGetError() == 0);
+					glFlush();
+					assert(glGetError() == 0);
+
+					QImage img = fb->toImage().scaled(QSize(d.lx, d.ly), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+					int wrap = ras->getLx() * sizeof(TPixel32);
+					uchar *srcPix = img.bits();
+					uchar *dstPix = ras->getRawData() + wrap * (d.ly - 1);
+					for (int y = 0; y < d.ly; y++) {
+						memcpy(dstPix, srcPix, wrap);
+						dstPix -= wrap;
+						srcPix += wrap;
+					}
+					fb->release();
+				}
+				glMatrixMode(GL_MODELVIEW), glPopMatrix();
+				glMatrixMode(GL_PROJECTION), glPopMatrix();
+
+				glPopAttrib();
+
+				context->doneCurrent();
+				tglMakeCurrent(oldContext);
+
+				TRasterImageP ri = TRasterImageP(ras);
 				ri->setOffset(off + ras->getCenter());
+
 				return ri;
 			}
-
-			QGLPixelBuffer *gl = imageRasterizerPixelBuffer; // (QSize(d.lx, d.ly));
-
-			gl->makeCurrent();
-			assert(glGetError() == 0);
-
-			glViewport(0, 0, 1024, 1024); // d.lx,d.ly);
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			gluOrtho2D(0, d.lx, 0, d.ly);
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
-			glTranslatef(0.375, 0.375, 0.0);
-			glClearColor(0, 0, 0, 0);
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			assert(glGetError() == 0);
-			tglDraw(rd, vi.getPointer());
-			assert(glGetError() == 0);
-
-			assert(glGetError() == 0);
-			glFlush();
-			assert(glGetError() == 0);
-
-			QImage img = gl->toImage().scaled(QSize(d.lx, d.ly), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-			TRaster32P ras(d);
-
-			int wrap = ras->getLx() * sizeof(TPixel32);
-			uchar *srcPix = img.bits();
-			uchar *dstPix = ras->getRawData() + wrap * (d.ly - 1);
-			for (int y = 0; y < d.ly; y++) {
-				memcpy(dstPix, srcPix, wrap);
-				dstPix -= wrap;
-				srcPix += wrap;
-			}
-			gl->doneCurrent();
-
-			tglMakeCurrent(oldContext);
-
-			TRasterImageP ri = TRasterImageP(ras);
-			ri->setOffset(off + ras->getCenter());
-			return ri;
 		}
 	}
 

@@ -178,10 +178,10 @@ LevelCreatePopup::LevelCreatePopup()
 	setWindowTitle(tr("New Level"));
 
 	m_nameFld = new LineEdit(this);
-	m_fromFld = new IntLineEdit(this);
-	m_toFld = new IntLineEdit(this);
-	m_stepFld = new IntLineEdit(this);
-	m_incFld = new IntLineEdit(this);
+	m_fromFld = new DVGui::IntLineEdit(this);
+	m_toFld = new DVGui::IntLineEdit(this);
+	m_stepFld = new DVGui::IntLineEdit(this);
+	m_incFld = new DVGui::IntLineEdit(this);
 	m_levelTypeOm = new QComboBox();
 
 	m_pathFld = new FileField(0);
@@ -395,15 +395,15 @@ bool LevelCreatePopup::apply()
 	int xres = tround(w * dpi), yres = tround(h * dpi);
 	int lType = getLevelType();
 
-	wstring levelName = m_nameFld->text().toStdWString();
+	std::wstring levelName = m_nameFld->text().toStdWString();
 	// tolgo i blanks prima e dopo
 
 	i = levelName.find_first_not_of(L' ');
-	if (i == (int)wstring::npos)
+	if (i == (int)std::wstring::npos)
 		levelName = L"";
 	else {
 		int j = levelName.find_last_not_of(L' ');
-		assert(j != (int)wstring::npos);
+		assert(j != (int)std::wstring::npos);
 		levelName = levelName.substr(i, j - i + 1);
 	}
 	if (levelName.empty()) {
@@ -445,7 +445,7 @@ bool LevelCreatePopup::apply()
 		/*question = "Folder " +toQString(parentDir) +
 								 " doesn't exist.\nDo you want to create it?";*/
 		question = tr("Folder %1 doesn't exist.\nDo you want to create it?").arg(toQString(parentDir));
-		int ret = MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
+		int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
 		if (ret == 0 || ret == 2)
 			return false;
 		try {

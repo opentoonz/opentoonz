@@ -43,14 +43,14 @@ using namespace std;
 // il problema si verifica ruotando gli oggetti sul camera stand
 //
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma optimize("", off)
 #endif
 TAffine makeRotation(double ang)
 {
 	return TRotation(ang);
 }
-#ifdef WIN32
+#ifdef _WIN32
 #pragma optimize("", on)
 #endif
 
@@ -1697,7 +1697,7 @@ void TStageObject::updateKeyframes()
 void TStageObject::saveData(TOStream &os)
 {
 	TStageObjectId parentId = getParent();
-	std::map<string, string> attr;
+	std::map<std::string, string> attr;
 	attr["id"] = parentId.toString();
 	attr["handle"] = m_handle;
 	attr["parentHandle"] = m_parentHandle;

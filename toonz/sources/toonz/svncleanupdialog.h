@@ -6,14 +6,12 @@
 #include "toonzqt/dvdialog.h"
 #include "versioncontrol.h"
 
-using namespace DVGui;
-
 class QPushButton;
 class QLabel;
 
 //-----------------------------------------------------------------------------
 
-class SVNCleanupDialog : public Dialog
+class SVNCleanupDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -30,7 +28,5 @@ protected slots:
 	void onCleanupDone();
 	void onError(const QString &);
 };
-
-using namespace DVGui;
 
 #endif // SVN_CLEANUP_DIALOG_H

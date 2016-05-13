@@ -45,8 +45,8 @@ class DVAPI RasterSelection : public TSelection
 
 	TPaletteP m_oldPalette;
 	TRectD m_selectionBbox;
-	vector<TStroke> m_strokes;
-	vector<TStroke> m_originalStrokes;
+	std::vector<TStroke> m_strokes;
+	std::vector<TStroke> m_originalStrokes;
 	TAffine m_affine;
 	TPoint m_startPosition;
 	TRasterP m_floatingSelection;
@@ -73,9 +73,9 @@ public:
 		m_currentImage = img, m_currentImageCell = imageCell;
 	}
 
-	void setStrokes(const vector<TStroke> &strokes) { m_strokes = strokes; }
-	vector<TStroke> getStrokes() const { return m_strokes; }
-	vector<TStroke> getOriginalStrokes() const { return m_originalStrokes; }
+	void setStrokes(const std::vector<TStroke> &strokes) { m_strokes = strokes; }
+	std::vector<TStroke> getStrokes() const { return m_strokes; }
+	std::vector<TStroke> getOriginalStrokes() const { return m_originalStrokes; }
 
 	void setTransformation(const TAffine &affine) { m_affine = affine; }
 	TAffine getTransformation() const { return m_affine; }

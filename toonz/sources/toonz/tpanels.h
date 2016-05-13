@@ -195,7 +195,7 @@ protected:
 
 public slots:
 
-	void onIoCurve(int type, TDoubleParam *curve, const string &name);
+	void onIoCurve(int type, TDoubleParam *curve, const std::string &name);
 	void onEditObject();
 };
 

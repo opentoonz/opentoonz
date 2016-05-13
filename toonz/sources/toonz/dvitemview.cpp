@@ -1756,7 +1756,7 @@ void DvItemViewerTitleBar::openContextMenu(QMouseEvent *event)
 void DvItemViewerTitleBar::paintEvent(QPaintEvent *)
 {
 	QPainter p(this);
-	std::vector<std::pair<DvItemListModel::DataType, pair<int, bool>>> columns;
+	std::vector<std::pair<DvItemListModel::DataType, std::pair<int, bool>>> columns;
 	m_itemViewer->getPanel()->getColumns(columns);
 	QRect rect(0, 0, width(), height());
 

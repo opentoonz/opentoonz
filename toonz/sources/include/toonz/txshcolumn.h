@@ -232,7 +232,7 @@ public:
 	void setColorTag(int colorTag) { m_colorTag = colorTag; } //Usato solo in tabkids
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DV_EXPORT_API TSmartPointerT<TXshColumn>;
 #endif
 typedef TSmartPointerT<TXshColumn> TXshColumnP;
@@ -259,7 +259,7 @@ typedef TSmartPointerT<TXshColumn> TXshColumnP;
 class DVAPI TXshCellColumn : public TXshColumn
 {
 protected:
-	vector<TXshCell> m_cells;
+	std::vector<TXshCell> m_cells;
 	int m_first;
 
 public:

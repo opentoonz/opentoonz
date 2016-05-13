@@ -15,6 +15,7 @@
 #include <GLUT/glut.h>
 #elif LINUX
 #include <GL/glut.h>
+#include <cstring>
 #endif
 
 #ifndef TCG_GLU_CALLBACK

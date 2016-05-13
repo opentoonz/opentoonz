@@ -80,7 +80,7 @@ public:
 						int level_n,
 						bool *random_level,
 						float dpi,
-						vector<int> lastframe,
+						std::vector<int> lastframe,
 						int &totalparticles,
 						QList<ParticleOrigin> &particleOrigin,
 						int genPartNum);
@@ -94,13 +94,13 @@ public:
 						  TDimension &p_size,
 						  TPointD &p_offset,
 						  std::map<int, TRasterFxPort *> ctrl_ports,
-						  vector<TLevelP> partLevel,
+							std::vector<TLevelP> partLevel,
 						  float dpi,
 						  int curr_frame,
 						  int shrink,
 						  double startx, double starty,
 						  double endx, double endy,
-						  vector<int> lastframe,
+							std::vector<int> lastframe,
 						  unsigned long fxId);
 
 	void do_render(TFlash *flash,
@@ -112,7 +112,7 @@ public:
 				   TDimension &p_size,
 				   TPointD &p_offset,
 				   int lastframe,
-				   vector<TLevelP> partLevel,
+					 std::vector<TLevelP> partLevel,
 				   struct particles_values &values,
 				   float opacity_range,
 				   int curr_frame,
@@ -121,29 +121,29 @@ public:
 
 	bool port_is_used(int i, struct particles_values &values);
 
-	void fill_single_region(vector<TPointD> &myregions,
+	void fill_single_region(std::vector<TPointD> &myregions,
 							TTile *ctrl1, int thres,
 							bool do_source_gradation,
 							QList<QList<int>> &myHistogram,
 							QList<ParticleOrigin> &particleOrigins);
 
 	void fill_subregions(int cont_index,
-						 vector<vector<TPointD>> &myregions,
+						 std::vector<std::vector<TPointD>> &myregions,
 						 TTile *ctrl1,
 						 int thres);
 
-	void normalize_array(vector<vector<TPointD>> &myregions,
+	void normalize_array(std::vector<std::vector<TPointD>> &myregions,
 						 TPointD pos,
 						 int lx, int ly,
 						 int regioncounter,
-						 vector<int> &myarray,
-						 vector<int> &lista, vector<int> &listb,
-						 vector<int> &final);
+						 std::vector<int> &myarray,
+						 std::vector<int> &lista, std::vector<int> &listb,
+						 std::vector<int> &final);
 
 	void fill_array(TTile *ctrl1,
 					int &regioncount,
-					vector<int> &myarray,
-					vector<int> &lista, vector<int> &listb,
+					std::vector<int> &myarray,
+					std::vector<int> &lista, std::vector<int> &listb,
 					int thres);
 
 	/*- 敷き詰めのため。まだ出発していない粒子情報を初期化 -*/
@@ -152,7 +152,7 @@ public:
 							 const double frame, const TAffine affine,
 							 struct particles_values &values,
 							 int level_n,
-							 vector<int> &lastframe,
+							 std::vector<int> &lastframe,
 							 double pixelMargin);
 
 	/*- Particle::create_Animationと同じ。粒子発生前に
@@ -165,7 +165,7 @@ public:
 						  QList<ParticleOrigin> &origins,
 						  std::vector<TRasterFxPort *> part_ports,
 						  const TRenderSettings &ri,
-						  vector<TLevelP> partLevel,
+							std::vector<TLevelP> partLevel,
 						  std::map<std::pair<int, int>, float> &partScales,
 						  TTile *baseImgTile);
 };

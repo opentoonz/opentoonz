@@ -28,16 +28,16 @@ public:
 private:
 	Logger();
 	std::vector<Listener *> m_listeners;
-	std::vector<wstring> m_rows;
+	std::vector<std::wstring> m_rows;
 
 public:
 	static Logger *instance();
 
-	void add(wstring s);
+	void add(std::wstring s);
 	void clear();
 
 	int getRowCount() const;
-	wstring getRow(int i) const;
+	std::wstring getRow(int i) const;
 
 	void addListener(Listener *listener);
 	void removeListener(Listener *listener);

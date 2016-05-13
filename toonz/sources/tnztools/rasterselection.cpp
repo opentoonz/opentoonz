@@ -111,7 +111,7 @@ TRasterPT<PIXEL1> getImageFromStroke(TRasterPT<PIXEL2> ras, const TStroke &strok
 	TRasterPT<PIXEL1> buffer(regionsBox.getSize());
 	buffer->clear();
 
-	//Compute regions created by the vector
+	//Compute regions created by the std::vector
 	TVectorImage app;
 	app.addStroke(new TStroke(stroke));
 	app.findRegions();
@@ -126,7 +126,7 @@ TRasterPT<PIXEL1> getImageFromStroke(TRasterPT<PIXEL2> ras, const TStroke &strok
 			PIXEL2 *selectedLine = ras->pixels(y);
 			int startY = y - regionsBox.y0;
 			PIXEL1 *bufferLine = buffer->pixels(startY >= 0 ? startY : 0);
-			vector<double> intersections;
+			std::vector<double> intersections;
 			app.getRegion(reg)->computeScanlineIntersections(y, intersections);
 			if (intersections.empty())
 				app.getRegion(reg)->computeScanlineIntersections(y + 0.9, intersections);
@@ -175,7 +175,7 @@ TRasterPT<PIXEL1> getImageFromSelection(TRasterPT<PIXEL2> &ras, RasterSelection 
 	rSelectionBound *= ras->getBounds();
 	TRasterPT<PIXEL1> selectedRaster(rSelectionBound.getSize());
 	selectedRaster->clear();
-	vector<TStroke> strokes = selection.getStrokes();
+	std::vector<TStroke> strokes = selection.getStrokes();
 	TPoint startPosition = rSelectionBound.getP00();
 	unsigned int i;
 	for (i = 0; i < strokes.size(); i++) {
@@ -217,7 +217,7 @@ TRasterP getImageFromSelection(const TImageP &image, RasterSelection &selection)
 //-----------------------------------------------------------------------------
 
 template <typename PIXEL>
-void deleteSelectionWithoutUndo(TRasterPT<PIXEL> &ras, const vector<TStroke> &strokes, PIXEL emptyValue)
+void deleteSelectionWithoutUndo(TRasterPT<PIXEL> &ras, const std::vector<TStroke> &strokes, PIXEL emptyValue)
 {
 	if (!ras)
 		return;
@@ -231,7 +231,7 @@ void deleteSelectionWithoutUndo(TRasterPT<PIXEL> &ras, const vector<TStroke> &st
 		if (!strokeRect.overlaps(ras->getBounds()))
 			continue;
 
-		//Compute regions created by the vector
+		//Compute regions created by the std::vector
 		TVectorImage app;
 		app.addStroke(new TStroke(s));
 		app.findRegions();
@@ -246,7 +246,7 @@ void deleteSelectionWithoutUndo(TRasterPT<PIXEL> &ras, const vector<TStroke> &st
 			for (y = bBox.y0; y <= bBox.y1; y++) {
 				PIXEL *selectedLine = ras->pixels(y);
 				int startY = y - strokeRect.y0;
-				vector<double> intersections;
+				std::vector<double> intersections;
 				app.getRegion(reg)->computeScanlineIntersections(y, intersections);
 				if (intersections.empty())
 					app.getRegion(reg)->computeScanlineIntersections(y + 0.9, intersections);
@@ -266,7 +266,7 @@ void deleteSelectionWithoutUndo(TRasterPT<PIXEL> &ras, const vector<TStroke> &st
 
 //-----------------------------------------------------------------------------
 
-void deleteSelectionWithoutUndo(const TImageP &image, const vector<TStroke> &strokes)
+void deleteSelectionWithoutUndo(const TImageP &image, const std::vector<TStroke> &strokes)
 {
 	if (TToonzImageP toonzImage = (TToonzImageP)image) {
 		TRasterPT<TPixelCM32> ras = toonzImage->getRaster();
@@ -308,9 +308,9 @@ class UndoDeleteSelection : public TUndo
 	static int m_id;
 	TXshSimpleLevelP m_level;
 	TFrameId m_frameId;
-	string m_erasedImageId;
+	std::string m_erasedImageId;
 	TPoint m_erasePoint;
-	vector<TStroke> m_strokes;
+	std::vector<TStroke> m_strokes;
 	TTool *m_tool;
 
 public:
@@ -439,8 +439,8 @@ class UndoPasteFloatingSelection : public TUndo
 	TXshCell m_imageCell; //!< Level/frame pair to the pasted-to image
 						  //!< (seemingly cached as m_imageId)
 	TPaletteP m_oldPalette, m_newPalette;
-	string m_imageId, m_floatingImageId, m_undoImageId, m_oldFloatingImageId;
-	vector<TStroke> m_strokes;
+	std::string m_imageId, m_floatingImageId, m_undoImageId, m_oldFloatingImageId;
+	std::vector<TStroke> m_strokes;
 	TRectD m_selectionRect;
 	TAffine m_transformation;
 	TPoint m_startPos;
@@ -780,7 +780,7 @@ TStroke getStrokeByRect(TRectD r)
 	TStroke stroke;
 	if (r.isEmpty())
 		return stroke;
-	vector<TThickPoint> points;
+	std::vector<TThickPoint> points;
 	points.push_back(r.getP00());
 	points.push_back((r.getP00() + r.getP01()) * 0.5);
 	points.push_back(r.getP01());

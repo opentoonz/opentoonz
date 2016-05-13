@@ -10,20 +10,18 @@
 class QPushButton;
 class QLineEdit;
 
-using namespace DVGui;
-
 //=============================================================================
 // AddFilmstripFramesPopup
 //-----------------------------------------------------------------------------
 
-class AddFilmstripFramesPopup : public Dialog
+class AddFilmstripFramesPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
 	QPushButton *m_okBtn;
 	QPushButton *m_cancelBtn;
 
-	IntLineEdit *m_startFld, *m_endFld, *m_stepFld;
+	DVGui::IntLineEdit *m_startFld, *m_endFld, *m_stepFld;
 
 public slots:
 	void onOk();

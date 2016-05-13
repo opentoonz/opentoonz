@@ -103,7 +103,7 @@ private:
 
 	struct {
 		QPoint curvePos, labelPos;
-		string text;
+		std::string text;
 		TDoubleParam *curve;
 	} m_curveLabel;
 

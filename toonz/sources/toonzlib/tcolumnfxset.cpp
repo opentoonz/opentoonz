@@ -107,7 +107,7 @@ void TFxSet::loadData(TIStream &is)
 {
 	clear();
 
-	string tagName;
+	std::string tagName;
 	while (is.openChild(tagName)) {
 		if (tagName == "fxnode") {
 			TPersist *p = 0;

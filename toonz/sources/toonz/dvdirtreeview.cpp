@@ -381,7 +381,7 @@ void DvDirTreeView::dropEvent(QDropEvent *e)
 
 		TFilePath path = dstFp + TFilePath(srcFp.getLevelNameW());
 		NameBuilder *nameBuilder = NameBuilder::getBuilder(toWideString(path.getName()));
-		wstring levelNameOut;
+		std::wstring levelNameOut;
 		do
 			levelNameOut = nameBuilder->getNext();
 		while (TSystem::doesExistFileOrLevel(path.withName(levelNameOut)));
@@ -392,7 +392,7 @@ void DvDirTreeView::dropEvent(QDropEvent *e)
 				TSystem::removeFileOrLevel(srcFp);
 				FileBrowser::refreshFolder(srcFp.getParentDir());
 			} else
-				MsgBox(CRITICAL, tr("There was an error copying %1 to %2").arg(toQString(srcFp)).arg(toQString(dstFp)));
+				DVGui::error(tr("There was an error copying %1 to %2").arg(toQString(srcFp)).arg(toQString(dstFp)));
 		}
 	}
 }
@@ -482,8 +482,8 @@ void DvDirTreeView::createMenuAction(QMenu &menu, QString name, const char *slot
 {
 	QAction *act = menu.addAction(name);
 	act->setEnabled(enable);
-	string slotName(slot);
-	slotName = string("1") + slotName;
+	std::string slotName(slot);
+	slotName = std::string("1") + slotName;
 	connect(act, SIGNAL(triggered()), slotName.c_str());
 }
 
@@ -567,7 +567,7 @@ void DvDirTreeView::deleteFolder()
 	if (!node->isRenameEnabled())
 		return;
 	TFilePath fp = node->getPath();
-	int ret = MsgBox(tr("Delete folder ") + toQString(fp) + "?", tr("Yes"), tr("No"), 1);
+	int ret = DVGui::MsgBox(tr("Delete folder ") + toQString(fp) + "?", tr("Yes"), tr("No"), 1);
 	if (ret == 2 || ret == 0)
 		return;
 
@@ -575,7 +575,7 @@ void DvDirTreeView::deleteFolder()
 		TSystem::rmDir(fp);
 		IconGenerator::instance()->remove(fp);
 	} catch (...) {
-		MsgBox(CRITICAL, tr("It is not possible to delete the folder.") + toQString(fp));
+		DVGui::error(tr("It is not possible to delete the folder.") + toQString(fp));
 		return;
 	}
 
@@ -617,7 +617,7 @@ void DvDirTreeView::updateVersionControl(DvDirVersionControlNode *node)
 	if (rootNode) {
 		QString localPath = QString::fromStdWString(rootNode->getLocalPath());
 		if (!QFile::exists(localPath)) {
-			MsgBox(WARNING, tr("The local path does not exist:") + " " + localPath);
+			DVGui::warning(tr("The local path does not exist:") + " " + localPath);
 			return;
 		}
 
@@ -1164,7 +1164,7 @@ void DvDirTreeView::onCheckOutError(const QString &text)
 
 	setRefreshVersionControlEnabled(true);
 
-	MsgBox(CRITICAL, tr("Refresh operation failed:\n") + text);
+	DVGui::error(tr("Refresh operation failed:\n") + text);
 }
 
 //-----------------------------------------------------------------------------
@@ -1297,7 +1297,7 @@ void DvDirTreeView::onRefreshStatusError(const QString &text)
 		return;
 	m_currentRefreshedNode->restoreName();
 	setRefreshVersionControlEnabled(true);
-	MsgBox(CRITICAL, tr("Refresh operation failed:\n") + text);
+	DVGui::error(tr("Refresh operation failed:\n") + text);
 }
 
 //-----------------------------------------------------------------------------
@@ -1327,7 +1327,7 @@ void DvDirTreeView::onCheckPartialLockError(const QString &text)
 	m_thread.disconnect(SIGNAL(done(const QString &)));
 	m_thread.disconnect(SIGNAL(error(const QString &)));
 	setRefreshVersionControlEnabled(true);
-	MsgBox(CRITICAL, tr("Refresh operation failed:\n") + text);
+	DVGui::error(tr("Refresh operation failed:\n") + text);
 }
 
 //-----------------------------------------------------------------------------

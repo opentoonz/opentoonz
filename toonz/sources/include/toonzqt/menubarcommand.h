@@ -170,6 +170,8 @@ public:
 
 	// use setToggleTexts for toggle commands that have two names according to the current status. e.g. show/hide something
 	void setToggleTexts(CommandId id, const QString &onText, const QString &offText);
+
+	std::string getIdFromAction(QAction* action);
 };
 
 //-----------------------------------------------------------------------------

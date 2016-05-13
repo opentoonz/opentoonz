@@ -288,25 +288,25 @@ int PsdSettingsPopup::getFolderOption()
 void PsdSettingsPopup::doPsdParser()
 {
 	TFilePath psdpath = TApp::instance()->getCurrentScene()->getScene()->decodeFilePath(m_path);
-	string mode = "";
+	std::string mode = "";
 	switch (m_mode) {
 	case FLAT: {
 		break;
 	}
 	case FRAMES: {
 		mode = "#frames";
-		string name = psdpath.getName() + "#" + toString(1) + mode + psdpath.getDottedType();
+		std::string name = psdpath.getName() + "#" + toString(1) + mode + psdpath.getDottedType();
 		psdpath = psdpath.getParentDir() + TFilePath(name);
 		break;
 	}
 	case COLUMNS: {
-		string name = psdpath.getName() + "#" + toString(1) + psdpath.getDottedType();
+		std::string name = psdpath.getName() + "#" + toString(1) + psdpath.getDottedType();
 		psdpath = psdpath.getParentDir() + TFilePath(name);
 		break;
 	}
 	case FOLDER: {
 		mode = "#group";
-		string name = psdpath.getName() + "#" + toString(1) + mode + psdpath.getDottedType();
+		std::string name = psdpath.getName() + "#" + toString(1) + mode + psdpath.getDottedType();
 		psdpath = psdpath.getParentDir() + TFilePath(name);
 		break;
 	}
@@ -320,7 +320,7 @@ void PsdSettingsPopup::doPsdParser()
 		m_psdLevelPaths.clear();
 		for (int i = 0; i < m_psdparser->getLevelsCount(); i++) {
 			int layerId = m_psdparser->getLevelId(i);
-			string name = m_path.getName();
+			std::string name = m_path.getName();
 			if (layerId > 0 && m_mode != FRAMES) {
 				name += "#" + toString(layerId);
 			}
@@ -344,7 +344,7 @@ TFilePath PsdSettingsPopup::getPsdFramePath(int levelIndex, int frameIndex)
 {
 	int layerId = m_psdparser->getLevelId(levelIndex);
 	int frameId = m_psdparser->getFrameId(layerId, frameIndex);
-	string name = m_path.getName();
+	std::string name = m_path.getName();
 	if (frameId > 0)
 		name += "#" + toString(frameId);
 	name += m_path.getDottedType();

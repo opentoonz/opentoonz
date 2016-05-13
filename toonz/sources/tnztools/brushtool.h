@@ -67,7 +67,7 @@ public:
 	const std::set<BrushData> &presets() const { return m_presets; }
 
 	void addPreset(const BrushData &data);
-	void removePreset(const wstring &name);
+	void removePreset(const std::wstring &name);
 };
 
 //************************************************************************
@@ -79,7 +79,7 @@ class BrushTool : public TTool
 	Q_DECLARE_TR_FUNCTIONS(BrushTool)
 
 public:
-	BrushTool(string name, int targetType);
+	BrushTool(std::string name, int targetType);
 
 	ToolType getToolType() const { return TTool::LevelWriteTool; }
 
@@ -104,7 +104,7 @@ public:
 	int getCursorId() const { return ToolCursor::PenCursor; }
 
 	TPropertyGroup *getProperties(int targetType);
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 
 	void onImageChanged();
 	void setWorkAndBackupImages();
@@ -156,7 +156,7 @@ protected:
 	TRasterCM32P m_backupRas;
 	TRaster32P m_workRas;
 
-	vector<TThickPoint> m_points;
+	std::vector<TThickPoint> m_points;
 	TRect m_strokeRect,
 		m_lastRect;
 

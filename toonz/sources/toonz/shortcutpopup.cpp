@@ -139,7 +139,7 @@ void ShortcutViewer::keyPressEvent(QKeyEvent *event)
 			return;
 		if (oldAction) {
 			QString msg = tr("%1 is already assigned to '%2'\nAssign to '%3'?").arg(keySequence.toString()).arg(oldAction->iconText()).arg(m_action->iconText());
-			int ret = MsgBox(msg, tr("Yes"), tr("No"), 1);
+			int ret = DVGui::MsgBox(msg, tr("Yes"), tr("No"), 1);
 			activateWindow();
 			if (ret == 2 || ret == 0)
 				return;

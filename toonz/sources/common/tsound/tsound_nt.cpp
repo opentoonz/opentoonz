@@ -647,7 +647,6 @@ TSoundOutputDevice::~TSoundOutputDevice()
 	close();
 	WaitForSingleObject(m_imp->m_closeDevice, INFINITE);
 	CloseHandle(m_imp->m_closeDevice);
-	delete m_imp;
 }
 
 //------------------------------------------------------------------------------
@@ -1111,14 +1110,14 @@ void WinSoundInputDevice::stop()
 class RecordTask : public TThread::Runnable
 {
 public:
-	RecordTask(TSoundInputDeviceImp *dev)
-		: Runnable(), m_dev(dev) {}
+	RecordTask(std::shared_ptr<TSoundInputDeviceImp> dev)
+		: Runnable(), m_dev(std::move(dev)) {}
 
 	~RecordTask() {}
 
 	void run();
 
-	TSoundInputDeviceImp *m_dev;
+	std::shared_ptr<TSoundInputDeviceImp> m_dev;
 };
 
 #endif
@@ -1140,8 +1139,8 @@ public:
 #ifndef TNZCORE_LIGHT
 	TThread::Executor m_executor;
 #endif
-	vector<WAVEHDR> m_whdr;
-	vector<char *> m_recordedBlocks;
+	std::vector<WAVEHDR> m_whdr;
+	std::vector<char *> m_recordedBlocks;
 	std::set<int> m_supportedRate;
 
 	HANDLE m_hLastBlockDone;
@@ -1268,7 +1267,6 @@ TSoundInputDevice::TSoundInputDevice() : m_imp(new TSoundInputDeviceImp())
 
 TSoundInputDevice::~TSoundInputDevice()
 {
-	delete m_imp;
 }
 
 //------------------------------------------------------------------------------
@@ -2064,7 +2062,7 @@ MMRESULT getControlDetails(HMIXEROBJ hMixer,
 //------------------------------------------------------------------------------
 
 // restituiscei l nome della linea identificata da lineID
-string getMixerLineName(DWORD lineID)
+std::string getMixerLineName(DWORD lineID)
 {
 	MIXERLINE mxl;
 	MMRESULT ret;
@@ -2074,7 +2072,7 @@ string getMixerLineName(DWORD lineID)
 	assert(false);
 	return "";
 #else
-	return string(mxl.szName);
+	return std::string(mxl.szName);
 #endif
 }
 
@@ -2082,9 +2080,9 @@ string getMixerLineName(DWORD lineID)
 
 // restituisce la lista degli identificativi delle linee sorgente associate
 // alla destinazione di tipo dstComponentType
-list<DWORD> getMixerSrcLines(DWORD dstComponentType)
+std::list<DWORD> getMixerSrcLines(DWORD dstComponentType)
 {
-	list<DWORD> srcList;
+	std::list<DWORD> srcList;
 	MMRESULT ret;
 	MIXERLINE mxl;
 
@@ -2108,9 +2106,9 @@ list<DWORD> getMixerSrcLines(DWORD dstComponentType)
 
 // restituisce la lista degli identificativi delle linee sorgente di tipo
 // srcComponentType associate alla destinazione di tipo dstComponentType
-list<DWORD> getMixerSrcLines(DWORD dstComponentType, DWORD srcComponentType)
+std::list<DWORD> getMixerSrcLines(DWORD dstComponentType, DWORD srcComponentType)
 {
-	list<DWORD> srcList;
+	std::list<DWORD> srcList;
 	MMRESULT ret;
 	MIXERLINE mxl;
 
@@ -2212,13 +2210,13 @@ bool setSrcMixMuxControl(MIXERCONTROL mxc, DWORD componentTypeSrc)
 	// determino l'indice dell'item corrispondente alla linea sorgente
 	// di tipo componentTypeSrc
 
-	MIXERCONTROLDETAILS_LISTTEXT *pmxcdSelectText =
-		new MIXERCONTROLDETAILS_LISTTEXT[dwMultipleItems];
+	std::unique_ptr<MIXERCONTROLDETAILS_LISTTEXT[]>
+		pmxcdSelectText(new MIXERCONTROLDETAILS_LISTTEXT[dwMultipleItems]);
 
-	if (pmxcdSelectText != NULL) {
+	if (pmxcdSelectText) {
 		// estraggo le info su tutte le linee associate al controllo
 		ret = getControlDetails((HMIXEROBJ)0, dwSelectControlID,
-								dwMultipleItems, pmxcdSelectText);
+								dwMultipleItems, pmxcdSelectText.get());
 
 		if (ret == MMSYSERR_NOERROR) {
 			for (DWORD dwi = 0; dwi < dwMultipleItems; dwi++) {
@@ -2233,8 +2231,6 @@ bool setSrcMixMuxControl(MIXERCONTROL mxc, DWORD componentTypeSrc)
 			}
 		}
 
-		delete[] pmxcdSelectText;
-
 		if (!found)
 			return false;
 	}
@@ -2244,11 +2240,11 @@ bool setSrcMixMuxControl(MIXERCONTROL mxc, DWORD componentTypeSrc)
 
 	bool bRetVal = false;
 
-	MIXERCONTROLDETAILS_BOOLEAN *pmxcdSelectValue =
-		new MIXERCONTROLDETAILS_BOOLEAN[dwMultipleItems];
+	std::unique_ptr<MIXERCONTROLDETAILS_BOOLEAN[]>
+		pmxcdSelectValue(new MIXERCONTROLDETAILS_BOOLEAN[dwMultipleItems]);
 
-	if (pmxcdSelectValue != NULL) {
-		::ZeroMemory(pmxcdSelectValue, dwMultipleItems * sizeof(MIXERCONTROLDETAILS_BOOLEAN));
+	if (pmxcdSelectValue) {
+		::ZeroMemory(pmxcdSelectValue.get(), dwMultipleItems * sizeof(MIXERCONTROLDETAILS_BOOLEAN));
 
 		// impostazione del valore
 		pmxcdSelectValue[dwIndexLine].fValue = (TINT32)1; // lVal; //dovrebbe esser uno
@@ -2256,11 +2252,9 @@ bool setSrcMixMuxControl(MIXERCONTROL mxc, DWORD componentTypeSrc)
 		ret = setControlDetails((HMIXEROBJ)0,
 								dwSelectControlID,
 								dwMultipleItems,
-								pmxcdSelectValue);
+								pmxcdSelectValue.get());
 		if (ret == MMSYSERR_NOERROR)
 			bRetVal = true;
-
-		delete[] pmxcdSelectValue;
 	}
 	return bRetVal;
 }

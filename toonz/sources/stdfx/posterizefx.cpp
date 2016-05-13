@@ -6,7 +6,7 @@
 namespace
 {
 template <typename T, typename PIXEL>
-void prepare_lut(int levels, vector<T> &lut)
+void prepare_lut(int levels, std::vector<T> &lut)
 {
 	int i, j;
 	int valuestep = PIXEL::maxChannelValue / (levels - 1);
@@ -58,7 +58,7 @@ public:
 template <typename PIXEL, typename CHANNEL_TYPE>
 void doPosterize(TRasterPT<PIXEL> ras, int levels)
 {
-	vector<CHANNEL_TYPE> solarize_lut(PIXEL::maxChannelValue + 1);
+	std::vector<CHANNEL_TYPE> solarize_lut(PIXEL::maxChannelValue + 1);
 
 	prepare_lut<CHANNEL_TYPE, PIXEL>(levels, solarize_lut);
 	int j;

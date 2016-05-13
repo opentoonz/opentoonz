@@ -294,8 +294,8 @@ public:
 class JunctionArea
 {
 public:
-	vector<EnteringSequence> m_enteringSequences;
-	vector<unsigned int> m_jointsAbsorbed;
+	std::vector<EnteringSequence> m_enteringSequences;
+	std::vector<unsigned int> m_jointsAbsorbed;
 	TPointD m_newJointPosition;
 
 	JunctionArea() {}

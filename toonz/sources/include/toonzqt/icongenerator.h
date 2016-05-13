@@ -111,7 +111,7 @@ public:
 	QPixmap getSceneIcon(ToonzScene *scene); //Unused in Toonz
 	void invalidateSceneIcon();
 
-	void remap(const string &newIconId, const string &oldIconId);
+	void remap(const std::string &newIconId, const std::string &oldIconId);
 
 	void clearRequests();
 	void clearSceneIcons();

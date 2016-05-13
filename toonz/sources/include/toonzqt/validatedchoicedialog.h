@@ -41,7 +41,7 @@ namespace DVGui
             ValidatedChoiceDialog() constructor.
 */
 
-class DVAPI ValidatedChoiceDialog : public Dialog
+class DVAPI ValidatedChoiceDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 

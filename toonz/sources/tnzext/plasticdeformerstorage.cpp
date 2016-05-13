@@ -1,4 +1,4 @@
-
+#include <memory>
 
 // TnzExt includes
 #include "ext/plasticskeleton.h"
@@ -10,9 +10,6 @@
 #include <algorithm>
 
 // Boost includes
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
@@ -42,7 +39,7 @@ struct Key {
 	const TMeshImage *m_mi;
 	DeformedSkeleton m_ds;
 
-	boost::shared_ptr<DataGroup> m_dataGroup;
+	std::shared_ptr<DataGroup> m_dataGroup;
 
 public:
 	Key(const TMeshImage *mi, const SkD *sd, int skelId)
@@ -83,7 +80,7 @@ namespace
 
 void initializeSO(PlasticDeformerData &data, const TTextureMeshP &mesh)
 {
-	data.m_so = new double[mesh->facesCount()];
+	data.m_so.reset(new double[mesh->facesCount()]);
 }
 
 //----------------------------------------------------------------------------------
@@ -93,14 +90,14 @@ void initializeDeformerData(PlasticDeformerData &data, const TTextureMeshP &mesh
 	initializeSO(data, mesh); // Allocates SO data
 
 	// Also, allocate suitable input-output arrays for the deformation
-	data.m_output = new double[2 * mesh->verticesCount()];
+	data.m_output.reset(new double[2 * mesh->verticesCount()]);
 }
 
 //----------------------------------------------------------------------------------
 
 void initializeDeformersData(DataGroup *group, const TMeshImage *meshImage)
 {
-	group->m_datas = new PlasticDeformerData[meshImage->meshes().size()];
+	group->m_datas.reset(new PlasticDeformerData[meshImage->meshes().size()]);
 
 	// Push a PlasticDeformer for each mesh in the image
 	const std::vector<TTextureMeshP> &meshes = meshImage->meshes();
@@ -272,7 +269,7 @@ void interpolateSO(DataGroup *group, const TMeshImage *meshImage)
 			const TTextureMesh &mesh = *meshImage->meshes()[m];
 			PlasticDeformerData &data = group->m_datas[m];
 
-			std::fill(data.m_so, data.m_so + mesh.facesCount(), 0.0);
+			std::fill(data.m_so.get(), data.m_so.get() + mesh.facesCount(), 0.0);
 		}
 
 		return;
@@ -284,9 +281,9 @@ void interpolateSO(DataGroup *group, const TMeshImage *meshImage)
 		PlasticDeformerData &data = group->m_datas[m];
 
 		// Interpolate so values
-		double *verticesSO = new double[mesh.verticesCount()];
+		std::unique_ptr<double[]> verticesSO(new double[mesh.verticesCount()]);
 
-		::buildSO(verticesSO, mesh, group->m_handles, &data.m_faceHints.front());
+		::buildSO(verticesSO.get(), mesh, group->m_handles, &data.m_faceHints.front());
 
 		// Make the mean of each face's vertex values and store that
 		int f, fCount = mesh.facesCount();
@@ -296,8 +293,6 @@ void interpolateSO(DataGroup *group, const TMeshImage *meshImage)
 
 			data.m_so[f] = (verticesSO[v0] + verticesSO[v1] + verticesSO[v2]) / 3.0;
 		}
-
-		delete[] verticesSO;
 	}
 }
 
@@ -379,7 +374,7 @@ void processMesh(DataGroup *group, double frame, const TMeshImage *meshImage,
 
 		for (m = 0; m != mCount; ++m) {
 			PlasticDeformerData &data = group->m_datas[m];
-			data.m_deformer.deform(dstHandlePos, data.m_output);
+			data.m_deformer.deform(dstHandlePos, data.m_output.get());
 		}
 
 		group->m_upToDate |= PlasticDeformerStorage::MESH;
@@ -393,7 +388,6 @@ void processMesh(DataGroup *group, double frame, const TMeshImage *meshImage,
 //***********************************************************************************************
 
 PlasticDeformerData::PlasticDeformerData()
-	: m_so(), m_output()
 {
 }
 
@@ -401,8 +395,6 @@ PlasticDeformerData::PlasticDeformerData()
 
 PlasticDeformerData::~PlasticDeformerData()
 {
-	delete[] m_so;
-	delete[] m_output;
 }
 
 //***********************************************************************************************
@@ -410,7 +402,12 @@ PlasticDeformerData::~PlasticDeformerData()
 //***********************************************************************************************
 
 PlasticDeformerDataGroup::PlasticDeformerDataGroup()
-	: m_datas(), m_compiled(PlasticDeformerStorage::NONE), m_upToDate(PlasticDeformerStorage::NONE), m_outputFrame((std::numeric_limits<double>::max)()), m_soMin(), m_soMax()
+	: m_datas()
+	, m_compiled(PlasticDeformerStorage::NONE)
+	, m_upToDate(PlasticDeformerStorage::NONE)
+	, m_outputFrame((std::numeric_limits<double>::max)())
+	, m_soMin()
+	, m_soMax()
 {
 }
 
@@ -418,7 +415,6 @@ PlasticDeformerDataGroup::PlasticDeformerDataGroup()
 
 PlasticDeformerDataGroup::~PlasticDeformerDataGroup()
 {
-	delete[] m_datas;
 }
 
 //***********************************************************************************************
@@ -448,7 +444,6 @@ PlasticDeformerStorage::PlasticDeformerStorage()
 
 PlasticDeformerStorage::~PlasticDeformerStorage()
 {
-	delete m_imp;
 }
 
 //----------------------------------------------------------------------------------
@@ -472,7 +467,7 @@ PlasticDeformerDataGroup *PlasticDeformerStorage::deformerData(
 	DeformersByKey::iterator dt = m_imp->m_deformers.find(key);
 	if (dt == m_imp->m_deformers.end()) {
 		// No deformer was found. Allocate it.
-		key.m_dataGroup = boost::make_shared<PlasticDeformerDataGroup>();
+		key.m_dataGroup = std::make_shared<PlasticDeformerDataGroup>();
 		initializeDeformersData(key.m_dataGroup.get(), meshImage);
 
 		dt = m_imp->m_deformers.insert(key).first;

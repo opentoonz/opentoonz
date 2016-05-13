@@ -46,7 +46,6 @@ TExpression::TExpression()
 
 TExpression::~TExpression()
 {
-	delete m_imp;
 }
 
 //--------------------------------------------------------------------------
@@ -89,7 +88,7 @@ const TSyntax::Grammar *TExpression::getGrammar() const
 
 //--------------------------------------------------------------------------
 
-void TExpression::setText(string text)
+void TExpression::setText(std::string text)
 {
 	if (m_imp->m_text != text) {
 		m_imp->m_text = text;
@@ -104,7 +103,7 @@ void TExpression::setText(string text)
 
 //--------------------------------------------------------------------------
 
-string TExpression::getText() const
+std::string TExpression::getText() const
 {
 	return m_imp->m_text;
 }
@@ -133,7 +132,7 @@ bool TExpression::isValid()
 
 //--------------------------------------------------------------------------
 
-string TExpression::getError() const
+std::string TExpression::getError() const
 {
 	return m_imp->m_error;
 }
@@ -209,5 +208,5 @@ TDoubleParam *TExpression::getOwnerParameter() const
 bool TExpression::isCycling() const
 {
 	// TODO: this is a quick&dirty implementation to be replaced with a more "semantic" one
-	return getText().find("cycle") != string::npos;
+	return getText().find("cycle") != std::string::npos;
 }

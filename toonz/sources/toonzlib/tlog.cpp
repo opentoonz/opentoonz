@@ -6,7 +6,7 @@
 
 #include <QDateTime>
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #include <windows.h>
 #include <stdio.h>
@@ -35,7 +35,7 @@ enum LEVEL {
 	LEVEL_INFO
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 WORD Level2WinEventType(LEVEL level)
 {
 	switch (level) {
@@ -71,9 +71,9 @@ int Level2XPriority(LEVEL level)
 }
 #endif
 
-void notify(LEVEL level, const string &msg)
+void notify(LEVEL level, const std::string &msg)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	TCHAR buf[_MAX_PATH + 1];
 
 	GetModuleFileName(0, buf, _MAX_PATH);
@@ -110,7 +110,7 @@ static TThread::Mutex MyMutex;
 
 //------------------------------------------------------------------------------
 
-void TSysLog::success(const string &msg)
+void TSysLog::success(const std::string &msg)
 {
 	QMutexLocker sl(&MyMutex);
 	notify(LEVEL_SUCCESS, msg);
@@ -118,7 +118,7 @@ void TSysLog::success(const string &msg)
 
 //------------------------------------------------------------------------------
 
-void TSysLog::warning(const string &msg)
+void TSysLog::warning(const std::string &msg)
 {
 	QMutexLocker sl(&MyMutex);
 	notify(LEVEL_WARNING, msg);
@@ -126,7 +126,7 @@ void TSysLog::warning(const string &msg)
 
 //------------------------------------------------------------------------------
 
-void TSysLog::error(const string &msg)
+void TSysLog::error(const std::string &msg)
 {
 	QMutexLocker sl(&MyMutex);
 	notify(LEVEL_ERROR, msg);
@@ -134,7 +134,7 @@ void TSysLog::error(const string &msg)
 
 //------------------------------------------------------------------------------
 
-void TSysLog::info(const string &msg)
+void TSysLog::info(const std::string &msg)
 {
 	QMutexLocker sl(&MyMutex);
 	notify(LEVEL_INFO, msg);
@@ -163,7 +163,7 @@ public:
 			delete m_os;
 	}
 
-	void write(const string &msg);
+	void write(const std::string &msg);
 
 	TThread::Mutex m_mutex;
 	std::ostream *m_os;
@@ -172,7 +172,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-void TUserLogAppend::Imp::write(const string &msg)
+void TUserLogAppend::Imp::write(const std::string &msg)
 {
 	QMutexLocker sl(&m_mutex);
 	*m_os << msg.c_str();
@@ -186,7 +186,7 @@ namespace
 
 //--------------------------------------------------------------------
 
-string myGetCurrentTime()
+std::string myGetCurrentTime()
 {
 	QString tmp = QTime::currentTime().toString("hh:mm:ss");
 	return tmp.toStdString();
@@ -210,16 +210,15 @@ TUserLogAppend::TUserLogAppend(const TFilePath &fp) : m_imp(new Imp(fp))
 
 TUserLogAppend::~TUserLogAppend()
 {
-	//delete m_imp;
 }
 
 //------------------------------------------------------------------------------
 
-void TUserLogAppend::warning(const string &msg)
+void TUserLogAppend::warning(const std::string &msg)
 {
-	DVGui::MsgBox(DVGui::WARNING, QString::fromStdString(msg));
+	DVGui::warning(QString::fromStdString(msg));
 
-	string fullMsg(myGetCurrentTime());
+	std::string fullMsg(myGetCurrentTime());
 	fullMsg += " WRN:";
 	fullMsg += "\n";
 	fullMsg += msg;
@@ -229,10 +228,10 @@ void TUserLogAppend::warning(const string &msg)
 
 //------------------------------------------------------------------------------
 
-void TUserLogAppend::error(const string &msg)
+void TUserLogAppend::error(const std::string &msg)
 {
-	DVGui::MsgBox(DVGui::CRITICAL, QString::fromStdString(msg));
-	string fullMsg(myGetCurrentTime());
+	DVGui::error(QString::fromStdString(msg));
+	std::string fullMsg(myGetCurrentTime());
 	fullMsg += " ERR:";
 	fullMsg += "\n";
 	fullMsg += msg;
@@ -242,9 +241,9 @@ void TUserLogAppend::error(const string &msg)
 
 //------------------------------------------------------------------------------
 
-void TUserLogAppend::info(const string &msg)
+void TUserLogAppend::info(const std::string &msg)
 {
-	string fullMsg("");
+	std::string fullMsg("");
 	//fullMsg += " INF:";
 	//fullMsg += "\n";
 	fullMsg += msg;

@@ -40,7 +40,7 @@ TXshZeraryFxColumn::TXshZeraryFxColumn(const TXshZeraryFxColumn &src)
 	assert((int)src.m_cells.size() == (int)m_cells.size());
 	TFx *fx = src.getZeraryColumnFx()->getZeraryFx();
 	if (fx) {
-		wstring fxName = fx->getName();
+		std::wstring fxName = fx->getName();
 		fx = fx->clone(false);
 		fx->setName(fxName);
 		m_zeraryColumnFx->setZeraryFx(fx);
@@ -150,7 +150,7 @@ void TXshZeraryFxColumn::loadData(TIStream &is)
 	int r0, r1;
 	bool touched = false;
 	const TXshCell cell(m_zeraryFxLevel, TFrameId(1));
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == "status") {
 			int status;

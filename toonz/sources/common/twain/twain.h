@@ -103,11 +103,11 @@
 #endif
 
 /* Microsoft C/C++ Compiler */
-#if defined(WIN32) || defined(WIN64) || defined(_WINDOWS)
+#if defined(_WIN32) || defined(WIN64) || defined(_WINDOWS)
 #define TWH_CMP_MSC
 #if defined(_WIN64) || defined(WIN64)
 #define TWH_64BIT
-#elif defined(WIN32) || defined(_WIN32)
+#elif defined(_WIN32) || defined(_WIN32)
 #define TWH_32BIT
 #endif
 
@@ -1844,7 +1844,7 @@ typedef struct {
  * Depreciated Items                                                        *
  ****************************************************************************/
 #ifdef _MSWIN_
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(WIN64)
 #define TW_HUGE
 #elif !defined(TWH_CMP_GNU)
 #define TW_HUGE huge

@@ -429,8 +429,7 @@ struct import_Locals {
 						  boost::bind(copy, boost::cref(srcDir), boost::cref(dstDir),
 									  _1, overwrite));
 		} catch (const TException &e) {
-			DVGui::MsgBox(DVGui::CRITICAL,
-						  QString::fromStdWString(e.getMessage()));
+			DVGui::error(QString::fromStdWString(e.getMessage()));
 		} catch (...) {
 		}
 	}

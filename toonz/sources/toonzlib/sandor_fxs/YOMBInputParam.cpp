@@ -4,15 +4,17 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#ifdef _WIN32
+#pragma warning(disable : 4996)
+#endif
+
+#include <algorithm>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <search.h>
 #include "YOMBInputParam.h"
-//#include "tmsg.h"
-#ifdef WIN32
-#pragma warning(disable : 4996)
-#endif
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -72,9 +74,9 @@ void CYOMBInputParam::strToColorIndex(const char *s, COLOR_INDEX_LIST &cil,
 		int begin = getRangeBegin(s);
 		int end = getRangeEnd(s);
 		if (begin >= 0 && end >= 0) {
-			begin = min(begin, maxIndex);
-			end = min(end, maxIndex);
-			for (int i = min(begin, end); i <= max(begin, end) && cil.nb < MAXNBCIL; i++)
+			begin = std::min(begin, maxIndex);
+			end = std::min(end, maxIndex);
+			for (int i = std::min(begin, end); i <= std::max(begin, end) && cil.nb < MAXNBCIL; i++)
 				cil.ci[cil.nb++] = (unsigned short)i;
 		}
 		// If there is no 'begin' or 'end' of range, it is considered

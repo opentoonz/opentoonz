@@ -12,7 +12,7 @@
 //#include "drawutil.h"
 #include "tvectorimage.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <crtdbg.h>
 #include <Windows.h>
 #endif
@@ -317,7 +317,7 @@ void removeFalseHoles(const vector<TStroke *> &strokes);
 
 inline void TraceLinkedQuadraticList(LinkedQuadraticList &quadraticList)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	_RPT0(_CRT_WARN,
 		  "\n__________________________________________________\n");
 	LinkedQuadraticList::iterator it = quadraticList.begin();

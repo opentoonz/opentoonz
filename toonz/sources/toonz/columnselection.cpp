@@ -127,8 +127,8 @@ bool canMergeColumns(int column, int mColumn, bool forMatchlines)
 
 	if (start > end)
 		return false;
-	vector<TXshCell> cell(end - start + 1);
-	vector<TXshCell> mCell(end - start + 1);
+	std::vector<TXshCell> cell(end - start + 1);
+	std::vector<TXshCell> mCell(end - start + 1);
 
 	xsh->getCells(start, column, cell.size(), &(cell[0]));
 	xsh->getCells(start, mColumn, cell.size(), &(mCell[0]));

@@ -255,7 +255,7 @@ public:
 
 class DVAPI Picker : public Visitor
 {
-	vector<int> m_columnIndexes, m_rows;
+	std::vector<int> m_columnIndexes, m_rows;
 	TPointD m_point;
 	TAffine m_viewAff;
 	double m_minDist2;
@@ -272,7 +272,7 @@ public:
 	void disableMask();
 
 	int getColumnIndex() const;
-	void getColumnIndexes(vector<int> &indexes) const;
+	void getColumnIndexes(std::vector<int> &indexes) const;
 	int getRow() const;
 };
 

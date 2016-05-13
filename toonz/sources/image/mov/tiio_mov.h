@@ -17,6 +17,9 @@ namespace QuickTime
 #define map Map
 #define iterator Iterator
 #define float_t Float_t
+#define int_fast8_t QT_int_fast8_t
+#define int_fast16_t QT_int_fast16_t
+#define uint_fast16_t QT_uint_fast16_t
 
 #include "QTML.h"
 #include "Movies.h"
@@ -31,6 +34,9 @@ namespace QuickTime
 #undef map
 #undef iterator
 #undef float_t
+#undef QT_int_fast8_t
+#undef QT_int_fast16_t
+#undef QT_uint_fast16_t
 } //namespace QuickTime
 
 //Toonz includes
@@ -119,7 +125,7 @@ class DVAPI TLevelReaderMov : public TLevelReader
 	Track m_track;
 	MediaHandler m_timecodeHandler;
 	long m_depth;
-	map<int, TimeValue> currentTimes;
+	std::map<int, TimeValue> currentTimes;
 	int m_lx, m_ly;
 	int m_hh, m_mm, m_ss, m_ff;
 	TThread::Mutex m_mutex;

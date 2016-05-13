@@ -6,11 +6,14 @@
 #include "menubarcommandids.h"
 #include "tapp.h"
 #include "cellselection.h"
+#include "mainwindow.h"
+#include "menubarpopup.h"
 
 // TnzQt includes
 #include "toonzqt/tselectionhandle.h"
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/menubarcommand.h"
+#include "toonzqt/gutil.h"
 
 // TnzLib includes
 #include "toonz/toonzscene.h"
@@ -19,6 +22,7 @@
 #include "toonz/txsheethandle.h"
 #include "toonz/tframehandle.h"
 #include "toonz/tcolumnhandle.h"
+#include "toonz/toonzfolders.h"
 
 // TnzTools includes
 #include "tools/toolcommandids.h"
@@ -28,6 +32,7 @@
 
 // TnzCore includes
 #include "tconvert.h"
+#include "tsystem.h"
 
 // Qt includes
 #include <QIcon>
@@ -37,6 +42,9 @@
 #include <QMenuBar>
 #include <QShortcut>
 #include <QDesktopServices>
+#include <QCheckBox>
+#include <QtDebug>
+#include <QXmlStreamReader>
 
 void UrlOpener::open()
 {
@@ -45,6 +53,178 @@ void UrlOpener::open()
 
 UrlOpener dvHome(QUrl("http://www.toonz.com/"));
 UrlOpener manual(QUrl("file:///C:/gmt/butta/M&C in EU.pdf"));
+
+TEnv::IntVar LockRoomTabToggle("LockRoomTabToggle", 0);
+
+//=============================================================================
+// RoomTabWidget
+//-----------------------------------------------------------------------------
+
+RoomTabWidget::RoomTabWidget(QWidget *parent)
+	: QTabBar(parent)
+	, m_clickedTabIndex(-1)
+	, m_tabToDeleteIndex(-1)
+	, m_renameTabIndex(-1)
+	, m_renameTextField(new DVGui::LineEdit(this))
+	, m_isLocked( LockRoomTabToggle != 0 )
+{
+	m_renameTextField->hide();
+	connect(m_renameTextField, SIGNAL(editingFinished()), this, SLOT(updateTabName()));
+}
+
+//-----------------------------------------------------------------------------
+
+RoomTabWidget::~RoomTabWidget()
+{
+}
+
+//-----------------------------------------------------------------------------
+
+void RoomTabWidget::swapIndex(int firstIndex, int secondIndex)
+{
+	QString firstText = tabText(firstIndex);
+	removeTab(firstIndex);
+	insertTab(secondIndex, firstText);
+	emit indexSwapped(firstIndex, secondIndex);
+
+	setCurrentIndex(secondIndex);
+}
+
+//-----------------------------------------------------------------------------
+
+void RoomTabWidget::mousePressEvent(QMouseEvent *event)
+{
+	m_renameTextField->hide();
+	if (event->button() == Qt::LeftButton)
+	{
+		m_clickedTabIndex = tabAt(event->pos());
+		if (m_clickedTabIndex<0) return;
+		setCurrentIndex(m_clickedTabIndex);
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void RoomTabWidget::mouseMoveEvent(QMouseEvent *event)
+{
+	if (m_isLocked) return;
+	if (event->buttons())
+	{
+		int tabIndex = tabAt(event->pos());
+		if (tabIndex == m_clickedTabIndex ||
+			tabIndex<0 || tabIndex >= count() ||
+			m_clickedTabIndex<0)
+			return;
+		swapIndex(m_clickedTabIndex, tabIndex);
+		m_clickedTabIndex = tabIndex;
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void RoomTabWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+	m_clickedTabIndex = -1;
+}
+
+//-----------------------------------------------------------------------------
+/*! Set a text field with focus in event position to edit tab name.
+*/
+void RoomTabWidget::mouseDoubleClickEvent(QMouseEvent * event)
+{
+	if (m_isLocked) return;
+	int index = tabAt(event->pos());
+	if (index<0) return;
+	m_renameTabIndex = index;
+	DVGui::LineEdit *fld = m_renameTextField;
+	fld->setText(tabText(index));
+	fld->setGeometry(tabRect(index));
+	fld->show();
+	fld->selectAll();
+	fld->setFocus(Qt::OtherFocusReason);
+}
+
+//-----------------------------------------------------------------------------
+
+void RoomTabWidget::contextMenuEvent(QContextMenuEvent *event) 
+{
+	if (m_isLocked) return;
+	m_tabToDeleteIndex = -1;
+	QMenu *menu = new QMenu(this);
+	QAction* newRoom = menu->addAction(tr("New Room"));
+	connect(newRoom, SIGNAL(triggered()), SLOT(addNewTab()));
+
+	int index = tabAt(event->pos());
+	if (index >= 0)
+	{
+		m_tabToDeleteIndex = index;
+		if (index != currentIndex())
+		{
+			QAction* deleteRoom = menu->addAction(tr("Delete Room \"%1\"").arg(tabText(index)));
+			connect(deleteRoom, SIGNAL(triggered()), SLOT(deleteTab()));
+		}
+#if defined(_WIN32) || defined(_CYGWIN_)
+		/*- customize menubar -*/
+		QAction* customizeMenuBar = menu->addAction(tr("Customize Menu Bar of Room \"%1\"").arg(tabText(index)));
+		connect(customizeMenuBar, SIGNAL(triggered()), SLOT(onCustomizeMenuBar()));
+#endif
+	}
+	menu->exec(event->globalPos());
+}
+
+//-----------------------------------------------------------------------------
+
+void RoomTabWidget::updateTabName()
+{
+	int index = m_renameTabIndex;
+	if (index<0) return;
+	m_renameTabIndex = -1;
+	QString newName = m_renameTextField->text();
+	setTabText(index, newName);
+	m_renameTextField->hide();
+	emit renameTabRoom(index, newName);
+}
+
+//-----------------------------------------------------------------------------
+
+void RoomTabWidget::addNewTab()
+{
+	insertTab(0, tr("Room"));
+	emit insertNewTabRoom();
+}
+
+//-----------------------------------------------------------------------------
+
+void RoomTabWidget::deleteTab()
+{
+	assert(m_tabToDeleteIndex != -1);
+
+	QString question(tr("Are you sure you want to remove room %1").arg(tabText(m_tabToDeleteIndex)));
+	int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
+	if (ret == 0 || ret == 2) return;
+
+	emit deleteTabRoom(m_tabToDeleteIndex);
+	removeTab(m_tabToDeleteIndex);
+	m_tabToDeleteIndex = -1;
+}
+
+//-----------------------------------------------------------------------------
+
+void RoomTabWidget::setIsLocked(bool lock)
+{
+	m_isLocked = lock;
+	LockRoomTabToggle = (lock) ? 1 : 0;
+}
+
+//-----------------------------------------------------------------------------
+
+void RoomTabWidget::onCustomizeMenuBar()
+{
+	/*- use m_tabToDeleteIndex for index of a room of which menubar is to be customized -*/
+	assert(m_tabToDeleteIndex != -1);
+
+	emit customizeMenuBar(m_tabToDeleteIndex);
+}
 
 //=============================================================================
 // StackedMenuBar
@@ -63,31 +243,154 @@ void StackedMenuBar::createMenuBarByName(const QString &roomName)
 	std::cout << "create " << roomName.toStdString() << std::endl;
 #if defined(_WIN32) || defined(_CYGWIN_)
 	if (roomName == "Cleanup")
-		createCleanupMenuBar();
+		addWidget(createCleanupMenuBar());
 	else if (roomName == "PltEdit")
-		createPltEditMenuBar();
+		addWidget(createPltEditMenuBar());
 	else if (roomName == "InknPaint")
-		createInknPaintMenuBar();
+		addWidget(createInknPaintMenuBar());
 	else if (roomName == "Xsheet" || roomName == "Schematic" || roomName == "QAR" || roomName == "Flip")
-		createXsheetMenuBar();
+		addWidget(createXsheetMenuBar());
 	else if (roomName == "Batches")
-		createBatchesMenuBar();
+		addWidget(createBatchesMenuBar());
 	else if (roomName == "Browser")
-		createBrowserMenuBar();
+		addWidget(createBrowserMenuBar());
 	else /*-- どれにもあてはまらない場合は全てのコマンドの入ったメニューバーを作る --*/
-		createFullMenuBar();
+		addWidget(createFullMenuBar());
 #else
 	/* OSX では stacked menu が動いていないのでとりあえず full のみ作成する */
-	createFullMenuBar();
+	addWidget(createFullMenuBar());
 #endif
 }
 
 //---------------------------------------------------------------------------------
 
-void StackedMenuBar::createCleanupMenuBar()
+void StackedMenuBar::loadAndAddMenubar(const TFilePath & fp)
 {
-	QMenuBar *cleanupMenuBar;
-	cleanupMenuBar = new QMenuBar(this);
+#if defined(_WIN32) || defined(_CYGWIN_)
+	QMenuBar* menuBar = loadMenuBar(fp);
+	if (menuBar)
+		addWidget(menuBar);
+	else
+		addWidget(createFullMenuBar());
+#else
+	/* OSX では stacked menu が動いていないのでとりあえず full のみ作成する */
+	addWidget(createFullMenuBar());
+#endif
+}
+
+//---------------------------------------------------------------------------------
+
+QMenuBar* StackedMenuBar::loadMenuBar(const TFilePath & fp)
+{
+
+	QFile file(toQString(fp));
+	if (!file.open(QFile::ReadOnly | QFile::Text)){
+		qDebug() << "Cannot read file" << file.errorString();
+		return 0;
+	}
+
+	QXmlStreamReader reader(&file);
+
+	QMenuBar* menuBar = new QMenuBar(this);
+	if (reader.readNextStartElement())
+	{
+		if (reader.name() == "menubar")
+		{
+			while (reader.readNextStartElement())
+			{
+				if (reader.name() == "menu")
+				{
+					QString title = reader.attributes().value("title").toString();
+					/*- Menu title will be translated if the title is registered in translation file -*/
+					QMenu* menu = new QMenu(tr(title.toStdString().c_str()));
+
+					if (readMenuRecursive(reader, menu))
+						menuBar->addMenu(menu);
+					else
+					{
+						reader.raiseError(tr("Failed to load menu %1").arg(title));
+						delete menu;
+					}
+
+				}
+				else if (reader.name() == "command")
+				{
+					QString cmdName = reader.readElementText();
+
+					QAction *action = CommandManager::instance()->getAction(cmdName.toStdString().c_str());
+					if (action)
+						menuBar->addAction(action);
+					else
+						reader.raiseError(tr("Failed to add command %1").arg(cmdName));
+				}
+				else
+					reader.skipCurrentElement();
+			}
+		}
+		else
+			reader.raiseError(QObject::tr("Incorrect file"));
+	}
+
+	if (reader.hasError())
+	{
+		delete menuBar;
+		return 0;
+	}
+	return  menuBar;
+}
+
+//---------------------------------------------------------------------------------
+
+bool StackedMenuBar::readMenuRecursive( QXmlStreamReader& reader, QMenu* menu)
+{
+	while (reader.readNextStartElement())
+	{
+		if (reader.name() == "menu")
+		{
+			QString title = reader.attributes().value("title").toString();
+			QMenu* subMenu = new QMenu(tr(title.toStdString().c_str()));
+
+			if (readMenuRecursive(reader, subMenu))
+				menu->addMenu(subMenu);
+			else
+			{
+				reader.raiseError(tr("Failed to load menu %1").arg(title));
+				delete subMenu;
+				return false;
+			}
+
+		}
+		else if (reader.name() == "command")
+		{
+			QString cmdName = reader.readElementText();
+			addMenuItem(menu, cmdName.toStdString().c_str());
+		}
+		else if (reader.name() == "command_debug")
+		{
+#ifndef NDEBUG
+			QString cmdName = reader.readElementText();
+			addMenuItem(menu, cmdName.toStdString().c_str());
+#else
+			reader.skipCurrentElement();
+#endif
+		}
+		else if (reader.name() == "separator")
+		{
+			menu->addSeparator();
+			reader.skipCurrentElement();
+		}
+		else
+			reader.skipCurrentElement();
+	}
+	
+	return !reader.hasError();
+}
+
+//---------------------------------------------------------------------------------
+
+QMenuBar* StackedMenuBar::createCleanupMenuBar()
+{
+	QMenuBar *cleanupMenuBar = new QMenuBar(this);
 	//----Files Menu
 	QMenu *filesMenu = addMenu(tr("Files"), cleanupMenuBar);
 	addMenuItem(filesMenu, MI_LoadLevel);
@@ -100,6 +403,7 @@ void StackedMenuBar::createCleanupMenuBar()
 	addMenuItem(filesMenu, MI_LoadScene);
 	addMenuItem(filesMenu, MI_SaveScene);
 	addMenuItem(filesMenu, MI_SaveSceneAs);
+    addMenuItem(filesMenu, MI_SaveAll);
 	addMenuItem(filesMenu, MI_OpenRecentScene);
 	addMenuItem(filesMenu, MI_RevertScene);
 	filesMenu->addSeparator();
@@ -205,15 +509,14 @@ void StackedMenuBar::createCleanupMenuBar()
 	QMenu *helpMenu = addMenu(tr("Help"), cleanupMenuBar);
 	addMenuItem(helpMenu, MI_About);
 
-	addWidget(cleanupMenuBar);
+	return cleanupMenuBar;
 }
 
 //---------------------------------------------------------------------------------
 
-void StackedMenuBar::createPltEditMenuBar()
+QMenuBar* StackedMenuBar::createPltEditMenuBar()
 {
-	QMenuBar *pltEditMenuBar;
-	pltEditMenuBar = new QMenuBar(this);
+	QMenuBar *pltEditMenuBar = new QMenuBar(this);
 
 	//---Files Menu
 	QMenu *filesMenu = addMenu(tr("Files"), pltEditMenuBar);
@@ -233,6 +536,7 @@ void StackedMenuBar::createPltEditMenuBar()
 	addMenuItem(filesMenu, MI_LoadScene);
 	addMenuItem(filesMenu, MI_SaveScene);
 	addMenuItem(filesMenu, MI_SaveSceneAs);
+    addMenuItem(filesMenu, MI_SaveAll);
 	addMenuItem(filesMenu, MI_OpenRecentScene);
 	addMenuItem(filesMenu, MI_RevertScene);
 	filesMenu->addSeparator();
@@ -369,15 +673,14 @@ void StackedMenuBar::createPltEditMenuBar()
 	QMenu *helpMenu = addMenu(tr("Help"), pltEditMenuBar);
 	addMenuItem(helpMenu, MI_About);
 
-	addWidget(pltEditMenuBar);
+	return pltEditMenuBar;
 }
 
 //---------------------------------------------------------------------------------
 
-void StackedMenuBar::createInknPaintMenuBar()
+QMenuBar* StackedMenuBar::createInknPaintMenuBar()
 {
-	QMenuBar *inknPaintMenuBar;
-	inknPaintMenuBar = new QMenuBar(this);
+	QMenuBar *inknPaintMenuBar = new QMenuBar(this);
 
 	//---Files Menu
 	QMenu *filesMenu = addMenu(tr("Files"), inknPaintMenuBar);
@@ -406,6 +709,7 @@ void StackedMenuBar::createInknPaintMenuBar()
 	addMenuItem(filesMenu, MI_LoadScene);
 	addMenuItem(filesMenu, MI_SaveScene);
 	addMenuItem(filesMenu, MI_SaveSceneAs);
+    addMenuItem(filesMenu, MI_SaveAll);
 	addMenuItem(filesMenu, MI_OpenRecentScene);
 	filesMenu->addSeparator();
 	addMenuItem(filesMenu, MI_NewScene);
@@ -543,20 +847,20 @@ void StackedMenuBar::createInknPaintMenuBar()
 	QMenu *helpMenu = addMenu(tr("Help"), inknPaintMenuBar);
 	addMenuItem(helpMenu, MI_About);
 
-	addWidget(inknPaintMenuBar);
+	return inknPaintMenuBar;
 }
 
 //---------------------------------------------------------------------------------
 
-void StackedMenuBar::createXsheetMenuBar()
+QMenuBar* StackedMenuBar::createXsheetMenuBar()
 {
-	QMenuBar *xsheetMenuBar;
-	xsheetMenuBar = new QMenuBar(this);
+	QMenuBar *xsheetMenuBar = new QMenuBar(this);
 	//----Xsheet Menu
 	QMenu *xsheetMenu = addMenu(tr("Xsheet"), xsheetMenuBar);
 	addMenuItem(xsheetMenu, MI_LoadScene);
 	addMenuItem(xsheetMenu, MI_SaveScene);
 	addMenuItem(xsheetMenu, MI_SaveSceneAs);
+    addMenuItem(xsheetMenu, MI_SaveAll);
 	addMenuItem(xsheetMenu, MI_OpenRecentScene);
 	addMenuItem(xsheetMenu, MI_RevertScene);
 	xsheetMenu->addSeparator();
@@ -722,15 +1026,14 @@ void StackedMenuBar::createXsheetMenuBar()
 	QMenu *helpMenu = addMenu(tr("Help"), xsheetMenuBar);
 	addMenuItem(helpMenu, MI_About);
 
-	addWidget(xsheetMenuBar);
+	return xsheetMenuBar;
 }
 
 //---------------------------------------------------------------------------------
 
-void StackedMenuBar::createBatchesMenuBar()
+QMenuBar* StackedMenuBar::createBatchesMenuBar()
 {
-	QMenuBar *batchesMenuBar;
-	batchesMenuBar = new QMenuBar(this);
+	QMenuBar *batchesMenuBar = new QMenuBar(this);
 
 	//---Files Menu
 	QMenu *filesMenu = addMenu(tr("Files"), batchesMenuBar);
@@ -759,15 +1062,14 @@ void StackedMenuBar::createBatchesMenuBar()
 	QMenu *helpMenu = addMenu(tr("Help"), batchesMenuBar);
 	addMenuItem(helpMenu, MI_About);
 
-	addWidget(batchesMenuBar);
+	return batchesMenuBar;
 }
 
 //---------------------------------------------------------------------------------
 
-void StackedMenuBar::createBrowserMenuBar()
+QMenuBar* StackedMenuBar::createBrowserMenuBar()
 {
-	QMenuBar *browserMenuBar;
-	browserMenuBar = new QMenuBar(this);
+	QMenuBar * browserMenuBar = new QMenuBar(this);
 
 	//---Files Menu
 	QMenu *filesMenu = addMenu(tr("Files"), browserMenuBar);
@@ -798,12 +1100,12 @@ void StackedMenuBar::createBrowserMenuBar()
 	QMenu *helpMenu = addMenu(tr("Help"), browserMenuBar);
 	addMenuItem(helpMenu, MI_About);
 
-	addWidget(browserMenuBar);
+	return browserMenuBar;
 }
 
 //---------------------------------------------------------------------------------
 
-void StackedMenuBar::createFullMenuBar()
+QMenuBar* StackedMenuBar::createFullMenuBar()
 {
 	QMenuBar *fullMenuBar = new QMenuBar(this);
 	//Menu' FILE
@@ -811,6 +1113,7 @@ void StackedMenuBar::createFullMenuBar()
 	addMenuItem(fileMenu, MI_NewScene);
 	addMenuItem(fileMenu, MI_LoadScene);
 	addMenuItem(fileMenu, MI_SaveScene);
+    addMenuItem(fileMenu, MI_SaveAll);
 	addMenuItem(fileMenu, MI_SaveSceneAs);
 	addMenuItem(fileMenu, MI_OpenRecentScene);
 	addMenuItem(fileMenu, MI_RevertScene);
@@ -1083,7 +1386,7 @@ void StackedMenuBar::createFullMenuBar()
 	QMenu *helpMenu = addMenu(tr("Help"), fullMenuBar);
 	addMenuItem(helpMenu, MI_About);
 
-	addWidget(fullMenuBar);
+	return fullMenuBar;
 }
 
 //-----------------------------------------------------------------------------
@@ -1106,6 +1409,71 @@ void StackedMenuBar::addMenuItem(QMenu *menu, const char *cmdId)
 	menu->addAction(action);
 }
 
+//-----------------------------------------------------------------------------
+
+void StackedMenuBar::onIndexSwapped(int firstIndex, int secondIndex)
+{
+	assert(firstIndex >= 0 && secondIndex >= 0);
+	QWidget* menuBar = widget(firstIndex);
+	removeWidget(menuBar);
+	insertWidget(secondIndex, menuBar);
+}
+
+//-----------------------------------------------------------------------------
+
+void StackedMenuBar::insertNewMenuBar()
+{
+	insertWidget(0, createFullMenuBar());
+}
+
+//-----------------------------------------------------------------------------
+
+void StackedMenuBar::deleteMenuBar(int index)
+{
+	QWidget* menuBar = widget(index);
+	removeWidget(menuBar);
+	delete menuBar;
+}
+
+//-----------------------------------------------------------------------------
+
+void StackedMenuBar::doCustomizeMenuBar(int index)
+{
+	MainWindow* mainWin = dynamic_cast<MainWindow*>(TApp::instance()->getMainWindow());
+	assert(mainWin);
+	Room* room = mainWin->getRoom(index);
+	if (!room) return;
+
+	MenuBarPopup mbPopup(room);
+
+	if (mbPopup.exec())
+	{
+		/*- OKが押され、roomname_menubar.xmlが更新された状態 -*/
+		/*- xmlファイルからメニューバーを作り直して格納 -*/
+		std::string mbFileName = room->getPath().getName() + "_menubar.xml";
+		TFilePath mbPath = ToonzFolder::getMyModuleDir() + mbFileName;
+		if (!TFileStatus(mbPath).isReadable())
+		{
+			DVGui::warning(tr("Cannot open menubar settings file %1").arg(QString::fromStdString(mbFileName)));
+			return;
+		}
+		QMenuBar* newMenu = loadMenuBar(mbPath); 
+		if (!newMenu)
+		{
+			DVGui::warning(tr("Failed to create menubar"));
+			return;
+		}
+		
+		QWidget* oldMenu = widget(index);
+		removeWidget(oldMenu);
+		insertWidget(index, newMenu);
+		delete oldMenu;
+		
+		setCurrentIndex(index);
+	}
+}
+
+
 //=============================================================================
 // DvTopBar
 //-----------------------------------------------------------------------------
@@ -1119,12 +1487,16 @@ TopBar::TopBar(QWidget *parent)
 	setObjectName("TopBar");
 
 	m_containerFrame = new QFrame(this);
-	m_roomTabBar = new QTabBar(this);
+	m_roomTabBar = new RoomTabWidget(this);
 	m_stackedMenuBar = new StackedMenuBar(this);
+	m_lockRoomCB = new QCheckBox(this);
 
 	m_containerFrame->setObjectName("TopBarTabContainer");
 	m_roomTabBar->setObjectName("TopBarTab");
 	m_roomTabBar->setDrawBase(false);
+	m_lockRoomCB->setObjectName("EditToolLockButton");
+	m_lockRoomCB->setToolTip(tr("Lock Rooms Tab"));
+	m_lockRoomCB->setChecked(m_roomTabBar->isLocked());
 
 	QHBoxLayout *mainLayout = new QHBoxLayout();
 	mainLayout->setSpacing(0);
@@ -1141,10 +1513,20 @@ TopBar::TopBar(QWidget *parent)
 		mainLayout->addLayout(menuLayout);
 		mainLayout->addStretch(1);
 		mainLayout->addWidget(m_roomTabBar, 0);
+		mainLayout->addSpacing(2);
+		mainLayout->addWidget(m_lockRoomCB, 0);
 	}
 	m_containerFrame->setLayout(mainLayout);
 	addWidget(m_containerFrame);
 
-	connect(m_roomTabBar, SIGNAL(currentChanged(int)),
+	bool ret = true;
+	ret = ret && connect(m_roomTabBar, SIGNAL(currentChanged(int)),
 			m_stackedMenuBar, SLOT(setCurrentIndex(int)));
+
+	ret = ret && connect(m_roomTabBar, SIGNAL(indexSwapped(int, int)), m_stackedMenuBar, SLOT(onIndexSwapped(int, int)));
+	ret = ret && connect(m_roomTabBar, SIGNAL(insertNewTabRoom()), m_stackedMenuBar, SLOT(insertNewMenuBar()));
+	ret = ret && connect(m_roomTabBar, SIGNAL(deleteTabRoom(int)), m_stackedMenuBar, SLOT(deleteMenuBar(int)));
+	ret = ret && connect(m_roomTabBar, SIGNAL(customizeMenuBar(int)), m_stackedMenuBar, SLOT(doCustomizeMenuBar(int)));
+	ret = ret && connect(m_lockRoomCB, SIGNAL(toggled(bool)), m_roomTabBar, SLOT(setIsLocked(bool)));
+	assert(ret);
 }

@@ -1,7 +1,7 @@
-
-
 #ifndef XSHNOTEVIEWER_H
 #define XSHNOTEVIEWER_H
+
+#include <memory>
 
 #include "toonz/txsheet.h"
 #include "toonzqt/dvdialog.h"
@@ -87,15 +87,11 @@ class NoteWidget : public QWidget
 	Q_OBJECT
 	XsheetViewer *m_viewer;
 	int m_noteIndex;
-	NotePopup *m_noteEditor;
+	std::unique_ptr<NotePopup> m_noteEditor;
 	bool m_isHovered;
 
 public:
 	NoteWidget(XsheetViewer *parent = 0, int noteIndex = -1);
-	~NoteWidget()
-	{
-		delete m_noteEditor;
-	}
 
 	int getNoteIndex() const { return m_noteIndex; }
 	void setNoteIndex(int index)
@@ -121,7 +117,7 @@ class NoteArea : public QFrame
 {
 	Q_OBJECT
 
-	NotePopup *m_newNotePopup; //Popup used to create new note
+	std::unique_ptr<NotePopup> m_newNotePopup; //Popup used to create new note
 	XsheetViewer *m_viewer;
 
 	QToolButton *m_nextNoteButton;
@@ -135,10 +131,6 @@ public:
 #else
 	NoteArea(XsheetViewer *parent = 0, Qt::WFlags flags = 0);
 #endif
-	~NoteArea()
-	{
-		delete m_newNotePopup;
-	}
 
 	void updatePopup()
 	{

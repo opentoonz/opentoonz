@@ -1,4 +1,4 @@
-
+#include <memory>
 
 // SDirection.cpp: implementation of the CSDirection class.
 //
@@ -12,7 +12,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CSDirection::CSDirection() : m_lX(0), m_lY(0), m_dir(0), m_lDf(0)
+CSDirection::CSDirection() : m_lX(0), m_lY(0), m_lDf(0)
 {
 	for (int i = 0; i < NBDIR; i++)
 		m_df[i] = 0;
@@ -20,19 +20,19 @@ CSDirection::CSDirection() : m_lX(0), m_lY(0), m_dir(0), m_lDf(0)
 
 CSDirection::CSDirection(const int lX, const int lY, const UCHAR *sel,
 						 const int sens)
-	: m_lX(lX), m_lY(lY), m_dir(0), m_lDf(0)
+	: m_lX(lX), m_lY(lY), m_lDf(0)
 {
 	for (int i = 0; i < NBDIR; i++)
 		m_df[i] = 0;
 
 	try {
 		if (m_lX > 0 && m_lY > 0) {
-			m_dir = new UCHAR[m_lX * m_lY];
+			m_dir.reset(new UCHAR[m_lX * m_lY]);
 			if (!m_dir) {
 				null();
 				throw SMemAllocError("in directionMap");
 			}
-			memcpy(m_dir, sel, sizeof(UCHAR) * m_lX * m_lY);
+			memcpy(m_dir.get(), sel, sizeof(UCHAR) * m_lX * m_lY);
 			setDir01();
 			//			For optimalization purpose.
 			//			The quality is better, if it is removed.
@@ -46,19 +46,19 @@ CSDirection::CSDirection(const int lX, const int lY, const UCHAR *sel,
 
 CSDirection::CSDirection(const int lX, const int lY, const UCHAR *sel,
 						 const int sens, const int border)
-	: m_lX(lX), m_lY(lY), m_dir(0), m_lDf(0)
+	: m_lX(lX), m_lY(lY), m_lDf(0)
 {
 	for (int i = 0; i < NBDIR; i++)
 		m_df[i] = 0;
 
 	try {
 		if (m_lX > 0 && m_lY > 0) {
-			m_dir = new UCHAR[m_lX * m_lY];
+			m_dir.reset(new UCHAR[m_lX * m_lY]);
 			if (!m_dir) {
 				null();
 				throw SMemAllocError("in directionMap");
 			}
-			memcpy(m_dir, sel, sizeof(UCHAR) * m_lX * m_lY);
+			memcpy(m_dir.get(), sel, sizeof(UCHAR) * m_lX * m_lY);
 			setDir01();
 			if (border > 0)
 				setContourBorder(border);
@@ -75,14 +75,14 @@ bool CSDirection::isContourBorder(const int xx, const int yy,
 	for (int y = yy - border; y <= (yy + border); y++)
 		for (int x = xx - border; x <= (xx + border); x++)
 			if (x >= 0 && y >= 0 && x < m_lX && y < m_lY)
-				if (*(m_dir + y * m_lX + x) == (UCHAR)0)
+				if (*(m_dir.get() + y * m_lX + x) == (UCHAR)0)
 					return true;
 	return false;
 }
 
 void CSDirection::setContourBorder(const int border)
 {
-	UCHAR *pDir = m_dir;
+	UCHAR *pDir = m_dir.get();
 	int y = 0;
 	for (y = 0; y < m_lY; y++)
 		for (int x = 0; x < m_lX; x++, pDir++)
@@ -91,22 +91,17 @@ void CSDirection::setContourBorder(const int border)
 					*pDir = (UCHAR)2;
 
 	int xy = m_lX * m_lY;
-	pDir = m_dir;
+	pDir = m_dir.get();
 	for (y = 0; y < xy; y++, pDir++)
 		*pDir = *pDir == (UCHAR)2 ? (UCHAR)0 : *pDir;
 }
 
 void CSDirection::null()
 {
-	if (m_dir) {
-		delete[] m_dir;
-		m_dir = 0;
+	m_dir.reset();
+	for (auto&& df : m_df) {
+		df.reset();
 	}
-	for (int i = 0; i < NBDIR; i++)
-		if (m_df[i]) {
-			delete[] m_df[i];
-			m_df[i] = 0;
-		}
 	m_lX = m_lY = 0;
 	m_lDf = 0;
 }
@@ -203,7 +198,7 @@ UCHAR CSDirection::getDir(const int xx, const int yy, UCHAR *sel)
 void CSDirection::makeDir(UCHAR *sel)
 {
 	UCHAR *pSel = sel;
-	UCHAR *pDir = m_dir;
+	UCHAR *pDir = m_dir.get();
 	for (int y = 0; y < m_lY; y++)
 		for (int x = 0; x < m_lX; x++, pSel++, pDir++) {
 			*pDir = 0;
@@ -281,7 +276,7 @@ UCHAR CSDirection::equalizeDir_LT50(UCHAR *sel,
 void CSDirection::equalizeDir(UCHAR *sel, const int d)
 {
 	UCHAR *pSel = sel;
-	UCHAR *pDir = m_dir;
+	UCHAR *pDir = m_dir.get();
 	for (int y = 0; y < m_lY; y++)
 		for (int x = 0; x < m_lX; x++, pSel++) {
 			if (*pSel > (UCHAR)0) {
@@ -321,7 +316,7 @@ void CSDirection::makeDirFilter(const int sens)
 
 	m_lDf = size * size;
 	for (int i = 0; i < NBDIR; i++) {
-		m_df[i] = new SXYW[m_lDf];
+		m_df[i].reset(new SXYW[m_lDf]);
 		if (!m_df[i]) {
 			null();
 			throw SMemAllocError("in directionMap");
@@ -378,41 +373,38 @@ UCHAR CSDirection::blurRadius(UCHAR *sel, const int xx, const int yy, const int 
 void CSDirection::blurRadius(const int dBlur)
 {
 	if (m_lX > 0 && m_lY > 0 && m_dir) {
-		UCHAR *sel = new UCHAR[m_lX * m_lY];
+		std::unique_ptr<UCHAR[]> sel(new UCHAR[m_lX * m_lY]);
 		if (!sel)
 			throw SMemAllocError("in directionMap");
-		memcpy(sel, m_dir, m_lX * m_lY * sizeof(UCHAR));
-		UCHAR *pSel = sel;
-		UCHAR *pDir = m_dir;
+		memcpy(sel.get(), m_dir.get(), m_lX * m_lY * sizeof(UCHAR));
+		UCHAR *pSel = sel.get();
+		UCHAR *pDir = m_dir.get();
 		for (int y = 0; y < m_lY; y++)
 			for (int x = 0; x < m_lX; x++, pSel++, pDir++)
 				if (*pSel > (UCHAR)0)
-					*pDir = blurRadius(sel, x, y, dBlur);
-		delete[] sel;
+					*pDir = blurRadius(sel.get(), x, y, dBlur);
 	}
 }
 
 void CSDirection::setDir01()
 {
 	int xy = m_lX * m_lY;
-	UCHAR *pDir = m_dir;
+	UCHAR *pDir = m_dir.get();
 	for (int i = 0; i < xy; i++, pDir++)
 		*pDir = *pDir > (UCHAR)0 ? (UCHAR)1 : (UCHAR)0;
 }
 
 void CSDirection::doDir()
 {
-	UCHAR *sel = 0;
 	if (m_lX > 0 && m_lY > 0 && m_dir) {
-		sel = new UCHAR[m_lX * m_lY];
+		std::unique_ptr<UCHAR[]> sel(new UCHAR[m_lX * m_lY]);
 		if (!sel)
 			throw SMemAllocError("in directionMap");
 		size_t length = (size_t)(m_lX * m_lY * sizeof(UCHAR));
-		memcpy(sel, m_dir, length);
-		makeDir(sel);
-		memcpy(sel, m_dir, length);
-		equalizeDir(sel, 3);
-		delete[] sel;
+		memcpy(sel.get(), m_dir.get(), length);
+		makeDir(sel.get());
+		memcpy(sel.get(), m_dir.get(), length);
+		equalizeDir(sel.get(), 3);
 	}
 }
 
@@ -421,7 +413,7 @@ void CSDirection::doRadius(const double rH, const double rLR,
 {
 	try {
 		int xy = m_lX * m_lY;
-		UCHAR *pDir = m_dir;
+		UCHAR *pDir = m_dir.get();
 		double r[4] = {D_CUT_0_1(rH), D_CUT_0_1(rLR), D_CUT_0_1(rV), D_CUT_0_1(rRL)};
 
 		for (int i = 0; i < xy; i++, pDir++)
@@ -439,5 +431,5 @@ void CSDirection::doRadius(const double rH, const double rLR,
 
 void CSDirection::getResult(UCHAR *sel)
 {
-	memcpy(sel, m_dir, (size_t)(m_lX * m_lY * sizeof(UCHAR)));
+	memcpy(sel, m_dir.get(), (size_t)(m_lX * m_lY * sizeof(UCHAR)));
 }

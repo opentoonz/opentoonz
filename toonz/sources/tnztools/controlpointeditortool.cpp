@@ -149,7 +149,7 @@ public:
 
 	void initUndo();
 
-	void getNearestStrokeColumnIndexes(vector<int> &indexes, TPointD pos);
+	void getNearestStrokeColumnIndexes(std::vector<int> &indexes, TPointD pos);
 
 	void drawMovingSegment();
 	void drawControlPoint();
@@ -172,7 +172,7 @@ public:
 	bool keyDown(int key, TUINT32 flags, const TPoint &pos);
 	void onEnter();
 	void onLeave();
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 
 	void onActivate();
 	void onDeactivate();
@@ -223,12 +223,12 @@ void ControlPointEditorTool::initUndo()
 
 //---------------------------------------------------------------------------
 
-void ControlPointEditorTool::getNearestStrokeColumnIndexes(vector<int> &indexes, TPointD pos)
+void ControlPointEditorTool::getNearestStrokeColumnIndexes(std::vector<int> &indexes, TPointD pos)
 {
 	TTool::Application *app = TTool::getApplication();
 	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 	int currentFrame = app->getCurrentFrame()->getFrameIndex();
-	vector<int> newIndexes;
+	std::vector<int> newIndexes;
 	TAffine aff = getMatrix();
 	int i = 0;
 	for (i = 0; i < (int)indexes.size(); i++) {
@@ -795,7 +795,7 @@ void ControlPointEditorTool::onLeave()
 
 //-----------------------------------------------------------------------------
 
-bool ControlPointEditorTool::onPropertyChanged(string propertyName)
+bool ControlPointEditorTool::onPropertyChanged(std::string propertyName)
 {
 	AutoSelectDrawing = (int)(m_autoSelectDrawing.getValue());
 	return true;

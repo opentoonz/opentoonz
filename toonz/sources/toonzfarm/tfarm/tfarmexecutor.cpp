@@ -11,7 +11,7 @@ TFarmExecutor::TFarmExecutor(int port)
 
 //------------------------------------------------------------------------------
 
-int extractArgs(const QString &s, vector<QString> &argv)
+int extractArgs(const QString &s, std::vector<QString> &argv)
 {
 	argv.clear();
 	if (s == "")
@@ -32,7 +32,7 @@ void TFarmExecutor::onReceive(int socket, const QString &data)
 	QString reply;
 
 	try {
-		vector<QString> argv;
+		std::vector<QString> argv;
 		extractArgs(data, argv);
 		reply = execute(argv);
 	} catch (...) {

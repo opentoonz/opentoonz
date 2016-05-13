@@ -29,7 +29,7 @@ void Iwa_Particle::create_Animation(const particles_values &values,
 
 Iwa_Particle::Iwa_Particle(int g_lifetime,
 						   int seed,
-						   map<int, TTile *> porttiles,
+							 std::map<int, TTile *> porttiles,
 						   const particles_values &values,
 						   const particles_ranges &ranges,
 						   int howmany,
@@ -41,7 +41,7 @@ Iwa_Particle::Iwa_Particle(int g_lifetime,
 						   int initSourceFrame) /*- Level内の初期フレーム位置 -*/
 {
 	double random_s_a_range, random_speed;
-	map<int, float> imagereferences;
+	std::map<int, float> imagereferences;
 	random = TRandom(seed);
 	float randomxreference = 0.0;
 	float randomyreference = 0.0;
@@ -226,7 +226,7 @@ void Iwa_Particle::create_Swing(const particles_values &values,
 
 void Iwa_Particle::create_Colors(const particles_values &values,
 								 const particles_ranges &ranges,
-								 map<int, TTile *> porttiles)
+								 std::map<int, TTile *> porttiles)
 {
 	if (values.genfadecol_val) {
 		TPixel32 color;
@@ -903,7 +903,7 @@ void Iwa_Particle::spread_color(TPixel32 &color, double range)
  粒子の移動
 -----------------------------------------------*/
 
-void Iwa_Particle::move(map<int, TTile *> porttiles,
+void Iwa_Particle::move(std::map<int, TTile *> porttiles,
 						const particles_values &values,
 						const particles_ranges &ranges,
 						float windx, float windy,
@@ -913,7 +913,7 @@ void Iwa_Particle::move(map<int, TTile *> porttiles,
 {
 	struct pos_dummy dummy;
 	float frictx, fricty;
-	map<int, float> imagereferences;
+	std::map<int, float> imagereferences;
 	dummy.x = dummy.y = dummy.a = 0.0;
 	frictx = fricty = 0.0;
 

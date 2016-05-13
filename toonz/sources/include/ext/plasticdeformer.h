@@ -1,7 +1,7 @@
-
-
 #ifndef PLASTICDEFORMER_H
 #define PLASTICDEFORMER_H
+
+#include <memory>
 
 // TnzCore includes
 #include "tgeometry.h"
@@ -42,7 +42,7 @@
 class DVAPI PlasticDeformer
 {
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	PlasticDeformer();

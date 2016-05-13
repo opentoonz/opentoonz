@@ -1,7 +1,7 @@
-
-
 #ifndef TMESHIMAGE_INCLUDED
 #define TMESHIMAGE_INCLUDED
+
+#include <memory>
 
 // TnzCore includes
 #include "tsmartpointer.h"
@@ -145,7 +145,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TTextureMesh>;
 #endif
 
@@ -172,14 +172,14 @@ struct graph_traits<TTextureMesh>
 class DVAPI TMeshImage : public TImage
 {
 	class Imp;
-	Imp *m_imp;
+	std::shared_ptr<Imp> m_imp;
 
 public:
 	typedef std::vector<TTextureMeshP> meshes_container;
 
 public:
 	TMeshImage();
-	TMeshImage(Imp *imp);
+	TMeshImage(std::shared_ptr<Imp> imp);
 	~TMeshImage();
 
 	TMeshImage(const TMeshImage &other);
@@ -204,7 +204,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TMeshImage>;
 template class DVAPI TDerivedSmartPointerT<TMeshImage, TImage>;
 #endif
@@ -215,7 +215,7 @@ public:
 	TMeshImageP() {}
 	TMeshImageP(TMeshImage *image) : DerivedSmartPointer(image) {}
 	TMeshImageP(TImageP image) : DerivedSmartPointer(image) {}
-#if !defined(WIN32)
+#if !defined(_WIN32)
 	TMeshImageP(TImage *image) : DerivedSmartPointer(TImageP(image))
 	{
 	}

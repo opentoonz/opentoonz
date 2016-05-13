@@ -17,7 +17,7 @@ void callRedo(const TUndo *undo) { undo->redo(); }
 
 class TUndoBlock : public TUndo
 {
-	vector<TUndo *> m_undos;
+	std::vector<TUndo *> m_undos;
 	typedef std::vector<TUndo *>::const_iterator Iterator;
 	typedef std::vector<TUndo *>::const_reverse_iterator ReverseIterator;
 	mutable bool m_deleted, m_undoing;
@@ -129,7 +129,7 @@ struct TUndoManager::TUndoManagerImp {
 	bool m_skipped;
 	int m_undoMemorySize; // in bytes
 
-	vector<TUndoBlock *> m_blockStack;
+	std::vector<TUndoBlock *> m_blockStack;
 
 public:
 	TUndoManagerImp() : m_skipped(false), m_undoMemorySize(0) { m_current = m_undoList.end(); }
@@ -174,7 +174,6 @@ TUndoManager *TUndoManager::manager()
 TUndoManager::TUndoManager()
 	: m_imp(new TUndoManagerImp)
 {
-	//  cout << "Creato undo manager" << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -184,7 +183,6 @@ TUndoManager::~TUndoManager()
 	//cout << "Distrutto undo manager" << endl;
 	assert(m_imp->m_blockStack.empty());
 	reset();
-	delete m_imp;
 }
 
 //-----------------------------------------------------------------------------

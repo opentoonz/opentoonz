@@ -1,12 +1,13 @@
-
-
 #ifndef _PLI_IO_H
 #define _PLI_IO_H
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4661)
 #pragma warning(disable : 4018)
 #endif
+
+#include <memory>
+#include <vector>
 
 #include "tfilepath.h"
 #include "tvectorimage.h"
@@ -107,7 +108,7 @@ public:
 	Type m_type;
 	double m_numericVal;
 	TRaster32P m_r;
-	string m_string;
+	std::string m_string;
 
 	TStyleParam()
 		: m_type(SP_NONE), m_numericVal(0), m_r(), m_string()
@@ -141,7 +142,7 @@ public:
 	{
 	}
 
-	TStyleParam(const string &x)
+	TStyleParam(const std::string &x)
 		: m_type(SP_STRING), m_numericVal(0), m_r(), m_string(x)
 	{
 	}
@@ -179,11 +180,11 @@ the description in the PLI specific document
 class TextTag : public PliObjectTag
 {
 public:
-	string m_text;
+	std::string m_text;
 
 	TextTag();
 	TextTag(const TextTag &textTag);
-	TextTag(const string &text);
+	TextTag(const std::string &text);
 };
 
 //=====================================================================
@@ -232,46 +233,47 @@ class ThickQuadraticChainTag : public PliGeometricTag
 
 public:
 	TUINT32 m_numCurves;
-	TThickQuadratic *m_curve;
+	std::unique_ptr<TThickQuadratic[]> m_curve;
 	bool m_isLoop;
 	double m_maxThickness;
 	TStroke::OutlineOptions m_outlineOptions;
 
 	ThickQuadraticChainTag()
-		: PliGeometricTag(THICK_QUADRATIC_CHAIN_GOBJ), m_numCurves(0), m_curve(0), m_maxThickness(1) {}
+		: PliGeometricTag(THICK_QUADRATIC_CHAIN_GOBJ)
+		, m_numCurves(0)
+		, m_maxThickness(1)
+	{
+	}
 
 	ThickQuadraticChainTag(TUINT32 numCurves, const TThickQuadratic *curve, double maxThickness)
-		: PliGeometricTag(THICK_QUADRATIC_CHAIN_GOBJ), m_numCurves(numCurves), m_maxThickness(maxThickness <= 0 ? 1 : maxThickness)
+		: PliGeometricTag(THICK_QUADRATIC_CHAIN_GOBJ)
+		, m_numCurves(numCurves)
+		, m_maxThickness(maxThickness <= 0 ? 1 : maxThickness)
 	{
-		if (m_numCurves == 0)
-			m_curve = 0;
-		else {
-			m_curve = new TThickQuadratic[m_numCurves];
-			for (UINT i = 0; i < m_numCurves; i++)
+		if (m_numCurves > 0) {
+			m_curve.reset(new TThickQuadratic[m_numCurves]);
+			for (UINT i = 0; i < m_numCurves; i++) {
 				m_curve[i] = curve[i];
+			}
 		}
 	}
 
 	ThickQuadraticChainTag(const ThickQuadraticChainTag &chainTag)
-		: PliGeometricTag(THICK_QUADRATIC_CHAIN_GOBJ), m_numCurves(chainTag.m_numCurves), m_maxThickness(chainTag.m_maxThickness)
+		: PliGeometricTag(THICK_QUADRATIC_CHAIN_GOBJ)
+		, m_numCurves(chainTag.m_numCurves)
+		, m_maxThickness(chainTag.m_maxThickness)
 	{
-		if (m_numCurves == 0)
-			m_curve = 0;
-		else {
-			m_curve = new TThickQuadratic[m_numCurves];
-			for (UINT i = 0; i < m_numCurves; i++)
+		if (m_numCurves > 0) {
+			m_curve.reset(new TThickQuadratic[m_numCurves]);
+			for (UINT i = 0; i < m_numCurves; i++) {
 				m_curve[i] = chainTag.m_curve[i];
+			}
 		}
-	}
-
-	~ThickQuadraticChainTag()
-	{
-		delete[] m_curve;
 	}
 
 private:
 	// not implemented
-	const ThickQuadraticChainTag &operator=(const ThickQuadraticChainTag &chainTag);
+	const ThickQuadraticChainTag &operator=(const ThickQuadraticChainTag &chainTag) = delete;
 };
 
 //=====================================================================
@@ -326,10 +328,10 @@ public:
 	attributeType m_attribute;
 
 	TUINT32 m_numColors;
-	TUINT32 *m_color;
+	std::unique_ptr<TUINT32[]> m_color;
 
 	ColorTag();
-	ColorTag(styleType style, attributeType attribute, TUINT32 numColors, TUINT32 *m_color);
+	ColorTag(styleType style, attributeType attribute, TUINT32 numColors, std::unique_ptr<TUINT32[]> color);
 	ColorTag(const ColorTag &colorTag);
 	~ColorTag();
 };
@@ -342,7 +344,7 @@ public:
 	USHORT m_id;
 	USHORT m_pageIndex;
 	int m_numParams;
-	TStyleParam *m_param;
+	std::unique_ptr<TStyleParam[]> m_param;
 
 	StyleTag();
 	StyleTag(int id, USHORT pagePaletteindex, int m_numParams, TStyleParam *m_params);
@@ -381,10 +383,11 @@ public:
 
 	UCHAR m_type;
 	TUINT32 m_numObjects;
-	PliObjectTag **m_object;
+	std::unique_ptr<PliObjectTag*[]> m_object;
 
 	GroupTag();
-	GroupTag(UCHAR type, TUINT32 numObjects, PliObjectTag **object);
+	GroupTag(UCHAR type, TUINT32 numObjects, PliObjectTag** object);
+	GroupTag(UCHAR type, TUINT32 numObjects, std::unique_ptr<PliObjectTag*[]> object);
 	GroupTag(const GroupTag &groupTag);
 	~GroupTag();
 };
@@ -397,10 +400,11 @@ public:
 	TFrameId m_numFrame;
 
 	TUINT32 m_numObjects;
-	PliObjectTag **m_object;
+	std::unique_ptr<PliObjectTag*[]> m_object;
 
 	//ImageTag();
-	ImageTag(const TFrameId &frameId, TUINT32 numObjects, PliObjectTag **object);
+	ImageTag(const TFrameId &numFrame, TUINT32 numObjects, PliObjectTag** object);
+	ImageTag(const TFrameId &frameId, TUINT32 numObjects, std::unique_ptr<PliObjectTag*[]> object);
 	ImageTag(const ImageTag &imageTag);
 	~ImageTag();
 };
@@ -424,10 +428,10 @@ class IntersectionDataTag : public PliObjectTag
 {
 public:
 	UINT m_branchCount;
-	TVectorImage::IntersectionBranch *m_branchArray;
+	std::unique_ptr<TVectorImage::IntersectionBranch[]> m_branchArray;
 
 	IntersectionDataTag();
-	IntersectionDataTag(UINT branchCount, TVectorImage::IntersectionBranch *branchArray);
+	IntersectionDataTag(UINT branchCount, std::unique_ptr<TVectorImage::IntersectionBranch[]> branchArray);
 	IntersectionDataTag(const IntersectionDataTag &tag);
 
 	~IntersectionDataTag();
@@ -502,7 +506,7 @@ public:
 	//aggiuti questi 2 membri per salvare la paletta globale
 
 	//vector<bool> m_idWrittenColorsArray;
-	vector<PliObjectTag *> m_palette_tags;
+	std::vector<PliObjectTag *> m_palette_tags;
 	// these two functions are used to browse the tag list,
 	// code example:   for (PliTag *tag = getFirstTag(); tag; tag = getNextTag()) {}
 

@@ -78,7 +78,7 @@ public:
 	void clearSwatchResults();
 
 	void getResource(
-		TCacheResourceP &resource, const string &alias,
+		TCacheResourceP &resource, const std::string &alias,
 		const TFxP &fx, double frame, const TRenderSettings &rs,
 		ResourceDeclaration *resData);
 
@@ -121,7 +121,7 @@ void setFxForCaching(TFx *fx)
 //-----------------------------------------------------------------------------
 
 //!Se name finisce con suffix ritorna la parte iniziale, altrimenti ""
-string matchSuffix(string name, string suffix)
+std::string matchSuffix(std::string name, std::string suffix)
 {
 	if (name.length() <= suffix.length())
 		return "";
@@ -322,11 +322,11 @@ void SwatchViewer::setFx(const TFxP &fx, const TFxP &actualFx, int frame)
 	// cerco i segmenti
 	int n = m_points.size();
 	for (i = 0; i < n; i++) {
-		string name = m_points[i].m_param->getName();
-		string prefix = matchSuffix(name, "_a");
+		std::string name = m_points[i].m_param->getName();
+		std::string prefix = matchSuffix(name, "_a");
 		if (prefix == "")
 			continue;
-		string otherName = prefix + "_b";
+		std::string otherName = prefix + "_b";
 		int j;
 		for (j = 0; j < n; j++)
 			if (i != j && m_points[j].m_param->getName() == otherName)
@@ -625,10 +625,10 @@ void SwatchViewer::mousePressEvent(QMouseEvent *event)
 			if (dd2 > 400)
 				m_selectedPoint = -1;
 			else {
-				string name = m_points[m_selectedPoint].m_param->getName();
-				string prefix = matchSuffix(name, "_b");
+				std::string name = m_points[m_selectedPoint].m_param->getName();
+				std::string prefix = matchSuffix(name, "_b");
 				if (prefix != "") {
-					string otherName = prefix + "_a";
+					std::string otherName = prefix + "_a";
 					int n = (int)m_points.size();
 					int j;
 					for (j = 0; j < n; j++)
@@ -910,7 +910,7 @@ void SwatchCacheManager::clearSwatchResults()
 //-----------------------------------------------------------------------------
 
 void SwatchCacheManager::getResource(
-	TCacheResourceP &resource, const string &alias,
+	TCacheResourceP &resource, const std::string &alias,
 	const TFxP &fx, double frame, const TRenderSettings &rs,
 	ResourceDeclaration *resData)
 {

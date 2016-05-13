@@ -31,10 +31,10 @@ enum ColorType {
 class DVAPI RasterStrokeGenerator
 {
 
-	typedef vector<TThickPoint>::iterator Iterator;
+	typedef std::vector<TThickPoint>::iterator Iterator;
 
 	TRasterCM32P m_raster;		  //L'immagine raster sulla quale dobbiamo disegnare lo stroke
-	vector<TThickPoint> m_points; //Il vettore di punti che rappresentano la spina dorsale dello stroke
+	std::vector<TThickPoint> m_points; //Il vettore di punti che rappresentano la spina dorsale dello stroke
 	int m_styleId;				  //L'ink-style dello stroke
 	bool m_selective;
 	TRect m_boxOfRaster; //Un rettangolo della stessa dimensione di "m_raster"
@@ -46,7 +46,7 @@ class DVAPI RasterStrokeGenerator
 	bool m_doAnArc;
 
 	//Ricalcola i punti in un nuovo sistema di riferimento
-	void translatePoints(vector<TThickPoint> &points, const TPoint &newOrigin) const;
+	void translatePoints(std::vector<TThickPoint> &points, const TPoint &newOrigin) const;
 
 	//Effettua la over.
 	void placeOver(const TRasterCM32P &out, const TRasterCM32P &in, const TPoint &p) const;
@@ -67,11 +67,11 @@ public:
 	void generateStroke(bool isPencil) const;
 
 	//Ritorna m_points
-	vector<TThickPoint> getPointsSequence() { return m_points; }
-	void setPointsSequence(const vector<TThickPoint> &points) { m_points = points; }
+	std::vector<TThickPoint> getPointsSequence() { return m_points; }
+	void setPointsSequence(const std::vector<TThickPoint> &points) { m_points = points; }
 
 	//Ritorna il rettangolo contenente i dischi generati con centri in "points" e raggio "points.thick" +2 pixel a bordo
-	TRect getBBox(const vector<TThickPoint> &points) const;
+	TRect getBBox(const std::vector<TThickPoint> &points) const;
 
 	TRect getLastRect() const;
 

@@ -72,7 +72,7 @@ TXshColumn *TXshSoundTextColumn::clone() const
 
 void TXshSoundTextColumn::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	while (is.openChild(tagName)) {
 		if (tagName == "cells") {
 			while (is.openChild(tagName)) {

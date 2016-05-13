@@ -258,9 +258,9 @@ qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 add_library(tnzcore SHARED ${HEADERS} ${SOURCES})
 
-if (APPLE)
+if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzcore.dylib")
-endif (APPLE)
+endif()
 
 add_definitions(-DTNZCORE_EXPORTS -DTCOLOR_EXPORTS -DTGEOMETRY_EXPORTS -DTRASTER_EXPORTS -DTIMAGE_EXPORTS -DTSYSTEM_EXPORTS -DTVECTORIMAGE_EXPORTS -DTGL_EXPORTS -DTSOUND_EXPORTS -DTIMAGE_IO_EXPORTS -DTRASTERIMAGE_EXPORTS -DTVRENDER_EXPORTS -DTFLASH_EXPORTS -DTROP_EXPORTS -DTSTREAM_EXPORTS)
 
@@ -268,7 +268,7 @@ message("subdir: tnzcore")
 message("Sources:" ${SOURCES})
 
 include_directories(../common/flash ${SDKROOT}/Lz4/Lz4_131/lib/)
-if (WIN32)
+if(WIN32)
     if(PLATFORM EQUAL 32)
         include_directories(${SDKROOT}/quicktime/QT73SDK/CIncludes)
     endif()

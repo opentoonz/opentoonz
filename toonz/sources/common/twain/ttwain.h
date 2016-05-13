@@ -3,7 +3,7 @@
 #ifndef __TTWAIN_H__
 #define __TTWAIN_H__
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #else
 #ifndef _UNIX_

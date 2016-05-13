@@ -3,7 +3,7 @@
 #ifndef TNZTYPES_H
 #define TNZTYPES_H
 
-#ifdef WIN32
+#ifdef _WIN32
 #define TINT32 __int32
 typedef unsigned __int32 TUINT32;
 typedef __int64 TINT64;

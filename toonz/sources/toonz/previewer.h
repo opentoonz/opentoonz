@@ -1,7 +1,7 @@
-
-
 #ifndef PREVIEWER_INCLUDED
 #define PREVIEWER_INCLUDED
+
+#include <memory>
 
 #include "traster.h"
 #include "tfx.h"
@@ -31,7 +31,7 @@ class Previewer : public QObject, public TFxObserver
 	Q_OBJECT
 
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 	Previewer(bool subcamera);
 	~Previewer();

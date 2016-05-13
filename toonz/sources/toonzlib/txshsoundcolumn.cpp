@@ -105,7 +105,7 @@ ColumnLevel *ColumnLevel::clone() const
 
 void ColumnLevel::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	is.openChild(tagName);
 	if (tagName == "SoundCells") {
 		TPersist *p = 0;

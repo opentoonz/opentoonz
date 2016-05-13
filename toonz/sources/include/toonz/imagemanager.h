@@ -1,7 +1,7 @@
-
-
 #ifndef IMAGEMANAGER_H
 #define IMAGEMANAGER_H
+
+#include <memory>
 
 // TnzCore includes
 #include "timage.h"
@@ -120,7 +120,7 @@ public:
 	void clear();
 
 	// load icon (and image) data of all frames into cache
-	void loadAllTlvIconsAndPutInCache(TXshSimpleLevel *, vector<TFrameId>, vector<string>, bool);
+	void loadAllTlvIconsAndPutInCache(TXshSimpleLevel *, std::vector<TFrameId>, std::vector<std::string>, bool);
 
 	/*!
     Returns the image built by the object associated with the specified identifier, using the
@@ -170,7 +170,7 @@ public:
 
 private:
 	struct Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 private:
 	ImageManager();
@@ -262,7 +262,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DV_EXPORT_API TSmartPointerT<ImageBuilder>;
 #endif
 

@@ -165,7 +165,10 @@ TXsheet::TXsheetImp::~TXsheetImp()
 // TXsheet
 
 TXsheet::TXsheet()
-	: TSmartObject(m_classCode), m_player(0), m_imp(new TXsheet::TXsheetImp), m_notes(new TXshNoteSet())
+	: TSmartObject(m_classCode)
+	, m_player(0)
+	, m_imp(new TXsheet::TXsheetImp)
+	, m_notes(new TXshNoteSet())
 {
 	//extern TSyntax::Grammar *createXsheetGrammar(TXsheet*);
 	m_soundProperties = new TXsheet::SoundProperties();
@@ -181,7 +184,6 @@ TXsheet::~TXsheet()
 	texture_utils::invalidateTextures(this);
 
 	assert(m_imp);
-	delete m_imp;
 	if (m_notes)
 		delete m_notes;
 	if (m_soundProperties)
@@ -759,7 +761,7 @@ void TXsheet::stepCells(int r0, int c0, int r1, int c1, int type)
 	if (nr < 1 || nc <= 0)
 		return;
 	int size = nr * nc;
-	TXshCell *cells = new TXshCell[size];
+	std::unique_ptr<TXshCell[]> cells(new TXshCell[size]);
 	if (!cells)
 		return;
 	//salvo il contenuto delle celle in cells
@@ -786,10 +788,6 @@ void TXsheet::stepCells(int r0, int c0, int r1, int c1, int type)
 			i += type; //dipende dal tipo di step (2 o 3 per ora)
 		}
 	}
-
-	if (cells)
-		delete[] cells;
-	cells = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -875,7 +873,7 @@ void TXsheet::eachCells(int r0, int c0, int r1, int c1, int type)
 
 	int size = newRows * nc;
 	assert(size > 0);
-	TXshCell *cells = new TXshCell[size];
+	std::unique_ptr<TXshCell[]> cells(new TXshCell[size]);
 	assert(cells);
 
 	int i, j, k;
@@ -898,10 +896,6 @@ void TXsheet::eachCells(int r0, int c0, int r1, int c1, int type)
 				setCell(i, j, cells[k]);
 			k++;
 		}
-
-	if (cells)
-		delete[] cells;
-	cells = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -987,7 +981,7 @@ void TXsheet::rollupCells(int r0, int c0, int r1, int c1)
 	int nc = c1 - c0 + 1;
 	int size = 1 * nc;
 	assert(size > 0);
-	TXshCell *cells = new TXshCell[size];
+	std::unique_ptr<TXshCell[]> cells(new TXshCell[size]);
 	assert(cells);
 
 	//in cells copio il contenuto delle celle che mi interessano
@@ -1002,10 +996,6 @@ void TXsheet::rollupCells(int r0, int c0, int r1, int c1)
 		insertCells(r1, k, 1);
 		setCell(r1, k, cells[k - c0]); //setto le celle
 	}
-
-	if (cells)
-		delete[] cells;
-	cells = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1016,7 +1006,7 @@ void TXsheet::rolldownCells(int r0, int c0, int r1, int c1)
 	int nc = c1 - c0 + 1;
 	int size = 1 * nc;
 	assert(size > 0);
-	TXshCell *cells = new TXshCell[size];
+	std::unique_ptr<TXshCell[]> cells(new TXshCell[size]);
 	assert(cells);
 
 	//in cells copio il contenuto delle celle che mi interessano
@@ -1031,10 +1021,6 @@ void TXsheet::rolldownCells(int r0, int c0, int r1, int c1)
 		insertCells(r0, k, 1);
 		setCell(r0, k, cells[k - c0]); //setto le celle
 	}
-
-	if (cells)
-		delete[] cells;
-	cells = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1049,9 +1035,9 @@ void TXsheet::timeStretch(int r0, int c0, int r1, int c1, int nr)
 		for (c = c0; c <= c1; c++) {
 			int dn = nr - oldNr;
 			assert(oldNr > 0);
-			TXshCell *cells = new TXshCell[oldNr];
+			std::unique_ptr<TXshCell[]> cells(new TXshCell[oldNr]);
 			assert(cells);
-			getCells(r0, c, oldNr, cells);
+			getCells(r0, c, oldNr, cells.get());
 			insertCells(r0 + 1, c, dn);
 			int i;
 			for (i = nr - 1; i >= 0; i--) {
@@ -1059,18 +1045,15 @@ void TXsheet::timeStretch(int r0, int c0, int r1, int c1, int nr)
 				if (j < i)
 					setCell(i + r0, c, cells[j]);
 			}
-			if (cells)
-				delete[] cells;
-			cells = 0;
 		}
 	} else /* rimpicciolisce */
 	{
 		int c;
 		for (c = c0; c <= c1; c++) {
 			int dn = oldNr - nr;
-			TXshCell *cells = new TXshCell[oldNr];
+			std::unique_ptr<TXshCell[]> cells(new TXshCell[oldNr]);
 			assert(cells);
-			getCells(r0, c, oldNr, cells);
+			getCells(r0, c, oldNr, cells.get());
 			int i;
 			for (i = 0; i < nr; i++) {
 				int j = i * double(oldNr) / double(nr);
@@ -1078,9 +1061,6 @@ void TXsheet::timeStretch(int r0, int c0, int r1, int c1, int nr)
 					setCell(i + r0, c, cells[j]);
 			}
 			removeCells(r1 - dn + 1, c, dn);
-			if (cells)
-				delete[] cells;
-			cells = 0;
 		}
 	}
 }

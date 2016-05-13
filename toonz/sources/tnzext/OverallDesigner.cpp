@@ -1,9 +1,3 @@
-
-
-#ifdef WIN32
-#define NOMINMAX
-#endif
-
 #include "ext/OverallDesigner.h"
 //#include "ext/StrokeParametricDeformer.h"
 #include "ext/StrokeDeformation.h"
@@ -207,7 +201,7 @@ void showCorners(const TStroke *s,
 		offset(20, 20);
 
 	// show corners
-	vector<double>
+	std::vector<double>
 		corners;
 
 	ToonzExt::cornersDetector(s,

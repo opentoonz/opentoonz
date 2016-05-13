@@ -1,10 +1,8 @@
-
-
 #ifndef TFARMSERVER_H
 #define TFARMSERVER_H
 
-//#include "texception.h"
-//#include "tconvert.h"
+#include <memory>
+
 #include "tcommon.h"
 
 #include <QString>
@@ -17,7 +15,7 @@
 #undef TFARMAPI
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifdef TFARM_EXPORTS
 #define TFARMAPI __declspec(dllexport)
 #else
@@ -50,7 +48,7 @@ public:
 
 	virtual int addTask(const QString &taskid, const QString &cmdline) = 0;
 	virtual int terminateTask(const QString &taskid) = 0;
-	virtual int getTasks(vector<QString> &tasks) = 0;
+	virtual int getTasks(std::vector<QString> &tasks) = 0;
 
 	virtual void queryHwInfo(HwInfo &hwInfo) = 0;
 
@@ -87,7 +85,7 @@ public:
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 };
 
 #endif

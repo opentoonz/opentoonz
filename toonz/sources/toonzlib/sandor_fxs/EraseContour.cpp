@@ -25,14 +25,14 @@ void CEraseContour::null()
 	m_lX = m_lY = 0;
 	m_picUC = 0;
 	m_picUS = 0;
-	m_sel = 0;
+	m_sel.reset();
 	m_ras = 0;
 	m_cil.m_nb = 0;
 }
 
 int CEraseContour::makeSelectionCMAP32()
 {
-	UCHAR *pSel = m_sel;
+	UCHAR *pSel = m_sel.get();
 	int xy = 0, nbSel = 0;
 
 	for (int y = 0; y < m_lY; y++)
@@ -74,7 +74,7 @@ int CEraseContour::makeSelection(const CCIL &iil)
 		return 0;
 	if (m_lX <= 0 || m_lY <= 0 || !m_sel || !m_ras || !(m_picUC || m_picUS))
 		return 0;
-	memset(m_sel, 0, m_lX * m_lY);
+	memset(m_sel.get(), 0, m_lX * m_lY);
 	if (m_ras->type == RAS_CM32)
 		nb = makeSelectionCMAP32();
 	if (nb > 0)
@@ -90,7 +90,7 @@ int CEraseContour::makeSelection(const CCIL &iil)
 //  3 - paint color
 int CEraseContour::makeSelection()
 {
-	memset(m_sel, 0, m_lX * m_lY);
+	memset(m_sel.get(), 0, m_lX * m_lY);
 	if (m_ras->type == RAS_CM32)
 		return makeSelectionCMAP32();
 	return 0;
@@ -116,14 +116,14 @@ int CEraseContour::doIt(const CCIL &iil)
 void CEraseContour::sel0123To01()
 {
 	int xy = m_lX * m_lY;
-	UCHAR *pSel = m_sel;
+	UCHAR *pSel = m_sel.get();
 	for (int i = 0; i < xy; i++, pSel++)
 		*pSel = *(pSel) == (UCHAR)1 ? (UCHAR)1 : (UCHAR)0;
 }
 
 void CEraseContour::eraseInkColors()
 {
-	UCHAR *pSel = m_sel;
+	UCHAR *pSel = m_sel.get();
 	prepareNeighbours();
 	for (int y = 0; y < m_lY; y++)
 		for (int x = 0; x < m_lX; x++, pSel++)
@@ -170,7 +170,7 @@ void CEraseContour::prepareNeighbours()
 			m_neighbours[m_nbNeighbours].w = sqrt((double)(x * x + y * y));
 			m_nbNeighbours++;
 		}
-	qsort(m_neighbours, m_nbNeighbours, sizeof(SXYDW), erasecontour_xydwCompare);
+	qsort(m_neighbours.data(), m_nbNeighbours, sizeof(SXYDW), erasecontour_xydwCompare);
 }
 
 bool CEraseContour::findClosestPaint(const int xx, const int yy, I_PIXEL &ip)
@@ -180,7 +180,7 @@ bool CEraseContour::findClosestPaint(const int xx, const int yy, I_PIXEL &ip)
 		int x = xx + m_neighbours[i].x;
 		int y = yy + m_neighbours[i].y;
 		if (x >= 0 && y >= 0 && x < m_lX && y < m_lY)
-			if (*(m_sel + y * m_lX + x) == (UCHAR)3) {
+			if (*(m_sel.get() + y * m_lX + x) == (UCHAR)3) {
 				if (m_picUC) {
 					UC_PIXEL *uc = m_picUC + y * m_lX + x;
 					ip.r = (int)uc->r;

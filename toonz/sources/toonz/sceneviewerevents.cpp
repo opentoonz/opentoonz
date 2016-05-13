@@ -144,7 +144,7 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button)
 		CASE FlipConsole::eSaveImg:
 		{
 			if (m_previewMode == NO_PREVIEW) {
-				DVGui::MsgBox(WARNING, QObject::tr("It is not possible to save images in camera stand view."));
+				DVGui::warning(QObject::tr("It is not possible to save images in camera stand view."));
 				return;
 			}
 			TApp *app = TApp::instance();
@@ -152,7 +152,7 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button)
 
 			Previewer *previewer = Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW);
 			if (!previewer->isFrameReady(row)) {
-				DVGui::MsgBox(WARNING, QObject::tr("The preview images are not ready yet."));
+				DVGui::warning(QObject::tr("The preview images are not ready yet."));
 				return;
 			}
 
@@ -474,7 +474,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event)
 	if (!tool || !tool->isEnabled()) {
 		if (!m_toolDisableReason.isEmpty() && m_mouseButton == Qt::LeftButton &&
 			!m_editPreviewSubCamera)
-			MsgBox(WARNING, m_toolDisableReason);
+			DVGui::warning(m_toolDisableReason);
 	}
 
 	if (m_freezedStatus != NO_FREEZED)
@@ -538,15 +538,45 @@ quit:
 
 //-----------------------------------------------------------------------------
 
-void SceneViewer::wheelEvent(QWheelEvent *e)
+void SceneViewer::wheelEvent(QWheelEvent *event)
 {
 	if (m_freezedStatus != NO_FREEZED)
 		return;
-	if (e->orientation() == Qt::Horizontal)
-		return;
-	int delta = e->delta() > 0 ? 120 : -120;
-	zoomQt(e->pos(), exp(0.001 * delta));
-	e->accept();
+
+	int delta =0;
+	switch(event->source()){
+
+	case Qt::MouseEventNotSynthesized:
+	{
+		delta =event->angleDelta().y();
+		break;
+	}
+
+	case Qt::MouseEventSynthesizedBySystem:
+	{
+		QPoint numPixels = event->pixelDelta();
+		QPoint numDegrees = event->angleDelta() / 8;
+		if (!numPixels.isNull()) {
+			delta =event->pixelDelta().y();
+		} else if (!numDegrees.isNull()) {
+			QPoint numSteps = numDegrees / 15;
+			delta =numSteps.y();
+		}
+		break;
+	}
+
+	default: //Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication
+	{
+		std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication" << std::endl;
+		break;
+	}
+
+	}// end switch
+
+	if(abs(delta) >0){
+		zoomQt(event->pos(), exp(0.001 * delta));
+	}
+	event->accept();
 }
 
 //-----------------------------------------------------------------------------
@@ -845,7 +875,7 @@ void SceneViewer::keyPressEvent(QKeyEvent *event)
 		QString text = event->text();
 		if ((event->modifiers() & Qt::ShiftModifier))
 			text.toUpper();
-		wstring unicodeChar = text.toStdWString();
+		std::wstring unicodeChar = text.toStdWString();
 		ret = tool->keyDown(key, unicodeChar, flags, pos); // per il textTool
 		if (ret) {
 			update();
@@ -957,7 +987,7 @@ using namespace ImageUtils;
 
 void SceneViewer::contextMenuEvent(QContextMenuEvent *e)
 {
-#ifndef WIN32
+#ifndef _WIN32
 	/* On windows the widget receive the release event before the menu
 	   is shown, on linux and osx the release event is lost, never
 	   received by the widget */
@@ -971,7 +1001,7 @@ void SceneViewer::contextMenuEvent(QContextMenuEvent *e)
 		return;
 
 	TPoint winPos(e->pos().x(), height() - e->pos().y());
-	vector<int> columnIndices;
+	std::vector<int> columnIndices;
 	// enable to select all the columns regardless of the click position
 	for (int i = 0; i < TApp::instance()->getCurrentXsheet()->getXsheet()->getColumnCount(); i++)
 		columnIndices.push_back(i);

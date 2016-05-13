@@ -23,7 +23,7 @@ void TParamVar::setParamObserver(TParamObserver *obs)
 class TParamContainer::Imp
 {
 public:
-	std::map<string, TParamVar *> m_nameTable;
+	std::map<std::string, TParamVar *> m_nameTable;
 	std::vector<TParamVar *> m_vars;
 	TParamObserver *m_paramObserver;
 	Imp() : m_paramObserver(0) {}
@@ -37,7 +37,6 @@ TParamContainer::TParamContainer()
 
 TParamContainer::~TParamContainer()
 {
-	delete m_imp;
 }
 
 void TParamContainer::setParamObserver(TParamObserver *observer)
@@ -75,7 +74,7 @@ bool TParamContainer::isParamHidden(int index) const
 	return m_imp->m_vars[index]->isHidden();
 }
 
-string TParamContainer::getParamName(int index) const
+std::string TParamContainer::getParamName(int index) const
 {
 	assert(0 <= index && index < getParamCount());
 	return m_imp->m_vars[index]->getName();
@@ -87,9 +86,9 @@ const TParamVar *TParamContainer::getParamVar(int index) const
 	return m_imp->m_vars[index];
 }
 
-TParam *TParamContainer::getParam(string name) const
+TParam *TParamContainer::getParam(std::string name) const
 {
-	std::map<string, TParamVar *>::const_iterator it;
+	std::map<std::string, TParamVar *>::const_iterator it;
 	it = m_imp->m_nameTable.find(name);
 	if (it == m_imp->m_nameTable.end())
 		return 0;

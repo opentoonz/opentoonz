@@ -32,7 +32,7 @@ class DVAPI TXshSoundTextLevel : public TXshLevel
 	QList<QString> m_framesText;
 
 public:
-	TXshSoundTextLevel(wstring name = L"");
+	TXshSoundTextLevel(std::wstring name = L"");
 	~TXshSoundTextLevel();
 
 	TXshSoundTextLevel *clone() const;
@@ -55,7 +55,7 @@ private:
 	TXshSoundTextLevel &operator=(const TXshSoundTextLevel &);
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DV_EXPORT_API TSmartPointerT<TXshSoundTextLevel>;
 #endif
 typedef TSmartPointerT<TXshSoundTextLevel> TXshSoundTextLevelP;

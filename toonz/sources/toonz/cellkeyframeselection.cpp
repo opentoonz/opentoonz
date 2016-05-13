@@ -23,7 +23,9 @@
 //-----------------------------------------------------------------------------
 
 TCellKeyframeSelection::TCellKeyframeSelection(TCellSelection *cellSelection, TKeyframeSelection *keyframeSelection)
-	: m_cellSelection(cellSelection), m_keyframeSelection(keyframeSelection), m_xsheetHandle(0)
+	: m_cellSelection(cellSelection)
+	, m_keyframeSelection(keyframeSelection)
+	, m_xsheetHandle(0)
 {
 }
 

@@ -41,7 +41,7 @@ TImageLocation::TImageLocation(TStageObjectSpline *spline)
 {
 }
 
-TImageLocation::TImageLocation(wstring levelName, const TFrameId &fid)
+TImageLocation::TImageLocation(std::wstring levelName, const TFrameId &fid)
 	: m_row(0), m_col(0), m_fid(fid), m_spline(0), m_levelName(levelName), m_type(LevelStripImage)
 {
 }

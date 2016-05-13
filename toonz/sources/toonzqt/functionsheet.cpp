@@ -664,7 +664,7 @@ void FunctionSheetCellViewer::drawCells(QPainter &painter, int r0, int c0, int r
 					text.append("~");
 				}
 
-#ifdef WIN32
+#ifdef _WIN32
 				static QFont font("Arial", 9, QFont::Normal);
 #else
 				static QFont font("Helvetica", 9, QFont::Normal);
@@ -712,7 +712,7 @@ void FunctionSheetCellViewer::mouseDoubleClickEvent(QMouseEvent *e)
 	} else
 		m_lineEdit->setText("");
 
-#ifdef WIN32
+#ifdef _WIN32
 	static QFont font("Arial", 9, QFont::Normal);
 #else
 	static QFont font("Helvetica", 9, QFont::Normal);

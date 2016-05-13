@@ -246,12 +246,12 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 		else
 			msg = QObject::tr("There were problems loading the scene %1.\n Some files may be missing.").arg(QString::fromStdWString(fp.getWideString()));
 
-		MsgBox(WARNING, msg);
+		DVGui::warning(msg);
 		return;
 	} catch (...) {
 		QString msg = QObject::tr("There were problems loading the scene %1.\n Some files may be missing.").arg(QString::fromStdWString(fp.getWideString()));
 
-		MsgBox(WARNING, msg);
+		DVGui::warning(msg);
 		return;
 	}
 
@@ -292,7 +292,7 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 				movieGenerator.addSoundtrack(scene, frameOffset, sceneFrames);
 			} catch (const TException&) {
 				QString text = tr("The %1 scene contains an audio file with different characteristics from the one used in the first exported scene.\nThe audio file will not be included in the rendered clip.").arg(QString::fromStdWString(fp.getLevelNameW()));
-				DVGui::MsgBox(DVGui::WARNING, text);
+				DVGui::warning(text);
 			}
 		}
 
@@ -315,7 +315,7 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 
 				if (!TSystem::showDocument(outPath)) {
 					QString msg(QObject::tr("It is not possible to display the file %1: no player associated with its format").arg(QString::fromStdWString(outPath.withoutParentDir().getWideString())));
-					MsgBox(WARNING, msg);
+					DVGui::warning(msg);
 				}
 			} else {
 				int r0 = 1, r1 = totalFrameCount, step = 1;
@@ -777,7 +777,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 	settingsLayout->setAlignment(Qt::AlignTop);
 
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	wstring sceneName = scene->getSceneName();
+	std::wstring sceneName = scene->getSceneName();
 	TFilePath scenePath = scene->getProperties()->getOutputProperties()->getPath().getParentDir();
 
 	//Label + saveInFileFld
@@ -886,7 +886,7 @@ void ExportPanel::loadExportSettings()
 	if (!TSystem::doesExistFileOrLevel(exportPath))
 		return;
 	TIStream is(exportPath);
-	string tagName;
+	std::string tagName;
 	try {
 		while (is.matchTag(tagName)) {
 			if (tagName == "ExportDir") {
@@ -894,13 +894,13 @@ void ExportPanel::loadExportSettings()
 				is >> outPath;
 				m_saveInFileFld->setPath(QString::fromStdWString(outPath.getWideString()));
 			} else if (tagName == "ExportFormat") {
-				string ext;
+				std::string ext;
 				is >> ext;
 				int index = m_fileFormat->findText(QString::fromStdString(ext));
 				m_fileFormat->setCurrentIndex(index);
 			} else if (tagName == "FormatSettings") {
 				TOutputProperties *outProp = RenderController::instance()->getOutputPropertites();
-				string ext = m_fileFormat->currentText().toStdString();
+				std::string ext = m_fileFormat->currentText().toStdString();
 				TPropertyGroup *props = outProp->getFileFormatProperties(ext);
 				props->loadData(is);
 			} else if (tagName == "UseMarkers") {
@@ -924,7 +924,7 @@ void ExportPanel::saveExportSettings()
 	TFilePath exportPath = TEnv::getConfigDir() + "exportsettings.txt";
 	TOStream os(exportPath);
 	os.child("ExportDir") << outPath;
-	string ext = m_fileFormat->currentText().toStdString();
+	std::string ext = m_fileFormat->currentText().toStdString();
 	os.child("ExportFormat") << ext;
 
 	os.openChild("FormatSettings");
@@ -941,7 +941,7 @@ void ExportPanel::saveExportSettings()
 void ExportPanel::generateMovie()
 {
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	string ext = RenderController::instance()->getMovieExt();
+	std::string ext = RenderController::instance()->getMovieExt();
 	QString path = m_saveInFileFld->getPath();
 	TFilePath outPath(path.toStdWString());
 	outPath = (outPath + m_fileNameFld->text().toStdWString()).withType(ext);
@@ -987,7 +987,7 @@ void ExportPanel::openSettingsPopup()
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	if (!scene)
 		return;
-	string ext = RenderController::instance()->getMovieExt();
+	std::string ext = RenderController::instance()->getMovieExt();
 
 	TOutputProperties *outProps = RenderController::instance()->getOutputPropertites();
 	if (!outProps) {

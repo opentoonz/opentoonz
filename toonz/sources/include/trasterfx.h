@@ -20,7 +20,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4251)
 #endif
 
@@ -236,7 +236,7 @@ public:
 
 	// resituisce una stringa che identifica univocamente il sottoalbero
 	// avente come radice l'effetto
-	virtual string getAlias(double frame, const TRenderSettings &info) const;
+	virtual std::string getAlias(double frame, const TRenderSettings &info) const;
 
 	virtual void dryCompute(TRectD &rect,
 							double frame,
@@ -266,7 +266,7 @@ public:
 
 //-------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TRasterFx>;
 template class DVAPI TDerivedSmartPointerT<TRasterFx, TFx>;
 #endif
@@ -285,7 +285,7 @@ public:
 
 //===================================================================
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TFxPortT<TRasterFx>;
 #endif
 typedef TFxPortT<TRasterFx> TRasterFxPort;
@@ -309,7 +309,7 @@ public:
 
 	virtual bool checkTimeRegion() const { return false; }
 
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 
 	void transform(double frame,
 				   int port,
@@ -321,7 +321,7 @@ public:
 
 //-------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TGeometryFx>;
 template class DVAPI TDerivedSmartPointerT<TGeometryFx, TFx>;
 #endif
@@ -343,7 +343,7 @@ public:
 
 //===================================================================
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TFxPortT<TGeometryFx>;
 #endif
 
@@ -386,7 +386,7 @@ public:
 		m_aff = aff;
 	}
 	bool isDpiAffine() const { return m_isDpiAffine; }
-	string getPluginId() const { return string(); }
+	std::string getPluginId() const { return std::string(); }
 
 protected:
 	TRasterFxPort m_port;
@@ -409,12 +409,12 @@ void DVAPI removeRenderCache(const std::string &alias);
 
 //-------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(push)
 #pragma warning(disable : 4251)
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(pop)
 #endif
 

@@ -73,7 +73,7 @@ void OnionSkinMask::clear()
 
 //-------------------------------------------------------------------
 
-void OnionSkinMask::getAll(int currentRow, vector<int> &output) const
+void OnionSkinMask::getAll(int currentRow, std::vector<int> &output) const
 {
 	output.clear();
 	output.reserve(m_fos.size() + m_mos.size());
@@ -234,10 +234,9 @@ void OnionSkinMaskModifier::click(int row, bool isFos)
 			m_curMask.setMos(drow, false);
 		} else if (drow == 0) {
 			m_status = 8 + 4 + 1; // accendere mos; partito da 0
-		} else if (!m_curMask.isEnabled()) {
-			// e' disabilitato e ho fatto click in un punto vuoto: non faccio niente
-			m_status = 128; // errore
 		} else {
+			if (!m_curMask.isEnabled())
+				m_curMask.enable(true);
 			m_curMask.setMos(drow, true);
 			m_status = 4 + 1; // accendere mos;
 		}

@@ -1,7 +1,7 @@
-
-
 #ifndef INFOVIEWER_H
 #define INFOVIEWER_H
+
+#include <memory>
 
 #include "toonzqt/dvdialog.h"
 
@@ -23,7 +23,7 @@ class InfoViewerImp;
 class DVAPI InfoViewer : public DVGui::Dialog
 {
 	Q_OBJECT
-	InfoViewerImp *m_imp;
+	std::unique_ptr<InfoViewerImp> m_imp;
 	QWidget *m_parent;
 
 public:

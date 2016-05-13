@@ -93,7 +93,7 @@ struct DOT {
 class FDG_INFO
 {
 public:
-	string m_name;
+	std::string m_name;
 	int ctr_type;
 	/* ctr_type == TRUE:  */
 	double ctr_x, ctr_y; /* in mm */
@@ -180,8 +180,8 @@ public:
 
 	const CleanupTypes::FDG_INFO &getFdgInfo();
 
-	string getFdgName() const { return m_fdgInfo.m_name; }
-	bool setFdgByName(string name);
+	std::string getFdgName() const { return m_fdgInfo.m_name; }
+	bool setFdgByName(std::string name);
 
 	// la scena serve per gestire i default:
 	// internamente il path puo' essere vuoto

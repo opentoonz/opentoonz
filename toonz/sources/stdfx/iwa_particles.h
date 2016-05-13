@@ -204,7 +204,7 @@ public:
 public:
 	Iwa_Particle(int lifetime,
 				 int seed,
-				 const map<int, TTile *> porttiles,
+				 const std::map<int, TTile *> porttiles,
 				 const particles_values &values,
 				 const particles_ranges &ranges,
 				 int howmany,
@@ -225,9 +225,9 @@ public:
 					  const particles_ranges &ranges,
 					  double randomxreference, double randomyreference);
 	void create_Colors(const particles_values &values,
-					   const particles_ranges &ranges, map<int, TTile *> porttiles);
+					   const particles_ranges &ranges, std::map<int, TTile *> porttiles);
 
-	void move(const map<int, TTile *> porttiles, const particles_values &values, const particles_ranges &ranges, float windx,
+	void move(const std::map<int, TTile *> porttiles, const particles_values &values, const particles_ranges &ranges, float windx,
 			  float windy, float xgravity, float ygravity, float dpi, int lastframe);
 
 	void spread_color(TPixel32 &color, double range);

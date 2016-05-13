@@ -32,7 +32,7 @@
 
 #include <assert.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <io.h>
 #include <windows.h>
 #else
@@ -103,21 +103,21 @@ const int IMAGERGB_HEADER_SIZE = sizeof(IMAGERGB);
 #define _IOERR 0x20
 #endif
 
-static USHORT *ibufalloc(register IMAGERGB *image, int bpp);
-static void cvtshorts(USHORT buffer[], register TINT32 n);
-static void cvtTINT32s(TUINT32 *buffer, register TINT32 n);
+static USHORT *ibufalloc(IMAGERGB *image, int bpp);
+static void cvtshorts(USHORT buffer[], TINT32 n);
+static void cvtTINT32s(TUINT32 *buffer, TINT32 n);
 static void cvtimage(IMAGERGB *image);
 static void img_rle_expand(USHORT *rlebuf, int ibpp, USHORT *expbuf, int obpp);
-static int img_getrowsize(register IMAGERGB *image);
+static int img_getrowsize(IMAGERGB *image);
 static TUINT32 img_optseek(IMAGERGB *image, TUINT32 offset);
 static TINT32 rgb_img_read(IMAGERGB *image, char *buffer, TINT32 count);
 static int img_badrow(IMAGERGB *image, int y, int z);
 static TUINT32 img_seek(IMAGERGB *image, UINT y, UINT z, UINT offs);
 static TINT32 RGB_img_write(IMAGERGB *image, char *buffer, TINT32 count);
-static void img_setrowsize(register IMAGERGB *image, UINT cnt, UINT y, UINT z);
+static void img_setrowsize(IMAGERGB *image, UINT cnt, UINT y, UINT z);
 static TINT32 img_rle_compact(USHORT *expbuf, int ibpp, USHORT *rlebuf,
 							  int obpp, int cnt);
-static int iflush(register IMAGERGB *image);
+static int iflush(IMAGERGB *image);
 
 /*-------------------------------------------------------------------------*/
 
@@ -205,10 +205,9 @@ static IMAGERGB *iopen(int fd, OpenMode openMode,
 					   unsigned int type, unsigned int dim, unsigned int xsize,
 					   unsigned int ysize, unsigned int zsize, short dorev)
 {
-	register IMAGERGB *image;
+	IMAGERGB *image;
 	extern int errno;
 	int tablesize, f = fd;
-	register int i, max;
 
 	image = (IMAGERGB *)malloc((int)sizeof(IMAGERGB));
 
@@ -281,8 +280,8 @@ static IMAGERGB *iopen(int fd, OpenMode openMode,
 
 		if (openMode == OpenWrite) {
 			//WRITE
-			max = image->ysize * image->zsize;
-			for (i = 0; i < max; i++) {
+			int max = image->ysize * image->zsize;
+			for (int i = 0; i < max; i++) {
 				image->rowstart[i] = 0;
 				image->rowsize[i] = -1;
 			}
@@ -291,7 +290,7 @@ static IMAGERGB *iopen(int fd, OpenMode openMode,
 			tablesize = image->ysize * image->zsize * (int)sizeof(TINT32);
 			lseek(f, 512L, 0);
 			if (read(f, image->rowstart, tablesize) != tablesize) {
-#ifdef WIN32
+#ifdef _WIN32
 				DWORD error;
 				error = GetLastError();
 #endif
@@ -302,7 +301,7 @@ static IMAGERGB *iopen(int fd, OpenMode openMode,
 			if (image->dorev)
 				cvtTINT32s(image->rowstart, tablesize);
 			if (read(f, image->rowsize, tablesize) != tablesize) {
-#ifdef WIN32
+#ifdef _WIN32
 				DWORD error;
 				error = GetLastError();
 #endif
@@ -337,7 +336,7 @@ static IMAGERGB *iopen(int fd, OpenMode openMode,
 
 /*-------------------------------------------------------------------------*/
 
-static USHORT *ibufalloc(register IMAGERGB *image, int bpp)
+static USHORT *ibufalloc(IMAGERGB *image, int bpp)
 {
 	return (USHORT *)malloc(IBUFSIZE(image->xsize) * bpp);
 }
@@ -347,14 +346,11 @@ static USHORT *ibufalloc(register IMAGERGB *image, int bpp)
    Inverte gli short del buffer
 */
 
-static void cvtshorts(unsigned short buffer[], register TINT32 n)
+static void cvtshorts(unsigned short buffer[], TINT32 n)
 {
-	register short i;
-	register TINT32 nshorts = n >> 1;
-	register unsigned short swrd;
-
-	for (i = 0; i < nshorts; i++) {
-		swrd = *buffer;
+	TINT32 nshorts = n >> 1;
+	for (int i = 0; i < nshorts; i++) {
+		unsigned short swrd = *buffer;
 		*buffer++ = (swrd >> 8) | (swrd << 8);
 	}
 	return;
@@ -368,12 +364,9 @@ static void cvtshorts(unsigned short buffer[], register TINT32 n)
 
 static void cvtTINT32s(TUINT32 buffer[], TINT32 n)
 {
-	register short i;
-	register TINT32 nTINT32s = n >> 2;
-	register TUINT32 lwrd;
-
-	for (i = 0; i < nTINT32s; i++) {
-		lwrd = buffer[i];
+	TINT32 nTINT32s = n >> 2;
+	for (int i = 0; i < nTINT32s; i++) {
+		TUINT32 lwrd = buffer[i];
 		buffer[i] = ((lwrd >> 24) |
 					 (lwrd >> 8 & 0xff00) |
 					 (lwrd << 8 & 0xff0000) |
@@ -424,27 +417,27 @@ static void img_rle_expand(unsigned short *rlebuf, int ibpp,
 						   unsigned short *expbuf, int obpp)
 {
 	if (ibpp == 1 && obpp == 1) {
-		register unsigned char *iptr = (unsigned char *)rlebuf;
-		register unsigned char *optr = (unsigned char *)expbuf;
-		register unsigned short pixel, count;
+		unsigned char *iptr = (unsigned char *)rlebuf;
+		unsigned char *optr = (unsigned char *)expbuf;
+		unsigned short pixel, count;
 
 		EXPAND_CODE(unsigned char);
 	} else if (ibpp == 1 && obpp == 2) {
-		register unsigned char *iptr = (unsigned char *)rlebuf;
-		register unsigned short *optr = expbuf;
-		register unsigned short pixel, count;
+		unsigned char *iptr = (unsigned char *)rlebuf;
+		unsigned short *optr = expbuf;
+		unsigned short pixel, count;
 
 		EXPAND_CODE(unsigned short);
 	} else if (ibpp == 2 && obpp == 1) {
-		register unsigned short *iptr = rlebuf;
-		register unsigned char *optr = (unsigned char *)expbuf;
-		register unsigned short pixel, count;
+		unsigned short *iptr = rlebuf;
+		unsigned char *optr = (unsigned char *)expbuf;
+		unsigned short pixel, count;
 
 		EXPAND_CODE(unsigned char);
 	} else if (ibpp == 2 && obpp == 2) {
-		register unsigned short *iptr = rlebuf;
-		register unsigned short *optr = expbuf;
-		register unsigned short pixel, count;
+		unsigned short *iptr = rlebuf;
+		unsigned short *optr = expbuf;
+		unsigned short pixel, count;
 
 		EXPAND_CODE(unsigned short);
 	} else
@@ -457,7 +450,7 @@ static void img_rle_expand(unsigned short *rlebuf, int ibpp,
 */
 /*-----------------------------------------------------------------------------*/
 
-static int img_getrowsize(register IMAGERGB *image)
+static int img_getrowsize(IMAGERGB *image)
 {
 	switch (image->dim) {
 	case 1:
@@ -571,7 +564,7 @@ static TUINT32 img_seek(IMAGERGB *image,
 
 static int new_getrow(IMAGERGB *image, void *buffer, UINT y, UINT z)
 {
-	register short cnt;
+	short cnt;
 
 	if (!(image->flags & (_IORW | _IOREAD)))
 		return -1;
@@ -655,7 +648,7 @@ static TINT32 RGB_img_write(IMAGERGB *image, char *buffer, TINT32 count)
 
 /*-----------------------------------------------------------------------------*/
 
-static void img_setrowsize(register IMAGERGB *image, UINT cnt, UINT y, UINT z)
+static void img_setrowsize(IMAGERGB *image, UINT cnt, UINT y, UINT z)
 {
 	TINT32 *sizeptr = 0;
 
@@ -717,42 +710,42 @@ static TINT32 img_rle_compact(unsigned short *expbuf, int ibpp, unsigned short *
 							  int obpp, int cnt)
 {
 	if (ibpp == 1 && obpp == 1) {
-		register unsigned char *iptr = (unsigned char *)expbuf;
-		register unsigned char *ibufend = iptr + cnt;
-		register unsigned char *sptr;
-		register unsigned char *optr = (unsigned char *)rlebuf;
-		register TUINT32 todo, cc;
-		register TINT32 count;
+		unsigned char *iptr = (unsigned char *)expbuf;
+		unsigned char *ibufend = iptr + cnt;
+		unsigned char *sptr;
+		unsigned char *optr = (unsigned char *)rlebuf;
+		TUINT32 todo, cc;
+		TINT32 count;
 
 		COMPACT_CODE(unsigned char);
 		return optr - (unsigned char *)rlebuf;
 	} else if (ibpp == 1 && obpp == 2) {
-		register unsigned char *iptr = (unsigned char *)expbuf;
-		register unsigned char *ibufend = iptr + cnt;
-		register unsigned char *sptr;
-		register unsigned short *optr = rlebuf;
-		register TUINT32 todo, cc;
-		register TINT32 count;
+		unsigned char *iptr = (unsigned char *)expbuf;
+		unsigned char *ibufend = iptr + cnt;
+		unsigned char *sptr;
+		unsigned short *optr = rlebuf;
+		TUINT32 todo, cc;
+		TINT32 count;
 
 		COMPACT_CODE(unsigned short);
 		return optr - rlebuf;
 	} else if (ibpp == 2 && obpp == 1) {
-		register unsigned short *iptr = expbuf;
-		register unsigned short *ibufend = iptr + cnt;
-		register unsigned short *sptr;
-		register unsigned char *optr = (unsigned char *)rlebuf;
-		register TUINT32 todo, cc;
-		register TINT32 count;
+		unsigned short *iptr = expbuf;
+		unsigned short *ibufend = iptr + cnt;
+		unsigned short *sptr;
+		unsigned char *optr = (unsigned char *)rlebuf;
+		TUINT32 todo, cc;
+		TINT32 count;
 
 		COMPACT_CODE(unsigned char);
 		return optr - (unsigned char *)rlebuf;
 	} else if (ibpp == 2 && obpp == 2) {
-		register unsigned short *iptr = expbuf;
-		register unsigned short *ibufend = iptr + cnt;
-		register unsigned short *sptr;
-		register unsigned short *optr = rlebuf;
-		register unsigned short todo, cc;
-		register TINT32 count;
+		unsigned short *iptr = expbuf;
+		unsigned short *ibufend = iptr + cnt;
+		unsigned short *sptr;
+		unsigned short *optr = rlebuf;
+		unsigned short todo, cc;
+		TINT32 count;
 
 		COMPACT_CODE(unsigned short);
 		return optr - rlebuf;
@@ -881,7 +874,7 @@ static int new_putrow(IMAGERGB *image, void *buffer, UINT y, UINT z)
 
 /*----------------------------------------------------------------------------*/
 
-static int iflush(register IMAGERGB *image)
+static int iflush(IMAGERGB *image)
 {
 	unsigned short *base;
 
@@ -982,7 +975,7 @@ void SgiReader::readLine(short *buffer, int x0, int x1, int shrink)
 
 	{ // 64 -> 32
 		TPixel64 *pix = (TPixel64 *)buffer;
-		vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+		std::vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
 		if (m_header->zsize == 4) {
 			new_getrow(m_header, &rbuf[0], m_currentY, 0);
 			new_getrow(m_header, &gbuf[0], m_currentY, 1);
@@ -1027,7 +1020,7 @@ void SgiReader::readLine(char *buffer, int x0, int x1, int shrink)
 	if (BPP(m_header->type) == 1) //32 -> 32
 	{
 		TPixel32 *pix = (TPixel32 *)buffer;
-		vector<UCHAR> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+		std::vector<UCHAR> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
 		if (m_header->zsize == 4) {
 			new_getrow(m_header, &rbuf[0], m_currentY, 0);
 			new_getrow(m_header, &gbuf[0], m_currentY, 1);
@@ -1064,7 +1057,7 @@ void SgiReader::readLine(char *buffer, int x0, int x1, int shrink)
 		}
 	} else { // 64 -> 32
 		TPixel32 *pix = (TPixel32 *)buffer;
-		vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+		std::vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
 		if (m_header->zsize == 4) {
 			new_getrow(m_header, &rbuf[0], m_currentY, 0);
 			new_getrow(m_header, &gbuf[0], m_currentY, 1);
@@ -1219,7 +1212,7 @@ void SgiWriter::writeLine(char *buffer)
 		{
 			new_putrow(m_header, buffer, m_currentY, 0);
 		} else {
-			vector<UCHAR> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+			std::vector<UCHAR> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
 			TPixelRGBM32 *pix = (TPixelRGBM32 *)buffer;
 			for (int i = 0; i < m_info.m_lx; ++i) {
 				rbuf[i] = pix->r;
@@ -1246,7 +1239,7 @@ void SgiWriter::writeLine(short *buffer)
 
 	{
 		if (m_header->dim < 3) {
-			vector<USHORT> tmp(m_info.m_lx);
+			std::vector<USHORT> tmp(m_info.m_lx);
 			TPixelRGBM64 *pix = (TPixelRGBM64 *)buffer;
 			for (int i = 0; i < m_info.m_lx; ++i) {
 				tmp[i] = TPixelGR16::from(*pix).value;
@@ -1254,7 +1247,7 @@ void SgiWriter::writeLine(short *buffer)
 			}
 			new_putrow(m_header, &tmp[0], m_currentY, 0);
 		} else {
-			vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
+			std::vector<USHORT> rbuf(m_info.m_lx), gbuf(m_info.m_lx), bbuf(m_info.m_lx), mbuf(m_info.m_lx);
 			TPixelRGBM64 *pix = (TPixelRGBM64 *)buffer;
 			for (int i = 0; i < m_info.m_lx; ++i) {
 				rbuf[i] = pix->r;

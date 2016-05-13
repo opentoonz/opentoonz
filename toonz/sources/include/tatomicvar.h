@@ -13,7 +13,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #elif defined(__sgi)
 #include <sys/atomic_ops.h>
@@ -227,7 +227,7 @@ public:
 
 	long operator++()
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		return InterlockedIncrement(&m_var);
 #elif defined(__sgi)
 		return ++m_var;
@@ -244,7 +244,7 @@ public:
 
 	long operator+=(long value)
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		InterlockedExchangeAdd(&m_var, value);
 		return m_var;
 
@@ -266,7 +266,7 @@ public:
 
 	long operator--()
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		return InterlockedDecrement(&m_var);
 #elif defined(__sgi)
 		return --m_var;
@@ -300,7 +300,7 @@ public:
 #endif
 	};
 
-#ifdef WIN32
+#ifdef _WIN32
 	long m_var;
 #elif defined(__sgi)
 	long m_var;

@@ -226,7 +226,7 @@ void CellsMover::restoreColumns(int c) const
 	TXsheet *xsh = getXsheet();
 	for (int i = 0; i < m_colCount; i++)
 		xsh->removeColumn(c);
-	list<int> restoredSplineIds;
+	std::list<int> restoredSplineIds;
 	m_columnsData->restoreObjects(ii, restoredSplineIds, xsh, StageObjectsData::eDoClone | StageObjectsData::eResetFxDagPositions);
 	for (int i = 0; i < m_colCount; i++) {
 		TXshColumn *column = xsh->getColumn(c + i);

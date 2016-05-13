@@ -3,7 +3,7 @@
 // BlurMatrix.cpp: implementation of the CBlurMatrix class.
 //
 //////////////////////////////////////////////////////////////////////
-#ifdef WIN32
+#ifdef _WIN32
 #include "Windows.h"
 #else
 #ifdef __sgi
@@ -17,10 +17,12 @@ int nanosleep(const struct timespec *rqtp, struct timespec *rmtp);
 
 #endif
 #endif
-#include <vector>
 
-#include <math.h>
-#include <stdlib.h>
+#include <vector>
+#include <algorithm>
+
+#include <cmath>
+#include <cstdlib>
 
 //#include "SError.h"
 #include "BlurMatrix.h"
@@ -199,7 +201,7 @@ void CBlurMatrix::addPath(vector<BLURSECTION>::iterator pBS)
 			//SXYD* xyd= pBS->begin();
 			int x = xyd->x;
 			int y = xyd->y;
-			int l = max(abs(x), abs(y));
+			int l = std::max(std::abs(x), std::abs(y));
 			double dx = -(double)x / (double)l;
 			double dy = -(double)y / (double)l;
 			double xx = (double)x + dx;

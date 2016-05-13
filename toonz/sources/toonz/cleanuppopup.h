@@ -1,7 +1,7 @@
-
-
 #ifndef CLEANUPPOPUP_H
 #define CLEANUPPOPUP_H
+
+#include <memory>
 
 // TnzQt includes
 #include "toonzqt/validatedchoicedialog.h"
@@ -11,7 +11,6 @@
 #include "timage.h"
 
 // boost includes
-#include <boost/scoped_ptr.hpp>
 #include <boost/container/vector.hpp>
 
 #include <QMap>
@@ -73,7 +72,7 @@ private:
 	QPushButton *m_cleanupButton;
 	QPushButton *m_skipButton;
 
-	boost::scoped_ptr<LevelUpdater>
+	std::unique_ptr<LevelUpdater>
 		m_updater; //!< The cleanup level updater.
 
 	bc::vector<CleanupLevel> m_cleanupLevels; //!< List of levels to be cleanupped.
@@ -84,10 +83,10 @@ private:
 
 	std::vector<TFrameId> m_cleanuppedLevelFrames; //!< Current level's list of cleanupped frames. Used
 												   //!  to selectively build the level's unpainted backup.
-	boost::scoped_ptr<CleanupParameters>
+	std::unique_ptr<CleanupParameters>
 		m_params; //!< Cleanup params used to cleanup.
 
-	boost::scoped_ptr<OverwriteDialog>
+	std::unique_ptr<OverwriteDialog>
 		m_overwriteDialog; //!< Dialog about level overwriting options.
 
 	/*	Palette上書きの判断をするために、保存先Levelが既に存在するかどうかのフラグ

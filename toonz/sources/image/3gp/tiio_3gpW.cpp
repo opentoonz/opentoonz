@@ -3,16 +3,15 @@
 #ifndef x64
 
 #include "texception.h"
-#include "tiio_3gp.h"
 #include "tsound.h"
 #include "tconvert.h"
 #include "tpropertytype.h"
-//#include "trop.h"
 #include "../mov/tiio_mov.h"
-//#include "timageinfo.h"
 #include "movsettings.h"
 #include "trasterimage.h"
 #include "tsystem.h"
+
+#include "tiio_3gp.h"
 
 namespace
 {
@@ -197,8 +196,8 @@ string long2fourchar(TINT32 fcc)
 	return s;
 }
 
-const string CodecNamesId = "PU_CodecName";
-const string CodecQualityId = "PU_CodecQuality";
+const std::string CodecNamesId = "PU_CodecName";
+const std::string CodecQualityId = "PU_CodecQuality";
 
 } //namespace
 

@@ -38,7 +38,7 @@ const int prjSuffixCount = 4;
 
 //===================================================================
 /*! Default inputs folder: is used to save all scanned immage.*/
-const string
+const std::string
 	TProject::Inputs = "inputs",
 	/*! Default drawings folder: is used to save all tlv and pli levels.*/
 	TProject::Drawings = "drawings",
@@ -283,7 +283,7 @@ TProject::~TProject()
 */
 void TProject::setFolder(string name, TFilePath path)
 {
-	std::map<string, TFilePath>::iterator it;
+	std::map<std::string, TFilePath>::iterator it;
 	it = m_folders.find(name);
 	if (it == m_folders.end()) {
 		m_folderNames.push_back(name);
@@ -311,7 +311,7 @@ void TProject::setFolder(string name)
 */
 TFilePath TProject::getFolder(string name) const
 {
-	std::map<string, TFilePath>::const_iterator it;
+	std::map<std::string, TFilePath>::const_iterator it;
 	it = m_folders.find(name);
 	if (it != m_folders.end())
 		return it->second;
@@ -376,7 +376,7 @@ string TProject::getFolderName(int index) const
 */
 int TProject::getFolderIndex(string name) const
 {
-	std::vector<string>::const_iterator it;
+	std::vector<std::string>::const_iterator it;
 	it = std::find(
 		m_folderNames.begin(),
 		m_folderNames.end(),
@@ -439,7 +439,7 @@ void TProject::setUseScenePath(string folderName, bool on)
 
 bool TProject::getUseScenePath(string folderName) const
 {
-	std::map<string, bool>::const_iterator it;
+	std::map<std::string, bool>::const_iterator it;
 	it = m_useScenePathFlags.find(folderName);
 	return it != m_useScenePathFlags.end() ? it->second : false;
 }
@@ -559,7 +559,7 @@ bool TProject::save(const TFilePath &projectPath)
 		TFilePath folderRelativePath = getFolder(i);
 		if (folderRelativePath == TFilePath())
 			continue;
-		std::map<string, string> attr;
+		std::map<std::string, string> attr;
 		string folderName = getFolderName(i);
 		attr["name"] = folderName;
 		attr["path"] = toString(folderRelativePath); // escape()
@@ -607,7 +607,7 @@ bool TProject::save(const TFilePath &projectPath)
 		TFilePath relativeProjectFolder = makeRelative(folderpath, m_path.getParentDir());
 
 		TOStream os2(xmlPath);
-		std::map<string, string> attr;
+		std::map<std::string, string> attr;
 		attr["type"] = "projectFolder";
 		os2.openChild("parentProject", attr);
 		os2 << relativeProjectFolder;
@@ -904,7 +904,7 @@ TFilePath TProjectManager::getProjectPathByName(const TFilePath &projectName)
 /*! Gets all project folder names and put them in the passed vector \b names.
 	\note All previous data contained in \b names are lost.*/
 
-void TProjectManager::getFolderNames(std::vector<string> &names)
+void TProjectManager::getFolderNames(std::vector<std::string> &names)
 {
 	names.clear();
 	TFilePath fp = ToonzFolder::getProfileFolder() + "project_folders.txt";
@@ -930,7 +930,7 @@ void TProjectManager::getFolderNames(std::vector<string> &names)
 			}
 	} catch (...) {
 	}
-	const string stdNames[] = {
+	const std::string stdNames[] = {
 		TProject::Inputs, TProject::Drawings, TProject::Scenes,
 		TProject::Extras, TProject::Outputs, TProject::Scripts};
 	for (int i = 0; i < (int)tArrayCount(stdNames); i++) {

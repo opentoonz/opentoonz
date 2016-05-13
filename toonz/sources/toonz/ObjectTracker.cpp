@@ -10,6 +10,8 @@ Compiler: Microsoft Visual Studio.net
 Luigi Sgaglione
 
 **********************************************************************/
+#include <memory>
+
 #include "ObjectTracker.h"
 #include <math.h>
 #include <stdio.h>
@@ -17,12 +19,10 @@ Luigi Sgaglione
 #include <fstream>
 #include <iostream>
 #include <ios>
+#include <algorithm>
 
 using namespace std;
 
-#define min(a, b) (((a) < (b)) ? (a) : (b))
-
-#define max(a, b) (((a) > (b)) ? (a) : (b))
 
 #define MEANSHIFT_ITERATION_NO 15
 #define ALPHA 0.98
@@ -56,11 +56,11 @@ CObjectTracker::CObjectTracker(int imW, int imH, bool _colorimage, bool _att_bac
 	else
 		HISTOGRAM_LENGTH = 8192;
 
-	m_sTrackingObject.initHistogram = new float[HISTOGRAM_LENGTH];
+	m_sTrackingObject.initHistogram.reset(new float[HISTOGRAM_LENGTH]);
 	if (att_background)
-		m_sTrackingObject.weights_background = new float[HISTOGRAM_LENGTH];
+		m_sTrackingObject.weights_background.reset(new float[HISTOGRAM_LENGTH]);
 	else
-		m_sTrackingObject.weights_background = 0;
+		m_sTrackingObject.weights_background.reset();
 
 	m_sTrackingObject.Status = false;
 	for (short j = 0; j < HISTOGRAM_LENGTH; j++)
@@ -71,8 +71,6 @@ CObjectTracker::CObjectTracker(int imW, int imH, bool _colorimage, bool _att_bac
 //Distructor
 CObjectTracker::~CObjectTracker()
 {
-	delete[] m_sTrackingObject.initHistogram;
-	delete[] m_sTrackingObject.weights_background;
 }
 
 //--------------------------------------------------------------------------------------------------------
@@ -158,7 +156,7 @@ void CObjectTracker::ObjeckTrackerHandlerByUser(TRaster32P *frame)
 
 	if (m_sTrackingObject.Status) {
 		if (!m_sTrackingObject.assignedAnObject) {
-			FindHistogram(frame, m_sTrackingObject.initHistogram, 1);
+			FindHistogram(frame, m_sTrackingObject.initHistogram.get(), 1);
 			m_sTrackingObject.assignedAnObject = true;
 			/*
 			ofstream output;
@@ -218,10 +216,10 @@ void CObjectTracker::FindHistogram(TRaster32P *frame, float(*histogram), float h
 	normx = short(m_sTrackingObject.X + m_sTrackingObject.W / 2);
 	normy = short(m_sTrackingObject.Y + m_sTrackingObject.H / 2);
 
-	for (y = max(m_sTrackingObject.Y - m_sTrackingObject.H / 2, 0);
-		 y <= min(m_sTrackingObject.Y + m_sTrackingObject.H / 2, m_nImageHeight - 1); y++)
-		for (x = max(m_sTrackingObject.X - m_sTrackingObject.W / 2, 0);
-			 x <= min(m_sTrackingObject.X + m_sTrackingObject.W / 2, m_nImageWidth - 1); x++) {
+	for (y = std::max(m_sTrackingObject.Y - m_sTrackingObject.H / 2, 0);
+		 y <= std::min(m_sTrackingObject.Y + m_sTrackingObject.H / 2, m_nImageHeight - 1); y++)
+		for (x = std::max(m_sTrackingObject.X - m_sTrackingObject.W / 2, 0);
+			 x <= std::min(m_sTrackingObject.X + m_sTrackingObject.W / 2, m_nImageWidth - 1); x++) {
 			E = CheckEdgeExistance(frame, x, y);
 
 			pixelValues = GetPixelValues(frame, x, y);
@@ -278,10 +276,10 @@ void CObjectTracker::FindHistogramBackground(TRaster32P *frame, float(*backgroun
 	for (i = 0; i < HISTOGRAM_LENGTH; i++)
 		background[i] = 0.0;
 
-	for (y = max(m_sTrackingObject.Y - (m_sTrackingObject.H * 1.73) / 2, 0);
-		 y <= min(m_sTrackingObject.Y + (m_sTrackingObject.H * 1.73) / 2, m_nImageHeight - 1); y++)
-		for (x = max(m_sTrackingObject.X - (m_sTrackingObject.W * 1.73) / 2, 0);
-			 x <= min(m_sTrackingObject.X + (m_sTrackingObject.W * 1.73) / 2, m_nImageWidth - 1); x++) {
+	for (y = std::max(m_sTrackingObject.Y - (m_sTrackingObject.H * 1.73) / 2, 0.0);
+		 y <= std::min(m_sTrackingObject.Y + (m_sTrackingObject.H * 1.73) / 2, m_nImageHeight - 1.0); y++)
+		for (x = std::max(m_sTrackingObject.X - (m_sTrackingObject.W * 1.73) / 2, 0.0);
+			 x <= std::min(m_sTrackingObject.X + (m_sTrackingObject.W * 1.73) / 2, m_nImageWidth - 1.0); x++) {
 			if (((m_sTrackingObject.Y - m_sTrackingObject.H / 2) <= y) && (y <= (m_sTrackingObject.Y + m_sTrackingObject.H / 2)) && ((m_sTrackingObject.X - m_sTrackingObject.W / 2) <= x) && (x <= (m_sTrackingObject.X + m_sTrackingObject.W / 2)))
 				continue;
 
@@ -307,13 +305,13 @@ void CObjectTracker::FindHistogramBackground(TRaster32P *frame, float(*backgroun
 void CObjectTracker::FindWeightsBackground(TRaster32P *frame)
 {
 	float small1;
-	float *background = new float[HISTOGRAM_LENGTH];
+	std::unique_ptr<float[]> background(new float[HISTOGRAM_LENGTH]);
 	short i;
 	for (i = 0; i < HISTOGRAM_LENGTH; i++)
 		m_sTrackingObject.weights_background[i] = 0.0;
 
 	//Histogram background
-	FindHistogramBackground(frame, background);
+	FindHistogramBackground(frame, background.get());
 
 	//searce min != 0.0
 	for (i = 0; background[i] == 0.0; i++)
@@ -330,8 +328,6 @@ void CObjectTracker::FindWeightsBackground(TRaster32P *frame)
 		else
 			m_sTrackingObject.weights_background[i] = small1 / background[i];
 	}
-
-	delete[] background;
 }
 
 //--------------------------------------------------------------------------------------------------------
@@ -349,7 +345,7 @@ void CObjectTracker::FindWightsAndCOM(TRaster32P *frame, float(*histogram))
 	float newY = 0.0;
 	ValuePixel pixelValues;
 
-	float *weights = new float[HISTOGRAM_LENGTH];
+	std::unique_ptr<float[]> weights(new float[HISTOGRAM_LENGTH]);
 
 	//weigths
 	for (i = 0; i < HISTOGRAM_LENGTH; i++) {
@@ -360,10 +356,10 @@ void CObjectTracker::FindWightsAndCOM(TRaster32P *frame, float(*histogram))
 	}
 
 	//new location
-	for (y = max(m_sTrackingObject.Y - m_sTrackingObject.H / 2, 0);
-		 y <= min(m_sTrackingObject.Y + m_sTrackingObject.H / 2, m_nImageHeight - 1); y++)
-		for (x = max(m_sTrackingObject.X - m_sTrackingObject.W / 2, 0);
-			 x <= min(m_sTrackingObject.X + m_sTrackingObject.W / 2, m_nImageWidth - 1); x++) {
+	for (y = std::max(m_sTrackingObject.Y - m_sTrackingObject.H / 2, 0);
+		 y <= std::min(m_sTrackingObject.Y + m_sTrackingObject.H / 2, m_nImageHeight - 1); y++)
+		for (x = std::max(m_sTrackingObject.X - m_sTrackingObject.W / 2, 0);
+			 x <= std::min(m_sTrackingObject.X + m_sTrackingObject.W / 2, m_nImageWidth - 1); x++) {
 			E = CheckEdgeExistance(frame, x, y);
 
 			pixelValues = GetPixelValues(frame, x, y);
@@ -388,8 +384,6 @@ void CObjectTracker::FindWightsAndCOM(TRaster32P *frame, float(*histogram))
 		m_sTrackingObject.X = short((newX / sumOfWeights) + 0.5);
 		m_sTrackingObject.Y = short((newY / sumOfWeights) + 0.5);
 	}
-
-	delete[] weights, weights = 0;
 }
 
 //--------------------------------------------------------------------------------------------------------
@@ -461,7 +455,7 @@ void CObjectTracker::FindNextLocation(TRaster32P *frame)
 	float DELTA;
 	double rho, rho1, rho2;
 
-	float *currentHistogram = new float[HISTOGRAM_LENGTH];
+	std::unique_ptr<float[]> currentHistogram(new float[HISTOGRAM_LENGTH]);
 
 	Height = m_sTrackingObject.H;
 	Width = m_sTrackingObject.W;
@@ -485,13 +479,13 @@ void CObjectTracker::FindNextLocation(TRaster32P *frame)
 		yold = m_sTrackingObject.Y;
 
 		//Histogram with bandwidth h
-		FindHistogram(frame, currentHistogram, h);
+		FindHistogram(frame, currentHistogram.get(), h);
 
 		//New location
-		FindWightsAndCOM(frame, currentHistogram);
+		FindWightsAndCOM(frame, currentHistogram.get());
 
 		//Histogram with new location
-		FindHistogram(frame, currentHistogram, h);
+		FindHistogram(frame, currentHistogram.get(), h);
 
 		//Battacharyya coefficient
 		for (i = 0; i < HISTOGRAM_LENGTH; i++)
@@ -504,13 +498,13 @@ void CObjectTracker::FindNextLocation(TRaster32P *frame)
 		//Histogram with bandwidth h-DELTA
 		m_sTrackingObject.H = Height - m_sTrackingObject.var_dim;
 		m_sTrackingObject.W = Width - m_sTrackingObject.var_dim;
-		FindHistogram(frame, currentHistogram, h - DELTA);
+		FindHistogram(frame, currentHistogram.get(), h - DELTA);
 
 		//New location
-		FindWightsAndCOM(frame, currentHistogram);
+		FindWightsAndCOM(frame, currentHistogram.get());
 
 		//Histogram with new location
-		FindHistogram(frame, currentHistogram, h - DELTA);
+		FindHistogram(frame, currentHistogram.get(), h - DELTA);
 
 		//Battacharyya coefficient
 		for (i = 0; i < HISTOGRAM_LENGTH; i++)
@@ -523,13 +517,13 @@ void CObjectTracker::FindNextLocation(TRaster32P *frame)
 		//Histogram with bandwidth h+DELTA
 		m_sTrackingObject.H = Height + m_sTrackingObject.var_dim;
 		m_sTrackingObject.W = Width + m_sTrackingObject.var_dim;
-		FindHistogram(frame, currentHistogram, h + DELTA);
+		FindHistogram(frame, currentHistogram.get(), h + DELTA);
 
 		//New location
-		FindWightsAndCOM(frame, currentHistogram);
+		FindWightsAndCOM(frame, currentHistogram.get());
 
 		//Histogram with new location
-		FindHistogram(frame, currentHistogram, h + DELTA);
+		FindHistogram(frame, currentHistogram.get(), h + DELTA);
 
 		//Battacharyya coefficient
 		for (i = 0; i < HISTOGRAM_LENGTH; i++)
@@ -561,10 +555,10 @@ void CObjectTracker::FindNextLocation(TRaster32P *frame)
 		m_sTrackingObject.Y = yold;
 
 		//Current Histogram
-		FindHistogram(frame, currentHistogram, h);
+		FindHistogram(frame, currentHistogram.get(), h);
 
 		//Definitive new location
-		FindWightsAndCOM(frame, currentHistogram);
+		FindWightsAndCOM(frame, currentHistogram.get());
 
 		//threshold
 		distanza = sqrt(float((xold - m_sTrackingObject.X) * (xold - m_sTrackingObject.X) + (yold - m_sTrackingObject.Y) * (yold - m_sTrackingObject.Y)));
@@ -573,11 +567,9 @@ void CObjectTracker::FindNextLocation(TRaster32P *frame)
 			break;
 	}
 	//New Histogram
-	FindHistogram(frame, currentHistogram, h);
+	FindHistogram(frame, currentHistogram.get(), h);
 	//Update
-	UpdateInitialHistogram(currentHistogram);
-
-	delete[] currentHistogram, currentHistogram = 0;
+	UpdateInitialHistogram(currentHistogram.get());
 }
 
 //--------------------------------------------------------------------------------------------------------
@@ -598,17 +590,12 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 	float dist = 0.0;
 	float min_dist = MAX_FLOAT;
 
-	ValuePixel *pixel_temp;
-	ValuePixel *area_ricerca;
-
 	short u, v, x, y;
 	short u_sup, v_sup;
 	short x_min, y_min;
 	short x_max, y_max;
 	short dimx, dimy;
 	short dimx_int, dimy_int;
-	short *u_att;
-	short *v_att;
 	short ok_u = 0;
 	short ok_v = 0;
 
@@ -622,14 +609,14 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 		}
 	}
 
-	u_att = new short[2 * m_sTrackingObject.dim_temp + 1];
-	v_att = new short[2 * m_sTrackingObject.dim_temp + 1];
+	std::unique_ptr<short[]> u_att(new short[2 * m_sTrackingObject.dim_temp + 1]);
+	std::unique_ptr<short[]> v_att(new short[2 * m_sTrackingObject.dim_temp + 1]);
 
-	x_min = max(m_sTrackingObject.X_temp - m_sTrackingObject.W_temp / 2, 0);
-	y_min = max(m_sTrackingObject.Y_temp - m_sTrackingObject.H_temp / 2, 0);
+	x_min = std::max(m_sTrackingObject.X_temp - m_sTrackingObject.W_temp / 2, 0);
+	y_min = std::max(m_sTrackingObject.Y_temp - m_sTrackingObject.H_temp / 2, 0);
 
-	x_max = min(m_sTrackingObject.X_temp + m_sTrackingObject.W_temp / 2, m_nImageWidth - 1);
-	y_max = min(m_sTrackingObject.Y_temp + m_sTrackingObject.H_temp / 2, m_nImageHeight - 1);
+	x_max = std::min(m_sTrackingObject.X_temp + m_sTrackingObject.W_temp / 2, m_nImageWidth - 1);
+	y_max = std::min(m_sTrackingObject.Y_temp + m_sTrackingObject.H_temp / 2, m_nImageHeight - 1);
 
 	//dimension template
 	dimx = x_max - x_min + 1;
@@ -667,7 +654,7 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 	if ((ok_u > 0) && (ok_v > 0)) {
 
 		//Interpolate template
-		pixel_temp = new ValuePixel[dimx_int * dimy_int];
+		std::unique_ptr<ValuePixel[]> pixel_temp(new ValuePixel[dimx_int * dimy_int]);
 
 		//original value
 		for (int i = 0; i <= (dimx - 1); i++)
@@ -737,7 +724,7 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 		dimx_int_ric = ((dimx + ok_u - 1) * 2 - 1);
 		dimy_int_ric = ((dimy + ok_v - 1) * 2 - 1);
 
-		area_ricerca = new ValuePixel[dimx_int_ric * dimy_int_ric];
+		std::unique_ptr<ValuePixel[]> area_ricerca(new ValuePixel[dimx_int_ric * dimy_int_ric]);
 
 		//Original value
 		for (int i = 0; i <= ((dimx + ok_u - 1) - 1); i++)
@@ -797,7 +784,7 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 
 		unsigned long indt, indc;
 
-		float *mat_dist = new float[(2 * ok_u - 1) * (2 * ok_v - 1)];
+		std::unique_ptr<float[]> mat_dist(new float[(2 * ok_u - 1) * (2 * ok_v - 1)]);
 		float att_dist_cent = MAX_FLOAT;
 		float dist_cent;
 
@@ -953,12 +940,6 @@ float CObjectTracker::Matching(TRaster32P *frame, TRaster32P *frame_temp)
 			m_sTrackingObject.X += u_sup / 2;
 			m_sTrackingObject.Y += v_sup / 2;
 		}
-
-		delete[] area_ricerca;
-		delete[] mat_dist;
-		delete[] pixel_temp;
-		delete[] u_att;
-		delete[] v_att;
 	}
 
 	return min_dist;
@@ -1178,7 +1159,7 @@ bool CObjectTracker::GetInit()
 	return m_initialized;
 }
 
-string CObjectTracker::GetVisibility()
+std::string CObjectTracker::GetVisibility()
 {
 	return m_visible;
 }

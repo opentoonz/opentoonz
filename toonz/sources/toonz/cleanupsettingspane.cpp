@@ -499,7 +499,7 @@ void CleanupSettingsPane::onSaveSettings()
 {
 	/*--- Clueaup保存先を指定していないとエラーを返す ---*/
 	if (m_pathField->getPath().isEmpty()) {
-		MsgBox(WARNING, "Please fill the Save In field.");
+		DVGui::warning("Please fill the Save In field.");
 		return;
 	}
 	CleanupSettingsModel::instance()->promptSave();

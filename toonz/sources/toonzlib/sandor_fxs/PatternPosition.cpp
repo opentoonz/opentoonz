@@ -4,9 +4,11 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #endif
+
+#include <memory>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -180,7 +182,6 @@ void CPatternPosition::makeDDPositions(const int lX, const int lY, UCHAR *sel,
 {
 	const int maxNbDDC = 20;
 	vector<SPOINT> ddc[maxNbDDC];
-	UCHAR *lSel = 0;
 
 	// Checking parameters
 	if (lX <= 0 || lY <= 0 || !sel)
@@ -202,33 +203,29 @@ void CPatternPosition::makeDDPositions(const int lX, const int lY, UCHAR *sel,
 		throw;
 	}
 	// Preparing local selection
-	lSel = new UCHAR[lX * lY];
+	std::unique_ptr<UCHAR[]> lSel(new UCHAR[lX * lY]);
 	if (!lSel) {
 		char s[50];
 		sprintf(s, "in Pattern Position Generation");
 		throw SMemAllocError(s);
 	}
-	memcpy(lSel, sel, lX * lY * sizeof(UCHAR));
+	memcpy(lSel.get(), sel, lX * lY * sizeof(UCHAR));
 
 	SRECT bb;
-	sel0255To01(lX, lY, lSel, bb);
+	sel0255To01(lX, lY, lSel.get(), bb);
 	if (bb.x0 > bb.x1 || bb.y0 > bb.y1) {
-		delete[] lSel;
 		return;
 	}
 
 	try {
 		int x = 0, y = 0;
-		while (findEmptyPos(lX, lY, lSel, x, y, bb)) {
+		while (findEmptyPos(lX, lY, lSel.get(), x, y, bb)) {
 			SPOINT sp = {x, y};
 			m_pos.push_back(sp);
 			int iddc = nbDDC == 1 ? 0 : rand() % nbDDC;
-			eraseCurrentArea(lX, lY, lSel, ddc[iddc], sp.x, sp.y);
+			eraseCurrentArea(lX, lY, lSel.get(), ddc[iddc], sp.x, sp.y);
 		}
-		delete[] lSel;
-
 	} catch (exception) {
-		delete[] lSel;
 		char s[50];
 		sprintf(s, "in Pattern Position Generation");
 		throw SMemAllocError(s);

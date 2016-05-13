@@ -7,7 +7,7 @@
 #include "timage_io.h"
 #include "tproperty.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #pragma warning(disable : 4290)
 #pragma warning(disable : 4251)
@@ -90,7 +90,7 @@ public:
 		VectorLevel
 	};
 
-	static FormatType getFormatType(string extension);
+	static FormatType getFormatType(std::string extension);
 
 	static void define(
 		QString extension,
@@ -113,7 +113,7 @@ private:
 
 //-----------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TLevelReader>;
 #endif
 
@@ -133,7 +133,7 @@ class TPropertyGroup;
 
 typedef TLevelWriter *TLevelWriterCreateProc(const TFilePath &path, TPropertyGroup *);
 
-typedef TPropertyGroup *TWriterInfoCreateProc(const string &ext);
+typedef TPropertyGroup *TWriterInfoCreateProc(const std::string &ext);
 
 //-----------------------------------------------------------
 
@@ -221,7 +221,7 @@ public:
 
 //-----------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TLevelWriter>;
 #endif
 
@@ -238,7 +238,7 @@ public:
 
 //  Some useful utility inlines
 
-inline bool isMovieType(string type)
+inline bool isMovieType(std::string type)
 {
 	return (type == "mov" || type == "avi" || type == "3gp");
 }
@@ -247,7 +247,7 @@ inline bool isMovieType(string type)
 
 inline bool isMovieType(const TFilePath &fp)
 {
-	string type(fp.getType());
+	std::string type(fp.getType());
 	return isMovieType(type);
 }
 

@@ -1,7 +1,7 @@
-
-
 #ifndef XSHEET_INCLUDED
 #define XSHEET_INCLUDED
+
+#include <memory>
 
 // TnzCore includes
 #include "traster.h"
@@ -118,7 +118,7 @@ private:
 	The TXsheetImp struct provides all objects necessary to define the \b TXsheet class.
 */
 	struct TXsheetImp;
-	TXsheetImp *m_imp;
+	std::unique_ptr<TXsheetImp> m_imp;
 	TXshNoteSet *m_notes;
 	SoundProperties *m_soundProperties;
 
@@ -285,7 +285,7 @@ public:
 	\n	This method inserts in \b \e forUndo vector all the inserted cells, it is useful for the undo process.
 	*/
 	bool incrementCells(int r0, int c0, int r1, int c1,
-						vector<std::pair<TRect, TXshCell>> &forUndo);
+						std::vector<std::pair<TRect, TXshCell>> &forUndo);
 	/*! A copy of cells, contained in rect delimited by first row \b \e r0, last row \b \e r1
 		and first column \b \e c0, is made in row cells from \b r1+1 to \b \e upTo. The duplicated
 		cells will be inserted by shifting the other down.
@@ -456,7 +456,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TXsheet>;
 #endif
 typedef TSmartPointerT<TXsheet> TXsheetP;

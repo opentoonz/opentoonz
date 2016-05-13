@@ -50,18 +50,18 @@ class UndoAutoclose : public ToolUtils::TToolUndo
 	VIStroke *m_oldStroke1;
 	VIStroke *m_oldStroke2;
 
-	vector<TFilledRegionInf> *m_fillInformation;
+	std::vector<TFilledRegionInf> *m_fillInformation;
 
 	int m_row;
 	int m_column;
-	vector<int> m_changedStrokes;
+	std::vector<int> m_changedStrokes;
 
 public:
 	VIStroke *m_newStroke;
 	int m_newStrokeId;
 	int m_newStrokePos;
 
-	UndoAutoclose(TXshSimpleLevel *level, const TFrameId &frameId, int pos1, int pos2, vector<TFilledRegionInf> *fillInformation, const vector<int> &changedStrokes)
+	UndoAutoclose(TXshSimpleLevel *level, const TFrameId &frameId, int pos1, int pos2, std::vector<TFilledRegionInf> *fillInformation, const std::vector<int> &changedStrokes)
 		: ToolUtils::TToolUndo(level, frameId), m_oldStroke1(0), m_oldStroke2(0), m_pos1(pos1), m_pos2(pos2), m_newStrokePos(-1), m_fillInformation(fillInformation), m_changedStrokes(changedStrokes)
 	{
 		TVectorImageP image = level->getFrame(m_frameId, true);
@@ -115,7 +115,7 @@ public:
 		if (m_oldStroke2)
 			image->insertStrokeAt(cloneVIStroke(m_oldStroke2), m_pos2);
 
-		image->notifyChangedStrokes(m_changedStrokes, vector<TStroke *>());
+		image->notifyChangedStrokes(m_changedStrokes, std::vector<TStroke *>());
 
 		if (!m_isLastInBlock)
 			return;
@@ -161,7 +161,7 @@ public:
 		VIStroke *stroke = cloneVIStroke(m_newStroke);
 		image->insertStrokeAt(stroke, m_pos1 == -1 ? m_newStrokePos : m_pos1, false);
 
-		image->notifyChangedStrokes(m_changedStrokes, vector<TStroke *>());
+		image->notifyChangedStrokes(m_changedStrokes, std::vector<TStroke *>());
 
 		app->getCurrentXsheet()->notifyXsheetChanged();
 		notifyImageChanged();
@@ -242,11 +242,11 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	bool onPropertyChanged(string propertyName)
+	bool onPropertyChanged(std::string propertyName)
 	{
 		TapeMode = toString(m_mode.getValue());
 		TapeSmooth = (int)(m_smooth.getValue());
-		wstring s = m_type.getValue();
+		std::wstring s = m_type.getValue();
 		if (!s.empty())
 			TapeType = toString(s);
 		TapeJoinStrokes = (int)(m_joinStrokes.getValue());
@@ -473,7 +473,7 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	void joinPointToPoint(const TVectorImageP &vi, vector<TFilledRegionInf> *fillInfo)
+	void joinPointToPoint(const TVectorImageP &vi, std::vector<TFilledRegionInf> *fillInfo)
 	{
 		int minindex = tmin(m_strokeIndex1, m_strokeIndex2);
 		int maxindex = tmax(m_strokeIndex1, m_strokeIndex2);
@@ -484,7 +484,7 @@ public:
 			undo = new UndoPath(getXsheet()->getStageObject(getObjectId())->getSpline());
 		else {
 			TXshSimpleLevel *level = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
-			vector<int> v(1);
+			std::vector<int> v(1);
 			v[0] = minindex;
 			autoCloseUndo = new UndoAutoclose(level, getCurrentFid(), minindex, maxindex, fillInfo, v);
 		}
@@ -506,14 +506,14 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	void joinPointToLine(const TVectorImageP &vi, vector<TFilledRegionInf> *fillInfo)
+	void joinPointToLine(const TVectorImageP &vi, std::vector<TFilledRegionInf> *fillInfo)
 	{
 		TUndo *undo = 0;
 		UndoAutoclose *autoCloseUndo = 0;
 		if (TTool::getApplication()->getCurrentObject()->isSpline())
 			undo = new UndoPath(getXsheet()->getStageObject(getObjectId())->getSpline());
 		else {
-			vector<int> v(2);
+			std::vector<int> v(2);
 			v[0] = m_strokeIndex1;
 			v[1] = m_strokeIndex2;
 			TXshSimpleLevel *level = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
@@ -539,23 +539,23 @@ public:
 
 	//-----------------------------------------------------------------------------
 
-	void joinLineToLine(const TVectorImageP &vi, vector<TFilledRegionInf> *fillInfo)
+	void joinLineToLine(const TVectorImageP &vi, std::vector<TFilledRegionInf> *fillInfo)
 	{
 		if (TTool::getApplication()->getCurrentObject()->isSpline())
-			return; //Caanot add vectros to spline... Spline can be only one vector
+			return; //Caanot add vectros to spline... Spline can be only one std::vector
 
 		TThickPoint p1 = vi->getStroke(m_strokeIndex1)->getThickPoint(m_w1);
 		TThickPoint p2 = vi->getStroke(m_strokeIndex2)->getThickPoint(m_w2);
 
 		UndoAutoclose *autoCloseUndo = 0;
-		vector<int> v(2);
+		std::vector<int> v(2);
 		v[0] = m_strokeIndex1;
 		v[1] = m_strokeIndex2;
 
 		TXshSimpleLevel *level = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
 		autoCloseUndo = new UndoAutoclose(level, getCurrentFid(), -1, -1, fillInfo, v);
 
-		vector<TThickPoint> points(3);
+		std::vector<TThickPoint> points(3);
 		points[0] = p1;
 		points[1] = 0.5 * (p1 + p2);
 		points[2] = p2;
@@ -571,14 +571,14 @@ public:
 		autoCloseUndo->m_newStrokePos = pos;
 		autoCloseUndo->m_newStroke = cloneVIStroke(newStroke);
 		autoCloseUndo->m_newStrokeId = vi->getStroke(pos)->getId();
-		vi->notifyChangedStrokes(v, vector<TStroke *>());
+		vi->notifyChangedStrokes(v, std::vector<TStroke *>());
 		notifyImageChanged();
 		TUndoManager::manager()->add(autoCloseUndo);
 	}
 
 	//-----------------------------------------------------------------------------
 
-	void inline rearrangeClosingPoints(const TVectorImageP &vi, pair<int, double> &closingPoint, const TPointD &p)
+	void inline rearrangeClosingPoints(const TVectorImageP &vi, std::pair<int, double> &closingPoint, const TPointD &p)
 	{
 		int erasedIndex = tmax(m_strokeIndex1, m_strokeIndex2);
 		int joinedIndex = tmin(m_strokeIndex1, m_strokeIndex2);
@@ -601,17 +601,17 @@ public:
 
 	void tapeRect(const TVectorImageP &vi, const TRectD &rect)
 	{
-		vector<TFilledRegionInf> *fillInformation = new vector<TFilledRegionInf>;
+		std::vector<TFilledRegionInf> *fillInformation = new std::vector<TFilledRegionInf>;
 		ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation, rect);
 
 		bool initUndoBlock = false;
 
-		vector<pair<int, double>> startPoints, endPoints;
+		std::vector<std::pair<int, double>> startPoints, endPoints;
 		getClosingPoints(rect, m_autocloseFactor.getValue(), vi, startPoints, endPoints);
 
 		assert(startPoints.size() == endPoints.size());
 
-		vector<TPointD> startP(startPoints.size()), endP(startPoints.size());
+		std::vector<TPointD> startP(startPoints.size()), endP(startPoints.size());
 
 		if (!startPoints.empty()) {
 			TUndoManager::manager()->beginBlock();
@@ -645,7 +645,7 @@ public:
 			TUndoManager::manager()->endBlock();
 	}
 
-	int doTape(const TVectorImageP &vi, vector<TFilledRegionInf> *fillInformation, bool joinStrokes)
+	int doTape(const TVectorImageP &vi, std::vector<TFilledRegionInf> *fillInformation, bool joinStrokes)
 	{
 		int type;
 		if (!joinStrokes)
@@ -694,7 +694,7 @@ public:
 		}
 		QMutexLocker lock(vi->getMutex());
 		m_secondPoint = false;
-		vector<TFilledRegionInf> *fillInformation = new vector<TFilledRegionInf>;
+		std::vector<TFilledRegionInf> *fillInformation = new std::vector<TFilledRegionInf>;
 		ImageUtils::getFillingInformationOverlappingArea(vi, *fillInformation, vi->getStroke(m_strokeIndex1)->getBBox() +
 																				   vi->getStroke(m_strokeIndex2)->getBBox());
 
@@ -728,7 +728,7 @@ public:
 		if (!m_firstTime)
 			return;
 
-		wstring s = toWideString(TapeMode.getValue());
+		std::wstring s = toWideString(TapeMode.getValue());
 		if (s != L"")
 			m_mode.setValue(s);
 		s = toWideString(TapeType.getValue());

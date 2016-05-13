@@ -540,14 +540,14 @@ public:
 
 class RemoveColumnsUndo : public TUndo
 {
-	vector<TFx *> m_deletedFx;
-	vector<TFx *> m_terminalFx;
+	std::vector<TFx *> m_deletedFx;
+	std::vector<TFx *> m_terminalFx;
 	QMap<TStageObjectId, QList<TFxPort *>> m_columnFxConnections;
 	QList<TFx *> m_notTerminalColumns;
 	TXsheetHandle *m_xshHandle;
 
 public:
-	RemoveColumnsUndo(const vector<TFx *> &deletedFx, const vector<TFx *> &terminalFx,
+	RemoveColumnsUndo(const std::vector<TFx *> &deletedFx, const std::vector<TFx *> &terminalFx,
 					  const QMap<TStageObjectId, QList<TFxPort *>> columnFxConnections,
 					  const QList<TFx *> &notTerminalColumns,
 					  TXsheetHandle *xshHandle)
@@ -699,7 +699,7 @@ class UndoUngroup : public TUndo
 	QList<TStageObjectId> m_objsId;
 	QList<int> m_positions;
 	int m_groupId;
-	wstring m_groupName;
+	std::wstring m_groupName;
 	TXsheetHandle *m_xshHandle;
 
 public:
@@ -773,13 +773,13 @@ class UndoRenameGroup : public TUndo
 {
 	QList<TStageObject *> m_objs;
 	QList<int> m_positions;
-	wstring m_oldGroupName;
-	wstring m_newGroupName;
+	std::wstring m_oldGroupName;
+	std::wstring m_newGroupName;
 	TXsheetHandle *m_xshHandle;
 
 public:
 	UndoRenameGroup(const QList<TStageObject *> &objs, const QList<int> &positions,
-					const wstring &newName, const wstring &oldName, TXsheetHandle *xshHandle)
+					const std::wstring &newName, const std::wstring &oldName, TXsheetHandle *xshHandle)
 		: m_objs(objs), m_newGroupName(newName), m_oldGroupName(oldName), m_xshHandle(xshHandle), m_positions(positions)
 	{
 		assert(objs.size() > 0);
@@ -979,7 +979,7 @@ void removeColums(const QVector<int> &columnIndexes, TXsheetHandle *xshHandle,
 		int j, outputPortCount = fx->getOutputConnectionCount();
 		for (j = outputPortCount - 1; j >= 0; j--) {
 			TFxPort *port = fx->getOutputConnection(j);
-			vector<TFx *>::iterator it = std::find(fxsToKill.begin(), fxsToKill.end(), port->getOwnerFx());
+			std::vector<TFx *>::iterator it = std::find(fxsToKill.begin(), fxsToKill.end(), port->getOwnerFx());
 			std::set<TFx *>::iterator it2 = std::find(leafesFx.begin(), leafesFx.end(), port->getFx());
 			if (it == fxsToKill.end() && it2 == leafesFx.end())
 				port->setFx(0);
@@ -1122,17 +1122,17 @@ public:
 
 //-------------------------------------------------------------------
 
-class StageObjectRenameUndo : public SetAttributeUndo<string>
+class StageObjectRenameUndo : public SetAttributeUndo<std::string>
 {
 public:
-	StageObjectRenameUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, string oldName, string newName)
-		: SetAttributeUndo<string>(id, xshHandle, oldName, newName) {}
-	void setAttribute(TStageObject *pegbar, string name) const { pegbar->setName(name); }
+	StageObjectRenameUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, std::string oldName, std::string newName)
+		: SetAttributeUndo<std::string>(id, xshHandle, oldName, newName) {}
+	void setAttribute(TStageObject *pegbar, std::string name) const { pegbar->setName(name); }
 	QString getActionName()
 	{
 		return QString("Rename Object");
 	}
-	QString getStringFromValue(string value)
+	QString getStringFromValue(std::string value)
 	{
 		return QString::fromStdString(value);
 	}
@@ -1179,23 +1179,23 @@ public:
 
 //-------------------------------------------------------------------
 
-class SetHandleUndo : public SetAttributeUndo<string>
+class SetHandleUndo : public SetAttributeUndo<std::string>
 {
 	TPointD m_center, m_offset;
 	TXsheetHandle *m_xshHandle;
 
 public:
-	SetHandleUndo(const TStageObjectId &id, string oldHandle, string newHandle, TXsheetHandle *xshHandle)
-		: SetAttributeUndo<string>(id, xshHandle, oldHandle, newHandle), m_xshHandle(xshHandle)
+	SetHandleUndo(const TStageObjectId &id, std::string oldHandle, std::string newHandle, TXsheetHandle *xshHandle)
+		: SetAttributeUndo<std::string>(id, xshHandle, oldHandle, newHandle), m_xshHandle(xshHandle)
 	{
 		TStageObject *pegbar = getStageObject();
 		if (pegbar)
 			pegbar->getCenterAndOffset(m_center, m_offset);
 	}
-	void setAttribute(TStageObject *pegbar, string handle) const { pegbar->setHandle(handle); }
+	void setAttribute(TStageObject *pegbar, std::string handle) const { pegbar->setHandle(handle); }
 	void undo() const
 	{
-		SetAttributeUndo<string>::undo();
+		SetAttributeUndo<std::string>::undo();
 		TStageObject *pegbar = getStageObject();
 		if (pegbar)
 			pegbar->setCenterAndOffset(m_center, m_offset);
@@ -1205,7 +1205,7 @@ public:
 	{
 		return QString("Set Handle");
 	}
-	QString getStringFromValue(string value)
+	QString getStringFromValue(std::string value)
 	{
 		return QString::fromStdString(value);
 	}
@@ -1213,17 +1213,17 @@ public:
 
 //-------------------------------------------------------------------
 
-class SetParentHandleUndo : public SetAttributeUndo<string>
+class SetParentHandleUndo : public SetAttributeUndo<std::string>
 {
 public:
-	SetParentHandleUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, string oldHandle, string newHandle)
-		: SetAttributeUndo<string>(id, xshHandle, oldHandle, newHandle) {}
-	void setAttribute(TStageObject *pegbar, string handle) const { pegbar->setParentHandle(handle); }
+	SetParentHandleUndo(const TStageObjectId &id, TXsheetHandle *xshHandle, std::string oldHandle, std::string newHandle)
+		: SetAttributeUndo<std::string>(id, xshHandle, oldHandle, newHandle) {}
+	void setAttribute(TStageObject *pegbar, std::string handle) const { pegbar->setParentHandle(handle); }
 	QString getActionName()
 	{
 		return QString("Set Parent Handle");
 	}
-	QString getStringFromValue(string value)
+	QString getStringFromValue(std::string value)
 	{
 		return QString::fromStdString(value);
 	}
@@ -1231,15 +1231,15 @@ public:
 
 //-------------------------------------------------------------------
 
-typedef std::pair<TStageObjectId, string> ParentIdAndHandle;
+typedef std::pair<TStageObjectId, std::string> ParentIdAndHandle;
 
 class SetParentUndo : public SetAttributeUndo<ParentIdAndHandle>
 {
 public:
 	SetParentUndo(
 		const TStageObjectId &id, TXsheetHandle *xshHandle,
-		TStageObjectId oldParentId, string oldParentHandle,
-		TStageObjectId newParentId, string newParentHandle)
+		TStageObjectId oldParentId, std::string oldParentHandle,
+		TStageObjectId newParentId, std::string newParentHandle)
 		: SetAttributeUndo<ParentIdAndHandle>(id, xshHandle,
 											  ParentIdAndHandle(oldParentId, oldParentHandle),
 											  ParentIdAndHandle(newParentId, newParentHandle)) {}
@@ -1346,12 +1346,12 @@ public:
 //
 //-------------------------------------------------------------------
 
-void TStageObjectCmd::rename(const TStageObjectId &id, string name, TXsheetHandle *xshHandle)
+void TStageObjectCmd::rename(const TStageObjectId &id, std::string name, TXsheetHandle *xshHandle)
 {
 	TStageObject *pegbar = xshHandle->getXsheet()->getStageObject(id);
 	if (!pegbar)
 		return;
-	string oldName = pegbar->getName();
+	std::string oldName = pegbar->getName();
 	if (oldName == name)
 		return;
 	pegbar->setName(name);
@@ -1415,12 +1415,12 @@ void TStageObjectCmd::resetPosition(const TStageObjectId &id, TXsheetHandle *xsh
 //
 //-------------------------------------------------------------------
 
-void TStageObjectCmd::setHandle(const TStageObjectId &id, string handle, TXsheetHandle *xshHandle)
+void TStageObjectCmd::setHandle(const TStageObjectId &id, std::string handle, TXsheetHandle *xshHandle)
 {
 	TStageObject *peg = xshHandle->getXsheet()->getStageObject(id);
 	if (!peg)
 		return;
-	string oldHandle = peg->getHandle();
+	std::string oldHandle = peg->getHandle();
 	TUndoManager::manager()->add(new SetHandleUndo(id, oldHandle, handle, xshHandle));
 	peg->setHandle(handle);
 }
@@ -1431,14 +1431,14 @@ void TStageObjectCmd::setHandle(const TStageObjectId &id, string handle, TXsheet
 //
 //-------------------------------------------------------------------
 
-void TStageObjectCmd::setParentHandle(const std::vector<TStageObjectId> &ids, string handle, TXsheetHandle *xshHandle)
+void TStageObjectCmd::setParentHandle(const std::vector<TStageObjectId> &ids, std::string handle, TXsheetHandle *xshHandle)
 {
 	for (int i = 0; i < (int)ids.size(); i++) {
 		TStageObjectId id = ids[i];
 		TStageObject *peg = xshHandle->getXsheet()->getStageObject(id);
 		if (!peg)
 			continue;
-		string oldHandle = peg->getParentHandle();
+		std::string oldHandle = peg->getParentHandle();
 		peg->setParentHandle(handle);
 		TUndoManager::manager()->add(new SetParentHandleUndo(id, xshHandle, oldHandle, handle));
 	}
@@ -1453,7 +1453,7 @@ void TStageObjectCmd::setParentHandle(const std::vector<TStageObjectId> &ids, st
 void TStageObjectCmd::setParent(
 	const TStageObjectId &id,
 	TStageObjectId parentId,
-	string parentHandle,
+	std::string parentHandle,
 	TXsheetHandle *xshHandle, bool doUndo)
 {
 	if (parentId == TStageObjectId::NoneId) {
@@ -1467,7 +1467,7 @@ void TStageObjectCmd::setParent(
 	if (!stageObject)
 		return;
 	TStageObjectId oldParentId = stageObject->getParent();
-	string oldParentHandle;
+	std::string oldParentHandle;
 	if (oldParentId != TStageObjectId::NoneId)
 		oldParentHandle = stageObject->getParentHandle();
 
@@ -1737,9 +1737,9 @@ void TStageObjectCmd::ungroup(int groupId, TXsheetHandle *xshHandle)
 //
 //-------------------------------------------------------------------
 
-void TStageObjectCmd::renameGroup(const QList<TStageObject *> objs, const wstring &name, bool fromEditor, TXsheetHandle *xshHandle)
+void TStageObjectCmd::renameGroup(const QList<TStageObject *> objs, const std::wstring &name, bool fromEditor, TXsheetHandle *xshHandle)
 {
-	wstring oldName;
+	std::wstring oldName;
 	TStageObjectTree *pegTree = xshHandle->getXsheet()->getStageObjectTree();
 	QList<int> positions;
 	int i;

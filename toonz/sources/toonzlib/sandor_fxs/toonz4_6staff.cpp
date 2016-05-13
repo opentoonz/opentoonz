@@ -5,7 +5,7 @@
 #include "tconvert.h"
 #include "toonz4.6/toonz.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #endif
 //---------------------------------------------------------------------
@@ -43,7 +43,7 @@ const char *strsave(const char *t)
 
 void convertParam(double param[], const char *cParam[], int cParamLen)
 {
-	string app;
+	std::string app;
 	for (int i = 1; i < 12; i++) {
 		app = toString(param[i]);
 		cParam[i] = strsave(app.c_str());

@@ -1,6 +1,6 @@
 
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #include "windows.h"
 #endif
@@ -56,7 +56,7 @@ void calligraphUC(const RASTER *inr, RASTER *outr, CCallParam &par,
 			fSize = D_CUT(fSize, 1.0, 20.0);
 			//			CSDirection dir(ipUC.m_lX,ipUC.m_lY,ipUC.m_sel,I_ROUND(fSize));
 			// Only on border (thickness of border is 3 )
-			CSDirection dir(ipUC.m_lX, ipUC.m_lY, ipUC.m_sel, I_ROUND(fSize), 3);
+			CSDirection dir(ipUC.m_lX, ipUC.m_lY, ipUC.m_sel.get(), I_ROUND(fSize), 3);
 			dir.doDir();
 
 			// Calculation of 'RADIUS MAP' based on the 'DIRECTION MAP'
@@ -65,7 +65,7 @@ void calligraphUC(const RASTER *inr, RASTER *outr, CCallParam &par,
 			fSize = D_CUT(fSize, 1.0, 10.0);
 			;
 			dir.doRadius(par.m_rH, par.m_rLR, par.m_rV, par.m_rRL, I_ROUND(fSize));
-			dir.getResult(ipUC.m_sel);
+			dir.getResult(ipUC.m_sel.get());
 
 			// Draws the circles
 			CCallCircle cc(par.m_thickness);
@@ -105,7 +105,7 @@ void calligraphUS(const RASTER *inr, RASTER *outr, CCallParam &par,
 			fSize = D_CUT(fSize, 1.0, 20.0);
 			//			CSDirection dir(ipUS.m_lX,ipUS.m_lY,ipUS.m_sel,I_ROUND(fSize));
 			// Only on border (thickness of border is 3 )
-			CSDirection dir(ipUS.m_lX, ipUS.m_lY, ipUS.m_sel, I_ROUND(fSize), 3);
+			CSDirection dir(ipUS.m_lX, ipUS.m_lY, ipUS.m_sel.get(), I_ROUND(fSize), 3);
 			dir.doDir();
 
 			// Calculation of 'RADIUS MAP' based on the 'DIRECTION MAP'
@@ -114,7 +114,7 @@ void calligraphUS(const RASTER *inr, RASTER *outr, CCallParam &par,
 			fSize = D_CUT(fSize, 1.0, 10.0);
 			;
 			dir.doRadius(par.m_rH, par.m_rLR, par.m_rV, par.m_rRL, I_ROUND(fSize));
-			dir.getResult(ipUS.m_sel);
+			dir.getResult(ipUS.m_sel.get());
 
 			// Draws the circles
 			CCallCircle cc(par.m_thickness);

@@ -12,8 +12,6 @@
 class QPushButton;
 class ShortcutItem;
 
-using namespace DVGui;
-
 //=============================================================================
 // ShortcutViewer
 // --------------
@@ -81,7 +79,7 @@ signals:
 // Questo e' il popup che l'utente utilizza per modificare gli shortcut
 //-----------------------------------------------------------------------------
 
-class ShortcutPopup : public Dialog
+class ShortcutPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 	QPushButton *m_removeBtn;

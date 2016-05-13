@@ -1,7 +1,7 @@
-
-
 #ifndef _TAUTOCLOSE_H_
 #define _TAUTOCLOSE_H_
+
+#include <memory>
 
 #include "tgeometry.h"
 #include "traster.h"
@@ -28,14 +28,14 @@ public:
 	void exec();
 
 	// non modifica il raster. Si limita a calcolare i segmenti
-	void compute(vector<Segment> &segments);
+	void compute(std::vector<Segment> &segments);
 
 	// disegna sul raster i segmenti
-	void draw(const vector<Segment> &segments);
+	void draw(const std::vector<Segment> &segments);
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 	//not implemented
 	TAutocloser();

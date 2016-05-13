@@ -28,6 +28,7 @@
 #include "toonz/txshcolumn.h"
 #include "toonz/tstageobjectspline.h"
 #include "toonz/tstageobjectid.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
 #include "tvectorimage.h"
@@ -74,7 +75,7 @@ void onShowHideSelectObject(QAction *action)
 	}
 }
 
-int addShowHideStageObjectCmds(const vector<int> &columnIndexes, QMenu *menu, bool isShow)
+int addShowHideStageObjectCmds(const std::vector<int> &columnIndexes, QMenu *menu, bool isShow)
 {
 	int ii, columnIndex = -1;
 	bool flag = true;
@@ -163,7 +164,7 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
 
 // onion skin
 #ifndef STUDENT
-	if (!parent->isPreviewEnabled())
+	if (Preferences::instance()->isOnionSkinEnabled() && !parent->isPreviewEnabled())
 		OnioniSkinMaskGUI::addOnionSkinCommand(this);
 #endif
 

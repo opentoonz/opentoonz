@@ -54,7 +54,7 @@ TPropertyGroup *TPropertyGroup::clone() const
 
 void TPropertyGroup::add(TProperty *p)
 {
-	string name = p->getName();
+	std::string name = p->getName();
 	assert(m_table.find(name) == m_table.end());
 	m_properties.push_back(std::make_pair(p, true));
 	m_table[name] = p;
@@ -62,13 +62,13 @@ void TPropertyGroup::add(TProperty *p)
 
 void TPropertyGroup::bind(TProperty &p)
 {
-	string name = p.getName();
+	std::string name = p.getName();
 	assert(m_table.find(name) == m_table.end());
 	m_properties.push_back(std::make_pair(&p, false));
 	m_table[name] = &p;
 }
 
-TProperty *TPropertyGroup::getProperty(string name)
+TProperty *TPropertyGroup::getProperty(std::string name)
 {
 	PropertyTable::iterator i = m_table.find(name);
 	if (i == m_table.end())
@@ -134,7 +134,7 @@ public:
 
 	void visit(TDoubleProperty *p)
 	{
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["type"] = "double";
 		attr["name"] = p->getName();
 		attr["min"] = toString(p->getRange().first);
@@ -144,7 +144,7 @@ public:
 	}
 	void visit(TDoublePairProperty *p)
 	{
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["type"] = "pair";
 		attr["name"] = p->getName();
 		attr["min"] = toString(p->getRange().first);
@@ -155,7 +155,7 @@ public:
 	}
 	void visit(TIntPairProperty *p)
 	{
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["type"] = "pair";
 		attr["name"] = p->getName();
 		attr["min"] = toString(p->getRange().first);
@@ -166,7 +166,7 @@ public:
 	}
 	void visit(TIntProperty *p)
 	{
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["type"] = "int";
 		attr["name"] = p->getName();
 		attr["min"] = toString(p->getRange().first);
@@ -176,7 +176,7 @@ public:
 	}
 	void visit(TBoolProperty *p)
 	{
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["type"] = "bool";
 		attr["name"] = p->getName();
 		attr["value"] = p->getValue() ? "true" : "false";
@@ -184,7 +184,7 @@ public:
 	}
 	void visit(TStringProperty *p)
 	{
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["type"] = "string";
 		attr["name"] = p->getName();
 		attr["value"] = toString(p->getValue());
@@ -193,7 +193,7 @@ public:
 
 	void visit(TStyleIndexProperty *p)
 	{
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["type"] = "string";
 		attr["name"] = p->getName();
 		attr["value"] = p->getValueAsString();
@@ -202,13 +202,13 @@ public:
 
 	void visit(TEnumProperty *p)
 	{
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["type"] = "enum";
 		attr["name"] = p->getName();
 		attr["value"] = toString(p->getValue());
 		if (TEnumProperty::isRangeSavingEnabled()) {
 			m_os.openChild("property", attr);
-			std::vector<wstring> range = p->getRange();
+			std::vector<std::wstring> range = p->getRange();
 			for (int i = 0; i < (int)range.size(); i++) {
 				attr.clear();
 				attr["value"] = toString(range[i]);
@@ -220,7 +220,7 @@ public:
 	}
 	void visit(TPointerProperty *p)
 	{
-		std::map<string, string> attr;
+		std::map<std::string, std::string> attr;
 		attr["type"] = "pointer";
 		attr["name"] = p->getName();
 		attr["value"] = p->getValueAsString();
@@ -236,12 +236,12 @@ void TPropertyGroup::loadData(TIStream &is)
 			delete it->first;
 	m_properties.clear();
 	m_table.clear();
-	string tagName;
+	std::string tagName;
 	while (is.matchTag(tagName)) {
 		if (tagName == "property") {
-			string name = is.getTagAttribute("name");
-			string type = is.getTagAttribute("type");
-			string svalue = is.getTagAttribute("value");
+			std::string name = is.getTagAttribute("name");
+			std::string type = is.getTagAttribute("type");
+			std::string svalue = is.getTagAttribute("value");
 			if (name == "")
 				throw TException("missing property name");
 			if (type == "")
@@ -258,7 +258,7 @@ void TPropertyGroup::loadData(TIStream &is)
 				double max = toDouble(is.getTagAttribute("max"));
 				TDoublePairProperty::Value v(0, 0);
 				int i = svalue.find(' ');
-				if (i != (int)string::npos) {
+				if (i != (int)std::string::npos) {
 					v.first = toDouble(svalue.substr(0, i));
 					v.second = toDouble(svalue.substr(i + 1));
 				}
@@ -280,7 +280,7 @@ void TPropertyGroup::loadData(TIStream &is)
 				else {
 					while (is.matchTag(tagName)) {
 						if (tagName == "item") {
-							string item = is.getTagAttribute("value");
+							std::string item = is.getTagAttribute("value");
 							p->addValue(toWideString(item));
 						} else
 							throw TException("expected range property <item>");

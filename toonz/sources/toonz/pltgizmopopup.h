@@ -8,8 +8,6 @@
 #include "toonzqt/doublefield.h"
 #include "toonzqt/colorfield.h"
 
-using namespace DVGui;
-
 //=============================================================================
 // ValueAdjuster
 //-----------------------------------------------------------------------------
@@ -18,7 +16,7 @@ class ValueAdjuster : public QWidget
 {
 	Q_OBJECT
 
-	DoubleLineEdit *m_valueLineEdit;
+	DVGui::DoubleLineEdit *m_valueLineEdit;
 
 public:
 #if QT_VERSION >= 0x050500
@@ -44,7 +42,7 @@ class ValueShifter : public QWidget
 {
 	Q_OBJECT
 
-	DoubleLineEdit *m_valueLineEdit;
+	DVGui::DoubleLineEdit *m_valueLineEdit;
 
 public:
 #if QT_VERSION >= 0x050500
@@ -72,7 +70,7 @@ class ColorFader : public QWidget
 {
 	Q_OBJECT
 
-	DoubleLineEdit *m_valueLineEdit;
+	DVGui::DoubleLineEdit *m_valueLineEdit;
 
 public:
 #if QT_VERSION >= 0x050500
@@ -93,11 +91,11 @@ signals:
 // PltGizmoPopup
 //-----------------------------------------------------------------------------
 
-class PltGizmoPopup : public Dialog
+class PltGizmoPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
-	ColorField *m_colorFld;
+	DVGui::ColorField *m_colorFld;
 
 public:
 	PltGizmoPopup();

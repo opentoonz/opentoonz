@@ -841,7 +841,7 @@ void TPassiveCacheManager::invalidateLevel(const std::string &levelName)
 		std::set<LockedResourceP> &resources = *it;
 		std::set<LockedResourceP>::iterator jt, kt;
 		for (jt = resources.begin(); jt != resources.end();) {
-			if ((*jt)->getName().find(levelName) != string::npos) {
+			if ((*jt)->getName().find(levelName) != std::string::npos) {
 				kt = jt++;
 				it->erase(kt);
 			} else
@@ -935,7 +935,7 @@ void TPassiveCacheManager::onXsheetChanged()
 //-------------------------------------------------------------------------
 
 void TPassiveCacheManager::getResource(
-	TCacheResourceP &resource, const string &alias,
+	TCacheResourceP &resource, const std::string &alias,
 	const TFxP &fx, double frame, const TRenderSettings &rs,
 	ResourceDeclaration *resData)
 {

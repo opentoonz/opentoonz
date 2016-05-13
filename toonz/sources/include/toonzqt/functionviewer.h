@@ -105,7 +105,7 @@ public:
 signals:
 
 	void curveChanged();
-	void curveIo(int type, TDoubleParam *curve, const string &name);
+	void curveIo(int type, TDoubleParam *curve, const std::string &name);
 	void editObject();
 
 public slots:
@@ -161,7 +161,7 @@ private:
 
 public:												 //  :(
 	void emitCurveChanged() { emit curveChanged(); } //!< \deprecated  Should not be public.
-	void emitIoCurve(int type, TDoubleParam *curve, const string &name)
+	void emitIoCurve(int type, TDoubleParam *curve, const std::string &name)
 	{
 		emit curveIo(type, curve, name);
 	} //!< \deprecated  Should not be public.

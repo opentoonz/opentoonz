@@ -14,8 +14,8 @@
  */
 template <class T>
 void forwardDifferences(
-	const vector<T> &coeff,
-	vector<T> &diffs)
+	const std::vector<T> &coeff,
+	std::vector<T> &diffs)
 {
 	diffs.clear();
 
@@ -41,8 +41,8 @@ void forwardDifferences(
   \note coeffs are ordered from smaller b[0] to greater b[size-1] .
  */
 template <class T>
-void bezier2poly(const vector<T> &bez,
-				 vector<T> &coeff)
+void bezier2poly(const std::vector<T> &bez,
+				 std::vector<T> &coeff)
 {
 	forwardDifferences(bez, coeff); // compute forward differences
 									// and store them in coeff.
@@ -72,8 +72,8 @@ void bezier2poly(const vector<T> &bez,
   \note coeffs are ordered from smaller b[0] to greater b[size-1].
  */
 template <class T>
-void poly2bezier(const vector<T> &poly,
-				 vector<T> &bez)
+void poly2bezier(const std::vector<T> &poly,
+				 std::vector<T> &bez)
 {
 	UINT n = poly.size();
 

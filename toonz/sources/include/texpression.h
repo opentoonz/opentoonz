@@ -1,7 +1,7 @@
-
-
 #ifndef TEXPRESSION_INCLUDED
 #define TEXPRESSION_INCLUDED
+
+#include <memory>
 
 // TnzCore includes
 #include "tcommon.h"
@@ -47,7 +47,7 @@ class Calculator;
 class DVAPI TExpression
 {
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	TExpression();
@@ -65,7 +65,7 @@ public:
     and grammar-recognized patterns that is able to calculate the
     expression's value at a given frame.
   */
-	void setText(string text);
+	void setText(std::string text);
 	std::string getText() const;
 
 	TSyntax::Calculator *getCalculator();

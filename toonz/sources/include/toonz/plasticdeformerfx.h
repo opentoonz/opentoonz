@@ -42,13 +42,13 @@ public:
 
 	bool canHandle(const TRenderSettings &info, double frame);
 
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 	bool doGetBBox(double frame, TRectD &bbox, const TRenderSettings &info);
 
 	void doCompute(TTile &tile, double frame, const TRenderSettings &info);
 	void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info);
 
-	string getPluginId() const { return string(); }
+	std::string getPluginId() const { return std::string(); }
 
 private:
 	void buildRenderSettings(double, TRenderSettings &);

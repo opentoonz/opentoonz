@@ -42,7 +42,7 @@ public:
 //===================================================================
 
 template <typename PIXEL, typename T>
-void my_compute_lut(double contrast, double brightness, vector<T> &lut)
+void my_compute_lut(double contrast, double brightness, std::vector<T> &lut)
 {
 	int i;
 	double value, nvalue, power;
@@ -94,7 +94,7 @@ void doBrightnessContrast(TRasterPT<PIXEL> ras, double contrast, double brightne
 	int lx = ras->getLx();
 	int ly = ras->getLy();
 
-	vector<CHANNEL_TYPE> lut(PIXEL::maxChannelValue + 1);
+	std::vector<CHANNEL_TYPE> lut(PIXEL::maxChannelValue + 1);
 	my_compute_lut<PIXEL, CHANNEL_TYPE>(contrast, brightness, lut);
 
 	int j;

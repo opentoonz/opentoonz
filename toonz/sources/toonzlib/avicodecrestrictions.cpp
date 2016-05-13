@@ -8,7 +8,7 @@
 namespace
 {
 
-HIC getCodec(const wstring &codecName, int &bpp)
+HIC getCodec(const std::wstring &codecName, int &bpp)
 {
 	HIC hic = 0;
 	ICINFO icinfo;
@@ -35,8 +35,8 @@ HIC getCodec(const wstring &codecName, int &bpp)
 			WideCharToMultiByte(CP_ACP, 0, icinfo.szDescription, -1, descr, sizeof(descr), 0, 0);
 			WideCharToMultiByte(CP_ACP, 0, icinfo.szName, -1, name, sizeof(name), 0, 0);
 
-			string compressorName;
-			compressorName = string(name) + " '" + toString(bpp) + "' " + string(descr);
+			std::string compressorName;
+			compressorName = std::string(name) + " '" + toString(bpp) + "' " + std::string(descr);
 
 			if (hic) {
 				if (ICCompressQuery(hic, &inFmt, NULL) != ICERR_OK) {
@@ -80,7 +80,7 @@ bool canWork(const HIC &hic, const TDimension &resolution, int bpp)
 
 //-----------------------------------------------------------------------------
 
-void AviCodecRestrictions::getRestrictions(const wstring &codecName, QString &restrictions)
+void AviCodecRestrictions::getRestrictions(const std::wstring &codecName, QString &restrictions)
 {
 	restrictions.clear();
 	if (codecName == L"Uncompressed") {
@@ -145,7 +145,7 @@ void AviCodecRestrictions::getRestrictions(const wstring &codecName, QString &re
 
 //-----------------------------------------------------------------------------
 
-bool AviCodecRestrictions::canWriteMovie(const wstring &codecName, const TDimension &resolution)
+bool AviCodecRestrictions::canWriteMovie(const std::wstring &codecName, const TDimension &resolution)
 {
 	if (codecName == L"Uncompressed") {
 		return true;
@@ -164,7 +164,7 @@ bool AviCodecRestrictions::canWriteMovie(const wstring &codecName, const TDimens
 
 //-----------------------------------------------------------------------------
 
-bool AviCodecRestrictions::canBeConfigured(const wstring &codecName)
+bool AviCodecRestrictions::canBeConfigured(const std::wstring &codecName)
 {
 	if (codecName == L"Uncompressed")
 		return false;
@@ -182,7 +182,7 @@ bool AviCodecRestrictions::canBeConfigured(const wstring &codecName)
 
 //-----------------------------------------------------------------------------
 
-void AviCodecRestrictions::openConfiguration(const wstring &codecName, void *winId)
+void AviCodecRestrictions::openConfiguration(const std::wstring &codecName, void *winId)
 {
 	if (codecName == L"Uncompressed")
 		return;
@@ -199,9 +199,9 @@ void AviCodecRestrictions::openConfiguration(const wstring &codecName, void *win
 
 //-----------------------------------------------------------------------------
 
-QMap<wstring, bool> AviCodecRestrictions::getUsableCodecs(const TDimension &resolution)
+QMap<std::wstring, bool> AviCodecRestrictions::getUsableCodecs(const TDimension &resolution)
 {
-	QMap<wstring, bool> codecs;
+	QMap<std::wstring, bool> codecs;
 
 	HIC hic = 0;
 	ICINFO icinfo;
@@ -228,8 +228,8 @@ QMap<wstring, bool> AviCodecRestrictions::getUsableCodecs(const TDimension &reso
 			WideCharToMultiByte(CP_ACP, 0, icinfo.szDescription, -1, descr, sizeof(descr), 0, 0);
 			WideCharToMultiByte(CP_ACP, 0, icinfo.szName, -1, name, sizeof(name), 0, 0);
 
-			wstring compressorName;
-			compressorName = toWideString(string(name) + " '" + toString(bpp) + "' " + string(descr));
+			std::wstring compressorName;
+			compressorName = toWideString(std::string(name) + " '" + toString(bpp) + "' " + std::string(descr));
 
 			if (hic) {
 				if (ICCompressQuery(hic, &inFmt, NULL) != ICERR_OK) {

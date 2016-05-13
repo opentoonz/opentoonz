@@ -42,16 +42,16 @@ QPixmap getMsgBoxPixmap(MsgType type)
 	QIcon msgBoxIcon;
 
 	switch (type) {
-	case INFORMATION:
+	case DVGui::INFORMATION:
 		msgBoxIcon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation);
 		break;
-	case WARNING:
+	case DVGui::WARNING:
 		msgBoxIcon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning);
 		break;
-	case CRITICAL:
+	case DVGui::CRITICAL:
 		msgBoxIcon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxCritical);
 		break;
-	case QUESTION:
+	case DVGui::QUESTION:
 		msgBoxIcon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxQuestion);
 		break;
 	default:
@@ -70,16 +70,16 @@ QString getMsgBoxTitle(MsgType type)
 	QString title = DialogTitle + " - ";
 
 	switch (type) {
-	case INFORMATION:
+	case DVGui::INFORMATION:
 		title.append(QObject::tr("Information"));
 		break;
-	case WARNING:
+	case DVGui::WARNING:
 		title.append(QObject::tr("Warning"));
 		break;
-	case CRITICAL:
+	case DVGui::CRITICAL:
 		title.append(QObject::tr("Critical"));
 		break;
-	case QUESTION:
+	case DVGui::QUESTION:
 		title.append(QObject::tr("Question"));
 		break;
 	default:
@@ -781,7 +781,7 @@ int DVGui::RadioButtonMsgBox(MsgType type, const QString &labelText,
 							 const QList<QString> &radioButtonList, QWidget *parent)
 {
 	RadioButtonDialog *dialog = new RadioButtonDialog(labelText, radioButtonList, parent);
-	QString msgBoxTitle = getMsgBoxTitle(WARNING);
+	QString msgBoxTitle = getMsgBoxTitle(DVGui::WARNING);
 	dialog->setWindowTitle(msgBoxTitle);
 	return dialog->exec();
 }
@@ -1086,7 +1086,7 @@ int DVGui::MsgBox(const QString &text,
 	std::vector<QString> buttons;
 	buttons.push_back(button1);
 	buttons.push_back(button2);
-	return MsgBox(QUESTION, text, buttons, defaultButtonIndex, parent);
+	return DVGui::MsgBox(DVGui::QUESTION, text, buttons, defaultButtonIndex, parent);
 }
 
 //-----------------------------------------------------------------------------
@@ -1201,7 +1201,7 @@ bool isStyleIdInPalette(int styleId, const TPalette *palette)
 int DVGui::eraseStylesInDemand(TPalette *palette, const TXsheetHandle *xsheetHandle, TPalette *newPalette)
 {
 	//Verifico se gli stili della paletta sono usati : eraseStylesInDemand()
-	vector<int> styleIds;
+	std::vector<int> styleIds;
 	int h;
 	for (h = 0; h < palette->getPageCount(); h++) {
 		TPalette::Page *page = palette->getPage(h);
@@ -1259,8 +1259,8 @@ int DVGui::eraseStylesInDemand(TPalette *palette, std::vector<int> styleIds,
 		std::vector<QString> buttons(2);
 		buttons[0] = QObject::tr("Ok"), buttons[1] = QObject::tr("Cancel");
 
-		if (DVGui::MsgBox(DVGui::WARNING, QObject::tr("Deletion of Lines and Areas from raster-based levels is not undoable.\n"
-													  "Are you sure?"),
+		if (DVGui::MsgBox(DVGui::WARNING,
+			QObject::tr("Deletion of Lines and Areas from raster-based levels is not undoable.\n""Are you sure?"),
 						  buttons) != 1)
 			return 0;
 	}
@@ -1286,7 +1286,7 @@ void DVGui::featureNotAvelaible(QString webSiteName, QString url)
 	Dialog dialog(0, true);
 	dialog.setWindowFlags(dialog.windowFlags() | Qt::WindowStaysOnTopHint);
 	dialog.setAlignment(Qt::AlignLeft);
-	QString msgBoxTitle = getMsgBoxTitle(WARNING);
+	QString msgBoxTitle = getMsgBoxTitle(DVGui::WARNING);
 	dialog.setWindowTitle(msgBoxTitle);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -1296,7 +1296,7 @@ void DVGui::featureNotAvelaible(QString webSiteName, QString url)
 	QString msg = QObject::tr("This feature is not available in the demo version.\nFor more information visit the %1 site:").arg(webSiteName);
 
 	QLabel *mainTextLabel = new QLabel(msg, &dialog);
-	QPixmap iconPixmap = getMsgBoxPixmap(WARNING);
+	QPixmap iconPixmap = getMsgBoxPixmap(DVGui::WARNING);
 	if (!iconPixmap.isNull()) {
 		QLabel *iconLabel = new QLabel(&dialog);
 		iconLabel->setPixmap(iconPixmap);
@@ -1338,7 +1338,7 @@ void DVGui::requestTrialLicense(QString url, QString mail)
 	Dialog dialog(0, true);
 	dialog.setWindowFlags(dialog.windowFlags() | Qt::WindowStaysOnTopHint);
 	dialog.setAlignment(Qt::AlignLeft);
-	QString msgBoxTitle = getMsgBoxTitle(WARNING);
+	QString msgBoxTitle = getMsgBoxTitle(DVGui::WARNING);
 	dialog.setWindowTitle(msgBoxTitle);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;

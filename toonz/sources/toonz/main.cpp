@@ -132,7 +132,7 @@ const char *applicationName = "OpenToonz";
 const char *applicationVersion = "1.0";
 const char *dllRelativePath = "./toonz6.app/Contents/Frameworks";
 
-#ifdef WIN32
+#ifdef _WIN32
 TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Arial");
 #else
 TEnv::StringVar EnvSoftwareCurrentFont("SoftwareCurrentFont", "Hervetica");
@@ -160,14 +160,14 @@ void qt_mac_set_menubar_merge(bool enable);
 
 void fatalError(QString msg)
 {
-	MsgBoxInPopup(CRITICAL, msg + "\n" + QObject::tr("Installing %1 again could fix the problem.").arg(applicationFullName));
+	DVGui::MsgBoxInPopup(CRITICAL, msg + "\n" + QObject::tr("Installing %1 again could fix the problem.").arg(applicationFullName));
 	exit(0);
 }
 //-----------------------------------------------------------------------------
 
 void lastWarningError(QString msg)
 {
-	MsgBox(CRITICAL, msg);
+	DVGui::error(msg);
 	//exit(0);
 }
 //-----------------------------------------------------------------------------
@@ -201,7 +201,7 @@ extern "C" void licenseObserverCB(char *msg)
 
 void toonzRunOutOfContMemHandler(unsigned long size)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	static bool firstTime = true;
 	if (firstTime) {
 		MessageBox(NULL, (LPCWSTR)L"Run out of contiguous physical memory: please save all and restart Toonz!",
@@ -330,9 +330,6 @@ void initToonzEnv()
 	if (cacheDir.isEmpty())
 		cacheDir = TEnv::getStuffDir() + "cache";
 	TImageCache::instance()->setRootDir(cacheDir);
-
-	DV_IMPORT_API void initializeImageRasterizer();
-	initializeImageRasterizer();
 }
 
 //-----------------------------------------------------------------------------
@@ -380,7 +377,7 @@ int main(int argc, char *argv[])
 	std::auto_ptr<QObject> mainScope(new QObject(&a)); // A QObject destroyed before the qApp is therefore explicitly
 	mainScope->setObjectName("mainScope");			   // provided. It can be accessed by looking in the qApp's children.
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef x64
 	//Store the floating point control word. It will be re-set before Toonz initialization
 	//has ended.
@@ -389,7 +386,7 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 	//At least on windows, Qt's 4.5.2 native windows feature tend to create
 	//weird flickering effects when dragging panel separators.
 	a.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
@@ -412,7 +409,7 @@ int main(int argc, char *argv[])
 
 	// splash screen
 	QPixmap splashPixmap(":Resources/splash.png");
-#ifdef WIN32
+#ifdef _WIN32
 	a.setFont(QFont("Arial", 10));
 #else
 	a.setFont(QFont("Helvetica", 10));
@@ -437,6 +434,10 @@ int main(int argc, char *argv[])
 	fmt.setStencil(true);
 	QGLFormat::setDefaultFormat(fmt);
 
+#ifdef LINUX
+	glutInit(&argc, argv);
+#endif
+
 	splash.showMessage(offsetStr + "Initializing Toonz environment ...", Qt::AlignCenter, Qt::white);
 	a.processEvents();
 
@@ -449,7 +450,7 @@ int main(int argc, char *argv[])
 	// Initialize thread components
 	TThread::init();
 
-	string feature = selectedFeature.getValue();
+	std::string feature = selectedFeature.getValue();
 
 	TProjectManager *projectManager = TProjectManager::instance();
 	if (Preferences::instance()->isSVNEnabled()) {
@@ -495,7 +496,7 @@ int main(int argc, char *argv[])
 
 	// Carico la traduzione contenuta in toonz.qm (se ï¿½ presente)
 	QString languagePathString = QString::fromStdString(toString(TEnv::getConfigDir() + "loc"));
-#ifdef MACOSX
+#ifndef WIN32
 	//the merge of menu on osx can cause problems with different languages with the Preferences menu
 	//qt_mac_set_menubar_merge(false);
 	languagePathString += "/" + Preferences::instance()->getCurrentLanguage();
@@ -642,7 +643,7 @@ int main(int argc, char *argv[])
 	License::writeMacAddress();
 	//Controllo che la data della prima installazione contenuta nella sentinella sia minore della data corrente.
 	if (License::isTemporaryLicense(license) && !License::isValidSentinel(license)) {
-		MsgBox(CRITICAL, QObject::tr("System date tampered."));
+		DVGui::error(QObject::tr("System date tampered."));
 		return -1;
 	}
 	if (License::checkLicense(license) == License::INVALID_LICENSE ||
@@ -676,12 +677,12 @@ int main(int argc, char *argv[])
 
 	QFont *myFont;
 
-	string family = EnvSoftwareCurrentFont;
+	std::string family = EnvSoftwareCurrentFont;
 	myFont = new QFont(QString(family.c_str()));
 
 	myFont->setPixelSize(EnvSoftwareCurrentFontSize);
 	/*-- フォントのBoldの指定 --*/
-	string weight = EnvSoftwareCurrentFontWeight;
+	std::string weight = EnvSoftwareCurrentFontWeight;
 	if (strcmp(weight.c_str(), "Yes") == 0)
 		myFont->setBold(true);
 	else
@@ -696,7 +697,7 @@ int main(int argc, char *argv[])
 		TUndoManager::manager(), SIGNAL(somethingChanged()),
 		TApp::instance()->getCurrentScene(), SLOT(setDirtyFlag()));
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef x64
 	//On 32-bit architecture, there could be cases in which initialization could alter the
 	//FPU floating point control word. I've seen this happen when loading some AVI coded (VFAPI),
@@ -716,7 +717,7 @@ int main(int argc, char *argv[])
 	TUndoManager::manager()->reset();
 	PreviewFxManager::instance()->reset();
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (consoleAttached) {
 		::FreeConsole();
 	}

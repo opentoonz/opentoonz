@@ -1,5 +1,3 @@
-
-
 #if _MSC_VER >= 1400
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
@@ -10,6 +8,8 @@
 #else
 #include <unistd.h>
 #endif
+
+#include <memory>
 
 #include "tiio.h"
 #include "tpixel.h"
@@ -25,7 +25,7 @@ extern "C" {
 
 #include "tiio_tif.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #include "windows.h"
 #endif
@@ -103,7 +103,7 @@ void TifReader::open(FILE *file)
 	m_tiff = TIFFFdOpen(dup(fd), "", "rb");
 #endif
 	if (!m_tiff) {
-		string str("Tiff file closed");
+		std::string str("Tiff file closed");
 		throw(str);
 	}
 
@@ -448,7 +448,7 @@ void TifReader::readLine(short *buffer, int x0, int x1, int shrink)
 
 			// Allocate a sufficient buffer to store a single tile
 			int tileSize = tileWidth * tileHeight;
-			uint64 *tile = new uint64[tileSize];
+			std::unique_ptr<uint64[]> tile(new uint64[tileSize]);
 
 			int x = 0;
 			int y = tileHeight * m_stripIndex;
@@ -458,7 +458,7 @@ void TifReader::readLine(short *buffer, int x0, int x1, int shrink)
 
 			// Traverse the tiles row
 			while (x < m_info.m_lx) {
-				int ret = TIFFReadRGBATile_64(m_tiff, x, y, tile);
+				int ret = TIFFReadRGBATile_64(m_tiff, x, y, tile.get());
 				assert(ret);
 
 				int tileRowSize = tmin((int)tileWidth, m_info.m_lx - x) * pixelSize;
@@ -467,14 +467,12 @@ void TifReader::readLine(short *buffer, int x0, int x1, int shrink)
 				for (int ty = 0; ty < lastTy; ++ty) {
 					memcpy(
 						m_stripBuffer + (ty * m_rowLength + x) * pixelSize,
-						(UCHAR *)tile + ty * tileWidth * pixelSize,
+						(UCHAR *)tile.get() + ty * tileWidth * pixelSize,
 						tileRowSize);
 				}
 
 				x += tileWidth;
 			}
-
-			delete[] tile;
 		} else {
 			int y = m_rowsPerStrip * m_stripIndex;
 			int ok = TIFFReadRGBAStrip_64(m_tiff, y, (uint64 *)m_stripBuffer);
@@ -536,7 +534,7 @@ void TifReader::readLine(short *buffer, int x0, int x1, int shrink)
 void TifReader::readLine(char *buffer, int x0, int x1, int shrink)
 {
 	if (this->m_info.m_bitsPerSample == 16 && this->m_info.m_samplePerPixel >= 3) {
-		vector<short> app(4 * (m_info.m_lx));
+		std::vector<short> app(4 * (m_info.m_lx));
 		readLine(&app[0], x0, x1, shrink);
 
 		TPixel64 *pixin = (TPixel64 *)&app[0];
@@ -575,7 +573,7 @@ void TifReader::readLine(char *buffer, int x0, int x1, int shrink)
 			assert(tileWidth > 0 && tileHeight > 0);
 
 			int tileSize = tileWidth * tileHeight;
-			uint32 *tile = new uint32[tileSize];
+			std::unique_ptr<uint32[]> tile(new uint32[tileSize]);
 
 			int x = 0;
 			int y = tileHeight * m_stripIndex;
@@ -583,7 +581,7 @@ void TifReader::readLine(char *buffer, int x0, int x1, int shrink)
 			int lastTy = tmin((int)tileHeight, m_info.m_ly - y);
 
 			while (x < m_info.m_lx) {
-				int ret = TIFFReadRGBATile(m_tiff, x, y, tile);
+				int ret = TIFFReadRGBATile(m_tiff, x, y, tile.get());
 				assert(ret);
 
 				int tileRowSize = tmin((int)tileWidth, (int)(m_info.m_lx - x)) * pixelSize;
@@ -591,14 +589,12 @@ void TifReader::readLine(char *buffer, int x0, int x1, int shrink)
 				for (int ty = 0; ty < lastTy; ++ty) {
 					memcpy(
 						m_stripBuffer + (ty * m_rowLength + x) * pixelSize,
-						(UCHAR *)tile + ty * tileWidth * pixelSize,
+						(UCHAR *)tile.get() + ty * tileWidth * pixelSize,
 						tileRowSize);
 				}
 
 				x += tileWidth;
 			}
-
-			delete[] tile;
 		} else {
 			int y = m_rowsPerStrip * m_stripIndex;
 			int ok = TIFFReadRGBAStrip(m_tiff, y, (uint32 *)m_stripBuffer);
@@ -658,7 +654,7 @@ Tiio::TifWriterProperties::TifWriterProperties()
 {
 	m_byteOrdering.addValue(L"IBM PC");
 	m_byteOrdering.addValue(L"Mac");
-#ifdef WIN32
+#ifdef _WIN32
 	m_byteOrdering.setValue(L"IBM PC");
 #else
 	m_byteOrdering.setValue(L"Mac");
@@ -762,12 +758,12 @@ TifWriter::~TifWriter()
 void TifWriter::open(FILE *file, const TImageInfo &info)
 {
 	m_info = info;
-	string mode = "w";
+	std::string mode = "w";
 
 	if (!m_properties)
 		m_properties = new Tiio::TifWriterProperties();
 
-	wstring byteOrdering = ((TEnumProperty *)(m_properties->getProperty("Byte Ordering")))->getValue();
+	std::wstring byteOrdering = ((TEnumProperty *)(m_properties->getProperty("Byte Ordering")))->getValue();
 	if (byteOrdering == L"IBM PC")
 		mode += "l";
 	else
@@ -775,7 +771,7 @@ void TifWriter::open(FILE *file, const TImageInfo &info)
 
 	TEnumProperty *p = (TEnumProperty *)(m_properties->getProperty("Bits Per Pixel"));
 	assert(p);
-	string str = toString(p->getValue());
+	std::string str = toString(p->getValue());
 	//const char* str = toString(p->getValue()).c_str();
 	m_bpp = atoi(str.c_str());
 	assert(m_bpp == 1 || m_bpp == 8 || m_bpp == 16 || m_bpp == 24 || m_bpp == 32 || m_bpp == 48 || m_bpp == 64);
@@ -789,7 +785,7 @@ void TifWriter::open(FILE *file, const TImageInfo &info)
 	if (!m_tiff)
 		return;
 
-	wstring worientation = ((TEnumProperty *)(m_properties->getProperty("Orientation")))->getValue();
+	std::wstring worientation = ((TEnumProperty *)(m_properties->getProperty("Orientation")))->getValue();
 
 	int orientation;
 	if (worientation == TNZ_INFO_ORIENT_TOPLEFT)
@@ -857,7 +853,7 @@ void TifWriter::open(FILE *file, const TImageInfo &info)
 	if (m_bpp == 1)
 		TIFFSetField(m_tiff, TIFFTAG_COMPRESSION, COMPRESSION_CCITTFAX4);
 	else {
-		wstring compressionType = ((TEnumProperty *)(m_properties->getProperty("Compression Type")))->getValue();
+		std::wstring compressionType = ((TEnumProperty *)(m_properties->getProperty("Compression Type")))->getValue();
 		if (compressionType == TNZ_INFO_COMPRESS_LZW)
 			TIFFSetField(m_tiff, TIFFTAG_COMPRESSION, COMPRESSION_LZW);
 		else if (compressionType == TNZ_INFO_COMPRESS_PACKBITS)
@@ -1014,11 +1010,11 @@ extern "C" {
 static void
 MyWarningHandler(const char *module, const char *fmt, va_list ap)
 {
-	string outMsg;
+	std::string outMsg;
 	char msg[2048];
 	msg[0] = 0;
 	if (module != NULL)
-		outMsg = string(module);
+		outMsg = std::string(module);
 	outMsg += "Warning, ";
 
 	_vsnprintf(msg, 2048, fmt, ap);
@@ -1031,11 +1027,11 @@ MyWarningHandler(const char *module, const char *fmt, va_list ap)
 static void
 MyErrorHandler(const char *module, const char *fmt, va_list ap)
 {
-	string outMsg;
+	std::string outMsg;
 	char msg[2048];
 	msg[0] = 0;
 	if (module != NULL)
-		outMsg = string(module);
+		outMsg = std::string(module);
 	//outMsg += "Warning, ";
 
 	_vsnprintf(msg, 2048, fmt, ap);

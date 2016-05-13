@@ -75,7 +75,7 @@ namespace
 //-----------------------------------------------------------------------------
 
 //Return index of point with min x or y
-int tminPoint(vector<TPointD> points, bool isX)
+int tminPoint(std::vector<TPointD> points, bool isX)
 {
 	int i;
 	int index = 0;
@@ -93,7 +93,7 @@ int tminPoint(vector<TPointD> points, bool isX)
 
 int tminPoint(TPointD p0, TPointD p1, bool isX)
 {
-	vector<TPointD> v;
+	std::vector<TPointD> v;
 	v.push_back(p0);
 	v.push_back(p1);
 	return tminPoint(v, isX);
@@ -111,13 +111,13 @@ FourPoints DragSelectionTool::FourPoints::orderedPoints() const
 {
 	FourPoints newPoints;
 	int i;
-	vector<TPointD> allPoints;
+	std::vector<TPointD> allPoints;
 	allPoints.push_back(m_p00);
 	allPoints.push_back(m_p01);
 	allPoints.push_back(m_p10);
 	allPoints.push_back(m_p11);
 	int minXindex1 = tminPoint(allPoints, true);
-	vector<TPointD> points;
+	std::vector<TPointD> points;
 	for (i = 0; i < 4; i++)
 		if (i != minXindex1)
 			points.push_back(allPoints[i]);
@@ -131,7 +131,7 @@ FourPoints DragSelectionTool::FourPoints::orderedPoints() const
 	newPoints.setP00(newPoint1);
 	newPoints.setP01(newPoint2);
 
-	vector<TPointD> points2;
+	std::vector<TPointD> points2;
 	for (i = 0; i < 3; i++)
 		if (i != minXindex2)
 			points2.push_back(points[i]);
@@ -1292,7 +1292,7 @@ void SelectionTool::onSelectionChanged()
 
 //-----------------------------------------------------------------------------
 
-bool SelectionTool::onPropertyChanged(string propertyName)
+bool SelectionTool::onPropertyChanged(std::string propertyName)
 {
 	if (propertyName == m_strokeSelectionType.getName()) {
 		SelectionType = toString(m_strokeSelectionType.getValue());
@@ -1406,7 +1406,7 @@ void SelectionTool::closePolyline(const TPointD &pos)
 	if (m_polyline.back() != m_polyline.front())
 		m_polyline.push_back(m_polyline.front());
 
-	vector<TThickPoint> strokePoints;
+	std::vector<TThickPoint> strokePoints;
 	for (UINT i = 0; i < m_polyline.size() - 1; i++) {
 		strokePoints.push_back(TThickPoint(m_polyline[i], 0));
 		strokePoints.push_back(TThickPoint(0.5 * (m_polyline[i] + m_polyline[i + 1]), 0));

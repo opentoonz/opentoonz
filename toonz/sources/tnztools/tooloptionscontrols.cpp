@@ -46,7 +46,7 @@ using namespace DVGui;
 //    ToolOptionControl  implementation
 //***********************************************************************************
 
-ToolOptionControl::ToolOptionControl(TTool *tool, string propertyName, ToolHandle *toolHandle)
+ToolOptionControl::ToolOptionControl(TTool *tool, std::string propertyName, ToolHandle *toolHandle)
 	: m_tool(tool), m_propertyName(propertyName), m_toolHandle(toolHandle)
 {
 }
@@ -614,7 +614,7 @@ void ToolOptionCombo::onActivated(int index)
 	if (index < 0 || index >= (int)range.size())
 		return;
 
-	wstring item = range[index];
+	std::wstring item = range[index];
 	m_property->setValue(item);
 	notifyTool();
 }
@@ -696,7 +696,7 @@ void ToolOptionPopupButton::onActivated(int index)
 	if (index < 0 || index >= (int)range.size())
 		return;
 
-	wstring item = range[index];
+	std::wstring item = range[index];
 	m_property->setValue(item);
 	notifyTool();
 }
@@ -980,7 +980,7 @@ MeasuredValueField::~MeasuredValueField()
 
 //-----------------------------------------------------------------------------
 
-void MeasuredValueField::setMeasure(string name)
+void MeasuredValueField::setMeasure(std::string name)
 {
 	// for reproducing the precision
 	int oldPrec = -1;

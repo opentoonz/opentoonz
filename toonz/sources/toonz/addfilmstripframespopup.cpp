@@ -24,9 +24,9 @@ AddFilmstripFramesPopup::AddFilmstripFramesPopup()
 {
 	setWindowTitle(tr("Add Frames"));
 
-	m_startFld = new IntLineEdit(this);
-	m_endFld = new IntLineEdit(this);
-	m_stepFld = new IntLineEdit(this);
+	m_startFld = new DVGui::IntLineEdit(this);
+	m_endFld = new DVGui::IntLineEdit(this);
+	m_stepFld = new DVGui::IntLineEdit(this);
 
 	m_okBtn = new QPushButton(tr("Add"), this);
 	m_cancelBtn = new QPushButton(tr("Cancel"), this);

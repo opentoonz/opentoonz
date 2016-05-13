@@ -1,7 +1,7 @@
-
-
 #ifndef PLASTICSKELETONDEFORMATION_H
 #define PLASTICSKELETONDEFORMATION_H
+
+#include <memory>
 
 // TnzCore includes
 #include "tsmartpointer.h"
@@ -139,7 +139,7 @@ class DVAPI PlasticSkeletonDeformation : public TSmartObject, public TPersist
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	typedef tcg::any_it<int, int, void *>::bidirectional skelId_iterator;
@@ -251,7 +251,7 @@ typedef PlasticSkeletonDeformation SkD;
 
 //===============================================================================
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<PlasticSkeletonDeformation>;
 #endif
 

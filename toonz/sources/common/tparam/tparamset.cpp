@@ -37,7 +37,7 @@ double m_lastAffectedFrame;
 */
 namespace
 {
-void doRelease(const pair<TParam *, string> &param)
+void doRelease(const std::pair<TParam *, std::string> &param)
 {
 	param.first->release();
 }
@@ -49,7 +49,7 @@ class TParamSetImp : public TParamObserver
 {
 	friend class TParamSet;
 	TParamSet *m_param;
-	vector<pair<TParam *, string>> m_params;
+	std::vector<std::pair<TParam *, std::string>> m_params;
 
 	// ChangeBlock *m_changeBlock;
 	bool m_draggingEnabled, m_notificationEnabled;
@@ -101,18 +101,18 @@ public:
 
 //---------------------------------------------------------
 
-TParamSet::TParamSet(string name)
+TParamSet::TParamSet(std::string name)
 	: TParam(name)
+	, m_imp(new TParamSetImp(this))
 {
-	m_imp = new TParamSetImp(this);
 }
 
 //---------------------------------------------------------
 
 TParamSet::TParamSet(const TParamSet &src)
 	: TParam(src.getName())
+	, m_imp(new TParamSetImp(this))
 {
-	m_imp = new TParamSetImp(this);
 }
 
 //---------------------------------------------------------
@@ -163,14 +163,14 @@ void TParamSet::beginParameterChange()
 
 	//assert(!m_imp->m_changeBlock);
 
-	vector<TParam *> params;
+	std::vector<TParam *> params;
 
 	/*
 MyBackInsertIterator<vector<pair<TParam*, string> > > myBackInsertIterator(params);
 copy(m_imp->m_params.begin(), m_imp->m_params.end(), myIterator);
 */
 
-	std::vector<pair<TParam *, string>>::iterator it2 = m_imp->m_params.begin();
+	std::vector<std::pair<TParam *, std::string>>::iterator it2 = m_imp->m_params.begin();
 	for (; it2 != m_imp->m_params.end(); ++it2)
 		params.push_back(it2->first);
 
@@ -202,10 +202,10 @@ m_imp->notify(change);
 
 //---------------------------------------------------------
 
-void TParamSet::addParam(const TParamP &param, const string &name)
+void TParamSet::addParam(const TParamP &param, const std::string &name)
 {
-	pair<TParam *, string> paramToInsert = std::make_pair(param.getPointer(), name);
-	std::vector<pair<TParam *, string>>::iterator it =
+	std::pair<TParam *, std::string> paramToInsert = std::make_pair(param.getPointer(), name);
+	std::vector<std::pair<TParam *, std::string>>::iterator it =
 		std::find(m_imp->m_params.begin(), m_imp->m_params.end(), paramToInsert);
 
 	if (it == m_imp->m_params.end()) {
@@ -221,10 +221,10 @@ void TParamSet::addParam(const TParamP &param, const string &name)
 
 //---------------------------------------------------------
 
-void TParamSet::insertParam(const TParamP &param, const string &name, int index)
+void TParamSet::insertParam(const TParamP &param, const std::string &name, int index)
 {
-	pair<TParam *, string> paramToInsert = std::make_pair(param.getPointer(), name);
-	std::vector<pair<TParam *, string>>::iterator it =
+	std::pair<TParam *, std::string> paramToInsert = std::make_pair(param.getPointer(), name);
+	std::vector<std::pair<TParam *, std::string>>::iterator it =
 		std::find(m_imp->m_params.begin(), m_imp->m_params.end(), paramToInsert);
 
 	if (it == m_imp->m_params.end()) {
@@ -250,7 +250,7 @@ class matchesParam
 
 public:
 	matchesParam(const TParamP &param) : m_param(param) {}
-	bool operator()(const pair<TParam *, string> &param)
+	bool operator()(const std::pair<TParam *, std::string> &param)
 	{
 		return m_param.getPointer() == param.first;
 	}
@@ -261,7 +261,7 @@ public:
 
 void TParamSet::removeParam(const TParamP &param)
 {
-	std::vector<pair<TParam *, string>>::iterator it =
+	std::vector<std::pair<TParam *, std::string>>::iterator it =
 		std::find_if(m_imp->m_params.begin(), m_imp->m_params.end(), matchesParam(param));
 	if (it != m_imp->m_params.end()) {
 		param->removeObserver(m_imp);
@@ -279,7 +279,7 @@ void TParamSet::removeParam(const TParamP &param)
 void TParamSet::removeAllParam()
 {
 	while (!m_imp->m_params.empty()) {
-		std::vector<pair<TParam *, string>>::iterator it = m_imp->m_params.begin();
+		std::vector<std::pair<TParam *, std::string>>::iterator it = m_imp->m_params.begin();
 		TParam *param = it->first;
 		param->removeObserver(m_imp);
 		param->release();
@@ -304,7 +304,7 @@ TParamP TParamSet::getParam(int i) const
 
 //---------------------------------------------------------
 
-string TParamSet::getParamName(int i) const
+std::string TParamSet::getParamName(int i) const
 {
 	assert(i >= 0 && i < (int)m_imp->m_params.size());
 	return m_imp->m_params[i].second;
@@ -312,7 +312,7 @@ string TParamSet::getParamName(int i) const
 
 //---------------------------------------------------------
 
-int TParamSet::getParamIdx(const string &name) const
+int TParamSet::getParamIdx(const std::string &name) const
 {
 	int i, paramsCount = m_imp->m_params.size();
 	for (i = 0; i < paramsCount; ++i)
@@ -324,9 +324,9 @@ int TParamSet::getParamIdx(const string &name) const
 
 //---------------------------------------------------------
 
-void TParamSet::getAnimatableParams(vector<TParamP> &params, bool recursive)
+void TParamSet::getAnimatableParams(std::vector<TParamP> &params, bool recursive)
 {
-	std::vector<pair<TParam *, string>>::iterator it = m_imp->m_params.begin();
+	std::vector<std::pair<TParam *, std::string>>::iterator it = m_imp->m_params.begin();
 	for (; it != m_imp->m_params.end(); ++it) {
 		TParam *param = it->first;
 
@@ -384,7 +384,7 @@ void TParamSet::removeObserver(TParamObserver *observer)
 
 void TParamSet::enableDragging(bool on)
 {
-	std::vector<pair<TParam *, string>>::iterator it = m_imp->m_params.begin();
+	std::vector<std::pair<TParam *, std::string>>::iterator it = m_imp->m_params.begin();
 	for (; it != m_imp->m_params.end(); ++it) {
 		TDoubleParamP dparam(it->first);
 		//if (dparam)
@@ -415,7 +415,7 @@ void TParamSet::enableNotification(bool on)
 {
 	//  std::for_each(m_imp->m_params.begin(), m_imp->m_params.end(), std::bind2nd(DoEnableNotification, on));
 
-	std::vector<pair<TParam *, string>>::iterator it = m_imp->m_params.begin();
+	std::vector<std::pair<TParam *, std::string>>::iterator it = m_imp->m_params.begin();
 	for (; it != m_imp->m_params.end(); ++it) {
 		it->first->enableNotification(on);
 	}
@@ -567,10 +567,10 @@ void TParamSet::copy(TParam *src)
 
 void TParamSet::loadData(TIStream &is)
 {
-	string tagName;
+	std::string tagName;
 	is.openChild(tagName);
 	while (!is.eos()) {
-		string paramName;
+		std::string paramName;
 		is.openChild(paramName);
 		TPersist *p = 0;
 		is >> p;
@@ -587,8 +587,8 @@ void TParamSet::loadData(TIStream &is)
 void TParamSet::saveData(TOStream &os)
 {
 	os.openChild(getName());
-	std::vector<pair<TParam *, string>>::iterator it = m_imp->m_params.begin();
-	std::vector<pair<TParam *, string>>::iterator end = m_imp->m_params.end();
+	std::vector<std::pair<TParam *, std::string>>::iterator it = m_imp->m_params.begin();
+	std::vector<std::pair<TParam *, std::string>>::iterator end = m_imp->m_params.end();
 	while (it != end) {
 		os.openChild(it->second);
 		//it->first->saveData(os);
@@ -601,14 +601,14 @@ void TParamSet::saveData(TOStream &os)
 
 //---------------------------------------------------------
 
-string TParamSet::getValueAlias(double frame, int precision)
+std::string TParamSet::getValueAlias(double frame, int precision)
 {
-	string alias = "(";
+	std::string alias = "(";
 
-	std::vector<pair<TParam *, string>>::iterator end = m_imp->m_params.begin();
+	std::vector<std::pair<TParam *, std::string>>::iterator end = m_imp->m_params.begin();
 	std::advance(end, m_imp->m_params.size() - 1);
 
-	std::vector<pair<TParam *, string>>::iterator it = m_imp->m_params.begin();
+	std::vector<std::pair<TParam *, std::string>>::iterator it = m_imp->m_params.begin();
 	for (; it != end; ++it)
 		alias += it->first->getValueAlias(frame, precision) + ",";
 

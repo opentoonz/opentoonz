@@ -806,8 +806,8 @@ bool pasteRasterImageInCellWithoutUndo(int row, int col, const RasterImageData *
 			ri->getDpi(imgDpiX, imgDpiY);
 		}
 		double dpiX, dpiY;
-		vector<TRectD> rects;
-		vector<TStroke> strokes;
+		std::vector<TRectD> rects;
+		std::vector<TStroke> strokes;
 		std::vector<TStroke> originalStrokes;
 		TAffine affine;
 		rasterImageData->getData(ras, dpiX, dpiY, rects, strokes, originalStrokes, affine, img->getPalette());

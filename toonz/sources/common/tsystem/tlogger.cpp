@@ -12,49 +12,6 @@
 
 using std::endl;
 
-/*
-class TLogger::Imp {
-public:
-  std::ofstream m_os;
-  TThread::Mutex m_mutex;
-
-  Imp(const TFilePath &fp) 
-  : m_os(toString(fp.getWideString()).c_str(), std::ios_base::out | std::ios_base::app)
-  , m_mutex()
-  {
-    TTime t = TSystem::getCurrentTime(); 
-    m_os << "========================" << std::endl;
-    m_os << t.getDate() << " " << t.getTime() << endl;
-    m_os << "Start logging" << endl << endl;
-  }
-};
-
-
-TLogger::TLogger()
-: m_imp(new Imp(TSystem::getTempDir() + "log.txt"))
-{
-}
-
-
-TLogger::~TLogger()
-{
-  delete m_imp;
-}
-
-TLogger *TLogger::instance()
-{
-  static TLogger _instance;
-  return &_instance;
-}
-
-
-void TLogger::print(string module, string msg)
-{
-  QMutexLocker sl(m_imp->m_mutex);
-  m_imp->m_os << module << " : " << msg << std::endl;
-}
-*/
-
 class TLogger::Imp
 {
 public:
@@ -96,7 +53,6 @@ TLogger::TLogger()
 
 TLogger::~TLogger()
 {
-	delete m_imp;
 }
 
 TLogger *TLogger::instance()
@@ -105,7 +61,7 @@ TLogger *TLogger::instance()
 	return &_instance;
 }
 
-TLogger::Message::Message(MessageType type, string text)
+TLogger::Message::Message(MessageType type, std::string text)
 	: m_type(type), m_text(text)
 {
 	QTime t = QTime::currentTime();
@@ -163,7 +119,7 @@ TLogger::Stream::~Stream()
 	}
 }
 
-TLogger::Stream &TLogger::Stream::operator<<(string v)
+TLogger::Stream &TLogger::Stream::operator<<(std::string v)
 {
 	m_text += v;
 	return *this;

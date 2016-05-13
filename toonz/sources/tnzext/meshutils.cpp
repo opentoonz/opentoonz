@@ -119,7 +119,7 @@ inline void tglDrawFaces(const TMeshImage &meshImage, const PlasticDeformerDataG
 			m = m_;
 
 			mesh = meshes[m].getPointer();
-			dstCoords = group->m_datas[m].m_output;
+			dstCoords = group->m_datas[m].m_output.get();
 		}
 
 		mesh->faceVertices(f, v0, v1, v2);
@@ -168,7 +168,7 @@ void tglDrawEdges(const TMeshImage &mi, const PlasticDeformerDataGroup *group)
 	if (group) {
 		for (m = 0; m != mCount; ++m)
 			tglDrawEdges<const TPointD *, TPointD, NoColorFunction>(
-				*meshes[m], (const TPointD *)group->m_datas[m].m_output, NoColorFunction());
+				*meshes[m], (const TPointD *)group->m_datas[m].m_output.get(), NoColorFunction());
 	} else {
 		for (m = 0; m != mCount; ++m) {
 			const TTextureMesh &mesh = *meshes[m];
@@ -374,7 +374,7 @@ void tglDraw(const TMeshImage &meshImage,
 			m = m_;
 
 			mesh = meshes[m].getPointer();
-			dstCoords = group.m_datas[m].m_output;
+			dstCoords = group.m_datas[m].m_output.get();
 		}
 
 		// Draw each face

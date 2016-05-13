@@ -51,7 +51,7 @@ QPixmap ProjectDvDirModelProjectNode::getPixmap(bool isOpen) const
 // ProjectDvDirModelFileFolderNode [Root]
 //-----------------------------------------------------------------------------
 
-DvDirModelNode *ProjectDvDirModelFileFolderNode::makeChild(wstring name)
+DvDirModelNode *ProjectDvDirModelFileFolderNode::makeChild(std::wstring name)
 {
 	return createNode(this, m_path + name);
 }
@@ -96,7 +96,7 @@ void ProjectDvDirModelRootNode::refreshChildren()
 		int i;
 		for (i = 0; i < (int)projectRoots.size(); i++) {
 			TFilePath projectRoot = projectRoots[i];
-			wstring rootDir = projectRoot.getWideString();
+			std::wstring rootDir = projectRoot.getWideString();
 			ProjectDvDirModelSpecialFileFolderNode *projectRootNode =
 				new ProjectDvDirModelSpecialFileFolderNode(this, L"Project root (" + rootDir + L")", projectRoot);
 			projectRootNode->setPixmap(QPixmap(":Resources/projects.png"));
@@ -175,7 +175,7 @@ QModelIndex ProjectDirModel::parent(const QModelIndex &index) const
 
 //-----------------------------------------------------------------------------
 
-QModelIndex ProjectDirModel::childByName(const QModelIndex &parent, const wstring &name) const
+QModelIndex ProjectDirModel::childByName(const QModelIndex &parent, const std::wstring &name) const
 {
 	if (!parent.isValid())
 		return QModelIndex();
@@ -338,7 +338,7 @@ ProjectPopup::ProjectPopup(bool isModal)
 		upperLayout->setColumnStretch(0, 0);
 		upperLayout->setColumnStretch(1, 1);
 
-		std::vector<string> folderNames;
+		std::vector<std::string> folderNames;
 		pm->getFolderNames(folderNames);
 		int i;
 		for (i = 0; i < (int)folderNames.size(); i++) {
@@ -351,7 +351,7 @@ ProjectPopup::ProjectPopup(bool isModal)
 		}
 		struct {
 			QString name;
-			string folderName;
+			std::string folderName;
 		} cbs[] = {
 			{tr("Append $scenepath to +drawings"), TProject::Drawings},
 			{tr("Append $scenepath to +inputs"), TProject::Inputs},
@@ -520,7 +520,7 @@ void ProjectSettingsPopup::onFolderChanged()
 	try {
 		project->save();
 	} catch (TSystemException se) {
-		MsgBox(WARNING, QString::fromStdWString(se.getMessage()));
+		DVGui::warning(QString::fromStdWString(se.getMessage()));
 		return;
 	}
 	DvDirModel::instance()->refreshFolder(project->getProjectFolder());
@@ -535,7 +535,7 @@ void ProjectSettingsPopup::onUseSceneChekboxChanged(int)
 	try {
 		project->save();
 	} catch (TSystemException se) {
-		MsgBox(WARNING, QString::fromStdWString(se.getMessage()));
+		DVGui::warning(QString::fromStdWString(se.getMessage()));
 		return;
 	}
 	DvDirModel::instance()->refreshFolder(project->getProjectFolder());
@@ -631,9 +631,9 @@ void ProjectCreatePopup::createProject()
 	try {
 		bool isSaved = project->save(projectPath);
 		if (!isSaved)
-			MsgBox(CRITICAL, tr("It is not possible to create the %1 project.").arg(toQString(projectPath)));
+			DVGui::error(tr("It is not possible to create the %1 project.").arg(toQString(projectPath)));
 	} catch (TSystemException se) {
-		MsgBox(WARNING, QString::fromStdWString(se.getMessage()));
+		DVGui::warning(QString::fromStdWString(se.getMessage()));
 		return;
 	}
 	pm->setCurrentProjectPath(projectPath);

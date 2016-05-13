@@ -217,7 +217,7 @@ void CleanupPaletteViewer::onRemoveClicked(bool)
 
 	QString question;
 	question = QObject::tr("Are you sure you want to delete the selected cleanup color?");
-	int ret = MsgBox(question, QObject::tr("Delete"), QObject::tr("Cancel"), 0);
+	int ret = DVGui::MsgBox(question, QObject::tr("Delete"), QObject::tr("Cancel"), 0);
 	if (ret == 2 || ret == 0)
 		return;
 

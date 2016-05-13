@@ -75,7 +75,7 @@ FileBrowserPopup::FileBrowserPopup(const QString &title, Options options, QStrin
 
 	m_browser = new FileBrowser(this, 0, false, m_multiSelectionEnabled);
 	m_nameFieldLabel = new QLabel(tr("File name:"));
-	m_nameField = new LineEdit(this);
+	m_nameField = new DVGui::LineEdit(this);
 	m_okButton = new QPushButton(tr("OK"), this);
 	m_cancelButton = new QPushButton(tr("Cancel"), this);
 	QPushButton *applyButton = 0;
@@ -212,7 +212,7 @@ void FileBrowserPopup::onOkPressed()
 	if (!m_nameField->text().isEmpty()) {
 		const QString &str = m_nameField->text();
 		if (!isValidFileName(QFileInfo(str).baseName()) && !m_isDirectoryOnly) {
-			error(QObject::tr("A filename cannot be empty or contain any of the following characters:\n \\ / : * ? \" < > |"));
+			DVGui::error(QObject::tr("A filename cannot be empty or contain any of the following characters:\n \\ / : * ? \" < > |"));
 			return;
 		}
 
@@ -232,7 +232,7 @@ void FileBrowserPopup::onOkPressed()
 			// history                                      // That means, TFilePath() represents
 			if (*pt == TFilePath() || !pt->isAbsolute()) // the History folder? Really? That's lame...
 			{
-				MsgBox(CRITICAL, tr("Invalid file"));
+				DVGui::error(tr("Invalid file"));
 				return;
 			}
 		} else {
@@ -276,7 +276,7 @@ void FileBrowserPopup::onApplyPressed()
 		if (folder == TFilePath()) {
 			// history
 			if (*it == TFilePath() || !it->isAbsolute()) {
-				MsgBox(CRITICAL, tr("Invalid file"));
+				DVGui::error(tr("Invalid file"));
 				return;
 			}
 		} else {
@@ -429,7 +429,7 @@ bool GenericSaveFilePopup::execute()
 	if (TFileStatus(path).doesExist()) {
 		const QString &question = QObject::tr("File %1 already exists.\nDo you want to overwrite it?").arg(toQString(path));
 
-		int ret = MsgBox(question, QObject::tr("Overwrite"), QObject::tr("Cancel"));
+		int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"), QObject::tr("Cancel"));
 		if (ret == 0 || ret == 2)
 			return false;
 	}
@@ -467,12 +467,12 @@ bool LoadScenePopup::execute()
 	const TFilePath &fp = *m_selectedPaths.begin();
 
 	if (fp.getType() != "tnz") {
-		MsgBox(CRITICAL, toQString(fp) + tr(" is not a scene file."));
+		DVGui::error(toQString(fp) + tr(" is not a scene file."));
 		return false;
 	}
 
 	if (!TFileStatus(fp).doesExist()) {
-		MsgBox(CRITICAL, toQString(fp) + tr(" does not exist."));
+		DVGui::error(toQString(fp) + tr(" does not exist."));
 		return false;
 	}
 
@@ -523,12 +523,12 @@ bool LoadSubScenePopup::execute()
 	const TFilePath &fp = *m_selectedPaths.begin();
 
 	if (fp.getType() != "tnz") {
-		MsgBox(CRITICAL, toQString(fp) + tr(" is not a scene file."));
+		DVGui::error(toQString(fp) + tr(" is not a scene file."));
 		return false;
 	}
 
 	if (!TFileStatus(fp).doesExist()) {
-		MsgBox(CRITICAL, toQString(fp) + tr(" does not exist."));
+		DVGui::error(toQString(fp) + tr(" does not exist."));
 		return false;
 	}
 
@@ -636,20 +636,20 @@ LoadLevelPopup::LoadLevelPopup()
 	QPushButton *showSubsequenceButton = new QPushButton("", this);
 	QLabel *subsequenceLabel = new QLabel(tr("Load Subsequence Level"), this);
 	m_subsequenceFrame = new QFrame(this);
-	m_fromFrame = new LineEdit(this);
-	m_toFrame = new LineEdit(this);
+	m_fromFrame = new DVGui::LineEdit(this);
+	m_toFrame = new DVGui::LineEdit(this);
 
 	//----Arrangement in Xsheet
 	QPushButton *showArrangementButton = new QPushButton("", this);
 	QLabel *arrangementLabel = new QLabel(tr("Arrangement in Xsheet"), this);
 	m_arrangementFrame = new QFrame(this);
-	m_xFrom = new LineEdit(this);
-	m_xTo = new LineEdit(this);
+	m_xFrom = new DVGui::LineEdit(this);
+	m_xTo = new DVGui::LineEdit(this);
 	m_stepCombo = new QComboBox(this);
 	m_incCombo = new QComboBox(this);
-	m_levelName = new LineEdit(this);
-	m_posFrom = new LineEdit(this);
-	m_posTo = new LineEdit(this);
+	m_levelName = new DVGui::LineEdit(this);
+	m_posFrom = new DVGui::LineEdit(this);
+	m_posTo = new DVGui::LineEdit(this);
 
 	m_notExistLabel = new QLabel(tr("(FILE DOES NOT EXIST)"));
 
@@ -1375,7 +1375,7 @@ bool SaveLevelAsPopup::execute()
 		doExpose = false;
 	else if (ret && !Preferences::instance()->isReplaceAfterSaveLevelAsEnabled()) {
 		QString question(QObject::tr("Do you want to expose the renamed level ?"));
-		int val = MsgBox(question,
+		int val = DVGui::MsgBox(question,
 						 QObject::tr("Expose"),			  //val = 1
 						 QObject::tr("Don't expose"), 0); //val = 2
 		if (val == 0)
@@ -1391,7 +1391,7 @@ bool SaveLevelAsPopup::execute()
 			dynamic_cast<TXshSimpleLevel *>(TApp::instance()->getCurrentLevel()->getLevel());
 		if (!sl)
 			return false;
-		string ext = sl->getPath().getType();
+		std::string ext = sl->getPath().getType();
 		if (fp.getType() == "")
 			fp = fp.withType(ext);
 
@@ -1512,7 +1512,7 @@ void ReplaceLevelPopup::show()
 	TCellSelection *cellSel = dynamic_cast<TCellSelection *>(sel);
 	TColumnSelection *columnSel = dynamic_cast<TColumnSelection *>(sel);
 	if ((!cellSel && !columnSel) || sel->isEmpty()) {
-		MsgBox(CRITICAL, tr("Nothing to replace: no cells selected."));
+		DVGui::error(tr("Nothing to replace: no cells selected."));
 		return;
 	}
 
@@ -1631,7 +1631,7 @@ bool SavePaletteAsPopup::execute()
 	TPalette *palette = paletteHandle->getPalette();
 
 	if (!palette) {
-		MsgBox(WARNING, "No current palette exists");
+		DVGui::warning("No current palette exists");
 		return true;
 	}
 
@@ -1644,7 +1644,7 @@ bool SavePaletteAsPopup::execute()
 
 	if (TFileStatus(fp).doesExist()) {
 		const QString &question = QObject::tr("The palette %1 already exists.\nDo you want to overwrite it?").arg(toQString(fp));
-		int ret = MsgBox(question, QObject::tr("Overwrite"), QObject::tr("Cancel"), 0);
+		int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"), QObject::tr("Cancel"), 0);
 		if (ret == 2 || ret == 0)
 			return false;
 	}
@@ -1684,7 +1684,7 @@ LoadColorModelPopup::LoadColorModelPopup()
 	: FileBrowserPopup(tr("Load Color Model"), Options(), "", new QFrame(0))
 {
 	QFrame *optionFrame = (QFrame *)m_customWidget;
-	m_paletteFrame = new LineEdit("", this);
+	m_paletteFrame = new DVGui::LineEdit("", this);
 
 	//layout
 	QHBoxLayout *mainLayout = new QHBoxLayout();
@@ -1762,7 +1762,7 @@ bool LoadColorModelPopup::execute()
 
 	TPalette *palette = paletteHandle->getPalette();
 	if (!palette || palette->isCleanupPalette()) {
-		error(QObject::tr("Cannot load Color Model in current palette."));
+		DVGui::error(QObject::tr("Cannot load Color Model in current palette."));
 		return false;
 	}
 
@@ -1776,7 +1776,7 @@ bool LoadColorModelPopup::execute()
 		QList<QString> list;
 		list.append(QObject::tr("Overwrite the destination palette."));
 		list.append(QObject::tr("Keep the destination palette and apply it to the color model."));
-		int ret = RadioButtonMsgBox(DVGui::WARNING, question, list);
+		int ret = DVGui::RadioButtonMsgBox(DVGui::WARNING, question, list);
 		if (ret == 0)
 			return false;
 		if (ret == 2)
@@ -1847,7 +1847,7 @@ void ReplaceParentDirectoryPopup::show()
 	TCellSelection *cellSel = dynamic_cast<TCellSelection *>(sel);
 	TColumnSelection *columnSel = dynamic_cast<TColumnSelection *>(sel);
 	if ((!cellSel && !columnSel) || sel->isEmpty()) {
-		MsgBox(CRITICAL, tr("Nothing to replace: no cells or columns selected."));
+		DVGui::error(tr("Nothing to replace: no cells or columns selected."));
 		return;
 	}
 	if (cellSel) {
@@ -1970,7 +1970,7 @@ bool ImportMagpieFilePopup::execute()
 	const TFilePath &fp = *m_selectedPaths.begin();
 
 	if (!TSystem::doesExistFileOrLevel(fp)) {
-		MsgBox(CRITICAL, tr("%1 does not exist.").arg(toQString(fp)));
+		DVGui::error(tr("%1 does not exist.").arg(toQString(fp)));
 		return false;
 	}
 
@@ -2015,7 +2015,7 @@ bool BrowserPopup::execute()
 
 	if (!TSystem::doesExistFileOrLevel(fp)) {
 		const QString &msg = tr("Path %1 doesn't exists.").arg(toQString(fp));
-		MsgBox(DVGui::INFORMATION, msg);
+		DVGui::info(msg);
 
 		return false;
 	}

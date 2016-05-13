@@ -29,7 +29,7 @@ class DVAPI TTest
 	int m_fxInstanceCount;
 
 public:
-	TTest(const string &testName);
+	TTest(const std::string &testName);
 	virtual ~TTest();
 
 	void setInstanceCount();
@@ -39,12 +39,12 @@ public:
 	virtual void before() { setInstanceCount(); };
 	virtual void after(){};
 
-	static void runTests(string filename);
+	static void runTests(std::string filename);
 };
 
 //Utility
 
-DVAPI TFilePath getTestFile(string name);
+DVAPI TFilePath getTestFile(std::string name);
 
 DVAPI int areEqual(TRasterP ra, TRasterP rb, double err = 1e-8);
 DVAPI int areEqual(TVectorImageP va, TVectorImageP vb, double err = 1e-8);

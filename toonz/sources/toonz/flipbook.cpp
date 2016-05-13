@@ -93,9 +93,9 @@
 
 #include <stdint.h> // for uintptr_t
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "avicodecrestrictions.h"
-#endif;
+#endif
 
 #include "flipbook.h"
 
@@ -292,7 +292,7 @@ enum { eBegin,
 	   eIncrement,
 	   eEnd };
 
-static ProgressDialog *Pd = 0;
+static DVGui::ProgressDialog *Pd = 0;
 
 class ProgressBarMessager : public TThread::Message
 {
@@ -306,7 +306,7 @@ public:
 		switch (m_choice) {
 		case eBegin:
 			if (!Pd)
-				Pd = new ProgressDialog(QObject::tr("Saving previewed frames...."), QObject::tr("Cancel"), 0, m_val);
+				Pd = new DVGui::ProgressDialog(QObject::tr("Saving previewed frames...."), QObject::tr("Cancel"), 0, m_val);
 			else
 				Pd->setMaximum(m_val);
 			Pd->show();
@@ -321,7 +321,7 @@ public:
 			}
 			break;
 		case eEnd: {
-			MsgBox(DVGui::INFORMATION, m_str);
+			DVGui::info(m_str);
 			delete Pd;
 			Pd = 0;
 		} break;
@@ -346,10 +346,10 @@ LoadImagesPopup::LoadImagesPopup(FlipBook *flip)
 	frameRangeFrame->setFrameStyle(QFrame::StyledPanel);
 	//frameRangeFrame->setFixedHeight(30);
 
-	m_fromField = new LineEdit(this);
-	m_toField = new LineEdit(this);
-	m_stepField = new LineEdit("1", this);
-	m_shrinkField = new LineEdit("1", this);
+	m_fromField = new DVGui::LineEdit(this);
+	m_toField = new DVGui::LineEdit(this);
+	m_stepField = new DVGui::LineEdit("1", this);
+	m_shrinkField = new DVGui::LineEdit("1", this);
 
 	//Define the append/load filter types
 	m_appendFilterTypes
@@ -365,7 +365,7 @@ LoadImagesPopup::LoadImagesPopup(FlipBook *flip)
 		<< "rgb"
 		<< "nol";
 
-#ifdef WIN32
+#ifdef _WIN32
 	m_appendFilterTypes << "avi";
 #endif
 
@@ -599,40 +599,40 @@ bool FlipBook::doSaveImages(TFilePath fp)
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 	TOutputProperties *outputSettings = scene->getProperties()->getOutputProperties();
 
-	string ext = fp.getType();
+	std::string ext = fp.getType();
 
 	// Open a notice that the previewFx is rendered in 8bpc regardless of the output settings.
 	if (m_isPreviewFx && outputSettings->getRenderSettings().m_bpp == 64) {
 		QString question = "Save previewed images :\nImages will be saved in 8 bit per channel with this command.\nDo you want to save images?";
-		int ret = MsgBox(question, QObject::tr("Save"), QObject::tr("Cancel"), 0);
+		int ret = DVGui::MsgBox(question, QObject::tr("Save"), QObject::tr("Cancel"), 0);
 		if (ret == 2 || ret == 0)
 			return false;
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (ext == "avi") {
 		TPropertyGroup *props = outputSettings->getFileFormatProperties(ext);
-		string codecName = props->getProperty(0)->getValueAsString();
+		std::string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
 		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
 			QString msg(QObject::tr("The resolution of the output camera does not fit with the options chosen for the output file format."));
-			MsgBox(WARNING, msg);
+			DVGui::warning(msg);
 			return false;
 		}
 	}
-#endif;
+#endif
 
 	if (ext == "") {
 		ext = outputSettings->getPath().getType();
 		fp = fp.withType(ext);
 	}
 	if (fp.getName() == "") {
-		MsgBox(WARNING, tr("The file name cannot be empty or contain any of the following characters:(new line)  \\ / : * ? \"  |"));
+		DVGui::warning(tr("The file name cannot be empty or contain any of the following characters:(new line)  \\ / : * ? \"  |"));
 		return false;
 	}
 
 	if (!formats.contains(QString::fromStdString(ext))) {
-		MsgBox(WARNING, tr("It is not possible to save because the selected file format is not supported."));
+		DVGui::warning(tr("It is not possible to save because the selected file format is not supported."));
 		return false;
 	}
 
@@ -640,7 +640,7 @@ bool FlipBook::doSaveImages(TFilePath fp)
 	m_flipConsole->getFrameRange(from, to, step);
 
 	if (m_currentFrameToSave != 0) {
-		info("Already saving!");
+		DVGui::info("Already saving!");
 		return true;
 	}
 
@@ -655,17 +655,17 @@ bool FlipBook::doSaveImages(TFilePath fp)
 			TSystem::mkDir(parent);
 			DvDirModel::instance()->refreshFolder(parent.getParentDir());
 		} catch (TException &e) {
-			error("Cannot create " + toQString(fp.getParentDir()) + " : " + QString(toString(e.getMessage()).c_str()));
+			DVGui::error("Cannot create " + toQString(fp.getParentDir()) + " : " + QString(toString(e.getMessage()).c_str()));
 			return false;
 		} catch (...) {
-			error("Cannot create " + toQString(fp.getParentDir()));
+			DVGui::error("Cannot create " + toQString(fp.getParentDir()));
 			return false;
 		}
 	}
 
 	if (TSystem::doesExistFileOrLevel(fp)) {
 		QString question(tr("File %1 already exists.\nDo you want to overwrite it?").arg(toQString(fp)));
-		int ret = MsgBox(question, QObject::tr("Overwrite"), QObject::tr("Cancel"));
+		int ret = DVGui::MsgBox(question, QObject::tr("Overwrite"), QObject::tr("Cancel"));
 		if (ret == 2)
 			return false;
 	}
@@ -673,7 +673,7 @@ bool FlipBook::doSaveImages(TFilePath fp)
 	try {
 		m_lw = TLevelWriterP(fp, outputSettings->getFileFormatProperties(fp.getType()));
 	} catch (...) {
-		error("It is not possible to save Flipbook content.");
+		DVGui::error("It is not possible to save Flipbook content.");
 		return false;
 	}
 
@@ -758,10 +758,10 @@ void FlipBook::onButtonPressed(FlipConsole::EGadget button)
 			TImageP img = getCurrentImage(m_flipConsole->getCurrentFrame());
 			m_loadbox = loadbox;
 			if (!img) {
-				MsgBox(WARNING, tr("There are no rendered images to save."));
+				DVGui::warning(tr("There are no rendered images to save."));
 				return;
 			} else if ((TVectorImageP)img) {
-				MsgBox(WARNING, tr("It is not possible to take or compare snapshots for Toonz vector levels."));
+				DVGui::warning(tr("It is not possible to take or compare snapshots for Toonz vector levels."));
 				return;
 			}
 			TRasterImageP ri(img);
@@ -775,7 +775,7 @@ void FlipBook::onButtonPressed(FlipConsole::EGadget button)
 		}
 		CASE FlipConsole::eCompare : if ((TVectorImageP)getCurrentImage(m_flipConsole->getCurrentFrame()))
 		{
-			MsgBox(WARNING, tr("It is not possible to take or compare snapshots for Toonz vector levels."));
+			DVGui::warning(tr("It is not possible to take or compare snapshots for Toonz vector levels."));
 			m_flipConsole->setChecked(FlipConsole::eCompare, false);
 			return;
 		}
@@ -891,7 +891,7 @@ void FlipBookPool::save() const
 
 	history.beginGroup("flipbooks");
 
-	map<int, FlipBook *>::const_iterator it;
+	std::map<int, FlipBook *>::const_iterator it;
 	for (it = m_pool.begin(); it != m_pool.end(); ++it) {
 		history.beginGroup(QString::number(it->first));
 		TPanel *panel = static_cast<TPanel *>(it->second->parent());
@@ -899,7 +899,7 @@ void FlipBookPool::save() const
 		history.endGroup();
 	}
 
-	map<int, QRect>::const_iterator jt;
+	std::map<int, QRect>::const_iterator jt;
 	for (jt = m_geometryPool.begin(); jt != m_geometryPool.end(); ++jt) {
 		history.beginGroup(QString::number(jt->first));
 		history.setValue("geometry", jt->second);
@@ -1465,7 +1465,7 @@ void FlipBook::playAudioFrame(int frame)
 		try {
 			m_player->play(m_snd, firstSample, lastSample, false, false);
 		} catch (TSoundDeviceException &e) {
-			string msg;
+			std::string msg;
 			if (e.getType() == TSoundDeviceException::UnsupportedFormat) {
 				try {
 					TSoundTrackFormat fmt = m_player->getPreferredFormat(m_snd->getFormat());
@@ -1483,7 +1483,7 @@ void FlipBook::playAudioFrame(int frame)
 
 TImageP FlipBook::getCurrentImage(int frame)
 {
-	string id = "";
+	std::string id = "";
 	TFrameId fid;
 	TFilePath fp;
 
@@ -1543,7 +1543,7 @@ TImageP FlipBook::getCurrentImage(int frame)
 
 	if (TImageCache::instance()->isCached(id)) {
 		TRect loadbox;
-		map<string, TRect>::const_iterator it = m_loadboxes.find(id);
+		std::map<std::string, TRect>::const_iterator it = m_loadboxes.find(id);
 		if (it != m_loadboxes.end())
 			loadbox = it->second;
 
@@ -1752,7 +1752,7 @@ void FlipBook::dragEnterEvent(QDragEnterEvent *e)
 
 	foreach (QUrl url, mimeData->urls()) {
 		TFilePath fp(url.toLocalFile().toStdWString());
-		string type = fp.getType();
+		std::string type = fp.getType();
 		if (type == "tzp" || type == "tzu" || type == "tnz" || type == "scr" || type == "mesh")
 			return;
 	}
@@ -2194,7 +2194,7 @@ void viewFile(const TFilePath &path, int from, int to, int step, int shrink,
 		 path.getType() == "avi" ||
 		 path.getType() == "3gp") &&
 		path.isLevelName()) {
-		MsgBox(WARNING, QObject::tr("%1  has an invalid extension format.")
+		DVGui::warning(QObject::tr("%1  has an invalid extension format.")
 							.arg(QString::fromStdString(path.getLevelName())));
 		return;
 	}

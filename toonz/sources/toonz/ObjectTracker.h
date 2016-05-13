@@ -1,7 +1,7 @@
-
-
 #if !defined(OBEJCTTRACKER_H_INCLUDED_)
 #define OBEJCTTRACKER_H_INCLUDED_
+
+#include <memory>
 
 #include "traster.h"
 #include "predict3d.h"
@@ -55,8 +55,8 @@ private:
 		short H_old;
 
 		//histogram
-		float *initHistogram;
-		float *weights_background;
+		std::unique_ptr<float[]> initHistogram;
+		std::unique_ptr<float[]> weights_background;
 
 		//template characterize
 		short X_temp;
@@ -75,7 +75,7 @@ private:
 	NEIGHBOUR neighbours[30];
 	Predict3D::Point initial;
 	bool m_initialized;
-	string m_visible;
+	std::string m_visible;
 	int m_K_dist;
 
 	//--------------------------------------------------------------------------------------------------------
@@ -147,10 +147,10 @@ public:
 	bool GetInit();
 	//--------------------------------------------------------------------------------------------------------
 
-	string GetVisibility();
+	std::string GetVisibility();
 	//--------------------------------------------------------------------------------------------------------
 
-	void SetVisibility(string visibily);
+	void SetVisibility(std::string visibily);
 	//--------------------------------------------------------------------------------------------------------
 
 	Predict3D::Point GetInitials();

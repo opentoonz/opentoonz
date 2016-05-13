@@ -14,7 +14,7 @@ enum {
 	CURSOR_HOURGLASS,
 	CURSOR_NO,
 	CURSOR_DUMMY,
-#ifndef WIN32
+#ifndef _WIN32
 	CURSOR_DND,
 	CURSOR_QUESTION,
 #endif

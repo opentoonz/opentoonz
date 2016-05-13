@@ -8,7 +8,7 @@
  |                                                                            |
  *----------------------------------------------------------------------------*/
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(push)
 #pragma warning(disable : 4113)
 #pragma warning(disable : 4996)
@@ -94,7 +94,7 @@ typedef struct avl_path PATH;
 #ifdef VAX
 #define SET_STRCMP(cmp, str1, str2)                                   \
 	{                                                                 \
-		register char *p1, *p2;                                       \
+		char *p1, *p2;                                       \
 		for (p1 = (str1), p2 = (str2); *p1 && *p1 == *p2; p1++, p2++) \
 			;                                                         \
 		(cmp) = *(unsigned char *)p1 - *(unsigned char *)p2;          \

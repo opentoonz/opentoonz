@@ -21,7 +21,7 @@ namespace
 //-----------------------------------------------------------------------------
 
 void computeSeeds(const TRasterCM32P &r, TStroke *stroke,
-				  vector<std::pair<TPoint, int>> &seeds)
+				  std::vector<std::pair<TPoint, int>> &seeds)
 {
 	int length = (int)stroke->getLength();
 	TRect bbox = r->getBounds();
@@ -48,7 +48,7 @@ void fillArea(const TRasterCM32P &ras, TRegion *r, int colorId,
 
 	for (int i = bbox.y0; i <= bbox.y1; i++) {
 		TPixelCM32 *line = ras->pixels(i);
-		vector<double> intersections;
+		std::vector<double> intersections;
 		r->computeScanlineIntersections(i, intersections);
 		assert(!(intersections.size() & 0x1));
 
@@ -71,7 +71,7 @@ void fillArea(const TRasterCM32P &ras, TRegion *r, int colorId,
 
 //-----------------------------------------------------------------------------
 
-void restoreColors(const TRasterCM32P &r, const vector<std::pair<TPoint, int>> &seeds)
+void restoreColors(const TRasterCM32P &r, const std::vector<std::pair<TPoint, int>> &seeds)
 {
 	FillParameters params;
 	for (UINT i = 0; i < seeds.size(); i++) {
@@ -183,7 +183,7 @@ void AreaFiller::rectFill(const TRect &rect, int color,
 	if (dx < 2 || dy < 2) //rect degenere(area contenuta nulla), skippo.
 		return;
 
-	vector<int> frameSeed(2 * (r.getLx() + r.getLy() - 2));
+	std::vector<int> frameSeed(2 * (r.getLx() + r.getLy() - 2));
 
 	int x, y, count1, count2;
 	/*- ptrをRect範囲のスタート地点に移動 -*/
@@ -285,7 +285,7 @@ void AreaFiller::strokeFill(TStroke *stroke, int colorId,
 	stroke->transform(TTranslation(convert(m_ras->getCenter())));
 	m_ras->lock();
 
-	vector<std::pair<TPoint, int>> seeds;
+	std::vector<std::pair<TPoint, int>> seeds;
 	computeSeeds(m_ras, stroke, seeds);
 
 	TVectorImage app;

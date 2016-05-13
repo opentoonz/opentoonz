@@ -32,7 +32,7 @@ TNZ_LITTLE_ENDIAN undefined !!
 #define TBOOL int
 
 	typedef struct LPIXEL {
-#ifdef WIN32
+#ifdef _WIN32
 	unsigned char b, g, r, m;
 #elif defined(__sgi)
 	unsigned char m, b, g, r;
@@ -46,7 +46,7 @@ TNZ_LITTLE_ENDIAN undefined !!
 } LPIXEL;
 
 typedef struct SPIXEL {
-#ifdef WIN32
+#ifdef _WIN32
 	unsigned short b, g, r, m;
 #elif defined(__sgi)
 	unsigned short m, b, g, r;
@@ -121,7 +121,7 @@ typedef struct IMAGE {
 
 #define CROP(X, MIN, MAX) (X < MIN ? MIN : (X > MAX ? MAX : X))
 
-#ifdef WIN32
+#ifdef _WIN32
 #define LPIXEL_TO_BGRM(X) (X)
 #else
 #if TNZ_LITTLE_ENDIAN

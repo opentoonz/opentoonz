@@ -38,7 +38,7 @@ TOutputProperties::TOutputProperties()
 TOutputProperties::TOutputProperties(const TOutputProperties &src)
 	: m_path(src.m_path), m_formatProperties(src.m_formatProperties), m_renderSettings(new TRenderSettings(*src.m_renderSettings)), m_frameRate(src.m_frameRate), m_from(src.m_from), m_to(src.m_to), m_whichLevels(src.m_whichLevels), m_offset(src.m_offset), m_step(src.m_step), m_multimediaRendering(src.m_multimediaRendering), m_maxTileSizeIndex(src.m_maxTileSizeIndex), m_threadIndex(src.m_threadIndex), m_subcameraPreview(src.m_subcameraPreview)
 {
-	std::map<string, TPropertyGroup *>::iterator ft, fEnd = m_formatProperties.end();
+	std::map<std::string, TPropertyGroup *>::iterator ft, fEnd = m_formatProperties.end();
 	for (ft = m_formatProperties.begin(); ft != fEnd; ++ft) {
 		if (ft->second)
 			ft->second = ft->second->clone();
@@ -78,7 +78,7 @@ TOutputProperties &TOutputProperties::operator=(const TOutputProperties &src)
 	std::for_each(m_formatProperties.begin(), m_formatProperties.end(),
 				  ::deleteValue);
 
-	std::map<string, TPropertyGroup *>::const_iterator sft, sfEnd = src.m_formatProperties.end();
+	std::map<std::string, TPropertyGroup *>::const_iterator sft, sfEnd = src.m_formatProperties.end();
 	for (sft = src.m_formatProperties.end(); sft != sfEnd; ++sft)
 		m_formatProperties[sft->first] = sft->second->clone();
 
@@ -141,9 +141,9 @@ void TOutputProperties::setFrameRate(double fps)
 
 //-------------------------------------------------------------------
 
-TPropertyGroup *TOutputProperties::getFileFormatProperties(string ext)
+TPropertyGroup *TOutputProperties::getFileFormatProperties(std::string ext)
 {
-	std::map<string, TPropertyGroup *>::const_iterator it;
+	std::map<std::string, TPropertyGroup *>::const_iterator it;
 	it = m_formatProperties.find(ext);
 	if (it == m_formatProperties.end()) {
 		TPropertyGroup *ret = Tiio::makeWriterProperties(ext);
@@ -155,10 +155,10 @@ TPropertyGroup *TOutputProperties::getFileFormatProperties(string ext)
 
 //-------------------------------------------------------------------
 
-void TOutputProperties::getFileFormatPropertiesExtensions(std::vector<string> &v) const
+void TOutputProperties::getFileFormatPropertiesExtensions(std::vector<std::string> &v) const
 {
 	v.reserve(m_formatProperties.size());
-	std::map<string, TPropertyGroup *>::const_iterator it;
+	std::map<std::string, TPropertyGroup *>::const_iterator it;
 	for (it = m_formatProperties.begin(); it != m_formatProperties.end(); ++it)
 		v.push_back(it->first);
 }

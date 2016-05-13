@@ -222,8 +222,8 @@ void CameraSettingsPopup::onNameChanged()
 	TStageObject *cameraObject = getCameraObject();
 	if (!cameraObject)
 		return;
-	string name = m_nameFld->text().toStdString();
-	string curName = cameraObject->getName();
+	std::string name = m_nameFld->text().toStdString();
+	std::string curName = cameraObject->getName();
 	if (curName == name)
 		return;
 	cameraObject->setName(name);

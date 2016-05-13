@@ -1,7 +1,7 @@
-
-
 #ifndef TFARMTASK_H
 #define TFARMTASK_H
+
+#include <memory>
 
 #include <QDateTime>
 #include "tpersist.h"
@@ -12,7 +12,7 @@
 #undef TFARMAPI
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifdef TFARM_EXPORTS
 #define TFARMAPI __declspec(dllexport)
 #else
@@ -196,7 +196,7 @@ public:
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 };
 
 #endif

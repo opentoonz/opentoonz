@@ -56,7 +56,7 @@ private:
 	TXshPaletteColumn &operator=(const TXshPaletteColumn &);
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 template class TSmartPointerT<TXshPaletteColumn>;
 #endif
 

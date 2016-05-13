@@ -92,11 +92,11 @@ MagpieFileImportPopup::MagpieFileImportPopup()
 	addWidget(tr("Phoneme"), frameLabel);
 	int i;
 	for (i = 0; i < 9; i++) {
-		IntLineEdit *field = new IntLineEdit(this, 1, 1);
+		DVGui::IntLineEdit *field = new DVGui::IntLineEdit(this, 1, 1);
 		QLabel *label = new QLabel("", this);
 		label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 		label->setFixedSize(getLabelWidth(), field->height());
-		m_actFields.append(QPair<QLabel *, IntLineEdit *>(label, field));
+		m_actFields.append(QPair<QLabel *, DVGui::IntLineEdit *>(label, field));
 		addWidgets(label, field);
 	}
 
@@ -149,7 +149,7 @@ void MagpieFileImportPopup::showEvent(QShowEvent *)
 	int i;
 	QList<QString> actsIdentifier = m_info->getActsIdentifier();
 	for (i = 0; i < m_actFields.size(); i++) {
-		IntLineEdit *field = m_actFields.at(i).second;
+		DVGui::IntLineEdit *field = m_actFields.at(i).second;
 		QLabel *label = m_actFields.at(i).first;
 		if (i >= actsIdentifier.size()) {
 			field->hide();
@@ -189,10 +189,10 @@ void MagpieFileImportPopup::onLevelPathChanged()
 	}
 	m_levelPath = levelPath;
 
-	string format = m_levelPath.getType();
+	std::string format = m_levelPath.getType();
 	if (format == "tzp" || format == "tzu") {
 
-		wstring name = m_levelPath.getWideName();
+		std::wstring name = m_levelPath.getWideName();
 		IoCmd::ConvertingPopup *convertingPopup = new IoCmd::ConvertingPopup(
 			TApp::instance()->getMainWindow(),
 			QString::fromStdWString(name) + QString::fromStdString(m_levelPath.getDottedType()));
@@ -237,7 +237,7 @@ void MagpieFileImportPopup::onOkPressed()
 		}
 		int j;
 		for (j = 0; j < m_actFields.size(); j++) {
-			IntLineEdit *field = m_actFields.at(j).second;
+			DVGui::IntLineEdit *field = m_actFields.at(j).second;
 			QString act = field->property("act").toString();
 			if (actorAct != act)
 				continue;

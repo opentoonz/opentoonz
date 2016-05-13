@@ -31,7 +31,7 @@
 #include "toonz/multimediarenderer.h"
 #include "toutputproperties.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "avicodecrestrictions.h"
 #endif
 
@@ -196,7 +196,7 @@ public:
 	{
 		if (m_error) {
 			m_error = false;
-			MsgBox(DVGui::CRITICAL, QObject::tr("There was an error saving frames for the %1 level.").arg(QString::fromStdWString(m_fp.withoutParentDir().getWideString())));
+			DVGui::error(QObject::tr("There was an error saving frames for the %1 level.").arg(QString::fromStdWString(m_fp.withoutParentDir().getWideString())));
 		}
 
 		bool isPreview = (m_fp.getType() == "noext");
@@ -214,7 +214,7 @@ public:
 
 				if (!TSystem::showDocument(m_fp)) {
 					QString msg(QObject::tr("It is not possible to display the file %1: no player associated with its format").arg(QString::fromStdWString(m_fp.withoutParentDir().getWideString())));
-					MsgBox(WARNING, msg);
+					DVGui::warning(msg);
 				}
 
 			}
@@ -301,7 +301,7 @@ bool RenderCommand::init(bool isPreview)
 	if (m_r1 >= scene->getFrameCount())
 		m_r1 = scene->getFrameCount() - 1;
 	if (m_r1 < m_r0) {
-		MsgBox(WARNING, QObject::tr("The command cannot be executed because the scene is empty."));
+		DVGui::warning(QObject::tr("The command cannot be executed because the scene is empty."));
 		return false;
 		// throw TException("empty scene");
 		// non so perche', ma termina il programma
@@ -345,10 +345,10 @@ bool RenderCommand::init(bool isPreview)
 			TSystem::mkDir(parent);
 			DvDirModel::instance()->refreshFolder(parent.getParentDir());
 		} catch (TException &e) {
-			MsgBox(WARNING, QObject::tr("It is not possible to create folder : %1").arg(QString::fromStdString(toString(e.getMessage()))));
+			DVGui::warning(QObject::tr("It is not possible to create folder : %1").arg(QString::fromStdString(toString(e.getMessage()))));
 			return false;
 		} catch (...) {
-			MsgBox(WARNING, QObject::tr("It is not possible to create a folder."));
+			DVGui::warning(QObject::tr("It is not possible to create a folder."));
 			return false;
 		}
 	}
@@ -387,7 +387,7 @@ void RenderCommand::flashRender()
 	FILE *fileP = fopen(m_fp, "wb");
 	if (!fileP)
 		return;
-	ProgressDialog pb("rendering " + toQString(m_fp), "Cancel", 0, m_numFrames);
+	DVGui::ProgressDialog pb("rendering " + toQString(m_fp), "Cancel", 0, m_numFrames);
 	pb.show();
 
 	TDimension cameraSize = scene->getCurrentCamera()->getRes();
@@ -446,7 +446,7 @@ void RenderCommand::flashRender()
 //===================================================================
 
 class RenderListener
-	: public ProgressDialog,
+	: public DVGui::ProgressDialog,
 	  public MovieRenderer::Listener
 {
 	QString m_progressBarString;
@@ -476,7 +476,7 @@ class RenderListener
 
 public:
 	RenderListener(TRenderer *renderer, const TFilePath &path, int steps, bool isPreview)
-		: ProgressDialog("Precomputing " + QString::number(steps) + " Frames" + ((isPreview) ? "" : " of " + toQString(path)), "Cancel", 0, steps, TApp::instance()->getMainWindow()), m_renderer(renderer), m_frameCounter(0), m_error(false)
+		: DVGui::ProgressDialog("Precomputing " + QString::number(steps) + " Frames" + ((isPreview) ? "" : " of " + toQString(path)), "Cancel", 0, steps, TApp::instance()->getMainWindow()), m_renderer(renderer), m_frameCounter(0), m_error(false)
 	{
 #ifdef MACOSX
 		//Modal dialogs seem to be preventing the execution of Qt::BlockingQueuedConnections on MAC...!
@@ -528,20 +528,20 @@ void RenderCommand::rasterRender(bool isPreview)
 		return;
 	}
 
-	string ext = m_fp.getType();
+	std::string ext = m_fp.getType();
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (ext == "avi" && !isPreview) {
 		TPropertyGroup *props = scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
-		string codecName = props->getProperty(0)->getValueAsString();
+		std::string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
 		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
 			QString msg(QObject::tr("The resolution of the output camera does not fit with the options chosen for the output file format."));
-			MsgBox(WARNING, msg);
+			DVGui::warning(msg);
 			return;
 		}
 	}
-#endif;
+#endif
 
 	//Extract output properties
 	TOutputProperties *prop = isPreview ? scene->getProperties()->getPreviewProperties() : scene->getProperties()->getOutputProperties();
@@ -632,7 +632,7 @@ void RenderCommand::rasterRender(bool isPreview)
 //===================================================================
 
 class MultimediaProgressBar
-	: public ProgressDialog,
+	: public DVGui::ProgressDialog,
 	  public MultimediaRenderer::Listener
 {
 	QString m_progressBarString;
@@ -738,20 +738,20 @@ public:
 void RenderCommand::multimediaRender()
 {
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	string ext = m_fp.getType();
+	std::string ext = m_fp.getType();
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (ext == "avi") {
 		TPropertyGroup *props = scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
-		string codecName = props->getProperty(0)->getValueAsString();
+		std::string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
 		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
 			QString msg(QObject::tr("The resolution of the output camera does not fit with the options chosen for the output file format."));
-			MsgBox(WARNING, msg);
+			DVGui::warning(msg);
 			return;
 		}
 	}
-#endif;
+#endif
 
 	TOutputProperties *prop = scene->getProperties()->getOutputProperties();
 
@@ -844,9 +844,9 @@ void RenderCommand::doRender(bool isPreview)
 		}
 	}
 	if (!isWritable) {
-		string str = "It is not possible to write the output:  the file";
+		std::string str = "It is not possible to write the output:  the file";
 		str += isMultiFrame ? "s are read only." : " is read only.";
-		MsgBox(WARNING, QString::fromStdString(str));
+		DVGui::warning(QString::fromStdString(str));
 		return;
 	}
 
@@ -865,9 +865,9 @@ void RenderCommand::doRender(bool isPreview)
 			/*-- 通常のRendering --*/
 			rasterRender(isPreview);
 	} catch (TException &e) {
-		MsgBox(WARNING, QString::fromStdString(toString(e.getMessage())));
+		DVGui::warning(QString::fromStdString(toString(e.getMessage())));
 	} catch (...) {
-		MsgBox(WARNING, QObject::tr("It is not possible to complete the rendering."));
+		DVGui::warning(QObject::tr("It is not possible to complete the rendering."));
 	}
 }
 

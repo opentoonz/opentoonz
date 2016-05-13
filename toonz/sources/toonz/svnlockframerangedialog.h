@@ -9,15 +9,13 @@
 
 #include <QList>
 
-using namespace DVGui;
-
 class QLabel;
 class QPushButton;
 class QPlainTextEdit;
 
 //-----------------------------------------------------------------------------
 
-class SVNLockFrameRangeDialog : public Dialog
+class SVNLockFrameRangeDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -29,8 +27,8 @@ class SVNLockFrameRangeDialog : public Dialog
 
 	QLabel *m_fromLabel;
 	QLabel *m_toLabel;
-	IntLineEdit *m_fromLineEdit;
-	IntLineEdit *m_toLineEdit;
+	DVGui::IntLineEdit *m_fromLineEdit;
+	DVGui::IntLineEdit *m_toLineEdit;
 
 	QPushButton *m_lockButton;
 	QPushButton *m_cancelButton;
@@ -77,7 +75,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNLockMultiFrameRangeDialog : public Dialog
+class SVNLockMultiFrameRangeDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -89,8 +87,8 @@ class SVNLockMultiFrameRangeDialog : public Dialog
 
 	QLabel *m_fromLabel;
 	QLabel *m_toLabel;
-	IntLineEdit *m_fromLineEdit;
-	IntLineEdit *m_toLineEdit;
+	DVGui::IntLineEdit *m_fromLineEdit;
+	DVGui::IntLineEdit *m_toLineEdit;
 
 	QPushButton *m_lockButton;
 	QPushButton *m_cancelButton;
@@ -134,7 +132,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNUnlockFrameRangeDialog : public Dialog
+class SVNUnlockFrameRangeDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -180,7 +178,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNUnlockMultiFrameRangeDialog : public Dialog
+class SVNUnlockMultiFrameRangeDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -222,7 +220,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNFrameRangeLockInfoDialog : public Dialog
+class SVNFrameRangeLockInfoDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 
@@ -245,7 +243,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class SVNMultiFrameRangeLockInfoDialog : public Dialog
+class SVNMultiFrameRangeLockInfoDialog : public DVGui::Dialog
 {
 	Q_OBJECT
 

@@ -2,7 +2,7 @@
 
 #include "tfile_io.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #include <windows.h>
 #include <assert.h>

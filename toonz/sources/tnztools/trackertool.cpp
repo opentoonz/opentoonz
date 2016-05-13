@@ -224,7 +224,7 @@ public:
 	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
 	void onSelectionChanged() { invalidate(); }
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 	bool select(const TSelection *) { return false; }
 
 	bool pick(int &hookIndex, const TPointD &pos);
@@ -342,7 +342,7 @@ void TrackerTool::draw()
 			char *objectChar = (char *)malloc(2);
 			objectChar[0] = (char)(objectId + 65);
 			objectChar[1] = '\0';
-			string text(objectChar);
+			std::string text(objectChar);
 			tglDrawText(TPointD(-15, 10), text);
 			glPopMatrix();
 		}
@@ -351,7 +351,7 @@ void TrackerTool::draw()
 		TPointD p1 = hook->getBPos(fid);
 		bool linked = p0 == p1;
 		drawHook(p0, linked ? ToolUtils::NormalHook : ToolUtils::PassHookA, m_hookSelectedIndex == i);
-		string hookName = toString(i + 1);
+		std::string hookName = toString(i + 1);
 		TPixel32 balloonColor(200, 220, 205, 200);
 		TPoint balloonOffset(20, 20);
 		drawBalloon(p0, hookName, balloonColor, balloonOffset, false, &balloons);

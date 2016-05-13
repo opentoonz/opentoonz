@@ -19,7 +19,7 @@
 //-------------------------------------------------------------------
 
 class TData;
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TData>;
 #endif
 
@@ -46,7 +46,7 @@ class DVAPI TTextData : public TData
 
 public:
 	TTextData(TString text) : m_text(text) {}
-	TTextData(string text);
+	TTextData(std::string text);
 
 	TDataP clone() const;
 
@@ -55,24 +55,24 @@ public:
 
 //-------------------------------------------------------------------
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(push)
 #pragma warning(disable : 4251)
 #endif
 
 class DVAPI TFilePathListData : public TData
 {
-	vector<TFilePath> m_filePaths;
+	std::vector<TFilePath> m_filePaths;
 
 public:
-	TFilePathListData(const vector<TFilePath> &filePaths) : m_filePaths(filePaths) {}
+	TFilePathListData(const std::vector<TFilePath> &filePaths) : m_filePaths(filePaths) {}
 	TDataP clone() const;
 
 	int getFilePathCount() const { return m_filePaths.size(); }
 	TFilePath getFilePath(int i) const;
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(pop)
 #endif
 

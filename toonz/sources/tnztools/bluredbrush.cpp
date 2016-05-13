@@ -76,7 +76,7 @@ void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId, b
 //----------------------------------------------------------------------------------
 
 void eraseFromRasterCM(const TRasterCM32P &out, const TRaster32P &in,
-					   bool selective, int selectedStyleId, const wstring &mode)
+					   bool selective, int selectedStyleId, const std::wstring &mode)
 {
 	if (!out.getPointer() || !in.getPointer())
 		return;
@@ -343,7 +343,7 @@ void BluredBrush::updateDrawing(const TRasterCM32P rasCM, const TRasterCM32P ras
 //----------------------------------------------------------------------------------
 
 void BluredBrush::eraseDrawing(const TRasterCM32P rasCM, const TRasterCM32P rasBackupCM, const TRect &bbox,
-							   bool selective, int selectedStyleId, const wstring &mode) const
+							   bool selective, int selectedStyleId, const std::wstring &mode) const
 {
 	if (!rasCM)
 		return;
@@ -359,7 +359,7 @@ void BluredBrush::eraseDrawing(const TRasterCM32P rasCM, const TRasterCM32P rasB
 
 //----------------------------------------------------------------------------------
 
-TRect BluredBrush::getBoundFromPoints(const vector<TThickPoint> &points) const
+TRect BluredBrush::getBoundFromPoints(const std::vector<TThickPoint> &points) const
 {
 	assert(points.size() <= 3);
 	TThickPoint p = points[0];

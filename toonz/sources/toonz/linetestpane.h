@@ -16,8 +16,6 @@
 #include <QThread>
 #include <QWaitCondition>
 
-using namespace DVGui;
-
 class QStackedWidget;
 
 //=============================================================================

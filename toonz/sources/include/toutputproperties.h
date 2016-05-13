@@ -78,7 +78,7 @@ public:
 private:
 	TFilePath m_path;
 
-	std::map<string, TPropertyGroup *> m_formatProperties; //!< [\p owned] Format properties by file extension.
+	std::map<std::string, TPropertyGroup *> m_formatProperties; //!< [\p owned] Format properties by file extension.
 
 	TRenderSettings *m_renderSettings;
 
@@ -194,12 +194,12 @@ public:
     Return \b TPropertyGroup, file format \b ext (Extension) properties.
     If extension there isn't is created.
   */
-	TPropertyGroup *getFileFormatProperties(string ext);
+	TPropertyGroup *getFileFormatProperties(std::string ext);
 
 	/*!
     Insert in \b v all extension in format properties of output settings.
   */
-	void getFileFormatPropertiesExtensions(std::vector<string> &v) const;
+	void getFileFormatPropertiesExtensions(std::vector<std::string> &v) const;
 
 	//! Sets the rendering behaviour to 'Multimedia'.
 	void setMultimediaRendering(int mode) { m_multimediaRendering = mode; }

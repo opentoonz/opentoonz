@@ -20,7 +20,7 @@ void mergePalette(const TPaletteP &targetPalette, std::map<int, int> &indexTable
 		assert(srcStyle);
 		TPalette::Page *page = sourcePalette->getStylePage(srcStyleId);
 		if (page) {
-			wstring pageName = page->getName();
+			std::wstring pageName = page->getName();
 			int j = 0;
 			for (j = 0; j < targetPalette->getPageCount(); j++) {
 				if (targetPalette->getPage(j)->getName() != pageName)

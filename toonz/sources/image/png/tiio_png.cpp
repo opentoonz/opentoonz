@@ -2,6 +2,8 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
+#include <memory>
+
 #include "tmachine.h"
 #include "texception.h"
 #include "tfilepath.h"
@@ -55,12 +57,24 @@ class PngReader : public Tiio::Reader
 	unsigned int m_sig_read;
 	int m_y;
 	bool m_is16bitEnabled;
-	unsigned char *m_rowBuffer;
-	unsigned char *m_tempBuffer; //Buffer temporaneo
+	std::unique_ptr<unsigned char[]> m_rowBuffer;
+	std::unique_ptr<unsigned char[]> m_tempBuffer; //Buffer temporaneo
 	int m_canDelete;
 public:
 	PngReader()
-		: m_chan(0), m_png_ptr(0), m_info_ptr(0), m_end_info_ptr(0), m_bit_depth(0), m_color_type(0), m_interlace_type(0), m_compression_type(0), m_filter_type(0), m_sig_read(0), m_y(0), m_is16bitEnabled(true), m_rowBuffer(0), m_tempBuffer(0), m_canDelete(0)
+		: m_chan(0)
+		, m_png_ptr(0)
+		, m_info_ptr(0)
+		, m_end_info_ptr(0)
+		, m_bit_depth(0)
+		, m_color_type(0)
+		, m_interlace_type(0)
+		, m_compression_type(0)
+		, m_filter_type(0)
+		, m_sig_read(0)
+		, m_y(0)
+		, m_is16bitEnabled(true)
+		, m_canDelete(0)
 	{
 	}
 
@@ -69,8 +83,6 @@ public:
 		if (m_canDelete == 1) {
 			png_destroy_read_struct(&m_png_ptr, &m_info_ptr, &m_end_info_ptr);
 		}
-		delete[] m_rowBuffer;
-		delete[] m_tempBuffer;
 	}
 	
 	virtual bool read16BitIsEnabled() const { return m_is16bitEnabled; }
@@ -140,9 +152,6 @@ public:
 		}
 
 		int rowBytes = png_get_rowbytes(m_png_ptr, m_info_ptr);
-		if (m_rowBuffer)
-			delete[] m_rowBuffer;
-		//m_rowBuffer = new unsigned char[rowBytes];
 
 		TUINT32 lx = 0, ly = 0;
 		png_get_IHDR(m_png_ptr, m_info_ptr, &lx, &ly, &m_bit_depth, &m_color_type,
@@ -157,11 +166,11 @@ public:
 
 		if (channels == 1 || channels == 2) {
 			if (m_bit_depth < 8) // (m_bit_depth == 1 || m_bit_depth == 2 || m_bit_depth == 4)
-				m_rowBuffer = new unsigned char[lx * 3];
+				m_rowBuffer.reset(new unsigned char[lx * 3]);
 			else
-				m_rowBuffer = new unsigned char[rowBytes * 4];
+				m_rowBuffer.reset(new unsigned char[rowBytes * 4]);
 		} else {
-			m_rowBuffer = new unsigned char[rowBytes];
+			m_rowBuffer.reset(new unsigned char[rowBytes]);
 		}
 
 		if (m_color_type == PNG_COLOR_TYPE_PALETTE) {
@@ -211,11 +220,11 @@ public:
 			if (m_interlace_type == 1) {
 				if (channels == 1 || channels == 2) {
 					if (m_bit_depth < 8)
-						m_tempBuffer = new unsigned char[ly * lx * 3];
+						m_tempBuffer.reset(new unsigned char[ly * lx * 3]);
 					else
-						m_tempBuffer = new unsigned char[ly * rowBytes * 4];
+						m_tempBuffer.reset(new unsigned char[ly * rowBytes * 4]);
 				} else {
-					m_tempBuffer = new unsigned char[ly * rowBytes];
+					m_tempBuffer.reset(new unsigned char[ly * rowBytes]);
 				}
 			}
 		}
@@ -225,8 +234,7 @@ public:
 			readLineInterlace(&buffer[0], x0, x1, shrink);
 			m_y++;
 			if (m_tempBuffer && m_y == ly) {
-				delete[] m_tempBuffer;
-				m_tempBuffer = 0;
+				m_tempBuffer.reset();
 			}
 			return;
 		}
@@ -236,14 +244,13 @@ public:
 			return;
 		m_y++;
 
-		png_bytep row_pointer = m_rowBuffer;
+		png_bytep row_pointer = m_rowBuffer.get();
 		png_read_row(m_png_ptr, row_pointer, NULL);
 
 		writeRow(buffer);
 
 		if (m_tempBuffer && m_y == ly) {
-			delete[] m_tempBuffer;
-			m_tempBuffer = 0;
+			m_tempBuffer.reset();
 		}
 	}
 
@@ -257,11 +264,11 @@ public:
 			if (m_interlace_type == 1) {
 				if (channels == 1 || channels == 2) {
 					if (m_bit_depth < 8) // (m_bit_depth == 1 || m_bit_depth == 2 || m_bit_depth == 4)
-						m_tempBuffer = new unsigned char[ly * lx * 3];
+						m_tempBuffer.reset(new unsigned char[ly * lx * 3]);
 					else
-						m_tempBuffer = new unsigned char[ly * rowBytes * 4];
+						m_tempBuffer.reset(new unsigned char[ly * rowBytes * 4]);
 				} else {
-					m_tempBuffer = new unsigned char[ly * rowBytes];
+					m_tempBuffer.reset(new unsigned char[ly * rowBytes]);
 				}
 			}
 		}
@@ -270,8 +277,7 @@ public:
 			readLineInterlace(&buffer[0], x0, x1, shrink);
 			m_y++;
 			if (m_tempBuffer && m_y == ly) {
-				delete[] m_tempBuffer;
-				m_tempBuffer = 0;
+				m_tempBuffer.reset();
 			}
 			return;
 		}
@@ -281,14 +287,13 @@ public:
 			return;
 		m_y++;
 
-		png_bytep row_pointer = m_rowBuffer;
+		png_bytep row_pointer = m_rowBuffer.get();
 		png_read_row(m_png_ptr, row_pointer, NULL);
 
 		writeRow(buffer);
 
 		if (m_tempBuffer && m_y == ly) {
-			delete[] m_tempBuffer;
-			m_tempBuffer = 0;
+			m_tempBuffer.reset();
 		}
 	}
 
@@ -303,7 +308,7 @@ public:
 				free(lineBuffer);
 			} else {
 				m_y++;
-				png_bytep row_pointer = m_rowBuffer;
+				png_bytep row_pointer = m_rowBuffer.get();
 				png_read_row(m_png_ptr, row_pointer, NULL);
 			}
 		}
@@ -468,43 +473,43 @@ public:
 		if ((channels == 4 || channels == 3) && m_bit_depth == 16) {
 			for (int i = 0; i < count; i += 2) {
 				for (int j = 0; j < channels * 2; j++) {
-					(m_tempBuffer + (dstY * rowBytes))[(i * dstDx + dstX) * channels + j] = m_rowBuffer[i * channels + j];
+					(m_tempBuffer.get() + (dstY * rowBytes))[(i * dstDx + dstX) * channels + j] = m_rowBuffer[i * channels + j];
 				}
 			}
 		} else if (channels == 2 && m_bit_depth == 16) {
 			for (int i = 0; i < count; i += 2) {
 				for (int j = 0; j < 4 * 2; j++) {
-					(m_tempBuffer + (dstY * rowBytes * 4))[(i * dstDx + dstX) * 4 + j] = m_rowBuffer[i * 4 + j];
+					(m_tempBuffer.get() + (dstY * rowBytes * 4))[(i * dstDx + dstX) * 4 + j] = m_rowBuffer[i * 4 + j];
 				}
 			}
 		} else if (channels == 1 && m_bit_depth == 16) {
 			for (int i = 0; i < count; i += 2) {
 				for (int j = 0; j < 3 * 2; j++) {
-					(m_tempBuffer + (dstY * rowBytes * 4))[(i * dstDx + dstX) * 3 + j] = m_rowBuffer[i * 3 + j];
+					(m_tempBuffer.get() + (dstY * rowBytes * 4))[(i * dstDx + dstX) * 3 + j] = m_rowBuffer[i * 3 + j];
 				}
 			}
 		} else if (channels == 1 && m_bit_depth == 8) {
 			for (int i = 0; i < count; i++) {
 				for (int j = 0; j < 3; j++) {
-					(m_tempBuffer + (dstY * rowBytes * 4))[(i * dstDx + dstX) * 3 + j] = m_rowBuffer[i * 3 + j];
+					(m_tempBuffer.get() + (dstY * rowBytes * 4))[(i * dstDx + dstX) * 3 + j] = m_rowBuffer[i * 3 + j];
 				}
 			}
 		} else if (channels == 2 && m_bit_depth == 8) {
 			for (int i = 0; i < count; i++) {
 				for (int j = 0; j < 4; j++) {
-					(m_tempBuffer + (dstY * rowBytes * 4))[(i * dstDx + dstX) * 4 + j] = m_rowBuffer[i * 4 + j];
+					(m_tempBuffer.get() + (dstY * rowBytes * 4))[(i * dstDx + dstX) * 4 + j] = m_rowBuffer[i * 4 + j];
 				}
 			}
 		} else if ((channels == 1 || channels == 2) && m_bit_depth < 8) {
 			for (int i = 0; i < count; i++) {
 				for (int j = 0; j < 3; j++) {
-					(m_tempBuffer + (dstY * lx * 3))[(i * dstDx + dstX) * 3 + j] = m_rowBuffer[i * 3 + j];
+					(m_tempBuffer.get() + (dstY * lx * 3))[(i * dstDx + dstX) * 3 + j] = m_rowBuffer[i * 3 + j];
 				}
 			}
 		} else {
 			for (int i = 0; i < count; i++) {
 				for (int j = 0; j < channels; j++) {
-					(m_tempBuffer + (dstY * rowBytes))[(i * dstDx + dstX) * channels + j] = m_rowBuffer[i * channels + j];
+					(m_tempBuffer.get() + (dstY * rowBytes))[(i * dstDx + dstX) * channels + j] = m_rowBuffer[i * channels + j];
 				}
 			}
 		}
@@ -524,7 +529,7 @@ public:
 		int channels = png_get_channels(m_png_ptr, m_info_ptr);
 
 		int rowBytes = png_get_rowbytes(m_png_ptr, m_info_ptr);
-		png_bytep row_pointer = m_rowBuffer;
+		png_bytep row_pointer = m_rowBuffer.get();
 
 		int lx = m_info.m_lx;
 
@@ -581,11 +586,11 @@ public:
 		// fase di copia
 		if (channels == 1 || channels == 2) {
 			if (m_bit_depth < 8)
-				memcpy(m_rowBuffer, m_tempBuffer + ((m_y)*lx * 3), lx * 3);
+				memcpy(m_rowBuffer.get(), m_tempBuffer.get() + ((m_y)*lx * 3), lx * 3);
 			else
-				memcpy(m_rowBuffer, m_tempBuffer + ((m_y)*rowBytes * 4), rowBytes * 4);
+				memcpy(m_rowBuffer.get(), m_tempBuffer.get() + ((m_y)*rowBytes * 4), rowBytes * 4);
 		} else {
-			memcpy(m_rowBuffer, m_tempBuffer + ((m_y)*rowBytes), rowBytes);
+			memcpy(m_rowBuffer.get(), m_tempBuffer.get() + ((m_y)*rowBytes), rowBytes);
 		}
 
 		// fase di copia vecchia
@@ -611,7 +616,7 @@ public:
 		int lx = m_info.m_lx;
 
 		int rowBytes = png_get_rowbytes(m_png_ptr, m_info_ptr);
-		png_bytep row_pointer = m_rowBuffer;
+		png_bytep row_pointer = m_rowBuffer.get();
 
 		while (passPng <= passRow && rowNumber < numRows) //finchè il passo d'interlacciamento è minore o uguale
 														  //del passo desiderato effettua tante volte le lettura della riga
@@ -652,9 +657,9 @@ public:
 
 		// fase di copia
 		if (channels == 1 || channels == 2) {
-			memcpy(m_rowBuffer, m_tempBuffer + ((m_y)*rowBytes * 4), rowBytes * 4);
+			memcpy(m_rowBuffer.get(), m_tempBuffer.get() + ((m_y)*rowBytes * 4), rowBytes * 4);
 		} else {
-			memcpy(m_rowBuffer, m_tempBuffer + ((m_y)*rowBytes), rowBytes);
+			memcpy(m_rowBuffer.get(), m_tempBuffer.get() + ((m_y)*rowBytes), rowBytes);
 		}
 
 		// fase di copia
@@ -684,7 +689,7 @@ class PngWriter : public Tiio::Writer
 	png_infop m_info_ptr;
 	FILE *m_chan;
 	bool m_matte;
-	vector<TPixel> *m_colormap;
+	std::vector<TPixel> *m_colormap;
 
 public:
 	PngWriter();

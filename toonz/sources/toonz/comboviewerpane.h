@@ -24,8 +24,6 @@ class FlipConsole;
 class TXshLevel;
 class ToolOptions;
 
-using namespace DVGui;
-
 //=============================================================================
 // ComboViewerPanel
 //-----------------------------------------------------------------------------

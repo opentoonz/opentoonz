@@ -1,0 +1,144 @@
+<menubar>
+  <menu title="File">    
+    <command>MI_LoadLevel</command>
+    <command>MI_LoadFolder</command>
+    <command>MI_SaveLevel</command>
+    <command>MI_SaveLevelAs</command>
+    <command>MI_ExportLevel</command>
+    <command>MI_OpenRecentLevel</command>
+    <command>MI_LevelSettings</command>
+    <separator/>
+    <command>MI_NewLevel</command>
+    <separator/>
+    <command>MI_OverwritePalette</command>
+    <command>MI_SavePaletteAs</command>
+    <separator/>
+    <command>MI_LoadScene</command>
+    <command>MI_SaveScene</command>
+    <command>MI_SaveSceneAs</command>
+    <command>MI_SaveAll</command>
+    <command>MI_OpenRecentScene</command>
+    <command>MI_RevertScene</command>
+    <separator/>
+    <command>MI_ConvertFileWithInput</command>
+    <separator/>
+    <command>MI_NewScene</command>
+    <separator/>
+    <command>MI_Quit</command>
+  </menu>
+  <menu title="Tools">
+    <command>T_StylePicker</command>
+    <command>T_RGBPicker</command>
+    <command>T_Tape</command>
+    <separator/>
+    <command>T_Fill</command>
+    <command>T_Brush</command>
+    <command>T_PaintBrush</command>
+    <command>T_Geometric</command>
+    <command>T_Type</command>
+    <separator/>
+    <command>T_Eraser</command>
+    <menu title="More Tools">
+      <command>T_Edit</command>
+      <command>T_Selection</command>
+      <separator/>
+      <command>T_ControlPointEditor</command>
+      <command>T_Pinch</command>
+      <command>T_Pump</command>
+      <command>T_Magnet</command>
+      <command>T_Bender</command>
+      <command>T_Iron</command>
+      <command>T_Cutter</command>
+      <separator/>
+      <command>T_Skeleton</command>
+      <command>T_Tracker</command>
+      <command>T_Hook</command>
+      <command>T_Plastic</command>
+      <separator/>
+      <command>T_Zoom</command>
+      <command>T_Rotate</command>
+      <command>T_Hand</command>
+    </menu>
+  </menu>
+  <menu title="Edit">
+    <command>MI_Undo</command>
+    <command>MI_Redo</command>
+    <separator/>
+    <command>MI_NextFrame</command>
+    <command>MI_PrevFrame</command>
+    <command>MI_FirstFrame</command>
+    <command>MI_LastFrame</command>
+    <command>MI_TestAnimation</command>
+    <separator/>
+    <command>MI_Copy</command>
+    <command>MI_Cut</command>
+    <command>MI_Paste</command>
+    <command>MI_PasteInto</command>
+    <separator/>
+    <command>MI_Clear</command>
+    <command>MI_Insert</command>
+    <command>MI_SelectAll</command>
+    <command>MI_InvertSelection</command>
+  </menu>
+  <menu title="Checks">
+    <command>MI_TCheck</command>
+    <command>MI_BCheck</command>
+    <command>MI_ICheck</command>
+    <command>MI_Ink1Check</command>
+    <command>MI_PCheck</command>
+  </menu>
+  <menu title="Render">
+    <command>MI_PreviewSettings</command>
+    <command>MI_Preview</command>
+    <command>MI_SavePreviewedFrames</command>
+    <separator/>
+    <command>MI_OutputSettings</command>
+    <command>MI_Render</command>
+  </menu>
+  <menu title="Windows">
+    <command>MI_OpenFileBrowser</command>
+    <command>MI_OpenFileViewer</command>
+    <command>MI_OpenFilmStrip</command>
+    <command>MI_OpenPalette</command>
+    <command>MI_OpenStudioPalette</command>
+    <command>MI_OpenStyleControl</command>
+    <command>MI_OpenLevelView</command>
+    <command>MI_OpenComboViewer</command>
+    <command>MI_OpenXshView</command>
+    <separator/>
+    <menu title="Other Windows">
+      <command>MI_OpenBatchServers</command>
+      <command>MI_OpenColorModel</command>
+      <command>MI_OpenFunctionEditor</command>
+      <command>MI_OpenFileBrowser2</command>
+      <command>MI_OpenSchematic</command>
+      <command>MI_OpenTasks</command>
+      <command>MI_OpenToolbar</command>
+      <command>MI_OpenToolOptionBar</command>
+      <command>MI_OpenHistoryPanel</command>
+      <command>MI_OpenTMessage</command>
+    </menu>
+  </menu>
+  <menu title="Customize">
+    <command>MI_Preferences</command>
+    <command>MI_ShortcutPopup</command>
+    <command>MI_SceneSettings</command>
+    <separator/>
+    <menu title="View">
+      <command>MI_ViewCamera</command>
+      <command>MI_ViewTable</command>
+      <command>MI_FieldGuide</command>
+      <command>MI_SafeArea</command>
+      <command>MI_ViewColorcard</command>
+    </menu>
+    <separator/>
+    <command>MI_DockingCheck</command>
+    <separator/>
+    <command>MI_RunScript</command>
+    <command>MI_OpenScriptConsole</command>
+    <command_debug>MI_ReloadStyle</command_debug>
+  </menu>
+  <menu title="Help">
+    <command>MI_About</command>
+  </menu>
+</menubar>

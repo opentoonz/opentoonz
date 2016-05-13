@@ -6,7 +6,7 @@
 /*---------------------------------------------------------------------------*/
 
 void getInfoRegion(
-	register INFO_REGION *region,
+	INFO_REGION *region,
 	int x1_out, int y1_out, int x2_out, int y2_out, int scale,
 	int width_in, int height_in)
 {
@@ -17,11 +17,11 @@ void getInfoRegion(
    *    ca cui prendere (leggere) la regione voluta (output).
    */
 
-	register int x1_in, y1_in, x2_in, y2_in;
+	int x1_in, y1_in, x2_in, y2_in;
 
 #define SWAP(a, b)        \
 	{                     \
-		register int tmp; \
+		int tmp; \
 		tmp = a;          \
 		a = b;            \
 		b = tmp;          \
@@ -142,7 +142,7 @@ int get_info_region(EXT_INFO_REGION *region,
 
 #define SWAP(a, b)        \
 	{                     \
-		register int tmp; \
+		int tmp; \
 		tmp = a;          \
 		a = b;            \
 		b = tmp;          \

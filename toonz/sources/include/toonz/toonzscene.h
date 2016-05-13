@@ -153,7 +153,7 @@ public:
     Create a new level with \b type defined in \b txshleveltypes.h and \b levelName.
     \b wstring \b levelName force an anambiguos name.
   */
-	TXshLevel *createNewLevel(int type, wstring levelName = L"", const TDimension &dim = TDimension(), double dpi = 0,
+	TXshLevel *createNewLevel(int type, std::wstring levelName = L"", const TDimension &dim = TDimension(), double dpi = 0,
 							  TFilePath fp = TFilePath());
 
 	/*!
@@ -175,7 +175,7 @@ public:
     Return the default \b TFilePath of a \b levelType level
   */
 
-	TFilePath getDefaultLevelPath(int levelType, wstring levelName = L"a") const;
+	TFilePath getDefaultLevelPath(int levelType, std::wstring levelName = L"a") const;
 
 	/*!
     Code save path. Es. +drawings/seq1/scena1/a.pli -> +drawings/$savepath/a.pli
@@ -197,7 +197,7 @@ public:
 	TCamera *getCurrentPreviewCamera();
 
 	/*!
-    Insert in \b std::vector \b columns all sound column of scene \b scene.
+    Insert in \b vector \b columns all sound column of scene \b scene.
   */
 	void getSoundColumns(std::vector<TXshSoundColumn *> &columns);
 	/*!

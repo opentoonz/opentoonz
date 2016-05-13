@@ -1,4 +1,4 @@
-
+#include <memory>
 
 #include "cellselection.h"
 
@@ -598,7 +598,7 @@ class ReframeUndo : public TUndo
 	int m_r0, m_r1;
 	int m_type;
 	int m_nr;
-	TXshCell *m_cells;
+	std::unique_ptr<TXshCell[]> m_cells;
 
 public:
 	std::vector<int> m_newRows;
@@ -629,11 +629,11 @@ public:
 //-----------------------------------------------------------------------------
 
 ReframeUndo::ReframeUndo(int r0, int r1, std::vector<int> columnIndeces, int type)
-	: m_r0(r0), m_r1(r1), m_type(type), m_nr(0), m_cells(0), m_columnIndeces(columnIndeces)
+	: m_r0(r0), m_r1(r1), m_type(type), m_nr(0), m_columnIndeces(columnIndeces)
 {
 	m_nr = m_r1 - m_r0 + 1;
 	assert(m_nr > 0);
-	m_cells = new TXshCell[m_nr * (int)m_columnIndeces.size()];
+	m_cells.reset(new TXshCell[m_nr * (int)m_columnIndeces.size()]);
 	assert(m_cells);
 	int k = 0;
 	for (int r = r0; r <= r1; r++)
@@ -647,8 +647,6 @@ ReframeUndo::ReframeUndo(int r0, int r1, std::vector<int> columnIndeces, int typ
 
 ReframeUndo::~ReframeUndo()
 {
-	delete[] m_cells;
-	m_cells = 0;
 }
 
 //-----------------------------------------------------------------------------

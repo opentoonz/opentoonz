@@ -11,17 +11,15 @@ class QPushButton;
 class QLabel;
 class TFilePath;
 
-using namespace DVGui;
-
 //=============================================================================
 // FileInfoPopup
 //-----------------------------------------------------------------------------
 
-class FileInfoPopup : public Dialog
+class FileInfoPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
-	typedef std::pair<string, string> StringPair;
+	typedef std::pair<std::string, std::string> StringPair;
 
 	QPushButton *m_closeBtn;
 
@@ -38,7 +36,7 @@ class FileInfoPopup : public Dialog
 	//  QLabel *m_dpiLabel;
 	//  TFilePath *m_xl;
 
-	void drawpair(TPoint p, std::pair<string, string> &StringPair);
+	void drawpair(TPoint p, std::pair<std::string, std::string> &StringPair);
 
 public:
 	FileInfoPopup();

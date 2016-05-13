@@ -15,8 +15,6 @@ class FileField;
 class LineEdit;
 }
 
-using namespace DVGui;
-
 class MagpieInfo
 {
 	QList<QString> m_actorActs;
@@ -39,17 +37,17 @@ public:
 // MagpieFileImportPopup
 //-----------------------------------------------------------------------------
 
-class MagpieFileImportPopup : public Dialog
+class MagpieFileImportPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
 	MagpieInfo *m_info;
 
-	FileField *m_levelField;
-	IntLineEdit *m_fromField;
-	IntLineEdit *m_toField;
+	DVGui::FileField *m_levelField;
+	DVGui::IntLineEdit *m_fromField;
+	DVGui::IntLineEdit *m_toField;
 
-	QList<QPair<QLabel *, IntLineEdit *>> m_actFields;
+	QList<QPair<QLabel *, DVGui::IntLineEdit *>> m_actFields;
 
 	FlipBook *m_flipbook;
 	TFilePath m_levelPath;

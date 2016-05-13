@@ -1,4 +1,4 @@
-
+#include <memory>
 
 // TnzCore includes
 #include "tgl.h"
@@ -8,9 +8,6 @@
 
 // tcg includes
 #include "tcg/tcg_list.h"
-
-// Boost includes
-#include <boost/make_shared.hpp>
 
 // Qt includes
 #include <QString>
@@ -150,7 +147,7 @@ DrawableTextureDataP TTexturesStorage::loadTexture(
 
 	MeshTexturizer &texturizer = it->second->m_texturizer;
 
-	DrawableTextureDataP dataPtr = boost::make_shared<DrawableTextureData>();
+	DrawableTextureDataP dataPtr = std::make_shared<DrawableTextureData>();
 	DrawableTextureData *data = dataPtr.get();
 
 	data->m_dlSpaceId = dlSpaceId;

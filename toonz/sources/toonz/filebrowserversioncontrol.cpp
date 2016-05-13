@@ -181,7 +181,7 @@ void FileBrowser::editVersionControl()
 	}
 
 	if (hasCurrentSceneFile) {
-		MsgBox(WARNING, tr("Some files that you want to edit are currently opened. Close them first."));
+		DVGui::warning(tr("Some files that you want to edit are currently opened. Close them first."));
 		return;
 	}
 
@@ -404,7 +404,7 @@ void FileBrowser::unlockVersionControl()
 	}
 
 	if (hasCurrentSceneFile) {
-		MsgBox(WARNING, tr("Some files that you want to unlock are currently opened. Close them first."));
+		DVGui::warning(tr("Some files that you want to unlock are currently opened. Close them first."));
 		return;
 	}
 	vc->unlock(this, path, files, sceneIconsCount);

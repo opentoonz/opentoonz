@@ -234,7 +234,7 @@ bool TrackerPopup::apply()
 	m_tracker = new Tracker(threshold, sensibility, activeBackground,
 							manageOcclusion, variationWindow, frameStart, framesNumber);
 	if (m_tracker->getLastError() != 0) {
-		DVGui::MsgBox(WARNING, m_tracker->getLastError());
+		DVGui::warning(m_tracker->getLastError());
 		return false;
 	}
 
@@ -402,40 +402,40 @@ bool Tracker::setup()
 	}
 
 	//ID object
-	short *id = new short[m_trackerCount];
+	std::unique_ptr<short[]> id(new short[m_trackerCount]);
 	if (!id) {
 		m_lastErrorCode = 1;
 		return false;
 	}
 
 	//(x,y) coordinate object
-	short *x = new short[m_trackerCount];
+	std::unique_ptr<short[]> x(new short[m_trackerCount]);
 	if (!x) {
 		m_lastErrorCode = 1;
 		return false;
 	}
 
-	short *y = new short[m_trackerCount];
+	std::unique_ptr<short[]> y(new short[m_trackerCount]);
 	if (!y) {
 		m_lastErrorCode = 1;
 		return false;
 	}
 
 	//Width and Height of object box
-	short *Width = new short[m_trackerCount];
+	std::unique_ptr<short[]> Width(new short[m_trackerCount]);
 	if (!Width) {
 		m_lastErrorCode = 1;
 		return false;
 	}
 
-	short *Height = new short[m_trackerCount];
+	std::unique_ptr<short[]> Height(new short[m_trackerCount]);
 	if (!Height) {
 		m_lastErrorCode = 1;
 		return false;
 	}
 
 	//# start frame
-	m_numstart = new int[m_trackerCount];
+	std::unique_ptr<int[]> m_numstart(new int[m_trackerCount]);
 	if (!m_numstart) {
 		m_lastErrorCode = 1;
 		return false;
@@ -628,11 +628,6 @@ bool Tracker::setup()
 	m_trackerRegionIndex = 0;
 	m_oldObjectId = 0;
 
-	delete[] x;
-	delete[] y;
-	delete[] Width;
-	delete[] Height;
-	delete[] id;
 	return true;
 }
 

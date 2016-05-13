@@ -405,7 +405,7 @@ void MeasuredDoubleLineEdit::getRange(double &minValue, double &maxValue)
 
 //-----------------------------------------------------------------------------
 
-void MeasuredDoubleLineEdit::setMeasure(string name)
+void MeasuredDoubleLineEdit::setMeasure(std::string name)
 {
 	delete m_value;
 	m_value = new TMeasuredValue(name != "" ? name : "dummy");
@@ -509,7 +509,7 @@ MeasuredDoubleField::MeasuredDoubleField(QWidget *parent, bool isRollerHide)
 
 ///----------------------------------------------------------------------------
 
-void MeasuredDoubleField::setMeasure(string measureName)
+void MeasuredDoubleField::setMeasure(std::string measureName)
 {
 	MeasuredDoubleLineEdit *lineEdit = dynamic_cast<MeasuredDoubleLineEdit *>(m_lineEdit);
 	assert(lineEdit);

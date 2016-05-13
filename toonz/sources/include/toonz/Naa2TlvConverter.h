@@ -30,14 +30,13 @@ class WorkRaster
 public:
 	typedef T Pixel;
 	WorkRaster(int lx, int ly) : m_lx(lx), m_ly(ly), m_buffer(new Pixel[lx * ly]) {}
-	~WorkRaster() { delete[] m_buffer; }
 
 	inline int getLx() const { return m_lx; }
 	inline int getLy() const { return m_ly; }
-	inline Pixel *pixels(int y = 0) const { return m_buffer + m_lx * y; }
+	inline Pixel *pixels(int y = 0) const { return m_buffer.get() + m_lx * y; }
 
 private:
-	Pixel *m_buffer;
+	std::unique_ptr<Pixel[]> m_buffer;
 	int m_lx, m_ly;
 };
 

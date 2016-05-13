@@ -38,7 +38,7 @@
 #include "tnzimage.h"
 #include "tflash.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "avicodecrestrictions.h"
 #endif
 
@@ -153,7 +153,7 @@ const char *systemVarPrefix = "TOONZ";
 
 void fatalError(string msg)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	std::cout << msg << std::endl;
 	//MessageBox(0,msg.c_str(),"Fatal error",MB_ICONERROR);
 	exit(1);
@@ -310,7 +310,7 @@ bool MyMovieRenderListener::onFrameCompleted(int frame)
 		msg = toString(fp.getWideString()) + " computed";
 	cout << msg << endl;
 	m_userLog->info(msg);
-	DVGui::MsgBox(INFORMATION, QString::fromStdString(msg));
+	DVGui::info(QString::fromStdString(msg));
 	if (FarmController) {
 		try {
 			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount, m_frameCount, frame + 1, FrameDone);
@@ -462,7 +462,7 @@ std::pair<int, int> generateMovie(ToonzScene *scene,
 
 	string ext = fp.getType();
 
-#ifdef WIN32
+#ifdef _WIN32
 	if (ext == "avi") {
 		TPropertyGroup *props = scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
 		string codecName = props->getProperty(0)->getValueAsString();
@@ -473,7 +473,7 @@ std::pair<int, int> generateMovie(ToonzScene *scene,
 			exit(1);
 		}
 	}
-#endif;
+#endif
 
 	double cameraXDpi, cameraYDpi;
 	TPointD camDpi = scene->getCurrentCamera()->getDpi();
@@ -600,7 +600,7 @@ int main(int argc, char *argv[])
 	std::auto_ptr<QObject> mainScope(new QObject(&app));
 	mainScope->setObjectName("mainScope");
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef x64
 	//Store the floating point control word. It will be re-set before Toonz initialization
 	//has ended.
@@ -616,7 +616,7 @@ int main(int argc, char *argv[])
 	// Install run out of contiguous memory callback
 	TBigMemoryManager::instance()->setRunOutOfContiguousMemoryHandler(&tcomposerRunOutOfContMemHandler);
 
-#ifdef WIN32
+#ifdef _WIN32
 //Define 64-bit precision for floating-point arithmetic. Please observe that the
 //initImageIo() call below would already impose this precision. This just wants to be
 //explicit.
@@ -1003,7 +1003,7 @@ int main(int argc, char *argv[])
 		//TCacheResourcePool::instance();   //Needs to be instanced before TPassiveCacheManager...
 		TPassiveCacheManager::instance()->setEnabled(false);
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef x64
 		//On 32-bit architecture, there could be cases in which initialization could alter the
 		//FPU floating point control word. I've seen this happen when loading some AVI coded (VFAPI),
@@ -1029,7 +1029,7 @@ int main(int argc, char *argv[])
 					  toString(TStopWatch::global(8).getTotalTime() / 1000.0, 2) + " seconds spent on rendering" + "\n";
 		cout << msg + msg2;
 		m_userLog->info(msg + msg2);
-		DVGui::MsgBox(INFORMATION, QString::fromStdString(msg));
+		DVGui::info(QString::fromStdString(msg));
 		TImageCache::instance()->clear(true);
 		/*
     cout << "Compositing completed in " + toString(Sw1.getTotalTime()/1000.0, 2) + " seconds";

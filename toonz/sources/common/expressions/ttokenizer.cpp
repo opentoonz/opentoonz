@@ -25,7 +25,7 @@ Tokenizer::Tokenizer()
 
 //-------------------------------------------------------------------
 
-Tokenizer::Tokenizer(string buffer)
+Tokenizer::Tokenizer(std::string buffer)
 	: m_buffer(), m_index(0)
 {
 	setBuffer(buffer);
@@ -39,7 +39,7 @@ Tokenizer::~Tokenizer()
 
 //-------------------------------------------------------------------
 
-void Tokenizer::setBuffer(string buffer)
+void Tokenizer::setBuffer(std::string buffer)
 {
 	m_buffer = buffer + '\0';
 	m_index = 0;
@@ -68,11 +68,11 @@ void Tokenizer::setBuffer(string buffer)
 			continue;
 		}
 
-		string token;
+		std::string token;
 
 		if (stringBlock) {
 			// string block - read mercilessly until either another '"' or EOS
-			token = string(1, s[i++]);
+			token = std::string(1, s[i++]);
 
 			while (s[i] != '"' && s[i] != '\0')
 				token.append(1, s[i++]);
@@ -80,7 +80,7 @@ void Tokenizer::setBuffer(string buffer)
 			m_tokens.push_back(Token(token, Token::Ident, j));
 		} else if (isascii(s[i]) && isalpha(s[i]) || s[i] == '_') {
 			// ident
-			token = string(1, s[i++]);
+			token = std::string(1, s[i++]);
 
 			while (isascii(s[i]) && (isalpha(s[i]) || s[i] == '_' || isdigit(s[i])))
 				token.append(1, s[i++]);
@@ -114,18 +114,18 @@ void Tokenizer::setBuffer(string buffer)
 		} else {
 			// punct.
 			if (s[i + 1] != '\0') {
-				token = string(s + i, 2);
+				token = std::string(s + i, 2);
 
-				const string ss[] = {
+				const std::string ss[] = {
 					"==", "!=", ">=", "<=", "||", "&&"};
 
 				const int m = tArrayCount(ss);
 				if (std::find(ss, ss + m, token) != ss + m)
 					i += 2;
 				else
-					token = string(1, s[i++]);
+					token = std::string(1, s[i++]);
 			} else
-				token = string(1, s[i++]);
+				token = std::string(1, s[i++]);
 
 			m_tokens.push_back(Token(token, Token::Punct, j));
 		}

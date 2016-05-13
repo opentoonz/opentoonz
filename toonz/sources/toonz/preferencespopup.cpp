@@ -637,6 +637,13 @@ void PreferencesPopup::onPaletteTypeForRasterColorModelChanged(int index)
 
 //-----------------------------------------------------------------------------
 
+void PreferencesPopup::onShowKeyframesOnCellAreaChanged(int index)
+{
+	m_pref->enableShowKeyframesOnXsheetCellArea(index == Qt::Checked);
+}
+
+//-----------------------------------------------------------------------------
+
 void PreferencesPopup::onStyleSheetTypeChanged(int index)
 {
 	m_pref->setCurrentStyleSheet(index);
@@ -839,7 +846,7 @@ PreferencesPopup::PreferencesPopup()
 	CheckBox *useDefaultViewerCB = new CheckBox(tr("Use Default Viewer for Movie Formats"), this);
 	CheckBox *minimizeRasterMemoryCB = new CheckBox(tr("Minimize Raster Memory Fragmentation *"), this);
 	CheckBox *autoSaveCB = new CheckBox(tr("Save Automatically Every Minutes"));
-	m_minuteFld = new IntLineEdit(this, 15, 1, 60);
+	m_minuteFld = new DVGui::IntLineEdit(this, 15, 1, 60);
 	CheckBox *replaceAfterSaveLevelAsCB = new CheckBox(tr("Replace Toonz Level after SaveLevelAs command"), this);
 
 	m_cellsDragBehaviour = new QComboBox();
@@ -872,10 +879,10 @@ PreferencesPopup::PreferencesPopup()
 	QComboBox *styleSheetType = new QComboBox(this);
 	QComboBox *unitOm = new QComboBox(this);
 	QComboBox *cameraUnitOm = new QComboBox(this);
-	m_iconSizeLx = new IntLineEdit(this, 80, 10, 400);
-	m_iconSizeLy = new IntLineEdit(this, 60, 10, 400);
-	m_viewShrink = new IntLineEdit(this, 1, 1, 20);
-	m_viewStep = new IntLineEdit(this, 1, 1, 20);
+	m_iconSizeLx = new DVGui::IntLineEdit(this, 80, 10, 400);
+	m_iconSizeLy = new DVGui::IntLineEdit(this, 60, 10, 400);
+	m_viewShrink = new DVGui::IntLineEdit(this, 1, 1, 20);
+	m_viewStep = new DVGui::IntLineEdit(this, 1, 1, 20);
 
 	CheckBox *moveCurrentFrameCB = new CheckBox(tr("Move Current Frame by Clicking on Xsheet / Numerical Columns Cell Area"), this);
 	//Viewer BG color
@@ -943,17 +950,18 @@ PreferencesPopup::PreferencesPopup()
 	m_xsheetStep = new DVGui::IntLineEdit(this, Preferences::instance()->getXsheetStep(), 0);
 	m_cellsDragBehaviour = new QComboBox();
 	CheckBox *ignoreAlphaonColumn1CB = new CheckBox(tr("Ignore Alpha Channel on Levels in Column 1"), this);
+	CheckBox *showKeyframesOnCellAreaCB = new CheckBox(tr("Show Keyframes on Cell Area"), this);
 
 	//--- Animation ------------------------------
 	categoryList->addItem(tr("Animation"));
 
 	m_keyframeType = new QComboBox(this);
-	m_animationStepField = new IntLineEdit(this, 1, 1, 500);
+	m_animationStepField = new DVGui::IntLineEdit(this, 1, 1, 500);
 
 	//--- Preview ------------------------------
 	categoryList->addItem(tr("Preview"));
 
-	m_blanksCount = new IntLineEdit(this, 0, 0, 1000);
+	m_blanksCount = new DVGui::IntLineEdit(this, 0, 0, 1000);
 	m_blankColor = new ColorField(this, false, TPixel::Black);
 	CheckBox *rewindAfterPlaybackCB = new CheckBox(tr("Rewind after Playback"), this);
 	CheckBox *displayInNewFlipBookCB = new CheckBox(tr("Display in a New Flipbook Window"), this);
@@ -972,7 +980,7 @@ PreferencesPopup::PreferencesPopup()
 	m_inksOnly->setChecked(onlyInks);
 
 	int thickness = m_pref->getOnionPaperThickness();
-	m_onionPaperThickness = new IntLineEdit(this, thickness, 0, 100);
+	m_onionPaperThickness = new DVGui::IntLineEdit(this, thickness, 0, 100);
 
 	//--- Transparency Check ------------------------------
 	categoryList->addItem(tr("Transparency Check"));
@@ -1129,6 +1137,7 @@ PreferencesPopup::PreferencesPopup()
 	m_cellsDragBehaviour->addItem(tr("Cells and Column Data"));
 	m_cellsDragBehaviour->setCurrentIndex(m_pref->getDragCellsBehaviour());
 	ignoreAlphaonColumn1CB->setChecked(m_pref->isIgnoreAlphaonColumn1Enabled());
+	showKeyframesOnCellAreaCB->setChecked(m_pref->isShowKeyframesOnXsheetCellAreaEnabled());
 
 	//--- Animation ------------------------------
 	QStringList list;
@@ -1416,11 +1425,12 @@ PreferencesPopup::PreferencesPopup()
 			xsheetFrameLay->addWidget(m_cellsDragBehaviour, 2, 1);
 
 			xsheetFrameLay->addWidget(ignoreAlphaonColumn1CB, 3, 0, 1, 2);
+			xsheetFrameLay->addWidget(showKeyframesOnCellAreaCB, 4, 0, 1, 2);
 		}
 		xsheetFrameLay->setColumnStretch(0, 0);
 		xsheetFrameLay->setColumnStretch(1, 0);
 		xsheetFrameLay->setColumnStretch(2, 1);
-		xsheetFrameLay->setRowStretch(4, 1);
+		xsheetFrameLay->setRowStretch(5, 1);
 		xsheetBox->setLayout(xsheetFrameLay);
 		stackedWidget->addWidget(xsheetBox);
 
@@ -1628,6 +1638,7 @@ PreferencesPopup::PreferencesPopup()
 	ret = ret && connect(ignoreAlphaonColumn1CB, SIGNAL(stateChanged(int)), this, SLOT(onIgnoreAlphaonColumn1Changed(int)));
 	ret = ret && connect(m_xsheetStep, SIGNAL(editingFinished()), SLOT(onXsheetStepChanged()));
 	ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)), SLOT(onDragCellsBehaviourChanged(int)));
+	ret = ret && connect(showKeyframesOnCellAreaCB, SIGNAL(stateChanged(int)), this, SLOT(onShowKeyframesOnCellAreaChanged(int)));
 
 	//--- Animation ----------------------
 	ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)), SLOT(onKeyframeTypeChanged(int)));

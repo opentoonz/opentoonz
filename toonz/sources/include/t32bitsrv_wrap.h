@@ -44,7 +44,7 @@ static QString srvName()
 	return name;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 static QString srvCmdline()
 {
 	static QString cmd("srv/t32bitsrv.exe " + srvName());

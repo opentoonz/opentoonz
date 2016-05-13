@@ -43,7 +43,7 @@ public:
 	}
 
 	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
-	string getAlias(double frame, const TRenderSettings &info) const;
+	std::string getAlias(double frame, const TRenderSettings &info) const;
 
 	bool canHandle(const TRenderSettings &info, double frame) { return true; }
 };
@@ -55,7 +55,7 @@ namespace
 template <class PIXEL>
 class RayleighNoise
 {
-	vector<double> noise_buf;
+	std::vector<double> noise_buf;
 
 public:
 	RayleighNoise(double sigma, int seed = 0)
@@ -167,9 +167,9 @@ void NoiseFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 }
 //------------------------------------------------------------------
 
-string NoiseFx::getAlias(double frame, const TRenderSettings &info) const
+std::string NoiseFx::getAlias(double frame, const TRenderSettings &info) const
 {
-	string alias = getFxType();
+	std::string alias = getFxType();
 	alias += "[";
 
 	// alias degli effetti connessi alle porte di input separati da virgole
@@ -187,7 +187,7 @@ string NoiseFx::getAlias(double frame, const TRenderSettings &info) const
 	}
 
 	bool addframe = 0;
-	string paramalias("");
+	std::string paramalias("");
 	for (i = 0; i < getParams()->getParamCount(); i++) {
 		TParam *param = getParams()->getParam(i);
 		paramalias += param->getName() + "=" + param->getValueAlias(frame, 3);

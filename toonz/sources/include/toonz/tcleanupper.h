@@ -33,7 +33,7 @@ class TCamera;
 
 class DVAPI CleanupPreprocessedImage
 {
-	string m_imgId;
+	std::string m_imgId;
 	TDimension m_size;
 
 public:

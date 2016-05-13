@@ -5,7 +5,7 @@
 #include "tconvert.h"
 #include "tlogger.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #else
 
@@ -34,7 +34,7 @@
 class TPluginManager::Plugin
 {
 public:
-#ifdef WIN32
+#ifdef _WIN32
 	typedef HINSTANCE Handle;
 #else
 	typedef void *Handle;
@@ -53,7 +53,7 @@ public:
 	Handle getHandle() const { return m_handle; }
 	const TPluginInfo &getInfo() const { return m_info; }
 	void setInfo(const TPluginInfo &info) { m_info = info; }
-	string getName() const { return m_info.getName(); }
+	std::string getName() const { return m_info.getName(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ typedef const TPluginInfo *TnzLibMainProcType();
 namespace
 {
 const char *TnzLibMainProcName = "TLibMain";
-#if !defined(WIN32)
+#if !defined(_WIN32)
 const char *TnzLibMainProcName2 = "_TLibMain";
 #endif
 }
@@ -94,7 +94,7 @@ TPluginManager *TPluginManager::instance()
 
 //-----------------------------------------------------------------------------
 
-bool TPluginManager::isIgnored(string name) const
+bool TPluginManager::isIgnored(std::string name) const
 {
 	return m_ignoreList.count(toLower(name)) > 0;
 }
@@ -107,7 +107,7 @@ void TPluginManager::unloadPlugins()
 		 it != m_pluginTable.end(); ++it) {
 		Plugin::Handle handle = (*it)->getHandle();
 #ifndef LINUX
-#ifdef WIN32
+#ifdef _WIN32
 		FreeLibrary(handle);
 #else
 		dlclose(handle);
@@ -126,24 +126,24 @@ void TPluginManager::loadPlugin(const TFilePath &fp)
 		TLogger::debug() << "Already loaded " << fp;
 		return;
 	}
-	string name = fp.getName();
+	std::string name = fp.getName();
 	if (isIgnored(name)) {
 		TLogger::debug() << "Ignored " << fp;
 		return;
 	}
 
 	TLogger::debug() << "Loading " << fp;
-#ifdef WIN32
+#ifdef _WIN32
 	Plugin::Handle handle = LoadLibraryW(fp.getWideString().c_str());
 #else
-	wstring str_fp = fp.getWideString();
+	std::wstring str_fp = fp.getWideString();
 	Plugin::Handle handle = dlopen(toString(str_fp).c_str(), RTLD_NOW); // RTLD_LAZY
 #endif
 	if (!handle) {
 		// non riesce a caricare la libreria;
 		TLogger::warning() << "Unable to load " << fp;
-#ifdef WIN32
-		wstring getFormattedMessage(DWORD lastError);
+#ifdef _WIN32
+		std::wstring getFormattedMessage(DWORD lastError);
 		TLogger::warning() << toString(getFormattedMessage(GetLastError()));
 #else
 		TLogger::warning() << dlerror();
@@ -154,7 +154,7 @@ void TPluginManager::loadPlugin(const TFilePath &fp)
 		m_pluginTable.push_back(plugin);
 		//cout << "loaded" << endl;
 		TnzLibMainProcType *tnzLibMain = 0;
-#ifdef WIN32
+#ifdef _WIN32
 		tnzLibMain = (TnzLibMainProcType *)
 			GetProcAddress(handle, TnzLibMainProcName);
 #else
@@ -168,7 +168,7 @@ void TPluginManager::loadPlugin(const TFilePath &fp)
 			// La libreria non esporta TLibMain;
 			TLogger::warning() << "Corrupted " << fp;
 
-#ifdef WIN32
+#ifdef _WIN32
 			FreeLibrary(handle);
 #else
 			dlclose(handle);
@@ -185,12 +185,12 @@ void TPluginManager::loadPlugin(const TFilePath &fp)
 
 void TPluginManager::loadPlugins(const TFilePath &dir)
 {
-#if defined(WIN32)
-	const string extension = "dll";
+#if defined(_WIN32)
+	const std::string extension = "dll";
 #elif defined(LINUX) || defined(__sgi)
-	const string extension = "so";
+	const std::string extension = "so";
 #elif defined(MACOSX)
-	const string extension = "dylib";
+	const std::string extension = "dylib";
 #endif
 
 	TFilePathSet dirContent = TSystem::readDirectory(dir, false);
@@ -202,9 +202,9 @@ void TPluginManager::loadPlugins(const TFilePath &dir)
 		TFilePath fp = *it;
 		if (fp.getType() != extension)
 			continue;
-		wstring fullpath = fp.getWideString();
+		std::wstring fullpath = fp.getWideString();
 
-#ifdef WIN32
+#ifdef _WIN32
 
 		bool isDebugLibrary = (fullpath.find(L".d.") == fullpath.size() - (extension.size() + 3));
 
@@ -238,9 +238,9 @@ void TPluginManager::loadStandardPlugins()
 
 //--------------------------------------------------------------
 
-void TPluginManager::setIgnoredList(const std::set<string> &names)
+void TPluginManager::setIgnoredList(const std::set<std::string> &names)
 {
 	m_ignoreList.clear();
-	for (std::set<string>::const_iterator it = names.begin(); it != names.end(); ++it)
+	for (std::set<std::string>::const_iterator it = names.begin(); it != names.end(); ++it)
 		m_ignoreList.insert(toLower(*it));
 }

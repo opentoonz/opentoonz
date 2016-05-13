@@ -23,14 +23,14 @@ TLevel::~TLevel()
 
 //-------------------------------------------------
 
-string TLevel::getName() const
+std::string TLevel::getName() const
 {
 	return m_name;
 }
 
 //-------------------------------------------------
 
-void TLevel::setName(string name)
+void TLevel::setName(std::string name)
 {
 	m_name = name;
 }

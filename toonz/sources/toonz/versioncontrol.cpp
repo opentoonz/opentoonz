@@ -486,7 +486,7 @@ void VersionControlManager::onError(const QString &text)
 		m_levelSet = 0;
 	}
 	m_scene = 0;
-	DVGui::MsgBox(WARNING, text);
+	DVGui::warning(text);
 }
 
 //=============================================================================
@@ -543,7 +543,7 @@ bool VersionControl::testSetup()
 
 	// Test configuration file
 	if (repositoriesCount == 0) {
-		MsgBox(CRITICAL, tr("The version control configuration file is empty or wrongly defined.\nPlease refer to the user guide for details."));
+		DVGui::error(tr("The version control configuration file is empty or wrongly defined.\nPlease refer to the user guide for details."));
 		return false;
 	}
 
@@ -554,7 +554,7 @@ bool VersionControl::testSetup()
 	if (!path.isEmpty() && !QFile::exists(path + "/svn.exe"))
 #endif
 	{
-		MsgBox(CRITICAL, tr("The version control client application specified on the configuration file cannot be found.\nPlease refer to the user guide for details."));
+		DVGui::error(tr("The version control client application specified on the configuration file cannot be found.\nPlease refer to the user guide for details."));
 		return false;
 	}
 
@@ -571,12 +571,12 @@ bool VersionControl::testSetup()
 		p.start("svn", QStringList("--version"));
 
 		if (!p.waitForStarted()) {
-			MsgBox(CRITICAL, tr("The version control client application is not installed on your computer.\nSubversion 1.5 or later is required.\nPlease refer to the user guide for details."));
+			DVGui::error(tr("The version control client application is not installed on your computer.\nSubversion 1.5 or later is required.\nPlease refer to the user guide for details."));
 			return false;
 		}
 
 		if (!p.waitForFinished()) {
-			MsgBox(CRITICAL, tr("The version control client application is not installed on your computer.\nSubversion 1.5 or later is required.\nPlease refer to the user guide for details."));
+			DVGui::error(tr("The version control client application is not installed on your computer.\nSubversion 1.5 or later is required.\nPlease refer to the user guide for details."));
 			return false;
 		}
 
@@ -590,7 +590,7 @@ bool VersionControl::testSetup()
 
 			double version = firstLine.left(3).toDouble();
 			if (version <= 1.5) {
-				MsgBox(WARNING, tr("The version control client application installed on your computer needs to be updated, otherwise some features may not be available.\nSubversion 1.5 or later is required.\nPlease refer to the user guide for details."));
+				DVGui::warning(tr("The version control client application installed on your computer needs to be updated, otherwise some features may not be available.\nSubversion 1.5 or later is required.\nPlease refer to the user guide for details."));
 				return true;
 			}
 		}

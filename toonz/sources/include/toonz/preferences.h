@@ -1,7 +1,7 @@
-
-
 #ifndef PREFERENCES_H
 #define PREFERENCES_H
+
+#include <memory>
 
 // TnzCore includes
 #include "tcommon.h"
@@ -16,9 +16,6 @@
 #include <QObject>
 #include <QMap>
 #include <QRegExp>
-
-// boost includes
-#include <boost/scoped_ptr.hpp>
 
 #undef DVAPI
 #undef DVVAR
@@ -135,10 +132,10 @@ public:
 	QString getStyleSheet(int index) const;
 	int getStyleSheetCount() const;
 
-	void setUnits(string s);
+	void setUnits(std::string s);
 	QString getUnits() const { return m_units; }
 
-	void setCameraUnits(string s);
+	void setCameraUnits(std::string s);
 	QString getCameraUnits() const { return m_cameraUnits; }
 
 	void enableGeneratedMovieView(bool on);
@@ -269,7 +266,7 @@ public:
 
 	// Drawing  tab
 
-	void setScanLevelType(string s);
+	void setScanLevelType(std::string s);
 	QString getScanLevelType() const { return m_scanLevelType; }
 
 	void setDefLevelType(int levelType);
@@ -336,6 +333,12 @@ public:
 
 	void setDragCellsBehaviour(int dragCellsBehaviour);
 	int getDragCellsBehaviour() const { return m_dragCellsBehaviour; }
+
+	void enableShowKeyframesOnXsheetCellArea(bool on);
+	bool isShowKeyframesOnXsheetCellAreaEnabled() const
+	{
+		return m_showKeyframesOnXsheetCellArea;
+	}
 
 	// Animation  tab
 
@@ -431,7 +434,7 @@ public:
 	void startAutoSave();
 
 private:
-	boost::scoped_ptr<QSettings> m_settings;
+	std::unique_ptr<QSettings> m_settings;
 
 	QMap<int, QString> m_languageMaps,
 		m_styleSheetMaps;
@@ -530,6 +533,8 @@ private:
 	0 : 全ての異なるピクセルの色を別のStyleにする, 1 : 似ている色をまとめて1つのStyleにする
   --*/
 	int m_paletteTypeOnLoadRasterImageAsColorModel;
+
+	bool m_showKeyframesOnXsheetCellArea;
 
 private:
 	Preferences();

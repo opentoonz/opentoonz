@@ -126,7 +126,7 @@ bool isStyleUsed(const TToonzImageP vi, int styleId)
 //-------------------------------------------------------------------
 
 /*! Return true if one style is used. */
-bool areStylesUsed(const TImageP image, const vector<int> styleIds)
+bool areStylesUsed(const TImageP image, const std::vector<int> styleIds)
 {
 	int j;
 	for (j = 0; j < (int)styleIds.size(); j++)
@@ -153,12 +153,12 @@ bool isStyleUsed(const TImageP image, int styleId)
 //===================================================================
 
 /*! Return true if one style is used. */
-bool areStylesUsed(const set<TXshSimpleLevel *> levels, const vector<int> styleIds)
+bool areStylesUsed(const set<TXshSimpleLevel *> levels, const std::vector<int> styleIds)
 {
 	set<TXshSimpleLevel *>::const_iterator it = levels.begin();
 	for (it; it != levels.end(); it++) {
 		TXshSimpleLevel *level = *it;
-		vector<TFrameId> fids;
+		std::vector<TFrameId> fids;
 		level->getFids(fids);
 		int i;
 		for (i = 0; i < (int)fids.size(); i++) {
@@ -405,7 +405,7 @@ void PaletteCmd::createStyle(
 	/*-  StudioPalette上でStyleを追加した場合、GlobalNameを自動で割り振る -*/
 	if (palette->getGlobalName() != L"") {
 		TColorStyle *cs = palette->getStyle(newStyleId);
-		wstring gname = L"-" + palette->getGlobalName() + L"-" + toWideString(newStyleId);
+		std::wstring gname = L"-" + palette->getGlobalName() + L"-" + toWideString(newStyleId);
 		cs->setGlobalName(gname);
 	}
 
@@ -536,12 +536,12 @@ void PaletteCmd::addStyles(TPaletteHandle *paletteHandle, int pageIndex,
 namespace
 {
 
-void eraseStylesInLevels(const set<TXshSimpleLevel *> &levels, const vector<int> styleIds)
+void eraseStylesInLevels(const set<TXshSimpleLevel *> &levels, const std::vector<int> styleIds)
 {
 	set<TXshSimpleLevel *>::const_iterator it = levels.begin();
 	for (it; it != levels.end(); it++) {
 		TXshSimpleLevel *level = *it;
-		vector<TFrameId> fids;
+		std::vector<TFrameId> fids;
 		level->getFids(fids);
 		int i;
 		for (i = 0; i < (int)fids.size(); i++) {
@@ -662,7 +662,7 @@ class AddPageUndo : public TUndo
 	TPaletteHandle *m_paletteHandle;
 	TPaletteP m_palette;
 	int m_pageIndex;
-	wstring m_pageName;
+	std::wstring m_pageName;
 	std::vector<std::pair<TColorStyle *, int>> m_styles;
 
 public:
@@ -670,7 +670,7 @@ public:
 	AddPageUndo(
 		TPaletteHandle *paletteHandle,
 		int pageIndex,
-		wstring pageName)
+		std::wstring pageName)
 		: m_paletteHandle(paletteHandle), m_pageIndex(pageIndex), m_pageName(pageName)
 	{
 		m_palette = m_paletteHandle->getPalette();
@@ -727,7 +727,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-void PaletteCmd::addPage(TPaletteHandle *paletteHandle, wstring name, bool withUndo)
+void PaletteCmd::addPage(TPaletteHandle *paletteHandle, std::wstring name, bool withUndo)
 {
 	TPalette *palette = paletteHandle->getPalette();
 	if (name == L"")
@@ -753,7 +753,7 @@ class DestroyPageUndo : public TUndo
 	TPaletteHandle *m_paletteHandle;
 	TPaletteP m_palette;
 	int m_pageIndex;
-	wstring m_pageName;
+	std::wstring m_pageName;
 	std::vector<int> m_styles;
 
 public:

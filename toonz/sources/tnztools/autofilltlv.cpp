@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "toonz/toonzimageutils.h"
-#include "Tw/Tw.h"
+#include "tw/tw.h"
 #include "toonz/fill.h"
 #include "toonz/ttilesaver.h"
 #include "toonz4.6/tmacro.h"

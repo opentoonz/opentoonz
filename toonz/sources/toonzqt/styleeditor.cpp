@@ -2039,7 +2039,7 @@ void CustomStyleChooserPage::onSelect(int index)
 	if (m_currentIndex < 0)
 		return;
 
-	string name = pattern.m_patternName;
+	std::string name = pattern.m_patternName;
 	if (pattern.m_isVector) {
 		TVectorImagePatternStrokeStyle cs(name);
 		emit styleSelected(cs);
@@ -2147,7 +2147,7 @@ void VectorBrushStyleChooserPage::onSelect(int index)
 		if (m_currentIndex < 0)
 			return;
 
-		string name = pattern.m_patternName;
+		std::string name = pattern.m_patternName;
 		assert(pattern.m_isVector);
 		if (!pattern.m_isVector)
 			return;
@@ -2173,7 +2173,7 @@ struct Texture {
 
 class TextureStyleChooserPage : public StyleChooserPage
 {
-	static vector<Texture> m_textures;
+	static std::vector<Texture> m_textures;
 	static bool m_loaded;
 
 public:
@@ -2210,7 +2210,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vector<Texture> TextureStyleChooserPage::m_textures;
+std::vector<Texture> TextureStyleChooserPage::m_textures;
 bool TextureStyleChooserPage::m_loaded(false);
 
 //-----------------------------------------------------------------------------
@@ -2324,7 +2324,7 @@ bool TextureStyleChooserPage::event(QEvent *e)
 class SpecialStyleChooserPage : public StyleChooserPage
 {
 
-	static vector<pair<int, QImage *>> m_customStyles;
+	static std::vector<std::pair<int, QImage *>> m_customStyles;
 	static bool m_loaded;
 
 public:
@@ -2353,14 +2353,14 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vector<pair<int, QImage *>> SpecialStyleChooserPage::m_customStyles;
+std::vector<std::pair<int, QImage *>> SpecialStyleChooserPage::m_customStyles;
 bool SpecialStyleChooserPage::m_loaded(false);
 
 //-----------------------------------------------------------------------------
 
 void SpecialStyleChooserPage::loadItems()
 {
-	vector<int> tags;
+	std::vector<int> tags;
 	TColorStyle::getAllTags(tags);
 
 	int chipCount = 0;
@@ -2883,7 +2883,7 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
 	TFilePath libraryPath = ToonzFolder::getLibraryFolder();
 	setRootPath(libraryPath);
 
-	m_styleBar = new TabBar(this);
+	m_styleBar = new DVGui::TabBar(this);
 	m_styleBar->setDrawBase(false);
 	m_styleBar->setObjectName("StyleEditorTabBar");
 
@@ -3004,8 +3004,8 @@ QFrame *StyleEditor::createBottomWidget()
 {
 	QFrame *bottomWidget = new QFrame(this);
 	m_autoButton = new QPushButton(tr("Auto  \nApply"));
-	m_oldColor = new StyleSample(this, 42, 20);
-	m_newColor = new StyleSample(this, 42, 20);
+	m_oldColor = new DVGui::StyleSample(this, 42, 20);
+	m_newColor = new DVGui::StyleSample(this, 42, 20);
 	m_applyButton = new QPushButton(tr("Apply"));
 
 	bottomWidget->setFrameStyle(QFrame::StyledPanel);

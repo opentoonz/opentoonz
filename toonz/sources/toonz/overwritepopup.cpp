@@ -47,7 +47,7 @@ bool OverwriteDialog::DecodeFileExistsFunc::operator()(const TFilePath &fp) cons
 //************************************************************************************
 
 OverwriteDialog::OverwriteDialog()
-	: Dialog(TApp::instance()->getMainWindow(), true)
+	: DVGui::Dialog(TApp::instance()->getMainWindow(), true)
 {
 	setModal(true);
 	setWindowTitle(tr("Warning!"));
@@ -72,7 +72,7 @@ OverwriteDialog::OverwriteDialog()
 	m_rename = new QRadioButton(tr("Rename the new file adding the suffix"), this);
 	buttonGroup->addButton(m_rename);
 
-	m_suffix = new LineEdit("_1", this);
+	m_suffix = new DVGui::LineEdit("_1", this);
 	m_suffix->setFixedWidth(25);
 	m_suffix->setEnabled(false);
 
@@ -266,13 +266,13 @@ std::wstring OverwriteDialog::execute(ToonzScene *scene, const TFilePath &srcLev
 
 	if (m_rename->isChecked()) {
 		if (m_suffix->text() == "") {
-			MsgBox(WARNING, tr("The suffix field is empty. Please specify a suffix."));
+			DVGui::warning(tr("The suffix field is empty. Please specify a suffix."));
 			return execute(scene, srcLevelPath, multiload);
 		}
 		levelPath = addSuffix(srcLevelPath);
 		actualLevelPath = scene->decodeFilePath(levelPath);
 		if (TSystem::doesExistFileOrLevel(actualLevelPath)) {
-			MsgBox(WARNING, tr("File %1 exists as well; please choose a different suffix.").arg(toQString(levelPath)));
+			DVGui::warning(tr("File %1 exists as well; please choose a different suffix.").arg(toQString(levelPath)));
 			return execute(scene, srcLevelPath, multiload);
 		}
 		m_choice = RENAME;

@@ -25,7 +25,7 @@ class Chunkinfo
 public:
 	TUINT32 m_size;
 	//int m_locks;
-	vector<TRaster *> m_rasters;
+	std::vector<TRaster *> m_rasters;
 	//bool m_putInNormalMemory;
 	Chunkinfo(TUINT32 size, TRaster *ras) //, bool putInNormalMemory=false)
 		: m_size(size)
@@ -203,7 +203,7 @@ UCHAR *TBigMemoryManager::getBuffer(UINT size)
 	if (m_theMemory == 0)
 		return (UCHAR *)calloc(size, 1);
 
-	map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
+	std::map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
 	UCHAR *buffer = m_theMemory;
 	TUINT32 chunkSize = 0;
 	UCHAR *address = 0;
@@ -333,7 +333,7 @@ if (m_availableMemory<size && !ras->m_parent)
   }*/
 
 	if (ras->m_parent) {
-		map<UCHAR *, Chunkinfo>::iterator it = m_chunks.find(ras->m_parent->m_buffer);
+		std::map<UCHAR *, Chunkinfo>::iterator it = m_chunks.find(ras->m_parent->m_buffer);
 
 		if (it != m_chunks.end()) {
 
@@ -406,7 +406,7 @@ TRaster *TBigMemoryManager::findRaster(TRaster *ras)
 {
 	//return 0;
 
-	map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
+	std::map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
 	while (it != m_chunks.end()) {
 		for (UINT i = 0; i < it->second.m_rasters.size(); i++)
 			if (it->second.m_rasters[i] == ras)
@@ -421,7 +421,7 @@ TRaster *TBigMemoryManager::findRaster(TRaster *ras)
 
 void TBigMemoryManager::printMap()
 {
-	map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
+	std::map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
 	TSystem::outputDebug("BIGMEMORY chunks totali: " + toString((int)m_chunks.size()) + "\n");
 
 	int count = 0;
@@ -445,7 +445,7 @@ bool TBigMemoryManager::releaseRaster(TRaster *ras)
 {
 	TThread::MutexLocker sl(&m_mutex);
 	UCHAR *buffer = (ras->m_parent) ? (ras->m_parent->m_buffer) : (ras->m_buffer);
-	map<UCHAR *, Chunkinfo>::iterator it = m_chunks.find(buffer);
+	std::map<UCHAR *, Chunkinfo>::iterator it = m_chunks.find(buffer);
 
 	if (m_theMemory == 0 || it == m_chunks.end()) {
 		assert(buffer);
@@ -466,7 +466,7 @@ bool TBigMemoryManager::releaseRaster(TRaster *ras)
 
 	if (it->second.m_rasters.size() > 1) //non e' il solo raster ad usare il buffer; non libero
 	{
-		vector<TRaster *>::iterator it2 = it->second.m_rasters.begin();
+		std::vector<TRaster *>::iterator it2 = it->second.m_rasters.begin();
 		for (; it2 != it->second.m_rasters.end(); ++it2) {
 			if (ras == *it2) {
 				it->second.m_rasters.erase(it2);
@@ -510,7 +510,7 @@ void TBigMemoryManager::checkConsistency()
 
 	int count = 0;
 	//int size = m_chunks.size();
-	map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
+	std::map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
 	UCHAR *endAddress = m_theMemory;
 	TUINT32 freeMem = 0, allocMem = 0;
 
@@ -553,7 +553,7 @@ void TBigMemoryManager::checkConsistency()
 
 //------------------------------------------------------------------------------
 
-map<UCHAR *, Chunkinfo>::iterator TBigMemoryManager::shiftBlock(const map<UCHAR *, Chunkinfo>::iterator &it, TUINT32 offset)
+std::map<UCHAR *, Chunkinfo>::iterator TBigMemoryManager::shiftBlock(const std::map<UCHAR *, Chunkinfo>::iterator &it, TUINT32 offset)
 {
 	UCHAR *newAddress = it->first - offset;
 
@@ -563,7 +563,7 @@ map<UCHAR *, Chunkinfo>::iterator TBigMemoryManager::shiftBlock(const map<UCHAR 
 		memmove(newAddress, it->first, it->second.m_size); //se overlappano.
 
 	m_chunks[newAddress] = Chunkinfo(it->second.m_size, it->second.m_rasters[0]);
-	map<UCHAR *, Chunkinfo>::iterator it1 = m_chunks.find(newAddress);
+	std::map<UCHAR *, Chunkinfo>::iterator it1 = m_chunks.find(newAddress);
 
 	assert(it1->first < it1->second.m_rasters[0]->m_buffer);
 	UINT i = 0;
@@ -611,7 +611,7 @@ UCHAR *TBigMemoryManager::remap(TUINT32 size) //size==0 -> remappo tutto
 	checkConsistency();
 #endif
 	UINT i;
-	map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
+	std::map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
 
 	try {
 		UCHAR *buffer = m_theMemory;
@@ -625,7 +625,7 @@ UCHAR *TBigMemoryManager::remap(TUINT32 size) //size==0 -> remappo tutto
 				return buffer + chunkSize;
 			else if (gap > 0 && it->second.m_size > 0) //c'e' un frammento di memoria, accorpo; ma solo se non sto in fondo
 			{
-				vector<TRaster *> &rasters = it->second.m_rasters;
+				std::vector<TRaster *> &rasters = it->second.m_rasters;
 				assert(rasters[0]->m_parent == 0);
 
 				//devo controllare il lockCount solo sul parent, la funzione lock() locka solo il parent;
@@ -674,7 +674,7 @@ void TBigMemoryManager::printLog(TUINT32 size)
 	os << "memoria richiesta: " << size / 1024 << " KB\n";
 	os << "memoria libera: " << m_availableMemory / 1024 << " KB\n\n\n";
 
-	map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
+	std::map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
 	UCHAR *buffer = m_theMemory;
 	UINT chunkSize = 0;
 	for (; it != m_chunks.end(); it++) {

@@ -18,31 +18,31 @@ class TFilePath;
 #define DVAPI DV_IMPORT_API
 #endif
 
-DVAPI bool isInt(string s);
-DVAPI bool isDouble(string s);
+DVAPI bool isInt(std::string s);
+DVAPI bool isDouble(std::string s);
 
-DVAPI string toString(int v);
-DVAPI string toString(unsigned long v);
-DVAPI string toString(unsigned long long v);
-DVAPI string toString(double v, int prec = -1);
-DVAPI string toString(wstring s);
-DVAPI string toString(const TFilePath &fp);
-DVAPI string toString(void *p);
+DVAPI std::string toString(int v);
+DVAPI std::string toString(unsigned long v);
+DVAPI std::string toString(unsigned long long v);
+DVAPI std::string toString(double v, int prec = -1);
+DVAPI std::string toString(std::wstring s);
+DVAPI std::string toString(const TFilePath &fp);
+DVAPI std::string toString(void *p);
 
-DVAPI int toInt(string s);
-DVAPI double toDouble(string s);
+DVAPI int toInt(std::string s);
+DVAPI double toDouble(std::string s);
 
-DVAPI bool isInt(wstring s);
-DVAPI bool isDouble(wstring s);
+DVAPI bool isInt(std::wstring s);
+DVAPI bool isDouble(std::wstring s);
 
-DVAPI wstring toWideString(string s);
-DVAPI wstring toWideString(int v);
-DVAPI wstring toWideString(double v, int prec = -1);
+DVAPI std::wstring toWideString(std::string s);
+DVAPI std::wstring toWideString(int v);
+DVAPI std::wstring toWideString(double v, int prec = -1);
 
-DVAPI int toInt(wstring s);
-DVAPI double toDouble(wstring s);
+DVAPI int toInt(std::wstring s);
+DVAPI double toDouble(std::wstring s);
 
-inline bool fromStr(int &v, string s)
+inline bool fromStr(int &v, std::string s)
 {
 	if (isInt(s)) {
 		v = toInt(s);
@@ -51,7 +51,7 @@ inline bool fromStr(int &v, string s)
 		return false;
 }
 
-inline bool fromStr(double &v, string s)
+inline bool fromStr(double &v, std::string s)
 {
 	if (isDouble(s)) {
 		v = toDouble(s);
@@ -60,17 +60,17 @@ inline bool fromStr(double &v, string s)
 		return false;
 }
 
-inline bool fromStr(string &out, string s)
+inline bool fromStr(std::string &out, std::string s)
 {
 	out = s;
 	return true;
 }
 
-DVAPI string toUpper(string a);
-DVAPI string toLower(string a);
+DVAPI std::string toUpper(std::string a);
+DVAPI std::string toLower(std::string a);
 
-DVAPI wstring toUpper(wstring a);
-DVAPI wstring toLower(wstring a);
+DVAPI std::wstring toUpper(std::wstring a);
+DVAPI std::wstring toLower(std::wstring a);
 
 #ifndef TNZCORE_LIGHT
 #include <QString>

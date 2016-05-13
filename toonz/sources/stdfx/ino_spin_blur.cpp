@@ -1,7 +1,3 @@
-#if defined _WIN32 && !defined NOMINMAX
-#define NOMINMAX
-#endif
-
 #include <sstream> /* std::ostringstream */
 #include "tfxparam.h"
 #include "tparamset.h" // TPointParamP

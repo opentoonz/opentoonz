@@ -55,7 +55,7 @@ DVAPI void addStyles(TPaletteHandle *paletteHandle, int pageIndex,
 DVAPI void eraseStyles(const std::set<TXshSimpleLevel *> &levels, const std::vector<int> &styleIds);
 
 // se name == L"" viene generato un nome univoco ('page N')
-DVAPI void addPage(TPaletteHandle *paletteHandle, wstring name = L"", bool withUndo = true);
+DVAPI void addPage(TPaletteHandle *paletteHandle, std::wstring name = L"", bool withUndo = true);
 
 DVAPI void destroyPage(TPaletteHandle *paletteHandle, int pageIndex);
 

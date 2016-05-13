@@ -18,7 +18,7 @@
 
 typedef TRasterT<TPixelCM32> TRasterCM32;
 
-#ifdef WIN32
+#ifdef _WIN32
 template class DVAPI TSmartPointerT<TRasterT<TPixelCM32>>;
 template class DVAPI TRasterPT<TPixelCM32>;
 #endif

@@ -98,23 +98,23 @@ SceneSettingsPopup::SceneSettingsPopup()
 
 	//Field Guide Size - A/R
 	int fieldGuideSize = sprop->getFieldGuideSize();
-	m_fieldGuideFld = new IntLineEdit(this, fieldGuideSize, 0, 50);
+	m_fieldGuideFld = new DVGui::IntLineEdit(this, fieldGuideSize, 0, 50);
 	m_aspectRatioFld = new DoubleLineEdit(this, 1.38);
 	m_aspectRatioFld->setRange(-10000.0, 10000.0);
 	m_aspectRatioFld->setDecimals(5);
 
 	//Image Subsampling  - Tlv Subsampling
 	int fullcolorSubsampling = sprop->getFullcolorSubsampling();
-	m_fullcolorSubsamplingFld = new IntLineEdit(this, fullcolorSubsampling, 1);
+	m_fullcolorSubsamplingFld = new DVGui::IntLineEdit(this, fullcolorSubsampling, 1);
 
 	int tlvSubsampling = sprop->getTlvSubsampling();
-	m_tlvSubsamplingFld = new IntLineEdit(this, tlvSubsampling, 1);
+	m_tlvSubsamplingFld = new DVGui::IntLineEdit(this, tlvSubsampling, 1);
 
 	//Marker Interval - Start Frame
 	int distance, offset;
 	sprop->getMarkers(distance, offset);
-	m_markerIntervalFld = new IntLineEdit(this, distance, 0);
-	m_startFrameFld = new IntLineEdit(this, offset);
+	m_markerIntervalFld = new DVGui::IntLineEdit(this, distance, 0);
+	m_startFrameFld = new DVGui::IntLineEdit(this, offset);
 
 	// layout
 	QGridLayout *mainLayout = new QGridLayout();

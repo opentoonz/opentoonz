@@ -1,6 +1,6 @@
 
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma warning(disable : 4996)
 #endif
 //#include "texception.h"
@@ -25,7 +25,7 @@
 
 //=========================================================
 
-const string Tiio::JpgWriterProperties::QUALITY("Quality");
+const std::string Tiio::JpgWriterProperties::QUALITY("Quality");
 
 //=========================================================
 

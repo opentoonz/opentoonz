@@ -1,4 +1,4 @@
-
+#include <memory>
 
 #include "ext/meshtexturizer.h"
 
@@ -14,10 +14,6 @@
 #include "tcg/tcg_macros.h"
 #include "tcg/tcg_list.h"
 #include "tcg/tcg_misc.h"
-
-// Boost includes
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 
 #define COPIED_BORDER 1								 // Amount of tile border from the original image
 #define TRANSP_BORDER 1								 // Amount of transparent tile border
@@ -39,7 +35,7 @@ class MeshTexturizer::Imp
 
 public:
 	QReadWriteLock m_lock;									  //!< Lock for synchronized access
-	tcg::list<boost::shared_ptr<TextureData>> m_textureDatas; //!< Pool of texture datas
+	tcg::list<std::shared_ptr<TextureData>> m_textureDatas; //!< Pool of texture datas
 
 public:
 	Imp() : m_lock(QReadWriteLock::Recursive) {}
@@ -216,7 +212,6 @@ MeshTexturizer::MeshTexturizer()
 
 MeshTexturizer::~MeshTexturizer()
 {
-	delete m_imp;
 }
 
 //---------------------------------------------------------------------------------
@@ -232,7 +227,7 @@ int MeshTexturizer::bindTexture(const TRaster32P &ras, const TRectD &geom,
 	glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
 
 	// Initialize a new texture data
-	int dataIdx = m_imp->m_textureDatas.push_back(boost::make_shared<TextureData>(geom));
+	int dataIdx = m_imp->m_textureDatas.push_back(std::make_shared<TextureData>(geom));
 
 	// Textures must have 2-power sizes. So, let's start with the smallest 2 power
 	// >= ras's sizes.

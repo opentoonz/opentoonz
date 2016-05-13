@@ -43,16 +43,16 @@ TFilePath importScene(TFilePath scenePath)
 	try {
 		ret = IoCmd::loadScene(scene, scenePath, true);
 	} catch (TException &e) {
-		MsgBox(CRITICAL, QObject::tr("Error loading scene %1 :%2").arg(toQString(scenePath)).arg(QString::fromStdWString(e.getMessage())));
+		DVGui::error(QObject::tr("Error loading scene %1 :%2").arg(toQString(scenePath)).arg(QString::fromStdWString(e.getMessage())));
 
 		return TFilePath();
 	} catch (...) {
-		MsgBox(CRITICAL, QObject::tr("Error loading scene %1").arg(toQString(scenePath)));
+		DVGui::error(QObject::tr("Error loading scene %1").arg(toQString(scenePath)));
 		return TFilePath();
 	}
 
 	if (!ret) {
-		MsgBox(CRITICAL, QObject::tr("It is not possible to export the scene %1 because it does not belong to any project.").arg(toQString(scenePath)));
+		DVGui::error(QObject::tr("It is not possible to export the scene %1 because it does not belong to any project.").arg(toQString(scenePath)));
 
 		return TFilePath();
 	}
@@ -86,7 +86,7 @@ int collectAssets(TFilePath scenePath)
 //=============================================================================
 // MyDvDirModelFileFolderNode [File folder]
 
-DvDirModelNode *ExportSceneDvDirModelFileFolderNode::makeChild(wstring name)
+DvDirModelNode *ExportSceneDvDirModelFileFolderNode::makeChild(std::wstring name)
 {
 	return createExposeSceneNode(this, m_path + name);
 }
@@ -102,7 +102,7 @@ DvDirModelFileFolderNode *ExportSceneDvDirModelFileFolderNode::createExposeScene
 		node = new ExportSceneDvDirModelProjectNode(parent, path);
 	else
 		node = new ExportSceneDvDirModelFileFolderNode(parent, path);
-	if (path.getName().find("_files") == string::npos)
+	if (path.getName().find("_files") == std::string::npos)
 		node->enableRename(true);
 	return node;
 }
@@ -128,7 +128,7 @@ ExportSceneDvDirModelRootNode::ExportSceneDvDirModelRootNode()
 
 //-----------------------------------------------------------------------------
 
-void ExportSceneDvDirModelRootNode::add(wstring name, const TFilePath &path)
+void ExportSceneDvDirModelRootNode::add(std::wstring name, const TFilePath &path)
 {
 	DvDirModelNode *child = new ExportSceneDvDirModelFileFolderNode(this, name, path);
 	child->setRow((int)m_children.size());
@@ -260,7 +260,7 @@ QModelIndex ExportSceneDvDirModel::parent(const QModelIndex &index) const
 
 //-----------------------------------------------------------------------------
 
-QModelIndex ExportSceneDvDirModel::childByName(const QModelIndex &parent, const wstring &name) const
+QModelIndex ExportSceneDvDirModel::childByName(const QModelIndex &parent, const std::wstring &name) const
 {
 	if (!parent.isValid())
 		return QModelIndex();
@@ -613,7 +613,7 @@ void ExportScenePopup::onExport()
 		DvDirModelFileFolderNode *node = (DvDirModelFileFolderNode *)m_projectTreeView->getCurrentNode();
 		if (!node || !pm->isProject(node->getPath())) {
 			QApplication::restoreOverrideCursor();
-			MsgBox(WARNING, tr("The folder you selected is not a project."));
+			DVGui::warning(tr("The folder you selected is not a project."));
 			return;
 		}
 		projectPath = pm->projectFolderToProjectPath(node->getPath());
@@ -639,7 +639,7 @@ void ExportScenePopup::onExport()
 	pm->setCurrentProjectPath(oldProjectPath);
 	if (newScenes.empty()) {
 		QApplication::restoreOverrideCursor();
-		MsgBox(WARNING, tr("There was an error exporting the scene."));
+		DVGui::warning(tr("There was an error exporting the scene."));
 		return;
 	}
 	for (i = 0; i < newScenes.size(); i++)
@@ -656,17 +656,17 @@ TFilePath ExportScenePopup::createNewProject()
 	TProjectManager *pm = TProjectManager::instance();
 	TFilePath projectName(m_newProjectName->text().toStdWString());
 	if (projectName == TFilePath()) {
-		MsgBox(WARNING, tr("The project name cannot be empty or contain any of the following characters:(new line)   \\ / : * ? \"  |"));
+		DVGui::warning(tr("The project name cannot be empty or contain any of the following characters:(new line)   \\ / : * ? \"  |"));
 		return TFilePath();
 	}
 	if (projectName.isAbsolute()) {
 		// bad project name
-		MsgBox(WARNING, tr("The project name cannot be empty or contain any of the following characters:(new line)   \\ / : * ? \"  |"));
+		DVGui::warning(tr("The project name cannot be empty or contain any of the following characters:(new line)   \\ / : * ? \"  |"));
 		return TFilePath();
 	}
 	if (pm->getProjectPathByName(projectName) != TFilePath()) {
 		// project already exists
-		MsgBox(WARNING, tr("The project name you specified is already used."));
+		DVGui::warning(tr("The project name you specified is already used."));
 		return TFilePath();
 	}
 

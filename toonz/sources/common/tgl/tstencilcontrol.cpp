@@ -130,7 +130,6 @@ TStencilControl::TStencilControl()
 
 TStencilControl::~TStencilControl()
 {
-	delete m_imp;
 }
 
 //---------------------------------------------------------

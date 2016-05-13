@@ -47,12 +47,12 @@ bool areTwEqual(TPointD p0, TPointD p1)
 }
 //-------------------------------------------------------------------
 
-const wstring TFlash::ConstantLines = L"Low: Constant Thickness";
-const wstring TFlash::MixedLines = L"Medium: Mixed Thickness";
-const wstring TFlash::VariableLines = L"High: Variable Thickness";
+const std::wstring TFlash::ConstantLines = L"Low: Constant Thickness";
+const std::wstring TFlash::MixedLines = L"Medium: Mixed Thickness";
+const std::wstring TFlash::VariableLines = L"High: Variable Thickness";
 
 Tiio::SwfWriterProperties::SwfWriterProperties()
-	: m_lineQuality("Curve Quality"), m_isCompressed("File Compression", true), m_autoplay("Autoplay", true), m_looping("Looping", true), m_jpgQuality("Jpg Quality", 0, 100, 90), m_url("URL", wstring()), m_preloader("Insert Preloader", false)
+	: m_lineQuality("Curve Quality"), m_isCompressed("File Compression", true), m_autoplay("Autoplay", true), m_looping("Looping", true), m_jpgQuality("Jpg Quality", 0, 100, 90), m_url("URL", std::wstring()), m_preloader("Insert Preloader", false)
 {
 	m_lineQuality.addValue(TFlash::MixedLines);
 	m_lineQuality.addValue(TFlash::ConstantLines);
@@ -102,7 +102,7 @@ public:
 	bool m_skip;
 	bool m_toBeDeleted;
 	bool m_isPoint;
-	vector<TQuadratic *> m_quads;
+	std::vector<TQuadratic *> m_quads;
 	PolyStyle m_fillStyle1;
 	PolyStyle m_fillStyle2;
 	PolyStyle m_lineStyle;
@@ -180,7 +180,7 @@ double computeAverageThickness(const TStroke *s)
 	return resThick / (s->getControlPointCount() - 4);
 }
 
-void putquads(const TStroke *s, double w0, double w1, vector<TQuadratic *> &quads)
+void putquads(const TStroke *s, double w0, double w1, std::vector<TQuadratic *> &quads)
 {
 	int chunkIndex0, chunkIndex1, i;
 	double dummy;
@@ -198,18 +198,18 @@ void putquads(const TStroke *s, double w0, double w1, vector<TQuadratic *> &quad
 
 //-------------------------------------------------------------------
 
-void computeOutlineBoundary(vector<TStroke *> &outlines, list<FlashPolyline> &polylinesArray, const TPixel &color)
+void computeOutlineBoundary(std::vector<TStroke *> &outlines, std::list<FlashPolyline> &polylinesArray, const TPixel &color)
 {
 	UINT size = polylinesArray.size();
 
-	vector<vector<TQuadratic *>> quads;
+	std::vector<std::vector<TQuadratic *>> quads;
 	computeSweepBoundary(outlines, quads);
 
 	outlines.clear();
 	std::list<FlashPolyline>::iterator it = polylinesArray.begin();
 	std::advance(it, size);
 	for (int i = 0; i < (int)quads.size(); i++) {
-		vector<TQuadratic *> &q = quads[i];
+		std::vector<TQuadratic *> &q = quads[i];
 
 		polylinesArray.push_back(FlashPolyline());
 		polylinesArray.back().m_quads = quads[i];
@@ -224,11 +224,11 @@ void computeOutlineBoundary(vector<TStroke *> &outlines, list<FlashPolyline> &po
 //	TFlash::drawSegments and TFlash::drawquads cannot be inline defined
 //	since size of TSegment and TQuadratic are unkown in the header
 
-void TFlash::drawSegments(const vector<TSegment> segmentArray, bool isGradientColor)
+void TFlash::drawSegments(const std::vector<TSegment> segmentArray, bool isGradientColor)
 {
 }
 
-void TFlash::drawquads(const vector<TQuadratic> quadsArray)
+void TFlash::drawquads(const std::vector<TQuadratic> quadsArray)
 {
 }
 
@@ -295,7 +295,7 @@ bool PolyStyle::operator<(const PolyStyle &p) const
 //-------------------------------------------------------------------
 
 void computeQuadChain(const TEdge &e,
-					  vector<TQuadratic *> &quadArray, vector<TQuadratic *> &toBeDeleted)
+					  std::vector<TQuadratic *> &quadArray, std::vector<TQuadratic *> &toBeDeleted)
 {
 	int chunk_b, chunk_e, chunk = -1;
 	double t_b, t_e, w0, w1;

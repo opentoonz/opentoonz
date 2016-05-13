@@ -131,13 +131,13 @@ public:
 	{
 	protected:
 		TParamP m_param; //!< The wrapped parameter.
-		wstring m_fxId;  //!< Fx identifier for m_param's owner, if any.
+		std::wstring m_fxId;  //!< Fx identifier for m_param's owner, if any.
 
 	public:
-		ParamWrapper(const TParamP &param, const wstring &fxId) : m_param(param), m_fxId(fxId) {}
+		ParamWrapper(const TParamP &param, const std::wstring &fxId) : m_param(param), m_fxId(fxId) {}
 		virtual ~ParamWrapper() {}
 
-		const wstring &getFxId() const { return m_fxId; }
+		const std::wstring &getFxId() const { return m_fxId; }
 
 		TParamP getParam() const { return m_param; }
 		virtual void setParam(const TParamP &param) { m_param = param; }
@@ -151,13 +151,13 @@ public:
 		FunctionTreeModel *m_model; //!< (\p not \p owned) Reference to the model
 		ChannelGroup *m_group;		//!< (\p not \p owned) Reference to the enclosing group
 
-		string m_paramNamePref;
+		std::string m_paramNamePref;
 
 		bool m_isActive; //!< Whether the channels is active, ie visible
 		//!< as a curve and numeric column
 	public:
 		Channel(FunctionTreeModel *model, TDoubleParam *param,
-				string paramNamePrefix = "", wstring fxId = L"");
+				std::string paramNamePrefix = "", std::wstring fxId = L"");
 		~Channel();
 
 		TDoubleParam *getParam() const { return (TDoubleParam *)m_param.getPointer(); }

@@ -218,7 +218,7 @@ The TCacheResourceP is a specialized smart pointer-like class that references TC
 instances.
 \n \n
 In order to retrieve a Cache resource, it is sufficient to know the resource name and invoke the
-\c TCacheResourceP(const string&, bool) constructor. The bool optionally specified as second
+\c TCacheResourceP(const std::string&, bool) constructor. The bool optionally specified as second
 argument specifies whether the resource has to be created if none is found with passed name.
 
 \sa TCacheResource, TSmartPointer classes.

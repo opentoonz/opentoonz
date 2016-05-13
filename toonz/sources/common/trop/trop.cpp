@@ -126,7 +126,7 @@ class Gamma_Lut
 {
 
 public:
-	vector<Q> m_table;
+	std::vector<Q> m_table;
 	Gamma_Lut(int insteps, int outsteps, double gamma)
 	{
 		double inspace = (double)(insteps);

@@ -24,15 +24,15 @@
 
 namespace
 {
-wstring removeSpaces(const wstring &str)
+	std::wstring removeSpaces(const std::wstring &str)
 {
-	wstring result;
-	wstring::size_type a = 0, b;
-	while ((b = str.find_first_of(L" ", a)) != wstring::npos) {
+	std::wstring result;
+	std::wstring::size_type a = 0, b;
+	while ((b = str.find_first_of(L" ", a)) != std::wstring::npos) {
 		result += str.substr(a, b - a);
 		a = b + 1;
 	}
-	result += str.substr(a, wstring::npos);
+	result += str.substr(a, std::wstring::npos);
 	return result;
 }
 }
@@ -58,7 +58,7 @@ public:
 
 	TRenderSettings m_renderSettings;
 
-	vector<MultimediaRenderer::Listener *> m_listeners;
+	std::vector<MultimediaRenderer::Listener *> m_listeners;
 
 	bool m_precomputingEnabled;
 	bool m_canceled;
@@ -281,7 +281,7 @@ void MultimediaRenderer::Imp::start()
 	double timeStretchFactor = stretchFrom / stretchTo;
 	bool fieldRendering = m_renderSettings.m_fieldPrevalence != TRenderSettings::NoField;
 
-	wstring modeStr;
+	std::wstring modeStr;
 	switch (m_multimediaMode) {
 	case COLUMNS:
 		modeStr = L"_col";
@@ -356,13 +356,13 @@ void MultimediaRenderer::Imp::start()
 			continue;
 
 		int columnIndex = colFx->getColumnIndex();
-		wstring columnName(colFx->getColumnName());
-		wstring columnId(colFx->getColumnId());
-		wstring fxName(currFx->getName());
-		wstring fxNameNoSpaces(::removeSpaces(fxName));
-		wstring fxId(currFx->getFxId());
+		std::wstring columnName(colFx->getColumnName());
+		std::wstring columnId(colFx->getColumnId());
+		std::wstring fxName(currFx->getName());
+		std::wstring fxNameNoSpaces(::removeSpaces(fxName));
+		std::wstring fxId(currFx->getFxId());
 
-		wstring fpName = m_fp.getWideName() +
+		std::wstring fpName = m_fp.getWideName() +
 						 L"_" + columnName + (columnId == columnName ? L"" : L"(" + columnId + L")") +
 						 (fxId.empty() ? L"" : L"_" + fxName + (fxId == fxNameNoSpaces ? L"" : L"(" + fxId + L")"));
 		//+ modeStr + toWideString(columnIndex+1);

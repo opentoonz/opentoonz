@@ -1,7 +1,7 @@
-
-
 #ifndef TSYSLOG_H
 #define TSYSLOG_H
+
+#include <memory>
 
 #include "tcommon.h"
 #include <QString>
@@ -12,7 +12,7 @@ class TFilePath;
 #undef TFARMAPI
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifdef TFARM_EXPORTS
 #define TFARMAPI __declspec(dllexport)
 #else
@@ -45,7 +45,7 @@ public:
 
 private:
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 };
 
 #endif

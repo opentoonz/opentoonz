@@ -6,17 +6,15 @@
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/lineedit.h"
 
-using namespace DVGui;
-
 //=============================================================================
 // SavePresetPopup
 //-----------------------------------------------------------------------------
 
-class SavePresetPopup : public Dialog
+class SavePresetPopup : public DVGui::Dialog
 {
 	Q_OBJECT
 
-	LineEdit *m_nameFld;
+	DVGui::LineEdit *m_nameFld;
 
 public:
 	SavePresetPopup();

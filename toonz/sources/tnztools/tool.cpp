@@ -130,14 +130,14 @@ std::vector<int> TTool::m_cellsData;
 //    TTool  implementation
 //*****************************************************************************************
 
-TTool::TTool(string name)
+TTool::TTool(std::string name)
 	: m_name(name), m_viewer(0), m_targetType(NoTarget), m_enabled(true), m_active(false), m_picking(false)
 {
 }
 
 //-------------------------------------------------------------------
 
-TTool *TTool::getTool(string toolName, ToolTargetType targetType)
+TTool *TTool::getTool(std::string toolName, ToolTargetType targetType)
 {
 	if (!toolTable)
 		return 0;

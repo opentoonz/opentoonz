@@ -1,9 +1,7 @@
-
-
 #ifndef TINBETWEEN_H
 #define TINBETWEEN_H
 
-//#include "tvectorimage.h"
+#include <memory>
 #include "tcommon.h"
 
 class TVectorImageP;
@@ -21,9 +19,8 @@ class TVectorImageP;
 
 class DVAPI TInbetween
 {
-
 	class Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	TInbetween(const TVectorImageP firstImage, const TVectorImageP lastImage);

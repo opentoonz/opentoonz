@@ -148,4 +148,4 @@ signals:
 	void doExplodeChild(const QList<TFxP> &);
 };
 
-#endif;
+#endif

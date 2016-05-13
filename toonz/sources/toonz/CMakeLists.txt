@@ -72,6 +72,7 @@ set(MOC_HEADERS
     mainwindow.h
     matchline.h
     menubar.h
+    menubarpopup.h
     menubarcommandids.h
     meshifypopup.h
     messagepanel.h
@@ -159,6 +160,7 @@ set(SOURCES
     mainwindow.cpp
     matchline.cpp
     menubar.cpp
+    menubarpopup.cpp
     mergecolumns.cpp
     moviegenerator.cpp
     pane.cpp
@@ -310,13 +312,13 @@ set(OBJCSOURCES filebrowsermodel.cpp)
 # Resource file(s)
 set(RESOURCES toonz.qrc)
 
-if (WIN32)
+if(WIN32)
     set(RC_FILE toonz.rc)
-endif ()
+endif()
 
 qt5_add_resources(SOURCES ${RESOURCES})
 
-if (APPLE)
+if(APPLE)
     #set_source_files_properties(${OBJCSOURCES} PROPERTIES LANGUAGE OBJCXX)
     set_source_files_properties(${OBJCSOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif()
@@ -344,7 +346,7 @@ message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
 include_directories(../../sources/toonzfarm/include)
 include_directories(../../sources/toonzqt)
-if (WIN32)
+if(WIN32)
     if(PLATFORM EQUAL 32)
         include_directories(${SDKROOT}/quicktime/QT73SDK/CIncludes)
     endif()
@@ -361,16 +363,13 @@ else()
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;colorfx;tnzext;image;sound;toonzqt;tnztools")
 
     # 変なところにライブラリ生成するカスども
-    get_target_property(TNZSTDFX_Location tnzstdfx LOCATION)
-    get_target_property(TFARM_Location tfarm LOCATION)
-
-    set(EXTRA_LIBS ${EXTRA_LIBS} ${TNZSTDFX_Location} ${TFARM_Location})
+    set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
 
     target_link_libraries(OpenToonz_${VERSION} Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml Qt5::Script Qt5::Widgets Qt5::PrintSupport ${GL_LIB} ${GLUT_LIB} ${COCOA_LIB} ${EXTRA_LIBS})
 
 endif()
 
-if (APPLE)
+if(APPLE)
     # CMAKE_RUNTIME_OUTPUT_DIRECTORY should be equivalent to usage on windows despite empty
     # OSX だと CMAKE_RUNTIME_OUTPUT_DIRECTORY が空だが Windows 版と同じ使い方ができるようにしておく
     get_target_property(bin OpenToonz_${VERSION} LOCATION)
@@ -378,12 +377,12 @@ if (APPLE)
 endif()
 
 # copy utilty executables onto the directory after build
-if(LZODRIVER-FOUND)
+if(LZODRIVER_FOUND)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzocompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS lzocompress)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzodecompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS lzodecompress)
 endif()
 
-if (APPLE)
+if(APPLE)
     get_target_property(loc OpenToonz_${VERSION} MACOSX_BUNDLE_NAME)
     message(" ==> App Bundle: " ${loc})
     message(" ==> Mach-o: " ${bin})
@@ -404,8 +403,6 @@ if (APPLE)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/qss)
 
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../../install/SystemVar.ini ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
-
-
-endif (APPLE)
+endif()
 
 

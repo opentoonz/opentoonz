@@ -23,13 +23,13 @@ namespace TDebugMessage
 class Manager
 {
 public:
-	virtual ostream &getStream() = 0;
+	virtual std::ostream &getStream() = 0;
 	virtual void flush(int code = 0) = 0;
 	virtual ~Manager() {}
 };
 
 DVAPI void setManager(Manager *manager);
-DVAPI ostream &getStream();
+DVAPI std::ostream &getStream();
 DVAPI void flush(int code = 0);
 
 } // namespace

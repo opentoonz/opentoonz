@@ -204,23 +204,23 @@ void addCleanupDefaultPalette(TXshSimpleLevelP sl)
 	TFileStatus pfs(palettePath);
 
 	if (!pfs.doesExist() || !pfs.isReadable()) {
-		MsgBox(WARNING, QString("CleanupDefaultPalette file: %1 is not found!").arg(QString::fromStdWString(palettePath.getWideString())));
+		DVGui::warning(QString("CleanupDefaultPalette file: %1 is not found!").arg(QString::fromStdWString(palettePath.getWideString())));
 		return;
 	}
 
 	TIStream is(palettePath);
 	if (!is) {
-		MsgBox(WARNING, QString("CleanupDefaultPalette file: failed to get TIStream"));
+		DVGui::warning(QString("CleanupDefaultPalette file: failed to get TIStream"));
 		return;
 	}
 
-	string tagName;
+	std::string tagName;
 	if (!is.matchTag(tagName) || tagName != "palette") {
-		MsgBox(WARNING, QString("CleanupDefaultPalette file: This is not palette file"));
+		DVGui::warning(QString("CleanupDefaultPalette file: This is not palette file"));
 		return;
 	}
 
-	string gname;
+	std::string gname;
 	is.getTagParam("name", gname);
 	TPalette *defaultPalette = new TPalette();
 	defaultPalette->loadData(is);
@@ -607,7 +607,7 @@ bool CleanupPopup::analyzeCleanupList()
 					// Thus, the conservative approach is not feasible.
 
 					// Inform the user and abort cleanup
-					DVGui::MsgBox(DVGui::WARNING, tr("There were errors opening the existing level \"%1\".\n\nPlease choose to delete the existing level and create a new one\nwhen running the cleanup process.").arg(QString::fromStdWString(outputPath.getLevelNameW())));
+					DVGui::warning(tr("There were errors opening the existing level \"%1\".\n\nPlease choose to delete the existing level and create a new one\nwhen running the cleanup process.").arg(QString::fromStdWString(outputPath.getLevelNameW())));
 
 					return false;
 				}
@@ -618,7 +618,7 @@ bool CleanupPopup::analyzeCleanupList()
 				m_params->getOutputImageInfo(outRes, outDpi.x, outDpi.y);
 
 				if (oldRes != outRes) {
-					DVGui::MsgBox(DVGui::WARNING, tr("The resulting resolution of level \"%1\"\ndoes not match with that of previously cleaned up level drawings.\n\nPlease set the right camera resolution and closest field, or choose to delete\nthe existing level and create a new one when running the cleanup process.").arg(QString::fromStdWString(outputPath.getLevelNameW())));
+					DVGui::warning(tr("The resulting resolution of level \"%1\"\ndoes not match with that of previously cleaned up level drawings.\n\nPlease set the right camera resolution and closest field, or choose to delete\nthe existing level and create a new one when running the cleanup process.").arg(QString::fromStdWString(outputPath.getLevelNameW())));
 
 					return false;
 				}
@@ -662,7 +662,7 @@ bool CleanupPopup::analyzeCleanupList()
 		}
 		question += QObject::tr("\nAre you sure ?");
 
-		int ret = MsgBox(question, QObject::tr("Delete"), QObject::tr("Cancel"), 0);
+		int ret = DVGui::MsgBox(question, QObject::tr("Delete"), QObject::tr("Cancel"), 0);
 		if (ret == 0 || ret == 2) {
 			return false;
 		} else if (ret == 1) {
@@ -788,7 +788,7 @@ void CleanupPopup::execute()
 	// If there are no (more) frames to cleanup, warn and quit
 	int framesCount = m_completion.second;
 	if (!framesCount) {
-		DVGui::MsgBox(DVGui::INFORMATION, tr("It is not possible to cleanup: the cleanup list is empty."));
+		DVGui::info(tr("It is not possible to cleanup: the cleanup list is empty."));
 
 		reset();
 		return;
@@ -917,8 +917,8 @@ QString CleanupPopup::setupLevel()
 					sl->getImageId(fid, 0),
 					sl->getImageId(fid, TXshSimpleLevel::Scanned));
 
-				const string &oldIconId = sl->getIconId(fid, 0);
-				const string &newIconId = sl->getIconId(fid, TXshSimpleLevel::Scanned);
+				const std::string &oldIconId = sl->getIconId(fid, 0);
+				const std::string &newIconId = sl->getIconId(fid, TXshSimpleLevel::Scanned);
 
 				IconGenerator::instance()->remap(newIconId, oldIconId);
 			}
@@ -944,9 +944,9 @@ QString CleanupPopup::setupLevel()
 				TFileStatus pfs(targetPalettePath);
 				if (pfs.doesExist() && pfs.isReadable()) {
 					TIStream is(targetPalettePath);
-					string tagName;
+					std::string tagName;
 					if (!is.matchTag(tagName) || tagName != "palette") {
-						MsgBox(WARNING, QString("CleanupDefaultPalette file: This is not palette file"));
+						DVGui::warning(QString("CleanupDefaultPalette file: This is not palette file"));
 						return NULL;
 					}
 					m_originalPalette = new TPalette();
@@ -1111,7 +1111,7 @@ void CleanupPopup::closeLevel()
 		ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 		TFilePath decodedPath(scene->decodeFilePath(outputPath));
 
-		if (outputPath.getLevelNameW().find(L"-np.") == wstring::npos &&
+		if (outputPath.getLevelNameW().find(L"-np.") == std::wstring::npos &&
 			TFileStatus(decodedPath).doesExist()) {
 			saveUnpaintedLevel(decodedPath, sl, m_cleanuppedLevelFrames, (m_keepOriginalPalette && m_originalPalette));
 		}
@@ -1150,7 +1150,7 @@ void CleanupPopup::cleanupFrame()
 				bool autocentered;
 				ri = cl->autocenterOnly(original, false, autocentered);
 				if (!autocentered)
-					DVGui::MsgBox(DVGui::WARNING, QObject::tr("The autocentering failed on the current drawing."));
+					DVGui::warning(QObject::tr("The autocentering failed on the current drawing."));
 			}
 
 			sl->setFrame(fid, ri);
@@ -1205,7 +1205,7 @@ void CleanupPopup::cleanupFrame()
 
 			int autocenterType = params->m_autocenterType;
 			if (autocenterType == CleanupTypes::AUTOCENTER_FDG && !cpi->m_autocentered)
-				DVGui::MsgBox(DVGui::WARNING, QObject::tr("The autocentering failed on the current drawing."));
+				DVGui::warning(QObject::tr("The autocentering failed on the current drawing."));
 
 			delete cpi;
 
@@ -1294,7 +1294,7 @@ void CleanupPopup::onCleanupFrame()
 		const QString &err = setupLevel();
 
 		if (!err.isEmpty()) {
-			MsgBox(DVGui::CRITICAL, err);
+			DVGui::error(err);
 			return;
 		}
 	}
@@ -1331,7 +1331,7 @@ void CleanupPopup::onCleanupAllFrame()
 			const QString &err = setupLevel();
 
 			if (!err.isEmpty()) {
-				MsgBox(DVGui::CRITICAL, err);
+				DVGui::error(err);
 				return;
 			}
 		}

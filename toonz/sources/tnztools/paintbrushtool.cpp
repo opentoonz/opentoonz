@@ -64,13 +64,13 @@ namespace
 
 class BrushUndo : public TRasterUndo
 {
-	vector<TThickPoint> m_points;
+	std::vector<TThickPoint> m_points;
 	int m_styleId;
 	bool m_selective;
 	ColorType m_colorType;
 
 public:
-	BrushUndo(TTileSetCM32 *tileSet, const vector<TThickPoint> &points,
+	BrushUndo(TTileSetCM32 *tileSet, const std::vector<TThickPoint> &points,
 			  ColorType colorType, int styleId, bool selective,
 			  TXshSimpleLevel *level,
 			  const TFrameId &frameId)
@@ -249,7 +249,7 @@ public:
 	void onLeave();
 	void onActivate();
 	void onDeactivate();
-	bool onPropertyChanged(string propertyName);
+	bool onPropertyChanged(std::string propertyName);
 
 	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
@@ -337,7 +337,7 @@ const UINT pointCount = 20;
 
 //-----------------------------------------------------------------------------
 
-bool PaintBrushTool::onPropertyChanged(string propertyName)
+bool PaintBrushTool::onPropertyChanged(std::string propertyName)
 {
 	/*-- Size ---*/
 	if (propertyName == m_toolSize.getName()) {

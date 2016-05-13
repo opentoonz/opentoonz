@@ -41,8 +41,6 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-using namespace DVGui;
-
 class TTool;
 class TFrameHandle;
 class TObjectHandle;
@@ -84,7 +82,7 @@ public:
 //    ToolOptionControl derivative  declarations
 //***********************************************************************************
 
-class ToolOptionCheckbox : public CheckBox, public ToolOptionControl
+class ToolOptionCheckbox : public DVGui::CheckBox, public ToolOptionControl
 {
 	Q_OBJECT
 
@@ -105,7 +103,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionSlider : public DoubleField, public ToolOptionControl
+class ToolOptionSlider : public DVGui::DoubleField, public ToolOptionControl
 {
 	Q_OBJECT
 
@@ -126,7 +124,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionPairSlider : public DoublePairField, public ToolOptionControl
+class ToolOptionPairSlider : public DVGui::DoublePairField, public ToolOptionControl
 {
 	Q_OBJECT
 
@@ -150,7 +148,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionIntPairSlider : public IntPairField, public ToolOptionControl
+class ToolOptionIntPairSlider : public DVGui::IntPairField, public ToolOptionControl
 {
 	Q_OBJECT
 
@@ -174,7 +172,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionIntSlider : public IntField, public ToolOptionControl
+class ToolOptionIntSlider : public DVGui::IntField, public ToolOptionControl
 {
 	Q_OBJECT
 
@@ -239,7 +237,7 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionTextField : public LineEdit, public ToolOptionControl
+class ToolOptionTextField : public DVGui::LineEdit, public ToolOptionControl
 {
 	Q_OBJECT
 
@@ -257,7 +255,7 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class StyleIndexFieldAndChip : public StyleIndexLineEdit, public ToolOptionControl
+class StyleIndexFieldAndChip : public DVGui::StyleIndexLineEdit, public ToolOptionControl
 {
 	Q_OBJECT
 
@@ -288,7 +286,7 @@ public slots:
   \li Editing with global keyframes (ie affecting multiple parameters other than the edited one)
   \li Undo/Redo of user interactions.
 */
-class ToolOptionParamRelayField : public MeasuredDoubleLineEdit, public ToolOptionControl
+class ToolOptionParamRelayField : public DVGui::MeasuredDoubleLineEdit, public ToolOptionControl
 {
 	Q_OBJECT
 
@@ -319,7 +317,7 @@ protected slots:
 //
 //=============================================================================
 
-class DVAPI MeasuredValueField : public LineEdit
+class DVAPI MeasuredValueField : public DVGui::LineEdit
 {
 	Q_OBJECT
 
@@ -337,7 +335,7 @@ public:
 	MeasuredValueField(QWidget *parent, QString name = "numfield");
 	~MeasuredValueField();
 
-	void setMeasure(string name);
+	void setMeasure(std::string name);
 
 	void enableGlobalKeyframe(bool isGlobalKeyframe) { m_isGlobalKeyframe = isGlobalKeyframe; }
 

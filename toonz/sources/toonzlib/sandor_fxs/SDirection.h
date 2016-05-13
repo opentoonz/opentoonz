@@ -13,9 +13,9 @@
 
 #include "SDef.h"
 
+#include <memory>
+#include <array>
 #include <vector>
-
-using namespace std;
 
 //#define MSIZE 3
 
@@ -29,8 +29,8 @@ typedef struct {
 class CSDirection
 {
 	int m_lX, m_lY;
-	UCHAR *m_dir;
-	SXYW *m_df[NBDIR];
+	std::unique_ptr<UCHAR[]> m_dir;
+	std::array<std::unique_ptr<SXYW[]>, NBDIR> m_df;
 	int m_lDf;
 
 	void null();

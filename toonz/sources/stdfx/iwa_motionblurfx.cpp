@@ -965,9 +965,9 @@ bool Iwa_MotionBlurCompFx::canHandle(const TRenderSettings &info,
  エイリアスは毎フレーム変える
 ------------------------------------------------------------*/
 
-string Iwa_MotionBlurCompFx::getAlias(double frame, const TRenderSettings &info) const
+std::string Iwa_MotionBlurCompFx::getAlias(double frame, const TRenderSettings &info) const
 {
-	string alias = getFxType();
+	std::string alias = getFxType();
 	alias += "[";
 
 	// alias degli effetti connessi alle porte di input separati da virgole
@@ -983,7 +983,7 @@ string Iwa_MotionBlurCompFx::getAlias(double frame, const TRenderSettings &info)
 		alias += ",";
 	}
 
-	string paramalias("");
+	std::string paramalias("");
 	for (i = 0; i < getParams()->getParamCount(); i++) {
 		TParam *param = getParams()->getParam(i);
 		paramalias += param->getName() + "=" + param->getValueAlias(frame, 3);

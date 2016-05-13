@@ -53,10 +53,10 @@ namespace
 {
 
 //!Riempie il vettore \b theVect con gli indici degli stroke contenuti nel mapping \b theMap.
-void mapToVector(const map<int, VIStroke *> &theMap, vector<int> &theVect)
+void mapToVector(const std::map<int, VIStroke *> &theMap, std::vector<int> &theVect)
 {
 	assert(theMap.size() == theVect.size());
-	map<int, VIStroke *>::const_iterator it = theMap.begin();
+	std::map<int, VIStroke *>::const_iterator it = theMap.begin();
 	UINT i = 0;
 	for (; it != theMap.end(); ++it) {
 		theVect[i++] = it->first;
@@ -427,7 +427,7 @@ TRaster32P ToolUtils::convertStrokeToImage(TStroke *stroke, const TRect &imageBo
 
 TStroke *ToolUtils::merge(const ArrayOfStroke &a)
 {
-	vector<TThickPoint> v;
+	std::vector<TThickPoint> v;
 
 	TStroke *ref = 0;
 	int controlPoints = 0;
@@ -602,7 +602,7 @@ void ToolUtils::TToolUndo::notifyImageChanged() const
 	IconGenerator::instance()->invalidateSceneIcon();
 
 	if (m_level && m_level->getType() == PLI_XSHLEVEL) {
-		string id = m_level->getImageId(m_frameId) + "_rasterized";
+		std::string id = m_level->getImageId(m_frameId) + "_rasterized";
 		ImageManager::instance()->invalidate(id);
 	}
 }
@@ -718,7 +718,7 @@ void ToolUtils::TFullColorRasterUndo::undo() const
 		TRasterImageP image = getImage();
 		if (!image)
 			return;
-		vector<TRect> rects = paste(image, m_tiles);
+		std::vector<TRect> rects = paste(image, m_tiles);
 		int i;
 		TRect resRect = rects[0];
 		for (i = 1; i < (int)rects.size(); i++)
@@ -733,9 +733,9 @@ void ToolUtils::TFullColorRasterUndo::undo() const
 
 //-----------------------------------------------------------------------------
 
-vector<TRect> ToolUtils::TFullColorRasterUndo::paste(const TRasterImageP &ti, const TTileSetFullColor *tileSet) const
+std::vector<TRect> ToolUtils::TFullColorRasterUndo::paste(const TRasterImageP &ti, const TTileSetFullColor *tileSet) const
 {
-	vector<TRect> rects;
+	std::vector<TRect> rects;
 	TRasterP raster = ti->getRaster();
 	for (int i = 0; i < tileSet->getTileCount(); i++) {
 		const TTileSetFullColor::Tile *tile = tileSet->getTile(i);
@@ -899,7 +899,7 @@ void ToolUtils::UndoModifyStrokeAndPaint::onAdd()
 
 	UndoModifyStroke::onAdd();
 	TStroke *stroke = image->getStroke(m_strokeIndex);
-	m_fillInformation = new vector<TFilledRegionInf>;
+	m_fillInformation = new std::vector<TFilledRegionInf>;
 	ImageUtils::getFillingInformationOverlappingArea(image, *m_fillInformation, m_oldBBox, stroke->getBBox());
 }
 
@@ -955,7 +955,7 @@ int ToolUtils::UndoModifyStrokeAndPaint::getSize() const
 //-----------------------------------------------------------------------------
 
 ToolUtils::UndoModifyListStroke::UndoModifyListStroke(TXshSimpleLevel *level, const TFrameId &frameId,
-													  const vector<TStroke *> &strokeVect)
+													  const std::vector<TStroke *> &strokeVect)
 	: TToolUndo(level, frameId), m_fillInformation(0)
 {
 	UINT strokeNum = strokeVect.size();
@@ -983,7 +983,7 @@ ToolUtils::UndoModifyListStroke::~UndoModifyListStroke()
 
 void ToolUtils::UndoModifyListStroke::onAdd()
 {
-	list<UndoModifyStroke *>::iterator it = m_beginIt;
+	std::list<UndoModifyStroke *>::iterator it = m_beginIt;
 	TRectD newBBox;
 
 	TVectorImageP image = m_level->getFrame(m_frameId, true);
@@ -995,7 +995,7 @@ void ToolUtils::UndoModifyListStroke::onAdd()
 		TStroke *s = image->getStroke((*it)->m_strokeIndex);
 		(*it)->onAdd();
 	}
-	m_fillInformation = new vector<TFilledRegionInf>;
+	m_fillInformation = new std::vector<TFilledRegionInf>;
 
 	if (m_beginIt != m_endIt)
 		ImageUtils::getFillingInformationOverlappingArea(image, *m_fillInformation, m_oldBBox, newBBox);
@@ -1009,7 +1009,7 @@ void ToolUtils::UndoModifyListStroke::undo() const
 	if (!app)
 		return;
 
-	list<UndoModifyStroke *>::iterator stroke_it = m_beginIt;
+	std::list<UndoModifyStroke *>::iterator stroke_it = m_beginIt;
 	if (m_beginIt == m_endIt)
 		return;
 
@@ -1050,7 +1050,7 @@ void ToolUtils::UndoModifyListStroke::redo() const
 	if (!app)
 		return;
 
-	list<UndoModifyStroke *>::iterator it = m_beginIt;
+	std::list<UndoModifyStroke *>::iterator it = m_beginIt;
 
 	for (; it != m_endIt; ++it) {
 		(*it)->redo();
@@ -1066,7 +1066,7 @@ int ToolUtils::UndoModifyListStroke::getSize() const
 {
 	int sum = 0;
 
-	list<UndoModifyStroke *>::iterator it = m_beginIt;
+	std::list<UndoModifyStroke *>::iterator it = m_beginIt;
 
 	for (; it != m_endIt; ++it) {
 		sum += (*it)->getSize();
@@ -1081,7 +1081,7 @@ int ToolUtils::UndoModifyListStroke::getSize() const
 //=============================================================================================
 
 ToolUtils::UndoPencil::UndoPencil(TStroke *stroke,
-								  vector<TFilledRegionInf> *fillInformation,
+								  std::vector<TFilledRegionInf> *fillInformation,
 								  TXshSimpleLevel *level, const TFrameId &frameId,
 								  bool createdFrame, bool createdLevel,
 								  bool autogroup, bool autofill)
@@ -1201,7 +1201,7 @@ int ToolUtils::UndoPencil::getSize() const
 
 ToolUtils::UndoRasterPencil::UndoRasterPencil(TXshSimpleLevel *level, const TFrameId &frameId, TStroke *stroke,
 											  bool selective, bool filled, bool doAntialias, bool createdFrame,
-											  bool createdLevel, string primitiveName)
+												bool createdLevel, std::string primitiveName)
 	: TRasterUndo(0, level, frameId, createdFrame, createdLevel, 0), m_selective(selective), m_filled(filled), m_doAntialias(doAntialias), m_primitiveName(primitiveName)
 {
 	TRasterCM32P raster = getImage()->getRaster();
@@ -1798,7 +1798,7 @@ TRectD ToolUtils::interpolateRect(const TRectD &rect1, const TRectD &rect2, doub
 
 //-----------------------------------------------------------------------------
 /*
-bool ToolUtils::isASubRegion(int reg, const vector<TRegion*> &regions)
+bool ToolUtils::isASubRegion(int reg, const std::vector<TRegion*> &regions)
 {
 	TRegion *region=regions[reg];
 	for (int i=0; i<(int)regions.size(); i++)
@@ -1812,7 +1812,7 @@ bool ToolUtils::isASubRegion(int reg, const vector<TRegion*> &regions)
 */
 //-----------------------------------------------------------------------------
 
-TRectD ToolUtils::getBounds(const vector<TThickPoint> &points, double maxThickness)
+TRectD ToolUtils::getBounds(const std::vector<TThickPoint> &points, double maxThickness)
 {
 	TThickPoint p = points[0];
 	double radius = maxThickness == 0 ? p.thick * 0.5 : maxThickness * 0.5;

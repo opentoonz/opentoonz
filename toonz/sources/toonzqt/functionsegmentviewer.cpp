@@ -362,7 +362,7 @@ void SpeedInOutSegmentPage::getGuiValues(TPointD &speedIn, TPointD &speedOut)
 EaseInOutSegmentPage::EaseInOutSegmentPage(bool isPercentage, FunctionSegmentViewer *parent)
 	: FunctionSegmentPage(parent), m_fieldScale(isPercentage ? 100.0 : 1.0), m_isPercentage(isPercentage)
 {
-	string measureName = isPercentage ? "percentage" : "";
+	std::string measureName = isPercentage ? "percentage" : "";
 
 	m_ease0Fld = new DVGui::MeasuredDoubleLineEdit();
 	m_ease0Fld->setMeasure(measureName);
@@ -534,13 +534,13 @@ void FunctionExpressionSegmentPage::refresh()
 	}
 
 	TDoubleKeyframe kf0 = curve->getKeyframeAt(getR0());
-	string expression = kf0.m_expressionText;
+	std::string expression = kf0.m_expressionText;
 	bool oldBlockSignalsStatus = m_expressionFld->blockSignals(true);
 	m_expressionFld->setGrammar(curve->getGrammar());
 	m_expressionFld->setExpression(expression);
 	m_expressionFld->blockSignals(oldBlockSignalsStatus);
 
-	wstring unitName = toWideString(kf0.m_unitName);
+	std::wstring unitName = toWideString(kf0.m_unitName);
 	if (unitName == L"" && curve->getMeasure())
 		unitName = curve->getMeasure()->getCurrentUnit()->getDefaultExtension();
 
@@ -583,7 +583,7 @@ void FunctionExpressionSegmentPage::init(int segmentLength)
 	} else {
 		m_expressionFld->setExpression("0");
 
-		wstring unitName = L"inch";
+		std::wstring unitName = L"inch";
 		if (curve->getMeasure())
 			unitName = curve->getMeasure()->getCurrentUnit()->getDefaultExtension();
 		m_unitFld->setText(QString::fromStdWString(unitName));
@@ -607,11 +607,11 @@ void FunctionExpressionSegmentPage::apply()
 	expr.setGrammar(curve->getGrammar());
 	expr.setText(expressionText);
 	if (dependsOn(expr, curve)) {
-		DVGui::MsgBox(DVGui::WARNING, tr("There is a circular reference in the definition of the interpolation."));
+		DVGui::warning(tr("There is a circular reference in the definition of the interpolation."));
 		return;
 	}
 
-	string unitName = m_unitFld->text().toStdString();
+	std::string unitName = m_unitFld->text().toStdString();
 
 	KeyframeSetter setter(curve, kIndex);
 	setter.setExpression(m_expressionFld->getExpression());
@@ -656,7 +656,7 @@ bool FunctionExpressionSegmentPage::getGuiValues(std::string &expressionText,
 	expr.setGrammar(curve->getGrammar());
 	expr.setText(expressionText);
 	if (dependsOn(expr, curve)) {
-		DVGui::MsgBox(DVGui::WARNING, tr("There is a circular reference in the definition of the interpolation."));
+		DVGui::warning(tr("There is a circular reference in the definition of the interpolation."));
 		return false;
 	}
 
@@ -725,7 +725,7 @@ public:
 		if (curve && kf.m_isKeyframe) {
 			TFilePath path;
 			int fieldIndex = 0;
-			string unitName = "";
+			std::string unitName = "";
 			if (kf.m_type == TDoubleKeyframe::File) {
 				path = kf.m_fileParams.m_path;
 				fieldIndex = kf.m_fileParams.m_fieldIndex;
@@ -754,7 +754,7 @@ public:
 			return;
 
 		TMeasure *measure = curve->getMeasure();
-		string unitName = "";
+		std::string unitName = "";
 		if (measure) {
 			const TUnit *unit = measure->getCurrentUnit();
 			if (unit)
@@ -784,7 +784,7 @@ public:
 
 		fileParams.m_path = TFilePath(stringPath.toStdWString());
 		fileParams.m_fieldIndex = qMax(0, m_fieldIndexFld->text().toInt() - 1);
-		string unitName = m_measureFld->text().toStdString();
+		std::string unitName = m_measureFld->text().toStdString();
 
 		KeyframeSetter setter(curve, kIndex);
 		setter.setFile(fileParams);
@@ -840,7 +840,7 @@ void SimilarShapeSegmentPage::refresh()
 	}
 
 	TDoubleKeyframe kf0 = curve->getKeyframeAt(getR0());
-	string expression = kf0.m_expressionText;
+	std::string expression = kf0.m_expressionText;
 	bool oldBlockSignalsStatus = m_expressionFld->blockSignals(true);
 	m_expressionFld->setGrammar(curve->getGrammar());
 	m_expressionFld->setExpression(expression);
@@ -860,7 +860,7 @@ void SimilarShapeSegmentPage::init(int segmentLength)
 
 	m_expressionFld->setEnabled(true);
 	TDoubleKeyframe kf0 = curve->getKeyframeAt(getR0());
-	string expression = kf0.m_expressionText;
+	std::string expression = kf0.m_expressionText;
 	bool oldBlockSignalsStatus = m_expressionFld->blockSignals(true);
 	m_expressionFld->setGrammar(curve->getGrammar());
 	m_expressionFld->setExpression(expression);
@@ -884,11 +884,11 @@ void SimilarShapeSegmentPage::apply()
 	expr.setGrammar(curve->getGrammar());
 	expr.setText(expressionText);
 	if (!expr.isValid()) {
-		DVGui::MsgBox(DVGui::WARNING, tr("There is a syntax error in the definition of the interpolation."));
+		DVGui::warning(tr("There is a syntax error in the definition of the interpolation."));
 		return;
 	}
 	if (dependsOn(expr, curve)) {
-		DVGui::MsgBox(DVGui::WARNING, tr("There is a circular reference in the definition of the interpolation."));
+		DVGui::warning(tr("There is a circular reference in the definition of the interpolation."));
 		return;
 	}
 	KeyframeSetter setter(curve, kIndex);
@@ -1173,6 +1173,7 @@ void FunctionSegmentViewer::refresh()
 
 		TDoubleKeyframe kf = m_curve->getKeyframeAt(m_r0);
 		int pageIndex = typeToIndex(kf.m_type);
+		m_typeCombo->setEnabled(true);
 		m_typeCombo->setCurrentIndex(pageIndex);
 		if (0 <= pageIndex && pageIndex < tArrayCount(m_pages)) {
 			m_parametersPanel->setCurrentIndex(pageIndex);
@@ -1217,11 +1218,13 @@ void FunctionSegmentViewer::refresh()
 		QRect selectedCells = m_sheet->getSelectedCells();
 		/*--- 選択範囲が空のとき、もしくはカーブが選ばれていないとき ---*/
 		if (selectedCells.isEmpty() || !m_curve) {
+			m_typeCombo->setEnabled(false);
 			m_fromFld->setText("");
 			m_toFld->setText("");
 		}
 		/*--- 何かカーブが選択されている ---*/
 		else {
+			m_typeCombo->setEnabled(true);
 			int s0 = selectedCells.top();
 			int s1 = selectedCells.bottom();
 
