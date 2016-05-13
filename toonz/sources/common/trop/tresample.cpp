@@ -807,25 +807,6 @@ inline void calcValueNoCalc(UINT &calc_value){
 		calc_value &= ~0x80U; \
 	}
 
-/////////////////////////////////////////////////////////
-// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-/////////////////////////////////////////////////////////
-
-//#define PIXVAL_EQ_EQUAL(V1,V2)        ((V1)==(V2))
-
-/*
-#define PIXVAL_EQ_24_EQUAL(V1,V2)     ((V1)&0xffffff==(V2)&0xffffff)
-#define PIXVAL_EQ_2_LONG_EQUAL(V1,V2) (*(TINT32*)&(V1)==*(TINT32*)&(V2) &&\
-                                      ((TINT32*)&(V1))[1]==((TINT32*)&(V2))[1])
-*/
-/////////////////////////////////////////////////////////
-// fine GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-/////////////////////////////////////////////////////////
-
-//#define PIXVAL_EQ_LONG_EQUAL(V1,V2)   (*(TINT32*)&(V1)==*(TINT32*)&(V2))
-//#define PIXVAL_EQ PIXVAL_EQ_LONG_EQUAL
-//#define PIXVAL_EQ PIXVAL_EQ_EQUAL
-
 template <typename PixType>
 #ifdef _WIN32
 __forceinline
@@ -1014,16 +995,6 @@ void create_calc(const TRasterPT<T> &rin,
 	ResampleCalcAlgo<T>(rin->pixels(), lu, lv, wrap_in, max_pix_ref_u, min_pix_ref_u,
 						max_pix_ref_v, min_pix_ref_v, calc, calc_bytesize, calc_bytewrap);
 
-	//for (int i=0;i<calc_bytesize;i++)
-	//  cout << i << ":" << (*p_calc)[i] << endl;
-
-	/////////////////////////////////////////////////////////
-	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-	/////////////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////////////
-	// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-	/////////////////////////////////////////////////////////
 }
 
 //---------------------------------------------------------------------------
@@ -2678,14 +2649,6 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 			pix_ref_u.get(), pix_ref_v.get(),
 			pix_ref_f.get(), pix_ref_g.get(),
 			filter);
-
-	/////////////////////////////////////////////////////////
-	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-	/////////////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////////////
-	// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-	/////////////////////////////////////////////////////////
 }
 
 //---------------------------------------------------------------------------
@@ -2932,18 +2895,6 @@ TAffine aff_0, inv_0;
 	if (!(rin->getLx() > 0 && rin->getLy() > 0)) /* immagine in vuota */
 	{
 		rout->fill(T::Black); //Black_rgbm
-
-		/////////////////////////////////////////////////////////
-		// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-		/////////////////////////////////////////////////////////
-
-		//---- NON GESTIAMO ANCORA EXTRA BUFFER
-		//ZERO_EXTRA_OF (rout)
-
-		/////////////////////////////////////////////////////////
-		// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-		/////////////////////////////////////////////////////////
-
 		return;
 	}
 
@@ -2955,14 +2906,6 @@ TAffine aff_0, inv_0;
 		throw TRopException("unsupported pixel type");
 
 #ifdef ALTRI_TIPI_DI_RASTER
-	/////////////////////////////////////////////////////////
-	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-	/////////////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////////////
-	// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-	/////////////////////////////////////////////////////////
-
 	jacob = fabs(aff.det());
 	if (jacob == 0.0)
 		throw TRopException("AFFINE transformation has zero determinant");
@@ -3003,14 +2946,6 @@ TAffine aff_0, inv_0;
 		   negradx_, negrady_, posradx_, posrady_);
 	minmax(negradx_ - rad_x, negrady_ - rad_y, posradx_ + rad_x, posrady_ + rad_y, inv_0,
 		   negradu_, negradv_, posradu_, posradv_);
-
-	/////////////////////////////////////////////////////////
-	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-	/////////////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////////////
-	// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-	/////////////////////////////////////////////////////////
 
 	//free_nocalc (coln);
 	if (coln)
@@ -4804,14 +4739,6 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
 								   pix_ref_u.get(), pix_ref_v.get(),
 								   pix_ref_f.get(), pix_ref_g.get(),
 								   filter, palette);
-
-	/////////////////////////////////////////////////////////
-	// INIZIO GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-	/////////////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////////////
-	// FINE GESTIONE ALTRI TIPI RASTER DA IMPLEMENTARE
-	/////////////////////////////////////////////////////////
 }
 
 //-----------------------------------------------------------------------------
