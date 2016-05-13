@@ -5,7 +5,7 @@ set(_search_LIB_DIR tiff-4.0.3/libtiff/.libs)
 #endif()
 
 find_path(TIFF_INCLUDE_DIR NAMES tiffio.h HINTS ${SDKROOT} PATH_SUFFIXES ${_search_INC_DIR})
-find_library(TIFF_LIBRARY NAMES libtiff.so HINTS ${SDKROOT} PATH_SUFFIXES ${_search_LIB_DIR})
+find_library(TIFF_LIBRARY NAMES libtiff.a libtiff.so HINTS ${SDKROOT} PATH_SUFFIXES ${_search_LIB_DIR})
 
 unset(_search_INC_DIR)
 unset(_search_LIB_DIR)
