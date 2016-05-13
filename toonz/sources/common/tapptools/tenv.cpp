@@ -104,7 +104,7 @@ public:
 			std::cout << "varName:" << varName << " TOONZROOT not set..." << std::endl;
 			return "";
 		}
-		return toString(systemVarPath);
+		return ::to_string(systemVarPath);
 /*
 			char *value = getenv(varName.c_str());
 			if (!value)
