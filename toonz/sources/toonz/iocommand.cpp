@@ -1662,6 +1662,30 @@ bool IoCmd::saveLevel(TXshSimpleLevel *sl)
 }
 
 //===========================================================================
+// IoCmd::saveAll() save current scene and all of its levels
+//---------------------------------------------------------------------------
+
+bool IoCmd::saveAll()
+{
+    // try to save as much as possible
+    // if anything is wrong, return false
+	bool result = saveScene();
+
+    TApp *app = TApp::instance();
+    ToonzScene* scene = app->getCurrentScene()->getScene();
+    
+	SceneResources resources(scene, 0);
+	resources.save(scene->getScenePath());
+	resources.updatePaths();
+	
+    // for update title bar
+	app->getCurrentLevel()->notifyLevelTitleChange();
+	app->getCurrentPalette()->notifyPaletteTitleChanged();
+    
+    return result;
+}
+
+//===========================================================================
 // IoCmd::saveSound(soundPath, soundColumn, overwrite)
 //---------------------------------------------------------------------------
 
@@ -2829,3 +2853,17 @@ public:
 		TApp::instance()->getPaletteController()->getCurrentLevelPalette()->notifyPaletteDirtyFlagChanged();
 	}
 } overwritePaletteCommandHandler;
+
+
+//=============================================================================
+// Save scene and levels
+//-----------------------------------------------------------------------------
+class SaveAllCommandHandler : public MenuItemHandler
+{
+public:
+    SaveAllCommandHandler() : MenuItemHandler(MI_SaveAll) {}
+    void execute()
+    {
+        IoCmd::saveAll();
+    }
+} saveAllCommandHandler;

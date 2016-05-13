@@ -12,9 +12,13 @@ endif()
 
 message("Thirdpary Library Search path:" ${THIRDPARTY_LIBS_HINTS})
 
-if (WIN32)
+if(WIN32)
     message("Windows System")
-    set(QT_PATH "C:/Qt/Qt5.5.1/5.5/msvc2013_64" CACHE PATH "Qt instlattion directory")
+    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(QT_PATH "C:/Qt/Qt5.6.0_32/5.6/msvc2013" CACHE PATH "Qt instlattion directory")
+    else()
+        set(QT_PATH "C:/Qt/Qt5.6.0/5.6/msvc2013_64" CACHE PATH "Qt instlattion directory")
+    endif()
     if(NOT EXISTS ${QT_PATH})
         message("Specify QT_PATH properly")
         return()
@@ -22,25 +26,25 @@ if (WIN32)
     set(QT_LIB_PATH ${QT_PATH})
     set(CMAKE_PREFIX_PATH "${QT_PATH}/lib/cmake/")
     add_definitions(-DNOMINMAX)
-elseif (APPLE)
+elseif(APPLE)
     message("Apple System")
-    if (NOT PLATFORM)
+    if(NOT PLATFORM)
         set(PLATFORM 64)
     endif()
     message("PLATFORM:" ${PLATFORM})
-    if (PLATFORM EQUAL 64)
-        set(QT_PATH "~/Qt/5.5/clang_64/lib/")
-        set(QT_LIB_PATH ${QT_PATH})
-        set(CMAKE_PREFIX_PATH "${QT_PATH}cmake/")
-
+    if(PLATFORM EQUAL 64)
+        set(QT_PATH "~/Qt/5.6/clang_64/lib" CACHE PATH "Qt instlattion directory")
+        set(QT_LIB_PATH "${QT_PATH}/")
+        set(CMAKE_PREFIX_PATH "${QT_LIB_PATH}cmake/")
 
         message("CMAKE_PREFIX_PATH:" ${CMAKE_PREFIX_PATH})
         add_definitions(-DMACOSX -Di386)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++11 -stdlib=libc++ -fno-implicit-templates")
     elseif(PLATFORM EQUAL 32)
-        set(QT_PATH "~/Qt/5.5/clang_32/lib/")
-        set(QT_LIB_PATH ${QT_PATH})
-        set(CMAKE_PREFIX_PATH ${QT_PATH}cmake/)
+        set(QT_PATH "~/Qt/5.6/clang_32/lib" CACHE PATH "Qt instlattion directory")
+        set(QT_LIB_PATH "${QT_PATH}/")
+        set(CMAKE_PREFIX_PATH "${QT_LIB_PATH}cmake/")
+
         message("CMAKE_PREFIX_PATH:" ${CMAKE_PREFIX_PATH})
         add_definitions(-DMACOSX -Di386)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32 -std=c++11 -stdlib=libc++ -fno-implicit-templates -D HAS_QUICKDRAW")
@@ -49,18 +53,26 @@ elseif (APPLE)
     else()
         message(FATAL_ERROR "Invalid PLATFORM:" ${PLATFORM} ". 'PLATFORM' must be 32 or 64.")
     endif()
-else ()
+else()
     message("Unknown System")
-endif ()
+endif()
 
 add_definitions(-DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CMAKE_INSTALL_RPATH ${QT_LIB_PATH})
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) 
+if(APPLE)
+    set(CMAKE_MACOSX_RPATH ON)
+    set(CMAKE_SKIP_BUILD_RPATH FALSE)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+    set(CMAKE_INSTALL_RPATH ${QT_LIB_PATH})
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${QT_LIB_PATH}" isSystemDir)
+    if("${isSystemDir}" STREQUAL "-1")
+        set(CMAKE_INSTALL_RPATH "${QT_LIB_PATH}")
+    endif()
+endif()
 
 include_directories(include)
 
@@ -108,7 +120,7 @@ set(TNZSTDFX_Location)
 set(TFARM_Location)
 
 if(WIN32)
-    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(PLATFORM 32)
         set(PLATFORM2)
     else()
@@ -134,7 +146,7 @@ if(WIN32)
     set(SUPERLU_LIB ${SDKROOT}/superlu/SuperLU_${PLATFORM}.lib)
     set(OPENBLAS_LIB ${SDKROOT}/openblas/libopenblas_${PLATFORM}.lib)
     set(USB_LIB)  # unused
-    if (PLATFORM EQUAL 32)
+    if(PLATFORM EQUAL 32)
         set(QT_LIB ${SDKROOT}/quicktime/QT73SDK/Libraries/QTMLClient.lib)
     endif()
 else()
@@ -174,7 +186,7 @@ else()
 
     pkg_check_modules(USB_LIB REQUIRED libusb-1.0)
     set(OPENBLAS_LIB) # unused?
-    if (PLATFORM EQUAL 32)
+    if(PLATFORM EQUAL 32)
         find_library(QT_LIB QuickTime)
     endif()
 
@@ -188,8 +200,8 @@ endif()
 include_directories(BEFORE ${TIFF_INCLUDE_DIR} ${PNG_INCLUDE_DIRS})
 
 find_path(BOOST_ROOT include/boost boost HINTS ${THIRDPARTY_LIBS_HINTS}
-	PATH_SUFFIXES boost/boost_1_60_0/ boost/boost_1_59_0/
-	boost/boost_1_58_0/ boost/boost_1_57_0/ boost/boost_1_56_0/ boost155/1.55.0_1/ boost/boost_1_55_0/ )
+    PATH_SUFFIXES boost/boost_1_60_0/ boost/boost_1_59_0/
+    boost/boost_1_58_0/ boost/boost_1_57_0/ boost/boost_1_56_0/ boost155/1.55.0_1/ boost/boost_1_55_0/ )
 find_package(Boost 1.55 REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR} ${LZ4_LIB_INCLUDE_DIRS} ${USB_LIB_INCLUDE_DIRS} ${SUPERLU_INCLUDE_DIR} ${JPEG_INCLUDE_DIR})
@@ -204,14 +216,14 @@ if(WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 endif()
 
-if (MSVC AND MSVC_VERSION EQUAL 1800)
+if(MSVC AND MSVC_VERSION EQUAL 1800)
     # Visual C++ 2013 cannot handle UTF-8 without BOM
     # Non-ascii characters in comments would not be a problem
     add_compile_options("/wd4819")
 endif()
 
 # generate Qt translations and messages
-set(LANGUAGES japanese italian french spanish)
+set(LANGUAGES japanese italian french spanish chinese)
 
 function(add_translation module)
     set(translation)
@@ -252,9 +264,9 @@ if(PLATFORM EQUAL 32)
     add_subdirectory(t32bitsrv)
 endif()
 
-if (APPLE)
+if(APPLE)
     add_custom_command(TARGET executable
         POST_BUILD COMMAND
         ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH}
         $<TARGET_FILE:executable>)
-endif (APPLE)
+endif()

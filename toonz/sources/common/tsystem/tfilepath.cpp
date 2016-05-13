@@ -762,7 +762,7 @@ TFilePath TFilePath::withFrame(const TFrameId &frame, TFrameId::FrameFormat form
 	std::wstring str = m_path.substr(i + 1); // str e' il path senza parentdir
 	assert(str != dot && str != dotDot);
 	int j = str.rfind(L'.');
-	char *ch = ".";
+	const char *ch = ".";
 	if (m_underscoreFormatAllowed &&
 		(format == TFrameId::UNDERSCORE_FOUR_ZEROS || format == TFrameId::UNDERSCORE_NO_PAD))
 		ch = "_";

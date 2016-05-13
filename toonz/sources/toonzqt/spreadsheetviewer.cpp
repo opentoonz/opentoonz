@@ -566,16 +566,36 @@ void SpreadsheetViewer::setColumnCount(int columnCount)
 
 void SpreadsheetViewer::scroll(QPoint delta)
 {
-	refreshContentSize(delta.x(), delta.y());
-	prepareToScroll(delta.y());
-	if (delta.y() != 0) {
-		QScrollBar *vSc = m_cellScrollArea->verticalScrollBar();
-		vSc->setValue(vSc->value() + delta.y());
-	}
-	if (delta.x() != 0) {
-		QScrollBar *hSc = m_cellScrollArea->horizontalScrollBar();
-		hSc->setValue(hSc->value() + delta.x());
-	}
+	int x = delta.x();
+	int y = delta.y();
+	prepareToScroll(y);
+
+	QScrollBar *hSc = m_cellScrollArea->horizontalScrollBar();
+	QScrollBar *vSc = m_cellScrollArea->verticalScrollBar();
+
+	int valueH = hSc->value() + x;
+	int valueV = vSc->value() + y;
+	int maxValueH = hSc->maximum();
+	int maxValueV = vSc->maximum();
+
+	bool notUpdateSizeH = maxValueH > valueH && x >= 0;
+	bool notUpdateSizeV = maxValueV > valueV && y >= 0;
+	if ((!notUpdateSizeH) && (!notUpdateSizeV))
+		refreshContentSize(x, y);
+	else if (notUpdateSizeH && !notUpdateSizeV)
+		refreshContentSize(0, y);
+	else if (!notUpdateSizeH && notUpdateSizeV)
+	  refreshContentSize(x, 0);
+
+	if (valueH > maxValueH && x > 0)
+		valueH = hSc->maximum();
+
+	if (valueV > maxValueV && y > 0)
+		valueV = vSc->maximum();
+
+	hSc->setValue(valueH);
+	vSc->setValue(valueV);
+
 }
 
 void SpreadsheetViewer::setAutoPanSpeed(const QPoint &speed)
@@ -718,9 +738,43 @@ void SpreadsheetViewer::resizeEvent(QResizeEvent *e)
 */
 }
 
-void SpreadsheetViewer::wheelEvent(QWheelEvent *e)
+void SpreadsheetViewer::wheelEvent(QWheelEvent *event)
 {
-	scroll(QPoint(0, -e->delta()));
+	switch(event->source()){
+
+	case Qt::MouseEventNotSynthesized:
+	{
+		if (event->angleDelta().x() == 0){ //vertical scroll
+			int scrollPixels =(event->angleDelta().y()>0 ? 1 : -1) *m_markRowDistance *m_rowHeight;
+			scroll(QPoint(0, -scrollPixels));
+		}else{                             //horizontal scroll
+			int scrollPixels =(event->angleDelta().x()>0 ? 1 : -1) *m_columnWidth;
+			scroll(QPoint(-scrollPixels, 0));
+		}
+		break;
+	}
+
+	case Qt::MouseEventSynthesizedBySystem: //macbook touch-pad
+	{
+		QPoint numPixels = event->pixelDelta();
+		QPoint numDegrees = event->angleDelta() / 8;
+		if (!numPixels.isNull()) {
+ 			scroll(-numPixels);
+		} else if (!numDegrees.isNull()) {
+			QPoint numSteps = numDegrees / 15;
+			scroll(-numSteps);
+		}
+		break;
+	}
+
+	default: //Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication
+	{
+		std::cout << "not supported wheelEvent.source(): Qt::MouseEventSynthesizedByQt, Qt::MouseEventSynthesizedByApplication" << std::endl;
+		break;
+	}
+
+ 	}// end switch
+
 }
 
 void SpreadsheetViewer::timerEvent(QTimerEvent *e)

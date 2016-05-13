@@ -44,7 +44,7 @@ inline int getEl(int i, int j, int n)
 typedef struct
 	{
 	int ord;
-	double coef[MAX_ORDER];
+	double coef[MAX_ORDER + 1];
 } poly;
 
 //-------------------------------------------------------------------------

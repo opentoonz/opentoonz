@@ -22,6 +22,8 @@ using namespace TConsts;
 #include <emmintrin.h> // per SSE2
 #endif
 
+#include <memory>
+
 //===========================================================================
 /*
 Versione con estensione dell'ultimo pixel e con default_value

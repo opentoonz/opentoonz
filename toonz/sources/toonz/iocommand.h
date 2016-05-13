@@ -173,6 +173,8 @@ bool saveLevel();
 bool saveLevel(const TFilePath &fp, TXshSimpleLevel *sl, bool overwrite);
 bool saveLevel(TXshSimpleLevel *sl);
 
+bool saveAll();
+
 bool saveSound(const TFilePath &fp, TXshSoundLevel *sc, bool overwrite);
 bool saveSound(TXshSoundLevel *sc);
 

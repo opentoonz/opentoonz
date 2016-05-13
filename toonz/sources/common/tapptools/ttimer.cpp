@@ -1,6 +1,7 @@
 
 
 #include "ttimer.h"
+#include "tthreadmessage.h"
 #include "texception.h"
 
 #ifdef _WIN32
@@ -178,16 +179,16 @@ public:
 	TGenericTimerAction *m_action;
 };
 
-class SendCommandMSG : public TThread::Msg
+class SendCommandMSG : public TThread::Message
 {
 	TTimer::Imp *m_ztimp;
 
 public:
-	SendCommandMSG(TTimer::Imp *ztimp) : TThread::Msg(), m_ztimp(ztimp)
+	SendCommandMSG(TTimer::Imp *ztimp) : TThread::Message(), m_ztimp(ztimp)
 	{
 	}
 	~SendCommandMSG() {}
-	TThread::Msg *clone() const { return new SendCommandMSG(*this); }
+	TThread::Message *clone() const { return new SendCommandMSG(*this); }
 	void onDeliver()
 	{
 		if (m_ztimp->m_action)

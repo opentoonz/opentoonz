@@ -23,7 +23,7 @@ protected:
 
 public:
 	SError() : m_msg(""){};
-	SError(char *s) : m_msg(s){};
+	SError(const char *s) : m_msg(s){};
 	virtual ~SError(){};
 	virtual void debug_print() const
 	{
@@ -38,7 +38,7 @@ class SMemAllocError : public SError
 {
 public:
 	SMemAllocError() : SError(""){};
-	SMemAllocError(char *s) : SError(s){};
+	SMemAllocError(const char *s) : SError(s){};
 	virtual ~SMemAllocError(){};
 	void debug_print() const
 	{
@@ -53,7 +53,7 @@ class SWriteRasterError : public SError
 {
 public:
 	SWriteRasterError() : SError(""){};
-	SWriteRasterError(char *s) : SError(s){};
+	SWriteRasterError(const char *s) : SError(s){};
 	virtual ~SWriteRasterError(){};
 	void debug_print() const
 	{
@@ -68,7 +68,7 @@ class SBlurMatrixError : public SError
 {
 public:
 	SBlurMatrixError() : SError(""){};
-	SBlurMatrixError(char *s) : SError(s){};
+	SBlurMatrixError(const char *s) : SError(s){};
 	virtual ~SBlurMatrixError(){};
 	void debug_print() const
 	{
@@ -83,7 +83,7 @@ class SFileReadError : public SError
 {
 public:
 	SFileReadError() : SError(""){};
-	SFileReadError(char *s) : SError(s){};
+	SFileReadError(const char *s) : SError(s){};
 	virtual ~SFileReadError(){};
 	void debug_print() const
 	{

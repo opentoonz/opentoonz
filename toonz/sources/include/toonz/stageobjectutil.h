@@ -119,7 +119,7 @@ public:
 
 	QString getHistoryString()
 	{
-		return QObject::tr("Set Keyframe   %1 at frame %2").arg(QString::fromStdString(m_objId.toString())).arg(m_frame);
+		return QObject::tr("Set Keyframe   %1 at frame %2").arg(QString::fromStdString(m_objId.toString())).arg(m_frame+1);
 	}
 };
 

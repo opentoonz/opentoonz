@@ -9,8 +9,8 @@
 - cmake
   - Version 3.2.2 confirmed to work.
 - Qt
-  - http://download.qt.io/official_releases/qt/5.5/5.5.1/
-    - qt-opensource-mac-x64-clang-5.5.1.dmg
+  - http://download.qt.io/official_releases/qt/5.6/5.6.0/
+    - qt-opensource-mac-x64-clang-5.6.0.dmg
 - boost
   - http://www.boost.org/users/history/version_1_55_0.html (or later, though only 1.55.0 is supported)
 
@@ -65,7 +65,7 @@ $ tar xjvf boost_1_55_0.tar.bz2
 $ cd ../../toonz
 $ mkdir build
 $ cd build
-  CMAKE_PREFIX_PATH=~/Qt5.5.1/5.5/clang_64 cmake ../sources
+  CMAKE_PREFIX_PATH=~/Qt5.6.0/5.6/clang_64 cmake ../sources
 $ make
 ```
 

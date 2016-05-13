@@ -102,7 +102,7 @@ extern void pri_funct_cv_start( int32_t i32_ys );
 extern void pri_funct_cv_run( int32_t i32_y );
 extern void pri_funct_cv_end( void );
 
-extern void pri_funct_set_cp_title( char *cp_title );
+extern void pri_funct_set_cp_title(const char *cp_title );
 extern void pri_funct_msg_ttvr( const char* fmt, ...);
 extern void pri_funct_msg_vr( const char* fmt, ...);
 extern void pri_funct_err_bttvr( const char* fmt, ...);
@@ -187,9 +187,9 @@ void pri_funct_cv_end(void)
 #define vsnprintf(buf, len, fmt, ap) _vsnprintf(buf, len, fmt, ap)
 #endif
 
-static char *pri_param_cp_com_name = "#";
+static const char *pri_param_cp_com_name = "#";
 
-void pri_funct_set_cp_title(char *cp_title)
+void pri_funct_set_cp_title(const char *cp_title)
 {
 	pri_param_cp_com_name = cp_title;
 }
@@ -510,7 +510,7 @@ public:
 	void set_subpixel_value(int32_t i32_x_sub, int32_t i32_y_sub);
 	void set_pixel_value(void);
 
-	int save(double d_xp, double d_yp, char *cp_fname);
+	int save(double d_xp, double d_yp, const char *cp_fname);
 	void debug_print(void);
 
 private:
@@ -712,7 +712,7 @@ void brush_curve_blur::set_pixel_value(void)
 
 #include "igs_line_blur.h" // "pri.h" "brush_curve_blur.h"
 
-int brush_curve_blur::save(double d_xp, double d_yp, char *cp_fname)
+int brush_curve_blur::save(double d_xp, double d_yp, const char *cp_fname)
 {
 	FILE *fp;
 	int32_t ii;
@@ -1495,7 +1495,7 @@ public:
 	pixel_point_node *append(pixel_point_node *clp_previous);
 
 	/* for debug */
-	int save(char *cp_fname);
+	int save(const char *cp_fname);
 
 	void mem_free(void);
 
@@ -1602,7 +1602,7 @@ int pixel_point_root::alloc_mem_and_list_node(int32_t i32_xs, int32_t i32_ys, ui
 	return OK;
 }
 
-int pixel_point_root::save(char *cp_fname)
+int pixel_point_root::save(const char *cp_fname)
 {
 	FILE *fp;
 	int32_t ii;
@@ -2985,16 +2985,16 @@ public:
 	void exec10_smooth_expand(void);
 	void exec11_set_bbox(void);
 
-	int save_not_include(pixel_point_root *clp_pixel_point_root, char *cp_fname);
-	int save_lines(char *cp_fname);
-	int save_one_point(char *cp_fname);
-	int save_middle_point(char *cp_fname);
-	int save_another_point(char *cp_fname);
+	int save_not_include(pixel_point_root *clp_pixel_point_root, const char *cp_fname);
+	int save_lines(const char *cp_fname);
+	int save_one_point(const char *cp_fname);
+	int save_middle_point(const char *cp_fname);
+	int save_another_point(const char *cp_fname);
 
-	int save_expand_lines(char *cp_fname);
-	int save_one_expand_point(char *cp_fname);
-	int save_another_expand_point(char *cp_fname);
-	int save_expand_vector(char *cp_fname);
+	int save_expand_lines(const char *cp_fname);
+	int save_one_expand_point(const char *cp_fname);
+	int save_another_expand_point(const char *cp_fname);
+	int save_expand_vector(const char *cp_fname);
 
 	void mem_free(void);
 
@@ -3764,7 +3764,7 @@ void pixel_line_root::mem_free(void)
 
 #include "igs_line_blur.h" // "pri.h" "pixel_line_root.h"
 
-int pixel_line_root::save_not_include(pixel_point_root *clp_pixel_point_root, char *cp_fname)
+int pixel_line_root::save_not_include(pixel_point_root *clp_pixel_point_root, const char *cp_fname)
 {
 	FILE *fp;
 	int32_t ii;
@@ -3823,7 +3823,7 @@ int pixel_line_root::save_not_include(pixel_point_root *clp_pixel_point_root, ch
 
 /********************************************************************/
 
-int pixel_line_root::save_lines(char *cp_fname)
+int pixel_line_root::save_lines(const char *cp_fname)
 {
 	FILE *fp;
 	int32_t ii;
@@ -3888,7 +3888,7 @@ int pixel_line_root::save_lines(char *cp_fname)
 
 /********************************************************************/
 
-int pixel_line_root::save_one_point(char *cp_fname)
+int pixel_line_root::save_one_point(const char *cp_fname)
 {
 	FILE *fp;
 	int32_t ii;
@@ -3940,7 +3940,7 @@ int pixel_line_root::save_one_point(char *cp_fname)
 	return OK;
 }
 
-int pixel_line_root::save_middle_point(char *cp_fname)
+int pixel_line_root::save_middle_point(const char *cp_fname)
 {
 	FILE *fp;
 	int32_t ii;
@@ -3992,7 +3992,7 @@ int pixel_line_root::save_middle_point(char *cp_fname)
 	return OK;
 }
 
-int pixel_line_root::save_another_point(char *cp_fname)
+int pixel_line_root::save_another_point(const char *cp_fname)
 {
 	FILE *fp;
 	int32_t ii;
@@ -4046,7 +4046,7 @@ int pixel_line_root::save_another_point(char *cp_fname)
 
 #include "igs_line_blur.h" // "pri.h" "pixel_line_root.h"
 
-int pixel_line_root::save_expand_lines(char *cp_fname)
+int pixel_line_root::save_expand_lines(const char *cp_fname)
 {
 	FILE *fp;
 	int32_t ii;
@@ -4111,7 +4111,7 @@ int pixel_line_root::save_expand_lines(char *cp_fname)
 
 /********************************************************************/
 
-int pixel_line_root::save_one_expand_point(char *cp_fname)
+int pixel_line_root::save_one_expand_point(const char *cp_fname)
 {
 	FILE *fp;
 	int32_t ii;
@@ -4163,7 +4163,7 @@ int pixel_line_root::save_one_expand_point(char *cp_fname)
 	return OK;
 }
 
-int pixel_line_root::save_another_expand_point(char *cp_fname)
+int pixel_line_root::save_another_expand_point(const char *cp_fname)
 {
 	FILE *fp;
 	int32_t ii;
@@ -4217,7 +4217,7 @@ int pixel_line_root::save_another_expand_point(char *cp_fname)
 
 #include "igs_line_blur.h" // "pri.h" "pixel_line_root.h"
 
-int pixel_line_root::save_expand_vector(char *cp_fname)
+int pixel_line_root::save_expand_vector(const char *cp_fname)
 {
 	FILE *fp;
 	int32_t ii;
@@ -4336,7 +4336,7 @@ public:
 	/******void exec( double d_xp, double d_yp, pixel_line_node *clp_line_first, int32_t i32_count, int32_t i32_blur_count, double d_effect_length_radius );******/
 	int get_line(int32_t i32_blur_count, double *dp_xv, double *dp_yv);
 
-	int save(double d_xp, double d_yp, int32_t i32_blur_count, char *cp_fname);
+	int save(double d_xp, double d_yp, int32_t i32_blur_count, const char *cp_fname);
 
 	void mem_free(void);
 
@@ -4671,7 +4671,7 @@ int pixel_select_curve_blur_root::get_line(int32_t i32_blur_count, double *dp_xv
 
 #include "igs_line_blur.h" // "pri.h" "pixel_select_curve_blur.h"
 
-int pixel_select_curve_blur_root::save(double d_xp, double d_yp, int32_t i32_blur_count, char *cp_fname)
+int pixel_select_curve_blur_root::save(double d_xp, double d_yp, int32_t i32_blur_count, const char *cp_fname)
 {
 	FILE *fp;
 	int32_t ii, jj;

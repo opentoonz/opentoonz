@@ -167,6 +167,7 @@ private slots:
 	void onShowRasterImageDarkenBlendedInViewerChanged(int index);
 	void onShowFrameNumberWithLettersChanged(int index);
 	void onPaletteTypeForRasterColorModelChanged(int index);
+	void onShowKeyframesOnCellAreaChanged(int);
 };
 
 //**********************************************************************************

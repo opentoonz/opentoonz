@@ -200,6 +200,7 @@ TStrokePointDeformation::TStrokePointDeformation(const TPointD &vect,
 												 double radius)
 												 : m_imp(new Imp(vect, center, radius))
 {
+	delete m_imp;
 }
 
 //-----------------------------------------------------------------------------

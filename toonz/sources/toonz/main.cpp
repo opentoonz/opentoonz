@@ -330,9 +330,6 @@ void initToonzEnv()
 	if (cacheDir.isEmpty())
 		cacheDir = TEnv::getStuffDir() + "cache";
 	TImageCache::instance()->setRootDir(cacheDir);
-
-	DV_IMPORT_API void initializeImageRasterizer();
-	initializeImageRasterizer();
 }
 
 //-----------------------------------------------------------------------------
@@ -437,6 +434,10 @@ int main(int argc, char *argv[])
 	fmt.setStencil(true);
 	QGLFormat::setDefaultFormat(fmt);
 
+#ifdef LINUX
+	glutInit(&argc, argv);
+#endif
+
 	splash.showMessage(offsetStr + "Initializing Toonz environment ...", Qt::AlignCenter, Qt::white);
 	a.processEvents();
 
@@ -495,7 +496,7 @@ int main(int argc, char *argv[])
 
 	// Carico la traduzione contenuta in toonz.qm (se ï¿½ presente)
 	QString languagePathString = QString::fromStdString(toString(TEnv::getConfigDir() + "loc"));
-#ifdef MACOSX
+#ifndef WIN32
 	//the merge of menu on osx can cause problems with different languages with the Preferences menu
 	//qt_mac_set_menubar_merge(false);
 	languagePathString += "/" + Preferences::instance()->getCurrentLanguage();

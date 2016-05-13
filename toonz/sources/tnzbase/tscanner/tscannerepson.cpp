@@ -10,7 +10,7 @@
 #include "tconvert.h"
 #include "trop.h"
 #include <fstream>
-
+#include <memory>
 #include "TScannerIO/TUSBScannerIO.h"
 
 using namespace TScannerUtil;

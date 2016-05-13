@@ -1173,6 +1173,7 @@ void FunctionSegmentViewer::refresh()
 
 		TDoubleKeyframe kf = m_curve->getKeyframeAt(m_r0);
 		int pageIndex = typeToIndex(kf.m_type);
+		m_typeCombo->setEnabled(true);
 		m_typeCombo->setCurrentIndex(pageIndex);
 		if (0 <= pageIndex && pageIndex < tArrayCount(m_pages)) {
 			m_parametersPanel->setCurrentIndex(pageIndex);
@@ -1217,11 +1218,13 @@ void FunctionSegmentViewer::refresh()
 		QRect selectedCells = m_sheet->getSelectedCells();
 		/*--- 選択範囲が空のとき、もしくはカーブが選ばれていないとき ---*/
 		if (selectedCells.isEmpty() || !m_curve) {
+			m_typeCombo->setEnabled(false);
 			m_fromFld->setText("");
 			m_toFld->setText("");
 		}
 		/*--- 何かカーブが選択されている ---*/
 		else {
+			m_typeCombo->setEnabled(true);
 			int s0 = selectedCells.top();
 			int s1 = selectedCells.bottom();
 

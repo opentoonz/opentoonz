@@ -826,6 +826,19 @@ void doBlurRgb(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx, 
 	if ((!fbuffer) || (!row1) || (!col1) || (!col2)) {
 		if (!useSSE)
 			r1->unlock();
+#ifdef _WIN32
+		if (useSSE) {
+			_aligned_free(col2);
+			_aligned_free(col1);
+			_aligned_free(row1);
+			_aligned_free(fbuffer);
+		} else
+#endif
+		{
+			delete[] col2;
+			delete[] col1;
+			delete[] row1;
+		}
 		return;
 	}
 
@@ -902,8 +915,12 @@ void doBlurGray(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx,
 	col1 = new float[lly + 2 * brad];
 	col2 = new T[lly];
 
-	if ((!fbuffer) || (!row1) || (!col1) || (!col2))
+	if ((!fbuffer) || (!row1) || (!col1) || (!col2)) {
+		delete[] row1;
+		delete[] col1;
+		delete[] col2;
 		return;
+	}
 
 	row2 = fbuffer;
 

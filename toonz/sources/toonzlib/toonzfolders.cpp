@@ -34,7 +34,7 @@ TFilePath ToonzFolder::getLibraryFolder()
 {
 	TFilePath fp = getSystemVarPathValue(getSystemVarPrefix() + "LIBRARY");
 	if (fp == TFilePath())
-		fp = getFirstProjectsFolder() + "library";
+		fp = getStuffDir() + "library";
 	return fp;
 }
 
@@ -42,7 +42,7 @@ TFilePath ToonzFolder::getStudioPaletteFolder()
 {
 	TFilePath fp = getSystemVarPathValue(getSystemVarPrefix() + "STUDIOPALETTE");
 	if (fp == TFilePath())
-		fp = getFirstProjectsFolder() + "studiopalette";
+		fp = getStuffDir() + "studiopalette";
 	return fp;
 }
 
@@ -50,7 +50,7 @@ TFilePath ToonzFolder::getFxPresetFolder()
 {
 	TFilePath fp = getSystemVarPathValue(getSystemVarPrefix() + "FXPRESETS");
 	if (fp == TFilePath())
-		fp = getFirstProjectsFolder() + "fxs";
+		fp = getStuffDir() + "fxs";
 	return fp;
 }
 

@@ -6,6 +6,9 @@
 #include "tapp.h"
 #include "xsheetviewer.h"
 
+// TnzQt includes
+#include "historytypes.h"
+
 // TnzLib includes
 #include "toonz/txsheethandle.h"
 #include "toonz/tscenehandle.h"
@@ -229,6 +232,16 @@ public:
 	int getSize() const
 	{
 		return sizeof(*this);
+	}
+
+	QString getHistoryString()
+	{
+		return QObject::tr("Move Keyframe");
+	}
+
+	int getHistoryType()
+	{
+		return HistoryType::Xsheet;
 	}
 };
 

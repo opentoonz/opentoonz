@@ -13,7 +13,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-#if !(defined(x64) || defined(__LP64__))
+#if !(defined(x64) || defined(__LP64__) || defined(LINUX))
 
 #ifdef _WIN32
 
@@ -22,6 +22,9 @@
 #define iterator Iterator
 #define float_t Float_t
 #define GetProcessInformation GetProcessInformation_
+#define int_fast8_t QT_int_fast8_t
+#define int_fast16_t QT_int_fast16_t
+#define uint_fast16_t QT_uint_fast16_t
 
 #include "QTML.h"
 #include "Movies.h"
@@ -37,6 +40,9 @@
 #undef iterator
 #undef float_t
 #undef GetProcessInformation
+#undef QT_int_fast8_t
+#undef QT_int_fast16_t
+#undef QT_uint_fast16_t
 
 #include "texception.h"
 #include "tpropertytype.h"

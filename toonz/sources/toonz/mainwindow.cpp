@@ -1029,6 +1029,7 @@ void MainWindow::onAbout()
 	dialog->setWindowTitle(tr("About OpenToonz"));
 	dialog->setTopMargin(0);
 	dialog->addWidget(label);
+	dialog->addWidget(new QLabel("OpenToonz (built " __DATE__ " " __TIME__ ")"));
 
 	QPushButton *button = new QPushButton(tr("Close"), dialog);
 	button->setDefault(true);
@@ -1579,6 +1580,7 @@ void MainWindow::defineActions()
 	createMenuFileAction(MI_LoadScene, tr("&Load Scene..."), "Ctrl+L");
 	createMenuFileAction(MI_SaveScene, tr("&Save Scene"), "Ctrl+S");
 	createMenuFileAction(MI_SaveSceneAs, tr("&Save Scene As..."), "Ctrl+Shift+S");
+    createMenuFileAction(MI_SaveAll, tr("&Save All"), "");
 	createMenuFileAction(MI_RevertScene, tr("&Revert Scene"), "");
 
 	QAction *act = CommandManager::instance()->getAction(MI_RevertScene);
@@ -1609,7 +1611,7 @@ void MainWindow::defineActions()
 	createMenuFileAction(MI_OutputSettings, tr("&Output Settings..."), "");
 	createMenuFileAction(MI_PreviewSettings, tr("&Preview Settings..."), "");
 	createMenuFileAction(MI_Render, tr("&Render"), "");
-	createMenuFileAction(MI_Preview, tr("&Preview"), "");
+	createMenuFileAction(MI_Preview, tr("&Preview"), "Ctrl+R");
 #ifndef BRAVODEMO
 	createRightClickMenuAction(MI_SavePreviewedFrames, tr("&Save Previewed Frames"), "");
 #endif
@@ -1651,14 +1653,14 @@ void MainWindow::defineActions()
 	createRightClickMenuAction(MI_PasteColors, tr("Paste Color"), "");
 	createRightClickMenuAction(MI_PasteNames, tr("Paste Name"), "");
 	createRightClickMenuAction(MI_GetColorFromStudioPalette, tr("Get Color from Studio Palette"), "");
-	createMenuEditAction(MI_Clear, tr("&Delete"), "");
+	createMenuEditAction(MI_Clear, tr("&Delete"), "Delete");
 	createMenuEditAction(MI_Insert, tr("&Insert"), "Ins");
-	createMenuEditAction(MI_Group, tr("&Group"), "");
+	createMenuEditAction(MI_Group, tr("&Group"), "Ctrl+G");
 	createMenuEditAction(MI_Ungroup, tr("&Ungroup"), "");
-	createMenuEditAction(MI_BringToFront, tr("&Bring to Front"), "");
-	createMenuEditAction(MI_BringForward, tr("&Bring Forward"), "");
-	createMenuEditAction(MI_SendBack, tr("&Send Back"), "");
-	createMenuEditAction(MI_SendBackward, tr("&Send Backward"), "");
+	createMenuEditAction(MI_BringToFront, tr("&Bring to Front"), "Ctrl+]");
+	createMenuEditAction(MI_BringForward, tr("&Bring Forward"), "]");
+	createMenuEditAction(MI_SendBack, tr("&Send Back"), "Ctrl+[");
+	createMenuEditAction(MI_SendBackward, tr("&Send Backward"), "[");
 	createMenuEditAction(MI_EnterGroup, tr("&Enter Group"), "");
 	createMenuEditAction(MI_ExitGroup, tr("&Exit Group"), "");
 	createMenuEditAction(MI_RemoveEndpoints, tr("&Remove Vector Overflow"), "");
@@ -1686,7 +1688,7 @@ void MainWindow::defineActions()
 	toggle = createToggle(MI_CameraTest, tr("&Camera Test"), "", 0, MenuScanCleanupCommandType);
 	CameraTestCheck::instance()->setToggle(toggle);
 
-	createToggle(MI_OpacityCheck, tr("&Opacity Check"), "", false, MenuScanCleanupCommandType);
+	createToggle(MI_OpacityCheck, tr("&Opacity Check"), "1", false, MenuScanCleanupCommandType);
 
 	createMenuScanCleanupAction(MI_Cleanup, tr("&Cleanup"), "");
 	createMenuLevelAction(MI_AddFrames, tr("&Add Frames..."), "");
@@ -1761,7 +1763,7 @@ void MainWindow::defineActions()
 	createMenuCellsAction(MI_Rollup, tr("&Roll Up"), "");
 	createMenuCellsAction(MI_Rolldown, tr("&Roll Down"), "");
 	createMenuCellsAction(MI_TimeStretch, tr("&Time Stretch..."), "");
-	createMenuCellsAction(MI_Duplicate, tr("&Duplicate Drawing  "), "");
+	createMenuCellsAction(MI_Duplicate, tr("&Duplicate Drawing  "), "D");
 	createMenuCellsAction(MI_Autorenumber, tr("&Autorenumber"), "");
 	createMenuCellsAction(MI_CloneLevel, tr("&Clone"), "");
 
@@ -1817,11 +1819,11 @@ void MainWindow::defineActions()
 	createPlaybackAction(MI_Pause, tr("Pause"), "");
 	createPlaybackAction(MI_FirstFrame, tr("First Frame"), "");
 	createPlaybackAction(MI_LastFrame, tr("Last Frame"), "");
-	createPlaybackAction(MI_PrevFrame, tr("Previous Frame"), "");
-	createPlaybackAction(MI_NextFrame, tr("Next Frame"), "");
+	createPlaybackAction(MI_PrevFrame, tr("Previous Frame"), "Shift+A");
+	createPlaybackAction(MI_NextFrame, tr("Next Frame"), "Shift+S");
 
-	createAction(MI_NextDrawing, tr("Next Drawing"), "", PlaybackCommandType);
-	createAction(MI_PrevDrawing, tr("Prev Drawing"), "", PlaybackCommandType);
+	createAction(MI_NextDrawing, tr("Next Drawing"), "Shift+X", PlaybackCommandType);
+	createAction(MI_PrevDrawing, tr("Prev Drawing"), "Shift+Z", PlaybackCommandType);
 	createAction(MI_NextStep, tr("Next Step"), "", PlaybackCommandType);
 	createAction(MI_PrevStep, tr("Prev Step"), "", PlaybackCommandType);
 
@@ -1940,19 +1942,19 @@ void MainWindow::defineActions()
 	/*-- カレントカラムの右側のカラムを全て非表示にするコマンド --*/
 	createRightClickMenuAction(MI_DeactivateUpperColumns, "Hide Upper Columns", "");
 
-	createToolAction(T_Edit, "edit", tr("Edit Tool"), "");
-	createToolAction(T_Selection, "selection", tr("Selection Tool"), "");
-	createToolAction(T_Brush, "brush", tr("Brush Tool"), "");
-	createToolAction(T_Geometric, "geometric", tr("Geometric Tool"), "");
-	createToolAction(T_Type, "type", tr("Type Tool"), "");
-	createToolAction(T_Fill, "fill", tr("Fill Tool"), "");
+	createToolAction(T_Edit, "edit", tr("Edit Tool"), "E");
+	createToolAction(T_Selection, "selection", tr("Selection Tool"), "S");
+	createToolAction(T_Brush, "brush", tr("Brush Tool"), "B");
+	createToolAction(T_Geometric, "geometric", tr("Geometric Tool"), "G");
+	createToolAction(T_Type, "type", tr("Type Tool"), "Y");
+	createToolAction(T_Fill, "fill", tr("Fill Tool"), "F");
 	createToolAction(T_PaintBrush, "paintbrush", tr("Paint Brush Tool"), "");
-	createToolAction(T_Eraser, "eraser", tr("Eraser Tool"), "");
-	createToolAction(T_Tape, "tape", tr("Tape Tool"), "");
-	createToolAction(T_StylePicker, "stylepicker", tr("Style Picker Tool"), "");
+	createToolAction(T_Eraser, "eraser", tr("Eraser Tool"), "A");
+	createToolAction(T_Tape, "tape", tr("Tape Tool"), "T");
+	createToolAction(T_StylePicker, "stylepicker", tr("Style Picker Tool"), "K");
 	createToolAction(T_RGBPicker, "RGBpicker", tr("RGB Picker Tool"), "");
-	createToolAction(T_ControlPointEditor, "controlpointeditor", tr("Control Point Editor Tool"), "");
-	createToolAction(T_Pinch, "pinch", tr("Pinch Tool"), "");
+	createToolAction(T_ControlPointEditor, "controlpointeditor", tr("Control Point Editor Tool"), "C");
+	createToolAction(T_Pinch, "pinch", tr("Pinch Tool"), "P");
 	createToolAction(T_Pump, "pump", tr("Pump Tool"), "");
 	createToolAction(T_Magnet, "magnet", tr("Magnet Tool"), "");
 	createToolAction(T_Bender, "bender", tr("Bender Tool"), "");
@@ -1961,18 +1963,18 @@ void MainWindow::defineActions()
 	createToolAction(T_Skeleton, "skeleton", tr("Skeleton Tool"), "");
 	createToolAction(T_Tracker, "tracker", tr("Tracker Tool"), "");
 	createToolAction(T_Hook, "hook", tr("Hook Tool"), "");
-	createToolAction(T_Zoom, "zoom", tr("Zoom Tool"), "");
-	createToolAction(T_Rotate, "rotate", tr("Rotate Tool"), "");
-	createToolAction(T_Hand, "hand", tr("Hand Tool"), "");
+	createToolAction(T_Zoom, "zoom", tr("Zoom Tool"), "Shift+Space");
+	createToolAction(T_Rotate, "rotate", tr("Rotate Tool"), "Ctrl+Space");
+	createToolAction(T_Hand, "hand", tr("Hand Tool"), "Space");
 	createToolAction(T_Plastic, "plastic", tr("Plastic Tool"), "");
 	createToolAction(T_Ruler, "ruler", tr("Ruler Tool"), "");
 	createToolAction(T_Finger, "finger", tr("Finger Tool"), "");
 
-	createViewerAction(V_ZoomIn, tr("Zoom In"), "");
-	createViewerAction(V_ZoomOut, tr("Zoom Out"), "");
-	createViewerAction(V_ZoomReset, tr("Reset View"), "");
+	createViewerAction(V_ZoomIn, tr("Zoom In"), "+");
+	createViewerAction(V_ZoomOut, tr("Zoom Out"), "-");
+	createViewerAction(V_ZoomReset, tr("Reset View"), "0");
 	createViewerAction(V_ZoomFit, tr("Fit to Window"), "");
-	createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "");
+	createViewerAction(V_ActualPixelSize, tr("Actual Pixel Size"), "N");
 	createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"), "");
 	CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen, tr("Full Screen Mode"), tr("Exit Full Screen Mode"));
 
@@ -1990,7 +1992,7 @@ void MainWindow::defineActions()
 
 	createToolOptionsAction("A_ToolOption_AutoGroup", tr("Auto Group"), "");
 	createToolOptionsAction("A_ToolOption_BreakSharpAngles", tr("Break sharp angles"), "");
-	createToolOptionsAction("A_ToolOption_FrameRange", tr("Frame range"), "");
+	createToolOptionsAction("A_ToolOption_FrameRange", tr("Frame range"), "F6");
 	createToolOptionsAction("A_ToolOption_IK", tr("Inverse kinematics"), "");
 	createToolOptionsAction("A_ToolOption_Invert", tr("Invert"), "");
 	createToolOptionsAction("A_ToolOption_Manual", tr("Manual"), "");
@@ -1999,8 +2001,8 @@ void MainWindow::defineActions()
 	createToolOptionsAction("A_ToolOption_PencilMode", tr("Pencil Mode"), "");
 	createToolOptionsAction("A_ToolOption_PreserveThickness", tr("Preserve Thickness"), "");
 	createToolOptionsAction("A_ToolOption_PressureSensibility", tr("Pressure sensibility"), "");
-	createToolOptionsAction("A_ToolOption_SegmentInk", tr("Segment Ink"), "");
-	createToolOptionsAction("A_ToolOption_Selective", tr("Selective"), "");
+	createToolOptionsAction("A_ToolOption_SegmentInk", tr("Segment Ink"), "F8");
+	createToolOptionsAction("A_ToolOption_Selective", tr("Selective"), "F7");
 	createToolOptionsAction("A_ToolOption_Smooth", tr("Smooth"), "");
 	createToolOptionsAction("A_ToolOption_Snap", tr("Snap"), "");
 	createToolOptionsAction("A_ToolOption_AutoSelectDrawing", tr("Auto Select Drawing"), "");
@@ -2018,7 +2020,7 @@ void MainWindow::defineActions()
 	createToolOptionsAction("A_ToolOption_Mode:Lines & Areas", tr("Mode - Lines & Areas"), "");
 	createToolOptionsAction("A_ToolOption_Type", tr("Type"), "");
 	createToolOptionsAction("A_ToolOption_Type:Normal", tr("Type - Normal"), "");
-	createToolOptionsAction("A_ToolOption_Type:Rectangular", tr("Type - Rectangular"), "");
+	createToolOptionsAction("A_ToolOption_Type:Rectangular", tr("Type - Rectangular"), "F5");
 	createToolOptionsAction("A_ToolOption_Type:Freehand", tr("Type - Freehand"), "");
 	createToolOptionsAction("A_ToolOption_Type:Polyline", tr("Type - Polyline"), "");
 	createToolOptionsAction("A_ToolOption_TypeFont", tr("TypeTool Font"), "");

@@ -134,7 +134,7 @@ LevelSettingsPopup::LevelSettingsPopup()
 
 	//subsampling
 	m_subsamplingLabel = new QLabel(tr("Subsampling:"));
-	m_subsamplingFld = new DVGui::IntLineEdit(this);
+	m_subsamplingFld = new DVGui::IntLineEdit(this,1,1);
 
 	m_doPremultiply = new CheckBox(tr("Premultiply"), this);
 

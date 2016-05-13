@@ -111,8 +111,6 @@ const QColor XsheetBGColor(212, 208, 200);
 //Xsheet horizontal lines
 const QColor NormalHLineColor(146, 144, 146);
 const QColor IntervalHLineColor(0, 255, 246);
-//"X" mark at the end of the level
-const QColor LevelEndCrossColor(50, 50, 50);
 
 //column header
 const QColor EmptyColumnHeadColor(200, 200, 200);

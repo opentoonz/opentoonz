@@ -4447,7 +4447,7 @@ TMosaicFillStyle::TMosaicFillStyle(const TPixel32 &bgColor,
 								   const double maxThickness)
 	: TSolidColorStyle(bgColor), m_size(size), m_deform(deform), m_minThickness(minThickness), m_maxThickness(maxThickness)
 {
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 4; i++)
 		m_pointColor[i] = pointColor[i];
 }
 

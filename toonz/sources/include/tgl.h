@@ -21,6 +21,12 @@
 #define GLUT_NO_WARNING_DISABLE
 #endif
 
+#ifdef LINUX
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
+#endif
+
 //#include "tcurves.h"
 #include "traster.h"
 //#include "tfilepath.h"

@@ -7,11 +7,13 @@
 
 ## 動作条件
 
-https://opentoonz.github.io/ を参照してください。
+<https://opentoonz.github.io/> を参照してください。
 
 ## インストール
 
-https://opentoonz.github.io/ から最新版のインストーラーをダウンロードしてインストールしてください。
+<https://opentoonz.github.io/> から最新安定版のインストーラーをダウンロードしてインストールしてください。
+
+過去のバージョンと不安定な最新版も <https://github.com/opentoonz/opentoonz/releases> から利用することができます。
 
 ## ビルド方法
 

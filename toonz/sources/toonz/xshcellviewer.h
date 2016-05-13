@@ -64,7 +64,7 @@ class CellArea : public QWidget
 	QString m_tooltip;
 
 	RenameCellField *m_renameCell;
-
+	
 	void drawCells(QPainter &p, const QRect toBeUpdated);
 	void drawLevelCell(QPainter &p, int row, int col, bool isReference = false);
 	void drawSoundTextCell(QPainter &p, int row, int col);
@@ -123,6 +123,7 @@ protected slots:
 	void onStepChanged(QAction *);
 	// replace level with another level in the cast
 	void onReplaceByCastedLevel(QAction *action);
+
 };
 
 } // namespace XsheetGUI

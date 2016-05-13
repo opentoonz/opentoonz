@@ -334,6 +334,12 @@ public:
 	void setDragCellsBehaviour(int dragCellsBehaviour);
 	int getDragCellsBehaviour() const { return m_dragCellsBehaviour; }
 
+	void enableShowKeyframesOnXsheetCellArea(bool on);
+	bool isShowKeyframesOnXsheetCellAreaEnabled() const
+	{
+		return m_showKeyframesOnXsheetCellArea;
+	}
+
 	// Animation  tab
 
 	void setKeyframeType(int s);
@@ -527,6 +533,8 @@ private:
 	0 : 全ての異なるピクセルの色を別のStyleにする, 1 : 似ている色をまとめて1つのStyleにする
   --*/
 	int m_paletteTypeOnLoadRasterImageAsColorModel;
+
+	bool m_showKeyframesOnXsheetCellArea;
 
 private:
 	Preferences();
