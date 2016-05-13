@@ -401,8 +401,5 @@ if(APPLE)
 
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/qss)
-
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../../install/SystemVar.ini ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
+    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/../install/SystemVar.ini ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
 endif()
-
-
