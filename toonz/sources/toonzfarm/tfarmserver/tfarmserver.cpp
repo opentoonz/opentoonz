@@ -14,6 +14,7 @@
 
 #include <string>
 #include <map>
+#include <strstream>
 
 #include <QString>
 #include <QProcess>

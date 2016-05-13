@@ -943,7 +943,7 @@ bool TSystem::showDocument(const TFilePath &path)
 	return true;
 #else
 	string cmd = "open ";
-	string thePath(toString(path.getWideString()));
+	string thePath(::to_string(path));
 	UINT pos = 0, count = 0;
 	//string newPath;
 	char newPath[2048];

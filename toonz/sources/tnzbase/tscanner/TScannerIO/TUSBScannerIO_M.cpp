@@ -3,6 +3,7 @@
 #include "TUSBScannerIO.h"
 #include "tsystem.h"
 #include <iostream>
+#include <strstream>
 
 //#define HAS_LIBUSB
 

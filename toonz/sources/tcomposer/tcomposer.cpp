@@ -927,14 +927,6 @@ int main(int argc, char *argv[])
 		m_userLog->info(msg + msg2);
 		DVGui::info(QString::fromStdString(msg));
 		TImageCache::instance()->clear(true);
-		/*
-    cout << "Compositing completed in " + toString(Sw1.getTotalTime()/1000.0, 2) + " seconds";
-    cout << endl;
-    
-    cout << toString(Sw2.getTotalTime()/1000.0, 2) << " seconds spent on loading" << endl;
-    cout << toString(TStopWatch::global(0).getTotalTime()/1000.0, 2) << " seconds spent on saving" << endl;
-    cout << toString(TStopWatch::global(8).getTotalTime()/1000.0, 2) << " seconds spent on rendering" << endl;
-    cout << endl;*/
 	} catch (TException &e) {
 		msg = "Untrapped exception: " + ::to_string(e.getMessage()),
 		cout << msg << endl;

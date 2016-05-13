@@ -1,6 +1,5 @@
 
 
-#include <assert.h>
 #include <errno.h>
 #include "texception.h"
 #include "tscanner.h"
@@ -9,9 +8,13 @@
 #include "tsystem.h"
 #include "tconvert.h"
 #include "trop.h"
-#include <fstream>
-#include <memory>
+
 #include "TScannerIO/TUSBScannerIO.h"
+
+#include <cassert>
+#include <memory>
+#include <fstream>
+#include <strstream>
 
 using namespace TScannerUtil;
 

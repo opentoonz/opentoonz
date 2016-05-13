@@ -24,7 +24,6 @@
 #endif
 
 #include <string>
-#include <strstream>
 #include <iostream>
 #include <fstream>
 #include <algorithm>

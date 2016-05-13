@@ -20,10 +20,9 @@ const char wauxslash = '\\';
 
 #include "tfilepath.h"
 #include "tconvert.h"
-//#include "tsystem.h"
-#include <math.h>
-//#include <tcommon.h>   contenuto in tconvert.h
-#include <ctype.h>
+#include <cmath>
+#include <cctype>
+#include <strstream>
 
 bool TFilePath::m_underscoreFormatAllowed = true;
 

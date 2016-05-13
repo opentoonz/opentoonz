@@ -23,16 +23,8 @@ TOfflineGL::Imp *MacOfflineGenerator1(const TDimension &dim)
 }
 #endif
 
-//#include <typeinfo>
-
-//#include <ctype.h>
-//#include <stdlib.h>
-
-//using namespace std;
-
 #include <map>
-//#include <fstream.h>
-//#include <strstream.h>
+#include <strstream>
 
 using namespace TEnv;
 

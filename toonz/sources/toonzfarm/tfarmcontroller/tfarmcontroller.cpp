@@ -20,6 +20,7 @@
 
 #include "tthread.h"
 
+#include <strstream>
 #include <string>
 using namespace std;
 

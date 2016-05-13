@@ -15,6 +15,7 @@
 
 #include <sstream>
 #include <memory>
+#include <strstream>
 
 using namespace std;
 
