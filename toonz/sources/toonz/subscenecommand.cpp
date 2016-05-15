@@ -1089,6 +1089,16 @@ void closeSubXsheet(int dlevel)
 	changeSaveSubXsheetAsCommand();
 }
 
+void toggleEditInPlace()
+{
+	TApp *app = TApp::instance();
+	ToonzScene *scene = app->getCurrentScene()->getScene();
+	int ancestorCount = scene->getChildStack()->getAncestorCount();
+	if (ancestorCount == 0)
+		return;
+	scene->getChildStack()->setEditInPlace(!scene->getChildStack()->getEditInPlace());
+}
+
 //=============================================================================
 
 void bringPegbarsInsideChildXsheet(TXsheet *xsh, TXsheet *childXsh)
@@ -2154,6 +2164,13 @@ public:
 	CloseChildCommand() : MenuItemHandler(MI_CloseChild) {}
 	void execute() { closeSubXsheet(1); }
 } closeChildCommand;
+
+class ToggleEditInPlaceCommand : public MenuItemHandler
+{
+public:
+	ToggleEditInPlaceCommand() : MenuItemHandler(MI_ToggleEditInPlace) {}
+	void execute() { toggleEditInPlace(); }
+} toggleEditInPlaceCommand;
 
 //=============================================================================
 // collapseColumns
