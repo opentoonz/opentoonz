@@ -263,7 +263,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p)
 	}
 
 	// Draw onion skin extender handles.
-	QRectF handleRect(3, m_viewer->rowToY(currentRow) + 1, onionHandleDiam, onionHandleDiam );
+	QRectF handleRect(3, m_viewer->rowToY(currentRow) + 1, onionHandleDiam, onionHandleDiam);
 	int angle180 = 16 * 180;
 	p.setBrush(QBrush(backColor));
 	p.drawChord(handleRect, 0, angle180);
@@ -309,13 +309,13 @@ void RowArea::drawOnionSkinSelection(QPainter &p)
 
 		if (osMask.isEnabled())
 			p.setBrush(mos < 0 ? backColor : frontColor);
-			else
+		else
 			p.setBrush(Qt::NoBrush);
 		p.drawEllipse(onionDotDiam, y, onionDotDiam, onionDotDiam);
-		}
+	}
 
 	//-- draw fixed onions
-	for (int i = 0; i < osMask.getFosCount(); i++) 
+	for (int i = 0; i < osMask.getFosCount(); i++)
 	{
 		int fos = osMask.getFos(i);
 		if (fos == currentRow) continue;
@@ -323,14 +323,14 @@ void RowArea::drawOnionSkinSelection(QPainter &p)
 		if (m_showOnionToSet == Fos && fos == m_row)
 			continue;
 		int y = m_viewer->rowToY(fos) + onionDotYPos;
-		
+
 		if (osMask.isEnabled())
 			p.setBrush(QBrush(QColor(0, 255, 255, 128)));
 		else
 			p.setBrush(Qt::NoBrush);
 		p.drawEllipse(0, y, onionDotDiam, onionDotDiam);
-		}
-	
+	}
+
 	//-- draw highlighted onion
 	if (m_showOnionToSet != None)
 	{

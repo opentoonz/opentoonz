@@ -971,7 +971,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 	int x = m_viewer->columnToX(col);
 	int y = m_viewer->rowToY(row);
 	QRect rect = QRect(x + 1, y + 1, ColumnWidth - 1, RowHeight - 1);
-	if (cell.isEmpty()) { // vuol dire che la precedente non e' vuota
+	if (cell.isEmpty()) { // draw end-of-level mark of which the previous cell is not empty
 		QColor levelEndColor = m_viewer->getTextColor();
 		levelEndColor.setAlphaF(0.3);
 		p.setPen(levelEndColor);
@@ -1193,7 +1193,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col, bool isReference)
 	int x = m_viewer->columnToX(col);
 	int y = m_viewer->rowToY(row);
 	QRect rect = QRect(x + 1, y + 1, ColumnWidth - 1, RowHeight - 1);
-	if (cell.isEmpty()) { // vuol dire che la precedente non e' vuota
+	if (cell.isEmpty()) { // draw end-of-level mark of which the previous cell is not empty
 		QColor levelEndColor = m_viewer->getTextColor();
 		levelEndColor.setAlphaF(0.3);
 		p.setPen(levelEndColor);
@@ -1299,7 +1299,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col, bool isReference)
 
 void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated)
 {
-	int r0, r1, c0, c1; // range di righe e colonne visibili
+	int r0, r1, c0, c1; // range of visible rows and columns
 	r0 = m_viewer->yToRow(toBeUpdated.top());
 	r1 = m_viewer->yToRow(toBeUpdated.bottom());
 	c0 = m_viewer->xToColumn(toBeUpdated.left());

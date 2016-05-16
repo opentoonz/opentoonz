@@ -806,13 +806,13 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 	formats.sort();
 
 	m_fileFormat->addItems(formats);
-	m_fileFormat->setMaximumHeight(WidgetHeight);
+	m_fileFormat->setMaximumHeight(DVGui::WidgetHeight);
 	connect(m_fileFormat, SIGNAL(currentIndexChanged(const QString &)),
 			SLOT(onFormatChanged(const QString &)));
 	m_fileFormat->setCurrentIndex(formats.indexOf("mov"));
 
 	QPushButton *fileFormatButton = new QPushButton(QString(tr("Options")));
-	fileFormatButton->setFixedSize(60, WidgetHeight);
+	fileFormatButton->setFixedSize(60, DVGui::WidgetHeight);
 	connect(fileFormatButton, SIGNAL(pressed()), this, SLOT(openSettingsPopup()));
 	QLabel *fileFormat = new QLabel(tr("File Format:"));
 	fileFormat->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -835,7 +835,7 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 
 	QVBoxLayout *exportLayout = new QVBoxLayout();
 	QPushButton *exportButton = new QPushButton(tr("Export"), exportBox);
-	exportButton->setFixedSize(65, WidgetHeight);
+	exportButton->setFixedSize(65, DVGui::WidgetHeight);
 	connect(exportButton, SIGNAL(pressed()), this, SLOT(generateMovie()));
 	exportLayout->addWidget(exportButton, 0, Qt::AlignCenter);
 	exportBox->setLayout(exportLayout);

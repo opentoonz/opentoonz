@@ -1008,7 +1008,7 @@ void MainWindow::onUndo()
 {
 	bool ret = TUndoManager::manager()->undo();
 	if (!ret)
-		error(QObject::tr("No more Undo operations available."));
+		DVGui::error(QObject::tr("No more Undo operations available."));
 }
 
 //-----------------------------------------------------------------------------
@@ -1017,7 +1017,7 @@ void MainWindow::onRedo()
 {
 	bool ret = TUndoManager::manager()->redo();
 	if (!ret)
-		error(QObject::tr("No more Redo operations available."));
+		DVGui::error(QObject::tr("No more Redo operations available."));
 }
 
 //-----------------------------------------------------------------------------
@@ -1057,7 +1057,7 @@ void MainWindow::onAbout()
 	QLabel *label = new QLabel();
 	label->setPixmap(QPixmap(":Resources/splash.png"));
 
-	Dialog *dialog = new Dialog(this, true);
+	DVGui::Dialog *dialog = new DVGui::Dialog(this, true);
 	dialog->setWindowTitle(tr("About OpenToonz"));
 	dialog->setTopMargin(0);
 	dialog->addWidget(label);
@@ -1280,7 +1280,7 @@ void MainWindow::checkForUpdates()
 {
 	// Since there is only a single version of Opentoonz, we can do a simple check against a string
 	QString updateUrl("http://opentoonz.github.io/opentoonz-version.txt");
-/* FIXME: とりあえずアップデートチェックしないことにする */
+
 	m_updateChecker = new UpdateChecker(updateUrl);
 	connect(m_updateChecker, SIGNAL(done(bool)),
 		this, SLOT(onUpdateCheckerDone(bool)));
@@ -1290,22 +1290,22 @@ void MainWindow::checkForUpdates()
 void MainWindow::onUpdateCheckerDone(bool error)
 {
 	if (error) {
-		// Get the last update date
+		// Don't bother doing the update if there was an error
 		return;
-		}
+	}
 
 	int const software_version = get_version_code_from(TEnv::getApplicationVersion());
 	int const latest_version = get_version_code_from(m_updateChecker->getLatestVersion().toStdString());
 	if (software_version < latest_version) {
-				std::vector<QString> buttons;
+		std::vector<QString> buttons;
 		buttons.push_back(QObject::tr("Visit Web Site"));
 		buttons.push_back(QObject::tr("Cancel"));
-		int ret = MsgBox(INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
+		int ret = DVGui::MsgBox(DVGui::INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
 		if (ret == 1) {
-				// Write the new last date to file
+			// This URL can be "translated" to give a localised version to non-English users
 			QDesktopServices::openUrl(QObject::tr("https://opentoonz.github.io/e/"));
-				}
-			}
+		}
+	}
 
 	disconnect(m_updateChecker);
 	m_updateChecker->deleteLater();

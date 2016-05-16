@@ -161,14 +161,6 @@ void initToonzEnv()
 {
 	StudioPalette::enable(true);
 
-#ifdef MACOSX
-// Stuff dir deve essere assoluta (la rendo tale)
-#if defined LINETEST
-	QFileInfo infoStuff(QString("Toonz 6.4 LineTest stuff"));
-#else
-	QFileInfo infoStuff(QString("Toonz 7.1 stuff"));
-#endif
-
 	TEnv::setApplication(applicationName, applicationVersion, applicationRevision);
 	TEnv::setRootVarName(rootVarName);
 	TEnv::setSystemVarPrefix(systemVarPrefix);
@@ -188,14 +180,6 @@ void initToonzEnv()
 		else
 			fatalError("Folder \"" + toQString(stuffDir) + "\" not found or not readable");
 	}
-
-	//  TProjectManager::instance()->enableSimpleProject(true);
-
-	//! Inizializzazione Librerie di Toonz.
-	/*! Inizializza le plugins di toonz, imposta la rootDir per
-    ImagePatternStrokeStyle e per ImageCache, setta i folder del progetto,
-    imposta lo Stencil Buffer Context (QT), e l'offlineGL da utilizzare
-*/
 
 	Tiio::defineStd();
 	initImageIo();
