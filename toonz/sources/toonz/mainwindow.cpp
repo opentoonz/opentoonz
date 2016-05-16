@@ -1685,6 +1685,7 @@ void MainWindow::defineActions()
 	createMenuXsheetAction(MI_CloseChild, tr("&Close Sub-xsheet"), "");
 	createMenuXsheetAction(MI_ExplodeChild, tr("Explode Sub-xsheet"), "");
 	createMenuXsheetAction(MI_Collapse, tr("Collapse"), "");
+	createMenuXsheetAction(MI_ToggleEditInPlace, tr("Toggle Edit in Place"), "");
 	createMenuXsheetAction(MI_SaveSubxsheetAs, tr("&Save Sub-xsheet As..."), "");
 	createMenuXsheetAction(MI_Resequence, tr("Resequence"), "");
 	createMenuXsheetAction(MI_CloneChild, tr("Clone Sub-xsheet"), "");
