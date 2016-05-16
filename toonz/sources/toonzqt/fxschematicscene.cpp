@@ -1548,7 +1548,7 @@ void FxSchematicScene::mousePressEvent(QGraphicsSceneMouseEvent *me)
 	FxSchematicPort *port = dynamic_cast<FxSchematicPort *>(item);
 	FxSchematicLink *link = dynamic_cast<FxSchematicLink *>(item);
 	SchematicScene::mousePressEvent(me);
-
+	onSelectionChanged();
 	if (me->button() == Qt::MidButton) {
 		int i;
 		for (i = 0; i < items.size(); i++)
