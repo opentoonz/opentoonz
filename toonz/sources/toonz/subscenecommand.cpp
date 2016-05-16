@@ -1089,6 +1089,8 @@ void closeSubXsheet(int dlevel)
 	changeSaveSubXsheetAsCommand();
 }
 
+//=============================================================================
+
 void toggleEditInPlace()
 {
 	TApp *app = TApp::instance();
@@ -1097,6 +1099,8 @@ void toggleEditInPlace()
 	if (ancestorCount == 0)
 		return;
 	scene->getChildStack()->setEditInPlace(!scene->getChildStack()->getEditInPlace());
+	/*- Notify the change in order to update the viewer -*/
+	app->instance()->getCurrentXsheet()->notifyXsheetChanged();
 }
 
 //=============================================================================
@@ -2164,6 +2168,10 @@ public:
 	CloseChildCommand() : MenuItemHandler(MI_CloseChild) {}
 	void execute() { closeSubXsheet(1); }
 } closeChildCommand;
+
+//=============================================================================
+// ToggleEditInPlaceCommand
+//-----------------------------------------------------------------------------
 
 class ToggleEditInPlaceCommand : public MenuItemHandler
 {
