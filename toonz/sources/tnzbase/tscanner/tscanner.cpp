@@ -392,7 +392,7 @@ TScanner *TScanner::instance()
 			instanceEpson = new TScannerEpson();
 	}
 
-	return (m_isTwain) ? instanceTwain : instanceEpson;
+	return (m_isTwain ? instanceTwain : instanceEpson);
 #endif
 }
 
