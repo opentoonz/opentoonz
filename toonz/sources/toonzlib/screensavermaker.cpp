@@ -9,6 +9,7 @@
 #pragma warning(disable : 4996)
 
 #include <windows.h>
+#include <shellapi.h>
 //#include <iostream.h>
 #include <sys/stat.h>
 #include <stdio.h>

@@ -1066,9 +1066,6 @@ void StudioPaletteTreeViewer::dragMoveEvent(QDragMoveEvent *event)
 
 void StudioPaletteTreeViewer::dropEvent(QDropEvent *event)
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-#else
 	TFilePath newPath = getItemPath(m_dropItem);
 
 	resetDropItem();
@@ -1120,7 +1117,6 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event)
 	TUndoManager::manager()->endBlock();
 	event->setDropAction(Qt::CopyAction);
 	event->accept();
-#endif
 }
 
 //-----------------------------------------------------------------------------

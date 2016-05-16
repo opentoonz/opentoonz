@@ -177,27 +177,25 @@ public:
 		int refStroke;
 		int moveBefore;
 		switch (m_moveType) {
-		case TGroupCommand::FRONT: {
+		case TGroupCommand::FRONT:
 			refStroke = m_moveBefore - m_count;
 			moveBefore = m_refStroke;
-		}
-			CASE TGroupCommand::FORWARD:
-			{
-				refStroke = m_moveBefore - m_count;
-				moveBefore = m_refStroke;
-			}
-			CASE TGroupCommand::BACK:
-			{
-				refStroke = m_moveBefore;
-				moveBefore = m_refStroke + m_count;
-			}
-			CASE TGroupCommand::BACKWARD:
-			{
-				refStroke = m_moveBefore;
-				moveBefore = m_refStroke + m_count;
-			}
-		DEFAULT:
+			break;
+		case TGroupCommand::FORWARD:
+			refStroke = m_moveBefore - m_count;
+			moveBefore = m_refStroke;
+			break;
+		case TGroupCommand::BACK:
+			refStroke = m_moveBefore;
+			moveBefore = m_refStroke + m_count;
+			break;
+		case TGroupCommand::BACKWARD:
+			refStroke = m_moveBefore;
+			moveBefore = m_refStroke + m_count;
+			break;
+		default:
 			assert(!"group move not defined!");
+			break;
 		}
 		TVectorImageP image = m_level->getFrame(m_frameId, true);
 		if (!image)
@@ -680,22 +678,30 @@ int doMoveGroup(UCHAR moveType, TVectorImage *vimg, const std::vector<std::pair<
 			moveBefore--;
 		if (moveBefore == refStroke + count)
 			return -1;
-		CASE TGroupCommand::FORWARD : moveBefore = refStroke + count + 1;
+
+		break;
+	case TGroupCommand::FORWARD:
+		moveBefore = refStroke + count + 1;
 		while (moveBefore <= (int)vimg->getStrokeCount() && !vimg->canMoveStrokes(refStroke, count, moveBefore))
 			moveBefore++;
 		if (moveBefore == vimg->getStrokeCount() + 1)
 			return -1;
-		CASE TGroupCommand::BACK : moveBefore = 0;
+		break;
+	case TGroupCommand::BACK:
+		moveBefore = 0;
 		while (moveBefore <= refStroke - 1 && !vimg->canMoveStrokes(refStroke, count, moveBefore))
 			moveBefore++;
 		if (moveBefore == refStroke)
 			return -1;
-		CASE TGroupCommand::BACKWARD : moveBefore = refStroke - 1;
+		break;
+	case TGroupCommand::BACKWARD:
+		moveBefore = refStroke - 1;
 		while (moveBefore >= 0 && !vimg->canMoveStrokes(refStroke, count, moveBefore))
 			moveBefore--;
 		if (moveBefore == -1)
 			return -1;
-	DEFAULT:
+		break;
+	default:
 		assert(false);
 	}
 
@@ -732,7 +738,8 @@ void TGroupCommand::moveGroup(UCHAR moveType)
 
 	switch (moveType) {
 	case TGroupCommand::FRONT:
-		__OR TGroupCommand::BACKWARD : i = 0;
+	case TGroupCommand::BACKWARD:
+		i = 0;
 		if (moveType == TGroupCommand::BACKWARD && vimg->getStrokeIndex(selectedGroups[i].first) == 0) //tutti i gruppi adiacenti gia in fondo non possono essere backwardati
 		{
 			i++;
@@ -742,7 +749,11 @@ void TGroupCommand::moveGroup(UCHAR moveType)
 		}
 		for (; i <= (int)selectedGroups.size() - 1; i++)
 			doMoveGroup(moveType, vimg, selectedGroups, i); //vimg->getStrokeIndex(selectedGroups[i].first), selectedGroups[i].second);
-		CASE TGroupCommand::BACK : __OR TGroupCommand::FORWARD : i = selectedGroups.size() - 1;
+		break;
+
+	case TGroupCommand::BACK:
+	case TGroupCommand::FORWARD:
+		i = selectedGroups.size() - 1;
 		if (moveType == TGroupCommand::FORWARD && vimg->getStrokeIndex(selectedGroups[i].first) + selectedGroups[i].second - 1 == vimg->getStrokeCount() - 1) //tutti i gruppi adiacenti gia in cime non possono essere forwardati
 		{
 			i--;
@@ -752,7 +763,9 @@ void TGroupCommand::moveGroup(UCHAR moveType)
 		}
 		for (; i >= 0; i--)
 			doMoveGroup(moveType, vimg, selectedGroups, i);
-	DEFAULT:
+		break;
+
+	default:
 		assert(false);
 	}
 

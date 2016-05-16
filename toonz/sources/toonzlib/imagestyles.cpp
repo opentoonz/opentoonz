@@ -569,16 +569,15 @@ int TTextureStyle::getParamCount() const
 QString TTextureStyle::getParamNames(int index) const
 {
 	switch (index) {
-	case 0:
-		return "Use As Pattern";
-		CASE 1 : return "Position";
-		CASE 2 : return "Scale";
-		CASE 3 : return "Rotation(degrees)";
-		CASE 4 : return "X displ";
-		CASE 5 : return "Y displ";
-		CASE 6 : return "Contrast";
-		CASE 7 : return "Load From File";
-	DEFAULT:
+	case 0: return "Use As Pattern";
+	case 1: return "Position";
+	case 2: return "Scale";
+	case 3: return "Rotation(degrees)";
+	case 4: return "X displ";
+	case 5: return "Y displ";
+	case 6: return "Contrast";
+	case 7: return "Load From File";
+	default:
 		assert(false);
 	}
 
@@ -594,15 +593,24 @@ void TTextureStyle::getParamRange(int index, double &min, double &max) const
 	case 2:
 		min = 0.15;
 		max = 10;
-		CASE 3 : min = -180;
+		break;
+	case 3:
+		min = -180;
 		max = 180;
-		CASE 4 : min = -500;
+		break;
+	case 4:
+		min = -500;
 		max = 500;
-		CASE 5 : min = -500;
+		break;
+	case 5:
+		min = -500;
 		max = 500;
-		CASE 6 : min = 0.01;
+		break;
+	case 6:
+		min = 0.01;
 		max = 10;
-	DEFAULT:
+		break;
+	default:
 		assert(false);
 	}
 }
@@ -653,13 +661,12 @@ double TTextureStyle::getParamValue(TColorStyle::double_tag, int index) const
 {
 	assert(index > 1);
 	switch (index) {
-	case 2:
-		return m_params.m_scale;
-		CASE 3 : return m_params.m_rotation;
-		CASE 4 : return m_params.m_displacement.x;
-		CASE 5 : return m_params.m_displacement.y;
-		CASE 6 : return m_params.m_contrast;
-	DEFAULT:
+	case 2: return m_params.m_scale;
+	case 3: return m_params.m_rotation;
+	case 4: return m_params.m_displacement.x;
+	case 5: return m_params.m_displacement.y;
+	case 6: return m_params.m_contrast;
+	default:
 		assert(false);
 	}
 	return 0;
@@ -714,14 +721,26 @@ void TTextureStyle::setParamValue(int index, double value)
 	switch (index) {
 	case 0:
 		m_params.m_isPattern = (((int)value == 0) ? false : true);
-		CASE 1 : m_params.m_type = (((int)value == 0) ? TTextureParams::FIXED : ((int)value == 1) ? TTextureParams::AUTOMATIC : TTextureParams::RANDOM);
-
-		CASE 2 : m_params.m_scale = value;
-		CASE 3 : m_params.m_rotation = value;
-		CASE 4 : m_params.m_displacement.x = value;
-		CASE 5 : m_params.m_displacement.y = value;
-		CASE 6 : m_params.m_contrast = value;
-	DEFAULT:
+		break;
+	case 1:
+		m_params.m_type = (((int)value == 0) ? TTextureParams::FIXED : ((int)value == 1) ? TTextureParams::AUTOMATIC : TTextureParams::RANDOM);
+		break;
+	case 2:
+		m_params.m_scale = value;
+		break;
+	case 3:
+		m_params.m_rotation = value;
+		break;
+	case 4:
+		m_params.m_displacement.x = value;
+		break;
+	case 5:
+		m_params.m_displacement.y = value;
+		break;
+	case 6:
+		m_params.m_contrast = value;
+		break;
+	default:
 		assert(false);
 	}
 }

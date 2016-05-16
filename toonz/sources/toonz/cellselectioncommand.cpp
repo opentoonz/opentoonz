@@ -1414,18 +1414,21 @@ bool CloneLevelUndo::chooseOverwrite(
 	default:
 		return false;
 
-	case OverwriteDialog::KEEP_OLD: {
+	case OverwriteDialog::KEEP_OLD:
 		// Load the level at the preferred clone path
 		if (!xl)
 			xl = scene->loadLevel(dstPath); // Hard load - from disk
 
 		assert(xl);
 		dstSl = xl->getSimpleLevel();
-	}
+		break;
 
-		CASE OverwriteDialog::OVERWRITE : assert(!xl);
+	case OverwriteDialog::OVERWRITE:
+		assert(!xl);
+		break;
 
-		CASE OverwriteDialog::RENAME:;
+	case OverwriteDialog::RENAME:
+		break;
 	}
 
 	return true;

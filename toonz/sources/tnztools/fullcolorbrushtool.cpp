@@ -151,10 +151,8 @@ FullColorBrushTool::FullColorBrushTool(std::string name)
 	m_prop.bind(m_hardness);
 	m_prop.bind(m_opacity);
 	m_prop.bind(m_pressure);
-#ifndef STUDENT
 	m_prop.bind(m_preset);
 	m_preset.setId("BrushPreset");
-#endif
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -470,10 +468,13 @@ void FullColorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 		double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
 
 		locals.addMinMax(m_thickness, int(add));
+
+		break;
 	}
 
-	DEFAULT:
+	default:
 		m_brushPos = pos;
+		break;
 	}
 
 	m_mousePos = pos;

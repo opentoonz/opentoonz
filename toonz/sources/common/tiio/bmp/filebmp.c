@@ -21,29 +21,6 @@
 
 #include "filebmp.h"
 
-/*
-typedef unsigned long  ULONG;
-typedef unsigned short USHORT;
-typedef unsigned char  UCHAR;
-typedef unsigned int   UINT;
-typedef void IMAGERGB;
-typedef struct {USHORT m,b,g,r;} SPIXEL;
-#define CASE break; case
-#define __OR      ; case
-#define DEFAULT break; default
-#define TRUE 1
-#define FALSE 0
-#define NIL (void*)0
-*/
-
-/*
-typedef struct bmpimage {
-	int xsize,ysize;
-	LPIXEL *buffer;
-  BMP_SUBTYPE type;
-	} IMAGE;
-*/
-
 #define UNUSED_REDUCE_COLORS
 
 /*---------------------------------------------------------------------------*/
@@ -202,9 +179,15 @@ int read_bmp_line(FILE *fp, void *line_buffer,
 	case BMP_BW:
 		pad = ((w + 31) / 32) * 32;
 		rv = load_lineBMP1(fp, pic, w, (UINT)pad, map);
-		CASE BMP_GREY16 : __OR BMP_CMAPPED16 : pad = ((w + 7) / 8) * 8;
+		break;
+	case BMP_GREY16:
+	case BMP_CMAPPED16:
+		pad = ((w + 7) / 8) * 8;
 		rv = load_lineBMP4(fp, pic, w, (UINT)pad, map);
-		CASE BMP_GREY16C : __OR BMP_CMAPPED16C : rv = load_lineBMPC4(fp, pic, w, row, map);
+		break;
+	case BMP_GREY16C:
+	case BMP_CMAPPED16C:
+		rv = load_lineBMPC4(fp, pic, w, row, map);
 		if (rv == -1)
 			rv = 1;
 		else if (rv == -2)
@@ -213,9 +196,15 @@ int read_bmp_line(FILE *fp, void *line_buffer,
 			rv = 0;
 		else
 			rv = 0;
-		CASE BMP_GREY256 : __OR BMP_CMAPPED256 : pad = ((w + 3) / 4) * 4;
+		break;
+	case BMP_GREY256:
+	case BMP_CMAPPED256:
+		pad = ((w + 3) / 4) * 4;
 		rv = load_lineBMP8(fp, pic, w, (UINT)pad, map);
-		CASE BMP_GREY256C : __OR BMP_CMAPPED256C : rv = load_lineBMPC8(fp, pic, w, row, map);
+		break;
+	case BMP_GREY256C:
+	case BMP_CMAPPED256C:
+		rv = load_lineBMPC8(fp, pic, w, row, map);
 		if (rv == -1)
 			rv = 1;
 		else if (rv == -2)
@@ -224,9 +213,10 @@ int read_bmp_line(FILE *fp, void *line_buffer,
 			rv = 0;
 		else
 			rv = 0;
-		CASE BMP_RGB : pad = (4 - ((w * 3) % 4)) & 0x03;
+		break;
+	case BMP_RGB:
+		pad = (4 - ((w * 3) % 4)) & 0x03;
 		rv = load_lineBMP24(fp, pic, w, (UINT)pad);
-	DEFAULT:
 		break;
 	}
 
@@ -247,15 +237,28 @@ int write_bmp_line(FILE *fp, void *line_buffer,
 	case BMP_BW:
 		pad = ((w + 31) / 32) * 32;
 		rv = line_writeBMP1(fp, pic, w, (UINT)pad, map);
-		CASE BMP_GREY16 : __OR BMP_CMAPPED16 : pad = ((w + 7) / 8) * 8;
+		break;
+	case BMP_GREY16:
+	case BMP_CMAPPED16:
+		pad = ((w + 7) / 8) * 8;
 		rv = line_writeBMP4(fp, pic, w, (UINT)pad, map);
-		CASE BMP_GREY16C : __OR BMP_CMAPPED16C : rv = line_writeBMPC4(fp, pic, w, row, map);
-		CASE BMP_GREY256 : __OR BMP_CMAPPED256 : pad = ((w + 3) / 4) * 4;
+		break;
+	case BMP_GREY16C:
+	case BMP_CMAPPED16C:
+		rv = line_writeBMPC4(fp, pic, w, row, map);
+		break;
+	case BMP_GREY256:
+	case BMP_CMAPPED256:
+		pad = ((w + 3) / 4) * 4;
 		rv = line_writeBMP8(fp, pic, w, (UINT)pad, map);
-		CASE BMP_GREY256C : __OR BMP_CMAPPED256C : rv = line_writeBMPC8(fp, pic, w, row, map);
-		CASE BMP_RGB : pad = (4 - ((w * 3) % 4)) & 0x03;
+		break;
+	case BMP_GREY256C:
+	case BMP_CMAPPED256C:
+		rv = line_writeBMPC8(fp, pic, w, row, map);
+		break;
+	case BMP_RGB:
+		pad = (4 - ((w * 3) % 4)) & 0x03;
 		rv = line_writeBMP24(fp, p24, w, (UINT)pad);
-	DEFAULT:
 		break;
 	}
 
@@ -273,15 +276,28 @@ int skip_bmp_lines(FILE *fp, UINT w, UINT rows, int whence, BMP_SUBTYPE type)
 	case BMP_BW:
 		pad = ((w + 31) / 32) * 32;
 		rv = skip_rowsBMP1(fp, w, (UINT)pad, rows, whence);
-		CASE BMP_GREY16 : __OR BMP_CMAPPED16 : pad = ((w + 7) / 8) * 8;
+		break;
+	case BMP_GREY16:
+	case BMP_CMAPPED16:
+		pad = ((w + 7) / 8) * 8;
 		rv = skip_rowsBMP4(fp, w, (UINT)pad, rows, whence);
-		CASE BMP_GREY16C : __OR BMP_CMAPPED16C : rv = skip_rowsBMPC4(fp, rows);
-		CASE BMP_GREY256 : __OR BMP_CMAPPED256 : pad = ((w + 3) / 4) * 4;
+		break;
+	case BMP_GREY16C:
+	case BMP_CMAPPED16C:
+		rv = skip_rowsBMPC4(fp, rows);
+		break;
+	case BMP_GREY256:
+	case BMP_CMAPPED256:
+		pad = ((w + 3) / 4) * 4;
 		rv = skip_rowsBMP8(fp, w, (UINT)pad, rows, whence);
-		CASE BMP_GREY256C : __OR BMP_CMAPPED256C : rv = skip_rowsBMPC8(fp, rows);
-		CASE BMP_RGB : pad = (4 - ((w * 3) % 4)) & 0x03;
+		break;
+	case BMP_GREY256C:
+	case BMP_CMAPPED256C:
+		rv = skip_rowsBMPC8(fp, rows);
+		break;
+	case BMP_RGB:
+		pad = (4 - ((w * 3) % 4)) & 0x03;
 		rv = skip_rowsBMP24(fp, w, (UINT)pad, rows, whence);
-	DEFAULT:
 		break;
 	}
 
@@ -552,10 +568,17 @@ static int img_read_bmp_generic(const MYSTRING fname, int type, IMAGE **pimg)
 	switch (hd->biBitCount) {
 	case 1:
 		rv = loadBMP1(fp, pic, hd->biWidth, hd->biHeight, r, g, b);
-		CASE 4 : rv = loadBMP4(fp, pic, hd->biWidth, hd->biHeight, hd->biCompression, r, g, b);
-		CASE 8 : rv = loadBMP8(fp, pic, hd->biWidth, hd->biHeight, hd->biCompression, r, g, b);
-		CASE 24 : rv = loadBMP24(fp, pic, hd->biWidth, hd->biHeight);
-	DEFAULT:
+		break;
+	case 4:
+		rv = loadBMP4(fp, pic, hd->biWidth, hd->biHeight, hd->biCompression, r, g, b);
+		break;
+	case 8:
+		rv = loadBMP8(fp, pic, hd->biWidth, hd->biHeight, hd->biCompression, r, g, b);
+		break;
+	case 24:
+		rv = loadBMP24(fp, pic, hd->biWidth, hd->biHeight);
+		break;
+	default:
 		retCode = UNSUPPORTED_BMP_FORMAT;
 		goto ERROR;
 	}
@@ -739,10 +762,17 @@ static int img_read_bmp_region(const MYSTRING fname, IMAGE **pimg, int x1, int y
 	switch (hd->biBitCount) {
 	case 1:
 		pad = ((hd->biWidth + 31) / 32) * 32;
-		CASE 4 : pad = ((hd->biWidth + 7) / 8) * 8;
-		CASE 8 : pad = ((hd->biWidth + 3) / 4) * 4;
-		CASE 24 : pad = (4 - ((hd->biWidth * 3) % 4)) & 0x03;
-	DEFAULT:
+		break;
+	case 4:
+		pad = ((hd->biWidth + 7) / 8) * 8;
+		break;
+	case 8:
+		pad = ((hd->biWidth + 3) / 4) * 4;
+		break;
+	case 24:
+		pad = (4 - ((hd->biWidth * 3) % 4)) & 0x03;
+		break;
+	default:
 		/* segnala errore ed esci */
 		break;
 	}
@@ -765,33 +795,6 @@ static int img_read_bmp_region(const MYSTRING fname, IMAGE **pimg, int x1, int y
 		if (load_lineBMP24(fp, line, hd->biWidth, pad))
 			goto ERROR;
 
-		/*  QUESTO SWITCH VA AGGIUSTATO!
-      switch (subtype)
-       {
-	 CASE BMP_BW:
-	     if (load_lineBMP1(fp, line, hd->biWidth, pad, map))
-	        goto ERROR;
-	 CASE BMP_GREY16:
-	 __OR BMP_CMAPPED16:
-	     if (load_lineBMP4(fp, line, hd->biWidth, pad, map))
-	        goto ERROR;
-	 CASE BMP_GREY16C:
-	 __OR BMP_CMAPPED16C:
-	     if (load_lineBMPC4(fp, line, hd->biWidth, i, map)==-1)
-	        goto ERROR;
-	 CASE BMP_GREY256:
-	 __OR BMP_CMAPPED256:
-	     if (load_lineBMP8(fp, line, hd->biWidth, pad, map))
-	        goto ERROR;
-	 CASE BMP_GREY256C:
-	 __OR BMP_CMAPPED256C:
-	     if (load_lineBMPC8(fp, line, hd->biWidth, i, map)==-1)
-	        goto ERROR;
-	 CASE BMP_RGB:
-	     if (load_lineBMP24(fp, line, hd->biWidth, pad))
-	        goto ERROR;
-}
-*/
 		for (appo = pic, j = c = 0; j < (UINT)info.scanNcol; j++, c += info.step)
 			*appo++ = *(line + info.startScanCol + c);
 		pic += info.xsize;
@@ -1224,19 +1227,26 @@ static int skip_rowsBMPC4(FILE *fp, UINT rows)
 			switch (c) {
 			case 0x00:
 				rows--;
-				CASE 0x01 : rows = 0;
-				CASE 0x02 : c1 = getc(fp); /* x buffer offest */
-				c1 = getc(fp);			   /* y buffer offest */
+				break;
+			case 0x01:
+				rows = 0;
+				break;
+			case 0x02:
+				c1 = getc(fp); /* x buffer offest */
+				c1 = getc(fp); /* y buffer offest */
 				rows -= c1;
-			DEFAULT:
+				break;
+			default:
 				for (i = 0; i < c; i++) {
 					if ((i & 1) == 0)
 						getc(fp);
 				}
 				if (((c & 3) == 1) || ((c & 3) == 2))
 					getc(fp);
+				break;
 			}
-		DEFAULT:
+			break;
+		default:
 			c1 = getc(fp);
 		}
 	}
@@ -1507,17 +1517,24 @@ static int skip_rowsBMPC8(FILE *fp, UINT rows)
 			switch (c) {
 			case 0x00:
 				rows--;
-				CASE 0x01 : rows = 0;
-				CASE 0x02 : c1 = getc(fp); /* x buffer offest */
-				c1 = getc(fp);			   /* y buffer offest */
+				break;
+			case 0x01:
+				rows = 0;
+				break;
+			case 0x02:
+				c1 = getc(fp); /* x buffer offest */
+				c1 = getc(fp); /* y buffer offest */
 				rows -= c1;
-			DEFAULT:
+				break;
+			default:
 				for (i = 0; i < c; i++)
 					getc(fp);
 				if (c & 1)
 					getc(fp);
+				break;
 			}
-		DEFAULT:
+			break;
+		default:
 			c1 = getc(fp);
 		}
 	}
@@ -1692,12 +1709,19 @@ int img_write_bmp(const MYSTRING fname, IMAGE *img)
 
 	switch (subtype) {
 	case BMP_BW:
-		__OR BMP_GREY16 : __OR BMP_GREY16C :
-
-						  __OR BMP_CMAPPED256 : __OR BMP_CMAPPED256C : return UNSUPPORTED_BMP_FORMAT;
-		CASE BMP_GREY256 : __OR BMP_GREY256C : nbits = 8;
-		CASE BMP_RGB : nbits = 24;
-	DEFAULT:
+	case BMP_GREY16:
+	case BMP_GREY16C:
+	case BMP_CMAPPED256:
+	case BMP_CMAPPED256C:
+		return UNSUPPORTED_BMP_FORMAT;
+	case BMP_GREY256:
+	case BMP_GREY256C:
+		nbits = 8;
+		break;
+	case BMP_RGB:
+		nbits = 24;
+		break;
+	default:
 		goto BMP_WRITE_ERROR;
 	}
 
@@ -1713,9 +1737,13 @@ int img_write_bmp(const MYSTRING fname, IMAGE *img)
 	switch (nbits) {
 	case 4:
 		comp = (comp == TRUE) ? BMP_BI_RLE4 : BMP_BI_RGB;
-		CASE 8 : comp = (comp == TRUE) ? BMP_BI_RLE8 : BMP_BI_RGB;
-	DEFAULT:
+		break;
+	case 8:
+		comp = (comp == TRUE) ? BMP_BI_RLE8 : BMP_BI_RGB;
+		break;
+	default:
 		comp = BMP_BI_RGB;
+		break;
 	}
 
 	/* fill image header */
@@ -1741,12 +1769,19 @@ int img_write_bmp(const MYSTRING fname, IMAGE *img)
 	switch (nbits) {
 	case 1:
 		write_function = writeBMP1;
-		CASE 4 : if (comp == BMP_BI_RGB) write_function = writeBMP4;
+		break;
+	case 4:
+		if (comp == BMP_BI_RGB) write_function = writeBMP4;
 		else write_function = writeBMPC4;
-		CASE 8 : if (comp == BMP_BI_RGB) write_function = writeBMP8;
+		break;
+	case 8:
+		if (comp == BMP_BI_RGB) write_function = writeBMP8;
 		else write_function = writeBMPC8;
-		CASE 24 : write_function = writeBMP24;
-	DEFAULT:
+		break;
+	case 24:
+		write_function = writeBMP24;
+		break;
+	default:
 		goto BMP_WRITE_ERROR;
 	}
 
@@ -2291,28 +2326,30 @@ int make_bmp_palette(int colors, int grey, UCHAR *r, UCHAR *g, UCHAR *b)
 	case 2:
 		for (i = 0; i < 2; i++)
 			r[i] = g[i] = b[i] = i * 255;
-		CASE 16 : for (i = 0; i < 16; i++)
-		{
+		break;
+	case 16:
+		for (i = 0; i < 16; i++) {
 			for (j = 0; j < 16; j++) {
 				ind = i * 16 + j;
 				val = i * 16;
 				r[ind] = g[ind] = b[ind] = val;
 			}
 		}
-		CASE 256 : if (grey)
-		{
+		break;
+	case 256:
+		if (grey) {
 			for (i = 0; i < 256; i++)
 				r[i] = g[i] = b[i] = i;
 		}
-		else
-		{
+		else {
 			for (i = 0; i < 256; i++) {
 				r[i] = BMP_RMAP(i);
 				g[i] = BMP_GMAP(i);
 				b[i] = BMP_BMAP(i);
 			}
 		}
-	DEFAULT:
+		break;
+	default:
 		return FALSE;
 	}
 
@@ -2381,7 +2418,10 @@ int writebmp(const MYSTRING filename, int xsize, int ysize, void *buffer, int bp
 	switch (bpp) {
 	case 8:
 		img.type = BMP_GREY256C;
-		CASE 32 : img.type = BMP_RGB;
+		break;
+	case 32:
+		img.type = BMP_RGB;
+		break;
 	}
 	return img_write_bmp(filename, &img);
 }

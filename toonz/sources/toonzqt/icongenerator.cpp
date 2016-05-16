@@ -1462,22 +1462,23 @@ QPixmap IconGenerator::getIcon(TXshLevel *xl, const TFrameId &fid, bool filmStri
 		case OVL_XSHLEVEL:
 		case TZI_XSHLEVEL:
 			addTask(id, new RasterImageIconRenderer(id, iconSize, sl, fid));
-
-			CASE PLI_XSHLEVEL : addTask(id, new VectorImageIconRenderer(id, iconSize, sl, fid, m_settings));
-
-			CASE TZP_XSHLEVEL:
-			{
-				// Yep, we could have rasters, due to a cleanupping process
-				if (status == TXshSimpleLevel::Scanned)
-					addTask(id, new RasterImageIconRenderer(id, iconSize, sl, fid));
-				else
-					addTask(id, new ToonzImageIconRenderer(id, iconSize, sl, fid, m_settings));
-			}
-
-			CASE MESH_XSHLEVEL : addTask(id, new MeshImageIconRenderer(id, iconSize, sl, fid, m_settings));
-
-		DEFAULT:
+			break;
+		case PLI_XSHLEVEL:
+			addTask(id, new VectorImageIconRenderer(id, iconSize, sl, fid, m_settings));
+			break;
+		case TZP_XSHLEVEL:
+			// Yep, we could have rasters, due to a cleanupping process
+			if (status == TXshSimpleLevel::Scanned)
+				addTask(id, new RasterImageIconRenderer(id, iconSize, sl, fid));
+			else
+				addTask(id, new ToonzImageIconRenderer(id, iconSize, sl, fid, m_settings));
+			break;
+		case MESH_XSHLEVEL:
+			addTask(id, new MeshImageIconRenderer(id, iconSize, sl, fid, m_settings));
+			break;
+		default:
 			assert(false);
+			break;
 		}
 
 		m_settings = oldSettings;
@@ -1502,23 +1503,23 @@ void IconGenerator::invalidate(TXshLevel *xl, const TFrameId &fid, bool onlyFilm
 		case OVL_XSHLEVEL:
 		case TZI_XSHLEVEL:
 			addTask(id, new RasterImageIconRenderer(id, getIconSize(), sl, fid));
-
-			CASE PLI_XSHLEVEL : removeIcon(id);
+			break;
+		case PLI_XSHLEVEL:
+			removeIcon(id);
 			addTask(id, new VectorImageIconRenderer(id, getIconSize(), sl, fid, m_settings));
-
-			CASE TZP_XSHLEVEL:
-			{
-				int status = sl->getFrameStatus(fid);
-				if (status == TXshSimpleLevel::Scanned)
-					addTask(id, new RasterImageIconRenderer(id, getIconSize(), sl, fid));
-				else
-					addTask(id, new ToonzImageIconRenderer(id, getIconSize(), sl, fid, m_settings));
-			}
-
-			CASE MESH_XSHLEVEL : addTask(id, new MeshImageIconRenderer(id, getIconSize(), sl, fid, m_settings));
-
-		DEFAULT:
+			break;
+		case TZP_XSHLEVEL:
+			if (sl->getFrameStatus(fid) == TXshSimpleLevel::Scanned)
+				addTask(id, new RasterImageIconRenderer(id, getIconSize(), sl, fid));
+			else
+				addTask(id, new ToonzImageIconRenderer(id, getIconSize(), sl, fid, m_settings));
+			break;
+		case MESH_XSHLEVEL:
+			addTask(id, new MeshImageIconRenderer(id, getIconSize(), sl, fid, m_settings));
+			break;
+		default:
 			assert(false);
+			break;
 		}
 
 		if (onlyFilmStrip)
@@ -1539,22 +1540,22 @@ void IconGenerator::invalidate(TXshLevel *xl, const TFrameId &fid, bool onlyFilm
 		case OVL_XSHLEVEL:
 		case TZI_XSHLEVEL:
 			addTask(id, new RasterImageIconRenderer(id, TDimension(80, 60), sl, fid));
-
-			CASE PLI_XSHLEVEL : addTask(id, new VectorImageIconRenderer(id, TDimension(80, 60), sl, fid, m_settings));
-
-			CASE TZP_XSHLEVEL:
-			{
-				int status = sl->getFrameStatus(fid);
-				if (status == TXshSimpleLevel::Scanned)
-					addTask(id, new RasterImageIconRenderer(id, TDimension(80, 60), sl, fid));
-				else
-					addTask(id, new ToonzImageIconRenderer(id, TDimension(80, 60), sl, fid, m_settings));
-			}
-
-			CASE MESH_XSHLEVEL : addTask(id, new MeshImageIconRenderer(id, TDimension(80, 60), sl, fid, m_settings));
-
-		DEFAULT:
+			break;
+		case PLI_XSHLEVEL:
+			addTask(id, new VectorImageIconRenderer(id, TDimension(80, 60), sl, fid, m_settings));
+			break;
+		case TZP_XSHLEVEL:
+			if (sl->getFrameStatus(fid) == TXshSimpleLevel::Scanned)
+				addTask(id, new RasterImageIconRenderer(id, TDimension(80, 60), sl, fid));
+			else
+				addTask(id, new ToonzImageIconRenderer(id, TDimension(80, 60), sl, fid, m_settings));
+			break;
+		case MESH_XSHLEVEL:
+			addTask(id, new MeshImageIconRenderer(id, TDimension(80, 60), sl, fid, m_settings));
+			break;
+		default:
 			assert(false);
+			break;
 		}
 
 		m_settings = oldSettings;

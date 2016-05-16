@@ -257,20 +257,27 @@ int getEnlargement(const std::vector<TRasterFxRenderDataP> &fxs, double scale)
 					BlendTzParams &params = sandorData->m_blendParams;
 					enlargement = params.m_amount * scale;
 				}
+
+				break;
 			}
 
-				CASE Calligraphic : __OR OutBorder:
+			case Calligraphic:
+			case OutBorder:
 				{
 					CalligraphicParams &params = sandorData->m_callParams;
 					enlargement = params.m_thickness * scale;
+
+					break;
 				}
 
-				CASE ArtAtContour:
+			case ArtAtContour:
 				{
 					ArtAtContourParams &params = sandorData->m_contourParams;
 					enlargement =
 						tmax(tceil(sandorData->m_controllerBBox.getLx()), tceil(sandorData->m_controllerBBox.getLy())) *
 						params.m_maxSize;
+
+					break;
 				}
 			}
 		}
@@ -556,9 +563,11 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 				blend(ti, rasterOut, blendParams);
 
 				blendParams.clear();
+				break;
 			}
-				CASE Calligraphic : __OR OutBorder:
-				{
+
+			case Calligraphic:
+			case OutBorder: {
 					if (sandorData->m_type == OutBorder && !firstSandorFx)
 						continue;
 
@@ -570,9 +579,10 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 
 					calligraph(oldRasterIn, oldRasterOut, sandorData->m_border, sandorData->m_argc,
 							   argv, sandorData->m_shrink, sandorData->m_type == OutBorder);
+
+					break;
 				}
-				CASE ArtAtContour:
-				{
+			case ArtAtContour: {
 					const char *argv[12];
 					memcpy(argv, sandorData->m_argv, 12 * sizeof(const char *));
 
@@ -590,8 +600,10 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 					patternmap(oldRasterIn, oldRasterOut, sandorData->m_border, sandorData->m_argc,
 							   argv, sandorData->m_shrink, imgContour);
 					TRop::releaseRaster46(imgContour);
+
+					break;
 				}
-			DEFAULT:
+			default:
 				assert(false);
 			}
 

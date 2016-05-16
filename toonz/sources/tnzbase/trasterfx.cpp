@@ -114,25 +114,24 @@ double norm2(const TAffine &aff)
 inline int getResampleFilterRadius(const TRenderSettings &info)
 {
 	switch (info.m_quality) {
-	case TRenderSettings::StandardResampleQuality:
-		return 1;
-		CASE TRenderSettings::ImprovedResampleQuality : return 2;
-		CASE TRenderSettings::HighResampleQuality : return 3;
-		CASE TRenderSettings::Triangle_FilterResampleQuality : return 1;
-		CASE TRenderSettings::Mitchell_FilterResampleQuality : return 2;
-		CASE TRenderSettings::Cubic5_FilterResampleQuality : return 2;
-		CASE TRenderSettings::Cubic75_FilterResampleQuality : return 2;
-		CASE TRenderSettings::Cubic1_FilterResampleQuality : return 2;
-		CASE TRenderSettings::Hann2_FilterResampleQuality : return 2;
-		CASE TRenderSettings::Hann3_FilterResampleQuality : return 3;
-		CASE TRenderSettings::Hamming2_FilterResampleQuality : return 2;
-		CASE TRenderSettings::Hamming3_FilterResampleQuality : return 3;
-		CASE TRenderSettings::Lanczos2_FilterResampleQuality : return 2;
-		CASE TRenderSettings::Lanczos3_FilterResampleQuality : return 3;
-		CASE TRenderSettings::Gauss_FilterResampleQuality : return 2;
-		CASE TRenderSettings::ClosestPixel_FilterResampleQuality : return 1;
-		CASE TRenderSettings::Bilinear_FilterResampleQuality : return 1;
-	DEFAULT:
+	case TRenderSettings::StandardResampleQuality            : return 1;
+	case TRenderSettings::ImprovedResampleQuality            : return 2;
+	case TRenderSettings::HighResampleQuality                : return 3;
+	case TRenderSettings::Triangle_FilterResampleQuality     : return 1;
+	case TRenderSettings::Mitchell_FilterResampleQuality     : return 2;
+	case TRenderSettings::Cubic5_FilterResampleQuality       : return 2;
+	case TRenderSettings::Cubic75_FilterResampleQuality      : return 2;
+	case TRenderSettings::Cubic1_FilterResampleQuality       : return 2;
+	case TRenderSettings::Hann2_FilterResampleQuality        : return 2;
+	case TRenderSettings::Hann3_FilterResampleQuality        : return 3;
+	case TRenderSettings::Hamming2_FilterResampleQuality     : return 2;
+	case TRenderSettings::Hamming3_FilterResampleQuality     : return 3;
+	case TRenderSettings::Lanczos2_FilterResampleQuality     : return 2;
+	case TRenderSettings::Lanczos3_FilterResampleQuality     : return 3;
+	case TRenderSettings::Gauss_FilterResampleQuality        : return 2;
+	case TRenderSettings::ClosestPixel_FilterResampleQuality : return 1;
+	case TRenderSettings::Bilinear_FilterResampleQuality     : return 1;
+	default:
 		assert(false);
 		return -1;
 	}
@@ -996,23 +995,56 @@ TRasterP TRasterFx::applyAffine(
 	switch (info.m_quality) {
 	case TRenderSettings::StandardResampleQuality:
 		qual = TRop::Triangle;
-		CASE TRenderSettings::ImprovedResampleQuality : qual = TRop::Hann2;
-		CASE TRenderSettings::HighResampleQuality : qual = TRop::Hamming3;
-		CASE TRenderSettings::Triangle_FilterResampleQuality : qual = TRop::Triangle;
-		CASE TRenderSettings::Mitchell_FilterResampleQuality : qual = TRop::Mitchell;
-		CASE TRenderSettings::Cubic5_FilterResampleQuality : qual = TRop::Cubic5;
-		CASE TRenderSettings::Cubic75_FilterResampleQuality : qual = TRop::Cubic75;
-		CASE TRenderSettings::Cubic1_FilterResampleQuality : qual = TRop::Cubic1;
-		CASE TRenderSettings::Hann2_FilterResampleQuality : qual = TRop::Hann2;
-		CASE TRenderSettings::Hann3_FilterResampleQuality : qual = TRop::Hann3;
-		CASE TRenderSettings::Hamming2_FilterResampleQuality : qual = TRop::Hamming2;
-		CASE TRenderSettings::Hamming3_FilterResampleQuality : qual = TRop::Hamming3;
-		CASE TRenderSettings::Lanczos2_FilterResampleQuality : qual = TRop::Lanczos2;
-		CASE TRenderSettings::Lanczos3_FilterResampleQuality : qual = TRop::Lanczos3;
-		CASE TRenderSettings::Gauss_FilterResampleQuality : qual = TRop::Gauss;
-		CASE TRenderSettings::ClosestPixel_FilterResampleQuality : qual = TRop::ClosestPixel;
-		CASE TRenderSettings::Bilinear_FilterResampleQuality : qual = TRop::Bilinear;
-	DEFAULT:
+		break;
+	case TRenderSettings::ImprovedResampleQuality:
+		qual = TRop::Hann2;
+		break;
+	case TRenderSettings::HighResampleQuality:
+		qual = TRop::Hamming3;
+		break;
+	case TRenderSettings::Triangle_FilterResampleQuality:
+		qual = TRop::Triangle;
+		break;
+	case TRenderSettings::Mitchell_FilterResampleQuality:
+		qual = TRop::Mitchell;
+		break;
+	case TRenderSettings::Cubic5_FilterResampleQuality:
+		qual = TRop::Cubic5;
+		break;
+	case TRenderSettings::Cubic75_FilterResampleQuality:
+		qual = TRop::Cubic75;
+		break;
+	case TRenderSettings::Cubic1_FilterResampleQuality:
+		qual = TRop::Cubic1;
+		break;
+	case TRenderSettings::Hann2_FilterResampleQuality:
+		qual = TRop::Hann2;
+		break;
+	case TRenderSettings::Hann3_FilterResampleQuality:
+		qual = TRop::Hann3;
+		break;
+	case TRenderSettings::Hamming2_FilterResampleQuality:
+		qual = TRop::Hamming2;
+		break;
+	case TRenderSettings::Hamming3_FilterResampleQuality:
+		qual = TRop::Hamming3;
+		break;
+	case TRenderSettings::Lanczos2_FilterResampleQuality:
+		qual = TRop::Lanczos2;
+		break;
+	case TRenderSettings::Lanczos3_FilterResampleQuality:
+		qual = TRop::Lanczos3;
+		break;
+	case TRenderSettings::Gauss_FilterResampleQuality:
+		qual = TRop::Gauss;
+		break;
+	case TRenderSettings::ClosestPixel_FilterResampleQuality:
+		qual = TRop::ClosestPixel;
+		break;
+	case TRenderSettings::Bilinear_FilterResampleQuality:
+		qual = TRop::Bilinear;
+		break;
+	default:
 		assert(false);
 	}
 

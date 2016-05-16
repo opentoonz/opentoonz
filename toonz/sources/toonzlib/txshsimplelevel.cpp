@@ -1888,15 +1888,17 @@ TImageP TXshSimpleLevel::createEmptyFrame()
 	case PLI_XSHLEVEL:
 		result = new TVectorImage;
 
-		CASE MESH_XSHLEVEL : assert(false); // Not implemented yet
+	case MESH_XSHLEVEL:
+		assert(false); // Not implemented yet
+		break;
 
-	DEFAULT : {
+	default: {
 		// normally the image must have the level->getProperties()->getImageDpi().
 		// if this value is missing (for some reason - can this happen, ever?) then
 		// we use the getDpi() (that is the current dpi, e.g. cameraDpi or customDpi).
 
 		TPointD dpi = getProperties()->getImageDpi();
-		/*-- 
+		/*--
 		tgaからtlvにconvertしたものをInsert Pasteしたとき、
 		ペーストしたフレームにのみDPIが付いてしまうので、この処理は省く
 		--*/
@@ -1921,6 +1923,8 @@ TImageP TXshSimpleLevel::createEmptyFrame()
 
 			result = ri;
 		}
+
+		break;
 	}
 	}
 
@@ -2273,9 +2277,11 @@ TRectD TXshSimpleLevel::getBBox(const TFrameId &fid) const
 
 		if (TMeshImageP mi = img)
 			mi->getDpi(dpiX, dpiY);
+
+		break;
 	}
 
-	DEFAULT : {
+	default: {
 		// Raster case: retrieve the image info from the ImageManager
 		const std::string &imageId = getImageId(fid);
 
@@ -2289,6 +2295,8 @@ TRectD TXshSimpleLevel::getBBox(const TFrameId &fid) const
 
 		if (info->m_dpix > 0.0 && info->m_dpiy > 0.0)
 			dpiX = info->m_dpix, dpiY = info->m_dpiy;
+
+		break;
 	}
 	}
 

@@ -74,30 +74,36 @@ void OLDHSV2RGB(double hue, double sat, double value,
 		t = value * (1 - (sat * (1 - f)));
 
 		switch (i) {
-			CASE 0 :
-				*red = value;
+		case 0:
+			*red = value;
 			*green = t;
 			*blue = p;
-			CASE 1 :
-				*red = q;
+			break;
+		case 1:
+			*red = q;
 			*green = value;
 			*blue = p;
-			CASE 2 :
-				*red = p;
+			break;
+		case 2:
+			*red = p;
 			*green = value;
 			*blue = t;
-			CASE 3 :
-				*red = p;
+			break;
+		case 3:
+			*red = p;
 			*green = q;
 			*blue = value;
-			CASE 4 :
-				*red = t;
+			break;
+		case 4:
+			*red = t;
 			*green = p;
 			*blue = value;
-			CASE 5 :
-				*red = value;
+			break;
+		case 5:
+			*red = value;
 			*green = p;
 			*blue = q;
+			break;
 		}
 	}
 }

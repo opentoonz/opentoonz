@@ -1299,7 +1299,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col, bool isReference)
 
 void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated)
 {
-	int r0, r1, c0, c1; // range of visible rows and columns 
+	int r0, r1, c0, c1; // range of visible rows and columns
 	r0 = m_viewer->yToRow(toBeUpdated.top());
 	r1 = m_viewer->yToRow(toBeUpdated.bottom());
 	c0 = m_viewer->xToColumn(toBeUpdated.left());
@@ -1377,7 +1377,7 @@ void CellArea::drawKeyframe(QPainter &p, const QRect toBeUpdated)
 					p.drawPixmap(x1, y + keyPixOffset, key);
 				}
 			} 
-		}
+					}
 
 		int y1 = m_viewer->rowToY(row1 + 1);
 		if (!emptyKeyframeRange && row0 <= row1 + 1) {

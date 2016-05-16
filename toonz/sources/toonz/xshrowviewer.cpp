@@ -263,7 +263,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p)
 	}
 
 	// Draw onion skin extender handles.
-	QRectF handleRect(3, m_viewer->rowToY(currentRow) + 1, onionHandleDiam, onionHandleDiam );
+	QRectF handleRect(3, m_viewer->rowToY(currentRow) + 1, onionHandleDiam, onionHandleDiam);
 	int angle180 = 16 * 180;
 	p.setBrush(QBrush(backColor));
 	p.drawChord(handleRect, 0, angle180);
@@ -315,7 +315,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p)
 	}
 
 	//-- draw fixed onions
-	for (int i = 0; i < osMask.getFosCount(); i++) 
+	for (int i = 0; i < osMask.getFosCount(); i++)
 	{
 		int fos = osMask.getFos(i);
 		if (fos == currentRow) continue;
@@ -323,14 +323,14 @@ void RowArea::drawOnionSkinSelection(QPainter &p)
 		if (m_showOnionToSet == Fos && fos == m_row)
 			continue;
 		int y = m_viewer->rowToY(fos) + onionDotYPos;
-		
+
 		if (osMask.isEnabled())
 			p.setBrush(QBrush(QColor(0, 255, 255, 128)));
 		else
 			p.setBrush(Qt::NoBrush);
 		p.drawEllipse(0, y, onionDotDiam, onionDotDiam);
 	}
-	
+
 	//-- draw highlighted onion
 	if (m_showOnionToSet != None)
 	{
@@ -402,28 +402,28 @@ void RowArea::mousePressEvent(QMouseEvent *event)
 		}
 		else
 		{
-			int playR0, playR1, step;
-			XsheetGUI::getPlayRange(playR0, playR1, step);
+		int playR0, playR1, step;
+		XsheetGUI::getPlayRange(playR0, playR1, step);
 
-			bool playRangeEnabled = playR0 <= playR1;
-			if (!playRangeEnabled) {
-				TXsheet *xsh = m_viewer->getXsheet();
-				playR1 = xsh->getFrameCount() - 1;
-				playR0 = 0;
-			}
+		bool playRangeEnabled = playR0 <= playR1;
+		if (!playRangeEnabled) {
+			TXsheet *xsh = m_viewer->getXsheet();
+			playR1 = xsh->getFrameCount() - 1;
+			playR0 = 0;
+		}
 
-			if (playR1 == -1) { //getFrameCount = 0 i.e. xsheet is empty
-				setDragTool(XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
+		if (playR1 == -1) { //getFrameCount = 0 i.e. xsheet is empty
+			setDragTool(XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
 				frameAreaIsClicked = true;
 			}
 			else if (m_xa <= pos.x && pos.x <= m_xa + 10 && (row == playR0 || row == playR1)) {
-				if (!playRangeEnabled)
-					XsheetGUI::setPlayRange(playR0, playR1, step);
-				setDragTool(XsheetGUI::DragTool::makePlayRangeModifierTool(m_viewer));
+			if (!playRangeEnabled)
+				XsheetGUI::setPlayRange(playR0, playR1, step);
+			setDragTool(XsheetGUI::DragTool::makePlayRangeModifierTool(m_viewer));
 			}
 			else
 			{
-				setDragTool(XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
+			setDragTool(XsheetGUI::DragTool::makeCurrentFrameModifierTool(m_viewer));
 				frameAreaIsClicked = true;
 			}
 		}
@@ -510,7 +510,7 @@ void RowArea::mouseMoveEvent(QMouseEvent *event)
 		if (Preferences::instance()->isOnionSkinEnabled() && x < RowHeight + 2)
 			m_tooltip = tr("Double Click to Toggle Onion Skin");
 		else
-			m_tooltip = tr("Curren Frame");
+		m_tooltip = tr("Curren Frame");
 	}
 	else if (m_showOnionToSet == Fos)
 		m_tooltip = tr("Fixed Onion Skin Toggle");
@@ -541,8 +541,6 @@ void RowArea::mouseReleaseEvent(QMouseEvent *event)
 
 void RowArea::contextMenuEvent(QContextMenuEvent *event)
 {
-#ifndef STUDENT
-
 	OnionSkinMask osMask = TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
 
 	QMenu *menu = new QMenu(this);
@@ -571,16 +569,13 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event)
 	menu->addAction(cmdManager->getAction(MI_InsertGlobalKeyframe));
 	menu->addAction(cmdManager->getAction(MI_RemoveGlobalKeyframe));
 
-#ifndef LINETEST
 	menu->addSeparator();
 	menu->addAction(cmdManager->getAction(MI_ShiftTrace));
 	menu->addAction(cmdManager->getAction(MI_EditShift));
 	menu->addAction(cmdManager->getAction(MI_NoShift));
 	menu->addAction(cmdManager->getAction(MI_ResetShift));
-#endif
 
 	menu->exec(event->globalPos());
-#endif
 }
 
 //-----------------------------------------------------------------------------

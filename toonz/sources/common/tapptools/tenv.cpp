@@ -153,15 +153,18 @@ public:
 		m_envFile = profilesDir + "env" + (TSystem::getUserName().toStdString() + ".env");
 	}
 
-	void setApplication(std::string applicationName, std::string applicationVersion)
+	void setApplication(std::string applicationName, std::string applicationVersion, std::string revision)
 	{
 		m_applicationName = applicationName;
 		m_applicationVersion = applicationVersion;
+		if (!revision.empty()) {
+			m_applicationVersion += "." + revision;
+		}
 		m_applicationFullName = m_applicationName + " " + m_applicationVersion;
 		m_moduleName = m_applicationName;
 		m_rootVarName = toUpper(m_applicationName) + "ROOT";
 #ifdef _WIN32
-		m_registryRoot = TFilePath("SOFTWARE\\OpenToonz\\") + m_applicationName + m_applicationVersion;
+		m_registryRoot = TFilePath("SOFTWARE\\OpenToonz\\") + m_applicationName + applicationVersion;
 #endif
 		m_systemVarPrefix = m_applicationName;
 		updateEnvFile();
@@ -458,9 +461,9 @@ void Variable::assignValue(std::string value)
 
 //===================================================================
 
-void TEnv::setApplication(std::string applicationName, std::string applicationVersion)
+void TEnv::setApplication(std::string applicationName, std::string applicationVersion, std::string revision)
 {
-	EnvGlobals::instance()->setApplication(applicationName, applicationVersion);
+	EnvGlobals::instance()->setApplication(applicationName, applicationVersion, revision);
 
 #ifdef LEVO_MACOSX
 	TOfflineGL::defineImpGenerator(MacOfflineGenerator1);

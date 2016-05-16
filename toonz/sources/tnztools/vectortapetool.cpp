@@ -662,10 +662,16 @@ public:
 		switch (type) {
 		case p2p:
 			joinPointToPoint(vi, fillInformation);
-			CASE p2l : joinPointToLine(vi, fillInformation);
-			CASE l2l : joinLineToLine(vi, fillInformation);
-		DEFAULT:
+			break;
+		case p2l:
+			joinPointToLine(vi, fillInformation);
+			break;
+		case l2l:
+			joinLineToLine(vi, fillInformation);
+			break;
+		default:
 			assert(false);
+			break;
 		}
 		return type;
 	}

@@ -223,21 +223,16 @@ int Displace_vector[8];
 /*------------------------------------------------------------------------*/
 
 #define UPDATE_POS(displ_code, x_pos, y_pos) \
-	switch (displ_code) {                    \
-		CASE 0 : x_pos--;                    \
-		y_pos--;                             \
-		CASE 1 : y_pos--;                    \
-		CASE 2 : x_pos++;                    \
-		y_pos--;                             \
-		CASE 3 : x_pos--;                    \
-		CASE 4 : x_pos++;                    \
-		CASE 5 : x_pos--;                    \
-		y_pos++;                             \
-		CASE 6 : y_pos++;                    \
-		CASE 7 : x_pos++;                    \
-		y_pos++;                             \
-	DEFAULT:                                 \
-		assert(FALSE);                       \
+	switch (displ_code) { \
+	case 0: x_pos--; y_pos--; break; \
+	case 1:          y_pos--; break; \
+	case 2: x_pos++; y_pos--; break; \
+	case 3: x_pos--;          break; \
+	case 4: x_pos++;          break; \
+	case 5: x_pos--; y_pos++; break; \
+	case 6:          y_pos++; break; \
+	case 7: x_pos++; y_pos++; break; \
+	default: assert(FALSE); \
 	}
 
 /*------------------------------------------------------------------------*/

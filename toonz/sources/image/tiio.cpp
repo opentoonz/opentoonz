@@ -1,5 +1,4 @@
 
-
 #include "tnzimage.h"
 #include "tiio.h"
 #include "tfiletype.h"
@@ -70,9 +69,6 @@ void initImageIo(bool lightVersion)
 {
 
 	if (!lightVersion) {
-
-#ifndef XPRESS
-
 		TLevelWriter::define("pli", TLevelWriterPli::create, false);
 		TLevelReader::define("pli", TLevelReaderPli::create);
 		TFileType::declare("pli", TFileType::VECTOR_LEVEL);
@@ -81,10 +77,6 @@ void initImageIo(bool lightVersion)
 		TFileType::declare("svg", TFileType::VECTOR_LEVEL);
 		TLevelWriter::define("svg", TLevelWriterSvg::create, false);
 		Tiio::defineWriterProperties("svg", new Tiio::SvgWriterProperties());
-
-#endif // !XPRESS
-
-#ifndef BRAVO
 
 		TLevelWriter::define("tzl", TLevelWriterTzl::create, false);
 		TLevelReader::define("tzl", TLevelReaderTzl::create);
@@ -108,8 +100,6 @@ void initImageIo(bool lightVersion)
 		Tiio::defineReaderMaker("plt", Tiio::makePltReader);
 		Tiio::defineWriterMaker("plt", Tiio::makePltWriter, false);
 		TFileType::declare("plt", TFileType::RASTER_IMAGE);
-
-#endif // !BRAVO
 
 		Tiio::defineReaderMaker("nol", Tiio::makePngReader);
 		Tiio::defineWriterMaker("nol", Tiio::makePngWriter, true);

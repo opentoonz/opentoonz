@@ -1474,16 +1474,6 @@ Sélectionnez les nœuds FX et les liens connexes avant de copier ou couper la s
         <translation>Appliquer</translation>
     </message>
     <message>
-        <source>This feature is not available in the demo version.
-For more information visit the %1 site:</source>
-        <translation>Cette fonctionnalité n&apos;est pas disponible dans la version de démonstration.
-Pour plus d&apos;informations visitez le site %1:</translation>
-    </message>
-    <message>
-        <source>To request a trial license please contact </source>
-        <translation>Pour demander une licence temporaire s&apos;il vous plaît contactez</translation>
-    </message>
-    <message>
         <source>For further information visit </source>
         <translation>Pour plus d&apos;informations visitez</translation>
     </message>

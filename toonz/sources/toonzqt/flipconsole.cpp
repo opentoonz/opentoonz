@@ -644,10 +644,14 @@ void FlipConsole::enableButton(UINT button, bool enable, bool doShowHide)
 	case eGRed:
 		if (m_doubleRed)
 			m_doubleRed->setEnabledSecondButton(enable);
-		CASE eGGreen : if (m_doubleGreen)
-						   m_doubleGreen->setEnabledSecondButton(enable);
-		CASE eGBlue : if (m_doubleBlue)
-						  m_doubleBlue->setEnabledSecondButton(enable);
+		break;
+	case eGGreen:
+		if (m_doubleGreen)
+			m_doubleGreen->setEnabledSecondButton(enable);
+		break;
+	case eGBlue:
+		if (m_doubleBlue)
+			m_doubleBlue->setEnabledSecondButton(enable);
 		break;
 	}
 }
@@ -1376,53 +1380,61 @@ void FlipConsole::doButtonPressed(UINT button)
 	switch (button) {
 	case eFirst:
 		m_currentFrame = from;
-		CASE ePrev : m_currentFrame = (m_currentFrame - m_step < from) ? from : m_currentFrame - m_step;
-		CASE eNext : m_currentFrame = (m_currentFrame + m_step > to) ? to : m_currentFrame + m_step;
-		CASE eLast : m_currentFrame = to;
-		CASE ePlay : __OR eLoop:
-		{
-			//if (	  isChecked(ePlay,   false);
-			//setChecked(eLoop,   false);
-			m_editCurrFrame->disconnect();
-			m_currFrameSlider->disconnect();
+		break;
+	case ePrev:
+		m_currentFrame = (m_currentFrame - m_step < from) ? from : m_currentFrame - m_step;
+		break;
+	case eNext:
+		m_currentFrame = (m_currentFrame + m_step > to) ? to : m_currentFrame + m_step;
+		break;
+	case eLast:
+		m_currentFrame = to;
+		break;
+	case ePlay:
+	case eLoop:
+		//if (	  isChecked(ePlay,   false);
+		//setChecked(eLoop,   false);
+		m_editCurrFrame->disconnect();
+		m_currFrameSlider->disconnect();
 
-			m_isPlay = (button == ePlay);
+		m_isPlay = (button == ePlay);
 
-			if (linked && m_isLinkedPlaying)
-				return;
+		if (linked && m_isLinkedPlaying)
+			return;
 
-			if ((m_fps == 0 || m_framesCount == 0) && m_playbackExecutor.isRunning()) {
-				doButtonPressed(ePause);
-				if (m_fpsLabel)
-					m_fpsLabel->setText(tr(" FPS ") + QString::number(m_fps));
-				if (m_fpsField)
-					m_fpsField->setLineEditBackgroundColor(Qt::transparent);
-				return;
-			}
+		if ((m_fps == 0 || m_framesCount == 0) && m_playbackExecutor.isRunning()) {
+			doButtonPressed(ePause);
 			if (m_fpsLabel)
-				m_fpsLabel->setText(tr(" FPS	") + "/");
+				m_fpsLabel->setText(tr(" FPS ") + QString::number(m_fps));
 			if (m_fpsField)
-				m_fpsField->setLineEditBackgroundColor(Qt::red);
-
-			m_playbackExecutor.resetFps(m_fps);
-			if (!m_playbackExecutor.isRunning())
-				m_playbackExecutor.start();
-			m_isLinkedPlaying = linked;
-
-			m_reverse = (m_fps < 0);
-
-			if (!linked) {
-				//if the play button pressed at the end frame, then go back to the start frame and play
-				if (m_currentFrame <= from || m_currentFrame >= to) //the first frame of the playback is drawn right now
-					m_currentFrame = m_reverse ? to : from;
-				m_settings.m_recomputeIfNeeded = true;
-				m_consoleOwner->onDrawFrame(m_currentFrame, m_settings);
-			}
-
-			emit playStateChanged(true);
+				m_fpsField->setLineEditBackgroundColor(Qt::transparent);
 			return;
 		}
-		CASE ePause : m_isLinkedPlaying = false;
+		if (m_fpsLabel)
+			m_fpsLabel->setText(tr(" FPS	") + "/");
+		if (m_fpsField)
+			m_fpsField->setLineEditBackgroundColor(Qt::red);
+
+		m_playbackExecutor.resetFps(m_fps);
+		if (!m_playbackExecutor.isRunning())
+			m_playbackExecutor.start();
+		m_isLinkedPlaying = linked;
+
+		m_reverse = (m_fps < 0);
+
+		if (!linked) {
+			//if the play button pressed at the end frame, then go back to the start frame and play
+			if (m_currentFrame <= from || m_currentFrame >= to) //the first frame of the playback is drawn right now
+				m_currentFrame = m_reverse ? to : from;
+			m_settings.m_recomputeIfNeeded = true;
+			m_consoleOwner->onDrawFrame(m_currentFrame, m_settings);
+		}
+
+		emit playStateChanged(true);
+		return;
+
+	case ePause:
+		m_isLinkedPlaying = false;
 
 		if (m_playbackExecutor.isRunning())
 			m_playbackExecutor.abort();
@@ -1451,86 +1463,94 @@ void FlipConsole::doButtonPressed(UINT button)
 		connect(m_currFrameSlider, SIGNAL(flipSliderReleased()), this, SLOT(onSliderRelease()));
 		emit playStateChanged(false);
 		return;
-		/*CASE eMatte:
-		if (isChecked(eMatte))
-			{
-			//setChecked(eRed,   false);
-			//setChecked(eGreen, false);
-			//setChecked(eBlue,  false);
-			setChecked(eGRed,   false);
+
+	case eGRed:
+	case eGGreen:
+	case eGBlue:
+	case eRed:
+	case eGreen:
+	case eBlue:
+	case eMatte: {
+		if (button != eGRed)
+			setChecked(eGRed, false);
+		if (button != eGGreen)
 			setChecked(eGGreen, false);
-			setChecked(eGBlue,  false);
-			m_settings.m_colorMask = TRop::MChan;
-			}
-		else
-			m_settings.m_colorMask = 0;
-			
-	if (m_doubleRed)
-    {
-    m_doubleRed->update();
-	  m_doubleGreen->update();
-	  m_doubleBlue->update();
-	  }*/
+		if (button != eGBlue)
+			setChecked(eGBlue, false);
 
-		CASE eGRed : __OR eGGreen : __OR eGBlue : __OR eRed : __OR eGreen : __OR eBlue : __OR eMatte:
-		{
+		if (button == eGRed || button == eGGreen || button == eGBlue) {
+			m_settings.m_greytones = isChecked(button);
+			setChecked(eRed, false);
+			setChecked(eGreen, false);
+			setChecked(eBlue, false);
+			setChecked(eMatte, false);
+		} else
+			m_settings.m_greytones = false;
 
-			if (button != eGRed)
-				setChecked(eGRed, false);
-			if (button != eGGreen)
-				setChecked(eGGreen, false);
-			if (button != eGBlue)
-				setChecked(eGBlue, false);
-
-			if (button == eGRed || button == eGGreen || button == eGBlue) {
-				m_settings.m_greytones = isChecked(button);
-				setChecked(eRed, false);
-				setChecked(eGreen, false);
-				setChecked(eBlue, false);
-				setChecked(eMatte, false);
-			} else
-				m_settings.m_greytones = false;
-
-			if (m_doubleRed) {
-				m_doubleRed->update();
-				m_doubleGreen->update();
-				m_doubleBlue->update();
-			}
-
-			int colorMask = 0;
-			if (isChecked(eRed) || isChecked(eGRed))
-				colorMask = colorMask | TRop::RChan;
-			if (isChecked(eGreen) || isChecked(eGGreen))
-				colorMask = colorMask | TRop::GChan;
-			if (isChecked(eBlue) || isChecked(eGBlue))
-				colorMask = colorMask | TRop::BChan;
-			if (isChecked(eMatte))
-				colorMask = colorMask | TRop::MChan;
-
-			if (colorMask == (TRop::RChan | TRop::GChan | TRop::BChan) ||
-				colorMask == (TRop::RChan | TRop::GChan | TRop::BChan | TRop::MChan))
-				m_settings.m_colorMask = 0;
-			else
-				m_settings.m_colorMask = colorMask;
+		if (m_doubleRed) {
+			m_doubleRed->update();
+			m_doubleGreen->update();
+			m_doubleBlue->update();
 		}
-		CASE eSound :
-			//emit soundEnabled(isChecked(eSound));
-			CASE eWhiteBg : __OR eBlackBg : __OR eCheckBg : m_settings.m_bg = (EGadget)button;
+
+		int colorMask = 0;
+		if (isChecked(eRed) || isChecked(eGRed))
+			colorMask = colorMask | TRop::RChan;
+		if (isChecked(eGreen) || isChecked(eGGreen))
+			colorMask = colorMask | TRop::GChan;
+		if (isChecked(eBlue) || isChecked(eGBlue))
+			colorMask = colorMask | TRop::BChan;
+		if (isChecked(eMatte))
+			colorMask = colorMask | TRop::MChan;
+
+		if (colorMask == (TRop::RChan | TRop::GChan | TRop::BChan) ||
+			colorMask == (TRop::RChan | TRop::GChan | TRop::BChan | TRop::MChan))
+			m_settings.m_colorMask = 0;
+		else
+			m_settings.m_colorMask = colorMask;
+		break;
+	}
+	case eSound:
+		//emit soundEnabled(isChecked(eSound));
+		break;
+
+	case eWhiteBg:
+	case eBlackBg:
+	case eCheckBg:
+		m_settings.m_bg = (EGadget)button;
 		FlipBookWhiteBgToggle = isChecked(eWhiteBg);
 		FlipBookBlackBgToggle = isChecked(eBlackBg);
 		FlipBookCheckBgToggle = isChecked(eCheckBg);
-		CASE FlipConsole::eCompare : m_settings.m_doCompare = !m_settings.m_doCompare;
-		CASE eHisto : CASE eSaveImg : CASE eSave :
-									  //nothing to do
-									  return;
-		CASE eDefineSubCamera :
-			//nothing to do
-			return;
-		CASE eDefineLoadBox : onLoadBox(true);
-		CASE eUseLoadBox : onLoadBox(false);
-		CASE eFilledRaster : return;
-	DEFAULT:
+		break;
+
+	case FlipConsole::eCompare:
+		m_settings.m_doCompare = !m_settings.m_doCompare;
+		break;
+
+	case eHisto:
+	case eSaveImg:
+	case eSave:
+		//nothing to do
+		return;
+
+	case eDefineSubCamera:
+		//nothing to do
+		return;
+
+	case eDefineLoadBox:
+		onLoadBox(true);
+		break;
+
+	case eUseLoadBox:
+		onLoadBox(false);
+		break;
+
+	case eFilledRaster:
+		return;
+
+	default:
 		assert(false);
+		break;
 	}
 
 	m_currFrameSlider->setValue(m_currentFrame);

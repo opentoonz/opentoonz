@@ -125,8 +125,6 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
 	if (tool && tool->isEnabled())
 		tool->addContextMenuItems(this);
 
-#ifndef LINETEST
-
 	// fullscreen
 	if (ImageUtils::FullScreenWidget *fsWidget =
 			dynamic_cast<ImageUtils::FullScreenWidget *>(m_viewer->parentWidget())) {
@@ -136,8 +134,6 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
 		addAction(action);
 		ret = ret && parent->connect(action, SIGNAL(triggered()), fsWidget, SLOT(toggleFullScreen()));
 	}
-
-#endif
 
 	// swap compared
 	if (parent->canSwapCompared()) {
@@ -163,10 +159,8 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
 	ret = ret && parent->connect(action, SIGNAL(triggered()), SLOT(setActualPixelSize()));
 
 // onion skin
-#ifndef STUDENT
 	if (Preferences::instance()->isOnionSkinEnabled() && !parent->isPreviewEnabled())
 		OnioniSkinMaskGUI::addOnionSkinCommand(this);
-#endif
 
 	// preview
 	if (parent->isPreviewEnabled()) {
@@ -288,7 +282,6 @@ void SceneViewerContextMenu::addLevelCommands(std::vector<int> &indices)
   }
   else
   */
-#ifndef LINETEST
 
 	/*-- Scene内の全Objectを選択可能にする --*/
 	TStageObjectId id;
@@ -320,7 +313,6 @@ void SceneViewerContextMenu::addLevelCommands(std::vector<int> &indices)
 	if (!flag)
 		columnMenu->setEnabled(false);
 
-#endif
 }
 
 //-----------------------------------------------------------------------------

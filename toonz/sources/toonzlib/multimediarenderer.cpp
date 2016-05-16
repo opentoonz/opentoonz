@@ -125,8 +125,11 @@ void MultimediaRenderer::Imp::scanSceneForRenderNodes()
 	switch (m_multimediaMode) {
 	case COLUMNS:
 		scanSceneForColumns();
-		CASE LAYERS : scanSceneForLayers();
-	DEFAULT:
+		break;
+	case LAYERS:
+		scanSceneForLayers();
+		break;
+	default:
 		assert(0);
 	}
 }
@@ -285,8 +288,11 @@ void MultimediaRenderer::Imp::start()
 	switch (m_multimediaMode) {
 	case COLUMNS:
 		modeStr = L"_col";
-		CASE LAYERS : modeStr = L"_lay";
-	DEFAULT:
+		break;
+	case LAYERS:
+		modeStr = L"_lay";
+		break;
+	default:
 		assert(0);
 	}
 

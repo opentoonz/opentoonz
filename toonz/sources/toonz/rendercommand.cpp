@@ -96,86 +96,6 @@ TRaster32P loadLight()
 	return ras;
 }
 
-#ifdef BRAVODEMO
-
-//---------------------------------------------------------
-
-TRaster32P loadBravo(const TDimension &res)
-{
-	static TRaster32P ras(160, 60);
-	static TDimension Res;
-	static TRaster32P rasOut;
-	static bool filled = false;
-
-	if (!filled) {
-		filled = true;
-		ras->lock();
-		UINT *pix = (UINT *)ras->getRawData();
-
-		for (UINT i = 0; i < 5216; i += 2)
-			for (UINT j = 0; j < bravoMark160x60[i]; j++)
-				*pix++ = bravoMark160x60[i + 1];
-
-		ras->unlock();
-	}
-
-	if (Res != res) {
-		rasOut = TRaster32P();
-		int outLx, outLy;
-
-		if (res.ly < res.lx) {
-			outLy = troundp(res.ly * 60.0 / 576.0);
-			outLx = troundp(outLy * 160. / 60.0);
-		} else {
-			outLx = troundp(res.lx * 160.0 / 768.0);
-			outLy = troundp(outLx * 60.0 / 160.0);
-		}
-
-		if (outLx == 160 && outLy == 60)
-			rasOut = ras;
-		else {
-			rasOut = TRaster32P(outLx, outLy);
-			TRop::resample(rasOut, ras, TScale(outLx / 160.0, outLy / 60.0).place(ras->getCenterD(), rasOut->getCenterD()));
-		}
-		Res = res;
-	}
-
-	return rasOut;
-
-#ifdef CREA_MARK
-	TRasterP ras1;
-	TImageReader::load(TFilePath("C:\\bravo52\\watermark.tif"), ras1);
-	UINT *pix1 = (UINT *)ras1->getRawData();
-	UINT *pixm = pix1;
-	int counter = 0;
-	int totcount = 0;
-	int tmpcount = 0;
-	int tt = 0;
-	Tofstream os(TFilePath("c:\\test.txt"));
-	for (UINT i = 0; i < ras1->getLx(); i++)
-		for (UINT j = 0; j < ras1->getLy(); j++) {
-			if (*pix1 == *pixm)
-				counter++;
-			else {
-
-				os << counter << ", " << *pixm << ", ";
-				*pixm = *pix1;
-				tmpcount += counter;
-				counter = 1;
-				tt++;
-				int azz = tt % 10;
-				if (!(tt % 10))
-					os << "\n";
-			}
-			*pix1++;
-			totcount++;
-		}
-	tmpcount += counter;
-	os << counter << ", " << *pixm << ", ";
-#endif
-	return ras;
-}
-#endif
 } //namespace
 
 //---------------------------------------------------------
@@ -416,17 +336,6 @@ void RenderCommand::flashRender()
 		TRasterFxP rfx = buildSceneFx(scene, m_r, 0, false);
 		assert(rfx);
 		rfx->compute(flash, tround(m_r)); // WARNING: This should accept a DOUBLE...
-#ifdef BRAVODEMO
-		TRasterImageP ri(loadBravo(scene->getCurrentCamera()->getRes()));
-		int lx = ri->getRaster()->getLx();
-		int ly = ri->getRaster()->getLx();
-		flash.pushMatrix();
-		int dx = tround(0.1 * (cameraSize.lx - lx));
-		int dy = tround(0.1 * (cameraSize.ly - ly));
-		flash.multMatrix(TTranslation((cameraSize.lx - lx) / 2 - (dx > 0 ? dx : 0), -(cameraSize.ly - ly) / 2 + (dy > 0 ? dy : 0)));
-		flash.draw(ri, 0);
-		flash.popMatrix();
-#endif
 		flash.endFrame(i == m_numFrames - 1, 0, true);
 		if (pb.wasCanceled())
 			break;
@@ -572,9 +481,6 @@ void RenderCommand::rasterRender(bool isPreview)
 
 //Build
 
-#ifdef BRAVODEMO
-	rs.m_mark = loadBravo(scene->getCurrentCamera()->getRes());
-#endif
 	/*-- RenderSettingsをセット --*/
 	movieRenderer.setRenderSettings(rs);
 	/*-- カメラDPIの取得、セット --*/
@@ -777,10 +683,6 @@ void RenderCommand::multimediaRender()
 
 	MultimediaRenderer multimediaRenderer(scene, m_fp, prop->getMultimediaRendering(), threadCount);
 	multimediaRenderer.setRenderSettings(rs);
-
-#ifdef BRAVODEMO
-	rs.m_mark = loadBravo(scene->getCurrentCamera()->getRes());
-#endif
 
 	TPointD cameraDpi = scene->getCurrentCamera()->getDpi();
 	multimediaRenderer.setDpi(cameraDpi.x, cameraDpi.y);

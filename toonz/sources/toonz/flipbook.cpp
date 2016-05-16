@@ -750,9 +750,13 @@ void FlipBook::onButtonPressed(FlipConsole::EGadget button)
 	switch (button) {
 	case FlipConsole::eSound:
 		m_playSound = !m_playSound;
-		CASE FlipConsole::eHisto : m_imageViewer->showHistogram();
-		CASE FlipConsole::eSaveImg:
-		{
+		break;
+	
+	case FlipConsole::eHisto:
+		m_imageViewer->showHistogram();
+		break;
+	
+	case FlipConsole::eSaveImg: {
 			TRect loadbox = m_loadbox;
 			m_loadbox = TRect();
 			TImageP img = getCurrentImage(m_flipConsole->getCurrentFrame());
@@ -772,15 +776,20 @@ void FlipBook::onButtonPressed(FlipConsole::EGadget button)
 			else
 				clonedImg = TToonzImageP(ti->getRaster()->clone(), ti->getSavebox());
 			TImageCache::instance()->add(QString("TnzCompareImg"), clonedImg);
+			break;
 		}
-		CASE FlipConsole::eCompare : if ((TVectorImageP)getCurrentImage(m_flipConsole->getCurrentFrame()))
-		{
+
+	case FlipConsole::eCompare:
+		if ((TVectorImageP)getCurrentImage(m_flipConsole->getCurrentFrame())) {
 			DVGui::warning(tr("It is not possible to take or compare snapshots for Toonz vector levels."));
 			m_flipConsole->setChecked(FlipConsole::eCompare, false);
 			return;
 		}
-		CASE FlipConsole::eSave : saveImages();
-	DEFAULT:;
+		break;
+
+	case FlipConsole::eSave:
+		saveImages();
+		break;
 	}
 }
 

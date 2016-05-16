@@ -775,11 +775,7 @@ EditTool::EditTool()
 {
 	bind(TTool::AllTargets);
 	m_prop.bind(m_scaleConstraint);
-	//#ifdef STUDENT
-	//	m_autoSelect.setValue(true);
-	//#else
 	m_prop.bind(m_autoSelect);
-	//#endif
 	m_prop.bind(m_globalKeyframes);
 
 	m_prop.bind(m_lockCenterX);

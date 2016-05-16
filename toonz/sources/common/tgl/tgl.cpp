@@ -10,6 +10,7 @@
 
 #ifndef __sgi
 #ifdef _WIN32
+#include <cstdlib>
 #include <GL/glut.h>
 #elif defined(LINUX)
 #include <GL/glut.h>

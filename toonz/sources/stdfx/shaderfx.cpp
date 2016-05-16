@@ -295,11 +295,12 @@ public:
 			case ShadingContext::NO_PIXEL_BUFFER:
 				DVGui::warning(QGLShaderProgram::tr(
 					"This system configuration does not support OpenGL Pixel Buffers. Shader Fxs will not be able to render."));
+				break;
 
-				CASE ShadingContext::NO_SHADERS : DVGui::warning(QGLShaderProgram::tr(
-													  "This system configuration does not support OpenGL Shader Programs. Shader Fxs will not be able to render."));
-
-			DEFAULT:;
+			case ShadingContext::NO_SHADERS:
+				DVGui::warning(QGLShaderProgram::tr(
+					"This system configuration does not support OpenGL Shader Programs. Shader Fxs will not be able to render."));
+				break;
 			}
 
 			sentMsg = true;
@@ -444,96 +445,112 @@ void ShaderFx::initialize()
 
 			m_params.push_back(param);
 			bindParam(this, siParam.m_name.toStdString(),
-					  *boost::unsafe_any_cast<TBoolParamP>(&m_params.back()));
+				*boost::unsafe_any_cast<TBoolParamP>(&m_params.back()));
+
+			break;
 		}
 
-			CASE ShaderInterface::FLOAT:
-			{
-				TDoubleParamP param(siParam.m_default.m_float);
-				param->setValueRange(siParam.m_range[0].m_float, siParam.m_range[1].m_float);
+		case ShaderInterface::FLOAT: {
+			TDoubleParamP param(siParam.m_default.m_float);
+			param->setValueRange(siParam.m_range[0].m_float, siParam.m_range[1].m_float);
 
-				locals.addUiConcept(siParam, param);
+			locals.addUiConcept(siParam, param);
 
-				switch (siParam.m_concept.m_type) {
-				case ShaderInterface::PERCENT:
-					param->setMeasureName(l_measureNames[PERCENT]);
+			switch (siParam.m_concept.m_type) {
+			case ShaderInterface::PERCENT:
+				param->setMeasureName(l_measureNames[PERCENT]);
+				break;
 
-					CASE ShaderInterface::LENGTH : case ShaderInterface::RADIUS_UI : case ShaderInterface::WIDTH_UI : case ShaderInterface::SIZE_UI : param->setMeasureName(l_measureNames[LENGTH]);
+			case ShaderInterface::LENGTH:
+			case ShaderInterface::RADIUS_UI:
+			case ShaderInterface::WIDTH_UI:
+			case ShaderInterface::SIZE_UI:
+				param->setMeasureName(l_measureNames[LENGTH]);
+				break;
 
-					CASE ShaderInterface::ANGLE : case ShaderInterface::ANGLE_UI : param->setMeasureName(l_measureNames[ANGLE]);
-
-				DEFAULT:;
-				}
-
-				m_params.push_back(param);
-				bindParam(this, siParam.m_name.toStdString(),
-						  *boost::unsafe_any_cast<TDoubleParamP>(&m_params.back()));
+			case ShaderInterface::ANGLE:
+			case ShaderInterface::ANGLE_UI:
+				param->setMeasureName(l_measureNames[ANGLE]);
+				break;
 			}
 
-			CASE ShaderInterface::VEC2:
-			{
-				TPointParamP param(TPointD(
-					siParam.m_default.m_vec2[0], siParam.m_default.m_vec2[1]));
+			m_params.push_back(param);
+			bindParam(this, siParam.m_name.toStdString(),
+				*boost::unsafe_any_cast<TDoubleParamP>(&m_params.back()));
+			break;
+		}
 
-				param->getX()->setValueRange(siParam.m_range[0].m_vec2[0], siParam.m_range[1].m_vec2[0]);
-				param->getY()->setValueRange(siParam.m_range[0].m_vec2[1], siParam.m_range[1].m_vec2[1]);
+		case ShaderInterface::VEC2: {
+			TPointParamP param(TPointD(
+				siParam.m_default.m_vec2[0], siParam.m_default.m_vec2[1]));
 
-				locals.addUiConcept(siParam, param);
+			param->getX()->setValueRange(siParam.m_range[0].m_vec2[0], siParam.m_range[1].m_vec2[0]);
+			param->getY()->setValueRange(siParam.m_range[0].m_vec2[1], siParam.m_range[1].m_vec2[1]);
 
-				switch (siParam.m_concept.m_type) {
-				case ShaderInterface::PERCENT:
-					param->getX()->setMeasureName(l_measureNames[PERCENT]);
-					param->getY()->setMeasureName(l_measureNames[PERCENT]);
+			locals.addUiConcept(siParam, param);
 
-					CASE ShaderInterface::LENGTH : case ShaderInterface::POINT : case ShaderInterface::POINT_UI : case ShaderInterface::VECTOR_UI : case ShaderInterface::WIDTH_UI : case ShaderInterface::SIZE_UI : param->getX()->setMeasureName(l_measureNames[LENGTH]);
-					param->getY()->setMeasureName(l_measureNames[LENGTH]);
+			switch (siParam.m_concept.m_type) {
+			case ShaderInterface::PERCENT:
+				param->getX()->setMeasureName(l_measureNames[PERCENT]);
+				param->getY()->setMeasureName(l_measureNames[PERCENT]);
+				break;
 
-					CASE ShaderInterface::ANGLE : case ShaderInterface::ANGLE_UI : param->getX()->setMeasureName(l_measureNames[ANGLE]);
-					param->getY()->setMeasureName(l_measureNames[ANGLE]);
+			case ShaderInterface::LENGTH:
+			case ShaderInterface::POINT:
+			case ShaderInterface::POINT_UI:
+			case ShaderInterface::VECTOR_UI:
+			case ShaderInterface::WIDTH_UI:
+			case ShaderInterface::SIZE_UI:
+				param->getX()->setMeasureName(l_measureNames[LENGTH]);
+				param->getY()->setMeasureName(l_measureNames[LENGTH]);
+				break;
 
-				DEFAULT:;
-				}
-
-				m_params.push_back(param);
-				bindParam(this, siParam.m_name.toStdString(),
-						  *boost::unsafe_any_cast<TPointParamP>(&m_params.back()));
+			case ShaderInterface::ANGLE:
+			case ShaderInterface::ANGLE_UI:
+				param->getX()->setMeasureName(l_measureNames[ANGLE]);
+				param->getY()->setMeasureName(l_measureNames[ANGLE]);
+				break;
 			}
 
-			CASE ShaderInterface::INT:
-			{
-				TIntParamP param(siParam.m_default.m_int);
-				param->setValueRange(siParam.m_range[0].m_int, siParam.m_range[1].m_int);
+			m_params.push_back(param);
+			bindParam(this, siParam.m_name.toStdString(),
+				*boost::unsafe_any_cast<TPointParamP>(&m_params.back()));
+			break;
+		}
 
-				m_params.push_back(param);
-				bindParam(this, siParam.m_name.toStdString(),
-						  *boost::unsafe_any_cast<TIntParamP>(&m_params.back()));
-			}
+		case ShaderInterface::INT: {
+			TIntParamP param(siParam.m_default.m_int);
+			param->setValueRange(siParam.m_range[0].m_int, siParam.m_range[1].m_int);
 
-			CASE ShaderInterface::RGBA:
-			{
-				TPixelParamP param(TPixel32(
-					siParam.m_default.m_rgba[0], siParam.m_default.m_rgba[1],
-					siParam.m_default.m_rgba[2], siParam.m_default.m_rgba[3]));
+			m_params.push_back(param);
+			bindParam(this, siParam.m_name.toStdString(),
+				*boost::unsafe_any_cast<TIntParamP>(&m_params.back()));
+			break;
+		}
 
-				m_params.push_back(param);
-				bindParam(this, siParam.m_name.toStdString(),
-						  *boost::unsafe_any_cast<TPixelParamP>(&m_params.back()));
-			}
+		case ShaderInterface::RGBA: {
+			TPixelParamP param(TPixel32(
+				siParam.m_default.m_rgba[0], siParam.m_default.m_rgba[1],
+				siParam.m_default.m_rgba[2], siParam.m_default.m_rgba[3]));
 
-			CASE ShaderInterface::RGB:
-			{
-				TPixelParamP param(TPixel32(
-					siParam.m_default.m_rgb[0], siParam.m_default.m_rgb[1],
-					siParam.m_default.m_rgb[2]));
+			m_params.push_back(param);
+			bindParam(this, siParam.m_name.toStdString(),
+				*boost::unsafe_any_cast<TPixelParamP>(&m_params.back()));
+			break;
+		}
 
-				param->enableMatte(false);
+		case ShaderInterface::RGB: {
+			TPixelParamP param(TPixel32(
+				siParam.m_default.m_rgb[0], siParam.m_default.m_rgb[1],
+				siParam.m_default.m_rgb[2]));
 
-				m_params.push_back(param);
-				bindParam(this, siParam.m_name.toStdString(),
-						  *boost::unsafe_any_cast<TPixelParamP>(&m_params.back()));
-			}
+			param->enableMatte(false);
 
-		DEFAULT:;
+			m_params.push_back(param);
+			bindParam(this, siParam.m_name.toStdString(),
+				*boost::unsafe_any_cast<TPixelParamP>(&m_params.back()));
+			break;
+		}
 		}
 	}
 
@@ -718,41 +735,41 @@ void ShaderFx::bindParameters(
 		case ShaderInterface::BOOL: {
 			const TBoolParamP &param = *boost::unsafe_any_cast<TBoolParamP>(&m_params[p]);
 			program->setUniformValue(siParam.m_name.toUtf8().data(), (GLboolean)param->getValue());
+			break;
 		}
 
-			CASE ShaderInterface::FLOAT:
-			{
-				const TDoubleParamP &param = *boost::unsafe_any_cast<TDoubleParamP>(&m_params[p]);
-				program->setUniformValue(siParam.m_name.toUtf8().data(),
-										 (GLfloat)param->getValue(frame));
-			}
+		case ShaderInterface::FLOAT: {
+			const TDoubleParamP &param = *boost::unsafe_any_cast<TDoubleParamP>(&m_params[p]);
+			program->setUniformValue(siParam.m_name.toUtf8().data(),
+				(GLfloat)param->getValue(frame));
+			break;
+		}
 
-			CASE ShaderInterface::VEC2:
-			{
-				const TPointParamP &param = *boost::unsafe_any_cast<TPointParamP>(&m_params[p]);
+		case ShaderInterface::VEC2: {
+			const TPointParamP &param = *boost::unsafe_any_cast<TPointParamP>(&m_params[p]);
 
-				const TPointD &value = param->getValue(frame);
-				program->setUniformValue(siParam.m_name.toUtf8().data(),
-										 (GLfloat)value.x, (GLfloat)value.y);
-			}
+			const TPointD &value = param->getValue(frame);
+			program->setUniformValue(siParam.m_name.toUtf8().data(),
+				(GLfloat)value.x, (GLfloat)value.y);
+			break;
+		}
 
-			CASE ShaderInterface::INT:
-			{
-				const TIntParamP &param = *boost::unsafe_any_cast<TIntParamP>(&m_params[p]);
-				program->setUniformValue(siParam.m_name.toUtf8().data(), (GLint)param->getValue());
-			}
+		case ShaderInterface::INT: {
+			const TIntParamP &param = *boost::unsafe_any_cast<TIntParamP>(&m_params[p]);
+			program->setUniformValue(siParam.m_name.toUtf8().data(), (GLint)param->getValue());
+			break;
+		}
 
-			CASE ShaderInterface::RGBA : case ShaderInterface::RGB:
-			{
-				const TPixelParamP &param = *boost::unsafe_any_cast<TPixelParamP>(&m_params[p]);
+		case ShaderInterface::RGBA:
+		case ShaderInterface::RGB: {
+			const TPixelParamP &param = *boost::unsafe_any_cast<TPixelParamP>(&m_params[p]);
 
-				const TPixel32 &value = param->getValue(frame);
-				program->setUniformValue(siParam.m_name.toUtf8().data(),
-										 (GLfloat)value.r / 255.0f, (GLfloat)value.g / 255.0f,
-										 (GLfloat)value.b / 255.0f, (GLfloat)value.m / 255.0f);
-			}
-
-		DEFAULT:;
+			const TPixel32 &value = param->getValue(frame);
+			program->setUniformValue(siParam.m_name.toUtf8().data(),
+				(GLfloat)value.r / 255.0f, (GLfloat)value.g / 255.0f,
+				(GLfloat)value.b / 255.0f, (GLfloat)value.m / 255.0f);
+			break;
+		}
 		}
 	}
 }

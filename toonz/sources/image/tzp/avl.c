@@ -20,15 +20,6 @@
 #define AVL_C
 #include "avl.h"
 #include "tcm.h"
-#define CASE \
-	break;   \
-	case
-#define __OR case
-#define DEFAULT \
-	break;      \
-	default
-
-#define LOOP for (;;)
 
 #ifndef TRUE
 #define TRUE 1
@@ -209,17 +200,17 @@ TREE *avl__tree(int treetype, uint keyoffs, int (*usrcmp)(void *, void *))
 
 	keyinfo = treetype << 2;
 	switch (treetype) {
-		CASE AVL_NODUP_MBR : __OR AVL_DUP_MBR : keyinfo |= USR_CMP;
-		CASE AVL_NODUP_PTR : __OR AVL_DUP_PTR : keyinfo |= USR_CMP;
-		CASE AVL_NODUP_STR : __OR AVL_DUP_STR : keyinfo |= STR_CMP;
-		CASE AVL_NODUP_LNG : __OR AVL_DUP_LNG : keyinfo |= VAL_CMP;
-		CASE AVL_NODUP_INT : __OR AVL_DUP_INT : keyinfo |= VAL_CMP;
-		CASE AVL_NODUP_SHT : __OR AVL_DUP_SHT : keyinfo |= VAL_CMP;
-		CASE AVL_NODUP_ULN : __OR AVL_DUP_ULN : keyinfo |= COR_CMP;
-		CASE AVL_NODUP_UIN : __OR AVL_DUP_UIN : keyinfo |= COR_CMP;
-		CASE AVL_NODUP_USH : __OR AVL_DUP_USH : keyinfo |= VAL_CMP;
-		CASE AVL_NODUP_CHR : __OR AVL_DUP_CHR : keyinfo |= VAL_CMP;
-	DEFAULT:
+	case AVL_NODUP_MBR: case AVL_DUP_MBR: keyinfo |= USR_CMP; break;
+	case AVL_NODUP_PTR: case AVL_DUP_PTR: keyinfo |= USR_CMP; break;
+	case AVL_NODUP_STR: case AVL_DUP_STR: keyinfo |= STR_CMP; break;
+	case AVL_NODUP_LNG: case AVL_DUP_LNG: keyinfo |= VAL_CMP; break;
+	case AVL_NODUP_INT: case AVL_DUP_INT: keyinfo |= VAL_CMP; break;
+	case AVL_NODUP_SHT: case AVL_DUP_SHT: keyinfo |= VAL_CMP; break;
+	case AVL_NODUP_ULN: case AVL_DUP_ULN: keyinfo |= COR_CMP; break;
+	case AVL_NODUP_UIN: case AVL_DUP_UIN: keyinfo |= COR_CMP; break;
+	case AVL_NODUP_USH: case AVL_DUP_USH: keyinfo |= VAL_CMP; break;
+	case AVL_NODUP_CHR: case AVL_DUP_CHR: keyinfo |= VAL_CMP; break;
+	default:
 		return NIL;
 	}
 	ALLOC_TREE(tree)
@@ -244,10 +235,10 @@ static int rebalance(NODE **rootaddr)
 	NODE *half;
 
 	switch (root->bal) {
-		CASE LEFTUNBAL : switch (root->left->bal)
-		{
-			CASE LEFT : /* simple rotation, tree depth decreased */
-						newroot = root->left;
+	case LEFTUNBAL:
+		switch (root->left->bal) {
+		case LEFT: /* simple rotation, tree depth decreased */
+			newroot = root->left;
 			root->left = newroot->right;
 			root->bal = BAL;
 			newroot->right = root;
@@ -255,8 +246,8 @@ static int rebalance(NODE **rootaddr)
 			*rootaddr = newroot;
 			return LESS;
 
-			CASE BAL : /* simple rotation, tree depth unchanged */
-					   newroot = root->left;
+		case BAL: /* simple rotation, tree depth unchanged */
+			newroot = root->left;
 			root->left = newroot->right;
 			root->bal = LEFT;
 			newroot->right = root;
@@ -264,18 +255,24 @@ static int rebalance(NODE **rootaddr)
 			*rootaddr = newroot;
 			return SAME;
 
-			CASE RIGHT : /* double rotation */
-						 half = root->left;
+		case RIGHT: /* double rotation */
+			half = root->left;
 			newroot = half->right;
 			root->left = newroot->right;
 			half->right = newroot->left;
 			switch (newroot->bal) {
-				CASE BAL : root->bal = BAL;
+			case BAL:
+				root->bal = BAL;
 				half->bal = BAL;
-				CASE LEFT : root->bal = RIGHT;
+				break;
+			case LEFT:
+				root->bal = RIGHT;
 				half->bal = BAL;
-				CASE RIGHT : root->bal = BAL;
+				break;
+			case RIGHT:
+				root->bal = BAL;
 				half->bal = LEFT;
+				break;
 			}
 			newroot->left = half;
 			newroot->right = root;
@@ -283,10 +280,11 @@ static int rebalance(NODE **rootaddr)
 			*rootaddr = newroot;
 			return LESS;
 		}
-		CASE RIGHTUNBAL : switch (root->right->bal)
-		{
-			CASE RIGHT : /* simple rotation, tree depth decreased */
-						 newroot = root->right;
+		break;
+	case RIGHTUNBAL:
+		switch (root->right->bal) {
+		case RIGHT: /* simple rotation, tree depth decreased */
+			newroot = root->right;
 			root->right = newroot->left;
 			root->bal = BAL;
 			newroot->left = root;
@@ -294,8 +292,8 @@ static int rebalance(NODE **rootaddr)
 			*rootaddr = newroot;
 			return LESS;
 
-			CASE BAL : /* simple rotation, tree depth unchanged */
-					   newroot = root->right;
+		case BAL: /* simple rotation, tree depth unchanged */
+			newroot = root->right;
 			root->right = newroot->left;
 			root->bal = RIGHT;
 			newroot->left = root;
@@ -303,18 +301,24 @@ static int rebalance(NODE **rootaddr)
 			*rootaddr = newroot;
 			return SAME;
 
-			CASE LEFT : /* double rotation */
-						half = root->right;
+		case LEFT: /* double rotation */
+			half = root->right;
 			newroot = half->left;
 			root->right = newroot->left;
 			half->left = newroot->right;
 			switch (newroot->bal) {
-				CASE BAL : root->bal = BAL;
+			case BAL:
+				root->bal = BAL;
 				half->bal = BAL;
-				CASE RIGHT : root->bal = LEFT;
+				break;
+			case RIGHT:
+				root->bal = LEFT;
 				half->bal = BAL;
-				CASE LEFT : root->bal = BAL;
+				break;
+			case LEFT:
+				root->bal = BAL;
 				half->bal = RIGHT;
+				break;
 			}
 			newroot->right = half;
 			newroot->left = root;
@@ -322,7 +326,8 @@ static int rebalance(NODE **rootaddr)
 			*rootaddr = newroot;
 			return LESS;
 		}
-	DEFAULT:
+		break;
+	default:
 		return SAME;
 	}
 	return ERROR;
@@ -346,17 +351,23 @@ static int insert_ptr(NODE **rootaddr,
 			ins = DEEPER;
 		}
 		switch (ins) {
-			CASE DEEPER : switch (root->bal)
-			{
-				CASE RIGHT : root->bal = BAL;
+		case DEEPER:
+			switch (root->bal) {
+			case RIGHT:
+				root->bal = BAL;
 				return INS;
-				CASE BAL : root->bal = LEFT;
+			case BAL:
+				root->bal = LEFT;
 				return DEEPER;
-				CASE LEFT : root->bal = LEFTUNBAL;
+			case LEFT:
+				root->bal = LEFTUNBAL;
 				return rebalance(rootaddr) == LESS ? INS : DEEPER;
 			}
-			CASE INS : return INS;
-			CASE NOTINS : return NOTINS;
+			break;
+		case INS:
+			return INS;
+		case NOTINS:
+			return NOTINS;
 		}
 	} else if (cmp > 0 || dup) {
 		if (root->right)
@@ -366,17 +377,23 @@ static int insert_ptr(NODE **rootaddr,
 			ins = DEEPER;
 		}
 		switch (ins) {
-			CASE DEEPER : switch (root->bal)
-			{
-				CASE LEFT : root->bal = BAL;
+		case DEEPER:
+			switch (root->bal) {
+			case LEFT:
+				root->bal = BAL;
 				return INS;
-				CASE BAL : root->bal = RIGHT;
+			case BAL:
+				root->bal = RIGHT;
 				return DEEPER;
-				CASE RIGHT : root->bal = RIGHTUNBAL;
+			case RIGHT:
+				root->bal = RIGHTUNBAL;
 				return rebalance(rootaddr) == LESS ? INS : DEEPER;
 			}
-			CASE INS : return INS;
-			CASE NOTINS : return NOTINS;
+			break;
+		case INS:
+			return INS;
+		case NOTINS:
+			return NOTINS;
 		}
 	}
 	return NOTINS;
@@ -397,37 +414,49 @@ static int insert_val(NODE **rootaddr, NODE *node, int dup)
 			ins = DEEPER;
 		}
 		switch (ins) {
-			CASE DEEPER : switch (root->bal)
-			{
-				CASE RIGHT : root->bal = BAL;
+		case DEEPER:
+			switch (root->bal) {
+			case RIGHT:
+				root->bal = BAL;
 				return INS;
-				CASE BAL : root->bal = LEFT;
+			case BAL:
+				root->bal = LEFT;
 				return DEEPER;
-				CASE LEFT : root->bal = LEFTUNBAL;
+			case LEFT:
+				root->bal = LEFTUNBAL;
 				return rebalance(rootaddr) == LESS ? INS : DEEPER;
 			}
-			CASE INS : return INS;
-			CASE NOTINS : return NOTINS;
+			break;
+		case INS:
+			return INS;
+		case NOTINS:
+			return NOTINS;
 		}
 	} else if (node->key.val > root->key.val || dup) {
-		if (root->right)
+		if (root->right) {
 			ins = insert_val(&root->right, node, dup);
+		}
 		else {
 			root->right = node;
 			ins = DEEPER;
 		}
 		switch (ins) {
-			CASE DEEPER : switch (root->bal)
-			{
-				CASE LEFT : root->bal = BAL;
+		case DEEPER:
+			switch (root->bal) {
+			case LEFT:
+				root->bal = BAL;
 				return INS;
-				CASE BAL : root->bal = RIGHT;
+			case BAL:
+				root->bal = RIGHT;
 				return DEEPER;
-				CASE RIGHT : root->bal = RIGHTUNBAL;
+			case RIGHT:
+				root->bal = RIGHTUNBAL;
 				return rebalance(rootaddr) == LESS ? INS : DEEPER;
 			}
-			CASE INS : return INS;
-			CASE NOTINS : return NOTINS;
+		case INS:
+			return INS;
+		case NOTINS:
+			return NOTINS;
 		}
 	}
 	return NOTINS;
@@ -451,30 +480,62 @@ int avl_insert(TREE *tree, void *data)
 	keyinfo = tree->keyinfo;
 
 	switch (KEYTYPE(keyinfo)) {
-		CASE MBR_KEY : node->key.ptr = (void *)((char *)data + tree->keyoffs);
-		CASE PTR_KEY : node->key.ptr = *(void **)((char *)data + tree->keyoffs);
-		CASE STR_KEY : node->key.ptr = *(void **)((char *)data + tree->keyoffs);
-		CASE LNG_KEY : node->key.val = *(long *)((char *)data + tree->keyoffs);
-		CASE INT_KEY : node->key.val = *(int *)((char *)data + tree->keyoffs);
-		CASE SHT_KEY : node->key.val = *(short *)((char *)data + tree->keyoffs);
-		CASE ULN_KEY : node->key.val =
-			CORRECT(*(ulong *)((char *)data + tree->keyoffs));
-		CASE UIN_KEY : node->key.val =
-			CORRECT(*(uint *)((char *)data + tree->keyoffs));
-		CASE USH_KEY : node->key.val = *(ushort *)((char *)data + tree->keyoffs);
-		CASE CHR_KEY : node->key.val = *((char *)data + tree->keyoffs);
-	DEFAULT:
+	case MBR_KEY:
+		node->key.ptr = (void *)((char *)data + tree->keyoffs);
+		break;
+	case PTR_KEY:
+		node->key.ptr = *(void **)((char *)data + tree->keyoffs);
+		break;
+	case STR_KEY:
+		node->key.ptr = *(void **)((char *)data + tree->keyoffs);
+		break;
+	case LNG_KEY:
+		node->key.val = *(long *)((char *)data + tree->keyoffs);
+		break;
+	case INT_KEY:
+		node->key.val = *(int *)((char *)data + tree->keyoffs);
+		break;
+	case SHT_KEY:
+		node->key.val = *(short *)((char *)data + tree->keyoffs);
+		break;
+	case ULN_KEY:
+		node->key.val = CORRECT(*(ulong *)((char *)data + tree->keyoffs));
+		break;
+	case UIN_KEY:
+		node->key.val = CORRECT(*(uint *)((char *)data + tree->keyoffs));
+		break;
+	case USH_KEY:
+		node->key.val = *(ushort *)((char *)data + tree->keyoffs);
+		break;
+	case CHR_KEY:
+		node->key.val = *((char *)data + tree->keyoffs);
+		break;
+	default:
 		FREE_NODE(node)
 		return FALSE;
 	}
 	if (tree->root) {
 		switch (LOCTYPE(keyinfo)) {
-			CASE USR_NODUP : ins = insert_ptr(&tree->root, node, tree->usrcmp, NODUP);
-			CASE STR_NODUP : ins = insert_ptr(&tree->root, node, AVL_AVLCMP, NODUP);
-			CASE COR_NODUP : __OR VAL_NODUP : ins = insert_val(&tree->root, node, NODUP);
-			CASE USR_DUP : ins = insert_ptr(&tree->root, node, tree->usrcmp, DUP);
-			CASE STR_DUP : ins = insert_ptr(&tree->root, node, AVL_AVLCMP, DUP);
-			CASE COR_DUP : __OR VAL_DUP : ins = insert_val(&tree->root, node, DUP);
+		case USR_NODUP:
+			ins = insert_ptr(&tree->root, node, tree->usrcmp, NODUP);
+			break;
+		case STR_NODUP:
+			ins = insert_ptr(&tree->root, node, AVL_AVLCMP, NODUP);
+			break;
+		case COR_NODUP:
+		case VAL_NODUP:
+			ins = insert_val(&tree->root, node, NODUP);
+			break;
+		case USR_DUP:
+			ins = insert_ptr(&tree->root, node, tree->usrcmp, DUP);
+			break;
+		case STR_DUP:
+			ins = insert_ptr(&tree->root, node, AVL_AVLCMP, DUP);
+			break;
+		case COR_DUP:
+		case VAL_DUP:
+			ins = insert_val(&tree->root, node, DUP);
+			break;
 		}
 		if (ins == NOTINS) {
 			FREE_NODE(node)
@@ -586,43 +647,60 @@ void *avl__locate(TREE *tree, long keyval)
 
 	node = tree->root;
 	switch (LOCTYPE(tree->keyinfo)) {
-		CASE USR_NODUP : usrcmp = tree->usrcmp;
-		while (node) {
-			cmp = (*usrcmp)((void *)keyval, node->key.ptr);
-			SELECT_EQ_NODUP(node, cmp, 0)
-		}
-		CASE STR_NODUP : while (node)
-		{
-			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr)
-			SELECT_EQ_NODUP(node, cmp, 0)
-		}
-		CASE COR_NODUP : keyval = CORRECT(keyval);
-		__OR VAL_NODUP : while (node)
-							 SELECT_EQ_NODUP(node, keyval, node->key.val)
-
-								 CASE USR_DUP : save = NIL;
+	case USR_NODUP:
 		usrcmp = tree->usrcmp;
 		while (node) {
 			cmp = (*usrcmp)((void *)keyval, node->key.ptr);
-			SELECT_EQ_DUP(node, cmp, 0, save)
+			SELECT_EQ_NODUP(node, cmp, 0);
 		}
-		if (save)
-			return save->data;
-
-		CASE STR_DUP : save = NIL;
+		break;
+	case STR_NODUP:
 		while (node) {
-			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr)
-			SELECT_EQ_DUP(node, cmp, 0, save)
+			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr);
+			SELECT_EQ_NODUP(node, cmp, 0);
 		}
-		if (save)
+		break;
+	case COR_NODUP:
+		keyval = CORRECT(keyval);
+		// fallthrough
+	case VAL_NODUP:
+		while (node) {
+			SELECT_EQ_NODUP(node, keyval, node->key.val);
+		}
+		break;
+	case USR_DUP:
+		save = NIL;
+		usrcmp = tree->usrcmp;
+		while (node) {
+			cmp = (*usrcmp)((void *)keyval, node->key.ptr);
+			SELECT_EQ_DUP(node, cmp, 0, save);
+		}
+		if (save) {
 			return save->data;
-
-		CASE COR_DUP : keyval = CORRECT(keyval);
-		__OR VAL_DUP : save = NIL;
-		while (node)
-			SELECT_EQ_DUP(node, keyval, node->key.val, save)
-		if (save)
+		}
+		break;
+	case STR_DUP:
+		save = NIL;
+		while (node) {
+			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr);
+			SELECT_EQ_DUP(node, cmp, 0, save);
+		}
+		if (save) {
 			return save->data;
+		}
+		break;
+	case COR_DUP:
+		keyval = CORRECT(keyval);
+		// fallthrough
+	case VAL_DUP:
+		save = NIL;
+		while (node) {
+			SELECT_EQ_DUP(node, keyval, node->key.val, save);
+		}
+		if (save) {
+			return save->data;
+		}
+		break;
 	}
 	return NIL;
 }
@@ -639,38 +717,50 @@ void *avl__locate_ge(TREE *tree, long keyval)
 	node = tree->root;
 	save = NIL;
 	switch (LOCTYPE(tree->keyinfo)) {
-		CASE USR_NODUP : usrcmp = tree->usrcmp;
+	case USR_NODUP:
+		usrcmp = tree->usrcmp;
 		while (node) {
 			cmp = (*usrcmp)((void *)keyval, node->key.ptr);
-			SELECT_GE_NODUP(node, cmp, 0, save)
+			SELECT_GE_NODUP(node, cmp, 0, save);
 		}
-		CASE STR_NODUP : while (node)
-		{
-			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr)
-			SELECT_GE_NODUP(node, cmp, 0, save)
+		break;
+	case STR_NODUP:
+		while (node) {
+			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr);
+			SELECT_GE_NODUP(node, cmp, 0, save);
 		}
-		CASE COR_NODUP : keyval = CORRECT(keyval);
-		__OR VAL_NODUP : while (node)
-							 SELECT_GE_NODUP(node, keyval, node->key.val, save)
-
-								 CASE USR_DUP : usrcmp = tree->usrcmp;
+		break;
+	case COR_NODUP:
+		keyval = CORRECT(keyval);
+		// fallthrough
+	case VAL_NODUP:
+		while (node) {
+			SELECT_GE_NODUP(node, keyval, node->key.val, save);
+		}
+		break;
+	case USR_DUP:
+		usrcmp = tree->usrcmp;
 		while (node) {
 			cmp = (*usrcmp)((void *)keyval, node->key.ptr);
-			SELECT_GE_DUP(node, cmp, 0, save)
+			SELECT_GE_DUP(node, cmp, 0, save);
 		}
-		CASE STR_DUP : while (node)
-		{
-			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr)
-			SELECT_GE_DUP(node, cmp, 0, save)
+		break;
+	case STR_DUP:
+		while (node) {
+			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr);
+			SELECT_GE_DUP(node, cmp, 0, save);
 		}
-		CASE COR_DUP : keyval = CORRECT(keyval);
-		__OR VAL_DUP : while (node)
-						   SELECT_GE_DUP(node, keyval, node->key.val, save)
+		break;
+	case COR_DUP:
+		keyval = CORRECT(keyval);
+		// fallthrough
+	case VAL_DUP:
+		while (node) {
+			SELECT_GE_DUP(node, keyval, node->key.val, save);
+		}
+		break;
 	}
-	if (save)
-		return save->data;
-	else
-		return NIL;
+	return save ? save->data : NIL;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -685,24 +775,29 @@ void *avl__locate_gt(TREE *tree, long keyval)
 	node = tree->root;
 	save = NIL;
 	switch (CMPTYPE(tree->keyinfo)) {
-		CASE USR_CMP : usrcmp = tree->usrcmp;
+	case USR_CMP:
+		usrcmp = tree->usrcmp;
 		while (node) {
 			cmp = (*usrcmp)((void *)keyval, node->key.ptr);
-			SELECT_GT(node, cmp, 0, save)
+			SELECT_GT(node, cmp, 0, save);
 		}
-		CASE STR_CMP : while (node)
-		{
-			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr)
-			SELECT_GT(node, cmp, 0, save)
+		break;
+	case STR_CMP:
+		while (node) {
+			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr);
+			SELECT_GT(node, cmp, 0, save);
 		}
-		CASE COR_CMP : keyval = CORRECT(keyval);
-		__OR VAL_CMP : while (node)
-						   SELECT_GT(node, keyval, node->key.val, save)
+		break;
+	case COR_CMP:
+		keyval = CORRECT(keyval);
+		// fallthrough
+	case VAL_CMP:
+		while (node) {
+			SELECT_GT(node, keyval, node->key.val, save);
+		}
+		break;
 	}
-	if (save)
-		return save->data;
-	else
-		return NIL;
+	return save ? save->data : NIL;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -717,38 +812,50 @@ void *avl__locate_le(TREE *tree, long keyval)
 	node = tree->root;
 	save = NIL;
 	switch (LOCTYPE(tree->keyinfo)) {
-		CASE USR_NODUP : usrcmp = tree->usrcmp;
+	case USR_NODUP:
+		usrcmp = tree->usrcmp;
 		while (node) {
 			cmp = (*usrcmp)((void *)keyval, node->key.ptr);
-			SELECT_LE_NODUP(node, cmp, 0, save)
+			SELECT_LE_NODUP(node, cmp, 0, save);
 		}
-		CASE STR_NODUP : while (node)
-		{
-			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr)
-			SELECT_LE_NODUP(node, cmp, 0, save)
+		break;
+	case STR_NODUP:
+		while (node) {
+			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr);
+			SELECT_LE_NODUP(node, cmp, 0, save);
 		}
-		CASE COR_NODUP : keyval = CORRECT(keyval);
-		__OR VAL_NODUP : while (node)
-							 SELECT_LE_NODUP(node, keyval, node->key.val, save)
-
-								 CASE USR_DUP : usrcmp = tree->usrcmp;
+		break;
+	case COR_NODUP:
+		keyval = CORRECT(keyval);
+		// fallthrough
+	case VAL_NODUP:
+		while (node) {
+			SELECT_LE_NODUP(node, keyval, node->key.val, save);
+		}
+		break;
+	case USR_DUP:
+		usrcmp = tree->usrcmp;
 		while (node) {
 			cmp = (*usrcmp)((void *)keyval, node->key.ptr);
-			SELECT_LE_DUP(node, cmp, 0, save)
+			SELECT_LE_DUP(node, cmp, 0, save);
 		}
-		CASE STR_DUP : while (node)
-		{
-			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr)
-			SELECT_LE_DUP(node, cmp, 0, save)
+		break;
+	case STR_DUP:
+		while (node) {
+			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr);
+			SELECT_LE_DUP(node, cmp, 0, save);
 		}
-		CASE COR_DUP : keyval = CORRECT(keyval);
-		__OR VAL_DUP : while (node)
-						   SELECT_LE_DUP(node, keyval, node->key.val, save)
+		break;
+	case COR_DUP:
+		keyval = CORRECT(keyval);
+		// fallthrough
+	case VAL_DUP:
+		while (node) {
+			SELECT_LE_DUP(node, keyval, node->key.val, save);
+		}
+		break;
 	}
-	if (save)
-		return save->data;
-	else
-		return NIL;
+	return save ? save->data : NIL;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -763,24 +870,29 @@ void *avl__locate_lt(TREE *tree, long keyval)
 	node = tree->root;
 	save = NIL;
 	switch (CMPTYPE(tree->keyinfo)) {
-		CASE USR_CMP : usrcmp = tree->usrcmp;
+	case USR_CMP:
+		usrcmp = tree->usrcmp;
 		while (node) {
 			cmp = (*usrcmp)((void *)keyval, node->key.ptr);
-			SELECT_LT(node, cmp, 0, save)
+			SELECT_LT(node, cmp, 0, save);
 		}
-		CASE STR_CMP : while (node)
-		{
-			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr)
-			SELECT_LT(node, cmp, 0, save)
+		break;
+	case STR_CMP:
+		while (node) {
+			SET_STRCMP(cmp, (char *)keyval, (char *)node->key.ptr);
+			SELECT_LT(node, cmp, 0, save);
 		}
-		CASE COR_CMP : keyval = CORRECT(keyval);
-		__OR VAL_CMP : while (node)
-						   SELECT_LT(node, keyval, node->key.val, save)
+		break;
+	case COR_CMP:
+		keyval = CORRECT(keyval);
+		// fallthrough
+	case VAL_CMP:
+		while (node) {
+			SELECT_LT(node, keyval, node->key.val, save);
+		}
+		break;
 	}
-	if (save)
-		return save->data;
-	else
-		return NIL;
+	return save ? save->data : NIL;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -824,11 +936,17 @@ static NODE *leftmost(NODE **rootaddr)
 			if (node->bal == LESS) {
 				/* left subtree depth decreased */
 				switch (root->bal) {
-					CASE LEFT : root->bal = BAL;
-					CASE BAL : root->bal = RIGHT;
+				case LEFT:
+					root->bal = BAL;
+					break;
+				case BAL:
+					root->bal = RIGHT;
 					node->bal = SAME;
-					CASE RIGHT : root->bal = RIGHTUNBAL;
+					break;
+				case RIGHT:
+					root->bal = RIGHTUNBAL;
 					node->bal = rebalance(rootaddr);
+					break;
 				}
 			}
 			return node;
@@ -858,11 +976,17 @@ static NODE *remove_ptr(NODE **rootaddr,
 		if (node && node->bal == LESS) {
 			/* left subtree depth decreased */
 			switch (root->bal) {
-				CASE LEFT : root->bal = BAL;
-				CASE BAL : root->bal = RIGHT;
+			case LEFT:
+				root->bal = BAL;
+				break;
+			case BAL:
+				root->bal = RIGHT;
 				node->bal = SAME;
-				CASE RIGHT : root->bal = RIGHTUNBAL;
+				break;
+			case RIGHT:
+				root->bal = RIGHTUNBAL;
 				node->bal = rebalance(rootaddr);
+				break;
 			}
 		}
 	} else if (cmp > 0) {
@@ -872,11 +996,17 @@ static NODE *remove_ptr(NODE **rootaddr,
 		if (node && node->bal == LESS) {
 			/* right subtree depth decreased */
 			switch (root->bal) {
-				CASE RIGHT : root->bal = BAL;
-				CASE BAL : root->bal = LEFT;
+			case RIGHT:
+				root->bal = BAL;
+				break;
+			case BAL:
+				root->bal = LEFT;
 				node->bal = SAME;
-				CASE LEFT : root->bal = LEFTUNBAL;
+				break;
+			case LEFT:
+				root->bal = LEFTUNBAL;
 				node->bal = rebalance(rootaddr);
+				break;
 			}
 		}
 	} else {
@@ -884,11 +1014,17 @@ static NODE *remove_ptr(NODE **rootaddr,
 			if (node->bal == LESS) {
 				/* left subtree depth decreased */
 				switch (root->bal) {
-					CASE LEFT : root->bal = BAL;
-					CASE BAL : root->bal = RIGHT;
+				case LEFT:
+					root->bal = BAL;
+					break;
+				case BAL:
+					root->bal = RIGHT;
 					node->bal = SAME;
-					CASE RIGHT : root->bal = RIGHTUNBAL;
+					break;
+				case RIGHT:
+					root->bal = RIGHTUNBAL;
 					node->bal = rebalance(rootaddr);
+					break;
 				}
 			}
 		} else {
@@ -907,12 +1043,18 @@ static NODE *remove_ptr(NODE **rootaddr,
 				if (root->bal == LESS) {
 					/* right subtree depth decreased */
 					switch (node->bal) {
-						CASE RIGHT : root->bal = BAL;
+					case RIGHT:
+						root->bal = BAL;
 						node->bal = LESS;
-						CASE BAL : root->bal = LEFT;
+						break;
+					case BAL:
+						root->bal = LEFT;
 						node->bal = SAME;
-						CASE LEFT : root->bal = LEFTUNBAL;
+						break;
+					case LEFT:
+						root->bal = LEFTUNBAL;
 						node->bal = rebalance(&root);
+						break;
 					}
 				} else {
 					root->bal = node->bal;
@@ -939,11 +1081,17 @@ static NODE *remove_val(NODE **rootaddr, long keyval, int dup)
 		if (node && node->bal == LESS) {
 			/* left subtree depth decreased */
 			switch (root->bal) {
-				CASE LEFT : root->bal = BAL;
-				CASE BAL : root->bal = RIGHT;
+			case LEFT:
+				root->bal = BAL;
+				break;
+			case BAL:
+				root->bal = RIGHT;
 				node->bal = SAME;
-				CASE RIGHT : root->bal = RIGHTUNBAL;
+				break;
+			case RIGHT:
+				root->bal = RIGHTUNBAL;
 				node->bal = rebalance(rootaddr);
+				break;
 			}
 		}
 	} else if (keyval > root->key.val) {
@@ -953,11 +1101,17 @@ static NODE *remove_val(NODE **rootaddr, long keyval, int dup)
 		if (node && node->bal == LESS) {
 			/* right subtree depth decreased */
 			switch (root->bal) {
-				CASE RIGHT : root->bal = BAL;
-				CASE BAL : root->bal = LEFT;
+			case RIGHT:
+				root->bal = BAL;
+				break;
+			case BAL:
+				root->bal = LEFT;
 				node->bal = SAME;
-				CASE LEFT : root->bal = LEFTUNBAL;
+				break;
+			case LEFT:
+				root->bal = LEFTUNBAL;
 				node->bal = rebalance(rootaddr);
+				break;
 			}
 		}
 	} else {
@@ -965,11 +1119,17 @@ static NODE *remove_val(NODE **rootaddr, long keyval, int dup)
 			if (node->bal == LESS) {
 				/* left subtree depth decreased */
 				switch (root->bal) {
-					CASE LEFT : root->bal = BAL;
-					CASE BAL : root->bal = RIGHT;
+				case LEFT:
+					root->bal = BAL;
+					break;
+				case BAL:
+					root->bal = RIGHT;
 					node->bal = SAME;
-					CASE RIGHT : root->bal = RIGHTUNBAL;
+					break;
+				case RIGHT:
+					root->bal = RIGHTUNBAL;
 					node->bal = rebalance(rootaddr);
+					break;
 				}
 			}
 		} else {
@@ -988,12 +1148,18 @@ static NODE *remove_val(NODE **rootaddr, long keyval, int dup)
 				if (root->bal == LESS) {
 					/* right subtree depth decreased */
 					switch (node->bal) {
-						CASE RIGHT : root->bal = BAL;
+					case RIGHT:
+						root->bal = BAL;
 						node->bal = LESS;
-						CASE BAL : root->bal = LEFT;
+						break;
+					case BAL:
+						root->bal = LEFT;
 						node->bal = SAME;
-						CASE LEFT : root->bal = LEFTUNBAL;
+						break;
+					case LEFT:
+						root->bal = LEFTUNBAL;
 						node->bal = rebalance(&root);
+						break;
 					}
 				} else {
 					root->bal = node->bal;
@@ -1015,14 +1181,30 @@ void *avl__remove(TREE *tree, long keyval)
 
 	if (tree->root) {
 		switch (LOCTYPE(tree->keyinfo)) {
-			CASE USR_NODUP : node = remove_ptr(&tree->root, (void *)keyval, tree->usrcmp, NODUP);
-			CASE STR_NODUP : node = remove_ptr(&tree->root, (void *)keyval, AVL_AVLCMP, NODUP);
-			CASE COR_NODUP : keyval = CORRECT(keyval);
-			__OR VAL_NODUP : node = remove_val(&tree->root, keyval, NODUP);
-			CASE USR_DUP : node = remove_ptr(&tree->root, (void *)keyval, tree->usrcmp, DUP);
-			CASE STR_DUP : node = remove_ptr(&tree->root, (void *)keyval, AVL_AVLCMP, DUP);
-			CASE COR_DUP : keyval = CORRECT(keyval);
-			__OR VAL_DUP : node = remove_val(&tree->root, keyval, DUP);
+		case USR_NODUP:
+			node = remove_ptr(&tree->root, (void *)keyval, tree->usrcmp, NODUP);
+			break;
+		case STR_NODUP:
+			node = remove_ptr(&tree->root, (void *)keyval, AVL_AVLCMP, NODUP);
+			break;
+		case COR_NODUP:
+			keyval = CORRECT(keyval);
+			// fallthrough
+		case VAL_NODUP:
+			node = remove_val(&tree->root, keyval, NODUP);
+			break;
+		case USR_DUP:
+			node = remove_ptr(&tree->root, (void *)keyval, tree->usrcmp, DUP);
+			break;
+		case STR_DUP:
+			node = remove_ptr(&tree->root, (void *)keyval, AVL_AVLCMP, DUP);
+			break;
+		case COR_DUP:
+			keyval = CORRECT(keyval);
+			// fallthrough
+		case VAL_DUP:
+			node = remove_val(&tree->root, keyval, DUP);
+			break;
 		}
 		if (node) {
 			tree->nodes--;
@@ -1202,100 +1384,137 @@ void *avl__start(TREE *tree, long keyval, int back)
 	*++pathright = back;
 	*++pathnode = node = tree->root;
 	switch (LOCTYPE(tree->keyinfo)) {
-		CASE USR_NODUP : __OR STR_NODUP : usrcmp = tree->usrcmp;
-		if (back)
-			LOOP
-			{
-				SET_PTRCMP(cmp, usrcmp, (void *)keyval, node->key.ptr)
+	case USR_NODUP:
+	case STR_NODUP:
+		usrcmp = tree->usrcmp;
+		if (back) {
+			for (;;) {
+				SET_PTRCMP(cmp, usrcmp, (void *)keyval, node->key.ptr);
 				if (cmp > 0) {
 					saveright = pathright;
 					savenode = pathnode;
-					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode)
-				} else if (cmp < 0)
-					DOWN_LEFT_OR_BREAK(node, pathright, pathnode)
-				else
-					START_OK_AND_RETURN(path, pathright, pathnode)
+					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
+				}
+				else if (cmp < 0) {
+					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
+				}
+				else {
+					START_OK_AND_RETURN(path, pathright, pathnode);
+				}
 			}
-		else
-			LOOP
-			{
-				SET_PTRCMP(cmp, usrcmp, (void *)keyval, node->key.ptr)
+		}
+		else {
+			for (;;) {
+				SET_PTRCMP(cmp, usrcmp, (void *)keyval, node->key.ptr);
 				if (cmp < 0) {
 					saveright = pathright;
 					savenode = pathnode;
-					DOWN_LEFT_OR_BREAK(node, pathright, pathnode)
-				} else if (cmp > 0)
-					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode)
-				else
-					START_OK_AND_RETURN(path, pathright, pathnode)
+					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
+				}
+				else if (cmp > 0) {
+					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
+				}
+				else {
+					START_OK_AND_RETURN(path, pathright, pathnode);
+				}
 			}
-		CASE COR_NODUP : keyval = CORRECT(keyval);
-		__OR VAL_NODUP : if (back)
-							 LOOP
-		{
-			if (keyval > node->key.val) {
-				saveright = pathright;
-				savenode = pathnode;
-				DOWN_RIGHT_OR_BREAK(node, pathright, pathnode)
-			} else if (keyval < node->key.val)
-				DOWN_LEFT_OR_BREAK(node, pathright, pathnode)
-			else
-				START_OK_AND_RETURN(path, pathright, pathnode)
 		}
-		else LOOP
-		{
-			if (keyval < node->key.val) {
-				saveright = pathright;
-				savenode = pathnode;
-				DOWN_LEFT_OR_BREAK(node, pathright, pathnode)
-			} else if (keyval > node->key.val)
-				DOWN_RIGHT_OR_BREAK(node, pathright, pathnode)
-			else
-				START_OK_AND_RETURN(path, pathright, pathnode)
+		break;
+	case COR_NODUP:
+			keyval = CORRECT(keyval);
+			// fallthrough
+	case VAL_NODUP:
+		if (back) {
+			for (;;) {
+				if (keyval > node->key.val) {
+					saveright = pathright;
+					savenode = pathnode;
+					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
+				}
+				else if (keyval < node->key.val) {
+					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
+				}
+				else {
+					START_OK_AND_RETURN(path, pathright, pathnode);
+				}
+			}
 		}
-		CASE USR_DUP : __OR STR_DUP : usrcmp = tree->usrcmp;
-		if (back)
-			LOOP
-			{
-				SET_PTRCMP(cmp, usrcmp, (void *)keyval, node->key.ptr)
+		else {
+			for (;;) {
+				if (keyval < node->key.val) {
+					saveright = pathright;
+					savenode = pathnode;
+					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
+				}
+				else if (keyval > node->key.val) {
+					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
+				}
+				else {
+					START_OK_AND_RETURN(path, pathright, pathnode);
+				}
+			}
+			break;
+		}
+		break;
+	case USR_DUP:
+	case STR_DUP:
+		usrcmp = tree->usrcmp;
+		if (back) {
+			for (;;) {
+				SET_PTRCMP(cmp, usrcmp, (void *)keyval, node->key.ptr);
 				if (cmp >= 0) {
 					saveright = pathright;
 					savenode = pathnode;
-					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode)
-				} else
-					DOWN_LEFT_OR_BREAK(node, pathright, pathnode)
+					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
+				}
+				else {
+					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
+				}
 			}
-		else
-			LOOP
-			{
-				SET_PTRCMP(cmp, usrcmp, (void *)keyval, node->key.ptr)
+		}
+		else {
+			for (;;) {
+				SET_PTRCMP(cmp, usrcmp, (void *)keyval, node->key.ptr);
 				if (cmp <= 0) {
 					saveright = pathright;
 					savenode = pathnode;
-					DOWN_LEFT_OR_BREAK(node, pathright, pathnode)
-				} else
-					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode)
+					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
+				}
+				else {
+					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
+				}
 			}
-		CASE COR_DUP : keyval = CORRECT(keyval);
-		__OR VAL_DUP : if (back)
-						   LOOP
-		{
-			if (keyval >= node->key.val) {
-				saveright = pathright;
-				savenode = pathnode;
-				DOWN_RIGHT_OR_BREAK(node, pathright, pathnode)
-			} else
-				DOWN_LEFT_OR_BREAK(node, pathright, pathnode)
 		}
-		else LOOP
-		{
-			if (keyval <= node->key.val) {
-				saveright = pathright;
-				savenode = pathnode;
-				DOWN_LEFT_OR_BREAK(node, pathright, pathnode)
-			} else
-				DOWN_RIGHT_OR_BREAK(node, pathright, pathnode)
+		break;
+	case COR_DUP:
+		keyval = CORRECT(keyval);
+		// fallthrough
+	case VAL_DUP:
+		if (back) {
+			for (;;) {
+				if (keyval >= node->key.val) {
+					saveright = pathright;
+					savenode = pathnode;
+					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
+				}
+				else {
+					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
+				}
+			}
 		}
+		else {
+			for (;;) {
+				if (keyval <= node->key.val) {
+					saveright = pathright;
+					savenode = pathnode;
+					DOWN_LEFT_OR_BREAK(node, pathright, pathnode);
+				}
+				else {
+					DOWN_RIGHT_OR_BREAK(node, pathright, pathnode);
+				}
+			}
+		}
+		break;
 	}
 	if (savenode) {
 		path->pathright = saveright;

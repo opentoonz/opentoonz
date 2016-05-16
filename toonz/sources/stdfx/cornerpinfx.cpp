@@ -564,24 +564,31 @@ void CornerPinFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 		switch (m_mode->getValue()) {
 		case SUBSTITUTE:
 			myOver32(tile.getRaster(), textureTile.getRaster(), &substitute<TPixel32>, v);
-
-			CASE PATTERNTYPE : witheCard = TRaster32P(textureTile.getRaster()->getSize());
+			break;
+		case PATTERNTYPE:
+			witheCard = TRaster32P(textureTile.getRaster()->getSize());
 			witheCard->fill(TPixel32::White);
 			TRop::over(textureTile.getRaster(), witheCard, textureTile.getRaster());
 			myOver32(tile.getRaster(), textureTile.getRaster(), &pattern32, v);
-
-			CASE ADD : myOver32(tile.getRaster(), textureTile.getRaster(), &textureAdd<TPixel32>, v / 100.0);
-
-			CASE SUBTRACT : myOver32(tile.getRaster(), textureTile.getRaster(), &textureSub<TPixel32>, v / 100.0);
-
-			CASE MULTIPLY : myOver32(tile.getRaster(), textureTile.getRaster(), &textureMult<TPixel32>, v);
-
-			CASE DARKEN : myOver32(tile.getRaster(), textureTile.getRaster(), &textureDarken<TPixel32>, v);
-
-			CASE LIGHTEN : myOver32(tile.getRaster(), textureTile.getRaster(), &textureLighten<TPixel32>, v);
-
-		DEFAULT:
+			break;
+		case ADD:
+			myOver32(tile.getRaster(), textureTile.getRaster(), &textureAdd<TPixel32>, v / 100.0);
+			break;
+		case SUBTRACT:
+			myOver32(tile.getRaster(), textureTile.getRaster(), &textureSub<TPixel32>, v / 100.0);
+			break;
+		case MULTIPLY:
+			myOver32(tile.getRaster(), textureTile.getRaster(), &textureMult<TPixel32>, v);
+			break;
+		case DARKEN:
+			myOver32(tile.getRaster(), textureTile.getRaster(), &textureDarken<TPixel32>, v);
+			break;
+		case LIGHTEN:
+			myOver32(tile.getRaster(), textureTile.getRaster(), &textureLighten<TPixel32>, v);
+			break;
+		default:
 			assert(0);
+			break;
 		}
 	} else {
 		TRaster64P witheCard;
@@ -591,24 +598,31 @@ void CornerPinFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 		switch (m_mode->getValue()) {
 		case SUBSTITUTE:
 			myOver64(tile.getRaster(), textureTile.getRaster(), &substitute<TPixel64>, v);
-
-			CASE PATTERNTYPE : witheCard = TRaster64P(textureTile.getRaster()->getSize());
+			break;
+		case PATTERNTYPE:
+			witheCard = TRaster64P(textureTile.getRaster()->getSize());
 			witheCard->fill(TPixel64::White);
 			TRop::over(textureTile.getRaster(), witheCard, textureTile.getRaster());
 			myOver64(tile.getRaster(), textureTile.getRaster(), &pattern64, v);
-
-			CASE ADD : myOver64(tile.getRaster(), textureTile.getRaster(), &textureAdd<TPixel64>, v / 100.0);
-
-			CASE SUBTRACT : myOver64(tile.getRaster(), textureTile.getRaster(), &textureSub<TPixel64>, v / 100.0);
-
-			CASE MULTIPLY : myOver64(tile.getRaster(), textureTile.getRaster(), &textureMult<TPixel64>, v);
-
-			CASE DARKEN : myOver64(tile.getRaster(), textureTile.getRaster(), &textureDarken<TPixel64>, v);
-
-			CASE LIGHTEN : myOver64(tile.getRaster(), textureTile.getRaster(), &textureLighten<TPixel64>, v);
-
-		DEFAULT:
+			break;
+		case ADD:
+			myOver64(tile.getRaster(), textureTile.getRaster(), &textureAdd<TPixel64>, v / 100.0);
+			break;
+		case SUBTRACT:
+			myOver64(tile.getRaster(), textureTile.getRaster(), &textureSub<TPixel64>, v / 100.0);
+			break;
+		case MULTIPLY:
+			myOver64(tile.getRaster(), textureTile.getRaster(), &textureMult<TPixel64>, v);
+			break;
+		case DARKEN:
+			myOver64(tile.getRaster(), textureTile.getRaster(), &textureDarken<TPixel64>, v);
+			break;
+		case LIGHTEN:
+			myOver64(tile.getRaster(), textureTile.getRaster(), &textureLighten<TPixel64>, v);
+			break;
+		default:
 			assert(0);
+			break;
 		}
 	}
 

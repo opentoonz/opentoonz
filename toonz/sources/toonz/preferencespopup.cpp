@@ -929,9 +929,7 @@ PreferencesPopup::PreferencesPopup()
 	//--- Drawing ------------------------------
 	categoryList->addItem(tr("Drawing"));
 
-#ifndef BRAVO
 	m_defScanLevelType = new QComboBox(this);
-#endif
 	m_defLevelType = new QComboBox(this);
 	m_defLevelWidth = new MeasuredDoubleLineEdit(0);
 	m_defLevelHeight = new MeasuredDoubleLineEdit(0);
@@ -1094,13 +1092,11 @@ PreferencesPopup::PreferencesPopup()
 	minimizeSaveboxAfterEditingCB->setChecked(m_pref->isMinimizeSaveboxAfterEditing());
 	useSaveboxToLimitFillingOpCB->setChecked(m_pref->getFillOnlySavebox());
 
-#ifndef BRAVO
 	QStringList scanLevelTypes;
 	scanLevelTypes << "tif"
 				   << "png";
 	m_defScanLevelType->addItems(scanLevelTypes);
 	m_defScanLevelType->setCurrentIndex(m_defScanLevelType->findText(m_pref->getScanLevelType()));
-#endif
 	QStringList levelTypes;
 	m_defLevelType->addItem(("Toonz Vector Level"), PLI_XSHLEVEL);
 	m_defLevelType->addItem(("Toonz Raster Level"), TZP_XSHLEVEL);
@@ -1379,10 +1375,8 @@ PreferencesPopup::PreferencesPopup()
 			drawingTopLay->setHorizontalSpacing(15);
 			drawingTopLay->setMargin(0);
 			{
-#ifndef BRAVO
 				drawingTopLay->addWidget(new QLabel(tr("Scan File Format:")), 0, 0, Qt::AlignRight);
 				drawingTopLay->addWidget(m_defScanLevelType, 0, 1, 1, 3);
-#endif
 
 				drawingTopLay->addWidget(new QLabel(tr("Default Level Type:")), 1, 0, Qt::AlignRight);
 				drawingTopLay->addWidget(m_defLevelType, 1, 1, 1, 3);
@@ -1623,9 +1617,7 @@ PreferencesPopup::PreferencesPopup()
 	ret = ret && connect(keepOriginalCleanedUpCB, SIGNAL(stateChanged(int)), this, SLOT(onSaveUnpaintedInCleanupChanged(int)));
 	ret = ret && connect(multiLayerStylePickerCB, SIGNAL(stateChanged(int)), this, SLOT(onMultiLayerStylePickerChanged(int)));
 	ret = ret && connect(useSaveboxToLimitFillingOpCB, SIGNAL(stateChanged(int)), this, SLOT(onGetFillOnlySavebox(int)));
-#ifndef BRAVO
 	ret = ret && connect(m_defScanLevelType, SIGNAL(currentIndexChanged(const QString &)), SLOT(onScanLevelTypeChanged(const QString &)));
-#endif
 	ret = ret && connect(minimizeSaveboxAfterEditingCB, SIGNAL(stateChanged(int)), this, SLOT(onMinimizeSaveboxAfterEditing(int)));
 	ret = ret && connect(m_defLevelType, SIGNAL(currentIndexChanged(int)), SLOT(onDefLevelTypeChanged(int)));
 	ret = ret && connect(m_autocreationType, SIGNAL(currentIndexChanged(int)), SLOT(onAutocreationTypeChanged(int)));

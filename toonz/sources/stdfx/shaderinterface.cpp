@@ -482,37 +482,47 @@ void ShaderInterface::Parameter::saveData(TOStream &os)
 	switch (m_type) {
 	case BOOL:
 		os << (int)m_default.m_bool;
-		CASE FLOAT : os << (double)m_default.m_float;
-
-		CASE VEC2 : os << (double)m_default.m_vec2[0] << (double)m_default.m_vec2[1];
-
-		CASE VEC3 : os << (double)m_default.m_vec3[0] << (double)m_default.m_vec3[1]
-					   << (double)m_default.m_vec3[2];
-
-		CASE VEC4 : os << (double)m_default.m_vec4[0] << (double)m_default.m_vec4[1]
-					   << (double)m_default.m_vec4[2]
-					   << (double)m_default.m_vec4[3];
-
-		CASE INT : os << m_default.m_int;
-
-		CASE IVEC2 : os << m_default.m_ivec2[0] << m_default.m_ivec2[1];
-
-		CASE IVEC3 : os << m_default.m_ivec3[0] << m_default.m_ivec3[1]
-						<< m_default.m_ivec3[2];
-
-		CASE IVEC4 : os << m_default.m_ivec4[0] << m_default.m_ivec4[1]
-						<< m_default.m_ivec4[2]
-						<< m_default.m_ivec4[3];
-
-		CASE RGBA : os << (int)m_default.m_rgba[0] << (int)m_default.m_rgba[1]
-					   << (int)m_default.m_rgba[2]
-					   << (int)m_default.m_rgba[3];
-
-		CASE RGB : os << (int)m_default.m_rgb[0] << (int)m_default.m_rgb[1]
-					  << (int)m_default.m_rgb[2];
-
-	DEFAULT:;
-	};
+		break;
+	case FLOAT:
+		os << (double)m_default.m_float;
+		break;
+	case VEC2:
+		os << (double)m_default.m_vec2[0] << (double)m_default.m_vec2[1];
+		break;
+	case VEC3:
+		os << (double)m_default.m_vec3[0] << (double)m_default.m_vec3[1]
+			<< (double)m_default.m_vec3[2];
+		break;
+	case VEC4:
+		os << (double)m_default.m_vec4[0] << (double)m_default.m_vec4[1]
+			<< (double)m_default.m_vec4[2]
+			<< (double)m_default.m_vec4[3];
+		break;
+	case INT:
+		os << m_default.m_int;
+		break;
+	case IVEC2:
+		os << m_default.m_ivec2[0] << m_default.m_ivec2[1];
+		break;
+	case IVEC3:
+		os << m_default.m_ivec3[0] << m_default.m_ivec3[1]
+			<< m_default.m_ivec3[2];
+		break;
+	case IVEC4:
+		os << m_default.m_ivec4[0] << m_default.m_ivec4[1]
+			<< m_default.m_ivec4[2]
+			<< m_default.m_ivec4[3];
+		break;
+	case RGBA:
+		os << (int)m_default.m_rgba[0] << (int)m_default.m_rgba[1]
+			<< (int)m_default.m_rgba[2]
+			<< (int)m_default.m_rgba[3];
+		break;
+	case RGB:
+		os << (int)m_default.m_rgb[0] << (int)m_default.m_rgb[1]
+			<< (int)m_default.m_rgb[2];
+		break;
+	}
 
 	os.closeChild();
 
@@ -521,47 +531,53 @@ void ShaderInterface::Parameter::saveData(TOStream &os)
 	switch (m_type) {
 	case FLOAT:
 		os << (double)m_range[0].m_float << (double)m_range[1].m_float;
-
-		CASE VEC2 : os << (double)m_range[0].m_vec2[0] << (double)m_range[1].m_vec2[0]
-					   << (double)m_range[0].m_vec2[1]
-					   << (double)m_range[1].m_vec2[1];
-
-		CASE VEC3 : os << (double)m_range[0].m_vec3[0] << (double)m_range[1].m_vec3[0]
+		break;
+	case VEC2:
+		os << (double)m_range[0].m_vec2[0] << (double)m_range[1].m_vec2[0]
+					  << (double)m_range[0].m_vec2[1]
+					  << (double)m_range[1].m_vec2[1];
+		break;
+	case VEC3:
+		os << (double)m_range[0].m_vec3[0] << (double)m_range[1].m_vec3[0]
 					   << (double)m_range[0].m_vec3[1]
 					   << (double)m_range[1].m_vec3[1]
 					   << (double)m_range[0].m_vec3[2]
 					   << (double)m_range[1].m_vec3[2];
-
-		CASE VEC4 : os << (double)m_range[0].m_vec4[0] << (double)m_range[1].m_vec4[0]
-					   << (double)m_range[0].m_vec4[1]
-					   << (double)m_range[1].m_vec4[1]
-					   << (double)m_range[0].m_vec4[2]
-					   << (double)m_range[1].m_vec4[2]
-					   << (double)m_range[0].m_vec4[3]
-					   << (double)m_range[1].m_vec4[3];
-
-		CASE INT : os << m_range[0].m_int << m_range[1].m_int;
-
-		CASE IVEC2 : os << m_range[0].m_ivec2[0] << m_range[1].m_ivec2[0]
+		break;
+	case VEC4:
+		os << (double)m_range[0].m_vec4[0] << (double)m_range[1].m_vec4[0]
+					  << (double)m_range[0].m_vec4[1]
+					  << (double)m_range[1].m_vec4[1]
+					  << (double)m_range[0].m_vec4[2]
+					  << (double)m_range[1].m_vec4[2]
+					  << (double)m_range[0].m_vec4[3]
+					  << (double)m_range[1].m_vec4[3];
+		break;
+	case INT:
+		os << m_range[0].m_int << m_range[1].m_int;
+		break;
+	case IVEC2:
+		os << m_range[0].m_ivec2[0] << m_range[1].m_ivec2[0]
 						<< m_range[0].m_ivec2[1]
 						<< m_range[1].m_ivec2[1];
-
-		CASE IVEC3 : os << m_range[0].m_ivec3[0] << m_range[1].m_ivec3[0]
+		break;
+	case IVEC3:
+		os << m_range[0].m_ivec3[0] << m_range[1].m_ivec3[0]
 						<< m_range[0].m_ivec3[1]
 						<< m_range[1].m_ivec3[1]
 						<< m_range[0].m_ivec3[2]
 						<< m_range[1].m_ivec3[2];
-
-		CASE IVEC4 : os << m_range[0].m_ivec4[0] << m_range[1].m_ivec4[0]
+		break;
+	case IVEC4:
+		os << m_range[0].m_ivec4[0] << m_range[1].m_ivec4[0]
 						<< m_range[0].m_ivec4[1]
 						<< m_range[1].m_ivec4[1]
 						<< m_range[0].m_ivec4[2]
 						<< m_range[1].m_ivec4[2]
 						<< m_range[0].m_ivec4[3]
 						<< m_range[1].m_ivec4[3];
-
-	DEFAULT:;
-	};
+		break;
+	}
 
 	os.closeChild();
 }
@@ -591,83 +607,62 @@ void ShaderInterface::Parameter::loadData(TIStream &is)
 	switch (m_type) {
 	case BOOL:
 		m_default.m_bool = false;
-
-		CASE FLOAT:
-		{
-			m_default.m_float = 0.0;
-			m_range[0].m_float = -(std::numeric_limits<GLfloat>::max)();
-			m_range[1].m_float = (std::numeric_limits<GLfloat>::max)();
-		}
-
-		CASE VEC2:
-		{
-			m_default.m_vec2[0] = m_default.m_vec2[1] = 0.0;
-			m_range[0].m_vec2[0] = m_range[0].m_vec2[1] = -(std::numeric_limits<GLfloat>::max)();
-			m_range[1].m_vec2[0] = m_range[1].m_vec2[1] = (std::numeric_limits<GLfloat>::max)();
-		}
-
-		CASE VEC3:
-		{
-			m_default.m_vec3[0] = m_default.m_vec3[1] = m_default.m_vec3[1] = 0.0;
-			m_range[0].m_vec3[0] = m_range[0].m_vec3[1] = m_range[0].m_vec3[2] = -(std::numeric_limits<GLfloat>::max)();
-			m_range[1].m_vec3[0] = m_range[1].m_vec3[1] = m_range[1].m_vec3[2] = (std::numeric_limits<GLfloat>::max)();
-		}
-
-		CASE VEC4:
-		{
-			m_default.m_vec4[0] = m_default.m_vec4[1] =
-				m_default.m_vec4[1] = m_default.m_vec4[1] = 0.0;
-			m_range[0].m_vec4[0] = m_range[0].m_vec4[1] =
-				m_range[0].m_vec4[2] = m_range[0].m_vec4[3] = -(std::numeric_limits<GLfloat>::max)();
-			m_range[1].m_vec4[0] = m_range[1].m_vec4[1] =
-				m_range[1].m_vec4[2] = m_range[1].m_vec4[3] = (std::numeric_limits<GLfloat>::max)();
-		}
-
-		CASE INT:
-		{
-			m_default.m_int = 0;
-			m_range[0].m_int = -(std::numeric_limits<GLint>::max)();
-			m_range[1].m_int = (std::numeric_limits<GLint>::max)();
-		}
-
-		CASE IVEC2:
-		{
-			m_default.m_ivec2[0] = m_default.m_ivec2[1] = 0;
-			m_range[0].m_ivec2[0] = m_range[0].m_ivec2[1] = -(std::numeric_limits<GLint>::max)();
-			m_range[1].m_ivec2[0] = m_range[1].m_ivec2[1] = (std::numeric_limits<GLint>::max)();
-		}
-
-		CASE IVEC3:
-		{
-			m_default.m_ivec3[0] = m_default.m_ivec3[1] = m_default.m_ivec3[1] = 0;
-			m_range[0].m_ivec3[0] = m_range[0].m_ivec3[1] = m_range[0].m_ivec3[2] = -(std::numeric_limits<GLint>::max)();
-			m_range[1].m_ivec3[0] = m_range[1].m_ivec3[1] = m_range[1].m_ivec3[2] = (std::numeric_limits<GLint>::max)();
-		}
-
-		CASE IVEC4:
-		{
-			m_default.m_ivec4[0] = m_default.m_ivec4[1] =
-				m_default.m_ivec4[1] = m_default.m_ivec4[1] = 0;
-			m_range[0].m_ivec4[0] = m_range[0].m_ivec4[1] =
-				m_range[0].m_ivec4[2] = m_range[0].m_ivec4[3] = -(std::numeric_limits<GLint>::max)();
-			m_range[1].m_ivec4[0] = m_range[1].m_ivec4[1] =
-				m_range[1].m_ivec4[2] = m_range[1].m_ivec4[3] = (std::numeric_limits<GLint>::max)();
-		}
-
-		CASE RGBA:
-		{
-			m_default.m_rgba[0] = m_default.m_rgba[1] =
-				m_default.m_rgba[2] = m_default.m_rgba[3] = 255;
-		}
-
-		CASE RGB:
-		{
-			m_default.m_rgb[0] = m_default.m_rgb[1] =
-				m_default.m_rgb[2] = 255;
-		}
-
-	DEFAULT:;
-	};
+		break;
+	case FLOAT:
+		m_default.m_float = 0.0;
+		m_range[0].m_float = -(std::numeric_limits<GLfloat>::max)();
+		m_range[1].m_float = (std::numeric_limits<GLfloat>::max)();
+		break;
+	case VEC2:
+		m_default.m_vec2[0] = m_default.m_vec2[1] = 0.0;
+		m_range[0].m_vec2[0] = m_range[0].m_vec2[1] = -(std::numeric_limits<GLfloat>::max)();
+		m_range[1].m_vec2[0] = m_range[1].m_vec2[1] = (std::numeric_limits<GLfloat>::max)();
+		break;
+	case VEC3:
+		m_default.m_vec3[0] = m_default.m_vec3[1] = m_default.m_vec3[1] = 0.0;
+		m_range[0].m_vec3[0] = m_range[0].m_vec3[1] = m_range[0].m_vec3[2] = -(std::numeric_limits<GLfloat>::max)();
+		m_range[1].m_vec3[0] = m_range[1].m_vec3[1] = m_range[1].m_vec3[2] = (std::numeric_limits<GLfloat>::max)();
+		break;
+	case VEC4:
+		m_default.m_vec4[0] = m_default.m_vec4[1] =
+			m_default.m_vec4[1] = m_default.m_vec4[1] = 0.0;
+		m_range[0].m_vec4[0] = m_range[0].m_vec4[1] =
+			m_range[0].m_vec4[2] = m_range[0].m_vec4[3] = -(std::numeric_limits<GLfloat>::max)();
+		m_range[1].m_vec4[0] = m_range[1].m_vec4[1] =
+			m_range[1].m_vec4[2] = m_range[1].m_vec4[3] = (std::numeric_limits<GLfloat>::max)();
+		break;
+	case INT:
+		m_default.m_int = 0;
+		m_range[0].m_int = -(std::numeric_limits<GLint>::max)();
+		m_range[1].m_int = (std::numeric_limits<GLint>::max)();
+		break;
+	case IVEC2:
+		m_default.m_ivec2[0] = m_default.m_ivec2[1] = 0;
+		m_range[0].m_ivec2[0] = m_range[0].m_ivec2[1] = -(std::numeric_limits<GLint>::max)();
+		m_range[1].m_ivec2[0] = m_range[1].m_ivec2[1] = (std::numeric_limits<GLint>::max)();
+		break;
+	case IVEC3:
+		m_default.m_ivec3[0] = m_default.m_ivec3[1] = m_default.m_ivec3[1] = 0;
+		m_range[0].m_ivec3[0] = m_range[0].m_ivec3[1] = m_range[0].m_ivec3[2] = -(std::numeric_limits<GLint>::max)();
+		m_range[1].m_ivec3[0] = m_range[1].m_ivec3[1] = m_range[1].m_ivec3[2] = (std::numeric_limits<GLint>::max)();
+		break;
+	case IVEC4:
+		m_default.m_ivec4[0] = m_default.m_ivec4[1] =
+			m_default.m_ivec4[1] = m_default.m_ivec4[1] = 0;
+		m_range[0].m_ivec4[0] = m_range[0].m_ivec4[1] =
+			m_range[0].m_ivec4[2] = m_range[0].m_ivec4[3] = -(std::numeric_limits<GLint>::max)();
+		m_range[1].m_ivec4[0] = m_range[1].m_ivec4[1] =
+			m_range[1].m_ivec4[2] = m_range[1].m_ivec4[3] = (std::numeric_limits<GLint>::max)();
+		break;
+	case RGBA:
+		m_default.m_rgba[0] = m_default.m_rgba[1] =
+			m_default.m_rgba[2] = m_default.m_rgba[3] = 255;
+		break;
+	case RGB:
+		m_default.m_rgb[0] = m_default.m_rgb[1] =
+			m_default.m_rgb[2] = 255;
+		break;
+	}
 
 	// Attempt loading range from file
 	while (is.openChild(tagName)) {
@@ -678,69 +673,71 @@ void ShaderInterface::Parameter::loadData(TIStream &is)
 			case BOOL: {
 				int val;
 				is >> val, m_default.m_bool = val;
+				break;
 			}
 
-				CASE FLOAT:
-				{
-					double val;
-					is >> val, m_default.m_float = val;
-				}
+			case FLOAT: {
+				double val;
+				is >> val, m_default.m_float = val;
+				break;
+			}
 
-				CASE VEC2:
-				{
-					double val;
+			case VEC2: {
+				double val;
+				is >> val, m_default.m_vec2[0] = val;
+				is >> val, m_default.m_vec2[1] = val;
+				break;
+			}
 
-					is >> val, m_default.m_vec2[0] = val;
-					is >> val, m_default.m_vec2[1] = val;
-				}
+			case VEC3: {
+				double val;
+				is >> val, m_default.m_vec3[0] = val;
+				is >> val, m_default.m_vec3[1] = val;
+				is >> val, m_default.m_vec3[2] = val;
+				break;
+			}
 
-				CASE VEC3:
-				{
-					double val;
+			case VEC4: {
+				double val;
+				is >> val, m_default.m_vec4[0] = val;
+				is >> val, m_default.m_vec4[1] = val;
+				is >> val, m_default.m_vec4[2] = val;
+				is >> val, m_default.m_vec4[3] = val;
+				break;
+			}
 
-					is >> val, m_default.m_vec3[0] = val;
-					is >> val, m_default.m_vec3[1] = val;
-					is >> val, m_default.m_vec3[2] = val;
-				}
+			case INT:
+				is >> m_default.m_int;
+				break;
 
-				CASE VEC4:
-				{
-					double val;
+			case IVEC2:
+				is >> m_default.m_ivec2[0] >> m_default.m_ivec2[1];
+				break;
 
-					is >> val, m_default.m_vec4[0] = val;
-					is >> val, m_default.m_vec4[1] = val;
-					is >> val, m_default.m_vec4[2] = val;
-					is >> val, m_default.m_vec4[3] = val;
-				}
+			case IVEC3:
+				is >> m_default.m_ivec3[0] >> m_default.m_ivec3[1] >> m_default.m_ivec3[2];
+				break;
 
-				CASE INT : is >> m_default.m_int;
+			case IVEC4:
+				is >> m_default.m_ivec4[0] >> m_default.m_ivec4[1] >> m_default.m_ivec4[2] >> m_default.m_ivec4[3];
+				break;
 
-				CASE IVEC2 : is >> m_default.m_ivec2[0] >> m_default.m_ivec2[1];
+			case RGBA: {
+				int val;
+				is >> val, m_default.m_rgba[0] = val;
+				is >> val, m_default.m_rgba[1] = val;
+				is >> val, m_default.m_rgba[2] = val;
+				is >> val, m_default.m_rgba[3] = val;
+				break;
+			}
 
-				CASE IVEC3 : is >> m_default.m_ivec3[0] >> m_default.m_ivec3[1] >> m_default.m_ivec3[2];
-
-				CASE IVEC4 : is >> m_default.m_ivec4[0] >> m_default.m_ivec4[1] >> m_default.m_ivec4[2] >> m_default.m_ivec4[3];
-
-				CASE RGBA:
-				{
-					int val;
-
-					is >> val, m_default.m_rgba[0] = val;
-					is >> val, m_default.m_rgba[1] = val;
-					is >> val, m_default.m_rgba[2] = val;
-					is >> val, m_default.m_rgba[3] = val;
-				}
-
-				CASE RGB:
-				{
-					int val;
-
-					is >> val, m_default.m_rgb[0] = val;
-					is >> val, m_default.m_rgb[1] = val;
-					is >> val, m_default.m_rgb[2] = val;
-				}
-
-			DEFAULT:;
+			case RGB: {
+				int val;
+				is >> val, m_default.m_rgb[0] = val;
+				is >> val, m_default.m_rgb[1] = val;
+				is >> val, m_default.m_rgb[2] = val;
+				break;
+			}
 			}
 
 			is.closeChild();
@@ -748,56 +745,65 @@ void ShaderInterface::Parameter::loadData(TIStream &is)
 			switch (m_type) {
 			case FLOAT: {
 				double val;
-
 				is >> val, m_range[0].m_float = val;
 				is >> val, m_range[1].m_float = val;
+				break;
 			}
 
-				CASE VEC2:
-				{
-					double val;
+			case VEC2: {
+				double val;
+				is >> val, m_range[0].m_vec2[0] = val;
+				is >> val, m_range[1].m_vec2[0] = val;
+				is >> val, m_range[0].m_vec2[1] = val;
+				is >> val, m_range[1].m_vec2[1] = val;
+				break;
+			}
 
-					is >> val, m_range[0].m_vec2[0] = val;
-					is >> val, m_range[1].m_vec2[0] = val;
-					is >> val, m_range[0].m_vec2[1] = val;
-					is >> val, m_range[1].m_vec2[1] = val;
-				}
+			case VEC3: {
+				double val;
+				is >> val, m_range[0].m_vec3[0] = val;
+				is >> val, m_range[1].m_vec3[0] = val;
+				is >> val, m_range[0].m_vec3[1] = val;
+				is >> val, m_range[1].m_vec3[1] = val;
+				is >> val, m_range[0].m_vec3[2] = val;
+				is >> val, m_range[1].m_vec3[2] = val;
+				break;
+			}
 
-				CASE VEC3:
-				{
-					double val;
+			case VEC4: {
+				double val;
+				is >> val, m_range[0].m_vec4[0] = val;
+				is >> val, m_range[1].m_vec4[0] = val;
+				is >> val, m_range[0].m_vec4[1] = val;
+				is >> val, m_range[1].m_vec4[1] = val;
+				is >> val, m_range[0].m_vec4[2] = val;
+				is >> val, m_range[1].m_vec4[2] = val;
+				is >> val, m_range[0].m_vec4[3] = val;
+				is >> val, m_range[1].m_vec4[3] = val;
+				break;
+			}
 
-					is >> val, m_range[0].m_vec3[0] = val;
-					is >> val, m_range[1].m_vec3[0] = val;
-					is >> val, m_range[0].m_vec3[1] = val;
-					is >> val, m_range[1].m_vec3[1] = val;
-					is >> val, m_range[0].m_vec3[2] = val;
-					is >> val, m_range[1].m_vec3[2] = val;
-				}
+			case INT:
+				is >> m_range[0].m_int >> m_range[1].m_int;
+				break;
 
-				CASE VEC4:
-				{
-					double val;
+			case IVEC2:
+				is >> m_range[0].m_ivec2[0] >> m_range[1].m_ivec2[0]
+					>> m_range[0].m_ivec2[1] >> m_range[1].m_ivec2[1];
+				break;
 
-					is >> val, m_range[0].m_vec4[0] = val;
-					is >> val, m_range[1].m_vec4[0] = val;
-					is >> val, m_range[0].m_vec4[1] = val;
-					is >> val, m_range[1].m_vec4[1] = val;
-					is >> val, m_range[0].m_vec4[2] = val;
-					is >> val, m_range[1].m_vec4[2] = val;
-					is >> val, m_range[0].m_vec4[3] = val;
-					is >> val, m_range[1].m_vec4[3] = val;
-				}
+			case IVEC3:
+				is >> m_range[0].m_ivec3[0] >> m_range[1].m_ivec3[0]
+					>> m_range[0].m_ivec3[1] >> m_range[1].m_ivec3[1]
+					>> m_range[0].m_ivec3[2] >> m_range[1].m_ivec3[2];
+				break;
 
-				CASE INT : is >> m_range[0].m_int >> m_range[1].m_int;
-
-				CASE IVEC2 : is >> m_range[0].m_ivec2[0] >> m_range[1].m_ivec2[0] >> m_range[0].m_ivec2[1] >> m_range[1].m_ivec2[1];
-
-				CASE IVEC3 : is >> m_range[0].m_ivec3[0] >> m_range[1].m_ivec3[0] >> m_range[0].m_ivec3[1] >> m_range[1].m_ivec3[1] >> m_range[0].m_ivec3[2] >> m_range[1].m_ivec3[2];
-
-				CASE IVEC4 : is >> m_range[0].m_ivec4[0] >> m_range[1].m_ivec4[0] >> m_range[0].m_ivec4[1] >> m_range[1].m_ivec4[1] >> m_range[0].m_ivec4[2] >> m_range[1].m_ivec4[2] >> m_range[0].m_ivec4[3] >> m_range[1].m_ivec4[3];
-
-			DEFAULT:;
+			case IVEC4:
+				is >> m_range[0].m_ivec4[0] >> m_range[1].m_ivec4[0]
+					>> m_range[0].m_ivec4[1] >> m_range[1].m_ivec4[1]
+					>> m_range[0].m_ivec4[2] >> m_range[1].m_ivec4[2]
+					>> m_range[0].m_ivec4[3] >> m_range[1].m_ivec4[3];
+				break;
 			}
 
 			is.closeChild();

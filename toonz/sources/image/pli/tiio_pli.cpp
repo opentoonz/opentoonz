@@ -1,7 +1,5 @@
 
 
-#ifndef XPRESS
-
 #include "tiio_pli.h"
 //#include "tstrokeoutline.h"
 #include "tsystem.h"
@@ -386,30 +384,36 @@ TImageP TImageReaderPli::doLoad()
 	// per tutti gli oggetti presenti nel tag
 	for (i = 0; i < imageTag->m_numObjects; i++) {
 		switch (imageTag->m_object[i]->m_type) {
-		case PliTag::GROUP_GOBJ: {
+		case PliTag::GROUP_GOBJ:
 			assert(((GroupTag *)imageTag->m_object[i])->m_type == GroupTag::STROKE);
 			createGroup((GroupTag *)imageTag->m_object[i], outVectImage, strokeData);
-		}
-			CASE PliTag::INTERSECTION_DATA_GOBJ : readRegionVersion4x((IntersectionDataTag *)imageTag->m_object[i], outVectImage);
+			break;
 
+		case PliTag::INTERSECTION_DATA_GOBJ:
+			readRegionVersion4x((IntersectionDataTag *)imageTag->m_object[i], outVectImage);
+			break;
+
+		case PliTag::THICK_QUADRATIC_CHAIN_GOBJ:
 			// aggiunge le stroke quadratiche
-			CASE PliTag::THICK_QUADRATIC_CHAIN_GOBJ : createStroke((ThickQuadraticChainTag *)imageTag->m_object[i], outVectImage, strokeData);
+			createStroke((ThickQuadraticChainTag *)imageTag->m_object[i], outVectImage, strokeData);
+			break;
 
+		case PliTag::COLOR_NGOBJ: {
 			// aggiunge curve quadratiche con spessore costante
-			CASE PliTag::COLOR_NGOBJ:
-			{
-				ColorTag *colorTag = (ColorTag *)imageTag->m_object[i];
+			ColorTag *colorTag = (ColorTag *)imageTag->m_object[i];
 
-				assert(colorTag->m_numColors == 1);
-				strokeData.m_styleId = colorTag->m_color[0];
-				// isSketch=(colorTag->m_color[0] < c_maxSketchColorNum);
-				// isSketch=(colorTag->m_color[0] < c_maxSketchColorNum);
-			}
+			assert(colorTag->m_numColors == 1);
+			strokeData.m_styleId = colorTag->m_color[0];
+			// isSketch=(colorTag->m_color[0] < c_maxSketchColorNum);
+			// isSketch=(colorTag->m_color[0] < c_maxSketchColorNum);
 
+			break;
+		}
+
+		case PliTag::OUTLINE_OPTIONS_GOBJ:
 			// adds outline options data
-			CASE PliTag::OUTLINE_OPTIONS_GOBJ : strokeData.m_options = ((StrokeOutlineOptionsTag *)imageTag->m_object[i])->m_options;
-
-		DEFAULT:;
+			strokeData.m_options = ((StrokeOutlineOptionsTag *)imageTag->m_object[i])->m_options;
+			break;
 		} // switch(groupTag->m_object[j]->m_type)
 	}	 // for (i=0; i<imageTag->m_numObjects; i++)
 
@@ -823,5 +827,3 @@ GroupTag *makeGroup(TVectorImageP &vi, int &currStyleId, int &index, int currDep
 }
 
 //=============================================================================
-
-#endif

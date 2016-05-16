@@ -6016,13 +6016,6 @@ Sei sicuro di voler tornare alla versione precedente?</translation>
         <translation>Le stanze saranno ripristinate la prossima volta che Toonz sarà avviato.</translation>
     </message>
     <message>
-        <source>The license validation process was not able to confirm the right to use this software on this computer.
- Please contact [ support@toonz.com ] for assistance.</source>
-        <translation>Il processo di validazione della licenza non è in grado di verificare il diritto d&apos;uso di questo software su questo computer.
-Contattare [ support@toonz.com ] per avere assistenza.
-</translation>
-    </message>
-    <message>
         <source>Saving previewed frames....</source>
         <translation>Salvataggio dei fotogrammi mostrati in anteprima in corso</translation>
     </message>

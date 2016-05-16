@@ -846,10 +846,8 @@ void DragSelectionTool::Scale::leftButtonDrag(const TPointD &pos, const TMouseEv
 SelectionTool::SelectionTool(int targetType)
 	: TTool("T_Selection"), m_firstTime(true), m_dragTool(0), m_what(Outside), m_leftButtonMousePressed(false), m_shiftPressed(false), m_selecting(false), m_mousePosition(TPointD()), m_stroke(0), m_justSelected(false), m_strokeSelectionType("Type:"), m_deformValues(), m_cursorId(ToolCursor::CURSOR_ARROW)
 {
-#ifndef STUDENT
 	bind(targetType);
 	m_prop.bind(m_strokeSelectionType);
-#endif
 
 	m_strokeSelectionType.addValue(RECT_SELECTION);
 	m_strokeSelectionType.addValue(FREEHAND_SELECTION);

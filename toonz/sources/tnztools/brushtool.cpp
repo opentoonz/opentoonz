@@ -570,11 +570,9 @@ BrushTool::BrushTool(std::string name, int targetType)
 	}
 
 	m_prop[0].bind(m_pressure);
-#ifndef STUDENT
 	m_prop[0].bind(m_preset);
 	m_preset.setId("BrushPreset");
 	m_preset.addValue(CUSTOM_WSTR);
-#endif
 	m_pressure.setId("PressureSensibility");
 
 	m_capStyle.addValue(BUTT_WSTR);
@@ -1229,10 +1227,13 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 		double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
 
 		locals.addMinMax(TToonzImageP(getImage(false, 1)) ? m_rasThickness : m_thickness, add);
+
+		break;
 	}
 
-	DEFAULT:
+	default:
 		m_brushPos = pos;
+		break;
 	}
 
 	m_mousePos = pos;

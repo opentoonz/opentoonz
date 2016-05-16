@@ -1282,13 +1282,16 @@ void ColumnArea::paintEvent(QPaintEvent *event)
 			switch (colType) {
 			case TXshColumn::ePaletteType:
 				drawPaletteColumnHead(p, col);
-
-				CASE TXshColumn::eSoundType : drawSoundColumnHead(p, col);
-
-				CASE TXshColumn::eSoundTextType : drawSoundTextColumnHead(p, col);
-
-			DEFAULT:
+				break;
+			case TXshColumn::eSoundType:
+				drawSoundColumnHead(p, col);
+				break;
+			case TXshColumn::eSoundTextType:
+				drawSoundTextColumnHead(p, col);
+				break;
+			default:
 				drawLevelColumnHead(p, col);
+				break;
 			}
 		}
 	}

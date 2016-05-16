@@ -405,27 +405,7 @@ if (    image->orientation != TOR_LEFTBOT  &&
 	TRasterP ras = image->getRaster();
 	wrap = ras->getWrap();
 	assert(TRaster32P(ras) || TRasterGR8P(ras)); //per ricordare di gestire le img bw!
-	/* DAFARE
-if (rop_pixbits (image->ras.type) < 8 && rop_fillerbits (image->ras.type))
-  wrap = (wrap + 7) / 8 * 8;
-*/
 
-	/* DAFARE
-switch (image->orientation)
-  {
-  CASE TOR_BOTLEFT:__OR TOR_BOTRIGHT:__OR TOR_TOPLEFT:__OR TOR_TOPRIGHT:
-    strip_width = mmToPixel (5.0, image->x_dpi);
-    lx = image->ras.lx;
-    ly = image->ras.ly;
-
-  CASE TOR_LEFTBOT:__OR TOR_RIGHTBOT:__OR TOR_LEFTTOP:__OR TOR_RIGHTTOP:
-    strip_width = mmToPixel (5.0, image->y_dpi);
-    lx = image->ras.ly;
-    ly = image->ras.lx;
-
-  DEFAULT: assert (FALSE);lx=ly=strip_width=0;
-  }
-*/
 	//assumo TOR_BOTLEFT:__OR TOR_BOTRIGHT:__OR TOR_TOPLEFT:__OR TOR_TOPRIGHT:
 	double dpix, dpiy;
 	image->getDpi(dpix, dpiy);
@@ -435,44 +415,7 @@ switch (image->orientation)
 
 	mx = lx - 1;
 	my = ly - 1;
-	/* DAFARE
-switch (image->orientation)
-  {
-  CASE TOR_BOTLEFT:
-    pix_origin = 0;
-    dpix_dx =  1;
-    dpix_dy =  wrap;
-  CASE TOR_BOTRIGHT:
-    pix_origin = mx;
-    dpix_dx = -1;
-    dpix_dy =  wrap;
-  CASE TOR_TOPLEFT:
-    pix_origin = my * wrap;
-    dpix_dx =  1;
-    dpix_dy = -wrap;
-  CASE TOR_TOPRIGHT:
-    pix_origin = mx + my * wrap;
-    dpix_dx = -1;
-    dpix_dy = -wrap;
-  CASE TOR_LEFTBOT:
-    pix_origin = 0;
-    dpix_dx =  wrap;
-    dpix_dy =  1;
-  CASE TOR_RIGHTBOT:
-    pix_origin = mx * wrap;
-    dpix_dx = -wrap;
-    dpix_dy =  1;
-  CASE TOR_LEFTTOP:
-    pix_origin = my;
-    dpix_dx =  wrap;
-    dpix_dy = -1;
-  CASE TOR_RIGHTTOP:
-    pix_origin = my + mx * wrap;
-    dpix_dx = -wrap;
-    dpix_dy = -1;
-  DEFAULT: assert(FALSE); pix_origin=dpix_dx=dpix_dy=0;
-  }
-*/
+
 	//assumo  CASE TOR_BOTLEFT:
 	pix_origin = 0;
 	dpix_dx = 1;
@@ -494,17 +437,7 @@ switch (image->orientation)
 		assert(!"Unsupported pixel type");
 
 	ras->unlock();
-	/*
-  CASE RAS_WB:
-  __OR RAS_BW:
-    assert ( !image->ras.bit_offs);
-    return autoalign_bw (image->ras.buffer, image->ras.type,
-                         wrap, lx, ly, pix_origin,
-		         dpix_dx, dpix_dy, strip_width);
 
-  DEFAULT: assert (!"Unsupported alignment\n");
-  }
-*/
 	return FALSE;
 }
 
@@ -729,12 +662,7 @@ static int find_dots(const TRasterP &img, int strip_width, PEGS_SIDE pegs_side,
 		return find_dots_gr8(ras8, strip_width, pegs_side, dotarray, dotarray_size,
 							 max_area);
 	assert(!"Unsupported pixel type");
-	/* DAFARE
-  CASE RAS_BW:
-  __OR RAS_WB:
-    return find_dots_bw (img, strip_width, pegs_side, dotarray, dotarray_size,
-                              max_area);
-*/
+
 	return 0;
 }
 
@@ -762,19 +690,25 @@ static int find_dots_bw(const TRasterP &img, int strip_width, PEGS_SIDE pegs_sid
 	}
 
 	switch (pegs_side) {
-		CASE PEGS_BOTTOM : __OR PEGS_TOP : x0 = 0;
+	case PEGS_BOTTOM:
+	case PEGS_TOP:
+		x0 = 0;
 		y0 = pegs_side == PEGS_BOTTOM ? 0 : img->ly - strip_width;
 		xsize = img->lx;
 		ysize = strip_width;
 		vertical = FALSE;
-
-		CASE PEGS_LEFT : __OR PEGS_RIGHT : x0 = pegs_side == PEGS_LEFT ? 0 : img->lx - strip_width;
+		break;
+		
+	case PEGS_LEFT:
+	case PEGS_RIGHT:
+		x0 = pegs_side == PEGS_LEFT ? 0 : img->lx - strip_width;
 		y0 = 0;
 		xsize = strip_width;
 		ysize = img->ly;
 		vertical = TRUE;
+		break;
 
-	DEFAULT : {
+	default: {
 		ostrstream os;
 		os << "find dots internal error: pegs_side = " << std::hex << pegs_side << '\0';
 		os.freeze(false);
@@ -891,19 +825,23 @@ static int find_dots_gr8(const TRasterGR8P &img, int strip_width, PEGS_SIDE pegs
 	int vertical;
 
 	switch (pegs_side) {
-		CASE PEGS_BOTTOM : __OR PEGS_TOP : x0 = 0;
+	case PEGS_BOTTOM:
+	case PEGS_TOP:
+		x0 = 0;
 		y0 = pegs_side == PEGS_BOTTOM ? 0 : img->getLy() - strip_width;
 		xsize = img->getLx();
 		ysize = strip_width;
 		vertical = FALSE;
-
-		CASE PEGS_LEFT : __OR PEGS_RIGHT : x0 = pegs_side == PEGS_LEFT ? 0 : img->getLx() - strip_width;
+		break;
+	case PEGS_LEFT:
+	case PEGS_RIGHT:
+		x0 = pegs_side == PEGS_LEFT ? 0 : img->getLx() - strip_width;
 		y0 = 0;
 		xsize = strip_width;
 		ysize = img->getLy();
 		vertical = TRUE;
-
-	DEFAULT : {
+		break;
+	default: {
 		std::ostrstream os;
 		os << "find dots internal error: pegs_side = " << std::hex << pegs_side << '\0';
 		os.freeze(false);
@@ -1016,24 +954,29 @@ static int find_dots_rgb(const TRaster32P &img, int strip_width, PEGS_SIDE pegs_
 
 	assert(img->getPixelSize() == 4); /*questo e' per ricordare che l'algo e' per RGB*/
 	switch (pegs_side) {
-		CASE PEGS_BOTTOM : __OR PEGS_TOP : x0 = 0;
+	case PEGS_BOTTOM:
+	case PEGS_TOP:
+		x0 = 0;
 		y0 = pegs_side == PEGS_BOTTOM ? 0 : img->getLy() - strip_width;
 		xsize = img->getLx();
 		ysize = strip_width;
 		vertical = FALSE;
-
-		CASE PEGS_LEFT : __OR PEGS_RIGHT : x0 = pegs_side == PEGS_LEFT ? 0 : img->getLx() - strip_width;
+		break;
+	case PEGS_LEFT:
+	case PEGS_RIGHT:
+		x0 = pegs_side == PEGS_LEFT ? 0 : img->getLx() - strip_width;
 		y0 = 0;
 		xsize = strip_width;
 		ysize = img->getLy();
 		vertical = TRUE;
-
-	DEFAULT : {
+		break;
+	default: {
 		std::ostrstream os;
 		os << "find dots internal error: pegs_side = " << std::hex << pegs_side << '\0';
 		os.freeze(false);
 		throw TCleanupException(os.str());
 		x0 = y0 = xsize = ysize = vertical = 0;
+		break;
 	}
 	}
 	xlast = x0 + xsize - 1;
@@ -1190,11 +1133,11 @@ start:
 	if (!STACK_IS_EMPTY) {
 		POP_FROM_STACK_U(ret, x, y, i, j, bit, byte);
 		switch (ret) {
-			CASE 1 : goto return_1;
-			CASE 2 : goto return_2;
-			CASE 3 : goto return_3;
-			CASE 4 : goto return_4;
-		DEFAULT:
+		case 1 : goto return_1;
+		case 2 : goto return_2;
+		case 3 : goto return_3;
+		case 4 : goto return_4;
+		default:
 			abort();
 		}
 	}
@@ -1319,11 +1262,11 @@ start:
 	if (!STACK_IS_EMPTY) {
 		POP_FROM_STACK_U(ret, x, y, i, j, dummy, pix);
 		switch (ret) {
-			CASE 1 : goto return_1;
-			CASE 2 : goto return_2;
-			CASE 3 : goto return_3;
-			CASE 4 : goto return_4;
-		DEFAULT:
+		case 1 : goto return_1;
+		case 2 : goto return_2;
+		case 3 : goto return_3;
+		case 4 : goto return_4;
+		default:
 			abort();
 		}
 	}
@@ -1432,11 +1375,11 @@ start:
 	if (!STACK_IS_EMPTY) {
 		POP_FROM_STACK_TPIXEL32(ret, x, y, i, j, dummy, pix);
 		switch (ret) {
-			CASE 1 : goto return_1;
-			CASE 2 : goto return_2;
-			CASE 3 : goto return_3;
-			CASE 4 : goto return_4;
-		DEFAULT:
+		case 1 : goto return_1;
+		case 2 : goto return_2;
+		case 3 : goto return_3;
+		case 4 : goto return_4;
+		default:
 			abort();
 		}
 	}
@@ -1558,9 +1501,13 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 		dx = dotarray[i + 1].x - dotarray[i].x;
 		dy = dotarray[i + 1].y - dotarray[i].y;
 		switch (pegs_side) {
-			CASE PEGS_LEFT : __OR PEGS_RIGHT : angle += dy == 0.0 ? TConsts::pi_2 : atan(dx / dy);
-		DEFAULT:
+		case PEGS_LEFT:
+		case PEGS_RIGHT:
+			angle += dy == 0.0 ? TConsts::pi_2 : atan(dx / dy);
+			break;
+		default:
 			angle -= dx == 0.0 ? TConsts::pi_2 : atan(dy / dx);
+			break;
 		}
 	}
 
