@@ -15,84 +15,84 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\crc32.h">
+    <ClInclude Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\crc32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deflate.h">
+    <ClInclude Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\deflate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gzguts.h">
+    <ClInclude Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\gzguts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\inffast.h">
+    <ClInclude Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\inffast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\inffixed.h">
+    <ClInclude Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\inffixed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\inflate.h">
+    <ClInclude Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\inflate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\inftrees.h">
+    <ClInclude Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\inftrees.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\trees.h">
+    <ClInclude Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\trees.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\zconf.h">
+    <ClInclude Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\zconf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\zlib.h">
+    <ClInclude Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\zlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\zutil.h">
+    <ClInclude Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\zutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\adler32.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\adler32.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\compress.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\compress.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\crc32.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\crc32.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deflate.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\deflate.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gzclose.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\gzclose.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gzlib.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\gzlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gzread.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\gzread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gzwrite.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\gzwrite.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\infback.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\infback.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\inffast.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\inffast.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\inflate.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\inflate.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\inftrees.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\inftrees.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\trees.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\trees.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\uncompr.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\uncompr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\zutil.c">
+    <ClCompile Include="..\..\..\..\..\..\depot\sdk\zlib\zlib-1.2.7\zutil.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
