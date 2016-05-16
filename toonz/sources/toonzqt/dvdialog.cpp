@@ -1049,21 +1049,21 @@ int DVGui::MsgBox(const QString &text,
 
 	QPushButton *button1 = new QPushButton(button1Text, &dialog);
 	button1->setDefault(false);
-	if (defaultButtonIndex = 0)
+	if (defaultButtonIndex == 0)
 		button1->setDefault(true);
 	dialog.addButtonBarWidget(button1);
 	buttonGroup->addButton(button1, 1);
 
 	QPushButton *button2 = new QPushButton(button2Text, &dialog);
 	button2->setDefault(false);
-	if (defaultButtonIndex = 1)
+	if (defaultButtonIndex == 1)
 		button2->setDefault(true);
 	dialog.addButtonBarWidget(button2);
 	buttonGroup->addButton(button2, 2);
 
 	QPushButton *button3 = new QPushButton(button3Text, &dialog);
 	button3->setDefault(false);
-	if (defaultButtonIndex = 2)
+	if (defaultButtonIndex == 2)
 		button3->setDefault(true);
 	dialog.addButtonBarWidget(button3);
 	buttonGroup->addButton(button3, 3);
