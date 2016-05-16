@@ -24,7 +24,6 @@ void UpdateChecker::httpRequestFinished(QNetworkReply *pReply)
 	QString candidateVersion = QString(reply->readAll()).trimmed();
 
 	// TODO: Verify that the response was valid by ensuring we have a single line in the format x.x[.x]*
-	// For now, we can do a lazy version by ensuring we have at least a period
 	if (candidateVersion.indexOf(".") < 0) {
 		// There was some invalid response, so we'll ignore the check for now
 		emit done(true);
