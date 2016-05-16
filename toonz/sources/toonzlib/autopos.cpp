@@ -1083,8 +1083,8 @@ static int find_dots_rgb(const TRaster32P &img, int strip_width, PEGS_SIDE pegs_
 				if (Npix < max_area * 3 / 2 &&
 					dot_lx > 3 && dot_lx < (xsize >> 1) &&
 					dot_ly > 3 && dot_ly < (ysize >> 1) &&
-					Xmin > x0 && Xmax < xlast &&
-					Ymin > y0 && Ymax < ylast) {
+					Xmin > x0 && Xmax <= xlast &&
+					Ymin > y0 && Ymax <= ylast) {
 					dot_x = (float)(BIG_TO_DOUBLE(Xsum) / BIG_TO_DOUBLE(Weightsum));
 					dot_y = (float)(BIG_TO_DOUBLE(Ysum) / BIG_TO_DOUBLE(Weightsum));
 					if (vertical) {
