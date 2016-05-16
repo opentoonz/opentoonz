@@ -418,7 +418,7 @@ BorderList *extractBorders(const TRasterP &ras, int threshold, int despeckling)
 
 				if ((signature = byteImage.getSignature(x, y)) == none) {
 					//We've found a border
-					if (foundPath = extractPath(byteImage, x, y, !enteredRegionType, xOuterPixel, despeckling))
+					if ((foundPath = extractPath(byteImage, x, y, !enteredRegionType, xOuterPixel, despeckling)))
 						if (enteredRegionType == outer)
 							innerBorders.push_back(foundPath);
 						else

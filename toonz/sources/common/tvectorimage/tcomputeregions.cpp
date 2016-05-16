@@ -1775,15 +1775,15 @@ void getClosingSegments(TL2LAutocloser &l2lautocloser, double facMin, double fac
 		return;
 
 	if (!s1->isSelfLoop() && !s2->isSelfLoop()) {
-		if (ret1 = isCloseEnoughP2P(facMin, facMax, s1, 0.0, s2, 1.0))
+		if ((ret1 = isCloseEnoughP2P(facMin, facMax, s1, 0.0, s2, 1.0)))
 			segments.push_back(std::pair<double, double>(0.0, 1.0));
 
 		if (s1 != s2) {
-			if (ret2 = isCloseEnoughP2P(facMin, facMax, s1, 0.0, s2, 0.0))
+			if ((ret2 = isCloseEnoughP2P(facMin, facMax, s1, 0.0, s2, 0.0)))
 				segments.push_back(std::pair<double, double>(0.0, 0.0));
-			if (ret3 = isCloseEnoughP2P(facMin, facMax, s1, 1.0, s2, 0.0))
+			if ((ret3 = isCloseEnoughP2P(facMin, facMax, s1, 1.0, s2, 0.0)))
 				segments.push_back(std::pair<double, double>(1.0, 0.0));
-			if (ret4 = isCloseEnoughP2P(facMin, facMax, s1, 1.0, s2, 1.0))
+			if ((ret4 = isCloseEnoughP2P(facMin, facMax, s1, 1.0, s2, 1.0)))
 				segments.push_back(std::pair<double, double>(1.0, 1.0));
 		}
 	}
