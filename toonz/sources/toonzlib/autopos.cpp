@@ -1486,6 +1486,7 @@ static void visit_rgb(int i, int j, int x, int y, TPixel32 *pix)
 
 #endif
 
+#define PERCENT (40.0 / 100.0)
 /*---------------------------------------------------------------------------*/
 /*
  * Attenzione: tutti i controlli e i calcoli vengono fatti in pixel.
@@ -1504,7 +1505,7 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 	DOT _dotarray[MAX_DOT];
 	DOT *dotarray = _dotarray;
 	int ndot, central;
-	int max_area;
+	int max_area, min_area;
 
 	*p_ang = 0.0;
 
@@ -1516,9 +1517,21 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 	}
 
 	max_area = 0;
+	if (ref_dot > 0)
+	{
+	  min_area = ref[0].area;
+	}
 	for (i = 0; i < ref_dot; i++)
+	{
 		if (ref[i].area > max_area)
+		{
 			max_area = ref[i].area;
+		}
+		if (ref[i].area < min_area)
+		{
+			min_area = ref[i].area;
+		}
+	}
 
 	ndot = find_dots(img, strip_width, pegs_side, dotarray, MAX_DOT, max_area);
 	if (Debug_flag)
@@ -1527,7 +1540,7 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 	i = 0;
 	while (i < ndot) //elimino i dots troppo piccoli
 	{
-		if (dotarray[i].area < 500) {
+		if (dotarray[i].area < min_area * PERCENT) {
 			for (int j = i; j < ndot - 1; j++)
 				dotarray[j] = dotarray[j + 1];
 			ndot--;
@@ -1576,7 +1589,6 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 }
 
 /*---------------------------------------------------------------------------*/
-#define PERCENT (40.0 / 100.0)
 #define MIN_V 100.0
 
 static int compare_dots(DOT dots[], int *ndots,
