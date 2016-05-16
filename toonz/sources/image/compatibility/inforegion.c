@@ -248,14 +248,17 @@ int get_info_region(EXT_INFO_REGION *region,
 	appoNrow = MIN((region->scanNrow * scale), height_in);
 
 	switch (orientation) {
-		CASE TNZ_TOPLEFT : region->buf_inc = 1;
+	case TNZ_TOPLEFT:
+		region->buf_inc = 1;
 		region->y_offset += region->scanNrow - 1;
 		region->verso_x = 0;
 		region->verso_y = -1;
 		region->sxpix = region->startScanCol;
 		region->sypix = height_in - region->startScanRow - appoNrow;
 		region->sypix = MAX(0, region->sypix);
-		CASE TNZ_TOPRIGHT : region->buf_inc = -1;
+		break;
+	case TNZ_TOPRIGHT:
+		region->buf_inc = -1;
 		region->y_offset += region->scanNrow - 1;
 		region->x_offset += region->scanNcol - 1;
 		region->verso_x = 0;
@@ -264,24 +267,32 @@ int get_info_region(EXT_INFO_REGION *region,
 		region->sypix = height_in - region->startScanRow - appoNrow;
 		region->sxpix = MAX(0, region->sxpix);
 		region->sypix = MAX(0, region->sypix);
-		CASE TNZ_BOTRIGHT : region->buf_inc = -1;
+		break;
+	case TNZ_BOTRIGHT:
+		region->buf_inc = -1;
 		region->x_offset += region->scanNcol - 1;
 		region->verso_x = 0;
 		region->verso_y = 1;
 		region->sxpix = width_in - region->startScanCol - appoNcol;
 		region->sypix = region->startScanRow;
-		CASE TNZ_BOTLEFT : region->buf_inc = 1;
+		break;
+	case TNZ_BOTLEFT:
+		region->buf_inc = 1;
 		region->verso_x = 0;
 		region->verso_y = 1;
 		region->sxpix = region->startScanCol;
 		region->sypix = region->startScanRow;
-		CASE TNZ_LEFTOP : region->buf_inc = -region->xsize;
+		break;
+	case TNZ_LEFTOP:
+		region->buf_inc = -region->xsize;
 		region->y_offset += region->scanNrow - 1;
 		region->verso_x = 1;
 		region->verso_y = 0;
 		region->sxpix = height_in - region->startScanRow - appoNrow;
 		region->sypix = region->startScanCol;
-		CASE TNZ_RIGHTOP : region->buf_inc = -region->xsize;
+		break;
+	case TNZ_RIGHTOP:
+		region->buf_inc = -region->xsize;
 		region->y_offset += region->scanNrow - 1;
 		region->x_offset += region->scanNcol - 1;
 		region->verso_x = -1;
@@ -290,18 +301,23 @@ int get_info_region(EXT_INFO_REGION *region,
 			region->sxpix = 0;
 		if ((region->sypix = width_in - region->startScanCol - appoNcol) < 0)
 			region->sypix = 0;
-		CASE TNZ_RIGHTBOT : region->buf_inc = region->xsize;
+		break;
+	case TNZ_RIGHTBOT:
+		region->buf_inc = region->xsize;
 		region->x_offset += region->scanNcol - 1;
 		region->verso_x = -1;
 		region->verso_y = 0;
 		region->sxpix = region->startScanRow;
 		region->sypix = width_in - region->startScanCol - appoNcol;
-		CASE TNZ_LEFTBOT : region->buf_inc = region->xsize;
+		break;
+	case TNZ_LEFTBOT:
+		region->buf_inc = region->xsize;
 		region->verso_x = 1;
 		region->verso_y = 0;
 		region->sxpix = region->startScanRow;
 		region->sypix = region->startScanCol;
-	DEFAULT:
+		break;
+	default:
 		printf("error: bad orientation type\n");
 		return FALSE;
 	}

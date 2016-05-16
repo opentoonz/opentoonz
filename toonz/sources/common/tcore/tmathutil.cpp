@@ -783,11 +783,19 @@ int rootFinding(const std::vector<double> &in_poly, std::vector<double> &sol)
 	case 0:
 		if (sol.empty())
 			return INFINITE_SOLUTIONS;
-		CASE 1 : //no solutions
-				 CASE 2 : sol.push_back(-p[0] / p[1]);
-		CASE 3 : rootForQuadraticEquation(p, sol);
-		CASE 4 : rootForCubicEquation(p, sol);
-	DEFAULT:
+		break;
+	case 1: //no solutions
+		break;
+	case 2:
+		sol.push_back(-p[0] / p[1]);
+		break;
+	case 3:
+		rootForQuadraticEquation(p, sol);
+		break;
+	case 4:
+		rootForCubicEquation(p, sol);
+		break;
+	default:
 		rootForGreaterThanThreeEquation(p, sol);
 	}
 	return sol.size();

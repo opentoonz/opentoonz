@@ -895,29 +895,25 @@ IoCmd::ExportLevelOptions ExportLevelPopup::ExportOptions::getOptions() const
 	opts.m_camera.setRes(TDimension(m_hResFld->getValue(), m_vResFld->getValue()));
 
 	switch (m_thicknessTransformMode->currentIndex()) {
-		enum { SCALE,
-			   ADD,
-			   CONSTANT };
+		enum { SCALE, ADD, CONSTANT };
 
-	case SCALE: {
+	case SCALE:
 		opts.m_thicknessTransform[0][0] = opts.m_thicknessTransform[1][0] = 0.0;
 		opts.m_thicknessTransform[0][1] = m_fromThicknessScale->getValue();
 		opts.m_thicknessTransform[1][1] = m_toThicknessScale->getValue();
-	}
+		break;
 
-		CASE ADD:
-		{
-			opts.m_thicknessTransform[0][1] = opts.m_thicknessTransform[1][1] = 1.0;
-			opts.m_thicknessTransform[0][0] = m_fromThicknessDisplacement->getValue() * Stage::inch;
-			opts.m_thicknessTransform[1][0] = m_toThicknessDisplacement->getValue() * Stage::inch;
-		}
+	case ADD:
+		opts.m_thicknessTransform[0][1] = opts.m_thicknessTransform[1][1] = 1.0;
+		opts.m_thicknessTransform[0][0] = m_fromThicknessDisplacement->getValue() * Stage::inch;
+		opts.m_thicknessTransform[1][0] = m_toThicknessDisplacement->getValue() * Stage::inch;
+		break;
 
-		CASE CONSTANT:
-		{
-			opts.m_thicknessTransform[0][1] = opts.m_thicknessTransform[1][1] = 0.0;
-			opts.m_thicknessTransform[0][0] = m_fromThicknessDisplacement->getValue() * Stage::inch;
-			opts.m_thicknessTransform[1][0] = m_toThicknessDisplacement->getValue() * Stage::inch;
-		}
+	case CONSTANT:
+		opts.m_thicknessTransform[0][1] = opts.m_thicknessTransform[1][1] = 0.0;
+		opts.m_thicknessTransform[0][0] = m_fromThicknessDisplacement->getValue() * Stage::inch;
+		opts.m_thicknessTransform[1][0] = m_toThicknessDisplacement->getValue() * Stage::inch;
+		break;
 	}
 
 	return opts;

@@ -242,10 +242,14 @@ bool PolyStyle::operator==(const PolyStyle &p) const
 	switch (m_type) {
 	case Centerline:
 		return m_thickness == p.m_thickness && m_color1 == p.m_color1;
-		CASE Solid : return m_color1 == p.m_color1;
-		CASE Texture : return m_matrix == p.m_matrix && m_texture.getPointer() == p.m_texture.getPointer();
-		CASE LinearGradient : __OR RadialGradient : return m_color1 == p.m_color1 && m_color2 == p.m_color2 && m_matrix == p.m_matrix && m_smooth == p.m_smooth;
-	DEFAULT:
+	case Solid:
+		return m_color1 == p.m_color1;
+	case Texture:
+		return m_matrix == p.m_matrix && m_texture.getPointer() == p.m_texture.getPointer();
+	case LinearGradient:
+	case RadialGradient:
+		return m_color1 == p.m_color1 && m_color2 == p.m_color2 && m_matrix == p.m_matrix && m_smooth == p.m_smooth;
+	default:
 		assert(false);
 		return false;
 	}
@@ -281,10 +285,14 @@ bool PolyStyle::operator<(const PolyStyle &p) const
 		switch (m_type) {
 		case Centerline:
 			return (m_thickness == p.m_thickness) ? m_color1 < p.m_color1 : m_thickness < p.m_thickness;
-			CASE Solid : return m_color1 < p.m_color1;
-			CASE Texture : return m_texture.getPointer() < p.m_texture.getPointer(); //ignoro la matrice!!!!
-			CASE LinearGradient : __OR RadialGradient : return (m_smooth == p.m_smooth) ? ((m_color1 == p.m_color1) ? ((m_color2 == p.m_color2) ? affineMinorThen(m_matrix, p.m_matrix) : m_color2 < p.m_color2) : m_color1 < p.m_color1) : m_smooth < p.m_smooth;
-		DEFAULT:
+		case Solid:
+			return m_color1 < p.m_color1;
+		case Texture:
+			return m_texture.getPointer() < p.m_texture.getPointer(); //ignoro la matrice!!!!
+		case LinearGradient:
+		case RadialGradient:
+			return (m_smooth == p.m_smooth) ? ((m_color1 == p.m_color1) ? ((m_color2 == p.m_color2) ? affineMinorThen(m_matrix, p.m_matrix) : m_color2 < p.m_color2) : m_color1 < p.m_color1) : m_smooth < p.m_smooth;
+		default:
 			assert(false);
 			return false;
 		}

@@ -187,32 +187,42 @@ static int quantel_get_info(const T_CHAR *fname, int type, int *xsize, int *ysiz
 	case QNT_FORMAT:
 		*xsize = QNT_PAL_XSIZE;
 		*ysize = QNT_PAL_YSIZE;
-		CASE QTL_FORMAT :
-			*xsize = QTL_NTSC_XSIZE;
+		break;
+	case QTL_FORMAT:
+		*xsize = QTL_NTSC_XSIZE;
 		*ysize = QTL_NTSC_YSIZE;
-		CASE YUV_FORMAT :
-			*xsize = QUANTEL_XSIZE;
+		break;
+	case YUV_FORMAT:
+		*xsize = QUANTEL_XSIZE;
 		switch (f_stat.st_size) {
 		case QNT_PAL_FILE_SIZE:
-			__OR QNT_PAL_W_FILE_SIZE :
-				*ysize = QNT_PAL_YSIZE;
-			CASE QTL_NTSC_FILE_SIZE : __OR QTL_NTSC_W_FILE_SIZE :
-										  *ysize = QTL_NTSC_YSIZE;
-		DEFAULT:
+		case QNT_PAL_W_FILE_SIZE:
+			*ysize = QNT_PAL_YSIZE;
+			break;
+		case QTL_NTSC_FILE_SIZE:
+		case QTL_NTSC_W_FILE_SIZE:
+			*ysize = QTL_NTSC_YSIZE;
+			break;
+		default:
 			*ysize = f_stat.st_size / (QUANTEL_XSIZE * sizeof(short));
+			break;
 		}
-		CASE SDL_FORMAT :
-			*xsize = QNT_PAL_XSIZE;
+		break;
+	case SDL_FORMAT:
+		*xsize = QNT_PAL_XSIZE;
 		switch (f_stat.st_size) {
 		case QNT_PAL_FILE_SIZE:
 			*ysize = QNT_PAL_YSIZE;
-			CASE QTL_NTSC_FILE_SIZE :
-				*ysize = QTL_NTSC_YSIZE;
-		DEFAULT:
+			break;
+		case QTL_NTSC_FILE_SIZE:
+			*ysize = QTL_NTSC_YSIZE;
+			break;
+		default:
 			/*printf("error: bad file dimension\n");*/
 			return FALSE;
 		}
-	DEFAULT:
+		break;
+	default:
 		/*printf("error: bad file format\n");*/
 		return FALSE;
 	}
@@ -457,16 +467,24 @@ int img_write_quantel(const T_CHAR *fname, void *buffer, int w, int h, int type)
 		interlace = FALSE;
 		yuv_flag = 0;
 		max_ysize = QNT_PAL_YSIZE;
-		CASE QTL_FORMAT : interlace = FALSE;
+		break;
+	case QTL_FORMAT:
+		interlace = FALSE;
 		yuv_flag = 0;
 		max_ysize = QTL_NTSC_YSIZE;
-		CASE YUV_FORMAT : __OR VPB_FORMAT : interlace = FALSE;
+		break;
+	case YUV_FORMAT:
+	case VPB_FORMAT:
+		interlace = FALSE;
 		yuv_flag = 0;
 		max_ysize = QUANTEL_GET_YSIZE(ysize);
-		CASE SDL_FORMAT : interlace = TRUE;
+		break;
+	case SDL_FORMAT:
+		interlace = TRUE;
 		yuv_flag = 0;
 		max_ysize = QUANTEL_GET_YSIZE(ysize);
-	DEFAULT:
+		break;
+	default:
 		/*printf("error: %d bad file format\n", fname);*/
 		return 0;
 	}

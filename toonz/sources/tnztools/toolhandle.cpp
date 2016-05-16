@@ -134,12 +134,17 @@ void ToolHandle::onImageChanged(TImage::Type imageType)
 	switch (imageType) {
 	case TImage::RASTER:
 		targetType = TTool::RasterImage;
-
-		CASE TImage::TOONZ_RASTER : targetType = TTool::ToonzImage;
-
-		CASE TImage::VECTOR : default : targetType = TTool::VectorImage;
-
-		CASE TImage::MESH : targetType = TTool::MeshImage;
+		break;
+	case TImage::TOONZ_RASTER:
+		targetType = TTool::ToonzImage;
+		break;
+	case TImage::VECTOR:
+	default:
+		targetType = TTool::VectorImage;
+		break;
+	case TImage::MESH:
+		targetType = TTool::MeshImage;
+		break;
 	}
 
 	if (targetType != m_toolTargetType) {

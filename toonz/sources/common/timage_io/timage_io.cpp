@@ -538,25 +538,21 @@ void convertForWriting(TRasterP &ras, const TRasterP &rin, int bpp)
 {
 	switch (bpp) {
 	case 1:
-		__OR 8:
-		{
-			ras = TRasterGR8P(rin->getSize());
-			TRop::convert(ras, rin);
-		}
-
-		CASE 24 : __OR 32:
-		{
-			ras = TRaster32P(rin->getSize());
-			TRop::convert(ras, rin);
-		}
-
-		CASE 48 : __OR 64:
-		{
-			ras = TRaster64P(rin->getSize());
-			TRop::convert(ras, rin);
-		}
-
-	DEFAULT:
+	case 8:
+		ras = TRasterGR8P(rin->getSize());
+		TRop::convert(ras, rin);
+		break;
+	case 24:
+	case 32:
+		ras = TRaster32P(rin->getSize());
+		TRop::convert(ras, rin);
+		break;
+	case 48:
+	case 64:
+		ras = TRaster64P(rin->getSize());
+		TRop::convert(ras, rin);
+		break;
+	default:
 		assert(false);
 	}
 }

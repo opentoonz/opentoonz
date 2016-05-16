@@ -771,14 +771,28 @@ inline void newP(int next, TPoint &p)
 {
 	switch (next) {
 	case 0:
-		__OR 3 : __OR 5 : p.x -= 1;
-		CASE 2 : __OR 4 : __OR 7 : p.x += 1;
+	case 3:
+	case 5:
+		p.x -= 1;
+		break;
+	case 2:
+	case 4:
+	case 7:
+		p.x += 1;
+		break;
 	}
 
 	switch (next) {
 	case 0:
-		__OR 1 : __OR 2 : p.y -= 1;
-		CASE 5 : __OR 6 : __OR 7 : p.y += 1;
+	case 1:
+	case 2:
+		p.y -= 1;
+		break;
+	case 5:
+	case 6:
+	case 7:
+		p.y += 1;
+		break;
 	}
 }
 

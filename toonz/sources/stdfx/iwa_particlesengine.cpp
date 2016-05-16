@@ -401,9 +401,10 @@ void Iwa_Particles_Engine::roll_particles(TTile *tile,							/*-結果を格納�
 				}
 				totalparticles++;
 			}
+			break;
 
-			CASE Iwa_TiledParticlesFx::TOP_RANDOM : for (i = 0; i < actualBirthParticles; i++)
-			{
+		case Iwa_TiledParticlesFx::TOP_RANDOM:
+			for (i = 0; i < actualBirthParticles; i++) {
 				double tmp = values.random_val->getFloat() * myParticles.size();
 				std::list<Iwa_Particle>::iterator it = myParticles.begin();
 				for (int j = 0; j < tmp; j++, it++)
@@ -439,8 +440,9 @@ void Iwa_Particles_Engine::roll_particles(TTile *tile,							/*-結果を格納�
 					totalparticles++;
 				}
 			}
+			break;
 
-		DEFAULT:
+		default:
 			for (i = 0; i < actualBirthParticles; i++) {
 				/*- 出発する粒子 -*/
 				ParticleOrigin po = particleOrigins.at(leavingPartIndex.at(i));
@@ -470,6 +472,7 @@ void Iwa_Particles_Engine::roll_particles(TTile *tile,							/*-結果を格納�
 				}
 				totalparticles++;
 			}
+			break;
 		}
 	}
 
@@ -1510,9 +1513,13 @@ unsigned char Iwa_Particles_Engine::getInitSourceFrame(const particles_values &v
 {
 	switch (values.animation_val) {
 	case Iwa_TiledParticlesFx::ANIM_CYCLE:
-		__OR Iwa_TiledParticlesFx::ANIM_S_CYCLE : return (unsigned char)first;
-		CASE Iwa_TiledParticlesFx::ANIM_SR_CYCLE : return (unsigned char)(first + (values.random_val->getFloat()) * (last - first));
-	DEFAULT:
+	case Iwa_TiledParticlesFx::ANIM_S_CYCLE:
+		return (unsigned char)first;
+
+	case Iwa_TiledParticlesFx::ANIM_SR_CYCLE:
+		return (unsigned char)(first + (values.random_val->getFloat()) * (last - first));
+
+	default:
 		return (unsigned char)(first + (values.random_val->getFloat()) * (last - first));
 	}
 }

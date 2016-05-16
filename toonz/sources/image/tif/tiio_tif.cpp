@@ -489,7 +489,7 @@ void TifReader::readLine(short *buffer, int x0, int x1, int shrink)
 	case ORIENTATION_TOPLEFT:
 	case ORIENTATION_TOPRIGHT:
 	case ORIENTATION_LEFTTOP:
-	case ORIENTATION_RIGHTTOP: {
+	case ORIENTATION_RIGHTTOP:
 		// We have to invert the fixed BOTTOM-UP returned by TIFF functions - since this function is
 		// supposed to ignore orientation issues (which are managed outside).
 
@@ -498,9 +498,14 @@ void TifReader::readLine(short *buffer, int x0, int x1, int shrink)
 
 		r = tmin(m_rowsPerStrip, m_info.m_ly - m_rowsPerStrip * m_stripIndex) - 1 -
 			(m_row % m_rowsPerStrip);
-	}
+		break;
 
-		CASE ORIENTATION_BOTRIGHT : case ORIENTATION_BOTLEFT : case ORIENTATION_RIGHTBOT : case ORIENTATION_LEFTBOT : r = m_row % m_rowsPerStrip;
+	case ORIENTATION_BOTRIGHT:
+	case ORIENTATION_BOTLEFT:
+	case ORIENTATION_RIGHTBOT:
+	case ORIENTATION_LEFTBOT:
+		r = m_row % m_rowsPerStrip;
+		break;
 	}
 
 	// Finally, copy the strip row to the output row buffer
@@ -611,7 +616,7 @@ void TifReader::readLine(char *buffer, int x0, int x1, int shrink)
 	case ORIENTATION_TOPLEFT:
 	case ORIENTATION_TOPRIGHT:
 	case ORIENTATION_LEFTTOP:
-	case ORIENTATION_RIGHTTOP: {
+	case ORIENTATION_RIGHTTOP:
 		// We have to invert the fixed BOTTOM-UP returned by TIFF functions - since this function is
 		// supposed to ignore orientation issues (which are managed outside).
 
@@ -620,9 +625,14 @@ void TifReader::readLine(char *buffer, int x0, int x1, int shrink)
 
 		r = tmin(m_rowsPerStrip, m_info.m_ly - m_rowsPerStrip * m_stripIndex) - 1 -
 			(m_row % m_rowsPerStrip);
-	}
+		break;
 
-		CASE ORIENTATION_BOTRIGHT : case ORIENTATION_BOTLEFT : case ORIENTATION_RIGHTBOT : case ORIENTATION_LEFTBOT : r = m_row % m_rowsPerStrip;
+	case ORIENTATION_BOTRIGHT:
+	case ORIENTATION_BOTLEFT:
+	case ORIENTATION_RIGHTBOT:
+	case ORIENTATION_LEFTBOT:
+		r = m_row % m_rowsPerStrip;
+		break;
 	}
 
 	TPixel32 *pix = (TPixel32 *)buffer;

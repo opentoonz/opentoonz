@@ -261,20 +261,16 @@ TRectD SandorFxRenderData::getBBoxEnlargement(const TRectD &bbox)
 		return bbox;
 	}
 
-		CASE Calligraphic : __OR OutBorder:
-		{
-			return bbox.enlarge(m_callParams.m_thickness);
-		}
+	case Calligraphic:
+	case OutBorder:
+		return bbox.enlarge(m_callParams.m_thickness);
 
-		CASE ArtAtContour:
-		{
-			return bbox.enlarge(
-				tmax(tceil(m_controllerBBox.getLx()), tceil(m_controllerBBox.getLy())) * m_contourParams.m_maxSize);
-		}
+	case ArtAtContour:
+		return bbox.enlarge(
+			tmax(tceil(m_controllerBBox.getLx()), tceil(m_controllerBBox.getLy())) * m_contourParams.m_maxSize);
 
-	DEFAULT : {
+	default:
 		assert(false);
 		return bbox;
-	}
 	}
 }

@@ -994,7 +994,7 @@ LevelType getLevelType(const TFilePath &fp)
 	switch (type) {
 	case TFileType::RASTER_IMAGE:
 	case TFileType::RASTER_LEVEL:
-	case TFileType::CMAPPED_LEVEL: {
+	case TFileType::CMAPPED_LEVEL:
 		if (format == "tzp" || format == "tzu") {
 			ret.m_ltype = TZP_XSHLEVEL;
 			ret.m_oldLevelFlag = true;
@@ -1005,26 +1005,26 @@ LevelType getLevelType(const TFilePath &fp)
 			ret.m_ltype = TZI_XSHLEVEL;
 		else
 			ret.m_ltype = OVL_XSHLEVEL;
-	}
+		break;
 
-		CASE TFileType::VECTOR_LEVEL:
-		{
-			if (format == "svg") {
-				ret.m_vectorNotPli = true;
-				ret.m_ext = "pli";
-			}
-			/*  if (format == "svg")
-        ret.m_ext = "pli";*/
-			ret.m_ltype = PLI_XSHLEVEL;
+	case TFileType::VECTOR_LEVEL:
+		if (format == "svg") {
+			ret.m_vectorNotPli = true;
+			ret.m_ext = "pli";
 		}
+		/*  if (format == "svg")
+			ret.m_ext = "pli";*/
+		ret.m_ltype = PLI_XSHLEVEL;
+		break;
 
-		CASE TFileType::AUDIO_LEVEL :
+	case TFileType::AUDIO_LEVEL:
+		ret.m_ltype = SND_XSHLEVEL;
+		break;
 
-			ret.m_ltype = SND_XSHLEVEL;
-
-		CASE TFileType::MESH_IMAGE : case TFileType::MESH_LEVEL :
-
-									 ret.m_ltype = MESH_XSHLEVEL;
+	case TFileType::MESH_IMAGE:
+	case TFileType::MESH_LEVEL:
+		ret.m_ltype = MESH_XSHLEVEL;
+		break;
 	}
 
 	return ret;

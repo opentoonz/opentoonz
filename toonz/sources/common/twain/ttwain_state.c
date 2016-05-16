@@ -30,12 +30,6 @@ extern int exitTwainSession(void);
 #endif
 static void TTWAIN_FreeVar(void);
 
-#define CASE \
-	break;   \
-	case
-#define DEFAULT \
-	break;      \
-	default
 #define RELEASE_STR "5.1"
 #define TITLEBAR_STR "Toonz5.1"
 #define TwProgramName "Toonz5.1"
@@ -989,7 +983,8 @@ memset(targetBuffer, 0xff, TTwainData.transferInfo.memorySize);
 		rc3 = TTWAIN_DS(DG_IMAGE, DAT_IMAGEMEMXFER, MSG_GET, (TW_MEMREF)imageMemXfer);
 		nTransferDone++;
 		switch (rc3) {
-			CASE TWRC_SUCCESS : PRINTF("IMAGEMEMXFER, GET, returns SUCCESS\n");
+		case TWRC_SUCCESS:
+			PRINTF("IMAGEMEMXFER, GET, returns SUCCESS\n");
 			if (imgInfoOk) {
 				TW_UINT32 colsToCopy;
 				rowsToCopy = MIN(imageMemXfer->Rows, rowsRemaining);
@@ -1022,7 +1017,10 @@ memset(targetBuffer, 0xff, TTwainData.transferInfo.memorySize);
 				sourceBuffer += imageMemXfer->BytesPerRow;
 			}
 			rowsRemaining -= rowsToCopy;
-			CASE TWRC_XFERDONE : PRINTF("IMAGEMEMXFER, GET, returns XFERDONE\n");
+			break;
+
+		case TWRC_XFERDONE:
+			PRINTF("IMAGEMEMXFER, GET, returns XFERDONE\n");
 			/*copy the last transfer data*/
 			if (imgInfoOk) {
 				TW_UINT32 colsToCopy;
@@ -1079,19 +1077,7 @@ memset(targetBuffer, 0xff, TTwainData.transferInfo.memorySize);
 			ret = TRUE;
 			goto done;
 
-			CASE TWRC_CANCEL : TTWAIN_RecordError();
-			twRC2 = TTWAIN_DS(DG_CONTROL, DAT_PENDINGXFERS, MSG_ENDXFER,
-							  (TW_MEMREF)&TTwainData.transferInfo.pendingXfers);
-			if (twRC2 != TWRC_SUCCESS) {
-				ret = FALSE;
-				goto done;
-			}
-			if (TTwainData.transferInfo.pendingXfers.Count == 0) {
-				ret = FALSE;
-				goto done;
-			}
-
-			CASE TWRC_FAILURE : PRINTF("IMAGEMEMXFER, GET, returns FAILURE\n");
+		case TWRC_CANCEL:
 			TTWAIN_RecordError();
 			twRC2 = TTWAIN_DS(DG_CONTROL, DAT_PENDINGXFERS, MSG_ENDXFER,
 							  (TW_MEMREF)&TTwainData.transferInfo.pendingXfers);
@@ -1103,7 +1089,24 @@ memset(targetBuffer, 0xff, TTwainData.transferInfo.memorySize);
 				ret = FALSE;
 				goto done;
 			}
-		DEFAULT:
+			break;
+
+		case TWRC_FAILURE:
+			PRINTF("IMAGEMEMXFER, GET, returns FAILURE\n");
+			TTWAIN_RecordError();
+			twRC2 = TTWAIN_DS(DG_CONTROL, DAT_PENDINGXFERS, MSG_ENDXFER,
+							  (TW_MEMREF)&TTwainData.transferInfo.pendingXfers);
+			if (twRC2 != TWRC_SUCCESS) {
+				ret = FALSE;
+				goto done;
+			}
+			if (TTwainData.transferInfo.pendingXfers.Count == 0) {
+				ret = FALSE;
+				goto done;
+			}
+			break;
+
+		default:
 			PRINTF("IMAGEMEMXFER, GET, returns ?!? Default handler called\n");
 			/* Abort the image */
 			TTWAIN_RecordError();
@@ -1132,11 +1135,18 @@ done:
 				xdpi = TTWAIN_Fix32ToFloat(info.XResolution);
 				ydpi = TTWAIN_Fix32ToFloat(info.YResolution);
 				switch (BB(info.PixelType, info.BitsPerPixel)) {
-					CASE BB(TWPT_BW, 1) : pixType = TTWAIN_BW;
-					CASE BB(TWPT_GRAY, 8) : pixType = TTWAIN_GRAY8;
-					CASE BB(TWPT_RGB, 24) : pixType = TTWAIN_RGB24;
-				DEFAULT:
+				case BB(TWPT_BW, 1):
+					pixType = TTWAIN_BW;
+					break;
+				case BB(TWPT_GRAY, 8):
+					pixType = TTWAIN_GRAY8;
+					break;
+				case BB(TWPT_RGB, 24):
 					pixType = TTWAIN_RGB24;
+					break;
+				default:
+					pixType = TTWAIN_RGB24;
+					break;
 				}
 			} else {
 				float lx = TTWAIN_Fix32ToFloat(imageLayout.Frame.Right) - TTWAIN_Fix32ToFloat(imageLayout.Frame.Left);
@@ -1145,20 +1155,6 @@ done:
 				xdpi = (float)TTwainData.transferInfo.preferredLx / lx;
 				ydpi = (float)TTwainData.transferInfo.preferredLy / ly;
 
-				/*
-					TW_UINT16 rc = TTWAIN_GetCurrentPixelType(&pixType);
-					printf("get cur pix type %s\n", (rc==TWRC_SUCCESS)?"OK":"FAIL");
-					if (rc == TWRC_SUCCESS)
-						switch (pixType)
-							{
-							CASE TWPT_BW  : pixType = TTWAIN_BW;
-  						CASE TWPT_GRAY: pixType = TTWAIN_GRAY8;
-    					CASE TWPT_RGB : pixType = TTWAIN_RGB24;
-    					DEFAULT : pixType = TTWAIN_RGB24;
-							}
-					else
-  					pixType = TTWAIN_RGB24;
-		*/
 				switch (imageMemXfer->BytesPerRow / TTwainData.transferInfo.preferredLx) {
 				case 1:
 					pixType = TTWAIN_GRAY8;

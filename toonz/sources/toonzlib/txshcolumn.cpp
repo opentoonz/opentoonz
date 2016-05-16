@@ -482,16 +482,11 @@ void TXshColumn::setStatusWord(int status)
 TXshColumn *TXshColumn::createEmpty(int type)
 {
 	switch (type) {
-	case eSoundType:
-		return new TXshSoundColumn;
-
-		CASE eZeraryFxType : return new TXshZeraryFxColumn(0);
-
-		CASE ePaletteType : return new TXshPaletteColumn;
-
-		CASE eSoundTextType : return new TXshSoundTextColumn;
-
-		CASE eMeshType : return new TXshMeshColumn;
+	case eSoundType    : return new TXshSoundColumn;
+	case eZeraryFxType : return new TXshZeraryFxColumn(0);
+	case ePaletteType  : return new TXshPaletteColumn;
+	case eSoundTextType: return new TXshSoundTextColumn;
+	case eMeshType     : return new TXshMeshColumn;
 	}
 
 	assert(type == eLevelType);

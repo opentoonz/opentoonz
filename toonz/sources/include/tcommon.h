@@ -199,14 +199,6 @@ const unsigned int c_maxuint = (unsigned int)(~0U);
 #define DV_ALIGNED(val) __attribute__((aligned(val)))
 #endif
 
-#define CASE \
-	break;   \
-	case
-#define __OR case
-#define DEFAULT \
-	break;      \
-	default
-
 inline short swapShort(short val)
 {
 	return ((val >> 8) & 0x00ff) | (val << 8);

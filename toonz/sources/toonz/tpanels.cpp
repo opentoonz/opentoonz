@@ -369,10 +369,16 @@ void FunctionViewerPanel::onIoCurve(int type, TDoubleParam *curve, const std::st
 	switch ((FunctionViewer::IoType)type) {
 	case FunctionViewer::eSaveCurve:
 		saveCurve(curve);
-		CASE FunctionViewer::eLoadCurve : loadCurve(curve);
-		CASE FunctionViewer::eExportCurve : exportCurve(curve, name);
-	DEFAULT:
+		break;
+	case FunctionViewer::eLoadCurve:
+		loadCurve(curve);
+		break;
+	case FunctionViewer::eExportCurve:
+		exportCurve(curve, name);
+		break;
+	default:
 		assert(false);
+		break;
 	}
 }
 

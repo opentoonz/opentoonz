@@ -147,11 +147,19 @@ int SetSaveboxTool::getCursorId(const TPointD &pos)
 	switch (dragType) {
 	case eMoveRect:
 		return ToolCursor::MoveCursor;
-		CASE eMoveLeft : __OR eMoveRight : return ToolCursor::ScaleHCursor;
-		CASE eMoveDown : __OR eMoveUp : return ToolCursor::ScaleVCursor;
-		CASE eMoveLeft | eMoveUp : __OR eMoveRight | eMoveDown : return ToolCursor::ScaleInvCursor;
-		CASE eMoveLeft | eMoveDown : __OR eMoveRight | eMoveUp : return ToolCursor::ScaleCursor;
-	DEFAULT:
+	case eMoveLeft:
+	case eMoveRight:
+		return ToolCursor::ScaleHCursor;
+	case eMoveDown:
+	case eMoveUp:
+		return ToolCursor::ScaleVCursor;
+	case eMoveLeft | eMoveUp:
+	case eMoveRight | eMoveDown:
+		return ToolCursor::ScaleInvCursor;
+	case eMoveLeft | eMoveDown:
+	case eMoveRight | eMoveUp:
+		return ToolCursor::ScaleCursor;
+	default:
 		return ToolCursor::StrokeSelectCursor;
 	}
 	return ToolCursor::StrokeSelectCursor;

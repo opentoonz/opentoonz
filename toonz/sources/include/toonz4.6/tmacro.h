@@ -49,14 +49,6 @@ typedef unsigned short USHORT;
 typedef unsigned int UINT;
 typedef unsigned long ULONG;
 
-#define CASE \
-	break;   \
-	case
-#define __OR case
-#define DEFAULT \
-	break;      \
-	default
-
 /*---------------------------------------------------------------------------*/
 
 typedef struct {

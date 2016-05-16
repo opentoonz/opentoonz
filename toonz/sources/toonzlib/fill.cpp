@@ -273,8 +273,11 @@ bool fill(const TRasterCM32P &r, const FillParameters &params, TTileSaverCM32 *s
 	switch (TPixelCM32::getMaxTone()) {
 	case 15:
 		fillDepth = (15 - fillDepth);
-		CASE 255 : fillDepth = ((15 - fillDepth) << 4) | (15 - fillDepth);
-	DEFAULT:
+		break;
+	case 255:
+		fillDepth = ((15 - fillDepth) << 4) | (15 - fillDepth);
+		break;
+	default:
 		assert(false);
 	}
 

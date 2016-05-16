@@ -601,28 +601,26 @@ FxPainter::FxPainter(FxSchematicNode *parent, double width, double height,
 	case eMacroFx:
 	case eNormalLayerBlendingFx:
 	case eNormalMatteFx:
-	case eNormalImageAdjustFx: {
+	case eNormalImageAdjustFx:
 		m_label = QString::fromStdWString(TStringTable::translate(parent->getFx()->getFxType()));
 		setToolTip(QString::fromStdWString(parent->getFx()->getFxId()));
-	}
-
-		CASE eZeraryFx:
-		{
-			TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(parent->getFx());
-			if (zfx) {
-				TFx *zeraryFx = zfx->getZeraryFx();
-				if (zeraryFx) {
-					m_label = QString::fromStdWString(TStringTable::translate(zeraryFx->getFxType()));
-					setToolTip(QString::fromStdWString(zeraryFx->getFxId()));
-				}
+		break;
+	case eZeraryFx: {
+		TZeraryColumnFx *zfx = dynamic_cast<TZeraryColumnFx *>(parent->getFx());
+		if (zfx) {
+			TFx *zeraryFx = zfx->getZeraryFx();
+			if (zeraryFx) {
+				m_label = QString::fromStdWString(TStringTable::translate(zeraryFx->getFxType()));
+				setToolTip(QString::fromStdWString(zeraryFx->getFxId()));
 			}
 		}
+		break;
+	}
 
-		CASE eGroupedFx:
-		{
-			m_label = QString("Group ") + QString::number(parent->getFx()->getAttributes()->getGroupId());
-			setToolTip(m_label);
-		}
+	case eGroupedFx:
+		m_label = QString("Group ") + QString::number(parent->getFx()->getAttributes()->getGroupId());
+		setToolTip(m_label);
+		break;
 	}
 }
 

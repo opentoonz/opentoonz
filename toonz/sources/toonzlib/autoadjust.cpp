@@ -1367,7 +1367,8 @@ void thresh_image(const TRasterImageP &image, int threshold, int oversample_fact
 	TMALLOC(bigline, outwrap_bytes * oversample_factor)
 
 	switch (oversample_factor) {
-		CASE 1 : for (y = 0; y < ly; y++)
+	case 1:
+		for (y = 0; y < ly; y++)
 		{
 			cur = buffer + y * wrap;
 			out = y == 0 ? bigline : buffer + y * outwrap_bytes;
@@ -1388,8 +1389,10 @@ void thresh_image(const TRasterImageP &image, int threshold, int oversample_fact
 			if (y == 0)
 				memcpy(buffer, bigline, outwrap_bytes);
 		}
+		break;
 
-		CASE 2 : for (y = 0; y < ly; y++)
+	case 2:
+		for (y = 0; y < ly; y++)
 		{
 			cur = buffer + y * wrap;
 			xnext = cur + 1;
@@ -1437,8 +1440,9 @@ void thresh_image(const TRasterImageP &image, int threshold, int oversample_fact
 			if (y == 0)
 				memcpy(buffer, bigline, outwrap_bytes * 2);
 		}
+		break;
 
-	DEFAULT:
+	default:
 		assert(0);
 	}
 	image->ras.type = RAS_WB;

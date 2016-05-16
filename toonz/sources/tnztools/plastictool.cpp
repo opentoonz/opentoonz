@@ -669,7 +669,9 @@ TTool::ToolType PlasticTool::getToolType() const
 	case RIGIDITY_IDX:
 		return TTool::LevelWriteTool;
 
-		CASE BUILD_IDX : case ANIMATE_IDX : return TTool::ColumnTool;
+	case BUILD_IDX:
+	case ANIMATE_IDX:
+		return TTool::ColumnTool;
 	}
 
 	assert(false);
@@ -1346,12 +1348,16 @@ void PlasticTool::mouseMove(const TPointD &pos, const TMouseEvent &me)
 	switch (m_mode.getIndex()) {
 	case MESH_IDX:
 		mouseMove_mesh(pos, me);
-
-		CASE BUILD_IDX : mouseMove_build(pos, me);
-
-		CASE RIGIDITY_IDX : mouseMove_rigidity(pos, me);
-
-		CASE ANIMATE_IDX : mouseMove_animate(pos, me);
+		break;
+	case BUILD_IDX:
+		mouseMove_build(pos, me);
+		break;
+	case RIGIDITY_IDX:
+		mouseMove_rigidity(pos, me);
+		break;
+	case ANIMATE_IDX:
+		mouseMove_animate(pos, me);
+		break;
 	}
 }
 
@@ -1362,12 +1368,16 @@ void PlasticTool::leftButtonDown(const TPointD &pos, const TMouseEvent &me)
 	switch (m_mode.getIndex()) {
 	case MESH_IDX:
 		leftButtonDown_mesh(pos, me);
-
-		CASE BUILD_IDX : leftButtonDown_build(pos, me);
-
-		CASE RIGIDITY_IDX : leftButtonDown_rigidity(pos, me);
-
-		CASE ANIMATE_IDX : leftButtonDown_animate(pos, me);
+		break;
+	case BUILD_IDX:
+		leftButtonDown_build(pos, me);
+		break;
+	case RIGIDITY_IDX:
+		leftButtonDown_rigidity(pos, me);
+		break;
+	case ANIMATE_IDX:
+		leftButtonDown_animate(pos, me);
+		break;
 	}
 }
 
@@ -1381,12 +1391,16 @@ void PlasticTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &me)
 	switch (m_mode.getIndex()) {
 	case MESH_IDX:
 		leftButtonDrag_mesh(pos, me);
-
-		CASE BUILD_IDX : leftButtonDrag_build(pos, me);
-
-		CASE RIGIDITY_IDX : leftButtonDrag_rigidity(pos, me);
-
-		CASE ANIMATE_IDX : leftButtonDrag_animate(pos, me);
+		break;
+	case BUILD_IDX:
+		leftButtonDrag_build(pos, me);
+		break;
+	case RIGIDITY_IDX:
+		leftButtonDrag_rigidity(pos, me);
+		break;
+	case ANIMATE_IDX:
+		leftButtonDrag_animate(pos, me);
+		break;
 	}
 }
 
@@ -1397,12 +1411,16 @@ void PlasticTool::leftButtonUp(const TPointD &pos, const TMouseEvent &me)
 	switch (m_mode.getIndex()) {
 	case MESH_IDX:
 		leftButtonUp_mesh(pos, me);
-
-		CASE BUILD_IDX : leftButtonUp_build(pos, me);
-
-		CASE RIGIDITY_IDX : leftButtonUp_rigidity(pos, me);
-
-		CASE ANIMATE_IDX : leftButtonUp_animate(pos, me);
+		break;
+	case BUILD_IDX:
+		leftButtonUp_build(pos, me);
+		break;
+	case RIGIDITY_IDX:
+		leftButtonUp_rigidity(pos, me);
+		break;
+	case ANIMATE_IDX:
+		leftButtonUp_animate(pos, me);
+		break;
 	}
 
 	m_pressedPos = TConsts::napd;
@@ -1433,12 +1451,16 @@ void PlasticTool::addContextMenuItems(QMenu *menu)
 	switch (m_mode.getIndex()) {
 	case MESH_IDX:
 		addContextMenuActions_mesh(menu);
-
-		CASE BUILD_IDX : addContextMenuActions_build(menu);
-
-		CASE RIGIDITY_IDX : addContextMenuActions_rigidity(menu);
-
-		CASE ANIMATE_IDX : addContextMenuActions_animate(menu);
+		break;
+	case BUILD_IDX:
+		addContextMenuActions_build(menu);
+		break;
+	case RIGIDITY_IDX:
+		addContextMenuActions_rigidity(menu);
+		break;
+	case ANIMATE_IDX:
+		addContextMenuActions_animate(menu);
+		break;
 	}
 
 	// Add view actions
@@ -1507,17 +1529,16 @@ bool PlasticTool::onPropertyChanged(std::string propertyName)
 		case BUILD_IDX:
 		case RIGIDITY_IDX:
 			m_pvs.m_showOriginalColumn = xshColumn();
+			break;
+		case ANIMATE_IDX:
+			m_pvs.m_showOriginalColumn = 0;
 
-			CASE ANIMATE_IDX:
-			{
-				m_pvs.m_showOriginalColumn = 0;
+			if (m_svSel.objects().size() > 1)
+				setSkeletonSelection(-1);
 
-				if (m_svSel.objects().size() > 1)
-					setSkeletonSelection(-1);
-
-				storeDeformation(); // Rebuild deformed skeleton
-			}
-		};
+			storeDeformation(); // Rebuild deformed skeleton
+			break;
+		}
 
 		m_mode.notifyListeners(); // You thought that was automatic, eh? BTW, this means
 								  // we're requesting toolbars to update options visibility
@@ -2060,12 +2081,16 @@ void PlasticTool::draw()
 	switch (m_mode.getIndex()) {
 	case MESH_IDX:
 		draw_mesh();
-
-		CASE BUILD_IDX : draw_build();
-
-		CASE RIGIDITY_IDX : draw_rigidity();
-
-		CASE ANIMATE_IDX : draw_animate();
+		break;
+	case BUILD_IDX:
+		draw_build();
+		break;
+	case RIGIDITY_IDX:
+		draw_rigidity();
+		break;
+	case ANIMATE_IDX:
+		draw_animate();
+		break;
 	};
 
 	glPopAttrib();

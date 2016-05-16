@@ -514,8 +514,11 @@ void MoveGroupHandleDragTool::drag(QMouseEvent *e)
 			switch (kf.m_type) {
 			case TDoubleKeyframe::SpeedInOut:
 				setter->setSpeedOut(kf.m_speedOut);
-				CASE TDoubleKeyframe::EaseInOut : setter->setEaseOut(kf.m_speedOut.x);
-			DEFAULT:
+				break;
+			case TDoubleKeyframe::EaseInOut:
+				setter->setEaseOut(kf.m_speedOut.x);
+				break;
+			default:
 				assert(false);
 			}
 		} else if (m_handle == 102) // aagghhrrr
@@ -525,8 +528,11 @@ void MoveGroupHandleDragTool::drag(QMouseEvent *e)
 			switch (kf.m_prevType) {
 			case TDoubleKeyframe::SpeedInOut:
 				setter->setSpeedIn(kf.m_speedIn);
-				CASE TDoubleKeyframe::EaseInOut : setter->setEaseIn(kf.m_speedIn.x);
-			DEFAULT:
+				break;
+			case TDoubleKeyframe::EaseInOut:
+				setter->setEaseIn(kf.m_speedIn.x);
+				break;
+			default:
 				assert(false);
 			}
 		}

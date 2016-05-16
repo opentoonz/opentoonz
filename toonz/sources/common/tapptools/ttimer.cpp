@@ -7,6 +7,8 @@
 #ifdef _WIN32
 
 #include <windows.h>
+#include <mmsystem.h>
+#include <cstdlib>
 
 //moto strano: se togliamo l'include della glut non linka
 #include <GL/glut.h>

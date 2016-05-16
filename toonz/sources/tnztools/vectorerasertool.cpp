@@ -1046,10 +1046,12 @@ void EraserTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 		double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
 
 		locals.addValue(m_toolSize, add);
+		break;
 	}
 
-	DEFAULT:
+	default:
 		m_brushPos = pos;
+		break;
 	}
 
 	m_oldMousePos = m_mousePos = pos;
