@@ -628,10 +628,14 @@ visit_bw(int i, int j, int x, int y, int bit, UCHAR *byte),
 #endif
 	visit_gr8(int i, int j, int x, int y, UCHAR *pix),
 	visit_rgb(int i, int j, int x, int y, TPixel32 *pix),
-	stampa_dot(DOT *dot);
+	stampa_dot(DOT const*dot);
 
+//! \brief Find the best matching pegs
+//!
+//! The found pegs are in array dots. The function checks, which of those best fits the reference in
+//! reference. The three best matching dots are returned in parameters i, j, k.
 static int
-compare_dots(DOT dots[], int *ndots, DOT reference[], int ref_dot);
+compare_dots(DOT const dots[], int ndots, DOT reference[], int ref_dot, int& i, int& j, int& k);
 
 #define REVERSE(byte, bit)  \
 	{                       \
@@ -1504,7 +1508,7 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 	float dx, dy;
 	DOT _dotarray[MAX_DOT];
 	DOT *dotarray = _dotarray;
-	int ndot, central;
+	int ndot;
 	int max_area, min_area;
 
 	*p_ang = 0.0;
@@ -1553,7 +1557,8 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 		return FALSE;
 	}
 
-	found = compare_dots(dotarray, &ndot, ref, ref_dot);
+	int indexArray[3] = { 0, 1, 2 };
+	found = compare_dots(dotarray, ndot, ref, ref_dot, indexArray[0], indexArray[1], indexArray[2]);
 
 	if (Debug_flag)
 		for (i = 0; i < ndot; i++) {
@@ -1564,12 +1569,10 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 	if (!found)
 		return FALSE;
 
-	central = ndot / 2;
-
 	angle = 0;
-	for (i = 0; i < ndot - 1; i++) {
-		dx = dotarray[i + 1].x - dotarray[i].x;
-		dy = dotarray[i + 1].y - dotarray[i].y;
+	for (i = 0; i < 2; i++) {
+		dx = dotarray[indexArray[i + 1]].x - dotarray[indexArray[i]].x;
+		dy = dotarray[indexArray[i + 1]].y - dotarray[indexArray[i]].y;
 		switch (pegs_side) {
 			CASE PEGS_LEFT : __OR PEGS_RIGHT : angle += dy == 0.0 ? TConsts::pi_2 : atan(dx / dy);
 		DEFAULT:
@@ -1577,9 +1580,16 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 		}
 	}
 
-	*p_ang = angle / (ndot - 1);
-	*cx = dotarray[central].x;
-	*cy = dotarray[central].y;
+	*p_ang = angle / 2;
+
+	// Now calculate the center, we have to get the offset of the center for the dot at point indexArray[1]
+	// from the reference and then use the angle to calculate the offsets for the center.
+	//
+	// It is assumed, that the holes are all on one line.
+	float pegWidth = sqrt((ref[ref_dot - 1].x - ref[0].x) * (ref[ref_dot - 1].x - ref[0].x) + (ref[ref_dot - 1].y - ref[0].y) * (ref[ref_dot - 1].y - ref[0].y));
+	float refPegOffset = sqrt((ref[indexArray[1]].x - ref[0].x) * (ref[indexArray[1]].x - ref[0].x) + (ref[indexArray[1]].y - ref[0].y) * (ref[indexArray[1]].y - ref[0].y));
+	*cx = dotarray[indexArray[1]].x + cos(*p_ang) * (pegWidth / 2.0f - refPegOffset);
+	*cy = dotarray[indexArray[1]].y + sin(*p_ang) * (pegWidth / 2.0f - refPegOffset);
 
 	if (Debug_flag) {
 		printf("\nang: %g\ncx : %g\ncy : %g\n\n", *p_ang, *cx, *cy);
@@ -1591,11 +1601,10 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
 /*---------------------------------------------------------------------------*/
 #define MIN_V 100.0
 
-static int compare_dots(DOT dots[], int *ndots,
-						DOT reference[], int ref_dot)
+static int compare_dots(DOT const dots[], int ndots, DOT reference[], int ref_dot, int& i_ok, int& j_ok, int& k_ok)
 {
 	int found;
-	int toll, i_ok = 0, j_ok = 0, k_ok = 0;
+	int toll;
 	float tolld;
 	int i, j, k;
 	short *dot_ok = 0;
@@ -1603,36 +1612,34 @@ static int compare_dots(DOT dots[], int *ndots,
 	float vmin, v, dist_i_j, dist_i_k, dist_j_k, del1, del2;
 	float ref_dis_0_1, ref_dis_1_2;
 
+	i_ok = 0;
+	j_ok = 0;
+	k_ok = 0;
+
 	/* questa funz e' indipendente da posizione e orientamento dei dots */
 
-	if (*ndots < 1 || ref_dot < 1) {
+	if (ndots < 1 || ref_dot < 1) {
 		goto error;
 	}
 
 	/* controllo quanti dots sono realmente buoni per il confronto */
-	dot_ok = (short *)calloc(*ndots, sizeof(short));
+	dot_ok = (short *)calloc(ndots, sizeof(short));
 	found = 0;
 
-	for (i = 0; i < *ndots; i++)
+	for (i = 0; i < ndots; i++) {
+	        dot_ok[i] = false;
 		for (j = 0; j < ref_dot; j++) {
 			toll = (int)((float)reference[j].area * PERCENT);
 			if (abs(dots[i].area - reference[j].area) < toll) {
-				dot_ok[found] = i;
+				dot_ok[i] = true;
 				found++;
 				break;
 			}
 		}
+	}
 
 	if (!found) {
 		goto error;
-	}
-
-	if (found < *ndots) {
-		for (i = 0; i < found; i++) {
-			if (dot_ok[i] != i)
-				*(dots + i) = *(dots + dot_ok[i]);
-		}
-		*ndots = found;
 	}
 
 	ref_dis = (float *)calloc(ref_dot, sizeof(float));
@@ -1658,9 +1665,17 @@ static int compare_dots(DOT dots[], int *ndots,
 
 	i_ok = -1;
 	v = vmin = 10000000.0;
-	for (i = 0; i < *ndots - 2; i++)
-		for (j = i + 1; j < *ndots - 1; j++)
-			for (k = j + 1; k < *ndots; k++) {
+	for (i = 0; i < ndots - 2; i++) {
+		if (!dot_ok[i])
+			continue;
+
+		for (j = i + 1; j < ndots - 1; j++) {
+			if (!dot_ok[j])
+				continue;
+			for (k = j + 1; k < ndots; k++) {
+				if (!dot_ok[k])
+					continue;
+
 				// Build square discrepancies from the reference relative hole distances
 				dx = dots[i].x - dots[j].x;
 				dy = dots[i].y - dots[j].y;
@@ -1684,6 +1699,8 @@ static int compare_dots(DOT dots[], int *ndots,
 					vmin = v;
 				}
 			}
+		}
+	}
 
 	if (Debug_flag) {
 		printf("Ho trovato v = %f su %f per %d %d %d \n",
@@ -1713,12 +1730,11 @@ static int compare_dots(DOT dots[], int *ndots,
 		dy = reference[1].y - reference[2].y;
 		ref_dis_1_2 = sqrtf((dx * dx) + (dy * dy));
 
-		if (fabsf(dist_i_j - ref_dis_0_1) < tolld &&
-			fabsf(dist_j_k - ref_dis_1_2) < tolld) {
-			*ndots = 3;
-			*(dots) = *(dots + i_ok);
-			*(dots + 1) = *(dots + j_ok);
-			*(dots + 2) = *(dots + k_ok);
+		if (fabsf(dist_i_j - ref_dis_0_1) >= tolld ||
+			fabsf(dist_j_k - ref_dis_1_2) >= tolld) {
+			i_ok = 0;
+			j_ok = 1;
+			k_ok = 2;
 		}
 	}
 
@@ -1738,7 +1754,7 @@ error:
 }
 /*---------------------------------------------------------------------------*/
 
-static void stampa_dot(DOT *dot)
+static void stampa_dot(DOT const*dot)
 {
 	printf("Dimensioni: %d,\t%d\n", dot->lx, dot->ly);
 	printf("Start     : %d,\t%d\n", dot->x1, dot->y1);
