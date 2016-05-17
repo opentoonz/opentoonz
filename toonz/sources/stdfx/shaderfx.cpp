@@ -946,7 +946,7 @@ void ShaderFx::doCompute(TTile &tile, double frame, const TRenderSettings &info)
 
 			if (currentSize.lx < size.lx || currentSize.ly < size.ly ||
 				currentFmt != fmt)
-				context.resize(tmax(size.lx, currentSize.lx), tmax(size.ly, currentSize.ly), fmt);
+				context.resize(std::max(size.lx, currentSize.lx), std::max(size.ly, currentSize.ly), fmt);
 		}
 	}; // locals
 

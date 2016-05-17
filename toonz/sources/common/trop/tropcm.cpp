@@ -67,7 +67,7 @@ void TRop::convert(const TRaster32P &rasOut,
 				   bool transparencyCheck)
 {
 	int count = palette->getStyleCount();
-	int count2 = tmax(count, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
+	int count2 = std::max({count, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint()});
 
 	// per poter utilizzare lo switch (piu' efficiente) si utilizza 255
 	// anziche' TPixelCM32::getMaxTone()
@@ -1133,7 +1133,7 @@ void TRop::zoomOutCm32Rgbm(const TRasterCM32P &rin, TRaster32P &rout, const TPal
 	int fac_fac_4;
 
 	int count = plt.getStyleCount();
-	int count2 = tmax(count, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
+	int count2 = std::max(count, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
 	std::vector<TPixel32> colors(count2);
 	for (i = 0; i < plt.getStyleCount(); i++)
 		colors[i] = ::premultiply(plt.getStyle(i)->getAverageColor());
@@ -1269,7 +1269,7 @@ void TRop::makeIcon(TRaster32P &_rout, const TRasterCM32P &rin, const TPaletteP 
 	int ly = rin->getLy();
 
 	int count = palette->getStyleCount();
-	int count2 = tmax(count, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
+	int count2 = std::max(count, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
 	std::vector<TPixel32> colors(count2);
 	for (i = 0; i < palette->getStyleCount(); i++)
 		colors[i] = /*::premultiply(*/ palette->getStyle(i)->getAverageColor(); //);

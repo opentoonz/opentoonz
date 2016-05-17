@@ -139,8 +139,9 @@ TRectD TAffine::operator*(const TRectD &rect) const
 				p2 = *this * rect.getP01(),
 				p3 = *this * rect.getP10(),
 				p4 = *this * rect.getP11();
-		return TRectD(tmin(p1.x, p2.x, p3.x, p4.x), tmin(p1.y, p2.y, p3.y, p4.y),
-					  tmax(p1.x, p2.x, p3.x, p4.x), tmax(p1.y, p2.y, p3.y, p4.y));
+		return TRectD(
+			std::min({p1.x, p2.x, p3.x, p4.x}), std::min({p1.y, p2.y, p3.y, p4.y}),
+			std::max({p1.x, p2.x, p3.x, p4.x}), std::max({p1.y, p2.y, p3.y, p4.y}));
 	} else
 		return TConsts::infiniteRectD;
 }

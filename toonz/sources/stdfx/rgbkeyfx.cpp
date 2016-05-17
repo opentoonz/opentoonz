@@ -109,12 +109,12 @@ void RGBKeyFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 	const TPixel32 Color = m_color->getPremultipliedValue(frame);
 	TRaster32P raster32 = tile.getRaster();
 
-	int lowR = tmax(0, Color.r - r_range);
-	int highR = tmin(255, Color.r + r_range);
-	int lowG = tmax(0, Color.g - g_range);
-	int highG = tmin(255, Color.g + g_range);
-	int lowB = tmax(0, Color.b - b_range);
-	int highB = tmin(255, Color.b + b_range);
+	int lowR = std::max(0, Color.r - r_range);
+	int highR = std::min(255, Color.r + r_range);
+	int lowG = std::max(0, Color.g - g_range);
+	int highG = std::min(255, Color.g + g_range);
+	int lowB = std::max(0, Color.b - b_range);
+	int highB = std::min(255, Color.b + b_range);
 
 	if (raster32)
 		doRGBKey<TPixel32, UCHAR>(raster32, highR, highG, highB, lowR, lowG, lowB, gender);

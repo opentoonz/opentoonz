@@ -78,12 +78,12 @@ void getHRange(const TThickQuadratic &ttq, double &x0, double &x1)
 	const TPointD &P2 = ttq.getP2();
 
 	//Get the horizontal range of the chunk
-	x0 = tmin(x0, P0.x, P2.x), x1 = tmax(x1, P0.x, P2.x);
+	x0 = std::min({x0, P0.x, P2.x}), x1 = std::max({x1, P0.x, P2.x});
 
 	double t = (P0.x - P1.x) / (P0.x + P2.x - 2.0 * P1.x);
 	if (t > 0.0 && t < 1.0) {
 		double x = getX(P0, P1, P2, t);
-		x0 = tmin(x0, x), x1 = tmax(x1, x);
+		x0 = std::min(x0, x), x1 = std::max(x1, x);
 	}
 }
 
@@ -97,12 +97,12 @@ void getHRange(const TThickQuadratic &ttq, double t0, double t1, double &x0, dou
 	double x1_ = getX(P0, P1, P2, t1);
 
 	//Get the horizontal range of the chunk
-	x0 = tmin(x0, x0_, x1_), x1 = tmax(x1, x0_, x1_);
+	x0 = std::min({x0, x0_, x1_}), x1 = std::max({x1, x0_, x1_});
 
 	double t = (P0.x - P1.x) / (P0.x + P2.x - 2.0 * P1.x);
 	if (t > t0 && t < t1) {
 		double x = getX(P0, P1, P2, t);
-		x0 = tmin(x0, x), x1 = tmax(x1, x);
+		x0 = std::min(x0, x), x1 = std::max(x1, x);
 	}
 }
 
@@ -296,7 +296,7 @@ int StrokeOutlinizationData::buildPoints(const CenterlinePoint &p, CenterlinePoi
 		}
 	}
 
-	return tmax(prevIdx, nextIdx) + 1;
+	return std::max(prevIdx, nextIdx) + 1;
 }
 
 //--------------------------------------------------------------------------------------------
@@ -446,7 +446,7 @@ void ReferenceChunksLinearizator::addCenterlinePoints(std::vector<CenterlinePoin
 	int i, initialSize = cPoints.size();
 	for (i = chunk0; i < chunk1; ++i) {
 #ifdef USE_LENGTH
-		double s = tmin(path.getLength(i, 1.0) / path.getLength(), 1.0);
+		double s = std::min(path.getLength(i, 1.0) / path.getLength(), 1.0);
 		double x = m_data.m_x0 + m_data.m_xRange * s;
 #else
 		double w = path.getW(i, 1.0);
@@ -602,7 +602,7 @@ void RecursiveReferenceLinearizator::subdivide(
 	buildEnvelopeDirections(cp1.m_p, cp1.m_prevD, envDirL1, envDirR1);
 
 	TPointD diff(convert(cp1.m_p) - convert(cp0.m_p));
-	double d = tmax(
+	double d = std::max(
 		fabs(envDirL0 * (diff + cp1.m_p.thick * envDirL1 - cp0.m_p.thick * envDirL0)),
 		fabs(envDirR0 * (diff + cp1.m_p.thick * envDirR1 - cp0.m_p.thick * envDirR0)));
 

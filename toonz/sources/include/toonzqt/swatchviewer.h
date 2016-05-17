@@ -70,8 +70,8 @@ public:
 	void paint(const TRaster32P &ras)
 	{
 		int n = 4, min = 4;
-		TDimensionD d(tmax(min, ras->getLx() / n), tmax(min, ras->getLy() / n));
-		d.lx = d.ly = tmax(d.lx, d.ly);
+		TDimensionD d(std::max(min, ras->getLx() / n), std::max(min, ras->getLy() / n));
+		d.lx = d.ly = std::max(d.lx, d.ly);
 		TRop::checkBoard(ras, m_c0, m_c1, d, TPointD());
 	}
 };

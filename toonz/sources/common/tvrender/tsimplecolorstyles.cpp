@@ -844,7 +844,7 @@ void TRasterImagePatternStrokeStyle::makeIcon(const TDimension &size)
 			icon->fill(TPixel32::White);
 			double sx = (double)icon->getLx() / (double)src->getLx();
 			double sy = (double)icon->getLy() / (double)src->getLy();
-			double sc = 0.8 * tmin(sx, sy);
+			double sc = 0.8 * std::min(sx, sy);
 			TRop::resample(icon, src, TScale(sc).place(src->getCenterD(), icon->getCenterD()));
 			TRop::addBackground(icon, TPixel32::White);
 			m_icon = icon;
@@ -942,7 +942,7 @@ void TRasterImagePatternStrokeStyle::loadLevel(const std::string &patternName)
 		{
 			double scx = 1 * dstSize.lx / (double)srcSize.lx;
 			double scy = 1 * dstSize.ly / (double)srcSize.ly;
-			double sc = tmin(scx, scy);
+			double sc = std::min(scx, scy);
 			double dx = (dstSize.lx - srcSize.lx * sc) * 0.5;
 			double dy = (dstSize.ly - srcSize.ly * sc) * 0.5;
 			return TScale(sc) * TTranslation(0.5 * TPointD(srcSize.lx, srcSize.ly) + TPointD(dx, dy));
@@ -1058,10 +1058,10 @@ void TRasterImagePatternStrokeStyle::computeTransformations(std::vector<TAffine>
 		TPointD v = stroke->getSpeed(t);
 		double ang = rad2degree(atan(v)) + m_rotation;
 
-		int ly = tmax(1.0, images[index].ly);
+		int ly = std::max(1.0, images[index].ly);
 		double sc = p.thick / ly;
 		transformations.push_back(TTranslation(p) * TRotation(ang) * TScale(sc));
-		double ds = tmax(2.0, sc * images[index].lx * 2 + m_space);
+		double ds = std::max(2.0, sc * images[index].lx * 2 + m_space);
 		s += ds;
 	}
 }
@@ -1319,7 +1319,7 @@ void TVectorImagePatternStrokeStyle::makeIcon(const TDimension &size)
 	TRectD bbox = img->getBBox();
 	double scx = 0.8 * size.lx / bbox.getLx();
 	double scy = 0.8 * size.ly / bbox.getLy();
-	double sc = tmin(scx, scy);
+	double sc = std::min(scx, scy);
 	double dx = (size.lx - bbox.getLx() * sc) * 0.5;
 	double dy = (size.ly - bbox.getLy() * sc) * 0.5;
 	TAffine aff = TScale(sc) * TTranslation(-bbox.getP00() + TPointD(dx, dy));
@@ -1451,7 +1451,7 @@ void TVectorImagePatternStrokeStyle::computeTransformations(std::vector<TAffine>
 		TAffine aff =
 			TTranslation(p) * TRotation(ang) * TScale(sc) * TTranslation(-center);
 		transformations.push_back(aff);
-		double ds = tmax(2.0, sc * bbox.getLx() + m_space);
+		double ds = std::max(2.0, sc * bbox.getLx() + m_space);
 		s += ds;
 	}
 }
@@ -1689,7 +1689,7 @@ void TVectorImagePatternStrokeStyle::drawStroke(TFlash &flash, const TStroke *st
 		//flash.draw(imgPointer, 0);
 		flash.popMatrix();
 
-		double ds = tmax(2.0, sc * bbox.getLx() + m_space);
+		double ds = std::max(2.0, sc * bbox.getLx() + m_space);
 		s += ds;
 	}
 }

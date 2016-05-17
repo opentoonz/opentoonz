@@ -49,7 +49,7 @@ public:
 		double d2 = p2.x * p2.x + p2.y * p2.y;
 		double d3 = p3.x * p3.x + p3.y * p3.y;
 		double d4 = p4.x * p4.x + p4.y * p4.y;
-		double maxD = tmax(tmax(tmax(d3, d4), d2), d1);
+		double maxD = std::max(std::max(std::max(d3, d4), d2), d1);
 		double dist = sqrt(maxD);
 		double blurangle;
 		if (dist > radius)

@@ -1,9 +1,14 @@
-
-
 #include <stdio.h>
 #include "inforegion.h"
 #include "tnz4.h"
 /*---------------------------------------------------------------------------*/
+
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
 
 void getInfoRegion(
 	INFO_REGION *region,
@@ -244,8 +249,8 @@ int get_info_region(EXT_INFO_REGION *region,
 		}
 	}
 
-	appoNcol = MIN((region->scanNcol * scale), width_in);
-	appoNrow = MIN((region->scanNrow * scale), height_in);
+	appoNcol = min((region->scanNcol * scale), width_in);
+	appoNrow = min((region->scanNrow * scale), height_in);
 
 	switch (orientation) {
 	case TNZ_TOPLEFT:
@@ -255,7 +260,7 @@ int get_info_region(EXT_INFO_REGION *region,
 		region->verso_y = -1;
 		region->sxpix = region->startScanCol;
 		region->sypix = height_in - region->startScanRow - appoNrow;
-		region->sypix = MAX(0, region->sypix);
+		region->sypix = max(0, region->sypix);
 		break;
 	case TNZ_TOPRIGHT:
 		region->buf_inc = -1;
@@ -265,8 +270,8 @@ int get_info_region(EXT_INFO_REGION *region,
 		region->verso_y = -1;
 		region->sxpix = width_in - region->startScanCol - appoNcol;
 		region->sypix = height_in - region->startScanRow - appoNrow;
-		region->sxpix = MAX(0, region->sxpix);
-		region->sypix = MAX(0, region->sypix);
+		region->sxpix = max(0, region->sxpix);
+		region->sypix = max(0, region->sypix);
 		break;
 	case TNZ_BOTRIGHT:
 		region->buf_inc = -1;

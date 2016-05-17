@@ -40,12 +40,12 @@ void StrokeGenerator::add(const TThickPoint &point, double pixelSize2)
 		TThickPoint lastPoint = m_points.back();
 		if (tdistance2(lastPoint, point) >= 4 * pixelSize2) {
 			m_points.push_back(point);
-			double d = tmax(point.thick, lastPoint.thick) + 3;
+			double d = std::max(point.thick, lastPoint.thick) + 3;
 			TRectD rect(TRectD(lastPoint, point).enlarge(d));
 			m_modifiedRegion += rect;
 			m_lastModifiedRegion += rect;
 		} else {
-			m_points.back().thick = tmax(m_points.back().thick, point.thick);
+			m_points.back().thick = std::max(m_points.back().thick, point.thick);
 		}
 	}
 }
@@ -61,7 +61,7 @@ void StrokeGenerator::filterPoints()
 	//  si hanno tra m_points[0] (al massimo m_points[1]) e i successivi)
 	int size1 = m_points.size();
 	int kMin = 0;
-	int kMax = tmin(4, size1 - 2); //  confronta 5 m_points iniziali con i successivi corrispondenti
+	int kMax = std::min(4, size1 - 2); //  confronta 5 m_points iniziali con i successivi corrispondenti
 	int k = kMax;
 	for (k = kMax; k >= kMin; --k) {
 		TThickPoint currPoint = m_points[k];
@@ -81,7 +81,7 @@ void StrokeGenerator::filterPoints()
 	//  si hanno tra m_points[size - 1] (al massimo m_points[size - 2]) e i predecessori)
 	int size2 = m_points.size();
 	kMax = size2 - 1;
-	kMin = tmax(kMax - 4, 1); //  confronta 5 m_points finali con i predecessori corrispondenti
+	kMin = std::max(kMax - 4, 1); //  confronta 5 m_points finali con i predecessori corrispondenti
 	k = kMin;
 	for (k = kMin; k <= kMax; ++k) {
 		TThickPoint currPoint = m_points[k];
@@ -171,7 +171,7 @@ void StrokeGenerator::drawLastFragments()
 
 	drawFragments(i, n - 1);
 
-	m_paintedPointCount = tmax(0, n - 2);
+	m_paintedPointCount = std::max(0, n - 2);
 }
 
 //-------------------------------------------------------------------

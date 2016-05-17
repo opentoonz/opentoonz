@@ -578,7 +578,7 @@ int TPassiveCacheManager::getNewPassiveCacheId()
 int TPassiveCacheManager::updatePassiveCacheId(int id)
 {
 	if (m_updatingPassiveCacheIds)
-		m_currentPassiveCacheId = tmax(m_currentPassiveCacheId, id);
+		m_currentPassiveCacheId = std::max(m_currentPassiveCacheId, id);
 	else
 		id = getNewPassiveCacheId();
 

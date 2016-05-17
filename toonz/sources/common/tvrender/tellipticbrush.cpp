@@ -430,7 +430,7 @@ void RecursiveLinearizator::subdivide(std::vector<CenterlinePoint> &cPoints,
 	buildEnvelopeDirections(cp1.m_p, cp1.m_prevD, envDirL1, envDirR1);
 
 	TPointD diff(convert(cp1.m_p) - convert(cp0.m_p));
-	double d = tmax(
+	double d = std::max(
 		fabs(envDirL0 * (diff + cp1.m_p.thick * envDirL1 - cp0.m_p.thick * envDirL0)),
 		fabs(envDirR0 * (diff + cp1.m_p.thick * envDirR1 - cp0.m_p.thick * envDirR0)));
 
@@ -917,7 +917,7 @@ void tellipticbrush::OutlineBuilder::addRoundSideCaps(
 	buildAngularSubdivision(cPoint.m_p.thick, totAngleL, m_pixSize, nAnglesL);
 	buildAngularSubdivision(cPoint.m_p.thick, totAngleR, m_pixSize, nAnglesR);
 
-	int nAngles = tmax(nAnglesL, nAnglesR);
+	int nAngles = std::max(nAnglesL, nAnglesR);
 	double stepAngleL = totAngleL / (double)nAngles;
 	double stepAngleR = totAngleR / (double)nAngles;
 
@@ -1012,7 +1012,7 @@ void tellipticbrush::OutlineBuilder::addMiterSideCaps(
 	TPointD p1(convert(cPoint.m_p) + envNextSide);
 
 	//Set coordinates bounds
-	double lowerBound = tmax(cPoint.m_p.thick * m_oOptions.m_miterLower, m_pixSize);
+	double lowerBound = std::max(cPoint.m_p.thick * m_oOptions.m_miterLower, m_pixSize);
 	double upperBound = cPoint.m_p.thick * m_oOptions.m_miterUpper;
 
 	//Build the intersection between the 2 lines

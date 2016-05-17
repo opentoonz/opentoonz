@@ -373,7 +373,7 @@ int Vectorizer::doVectorize()
 			center = ri->getRaster()->getCenterD();
 
 		// Build vectorizer configuration
-		double weight = (ft->getNumber() - 1 - frameRange[0]) / tmax(frameRange[1] - frameRange[0], 1.0);
+		double weight = (ft->getNumber() - 1 - frameRange[0]) / std::max(frameRange[1] - frameRange[0], 1.0);
 		weight = tcrop(weight, 0.0, 1.0);
 
 		locals.updateConfig(weight); // TEMPORARY

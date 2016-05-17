@@ -17,8 +17,8 @@ void TColorValue::getHsv(int &ih, int &is, int &iv) const
 	assert(0 <= g && g <= 1);
 	assert(0 <= b && b <= 1);
 
-	max = tmax(r, g, b);
-	min = tmin(r, g, b);
+	max = std::max({r, g, b});
+	min = std::min({r, g, b});
 
 	v = max;
 
@@ -57,8 +57,8 @@ void TColorValue::getHls(double &h, double &l, double &s) const
 	double max, min;
 	double delta;
 
-	max = tmax(m_r, m_g, m_b);
-	min = tmin(m_r, m_g, m_b);
+	max = std::max({m_r, m_g, m_b});
+	min = std::min({m_r, m_g, m_b});
 
 	l = (max + min) / 2;
 

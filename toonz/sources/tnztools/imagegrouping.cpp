@@ -621,7 +621,7 @@ int commonDepth(TVectorImage *vimg, int index1, int count, int index2)
 {
 	int i, ret = 1000;
 	for (i = index1; i < index1 + count; i++)
-		ret = tmin(ret, vimg->getCommonGroupDepth(i, index2));
+		ret = std::min(ret, vimg->getCommonGroupDepth(i, index2));
 	return ret;
 }
 

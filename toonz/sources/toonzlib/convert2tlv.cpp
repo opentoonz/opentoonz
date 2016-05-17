@@ -85,7 +85,7 @@ int findClosest(const std::map<TPixel, int> &colorMap, TPixel &curPixColor)
 
 TPoint getClosestToneValue(const TRasterCM32P &r, int y, int x, int tone)
 {
-	int maxRad = tmin(x, r->getLx() - x - 1, y, r->getLy() - y - 1);
+	int maxRad = std::min({x, r->getLx() - x - 1, y, r->getLy() - y - 1});
 
 	for (int rad = 1; rad < maxRad; rad++) {
 		CHECKCOLOR(r, x, y - rad, tone)
@@ -148,7 +148,7 @@ int getMaxMatte(const TRaster32P &r)
 	for (int i = 0; i < r->getLy(); i++) {
 		TPixel32 *pix = r->pixels(i);
 		for (int j = 0; j < r->getLx(); j++, pix++) {
-			maxMatte = tmax(maxMatte, (int)pix->m);
+			maxMatte = std::max(maxMatte, (int)pix->m);
 			if (pix->m != 255)
 				withMatte = true;
 		}
@@ -742,8 +742,8 @@ bool Convert2Tlv::init(std::string &errorMessage)
 			errorMessage = "Error: all frames must have 8 bits per channel!\n";
 			return false;
 		}
-		m_size.lx = tmax(m_size.lx, info1->m_lx);
-		m_size.ly = tmax(m_size.ly, info1->m_ly);
+		m_size.lx = std::max(m_size.lx, info1->m_lx);
+		m_size.ly = std::max(m_size.ly, info1->m_ly);
 
 		if (m_lr2 != TLevelReaderP()) {
 			TImageReaderP ir2 = m_lr2->getFrameReader(it2->first);

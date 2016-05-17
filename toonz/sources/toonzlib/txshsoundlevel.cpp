@@ -183,7 +183,7 @@ void TXshSoundLevel::computeValues(int frameHeight)
 	m_soundTrack->getMinMaxPressure(
 		TINT32(0), (TINT32)sampleCount, TSound::LEFT, minPressure, maxPressure);
 
-	double absMaxPressure = tmax(fabs(minPressure), fabs(maxPressure));
+	double absMaxPressure = std::max(fabs(minPressure), fabs(maxPressure));
 
 	if (absMaxPressure <= 0)
 		return;

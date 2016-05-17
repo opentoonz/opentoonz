@@ -65,7 +65,7 @@ TDimensionI TextureManager::getMaxSize(bool isRGBM)
 
 		int s = Preferences::instance()->getTextureSize();
 		if (s)
-			s = tmin(s, 64 << (shift - 1));
+			s = std::min(s, 64 << (shift - 1));
 		else
 			s = 64 << (shift - 1);
 		m_textureSize.lx = s;
@@ -73,7 +73,7 @@ TDimensionI TextureManager::getMaxSize(bool isRGBM)
 
 		glDisable(GL_TEXTURE_2D);
 	}
-	return TDimension(tmin(m_textureSize.lx, 2048), tmin(m_textureSize.ly, 2048));
+	return TDimension(std::min(m_textureSize.lx, 2048), std::min(m_textureSize.ly, 2048));
 }
 #else
 TDimension TextureManager::getMaxSize(bool isRGBM)

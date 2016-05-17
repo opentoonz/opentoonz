@@ -505,8 +505,8 @@ TPoint nearestInk(const TRasterCM32P &r, const TPoint &p, int ray)
 	int i, j;
 	TPixelCM32 *buf = (TPixelCM32 *)r->getRawData();
 
-	for (j = tmax(p.y - ray, 0); j <= tmin(p.y + ray, r->getLy() - 1); j++)
-		for (i = tmax(p.x - ray, 0); i <= tmin(p.x + ray, r->getLx() - 1); i++)
+	for (j = std::max(p.y - ray, 0); j <= std::min(p.y + ray, r->getLy() - 1); j++)
+		for (i = std::max(p.x - ray, 0); i <= std::min(p.x + ray, r->getLx() - 1); i++)
 			if (!(buf + j * r->getWrap() + i)->isPurePaint())
 				return TPoint(i, j);
 

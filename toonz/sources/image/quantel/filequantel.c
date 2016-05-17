@@ -16,6 +16,13 @@
 #include "filequantel.h"
 #include "filequantelP.h"
 
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
+
 #ifdef _WIN32
 #define STAT_BUF struct _stat
 #else
@@ -627,7 +634,7 @@ static IMAGE *img_read_region_quantel_no_interlaced(T_CHAR *fname,
 		rows_field2 = region.scanNrow / 2;
 	} else
 		rows_field1 = rows_field2 = region.scanNrow / 2;
-	offset = (region.ly_in - (region.scanNrow * scale + MAX(y1, 0))) / 2;
+	offset = (region.ly_in - (region.scanNrow * scale + max(y1, 0))) / 2;
 	offset *= BYTESPERROW;
 
 	if (fseek(fileyuv, imgoffs + offset, SEEK_SET)) {
@@ -704,7 +711,7 @@ static IMAGE *img_read_region_quantel_no_interlaced(T_CHAR *fname,
 		}
 		bufout1 -= region.xsize * 2;
 	}
-	offset = (region.ly_in - (region.scanNrow * scale + MAX(y1, 0))) / 2;
+	offset = (region.ly_in - (region.scanNrow * scale + max(y1, 0))) / 2;
 	offset = (region.ly_in / 2 + offset);
 	offset *= BYTESPERROW;
 	if (fseek(fileyuv, imgoffs + offset, SEEK_SET)) {

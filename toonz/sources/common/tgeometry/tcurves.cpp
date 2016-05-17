@@ -473,7 +473,7 @@ TRectD TThickQuadratic::getBBox() const
 
 	TRectD bBox = TQuadratic::getBBox();
 
-	double maxRadius = tmax(m_thickP0, m_thickP1, m_thickP2);
+	double maxRadius = std::max({m_thickP0, m_thickP1, m_thickP2});
 	if (maxRadius > 0) {
 		//  bBox.enlarge(maxRadius) si comporta male nel caso bBox.isEmpty()
 		bBox.x0 -= maxRadius;

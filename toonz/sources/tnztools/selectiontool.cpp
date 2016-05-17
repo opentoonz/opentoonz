@@ -220,7 +220,7 @@ void DragSelectionTool::FourPoints::empty()
 
 bool DragSelectionTool::FourPoints::contains(TPointD p)
 {
-	double maxDistance = tmax(tdistance2(getP00(), getP11()), tdistance2(getP10(), getP01()));
+	double maxDistance = std::max(tdistance2(getP00(), getP11()), tdistance2(getP10(), getP01()));
 	TPointD outP = p + maxDistance * TPointD(1, 1);
 	TSegment segment(outP, p);
 	std::vector<DoublePair> d;
@@ -235,10 +235,10 @@ bool DragSelectionTool::FourPoints::contains(TPointD p)
 
 TRectD DragSelectionTool::FourPoints::getBox() const
 {
-	double x0 = tmin(getP00().x, getP10().x, getP01().x, getP11().x);
-	double y0 = tmin(getP00().y, getP10().y, getP01().y, getP11().y);
-	double x1 = tmax(getP00().x, getP10().x, getP01().x, getP11().x);
-	double y1 = tmax(getP00().y, getP10().y, getP01().y, getP11().y);
+	double x0 = std::min({getP00().x, getP10().x, getP01().x, getP11().x});
+	double y0 = std::min({getP00().y, getP10().y, getP01().y, getP11().y});
+	double x1 = std::max({getP00().x, getP10().x, getP01().x, getP11().x});
+	double y1 = std::max({getP00().y, getP10().y, getP01().y, getP11().y});
 	return TRectD(TPointD(x0, y0), TPointD(x1, y1));
 }
 

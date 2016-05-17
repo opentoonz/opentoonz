@@ -43,10 +43,11 @@ public:
 
 	bool areEqual(const PIX &a, const PIX &b) const
 	{
-		return tmax(abs((int)a.r - b.r),
-					abs((int)a.g - b.g),
-					abs((int)a.b - b.b),
-					abs((int)a.m - b.m)) < m_thresh;
+		return std::max({
+			abs((int)a.r - b.r),
+			abs((int)a.g - b.g),
+			abs((int)a.b - b.b),
+			abs((int)a.m - b.m)}) < m_thresh;
 	}
 };
 
@@ -156,7 +157,7 @@ inline void filterLine(PIX *inLPix, PIX *inUPix, PIX *outLPix, PIX *outUPix,
 	double h0 = hStart, h1, area;
 	double base = hStart / slope;
 
-	int i, end = tmin(tfloor(base), ll);
+	int i, end = std::min(tfloor(base), ll);
 	if (filterLower) {
 		//Filter lower line
 		for (i = 0; i < end; ++i, h0 = h1,

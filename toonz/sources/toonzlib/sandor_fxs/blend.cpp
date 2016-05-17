@@ -67,7 +67,7 @@ BlurPattern::BlurPattern(double distance, unsigned int samplesCount, bool radial
 		for (i = 0; i < samplesCount; ++i) {
 			TPoint &sample = m_samples[i];
 
-			int l = tmax(abs(sample.x), abs(sample.y));
+			int l = std::max(abs(sample.x), abs(sample.y));
 
 			m_samplePaths[i].reserve(l);
 
@@ -598,7 +598,7 @@ void blend(TToonzImageP ti, TRasterPT<PIXEL> rasOut, const std::vector<BlendPara
 	for (i = 0; i < params.size(); ++i)
 		for (j = 0; j < params[i].colorsIndexes.size(); ++j)
 			if (params[i].colorsIndexes[j] == 0)
-				enlargement = tmax(enlargement, tceil(params[i].intensity));
+				enlargement = std::max(enlargement, tceil(params[i].intensity));
 	saveBox = saveBox.enlarge(enlargement);
 
 	TRasterCM32P cmIn(ti->getRaster()->extract(saveBox));

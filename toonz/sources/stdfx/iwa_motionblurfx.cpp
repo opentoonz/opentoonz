@@ -126,10 +126,10 @@ void Iwa_MotionBlurCompFx::makeMotionBlurFilter_CPU(float *filter_p,
 				float4 p1 = pointsTable[v + 1];
 
 				/*- 範囲内に無ければcontinue -*/
-				if (pos.x < tmin(p0.x, p1.x) - 1.0f ||
-					pos.x > tmax(p0.x, p1.x) + 1.0f ||
-					pos.y < tmin(p0.y, p1.y) - 1.0f ||
-					pos.y > tmax(p0.y, p1.y) + 1.0f)
+				if (pos.x < std::min(p0.x, p1.x) - 1.0f ||
+					pos.x > std::max(p0.x, p1.x) + 1.0f ||
+					pos.y < std::min(p0.y, p1.y) - 1.0f ||
+					pos.y > std::max(p0.y, p1.y) + 1.0f)
 					continue;
 
 				/*- 範囲内にあるので、線分と点の距離を得る -*/

@@ -275,7 +275,7 @@ bool TBigMemoryManager::putRaster(TRaster *ras, bool canPutOnDisk)
 	{
 		if (!ras->m_parent) {
 			int sizeKB = size >> 10;
-			allocationPeakKB = tmax(allocationPeakKB, sizeKB);
+			allocationPeakKB = std::max(allocationPeakKB, sizeKB);
 			allocationSumKB += sizeKB;
 			allocationCount++;
 		}

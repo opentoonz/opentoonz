@@ -58,8 +58,8 @@ namespace
 TPointD getCurvature(TStroke *stroke, double w)
 {
 	const double h = 0.0001;
-	double w0 = tmax(0.0, w - h);
-	double w1 = tmin(1.0, w + h);
+	double w0 = std::max(0.0, w - h);
+	double w1 = std::min(1.0, w + h);
 	TPointD p0 = stroke->getPoint(w0);
 	TPointD p1 = stroke->getPoint(w1);
 	double ds = norm(p0 - p1);
@@ -270,7 +270,7 @@ void StrokesIntersection::computeIntersectionDistances(
 			if (is[k] > s)
 				d = is[k] - s;
 			else if (k + 1 < isn)
-				d = tmin(is[k + 1] - s, s - is[k]);
+				d = std::min(is[k + 1] - s, s - is[k]);
 			else
 				d = s - is[k];
 		}

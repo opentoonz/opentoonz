@@ -336,7 +336,7 @@ public:
 		const T *srcSample = src.samples() + ss0;
 
 		const T *srcEndSample =
-			srcSample + tmin((TINT32)(ss1 - ss0 + 1), (TINT32)(getSampleCount() - dst_s0));
+			srcSample + std::min((TINT32)(ss1 - ss0 + 1), (TINT32)(getSampleCount() - dst_s0));
 
 		T *dstSample = samples() + dst_s0;
 

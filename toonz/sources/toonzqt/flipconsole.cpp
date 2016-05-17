@@ -226,7 +226,7 @@ void PlaybackExecutor::run()
 		}
 
 		// Calculate the new emission instant
-		emissionInstant = tmax((int)(emissionInstantD += targetFrameTime), 0);
+		emissionInstant = std::max((int)(emissionInstantD += targetFrameTime), 0);
 
 		// Sleep until the next emission instant has been reached
 		while (timer.getTotalTime() < emissionInstant)
@@ -1848,12 +1848,12 @@ void FlipConsole::onPreferenceChanged()
 			}
 
 			int dc = 150;
-			QColor lightBevel(tmin(m_blankColor.r + dc, 255),
-							  tmin(m_blankColor.g + dc, 255),
-							  tmin(m_blankColor.b + dc, 255));
-			QColor darkBevel(tmax(m_blankColor.r - dc, 0),
-							 tmax(m_blankColor.g - dc, 0),
-							 tmax(m_blankColor.b - dc, 0));
+			QColor lightBevel(std::min(m_blankColor.r + dc, 255),
+							  std::min(m_blankColor.g + dc, 255),
+							  std::min(m_blankColor.b + dc, 255));
+			QColor darkBevel(std::max(m_blankColor.r - dc, 0),
+							 std::max(m_blankColor.g - dc, 0),
+							 std::max(m_blankColor.b - dc, 0));
 
 			m_enableBlankFrameButton->setStyleSheet(
 				QString("#enableBlankFrameButton{ \

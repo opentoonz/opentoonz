@@ -406,7 +406,7 @@ void XsheetViewer::setAutoPanSpeed(const QPoint &speed)
 int getAutoPanSpeed(int pixels)
 {
 	int f = 40;
-	return tmin(100, (f - 1 + pixels * f) / 100);
+	return std::min(100, (f - 1 + pixels * f) / 100);
 }
 
 //-----------------------------------------------------------------------------
@@ -579,8 +579,8 @@ void XsheetViewer::setScrubHighlight(int row, int startRow, int col)
 {
 	if (m_scrubCol == -1)
 		m_scrubCol = col;
-	m_scrubRow0 = tmin(row, startRow);
-	m_scrubRow1 = tmax(row, startRow);
+	m_scrubRow0 = std::min(row, startRow);
+	m_scrubRow1 = std::max(row, startRow);
 	return;
 }
 
@@ -781,13 +781,13 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event)
 
 	switch (int key = event->key()) {
 	case Qt::Key_Up:
-		setCurrentRow(tmax(row - 1, 0));
+		setCurrentRow(std::max(row - 1, 0));
 		break;
 	case Qt::Key_Down:
 		setCurrentRow(row + 1);
 		break;
 	case Qt::Key_Left:
-		setCurrentColumn(tmax(col - 1, 0));
+		setCurrentColumn(std::max(col - 1, 0));
 		break;
 	case Qt::Key_Right:
 		setCurrentColumn(col + 1);

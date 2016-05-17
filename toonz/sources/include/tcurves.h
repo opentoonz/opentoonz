@@ -319,10 +319,11 @@ public:
 	//!Return rect that contains the cubic.
 	TRectD getBBox() const
 	{
-		return TRectD(tmin(m_p0.x, m_p1.x, m_p2.x, m_p3.x),
-					  tmin(m_p0.y, m_p1.y, m_p2.y, m_p3.y),
-					  tmax(m_p0.x, m_p1.x, m_p2.x, m_p3.x),
-					  tmax(m_p0.y, m_p1.y, m_p2.y, m_p3.y));
+		return TRectD(
+			std::min({m_p0.x, m_p1.x, m_p2.x, m_p3.x}),
+			std::min({m_p0.y, m_p1.y, m_p2.y, m_p3.y}),
+			std::max({m_p0.x, m_p1.x, m_p2.x, m_p3.x}),
+			std::max({m_p0.y, m_p1.y, m_p2.y, m_p3.y}));
 	};
 
 	//!Return the point of cubic at parameter \b t.

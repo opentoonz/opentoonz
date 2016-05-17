@@ -301,7 +301,7 @@ public:
 		//TThickPoint point1 = stroke1->getControlPoint(m_cpIndex1);
 
 		m_pixelSize = getPixelSize();
-		double thick = tmax(6.0 * m_pixelSize, point1.thick);
+		double thick = std::max(6.0 * m_pixelSize, point1.thick);
 
 		tglDrawCircle(point1, thick);
 
@@ -311,7 +311,7 @@ public:
 			if (m_strokeIndex2 != -1) {
 				TStroke *stroke2 = vi->getStroke(m_strokeIndex2);
 				point2 = stroke2->getPoint(m_w2);
-				thick = tmax(6.0 * m_pixelSize, point2.thick);
+				thick = std::max(6.0 * m_pixelSize, point2.thick);
 			} else {
 				tglColor(TPixelD(0.6, 0.7, 0.4));
 				thick = 4 * m_pixelSize;
@@ -408,7 +408,7 @@ public:
 			return;
 
 		if (m_type.getValue() == RECT) {
-			m_selectionRect = TRectD(tmin(m_startRect.x, pos.x), tmin(m_startRect.y, pos.y), tmax(m_startRect.x, pos.x), tmax(m_startRect.y, pos.y));
+			m_selectionRect = TRectD(std::min(m_startRect.x, pos.x), std::min(m_startRect.y, pos.y), std::max(m_startRect.x, pos.x), std::max(m_startRect.y, pos.y));
 			invalidate();
 			return;
 		}
@@ -475,8 +475,8 @@ public:
 
 	void joinPointToPoint(const TVectorImageP &vi, std::vector<TFilledRegionInf> *fillInfo)
 	{
-		int minindex = tmin(m_strokeIndex1, m_strokeIndex2);
-		int maxindex = tmax(m_strokeIndex1, m_strokeIndex2);
+		int minindex = std::min(m_strokeIndex1, m_strokeIndex2);
+		int maxindex = std::max(m_strokeIndex1, m_strokeIndex2);
 
 		UndoAutoclose *autoCloseUndo = 0;
 		TUndo *undo = 0;
@@ -580,8 +580,8 @@ public:
 
 	void inline rearrangeClosingPoints(const TVectorImageP &vi, std::pair<int, double> &closingPoint, const TPointD &p)
 	{
-		int erasedIndex = tmax(m_strokeIndex1, m_strokeIndex2);
-		int joinedIndex = tmin(m_strokeIndex1, m_strokeIndex2);
+		int erasedIndex = std::max(m_strokeIndex1, m_strokeIndex2);
+		int joinedIndex = std::min(m_strokeIndex1, m_strokeIndex2);
 
 		if (closingPoint.first == joinedIndex)
 			closingPoint.second = vi->getStroke(joinedIndex)->getW(p);
