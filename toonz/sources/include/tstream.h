@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TSTREAM_H
 #define TSTREAM_H
 

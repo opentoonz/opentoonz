@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCUBICBEZIER_INCLUDED
 #define TCUBICBEZIER_INCLUDED

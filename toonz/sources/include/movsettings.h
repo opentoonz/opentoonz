@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TMOVSETTINGS_INCLUDED
 #define TMOVSETTINGS_INCLUDED

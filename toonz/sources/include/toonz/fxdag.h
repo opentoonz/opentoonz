@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FXDAG_INCLUDED
 #define FXDAG_INCLUDED

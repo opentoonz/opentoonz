@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _AFFINE_H_
 #define _AFFINE_H_

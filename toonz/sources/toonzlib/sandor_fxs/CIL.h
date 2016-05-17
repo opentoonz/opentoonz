@@ -1,4 +1,4 @@
-
+#pragma once
 
 // CIL.h: interface for the CCIL class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_CIL_H__2B094D96_25D9_11D6_B9C6_0040F674BE6A__INCLUDED_)
 #define AFX_CIL_H__2B094D96_25D9_11D6_B9C6_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #define MAXNBCI 4096 //512
 

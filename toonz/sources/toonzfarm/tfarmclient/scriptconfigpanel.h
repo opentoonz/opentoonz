@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCRIPTCONFIGPANEL_H
 #define SCRIPTCONFIGPANEL_H

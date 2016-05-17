@@ -1,3 +1,5 @@
+#pragma once
+
 //------------------------------------------------------------------
 // Iwa_ParticlesManager for Marnie
 // based on ParticlesManager by Digital Video

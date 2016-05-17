@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef UPDATE_CHECKER_H
 #define UPDATE_CHECKER_H
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef T_UNDO_INCLUDED
 #define T_UNDO_INCLUDED
 

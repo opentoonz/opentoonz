@@ -1,4 +1,4 @@
-
+#pragma once
 
 /*
   NOTE: This is a reduced version of cblas.h without some complex-type routines.

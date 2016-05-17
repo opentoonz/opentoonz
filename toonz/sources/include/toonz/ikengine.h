@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef IKENGINE_H
 #define IKENGINE_H

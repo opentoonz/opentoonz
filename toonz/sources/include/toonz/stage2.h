@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STAGE2_INCLUDED
 #define STAGE2_INCLUDED

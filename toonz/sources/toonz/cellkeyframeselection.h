@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCELLKEYFRAMESELECTION_H
 #define TCELLKEYFRAMESELECTION_H

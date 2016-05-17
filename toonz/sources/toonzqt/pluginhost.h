@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TOONZ_STDFX_PLUGIN_HOST_H__
 #define TOONZ_STDFX_PLUGIN_HOST_H__
 #include <QThread>

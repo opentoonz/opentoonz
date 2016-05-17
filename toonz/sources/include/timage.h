@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIMAGE_INCLUDED
 #define TIMAGE_INCLUDED

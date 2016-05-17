@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STAGEPLAYER_H
 #define STAGEPLAYER_H

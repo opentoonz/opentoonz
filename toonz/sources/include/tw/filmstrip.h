@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FILMSTRIP_INCLUDED
 #define FILMSTRIP_INCLUDED

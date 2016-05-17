@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PSD_INCLUDED
 #define PSD_INCLUDED

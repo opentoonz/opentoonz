@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TARGETCOLORS_H
 #define TARGETCOLORS_H

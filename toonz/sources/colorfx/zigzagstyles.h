@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef ZIGZAG_STROKE_STYLE_H
 #define ZIGZAG_STROKE_STYLE_H

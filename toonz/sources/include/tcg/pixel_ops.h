@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_PIXEL_OPS_H
 #define TCG_PIXEL_OPS_H

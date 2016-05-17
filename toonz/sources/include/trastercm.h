@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_RASTERCM_INCLUDED
 #define T_RASTERCM_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SERVERSTATUSPAGE_H
 #define SERVERSTATUSPAGE_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef VERSION_CONTROL_H
 #define VERSION_CONTROL_H

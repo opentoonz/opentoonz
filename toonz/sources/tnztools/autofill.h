@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _AUTOFILL_H_
 #define _AUTOFILL_H_

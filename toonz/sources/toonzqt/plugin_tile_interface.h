@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef PLUGIN_TILE_INTERFACE
 #define PLUGIN_TILE_INTERFACE
 

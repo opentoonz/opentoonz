@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_WRAP_H
 #define TCG_WRAP_H

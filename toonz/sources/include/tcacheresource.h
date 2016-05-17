@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCACHERESOURCE_INCLUDED
 #define TCACHERESOURCE_INCLUDED

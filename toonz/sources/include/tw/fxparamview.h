@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_FXPARAMVIEW_INCLUDED
 #define TNZ_FXPARAMVIEW_INCLUDED

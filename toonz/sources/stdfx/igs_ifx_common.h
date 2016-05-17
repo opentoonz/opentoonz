@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_ifx_common_h
 #define igs_ifx_common_h
 

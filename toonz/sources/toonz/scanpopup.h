@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCANPOPUP_H
 #define SCANPOPUP_H

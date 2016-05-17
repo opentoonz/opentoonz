@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TOOLOPTIONS_H
 #define TOOLOPTIONS_H

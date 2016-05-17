@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STYLEMANAGER_H
 #define STYLEMANAGER_H

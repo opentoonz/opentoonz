@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_AUTO_H
 #define TCG_AUTO_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef RUNSMAP_H
 #define RUNSMAP_H

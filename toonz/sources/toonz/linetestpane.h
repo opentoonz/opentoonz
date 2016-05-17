@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LINETEST_PANE_INCLUDED
 #define LINETEST_PANE_INCLUDED

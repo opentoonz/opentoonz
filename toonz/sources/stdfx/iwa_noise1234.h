@@ -1,3 +1,5 @@
+#pragma once
+
 /*-------------------------------------------------------------
  iwa_noise1234.h
  Identical to a public domain code "noise1234.h" by Stefan Gustavson.

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIIO_MOV_PROXY_H
 #define TIIO_MOV_PROXY_H

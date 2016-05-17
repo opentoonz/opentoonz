@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef ADJUST_THICKNESS_POPUP_H
 #define ADJUST_THICKNESS_POPUP_H

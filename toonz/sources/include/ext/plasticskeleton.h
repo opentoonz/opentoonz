@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef PLASTICSKELETON_H
 #define PLASTICSKELETON_H
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LOOP_MACROS_INCLUDED
 #define LOOP_MACROS_INCLUDED

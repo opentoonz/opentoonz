@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FUNCTIONTOOLBAR_INCLUDED
 #define FUNCTIONTOOLBAR_INCLUDED

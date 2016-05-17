@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FILEBROWSERMODEL_INCLUDED
 #define FILEBROWSERMODEL_INCLUDED

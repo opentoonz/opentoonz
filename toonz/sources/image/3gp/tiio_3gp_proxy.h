@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIIO_3GP_PROXY_H
 #define TIIO_3GP_PROXY_H

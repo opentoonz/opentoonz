@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DVTEXTEDIT_H
 #define DVTEXTEDIT_H

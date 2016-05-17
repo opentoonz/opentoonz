@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TPROPERTYTYPE_H
 #define TPROPERTYTYPE_H

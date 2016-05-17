@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TTOKENIZER_INCLUDED
 #define TTOKENIZER_INCLUDED

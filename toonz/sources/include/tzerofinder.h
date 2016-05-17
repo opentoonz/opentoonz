@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TZEROFINDER_H
 #define TZEROFINDER_H

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef VECTORIZERPOPUP_H
 #define VECTORIZERPOPUP_H
 

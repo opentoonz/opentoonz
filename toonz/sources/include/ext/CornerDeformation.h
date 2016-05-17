@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CORNERDEFORMATION_H
 #define CORNERDEFORMATION_H

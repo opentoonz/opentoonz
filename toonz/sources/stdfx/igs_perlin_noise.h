@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_perlin_noise_h
 #define igs_perlin_noise_h
 

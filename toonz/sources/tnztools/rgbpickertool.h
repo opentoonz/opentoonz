@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef RGBPICKERTOOL_H
 #define RGBPICKERTOOL_H
 

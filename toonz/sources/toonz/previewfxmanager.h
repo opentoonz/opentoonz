@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PREVIEW_FX_MANAGER
 #define PREVIEW_FX_MANAGER

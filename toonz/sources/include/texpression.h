@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TEXPRESSION_INCLUDED
 #define TEXPRESSION_INCLUDED
 

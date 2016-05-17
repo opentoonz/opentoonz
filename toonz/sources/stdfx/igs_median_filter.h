@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_median_filter_h
 #define igs_median_filter_h
 

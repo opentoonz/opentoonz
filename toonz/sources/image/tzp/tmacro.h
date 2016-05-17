@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _TMACRO_H_
 #define _TMACRO_H_

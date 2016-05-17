@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_TREEVIEW_INCLUDED
 #define TNZ_TREEVIEW_INCLUDED

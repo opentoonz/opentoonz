@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TOONZIMAGE_DATA_H
 #define TOONZIMAGE_DATA_H

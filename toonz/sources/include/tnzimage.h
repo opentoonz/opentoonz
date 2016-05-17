@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZIMAGE_INCLUDED
 #define TNZIMAGE_INCLUDED

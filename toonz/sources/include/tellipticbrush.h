@@ -1,4 +1,4 @@
-
+#pragma once
 
 //-----------------------------------------------------------------------------
 // tellipticbrush.h: interface for the TEllipticBrush class.
@@ -8,10 +8,6 @@
 #define TELLIPTIC_BRUSH_H
 
 #ifdef PER_VECCHIO_ELLIPTIC_BRUSH
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #include "tbrush.h"
 

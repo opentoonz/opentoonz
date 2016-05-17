@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef RESLIST_H
 #define RESLIST_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TASKSTATUSPAGE_H
 #define TASKSTATUSPAGE_H

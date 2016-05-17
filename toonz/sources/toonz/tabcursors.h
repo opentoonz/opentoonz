@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TABCURSORS_INCLUDED
 #define TABCURSORS_INCLUDED

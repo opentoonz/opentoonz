@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCANNER_TWAIN_INCLUDED
 #define SCANNER_TWAIN_INCLUDED

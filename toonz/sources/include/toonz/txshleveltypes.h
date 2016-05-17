@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TXSHLEVELTYPES_INCLUDED
 #define TXSHLEVELTYPES_INCLUDED

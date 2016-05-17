@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CELLDATA_INCLUDED
 #define CELLDATA_INCLUDED

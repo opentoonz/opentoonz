@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STYLESELECTION_INCLUDED
 #define STYLESELECTION_INCLUDED

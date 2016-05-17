@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _AUTOADJUST_H_
 #define _AUTOADJUST_H_

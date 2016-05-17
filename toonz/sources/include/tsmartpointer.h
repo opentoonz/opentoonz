@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TSMARTPOINTER_INCLUDED
 #define TSMARTPOINTER_INCLUDED
 

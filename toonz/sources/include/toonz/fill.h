@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_FILL_INCLUDED
 #define T_FILL_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TTHREAD_H
 #define TTHREAD_H

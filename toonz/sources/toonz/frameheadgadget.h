@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FRAMEHEAD_GADGET_INCLUDED
 #define FRAMEHEAD_GADGET_INCLUDED

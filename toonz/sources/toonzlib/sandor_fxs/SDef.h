@@ -1,4 +1,4 @@
-
+#pragma once
 
 /* SDef.h: Sasa definitions.
 */

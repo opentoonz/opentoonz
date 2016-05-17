@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFLASH_INCLUDED
 #define TFLASH_INCLUDED

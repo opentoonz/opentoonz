@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TTHREADP_H
 #define TTHREADP_H

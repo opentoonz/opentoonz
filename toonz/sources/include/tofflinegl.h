@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TOFFLINEGL_INCLUDED
 #define TOFFLINEGL_INCLUDED
 

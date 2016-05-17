@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _FUNCTIONTREEMODEL_
 #define _FUNCTIONTREEMODEL_

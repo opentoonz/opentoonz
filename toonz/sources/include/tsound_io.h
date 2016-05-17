@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSOUND_IO_INCLUDED
 #define TSOUND_IO_INCLUDED

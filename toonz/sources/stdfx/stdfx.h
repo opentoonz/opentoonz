@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STDFX_INCLUDED
 #define STDFX_INCLUDED

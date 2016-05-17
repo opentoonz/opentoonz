@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CONVERT2FILLED_INCLUDED
 #define CONVERT2FILLED_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef XSHROWVIEWER_H
 #define XSHROWVIEWER_H

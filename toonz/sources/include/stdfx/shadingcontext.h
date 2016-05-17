@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef SHADINGCONTEXT_H
 #define SHADINGCONTEXT_H
 

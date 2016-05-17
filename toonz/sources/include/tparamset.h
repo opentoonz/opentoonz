@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TPARAMSET_H
 #define TPARAMSET_H

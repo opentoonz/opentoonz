@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_POLYLINE_OPS
 #define TCG_POLYLINE_OPS

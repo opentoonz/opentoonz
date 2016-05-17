@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCRIPTBINDING_RASTERIZER_H
 #define SCRIPTBINDING_RASTERIZER_H

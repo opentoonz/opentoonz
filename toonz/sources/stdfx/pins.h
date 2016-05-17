@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PINS_H
 #define PINS_H

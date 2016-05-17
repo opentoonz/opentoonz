@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSIMPLECOLORSTYLES_H
 #define TSIMPLECOLORSTYLES_H

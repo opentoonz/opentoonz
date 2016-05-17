@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSYSTEM_INCLUDED
 #define TSYSTEM_INCLUDED

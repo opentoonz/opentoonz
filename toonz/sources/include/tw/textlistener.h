@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TW_TEXT_LISTENER_INCLUDED
 #define TW_TEXT_LISTENER_INCLUDED

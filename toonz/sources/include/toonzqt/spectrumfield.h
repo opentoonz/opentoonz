@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SPECTRUMFIELD_H
 #define SPECTRUMFIELD_H

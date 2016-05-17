@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef XSCOPEDLOCK_H
 #define XSCOPEDLOCK_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DV_ITEM_VIEW_INCLUDED
 #define DV_ITEM_VIEW_INCLUDED

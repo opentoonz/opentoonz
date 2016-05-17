@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CASMSUBMITPAGE_H
 #define CASMSUBMITPAGE_H

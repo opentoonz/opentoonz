@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef __FILEBMP_INCLUDED__
 #define __FILEBMP_INCLUDED__

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_STAGE_OBJECT_ID_INCLUDED
 #define T_STAGE_OBJECT_ID_INCLUDED

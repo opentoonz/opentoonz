@@ -1,4 +1,4 @@
-
+#pragma once
 
 // Pattern.h: interface for the CPattern class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_PATTERN_H__8E417023_35C0_11D6_B9EA_0040F674BE6A__INCLUDED_)
 #define AFX_PATTERN_H__8E417023_35C0_11D6_B9EA_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #include <memory>
 #include "STColSelPic.h"

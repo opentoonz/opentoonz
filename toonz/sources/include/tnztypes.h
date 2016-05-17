@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZTYPES_H
 #define TNZTYPES_H

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_color_rgb_hls_h
 #define igs_color_rgb_hls_h
 

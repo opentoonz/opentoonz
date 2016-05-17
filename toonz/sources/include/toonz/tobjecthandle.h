@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TOBJECTHANDLE_H
 #define TOBJECTHANDLE_H

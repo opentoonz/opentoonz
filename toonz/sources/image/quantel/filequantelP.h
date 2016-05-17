@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef __FILEQUANTELP_H__
 #define __FILEQUANTELP_H__

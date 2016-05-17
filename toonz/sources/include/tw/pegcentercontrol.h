@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PEGCENTERCONTROL_INCLUDED
 #define PEGCENTERCONTROL_INCLUDED

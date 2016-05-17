@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STYLEEDITOR_H
 #define STYLEEDITOR_H

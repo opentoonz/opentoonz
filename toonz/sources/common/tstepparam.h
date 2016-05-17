@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSTEPPARAM_H
 #define TSTEPPARAM_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DUMMYPROCESSOR_H
 #define DUMMYPROCESSOR_H

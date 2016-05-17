@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCOLUMNSET_INCLUDED
 #define TCOLUMNSET_INCLUDED

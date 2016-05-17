@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef GRADIENTS_H
 #define GRADIENTS_H

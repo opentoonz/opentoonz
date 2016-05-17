@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PINCHTOOL_H
 #define PINCHTOOL_H

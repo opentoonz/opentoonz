@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TENV_INCLUDED
 #define TENV_INCLUDED

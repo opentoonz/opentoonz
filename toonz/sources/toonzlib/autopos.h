@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef AUTOPOS_H
 #define AUTOPOS_H

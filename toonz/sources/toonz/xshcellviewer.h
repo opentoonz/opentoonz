@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef XSHCELLVIEWER_H
 #define XSHCELLVIEWER_H

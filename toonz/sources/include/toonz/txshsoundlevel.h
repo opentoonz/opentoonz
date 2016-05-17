@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TXSHSOUNDLEVEL_INCLUDED
 #define TXSHSOUNDLEVEL_INCLUDED

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TDOUBLEPARAM_H
 #define TDOUBLEPARAM_H
 

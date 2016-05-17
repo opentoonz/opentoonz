@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TRENDERERP_INCLUDE
 #define TRENDERERP_INCLUDE

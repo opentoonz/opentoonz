@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_TILE_INCLUDED
 #define T_TILE_INCLUDED

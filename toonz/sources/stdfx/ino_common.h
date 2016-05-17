@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef ino_common_h
 #define ino_common_h
 

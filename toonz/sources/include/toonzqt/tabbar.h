@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TABBAR_H
 #define TABBAR_H

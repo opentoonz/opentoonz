@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSCANNER_IO_H
 #define TSCANNER_IO_H

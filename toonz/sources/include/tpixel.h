@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_PIXEL_INCLUDED
 #define T_PIXEL_INCLUDED

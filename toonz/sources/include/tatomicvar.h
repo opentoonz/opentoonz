@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TATOMICVAR_H
 #define TATOMICVAR_H

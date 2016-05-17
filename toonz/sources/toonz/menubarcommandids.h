@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MENUBAR_COMMANDS_IDS_DEFINED
 #define MENUBAR_COMMANDS_IDS_DEFINED

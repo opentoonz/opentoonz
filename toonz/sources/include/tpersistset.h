@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TPERSISTSET_H
 #define TPERSISTSET_H

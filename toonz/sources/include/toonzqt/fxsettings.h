@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FXSETTINGS_H
 #define FXSETTINGS_H

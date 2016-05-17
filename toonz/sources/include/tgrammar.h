@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TGRAMMAR_INCLUDED
 #define TGRAMMAR_INCLUDED
 

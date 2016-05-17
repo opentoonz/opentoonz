@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_MACHINE_INCLUDED
 #define T_MACHINE_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_MACROS_H
 #define TCG_MACROS_H

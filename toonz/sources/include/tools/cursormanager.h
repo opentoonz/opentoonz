@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CURSORMANAGER_H
 #define CURSORMANAGER_H

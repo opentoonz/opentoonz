@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TRASTERIMAGE_UTILS_INCLUDED
 #define TRASTERIMAGE_UTILS_INCLUDED

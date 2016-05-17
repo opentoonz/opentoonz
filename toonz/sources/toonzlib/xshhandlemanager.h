@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef XSHHANDLEMANAGER_INCLUDED
 #define XSHHANDLEMANAGER_INCLUDED

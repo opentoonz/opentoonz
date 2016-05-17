@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TLIN_MATRIX_H
 #define TLIN_MATRIX_H

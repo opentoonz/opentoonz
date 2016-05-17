@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef CIE_D65_H
 #define CIE_D65_H
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef ALIASES_INCLUDED
 #define ALIASES_INCLUDED

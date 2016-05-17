@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PROGRESSBAR_INCLUDED
 #define PROGRESSBAR_INCLUDED

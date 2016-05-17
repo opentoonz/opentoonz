@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_level_auto_h
 #define igs_level_auto_h
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #if !defined(TOONZ_PLUGIN_UTILITIES_HPP__)
 #define TOONZ_PLUGIN_UTILITIES_HPP__
 #include "toonz_hostif.h"

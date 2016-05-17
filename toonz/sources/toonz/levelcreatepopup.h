@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LEVELCREATEPOPUP_H
 #define LEVELCREATEPOPUP_H

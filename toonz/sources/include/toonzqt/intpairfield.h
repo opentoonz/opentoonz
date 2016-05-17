@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef INTPAIRFIELD_H
 #define INTPAIRFIELD_H

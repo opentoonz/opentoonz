@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef APPMAINSHELL_H
 #define APPMAINSHELL_H

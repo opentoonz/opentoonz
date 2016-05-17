@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TTCPIP_H
 #define TTCPIP_H
 

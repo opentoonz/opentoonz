@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef XSHEETEXPR_INCLUDED
 #define XSHEETEXPR_INCLUDED

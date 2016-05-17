@@ -1,3 +1,5 @@
+#pragma once
+
 #if !defined(TOONZ_PLUGIN_LOADER_H__)
 #define TOONZ_PLUGIN_LOADER_H__
 

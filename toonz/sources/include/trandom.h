@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TRANDOM_INCLUDED
 #define TRANDOM_INCLUDED

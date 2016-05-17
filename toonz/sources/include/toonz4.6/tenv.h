@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef __TENV_H__
 #define __TENV_H__
