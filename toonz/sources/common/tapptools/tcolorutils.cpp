@@ -6,6 +6,7 @@
 
 #include <set>
 #include <list>
+#include <cmath>
 
 typedef float KEYER_FLOAT;
 
@@ -13,9 +14,6 @@ typedef float KEYER_FLOAT;
 #ifdef _WIN32
 #define ISNAN _isnan
 #else
-#  ifdef MACOSX
-extern "C" int isnan(double);
-#  endif
 #define ISNAN isnan
 #endif
 
