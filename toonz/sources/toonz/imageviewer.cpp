@@ -333,6 +333,8 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event)
 
 	action = CommandManager::instance()->getAction(MI_LoadRecentImage);
 	action->setParent(0);
+
+	update();
 }
 
 //-----------------------------------------------------------------------------
