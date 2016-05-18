@@ -248,8 +248,8 @@ bool updateHandlesSO(DataGroup *group, const SkD *sd, int skelId, double frame)
 		for (h = 0; h != hCount; ++h) {
 			const double &so = group->m_handles[h].m_so;
 
-			group->m_soMin = tmin(group->m_soMin, so);
-			group->m_soMax = tmax(group->m_soMax, so);
+			group->m_soMin = std::min(group->m_soMin, so);
+			group->m_soMax = std::max(group->m_soMax, so);
 		}
 	}
 

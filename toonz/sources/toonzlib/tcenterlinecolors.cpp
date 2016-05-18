@@ -165,7 +165,7 @@ void sampleColor(const TRasterCM32P &ras, int threshold, Sequence &seq, Sequence
 	int paramCount = params.size(),
 		paramMax = paramCount - 1;
 
-	int sampleMax = tmax(params.back() / tmax(meanThickness, 1.0), 3.0), // Number of color samples depends on
+	int sampleMax = std::max(params.back() / std::max(meanThickness, 1.0), 3.0), // Number of color samples depends on
 		sampleCount = sampleMax + 1;									 // the ratio params.back() / meanThickness
 
 	std::vector<double> sampleParams(sampleCount); // Sampling lengths
@@ -184,8 +184,8 @@ void sampleColor(const TRasterCM32P &ras, int threshold, Sequence &seq, Sequence
 		T3DPointD samplePoint(*currGraph->getNode(nodes[j]) * (1 - t) + *currGraph->getNode(nodes[j + 1]) * t);
 
 		sampleParams[s] = samplePar;
-		samplePoints[s] = TPoint(tmin(samplePoint.x, double(ras->getLx() - 1)),  // This deals with sample points at
-								 tmin(samplePoint.y, double(ras->getLy() - 1))); // the top/right raster border
+		samplePoints[s] = TPoint(std::min(samplePoint.x, double(ras->getLx() - 1)),  // This deals with sample points at
+								 std::min(samplePoint.y, double(ras->getLy() - 1))); // the top/right raster border
 		sampleSegments[s] = j;
 	}
 
@@ -423,12 +423,12 @@ int getInkPredominance(const TRasterCM32P &ras, TPalette *palette, int x, int y,
 	int mx, my, Mx, My;
 	std::vector<int> inksFound(palette->getStyleCount());
 
-	radius = tmin(radius, 7); //Restrict radius for a minimum significative neighbour
+	radius = std::min(radius, 7); //Restrict radius for a minimum significative neighbour
 
-	mx = tmax(x - radius, 0);
-	my = tmax(y - radius, 0);
-	Mx = tmin(x + radius, ras->getLx() - 1);
-	My = tmin(y + radius, ras->getLy() - 1);
+	mx = std::max(x - radius, 0);
+	my = std::max(y - radius, 0);
+	Mx = std::min(x + radius, ras->getLx() - 1);
+	My = std::min(y + radius, ras->getLy() - 1);
 
 	//Check square grid around (x,y)
 	for (i = mx; i <= Mx; ++i)

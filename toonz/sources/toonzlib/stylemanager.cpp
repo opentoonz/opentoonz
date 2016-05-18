@@ -108,7 +108,7 @@ void CustomStyleManager::StyleLoaderTask::run()
 			TRectD bbox = img->getBBox();
 			double scx = 0.8 * chipSize.lx / bbox.getLx();
 			double scy = 0.8 * chipSize.ly / bbox.getLy();
-			double sc = tmin(scx, scy);
+			double sc = std::min(scx, scy);
 			double dx = 0.5 * chipSize.lx;
 			double dy = 0.5 * chipSize.ly;
 

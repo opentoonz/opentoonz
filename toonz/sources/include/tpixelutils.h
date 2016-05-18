@@ -316,7 +316,7 @@ DVAPI inline TPixel32 overPixOnBlack(const TPixel32 &top)
 
 DVAPI inline TPixelGR8 over(const TPixelGR8 &bot, const TPixelGR8 &top)
 {
-	return TPixelGR8(tmin(bot.value, top.value));
+	return TPixelGR8(std::min(bot.value, top.value));
 }
 
 //-----------------------------------------------------------------------------
@@ -364,17 +364,17 @@ DVAPI inline void premult(TPixel64 &pix)
 DVAPI inline void depremult(TPixel32 &pix)
 {
 	float fac = 255.0f / pix.m;
-	pix.r = tmin(pix.r * fac, 255.0f);
-	pix.g = tmin(pix.g * fac, 255.0f);
-	pix.b = tmin(pix.b * fac, 255.0f);
+	pix.r = std::min(pix.r * fac, 255.0f);
+	pix.g = std::min(pix.g * fac, 255.0f);
+	pix.b = std::min(pix.b * fac, 255.0f);
 }
 
 DVAPI inline void depremult(TPixel64 &pix)
 {
 	double fac = 65535.0 / pix.m;
-	pix.r = tmin(pix.r * fac, 65535.0);
-	pix.g = tmin(pix.g * fac, 65535.0);
-	pix.b = tmin(pix.b * fac, 65535.0);
+	pix.r = std::min(pix.r * fac, 65535.0);
+	pix.g = std::min(pix.g * fac, 65535.0);
+	pix.b = std::min(pix.b * fac, 65535.0);
 }
 
 //-----------------------------------------------------------------------------

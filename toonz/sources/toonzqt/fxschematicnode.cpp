@@ -1612,8 +1612,8 @@ void FxSchematicPort::handleSnappedLinksOnDynamicPortFx(const std::vector<TFxPor
 
 	//hide existing links
 	QMap<int, SchematicPort *> linkedPorts;
-	int minIndex = tmin(targetIndex, startIndex);
-	int maxIndex = tmax(targetIndex, startIndex);
+	int minIndex = std::min(targetIndex, startIndex);
+	int maxIndex = std::max(targetIndex, startIndex);
 	for (i = minIndex; i <= maxIndex; i++) {
 		TFxPort *currentPort = groupedPorts[i];
 		int portId = getInputPortIndex(currentPort, currentPort->getOwnerFx());

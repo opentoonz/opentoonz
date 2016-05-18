@@ -683,7 +683,7 @@ std::vector<int> string2Indexes(const QString &values)
 			if (!ok)
 				return std::vector<int>();
 
-			for (j = tmin(from, to); j <= tmax(from, to); j++)
+			for (j = std::min(from, to); j <= std::max(from, to); j++)
 				ret.push_back(j);
 		} else {
 			int val = vals.at(i).toInt(&ok);

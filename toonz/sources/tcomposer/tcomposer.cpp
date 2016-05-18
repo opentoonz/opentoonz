@@ -626,12 +626,6 @@ int main(int argc, char *argv[])
 	QFileInfo infoStuff(QString("Toonz 7.1 stuff"));
 	TFilePath stuffDirPath(infoStuff.absoluteFilePath().toStdString());
 	TEnv::setStuffDir(stuffDirPath);
-
-/*
-      TFilePath stuffDir("/Applications/Toonz 7.1/Toonz 7.1 stuff");
-	  TEnv::setStuffDir(stuffDir);
-*/
-
 #endif
 
 	// controllo se la xxxroot e' definita e corrisponde ad un file esistente
@@ -645,60 +639,6 @@ int main(int argc, char *argv[])
 	TFilePath logFilePath = lRootDir + "tcomposer.log";
 	m_userLog = new TUserLogAppend(logFilePath);
 	string msg;
-
-	/*
-
-  #ifdef MACOSX
-    // Library and cacheRoot Folders
-	
-	TFilePath libraryFolder = 
-      setToonzFolder(
-        TEnv::getStuffDir() + "toonzenv.txt",
-        TEnv::getSystemVarPrefix() +"LIBRARY");
-	  if(libraryFolder == TFilePath())
-	  {
-	    cout << "Cannot set " << TEnv::getSystemVarPrefix() << "LIBRARY folder" << endl;
-	    m_userLog->error("Cannot set " +TEnv::getSystemVarPrefix()+"LIBRARY folder");
-		  return -1;
-	  }
-	  TFilePath cacheRoot = 
-      setToonzFolder(
-        TEnv::getStuffDir() + "toonzenv.txt",
-        TEnv::getSystemVarPrefix()+"CACHEROOT");
-	  if(cacheRoot == TFilePath())
-	  {
-	    cout << "Cannot set " + TEnv::getSystemVarPrefix() +"CACHEROOT folder" << endl;
-	    m_userLog->error("Cannot set " + TEnv::getSystemVarPrefix() + "CACHEROOT folder");
-		  return -1;
-	  }
-*/
-	/*
-    TFilePath libraryFolder("/Applications/Toonz 5.0/Toonz 5.0 stuff/projects/library");
-    TFilePath cacheRoot("/Applications/Toonz 5.0/Toonz 5.0 stuff/cache");
-*/
-	/*
-	TRasterImagePatternStrokeStyle::setRootDir(libraryFolder);
-	  TVectorImagePatternStrokeStyle::setRootDir(libraryFolder);
-	  TPalette::setRootDir(libraryFolder);
-    cacheRoot += TFilePath(toString(TSystem::getProcessId()));
-    TFileStatus fs(cacheRoot);
-    if (!fs.doesExist())
-      TSystem::mkDir(cacheRoot);
-    TImageCache::instance()->setRootDir(cacheRoot);
-  
-  	// ProjectFolder
-    TFilePath projectFolder = setToonzFolder(TEnv::getStuffDir() + "toonzenv.txt", TEnv::getSystemVarPrefix()+"PROJECTS");
-		
-	  if(projectFolder == TFilePath()) 
-	  {
-	    cout << "Cannot set TOONZPROJECTS folder" << endl;
-	    m_userLog->error("Cannot set TOONZPROJECTS folder");
-		  return -1;
-	  }
-	
-	  TProjectManager::instance()->addProjectsRoot(projectFolder);
-  #else
-*/
 
 	// Initialize measure units
 	Preferences::instance();					 // Loads standard (linear) units
@@ -767,19 +707,6 @@ int main(int argc, char *argv[])
 
 	try {
 		Tiio::defineStd();
-
-		//#ifdef MACOSX
-		// LoadStandardPlugins ha bisogno di BINROOT definita
-		// non potendola memorizzare su TSystem (non ci sono setter)
-		// mi prendo il suo valore da toonzenv.txt e carico direttamente
-		// i plugins scolpendo le directory mancanti
-
-		//	TFilePath binRoot = setToonzFolder(TEnv::getStuffDir() + "toonzenv.txt","BINROOT");
-
-		//	TPluginManager::instance()->loadPlugins(binRoot + "bin" + "plugins" + "io");
-		//	TPluginManager::instance()->loadPlugins(binRoot + "bin" + "plugins" + "fx");
-		//#else
-		//    TPluginManager::instance()->loadStandardPlugins();//per ora , visto che altrimenti non funzionano gli stili speciali
 
 		initImageIo();
 		Tiio::defineStd();

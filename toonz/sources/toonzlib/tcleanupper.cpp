@@ -125,8 +125,8 @@ HSVColor HSVColor::fromRGB(double r, double g, double b)
 	double h, s, v;
 	double max, min, delta;
 
-	max = tmax(r, g, b);
-	min = tmin(r, g, b);
+	max = std::max({r, g, b});
+	min = std::min({r, g, b});
 
 	v = max;
 
@@ -209,7 +209,7 @@ class TransfFunction
 		for (i = 0; i <= p1; i++)
 			TransfFun[pencil << 8 | i] = 0;
 		for (; i < p2; i++)
-			TransfFun[pencil << 8 | i] = tmin(max, max * (i - p1) / cont);
+			TransfFun[pencil << 8 | i] = std::min(max, max * (i - p1) / cont);
 		for (; i < 256; i++)
 			TransfFun[pencil << 8 | i] = max;
 	}
@@ -218,7 +218,7 @@ public:
 	TransfFunction(const TargetColors &colors)
 	{
 		memset(TransfFun, 0, sizeof TransfFun);
-		int count = tmin(colors.getColorCount(), MAX_N_PENCILS);
+		int count = std::min(colors.getColorCount(), MAX_N_PENCILS);
 		for (int p = 0; p < count; p++) {
 			int brightness = troundp(2.55 * colors.getColor(p).m_brightness);
 			int contrast = troundp(2.55 * colors.getColor(p).m_contrast);
@@ -1017,7 +1017,7 @@ inline void preprocessColor(const TPixel32 &pix, const TargetColorData &blackCol
 
 		//Retrieve the hue distance and, in case it's less than current one, this idx better
 		//approximates the color.
-		newHDist = (pixHSV.m_h > fColor.m_hsv.m_h) ? tmin(pixHSV.m_h - fColor.m_hsv.m_h, fColor.m_hsv.m_h - pixHSV.m_h + 360.0) : tmin(fColor.m_hsv.m_h - pixHSV.m_h, pixHSV.m_h - fColor.m_hsv.m_h + 360.0);
+		newHDist = (pixHSV.m_h > fColor.m_hsv.m_h) ? std::min(pixHSV.m_h - fColor.m_hsv.m_h, fColor.m_hsv.m_h - pixHSV.m_h + 360.0) : std::min(fColor.m_hsv.m_h - pixHSV.m_h, pixHSV.m_h - fColor.m_hsv.m_h + 360.0);
 		if (newHDist < hDist) {
 			hDist = newHDist;
 			idx = i;

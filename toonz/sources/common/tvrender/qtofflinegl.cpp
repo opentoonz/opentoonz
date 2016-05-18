@@ -304,7 +304,7 @@ void QtOfflineGLPBuffer::createContext(TDimension rasterSize)
 
 	// Il PixelBuffer deve essere con width ed height potenze di 2
 
-	int sizeMax = tmax(rasterSize.lx, rasterSize.ly);
+	int sizeMax = std::max(rasterSize.lx, rasterSize.ly);
 
 	// trovo la potenza di 2 che "contiene" sizeMax e la utilizzo per il PBuffer
 	int pBufferSize = 2;

@@ -88,8 +88,8 @@ public:
 			m_bBox = TRectD();
 
 			for (UINT i = 0; i < m_edge.size(); i++)
-				m_bBox += m_edge[i]->m_s->getBBox(tmin(m_edge[i]->m_w0, m_edge[i]->m_w1),
-												  tmax(m_edge[i]->m_w0, m_edge[i]->m_w1));
+				m_bBox += m_edge[i]->m_s->getBBox(std::min(m_edge[i]->m_w0, m_edge[i]->m_w1),
+												  std::max(m_edge[i]->m_w0, m_edge[i]->m_w1));
 
 			m_isValidBBox = true;
 		}
@@ -696,7 +696,7 @@ bool TRegion::Imp::contains(const TPointD &p) const
 			else
 				p1 = m_edge[0]->m_s->getPoint(m_edge[0]->m_w0);
 
-			if (tmin(p0.y, p1.y) > p.y || tmax(p0.y, p1.y) < p.y)
+			if (std::min(p0.y, p1.y) > p.y || std::max(p0.y, p1.y) < p.y)
 				continue;
 
 			if (!areAlmostEqual(p0, p1, 1e-2))
@@ -1070,10 +1070,10 @@ for (i=0; i<m_edge.size(); i++)
   for (j=0, found=false; !found && j<r.m_edge.size(); j++)
     if (m_edge[i]->m_s==r.m_edge[j]->m_s)
       {
-      double w0 = tmin(m_edge[i]->m_w0, m_edge[i]->m_w1) ;
-      double w1 = tmax(m_edge[i]->m_w0, m_edge[i]->m_w1) ;
-      double r_w0 = tmin(r.m_edge[j]->m_w0, r.m_edge[j]->m_w1);
-      double r_w1 = tmax(r.m_edge[j]->m_w0, r.m_edge[j]->m_w1);
+      double w0 = std::min(m_edge[i]->m_w0, m_edge[i]->m_w1) ;
+      double w1 = std::max(m_edge[i]->m_w0, m_edge[i]->m_w1) ;
+      double r_w0 = std::min(r.m_edge[j]->m_w0, r.m_edge[j]->m_w1);
+      double r_w1 = std::max(r.m_edge[j]->m_w0, r.m_edge[j]->m_w1);
 
       if ((w0>=r_w0 || areAlmostEqual(w0, r_w0, 0.1)) && 
           (w1<=r_w1 || areAlmostEqual(w1, r_w1, 0.1)))

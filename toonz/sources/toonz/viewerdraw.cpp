@@ -252,8 +252,8 @@ void ViewerDraw::drawCameraMask(SceneViewer *viewer)
 			tglFillRect(x1, bounds.y0, bounds.x1, bounds.y1);
 
 		if (x0 < bounds.x1 && x1 > bounds.x0) {
-			double xa = tmax(x0, bounds.x0);
-			double xb = tmin(x1, bounds.x1);
+			double xa = std::max(x0, bounds.x0);
+			double xb = std::min(x1, bounds.x1);
 			if (bounds.y0 < y0)
 				tglFillRect(xa, bounds.y0, xb, y0);
 			if (y1 < bounds.y1)
@@ -291,10 +291,10 @@ void ViewerDraw::drawGridAndGuides(
 	TPointD p10 = mat * convert(clipRect.getP10());
 	TPointD p11 = mat * convert(clipRect.getP11());
 
-	double xmin = tmin(p00.x, p01.x, p10.x, p11.x);
-	double xmax = tmax(p00.x, p01.x, p10.x, p11.x);
-	double ymin = tmin(p00.y, p01.y, p10.y, p11.y);
-	double ymax = tmax(p00.y, p01.y, p10.y, p11.y);
+	double xmin = std::min({p00.x, p01.x, p10.x, p11.x});
+	double xmax = std::max({p00.x, p01.x, p10.x, p11.x});
+	double ymin = std::min({p00.y, p01.y, p10.y, p11.y});
+	double ymax = std::max({p00.y, p01.y, p10.y, p11.y});
 
 	double step = 10;
 	if (sc * step < 4)

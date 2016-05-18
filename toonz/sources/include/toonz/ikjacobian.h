@@ -134,7 +134,7 @@ inline void VectorRn::SetLength(long newLength)
 	assert(newLength > 0);
 	if (newLength > AllocLength) {
 		delete x;
-		AllocLength = tmax(newLength, AllocLength << 1);
+		AllocLength = std::max(newLength, AllocLength << 1);
 		x = new double[AllocLength];
 	}
 	length = newLength;
@@ -427,7 +427,7 @@ inline void MatrixRmn::SetSize(long numRows, long numCols)
 	long newLength = numRows * numCols;
 	if (newLength > AllocSize) {
 		delete x;
-		AllocSize = tmax(newLength, AllocSize << 1);
+		AllocSize = std::max(newLength, AllocSize << 1);
 		x = new double[AllocSize];
 	}
 	NumRows = numRows;

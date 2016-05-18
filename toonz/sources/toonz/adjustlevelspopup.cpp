@@ -551,8 +551,8 @@ void AdjustLevelsPopup::autoAdjust()
 		::getRange(histograms->getHistogramView(2)->values(), m_threshold, minG, maxG);
 		::getRange(histograms->getHistogramView(3)->values(), m_threshold, minB, maxB);
 
-		min = tmin(minR, minG, minB);
-		max = tmax(maxR, maxG, maxB);
+		min = std::min({minR, minG, minB});
+		max = std::max({maxR, maxG, maxB});
 	} else
 		::getRange(values, m_threshold, min, max);
 

@@ -1044,7 +1044,7 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(std::set<int> &colu
 			// Err.... don't remember. Inquire further? :|
 			int fxTypeCount = xsh->getFxDag()->getFxTypeCount(fx);
 
-			int maxFxTypeId = tmax(fxTypeCount, fx->getAttributes()->getId());
+			int maxFxTypeId = std::max(fxTypeCount, fx->getAttributes()->getId());
 			xsh->getFxDag()->updateFxTypeTable(fx, maxFxTypeId);
 			xsh->getFxDag()->updateFxIdTable(fx);
 		}
@@ -1081,7 +1081,7 @@ std::vector<TStageObjectId> StageObjectsData::restoreObjects(std::set<int> &colu
 
 				if (!doClone) {
 					int fxTypeCount = xsh->getFxDag()->getFxTypeCount(linkedFx);
-					int maxFxTypeId = tmax(fxTypeCount, linkedFx->getAttributes()->getId());
+					int maxFxTypeId = std::max(fxTypeCount, linkedFx->getAttributes()->getId());
 					xsh->getFxDag()->updateFxTypeTable(linkedFx, maxFxTypeId);
 					xsh->getFxDag()->updateFxIdTable(linkedFx);
 				}

@@ -149,7 +149,7 @@ ColorModel::ColorModel()
 void ColorModel::rgb2hsv()
 {
 	QColor converter(m_channels[0], m_channels[1], m_channels[2]);
-	m_channels[4] = tmax(converter.hue(), 0); // hue() ritorna -1 per colori acromatici
+	m_channels[4] = std::max(converter.hue(), 0); // hue() ritorna -1 per colori acromatici
 	m_channels[5] = converter.saturation() * 100 / 255;
 	m_channels[6] = converter.value() * 100 / 255;
 }
@@ -177,7 +177,7 @@ void ColorModel::setTPixel(const TPixel32 &pix)
 	m_channels[1] = color.green();
 	m_channels[2] = color.blue();
 	m_channels[3] = color.alpha();
-	m_channels[4] = tmax(color.hue(), 0); // hue() ritorna -1 per colori acromatici
+	m_channels[4] = std::max(color.hue(), 0); // hue() ritorna -1 per colori acromatici
 	m_channels[5] = color.saturation() * 100 / 255;
 	m_channels[6] = color.value() * 100 / 255;
 }
@@ -883,7 +883,7 @@ void HexagonalColorWheel::clickLeftWheel(const QPoint &pos)
 	if (h > 359)
 		h = 359;
 	//clamping
-	int s = (int)(tmin(p.length() / d, 1.0) * 100.0f);
+	int s = (int)(std::min(p.length() / d, 1.0) * 100.0f);
 
 	m_color.setValues(eValue, h, s);
 
@@ -900,10 +900,10 @@ void HexagonalColorWheel::clickRightTriangle(const QPoint &pos)
 		s = 0;
 		v = 0;
 	} else {
-		float v_ratio = tmin((float)(p.ry() / (m_triHeight * 2.0f)), 1.0f);
+		float v_ratio = std::min((float)(p.ry() / (m_triHeight * 2.0f)), 1.0f);
 		float s_f = p.rx() / (m_triEdgeLen * v_ratio);
 		v = (int)(v_ratio * 100.0f);
-		s = (int)(tmin(tmax(s_f, 0.0f), 1.0f) * 100.0f);
+		s = (int)(std::min(std::max(s_f, 0.0f), 1.0f) * 100.0f);
 	}
 	m_color.setValues(eHue, s, v);
 	emit colorChanged(m_color, true);

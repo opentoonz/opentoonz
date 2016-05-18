@@ -890,8 +890,8 @@ bool isNearestInkOrPaintInRegion(bool findInk, const TRasterCM32P &ras, TRegion 
 	for (i = 1; i <= 100; i++) {
 		int j, t, s, e;
 		if (p.x - i >= 0) {
-			my = tmax(p.y - i, 0);
-			My = tmin(p.y + i, ras->getLy() - 1);
+			my = std::max(p.y - i, 0);
+			My = std::min(p.y + i, ras->getLy() - 1);
 			for (j = my; j <= My; j++) {
 				TPixelCM32 col = ras->pixels(j)[p.x - i];
 				int tone = col.getTone();
@@ -904,8 +904,8 @@ bool isNearestInkOrPaintInRegion(bool findInk, const TRasterCM32P &ras, TRegion 
 			}
 		}
 		if (p.y + i < ras->getLy()) {
-			mx = tmax(p.x - i + 1, 0);
-			Mx = tmin(p.x + i, ras->getLx() - 1);
+			mx = std::max(p.x - i + 1, 0);
+			Mx = std::min(p.x + i, ras->getLx() - 1);
 			for (t = mx; t <= Mx; t++) {
 				TPixelCM32 col = ras->pixels(p.y + i)[t];
 				int tone = col.getTone();
@@ -918,8 +918,8 @@ bool isNearestInkOrPaintInRegion(bool findInk, const TRasterCM32P &ras, TRegion 
 			}
 		}
 		if (p.x + i < ras->getLx()) {
-			my = tmax(p.y - i, 0);
-			My = tmin(p.y + i - 1, ras->getLy() - 1);
+			my = std::max(p.y - i, 0);
+			My = std::min(p.y + i - 1, ras->getLy() - 1);
 			for (s = my; s <= My; s++) {
 				TPixelCM32 col = ras->pixels(s)[p.x + i];
 				int tone = col.getTone();
@@ -932,8 +932,8 @@ bool isNearestInkOrPaintInRegion(bool findInk, const TRasterCM32P &ras, TRegion 
 			}
 		}
 		if (p.y - i >= 0) {
-			mx = tmax(p.x - i + 1, 0);
-			Mx = tmin(p.x + i - 1, ras->getLx() - 1);
+			mx = std::max(p.x - i + 1, 0);
+			Mx = std::min(p.x + i - 1, ras->getLx() - 1);
 			for (e = mx; e <= Mx; e++) {
 				TPixelCM32 col = ras->pixels(p.y - i)[e];
 				int tone = col.getTone();
@@ -968,7 +968,7 @@ inline bool isBright(const TPixelGR8 &pix, int threshold)
 inline bool isBright(const TPixel32 &pix, int threshold)
 {
 	// Using Value in HSV color model
-	return tmax(pix.r, tmax(pix.g, pix.b)) >= threshold * (pix.m / 255.0);
+	return std::max(pix.r, std::max(pix.g, pix.b)) >= threshold * (pix.m / 255.0);
 
 	// Using Lightness in HSL color model
 	//return (max(pix.r,max(pix.g,pix.b)) + min(pix.r,min(pix.g,pix.b))) / 2.0
@@ -1075,7 +1075,7 @@ bool getInternalPoint(const TRasterPT<Pix> &ras, const Selector &sel,
 		bool adjustPoint(TPointD &p)
 		{
 			const TRectD &bbox = m_region.getBBox();
-			const double tol = tmax(1e-1 * m_pixelSize, 1e-4);
+			const double tol = std::max(1e-1 * m_pixelSize, 1e-4);
 
 			TPointD newP = p;
 			{

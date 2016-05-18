@@ -242,7 +242,7 @@ void convertSamplesT(TSoundTrackT<T1> &dst, const TSoundTrackT<T2> &src)
 	const T2 *srcSample = src.samples();
 	T1 *dstSample = dst.samples();
 
-	const T2 *srcEndSample = srcSample + tmin(src.getSampleCount(), dst.getSampleCount());
+	const T2 *srcEndSample = srcSample + std::min(src.getSampleCount(), dst.getSampleCount());
 	while (srcSample < srcEndSample) {
 		*dstSample = T1::from(*srcSample);
 		++dstSample;
@@ -326,11 +326,11 @@ T *resampleT(T &src, TINT32 sampleRate, FLT_TYPE flt_type)
 		int iwFirst, iwLast;
 		if (is > 0) {
 			iwFirst = 0;
-			iwLast = tmin<int>(filter.weightset[ip].n_weights, src.getSampleCount() - is);
+			iwLast = std::min<int>(filter.weightset[ip].n_weights, src.getSampleCount() - is);
 		} else {
 			iwFirst = -is;
 			is = 0;
-			iwLast = tmin<int>(filter.weightset[ip].n_weights, src.getSampleCount());
+			iwLast = std::min<int>(filter.weightset[ip].n_weights, src.getSampleCount());
 		}
 
 		double dstChannel[2];
@@ -780,7 +780,7 @@ TSoundTrackP doReverb(
 
 	//  int channelCount = src->getChannelCount();
 
-	endDstSample = dst->samples() + tmin(dstSampleCount, (TINT32)src->getSampleCount());
+	endDstSample = dst->samples() + std::min(dstSampleCount, (TINT32)src->getSampleCount());
 	while (dstSample < endDstSample) {
 		//*dstSample = *srcSample + *(dstSample - k)*decayFactor;
 		*dstSample = T::mix(*srcSample, 1, *(dstSample - k), decayFactor);
@@ -1114,7 +1114,7 @@ TSoundTrackP doEcho(
 	// out(i) = in(i) + decayFactor * in(i - k)
 
 	bool chans = src->getChannelCount() == 2;
-	endDstSample = dst->samples() + tmin(dstSampleCount, (TINT32)src->getSampleCount());
+	endDstSample = dst->samples() + std::min(dstSampleCount, (TINT32)src->getSampleCount());
 	while (dstSample < endDstSample) {
 		//*dstSample = *srcSample + *(srcSample - k)*decayFactor;
 		ChannelValueType val =
@@ -1263,8 +1263,8 @@ TSoundTrackP TSop::remove(TSoundTrackP src, TINT32 s0, TINT32 s1, TSoundTrackP &
 {
 	TINT32 ss0, ss1;
 
-	ss0 = tmax<TINT32>((TINT32)0, s0);
-	ss1 = tmin(s1, (TINT32)(src->getSampleCount() - 1));
+	ss0 = std::max<TINT32>((TINT32)0, s0);
+	ss1 = std::min(s1, (TINT32)(src->getSampleCount() - 1));
 	TSoundTrackP soundTrackSlice;
 	if (ss0 <= ss1)
 		soundTrackSlice = src->extract(ss0, ss1);
@@ -1303,7 +1303,7 @@ template <class T>
 TSoundTrackP mixT(
 	TSoundTrackT<T> *st1, double a1, TSoundTrackT<T> *st2, double a2)
 {
-	TINT32 sampleCount = tmax(st1->getSampleCount(), st2->getSampleCount());
+	TINT32 sampleCount = std::max(st1->getSampleCount(), st2->getSampleCount());
 
 	TSoundTrackT<T> *dst = new TSoundTrackT<T>(
 		st1->getSampleRate(),
@@ -1311,7 +1311,7 @@ TSoundTrackP mixT(
 		sampleCount);
 
 	T *dstSample = dst->samples();
-	T *endDstSample = dstSample + tmin(st1->getSampleCount(), st2->getSampleCount());
+	T *endDstSample = dstSample + std::min(st1->getSampleCount(), st2->getSampleCount());
 
 	T *st1Sample = st1->samples();
 	T *st2Sample = st2->samples();

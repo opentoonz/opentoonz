@@ -1678,8 +1678,8 @@ TRect SceneViewer::getActualClipRect(const TAffine &aff)
 		TPointD p01 = winToWorld(clipRect.getP01());
 		TPointD p10 = winToWorld(clipRect.getP10());
 		TPointD p11 = winToWorld(clipRect.getP11());
-		clipRect = TRect(TPoint(tmin(p00.x, p01.x), tmin(p00.y, p10.y)),
-						 TPoint(tmax(p11.x, p10.x), tmax(p11.y, p01.y)));
+		clipRect = TRect(TPoint(std::min(p00.x, p01.x), std::min(p00.y, p10.y)),
+						 TPoint(std::max(p11.x, p10.x), std::max(p11.y, p01.y)));
 	} else if (m_clipRect.isEmpty())
 		clipRect -= TPoint(viewerSize.lx / 2, viewerSize.ly / 2);
 	else {
@@ -1938,7 +1938,7 @@ double SceneViewer::getZoomScaleFittingWithScreen()
 	//fit to either direction
 	int moni_x = rec.width() - (margin * 2);
 	int moni_y = rec.height() - (margin * 2);
-	return tmin((double)moni_x / (double)imgSize.lx, (double)moni_y / (double)imgSize.ly);
+	return std::min((double)moni_x / (double)imgSize.lx, (double)moni_y / (double)imgSize.ly);
 }
 
 //-----------------------------------------------------------------------------
@@ -2048,8 +2048,8 @@ void SceneViewer::fitToCamera()
 	TPointD P10 = cameraAff * cameraRect.getP10();
 	TPointD P01 = cameraAff * cameraRect.getP01();
 	TPointD P11 = cameraAff * cameraRect.getP11();
-	TPointD p0 = TPointD(tmin(P00.x, P01.x, P10.x, P11.x), tmin(P00.y, P01.y, P10.y, P11.y));
-	TPointD p1 = TPointD(tmax(P00.x, P01.x, P10.x, P11.x), tmax(P00.y, P01.y, P10.y, P11.y));
+	TPointD p0 = TPointD(std::min({P00.x, P01.x, P10.x, P11.x}), std::min({P00.y, P01.y, P10.y, P11.y}));
+	TPointD p1 = TPointD(std::max({P00.x, P01.x, P10.x, P11.x}), std::max({P00.y, P01.y, P10.y, P11.y}));
 	cameraRect = TRectD(p0.x, p0.y, p1.x, p1.y);
 
 	// Pan
@@ -2060,7 +2060,7 @@ void SceneViewer::fitToCamera()
 
 	double xratio = (double)viewRect.width() / cameraRect.getLx();
 	double yratio = (double)viewRect.height() / cameraRect.getLy();
-	double ratio = tmin(xratio, yratio);
+	double ratio = std::min(xratio, yratio);
 
 	// Scale and center on the center of \a rect.
 	QPoint c = viewRect.center();
@@ -2426,7 +2426,7 @@ void drawSpline(const TAffine &viewMatrix, const TRect &clipRect, bool camera3d,
 	glEnable(GL_LINE_STIPPLE);
 	tglMultMatrix(aff);
 
-	double pixelSize = tmax(0.1, pixelsize);
+	double pixelSize = std::max(0.1, pixelsize);
 	double strokeLength = stroke->getLength();
 	int n = (int)(5 + (strokeLength / pixelSize) * 0.1);
 

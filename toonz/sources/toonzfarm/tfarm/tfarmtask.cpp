@@ -592,7 +592,7 @@ bool TFarmTaskGroup::changeChunkSize(int chunksize)
 	if (subCount > 1) {
 		int ra = m_from;
 		for (int i = 1; i <= subCount; ++i) {
-			int rb = tmin(ra + m_chunkSize - 1, m_to);
+			int rb = std::min(ra + m_chunkSize - 1, m_to);
 
 			try {
 				QString subName = m_name + " " + toString(ra, 2, '0') + "-" + toString(rb, 2, '0');
@@ -650,7 +650,7 @@ TFarmTaskGroup::TFarmTaskGroup(
 	int ra = from;
 	if (subCount > 1) {
 		for (int i = 1; i <= subCount; ++i) {
-			int rb = tmin(ra + chunksize - 1, to);
+			int rb = std::min(ra + chunksize - 1, to);
 
 			try {
 				QString subName = name + " " + toString(ra, 2, '0') + "-" + toString(rb, 2, '0');

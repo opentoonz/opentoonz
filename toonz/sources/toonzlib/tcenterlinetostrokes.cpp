@@ -166,7 +166,7 @@ SequenceSimplifier::lengthOf(UINT a, UINT aLink, UINT b)
 
 	for (; curr != b; m_s->advance(old, curr)) {
 		d = tdistance2(*m_graph->getNode(curr), v, *m_graph->getNode(a));
-		if (d > tmin(m_graph->getNode(curr)->z * Polyg_eps_mul, Polyg_eps_max)) {
+		if (d > std::min(m_graph->getNode(curr)->z * Polyg_eps_mul, Polyg_eps_max)) {
 			res.infty();
 			return res;
 		} else
@@ -614,7 +614,7 @@ bool SequenceConverter::penalty(unsigned int a, unsigned int b, Length &len)
 
 	//Confronting 4th power of error with mean polygonal thickness
 	// - can be changed
-	p_max = tmin(sqrt(p_max) * m_penalty, Quad_eps_max);
+	p_max = std::min(sqrt(p_max) * m_penalty, Quad_eps_max);
 
 	//CP only integral
 	p = (ellProd(CPs[0], CPs[0]) + 2 * ellProd(CPs[2], CPs[2]) + ellProd(CPs[4], CPs[4]) +

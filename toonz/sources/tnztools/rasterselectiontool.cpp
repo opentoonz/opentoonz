@@ -62,10 +62,10 @@ void RasterFreeDeformer::deformImage()
 	TPointD p11 = m_newPoints[2] - m_newPoints[0];
 	TPointD p01 = m_newPoints[3] - m_newPoints[0];
 
-	double x0 = tmin(p00.x, p10.x, p11.x, p01.x);
-	double y0 = tmin(p00.y, p10.y, p11.y, p01.y);
-	double x1 = tmax(p00.x, p10.x, p11.x, p01.x);
-	double y1 = tmax(p00.y, p10.y, p11.y, p01.y);
+	double x0 = std::min({p00.x, p10.x, p11.x, p01.x});
+	double y0 = std::min({p00.y, p10.y, p11.y, p01.y});
+	double x1 = std::max({p00.x, p10.x, p11.x, p01.x});
+	double y1 = std::max({p00.y, p10.y, p11.y, p01.y});
 
 	TRectD sourceRect(TPointD(), TPointD(m_ras->getLx(), m_ras->getLy()));
 	BilinearDistorterBase dist(
@@ -629,8 +629,8 @@ void RasterSelectionTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &
 			else if (ri)
 				imageSize = ri->getRaster()->getSize();
 			TPointD p(imageSize.lx % 2 ? 0.5 : 0.0, imageSize.ly % 2 ? 0.5 : 0.0);
-			TRectD rectD(tround(tmin(m_firstPos.x, pos.x) - p.x) + p.x, tround(tmin(m_firstPos.y, pos.y) - p.y) + p.y,
-						 tround(tmax(m_firstPos.x, pos.x) - p.x) + p.x, tround(tmax(m_firstPos.y, pos.y) - p.y) + p.y);
+			TRectD rectD(tround(std::min(m_firstPos.x, pos.x) - p.x) + p.x, tround(std::min(m_firstPos.y, pos.y) - p.y) + p.y,
+						 tround(std::max(m_firstPos.x, pos.x) - p.x) + p.x, tround(std::max(m_firstPos.y, pos.y) - p.y) + p.y);
 
 			m_selectingRect = rectD;
 			m_bboxs.clear();

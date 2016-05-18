@@ -413,17 +413,21 @@ void subdivision(const TPointD &p00,
 
 		details--;
 
-		TRectD r1 = TRectD(tmin(A.x, L1.x, M.x, H1.x), tmin(A.y, L1.y, M.y, H1.y),
-						   tmax(A.x, L1.x, M.x, H1.x), tmax(A.y, L1.y, M.y, H1.y));
+		TRectD r1 = TRectD(
+			std::min({A.x, L1.x, M.x, H1.x}), std::min({A.y, L1.y, M.y, H1.y}),
+			std::max({A.x, L1.x, M.x, H1.x}), std::max({A.y, L1.y, M.y, H1.y}));
 
-		TRectD r2 = TRectD(tmin(L1.x, B.x, H2.x, M.x), tmin(L1.y, B.y, H2.y, M.y),
-						   tmax(L1.x, B.x, H2.x, M.x), tmax(L1.y, B.y, H2.y, M.y));
+		TRectD r2 = TRectD(
+			std::min({L1.x, B.x, H2.x, M.x}), std::min({L1.y, B.y, H2.y, M.y}),
+			std::max({L1.x, B.x, H2.x, M.x}), std::max({L1.y, B.y, H2.y, M.y}));
 
-		TRectD r3 = TRectD(tmin(M.x, H2.x, C.x, L2.x), tmin(M.y, H2.y, C.y, L2.y),
-						   tmax(M.x, H2.x, C.x, L2.x), tmax(M.y, H2.y, C.y, L2.y));
+		TRectD r3 = TRectD(
+			std::min({M.x, H2.x, C.x, L2.x}), std::min({M.y, H2.y, C.y, L2.y}),
+			std::max({M.x, H2.x, C.x, L2.x}), std::max({M.y, H2.y, C.y, L2.y}));
 
-		TRectD r4 = TRectD(tmin(H1.x, M.x, L2.x, D.x), tmin(H1.y, M.y, L2.y, D.y),
-						   tmax(H1.x, M.x, L2.x, D.x), tmax(H1.y, M.y, L2.y, D.y));
+		TRectD r4 = TRectD(
+			std::min({H1.x, M.x, L2.x, D.x}), std::min({H1.y, M.y, L2.y, D.y}),
+			std::max({H1.x, M.x, L2.x, D.x}), std::max({H1.y, M.y, L2.y, D.y}));
 
 		if (r1.overlaps(clippingRect))
 			subdivision(A, L1, M, H1, tex00, texA, texM, texD, clippingRect, details);

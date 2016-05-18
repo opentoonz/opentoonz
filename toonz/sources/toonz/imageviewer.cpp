@@ -894,8 +894,8 @@ int ImageViewer::getDragType(const TPoint &pos, const TRect &loadbox)
 	if (loadbox == TRect())
 		return eDrawRect;
 
-	int ret = 0, dx = tmin(abs(loadbox.x0 - pos.x), abs(loadbox.x1 - pos.x)),
-		dy = tmin(abs(loadbox.y0 - pos.y), abs(loadbox.y1 - pos.y));
+	int ret = 0, dx = std::min(abs(loadbox.x0 - pos.x), abs(loadbox.x1 - pos.x)),
+		dy = std::min(abs(loadbox.y0 - pos.y), abs(loadbox.y1 - pos.y));
 
 	if (dx > 10 && dy > 10)
 		return (loadbox.contains(pos)) ? eMoveRect : eDrawRect;
@@ -1099,7 +1099,7 @@ void ImageViewer::adaptView(const TRect &imgRect, const TRect &viewRect)
 	QRect viewerRect(geometry());
 
 	double imageScale =
-		tmin(viewerRect.width() / (double)viewRect.getLx(),
+		std::min(viewerRect.width() / (double)viewRect.getLx(),
 			 viewerRect.height() / (double)viewRect.getLy());
 
 	TPointD viewRectCenter((viewRect.x0 + viewRect.x1 + 1) * 0.5, (viewRect.y0 + viewRect.y1 + 1) * 0.5);

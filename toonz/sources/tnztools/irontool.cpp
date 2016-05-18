@@ -142,8 +142,8 @@ public:
 		m_range.second = m_strokeRef->getW(pos);
 		m_cursor = m_strokeRef->getThickPoint(m_range.second);
 
-		double v0 = tmin(m_range.first, m_range.second);
-		double v1 = tmax(m_range.first, m_range.second);
+		double v0 = std::min(m_range.first, m_range.second);
+		double v1 = std::max(m_range.first, m_range.second);
 		const double eps = 0.005;
 
 		if (v1 - v0 < eps && !(m_strokeRef->isSelfLoop() && 1 - (v1 - v0) < eps)) {

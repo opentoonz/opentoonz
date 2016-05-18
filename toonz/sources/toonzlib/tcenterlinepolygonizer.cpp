@@ -132,7 +132,7 @@ inline unsigned char PixelEvaluator<TPixel32>::getBlackOrWhite(int x, int y)
 	//NOTE: Green is considered twice brighter than red or blue channel.
 
 	//Using Value of HSV color model
-	return tmax(m_ras->pixels(y)[x].r, tmax(m_ras->pixels(y)[x].g, m_ras->pixels(y)[x].b)) <
+	return std::max(m_ras->pixels(y)[x].r, std::max(m_ras->pixels(y)[x].g, m_ras->pixels(y)[x].b)) <
 		   m_threshold * (m_ras->pixels(y)[x].m / 255.0);
 
 	//Using Lightness of HSV color model

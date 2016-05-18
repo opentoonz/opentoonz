@@ -1616,8 +1616,8 @@ bool TypeTool::keyDown(int key, std::wstring unicodeChar, TUINT32 flags, const T
 void TypeTool::onInputText(std::wstring preedit, std::wstring commit, int replacementStart, int replacementLen)
 {
 	// butto la vecchia preedit string
-	m_preeditRange.first = tmax(0, m_preeditRange.first);
-	m_preeditRange.second = tmin((int)m_string.size(), m_preeditRange.second);
+	m_preeditRange.first = std::max(0, m_preeditRange.first);
+	m_preeditRange.second = std::min((int)m_string.size(), m_preeditRange.second);
 	if (m_preeditRange.first < m_preeditRange.second)
 		m_string.erase(m_string.begin() + m_preeditRange.first, m_string.begin() + m_preeditRange.second);
 

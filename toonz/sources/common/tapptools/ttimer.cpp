@@ -85,7 +85,7 @@ TTimer::Imp::Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *tim
 		throw TException("Unable to create timer");
 	}
 
-	m_timerRes = tmin((int)tmax((int)tc.wPeriodMin, (int)m_timerRes), (int)tc.wPeriodMax);
+	m_timerRes = std::min((int)std::max((int)tc.wPeriodMin, (int)m_timerRes), (int)tc.wPeriodMax);
 	timeBeginPeriod(m_timerRes);
 
 	switch (type) {

@@ -153,7 +153,7 @@ void CleanupSwatch::CleanupSwatchArea::keyPressEvent(QKeyEvent *event)
 		double currZoomScale = sqrt(m_sw->m_viewAff.det());
 		double factor = getQuantizedZoomFactor(currZoomScale, forward);
 
-		double minZoom = tmin((double)m_sw->m_lx / m_sw->m_resampledRaster->getLx(), (double)m_sw->m_ly / m_sw->m_resampledRaster->getLy());
+		double minZoom = std::min((double)m_sw->m_lx / m_sw->m_resampledRaster->getLx(), (double)m_sw->m_ly / m_sw->m_resampledRaster->getLy());
 		if ((!forward && factor < minZoom) || (forward && factor > 40.0))
 			return;
 
@@ -203,7 +203,7 @@ void CleanupSwatch::CleanupSwatchArea::wheelEvent(QWheelEvent *event)
 	if (factor == 1.0)
 		return;
 	double scale = m_sw->m_viewAff.det();
-	double minZoom = tmin((double)m_sw->m_lx / m_sw->m_resampledRaster->getLx(), (double)m_sw->m_ly / m_sw->m_resampledRaster->getLy());
+	double minZoom = std::min((double)m_sw->m_lx / m_sw->m_resampledRaster->getLx(), (double)m_sw->m_ly / m_sw->m_resampledRaster->getLy());
 	if ((factor < 1 && sqrt(scale) < minZoom) || (factor > 1 && scale > 1200.0))
 		return;
 

@@ -91,22 +91,6 @@ typedef unsigned char BYTE;
 #endif
 
 template <class T>
-inline T tmin(T a, T b)
-{
-	return a < b ? a : b;
-}
-template <class T>
-inline T tmax(T a, T b) { return a > b ? a : b; }
-template <class T>
-inline T tmin(T a, T b, T c) { return tmin(tmin(a, b), c); }
-template <class T>
-inline T tmax(T a, T b, T c) { return tmax(tmax(a, b), c); }
-template <class T>
-inline T tmin(T a, T b, T c, T d) { return tmin(tmin(a, b), tmin(c, d)); }
-template <class T>
-inline T tmax(T a, T b, T c, T d) { return tmax(tmax(a, b), tmax(c, d)); }
-
-template <class T>
 inline void tswap(T &a, T &b)
 {
 	T tmp = a;
@@ -114,7 +98,7 @@ inline void tswap(T &a, T &b)
 	b = tmp;
 }
 template <class T>
-inline T tcrop(T x, T a, T b) { return tmin(tmax(x, a), b); }
+inline T tcrop(T x, T a, T b) { return std::min(std::max(x, a), b); }
 template <class T>
 inline void notLessThan(T threshold, T &x)
 {
@@ -144,13 +128,6 @@ inline int troundp(double x)
 {
 	return ((int)((x) + 0.5F));
 }
-
-/* li metto dopo
-   equivalenti a (int)floor() e (int)ceil() (ma piu' veloci)
-   solo se la risoluzione dell'argomento e' inferiore ad 1 
-#define FLOOR(x) ((int)(x) > (x) ? (int)(x)-1 : (int)(x))
-#define CEIL(x)  ((int)(x) < (x) ? (int)(x)+1 : (int)(x))
-*/
 
 /*! byteFromUshort(u) converts integer from [0..65535] to [0..255] */
 inline UCHAR byteFromUshort(USHORT u)

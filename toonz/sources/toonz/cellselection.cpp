@@ -1508,7 +1508,7 @@ void TCellSelection::pasteCells()
 
 				std::set<TKeyframeSelection::Position>::const_iterator it, end = positions.end();
 				for (it = positions.begin(); it != end; ++it)
-					c1 = tmax(c1, it->second);
+					c1 = std::max(c1, it->second);
 			}
 		}
 		if (!initUndo) {

@@ -526,5 +526,5 @@ void MeasuredDoubleField::setDecimals(int decimals)
 
 	/*--- rollerにもStepを設定 ---*/
 	if (isRollerEnabled())
-		m_roller->setStep(pow(0.1, tmax(decimals - 1, 1)));
+		m_roller->setStep(pow(0.1, std::max(decimals - 1, 1)));
 }

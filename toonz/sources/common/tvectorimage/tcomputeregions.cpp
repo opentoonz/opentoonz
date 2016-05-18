@@ -1041,7 +1041,7 @@ double nearCrossVal(TStroke *s0, double w0, TStroke *s1, double w1)
 {
 	double ltot0 = s0->getLength();
 	double ltot1 = s1->getLength();
-	double dl = tmin(ltot1, ltot0) / 1000;
+	double dl = std::min(ltot1, ltot0) / 1000;
 
 	double crossVal, dl0 = dl, dl1 = dl;
 
@@ -1457,20 +1457,20 @@ bool isCloseEnoughP2P(double facMin, double facMax, TStroke *s1, double w0, TStr
 		p1.thick = p0.thick;
 	if (facMin == 0) {
 		autoDistMin = 0;
-		autoDistMax = tmax(-2.0, facMax * (p0.thick + p1.thick) * (p0.thick + p1.thick));
+		autoDistMax = std::max(-2.0, facMax * (p0.thick + p1.thick) * (p0.thick + p1.thick));
 		if (autoDistMax < 0.0000001) //! for strokes without thickness, I connect for distances less than min between 2.5 and half of the length of the stroke)
 		{
 			double len1 = s1->getLength();
 			double len2 = s2->getLength();
-			autoDistMax = facMax * tmin(2.5, len1 * len1 / (2 * 2), len2 * len2 / (2 * 2), 100.0 /*dummyVal*/);
+			autoDistMax = facMax * std::min({2.5, len1 * len1 / (2 * 2), len2 * len2 / (2 * 2), 100.0 /*dummyVal*/});
 		}
 	} else {
-		autoDistMin = tmax(-2.0, facMin * (p0.thick + p1.thick) * (p0.thick + p1.thick));
+		autoDistMin = std::max(-2.0, facMin * (p0.thick + p1.thick) * (p0.thick + p1.thick));
 		if (autoDistMin < 0.0000001) //! for strokes without thickness, I connect for distances less than min between 2.5 and half of the length of the stroke)
 		{
 			double len1 = s1->getLength();
 			double len2 = s2->getLength();
-			autoDistMin = facMax * tmin(2.5, len1 * len1 / (2 * 2), len2 * len2 / (2 * 2), 100.0 /*dummyVal*/);
+			autoDistMin = facMax * std::min({2.5, len1 * len1 / (2 * 2), len2 * len2 / (2 * 2), 100.0 /*dummyVal*/});
 		}
 
 		autoDistMax = autoDistMin + (facMax - facMin) * (facMax - facMin);
@@ -1479,7 +1479,7 @@ bool isCloseEnoughP2P(double facMin, double facMax, TStroke *s1, double w0, TStr
 	if (dist2 < autoDistMin || dist2 > autoDistMax)
 		return false;
 
-	//if (dist2<=tmax(2.0, g_autocloseTolerance*(p0.thick+p1.thick)*(p0.thick+p1.thick))) //0.01 tiene conto di quando thick==0
+	//if (dist2<=std::max(2.0, g_autocloseTolerance*(p0.thick+p1.thick)*(p0.thick+p1.thick))) //0.01 tiene conto di quando thick==0
 	if (s1 == s2) {
 		TRectD r = s1->getBBox(); //se e' un autoclose su una stroke piccolissima, creerebbe uan area trascurabile, ignoro
 		if (fabs(r.x1 - r.x0) < 2 && fabs(r.y1 - r.y0) < 2)
@@ -1542,7 +1542,7 @@ double getCurlW(TStroke *s, bool isBegin) //trova il punto di split su una strok
 
 	int maxMin1 = isBegin ? j : numChunks - 1 - j;
 
-	return getWfromChunkAndT(s, isBegin ? tmax(maxMin0, maxMin1) : tmin(maxMin0, maxMin1), isBegin ? 1.0 : 0.0);
+	return getWfromChunkAndT(s, isBegin ? std::max(maxMin0, maxMin1) : std::min(maxMin0, maxMin1), isBegin ? 1.0 : 0.0);
 }
 
 #ifdef Levo
@@ -1590,7 +1590,7 @@ bool isCloseEnoughP2L(double facMin, double facMax, TStroke *s1, double w1, TStr
 		if (w == -1)
 			return false;
 
-		split<TStroke>(*s1, tmin(1 - w1, w), tmax(1 - w1, w), sAux);
+		split<TStroke>(*s1, std::min(1 - w1, w), std::max(1 - w1, w), sAux);
 		sComp = &sAux;
 	} else
 		sComp = s2;
@@ -1618,30 +1618,30 @@ bool isCloseEnoughP2L(double facMin, double facMax, TStroke *s1, double w1, TStr
 		double autoDistMin, autoDistMax;
 		if (facMin == 0) {
 			autoDistMin = 0;
-			autoDistMax = tmax(-2.0, (facMax + 0.7) * (p0.thick + p1.thick) * (p0.thick + p1.thick));
+			autoDistMax = std::max(-2.0, (facMax + 0.7) * (p0.thick + p1.thick) * (p0.thick + p1.thick));
 			if (autoDistMax < 0.0000001) //! for strokes without thickness, I connect for distances less than min between 2.5 and half of the length of the pointing stroke)
 			{
 				double len1 = s1->getLength();
-				autoDistMax = facMax * tmin(2.5, len1 * len1 / (2 * 2));
+				autoDistMax = facMax * std::min(2.5, len1 * len1 / (2 * 2));
 			}
 		} else {
-			autoDistMin = tmax(-2.0, (facMin + 0.7) * (p0.thick + p1.thick) * (p0.thick + p1.thick));
+			autoDistMin = std::max(-2.0, (facMin + 0.7) * (p0.thick + p1.thick) * (p0.thick + p1.thick));
 			if (autoDistMin < 0.0000001) //! for strokes without thickness, I connect for distances less than min between 2.5 and half of the length of the pointing stroke)
 			{
 				double len1 = s1->getLength();
-				autoDistMin = facMax * tmin(2.5, len1 * len1 / (2 * 2));
+				autoDistMin = facMax * std::min(2.5, len1 * len1 / (2 * 2));
 			}
 
 			autoDistMax = autoDistMin + (facMax - facMin + 0.7) * (facMax - facMin + 0.7);
 		}
 
-		//double autoDistMin = tmax(-2.0, facMin==0?0:(facMin+0.7)*(p0.thick+p1.thick)*(p0.thick+p1.thick));
-		//double autoDistMax = tmax(-2.0, (facMax+0.7)*(p0.thick+p1.thick)*(p0.thick+p1.thick));
+		//double autoDistMin = std::max(-2.0, facMin==0?0:(facMin+0.7)*(p0.thick+p1.thick)*(p0.thick+p1.thick));
+		//double autoDistMax = std::max(-2.0, (facMax+0.7)*(p0.thick+p1.thick)*(p0.thick+p1.thick));
 
 		if (dist2 < autoDistMin || dist2 > autoDistMax)
 			return false;
 
-		//if (dist2<=(tmax(2.0, (g_autocloseTolerance+0.7)*(p0.thick+p1.thick)*(p0.thick+p1.thick)))) //0.01 tiene conto di quando thick==0
+		//if (dist2<=(std::max(2.0, (g_autocloseTolerance+0.7)*(p0.thick+p1.thick)*(p0.thick+p1.thick)))) //0.01 tiene conto di quando thick==0
 
 		w = getWfromChunkAndT(s2, index, t);
 		return true;
@@ -2465,8 +2465,8 @@ for (UINT i=0; i<r1.getEdgeCount(); i++)
     {
     TEdge *e2 = r2.getEdge(j);
     if (e1->m_s==e2->m_s &&
-        tmin(e1->m_w0, e1->m_w1)==tmin(e2->m_w0, e2->m_w1) &&
-        tmax(e1->m_w0, e1->m_w1)==tmax(e2->m_w0, e2->m_w1))
+        std::min(e1->m_w0, e1->m_w1)==std::min(e2->m_w0, e2->m_w1) &&
+        std::max(e1->m_w0, e1->m_w1)==std::max(e2->m_w0, e2->m_w1))
       {
       if (e1->m_styleId && !e2->m_styleId)
         e2->m_styleId=e1->m_styleId;
@@ -3363,8 +3363,8 @@ TStroke *TVectorImage::Imp::removeEndpoints(int strokeIndex)
 	double minW = 1.0;
 	double maxW = 0.0;
 	for (; it != vs->m_edgeList.end(); ++it) {
-		minW = tmin(minW - 0.00002, (*it)->m_w0, (*it)->m_w1);
-		maxW = tmax(maxW + 0.00002, (*it)->m_w0, (*it)->m_w1);
+		minW = std::min({minW - 0.00002, (*it)->m_w0, (*it)->m_w1});
+		maxW = std::max({maxW + 0.00002, (*it)->m_w0, (*it)->m_w1});
 	}
 
 	if (areAlmostEqual(minW, 0.0, 0.001) && areAlmostEqual(maxW, 1.0, 0.001))

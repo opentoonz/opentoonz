@@ -139,7 +139,7 @@ struct VectorThicknessTransformer {
 
 					thickBackup.m_thicknesses.push_back(point.thick);
 
-					point.thick = tmax(
+					point.thick = std::max(
 						tcg::poly_ops::evaluate(thickPoly, 1, point.thick),
 						0.0);
 

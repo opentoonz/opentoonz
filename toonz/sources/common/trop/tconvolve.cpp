@@ -10,9 +10,6 @@
 
 #include <memory>
 
-#define TMIN(a, b) (a < b ? a : b)
-#define TMAX(a, b) (a > b ? a : b)
-
 //------------------------------------------------------------------------------
 
 namespace
@@ -244,10 +241,10 @@ void doConvolve_3_i(TRasterPT<PIXOUT> rout,
 	wrapout = rout->getWrap();
 
 	/* calcolo l'area di output interessata */
-	x1 = TMAX(0, -dx - 1);
-	y1 = TMAX(0, -dy - 1);
-	x2 = TMIN(rout->getLx() - 1, -dx + rin->getLx());
-	y2 = TMIN(rout->getLy() - 1, -dy + rin->getLy());
+	x1 = std::max(0, -dx - 1);
+	y1 = std::max(0, -dy - 1);
+	x2 = std::min(rout->getLx() - 1, -dx + rin->getLx());
+	y2 = std::min(rout->getLy() - 1, -dy + rin->getLy());
 
 	rin->lock();
 	rout->lock();
@@ -255,8 +252,8 @@ void doConvolve_3_i(TRasterPT<PIXOUT> rout,
 	bufferout = rout->pixels();
 
 	for (y = y1; y <= y2; y++) {
-		fy1 = TMAX(-1, -dy - y);
-		fy2 = TMIN(1, -dy + rin->getLy() - 1 - y);
+		fy1 = std::max(-1, -dy - y);
+		fy2 = std::min(1, -dy + rin->getLy() - 1 - y);
 		if (fy1 > fy2)
 			continue;
 		x = x1;
@@ -264,10 +261,10 @@ void doConvolve_3_i(TRasterPT<PIXOUT> rout,
 		pixin = bufferin + wrapin * (y + dy) + (x + dx);
 
 		while (x <= x2) {
-			fx1 = TMAX(-1, -dx - x);
-			fx2 = TMIN(1, -dx + rin->getLx() - 1 - x);
+			fx1 = std::max(-1, -dx - x);
+			fx2 = std::min(1, -dx + rin->getLx() - 1 - x);
 			if (x > -dx && x < -dx + rin->getLx() - 1)
-				n = tmin(-dx + rin->getLx() - 1 - x, x2 - x + 1);
+				n = std::min(-dx + rin->getLx() - 1 - x, x2 - x + 1);
 			else
 				n = 1;
 			if (n < 1)
@@ -322,10 +319,10 @@ void doConvolve_i(TRasterPT<PIXOUT> rout,
 	wrapout = rout->getWrap();
 
 	/* calcolo l'area di output interessata */
-	x1 = TMAX(0, -dx - 1);
-	y1 = TMAX(0, -dy - 1);
-	x2 = TMIN(rout->getLx() - 1, -dx + rin->getLx());
-	y2 = TMIN(rout->getLy() - 1, -dy + rin->getLy());
+	x1 = std::max(0, -dx - 1);
+	y1 = std::max(0, -dy - 1);
+	x2 = std::min(rout->getLx() - 1, -dx + rin->getLx());
+	y2 = std::min(rout->getLy() - 1, -dy + rin->getLy());
 
 	rin->lock();
 	rout->lock();
@@ -333,8 +330,8 @@ void doConvolve_i(TRasterPT<PIXOUT> rout,
 	bufferout = rout->pixels();
 
 	for (y = y1; y <= y2; y++) {
-		fy1 = TMAX(radius0, -dy - y);
-		fy2 = TMIN(radius1, -dy - y + rin->getLy() - 1);
+		fy1 = std::max(radius0, -dy - y);
+		fy2 = std::min(radius1, -dy - y + rin->getLy() - 1);
 		if (fy1 > fy2)
 			continue;
 		x = x1;
@@ -342,10 +339,10 @@ void doConvolve_i(TRasterPT<PIXOUT> rout,
 		pixin = bufferin + wrapin * (y + dy) + (x + dx);
 
 		while (x <= x2) {
-			fx1 = TMAX(radius0, -dx - x);
-			fx2 = TMIN(radius1, -dx - x + rin->getLx() - 1);
+			fx1 = std::max(radius0, -dx - x);
+			fx2 = std::min(radius1, -dx - x + rin->getLx() - 1);
 			if (x > -dx && x < -dx + rin->getLx() - 1)
-				n = tmin(-dx + rin->getLx() - 1 - x, x2 - x + 1);
+				n = std::min(-dx + rin->getLx() - 1 - x, x2 - x + 1);
 			else
 				n = 1;
 			if (n < 1)
@@ -395,13 +392,13 @@ void doConvolve_cm32_3_i(TRasterPT<PIXOUT> rout,
 	wrapout = rout->getWrap();
 
 	/* calcolo l'area di output interessata */
-	x1 = TMAX(0, -dx - 1);
-	y1 = TMAX(0, -dy - 1);
-	x2 = TMIN(rout->getLx() - 1, -dx + rin->getLx());
-	y2 = TMIN(rout->getLy() - 1, -dy + rin->getLy());
+	x1 = std::max(0, -dx - 1);
+	y1 = std::max(0, -dy - 1);
+	x2 = std::min(rout->getLx() - 1, -dx + rin->getLx());
+	y2 = std::min(rout->getLy() - 1, -dy + rin->getLy());
 
 	int colorCount = palette->getStyleCount();
-	colorCount = tmax(colorCount, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
+	colorCount = std::max({colorCount, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint()});
 
 	std::vector<TPixel32> paints(colorCount);
 	std::vector<TPixel32> inks(colorCount);
@@ -415,8 +412,8 @@ void doConvolve_cm32_3_i(TRasterPT<PIXOUT> rout,
 		paints[i] = inks[i] = palette->getStyle(i)->getAverageColor();
 
 	for (y = y1; y <= y2; y++) {
-		fy1 = TMAX(-1, -dy - y);
-		fy2 = TMIN(1, -dy + rin->getLy() - 1 - y);
+		fy1 = std::max(-1, -dy - y);
+		fy2 = std::min(1, -dy + rin->getLy() - 1 - y);
 		if (fy1 > fy2)
 			continue;
 		x = x1;
@@ -424,10 +421,10 @@ void doConvolve_cm32_3_i(TRasterPT<PIXOUT> rout,
 		pixin = bufferin + wrapin * (y + dy) + (x + dx);
 
 		while (x <= x2) {
-			fx1 = TMAX(-1, -dx - x);
-			fx2 = TMIN(1, -dx + rin->getLx() - 1 - x);
+			fx1 = std::max(-1, -dx - x);
+			fx2 = std::min(1, -dx + rin->getLx() - 1 - x);
 			if (x > -dx && x < -dx + rin->getLx() - 1)
-				n = TMIN(-dx + rin->getLx() - 1 - x, x2 - x + 1);
+				n = std::min(-dx + rin->getLx() - 1 - x, x2 - x + 1);
 			else
 				n = 1;
 			if (n < 1)
@@ -480,13 +477,13 @@ void doConvolve_cm32_i(TRasterPT<PIXOUT> rout,
 	wrapout = rout->getWrap();
 
 	/* calcolo l'area di output interessata */
-	x1 = TMAX(0, -dx - 1);
-	y1 = TMAX(0, -dy - 1);
-	x2 = TMIN(rout->getLx() - 1, -dx + rin->getLx());
-	y2 = TMIN(rout->getLy() - 1, -dy + rin->getLy());
+	x1 = std::max(0, -dx - 1);
+	y1 = std::max(0, -dy - 1);
+	x2 = std::min(rout->getLx() - 1, -dx + rin->getLx());
+	y2 = std::min(rout->getLy() - 1, -dy + rin->getLy());
 
 	int colorCount = palette->getStyleCount();
-	colorCount = tmax(colorCount, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
+	colorCount = std::max({colorCount, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint()});
 
 	std::vector<TPixel32> paints(colorCount);
 	std::vector<TPixel32> inks(colorCount);
@@ -500,8 +497,8 @@ void doConvolve_cm32_i(TRasterPT<PIXOUT> rout,
 		paints[i] = inks[i] = palette->getStyle(i)->getAverageColor();
 
 	for (y = y1; y <= y2; y++) {
-		fy1 = TMAX(radius0, -dy - y);
-		fy2 = TMIN(radius1, -dy + rin->getLy() - 1 - y);
+		fy1 = std::max(radius0, -dy - y);
+		fy2 = std::min(radius1, -dy + rin->getLy() - 1 - y);
 		if (fy1 > fy2)
 			continue;
 		x = x1;
@@ -509,10 +506,10 @@ void doConvolve_cm32_i(TRasterPT<PIXOUT> rout,
 		pixin = bufferin + wrapin * (y + dy) + (x + dx);
 
 		while (x <= x2) {
-			fx1 = TMAX(radius0, -dx - x);
-			fx2 = TMIN(radius1, -dx + rin->getLx() - 1 - x);
+			fx1 = std::max(radius0, -dx - x);
+			fx2 = std::min(radius1, -dx + rin->getLx() - 1 - x);
 			if (x > -dx && x < -dx + rin->getLx() - 1)
-				n = TMIN(-dx + rin->getLx() - 1 - x, x2 - x + 1);
+				n = std::min(-dx + rin->getLx() - 1 - x, x2 - x + 1);
 			else
 				n = 1;
 			if (n < 1)

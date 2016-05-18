@@ -230,7 +230,7 @@ TRaster32P convertToIcon(
 	const int margin = 10;
 	double scx = (iconSize.lx - margin) / imageBox.getLx();
 	double scy = (iconSize.ly - margin) / imageBox.getLy();
-	double sc = tmin(scx, scy);
+	double sc = std::min(scx, scy);
 	// aggiungo la traslazione: il punto centrale dell'immagine va nel punto
 	// centrale della pixmap
 	TPointD iconCenter(iconSize.lx * 0.5, iconSize.ly * 0.5);
@@ -290,7 +290,7 @@ TRaster32P convertToIcon(
 	int lx = rasCM32->getSize().lx;
 	int ly = rasCM32->getSize().ly;
 	int iconLx = iconSize.lx, iconLy = iconSize.ly;
-	if (tmax(double(lx) / iconSize.lx, double(ly) / iconSize.ly) == double(ly) / iconSize.ly)
+	if (std::max(double(lx) / iconSize.lx, double(ly) / iconSize.ly) == double(ly) / iconSize.ly)
 		iconLx = tround((double(lx) * iconSize.ly) / ly);
 	else
 		iconLy = tround((double(ly) * iconSize.lx) / lx);
@@ -395,7 +395,7 @@ TRaster32P convertToIcon(
 	const int margin = 10;
 	double scx = (iconSize.lx - margin) / imageBox.getLx();
 	double scy = (iconSize.ly - margin) / imageBox.getLy();
-	double sc = tmin(scx, scy);
+	double sc = std::min(scx, scy);
 
 	// aggiungo la traslazione: il punto centrale dell'immagine va nel punto
 	// centrale della pixmap
@@ -631,7 +631,7 @@ TRaster32P SplineIconRenderer::generateRaster(const TDimension &iconSize) const
 		scaleX = (double)iconSize.lx / sbbox.getLx();
 	if (sbbox.getLy() > 0.0)
 		scaleY = (double)iconSize.ly / sbbox.getLy();
-	double scale = 0.8 * tmin(scaleX, scaleY);
+	double scale = 0.8 * std::min(scaleX, scaleY);
 	TPointD centerStroke = 0.5 * (sbbox.getP00() + sbbox.getP11());
 	TPointD centerPixmap(iconSize.lx * 0.5, iconSize.ly * 0.5);
 	glPushMatrix();
@@ -1122,7 +1122,7 @@ TRaster32P IconGenerator::generateRasterFileIcon(
 
 	double sx = double(iconSize.lx) / ras32->getLx();
 	double sy = double(iconSize.ly) / ras32->getLy();
-	double sc = tmin(sx, sy); // show all the image, possibly adding bands
+	double sc = std::min(sx, sy); // show all the image, possibly adding bands
 
 	TAffine aff = TScale(sc).place(ras32->getCenterD(), icon->getCenterD());
 
@@ -1385,7 +1385,7 @@ TOfflineGL *IconGenerator::getOfflineGLContext()
 {
 	//One context per rendering thread
 	if (!m_contexts.hasLocalData()) {
-		TDimension contextSize(tmax(FilmstripIconSize.lx, IconSize.lx), tmax(FilmstripIconSize.ly, IconSize.ly));
+		TDimension contextSize(std::max(FilmstripIconSize.lx, IconSize.lx), std::max(FilmstripIconSize.ly, IconSize.ly));
 		m_contexts.setLocalData(new TOfflineGL(contextSize));
 	}
 	return m_contexts.localData();
