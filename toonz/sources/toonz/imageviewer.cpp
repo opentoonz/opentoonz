@@ -1084,8 +1084,7 @@ void ImageViewer::adaptView(const QRect &geomRect)
 }
 
 void ImageViewer::doSwapBuffers() {
-	// swapBuffers();
-	glFlush();
+	update();
 }
 
 void ImageViewer::changeSwapBehavior(bool enable) {
