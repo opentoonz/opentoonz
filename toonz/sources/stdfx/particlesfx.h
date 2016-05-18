@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PARTICLESFX_H
 #define PARTICLESFX_H

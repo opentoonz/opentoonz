@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef TCG_TRIANGULATE_HPP
 #define TCG_TRIANGULATE_HPP

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PLASTICVISUALSETTINGS_H
 #define PLASTICVISUALSETTINGS_H

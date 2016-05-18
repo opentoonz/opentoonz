@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef MENUBARPOPUP_H
 #define MENUBARPOPUP_H
 

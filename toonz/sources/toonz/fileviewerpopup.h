@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FILEVIEWERPOPUP_H
 #define FILEVIEWERPOPUP_H

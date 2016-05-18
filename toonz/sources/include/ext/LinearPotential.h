@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LINEAR_POTENTIAL_H
 #define LINEAR_POTENTIAL_H

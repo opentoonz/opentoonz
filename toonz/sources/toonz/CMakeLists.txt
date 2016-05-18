@@ -1,7 +1,6 @@
 set(VERSION 1.0)
 
 set(MOC_HEADERS
-    actioncommand.h
     addfilmstripframespopup.h
     adjustlevelspopup.h
     adjustthicknesspopup.h

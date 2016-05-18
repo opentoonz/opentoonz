@@ -529,11 +529,7 @@ int main(int argc, char *argv[])
 	TEnv::setStuffDir(stuffDirPath);
 
 /*
-  #ifdef BRAVO
-    TFilePath stuffDir("/Applications/Toonz 7.1 Bravo/Toonz 7.1 Bravo stuff");
-  #else
     TFilePath  stuffDir("/Applications/Toonz 7.1/Toonz 7.1 stuff");
-  #endif
 	
   TEnv::setStuffDir(stuffDir);
 */
@@ -838,15 +834,7 @@ int main(int argc, char *argv[])
 
 namespace
 {
-#ifdef BRAVO
-#ifdef BRAVODEMO
-const char *toonzVersion = "Bravo 7.1 (demo)";
-#else
-const char *toonzVersion = "Bravo 7.1";
-#endif
-#else
 const char *toonzVersion = "Toonz 7.1";
-#endif
 } // namespace
 
 string getToonzVersion()

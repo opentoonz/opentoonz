@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef XSHEET_INCLUDED
 #define XSHEET_INCLUDED
 

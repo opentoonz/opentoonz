@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef OVERALLDESIGNER_H
 #define OVERALLDESIGNER_H

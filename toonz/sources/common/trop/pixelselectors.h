@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PIXEL_SELECTORS_H
 #define PIXEL_SELECTORS_H

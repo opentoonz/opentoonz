@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TDOCKWINDOWS_H
 #define TDOCKWINDOWS_H

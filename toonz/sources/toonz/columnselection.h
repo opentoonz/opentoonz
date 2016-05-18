@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCOLUMNSELECTION_H
 #define TCOLUMNSELECTION_H

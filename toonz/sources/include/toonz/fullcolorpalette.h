@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FULLCOLOR_PALETTE
 #define FULLCOLOR_PALETTE

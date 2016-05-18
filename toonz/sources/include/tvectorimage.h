@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TVECTORIMAGE_INCLUDED
 #define TVECTORIMAGE_INCLUDED
 

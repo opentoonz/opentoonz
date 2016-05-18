@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_resource_sleep_h
 #define igs_resource_sleep_h
 

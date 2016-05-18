@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TPERSIST_INCLUDED
 #define TPERSIST_INCLUDED

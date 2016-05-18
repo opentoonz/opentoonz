@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TQUICKTIME_INCLUDED
 #define TQUICKTIME_INCLUDED

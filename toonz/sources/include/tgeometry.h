@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_GEOMETRY_INCLUDED
 #define T_GEOMETRY_INCLUDED

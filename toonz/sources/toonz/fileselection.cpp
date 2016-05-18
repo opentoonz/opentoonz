@@ -13,9 +13,7 @@
 #include "exportscenepopup.h"
 #include "tapp.h"
 
-#ifndef LINETEST
 #include "batches.h"
-#endif
 
 // TnzQt includes
 #include "toonzqt/imageutils.h"
@@ -279,10 +277,6 @@ void FileSelection::enableCommands()
 
 void FileSelection::addToBatchRenderList()
 {
-#ifndef LINETEST
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-#else
 	std::vector<TFilePath> files;
 	getSelectedFiles(files);
 	int i;
@@ -290,15 +284,12 @@ void FileSelection::addToBatchRenderList()
 		BatchesController::instance()->addComposerTask(files[i]);
 
 	DVGui::info(QObject::tr(" Task added to the Batch Render List."));
-#endif
-#endif
 }
 
 //------------------------------------------------------------------------
 
 void FileSelection::addToBatchCleanupList()
 {
-#ifndef LINETEST
 	std::vector<TFilePath> files;
 	getSelectedFiles(files);
 	int i;
@@ -306,7 +297,6 @@ void FileSelection::addToBatchCleanupList()
 		BatchesController::instance()->addCleanupTask(files[i]);
 
 	DVGui::info(QObject::tr(" Task added to the Batch Cleanup List."));
-#endif
 }
 
 //------------------------------------------------------------------------
@@ -587,10 +577,6 @@ int importScene(TFilePath scenePath)
 
 void FileSelection::importScenes()
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-
-#else
 	std::vector<TFilePath> files;
 	getSelectedFiles(files);
 	if (files.empty())
@@ -623,7 +609,6 @@ void FileSelection::importScenes()
 		DVGui::info(QObject::tr("One scene imported"));
 	else
 		DVGui::info(QString::number(importedSceneCount) + QObject::tr("%1 scenes imported").arg(importedSceneCount));
-#endif
 }
 //------------------------------------------------------------------------
 

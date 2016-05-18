@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TOONZSCENE_H
 #define TOONZSCENE_H

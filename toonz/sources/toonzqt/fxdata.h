@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FXDATA_H
 #define FXDATA_H

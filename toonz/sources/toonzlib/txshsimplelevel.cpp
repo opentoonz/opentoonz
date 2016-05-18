@@ -1887,6 +1887,7 @@ TImageP TXshSimpleLevel::createEmptyFrame()
 	switch (m_type) {
 	case PLI_XSHLEVEL:
 		result = new TVectorImage;
+		break;
 
 	case MESH_XSHLEVEL:
 		assert(false); // Not implemented yet

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _SKELETONLUT_H_
 #define _SKELETONLUT_H_

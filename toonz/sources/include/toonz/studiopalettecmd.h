@@ -1,6 +1,5 @@
-
-
 #pragma once
+
 #include "tcommon.h"
 
 #undef DVAPI

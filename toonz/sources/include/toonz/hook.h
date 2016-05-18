@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef HOOKSET_INCLUDED
 #define HOOKSET_INCLUDED

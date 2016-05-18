@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STYLE_PICKER_H
 #define STYLE_PICKER_H

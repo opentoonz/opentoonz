@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PLANE_VIEWER_H
 #define PLANE_VIEWER_H

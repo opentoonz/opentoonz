@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PALETTEVIEWER_H
 #define PALETTEVIEWER_H

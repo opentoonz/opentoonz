@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFXDEF_INCLUDED
 #define TFXDEF_INCLUDED

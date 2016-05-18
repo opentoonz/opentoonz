@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SETSAVEBOXTOOL_INCLUDED
 #define SETSAVEBOXTOOL_INCLUDED

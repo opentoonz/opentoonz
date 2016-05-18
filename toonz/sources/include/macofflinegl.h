@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MACOFFLINEGL_H
 #define MACOFFLINEGL_H

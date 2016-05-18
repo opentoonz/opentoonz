@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TTILESAVER_INCLUDE
 #define TTILESAVER_INCLUDE

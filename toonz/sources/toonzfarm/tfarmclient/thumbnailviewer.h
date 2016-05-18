@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_THUMBNAILVIEWE_INCLUDED
 #define T_THUMBNAILVIEWE_INCLUDED

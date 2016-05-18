@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_COLORSQUARE_INCLUDED
 #define TNZ_COLORSQUARE_INCLUDED

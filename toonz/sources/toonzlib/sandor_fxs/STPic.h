@@ -1,4 +1,4 @@
-
+#pragma once
 
 // STPic.h: interface for the CSTPic class.
 //
@@ -8,10 +8,6 @@
 
 #ifndef STPIC_H
 #define STPIC_H
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 /****** SASA Picture Class Template **********************
 

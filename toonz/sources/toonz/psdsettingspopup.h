@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PSDSETTINGSPOPUP_H
 #define PSDSETTINGSPOPUP_H

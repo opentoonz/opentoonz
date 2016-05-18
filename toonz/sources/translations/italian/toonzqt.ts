@@ -1473,16 +1473,6 @@ Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare 
         <translation>Applica</translation>
     </message>
     <message>
-        <source>This feature is not available in the demo version.
-For more information visit the %1 site:</source>
-        <translation>Questa funzionalità non è disponibile nella versione demo. 
-Per maggiori informazioni visita il sito %1.</translation>
-    </message>
-    <message>
-        <source>To request a trial license please contact </source>
-        <translation>Per richiedere una licenza demo contatta </translation>
-    </message>
-    <message>
         <source>For further information visit </source>
         <translation>Per ulteriori informazioni visita </translation>
     </message>

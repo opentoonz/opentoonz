@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef CAST_VIEWER_INCLUDED
 #define CAST_VIEWER_INCLUDED
 

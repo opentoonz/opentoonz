@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_EDGE_H
 #define TCG_EDGE_H

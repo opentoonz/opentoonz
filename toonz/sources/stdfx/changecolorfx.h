@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CHANGECOLORFX_H
 #define CHANGECOLORFX_H

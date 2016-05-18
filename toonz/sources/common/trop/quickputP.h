@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef QUICKPUT_P_INCLUDED
 #define QUICKPUT_P_INCLUDED

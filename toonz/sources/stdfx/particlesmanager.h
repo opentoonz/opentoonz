@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PARTICLES_CONTAINER
 #define PARTICLES_CONTAINER

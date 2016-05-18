@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CACHEFXCOMMAND_INCLUDE
 #define CACHEFXCOMMAND_INCLUDE

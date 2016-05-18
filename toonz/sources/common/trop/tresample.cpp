@@ -2868,12 +2868,6 @@ void do_resample(TRasterPT<T> rout, const TRasterPT<T> &rin,
 				 const TAffine &aff, TRop::ResampleFilterType flt_type, double blur)
 
 {
-/*
-TAffine scale;
-TAffine rot;
-TAffine invrot;
-TAffine aff_0, inv_0;
-*/
 #ifdef ALTRI_TIPI_DI_RASTER
 	double jacob;
 	double s11, s22, s13, s23;
@@ -2916,10 +2910,8 @@ TAffine aff_0, inv_0;
 	s13 = aff.a13;
 	s23 = aff.a23;
 
-	//rot = aff_place (0.0, 0.0, 0.0, 0.0, TScale(1/s11, 1/s22)*aff);//eventualmente invertire ordine
 	rot = (TScale(1 / s11, 1 / s22) * aff).place(0.0, 0.0, 0.0, 0.0);
 
-	//scale = aff_place (0.0, 0.0, s13, s23, TScale(s11, s22));
 	scale = TScale(s11, s22).place(0.0, 0.0, s13, s23);
 	invrot = rot.inv();
 
@@ -2947,16 +2939,12 @@ TAffine aff_0, inv_0;
 	minmax(negradx_ - rad_x, negrady_ - rad_y, posradx_ + rad_x, posrady_ + rad_y, inv_0,
 		   negradu_, negradv_, posradu_, posradv_);
 
-	//free_nocalc (coln);
 	if (coln)
 		delete (coln);
-	//free_nocalc (rown);
 	if (rown)
 		delete (rown);
 	free_filter(colf, rout->getLy());
 	free_filter(rowf, rout->getLx());
-//----NON GESTIAMO ANCORA EXTRA BUFFER
-//rop_resample_extra (rin, rout, aff);
 #endif
 }
 

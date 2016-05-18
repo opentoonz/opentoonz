@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _TRANSPARENCYCHECK__
 #define _TRANSPARENCYCHECK__

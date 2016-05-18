@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef BATCHSERVERSVIEWER_H
 #define BATCHSERVERSVIEWER_H
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CHILDSTACK_INCLUDED
 #define CHILDSTACK_INCLUDED

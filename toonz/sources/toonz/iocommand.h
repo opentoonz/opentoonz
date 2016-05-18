@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef IOCOMMAND_H
 #define IOCOMMAND_H
 

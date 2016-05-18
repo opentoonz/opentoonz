@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_DATA_INCLUDED
 #define T_DATA_INCLUDED

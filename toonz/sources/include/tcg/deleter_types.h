@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_DELETER_TYPES_H
 #define TCG_DELETER_TYPES_H

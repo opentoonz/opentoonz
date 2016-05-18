@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_LOGVIEWER_INCLUDED
 #define TNZ_LOGVIEWER_INCLUDED

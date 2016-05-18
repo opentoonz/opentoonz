@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef GUTIL_H
 #define GUTIL_H

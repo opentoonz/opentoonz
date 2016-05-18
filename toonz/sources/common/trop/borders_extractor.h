@@ -1,4 +1,4 @@
-
+// #pragma once // could not use by INCLUDE_HPP
 
 #ifndef BORDERS_EXTRACTOR_H
 #define BORDERS_EXTRACTOR_H

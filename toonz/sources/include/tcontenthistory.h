@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _CONTENT_HISTORY_H
 #define _CONTENT_HISTORY_H

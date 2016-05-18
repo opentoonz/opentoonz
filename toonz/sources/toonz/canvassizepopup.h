@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CANVASSIZEPOPUP_H
 #define CANVASSIZEPOPUP_H

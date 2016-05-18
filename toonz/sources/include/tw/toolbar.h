@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_TOOLBAR_INCLUDED
 #define TNZ_TOOLBAR_INCLUDED

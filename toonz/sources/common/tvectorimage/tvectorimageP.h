@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _TVECTORIMAGEP_H_
 #define _TVECTORIMAGEP_H_

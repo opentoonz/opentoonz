@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TPROPERTY_INCLUDED
 #define TPROPERTY_INCLUDED

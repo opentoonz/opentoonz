@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TPARSER_INCLUDED
 #define TPARSER_INCLUDED
 

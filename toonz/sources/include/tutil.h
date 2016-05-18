@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TUTIL_INCLUDED
 #define TUTIL_INCLUDED

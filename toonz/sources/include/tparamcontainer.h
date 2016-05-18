@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TPARAMCONTAINER_INCLUDED
 #define TPARAMCONTAINER_INCLUDED
 

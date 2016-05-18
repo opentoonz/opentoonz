@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCACHEDLEVEL_INCLUDED
 #define TCACHEDLEVEL_INCLUDED

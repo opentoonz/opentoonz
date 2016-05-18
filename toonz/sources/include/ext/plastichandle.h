@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PLASTICHANDLE_H
 #define PLASTICHANDLE_H

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef PLUGIN_PORT_INTERFACE
 #define PLUGIN_PORT_INTERFACE
 

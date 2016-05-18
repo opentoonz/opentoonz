@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCONST_INCLUDED
 #define TCONST_INCLUDED

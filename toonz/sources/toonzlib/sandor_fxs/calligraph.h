@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef __CALLIGRAPH_H_
 #define __CALLIGRAPH_H_

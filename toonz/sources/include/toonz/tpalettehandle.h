@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TPALETTEHANDLE_H
 #define TPALETTEHANDLE_H

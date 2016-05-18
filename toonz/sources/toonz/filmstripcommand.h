@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FILMSTRIPCOMMAND_H
 #define FILMSTRIPCOMMAND_H

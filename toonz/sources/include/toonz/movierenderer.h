@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MOVIERENDERER_INCLUDED
 #define MOVIERENDERER_INCLUDED

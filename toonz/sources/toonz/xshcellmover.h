@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef XSHCELLMOVER_H
 #define XSHCELLMOVER_H

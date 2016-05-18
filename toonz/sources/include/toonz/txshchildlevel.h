@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TXSHCHILDLEVEL_INCLUDED
 #define TXSHCHILDLEVEL_INCLUDED

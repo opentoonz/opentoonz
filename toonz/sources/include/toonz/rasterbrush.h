@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef RASTERBRUSH_INCLUDED
 #define RASTERBRUSH_INCLUDED

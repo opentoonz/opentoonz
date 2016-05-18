@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TGL_INCLUDED
 #define TGL_INCLUDED

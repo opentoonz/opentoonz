@@ -3302,9 +3302,7 @@ void StyleEditor::onColorChanged(const ColorModel &color, bool isDragging)
 		m_newColor->setStyle(*m_editedStyle);
 		m_colorParameterSelector->setStyle(*m_editedStyle);
 
-#ifndef STUDENT
 		if (m_autoButton->isChecked())
-#endif
 		{
 			copyEditedStyleToPalette(isDragging);
 		}
@@ -3389,7 +3387,6 @@ void StyleEditor::applyButtonClicked()
 void StyleEditor::autoCheckChanged(bool value)
 {
 
-#ifndef STUDENT
 	m_paletteController->enableColorAutoApply(!!value);
 
 	if (!m_enabled)
@@ -3399,7 +3396,6 @@ void StyleEditor::autoCheckChanged(bool value)
 		m_applyButton->setDisabled(true);
 	else
 		m_applyButton->setDisabled(false);
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -3495,9 +3491,7 @@ void StyleEditor::selectStyle(const TColorStyle &newStyle)
 		m_editedStyle && m_editedStyle->hasMainColor())
 		m_editedStyle->setMainColor(m_oldStyle->getMainColor());
 
-#ifndef STUDENT
 	if (m_autoButton->isChecked())
-#endif
 	{
 		// If the adited style is linked to the studio palette, then activate the edited flag
 		if (m_editedStyle->getGlobalName() != L"" && m_editedStyle->getOriginalName() != L"")

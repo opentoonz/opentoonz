@@ -1,3 +1,5 @@
+// #pragma once // could not use by INCLUDE_HPP
+
 #ifndef TROP_BORDERS_H
 #define TROP_BORDERS_H
 

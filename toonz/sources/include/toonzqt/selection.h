@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSELECTION_H
 #define TSELECTION_H

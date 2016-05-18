@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TFXCACHEMANAGER_H
 #define TFXCACHEMANAGER_H
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TTESSELLATOR_H
 #define TTESSELLATOR_H

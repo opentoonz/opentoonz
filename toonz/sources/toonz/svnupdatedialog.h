@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SVN_UPDATE_DIALOG_H
 #define SVN_UPDATE_DIALOG_H

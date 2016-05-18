@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_gaussian_blur_hv_h
 #define igs_gaussian_blur_hv_h
 

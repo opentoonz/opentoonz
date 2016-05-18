@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TTHREADMESSAGE_H
 #define TTHREADMESSAGE_H

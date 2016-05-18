@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TKEYFRAMESELECTION_H
 #define TKEYFRAMESELECTION_H

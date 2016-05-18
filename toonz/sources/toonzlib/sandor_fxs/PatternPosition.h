@@ -1,4 +1,4 @@
-
+#pragma once
 
 // PatternPosition.h: interface for the CPatternPosition class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_PATTERNPOSITION_H__9FB82504_34F2_11D6_B9E8_0040F674BE6A__INCLUDED_)
 #define AFX_PATTERNPOSITION_H__9FB82504_34F2_11D6_B9E8_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #include <vector>
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TBINARIZER_H
 #define TBINARIZER_H

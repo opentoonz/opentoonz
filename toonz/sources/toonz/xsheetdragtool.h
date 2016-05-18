@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef XSHEET_DRAG_TOOL_H
 #define XSHEET_DRAG_TOOL_H

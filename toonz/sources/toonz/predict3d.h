@@ -1,4 +1,4 @@
-
+#pragma once
 
 /*---------------------------------------------------------
  * Interfaccia di predict3d.cpp

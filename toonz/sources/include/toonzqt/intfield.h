@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef INTFIELD_H
 #define INTFIELD_H

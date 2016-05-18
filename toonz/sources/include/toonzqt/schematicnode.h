@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCHEMATICNODE_H
 #define SCHEMATICNODE_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TGLDISPLAYLISTSMANAGER_H
 #define TGLDISPLAYLISTSMANAGER_H

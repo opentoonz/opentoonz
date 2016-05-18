@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCOLUMNHANDLE_H
 #define TCOLUMNHANDLE_H

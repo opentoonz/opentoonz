@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_fog_h
 #define igs_fog_h
 

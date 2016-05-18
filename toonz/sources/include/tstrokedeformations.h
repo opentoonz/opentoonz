@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSTROKES_DEFORMATIONS_H
 #define TSTROKES_DEFORMATIONS_H

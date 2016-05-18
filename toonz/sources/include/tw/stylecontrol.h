@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_STYLECONTROL_INCLUDED
 #define TNZ_STYLECONTROL_INCLUDED

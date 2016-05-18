@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef MESHTEXTURIZER_H
 #define MESHTEXTURIZER_H
 

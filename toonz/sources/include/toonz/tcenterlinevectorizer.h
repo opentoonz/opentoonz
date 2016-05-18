@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_CENTERLINE_VECTORIZER
 #define T_CENTERLINE_VECTORIZER

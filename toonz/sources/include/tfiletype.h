@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFILETYPE_INCLUDED
 #define TFILETYPE_INCLUDED

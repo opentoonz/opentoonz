@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef PLUGIN_PARAM_INTERFACE
 #define PLUGIN_PARAM_INTERFACE
 

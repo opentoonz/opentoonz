@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef ZIPPED_RANGE_H
 #define ZIPPED_RANGE_H

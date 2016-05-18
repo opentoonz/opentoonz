@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TDOUBLEPARAMFILE_INCLUDED
 #define TDOUBLEPARAMFILE_INCLUDED

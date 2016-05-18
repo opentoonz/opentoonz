@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MESHUTILS_H
 #define MESHUTILS_H

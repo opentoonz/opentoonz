@@ -1857,15 +1857,11 @@ FillTool::FillTool(int targetType)
 	m_normalLineFillTool = new NormalLineFillTool(this);
 
 	bind(targetType);
-#ifndef STUDENT
 	m_prop.bind(m_fillType);
 	m_fillType.addValue(NORMALFILL);
 	m_fillType.addValue(RECTFILL);
 	m_fillType.addValue(FREEHANDFILL);
 	m_fillType.addValue(POLYLINEFILL);
-#else
-	m_fillType.addValue(NORMALFILL);
-#endif
 
 	m_prop.bind(m_colorType);
 	m_colorType.addValue(LINES);

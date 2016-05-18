@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TLIN_SUPERLU_WRAP
 #define TLIN_SUPERLU_WRAP

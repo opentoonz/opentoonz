@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef VIEWER_PANE_INCLUDED
 #define VIEWER_PANE_INCLUDED

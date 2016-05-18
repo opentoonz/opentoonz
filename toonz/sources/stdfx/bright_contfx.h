@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef BRIGHTCONTFX_H
 #define BRIGHTCONTFX_H

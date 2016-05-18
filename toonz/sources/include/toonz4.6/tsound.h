@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef __TSOUND_H__
 #define __TSOUND_H__

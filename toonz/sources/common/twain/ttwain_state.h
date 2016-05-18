@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef __TTWAIN_STATE_H__
 #define __TTWAIN_STATE_H__

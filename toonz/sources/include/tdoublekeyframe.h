@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TDOUBLEKEYFRAME_INCLUDED
 #define TDOUBLEKEYFRAME_INCLUDED

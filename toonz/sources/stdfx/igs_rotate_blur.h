@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_rotate_blur_h
 #define igs_rotate_blur_h
 

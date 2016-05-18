@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _TBIGMEMORYMANAGER_
 #define _TBIGMEMORYMANAGER_

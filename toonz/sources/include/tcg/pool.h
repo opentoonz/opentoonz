@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_POOL_H
 #define TCG_POOL_H

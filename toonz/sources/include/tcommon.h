@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_COMMON_INCLUDED
 #define T_COMMON_INCLUDED

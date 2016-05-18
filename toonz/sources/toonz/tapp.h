@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TAPP_H
 #define TAPP_H

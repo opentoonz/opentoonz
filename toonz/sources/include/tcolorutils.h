@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef COLORCLUSTERIZE_INCLUDED
 #define COLORCLUSTERIZE_INCLUDED

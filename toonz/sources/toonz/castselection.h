@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CASTSELECTION_H
 #define CASTSELECTION_H

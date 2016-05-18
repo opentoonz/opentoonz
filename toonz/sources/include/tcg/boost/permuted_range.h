@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PERMUTED_RANGE_H
 #define PERMUTED_RANGE_H

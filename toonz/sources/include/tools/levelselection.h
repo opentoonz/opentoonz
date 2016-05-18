@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LEVELSELECTION_H
 #define LEVELSELECTION_H

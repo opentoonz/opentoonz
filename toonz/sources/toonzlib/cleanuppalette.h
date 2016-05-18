@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CLEANUPPALETTE_INCLUDED
 #define CLEANUPPALETTE_INCLUDED

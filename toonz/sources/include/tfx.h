@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TFX_INCLUDED
 #define TFX_INCLUDED
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PREFERENCESPOPUP_H
 #define PREFERENCESPOPUP_H

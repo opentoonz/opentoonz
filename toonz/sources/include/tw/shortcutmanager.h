@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SHORTCUTMANAGER_INCLUDED
 #define SHORTCUTMANAGER_INCLUDED

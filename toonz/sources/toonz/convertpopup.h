@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CONVERTPOPUP_H
 #define CONVERTPOPUP_H

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_hsv_add_h
 #define igs_hsv_add_h
 

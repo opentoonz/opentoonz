@@ -876,6 +876,7 @@ QMenuBar* StackedMenuBar::createXsheetMenuBar()
 	addMenuItem(subxsheetMenu, MI_OpenChild);
 	addMenuItem(subxsheetMenu, MI_CloseChild);
 	addMenuItem(subxsheetMenu, MI_Collapse);
+	addMenuItem(subxsheetMenu, MI_ToggleEditInPlace);
 	addMenuItem(subxsheetMenu, MI_Resequence);
 	addMenuItem(subxsheetMenu, MI_SaveSubxsheetAs);
 	addMenuItem(subxsheetMenu, MI_LoadSubSceneFile);
@@ -1183,7 +1184,6 @@ QMenuBar* StackedMenuBar::createFullMenuBar()
 	addMenuItem(editMenu, MI_SelectAll);
 	addMenuItem(editMenu, MI_InvertSelection);
 	editMenu->addSeparator();
-#ifndef XPRESS
 	addMenuItem(editMenu, MI_RemoveEndpoints);
 	editMenu->addSeparator();
 	addMenuItem(editMenu, MI_Group);
@@ -1196,9 +1196,7 @@ QMenuBar* StackedMenuBar::createFullMenuBar()
 	addMenuItem(editMenu, MI_BringForward);
 	addMenuItem(editMenu, MI_SendBack);
 	addMenuItem(editMenu, MI_SendBackward);
-#endif
 //Menu' SCAN CLEANUP
-#ifndef BRAVO
 #ifdef LINETEST
 	QMenu *scanCleanupMenu = addMenu(tr("Scan"));
 #else
@@ -1213,8 +1211,7 @@ QMenuBar* StackedMenuBar::createFullMenuBar()
 #ifdef LINETEST
 	scanCleanupMenu->addSeparator();
 	addMenuItem(scanCleanupMenu, MI_Autocenter);
-#endif
-#ifndef LINETEST
+#else
 	scanCleanupMenu->addSeparator();
 	addMenuItem(scanCleanupMenu, MI_CleanupSettings);
 	addMenuItem(scanCleanupMenu, MI_CleanupPreview);
@@ -1222,19 +1219,15 @@ QMenuBar* StackedMenuBar::createFullMenuBar()
 	addMenuItem(scanCleanupMenu, MI_Cleanup);
 	scanCleanupMenu->addSeparator();
 #endif
-#endif
+
 	//Menu' LEVEL
 	QMenu *levelMenu = addMenu(tr("Level"), fullMenuBar);
 	addMenuItem(levelMenu, MI_AddFrames);
 	addMenuItem(levelMenu, MI_Renumber);
 	addMenuItem(levelMenu, MI_ReplaceLevel);
-#ifndef BRAVO
 	addMenuItem(levelMenu, MI_RevertToCleanedUp);
-#endif
 	addMenuItem(levelMenu, MI_RevertToLastSaved);
-#ifndef XPRESS
 	addMenuItem(levelMenu, MI_ConvertToVectors);
-#endif
 	addMenuItem(levelMenu, MI_Tracking);
 	levelMenu->addSeparator();
 	addMenuItem(levelMenu, MI_ExposeResource);
@@ -1350,9 +1343,7 @@ QMenuBar* StackedMenuBar::createFullMenuBar()
 	QMenu *windowsMenu = addMenu(tr("Windows"), fullMenuBar);
 	addMenuItem(windowsMenu, MI_DockingCheck);
 	windowsMenu->addSeparator();
-#ifndef BRAVO
 	addMenuItem(windowsMenu, MI_OpenBatchServers);
-#endif
 	addMenuItem(windowsMenu, MI_OpenCleanupSettings);
 	addMenuItem(windowsMenu, MI_OpenColorModel);
 #ifdef LINETEST

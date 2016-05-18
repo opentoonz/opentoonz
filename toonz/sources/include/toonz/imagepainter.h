@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef IMAGEPAINTER_H
 #define IMAGEPAINTER_H

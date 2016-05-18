@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SUBSCENECOMMAND_H
 #define SUBSCENECOMMAND_H

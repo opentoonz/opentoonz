@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TXSHNOTESET_INCLUDED
 #define TXSHNOTESET_INCLUDED

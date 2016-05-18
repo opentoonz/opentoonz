@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef XSHNOTEVIEWER_H
 #define XSHNOTEVIEWER_H
 

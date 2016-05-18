@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PLTGIZMOPOPUP_H
 #define PLTGIZMOPOPUP_H

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_resource_msg_from_err_h
 #define igs_resource_msg_from_err_h
 

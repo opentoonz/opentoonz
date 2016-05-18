@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TPANELS_INCLUDED
 #define TPANELS_INCLUDED

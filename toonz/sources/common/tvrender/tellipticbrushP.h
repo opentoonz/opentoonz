@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TELLIPTIC_BRUSH_P_H
 #define TELLIPTIC_BRUSH_P_H

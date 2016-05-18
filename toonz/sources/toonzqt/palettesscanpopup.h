@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PALETTESCANPOPUP_H
 #define PALETTESCANPOPUP_H

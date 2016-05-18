@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFARMPLATFORMS_H
 #define TFARMPLATFORMS_H

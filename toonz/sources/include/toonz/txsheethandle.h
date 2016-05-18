@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TXSHEETHANDLE_H
 #define TXSHEETHANDLE_H

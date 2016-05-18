@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DRAWINGDATA_INCLUDED
 #define DRAWINGDATA_INCLUDED

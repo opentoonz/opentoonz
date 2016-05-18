@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STAGEVISITOR_H
 #define STAGEVISITOR_H

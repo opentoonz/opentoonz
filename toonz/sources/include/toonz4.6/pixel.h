@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _PIXEL_H_
 #define _PIXEL_H_

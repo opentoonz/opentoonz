@@ -1,5 +1,3 @@
-
-
 #pragma once
 
 #include "toonzqt/dvdialog.h"

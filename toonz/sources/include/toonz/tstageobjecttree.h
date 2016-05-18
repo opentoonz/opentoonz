@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef T_STAGE_OBJECT_TREE_INCLUDED
 #define T_STAGE_OBJECT_TREE_INCLUDED
 

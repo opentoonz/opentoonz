@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SVN_LOCK_DIALOG_H
 #define SVN_LOCK_DIALOG_H

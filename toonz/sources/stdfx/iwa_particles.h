@@ -1,3 +1,5 @@
+#pragma once
+
 //------------------------------------------------------------------
 // Iwa_Particle for Marnie
 // based on ParticlesFx by Digital Video

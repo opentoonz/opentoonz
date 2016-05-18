@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _READCASM_H_
 #define _READCASM_H_

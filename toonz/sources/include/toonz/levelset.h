@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LEVELSET_INCLUDED
 #define LEVELSET_INCLUDED

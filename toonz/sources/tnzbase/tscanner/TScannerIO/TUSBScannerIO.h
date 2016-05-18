@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TUSBSCANNER_IO_H
 #define TUSBSCANNER_IO_H

@@ -538,8 +538,6 @@ void ExportLevelPopup::updateOnSelection()
 	TColumnSelection *colSelection = dynamic_cast<TColumnSelection *>(sel);
 	m_nameField->setEnabled(!colSelection || colSelection->getIndices().size() <= 1);
 
-#ifndef BRAVO
-
 	// Enable tlv output in case all inputs are pli
 	TApp *app = TApp::instance();
 
@@ -576,8 +574,6 @@ void ExportLevelPopup::updateOnSelection()
 		if (tlvIdx > 0)
 			m_format->removeItem(tlvIdx);
 	}
-
-#endif // !BRAVO
 
 	m_exportOptions->updateOnSelection();
 }

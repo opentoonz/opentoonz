@@ -1,4 +1,4 @@
-
+#pragma once
 
 #include "tw/tw.h"
 #include "tw/popup.h"

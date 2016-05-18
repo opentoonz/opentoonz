@@ -1,4 +1,4 @@
-
+#pragma once
 
 #include "toonz4.6/img.h"
 #include "toonz4.6/raster.h"

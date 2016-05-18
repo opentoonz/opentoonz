@@ -1,3 +1,4 @@
+#pragma once
 
 static unsigned long casm_browser_icon_buffer[] = {
 	0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,

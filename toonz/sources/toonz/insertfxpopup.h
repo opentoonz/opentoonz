@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef INSERTFXPOPUP_H
 #define INSERTFXPOPUP_H

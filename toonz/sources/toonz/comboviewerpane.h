@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef COMBOVIEWER_PANE_INCLUDED
 #define COMBOVIEWER_PANE_INCLUDED
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIIO_MESH_H
 #define TIIO_MESH_H

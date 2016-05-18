@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DESIGNER_H
 #define DESIGNER_H

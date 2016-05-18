@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_COLORFIELD_INCLUDED
 #define TNZ_COLORFIELD_INCLUDED

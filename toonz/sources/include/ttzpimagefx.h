@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TTZPIMAGEFX_H
 #define TTZPIMAGEFX_H

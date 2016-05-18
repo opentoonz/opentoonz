@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCONVERT_INCLUDED
 #define TCONVERT_INCLUDED

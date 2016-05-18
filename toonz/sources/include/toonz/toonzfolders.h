@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TOONZFOLDERS_INCLUDED
 #define TOONZFOLDERS_INCLUDED

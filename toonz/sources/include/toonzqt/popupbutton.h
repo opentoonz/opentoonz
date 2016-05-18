@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef POPUP_BUTTON_H
 #define POPUP_BUTTON_H

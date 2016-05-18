@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PROJECTPOPUP_H
 #define PROJECTPOPUP_H

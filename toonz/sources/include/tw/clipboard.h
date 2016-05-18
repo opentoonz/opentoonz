@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_CLIPBOARD_INCLUDED
 #define TNZ_CLIPBOARD_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FLICONSOLE_H
 #define FLICONSOLE_H

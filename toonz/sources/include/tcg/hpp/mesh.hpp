@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef TCG_MESH_HPP
 #define TCG_MESH_HPP

@@ -1,11 +1,7 @@
-
+#pragma once
 
 #ifndef TFONT_H
 #define TFONT_H
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 //Toonz includes
 #include "trastercm.h"

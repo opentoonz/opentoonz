@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TNOTANIMATABLEPARAM_H
 #define TNOTANIMATABLEPARAM_H
 

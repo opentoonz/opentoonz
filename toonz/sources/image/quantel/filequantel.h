@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FILEQUANTEL_H
 #define FILEQUANTEL_H

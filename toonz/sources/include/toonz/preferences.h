@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef PREFERENCES_H
 #define PREFERENCES_H
 
