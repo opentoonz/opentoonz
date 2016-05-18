@@ -220,6 +220,8 @@ UCHAR *TBigMemoryManager::getBuffer(UINT size)
 		chunkSize = it->second.m_size;
 		it++;
 	}
+	if (address)
+		memset(address, 0x00, size);
 	return address;
 }
 
