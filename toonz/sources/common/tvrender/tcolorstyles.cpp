@@ -298,7 +298,7 @@ void TColorStyle::makeIcon(const TDimension &d)
 
 	double scx = 0.9 * d.lx / bbox.getLx();
 	double scy = 0.9 * d.ly / bbox.getLy();
-	double sc = tmin(scx, scy);
+	double sc = std::min(scx, scy);
 	double dx = (d.lx - bbox.getLx() * sc) * 0.5;
 	double dy = (d.ly - bbox.getLy() * sc) * 0.5;
 	TAffine aff = TScale(scx, scy) * TTranslation(-bbox.getP00() + TPointD(dx, dy));

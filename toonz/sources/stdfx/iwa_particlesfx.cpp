@@ -361,7 +361,7 @@ void Iwa_TiledParticlesFx::doDryCompute(TRectD &rect, double frame, const TRende
 	infoOnInput.m_bpp = 64;			  // Control ports rendered at 32 bit - since not visible.
 
 	for (i = startframe - 1; i <= curr_frame; ++i) {
-		double frame = tmax(0, i);
+		double frame = std::max(0, i);
 
 		for (j = 0; j < inputPortCount; ++j) {
 			TFxPort *port = getInputPort(j);

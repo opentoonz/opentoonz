@@ -191,8 +191,8 @@ public:
 
 	TFxTimeRegion &operator+=(const TFxTimeRegion &rhs)
 	{
-		m_start = tmin(m_start, rhs.m_start);
-		m_end = tmax(m_end, rhs.m_end);
+		m_start = std::min(m_start, rhs.m_start);
+		m_end = std::max(m_end, rhs.m_end);
 		return *this;
 	}
 

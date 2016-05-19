@@ -131,7 +131,7 @@ void do_over(TRasterCM32P rout, const TRasterCM32P &rup)
 
 				*outl = ((*upl) & (TPixelCM32::getInkMask())) |
 						((*outl) & (TPixelCM32::getPaintMask())) |
-						tmin(up_pix->getTone(), out_pix->getTone());
+						std::min(up_pix->getTone(), out_pix->getTone());
 			}
 		}
 	}

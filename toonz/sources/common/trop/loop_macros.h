@@ -125,8 +125,8 @@
 			kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL); \
 		}                                                      \
 	}                                                          \
-	kMin = tmax(kMinX, kMinY, (int)0);                         \
-	kMax = tmin(kMaxX, kMaxY, xMax - xMin);                    \
+	kMin = std::max({kMinX, kMinY, (int)0});                         \
+	kMax = std::min(kMaxX, kMaxY, xMax - xMin);                    \
 	dnPix = dnRow + xMin + kMin;                               \
 	dnEndPix = dnRow + xMin + kMax + 1;                        \
 	xL = xL0 + (kMin - 1) * deltaXL;                           \

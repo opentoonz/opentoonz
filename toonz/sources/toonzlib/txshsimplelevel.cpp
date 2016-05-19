@@ -754,7 +754,7 @@ TAffine getAffine(const TDimension &srcSize, const TDimension &dstSize)
 {
 	double scx = 1 * dstSize.lx / (double)srcSize.lx;
 	double scy = 1 * dstSize.ly / (double)srcSize.ly;
-	double sc = tmin(scx, scy);
+	double sc = std::min(scx, scy);
 	double dx = (dstSize.lx - srcSize.lx * sc) * 0.5;
 	double dy = (dstSize.ly - srcSize.ly * sc) * 0.5;
 	return TScale(sc) * TTranslation(0.5 * TPointD(srcSize.lx, srcSize.ly) + TPointD(dx, dy));
@@ -789,7 +789,7 @@ TImageP buildIcon(const TImageP &img, const TDimension &size)
 			rasCM32 = rasCM32->extractT(bbox);
 			double sx = raster->getLx() / (double)rasCM32->getLx();
 			double sy = raster->getLy() / (double)rasCM32->getLy();
-			double sc = tmin(sx, sy);
+			double sc = std::min(sx, sy);
 			TAffine aff = TScale(sc).place(
 				rasCM32->getCenterD(),
 				raster->getCenterD());

@@ -711,9 +711,9 @@ void SizeFxGadget::draw(bool picking)
 void SizeFxGadget::leftButtonDrag(const TPointD &pos, const TMouseEvent &)
 {
 	if (m_ly)
-		setValue(m_lx, tmax(pos.x, 0.1)), setValue(m_ly, tmax(pos.y, 0.1));
+		setValue(m_lx, std::max(pos.x, 0.1)), setValue(m_ly, std::max(pos.y, 0.1));
 	else
-		setValue(m_lx, tmax(pos.x, pos.y, 0.1));
+		setValue(m_lx, std::max({pos.x, pos.y, 0.1}));
 }
 
 //=============================================================================

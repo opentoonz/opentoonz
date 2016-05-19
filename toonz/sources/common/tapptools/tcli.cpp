@@ -568,8 +568,8 @@ void UsageImp::parse(int argc, char *argv[])
 			UsageLine &ul = **it;
 			int lmin, lmax;
 			getArgCountRange(ul, 0, ul.getCount() - 1, lmin, lmax);
-			min = tmin(min, lmin);
-			max = tmax(max, lmax);
+			min = std::min(min, lmin);
+			max = std::max(max, lmax);
 			if (matchArgCount(ul, 0, ul.getCount() - 1, argc - 1) == false)
 				it = usages.erase(it);
 			else

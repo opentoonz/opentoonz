@@ -455,7 +455,7 @@ TMeshImageP buildMesh(const TRasterP &ras, const MeshBuilderOptions &options)
 	double minEdgeLength = buildMinimumEdgeLength(tribe, options.m_targetMaxVerticesCount);
 
 	MeshBuilderOptions opts(options);
-	opts.m_targetEdgeLength = tmax(opts.m_targetEdgeLength, minEdgeLength);
+	opts.m_targetEdgeLength = std::max(opts.m_targetEdgeLength, minEdgeLength);
 
 	// Perform tessellation
 	TMeshImageP meshImage(new TMeshImage);

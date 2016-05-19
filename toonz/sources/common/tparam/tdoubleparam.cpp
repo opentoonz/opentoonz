@@ -229,8 +229,8 @@ inline double getEaseInOutValue(
 		return k0.m_value;
 	else if (x >= x3)
 		return k1.m_value;
-	double e0 = tmax(k0.m_speedOut.x, 0.0);
-	double e1 = tmax(-k1.m_speedIn.x, 0.0);
+	double e0 = std::max(k0.m_speedOut.x, 0.0);
+	double e1 = std::max(-k1.m_speedIn.x, 0.0);
 	if (percentage) {
 		e0 *= x3 * 0.01;
 		e1 *= x3 * 0.01;
@@ -661,7 +661,7 @@ double TDoubleParam::getValue(double frame, bool leftmost) const
 			tmpKeyframe[2] = *b;
 			b = tmpKeyframe.begin() + 2;
 
-			int relPos = tfloor(b->m_frame - a->m_frame), step = tmin(a->m_step, relPos);
+			int relPos = tfloor(b->m_frame - a->m_frame), step = std::min(a->m_step, relPos);
 
 			tmpKeyframe[2].m_frame = a->m_frame + tfloor(relPos, step);
 			if (frame > b->m_frame)

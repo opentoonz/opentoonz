@@ -491,10 +491,10 @@ void putStroke(TStroke *stroke, int &currStyleId, std::vector<PliObjectTag *> &t
 	UINT k;
 	for (k = 0; k < (UINT)chunkCount; ++k) {
 		const TThickQuadratic *q = stroke->getChunk(k);
-		maxThickness = tmax(maxThickness, q->getThickP0().thick, q->getThickP1().thick);
+		maxThickness = std::max({maxThickness, q->getThickP0().thick, q->getThickP1().thick});
 		strokeChain[k] = *q;
 	}
-	maxThickness = tmax(maxThickness, stroke->getChunk(chunkCount - 1)->getThickP2().thick);
+	maxThickness = std::max(maxThickness, stroke->getChunk(chunkCount - 1)->getThickP2().thick);
 
 	ThickQuadraticChainTag *quadChainTag = new ThickQuadraticChainTag(k, &strokeChain[0], maxThickness);
 	quadChainTag->m_isLoop = stroke->isSelfLoop();

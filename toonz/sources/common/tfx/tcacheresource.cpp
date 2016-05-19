@@ -765,7 +765,7 @@ void TCacheResource::releaseLock()
 	//DIAGNOSTICS_NUMBEREDSTR(prefix + QString::number((UINT) this) + " | Stack | ",
 	//"crStack", "releaseLock");
 
-	m_locksCount = tmax(m_locksCount - 1, 0);
+	m_locksCount = std::max(m_locksCount - 1, 0);
 
 	if (m_locksCount > 0)
 		return;

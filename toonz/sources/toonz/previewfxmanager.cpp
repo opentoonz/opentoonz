@@ -530,8 +530,8 @@ void PreviewFxInstance::updateFrameRange()
 	//Intersect with the fx active frame range
 	TRasterFxP rasterFx(m_fx);
 	TFxTimeRegion timeRegion(rasterFx->getTimeRegion());
-	m_start = tmax(timeRegion.getFirstFrame(), m_start);
-	m_end = tmin(timeRegion.getLastFrame(), m_end);
+	m_start = std::max(timeRegion.getFirstFrame(), m_start);
+	m_end = std::min(timeRegion.getLastFrame(), m_end);
 
 	//Release all images not in the new frame range
 	std::map<int, FrameInfo>::iterator it, jt;
@@ -588,7 +588,7 @@ void PreviewFxInstance::updateInitialFrame()
 	std::set<FlipBook *>::iterator kt;
 	m_initFrame = (std::numeric_limits<int>::max)();
 	for (kt = m_flipbooks.begin(); kt != m_flipbooks.end(); ++kt)
-		m_initFrame = tmin(m_initFrame, (*kt)->getCurrentFrame() - 1);
+		m_initFrame = std::min(m_initFrame, (*kt)->getCurrentFrame() - 1);
 
 	cropAndStep(m_initFrame);
 }

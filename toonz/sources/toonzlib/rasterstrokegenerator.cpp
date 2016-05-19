@@ -203,7 +203,7 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out, const TRasterCM32
 							outPix->setTone(255);
 						}
 					} else if (inPix->getTone() < 255 && (!m_selective || (m_selective && outPix->getInk() == m_selectedStyle))) {
-						outPix->setTone(tmax(outPix->getTone(), 255 - inPix->getTone()));
+						outPix->setTone(std::max(outPix->getTone(), 255 - inPix->getTone()));
 					}
 				}
 				if (m_colorType == PAINT) {
@@ -218,7 +218,7 @@ void RasterStrokeGenerator::placeOver(const TRasterCM32P &out, const TRasterCM32
 							outPix->setTone(255);
 						}
 					} else if (inPix->getTone() < 255 && (!m_selective || (m_selective && outPix->getInk() == m_selectedStyle))) {
-						outPix->setTone(tmax(outPix->getTone(), 255 - inPix->getTone()));
+						outPix->setTone(std::max(outPix->getTone(), 255 - inPix->getTone()));
 					}
 				}
 			} else if (m_task == PAINTBRUSH) {

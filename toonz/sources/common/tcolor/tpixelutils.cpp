@@ -165,8 +165,8 @@ void RGB2HSV(double r, double g, double b,
 	double max, min;
 	double delta;
 
-	max = tmax(r, g, b);
-	min = tmin(r, g, b);
+	max = std::max({r, g, b});
+	min = std::min({r, g, b});
 
 	*v = max;
 
@@ -201,8 +201,8 @@ void rgb2hsv(int dstHsv[3], const TPixel32 &srcRgb, int maxHsv)
 	g = srcRgb.g / 255.;
 	b = srcRgb.b / 255.;
 
-	max = tmax(r, g, b);
-	min = tmin(r, g, b);
+	max = std::max({r, g, b});
+	min = std::min({r, g, b});
 
 	v = max;
 
@@ -283,8 +283,8 @@ void rgb2hls(double r, double g, double b,
 	double max, min;
 	double delta;
 
-	max = tmax(r, g, b);
-	min = tmin(r, g, b);
+	max = std::max({r, g, b});
+	min = std::min({r, g, b});
 
 	*l = (max + min) / 2;
 

@@ -40,7 +40,7 @@ unsigned int takeoverDist(unsigned int a, unsigned int b, unsigned int d)
 	// using integers only.
 
 	// NOTE: It can be proven that with integer division, x/ab == (x/a)/b.
-	return (b < a) ? d : tmax((d + (b - a) / d + 1) / 2, d); // Note the +1 to get the ceil
+	return (b < a) ? d : std::max((d + (b - a) / d + 1) / 2, d); // Note the +1 to get the ceil
 }
 
 //--------------------------------------------------------------
@@ -102,7 +102,7 @@ void expand(int lineLength, int linesCount,
 				}
 			}
 
-			dtEnd = dtRef + tmin(d, dMax); // Could end the line before (dMax < d)
+			dtEnd = dtRef + std::min(d, dMax); // Could end the line before (dMax < d)
 			dtNewRef = dtRef + dNew;
 		}
 	}; // locals

@@ -278,7 +278,7 @@ public:
 			}
 		};
 
-		double delta = tmax(1.0, m_a->compute(vars));
+		double delta = std::max(1.0, m_a->compute(vars));
 
 		const TDoubleParam *ownerParam = getCalculator()->getOwnerParameter();
 		if (!ownerParam)

@@ -951,7 +951,7 @@ void TTextureStyle::makeIcon(const TDimension &outputRect)
 	} else
 		rTex = m_texture;
 
-	double fitScale = tmin((double)(outputRect.lx) / m_texture->getLx(), (double)(outputRect.ly) / m_texture->getLy());
+	double fitScale = std::min((double)(outputRect.lx) / m_texture->getLx(), (double)(outputRect.ly) / m_texture->getLy());
 	TAffine affine = TScale(m_params.m_scale * (fitScale)) * TRotation(-m_params.m_rotation);
 
 	if (affine != TAffine()) {

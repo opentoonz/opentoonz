@@ -84,7 +84,7 @@ void TRasterImage::makeIcon(const TRaster32P &dstRas)
 		dpiy = 1;
 	double sx = (double)dstRas->getLx() * dpix / (double)srcRas->getLx();
 	double sy = (double)dstRas->getLy() * dpiy / (double)srcRas->getLy();
-	double sc = tmax(sx, sy);
+	double sc = std::max(sx, sy);
 	TAffine aff = TScale(sc / dpix, sc / dpiy)
 					  .place(srcRas->getCenterD(), dstRas->getCenterD());
 

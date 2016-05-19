@@ -242,7 +242,7 @@ void Iwa_Particles_Engine::roll_particles(TTile *tile,							/*-結果を格納�
 						   particleOrigins);
 
 	/*- 粒子が出きったらもう出さない -*/
-	int actualBirthParticles = tmin(genPartNum, particleOrigins.size());
+	int actualBirthParticles = std::min(genPartNum, particleOrigins.size());
 	/*- 出発する粒子のインデックス -*/
 	QList<int> leavingPartIndex;
 	if (myregions.size() && values.source_ctrl_val != Iwa_TiledParticlesFx::CTRL_NONE) {
@@ -801,7 +801,7 @@ void Iwa_Particles_Engine::render_particles(TFlash *flash,							 /*-  0 が入�
 						partScales.find(ndxPair);
 
 					if (it != partScales.end())
-						it->second = tmax(part.scale, it->second);
+						it->second = std::max(part.scale, it->second);
 					else
 						partScales[ndxPair] = part.scale;
 				}
@@ -814,7 +814,7 @@ void Iwa_Particles_Engine::render_particles(TFlash *flash,							 /*-  0 が入�
 					std::map<std::pair<int, int>, float>::iterator it =
 						partScales.find(ndxPair);
 					if (it != partScales.end())
-						it->second = tmax((float)values.scale_val.second, it->second);
+						it->second = std::max((float)values.scale_val.second, it->second);
 					else
 						partScales[ndxPair] = values.scale_val.second;
 				}

@@ -119,10 +119,10 @@ private:
 
 void KaleidoFx::buildSectionRect(TRectD &inRect, double angle)
 {
-	inRect.y0 = tmax(inRect.y0, 0.0);
+	inRect.y0 = std::max(inRect.y0, 0.0);
 	if (angle <= TConsts::pi_2) {
-		inRect.x0 = tmax(inRect.x0, 0.0);
-		inRect.y1 = tmin(inRect.y1, inRect.x1 * tan(angle));
+		inRect.x0 = std::max(inRect.x0, 0.0);
+		inRect.y1 = std::min(inRect.y1, inRect.x1 * tan(angle));
 	}
 }
 
@@ -130,7 +130,7 @@ void KaleidoFx::buildSectionRect(TRectD &inRect, double angle)
 
 void KaleidoFx::rotate(TRectD &rect)
 {
-	TPointD pMax(tmax(-rect.x0, rect.x1), tmax(-rect.y0, rect.y1));
+	TPointD pMax(std::max(-rect.x0, rect.x1), std::max(-rect.y0, rect.y1));
 	double normPMax = norm(pMax);
 
 	rect = TRectD(-normPMax, -normPMax, normPMax, normPMax);

@@ -33,8 +33,8 @@ void ropSharpen(const TRasterPT<T> &rin, TRasterPT<T> &rout, int sharpen_max_cor
 	rout->lock();
 	bufin = (T *)rin->getRawData();
 	bufout = (T *)rout->getRawData();
-	lx = tmin(rin->getLx(), rout->getLx());
-	ly = tmin(rin->getLy(), rout->getLy());
+	lx = std::min(rin->getLx(), rout->getLx());
+	ly = std::min(rin->getLy(), rout->getLy());
 	wrapin = rin->getWrap();
 	wrapout = rout->getWrap();
 	int maxChanVal = T::maxChannelValue;

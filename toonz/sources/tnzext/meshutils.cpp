@@ -403,10 +403,11 @@ void tglDraw(const TMeshImage &meshImage,
 			TPointD s[3] = {tileAff[t] * p0, tileAff[t] * p1, tileAff[t] * p2};
 
 			// Test the face bbox - tile intersection
-			if (tmin(s[0].x, s[1].x, s[2].x) > 1.0 ||
-				tmin(s[0].y, s[1].y, s[2].y) > 1.0 ||
-				tmax(s[0].x, s[1].x, s[2].x) < 0.0 ||
-				tmax(s[0].y, s[1].y, s[2].y) < 0.0)
+			if (
+				std::min({s[0].x, s[1].x, s[2].x}) > 1.0 ||
+				std::min({s[0].y, s[1].y, s[2].y}) > 1.0 ||
+				std::max({s[0].x, s[1].x, s[2].x}) < 0.0 ||
+				std::max({s[0].y, s[1].y, s[2].y}) < 0.0)
 				continue;
 
 			// If the tile has changed, interrupt the glBegin/glEnd block and bind the

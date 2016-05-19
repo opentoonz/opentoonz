@@ -68,7 +68,7 @@ void Iwa_ParticlesManager::FrameData::buildMaxTrail()
 	//Store the maximum trail of each particle
 	std::list<Iwa_Particle>::iterator it;
 	for (it = m_particles.begin(); it != m_particles.end(); ++it)
-		m_maxTrail = tmax(m_maxTrail, it->trail);
+		m_maxTrail = std::max(m_maxTrail, it->trail);
 }
 
 //-------------------------------------------------------------------------

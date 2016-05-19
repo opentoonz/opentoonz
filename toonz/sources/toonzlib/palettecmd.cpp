@@ -632,7 +632,7 @@ void PaletteCmd::eraseStyles(const std::set<TXshSimpleLevel *> &levels,
 
 		static void restoreImages(LevelImages &levelImages)
 		{
-			int f, fCount = tmin(levelImages.first->getFrameCount(), int(levelImages.second.size()));
+			int f, fCount = std::min(levelImages.first->getFrameCount(), int(levelImages.second.size()));
 
 			for (f = 0; f != fCount; ++f)
 				restoreImage(levelImages.first, f, levelImages.second[f]);

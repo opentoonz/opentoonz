@@ -439,7 +439,7 @@ void RowArea::mousePressEvent(QMouseEvent *event)
 			}
 
 			m_viewer->getCellSelection()->selectNone();
-			m_viewer->getCellSelection()->selectCells(row, 0, row, tmax(0, filledCol));
+			m_viewer->getCellSelection()->selectCells(row, 0, row, std::max(0, filledCol));
 			m_viewer->updateCellRowAree();
 		}
 

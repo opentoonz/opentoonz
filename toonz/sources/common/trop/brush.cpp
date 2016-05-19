@@ -22,7 +22,7 @@ public:
 		int y = m_radius;				  //  inizializzazione indice scanline
 		int x = 0;						  //  inizializzazione indice colonna
 		do {
-			m_array[y] = tmax(x, m_array[y]);
+			m_array[y] = std::max(x, m_array[y]);
 			m_array[x] = y;
 			if (dCircle <= 0) {
 				dCircle = dCircle + 2 * x + 3;
@@ -95,8 +95,8 @@ void TRop::brush(
 		//  N.B. le coordinate sono relative ad un sist. di rif. con l'origine in a
 		//  l'eq. della retta e' alpha * x + beta * y = 0
 
-		int yMin = tmax(a.y, 0) - a.y;		//  clipping y + cambio  riferimento
-		int yMax = tmin(b.y, ly - 1) - a.y; //  (trasporto dell'origine in a)
+		int yMin = std::max(a.y, 0) - a.y;		//  clipping y + cambio  riferimento
+		int yMax = std::min(b.y, ly - 1) - a.y; //  (trasporto dell'origine in a)
 		if (dx > 0 && m <= 1) {
 			//  midpoint algorithm
 			TPoint segm;
@@ -122,12 +122,12 @@ void TRop::brush(
 				//  NordEst
 				int xMin, xMax;
 				if (k > 0) {
-					xMin = tmax(a.x + segm.x - count, a.x, 0); //  clipping x + ritorno alle
-					xMax = tmin(a.x + segm.x, b.x, lx - 1);	//  coordinate "di schermo"
+					xMin = std::max({a.x + segm.x - count, a.x, 0}); //  clipping x + ritorno alle
+					xMax = std::min({a.x + segm.x, b.x, lx - 1});	//  coordinate "di schermo"
 
 				} else {
-					xMin = tmax(a.x - segm.x, a.x - dx, 0);			//  clipping x + riflessione + ritorno
-					xMax = tmin(a.x - segm.x + count, a.x, lx - 1); //  alle  coordinate "di schermo"
+					xMin = std::max({a.x - segm.x, a.x - dx, 0});			//  clipping x + riflessione + ritorno
+					xMax = std::min({a.x - segm.x + count, a.x, lx - 1}); //  alle  coordinate "di schermo"
 				}
 
 				TPixel32 *p = ras->pixels(segm.y + a.y) + xMin;
@@ -158,12 +158,12 @@ void TRop::brush(
 			while (segm.y <= yMax) {
 				int xMin, xMax;
 				if (k > 0) {
-					xMin = tmax(a.x + segm.x, 0);	  //  clipping x + ritorno alle
-					xMax = tmin(a.x + segm.x, lx - 1); //  coordinate "di schermo"
+					xMin = std::max(a.x + segm.x, 0);	  //  clipping x + ritorno alle
+					xMax = std::min(a.x + segm.x, lx - 1); //  coordinate "di schermo"
 
 				} else {
-					xMin = tmax(a.x - segm.x, 0);	  //  clipping x + riflessione + ritorno
-					xMax = tmin(a.x - segm.x, lx - 1); //  alle  coordinate "di schermo"
+					xMin = std::max(a.x - segm.x, 0);	  //  clipping x + riflessione + ritorno
+					xMax = std::min(a.x - segm.x, lx - 1); //  alle  coordinate "di schermo"
 				}
 
 				TPixel32 *p = ras->pixels(segm.y + a.y) + xMin;
@@ -193,12 +193,12 @@ void TRop::brush(
 
 	// ----- punti iniziali coincidenti: disegna un cerchio
 	if (a == b) {
-		int yMin = tmax(a.y - radius, 0);	  //  clipping y
-		int yMax = tmin(a.y + radius, ly - 1); //  clipping y
+		int yMin = std::max(a.y - radius, 0);	  //  clipping y
+		int yMax = std::min(a.y + radius, ly - 1); //  clipping y
 		for (y = yMin; y <= yMax; y++) {
 			int deltay = abs(y - a.y);
-			int xMin = tmax(a.x - halfCord.getCord(deltay), 0);		 //  clipping x
-			int xMax = tmin(a.x + halfCord.getCord(deltay), lx - 1); //  clipping x
+			int xMin = std::max(a.x - halfCord.getCord(deltay), 0);		 //  clipping x
+			int xMax = std::min(a.x + halfCord.getCord(deltay), lx - 1); //  clipping x
 			TPixel32 *p = ras->pixels(y) + xMin;
 			TPixel32 *q = p + (xMax - xMin);
 			while (p <= q)
@@ -210,14 +210,14 @@ void TRop::brush(
 
 	// -----  rettangolo orizzontale (a.y = b.y, a.x != b.x)
 	if (a.y == b.y) {
-		int yMin = tmax((a.y - radius), 0);		 //  clipping y
-		int yMax = tmin((a.y + radius), ly - 1); //  clipping y
-		int xLeft = tmin(a.x, b.x);
-		int xRight = tmax(a.x, b.x);
+		int yMin = std::max((a.y - radius), 0);		 //  clipping y
+		int yMax = std::min((a.y + radius), ly - 1); //  clipping y
+		int xLeft = std::min(a.x, b.x);
+		int xRight = std::max(a.x, b.x);
 		for (y = yMin; y <= yMax; y++) {
 			int deltay = abs(y - a.y);
-			int xMin = tmax(xLeft - halfCord.getCord(deltay), 0);		//  clipping x
-			int xMax = tmin(xRight + halfCord.getCord(deltay), lx - 1); //  clipping x
+			int xMin = std::max(xLeft - halfCord.getCord(deltay), 0);		//  clipping x
+			int xMax = std::min(xRight + halfCord.getCord(deltay), lx - 1); //  clipping x
 			TPixel32 *p = ras->pixels(y) + xMin;
 			TPixel32 *q = p + (xMax - xMin);
 			while (p <= q)
@@ -230,12 +230,12 @@ void TRop::brush(
 	// -----  rettangolo verticale (a.x = b.x, a.y != b.y)
 	if (a.x == b.x) {
 
-		int xMin = tmax(a.x - radius, 0);	  //  clipping x
-		int xMax = tmin(a.x + radius, lx - 1); //  clipping x
+		int xMin = std::max(a.x - radius, 0);	  //  clipping x
+		int xMax = std::min(a.x + radius, lx - 1); //  clipping x
 		for (x = xMin; x <= xMax; x++) {
 			int deltax = abs(x - a.x);
-			int yMin = tmax(a.y - halfCord.getCord(deltax), 0);		 //  clipping y
-			int yMax = tmin(b.y + halfCord.getCord(deltax), ly - 1); //  clipping y
+			int yMin = std::max(a.y - halfCord.getCord(deltax), 0);		 //  clipping y
+			int yMax = std::min(b.y + halfCord.getCord(deltax), ly - 1); //  clipping y
 			if (yMin <= yMax) {
 				TPixel32 *p = ras->pixels(yMin) + x;
 				TPixel32 *q = ras->pixels(yMax) + x;
@@ -319,24 +319,24 @@ void TRop::brush(
 	// -----  riempie "calotte" circolari
 
 	// -----  riempie "calotta" circolare inferiore
-	int yMin = tmax(a.y - radius, 0);		   //  clipping y
-	int yMax = tmin(a.y - cutExt - 1, ly - 1); //  clipping y
+	int yMin = std::max(a.y - radius, 0);		   //  clipping y
+	int yMax = std::min(a.y - cutExt - 1, ly - 1); //  clipping y
 	for (y = yMin; y <= yMax; y++) {
 		int r = halfCord.getCord(a.y - y);
-		int xMin = tmax(a.x - r, 0);	  //  clipping x
-		int xMax = tmin(a.x + r, lx - 1); //  clipping x
+		int xMin = std::max(a.x - r, 0);	  //  clipping x
+		int xMax = std::min(a.x + r, lx - 1); //  clipping x
 		TPixel32 *p = ras->pixels(y) + xMin;
 		TPixel32 *q = p + (xMax - xMin);
 		while (p <= q)
 			*p++ = col;
 	}
 	// -----  riempie "calotta" circolare superiore
-	yMin = tmax(b.y + cutExt + 1, 0);  //  clipping y
-	yMax = tmin(b.y + radius, ly - 1); //  clipping y
+	yMin = std::max(b.y + cutExt + 1, 0);  //  clipping y
+	yMax = std::min(b.y + radius, ly - 1); //  clipping y
 	for (y = yMin; y <= yMax; y++) {
 		int r = halfCord.getCord(y - b.y);
-		int xMin = tmax(b.x - r, 0);	  //  clipping x
-		int xMax = tmin(b.x + r, lx - 1); //  clipping x
+		int xMin = std::max(b.x - r, 0);	  //  clipping x
+		int xMax = std::min(b.x + r, lx - 1); //  clipping x
 		TPixel32 *p = ras->pixels(y) + xMin;
 		TPixel32 *q = p + (xMax - xMin);
 		while (p <= q)
@@ -358,8 +358,8 @@ void TRop::brush(
 	// N.B. le coordinate sono relative ad un sist. di rif. con l'origine sul centro
 	// del cerchio inferiore
 
-	yMin = tmax(a.y - cutExt, 0) - a.y;						 //  clipping y
-	yMax = tmin(a.y + cutIn, b.y - cutIn - 1, ly - 1) - a.y; //  clipping y
+	yMin = std::max(a.y - cutExt, 0) - a.y;						 //  clipping y
+	yMax = std::min({a.y + cutIn, b.y - cutIn - 1, ly - 1}) - a.y; //  clipping y
 
 	// l'eq. della retta e' alpha * x + beta * y + gammaRight = 0
 	const int alpha = dy, beta = -dx;
@@ -382,11 +382,11 @@ void TRop::brush(
 			{
 				int xMin, xMax;
 				if (k > 0) {
-					xMin = tmax(a.x - halfCord.getCord(abs(segmRight.y)), 0); //  clipping x
-					xMax = tmin(a.x + tmin(segmRight.x, xSegmMax), lx - 1);   //  clipping x
+					xMin = std::max(a.x - halfCord.getCord(abs(segmRight.y)), 0); //  clipping x
+					xMax = std::min(a.x + std::min(segmRight.x, xSegmMax), lx - 1);   //  clipping x
 				} else {
-					xMin = tmax(a.x - tmin(segmRight.x, xSegmMax), 0);			   //  clipping x + ritorno alle
-					xMax = tmin(a.x + halfCord.getCord(abs(segmRight.y)), lx - 1); //   coordinate "di schermo"
+					xMin = std::max(a.x - std::min(segmRight.x, xSegmMax), 0);			   //  clipping x + ritorno alle
+					xMax = std::min(a.x + halfCord.getCord(abs(segmRight.y)), lx - 1); //   coordinate "di schermo"
 				}
 				TPixel32 *p = ras->pixels(segmRight.y + a.y) + xMin;
 				TPixel32 *q = p + (xMax - xMin);
@@ -406,11 +406,11 @@ void TRop::brush(
 		while (segmRight.y <= yMax) {
 			int xMin, xMax;
 			if (k > 0) {
-				xMin = tmax(a.x - halfCord.getCord(abs(segmRight.y)), 0); //  clipping x
-				xMax = tmin(a.x + segmRight.x, lx - 1);					  //  clipping x
+				xMin = std::max(a.x - halfCord.getCord(abs(segmRight.y)), 0); //  clipping x
+				xMax = std::min(a.x + segmRight.x, lx - 1);					  //  clipping x
 			} else {
-				xMin = tmax(a.x - segmRight.x, 0);							   //  clipping x + ritorno alle coordinate
-				xMax = tmin(a.x + halfCord.getCord(abs(segmRight.y)), lx - 1); //  "di schermo"
+				xMin = std::max(a.x - segmRight.x, 0);							   //  clipping x + ritorno alle coordinate
+				xMax = std::min(a.x + halfCord.getCord(abs(segmRight.y)), lx - 1); //  "di schermo"
 			}
 			TPixel32 *p = ras->pixels(segmRight.y + a.y) + xMin;
 			TPixel32 *q = p + (xMax - xMin);
@@ -433,8 +433,8 @@ void TRop::brush(
 
 	//  N.B. le coordinate sono relative ad un sist. di rif. con l'origine sul centro
 	//  del cerchio superiore
-	yMin = tmax(b.y - cutIn, a.y + cutIn + 1, 0) - b.y; //  clipping y
-	yMax = tmin(b.y + cutExt, ly - 1) - b.y;			//  clipping y
+	yMin = std::max({b.y - cutIn, a.y + cutIn + 1, 0}) - b.y; //  clipping y
+	yMax = std::min(b.y + cutExt, ly - 1) - b.y;			//  clipping y
 
 	//   l'eq. della retta e' alpha * x + beta * y + gammaLeft = 0
 	const double gammaLeft = leftDown.y * dx - leftDown.x * dy;
@@ -447,11 +447,11 @@ void TRop::brush(
 		while (segmLeft.y <= yMax) {
 			int xMin, xMax;
 			if (k > 0) {
-				xMin = tmax(b.x + tmax(segmLeft.x, xSegmMin - dx), 0);		  //  clipping x
-				xMax = tmin(b.x + halfCord.getCord(abs(segmLeft.y)), lx - 1); //  clipping x
+				xMin = std::max(b.x + std::max(segmLeft.x, xSegmMin - dx), 0);		  //  clipping x
+				xMax = std::min(b.x + halfCord.getCord(abs(segmLeft.y)), lx - 1); //  clipping x
 			} else {
-				xMin = tmax(b.x - halfCord.getCord(abs(segmLeft.y)), 0);	//  clipping x + ritorno alle
-				xMax = tmin(b.x - tmax(segmLeft.x, xSegmMin - dx), lx - 1); //   coordinate "di schermo"
+				xMin = std::max(b.x - halfCord.getCord(abs(segmLeft.y)), 0);	//  clipping x + ritorno alle
+				xMax = std::min(b.x - std::max(segmLeft.x, xSegmMin - dx), lx - 1); //   coordinate "di schermo"
 			}
 			TPixel32 *p = ras->pixels(segmLeft.y + b.y) + xMin;
 			TPixel32 *q = p + (xMax - xMin);
@@ -474,11 +474,11 @@ void TRop::brush(
 		while (segmLeft.y <= yMax) {
 			int xMin, xMax;
 			if (k > 0) {
-				xMin = tmax(b.x + segmLeft.x, 0);							  //  clipping x
-				xMax = tmin(b.x + halfCord.getCord(abs(segmLeft.y)), lx - 1); //  clipping x
+				xMin = std::max(b.x + segmLeft.x, 0);							  //  clipping x
+				xMax = std::min(b.x + halfCord.getCord(abs(segmLeft.y)), lx - 1); //  clipping x
 			} else {
-				xMin = tmax(b.x - halfCord.getCord(abs(segmLeft.y)), 0); //  clipping x + ritorno alle
-				xMax = tmin(b.x - segmLeft.x, lx - 1);					 //   coordinate "di schermo"
+				xMin = std::max(b.x - halfCord.getCord(abs(segmLeft.y)), 0); //  clipping x + ritorno alle
+				xMax = std::min(b.x - segmLeft.x, lx - 1);					 //   coordinate "di schermo"
 			}
 			TPixel32 *p = ras->pixels(segmLeft.y + b.y) + xMin;
 			TPixel32 *q = p + (xMax - xMin);
@@ -506,8 +506,8 @@ void TRop::brush(
 	//  retta destra di equaz.   alpha * x + beta * y + gammaRight = 0
 	//  retta sinistra di equaz. alpha * x + beta * y + gammaLeft = 0
 
-	yMin = tmax(a.y + cutIn + 1, 0) - a.y;		//clipping y
-	yMax = tmin(b.y - cutIn - 1, ly - 1) - a.y; //clipping y
+	yMin = std::max(a.y + cutIn + 1, 0) - a.y;		//clipping y
+	yMax = std::min(b.y - cutIn - 1, ly - 1) - a.y; //clipping y
 	if (m <= 1) {
 		//  midpoint algorithm; le scanline vengono disegnate solo
 		//  sul NordEst. L'ultima scanline non viene disegnata
@@ -524,11 +524,11 @@ void TRop::brush(
 			{
 				int xMin, xMax;
 				if (k > 0) {
-					xMin = tmax(a.x + tmax(segmLeft.x, xSegmMin), 0);		//  clipping x
-					xMax = tmin(a.x + tmin(segmRight.x, xSegmMax), lx - 1); //  clipping x
+					xMin = std::max(a.x + std::max(segmLeft.x, xSegmMin), 0);		//  clipping x
+					xMax = std::min(a.x + std::min(segmRight.x, xSegmMax), lx - 1); //  clipping x
 				} else {
-					xMin = tmax(a.x - tmin(segmRight.x, xSegmMax), 0);	 //  clipping x + ritorno alle
-					xMax = tmin(a.x - tmax(segmLeft.x, xSegmMin), lx - 1); //   coordinate "di schermo"
+					xMin = std::max(a.x - std::min(segmRight.x, xSegmMax), 0);	 //  clipping x + ritorno alle
+					xMax = std::min(a.x - std::max(segmLeft.x, xSegmMin), lx - 1); //   coordinate "di schermo"
 				}
 
 				TPixel32 *p = ras->pixels(segmRight.y + a.y) + xMin;
@@ -562,11 +562,11 @@ void TRop::brush(
 		while (segmRight.y <= yMax) {
 			int xMin, xMax;
 			if (k > 0) {
-				xMin = tmax(a.x + segmLeft.x, 0);		//  clipping x
-				xMax = tmin(a.x + segmRight.x, lx - 1); //  clipping x
+				xMin = std::max(a.x + segmLeft.x, 0);		//  clipping x
+				xMax = std::min(a.x + segmRight.x, lx - 1); //  clipping x
 			} else {
-				xMin = tmax(a.x - segmRight.x, 0);	 //  clipping x + ritorno alle
-				xMax = tmin(a.x - segmLeft.x, lx - 1); //   coordinate "di schermo"
+				xMin = std::max(a.x - segmRight.x, 0);	 //  clipping x + ritorno alle
+				xMax = std::min(a.x - segmLeft.x, lx - 1); //   coordinate "di schermo"
 			}
 
 			TPixel32 *p = ras->pixels(segmRight.y + a.y) + xMin;
@@ -600,16 +600,16 @@ void TRop::brush(
 
 	// N.B. coordinate di schermo (riflessione per k<0 )
 
-	yMin = tmax(b.y - cutIn, 0);
-	yMax = tmin(a.y + cutIn, ly - 1);
+	yMin = std::max(b.y - cutIn, 0);
+	yMax = std::min(a.y + cutIn, ly - 1);
 	for (y = yMin; y <= yMax; y++) {
 		int xMin, xMax;
 		if (k > 0) {
-			xMin = tmax(a.x - halfCord.getCord(abs(y - a.y)), 0);	  //  clipping x
-			xMax = tmin(b.x + halfCord.getCord(abs(b.y - y)), lx - 1); //  clipping x
+			xMin = std::max(a.x - halfCord.getCord(abs(y - a.y)), 0);	  //  clipping x
+			xMax = std::min(b.x + halfCord.getCord(abs(b.y - y)), lx - 1); //  clipping x
 		} else {
-			xMin = tmax(b.x - halfCord.getCord(abs(b.y - y)), 0);	  //  clipping x + ritorno alle
-			xMax = tmin(a.x + halfCord.getCord(abs(y - a.y)), lx - 1); //   coordinate "di schermo"
+			xMin = std::max(b.x - halfCord.getCord(abs(b.y - y)), 0);	  //  clipping x + ritorno alle
+			xMax = std::min(a.x + halfCord.getCord(abs(y - a.y)), lx - 1); //   coordinate "di schermo"
 		}
 		TPixel32 *p = ras->pixels(y) + xMin;
 		TPixel32 *q = p + (xMax - xMin);

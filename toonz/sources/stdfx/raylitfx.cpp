@@ -86,7 +86,7 @@ void BaseRaylitFx::doDryCompute(TRectD &rect,
 	if (bboxIn == TConsts::infiniteRectD)
 		bboxIn = rect;
 
-	TDimension sizeIn(tmax(tceil(bboxIn.getLx()), 1), tmax(tceil(bboxIn.getLy()), 1));
+	TDimension sizeIn(std::max(tceil(bboxIn.getLx()), 1), std::max(tceil(bboxIn.getLy()), 1));
 	bboxIn = TRectD(bboxIn.getP00(), TDimensionD(sizeIn.lx, sizeIn.ly));
 	m_input->dryCompute(bboxIn, frame, ri);
 }
@@ -151,7 +151,7 @@ void RaylitFx::doCompute(TTile &tileOut, double frame, const TRenderSettings &ri
 		TPoint posIn, posOut;
 
 		TTile tileIn;
-		TDimension sizeIn(tmax(tceil(bboxIn.getLx()), 1), tmax(tceil(bboxIn.getLy()), 1));
+		TDimension sizeIn(std::max(tceil(bboxIn.getLx()), 1), std::max(tceil(bboxIn.getLy()), 1));
 		m_input->allocateAndCompute(tileIn, bboxIn.getP00(), sizeIn,
 									tileOut.getRaster(), frame, ri);
 
@@ -211,7 +211,7 @@ void ColorRaylitFx::doCompute(TTile &tileOut, double frame, const TRenderSetting
 		TPoint posIn, posOut;
 
 		TTile tileIn;
-		TDimension sizeIn(tmax(tceil(bboxIn.getLx()), 1), tmax(tceil(bboxIn.getLy()), 1));
+		TDimension sizeIn(std::max(tceil(bboxIn.getLx()), 1), std::max(tceil(bboxIn.getLy()), 1));
 		m_input->allocateAndCompute(tileIn, bboxIn.getP00(), sizeIn,
 									tileOut.getRaster(), frame, ri);
 

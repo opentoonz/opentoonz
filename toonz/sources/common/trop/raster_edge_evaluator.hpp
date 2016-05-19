@@ -84,7 +84,7 @@ RasterEdgeEvaluator<RanIt>::furthestFrom(const iterator_type &start)
 		if (cross(displace, rightConstraint) > 0)
 			break;
 
-		if (tmax(displace.x, -displace.x, displace.y, -displace.y) > m_tolerance) {
+		if (std::max({displace.x, -displace.x, displace.y, -displace.y}) > m_tolerance) {
 			//Update m_tolerance constraints
 			newLeftConstraint.x = displace.x +
 								  (displace.y < 0 || (displace.y == 0 && displace.x < 0) ? m_tolerance : -m_tolerance);
@@ -111,7 +111,7 @@ RasterEdgeEvaluator<RanIt>::furthestFrom(const iterator_type &start)
 	if (jt != this->m_end)
 		--jt; //Chop Right
 
-	return start + tmax((int)tmin(jt - start - 1, this->m_end - this->m_begin - 2), 1);
+	return start + std::max((int)std::min(jt - start - 1, this->m_end - this->m_begin - 2), 1);
 }
 
 #endif // RASTER_EDGE_EVALUATOR_HPP

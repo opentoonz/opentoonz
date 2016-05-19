@@ -34,12 +34,12 @@ int t32bitsrv::RasterExchanger<PIXEL>::read(const char *srcBuf, int len)
 		int xStart = (m_pix - m_ras->pixels(0)) % m_ras->getWrap();
 		int remainingData = len;
 		int lineData = m_ras->getLx() * sizeof(PIXEL);
-		int lineDataToRead = tmin((int)((m_ras->getLx() - xStart) * sizeof(PIXEL)), remainingData);
+		int lineDataToRead = std::min((int)((m_ras->getLx() - xStart) * sizeof(PIXEL)), remainingData);
 
 		for (; remainingData > 0;
 			 m_pix += (m_ras->getWrap() - xStart),
 			 remainingData -= lineDataToRead,
-			 lineDataToRead = tmin(lineData, remainingData),
+			 lineDataToRead = std::min(lineData, remainingData),
 			 xStart = 0)
 			memcpy(m_pix, srcBuf, lineDataToRead);
 	}
@@ -62,12 +62,12 @@ int t32bitsrv::RasterExchanger<PIXEL>::write(char *dstBuf, int len)
 		int xStart = (m_pix - m_ras->pixels(0)) % m_ras->getWrap();
 		int remainingData = len;
 		int lineData = m_ras->getLx() * sizeof(PIXEL);
-		int lineDataToWrite = tmin((int)((m_ras->getLx() - xStart) * sizeof(PIXEL)), remainingData);
+		int lineDataToWrite = std::min((int)((m_ras->getLx() - xStart) * sizeof(PIXEL)), remainingData);
 
 		for (; remainingData > 0;
 			 m_pix += (m_ras->getWrap() - xStart),
 			 remainingData -= lineDataToWrite,
-			 lineDataToWrite = tmin(lineData, remainingData),
+			 lineDataToWrite = std::min(lineData, remainingData),
 			 xStart = 0)
 			memcpy(dstBuf, m_pix, lineDataToWrite);
 	}

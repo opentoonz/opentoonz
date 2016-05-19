@@ -113,8 +113,8 @@ int SetSaveboxTool::getDragType(const TPointD &pos)
 	TRectD bbox = ToonzImageUtils::convertRasterToWorld(convert(image->getBBox()), image);
 
 	int ret = 0;
-	int dx = tmin(fabs(bbox.x0 - pos.x), fabs(bbox.x1 - pos.x));
-	int dy = tmin(fabs(bbox.y0 - pos.y), fabs(bbox.y1 - pos.y));
+	int dx = std::min(fabs(bbox.x0 - pos.x), fabs(bbox.x1 - pos.x));
+	int dy = std::min(fabs(bbox.y0 - pos.y), fabs(bbox.y1 - pos.y));
 
 	double maxDist = 5 * m_tool->getPixelSize();
 	if (dx > maxDist && dy > maxDist)

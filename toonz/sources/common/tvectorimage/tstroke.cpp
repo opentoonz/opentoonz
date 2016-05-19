@@ -147,10 +147,10 @@ void analyzeSolution(const vector<double> &coeff, vector<DoublePair> &interval)
 
 		if (coeff[1] > 0) {
 			if (singleSol < 1)
-				interval.push_back(DoublePair(tmax(0.0, singleSol), 1.0));
+				interval.push_back(DoublePair(std::max(0.0, singleSol), 1.0));
 		} else {
 			if (singleSol > 0)
-				interval.push_back(DoublePair(0.0, tmin(1.0, singleSol)));
+				interval.push_back(DoublePair(0.0, std::min(1.0, singleSol)));
 		}
 		return;
 	}
@@ -171,13 +171,13 @@ void analyzeSolution(const vector<double> &coeff, vector<DoublePair> &interval)
 			break;
 
 		case 2:
-			interval.push_back(DoublePair(0.0, tmin(tmax(sol[0], 0.0), 1.0)));
-			interval.push_back(DoublePair(tmax(tmin(sol[1], 1.0), 0.0), 1.0));
+			interval.push_back(DoublePair(0.0, std::min(std::max(sol[0], 0.0), 1.0)));
+			interval.push_back(DoublePair(std::max(std::min(sol[1], 1.0), 0.0), 1.0));
 			break;
 		}
 	} else if (coeff[2] < 0 && sol.size() == 2)
-		interval.push_back(DoublePair(tmin(tmax(sol[0], 0.0), 1.0),
-									  tmax(tmin(sol[1], 1.0), 0.0)));
+		interval.push_back(DoublePair(std::min(std::max(sol[0], 0.0), 1.0),
+									  std::max(std::min(sol[1], 1.0), 0.0)));
 
 	// eat not valid interval
 	std::vector<DoublePair>::iterator it = std::remove_if(interval.begin(),
@@ -366,7 +366,7 @@ inline void changeTQDirection(TThickQuadratic *tq)
       double dist23 = tdistance2(p, rect.getP10());
       double dist24 = tdistance2(p, rect.getP11());
       
-      if (tmin(dist21, dist22, dist23, dist24)>=maxDistance2)
+      if (std::min(dist21, dist22, dist23, dist24)>=maxDistance2)
         return maxDistance2;
     }
     currT = tq.getT(p);
@@ -871,7 +871,7 @@ void TStroke::Imp::computeMaxThickness()
 {
 	m_maxThickness = m_centerLineArray[0]->getThickP0().thick;
 	for (UINT i = 0; i < m_centerLineArray.size(); i++)
-		m_maxThickness = tmax(m_maxThickness, m_centerLineArray[i]->getThickP1().thick, m_centerLineArray[i]->getThickP2().thick);
+		m_maxThickness = std::max({m_maxThickness, m_centerLineArray[i]->getThickP1().thick, m_centerLineArray[i]->getThickP2().thick});
 }
 
 void TStroke::Imp::computeCacheVector()
@@ -2057,7 +2057,7 @@ void TStroke::enableComputeOfCaches()
 //DEL     double dist23 = tdistance2(p, rect.getP10());
 //DEL     double dist24 = tdistance2(p, rect.getP11());
 //DEL
-//DEL     if (tmin(dist21, dist22, dist23, dist24)>=maxDistance2)
+//DEL     if (std::min(dist21, dist22, dist23, dist24)>=maxDistance2)
 //DEL       return maxDistance2;
 //DEL   }
 //DEL

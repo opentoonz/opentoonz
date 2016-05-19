@@ -243,8 +243,8 @@ template <typename PIXEL, typename CHANNEL_TYPE>
 PIXEL filterPixel(double a, double b, PIXEL *lineSrc, int lineLength, int lineWrap)
 {
 	//Retrieve the interesting pixel interval
-	double x0 = tmax(a, 0.0);
-	double x1 = tmin(b, (double)lineLength);
+	double x0 = std::max(a, 0.0);
+	double x1 = std::min(b, (double)lineLength);
 
 	int x0Floor = tfloor(x0);
 	int x0Ceil = tceil(x0);
@@ -329,8 +329,8 @@ PIXEL filterPixel(double a, double b, double c, double d, const TRasterPT<PIXEL>
 	}
 
 	//Now, filter each column in [a, b]
-	double x0 = tmax(a, 0.0);
-	double x1 = tmin(b, (double)rasIn->getLx());
+	double x0 = std::max(a, 0.0);
+	double x1 = std::min(b, (double)rasIn->getLx());
 
 	if (x0 >= x1)
 		return PIXEL::Transparent;
@@ -395,7 +395,7 @@ void resample(const TRasterPT<T> &rasIn, TRasterPT<T> &rasOut, const TDistorter 
 		for (int x = 0; x < rasOut->getLx(); currOldInv += invsCount, currNewInv += invsCount, ++x, ++pix) {
 			T pixDown(0, 0, 0, 0);
 
-			int count = tmin(oldCounts[x], oldCounts[x + 1], newCounts[x]);
+			int count = std::min({oldCounts[x], oldCounts[x + 1], newCounts[x]});
 			for (int i = 0; i < count; ++i) {
 				T pixUp(0, 0, 0, 0);
 
@@ -820,8 +820,9 @@ TRectD PerspectiveDistorter::TPerspect::operator*(const TRectD &rect) const
 				p2 = *this * rect.getP01(),
 				p3 = *this * rect.getP10(),
 				p4 = *this * rect.getP11();
-		return TRectD(tmin(p1.x, p2.x, p3.x, p4.x), tmin(p1.y, p2.y, p3.y, p4.y),
-					  tmax(p1.x, p2.x, p3.x, p4.x), tmax(p1.y, p2.y, p3.y, p4.y));
+		return TRectD(
+			std::min({p1.x, p2.x, p3.x, p4.x}), std::min({p1.y, p2.y, p3.y, p4.y}),
+			std::max({p1.x, p2.x, p3.x, p4.x}), std::max({p1.y, p2.y, p3.y, p4.y}));
 	} else
 		return TConsts::infiniteRectD;
 }
@@ -855,8 +856,8 @@ void PerspectiveDistorter::computeMatrix()
 	//and inverting makes squares with respect to their elements' size, we'd better put the
 	//quadrilaterals in more numerically stable references before inversions.
 
-	double srcSize = tmax(dist(m_p00s, m_p10s), dist(m_p00s, m_p01s), dist(m_p10s, m_p11s), dist(m_p01s, m_p11s));
-	double dstSize = tmax(dist(m_p00d, m_p10d), dist(m_p00d, m_p01d), dist(m_p10d, m_p11d), dist(m_p01d, m_p11d));
+	double srcSize = std::max({dist(m_p00s, m_p10s), dist(m_p00s, m_p01s), dist(m_p10s, m_p11s), dist(m_p01s, m_p11s)});
+	double dstSize = std::max({dist(m_p00d, m_p10d), dist(m_p00d, m_p01d), dist(m_p10d, m_p11d), dist(m_p01d, m_p11d)});
 
 	TAffine toSrcNormalizedRef(TScale(1.0 / srcSize) * TTranslation(-m_p00s));
 	TAffine toSrcRef(TTranslation(m_p00s) * TScale(srcSize));
@@ -997,29 +998,29 @@ inline void updateResult(
 			//Rect lies on one side of the derivative line extension. Therefore, the
 			//inverted rect can be updated.
 			if (sideDerXAgainstRectSideX > 0 || sideDerXAgainstRectSideY > 0)
-				posResult.y0 = tmin(posResult.y0, srcCorner.y - securityAddendum);
+				posResult.y0 = std::min(posResult.y0, srcCorner.y - securityAddendum);
 			else
-				posResult.y1 = tmax(posResult.y1, srcCorner.y + securityAddendum);
+				posResult.y1 = std::max(posResult.y1, srcCorner.y + securityAddendum);
 
 		if (sideDerYAgainstRectSideX != -sideDerYAgainstRectSideY)
 			if (sideDerYAgainstRectSideX > 0 || sideDerYAgainstRectSideY > 0)
-				posResult.x1 = tmax(posResult.x1, srcCorner.x + securityAddendum);
+				posResult.x1 = std::max(posResult.x1, srcCorner.x + securityAddendum);
 			else
-				posResult.x0 = tmin(posResult.x0, srcCorner.x - securityAddendum);
+				posResult.x0 = std::min(posResult.x0, srcCorner.x - securityAddendum);
 	} else if (jacobianSign < 0) {
 		hasNegativeResults = true;
 
 		if (sideDerXAgainstRectSideX != -sideDerXAgainstRectSideY)
 			if (sideDerXAgainstRectSideX > 0 || sideDerXAgainstRectSideY > 0)
-				negResult.y1 = tmax(posResult.y1, srcCorner.y + securityAddendum);
+				negResult.y1 = std::max(posResult.y1, srcCorner.y + securityAddendum);
 			else
-				negResult.y0 = tmin(posResult.y0, srcCorner.y - securityAddendum);
+				negResult.y0 = std::min(posResult.y0, srcCorner.y - securityAddendum);
 
 		if (sideDerYAgainstRectSideX != -sideDerYAgainstRectSideY)
 			if (sideDerYAgainstRectSideX > 0 || sideDerYAgainstRectSideY > 0)
-				negResult.x0 = tmin(posResult.x0, srcCorner.x - securityAddendum);
+				negResult.x0 = std::min(posResult.x0, srcCorner.x - securityAddendum);
 			else
-				negResult.x1 = tmax(posResult.x1, srcCorner.x + securityAddendum);
+				negResult.x1 = std::max(posResult.x1, srcCorner.x + securityAddendum);
 	}
 }
 
@@ -1121,10 +1122,10 @@ TRectD BilinearDistorter::invMap(const TRectD &rect) const
 	for (i = 0; i < 4; ++i) {
 		for (j = 0; j < count[i]; ++j) {
 			TPointD &inv(invs[j + 2 * i]);
-			bbox.x0 = tmin(bbox.x0, inv.x);
-			bbox.y0 = tmin(bbox.y0, inv.y);
-			bbox.x1 = tmax(bbox.x1, inv.x);
-			bbox.y1 = tmax(bbox.y1, inv.y);
+			bbox.x0 = std::min(bbox.x0, inv.x);
+			bbox.y0 = std::min(bbox.y0, inv.y);
+			bbox.x1 = std::max(bbox.x1, inv.x);
+			bbox.y1 = std::max(bbox.y1, inv.y);
 		}
 	}
 
@@ -1136,10 +1137,10 @@ TRectD BilinearDistorter::invMap(const TRectD &rect) const
 	invs[2] = m_refToSource.map(bbox.getP01());
 	invs[3] = m_refToSource.map(bbox.getP11());
 
-	bbox.x0 = tmin(invs[0].x, invs[1].x, invs[2].x, invs[3].x);
-	bbox.y0 = tmin(invs[0].y, invs[1].y, invs[2].y, invs[3].y);
-	bbox.x1 = tmax(invs[0].x, invs[1].x, invs[2].x, invs[3].x);
-	bbox.y1 = tmax(invs[0].y, invs[1].y, invs[2].y, invs[3].y);
+	bbox.x0 = std::min({invs[0].x, invs[1].x, invs[2].x, invs[3].x});
+	bbox.y0 = std::min({invs[0].y, invs[1].y, invs[2].y, invs[3].y});
+	bbox.x1 = std::max({invs[0].x, invs[1].x, invs[2].x, invs[3].x});
+	bbox.y1 = std::max({invs[0].y, invs[1].y, invs[2].y, invs[3].y});
 
 	return bbox.enlarge(5); //Enlarge a little just to be sure
 }

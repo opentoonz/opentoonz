@@ -435,7 +435,7 @@ void TImageWriterMov::save(const TImageP &img)
 
 void TLevelWriterMov::save(const TImageP &img, int frameIndex)
 {
-	m_firstFrame = tmin(frameIndex, m_firstFrame);
+	m_firstFrame = std::min(frameIndex, m_firstFrame);
 
 	TRasterImageP image(img);
 	if (!image)

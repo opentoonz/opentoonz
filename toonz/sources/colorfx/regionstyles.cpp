@@ -1473,11 +1473,11 @@ int TPointShadowFillStyle::shadowOnEdge_parallel(TFlash &flash,
 
 	TPointD diff = normalize(rotate90(p1 - p0));
 	double len1 = diff * m_shadowDirection;
-	len1 = tmax(0.0, len1);
+	len1 = std::max(0.0, len1);
 
 	diff = normalize(rotate90(p2 - p1));
 	double len2 = diff * m_shadowDirection;
-	len2 = tmax(0.0, len2);
+	len2 = std::max(0.0, len2);
 
 	if ((len1 + len2) > 0) {
 		TPointD la = p1 + m_shadowDirection * len1 * m_shadowSize;
@@ -1786,7 +1786,7 @@ void TDottedFillStyle::setColorParamValue(int index, const TPixel32 &color)
 
 void TDottedFillStyle::drawRegion(const TColorFunction *cf, const bool antiAliasing, TRegionOutline &boundary) const
 {
-	double LDotDist = tmax(m_dotDist, 0.1);
+	double LDotDist = std::max(m_dotDist, 0.1);
 	//double LDotSize=m_dotSize;
 	bool LIsShifted = m_isShifted;
 	const bool isTransparent = m_pointColor.m < 255;
@@ -1857,7 +1857,7 @@ int TDottedFillStyle::nbClip(const double LDotDist, const bool LIsShifted,
 
 void TDottedFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 {
-	double LDotDist = tmax(m_dotDist, 0.1);
+	double LDotDist = std::max(m_dotDist, 0.1);
 	double LDotSize = m_dotSize;
 	bool LIsShifted = m_isShifted;
 	TRectD bbox(r->getBBox());
@@ -4036,8 +4036,8 @@ void TRadGradFillStyle::drawRegion(const TColorFunction *cf, const bool antiAlia
 	TRectD bbox(boundary.m_bbox);
 	double lx = bbox.x1 - bbox.x0;
 	double ly = bbox.y1 - bbox.y0;
-	double r2 = (double)tmax(lx, ly) * 5.0;
-	double r1 = 0.5 * (double)tmax(lx, ly) * m_Radius * 0.01;
+	double r2 = std::max(lx, ly) * 5.0;
+	double r1 = 0.5 * std::max(lx, ly) * m_Radius * 0.01;
 	double r0 = r1 * (100.0 - m_Smooth) * 0.01;
 
 	TPointD center((bbox.x1 + bbox.x0) / 2.0, (bbox.y1 + bbox.y0) / 2.0);
@@ -4087,7 +4087,7 @@ void TRadGradFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 	TRectD bbox(r->getBBox());
 	double lx = bbox.x1 - bbox.x0;
 	double ly = bbox.y1 - bbox.y0;
-	double r1 = 0.5 * (double)tmax(lx, ly) * m_Radius * 0.01;
+	double r1 = 0.5 * std::max(lx, ly) * m_Radius * 0.01;
 	if (m_Smooth < 50)
 		r1 *= (0.3 * ((100 - m_Smooth) / 50.0) + 0.7);
 	TPointD center((bbox.x1 + bbox.x0) / 2.0, (bbox.y1 + bbox.y0) / 2.0);
@@ -4377,10 +4377,10 @@ void TCircleStripeFillStyle::drawRegion(const TColorFunction *cf, const bool ant
 	center.y = center.y + m_YPos * 0.01 * 0.5 * ly;
 
 	double maxDist = 0.0;
-	maxDist = tmax(tdistance(center, TPointD(bbox.x0, bbox.y0)), maxDist);
-	maxDist = tmax(tdistance(center, TPointD(bbox.x0, bbox.y1)), maxDist);
-	maxDist = tmax(tdistance(center, TPointD(bbox.x1, bbox.y0)), maxDist);
-	maxDist = tmax(tdistance(center, TPointD(bbox.x1, bbox.y1)), maxDist);
+	maxDist = std::max(tdistance(center, TPointD(bbox.x0, bbox.y0)), maxDist);
+	maxDist = std::max(tdistance(center, TPointD(bbox.x0, bbox.y1)), maxDist);
+	maxDist = std::max(tdistance(center, TPointD(bbox.x1, bbox.y0)), maxDist);
+	maxDist = std::max(tdistance(center, TPointD(bbox.x1, bbox.y1)), maxDist);
 
 	double halfThick = m_Thickness * 0.5;
 	for (double d = 0; d <= maxDist; d += m_Dist)
@@ -4407,10 +4407,10 @@ void TCircleStripeFillStyle::drawRegion(TFlash &flash, const TRegion *r) const
 	center.y = center.y + m_YPos * 0.01 * 0.5 * ly;
 
 	double maxDist = 0.0;
-	maxDist = tmax(tdistance(center, TPointD(bbox.x0, bbox.y0)), maxDist);
-	maxDist = tmax(tdistance(center, TPointD(bbox.x0, bbox.y1)), maxDist);
-	maxDist = tmax(tdistance(center, TPointD(bbox.x1, bbox.y0)), maxDist);
-	maxDist = tmax(tdistance(center, TPointD(bbox.x1, bbox.y1)), maxDist);
+	maxDist = std::max(tdistance(center, TPointD(bbox.x0, bbox.y0)), maxDist);
+	maxDist = std::max(tdistance(center, TPointD(bbox.x0, bbox.y1)), maxDist);
+	maxDist = std::max(tdistance(center, TPointD(bbox.x1, bbox.y0)), maxDist);
+	maxDist = std::max(tdistance(center, TPointD(bbox.x1, bbox.y1)), maxDist);
 
 	int nbClip = 2;
 	double d = m_Dist;

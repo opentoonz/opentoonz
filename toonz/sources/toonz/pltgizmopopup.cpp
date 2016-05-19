@@ -118,7 +118,7 @@ public:
 	{
 		std::vector<TColorStyle *> styles;
 		getStyles(styles, m_selection, m_palette);
-		int n = tmin(styles.size(), colors.size());
+		int n = std::min(styles.size(), colors.size());
 		for (int i = 0; i < n; i++) {
 			QString gname = QString::fromStdWString(styles[i]->getGlobalName());
 			if (!gname.isEmpty() && gname[0] != L'-')

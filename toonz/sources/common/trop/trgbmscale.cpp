@@ -42,7 +42,7 @@ void do_greyScale_lut(TRasterPT<T> rout, TRasterPT<T> rin,
 	int chanValuesCount = T::maxChannelValue + 1;
 
 	int fac = chanValuesCount / 256;
-	out0 = tmax(fac * out0, 0), out1 = tmin(fac * out1, T::maxChannelValue);
+	out0 = std::max(fac * out0, 0), out1 = std::min(fac * out1, T::maxChannelValue);
 
 	//Build lut
 	Channel *lut = new Channel[chanValuesCount];
@@ -91,10 +91,10 @@ void do_rgbmScale_lut(TRasterPT<T> rout, TRasterPT<T> rin,
 	int m, max = T::maxChannelValue, chanValuesCount = max + 1;
 
 	int fac = chanValuesCount / 256;
-	int out0R = tmax(fac * out0[0], 0), out1R = tmin(fac * out1[0], T::maxChannelValue);
-	int out0G = tmax(fac * out0[1], 0), out1G = tmin(fac * out1[1], T::maxChannelValue);
-	int out0B = tmax(fac * out0[2], 0), out1B = tmin(fac * out1[2], T::maxChannelValue);
-	int out0M = tmax(fac * out0[3], 0), out1M = tmin(fac * out1[3], T::maxChannelValue);
+	int out0R = std::max(fac * out0[0], 0), out1R = std::min(fac * out1[0], T::maxChannelValue);
+	int out0G = std::max(fac * out0[1], 0), out1G = std::min(fac * out1[1], T::maxChannelValue);
+	int out0B = std::max(fac * out0[2], 0), out1B = std::min(fac * out1[2], T::maxChannelValue);
+	int out0M = std::max(fac * out0[3], 0), out1M = std::min(fac * out1[3], T::maxChannelValue);
 
 	//Build luts
 	Channel *lut_r = new Channel[chanValuesCount];
@@ -125,9 +125,9 @@ void do_rgbmScale_lut(TRasterPT<T> rout, TRasterPT<T> rin,
 			depremFac = lut_deprem[in->m];
 			premFac = lut_prem[m];
 
-			out->r = premFac * lut_r[tmin((int)(in->r * depremFac), max)];
-			out->g = premFac * lut_g[tmin((int)(in->g * depremFac), max)];
-			out->b = premFac * lut_b[tmin((int)(in->b * depremFac), max)];
+			out->r = premFac * lut_r[std::min((int)(in->r * depremFac), max)];
+			out->g = premFac * lut_g[std::min((int)(in->g * depremFac), max)];
+			out->b = premFac * lut_b[std::min((int)(in->b * depremFac), max)];
 			out->m = m;
 		}
 	}
@@ -152,10 +152,10 @@ void do_rgbmScale(TRasterPT<T> rout, TRasterPT<T> rin,
 
 	int fac = chanValuesCount / 256;
 
-	int out0R = tmax(fac * out0[0], 0), out1R = tmin(fac * out1[0], T::maxChannelValue);
-	int out0G = tmax(fac * out0[1], 0), out1G = tmin(fac * out1[1], T::maxChannelValue);
-	int out0B = tmax(fac * out0[2], 0), out1B = tmin(fac * out1[2], T::maxChannelValue);
-	int out0M = tmax(fac * out0[3], 0), out1M = tmin(fac * out1[3], T::maxChannelValue);
+	int out0R = std::max(fac * out0[0], 0), out1R = std::min(fac * out1[0], T::maxChannelValue);
+	int out0G = std::max(fac * out0[1], 0), out1G = std::min(fac * out1[1], T::maxChannelValue);
+	int out0B = std::max(fac * out0[2], 0), out1B = std::min(fac * out1[2], T::maxChannelValue);
+	int out0M = std::max(fac * out0[3], 0), out1M = std::min(fac * out1[3], T::maxChannelValue);
 
 	//Retrieve de/premultiplication luts
 	const double *lut_prem = premultiplyTable<Channel>();
@@ -205,14 +205,14 @@ void do_rgbmAdjust(TRasterPT<T> rout, TRasterPT<T> rin, ScaleFunc scaleFunc,
 	//Ensure that the output is cropped according to output params
 	int out0i[4], out1i[4];
 
-	out0i[0] = tmax(out0[0], tcrop((int)(a[0] + k[0] * out0[1]), 0, 255));
-	out1i[0] = tmin(out1[0], tcrop((int)(a[0] + k[0] * out1[1]), 0, 255));
+	out0i[0] = std::max(out0[0], tcrop((int)(a[0] + k[0] * out0[1]), 0, 255));
+	out1i[0] = std::min(out1[0], tcrop((int)(a[0] + k[0] * out1[1]), 0, 255));
 
-	out0i[1] = tmax(out0[0], tcrop((int)(a[0] + k[0] * out0[2]), 0, 255));
-	out1i[1] = tmin(out1[0], tcrop((int)(a[0] + k[0] * out1[2]), 0, 255));
+	out0i[1] = std::max(out0[0], tcrop((int)(a[0] + k[0] * out0[2]), 0, 255));
+	out1i[1] = std::min(out1[0], tcrop((int)(a[0] + k[0] * out1[2]), 0, 255));
 
-	out0i[2] = tmax(out0[0], tcrop((int)(a[0] + k[0] * out0[3]), 0, 255));
-	out1i[2] = tmin(out1[0], tcrop((int)(a[0] + k[0] * out1[3]), 0, 255));
+	out0i[2] = std::max(out0[0], tcrop((int)(a[0] + k[0] * out0[3]), 0, 255));
+	out1i[2] = std::min(out1[0], tcrop((int)(a[0] + k[0] * out1[3]), 0, 255));
 
 	out0i[3] = out0[4];
 	out1i[3] = out1[4];

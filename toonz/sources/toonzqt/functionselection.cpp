@@ -83,7 +83,7 @@ public:
 		: m_data(dynamic_cast<FunctionKeyframesData *>(data->clone())), m_frame(frame)
 	{
 		assert((int)params.size() <= data->getColumnCount());
-		int columnCount = tmin((int)(params.size()), data->getColumnCount());
+		int columnCount = std::min((int)(params.size()), data->getColumnCount());
 		m_columns.resize(columnCount);
 		for (int col = 0; col < columnCount; col++) {
 			TDoubleParam *param = params[col];

@@ -2044,8 +2044,8 @@ public:
 
 	void onRelease(int row, int col)
 	{
-		int r0 = tmin(row, m_startRow);
-		int r1 = tmax(row, m_startRow);
+		int r0 = std::min(row, m_startRow);
+		int r1 = std::max(row, m_startRow);
 		assert(m_soundColumn);
 		TApp *app = TApp::instance();
 		ToonzScene *scene = app->getCurrentScene()->getScene();

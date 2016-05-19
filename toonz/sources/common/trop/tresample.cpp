@@ -331,18 +331,18 @@ inline void minmax(double u0, double v0,
 	y_c = affMV2(aff, u1, v1);
 	x_d = affMV1(aff, u0, v1);
 	y_d = affMV2(aff, u0, v1);
-	xmin = tmin(x_a, x_b);
-	xmax = tmax(x_a, x_b);
-	xmin = tmin(xmin, x_c);
-	xmax = tmax(xmax, x_c);
-	xmin = tmin(xmin, x_d);
-	xmax = tmax(xmax, x_d);
-	ymin = tmin(y_a, y_b);
-	ymax = tmax(y_a, y_b);
-	ymin = tmin(ymin, y_c);
-	ymax = tmax(ymax, y_c);
-	ymin = tmin(ymin, y_d);
-	ymax = tmax(ymax, y_d);
+	xmin = std::min(x_a, x_b);
+	xmax = std::max(x_a, x_b);
+	xmin = std::min(xmin, x_c);
+	xmax = std::max(xmax, x_c);
+	xmin = std::min(xmin, x_d);
+	xmax = std::max(xmax, x_d);
+	ymin = std::min(y_a, y_b);
+	ymax = std::max(y_a, y_b);
+	ymin = std::min(ymin, y_c);
+	ymax = std::max(ymax, y_c);
+	ymin = std::min(ymin, y_d);
+	ymax = std::max(ymax, y_d);
 	x0 = xmin;
 	y0 = ymin;
 	x1 = xmax;
@@ -758,8 +758,8 @@ INT_GT (2*radx_) = width
 		uhi_ = ulo_ + du_dx;
 		ulo = intGE(ulo_);
 		uhi = intLT(uhi_);
-		nocalc[x].first = tmax(umin, ulo);
-		nocalc[x].last = tmin(umax, uhi);
+		nocalc[x].first = std::max(umin, ulo);
+		nocalc[x].last = std::min(umax, uhi);
 	}
 	xwidth = width;
 
@@ -2013,10 +2013,10 @@ static void rop_resample_gr8(const TRasterGR8P &rin, TRasterGR8P rout,
 				NOT_LESS_THAN(0, ylo);
 				NOT_MORE_THAN(my, yhi);
 #endif
-				xlo = tmax(0, (int)xlo_);
-				xhi = tmin(mx, (int)xhi_);
-				ylo = tmax(0, (int)ylo_);
-				yhi = tmin(my, (int)yhi_);
+				xlo = std::max(0, (int)xlo_);
+				xhi = std::min(mx, (int)xhi_);
+				ylo = std::max(0, (int)ylo_);
+				yhi = std::min(my, (int)yhi_);
 				for (y = ylo; y <= yhi; y++)
 					for (x = xlo; x <= xhi; x++)
 						bufout_gr8[x + y * wrapout] = flatval, count++;
@@ -2227,10 +2227,10 @@ static void rop_resample_rgbm32_gr8(const TRaster32P &rin, TRasterGR8P rout,
 				NOT_LESS_THAN(0, ylo);
 				NOT_MORE_THAN(my, yhi);
 #endif
-				xlo = tmax(0, (int)xlo_);
-				xhi = tmin(mx, (int)xhi_);
-				ylo = tmax(0, (int)ylo_);
-				yhi = tmin(my, (int)yhi_);
+				xlo = std::max(0, (int)xlo_);
+				xhi = std::min(mx, (int)xhi_);
+				ylo = std::max(0, (int)ylo_);
+				yhi = std::min(my, (int)yhi_);
 				for (y = ylo; y <= yhi; y++)
 					for (x = xlo; x <= xhi; x++)
 						bufout_gr8[x + y * wrapout] = flatval, count++;
@@ -2589,8 +2589,8 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 #endif
 
 	//Considering the bounding square in fg
-	min_pix_out_fg = tmin(min_pix_out_f, min_pix_out_g);
-	max_pix_out_fg = tmax(max_pix_out_f, max_pix_out_g);
+	min_pix_out_fg = std::min(min_pix_out_f, min_pix_out_g);
+	max_pix_out_fg = std::max(max_pix_out_f, max_pix_out_g);
 	if (min_pix_out_fg < min_filter_fg || max_pix_out_fg > max_filter_fg) {
 		//Reallocate the filter... and so on...
 		filter_size = max_pix_out_fg - min_pix_out_fg + 1;
@@ -3382,7 +3382,7 @@ void resample_main_cm32_rgbm_SSE2(TRasterPT<T> rout, const TRasterCM32P &rin,
 	outside_max_v_ = lv - 0.5;
 
 	int count = palette->getStyleCount();
-	int count2 = tmax(count, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
+	int count2 = std::max({count, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint()});
 
 	TPixelFloat *paints = (TPixelFloat *)_aligned_malloc(count2 * sizeof(TPixelFloat), 16);
 	TPixelFloat *inks = (TPixelFloat *)_aligned_malloc(count2 * sizeof(TPixelFloat), 16);
@@ -3667,7 +3667,7 @@ void resample_main_cm32_rgbm_bigradius(TRasterPT<T> rout, const TRasterCM32P &ri
 	outside_max_v_ = lv - 0.5;
 
 	int colorCount = palette->getStyleCount();
-	colorCount = tmax(colorCount, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
+	colorCount = std::max({colorCount, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint()});
 
 	std::vector<TPixel32> paints(colorCount);
 	std::vector<TPixel32> inks(colorCount);
@@ -3962,7 +3962,7 @@ void resample_main_cm32_rgbm(TRasterPT<T> rout, const TRasterCM32P &rin,
 	outside_max_v_ = lv - 0.5;
 
 	int colorCount = palette->getStyleCount();
-	colorCount = tmax(colorCount, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
+	colorCount = std::max({colorCount, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint()});
 
 	std::vector<TPixel32> paints(colorCount);
 	std::vector<TPixel32> inks(colorCount);
@@ -4236,7 +4236,7 @@ void resample_cm32_rgbm(TRaster32P rout, const TRasterCM32P &rin,
 	}
 
 	int colorCount = palette->getStyleCount();
-	colorCount = tmax(colorCount, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
+	colorCount = std::max({colorCount, TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint()});
 
 	std::vector<TPixel32> paints(colorCount);
 	std::vector<TPixel32> inks(colorCount);
@@ -4678,8 +4678,8 @@ void rop_resample_rgbm_2(TRasterPT<T> rout, const TRasterCM32P &rin,
 	}
 #endif
 
-	min_pix_out_fg = tmin(min_pix_out_f, min_pix_out_g);
-	max_pix_out_fg = tmax(max_pix_out_f, max_pix_out_g);
+	min_pix_out_fg = std::min(min_pix_out_f, min_pix_out_g);
+	max_pix_out_fg = std::max(max_pix_out_f, max_pix_out_g);
 	if (min_pix_out_fg < min_filter_fg || max_pix_out_fg > max_filter_fg) {
 		filter_size = max_pix_out_fg - min_pix_out_fg + 1;
 		if (filter_size > filter_array_size) {

@@ -129,10 +129,10 @@ TRectD TTextureMesh::getBBox() const
 	for (v = 0; v != vCount; ++v) {
 		const TTextureVertex &vx = m_vertices[v];
 
-		result.x0 = tmin(result.x0, vx.P().x);
-		result.y0 = tmin(result.y0, vx.P().y);
-		result.x1 = tmax(result.x1, vx.P().x);
-		result.y1 = tmax(result.y1, vx.P().y);
+		result.x0 = std::min(result.x0, vx.P().x);
+		result.y0 = std::min(result.y0, vx.P().y);
+		result.x1 = std::max(result.x1, vx.P().x);
+		result.y1 = std::max(result.y1, vx.P().y);
 	}
 
 	return result;
@@ -279,7 +279,7 @@ void TTextureMesh::loadData(TIStream &is)
 			is.closeChild();
 		} else if (str == "rigidities") {
 			is >> size;
-			size = tmin(size, this->verticesCount());
+			size = std::min(size, this->verticesCount());
 
 			for (i = 0; i < size; ++i)
 				is >> m_vertices[i].P().rigidity;

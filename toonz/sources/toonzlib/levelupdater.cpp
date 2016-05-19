@@ -266,7 +266,7 @@ void LevelUpdater::open(TXshSimpleLevel *sl)
 	assert(levelProperties);
 
 	if (levelProperties->hasAlpha() || !existsLevel) {
-		int bpp = levelProperties->hasAlpha() ? tmin(32, levelProperties->getBpp()) : levelProperties->getBpp();
+		int bpp = levelProperties->hasAlpha() ? std::min(32, levelProperties->getBpp()) : levelProperties->getBpp();
 		enforceBpp(m_pg, bpp, existsLevel);
 	}
 
