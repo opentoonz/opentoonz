@@ -10,7 +10,10 @@
 //-----------------------------------------------------------------------------
 
 Viewer::Viewer(QWidget *parent)
-	: QGLWidget(parent), m_raster(0), m_processor(0), update_frame(true)
+	: QOpenGLWidget(parent)
+	, m_raster(0)
+	, m_processor(0)
+	, update_frame(true)
 {
 }
 
@@ -24,6 +27,7 @@ Viewer::~Viewer()
 
 void Viewer::initializeGL()
 {
+	initializeOpenGLFunctions();
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 }
 

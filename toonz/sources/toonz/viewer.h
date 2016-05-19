@@ -3,13 +3,15 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
-#include <QGLWidget>
 #include "traster.h"
+
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions_3_0>
 
 class Processor;
 
 //! OpenGL Widget that display the movie
-class Viewer : public QGLWidget
+class Viewer : public QOpenGLWidget, private QOpenGLFunctions_3_0
 {
 	//! Raster that store the current Frame of the Movie.
 	TRaster32P m_raster;
@@ -23,7 +25,7 @@ public:
 	bool update_frame;
 
 	//! Construct a QGLWidget object which is a child of parent.
-	Viewer(QWidget *parent = 0);
+	Viewer(QWidget *parent);
 	//! Destroys the widget
 	~Viewer();
 
@@ -38,9 +40,9 @@ public:
 	void setMessage(std::string msg);
 
 protected:
-	void initializeGL();
-	void paintGL();
-	void resizeGL(int width, int height);
+	void initializeGL() override;
+	void paintGL() override;
+	void resizeGL(int width, int height) override;
 };
 
 #endif // VIEWER_H
