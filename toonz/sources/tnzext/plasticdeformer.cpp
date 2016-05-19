@@ -36,14 +36,14 @@
   which can be solved using the Lagrange Multipliers theorem:
 
   <P> \f$
-  
+
   \Rightarrow \left{ \begin{array}{c}
     H v + f = A^t \lambda
     A v + d = 0
   \end{array} \right.
 
   \Rightarrow \left( \begin{array}{c} H \\ A \end{array} \begin{array}{c} -A^t \\ 0 \end{array} \right)
-              \left( \begin{array}{c} v \\ \lambda \end{array} \right) = 
+              \left( \begin{array}{c} v \\ \lambda \end{array} \right) =
               \left( \begin{array}{c} -f \\ -d \end{array} \right)
 
   \f$ </P>
@@ -70,54 +70,21 @@ struct LinearConstraint {
 
 //-------------------------------------------------------------------------------------------
 
-// Forced to implement a sloppy substitute to C++11's std::unique_ptr -- since we're still compiling
-// C++03 on MAC... ARGH !
-template <typename T, typename D>
-class UniquePtr
-{
-	T *m_t;
-
-public:
-	UniquePtr() : m_t() {}
-	UniquePtr(T *t) : m_t(t) {}
-	~UniquePtr() { D::destroy(m_t); }
-
-	void reset(T *t = 0)
-	{
-		D::destroy(m_t);
-		m_t = t;
-	}
-
-	const T *get() const { return m_t; }
-	T *get() { return m_t; }
-
-	const T *operator->() const { return m_t; }
-	T *operator->() { return m_t; }
-
-	const T &operator*() const { return *m_t; }
-	T &operator*() { return *m_t; }
-
-	const T &operator[](size_t i) const { return m_t[i]; }
-	T &operator[](size_t i) { return m_t[i]; }
-};
-
-//-------------------------------------------------------------------------------------------
-
 struct SuperFactors_free {
-	static inline void destroy(tlin::SuperFactors *f) { tlin::freeF(f); }
+  void operator()(tlin::SuperFactors *f) { tlin::freeF(f); }
 };
 struct freer {
-	static inline void destroy(void *d) { free(d); }
+  void operator()(void *d) { free(d); }
 };
 struct deleter {
-	static inline void destroy(void *d) { delete d; }
+  void operator()(void *d) { delete d; }
 };
 
 //-------------------------------------------------------------------------------------------
 
-typedef UniquePtr<tlin::SuperFactors, SuperFactors_free> SuperFactorsPtr;
-typedef UniquePtr<double, freer> DoublePtr;
-typedef UniquePtr<TPointD, deleter> TPointDPtr;
+typedef std::unique_ptr<tlin::SuperFactors, SuperFactors_free> SuperFactorsPtr;
+typedef std::unique_ptr<double[], freer> DoublePtr;
+typedef std::unique_ptr<TPointD[], deleter> TPointDPtr;
 
 } // namespace
 
