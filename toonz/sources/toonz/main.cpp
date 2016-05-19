@@ -258,6 +258,9 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	QGuiApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+	QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
 	QApplication a(argc, argv);
 
 #ifdef Q_OS_WIN
