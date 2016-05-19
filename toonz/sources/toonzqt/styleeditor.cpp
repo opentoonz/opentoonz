@@ -587,49 +587,29 @@ QPixmap makeSquareShading(
 //*****************************************************************************
 
 HexagonalColorWheel::HexagonalColorWheel(QWidget *parent)
-	: QGLWidget(parent), m_bgColor(128, 128, 128) //defaul value in case this value does not set in the style sheet
-												  //, m_ghibli3DLutUtil(0)//iwsw commented out temporarily
+	: QOpenGLWidget(parent)
+	, m_bgColor(128, 128, 128) //defaul value in case this value does not set in the style sheet
 {
 	setObjectName("HexagonalColorWheel");
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	setFocusPolicy(Qt::NoFocus);
 	m_currentWheel = none;
-
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && Ghibli3DLutUtil::m_isValid)
-	{
-	m_ghibli3DLutUtil = new Ghibli3DLutUtil();
-	m_ghibli3DLutUtil->setInvert();
-	}
-	*/
 }
 
 //-----------------------------------------------------------------------------
 
 HexagonalColorWheel::~HexagonalColorWheel()
 {
-	//iwsw commented out temporarily
-	/*
-	if(m_ghibli3DLutUtil)
-	{
-	m_ghibli3DLutUtil->onEnd();
-	delete m_ghibli3DLutUtil;
-	}
-	*/
 }
 
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::initializeGL()
 {
-	qglClearColor(getBGColor());
+	initializeOpenGLFunctions();
 
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
-	m_ghibli3DLutUtil->onInit();
-	*/
+	QColor color = getBGColor();
+	glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
 
 //-----------------------------------------------------------------------------
@@ -679,28 +659,16 @@ void HexagonalColorWheel::resizeGL(int width, int height)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0.0, (GLdouble)width, (GLdouble)height, 0.0, 1.0, -1.0);
-
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
-	m_ghibli3DLutUtil->onResize(width,height);
-	*/
 }
 
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::paintGL()
 {
-	//call ClearColor() here in order to update bg color when the stylesheet is switched
-	qglClearColor(getBGColor());
+	QColor color = getBGColor();
+	glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 
 	glMatrixMode(GL_MODELVIEW);
-
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
-	m_ghibli3DLutUtil->startDraw();
-	*/
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -746,12 +714,6 @@ void HexagonalColorWheel::paintGL()
 	drawCurrentColorMark();
 
 	glPopMatrix();
-
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
-	m_ghibli3DLutUtil->endDraw();
-	*/
 }
 
 //-----------------------------------------------------------------------------

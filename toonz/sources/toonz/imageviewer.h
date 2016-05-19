@@ -6,7 +6,7 @@
 #include "toonz/imagepainter.h"
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_0>
 
 //-----------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ class HistogramPopup;
 //    ImageViewer
 //--------------------
 
-class ImageViewer : public QOpenGLWidget, private QOpenGLFunctions
+class ImageViewer : public QOpenGLWidget, private QOpenGLFunctions_3_0
 {
 	Q_OBJECT
 	enum DragType { eNone,
