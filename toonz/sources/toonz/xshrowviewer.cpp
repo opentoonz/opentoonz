@@ -329,11 +329,7 @@ void RowArea::drawOnionSkinSelection(QPainter &p)
 		else
 			p.setBrush(Qt::NoBrush);
 		p.drawEllipse(0, y, onionDotDiam, onionDotDiam);
-<<<<<<< HEAD
-		}
-=======
 	}
->>>>>>> upstream/master
 
 	//-- draw highlighted onion
 	if (m_showOnionToSet != None)
