@@ -141,7 +141,7 @@ public:
 	TRasterP raster() const { return m_ras; }
 	TRasterP &raster() { return m_ras; }
 
-	void paintGL()
+	void paintGL() override
 	{
 		pushGLWorldCoordinates();
 		drawBackground();

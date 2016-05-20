@@ -38,7 +38,6 @@
 #include <QCoreApplication>
 
 #include <QPainter>
-#include <QGLWidget>
 
 using namespace ToolUtils;
 

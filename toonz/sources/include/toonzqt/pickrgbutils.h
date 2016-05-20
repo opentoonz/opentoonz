@@ -23,7 +23,7 @@
 //  Forward declarations
 
 class QWidget;
-class QGLWidget;
+class QOpenGLWidget;
 
 //-------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ class QGLWidget;
     widget bounds.
 
 \warning Use this function only on plain widgets - in case your widget inherits
-         QGLWidget, invoke the overloaded function accepting a QGLWidget* type
+         QOpenGLWidget, invoke the overloaded function accepting a QOpenGLWidget* type
          instead.
 */
 QRgb DVAPI pickRGB(QWidget *widget, const QRect &rect);
@@ -42,14 +42,14 @@ inline QRgb pickRGB(QWidget *widget, const QPoint &pos)
 	return pickRGB(widget, QRect(pos.x(), pos.y(), 1, 1));
 }
 
-//! Returns the average color displayed in a QGLWidget instance across the specified rect.
+//! Returns the average color displayed in a QOpenGLWidget instance across the specified rect.
 /*! This function reads the widget's front frame buffer on given rect, and returns
     a mean of its pixels.
     
 \warning Pixel colors are undefined outside the widget's geometry.
 */
-QRgb DVAPI pickRGB(QGLWidget *widget, const QRect &rect);
-inline QRgb pickRGB(QGLWidget *widget, const QPoint &pos)
+QRgb DVAPI pickRGB(QOpenGLWidget *widget, const QRect &rect);
+inline QRgb pickRGB(QOpenGLWidget *widget, const QPoint &pos)
 {
 	return pickRGB(widget, QRect(pos.x(), pos.y(), 1, 1));
 }

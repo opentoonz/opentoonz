@@ -15,7 +15,7 @@
 #ifdef USE_QPAINTER
 #include <QWidget>
 #else
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #endif
 
 //-----------------------------------------------------------------------------
@@ -25,7 +25,7 @@
 #ifdef USE_QPAINTER
 class LineTestViewer : public QWidget
 #else
-class LineTestViewer : public QGLWidget
+class LineTestViewer : public QOpenGLWidget
 #endif
 {
 	Q_OBJECT

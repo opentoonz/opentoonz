@@ -245,7 +245,7 @@ public:
 	TVectorImageP image() const { return m_vi; }
 	TVectorImageP &image() { return m_vi; }
 
-	void paintGL()
+	void paintGL() override
 	{
 		drawBackground();
 

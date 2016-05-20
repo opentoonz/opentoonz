@@ -5,7 +5,7 @@
 //Qt includes
 #include <QPixmap>
 #include <QImage>
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #include <QDesktopWidget>
 #include <QApplication>
 
@@ -91,7 +91,7 @@ QRgb pickScreenRGB(const QRect &rect)
 
 //------------------------------------------------------------------------------
 
-QRgb pickRGB(QGLWidget *widget, const QRect &rect)
+QRgb pickRGB(QOpenGLWidget *widget, const QRect &rect)
 {
 	widget->makeCurrent();
 

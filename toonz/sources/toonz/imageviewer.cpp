@@ -189,7 +189,7 @@ public:
 /*! \class ImageViewer
 		\brief The ImageViewer class provides to view an image.
 
-		Inherits \b QGLWidget.
+		Inherits \b QOpenGLWidget.
 
 		The object allows also to manage pan and zoom event. It's possible to set a
 		color mask TRop::ColorMask to image view.
