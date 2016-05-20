@@ -1040,22 +1040,27 @@ namespace {
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER) {
 		}
-		return 0; // error
+		return ICERR_INTERNAL;
 #else
 		return ICInfo(fccType, fccHandler, lpicinfo);
 #endif
 	}
 
 	LRESULT safe_ICClose(HIC hic) {
+#ifdef _MSC_VER
 		__try {
 			if (hic) {
 				return ICClose(hic);
 			}
-			return 0;
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER) {
 		}
-		return 0;
+#else
+		if (hic) {
+			return ICClose(hic);
+		}
+#endif
+		return ICERR_OK;
 	}
 
 	using hic_t = std::unique_ptr<std::remove_pointer_t<HIC>, decltype(&safe_ICClose)>;
@@ -1087,22 +1092,22 @@ namespace {
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER) {
 		}
-		return 0; // error
+		return 0; // return copied size in bytes (0 means an error)
 #else
 		return ICGetInfo(hic.get(), picinfo, cb);
 #endif
 	}
 
-	LRESULT safe_ICCompressQuery(hic_t const& hic, BITMAPINFO* lpbiInput) {
+	LRESULT safe_ICCompressQuery(hic_t const& hic, BITMAPINFO* lpbiInput, BITMAPINFO* lpbiOutput) {
 #ifdef _MSC_VER
 		__try {
-			return ICCompressQuery(hic.get(), lpbiInput, NULL);
+			return ICCompressQuery(hic.get(), lpbiInput, lpbiOutput);
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER) {
 		}
 		return ICERR_INTERNAL;
 #else
-		return ICCompressQuery(hic.get(), lpbiInput, NULL);
+		return ICCompressQuery(hic.get(), lpbiInput, lpbiOutput);
 #endif
 	}
 }
@@ -1128,19 +1133,18 @@ Tiio::AviWriterProperties::AviWriterProperties()
 			inFmt.bmiHeader.biBitCount = bpp;
 			for (int i = 0;; i++) {
 				memset(&icinfo, 0, sizeof icinfo);
-				int const rc = safe_ICInfo(fccType, i, &icinfo);
-				if (!rc) {
+				if (safe_ICInfo(fccType, i, &icinfo) != ICERR_OK) {
 					break;
 				}
 
 				auto const hic = safe_ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_QUERY);
 				if (!hic) {
-					continue;
+					break;
 				}
 
 				// Find out the compressor name
 				if (safe_ICGetInfo(hic, &icinfo, sizeof(ICINFO)) == 0) {
-					continue;
+					break;
 				}
 
 				WideChar2Char(icinfo.szDescription, descr, sizeof(descr));
@@ -1157,7 +1161,7 @@ Tiio::AviWriterProperties::AviWriterProperties()
 					continue;
 				}
 
-				if (safe_ICCompressQuery(hic, &inFmt) != ICERR_OK) {
+				if (safe_ICCompressQuery(hic, &inFmt, nullptr) != ICERR_OK) {
 					continue; // Skip this compressor if it can't handle the format.
 				}
 
