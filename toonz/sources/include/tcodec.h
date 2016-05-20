@@ -139,7 +139,7 @@ public:
 	~TRasterCodecLZO();
 
 	TRasterP compress(const TRasterP &inRas, int allocUnit, TINT32 &outDataSize);
-	bool decompress(const UCHAR *inData, TINT32 inDataSize, TRasterP &outRas, bool safeMode);
+	void decompress(const UCHAR *inData, TINT32 inDataSize, TRasterP &outRas);
 	void decompress(const TRasterP &compressedRas, TRasterP &outRas);
 
 	void reset()

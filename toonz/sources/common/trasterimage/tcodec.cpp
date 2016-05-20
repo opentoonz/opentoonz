@@ -718,7 +718,7 @@ TRasterP TRasterCodecLZO::compress(const TRasterP &inRas, int allocUnit, TINT32 
 
 //------------------------------------------------------------------------------
 
-bool TRasterCodecLZO::decompress(const UCHAR *inData, TINT32 inDataSize, TRasterP &outRas, bool safeMode)
+void TRasterCodecLZO::decompress(const UCHAR *inData, TINT32 inDataSize, TRasterP &outRas)
 {
 	int headerSize = sizeof(Header);
 
@@ -745,25 +745,8 @@ bool TRasterCodecLZO::decompress(const UCHAR *inData, TINT32 inDataSize, TRaster
 
 	outRas->lock();
 	memcpy(outRas->getRawData(), decompressedBuffer.data(), decompressedBuffer.size());
-	bool rc = true;
-
 	outRas->unlock();
-
-	/*
-  if (rc != true)                                     // Check success code here
-    {
-    if (safeMode)
-      return false;
-    else
-      {
-      throw TException("decompress... something goes bad");   
-      return false;
-      }
-    }
-	*/
-
 	assert(outSize == (size_t)outDataSize);
-	return true;
 }
 
 //------------------------------------------------------------------------------

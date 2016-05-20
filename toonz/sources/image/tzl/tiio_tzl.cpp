@@ -1658,8 +1658,7 @@ TImageP TImageReaderTzl::load10()
 
 	TRasterCodecLZO codec("LZO", false);
 	TRasterP ras;
-	if (!codec.decompress(imgBuff, actualBuffSize, ras, m_safeMode))
-		return TImageP();
+	codec.decompress(imgBuff, actualBuffSize, ras);
 	assert((TRasterCM32P)ras);
 	assert(ras->getLx() == header->m_lx);
 	assert(ras->getLy() == header->m_ly);
@@ -1781,8 +1780,7 @@ TImageP TImageReaderTzl::load11()
 
 	TRasterCodecLZO codec("LZO", false);
 	TRasterP ras;
-	if (!codec.decompress(imgBuff, actualBuffSize, ras, m_safeMode))
-		return TImageP();
+	codec.decompress(imgBuff, actualBuffSize, ras);
 	assert((TRasterCM32P)ras);
 	assert(ras->getLx() == header->m_lx);
 	assert(ras->getLy() == header->m_ly);
@@ -1897,8 +1895,7 @@ TImageP TImageReaderTzl::load13()
 #endif
 		TRasterCodecLZO codec("LZO", false);
 		TRasterP ras;
-		if (!codec.decompress(imgBuff, actualBuffSize, ras, m_safeMode))
-			return TImageP();
+		codec.decompress(imgBuff, actualBuffSize, ras);
 		assert((TRasterCM32P)ras);
 		delete[] imgBuff;
 
@@ -1978,8 +1975,7 @@ TImageP TImageReaderTzl::load13()
 
 	TRasterCodecLZO codec("LZO", false);
 	TRasterP ras;
-	if (!codec.decompress(imgBuff, actualBuffSize, ras, m_safeMode))
-		return TImageP();
+	codec.decompress(imgBuff, actualBuffSize, ras);
 	assert((TRasterCM32P)ras);
 	assert(ras->getLx() == header->m_lx);
 	assert(ras->getLy() == header->m_ly);
@@ -2135,8 +2131,7 @@ TImageP TImageReaderTzl::load14()
 
 		TRasterCodecLZO codec("LZO", false);
 		TRasterP ras;
-		if (!codec.decompress(imgBuff, actualBuffSize, ras, m_safeMode))
-			return TImageP();
+		codec.decompress(imgBuff, actualBuffSize, ras);
 		assert((TRasterCM32P)ras);
 		raux->unlock();
 		raux = TRasterCM32P();
@@ -2209,32 +2204,23 @@ TImageP TImageReaderTzl::load14()
 		ti->setPalette(m_lrp->m_level->getPalette());
 		return ti;
 	}
-	if (actualBuffSize <= 0 || actualBuffSize > (int)(m_lx * m_ly * sizeof(TPixelCM32)))
-		throw TException("Loading tlv: buffer size error");
 
 	TRasterCM32P raux = TRasterCM32P(m_lx, m_ly);
 
-	//imgBuffSize = m_lx*m_ly*sizeof(TPixelCM32);
-
+	// load lzo-compressed image and decompress it
 	raux->lock();
-	imgBuff = (UCHAR *)raux->getRawData(); //new UCHAR[imgBuffSize];
-										   //int ret =
-
+	imgBuff = new UCHAR[actualBuffSize];
 	fread(imgBuff, actualBuffSize, 1, chan);
-	//assert(ret==1);
+	TRasterCodecLZO codec("LZO", false);
+	TRasterP ras;
+	codec.decompress(imgBuff, actualBuffSize, ras);
 
 	Header *header = (Header *)imgBuff;
-
 #if !TNZ_LITTLE_ENDIAN
 	header->m_lx = swapTINT32(header->m_lx);
 	header->m_ly = swapTINT32(header->m_ly);
 	header->m_rasType = (Header::RasType)swapTINT32(header->m_rasType);
 #endif
-
-	TRasterCodecLZO codec("LZO", false);
-	TRasterP ras;
-	if (!codec.decompress(imgBuff, actualBuffSize, ras, m_safeMode))
-		return TImageP();
 	assert((TRasterCM32P)ras);
 	assert(ras->getLx() == header->m_lx);
 	assert(ras->getLy() == header->m_ly);
@@ -2244,7 +2230,6 @@ TImageP TImageReaderTzl::load14()
 		throw TException("Loading tlv: ly dimension error.");
 	raux->unlock();
 	raux = TRasterCM32P();
-
 #if !TNZ_LITTLE_ENDIAN
 
 	for (int y = 0; y < ras->getLy(); ++y) {
