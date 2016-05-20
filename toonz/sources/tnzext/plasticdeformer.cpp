@@ -542,8 +542,6 @@ void PlasticDeformer::Imp::compileStep1(const std::vector<PlasticHandle> &handle
 		m_invC.reset(invC);
 
 		// Reallocate arrays
-		//		m_q.reset((double *)malloc(cSize * sizeof(double)));
-		//m_out.reset((double *)malloc(cSize * sizeof(double)));
 		m_q.reset(new double[cSize]);
 		m_out.reset(new double[cSize]);
 
