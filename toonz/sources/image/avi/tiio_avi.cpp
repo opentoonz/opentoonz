@@ -1040,7 +1040,7 @@ namespace {
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER) {
 		}
-		return ICERR_INTERNAL;
+		return FALSE;
 #else
 		return ICInfo(fccType, fccHandler, lpicinfo);
 #endif
@@ -1133,7 +1133,7 @@ Tiio::AviWriterProperties::AviWriterProperties()
 			inFmt.bmiHeader.biBitCount = bpp;
 			for (int i = 0;; i++) {
 				memset(&icinfo, 0, sizeof icinfo);
-				if (safe_ICInfo(fccType, i, &icinfo) != ICERR_OK) {
+				if (!safe_ICInfo(fccType, i, &icinfo)) {
 					break;
 				}
 
