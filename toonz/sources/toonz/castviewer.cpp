@@ -828,8 +828,8 @@ void CastBrowser::expose()
 	std::set<int> selectedIndices = m_itemViewer->getPanel()->getSelectedIndices();
 	std::set<int>::iterator it = selectedIndices.begin();
 	TUndoManager::manager()->beginBlock();
-	for (it; it != selectedIndices.end(); it++) {
-		CastItem *item = m_castItems->getItem(*it);
+	for (int index : selectedIndices) {
+		CastItem *item = m_castItems->getItem(index);
 		TXshSimpleLevel *sl = item->getSimpleLevel();
 		TXshPaletteLevel *pl = item->getPaletteLevel();
 		TXshSoundLevel *soundl = item->getSoundLevel();

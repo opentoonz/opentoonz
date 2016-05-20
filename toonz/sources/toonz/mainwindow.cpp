@@ -1099,11 +1099,11 @@ void MainWindow::resetRoomsLayout()
 		try {
 			TFilePathSet fpset;
 			TSystem::readDirectory(fpset, layoutDir, true, false);
-			TFilePathSet::iterator it = fpset.begin();
-			for (it; it != fpset.end(); it++) {
-				QString fn = toQString((*it).withoutParentDir());
-				if (fn.startsWith("room") || fn.startsWith("popups"))
-					TSystem::deleteFile(*it);
+			for (auto const& path : fpset) {
+				QString fn = toQString(path.withoutParentDir());
+				if (fn.startsWith("room") || fn.startsWith("popups")) {
+					TSystem::deleteFile(path);
+				}
 			}
 		} catch (...) {
 		}

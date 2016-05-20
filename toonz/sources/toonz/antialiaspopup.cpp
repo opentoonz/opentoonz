@@ -388,10 +388,9 @@ void AntialiasPopup::apply()
 		TXshSimpleLevel *simpleLevel = TApp::instance()->getCurrentLevel()->getSimpleLevel();
 		if (simpleLevel) {
 			std::set<TFrameId> fids = filmstripSelection->getSelectedFids();
-			std::set<TFrameId>::iterator it = fids.begin();
 			bool oneImageChanged = false;
-			for (it; it != fids.end(); it++) {
-				TImageP image = simpleLevel->getFrame(*it, true);
+			for (auto const fid : fids) {
+				TImageP image = simpleLevel->getFrame(fid, true);
 				if (!image)
 					continue;
 				TRasterP ras = image->raster();
@@ -399,9 +398,9 @@ void AntialiasPopup::apply()
 					continue;
 				oneImageChanged = true;
 				onChange(ras, threshold, softness);
-				simpleLevel->touchFrame(*it);
+				simpleLevel->touchFrame(fid);
 				simpleLevel->setDirtyFlag(true);
-				IconGenerator::instance()->invalidate(simpleLevel, *it);
+				IconGenerator::instance()->invalidate(simpleLevel, fid);
 			}
 			if (oneImageChanged) {
 				close();

@@ -1057,9 +1057,8 @@ QGraphicsItem *FxSchematicScene::getCurrentNode()
 {
 	QList<QGraphicsItem *> allItems = items();
 
-	QList<QGraphicsItem *>::iterator it = allItems.begin();
-	for (it; it != allItems.end(); it++) {
-		FxSchematicNode *node = dynamic_cast<FxSchematicNode *>(*it);
+	for (auto const item : allItems) {
+		FxSchematicNode *node = dynamic_cast<FxSchematicNode *>(item);
 		if (node && node->getFx() == m_fxHandle->getFx())
 			return node;
 	}

@@ -731,9 +731,8 @@ void AdjustLevelsPopup::apply()
 			std::set<TFrameId> fids = filmstripSelection->getSelectedFids();
 			bool oneImageChanged = false;
 
-			std::set<TFrameId>::iterator it = fids.begin();
-			for (it; it != fids.end(); it++) {
-				TRasterImageP rasImage = (TRasterImageP)simpleLevel->getFrame(*it, true);
+			for (auto const& fid : fids) {
+				TRasterImageP rasImage = (TRasterImageP)simpleLevel->getFrame(fid, true);
 				if (!rasImage)
 					continue;
 
@@ -744,10 +743,10 @@ void AdjustLevelsPopup::apply()
 				oneImageChanged = true;
 				TRop::rgbmAdjust(ras, ras, in0, in1, out0, out1);
 
-				simpleLevel->touchFrame(*it);
+				simpleLevel->touchFrame(fid);
 				simpleLevel->setDirtyFlag(true);
 
-				IconGenerator::instance()->invalidate(simpleLevel, *it);
+				IconGenerator::instance()->invalidate(simpleLevel, fid);
 			}
 
 			if (oneImageChanged) {

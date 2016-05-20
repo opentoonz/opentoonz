@@ -277,9 +277,7 @@ public:
 		: m_sl(sl), m_selectedFids(selectedFids), m_isCleanedUp(isCleanedUp)
 	{
 		static int revertToCommandCount = 0;
-		std::set<TFrameId>::const_iterator it = m_selectedFids.begin();
-		for (it; it != m_selectedFids.end(); it++) {
-			TFrameId fid = *it;
+		for (auto const& fid : m_selectedFids) {
 			if (!sl->isFid(fid))
 				continue;
 			TImageP image = sl->getFrame(fid, false);
@@ -302,9 +300,7 @@ public:
 	{
 		assert((int)m_replacedImgsId.size() == (int)m_selectedFids.size());
 		int i = 0;
-		std::set<TFrameId>::const_iterator it = m_selectedFids.begin();
-		for (it; it != m_selectedFids.end(); it++, i++) {
-			TFrameId fid = *it;
+		for (auto const& fid : m_selectedFids) {
 			QString imageId = m_replacedImgsId[i];
 			TImageP img = TImageCache::instance()->get(imageId, false)->cloneImage();
 			if (!img.getPointer())
@@ -403,8 +399,7 @@ void revertTo(bool isCleanedUp)
 		TUndoManager::manager()->beginBlock();
 		std::set<TXshSimpleLevel *>::iterator it = levels.begin();
 		/*-- Revert対象の各レベルについて --*/
-		for (it; it != levels.end(); it++) {
-			TXshSimpleLevel *sl = *it;
+		for (auto const sl : levels) {
 			std::set<TFrameId> selectedFids;
 			/*- 選択範囲のFrameIdを取得する -*/
 			getLevelSelectedFids(selectedFids, *it, r0, c0, r1, c1);

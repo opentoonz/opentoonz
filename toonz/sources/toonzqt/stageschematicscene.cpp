@@ -649,9 +649,8 @@ QGraphicsItem *StageSchematicScene::getCurrentNode()
 {
 	QList<QGraphicsItem *> allItems = items();
 
-	QList<QGraphicsItem *>::iterator it = allItems.begin();
-	for (it; it != allItems.end(); it++) {
-		StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(*it);
+	for (auto const item : allItems) {
+		StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(item);
 		if (node && node->getStageObject()->getId() == m_objHandle->getObjectId())
 			return node;
 	}
