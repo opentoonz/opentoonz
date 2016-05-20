@@ -582,12 +582,10 @@ void CastBrowser::sortByDataModel(DataType dataType, bool isDiscendent)
 	if (isDiscendentOrder() != isDiscendent) {
 		setIsDiscendentOrder(isDiscendent);
 		std::vector<CastItem *> items;
-		int i = 0;
-		for (i; i < m_castItems->getItemCount(); i++)
+		for (int i = 0; i < m_castItems->getItemCount(); i++)
 			items.push_back(m_castItems->getItem(i)->clone());
 		m_castItems->clear();
-		i = items.size() - 1;
-		for (i; i >= 0; i--)
+		for (int i = items.size() - 1; i >= 0; i--)
 			m_castItems->addItem(items[i]);
 	}
 

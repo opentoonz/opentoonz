@@ -1187,8 +1187,7 @@ void StageSchematicScene::mousePressEvent(QGraphicsSceneMouseEvent *me)
 SchematicNode *StageSchematicScene::getNodeFromPosition(const QPointF &pos)
 {
 	QList<QGraphicsItem *> pickedItems = items(pos);
-	int i = 0;
-	for (i; i < pickedItems.size(); i++) {
+	for (int i = 0; i < pickedItems.size(); i++) {
 		SchematicNode *node = dynamic_cast<SchematicNode *>(pickedItems.at(i));
 		if (node)
 			return node;
