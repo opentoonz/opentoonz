@@ -72,7 +72,7 @@ void KeyframeMover::getKeyframes()
 		int c = pos.second;
 		TStageObjectId objId = c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
 		TStageObject *stObj = xsh->getStageObject(objId);
-		assert(stObj->isKeyframe(it->first));
+		assert(stObj->isKeyframe(pos.first));
 		TStageObject::KeyframeMap keyframes;
 		stObj->getKeyframes(keyframes);
 		for (auto const& frame : keyframes) {
