@@ -73,18 +73,12 @@ struct LinearConstraint {
 struct SuperFactors_free {
   void operator()(tlin::SuperFactors *f) { tlin::freeF(f); }
 };
-struct freer {
-  void operator()(void *d) { free(d); }
-};
-struct deleter {
-  void operator()(void *d) { delete d; }
-};
 
 //-------------------------------------------------------------------------------------------
 
-typedef std::unique_ptr<tlin::SuperFactors, SuperFactors_free> SuperFactorsPtr;
-typedef std::unique_ptr<double[], freer> DoublePtr;
-typedef std::unique_ptr<TPointD[], deleter> TPointDPtr;
+using SuperFactorsPtr =std::unique_ptr<tlin::SuperFactors, SuperFactors_free>;
+using DoublePtr =std::unique_ptr<double[]>;
+using TPointDPtr =std::unique_ptr<TPointD[]>;
 
 } // namespace
 
@@ -548,8 +542,10 @@ void PlasticDeformer::Imp::compileStep1(const std::vector<PlasticHandle> &handle
 		m_invC.reset(invC);
 
 		// Reallocate arrays
-		m_q.reset((double *)malloc(cSize * sizeof(double)));
-		m_out.reset((double *)malloc(cSize * sizeof(double)));
+		//		m_q.reset((double *)malloc(cSize * sizeof(double)));
+		//m_out.reset((double *)malloc(cSize * sizeof(double)));
+		m_q.reset(new double[cSize]);
+		m_out.reset(new double[cSize]);
 
 		memset(m_q.get(), 0, 2 * vCount * sizeof(double)); // Initialize the system's known term with 0
 	} else
