@@ -228,7 +228,7 @@ TFrameId Level::getFid(const QScriptValue &arg, QString &err)
 {
 	if (arg.isNumber() || arg.isString()) {
 		QString s = arg.toString();
-		QRegExp re("(\\d+)(\\w?)");
+		QRegExp re("(-?\\d+)(\\w?)");
 		if (re.exactMatch(s)) {
 			int d = re.cap(1).toInt();
 			QString c = re.cap(2);
