@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DEFORMATIONSELECTOR_H
 #define DEFORMATIONSELECTOR_H

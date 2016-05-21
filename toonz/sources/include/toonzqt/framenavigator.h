@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FRAMENVIGATOR_H
 #define FRAMENVIGATOR_H

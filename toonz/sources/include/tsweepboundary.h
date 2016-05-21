@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSWEEPBOUNDARY_INCLUDED
 #define TSWEEPBOUNDARY_INCLUDED

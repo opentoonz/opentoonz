@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef HOOK_SELECTION
 #define HOOK_SELECTION

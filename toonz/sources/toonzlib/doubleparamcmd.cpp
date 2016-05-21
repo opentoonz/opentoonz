@@ -323,7 +323,7 @@ void KeyframeSetter::moveKeyframes(int dFrame, double dValue)
 			dFrame -= 1;
 		}
 
-		dFrame = dFrameSgn * tmax(0, dFrame);
+		dFrame = dFrameSgn * std::max(0, dFrame);
 		if (dFrame != preferredDFrame)
 			m_extraDFrame = preferredDFrame - dFrame;
 		// at this point dFrame (possibly ==0) is ok (no keyframe collisions, no segment type mismatches)

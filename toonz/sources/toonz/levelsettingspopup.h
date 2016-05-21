@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LEVELSETTINGSPOPUP_H
 #define LEVELSETTINGSPOPUP_H

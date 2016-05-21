@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef OVERWRITEPOPUP_H
 #define OVERWRITEPOPUP_H

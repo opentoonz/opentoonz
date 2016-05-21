@@ -181,14 +181,18 @@ std::vector<int> getSelectedStrokes(TVectorImage &vi, const LevelSelection &leve
 	std::vector<int> strokes;
 
 	switch (levelSelection.filter()) {
-	case LevelSelection::EMPTY:;
-
-		CASE LevelSelection::WHOLE : strokes.assign(boost::make_counting_iterator(0u),
-													boost::make_counting_iterator(vi.getStrokeCount()));
-
-		CASE LevelSelection::SELECTED_STYLES : locals::selectStyles(vi, levelSelection.styles(), strokes);
-
-		CASE LevelSelection::BOUNDARY_STROKES : getBoundaries(vi, strokes);
+	case LevelSelection::EMPTY:
+		break;
+	case LevelSelection::WHOLE:
+		strokes.assign(boost::make_counting_iterator(0u),
+		               boost::make_counting_iterator(vi.getStrokeCount()));
+		break;
+	case LevelSelection::SELECTED_STYLES:
+		locals::selectStyles(vi, levelSelection.styles(), strokes);
+		break;
+	case LevelSelection::BOUNDARY_STROKES:
+		getBoundaries(vi, strokes);
+		break;
 	}
 
 	return strokes;

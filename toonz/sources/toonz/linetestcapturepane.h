@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LINETESTCAPTUREPANE_H
 #define LINETESTCAPTUREPANE_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FILEBROWSERPOPUP_H
 #define FILEBROWSERPOPUP_H
@@ -246,9 +246,6 @@ public:
 	bool execute();
 	void initFolder();
 
-#ifdef BRAVODEMO
-	void show();
-#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -262,10 +259,6 @@ public:
 
 	bool execute();
 	void initFolder();
-
-#ifdef BRAVODEMO
-	void show();
-#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -334,9 +327,6 @@ public:
 	bool execute();
 	void initFolder();
 
-#ifdef BRAVODEMO
-	void show();
-#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -371,10 +361,6 @@ public:
 	SavePaletteAsPopup();
 
 	bool execute();
-
-#ifdef BRAVODEMO
-	void show();
-#endif
 	void initFolder();
 };
 

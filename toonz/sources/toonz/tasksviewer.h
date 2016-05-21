@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TASKSVIEWER_H
 #define TASKSVIEWER_H

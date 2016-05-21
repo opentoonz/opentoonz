@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SVN_REVERT_DIALOG_H
 #define SVN_REVERT_DIALOG_H

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef PLUGIN_FXNODE_INTERFACE
 #define PLUGIN_FXNODE_INTERFACE
 

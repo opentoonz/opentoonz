@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_OBSERVER_NOTIFIER_H
 #define TCG_OBSERVER_NOTIFIER_H

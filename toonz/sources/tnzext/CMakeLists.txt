@@ -74,18 +74,18 @@ endif()
 
 add_library(tnzext SHARED ${HEADERS} ${SOURCES} ${OBJCSOURCES})
 
-if (APPLE)
+if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzext.dylib")
-endif (APPLE)
+endif()
 
 add_definitions(-DTNZEXT_EXPORTS)
 
 message("subdir: tnzext")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
-if (APPLE)
-find_library(ACCE_LIB Accelerate)
-endif (APPLE)
+if(APPLE)
+    find_library(ACCE_LIB Accelerate)
+endif()
 
 include_directories(${SDKROOT}/superlu/SuperLU_4.1/SRC)
 

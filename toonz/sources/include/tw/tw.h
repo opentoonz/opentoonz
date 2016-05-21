@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TW_INCLUDED
 #define TW_INCLUDED

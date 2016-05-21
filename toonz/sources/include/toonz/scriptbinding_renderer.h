@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCRIPTBINDING_RENDERER_H
 #define SCRIPTBINDING_RENDERER_H

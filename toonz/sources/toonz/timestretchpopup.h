@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIMESTRETCHPOPUP_H
 #define TIMESTRETCHPOPUP_H

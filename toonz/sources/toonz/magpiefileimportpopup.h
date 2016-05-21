@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MAGPIEFILEIMPORTPOPUP_H
 #define MAGPIEFILEIMPORTPOPUP_H

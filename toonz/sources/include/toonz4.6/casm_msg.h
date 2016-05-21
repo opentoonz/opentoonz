@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _MSG_H_
 #define _MSG_H_

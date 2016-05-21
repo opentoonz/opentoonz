@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TREGIONOUTLINE_H
 #define TREGIONOUTLINE_H

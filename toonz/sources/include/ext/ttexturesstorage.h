@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef DRAWABLEMESHIMAGE_H
 #define DRAWABLEMESHIMAGE_H
 

@@ -48,7 +48,7 @@ set(SOURCES
     3gp/tiio_3gp_proxy.cpp
     mesh/tiio_mesh.cpp)
 
-if (WIN32)
+if(WIN32)
     set(HEADERS ${HEADERS}
         avi/tiio_avi.h
         mov/tiio_mov.h
@@ -57,20 +57,20 @@ if (WIN32)
         avi/tiio_avi.cpp
         mov/tiio_movW.cpp
         3gp/tiio_3gpW.cpp)
-else ()
+else()
     set(HEADERS ${HEADERS}
         mov/tiio_movM.h
         3gp/tiio_3gpM.h)
     set(SOURCES ${SOURCES}
         mov/tiio_movM.cpp
         3gp/tiio_3gpM.cpp)
-endif ()
+endif()
 
 add_library(image SHARED ${HEADERS} ${SOURCES})
 add_definitions(-DTNZIMAGE_DLL -D_USRDLL -DIMAGE_EXPORTS)
-if (APPLE)
+if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libimage.dylib")
-endif (APPLE)
+endif()
 
 message("subdir: image")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
@@ -78,7 +78,7 @@ message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 include_directories(
     ${TIFF_INCLUDE_DIR}
     ${SDKROOT}/LibJPEG/jpeg-9)
-if (WIN32)
+if(WIN32)
     include_directories(${SDKROOT}/libpng-1.6.21)
     if(PLATFORM EQUAL 32)
         include_directories(${SDKROOT}/quicktime/QT73SDK/CIncludes)
@@ -92,10 +92,10 @@ if(WIN32)
         ${TNZLIBS}
         vfw32.lib)
 else()
-    if (PLATFORM EQUAL 32)
+    if(PLATFORM EQUAL 32)
         find_library(CORE_SERVICES_LIB CoreServices)
         set(OSX_10_6_SDK_PATH "")
-        if (NOT OSX_10_6_SDK_PATH)
+        if(NOT OSX_10_6_SDK_PATH)
            message(FATAL_ERROR "Set variable 'OSX_10_6_SDK_PATH'")
         endif()
         find_library(QD_LIB

@@ -413,7 +413,7 @@ void copy(/*std::ofstream& cout,*/
 		  const std::vector<TQuadratic *> &arrayDown,
 		  outlineBoundary &ob)
 {
-	int minSize = tmin(arrayUp.size(), arrayDown.size());
+	int minSize = std::min(arrayUp.size(), arrayDown.size());
 
 	assert(minSize > 0);
 

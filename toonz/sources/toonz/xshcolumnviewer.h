@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef XSHCOLUMNVIEWER_H
 #define XSHCOLUMNVIEWER_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STAGEOBJECTSELECTION_H
 #define STAGEOBJECTSELECTION_H

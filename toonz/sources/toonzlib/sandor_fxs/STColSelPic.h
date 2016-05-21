@@ -1,4 +1,4 @@
-
+#pragma once
 
 #if _MSC_VER >= 1400
 #define _CRT_SECURE_NO_DEPRECATE 1
@@ -10,10 +10,6 @@
 
 #if !defined(AFX_STCOLSELPIC_H__80D708B0_FCA2_11D5_B949_0040F674BE6A__INCLUDED_)
 #define AFX_STCOLSELPIC_H__80D708B0_FCA2_11D5_B949_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #ifdef _WIN32
 #pragma warning(disable : 4996)

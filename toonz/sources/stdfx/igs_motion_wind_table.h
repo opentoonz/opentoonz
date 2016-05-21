@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_motion_wind_table_h
 #define igs_motion_wind_table_h
 

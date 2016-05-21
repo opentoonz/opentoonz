@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _CASM_H_
 #define _CASM_H_

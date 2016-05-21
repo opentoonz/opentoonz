@@ -1035,7 +1035,7 @@ inline bool Event::process()
 
 	if (!m_generator->hasAttribute(ContourNode::ELIMINATED)) {
 		switch (m_type) {
-		case special: {
+		case special:
 			assert(!m_coGenerator->hasAttribute(ContourNode::ELIMINATED));
 
 			if (m_coGenerator->m_prev->hasAttribute(ContourNode::ELIMINATED) || // These two are most probably useless - could
@@ -1052,75 +1052,75 @@ inline bool Event::process()
 			//else allow processing
 			algoritmicTime++;
 			processSpecialEvent();
-		}
 
-			CASE edge:
-			{
-				if (m_coGenerator->hasAttribute(ContourNode::ELIMINATED) ||
-					m_algoritmicTime < m_coGenerator->m_next->m_updateTime) {
-					//recalculate event
-					Event newEvent(m_generator, m_context);
-					if (newEvent.m_type != failure)
-						timeline.push(newEvent);
-					return false;
-				}
+			break;
 
-				//Deal with edge superposition cases *only* when m_generator has the m_direction.z == 0.0
-				if ((m_coGenerator->m_direction.z == 0.0 && m_coGenerator != m_generator) ||
-					(m_coGenerator->m_next->m_direction.z == 0.0 && m_coGenerator == m_generator))
-					return false;
-
-				//else allow processing
-				algoritmicTime++; //global
-				if (m_generator->m_next->m_next == m_generator->m_prev)
-					processMaxEvent();
-				else
-					processEdgeEvent();
+		case edge:
+			if (m_coGenerator->hasAttribute(ContourNode::ELIMINATED) ||
+				m_algoritmicTime < m_coGenerator->m_next->m_updateTime) {
+				//recalculate event
+				Event newEvent(m_generator, m_context);
+				if (newEvent.m_type != failure)
+					timeline.push(newEvent);
+				return false;
 			}
 
-			CASE vertex:
-			{
-				if (m_coGenerator->hasAttribute(ContourNode::ELIMINATED)) {
-					//recalculate event
-					Event newEvent(m_generator, m_context);
-					if (newEvent.m_type != failure)
-						timeline.push(newEvent);
-					return false;
-				}
+			//Deal with edge superposition cases *only* when m_generator has the m_direction.z == 0.0
+			if ((m_coGenerator->m_direction.z == 0.0 && m_coGenerator != m_generator) ||
+				(m_coGenerator->m_next->m_direction.z == 0.0 && m_coGenerator == m_generator))
+				return false;
 
-				// Unlike the split case, we don't need to rebuild if
-				// the event is not up to date with m_coGenerator - since
-				// the event is not about splitting an edge
+			//else allow processing
+			algoritmicTime++; //global
+			if (m_generator->m_next->m_next == m_generator->m_prev)
+				processMaxEvent();
+			else
+				processEdgeEvent();
 
-				if (m_coGenerator == m_generator->m_next->m_next	 // CAN devolve to a special event - which should
-					|| m_coGenerator == m_generator->m_prev->m_prev) // already be present in the timeline
-					return false;
+			break;
 
-				//then, process it
-				algoritmicTime++;
-				processVertexEvent();
+		case vertex:
+			if (m_coGenerator->hasAttribute(ContourNode::ELIMINATED)) {
+				//recalculate event
+				Event newEvent(m_generator, m_context);
+				if (newEvent.m_type != failure)
+					timeline.push(newEvent);
+				return false;
 			}
 
-			CASE split_regenerate:
-			{
-				if (m_coGenerator->hasAttribute(ContourNode::ELIMINATED) ||
-					(m_algoritmicTime < m_coGenerator->m_next->m_updateTime)) {
-					//recalculate event
-					Event newEvent(m_generator, m_context);
-					if (newEvent.m_type != failure)
-						timeline.push(newEvent);
-					return false;
-				}
+			// Unlike the split case, we don't need to rebuild if
+			// the event is not up to date with m_coGenerator - since
+			// the event is not about splitting an edge
 
-				// This may actually happen on current implementation, due to quirky event
-				// generation and preferential events rejection. See function tryRay..()
-				// around the end. Historically resolved to a split event, so we maintain that.
+			if (m_coGenerator == m_generator->m_next->m_next	 // CAN devolve to a special event - which should
+				|| m_coGenerator == m_generator->m_prev->m_prev) // already be present in the timeline
+				return false;
 
-				//assert(false);
+			//then, process it
+			algoritmicTime++;
+			processVertexEvent();
+
+			break;
+
+		case split_regenerate:
+			if (m_coGenerator->hasAttribute(ContourNode::ELIMINATED) ||
+				(m_algoritmicTime < m_coGenerator->m_next->m_updateTime)) {
+				//recalculate event
+				Event newEvent(m_generator, m_context);
+				if (newEvent.m_type != failure)
+					timeline.push(newEvent);
+				return false;
 			}
+
+			// This may actually happen on current implementation, due to quirky event
+			// generation and preferential events rejection. See function tryRay..()
+			// around the end. Historically resolved to a split event, so we maintain that.
+
+			//assert(false);
+
+			/* fallthrough */
 
 		case split: // No break is intended
-		{
 			if (m_coGenerator->hasAttribute(ContourNode::ELIMINATED) ||
 				(m_algoritmicTime < m_coGenerator->m_next->m_updateTime)) {
 				//recalculate event
@@ -1137,7 +1137,8 @@ inline bool Event::process()
 				algoritmicTime++;
 				processSplitEvent();
 			}
-		}
+
+			break;
 		}
 	}
 

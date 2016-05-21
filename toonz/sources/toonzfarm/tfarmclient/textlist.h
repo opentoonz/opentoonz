@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TEXTLIST_INCLUDED
 #define TEXTLIST_INCLUDED

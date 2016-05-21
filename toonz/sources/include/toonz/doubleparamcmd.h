@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PARAMCMD_INCLUDED
 #define PARAMCMD_INCLUDED

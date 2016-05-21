@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_SFINAE_H
 #define TCG_SFINAE_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TOOL_COMMAND_IDS_H
 #define TOOL_COMMAND_IDS_H

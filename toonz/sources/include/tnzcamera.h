@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZCAMERA_H
 #define TNZCAMERA_H

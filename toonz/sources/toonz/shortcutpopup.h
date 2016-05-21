@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SHORTCUTPOPUP_H
 #define SHORTCUTPOPUP_H

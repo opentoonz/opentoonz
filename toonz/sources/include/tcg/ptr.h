@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_PTR_WRAPPER
 #define TCG_PTR_WRAPPER

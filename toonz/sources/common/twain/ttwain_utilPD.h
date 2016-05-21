@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef __TTWAIN_UTIL_PD_H__
 #define __TTWAIN_UTIL_PD_H__

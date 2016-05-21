@@ -56,7 +56,7 @@ TPointD closestMeshVertexPos(const TPointD &pos, double *distance = 0)
 	const TPointD &vxPos_mesh = mi->meshes()[closest.second.m_meshIdx]->vertex(closest.second.m_idx).P();
 
 	if (distance)
-		*distance = tmin(Stage::inch / dpi.x, Stage::inch / dpi.y) * closest.first;
+		*distance = std::min(Stage::inch / dpi.x, Stage::inch / dpi.y) * closest.first;
 
 	// Cast it back to world coordinates
 	return TPointD(vxPos_mesh.x * (Stage::inch / dpi.x), vxPos_mesh.y * (Stage::inch / dpi.y));

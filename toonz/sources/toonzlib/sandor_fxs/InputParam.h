@@ -1,4 +1,4 @@
-
+#pragma once
 
 // InputParam.h: interface for the CInputParam class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_INPUTPARAM_H__41D42157_F2EE_11D5_B92D_0040F674BE6A__INCLUDED_)
 #define AFX_INPUTPARAM_H__41D42157_F2EE_11D5_B92D_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #ifdef _WIN32
 #include "Windows.h"

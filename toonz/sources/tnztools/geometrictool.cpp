@@ -1153,10 +1153,10 @@ TStroke *RectanglePrimitive::makeStroke() const
 		return 0;
 
 	TRectD selArea;
-	selArea.x0 = tmin(m_selectingRect.x0, m_selectingRect.x1);
-	selArea.y0 = tmin(m_selectingRect.y0, m_selectingRect.y1);
-	selArea.x1 = tmax(m_selectingRect.x0, m_selectingRect.x1);
-	selArea.y1 = tmax(m_selectingRect.y0, m_selectingRect.y1);
+	selArea.x0 = std::min(m_selectingRect.x0, m_selectingRect.x1);
+	selArea.y0 = std::min(m_selectingRect.y0, m_selectingRect.y1);
+	selArea.x1 = std::max(m_selectingRect.x0, m_selectingRect.x1);
+	selArea.y1 = std::max(m_selectingRect.y0, m_selectingRect.y1);
 
 	double thick = getThickness();
 

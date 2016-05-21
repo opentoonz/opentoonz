@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TENV_INCLUDED
 #define TENV_INCLUDED
@@ -95,7 +95,7 @@ public:
 //
 // es.:  TEnv::setApplication("Toonz","5.0");
 //
-DVAPI void setApplication(std::string applicationName, std::string applicationVersion);
+DVAPI void setApplication(std::string applicationName, std::string version, std::string revision = std::string());
 
 DVAPI std::string getApplicationName();
 DVAPI std::string getApplicationVersion();

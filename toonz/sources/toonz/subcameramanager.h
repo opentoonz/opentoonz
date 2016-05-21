@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SUBCAMERAMANAGER_INCLUDED
 #define SUBCAMERAMANAGER_INCLUDED

@@ -10,31 +10,6 @@
 
 //---------------------------------------------------------
 
-/*
-class ChangeBlock {
-public:
-  ChangeBlock()
-      : m_firstAffectedFrame ( TParamChange::m_maxFrame)
-      , m_lastAffectedFrame  ( TParamChange::m_minFrame)
-    {
-    }
-
-  ~ChangeBlock()
-    {
-    }
-
-  void add(const TParamChange &change)
-    {
-    m_firstAffectedFrame = tmin(m_firstAffectedFrame, change.m_firstAffectedFrame);
-    m_lastAffectedFrame  = tmax(m_lastAffectedFrame , change.m_lastAffectedFrame);
-
-    m_changes.push_back(change.clone());
-    }
-  vector<TParamChange*> m_changes;
-double m_firstAffectedFrame;
-double m_lastAffectedFrame;
-};
-*/
 namespace
 {
 void doRelease(const std::pair<TParam *, std::string> &param)
@@ -74,28 +49,6 @@ public:
 
 	void onChange(const TParamChange &change)
 	{
-
-		/*
-    if (!m_changeBlock)  // se non stiamo modificando un blocco di parametri, invio la notifica
-      {
-      vector<TParam*> params; 
-      params.push_back(change.m_param);
-
-      TParamSetChange psChange(m_param, change.m_firstAffectedFrame, change.m_lastAffectedFrame, 
-                               params, change.m_undoing);
-      notify(psChange);
-      }
-    else
-      notify(change);
-
-    if (!m_changeBlock)  // se non stiamo modificando un blocco di parametri, invio la notifica
-      notify(change);
-    else
-      {
-      //metto da parte la TParamChange, per poi alla fine notificare una TParamSetChange
-      m_changeBlock->add(change);
-      }
-      */
 	}
 };
 

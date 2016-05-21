@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_TABBEDWINDOW_INCLUDED
 #define TNZ_TABBEDWINDOW_INCLUDED

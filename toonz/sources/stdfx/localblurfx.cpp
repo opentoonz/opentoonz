@@ -124,8 +124,8 @@ void filterLine(Pix *lineIn, int wrapIn, Grey *lineGr, int wrapGr, Pix *lineOut,
 			// NOTE: The normalization factor with blur (not integer) would be:
 			//        1.0 / (1 + 2 * blurI - (blurI / blur) * (blurI + 1))                    -- could be done using a factors table
 
-			iLeft = tmax(i - tfloor(blur) - 1, 0);
-			iRight = tmin(i + tfloor(blur), length - 1);
+			iLeft = std::max(i - tfloor(blur) - 1, 0);
+			iRight = std::min(i + tfloor(blur), length - 1);
 
 			pixOut->r = troundp(
 				kLeft * (sums.m_sumsIX_r[i] - sums.m_sumsIX_r[iLeft]) + kRight * (sums.m_sumsIX_r[iRight] - sums.m_sumsIX_r[i]) +

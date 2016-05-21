@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FUNCTIONVIEWER_H
 #define FUNCTIONVIEWER_H

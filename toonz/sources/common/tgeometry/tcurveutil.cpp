@@ -315,14 +315,14 @@ int intersectCloseControlPoints(const TQuadratic &c0,
 	double dist2 = tdistance2(c0.getP1(), c0.getP2());
 	if (dist2 == 0)
 		dist2 = 1e-20;
-	double val0 = tmax(dist1, dist2) / tmin(dist1, dist2);
+	double val0 = std::max(dist1, dist2) / std::min(dist1, dist2);
 	double dist3 = tdistance2(c1.getP0(), c1.getP1());
 	if (dist3 == 0)
 		dist3 = 1e-20;
 	double dist4 = tdistance2(c1.getP1(), c1.getP2());
 	if (dist4 == 0)
 		dist4 = 1e-20;
-	double val1 = tmax(dist3, dist4) / tmin(dist3, dist4);
+	double val1 = std::max(dist3, dist4) / std::min(dist3, dist4);
 
 	if (val0 > 1000000 && val1 > 1000000) //entrambe c0 e c1  approssimate a segmenti
 	{
@@ -532,7 +532,7 @@ double computeStep(const TThickQuadratic &quad, double pixelSize)
 		q2(TPointD(cp0.y, cp0.thick), TPointD(cp1.y, cp1.thick), TPointD(cp2.y, cp2.thick)),
 		q3(TPointD(cp0.x, cp0.thick), TPointD(cp1.x, cp1.thick), TPointD(cp2.x, cp2.thick));
 
-	return tmin(computeStep(q1, pixelSize), computeStep(q2, pixelSize), computeStep(q3, pixelSize));
+	return std::min({computeStep(q1, pixelSize), computeStep(q2, pixelSize), computeStep(q3, pixelSize)});
 }
 
 //=============================================================================

@@ -325,7 +325,7 @@ void FxDag::loadData(TIStream &is)
 					continue;
 				}
 				int fxTypeCount = getFxTypeCount(fx);
-				int maxFxTypeId = tmax(fxTypeCount, fx->getAttributes()->getId());
+				int maxFxTypeId = std::max(fxTypeCount, fx->getAttributes()->getId());
 				updateFxTypeTable(fx, maxFxTypeId);
 				TMacroFx *macroFx = dynamic_cast<TMacroFx *>(fx);
 				if (macroFx) {
@@ -334,7 +334,7 @@ void FxDag::loadData(TIStream &is)
 					for (j = 0; j < (int)fxs.size(); j++) {
 						TFxP inMacroFx = fxs[j];
 						fxTypeCount = getFxTypeCount(inMacroFx.getPointer());
-						maxFxTypeId = tmax(fxTypeCount, inMacroFx->getAttributes()->getId());
+						maxFxTypeId = std::max(fxTypeCount, inMacroFx->getAttributes()->getId());
 						updateFxTypeTable(inMacroFx.getPointer(), maxFxTypeId);
 						m_idTable[toLower(inMacroFx->getFxId())] = inMacroFx.getPointer();
 					}
@@ -357,7 +357,7 @@ void FxDag::loadData(TIStream &is)
 					continue;
 				}
 				int fxTypeCount = getFxTypeCount(fx);
-				int maxFxTypeId = tmax(fxTypeCount, fx->getAttributes()->getId());
+				int maxFxTypeId = std::max(fxTypeCount, fx->getAttributes()->getId());
 				updateFxTypeTable(fx, maxFxTypeId);
 				m_idTable[toLower(fx->getFxId())] = fx;
 			}

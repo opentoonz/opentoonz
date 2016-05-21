@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TXSHSOUNDCOLUMN_INCLUDED
 #define TXSHSOUNDCOLUMN_INCLUDED

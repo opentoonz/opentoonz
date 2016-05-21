@@ -1,7 +1,5 @@
 #include <memory>
 
-#ifndef XPRESS
-
 #include "tmachine.h"
 #include "pli_io.h"
 #include "tcommon.h"
@@ -289,14 +287,13 @@ inline MyIfstream &MyIfstream::operator>>(string &un)
 UINT TStyleParam::getSize()
 {
 	switch (m_type) {
-	case SP_BYTE:
-		return 1;
-		CASE SP_INT : return 4;
-		CASE SP_DOUBLE : return 4;
-		CASE SP_USHORT : return 2;
-		CASE SP_RASTER : return 2 + 2 + m_r->getLx() * m_r->getLy() * m_r->getPixelSize();
-		CASE SP_STRING : return (m_string.size() + sizeof(USHORT));
-	DEFAULT:
+	case SP_BYTE  : return 1;
+	case SP_INT   : return 4;
+	case SP_DOUBLE: return 4;
+	case SP_USHORT: return 2;
+	case SP_RASTER: return 2 + 2 + m_r->getLx() * m_r->getLy() * m_r->getPixelSize();
+	case SP_STRING: return (m_string.size() + sizeof(USHORT));
+	default:
 		assert(false);
 		return 0;
 	}
@@ -745,9 +742,15 @@ void ParsedPliImp::loadInfo(bool readPlt, TPalette *&palette, TContentHistory *&
 			switch (type) {
 			case PliTag::SET_DATA_8_CNTRL:
 				m_currDinamicTypeBytesNum = 1;
-				CASE PliTag::SET_DATA_16_CNTRL : m_currDinamicTypeBytesNum = 2;
-				CASE PliTag::SET_DATA_32_CNTRL : m_currDinamicTypeBytesNum = 4;
-			DEFAULT:;
+				break;
+			case PliTag::SET_DATA_16_CNTRL:
+				m_currDinamicTypeBytesNum = 2;
+				break;
+			case PliTag::SET_DATA_32_CNTRL:
+				m_currDinamicTypeBytesNum = 4;
+				break;
+			default:
+				break;
 			}
 		}
 		pos = m_iChan.tellg();
@@ -788,15 +791,25 @@ USHORT ParsedPliImp::readTagHeader()
 	switch (tagLengthId) {
 	case 0x0:
 		m_tagLength = 0;
-		CASE 0x1 : UCHAR clength;
+		break;
+	case 0x1: {
+		UCHAR clength;
 		m_iChan >> clength;
 		m_tagLength = clength;
-		CASE 0x2 : USHORT slength;
+		break;
+	}
+	case 0x2: {
+		USHORT slength;
 		m_iChan >> slength;
 		m_tagLength = slength;
-		CASE 0x3 : m_iChan >> m_tagLength;
-	DEFAULT:
+		break;
+	}
+	case 0x3:
+		m_iChan >> m_tagLength;
+		break;
+	default:
 		assert(false);
+		break;
 	}
 
 	return tagType;
@@ -895,14 +908,23 @@ TagElem *ParsedPliImp::readTag()
 	switch (tagLengthId) {
 	case 0x0:
 		m_tagLength = 0;
-		CASE 0x1 : UCHAR clength;
+		break;
+	case 0x1: {
+		UCHAR clength;
 		m_iChan >> clength;
 		m_tagLength = clength;
-		CASE 0x2 : USHORT slength;
+		break;
+	}
+	case 0x2: {
+		USHORT slength;
 		m_iChan >> slength;
 		m_tagLength = slength;
-		CASE 0x3 : m_iChan >> m_tagLength;
-	DEFAULT:
+		break;
+	}
+	case 0x3:
+		m_iChan >> m_tagLength;
+		break;
+	default:
 		assert(false);
 	}
 
@@ -921,25 +943,58 @@ TagElem *ParsedPliImp::readTag()
 	switch (tagType) {
 	case PliTag::SET_DATA_8_CNTRL:
 		m_currDinamicTypeBytesNum = 1;
-		CASE PliTag::SET_DATA_16_CNTRL : m_currDinamicTypeBytesNum = 2;
-		CASE PliTag::SET_DATA_32_CNTRL : m_currDinamicTypeBytesNum = 4;
-		CASE PliTag::TEXT : newTag = readTextTag();
-		CASE PliTag::PALETTE : newTag = readPaletteTag();
-		CASE PliTag::PALETTE_WITH_ALPHA : newTag = readPaletteWithAlphaTag();
-		CASE PliTag::THICK_QUADRATIC_CHAIN_GOBJ : __OR PliTag::THICK_QUADRATIC_LOOP_GOBJ : newTag = readThickQuadraticChainTag(tagType == PliTag::THICK_QUADRATIC_LOOP_GOBJ);
-		CASE PliTag::GROUP_GOBJ : newTag = readGroupTag();
-		CASE PliTag::IMAGE_GOBJ : newTag = readImageTag();
-		CASE PliTag::COLOR_NGOBJ : newTag = readColorTag();
-		CASE PliTag::STYLE_NGOBJ : newTag = readStyleTag();
-		CASE PliTag::GEOMETRIC_TRANSFORMATION_GOBJ : newTag = readGeometricTransformationTag();
-		CASE PliTag::DOUBLEPAIR_OBJ : newTag = readDoublePairTag();
-		CASE PliTag::BITMAP_GOBJ : newTag = readBitmapTag();
-		CASE PliTag::INTERSECTION_DATA_GOBJ : newTag = readIntersectionDataTag();
-		CASE PliTag::OUTLINE_OPTIONS_GOBJ : newTag = readOutlineOptionsTag();
-		CASE PliTag::PRECISION_SCALE_GOBJ : newTag = readPrecisionScaleTag();
-
-		CASE PliTag::END_CNTRL : return 0;
-	DEFAULT:;
+		break;
+	case PliTag::SET_DATA_16_CNTRL:
+		m_currDinamicTypeBytesNum = 2;
+		break;
+	case PliTag::SET_DATA_32_CNTRL:
+		m_currDinamicTypeBytesNum = 4;
+		break;
+	case PliTag::TEXT:
+		newTag = readTextTag();
+		break;
+	case PliTag::PALETTE:
+		newTag = readPaletteTag();
+		break;
+	case PliTag::PALETTE_WITH_ALPHA:
+		newTag = readPaletteWithAlphaTag();
+		break;
+	case PliTag::THICK_QUADRATIC_CHAIN_GOBJ:
+	case PliTag::THICK_QUADRATIC_LOOP_GOBJ:
+		newTag = readThickQuadraticChainTag(tagType == PliTag::THICK_QUADRATIC_LOOP_GOBJ);
+		break;
+	case PliTag::GROUP_GOBJ:
+		newTag = readGroupTag();
+		break;
+	case PliTag::IMAGE_GOBJ:
+		newTag = readImageTag();
+		break;
+	case PliTag::COLOR_NGOBJ:
+		newTag = readColorTag();
+		break;
+	case PliTag::STYLE_NGOBJ:
+		newTag = readStyleTag();
+		break;
+	case PliTag::GEOMETRIC_TRANSFORMATION_GOBJ:
+		newTag = readGeometricTransformationTag();
+		break;
+	case PliTag::DOUBLEPAIR_OBJ:
+		newTag = readDoublePairTag();
+		break;
+	case PliTag::BITMAP_GOBJ:
+		newTag = readBitmapTag();
+		break;
+	case PliTag::INTERSECTION_DATA_GOBJ:
+		newTag = readIntersectionDataTag();
+		break;
+	case PliTag::OUTLINE_OPTIONS_GOBJ:
+		newTag = readOutlineOptionsTag();
+		break;
+	case PliTag::PRECISION_SCALE_GOBJ:
+		newTag = readPrecisionScaleTag();
+		break;
+	case PliTag::END_CNTRL:
+		return 0;
 	}
 
 	if (newTag)
@@ -984,16 +1039,22 @@ inline void ParsedPliImp::readDinamicData(TUINT32 &val, TUINT32 &bufOffs)
 	switch (m_currDinamicTypeBytesNum) {
 	case 1:
 		val = m_buf[bufOffs++];
-		CASE 2 : if (m_isIrixEndian)
-					 val = m_buf[bufOffs + 1] | (m_buf[bufOffs] << 8);
-		else val = m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8);
-
+		break;
+	case 2:
+		if (m_isIrixEndian)
+			val = m_buf[bufOffs + 1] | (m_buf[bufOffs] << 8);
+		else
+			val = m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8);
 		bufOffs += 2;
-		CASE 4 : if (m_isIrixEndian)
-					 val = m_buf[bufOffs + 3] | (m_buf[bufOffs + 2] << 8) | (m_buf[bufOffs + 1] << 16) | (m_buf[bufOffs] << 24);
-		else val = m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8) | (m_buf[bufOffs + 2] << 16) | (m_buf[bufOffs + 3] << 24);
+		break;
+	case 4:
+		if (m_isIrixEndian)
+			val = m_buf[bufOffs + 3] | (m_buf[bufOffs + 2] << 8) | (m_buf[bufOffs + 1] << 16) | (m_buf[bufOffs] << 24);
+		else
+			val = m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8) | (m_buf[bufOffs + 2] << 16) | (m_buf[bufOffs + 3] << 24);
 		bufOffs += 4;
-	DEFAULT:
+		break;
+	default:
 		assert(false);
 	}
 }
@@ -1012,16 +1073,16 @@ inline bool ParsedPliImp::readDinamicData(TINT32 &val, TUINT32 &bufOffs)
 			isNegative = true;
 		}
 		bufOffs++;
-		CASE 2 : if (m_isIrixEndian)
-		{
+		break;
+	case 2:
+		if (m_isIrixEndian) {
 			val = (m_buf[bufOffs + 1] | (m_buf[bufOffs] << 8)) & 0x7fff;
 			if (m_buf[bufOffs] & 0x80) {
 				val = -val;
 				isNegative = true;
 			}
 		}
-		else
-		{
+		else {
 			val = (m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8)) & 0x7fff;
 			if (m_buf[bufOffs + 1] & 0x80) {
 				val = -val;
@@ -1029,16 +1090,16 @@ inline bool ParsedPliImp::readDinamicData(TINT32 &val, TUINT32 &bufOffs)
 			}
 		}
 		bufOffs += 2;
-		CASE 4 : if (m_isIrixEndian)
-		{
+		break;
+	case 4:
+		if (m_isIrixEndian) {
 			val = m_buf[bufOffs + 3] | (m_buf[bufOffs + 2] << 8) | (m_buf[bufOffs + 1] << 16) | (m_buf[bufOffs] << 24) & 0x7fffffff;
 			if (m_buf[bufOffs] & 0x80) {
 				val = -val;
 				isNegative = true;
 			}
 		}
-		else
-		{
+		else {
 			val = m_buf[bufOffs] | (m_buf[bufOffs + 1] << 8) | (m_buf[bufOffs + 2] << 16) | (m_buf[bufOffs + 3] << 24) & 0x7fffffff;
 			if (m_buf[bufOffs + 3] & 0x80) {
 				val = -val;
@@ -1046,8 +1107,8 @@ inline bool ParsedPliImp::readDinamicData(TINT32 &val, TUINT32 &bufOffs)
 			}
 		}
 		bufOffs += 4;
-
-	DEFAULT:
+		break;
+	default:
 		assert(false);
 	}
 	return isNegative;
@@ -1307,21 +1368,34 @@ PliTag *ParsedPliImp::readStyleTag()
 		case TStyleParam::SP_BYTE:
 			param.m_numericVal = m_buf[bufOffs++];
 			lenght--;
-			CASE TStyleParam::SP_USHORT : USHORT val;
+			break;
+		case TStyleParam::SP_USHORT: {
+			USHORT val;
 			readUShortData(val, bufOffs);
 			param.m_numericVal = val;
 			lenght -= 2;
-			CASE TStyleParam::SP_INT : __OR TStyleParam::SP_DOUBLE : readFloatData(param.m_numericVal, bufOffs);
+			break;
+		}
+		case TStyleParam::SP_INT:
+		case TStyleParam::SP_DOUBLE:
+			readFloatData(param.m_numericVal, bufOffs);
 			lenght -= 4;
-			CASE TStyleParam::SP_RASTER : lenght -= readRasterData(param.m_r, bufOffs);
-			CASE TStyleParam::SP_STRING : USHORT strLen;
+			break;
+		case TStyleParam::SP_RASTER:
+			lenght -= readRasterData(param.m_r, bufOffs);
+			break;
+		case TStyleParam::SP_STRING: {
+			USHORT strLen;
 			readUShortData(strLen, bufOffs);
 			//bufOffs+=2;
 			param.m_string = "";
-			for (i = 0; i < strLen; i++)
+			for (i = 0; i < strLen; i++) {
 				param.m_string.append(1, m_buf[bufOffs++]);
+			}
 			lenght -= strLen + sizeof(USHORT);
-		DEFAULT:
+			break;
+		}
+		default:
 			assert(false);
 		}
 		paramArray.push_back(param);
@@ -1738,21 +1812,47 @@ void ParsedPliImp::writeTag(TagElem *elem)
 	switch (elem->m_tag->m_type) {
 	case PliTag::TEXT:
 		elem->m_offset = writeTextTag((TextTag *)elem->m_tag);
-		CASE PliTag::PALETTE : elem->m_offset = writePaletteTag((PaletteTag *)elem->m_tag);
-		CASE PliTag::PALETTE_WITH_ALPHA : elem->m_offset = writePaletteWithAlphaTag((PaletteWithAlphaTag *)elem->m_tag);
-		CASE PliTag::THICK_QUADRATIC_CHAIN_GOBJ : elem->m_offset = writeThickQuadraticChainTag((ThickQuadraticChainTag *)elem->m_tag);
-		CASE PliTag::GROUP_GOBJ : elem->m_offset = writeGroupTag((GroupTag *)elem->m_tag);
-		CASE PliTag::IMAGE_GOBJ : elem->m_offset = writeImageTag((ImageTag *)elem->m_tag);
-		CASE PliTag::COLOR_NGOBJ : elem->m_offset = writeColorTag((ColorTag *)elem->m_tag);
-		CASE PliTag::STYLE_NGOBJ : elem->m_offset = writeStyleTag((StyleTag *)elem->m_tag);
-		CASE PliTag::GEOMETRIC_TRANSFORMATION_GOBJ : elem->m_offset = writeGeometricTransformationTag((GeometricTransformationTag *)elem->m_tag);
-		CASE PliTag::DOUBLEPAIR_OBJ : elem->m_offset = writeDoublePairTag((DoublePairTag *)elem->m_tag);
-		CASE PliTag::BITMAP_GOBJ : elem->m_offset = writeBitmapTag((BitmapTag *)elem->m_tag);
-		CASE PliTag::INTERSECTION_DATA_GOBJ : elem->m_offset = writeIntersectionDataTag((IntersectionDataTag *)elem->m_tag);
-		CASE PliTag::OUTLINE_OPTIONS_GOBJ : elem->m_offset = writeOutlineOptionsTag((StrokeOutlineOptionsTag *)elem->m_tag);
-		CASE PliTag::PRECISION_SCALE_GOBJ : elem->m_offset = writePrecisionScaleTag((PrecisionScaleTag *)elem->m_tag);
-
-	DEFAULT:
+		break;
+	case PliTag::PALETTE:
+		elem->m_offset = writePaletteTag((PaletteTag *)elem->m_tag);
+		break;
+	case PliTag::PALETTE_WITH_ALPHA:
+		elem->m_offset = writePaletteWithAlphaTag((PaletteWithAlphaTag *)elem->m_tag);
+		break;
+	case PliTag::THICK_QUADRATIC_CHAIN_GOBJ:
+		elem->m_offset = writeThickQuadraticChainTag((ThickQuadraticChainTag *)elem->m_tag);
+		break;
+	case PliTag::GROUP_GOBJ:
+		elem->m_offset = writeGroupTag((GroupTag *)elem->m_tag);
+		break;
+	case PliTag::IMAGE_GOBJ:
+		elem->m_offset = writeImageTag((ImageTag *)elem->m_tag);
+		break;
+	case PliTag::COLOR_NGOBJ:
+		elem->m_offset = writeColorTag((ColorTag *)elem->m_tag);
+		break;
+	case PliTag::STYLE_NGOBJ:
+		elem->m_offset = writeStyleTag((StyleTag *)elem->m_tag);
+		break;
+	case PliTag::GEOMETRIC_TRANSFORMATION_GOBJ:
+		elem->m_offset = writeGeometricTransformationTag((GeometricTransformationTag *)elem->m_tag);
+		break;
+	case PliTag::DOUBLEPAIR_OBJ:
+		elem->m_offset = writeDoublePairTag((DoublePairTag *)elem->m_tag);
+		break;
+	case PliTag::BITMAP_GOBJ:
+		elem->m_offset = writeBitmapTag((BitmapTag *)elem->m_tag);
+		break;
+	case PliTag::INTERSECTION_DATA_GOBJ:
+		elem->m_offset = writeIntersectionDataTag((IntersectionDataTag *)elem->m_tag);
+		break;
+	case PliTag::OUTLINE_OPTIONS_GOBJ:
+		elem->m_offset = writeOutlineOptionsTag((StrokeOutlineOptionsTag *)elem->m_tag);
+		break;
+	case PliTag::PRECISION_SCALE_GOBJ:
+		elem->m_offset = writePrecisionScaleTag((PrecisionScaleTag *)elem->m_tag);
+		break;
+	default:
 		assert(false);
 		//m_error = UNKNOWN_TAG;
 		;
@@ -1788,9 +1888,14 @@ inline void ParsedPliImp::writeDinamicData(TUINT32 val)
 	switch (m_currDinamicTypeBytesNum) {
 	case 1:
 		*m_oChan << (UCHAR)val;
-		CASE 2 : *m_oChan << (USHORT)val;
-		CASE 4 : *m_oChan << (TUINT32)val;
-	DEFAULT:
+		break;
+	case 2:
+		*m_oChan << (USHORT)val;
+		break;
+	case 4:
+		*m_oChan << (TUINT32)val;
+		break;
+	default:
 		assert(false);
 	}
 }
@@ -1803,9 +1908,14 @@ inline void ParsedPliImp::writeDinamicData(TINT32 val, bool isNegative = false)
 	switch (m_currDinamicTypeBytesNum) {
 	case 1:
 		*m_oChan << complement1((char)val, isNegative);
-		CASE 2 : *m_oChan << complement1((short)val, isNegative);
-		CASE 4 : *m_oChan << complement1(val, isNegative);
-	DEFAULT:
+		break;
+	case 2:
+		*m_oChan << complement1((short)val, isNegative);
+		break;
+	case 4:
+		*m_oChan << complement1(val, isNegative);
+		break;
+	default:
 		assert(false);
 	}
 }
@@ -2239,13 +2349,23 @@ TUINT32 ParsedPliImp::writeStyleTag(StyleTag *tag)
 		switch (tag->m_param[i].m_type) {
 		case TStyleParam::SP_BYTE:
 			*m_oChan << (UCHAR)tag->m_param[i].m_numericVal;
-			CASE TStyleParam::SP_USHORT : *m_oChan << (USHORT)tag->m_param[i].m_numericVal;
-			CASE TStyleParam::SP_INT : __OR TStyleParam::SP_DOUBLE : writeFloatData((double)tag->m_param[i].m_numericVal);
-			CASE TStyleParam::SP_RASTER : *m_oChan << tag->m_param[i].m_r;
-			CASE TStyleParam::SP_STRING : *m_oChan << tag->m_param[i].m_string;
-
-		DEFAULT:
+			break;
+		case TStyleParam::SP_USHORT:
+			*m_oChan << (USHORT)tag->m_param[i].m_numericVal;
+			break;
+		case TStyleParam::SP_INT:
+		case TStyleParam::SP_DOUBLE:
+			writeFloatData((double)tag->m_param[i].m_numericVal);
+			break;
+		case TStyleParam::SP_RASTER:
+			*m_oChan << tag->m_param[i].m_r;
+			break;
+		case TStyleParam::SP_STRING:
+			*m_oChan << tag->m_param[i].m_string;
+			break;
+		default:
 			assert(false);
+			break;
 		}
 	}
 	return offset;
@@ -2665,5 +2785,3 @@ int &ParsedPli::precisionScale()
 {
 	return imp->m_precisionScale;
 }
-
-#endif

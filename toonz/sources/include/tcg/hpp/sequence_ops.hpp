@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef TCG_SEQUENCE_OPS_HPP
 #define TCG_SEQUENCE_OPS_HPP

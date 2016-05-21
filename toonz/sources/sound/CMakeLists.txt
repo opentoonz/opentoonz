@@ -14,9 +14,9 @@ set(SOURCES
     
 add_library(sound SHARED ${HEADERS} ${SOURCES})
 add_definitions(-DSOUND_EXPORTS)
-if (APPLE)
+if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libsound.dylib")
-endif (APPLE)
+endif()
 
 message("subdir: sound")
 message("type:" ${CMAKE_SHARED_LIBRARY_SUFFIX})

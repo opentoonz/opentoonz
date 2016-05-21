@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef QTOFFLINEGL_H
 #define QTOFFLINEGL_H
 

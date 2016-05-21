@@ -25,7 +25,7 @@ void crop(QVector<int> &values, int min, int max)
 void rollDown(QVector<int> &values, int max, int sortDist)
 {
 	assert(!values.empty());
-	values.back() = tmin(max, values.back());
+	values.back() = std::min(max, values.back());
 
 	int val;
 
@@ -43,7 +43,7 @@ void rollDown(QVector<int> &values, int max, int sortDist)
 void rollUp(QVector<int> &values, int min, int sortDist)
 {
 	assert(!values.empty());
-	values.front() = tmax(min, values.front());
+	values.front() = std::max(min, values.front());
 
 	int val;
 

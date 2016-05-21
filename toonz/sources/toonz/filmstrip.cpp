@@ -226,7 +226,7 @@ void FilmstripFrames::select(int index, SelectionMode mode)
 		if (!outOfRange)
 			m_selection->select(fid);
 		break;
-	case SIMPLE_SELECT: {
+	case SIMPLE_SELECT:
 		// Bail out if fid is already selected
 		if (!outOfRange && m_selection->isSelected(fid))
 			return;
@@ -234,90 +234,87 @@ void FilmstripFrames::select(int index, SelectionMode mode)
 		m_selection->selectNone();
 		if (!outOfRange)
 			m_selection->select(fid);
-	}
+		break;
 
-		CASE SHIFT_SELECT:
-		{
-			if (outOfRange)
-				return;
+	case SHIFT_SELECT:
+		if (outOfRange)
+			return;
 
-			// Bail out if fid is already selected
-			if (m_selection->isSelected(fid))
-				return;
+		// Bail out if fid is already selected
+		if (m_selection->isSelected(fid))
+			return;
 
-			if (m_selection->isEmpty())
-				m_selection->select(fid);
-			else {
-				TXshSimpleLevel *sl = getLevel();
-				if (!sl)
-					return;
-
-				// seleziono il range da fid al piu' vicino frame selezionato (in entrambe le direzioni)
-				int frameCount = sl->getFrameCount();
-
-				// calcolo il limite inferiore della selezione
-				int ia = index;
-				while (ia > 0 && !m_selection->isSelected(sl->index2fid(ia - 1)))
-					ia--;
-				if (ia == 0)
-					ia = index;
-
-				// calcolo il limite superiore della selezione
-				int ib = index;
-				while (ib < frameCount - 1 && !m_selection->isSelected(sl->index2fid(ib + 1)))
-					ib++;
-				if (ib == frameCount - 1)
-					ib = index;
-
-				// seleziono
-				for (int i = ia; i <= ib; i++)
-					m_selection->select(sl->index2fid(i));
-			}
-		}
-
-		CASE CTRL_SELECT:
-		{
-			if (outOfRange)
-				return;
-
-			m_selection->select(fid, !m_selection->isSelected(fid));
-		}
-
-		CASE START_DRAG_SELECT:
-		{
-			m_selection->selectNone();
-
-			if (outOfRange) {
-				m_dragSelectionStartIndex =
-					m_dragSelectionEndIndex = -1;
-
-				break;
-			}
-
+		if (m_selection->isEmpty())
 			m_selection->select(fid);
-			m_dragSelectionStartIndex = index;
-		}
-
-		CASE DRAG_SELECT:
-		{
-			if (outOfRange ||
-				m_dragSelectionStartIndex < 0 ||
-				m_dragSelectionEndIndex == index)
+		else {
+			TXshSimpleLevel *sl = getLevel();
+			if (!sl)
 				return;
 
-			m_dragSelectionEndIndex = index;
+			// seleziono il range da fid al piu' vicino frame selezionato (in entrambe le direzioni)
+			int frameCount = sl->getFrameCount();
 
-			m_selection->selectNone();
+			// calcolo il limite inferiore della selezione
+			int ia = index;
+			while (ia > 0 && !m_selection->isSelected(sl->index2fid(ia - 1)))
+				ia--;
+			if (ia == 0)
+				ia = index;
 
-			int ia = m_dragSelectionStartIndex;
+			// calcolo il limite superiore della selezione
 			int ib = index;
+			while (ib < frameCount - 1 && !m_selection->isSelected(sl->index2fid(ib + 1)))
+				ib++;
+			if (ib == frameCount - 1)
+				ib = index;
 
-			if (ia > ib)
-				std::swap(ia, ib);
-
-			for (int i = ia; i <= ib; ++i)
-				m_selection->select(index2fid(i));
+			// seleziono
+			for (int i = ia; i <= ib; i++)
+				m_selection->select(sl->index2fid(i));
 		}
+		break;
+
+	case CTRL_SELECT:
+		if (outOfRange)
+			return;
+
+		m_selection->select(fid, !m_selection->isSelected(fid));
+		break;
+
+	case START_DRAG_SELECT:
+		m_selection->selectNone();
+
+		if (outOfRange) {
+			m_dragSelectionStartIndex =
+				m_dragSelectionEndIndex = -1;
+
+			break;
+		}
+
+		m_selection->select(fid);
+		m_dragSelectionStartIndex = index;
+		break;
+
+	case DRAG_SELECT:
+		if (outOfRange ||
+			m_dragSelectionStartIndex < 0 ||
+			m_dragSelectionEndIndex == index)
+			return;
+
+		m_dragSelectionEndIndex = index;
+
+		m_selection->selectNone();
+
+		int ia = m_dragSelectionStartIndex;
+		int ib = index;
+
+		if (ia > ib)
+			std::swap(ia, ib);
+
+		for (int i = ia; i <= ib; ++i)
+			m_selection->select(index2fid(i));
+
+		break;
 	}
 
 	TObjectHandle *objectHandle = TApp::instance()->getCurrentObject();
@@ -915,9 +912,7 @@ void FilmstripFrames::contextMenuEvent(QContextMenuEvent *event)
 	}
 	menu->addAction(cm->getAction(MI_ExposeResource));
 	if (!isSubsequenceLevel && !isReadOnly) {
-#ifndef STUDENT
 		menu->addAction(cm->getAction(MI_AddFrames));
-#endif
 		menu->addAction(cm->getAction(MI_Renumber));
 		if (sl && sl->getType() == TZP_XSHLEVEL)
 			menu->addAction(cm->getAction(MI_RevertToCleanedUp));

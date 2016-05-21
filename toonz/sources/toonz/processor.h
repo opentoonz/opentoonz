@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PROCESSOR_H
 #define PROCESSOR_H

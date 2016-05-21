@@ -98,12 +98,12 @@ void HSVKeyFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
 	double v_range = m_vrange->getValue(frame);
 	bool gender = (int)m_gender->getValue();
 
-	double lowH = tmax(0.0, h_ref - h_range);
-	double highH = tmin(360.0, h_ref + h_range);
-	double lowS = tmax(0.0, s_ref - s_range);
-	double highS = tmin(1.0, s_ref + s_range);
-	double lowV = tmax(0.0, v_ref - v_range);
-	double highV = tmin(1.0, v_ref + v_range);
+	double lowH = std::max(0.0, h_ref - h_range);
+	double highH = std::min(360.0, h_ref + h_range);
+	double lowS = std::max(0.0, s_ref - s_range);
+	double highS = std::min(1.0, s_ref + s_range);
+	double lowV = std::max(0.0, v_ref - v_range);
+	double highV = std::min(1.0, v_ref + v_range);
 
 	TRaster32P raster32 = tile.getRaster();
 

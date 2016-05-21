@@ -230,7 +230,7 @@ TRaster32P convertToIcon(
 	const int margin = 10;
 	double scx = (iconSize.lx - margin) / imageBox.getLx();
 	double scy = (iconSize.ly - margin) / imageBox.getLy();
-	double sc = tmin(scx, scy);
+	double sc = std::min(scx, scy);
 	// aggiungo la traslazione: il punto centrale dell'immagine va nel punto
 	// centrale della pixmap
 	TPointD iconCenter(iconSize.lx * 0.5, iconSize.ly * 0.5);
@@ -290,7 +290,7 @@ TRaster32P convertToIcon(
 	int lx = rasCM32->getSize().lx;
 	int ly = rasCM32->getSize().ly;
 	int iconLx = iconSize.lx, iconLy = iconSize.ly;
-	if (tmax(double(lx) / iconSize.lx, double(ly) / iconSize.ly) == double(ly) / iconSize.ly)
+	if (std::max(double(lx) / iconSize.lx, double(ly) / iconSize.ly) == double(ly) / iconSize.ly)
 		iconLx = tround((double(lx) * iconSize.ly) / ly);
 	else
 		iconLy = tround((double(ly) * iconSize.lx) / lx);
@@ -395,7 +395,7 @@ TRaster32P convertToIcon(
 	const int margin = 10;
 	double scx = (iconSize.lx - margin) / imageBox.getLx();
 	double scy = (iconSize.ly - margin) / imageBox.getLy();
-	double sc = tmin(scx, scy);
+	double sc = std::min(scx, scy);
 
 	// aggiungo la traslazione: il punto centrale dell'immagine va nel punto
 	// centrale della pixmap
@@ -631,7 +631,7 @@ TRaster32P SplineIconRenderer::generateRaster(const TDimension &iconSize) const
 		scaleX = (double)iconSize.lx / sbbox.getLx();
 	if (sbbox.getLy() > 0.0)
 		scaleY = (double)iconSize.ly / sbbox.getLy();
-	double scale = 0.8 * tmin(scaleX, scaleY);
+	double scale = 0.8 * std::min(scaleX, scaleY);
 	TPointD centerStroke = 0.5 * (sbbox.getP00() + sbbox.getP11());
 	TPointD centerPixmap(iconSize.lx * 0.5, iconSize.ly * 0.5);
 	glPushMatrix();
@@ -1122,7 +1122,7 @@ TRaster32P IconGenerator::generateRasterFileIcon(
 
 	double sx = double(iconSize.lx) / ras32->getLx();
 	double sy = double(iconSize.ly) / ras32->getLy();
-	double sc = tmin(sx, sy); // show all the image, possibly adding bands
+	double sc = std::min(sx, sy); // show all the image, possibly adding bands
 
 	TAffine aff = TScale(sc).place(ras32->getCenterD(), icon->getCenterD());
 
@@ -1385,7 +1385,7 @@ TOfflineGL *IconGenerator::getOfflineGLContext()
 {
 	//One context per rendering thread
 	if (!m_contexts.hasLocalData()) {
-		TDimension contextSize(tmax(FilmstripIconSize.lx, IconSize.lx), tmax(FilmstripIconSize.ly, IconSize.ly));
+		TDimension contextSize(std::max(FilmstripIconSize.lx, IconSize.lx), std::max(FilmstripIconSize.ly, IconSize.ly));
 		m_contexts.setLocalData(new TOfflineGL(contextSize));
 	}
 	return m_contexts.localData();
@@ -1462,22 +1462,23 @@ QPixmap IconGenerator::getIcon(TXshLevel *xl, const TFrameId &fid, bool filmStri
 		case OVL_XSHLEVEL:
 		case TZI_XSHLEVEL:
 			addTask(id, new RasterImageIconRenderer(id, iconSize, sl, fid));
-
-			CASE PLI_XSHLEVEL : addTask(id, new VectorImageIconRenderer(id, iconSize, sl, fid, m_settings));
-
-			CASE TZP_XSHLEVEL:
-			{
-				// Yep, we could have rasters, due to a cleanupping process
-				if (status == TXshSimpleLevel::Scanned)
-					addTask(id, new RasterImageIconRenderer(id, iconSize, sl, fid));
-				else
-					addTask(id, new ToonzImageIconRenderer(id, iconSize, sl, fid, m_settings));
-			}
-
-			CASE MESH_XSHLEVEL : addTask(id, new MeshImageIconRenderer(id, iconSize, sl, fid, m_settings));
-
-		DEFAULT:
+			break;
+		case PLI_XSHLEVEL:
+			addTask(id, new VectorImageIconRenderer(id, iconSize, sl, fid, m_settings));
+			break;
+		case TZP_XSHLEVEL:
+			// Yep, we could have rasters, due to a cleanupping process
+			if (status == TXshSimpleLevel::Scanned)
+				addTask(id, new RasterImageIconRenderer(id, iconSize, sl, fid));
+			else
+				addTask(id, new ToonzImageIconRenderer(id, iconSize, sl, fid, m_settings));
+			break;
+		case MESH_XSHLEVEL:
+			addTask(id, new MeshImageIconRenderer(id, iconSize, sl, fid, m_settings));
+			break;
+		default:
 			assert(false);
+			break;
 		}
 
 		m_settings = oldSettings;
@@ -1502,23 +1503,23 @@ void IconGenerator::invalidate(TXshLevel *xl, const TFrameId &fid, bool onlyFilm
 		case OVL_XSHLEVEL:
 		case TZI_XSHLEVEL:
 			addTask(id, new RasterImageIconRenderer(id, getIconSize(), sl, fid));
-
-			CASE PLI_XSHLEVEL : removeIcon(id);
+			break;
+		case PLI_XSHLEVEL:
+			removeIcon(id);
 			addTask(id, new VectorImageIconRenderer(id, getIconSize(), sl, fid, m_settings));
-
-			CASE TZP_XSHLEVEL:
-			{
-				int status = sl->getFrameStatus(fid);
-				if (status == TXshSimpleLevel::Scanned)
-					addTask(id, new RasterImageIconRenderer(id, getIconSize(), sl, fid));
-				else
-					addTask(id, new ToonzImageIconRenderer(id, getIconSize(), sl, fid, m_settings));
-			}
-
-			CASE MESH_XSHLEVEL : addTask(id, new MeshImageIconRenderer(id, getIconSize(), sl, fid, m_settings));
-
-		DEFAULT:
+			break;
+		case TZP_XSHLEVEL:
+			if (sl->getFrameStatus(fid) == TXshSimpleLevel::Scanned)
+				addTask(id, new RasterImageIconRenderer(id, getIconSize(), sl, fid));
+			else
+				addTask(id, new ToonzImageIconRenderer(id, getIconSize(), sl, fid, m_settings));
+			break;
+		case MESH_XSHLEVEL:
+			addTask(id, new MeshImageIconRenderer(id, getIconSize(), sl, fid, m_settings));
+			break;
+		default:
 			assert(false);
+			break;
 		}
 
 		if (onlyFilmStrip)
@@ -1539,22 +1540,22 @@ void IconGenerator::invalidate(TXshLevel *xl, const TFrameId &fid, bool onlyFilm
 		case OVL_XSHLEVEL:
 		case TZI_XSHLEVEL:
 			addTask(id, new RasterImageIconRenderer(id, TDimension(80, 60), sl, fid));
-
-			CASE PLI_XSHLEVEL : addTask(id, new VectorImageIconRenderer(id, TDimension(80, 60), sl, fid, m_settings));
-
-			CASE TZP_XSHLEVEL:
-			{
-				int status = sl->getFrameStatus(fid);
-				if (status == TXshSimpleLevel::Scanned)
-					addTask(id, new RasterImageIconRenderer(id, TDimension(80, 60), sl, fid));
-				else
-					addTask(id, new ToonzImageIconRenderer(id, TDimension(80, 60), sl, fid, m_settings));
-			}
-
-			CASE MESH_XSHLEVEL : addTask(id, new MeshImageIconRenderer(id, TDimension(80, 60), sl, fid, m_settings));
-
-		DEFAULT:
+			break;
+		case PLI_XSHLEVEL:
+			addTask(id, new VectorImageIconRenderer(id, TDimension(80, 60), sl, fid, m_settings));
+			break;
+		case TZP_XSHLEVEL:
+			if (sl->getFrameStatus(fid) == TXshSimpleLevel::Scanned)
+				addTask(id, new RasterImageIconRenderer(id, TDimension(80, 60), sl, fid));
+			else
+				addTask(id, new ToonzImageIconRenderer(id, TDimension(80, 60), sl, fid, m_settings));
+			break;
+		case MESH_XSHLEVEL:
+			addTask(id, new MeshImageIconRenderer(id, TDimension(80, 60), sl, fid, m_settings));
+			break;
+		default:
 			assert(false);
+			break;
 		}
 
 		m_settings = oldSettings;

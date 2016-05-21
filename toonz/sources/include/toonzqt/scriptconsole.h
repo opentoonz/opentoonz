@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCRIPTCONSOLE_H
 #define SCRIPTCONSOLE_H

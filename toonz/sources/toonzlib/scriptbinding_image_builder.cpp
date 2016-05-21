@@ -4,8 +4,7 @@
 #include "toonz/scriptbinding_image.h"
 #include "ttoonzimage.h"
 #include "trop.h"
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 namespace TScriptBinding
 {

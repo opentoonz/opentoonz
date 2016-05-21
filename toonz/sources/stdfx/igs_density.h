@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_density_h
 #define igs_density_h
 

@@ -37,7 +37,6 @@ set(MOC_HEADERS
     ../include/toonzqt/intpairfield.h
     ../include/toonzqt/keyframenavigator.h
     ../include/toonzqt/lineedit.h
-    ../include/toonzqt/licensechecker.h
     ../include/toonzqt/menubarcommand.h
     ../include/toonzqt/multipleselection.h
     palettedata.h
@@ -124,7 +123,6 @@ set(SOURCES
     intpairfield.cpp
     keyframenavigator.cpp
     lineedit.cpp
-    licensechecker.cpp
     menubarcommand.cpp
     palettesscanpopup.cpp
     paletteviewer.cpp
@@ -211,9 +209,9 @@ qt5_add_resources(SOURCES ${RESOURCES})
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS} OPTIONS ${incs})
 
 add_library(toonzqt SHARED ${HEADERS} ${SOURCES} ${RESOURCES})
-if (APPLE)
+if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtoonzqt.dylib")
-endif (APPLE)
+endif()
 
 add_definitions(-DQT_WIDGETS_LIB -DTOONZQT_EXPORTS)
 

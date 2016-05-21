@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef VIEWERDRAW_INCLUDED
 #define VIEWERDRAW_INCLUDED

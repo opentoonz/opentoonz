@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SELECTION_COMMANDS_IDS_H
 #define SELECTION_COMMANDS_IDS_H
@@ -33,5 +33,6 @@
 #define MI_CloseChild "MI_CloseChild"
 #define MI_Collapse "MI_Collapse"
 #define MI_ExplodeChild "MI_ExplodeChild"
+#define MI_ToggleEditInPlace "MI_ToggleEditInPlace"
 
 #endif

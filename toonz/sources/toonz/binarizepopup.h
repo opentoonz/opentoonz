@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef BINARIZEPOPUP_H
 #define BINARIZEPOPUP_H

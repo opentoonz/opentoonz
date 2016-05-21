@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIIO_QUANTEL_INCLUDED
 #define TIIO_QUANTEL_INCLUDED

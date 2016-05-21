@@ -199,9 +199,7 @@ ShortcutTree::ShortcutTree(QWidget *parent)
 	addFolder(tr("Fill"), FillCommandType);
 	addFolder(tr("File"), MenuFileCommandType, menuCommandFolder);
 	addFolder(tr("Edit"), MenuEditCommandType, menuCommandFolder);
-#ifndef LINETEST
 	addFolder(tr("Scan & Cleanup"), MenuScanCleanupCommandType, menuCommandFolder);
-#endif
 	addFolder(tr("Level"), MenuLevelCommandType, menuCommandFolder);
 	addFolder(tr("Xsheet"), MenuXsheetCommandType, menuCommandFolder);
 	addFolder(tr("Cells"), MenuCellsCommandType, menuCommandFolder);
@@ -211,9 +209,7 @@ ShortcutTree::ShortcutTree(QWidget *parent)
 	addFolder(tr("Right-click Menu Commands"), RightClickMenuCommandType);
 
 	addFolder(tr("Tools"), ToolCommandType);
-#ifndef LINETEST
 	addFolder(tr("Tool Modifiers"), ToolModifierCommandType);
-#endif
 	addFolder(tr("Visualization"), ZoomCommandType);
 	addFolder(tr("Misc"), MiscCommandType);
 	addFolder(tr("Playback Controls"), PlaybackCommandType);

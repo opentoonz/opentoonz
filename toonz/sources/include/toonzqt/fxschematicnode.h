@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef FXSCHEMATICNODE_H
 #define FXSCHEMATICNODE_H

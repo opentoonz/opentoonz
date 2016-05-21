@@ -1,3 +1,5 @@
+#pragma once
+
 #if !defined(TOONZ_PARAMS_H__)
 #define TOONZ_PARAMS_H__
 

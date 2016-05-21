@@ -106,7 +106,7 @@ TRaster32P render(const TVectorImageP &vi, double &rasDpi, int margin,
 	// Ensure that the maximum lateral resolution is respected
 	if (scale * bboxD.getLx() > RENDERED_IMAGES_MAX_LATERAL_RESOLUTION ||
 		scale * bboxD.getLy() > RENDERED_IMAGES_MAX_LATERAL_RESOLUTION) {
-		scale = tmin(RENDERED_IMAGES_MAX_LATERAL_RESOLUTION / bboxD.getLx(),
+		scale = std::min(RENDERED_IMAGES_MAX_LATERAL_RESOLUTION / bboxD.getLx(),
 					 RENDERED_IMAGES_MAX_LATERAL_RESOLUTION / bboxD.getLy());
 	}
 
@@ -155,7 +155,7 @@ TRaster32P render(const TXsheet *xsh, int row, double &rasDpi, int margin,
 	// Ensure that the maximum lateral resolution is respected
 	if (scale * bbox.getLx() > RENDERED_IMAGES_MAX_LATERAL_RESOLUTION ||
 		scale * bbox.getLy() > RENDERED_IMAGES_MAX_LATERAL_RESOLUTION) {
-		scale = tmin(RENDERED_IMAGES_MAX_LATERAL_RESOLUTION / bbox.getLx(),
+		scale = std::min(RENDERED_IMAGES_MAX_LATERAL_RESOLUTION / bbox.getLx(),
 					 RENDERED_IMAGES_MAX_LATERAL_RESOLUTION / bbox.getLy());
 	}
 
@@ -302,7 +302,7 @@ TXshSimpleLevel *createMeshLevel(TXshLevel *texturesLevel)
 		case CANCEL:
 			return result;
 
-		case DELETE_OLD: {
+		case DELETE_OLD:
 			// Remove the level on disk
 			TSystem::removeFileOrLevel(origPath);
 			if (origSl) {
@@ -315,18 +315,17 @@ TXshSimpleLevel *createMeshLevel(TXshLevel *texturesLevel)
 
 			codedDstPath = codedOrigPath;
 			dstPath = origPath;
-		}
+			break;
 
-			CASE OVERWRITE_OLD:
-			{
-				if (origSl) {
-					removeIcons(origSl, origSl->getFids()); // Invalidate the levels' icons
-					origSl->setDirtyFlag(true);
-				}
-
-				codedDstPath = codedOrigPath;
-				dstPath = origPath;
+		case OVERWRITE_OLD:
+			if (origSl) {
+				removeIcons(origSl, origSl->getFids()); // Invalidate the levels' icons
+				origSl->setDirtyFlag(true);
 			}
+
+			codedDstPath = codedOrigPath;
+			dstPath = origPath;
+			break;
 		}
 	}
 
@@ -747,7 +746,7 @@ void MeshifyPopup::acquirePreview()
 			m_cell = xsh->getCell(m_r, childId.getIndex());
 	}
 
-	if (sl = m_cell.getSimpleLevel()) {
+	if ((sl = m_cell.getSimpleLevel())) {
 		// Standard image case
 		m_viewer->m_img = sl->getFullsampledFrame(m_cell.getFrameId(), ImageManager::dontPutInCache);
 
@@ -1174,8 +1173,8 @@ void meshifySelection(Func func,
 			if (!column || column->isEmpty())
 				continue;
 
-			r0 = tmin(r0, column->getFirstRow());
-			r1 = tmax(r1, column->getMaxFrame());
+			r0 = std::min(r0, column->getFirstRow());
+			r1 = std::max(r1, column->getMaxFrame());
 		}
 
 		(*func)(r0, c0, r1, c1, options);
@@ -1266,24 +1265,19 @@ bool meshifySelection(const MeshifyOptions &options)
 
 	switch (cTypes) {
 	case HAS_LEVEL_COLUMNS:
-
 		// Create new mesh columns corresponding to specified selection
 		meshifySelection(&createMeshifiedColumns, selection, options);
-
-		CASE HAS_MESH_COLUMNS :
-
-			// Check parental relationship - if specified columns have level column children,
-			// update related meshes
-			meshifySelection(&updateMeshifiedColumns, selection, options);
-
-		CASE HAS_LEVEL_COLUMNS | HAS_MESH_COLUMNS :
-
-			// Error message
-			DVGui::error(MeshifyPopup::tr("Current selection contains mixed image and mesh level types"));
+		break;
+	case HAS_MESH_COLUMNS:
+		// Check parental relationship - if specified columns have level column children,
+		// update related meshes
+		meshifySelection(&updateMeshifiedColumns, selection, options);
+		break;
+	case HAS_LEVEL_COLUMNS | HAS_MESH_COLUMNS:
+		// Error message
+		DVGui::error(MeshifyPopup::tr("Current selection contains mixed image and mesh level types"));
 		return false;
-
-	DEFAULT:
-
+	default:
 		// Error message
 		DVGui::error(MeshifyPopup::tr("Current selection contains no image or mesh level types"));
 		return false;

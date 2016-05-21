@@ -55,8 +55,8 @@ void fillArea(const TRasterCM32P &ras, TRegion *r, int colorId,
 		for (UINT j = 0; j < intersections.size(); j += 2) {
 			if (intersections[j] == intersections[j + 1])
 				continue;
-			int from = tmax(tfloor(intersections[j]), bbox.x0);
-			int to = tmin(tceil(intersections[j + 1]), bbox.x1);
+			int from = std::max(tfloor(intersections[j]), bbox.x0);
+			int to = std::min(tceil(intersections[j + 1]), bbox.x1);
 			TPixelCM32 *pix = line + from;
 			for (int k = from; k < to; k++, pix++) {
 				if (fillPaints && (!onlyUnfilled || pix->getPaint() == 0))
@@ -679,8 +679,8 @@ TPoint InkSegmenter::nearestInk(const TPoint &p, int ray)
 {
 	int i, j;
 
-	for (j = tmax(p.y - ray, 0); j <= tmin(p.y + ray, m_ly - 1); j++)
-		for (i = tmax(p.x - ray, 0); i <= tmin(p.x + ray, m_lx - 1); i++)
+	for (j = std::max(p.y - ray, 0); j <= std::min(p.y + ray, m_ly - 1); j++)
+		for (i = std::max(p.x - ray, 0); i <= std::min(p.x + ray, m_lx - 1); i++)
 			if (!(m_buf + j * m_wrap + i)->isPurePaint())
 				return TPoint(i, j);
 
@@ -771,14 +771,28 @@ inline void newP(int next, TPoint &p)
 {
 	switch (next) {
 	case 0:
-		__OR 3 : __OR 5 : p.x -= 1;
-		CASE 2 : __OR 4 : __OR 7 : p.x += 1;
+	case 3:
+	case 5:
+		p.x -= 1;
+		break;
+	case 2:
+	case 4:
+	case 7:
+		p.x += 1;
+		break;
 	}
 
 	switch (next) {
 	case 0:
-		__OR 1 : __OR 2 : p.y -= 1;
-		CASE 5 : __OR 6 : __OR 7 : p.y += 1;
+	case 1:
+	case 2:
+		p.y -= 1;
+		break;
+	case 5:
+	case 6:
+	case 7:
+		p.y += 1;
+		break;
 	}
 }
 

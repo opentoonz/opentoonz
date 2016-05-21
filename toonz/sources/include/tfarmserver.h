@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TFARMSERVER_H
 #define TFARMSERVER_H
 

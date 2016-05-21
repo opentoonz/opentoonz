@@ -860,9 +860,6 @@ void PaletteViewer::deletePage()
 		*/
 void PaletteViewer::saveStudioPalette()
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-#else
 	StudioPalette *sp = StudioPalette::instance();
 	TPalette *palette = getPalette();
 	if (!palette) {
@@ -910,7 +907,6 @@ void PaletteViewer::saveStudioPalette()
 	}
 
 	m_paletteHandle->notifyPaletteChanged();
-#endif
 }
 
 //-----------------------------------------------------------------------------

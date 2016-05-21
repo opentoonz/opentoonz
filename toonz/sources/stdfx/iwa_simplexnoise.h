@@ -1,3 +1,5 @@
+#pragma once
+
 /*--------------------------------------------------------------------
  Simplex Noise C++ implementation
  Based on a public domain code by Stefan Gustavson.

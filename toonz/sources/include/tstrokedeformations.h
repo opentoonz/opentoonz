@@ -1,10 +1,11 @@
-
+#pragma once
 
 #ifndef TSTROKES_DEFORMATIONS_H
 #define TSTROKES_DEFORMATIONS_H
 
 // #include "tstrokeutil.h"
 #include "tgeometry.h"
+#include <memory>
 
 #undef DVAPI
 #undef DVVAR
@@ -80,7 +81,7 @@ class DVAPI TStrokePointDeformation : public TStrokeDeformation
 {
 protected:
 	struct Imp;
-	Imp *m_imp;
+	std::unique_ptr<Imp> m_imp;
 
 public:
 	/*!

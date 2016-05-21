@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SAVEPRESETPOPUP_H
 #define SAVEPRESETPOPUP_H

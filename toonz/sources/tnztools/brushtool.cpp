@@ -290,7 +290,7 @@ void findMaxCurvPoints(
 			t_ext = 0;
 		else
 			t_ext = 1;
-		double maxEstremi = tmax(estremo_dx, estremo_sx);
+		double maxEstremi = std::max(estremo_dx, estremo_sx);
 		if (maxEstremi > estremo_int) {
 			t = t_ext;
 			curv_max = maxEstremi;
@@ -570,11 +570,9 @@ BrushTool::BrushTool(std::string name, int targetType)
 	}
 
 	m_prop[0].bind(m_pressure);
-#ifndef STUDENT
 	m_prop[0].bind(m_preset);
 	m_preset.setId("BrushPreset");
 	m_preset.addValue(CUSTOM_WSTR);
-#endif
 	m_pressure.setId("PressureSensibility");
 
 	m_capStyle.addValue(BUTT_WSTR);
@@ -1229,10 +1227,13 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
 		double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
 
 		locals.addMinMax(TToonzImageP(getImage(false, 1)) ? m_rasThickness : m_thickness, add);
+
+		break;
 	}
 
-	DEFAULT:
+	default:
 		m_brushPos = pos;
+		break;
 	}
 
 	m_mousePos = pos;
@@ -1494,7 +1495,7 @@ void BrushTool::loadPreset()
 			m_joinStyle.setIndex(preset.m_join);
 			m_miterJoinLimit.setValue(preset.m_miter);
 		} else {
-			m_rasThickness.setValue(TDoublePairProperty::Value(tmax(preset.m_min, 1.0), preset.m_max));
+			m_rasThickness.setValue(TDoublePairProperty::Value(std::max(preset.m_min, 1.0), preset.m_max));
 			m_brushPad = ToolUtils::getBrushPad(preset.m_max, preset.m_hardness * 0.01);
 			m_hardness.setValue(preset.m_hardness, true);
 			m_selective.setValue(preset.m_selective);

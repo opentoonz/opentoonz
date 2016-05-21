@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TPREDICTIVECACHEMANAGER_H
 #define TPREDICTIVECACHEMANAGER_H
 

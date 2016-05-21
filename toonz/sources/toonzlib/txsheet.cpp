@@ -1209,7 +1209,7 @@ void TXsheet::updateFrameCount()
 	for (int i = 0; i < m_imp->m_columnSet.getColumnCount(); ++i) {
 		TXshColumnP cc = m_imp->m_columnSet.getColumn(i);
 		if (cc && !cc->isEmpty())
-			m_imp->m_frameCount = tmax(m_imp->m_frameCount, cc->getMaxFrame() + 1);
+			m_imp->m_frameCount = std::max(m_imp->m_frameCount, cc->getMaxFrame() + 1);
 	}
 }
 
@@ -1237,7 +1237,7 @@ void TXsheet::loadData(TIStream &is)
 				if (TXshZeraryFxColumn *zc = dynamic_cast<TXshZeraryFxColumn *>(column)) {
 					TFx *fx = zc->getZeraryColumnFx()->getZeraryFx();
 					int fxTypeCount = m_imp->m_fxDag->getFxTypeCount(fx);
-					int maxFxTypeId = tmax(fxTypeCount, fx->getAttributes()->getId());
+					int maxFxTypeId = std::max(fxTypeCount, fx->getAttributes()->getId());
 					m_imp->m_fxDag->updateFxTypeTable(fx, maxFxTypeId);
 					m_imp->m_fxDag->updateFxIdTable(fx);
 					for (int j = 0; j < fx->getParams()->getParamCount(); j++) {
@@ -1397,7 +1397,7 @@ void TXsheet::moveColumn(int srcIndex, int dstIndex)
 		return;
 	assert(srcIndex >= 0);
 	assert(dstIndex >= 0);
-	int col = tmax(srcIndex, dstIndex);
+	int col = std::max(srcIndex, dstIndex);
 	if (col >= m_imp->m_columnSet.getColumnCount()) {
 		int n = m_imp->m_columnSet.getColumnCount();
 		touchColumn(col, TXshColumn::eLevelType);
@@ -1718,10 +1718,10 @@ TRectD TXsheet::getBBox(int r) const
 		const TRectD &colBBox = locals::getBBox(this, r, c);
 
 		// Make the union
-		bbox.x0 = tmin(bbox.x0, colBBox.x0);
-		bbox.y0 = tmin(bbox.y0, colBBox.y0);
-		bbox.x1 = tmax(bbox.x1, colBBox.x1);
-		bbox.y1 = tmax(bbox.y1, colBBox.y1);
+		bbox.x0 = std::min(bbox.x0, colBBox.x0);
+		bbox.y0 = std::min(bbox.y0, colBBox.y0);
+		bbox.x1 = std::max(bbox.x1, colBBox.x1);
+		bbox.y1 = std::max(bbox.y1, colBBox.y1);
 	}
 
 	return bbox;

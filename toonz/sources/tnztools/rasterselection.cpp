@@ -133,8 +133,8 @@ TRasterPT<PIXEL1> getImageFromStroke(TRasterPT<PIXEL2> ras, const TStroke &strok
 			for (j = 0; j < (int)intersections.size(); j += 2) {
 				if (intersections[j] == intersections[j + 1])
 					continue;
-				int from = tmax(tfloor(intersections[j]), bBox.x0);
-				int to = tmin(tceil(intersections[j + 1]), bBox.x1);
+				int from = std::max(tfloor(intersections[j]), bBox.x0);
+				int to = std::min(tceil(intersections[j + 1]), bBox.x1);
 				for (k = from; k <= to; k++) {
 					TRasterCM32P bufferCM(buffer);
 					TRaster32P buffer32(buffer);
@@ -188,7 +188,7 @@ TRasterPT<PIXEL1> getImageFromSelection(TRasterPT<PIXEL2> &ras, RasterSelection 
 		TRect strokeRect(tfloor(strokeRectD.x0), tfloor(strokeRectD.y0), tceil(strokeRectD.x1) - 1, tceil(strokeRectD.y1) - 1);
 		TPoint offset((strokeRect * rSelectionBound).getP00() - rSelectionBound.getP00());
 		TPoint startP = rSelectionBound.getP00() + offset;
-		startPosition = TPoint(tmin(startPosition.x, startP.x), tmin(startPosition.y, startP.y));
+		startPosition = TPoint(std::min(startPosition.x, startP.x), std::min(startPosition.y, startP.y));
 		TRop::over(selectedRaster, app, offset);
 	}
 
@@ -253,8 +253,8 @@ void deleteSelectionWithoutUndo(TRasterPT<PIXEL> &ras, const std::vector<TStroke
 				for (j = 0; j < (int)intersections.size(); j += 2) {
 					if (intersections[j] == intersections[j + 1])
 						continue;
-					int from = tmax(tfloor(intersections[j]), bBox.x0);
-					int to = tmin(tceil(intersections[j + 1]), bBox.x1);
+					int from = std::max(tfloor(intersections[j]), bBox.x0);
+					int to = std::min(tceil(intersections[j + 1]), bBox.x1);
 					for (k = from; k <= to; k++)
 						*(selectedLine + k) = emptyValue;
 				}

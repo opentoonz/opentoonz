@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef igs_radial_blur_h
 #define igs_radial_blur_h
 

@@ -820,12 +820,10 @@ void LineTestViewer::resetView()
 void LineTestViewer::onButtonPressed(FlipConsole::EGadget button)
 {
 	switch (button) {
-		CASE FlipConsole::eFilledRaster:
-		{
-			TXshSimpleLevel::m_fillFullColorRaster = !TXshSimpleLevel::m_fillFullColorRaster;
-			update();
-		}
-	DEFAULT:;
+	case FlipConsole::eFilledRaster:
+		TXshSimpleLevel::m_fillFullColorRaster = !TXshSimpleLevel::m_fillFullColorRaster;
+		update();
+		break;
 	}
 }
 

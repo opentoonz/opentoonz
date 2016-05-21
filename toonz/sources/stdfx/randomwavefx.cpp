@@ -273,7 +273,7 @@ public:
 		double warperEnlargement = getWarperEnlargement(params);
 		warperComputeRect = warperComputeRect.enlarge(warperEnlargement);
 
-		return tmax(
+		return std::max(
 			TRasterFx::memorySize(warpedComputeRect, info.m_bpp),
 			TRasterFx::memorySize(warperComputeRect, info.m_bpp));
 	}

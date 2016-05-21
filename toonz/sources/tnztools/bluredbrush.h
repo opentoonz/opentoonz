@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_BLUREDBRUSH
 #define T_BLUREDBRUSH

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSCENEHANDLE_H
 #define TSCENEHANDLE_H

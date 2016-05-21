@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIIO_SGI_INCLUDED
 #define TIIO_SGI_INCLUDED

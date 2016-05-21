@@ -1,7 +1,6 @@
 set(VERSION 1.0)
 
 set(MOC_HEADERS
-    actioncommand.h
     addfilmstripframespopup.h
     adjustlevelspopup.h
     adjustthicknesspopup.h
@@ -72,7 +71,7 @@ set(MOC_HEADERS
     mainwindow.h
     matchline.h
     menubar.h
-	menubarpopup.h
+    menubarpopup.h
     menubarcommandids.h
     meshifypopup.h
     messagepanel.h
@@ -144,9 +143,7 @@ set(MOC_HEADERS
     metnum.h
     ObjectTracker.h
     predict3d.h
-    processor.h
-    viewer.h
-    writer.h)
+    processor.h)
 
 set(HEADERS ${MOC_HEADERS})
 
@@ -160,7 +157,7 @@ set(SOURCES
     mainwindow.cpp
     matchline.cpp
     menubar.cpp
-	menubarpopup.cpp
+    menubarpopup.cpp
     mergecolumns.cpp
     moviegenerator.cpp
     pane.cpp
@@ -301,9 +298,7 @@ set(SOURCES
     dummyprocessor.cpp
     metnum.cpp
     ObjectTracker.cpp
-    predict3d.cpp
-    viewer.cpp
-    writer.cpp)
+    predict3d.cpp)
 
 add_translation(toonz ${HEADERS} ${SOURCES})
 
@@ -312,13 +307,13 @@ set(OBJCSOURCES filebrowsermodel.cpp)
 # Resource file(s)
 set(RESOURCES toonz.qrc)
 
-if (WIN32)
+if(WIN32)
     set(RC_FILE toonz.rc)
-endif ()
+endif()
 
 qt5_add_resources(SOURCES ${RESOURCES})
 
-if (APPLE)
+if(APPLE)
     #set_source_files_properties(${OBJCSOURCES} PROPERTIES LANGUAGE OBJCXX)
     set_source_files_properties(${OBJCSOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif()
@@ -346,7 +341,7 @@ message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
 include_directories(../../sources/toonzfarm/include)
 include_directories(../../sources/toonzqt)
-if (WIN32)
+if(WIN32)
     if(PLATFORM EQUAL 32)
         include_directories(${SDKROOT}/quicktime/QT73SDK/CIncludes)
     endif()
@@ -369,7 +364,7 @@ else()
 
 endif()
 
-if (APPLE)
+if(APPLE)
     # CMAKE_RUNTIME_OUTPUT_DIRECTORY should be equivalent to usage on windows despite empty
     # OSX だと CMAKE_RUNTIME_OUTPUT_DIRECTORY が空だが Windows 版と同じ使い方ができるようにしておく
     get_target_property(bin OpenToonz_${VERSION} LOCATION)
@@ -382,7 +377,7 @@ if(LZODRIVER_FOUND)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lzodecompress> ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} DEPENDS lzodecompress)
 endif()
 
-if (APPLE)
+if(APPLE)
     get_target_property(loc OpenToonz_${VERSION} MACOSX_BUNDLE_NAME)
     message(" ==> App Bundle: " ${loc})
     message(" ==> Mach-o: " ${bin})
@@ -401,10 +396,5 @@ if (APPLE)
 
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/qss)
-
-    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../../install/SystemVar.ini ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
-
-
-endif (APPLE)
-
-
+    add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/../install/SystemVar.ini ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
+endif()

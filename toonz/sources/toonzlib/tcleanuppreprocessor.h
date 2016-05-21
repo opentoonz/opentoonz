@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCLEANUP_PREPROCESSOR_H
 #define TCLEANUP_PREPROCESSOR_H

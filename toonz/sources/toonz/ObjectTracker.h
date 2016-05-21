@@ -1,3 +1,5 @@
+#pragma once
+
 #if !defined(OBEJCTTRACKER_H_INCLUDED_)
 #define OBEJCTTRACKER_H_INCLUDED_
 

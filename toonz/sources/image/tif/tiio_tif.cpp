@@ -454,14 +454,14 @@ void TifReader::readLine(short *buffer, int x0, int x1, int shrink)
 			int y = tileHeight * m_stripIndex;
 
 			// In case it's the last tiles row, the tile size might exceed the image bounds
-			int lastTy = tmin((int)tileHeight, m_info.m_ly - y);
+			int lastTy = std::min((int)tileHeight, m_info.m_ly - y);
 
 			// Traverse the tiles row
 			while (x < m_info.m_lx) {
 				int ret = TIFFReadRGBATile_64(m_tiff, x, y, tile.get());
 				assert(ret);
 
-				int tileRowSize = tmin((int)tileWidth, m_info.m_lx - x) * pixelSize;
+				int tileRowSize = std::min((int)tileWidth, m_info.m_lx - x) * pixelSize;
 
 				// Copy the tile rows in the corresponding output strip rows
 				for (int ty = 0; ty < lastTy; ++ty) {
@@ -489,18 +489,23 @@ void TifReader::readLine(short *buffer, int x0, int x1, int shrink)
 	case ORIENTATION_TOPLEFT:
 	case ORIENTATION_TOPRIGHT:
 	case ORIENTATION_LEFTTOP:
-	case ORIENTATION_RIGHTTOP: {
+	case ORIENTATION_RIGHTTOP:
 		// We have to invert the fixed BOTTOM-UP returned by TIFF functions - since this function is
 		// supposed to ignore orientation issues (which are managed outside).
 
 		// The last tiles row will actually start at the END OF THE IMAGE (not necessarily at
 		// m_rowsPerStrip multiples). So, we must adjust for that.
 
-		r = tmin(m_rowsPerStrip, m_info.m_ly - m_rowsPerStrip * m_stripIndex) - 1 -
+		r = std::min(m_rowsPerStrip, m_info.m_ly - m_rowsPerStrip * m_stripIndex) - 1 -
 			(m_row % m_rowsPerStrip);
-	}
+		break;
 
-		CASE ORIENTATION_BOTRIGHT : case ORIENTATION_BOTLEFT : case ORIENTATION_RIGHTBOT : case ORIENTATION_LEFTBOT : r = m_row % m_rowsPerStrip;
+	case ORIENTATION_BOTRIGHT:
+	case ORIENTATION_BOTLEFT:
+	case ORIENTATION_RIGHTBOT:
+	case ORIENTATION_LEFTBOT:
+		r = m_row % m_rowsPerStrip;
+		break;
 	}
 
 	// Finally, copy the strip row to the output row buffer
@@ -578,13 +583,13 @@ void TifReader::readLine(char *buffer, int x0, int x1, int shrink)
 			int x = 0;
 			int y = tileHeight * m_stripIndex;
 
-			int lastTy = tmin((int)tileHeight, m_info.m_ly - y);
+			int lastTy = std::min((int)tileHeight, m_info.m_ly - y);
 
 			while (x < m_info.m_lx) {
 				int ret = TIFFReadRGBATile(m_tiff, x, y, tile.get());
 				assert(ret);
 
-				int tileRowSize = tmin((int)tileWidth, (int)(m_info.m_lx - x)) * pixelSize;
+				int tileRowSize = std::min((int)tileWidth, (int)(m_info.m_lx - x)) * pixelSize;
 
 				for (int ty = 0; ty < lastTy; ++ty) {
 					memcpy(
@@ -611,18 +616,23 @@ void TifReader::readLine(char *buffer, int x0, int x1, int shrink)
 	case ORIENTATION_TOPLEFT:
 	case ORIENTATION_TOPRIGHT:
 	case ORIENTATION_LEFTTOP:
-	case ORIENTATION_RIGHTTOP: {
+	case ORIENTATION_RIGHTTOP:
 		// We have to invert the fixed BOTTOM-UP returned by TIFF functions - since this function is
 		// supposed to ignore orientation issues (which are managed outside).
 
 		// The last tiles row will actually start at the END OF THE IMAGE (not necessarily at
 		// m_rowsPerStrip multiples). So, we must adjust for that.
 
-		r = tmin(m_rowsPerStrip, m_info.m_ly - m_rowsPerStrip * m_stripIndex) - 1 -
+		r = std::min(m_rowsPerStrip, m_info.m_ly - m_rowsPerStrip * m_stripIndex) - 1 -
 			(m_row % m_rowsPerStrip);
-	}
+		break;
 
-		CASE ORIENTATION_BOTRIGHT : case ORIENTATION_BOTLEFT : case ORIENTATION_RIGHTBOT : case ORIENTATION_LEFTBOT : r = m_row % m_rowsPerStrip;
+	case ORIENTATION_BOTRIGHT:
+	case ORIENTATION_BOTLEFT:
+	case ORIENTATION_RIGHTBOT:
+	case ORIENTATION_LEFTBOT:
+		r = m_row % m_rowsPerStrip;
+		break;
 	}
 
 	TPixel32 *pix = (TPixel32 *)buffer;

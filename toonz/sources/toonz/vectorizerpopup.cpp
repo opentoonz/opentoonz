@@ -272,19 +272,19 @@ void Vectorizer::setLevel(const TXshSimpleLevelP &level)
 			return;
 
 		switch (m_dialog->getChoice()) {
-		case OverwriteDialog::KEEP_OLD: {
+		case OverwriteDialog::KEEP_OLD:
 			xl = scene->getLevelSet()->getLevel(levelName);
 			if (!xl)
 				xl = scene->loadLevel(dstPath);
 
 			m_vLevel = xl->getSimpleLevel();
 			return;
-		}
-
-			CASE OverwriteDialog::OVERWRITE : overWrite = true;
-
-		DEFAULT:
+		case OverwriteDialog::OVERWRITE:
+			overWrite = true;
+			break;
+		default:
 			levelName = name;
+			break;
 		}
 	}
 
@@ -373,7 +373,7 @@ int Vectorizer::doVectorize()
 			center = ri->getRaster()->getCenterD();
 
 		// Build vectorizer configuration
-		double weight = (ft->getNumber() - 1 - frameRange[0]) / tmax(frameRange[1] - frameRange[0], 1.0);
+		double weight = (ft->getNumber() - 1 - frameRange[0]) / std::max(frameRange[1] - frameRange[0], 1.0);
 		weight = tcrop(weight, 0.0, 1.0);
 
 		locals.updateConfig(weight); // TEMPORARY

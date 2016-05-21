@@ -161,10 +161,10 @@ bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer, QMouseEvent *e
 			worldCurPos = cameraAffInv * worldCurPos;
 
 			TRectD worldPreviewSubCameraRect(
-				tmin(worldMousePressPos.x, worldCurPos.x),
-				tmin(worldMousePressPos.y, worldCurPos.y),
-				tmax(worldMousePressPos.x, worldCurPos.x),
-				tmax(worldMousePressPos.y, worldCurPos.y));
+				std::min(worldMousePressPos.x, worldCurPos.x),
+				std::min(worldMousePressPos.y, worldCurPos.y),
+				std::max(worldMousePressPos.x, worldCurPos.x),
+				std::max(worldMousePressPos.y, worldCurPos.y));
 
 			TCamera *camera = app->getCurrentScene()->getScene()->getCurrentCamera();
 			//camera->setInterestStageRect(worldPreviewSubCameraRect);
@@ -212,11 +212,22 @@ bool PreviewSubCameraManager::mouseMoveEvent(SceneViewer *viewer, QMouseEvent *e
 			case DRAG_LEFT:
 			case DRAG_RIGHT:
 				viewer->setCursor(Qt::SizeHorCursor);
-				CASE DRAG_TOP : case DRAG_BOTTOM : viewer->setCursor(Qt::SizeVerCursor);
-				CASE DRAG_LEFT | DRAG_TOP : case DRAG_RIGHT | DRAG_BOTTOM : viewer->setCursor(Qt::SizeFDiagCursor);
-				CASE DRAG_LEFT | DRAG_BOTTOM : case DRAG_RIGHT | DRAG_TOP : viewer->setCursor(Qt::SizeBDiagCursor);
-			DEFAULT:
+				break;
+			case DRAG_TOP:
+			case DRAG_BOTTOM:
+				viewer->setCursor(Qt::SizeVerCursor);
+				break;
+			case DRAG_LEFT | DRAG_TOP:
+			case DRAG_RIGHT | DRAG_BOTTOM:
+				viewer->setCursor(Qt::SizeFDiagCursor);
+				break;
+			case DRAG_LEFT | DRAG_BOTTOM:
+			case DRAG_RIGHT | DRAG_TOP:
+				viewer->setCursor(Qt::SizeBDiagCursor);
+				break;
+			default:
 				viewer->setCursor(Qt::ArrowCursor);
+				break;
 			}
 	}
 
@@ -265,10 +276,10 @@ UCHAR PreviewSubCameraManager::getSubCameraDragEnum(SceneViewer *viewer, const Q
 	TPointD cameraPosB(winToCamera(viewer, mousePos + QPoint(0, 10)));
 
 	TRectD cameraPosBox(
-		tmin(cameraPosL.x, cameraPosR.x, cameraPosT.x, cameraPosB.x),
-		tmin(cameraPosL.y, cameraPosR.y, cameraPosT.y, cameraPosB.y),
-		tmax(cameraPosL.x, cameraPosR.x, cameraPosT.x, cameraPosB.x),
-		tmax(cameraPosL.y, cameraPosR.y, cameraPosT.y, cameraPosB.y));
+		std::min({cameraPosL.x, cameraPosR.x, cameraPosT.x, cameraPosB.x}),
+		std::min({cameraPosL.y, cameraPosR.y, cameraPosT.y, cameraPosB.y}),
+		std::max({cameraPosL.x, cameraPosR.x, cameraPosT.x, cameraPosB.x}),
+		std::max({cameraPosL.y, cameraPosR.y, cameraPosT.y, cameraPosB.y}));
 
 	TRectD subCameraD(subCamera.x0, subCamera.y0, subCamera.x1 + 1, subCamera.y1 + 1);
 

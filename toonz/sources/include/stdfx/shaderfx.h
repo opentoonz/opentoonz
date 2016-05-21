@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SHADERFX_H
 #define SHADERFX_H

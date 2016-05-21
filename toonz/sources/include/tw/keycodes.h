@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TW_KEYCODES_INCLUDED
 #define TW_KEYCODES_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef PLASTICVERTEXSELECTION_H
 #define PLASTICVERTEXSELECTION_H

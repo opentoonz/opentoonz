@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef NAMEBUILDER_INCLUDED
 #define NAMEBUILDER_INCLUDED

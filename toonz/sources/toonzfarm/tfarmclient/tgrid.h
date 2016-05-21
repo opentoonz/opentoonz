@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TGRID_H
 #define TGRID_H

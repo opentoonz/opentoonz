@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCENE_VIEWER_CONTEXT_MENU
 #define SCENE_VIEWER_CONTEXT_MENU

@@ -85,7 +85,7 @@ void doQuickPutFilter(
 
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	//  disponibili per la parte intera di xL, yL)
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
 						  (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
@@ -94,16 +94,16 @@ void doQuickPutFilter(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	TAffine invAff = inv(aff); //  inversa di aff
 
@@ -245,8 +245,8 @@ void doQuickPutFilter(
 		}
 
 		//  calcola kMin, kMax effettuando anche il clipping su dn
-		int kMin = tmax(kMinX, kMinY, (int)0);
-		int kMax = tmin(kMaxX, kMaxY, xMax - xMin);
+		int kMin = std::max({kMinX, kMinY, (int)0});
+		int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
 		TPixel32 *dnPix = dnRow + xMin + kMin;
 		TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
@@ -360,7 +360,7 @@ void doQuickPutNoFilter(
 
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	//  disponibili per la parte intera di xL, yL)
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TRectD boundingBoxD = TRectD(convert(dn->getBounds())) *
 						  (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
@@ -370,16 +370,16 @@ void doQuickPutNoFilter(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	//  inversa di aff
 	TAffine invAff = inv(aff);
@@ -534,8 +534,8 @@ void doQuickPutNoFilter(
 		}
 
 		//  calcola kMin, kMax effettuando anche il clippind su dn
-		int kMin = tmax(kMinX, kMinY, (int)0);
-		int kMax = tmin(kMaxX, kMaxY, xMax - xMin);
+		int kMin = std::max({kMinX, kMinY, (int)0});
+		int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
 		TPixel32 *dnPix = dnRow + xMin + kMin;
 		TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
@@ -605,7 +605,7 @@ void doQuickPutNoFilter(
 
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	//  disponibili per la parte intera di xL, yL)
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TRectD boundingBoxD = TRectD(convert(dn->getBounds())) *
 						  (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
@@ -615,16 +615,16 @@ void doQuickPutNoFilter(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	//  inversa di aff
 	TAffine invAff = inv(aff);
@@ -779,8 +779,8 @@ void doQuickPutNoFilter(
 		}
 
 		//  calcola kMin, kMax effettuando anche il clippind su dn
-		int kMin = tmax(kMinX, kMinY, (int)0);
-		int kMax = tmin(kMaxX, kMaxY, xMax - xMin);
+		int kMin = std::max({kMinX, kMinY, (int)0});
+		int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
 		TPixel32 *dnPix = dnRow + xMin + kMin;
 		TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
@@ -832,7 +832,7 @@ void doQuickPutNoFilter(
 	if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0)
 		return;
 	const int PADN = 16;
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TRectD boundingBoxD = TRectD(convert(dn->getBounds())) *
 						  (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
@@ -840,13 +840,13 @@ void doQuickPutNoFilter(
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
 		return;
 
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	TAffine invAff = inv(aff);
 
@@ -935,8 +935,8 @@ void doQuickPutNoFilter(
 		}
 
 		//  calcola kMin, kMax effettuando anche il clippind su dn
-		int kMin = tmax(kMinX, kMinY, (int)0);
-		int kMax = tmin(kMaxX, kMaxY, xMax - xMin);
+		int kMin = std::max({kMinX, kMinY, (int)0});
+		int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
 		TPixel32 *dnPix = dnRow + xMin + kMin;
 		TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
@@ -1003,7 +1003,7 @@ void doQuickPutFilter(
 	//  maschera del filtro bilineare
 	const int MASKN = (1 << PADN) - 1;
 
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	//  disponibili per la parte intera di xL, yL)
@@ -1016,16 +1016,16 @@ void doQuickPutFilter(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	//  inversa di aff
 	TAffine invAff = inv(aff);
@@ -1133,8 +1133,8 @@ void doQuickPutFilter(
 		}
 	}
 	//	calcola kMinY, kMaxY effettuando anche il clippind su dn
-	kMinY = tmax(kMinY, (int)0);
-	kMaxY = tmin(kMaxY, yMax - yMin);
+	kMinY = std::max(kMinY, (int)0);
+	kMaxY = std::min(kMaxY, yMax - yMin);
 
 	//  calcola kMinX, kMaxX intersecando la (2) con
 	//  i lati (x = xMin) e (x = xMax) di up
@@ -1158,8 +1158,8 @@ void doQuickPutFilter(
 		}
 	}
 	//  calcola kMinX, kMaxX effettuando anche il clippind su dn
-	kMinX = tmax(kMinX, (int)0);
-	kMaxX = tmin(kMaxX, xMax - xMin);
+	kMinX = std::max(kMinX, (int)0);
+	kMaxX = std::min(kMaxX, xMax - xMin);
 
 	int dnWrap = dn->getWrap();
 	int upWrap = up->getWrap();
@@ -1277,7 +1277,7 @@ void doQuickPutNoFilter(
 
 	//  contatore bit di shift
 	const int PADN = 16;
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	// disponibili per la parte intera di xL, yL)
 
@@ -1290,16 +1290,16 @@ void doQuickPutNoFilter(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	TAffine invAff = inv(aff); //  inversa di aff
 
@@ -1411,8 +1411,8 @@ void doQuickPutNoFilter(
 		}
 	}
 	//  calcola kMinY, kMaxY effettuando anche il clippind su dn
-	kMinY = tmax(kMinY, (int)0);
-	kMaxY = tmin(kMaxY, yMax - yMin);
+	kMinY = std::max(kMinY, (int)0);
+	kMaxY = std::min(kMaxY, yMax - yMin);
 
 	//  calcola kMinX, kMaxX intersecando la (2) con i lati
 	//  (x = xMin) e (x = xMax) di up
@@ -1436,8 +1436,8 @@ void doQuickPutNoFilter(
 		}
 	}
 	//  calcola kMinX, kMaxX effettuando anche il clippind su dn
-	kMinX = tmax(kMinX, (int)0);
-	kMaxX = tmin(kMaxX, xMax - xMin);
+	kMinX = std::max(kMinX, (int)0);
+	kMaxX = std::min(kMaxX, xMax - xMin);
 
 	int dnWrap = dn->getWrap();
 	int upWrap = up->getWrap();
@@ -1515,7 +1515,7 @@ void doQuickPutNoFilter(
 		return;
 
 	const int PADN = 16;
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TAffine aff(sx, 0, tx, 0, sy, ty);
 	TRectD boundingBoxD = TRectD(convert(dn->getBounds())) *
@@ -1524,10 +1524,10 @@ void doQuickPutNoFilter(
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
 		return;
 
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	TAffine invAff = inv(aff); //  inversa di aff
 
@@ -1563,8 +1563,8 @@ void doQuickPutNoFilter(
 			kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL); //  ceil
 		}
 	}
-	kMinY = tmax(kMinY, (int)0);
-	kMaxY = tmin(kMaxY, yMax - yMin);
+	kMinY = std::max(kMinY, (int)0);
+	kMaxY = std::min(kMaxY, yMax - yMin);
 
 	if (deltaXL > 0) //  (deltaXL != 0)
 	{
@@ -1583,8 +1583,8 @@ void doQuickPutNoFilter(
 			kMinX = (xL0 - lxPred - deltaXL - 1) / (-deltaXL); //  ceil
 		}
 	}
-	kMinX = tmax(kMinX, (int)0);
-	kMaxX = tmin(kMaxX, xMax - xMin);
+	kMinX = std::max(kMinX, (int)0);
+	kMaxX = std::min(kMaxX, xMax - xMin);
 
 	int dnWrap = dn->getWrap();
 	int upWrap = up->getWrap();
@@ -1658,7 +1658,7 @@ void doQuickResampleFilter(
 
 	//  maschera del filtro bilineare
 	const int MASKN = (1 << PADN) - 1;
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	//  disponibili per la parte intera di xL, yL)
 
@@ -1670,16 +1670,16 @@ void doQuickResampleFilter(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	TAffine invAff = inv(aff); //  inversa di aff
 
@@ -1827,8 +1827,8 @@ void doQuickResampleFilter(
 		}
 
 		//  calcola kMin, kMax effettuando anche il clippind su dn
-		int kMin = tmax(kMinX, kMinY, (int)0);
-		int kMax = tmin(kMaxX, kMaxY, xMax - xMin);
+		int kMin = std::max({kMinX, kMinY, (int)0});
+		int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
 		TPixel32 *dnPix = dnRow + xMin + kMin;
 		TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
@@ -1917,7 +1917,7 @@ void doQuickResampleFilter(
 	const int PADN = 16;
 
 	const int MASKN = (1 << PADN) - 1;
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
 						  (aff * TRectD(0, 0, up->getLx() - 2, up->getLy() - 2));
@@ -1926,10 +1926,10 @@ void doQuickResampleFilter(
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
 		return;
 
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	TAffine invAff = inv(aff); //  inversa di aff
 
@@ -2002,8 +2002,8 @@ void doQuickResampleFilter(
 			}
 		}
 
-		int kMin = tmax(kMinX, kMinY, (int)0);
-		int kMax = tmin(kMaxX, kMaxY, xMax - xMin);
+		int kMin = std::max({kMinX, kMinY, (int)0});
+		int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
 		TPixel32 *dnPix = dnRow + xMin + kMin;
 		TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
@@ -2068,7 +2068,7 @@ void doQuickResampleColorFilter(
 		return;
 	const int PADN = 16;
 
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TRectD boundingBoxD = TRectD(convert(dn->getBounds())) *
 						  (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
@@ -2076,10 +2076,10 @@ void doQuickResampleColorFilter(
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
 		return;
 
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);			  //  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1); //  clipping y su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);			  //  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1); //  clipping x su dn
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);			  //  clipping y su dn
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1); //  clipping y su dn
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);			  //  clipping x su dn
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1); //  clipping x su dn
 
 	TAffine invAff = inv(aff); //  inversa di aff
 
@@ -2144,8 +2144,8 @@ void doQuickResampleColorFilter(
 			if (lyPred < yL0)
 				kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL); //  ceil
 		}
-		int kMin = tmax(kMinX, kMinY, (int)0);
-		int kMax = tmin(kMaxX, kMaxY, xMax - xMin);
+		int kMin = std::max({kMinX, kMinY, (int)0});
+		int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 		TPixel32 *dnPix = dnRow + xMin + kMin;
 		TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
 		int xL = xL0 + (kMin - 1) * deltaXL; //  inizializza xL
@@ -2191,7 +2191,7 @@ void doQuickResampleColorFilter(
 		return;
 	const int PADN = 16;
 
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TRectD boundingBoxD = TRectD(convert(dn->getBounds())) *
 						  (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
@@ -2199,10 +2199,10 @@ void doQuickResampleColorFilter(
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
 		return;
 
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);			  //  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1); //  clipping y su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);			  //  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1); //  clipping x su dn
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);			  //  clipping y su dn
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1); //  clipping y su dn
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);			  //  clipping x su dn
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1); //  clipping x su dn
 
 	TAffine invAff = inv(aff); //  inversa di aff
 
@@ -2267,8 +2267,8 @@ void doQuickResampleColorFilter(
 			if (lyPred < yL0)
 				kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL); //  ceil
 		}
-		int kMin = tmax(kMinX, kMinY, (int)0);
-		int kMax = tmin(kMaxX, kMaxY, xMax - xMin);
+		int kMin = std::max({kMinX, kMinY, (int)0});
+		int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 		TPixel32 *dnPix = dnRow + xMin + kMin;
 		TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
 		int xL = xL0 + (kMin - 1) * deltaXL; //  inizializza xL
@@ -2319,7 +2319,7 @@ void doQuickResampleFilter(
 
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	// disponibili per la parte intera di xL, yL)
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TAffine aff(sx, 0, tx, 0, sy, ty);
 	TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
@@ -2330,16 +2330,16 @@ void doQuickResampleFilter(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	//  inversa di aff
 	TAffine invAff = inv(aff);
@@ -2434,8 +2434,8 @@ void doQuickResampleFilter(
 		}
 	}
 	//  calcola kMinY, kMaxY effettuando anche il clippind su dn
-	kMinY = tmax(kMinY, (int)0);
-	kMaxY = tmin(kMaxY, yMax - yMin);
+	kMinY = std::max(kMinY, (int)0);
+	kMaxY = std::min(kMaxY, yMax - yMin);
 
 	//  calcola kMinX, kMaxX intersecando la (2) con i lati
 	//  (x = xMin) e (x = xMax) di up
@@ -2459,8 +2459,8 @@ void doQuickResampleFilter(
 		}
 	}
 	//  calcola kMinX, kMaxX effettuando anche il clippind su dn
-	kMinX = tmax(kMinX, (int)0);
-	kMaxX = tmin(kMaxX, xMax - xMin);
+	kMinX = std::max(kMinX, (int)0);
+	kMaxX = std::min(kMaxX, xMax - xMin);
 
 	int dnWrap = dn->getWrap();
 	int upWrap = up->getWrap();
@@ -2572,7 +2572,7 @@ void doQuickResampleFilter(
 
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	// disponibili per la parte intera di xL, yL)
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TAffine aff(sx, 0, tx, 0, sy, ty);
 	TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
@@ -2583,16 +2583,16 @@ void doQuickResampleFilter(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	//  inversa di aff
 	TAffine invAff = inv(aff);
@@ -2687,8 +2687,8 @@ void doQuickResampleFilter(
 		}
 	}
 	//  calcola kMinY, kMaxY effettuando anche il clippind su dn
-	kMinY = tmax(kMinY, (int)0);
-	kMaxY = tmin(kMaxY, yMax - yMin);
+	kMinY = std::max(kMinY, (int)0);
+	kMaxY = std::min(kMaxY, yMax - yMin);
 
 	//  calcola kMinX, kMaxX intersecando la (2) con i lati
 	//  (x = xMin) e (x = xMax) di up
@@ -2712,8 +2712,8 @@ void doQuickResampleFilter(
 		}
 	}
 	//  calcola kMinX, kMaxX effettuando anche il clippind su dn
-	kMinX = tmax(kMinX, (int)0);
-	kMaxX = tmin(kMaxX, xMax - xMin);
+	kMinX = std::max(kMinX, (int)0);
+	kMaxX = std::min(kMaxX, xMax - xMin);
 
 	int dnWrap = dn->getWrap();
 	int upWrap = up->getWrap();
@@ -2804,7 +2804,7 @@ void doQuickResampleNoFilter(
 
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	//  disponibili per la parte intera di xL, yL)
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TAffine aff(sx, 0, tx, 0, sy, ty);
 	TRectD boundingBoxD = TRectD(convert(dn->getBounds())) *
@@ -2814,16 +2814,16 @@ void doQuickResampleNoFilter(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	TAffine invAff = inv(aff); //  inversa di aff
 
@@ -2909,8 +2909,8 @@ void doQuickResampleNoFilter(
 		}
 	}
 	//	calcola kMinY, kMaxY effettuando anche il clippind su dn
-	kMinY = tmax(kMinY, (int)0);
-	kMaxY = tmin(kMaxY, yMax - yMin);
+	kMinY = std::max(kMinY, (int)0);
+	kMaxY = std::min(kMaxY, yMax - yMin);
 
 	//  calcola kMinX, kMaxX  intersecando la (2) con i lati
 	//  (x = xMin) e (x = xMax) di up
@@ -2934,8 +2934,8 @@ void doQuickResampleNoFilter(
 		}
 	}
 	//  calcola kMinX, kMaxX effettuando anche il clippind su dn
-	kMinX = tmax(kMinX, (int)0);
-	kMaxX = tmin(kMaxX, xMax - xMin);
+	kMinX = std::max(kMinX, (int)0);
+	kMaxX = std::min(kMaxX, xMax - xMin);
 
 	int dnWrap = dn->getWrap();
 	int upWrap = up->getWrap();
@@ -3011,7 +3011,7 @@ void doQuickPutCmapped(
 
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	//  disponibili per la parte intera di xL, yL)
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TRectD boundingBoxD = TRectD(convert(dn->getBounds())) *
 						  (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
@@ -3021,16 +3021,16 @@ void doQuickPutCmapped(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	//  inversa di aff
 	TAffine invAff = inv(aff);
@@ -3196,8 +3196,8 @@ void doQuickPutCmapped(
 		}
 
 		//  calcola kMin, kMax effettuando anche il clippind su dn
-		int kMin = tmax(kMinX, kMinY, (int)0);
-		int kMax = tmin(kMaxX, kMaxY, xMax - xMin);
+		int kMin = std::max({kMinX, kMinY, (int)0});
+		int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
 		TPixel32 *dnPix = dnRow + xMin + kMin;
 		TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
@@ -3233,18 +3233,26 @@ void doQuickPutCmapped(
 					switch (t) {
 					case 0:
 						colorUp = colors[i];
-						CASE 255 : colorUp = TPixel::Transparent;
-					DEFAULT:
+						break;
+					case 255:
+						colorUp = TPixel::Transparent;
+						break;
+					default:
 						colorUp = antialias(colors[i], 255 - t);
+						break;
 					}
 				else
 					switch (t) {
 					case 0:
 						colorUp = colors[i];
-						CASE 255 : colorUp = colors[p];
-					DEFAULT:
+						break;
+					case 255:
+						colorUp = colors[p];
+						break;
+					default:
 						colorUp = blend(colors[i], colors[p], t, TPixelCM32::getMaxTone());
-					}
+						break;
+				}
 
 				if (colorUp.m == 255)
 					*dnPix = colorUp;
@@ -3283,15 +3291,15 @@ void doQuickPutCmapped(
 	if ((aff.a11 * aff.a22 - aff.a12 * aff.a21) == 0)
 		return;
 	const int PADN = 16;
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 	TRectD boundingBoxD = TRectD(convert(dn->getBounds())) *
 						  (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
 		return;
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 	TAffine invAff = inv(aff);
 	double deltaXD = invAff.a11;
 	double deltaYD = invAff.a21;
@@ -3364,8 +3372,8 @@ void doQuickPutCmapped(
 			if (lyPred < yL0)
 				kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL); //  ceil
 		}
-		int kMin = tmax(kMinX, kMinY, (int)0);
-		int kMax = tmin(kMaxX, kMaxY, xMax - xMin);
+		int kMin = std::max({kMinX, kMinY, (int)0});
+		int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
 		TPixel32 *dnPix = dnRow + xMin + kMin;
 		TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
@@ -3391,26 +3399,34 @@ void doQuickPutCmapped(
 					switch (t) {
 					case 0:
 						colorUp = (i == s.m_inkIndex) ? TPixel::Red : inks[i];
-						CASE 255 : colorUp = TPixel::Transparent;
-					DEFAULT:
+						break;
+					case 255:
+						colorUp = TPixel::Transparent;
+						break;
+					default: {
 						TPixel inkColor;
 						if (i == s.m_inkIndex) {
 							inkColor = TPixel::Red;
 							if (p == 0) {
-								t = t / 2; //transparency check(for a bug!) darken semitrasparent pixels; ghibli likes it, and wants it also for ink checks...
-										   //otherwise, ramps goes always from reds towards grey...
+								t = t / 2; // transparency check(for a bug!) darken semitrasparent pixels; ghibli likes it, and wants it also for ink checks...
+								           // otherwise, ramps goes always from reds towards grey...
 							}
 						} else
 							inkColor = inks[i];
 
 						colorUp = antialias(inkColor, 255 - t);
+						break;
+					}
 					}
 				else
 					switch (t) {
 					case 0:
 						colorUp = (i == s.m_inkIndex) ? TPixel::Red : inks[i];
-						CASE 255 : colorUp = (p == s.m_paintIndex) ? TPixel::Red : paints[p];
-					DEFAULT:
+						break;
+					case 255:
+						colorUp = (p == s.m_paintIndex) ? TPixel::Red : paints[p];
+						break;
+					default: {
 						TPixel paintColor = (p == s.m_paintIndex) ? TPixel::Red : paints[p];
 						TPixel inkColor;
 						if (i == s.m_inkIndex) {
@@ -3425,7 +3441,10 @@ void doQuickPutCmapped(
 							t = t / 2;
 
 						colorUp = blend(inkColor, paintColor, t, TPixelCM32::getMaxTone());
+						break;
 					}
+					}
+
 				if (colorUp.m == 255)
 					*dnPix = colorUp;
 				else if (colorUp.m != 0)
@@ -3455,7 +3474,7 @@ void doQuickPutCmapped(
 
 	//  contatore bit di shift
 	const int PADN = 16;
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	// disponibili per la parte intera di xL, yL)
 
@@ -3468,16 +3487,16 @@ void doQuickPutCmapped(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	TAffine invAff = inv(aff); //  inversa di aff
 
@@ -3589,8 +3608,8 @@ void doQuickPutCmapped(
 		}
 	}
 	//  calcola kMinY, kMaxY effettuando anche il clippind su dn
-	kMinY = tmax(kMinY, (int)0);
-	kMaxY = tmin(kMaxY, yMax - yMin);
+	kMinY = std::max(kMinY, (int)0);
+	kMaxY = std::min(kMaxY, yMax - yMin);
 
 	//  calcola kMinX, kMaxX intersecando la (2) con i lati
 	//  (x = xMin) e (x = xMax) di up
@@ -3614,13 +3633,13 @@ void doQuickPutCmapped(
 		}
 	}
 	//  calcola kMinX, kMaxX effettuando anche il clippind su dn
-	kMinX = tmax(kMinX, (int)0);
-	kMaxX = tmin(kMaxX, xMax - xMin);
+	kMinX = std::max(kMinX, (int)0);
+	kMaxX = std::min(kMaxX, xMax - xMin);
 
 	int dnWrap = dn->getWrap();
 	int upWrap = up->getWrap();
 
-	int count = tmax(palette->getStyleCount(), TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint());
+	int count = std::max({palette->getStyleCount(), TPixelCM32::getMaxInk(), TPixelCM32::getMaxPaint()});
 
 	std::vector<TPixel32> paints(count, TPixel32::Red);
 	std::vector<TPixel32> inks(count, TPixel32::Red);
@@ -3681,18 +3700,25 @@ void doQuickPutCmapped(
 					switch (t) {
 					case 0:
 						colorUp = inks[i];
-						CASE 255 : colorUp = TPixel::Transparent;
-					DEFAULT:
+						break;
+					case 255:
+						colorUp = TPixel::Transparent;
+						break;
+					default:
 						colorUp = antialias(inks[i], 255 - t);
+						break;
 					}
 				else
 					switch (t) {
 					case 0:
 						colorUp = inks[i];
-						CASE 255 : colorUp = paints[p];
-
-					DEFAULT:
+						break;
+					case 255:
+						colorUp = paints[p];
+						break;
+					default:
 						colorUp = blend(inks[i], paints[p], t, TPixelCM32::getMaxTone());
+						break;
 					}
 
 				if (colorUp.m == 255)
@@ -3727,7 +3753,7 @@ void doQuickResampleColorFilter(
 	for (int i = 0; i < plt->getStyleCount(); i++)
 		paints[i] = inks[i] = ::premultiply(plt->getStyle(i)->getAverageColor());
 
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TRectD boundingBoxD = TRectD(convert(dn->getBounds())) *
 						  (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
@@ -3735,10 +3761,10 @@ void doQuickResampleColorFilter(
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
 		return;
 
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);			  //  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1); //  clipping y su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);			  //  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1); //  clipping x su dn
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);			  //  clipping y su dn
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1); //  clipping y su dn
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);			  //  clipping x su dn
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1); //  clipping x su dn
 
 	TAffine invAff = inv(aff); //  inversa di aff
 
@@ -3803,8 +3829,8 @@ void doQuickResampleColorFilter(
 			if (lyPred < yL0)
 				kMinY = (yL0 - lyPred - deltaYL - 1) / (-deltaYL); //  ceil
 		}
-		int kMin = tmax(kMinX, kMinY, (int)0);
-		int kMax = tmin(kMaxX, kMaxY, xMax - xMin);
+		int kMin = std::max({kMinX, kMinY, (int)0});
+		int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 		TPixel32 *dnPix = dnRow + xMin + kMin;
 		TPixel32 *dnEndPix = dnRow + xMin + kMax + 1;
 		int xL = xL0 + (kMin - 1) * deltaXL; //  inizializza xL
@@ -3826,9 +3852,13 @@ void doQuickResampleColorFilter(
 			switch (t) {
 			case 0:
 				colorUp = inks[i];
-				CASE 255 : colorUp = paints[p];
-			DEFAULT:
+				break;
+			case 255:
+				colorUp = paints[p];
+				break;
+			default:
 				colorUp = blend(inks[i], paints[p], t, TPixelCM32::getMaxTone());
+				break;
 			}
 
 			if (colorMask == TRop::MChan)
@@ -3864,7 +3894,7 @@ void doQuickResampleFilter_optimized(
 
 	//  maschera del filtro bilineare
 	const int MASKN = (1 << PADN) - 1;
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	//  disponibili per la parte intera di xL, yL)
 
@@ -3876,16 +3906,16 @@ void doQuickResampleFilter_optimized(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	TAffine invAff = inv(aff); //  inversa di aff
 
@@ -4024,7 +4054,7 @@ void doQuickResampleFilter_optimized(
 
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	// disponibili per la parte intera di xL, yL)
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TAffine aff(sx, 0, tx, 0, sy, ty);
 	TRectD boundingBoxD = TRectD(convert(dn->getSize())) *
@@ -4035,16 +4065,16 @@ void doQuickResampleFilter_optimized(
 		return;
 
 	//  clipping y su dn
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);
 
 	//  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1);
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1);
 
 	//  clipping x su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);
 
 	//  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1);
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1);
 
 	//  inversa di aff
 	TAffine invAff = inv(aff);
@@ -4139,8 +4169,8 @@ void doQuickResampleFilter_optimized(
 		}
 	}
 	//  calcola kMinY, kMaxY effettuando anche il clippind su dn
-	kMinY = tmax(kMinY, (int)0);
-	kMaxY = tmin(kMaxY, yMax - yMin);
+	kMinY = std::max(kMinY, (int)0);
+	kMaxY = std::min(kMaxY, yMax - yMin);
 
 	//  calcola kMinX, kMaxX intersecando la (2) con i lati
 	//  (x = xMin) e (x = xMax) di up
@@ -4164,8 +4194,8 @@ void doQuickResampleFilter_optimized(
 		}
 	}
 	//  calcola kMinX, kMaxX effettuando anche il clippind su dn
-	kMinX = tmax(kMinX, (int)0);
-	kMaxX = tmin(kMaxX, xMax - xMin);
+	kMinX = std::max(kMinX, (int)0);
+	kMaxX = std::min(kMaxX, xMax - xMin);
 
 	int dnWrap = dn->getWrap();
 	int upWrap = up->getWrap();
@@ -4379,7 +4409,7 @@ void doQuickResampleNoFilter(
 
 	//  max dimensioni di up gestibili (limite imposto dal numero di bit
 	//  disponibili per la parte intera di xL, yL)
-	assert(tmax(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
+	assert(std::max(up->getLx(), up->getLy()) < (1 << (8 * sizeof(int) - PADN - 1)));
 
 	TRectD boundingBoxD = TRectD(convert(dn->getBounds())) *
 						  (aff * TRectD(-0.5, -0.5, up->getLx() - 0.5, up->getLy() - 0.5));
@@ -4387,10 +4417,10 @@ void doQuickResampleNoFilter(
 	if (boundingBoxD.x0 >= boundingBoxD.x1 || boundingBoxD.y0 >= boundingBoxD.y1)
 		return;
 
-	int yMin = tmax(tfloor(boundingBoxD.y0), 0);			  //  clipping y su dn
-	int yMax = tmin(tceil(boundingBoxD.y1), dn->getLy() - 1); //  clipping y su dn
-	int xMin = tmax(tfloor(boundingBoxD.x0), 0);			  //  clipping x su dn
-	int xMax = tmin(tceil(boundingBoxD.x1), dn->getLx() - 1); //  clipping x su dn
+	int yMin = std::max(tfloor(boundingBoxD.y0), 0);			  //  clipping y su dn
+	int yMax = std::min(tceil(boundingBoxD.y1), dn->getLy() - 1); //  clipping y su dn
+	int xMin = std::max(tfloor(boundingBoxD.x0), 0);			  //  clipping x su dn
+	int xMax = std::min(tceil(boundingBoxD.x1), dn->getLx() - 1); //  clipping x su dn
 
 	TAffine invAff = inv(aff); //  inversa di aff
 
@@ -4520,8 +4550,8 @@ void doQuickResampleNoFilter(
 		}
 
 		//  calcola kMin, kMax effettuando anche il clippind su dn
-		int kMin = tmax(kMinX, kMinY, (int)0);
-		int kMax = tmin(kMaxX, kMaxY, xMax - xMin);
+		int kMin = std::max({kMinX, kMinY, (int)0});
+		int kMax = std::min({kMaxX, kMaxY, xMax - xMin});
 
 		PIX *dnPix = dnRow + xMin + kMin;
 		PIX *dnEndPix = dnRow + xMin + kMax + 1;

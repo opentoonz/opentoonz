@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STROKE_DEFORMATION_H
 #define STROKE_DEFORMATION_H

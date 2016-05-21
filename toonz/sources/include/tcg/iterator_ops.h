@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_ITERATOR_OPS_H
 #define TCG_ITERATOR_OPS_H

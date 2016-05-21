@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MULTIPLESELECTION_H
 #define MULTIPLESELECTION_H

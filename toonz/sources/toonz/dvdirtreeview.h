@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DVDIRTREEVIEW_H
 #define DVDIRTREEVIEW_H

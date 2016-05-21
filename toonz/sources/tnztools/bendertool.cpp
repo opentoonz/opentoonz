@@ -538,10 +538,10 @@ void BenderTool::findCurves(TVectorImageP &vi)
 
 				TPointD bboxP0 = bbox.getP00();
 				TPointD bboxP1 = bbox.getP11();
-				double bboxX0 = tmin(bboxP0.x, bboxP1.x);
-				double bboxX1 = tmax(bboxP0.x, bboxP1.x);
-				double bboxY0 = tmin(bboxP0.y, bboxP1.y);
-				double bboxY1 = tmax(bboxP0.y, bboxP1.y);
+				double bboxX0 = std::min(bboxP0.x, bboxP1.x);
+				double bboxX1 = std::max(bboxP0.x, bboxP1.x);
+				double bboxY0 = std::min(bboxP0.y, bboxP1.y);
+				double bboxY1 = std::max(bboxP0.y, bboxP1.y);
 
 				TSegment segment;
 				TPointD pp0 = m_benderSegment.getP0();
@@ -565,7 +565,7 @@ void BenderTool::findCurves(TVectorImageP &vi)
 					else if (pp1.y == pp0.y)
 						t = (x - pp0.x) / (pp1.x - pp0.x);
 					else
-						t = tmin((x - pp0.x) / (pp1.x - pp0.x), (y - pp0.y) / (pp1.y - pp0.y));
+						t = std::min((x - pp0.x) / (pp1.x - pp0.x), (y - pp0.y) / (pp1.y - pp0.y));
 
 					newP1 = (t > 1) ? m_benderSegment.getPoint(t + littleBit) : pp1;
 				} else
@@ -586,7 +586,7 @@ void BenderTool::findCurves(TVectorImageP &vi)
 					else if (pp1.y == pp0.y)
 						t = (x - pp0.x) / (pp1.x - pp0.x);
 					else
-						t = tmax((x - pp0.x) / (pp1.x - pp0.x), (y - pp0.y) / (pp1.y - pp0.y));
+						t = std::max((x - pp0.x) / (pp1.x - pp0.x), (y - pp0.y) / (pp1.y - pp0.y));
 
 					newP0 = (t < 0) ? m_benderSegment.getPoint(t - littleBit) : pp0;
 				} else

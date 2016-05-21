@@ -114,7 +114,7 @@ CSDirection::~CSDirection()
 double CSDirection::adjustAngle(const short sum[4], const int Ima,
 								const int Im45, const int Ip45)
 {
-	short ma = MAX(sum[Im45], sum[Ip45]);
+	short ma = std::max(sum[Im45], sum[Ip45]);
 
 	if (ma < 0)
 		return 0.0;
@@ -188,7 +188,7 @@ UCHAR CSDirection::getDir(const int xx, const int yy, UCHAR *sel)
 	}
 	if (w == 0)
 		return 0;
-	short ma = MAX(MAX(MAX(sum[0], sum[1]), sum[2]), sum[3]);
+	short ma = std::max({sum[0], sum[1], sum[2], sum[3]});
 	double angle = getAngle(sum, ma);
 	//tmsg_info(" - dir - %d, %d, %d, %d angle=%f", sum[0],sum[1],sum[2],sum[3],
 	//		                                          angle-50.0);

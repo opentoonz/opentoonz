@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TSTENCILCONTROL_H
 #define TSTENCILCONTROL_H
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef MOVIEGENERATOR_INCLUDED
 #define MOVIEGENERATOR_INCLUDED
 

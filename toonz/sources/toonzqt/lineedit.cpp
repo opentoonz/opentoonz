@@ -43,13 +43,21 @@ void LineEdit::keyPressEvent(QKeyEvent *event)
 		m_isReturnPressed = false;
 		if (m_forbiddenSpecialChars) {
 			switch (event->key()) {
-				CASE Qt::Key_Backslash : __OR Qt::Key_Slash : __OR Qt::Key_Colon : __OR Qt::Key_Asterisk : __OR Qt::Key_Question : __OR Qt::Key_QuoteDbl : __OR Qt::Key_Greater : __OR Qt::Key_Less : __OR Qt::Key_Bar : __OR Qt::Key_Period:
-				{
-					DVGui::info(tr("A file name cannot contains any of the following chracters: /\\:*?\"<>|."));
-					return;
-				}
+			case Qt::Key_Backslash:
+			case Qt::Key_Slash:
+			case Qt::Key_Colon:
+			case Qt::Key_Asterisk:
+			case Qt::Key_Question:
+			case Qt::Key_QuoteDbl:
+			case Qt::Key_Greater:
+			case Qt::Key_Less:
+			case Qt::Key_Bar:
+			case Qt::Key_Period:
+				DVGui::info(tr("A file name cannot contains any of the following chracters: /\\:*?\"<>|."));
+				return;
 			default:
 				QLineEdit::keyPressEvent(event);
+				break;
 			}
 		} else
 			QLineEdit::keyPressEvent(event);

@@ -1,4 +1,4 @@
-
+#pragma once
 
 // YOMBInputParam.h: interface for the CYOMBInputParam class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_YOMBINPUTPARAM_H__41D42153_F2EE_11D5_B92D_0040F674BE6A__INCLUDED_)
 #define AFX_YOMBINPUTPARAM_H__41D42153_F2EE_11D5_B92D_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #include "SDef.h"
 #include "InputParam.h"

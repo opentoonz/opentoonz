@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCOLUMNFX_H
 #define TCOLUMNFX_H

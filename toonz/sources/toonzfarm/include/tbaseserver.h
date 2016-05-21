@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TBASESERVER_H
 #define TBASESERVER_H

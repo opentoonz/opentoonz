@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ4_H
 #define TNZ4_H
@@ -74,18 +74,6 @@ typedef struct IMAGE {
 #define TOONZRGB (1234)
 #define TOONZRGB64 (4567)
 
-#define CASE \
-	break;   \
-	case
-#ifndef __OR
-#define __OR \
-	;        \
-	case
-#endif
-#define DEFAULT \
-	break;      \
-	default
-
 #define TMALLOC(ptr, elem) \
 	(ptr) = (void *)malloc((elem) * sizeof(*(ptr)));
 #define TCALLOC(ptr, elem) \
@@ -104,9 +92,6 @@ typedef struct IMAGE {
 			ptr = NIL; \
 		}              \
 	}
-
-#define MAX(A, B) ((A) > (B) ? (A) : (B))
-#define MIN(A, B) ((A) < (B) ? (A) : (B))
 
 #define NOT_LESS_THAN(MIN, X) \
 	{                         \

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef DUPLICATEPOPUP_H
 #define DUPLICATEPOPUP_H

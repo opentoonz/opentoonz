@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TTIO_SVG_INCLUDED
 #define TTIO_SVG_INCLUDED

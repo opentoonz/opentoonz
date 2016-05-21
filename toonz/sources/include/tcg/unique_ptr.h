@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_UNIQUE_PTR_H
 #define TCG_UNIQUE_PTR_H

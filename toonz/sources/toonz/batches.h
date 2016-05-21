@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef BATCHES_H
 #define BATCHES_H

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNONGRAPHICTEST_INCLUDED
 #define TNONGRAPHICTEST_INCLUDED

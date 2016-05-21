@@ -1196,10 +1196,8 @@ VectorSelectionTool::VectorSelectionTool(int targetType)
 	: SelectionTool(targetType), m_selectionTarget("Mode:"), m_constantThickness("Preserve Thickness", false), m_levelSelection(m_strokeSelection), m_capStyle("Cap"), m_joinStyle("Join"), m_miterJoinLimit("Miter:", 0, 100, 4), m_selectionCount(0), m_canEnterGroup(true)
 {
 	if (targetType == TTool::Vectors) {
-#ifndef STUDENT
 		m_prop.bind(m_selectionTarget);
 		m_prop.bind(m_constantThickness);
-#endif
 
 		m_selectionTarget.addValue(NORMAL_TYPE);
 		m_selectionTarget.addValue(SELECTED_FRAMES_TYPE);
@@ -1333,10 +1331,19 @@ void VectorSelectionTool::updateSelectionTarget()
 	case SAME_STYLE_TYPE_IDX:
 	case BOUNDARY_TYPE_IDX:
 		framesMode = LevelSelection::FRAMES_CURRENT;
+		break;
 
-		CASE ALL_LEVEL_TYPE_IDX : case STYLE_LEVEL_TYPE_IDX : case BOUNDARY_LEVEL_TYPE_IDX : framesMode = LevelSelection::FRAMES_ALL;
+	case ALL_LEVEL_TYPE_IDX:
+	case STYLE_LEVEL_TYPE_IDX:
+	case BOUNDARY_LEVEL_TYPE_IDX:
+		framesMode = LevelSelection::FRAMES_ALL;
+		break;
 
-		CASE SELECTED_FRAMES_TYPE_IDX : case STYLE_SELECTED_FRAMES_TYPE_IDX : case BOUNDARY_SELECTED_FRAMES_TYPE_IDX : framesMode = LevelSelection::FRAMES_SELECTED;
+	case SELECTED_FRAMES_TYPE_IDX:
+	case STYLE_SELECTED_FRAMES_TYPE_IDX:
+	case BOUNDARY_SELECTED_FRAMES_TYPE_IDX:
+		framesMode = LevelSelection::FRAMES_SELECTED;
+		break;
 	}
 
 	if (framesMode != m_levelSelection.framesMode())
@@ -1348,18 +1355,23 @@ void VectorSelectionTool::updateSelectionTarget()
 	LevelSelection::Filter filter;
 	switch (m_selectionTarget.getIndex()) {
 	case SELECTED_FRAMES_TYPE_IDX:
-	case ALL_LEVEL_TYPE_IDX: {
+	case ALL_LEVEL_TYPE_IDX:
 		filter = LevelSelection::WHOLE;
 		selectedStyles().clear();
-	}
+		break;
 
-		CASE SAME_STYLE_TYPE_IDX : case STYLE_SELECTED_FRAMES_TYPE_IDX : case STYLE_LEVEL_TYPE_IDX : filter = LevelSelection::SELECTED_STYLES;
+	case SAME_STYLE_TYPE_IDX:
+	case STYLE_SELECTED_FRAMES_TYPE_IDX:
+	case STYLE_LEVEL_TYPE_IDX:
+		filter = LevelSelection::SELECTED_STYLES;
+		break;
 
-		CASE BOUNDARY_TYPE_IDX : case BOUNDARY_SELECTED_FRAMES_TYPE_IDX : case BOUNDARY_LEVEL_TYPE_IDX:
-		{
-			filter = LevelSelection::BOUNDARY_STROKES;
-			selectedStyles().clear();
-		}
+	case BOUNDARY_TYPE_IDX:
+	case BOUNDARY_SELECTED_FRAMES_TYPE_IDX:
+	case BOUNDARY_LEVEL_TYPE_IDX:
+		filter = LevelSelection::BOUNDARY_STROKES;
+		selectedStyles().clear();
+		break;
 	}
 
 	if (filter != m_levelSelection.filter())

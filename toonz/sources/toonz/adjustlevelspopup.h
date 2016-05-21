@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef ADJUST_LEVELS_POPUP_H
 #define ADJUST_LEVELS_POPUP_H

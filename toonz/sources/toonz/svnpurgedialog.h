@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SVN_PURGE_DIALOG_H
 #define SVN_PURGE_DIALOG_H

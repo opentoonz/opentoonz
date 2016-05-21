@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef EXPORTSCENEPOPUP_H
 #define EXPORTSCENEPOPUP_H

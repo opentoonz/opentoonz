@@ -111,14 +111,21 @@ bool TColorStyle::operator==(const TColorStyle &cs) const
 		case BOOL:
 			if (getParamValue(bool_tag(), p) != cs.getParamValue(bool_tag(), p))
 				return false;
-
-			CASE INT : case ENUM : if (getParamValue(int_tag(), p) != cs.getParamValue(int_tag(), p)) return false;
-
-			CASE DOUBLE : if (getParamValue(double_tag(), p) != cs.getParamValue(double_tag(), p)) return false;
-
-			CASE FILEPATH : if (getParamValue(TFilePath_tag(), p) != cs.getParamValue(TFilePath_tag(), p)) return false;
-
-		DEFAULT:
+			break;
+		case INT:
+		case ENUM:
+			if (getParamValue(int_tag(), p) != cs.getParamValue(int_tag(), p))
+				return false;
+			break;
+		case DOUBLE:
+			if (getParamValue(double_tag(), p) != cs.getParamValue(double_tag(), p))
+				return false;
+			break;
+		case FILEPATH:
+			if (getParamValue(TFilePath_tag(), p) != cs.getParamValue(TFilePath_tag(), p))
+				return false;
+			break;
+		default:
 			assert(false);
 		}
 	}
@@ -291,7 +298,7 @@ void TColorStyle::makeIcon(const TDimension &d)
 
 	double scx = 0.9 * d.lx / bbox.getLx();
 	double scy = 0.9 * d.ly / bbox.getLy();
-	double sc = tmin(scx, scy);
+	double sc = std::min(scx, scy);
 	double dx = (d.lx - bbox.getLx() * sc) * 0.5;
 	double dy = (d.ly - bbox.getLy() * sc) * 0.5;
 	TAffine aff = TScale(scx, scy) * TTranslation(-bbox.getP00() + TPointD(dx, dy));
@@ -346,9 +353,11 @@ void TColorStyle::assignBlend(const TColorStyle &a, const TColorStyle &b, double
 
 		for (par = 0; par != parCount; ++par) {
 			switch (getParamType(par)) {
-				CASE DOUBLE : setParamValue(par, (1 - t) * a.getParamValue(double_tag(), par) + t * b.getParamValue(double_tag(), par));
-
-			DEFAULT:;
+			case DOUBLE:
+				setParamValue(par, (1 - t) * a.getParamValue(double_tag(), par) + t * b.getParamValue(double_tag(), par));
+				break;
+			default:
+				break;
 			}
 		}
 	}

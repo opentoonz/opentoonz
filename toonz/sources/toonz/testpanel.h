@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TESTPANEL_H
 #define TESTPANEL_H

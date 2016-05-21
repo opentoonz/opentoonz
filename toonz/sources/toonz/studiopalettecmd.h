@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef STUDIOPALETTECMD_INCLUDED
 #define STUDIOPALETTECMD_INCLUDED

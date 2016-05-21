@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TIIO_PSD_INCLUDED
 #define TIIO_PSD_INCLUDED

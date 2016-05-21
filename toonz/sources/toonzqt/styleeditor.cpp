@@ -149,7 +149,7 @@ ColorModel::ColorModel()
 void ColorModel::rgb2hsv()
 {
 	QColor converter(m_channels[0], m_channels[1], m_channels[2]);
-	m_channels[4] = tmax(converter.hue(), 0); // hue() ritorna -1 per colori acromatici
+	m_channels[4] = std::max(converter.hue(), 0); // hue() ritorna -1 per colori acromatici
 	m_channels[5] = converter.saturation() * 100 / 255;
 	m_channels[6] = converter.value() * 100 / 255;
 }
@@ -177,7 +177,7 @@ void ColorModel::setTPixel(const TPixel32 &pix)
 	m_channels[1] = color.green();
 	m_channels[2] = color.blue();
 	m_channels[3] = color.alpha();
-	m_channels[4] = tmax(color.hue(), 0); // hue() ritorna -1 per colori acromatici
+	m_channels[4] = std::max(color.hue(), 0); // hue() ritorna -1 per colori acromatici
 	m_channels[5] = color.saturation() * 100 / 255;
 	m_channels[6] = color.value() * 100 / 255;
 }
@@ -587,49 +587,29 @@ QPixmap makeSquareShading(
 //*****************************************************************************
 
 HexagonalColorWheel::HexagonalColorWheel(QWidget *parent)
-	: QGLWidget(parent), m_bgColor(128, 128, 128) //defaul value in case this value does not set in the style sheet
-												  //, m_ghibli3DLutUtil(0)//iwsw commented out temporarily
+	: QOpenGLWidget(parent)
+	, m_bgColor(128, 128, 128) //defaul value in case this value does not set in the style sheet
 {
 	setObjectName("HexagonalColorWheel");
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	setFocusPolicy(Qt::NoFocus);
 	m_currentWheel = none;
-
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && Ghibli3DLutUtil::m_isValid)
-	{
-	m_ghibli3DLutUtil = new Ghibli3DLutUtil();
-	m_ghibli3DLutUtil->setInvert();
-	}
-	*/
 }
 
 //-----------------------------------------------------------------------------
 
 HexagonalColorWheel::~HexagonalColorWheel()
 {
-	//iwsw commented out temporarily
-	/*
-	if(m_ghibli3DLutUtil)
-	{
-	m_ghibli3DLutUtil->onEnd();
-	delete m_ghibli3DLutUtil;
-	}
-	*/
 }
 
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::initializeGL()
 {
-	qglClearColor(getBGColor());
+	initializeOpenGLFunctions();
 
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
-	m_ghibli3DLutUtil->onInit();
-	*/
+	QColor color = getBGColor();
+	glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
 
 //-----------------------------------------------------------------------------
@@ -679,28 +659,16 @@ void HexagonalColorWheel::resizeGL(int width, int height)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0.0, (GLdouble)width, (GLdouble)height, 0.0, 1.0, -1.0);
-
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
-	m_ghibli3DLutUtil->onResize(width,height);
-	*/
 }
 
 //-----------------------------------------------------------------------------
 
 void HexagonalColorWheel::paintGL()
 {
-	//call ClearColor() here in order to update bg color when the stylesheet is switched
-	qglClearColor(getBGColor());
+	QColor color = getBGColor();
+	glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 
 	glMatrixMode(GL_MODELVIEW);
-
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
-	m_ghibli3DLutUtil->startDraw();
-	*/
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -746,12 +714,6 @@ void HexagonalColorWheel::paintGL()
 	drawCurrentColorMark();
 
 	glPopMatrix();
-
-	//iwsw commented out temporarily
-	/*
-	if(Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
-	m_ghibli3DLutUtil->endDraw();
-	*/
 }
 
 //-----------------------------------------------------------------------------
@@ -883,7 +845,7 @@ void HexagonalColorWheel::clickLeftWheel(const QPoint &pos)
 	if (h > 359)
 		h = 359;
 	//clamping
-	int s = (int)(tmin(p.length() / d, 1.0) * 100.0f);
+	int s = (int)(std::min(p.length() / d, 1.0) * 100.0f);
 
 	m_color.setValues(eValue, h, s);
 
@@ -900,10 +862,10 @@ void HexagonalColorWheel::clickRightTriangle(const QPoint &pos)
 		s = 0;
 		v = 0;
 	} else {
-		float v_ratio = tmin((float)(p.ry() / (m_triHeight * 2.0f)), 1.0f);
+		float v_ratio = std::min((float)(p.ry() / (m_triHeight * 2.0f)), 1.0f);
 		float s_f = p.rx() / (m_triEdgeLen * v_ratio);
 		v = (int)(v_ratio * 100.0f);
-		s = (int)(tmin(tmax(s_f, 0.0f), 1.0f) * 100.0f);
+		s = (int)(std::min(std::max(s_f, 0.0f), 1.0f) * 100.0f);
 	}
 	m_color.setValues(eHue, s, v);
 	emit colorChanged(m_color, true);
@@ -2654,63 +2616,69 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle)
 				m_paramsLayout->addWidget(checkBox, p, 1);
 
 				ret = QObject::connect(checkBox, SIGNAL(toggled(bool)), this, SLOT(onValueChanged())) && ret;
+
+				break;
 			}
 
-				CASE TColorStyle::INT:
-				{
-					DVGui::IntField *intField = new DVGui::IntField;
-					m_paramsLayout->addWidget(intField, p, 1);
+			case TColorStyle::INT: {
+				DVGui::IntField *intField = new DVGui::IntField;
+				m_paramsLayout->addWidget(intField, p, 1);
 
-					int min, max;
-					m_editedStyle->getParamRange(p, min, max);
+				int min, max;
+				m_editedStyle->getParamRange(p, min, max);
 
-					intField->setRange(min, max);
+				intField->setRange(min, max);
 
-					ret = QObject::connect(intField, SIGNAL(valueChanged(bool)), this, SLOT(onValueChanged(bool))) && ret;
-				}
+				ret = QObject::connect(intField, SIGNAL(valueChanged(bool)), this, SLOT(onValueChanged(bool))) && ret;
 
-				CASE TColorStyle::ENUM:
-				{
-					QComboBox *comboBox = new QComboBox;
-					m_paramsLayout->addWidget(comboBox, p, 1);
+				break;
+			}
 
-					QStringList items;
-					m_editedStyle->getParamRange(p, items);
+			case TColorStyle::ENUM: {
+				QComboBox *comboBox = new QComboBox;
+				m_paramsLayout->addWidget(comboBox, p, 1);
 
-					comboBox->addItems(items);
+				QStringList items;
+				m_editedStyle->getParamRange(p, items);
 
-					ret = QObject::connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onValueChanged())) && ret;
-				}
+				comboBox->addItems(items);
 
-				CASE TColorStyle::DOUBLE:
-				{
-					DVGui::DoubleField *doubleField = new DVGui::DoubleField;
-					m_paramsLayout->addWidget(doubleField, p, 1);
+				ret = QObject::connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onValueChanged())) && ret;
 
-					double min, max;
-					m_editedStyle->getParamRange(p, min, max);
+				break;
+			}
 
-					doubleField->setRange(min, max);
+			case TColorStyle::DOUBLE: {
+				DVGui::DoubleField *doubleField = new DVGui::DoubleField;
+				m_paramsLayout->addWidget(doubleField, p, 1);
 
-					ret = QObject::connect(doubleField, SIGNAL(valueChanged(bool)), this, SLOT(onValueChanged(bool))) && ret;
-				}
+				double min, max;
+				m_editedStyle->getParamRange(p, min, max);
 
-				CASE TColorStyle::FILEPATH:
-				{
-					DVGui::FileField *fileField = new DVGui::FileField;
-					m_paramsLayout->addWidget(fileField, p, 1);
+				doubleField->setRange(min, max);
 
-					QStringList extensions;
-					m_editedStyle->getParamRange(p, extensions);
+				ret = QObject::connect(doubleField, SIGNAL(valueChanged(bool)), this, SLOT(onValueChanged(bool))) && ret;
 
-					fileField->setFileMode(QFileDialog::AnyFile);
-					fileField->setFilters(extensions);
+				break;
+			}
 
-					fileField->setPath(QString::fromStdWString(
-						editedStyle->getParamValue(TColorStyle::TFilePath_tag(), p).getWideString()));
+			case TColorStyle::FILEPATH: {
+				DVGui::FileField *fileField = new DVGui::FileField;
+				m_paramsLayout->addWidget(fileField, p, 1);
 
-					ret = QObject::connect(fileField, SIGNAL(pathChanged()), this, SLOT(onValueChanged())) && ret;
-				}
+				QStringList extensions;
+				m_editedStyle->getParamRange(p, extensions);
+
+				fileField->setFileMode(QFileDialog::AnyFile);
+				fileField->setFilters(extensions);
+
+				fileField->setPath(QString::fromStdWString(
+					editedStyle->getParamValue(TColorStyle::TFilePath_tag(), p).getWideString()));
+
+				ret = QObject::connect(fileField, SIGNAL(pathChanged()), this, SLOT(onValueChanged())) && ret;
+
+				break;
+			}
 			}
 
 			assert(ret);
@@ -2744,40 +2712,46 @@ void SettingsPage::updateValues()
 				m_paramsLayout->itemAtPosition(p, 1)->widget());
 
 			checkBox->setChecked(m_editedStyle->getParamValue(TColorStyle::bool_tag(), p));
+
+			break;
 		}
 
-			CASE TColorStyle::INT:
-			{
-				DVGui::IntField *intField = static_cast<DVGui::IntField *>(
-					m_paramsLayout->itemAtPosition(p, 1)->widget());
+		case TColorStyle::INT: {
+			DVGui::IntField *intField = static_cast<DVGui::IntField *>(
+				m_paramsLayout->itemAtPosition(p, 1)->widget());
 
-				intField->setValue(m_editedStyle->getParamValue(TColorStyle::int_tag(), p));
-			}
+			intField->setValue(m_editedStyle->getParamValue(TColorStyle::int_tag(), p));
 
-			CASE TColorStyle::ENUM:
-			{
-				QComboBox *comboBox = static_cast<QComboBox *>(
-					m_paramsLayout->itemAtPosition(p, 1)->widget());
+			break;
+		}
 
-				comboBox->setCurrentIndex(m_editedStyle->getParamValue(TColorStyle::int_tag(), p));
-			}
+		case TColorStyle::ENUM: {
+			QComboBox *comboBox = static_cast<QComboBox *>(
+				m_paramsLayout->itemAtPosition(p, 1)->widget());
 
-			CASE TColorStyle::DOUBLE:
-			{
-				DVGui::DoubleField *doubleField = static_cast<DVGui::DoubleField *>(
-					m_paramsLayout->itemAtPosition(p, 1)->widget());
+			comboBox->setCurrentIndex(m_editedStyle->getParamValue(TColorStyle::int_tag(), p));
 
-				doubleField->setValue(m_editedStyle->getParamValue(TColorStyle::double_tag(), p));
-			}
+			break;
+		}
 
-			CASE TColorStyle::FILEPATH:
-			{
-				DVGui::FileField *fileField = static_cast<DVGui::FileField *>(
-					m_paramsLayout->itemAtPosition(p, 1)->widget());
+		case TColorStyle::DOUBLE: {
+			DVGui::DoubleField *doubleField = static_cast<DVGui::DoubleField *>(
+				m_paramsLayout->itemAtPosition(p, 1)->widget());
 
-				fileField->setPath(QString::fromStdWString(
-					m_editedStyle->getParamValue(TColorStyle::TFilePath_tag(), p).getWideString()));
-			}
+			doubleField->setValue(m_editedStyle->getParamValue(TColorStyle::double_tag(), p));
+
+			break;
+		}
+
+		case TColorStyle::FILEPATH: {
+			DVGui::FileField *fileField = static_cast<DVGui::FileField *>(
+				m_paramsLayout->itemAtPosition(p, 1)->widget());
+
+			fileField->setPath(QString::fromStdWString(
+				m_editedStyle->getParamValue(TColorStyle::TFilePath_tag(), p).getWideString()));
+
+			break;
+		}
 		}
 	}
 }
@@ -2823,17 +2797,21 @@ void SettingsPage::onValueChanged(bool isDragging)
 	switch (m_editedStyle->getParamType(p)) {
 	case TColorStyle::BOOL:
 		m_editedStyle->setParamValue(p, static_cast<QCheckBox *>(senderWidget)->isChecked());
-
-		CASE TColorStyle::INT : m_editedStyle->setParamValue(p, static_cast<DVGui::IntField *>(senderWidget)->getValue());
-
-		CASE TColorStyle::ENUM : m_editedStyle->setParamValue(p, static_cast<QComboBox *>(senderWidget)->currentIndex());
-
-		CASE TColorStyle::DOUBLE : m_editedStyle->setParamValue(p, static_cast<DVGui::DoubleField *>(senderWidget)->getValue());
-
-		CASE TColorStyle::FILEPATH:
+		break;
+	case TColorStyle::INT:
+		m_editedStyle->setParamValue(p, static_cast<DVGui::IntField *>(senderWidget)->getValue());
+		break;
+	case TColorStyle::ENUM:
+		m_editedStyle->setParamValue(p, static_cast<QComboBox *>(senderWidget)->currentIndex());
+		break;
+	case TColorStyle::DOUBLE:
+		m_editedStyle->setParamValue(p, static_cast<DVGui::DoubleField *>(senderWidget)->getValue());
+		break;
+	case TColorStyle::FILEPATH:
 		{
 			const QString &string = static_cast<DVGui::FileField *>(senderWidget)->getPath();
 			m_editedStyle->setParamValue(p, TFilePath(string.toStdWString()));
+			break;
 		}
 	}
 
@@ -3286,9 +3264,7 @@ void StyleEditor::onColorChanged(const ColorModel &color, bool isDragging)
 		m_newColor->setStyle(*m_editedStyle);
 		m_colorParameterSelector->setStyle(*m_editedStyle);
 
-#ifndef STUDENT
 		if (m_autoButton->isChecked())
-#endif
 		{
 			copyEditedStyleToPalette(isDragging);
 		}
@@ -3373,7 +3349,6 @@ void StyleEditor::applyButtonClicked()
 void StyleEditor::autoCheckChanged(bool value)
 {
 
-#ifndef STUDENT
 	m_paletteController->enableColorAutoApply(!!value);
 
 	if (!m_enabled)
@@ -3383,7 +3358,6 @@ void StyleEditor::autoCheckChanged(bool value)
 		m_applyButton->setDisabled(true);
 	else
 		m_applyButton->setDisabled(false);
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -3479,9 +3453,7 @@ void StyleEditor::selectStyle(const TColorStyle &newStyle)
 		m_editedStyle && m_editedStyle->hasMainColor())
 		m_editedStyle->setMainColor(m_oldStyle->getMainColor());
 
-#ifndef STUDENT
 	if (m_autoButton->isChecked())
-#endif
 	{
 		// If the adited style is linked to the studio palette, then activate the edited flag
 		if (m_editedStyle->getGlobalName() != L"" && m_editedStyle->getOriginalName() != L"")

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_STOPWATCH_INCLUDED
 #define T_STOPWATCH_INCLUDED

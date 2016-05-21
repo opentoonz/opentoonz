@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TONIONSKINMASKHANDLE_H
 #define TONIONSKINMASKHANDLE_H

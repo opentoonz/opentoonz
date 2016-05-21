@@ -88,7 +88,7 @@ HistoryField::HistoryField(QScrollArea *parent, Qt::WFlags flags)
 	setFocusPolicy(Qt::StrongFocus); /*-- KeyboadでもTabキーでもFocusされる --*/
 
 	setFixedHeight(parentWidget()->height());
-	setMinimumWidth(tmax(parentWidget()->width(), 600));
+	setMinimumWidth(std::max(parentWidget()->width(), 600));
 }
 //-----------------------------------------------------------------------------
 
@@ -250,7 +250,7 @@ void HistoryPane::onHistoryChanged()
 void HistoryPane::resizeEvent(QResizeEvent *e)
 {
 	m_field->updateContentHeight();
-	m_field->setFixedWidth(tmax(width(), 600));
+	m_field->setFixedWidth(std::max(width(), 600));
 }
 
 //-----------------------------------------------------------------------------

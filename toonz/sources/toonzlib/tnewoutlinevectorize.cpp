@@ -27,7 +27,7 @@
 #include "tcg/tcg_cyclic.h"
 
 //Toonz includes
-#include "../common/trop/raster_edge_evaluator.h"
+#include "../common/trop/raster_edge_evaluator.hpp"
 
 #undef INCLUDE_HPP
 

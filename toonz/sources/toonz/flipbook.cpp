@@ -750,9 +750,13 @@ void FlipBook::onButtonPressed(FlipConsole::EGadget button)
 	switch (button) {
 	case FlipConsole::eSound:
 		m_playSound = !m_playSound;
-		CASE FlipConsole::eHisto : m_imageViewer->showHistogram();
-		CASE FlipConsole::eSaveImg:
-		{
+		break;
+	
+	case FlipConsole::eHisto:
+		m_imageViewer->showHistogram();
+		break;
+	
+	case FlipConsole::eSaveImg: {
 			TRect loadbox = m_loadbox;
 			m_loadbox = TRect();
 			TImageP img = getCurrentImage(m_flipConsole->getCurrentFrame());
@@ -772,15 +776,20 @@ void FlipBook::onButtonPressed(FlipConsole::EGadget button)
 			else
 				clonedImg = TToonzImageP(ti->getRaster()->clone(), ti->getSavebox());
 			TImageCache::instance()->add(QString("TnzCompareImg"), clonedImg);
+			break;
 		}
-		CASE FlipConsole::eCompare : if ((TVectorImageP)getCurrentImage(m_flipConsole->getCurrentFrame()))
-		{
+
+	case FlipConsole::eCompare:
+		if ((TVectorImageP)getCurrentImage(m_flipConsole->getCurrentFrame())) {
 			DVGui::warning(tr("It is not possible to take or compare snapshots for Toonz vector levels."));
 			m_flipConsole->setChecked(FlipConsole::eCompare, false);
 			return;
 		}
-		CASE FlipConsole::eSave : saveImages();
-	DEFAULT:;
+		break;
+
+	case FlipConsole::eSave:
+		saveImages();
+		break;
 	}
 }
 
@@ -1097,8 +1106,8 @@ void FlipBook::setLevel(const TFilePath &fp, TPalette *palette, int from, int to
 				}
 
 				if (level->begin()->first.getNumber() != TFrameId::NO_FRAME) {
-					fromIndex = tmax(fromIndex, level->begin()->first.getNumber());
-					toIndex = tmin(toIndex, (--level->end())->first.getNumber());
+					fromIndex = std::max(fromIndex, level->begin()->first.getNumber());
+					toIndex = std::min(toIndex, (--level->end())->first.getNumber());
 				} else {
 					fromIndex = level->begin()->first.getNumber();
 					toIndex = (--level->end())->first.getNumber();
@@ -1107,7 +1116,7 @@ void FlipBook::setLevel(const TFilePath &fp, TPalette *palette, int from, int to
 
 				//Workaround to display simple background images when loading from
 				//the right-click menu context
-				fromIndex = tmin(fromIndex, toIndex);
+				fromIndex = std::min(fromIndex, toIndex);
 			}
 
 			Level levelToPush(level, fp, fromIndex, toIndex, step);
@@ -1885,7 +1894,7 @@ void FlipBook::showEvent(QShowEvent *e)
 		m_flipConsole->onPreferenceChanged();
 	}
 	m_flipConsole->setActive(true);
-	m_imageViewer->updateGL();
+	m_imageViewer->update();
 }
 
 //-------------------------------------------------------------------
@@ -1993,8 +2002,8 @@ void FlipBook::adaptWidGeometry(const TRect &interestWidGeom, const TRect &imgWi
 	QSize flipMinimumSize(panel->minimumSize());
 	flipMinimumSize -= QSize(margins.right() - margins.left(), margins.bottom() - margins.top());
 	QSize minAddition(
-		tceil(tmax(0, flipMinimumSize.width() - interestGeom.width()) * 0.5),
-		tceil(tmax(0, flipMinimumSize.height() - interestGeom.height()) * 0.5));
+		tceil(std::max(0, flipMinimumSize.width() - interestGeom.width()) * 0.5),
+		tceil(std::max(0, flipMinimumSize.height() - interestGeom.height()) * 0.5));
 	interestGeom.adjust(-minAddition.width(), -minAddition.height(), minAddition.width(), minAddition.height());
 
 	//Translate to keep the current view top-left corner, if required

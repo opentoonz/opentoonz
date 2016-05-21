@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LOADFOLDERPOPUP_H
 #define LOADFOLDERPOPUP_H

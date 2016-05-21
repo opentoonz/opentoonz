@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_LIST_H
 #define TCG_LIST_H

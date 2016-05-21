@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef TFARMTASK_H
 #define TFARMTASK_H
 

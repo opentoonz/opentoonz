@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef CASMCONFIGPANEL_H
 #define CASMCONFIGPANEL_H

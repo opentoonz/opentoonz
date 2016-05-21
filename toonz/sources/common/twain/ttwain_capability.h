@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef __TTWAIN_CAP_H__
 #define __TTWAIN_CAP_H__

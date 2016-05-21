@@ -102,20 +102,19 @@ int getFilterRadius(FLT_TYPE flt_type)
 {
 	int result = 0;
 	switch (flt_type) {
-	case FLT_TRIANGLE:
-		result = 1;
-		CASE FLT_MITCHELL : result = 2;
-		CASE FLT_CUBIC_5 : result = 2;
-		CASE FLT_CUBIC_75 : result = 2;
-		CASE FLT_CUBIC_1 : result = 2;
-		CASE FLT_HANN2 : result = 2;
-		CASE FLT_HANN3 : result = 3;
-		CASE FLT_HAMMING2 : result = 2;
-		CASE FLT_HAMMING3 : result = 3;
-		CASE FLT_LANCZOS2 : result = 2;
-		CASE FLT_LANCZOS3 : result = 3;
-		CASE FLT_GAUSS : result = 2;
-	DEFAULT:
+	case FLT_TRIANGLE: result = 1; break;
+	case FLT_MITCHELL: result = 2; break;
+	case FLT_CUBIC_5 : result = 2; break;
+	case FLT_CUBIC_75: result = 2; break;
+	case FLT_CUBIC_1 : result = 2; break;
+	case FLT_HANN2   : result = 2; break;
+	case FLT_HANN3   : result = 3; break;
+	case FLT_HAMMING2: result = 2; break;
+	case FLT_HAMMING3: result = 3; break;
+	case FLT_LANCZOS2: result = 2; break;
+	case FLT_LANCZOS3: result = 3; break;
+	case FLT_GAUSS   : result = 2; break;
+	default:
 		assert(!"bad filter type");
 		break;
 	}
@@ -139,8 +138,9 @@ double filterValue(FLT_TYPE flt_type, double x)
 			result = 1.0 - x;
 		else
 			result = 0.0;
+		break;
 
-		CASE FLT_MITCHELL:
+	case FLT_MITCHELL:
 		{
 			static double p0, p2, p3, q0, q1, q2, q3;
 
@@ -166,43 +166,65 @@ double filterValue(FLT_TYPE flt_type, double x)
 				result = (p0 + x * x * (p2 + x * p3));
 			else if (x < 2.0)
 				result = (q0 + x * (q1 + x * (q2 + x * q3)));
-		}
 
-		CASE FLT_CUBIC_5 : if (x < 0.0) x = -x;
+			break;
+	}
+
+	case FLT_CUBIC_5:
+		if (x < 0.0) x = -x;
 		else if (x < 1.0) result = 2.5 * x * x * x - 3.5 * x * x + 1;
 		else if (x < 2.0) result = 0.5 * x * x * x - 2.5 * x * x + 4 * x - 2;
+		break;
 
-		CASE FLT_CUBIC_75 : if (x < 0.0) x = -x;
+	case FLT_CUBIC_75:
+		if (x < 0.0) x = -x;
 		else if (x < 1.0) result = 2.75 * x * x * x - 3.75 * x * x + 1;
 		else if (x < 2.0) result = 0.75 * x * x * x - 3.75 * x * x + 6 * x - 3;
+		break;
 
-		CASE FLT_CUBIC_1 : if (x < 0.0) x = -x;
+	case FLT_CUBIC_1:
+		if (x < 0.0) x = -x;
 		else if (x < 1.0) result = 3 * x * x * x - 4 * x * x + 1;
 		else if (x < 2.0) result = x * x * x - 5 * x * x + 8 * x - 4;
+		break;
 
-		CASE FLT_HANN2 : if (x <= -2.0) result = 0.0;
+	case FLT_HANN2:
+		if (x <= -2.0) result = 0.0;
 		else if (x < 2.0) result = SINC0(x, 1) * (0.5 + 0.5 * cos((TConsts::pi_2)*x));
+		break;
 
-		CASE FLT_HANN3 : if (x <= -3.0) result = 0.0;
+	case FLT_HANN3:
+		if (x <= -3.0) result = 0.0;
 		else if (x < 3.0) result = SINC0(x, 1) * (0.5 + 0.5 * cos((TConsts::pi / 3) * x));
+		break;
 
-		CASE FLT_HAMMING2 : if (x <= -2.0) result = 0.0;
+	case FLT_HAMMING2:
+		if (x <= -2.0) result = 0.0;
 		else if (x < 2.0) result = SINC0(x, 1) * (0.54 + 0.46 * cos((TConsts::pi_2)*x));
+		break;
 
-		CASE FLT_HAMMING3 : if (x <= -3.0) result = 0.0;
+	case FLT_HAMMING3:
+		if (x <= -3.0) result = 0.0;
 		else if (x < 3.0) result = SINC0(x, 1) * (0.54 + 0.46 * cos((TConsts::pi / 3) * x));
+		break;
 
-		CASE FLT_LANCZOS2 : if (x <= -2.0) result = 0.0;
+	case FLT_LANCZOS2:
+		if (x <= -2.0) result = 0.0;
 		else if (x < 2.0) result = SINC0(x, 1) * SINC0(x, 2);
+		break;
 
-		CASE FLT_LANCZOS3 : if (x <= -3.0) result = 0.0;
+	case FLT_LANCZOS3:
+		if (x <= -3.0) result = 0.0;
 		else if (x < 3.0) result = SINC0(x, 1) * SINC0(x, 3);
+		break;
 
-		CASE FLT_GAUSS : if (x <= -2.0) result = 0.0;
+	case FLT_GAUSS:
+		if (x <= -2.0) result = 0.0;
 		else if (x < 2.0) result = exp((-TConsts::pi) * x * x);
-	/* exp(-M_PI*2*2)~=3.5*10^-6 */
+		/* exp(-M_PI*2*2)~=3.5*10^-6 */
+		break;
 
-	DEFAULT:
+	default:
 		assert(!"bad filter type");
 	}
 	return result;
@@ -220,7 +242,7 @@ void convertSamplesT(TSoundTrackT<T1> &dst, const TSoundTrackT<T2> &src)
 	const T2 *srcSample = src.samples();
 	T1 *dstSample = dst.samples();
 
-	const T2 *srcEndSample = srcSample + tmin(src.getSampleCount(), dst.getSampleCount());
+	const T2 *srcEndSample = srcSample + std::min(src.getSampleCount(), dst.getSampleCount());
 	while (srcSample < srcEndSample) {
 		*dstSample = T1::from(*srcSample);
 		++dstSample;
@@ -304,11 +326,11 @@ T *resampleT(T &src, TINT32 sampleRate, FLT_TYPE flt_type)
 		int iwFirst, iwLast;
 		if (is > 0) {
 			iwFirst = 0;
-			iwLast = tmin<int>(filter.weightset[ip].n_weights, src.getSampleCount() - is);
+			iwLast = std::min<int>(filter.weightset[ip].n_weights, src.getSampleCount() - is);
 		} else {
 			iwFirst = -is;
 			is = 0;
-			iwLast = tmin<int>(filter.weightset[ip].n_weights, src.getSampleCount());
+			iwLast = std::min<int>(filter.weightset[ip].n_weights, src.getSampleCount());
 		}
 
 		double dstChannel[2];
@@ -758,7 +780,7 @@ TSoundTrackP doReverb(
 
 	//  int channelCount = src->getChannelCount();
 
-	endDstSample = dst->samples() + tmin(dstSampleCount, (TINT32)src->getSampleCount());
+	endDstSample = dst->samples() + std::min(dstSampleCount, (TINT32)src->getSampleCount());
 	while (dstSample < endDstSample) {
 		//*dstSample = *srcSample + *(dstSample - k)*decayFactor;
 		*dstSample = T::mix(*srcSample, 1, *(dstSample - k), decayFactor);
@@ -1092,7 +1114,7 @@ TSoundTrackP doEcho(
 	// out(i) = in(i) + decayFactor * in(i - k)
 
 	bool chans = src->getChannelCount() == 2;
-	endDstSample = dst->samples() + tmin(dstSampleCount, (TINT32)src->getSampleCount());
+	endDstSample = dst->samples() + std::min(dstSampleCount, (TINT32)src->getSampleCount());
 	while (dstSample < endDstSample) {
 		//*dstSample = *srcSample + *(srcSample - k)*decayFactor;
 		ChannelValueType val =
@@ -1241,8 +1263,8 @@ TSoundTrackP TSop::remove(TSoundTrackP src, TINT32 s0, TINT32 s1, TSoundTrackP &
 {
 	TINT32 ss0, ss1;
 
-	ss0 = tmax<TINT32>((TINT32)0, s0);
-	ss1 = tmin(s1, (TINT32)(src->getSampleCount() - 1));
+	ss0 = std::max<TINT32>((TINT32)0, s0);
+	ss1 = std::min(s1, (TINT32)(src->getSampleCount() - 1));
 	TSoundTrackP soundTrackSlice;
 	if (ss0 <= ss1)
 		soundTrackSlice = src->extract(ss0, ss1);
@@ -1281,7 +1303,7 @@ template <class T>
 TSoundTrackP mixT(
 	TSoundTrackT<T> *st1, double a1, TSoundTrackT<T> *st2, double a2)
 {
-	TINT32 sampleCount = tmax(st1->getSampleCount(), st2->getSampleCount());
+	TINT32 sampleCount = std::max(st1->getSampleCount(), st2->getSampleCount());
 
 	TSoundTrackT<T> *dst = new TSoundTrackT<T>(
 		st1->getSampleRate(),
@@ -1289,7 +1311,7 @@ TSoundTrackP mixT(
 		sampleCount);
 
 	T *dstSample = dst->samples();
-	T *endDstSample = dstSample + tmin(st1->getSampleCount(), st2->getSampleCount());
+	T *endDstSample = dstSample + std::min(st1->getSampleCount(), st2->getSampleCount());
 
 	T *st1Sample = st1->samples();
 	T *st2Sample = st2->samples();

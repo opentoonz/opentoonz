@@ -39,18 +39,15 @@ void WideChar2Char(LPCWSTR wideCharStr, char *str, int strBuffSize)
 std::string buildAVIExceptionString(int rc)
 {
 	switch (rc) {
-		CASE AVIERR_BADFORMAT : return "The file couldn't be read, indicating a corrupt file or an unrecognized format.";
-		CASE AVIERR_MEMORY : return "The file could not be opened because of insufficient memory.";
-		CASE AVIERR_FILEREAD : return "A disk error occurred while reading the file.";
-		CASE AVIERR_FILEOPEN : return "A disk error occurred while opening the file.";
-		CASE REGDB_E_CLASSNOTREG : return "According to the registry, the type of file specified in m_aviFileOpen does not have a handler to process it.";
-
-		CASE AVIERR_UNSUPPORTED : return "Format unsupported";
-		CASE AVIERR_INTERNAL : return "Internal error";
-		CASE AVIERR_NODATA : return "No data";
-
-	DEFAULT:
-		return "Unable to create avi.";
+	case AVIERR_BADFORMAT : return "The file couldn't be read, indicating a corrupt file or an unrecognized format.";
+	case AVIERR_MEMORY : return "The file could not be opened because of insufficient memory.";
+	case AVIERR_FILEREAD : return "A disk error occurred while reading the file.";
+	case AVIERR_FILEOPEN : return "A disk error occurred while opening the file.";
+	case REGDB_E_CLASSNOTREG : return "According to the registry, the type of file specified in m_aviFileOpen does not have a handler to process it.";
+	case AVIERR_UNSUPPORTED : return "Format unsupported";
+	case AVIERR_INTERNAL : return "Internal error";
+	case AVIERR_NODATA : return "No data";
+	default: return "Unable to create avi.";
 	}
 }
 
@@ -942,21 +939,19 @@ TImageP TLevelReaderAvi::load(int frameIndex)
 	int bpp = m_dstBitmapInfo->bmiHeader.biBitCount;
 	m_prevFrame = frameIndex;
 	switch (bpp) {
-		CASE 32:
-		{
-			TRasterPT<TPixelRGBM32> ret;
-			ret.create(width, height);
-			ret->lock();
-			memcpy(ret->getRawData(), m_decompressedBuffer, width * height * 4);
-			ret->unlock();
-			return TRasterImageP(ret);
-		}
-		CASE 24:
-		{
-			TRasterImageP i(DIBToRaster((UCHAR *)m_decompressedBuffer, width, height));
-			return i;
-		}
-	DEFAULT : {
+	case 32: {
+		TRasterPT<TPixelRGBM32> ret;
+		ret.create(width, height);
+		ret->lock();
+		memcpy(ret->getRawData(), m_decompressedBuffer, width * height * 4);
+		ret->unlock();
+		return TRasterImageP(ret);
+	}
+	case 24: {
+		TRasterImageP i(DIBToRaster((UCHAR *)m_decompressedBuffer, width, height));
+		return i;
+	}
+	default: {
 		throw TImageException(m_path, toString(bpp) + " to 32 bit not supported\n");
 	}
 	}

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_VALUEFIELD_INCLUDED
 #define TNZ_VALUEFIELD_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_FILEBROWSER_INCLUDED
 #define TNZ_FILEBROWSER_INCLUDED

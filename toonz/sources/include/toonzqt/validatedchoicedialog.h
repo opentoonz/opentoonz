@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef VALIDATEDCHOICEDIALOG_H
 #define VALIDATEDCHOICEDIALOG_H

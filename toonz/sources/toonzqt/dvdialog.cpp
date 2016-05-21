@@ -249,7 +249,7 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize, const QString
 	if (geo != QString()) {
 		QStringList values = geo.split(" ");
 		assert(values.size() == 4);
-		setGeometry(values.at(0).toInt(), tmax(30, values.at(1).toInt()), values.at(2).toInt(), values.at(3).toInt());
+		setGeometry(values.at(0).toInt(), std::max(30, values.at(1).toInt()), values.at(2).toInt(), values.at(3).toInt());
 	}
 }
 
@@ -1049,21 +1049,21 @@ int DVGui::MsgBox(const QString &text,
 
 	QPushButton *button1 = new QPushButton(button1Text, &dialog);
 	button1->setDefault(false);
-	if (defaultButtonIndex = 0)
+	if (defaultButtonIndex == 0)
 		button1->setDefault(true);
 	dialog.addButtonBarWidget(button1);
 	buttonGroup->addButton(button1, 1);
 
 	QPushButton *button2 = new QPushButton(button2Text, &dialog);
 	button2->setDefault(false);
-	if (defaultButtonIndex = 1)
+	if (defaultButtonIndex == 1)
 		button2->setDefault(true);
 	dialog.addButtonBarWidget(button2);
 	buttonGroup->addButton(button2, 2);
 
 	QPushButton *button3 = new QPushButton(button3Text, &dialog);
 	button3->setDefault(false);
-	if (defaultButtonIndex = 2)
+	if (defaultButtonIndex == 2)
 		button3->setDefault(true);
 	dialog.addButtonBarWidget(button3);
 	buttonGroup->addButton(button3, 3);
@@ -1281,114 +1281,3 @@ void DVGui::setDialogTitle(const QString &dialogTitle)
 
 //-----------------------------------------------------------------------------
 
-void DVGui::featureNotAvelaible(QString webSiteName, QString url)
-{
-	Dialog dialog(0, true);
-	dialog.setWindowFlags(dialog.windowFlags() | Qt::WindowStaysOnTopHint);
-	dialog.setAlignment(Qt::AlignLeft);
-	QString msgBoxTitle = getMsgBoxTitle(DVGui::WARNING);
-	dialog.setWindowTitle(msgBoxTitle);
-
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->setSpacing(0);
-
-	QHBoxLayout *msgLayout = new QHBoxLayout;
-	QString msg = QObject::tr("This feature is not available in the demo version.\nFor more information visit the %1 site:").arg(webSiteName);
-
-	QLabel *mainTextLabel = new QLabel(msg, &dialog);
-	QPixmap iconPixmap = getMsgBoxPixmap(DVGui::WARNING);
-	if (!iconPixmap.isNull()) {
-		QLabel *iconLabel = new QLabel(&dialog);
-		iconLabel->setPixmap(iconPixmap);
-		msgLayout->addWidget(iconLabel);
-		msgLayout->addSpacing(10);
-	}
-	msgLayout->addWidget(mainTextLabel);
-
-	mainLayout->addLayout(msgLayout);
-	mainLayout->addSpacing(5);
-
-	QLabel *linkTextLabel = new QLabel("<A href=\"" + url + "\">" + url + "</a>", &dialog);
-	linkTextLabel->setAlignment(Qt::AlignCenter);
-	linkTextLabel->setTextFormat(Qt::RichText);
-	linkTextLabel->setOpenExternalLinks(true);
-	mainLayout->addWidget(linkTextLabel, Qt::AlignHCenter);
-
-	dialog.addLayout(mainLayout);
-
-	// ButtonGroup: is used only to retrieve the clicked button
-	QButtonGroup *buttonGroup = new QButtonGroup(&dialog);
-
-	QPushButton *button = new QPushButton(QPushButton::tr("OK"), &dialog);
-	button->setDefault(true);
-	dialog.addButtonBarWidget(button);
-
-	buttonGroup->addButton(button, 1);
-
-	QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), &dialog, SLOT(done(int)));
-
-	dialog.raise();
-	dialog.exec();
-}
-
-//-----------------------------------------------------------------------------
-
-void DVGui::requestTrialLicense(QString url, QString mail)
-{
-	Dialog dialog(0, true);
-	dialog.setWindowFlags(dialog.windowFlags() | Qt::WindowStaysOnTopHint);
-	dialog.setAlignment(Qt::AlignLeft);
-	QString msgBoxTitle = getMsgBoxTitle(DVGui::WARNING);
-	dialog.setWindowTitle(msgBoxTitle);
-
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->setSpacing(0);
-
-	//Request Licence
-	QHBoxLayout *requestLicenseLayout = new QHBoxLayout;
-	QString msg = QObject::tr("To request a trial license please contact ");
-	QLabel *requestLicenseTextLabel = new QLabel(msg, &dialog);
-	requestLicenseTextLabel->setAlignment(Qt::AlignRight);
-	requestLicenseLayout->addWidget(requestLicenseTextLabel, Qt::AlignHCenter);
-
-	QLabel *mailTextLabel = new QLabel("<a href=\"mailto:" + mail + "\">" + mail + "</a>", &dialog);
-	mailTextLabel->setAlignment(Qt::AlignLeft);
-	mailTextLabel->setTextFormat(Qt::RichText);
-	mailTextLabel->setOpenExternalLinks(true);
-	requestLicenseLayout->addWidget(mailTextLabel, Qt::AlignHCenter);
-
-	mainLayout->addLayout(requestLicenseLayout);
-	mainLayout->addSpacing(5);
-
-	//Request info
-	QHBoxLayout *infoLayout = new QHBoxLayout;
-	QString infoMsg = QObject::tr("For further information visit ");
-	QLabel *infoMsgLabel = new QLabel(infoMsg, &dialog);
-	infoMsgLabel->setAlignment(Qt::AlignRight);
-	infoLayout->addWidget(infoMsgLabel, Qt::AlignHCenter);
-
-	QLabel *linkTextLabel = new QLabel("<a href=\"" + url + "\">" + url + "</a>", &dialog);
-	linkTextLabel->setAlignment(Qt::AlignLeft);
-	linkTextLabel->setTextFormat(Qt::RichText);
-	linkTextLabel->setOpenExternalLinks(true);
-	infoLayout->addWidget(linkTextLabel, Qt::AlignHCenter);
-
-	mainLayout->addLayout(infoLayout);
-	mainLayout->addSpacing(5);
-
-	dialog.addLayout(mainLayout);
-
-	// ButtonGroup: is used only to retrieve the clicked button
-	QButtonGroup *buttonGroup = new QButtonGroup(&dialog);
-
-	QPushButton *button = new QPushButton(QPushButton::tr("OK"), &dialog);
-	button->setDefault(true);
-	dialog.addButtonBarWidget(button);
-
-	buttonGroup->addButton(button, 1);
-
-	QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), &dialog, SLOT(done(int)));
-
-	dialog.raise();
-	dialog.exec();
-}

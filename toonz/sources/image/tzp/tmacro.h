@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _TMACRO_H_
 #define _TMACRO_H_
@@ -48,14 +48,6 @@ typedef unsigned char UCHAR;
 typedef unsigned short USHORT;
 typedef unsigned int UINT;
 typedef unsigned long ULONG;
-
-#define CASE \
-	break;   \
-	case
-#define __OR case
-#define DEFAULT \
-	break;      \
-	default
 
 /*---------------------------------------------------------------------------*/
 

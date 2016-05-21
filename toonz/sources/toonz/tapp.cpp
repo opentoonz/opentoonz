@@ -276,8 +276,6 @@ int TApp::getCurrentImageType()
 		if (col < 0)
 #ifdef LINETEST
 			return TImage::RASTER;
-#elif defined BRAVO
-			return TImage::VECTOR;
 #else
 		{
 			int levelType = Preferences::instance()->getDefLevelType();
@@ -298,8 +296,6 @@ int TApp::getCurrentImageType()
 			{
 #ifdef LINETEST
 				return TImage::RASTER;
-#elif defined BRAVO
-				return TImage::VECTOR;
 #else
 				int levelType = Preferences::instance()->getDefLevelType();
 				return (levelType == PLI_XSHLEVEL) ? TImage::VECTOR : (levelType == TZP_XSHLEVEL) ? TImage::TOONZ_RASTER : TImage::RASTER;
@@ -315,12 +311,13 @@ int TApp::getCurrentImageType()
 		switch (sl->getType()) {
 		case TZP_XSHLEVEL:
 			return TImage::TOONZ_RASTER;
-
-			CASE OVL_XSHLEVEL : return TImage::RASTER;
-
-			CASE PLI_XSHLEVEL : default : return TImage::VECTOR;
-
-			CASE MESH_XSHLEVEL : return TImage::MESH;
+		case OVL_XSHLEVEL:
+			return TImage::RASTER;
+		case PLI_XSHLEVEL:
+		default:
+			return TImage::VECTOR;
+		case MESH_XSHLEVEL:
+			return TImage::MESH;
 		}
 	}
 

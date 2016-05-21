@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef COLORFIELD_H
 #define COLORFIELD_H

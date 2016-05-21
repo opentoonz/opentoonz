@@ -443,15 +443,15 @@ QPainterPath FunctionPanel::getSegmentPainterPath(TDoubleParam *curve, int segme
 	int step = 1;
 	if (kCount > 0) {
 		if (segmentIndex < 0)
-			frame1 = tmin(frame1, curve->keyframeIndexToFrame(0)); // before first keyframe
+			frame1 = std::min(frame1, curve->keyframeIndexToFrame(0)); // before first keyframe
 		else if (segmentIndex >= kCount - 1)
-			frame0 = tmax(frame0, curve->keyframeIndexToFrame(kCount - 1)); // after last keyframe
+			frame0 = std::max(frame0, curve->keyframeIndexToFrame(kCount - 1)); // after last keyframe
 		else {
 			// between keyframes
 			TDoubleKeyframe kf = curve->getKeyframe(segmentIndex);
-			frame0 = tmax(frame0, kf.m_frame);
+			frame0 = std::max(frame0, kf.m_frame);
 			double f = curve->keyframeIndexToFrame(segmentIndex + 1);
-			frame1 = tmin(frame1, f);
+			frame1 = std::min(frame1, f);
 			step = kf.m_step;
 		}
 	}
@@ -465,7 +465,7 @@ QPainterPath FunctionPanel::getSegmentPainterPath(TDoubleParam *curve, int segme
 	} else //FRAME_BASED
 	{
 		frame = (double)tfloor(frame0);
-		df = tmax(df, 1.0);
+		df = std::max(df, 1.0);
 	}
 
 	QPainterPath path;
@@ -592,7 +592,7 @@ void FunctionPanel::drawValueGrid(QPainter &painter)
 		if (isLabel) {
 			painter.setPen(m_textColor);
 			QString labelText = QString::number(v);
-			painter.drawText(tmax(0, x - 5 - fm.width(labelText)), y + fm.height() / 2, labelText);
+			painter.drawText(std::max(0, x - 5 - fm.width(labelText)), y + fm.height() / 2, labelText);
 		}
 	}
 	if (false && ruler.getTickCount() > 10) {
@@ -716,20 +716,21 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve)
 					QPointF q = getWinPos(curve, currentPointLeft + speedIn);
 					m_gadgets.push_back(Gadget(SpeedIn, i, q, handleHitRadius, handleHitRadius, pLeft));
 				}
+				break;
 			}
 
-				CASE TDoubleKeyframe::EaseInOut:
-				{
-					QPointF q = getWinPos(curve, kf.m_frame + kf.m_speedIn.x);
-					m_gadgets.push_back(Gadget(EaseIn, i, q, 6, 15));
-				}
+			case TDoubleKeyframe::EaseInOut: {
+				QPointF q = getWinPos(curve, kf.m_frame + kf.m_speedIn.x);
+				m_gadgets.push_back(Gadget(EaseIn, i, q, 6, 15));
+				break;
+			}
 
-				CASE TDoubleKeyframe::EaseInOutPercentage:
-				{
-					double easeIn = kf.m_speedIn.x * (kf.m_frame - oldKf.m_frame) * 0.01;
-					QPointF q = getWinPos(curve, kf.m_frame + easeIn);
-					m_gadgets.push_back(Gadget(EaseInPercentage, i, q, 6, 15));
-				}
+			case TDoubleKeyframe::EaseInOutPercentage: {
+				double easeIn = kf.m_speedIn.x * (kf.m_frame - oldKf.m_frame) * 0.01;
+				QPointF q = getWinPos(curve, kf.m_frame + easeIn);
+				m_gadgets.push_back(Gadget(EaseInPercentage, i, q, 6, 15));
+				break;
+			}
 			}
 
 			// Right handle
@@ -741,22 +742,23 @@ void FunctionPanel::updateGadgets(TDoubleParam *curve)
 						QPointF q = getWinPos(curve, currentPointRight + speedOut);
 						m_gadgets.push_back(Gadget(SpeedOut, i, q, handleHitRadius, handleHitRadius, p));
 					}
+					break;
 				}
 
-					CASE TDoubleKeyframe::EaseInOut:
-					{
-						QPointF q = getWinPos(curve, kf.m_frame + kf.m_speedOut.x);
-						m_gadgets.push_back(Gadget(EaseOut, i, q, 6, 15));
-					}
+				case TDoubleKeyframe::EaseInOut: {
+					QPointF q = getWinPos(curve, kf.m_frame + kf.m_speedOut.x);
+					m_gadgets.push_back(Gadget(EaseOut, i, q, 6, 15));
+					break;
+				}
 
-					CASE TDoubleKeyframe::EaseInOutPercentage:
-					{
-						double segmentWidth = curve->keyframeIndexToFrame(i + 1) - kf.m_frame;
-						double easeOut = segmentWidth * kf.m_speedOut.x * 0.01;
+				case TDoubleKeyframe::EaseInOutPercentage: {
+					double segmentWidth = curve->keyframeIndexToFrame(i + 1) - kf.m_frame;
+					double easeOut = segmentWidth * kf.m_speedOut.x * 0.01;
 
-						QPointF q = getWinPos(curve, kf.m_frame + easeOut);
-						m_gadgets.push_back(Gadget(EaseOutPercentage, i, q, 6, 15));
-					}
+					QPointF q = getWinPos(curve, kf.m_frame + easeOut);
+					m_gadgets.push_back(Gadget(EaseOutPercentage, i, q, 6, 15));
+					break;
+				}
 				}
 			}
 		}

@@ -252,10 +252,10 @@ void CornerPinFx::transform(
 	//(especially for vector images).
 
 	double scale = 0;
-	scale = tmax(scale, norm(p10_a - p00_a) / norm(p10_b - p00_b));
-	scale = tmax(scale, norm(p01_a - p00_a) / norm(p01_b - p00_b));
-	scale = tmax(scale, norm(p11_a - p10_a) / norm(p11_b - p10_b));
-	scale = tmax(scale, norm(p11_a - p01_a) / norm(p11_b - p01_b));
+	scale = std::max(scale, norm(p10_a - p00_a) / norm(p10_b - p00_b));
+	scale = std::max(scale, norm(p01_a - p00_a) / norm(p01_b - p00_b));
+	scale = std::max(scale, norm(p11_a - p10_a) / norm(p11_b - p10_b));
+	scale = std::max(scale, norm(p11_a - p01_a) / norm(p11_b - p01_b));
 
 	TAffine A_1B(getPort1Affine(frame));
 	TAffine B(infoOnOutput.m_affine * A_1B);
@@ -358,10 +358,10 @@ void CornerPinFx::safeTransform(
 		TPointD affP11_b(infoOnInput.m_affine * m_p11_b->getValue(frame));
 
 		TRectD source;
-		source.x0 = tmin(affP00_b.x, affP10_b.x, affP01_b.x, affP11_b.x);
-		source.y0 = tmin(affP00_b.y, affP10_b.y, affP01_b.y, affP11_b.y);
-		source.x1 = tmax(affP00_b.x, affP10_b.x, affP01_b.x, affP11_b.x);
-		source.y1 = tmax(affP00_b.y, affP10_b.y, affP01_b.y, affP11_b.y);
+		source.x0 = std::min({affP00_b.x, affP10_b.x, affP01_b.x, affP11_b.x});
+		source.y0 = std::min({affP00_b.y, affP10_b.y, affP01_b.y, affP11_b.y});
+		source.x1 = std::max({affP00_b.x, affP10_b.x, affP01_b.x, affP11_b.x});
+		source.y1 = std::max({affP00_b.y, affP10_b.y, affP01_b.y, affP11_b.y});
 
 		rectOnInput *= source;
 	}
@@ -509,10 +509,10 @@ void CornerPinFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 		TPointD p11_a = m_p11_a->getValue(frame);
 
 		double scale = 0;
-		scale = tmax(scale, norm(p10_a - p00_a) / norm(p10_b - p00_b));
-		scale = tmax(scale, norm(p01_a - p00_a) / norm(p01_b - p00_b));
-		scale = tmax(scale, norm(p11_a - p10_a) / norm(p11_b - p10_b));
-		scale = tmax(scale, norm(p11_a - p01_a) / norm(p11_b - p01_b));
+		scale = std::max(scale, norm(p10_a - p00_a) / norm(p10_b - p00_b));
+		scale = std::max(scale, norm(p01_a - p00_a) / norm(p01_b - p00_b));
+		scale = std::max(scale, norm(p11_a - p10_a) / norm(p11_b - p10_b));
+		scale = std::max(scale, norm(p11_a - p01_a) / norm(p11_b - p01_b));
 
 		TAffine A_1B(getPort1Affine(frame));
 		TAffine B(ri.m_affine * A_1B);
@@ -564,24 +564,31 @@ void CornerPinFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 		switch (m_mode->getValue()) {
 		case SUBSTITUTE:
 			myOver32(tile.getRaster(), textureTile.getRaster(), &substitute<TPixel32>, v);
-
-			CASE PATTERNTYPE : witheCard = TRaster32P(textureTile.getRaster()->getSize());
+			break;
+		case PATTERNTYPE:
+			witheCard = TRaster32P(textureTile.getRaster()->getSize());
 			witheCard->fill(TPixel32::White);
 			TRop::over(textureTile.getRaster(), witheCard, textureTile.getRaster());
 			myOver32(tile.getRaster(), textureTile.getRaster(), &pattern32, v);
-
-			CASE ADD : myOver32(tile.getRaster(), textureTile.getRaster(), &textureAdd<TPixel32>, v / 100.0);
-
-			CASE SUBTRACT : myOver32(tile.getRaster(), textureTile.getRaster(), &textureSub<TPixel32>, v / 100.0);
-
-			CASE MULTIPLY : myOver32(tile.getRaster(), textureTile.getRaster(), &textureMult<TPixel32>, v);
-
-			CASE DARKEN : myOver32(tile.getRaster(), textureTile.getRaster(), &textureDarken<TPixel32>, v);
-
-			CASE LIGHTEN : myOver32(tile.getRaster(), textureTile.getRaster(), &textureLighten<TPixel32>, v);
-
-		DEFAULT:
+			break;
+		case ADD:
+			myOver32(tile.getRaster(), textureTile.getRaster(), &textureAdd<TPixel32>, v / 100.0);
+			break;
+		case SUBTRACT:
+			myOver32(tile.getRaster(), textureTile.getRaster(), &textureSub<TPixel32>, v / 100.0);
+			break;
+		case MULTIPLY:
+			myOver32(tile.getRaster(), textureTile.getRaster(), &textureMult<TPixel32>, v);
+			break;
+		case DARKEN:
+			myOver32(tile.getRaster(), textureTile.getRaster(), &textureDarken<TPixel32>, v);
+			break;
+		case LIGHTEN:
+			myOver32(tile.getRaster(), textureTile.getRaster(), &textureLighten<TPixel32>, v);
+			break;
+		default:
 			assert(0);
+			break;
 		}
 	} else {
 		TRaster64P witheCard;
@@ -591,24 +598,31 @@ void CornerPinFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri
 		switch (m_mode->getValue()) {
 		case SUBSTITUTE:
 			myOver64(tile.getRaster(), textureTile.getRaster(), &substitute<TPixel64>, v);
-
-			CASE PATTERNTYPE : witheCard = TRaster64P(textureTile.getRaster()->getSize());
+			break;
+		case PATTERNTYPE:
+			witheCard = TRaster64P(textureTile.getRaster()->getSize());
 			witheCard->fill(TPixel64::White);
 			TRop::over(textureTile.getRaster(), witheCard, textureTile.getRaster());
 			myOver64(tile.getRaster(), textureTile.getRaster(), &pattern64, v);
-
-			CASE ADD : myOver64(tile.getRaster(), textureTile.getRaster(), &textureAdd<TPixel64>, v / 100.0);
-
-			CASE SUBTRACT : myOver64(tile.getRaster(), textureTile.getRaster(), &textureSub<TPixel64>, v / 100.0);
-
-			CASE MULTIPLY : myOver64(tile.getRaster(), textureTile.getRaster(), &textureMult<TPixel64>, v);
-
-			CASE DARKEN : myOver64(tile.getRaster(), textureTile.getRaster(), &textureDarken<TPixel64>, v);
-
-			CASE LIGHTEN : myOver64(tile.getRaster(), textureTile.getRaster(), &textureLighten<TPixel64>, v);
-
-		DEFAULT:
+			break;
+		case ADD:
+			myOver64(tile.getRaster(), textureTile.getRaster(), &textureAdd<TPixel64>, v / 100.0);
+			break;
+		case SUBTRACT:
+			myOver64(tile.getRaster(), textureTile.getRaster(), &textureSub<TPixel64>, v / 100.0);
+			break;
+		case MULTIPLY:
+			myOver64(tile.getRaster(), textureTile.getRaster(), &textureMult<TPixel64>, v);
+			break;
+		case DARKEN:
+			myOver64(tile.getRaster(), textureTile.getRaster(), &textureDarken<TPixel64>, v);
+			break;
+		case LIGHTEN:
+			myOver64(tile.getRaster(), textureTile.getRaster(), &textureLighten<TPixel64>, v);
+			break;
+		default:
 			assert(0);
+			break;
 		}
 	}
 
@@ -628,7 +642,7 @@ int CornerPinFx::getMemoryRequirement(const TRectD &rect, double frame, const TR
 	safeTransform(frame, 1, rect, info, inRect, riNew, inBBox);
 	inRect *= inBBox;
 
-	return tmax(TRasterFx::memorySize(rect, info.m_bpp), TRasterFx::memorySize(inRect, riNew.m_bpp));
+	return std::max(TRasterFx::memorySize(rect, info.m_bpp), TRasterFx::memorySize(inRect, riNew.m_bpp));
 }
 
 //-------------------------------------------------------------------------
@@ -637,10 +651,10 @@ TRectD CornerPinFx::getContainingBox(const FourPoints &points)
 {
 	if(points.m_p00==points.m_p01 && points.m_p01==points.m_p10 && points.m_p10==points.m_p11)
 		return TRectD(points.m_p00,points.m_p00);
-	double xMax=tmax(points.m_p00.x,points.m_p01.x,points.m_p10.x,points.m_p11.x);
-	double yMax=tmax(points.m_p00.y,points.m_p01.y,points.m_p10.y,points.m_p11.y);
-	double xMin=tmin(points.m_p00.x,points.m_p01.x,points.m_p10.x,points.m_p11.x);
-	double yMin=tmin(points.m_p00.y,points.m_p01.y,points.m_p10.y,points.m_p11.y);
+	double xMax=std::max(points.m_p00.x,points.m_p01.x,points.m_p10.x,points.m_p11.x);
+	double yMax=std::max(points.m_p00.y,points.m_p01.y,points.m_p10.y,points.m_p11.y);
+	double xMin=std::min(points.m_p00.x,points.m_p01.x,points.m_p10.x,points.m_p11.x);
+	double yMin=std::min(points.m_p00.y,points.m_p01.y,points.m_p10.y,points.m_p11.y);
 	return TRectD(xMin,yMin,xMax, yMax);
 }
 */

@@ -351,7 +351,7 @@ namespace
 
 int intersect_segment(int x1, int y1, int x2, int y2, int i, double *ris)
 {
-	if ((i < tmin(y1, y2)) || (i > tmax(y1, y2)) || (y1 == y2))
+	if ((i < std::min(y1, y2)) || (i > std::max(y1, y2)) || (y1 == y2))
 		return 0;
 
 	*ris = ((double)((x1 - x2) * (i - y2)) / (double)(y1 - y2) + x2);
@@ -399,13 +399,13 @@ int intersect_triangle(int x1a, int y1a, int x2a, int y2a, int x3a, int y3a,
 	int minx, maxx, miny, maxy, i;
 	double xamin, xamax, xbmin, xbmax, val;
 
-	miny = tmax(tmin(y1a, y2a, y3a), tmin(y1b, y2b, y3b));
-	maxy = tmin(tmax(y1a, y2a, y3a), tmax(y1b, y2b, y3b));
+	miny = std::max(std::min({y1a, y2a, y3a}), std::min({y1b, y2b, y3b}));
+	maxy = std::min(std::max({y1a, y2a, y3a}), std::max({y1b, y2b, y3b}));
 	if (maxy < miny)
 		return 0;
 
-	minx = tmax(tmin(x1a, x2a, x3a), tmin(x1b, x2b, x3b));
-	maxx = tmin(tmax(x1a, x2a, x3a), tmax(x1b, x2b, x3b));
+	minx = std::max(std::min({x1a, x2a, x3a}), std::min({x1b, x2b, x3b}));
+	maxx = std::min(std::max({x1a, x2a, x3a}), std::max({x1b, x2b, x3b}));
 	if (maxx < minx)
 		return 0;
 

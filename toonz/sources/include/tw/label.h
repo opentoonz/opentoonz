@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_LABEL_INCLUDED
 #define TNZ_LABEL_INCLUDED

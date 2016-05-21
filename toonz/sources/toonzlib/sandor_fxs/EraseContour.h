@@ -1,4 +1,4 @@
-
+#pragma once
 
 // EraseContour.h: interface for the CEraseContour class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_ERASECONTOUR_H__53513372_34D4_11D6_B9E7_0040F674BE6A__INCLUDED_)
 #define AFX_ERASECONTOUR_H__53513372_34D4_11D6_B9E7_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #include <memory>
 #include <array>

@@ -698,8 +698,8 @@ void StageSchematicScene::placeNodes()
 		yPos = maxYPos + (pegbar->getId().isCamera() ? 100 : step);
 		pegbar->setDagNodePos(TPointD(xPos, yPos));
 		placeChildren(roots[i], xPos, yPos);
-		maxXPos = tmax(xPos, maxXPos);
-		maxYPos = tmax(yPos, maxYPos);
+		maxXPos = std::max(xPos, maxXPos);
+		maxYPos = std::max(yPos, maxYPos);
 	}
 
 	//places all spline nodes.
@@ -783,7 +783,7 @@ void StageSchematicScene::placeChildren(TreeStageNode *treeNode, double &xPos, d
 		firstChild = false;
 		childPegbar->setDagNodePos(TPointD(xChildPos, yPos));
 		placeChildren(childNode, xChildPos, yPos, startFromCamera);
-		xPos = tmax(xPos, xChildPos);
+		xPos = std::max(xPos, xChildPos);
 	}
 }
 
@@ -988,9 +988,6 @@ void StageSchematicScene::onRemoveSpline()
 
 void StageSchematicScene::onSaveSpline()
 {
-#ifdef BRAVODEMO
-	DVGui::featureNotAvelaible();
-#else
 	TFilePath projectFolder = m_sceneHandle->getScene()->getProject()->getProjectFolder();
 	QString fileNameStr = QFileDialog::getSaveFileName(this->views()[0],
 													   QObject::tr("Save Motion Path"), QString::fromStdWString(projectFolder.getWideString()),
@@ -1023,7 +1020,6 @@ void StageSchematicScene::onSaveSpline()
 	} catch (...) {
 		DVGui::warning(QObject::tr("It is not possible to save the motion path."));
 	}
-#endif
 }
 
 //------------------------------------------------------------------

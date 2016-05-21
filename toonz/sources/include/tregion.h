@@ -1,3 +1,5 @@
+#pragma once
+
 //-----------------------------------------------------------------------------
 // tregion.h: interface for the TRegion class.
 //-----------------------------------------------------------------------------
@@ -5,10 +7,6 @@
 #define TREGION_H
 
 #include <memory>
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #include "tgeometry.h"
 //#include "tsmartpointer.h"

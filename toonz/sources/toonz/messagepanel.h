@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef MESSAGEPANEL_H
 #define MESSAGEPANEL_H

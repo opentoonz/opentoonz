@@ -341,27 +341,25 @@ AdjustThicknessPopup::SelectionData::SelectionData(const TSelection *sel)
 			}
 
 			switch (m_this->m_framesType) {
-			case ALL_FRAMES: {
+			case ALL_FRAMES:
 				if (m_this->m_sl->getFrameCount() <= 0)
 					*m_this = SelectionData();
-			}
+				break;
+			case SELECTED_FRAMES:
+				// Since fid2index may return negative indexes, cut them out
+				m_this->m_frameIdxs.erase(m_this->m_frameIdxs.begin(), m_this->m_frameIdxs.lower_bound(0));
 
-				CASE SELECTED_FRAMES:
-				{
-					// Since fid2index may return negative indexes, cut them out
-					m_this->m_frameIdxs.erase(m_this->m_frameIdxs.begin(), m_this->m_frameIdxs.lower_bound(0));
+				// Also cut indexes greater than m_sl's frames count
+				m_this->m_frameIdxs.erase(m_this->m_frameIdxs.lower_bound(m_this->m_sl->getFrameCount()),
+											m_this->m_frameIdxs.end());
 
-					// Also cut indexes greater than m_sl's frames count
-					m_this->m_frameIdxs.erase(m_this->m_frameIdxs.lower_bound(m_this->m_sl->getFrameCount()),
-											  m_this->m_frameIdxs.end());
+				// Reset to empty in case no frame was selected
+				if (m_this->m_frameIdxs.empty())
+					*m_this = SelectionData();
 
-					// Reset to empty in case no frame was selected
-					if (m_this->m_frameIdxs.empty())
-						*m_this = SelectionData();
-
-					// NOTE: This may notably happen whenever non-empty level cells refer to frames
-					//       not present in the level.
-				}
+				// NOTE: This may notably happen whenever non-empty level cells refer to frames
+				//       not present in the level.
+				break;
 			}
 		}
 
@@ -485,38 +483,41 @@ AdjustThicknessPopup::SelectionData::SelectionData(const TSelection *sel)
 				switch (selection.filter()) {
 				case LevelSelection::WHOLE:
 					m_this->m_contentType = IMAGE;
+					break;
 
-					CASE LevelSelection::SELECTED_STYLES:
-					{
-						m_this->m_contentType = STYLES;
-						m_this->m_idxs = std::vector<int>(
-							selection.styles().begin(), selection.styles().end());
+				case LevelSelection::SELECTED_STYLES:
+					m_this->m_contentType = STYLES;
+					m_this->m_idxs = std::vector<int>(
+						selection.styles().begin(), selection.styles().end());
 
-						// Reset to empty in case no style was selected
-						if (m_this->m_idxs.empty()) {
-							*m_this = SelectionData();
-							return;
-						}
+					// Reset to empty in case no style was selected
+					if (m_this->m_idxs.empty()) {
+						*m_this = SelectionData();
+						return;
 					}
 
-					CASE LevelSelection::BOUNDARY_STROKES : m_this->m_contentType = BOUNDARIES;
+					break;
+				case LevelSelection::BOUNDARY_STROKES:
+					m_this->m_contentType = BOUNDARIES;
+					break;
 				}
 
 				// Discriminate frames selection modes
 				switch (selection.framesMode()) {
 				case LevelSelection::FRAMES_ALL:
 					m_this->m_framesType = ALL_FRAMES;
+					break;
 
-					CASE LevelSelection::FRAMES_SELECTED:
-					{
-						m_this->m_framesType = SELECTED_FRAMES;
+				case LevelSelection::FRAMES_SELECTED: {
+					m_this->m_framesType = SELECTED_FRAMES;
 
-						const std::set<TFrameId> &fids = TTool::getSelectedFrames();
+					const std::set<TFrameId> &fids = TTool::getSelectedFrames();
 
-						m_this->m_frameIdxs = std::set<int>(
-							tcg::make_cast_it(fids.begin(), tcg::bind1st(Fid2Index(), *m_this->m_sl)),
-							tcg::make_cast_it(fids.end(), tcg::bind1st(Fid2Index(), *m_this->m_sl)));
-					}
+					m_this->m_frameIdxs = std::set<int>(
+						tcg::make_cast_it(fids.begin(), tcg::bind1st(Fid2Index(), *m_this->m_sl)),
+						tcg::make_cast_it(fids.end(), tcg::bind1st(Fid2Index(), *m_this->m_sl)));
+					break;
+				}
 				}
 
 				resetIfInvalid();
@@ -565,20 +566,19 @@ void AdjustThicknessPopup::SelectionData::getRange(int &startIdx, int &endIdx) c
 		return;
 
 	switch (m_framesType) {
-	case ALL_FRAMES: {
+	case ALL_FRAMES:
 		assert(m_sl);
 
 		startIdx = 0;
 		endIdx = m_sl->getFrameCount() - 1;
-	}
+		break;
 
-		CASE SELECTED_FRAMES:
-		{
-			assert(!m_frameIdxs.empty());
+	case SELECTED_FRAMES:
+		assert(!m_frameIdxs.empty());
 
-			startIdx = *m_frameIdxs.begin();
-			endIdx = *--m_frameIdxs.end();
-		}
+		startIdx = *m_frameIdxs.begin();
+		endIdx = *--m_frameIdxs.end();
+		break;
 	}
 }
 
@@ -626,44 +626,43 @@ TVectorImageP processFrame(
 
 			// Perform the operation preview
 			switch (selData.m_contentType) {
-				CASE SelectionData::IMAGE:
-				{
-					double transform[2];
-					locals::makeTransform(transform, fromTransform, toTransform,
-										  startIdx, endIdx, slFrameIndex);
+			case SelectionData::IMAGE: {
+				double transform[2];
+				locals::makeTransform(transform, fromTransform, toTransform,
+					startIdx, endIdx, slFrameIndex);
 
-					::transformThickness_image(viOut, transform);
-				}
+				::transformThickness_image(viOut, transform);
+				break;
+			}
 
-				CASE SelectionData::STYLES:
-				{
-					double transform[2];
-					locals::makeTransform(transform, fromTransform, toTransform,
-										  startIdx, endIdx, slFrameIndex);
+			case SelectionData::STYLES: {
+				double transform[2];
+				locals::makeTransform(transform, fromTransform, toTransform,
+					startIdx, endIdx, slFrameIndex);
 
-					::transformThickness_styles(viOut, transform,
-												&selData.m_idxs.front(), selData.m_idxs.size());
-				}
+				::transformThickness_styles(viOut, transform,
+					selData.m_idxs.data(), selData.m_idxs.size());
+				break;
+			}
 
-				CASE SelectionData::BOUNDARIES:
-				{
-					double transform[2];
-					locals::makeTransform(transform, fromTransform, toTransform,
-										  startIdx, endIdx, slFrameIndex);
+			case SelectionData::BOUNDARIES: {
+				double transform[2];
+				locals::makeTransform(transform, fromTransform, toTransform,
+					startIdx, endIdx, slFrameIndex);
 
-					std::vector<int> strokes = getBoundaryStrokes(*viOut);
+				std::vector<int> strokes = getBoundaryStrokes(*viOut);
 
-					::transformThickness_strokes(viOut, transform,
-												 &strokes.front(), strokes.size());
-				}
+				::transformThickness_strokes(viOut, transform,
+					strokes.data(), strokes.size());
+				break;
+			}
 
-				CASE SelectionData::STROKES:
-				{
-					::transformThickness_strokes(viOut, fromTransform,
-												 &selData.m_idxs.front(), selData.m_idxs.size());
-				}
+			case SelectionData::STROKES:
+				::transformThickness_strokes(viOut, fromTransform,
+					selData.m_idxs.data(), selData.m_idxs.size());
+				break;
 
-			DEFAULT:
+			default:
 				assert(false);
 			}
 
@@ -941,31 +940,29 @@ void AdjustThicknessPopup::getTransformParameters(
 		   CONSTANT };
 
 	switch (m_thicknessMode->currentIndex()) {
-	case SCALE: {
+	case SCALE:
 		fromTransform[0] = 0.0;
 		fromTransform[1] = m_fromScale->getValue();
 
 		toTransform[0] = 0.0;
 		toTransform[1] = m_toScale->getValue();
-	}
+		break;
 
-		CASE ADD:
-		{
-			fromTransform[0] = m_fromDisplacement->getValue() * Stage::inch;
-			fromTransform[1] = 1.0;
+	case ADD:
+		fromTransform[0] = m_fromDisplacement->getValue() * Stage::inch;
+		fromTransform[1] = 1.0;
 
-			toTransform[0] = m_toDisplacement->getValue() * Stage::inch;
-			toTransform[1] = 1.0;
-		}
+		toTransform[0] = m_toDisplacement->getValue() * Stage::inch;
+		toTransform[1] = 1.0;
+		break;
 
-		CASE CONSTANT:
-		{
-			fromTransform[0] = m_fromDisplacement->getValue() * Stage::inch;
-			fromTransform[1] = 0.0;
+	case CONSTANT:
+		fromTransform[0] = m_fromDisplacement->getValue() * Stage::inch;
+		fromTransform[1] = 0.0;
 
-			toTransform[0] = m_toDisplacement->getValue() * Stage::inch;
-			toTransform[1] = 0.0;
-		}
+		toTransform[0] = m_toDisplacement->getValue() * Stage::inch;
+		toTransform[1] = 0.0;
+		break;
 	}
 }
 
@@ -1082,18 +1079,16 @@ void AdjustThicknessUndo::redo() const
 
 	// Iterate selected frames
 	switch (m_selData.m_framesType) {
-	case SelectionData::ALL_FRAMES: {
+	case SelectionData::ALL_FRAMES:
 		std::for_each(boost::make_counting_iterator(0),
 					  boost::make_counting_iterator(m_selData.m_sl->getFrameCount()),
 					  tcg::bind1st(&locals::processFrame, *this));
-	}
-
-		CASE SelectionData::SELECTED_FRAMES:
-		{
-			std::for_each(m_selData.m_frameIdxs.begin(),
-						  m_selData.m_frameIdxs.end(),
-						  tcg::bind1st(&locals::processFrame, *this));
-		}
+		break;
+	case SelectionData::SELECTED_FRAMES:
+		std::for_each(m_selData.m_frameIdxs.begin(),
+						m_selData.m_frameIdxs.end(),
+						tcg::bind1st(&locals::processFrame, *this));
+		break;
 	}
 }
 

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef IKSKELETON_H
 #define IKSKELETON_H

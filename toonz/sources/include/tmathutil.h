@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TMATH_UTIL_H
 #define TMATH_UTIL_H

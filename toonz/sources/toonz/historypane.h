@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef HISTORYPANE_H
 #define HISTORYPANE_H
 

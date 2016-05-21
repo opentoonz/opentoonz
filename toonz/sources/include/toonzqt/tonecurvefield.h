@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TONECURVEFIELD_H
 #define TONECURVEFIELD_H

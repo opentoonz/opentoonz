@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFUNCTORINVOKER_H
 #define TFUNCTORINVOKER_H

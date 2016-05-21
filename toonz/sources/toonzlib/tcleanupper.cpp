@@ -125,8 +125,8 @@ HSVColor HSVColor::fromRGB(double r, double g, double b)
 	double h, s, v;
 	double max, min, delta;
 
-	max = tmax(r, g, b);
-	min = tmin(r, g, b);
+	max = std::max({r, g, b});
+	min = std::min({r, g, b});
 
 	v = max;
 
@@ -209,7 +209,7 @@ class TransfFunction
 		for (i = 0; i <= p1; i++)
 			TransfFun[pencil << 8 | i] = 0;
 		for (; i < p2; i++)
-			TransfFun[pencil << 8 | i] = tmin(max, max * (i - p1) / cont);
+			TransfFun[pencil << 8 | i] = std::min(max, max * (i - p1) / cont);
 		for (; i < 256; i++)
 			TransfFun[pencil << 8 | i] = max;
 	}
@@ -218,7 +218,7 @@ public:
 	TransfFunction(const TargetColors &colors)
 	{
 		memset(TransfFun, 0, sizeof TransfFun);
-		int count = tmin(colors.getColorCount(), MAX_N_PENCILS);
+		int count = std::min(colors.getColorCount(), MAX_N_PENCILS);
 		for (int p = 0; p < count; p++) {
 			int brightness = troundp(2.55 * colors.getColor(p).m_brightness);
 			int contrast = troundp(2.55 * colors.getColor(p).m_contrast);
@@ -617,7 +617,7 @@ CleanupPreprocessedImage *TCleanupper::process(
 			image->setRaster(rgr);
 		}
 		switch (m_parameters->m_autoAdjustMode) {
-		case AUTO_ADJ_HISTOGRAM: {
+		case AUTO_ADJ_HISTOGRAM:
 			if (first_image) {
 				build_gr_cum(image, ref_cum);
 			} else {
@@ -625,13 +625,20 @@ CleanupPreprocessedImage *TCleanupper::process(
 				build_gr_lut(ref_cum, cum, lut);
 				apply_lut(image, lut);
 			}
-		}
+			break;
 
-			CASE AUTO_ADJ_HISTO_L : histo_l_algo(image, first_image);
+		case AUTO_ADJ_HISTO_L:
+			histo_l_algo(image, first_image);
+			break;
 
-			CASE AUTO_ADJ_BLACK_EQ : black_eq_algo(image);
+		case AUTO_ADJ_BLACK_EQ:
+			black_eq_algo(image);
+			break;
 
-			CASE AUTO_ADJ_NONE : DEFAULT : assert(false);
+		case AUTO_ADJ_NONE:
+		default:
+			assert(false);
+			break;
 		}
 	}
 
@@ -899,11 +906,19 @@ bool TCleanupper::doAutocenter(
 		switch (m_parameters->m_pegSide) {
 		case PEGS_BOTTOM:
 			sigma = 0.0;
-			CASE PEGS_RIGHT : sigma = 90.0;
-			CASE PEGS_TOP : sigma = 180.0;
-			CASE PEGS_LEFT : sigma = -90.0;
-		DEFAULT:
+			break;
+		case PEGS_RIGHT:
+			sigma = 90.0;
+			break;
+		case PEGS_TOP:
+			sigma = 180.0;
+			break;
+		case PEGS_LEFT:
+			sigma = -90.0;
+			break;
+		default:
 			sigma = 0.0;
+			break;
 		}
 
 		theta = sigma;
@@ -926,9 +941,12 @@ bool TCleanupper::doAutocenter(
 
 		switch (pegs_ras_side) {
 		case PEGS_LEFT:
-			__OR PEGS_RIGHT : notMoreThan(image->getRaster()->getLx(), strip_width);
-		DEFAULT:
+		case PEGS_RIGHT:
+			notMoreThan(image->getRaster()->getLx(), strip_width);
+			break;
+		default:
 			notMoreThan(image->getRaster()->getLy(), strip_width);
+			break;
 		}
 
 		convert_dots_mm_to_pixel(
@@ -949,19 +967,25 @@ bool TCleanupper::doAutocenter(
 			switch (m_parameters->m_pegSide) {
 			case PEGS_BOTTOM:
 				cqout -= dist;
-				CASE PEGS_TOP : cqout += dist;
-				CASE PEGS_LEFT : cpout -= dist;
-				CASE PEGS_RIGHT : cpout += dist;
-			DEFAULT : {
+				break;
+			case PEGS_TOP:
+				cqout += dist;
+				break;
+			case PEGS_LEFT:
+				cpout -= dist;
+				break;
+			case PEGS_RIGHT:
+				cpout += dist;
+				break;
+			default:
 				// bad pegs side
 				return false;
 			}
-			}
 		}
 		fdg_info.dots.clear();
-	}
 
-	break;
+		break;
+	}
 
 	default:
 		return false;
@@ -993,7 +1017,7 @@ inline void preprocessColor(const TPixel32 &pix, const TargetColorData &blackCol
 
 		//Retrieve the hue distance and, in case it's less than current one, this idx better
 		//approximates the color.
-		newHDist = (pixHSV.m_h > fColor.m_hsv.m_h) ? tmin(pixHSV.m_h - fColor.m_hsv.m_h, fColor.m_hsv.m_h - pixHSV.m_h + 360.0) : tmin(fColor.m_hsv.m_h - pixHSV.m_h, pixHSV.m_h - fColor.m_hsv.m_h + 360.0);
+		newHDist = (pixHSV.m_h > fColor.m_hsv.m_h) ? std::min(pixHSV.m_h - fColor.m_hsv.m_h, fColor.m_hsv.m_h - pixHSV.m_h + 360.0) : std::min(fColor.m_hsv.m_h - pixHSV.m_h, pixHSV.m_h - fColor.m_hsv.m_h + 360.0);
 		if (newHDist < hDist) {
 			hDist = newHDist;
 			idx = i;

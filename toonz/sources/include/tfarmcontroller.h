@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TFARMCONTROLLER_H
 #define TFARMCONTROLLER_H

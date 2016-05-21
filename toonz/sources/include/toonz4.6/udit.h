@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _UDIT_H
 #define _UDIT_H

@@ -823,7 +823,7 @@ inline TINT32 hasExternalReferences(const TImageP &img)
 	}
 #endif
 
-	return tmax(refCount, img->getRefCount()) > 1;
+	return std::max(refCount, img->getRefCount()) > 1;
 }
 }
 //------------------------------------------------------------------------------

@@ -1416,7 +1416,7 @@ bool DockLayout::restoreState(const State &state)
 
 	//Docked widgets are found in hierarchy
 	for (j = 0; j < m_regions.size(); ++j)
-		if (item = m_regions[j]->m_item) {
+		if ((item = m_regions[j]->m_item)) {
 			item->setWindowFlags(Qt::SubWindow);
 			item->setDockedAppearance();
 			item->m_floating = false;

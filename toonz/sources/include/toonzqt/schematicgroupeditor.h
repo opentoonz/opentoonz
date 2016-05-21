@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCHEMATICGROUPEDITOR_H
 #define SCHEMATICGROUPEDITOR_H

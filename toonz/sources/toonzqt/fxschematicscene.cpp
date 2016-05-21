@@ -679,7 +679,7 @@ void FxSchematicScene::placeNode(FxSchematicNode *node)
 			TFx *terminalFx = terminalFxs->getFx(i);
 			if (terminalFx->getAttributes()->getDagNodePos() == TConst::nowhere)
 				continue;
-			maxX = tmax(maxX, terminalFx->getAttributes()->getDagNodePos().x);
+			maxX = std::max(maxX, terminalFx->getAttributes()->getDagNodePos().x);
 		}
 		TPointD oldPos = node->getFx()->getAttributes()->getDagNodePos();
 		QPointF pos;
@@ -1165,7 +1165,7 @@ void FxSchematicScene::reorderScene()
 		x = sceneCenter.x();
 		placeNodeAndParents(fx, x, maxX, minY);
 		y -= step;
-		minY = tmin(y, minY);
+		minY = std::min(y, minY);
 	}
 
 	//remove retrolink
@@ -1222,7 +1222,7 @@ void FxSchematicScene::removeRetroLinks(TFx *fx, double &maxX)
 		if (fxPos.x <= inFxPos.x) {
 			while (fxPos.x <= inFxPos.x)
 				fxPos.x += 150;
-			maxX = tmax(fxPos.x + 150, maxX);
+			maxX = std::max(fxPos.x + 150, maxX);
 			fx->getAttributes()->setDagNodePos(fxPos);
 			for (int j = 0; j < fx->getOutputConnectionCount(); j++) {
 				TFx *outFx = fx->getOutputConnection(j)->getOwnerFx();
@@ -1258,7 +1258,7 @@ void FxSchematicScene::placeNodeAndParents(TFx *fx, double x, double &maxX, doub
 	if (fx->getOutputConnectionCount() == 0)
 		minY -= step;
 	x += 120;
-	maxX = tmax(maxX, x);
+	maxX = std::max(maxX, x);
 	int i;
 	for (i = 0; i < fx->getOutputConnectionCount(); i++) {
 		TFx *outputFx = fx->getOutputConnection(i)->getOwnerFx();
@@ -1269,7 +1269,7 @@ void FxSchematicScene::placeNodeAndParents(TFx *fx, double x, double &maxX, doub
 		if (!m_placedFxs.contains(outputFx) || outputFx->getAttributes()->getDagNodePos().x < x) {
 			placeNodeAndParents(outputFx, x, maxX, minY);
 			y -= step;
-			minY = tmin(y, minY);
+			minY = std::min(y, minY);
 		}
 	}
 }
@@ -1539,23 +1539,6 @@ TFx *FxSchematicScene::getCurrentFx()
 
 void FxSchematicScene::mousePressEvent(QGraphicsSceneMouseEvent *me)
 {
-	// avoid clear of selection by middle-click
-	if (me->button() != Qt::MidButton)
-		SchematicScene::mousePressEvent(me);
-
-	if (me->button() == Qt::RightButton) {
-		QList<QGraphicsItem *> pointedItems = items(me->scenePos());
-		for (int i = 0; i < pointedItems.size(); i++) {
-			FxSchematicNode *sn = dynamic_cast<FxSchematicNode *>(pointedItems[i]);
-			if (sn) {
-				m_fxHandle->setFx(sn->getFx(), false);
-				if (!m_selection->isSelected(sn->getFx()))
-					m_selection->select(sn->getFx());
-				m_selection->makeCurrent();
-			}
-		}
-	}
-
 	QList<QGraphicsItem *> items = selectedItems();
 #if QT_VERSION >= 0x050000
 	QGraphicsItem *item = itemAt(me->scenePos(), QTransform());
@@ -1564,25 +1547,17 @@ void FxSchematicScene::mousePressEvent(QGraphicsSceneMouseEvent *me)
 #endif
 	FxSchematicPort *port = dynamic_cast<FxSchematicPort *>(item);
 	FxSchematicLink *link = dynamic_cast<FxSchematicLink *>(item);
-
+	SchematicScene::mousePressEvent(me);
+	onSelectionChanged();
 	if (me->button() == Qt::MidButton) {
 		int i;
 		for (i = 0; i < items.size(); i++)
 			items[i]->setSelected(true);
 	}
-
 	/*
-  ここに入ったとき、
-   ① 上記のSchematicScene::mousePressEvent(me)が呼ばれ
-   ② 最上段にあるSchematicNode::mousePressEvent内でsetSelected(this)が呼ばれ
-   ③ シグナルQGraphicsScene::selectionChanged()がエミットされ
-   ④ スロットFxSchematticScene::onSelectionChanged()が呼ばれ
-    その中で、いったんselectNone()され、その後選択ノードが追加される。
-   ここにいたるまでにm_selectionが正しく更新される保障が無い。
-   よって、選択Fx無しと勘違いして、FxSettingsが更新されないおそれがある。
-   そこで、m_selection->isEmpty()では無く、QGraphicsScene::selectedItems()の個数で
-   直接判断することにする
-  */
+	m_selection may not be updated here, so I use QGraphicsScene::selectedItems() 
+	instead of m_selection->isEmpty() to check whether any node is selected or not.
+	*/
 	if (selectedItems().isEmpty()) {
 		if (me->button() != Qt::MidButton && !item)
 			m_fxHandle->setFx(0, false);

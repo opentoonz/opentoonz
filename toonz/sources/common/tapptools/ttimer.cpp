@@ -7,6 +7,8 @@
 #ifdef _WIN32
 
 #include <windows.h>
+#include <mmsystem.h>
+#include <cstdlib>
 
 //moto strano: se togliamo l'include della glut non linka
 #include <GL/glut.h>
@@ -83,7 +85,7 @@ TTimer::Imp::Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *tim
 		throw TException("Unable to create timer");
 	}
 
-	m_timerRes = tmin((int)tmax((int)tc.wPeriodMin, (int)m_timerRes), (int)tc.wPeriodMax);
+	m_timerRes = std::min((int)std::max((int)tc.wPeriodMin, (int)m_timerRes), (int)tc.wPeriodMax);
 	timeBeginPeriod(m_timerRes);
 
 	switch (type) {

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCRIPTBINDING_LEVEL_H
 #define SCRIPTBINDING_LEVEL_H

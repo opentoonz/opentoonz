@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_POPUPMENU_INCLUDED
 #define TNZ_POPUPMENU_INCLUDED

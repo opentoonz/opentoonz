@@ -754,7 +754,7 @@ TAffine getAffine(const TDimension &srcSize, const TDimension &dstSize)
 {
 	double scx = 1 * dstSize.lx / (double)srcSize.lx;
 	double scy = 1 * dstSize.ly / (double)srcSize.ly;
-	double sc = tmin(scx, scy);
+	double sc = std::min(scx, scy);
 	double dx = (dstSize.lx - srcSize.lx * sc) * 0.5;
 	double dy = (dstSize.ly - srcSize.ly * sc) * 0.5;
 	return TScale(sc) * TTranslation(0.5 * TPointD(srcSize.lx, srcSize.ly) + TPointD(dx, dy));
@@ -789,7 +789,7 @@ TImageP buildIcon(const TImageP &img, const TDimension &size)
 			rasCM32 = rasCM32->extractT(bbox);
 			double sx = raster->getLx() / (double)rasCM32->getLx();
 			double sy = raster->getLy() / (double)rasCM32->getLy();
-			double sc = tmin(sx, sy);
+			double sc = std::min(sx, sy);
 			TAffine aff = TScale(sc).place(
 				rasCM32->getCenterD(),
 				raster->getCenterD());
@@ -1887,16 +1887,19 @@ TImageP TXshSimpleLevel::createEmptyFrame()
 	switch (m_type) {
 	case PLI_XSHLEVEL:
 		result = new TVectorImage;
+		break;
 
-		CASE MESH_XSHLEVEL : assert(false); // Not implemented yet
+	case MESH_XSHLEVEL:
+		assert(false); // Not implemented yet
+		break;
 
-	DEFAULT : {
+	default: {
 		// normally the image must have the level->getProperties()->getImageDpi().
 		// if this value is missing (for some reason - can this happen, ever?) then
 		// we use the getDpi() (that is the current dpi, e.g. cameraDpi or customDpi).
 
 		TPointD dpi = getProperties()->getImageDpi();
-		/*-- 
+		/*--
 		tgaからtlvにconvertしたものをInsert Pasteしたとき、
 		ペーストしたフレームにのみDPIが付いてしまうので、この処理は省く
 		--*/
@@ -1921,6 +1924,8 @@ TImageP TXshSimpleLevel::createEmptyFrame()
 
 			result = ri;
 		}
+
+		break;
 	}
 	}
 
@@ -2273,9 +2278,11 @@ TRectD TXshSimpleLevel::getBBox(const TFrameId &fid) const
 
 		if (TMeshImageP mi = img)
 			mi->getDpi(dpiX, dpiY);
+
+		break;
 	}
 
-	DEFAULT : {
+	default: {
 		// Raster case: retrieve the image info from the ImageManager
 		const std::string &imageId = getImageId(fid);
 
@@ -2289,6 +2296,8 @@ TRectD TXshSimpleLevel::getBBox(const TFrameId &fid) const
 
 		if (info->m_dpix > 0.0 && info->m_dpiy > 0.0)
 			dpiX = info->m_dpix, dpiY = info->m_dpiy;
+
+		break;
 	}
 	}
 

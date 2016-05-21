@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TUNIT_INCLUDED
 #define TUNIT_INCLUDED

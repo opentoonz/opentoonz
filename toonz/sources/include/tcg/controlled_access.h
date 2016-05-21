@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_CONTROLLED_ACCESS_H
 #define TCG_CONTROLLED_ACCESS_H

@@ -476,7 +476,7 @@ int tipc::shm_maxSegmentSize()
 		size_t valSize = sizeof(TINT64);
 		TINT64 val;
 		sysctlbyname("kern.sysv.shmmax", &val, &valSize, NULL, 0);
-		shm_max = tmin(val, (TINT64)(std::numeric_limits<int>::max)());
+		shm_max = std::min(val, (TINT64)(std::numeric_limits<int>::max)());
 #else
 		//Windows case: no such limit
 		//Observe that QSharedMemory accepts only an int size - so the num_lim is against int.
@@ -497,7 +497,7 @@ int tipc::shm_maxSegmentCount()
 		size_t valSize = sizeof(TINT64);
 		TINT64 val;
 		sysctlbyname("kern.sysv.shmseg", &val, &valSize, NULL, 0);
-		shm_seg = tmin(val, (TINT64)(std::numeric_limits<int>::max)());
+		shm_seg = std::min(val, (TINT64)(std::numeric_limits<int>::max)());
 #else
 		//Windows case: no such limit - again, using limit against max due to Qt
 		shm_seg = (std::numeric_limits<int>::max)();
@@ -516,7 +516,7 @@ int tipc::shm_maxSharedPages()
 		size_t valSize = sizeof(TINT64);
 		TINT64 val;
 		sysctlbyname("kern.sysv.shmall", &val, &valSize, NULL, 0);
-		shm_all = tmin(val, (TINT64)(std::numeric_limits<int>::max)());
+		shm_all = std::min(val, (TINT64)(std::numeric_limits<int>::max)());
 #else
 		shm_all = (std::numeric_limits<int>::max)();
 #endif
@@ -534,7 +534,7 @@ int tipc::shm_maxSharedCount()
 		size_t valSize = sizeof(TINT64);
 		TINT64 val;
 		sysctlbyname("kern.sysv.shmmni", &val, &valSize, NULL, 0);
-		shm_mni = tmin(val, (TINT64)(std::numeric_limits<int>::max)());
+		shm_mni = std::min(val, (TINT64)(std::numeric_limits<int>::max)());
 #else
 		shm_mni = (std::numeric_limits<int>::max)();
 #endif
@@ -605,7 +605,7 @@ int tipc::create(QSharedMemory &shmem, int size, bool strictSize)
 	bool ok, retried = false;
 
 	if (!strictSize)
-		size = tmin(size, (int)shm_maxSegmentSize());
+		size = std::min(size, (int)shm_maxSegmentSize());
 
 	tipc_debug(qDebug() << "shMem create: size =" << size);
 
@@ -662,7 +662,7 @@ bool tipc::writeShMemBuffer(Stream &stream, Message &msg, int bufSize, ShMemWrit
 			//Write to the shared memory segment
 			tipc_debug(QTime xchTime; xchTime.start());
 			shmem.lock();
-			remainingData -= chunkData = dataWriter->write((char *)shmem.data(), tmin(shmem.size(), remainingData));
+			remainingData -= chunkData = dataWriter->write((char *)shmem.data(), std::min(shmem.size(), remainingData));
 			shmem.unlock();
 			tipc_debug(qDebug() << "exchange time:" << xchTime.elapsed());
 

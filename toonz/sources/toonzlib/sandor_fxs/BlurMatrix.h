@@ -1,4 +1,4 @@
-
+#pragma once
 
 // BlurMatrix.h: interface for the CBlurMatrix class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_BLURMATRIX_H__8298C171_0035_11D6_B94F_0040F674BE6A__INCLUDED_)
 #define AFX_BLURMATRIX_H__8298C171_0035_11D6_B94F_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #include <vector>
 

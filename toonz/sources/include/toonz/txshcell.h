@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TXSHCELL_INCLUDED
 #define TXSHCELL_INCLUDED

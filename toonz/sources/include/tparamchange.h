@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TPARAMCHANGE_INCLUDED
 #define TPARAMCHANGE_INCLUDED

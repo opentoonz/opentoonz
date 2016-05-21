@@ -50,6 +50,7 @@
 // TnzCore includes
 #include "tconvert.h"
 
+#include <QApplication>
 #include <QMainWindow>
 #include <QPainter>
 #include <QMouseEvent>
@@ -1281,13 +1282,16 @@ void ColumnArea::paintEvent(QPaintEvent *event)
 			switch (colType) {
 			case TXshColumn::ePaletteType:
 				drawPaletteColumnHead(p, col);
-
-				CASE TXshColumn::eSoundType : drawSoundColumnHead(p, col);
-
-				CASE TXshColumn::eSoundTextType : drawSoundTextColumnHead(p, col);
-
-			DEFAULT:
+				break;
+			case TXshColumn::eSoundType:
+				drawSoundColumnHead(p, col);
+				break;
+			case TXshColumn::eSoundTextType:
+				drawSoundTextColumnHead(p, col);
+				break;
+			default:
 				drawLevelColumnHead(p, col);
+				break;
 			}
 		}
 	}
@@ -1318,7 +1322,7 @@ ColumnTransparencyPopup::ColumnTransparencyPopup(QWidget *parent)
 	/*m_value->setValidator(new QIntValidator (1, 100, m_value));
 m_value->setFixedHeight(16);
 m_value->setFixedWidth(30);
-static QFont font("Helvetica", 7, QFont::Normal); 
+static QFont font("Helvetica", 7, QFont::Normal);
 m_value->setFont(font);*/
 
 	QHBoxLayout *hlayout = new QHBoxLayout;
@@ -1730,6 +1734,15 @@ void ColumnArea::mouseDoubleClickEvent(QMouseEvent *event)
 
 void ColumnArea::contextMenuEvent(QContextMenuEvent *event)
 {
+#ifndef _WIN32
+  /* On windows the widget receive the release event before the menu
+     is shown, on linux and osx the release event is lost, never
+     received by the widget */
+        QMouseEvent fakeRelease(QEvent::MouseButtonRelease, event->pos(),
+			  Qt::RightButton, Qt::NoButton, Qt::NoModifier);
+
+	QApplication::instance()->sendEvent(this, &fakeRelease);
+#endif
 	QPoint qPos = event->pos();
 	TPoint pos(qPos.x(), qPos.y());
 	int row = m_viewer->yToRow(pos.y);

@@ -555,7 +555,7 @@ void PumpTool::onLeave()
 
 double PumpTool::actionRadius(double strokeLength)
 {
-	double toolSize = tmax(m_toolSize.getValue(), 5.0);
+	double toolSize = std::max(m_toolSize.getValue(), 5.0);
 	double toolPercent = toolSize * 0.01;
 	double interpolationVal = pow(toolPercent, 5);
 	double indipendentValue = 7.0 * toolSize;
@@ -563,7 +563,7 @@ double PumpTool::actionRadius(double strokeLength)
 	double actionRadius = (indipendentValue) * (1.0 - interpolationVal) +
 						  (strokeLength * toolPercent) * interpolationVal;
 
-	return tmax(actionRadius, indipendentValue);
+	return std::max(actionRadius, indipendentValue);
 }
 
 //----------------------------------------------------------------------
@@ -611,8 +611,8 @@ void PumpTool::splitStroke(TStroke *s)
 			//Regular split positions, in the [0.0, totalLength] range.
 			//Split points at extremities are dealt.
 
-			m_splitPars[0] = s->getParameterAtLength(tmax(startLen, 0.0)); //Crop in the open case
-			m_splitPars[1] = s->getParameterAtLength(tmin(endLen, totalLength));
+			m_splitPars[0] = s->getParameterAtLength(std::max(startLen, 0.0)); //Crop in the open case
+			m_splitPars[1] = s->getParameterAtLength(std::min(endLen, totalLength));
 
 			if (m_splitPars[0] == 0.0) // the "&& m_splitPars[0] == totalLength" was dealt outside
 			{

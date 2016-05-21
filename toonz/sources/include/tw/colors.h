@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TW_COLORS_INCLUDED
 #define TW_COLORS_INCLUDED

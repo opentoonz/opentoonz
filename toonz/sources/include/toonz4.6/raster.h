@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef _RASTER_H_
 #define _RASTER_H_

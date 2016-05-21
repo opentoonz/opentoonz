@@ -141,38 +141,41 @@ void SceneViewer::onButtonPressed(FlipConsole::EGadget button)
 	if (m_freezedStatus != NO_FREEZED)
 		return;
 	switch (button) {
-		CASE FlipConsole::eSaveImg:
-		{
-			if (m_previewMode == NO_PREVIEW) {
-				DVGui::warning(QObject::tr("It is not possible to save images in camera stand view."));
-				return;
-			}
-			TApp *app = TApp::instance();
-			int row = app->getCurrentFrame()->getFrame();
+	case FlipConsole::eSaveImg: {
+		if (m_previewMode == NO_PREVIEW) {
+			DVGui::warning(QObject::tr("It is not possible to save images in camera stand view."));
+			return;
+		}
+		TApp *app = TApp::instance();
+		int row = app->getCurrentFrame()->getFrame();
 
-			Previewer *previewer = Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW);
-			if (!previewer->isFrameReady(row)) {
-				DVGui::warning(QObject::tr("The preview images are not ready yet."));
-				return;
-			}
-
-			TRasterP ras = previewer->getRaster(row, m_visualSettings.m_recomputeIfNeeded);
-
-			TImageCache::instance()->add(QString("TnzCompareImg"), TRasterImageP(ras->clone()));
+		Previewer *previewer = Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW);
+		if (!previewer->isFrameReady(row)) {
+			DVGui::warning(QObject::tr("The preview images are not ready yet."));
+			return;
 		}
 
-		CASE FlipConsole::eSave : Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW)->saveRenderedFrames();
-		CASE FlipConsole::eHisto:
-		{
-			QAction *action = CommandManager::instance()->getAction(MI_Histogram);
-			action->trigger();
-		}
-		CASE FlipConsole::eDefineSubCamera:
-		{
-			m_editPreviewSubCamera = !m_editPreviewSubCamera;
-			update();
-		}
-	DEFAULT:;
+		TRasterP ras = previewer->getRaster(row, m_visualSettings.m_recomputeIfNeeded);
+
+		TImageCache::instance()->add(QString("TnzCompareImg"), TRasterImageP(ras->clone()));
+
+		break;
+	}
+
+	case FlipConsole::eSave:
+		Previewer::instance(m_previewMode == SUBCAMERA_PREVIEW)->saveRenderedFrames();
+		break;
+
+	case FlipConsole::eHisto: {
+		QAction *action = CommandManager::instance()->getAction(MI_Histogram);
+		action->trigger();
+		break;
+	}
+
+	case FlipConsole::eDefineSubCamera:
+		m_editPreviewSubCamera = !m_editPreviewSubCamera;
+		update();
+		break;
 	}
 }
 

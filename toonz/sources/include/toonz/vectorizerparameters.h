@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef VECTORIZERPARAMETERS_H
 #define VECTORIZERPARAMETERS_H

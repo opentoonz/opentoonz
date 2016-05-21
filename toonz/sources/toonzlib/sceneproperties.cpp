@@ -205,7 +205,7 @@ void TSceneProperties::saveData(TOStream &os) const
 			break;
 		case TRenderSettings::HighResampleQuality:
 			os.child("resquality") << (int)2;
-
+			break;
 		case TRenderSettings::Triangle_FilterResampleQuality:
 			os.child("resquality") << (int)100;
 			break;
@@ -248,8 +248,7 @@ void TSceneProperties::saveData(TOStream &os) const
 		case TRenderSettings::Bilinear_FilterResampleQuality:
 			os.child("resquality") << (int)113;
 			break;
-			break;
-		DEFAULT:
+		default:
 			assert(false);
 		}
 		switch (rs.m_fieldPrevalence) {
@@ -262,7 +261,7 @@ void TSceneProperties::saveData(TOStream &os) const
 		case TRenderSettings::OddField:
 			os.child("fieldprevalence") << (int)2;
 			break;
-		DEFAULT:
+		default:
 			assert(false);
 		}
 		os.child("gamma") << rs.m_gamma;
@@ -491,23 +490,56 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 							switch (j) {
 							case 0:
 								renderSettings.m_quality = TRenderSettings::StandardResampleQuality;
-								CASE 1 : renderSettings.m_quality = TRenderSettings::ImprovedResampleQuality;
-								CASE 2 : renderSettings.m_quality = TRenderSettings::HighResampleQuality;
-								CASE 100 : renderSettings.m_quality = TRenderSettings::Triangle_FilterResampleQuality;
-								CASE 101 : renderSettings.m_quality = TRenderSettings::Mitchell_FilterResampleQuality;
-								CASE 102 : renderSettings.m_quality = TRenderSettings::Cubic5_FilterResampleQuality;
-								CASE 103 : renderSettings.m_quality = TRenderSettings::Cubic75_FilterResampleQuality;
-								CASE 104 : renderSettings.m_quality = TRenderSettings::Cubic1_FilterResampleQuality;
-								CASE 105 : renderSettings.m_quality = TRenderSettings::Hann2_FilterResampleQuality;
-								CASE 106 : renderSettings.m_quality = TRenderSettings::Hann3_FilterResampleQuality;
-								CASE 107 : renderSettings.m_quality = TRenderSettings::Hamming2_FilterResampleQuality;
-								CASE 108 : renderSettings.m_quality = TRenderSettings::Hamming3_FilterResampleQuality;
-								CASE 109 : renderSettings.m_quality = TRenderSettings::Lanczos2_FilterResampleQuality;
-								CASE 110 : renderSettings.m_quality = TRenderSettings::Lanczos3_FilterResampleQuality;
-								CASE 111 : renderSettings.m_quality = TRenderSettings::Gauss_FilterResampleQuality;
-								CASE 112 : renderSettings.m_quality = TRenderSettings::ClosestPixel_FilterResampleQuality;
-								CASE 113 : renderSettings.m_quality = TRenderSettings::Bilinear_FilterResampleQuality;
-							DEFAULT:
+								break;
+							case 1:
+								renderSettings.m_quality = TRenderSettings::ImprovedResampleQuality;
+								break;
+							case 2:
+								renderSettings.m_quality = TRenderSettings::HighResampleQuality;
+								break;
+							case 100:
+								renderSettings.m_quality = TRenderSettings::Triangle_FilterResampleQuality;
+								break;
+							case 101:
+								renderSettings.m_quality = TRenderSettings::Mitchell_FilterResampleQuality;
+								break;
+							case 102:
+								renderSettings.m_quality = TRenderSettings::Cubic5_FilterResampleQuality;
+								break;
+							case 103:
+								renderSettings.m_quality = TRenderSettings::Cubic75_FilterResampleQuality;
+								break;
+							case 104:
+								renderSettings.m_quality = TRenderSettings::Cubic1_FilterResampleQuality;
+								break;
+							case 105:
+								renderSettings.m_quality = TRenderSettings::Hann2_FilterResampleQuality;
+								break;
+							case 106:
+								renderSettings.m_quality = TRenderSettings::Hann3_FilterResampleQuality;
+								break;
+							case 107:
+								renderSettings.m_quality = TRenderSettings::Hamming2_FilterResampleQuality;
+								break;
+							case 108:
+								renderSettings.m_quality = TRenderSettings::Hamming3_FilterResampleQuality;
+								break;
+							case 109:
+								renderSettings.m_quality = TRenderSettings::Lanczos2_FilterResampleQuality;
+								break;
+							case 110:
+								renderSettings.m_quality = TRenderSettings::Lanczos3_FilterResampleQuality;
+								break;
+							case 111:
+								renderSettings.m_quality = TRenderSettings::Gauss_FilterResampleQuality;
+								break;
+							case 112:
+								renderSettings.m_quality = TRenderSettings::ClosestPixel_FilterResampleQuality;
+								break;
+							case 113:
+								renderSettings.m_quality = TRenderSettings::Bilinear_FilterResampleQuality;
+								break;
+							default:
 								renderSettings.m_quality = TRenderSettings::StandardResampleQuality;
 							}
 						} else if (tagName == "fieldprevalence") {
@@ -516,10 +548,16 @@ void TSceneProperties::loadData(TIStream &is, bool isLoadingProject)
 							switch (j) {
 							case 0:
 								renderSettings.m_fieldPrevalence = TRenderSettings::NoField;
-								CASE 1 : renderSettings.m_fieldPrevalence = TRenderSettings::EvenField;
-								CASE 2 : renderSettings.m_fieldPrevalence = TRenderSettings::OddField;
-							DEFAULT:
+								break;
+							case 1:
+								renderSettings.m_fieldPrevalence = TRenderSettings::EvenField;
+								break;
+							case 2:
+								renderSettings.m_fieldPrevalence = TRenderSettings::OddField;
+								break;
+							default:
 								renderSettings.m_fieldPrevalence = TRenderSettings::NoField;
+								break;
 							}
 						} else if (tagName == "gamma") {
 							double g;

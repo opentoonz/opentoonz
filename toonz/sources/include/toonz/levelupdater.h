@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef LEVELUPDATER_H
 #define LEVELUPDATER_H

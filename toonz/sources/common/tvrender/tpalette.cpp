@@ -445,8 +445,8 @@ bool TPalette::getFxRects(const TRect &rect, TRect &rectIn, TRect &rectOut)
 	for (i = 0; i < (int)m_styles.size(); i++)
 		if (m_styles[i].second->isRasterStyle()) {
 			m_styles[i].second->getRasterStyleFx()->getEnlargement(borderIn, borderOut);
-			fullBorderIn = tmax(fullBorderIn, borderIn);
-			fullBorderOut = tmax(fullBorderOut, borderOut);
+			fullBorderIn = std::max(fullBorderIn, borderIn);
+			fullBorderOut = std::max(fullBorderOut, borderOut);
 			ret = true;
 		}
 

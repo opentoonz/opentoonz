@@ -1,4 +1,4 @@
-
+#pragma once
 
 // SError.h: interface for the SError class.
 //
@@ -6,10 +6,6 @@
 
 #if !defined(AFX_SERROR_H__25953AF0_0B0B_11D6_B96F_0040F674BE6A__INCLUDED_)
 #define AFX_SERROR_H__25953AF0_0B0B_11D6_B96F_0040F674BE6A__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
 #include <string>
 #include <vector>

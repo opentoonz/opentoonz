@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TABPAGE_H
 #define TABPAGE_H

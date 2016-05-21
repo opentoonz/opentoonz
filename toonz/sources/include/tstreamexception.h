@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TSTREAMEXCEPTION_INCLUDED
 #define TSTREAMEXCEPTION_INCLUDED

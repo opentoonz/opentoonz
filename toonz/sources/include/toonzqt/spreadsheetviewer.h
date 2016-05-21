@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SPREADSHEETVIEWER_H
 #define SPREADSHEETVIEWER_H

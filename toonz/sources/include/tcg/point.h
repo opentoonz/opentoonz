@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TCG_POINT_H
 #define TCG_POINT_H

@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef BORDERS_EXTRACTOR_HPP
 #define BORDERS_EXTRACTOR_HPP

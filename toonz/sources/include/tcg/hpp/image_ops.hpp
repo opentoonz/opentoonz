@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef TCG_IMAGE_OPS_HPP
 #define TCG_IMAGE_OPS_HPP

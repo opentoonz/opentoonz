@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef OPTIMIZE_FOR_LP64_INCLUDED
 #define OPTIMIZE_FOR_LP64_INCLUDED

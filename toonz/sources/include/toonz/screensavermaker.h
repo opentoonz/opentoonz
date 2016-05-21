@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef SCREENSAVERMAKER_INCLUDED
 #define SCREENSAVERMAKER_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TNZ_FXBROWSER_INCLUDED
 #define TNZ_FXBROWSER_INCLUDED

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef T_PARAMUNDO_INCLUDED
 #define T_PARAMUNDO_INCLUDED

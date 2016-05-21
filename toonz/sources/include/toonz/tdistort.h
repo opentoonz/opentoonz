@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef TDISTORT_H
 #define TDISTORT_H
