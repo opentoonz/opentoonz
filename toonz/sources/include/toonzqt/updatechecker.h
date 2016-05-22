@@ -10,6 +10,7 @@
 #include <QNetworkAccessManager>
 #include <QUrl>
 #include <QString>
+#include <QSharedPointer>
 
 #undef DVAPI
 #undef DVVAR
