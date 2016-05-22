@@ -3397,14 +3397,19 @@ void FxGroupNode::updateFxsDagPosition(const TPointD &pos) const
 	TPointD delta = pos - oldPos;
 	int i;
 	for (i = 0; i < m_groupedFxs.size(); i++) {
-		m_groupedFxs[i]->getAttributes()->setDagNodePos(m_groupedFxs[i]->getAttributes()->getDagNodePos() + delta);
-		TMacroFx *macro = dynamic_cast<TMacroFx *>(m_groupedFxs[i].getPointer());
-		if (macro) {
-			std::vector<TFxP> fxs = macro->getFxs();
-			int i;
-			for (i = 0; i < (int)fxs.size(); i++) {
-				TPointD oldP = fxs[i]->getAttributes()->getDagNodePos();
-				fxs[i]->getAttributes()->setDagNodePos(oldP + delta);
+		// If the node position is unidentified, then leave the placement of it to placeNode() function.
+		//if (m_groupedFxs[i]->getAttributes()->getDagNodePos() != TConst::nowhere)
+		{
+			m_groupedFxs[i]->getAttributes()->setDagNodePos(m_groupedFxs[i]->getAttributes()->getDagNodePos() + delta);
+			TMacroFx *macro = dynamic_cast<TMacroFx *>(m_groupedFxs[i].getPointer());
+			if (macro) {
+				std::vector<TFxP> fxs = macro->getFxs();
+				int i;
+				for (i = 0; i < (int)fxs.size(); i++) {
+					TPointD oldP = fxs[i]->getAttributes()->getDagNodePos();
+					//if (oldP != TConst::nowhere)
+						fxs[i]->getAttributes()->setDagNodePos(oldP + delta);
+				}
 			}
 		}
 	}

@@ -1539,23 +1539,6 @@ TFx *FxSchematicScene::getCurrentFx()
 
 void FxSchematicScene::mousePressEvent(QGraphicsSceneMouseEvent *me)
 {
-	// avoid clear of selection by middle-click
-	if (me->button() != Qt::MidButton)
-		SchematicScene::mousePressEvent(me);
-
-	if (me->button() == Qt::RightButton) {
-		QList<QGraphicsItem *> pointedItems = items(me->scenePos());
-		for (int i = 0; i < pointedItems.size(); i++) {
-			FxSchematicNode *sn = dynamic_cast<FxSchematicNode *>(pointedItems[i]);
-			if (sn) {
-				m_fxHandle->setFx(sn->getFx(), false);
-				if (!m_selection->isSelected(sn->getFx()))
-					m_selection->select(sn->getFx());
-				m_selection->makeCurrent();
-			}
-		}
-	}
-
 	QList<QGraphicsItem *> items = selectedItems();
 #if QT_VERSION >= 0x050000
 	QGraphicsItem *item = itemAt(me->scenePos(), QTransform());
@@ -1564,25 +1547,17 @@ void FxSchematicScene::mousePressEvent(QGraphicsSceneMouseEvent *me)
 #endif
 	FxSchematicPort *port = dynamic_cast<FxSchematicPort *>(item);
 	FxSchematicLink *link = dynamic_cast<FxSchematicLink *>(item);
-
+	SchematicScene::mousePressEvent(me);
+	onSelectionChanged();
 	if (me->button() == Qt::MidButton) {
 		int i;
 		for (i = 0; i < items.size(); i++)
 			items[i]->setSelected(true);
 	}
-
 	/*
-  ここに入ったとき、
-   ① 上記のSchematicScene::mousePressEvent(me)が呼ばれ
-   ② 最上段にあるSchematicNode::mousePressEvent内でsetSelected(this)が呼ばれ
-   ③ シグナルQGraphicsScene::selectionChanged()がエミットされ
-   ④ スロットFxSchematticScene::onSelectionChanged()が呼ばれ
-    その中で、いったんselectNone()され、その後選択ノードが追加される。
-   ここにいたるまでにm_selectionが正しく更新される保障が無い。
-   よって、選択Fx無しと勘違いして、FxSettingsが更新されないおそれがある。
-   そこで、m_selection->isEmpty()では無く、QGraphicsScene::selectedItems()の個数で
-   直接判断することにする
-  */
+	m_selection may not be updated here, so I use QGraphicsScene::selectedItems() 
+	instead of m_selection->isEmpty() to check whether any node is selected or not.
+	*/
 	if (selectedItems().isEmpty()) {
 		if (me->button() != Qt::MidButton && !item)
 			m_fxHandle->setFx(0, false);

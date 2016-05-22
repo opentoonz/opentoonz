@@ -814,7 +814,7 @@ void FullScreenWidget::setWidget(QWidget *widget)
 	QLayout *layout = this->layout();
 
 	delete layout->takeAt(0);
-	if (m_widget = widget)
+	if ((m_widget = widget))
 		layout->addWidget(m_widget);
 }
 

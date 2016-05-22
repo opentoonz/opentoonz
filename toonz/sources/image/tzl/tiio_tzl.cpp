@@ -2116,7 +2116,6 @@ TImageP TImageReaderTzl::load14()
 			throw TException("Loading tlv: bad icon size.");
 		fread(&actualBuffSize, sizeof(TINT32), 1, chan);
 
-		assert(actualBuffSize > 0 && actualBuffSize <= (int)(iconLx * iconLx * sizeof(TPixelCM32)));
 		if (actualBuffSize <= 0 || actualBuffSize > (int)(iconLx * iconLx * sizeof(TPixelCM32)))
 			throw TException("Loading tlv: icon buffer size error.");
 
@@ -2210,8 +2209,6 @@ TImageP TImageReaderTzl::load14()
 		ti->setPalette(m_lrp->m_level->getPalette());
 		return ti;
 	}
-
-	assert(actualBuffSize > 0 && actualBuffSize <= (int)(m_lx * m_ly * sizeof(TPixelCM32)));
 	if (actualBuffSize <= 0 || actualBuffSize > (int)(m_lx * m_ly * sizeof(TPixelCM32)))
 		throw TException("Loading tlv: buffer size error");
 

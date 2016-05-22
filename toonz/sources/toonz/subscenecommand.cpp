@@ -520,7 +520,7 @@ TFx *explodeFxSubTree(TFx *innerFx, QMap<TFx *, QPair<TFx *, int>> &fxs, FxDag *
 			overFx->getInputPort(1)->setFx(root);
 			outerDag->removeFromXsheet(fx);
 			TPointD pos = root->getAttributes()->getDagNodePos();
-			overFx->getAttributes()->setDagNodePos(TPointD(pos.x + 150, pos.y));
+			overFx->getAttributes()->setDagNodePos((pos == TConst::nowhere) ? TConst::nowhere : TPointD(pos.x + 150, pos.y));
 			root = overFx;
 			//e' brutto... mi serve solo per mettere gli over dentro il gruppo
 			fxs[overFx] = QPair<TFx *, int>(overFx, -1);
@@ -632,7 +632,11 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 		}
 		obj->assignParams(params);
 		delete params;
-		obj->setParent(parentId);
+		// a pegbar cannot be a child of column
+		if (parentId.isColumn())
+			obj->setParent(TStageObjectId::TableId);
+		else
+			obj->setParent(parentId);
 
 		//Put in the right StageObject group if needed
 		obj->removeFromAllGroup();
@@ -655,6 +659,7 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 	//add colums;
 	FxDag *innerDag = subXsh->getFxDag();
 	FxDag *outerDag = xsh->getFxDag();
+	TStageObjectId tmpParentId = parentId;
 	set<int> indexes;
 	int i;
 	for (i = 0; i < subXsh->getColumnCount(); i++) {
@@ -665,6 +670,12 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 		TFx *outerFx = outerColumn->getFx();
 
 		xsh->insertColumn(index, outerColumn);
+		// the above insertion operation may increment the parentId, in case that
+		// 1, the parent object is column, and
+		// 2, the parent column is placed on the right side of the inserted column
+		//    ( i.e. index of the parent column is equal to or higher than "index")
+		if (onlyColumn && tmpParentId.isColumn() && tmpParentId.getIndex() >= index)
+			tmpParentId = TStageObjectId::ColumnId(tmpParentId.getIndex() + 1);
 
 		if (innerFx && outerFx) {
 			outerFx->getAttributes()->setDagNodePos(innerFx->getAttributes()->getDagNodePos());
@@ -701,7 +712,7 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 		}
 
 		if (onlyColumn)
-			outerCol->setParent(parentId);
+			outerCol->setParent(tmpParentId);
 
 		//Put in the right StageObject group if needed
 		if (!objGroupData.m_groupIds.empty()) {
@@ -830,7 +841,7 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh,
 	}
 
 	//cerco il punto medio tra tutti i nodi
-	TPointD middlePoint;
+	TPointD middlePoint(0.0,0.0);
 	int fxsCount = 0;
 
 	QMap<TFx *, QPair<TFx *, int>>::iterator it;
@@ -849,6 +860,8 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh,
 	}
 	if (fxsCount > 0)
 		middlePoint = TPointD(middlePoint.x / fxsCount, middlePoint.y / fxsCount);
+	else
+		middlePoint = TPointD(25000, 25000);//center of the scene
 
 	//faccio in modo che tutti i nodi estratti siano centrati in middlePoint
 	//Li metto poi in un gruppo
@@ -2472,6 +2485,12 @@ void SubsceneCmd::explode(int index)
 
 		// Remove column
 		xsh->removeColumn(index);
+		// The above removing operation may decrement the parentId, in case that
+		// 1, the parent object is column, and
+		// 2, the parent column is placed on the right side of the removed column
+		//    ( i.e. index of the parent column is higher than "index")
+		if (parentId.isColumn() && parentId.getIndex() > index)
+			parentId = TStageObjectId::ColumnId(parentId.getIndex() - 1);
 
 		// Explode
 		set<int> newIndexes = ::explode(xsh, childLevel->getXsheet(), index, parentId,

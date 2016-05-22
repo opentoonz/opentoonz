@@ -219,7 +219,7 @@ void DockWidget::hoverMoveEvent(QHoverEvent *he)
 	if (m_floating && !m_resizing && !m_undocking) {
 		QCursor newCursor = Qt::ArrowCursor;
 
-		if (m_marginType = isResizeGrip(he->pos())) {
+		if ((m_marginType = isResizeGrip(he->pos()))) {
 			//Hovering a margin - update cursor shape
 			if (m_marginType & leftMargin) {
 				if (m_marginType & topMargin)
@@ -254,7 +254,7 @@ void DockWidget::hoverMoveEvent(QHoverEvent *he)
 //!b)  Trigger a window drag if press is over a drag grip
 void DockWidget::mousePressEvent(QMouseEvent *me)
 {
-	if (m_marginType = m_floating ? isResizeGrip(me->pos()) : 0) {
+	if ((m_marginType = m_floating ? isResizeGrip(me->pos()) : 0)) {
 		//Resize begins
 
 		//NOTE: It is better to assume that resize grips dominate over drag grips: this ensures
@@ -613,7 +613,7 @@ DockPlaceholder *DockPlaceholder::parentPlaceholder()
 	if (!m_region || !m_region->getParent())
 		return this;
 
-	if (grandParent = m_region->getParent()->getParent()) {
+	if ((grandParent = m_region->getParent()->getParent())) {
 		//Good, we finally have to search in grandParent's region our direct parent.
 		unsigned int idx = grandParent->find(m_region->getParent());
 
