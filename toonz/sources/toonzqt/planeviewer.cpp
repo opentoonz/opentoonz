@@ -137,7 +137,6 @@ void PlaneViewer::drawBackground()
 
 void PlaneViewer::initializeGL()
 {
-	initializeOpenGLFunctions();
 }
 
 void PlaneViewer::resizeGL(int width, int height)

@@ -587,8 +587,8 @@ QPixmap makeSquareShading(
 //*****************************************************************************
 
 HexagonalColorWheel::HexagonalColorWheel(QWidget *parent)
-	: QGLWidget(parent), m_bgColor(128, 128, 128) //defaul value in case this value does not set in the style sheet
-												  //, m_ghibli3DLutUtil(0)//iwsw commented out temporarily
+	: QOpenGLWidget(parent)
+	, m_bgColor(128, 128, 128) //defaul value in case this value does not set in the style sheet
 {
 	setObjectName("HexagonalColorWheel");
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -623,7 +623,8 @@ HexagonalColorWheel::~HexagonalColorWheel()
 
 void HexagonalColorWheel::initializeGL()
 {
-	qglClearColor(getBGColor());
+	QColor const color = getBGColor();
+	glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 
 	//iwsw commented out temporarily
 	/*
@@ -692,7 +693,8 @@ void HexagonalColorWheel::resizeGL(int width, int height)
 void HexagonalColorWheel::paintGL()
 {
 	//call ClearColor() here in order to update bg color when the stylesheet is switched
-	qglClearColor(getBGColor());
+	QColor const color = getBGColor();
+	glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 
 	glMatrixMode(GL_MODELVIEW);
 

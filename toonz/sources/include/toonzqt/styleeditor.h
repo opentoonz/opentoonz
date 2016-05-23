@@ -32,7 +32,7 @@
 #include <QSlider>
 #include <QToolButton>
 #include <QScrollArea>
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #include <QMouseEvent>
 #include <QPointF>
 
@@ -141,7 +141,7 @@ enum CurrentWheel {
 	rightTriangle
 };
 
-class DVAPI HexagonalColorWheel : public QGLWidget
+class DVAPI HexagonalColorWheel : public QOpenGLWidget
 {
 	Q_OBJECT
 

@@ -10,7 +10,6 @@
 
 // Qt includes
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions_3_0>
 
 #undef DVAPI
 #undef DVVAR
@@ -45,7 +44,7 @@ class TVectorImageP;
             efficient image-drawing functions for all Toonz image types.
 */
 
-class DVAPI PlaneViewer : public QOpenGLWidget, protected QOpenGLFunctions_3_0
+class DVAPI PlaneViewer : public QOpenGLWidget
 {
 public:
 	PlaneViewer(QWidget *parent);

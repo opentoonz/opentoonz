@@ -548,7 +548,7 @@ void SceneViewer::setVisual(const ImagePainter::VisualSettings &settings)
 	m_visualSettings = settings;
 	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
 	if (repaint)
-		updateGL();
+		update();
 }
 
 //-----------------------------------------------------------------------------
