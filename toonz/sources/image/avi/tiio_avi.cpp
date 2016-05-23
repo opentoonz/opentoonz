@@ -1031,6 +1031,87 @@ TImageP TLevelReaderAvi::load(int frameIndex)
 //===========================================================
 
 #ifdef _WIN32
+
+namespace {
+	BOOL safe_ICInfo(DWORD fccType, DWORD fccHandler, ICINFO* lpicinfo) {
+#ifdef _MSC_VER
+		__try {
+			return ICInfo(fccType, fccHandler, lpicinfo);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+		}
+		return FALSE;
+#else
+		return ICInfo(fccType, fccHandler, lpicinfo);
+#endif
+	}
+
+	LRESULT safe_ICClose(HIC hic) {
+#ifdef _MSC_VER
+		__try {
+			if (hic) {
+				return ICClose(hic);
+			}
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+		}
+#else
+		if (hic) {
+			return ICClose(hic);
+		}
+#endif
+		return ICERR_OK;
+	}
+
+	using hic_t = std::unique_ptr<std::remove_pointer_t<HIC>, decltype(&safe_ICClose)>;
+
+	hic_t safe_ICOpen(DWORD fccType, DWORD fccHandler, UINT wMode) {
+#ifdef _MSC_VER
+		HIC const hic = [fccType, fccHandler, wMode]() -> HIC {
+			__try {
+				return ICOpen(fccType, fccHandler, wMode);
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER) {
+			}
+			return nullptr;
+		}();
+#else
+		HIC hic = nullptr;
+		try {
+			hic = ICOpen(fccType, fccHandler, wMode);
+		} catch (...) {
+		}
+#endif
+		return hic_t(hic, safe_ICClose);
+	}
+
+	LRESULT safe_ICGetInfo(hic_t const& hic, ICINFO* picinfo, DWORD cb) {
+#ifdef _MSC_VER
+		__try {
+			return ICGetInfo(hic.get(), picinfo, cb);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+		}
+		return 0; // return copied size in bytes (0 means an error)
+#else
+		return ICGetInfo(hic.get(), picinfo, cb);
+#endif
+	}
+
+	LRESULT safe_ICCompressQuery(hic_t const& hic, BITMAPINFO* lpbiInput, BITMAPINFO* lpbiOutput) {
+#ifdef _MSC_VER
+		__try {
+			return ICCompressQuery(hic.get(), lpbiInput, lpbiOutput);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+		}
+		return ICERR_INTERNAL;
+#else
+		return ICCompressQuery(hic.get(), lpbiInput, lpbiOutput);
+#endif
+	}
+}
+
 Tiio::AviWriterProperties::AviWriterProperties()
 	: m_codec("Codec")
 {
@@ -1052,54 +1133,41 @@ Tiio::AviWriterProperties::AviWriterProperties()
 			inFmt.bmiHeader.biBitCount = bpp;
 			for (int i = 0;; i++) {
 				memset(&icinfo, 0, sizeof icinfo);
-				int rc = ICInfo(fccType, i, &icinfo);
-				if (!rc)
+				if (!safe_ICInfo(fccType, i, &icinfo)) {
 					break;
-				HIC hic = 0;
-#ifdef _MSC_VER
-				[&](){
-					__try {
-						hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_QUERY);
-					} __except (EXCEPTION_EXECUTE_HANDLER) {
-					}
-				}();
-#else
-				try {
-					hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_QUERY);
-				} catch (...) {
 				}
-#endif
-				if (hic) {
-					if (ICGetInfo(hic, &icinfo, sizeof(ICINFO)) == 0) // Find out the compressor name
-					{
-						ICClose(hic);
-						continue;
-					}
-					WideChar2Char(icinfo.szDescription, descr, sizeof(descr));
-					WideChar2Char(icinfo.szName, name, sizeof(name));
-					if (strstr(name, "IYUV") != 0 || (strstr(name, "IR32") != 0 && bpp == 24)) {
-						ICClose(hic);
-						continue;
-					}
 
-					std::string compressorName;
-					compressorName = std::string(name) + " '" + toString(bpp) + "' " + std::string(descr);
+				auto const hic = safe_ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_QUERY);
+				if (!hic) {
+					break;
+				}
 
-					if (std::string(compressorName).find("Indeo") != -1) // per il momento togliamo i codec indeo
-					{
-						ICClose(hic);
-						continue;
-					}
-					if (ICCompressQuery(hic, &inFmt, NULL) != ICERR_OK) {
-						ICClose(hic);
-						continue; // Skip this compressor if it can't handle the format.
-					}
-					m_defaultCodec.addValue(toWideString(compressorName));
+				// Find out the compressor name
+				if (safe_ICGetInfo(hic, &icinfo, sizeof(ICINFO)) == 0) {
+					break;
+				}
 
-					if (compressorName.find("inepak") != -1)
-						m_defaultCodec.setValue(toWideString(compressorName));
+				WideChar2Char(icinfo.szDescription, descr, sizeof(descr));
+				WideChar2Char(icinfo.szName, name, sizeof(name));
+				if ((strstr(name, "IYUV") != 0) || ((strstr(name, "IR32") != 0) && (bpp == 24))) {
+					continue;
+				}
 
-					ICClose(hic);
+				std::string compressorName;
+				compressorName = std::string(name) + " '" + toString(bpp) + "' " + std::string(descr);
+
+				// per il momento togliamo i codec indeo
+				if (std::string(compressorName).find("Indeo") != -1) {
+					continue;
+				}
+
+				if (safe_ICCompressQuery(hic, &inFmt, nullptr) != ICERR_OK) {
+					continue; // Skip this compressor if it can't handle the format.
+				}
+
+				m_defaultCodec.addValue(toWideString(compressorName));
+				if (compressorName.find("inepak") != -1) {
+					m_defaultCodec.setValue(toWideString(compressorName));
 				}
 			}
 		}

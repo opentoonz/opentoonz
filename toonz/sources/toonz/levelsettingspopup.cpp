@@ -695,9 +695,9 @@ void LevelSettingsPopup::onPathChanged()
 			m_sl->invalidateFrames();
 			std::vector<TFrameId> frames;
 			m_sl->getFids(frames);
-			std::vector<TFrameId>::iterator it = frames.begin();
-			for (it; it != frames.end(); it++)
-				IconGenerator::instance()->invalidate(m_sl.getPointer(), *it);
+			for (auto const& fid : frames) {
+				IconGenerator::instance()->invalidate(m_sl.getPointer(), fid);
+			}
 			return;
 		}
 	}
@@ -719,9 +719,9 @@ void LevelSettingsPopup::onPathChanged()
 	m_sl->invalidateFrames();
 	std::vector<TFrameId> frames;
 	m_sl->getFids(frames);
-	std::vector<TFrameId>::iterator it = frames.begin();
-	for (it; it != frames.end(); it++)
-		IconGenerator::instance()->invalidate(m_sl.getPointer(), *it);
+	for (auto const& fid : frames) {
+		IconGenerator::instance()->invalidate(m_sl.getPointer(), fid);
+	}
 	updateLevelSettings();
 }
 

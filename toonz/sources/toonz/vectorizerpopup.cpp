@@ -913,9 +913,8 @@ bool VectorizerPopup::apply()
 	assert(ret);
 
 	int newIndexColumn = c1 + 1;
-	std::set<TXshLevel *>::iterator it = levels.begin();
-	for (it; it != levels.end(); it++) {
-		TXshSimpleLevel *sl = dynamic_cast<TXshSimpleLevel *>(*it);
+	for (auto const level : levels) {
+		TXshSimpleLevel *sl = dynamic_cast<TXshSimpleLevel *>(level);
 		if (!sl || !sl->getSimpleLevel() || !isLevelToConvert(sl)) {
 			QString levelName = tr(toString(sl->getName()).c_str());
 			QString errorMsg = tr("Cannot convert to vector the current selection.") + levelName;
@@ -969,12 +968,10 @@ bool VectorizerPopup::apply()
 					TFrameId curFid = cell.getFrameId();
 					std::vector<TFrameId> newFids;
 					vl->getFids(newFids);
-					std::vector<TFrameId>::iterator it1 = newFids.begin();
-					for (it1; it1 != newFids.end(); it1++) {
-						TFrameId id = *it1;
-						if (id.getNumber() == curFid.getNumber() ||			   // Hanno stesso numero di frame
-							(id.getNumber() == 1 && curFid.getNumber() == -2)) // La vecchia cella non ha numero di frame
-							xsheet->setCell(r, newIndexColumn, TXshCell(vl, id));
+					for (auto const& fid : newFids) {
+						if (fid.getNumber() == curFid.getNumber() ||			   // Hanno stesso numero di frame
+							(fid.getNumber() == 1 && curFid.getNumber() == -2)) // La vecchia cella non ha numero di frame
+							xsheet->setCell(r, newIndexColumn, TXshCell(vl, fid));
 					}
 				}
 			}

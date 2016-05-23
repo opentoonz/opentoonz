@@ -1578,7 +1578,6 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 
 	std::vector<TFrameId> fids;
 	getFids(fids);
-	std::vector<TFrameId>::iterator it;
 
 	bool isLevelModified = getProperties()->getDirtyFlag();
 	bool isPaletteModified = false;
@@ -1634,11 +1633,11 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 				// is a scan-cleanup mix). This is fine even on the temporarily substituted m_path.
 				std::map<TFrameId, TFrameId> renumberTable;
 
-				std::map<TFrameId, TFrameId>::reverse_iterator mapIt = m_renumberTable.rbegin();
-				for (mapIt; mapIt != m_renumberTable.rend(); ++mapIt) {
-					TFrameId id = mapIt->first;
-					if (getFrameStatus(id) != Scanned && getFrameStatus(id) != CleanupPreview)
-						renumberTable[id] = mapIt->second;
+				for (auto it = m_renumberTable.rbegin(); it != m_renumberTable.rend(); ++it) {
+					TFrameId id = (*it).first;
+					if ((getFrameStatus(id) != Scanned) && (getFrameStatus(id) != CleanupPreview)) {
+						renumberTable[id] = (*it).second;
+					}
 				}
 
 				m_renumberTable.clear();
@@ -1653,12 +1652,12 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 
 				ImageLoader::BuildExtData extData(this, TFrameId());
 
-				for (it = fids.begin(); it != fids.end(); ++it) {
-					std::string imageId = getImageId(*it, Normal); // Retrieve the actual level frames ("L_whatever")
+				for (auto const& fid : fids) {
+					std::string imageId = getImageId(fid, Normal); // Retrieve the actual level frames ("L_whatever")
 					if (!ImageManager::instance()->isModified(imageId))
 						continue;
 
-					extData.m_fid = *it;
+					extData.m_fid = fid;
 					TImageP img = ImageManager::instance()->getImage(imageId, imFlags, &extData);
 
 					assert(img);
@@ -1682,7 +1681,7 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 						ti->setSavebox(saveBox);
 					}
 
-					lw->getFrameWriter(*it)->save(img);
+					lw->getFrameWriter(fid)->save(img);
 				}
 
 				lw = TLevelWriterP(); // TLevelWriterP's destructor saves the palette
@@ -1712,12 +1711,12 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 
 				ImageLoader::BuildExtData extData(this, TFrameId());
 
-				for (it = fids.begin(); it != fids.end(); ++it) {
-					std::string imageId = getImageId(*it, Normal); // Retrieve the actual level frames ("L_whatever")
+				for (auto const& fid : fids) {
+					std::string imageId = getImageId(fid, Normal); // Retrieve the actual level frames ("L_whatever")
 					if (!ImageManager::instance()->isModified(imageId))
 						continue;
 
-					extData.m_fid = *it;
+					extData.m_fid = fid;
 					TImageP img = ImageManager::instance()->getImage(imageId, imFlags, &extData);
 
 					assert(img);
@@ -1734,7 +1733,7 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 					if (subs != 1)
 						continue;
 
-					updater.update(*it, img);
+					updater.update(fid, img);
 				}
 			}
 			updater.close(); //Needs the original level subs
@@ -2010,16 +2009,16 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids)
 		TFrameId oldFrameId = *it;
 		TFrameId newFrameId = fids[i++];
 		table[oldFrameId] = newFrameId;
-		std::map<TFrameId, TFrameId>::iterator mapIt = m_renumberTable.begin();
-		for (mapIt; mapIt != m_renumberTable.end(); ++mapIt)
-			if (mapIt->second == oldFrameId) {
-				newRenumberTable[mapIt->first] = newFrameId;
+		for (auto const& renumber : m_renumberTable) {
+			if (renumber.second == oldFrameId) {
+				newRenumberTable[renumber.first] = newFrameId;
 				break;
 			}
+		}
 	}
-	std::map<TFrameId, TFrameId>::iterator newMapIt = newRenumberTable.begin();
-	for (newMapIt; newMapIt != newRenumberTable.end(); ++newMapIt)
-		m_renumberTable[newMapIt->first] = newMapIt->second;
+	for (auto const& renumber : newRenumberTable) {
+		m_renumberTable[renumber.first] = renumber.second;
+	}
 
 	m_frames.clear();
 	for (i = 0; i < n; ++i) {

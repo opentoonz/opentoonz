@@ -582,12 +582,10 @@ void CastBrowser::sortByDataModel(DataType dataType, bool isDiscendent)
 	if (isDiscendentOrder() != isDiscendent) {
 		setIsDiscendentOrder(isDiscendent);
 		std::vector<CastItem *> items;
-		int i = 0;
-		for (i; i < m_castItems->getItemCount(); i++)
+		for (int i = 0; i < m_castItems->getItemCount(); i++)
 			items.push_back(m_castItems->getItem(i)->clone());
 		m_castItems->clear();
-		i = items.size() - 1;
-		for (i; i >= 0; i--)
+		for (int i = items.size() - 1; i >= 0; i--)
 			m_castItems->addItem(items[i]);
 	}
 
@@ -826,10 +824,9 @@ QMenu *CastBrowser::getContextMenu(QWidget *parent, int index)
 void CastBrowser::expose()
 {
 	std::set<int> selectedIndices = m_itemViewer->getPanel()->getSelectedIndices();
-	std::set<int>::iterator it = selectedIndices.begin();
 	TUndoManager::manager()->beginBlock();
-	for (it; it != selectedIndices.end(); it++) {
-		CastItem *item = m_castItems->getItem(*it);
+	for (int index : selectedIndices) {
+		CastItem *item = m_castItems->getItem(index);
 		TXshSimpleLevel *sl = item->getSimpleLevel();
 		TXshPaletteLevel *pl = item->getPaletteLevel();
 		TXshSoundLevel *soundl = item->getSoundLevel();

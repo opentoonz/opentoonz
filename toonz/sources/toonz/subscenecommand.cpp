@@ -508,8 +508,7 @@ TFx *explodeFxSubTree(TFx *innerFx, QMap<TFx *, QPair<TFx *, int>> &fxs, FxDag *
 		TFx *root = sortedFx.begin().value();
 		QMultiMap<int, TFx *>::iterator it = sortedFx.begin();
 		outerDag->removeFromXsheet(it.value());
-		it++;
-		for (it; it != sortedFx.end(); it++) {
+		for (++it; it != sortedFx.end(); ++it) {
 			TFx *fx = it.value();
 			assert(fx);
 			TFx *overFx = TFx::create("overFx");

@@ -2184,9 +2184,9 @@ public:
 				return;
 			std::vector<TFrameId> fids;
 			std::set<TFrameId> fidsSet = s->getSelectedFids();
-			std::set<TFrameId>::iterator it = fidsSet.begin();
-			for (it; it != fidsSet.end(); it++)
-				fids.push_back(*it);
+			for (auto const& fid : fidsSet) {
+				fids.push_back(fid);
+			}
 			m_data->addSimpleLevel(std::make_pair(sl, fids));
 		}
 		refreshCellsArea();

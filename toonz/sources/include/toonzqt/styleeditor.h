@@ -32,8 +32,7 @@
 #include <QSlider>
 #include <QToolButton>
 #include <QScrollArea>
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions_3_0>
+#include <QGLWidget>
 #include <QMouseEvent>
 #include <QPointF>
 
@@ -142,7 +141,7 @@ enum CurrentWheel {
 	rightTriangle
 };
 
-class DVAPI HexagonalColorWheel : public QOpenGLWidget, private QOpenGLFunctions_3_0
+class DVAPI HexagonalColorWheel : public QGLWidget
 {
 	Q_OBJECT
 
@@ -176,17 +175,17 @@ public:
 	QColor getBGColor() const { return m_bgColor; }
 
 protected:
-	void initializeGL() override;
-	void resizeGL(int width, int height) override;
-	void paintGL() override;
+	void initializeGL();
+	void resizeGL(int width, int height);
+	void paintGL();
 	QSize SizeHint() const
 	{
 		return QSize(300, 200);
 	};
 
-	void mousePressEvent(QMouseEvent *event) override;
-	void mouseMoveEvent(QMouseEvent *event) override;
-	void mouseReleaseEvent(QMouseEvent *event) override;
+	void mousePressEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
 
 signals:
 	void colorChanged(const ColorModel &color, bool isDragging);

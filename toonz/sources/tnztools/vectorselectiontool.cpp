@@ -211,20 +211,23 @@ void VectorFreeDeformer::deformRegions()
 
 void VectorFreeDeformer::deformImage()
 {
-	assert(int(m_strokeIndexes.size()) == int(m_originalStrokes.size()));
+	// debug
+	assert(m_strokeIndexes.size() == m_originalStrokes.size());
+
+	// release
+	if (m_strokeIndexes.size() != m_originalStrokes.size()) {
+		return;
+	}
 
 	QMutexLocker lock(m_vi->getMutex());
 
-	std::set<int>::iterator it1 = m_strokeIndexes.begin();
-	std::vector<TStroke *>::iterator it2 = m_originalStrokes.begin();
-
-	for (it1; it1 != m_strokeIndexes.end(); ++it1, ++it2) {
-		TStroke *stroke = m_vi->getStroke(*it1);
-		TStroke *originalStroke = *it2;
+	std::size_t i = 0;
+	for (auto it = m_strokeIndexes.begin(), end = m_strokeIndexes.end(); it != end; ++it) {
+		TStroke *stroke = m_vi->getStroke(*it);
+		TStroke *originalStroke = m_originalStrokes[i++];
 
 		assert(stroke->getControlPointCount() == originalStroke->getControlPointCount());
-		int j;
-		for (j = 0; j < stroke->getControlPointCount(); j++) {
+		for (int j = 0, count = stroke->getControlPointCount(); j < count; ++j) {
 			TThickPoint p = deform(originalStroke->getControlPoint(j));
 			stroke->setControlPoint(j, p);
 		}

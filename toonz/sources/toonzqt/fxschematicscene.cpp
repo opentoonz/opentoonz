@@ -980,8 +980,7 @@ QPointF FxSchematicScene::nearestPoint(const QPointF &point)
 FxSchematicNode *FxSchematicScene::getFxNodeFromPosition(const QPointF &pos)
 {
 	QList<QGraphicsItem *> pickedItems = items(pos);
-	int i = 0;
-	for (i; i < pickedItems.size(); i++) {
+	for (int i = 0; i < pickedItems.size(); i++) {
 		FxSchematicNode *fxNode = dynamic_cast<FxSchematicNode *>(pickedItems.at(i));
 		if (fxNode)
 			return fxNode;
@@ -1057,9 +1056,8 @@ QGraphicsItem *FxSchematicScene::getCurrentNode()
 {
 	QList<QGraphicsItem *> allItems = items();
 
-	QList<QGraphicsItem *>::iterator it = allItems.begin();
-	for (it; it != allItems.end(); it++) {
-		FxSchematicNode *node = dynamic_cast<FxSchematicNode *>(*it);
+	for (auto const item : allItems) {
+		FxSchematicNode *node = dynamic_cast<FxSchematicNode *>(item);
 		if (node && node->getFx() == m_fxHandle->getFx())
 			return node;
 	}

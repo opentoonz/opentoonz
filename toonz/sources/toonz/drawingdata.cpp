@@ -274,18 +274,16 @@ bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
 	TPaletteP imgPlt;
 	// selected frames
 	std::set<TFrameId>::iterator it = framesToInsert.begin();
-	// copied frames
-	std::map<TFrameId, QString>::const_iterator mapIt = m_imageSet.begin();
 
 	//Preprocessing to keep used styles
-	for (mapIt; mapIt != m_imageSet.end(); ++mapIt) {
-		QString imageId = mapIt->second;
+	for (auto const& image : m_imageSet) {
+		QString imageId = image.second;
 		// paste destination
 		TFrameId frameId;
 
 		//merge
 		if (setType == OVER_FRAMEID) //If setType == OVER_FRAMEID ignore frames
-			frameId = mapIt->first;
+			frameId = image.first;
 		else {
 			// if type == OVER_SELECTION, pasting ends at the end of selected range
 			if (it == framesToInsert.end())
@@ -315,12 +313,12 @@ bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
 		styleTable[s] = s;
 
 	//Merge Image
-	for (mapIt = usedImageSet.begin(); mapIt != usedImageSet.end(); ++mapIt) {
-		QString imageId = mapIt->second;
+	for (auto const& image : usedImageSet) {
+		QString imageId = image.second;
 		TImageP img = getImage(imageId, sl, styleTable);
 		if (!cloneImages)
 			TImageCache::instance()->remove(imageId);
-		sl->setFrame(mapIt->first, cloneImages ? img->cloneImage() : img);
+		sl->setFrame(image.first, cloneImages ? img->cloneImage() : img);
 	}
 
 	//merge Hooks
@@ -329,17 +327,18 @@ bool DrawingData::getLevelFrames(TXshSimpleLevel *sl,
 	int hookCount = m_levelHooks.getHookCount();
 	//shiftHooks(sl,usedImageSet.begin()->first,framesToInsert.size());
 
-	std::map<TFrameId, QString>::const_iterator frameIt = m_imageSet.begin();
-	for (mapIt = usedImageSet.begin(); mapIt != usedImageSet.end(); ++mapIt, ++frameIt) {
+	auto frameIt = m_imageSet.begin();
+	for (auto const& image : usedImageSet) {
 		for (int i = 0; i < hookCount; i++) {
 			Hook *levelHook = levelHooks->getHook(i);
 			if (!levelHook)
 				levelHook = levelHooks->addHook();
 			Hook *copiedHook = m_levelHooks.getHook(i);
 			assert(copiedHook);
-			levelHook->setAPos(mapIt->first, copiedHook->getAPos(frameIt->first));
-			levelHook->setBPos(mapIt->first, copiedHook->getBPos(frameIt->first));
+			levelHook->setAPos(image.first, copiedHook->getAPos((*frameIt).first));
+			levelHook->setBPos(image.first, copiedHook->getBPos((*frameIt).first));
 		}
+		++frameIt;
 	}
 
 	sl->setDirtyFlag(true);
@@ -435,9 +434,8 @@ void DrawingData::setFrames(const std::map<TFrameId, QString> &imageSet, TXshSim
 
 void DrawingData::getFrames(std::set<TFrameId> &frames) const
 {
-	std::map<TFrameId, QString>::const_iterator mapIt = m_imageSet.begin();
-	for (mapIt; mapIt != m_imageSet.end(); ++mapIt)
-		frames.insert(mapIt->first);
+	for (auto const& image : m_imageSet)
+		frames.insert(image.first);
 }
 
 //-----------------------------------------------------------------------------

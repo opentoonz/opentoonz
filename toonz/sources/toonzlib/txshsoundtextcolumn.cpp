@@ -30,9 +30,8 @@ void TXshSoundTextColumn::createSoundTextLevel(int row, QList<QString> textList)
 {
 	TXshSoundTextLevel *level = new TXshSoundTextLevel();
 	level->setType(SND_TXT_XSHLEVEL);
-	int i = 0;
 	TXshCell cell;
-	for (i; i < textList.size(); i++, row++) {
+	for (int i = 0; i < textList.size(); i++, row++) {
 		QString str = textList.at(i);
 		QString precStr = (i > 0) ? level->getFrameText(i - 1) : QString();
 		if (str == QString("<none>")) {

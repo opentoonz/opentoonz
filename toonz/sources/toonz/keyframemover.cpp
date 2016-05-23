@@ -50,16 +50,15 @@ void KeyframeMover::setKeyframes()
 {
 	TXsheet *xsh = getXsheet();
 	std::set<KeyframePosition>::iterator posIt;
-	std::set<KeyframePosition>::iterator it = m_lastKeyframes.begin();
-	for (it; it != m_lastKeyframes.end(); it++) {
-		int c = it->second;
+	for (auto const& key : m_lastKeyframes) {
+		int c = key.second;
 		TStageObjectId objId = c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
 		TStageObject *stObj = xsh->getStageObject(objId);
 		TStageObject::KeyframeMap keyframes;
 		stObj->getKeyframes(keyframes);
-		TStageObject::KeyframeMap::iterator it2 = keyframes.begin();
-		for (it2; it2 != keyframes.end(); it2++)
-			stObj->removeKeyframeWithoutUndo(it2->first);
+		for (auto const& frame : keyframes) {
+			stObj->removeKeyframeWithoutUndo(frame.first);
+		}
 	}
 	m_lastKeyframeData->getKeyframes(m_lastKeyframes, xsh);
 }
@@ -69,17 +68,16 @@ void KeyframeMover::setKeyframes()
 void KeyframeMover::getKeyframes()
 {
 	TXsheet *xsh = getXsheet();
-	std::set<TKeyframeSelection::Position>::iterator it = m_startSelectedKeyframes.begin();
-	for (it; it != m_startSelectedKeyframes.end(); it++) {
-		int c = it->second;
+	for (auto const& pos : m_startSelectedKeyframes) {
+		int c = pos.second;
 		TStageObjectId objId = c >= 0 ? TStageObjectId::ColumnId(c) : TStageObjectId::CameraId(0);
 		TStageObject *stObj = xsh->getStageObject(objId);
-		assert(stObj->isKeyframe(it->first));
+		assert(stObj->isKeyframe(pos.first));
 		TStageObject::KeyframeMap keyframes;
 		stObj->getKeyframes(keyframes);
-		TStageObject::KeyframeMap::iterator it2 = keyframes.begin();
-		for (it2; it2 != keyframes.end(); it2++)
-			m_lastKeyframes.insert(KeyframePosition(it2->first, c));
+		for (auto const& frame : keyframes) {
+			m_lastKeyframes.insert(KeyframePosition(frame.first, c));
+		}
 	}
 
 	if (m_lastKeyframeData) {

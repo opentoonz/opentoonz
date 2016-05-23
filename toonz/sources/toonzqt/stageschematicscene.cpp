@@ -649,9 +649,8 @@ QGraphicsItem *StageSchematicScene::getCurrentNode()
 {
 	QList<QGraphicsItem *> allItems = items();
 
-	QList<QGraphicsItem *>::iterator it = allItems.begin();
-	for (it; it != allItems.end(); it++) {
-		StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(*it);
+	for (auto const item : allItems) {
+		StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(item);
 		if (node && node->getStageObject()->getId() == m_objHandle->getObjectId())
 			return node;
 	}
@@ -1188,8 +1187,7 @@ void StageSchematicScene::mousePressEvent(QGraphicsSceneMouseEvent *me)
 SchematicNode *StageSchematicScene::getNodeFromPosition(const QPointF &pos)
 {
 	QList<QGraphicsItem *> pickedItems = items(pos);
-	int i = 0;
-	for (i; i < pickedItems.size(); i++) {
+	for (int i = 0; i < pickedItems.size(); i++) {
 		SchematicNode *node = dynamic_cast<SchematicNode *>(pickedItems.at(i));
 		if (node)
 			return node;

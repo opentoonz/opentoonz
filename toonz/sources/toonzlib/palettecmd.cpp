@@ -155,9 +155,7 @@ bool isStyleUsed(const TImageP image, int styleId)
 /*! Return true if one style is used. */
 bool areStylesUsed(const set<TXshSimpleLevel *> levels, const std::vector<int> styleIds)
 {
-	set<TXshSimpleLevel *>::const_iterator it = levels.begin();
-	for (it; it != levels.end(); it++) {
-		TXshSimpleLevel *level = *it;
+	for (auto const level : levels) {
 		std::vector<TFrameId> fids;
 		level->getFids(fids);
 		int i;
@@ -538,9 +536,7 @@ namespace
 
 void eraseStylesInLevels(const set<TXshSimpleLevel *> &levels, const std::vector<int> styleIds)
 {
-	set<TXshSimpleLevel *>::const_iterator it = levels.begin();
-	for (it; it != levels.end(); it++) {
-		TXshSimpleLevel *level = *it;
+	for (auto const level : levels) {
 		std::vector<TFrameId> fids;
 		level->getFids(fids);
 		int i;

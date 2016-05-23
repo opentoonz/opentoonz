@@ -416,17 +416,16 @@ void insertNotEmptyframes(const TXshSimpleLevelP &sl,
 	std::vector<TFrameId> fids;
 	sl->getFids(fids);
 	std::set<TFrameId> frames;
-	std::map<TFrameId, QString>::const_iterator it = framesToInsert.begin();
-	for (it; it != framesToInsert.end(); it++)
-		frames.insert(it->first);
+	for (auto const& frame : framesToInsert) {
+		frames.insert(frame.first);
+	}
 	makeSpaceForFids(sl.getPointer(), frames);
 
-	for (it = framesToInsert.begin(); it != framesToInsert.end(); ++it) {
-		//QString cacheId = "UndoImage"+QString::number(id)+"-"+QString::number(it->first.getNumber());
-		TImageP img = TImageCache::instance()->get(it->second, false);
-		TImageCache::instance()->remove(it->second);
+	for (auto const& frame : framesToInsert) {
+		TImageP img = TImageCache::instance()->get(frame.second, false);
+		TImageCache::instance()->remove(frame.second);
 		assert(img);
-		sl->setFrame(it->first, img);
+		sl->setFrame(frame.first, img);
 	}
 	invalidateIcons(sl.getPointer(), frames);
 	sl->setDirtyFlag(true);
@@ -1203,10 +1202,9 @@ public:
 	{
 		makeSpaceForFids(m_level.getPointer(), m_insertedFids);
 
-		std::set<TFrameId>::const_iterator it = m_insertedFids.begin();
-		for (it; it != m_insertedFids.end(); it++) {
-			m_level->setFrame(*it, m_level->createEmptyFrame());
-			IconGenerator::instance()->invalidate(m_level.getPointer(), *it);
+		for (auto const& fid : m_insertedFids) {
+			m_level->setFrame(fid, m_level->createEmptyFrame());
+			IconGenerator::instance()->invalidate(m_level.getPointer(), fid);
 		}
 		m_level->setDirtyFlag(true);
 
@@ -1261,10 +1259,9 @@ void FilmstripCmd::addFrames(TXshSimpleLevel *sl, int start, int end, int step)
 
 	makeSpaceForFids(sl, fidsToInsert);
 
-	std::set<TFrameId>::iterator it = fidsToInsert.begin();
-	for (it; it != fidsToInsert.end(); it++) {
-		sl->setFrame(*it, sl->createEmptyFrame());
-		IconGenerator::instance()->invalidate(sl, *it);
+	for (auto const& fid : fidsToInsert) {
+		sl->setFrame(fid, sl->createEmptyFrame());
+		IconGenerator::instance()->invalidate(sl, fid);
 	}
 	sl->setDirtyFlag(true);
 
@@ -2305,15 +2302,11 @@ void FilmstripCmd::duplicate(TXshSimpleLevel *sl, std::set<TFrameId> &frames, bo
 
 	std::map<TFrameId, QString> framesToInsert;
 	std::set<TFrameId> newFrames;
-	std::set<TFrameId>::iterator it = frames.begin();
 	int i = 0;
-	for (it; it != frames.end(); it++) {
-		TFrameId fid = *it;
-		TImageP img = sl->getFrame(*it, false);
+	for (auto const& fid : frames) {
+		TImageP img = sl->getFrame(fid, false);
 		TImageP imgClone = (img) ? img->cloneImage() : 0;
-		//QString id = "dupFrames"+QString::number((UINT)sl)+"-"+QString::number(it->getNumber());
-		QString id = "dupFrames" + QString::number((uintptr_t)sl) + "-" + QString::number(it->getNumber());
-		//TImageCache::instance()->add(id, sl->getFrame(*it, false));
+		QString id = "dupFrames" + QString::number((uintptr_t)sl) + "-" + QString::number(fid.getNumber());
 		TImageCache::instance()->add(id, imgClone);
 		framesToInsert[insertPoint + i] = id;
 		newFrames.insert(insertPoint + i);
@@ -2624,11 +2617,10 @@ void FilmstripCmd::inbetween(TXshSimpleLevel *sl,
 	std::vector<TFrameId> fids;
 	std::vector<TFrameId> levelFids;
 	sl->getFids(levelFids);
-	std::vector<TFrameId>::iterator it = levelFids.begin();
-	for (it; it != levelFids.end(); it++) {
-		int curFid = it->getNumber();
+	for (auto const &fid : levelFids) {
+		int curFid = fid.getNumber();
 		if (fid0.getNumber() <= curFid && curFid <= fid1.getNumber())
-			fids.push_back(*it);
+			fids.push_back(fid);
 	}
 
 	TUndoManager::manager()->add(new UndoInbetween(sl, fids, interpolation));
