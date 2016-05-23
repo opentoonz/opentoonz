@@ -98,11 +98,10 @@ bool TKeyframeData::getKeyframes(std::set<Position> &positions, TXsheet *xsh) co
 	if (!keyFrameChanged)
 		return false;
 
-	std::map<int, bool>::const_iterator it1 = m_isPegbarsCycleEnabled.begin();
-	for (it1; it1 != m_isPegbarsCycleEnabled.end(); it1++) {
-		int col = it1->first;
-		TStageObject *pegbar = xsh->getStageObject(col >= 0 ? TStageObjectId::ColumnId(col) : cameraId);
-		pegbar->enableCycle(it1->second);
+	for (auto const pegbar : m_isPegbarsCycleEnabled) {
+		int const col = pegbar.first;
+		TStageObjectId objectId = (col >= 0) ? TStageObjectId::ColumnId(col) : cameraId;
+		xsh->getStageObject(objectId)->enableCycle(pegbar.second);
 	}
 	return true;
 }

@@ -205,22 +205,10 @@ public:
 */
 
 ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook, bool showHistogram)
-	: QOpenGLWidget(parent)
-	, m_pressedMousePos(0, 0)
-	, m_mouseButton(Qt::NoButton)
-	, m_draggingZoomSelection(false)
-	, m_image()
-	, m_FPS(0)
-	, m_viewAff()
-	, m_pos(0, 0)
-	, m_visualSettings()
-	, m_compareSettings()
-	, m_isHistogramEnable(showHistogram)
-	, m_flipbook(flipbook)
-	, m_isColorModel(false)
-	, m_histogramPopup(0)
-	, m_isRemakingPreviewFx(false)
-	, m_rectRGBPick(false)
+	: QGLWidget(parent), m_pressedMousePos(0, 0), m_mouseButton(Qt::NoButton), m_draggingZoomSelection(false), m_image(), m_FPS(0), m_viewAff(), m_pos(0, 0), m_visualSettings(), m_compareSettings(), m_isHistogramEnable(showHistogram), m_flipbook(flipbook), m_isColorModel(false), m_histogramPopup(0), m_isRemakingPreviewFx(false)
+	  //, m_ghibli3DLutUtil(0) //iwsw commented out temporarily
+	  ,
+	  m_rectRGBPick(false)
 {
 	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
 	m_visualSettings.m_drawExternalBG = true;
@@ -231,6 +219,10 @@ ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook, bool showHistogram
 
 	if (m_isHistogramEnable)
 		m_histogramPopup = new HistogramPopup(tr("Flipbook Histogram"));
+
+	//iwsw commented out 2 lines temporarily
+	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && Ghibli3DLutUtil::m_isValid)
+	//	m_ghibli3DLutUtil = new Ghibli3DLutUtil();
 }
 
 //-----------------------------------------------------------------------------
@@ -247,7 +239,7 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event)
 		return;
 	}
 
-	std::unique_ptr<QMenu> menu(new QMenu(this));
+	QMenu *menu = new QMenu(this);
 
 	if (m_flipbook->getPreviewedFx()) {
 		if (!(windowState() & Qt::WindowFullScreen)) {
@@ -334,7 +326,8 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event)
 	action = CommandManager::instance()->getAction(MI_LoadRecentImage);
 	action->setParent(0);
 
-	update();
+	delete menu;
+	updateGL();
 }
 
 //-----------------------------------------------------------------------------
@@ -344,6 +337,20 @@ void ImageViewer::setVisual(const ImagePainter::VisualSettings &settings)
 	m_visualSettings = settings;
 	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
 	m_visualSettings.m_drawExternalBG = true;
+}
+
+//-----------------------------------------------------------------------------
+
+ImageViewer::~ImageViewer()
+{
+	//iwsw commented out temporarily
+	/*
+	if (m_ghibli3DLutUtil)
+	{
+		m_ghibli3DLutUtil->onEnd();
+		delete m_ghibli3DLutUtil;
+	}
+	*/
 }
 
 //-----------------------------------------------------------------------------
@@ -396,8 +403,12 @@ void ImageViewer::hideHistogram()
 
 void ImageViewer::initializeGL()
 {
-	initializeOpenGLFunctions();
+	// glClearColor(1.0,1.0,1.0,1);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	//iwsw commented out temporarily
+	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
+	//  m_ghibli3DLutUtil->onInit();
 }
 
 //-----------------------------------------------------------------------------
@@ -415,14 +426,25 @@ void ImageViewer::resizeGL(int w, int h)
 	glLoadIdentity();
 	glTranslatef(0.375, 0.375, 0.0);
 	glTranslated(w * 0.5, h * 0.5, 0);
+
+	//iwsw commented out temporarily
+	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
+	//	m_ghibli3DLutUtil->onResize(w, h);
 }
 
 //-----------------------------------------------------------------------------
 
 void ImageViewer::paintGL()
 {
+	//iwsw commented out temporarily
+	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
+	//	m_ghibli3DLutUtil->startDraw();
+
 	TDimension viewerSize(width(), height());
 	TAffine aff = m_viewAff;
+
+	//if (!m_visualSettings.m_defineLoadbox && m_flipbook && m_flipbook->getLoadbox()!=TRect())
+	//  offs = convert(m_flipbook->getLoadbox().getP00())-TPointD(m_flipbook->getImageSize().lx/2.0, m_flipbook->getImageSize().ly/2.0);
 
 	TDimension imageSize;
 	TRect loadbox;
@@ -436,7 +458,6 @@ void ImageViewer::paintGL()
 			loadbox = m_flipbook->getLoadbox();
 	}
 	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
-
 	// enable checks only in the color model
 	m_visualSettings.m_useChecks = m_isColorModel;
 	ImagePainter::paintImage(m_image, imageSize, viewerSize, aff, m_visualSettings, m_compareSettings, loadbox);
@@ -465,6 +486,10 @@ void ImageViewer::paintGL()
 	}
 
 	if (!m_image) {
+		//iwsw commented out temporarily
+		//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
+		//	m_ghibli3DLutUtil->endDraw();
+
 		return;
 	}
 
@@ -533,6 +558,10 @@ void ImageViewer::paintGL()
 			glEnd();
 		}
 	}
+
+	//iwsw commented out temporarily
+	//if (Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled() && m_ghibli3DLutUtil)
+	//  m_ghibli3DLutUtil->endDraw();
 }
 
 //------------------------------------------------------------------------------
@@ -790,7 +819,15 @@ void ImageViewer::pickColor(QMouseEvent *event, bool putValueToStyleEditor)
 	TPoint mousePos = TPoint(event->pos().x(), height() - 1 - event->pos().y());
 	TRectD area = TRectD(mousePos.x, mousePos.y, mousePos.x, mousePos.y);
 
+	//iwsw commented out temporarily
+	//if (get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	//	get3DLutUtil()->bindFBO();
+
 	const TPixel32 pix = picker.pickColor(area);
+
+	//iwsw commented out temporarily
+	//if (get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	//	get3DLutUtil()->releaseFBO();
 
 	QPoint viewP = mapFrom(this, event->pos());
 	TPointD pos = getViewAff().inv() * TPointD(viewP.x() - width() / 2,
@@ -830,7 +867,15 @@ void ImageViewer::rectPickColor(bool putValueToStyleEditor)
 		return;
 	}
 
+	//iwsw commented out temporarily
+	//if (get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	//	get3DLutUtil()->bindFBO();
+
 	const TPixel32 pix = picker.pickColor(area.enlarge(-1, -1));
+
+	//iwsw commented out temporarily
+	//if (get3DLutUtil() && Preferences::instance()->isDoColorCorrectionByUsing3DLutEnabled())
+	//	get3DLutUtil()->releaseFBO();
 
 	//throw the picked color to the histogram
 	m_histogramPopup->updateAverageColor(pix);
@@ -1081,14 +1126,6 @@ void ImageViewer::adaptView(const QRect &geomRect)
 	TRect viewRect(tfloor(viewRectD.x0), tfloor(viewRectD.y0), tceil(viewRectD.x1) - 1, tceil(viewRectD.y1) - 1);
 
 	adaptView(imgBounds, viewRect);
-}
-
-void ImageViewer::doSwapBuffers() {
-	update();
-}
-
-void ImageViewer::changeSwapBehavior(bool enable) {
-	setUpdateBehavior(enable ? PartialUpdate : NoPartialUpdate);
 }
 
 //-----------------------------------------------------------------------------

@@ -180,7 +180,7 @@ void DvScrollWidget::setWidget(QWidget *widget)
 
 void DvScrollWidget::setOrientation(Qt::Orientation orientation)
 {
-	if (m_horizontal = (orientation == Qt::Horizontal)) {
+	if ((m_horizontal = (orientation == Qt::Horizontal))) {
 		setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
 		m_scrollBackward->setObjectName("ScrollLeftButton");

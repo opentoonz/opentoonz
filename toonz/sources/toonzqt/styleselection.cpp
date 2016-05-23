@@ -765,9 +765,7 @@ void TStyleSelection::eraseUnsedStyle()
 	//Verifico quali stili sono usati e quali no
 	std::map<int, bool> usedStyleIds;
 	int pageCount = palette->getPageCount();
-	std::set<TXshSimpleLevel *>::const_iterator it = levels.begin();
-	for (it; it != levels.end(); it++) {
-		TXshSimpleLevel *level = *it;
+	for (auto const level : levels) {
 		std::vector<TFrameId> fids;
 		level->getFids(fids);
 		int m, i, j;

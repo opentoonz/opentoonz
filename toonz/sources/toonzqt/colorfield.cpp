@@ -703,7 +703,7 @@ void CleanupColorField::updateColor()
 		if ((bs = dynamic_cast<TBlackCleanupStyle *>(m_cleanupStyle)) && !m_greyMode) {
 			m_cThresholdChannel->setChannel(bs->getColorThreshold());
 			m_wThresholdChannel->setChannel(bs->getWhiteThreshold());
-		} else if (cs = dynamic_cast<TColorCleanupStyle *>(m_cleanupStyle)) {
+		} else if ((cs = dynamic_cast<TColorCleanupStyle *>(m_cleanupStyle))) {
 			m_hRangeChannel->setChannel(cs->getHRange());
 			m_lineWidthChannel->setChannel(cs->getLineWidth());
 		}

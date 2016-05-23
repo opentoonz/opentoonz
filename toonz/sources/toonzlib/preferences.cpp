@@ -354,13 +354,11 @@ Preferences::Preferences()
 
 		if (langPathFs.doesExist() && langPathFs.isDirectory()) {
 			TSystem::readDirectory(lang_fpset, lang_path, true, false);
-		} else {
 		}
-		TFilePathSet::iterator it = lang_fpset.begin();
 
-		int i = 1;
-		for (it; it != lang_fpset.end(); it++, i++) {
-			TFilePath newPath = *it;
+		int i = 0;
+		for (auto const& newPath : lang_fpset) {
+			++i;
 			if (newPath == lang_path)
 				continue;
 			if (TFileStatus(newPath).isDirectory()) {
@@ -375,10 +373,9 @@ Preferences::Preferences()
 	TFilePathSet fpset;
 	try {
 		TSystem::readDirectory(fpset, path, true, false);
-		TFilePathSet::iterator it = fpset.begin();
-		int i = 0;
-		for (it; it != fpset.end(); it++, i++) {
-			TFilePath newPath = *it;
+		int i = -1;
+		for (auto const& newPath : fpset) {
+			++i;
 			if (newPath == path)
 				continue;
 			QString fpName = QString::fromStdWString(newPath.getWideName());

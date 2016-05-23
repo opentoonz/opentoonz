@@ -143,7 +143,9 @@ set(MOC_HEADERS
     metnum.h
     ObjectTracker.h
     predict3d.h
-    processor.h)
+    processor.h
+    viewer.h
+    writer.h)
 
 set(HEADERS ${MOC_HEADERS})
 
@@ -298,7 +300,9 @@ set(SOURCES
     dummyprocessor.cpp
     metnum.cpp
     ObjectTracker.cpp
-    predict3d.cpp)
+    predict3d.cpp
+    viewer.cpp
+    writer.cpp)
 
 add_translation(toonz ${HEADERS} ${SOURCES})
 

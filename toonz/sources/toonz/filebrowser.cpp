@@ -1503,9 +1503,9 @@ bool FileBrowser::drop(const QMimeData *mimeData)
 		newSl->setPalette(sl->getPalette());
 		newSl->setScene(sl->getScene());
 		std::set<TFrameId> frames = s->getSelectedFids();
-		std::set<TFrameId>::iterator it = frames.begin();
-		for (it; it != frames.end(); it++)
-			newSl->setFrame(*it, sl->getFrame(*it, false));
+		for (auto const& fid : frames) {
+			newSl->setFrame(fid, sl->getFrame(fid, false));
+		}
 
 		IoCmd::saveLevel(folderPath, newSl, false);
 		refreshFolder(folderPath.getParentDir());

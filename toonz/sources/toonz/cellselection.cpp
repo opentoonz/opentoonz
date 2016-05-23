@@ -609,9 +609,9 @@ bool pasteStrokesInCellWithoutUndo(int row, int col, const StrokesData *strokesD
 	if (vi) {
 		std::set<int> indicesSet;
 		strokesData->getImage(vi, indicesSet, true);
-		std::set<int>::iterator it = indicesSet.begin();
-		for (it; it != indicesSet.end(); it++)
-			indices.push_back(*it);
+		for (int index : indicesSet) {
+			indices.push_back(index);
+		}
 		assert(sl);
 		app->getPaletteController()->getCurrentLevelPalette()->notifyPaletteChanged();
 		IconGenerator::instance()->invalidate(sl, fid);

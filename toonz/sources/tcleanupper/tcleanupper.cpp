@@ -316,11 +316,16 @@ void searchLevelsToCleanup(
 			}
 		}
 	}
+
 	assert(levelTable.size() == framesTable.size());
-	std::map<wstring, TXshSimpleLevel *>::iterator it1 = levelTable.begin();
-	std::map<wstring, std::set<TFrameId>>::iterator it2 = framesTable.begin();
-	for (it1; it1 != levelTable.end(); ++it1, ++it2)
-		levels.push_back(std::make_pair(it1->second, it2->second));
+
+	for (auto const& level : levelTable) {
+		auto const it = framesTable.find(level.first);
+		if (it == framesTable.end()) {
+			continue;
+		}
+		levels.push_back(std::make_pair(level.second, (*it).second));
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -413,10 +418,7 @@ void cleanupLevel(TXshSimpleLevel *xl, std::set<TFrameId> fidsInXsheet,
 	m_userLog.info(info);
 	DVGui::info(QString::fromStdString(info));
 	bool firstImage = true;
-	std::set<TFrameId>::iterator it = fidsInXsheet.begin();
-	for (it; it != fidsInXsheet.end(); it++) {
-		TFrameId fid = *it;
-
+	for (auto const& fid : fidsInXsheet) {
 		cout << "  " << fid << endl;
 		info = "  " + fid.expand();
 		m_userLog.info(info);

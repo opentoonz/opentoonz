@@ -310,7 +310,7 @@ int BinarizePopup::getSelectedFrames()
 	TCellSelection *cellSelection;
 	TFilmstripSelection *filmstripSelection;
 	int count = 0;
-	if (cellSelection = dynamic_cast<TCellSelection *>(selection)) {
+	if ((cellSelection = dynamic_cast<TCellSelection *>(selection))) {
 		std::set<TRasterImage *> images;
 		int r0, c0, r1, c1;
 		cellSelection->getSelectedCells(r0, c0, r1, c1);
@@ -331,7 +331,7 @@ int BinarizePopup::getSelectedFrames()
 				}
 			}
 		}
-	} else if (filmstripSelection = dynamic_cast<TFilmstripSelection *>(selection)) {
+	} else if ((filmstripSelection = dynamic_cast<TFilmstripSelection *>(selection))) {
 		TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
 		if (sl) {
 			std::set<TFrameId> fids = filmstripSelection->getSelectedFids();

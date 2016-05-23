@@ -225,8 +225,7 @@ void MagpieFileImportPopup::onOkPressed()
 	QList<QString> commentList;
 	int commentCount = comments.size();
 	int actorActsCount = actorActs.size();
-	int i = from;
-	for (i; i <= to; i++) {
+	for (int i = from; i <= to; i++) {
 		if (commentCount <= i || actorActsCount <= i)
 			continue;
 		commentList.append(comments.at(i));
@@ -235,8 +234,7 @@ void MagpieFileImportPopup::onOkPressed()
 			frameList.push_back(TFrameId());
 			continue;
 		}
-		int j;
-		for (j = 0; j < m_actFields.size(); j++) {
+		for (int j = 0; j < m_actFields.size(); j++) {
 			DVGui::IntLineEdit *field = m_actFields.at(j).second;
 			QString act = field->property("act").toString();
 			if (actorAct != act)

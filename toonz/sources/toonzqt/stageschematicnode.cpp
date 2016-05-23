@@ -6,6 +6,7 @@
 #include "tconvert.h"
 #include "tvectorimage.h"
 #include "tundo.h"
+#include "tconst.h"
 
 // TnzLib includes
 #include "toonz/tstageobjectid.h"
@@ -2401,7 +2402,11 @@ void StageSchematicGroupNode::updateObjsDagPosition(const TPointD &pos) const
 	TPointD delta = pos - oldPos;
 	int i;
 	for (i = 0; i < m_groupedObj.size(); i++)
-		m_groupedObj[i]->setDagNodePos(m_groupedObj[i]->getDagNodePos() + delta);
+	{
+		// If the node position is unidentified, then leave the placement of it to placeNode() function.
+		if (m_groupedObj[i]->getDagNodePos() != TConst::nowhere)
+			m_groupedObj[i]->setDagNodePos(m_groupedObj[i]->getDagNodePos() + delta);
+	}
 }
 
 //--------------------------------------------------------
