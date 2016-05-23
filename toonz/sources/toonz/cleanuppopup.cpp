@@ -935,7 +935,7 @@ QString CleanupPopup::setupLevel()
 
 		/*--- Cleanup後にPaletteを元に戻すため、Paletteを保持しておく ---*/
 		if (m_keepOriginalPalette) {
-			if (sl->getType() == TZP_XSHLEVEL || sl->getType() == TZI_XSHLEVEL)
+			if ((sl->getType() == TZP_XSHLEVEL || sl->getType() == TZI_XSHLEVEL) && sl->getPalette() != NULL)
 				m_originalPalette = sl->getPalette()->clone();
 			else /*--- 既にCleanup済みだが、再びTIFファイルからCleanupを行う場合 ---*/
 			{
