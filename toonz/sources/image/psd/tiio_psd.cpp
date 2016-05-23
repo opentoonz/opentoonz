@@ -40,7 +40,7 @@ TLevelReaderPsd::TLevelReaderPsd(const TFilePath &path)
 #ifdef REF_LAYER_BY_NAME
 		if (layerStr != "frames") {
 			TPSDParser psdparser(m_path);
-			m_layerId = psdparser.getLevelIdByName(layerStr.toStdString());
+			m_layerId = psdparser.getLevelIdByName(layerStr.toLocal8Bit().constData());
 		} else
 			m_layerId = layerStr.toInt();
 #else

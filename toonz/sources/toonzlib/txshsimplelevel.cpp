@@ -1106,7 +1106,7 @@ TFilePath getLevelPathAndSetNameWithPsdLevelName(TXshSimpleLevel *xshLevel)
 			TPSDParser psdparser(xshLevel->getScene()->decodeFilePath(retfp));
 			std::string levelName = psdparser.getLevelNameWithCounter(layid); // o_o  what about UNICODE names??
 
-			list[1] = QString::fromStdString(levelName);
+			list[1] = QString::fromLocal8Bit(levelName.c_str());
 
 			std::wstring wLevelName = list.join("#").toStdWString();
 			retfp = retfp.withName(wLevelName);
