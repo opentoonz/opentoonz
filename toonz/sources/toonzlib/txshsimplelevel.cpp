@@ -1106,7 +1106,11 @@ TFilePath getLevelPathAndSetNameWithPsdLevelName(TXshSimpleLevel *xshLevel)
 			TPSDParser psdparser(xshLevel->getScene()->decodeFilePath(retfp));
 			std::string levelName = psdparser.getLevelNameWithCounter(layid); // o_o  what about UNICODE names??
 
+#ifdef _WIN32
+			list[1] = QString::fromLocal8Bit(levelName.c_str());
+#else /*- For OSX (still unable to load layer with non-ASCII name) -*/
 			list[1] = QString::fromStdString(levelName);
+#endif
 
 			std::wstring wLevelName = list.join("#").toStdWString();
 			retfp = retfp.withName(wLevelName);

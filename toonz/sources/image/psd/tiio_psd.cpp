@@ -40,7 +40,11 @@ TLevelReaderPsd::TLevelReaderPsd(const TFilePath &path)
 #ifdef REF_LAYER_BY_NAME
 		if (layerStr != "frames") {
 			TPSDParser psdparser(m_path);
+#ifdef _WIN32
+			m_layerId = psdparser.getLevelIdByName(layerStr.toLocal8Bit().constData());
+#else /*- For OSX (still unable to load layer with non-ASCII name) -*/
 			m_layerId = psdparser.getLevelIdByName(layerStr.toStdString());
+#endif
 		} else
 			m_layerId = layerStr.toInt();
 #else
