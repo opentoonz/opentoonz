@@ -1135,7 +1135,7 @@ Tiio::AviWriterProperties::AviWriterProperties()
 				memset(&icinfo, 0, sizeof icinfo);
 				if (!safe_ICInfo(fccType, i, &icinfo)) {
 					break;
-					}
+				}
 
 				auto const hic = safe_ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_QUERY);
 				if (!hic) {
@@ -1145,29 +1145,29 @@ Tiio::AviWriterProperties::AviWriterProperties()
 				// Find out the compressor name
 				if (safe_ICGetInfo(hic, &icinfo, sizeof(ICINFO)) == 0) {
 					break;
-					}
+				}
 
-					WideChar2Char(icinfo.szDescription, descr, sizeof(descr));
-					WideChar2Char(icinfo.szName, name, sizeof(name));
+				WideChar2Char(icinfo.szDescription, descr, sizeof(descr));
+				WideChar2Char(icinfo.szName, name, sizeof(name));
 				if ((strstr(name, "IYUV") != 0) || ((strstr(name, "IR32") != 0) && (bpp == 24))) {
-						continue;
-					}
+					continue;
+				}
 
-					std::string compressorName;
-					compressorName = std::string(name) + " '" + std::to_string(bpp) + "' " + std::string(descr);
+				std::string compressorName;
+				compressorName = std::string(name) + " '" + std::to_string(bpp) + "' " + std::string(descr);
 
 				// per il momento togliamo i codec indeo
 				if (std::string(compressorName).find("Indeo") != -1) {
-						continue;
-					}
+					continue;
+				}
 
 				if (safe_ICCompressQuery(hic, &inFmt, nullptr) != ICERR_OK) {
-						continue; // Skip this compressor if it can't handle the format.
-					}
+					continue; // Skip this compressor if it can't handle the format.
+				}
 
 				m_defaultCodec.addValue(::to_wstring(compressorName));
 				if (compressorName.find("inepak") != -1) {
-						m_defaultCodec.setValue(::to_wstring(compressorName));
+					m_defaultCodec.setValue(::to_wstring(compressorName));
 				}
 			}
 		}
