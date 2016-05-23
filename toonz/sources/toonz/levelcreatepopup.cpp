@@ -392,7 +392,8 @@ bool LevelCreatePopup::apply()
 	double w = m_widthFld->getValue();
 	double h = m_heightFld->getValue();
 	double dpi = m_dpiFld->getValue();
-	int xres = tround(w * dpi), yres = tround(h * dpi);
+	int xres = std::max(tround(w * dpi), 1);
+	int yres = std::max(tround(h * dpi), 1);
 	int lType = getLevelType();
 
 	std::wstring levelName = m_nameFld->text().toStdWString();

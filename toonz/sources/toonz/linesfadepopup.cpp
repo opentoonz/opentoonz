@@ -402,10 +402,9 @@ void LinesFadePopup::apply()
 		TXshSimpleLevel *simpleLevel = TApp::instance()->getCurrentLevel()->getSimpleLevel();
 		if (simpleLevel) {
 			std::set<TFrameId> fids = filmstripSelection->getSelectedFids();
-			std::set<TFrameId>::iterator it = fids.begin();
 			bool oneImageChanged = false;
-			for (it; it != fids.end(); it++) {
-				TRasterImageP rasImage = (TRasterImageP)simpleLevel->getFrame(*it, true);
+			for (auto const& fid : fids) {
+				TRasterImageP rasImage = (TRasterImageP)simpleLevel->getFrame(fid, true);
 				;
 				if (!rasImage)
 					continue;
@@ -414,9 +413,9 @@ void LinesFadePopup::apply()
 					continue;
 				oneImageChanged = true;
 				onChange(ras, ras, color, intensity);
-				simpleLevel->touchFrame(*it);
+				simpleLevel->touchFrame(fid);
 				simpleLevel->setDirtyFlag(true);
-				IconGenerator::instance()->invalidate(simpleLevel, *it);
+				IconGenerator::instance()->invalidate(simpleLevel, fid);
 			}
 			if (oneImageChanged) {
 				close();

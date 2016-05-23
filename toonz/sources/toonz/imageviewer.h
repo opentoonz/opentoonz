@@ -3,10 +3,12 @@
 #ifndef IMAGEVIEWER_INCLUDE
 #define IMAGEVIEWER_INCLUDE
 
+//iwsw commented out temporarily
+//#include "toonzqt/ghibli_3dlut_util.h"
+
 #include "toonz/imagepainter.h"
 
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions_3_0>
+#include <QGLWidget>
 
 //-----------------------------------------------------------------------------
 
@@ -20,7 +22,7 @@ class HistogramPopup;
 //    ImageViewer
 //--------------------
 
-class ImageViewer : public QOpenGLWidget, private QOpenGLFunctions_3_0
+class ImageViewer : public QGLWidget
 {
 	Q_OBJECT
 	enum DragType { eNone,
@@ -56,6 +58,9 @@ class ImageViewer : public QOpenGLWidget, private QOpenGLFunctions_3_0
 	//a flipbook shows a red border line before the rendered result is shown.
 	bool m_isRemakingPreviewFx;
 
+	//iwsw commented out temporarily
+	//Ghibli3DLutUtil * m_ghibli3DLutUtil;
+
 	int getDragType(const TPoint &pos, const TRect &loadBox);
 	void updateLoadbox(const TPoint &curPos);
 	void updateCursor(const TPoint &curPos);
@@ -67,6 +72,7 @@ class ImageViewer : public QOpenGLWidget, private QOpenGLFunctions_3_0
 
 public:
 	ImageViewer(QWidget *parent, FlipBook *flipbook, bool showHistogram);
+	~ImageViewer();
 
 	void setIsColorModel(bool isColorModel) { m_isColorModel = isColorModel; }
 	bool isColorModel() { return m_isColorModel; }
@@ -100,21 +106,28 @@ public:
 	void adaptView(const TRect &imgRect, const TRect &viewRect);
 	void adaptView(const QRect &viewerRect);
 
-	void doSwapBuffers();
-	void changeSwapBehavior(bool enable);
+	void doSwapBuffers()
+	{
+		swapBuffers();
+		glFlush();
+	}
+	void changeSwapBehavior(bool enable) { setAutoBufferSwap(enable); }
+
+	//iwsw commented out temporarily
+	//Ghibli3DLutUtil* get3DLutUtil(){ return m_ghibli3DLutUtil; }
 
 protected:
-	void contextMenuEvent(QContextMenuEvent *event) override;
-	void initializeGL() override;
-	void resizeGL(int width, int height) override;
-	void paintGL() override;
+	void contextMenuEvent(QContextMenuEvent *event);
+	void initializeGL();
+	void resizeGL(int width, int height);
+	void paintGL();
 
-	void mouseMoveEvent(QMouseEvent *event) override;
-	void mousePressEvent(QMouseEvent *event) override;
-	void mouseReleaseEvent(QMouseEvent *event) override;
-	void keyPressEvent(QKeyEvent *event) override;
-	void mouseDoubleClickEvent(QMouseEvent *event) override;
-	void wheelEvent(QWheelEvent *) override;
+	void mouseMoveEvent(QMouseEvent *event);
+	void mousePressEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
+	void keyPressEvent(QKeyEvent *event);
+	void mouseDoubleClickEvent(QMouseEvent *event);
+	void wheelEvent(QWheelEvent *);
 
 	void panQt(const QPoint &delta);
 	void zoomQt(const QPoint &center, double factor);

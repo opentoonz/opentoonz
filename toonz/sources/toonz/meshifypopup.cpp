@@ -746,7 +746,7 @@ void MeshifyPopup::acquirePreview()
 			m_cell = xsh->getCell(m_r, childId.getIndex());
 	}
 
-	if (sl = m_cell.getSimpleLevel()) {
+	if ((sl = m_cell.getSimpleLevel())) {
 		// Standard image case
 		m_viewer->m_img = sl->getFullsampledFrame(m_cell.getFrameId(), ImageManager::dontPutInCache);
 

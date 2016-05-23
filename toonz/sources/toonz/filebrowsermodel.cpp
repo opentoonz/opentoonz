@@ -53,6 +53,31 @@ TFilePath getMyDocumentsPath()
 	return TFilePath();
 #endif
 }
+
+//Desktop Path
+TFilePath getDesktopPath()
+{
+#ifdef _WIN32
+	WCHAR szPath[MAX_PATH];
+	if (SHGetSpecialFolderPath(NULL, szPath, CSIDL_DESKTOP, 0)) {
+		return TFilePath(szPath);
+	}
+	return TFilePath();
+#elif defined MACOSX
+	NSArray *foundref = NSSearchPathForDirectoriesInDomains(
+		NSDesktopDirectory,
+		NSUserDomainMask,
+		YES);
+	if (!foundref)
+		return TFilePath();
+	int c = [foundref count];
+	assert(c == 1);
+	NSString *desktopDirectory = [foundref objectAtIndex : 0];
+	return TFilePath((const char *)[desktopDirectory cStringUsingEncoding : NSASCIIStringEncoding]);
+#else
+	return TFilePath();
+#endif
+}
 }
 
 //=============================================================================
@@ -1186,6 +1211,10 @@ void DvDirModelRootNode::refreshChildren()
 		DvDirModelSpecialFileFolderNode *child;
 		child = new DvDirModelSpecialFileFolderNode(this, L"My Documents", getMyDocumentsPath());
 		child->setPixmap(QPixmap(":Resources/my_documents.png"));
+		addChild(child);
+
+		child = new DvDirModelSpecialFileFolderNode(this, L"Desktop", getDesktopPath());
+		child->setPixmap(QPixmap(":Resources/desktop.png"));
 		addChild(child);
 
 		child = new DvDirModelSpecialFileFolderNode(this, L"Library", ToonzFolder::getLibraryFolder());

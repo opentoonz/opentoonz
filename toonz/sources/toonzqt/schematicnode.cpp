@@ -849,12 +849,10 @@ void SchematicNode::mouseMoveEvent(QGraphicsSceneMouseEvent *me)
 	QList<QGraphicsItem *> items = scene()->selectedItems();
 	if (items.empty())
 		return;
-	QList<QGraphicsItem *>::iterator it = items.begin();
 	QPointF delta = me->scenePos() - me->lastScenePos();
 	QGraphicsView *viewer = scene()->views()[0];
-	it = items.begin();
-	for (it; it != items.end(); it++) {
-		SchematicNode *node = dynamic_cast<SchematicNode *>(*it);
+	for (auto const& item : items) {
+		SchematicNode *node = dynamic_cast<SchematicNode *>(item);
 		if (node) {
 			node->setPosition(node->scenePos() + delta);
 			node->setSchematicNodePos(node->scenePos());
