@@ -768,7 +768,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(QWidget *parent, TTool *tool, TProperty
 			globalKeyLay->addWidget(m_globalKey, 0);
 		}
 
-		mainLay->addStretch(1);
+		mainLay->addSpacing(3);
 
 
 		mainLay->addStretch(1);
