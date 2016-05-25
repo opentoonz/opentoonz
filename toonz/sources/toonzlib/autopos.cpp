@@ -1607,7 +1607,7 @@ static int compare_dots(DOT const dots[], int ndots, DOT reference[], int ref_do
 	int toll;
 	float tolld;
 	int i, j, k;
-	short *dot_ok = 0;
+	bool *dot_ok = 0;
 	float *ref_dis = 0, dx, dy;
 	float vmin, v, dist_i_j, dist_i_k, dist_j_k, del1, del2;
 	float ref_dis_0_1, ref_dis_1_2;
@@ -1623,7 +1623,7 @@ static int compare_dots(DOT const dots[], int ndots, DOT reference[], int ref_do
 	}
 
 	/* controllo quanti dots sono realmente buoni per il confronto */
-	dot_ok = (short *)calloc(ndots, sizeof(short));
+	dot_ok = (bool *)calloc(ndots, sizeof(bool));
 	found = 0;
 
 	for (i = 0; i < ndots; i++) {
