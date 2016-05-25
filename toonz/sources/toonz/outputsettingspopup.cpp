@@ -112,7 +112,7 @@ enum GranularityOption {
 OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 	: Dialog(TApp::instance()->getMainWindow(),
 			 false,
-			 Preferences::instance()->getCurrentLanguage() == "english",
+			 Preferences::instance()->getCurrentLanguage() == "English",
 			 isPreview ? "PreviewSettings" : "OutputSettings"),
 	  m_subcameraChk(0), m_applyShrinkChk(0), m_outputCameraOm(0), m_isPreviewSettings(isPreview), m_presetCombo(0)
 {

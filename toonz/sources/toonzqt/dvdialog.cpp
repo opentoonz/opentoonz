@@ -273,7 +273,7 @@ void Dialog::moveEvent(QMoveEvent *e)
 
 void Dialog::resizeEvent(QResizeEvent *e)
 {
-	if (Preferences::instance()->getCurrentLanguage() != "english") {
+	if (Preferences::instance()->getCurrentLanguage() != "English") {
 		QSize t = this->size();
 		QLabel *s;
 		foreach (s, m_labelList)

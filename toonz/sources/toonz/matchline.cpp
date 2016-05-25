@@ -962,7 +962,7 @@ std::vector<TFrameId> DeleteInkDialog::getFrames()
 }
 
 DeleteInkDialog::DeleteInkDialog(const QString &str, int inkIndex)
-	: Dialog(TApp::instance()->getMainWindow(), true, Preferences::instance()->getCurrentLanguage() == "english", "DeleteInk")
+	: Dialog(TApp::instance()->getMainWindow(), true, Preferences::instance()->getCurrentLanguage() == "English", "DeleteInk")
 {
 	setWindowTitle(tr("Delete Lines"));
 

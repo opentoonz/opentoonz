@@ -347,7 +347,7 @@ Preferences::Preferences()
 
 	TFilePath lang_path = TEnv::getConfigDir() + "loc";
 	TFilePathSet lang_fpset;
-	m_languageMaps[0] = "english";
+	m_languageMaps[0] = "English";
 	//m_currentLanguage=0;
 	try {
 		TFileStatus langPathFs(lang_path);

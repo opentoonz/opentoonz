@@ -190,7 +190,7 @@ void makeTransparent(const TRaster32P &ras)
 //-----------------------------------------------------------------------------
 
 DefineScannerPopup::DefineScannerPopup()
-	: Dialog(TApp::instance()->getMainWindow(), true, Preferences::instance()->getCurrentLanguage() == "english", "DefineScanner")
+	: Dialog(TApp::instance()->getMainWindow(), true, Preferences::instance()->getCurrentLanguage() == "English", "DefineScanner")
 {
 #ifdef MACOSX
 	setModal(false);
