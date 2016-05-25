@@ -5934,7 +5934,7 @@ some regions are too high.</source>
         <translation>距離しきい値のエラー</translation>
     </message>
     <message>
-        <source>Sensibility Error</source>
+        <source>Sensitivity Error</source>
         <translation>感度のエラー</translation>
     </message>
     <message>
@@ -8946,7 +8946,7 @@ Click the arrow button to create a new sub-xsheet</source>
         <translation>しきい値：</translation>
     </message>
     <message>
-        <source>Sensibility:</source>
+        <source>Sensitivity:</source>
         <translation>検出感度：</translation>
     </message>
     <message>

@@ -5917,8 +5917,8 @@ alcune regioni sono troppo alte.</translation>
         <translation type="unfinished">Errore nella soglia di distanza</translation>
     </message>
     <message>
-        <source>Sensibility Error</source>
-        <translation type="unfinished">Errore di Sensibilità</translation>
+        <source>Sensitivity Error</source>
+        <translation>Errore di Sensibilità</translation>
     </message>
     <message>
         <source>No Frame Found</source>
@@ -8951,8 +8951,8 @@ Clicca la freccia per creare un nuovo sub-xsheet</translation>
         <translation type="unfinished">Soglia:</translation>
     </message>
     <message>
-        <source>Sensibility:</source>
-        <translation type="unfinished">Sensibilità:</translation>
+        <source>Sensitivity:</source>
+        <translation>Sensibilità:</translation>
     </message>
     <message>
         <source>Variable Region Size</source>

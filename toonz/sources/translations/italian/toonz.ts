@@ -5912,7 +5912,7 @@ alcune regioni sono troppo alte.</translation>
         <translation>Errore nella soglia di distanza</translation>
     </message>
     <message>
-        <source>Sensibility Error</source>
+        <source>Sensitivity Error</source>
         <translation>Errore di Sensibilità</translation>
     </message>
     <message>
@@ -8930,7 +8930,7 @@ Clicca la freccia per creare un nuovo sub-xsheet</translation>
         <translation>Soglia:</translation>
     </message>
     <message>
-        <source>Sensibility:</source>
+        <source>Sensitivity:</source>
         <translation>Sensibilità:</translation>
     </message>
     <message>

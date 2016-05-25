@@ -5945,7 +5945,7 @@ some regions are too high.</source>
         <translation>阀值距离错误</translation>
     </message>
     <message>
-        <source>Sensibility Error</source>
+        <source>Sensitivity Error</source>
         <translation>灵敏度错误</translation>
     </message>
     <message>
@@ -8973,7 +8973,7 @@ Click the arrow button to create a new sub-xsheet</source>
         <translation>阀值：</translation>
     </message>
     <message>
-        <source>Sensibility:</source>
+        <source>Sensitivity:</source>
         <translation>灵敏度：</translation>
     </message>
     <message>

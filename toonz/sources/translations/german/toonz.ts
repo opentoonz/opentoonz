@@ -6133,7 +6133,7 @@ Einige Flächen sind zu hoch.</translation>
         <translation>Abstand-Schwellwert-Fehler</translation>
     </message>
     <message>
-        <source>Sensibility Error</source>
+        <source>Sensitivity Error</source>
         <translation>Empfindlichkeit-Fehler</translation>
     </message>
     <message>
@@ -9192,7 +9192,7 @@ Click the arrow button to create a new sub-xsheet</source>
         <translation>Schwellenwert:</translation>
     </message>
     <message>
-        <source>Sensibility:</source>
+        <source>Sensitivity:</source>
         <translation>Empfindlichkeit:</translation>
     </message>
     <message>
