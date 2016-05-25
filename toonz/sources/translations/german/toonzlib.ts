@@ -146,7 +146,7 @@ Wahrscheinlich funktioniert der Codec nicht korrekt.</translation>
     </message>
     <message>
         <source>Add Style to Palette %1</source>
-        <translation>Stil zu Palette %1 hinzufügen</translation>
+        <translation type="vanished">Stil zu Palette %1 hinzufügen</translation>
     </message>
     <message>
         <source>Add Page %1 to Palette %2</source>
@@ -327,6 +327,10 @@ Wahrscheinlich funktioniert der Codec nicht korrekt.</translation>
     <message>
         <source>Move Center   %1  Frame %2</source>
         <translation>Verschiebe Zentrum %1 Frame %2</translation>
+    </message>
+    <message>
+        <source>Add Style  to Palette %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

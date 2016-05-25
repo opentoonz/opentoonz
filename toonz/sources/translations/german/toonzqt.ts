@@ -5,7 +5,7 @@
     <name>AddFxContextMenu</name>
     <message>
         <source>Insert Fx</source>
-        <translation>FX einsetzen</translation>
+        <translation type="vanished">FX einsetzen</translation>
     </message>
     <message>
         <source>Add FX</source>
@@ -26,6 +26,10 @@
     <message>
         <source>Replace </source>
         <translation>Ersetzen</translation>
+    </message>
+    <message>
+        <source>Insert FX</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -121,6 +125,14 @@ Possibly the preset file has been corrupted</source>
         <source>Force Squared Pixel</source>
         <translation>Quadratische Pixel erzwingen</translation>
     </message>
+    <message>
+        <source>Error : Preset Name is Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The preset name must not use &apos;,&apos;(comma).</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -203,11 +215,15 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui</name>
     <message>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="vanished">Ok</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1446,11 +1462,7 @@ Wählen Sie Effekt-Nodes und verwandte Links, die Sie einfügen möchten, bevor 
     </message>
     <message>
         <source>Fx Schematic</source>
-        <translation>Effekt-Schaubild</translation>
-    </message>
-    <message>
-        <source>Fx Schematic</source>
-        <translation type="vanished">Schaubild[Effekt]</translation>
+        <translation type="vanished">Effekt-Schaubild</translation>
     </message>
     <message>
         <source>Save Motion Path</source>
@@ -1491,16 +1503,16 @@ Wählen Sie Effekt-Nodes und verwandte Links, die Sie einfügen möchten, bevor 
     <message>
         <source>This feature is not available in the demo version.
 For more information visit the %1 site:</source>
-        <translation>Dieses Feature ist in der Demo-Version nicht verfügbar.
+        <translation type="vanished">Dieses Feature ist in der Demo-Version nicht verfügbar.
 Für mehr Informationen besuchen Sie die Seite %1:</translation>
     </message>
     <message>
         <source>To request a trial license please contact </source>
-        <translation>Um eine Probelizenz zu beantragen, kontaktieren Sie bitte </translation>
+        <translation type="vanished">Um eine Probelizenz zu beantragen, kontaktieren Sie bitte </translation>
     </message>
     <message>
         <source>For further information visit </source>
-        <translation>Für weitere Informationen besuchen Sie </translation>
+        <translation type="vanished">Für weitere Informationen besuchen Sie </translation>
     </message>
     <message>
         <source>Fullpath:     </source>
@@ -1676,7 +1688,7 @@ Für mehr Informationen besuchen Sie die Seite %1:</translation>
     </message>
     <message>
         <source>Toonz 7.1</source>
-        <translation>OpenToonz</translation>
+        <translation type="vanished">OpenToonz</translation>
     </message>
     <message>
         <source>The file name cannot be empty or contain any of the following characters: (new line) \ / : * ? &quot; |</source>
@@ -1843,12 +1855,24 @@ Sind Sie sicher?</translation>
         <source>Set</source>
         <translation>Einstellen</translation>
     </message>
+    <message>
+        <source>FX Schematic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenToonz 1.0</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QPushButton</name>
     <message>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="vanished">Ok</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1899,6 +1923,10 @@ Sind Sie sicher?</translation>
     <message>
         <source>&amp;Schematic Toggle</source>
         <translation type="vanished">Schaubild umschalten</translation>
+    </message>
+    <message>
+        <source>&amp;Swtich output port display mode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2126,7 +2154,7 @@ anwenden</translation>
     <name>StyleEditorGUI::PlainColorPage</name>
     <message>
         <source>Wheel</source>
-        <translation>Farbrad<translation>
+        <translation>Farbrad</translation>
     </message>
     <message>
         <source>HSV</source>
@@ -2156,7 +2184,7 @@ anwenden</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="vanished">Ok</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -2173,6 +2201,10 @@ anwenden</translation>
     <message>
         <source>Name Editor: # %1</source>
         <translation>Stil-Name bearbeiten: # %1</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

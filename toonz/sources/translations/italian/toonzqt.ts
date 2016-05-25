@@ -122,6 +122,14 @@ E&apos; possibile che il file sia corrotto.</translation>
         <source>Force Squared Pixel</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Error : Preset Name is Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The preset name must not use &apos;,&apos;(comma).</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -1474,7 +1482,7 @@ Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare 
     </message>
     <message>
         <source>For further information visit </source>
-        <translation>Per ulteriori informazioni visita </translation>
+        <translation type="vanished">Per ulteriori informazioni visita </translation>
     </message>
     <message>
         <source>Fullpath:     </source>
@@ -1650,7 +1658,7 @@ Seleziona i nodi Effetto ed i relativi collegamenti prima di copiare o tagliare 
     </message>
     <message>
         <source>Toonz 7.1</source>
-        <translation>Toonz 7.1</translation>
+        <translation type="vanished">Toonz 7.1</translation>
     </message>
     <message>
         <source>The file name cannot be empty or contain any of the following characters: (new line) \ / : * ? &quot; |</source>
@@ -1815,6 +1823,10 @@ Are you sure?</source>
         <source>Set</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>OpenToonz 1.0</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QPushButton</name>
@@ -1871,6 +1883,10 @@ Are you sure?</source>
     <message>
         <source>&amp;Schematic Toggle</source>
         <translation type="vanished">&amp;Diagramma Effetti/Scena</translation>
+    </message>
+    <message>
+        <source>&amp;Swtich output port display mode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

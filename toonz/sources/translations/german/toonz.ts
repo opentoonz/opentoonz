@@ -112,7 +112,7 @@
         <translation>Es ist nicht möglich die Anpassungslinien anzuweden, da keine Spalte gewählt wurde.</translation>
     </message>
     <message>
-        <source>It is not possible to apply the match lines because two columns have to be seleted.</source>
+        <source>It is not possible to apply the match lines because two columns have to be selected.</source>
         <translation>Es ist nicht möglich die Anpassungslinien anzuwenden, da zwei Spalten gewählt sein müssen.</translation>
     </message>
 </context>
@@ -749,11 +749,22 @@ What do you want to do?</source>
     <name>CloneLevelUndo:: LevelNamePopup</name>
     <message>
         <source>Clone Level</source>
-        <translation>Ebene duplizieren</translation>
+        <translation type="vanished">Ebene duplizieren</translation>
     </message>
     <message>
         <source>Level Name:</source>
-        <translation>Name der Ebene:</translation>
+        <translation type="vanished">Name der Ebene:</translation>
+    </message>
+</context>
+<context>
+    <name>CloneLevelUndo::LevelNamePopup</name>
+    <message>
+        <source>Clone Level</source>
+        <translation type="unfinished">Ebene duplizieren</translation>
+    </message>
+    <message>
+        <source>Level Name:</source>
+        <translation type="unfinished">Name der Ebene:</translation>
     </message>
 </context>
 <context>
@@ -828,6 +839,13 @@ What do you want to do?</source>
     <message>
         <source>Level: </source>
         <translation>Ebene:</translation>
+    </message>
+</context>
+<context>
+    <name>CommandListTree</name>
+    <message>
+        <source>----Separator----</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1025,7 +1043,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>StrOke Mode:</source>
-        <translation>Von PLI zu SVG umwandeln:</translation>
+        <translation type="vanished">Von PLI zu SVG umwandeln:</translation>
     </message>
     <message>
         <source>Centerline</source>
@@ -1062,6 +1080,10 @@ What do you want to do?</source>
     <message>
         <source>Palette:</source>
         <translation>Palette :</translation>
+    </message>
+    <message>
+        <source>Stroke Mode:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1110,7 +1132,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="vanished">Ok</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1370,67 +1396,134 @@ What do you want to do?</source>
     <name>ExportLevelPopup:: ExportOptions</name>
     <message>
         <source>Background Color:</source>
-        <translation>Hintergrundfarbe:</translation>
+        <translation type="vanished">Hintergrundfarbe:</translation>
     </message>
     <message>
         <source>No Antialias</source>
-        <translation>Binarisieren</translation>
+        <translation type="vanished">Binarisieren</translation>
     </message>
     <message>
         <source>Vectors Export Box</source>
-        <translation>Vektor-Export-Einstellungen</translation>
+        <translation type="vanished">Vektor-Export-Einstellungen</translation>
     </message>
     <message>
         <source>Width:</source>
-        <translation>Breite:</translation>
+        <translation type="vanished">Breite:</translation>
     </message>
     <message>
         <source>Height:</source>
-        <translation>Höhe:</translation>
+        <translation type="vanished">Höhe:</translation>
     </message>
     <message>
         <source>H Resolution:</source>
-        <translation>H Auflösung:</translation>
+        <translation type="vanished">H Auflösung:</translation>
     </message>
     <message>
         <source>V Resolution:</source>
-        <translation>V Auflösung:</translation>
+        <translation type="vanished">V Auflösung:</translation>
     </message>
     <message>
         <source>DPI: </source>
-        <translation>DPI:</translation>
+        <translation type="vanished">DPI:</translation>
     </message>
     <message>
         <source>Vectors Thickness</source>
-        <translation>Vektoren-Dicke</translation>
+        <translation type="vanished">Vektoren-Dicke</translation>
     </message>
     <message>
         <source>Mode:</source>
-        <translation>Modus:</translation>
+        <translation type="vanished">Modus:</translation>
     </message>
     <message>
         <source>Scale Thickness</source>
-        <translation>Linien-Dicke skalieren</translation>
+        <translation type="vanished">Linien-Dicke skalieren</translation>
     </message>
     <message>
         <source>Add Thickness</source>
-        <translation>Linien-Dicke hinzufügen</translation>
+        <translation type="vanished">Linien-Dicke hinzufügen</translation>
     </message>
     <message>
         <source>Constant Thickness</source>
-        <translation>Konstante Dicke</translation>
+        <translation type="vanished">Konstante Dicke</translation>
     </message>
     <message>
         <source>Start:</source>
-        <translation>Start:</translation>
+        <translation type="vanished">Start:</translation>
     </message>
     <message>
         <source>End:</source>
-        <translation>Ende:</translation>
+        <translation type="vanished">Ende:</translation>
     </message>
     <message>
         <source>Scale:</source>
-        <translation>Größe ändern:</translation>
+        <translation type="vanished">Größe ändern:</translation>
+    </message>
+</context>
+<context>
+    <name>ExportLevelPopup::ExportOptions</name>
+    <message>
+        <source>Background Color:</source>
+        <translation type="unfinished">Hintergrundfarbe:</translation>
+    </message>
+    <message>
+        <source>No Antialias</source>
+        <translation type="unfinished">Binarisieren</translation>
+    </message>
+    <message>
+        <source>Vectors Export Box</source>
+        <translation type="unfinished">Vektor-Export-Einstellungen</translation>
+    </message>
+    <message>
+        <source>Width:</source>
+        <translation type="unfinished">Breite:</translation>
+    </message>
+    <message>
+        <source>Height:</source>
+        <translation type="unfinished">Höhe:</translation>
+    </message>
+    <message>
+        <source>H Resolution:</source>
+        <translation type="unfinished">H Auflösung:</translation>
+    </message>
+    <message>
+        <source>V Resolution:</source>
+        <translation type="unfinished">V Auflösung:</translation>
+    </message>
+    <message>
+        <source>Scale:</source>
+        <translation type="unfinished">Größe ändern:</translation>
+    </message>
+    <message>
+        <source>Vectors Thickness</source>
+        <translation type="unfinished">Vektoren-Dicke</translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation type="unfinished">Modus:</translation>
+    </message>
+    <message>
+        <source>Scale Thickness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Thickness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Constant Thickness</source>
+        <translation type="unfinished">Konstante Dicke</translation>
+    </message>
+    <message>
+        <source>Start:</source>
+        <translation type="unfinished">Start:</translation>
+    </message>
+    <message>
+        <source>End:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DPI: </source>
+        <translation type="unfinished">DPI:</translation>
     </message>
 </context>
 <context>
@@ -1681,7 +1774,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="vanished">Ok</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1702,6 +1795,10 @@ What do you want to do?</source>
     <message>
         <source>Apply</source>
         <translation>Anwenden</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1786,45 +1883,89 @@ What do you want to do?</source>
     <name>FlipBoOk</name>
     <message>
         <source>FlipboOk</source>
-        <translation>Flipbook</translation>
+        <translation type="vanished">Flipbook</translation>
     </message>
     <message>
         <source>Rendered Frames  ::  From %1 To %2  ::  Step %3</source>
-        <translation>Gerenderte Framess :: Frame %1 bis %2 :: Schritt %3</translation>
+        <translation type="vanished">Gerenderte Framess :: Frame %1 bis %2 :: Schritt %3</translation>
     </message>
     <message>
         <source>  ::  Shrink </source>
-        <translation>::Schrumpfen</translation>
+        <translation type="vanished">::Schrumpfen</translation>
     </message>
     <message>
         <source>It is not possible to save FlipboOk content.</source>
-        <translation>Der Flipbook-Inhalt kann nicht gespeichert werden.</translation>
+        <translation type="vanished">Der Flipbook-Inhalt kann nicht gespeichert werden.</translation>
     </message>
     <message>
         <source>Saved %1 frames out of %2 in %3</source>
-        <translation>%1 Frames von %2 wurden in %3 gespeichert</translation>
+        <translation type="vanished">%1 Frames von %2 wurden in %3 gespeichert</translation>
     </message>
     <message>
         <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
-        <translation>Der Dateiname darf nicht leer sein oder folgende Zeichen enthalten: (new line)  \ / : * ? &quot;  |</translation>
+        <translation type="vanished">Der Dateiname darf nicht leer sein oder folgende Zeichen enthalten: (new line)  \ / : * ? &quot;  |</translation>
     </message>
     <message>
         <source>It is not possible to save because the selected file format is not supported.</source>
-        <translation>Es kann nicht gespeichert werden, da das gewählte Datei-Format nicht unterstützt wird.</translation>
+        <translation type="vanished">Es kann nicht gespeichert werden, da das gewählte Datei-Format nicht unterstützt wird.</translation>
     </message>
     <message>
         <source>There are no rendered images to save.</source>
-        <translation>Es gibt keine gerenderten Bilder zum speichern.</translation>
+        <translation type="vanished">Es gibt keine gerenderten Bilder zum speichern.</translation>
     </message>
     <message>
         <source>It is not possible to take or compare snapshots for Toonz vector levels.</source>
-        <translation>Es ist nicht möglich Snapshots von Toonz Vektor-Ebenen zu erstellen oder zu vergleichen.</translation>
+        <translation type="vanished">Es ist nicht möglich Snapshots von Toonz Vektor-Ebenen zu erstellen oder zu vergleichen.</translation>
     </message>
     <message>
         <source>File %1 already exists.
 Do you want to overwrite it?</source>
-        <translation>Die Datei %1 existiert bereits.
+        <translation type="vanished">Die Datei %1 existiert bereits.
 Möchten Sie sie überschreiben?</translation>
+    </message>
+</context>
+<context>
+    <name>FlipBook</name>
+    <message>
+        <source>Flipbook</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file name cannot be empty or contain any of the following characters:(new line)  \ / : * ? &quot;  |</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to save because the selected file format is not supported.</source>
+        <translation type="unfinished">Es kann nicht gespeichert werden, da das gewählte Datei-Format nicht unterstützt wird.</translation>
+    </message>
+    <message>
+        <source>File %1 already exists.
+Do you want to overwrite it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to save Flipbook content.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saved %1 frames out of %2 in %3</source>
+        <translation type="unfinished">%1 Frames von %2 wurden in %3 gespeichert</translation>
+    </message>
+    <message>
+        <source>There are no rendered images to save.</source>
+        <translation type="unfinished">Es gibt keine gerenderten Bilder zum speichern.</translation>
+    </message>
+    <message>
+        <source>It is not possible to take or compare snapshots for Toonz vector levels.</source>
+        <translation type="unfinished">Es ist nicht möglich Snapshots von Toonz Vektor-Ebenen zu erstellen oder zu vergleichen.</translation>
+    </message>
+    <message>
+        <source>Rendered Frames  ::  From %1 To %2  ::  Step %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>  ::  Shrink </source>
+        <translation type="unfinished">::Schrumpfen</translation>
     </message>
 </context>
 <context>
@@ -1842,7 +1983,7 @@ Möchten Sie sie überschreiben?</translation>
     </message>
     <message>
         <source>Relative Onion Skin Toggle</source>
-        <translation>Relative Onion Skin Umschaltung</translation>
+        <translation type="vanished">Relative Onion Skin Umschaltung</translation>
     </message>
     <message>
         <source>Fixed Onion Skin Toggle</source>
@@ -1860,7 +2001,7 @@ Möchten Sie sie überschreiben?</translation>
     <name>ImageViewer</name>
     <message>
         <source>FlipboOk Histogram</source>
-        <translation>Flipbook Histogramm</translation>
+        <translation type="vanished">Flipbook Histogramm</translation>
     </message>
     <message>
         <source>Clone Preview</source>
@@ -1925,6 +2066,10 @@ Möchten Sie sie überschreiben?</translation>
     <message>
         <source>Load / Append Images</source>
         <translation>Bild laden/hinzufügen</translation>
+    </message>
+    <message>
+        <source>Flipbook Histogram</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2106,7 +2251,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="vanished">Ok</translation>
     </message>
     <message>
         <source>Apply</source>
@@ -2115,6 +2260,10 @@ Möchten Sie einen erstellen?</translation>
     <message>
         <source>Save In:</source>
         <translation>Speichern in:</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2622,11 +2771,11 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Visit Web Site</source>
-        <translation>Webseite öffnen</translation>
+        <translation type="vanished">Webseite öffnen</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="vanished">Abbrechen</translation>
     </message>
     <message>
         <source>&amp;New Scene</source>
@@ -3222,7 +3371,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;FlipboOk</source>
-        <translation>Flipbook (&amp;F)</translation>
+        <translation type="vanished">Flipbook (&amp;F)</translation>
     </message>
     <message>
         <source>&amp;Function Editor</source>
@@ -3566,7 +3715,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>HoOk Tool</source>
-        <translation>Haken-Tool</translation>
+        <translation type="vanished">Haken-Tool</translation>
     </message>
     <message>
         <source>Zoom Tool</source>
@@ -3934,7 +4083,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>Link FlipboOks</source>
-        <translation>Flipbook verlinken</translation>
+        <translation type="vanished">Flipbook verlinken</translation>
     </message>
     <message>
         <source>&amp;Message Center</source>
@@ -4006,7 +4155,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;Clear Recent FlipboOk Image List</source>
-        <translation>Vorherige Flipbook Bild-Liste leeren (&amp;C)</translation>
+        <translation type="vanished">Vorherige Flipbook Bild-Liste leeren (&amp;C)</translation>
     </message>
     <message>
         <source>Preview Fx</source>
@@ -4206,7 +4355,7 @@ Möchten Sie einen erstellen?</translation>
     </message>
     <message>
         <source>&amp;Abount OpenToonz...</source>
-        <translation>Über OpenToonz (&amp;A)...</translation>
+        <translation type="vanished">Über OpenToonz (&amp;A)...</translation>
     </message>
     <message>
         <source>&amp;ComboViewer</source>
@@ -4215,6 +4364,34 @@ Möchten Sie einen erstellen?</translation>
     <message>
         <source>&amp;History</source>
         <translation>Verlauf (&amp;H)</translation>
+    </message>
+    <message>
+        <source>&amp;Save All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Clear Recent Flipbook Image List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Edit in Place</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Link Flipbooks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Flipbook</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;About OpenToonz...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hook Tool</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4282,6 +4459,53 @@ beibehalten</translation>
 Gaps</source>
         <translation>Lücken
 Füllen</translation>
+    </message>
+</context>
+<context>
+    <name>MenuBarPopup</name>
+    <message>
+        <source>Customize Menu Bar of Room &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Abbrechen</translation>
+    </message>
+    <message>
+        <source>%1 Menu Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>N.B. If you put unique title to submenu, it may not be translated to another language.
+N.B. Duplicated commands will be ignored. Only the last one will appear in the menu bar.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MenuBarTree</name>
+    <message>
+        <source>Insert Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Submenu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4574,7 +4798,7 @@ Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Columns</source>
-        <translation>Spalten</translation>
+        <translation type="vanished">Spalten</translation>
     </message>
     <message>
         <source>Camera Shift:</source>
@@ -4910,7 +5134,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Open FlipboOk after Rendering</source>
-        <translation>Nach dem Rendern Flipbook öffnen</translation>
+        <translation type="vanished">Nach dem Rendern Flipbook öffnen</translation>
     </message>
     <message>
         <source>Unit:</source>
@@ -4994,7 +5218,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Display in a New FlipboOk Window</source>
-        <translation>In einem neue Flipbook anzeigen</translation>
+        <translation type="vanished">In einem neue Flipbook anzeigen</translation>
     </message>
     <message>
         <source>Rewind after Playback</source>
@@ -5142,7 +5366,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Fit to FlipboOk</source>
-        <translation>Alles im Flipbook anzeigen</translation>
+        <translation type="vanished">Alles im Flipbook anzeigen</translation>
     </message>
     <message>
         <source>New Level Format</source>
@@ -5199,7 +5423,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Replace Level after SaveLevelAs command</source>
-        <translation type="vanished">Ebene nach dem "Speichern als"-Befehl ersetzen</translation>
+        <translation type="vanished">Ebene nach dem &quot;Speichern als&quot;-Befehl ersetzen</translation>
     </message>
     <message>
         <source>* Changes will take effect the next time you run Toonz</source>
@@ -5223,7 +5447,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Show &quot;ABC&quot;  to the Frame Number in Xsheet Cell</source>
-        <translation>Den Anhang &quot;ABC&quot; an der Frame-Nummer im Xsheet anzeigen</translation>
+        <translation type="vanished">Den Anhang &quot;ABC&quot; an der Frame-Nummer im Xsheet anzeigen</translation>
     </message>
     <message>
         <source>Automatically Remove Scene Number from Loaded Level Name</source>
@@ -5375,26 +5599,65 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Replace Toonz Level after SaveLevelAs command</source>
-        <translation>Toonz-Ebene nach dem "Speichern als"-Befehl ersetzen</translation>
+        <translation>Toonz-Ebene nach dem &quot;Speichern als&quot;-Befehl ersetzen</translation>
+    </message>
+    <message>
+        <source>Open Flipbook after Rendering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show &quot;ABC&quot; Appendix to the Frame Number in Xsheet Cell</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Keyframes on Cell Area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display in a New Flipbook Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fit to Flipbook</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PreferencesPopup:: FormatProperties</name>
     <message>
         <source>Level Settings by File Format</source>
-        <translation>Ebenen-Einstellungen nach Datei-Format</translation>
+        <translation type="vanished">Ebenen-Einstellungen nach Datei-Format</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation>Name:</translation>
+        <translation type="vanished">Name:</translation>
     </message>
     <message>
         <source>Regular Expression:</source>
-        <translation>Datei-Format（Reguläre Ausdrücke）:</translation>
+        <translation type="vanished">Datei-Format（Reguläre Ausdrücke）:</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation>Priorität</translation>
+        <translation type="vanished">Priorität</translation>
+    </message>
+</context>
+<context>
+    <name>PreferencesPopup::FormatProperties</name>
+    <message>
+        <source>Level Settings by File Format</source>
+        <translation type="unfinished">Ebenen-Einstellungen nach Datei-Format</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Regular Expression:</source>
+        <translation type="unfinished">Datei-Format（Reguläre Ausdrücke）:</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished">Priorität</translation>
     </message>
 </context>
 <context>
@@ -5469,7 +5732,7 @@ Möchte Sie sie überschreiben?</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="vanished">Ok</translation>
     </message>
     <message>
         <source>It is not possible to create the %1 project.</source>
@@ -5482,11 +5745,19 @@ Möchte Sie sie überschreiben?</translation>
     </message>
     <message>
         <source>Bad project name: &apos;%1&apos; loOks like an absolute file path</source>
-        <translation>Ungültiger Projektname: &apos;%1&apos; scheint ein absoluter Pfad zu sein</translation>
+        <translation type="vanished">Ungültiger Projektname: &apos;%1&apos; scheint ein absoluter Pfad zu sein</translation>
     </message>
     <message>
         <source>Project &apos;%1&apos; already exists</source>
         <translation>Projekt &apos;%1&apos; existiert bereits</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bad project name: &apos;%1&apos; looks like an absolute file path</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5665,6 +5936,7 @@ Was möchten Sie tun?</translation>
         <source>Deleting %n files. Are you sure?</source>
         <translation>
             <numerusform>%n Dateien zum Löschen. Sind Sie sich sicher?</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -5748,7 +6020,7 @@ Möchten Sie sie importieren oder von ihrem ursprünglichen Standort laden.</tra
     </message>
     <message>
         <source>System date tampered.</source>
-        <translation>Das System-Datum wurde manipuliert.</translation>
+        <translation type="vanished">Das System-Datum wurde manipuliert.</translation>
     </message>
     <message>
         <source>No more Undo operations available.</source>
@@ -5766,7 +6038,7 @@ Bitte besuchen Sie die Webseite für mehr Informationen.</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation>Beenden</translation>
+        <translation type="vanished">Beenden</translation>
     </message>
     <message>
         <source>Scan</source>
@@ -5889,7 +6161,7 @@ Speichern Sie die Ebene vorher.</translation>
     <message>
         <source>It is not possible to track the level:
 undefinied error.</source>
-        <translation>Die Ebene kann nicht getrackt werden:
+        <translation type="vanished">Die Ebene kann nicht getrackt werden:
 Undefinierter Fehler.</translation>
     </message>
     <message>
@@ -5954,7 +6226,7 @@ Undefinierter Fehler.</translation>
     </message>
     <message>
         <source>FlipBoOk</source>
-        <translation>Flipbook</translation>
+        <translation type="vanished">Flipbook</translation>
     </message>
     <message>
         <source>Deactivate Onion Skin</source>
@@ -6079,7 +6351,7 @@ Was möchten Sie tun?</translation>
     <message>
         <source>The license validation process was not able to confirm the right to use this software on this computer.
  Please contact [ support@toonz.com ] for assistance.</source>
-        <translation>Der Lizenz-Validierungsprozess konnte die Rechte zum nutzen der Software auf diesem Computer nicht bestätigen.
+        <translation type="vanished">Der Lizenz-Validierungsprozess konnte die Rechte zum nutzen der Software auf diesem Computer nicht bestätigen.
 Bitte verbinden Sie sich mit support@toonz.com für Ünterstützung.</translation>
     </message>
     <message>
@@ -6183,7 +6455,7 @@ Sind Sie sich sicher, dass Sie überschreiben möchten?</translation>
     </message>
     <message>
         <source>File %1 doesn&apos;t loOk like a TOONZ Scene</source>
-        <translation>Datei %1 scheint keine Toonz-Szene zu sein</translation>
+        <translation type="vanished">Datei %1 scheint keine Toonz-Szene zu sein</translation>
     </message>
     <message>
         <source>It is not possible to load the scene %1 because it does not belong to any project.</source>
@@ -6223,7 +6495,7 @@ Einige Ebenen wurden nicht geladen, da ihre Version nicht unterstützt wird</tra
     </message>
     <message>
         <source>The Revert to Last Saved command is not supported for the current selection.</source>
-        <translation>Der "Zur zuletzt gespeicherten Version zurücksetzen" Befehl wird nicht für die aktuelle Auswahl unterstützt.</translation>
+        <translation>Der &quot;Zur zuletzt gespeicherten Version zurücksetzen&quot; Befehl wird nicht für die aktuelle Auswahl unterstützt.</translation>
     </message>
     <message>
         <source>The selected column is empty.</source>
@@ -6456,7 +6728,7 @@ Einige Ebenen wurden nicht geladen, da ihre Version nicht unterstützt wird</tra
     </message>
     <message>
         <source>The merge command is not available for greytones images.</source>
-        <translation>Der "Vereinen"-Befehl ist nicht für Grauton-Bilder verfügbar.</translation>
+        <translation>Der &quot;Vereinen&quot;-Befehl ist nicht für Grauton-Bilder verfügbar.</translation>
     </message>
     <message>
         <source>The cleanup settings for the current level have been modified...
@@ -6472,7 +6744,7 @@ Möchten Sie die Änderungen speichern?</translation>
     </message>
     <message>
         <source>The scene %1 was created with Toonz and cannot be loaded in LineTest.</source>
-        <translation>Szene %1 wurde mit Toonz erstellt und kann nicht im Linien-Test geladen werden.</translation>
+        <translation type="vanished">Szene %1 wurde mit Toonz erstellt und kann nicht im Linien-Test geladen werden.</translation>
     </message>
     <message>
         <source>File %1 already exists.
@@ -6627,10 +6899,6 @@ Sind Sie sicher </translation>
         <translation> das Sie trotzdem?</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation>Ok</translation>
-    </message>
-    <message>
         <source>Overwrite Palette</source>
         <translation>Palette überschreiben</translation>
     </message>
@@ -6644,7 +6912,7 @@ Sind Sie sicher </translation>
     </message>
     <message>
         <source>Toonz cannot Save this Level</source>
-        <translation>Diese Ebene kann nicht gespeichert werden</translation>
+        <translation type="vanished">Diese Ebene kann nicht gespeichert werden</translation>
     </message>
     <message>
         <source>No Current Scene</source>
@@ -6704,7 +6972,7 @@ Sind Sie sicher </translation>
     </message>
     <message>
         <source>Inbeteween  : Level %1,  </source>
-        <translation>Dazwischen : Ebene %1</translation>
+        <translation type="vanished">Dazwischen : Ebene %1</translation>
     </message>
     <message>
         <source>Paste Column :  </source>
@@ -6836,7 +7104,7 @@ Sind Sie sicher </translation>
     </message>
     <message>
         <source>Paste (StrOkes)</source>
-        <translation>Einfügen（Strich）</translation>
+        <translation type="vanished">Einfügen（Strich）</translation>
     </message>
     <message>
         <source>Paste</source>
@@ -6874,7 +7142,7 @@ Im Clipboard sind keine Daten zum einfügen</translation>
     </message>
     <message>
         <source>Set Keyframe  : %1  at Frame %2</source>
-        <translation>Keyframe setzen : %1  Frame %2</translation>
+        <translation type="vanished">Keyframe setzen : %1  Frame %2</translation>
     </message>
     <message>
         <source>Move Columns</source>
@@ -6931,6 +7199,79 @@ Im Clipboard sind keine Daten zum einfügen</translation>
     <message>
         <source>History</source>
         <translation>Verlauf</translation>
+    </message>
+    <message>
+        <source>Move Keyframe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File %1 doesn&apos;t look like a TOONZ Scene</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inbetween  : Level %1,  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FlipBook</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to track the level:
+undefined error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste (Strokes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move keyframe handle  : %1  Handle of the keyframe %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle cycle of  %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Drag] to move position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>----Separator----</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Drag] to move position, [Double Click] to edit title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Drag&amp;Drop] to copy separator to menu bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Drag&amp;Drop] to copy command to menu bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open menubar settings template file. Re-installing Toonz will solve this problem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Visit Web Site</source>
+        <translation type="unfinished">Webseite öffnen</translation>
+    </message>
+    <message>
+        <source>https://opentoonz.github.io/e/</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7059,7 +7400,7 @@ Das Ergebnis des Outputs könnte anders sein als erwartet. Was möchten Sie tun?
     <name>RoomTabWidget</name>
     <message>
         <source>New Room</source>
-        <translation type="vanished">Neue Arbeitsfläche</translation>
+        <translation>Neue Arbeitsfläche</translation>
     </message>
     <message>
         <source>Delete Room</source>
@@ -7067,11 +7408,19 @@ Das Ergebnis des Outputs könnte anders sein als erwartet. Was möchten Sie tun?
     </message>
     <message>
         <source>Room</source>
-        <translation type="vanished">Arbeitsfläche</translation>
+        <translation>Arbeitsfläche</translation>
     </message>
     <message>
         <source>Are you sure you want to remove room %1</source>
-        <translation type="vanished">Sind Sie sich sicher, dass Sie Arbeitsfläche %1 löschen möchten?</translation>
+        <translation>Sind Sie sich sicher, dass Sie Arbeitsfläche %1 löschen möchten?</translation>
+    </message>
+    <message>
+        <source>Delete Room &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Customize Menu Bar of Room &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7148,7 +7497,7 @@ Das Ergebnis des Outputs könnte anders sein als erwartet. Was möchten Sie tun?
     </message>
     <message>
         <source>Set needs-lock property...</source>
-        <translation>"Sperre nötig"-Eigenschaft setzen...</translation>
+        <translation>&quot;Sperre nötig&quot;-Eigenschaft setzen...</translation>
     </message>
     <message>
         <source>Committing %1 items...</source>
@@ -7231,11 +7580,19 @@ Das Ergebnis des Outputs könnte anders sein als erwartet. Was möchten Sie tun?
     </message>
     <message>
         <source>Adding hoOk file to repository...</source>
-        <translation>Haken-Datei wird zum Repository hinzugefügt...</translation>
+        <translation type="vanished">Haken-Datei wird zum Repository hinzugefügt...</translation>
     </message>
     <message>
         <source>Setting the needs-lock property to hoOk file...</source>
-        <translation>Die "Sperre nötig"-Eigenschaft wird in der Haken-Datei eingestellt...</translation>
+        <translation type="vanished">Die &quot;Sperre nötig&quot;-Eigenschaft wird in der Haken-Datei eingestellt...</translation>
+    </message>
+    <message>
+        <source>Adding hook file to repository...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Setting the needs-lock property to hook file...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7888,11 +8245,15 @@ Bitte tragen Sie die Änderungen ein oder setzen sie zurück.</translation>
     <name>SaveImagesPopup</name>
     <message>
         <source>Save FlipboOk Images</source>
-        <translation>Flipbook-Bilder speichern</translation>
+        <translation type="vanished">Flipbook-Bilder speichern</translation>
     </message>
     <message>
         <source>Save</source>
         <translation>Speichern</translation>
+    </message>
+    <message>
+        <source>Save Flipbook Images</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8416,6 +8777,22 @@ Zu &apos;%3&apos; zuweisen?</translation>
         <source>Help</source>
         <translation>Hilfe</translation>
     </message>
+    <message>
+        <source>Failed to load menu %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to add command %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open menubar settings file %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to create menubar</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SubSheetBar</name>
@@ -8516,7 +8893,7 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Successfull Steps:</source>
-        <translation>Anzahl erfolgreicher Schritte:</translation>
+        <translation type="vanished">Anzahl erfolgreicher Schritte:</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -8633,6 +9010,10 @@ Click the arrow button to create a new sub-xsheet</source>
     <message>
         <source>&lt;&lt; Add</source>
         <translation>&lt;&lt; Hinzufügen</translation>
+    </message>
+    <message>
+        <source>Successful Steps:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8791,6 +9172,13 @@ Click the arrow button to create a new sub-xsheet</source>
     <message>
         <source>Older Version</source>
         <translation>Alte Version</translation>
+    </message>
+</context>
+<context>
+    <name>TopBar</name>
+    <message>
+        <source>Lock Rooms Tab</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9021,19 +9409,19 @@ Genaueres können Sie aus der Nutzerhilfe entnehmen.</translation>
     <name>XsheetGUI::CellArea</name>
     <message>
         <source>Click to select keyframe, drag to move it</source>
-        <translation type="vanished">[Click] Keyframe wählen, [Ziehen] Verschieben</translation>
+        <translation>[Click] Keyframe wählen, [Ziehen] Verschieben</translation>
     </message>
     <message>
         <source>Click and drag to set the acceleration range</source>
-        <translation type="vanished">[Ziehen] Beschleunigungs-Bereich einstellen</translation>
+        <translation>[Ziehen] Beschleunigungs-Bereich einstellen</translation>
     </message>
     <message>
         <source>Click and drag to set the deceleration range</source>
-        <translation type="vanished">[Ziehen] Verzögerungs-Bereich einstellen</translation>
+        <translation>[Ziehen] Verzögerungs-Bereich einstellen</translation>
     </message>
     <message>
         <source>Set the cycle of previous keyframes</source>
-        <translation type="vanished">Zyklus der vorherigen Keyframes einstellen</translation>
+        <translation>Zyklus der vorherigen Keyframes einstellen</translation>
     </message>
     <message>
         <source>Click and drag to move the selection</source>
@@ -9201,11 +9589,11 @@ Genaueres können Sie aus der Nutzerhilfe entnehmen.</translation>
     </message>
     <message>
         <source>Relative Onion Skin Toggle</source>
-        <translation type="vanished">Onion Skin umschalten [relativ]</translation>
+        <translation>Onion Skin umschalten [relativ]</translation>
     </message>
     <message>
         <source>Fixed Onion Skin Toggle</source>
-        <translation type="vanished">Onion Skin umschalten [fixiert]</translation>
+        <translation>Onion Skin umschalten [fixiert]</translation>
     </message>
     <message>
         <source>Playback Start Marker</source>
@@ -9234,6 +9622,10 @@ Genaueres können Sie aus der Nutzerhilfe entnehmen.</translation>
     <message>
         <source>Preview This</source>
         <translation>Nur Vorschau dieses Frames</translation>
+    </message>
+    <message>
+        <source>Double Click to Toggle Onion Skin</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

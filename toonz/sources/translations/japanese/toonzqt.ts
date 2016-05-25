@@ -122,6 +122,14 @@ Possibly the preset file has been corrupted</source>
         <source>Force Squared Pixel</source>
         <translation>正方ピクセルを保持</translation>
     </message>
+    <message>
+        <source>Error : Preset Name is Invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The preset name must not use &apos;,&apos;(comma).</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChannelHisto</name>
@@ -1492,7 +1500,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>For further information visit </source>
-        <translation>詳しい情報に関しては、こちらへ：</translation>
+        <translation type="vanished">詳しい情報に関しては、こちらへ：</translation>
     </message>
     <message>
         <source>Fullpath:     </source>
@@ -1668,7 +1676,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>Toonz 7.1</source>
-        <translation>OpenToonz</translation>
+        <translation type="vanished">OpenToonz</translation>
     </message>
     <message>
         <source>The file name cannot be empty or contain any of the following characters: (new line) \ / : * ? &quot; |</source>
@@ -1835,6 +1843,10 @@ Are you sure?</source>
         <source>Set</source>
         <translation>設定</translation>
     </message>
+    <message>
+        <source>OpenToonz 1.0</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QPushButton</name>
@@ -1891,6 +1903,10 @@ Are you sure?</source>
     <message>
         <source>&amp;Schematic Toggle</source>
         <translation type="vanished">スキマティック切り替え</translation>
+    </message>
+    <message>
+        <source>&amp;Swtich output port display mode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
