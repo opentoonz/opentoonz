@@ -21,6 +21,11 @@
 #include "toutputproperties.h"
 #include "toonz/preferences.h"
 
+#include "tools/toolhandle.h"
+#include "tools/toolcommandids.h"
+#include "toonz/tstageobject.h"
+#include "toonz/tpinnedrangeset.h"
+
 #include <QPainter>
 #include <QMouseEvent>
 #include <QMenu>
@@ -46,6 +51,8 @@ RowArea::RowArea(XsheetViewer *parent, Qt::WFlags flags)
 	setMouseTracking(true);
 	connect(TApp::instance()->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()),
 			this, SLOT(update()));
+	// for displaying the pinned center keys when the skeleton tool is selected  
+	connect(TApp::instance()->getCurrentTool(), SIGNAL(toolSwitched()), this, SLOT(update()));
 }
 
 //-----------------------------------------------------------------------------
@@ -344,6 +351,90 @@ void RowArea::drawOnionSkinSelection(QPainter &p)
 
 //-----------------------------------------------------------------------------
 
+namespace
+{
+
+	TStageObjectId getAncestor(TXsheet *xsh, TStageObjectId id)
+	{
+		assert(id.isColumn());
+		TStageObjectId parentId;
+		while (parentId = xsh->getStageObjectParent(id), parentId.isColumn())
+			id = parentId;
+		return id;
+	}
+
+	int getPinnedColumnId(int row, TXsheet* xsh, TStageObjectId ancestorId, int columnCount)
+	{
+		int tmp_pinnedCol = -1;
+		for (int c = 0; c < columnCount; c++)
+		{
+			TStageObjectId columnId(TStageObjectId::ColumnId(c));
+			if (getAncestor(xsh, columnId) != ancestorId)
+				continue;
+			TStageObject *obj = xsh->getStageObject(columnId);
+
+			if (obj->getPinnedRangeSet()->isPinned(row))
+			{
+				tmp_pinnedCol = c;
+				break;
+			}
+		}
+		return tmp_pinnedCol;
+	}
+
+} // namespace
+
+void RowArea::drawPinnedCenterKeys(QPainter &p, int r0, int r1)
+{
+	//std::cout << "Skeleton Tool activated" << std::endl;
+	int col = m_viewer->getCurrentColumn();
+	TXsheet* xsh = m_viewer->getXsheet();
+	if (col < 0 || !xsh || xsh->isColumnEmpty(col))
+		return;
+
+	TStageObjectId ancestorId = getAncestor(xsh, TStageObjectId::ColumnId(col));
+
+	int columnCount = xsh->getColumnCount();
+	int prev_pinnedCol = -2;
+
+	QRect keyRect(30, 5, 10, 10);
+	p.setPen(Qt::black);
+
+	r1 = (r1 < xsh->getFrameCount() - 1) ? xsh->getFrameCount() - 1 : r1;
+
+	for (int r = r0 - 1; r <= r1; r++)
+	{
+		if (r < 0) continue;
+
+		int tmp_pinnedCol = getPinnedColumnId(r, xsh, ancestorId, columnCount);
+
+		//Pinned Column is changed at this row
+		if (tmp_pinnedCol != prev_pinnedCol)
+		{
+			prev_pinnedCol = tmp_pinnedCol;
+			if (r != r0 - 1)
+			{
+				if (m_pos.x() >= 30 && m_pos.x() <= 40 && m_row == r)
+					p.setBrush(QColor(30, 210, 255));
+				else
+					p.setBrush(QColor(0, 175, 255));
+
+				int y = m_viewer->rowToY(r);
+				QRect tmpKeyRect = keyRect.translated(0, y);
+				p.drawRect(tmpKeyRect);
+
+				QFont font = p.font();
+				font.setPixelSize(8);
+				font.setBold(false);
+				p.setFont(font);
+				p.drawText(tmpKeyRect, Qt::AlignCenter, QString::number((tmp_pinnedCol == -1) ? ancestorId.getIndex() + 1 : tmp_pinnedCol + 1));
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
 void RowArea::paintEvent(QPaintEvent *event)
 {
 	QRect toBeUpdated = event->rect();
@@ -367,6 +458,9 @@ void RowArea::paintEvent(QPaintEvent *event)
 
 	if (TApp::instance()->getCurrentFrame()->isEditingScene() && Preferences::instance()->isOnionSkinEnabled())
 			drawOnionSkinSelection(p);
+
+	if (TApp::instance()->getCurrentTool()->getTool()->getName() == T_Skeleton)
+		drawPinnedCenterKeys(p, r0, r1);
 
 	drawPlayRange(p, r0, r1);
 }
@@ -499,12 +593,45 @@ void RowArea::mouseMoveEvent(QMouseEvent *event)
 		else if (x <= onionDotDiam * 2 && row != currentRow)
 			m_showOnionToSet = Mos;
 	}
+	
+	/*- For showing the pinned center keys -*/
+	bool isOnPinnedCenterKey = false;
+	bool isRootBonePinned;
+	int pinnedCenterColumnId = -1;
+	if (TApp::instance()->getCurrentTool()->getTool()->getName() == T_Skeleton && x >= 30 && x <= 40)
+	{
+		int col = m_viewer->getCurrentColumn();
+		TXsheet* xsh = m_viewer->getXsheet();
+		if (col >= 0 && xsh && !xsh->isColumnEmpty(col))
+		{
+			TStageObjectId ancestorId = getAncestor(xsh, TStageObjectId::ColumnId(col));
+			int columnCount = xsh->getColumnCount();
+			/*- Check if the current row is the pinned center key-*/
+			int prev_pinnedCol = (row == 0) ? -2 : getPinnedColumnId(row - 1, xsh, ancestorId, columnCount);
+			int pinnedCol = getPinnedColumnId(row, xsh, ancestorId, columnCount);
+			if (pinnedCol != prev_pinnedCol)
+			{
+				isOnPinnedCenterKey = true;
+				isRootBonePinned = (pinnedCol == -1);
+				pinnedCenterColumnId = (isRootBonePinned) ? ancestorId.getIndex() : pinnedCol;
+			}
+		}
+	}
+
 	update();
 
-	if (m_xa <= x && x <= m_xa + 10 && row == m_r0)
+	int y0 = m_viewer->rowToY(m_r0);
+	int y1 = m_viewer->rowToY(m_r1 + 1) - 12;
+	QPolygon startArrow, endArrow;
+	startArrow << QPoint(m_xa, y0 + 1) << QPoint(m_xa + 10, y0 + 1) << QPoint(m_xa, y0 + 11);
+	endArrow << QPoint(m_xa, y1 + 1) << QPoint(m_xa + 10, y1 + 11) << QPoint(m_xa, y1 + 11);
+
+	if (startArrow.containsPoint(m_pos, Qt::OddEvenFill))
 		m_tooltip = tr("Playback Start Marker");
-	else if (m_xa <= x && x <= m_xa + 10 && row == m_r1)
+	else if (endArrow.containsPoint(m_pos, Qt::OddEvenFill))
 		m_tooltip = tr("Playback End Marker");
+	else if (isOnPinnedCenterKey)
+		m_tooltip = tr("Pinned Center : Col%1%2").arg(pinnedCenterColumnId+1).arg((isRootBonePinned) ? " (Root)" : "");
 	else if (row == currentRow)
 	{
 		if (Preferences::instance()->isOnionSkinEnabled() && x < RowHeight + 2)
