@@ -903,6 +903,9 @@ ParamsPage {
 #XsheetScrollBar::add-page {
   background: none;
 }
+#noteTextEdit {
+  color: black;
+}
 XsheetViewer {
   qproperty-TextColor: #e6e6e6;
   qproperty-BGColor: #484848;
