@@ -219,6 +219,13 @@ void PreferencesPopup::onCameraUnitChanged(int index)
 }
 
 //-----------------------------------------------------------------------------
+//don't have a clue yet what this does.
+void PreferencesPopup::onRoomChoiceChanged(int index)
+{
+	m_pref->setRoomChoice(::units[index].toStdString());
+}
+
+//-----------------------------------------------------------------------------
 
 void PreferencesPopup::onScanLevelTypeChanged(const QString &text)
 {
@@ -879,6 +886,8 @@ PreferencesPopup::PreferencesPopup()
 	QComboBox *styleSheetType = new QComboBox(this);
 	QComboBox *unitOm = new QComboBox(this);
 	QComboBox *cameraUnitOm = new QComboBox(this);
+	//Choose between standard and Studio Ghibli rooms
+	QComboBox *roomChoice = new QComboBox(this);
 	m_iconSizeLx = new DVGui::IntLineEdit(this, 80, 10, 400);
 	m_iconSizeLy = new DVGui::IntLineEdit(this, 60, 10, 400);
 	m_viewShrink = new DVGui::IntLineEdit(this, 1, 1, 20);
@@ -1037,6 +1046,12 @@ PreferencesPopup::PreferencesPopup()
 
 	idx = std::find(::units, ::units + ::unitsCount, m_pref->getCameraUnits()) - ::units;
 	cameraUnitOm->setCurrentIndex((idx < ::unitsCount) ? idx : ::inchIdx);
+
+	//roomChoice stuff will go here for rooms
+
+	QStringList rooms;
+	rooms << tr("Standard") << tr("Studio Ghibli");
+	roomChoice->addItems(rooms);
 
 	m_iconSizeLx->setValue(m_pref->getIconSize().lx);
 	m_iconSizeLy->setValue(m_pref->getIconSize().ly);
@@ -1245,6 +1260,9 @@ PreferencesPopup::PreferencesPopup()
 
 				styleLay->addWidget(new QLabel(tr("Camera Unit:"), this), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
 				styleLay->addWidget(cameraUnitOm, 2, 1);
+
+				styleLay->addWidget(new QLabel(tr("Rooms:"), this), 3, 0, Qt::AlignRight | Qt::AlignVCenter);
+				styleLay->addWidget(roomChoice, 2, 1);
 			}
 			styleLay->setColumnStretch(0, 0);
 			styleLay->setColumnStretch(1, 0);
@@ -1575,6 +1593,8 @@ PreferencesPopup::PreferencesPopup()
 	ret = ret && connect(styleSheetType, SIGNAL(currentIndexChanged(int)), SLOT(onStyleSheetTypeChanged(int)));
 	ret = ret && connect(unitOm, SIGNAL(currentIndexChanged(int)), SLOT(onUnitChanged(int)));
 	ret = ret && connect(cameraUnitOm, SIGNAL(currentIndexChanged(int)), SLOT(onCameraUnitChanged(int)));
+	//room choice connection - on roomChanged doesn't exist yet.
+	ret = ret && connect(roomChoice, SIGNAL(currentIndexChanged(int)), SLOT(onRoomChanged(int)));
 	ret = ret && connect(openFlipbookAfterCB, SIGNAL(stateChanged(int)), this, SLOT(onViewGeneratedMovieChanged(int)));
 	ret = ret && connect(m_iconSizeLx, SIGNAL(editingFinished()), SLOT(onIconSizeChanged()));
 	ret = ret && connect(m_iconSizeLy, SIGNAL(editingFinished()), SLOT(onIconSizeChanged()));
