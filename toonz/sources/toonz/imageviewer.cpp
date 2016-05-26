@@ -189,7 +189,7 @@ public:
 /*! \class ImageViewer
 		\brief The ImageViewer class provides to view an image.
 
-		Inherits \b QGLWidget.
+		Inherits \b QOpenGLWidget.
 
 		The object allows also to manage pan and zoom event. It's possible to set a
 		color mask TRop::ColorMask to image view.
@@ -205,10 +205,22 @@ public:
 */
 
 ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook, bool showHistogram)
-	: QGLWidget(parent), m_pressedMousePos(0, 0), m_mouseButton(Qt::NoButton), m_draggingZoomSelection(false), m_image(), m_FPS(0), m_viewAff(), m_pos(0, 0), m_visualSettings(), m_compareSettings(), m_isHistogramEnable(showHistogram), m_flipbook(flipbook), m_isColorModel(false), m_histogramPopup(0), m_isRemakingPreviewFx(false)
-	  //, m_ghibli3DLutUtil(0) //iwsw commented out temporarily
-	  ,
-	  m_rectRGBPick(false)
+	: QOpenGLWidget(parent)
+	, m_pressedMousePos(0, 0)
+	, m_mouseButton(Qt::NoButton)
+	, m_draggingZoomSelection(false)
+	, m_image()
+	, m_FPS(0)
+	, m_viewAff()
+	, m_pos(0, 0)
+	, m_visualSettings()
+	, m_compareSettings()
+	, m_isHistogramEnable(showHistogram)
+	, m_flipbook(flipbook)
+	, m_isColorModel(false)
+	, m_histogramPopup(0)
+	, m_isRemakingPreviewFx(false)
+	, m_rectRGBPick(false)
 {
 	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
 	m_visualSettings.m_drawExternalBG = true;
@@ -327,7 +339,7 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event)
 	action->setParent(0);
 
 	delete menu;
-	updateGL();
+	update();
 }
 
 //-----------------------------------------------------------------------------
@@ -1126,6 +1138,14 @@ void ImageViewer::adaptView(const QRect &geomRect)
 	TRect viewRect(tfloor(viewRectD.x0), tfloor(viewRectD.y0), tceil(viewRectD.x1) - 1, tceil(viewRectD.y1) - 1);
 
 	adaptView(imgBounds, viewRect);
+}
+
+void ImageViewer::doSwapBuffers() {
+	glFlush();
+}
+
+void ImageViewer::changeSwapBehavior(bool enable) {
+	setUpdateBehavior(enable ? PartialUpdate : NoPartialUpdate);
 }
 
 //-----------------------------------------------------------------------------

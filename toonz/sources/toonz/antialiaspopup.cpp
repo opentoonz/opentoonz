@@ -88,7 +88,7 @@ public:
 
 	void setImage(const TImageP &img) { m_img = img; }
 
-	void paintGL()
+	void paintGL() override
 	{
 		drawBackground();
 

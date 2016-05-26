@@ -9,7 +9,7 @@
 #include "timage.h"
 
 // Qt includes
-#include <QGLWidget>
+#include <QOpenGLWidget>
 
 #undef DVAPI
 #undef DVVAR
@@ -44,10 +44,10 @@ class TVectorImageP;
             efficient image-drawing functions for all Toonz image types.
 */
 
-class DVAPI PlaneViewer : public QGLWidget
+class DVAPI PlaneViewer : public QOpenGLWidget
 {
 public:
-	PlaneViewer(QWidget *parent = 0);
+	PlaneViewer(QWidget *parent);
 
 	// Background functions
 	void setBgColor(const TPixel32 &color1, const TPixel32 &color2);
@@ -113,18 +113,20 @@ protected:
 	double m_zoomRange[2]; //!< Viewport zoom range (default: [-1024, 1024]).
 
 protected:
-	virtual void mouseMoveEvent(QMouseEvent *event);
-	virtual void mousePressEvent(QMouseEvent *event);
-	virtual void wheelEvent(QWheelEvent *event);
-	virtual void keyPressEvent(QKeyEvent *event);
-	virtual void resizeEvent(QResizeEvent *event);
-	virtual void hideEvent(QHideEvent *event);
+	virtual void mouseMoveEvent(QMouseEvent *event) override;
+	virtual void mousePressEvent(QMouseEvent *event) override;
+	virtual void wheelEvent(QWheelEvent *event) override;
+	virtual void keyPressEvent(QKeyEvent *event) override;
+	virtual void hideEvent(QHideEvent *event) override;
 
-	void initMatrix();
+	void initializeGL() override final;
+	void resizeGL(int width, int height) override final;
 
 private:
 	GLdouble m_matrix[16];
 	bool m_firstResize;
+	int m_width;
+	int m_height;
 };
 
 #endif //PLANE_VIEWER_H

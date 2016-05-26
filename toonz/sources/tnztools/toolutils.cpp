@@ -41,7 +41,7 @@
 #include "tools/strokeselection.h"
 
 #include <QPainter>
-#include <QGLWidget>
+#include <QGLWidget> // for QGLWidget::convertToGLFormat
 #include <QFont>
 #include <QFontMetrics>
 

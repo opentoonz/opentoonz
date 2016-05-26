@@ -57,9 +57,12 @@ bool PlaneViewerZoomer::zoom(bool zoomin, bool resetZoom)
 //=========================================================================================
 
 PlaneViewer::PlaneViewer(QWidget *parent)
-	: QGLWidget(parent), m_firstResize(true), m_xpos(0), m_ypos(0), m_aff() // initialized at the first resize
-	  ,
-	  m_chessSize(40.0)
+	: QOpenGLWidget(parent)
+	, m_firstResize(true)
+	, m_xpos(0)
+	, m_ypos(0)
+	, m_aff() // initialized at the first resize
+	, m_chessSize(40.0)
 {
 	m_zoomRange[0] = 1e-3, m_zoomRange[1] = 1024.0;
 	setBgColor(TPixel32(235, 235, 235), TPixel32(235, 235, 235));
@@ -132,42 +135,38 @@ void PlaneViewer::drawBackground()
 
 //=========================================================================================
 
-//! The initMatrix() function is used to match the identity matrix with the widget reference,
-//! during widget size initialization.
-void PlaneViewer::initMatrix()
+void PlaneViewer::initializeGL()
 {
-	makeCurrent();
+}
 
-	glViewport(0, 0, width(), height());
+void PlaneViewer::resizeGL(int width, int height)
+{
+	glViewport(0, 0, width, height);
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(0, width(), 0, height());
+	gluOrtho2D(0, width, 0, height);
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	doneCurrent();
-}
-
-//=========================================================================================
-
-void PlaneViewer::resizeEvent(QResizeEvent *event)
-{
-	initMatrix();
-
-	const QSize &oldSize = event->oldSize(), &size = event->size();
-
 	if (m_firstResize) {
 		m_firstResize = false;
-		m_aff = TTranslation(0.5 * size.width(), 0.5 * size.height());
-	} else {
-		TPointD oldCenter(oldSize.width() * 0.5, oldSize.height() * 0.5);
-		TPointD newCenter(size.width() * 0.5, size.height() * 0.5);
+		m_aff = TTranslation(0.5 * width, 0.5 * height);
+		m_width = width;
+		m_height = height;
+	}
+	else {
+		TPointD oldCenter(m_width * 0.5, m_height * 0.5);
+		TPointD newCenter(width * 0.5, height * 0.5);
 
 		m_aff = m_aff.place(m_aff.inv() * oldCenter, newCenter);
+		m_width = width;
+		m_height = height;
 	}
 }
 
-//------------------------------------------------------
+//=========================================================================================
 
 void PlaneViewer::mouseMoveEvent(QMouseEvent *event)
 {
@@ -201,7 +200,7 @@ void PlaneViewer::keyPressEvent(QKeyEvent *event)
 	if (PlaneViewerZoomer(this).exec(event))
 		return;
 
-	QGLWidget::keyPressEvent(event);
+	QOpenGLWidget::keyPressEvent(event);
 }
 
 //------------------------------------------------------

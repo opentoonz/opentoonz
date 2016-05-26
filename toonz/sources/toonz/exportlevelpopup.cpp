@@ -119,10 +119,10 @@ public:
 	TImageP &image() { return m_img; }
 
 protected:
-	void showEvent(QShowEvent *se);
-	void keyPressEvent(QKeyEvent *ke);
+	void showEvent(QShowEvent *se) override;
+	void keyPressEvent(QKeyEvent *ke) override;
 	void keyPressEvent(QShowEvent *se);
-	void paintGL();
+	void paintGL() override;
 
 	void setActualPixelSize();
 

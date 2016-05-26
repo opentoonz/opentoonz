@@ -514,7 +514,7 @@ public:
 		m_img = TImageP(), m_xsh = TXsheetP(), m_row = -1, m_meshImg = TMeshImageP();
 	}
 
-	void paintGL()
+	void paintGL() override
 	{
 		drawBackground();
 

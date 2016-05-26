@@ -79,8 +79,8 @@ public:
 	void setDrawInProgress(bool draw) { m_drawInProgress = draw; }
 
 protected:
-	bool event(QEvent *e);
-	void paintGL();
+	bool event(QEvent *e) override;
+	void paintGL() override;
 	void drawVectors();
 	void drawInProgress();
 };

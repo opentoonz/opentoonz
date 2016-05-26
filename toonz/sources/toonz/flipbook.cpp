@@ -1887,14 +1887,14 @@ void FlipBook::reset()
 void FlipBook::showEvent(QShowEvent *e)
 {
 	TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
-	connect(sceneHandle, SIGNAL(sceneChanged()), m_imageViewer, SLOT(updateGL()));
+	connect(sceneHandle, SIGNAL(sceneChanged()), m_imageViewer, SLOT(update()));
 	// for updating the blank frame button
 	if (!m_imageViewer->isColorModel()) {
 		connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole, SLOT(onPreferenceChanged()));
 		m_flipConsole->onPreferenceChanged();
 	}
 	m_flipConsole->setActive(true);
-	m_imageViewer->updateGL();
+	m_imageViewer->update();
 }
 
 //-------------------------------------------------------------------
@@ -1902,7 +1902,7 @@ void FlipBook::showEvent(QShowEvent *e)
 void FlipBook::hideEvent(QHideEvent *e)
 {
 	TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
-	disconnect(sceneHandle, SIGNAL(sceneChanged()), m_imageViewer, SLOT(updateGL()));
+	disconnect(sceneHandle, SIGNAL(sceneChanged()), m_imageViewer, SLOT(update()));
 	m_flipConsole->setActive(false);
 }
 

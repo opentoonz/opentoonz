@@ -129,7 +129,7 @@ LineTestViewer::LineTestViewer(QWidget *parent)
 #ifdef USE_QPAINTER
 	: QWidget(parent)
 #else
-	: QGLWidget(parent)
+	: QOpenGLWidget(parent)
 //, m_pboSupported(false)
 #endif //USE_QPAINTER
 	  ,

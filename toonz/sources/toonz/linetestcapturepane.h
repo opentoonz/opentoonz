@@ -15,7 +15,6 @@
 #include "toonzqt/checkbox.h"
 #include "toonzqt/colorfield.h"
 
-#include <QGLWidget>
 #include <QApplication>
 #include <QMainWindow>
 #include <QDialog>

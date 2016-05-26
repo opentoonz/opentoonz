@@ -177,7 +177,7 @@ TrackerPopup::TrackerPopup(QWidget *parent, Qt::WFlags flags)
 	m_sensibility->setFixedHeight(WidgetHeight);
 	m_sensibility->setRange(0, 1000);
 	m_sensibility->setValue(10);
-	addWidget(tr("Sensibility:"), m_sensibility);
+	addWidget(tr("Sensitivity:"), m_sensibility);
 
 	m_variationWindow = new CheckBox(tr("Variable Region Size"));
 	m_variationWindow->setFixedHeight(WidgetHeight);
@@ -773,7 +773,7 @@ QString Tracker::getErrorMessage(int errorCode)
 		errorMessage = QObject::tr("Threshold Distance Error");
 		break;
 	case 10:
-		errorMessage = QObject::tr("Sensibility Error");
+		errorMessage = QObject::tr("Sensitivity Error");
 		break;
 	case 11:
 		errorMessage = QObject::tr("No Frame Found");
