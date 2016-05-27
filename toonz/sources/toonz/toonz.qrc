@@ -446,5 +446,7 @@
       <file>Resources/finger_rollover.svg</file>
       <file>Resources/ruler.svg</file>
       <file>Resources/ruler_rollover.svg</file>
+      <file>Resources/refresh.png</file>
+      <file>Resources/refresh_over.png</file>
     </qresource>
 </RCC>

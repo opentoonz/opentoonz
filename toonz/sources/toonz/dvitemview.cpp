@@ -1882,10 +1882,14 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer, QWidget *
 //  addAction(tableView);
 	addSeparator();
 
+	addAction(CommandManager::instance()->getAction("MI_RefreshTree"));
+	addSeparator();
+
 	// button to export file list to csv
 	QAction *exportFileListAction = new QAction(tr("Export File List"), this);
 	addAction(exportFileListAction);
 	addSeparator();
+	
 	connect(exportFileListAction, SIGNAL(triggered()), itemViewer->getPanel(), SLOT(exportFileList()));
 
 	connect(folderUp, SIGNAL(triggered()), SIGNAL(folderUp()));

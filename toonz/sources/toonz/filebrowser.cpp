@@ -75,6 +75,7 @@
 #include <QLineEdit>
 #include <QTreeWidgetItem>
 #include <QSplitter>
+#include <QFileSystemWatcher>
 
 // tcg includes
 #include "tcg/boost/range_utility.h"
@@ -179,6 +180,8 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu, 
 	DvItemViewerButtonBar *buttonBar = new DvItemViewerButtonBar(m_itemViewer, box);
 	DvItemViewerPanel *viewerPanel = m_itemViewer->getPanel();
 
+	m_fileSystemWatcher = new QFileSystemWatcher(this);
+
 	viewerPanel->addColumn(DvItemListModel::FileType, 50);
 	viewerPanel->addColumn(DvItemListModel::FrameCount, 50);
 	viewerPanel->addColumn(DvItemListModel::FileSize, 50);
@@ -259,6 +262,9 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu, 
 	ret = ret && connect(buttonBar, SIGNAL(folderFwd()), this, SLOT(onFwdButtonPushed()));
 	// when the history changes, enable/disable the history buttons accordingly
 	ret = ret && connect(this, SIGNAL(historyChanged(bool, bool)), buttonBar, SLOT(onHistoryChanged(bool, bool)));
+
+	// check out the update of the current folder
+	ret = ret && connect(m_fileSystemWatcher, SIGNAL(directoryChanged(const QString&)), this, SLOT(onFileSystemChanged(const QString&)));
 
 	// store the first item("Root") in the history
 	m_indexHistoryList.append(m_folderTreeView->currentIndex());
@@ -397,6 +403,18 @@ void FileBrowser::clearHistory()
 }
 
 //-----------------------------------------------------------------------------
+/*! update the current folder when changes detected from QFileSystemWatcher
+*/
+void FileBrowser::onFileSystemChanged(const QString& folderPath)
+{
+	//changes may create/delete of folder, so update the DvDirModel
+	QModelIndex parentFolderIndex = m_folderTreeView->currentIndex();
+	DvDirModel::instance()->refresh(parentFolderIndex);
+
+	refreshCurrentFolderItems();
+}
+
+//-----------------------------------------------------------------------------
 
 void FileBrowser::sortByDataModel(DataType dataType, bool isDiscendent)
 {
@@ -502,30 +520,18 @@ void FileBrowser::removeFilterType(const QString &type)
 
 //-----------------------------------------------------------------------------
 
-void FileBrowser::setFolder(const TFilePath &fp, bool expandNode)
+void FileBrowser::refreshCurrentFolderItems()
 {
-	if (fp == m_folder)
-		return;
-
-	//set the current folder path
-	m_folder = fp;
-	m_dayDateString = "";
-	//set the folder name
-	if (fp == TFilePath())
-		m_folderName->setText("");
-	else
-		m_folderName->setText(toQString(fp));
-
 	m_items.clear();
 
 	// put the parent directory item
-	TFilePath parentFp = fp.getParentDir();
-	if (parentFp != TFilePath("") && parentFp != fp)
+	TFilePath parentFp = m_folder.getParentDir();
+	if (parentFp != TFilePath("") && parentFp != m_folder)
 		m_items.push_back(Item(parentFp, true, false));
 
 	// register the all folder items by using the folde tree model
 	DvDirModel *model = DvDirModel::instance();
-	QModelIndex currentIndex = model->getIndexByPath(fp);
+	QModelIndex currentIndex = model->getIndexByPath(m_folder);
 	if (currentIndex.isValid()) {
 		for (int i = 0; i < model->rowCount(currentIndex); i++) {
 			QModelIndex tmpIndex = model->index(i, 0, currentIndex);
@@ -541,26 +547,28 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode)
 				}
 			}
 		}
-	} else
-		setUnregisteredFolder(fp);
+	}
+	else
+		setUnregisteredFolder(m_folder);
 
 	// register the file items
-	if (fp != TFilePath()) {
+	if (m_folder != TFilePath()) {
 		TFilePathSet files;
 		TFilePathSet all_files; // for updating m_multiFileItemMap
 
-		TFileStatus fpStatus(fp);
+		TFileStatus fpStatus(m_folder);
 		//if the item is link, then set the link target of it
 		if (fpStatus.isLink()) {
-			QFileInfo info(toQString(fp));
+			QFileInfo info(toQString(m_folder));
 			setFolder(TFilePath(info.symLinkTarget().toStdWString()));
 			return;
 		}
 		if (fpStatus.doesExist() && fpStatus.isDirectory() &&
 			fpStatus.isReadable()) {
 			try {
-				TSystem::readDirectory(files, all_files, fp);
-			} catch (...) {
+				TSystem::readDirectory(files, all_files, m_folder);
+			}
+			catch (...) {
 			}
 		}
 		TFilePathSet::iterator it;
@@ -579,7 +587,8 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode)
 					it->getType() != "tpl" &&
 					TFileType::getInfo(*it) == TFileType::UNKNOW_FILE)
 					continue;
-			} else if (!m_filter.contains(QString::fromStdString(it->getType())))
+			}
+			else if (!m_filter.contains(QString::fromStdString(it->getType())))
 				continue;
 			//store the filtered file paths
 			m_items.push_back(Item(*it));
@@ -642,6 +651,30 @@ void FileBrowser::setFolder(const TFilePath &fp, bool expandNode)
 	setOrderType(Name);
 	setIsDiscendentOrder(true);
 	sortByDataModel(currentDataType, discendentOrder);
+}
+
+//-----------------------------------------------------------------------------
+
+void FileBrowser::setFolder(const TFilePath &fp, bool expandNode, bool forceUpdate)
+{
+	if (fp == m_folder && !forceUpdate)
+		return;
+
+	//set the current folder path
+	m_folder = fp;
+	m_dayDateString = "";
+	//set the folder name
+	if (fp == TFilePath())
+		m_folderName->setText("");
+	else
+		m_folderName->setText(toQString(fp));
+
+	/*- reset the watching path -*/
+	m_fileSystemWatcher->removePaths(m_fileSystemWatcher->directories());
+	if (fp != TFilePath())
+		m_fileSystemWatcher->addPath(toQString(fp));
+
+	refreshCurrentFolderItems();
 
 	m_folderTreeView->setCurrentNode(fp, expandNode);
 }
@@ -2027,7 +2060,7 @@ void FileBrowser::refreshFolder(const TFilePath &folderPath)
 		FileBrowser *browser = *it;
 		DvDirModel::instance()->refreshFolder(folderPath);
 		if (browser->getFolder() == folderPath) {
-			browser->setFolder(folderPath);
+			browser->setFolder(folderPath, false, true);
 		}
 	}
 }
@@ -2081,7 +2114,7 @@ void FileBrowser::refresh()
 	}
 	m_folderTreeView->verticalScrollBar()->setValue(dx);
 
-	setFolder(originalFolder);
+	setFolder(originalFolder, false, true);
 }
 
 //-----------------------------------------------------------------------------
@@ -2168,7 +2201,7 @@ void FileBrowser::showEvent(QShowEvent *)
 	activeBrowsers.insert(this);
 	// refresh
 	if (getFolder() != TFilePath())
-		setFolder(getFolder());
+		setFolder(getFolder(), false, true);
 	else if (getDayDateString() != "")
 		setHistoryDay(getDayDateString());
 	m_folderTreeView->scrollTo(m_folderTreeView->currentIndex());
