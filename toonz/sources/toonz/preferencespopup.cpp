@@ -53,7 +53,7 @@ namespace
 
 static const int unitsCount = 5, inchIdx = 2;
 static const QString units[unitsCount] = {"cm", "mm", "inch", "field", "pixel"};
-
+static const QString rooms[2] = { "standard", "studioGhibli" };
 enum DpiPolicy { DP_ImageDpi,
 				 DP_CustomDpi };
 
@@ -222,7 +222,7 @@ void PreferencesPopup::onCameraUnitChanged(int index)
 //don't have a clue yet what this does.
 void PreferencesPopup::onRoomChoiceChanged(int index)
 {
-	m_pref->setRoomChoice(::units[index].toStdString());
+	m_pref->setCurrentRoomChoice(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -888,6 +888,8 @@ PreferencesPopup::PreferencesPopup()
 	QComboBox *cameraUnitOm = new QComboBox(this);
 	//Choose between standard and Studio Ghibli rooms
 	QComboBox *roomChoice = new QComboBox(this);
+	
+
 	m_iconSizeLx = new DVGui::IntLineEdit(this, 80, 10, 400);
 	m_iconSizeLy = new DVGui::IntLineEdit(this, 60, 10, 400);
 	m_viewShrink = new DVGui::IntLineEdit(this, 1, 1, 20);
@@ -1048,10 +1050,30 @@ PreferencesPopup::PreferencesPopup()
 	cameraUnitOm->setCurrentIndex((idx < ::unitsCount) ? idx : ::inchIdx);
 
 	//roomChoice stuff will go here for rooms
+	/*QStringList roomChoices;
+	for (int i = 0; i < m_pref->getRoomChoiceCount(); i++) {
+		QString string = getRoomChoice(i); blarb
+		if (string == m_pref->getCurrentStyleSheet())
+			currentIndex = i;
+		TFilePath path(string.toStdWString());
+		styleSheetList.push_back(QString::fromStdWString(path.getWideName()));
+	}
+	//roomChoices << tr("Standard") << tr("Studio Ghibli");
+	roomChoice->addItems(roomChoices);*/
 
-	QStringList rooms;
-	rooms << tr("Standard") << tr("Studio Ghibli");
-	roomChoice->addItems(rooms);
+	QStringList roomList;
+	int currentRoomIndex = 0;
+	for (int i = 0; i < m_pref->getRoomChoiceCount(); i++) {
+		QString string = m_pref->getRoomChoice(i);
+		if (string == m_pref->getCurrentRoomChoice())
+			currentRoomIndex = i;
+		roomList.push_back(string);
+	}
+
+	if (roomList.size() > 1) {
+		roomChoice->addItems(roomList);
+		roomChoice->setCurrentIndex(currentRoomIndex);
+	}
 
 	m_iconSizeLx->setValue(m_pref->getIconSize().lx);
 	m_iconSizeLy->setValue(m_pref->getIconSize().ly);
@@ -1261,8 +1283,8 @@ PreferencesPopup::PreferencesPopup()
 				styleLay->addWidget(new QLabel(tr("Camera Unit:"), this), 2, 0, Qt::AlignRight | Qt::AlignVCenter);
 				styleLay->addWidget(cameraUnitOm, 2, 1);
 
-				styleLay->addWidget(new QLabel(tr("Rooms:"), this), 3, 0, Qt::AlignRight | Qt::AlignVCenter);
-				styleLay->addWidget(roomChoice, 2, 1);
+				styleLay->addWidget(new QLabel(tr("Rooms *:"), this), 3, 0, Qt::AlignRight | Qt::AlignVCenter);
+				styleLay->addWidget(roomChoice, 3, 1);
 			}
 			styleLay->setColumnStretch(0, 0);
 			styleLay->setColumnStretch(1, 0);
@@ -1594,7 +1616,7 @@ PreferencesPopup::PreferencesPopup()
 	ret = ret && connect(unitOm, SIGNAL(currentIndexChanged(int)), SLOT(onUnitChanged(int)));
 	ret = ret && connect(cameraUnitOm, SIGNAL(currentIndexChanged(int)), SLOT(onCameraUnitChanged(int)));
 	//room choice connection - on roomChanged doesn't exist yet.
-	ret = ret && connect(roomChoice, SIGNAL(currentIndexChanged(int)), SLOT(onRoomChanged(int)));
+	ret = ret && connect(roomChoice, SIGNAL(currentIndexChanged(int)), SLOT(onRoomChoiceChanged(int)));
 	ret = ret && connect(openFlipbookAfterCB, SIGNAL(stateChanged(int)), this, SLOT(onViewGeneratedMovieChanged(int)));
 	ret = ret && connect(m_iconSizeLx, SIGNAL(editingFinished()), SLOT(onIconSizeChanged()));
 	ret = ret && connect(m_iconSizeLy, SIGNAL(editingFinished()), SLOT(onIconSizeChanged()));

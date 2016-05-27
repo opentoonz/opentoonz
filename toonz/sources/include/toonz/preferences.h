@@ -140,6 +140,14 @@ public:
 	void setCameraUnits(std::string s);
 	QString getCameraUnits() const { return m_cameraUnits; }
 
+	void setRoomChoice(std::string s);
+	QString getRoomChoice() const { return m_roomChoice; }
+
+	void setCurrentRoomChoice(int currentRoomChoice);
+	QString getCurrentRoomChoice() const;
+	int getRoomChoiceCount() const;
+	QString getRoomChoice(int index) const;
+
 	void enableGeneratedMovieView(bool on);
 	bool isGeneratedMovieViewEnabled() const
 	{
@@ -439,13 +447,15 @@ private:
 	std::unique_ptr<QSettings> m_settings;
 
 	QMap<int, QString> m_languageMaps,
-		m_styleSheetMaps;
+		m_styleSheetMaps,
+		m_roomMaps;
 
 	std::vector<LevelFormat> m_levelFormats;
 
 	QString m_units,
 		m_cameraUnits,
-		m_scanLevelType;
+		m_scanLevelType,
+		m_roomChoice;
 
 	double m_defLevelWidth,
 		m_defLevelHeight,
@@ -472,6 +482,7 @@ private:
 		m_animationStep;
 	int m_currentLanguage,
 		m_currentStyleSheet,
+		m_currentRoomChoice,
 		m_undoMemorySize, // in megabytes
 		m_dragCellsBehaviour,
 		m_lineTestFpsCapture,
