@@ -71,6 +71,8 @@ class MainWindow : public QMainWindow
 
 	bool m_saveSettingsOnQuit;
 	int m_oldRoomIndex;
+	QString m_currentRoomsChoice;
+
 	UpdateChecker *m_updateChecker;
 
 	TopBar *m_topBar;
@@ -108,7 +110,7 @@ public:
 	Room *getRoomByName(QString &roomName);
 
 	Room *getCurrentRoom() const;
-
+	void refreshWriteSettings();
 	/*-- FillAreas,FillLinesに直接切り替えるコマンド --*/
 	void toggleFillAreas();
 	void toggleFillLines();
@@ -127,9 +129,9 @@ private:
 	/*!Must be call before readSettings().*/
 	void defineActions();
 	/*
-  Room *createPaintRoom();
-  Room *createAnimationRoom();
-  Room *createBrowserRoom(); 
+	Room *createPaintRoom();
+	Room *createAnimationRoom();
+	Room *createBrowserRoom(); 
 	Room *createPltEditRoom();
 	Room *createFarmRoom();
 	*/

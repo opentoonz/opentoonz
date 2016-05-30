@@ -234,6 +234,16 @@ TMainWindow *TApp::getCurrentRoom() const
 
 //-----------------------------------------------------------------------------
 
+void TApp::writeSettings()
+{
+	MainWindow *mainWindow = dynamic_cast<MainWindow *>(getMainWindow());
+	if (mainWindow)
+		mainWindow->refreshWriteSettings();
+}
+
+//-----------------------------------------------------------------------------
+
+
 TPaletteHandle *TApp::getCurrentPalette() const
 {
 	return m_paletteController->getCurrentPalette();

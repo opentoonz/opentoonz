@@ -24,6 +24,12 @@ DVAPI TFilePath getModulesDir();
 DVAPI TFilePath getTemplateModuleDir();
 DVAPI TFilePath getMyModuleDir();
 
+DVAPI TFilePath getRoomsDir();
+DVAPI TFilePath getTemplateRoomsDir();
+DVAPI TFilePath getMyRoomsDir();
+DVAPI TFilePath getRoomsFile(TFilePath filename);
+DVAPI TFilePath getRoomsFile(std::string fn);
+
 // restituisce getMyModuleDir() + filename
 // o getTemplateModuleDir() + filename
 DVAPI TFilePath getModuleFile(TFilePath filename);
