@@ -219,10 +219,12 @@ void PreferencesPopup::onCameraUnitChanged(int index)
 }
 
 //-----------------------------------------------------------------------------
-//don't have a clue yet what this does.
+
 void PreferencesPopup::onRoomChoiceChanged(int index)
 {
+	TApp::instance()->writeSettings();
 	m_pref->setCurrentRoomChoice(index);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1049,18 +1051,6 @@ PreferencesPopup::PreferencesPopup()
 	idx = std::find(::units, ::units + ::unitsCount, m_pref->getCameraUnits()) - ::units;
 	cameraUnitOm->setCurrentIndex((idx < ::unitsCount) ? idx : ::inchIdx);
 
-	//roomChoice stuff will go here for rooms
-	/*QStringList roomChoices;
-	for (int i = 0; i < m_pref->getRoomChoiceCount(); i++) {
-		QString string = getRoomChoice(i); blarb
-		if (string == m_pref->getCurrentStyleSheet())
-			currentIndex = i;
-		TFilePath path(string.toStdWString());
-		styleSheetList.push_back(QString::fromStdWString(path.getWideName()));
-	}
-	//roomChoices << tr("Standard") << tr("Studio Ghibli");
-	roomChoice->addItems(roomChoices);*/
-
 	QStringList roomList;
 	int currentRoomIndex = 0;
 	for (int i = 0; i < m_pref->getRoomChoiceCount(); i++) {
@@ -1615,7 +1605,6 @@ PreferencesPopup::PreferencesPopup()
 	ret = ret && connect(styleSheetType, SIGNAL(currentIndexChanged(int)), SLOT(onStyleSheetTypeChanged(int)));
 	ret = ret && connect(unitOm, SIGNAL(currentIndexChanged(int)), SLOT(onUnitChanged(int)));
 	ret = ret && connect(cameraUnitOm, SIGNAL(currentIndexChanged(int)), SLOT(onCameraUnitChanged(int)));
-	//room choice connection - on roomChanged doesn't exist yet.
 	ret = ret && connect(roomChoice, SIGNAL(currentIndexChanged(int)), SLOT(onRoomChoiceChanged(int)));
 	ret = ret && connect(openFlipbookAfterCB, SIGNAL(stateChanged(int)), this, SLOT(onViewGeneratedMovieChanged(int)));
 	ret = ret && connect(m_iconSizeLx, SIGNAL(editingFinished()), SLOT(onIconSizeChanged()));

@@ -140,10 +140,11 @@ public:
 	void setCameraUnits(std::string s);
 	QString getCameraUnits() const { return m_cameraUnits; }
 
-	void setRoomChoice(std::string s);
-	QString getRoomChoice() const { return m_roomChoice; }
+	//void setRoomChoice(std::string s);
+	//QString getRoomChoice() const { return m_roomChoice; }
 
 	void setCurrentRoomChoice(int currentRoomChoice);
+	void setCurrentRoomChoice(QString currentRoomChoice);
 	QString getCurrentRoomChoice() const;
 	int getRoomChoiceCount() const;
 	QString getRoomChoice(int index) const;
@@ -455,7 +456,7 @@ private:
 	QString m_units,
 		m_cameraUnits,
 		m_scanLevelType,
-		m_roomChoice;
+		m_currentRoomChoice;
 
 	double m_defLevelWidth,
 		m_defLevelHeight,
@@ -480,9 +481,9 @@ private:
 		m_autocreationType,
 		m_keyframeType,
 		m_animationStep;
+
 	int m_currentLanguage,
 		m_currentStyleSheet,
-		m_currentRoomChoice,
 		m_undoMemorySize, // in megabytes
 		m_dragCellsBehaviour,
 		m_lineTestFpsCapture,
