@@ -154,6 +154,9 @@ bool ImageLoader::isImageCompatible(int imFlags, void *extData)
 
 	BuildExtData *data = static_cast<BuildExtData *>(extData);
 	const TXshSimpleLevel *sl = data->m_sl;
+
+	// NOTE: Vector and Mesh dont care about sub sampling rate and bit depth compatibility.
+	//       They are property of Raster.
 	if (sl->getType() == PLI_XSHLEVEL || sl->getType() == MESH_XSHLEVEL)
 		return true;
 
@@ -162,7 +165,11 @@ bool ImageLoader::isImageCompatible(int imFlags, void *extData)
 	if (m_subsampling <= 0 || subsampling != m_subsampling)
 		return false;
 
-	return (m_64bitCompatible || !(imFlags & ImageManager::is64bitEnabled));
+	if (m_64bitCompatible || !(imFlags & ImageManager::is64bitEnabled)){
+                return true;
+	}else{
+	        return false;
+	}
 }
 
 //-------------------------------------------------------------------------
