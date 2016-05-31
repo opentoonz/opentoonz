@@ -1106,6 +1106,10 @@ void MainWindow::resetRoomsLayout()
 
 	TFilePath layoutDir = ToonzFolder::getMyRoomsDir();
 	if (layoutDir != TFilePath()) {
+		//TSystem::deleteFile(layoutDir);
+		TSystem::rmDirTree(layoutDir);
+	}
+	/*if (layoutDir != TFilePath()) {
 		try {
 			TFilePathSet fpset;
 			TSystem::readDirectory(fpset, layoutDir, true, false);
@@ -1117,7 +1121,7 @@ void MainWindow::resetRoomsLayout()
 			}
 		} catch (...) {
 		}
-	}
+	}*/
 
 	DVGui::info(QObject::tr("The rooms will be reset the next time you run Toonz."));
 }
