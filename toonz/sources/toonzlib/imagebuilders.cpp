@@ -154,7 +154,7 @@ bool ImageLoader::isImageCompatible(int imFlags, void *extData)
 
 	BuildExtData *data = static_cast<BuildExtData *>(extData);
 	const TXshSimpleLevel *sl = data->m_sl;
-	if (sl->getType() == PLI_XSHLEVEL)
+	if (sl->getType() == PLI_XSHLEVEL || sl->getType() == MESH_XSHLEVEL)
 		return true;
 
 	int subsampling = buildSubsampling(imFlags, data);
