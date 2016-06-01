@@ -1603,6 +1603,19 @@ void DvDirTreeView::onCollapsed(const QModelIndex & index)
 void DvDirTreeView::onMonitoredDirectoryChanged(const QString & dirPath)
 {
 	DvDirModel::instance()->refreshFolder(TFilePath(dirPath));
+	
+	/*- the change may be adding of a new folder, which is needed to be added to the monitored paths -*/
+	DvDirModelNode* node = DvDirModel::instance()->getNode(rootIndex())->getNodeByPath(TFilePath(dirPath));
+	if (!node) return;
+	QStringList paths;
+	for (int c = 0; c < node->getChildCount(); c++)
+	{
+		DvDirModelFileFolderNode* childNode = dynamic_cast<DvDirModelFileFolderNode*>(node->getChild(c));
+		if (childNode)
+			paths.append(toQString(childNode->getPath()));
+	}
+	/*- if there are paths which are already being monitored, they will be ignored. -*/
+	m_dirFileSystemWatcher->addPaths(paths);
 }
 
 //=============================================================================
