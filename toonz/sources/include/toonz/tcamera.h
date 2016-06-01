@@ -22,7 +22,7 @@ class TOStream;
 //=============================================================================
 //!The TCamera class provides a camera and allows its management.
 /*!A camera is specified by size, getSize() and resolution, getRes(). 
-   It can be changed using the setSize(), setRes() functions.
+   It can be changed using the setSize(), setRes() functions.tcamera
 
    The class moreover gives methods to know camera Dpi getDpi(), camera aspect ratio
    getAspectRatio() and stage rect getStageRect().
@@ -40,6 +40,7 @@ class DVAPI TCamera
 public:
 	/*!
     Constructs TCamera with default value, size (12,9) and resolution (768,576).
+	Constructs TCamera with default value, size (12,9) and resolution (1920,1080). - 05/31/16
   */
 	TCamera();
 

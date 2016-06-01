@@ -1324,7 +1324,8 @@ void IoCmd::newScene()
 	TImageStyle::setCurrentScene(scene);
 
 	TCamera *camera = scene->getCurrentCamera();
-	TDimension res(768, 576);
+	TDimension res(1920, 1080);
+	//TDimension res(768, 576);
 	camera->setRes(res);
 	camera->setSize(TDimensionD((double)res.lx / cameraDpi, (double)res.ly / cameraDpi));
 	scene->getProperties()->setBgColor(TPixel32::White);

@@ -1007,7 +1007,8 @@ void TRasterImagePatternStrokeStyle::loadLevel(const std::string &patternName)
 				glContext = new TOfflineGL(ras->getSize());
 			// camera di default 640x480. probabilmente non e' la scelta
 			// migliore.
-			TDimension cameraSize(768, 576);
+			//TDimension cameraSize(768, 576);
+			TDimension cameraSize(1920, 1080);
 
 			// definisco i renderdata
 			const TVectorRenderData rd(

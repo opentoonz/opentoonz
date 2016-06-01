@@ -767,7 +767,8 @@ TImageP buildIcon(const TImageP &img, const TDimension &size)
 	TRaster32P raster(size);
 	if (TVectorImageP vi = img) {
 		TOfflineGL *glContext = new TOfflineGL(size);
-		TDimension cameraSize(768, 576);
+		//TDimension cameraSize(768, 576);
+		TDimension cameraSize(1920, 1080);
 		TPalette *vPalette = img->getPalette();
 		assert(vPalette);
 		const TVectorRenderData rd(
