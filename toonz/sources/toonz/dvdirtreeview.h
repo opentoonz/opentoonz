@@ -28,6 +28,7 @@ class DvDirModel;
 class DvDirModelNode;
 class DvDirVersionControlNode;
 class DvDirTreeView;
+class QFileSystemWatcher;
 
 //==============================================================
 
@@ -145,6 +146,10 @@ public slots:
 	void onRefreshStatusDone(const QString &);
 	void onRefreshStatusError(const QString &);
 
+	void onExpanded(const QModelIndex &);
+	void onCollapsed(const QModelIndex &);
+	void onMonitoredDirectoryChanged(const QString &);
+
 protected:
 	QSize sizeHint() const;
 
@@ -175,6 +180,11 @@ private:
 
 	// Using for version control node refreshing
 	DvDirVersionControlNode *m_currentRefreshedNode;
+
+	QFileSystemWatcher * m_dirFileSystemWatcher;
+	/*- Refresh monitoring paths according to expand/shrink state of the folder tree -*/
+	void updateWatcher();
+	void getExpandedPathsRecursive(const QModelIndex&, QStringList&);
 };
 
 //**********************************************************************************
