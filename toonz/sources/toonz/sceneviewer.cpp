@@ -836,6 +836,11 @@ void SceneViewer::showEvent(QShowEvent *)
 			m_vRuler->show();
 		}
 	}
+	if (m_shownOnce == false)
+	{
+		fitToCamera();
+		m_shownOnce = true;
+	}
 }
 
 //-----------------------------------------------------------------------------

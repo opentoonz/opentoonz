@@ -71,7 +71,7 @@ class SceneViewer : public QGLWidget, public TTool::Viewer, public Previewer::Li
 	bool m_tabletEvent;
 	//used to handle wrong mouse drag events!
 	bool m_buttonClicked;
-
+	bool m_shownOnce = false;
 	int m_referenceMode;
 	int m_previewMode;
 	bool m_isMouseEntered, m_forceGlFlush;
