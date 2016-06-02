@@ -347,7 +347,7 @@ ProjectPopup::ProjectPopup(bool isModal)
 			FileField *ff = new FileField(0, qName);
 			m_folderFlds.append(qMakePair(name, ff));
 			upperLayout->addWidget(new QLabel("+" + qName, this), i + 2, 0, Qt::AlignRight | Qt::AlignVCenter);
-			upperLayout->addWidget(ff, i + 2, 1);
+			upperLayout->addWidget(ff, i + 2, 1);	
 		}
 		struct {
 			QString name;
@@ -464,6 +464,7 @@ void ProjectPopup::showEvent(QShowEvent *)
 	m_model->refreshFolderChild(index);
 	TProjectP currentProject = TProjectManager::instance()->getCurrentProject();
 	updateFieldsFromProject(currentProject.getPointer());
+	updateChooseProjectCombo();
 }
 
 //=============================================================================
@@ -647,8 +648,10 @@ void ProjectCreatePopup::createProject()
 void ProjectCreatePopup::showEvent(QShowEvent *)
 {
 	int i;
+	QString fldName;
 	for (i = 0; i < m_folderFlds.size(); i++) {
-		m_folderFlds[i].second->setPath("");
+		fldName = QString::fromStdString(m_folderFlds[i].first);
+		m_folderFlds[i].second->setPath(fldName);
 	}
 	for (i = 0; i < m_useScenePathCbs.size(); i++) {
 		CheckBox *cb = m_useScenePathCbs[i].second;
