@@ -579,7 +579,10 @@ TPalette *Convert2Tlv::buildPalette()
 			page->addStyle(stylesToBeAddedToPage.at(s));
 	}
 
-	/*-- Cleanupデフォルトパレットを追加する --*/
+	if (!m_appendDefaultPalette)
+		return m_palette;
+
+	/*-- Adding styles in the default palette to the result palette, starts here --*/
 	TFilePath palettePath = ToonzFolder::getStudioPaletteFolder() + "cleanup_default.tpl";
 	TFileStatus pfs(palettePath);
 
@@ -627,7 +630,7 @@ TPalette *Convert2Tlv::buildPalette()
 		}
 	}
 	delete defaultPalette;
-	/*-- Cleanupデフォルトパレットを追加する ここまで --*/
+	/*-- Adding styles in the default palette to the result palette, ends here --*/
 
 	return m_palette;
 }
@@ -636,8 +639,8 @@ TPalette *Convert2Tlv::buildPalette()
 
 Convert2Tlv::Convert2Tlv(const TFilePath &filepath1, const TFilePath &filepath2, const TFilePath &outFolder, const QString &outName,
 						 int from, int to, bool doAutoclose, const TFilePath &palettePath, int colorTolerance,
-						 int antialiasType, int antialiasValue, bool isUnpaintedFromNAA)
-	: m_size(0, 0), m_level1(), m_levelIn1(), m_levelIn2(), m_levelOut(), m_autoclose(doAutoclose), m_premultiply(false), m_count(0), m_from(from), m_to(to), m_palettePath(palettePath), m_colorTolerance(colorTolerance), m_palette(0), m_antialiasType(antialiasType), m_antialiasValue(antialiasValue), m_isUnpaintedFromNAA(isUnpaintedFromNAA)
+						 int antialiasType, int antialiasValue, bool isUnpaintedFromNAA, bool appendDefaultPalette)
+						 : m_size(0, 0), m_level1(), m_levelIn1(), m_levelIn2(), m_levelOut(), m_autoclose(doAutoclose), m_premultiply(false), m_count(0), m_from(from), m_to(to), m_palettePath(palettePath), m_colorTolerance(colorTolerance), m_palette(0), m_antialiasType(antialiasType), m_antialiasValue(antialiasValue), m_isUnpaintedFromNAA(isUnpaintedFromNAA), m_appendDefaultPalette(appendDefaultPalette)
 {
 	if (filepath1 != TFilePath()) {
 		m_levelIn1 = filepath1.getParentDir() + filepath1.getLevelName();

@@ -113,7 +113,8 @@ private:
 	QFrame *m_tlvFrame;
 	QCheckBox *m_applyAutoclose,
 		*m_removeDotBeforeFrameNumber,
-		*m_saveBackupToNopaint;
+		*m_saveBackupToNopaint,
+		*m_appendDefaultPalette;
 	DVGui::CheckBox *m_skip;
 	QComboBox *m_antialias,
 		*m_tlvMode,
