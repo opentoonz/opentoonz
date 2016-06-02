@@ -24,7 +24,9 @@
 //=============================================================================
 
 TSceneProperties::TSceneProperties()
-	: m_cleanupParameters(new CleanupParameters()), m_scanParameters(new TScannerParameters()), m_vectorizerParameters(new VectorizerParameters()), m_captureParameters(new CaptureParameters()), m_outputProp(new TOutputProperties()), m_previewProp(new TOutputProperties()), m_bgColor(255, 255, 255, 0), m_markerDistance(6), m_markerOffset(0), m_fullcolorSubsampling(1), m_tlvSubsampling(1), m_fieldGuideSize(12), m_fieldGuideAspectRatio(1.38)
+	: m_cleanupParameters(new CleanupParameters()), m_scanParameters(new TScannerParameters()), m_vectorizerParameters(new VectorizerParameters()), 
+	m_captureParameters(new CaptureParameters()), m_outputProp(new TOutputProperties()), m_previewProp(new TOutputProperties()), 
+	m_bgColor(255, 255, 255, 255), m_markerDistance(6), m_markerOffset(0), m_fullcolorSubsampling(1), m_tlvSubsampling(1), m_fieldGuideSize(12), m_fieldGuideAspectRatio(1.38)
 {
 	//Default color
 	m_notesColor.push_back(TPixel32(255, 235, 140));
