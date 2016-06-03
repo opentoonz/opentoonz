@@ -227,7 +227,7 @@ bool Preferences::LevelFormat::matches(const TFilePath &fp) const
 //**********************************************************************************
 
 Preferences::Preferences()
-	: m_units("mm"), m_cameraUnits("inch"), m_scanLevelType("tif"), m_defLevelWidth(0.0), m_defLevelHeight(0.0), m_defLevelDpi(0.0), m_iconSize(160, 120), m_blankColor(TPixel32::White), m_frontOnionColor(TPixel::Black), m_backOnionColor(TPixel::Black), m_transpCheckBg(TPixel::White), m_transpCheckInk(TPixel::Black), m_transpCheckPaint(TPixel(127, 127, 127)), m_autosavePeriod(15), m_chunkSize(10), m_rasterOptimizedMemory(0), m_shrink(1), m_step(1), m_blanksCount(0), m_keyframeType(3), m_animationStep(1), m_textureSize(0), m_xsheetStep(10), m_shmmax(-1), m_shmseg(-1), m_shmall(-1), m_shmmni(-1), m_onionPaperThickness(50), m_currentLanguage(0), m_currentStyleSheet(0), m_undoMemorySize(100), m_dragCellsBehaviour(0), m_lineTestFpsCapture(25), m_defLevelType(0), m_autocreationType(1), m_autoExposeEnabled(true), m_autoCreateEnabled(true), m_subsceneFolderEnabled(true), m_generatedMovieViewEnabled(true), m_xsheetAutopanEnabled(true), m_ignoreAlphaonColumn1Enabled(false), m_rewindAfterPlaybackEnabled(true), m_fitToFlipbookEnabled(false), m_previewAlwaysOpenNewFlipEnabled(false), m_autosaveEnabled(false), m_defaultViewerEnabled(false), m_saveUnpaintedInCleanup(true), m_askForOverrideRender(true), m_automaticSVNFolderRefreshEnabled(true), m_SVNEnabled(false), m_minimizeSaveboxAfterEditing(true), m_levelsBackupEnabled(false), m_sceneNumberingEnabled(false), m_animationSheetEnabled(false), m_inksOnly(false), m_fillOnlySavebox(false), m_show0ThickLines(true), m_regionAntialias(false), m_viewerBGColor(128, 128, 128, 255), m_previewBGColor(64, 64, 64, 255), m_chessboardColor1(180, 180, 180), m_chessboardColor2(230, 230, 230), m_showRasterImagesDarkenBlendedInViewer(false), m_actualPixelViewOnSceneEditingMode(false), m_viewerZoomCenter(0), m_initialLoadTlvCachingBehavior(0), m_removeSceneNumberFromLoadedLevelName(false), m_replaceAfterSaveLevelAs(true), m_showFrameNumberWithLetters(false), m_levelNameOnEachMarker(false), m_columnIconLoadingPolicy((int)LoadAtOnce), m_moveCurrentFrameByClickCellArea(true), m_onionSkinEnabled(true), m_multiLayerStylePickerEnabled(false), m_paletteTypeOnLoadRasterImageAsColorModel(0), m_showKeyframesOnXsheetCellArea(true)
+	: m_units("mm"), m_cameraUnits("inch"), m_currentRoomChoice("Default"), m_scanLevelType("tif"), m_defLevelWidth(0.0), m_defLevelHeight(0.0), m_defLevelDpi(0.0), m_iconSize(160, 120), m_blankColor(TPixel32::White), m_frontOnionColor(TPixel::Black), m_backOnionColor(TPixel::Black), m_transpCheckBg(TPixel::White), m_transpCheckInk(TPixel::Black), m_transpCheckPaint(TPixel(127, 127, 127)), m_autosavePeriod(15), m_chunkSize(10), m_rasterOptimizedMemory(0), m_shrink(1), m_step(1), m_blanksCount(0), m_keyframeType(3), m_animationStep(1), m_textureSize(0), m_xsheetStep(10), m_shmmax(-1), m_shmseg(-1), m_shmall(-1), m_shmmni(-1), m_onionPaperThickness(50), m_currentLanguage(0), m_currentStyleSheet(0), m_undoMemorySize(100), m_dragCellsBehaviour(0), m_lineTestFpsCapture(25), m_defLevelType(0), m_autocreationType(1), m_autoExposeEnabled(true), m_autoCreateEnabled(true), m_subsceneFolderEnabled(true), m_generatedMovieViewEnabled(true), m_xsheetAutopanEnabled(true), m_ignoreAlphaonColumn1Enabled(false), m_rewindAfterPlaybackEnabled(true), m_fitToFlipbookEnabled(false), m_previewAlwaysOpenNewFlipEnabled(false), m_autosaveEnabled(false), m_defaultViewerEnabled(false), m_saveUnpaintedInCleanup(true), m_askForOverrideRender(true), m_automaticSVNFolderRefreshEnabled(true), m_SVNEnabled(false), m_minimizeSaveboxAfterEditing(true), m_levelsBackupEnabled(false), m_sceneNumberingEnabled(false), m_animationSheetEnabled(false), m_inksOnly(false), m_fillOnlySavebox(false), m_show0ThickLines(true), m_regionAntialias(false), m_viewerBGColor(128, 128, 128, 255), m_previewBGColor(64, 64, 64, 255), m_chessboardColor1(180, 180, 180), m_chessboardColor2(230, 230, 230), m_showRasterImagesDarkenBlendedInViewer(false), m_actualPixelViewOnSceneEditingMode(false), m_viewerZoomCenter(0), m_initialLoadTlvCachingBehavior(0), m_removeSceneNumberFromLoadedLevelName(false), m_replaceAfterSaveLevelAs(true), m_showFrameNumberWithLetters(false), m_levelNameOnEachMarker(false), m_columnIconLoadingPolicy((int)LoadAtOnce), m_moveCurrentFrameByClickCellArea(true), m_onionSkinEnabled(true), m_multiLayerStylePickerEnabled(false), m_paletteTypeOnLoadRasterImageAsColorModel(0), m_showKeyframesOnXsheetCellArea(true)
 {
 	TCamera camera;
 	m_defLevelType = PLI_XSHLEVEL;
@@ -345,6 +345,7 @@ Preferences::Preferences()
 	std::sort(m_levelFormats.begin(), m_levelFormats.end(), // Format sorting must be
 			  formatLess);									// enforced
 
+	//load languages
 	TFilePath lang_path = TEnv::getConfigDir() + "loc";
 	TFilePathSet lang_fpset;
 	m_languageMaps[0] = "English";
@@ -369,6 +370,7 @@ Preferences::Preferences()
 	} catch (...) {
 	}
 
+	//load styles
 	TFilePath path(TEnv::getConfigDir() + "qss");
 	TFilePathSet fpset;
 	try {
@@ -391,8 +393,50 @@ Preferences::Preferences()
 	} catch (...) {
 	}
 
+	//load rooms or layouts
+	QString rooms;
+	bool roomsExist = false;
+	rooms = m_settings->value("CurrentRoomChoice").toString();
+
+	TFilePath room_path(TEnv::getStuffDir() + "profiles/layouts/rooms");
+	TFilePathSet room_fpset;
+	try {
+		TSystem::readDirectory(room_fpset, room_path, true, false);
+		TFilePathSet::iterator it = room_fpset.begin();
+		int i = 0;
+		for (it; it != room_fpset.end(); it++) {
+			TFilePath newPath = *it;
+			if (newPath == room_path)
+				continue;
+			if (TFileStatus(newPath).isDirectory()) {
+				QString string = QString::fromStdWString(newPath.getWideName());
+				if (string == rooms)
+					roomsExist = true;
+				m_roomMaps[i] = string;
+				i++;
+			} 
+		}
+	}
+	catch (...) {
+	}
+	//make sure the selected rooms exists
+	if (rooms != "" && roomsExist)
+	{
+		m_currentRoomChoice = rooms;
+		setCurrentRoomChoice(rooms);
+	}
+	//or set the selected rooms to the first ones in the folder
+	else
+	{
+		m_currentRoomChoice = m_roomMaps[0];
+		setCurrentRoomChoice(0);
+	}
+
 	getValue(*m_settings, "CurrentLanguage", m_currentLanguage);
 	getValue(*m_settings, "CurrentStyleSheet", m_currentStyleSheet);
+	
+
+
 	getValue(*m_settings, "DragCellsBehaviour", m_dragCellsBehaviour);
 
 	getValue(*m_settings, "LineTestFpsCapture", m_lineTestFpsCapture);
@@ -886,6 +930,44 @@ void Preferences::setCameraUnits(std::string units)
 	setCurrentUnits("camera.lx", units);
 	setCurrentUnits("camera.ly", units);
 }
+
+//-----------------------------------------------------------------
+
+void Preferences::setCurrentRoomChoice(int currentRoomChoice)
+{
+	m_currentRoomChoice = getRoomChoice(currentRoomChoice);
+	m_settings->setValue("CurrentRoomChoice", m_currentRoomChoice);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setCurrentRoomChoice(QString currentRoomChoice)
+{
+	m_currentRoomChoice = currentRoomChoice;
+	m_settings->setValue("CurrentRoomChoice", m_currentRoomChoice);
+}
+
+//-----------------------------------------------------------------
+
+QString Preferences::getCurrentRoomChoice() const
+{
+	return m_currentRoomChoice;
+}
+
+//-----------------------------------------------------------------
+
+int Preferences::getRoomChoiceCount() const
+{
+	return m_roomMaps.size();
+}
+
+//-----------------------------------------------------------------
+
+QString Preferences::getRoomChoice(int index) const
+{
+	return m_roomMaps[index];
+}
+
 //-----------------------------------------------------------------
 
 void Preferences::setScanLevelType(std::string type)

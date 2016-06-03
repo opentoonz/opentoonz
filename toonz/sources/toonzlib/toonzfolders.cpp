@@ -5,6 +5,7 @@
 #include "tenv.h"
 //#include "appmainshell.h"
 #include "tconvert.h"
+#include "toonz/preferences.h"
 
 using namespace TEnv;
 
@@ -77,7 +78,8 @@ TFilePath ToonzFolder::getReslistPath(bool forCleanup)
 
 TFilePath ToonzFolder::getTemplateModuleDir()
 {
-	return getModulesDir() + getModuleName();
+	//return getModulesDir() + getModuleName();
+	return getModulesDir() + "settings";
 }
 
 TFilePath ToonzFolder::getMyModuleDir()
@@ -98,6 +100,40 @@ TFilePath ToonzFolder::getModuleFile(TFilePath filename)
 TFilePath ToonzFolder::getModuleFile(std::string fn)
 {
 	return ToonzFolder::getModuleFile(TFilePath(fn));
+}
+
+//turtle
+TFilePath ToonzFolder::getRoomsDir()
+{
+	return getProfileFolder() + "layouts/rooms";
+}
+
+TFilePath ToonzFolder::getTemplateRoomsDir()
+{
+	return getRoomsDir() + Preferences::instance()->getCurrentRoomChoice().toStdWString();
+	//TFilePath fp(getMyModuleDir() + TFilePath(mySettingsFileName));
+	//return getRoomsDir() + getModuleName();
+}
+
+TFilePath ToonzFolder::getMyRoomsDir()
+{
+	//TFilePath fp(getTemplateRoomsDir());
+	TFilePath fp(getProfileFolder());
+	return fp.withName(fp.getWideName() + L"/layouts/personal/" + Preferences::instance()->getCurrentRoomChoice().toStdWString() + L"." + TSystem::getUserName().toStdWString());
+}
+
+TFilePath ToonzFolder::getRoomsFile(TFilePath filename)
+{
+	TFilePath fp = getMyRoomsDir() + filename;
+	if (TFileStatus(fp).doesExist())
+		return fp;
+	fp = getTemplateRoomsDir() + filename;
+	return fp;
+}
+
+TFilePath ToonzFolder::getRoomsFile(std::string fn)
+{
+	return ToonzFolder::getRoomsFile(TFilePath(fn));
 }
 
 //===================================================================

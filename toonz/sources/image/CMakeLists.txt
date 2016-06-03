@@ -85,7 +85,11 @@ if(WIN32)
     endif()
 endif()
 
-_find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")
+if(PLATFORM EQUAL 32)
+    _find_toonz_library(TNZLIBS "tnzcore;tnzbase")
+else()
+    _find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")
+endif()
 
 if(WIN32)
     set(EXTRA_LIBS
