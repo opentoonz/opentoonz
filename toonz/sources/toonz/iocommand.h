@@ -180,7 +180,7 @@ bool saveAll();
 bool saveSound(const TFilePath &fp, TXshSoundLevel *sc, bool overwrite);
 bool saveSound(TXshSoundLevel *sc);
 
-bool loadColorModel(const TFilePath &fp, int paletteFrame = 0);
+//bool loadColorModel(const TFilePath &fp, int paletteFrame = 0);
 
 /*! \note     Will fallback to loadResourceFolders() in case all
               argument paths are folders.                                 */

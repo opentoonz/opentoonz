@@ -867,7 +867,7 @@ public:
 // loadRefImage
 //-------------------------------------------------------------------
 
-int loadRefImage(TPaletteHandle *paletteHandle, bool replace,
+int loadRefImage(TPaletteHandle *paletteHandle, PaletteCmd::ColorModelPltBehavior pltBehavior,
 				 TPaletteP levelPalette, const TFilePath &_fp, int &frame, ToonzScene *scene,
 				 const std::vector<int> &frames)
 {
@@ -947,7 +947,7 @@ int loadRefImage(TPaletteHandle *paletteHandle, bool replace,
 
 	TUndo *undo = new SetReferenceImageUndo(levelPalette, paletteHandle);
 
-	if (!replace) //ret==1)
+	if (pltBehavior != PaletteCmd::ReplaceColorModelPlt) //ret==1 or 3)
 	{
 		TPaletteP imagePalette;
 		if (TRasterImageP ri = img) {
@@ -962,10 +962,18 @@ int loadRefImage(TPaletteHandle *paletteHandle, bool replace,
 					/*-- 似ている色をまとめて1つのStyleにする --*/
 					TColorUtils::buildPalette(colors, raster, colorCount);
 				colors.erase(TPixel::Black); //il nero viene messo dal costruttore della TPalette
-				imagePalette = new TPalette();
+				int pageIndex = 0;
+				if (pltBehavior == PaletteCmd::KeepColorModelPlt)
+					imagePalette = new TPalette();
+				else
+				{
+					imagePalette = levelPalette->clone();
+					/*- Add new page and store color model's styles in it -*/
+					pageIndex = imagePalette->addPage(QObject::tr("color model").toStdWString())->getIndex();
+				}
 				std::set<TPixel32>::const_iterator it = colors.begin();
 				for (; it != colors.end(); ++it)
-					imagePalette->getPage(0)->addStyle(*it);
+					imagePalette->getPage(pageIndex)->addStyle(*it);
 			}
 		} else
 			imagePalette = img->getPalette();
@@ -992,8 +1000,6 @@ int loadRefImage(TPaletteHandle *paletteHandle, bool replace,
 	img->setPalette(0);
 
 	levelPalette->setRefImgPath(_fp);
-	if (!replace)
-		levelPalette->setDirtyFlag(true);
 
 	TUndoManager::manager()->add(undo);
 	paletteHandle->notifyPaletteChanged();
@@ -1011,7 +1017,7 @@ int loadRefImage(TPaletteHandle *paletteHandle, bool replace,
 // return values -- 2: failed_to_get_palette, 1: failed_to_get_image, 0: OK
 //-------------------------------------------------------------------
 
-int PaletteCmd::loadReferenceImage(TPaletteHandle *paletteHandle, bool replace,
+int PaletteCmd::loadReferenceImage(TPaletteHandle *paletteHandle, ColorModelPltBehavior pltBehavior,
 								   const TFilePath &_fp, int &frame, ToonzScene *scene,
 								   const std::vector<int> &frames)
 {
@@ -1019,12 +1025,12 @@ int PaletteCmd::loadReferenceImage(TPaletteHandle *paletteHandle, bool replace,
 	if (!levelPalette)
 		return 2;
 
-	int ret = loadRefImage(paletteHandle, replace, levelPalette, _fp, frame, scene, frames);
+	int ret = loadRefImage(paletteHandle, pltBehavior, levelPalette, _fp, frame, scene, frames);
 	if (ret != 0)
 		return ret;
 
 	// when choosing replace(Keep the destination palette), dirty flag is unchanged
-	if (!replace)
+	if (pltBehavior != ReplaceColorModelPlt)
 		levelPalette->setDirtyFlag(true);
 
 	return 0;

@@ -152,22 +152,42 @@ void ColorModelViewer::loadImage(const TFilePath &fp)
 	if (!paletteHandle->getPalette())
 		return;
 
+	std::string type(fp.getType());
+
 	QString question(QObject::tr("The color model palette is different from the destination palette.\nWhat do you want to do? "));
 	QList<QString> list;
 	list.append(QObject::tr("Overwrite the destination palette."));
 	list.append(QObject::tr("Keep the destination palette and apply it to the color model."));
+	/*- if the file is raster image (i.e. without palette), then add another option "add styles"  -*/
+	if (type != "tlv" && type != "pli")
+		list.append(QObject::tr("Add color model's palette to the destination palette."));
+
 	int ret = DVGui::RadioButtonMsgBox(DVGui::WARNING, question, list);
-	if (ret == 0)
+
+	PaletteCmd::ColorModelPltBehavior pltBehavior;
+	switch (ret)
+	{
+	case 0:
 		return;
-	bool replace = false;
-	if (ret == 2)
-		replace = true;
+	case 1: 
+		pltBehavior = PaletteCmd::KeepColorModelPlt;
+		break;
+	case 2:
+		pltBehavior = PaletteCmd::ReplaceColorModelPlt;
+		break;
+	case 3:
+		pltBehavior = PaletteCmd::AddColorModelPlt;
+		break;
+	default:
+		pltBehavior = PaletteCmd::KeepColorModelPlt;
+		break;
+	}
 
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
 	int paletteFrame = 0;
 
-	PaletteCmd::loadReferenceImage(paletteHandle, replace, fp, paletteFrame, scene);
+	PaletteCmd::loadReferenceImage(paletteHandle, pltBehavior, fp, paletteFrame, scene);
 
 	TXshLevel *level = TApp::instance()->getCurrentLevel()->getLevel();
 	if (!level)

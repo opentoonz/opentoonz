@@ -1693,7 +1693,7 @@ bool IoCmd::saveSound(TXshSoundLevel *sl)
 //===========================================================================
 // IoCmd::loadColorModel(soundColumn)
 //---------------------------------------------------------------------------
-
+/*
 bool IoCmd::loadColorModel(const TFilePath &fp, int frame)
 {
 	TPaletteHandle *paletteHandle = TApp::instance()->getPaletteController()->getCurrentPalette();
@@ -1758,7 +1758,7 @@ bool IoCmd::loadColorModel(const TFilePath &fp, int frame)
 
 	return true;
 }
-
+*/
 //=========================================================================
 // IoCmd::loadScene(scene, scenePath, import)
 //---------------------------------------------------------------------------
