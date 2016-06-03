@@ -27,6 +27,7 @@
 #include <QUrl>
 #include <QDir>
 #include <QMimeData>
+#include <QFileSystemWatcher>
 
 using namespace DVGui;
 
@@ -292,6 +293,8 @@ DvDirTreeView::DvDirTreeView(QWidget *parent)
 	setIndentation(14);
 	setAlternatingRowColors(true);
 
+	m_dirFileSystemWatcher = new QFileSystemWatcher(this);
+
 	//Connect all possible changes that can alter the
 	//bottom horizontal scrollbar to resize contents...
 	connect(
@@ -306,7 +309,21 @@ DvDirTreeView::DvDirTreeView(QWidget *parent)
 		this->model(), SIGNAL(layoutChanged()),
 		this, SLOT(resizeToConts()));
 
+	connect(
+		this, SIGNAL(expanded(const QModelIndex &)),
+		this, SLOT(onExpanded(const QModelIndex &)));
+
+	connect(
+		this, SIGNAL(collapsed(const QModelIndex &)),
+		this, SLOT(onCollapsed(const QModelIndex &)));
+
+	connect(
+		m_dirFileSystemWatcher, SIGNAL(directoryChanged(const QString &)),
+		this, SLOT(onMonitoredDirectoryChanged(const QString &)));
+
 	setAcceptDrops(true);
+
+	updateWatcher();
 }
 
 //-----------------------------------------------------------------------------
@@ -1526,6 +1543,79 @@ DvItemListModel::Status DvDirTreeView::getItemVersionControlStatus(
 		return DvItemListModel::VC_None;
 	}
 	return DvItemListModel::VC_None;
+}
+
+/*- Refresh monitoring paths according to expand/shrink state of the folder tree -*/
+void DvDirTreeView::updateWatcher()
+{
+	if (!m_dirFileSystemWatcher->directories().isEmpty())
+		m_dirFileSystemWatcher->removePaths(m_dirFileSystemWatcher->directories());
+
+	QStringList paths;
+	getExpandedPathsRecursive(rootIndex(), paths);
+
+	m_dirFileSystemWatcher->addPaths(paths);
+}
+
+void DvDirTreeView::getExpandedPathsRecursive(const QModelIndex& index, QStringList& paths)
+{
+	DvDirModelNode* node = DvDirModel::instance()->getNode(index);
+	DvDirModelFileFolderNode* fileFolderNode = dynamic_cast<DvDirModelFileFolderNode*>(node);
+	if (fileFolderNode)
+	{
+		QString path = toQString(fileFolderNode->getPath());
+		if (!paths.contains(path))
+		{
+			paths.append(path);
+		}
+	}
+	/*- serch child nodes if this node is expanded -*/
+	if (index!=rootIndex() && !isExpanded(index))
+		return;
+
+	int count = DvDirModel::instance()->rowCount(index);
+	for (int r = 0; r < count; r++)
+	{
+		QModelIndex child = DvDirModel::instance()->index(r, 0, index);
+		getExpandedPathsRecursive(child, paths);
+	}
+}
+
+void DvDirTreeView::onExpanded(const QModelIndex & index)
+{
+	QStringList paths;
+	getExpandedPathsRecursive(index, paths);
+	m_dirFileSystemWatcher->addPaths(paths);
+}
+
+void DvDirTreeView::onCollapsed(const QModelIndex & index)
+{
+	QStringList paths;
+	int count = DvDirModel::instance()->rowCount(index);
+	for (int r = 0; r < count; r++)
+	{
+		QModelIndex child = DvDirModel::instance()->index(r, 0, index);
+		getExpandedPathsRecursive(child, paths);		
+	}
+	m_dirFileSystemWatcher->removePaths(paths);
+}
+
+void DvDirTreeView::onMonitoredDirectoryChanged(const QString & dirPath)
+{
+	DvDirModel::instance()->refreshFolder(TFilePath(dirPath));
+	
+	/*- the change may be adding of a new folder, which is needed to be added to the monitored paths -*/
+	DvDirModelNode* node = DvDirModel::instance()->getNode(rootIndex())->getNodeByPath(TFilePath(dirPath));
+	if (!node) return;
+	QStringList paths;
+	for (int c = 0; c < node->getChildCount(); c++)
+	{
+		DvDirModelFileFolderNode* childNode = dynamic_cast<DvDirModelFileFolderNode*>(node->getChild(c));
+		if (childNode)
+			paths.append(toQString(childNode->getPath()));
+	}
+	/*- if there are paths which are already being monitored, they will be ignored. -*/
+	m_dirFileSystemWatcher->addPaths(paths);
 }
 
 //=============================================================================

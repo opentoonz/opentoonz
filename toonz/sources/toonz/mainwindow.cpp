@@ -102,16 +102,16 @@ bool readRoomList(std::vector<TFilePath> &roomPaths,
 	TFilePath fp;
 	/*-レイアウトファイルが指定されている場合--*/
 	if (!argumentLayoutFileName.isEmpty()) {
-		fp = ToonzFolder::getModuleFile(argumentLayoutFileName.toStdString());
+		fp = ToonzFolder::getRoomsFile(argumentLayoutFileName.toStdString());
 		if (!TFileStatus(fp).doesExist()) {
 			DVGui::warning("Room layout file " + argumentLayoutFileName + " not found!");
-			fp = ToonzFolder::getModuleFile(layoutsFileName);
+			fp = ToonzFolder::getRoomsFile(layoutsFileName);
 			if (!TFileStatus(fp).doesExist())
 				return false;
 		} else
 			argumentLayoutFileLoaded = true;
 	} else {
-		fp = ToonzFolder::getModuleFile(layoutsFileName);
+		fp = ToonzFolder::getRoomsFile(layoutsFileName);
 		if (!TFileStatus(fp).doesExist())
 			return false;
 	}
@@ -144,7 +144,7 @@ bool readRoomList(std::vector<TFilePath> &roomPaths,
 
 void writeRoomList(std::vector<TFilePath> &roomPaths)
 {
-	TFilePath fp = ToonzFolder::getMyModuleDir() + layoutsFileName;
+	TFilePath fp = ToonzFolder::getMyRoomsDir() + layoutsFileName;
 	TSystem::touchParentDir(fp);
 	Tofstream os(fp);
 	if (!os)
@@ -170,7 +170,7 @@ void writeRoomList(std::vector<Room *> &rooms)
 
 void makePrivate(Room *room)
 {
-	TFilePath layoutDir = ToonzFolder::getMyModuleDir();
+	TFilePath layoutDir = ToonzFolder::getMyRoomsDir();
 	TFilePath roomPath = room->getPath();
 	std::string mbSrcFileName = roomPath.getName() + "_menubar.xml";
 	if (roomPath == TFilePath() || roomPath.getParentDir() != layoutDir) {
@@ -189,12 +189,12 @@ void makePrivate(Room *room)
 	TFilePath myMBPath = layoutDir + mbDstFileName;
 	if (!TFileStatus(myMBPath).isReadable())
 	{
-		TFilePath templateRoomMBPath = ToonzFolder::getTemplateModuleDir() + mbSrcFileName;
+		TFilePath templateRoomMBPath = ToonzFolder::getTemplateRoomsDir() + mbSrcFileName;
 		if (TFileStatus(templateRoomMBPath).doesExist())
 			TSystem::copyFile(myMBPath, templateRoomMBPath);
 		else
 		{
-			TFilePath templateFullMBPath = ToonzFolder::getTemplateModuleDir() + "menubar_template.xml";
+			TFilePath templateFullMBPath = ToonzFolder::getTemplateRoomsDir() + "menubar_template.xml";
 			if (TFileStatus(templateFullMBPath).doesExist())
 				TSystem::copyFile(myMBPath, templateFullMBPath);
 			else
@@ -379,7 +379,7 @@ MainWindow::MainWindow(const QString &argumentLayoutFileName, QWidget *parent, Q
 {
 	m_toolsActionGroup = new QActionGroup(this);
 	m_toolsActionGroup->setExclusive(true);
-
+	m_currentRoomsChoice = Preferences::instance()->getCurrentRoomChoice();
 	defineActions();
 	TApp::instance()->getCurrentScene()->setDirtyFlag(false);
 
@@ -527,6 +527,13 @@ int MainWindow::getRoomCount() const
 
 //-----------------------------------------------------------------------------
 
+void MainWindow::refreshWriteSettings()
+{
+	writeSettings();
+}
+
+//-----------------------------------------------------------------------------
+
 void MainWindow::readSettings(const QString &argumentLayoutFileName)
 {
 
@@ -570,7 +577,7 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 
 			/*- ここでMenuBarファイルをロードする -*/
 			std::string mbFileName = roomPath.getName() + "_menubar.xml";
-			stackedMenuBar->loadAndAddMenubar(ToonzFolder::getModuleFile(mbFileName));
+			stackedMenuBar->loadAndAddMenubar(ToonzFolder::getRoomsFile(mbFileName));
 
 			//room->setDockOptions(QMainWindow::DockOptions(
 			//  (QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks) & ~QMainWindow::AllowTabbedDocks));
@@ -627,7 +634,7 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 	writeRoomList(rooms);
 	
 	// Imposto la stanza corrente
-	fp = ToonzFolder::getModuleFile(currentRoomFileName);
+	fp = ToonzFolder::getRoomsFile(currentRoomFileName);
 	Tifstream is(fp);
 	std::string currentRoomName;
 	is >> currentRoomName;
@@ -705,10 +712,13 @@ void MainWindow::writeSettings()
 		rooms.push_back(room);
 		room->save();
 	}
-	writeRoomList(rooms);
+	if (m_currentRoomsChoice == Preferences::instance()->getCurrentRoomChoice())
+	{
+		writeRoomList(rooms);
+	}
 
 	//Current room settings
-	Tofstream os(ToonzFolder::getMyModuleDir() + currentRoomFileName);
+	Tofstream os(ToonzFolder::getMyRoomsDir() + currentRoomFileName);
 	os << getCurrentRoom()->getName().toStdString();
 
 	//Main window settings
@@ -1094,8 +1104,12 @@ void MainWindow::resetRoomsLayout()
 
 	m_saveSettingsOnQuit = false;
 
-	TFilePath layoutDir = ToonzFolder::getMyModuleDir();
+	TFilePath layoutDir = ToonzFolder::getMyRoomsDir();
 	if (layoutDir != TFilePath()) {
+		//TSystem::deleteFile(layoutDir);
+		TSystem::rmDirTree(layoutDir);
+	}
+	/*if (layoutDir != TFilePath()) {
 		try {
 			TFilePathSet fpset;
 			TSystem::readDirectory(fpset, layoutDir, true, false);
@@ -1107,7 +1121,7 @@ void MainWindow::resetRoomsLayout()
 			}
 		} catch (...) {
 		}
-	}
+	}*/
 
 	DVGui::info(QObject::tr("The rooms will be reset the next time you run Toonz."));
 }
@@ -1932,7 +1946,7 @@ void MainWindow::defineActions()
 	createViewerAction(V_ShowHideFullScreen, tr("Show//Hide Full Screen"), "");
 	CommandManager::instance()->setToggleTexts(V_ShowHideFullScreen, tr("Full Screen Mode"), tr("Exit Full Screen Mode"));
 
-	createMiscAction(MI_RefreshTree, "Refresh Folder Tree", "");
+	createMiscAction(MI_RefreshTree, tr("Refresh Folder Tree"), "");
 
 	createToolOptionsAction("A_ToolOption_GlobalKey", tr("Global Key"), "");
 

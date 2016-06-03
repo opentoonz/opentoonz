@@ -99,6 +99,7 @@ private slots:
 
 	void onUnitChanged(int index);
 	void onCameraUnitChanged(int index);
+	void onRoomChoiceChanged(int index);
 	void onScanLevelTypeChanged(const QString &text);
 	void onMinuteChanged();
 	void onIconSizeChanged();
