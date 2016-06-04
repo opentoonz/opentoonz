@@ -549,7 +549,7 @@ class MessageCreateContext : public TThread::Message
 	std::shared_ptr<TOfflineGL::Imp> m_shared;
 
 public:
-	MessageCreateContext(TOfflineGL *ogl, const TDimension &size, const TOfflineGL::Imp *shared)
+	MessageCreateContext(TOfflineGL *ogl, const TDimension &size, TOfflineGL::Imp *shared)
 		: m_ogl(ogl), m_size(size), m_shared(shared) {}
 
 	void onDeliver()
