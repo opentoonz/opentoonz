@@ -92,12 +92,12 @@ void performStandardRaylit(T *bufIn, T *bufOut,
 			if (insideSrc) {
 				// Add a light component depending on source's matte
 				if (pixIn->m == opaque_val)
-					lightness = tmax(0.0, lightness - neg_delta_p); // No light source - ray fading
+					lightness = std::max(0.0, lightness - neg_delta_p); // No light source - ray fading
 				else {
 					if (pixIn->m == transp_val)
 						lightness += intensity; // Full light source - ray enforcing
 					else
-						lightness = tmax(0.0, lightness +														   // Half light source
+						lightness = std::max(0.0, lightness +														   // Half light source
 												  (params.m_invert ? pixIn->m : (max - pixIn->m)) * quot_delta_p); //   matte-linear enforcing
 				}
 
@@ -112,7 +112,7 @@ void performStandardRaylit(T *bufIn, T *bufOut,
 				if (!params.m_invert)
 					lightness += intensity;
 				else
-					lightness = tmax(0.0, lightness - neg_delta_p);
+					lightness = std::max(0.0, lightness - neg_delta_p);
 
 				val_r = val_g = val_b = val_m = 0;
 			}
@@ -210,16 +210,16 @@ void performColorRaylit(T *bufIn, T *bufOut,
 				val_b = pixIn->b;
 				val_m = pixIn->m;
 
-				lightness_r = tmax(0.0, val_r ? lightness_r + val_r * quot_delta_p : lightness_r - neg_delta_p);
-				lightness_g = tmax(0.0, val_g ? lightness_g + val_g * quot_delta_p : lightness_g - neg_delta_p);
-				lightness_b = tmax(0.0, val_b ? lightness_b + val_b * quot_delta_p : lightness_b - neg_delta_p);
+				lightness_r = std::max(0.0, val_r ? lightness_r + val_r * quot_delta_p : lightness_r - neg_delta_p);
+				lightness_g = std::max(0.0, val_g ? lightness_g + val_g * quot_delta_p : lightness_g - neg_delta_p);
+				lightness_b = std::max(0.0, val_b ? lightness_b + val_b * quot_delta_p : lightness_b - neg_delta_p);
 
 				if (!params.m_includeInput)
 					val_r = val_g = val_b = val_m = 0;
 			} else {
-				lightness_r = tmax(0.0, lightness_r - neg_delta_p);
-				lightness_g = tmax(0.0, lightness_g - neg_delta_p);
-				lightness_b = tmax(0.0, lightness_b - neg_delta_p);
+				lightness_r = std::max(0.0, lightness_r - neg_delta_p);
+				lightness_g = std::max(0.0, lightness_g - neg_delta_p);
+				lightness_b = std::max(0.0, lightness_b - neg_delta_p);
 
 				val_r = val_g = val_b = val_m = 0;
 			}
@@ -235,9 +235,9 @@ void performColorRaylit(T *bufIn, T *bufOut,
 				val_r += l = (int)(fac * lightness_r + 0.5);
 				l_max = l;
 				val_g += l = (int)(fac * lightness_g + 0.5);
-				l_max = tmax(l, l_max);
+				l_max = std::max(l, l_max);
 				val_b += l = (int)(fac * lightness_b + 0.5);
-				l_max = tmax(l, l_max);
+				l_max = std::max(l, l_max);
 				val_m += l_max;
 
 				pixOut->r = (val_r > max) ? max : val_r;

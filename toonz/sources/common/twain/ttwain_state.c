@@ -37,7 +37,13 @@ static void TTWAIN_FreeVar(void);
 #define COMPANY "Digital Video"
 #define PRODUCT "TOONZ"
 
-#define MIN(A, B) (((A) < (B)) ? (A) : (B))
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
+
 #define CEIL(x) ((int)(x) < (x) ? (int)(x) + 1 : (int)(x))
 
 #define PRINTF
@@ -959,7 +965,7 @@ static int TTWAIN_MemoryXferHandler(void)
 	extraX = info.ImageWidth - TTwainData.transferInfo.preferredLx;
 	extraY = info.ImageLength - TTwainData.transferInfo.preferredLy;
 
-	rowsRemaining = MIN(TTwainData.transferInfo.preferredLy, info.ImageLength);
+	rowsRemaining = min(TTwainData.transferInfo.preferredLy, info.ImageLength);
 
 	targetBuffer = TTwainData.transferInfo.memoryBuffer;
 
@@ -987,8 +993,8 @@ memset(targetBuffer, 0xff, TTwainData.transferInfo.memorySize);
 			PRINTF("IMAGEMEMXFER, GET, returns SUCCESS\n");
 			if (imgInfoOk) {
 				TW_UINT32 colsToCopy;
-				rowsToCopy = MIN(imageMemXfer->Rows, rowsRemaining);
-				colsToCopy = MIN(imageMemXfer->Columns, (unsigned long)TTwainData.transferInfo.preferredLx);
+				rowsToCopy = min(imageMemXfer->Rows, rowsRemaining);
+				colsToCopy = min(imageMemXfer->Columns, (unsigned long)TTwainData.transferInfo.preferredLx);
 				bytesToCopy = CEIL(colsToCopy * pixSize);
 				bytesToWrap = CEIL(TTwainData.transferInfo.preferredLx * pixSize);
 			} else {
@@ -1024,8 +1030,8 @@ memset(targetBuffer, 0xff, TTwainData.transferInfo.memorySize);
 			/*copy the last transfer data*/
 			if (imgInfoOk) {
 				TW_UINT32 colsToCopy;
-				rowsToCopy = MIN(imageMemXfer->Rows, rowsRemaining);
-				colsToCopy = MIN(imageMemXfer->Columns, (unsigned long)TTwainData.transferInfo.preferredLx);
+				rowsToCopy = min(imageMemXfer->Rows, rowsRemaining);
+				colsToCopy = min(imageMemXfer->Columns, (unsigned long)TTwainData.transferInfo.preferredLx);
 				bytesToCopy = CEIL(colsToCopy * pixSize);
 				bytesToWrap = CEIL(TTwainData.transferInfo.preferredLx * pixSize);
 			} else {

@@ -106,7 +106,7 @@ double norm2(const TAffine &aff)
 
 	double eig1 = a11plusa22 + delta;
 	double eig2 = a11plusa22 - delta;
-	return tmax(sqrt(eig1 / 2.0), sqrt(eig2 / 2.0));
+	return std::max(sqrt(eig1 / 2.0), sqrt(eig2 / 2.0));
 }
 
 //--------------------------------------------------

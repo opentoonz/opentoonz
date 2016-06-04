@@ -367,7 +367,7 @@ void SwatchViewer::updateSize(const QSize &size)
 {
 	int h = size.height();
 	double ratio = m_cameraRect.getLy() > 0 ? m_cameraRect.getLx() / (double)m_cameraRect.getLy() : 1.0;
-	int w = tmin((int)(h * ratio), parentWidget()->width());
+	int w = std::min((int)(h * ratio), parentWidget()->width());
 	setFixedWidth(w);
 	if (w > 2 && h > 2)
 		m_raster = TRaster32P(TDimension(w, h));

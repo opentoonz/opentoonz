@@ -1726,8 +1726,8 @@ public:
 		{
 			double k = dy / dx; /*-- 直線の傾き --*/
 			/*--- roundでは負値のときにうまく繋がらない ---*/
-			int start = tmin((int)floor(m_startPosition.x + 0.5), (int)floor(m_mousePosition.x + 0.5));
-			int end = tmax((int)floor(m_startPosition.x + 0.5), (int)floor(m_mousePosition.x + 0.5));
+			int start = std::min((int)floor(m_startPosition.x + 0.5), (int)floor(m_mousePosition.x + 0.5));
+			int end = std::max((int)floor(m_startPosition.x + 0.5), (int)floor(m_mousePosition.x + 0.5));
 			double start_x = (m_startPosition.x < m_mousePosition.x) ? m_startPosition.x : m_mousePosition.x;
 			double start_y = (m_startPosition.x < m_mousePosition.x) ? m_startPosition.y : m_mousePosition.y;
 			for (int x = start; x <= end; x++) {
@@ -1745,8 +1745,8 @@ public:
 		{
 			double k = dx / dy; /*-- 直線の傾き --*/
 			/*--- roundでは負値のときにうまく繋がらない ---*/
-			int start = tmin((int)floor(m_startPosition.y + 0.5), (int)floor(m_mousePosition.y + 0.5));
-			int end = tmax((int)floor(m_startPosition.y + 0.5), (int)floor(m_mousePosition.y + 0.5));
+			int start = std::min((int)floor(m_startPosition.y + 0.5), (int)floor(m_mousePosition.y + 0.5));
+			int end = std::max((int)floor(m_startPosition.y + 0.5), (int)floor(m_mousePosition.y + 0.5));
 			double start_x = (m_startPosition.y < m_mousePosition.y) ? m_startPosition.x : m_mousePosition.x;
 			double start_y = (m_startPosition.y < m_mousePosition.y) ? m_startPosition.y : m_mousePosition.y;
 			for (int y = start; y <= end; y++) {

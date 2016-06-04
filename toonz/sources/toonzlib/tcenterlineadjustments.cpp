@@ -549,7 +549,7 @@ inline bool checkCircles(std::vector<double> &heights)
 
 	test_against_max_height:
 		//Reusing cos
-		cos = (sin < 0.1) ? tmax(heights[i], heights[j]) : norm((vi * (heights[j] / sin)) + (vj * (heights[i] / sin)));
+		cos = (sin < 0.1) ? std::max(heights[i], heights[j]) : norm((vi * (heights[j] / sin)) + (vj * (heights[i] / sin)));
 		if (cos < hMax)
 			return 0;
 	}
@@ -576,7 +576,7 @@ inline void tryConfiguration(const std::vector<unsigned int> &bounds)
 		mean /= end - first;
 
 		//Check if the distance from extremities to mean is tolerable
-		if (tmax((*currEnterings)[(*heightIndicesPtr)[end - 1]].m_height - mean,
+		if (std::max((*currEnterings)[(*heightIndicesPtr)[end - 1]].m_height - mean,
 				 mean - (*currEnterings)[(*heightIndicesPtr)[first]].m_height) > hDiffMul * mean)
 			return;
 
@@ -791,7 +791,7 @@ inline bool JunctionArea::sequencesPullBack()
 
 			P = planeProjection(*a->m_graphHolder->getNode(i));
 			if (tdistance(P, a->m_direction, m_newJointPosition) >
-				tmax(pullBackMul * a->m_height, 1.0))
+				std::max(pullBackMul * a->m_height, 1.0))
 				return 0; //Pull back failed
 		}
 

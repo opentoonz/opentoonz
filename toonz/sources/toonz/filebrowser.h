@@ -22,6 +22,7 @@ class QTreeWidgetItem;
 class QSplitter;
 class DvDirModelNode;
 class DvDirTreeView;
+class QFileSystemWatcher;
 
 //-----------------------------------------------------------------------------
 
@@ -91,7 +92,7 @@ public:
 	const QStringList &getFilterTypes() const { return m_filter; }
 	void removeFilterType(const QString &type);
 
-	void setFolder(const TFilePath &fp, bool expandNode = false);
+	void setFolder(const TFilePath &fp, bool expandNode = false, bool forceUpdate = false);
 	// process when inputting the folder which is not regitered in the folder tree
 	// (e.g. UNC path in Windows)
 	void setUnregisteredFolder(const TFilePath &fp);
@@ -179,6 +180,8 @@ protected slots:
 
 	void onVersionControlCommandDone(const QStringList &files);
 
+	void onFileSystemChanged(const QString& folderPath);
+
 signals:
 
 	void filePathClicked(const TFilePath &);
@@ -228,9 +231,13 @@ private:
 	QStringList m_filter;
 	std::map<TFilePath, Item> m_multiFileItemMap;
 
+	QFileSystemWatcher* m_fileSystemWatcher;
+
 private:
 	void readFrameCount(Item &item);
 	void readInfo(Item &item);
+
+	void refreshCurrentFolderItems();
 
 	DvItemListModel::Status getItemVersionControlStatus(const FileBrowser::Item &item);
 };

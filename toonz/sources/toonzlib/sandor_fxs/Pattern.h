@@ -91,10 +91,10 @@ public:
 		bool isUC = pic.getType() == ST_RGBM ? true : false;
 		double maxPixVal = isUC ? 255.0 : 65535.0;
 		double ddiv = 1.0 / (maxPixVal * 255.0);
-		int yBeg = MAX(yy - iSDiag2, 0);
-		int yEnd = MIN(yy + iSDiag2, pic.m_lY - 1);
-		int xBeg = MAX(xx - iSDiag2, 0);
-		int xEnd = MIN(xx + iSDiag2, pic.m_lX - 1);
+		int yBeg = std::max(yy - iSDiag2, 0);
+		int yEnd = std::min(yy + iSDiag2, pic.m_lY - 1);
+		int xBeg = std::max(xx - iSDiag2, 0);
+		int xEnd = std::min(xx + iSDiag2, pic.m_lX - 1);
 		double lxm105 = (double)(m_lX - 1) * 0.5;
 		double lym105 = (double)(m_lY - 1) * 0.5;
 
@@ -179,87 +179,6 @@ public:
 					}
 				}
 	}
-
-	/*	Optimized version. Doesn't use the ROTATION parameter. 
-	!!! Semi-finished version !!!
-template<class P>
-void mapIt(CSTColSelPic<P>& pic, const CSTColSelPic<P>& oriPic, 
-		   const int xx, const int yy, 
-		   const double scale, const bool isUseOriColor)
-{	
-	
-	if ( scale<0.01 ) 
-		return;
-
-	double scaleInv=1.0/scale;
-	double sDiag=scale*sqrt(m_lX*m_lX+m_lY*m_lY);
-	int iSDiag=(int)sDiag+1;
-	int iSDiag2=iSDiag/2+1;
-	if ( iSDiag<=0 ) 
-		return;
-
-	bool isUC= pic.getType()==ST_RGBM ? true : false;
-	double maxPixVal= isUC ? 255.0 : 65535.0;
-
-	int yBeg=MAX(yy-iSDiag2,0);
-	int yEnd=MIN(yy+iSDiag2,pic.m_lY-1);
-	int xBeg=MAX(xx-iSDiag2,0);
-	int xEnd=MIN(xx+iSDiag2,pic.m_lX-1);
-	I_PIXEL eCol;
-	for( int y=yBeg; y<=yEnd; y++ )
-		for( int x=xBeg; x<=xEnd; x++ ) 
-			if ( x>=0 && x<pic.m_lX && y>=0 && y<pic.m_lY ) {
-// Gets the pointer to the proper pattern pixel		
-					UC_PIXEL* pPatPixel=0;	
-					double dxx=(double)(x-xx)*scaleInv+(double)(m_lX-1)*0.5;
-					double dyy=(double)(y-yy)*scaleInv+(double)(m_lY-1)*0.5;
-					int x1=I_ROUND(dxx);
-					int y1=I_ROUND(dyy);
-					if ( x1>=0 && x1<m_lX && y1>=0 && y1<m_lY ) {
-						pPatPixel=m_pat+y1*m_lX+x1;
-						pPatPixel= pPatPixel->m>(UCHAR)0 ? pPatPixel : 0;
-					}
-						
-//					getMapPixel(x-xx,y-yy,scale,ucp);
-					if ( pPatPixel ) {
-						int xy=y*pic.m_lX+x;
-						P* pPic=pic.m_pic+xy;
-						P* pOriPic=oriPic+xy;
-						if ( isUseOriColor ) {
-							eCol.r=(int)pOriPic->r;
-							eCol.g=(int)pOriPic->g;
-							eCol.b=(int)pOriPic->b;
-							eCol.m=(int)pOriPic->m;
-						} else {
-							eCol.r=(int)pPat->r;
-							eCol.g=(int)pPat->g;
-							eCol.b=(int)pPat->b;
-							eCol.m=(int)pPat->m;						
-						}
-						double q= ((double)pPatPixel->m/255.0)*((double)eCol.m/maxPixVal);
-						double r=(1.0-q)*(double)pPic->r+q*(double)eCol.r;
-						double g=(1.0-q)*(double)pPic->g+q*(double)eCol.g;
-						double b=(1.0-q)*(double)pPic->b+q*(double)eCol.b;
-						double m=(1.0-q)*(double)pPic->m+q*(double)eCol.m;
-						r=D_CUT(r,0.0,maxPixVal);
-						g=D_CUT(g,0.0,maxPixVal);
-						b=D_CUT(b,0.0,maxPixVal);
-						m=D_CUT(m,0.0,maxPixVal);
-						if ( isUC ) {
-							pPic->r=UC_ROUND(r);
-							pPic->g=UC_ROUND(g);
-							pPic->b=UC_ROUND(b);
-							pPic->m=UC_ROUND(m);
-						} else {
-							pPic->r=US_ROUND(r);
-							pPic->g=US_ROUND(g);
-							pPic->b=US_ROUND(b);
-							pPic->m=US_ROUND(m);
-						}
-					}
-			}
-}	
-*/
 };
 
 #endif // !defined(AFX_PATTERN_H__8E417023_35C0_11D6_B9EA_0040F674BE6A__INCLUDED_)

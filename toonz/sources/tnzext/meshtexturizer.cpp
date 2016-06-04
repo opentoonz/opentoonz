@@ -235,8 +235,8 @@ int MeshTexturizer::bindTexture(const TRaster32P &ras, const TRectD &geom,
 	int textureLy = tcg::numeric_ops::GE_2Power((unsigned int)ras->getLy() + TOTAL_BORDER_2);
 
 	// We'll assume a strict granularity max of 512 x 512 textures
-	textureLx = tmin(textureLx, 1 << 9);
-	textureLy = tmin(textureLy, 1 << 9);
+	textureLx = std::min(textureLx, 1 << 9);
+	textureLy = std::min(textureLy, 1 << 9);
 
 	// Allocate a suitable texture raster. The texture will include a transparent 1-pix border
 	// that is needed to perform texture mapping with GL_CLAMP transparent wrapping

@@ -113,7 +113,7 @@
         <translation>未能应用适配线，因为没有列被选中。</translation>
     </message>
     <message>
-        <source>It is not possible to apply the match lines because two columns have to be seleted.</source>
+        <source>It is not possible to apply the match lines because two columns have to be selected.</source>
         <translation>未能应用适配线，因为有两列同时被选中。</translation>
     </message>
 </context>
@@ -552,11 +552,11 @@ when running the cleanup process.</source>
     </message>
     <message>
         <source>Cleanup all selected drawings overwriting those previously cleaned up.</source>
-        <translation>清理所有选中的图稿，并对上一次已经清理过的重新清理。</translation>
+        <translation type="vanished">清理所有选中的图稿，并对上一次已经清理过的重新清理。</translation>
     </message>
     <message>
         <source>Cleanup only non-cleaned up drawings and keep those previously cleaned up.</source>
-        <translation>只清理尚未清理的图稿，并保持之前已经清理过的不动。</translation>
+        <translation type="vanished">只清理尚未清理的图稿，并保持之前已经清理过的不动。</translation>
     </message>
     <message>
         <source>Delete existing level and create a new level with selected drawings only.</source>
@@ -838,6 +838,13 @@ What do you want to do?</source>
     </message>
 </context>
 <context>
+    <name>CommandListTree</name>
+    <message>
+        <source>----Separator----</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ConflictWidget</name>
     <message>
         <source>Mine</source>
@@ -928,7 +935,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>                      Palette:</source>
-        <translation>                      调色板：</translation>
+        <translation type="vanished">                      调色板：</translation>
     </message>
     <message>
         <source>Tolerance:</source>
@@ -936,15 +943,15 @@ What do you want to do?</source>
     </message>
     <message>
         <source>End:</source>
-        <translation>结束：</translation>
+        <translation type="vanished">结束：</translation>
     </message>
     <message>
         <source>File to convert:</source>
-        <translation>要转换的文件：</translation>
+        <translation type="vanished">要转换的文件：</translation>
     </message>
     <message>
         <source>Output Name:</source>
-        <translation>输出名：</translation>
+        <translation type="vanished">输出名：</translation>
     </message>
     <message>
         <source>Same as Painted</source>
@@ -1136,11 +1143,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Style Index: </source>
-        <translation>风格索引编号：</translation>
+        <translation type="vanished">风格索引编号：</translation>
     </message>
     <message>
         <source>Apply to Frames: </source>
-        <translation>应用给这些帧：</translation>
+        <translation type="vanished">应用给这些帧：</translation>
     </message>
     <message>
         <source>Style Index:</source>
@@ -1167,7 +1174,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>取消</translation>
+        <translation type="vanished">取消</translation>
     </message>
     <message>
         <source>Close</source>
@@ -1255,7 +1262,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Thumbnails View</source>
-        <translation>缩略视图</translation>
+        <translation type="vanished">缩略视图</translation>
     </message>
     <message>
         <source>List View</source>
@@ -1293,39 +1300,39 @@ What do you want to do?</source>
     <name>DvTopBar</name>
     <message>
         <source>File</source>
-        <translation>文件</translation>
+        <translation type="vanished">文件</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>编辑</translation>
+        <translation type="vanished">编辑</translation>
     </message>
     <message>
         <source>Scan &amp;&amp; Cleanup</source>
-        <translation>扫描 &amp;&amp; 清理</translation>
+        <translation type="vanished">扫描 &amp;&amp; 清理</translation>
     </message>
     <message>
         <source>Level</source>
-        <translation>层级</translation>
+        <translation type="vanished">层级</translation>
     </message>
     <message>
         <source>Xsheet</source>
-        <translation>摄影表</translation>
+        <translation type="vanished">摄影表</translation>
     </message>
     <message>
         <source>Cells</source>
-        <translation>单元格</translation>
+        <translation type="vanished">单元格</translation>
     </message>
     <message>
         <source>View</source>
-        <translation>视图</translation>
+        <translation type="vanished">视图</translation>
     </message>
     <message>
         <source>Windows</source>
-        <translation>窗口</translation>
+        <translation type="vanished">窗口</translation>
     </message>
     <message>
         <source>Scan</source>
-        <translation>扫描</translation>
+        <translation type="vanished">扫描</translation>
     </message>
 </context>
 <context>
@@ -1701,11 +1708,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>From:</source>
-        <translation>从：</translation>
+        <translation type="vanished">从：</translation>
     </message>
     <message>
         <source>To:</source>
-        <translation>到：</translation>
+        <translation type="vanished">到：</translation>
     </message>
     <message>
         <source>Apply</source>
@@ -1850,7 +1857,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Relative Onion Skin Toggle</source>
-        <translation>相对洋葱皮的开关</translation>
+        <translation type="vanished">相对洋葱皮的开关</translation>
     </message>
     <message>
         <source>Fixed Onion Skin Toggle</source>
@@ -1908,11 +1915,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Load Images</source>
-        <translation>加载图像</translation>
+        <translation type="vanished">加载图像</translation>
     </message>
     <message>
         <source>Append Images</source>
-        <translation>附上图像</translation>
+        <translation type="vanished">附上图像</translation>
     </message>
     <message>
         <source>Save Images</source>
@@ -2060,7 +2067,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Save in:</source>
-        <translation>保存到：</translation>
+        <translation type="vanished">保存到：</translation>
     </message>
     <message>
         <source>Width:</source>
@@ -2072,7 +2079,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Create</source>
-        <translation>创建</translation>
+        <translation type="vanished">创建</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -2169,7 +2176,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Image Resolution:</source>
-        <translation>图像分辨率：</translation>
+        <translation type="vanished">图像分辨率：</translation>
     </message>
     <message>
         <source>Premultiply</source>
@@ -2181,7 +2188,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>      Subsampling:</source>
-        <translation>子采用：</translation>
+        <translation type="vanished">子采用：</translation>
     </message>
     <message>
         <source>DPI:</source>
@@ -2353,7 +2360,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Palette from Frame:</source>
-        <translation>从某帧开始的调色板，帧：</translation>
+        <translation type="vanished">从某帧开始的调色板，帧：</translation>
     </message>
     <message>
         <source>Frames :</source>
@@ -2390,7 +2397,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Append Images</source>
-        <translation>附上图像</translation>
+        <translation type="vanished">附上图像</translation>
     </message>
     <message>
         <source>From:</source>
@@ -2429,7 +2436,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>%1 does not exist.</source>
-        <translation>%1 不存在。</translation>
+        <translation type="vanished">%1 不存在。</translation>
     </message>
     <message>
         <source>TLV Caching Behavior</source>
@@ -2568,7 +2575,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>%1 is not a TNZ file.</source>
-        <translation>%1 不是 TNZ 文件。</translation>
+        <translation type="vanished">%1 不是 TNZ 文件。</translation>
     </message>
     <message>
         <source> you can load only TNZ files for render task.</source>
@@ -2630,11 +2637,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Visit Web Site</source>
-        <translation>访问网站</translation>
+        <translation type="vanished">访问网站</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>取消</translation>
+        <translation type="vanished">取消</translation>
     </message>
     <message>
         <source>&amp;New Scene</source>
@@ -2811,7 +2818,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Paste</source>
-        <translation>粘贴(&amp;P)</translation>
+        <translation type="vanished">粘贴(&amp;P)</translation>
     </message>
     <message>
         <source>&amp;Merge</source>
@@ -2823,7 +2830,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Paste RGBA Values</source>
-        <translation>粘贴 RGBA 值</translation>
+        <translation type="vanished">粘贴 RGBA 值</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
@@ -3340,7 +3347,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Premultiply</source>
-        <translation>预合成</translation>
+        <translation type="vanished">预合成</translation>
     </message>
     <message>
         <source>Convert to Vectors...</source>
@@ -3424,75 +3431,75 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Activate this column only</source>
-        <translation>仅激活这一列</translation>
+        <translation type="vanished">仅激活这一列</translation>
     </message>
     <message>
         <source>Activate selected columns</source>
-        <translation>激活被选的列</translation>
+        <translation type="vanished">激活被选的列</translation>
     </message>
     <message>
         <source>Activate all columns</source>
-        <translation>激活全部列</translation>
+        <translation type="vanished">激活全部列</translation>
     </message>
     <message>
         <source>Deactivate selected columns</source>
-        <translation>取消激活被选的列</translation>
+        <translation type="vanished">取消激活被选的列</translation>
     </message>
     <message>
         <source>Deactivate all columns</source>
-        <translation>取消激活全部列</translation>
+        <translation type="vanished">取消激活全部列</translation>
     </message>
     <message>
         <source>Toggle columns activation</source>
-        <translation>切换列的活跃性</translation>
+        <translation type="vanished">切换列的活跃性</translation>
     </message>
     <message>
         <source>Enable this column only</source>
-        <translation>仅启用这一列</translation>
+        <translation type="vanished">仅启用这一列</translation>
     </message>
     <message>
         <source>Enable selected columns</source>
-        <translation>启用被选的列</translation>
+        <translation type="vanished">启用被选的列</translation>
     </message>
     <message>
         <source>Enable all columns</source>
-        <translation>启用全部列</translation>
+        <translation type="vanished">启用全部列</translation>
     </message>
     <message>
         <source>Disable all columns</source>
-        <translation>停用全部列</translation>
+        <translation type="vanished">停用全部列</translation>
     </message>
     <message>
         <source>Disable selected columns</source>
-        <translation>停用被选的列</translation>
+        <translation type="vanished">停用被选的列</translation>
     </message>
     <message>
         <source>Swap enabled columns</source>
-        <translation>交换已启用的列</translation>
+        <translation type="vanished">交换已启用的列</translation>
     </message>
     <message>
         <source>Lock this column only</source>
-        <translation>仅锁定这一列</translation>
+        <translation type="vanished">仅锁定这一列</translation>
     </message>
     <message>
         <source>Lock selected columns</source>
-        <translation>锁定被选的列</translation>
+        <translation type="vanished">锁定被选的列</translation>
     </message>
     <message>
         <source>Lock all columns</source>
-        <translation>锁定全部列</translation>
+        <translation type="vanished">锁定全部列</translation>
     </message>
     <message>
         <source>Unlock selected columns</source>
-        <translation>解锁被选的列</translation>
+        <translation type="vanished">解锁被选的列</translation>
     </message>
     <message>
         <source>Unlock all columns</source>
-        <translation>解锁全部列</translation>
+        <translation type="vanished">解锁全部列</translation>
     </message>
     <message>
         <source>Swap locked columns</source>
-        <translation>交换被锁的列</translation>
+        <translation type="vanished">交换被锁的列</translation>
     </message>
     <message>
         <source>Edit Tool</source>
@@ -3628,11 +3635,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Increase brush hardness</source>
-        <translation>增加笔刷硬度</translation>
+        <translation type="vanished">增加笔刷硬度</translation>
     </message>
     <message>
         <source>Decrease brush hardness</source>
-        <translation>降低笔刷硬度</translation>
+        <translation type="vanished">降低笔刷硬度</translation>
     </message>
     <message>
         <source>Auto Group</source>
@@ -3728,15 +3735,15 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Areas Mode</source>
-        <translation>区域模式</translation>
+        <translation type="vanished">区域模式</translation>
     </message>
     <message>
         <source>Lines Mode</source>
-        <translation>线模式</translation>
+        <translation type="vanished">线模式</translation>
     </message>
     <message>
         <source>Lines &amp; Areas Mode</source>
-        <translation>线和区域模式</translation>
+        <translation type="vanished">线和区域模式</translation>
     </message>
     <message>
         <source>Type</source>
@@ -3744,19 +3751,19 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Normal Type</source>
-        <translation>标准</translation>
+        <translation type="vanished">标准</translation>
     </message>
     <message>
         <source>Rectangular Type</source>
-        <translation>长方形类型</translation>
+        <translation type="vanished">长方形类型</translation>
     </message>
     <message>
         <source>Freehand Type</source>
-        <translation>手绘类型</translation>
+        <translation type="vanished">手绘类型</translation>
     </message>
     <message>
         <source>Polyline Type</source>
-        <translation>多边形类型</translation>
+        <translation type="vanished">多边形类型</translation>
     </message>
     <message>
         <source>TypeTool Font</source>
@@ -3808,23 +3815,23 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Drawing</source>
-        <translation>绘制</translation>
+        <translation type="vanished">绘制</translation>
     </message>
     <message>
         <source>Animation</source>
-        <translation>动画</translation>
+        <translation type="vanished">动画</translation>
     </message>
     <message>
         <source>Browser</source>
-        <translation>浏览器</translation>
+        <translation type="vanished">浏览器</translation>
     </message>
     <message>
         <source>Pltedit</source>
-        <translation>色板编辑</translation>
+        <translation type="vanished">色板编辑</translation>
     </message>
     <message>
         <source>Farm</source>
-        <translation>农场</translation>
+        <translation type="vanished">农场</translation>
     </message>
     <message>
         <source>Reload qss</source>
@@ -3884,19 +3891,19 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Increase max brush thickness</source>
-        <translation>增大最大笔触</translation>
+        <translation type="vanished">增大最大笔触</translation>
     </message>
     <message>
         <source>Decrease max brush thickness</source>
-        <translation>减小最大笔触</translation>
+        <translation type="vanished">减小最大笔触</translation>
     </message>
     <message>
         <source>Increase min brush thickness</source>
-        <translation>增大最小笔触</translation>
+        <translation type="vanished">增大最小笔触</translation>
     </message>
     <message>
         <source>Decrease min brush thickness</source>
-        <translation>减小最小笔触</translation>
+        <translation type="vanished">减小最小笔触</translation>
     </message>
     <message>
         <source>&amp;Binarize...</source>
@@ -3912,7 +3919,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Linetest</source>
-        <translation>线条测试</translation>
+        <translation type="vanished">线条测试</translation>
     </message>
     <message>
         <source>&amp;Load As Sub-xsheet...</source>
@@ -3972,7 +3979,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Toggle &amp;Opacity Check</source>
-        <translation>开关不透明度检查(&amp;O)</translation>
+        <translation type="vanished">开关不透明度检查(&amp;O)</translation>
     </message>
     <message>
         <source>&amp;Load Folder...</source>
@@ -4216,7 +4223,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Abount OpenToonz...</source>
-        <translation>关于 OpenToonz (&amp;A)...</translation>
+        <translation type="vanished">关于 OpenToonz (&amp;A)...</translation>
     </message>
     <message>
         <source>&amp;ComboViewer</source>
@@ -4226,20 +4233,32 @@ Do you want to create it?</source>
         <source>&amp;History</source>
         <translation>历史记录(&amp;H)</translation>
     </message>
+    <message>
+        <source>&amp;Save All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Edit in Place</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;About OpenToonz...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
     <message>
         <source> Apply Match Lines</source>
-        <translation>应用适配线条</translation>
+        <translation type="vanished">应用适配线条</translation>
     </message>
     <message>
         <source>Add Match Line Styles</source>
-        <translation>添加适配线条样式</translation>
+        <translation type="vanished">添加适配线条样式</translation>
     </message>
     <message>
         <source>Use Style: </source>
-        <translation>使用样式：</translation>
+        <translation type="vanished">使用样式：</translation>
     </message>
     <message>
         <source>Line Prevalence</source>
@@ -4292,6 +4311,53 @@ Halftone</source>
 Gaps</source>
         <translation>填充
 空隙</translation>
+    </message>
+</context>
+<context>
+    <name>MenuBarPopup</name>
+    <message>
+        <source>Customize Menu Bar of Room &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
+    </message>
+    <message>
+        <source>%1 Menu Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>N.B. If you put unique title to submenu, it may not be translated to another language.
+N.B. Duplicated commands will be ignored. Only the last one will appear in the menu bar.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MenuBarTree</name>
+    <message>
+        <source>Insert Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Submenu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4434,11 +4500,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>File Name:</source>
-        <translation>文件名：</translation>
+        <translation type="vanished">文件名：</translation>
     </message>
     <message>
         <source>File Format:</source>
-        <translation>文件格式：</translation>
+        <translation type="vanished">文件格式：</translation>
     </message>
     <message>
         <source>Output Camera:</source>
@@ -4446,11 +4512,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>To Frame:</source>
-        <translation>结束帧：</translation>
+        <translation type="vanished">结束帧：</translation>
     </message>
     <message>
         <source>From Frame:</source>
-        <translation>开始帧：</translation>
+        <translation type="vanished">开始帧：</translation>
     </message>
     <message>
         <source>Shrink:</source>
@@ -4474,7 +4540,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Multiple Rendering: </source>
-        <translation>多重渲染：</translation>
+        <translation type="vanished">多重渲染：</translation>
     </message>
     <message>
         <source>Standard</source>
@@ -4514,7 +4580,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>to FPS:</source>
-        <translation>伸缩后的 FPS：</translation>
+        <translation type="vanished">伸缩后的 FPS：</translation>
     </message>
     <message>
         <source>Stretch from FPS:</source>
@@ -4574,15 +4640,15 @@ What do you want to do?</source>
     </message>
     <message>
         <source>8 bits</source>
-        <translation>8位</translation>
+        <translation type="vanished">8位</translation>
     </message>
     <message>
         <source>16 bits</source>
-        <translation>16位</translation>
+        <translation type="vanished">16位</translation>
     </message>
     <message>
         <source>Columns</source>
-        <translation>列</translation>
+        <translation type="vanished">列</translation>
     </message>
     <message>
         <source>Camera Shift:</source>
@@ -4590,7 +4656,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Stereoscopic Render:</source>
-        <translation>立体渲染：</translation>
+        <translation type="vanished">立体渲染：</translation>
     </message>
     <message>
         <source>Camera Settings</source>
@@ -4810,19 +4876,19 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Luminance:</source>
-        <translation>亮度：</translation>
+        <translation type="vanished">亮度：</translation>
     </message>
     <message>
         <source>Saturation:</source>
-        <translation>饱和度：</translation>
+        <translation type="vanished">饱和度：</translation>
     </message>
     <message>
         <source>Hue:</source>
-        <translation>色相：</translation>
+        <translation type="vanished">色相：</translation>
     </message>
     <message>
         <source>Transparency:</source>
-        <translation>透明度：</translation>
+        <translation type="vanished">透明度：</translation>
     </message>
     <message>
         <source>Fade to Color</source>
@@ -4830,7 +4896,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>              Color:</source>
-        <translation>              颜色：</translation>
+        <translation type="vanished">              颜色：</translation>
     </message>
     <message>
         <source>Fade</source>
@@ -4893,7 +4959,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Minimize Raster Memory Fragmentation*</source>
-        <translation>最小光栅内存片段＊</translation>
+        <translation type="vanished">最小光栅内存片段＊</translation>
     </message>
     <message>
         <source>Save Automatically Every Minutes</source>
@@ -4929,15 +4995,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Flipbook Shrink:</source>
-        <translation>翻页书收缩：</translation>
+        <translation type="vanished">翻页书收缩：</translation>
     </message>
     <message>
         <source>Step:</source>
-        <translation>步长：</translation>
+        <translation type="vanished">步长：</translation>
     </message>
     <message>
         <source>Height*:</source>
-        <translation>高＊：</translation>
+        <translation type="vanished">高＊：</translation>
     </message>
     <message>
         <source>Loading</source>
@@ -4966,7 +5032,7 @@ Do you want to overwrite it?</source>
     <message>
         <source>Default Interpolation: </source>
         <translatorcomment>是不是翻译成“补帧”更好？</translatorcomment>
-        <translation>缺省插值：</translation>
+        <translation type="vanished">缺省插值：</translation>
     </message>
     <message>
         <source>Linear</source>
@@ -5014,11 +5080,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>   Following Frames Correction: </source>
-        <translation>   后续帧修正：</translation>
+        <translation type="vanished">   后续帧修正：</translation>
     </message>
     <message>
         <source>   Previous  Frames Correction: </source>
-        <translation>   前帧修正：</translation>
+        <translation type="vanished">   前帧修正：</translation>
     </message>
     <message>
         <source>Display Lines Only </source>
@@ -5042,11 +5108,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Language*:</source>
-        <translation>语言＊：</translation>
+        <translation type="vanished">语言＊：</translation>
     </message>
     <message>
         <source>Undo Memory Size (MB):</source>
-        <translation>分配给撤消的内存大小(MB)：</translation>
+        <translation type="vanished">分配给撤消的内存大小(MB)：</translation>
     </message>
     <message>
         <source>Render Task Chunk Size:</source>
@@ -5058,7 +5124,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>*Changes will take effect the next time you run Toonz</source>
-        <translation>带星号（＊）的改动需要重启 Toonz 才能起效</translation>
+        <translation type="vanished">带星号（＊）的改动需要重启 Toonz 才能起效</translation>
     </message>
     <message>
         <source>cm</source>
@@ -5082,15 +5148,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Level Strip Frames Width*:</source>
-        <translation>层级条的帧数宽＊：</translation>
+        <translation type="vanished">层级条的帧数宽＊：</translation>
     </message>
     <message>
         <source>Capture</source>
-        <translation>拍摄</translation>
+        <translation type="vanished">拍摄</translation>
     </message>
     <message>
         <source>        Frame Rate:</source>
-        <translation>帧率：</translation>
+        <translation type="vanished">帧率：</translation>
     </message>
     <message>
         <source>Scan File Format:</source>
@@ -5102,7 +5168,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Height:</source>
-        <translation>高：</translation>
+        <translation type="vanished">高：</translation>
     </message>
     <message>
         <source>DPI:</source>
@@ -5122,7 +5188,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Enable Version Control *</source>
-        <translation>启用版本控制＊</translation>
+        <translation type="vanished">启用版本控制＊</translation>
     </message>
     <message>
         <source>Default Level Type:</source>
@@ -5138,15 +5204,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>   Ink Color on White Bg: </source>
-        <translation>   白色背景上的勾线色：</translation>
+        <translation type="vanished">   白色背景上的勾线色：</translation>
     </message>
     <message>
         <source>   Ink Color on Black Bg: </source>
-        <translation>   黑色背景上的勾线色：</translation>
+        <translation type="vanished">   黑色背景上的勾线色：</translation>
     </message>
     <message>
         <source> Paint Color: </source>
-        <translation> 涂色：</translation>
+        <translation type="vanished"> 涂色：</translation>
     </message>
     <message>
         <source>Fit to Flipbook</source>
@@ -5199,7 +5265,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>pixel</source>
-        <translation>像素</translation>
+        <translation type="vanished">像素</translation>
     </message>
     <message>
         <source>Minimize Raster Memory Fragmentation *</source>
@@ -5207,7 +5273,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Replace Level after SaveLevelAs command</source>
-        <translation>另存层级命令之后替换层级</translation>
+        <translation type="vanished">另存层级命令之后替换层级</translation>
     </message>
     <message>
         <source>* Changes will take effect the next time you run Toonz</source>
@@ -5387,6 +5453,10 @@ Do you want to overwrite it?</source>
     <message>
         <source>Replace Toonz Level after SaveLevelAs command</source>
         <translation>另存层级命令后，替换 Toonz 层级</translation>
+    </message>
+    <message>
+        <source>Show Keyframes on Cell Area</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5762,7 +5832,7 @@ Do you want to import it or load it from its original location?</source>
     </message>
     <message>
         <source>System date tampered.</source>
-        <translation>系统数据已损坏</translation>
+        <translation type="vanished">系统数据已损坏</translation>
     </message>
     <message>
         <source>No more Undo operations available.</source>
@@ -5780,7 +5850,7 @@ Visit the Web site for more information.</source>
     </message>
     <message>
         <source>Quit</source>
-        <translation>退出</translation>
+        <translation type="vanished">退出</translation>
     </message>
     <message>
         <source>Scan</source>
@@ -5792,7 +5862,7 @@ Visit the Web site for more information.</source>
     </message>
     <message>
         <source>Select an empty cell or a sub-xsheet cell.</source>
-        <translation>选择一个空单元格或一个子摄影单元格。</translation>
+        <translation type="vanished">选择一个空单元格或一个子摄影单元格。</translation>
     </message>
     <message>
         <source>Collapsing columns: what you want to do?</source>
@@ -5875,7 +5945,7 @@ some regions are too high.</source>
         <translation>阀值距离错误</translation>
     </message>
     <message>
-        <source>Sensibility Error</source>
+        <source>Sensitivity Error</source>
         <translation>灵敏度错误</translation>
     </message>
     <message>
@@ -5903,7 +5973,7 @@ the level has to be saved first.</source>
     <message>
         <source>It is not possible to track the level:
 undefinied error.</source>
-        <translation>未能追踪该层级：
+        <translation type="vanished">未能追踪该层级：
 为定义的错误。</translation>
     </message>
     <message>
@@ -6091,11 +6161,6 @@ What do you want to do?</source>
         <translation>在下一次运行 Toonz 时，房间将被重置。</translation>
     </message>
     <message>
-        <source>The license validation process was not able to confirm the right to use this software on this computer.
- Please contact [ support@toonz.com ] for assistance.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Saving previewed frames....</source>
         <translation>正在保存预览过的帧...</translation>
     </message>
@@ -6105,7 +6170,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Change project</source>
-        <translation>改变项目</translation>
+        <translation type="vanished">改变项目</translation>
     </message>
     <message>
         <source>It is not possible to delete the selection.</source>
@@ -6486,7 +6551,7 @@ Do you want to save your changes?</source>
     </message>
     <message>
         <source>The scene %1 was created with Toonz and cannot be loaded in LineTest.</source>
-        <translation>场景 %1 是用 Toonz 创建的，不能加载到 LineTest 中。</translation>
+        <translation type="vanished">场景 %1 是用 Toonz 创建的，不能加载到 LineTest 中。</translation>
     </message>
     <message>
         <source>File %1 already exists.
@@ -6657,7 +6722,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Toonz cannot Save this Level</source>
-        <translation>Toonz 不能保存该层级</translation>
+        <translation type="vanished">Toonz 不能保存该层级</translation>
     </message>
     <message>
         <source>No Current Scene</source>
@@ -6717,7 +6782,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Inbeteween  : Level %1,  </source>
-        <translation>过渡帧   ：层级 %1，</translation>
+        <translation type="vanished">过渡帧   ：层级 %1，</translation>
     </message>
     <message>
         <source>Paste Column :  </source>
@@ -6887,7 +6952,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Set Keyframe  : %1  at Frame %2</source>
-        <translation>设定关键帧   :  %1   在帧 %2</translation>
+        <translation type="vanished">设定关键帧   :  %1   在帧 %2</translation>
     </message>
     <message>
         <source>Move Columns</source>
@@ -6911,7 +6976,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Cleeanup Settings</source>
-        <translation>清理设定</translation>
+        <translation type="vanished">清理设定</translation>
     </message>
     <message>
         <source>Move Level to Cast Folder</source>
@@ -6944,6 +7009,63 @@ Are you sure to </source>
     <message>
         <source>History</source>
         <translation>历史记录</translation>
+    </message>
+    <message>
+        <source>Move Keyframe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inbetween  : Level %1,  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not possible to track the level:
+undefined error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move keyframe handle  : %1  Handle of the keyframe %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle cycle of  %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Drag] to move position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>----Separator----</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Drag] to move position, [Double Click] to edit title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Drag&amp;Drop] to copy separator to menu bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Drag&amp;Drop] to copy command to menu bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open menubar settings template file. Re-installing Toonz will solve this problem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Visit Web Site</source>
+        <translation type="unfinished">访问网站</translation>
+    </message>
+    <message>
+        <source>https://opentoonz.github.io/e/</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7076,7 +7198,7 @@ The audio file will not be included in the rendered clip.</source>
     </message>
     <message>
         <source>Delete Room</source>
-        <translation>删除房间</translation>
+        <translation type="vanished">删除房间</translation>
     </message>
     <message>
         <source>Room</source>
@@ -7085,6 +7207,14 @@ The audio file will not be included in the rendered clip.</source>
     <message>
         <source>Are you sure you want to remove room %1</source>
         <translation>确实要删除 %1 房间吗</translation>
+    </message>
+    <message>
+        <source>Delete Room &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Customize Menu Bar of Room &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8066,7 +8196,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>          Frame Rate:</source>
-        <translation>帧率：</translation>
+        <translation type="vanished">帧率：</translation>
     </message>
     <message>
         <source>Camera BG Color:</source>
@@ -8074,19 +8204,19 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Viewer BG Color:</source>
-        <translation>查看器背景色：</translation>
+        <translation type="vanished">查看器背景色：</translation>
     </message>
     <message>
         <source>   Preview BG Color:</source>
-        <translation>预览背景色：</translation>
+        <translation type="vanished">预览背景色：</translation>
     </message>
     <message>
         <source>Checkerboard Color 1:</source>
-        <translation>棋盘色1：</translation>
+        <translation type="vanished">棋盘色1：</translation>
     </message>
     <message>
         <source>Checkerboard Color 2:</source>
-        <translation>棋盘色2：</translation>
+        <translation type="vanished">棋盘色2：</translation>
     </message>
     <message>
         <source>Image Subsampling:</source>
@@ -8094,7 +8224,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>      Marker Interval:</source>
-        <translation>标记器间隔：</translation>
+        <translation type="vanished">标记器间隔：</translation>
     </message>
     <message>
         <source>A/R:</source>
@@ -8102,11 +8232,11 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Safe Area Box 2:</source>
-        <translation>安全区域框 2：</translation>
+        <translation type="vanished">安全区域框 2：</translation>
     </message>
     <message>
         <source>Safe Area Box 1:</source>
-        <translation>安全区域框 1：</translation>
+        <translation type="vanished">安全区域框 1：</translation>
     </message>
     <message>
         <source>TLV Subsampling:</source>
@@ -8114,11 +8244,11 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Start Frame:</source>
-        <translation>开始帧：</translation>
+        <translation type="vanished">开始帧：</translation>
     </message>
     <message>
         <source>Level And Column Icon:</source>
-        <translation>层级和列图标：</translation>
+        <translation type="vanished">层级和列图标：</translation>
     </message>
     <message>
         <source>Field Guide Size:</source>
@@ -8157,7 +8287,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Select</source>
-        <translation>选择</translation>
+        <translation type="vanished">选择</translation>
     </message>
     <message>
         <source>Reset Subcamera</source>
@@ -8428,41 +8558,57 @@ Assign to &apos;%3&apos;?</source>
         <source>Help</source>
         <translation>帮助</translation>
     </message>
+    <message>
+        <source>Failed to load menu %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to add command %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open menubar settings file %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to create menubar</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SubSheetBar</name>
     <message>
         <source>Sub-scene controls: 
 Click the arrow button to create a new sub-xsheet</source>
-        <translation>子场景控制：冻结箭头按钮创建新子摄影表</translation>
+        <translation type="vanished">子场景控制：冻结箭头按钮创建新子摄影表</translation>
     </message>
     <message>
         <source>Disable Edit in Place</source>
-        <translation>Disable Edit in Place</translation>
+        <translation type="vanished">Disable Edit in Place</translation>
     </message>
     <message>
         <source>Enable Edit in Place</source>
-        <translation>Enable Edit in Place</translation>
+        <translation type="vanished">Enable Edit in Place</translation>
     </message>
     <message>
         <source>Exit Sub-xsheet (1 Level Up)</source>
-        <translation>退出子摄影表(1 Level Up)</translation>
+        <translation type="vanished">退出子摄影表(1 Level Up)</translation>
     </message>
     <message>
         <source>Exit Sub-xsheet (2 Levels Up)</source>
-        <translation>退出子摄影表(2 Level Up)</translation>
+        <translation type="vanished">退出子摄影表(2 Level Up)</translation>
     </message>
     <message>
         <source>Exit Sub-xsheet (3 or More Levels Up)</source>
-        <translation>退出子摄影表(3 以上 Level Up)</translation>
+        <translation type="vanished">退出子摄影表(3 以上 Level Up)</translation>
     </message>
     <message>
         <source>Enter Sub-xsheet</source>
-        <translation>进入子摄影表</translation>
+        <translation type="vanished">进入子摄影表</translation>
     </message>
     <message>
         <source>Current Scene</source>
-        <translation>当前场景</translation>
+        <translation type="vanished">当前场景</translation>
     </message>
 </context>
 <context>
@@ -8528,7 +8674,7 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Successfull Steps:</source>
-        <translation>成功的步数：</translation>
+        <translation type="vanished">成功的步数：</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -8560,7 +8706,7 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Multiple Rendering:</source>
-        <translation>复数渲染：</translation>
+        <translation type="vanished">复数渲染：</translation>
     </message>
     <message>
         <source>None</source>
@@ -8620,11 +8766,11 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Remove -&gt;</source>
-        <translation>移除 -&gt;</translation>
+        <translation type="vanished">移除 -&gt;</translation>
     </message>
     <message>
         <source>&lt;- Add</source>
-        <translation>&lt;-添加</translation>
+        <translation type="vanished">&lt;-添加</translation>
     </message>
     <message>
         <source>Multimedia:</source>
@@ -8645,6 +8791,10 @@ Click the arrow button to create a new sub-xsheet</source>
     <message>
         <source>&lt;&lt; Add</source>
         <translation>&lt;&lt; 添加</translation>
+    </message>
+    <message>
+        <source>Successful Steps:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8806,6 +8956,13 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
 </context>
 <context>
+    <name>TopBar</name>
+    <message>
+        <source>Lock Rooms Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TrackerPopup</name>
     <message>
         <source>Tracking Settings</source>
@@ -8816,7 +8973,7 @@ Click the arrow button to create a new sub-xsheet</source>
         <translation>阀值：</translation>
     </message>
     <message>
-        <source>Sensibility:</source>
+        <source>Sensitivity:</source>
         <translation>灵敏度：</translation>
     </message>
     <message>
@@ -9092,11 +9249,11 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Camera Stand Toggle</source>
-        <translation>相机位开关</translation>
+        <translation type="vanished">相机位开关</translation>
     </message>
     <message>
         <source>Render Toggle</source>
-        <translation>渲染开关</translation>
+        <translation type="vanished">渲染开关</translation>
     </message>
     <message>
         <source>Lock Toggle</source>
@@ -9112,7 +9269,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Click to select the type of motion path</source>
-        <translation>点击以选择运动路径类型</translation>
+        <translation type="vanished">点击以选择运动路径类型</translation>
     </message>
     <message>
         <source>Click to select column, drag to move it</source>
@@ -9120,15 +9277,15 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Click to unlink column</source>
-        <translation>点击以不链接列</translation>
+        <translation type="vanished">点击以不链接列</translation>
     </message>
     <message>
         <source>Click and drag to link column</source>
-        <translation>点击并拖动以链接列</translation>
+        <translation type="vanished">点击并拖动以链接列</translation>
     </message>
     <message>
         <source>Master column of linked columns</source>
-        <translation>相链接列的主列</translation>
+        <translation type="vanished">相链接列的主列</translation>
     </message>
     <message>
         <source>&amp;Subsampling 1</source>
@@ -9205,11 +9362,11 @@ Please refer to the user guide for details.</source>
     <name>XsheetGUI::RowArea</name>
     <message>
         <source>Onion Skin Toggle</source>
-        <translation>洋葱皮开关</translation>
+        <translation type="vanished">洋葱皮开关</translation>
     </message>
     <message>
         <source>Current Frame</source>
-        <translation>当前帧</translation>
+        <translation type="vanished">当前帧</translation>
     </message>
     <message>
         <source>Relative Onion Skin Toggle</source>
@@ -9246,6 +9403,10 @@ Please refer to the user guide for details.</source>
     <message>
         <source>Preview This</source>
         <translation>预览这个</translation>
+    </message>
+    <message>
+        <source>Double Click to Toggle Onion Skin</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

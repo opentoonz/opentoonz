@@ -154,7 +154,7 @@ static void *new_memory(uint size)
 		*(void **)base = Free_List[NODE_LIST];
 		Free_List[NODE_LIST] = (void *)base;
 	}
-	if (Avail_Base = (char *)malloc(MALLOC_SIZE)) {
+	if ((Avail_Base = (char *)malloc(MALLOC_SIZE))) {
 		Avail_Size = MALLOC_SIZE - size;
 		return (void *)(Avail_Base + Avail_Size);
 	} else {
@@ -904,7 +904,7 @@ void *avl_locate_first(TREE *tree)
 	node = tree->root;
 	if (!node)
 		return NIL;
-	while (leftnode = node->left)
+	while ((leftnode = node->left))
 		node = leftnode;
 	return node->data;
 }
@@ -918,7 +918,7 @@ void *avl_locate_last(TREE *tree)
 	node = tree->root;
 	if (!node)
 		return NIL;
-	while (rightnode = node->right)
+	while ((rightnode = node->right))
 		node = rightnode;
 	return node->data;
 }
@@ -1280,7 +1280,7 @@ void *avl_first(TREE *tree)
 	*++pathnode = NIL;
 	*++pathright = FALSE;
 	*++pathnode = node = tree->root;
-	while (node = node->left) {
+	while ((node = node->left)) {
 		*++pathright = FALSE;
 		*++pathnode = node;
 	}
@@ -1315,7 +1315,7 @@ void *avl_last(TREE *tree)
 	*++pathnode = NIL;
 	*++pathright = TRUE;
 	*++pathnode = node = tree->root;
-	while (node = node->right) {
+	while ((node = node->right)) {
 		*++pathright = TRUE;
 		*++pathnode = node;
 	}
@@ -1328,7 +1328,7 @@ void *avl_last(TREE *tree)
 
 #define DOWN_RIGHT_OR_BREAK(node, pathright, pathnode) \
 	{                                                  \
-		if (node = node->right) {                      \
+		if ((node = node->right)) {                    \
 			*++pathright = TRUE;                       \
 			*++pathnode = node;                        \
 		} else                                         \
@@ -1337,7 +1337,7 @@ void *avl_last(TREE *tree)
 
 #define DOWN_LEFT_OR_BREAK(node, pathright, pathnode) \
 	{                                                 \
-		if (node = node->left) {                      \
+		if ((node = node->left)) {                    \
 			*++pathright = FALSE;                     \
 			*++pathnode = node;                       \
 		} else                                        \
@@ -1541,10 +1541,10 @@ void *avl_next(TREE *tree)
 		return NIL;
 	pathright = path->pathright;
 	pathnode = path->pathnode;
-	if (node = (*pathnode)->right) {
+	if ((node = (*pathnode)->right)) {
 		*++pathright = TRUE;
 		*++pathnode = node;
-		while (node = node->left) {
+		while ((node = node->left)) {
 			*++pathright = FALSE;
 			*++pathnode = node;
 		}
@@ -1580,10 +1580,10 @@ void *avl_prev(TREE *tree)
 		return NIL;
 	pathright = path->pathright;
 	pathnode = path->pathnode;
-	if (node = (*pathnode)->left) {
+	if ((node = (*pathnode)->left)) {
 		*++pathright = FALSE;
 		*++pathnode = node;
-		while (node = node->right) {
+		while ((node = node->right)) {
 			*++pathright = TRUE;
 			*++pathnode = node;
 		}

@@ -292,16 +292,16 @@ void TriMeshStuff::DefaultEvaluator<mesh_type>::actionSort(
 		v3 = &mesh.vertex(mesh.otherFaceVertex(f1, e)).P();
 		length[1] = norm(*v3 - *v1);
 		length[2] = norm(*v3 - *v2);
-		lengthMax = tmax(lengthMax, length[1], length[2]);
-		lengthMin = tmin(lengthMin, length[1], length[2]);
+		lengthMax = std::max({lengthMax, length[1], length[2]});
+		lengthMin = std::min({lengthMin, length[1], length[2]});
 	}
 
 	if (f2 >= 0) {
 		v4 = &mesh.vertex(mesh.otherFaceVertex(f2, e)).P();
 		length[3] = norm(*v4 - *v1);
 		length[4] = norm(*v4 - *v2);
-		lengthMax = tmax(lengthMax, length[3], length[4]);
-		lengthMin = tmin(lengthMin, length[3], length[4]);
+		lengthMax = std::max({lengthMax, length[3], length[4]});
+		lengthMin = std::min({lengthMin, length[3], length[4]});
 	}
 
 	if (f1 >= 0 && f2 >= 0) {
@@ -314,7 +314,7 @@ void TriMeshStuff::DefaultEvaluator<mesh_type>::actionSort(
 		double m3 = (length[5] + length[1] + length[3]) / 3.0;
 		double m4 = (length[5] + length[2] + length[4]) / 3.0;
 
-		if (tmax(m3, m4) < tmax(m1, m2) - 1e-5)
+		if (std::max(m3, m4) < std::max(m1, m2) - 1e-5)
 			actionSequence[count++] = ActionEvaluator::SWAP;
 
 		//NOTE: The original swap evaluation was about maximizing the minimal face angle.

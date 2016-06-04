@@ -111,7 +111,7 @@ public:
 	TRasterP raster() const { return m_ras; }
 	TRasterP &raster() { return m_ras; }
 
-	void paintGL()
+	void paintGL() override
 	{
 		drawBackground();
 
@@ -551,8 +551,8 @@ void AdjustLevelsPopup::autoAdjust()
 		::getRange(histograms->getHistogramView(2)->values(), m_threshold, minG, maxG);
 		::getRange(histograms->getHistogramView(3)->values(), m_threshold, minB, maxB);
 
-		min = tmin(minR, minG, minB);
-		max = tmax(maxR, maxG, maxB);
+		min = std::min({minR, minG, minB});
+		max = std::max({maxR, maxG, maxB});
 	} else
 		::getRange(values, m_threshold, min, max);
 
@@ -731,9 +731,8 @@ void AdjustLevelsPopup::apply()
 			std::set<TFrameId> fids = filmstripSelection->getSelectedFids();
 			bool oneImageChanged = false;
 
-			std::set<TFrameId>::iterator it = fids.begin();
-			for (it; it != fids.end(); it++) {
-				TRasterImageP rasImage = (TRasterImageP)simpleLevel->getFrame(*it, true);
+			for (auto const& fid : fids) {
+				TRasterImageP rasImage = (TRasterImageP)simpleLevel->getFrame(fid, true);
 				if (!rasImage)
 					continue;
 
@@ -744,10 +743,10 @@ void AdjustLevelsPopup::apply()
 				oneImageChanged = true;
 				TRop::rgbmAdjust(ras, ras, in0, in1, out0, out1);
 
-				simpleLevel->touchFrame(*it);
+				simpleLevel->touchFrame(fid);
 				simpleLevel->setDirtyFlag(true);
 
-				IconGenerator::instance()->invalidate(simpleLevel, *it);
+				IconGenerator::instance()->invalidate(simpleLevel, fid);
 			}
 
 			if (oneImageChanged) {

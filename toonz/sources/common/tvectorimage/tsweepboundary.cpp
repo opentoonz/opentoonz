@@ -490,16 +490,18 @@ inline void computeStrokeBoundary(const TStroke &stroke, LinkedQuadraticList &in
 	thickQuadratic = stroke.getChunk(chunkIndex);
 	while (thickQuadratic->getP0() == thickQuadratic->getP2()) {
 		double thickness;
-		thickness = tmax(thickQuadratic->getThickP0().thick,
-						 thickQuadratic->getThickP1().thick,
-						 thickQuadratic->getThickP2().thick);
+		thickness = std::max({
+			thickQuadratic->getThickP0().thick,
+			thickQuadratic->getThickP1().thick,
+			thickQuadratic->getThickP2().thick});
 
 		++chunkIndex;
 		if (chunkIndex == chunkCount) {
 			vector<TQuadratic *> quadArray;
-			double thickness = tmax(thickQuadratic->getThickP0().thick,
-									thickQuadratic->getThickP1().thick,
-									thickQuadratic->getThickP2().thick);
+			double thickness = std::max({
+				thickQuadratic->getThickP0().thick,
+				thickQuadratic->getThickP1().thick,
+				thickQuadratic->getThickP2().thick});
 
 			if (thickness < thicknessLimit)
 				thickness = thicknessLimit;

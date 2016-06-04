@@ -290,7 +290,7 @@ void findMaxCurvPoints(
 			t_ext = 0;
 		else
 			t_ext = 1;
-		double maxEstremi = tmax(estremo_dx, estremo_sx);
+		double maxEstremi = std::max(estremo_dx, estremo_sx);
 		if (maxEstremi > estremo_int) {
 			t = t_ext;
 			curv_max = maxEstremi;
@@ -1495,7 +1495,7 @@ void BrushTool::loadPreset()
 			m_joinStyle.setIndex(preset.m_join);
 			m_miterJoinLimit.setValue(preset.m_miter);
 		} else {
-			m_rasThickness.setValue(TDoublePairProperty::Value(tmax(preset.m_min, 1.0), preset.m_max));
+			m_rasThickness.setValue(TDoublePairProperty::Value(std::max(preset.m_min, 1.0), preset.m_max));
 			m_brushPad = ToolUtils::getBrushPad(preset.m_max, preset.m_hardness * 0.01);
 			m_hardness.setValue(preset.m_hardness, true);
 			m_selective.setValue(preset.m_selective);

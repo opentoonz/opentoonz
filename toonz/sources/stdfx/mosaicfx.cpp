@@ -267,8 +267,8 @@ void doMosaic(TRasterPT<PIXEL> ras, TRasterPT<PIXEL> cellsRas, int step, const T
 			x1 = x0 + step, y1 = y0 + step;
 
 			//Retrieve the cell buffer position and its eventual adjustment
-			int u0 = tmax(x0, 0), v0 = tmax(y0, 0);
-			int u1 = tmin(x1, lx), v1 = tmin(y1, ly);
+			int u0 = std::max(x0, 0), v0 = std::max(y0, 0);
+			int u1 = std::min(x1, lx), v1 = std::min(y1, ly);
 
 			PIXEL *cb = buffer + u0 + v0 * wrap;
 

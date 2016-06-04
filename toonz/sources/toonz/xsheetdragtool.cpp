@@ -2044,8 +2044,8 @@ public:
 
 	void onRelease(int row, int col)
 	{
-		int r0 = tmin(row, m_startRow);
-		int r1 = tmax(row, m_startRow);
+		int r0 = std::min(row, m_startRow);
+		int r1 = std::max(row, m_startRow);
 		assert(m_soundColumn);
 		TApp *app = TApp::instance();
 		ToonzScene *scene = app->getCurrentScene()->getScene();
@@ -2184,9 +2184,9 @@ public:
 				return;
 			std::vector<TFrameId> fids;
 			std::set<TFrameId> fidsSet = s->getSelectedFids();
-			std::set<TFrameId>::iterator it = fidsSet.begin();
-			for (it; it != fidsSet.end(); it++)
-				fids.push_back(*it);
+			for (auto const& fid : fidsSet) {
+				fids.push_back(fid);
+			}
 			m_data->addSimpleLevel(std::make_pair(sl, fids));
 		}
 		refreshCellsArea();

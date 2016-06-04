@@ -435,7 +435,7 @@ void transform_thickness(TStroke &stroke, const double poly[], int deg)
 	int cp, cpCount = stroke.getControlPointCount();
 	for (cp = 0; cp != cpCount; ++cp) {
 		TThickPoint cpPoint = stroke.getControlPoint(cp);
-		cpPoint.thick = tmax(
+		cpPoint.thick = std::max(
 			tcg::poly_ops::evaluate(poly, deg, cpPoint.thick),
 			0.0);
 

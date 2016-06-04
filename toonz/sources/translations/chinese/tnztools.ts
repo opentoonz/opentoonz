@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_CN">
+<TS version="2.1" language="zh_CN">
 <context>
     <name>ArrowToolOptionsBox</name>
     <message>
@@ -57,11 +57,11 @@
     </message>
     <message>
         <source>Center</source>
-        <translation>基準点</translation>
+        <translation type="vanished">基準点</translation>
     </message>
     <message>
         <source>Lock</source>
-        <translation>ロック</translation>
+        <translation type="vanished">ロック</translation>
     </message>
     <message>
         <source>(</source>
@@ -80,7 +80,7 @@
     <name>BrushTool</name>
     <message>
         <source>Thickness</source>
-        <translation>粗细</translation>
+        <translation type="vanished">粗细</translation>
     </message>
     <message>
         <source>Hardness:</source>
@@ -100,15 +100,15 @@
     </message>
     <message>
         <source>Break Sharp Angles</source>
-        <translation>鋭角で線を分割</translation>
+        <translation type="vanished">鋭角で線を分割</translation>
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation>鉛筆モード</translation>
+        <translation type="vanished">鉛筆モード</translation>
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation>圧力感度</translation>
+        <translation type="vanished">圧力感度</translation>
     </message>
     <message>
         <source>Cap</source>
@@ -694,7 +694,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current column is not visible in Camera Stand.</source>
-        <translation>選択した列はテーブルに非表示で、作業できません。</translation>
+        <translation type="vanished">選択した列はテーブルに非表示で、作業できません。</translation>
     </message>
     <message>
         <source>It is not possible to edit the audio column.</source>

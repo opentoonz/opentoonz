@@ -5,7 +5,7 @@
 //Qt includes
 #include <QPixmap>
 #include <QImage>
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #include <QDesktopWidget>
 #include <QApplication>
 
@@ -72,10 +72,10 @@ QRgb pickScreenRGB(const QRect &rect)
 
 	const QRect &screen0Geom = QApplication::desktop()->screenGeometry(0);
 
-	int left = tmin(rect.left(), screen0Geom.right());
-	int top = tmin(rect.top(), screen0Geom.bottom());
-	int right = tmax(rect.right(), screen0Geom.left());
-	int bottom = tmax(rect.bottom(), screen0Geom.right());
+	int left = std::min(rect.left(), screen0Geom.right());
+	int top = std::min(rect.top(), screen0Geom.bottom());
+	int right = std::max(rect.right(), screen0Geom.left());
+	int bottom = std::max(rect.bottom(), screen0Geom.right());
 
 	QRect theRect(QPoint(left, top), QPoint(right, bottom));
 
@@ -91,7 +91,7 @@ QRgb pickScreenRGB(const QRect &rect)
 
 //------------------------------------------------------------------------------
 
-QRgb pickRGB(QGLWidget *widget, const QRect &rect)
+QRgb pickRGB(QOpenGLWidget *widget, const QRect &rect)
 {
 	widget->makeCurrent();
 

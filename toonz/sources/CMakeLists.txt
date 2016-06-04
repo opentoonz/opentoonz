@@ -40,6 +40,7 @@ elseif(APPLE)
         message("CMAKE_PREFIX_PATH:" ${CMAKE_PREFIX_PATH})
         add_definitions(-DMACOSX -Di386)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++11 -stdlib=libc++ -fno-implicit-templates")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
     elseif(PLATFORM EQUAL 32)
         set(QT_PATH "~/Qt/5.6/clang_32/lib" CACHE PATH "Qt instlattion directory")
         set(QT_LIB_PATH "${QT_PATH}/")
@@ -300,7 +301,7 @@ if(MSVC AND MSVC_VERSION EQUAL 1800)
 endif()
 
 # generate Qt translations and messages
-set(LANGUAGES japanese italian french spanish chinese)
+set(LANGUAGES japanese italian french spanish chinese german)
 
 function(add_translation module)
     set(translation)

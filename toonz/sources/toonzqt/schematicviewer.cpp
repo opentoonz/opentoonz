@@ -159,15 +159,14 @@ void SchematicScene::clearAllItems()
 bool SchematicScene::isAnEmptyZone(const QRectF &rect)
 {
 	QList<QGraphicsItem *> allItems = items();
-	QList<QGraphicsItem *>::iterator it = allItems.begin();
-	for (it; it != allItems.end(); it++) {
-		SchematicNode *node = dynamic_cast<SchematicNode *>(*it);
+	for (auto const level : allItems) {
+		SchematicNode *node = dynamic_cast<SchematicNode *>(level);
 		if (!node)
 			continue;
 		FxSchematicNode *fxNode = dynamic_cast<FxSchematicNode *>(node);
 		if (fxNode && fxNode->isA(eXSheetFx))
 			continue;
-		if ((*it)->boundingRect().translated((*it)->scenePos()).intersects(rect))
+		if (node->boundingRect().translated(node->scenePos()).intersects(rect))
 			return false;
 	}
 	return true;
@@ -179,10 +178,9 @@ QVector<SchematicNode *> SchematicScene::getPlacedNode(SchematicNode *node)
 {
 	QRectF rect = node->boundingRect().translated(node->scenePos());
 	QList<QGraphicsItem *> allItems = items();
-	QList<QGraphicsItem *>::iterator it = allItems.begin();
 	QVector<SchematicNode *> nodes;
-	for (it; it != allItems.end(); it++) {
-		SchematicNode *placedNode = dynamic_cast<SchematicNode *>(*it);
+	for (auto const item : allItems) {
+		SchematicNode *placedNode = dynamic_cast<SchematicNode *>(item);
 		if (!placedNode || placedNode == node)
 			continue;
 		QRectF nodeRect = placedNode->boundingRect().translated(placedNode->scenePos());

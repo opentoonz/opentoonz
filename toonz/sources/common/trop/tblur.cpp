@@ -33,8 +33,6 @@ struct BlurPixel {
 
 //===================================================================
 
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
-
 #define LOAD_COL_CODE                  \
                                        \
 	buffer += x;                       \
@@ -497,7 +495,7 @@ inline void blur_code_SSE2(
 		ampl = 1.0 + blur / 15.0;                                          \
                                                                            \
 		if (backlit)                                                       \
-			for (i = ((dy >= 0) ? 0 : -dy); i < MIN(ly, r_ly - dy); i++) { \
+			for (i = ((dy >= 0) ? 0 : -dy); i < std::min(ly, r_ly - dy); i++) { \
 				val = troundp(col[i].r * ampl);                            \
 				buffer->r = (val > crop_val) ? crop_val : val;             \
 				val = troundp(col[i].g * ampl);                            \
@@ -509,7 +507,7 @@ inline void blur_code_SSE2(
 				buffer += wrap;                                            \
 			}                                                              \
 		else                                                               \
-			for (i = ((dy >= 0) ? 0 : -dy); i < MIN(ly, r_ly - dy); i++) { \
+			for (i = ((dy >= 0) ? 0 : -dy); i < std::min(ly, r_ly - dy); i++) { \
 				*buffer = col[i];                                          \
 				buffer += wrap;                                            \
 			}                                                              \
@@ -541,7 +539,7 @@ void store_colGray(T *buffer, int wrap, int r_ly, T *col,
 
 	ampl = 1.0 + blur / 15.0;
 
-	for (i = ((dy >= 0) ? 0 : -dy); i < MIN(ly, r_ly - dy); i++) {
+	for (i = ((dy >= 0) ? 0 : -dy); i < std::min(ly, r_ly - dy); i++) {
 		*buffer = col[i];
 		buffer += wrap;
 	}
@@ -856,7 +854,7 @@ void doBlurRgb(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx, 
 		if (dy >= 0)
 			buffer += (dstRas->getWrap()) * dy;
 
-		for (i = (dx >= 0) ? 0 : -dx; i < tmin(llx, dstRas->getLx() - dx); i++) {
+		for (i = (dx >= 0) ? 0 : -dx; i < std::min(llx, dstRas->getLx() - dx); i++) {
 			load_colRgb<P>(fbuffer, col1 + brad, llx, ly, i, brad, by1, by2);
 			do_filtering_chan<T, Q, P>(col1 + brad, col2, lly, coeff, coeffq, brad, diff, useSSE);
 			store_colRgb<T>(buffer, dstRas->getWrap(), dstRas->getLy(), col2, lly, i + dx, dy, 0, blur);
@@ -935,7 +933,7 @@ void doBlurGray(TRasterPT<T> &dstRas, TRasterPT<T> &srcRas, double blur, int dx,
 	if (dy >= 0)
 		buffer += (dstRas->getWrap()) * dy;
 
-	for (i = (dx >= 0) ? 0 : -dx; i < tmin(llx, dstRas->getLx() - dx); i++) {
+	for (i = (dx >= 0) ? 0 : -dx; i < std::min(llx, dstRas->getLx() - dx); i++) {
 		load_channel_col32(fbuffer, col1 + brad, llx, ly, i, brad, by1, by2);
 		do_filtering_channel_gray<T>(col1 + brad, col2, lly, coeff, coeffq, brad, diff);
 

@@ -309,7 +309,7 @@ bool adjustIconAspectRatio(TDimension &outDimension, TDimension inDimension, TDi
 	int lx = imageRes.lx;
 	int ly = imageRes.ly;
 
-	if (tmax(double(lx) / inDimension.lx, double(ly) / inDimension.ly) == double(ly) / inDimension.ly)
+	if (std::max(double(lx) / inDimension.lx, double(ly) / inDimension.ly) == double(ly) / inDimension.ly)
 		iconLx = tround((double(lx) * inDimension.ly) / ly);
 	else
 		iconLy = tround((double(ly) * inDimension.lx) / lx);
@@ -1173,8 +1173,8 @@ void TLevelWriterTzl::createIcon(const TImageP &imgIn, TImageP &imgOut)
 	if (tmp_savebox.isEmpty()) {
 		TINT32 iconsbx0 = tround((double)iconLx * sbx0 / ti->getSize().lx);
 		TINT32 iconsby0 = tround((double)iconLy * sby0 / ti->getSize().ly);
-		TINT32 iconsblx = tmax(tround((double)iconLx * sblx / ti->getSize().lx), 1);
-		TINT32 iconsbly = tmax(tround((double)iconLy * sbly / ti->getSize().ly), 1);
+		TINT32 iconsblx = std::max(tround((double)iconLx * sblx / ti->getSize().lx), 1);
+		TINT32 iconsbly = std::max(tround((double)iconLy * sbly / ti->getSize().ly), 1);
 		savebox = TRect(TPoint(iconsbx0, iconsby0), TDimension(iconsblx, iconsbly));
 	} else {
 		savebox = tmp_savebox;
@@ -2116,7 +2116,6 @@ TImageP TImageReaderTzl::load14()
 			throw TException("Loading tlv: bad icon size.");
 		fread(&actualBuffSize, sizeof(TINT32), 1, chan);
 
-		assert(actualBuffSize > 0 && actualBuffSize <= (int)(iconLx * iconLx * sizeof(TPixelCM32)));
 		if (actualBuffSize <= 0 || actualBuffSize > (int)(iconLx * iconLx * sizeof(TPixelCM32)))
 			throw TException("Loading tlv: icon buffer size error.");
 
@@ -2173,8 +2172,8 @@ TImageP TImageReaderTzl::load14()
 		if (tmp_savebox.isEmpty()) {
 			TINT32 iconsbx0 = tround((double)iconLx * sbx0 / m_lrp->m_res.lx);
 			TINT32 iconsby0 = tround((double)iconLy * sby0 / m_lrp->m_res.ly);
-			TINT32 iconsblx = tmax(tround((double)iconLx * sblx / m_lrp->m_res.lx), 1);
-			TINT32 iconsbly = tmax(tround((double)iconLy * sbly / m_lrp->m_res.ly), 1);
+			TINT32 iconsblx = std::max(tround((double)iconLx * sblx / m_lrp->m_res.lx), 1);
+			TINT32 iconsbly = std::max(tround((double)iconLy * sbly / m_lrp->m_res.ly), 1);
 			savebox = TRect(TPoint(iconsbx0, iconsby0), TDimension(iconsblx, iconsbly));
 		} else {
 			TINT32 iconsbx0 = tfloor((double)iconLx * sbx0 / m_lrp->m_res.lx);
@@ -2210,8 +2209,6 @@ TImageP TImageReaderTzl::load14()
 		ti->setPalette(m_lrp->m_level->getPalette());
 		return ti;
 	}
-
-	assert(actualBuffSize > 0 && actualBuffSize <= (int)(m_lx * m_ly * sizeof(TPixelCM32)));
 	if (actualBuffSize <= 0 || actualBuffSize > (int)(m_lx * m_ly * sizeof(TPixelCM32)))
 		throw TException("Loading tlv: buffer size error");
 

@@ -50,6 +50,7 @@ class EnvGlobals
 
 	std::string m_applicationName;
 	std::string m_applicationVersion;
+	std::string m_applicationVersionWithoutRevision;
 	std::string m_applicationFullName;
 	std::string m_moduleName;
 	std::string m_rootVarName;
@@ -79,7 +80,7 @@ public:
 
 #ifdef MACOSX
 		settingsPath = QString::fromStdString(getApplicationName()) + QString("_") +
-		               QString::fromStdString(getApplicationVersion()) + QString(".app") +
+		               QString::fromStdString(getApplicationVersionWithoutRevision()) + QString(".app") +
 		               QString("/Contents/Resources/SystemVar.ini");
 #else  /* Generic Unix */
 		// TODO: use QStandardPaths::ConfigLocation when we drop Qt4
@@ -156,9 +157,11 @@ public:
 	void setApplication(std::string applicationName, std::string applicationVersion, std::string revision)
 	{
 		m_applicationName = applicationName;
-		m_applicationVersion = applicationVersion;
+		m_applicationVersionWithoutRevision = applicationVersion;
 		if (!revision.empty()) {
-			m_applicationVersion += "." + revision;
+			m_applicationVersion = m_applicationVersionWithoutRevision + "." + revision;
+		} else {
+			m_applicationVersion = m_applicationVersionWithoutRevision;
 		}
 		m_applicationFullName = m_applicationName + " " + m_applicationVersion;
 		m_moduleName = m_applicationName;
@@ -172,6 +175,7 @@ public:
 
 	std::string getApplicationName() { return m_applicationName; }
 	std::string getApplicationVersion() { return m_applicationVersion; }
+	std::string getApplicationVersionWithoutRevision() { return m_applicationVersionWithoutRevision; }
 
 	TFilePath getEnvFile() { return m_envFile; }
 

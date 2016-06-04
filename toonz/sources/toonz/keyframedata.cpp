@@ -46,8 +46,8 @@ void TKeyframeData::setKeyframes(std::set<Position> positions, TXsheet *xsh)
 	int r0 = it->first;
 	int c0 = it->second;
 	for (++it; it != positions.end(); ++it) {
-		r0 = tmin(r0, it->first);
-		c0 = tmin(c0, it->second);
+		r0 = std::min(r0, it->first);
+		c0 = std::min(c0, it->second);
 	}
 
 	for (it = positions.begin(); it != positions.end(); ++it) {
@@ -73,8 +73,8 @@ bool TKeyframeData::getKeyframes(std::set<Position> &positions, TXsheet *xsh) co
 	int r0 = it2->first;
 	int c0 = it2->second;
 	for (++it2; it2 != positions.end(); ++it2) {
-		r0 = tmin(r0, it2->first);
-		c0 = tmin(c0, it2->second);
+		r0 = std::min(r0, it2->first);
+		c0 = std::min(c0, it2->second);
 	}
 	positions.clear();
 	TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
@@ -98,11 +98,10 @@ bool TKeyframeData::getKeyframes(std::set<Position> &positions, TXsheet *xsh) co
 	if (!keyFrameChanged)
 		return false;
 
-	std::map<int, bool>::const_iterator it1 = m_isPegbarsCycleEnabled.begin();
-	for (it1; it1 != m_isPegbarsCycleEnabled.end(); it1++) {
-		int col = it1->first;
-		TStageObject *pegbar = xsh->getStageObject(col >= 0 ? TStageObjectId::ColumnId(col) : cameraId);
-		pegbar->enableCycle(it1->second);
+	for (auto const pegbar : m_isPegbarsCycleEnabled) {
+		int const col = pegbar.first;
+		TStageObjectId objectId = (col >= 0) ? TStageObjectId::ColumnId(col) : cameraId;
+		xsh->getStageObject(objectId)->enableCycle(pegbar.second);
 	}
 	return true;
 }

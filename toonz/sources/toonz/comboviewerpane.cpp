@@ -57,7 +57,6 @@
 #include <QAction>
 #include <QDialogButtonBox>
 #include <QAbstractButton>
-#include <QGLWidget>
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QLabel>

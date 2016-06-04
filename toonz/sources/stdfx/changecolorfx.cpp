@@ -12,8 +12,8 @@ static void OLDRGB2HSV(double r, double g, double b,
 	double max, min;
 	double delta;
 
-	max = tmax(r, g, b);
-	min = tmin(r, g, b);
+	max = std::max({r, g, b});
+	min = std::min({r, g, b});
 
 	*v = max;
 

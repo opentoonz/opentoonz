@@ -79,7 +79,7 @@ void getRange(ToonzScene *scene, bool isPreview, int &from, int &to)
 			int r0, r1;
 			xs->getCellRange(k, r0, r1);
 
-			from = tmin(from, r0), to = tmax(to, r1);
+			from = std::min(from, r0), to = std::max(to, r1);
 		}
 	}
 }
@@ -297,7 +297,7 @@ void MovieRenderer::Imp::addSoundtrack(int r0, int r1, double fps)
 
 	// Then, add the rest
 	TINT32 fromSample = m_st->getSampleCount();
-	TINT32 numSample = tmax(TINT32((r1 - r0 + 1) * samplePerFrame),
+	TINT32 numSample = std::max(TINT32((r1 - r0 + 1) * samplePerFrame),
 							snd1->getSampleCount());
 
 	m_st = TSop::insertBlank(m_st, fromSample, numSample + m_whiteSample);
@@ -426,8 +426,8 @@ void MovieRenderer::Imp::doRenderRasterCompleted(const RenderData &renderData)
 
 		TLevelP oldLevel(m_levelUpdaterA->getInputLevel());
 		if (oldLevel) {
-			from = tmin(from, oldLevel->begin()->first.getNumber() - 1);
-			to = tmax(to, (--oldLevel->end())->first.getNumber() - 1);
+			from = std::min(from, oldLevel->begin()->first.getNumber() - 1);
+			to = std::max(to, (--oldLevel->end())->first.getNumber() - 1);
 		}
 
 		addSoundtrack(from, to, m_scene->getProperties()->getOutputProperties()->getFrameRate());

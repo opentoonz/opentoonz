@@ -1124,7 +1124,7 @@ public:
 		TStageObject::Keyframe keyframe0 = pegbar->getKeyframe(r0);
 		TStageObject::Keyframe keyframe1 = pegbar->getKeyframe(r1);
 
-		int dr = tmax(r1 - r0, 0);
+		int dr = std::max(r1 - r0, 0);
 		if (keyframe0.m_easeOut == dr)
 			return;
 
@@ -1173,7 +1173,7 @@ public:
 		TStageObject::Keyframe keyframe0 = pegbar->getKeyframe(r0);
 		TStageObject::Keyframe keyframe1 = pegbar->getKeyframe(r1);
 
-		int dr = tmax(r1 - r0, 0);
+		int dr = std::max(r1 - r0, 0);
 		if (keyframe1.m_easeIn == dr)
 			return;
 
@@ -1556,21 +1556,21 @@ void XsheetWriter::write(ostream &os)
 	int c0, c1;
 	c0 = 0;
 	for (;;) {
-		c1 = tmin(totColCount, c0 + columnsPerPage) - 1;
+		c1 = std::min(totColCount, c0 + columnsPerPage) - 1;
 		int ca0 = 0, ca1 = -1, cb0 = 0, cb1 = -1;
 		if (c0 < colCount) {
 			ca0 = c0;
-			ca1 = tmin(colCount - 1, c1);
+			ca1 = std::min(colCount - 1, c1);
 		}
 		if (c1 >= colCount) {
-			cb0 = tmax(c0, colCount);
+			cb0 = std::max(c0, colCount);
 			cb1 = c1;
 		}
 
 		int r0, r1, r, c;
 		r0 = 0;
 		for (;;) {
-			r1 = tmin(rowCount, r0 + rowsPerPage) - 1;
+			r1 = std::min(rowCount, r0 + rowsPerPage) - 1;
 			tableCaption(os);
 			os << "<table>" << endl
 			   << "<tr>" << endl;

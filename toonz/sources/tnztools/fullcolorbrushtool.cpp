@@ -641,7 +641,7 @@ void FullColorBrushTool::loadPreset()
 
 	try //Don't bother with RangeErrors
 	{
-		m_thickness.setValue(TIntPairProperty::Value(tmax((int)preset.m_min, 1), preset.m_max));
+		m_thickness.setValue(TIntPairProperty::Value(std::max((int)preset.m_min, 1), preset.m_max));
 		m_brushPad = ToolUtils::getBrushPad(preset.m_max, preset.m_hardness * 0.01);
 		m_hardness.setValue(preset.m_hardness, true);
 		m_opacity.setValue(TDoublePairProperty::Value(preset.m_opacityMin, preset.m_opacityMax));

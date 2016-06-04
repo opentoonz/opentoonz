@@ -40,7 +40,7 @@
 // Qt includes
 #include <QCoreApplication> // Qt translation support
 #include <QPainter>
-#include <QGLWidget>
+#include <QGLWidget> // for QGLWidget::convertToGLFormat
 #include <QPainterPath>
 #include <QString>
 #include <QImage>

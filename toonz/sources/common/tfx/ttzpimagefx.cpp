@@ -267,7 +267,7 @@ TRectD SandorFxRenderData::getBBoxEnlargement(const TRectD &bbox)
 
 	case ArtAtContour:
 		return bbox.enlarge(
-			tmax(tceil(m_controllerBBox.getLx()), tceil(m_controllerBBox.getLy())) * m_contourParams.m_maxSize);
+			std::max(tceil(m_controllerBBox.getLx()), tceil(m_controllerBBox.getLy())) * m_contourParams.m_maxSize);
 
 	default:
 		assert(false);

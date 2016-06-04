@@ -542,6 +542,10 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(QWidget *parent, TTool *tool, TProperty
 	if (lockProp)
 		m_lockNSCenterCheckbox = new ToolOptionCheckbox(m_tool, lockProp, toolHandle, this);
 
+	TBoolProperty *prop = dynamic_cast<TBoolProperty *>(m_pg->getProperty("Global Key"));
+	if (prop)
+		m_globalKey = new ToolOptionCheckbox(m_tool, prop, toolHandle, this);
+
 	m_lockEWPosCheckbox->setObjectName("EditToolLockButton");
 	m_lockNSPosCheckbox->setObjectName("EditToolLockButton");
 	m_lockEWCenterCheckbox->setObjectName("EditToolLockButton");
@@ -628,7 +632,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(QWidget *parent, TTool *tool, TProperty
 				}
 				posLay->addLayout(soLay, 0);
 
-				posLay->addStretch(1);
+				posLay->addSpacing(3);
 			}
 
 			//Rotation
@@ -755,6 +759,17 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(QWidget *parent, TTool *tool, TProperty
 				centerPosLay->addStretch(1);
 			}
 		}
+
+		QHBoxLayout *globalKeyLay = new QHBoxLayout();
+		globalKeyLay->setMargin(0);
+		globalKeyLay->setSpacing(0);
+		mainLay->addLayout(globalKeyLay, 0);
+		{
+			globalKeyLay->addWidget(m_globalKey, 0);
+		}
+
+		mainLay->addSpacing(3);
+
 
 		mainLay->addStretch(1);
 

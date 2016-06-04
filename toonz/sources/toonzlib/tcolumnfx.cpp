@@ -274,7 +274,7 @@ int getEnlargement(const std::vector<TRasterFxRenderDataP> &fxs, double scale)
 				{
 					ArtAtContourParams &params = sandorData->m_contourParams;
 					enlargement =
-						tmax(tceil(sandorData->m_controllerBBox.getLx()), tceil(sandorData->m_controllerBBox.getLy())) *
+						std::max(tceil(sandorData->m_controllerBBox.getLx()), tceil(sandorData->m_controllerBBox.getLy())) *
 						params.m_maxSize;
 
 					break;

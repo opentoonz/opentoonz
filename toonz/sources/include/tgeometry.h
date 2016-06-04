@@ -649,10 +649,10 @@ public:
 	TRectT(const TRectT &rect)
 		: x0(rect.x0), y0(rect.y0), x1(rect.x1), y1(rect.y1){};
 	TRectT(const TPointT<T> &p0, const TPointT<T> &p1) // non importa l'ordine
-		: x0(tmin((T)p0.x, (T)p1.x)),
-		  y0(tmin((T)p0.y, (T)p1.y)),
-		  x1(tmax((T)p0.x, (T)p1.x)),
-		  y1(tmax((T)p0.y, (T)p1.y)){};
+		: x0(std::min((T)p0.x, (T)p1.x)),
+		  y0(std::min((T)p0.y, (T)p1.y)),
+		  x1(std::max((T)p0.x, (T)p1.x)),
+		  y1(std::max((T)p0.y, (T)p1.y)){};
 	TRectT(const TPointT<T> &bottomLeft, const TDimensionT<T> &d);
 	TRectT(const TDimensionT<T> &d);
 
@@ -686,8 +686,8 @@ public:
 			return *this;
 		else
 			return TRectT<T>(
-				tmin((T)x0, (T)rect.x0), tmin((T)y0, (T)rect.y0),
-				tmax((T)x1, (T)rect.x1), tmax((T)y1, (T)rect.y1));
+				std::min((T)x0, (T)rect.x0), std::min((T)y0, (T)rect.y0),
+				std::max((T)x1, (T)rect.x1), std::max((T)y1, (T)rect.y1));
 	};
 	TRectT<T> &operator+=(const TRectT<T> &rect)
 	{ // unione
@@ -710,8 +710,8 @@ public:
 			return TRectT<T>();
 		else
 			return TRectT<T>(
-				tmax((T)x0, (T)rect.x0), tmax((T)y0, (T)rect.y0),
-				tmin((T)x1, (T)rect.x1), tmin((T)y1, (T)rect.y1));
+				std::max((T)x0, (T)rect.x0), std::max((T)y0, (T)rect.y0),
+				std::min((T)x1, (T)rect.x1), std::min((T)y1, (T)rect.y1));
 	};
 
 	TRectT<T> &operator+=(const TPointT<T> &p)
@@ -820,8 +820,9 @@ inline TRectD convert(const TRect &r)
 */
 inline TRectD boundingBox(const TPointD &p0, const TPointD &p1)
 {
-	return TRectD(tmin(p0.x, p1.x), tmin(p0.y, p1.y),
-				  tmax(p0.x, p1.x), tmax(p0.y, p1.y));
+	return TRectD(
+		std::min(p0.x, p1.x), std::min(p0.y, p1.y),
+		std::max(p0.x, p1.x), std::max(p0.y, p1.y));
 }
 /*!
 \relates TRectT 
@@ -832,8 +833,9 @@ inline TRectD boundingBox(
 	const TPointD &p1,
 	const TPointD &p2)
 {
-	return TRectD(tmin(p0.x, p1.x, p2.x), tmin(p0.y, p1.y, p2.y),
-				  tmax(p0.x, p1.x, p2.x), tmax(p0.y, p1.y, p2.y));
+	return TRectD(
+		std::min({p0.x, p1.x, p2.x}), std::min({p0.y, p1.y, p2.y}),
+		std::max({p0.x, p1.x, p2.x}), std::max({p0.y, p1.y, p2.y}));
 }
 
 /*!
@@ -847,10 +849,10 @@ inline TRectD boundingBox(
 	const TPointD &p3)
 {
 	return TRectD(
-		tmin(p0.x, p1.x, p2.x, p3.x),
-		tmin(p0.y, p1.y, p2.y, p3.y),
-		tmax(p0.x, p1.x, p2.x, p3.x),
-		tmax(p0.y, p1.y, p2.y, p3.y));
+		std::min({p0.x, p1.x, p2.x, p3.x}),
+		std::min({p0.y, p1.y, p2.y, p3.y}),
+		std::max({p0.x, p1.x, p2.x, p3.x}),
+		std::max({p0.y, p1.y, p2.y, p3.y}));
 }
 
 //-----------------------------------------------------------------------------
@@ -1136,21 +1138,6 @@ public:
 		Retruns the transformed box of the bounding box.
 	*/
 	TRectD operator*(const TRectD &rect) const;
-	/*Sposto in tgeometry.cpp
-  {
-    if (rect != TConsts::infiniteRectD)
-    {
-			TPointD p1= *this * rect.getP00(),
-				p2= *this * rect.getP01(),
-				p3= *this * rect.getP10(),
-				p4= *this * rect.getP11();
-			return TRectD(tmin(p1.x,p2.x,p3.x,p4.x), tmin(p1.y,p2.y,p3.y,p4.y),
-				tmax(p1.x,p2.x,p3.x,p4.x), tmax(p1.y,p2.y,p3.y,p4.y));
-		}
-		else
-      return TConsts::infiniteRectD;
-  };
-  */
 
 	/*!
 		Returns a translated matrix that change the vector (u,v) in (x,y).
@@ -1159,23 +1146,11 @@ public:
 		\vec{0}&1\end{array}\right)\f$</p>
 	*/
 	TAffine place(double u, double v, double x, double y) const;
-	/*Sposto in tgeometry.cpp
-  {
-    return TAffine(a11, a12, x - (a11 * u + a12 * v),  
-      a21, a22, y - (a21 * u + a22 * v));
-  };
-  */
+
 	/*!
 		See above.
 	*/
-
 	TAffine place(const TPointD &pIn, const TPointD &pOut) const;
-	/*Sposto in tgeometry.cpp
-  {
-    return TAffine(a11, a12, pOut.x - (a11 * pIn.x + a12 * pIn.y),  
-      a21, a22, pOut.y - (a21 * pIn.x + a22 * pIn.y));
-  };
-  */
 };
 
 //-----------------------------------------------------------------------------

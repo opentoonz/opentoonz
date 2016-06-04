@@ -452,8 +452,8 @@ void build_lw_lut(float ref_lw[256], float lw[256], UCHAR lut[256])
 	top_lw = lw[i];
 	top_gr = i;
 
-	min_lw = tmax(bot_ref_lw, bot_lw);
-	max_lw = tmin(top_ref_lw, top_lw);
+	min_lw = std::max(bot_ref_lw, bot_lw);
+	max_lw = std::min(top_ref_lw, top_lw);
 
 	if (min_lw >= max_lw) {
 		for (i = 0; i < 256; i++)

@@ -1106,7 +1106,6 @@ public:
 	{
 		Filmstrip *filmstrip = new Filmstrip(panel);
 		panel->setWidget(filmstrip);
-		panel->setMinimumWidth(filmstrip->width() + 2 * panel->getFloatingMargin());
 		panel->setIsMaximizable(false);
 	}
 } filmStripFactory;

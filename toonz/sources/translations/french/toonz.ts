@@ -838,6 +838,13 @@ Que voulez-vous faire?</translation>
     </message>
 </context>
 <context>
+    <name>CommandListTree</name>
+    <message>
+        <source>----Separator----</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ConflictWidget</name>
     <message>
         <source>Mine</source>
@@ -1851,7 +1858,7 @@ Do you want to overwrite it?</translation>
     </message>
     <message>
         <source>Relative Onion Skin Toggle</source>
-        <translation>Activer/Désactiver la Pelure d&apos;Oignon Relative</translation>
+        <translation type="vanished">Activer/Désactiver la Pelure d&apos;Oignon Relative</translation>
     </message>
     <message>
         <source>Fixed Onion Skin Toggle</source>
@@ -2631,11 +2638,11 @@ Voulez-vous le créer?</translation>
     </message>
     <message>
         <source>Visit Web Site</source>
-        <translation>Visiter le Site Web</translation>
+        <translation type="vanished">Visiter le Site Web</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation type="vanished">Annuler</translation>
     </message>
     <message>
         <source>&amp;New Scene</source>
@@ -4205,6 +4212,34 @@ Voulez-vous le créer?</translation>
         <source>Type - Polyline</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>About OpenToonz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">Fermer</translation>
+    </message>
+    <message>
+        <source>&amp;Save All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Edit in Place</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;ComboViewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;About OpenToonz...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -4268,6 +4303,53 @@ Halftone</source>
     <message>
         <source>Fill
 Gaps</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MenuBarPopup</name>
+    <message>
+        <source>Customize Menu Bar of Room &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>%1 Menu Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>N.B. If you put unique title to submenu, it may not be translated to another language.
+N.B. Duplicated commands will be ignored. Only the last one will appear in the menu bar.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MenuBarTree</name>
+    <message>
+        <source>Insert Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insert Submenu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Menu</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4560,7 +4642,7 @@ Que voulez-vous faire?</translation>
     </message>
     <message>
         <source>Columns</source>
-        <translation>Colonnes</translation>
+        <translation type="vanished">Colonnes</translation>
     </message>
     <message>
         <source>Camera Shift:</source>
@@ -5180,10 +5262,6 @@ Que voulez-vous faire?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Replace Level after SaveLevelAs command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>* Changes will take effect the next time you run Toonz</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5305,6 +5383,62 @@ Que voulez-vous faire?</translation>
     </message>
     <message>
         <source>Paint Color:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replace Toonz Level after SaveLevelAs command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Keyframes on Cell Area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mouse Cursor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Viewer Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On Demand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Icons</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Icons &amp; Images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At Once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick Every Colors as Different Styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Integrate Similar Colors as One Style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Xsheet as Animation Sheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette Type on Loading Raster Image as Color Model</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5509,7 +5643,7 @@ Voulez-vous le remplacer?</translation>
     <name>QObject</name>
     <message>
         <source>System date tampered.</source>
-        <translation>Date de système altéré.</translation>
+        <translation type="vanished">Date de système altéré.</translation>
     </message>
     <message>
         <source>No more Undo operations available.</source>
@@ -5527,7 +5661,7 @@ Visitez le site Web pour avoir plus d&apos;informations.</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation>Quitter</translation>
+        <translation type="vanished">Quitter</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -5777,7 +5911,7 @@ certaines régions sont trop haute.</translation>
         <translation>Erreur dans la Seuil de Distance</translation>
     </message>
     <message>
-        <source>Sensibility Error</source>
+        <source>Sensitivity Error</source>
         <translation>Erreur de Sensibilité</translation>
     </message>
     <message>
@@ -6403,7 +6537,7 @@ Voulez-vous enregistrer vos modifications?</translation>
     </message>
     <message>
         <source>The scene %1 was created with Toonz and cannot be loaded in LineTest.</source>
-        <translation>La scène %1 a été créé avec Toonz et ne peut pas être chargé dans LineTest.</translation>
+        <translation type="vanished">La scène %1 a été créé avec Toonz et ne peut pas être chargé dans LineTest.</translation>
     </message>
     <message>
         <source>File %1 already exists.
@@ -6568,10 +6702,6 @@ Are you sure to </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Toonz cannot Save this Level</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No Current Scene</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6705,7 +6835,7 @@ Are you sure to </source>
     </message>
     <message>
         <source>Palette Gizmo</source>
-        <translation type="unfinished">Palette Gizmo</translation>
+        <translation type="obsolete">Palette Gizmo</translation>
     </message>
     <message>
         <source>Create Level %1  at Column %2</source>
@@ -6797,10 +6927,6 @@ Are you sure to </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set Keyframe  : %1  at Frame %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Move Columns</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6834,6 +6960,70 @@ Are you sure to </source>
     </message>
     <message>
         <source>Apply Matchline  : Column%1 &lt; Column%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Keyframe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette Gizmo  %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palette is locked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move keyframe handle  : %1  Handle of the keyframe %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle cycle of  %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Drag] to move position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>----Separator----</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Drag] to move position, [Double Click] to edit title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Drag&amp;Drop] to copy separator to menu bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Drag&amp;Drop] to copy command to menu bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open menubar settings template file. Re-installing Toonz will solve this problem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Visit Web Site</source>
+        <translation type="unfinished">Visiter le Site Web</translation>
+    </message>
+    <message>
+        <source>https://opentoonz.github.io/e/</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6962,7 +7152,7 @@ Les fichiers audio ne seront pas inclus dans le clip rendu.</translation>
     <name>RoomTabWidget</name>
     <message>
         <source>New Room</source>
-        <translation type="vanished">Nouvel Espace de Travail</translation>
+        <translation>Nouvel Espace de Travail</translation>
     </message>
     <message>
         <source>Delete Room</source>
@@ -6970,11 +7160,19 @@ Les fichiers audio ne seront pas inclus dans le clip rendu.</translation>
     </message>
     <message>
         <source>Room</source>
-        <translation type="vanished">Espace</translation>
+        <translation>Espace</translation>
     </message>
     <message>
         <source>Are you sure you want to remove room %1</source>
-        <translation type="vanished">Êtes-vous sûr de vouloir supprimer l&apos;espace de travail 1%</translation>
+        <translation>Êtes-vous sûr de vouloir supprimer l&apos;espace de travail 1%</translation>
+    </message>
+    <message>
+        <source>Delete Room &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Customize Menu Bar of Room &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8315,6 +8513,26 @@ Attribuer à  &apos;3%&apos;?</translation>
         <source>Level</source>
         <translation type="unfinished">Niveau</translation>
     </message>
+    <message>
+        <source>Failed to load menu %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to add command %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open menubar settings file %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to create menubar</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SubSheetBar</name>
@@ -8694,6 +8912,13 @@ Cliquez sur le bouton fléché pour créer un nouveau sub-xsheet</translation>
     </message>
 </context>
 <context>
+    <name>TopBar</name>
+    <message>
+        <source>Lock Rooms Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TrackerPopup</name>
     <message>
         <source>Tracking Settings</source>
@@ -8704,7 +8929,7 @@ Cliquez sur le bouton fléché pour créer un nouveau sub-xsheet</translation>
         <translation>Seuil:</translation>
     </message>
     <message>
-        <source>Sensibility:</source>
+        <source>Sensitivity:</source>
         <translation>Sensibilité:</translation>
     </message>
     <message>
@@ -8921,19 +9146,19 @@ S&apos;il vous plaît se référer à la guide de l&apos;utilisateur pour plus d
     <name>XsheetGUI::CellArea</name>
     <message>
         <source>Click to select keyframe, drag to move it</source>
-        <translation type="vanished">Cliquer pour sélectionner une clé, faire glisser pour la déplacer</translation>
+        <translation>Cliquer pour sélectionner une clé, faire glisser pour la déplacer</translation>
     </message>
     <message>
         <source>Click and drag to set the acceleration range</source>
-        <translation type="vanished">Cliquer et faire glisser pour définir l&apos;intervalle d&apos;accélération</translation>
+        <translation>Cliquer et faire glisser pour définir l&apos;intervalle d&apos;accélération</translation>
     </message>
     <message>
         <source>Click and drag to set the deceleration range</source>
-        <translation type="vanished">Cliquer et faire glisser pour définir l&apos;intervalle de décélération</translation>
+        <translation>Cliquer et faire glisser pour définir l&apos;intervalle de décélération</translation>
     </message>
     <message>
         <source>Set the cycle of previous keyframes</source>
-        <translation type="vanished">Définir la cycle des clés précédentes</translation>
+        <translation>Définir la cycle des clés précédentes</translation>
     </message>
     <message>
         <source>Click and drag to move the selection</source>
@@ -9101,11 +9326,11 @@ S&apos;il vous plaît se référer à la guide de l&apos;utilisateur pour plus d
     </message>
     <message>
         <source>Relative Onion Skin Toggle</source>
-        <translation type="vanished">Activer/Désactiver la Pelure d&apos;Oignon Relative</translation>
+        <translation>Activer/Désactiver la Pelure d&apos;Oignon Relative</translation>
     </message>
     <message>
         <source>Fixed Onion Skin Toggle</source>
-        <translation type="vanished">Activer/Désactiver la Pelure d&apos;Oignon Fixe</translation>
+        <translation>Activer/Désactiver la Pelure d&apos;Oignon Fixe</translation>
     </message>
     <message>
         <source>Playback Start Marker</source>
@@ -9133,6 +9358,10 @@ S&apos;il vous plaît se référer à la guide de l&apos;utilisateur pour plus d
     </message>
     <message>
         <source>Preview This</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Double Click to Toggle Onion Skin</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

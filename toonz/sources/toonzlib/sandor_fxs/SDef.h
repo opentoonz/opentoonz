@@ -75,13 +75,6 @@ typedef struct {
 	double d;
 } SXYD;
 
-#ifndef MIN
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
-#endif
-#ifndef MAX
-#define MAX(x, y) ((x) > (y) ? (x) : (y))
-#endif
-
 #define I_ROUND(x) ((int)(((int)(-0.9F) == 0 && (x) < 0.0F) ? ((x)-0.5F) : ((x) + 0.5F)))
 #define I_ROUNDP(x) ((int)((x) + 0.5F))
 #define UC_ROUND(x) ((unsigned char)((x) + 0.5F))

@@ -649,7 +649,7 @@ void TStageObjectTree::insertSpline(TStageObjectSpline *s)
 	if (containsSpline(s))
 		return;
 	splines[s->getId()] = s;
-	m_imp->m_splineCount = tmax(m_imp->m_splineCount, s->getId() + 1);
+	m_imp->m_splineCount = std::max(m_imp->m_splineCount, s->getId() + 1);
 	s->addRef();
 }
 

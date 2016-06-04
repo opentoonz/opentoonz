@@ -289,7 +289,7 @@ inline TInterval square(const TInterval &w)
 		return TInterval(b, a); //  return [m_max^2, m_min^2]
 	else {
 		assert(w.m_min < 0 && 0 < w.m_max);
-		return TInterval(0, tmax(a, b)); //  [0, max(w.m_min^2, w.m_max^2)]
+		return TInterval(0, std::max(a, b)); //  [0, max(w.m_min^2, w.m_max^2)]
 	}
 }
 //-----------------------------------------------------
@@ -306,8 +306,8 @@ inline TInterval intersection(const TInterval &a, const TInterval &b)
 {
 	//  return a_intersezione_b (insiemistico) se questa e' non vuota, altrimenti
 	//  return TInterval() (intervallo vuoto)
-	double min = tmax(a.m_min, b.m_min);
-	double max = tmin(a.m_max, b.m_max);
+	double min = std::max(a.m_min, b.m_min);
+	double max = std::min(a.m_max, b.m_max);
 	if (min <= max) //  a.isEmpty() || b.isEmpty() => (min >= 1 && max <= -1) => min > max
 		return TInterval(min, max);
 	else
@@ -335,7 +335,7 @@ inline TInterval createErrorTInterval(double center,
 	//  implementare l'artimetica double standard IEEE.
 	assert(minError >= 0);
 	const double relativeDoubleError = 1e-13;
-	double error = tmax(fabs(center) * relativeDoubleError, minError);
+	double error = std::max(fabs(center) * relativeDoubleError, minError);
 	return TInterval(center - error, center + error);
 }
 //-----------------------------------------------------

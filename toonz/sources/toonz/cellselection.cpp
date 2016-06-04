@@ -609,9 +609,9 @@ bool pasteStrokesInCellWithoutUndo(int row, int col, const StrokesData *strokesD
 	if (vi) {
 		std::set<int> indicesSet;
 		strokesData->getImage(vi, indicesSet, true);
-		std::set<int>::iterator it = indicesSet.begin();
-		for (it; it != indicesSet.end(); it++)
-			indices.push_back(*it);
+		for (int index : indicesSet) {
+			indices.push_back(index);
+		}
 		assert(sl);
 		app->getPaletteController()->getCurrentLevelPalette()->notifyPaletteChanged();
 		IconGenerator::instance()->invalidate(sl, fid);
@@ -1508,7 +1508,7 @@ void TCellSelection::pasteCells()
 
 				std::set<TKeyframeSelection::Position>::const_iterator it, end = positions.end();
 				for (it = positions.begin(); it != end; ++it)
-					c1 = tmax(c1, it->second);
+					c1 = std::max(c1, it->second);
 			}
 		}
 		if (!initUndo) {

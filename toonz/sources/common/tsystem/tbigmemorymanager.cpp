@@ -220,6 +220,8 @@ UCHAR *TBigMemoryManager::getBuffer(UINT size)
 		chunkSize = it->second.m_size;
 		it++;
 	}
+	if (address)
+		memset(address, 0x00, size);
 	return address;
 }
 
@@ -275,7 +277,7 @@ bool TBigMemoryManager::putRaster(TRaster *ras, bool canPutOnDisk)
 	{
 		if (!ras->m_parent) {
 			int sizeKB = size >> 10;
-			allocationPeakKB = tmax(allocationPeakKB, sizeKB);
+			allocationPeakKB = std::max(allocationPeakKB, sizeKB);
 			allocationSumKB += sizeKB;
 			allocationCount++;
 		}

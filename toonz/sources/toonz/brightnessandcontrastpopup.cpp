@@ -218,7 +218,7 @@ public:
 	TRasterP raster() const { return m_ras; }
 	TRasterP &raster() { return m_ras; }
 
-	void paintGL()
+	void paintGL() override
 	{
 		drawBackground();
 
@@ -512,8 +512,8 @@ void BrightnessAndContrastPopup::apply()
 			std::set<TFrameId> fids = filmstripSelection->getSelectedFids();
 			std::set<TFrameId>::iterator it = fids.begin();
 			bool oneImageChanged = false;
-			for (it; it != fids.end(); it++) {
-				TRasterImageP rasImage = (TRasterImageP)simpleLevel->getFrame(*it, true);
+			for (auto const& fid : fids) {
+				TRasterImageP rasImage = (TRasterImageP)simpleLevel->getFrame(fid, true);
 				;
 				if (!rasImage)
 					continue;
@@ -522,9 +522,9 @@ void BrightnessAndContrastPopup::apply()
 					continue;
 				oneImageChanged = true;
 				onChange(ras, contrast, brightness);
-				simpleLevel->touchFrame(*it);
+				simpleLevel->touchFrame(fid);
 				simpleLevel->setDirtyFlag(true);
-				IconGenerator::instance()->invalidate(simpleLevel, *it);
+				IconGenerator::instance()->invalidate(simpleLevel, fid);
 			}
 			if (oneImageChanged) {
 				close();

@@ -56,7 +56,7 @@ MatrixRmn MatrixRmn::WorkMatrix; // Temporary work matrix
 // Fill the diagonal entries with the value d.  The rest of the matrix is unchanged.
 void MatrixRmn::SetDiagonalEntries(double d)
 {
-	long diagLen = tmin(NumRows, NumCols);
+	long diagLen = std::min(NumRows, NumCols);
 	double *dPtr = x;
 	for (; diagLen > 0; diagLen--) {
 		*dPtr = d;
@@ -67,7 +67,7 @@ void MatrixRmn::SetDiagonalEntries(double d)
 // Fill the diagonal entries with values in vector d.  The rest of the matrix is unchanged.
 void MatrixRmn::SetDiagonalEntries(const VectorRn &d)
 {
-	long diagLen = tmin(NumRows, NumCols);
+	long diagLen = std::min(NumRows, NumCols);
 	assert(d.length == diagLen);
 	double *dPtr = x;
 	double *from = d.x;
@@ -80,7 +80,7 @@ void MatrixRmn::SetDiagonalEntries(const VectorRn &d)
 // Fill the superdiagonal entries with the value d.  The rest of the matrix is unchanged.
 void MatrixRmn::SetSuperDiagonalEntries(double d)
 {
-	long sDiagLen = tmin(NumRows, (long)(NumCols - 1));
+	long sDiagLen = std::min(NumRows, (long)(NumCols - 1));
 	double *to = x + NumRows;
 	for (; sDiagLen > 0; sDiagLen--) {
 		*to = d;
@@ -91,7 +91,7 @@ void MatrixRmn::SetSuperDiagonalEntries(double d)
 // Fill the superdiagonal entries with values in vector d.  The rest of the matrix is unchanged.
 void MatrixRmn::SetSuperDiagonalEntries(const VectorRn &d)
 {
-	long sDiagLen = tmin((long)(NumRows - 1), NumCols);
+	long sDiagLen = std::min((long)(NumRows - 1), NumCols);
 	assert(sDiagLen == d.length);
 	double *to = x + NumRows;
 	double *from = d.x;
@@ -104,7 +104,7 @@ void MatrixRmn::SetSuperDiagonalEntries(const VectorRn &d)
 // Fill the subdiagonal entries with the value d.  The rest of the matrix is unchanged.
 void MatrixRmn::SetSubDiagonalEntries(double d)
 {
-	long sDiagLen = tmin(NumRows, NumCols) - 1;
+	long sDiagLen = std::min(NumRows, NumCols) - 1;
 	double *to = x + 1;
 	for (; sDiagLen > 0; sDiagLen--) {
 		*to = d;
@@ -115,7 +115,7 @@ void MatrixRmn::SetSubDiagonalEntries(double d)
 // Fill the subdiagonal entries with values in vector d.  The rest of the matrix is unchanged.
 void MatrixRmn::SetSubDiagonalEntries(const VectorRn &d)
 {
-	long sDiagLen = tmin(NumRows, NumCols) - 1;
+	long sDiagLen = std::min(NumRows, NumCols) - 1;
 	assert(sDiagLen == d.length);
 	double *to = x + 1;
 	double *from = d.x;
@@ -262,7 +262,7 @@ double MatrixRmn::DotProductColumn(const VectorRn &v, long colNum) const
 // Add a constant to each entry on the diagonal
 MatrixRmn &MatrixRmn::AddToDiagonal(double d) // Adds d to each diagonal entry
 {
-	long diagLen = tmin(NumRows, NumCols);
+	long diagLen = std::min(NumRows, NumCols);
 	double *dPtr = x;
 	for (; diagLen > 0; diagLen--) {
 		*dPtr += d;
@@ -274,7 +274,7 @@ MatrixRmn &MatrixRmn::AddToDiagonal(double d) // Adds d to each diagonal entry
 // Aggiunge i temini del vettore alla diagonale
 MatrixRmn &MatrixRmn::AddToDiagonal(const VectorRn &v) // Adds d to each diagonal entry
 {
-	long diagLen = tmin(NumRows, NumCols);
+	long diagLen = std::min(NumRows, NumCols);
 	double *dPtr = x;
 	const double *dv = v.x;
 	for (; diagLen > 0; diagLen--) {
@@ -412,7 +412,7 @@ void MatrixRmn::ConvertToRefNoFree()
 	// Find row with most non-zero entry.
 	// Swap to the highest active row
 	// Subtract appropriately from all the lower rows (row op of type 3)
-	long numIters = tmin(NumRows, NumCols);
+	long numIters = std::min(NumRows, NumCols);
 	double *rowPtr1 = x;
 	const long diagStep = NumRows + 1;
 	long lenRowLeft = NumCols;
@@ -528,7 +528,7 @@ void MatrixRmn::PostApplyGivens(double c, double s, long idx1, long idx2)
 // ********************************************************************************************
 void MatrixRmn::ComputeSVD(MatrixRmn &U, VectorRn &w, MatrixRmn &V) const
 {
-	assert(U.NumRows == NumRows && V.NumCols == NumCols && U.NumRows == U.NumCols && V.NumRows == V.NumCols && w.GetLength() == tmin(NumRows, NumCols));
+	assert(U.NumRows == NumRows && V.NumCols == NumCols && U.NumRows == U.NumCols && V.NumRows == V.NumCols && w.GetLength() == std::min(NumRows, NumCols));
 
 	double temp = 0.0;
 	VectorRn &superDiag = VectorRn::GetWorkVector(w.GetLength() - 1); // Some extra work space.  Will get passed around.
@@ -777,7 +777,7 @@ void MatrixRmn::ConvertBidiagToDiagonal(MatrixRmn &U, MatrixRmn &V, VectorRn &w,
 	double aa = w.MaxAbs();
 	double bb = superDiag.MaxAbs();
 
-	double eps = 1.0e-15 * tmax(w.MaxAbs(), superDiag.MaxAbs());
+	double eps = 1.0e-15 * std::max(w.MaxAbs(), superDiag.MaxAbs());
 
 	while (true) {
 		bool workLeft = UpdateBidiagIndices(&firstBidiagIdx, &lastBidiagIdx, w, superDiag, eps);

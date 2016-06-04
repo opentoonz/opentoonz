@@ -8,7 +8,7 @@
 
 #include "toonz/imagepainter.h"
 
-#include <QGLWidget>
+#include <QOpenGLWidget>
 
 //-----------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ class HistogramPopup;
 //    ImageViewer
 //--------------------
 
-class ImageViewer : public QGLWidget
+class ImageViewer : public QOpenGLWidget
 {
 	Q_OBJECT
 	enum DragType { eNone,
@@ -106,12 +106,8 @@ public:
 	void adaptView(const TRect &imgRect, const TRect &viewRect);
 	void adaptView(const QRect &viewerRect);
 
-	void doSwapBuffers()
-	{
-		swapBuffers();
-		glFlush();
-	}
-	void changeSwapBehavior(bool enable) { setAutoBufferSwap(enable); }
+	void doSwapBuffers();
+	void changeSwapBehavior(bool enable);
 
 	//iwsw commented out temporarily
 	//Ghibli3DLutUtil* get3DLutUtil(){ return m_ghibli3DLutUtil; }

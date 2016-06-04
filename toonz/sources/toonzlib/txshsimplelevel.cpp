@@ -1,5 +1,3 @@
-
-
 #include "toonz/txshsimplelevel.h"
 #include "imagebuilders.h"
 
@@ -40,6 +38,7 @@
 #include <QDir>
 #include <QRegExp>
 #include <QMessageBox>
+#include <QtCore>
 
 #include "../common/psdlib/psd.h"
 
@@ -754,7 +753,7 @@ TAffine getAffine(const TDimension &srcSize, const TDimension &dstSize)
 {
 	double scx = 1 * dstSize.lx / (double)srcSize.lx;
 	double scy = 1 * dstSize.ly / (double)srcSize.ly;
-	double sc = tmin(scx, scy);
+	double sc = std::min(scx, scy);
 	double dx = (dstSize.lx - srcSize.lx * sc) * 0.5;
 	double dy = (dstSize.ly - srcSize.ly * sc) * 0.5;
 	return TScale(sc) * TTranslation(0.5 * TPointD(srcSize.lx, srcSize.ly) + TPointD(dx, dy));
@@ -789,7 +788,7 @@ TImageP buildIcon(const TImageP &img, const TDimension &size)
 			rasCM32 = rasCM32->extractT(bbox);
 			double sx = raster->getLx() / (double)rasCM32->getLx();
 			double sy = raster->getLy() / (double)rasCM32->getLy();
-			double sc = tmin(sx, sy);
+			double sc = std::min(sx, sy);
 			TAffine aff = TScale(sc).place(
 				rasCM32->getCenterD(),
 				raster->getCenterD());
@@ -1100,14 +1099,14 @@ TFilePath getLevelPathAndSetNameWithPsdLevelName(TXshSimpleLevel *xshLevel)
 	if (list.size() >= 2 && list.at(1) != "frames") {
 		bool hasLayerId;
 		int layid = list.at(1).toInt(&hasLayerId);
+		QTextCodec* layerNameCodec = QTextCodec::codecForName( Preferences::instance()->getLayerNameEncoding().c_str() );
 
 		if (hasLayerId) {
 			// An explicit photoshop layer id must be converted to the associated level name
 			TPSDParser psdparser(xshLevel->getScene()->decodeFilePath(retfp));
 			std::string levelName = psdparser.getLevelNameWithCounter(layid); // o_o  what about UNICODE names??
 
-			list[1] = QString::fromStdString(levelName);
-
+			list[1] = layerNameCodec->toUnicode(levelName.c_str());
 			std::wstring wLevelName = list.join("#").toStdWString();
 			retfp = retfp.withName(wLevelName);
 
@@ -1574,7 +1573,6 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 
 	std::vector<TFrameId> fids;
 	getFids(fids);
-	std::vector<TFrameId>::iterator it;
 
 	bool isLevelModified = getProperties()->getDirtyFlag();
 	bool isPaletteModified = false;
@@ -1630,11 +1628,11 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 				// is a scan-cleanup mix). This is fine even on the temporarily substituted m_path.
 				std::map<TFrameId, TFrameId> renumberTable;
 
-				std::map<TFrameId, TFrameId>::reverse_iterator mapIt = m_renumberTable.rbegin();
-				for (mapIt; mapIt != m_renumberTable.rend(); ++mapIt) {
-					TFrameId id = mapIt->first;
-					if (getFrameStatus(id) != Scanned && getFrameStatus(id) != CleanupPreview)
-						renumberTable[id] = mapIt->second;
+				for (auto it = m_renumberTable.rbegin(); it != m_renumberTable.rend(); ++it) {
+					TFrameId id = (*it).first;
+					if ((getFrameStatus(id) != Scanned) && (getFrameStatus(id) != CleanupPreview)) {
+						renumberTable[id] = (*it).second;
+					}
 				}
 
 				m_renumberTable.clear();
@@ -1649,12 +1647,12 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 
 				ImageLoader::BuildExtData extData(this, TFrameId());
 
-				for (it = fids.begin(); it != fids.end(); ++it) {
-					std::string imageId = getImageId(*it, Normal); // Retrieve the actual level frames ("L_whatever")
+				for (auto const& fid : fids) {
+					std::string imageId = getImageId(fid, Normal); // Retrieve the actual level frames ("L_whatever")
 					if (!ImageManager::instance()->isModified(imageId))
 						continue;
 
-					extData.m_fid = *it;
+					extData.m_fid = fid;
 					TImageP img = ImageManager::instance()->getImage(imageId, imFlags, &extData);
 
 					assert(img);
@@ -1678,7 +1676,7 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 						ti->setSavebox(saveBox);
 					}
 
-					lw->getFrameWriter(*it)->save(img);
+					lw->getFrameWriter(fid)->save(img);
 				}
 
 				lw = TLevelWriterP(); // TLevelWriterP's destructor saves the palette
@@ -1708,12 +1706,12 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 
 				ImageLoader::BuildExtData extData(this, TFrameId());
 
-				for (it = fids.begin(); it != fids.end(); ++it) {
-					std::string imageId = getImageId(*it, Normal); // Retrieve the actual level frames ("L_whatever")
+				for (auto const& fid : fids) {
+					std::string imageId = getImageId(fid, Normal); // Retrieve the actual level frames ("L_whatever")
 					if (!ImageManager::instance()->isModified(imageId))
 						continue;
 
-					extData.m_fid = *it;
+					extData.m_fid = fid;
 					TImageP img = ImageManager::instance()->getImage(imageId, imFlags, &extData);
 
 					assert(img);
@@ -1730,7 +1728,7 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp, bool overwrite
 					if (subs != 1)
 						continue;
 
-					updater.update(*it, img);
+					updater.update(fid, img);
 				}
 			}
 			updater.close(); //Needs the original level subs
@@ -1887,6 +1885,7 @@ TImageP TXshSimpleLevel::createEmptyFrame()
 	switch (m_type) {
 	case PLI_XSHLEVEL:
 		result = new TVectorImage;
+		break;
 
 	case MESH_XSHLEVEL:
 		assert(false); // Not implemented yet
@@ -2005,16 +2004,16 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids)
 		TFrameId oldFrameId = *it;
 		TFrameId newFrameId = fids[i++];
 		table[oldFrameId] = newFrameId;
-		std::map<TFrameId, TFrameId>::iterator mapIt = m_renumberTable.begin();
-		for (mapIt; mapIt != m_renumberTable.end(); ++mapIt)
-			if (mapIt->second == oldFrameId) {
-				newRenumberTable[mapIt->first] = newFrameId;
+		for (auto const& renumber : m_renumberTable) {
+			if (renumber.second == oldFrameId) {
+				newRenumberTable[renumber.first] = newFrameId;
 				break;
 			}
+		}
 	}
-	std::map<TFrameId, TFrameId>::iterator newMapIt = newRenumberTable.begin();
-	for (newMapIt; newMapIt != newRenumberTable.end(); ++newMapIt)
-		m_renumberTable[newMapIt->first] = newMapIt->second;
+	for (auto const& renumber : newRenumberTable) {
+		m_renumberTable[renumber.first] = renumber.second;
+	}
 
 	m_frames.clear();
 	for (i = 0; i < n; ++i) {

@@ -171,7 +171,7 @@ static int create_param_view(toonz_node_handle_t node, toonz_param_view_handle_t
 			return TOONZ_ERROR_INVALID_HANDLE;
 		}
 
-		if (p = fx->createParamView()) {
+		if ((p = fx->createParamView())) {
 			*view = p;
 		} else {
 			printf("create_param_view: invalid param name");
@@ -311,7 +311,7 @@ static int add_preference(toonz_node_handle_t node, const char *name, toonz_ui_p
 			return TOONZ_ERROR_INVALID_HANDLE;
 		}
 
-		if (p = fx->createUIPage(name)) {
+		if ((p = fx->createUIPage(name))) {
 			*ui = p;
 		} else {
 			printf("add_preference: failed to get UIPage\n");
@@ -335,7 +335,7 @@ static int add_param(toonz_node_handle_t node, const char *name, int type, toonz
 			return TOONZ_ERROR_INVALID_HANDLE;
 		}
 
-		if (p = fx->createParam(name, toonz_param_type_enum(type))) {
+		if ((p = fx->createParam(name, toonz_param_type_enum(type)))) {
 			*param = p;
 		} else {
 			printf("add_param: invalid type");

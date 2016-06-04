@@ -177,6 +177,8 @@ public:
 
 	bool isPenCloseToTablet() const { return m_isPenCloseToTablet; }
 
+	void writeSettings();
+
 protected:
 	bool eventFilter(QObject *obj, QEvent *event);
 

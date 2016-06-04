@@ -112,7 +112,7 @@ enum GranularityOption {
 OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
 	: Dialog(TApp::instance()->getMainWindow(),
 			 false,
-			 Preferences::instance()->getCurrentLanguage() == "english",
+			 Preferences::instance()->getCurrentLanguage() == "English",
 			 isPreview ? "PreviewSettings" : "OutputSettings"),
 	  m_subcameraChk(0), m_applyShrinkChk(0), m_outputCameraOm(0), m_isPreviewSettings(isPreview), m_presetCombo(0)
 {
@@ -1020,7 +1020,7 @@ void OutputSettingsPopup::onFrameFldEditFinished()
 		return;
 	TOutputProperties *prop = getProperties();
 
-	int maxR0 = tmax(0, scene->getFrameCount() - 1);
+	int maxR0 = std::max(0, scene->getFrameCount() - 1);
 	int r0 = (int)m_startFld->getValue() - 1;
 	int r1 = (int)m_endFld->getValue() - 1;
 	int step = (int)m_stepFld->getValue();

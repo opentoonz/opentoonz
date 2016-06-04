@@ -2352,7 +2352,7 @@ void TSketchStrokeStyle::drawStroke(const TColorFunction *cf, const TStroke *str
 
 	int count = (int)(length * m_density);
 
-	double maxDw = tmin(1.0, 20.0 / length);
+	double maxDw = std::min(1.0, 20.0 / length);
 	double minDw = 1.0 / length;
 
 	TPixel32 color;
@@ -2426,7 +2426,7 @@ void TSketchStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const
 
 	int count = (int)(length * m_density);
 
-	double maxDw = tmin(1.0, 20.0 / length);
+	double maxDw = std::min(1.0, 20.0 / length);
 	double minDw = 1.0 / length;
 	TPixel color(m_color.r, m_color.g, m_color.b, m_color.m);
 	flash.setLineColor(color);
@@ -2914,7 +2914,7 @@ void TBiColorStrokeStyle::drawStroke(const TColorFunction *cf, TStrokeOutline *o
 void TBiColorStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const
 {
 	TOutlineUtil::OutlineParameter param;
-	param.m_lengthStep = tmax(10.0, m_parameter);
+	param.m_lengthStep = std::max(10.0, m_parameter);
 	TStrokeOutline outline;
 	TOutlineStyle::computeOutline(stroke, outline, param);
 	const std::vector<TOutlinePoint> &v = outline.getArray();
@@ -4094,7 +4094,7 @@ void TSawToothStrokeStyle::computeOutline(const TStroke *stroke,
 void TSawToothStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const
 {
 	TOutlineUtil::OutlineParameter param;
-	param.m_lengthStep = tmax(20.0, m_parameter);
+	param.m_lengthStep = std::max(20.0, m_parameter);
 	TStrokeOutline outline;
 	TOutlineStyle::computeOutline(stroke, outline, param);
 	const std::vector<TOutlinePoint> &v = outline.getArray();
@@ -4708,10 +4708,10 @@ bool TZigzagStrokeStyle::getZigZagPosition(const TStroke *stroke, TRandom &rnd,
 void TZigzagStrokeStyle::setRealMinMax() const
 {
 	TZigzagStrokeStyle *ncpthis = const_cast<TZigzagStrokeStyle *>(this);
-	double minDist = tmin(m_minDist, m_maxDist);
-	double maxDist = tmax(m_minDist, m_maxDist);
-	double minAngle = tmin(m_minAngle, m_maxAngle);
-	double maxAngle = tmax(m_minAngle, m_maxAngle);
+	double minDist = std::min(m_minDist, m_maxDist);
+	double maxDist = std::max(m_minDist, m_maxDist);
+	double minAngle = std::min(m_minAngle, m_maxAngle);
+	double maxAngle = std::max(m_minAngle, m_maxAngle);
 	ncpthis->m_minDist = minDist;
 	ncpthis->m_maxDist = maxDist;
 	ncpthis->m_minAngle = minAngle;
@@ -6003,7 +6003,7 @@ void drawCenterline(const TStroke *stroke)
 	for (i = 0; i < n; ++i) {
 		const TThickQuadratic *chunk = stroke->getChunk(i);
 		double length = chunk->getLength(0, 1);
-		int maxCount = tmax(tceil(length / (5 * sqrt(tglGetPixelSize2()))), 1);
+		int maxCount = std::max(tceil(length / (5 * sqrt(tglGetPixelSize2()))), 1);
 		double deltaT = 1.0 / maxCount;
 		double t = 0;
 		for (t = 0; t < 1 + (deltaT / 2); t += deltaT) {

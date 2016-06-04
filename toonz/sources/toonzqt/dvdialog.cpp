@@ -249,7 +249,7 @@ Dialog::Dialog(QWidget *parent, bool hasButton, bool hasFixedSize, const QString
 	if (geo != QString()) {
 		QStringList values = geo.split(" ");
 		assert(values.size() == 4);
-		setGeometry(values.at(0).toInt(), tmax(30, values.at(1).toInt()), values.at(2).toInt(), values.at(3).toInt());
+		setGeometry(values.at(0).toInt(), std::max(30, values.at(1).toInt()), values.at(2).toInt(), values.at(3).toInt());
 	}
 }
 
@@ -273,7 +273,7 @@ void Dialog::moveEvent(QMoveEvent *e)
 
 void Dialog::resizeEvent(QResizeEvent *e)
 {
-	if (Preferences::instance()->getCurrentLanguage() != "english") {
+	if (Preferences::instance()->getCurrentLanguage() != "English") {
 		QSize t = this->size();
 		QLabel *s;
 		foreach (s, m_labelList)

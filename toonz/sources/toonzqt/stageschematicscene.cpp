@@ -649,9 +649,8 @@ QGraphicsItem *StageSchematicScene::getCurrentNode()
 {
 	QList<QGraphicsItem *> allItems = items();
 
-	QList<QGraphicsItem *>::iterator it = allItems.begin();
-	for (it; it != allItems.end(); it++) {
-		StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(*it);
+	for (auto const item : allItems) {
+		StageSchematicNode *node = dynamic_cast<StageSchematicNode *>(item);
 		if (node && node->getStageObject()->getId() == m_objHandle->getObjectId())
 			return node;
 	}
@@ -698,8 +697,8 @@ void StageSchematicScene::placeNodes()
 		yPos = maxYPos + (pegbar->getId().isCamera() ? 100 : step);
 		pegbar->setDagNodePos(TPointD(xPos, yPos));
 		placeChildren(roots[i], xPos, yPos);
-		maxXPos = tmax(xPos, maxXPos);
-		maxYPos = tmax(yPos, maxYPos);
+		maxXPos = std::max(xPos, maxXPos);
+		maxYPos = std::max(yPos, maxYPos);
 	}
 
 	//places all spline nodes.
@@ -783,7 +782,7 @@ void StageSchematicScene::placeChildren(TreeStageNode *treeNode, double &xPos, d
 		firstChild = false;
 		childPegbar->setDagNodePos(TPointD(xChildPos, yPos));
 		placeChildren(childNode, xChildPos, yPos, startFromCamera);
-		xPos = tmax(xPos, xChildPos);
+		xPos = std::max(xPos, xChildPos);
 	}
 }
 
@@ -1188,8 +1187,7 @@ void StageSchematicScene::mousePressEvent(QGraphicsSceneMouseEvent *me)
 SchematicNode *StageSchematicScene::getNodeFromPosition(const QPointF &pos)
 {
 	QList<QGraphicsItem *> pickedItems = items(pos);
-	int i = 0;
-	for (i; i < pickedItems.size(); i++) {
+	for (int i = 0; i < pickedItems.size(); i++) {
 		SchematicNode *node = dynamic_cast<SchematicNode *>(pickedItems.at(i));
 		if (node)
 			return node;

@@ -189,7 +189,7 @@ public:
 /*! \class ImageViewer
 		\brief The ImageViewer class provides to view an image.
 
-		Inherits \b QGLWidget.
+		Inherits \b QOpenGLWidget.
 
 		The object allows also to manage pan and zoom event. It's possible to set a
 		color mask TRop::ColorMask to image view.
@@ -205,10 +205,22 @@ public:
 */
 
 ImageViewer::ImageViewer(QWidget *parent, FlipBook *flipbook, bool showHistogram)
-	: QGLWidget(parent), m_pressedMousePos(0, 0), m_mouseButton(Qt::NoButton), m_draggingZoomSelection(false), m_image(), m_FPS(0), m_viewAff(), m_pos(0, 0), m_visualSettings(), m_compareSettings(), m_isHistogramEnable(showHistogram), m_flipbook(flipbook), m_isColorModel(false), m_histogramPopup(0), m_isRemakingPreviewFx(false)
-	  //, m_ghibli3DLutUtil(0) //iwsw commented out temporarily
-	  ,
-	  m_rectRGBPick(false)
+	: QOpenGLWidget(parent)
+	, m_pressedMousePos(0, 0)
+	, m_mouseButton(Qt::NoButton)
+	, m_draggingZoomSelection(false)
+	, m_image()
+	, m_FPS(0)
+	, m_viewAff()
+	, m_pos(0, 0)
+	, m_visualSettings()
+	, m_compareSettings()
+	, m_isHistogramEnable(showHistogram)
+	, m_flipbook(flipbook)
+	, m_isColorModel(false)
+	, m_histogramPopup(0)
+	, m_isRemakingPreviewFx(false)
+	, m_rectRGBPick(false)
 {
 	m_visualSettings.m_sceneProperties = TApp::instance()->getCurrentScene()->getScene()->getProperties();
 	m_visualSettings.m_drawExternalBG = true;
@@ -327,7 +339,7 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event)
 	action->setParent(0);
 
 	delete menu;
-	updateGL();
+	update();
 }
 
 //-----------------------------------------------------------------------------
@@ -894,8 +906,8 @@ int ImageViewer::getDragType(const TPoint &pos, const TRect &loadbox)
 	if (loadbox == TRect())
 		return eDrawRect;
 
-	int ret = 0, dx = tmin(abs(loadbox.x0 - pos.x), abs(loadbox.x1 - pos.x)),
-		dy = tmin(abs(loadbox.y0 - pos.y), abs(loadbox.y1 - pos.y));
+	int ret = 0, dx = std::min(abs(loadbox.x0 - pos.x), abs(loadbox.x1 - pos.x)),
+		dy = std::min(abs(loadbox.y0 - pos.y), abs(loadbox.y1 - pos.y));
 
 	if (dx > 10 && dy > 10)
 		return (loadbox.contains(pos)) ? eMoveRect : eDrawRect;
@@ -1099,7 +1111,7 @@ void ImageViewer::adaptView(const TRect &imgRect, const TRect &viewRect)
 	QRect viewerRect(geometry());
 
 	double imageScale =
-		tmin(viewerRect.width() / (double)viewRect.getLx(),
+		std::min(viewerRect.width() / (double)viewRect.getLx(),
 			 viewerRect.height() / (double)viewRect.getLy());
 
 	TPointD viewRectCenter((viewRect.x0 + viewRect.x1 + 1) * 0.5, (viewRect.y0 + viewRect.y1 + 1) * 0.5);
@@ -1126,6 +1138,14 @@ void ImageViewer::adaptView(const QRect &geomRect)
 	TRect viewRect(tfloor(viewRectD.x0), tfloor(viewRectD.y0), tceil(viewRectD.x1) - 1, tceil(viewRectD.y1) - 1);
 
 	adaptView(imgBounds, viewRect);
+}
+
+void ImageViewer::doSwapBuffers() {
+	glFlush();
+}
+
+void ImageViewer::changeSwapBehavior(bool enable) {
+	setUpdateBehavior(enable ? PartialUpdate : NoPartialUpdate);
 }
 
 //-----------------------------------------------------------------------------

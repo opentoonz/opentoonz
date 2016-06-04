@@ -192,7 +192,7 @@ public:
 
 		double sx = (double)m_offlineGlContext.getLx() / (double)cameraRes.lx;
 		double sy = (double)m_offlineGlContext.getLy() / (double)cameraRes.ly;
-		double sc = tmin(sx, sy);
+		double sc = std::min(sx, sy);
 
 		// TAffine cameraAff = scene.getXsheet()->getPlacement(TStageObjectId::CameraId(0), row);
 		TAffine cameraAff = scene.getXsheet()->getCameraAff(row);
@@ -277,7 +277,7 @@ public:
 			m_whiteSample = 0;
 		}
 		TINT32 fromSample = m_st->getSampleCount();
-		TINT32 numSample = tmax(
+		TINT32 numSample = std::max(
 			TINT32(sceneFrameCount * samplePerFrame),
 			snd1->getSampleCount());
 		m_st = TSop::insertBlank(m_st, fromSample, numSample + m_whiteSample);

@@ -1232,7 +1232,7 @@ void LoadLevelPopup::updateBottomGUI()
 		scene.setScenePath(fp);
 		int sceneLength = scene.getFrameCount();
 		QString str;
-		m_fromFrame->setText(str.number(tmin(1, sceneLength)));
+		m_fromFrame->setText(str.number(std::min(1, sceneLength)));
 		m_toFrame->setText(str.number(sceneLength));
 		m_subsequenceFrame->setEnabled(false);
 

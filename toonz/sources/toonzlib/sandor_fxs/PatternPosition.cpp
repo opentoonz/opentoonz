@@ -152,10 +152,10 @@ void CPatternPosition::sel0255To01(const int lX, const int lY, UCHAR *sel, SRECT
 		for (int x = 0; x < lX; x++, pSel++)
 			if (*pSel >= (UCHAR)1) {
 				*pSel = (UCHAR)1;
-				bb.x0 = MIN(x, bb.x0);
-				bb.x1 = MAX(x, bb.x1);
-				bb.y0 = MIN(y, bb.y0);
-				bb.y1 = MAX(y, bb.y1);
+				bb.x0 = std::min(x, bb.x0);
+				bb.x1 = std::max(x, bb.x1);
+				bb.y0 = std::min(y, bb.y0);
+				bb.y1 = std::max(y, bb.y1);
 			}
 }
 

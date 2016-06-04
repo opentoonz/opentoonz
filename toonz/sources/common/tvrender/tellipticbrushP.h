@@ -250,10 +250,10 @@ inline void OutlineBuilder::addEnvelopePoint(TRectD &bbox, const TPointD &oPoint
 template <>
 inline void OutlineBuilder::addExtensionPoint(TRectD &bbox, const TPointD &oPoint, int countIdx)
 {
-	bbox.x0 = tmin(bbox.x0, oPoint.x);
-	bbox.y0 = tmin(bbox.y0, oPoint.y);
-	bbox.x1 = tmax(bbox.x1, oPoint.x);
-	bbox.y1 = tmax(bbox.y1, oPoint.y);
+	bbox.x0 = std::min(bbox.x0, oPoint.x);
+	bbox.y0 = std::min(bbox.y0, oPoint.y);
+	bbox.x1 = std::max(bbox.x1, oPoint.x);
+	bbox.y1 = std::max(bbox.y1, oPoint.y);
 }
 
 template <>

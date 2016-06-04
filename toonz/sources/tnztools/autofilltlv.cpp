@@ -581,7 +581,7 @@ static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rls
 						if (region_id < 0) {
 							region_id = region_old;
 							rlst->array[region_id].per += 2 * (xb - xa + 1) + 2 -
-														  2 * (MIN(row[rold][j].xb, xb) - MAX(row[rold][j].xa, xa) + 1);
+														  2 * (std::min(row[rold][j].xb, xb) - std::max(row[rold][j].xa, xa) + 1);
 						} else if (region_id != region_old) {
 							/* CONTATTO FRA region_id E region_old */
 							PRINTF("Contatto tra %d e %d \n", region_id, region_old);
@@ -605,7 +605,7 @@ static void scan_fabri_regions(TRasterCM32P ras, struct s_fabri_region_list *rls
 							rlst->array[keep].holes += rlst->array[discard].holes;
 							rlst->array[keep].npix += rlst->array[discard].npix;
 							rlst->array[keep].per += rlst->array[discard].per -
-													 2 * (MIN(row[rold][j].xb, xb) - MAX(row[rold][j].xa, xa) + 1);
+													 2 * (std::min(row[rold][j].xb, xb) - std::max(row[rold][j].xa, xa) + 1);
 
 							fondi(rlst, keep, discard);
 
@@ -1003,7 +1003,7 @@ static void assign_prob3(int prob[], int i, int j)
 					   (delta_pos / delta_pos_max)));
 
 	delta_pix = abs(F_reference.array[i].npix - F_work.array[j].npix);
-	delta_pix_max = MAX((F_work.lx * F_work.ly), (F_reference.lx * F_reference.ly));
+	delta_pix_max = std::max((F_work.lx * F_work.ly), (F_reference.lx * F_reference.ly));
 
 	prob[(F_work.n * F_reference.n) + i + (j * F_reference.n)] =
 		ROUNDP(1000 * (1 - ((double)delta_pix /
@@ -1113,7 +1113,7 @@ static int somma_quadrati(int x, int y)
 	int somma = 0;
 	int i;
 
-	for (i = MIN(x, y); i <= MAX(x, y); i++)
+	for (i = std::min(x, y); i <= std::max(x, y); i++)
 		somma += i * i;
 	return somma;
 }

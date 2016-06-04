@@ -48,7 +48,7 @@ void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId, b
 				bool sameStyleId = styleId == outPix->getInk();
 				int tone = sameStyleId ? outPix->getTone() * (255 - inPix->m) / 255 : outPix->getTone();
 				int ink = !sameStyleId && outPix->getTone() < 255 - inPix->m ? outPix->getInk() : styleId;
-				*outPix = TPixelCM32(ink, outPix->getPaint(), tmin(255 - inPix->m, tone));
+				*outPix = TPixelCM32(ink, outPix->getPaint(), std::min(255 - inPix->m, tone));
 			}
 		}
 	} else {
@@ -67,7 +67,7 @@ void putOnRasterCM(const TRasterCM32P &out, const TRaster32P &in, int styleId, b
 				bool sameStyleId = styleId == outPix->getInk();
 				int tone = sameStyleId ? outPix->getTone() * (255 - inPix->m) / 255 : outPix->getTone();
 				int ink = outPix->getTone() < 255 && !sameStyleId && outPix->getTone() <= 255 - inPix->m ? outPix->getInk() : styleId;
-				*outPix = TPixelCM32(ink, outPix->getPaint(), tmin(255 - inPix->m, tone));
+				*outPix = TPixelCM32(ink, outPix->getPaint(), std::min(255 - inPix->m, tone));
 			}
 		}
 	}
@@ -98,7 +98,7 @@ void eraseFromRasterCM(const TRasterCM32P &out, const TRaster32P &in,
 			bool eraseInk = !selective || (selective && selectedStyleId == outPix->getInk());
 			bool erasePaint = !selective || (selective && selectedStyleId == outPix->getPaint());
 			int paint = eraseAreas && erasePaint ? 0 : outPix->getPaint();
-			int tone = inPix->m > 0 && eraseLine && eraseInk ? tmax(outPix->getTone(), (int)inPix->m) : outPix->getTone();
+			int tone = inPix->m > 0 && eraseLine && eraseInk ? std::max(outPix->getTone(), (int)inPix->m) : outPix->getTone();
 			*outPix = TPixelCM32(outPix->getInk(), paint, tone);
 		}
 	}

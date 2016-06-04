@@ -238,6 +238,8 @@ class ArrowToolOptionsBox : public ToolOptionsBox
 	ToolOptionCheckbox *m_lockEWCenterCheckbox;
 	ToolOptionCheckbox *m_lockNSCenterCheckbox;
 
+	ToolOptionCheckbox *m_globalKey;
+
 public:
 	ArrowToolOptionsBox(QWidget *parent, TTool *tool, TPropertyGroup *pg,
 						TFrameHandle *frameHandle, TObjectHandle *objHandle, TXsheetHandle *xshHandle,
