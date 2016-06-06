@@ -671,9 +671,9 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName)
 					if (r == 0) //InknPaintRoom
 						TApp::instance()->setInknPaintViewerPanel(cvp);
 					mySettings.beginGroup(tmpRoomName);
-					cvp->setShowHideFlag(CVPARTS_TOOLBAR, mySettings.value("Toolbar", false).toBool());
-					cvp->setShowHideFlag(CVPARTS_TOOLOPTIONS, mySettings.value("ToolOptions", false).toBool());
-					cvp->setShowHideFlag(CVPARTS_FLIPCONSOLE, mySettings.value("Console", false).toBool());
+					cvp->setShowHideFlag(CVPARTS_TOOLBAR, mySettings.value("Toolbar", true).toBool());
+					cvp->setShowHideFlag(CVPARTS_TOOLOPTIONS, mySettings.value("ToolOptions", true).toBool());
+					cvp->setShowHideFlag(CVPARTS_FLIPCONSOLE, mySettings.value("Console", true).toBool());
 					cvp->updateShowHide();
 					mySettings.endGroup();
 				}
