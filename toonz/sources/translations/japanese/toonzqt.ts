@@ -124,11 +124,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Error : Preset Name is Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>エラー ： プリセット名は無効です</translation>
     </message>
     <message>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
-        <translation type="unfinished"></translation>
+        <translation>プリセット名に &quot;,&quot; (カンマ)を使用できません</translation>
     </message>
 </context>
 <context>
@@ -1845,7 +1845,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>OpenToonz 1.0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1906,7 +1906,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>&amp;Swtich output port display mode</source>
-        <translation type="unfinished"></translation>
+        <translation>ポートの表示を切り替える (&amp;S)</translation>
     </message>
 </context>
 <context>
