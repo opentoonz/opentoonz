@@ -59,7 +59,14 @@ DVAPI void addPage(TPaletteHandle *paletteHandle, std::wstring name = L"", bool 
 
 DVAPI void destroyPage(TPaletteHandle *paletteHandle, int pageIndex);
 
-DVAPI int loadReferenceImage(TPaletteHandle *paletteHandle, bool replace,
+enum ColorModelPltBehavior
+{
+	KeepColorModelPlt = 0,
+	ReplaceColorModelPlt,
+	AddColorModelPlt
+};
+
+DVAPI int loadReferenceImage(TPaletteHandle *paletteHandle, ColorModelPltBehavior pltBehavior,
 							 const TFilePath &_fp, int &frame, ToonzScene *scene,
 							 const std::vector<int> &frames = std::vector<int>());
 

@@ -497,7 +497,7 @@ void RenameCellField::showInRowCol(int row, int col)
 		else {
 			std::string frameNumber("");
 			if (fid.getNumber() > 0)
-				frameNumber = toString(fid.getNumber());
+				frameNumber = std::to_string(fid.getNumber());
 			if (fid.getLetter() != 0)
 				frameNumber.append(1, fid.getLetter());
 			setText((frameNumber.empty()) ? QString::fromStdWString(levelName)
@@ -971,7 +971,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 	int x = m_viewer->columnToX(col);
 	int y = m_viewer->rowToY(row);
 	QRect rect = QRect(x + 1, y + 1, ColumnWidth - 1, RowHeight - 1);
-	if (cell.isEmpty()) { // draw end-of-level mark of which the previous cell is not empty
+	if (cell.isEmpty()) { // vuol dire che la precedente non e' vuota
 		QColor levelEndColor = m_viewer->getTextColor();
 		levelEndColor.setAlphaF(0.3);
 		p.setPen(levelEndColor);
@@ -1081,7 +1081,7 @@ void CellArea::drawLevelCell(QPainter &p, int row, int col, bool isReference)
 			std::string frameNumber("");
 			//set number
 			if (fid.getNumber() > 0)
-				frameNumber = toString(fid.getNumber());
+				frameNumber = std::to_string(fid.getNumber());
 			//add letter
 			if (fid.getLetter() != 0)
 				frameNumber.append(1, fid.getLetter());
@@ -1193,7 +1193,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col, bool isReference)
 	int x = m_viewer->columnToX(col);
 	int y = m_viewer->rowToY(row);
 	QRect rect = QRect(x + 1, y + 1, ColumnWidth - 1, RowHeight - 1);
-	if (cell.isEmpty()) { // draw end-of-level mark of which the previous cell is not empty
+	if (cell.isEmpty()) { // vuol dire che la precedente non e' vuota
 		QColor levelEndColor = m_viewer->getTextColor();
 		levelEndColor.setAlphaF(0.3);
 		p.setPen(levelEndColor);
@@ -1254,7 +1254,7 @@ void CellArea::drawPaletteCell(QPainter &p, int row, int col, bool isReference)
 		std::wstring levelName = cell.m_level->getName();
 		std::string frameNumber("");
 		if (fid.getNumber() > 0)
-			frameNumber = toString(fid.getNumber());
+			frameNumber = std::to_string(fid.getNumber());
 		if (fid.getLetter() != 0)
 			frameNumber.append(1, fid.getLetter());
 
@@ -1786,7 +1786,7 @@ void CellArea::mouseMoveEvent(QMouseEvent *event)
 		} else {
 			std::string frameNumber("");
 			if (fid.getNumber() > 0)
-				frameNumber = toString(fid.getNumber());
+				frameNumber = std::to_string(fid.getNumber());
 			if (fid.getLetter() != 0)
 				frameNumber.append(1, fid.getLetter());
 			m_tooltip = QString((frameNumber.empty()) ? QString::fromStdWString(levelName)

@@ -276,7 +276,7 @@ TRasterImageP TRasterImageUtils::vectorToFullColorImage(
 		for (i = 0; i < (int)fxs->size(); i++) {
 			SandorFxRenderData *sandorData = dynamic_cast<SandorFxRenderData *>((*fxs)[i].getPointer());
 			if (sandorData && sandorData->m_type == BlendTz) {
-				std::string indexes = toString(sandorData->m_blendParams.m_colorIndex);
+				std::string indexes = ::to_string(sandorData->m_blendParams.m_colorIndex);
 				std::vector<std::string> items;
 				parseIndexes(indexes, items);
 				PaletteFilterFxRenderData paletteFilterData;

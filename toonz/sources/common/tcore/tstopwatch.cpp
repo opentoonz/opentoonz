@@ -2,6 +2,8 @@
 
 #include "tstopwatch.h"
 
+#include <strstream>
+
 #ifdef _WIN32
 #include <stdlib.h>
 #else //_WIN32

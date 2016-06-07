@@ -64,7 +64,7 @@ void PaletteFilterFx::doDryCompute(TRectD &rect, double frame,
 		return;
 
 	std::vector<std::string> items;
-	std::string indexes = toString(m_string->getValue());
+	std::string indexes = ::to_string(m_string->getValue());
 	parseIndexes(indexes, items);
 	TRenderSettings ri2(info);
 	PaletteFilterFxRenderData *PaletteFilterData = new PaletteFilterFxRenderData;
@@ -94,7 +94,7 @@ void PaletteFilterFx::doCompute(TTile &tile, double frame, const TRenderSettings
 		return;
 
 	std::vector<std::string> items;
-	std::string indexes = toString(m_string->getValue());
+	std::string indexes = ::to_string(m_string->getValue());
 	parseIndexes(indexes, items);
 	TRenderSettings ri2(ri);
 	PaletteFilterFxRenderData *PaletteFilterData = new PaletteFilterFxRenderData;

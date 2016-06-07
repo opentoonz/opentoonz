@@ -128,7 +128,7 @@ std::string SaltPepperNoiseFx::getAlias(double frame, const TRenderSettings &inf
 	}
 
 	if (addframe)
-		alias += toString(frame) + ",";
+		alias += std::to_string(frame) + ",";
 	alias += paramalias + "]";
 
 	return alias;

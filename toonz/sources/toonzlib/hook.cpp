@@ -528,5 +528,5 @@ std::string getHookName(int code)
 	if (code == 0)
 		return "B";
 	else
-		return "H" + toString(code);
+		return "H" + std::to_string(code);
 }

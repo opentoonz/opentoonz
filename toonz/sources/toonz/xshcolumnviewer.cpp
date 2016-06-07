@@ -336,7 +336,7 @@ void ChangeObjectParent::refresh()
 	for (i = 0; i < objectCount; i++) {
 		TStageObjectId id = tree->getStageObject(i)->getId();
 		int index = id.getIndex();
-		QString indexStr = QString(toString(id.getIndex() + 1).c_str());
+		QString indexStr(std::to_string(id.getIndex() + 1).c_str());
 		QString newText;
 		if (id == parentId) {
 			if (parentId.isPegbar())
@@ -495,7 +495,7 @@ void RenameColumnField::show(QPoint pos, int col)
 	TXshColumn *column = xsh->getColumn(col);
 	TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
 	if (zColumn)
-		name = toString(zColumn->getZeraryColumnFx()->getZeraryFx()->getName());
+		name = ::to_string(zColumn->getZeraryColumnFx()->getZeraryFx()->getName());
 	setText(QString(name.c_str()));
 	selectAll();
 
@@ -513,7 +513,7 @@ void RenameColumnField::renameColumn()
 	TXshColumn *column = m_xsheetHandle->getXsheet()->getColumn(columnId.getIndex());
 	TXshZeraryFxColumn *zColumn = dynamic_cast<TXshZeraryFxColumn *>(column);
 	if (zColumn)
-		TFxCommand::renameFx(zColumn->getZeraryColumnFx(), toWideString(newName), m_xsheetHandle);
+		TFxCommand::renameFx(zColumn->getZeraryColumnFx(), ::to_wstring(newName), m_xsheetHandle);
 	else
 		TStageObjectCmd::rename(columnId, newName, m_xsheetHandle);
 	m_xsheetHandle->notifyXsheetChanged();
@@ -888,7 +888,7 @@ void ColumnArea::drawSoundColumnHead(QPainter &p, int col)
 
 	// column number
 	p.setPen((isCurrent) ? Qt::red : Qt::black);
-	p.drawText(columnNamePos, QString(toString(col + 1).c_str()));
+	p.drawText(columnNamePos, QString(std::to_string(col + 1).c_str()));
 
 	//Icona sound
 	if (sc->isPlaying()) {
@@ -1131,7 +1131,7 @@ void ColumnArea::drawSoundTextColumnHead(QPainter &p, int col)
 		p.fillRect(indexBox, m_viewer->getDarkBGColor());
 		// indice colonna in alto a sinistra
 		p.setPen(isCurrent ? Qt::red : Qt::black);
-		p.drawText(indexBox.adjusted(0, 2, -2, 0), Qt::AlignRight, QString(toString(col + 1).c_str()));
+		p.drawText(indexBox.adjusted(0, 2, -2, 0), Qt::AlignRight, QString(std::to_string(col + 1).c_str()));
 
 		x0 = orig.x() + m_tabBox.x() + 1;
 		int x1 = x0 + RowHeight;

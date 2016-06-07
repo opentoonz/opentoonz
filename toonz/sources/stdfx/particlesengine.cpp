@@ -26,6 +26,8 @@
 
 #include "trenderer.h"
 
+#include <strstream>
+
 /*-----------------------------------------------------------------*/
 
 Particles_Engine::Particles_Engine(ParticlesFx *parent, double frame)

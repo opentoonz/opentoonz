@@ -579,7 +579,10 @@ TPalette *Convert2Tlv::buildPalette()
 			page->addStyle(stylesToBeAddedToPage.at(s));
 	}
 
-	/*-- Cleanupデフォルトパレットを追加する --*/
+	if (!m_appendDefaultPalette)
+		return m_palette;
+
+	/*-- Adding styles in the default palette to the result palette, starts here --*/
 	TFilePath palettePath = ToonzFolder::getStudioPaletteFolder() + "cleanup_default.tpl";
 	TFileStatus pfs(palettePath);
 
@@ -627,7 +630,7 @@ TPalette *Convert2Tlv::buildPalette()
 		}
 	}
 	delete defaultPalette;
-	/*-- Cleanupデフォルトパレットを追加する ここまで --*/
+	/*-- Adding styles in the default palette to the result palette, ends here --*/
 
 	return m_palette;
 }
@@ -636,8 +639,8 @@ TPalette *Convert2Tlv::buildPalette()
 
 Convert2Tlv::Convert2Tlv(const TFilePath &filepath1, const TFilePath &filepath2, const TFilePath &outFolder, const QString &outName,
 						 int from, int to, bool doAutoclose, const TFilePath &palettePath, int colorTolerance,
-						 int antialiasType, int antialiasValue, bool isUnpaintedFromNAA)
-	: m_size(0, 0), m_level1(), m_levelIn1(), m_levelIn2(), m_levelOut(), m_autoclose(doAutoclose), m_premultiply(false), m_count(0), m_from(from), m_to(to), m_palettePath(palettePath), m_colorTolerance(colorTolerance), m_palette(0), m_antialiasType(antialiasType), m_antialiasValue(antialiasValue), m_isUnpaintedFromNAA(isUnpaintedFromNAA)
+						 int antialiasType, int antialiasValue, bool isUnpaintedFromNAA, bool appendDefaultPalette)
+						 : m_size(0, 0), m_level1(), m_levelIn1(), m_levelIn2(), m_levelOut(), m_autoclose(doAutoclose), m_premultiply(false), m_count(0), m_from(from), m_to(to), m_palettePath(palettePath), m_colorTolerance(colorTolerance), m_palette(0), m_antialiasType(antialiasType), m_antialiasValue(antialiasValue), m_isUnpaintedFromNAA(isUnpaintedFromNAA), m_appendDefaultPalette(appendDefaultPalette)
 {
 	if (filepath1 != TFilePath()) {
 		m_levelIn1 = filepath1.getParentDir() + filepath1.getLevelName();
@@ -688,12 +691,12 @@ bool Convert2Tlv::init(std::string &errorMessage)
 		if (m_lr1)
 			m_level1 = m_lr1->loadInfo();
 	} catch (...) {
-		errorMessage = "Error: can't read level " + toString(m_levelIn1.getWideString());
+		errorMessage = "Error: can't read level " + ::to_string(m_levelIn1.getWideString());
 		return false;
 	}
 
 	if (m_level1->getFrameCount() == 0) {
-		errorMessage = "Error: can't find level " + toString(m_levelIn1.getWideString());
+		errorMessage = "Error: can't find level " + ::to_string(m_levelIn1.getWideString());
 		return false;
 	}
 
@@ -705,12 +708,12 @@ bool Convert2Tlv::init(std::string &errorMessage)
 			if (m_lr2)
 				level2 = m_lr2->loadInfo();
 		} catch (...) {
-			errorMessage = "Error: can't read level " + toString(m_levelIn2.getWideString());
+			errorMessage = "Error: can't read level " + ::to_string(m_levelIn2.getWideString());
 			return false;
 		}
 
 		if (level2->getFrameCount() == 0) {
-			errorMessage = "Error: can't find level " + toString(m_levelIn2.getWideString());
+			errorMessage = "Error: can't find level " + ::to_string(m_levelIn2.getWideString());
 			return false;
 		}
 
@@ -734,7 +737,7 @@ bool Convert2Tlv::init(std::string &errorMessage)
 		TImageReaderP ir1 = m_lr1->getFrameReader(m_it->first);
 		const TImageInfo *info1 = ir1->getImageInfo();
 		if (!info1) {
-			errorMessage = "Error: can't read frame " + toString(m_it->first.getNumber()) + " of level  " + toString(m_levelIn1.getWideString());
+			errorMessage = "Error: can't read frame " + std::to_string(m_it->first.getNumber()) + " of level  " + ::to_string(m_levelIn1.getWideString());
 			return false;
 		}
 
@@ -751,7 +754,7 @@ bool Convert2Tlv::init(std::string &errorMessage)
 			if (ir2) {
 				const TImageInfo *info2 = ir2->getImageInfo();
 				if (!info1) {
-					errorMessage = "Error: can't read frame " + toString(it2->first.getNumber()) + " of level  " + toString(m_levelIn2.getWideString());
+					errorMessage = "Error: can't read frame " + std::to_string(it2->first.getNumber()) + " of level  " + ::to_string(m_levelIn2.getWideString());
 					;
 					return false;
 				}
@@ -815,7 +818,7 @@ bool Convert2Tlv::convertNext(std::string &errorMessage)
 	TImageReaderP ir1 = m_lr1->getFrameReader(m_it->first);
 	TRasterImageP imgIn1 = (TRasterImageP)ir1->load();
 	if (!imgIn1) {
-		errorMessage = "Error: cannot read frame" + toString(m_it->first.getNumber()) + " of " + toString(m_levelIn1.getWideString()) + "!";
+		errorMessage = "Error: cannot read frame" + std::to_string(m_it->first.getNumber()) + " of " + ::to_string(m_levelIn1.getWideString()) + "!";
 		return false;
 	}
 	TRasterP rin1 = imgIn1->getRaster();
@@ -829,7 +832,7 @@ bool Convert2Tlv::convertNext(std::string &errorMessage)
 		TImageReaderP ir2 = m_lr2->getFrameReader(m_it->first);
 		imgIn2 = (TRasterImageP)ir2->load();
 		if (!imgIn2) {
-			errorMessage = "Error: cannot read frame " + toString(m_it->first.getNumber()) + " of " + toString(m_levelIn2.getWideString()) + "!";
+			errorMessage = "Error: cannot read frame " + std::to_string(m_it->first.getNumber()) + " of " + ::to_string(m_levelIn2.getWideString()) + "!";
 			return false;
 		}
 		rin2 = imgIn2->getRaster();

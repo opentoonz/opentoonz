@@ -614,7 +614,7 @@ bool FlipBook::doSaveImages(TFilePath fp)
 		TPropertyGroup *props = outputSettings->getFileFormatProperties(ext);
 		std::string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
-		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
+		if (!AviCodecRestrictions::canWriteMovie(::to_wstring(codecName), res)) {
 			QString msg(QObject::tr("The resolution of the output camera does not fit with the options chosen for the output file format."));
 			DVGui::warning(msg);
 			return false;
@@ -655,7 +655,7 @@ bool FlipBook::doSaveImages(TFilePath fp)
 			TSystem::mkDir(parent);
 			DvDirModel::instance()->refreshFolder(parent.getParentDir());
 		} catch (TException &e) {
-			DVGui::error("Cannot create " + toQString(fp.getParentDir()) + " : " + QString(toString(e.getMessage()).c_str()));
+			DVGui::error("Cannot create " + toQString(fp.getParentDir()) + " : " + QString(::to_string(e.getMessage()).c_str()));
 			return false;
 		} catch (...) {
 			DVGui::error("Cannot create " + toQString(fp.getParentDir()));
@@ -730,8 +730,7 @@ void FlipBook::saveImage()
 		return;
 	}
 
-	QString str = tr("Saved %1 frames out of %2 in %3").arg(toString(savedFrames).c_str()).arg(toString(m_framesCount).c_str()).arg(toString(m_lw->getFilePath().getWideString()).c_str());
-	QString(toString(m_lw->getFilePath().getWideString()).c_str());
+	QString str = tr("Saved %1 frames out of %2 in %3").arg(std::to_string(savedFrames).c_str()).arg(std::to_string(m_framesCount).c_str()).arg(::to_string(m_lw->getFilePath()).c_str());
 
 	if (!Pd)
 		str = "Canceled! " + str;
@@ -1537,7 +1536,7 @@ TImageP FlipBook::getCurrentImage(int frame)
 		fid = m_levels[i].flipbookIndexToLevelFrame(frameIndex);
 		if (fid == TFrameId())
 			return 0;
-		id = levelName.toStdString() + fid.expand(TFrameId::NO_PAD) + ((m_isPreviewFx) ? "" : toString(this));
+		id = levelName.toStdString() + fid.expand(TFrameId::NO_PAD) + ((m_isPreviewFx) ? "" : ::to_string(this));
 
 		if (!m_isPreviewFx)
 			m_title1 = m_viewerTitle + " :: " + fp.withoutParentDir().withFrame(fid);
@@ -1546,7 +1545,7 @@ TImageP FlipBook::getCurrentImage(int frame)
 	} else if (m_levelNames.empty())
 		return 0;
 	else //is a render
-		id = m_levelNames[0].toStdString() + toString(frame);
+		id = m_levelNames[0].toStdString() + std::to_string(frame);
 
 	bool showSub = m_flipConsole->isChecked(FlipConsole::eUseLoadBox);
 
@@ -1696,7 +1695,7 @@ void FlipBook::clearCache()
 	if (!m_levels.empty()) //is a viewfile
 		for (i = 0; i < m_levels.size(); i++)
 			for (it = m_levels[i].m_level->begin(); it != m_levels[i].m_level->end(); ++it)
-				TImageCache::instance()->remove(m_levelNames[i].toStdString() + toString(it->first.getNumber()) + ((m_isPreviewFx) ? "" : toString(this)));
+				TImageCache::instance()->remove(m_levelNames[i].toStdString() + std::to_string(it->first.getNumber()) + ((m_isPreviewFx) ? "" : ::to_string(this)));
 	else {
 		int from, to, step;
 		m_flipConsole->getFrameRange(from, to, step);
@@ -1707,12 +1706,12 @@ void FlipBook::clearCache()
 				std::vector<TFrameId> fids(m_palette->getRefLevelFids());
 				if (!fids.empty() && (int)fids.size() >= i) {
 					int frame = fids[i - 1].getNumber();
-					TImageCache::instance()->remove(m_levelNames[0].toStdString() + toString(frame));
+					TImageCache::instance()->remove(m_levelNames[0].toStdString() + std::to_string(frame));
 				} else {
-					TImageCache::instance()->remove(m_levelNames[0].toStdString() + toString(i));
+					TImageCache::instance()->remove(m_levelNames[0].toStdString() + std::to_string(i));
 				}
 			} else
-				TImageCache::instance()->remove(m_levelNames[0].toStdString() + toString(i));
+				TImageCache::instance()->remove(m_levelNames[0].toStdString() + std::to_string(i));
 	}
 }
 
@@ -2134,7 +2133,7 @@ void FlipBook::loadAndCacheAllTlvImages(Level level,
 		if (fid == TFrameId())
 			continue;
 
-		std::string id = fileName + fid.expand(TFrameId::NO_PAD) + toString(this);
+		std::string id = fileName + fid.expand(TFrameId::NO_PAD) + ::to_string(this);
 
 		TImageReaderP ir = m_lr->getFrameReader(fid);
 		ir->setShrink(m_shrink);

@@ -122,7 +122,7 @@ bool pasteStylesDataWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle, co
 			}
 			// 2. If pasting normal style to studio palette, add a new link and make it linkable
 			else {
-				std::wstring gname = L"-" + palette->getGlobalName() + L"-" + toWideString(styleId);
+				std::wstring gname = L"-" + palette->getGlobalName() + L"-" + std::to_wstring(styleId);
 				style->setGlobalName(gname);
 			}
 		}
@@ -1874,7 +1874,7 @@ void TStyleSelection::getBackOriginalStyle()
 			spPalette = palIt->second.getPointer();
 
 		//j is StudioPaletteID
-		int j = toInt(gname.substr(k + 1));
+		int j = std::stoi(gname.substr(k + 1));
 
 		if (spPalette && 0 <= j && j < spPalette->getStyleCount()) {
 			TColorStyle *spStyle = spPalette->getStyle(j);

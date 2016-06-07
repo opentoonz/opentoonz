@@ -38,6 +38,7 @@ private:
 	int m_antialiasValue;
 
 	bool m_isUnpaintedFromNAA;
+	bool m_appendDefaultPalette;
 
 	void buildToonzRaster(TRasterCM32P &rout, const TRasterP &rin1, const TRasterP &rin2);
 	void doFill(TRasterCM32P &rout, const TRaster32P &rin);
@@ -60,7 +61,7 @@ public:
 	// la tlv e la tpl vengono salvate con il nome e il folder di filepath1.
 	Convert2Tlv(const TFilePath &filepath1, const TFilePath &filepath2, const TFilePath &outFolder, const QString &outName,
 				int from, int to, bool doAutoclose, const TFilePath &palettePath, int colorTolerance,
-				int antialiasType, int antialiasValue, bool isUnpaintedFromNAA);
+				int antialiasType, int antialiasValue, bool isUnpaintedFromNAA, bool appendDefaultPalette);
 
 	bool init(std::string &errorMessage);
 	int getFramesToConvertCount();

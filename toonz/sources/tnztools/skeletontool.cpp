@@ -192,7 +192,7 @@ HookData::HookData(TXsheet *xsh, int columnIndex, int hookId, const TPointD &pos
 			m_isPivot = true;
 		}
 	} else {
-		m_name = toString(m_hookId);
+		m_name = std::to_string(m_hookId);
 		m_isPivot = "H" + m_name == handle;
 	}
 }
@@ -1206,7 +1206,7 @@ void SkeletonTool::drawHooks()
 		const HookData &h1 = magicLink.m_h1;
 		std::string name;
 		name = (m_parentProbeEnabled ? "Linking " : "Link ") + removeTrailingH(magicLink.m_h0.getHandle()) +
-			   " to Col " + toString(h1.m_columnIndex + 1) + "/" + removeTrailingH(h1.getHandle());
+			   " to Col " + std::to_string(h1.m_columnIndex + 1) + "/" + removeTrailingH(h1.getHandle());
 
 		int code = TD_MagicLink + i;
 		glPushName(code);
@@ -1226,7 +1226,7 @@ void SkeletonTool::drawDrawingBrowser(const TXshCell &cell, const TPointD &cente
 		return;
 	double pixelSize = getPixelSize();
 
-	std::string name = toString(cell.m_level->getName()) + "." + toString(cell.m_frameId.getNumber());
+	std::string name = ::to_string(cell.m_level->getName()) + "." + std::to_string(cell.m_frameId.getNumber());
 
 	QString qText = QString::fromStdString(name);
 	QFont font("Arial", 10); // ,QFont::Bold);

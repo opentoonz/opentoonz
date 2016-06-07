@@ -117,6 +117,6 @@ TFilePath TFarmStuff::getGlobalRoot()
 
 void TFarmStuff::setGlobalRoot(const TFilePath &fp)
 {
-	GRootEnvVar = toString(fp.getWideString());
+	GRootEnvVar = ::to_string(fp);
 	//GRootEnvVar = fp;
 }

@@ -1260,7 +1260,7 @@ void SelectionTool::drawCommandHandle(const TImage *image)
 void SelectionTool::onActivate()
 {
 	if (m_firstTime) {
-		m_strokeSelectionType.setValue(toWideString(SelectionType.getValue()));
+		m_strokeSelectionType.setValue(::to_wstring(SelectionType.getValue()));
 		m_firstTime = false;
 	}
 	if (isLevelType() || isSelectedFramesType())
@@ -1293,7 +1293,7 @@ void SelectionTool::onSelectionChanged()
 bool SelectionTool::onPropertyChanged(std::string propertyName)
 {
 	if (propertyName == m_strokeSelectionType.getName()) {
-		SelectionType = toString(m_strokeSelectionType.getValue());
+		SelectionType = ::to_string(m_strokeSelectionType.getValue());
 		return true;
 	}
 	return false;

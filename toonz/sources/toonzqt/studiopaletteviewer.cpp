@@ -451,11 +451,11 @@ void StudioPaletteTreeViewer::onItemChanged(QTreeWidgetItem *item, int column)
 	TFilePath oldPath = getCurrentFolderPath();
 	if (oldPath.isEmpty() || name.empty() || oldPath.getWideName() == name)
 		return;
-	TFilePath newPath(oldPath.getParentDir() + TFilePath(name + toWideString(oldPath.getDottedType())));
+	TFilePath newPath(oldPath.getParentDir() + TFilePath(name + ::to_wstring(oldPath.getDottedType())));
 	try {
 		StudioPaletteCmd::movePalette(newPath, oldPath);
 	} catch (TException &e) {
-		error(QString(toString(e.getMessage()).c_str()));
+		error(QString(::to_string(e.getMessage()).c_str()));
 		item->setText(column, QString::fromStdWString(oldPath.getWideName()));
 	} catch (...) {
 		error("Can't rename file");
@@ -514,7 +514,7 @@ void StudioPaletteTreeViewer::addNewPalette()
 	try {
 		newPath = StudioPaletteCmd::createPalette(getCurrentFolderPath(), "", 0);
 	} catch (TException &e) {
-		error("Can't create palette: " + QString(toString(e.getMessage()).c_str()));
+		error("Can't create palette: " + QString(::to_string(e.getMessage()).c_str()));
 	} catch (...) {
 		error("Can't create palette");
 	}
@@ -534,7 +534,7 @@ void StudioPaletteTreeViewer::addNewFolder()
 	try {
 		newPath = StudioPaletteCmd::addFolder(getCurrentFolderPath());
 	} catch (TException &e) {
-		error("Can't create palette folder: " + QString(toString(e.getMessage()).c_str()));
+		error("Can't create palette folder: " + QString(::to_string(e.getMessage()).c_str()));
 	} catch (...) {
 		error("Can't create palette folder");
 	}
@@ -571,7 +571,7 @@ void StudioPaletteTreeViewer::convertToStudioPalette()
 		// apply global name
 		time_t ltime;
 		time(&ltime);
-		wstring gname = toWideString((int)ltime) + L"_" + toWideString(rand());
+		wstring gname = std::to_wstring(ltime) + L"_" + std::to_wstring(rand());
 		m_currentPalette->setGlobalName(gname);
 		studioPalette->setStylesGlobalNames(m_currentPalette.getPointer());
 		studioPalette->save(path, m_currentPalette.getPointer());
@@ -605,7 +605,7 @@ void StudioPaletteTreeViewer::deleteItem(QTreeWidgetItem *item)
 		try {
 			StudioPaletteCmd::deleteFolder(path);
 		} catch (TException &e) {
-			error("Can't delete folder: " + QString(toString(e.getMessage()).c_str()));
+			error("Can't delete folder: " + QString(::to_string(e.getMessage()).c_str()));
 		} catch (...) {
 			error("Can't delete folder");
 		}
@@ -614,7 +614,7 @@ void StudioPaletteTreeViewer::deleteItem(QTreeWidgetItem *item)
 		try {
 			StudioPaletteCmd::deletePalette(path);
 		} catch (TException &e) {
-			error("Can't delete palette: " + QString(toString(e.getMessage()).c_str()));
+			error("Can't delete palette: " + QString(::to_string(e.getMessage()).c_str()));
 		} catch (...) {
 			error("Can't delete palette");
 		}
@@ -1079,9 +1079,9 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event)
 				return;
 
 			try {
-				StudioPaletteCmd::createPalette(newPath, toString(palette->getPaletteName()), palette);
+				StudioPaletteCmd::createPalette(newPath, ::to_string(palette->getPaletteName()), palette);
 			} catch (TException &e) {
-				error("Can't create palette: " + QString(toString(e.getMessage()).c_str()));
+				error("Can't create palette: " + QString(::to_string(e.getMessage()).c_str()));
 			} catch (...) {
 				error("Can't create palette");
 			}
@@ -1104,11 +1104,11 @@ void StudioPaletteTreeViewer::dropEvent(QDropEvent *event)
 			continue;
 
 		if (isInStudioPalette(path)) {
-			TFilePath newPalettePath = newPath + TFilePath(path.getWideName() + toWideString(path.getDottedType()));
+			TFilePath newPalettePath = newPath + TFilePath(path.getWideName() + ::to_wstring(path.getDottedType()));
 			try {
 				StudioPaletteCmd::movePalette(newPalettePath, path);
 			} catch (TException &e) {
-				error("Can't rename palette: " + QString(toString(e.getMessage()).c_str()));
+				error("Can't rename palette: " + QString(::to_string(e.getMessage()).c_str()));
 			} catch (...) {
 				error("Can't rename palette");
 			}

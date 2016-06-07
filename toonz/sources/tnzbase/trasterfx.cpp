@@ -173,12 +173,12 @@ inline std::string traduce(const TAffine &aff)
 	return
 		//Observe that toString distinguishes + and - 0. That is a problem
 		//when comparing aliases - so near 0 values are explicitly rounded to 0.
-		(areAlmostEqual(aff.a11, 0.0) ? "0" : toString(aff.a11, 5)) + "," +
-		(areAlmostEqual(aff.a12, 0.0) ? "0" : toString(aff.a12, 5)) + "," +
-		(areAlmostEqual(aff.a13, 0.0) ? "0" : toString(aff.a13, 5)) + "," +
-		(areAlmostEqual(aff.a21, 0.0) ? "0" : toString(aff.a21, 5)) + "," +
-		(areAlmostEqual(aff.a22, 0.0) ? "0" : toString(aff.a22, 5)) + "," +
-		(areAlmostEqual(aff.a23, 0.0) ? "0" : toString(aff.a23, 5));
+		(areAlmostEqual(aff.a11, 0.0) ? "0" : ::to_string(aff.a11, 5)) + "," +
+		(areAlmostEqual(aff.a12, 0.0) ? "0" : ::to_string(aff.a12, 5)) + "," +
+		(areAlmostEqual(aff.a13, 0.0) ? "0" : ::to_string(aff.a13, 5)) + "," +
+		(areAlmostEqual(aff.a21, 0.0) ? "0" : ::to_string(aff.a21, 5)) + "," +
+		(areAlmostEqual(aff.a22, 0.0) ? "0" : ::to_string(aff.a22, 5)) + "," +
+		(areAlmostEqual(aff.a23, 0.0) ? "0" : ::to_string(aff.a23, 5));
 }
 
 } // Local namespace
@@ -684,7 +684,7 @@ void TRasterFx::dryCompute(TRectD &rect,
 		return;
 	}
 
-	std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) + "][" + ::toString(info.m_bpp) + "]";
+	std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) + "][" + std::to_string(info.m_bpp) + "]";
 
 	int renderStatus = TRenderer::instance().getRenderStatus(TRenderer::renderId());
 	TFxCacheManager *cacheManager = TFxCacheManager::instance();
@@ -869,7 +869,7 @@ void TRasterFx::compute(TTile &tile, double frame,
 	TRectD tilePlacement = myConvert(tile.getRaster()->getBounds()) + tile.m_pos;
 
 	//Build the fx result alias (in other words, its name)
-	std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) + "][" + ::toString(info.m_bpp) + "]"; //To be moved below
+	std::string alias = getAlias(frame, info) + "[" + ::traduce(info.m_affine) + "][" + std::to_string(info.m_bpp) + "]"; //To be moved below
 
 	TRectD bbox;
 	getBBox(frame, bbox, info);
@@ -1089,23 +1089,23 @@ TRenderSettings::~TRenderSettings()
 std::string TRenderSettings::toString() const
 {
 	std::string ss =
-		::toString(m_bpp) + ";" +
-		::toString(m_quality) + ";" +
-		::toString(m_gamma) + ";" +
-		::toString(m_timeStretchFrom) + ";" +
-		::toString(m_timeStretchTo) + ";" +
-		::toString(m_fieldPrevalence) + ";" +
-		::toString(m_shrinkX) + "," +
-		::toString(m_shrinkY) + ";" +
-		::toString(m_affine.a11) + "," +
-		::toString(m_affine.a12) + "," +
-		::toString(m_affine.a13) + "," +
-		::toString(m_affine.a21) + "," +
-		::toString(m_affine.a22) + "," +
-		::toString(m_affine.a23) + ";" +
-		::toString(m_maxTileSize) + ";" +
-		::toString(m_isSwatch) + ";" +
-		::toString(m_userCachable) + ";{";
+		std::to_string(m_bpp) + ";" +
+		std::to_string(m_quality) + ";" +
+		std::to_string(m_gamma) + ";" +
+		std::to_string(m_timeStretchFrom) + ";" +
+		std::to_string(m_timeStretchTo) + ";" +
+		std::to_string(m_fieldPrevalence) + ";" +
+		std::to_string(m_shrinkX) + "," +
+		std::to_string(m_shrinkY) + ";" +
+		std::to_string(m_affine.a11) + "," +
+		std::to_string(m_affine.a12) + "," +
+		std::to_string(m_affine.a13) + "," +
+		std::to_string(m_affine.a21) + "," +
+		std::to_string(m_affine.a22) + "," +
+		std::to_string(m_affine.a23) + ";" +
+		std::to_string(m_maxTileSize) + ";" +
+		std::to_string(m_isSwatch) + ";" +
+		std::to_string(m_userCachable) + ";{";
 	if (!m_data.empty()) {
 		ss += m_data[0]->toString();
 		for (int i = 1; i < (int)m_data.size(); i++)

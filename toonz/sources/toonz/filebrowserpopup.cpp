@@ -1728,21 +1728,38 @@ bool LoadColorModelPopup::execute()
 		return false;
 	}
 
-	bool replace = false;
+	PaletteCmd::ColorModelPltBehavior pltBehavior;
 
 	// if the palette is locked, replace the color model's palette with the destination
 	if (palette->isLocked())
-		replace = true;
+		pltBehavior = PaletteCmd::ReplaceColorModelPlt;
 	else {
+		std::string type(fp.getType());
 		QString question(QObject::tr("The color model palette is different from the destination palette.\nWhat do you want to do? "));
 		QList<QString> list;
 		list.append(QObject::tr("Overwrite the destination palette."));
 		list.append(QObject::tr("Keep the destination palette and apply it to the color model."));
+		/*- if the file is raster image (i.e. without palette), then add another option "add styles"  -*/
+		if (type != "tlv" && type != "pli")
+			list.append(QObject::tr("Add color model's palette to the destination palette."));
 		int ret = DVGui::RadioButtonMsgBox(DVGui::WARNING, question, list);
-		if (ret == 0)
+		switch (ret)
+		{
+		case 0:
 			return false;
-		if (ret == 2)
-			replace = true;
+		case 1:
+			pltBehavior = PaletteCmd::KeepColorModelPlt;
+			break;
+		case 2:
+			pltBehavior = PaletteCmd::ReplaceColorModelPlt;
+			break;
+		case 3:
+			pltBehavior = PaletteCmd::AddColorModelPlt;
+			break;
+		default:
+			pltBehavior = PaletteCmd::KeepColorModelPlt;
+			break;
+		}
 	}
 
 	std::vector<int> framesInput = string2Indexes(m_paletteFrame->text());
@@ -1754,7 +1771,7 @@ bool LoadColorModelPopup::execute()
 
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
-	int isLoaded = PaletteCmd::loadReferenceImage(paletteHandle, replace, fp, index, scene, framesInput);
+	int isLoaded = PaletteCmd::loadReferenceImage(paletteHandle, pltBehavior, fp, index, scene, framesInput);
 
 	// return value - isLoaded
 	// 2: failed to get palette
@@ -1772,7 +1789,8 @@ bool LoadColorModelPopup::execute()
 	}
 
 	//no changes in the icon with replace (Keep the destination palette) option
-	if (!replace) {
+	if (pltBehavior != PaletteCmd::ReplaceColorModelPlt) 
+	{
 		TXshLevel *level = TApp::instance()->getCurrentLevel()->getLevel();
 		if (!level)
 			return true;
@@ -2050,7 +2068,7 @@ QString BrowserPopupController::getPath()
 	TFilePath fp = m_browserPopup->getPath();
 	if (scene)
 		fp = scene->codeFilePath(fp);
-	std::cout << toString(fp.getWideString()) << std::endl;
+	std::cout << ::to_string(fp) << std::endl;
 	return toQString(fp);
 }
 

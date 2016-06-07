@@ -68,7 +68,7 @@ public:
 			int shrink = tround((info.m_shrinkX + info.m_shrinkY) / 2.0);
 			int argc = 8;
 			const char *argv[8];
-			argv[0] = strsave(toString(m_colorIndex->getValue()).c_str());
+			argv[0] = strsave(::to_string(m_colorIndex->getValue()).c_str());
 			getValues(argv, argc, frame);
 			SandorFxRenderData *calligraphicData = new SandorFxRenderData(Calligraphic, argc, argv, 0, shrink);
 			CalligraphicParams &params = calligraphicData->m_callParams;
@@ -122,7 +122,7 @@ private:
 	{
 		std::string app;
 		for (int i = 1; i < cParamLen; i++) {
-			app = toString(param[i]);
+			app = std::to_string(param[i]);
 			cParam[i] = strsave(app.c_str());
 		}
 	}
@@ -135,7 +135,7 @@ private:
 		int shrink = tround((ri.m_shrinkX + ri.m_shrinkY) / 2.0);
 		int argc = 8;
 		const char *argv[8];
-		argv[0] = strsave(toString(m_colorIndex->getValue()).c_str());
+		argv[0] = strsave(::to_string(m_colorIndex->getValue()).c_str());
 		getValues(argv, argc, frame);
 		TRenderSettings ri2(ri);
 		SandorFxRenderData *calligraphicData = new SandorFxRenderData(Calligraphic, argc, argv, 0, shrink);
@@ -166,7 +166,7 @@ private:
 		int shrink = tround((infoOnOutput.m_shrinkX + infoOnOutput.m_shrinkY) / 2.0);
 		int argc = 8;
 		const char *argv[8];
-		argv[0] = strsave(toString(m_colorIndex->getValue()).c_str());
+		argv[0] = strsave(::to_string(m_colorIndex->getValue()).c_str());
 		getValues(argv, argc, frame);
 		SandorFxRenderData *calligraphicData = new SandorFxRenderData(Calligraphic, argc, argv, 0, shrink);
 		CalligraphicParams &params = calligraphicData->m_callParams;
@@ -230,7 +230,7 @@ public:
 			int shrink = tround((info.m_shrinkX + info.m_shrinkY) / 2.0);
 			int argc = 8;
 			const char *argv[8];
-			argv[0] = strsave(toString(L"-1").c_str());
+			argv[0] = "-1";
 			getValues(argv, argc, frame);
 			SandorFxRenderData *outBorderData = new SandorFxRenderData(OutBorder, argc, argv, 0, shrink);
 			CalligraphicParams &params = outBorderData->m_callParams;
@@ -282,7 +282,7 @@ private:
 	{
 		std::string app;
 		for (int i = 1; i < cParamLen; i++) {
-			app = toString(param[i]);
+			app = std::to_string(param[i]);
 			cParam[i] = strsave(app.c_str());
 		}
 	}
@@ -295,7 +295,7 @@ private:
 		int shrink = tround((ri.m_shrinkX + ri.m_shrinkY) / 2.0);
 		int argc = 8;
 		const char *argv[8];
-		argv[0] = strsave(toString(L"-1").c_str());
+		argv[0] = "-1";
 		getValues(argv, argc, frame);
 		TRenderSettings ri2(ri);
 		SandorFxRenderData *outBorderData = new SandorFxRenderData(OutBorder, argc, argv, 0, shrink);
@@ -325,7 +325,7 @@ private:
 		int shrink = tround((infoOnOutput.m_shrinkX + infoOnOutput.m_shrinkY) / 2.0);
 		int argc = 8;
 		const char *argv[8];
-		argv[0] = strsave(toString(L"-1").c_str());
+		argv[0] = "-1";
 		getValues(argv, argc, frame);
 		SandorFxRenderData *outBorderData = new SandorFxRenderData(OutBorder, argc, argv, 0, shrink);
 		CalligraphicParams &params = outBorderData->m_callParams;

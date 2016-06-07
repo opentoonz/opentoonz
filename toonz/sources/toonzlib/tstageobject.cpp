@@ -119,15 +119,15 @@ TStageObjectId toStageObjectId(string s)
 		return TStageObjectId::TableId;
 	else if (isInt(s)) {
 		TStageObjectId id;
-		id.setCode(toInt(s));
+		id.setCode(std::stoi(s));
 		return id;
 	} else if (s.length() > 3) {
 		if (s.substr(0, 3) == "Col")
-			return TStageObjectId::ColumnId(toInt(s.substr(3)) - 1);
+			return TStageObjectId::ColumnId(std::stoi(s.substr(3)) - 1);
 		else if (s.substr(0, 3) == "Peg")
-			return TStageObjectId::PegbarId(toInt(s.substr(3)) - 1);
+			return TStageObjectId::PegbarId(std::stoi(s.substr(3)) - 1);
 		else if (s.length() > 6 && s.substr(0, 6) == "Camera")
-			return TStageObjectId::CameraId(toInt(s.substr(6)) - 1);
+			return TStageObjectId::CameraId(std::stoi(s.substr(6)) - 1);
 	}
 	return TStageObjectId::NoneId;
 }
@@ -208,16 +208,16 @@ string TStageObjectId::toString() const
 		shortName = "None";
 		break;
 	case CAMERA:
-		shortName = "Camera" + ::toString(index + 1);
+		shortName = "Camera" + std::to_string(index + 1);
 		break;
 	case TABLE:
 		shortName = "Table";
 		break;
 	case PEGBAR:
-		shortName = "Peg" + ::toString(index + 1);
+		shortName = "Peg" + std::to_string(index + 1);
 		break;
 	case COLUMN:
-		shortName = "Col" + ::toString(index + 1);
+		shortName = "Col" + std::to_string(index + 1);
 		break;
 	default:
 		shortName = "BadPegbar";
@@ -553,8 +553,7 @@ string TStageObject::getName() const
 		return m_name;
 	if (!m_id.isColumn())
 		return m_id.toString();
-	wstring s = L"Col" + toWideString(m_id.getIndex() + 1);
-	return toString(s);
+	return "Col" + std::to_string(m_id.getIndex() + 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -568,7 +567,7 @@ string TStageObject::getFullName() const
 			name.find_first_not_of("0123456789", 3) == string::npos)
 			return name;
 		else
-			return name + " (" + toString(m_id.getIndex() + 1) + ")";
+			return name + " (" + std::to_string(m_id.getIndex() + 1) + ")";
 	} else
 		return name;
 }

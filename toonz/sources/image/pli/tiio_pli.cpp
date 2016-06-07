@@ -92,7 +92,7 @@ public:
 	TInputStreamInterface &operator>>(std::string &x)
 	{
 		if ((*m_stream)[m_count].m_type == TStyleParam::SP_INT)
-			x = toString((int)(*m_stream)[m_count++].m_numericVal);
+			x = std::to_string(static_cast<int>((*m_stream)[m_count++].m_numericVal));
 		else {
 			assert((*m_stream)[m_count].m_type == TStyleParam::SP_STRING);
 			x = (*m_stream)[m_count++].m_string;
@@ -165,7 +165,7 @@ void buildPalette(ParsedPli *pli, const TImageP img)
 	// se c'e' una reference image, uso il primo stile della palette per memorizzare il path
 	TFilePath fp;
 	if ((fp = vPalette->getRefImgPath()) != TFilePath()) {
-		TStyleParam styleParam("refimage" + toString(fp));
+		TStyleParam styleParam("refimage" + ::to_string(fp));
 		StyleTag *refImageTag = new StyleTag(0, 0, 1, &styleParam);
 		pli->m_palette_tags.push_back((PliObjectTag *)refImageTag);
 	}
@@ -177,7 +177,7 @@ void buildPalette(ParsedPli *pli, const TImageP img)
 
 	std::vector<TStyleParam> pageNames(vPalette->getPageCount());
 	for (i = 0; i < pageNames.size(); i++)
-		pageNames[i] = TStyleParam(toString(vPalette->getPage(i)->getName()));
+		pageNames[i] = TStyleParam(::to_string(vPalette->getPage(i)->getName()));
 	StyleTag *pageNamesTag = new StyleTag(0, 0, pageNames.size(), pageNames.data());
 
 	pli->m_palette_tags.push_back((PliObjectTag *)pageNamesTag);
@@ -685,9 +685,9 @@ TPalette *readPalette(GroupTag *paletteTag, int majorVersion, int minorVersion)
 			for (int j = 0; j < styleTag->m_numParams; j++) {
 				assert(styleTag->m_param[j].m_type == TStyleParam::SP_STRING);
 				if (j == 0)
-					palette->getPage(0)->setName(toWideString(styleTag->m_param[j].m_string));
+					palette->getPage(0)->setName(::to_wstring(styleTag->m_param[j].m_string));
 				else {
-					palette->addPage(toWideString(styleTag->m_param[j].m_string));
+					palette->addPage(::to_wstring(styleTag->m_param[j].m_string));
 					//palette->getPage(j)->addStyle(TPixel32::Red);
 				}
 			}

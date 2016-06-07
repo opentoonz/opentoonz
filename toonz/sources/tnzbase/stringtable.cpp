@@ -275,9 +275,9 @@ void TStringTableImp::load(const TFilePath &fp)
 				}
 			}
 			Item &item = m_table[id];
-			item.m_name = toWideString(name);
-			item.m_help = toWideString(help);
-			item.m_tip = toWideString(tip);
+			item.m_name = ::to_wstring(name);
+			item.m_help = ::to_wstring(help);
+			item.m_tip = ::to_wstring(tip);
 		} else if (tagName == "defaultFont") {
 			std::string fontName;
 			int fontSize = 0;
@@ -333,7 +333,7 @@ std::wstring TStringTable::translate(std::string name)
 	if (item)
 		return item->m_name;
 	else
-		return toWideString(name);
+		return ::to_wstring(name);
 }
 
 //-------------------------------------------------------------------

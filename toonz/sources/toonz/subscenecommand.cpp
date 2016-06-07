@@ -571,7 +571,7 @@ void bringObjectOut(TStageObject *obj, TXsheet *xsh,
 		outerObj->removeFromAllGroup();
 		if (groupId != -1) {
 			outerObj->setGroupId(groupId);
-			outerObj->setGroupName(L"Group " + toWideString(groupId));
+			outerObj->setGroupName(L"Group " + std::to_wstring(groupId));
 		}
 		if (!objGroupData.m_groupIds.empty()) {
 			int i;
@@ -641,7 +641,7 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 		obj->removeFromAllGroup();
 		groupId = outerTree->getNewGroupId();
 		obj->setGroupId(groupId);
-		obj->setGroupName(L"Group " + toWideString(groupId));
+		obj->setGroupName(L"Group " + std::to_wstring(groupId));
 		if (!objGroupData.m_groupIds.empty()) {
 			int i;
 			for (i = 0; i < objGroupData.m_groupIds.size(); i++) {
@@ -707,7 +707,7 @@ set<int> explodeStageObjects(TXsheet *xsh, TXsheet *subXsh, int index, const TSt
 		outerCol->removeFromAllGroup();
 		if (groupId != -1) {
 			outerCol->setGroupId(groupId);
-			outerCol->setGroupName(L"Group " + toWideString(groupId));
+			outerCol->setGroupName(L"Group " + std::to_wstring(groupId));
 		}
 
 		if (onlyColumn)
@@ -870,7 +870,7 @@ void explodeFxs(TXsheet *xsh, TXsheet *subXsh,
 		QPair<TFx *, int> pair = it.value();
 		TFx *outerFx = pair.first;
 		outerFx->getAttributes()->setGroupId(groupId);
-		outerFx->getAttributes()->setGroupName(L"Group " + toWideString(groupId));
+		outerFx->getAttributes()->setGroupName(L"Group " + std::to_wstring(groupId));
 		TPointD outerFxPos = outerFx->getAttributes()->getDagNodePos();
 		if (outerFxPos != TConst::nowhere)
 			outerFx->getAttributes()->setDagNodePos(outerFxPos - offset);

@@ -318,7 +318,7 @@ public:
 		: TUndo(), m_level(level), m_frameId(selection->getFrameId()), m_strokes(selection->getOriginalStrokes())
 	{
 		TImageP image = m_level->getFrame(m_frameId, true);
-		m_erasedImageId = "UndoDeleteSelection" + toString(m_id++);
+		m_erasedImageId = "UndoDeleteSelection" + std::to_string(m_id++);
 		TRasterP ras = getRaster(image);
 		TRasterP erasedRas;
 		if (!selection->isFloating())
@@ -458,10 +458,10 @@ public:
 		if (!image)
 			return;
 
-		m_imageId = "UndoPasteImage_" + toString(m_id);
+		m_imageId = "UndoPasteImage_" + std::to_string(m_id);
 		TImageCache::instance()->add(m_imageId, image, false);
 
-		m_floatingImageId = "UndoPasteFloatingSelection_floating_" + toString(m_id);
+		m_floatingImageId = "UndoPasteFloatingSelection_floating_" + std::to_string(m_id);
 		TRasterP floatingRas = currentSelection->getFloatingSelection();
 		TImageP floatingImage;
 		if (TRasterCM32P toonzRas = (TRasterCM32P)(floatingRas))
@@ -472,7 +472,7 @@ public:
 			floatingImage = TRasterImageP(grRas);
 		TImageCache::instance()->add(m_floatingImageId, floatingImage, false);
 
-		m_oldFloatingImageId = "UndoPasteFloatingSelection_oldFloating_" + toString(m_id);
+		m_oldFloatingImageId = "UndoPasteFloatingSelection_oldFloating_" + std::to_string(m_id);
 		TRasterP oldFloatingRas = currentSelection->getOriginalFloatingSelection();
 		TImageP olfFloatingImage;
 		if (TRasterCM32P toonzRas = (TRasterCM32P)(oldFloatingRas))
@@ -490,7 +490,7 @@ public:
 		TRect rRect = convertWorldToRaster(wRect, image);
 		rRect *= rasImage->getBounds();
 		if (!rRect.isEmpty()) {
-			m_undoImageId = "UndoPasteFloatingSelection_undo" + toString(m_id);
+			m_undoImageId = "UndoPasteFloatingSelection_undo" + std::to_string(m_id);
 			TRasterP undoRas = rasImage->extract(rRect)->clone();
 			TImageP undoImage;
 			if (TRasterCM32P toonzRas = (TRasterCM32P)(undoRas))

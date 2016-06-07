@@ -94,7 +94,7 @@ int TTcpIpServerImp::readData(int sock, QString &data)
 	for (int i = x1; i < x2; ++i)
 		ssize.push_back(buff[i]);
 
-	int dataSize = toInt(ssize);
+	int dataSize = std::stoi(ssize);
 
 	unsigned long size = dataSize;
 	data = QString(buff + x2 + sizeof("#$#THE") - 1);
@@ -136,7 +136,7 @@ int TTcpIpServerImp::readData(int sock, QString &data)
 	}
 
 #ifdef TRACE
-	cout << "read " << toString((int)data.length()) << " on " << toString((int)dataSize) << endl
+	cout << "read " << toString((int)data.length()) << " on " << dataSize << endl
 		 << endl;
 #endif
 

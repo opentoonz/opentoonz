@@ -338,7 +338,7 @@ void TLevelSet::loadFolder(TIStream &is, TFilePath folder)
 			}
 		} else if (tagName == "folder") {
 			is.getTagParam("name", s);
-			TFilePath child = createFolder(folder, toWideString(s));
+			TFilePath child = createFolder(folder, ::to_wstring(s));
 			loadFolder(is, child);
 		} else
 			throw TException("expected <levels> or <folder>");
@@ -364,7 +364,7 @@ void TLevelSet::loadData(TIStream &is)
 					}
 				}
 			} else if (tagName == "folder") {
-				std::string name = toString(defaultRootFolder.getWideString());
+				std::string name = ::to_string(defaultRootFolder.getWideString());
 				is.getTagParam("name", name);
 				TFilePath folder(name);
 				if (folderCount == 1)

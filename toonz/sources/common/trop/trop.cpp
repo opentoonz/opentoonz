@@ -12,7 +12,7 @@
 
 TString TRopException::getMessage() const
 {
-	return toWideString(message);
+	return ::to_wstring(message);
 }
 
 namespace

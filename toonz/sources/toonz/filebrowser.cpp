@@ -1514,14 +1514,14 @@ bool FileBrowser::drop(const QMimeData *mimeData)
 			return false;
 
 		std::wstring levelName = sl->getName();
-		folderPath += TFilePath(levelName + toWideString(sl->getPath().getDottedType()));
+		folderPath += TFilePath(levelName + ::to_wstring(sl->getPath().getDottedType()));
 		if (TSystem::doesExistFileOrLevel(folderPath)) {
 			QString question = "Level " + toQString(folderPath) + " already exists\nDo you want to duplicate it?";
 			int ret = DVGui::MsgBox(question, QObject::tr("Duplicate"), QObject::tr("Don't Duplicate"), 0);
 			if (ret == 2 || ret == 0)
 				return false;
 			TFilePath path = folderPath;
-			NameBuilder *nameBuilder = NameBuilder::getBuilder(toWideString(path.getName()));
+			NameBuilder *nameBuilder = NameBuilder::getBuilder(::to_wstring(path.getName()));
 			do
 				levelName = nameBuilder->getNext();
 			while (TSystem::doesExistFileOrLevel(path.withName(levelName)));
@@ -2140,7 +2140,7 @@ void FileBrowser::newFolder()
 	TFilePath folderPath = parentFolder + folderName;
 	int i = 1;
 	while (TFileStatus(folderPath).doesExist())
-		folderPath = parentFolder + (folderName + L" " + toWideString(++i));
+		folderPath = parentFolder + (folderName + L" " + std::to_wstring(++i));
 
 	try {
 		TSystem::mkDir(folderPath);

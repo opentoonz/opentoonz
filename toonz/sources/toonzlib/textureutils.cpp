@@ -165,7 +165,7 @@ namespace
 
 std::string getImageId(const TXsheet *xsh, int frame)
 {
-	return "X" + toString(xsh->id()) + "_" + toString(frame);
+	return "X" + std::to_string(xsh->id()) + "_" + std::to_string(frame);
 }
 
 } // namespace

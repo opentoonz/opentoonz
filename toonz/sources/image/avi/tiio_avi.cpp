@@ -231,7 +231,7 @@ TLevelWriterAvi::~TLevelWriterAvi()
 	AVIFileExit();
 	CoUninitialize();
 	if (!m_delayedFrames.empty())
-		throw TImageException(getFilePath(), "error compressing frame " + toString(m_delayedFrames.front()));
+		throw TImageException(getFilePath(), "error compressing frame " + std::to_string(m_delayedFrames.front()));
 }
 
 //-----------------------------------------------------------
@@ -274,14 +274,14 @@ void TLevelWriterAvi::searchForCodec()
 				WideChar2Char(icinfo.szName, name, sizeof(name));
 
 				std::string compressorName;
-				compressorName = std::string(name) + " '" + toString(bpp) + "' " + std::string(descr);
+				compressorName = std::string(name) + " '" + std::to_string(bpp) + "' " + std::string(descr);
 
 				if (hic) {
 					if (ICCompressQuery(hic, &inFmt, NULL) != ICERR_OK) {
 						ICClose(hic);
 						continue; // Skip this compressor if it can't handle the format.
 					}
-					if (toWideString(compressorName) == codecName) {
+					if (::to_wstring(compressorName) == codecName) {
 						found = true;
 						m_bpp = bpp;
 						break;
@@ -389,7 +389,7 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex)
 			rc = ICCompressGetFormat(m_hic, m_bitmapinfo, m_outputFmt);
 			if (rc != ICERR_OK)
 				throw TImageException(getFilePath(),
-									  "Error codec (ec = " + toString(rc) + ")");
+									  "Error codec (ec = " + std::to_string(rc) + ")");
 
 			ICCOMPRESSFRAMES icf;
 			memset(&icf, 0, sizeof icf);
@@ -409,7 +409,7 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex)
 			rc = ICCompressBegin(m_hic, m_bitmapinfo, m_outputFmt);
 			if (rc != ICERR_OK)
 				throw TImageException(getFilePath(),
-									  "Error starting codec (ec = " + toString(rc) + ")");
+									  "Error starting codec (ec = " + std::to_string(rc) + ")");
 
 			if (AVIStreamSetFormat(m_videoStream, 0, &m_outputFmt->bmiHeader, m_outputFmt->bmiHeader.biSize))
 				throw TImageException(getFilePath(), "unable to set format");
@@ -466,7 +466,7 @@ void TLevelWriterAvi::save(const TImageP &img, int frameIndex)
 		if (res != ICERR_OK) {
 			if (bufferOut)
 				_aligned_free(bufferOut);
-			throw TImageException(getFilePath(), "error compressing frame " + toString(index));
+			throw TImageException(getFilePath(), "error compressing frame " + std::to_string(index));
 		}
 
 		if (outHeader.biCompression == '05xd' ||
@@ -744,9 +744,9 @@ TLevelReaderAvi::TLevelReaderAvi(const TFilePath &path)
 		WideChar2Char(icinfo.szDescription, descr, sizeof(descr));
 		WideChar2Char(icinfo.szName, name, sizeof(name));
 		std::string compressorName;
-		compressorName = std::string(name) + " '" + toString(m_dstBitmapInfo->bmiHeader.biBitCount) + "' " + std::string(descr);
+		compressorName = std::string(name) + " '" + std::to_string(m_dstBitmapInfo->bmiHeader.biBitCount) + "' " + std::string(descr);
 		TEnumProperty *p = (TEnumProperty *)m_info->m_properties->getProperty("Codec");
-		p->setValue(toWideString(compressorName));
+		p->setValue(::to_wstring(compressorName));
 		m_decompressedBuffer = _aligned_malloc(m_dstBitmapInfo->bmiHeader.biSizeImage, 128);
 	} else {
 		m_hic = 0;
@@ -910,7 +910,7 @@ TImageP TLevelReaderAvi::load(int frameIndex)
 	if (!m_hic) {
 		rc = readFrameFromStream(m_decompressedBuffer, si.dwSuggestedBufferSize, frameIndex);
 		if (rc) {
-			throw TImageException(m_path, "unable read frame " + toString(frameIndex) + "from video stream.");
+			throw TImageException(m_path, "unable read frame " + std::to_string(frameIndex) + "from video stream.");
 		}
 	} else {
 		int prevKeyFrame = m_prevFrame == frameIndex - 1 ? frameIndex : getPrevKeyFrame(m_videoStream, frameIndex);
@@ -920,14 +920,14 @@ TImageP TLevelReaderAvi::load(int frameIndex)
 			rc = readFrameFromStream(bufferOut, bytesRead, prevKeyFrame);
 			if (rc) {
 				_aligned_free(bufferOut);
-				throw TImageException(m_path, "unable read frame " + toString(frameIndex) + "from video stream.");
+				throw TImageException(m_path, "unable read frame " + std::to_string(frameIndex) + "from video stream.");
 			}
 
 			DWORD res = decompressFrame(bufferOut, bytesRead, m_decompressedBuffer, prevKeyFrame, frameIndex);
 
 			_aligned_free(bufferOut);
 			if (res != ICERR_OK) {
-				throw TImageException(m_path, "error decompressing frame " + toString(frameIndex));
+				throw TImageException(m_path, "error decompressing frame " + std::to_string(frameIndex));
 			}
 			prevKeyFrame++;
 		}
@@ -952,7 +952,7 @@ TImageP TLevelReaderAvi::load(int frameIndex)
 		return i;
 	}
 	default: {
-		throw TImageException(m_path, toString(bpp) + " to 32 bit not supported\n");
+		throw TImageException(m_path, std::to_string(bpp) + " to 32 bit not supported\n");
 	}
 	}
 	return TRasterImageP();
@@ -1154,7 +1154,7 @@ Tiio::AviWriterProperties::AviWriterProperties()
 				}
 
 				std::string compressorName;
-				compressorName = std::string(name) + " '" + toString(bpp) + "' " + std::string(descr);
+				compressorName = std::string(name) + " '" + std::to_string(bpp) + "' " + std::string(descr);
 
 				// per il momento togliamo i codec indeo
 				if (std::string(compressorName).find("Indeo") != -1) {
@@ -1165,9 +1165,9 @@ Tiio::AviWriterProperties::AviWriterProperties()
 					continue; // Skip this compressor if it can't handle the format.
 				}
 
-				m_defaultCodec.addValue(toWideString(compressorName));
+				m_defaultCodec.addValue(::to_wstring(compressorName));
 				if (compressorName.find("inepak") != -1) {
-					m_defaultCodec.setValue(toWideString(compressorName));
+					m_defaultCodec.setValue(::to_wstring(compressorName));
 				}
 			}
 		}

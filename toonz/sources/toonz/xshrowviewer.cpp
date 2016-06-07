@@ -309,10 +309,10 @@ void RowArea::drawOnionSkinSelection(QPainter &p)
 
 		if (osMask.isEnabled())
 			p.setBrush(mos < 0 ? backColor : frontColor);
-		else
+			else
 			p.setBrush(Qt::NoBrush);
 		p.drawEllipse(onionDotDiam, y, onionDotDiam, onionDotDiam);
-	}
+		}
 
 	//-- draw fixed onions
 	for (int i = 0; i < osMask.getFosCount(); i++)

@@ -176,7 +176,7 @@ void makePrivate(Room *room)
 	if (roomPath == TFilePath() || roomPath.getParentDir() != layoutDir) {
 		int count = 1;
 		for (;;) {
-			roomPath = layoutDir + ("room" + toString(count++) + ".ini");
+			roomPath = layoutDir + ("room" + std::to_string(count++) + ".ini");
 			if (!TFileStatus(roomPath).doesExist())
 				break;
 		}
@@ -1304,7 +1304,7 @@ void MainWindow::checkForUpdates()
 void MainWindow::onUpdateCheckerDone(bool error)
 {
 	if (error) {
-		// Don't bother doing the update if there was an error
+		// Get the last update date
 		return;
 	}
 
@@ -1316,7 +1316,7 @@ void MainWindow::onUpdateCheckerDone(bool error)
 		buttons.push_back(QObject::tr("Cancel"));
 		int ret = DVGui::MsgBox(DVGui::INFORMATION, QObject::tr("An update is available for this software.\nVisit the Web site for more information."), buttons);
 		if (ret == 1) {
-			// This URL can be "translated" to give a localised version to non-English users
+			// Write the new last date to file
 			QDesktopServices::openUrl(QObject::tr("https://opentoonz.github.io/e/"));
 		}
 	}

@@ -35,11 +35,11 @@ TFilePath makeUniqueName(TFilePath fp)
 	int index = 2;
 	int j = name.find_last_not_of(L"0123456789");
 	if (j != (int)std::wstring::npos && j + 1 < (int)name.length()) {
-		index = toInt(name.substr(j + 1)) + 1;
+		index = std::stoi(name.substr(j + 1)) + 1;
 		name = name.substr(0, j + 1);
 	}
 	for (;;) {
-		fp = fp.withName(name + toWideString(index));
+		fp = fp.withName(name + std::to_wstring(index));
 		if (TFileStatus(fp).doesExist() == false)
 			return fp;
 		index++;
@@ -128,7 +128,7 @@ std::wstring readPaletteGlobalName(TFilePath path)
 			return L"";
 		std::string name;
 		if (is.getTagParam("name", name))
-			return toWideString(name);
+			return ::to_wstring(name);
 	} catch (...) {
 	}
 	return L"";
@@ -416,7 +416,7 @@ TFilePath StudioPalette::createPalette(const TFilePath &folderPath, std::string 
 	TFilePath fp = makeUniqueName(folderPath + (name + ".tpl"));
 	time_t ltime;
 	time(&ltime);
-	std::wstring gname = toWideString((int)ltime) + L"_" + toWideString(rand());
+	std::wstring gname = std::to_wstring(ltime) + L"_" + std::to_wstring(rand());
 	palette->setGlobalName(gname);
 	setStylesGlobalNames(palette);
 	save(fp, palette);
@@ -496,7 +496,7 @@ TFilePath StudioPalette::importPalette(
 	TFilePath fp = makeUniqueName(dstFolder + (name + L".tpl"));
 	time_t ltime;
 	time(&ltime);
-	std::wstring gname = toWideString((int)ltime) + L"_" + toWideString(rand());
+	std::wstring gname = std::to_wstring(ltime) + L"_" + std::to_wstring(rand());
 	palette->setGlobalName(gname);
 	setStylesGlobalNames(palette.getPointer());
 	TSystem::touchParentDir(fp);
@@ -566,7 +566,7 @@ std::pair<TFilePath, int> StudioPalette::getSourceStyle(TColorStyle *cs)
 		return ret;
 	std::wstring paletteId = gname.substr(1, k - 1);
 	ret.first = getPalettePath(paletteId) - m_root;
-	ret.second = toInt(gname.substr(k + 1));
+	ret.second = std::stoi(gname.substr(k + 1));
 	return ret;
 }
 
@@ -602,7 +602,7 @@ bool StudioPalette::updateLinkedColors(TPalette *palette)
 		} else
 			spPalette = it->second.getPointer();
 
-		int j = toInt(gname.substr(k + 1));
+		int j = std::stoi(gname.substr(k + 1));
 		if (spPalette && 0 <= j && j < spPalette->getStyleCount()) {
 			TColorStyle *spStyle = spPalette->getStyle(j);
 			assert(spStyle);
@@ -630,7 +630,7 @@ void StudioPalette::setStylesGlobalNames(TPalette *palette)
 		TColorStyle *cs = palette->getStyle(i);
 		// set global name only to the styles of which the global name is empty
 		if (cs->getGlobalName() == L"") {
-			std::wstring gname = L"-" + palette->getGlobalName() + L"-" + toWideString(i);
+			std::wstring gname = L"-" + palette->getGlobalName() + L"-" + std::to_wstring(i);
 			cs->setGlobalName(gname);
 		}
 	}
@@ -642,7 +642,7 @@ void StudioPalette::save(const TFilePath &path, TPalette *palette)
 {
 	TOStream os(path);
 	std::map<std::string, std::string> attr;
-	attr["name"] = toString(palette->getGlobalName());
+	attr["name"] = ::to_string(palette->getGlobalName());
 	os.openChild("palette", attr);
 	palette->saveData(os);
 	os.closeChild();
@@ -663,7 +663,7 @@ TPalette *StudioPalette::load(const TFilePath &path)
 		is.getTagParam("name", gname);
 		TPalette *palette = new TPalette();
 		palette->loadData(is);
-		palette->setGlobalName(toWideString(gname));
+		palette->setGlobalName(::to_wstring(gname));
 		is.matchEndTag();
 		palette->setPaletteName(path.getWideName());
 		return palette;

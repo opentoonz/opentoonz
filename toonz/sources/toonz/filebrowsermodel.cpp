@@ -399,7 +399,7 @@ DvDirModelSceneFolderNode::DvDirModelSceneFolderNode(DvDirModelNode *parent, con
 			std::string folderName = project->getFolderName(i);
 			TFilePath folderPath = project->getFolder(i);
 			if (folderPath.isAbsolute() && !project->isConstantFolder(i)) {
-				std::wstring alias = L"+" + toWideString(folderName);
+				std::wstring alias = L"+" + ::to_wstring(folderName);
 				TFilePath folderActualPath = scene.decodeFilePath(TFilePath(alias));
 				m_folders[alias] = folderActualPath;
 			}
@@ -883,7 +883,7 @@ void DvDirVersionControlProjectNode::getChildrenNames(std::vector<std::wstring> 
 		TFilePath folderPath = project->getFolder(i);
 		//if(folderPath.isAbsolute() || folderPath.getParentDir() != TFilePath())
 		if (folderPath.isAbsolute() && project->isConstantFolder(i)) {
-			names.push_back(L"+" + toWideString(folderName));
+			names.push_back(L"+" + ::to_wstring(folderName));
 		}
 	}
 	delete project;
@@ -978,7 +978,7 @@ void DvDirModelProjectNode::getChildrenNames(std::vector<std::wstring> &names) c
 		TFilePath folderPath = project->getFolder(i);
 		//if(folderPath.isAbsolute() || folderPath.getParentDir() != TFilePath())
 		if (folderPath.isAbsolute() && project->isConstantFolder(i)) {
-			names.push_back(L"+" + toWideString(folderName));
+			names.push_back(L"+" + ::to_wstring(folderName));
 		}
 	}
 	delete project;
@@ -992,7 +992,7 @@ DvDirModelNode *DvDirModelProjectNode::makeChild(std::wstring name)
 		TProjectManager *pm = TProjectManager::instance();
 		TProject *project = new TProject();
 		project->load(getProjectPath());
-		std::string folderName = toString(name.substr(1));
+		std::string folderName = ::to_string(name.substr(1));
 		TFilePath folderPath = project->getFolder(folderName);
 		DvDirModelNode *node = new DvDirModelFileFolderNode(this, name, folderPath);
 		delete project;
@@ -1008,7 +1008,7 @@ DvDirModelNode *DvDirModelProjectNode::makeChild(std::wstring name)
 //-----------------------------------------------------------------------------
 
 DvDirModelDayNode::DvDirModelDayNode(DvDirModelNode *parent, std::wstring dayDateString)
-	: DvDirModelNode(parent, dayDateString), m_dayDateString(toString(dayDateString))
+	: DvDirModelNode(parent, dayDateString), m_dayDateString(::to_string(dayDateString))
 {
 	m_nodeType = "Day";
 }
@@ -1050,7 +1050,7 @@ void DvDirModelHistoryNode::refreshChildren()
 	History *h = History::instance();
 	for (int i = 0; i < h->getDayCount(); i++) {
 		const History::Day *day = h->getDay(i);
-		DvDirModelNode *child = new DvDirModelDayNode(this, toWideString(day->getDate()));
+		DvDirModelNode *child = new DvDirModelDayNode(this, ::to_wstring(day->getDate()));
 		addChild(child);
 	}
 }

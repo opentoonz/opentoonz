@@ -546,7 +546,7 @@ void TypeTool::loadFonts()
 		m_fontFamilyMenu.addValue(*it);
 
 	std::string favFontApp = EnvCurrentFont;
-	std::wstring favouriteFont = toWideString(favFontApp);
+	std::wstring favouriteFont = ::to_wstring(favFontApp);
 	if (m_fontFamilyMenu.isValue(favouriteFont)) {
 		m_fontFamilyMenu.setValue(favouriteFont);
 		setFont(favouriteFont);
@@ -603,7 +603,7 @@ void TypeTool::setFont(std::wstring family)
 
 		updateStrokeChar();
 		invalidate();
-		EnvCurrentFont = toString(m_fontFamily);
+		EnvCurrentFont = ::to_string(m_fontFamily);
 	} catch (TFontCreationError &) {
 		//    TMessage::error(toString(e.getMessage()));
 		assert(m_fontFamily == instance->getCurrentFamily());
@@ -636,7 +636,7 @@ void TypeTool::setSize(std::wstring strSize)
 {
 	// font e tool fields update
 
-	double dimension = (double)atoi(toString(strSize).c_str());
+	double dimension = std::stod(strSize);
 	if (m_dimension == dimension)
 		return;
 

@@ -92,7 +92,7 @@ void FdgManager::loadFieldGuideInfo()
 			TFilePath fname = *it;
 			if (fname.getType() != "fdg")
 				continue;
-			fp = fopen(toString(fname.getWideString()).c_str(), "r");
+			fp = fopen(::to_string(fname.getWideString()).c_str(), "r");
 			if (!fp)
 				continue;
 			FDG_INFO fdg_info;
@@ -321,9 +321,8 @@ void CleanupParameters::saveData(TOStream &os) const
 	std::map<std::string, std::string> attr;
 	if (m_autocenterType != AUTOCENTER_NONE) {
 		attr.clear();
-		attr["type"] = toString((int)m_autocenterType);
-		attr["pegHoles"] = toString((int)m_pegSide);
-		//attr["fieldGuide"] = toString((int)m_pegSide);
+		attr["type"] = std::to_string(m_autocenterType);
+		attr["pegHoles"] = std::to_string(m_pegSide);
 		os.openCloseChild("autoCenter", attr);
 	}
 
@@ -334,19 +333,18 @@ void CleanupParameters::saveData(TOStream &os) const
 		if (flip != "")
 			attr["flip"] = flip;
 		if (m_rotate != 0)
-			attr["rotate"] = toString(m_rotate);
-		//if(m_scale!=1) attr["scale"] = toString(m_scale);
+			attr["rotate"] = std::to_string(m_rotate);
 		if (m_offx != 0.0)
-			attr["xoff"] = toString(m_offx);
+			attr["xoff"] = std::to_string(m_offx);
 		if (m_offy != 0.0)
-			attr["yoff"] = toString(m_offy);
+			attr["yoff"] = std::to_string(m_offy);
 		os.openCloseChild("transform", attr);
 	}
 
 	if (m_lineProcessingMode != lpNone) {
 		attr.clear();
-		attr["sharpness"] = toString(m_sharpness);
-		attr["autoAdjust"] = toString((int)m_autoAdjustMode);
+		attr["sharpness"] = std::to_string(m_sharpness);
+		attr["autoAdjust"] = std::to_string(m_autoAdjustMode);
 		attr["mode"] = (m_lineProcessingMode == lpGrey ? "grey" : "color");
 		os.openCloseChild("lineProcessing", attr);
 	}
@@ -359,13 +357,13 @@ void CleanupParameters::saveData(TOStream &os) const
 		os.openCloseChild("MLAA", attr);
 	}
 	attr.clear();
-	attr["value"] = toString(m_despeckling);
+	attr["value"] = std::to_string(m_despeckling);
 	os.openCloseChild("despeckling", attr);
 	attr.clear();
-	attr["value"] = toString(m_aaValue);
+	attr["value"] = std::to_string(m_aaValue);
 	os.openCloseChild("aaValue", attr);
 	attr.clear();
-	attr["value"] = toString(m_closestField);
+	attr["value"] = std::to_string(m_closestField);
 	os.openCloseChild("closestField", attr);
 	attr.clear();
 	attr["name"] = m_fdgInfo.m_name;
@@ -373,14 +371,6 @@ void CleanupParameters::saveData(TOStream &os) const
 	attr.clear();
 	if (m_path != TFilePath())
 		os.child("path") << m_path;
-
-	// attr["path"] = toString(m_path.getWideString());
-	// os.openCloseChild("path", attr);
-
-	//m_closestField = param->m_closestField;
-	//m_autoAdjustMode = param->m_autoAdjustMode;
-	//m_sharpness = param->m_sharpness;
-	//m_transparencyCheckEnabled = param->m_transparencyCheckEnabled;
 }
 
 //---------------------------------------------------------
@@ -409,42 +399,42 @@ void CleanupParameters::loadData(TIStream &is, bool globalParams)
 			m_autocenterType = AUTOCENTER_FDG;
 			std::string s = is.getTagAttribute("type");
 			if (s != "" && isInt(s))
-				m_autocenterType = (AUTOCENTER_TYPE)toInt(s);
+				m_autocenterType = (AUTOCENTER_TYPE)std::stoi(s);
 			s = is.getTagAttribute("pegHoles");
 			if (s != "" && isInt(s))
-				m_pegSide = (PEGS_SIDE)toInt(s);
+				m_pegSide = (PEGS_SIDE)std::stoi(s);
 		} else if (tagName == "transform") {
 			std::string s = is.getTagAttribute("flip");
 			m_flipx = (s.find("x") != std::string::npos);
 			m_flipy = (s.find("y") != std::string::npos);
 			s = is.getTagAttribute("rotate");
 			if (s != "" && isInt(s))
-				m_rotate = toInt(s);
+				m_rotate = std::stoi(s);
 			s = is.getTagAttribute("xoff");
 			if (s != "" && isDouble(s))
-				m_offx = toDouble(s);
+				m_offx = std::stod(s);
 			s = is.getTagAttribute("yoff");
 			if (s != "" && isDouble(s))
-				m_offy = toDouble(s);
+				m_offy = std::stod(s);
 		} else if (tagName == "lineProcessing") {
 			m_lineProcessingMode = lpGrey;
 			std::string s = is.getTagAttribute("sharpness");
 			if (s != "" && isDouble(s))
-				m_sharpness = toDouble(s);
+				m_sharpness = std::stod(s);
 			s = is.getTagAttribute("autoAdjust");
 			if (s != "" && isDouble(s))
-				m_autoAdjustMode = (CleanupTypes::AUTO_ADJ_MODE)toInt(s);
+				m_autoAdjustMode = (CleanupTypes::AUTO_ADJ_MODE)std::stoi(s);
 			s = is.getTagAttribute("mode");
 			if (s != "" && s == "color")
 				m_lineProcessingMode = lpColor;
 		} else if (tagName == "despeckling") {
 			std::string s = is.getTagAttribute("value");
 			if (s != "" && isInt(s))
-				m_despeckling = toInt(s);
+				m_despeckling = std::stoi(s);
 		} else if (tagName == "aaValue") {
 			std::string s = is.getTagAttribute("value");
 			if (s != "" && isInt(s))
-				m_aaValue = toInt(s);
+				m_aaValue = std::stoi(s);
 		} else if (tagName == "noAntialias")
 			m_noAntialias = true;
 		else if (tagName == "MLAA")
@@ -452,7 +442,7 @@ void CleanupParameters::loadData(TIStream &is, bool globalParams)
 		else if (tagName == "closestField") {
 			std::string s = is.getTagAttribute("value");
 			if (s != "" && isDouble(s))
-				m_closestField = toDouble(s);
+				m_closestField = std::stod(s);
 		} else if (tagName == "fdg") {
 			std::string s = is.getTagAttribute("name");
 			if (s != "")
