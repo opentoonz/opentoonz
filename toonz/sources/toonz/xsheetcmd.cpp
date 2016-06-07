@@ -609,6 +609,142 @@ public:
 	}
 } removeGlobalKeyframeCommand;
 
+//============================================================
+//	Drawing Substitution
+//============================================================
+class DrawingSubtitutionUndo : public TUndo
+{
+
+private:
+	int direction;
+	
+
+public:
+	DrawingSubtitutionUndo(int dir) : direction(dir) {}
+
+	void undo() const
+	{
+		changeDrawing(direction);
+		TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+	}
+
+	void redo() const
+	{
+		changeDrawing(direction);
+		TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+	}
+
+	int getSize() const
+	{
+		return sizeof(*this);
+	}
+
+	QString getHistoryString()
+	{
+		return QObject::tr("Change current drawing %1").arg(QString::number(direction));
+	}
+
+	int getHistoryType()
+	{
+		return HistoryType::Xsheet;
+	}
+protected:
+	TTool::Application *app;
+	TXsheet *xsh;
+	TXshCell cell;
+	static bool changeDrawing(int delta);
+	static void setDrawing(const TFrameId &fid, int row, int col);
+};
+
+//============================================================
+
+bool DrawingSubtitutionUndo::changeDrawing(int delta)
+{
+		TTool::Application *app = TTool::getApplication();
+		TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
+		int row = app->getCurrentFrame()->getFrame();
+		int col = app->getCurrentColumn()->getColumnIndex();
+		TXshCell cell = xsh->getCell(row, col);
+		
+		if (!cell.m_level || !cell.m_level->getSimpleLevel())
+			return false;
+		
+		std::vector<TFrameId> fids;
+		cell.m_level->getSimpleLevel()->getFids(fids);
+		int n = fids.size();
+		
+		if (n < 2)
+			return false;
+		
+		std::vector<TFrameId>::iterator it;
+		it = std::find(fids.begin(), fids.end(), cell.m_frameId);
+		
+		if (it == fids.end())
+			return false;
+		
+		int index = std::distance(fids.begin(), it);
+		while (delta < 0)
+			delta += n;
+		index = (index + delta) % n;
+		
+		setDrawing(fids[index], row, col);
+
+}
+
+void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col)
+{
+		TTool::Application *app = TTool::getApplication();
+		TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
+		TXshCell cell = xsh->getCell(row, col);
+		cell.m_frameId = fid;
+		xsh->setCell(row, col, cell);
+		TStageObject *pegbar = xsh->getStageObject(TStageObjectId::ColumnId(col));
+		pegbar->setOffset(pegbar->getOffset());
+
+		app->getCurrentXsheet()->notifyXsheetChanged();
+		TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+}
+
+//-----------------------------------------------------------------------------
+
+void drawingSubstituion(int dir)
+{
+	DrawingSubtitutionUndo *undo = new DrawingSubtitutionUndo(dir);
+	TUndoManager::manager()->add(undo);
+
+	undo->redo();
+}
+
+//=============================================================================
+
+class DrawingSubstitutionForwardCommand : public MenuItemHandler
+{
+public:
+	DrawingSubstitutionForwardCommand() : MenuItemHandler(MI_DrawingSubForward) {}
+	void execute()
+	{
+		XshCmd::drawingSubstituion(1);
+	}
+} DrawingSubstitutionForwardCommand;
+
+
+//============================================================
+
+class DrawingSubstitutionBackwardCommand : public MenuItemHandler
+{
+public:
+	DrawingSubstitutionBackwardCommand() : MenuItemHandler(MI_DrawingSubBackward) {}
+	void execute()
+	{
+		XshCmd::drawingSubstituion(-1);
+	}
+} DrawingSubstitutionBackwardCommand;
+
+
+//============================================================
+
 } // namespace XshCmd
 
 //*****************************************************************************

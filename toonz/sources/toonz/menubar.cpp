@@ -1278,6 +1278,8 @@ QMenuBar* StackedMenuBar::createFullMenuBar()
 	addMenuItem(xsheetMenu, MI_RemoveSceneFrame);
 	addMenuItem(xsheetMenu, MI_InsertGlobalKeyframe);
 	addMenuItem(xsheetMenu, MI_RemoveGlobalKeyframe);
+	addMenuItem(xsheetMenu, MI_DrawingSubForward);
+	addMenuItem(xsheetMenu, MI_DrawingSubBackward);
 
 	//Menu' CELLS
 	QMenu *cellsMenu = addMenu(tr("Cells"), fullMenuBar);

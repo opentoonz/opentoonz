@@ -1717,6 +1717,8 @@ void MainWindow::defineActions()
 	createMenuXsheetAction(MI_RemoveSceneFrame, tr("Remove Frame"), "");
 	createMenuXsheetAction(MI_InsertGlobalKeyframe, tr("Insert Multiple Keys"), "");
 	createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"), "");
+	createMenuXsheetAction(MI_DrawingSubForward, tr("Change current drawing number by 1"), ".");
+	createMenuXsheetAction(MI_DrawingSubBackward, tr("Change current drawing number by -1"), ",");
 
 	createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
 	createMenuCellsAction(MI_Swing, tr("&Swing"), "");
