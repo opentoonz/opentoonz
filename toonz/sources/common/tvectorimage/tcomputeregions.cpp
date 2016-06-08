@@ -2742,19 +2742,6 @@ void printStrokes1(vector<VIStroke *> &v, int size)
 }
 
 //-----------------------------------------------------------------------------
-#ifdef _DEBUG
-static void printTime(TStopWatch &sw, string name)
-{
-	ostrstream ss;
-	ss << name << " : ";
-	sw.print(ss);
-	ss << '\n' << '\0';
-	string s = ss.str();
-	ss.freeze(false);
-	//TSystem::outputDebug(s);
-}
-#endif
-//-----------------------------------------------------------------------------
 void printStrokes1(vector<VIStroke *> &v, int size);
 
 //void testHistory();

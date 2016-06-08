@@ -4,6 +4,8 @@
 #include "tsystem.h"
 #include "toonz/preferences.h"
 
+#include <sstream>
+
 //==============================================================================
 //
 //TextureManager
@@ -55,10 +57,9 @@ TDimensionI TextureManager::getMaxSize(bool isRGBM)
 			glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_COMPONENTS, &cmpt);
 
 			if (outX && outY) {
-				std::ostrstream os;
+				std::stringstream os;
 				os << "texture size = " << outX << "x" << outY << " fmt " << intFmt << " cmpt# " << cmpt << " " << rSize << "," << gSize << "," << bSize << "," << aSize << '\n' << '\0';
 				TSystem::outputDebug(os.str());
-				os.freeze(false);
 			}
 #endif
 		} while ((outX == texLx) && (outY == texLy));

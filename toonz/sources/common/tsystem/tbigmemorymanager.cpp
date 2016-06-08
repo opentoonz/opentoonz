@@ -424,17 +424,17 @@ TRaster *TBigMemoryManager::findRaster(TRaster *ras)
 void TBigMemoryManager::printMap()
 {
 	std::map<UCHAR *, Chunkinfo>::iterator it = m_chunks.begin();
-	TSystem::outputDebug("BIGMEMORY chunks totali: " + toString((int)m_chunks.size()) + "\n");
+	TSystem::outputDebug("BIGMEMORY chunks totali: " + std::to_string((int)m_chunks.size()) + "\n");
 
 	int count = 0;
 
 	while (it != m_chunks.end()) {
 		TSystem::outputDebug("chunk #" +
-							 toString((int)count++) +
+							 std::to_string((int)count++) +
 							 "dimensione(kb):" +
-							 toString((int)(it->second.m_size >> 10)) +
+							 std::to_string((int)(it->second.m_size >> 10)) +
 							 "num raster:" +
-							 toString((int)(it->second.m_rasters.size())) +
+							 std::to_string((int)(it->second.m_rasters.size())) +
 							 "\n");
 
 		it++;
