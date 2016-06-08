@@ -1741,6 +1741,8 @@ void MainWindow::defineActions()
 	createMenuCellsAction(MI_CloneLevel, tr("&Clone"), "");
 	createMenuCellsAction(MI_DrawingSubForward, tr("Drawing Substitution Forward"), ".");
 	createMenuCellsAction(MI_DrawingSubBackward, tr("Drawing Substitution Backward"), ",");
+	createMenuCellsAction(MI_DrawingSubGroupForward, tr("Similar Drawing Substitution Forward"), "Ctrl+.");
+	createMenuCellsAction(MI_DrawingSubGroupBackward, tr("Similar Drawing Substitution Backward"), "Ctrl+,");
 
 	createMenuCellsAction(MI_Reframe1, tr("1's"), "");
 	createMenuCellsAction(MI_Reframe2, tr("2's"), "");

@@ -616,24 +616,30 @@ class DrawingSubtitutionUndo : public TUndo
 {
 
 private:
-	int m_direction;
+	int m_direction, m_row, m_col;
 	TCellSelection::Range m_range;
+	bool m_selected;
 
 public:
-	DrawingSubtitutionUndo(int dir, TCellSelection::Range range) : m_direction(dir), m_range(range){}
+	DrawingSubtitutionUndo(int dir, TCellSelection::Range range, int row, int col, bool selected) : m_direction(dir), m_range(range), m_row(row), m_col(col), m_selected(selected){}
 	
 	void undo() const
 	{
-		int m_col, m_row;
+		if (!m_selected)
+		{
+			changeDrawing(-m_direction, m_row, m_col);
+			return;
+		}
+		int col, row;
 		int c = m_range.m_c0;
 		int r = m_range.m_r0;
 		while (c <= m_range.m_c1)
 		{
-			m_col = c;
+			col = c;
 			while (r <= m_range.m_r1)
 			{
-				m_row = r;
-				changeDrawing(-m_direction, m_row, m_col);
+				row = r;
+				changeDrawing(-m_direction, row, col);
 				r++;
 			}
 			r = m_range.m_r0;
@@ -644,16 +650,22 @@ public:
 
 	void redo() const
 	{
-		int m_col, m_row;
+		if (!m_selected)
+		{
+			changeDrawing(m_direction, m_row, m_col);
+			return;
+		}
+		
+		int col, row;
 		int c = m_range.m_c0;
 		int r = m_range.m_r0;
 		while (c <= m_range.m_c1)
 		{
-			m_col = c;
+			col = c;
 			while (r <= m_range.m_r1)
 			{
-				m_row = r;
-				changeDrawing(m_direction, m_row, m_col);
+				row = r;
+				changeDrawing(m_direction, row, col);
 				r++;
 			}
 			r = m_range.m_r0;
@@ -676,11 +688,91 @@ public:
 		return HistoryType::Xsheet;
 	}
 protected:
-	TTool::Application *app;
-	TXsheet *xsh;
-	TXshCell cell;
+
 	static bool changeDrawing(int delta, int row, int col);
 	static void setDrawing(const TFrameId &fid, int row, int col, TXshCell cell);
+	friend class DrawingSubtitutionGroupUndo;
+};
+
+//============================================================
+
+class DrawingSubtitutionGroupUndo : public TUndo
+{
+
+private:
+	int m_direction;
+	int m_row;
+	int m_col;
+
+public:
+	DrawingSubtitutionGroupUndo(int dir, int row, int col) : m_direction(dir), m_col(col), m_row(row){}
+
+	void undo() const
+	{
+		int n = 1;
+		TXshCell cell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row, m_col);
+		if (!cell.m_level || !cell.m_level->getSimpleLevel())
+			return;
+		
+		TFrameId id = cell.m_frameId;
+		DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row, m_col);
+
+		TXshCell nextCell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row + n, m_col);
+		if (!nextCell.m_level || !nextCell.m_level->getSimpleLevel())
+			return;
+
+		TFrameId nextId = nextCell.m_frameId;
+		
+		while (id == nextId)
+		{
+			DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row + n, m_col);
+			n++;
+			nextCell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row + n, m_col);
+			nextId = nextCell.m_frameId;
+		}
+				
+	}
+
+	void redo() const
+	{
+		int n = 1;
+		TXshCell cell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row, m_col);
+		if (!cell.m_level || !cell.m_level->getSimpleLevel())
+			return;
+
+		TFrameId id = cell.m_frameId;
+		DrawingSubtitutionUndo::changeDrawing(m_direction, m_row, m_col);
+
+		TXshCell nextCell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row + n, m_col);
+		if (!nextCell.m_level || !nextCell.m_level->getSimpleLevel())
+			return;
+
+		TFrameId nextId = nextCell.m_frameId;
+
+		while (id == nextId)
+		{
+			DrawingSubtitutionUndo::changeDrawing(m_direction, m_row + n, m_col);
+			n++;
+			nextCell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row + n, m_col);
+			nextId = nextCell.m_frameId;
+		}
+	}
+
+	int getSize() const
+	{
+		return sizeof(*this);
+	}
+
+	QString getHistoryString()
+	{
+		return QObject::tr("Change current drawing %1").arg(QString::number(m_direction));
+	}
+
+	int getHistoryType()
+	{
+		return HistoryType::Xsheet;
+	}
+
 };
 
 //============================================================
@@ -733,12 +825,36 @@ void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col, T
 
 void drawingSubstituion(int dir)
 {
-	TTool::Application *app = TTool::getApplication();
-	TCellSelection *selection = dynamic_cast<TCellSelection *>(app->getCurrentSelection()->getSelection());
+	//TTool::Application *app = TTool::getApplication();
+	//TCellSelection *selection = dynamic_cast<TCellSelection *>(app->getCurrentSelection()->getSelection());
+	TCellSelection *selection = dynamic_cast<TCellSelection *>(TTool::getApplication()->getCurrentSelection()->getSelection());
+	TCellSelection::Range range;
+	bool selected = false;
+	if (selection)
+	{
+		range = selection->getSelectedCells();
+		if (!(range.isEmpty()))
+			selected = true;
+	}
+	int row = TTool::getApplication()->getCurrentFrame()->getFrame();
+	int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+	
+	DrawingSubtitutionUndo *undo = new DrawingSubtitutionUndo(dir, range, row, col, selected);
+	TUndoManager::manager()->add(undo);
+
+	undo->redo();
+}
+
+void drawingSubstituionGroup(int dir)
+{
+	//TTool::Application *app = TTool::getApplication();
+	TCellSelection *selection = dynamic_cast<TCellSelection *>(TTool::getApplication()->getCurrentSelection()->getSelection());
 	if (!selection)
 		return;
+	int row = TTool::getApplication()->getCurrentFrame()->getFrame();
+	int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
 	TCellSelection::Range range = selection->getSelectedCells();
-	DrawingSubtitutionUndo *undo = new DrawingSubtitutionUndo(dir, range);
+	DrawingSubtitutionGroupUndo *undo = new DrawingSubtitutionGroupUndo(dir, row, col);
 	TUndoManager::manager()->add(undo);
 
 	undo->redo();
@@ -768,6 +884,31 @@ public:
 		XshCmd::drawingSubstituion(-1);
 	}
 } DrawingSubstitutionBackwardCommand;
+
+//=============================================================================
+
+class DrawingSubstitutionGroupForwardCommand : public MenuItemHandler
+{
+public:
+	DrawingSubstitutionGroupForwardCommand() : MenuItemHandler(MI_DrawingSubGroupForward) {}
+	void execute()
+	{
+		XshCmd::drawingSubstituionGroup(1);
+	}
+} DrawingSubstitutionGroupForwardCommand;
+
+
+//============================================================
+
+class DrawingSubstitutionGroupBackwardCommand : public MenuItemHandler
+{
+public:
+	DrawingSubstitutionGroupBackwardCommand() : MenuItemHandler(MI_DrawingSubGroupBackward) {}
+	void execute()
+	{
+		XshCmd::drawingSubstituionGroup(-1);
+	}
+} DrawingSubstitutionGroupBackwardCommand;
 
 
 //============================================================
