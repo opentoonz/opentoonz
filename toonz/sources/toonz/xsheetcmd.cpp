@@ -616,24 +616,49 @@ class DrawingSubtitutionUndo : public TUndo
 {
 
 private:
-	int direction;
-	
+	int m_direction;
+	TCellSelection::Range m_range;
 
 public:
-	DrawingSubtitutionUndo(int dir) : direction(dir) {}
-
+	DrawingSubtitutionUndo(int dir, TCellSelection::Range range) : m_direction(dir), m_range(range){}
+	
 	void undo() const
 	{
-		changeDrawing(direction);
-		TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+		int m_col, m_row;
+		int c = m_range.m_c0;
+		int r = m_range.m_r0;
+		while (c <= m_range.m_c1)
+		{
+			m_col = c;
+			while (r <= m_range.m_r1)
+			{
+				m_row = r;
+				changeDrawing(-m_direction, m_row, m_col);
+				r++;
+			}
+			r = m_range.m_r0;
+			c++;
+		}
+		
 	}
 
 	void redo() const
 	{
-		changeDrawing(direction);
-		TApp::instance()->getCurrentScene()->setDirtyFlag(true);
-		TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+		int m_col, m_row;
+		int c = m_range.m_c0;
+		int r = m_range.m_r0;
+		while (c <= m_range.m_c1)
+		{
+			m_col = c;
+			while (r <= m_range.m_r1)
+			{
+				m_row = r;
+				changeDrawing(m_direction, m_row, m_col);
+				r++;
+			}
+			r = m_range.m_r0;
+			c++;
+		}
 	}
 
 	int getSize() const
@@ -643,7 +668,7 @@ public:
 
 	QString getHistoryString()
 	{
-		return QObject::tr("Change current drawing %1").arg(QString::number(direction));
+		return QObject::tr("Change current drawing %1").arg(QString::number(m_direction));
 	}
 
 	int getHistoryType()
@@ -654,18 +679,16 @@ protected:
 	TTool::Application *app;
 	TXsheet *xsh;
 	TXshCell cell;
-	static bool changeDrawing(int delta);
-	static void setDrawing(const TFrameId &fid, int row, int col);
+	static bool changeDrawing(int delta, int row, int col);
+	static void setDrawing(const TFrameId &fid, int row, int col, TXshCell cell);
 };
 
 //============================================================
 
-bool DrawingSubtitutionUndo::changeDrawing(int delta)
+bool DrawingSubtitutionUndo::changeDrawing(int delta, int row, int col)
 {
 		TTool::Application *app = TTool::getApplication();
 		TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
-		int row = app->getCurrentFrame()->getFrame();
-		int col = app->getCurrentColumn()->getColumnIndex();
 		TXshCell cell = xsh->getCell(row, col);
 		
 		if (!cell.m_level || !cell.m_level->getSimpleLevel())
@@ -689,15 +712,14 @@ bool DrawingSubtitutionUndo::changeDrawing(int delta)
 			delta += n;
 		index = (index + delta) % n;
 		
-		setDrawing(fids[index], row, col);
+		setDrawing(fids[index], row, col, cell);
 
 }
 
-void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col)
+void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col, TXshCell cell)
 {
 		TTool::Application *app = TTool::getApplication();
 		TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
-		TXshCell cell = xsh->getCell(row, col);
 		cell.m_frameId = fid;
 		xsh->setCell(row, col, cell);
 		TStageObject *pegbar = xsh->getStageObject(TStageObjectId::ColumnId(col));
@@ -711,7 +733,12 @@ void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col)
 
 void drawingSubstituion(int dir)
 {
-	DrawingSubtitutionUndo *undo = new DrawingSubtitutionUndo(dir);
+	TTool::Application *app = TTool::getApplication();
+	TCellSelection *selection = dynamic_cast<TCellSelection *>(app->getCurrentSelection()->getSelection());
+	if (!selection)
+		return;
+	TCellSelection::Range range = selection->getSelectedCells();
+	DrawingSubtitutionUndo *undo = new DrawingSubtitutionUndo(dir, range);
 	TUndoManager::manager()->add(undo);
 
 	undo->redo();
