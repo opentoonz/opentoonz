@@ -703,58 +703,53 @@ private:
 	int m_direction;
 	int m_row;
 	int m_col;
+	int m_count;
 
 public:
-	DrawingSubtitutionGroupUndo(int dir, int row, int col) : m_direction(dir), m_col(col), m_row(row){}
-
-	void undo() const
+	DrawingSubtitutionGroupUndo(int dir, int row, int col) : m_direction(dir), m_col(col), m_row(row)
 	{
-		int n = 1;
+		m_count = 1;
 		TXshCell cell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row, m_col);
 		if (!cell.m_level || !cell.m_level->getSimpleLevel())
 			return;
-		
-		TFrameId id = cell.m_frameId;
-		DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row, m_col);
 
-		TXshCell nextCell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row + n, m_col);
+		TFrameId id = cell.m_frameId;
+
+		TXshCell nextCell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row + m_count, m_col);
 		if (!nextCell.m_level || !nextCell.m_level->getSimpleLevel())
 			return;
 
 		TFrameId nextId = nextCell.m_frameId;
-		
+
 		while (id == nextId)
 		{
-			DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row + n, m_col);
-			n++;
-			nextCell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row + n, m_col);
+			m_count++;
+			nextCell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row + m_count, m_col);
 			nextId = nextCell.m_frameId;
 		}
+	}
+
+	void undo() const
+	{
+		int n = 1;
+		DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row, m_col);
+		while (n < m_count)
+		{
+			DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row + n, m_col);
+			n++; 
+		}
+
 				
 	}
 
 	void redo() const
 	{
 		int n = 1;
-		TXshCell cell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row, m_col);
-		if (!cell.m_level || !cell.m_level->getSimpleLevel())
-			return;
-
-		TFrameId id = cell.m_frameId;
 		DrawingSubtitutionUndo::changeDrawing(m_direction, m_row, m_col);
-
-		TXshCell nextCell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row + n, m_col);
-		if (!nextCell.m_level || !nextCell.m_level->getSimpleLevel())
-			return;
-
-		TFrameId nextId = nextCell.m_frameId;
-
-		while (id == nextId)
+		while (n < m_count)
 		{
 			DrawingSubtitutionUndo::changeDrawing(m_direction, m_row + n, m_col);
 			n++;
-			nextCell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row + n, m_col);
-			nextId = nextCell.m_frameId;
 		}
 	}
 
@@ -847,13 +842,8 @@ void drawingSubstituion(int dir)
 
 void drawingSubstituionGroup(int dir)
 {
-	//TTool::Application *app = TTool::getApplication();
-	TCellSelection *selection = dynamic_cast<TCellSelection *>(TTool::getApplication()->getCurrentSelection()->getSelection());
-	if (!selection)
-		return;
 	int row = TTool::getApplication()->getCurrentFrame()->getFrame();
 	int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
-	TCellSelection::Range range = selection->getSelectedCells();
 	DrawingSubtitutionGroupUndo *undo = new DrawingSubtitutionGroupUndo(dir, row, col);
 	TUndoManager::manager()->add(undo);
 
