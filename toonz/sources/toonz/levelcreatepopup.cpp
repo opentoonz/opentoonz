@@ -33,6 +33,7 @@
 #include "toonz/preferences.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/tproject.h"
+#include "toonz/namebuilder.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -289,21 +290,29 @@ LevelCreatePopup::LevelCreatePopup()
 
 //-----------------------------------------------------------------------------
 
-void LevelCreatePopup::updatePath()
+void LevelCreatePopup::updatePath(QString levelType)
 {
 	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
 	/*--- 初期Pathを入れる。Xsheet Roomのときのみ、分岐 ---*/
 	QString roomName = TApp::instance()->getCurrentRoomName();
 	TFilePath defaultPath;
-	if (roomName == "Xsheet") {
+	//if (roomName == "Xsheet") {
 		/*--- 名称未設定シーンのとき、+satsuei直下に ---*/
-		if (scene->isUntitled())
-			defaultPath = TFilePath("+" + TProject::Scenes);
-		/*--- 保存済みシーンのとき、そのシーンファイルの入っているフォルダの1階層上のフォルダにする ---*/
-		else
-			defaultPath = scene->codeFilePath(scene->getScenePath().getParentDir().getParentDir());
-	} else
+		//if (scene->isUntitled())
+		//{
+		//	if (levelType == "Raster Level" || levelType == "34")
+		//	{
+		//		defaultPath = TFilePath("+" + TProject::Extras);
+		//	}
+		//	else
+		//		defaultPath = TFilePath("+" + TProject::Drawings);
+		//}
+		//	
+		///*--- 保存済みシーンのとき、そのシーンファイルの入っているフォルダの1階層上のフォルダにする ---*/
+		//else
+		//	defaultPath = scene->codeFilePath(scene->getScenePath().getParentDir().getParentDir());
+	//} else
 		defaultPath = scene->getDefaultLevelPath(getLevelType()).getParentDir();
 
 	m_pathFld->setPath(toQString(defaultPath));
@@ -311,8 +320,67 @@ void LevelCreatePopup::updatePath()
 
 //-----------------------------------------------------------------------------
 
+void LevelCreatePopup::nextName()
+{
+	const std::auto_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
+
+	TLevelSet* levelSet = TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
+	ToonzScene* scene = TApp::instance()->getCurrentScene()->getScene();
+	std::wstring levelName = L"";
+
+	// Select a different unique level name in case it already exists (either in scene or on disk)
+	TFilePath fp;
+	TFilePath actualFp;
+	for (;;) {
+		levelName = nameBuilder->getNext();
+
+		if (levelSet->getLevel(levelName) != 0)
+			continue;
+
+		fp = scene->getDefaultLevelPath(PLI_XSHLEVEL, levelName); 
+		actualFp = scene->decodeFilePath(fp);
+
+		if (TSystem::doesExistFileOrLevel(actualFp)) 
+		{
+			continue;
+		}
+
+		fp = scene->getDefaultLevelPath(TZP_XSHLEVEL, levelName); 
+		actualFp = scene->decodeFilePath(fp);
+
+		if (TSystem::doesExistFileOrLevel(actualFp)) 
+		{
+			continue;
+		}
+
+		fp = scene->getDefaultLevelPath(OVL_XSHLEVEL, levelName); 
+		actualFp = scene->decodeFilePath(fp);
+
+		if (TSystem::doesExistFileOrLevel(actualFp)) 
+		{
+			continue;
+		}
+
+		fp = scene->getDefaultLevelPath(TZI_XSHLEVEL, levelName);
+		actualFp = scene->decodeFilePath(fp);
+
+		if (TSystem::doesExistFileOrLevel(actualFp))
+		{
+			continue;
+		}
+
+		break;
+	}
+
+	m_nameFld->setText(QString::fromStdWString(levelName));
+
+}
+
+
+
 void LevelCreatePopup::showEvent(QShowEvent *)
 {
+	nextName();
 	update();
 }
 
@@ -352,7 +420,7 @@ void LevelCreatePopup::onLevelTypeChanged(const QString &text)
 		setSizeWidgetEnable(true);
 	else
 		setSizeWidgetEnable(false);
-	updatePath();
+	updatePath(text);
 }
 
 //-----------------------------------------------------------------------------
@@ -536,7 +604,7 @@ bool LevelCreatePopup::apply()
 
 void LevelCreatePopup::update()
 {
-	updatePath();
+	updatePath(QString::fromStdString(std::to_string(Preferences::instance()->getDefLevelType())));
 	Preferences *pref = Preferences::instance();
 
 	m_widthFld->setValue(pref->getDefLevelWidth());
