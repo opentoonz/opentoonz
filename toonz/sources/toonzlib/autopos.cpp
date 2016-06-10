@@ -3,7 +3,7 @@
 #include "autopos.h"
 #include "cleanupcommon.h"
 
-#include <strstream>
+#include <sstream>
 
 using namespace CleanupTypes;
 
@@ -12,7 +12,7 @@ guardare DAFARE
 guardare assumo
 autoalign rgb ->ora viene chiamata con un buffer rgbm ! modificare opportunamente
 
-fare resize e realloc size dello stack a 65000 unita' 
+fare resize e realloc size dello stack a 65000 unita'
 
 */
 
@@ -28,7 +28,7 @@ static int Debug_flag = FALSE;
 /*===========================================================================*/
 /*
 
-     AUTOALIGNMENT 
+     AUTOALIGNMENT
 
 
 */
@@ -451,7 +451,7 @@ if (    image->orientation != TOR_LEFTBOT  &&
 
 */
 /*
- * Calcoli in millimetri per questa funzione che alla fine restituisce un 
+ * Calcoli in millimetri per questa funzione che alla fine restituisce un
  * valore per la striscia di ricerca direttamente in pixel
  */
 
@@ -700,7 +700,7 @@ static int find_dots_bw(const TRasterP &img, int strip_width, PEGS_SIDE pegs_sid
 		ysize = strip_width;
 		vertical = FALSE;
 		break;
-		
+
 	case PEGS_LEFT:
 	case PEGS_RIGHT:
 		x0 = pegs_side == PEGS_LEFT ? 0 : img->lx - strip_width;
@@ -711,10 +711,9 @@ static int find_dots_bw(const TRasterP &img, int strip_width, PEGS_SIDE pegs_sid
 		break;
 
 	default: {
-		ostrstream os;
+	        std::ostringstream os;
 		os << "find dots internal error: pegs_side = " << std::hex << pegs_side << '\0';
-		os.freeze(false);
-		throw TCleanupException(os.str());
+		throw TCleanupException(os.str().c_str());
 		x0 = y0 = xsize = ysize = vertical = 0;
 	}
 	}
@@ -844,10 +843,9 @@ static int find_dots_gr8(const TRasterGR8P &img, int strip_width, PEGS_SIDE pegs
 		vertical = TRUE;
 		break;
 	default: {
-		std::ostrstream os;
+		std::ostringstream os;
 		os << "find dots internal error: pegs_side = " << std::hex << pegs_side << '\0';
-		os.freeze(false);
-		throw TCleanupException(os.str());
+		throw TCleanupException(os.str().c_str());
 		x0 = y0 = xsize = ysize = vertical = 0;
 	}
 	}
@@ -973,10 +971,9 @@ static int find_dots_rgb(const TRaster32P &img, int strip_width, PEGS_SIDE pegs_
 		vertical = TRUE;
 		break;
 	default: {
-		std::ostrstream os;
+		std::ostringstream os;
 		os << "find dots internal error: pegs_side = " << std::hex << pegs_side << '\0';
-		os.freeze(false);
-		throw TCleanupException(os.str());
+		throw TCleanupException(os.str().c_str());
 		x0 = y0 = xsize = ysize = vertical = 0;
 		break;
 	}

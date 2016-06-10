@@ -22,7 +22,7 @@ const char wauxslash = '\\';
 #include "tconvert.h"
 #include <cmath>
 #include <cctype>
-#include <strstream>
+#include <sstream>
 
 bool TFilePath::m_underscoreFormatAllowed = true;
 
@@ -49,8 +49,7 @@ std::string TFrameId::expand(FrameFormat format) const
 		return "";
 	else if (m_frame == NO_FRAME)
 		return "-";
-	char buffer[80];
-	std::ostrstream o_buff(buffer, sizeof(buffer));
+	std::ostringstream o_buff;
 	if (format == FOUR_ZEROS || format == UNDERSCORE_FOUR_ZEROS) {
 		o_buff.fill('0');
 		o_buff.width(4);
@@ -61,8 +60,7 @@ std::string TFrameId::expand(FrameFormat format) const
 	}
 	if (m_letter != '\0')
 		o_buff << m_letter;
-	int len = o_buff.pcount();
-	return std::string(buffer, len);
+	return std::string(o_buff.str());
 }
 
 //-------------------------------------------------------------------
@@ -117,9 +115,9 @@ inline int getLastSlash(const std::wstring &path)
 void TFilePath::setPath(string path)
 {
 bool isUncName = false;
-  // elimino i '//', './' e '/' finali; raddrizzo gli slash 'storti'. 
+  // elimino i '//', './' e '/' finali; raddrizzo gli slash 'storti'.
   // se il path comincia con  "<alpha>:" aggiungo uno slash
-  int length =path.length();   
+  int length =path.length();
   int pos = 0;
   if(path.length()>=2 && isalpha(path[0]) && path[1] == ':')
     {
@@ -141,13 +139,13 @@ bool isUncName = false;
     if(path[pos] == '.')
     {
       pos++;
-      if(pos>=length) 
+      if(pos>=length)
       {
         if(pos>1) m_path.append(1,'.');
       }
       else if(!isSlash(path[pos])) m_path.append(path,pos-1,2);
       else {
-         while(pos+1<length && isSlash(path[pos+1])) 
+         while(pos+1<length && isSlash(path[pos+1]))
            pos++;
       }
     }
@@ -169,7 +167,7 @@ bool isUncName = false;
          m_path.length()==3 && isalpha(m_path[0]) && m_path[1] == ':' && m_path[2] == slash)
       && m_path.length()>1 && m_path[m_path.length()-1] == slash)
       m_path.erase(m_path.length()-1, 1);
-  
+
   if (isUncName && m_path.find_last_of('\\') == 1) // e' indicato solo il nome della macchina...
     m_path.append(1, slash);
 }
@@ -181,9 +179,9 @@ void append(string &out, wchar_t c)
 {
   if(32 <= c && c<=127 && c!='&') out.append(1, (char)c);
   else if(c=='&') out.append("&amp;");
-  else 
+  else
     {
-     ostrstream ss;
+     ostringstream ss;
      ss << "&#" <<  c << ";" << '\0';
      out += ss.str();
      ss.freeze(0);
@@ -421,7 +419,7 @@ const std::wstring TFilePath::getWideString() const
     {
      char c = m_path[i];
      if(c!='&') s.append(1, (unsigned short)c);
-     else 
+     else
        {
         i++;
         if(m_path[i] == '#')
@@ -441,7 +439,7 @@ const std::wstring TFilePath::getWideString() const
                 break;
               i++;
              }
-           s.append(1, w);           
+           s.append(1, w);
           }
        }
     }
@@ -483,9 +481,9 @@ TFilePath TFilePath::operator+ (const TFilePath &fp) const
 assert(!fp.isAbsolute());
 if(fp.isEmpty()) return *this;
 else if(isEmpty()) return fp;
-else if(m_path.length()!=1 || m_path[0] != slash) 
+else if(m_path.length()!=1 || m_path[0] != slash)
   return TFilePath(m_path + slash + fp.m_path);
-else 
+else
   return TFilePath(m_path + fp.m_path);
 }
 */

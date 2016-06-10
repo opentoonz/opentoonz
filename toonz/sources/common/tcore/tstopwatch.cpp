@@ -2,7 +2,7 @@
 
 #include "tstopwatch.h"
 
-#include <strstream>
+#include <sstream>
 
 #ifdef _WIN32
 #include <stdlib.h>
@@ -353,10 +353,9 @@ TUINT32 TStopWatch::getSystemTime()
 
 TStopWatch::operator string()
 {
-	char buffer[256];
-	ostrstream out(buffer, sizeof(buffer));
+	ostringstream out;
 	out << m_name.c_str() << ": " << (int)getTotalTime() << " u" << (int)getUserTime() << " s" << (TINT32)getSystemTime();
-	return string(buffer, out.pcount());
+	return string(out.str());
 }
 
 //------------------------------------------------------------
