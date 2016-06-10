@@ -171,7 +171,7 @@ private:
 				char *sysErr = strerror(errorCode);
 				ostringstream os;
 				os << errorCode << '\0';
-				return string(sysErr) + "(" + os.str().c_str() + ")";
+				return string(sysErr) + "(" + os.str() + ")";
 				break;
 			}
 			return "";

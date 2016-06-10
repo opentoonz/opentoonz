@@ -60,7 +60,7 @@ std::string TFrameId::expand(FrameFormat format) const
 	}
 	if (m_letter != '\0')
 		o_buff << m_letter;
-	return std::string(o_buff.str());
+	return o_buff.str();
 }
 
 //-------------------------------------------------------------------
