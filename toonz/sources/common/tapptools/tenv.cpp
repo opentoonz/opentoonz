@@ -638,8 +638,7 @@ std::string toString2(T value)
 {
 	std::ostringstream ss;
 	ss << value << '\0';
-	std::string s(ss.str());
-	return s;
+	return ss.str();
 }
 
 template <>
@@ -647,8 +646,7 @@ std::string toString2(TRect value)
 {
 	std::ostringstream ss;
 	ss << value.x0 << " " << value.y0 << " " << value.x1 << " " << value.y1 << '\0';
-	std::string s = ss.str();
-	return s;
+	return ss.str();
 }
 
 template <class T>

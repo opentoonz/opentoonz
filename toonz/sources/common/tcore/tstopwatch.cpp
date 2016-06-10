@@ -355,7 +355,7 @@ TStopWatch::operator string()
 {
 	ostringstream out;
 	out << m_name.c_str() << ": " << (int)getTotalTime() << " u" << (int)getUserTime() << " s" << (TINT32)getSystemTime();
-	return string(out.str());
+	return out.str();
 }
 
 //------------------------------------------------------------
