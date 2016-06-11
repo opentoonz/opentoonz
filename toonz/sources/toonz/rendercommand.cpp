@@ -177,6 +177,7 @@ class RenderCommand
 	TFilePath m_fp;
 	int m_numFrames;
 	TPixel32 m_oldBgColor;
+	static TPixel32 m_priorBgColor;
 	TDimension m_oldCameraRes;
 	double m_r, m_stepd;
 	double m_timeStretchFactor;
@@ -197,6 +198,7 @@ public:
 	void multimediaRender();
 	void onRender();
 	void onPreview();
+	static void resetBgColor();
 	void doRender(bool isPreview);
 };
 
@@ -414,6 +416,7 @@ public:
 		Message(this, -1, "").send();
 		OnRenderCompleted(fp, m_error).send();
 		m_error = false;
+		RenderCommand::resetBgColor();
 	}
 
 	void onCancel()
@@ -422,6 +425,7 @@ public:
 		setLabelText("Aborting render...");
 		reset();
 		hide();
+		RenderCommand::resetBgColor();
 	}
 };
 
@@ -453,6 +457,7 @@ void RenderCommand::rasterRender(bool isPreview)
 #endif
 
 	TPixel32 currBgColor = scene->getProperties()->getBgColor();
+	m_priorBgColor = currBgColor;
 	if (ext == "jpg" || ext == "avi" || ext == "bmp")
 	{
 		currBgColor.m = 255;
@@ -540,6 +545,15 @@ void RenderCommand::rasterRender(bool isPreview)
 	//FileViewerPopupPool::instance()->getCurrent()->onClose();
 
 	movieRenderer.start();
+}
+
+
+TPixel32 RenderCommand::m_priorBgColor;
+
+void RenderCommand::resetBgColor()
+{
+	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+	scene->getProperties()->setBgColor(m_priorBgColor);
 }
 
 //===================================================================
