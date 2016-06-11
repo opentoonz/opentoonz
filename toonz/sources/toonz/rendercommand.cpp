@@ -452,6 +452,13 @@ void RenderCommand::rasterRender(bool isPreview)
 	}
 #endif
 
+	TPixel32 currBgColor = scene->getProperties()->getBgColor();
+	if (ext == "jpg" || ext == "avi" || ext == "bmp")
+	{
+		currBgColor.m = 255;
+		scene->getProperties()->setBgColor(currBgColor);
+	}
+
 	//Extract output properties
 	TOutputProperties *prop = isPreview ? scene->getProperties()->getPreviewProperties() : scene->getProperties()->getOutputProperties();
 
