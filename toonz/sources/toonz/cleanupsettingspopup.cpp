@@ -826,7 +826,6 @@ public:
 //    Open Popup Command
 //**********************************************************************
 
-/*
 class CleanupSettingsFactory : public TPanelFactory
 {
 public:
@@ -848,6 +847,5 @@ public:
   }
 
 } cleanupSettingsFactory;
-*/
 
 OpenFloatingPanel cleanupSettingsCommand(MI_CleanupSettings, "CleanupSettings", QObject::tr("Cleanup Settings"));

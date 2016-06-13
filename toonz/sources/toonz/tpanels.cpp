@@ -1318,6 +1318,7 @@ OpenFloatingPanel openComboViewerCommand(MI_OpenComboViewer, "ComboViewer", QObj
 // CleanupSettings DockWindow
 //-----------------------------------------------------------------------------
 
+#if 0
 class CleanupSettingsFactory : public TPanelFactory
 {
 public:
@@ -1330,6 +1331,7 @@ public:
 	}
 
 } cleanupSettingsFactory;
+#endif
 
 //=============================================================================
 OpenFloatingPanel openCleanupSettingsDockCommand(MI_OpenCleanupSettings, "CleanupSettings", QObject::tr("Cleanup Settings"));
