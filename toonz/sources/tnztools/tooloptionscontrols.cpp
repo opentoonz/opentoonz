@@ -350,6 +350,7 @@ ToolOptionIntPairSlider::ToolOptionIntPairSlider(TTool *tool,
   TIntPairProperty::Value value = property->getValue();
   TIntPairProperty::Range range = property->getRange();
   setRange(range.first, range.second);
+  setMaximumWidth(300);
   updateStatus();
   connect(this, SIGNAL(valuesChanged(bool)), SLOT(onValuesChanged(bool)));
 }
@@ -460,6 +461,7 @@ ToolOptionIntSlider::ToolOptionIntSlider(TTool *tool, TIntProperty *property,
   m_property->addListener(this);
   TIntProperty::Range range = property->getRange();
   setRange(range.first, range.second);
+  setMaximumWidth(300);
   updateStatus();
   connect(this, SIGNAL(valueChanged(bool)), SLOT(onValueChanged(bool)));
   // synchronize the state with the same widgets in other tool option bars

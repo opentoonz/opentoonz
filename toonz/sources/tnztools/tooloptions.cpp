@@ -352,15 +352,13 @@ void ToolOptionControlBuilder::visit(TEnumProperty *p) {
   }
   }
 
-  hLayout()->addWidget(widget, 10);
+  hLayout()->addWidget(widget, 100);
   m_panel->addControl(control);
   hLayout()->addSpacing(5);
 
   if (p->getId() != "") {
     std::string actionName = "A_ToolOption_" + p->getId();
     QAction *a = CommandManager::instance()->getAction(actionName.c_str());
-
-
     if (a) {
       widget->addAction(a);
       QObject::connect(a, SIGNAL(triggered()), widget, SLOT(doShowPopup()));
@@ -1232,6 +1230,7 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
   addSeparator();
   if (tool && tool->getProperties(1)) tool->getProperties(1)->accept(builder);
 
+  hLayout()->addStretch(1);
   m_hardnessField =
       dynamic_cast<ToolOptionSlider *>(m_controls.value("Hardness:"));
   if (m_hardnessField)
@@ -1378,6 +1377,7 @@ PaintbrushToolOptionsBox::PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,
 
   ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
   if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
+  hLayout()->addStretch(1);
 
   m_colorMode = dynamic_cast<ToolOptionCombo *>(m_controls.value("Mode:"));
   m_selectiveMode =
@@ -1706,6 +1706,8 @@ EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
   ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
   if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
 
+  hLayout()->addStretch(1);
+
   m_toolType = dynamic_cast<ToolOptionCombo *>(m_controls.value("Type:"));
   m_hardnessField =
       dynamic_cast<ToolOptionSlider *>(m_controls.value("Hardness:"));
@@ -1952,7 +1954,8 @@ TapeToolOptionsBox::TapeToolOptionsBox(QWidget *parent, TTool *tool,
 
   ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
   if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
-
+  
+  hLayout()->addStretch(1);
   if (!(tool->getTargetType() & TTool::Vectors)) return;
 
   m_smoothMode = dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Smooth"));

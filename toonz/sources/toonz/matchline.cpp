@@ -372,7 +372,7 @@ MatchlinesDialog::MatchlinesDialog()
     {
       inkUsageLay->addWidget(m_button1, 0, 0, 1, 2);
       inkUsageLay->addWidget(m_button2, 1, 0);
-      inkUsageLay->addWidget(m_inkIndex, 1, 1);
+      inkUsageLay->addWidget(m_inkIndex, 1, 1, Qt::AlignLeft);
     }
     inkUsageLay->setColumnStretch(0, 0);
     inkUsageLay->setColumnStretch(1, 1);
