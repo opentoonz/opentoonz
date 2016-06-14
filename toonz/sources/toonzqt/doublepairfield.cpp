@@ -5,6 +5,8 @@
 
 #include "tcommon.h"
 
+#include <cmath>
+
 #include <QLabel>
 #include <QPainter>
 #include <QMouseEvent>
