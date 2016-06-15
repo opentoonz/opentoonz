@@ -10,49 +10,43 @@
 using namespace TSystem;
 
 #ifdef x64
-long TSystem::getCPUExtensions()
-{
-	return TSystem::CpuSupportsSse | TSystem::CpuSupportsSse2; //TSystem::CPUExtensionsNone
+long TSystem::getCPUExtensions() {
+  return TSystem::CpuSupportsSse |
+         TSystem::CpuSupportsSse2;  // TSystem::CPUExtensionsNone
 }
 
 #else
 #ifndef _WIN32
-long TSystem::getCPUExtensions()
-{
-	return TSystem::CPUExtensionsNone;
-}
+long TSystem::getCPUExtensions() { return TSystem::CPUExtensionsNone; }
 #else
-namespace
-{
+namespace {
 
 long CPUExtensionsAvailable = TSystem::CPUExtensionsNone;
-bool CPUExtensionsEnabled = true;
-bool FistTime = true;
+bool CPUExtensionsEnabled   = true;
+bool FistTime               = true;
 
 //#ifdef _WIN32
 
 //------------------------------------------------------------------------------
 
-long CPUCheckForSSESupport()
-{
-	__try {
-		//		__asm andps xmm0,xmm0
+long CPUCheckForSSESupport() {
+  __try {
+    //		__asm andps xmm0,xmm0
 
-		__asm _emit 0x0f __asm _emit 0x54 __asm _emit 0xc0
+    __asm _emit 0x0f __asm _emit 0x54 __asm _emit 0xc0
 
-	} __except (EXCEPTION_EXECUTE_HANDLER) {
-		if (_exception_code() == STATUS_ILLEGAL_INSTRUCTION)
-			CPUExtensionsAvailable &= ~(CpuSupportsSse | CpuSupportsSse2);
-	}
+  } __except (EXCEPTION_EXECUTE_HANDLER) {
+    if (_exception_code() == STATUS_ILLEGAL_INSTRUCTION)
+      CPUExtensionsAvailable &= ~(CpuSupportsSse | CpuSupportsSse2);
+  }
 
-	return CPUExtensionsAvailable;
+  return CPUExtensionsAvailable;
 }
 
 //------------------------------------------------------------------------------
 
-long __declspec(naked) CPUCheckForExtensions()
-{
-	__asm {
+long __declspec(naked) CPUCheckForExtensions() {
+        __asm {
 		push	ebp
 		push	edi
 		push	esi
@@ -149,22 +143,20 @@ nocheck:
 
 //#endif
 //#endif
-} // anonymous namespace
+}  // anonymous namespace
 
 //------------------------------------------------------------------------------
 
-long TSystem::getCPUExtensions()
-{
+long TSystem::getCPUExtensions() {
+  if (FistTime) {
+    CPUCheckForExtensions();
+    FistTime = false;
+  }
 
-	if (FistTime) {
-		CPUCheckForExtensions();
-		FistTime = false;
-	}
-
-	if (CPUExtensionsEnabled)
-		return CPUExtensionsAvailable;
-	else
-		return TSystem::CPUExtensionsNone;
+  if (CPUExtensionsEnabled)
+    return CPUExtensionsAvailable;
+  else
+    return TSystem::CPUExtensionsNone;
 }
 
 #endif

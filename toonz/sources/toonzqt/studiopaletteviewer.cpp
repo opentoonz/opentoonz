@@ -48,1083 +48,1063 @@ using namespace PaletteViewerGUI;
 using namespace DVGui;
 
 //=============================================================================
-namespace
-{
+namespace {
 //-----------------------------------------------------------------------------
 /*! Return true if path is in folder \b rootPath of \b StudioPalette.
 */
-bool isInStudioPaletteFolder(TFilePath path, TFilePath rootPath)
-{
-	if (path.getType() != "tpl")
-		return false;
-	StudioPalette *studioPalette = StudioPalette::instance();
-	std::vector<TFilePath> childrenPath;
-	studioPalette->getChildren(childrenPath, rootPath);
-	int i;
-	for (i = 0; i < (int)childrenPath.size(); i++) {
-		if (path == childrenPath[i])
-			return true;
-		else if (isInStudioPaletteFolder(path, childrenPath[i]))
-			return true;
-	}
-	return false;
+bool isInStudioPaletteFolder(TFilePath path, TFilePath rootPath) {
+  if (path.getType() != "tpl") return false;
+  StudioPalette *studioPalette = StudioPalette::instance();
+  std::vector<TFilePath> childrenPath;
+  studioPalette->getChildren(childrenPath, rootPath);
+  int i;
+  for (i = 0; i < (int)childrenPath.size(); i++) {
+    if (path == childrenPath[i])
+      return true;
+    else if (isInStudioPaletteFolder(path, childrenPath[i]))
+      return true;
+  }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
 /*! Return true if path is in a \b StudioPalette folder.
 */
-bool isInStudioPalette(TFilePath path)
-{
-	if (path.getType() != "tpl")
-		return false;
-	StudioPalette *studioPalette = StudioPalette::instance();
-	if (isInStudioPaletteFolder(path, studioPalette->getLevelPalettesRoot()))
-		return true;
-	if (isInStudioPaletteFolder(path, studioPalette->getProjectPalettesRoot()))
-		return true;
-	return false;
+bool isInStudioPalette(TFilePath path) {
+  if (path.getType() != "tpl") return false;
+  StudioPalette *studioPalette = StudioPalette::instance();
+  if (isInStudioPaletteFolder(path, studioPalette->getLevelPalettesRoot()))
+    return true;
+  if (isInStudioPaletteFolder(path, studioPalette->getProjectPalettesRoot()))
+    return true;
+  return false;
 }
 
 //-----------------------------------------------------------------------------
-} //namespace
+}  // namespace
 //-----------------------------------------------------------------------------
 
 //=============================================================================
 // StudioPaletteTreeViewer
 //-----------------------------------------------------------------------------
 
-StudioPaletteTreeViewer::StudioPaletteTreeViewer(QWidget *parent,
-												 TPaletteHandle *studioPaletteHandle,
-												 TPaletteHandle *levelPaletteHandle,
-												 TXsheetHandle *xsheetHandle,
-												 TXshLevelHandle *currentLevelHandle)
-	: QTreeWidget(parent), m_dropItem(0), m_studioPaletteHandle(studioPaletteHandle), m_levelPaletteHandle(levelPaletteHandle), m_currentLevelHandle(currentLevelHandle), m_xsheetHandle(xsheetHandle), m_folderIcon(QIcon()), m_levelPaletteIcon(QIcon()), m_studioPaletteIcon(QIcon())
-{
-	setIndentation(14);
-	setAlternatingRowColors(true);
+StudioPaletteTreeViewer::StudioPaletteTreeViewer(
+    QWidget *parent, TPaletteHandle *studioPaletteHandle,
+    TPaletteHandle *levelPaletteHandle, TXsheetHandle *xsheetHandle,
+    TXshLevelHandle *currentLevelHandle)
+    : QTreeWidget(parent)
+    , m_dropItem(0)
+    , m_studioPaletteHandle(studioPaletteHandle)
+    , m_levelPaletteHandle(levelPaletteHandle)
+    , m_currentLevelHandle(currentLevelHandle)
+    , m_xsheetHandle(xsheetHandle)
+    , m_folderIcon(QIcon())
+    , m_levelPaletteIcon(QIcon())
+    , m_studioPaletteIcon(QIcon()) {
+  setIndentation(14);
+  setAlternatingRowColors(true);
 
-	header()->close();
-	setUniformRowHeights(true);
-	setIconSize(QSize(21, 17));
+  header()->close();
+  setUniformRowHeights(true);
+  setIconSize(QSize(21, 17));
 
-	QList<QTreeWidgetItem *> paletteItems;
+  QList<QTreeWidgetItem *> paletteItems;
 
-	QString open = QString(":Resources/folder_close.png");
-	QString close = QString(":Resources/folder_open.png");
-	m_folderIcon.addFile(close, QSize(21, 17), QIcon::Normal, QIcon::On);
-	m_folderIcon.addFile(open, QSize(21, 17), QIcon::Normal, QIcon::Off);
+  QString open  = QString(":Resources/folder_close.png");
+  QString close = QString(":Resources/folder_open.png");
+  m_folderIcon.addFile(close, QSize(21, 17), QIcon::Normal, QIcon::On);
+  m_folderIcon.addFile(open, QSize(21, 17), QIcon::Normal, QIcon::Off);
 
-	QString levelPaletteIcon = QString(":Resources/palette.png");
-	m_levelPaletteIcon.addPixmap(levelPaletteIcon, QIcon::Normal, QIcon::On);
-	QString studioPaletteIcon = QString(":Resources/studiopalette.png");
-	m_studioPaletteIcon.addPixmap(studioPaletteIcon, QIcon::Normal, QIcon::On);
+  QString levelPaletteIcon = QString(":Resources/palette.png");
+  m_levelPaletteIcon.addPixmap(levelPaletteIcon, QIcon::Normal, QIcon::On);
+  QString studioPaletteIcon = QString(":Resources/studiopalette.png");
+  m_studioPaletteIcon.addPixmap(studioPaletteIcon, QIcon::Normal, QIcon::On);
 
-	StudioPalette *studioPalette = StudioPalette::instance();
+  StudioPalette *studioPalette = StudioPalette::instance();
 
-	TFilePath levelPalettePath = studioPalette->getLevelPalettesRoot();
-	paletteItems.append(createRootItem(levelPalettePath));
+  TFilePath levelPalettePath = studioPalette->getLevelPalettesRoot();
+  paletteItems.append(createRootItem(levelPalettePath));
 
-	TFilePath projectPalettePath = studioPalette->getProjectPalettesRoot();
-	if (TSystem::doesExistFileOrLevel(projectPalettePath))
-		paletteItems.append(createRootItem(projectPalettePath));
+  TFilePath projectPalettePath = studioPalette->getProjectPalettesRoot();
+  if (TSystem::doesExistFileOrLevel(projectPalettePath))
+    paletteItems.append(createRootItem(projectPalettePath));
 
-	insertTopLevelItems(0, paletteItems);
+  insertTopLevelItems(0, paletteItems);
 
-	bool ret = connect(this, SIGNAL(itemChanged(QTreeWidgetItem *, int)), SLOT(onItemChanged(QTreeWidgetItem *, int)));
-	ret = ret && connect(this, SIGNAL(itemClicked(QTreeWidgetItem *, int)), SLOT(onItemClicked(QTreeWidgetItem *, int)));
-	ret = ret && connect(this, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-						 SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
-	ret = ret && connect(this, SIGNAL(itemClicked(QTreeWidgetItem *, int)), this, SLOT(onTreeItemExpanded(QTreeWidgetItem *)));
+  bool ret = connect(this, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+                     SLOT(onItemChanged(QTreeWidgetItem *, int)));
+  ret = ret && connect(this, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+                       SLOT(onItemClicked(QTreeWidgetItem *, int)));
+  ret =
+      ret &&
+      connect(this,
+              SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
+              SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
+  ret = ret && connect(this, SIGNAL(itemClicked(QTreeWidgetItem *, int)), this,
+                       SLOT(onTreeItemExpanded(QTreeWidgetItem *)));
 
-	//refresh tree with shortcut key
-	QAction *refreshAct = CommandManager::instance()->getAction(MI_RefreshTree);
-	ret = ret && connect(refreshAct, SIGNAL(triggered()), this, SLOT(onRefreshTreeShortcutTriggered()));
-	addAction(refreshAct);
+  // refresh tree with shortcut key
+  QAction *refreshAct = CommandManager::instance()->getAction(MI_RefreshTree);
+  ret                 = ret && connect(refreshAct, SIGNAL(triggered()), this,
+                       SLOT(onRefreshTreeShortcutTriggered()));
+  addAction(refreshAct);
 
-	m_palettesScanPopup = new PalettesScanPopup();
+  m_palettesScanPopup = new PalettesScanPopup();
 
-	setAcceptDrops(true);
+  setAcceptDrops(true);
 
-	//Per la selezione multipla
-	setSelectionMode(QAbstractItemView::ExtendedSelection);
+  // Per la selezione multipla
+  setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-	StudioPalette::instance()->addListener(this);
-	TProjectManager::instance()->addListener(this);
+  StudioPalette::instance()->addListener(this);
+  TProjectManager::instance()->addListener(this);
 
-	refresh();
+  refresh();
 
-	assert(ret);
+  assert(ret);
 }
 
 //-----------------------------------------------------------------------------
 
-StudioPaletteTreeViewer::~StudioPaletteTreeViewer()
-{
-	StudioPalette::instance()->removeListener(this);
-	TProjectManager::instance()->removeListener(this);
+StudioPaletteTreeViewer::~StudioPaletteTreeViewer() {
+  StudioPalette::instance()->removeListener(this);
+  TProjectManager::instance()->removeListener(this);
 }
 
 //-----------------------------------------------------------------------------
-void StudioPaletteTreeViewer::setCurrentLevelHandle(TXshLevelHandle *currentLevelHandle)
-{
-	m_currentLevelHandle = currentLevelHandle;
+void StudioPaletteTreeViewer::setCurrentLevelHandle(
+    TXshLevelHandle *currentLevelHandle) {
+  m_currentLevelHandle = currentLevelHandle;
 }
 
 //---------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::setLevelPaletteHandle(TPaletteHandle *paletteHandle)
-{
-	m_levelPaletteHandle = paletteHandle;
+void StudioPaletteTreeViewer::setLevelPaletteHandle(
+    TPaletteHandle *paletteHandle) {
+  m_levelPaletteHandle = paletteHandle;
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::setStdPaletteHandle(TPaletteHandle *studioPaletteHandle)
-{
-	m_studioPaletteHandle = studioPaletteHandle;
+void StudioPaletteTreeViewer::setStdPaletteHandle(
+    TPaletteHandle *studioPaletteHandle) {
+  m_studioPaletteHandle = studioPaletteHandle;
 }
 
 //-----------------------------------------------------------------------------
 
-QTreeWidgetItem *StudioPaletteTreeViewer::createRootItem(TFilePath path)
-{
-	QString rootName = QString::fromStdWString(path.getWideName());
-	if (rootName != "Toonz Palettes")
-		rootName = "Project Palettes";
-	QTreeWidgetItem *rootItem = new QTreeWidgetItem((QTreeWidget *)0, QStringList(rootName));
-	rootItem->setIcon(0, m_folderIcon);
-	rootItem->setData(1, Qt::UserRole, toQString(path));
+QTreeWidgetItem *StudioPaletteTreeViewer::createRootItem(TFilePath path) {
+  QString rootName = QString::fromStdWString(path.getWideName());
+  if (rootName != "Toonz Palettes") rootName = "Project Palettes";
+  QTreeWidgetItem *rootItem =
+      new QTreeWidgetItem((QTreeWidget *)0, QStringList(rootName));
+  rootItem->setIcon(0, m_folderIcon);
+  rootItem->setData(1, Qt::UserRole, toQString(path));
 
-	refreshItem(rootItem);
+  refreshItem(rootItem);
 
-	return rootItem;
+  return rootItem;
 }
 
 //-----------------------------------------------------------------------------
 
-bool StudioPaletteTreeViewer::isRootItem(QTreeWidgetItem *item)
-{
-	assert(item);
-	TFilePath path = getItemPath(item);
+bool StudioPaletteTreeViewer::isRootItem(QTreeWidgetItem *item) {
+  assert(item);
+  TFilePath path = getItemPath(item);
 
-	StudioPalette *studioPalette = StudioPalette::instance();
-	if (path == studioPalette->getLevelPalettesRoot() ||
-		path == studioPalette->getProjectPalettesRoot())
-		return true;
+  StudioPalette *studioPalette = StudioPalette::instance();
+  if (path == studioPalette->getLevelPalettesRoot() ||
+      path == studioPalette->getProjectPalettesRoot())
+    return true;
 
-	return false;
+  return false;
 }
 
 //-----------------------------------------------------------------------------
 
-QTreeWidgetItem *StudioPaletteTreeViewer::createItem(const TFilePath path)
-{
-	StudioPalette *studioPalette = StudioPalette::instance();
-	QString itemName = toQString(TFilePath(path.getWideName()));
-	QTreeWidgetItem *item = new QTreeWidgetItem((QTreeWidget *)0, QStringList(itemName));
-	if (studioPalette->isPalette(path)) {
-		if (studioPalette->hasGlobalName(path))
-			item->setIcon(0, m_studioPaletteIcon);
-		else
-			item->setIcon(0, m_levelPaletteIcon);
-	} else if (studioPalette->isFolder(path))
-		item->setIcon(0, m_folderIcon);
-	item->setData(1, Qt::UserRole, toQString(path));
-	item->setFlags(item->flags() | Qt::ItemIsEditable);
+QTreeWidgetItem *StudioPaletteTreeViewer::createItem(const TFilePath path) {
+  StudioPalette *studioPalette = StudioPalette::instance();
+  QString itemName             = toQString(TFilePath(path.getWideName()));
+  QTreeWidgetItem *item =
+      new QTreeWidgetItem((QTreeWidget *)0, QStringList(itemName));
+  if (studioPalette->isPalette(path)) {
+    if (studioPalette->hasGlobalName(path))
+      item->setIcon(0, m_studioPaletteIcon);
+    else
+      item->setIcon(0, m_levelPaletteIcon);
+  } else if (studioPalette->isFolder(path))
+    item->setIcon(0, m_folderIcon);
+  item->setData(1, Qt::UserRole, toQString(path));
+  item->setFlags(item->flags() | Qt::ItemIsEditable);
 
-	return item;
+  return item;
 }
 
 //-----------------------------------------------------------------------------
 
-TFilePath StudioPaletteTreeViewer::getItemPath(QTreeWidgetItem *item)
-{
-	TFilePath path = (item) ? TFilePath(item->data(1, Qt::UserRole).toString().toStdWString())
-							: TFilePath();
-	return path;
+TFilePath StudioPaletteTreeViewer::getItemPath(QTreeWidgetItem *item) {
+  TFilePath path =
+      (item) ? TFilePath(item->data(1, Qt::UserRole).toString().toStdWString())
+             : TFilePath();
+  return path;
 }
 
 //-----------------------------------------------------------------------------
 
-TFilePath StudioPaletteTreeViewer::getCurrentFolderPath()
-{
-	return getItemPath(currentItem());
+TFilePath StudioPaletteTreeViewer::getCurrentFolderPath() {
+  return getItemPath(currentItem());
 }
 
 //-----------------------------------------------------------------------------
 
-QTreeWidgetItem *StudioPaletteTreeViewer::getItem(const TFilePath path)
-{
-	QList<QTreeWidgetItem *> oldItems = findItems(QString(""), Qt::MatchContains, 0);
-	if (oldItems.isEmpty())
-		return 0;
-	int i;
-	for (i = 0; i < (int)oldItems.size(); i++) {
-		TFilePath oldItemPath(oldItems[i]->data(1, Qt::UserRole).toString().toStdWString());
-		if (oldItemPath == path)
-			return oldItems[i];
-		else {
-			QTreeWidgetItem *item = getFolderItem(oldItems[i], path);
-			if (item)
-				return item;
-		}
-	}
-	return 0;
+QTreeWidgetItem *StudioPaletteTreeViewer::getItem(const TFilePath path) {
+  QList<QTreeWidgetItem *> oldItems =
+      findItems(QString(""), Qt::MatchContains, 0);
+  if (oldItems.isEmpty()) return 0;
+  int i;
+  for (i = 0; i < (int)oldItems.size(); i++) {
+    TFilePath oldItemPath(
+        oldItems[i]->data(1, Qt::UserRole).toString().toStdWString());
+    if (oldItemPath == path)
+      return oldItems[i];
+    else {
+      QTreeWidgetItem *item = getFolderItem(oldItems[i], path);
+      if (item) return item;
+    }
+  }
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
 
-QTreeWidgetItem *StudioPaletteTreeViewer::getFolderItem(QTreeWidgetItem *parent, const TFilePath path)
-{
-	int childrenCount = parent->childCount();
-	int i;
-	for (i = 0; i < childrenCount; i++) {
-		QTreeWidgetItem *item = parent->child(i);
-		if (getItemPath(item) == path)
-			return item;
-		else {
-			item = getFolderItem(item, path);
-			if (item)
-				return item;
-		}
-	}
-	return 0;
+QTreeWidgetItem *StudioPaletteTreeViewer::getFolderItem(QTreeWidgetItem *parent,
+                                                        const TFilePath path) {
+  int childrenCount = parent->childCount();
+  int i;
+  for (i = 0; i < childrenCount; i++) {
+    QTreeWidgetItem *item = parent->child(i);
+    if (getItemPath(item) == path)
+      return item;
+    else {
+      item = getFolderItem(item, path);
+      if (item) return item;
+    }
+  }
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::resetDropItem()
-{
-	if (!m_dropItem)
-		return;
-	m_dropItem->setTextColor(0, Qt::black);
-	m_dropItem = 0;
+void StudioPaletteTreeViewer::resetDropItem() {
+  if (!m_dropItem) return;
+  m_dropItem->setTextColor(0, Qt::black);
+  m_dropItem = 0;
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::refresh()
-{
-	m_openedItems.clear();
+void StudioPaletteTreeViewer::refresh() {
+  m_openedItems.clear();
 
-	StudioPalette *studioPalette = StudioPalette::instance();
+  StudioPalette *studioPalette = StudioPalette::instance();
 
-	TFilePath levelPalettePath = studioPalette->getLevelPalettesRoot();
-	refreshItem(getItem(levelPalettePath));
+  TFilePath levelPalettePath = studioPalette->getLevelPalettesRoot();
+  refreshItem(getItem(levelPalettePath));
 
-	TFilePath projectPalettePath = studioPalette->getProjectPalettesRoot();
-	if (!TSystem::doesExistFileOrLevel(projectPalettePath))
-		return;
-	refreshItem(getItem(projectPalettePath));
+  TFilePath projectPalettePath = studioPalette->getProjectPalettesRoot();
+  if (!TSystem::doesExistFileOrLevel(projectPalettePath)) return;
+  refreshItem(getItem(projectPalettePath));
 
-	//refresh all expanded items
-	QList<QTreeWidgetItem *> items = findItems(QString(""), Qt::MatchContains | Qt::MatchRecursive, 0);
-	if (items.isEmpty())
-		return;
+  // refresh all expanded items
+  QList<QTreeWidgetItem *> items =
+      findItems(QString(""), Qt::MatchContains | Qt::MatchRecursive, 0);
+  if (items.isEmpty()) return;
 
-	for (int i = 0; i < (int)items.size(); i++)
-		if (items[i]->isExpanded())
-			refreshItem(items[i]);
+  for (int i = 0; i < (int)items.size(); i++)
+    if (items[i]->isExpanded()) refreshItem(items[i]);
 }
 
 //-----------------------------------------------------------------------------
-/*!When expand a tree, prepare the child items of it 
+/*!When expand a tree, prepare the child items of it
 */
-void StudioPaletteTreeViewer::onTreeItemExpanded(QTreeWidgetItem *item)
-{
-	if (!item)
-		return;
+void StudioPaletteTreeViewer::onTreeItemExpanded(QTreeWidgetItem *item) {
+  if (!item) return;
 
-	//if this item was not yet opened, then get the children of this item
-	if (!m_openedItems.contains(item))
-		refreshItem(item);
+  // if this item was not yet opened, then get the children of this item
+  if (!m_openedItems.contains(item)) refreshItem(item);
 
-	//expand the item
-	item->setExpanded(!item->isExpanded());
+  // expand the item
+  item->setExpanded(!item->isExpanded());
 }
 
 //-----------------------------------------------------------------------------
 /*! Refresh tree only when this widget has focus
 */
-void StudioPaletteTreeViewer::onRefreshTreeShortcutTriggered()
-{
-	if (hasFocus())
-		refresh();
+void StudioPaletteTreeViewer::onRefreshTreeShortcutTriggered() {
+  if (hasFocus()) refresh();
 }
 
 //-----------------------------------------------------------------------------
 /*! Update the content of item
 */
 
-void StudioPaletteTreeViewer::refreshItem(QTreeWidgetItem *item)
-{
-	TFilePath folderPath = getItemPath(item);
-	assert(folderPath != TFilePath());
-	//correct only tpl files and folders
-	std::vector<TFilePath> childrenPath;
-	StudioPalette::instance()->getChildren(childrenPath, folderPath);
-	int currentChildCount = item->childCount();
-	std::vector<QTreeWidgetItem *> currentChildren;
-	int i;
-	for (i = 0; i < currentChildCount; i++)
-		currentChildren.push_back(item->child(i));
+void StudioPaletteTreeViewer::refreshItem(QTreeWidgetItem *item) {
+  TFilePath folderPath = getItemPath(item);
+  assert(folderPath != TFilePath());
+  // correct only tpl files and folders
+  std::vector<TFilePath> childrenPath;
+  StudioPalette::instance()->getChildren(childrenPath, folderPath);
+  int currentChildCount = item->childCount();
+  std::vector<QTreeWidgetItem *> currentChildren;
+  int i;
+  for (i = 0; i < currentChildCount; i++)
+    currentChildren.push_back(item->child(i));
 
-	int childrenPathCount = childrenPath.size();
-	int itemIndex = 0;
-	int pathIndex = 0;
-	while (itemIndex < currentChildCount || pathIndex < childrenPathCount) {
-		TFilePath path = (pathIndex < childrenPathCount) ? childrenPath[pathIndex] : TFilePath();
+  int childrenPathCount = childrenPath.size();
+  int itemIndex         = 0;
+  int pathIndex         = 0;
+  while (itemIndex < currentChildCount || pathIndex < childrenPathCount) {
+    TFilePath path =
+        (pathIndex < childrenPathCount) ? childrenPath[pathIndex] : TFilePath();
 
-		QTreeWidgetItem *currentItem = (itemIndex < currentChildCount) ? currentChildren[itemIndex] : 0;
-		TFilePath currentItemPath = getItemPath(currentItem);
+    QTreeWidgetItem *currentItem =
+        (itemIndex < currentChildCount) ? currentChildren[itemIndex] : 0;
+    TFilePath currentItemPath = getItemPath(currentItem);
 
-		if (path == currentItemPath) {
-			itemIndex++;
-			pathIndex++;
-		} else if ((!path.isEmpty() && path < currentItemPath) ||
-				   currentItemPath.isEmpty()) {
-			currentItem = createItem(path);
-			item->insertChild(itemIndex, currentItem);
-			itemIndex++;
-			pathIndex++;
-		} else {
-			assert(currentItemPath < path || path.isEmpty());
-			assert(currentItem);
-			item->removeChild(currentItem);
-			itemIndex++;
-		}
-	}
-	m_openedItems.insert(item);
+    if (path == currentItemPath) {
+      itemIndex++;
+      pathIndex++;
+    } else if ((!path.isEmpty() && path < currentItemPath) ||
+               currentItemPath.isEmpty()) {
+      currentItem = createItem(path);
+      item->insertChild(itemIndex, currentItem);
+      itemIndex++;
+      pathIndex++;
+    } else {
+      assert(currentItemPath < path || path.isEmpty());
+      assert(currentItem);
+      item->removeChild(currentItem);
+      itemIndex++;
+    }
+  }
+  m_openedItems.insert(item);
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::resetProjectPaletteFolder()
-{
-	int projectPaletteIndex = 1;
-	TFilePath projectPalettePath = StudioPalette::instance()->getProjectPalettesRoot();
-	// Prendo l'item del project palette.
-	QTreeWidgetItem *projectPaletteItem = topLevelItem(projectPaletteIndex);
-	if (projectPaletteItem) {
-		// Se il path dell'item e' uguale a quello del project palette corrente ritorno.
-		if (getItemPath(projectPaletteItem) == projectPalettePath)
-			return;
-		// Altrimenti lo rimuovo.
-		removeItemWidget(projectPaletteItem, 0);
-		delete projectPaletteItem;
-		//clear the item list in order to search the folder from scratch
-		m_openedItems.clear();
-		//Toonz Palette is not changed, so resurrect the ToonzPaletteRoot
-		m_openedItems.insert(topLevelItem(0));
-	}
-	if (!TSystem::doesExistFileOrLevel(projectPalettePath))
-		return;
-	// Creo il nuovo item con il nuovo project folder e lo inserisco nell'albero.
-	// Items in the ProjectPaletteRoot are refreshed here. Stored in openedItems as well.
-	QTreeWidgetItem *newProjectPaletteItem = createRootItem(projectPalettePath);
-	insertTopLevelItem(projectPaletteIndex, newProjectPaletteItem);
+void StudioPaletteTreeViewer::resetProjectPaletteFolder() {
+  int projectPaletteIndex = 1;
+  TFilePath projectPalettePath =
+      StudioPalette::instance()->getProjectPalettesRoot();
+  // Prendo l'item del project palette.
+  QTreeWidgetItem *projectPaletteItem = topLevelItem(projectPaletteIndex);
+  if (projectPaletteItem) {
+    // Se il path dell'item e' uguale a quello del project palette corrente
+    // ritorno.
+    if (getItemPath(projectPaletteItem) == projectPalettePath) return;
+    // Altrimenti lo rimuovo.
+    removeItemWidget(projectPaletteItem, 0);
+    delete projectPaletteItem;
+    // clear the item list in order to search the folder from scratch
+    m_openedItems.clear();
+    // Toonz Palette is not changed, so resurrect the ToonzPaletteRoot
+    m_openedItems.insert(topLevelItem(0));
+  }
+  if (!TSystem::doesExistFileOrLevel(projectPalettePath)) return;
+  // Creo il nuovo item con il nuovo project folder e lo inserisco nell'albero.
+  // Items in the ProjectPaletteRoot are refreshed here. Stored in openedItems
+  // as well.
+  QTreeWidgetItem *newProjectPaletteItem = createRootItem(projectPalettePath);
+  insertTopLevelItem(projectPaletteIndex, newProjectPaletteItem);
 
-	setCurrentItem(0);
+  setCurrentItem(0);
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::onItemClicked(QTreeWidgetItem *item, int column)
-{
-	if (currentItem() && m_studioPaletteHandle && m_currentPalette.getPointer()) {
-		// if(m_studioPaletteHandle->getPalette() != m_currentPalette.getPointer())
-		{
-			m_studioPaletteHandle->setPalette(m_currentPalette.getPointer());
-			m_studioPaletteHandle->notifyPaletteSwitched();
-			StudioPaletteCmd::updateAllLinkedStyles(m_levelPaletteHandle, m_xsheetHandle);
-		}
-	}
+void StudioPaletteTreeViewer::onItemClicked(QTreeWidgetItem *item, int column) {
+  if (currentItem() && m_studioPaletteHandle && m_currentPalette.getPointer()) {
+    // if(m_studioPaletteHandle->getPalette() != m_currentPalette.getPointer())
+    {
+      m_studioPaletteHandle->setPalette(m_currentPalette.getPointer());
+      m_studioPaletteHandle->notifyPaletteSwitched();
+      StudioPaletteCmd::updateAllLinkedStyles(m_levelPaletteHandle,
+                                              m_xsheetHandle);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::onItemChanged(QTreeWidgetItem *item, int column)
-{
-	if (item != currentItem() || isRootItem(item))
-		return;
-	wstring name = item->text(column).toStdWString();
-	TFilePath oldPath = getCurrentFolderPath();
-	if (oldPath.isEmpty() || name.empty() || oldPath.getWideName() == name)
-		return;
-	TFilePath newPath(oldPath.getParentDir() + TFilePath(name + ::to_wstring(oldPath.getDottedType())));
-	try {
-		StudioPaletteCmd::movePalette(newPath, oldPath);
-	} catch (TException &e) {
-		error(QString(::to_string(e.getMessage()).c_str()));
-		item->setText(column, QString::fromStdWString(oldPath.getWideName()));
-	} catch (...) {
-		error("Can't rename file");
-		item->setText(column, QString::fromStdWString(oldPath.getWideName()));
-	}
-	refreshItem(getItem(oldPath.getParentDir()));
-	setCurrentItem(getItem(newPath));
+void StudioPaletteTreeViewer::onItemChanged(QTreeWidgetItem *item, int column) {
+  if (item != currentItem() || isRootItem(item)) return;
+  wstring name      = item->text(column).toStdWString();
+  TFilePath oldPath = getCurrentFolderPath();
+  if (oldPath.isEmpty() || name.empty() || oldPath.getWideName() == name)
+    return;
+  TFilePath newPath(oldPath.getParentDir() +
+                    TFilePath(name + ::to_wstring(oldPath.getDottedType())));
+  try {
+    StudioPaletteCmd::movePalette(newPath, oldPath);
+  } catch (TException &e) {
+    error(QString(::to_string(e.getMessage()).c_str()));
+    item->setText(column, QString::fromStdWString(oldPath.getWideName()));
+  } catch (...) {
+    error("Can't rename file");
+    item->setText(column, QString::fromStdWString(oldPath.getWideName()));
+  }
+  refreshItem(getItem(oldPath.getParentDir()));
+  setCurrentItem(getItem(newPath));
 }
 
 //-----------------------------------------------------------------------------
 /*! Called when the current palette is switched
 */
-void StudioPaletteTreeViewer::onCurrentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
-{
-	TFilePath oldPath = getItemPath(previous);
-	TFilePath newPath = getCurrentFolderPath();
-	if (!m_studioPaletteHandle)
-		return;
+void StudioPaletteTreeViewer::onCurrentItemChanged(QTreeWidgetItem *current,
+                                                   QTreeWidgetItem *previous) {
+  TFilePath oldPath = getItemPath(previous);
+  TFilePath newPath = getCurrentFolderPath();
+  if (!m_studioPaletteHandle) return;
 
-	if (m_currentPalette.getPointer() && m_currentPalette->getDirtyFlag()) {
-		TFilePath oldPath = StudioPalette::instance()->getPalettePath(m_currentPalette->getGlobalName());
-		if (oldPath == newPath)
-			return;
-		wstring gname = m_currentPalette->getGlobalName();
-		QString question;
-		question = "The current palette " + QString::fromStdWString(oldPath.getWideString()) + " \nin the studio palette has been modified. Do you want to save your changes?";
-		int ret = DVGui::MsgBox(question, QObject::tr("Save"), QObject::tr("Discard"), QObject::tr("Cancel"), 0);
-		if (ret == 3) {
-			setCurrentItem(getItem(oldPath));
-			return;
-		}
-		if (ret == 1) {
-			//If the palette is level palette (i.e. NOT stdio palette), just overwrite it
-			if (gname.empty())
-				StudioPalette::instance()->save(oldPath, m_currentPalette.getPointer());
-			else
-				StudioPalette::instance()->setPalette(oldPath, m_currentPalette.getPointer(), false);
-		}
-		m_currentPalette->setDirtyFlag(false);
-	}
-	//load palette here
-	m_currentPalette = StudioPalette::instance()->getPalette(newPath, false);
-	m_studioPaletteHandle->setPalette(m_currentPalette.getPointer());
-	m_studioPaletteHandle->notifyPaletteSwitched();
+  if (m_currentPalette.getPointer() && m_currentPalette->getDirtyFlag()) {
+    TFilePath oldPath = StudioPalette::instance()->getPalettePath(
+        m_currentPalette->getGlobalName());
+    if (oldPath == newPath) return;
+    wstring gname = m_currentPalette->getGlobalName();
+    QString question;
+    question = "The current palette " +
+               QString::fromStdWString(oldPath.getWideString()) +
+               " \nin the studio palette has been modified. Do you want to "
+               "save your changes?";
+    int ret = DVGui::MsgBox(question, QObject::tr("Save"),
+                            QObject::tr("Discard"), QObject::tr("Cancel"), 0);
+    if (ret == 3) {
+      setCurrentItem(getItem(oldPath));
+      return;
+    }
+    if (ret == 1) {
+      // If the palette is level palette (i.e. NOT stdio palette), just
+      // overwrite it
+      if (gname.empty())
+        StudioPalette::instance()->save(oldPath, m_currentPalette.getPointer());
+      else
+        StudioPalette::instance()->setPalette(
+            oldPath, m_currentPalette.getPointer(), false);
+    }
+    m_currentPalette->setDirtyFlag(false);
+  }
+  // load palette here
+  m_currentPalette = StudioPalette::instance()->getPalette(newPath, false);
+  m_studioPaletteHandle->setPalette(m_currentPalette.getPointer());
+  m_studioPaletteHandle->notifyPaletteSwitched();
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::addNewPalette()
-{
-	if (!currentItem()) {
-		error("Error: No folder selected.");
-		return;
-	}
-	TFilePath newPath;
-	try {
-		newPath = StudioPaletteCmd::createPalette(getCurrentFolderPath(), "", 0);
-	} catch (TException &e) {
-		error("Can't create palette: " + QString(::to_string(e.getMessage()).c_str()));
-	} catch (...) {
-		error("Can't create palette");
-	}
-	refreshItem(currentItem());
-	setCurrentItem(getItem(newPath));
+void StudioPaletteTreeViewer::addNewPalette() {
+  if (!currentItem()) {
+    error("Error: No folder selected.");
+    return;
+  }
+  TFilePath newPath;
+  try {
+    newPath = StudioPaletteCmd::createPalette(getCurrentFolderPath(), "", 0);
+  } catch (TException &e) {
+    error("Can't create palette: " +
+          QString(::to_string(e.getMessage()).c_str()));
+  } catch (...) {
+    error("Can't create palette");
+  }
+  refreshItem(currentItem());
+  setCurrentItem(getItem(newPath));
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::addNewFolder()
-{
-	if (!currentItem()) {
-		error("Error: No folder selected.");
-		return;
-	}
-	TFilePath newPath;
-	try {
-		newPath = StudioPaletteCmd::addFolder(getCurrentFolderPath());
-	} catch (TException &e) {
-		error("Can't create palette folder: " + QString(::to_string(e.getMessage()).c_str()));
-	} catch (...) {
-		error("Can't create palette folder");
-	}
-	refreshItem(currentItem());
-	setCurrentItem(getItem(newPath));
+void StudioPaletteTreeViewer::addNewFolder() {
+  if (!currentItem()) {
+    error("Error: No folder selected.");
+    return;
+  }
+  TFilePath newPath;
+  try {
+    newPath = StudioPaletteCmd::addFolder(getCurrentFolderPath());
+  } catch (TException &e) {
+    error("Can't create palette folder: " +
+          QString(::to_string(e.getMessage()).c_str()));
+  } catch (...) {
+    error("Can't create palette folder");
+  }
+  refreshItem(currentItem());
+  setCurrentItem(getItem(newPath));
 }
 
 //-----------------------------------------------------------------------------
-/*! Convert level palette to studio palette. 
+/*! Convert level palette to studio palette.
 */
-void StudioPaletteTreeViewer::convertToStudioPalette()
-{
-	TFilePath path = getItemPath(currentItem());
-	StudioPalette *studioPalette = StudioPalette::instance();
-	if (studioPalette->isPalette(path)) {
-		TPalette *palette = studioPalette->getPalette(path);
+void StudioPaletteTreeViewer::convertToStudioPalette() {
+  TFilePath path               = getItemPath(currentItem());
+  StudioPalette *studioPalette = StudioPalette::instance();
+  if (studioPalette->isPalette(path)) {
+    TPalette *palette = studioPalette->getPalette(path);
 
-		if (!palette) {
-			error("Can't touch palette");
-			return;
-		}
+    if (!palette) {
+      error("Can't touch palette");
+      return;
+    }
 
-		if (m_currentPalette->getPaletteName() != palette->getPaletteName()) {
-			error("Can't touch palette");
-			return;
-		}
+    if (m_currentPalette->getPaletteName() != palette->getPaletteName()) {
+      error("Can't touch palette");
+      return;
+    }
 
-		QString question;
-		question = QString::fromStdWString(L"Convert " + path.getWideString() + L" to Studio Palette and Overwrite. \nAre you sure ?");
-		int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
-		if (ret == 0 || ret == 2)
-			return;
+    QString question;
+    question = QString::fromStdWString(
+        L"Convert " + path.getWideString() +
+        L" to Studio Palette and Overwrite. \nAre you sure ?");
+    int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
+    if (ret == 0 || ret == 2) return;
 
-		// apply global name
-		time_t ltime;
-		time(&ltime);
-		wstring gname = std::to_wstring(ltime) + L"_" + std::to_wstring(rand());
-		m_currentPalette->setGlobalName(gname);
-		studioPalette->setStylesGlobalNames(m_currentPalette.getPointer());
-		studioPalette->save(path, m_currentPalette.getPointer());
+    // apply global name
+    time_t ltime;
+    time(&ltime);
+    wstring gname = std::to_wstring(ltime) + L"_" + std::to_wstring(rand());
+    m_currentPalette->setGlobalName(gname);
+    studioPalette->setStylesGlobalNames(m_currentPalette.getPointer());
+    studioPalette->save(path, m_currentPalette.getPointer());
 
-		m_currentPalette->setDirtyFlag(false);
-		currentItem()->setIcon(0, m_studioPaletteIcon);
+    m_currentPalette->setDirtyFlag(false);
+    currentItem()->setIcon(0, m_studioPaletteIcon);
 
-	} else
-		error("Can't find palette");
+  } else
+    error("Can't find palette");
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::deleteItem(QTreeWidgetItem *item)
-{
-	QTreeWidgetItem *parent = item->parent();
-	if (!parent)
-		return;
+void StudioPaletteTreeViewer::deleteItem(QTreeWidgetItem *item) {
+  QTreeWidgetItem *parent = item->parent();
+  if (!parent) return;
 
-	if (item->childCount() > 0) {
-		QString question;
-		question = tr("This folder is not empty. Delete anyway?");
-		int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
-		if (ret == 0 || ret == 2)
-			return;
-	}
+  if (item->childCount() > 0) {
+    QString question;
+    question = tr("This folder is not empty. Delete anyway?");
+    int ret  = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
+    if (ret == 0 || ret == 2) return;
+  }
 
-	TFilePath path = getItemPath(item);
-	StudioPalette *studioPalette = StudioPalette::instance();
-	if (studioPalette->isFolder(path)) {
-		try {
-			StudioPaletteCmd::deleteFolder(path);
-		} catch (TException &e) {
-			error("Can't delete folder: " + QString(::to_string(e.getMessage()).c_str()));
-		} catch (...) {
-			error("Can't delete folder");
-		}
-	} else {
-		assert(studioPalette->isPalette(path));
-		try {
-			StudioPaletteCmd::deletePalette(path);
-		} catch (TException &e) {
-			error("Can't delete palette: " + QString(::to_string(e.getMessage()).c_str()));
-		} catch (...) {
-			error("Can't delete palette");
-		}
-	}
+  TFilePath path               = getItemPath(item);
+  StudioPalette *studioPalette = StudioPalette::instance();
+  if (studioPalette->isFolder(path)) {
+    try {
+      StudioPaletteCmd::deleteFolder(path);
+    } catch (TException &e) {
+      error("Can't delete folder: " +
+            QString(::to_string(e.getMessage()).c_str()));
+    } catch (...) {
+      error("Can't delete folder");
+    }
+  } else {
+    assert(studioPalette->isPalette(path));
+    try {
+      StudioPaletteCmd::deletePalette(path);
+    } catch (TException &e) {
+      error("Can't delete palette: " +
+            QString(::to_string(e.getMessage()).c_str()));
+    } catch (...) {
+      error("Can't delete palette");
+    }
+  }
 
-	refreshItem(parent);
+  refreshItem(parent);
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::deleteItems()
-{
-	QList<QTreeWidgetItem *> items = selectedItems();
-	int count = items.size();
+void StudioPaletteTreeViewer::deleteItems() {
+  QList<QTreeWidgetItem *> items = selectedItems();
+  int count                      = items.size();
 
-	if (count == 0) {
-		error("Nothing to delete");
-		return;
-	}
-	int i;
-	TUndoManager::manager()->beginBlock();
-	for (i = 0; i < count; i++)
-		deleteItem(items[i]);
-	TUndoManager::manager()->endBlock();
+  if (count == 0) {
+    error("Nothing to delete");
+    return;
+  }
+  int i;
+  TUndoManager::manager()->beginBlock();
+  for (i = 0; i < count; i++) deleteItem(items[i]);
+  TUndoManager::manager()->endBlock();
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::searchForPalette()
-{
-	m_palettesScanPopup->setCurrentFolder(getCurrentFolderPath());
-	int ret = m_palettesScanPopup->exec();
-	if (ret == QDialog::Accepted)
-		refresh();
+void StudioPaletteTreeViewer::searchForPalette() {
+  m_palettesScanPopup->setCurrentFolder(getCurrentFolderPath());
+  int ret = m_palettesScanPopup->exec();
+  if (ret == QDialog::Accepted) refresh();
 }
 
 //-----------------------------------------------------------------------------
 
-class InvalidateIconsUndo : public TUndo
-{
-	TPaletteP m_targetPalette, m_oldPalette, m_newPalette;
-	TXshLevelHandle *m_levelHandle;
+class InvalidateIconsUndo : public TUndo {
+  TPaletteP m_targetPalette, m_oldPalette, m_newPalette;
+  TXshLevelHandle *m_levelHandle;
 
 public:
-	InvalidateIconsUndo(TXshLevelHandle *levelHandle)
-		: m_levelHandle(levelHandle)
-	{
-	}
+  InvalidateIconsUndo(TXshLevelHandle *levelHandle)
+      : m_levelHandle(levelHandle) {}
 
-	void undo() const
-	{
-		TXshLevel *level = m_levelHandle->getLevel();
-		if (level) {
-			std::vector<TFrameId> fids;
-			level->getFids(fids);
-			invalidateIcons(level, fids);
-		}
-	}
-	void redo() const
-	{
-		undo();
-	}
+  void undo() const {
+    TXshLevel *level = m_levelHandle->getLevel();
+    if (level) {
+      std::vector<TFrameId> fids;
+      level->getFids(fids);
+      invalidateIcons(level, fids);
+    }
+  }
+  void redo() const { undo(); }
 
-	int getSize() const
-	{
-		return sizeof(*this);
-	}
+  int getSize() const { return sizeof(*this); }
 };
 
 //----------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 
-class AdjustPaletteDialog : public DVGui::Dialog
-{
+class AdjustPaletteDialog : public DVGui::Dialog {
 private:
-	IntField *m_tolerance;
+  IntField *m_tolerance;
 
 public:
-	int getTolerance() { return m_tolerance->getValue(); }
+  int getTolerance() { return m_tolerance->getValue(); }
 
-	AdjustPaletteDialog()
-		: Dialog(0, true, true, "Adjust Current Level to This Palette")
-	{
-		setWindowTitle(tr("Adjust Current Level to This Palette"));
+  AdjustPaletteDialog()
+      : Dialog(0, true, true, "Adjust Current Level to This Palette") {
+    setWindowTitle(tr("Adjust Current Level to This Palette"));
 
-		beginVLayout();
-		m_tolerance = new IntField(this);
-		m_tolerance->setRange(0, 255);
-		m_tolerance->setValue(0);
-		addWidget(tr("Tolerance"), m_tolerance);
-		endVLayout();
+    beginVLayout();
+    m_tolerance = new IntField(this);
+    m_tolerance->setRange(0, 255);
+    m_tolerance->setValue(0);
+    addWidget(tr("Tolerance"), m_tolerance);
+    endVLayout();
 
-		QPushButton *okBtn = new QPushButton(tr("Apply"), this);
-		okBtn->setDefault(true);
-		QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-		bool ret = connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
-		ret = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
-		assert(ret);
+    QPushButton *okBtn = new QPushButton(tr("Apply"), this);
+    okBtn->setDefault(true);
+    QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
+    bool ret = connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
+    ret = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+    assert(ret);
 
-		addButtonBarWidget(okBtn, cancelBtn);
-	}
+    addButtonBarWidget(okBtn, cancelBtn);
+  }
 };
 
 //-------------------------------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::loadInCurrentPaletteAndAdaptLevel()
-{
-	QList<QTreeWidgetItem *> items = selectedItems();
-	assert(items.size() == 1);
+void StudioPaletteTreeViewer::loadInCurrentPaletteAndAdaptLevel() {
+  QList<QTreeWidgetItem *> items = selectedItems();
+  assert(items.size() == 1);
 
-	TPalette *palette = m_levelPaletteHandle->getPalette();
-	if (!palette)
-		return;
+  TPalette *palette = m_levelPaletteHandle->getPalette();
+  if (!palette) return;
 
-	TPalette *newPalette = StudioPalette::instance()->getPalette(getItemPath(items[0]), true);
-	if (!newPalette)
-		return;
+  TPalette *newPalette =
+      StudioPalette::instance()->getPalette(getItemPath(items[0]), true);
+  if (!newPalette) return;
 
-	AdjustPaletteDialog apd;
+  AdjustPaletteDialog apd;
 
-	if (apd.exec() != QDialog::Accepted)
-		return;
+  if (apd.exec() != QDialog::Accepted) return;
 
-	/* awful patch: since in StudioPaletteCmd(defined in toonzlib) I cannot use the invalidateIcons(defined in toonzqt) 
-    i do invalidate icons from here using a "fake TUndo", named InvalidateIconsUndo. 
-    And, since I need to refresh icons at the end of the processing, i have to put that fake undo twice, one before and one after.
-    this way , when the user do either an undo or a redo operation, I am ensured that the last operation is the icon refresh...
-  */
-	TUndoManager::manager()->beginBlock();
+  /* awful patch: since in StudioPaletteCmd(defined in toonzlib) I cannot use
+the invalidateIcons(defined in toonzqt)
+i do invalidate icons from here using a "fake TUndo", named InvalidateIconsUndo.
+And, since I need to refresh icons at the end of the processing, i have to put
+that fake undo twice, one before and one after.
+this way , when the user do either an undo or a redo operation, I am ensured
+that the last operation is the icon refresh...
+*/
+  TUndoManager::manager()->beginBlock();
 
-	TUndoManager::manager()->add(new InvalidateIconsUndo(m_currentLevelHandle));
+  TUndoManager::manager()->add(new InvalidateIconsUndo(m_currentLevelHandle));
 
-	StudioPaletteCmd::loadIntoCurrentPalette(m_levelPaletteHandle, newPalette, m_currentLevelHandle, apd.getTolerance());
+  StudioPaletteCmd::loadIntoCurrentPalette(m_levelPaletteHandle, newPalette,
+                                           m_currentLevelHandle,
+                                           apd.getTolerance());
 
-	TUndoManager::manager()->add(new InvalidateIconsUndo(m_currentLevelHandle));
+  TUndoManager::manager()->add(new InvalidateIconsUndo(m_currentLevelHandle));
 
-	TUndoManager::manager()->endBlock();
+  TUndoManager::manager()->endBlock();
 
-	InvalidateIconsUndo(m_currentLevelHandle).undo();
+  InvalidateIconsUndo(m_currentLevelHandle).undo();
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::loadInCurrentPalette()
-{
-	QList<QTreeWidgetItem *> items = selectedItems();
-	int count = items.size();
-	if (count == 0)
-		return;
+void StudioPaletteTreeViewer::loadInCurrentPalette() {
+  QList<QTreeWidgetItem *> items = selectedItems();
+  int count                      = items.size();
+  if (count == 0) return;
 
-	TPalette *palette = m_levelPaletteHandle->getPalette();
-	if (!palette)
-		return;
+  TPalette *palette = m_levelPaletteHandle->getPalette();
+  if (!palette) return;
 
-	if (palette->isLocked()) {
-		DVGui::warning("Palette is Locked!");
-		return;
-	}
+  if (palette->isLocked()) {
+    DVGui::warning("Palette is Locked!");
+    return;
+  }
 
-	TPalette *newPalette = StudioPalette::instance()->getPalette(getItemPath(items[0]), false);
-	if (!newPalette)
-		return;
-	if (m_xsheetHandle) {
-		int ret = DVGui::eraseStylesInDemand(palette, m_xsheetHandle, newPalette);
-		if (ret == 0)
-			return;
-	}
+  TPalette *newPalette =
+      StudioPalette::instance()->getPalette(getItemPath(items[0]), false);
+  if (!newPalette) return;
+  if (m_xsheetHandle) {
+    int ret = DVGui::eraseStylesInDemand(palette, m_xsheetHandle, newPalette);
+    if (ret == 0) return;
+  }
 
-	StudioPaletteCmd::loadIntoCurrentPalette(m_levelPaletteHandle, newPalette);
-	m_currentLevelHandle->notifyLevelChange();
+  StudioPaletteCmd::loadIntoCurrentPalette(m_levelPaletteHandle, newPalette);
+  m_currentLevelHandle->notifyLevelChange();
 
-	TXshLevel *level = m_currentLevelHandle->getLevel();
-	if (level) {
-		std::vector<TFrameId> fids;
-		level->getFids(fids);
-		invalidateIcons(level, fids);
-	}
+  TXshLevel *level = m_currentLevelHandle->getLevel();
+  if (level) {
+    std::vector<TFrameId> fids;
+    level->getFids(fids);
+    invalidateIcons(level, fids);
+  }
 
-	int i;
-	for (i = 1; i < count; i++) {
-		TFilePath path = getItemPath(items[i]);
-		StudioPaletteCmd::mergeIntoCurrentPalette(m_levelPaletteHandle, path);
-	}
-	// in order to update the title bar of palette viewer
-	m_levelPaletteHandle->getPalette()->setDirtyFlag(true);
-	m_levelPaletteHandle->notifyPaletteChanged();
+  int i;
+  for (i = 1; i < count; i++) {
+    TFilePath path = getItemPath(items[i]);
+    StudioPaletteCmd::mergeIntoCurrentPalette(m_levelPaletteHandle, path);
+  }
+  // in order to update the title bar of palette viewer
+  m_levelPaletteHandle->getPalette()->setDirtyFlag(true);
+  m_levelPaletteHandle->notifyPaletteChanged();
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::replaceCurrentPalette()
-{
-	QList<QTreeWidgetItem *> items = selectedItems();
-	int count = items.size();
-	if (count == 0)
-		return;
+void StudioPaletteTreeViewer::replaceCurrentPalette() {
+  QList<QTreeWidgetItem *> items = selectedItems();
+  int count                      = items.size();
+  if (count == 0) return;
 
-	//exec confirmation dialog
-	TPalette *current = m_levelPaletteHandle->getPalette();
-	if (!current)
-		return;
+  // exec confirmation dialog
+  TPalette *current = m_levelPaletteHandle->getPalette();
+  if (!current) return;
 
-	QString label;
-	if (count != 1) //replacing to multiple palettes
-		label = QString::fromStdWString(L"Replacing all selected palettes with the palette \"" + current->getPaletteName() + L"\". \nAre you sure ?");
-	else {
-		TPalette *dstPalette = StudioPalette::instance()->getPalette(getItemPath(items[0]));
-		if (!dstPalette)
-			return;
-		label = QString::fromStdWString(L"Replacing the palette \"" + dstPalette->getPaletteName() + L"\" with the palette \"" + current->getPaletteName() + L"\". \nAre you sure ?");
-	}
+  QString label;
+  if (count != 1)  // replacing to multiple palettes
+    label = QString::fromStdWString(
+        L"Replacing all selected palettes with the palette \"" +
+        current->getPaletteName() + L"\". \nAre you sure ?");
+  else {
+    TPalette *dstPalette =
+        StudioPalette::instance()->getPalette(getItemPath(items[0]));
+    if (!dstPalette) return;
+    label = QString::fromStdWString(
+        L"Replacing the palette \"" + dstPalette->getPaletteName() +
+        L"\" with the palette \"" + current->getPaletteName() +
+        L"\". \nAre you sure ?");
+  }
 
-	int ret = DVGui::MsgBox(label, QObject::tr("Replace"), QObject::tr("Cancel"), 1);
-	if (ret == 0 || ret == 2)
-		return;
+  int ret =
+      DVGui::MsgBox(label, QObject::tr("Replace"), QObject::tr("Cancel"), 1);
+  if (ret == 0 || ret == 2) return;
 
-	TUndoManager::manager()->beginBlock();
-	int i;
-	for (i = 0; i < count; i++)
-		StudioPaletteCmd::replaceWithCurrentPalette(m_levelPaletteHandle, m_studioPaletteHandle, getItemPath(items[i]));
-	TUndoManager::manager()->endBlock();
+  TUndoManager::manager()->beginBlock();
+  int i;
+  for (i = 0; i < count; i++)
+    StudioPaletteCmd::replaceWithCurrentPalette(
+        m_levelPaletteHandle, m_studioPaletteHandle, getItemPath(items[i]));
+  TUndoManager::manager()->endBlock();
 
-	if (m_currentPalette)
-		m_currentPalette->setDirtyFlag(false);
-	//in order to update display
-	onCurrentItemChanged(currentItem(), currentItem());
+  if (m_currentPalette) m_currentPalette->setDirtyFlag(false);
+  // in order to update display
+  onCurrentItemChanged(currentItem(), currentItem());
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::mergeToCurrentPalette()
-{
-	QList<QTreeWidgetItem *> items = selectedItems();
-	int count = items.size();
-	if (count == 0)
-		return;
+void StudioPaletteTreeViewer::mergeToCurrentPalette() {
+  QList<QTreeWidgetItem *> items = selectedItems();
+  int count                      = items.size();
+  if (count == 0) return;
 
-	TUndoManager::manager()->beginBlock();
-	int i;
-	for (i = 0; i < count; i++)
-		StudioPaletteCmd::mergeIntoCurrentPalette(m_levelPaletteHandle, getItemPath(items[i]));
-	TUndoManager::manager()->endBlock();
+  TUndoManager::manager()->beginBlock();
+  int i;
+  for (i = 0; i < count; i++)
+    StudioPaletteCmd::mergeIntoCurrentPalette(m_levelPaletteHandle,
+                                              getItemPath(items[i]));
+  TUndoManager::manager()->endBlock();
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::paintEvent(QPaintEvent *event)
-{
-	QTreeWidget::paintEvent(event);
-	QPainter p(viewport());
-	if (m_dropItem) {
-		p.setPen(QColor(50, 105, 200));
-		p.drawRect(visualItemRect(m_dropItem));
-	}
+void StudioPaletteTreeViewer::paintEvent(QPaintEvent *event) {
+  QTreeWidget::paintEvent(event);
+  QPainter p(viewport());
+  if (m_dropItem) {
+    p.setPen(QColor(50, 105, 200));
+    p.drawRect(visualItemRect(m_dropItem));
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event)
-{
-	TFilePath path = getCurrentFolderPath();
+void StudioPaletteTreeViewer::contextMenuEvent(QContextMenuEvent *event) {
+  TFilePath path = getCurrentFolderPath();
 
-	StudioPalette *studioPalette = StudioPalette::instance();
+  StudioPalette *studioPalette = StudioPalette::instance();
 
-	//Menu' per la selezione singola
-	QList<QTreeWidgetItem *> items = selectedItems();
-	int count = items.size();
-	if (count == 1) {
-		// Verify if click position is in a row containing an item.
-		QRect rect = visualItemRect(currentItem());
-		if (!QRect(0, rect.y(), width(), rect.height()).contains(event->pos()))
-			return;
+  // Menu' per la selezione singola
+  QList<QTreeWidgetItem *> items = selectedItems();
+  int count                      = items.size();
+  if (count == 1) {
+    // Verify if click position is in a row containing an item.
+    QRect rect = visualItemRect(currentItem());
+    if (!QRect(0, rect.y(), width(), rect.height()).contains(event->pos()))
+      return;
 
-		bool isFolder = (studioPalette->isFolder(path));
+    bool isFolder = (studioPalette->isFolder(path));
 
-		QMenu menu(this);
-		if (isFolder) {
-			createMenuAction(menu, "", tr("New Palette"), "addNewPalette()");
-			createMenuAction(menu, "", tr("New Folder"), "addNewFolder()");
-		}
+    QMenu menu(this);
+    if (isFolder) {
+      createMenuAction(menu, "", tr("New Palette"), "addNewPalette()");
+      createMenuAction(menu, "", tr("New Folder"), "addNewFolder()");
+    }
 
-		if (studioPalette->isFolder(path) &&
-			studioPalette->getLevelPalettesRoot() != path &&
-			studioPalette->getProjectPalettesRoot() != path) {
-			menu.addSeparator();
-			createMenuAction(menu, "", tr("Delete Folder"), "deleteItems()");
-		} else if (studioPalette->isPalette(path)) {
-			if (m_studioPaletteHandle->getPalette()) {
-				createMenuAction(menu, "MI_LoadIntoCurrentPalette", tr("Load into Current Palette"), "loadInCurrentPalette()");
-				createMenuAction(menu, "MI_AdjustCurrentLevelToPalette", tr("Adjust Current Level to This Palette"), "loadInCurrentPaletteAndAdaptLevel()");
-				createMenuAction(menu, "MI_MergeToCurrentPalette", tr("Merge to Current Palette"), "mergeToCurrentPalette()");
-				if (!m_studioPaletteHandle->getPalette()->isLocked()) {
-					createMenuAction(menu, "MI_ReplaceWithCurrentPalette", tr("Replace with Current Palette"), "replaceCurrentPalette()");
-					menu.addSeparator();
-					createMenuAction(menu, "MI_DeletePalette", tr("Delete Palette"), "deleteItems()");
-				}
-			}
-			if (!studioPalette->hasGlobalName(path)) {
-				menu.addSeparator();
-				createMenuAction(menu, "", tr("Convert to Studio Palette and Overwrite"), "convertToStudioPalette()");
-			}
-		}
+    if (studioPalette->isFolder(path) &&
+        studioPalette->getLevelPalettesRoot() != path &&
+        studioPalette->getProjectPalettesRoot() != path) {
+      menu.addSeparator();
+      createMenuAction(menu, "", tr("Delete Folder"), "deleteItems()");
+    } else if (studioPalette->isPalette(path)) {
+      if (m_studioPaletteHandle->getPalette()) {
+        createMenuAction(menu, "MI_LoadIntoCurrentPalette",
+                         tr("Load into Current Palette"),
+                         "loadInCurrentPalette()");
+        createMenuAction(menu, "MI_AdjustCurrentLevelToPalette",
+                         tr("Adjust Current Level to This Palette"),
+                         "loadInCurrentPaletteAndAdaptLevel()");
+        createMenuAction(menu, "MI_MergeToCurrentPalette",
+                         tr("Merge to Current Palette"),
+                         "mergeToCurrentPalette()");
+        if (!m_studioPaletteHandle->getPalette()->isLocked()) {
+          createMenuAction(menu, "MI_ReplaceWithCurrentPalette",
+                           tr("Replace with Current Palette"),
+                           "replaceCurrentPalette()");
+          menu.addSeparator();
+          createMenuAction(menu, "MI_DeletePalette", tr("Delete Palette"),
+                           "deleteItems()");
+        }
+      }
+      if (!studioPalette->hasGlobalName(path)) {
+        menu.addSeparator();
+        createMenuAction(menu, "",
+                         tr("Convert to Studio Palette and Overwrite"),
+                         "convertToStudioPalette()");
+      }
+    }
 
-		if (isFolder) {
-			menu.addSeparator();
-			createMenuAction(menu, "", tr("Search for Palettes"), "searchForPalette()");
-		}
-		menu.exec(event->globalPos());
-		return;
-	}
+    if (isFolder) {
+      menu.addSeparator();
+      createMenuAction(menu, "", tr("Search for Palettes"),
+                       "searchForPalette()");
+    }
+    menu.exec(event->globalPos());
+    return;
+  }
 
-	//Menu' per la selezione multipla
-	// Verify if click position is in a row containing an item.
-	bool areAllPalette = true;
-	bool isClickInSelection = false;
-	int i;
-	for (i = 0; i < count; i++) {
-		QTreeWidgetItem *item = items[i];
-		QRect rect = visualItemRect(item);
-		if (QRect(0, rect.y(), width(), rect.height()).contains(event->pos()))
-			isClickInSelection = true;
-		TFilePath path = getItemPath(item);
-		if (studioPalette->isFolder(path))
-			areAllPalette = false;
-	}
-	if (!isClickInSelection)
-		return;
+  // Menu' per la selezione multipla
+  // Verify if click position is in a row containing an item.
+  bool areAllPalette      = true;
+  bool isClickInSelection = false;
+  int i;
+  for (i = 0; i < count; i++) {
+    QTreeWidgetItem *item = items[i];
+    QRect rect            = visualItemRect(item);
+    if (QRect(0, rect.y(), width(), rect.height()).contains(event->pos()))
+      isClickInSelection                             = true;
+    TFilePath path                                   = getItemPath(item);
+    if (studioPalette->isFolder(path)) areAllPalette = false;
+  }
+  if (!isClickInSelection) return;
 
-	QMenu menu(this);
-	if (areAllPalette) {
-		createMenuAction(menu, "", tr("Load into Current Palette"), "loadInCurrentPalette()");
-		createMenuAction(menu, "", tr("Merge to Current Palette"), "mergeToCurrentPalette()");
-		createMenuAction(menu, "", tr("Replace with Current Palette"), "replaceCurrentPalette()");
-		menu.addSeparator();
-	}
-	createMenuAction(menu, "", tr("Delete"), "deleteItems()");
+  QMenu menu(this);
+  if (areAllPalette) {
+    createMenuAction(menu, "", tr("Load into Current Palette"),
+                     "loadInCurrentPalette()");
+    createMenuAction(menu, "", tr("Merge to Current Palette"),
+                     "mergeToCurrentPalette()");
+    createMenuAction(menu, "", tr("Replace with Current Palette"),
+                     "replaceCurrentPalette()");
+    menu.addSeparator();
+  }
+  createMenuAction(menu, "", tr("Delete"), "deleteItems()");
 
-	menu.exec(event->globalPos());
+  menu.exec(event->globalPos());
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::createMenuAction(QMenu &menu, const char *id, QString name, const char *slot)
-{
-	QAction *act = menu.addAction(name);
-	string slotName(slot);
-	slotName = string("1") + slotName;
-	connect(act, SIGNAL(triggered()), slotName.c_str());
+void StudioPaletteTreeViewer::createMenuAction(QMenu &menu, const char *id,
+                                               QString name, const char *slot) {
+  QAction *act = menu.addAction(name);
+  string slotName(slot);
+  slotName = string("1") + slotName;
+  connect(act, SIGNAL(triggered()), slotName.c_str());
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::mouseMoveEvent(QMouseEvent *event)
-{
-	// If left button is not pressed return; is not drag event.
-	if (!(event->buttons() & Qt::LeftButton))
-		return;
-	startDragDrop();
+void StudioPaletteTreeViewer::mouseMoveEvent(QMouseEvent *event) {
+  // If left button is not pressed return; is not drag event.
+  if (!(event->buttons() & Qt::LeftButton)) return;
+  startDragDrop();
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::startDragDrop()
-{
-	TRepetitionGuard guard;
-	if (!guard.hasLock())
-		return;
+void StudioPaletteTreeViewer::startDragDrop() {
+  TRepetitionGuard guard;
+  if (!guard.hasLock()) return;
 
-	QDrag *drag = new QDrag(this);
-	QMimeData *mimeData = new QMimeData;
-	QList<QUrl> urls;
+  QDrag *drag         = new QDrag(this);
+  QMimeData *mimeData = new QMimeData;
+  QList<QUrl> urls;
 
-	QList<QTreeWidgetItem *> items = selectedItems();
-	int i;
+  QList<QTreeWidgetItem *> items = selectedItems();
+  int i;
 
-	for (i = 0; i < items.size(); i++) {
-		//Sposto solo le palette.
-		TFilePath path = getItemPath(items[i]);
-		if (!path.isEmpty() &&
-			(path.getType() == "tpl" || path.getType() == "pli" ||
-			 path.getType() == "tlv" || path.getType() == "tnz"))
-			urls.append(pathToUrl(path));
-	}
-	if (urls.isEmpty())
-		return;
-	mimeData->setUrls(urls);
-	drag->setMimeData(mimeData);
-	Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction);
-	viewport()->update();
+  for (i = 0; i < items.size(); i++) {
+    // Sposto solo le palette.
+    TFilePath path = getItemPath(items[i]);
+    if (!path.isEmpty() &&
+        (path.getType() == "tpl" || path.getType() == "pli" ||
+         path.getType() == "tlv" || path.getType() == "tnz"))
+      urls.append(pathToUrl(path));
+  }
+  if (urls.isEmpty()) return;
+  mimeData->setUrls(urls);
+  drag->setMimeData(mimeData);
+  Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction);
+  viewport()->update();
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::dragEnterEvent(QDragEnterEvent *event)
-{
-	const QMimeData *mimeData = event->mimeData();
-	const PaletteData *paletteData = dynamic_cast<const PaletteData *>(mimeData);
+void StudioPaletteTreeViewer::dragEnterEvent(QDragEnterEvent *event) {
+  const QMimeData *mimeData      = event->mimeData();
+  const PaletteData *paletteData = dynamic_cast<const PaletteData *>(mimeData);
 
-	if (acceptResourceDrop(mimeData->urls())) {
-		QList<QUrl> urls = mimeData->urls();
-		int count = urls.size();
-		if (count == 0)
-			return;
+  if (acceptResourceDrop(mimeData->urls())) {
+    QList<QUrl> urls = mimeData->urls();
+    int count        = urls.size();
+    if (count == 0) return;
 
-		//Controllo che almeno un url del drag sia una palette da spostare.
-		bool isPalette = false;
-		int i;
-		for (i = 0; i < count; i++) {
-			QUrl url = urls[i];
-			TFilePath path(url.toLocalFile().toStdWString());
-			if (!path.isEmpty() &&
-				(path.getType() == "tpl" || path.getType() == "pli" ||
-				 path.getType() == "tlv" || path.getType() == "tnz")) {
-				isPalette = true;
-				break;
-			}
-		}
-		if (!isPalette)
-			return;
+    // Controllo che almeno un url del drag sia una palette da spostare.
+    bool isPalette = false;
+    int i;
+    for (i = 0; i < count; i++) {
+      QUrl url = urls[i];
+      TFilePath path(url.toLocalFile().toStdWString());
+      if (!path.isEmpty() &&
+          (path.getType() == "tpl" || path.getType() == "pli" ||
+           path.getType() == "tlv" || path.getType() == "tnz")) {
+        isPalette = true;
+        break;
+      }
+    }
+    if (!isPalette) return;
 
-		event->acceptProposedAction();
-	} else if (paletteData && paletteData->hasOnlyPalette())
-		event->acceptProposedAction();
-	viewport()->update();
+    event->acceptProposedAction();
+  } else if (paletteData && paletteData->hasOnlyPalette())
+    event->acceptProposedAction();
+  viewport()->update();
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::dragMoveEvent(QDragMoveEvent *event)
-{
-	QTreeWidgetItem *item = itemAt(event->pos());
-	TFilePath newPath = getItemPath(item);
+void StudioPaletteTreeViewer::dragMoveEvent(QDragMoveEvent *event) {
+  QTreeWidgetItem *item = itemAt(event->pos());
+  TFilePath newPath     = getItemPath(item);
 
-	if (m_dropItem)
-		m_dropItem->setTextColor(0, Qt::black);
+  if (m_dropItem) m_dropItem->setTextColor(0, Qt::black);
 
-	if (item) {
-		m_dropItem = item;
-		event->acceptProposedAction();
-	} else {
-		m_dropItem = 0;
-		event->ignore();
-	}
-	viewport()->update();
+  if (item) {
+    m_dropItem = item;
+    event->acceptProposedAction();
+  } else {
+    m_dropItem = 0;
+    event->ignore();
+  }
+  viewport()->update();
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::dropEvent(QDropEvent *event)
-{
-	TFilePath newPath = getItemPath(m_dropItem);
+void StudioPaletteTreeViewer::dropEvent(QDropEvent *event) {
+  TFilePath newPath = getItemPath(m_dropItem);
 
-	resetDropItem();
+  resetDropItem();
 
-	const QMimeData *mimeData = event->mimeData();
-	const PaletteData *paletteData = dynamic_cast<const PaletteData *>(mimeData);
-	if (paletteData) {
-		if (paletteData->hasOnlyPalette()) {
-			TPalette *palette = paletteData->getPalette();
-			if (!palette)
-				return;
+  const QMimeData *mimeData      = event->mimeData();
+  const PaletteData *paletteData = dynamic_cast<const PaletteData *>(mimeData);
+  if (paletteData) {
+    if (paletteData->hasOnlyPalette()) {
+      TPalette *palette = paletteData->getPalette();
+      if (!palette) return;
 
-			try {
-				StudioPaletteCmd::createPalette(newPath, ::to_string(palette->getPaletteName()), palette);
-			} catch (TException &e) {
-				error("Can't create palette: " + QString(::to_string(e.getMessage()).c_str()));
-			} catch (...) {
-				error("Can't create palette");
-			}
-		}
-		return;
-	}
+      try {
+        StudioPaletteCmd::createPalette(
+            newPath, ::to_string(palette->getPaletteName()), palette);
+      } catch (TException &e) {
+        error("Can't create palette: " +
+              QString(::to_string(e.getMessage()).c_str()));
+      } catch (...) {
+        error("Can't create palette");
+      }
+    }
+    return;
+  }
 
-	if (!mimeData->hasUrls() || mimeData->urls().size() == 0)
-		return;
+  if (!mimeData->hasUrls() || mimeData->urls().size() == 0) return;
 
-	QList<QUrl> urls = mimeData->urls();
-	TUndoManager::manager()->beginBlock();
-	int i;
-	for (i = 0; i < urls.size(); i++) {
-		QUrl url = urls[i];
-		TFilePath path = TFilePath(url.toLocalFile().toStdWString());
+  QList<QUrl> urls = mimeData->urls();
+  TUndoManager::manager()->beginBlock();
+  int i;
+  for (i = 0; i < urls.size(); i++) {
+    QUrl url       = urls[i];
+    TFilePath path = TFilePath(url.toLocalFile().toStdWString());
 
-		StudioPalette *studioPalette = StudioPalette::instance();
-		if (path == newPath || path.getParentDir() == newPath)
-			continue;
+    StudioPalette *studioPalette = StudioPalette::instance();
+    if (path == newPath || path.getParentDir() == newPath) continue;
 
-		if (isInStudioPalette(path)) {
-			TFilePath newPalettePath = newPath + TFilePath(path.getWideName() + ::to_wstring(path.getDottedType()));
-			try {
-				StudioPaletteCmd::movePalette(newPalettePath, path);
-			} catch (TException &e) {
-				error("Can't rename palette: " + QString(::to_string(e.getMessage()).c_str()));
-			} catch (...) {
-				error("Can't rename palette");
-			}
-		}
-	}
-	TUndoManager::manager()->endBlock();
-	event->setDropAction(Qt::CopyAction);
-	event->accept();
+    if (isInStudioPalette(path)) {
+      TFilePath newPalettePath =
+          newPath +
+          TFilePath(path.getWideName() + ::to_wstring(path.getDottedType()));
+      try {
+        StudioPaletteCmd::movePalette(newPalettePath, path);
+      } catch (TException &e) {
+        error("Can't rename palette: " +
+              QString(::to_string(e.getMessage()).c_str()));
+      } catch (...) {
+        error("Can't rename palette");
+      }
+    }
+  }
+  TUndoManager::manager()->endBlock();
+  event->setDropAction(Qt::CopyAction);
+  event->accept();
 }
 
 //-----------------------------------------------------------------------------
 
-void StudioPaletteTreeViewer::dragLeaveEvent(QDragLeaveEvent *event)
-{
-	resetDropItem();
-	update();
+void StudioPaletteTreeViewer::dragLeaveEvent(QDragLeaveEvent *event) {
+  resetDropItem();
+  update();
 }
 
 //=============================================================================
@@ -1132,55 +1112,53 @@ void StudioPaletteTreeViewer::dragLeaveEvent(QDragLeaveEvent *event)
 //-----------------------------------------------------------------------------
 
 StudioPaletteViewer::StudioPaletteViewer(QWidget *parent,
-										 TPaletteHandle *studioPaletteHandle,
-										 TPaletteHandle *levelPaletteHandle,
-										 TFrameHandle *frameHandle,
-										 TXsheetHandle *xsheetHandle,
-										 TXshLevelHandle *currentLevelHandle)
-	: QSplitter(parent)
-{
-	// style sheet
-	setObjectName("StudioPaletteViewer");
-	setFrameStyle(QFrame::StyledPanel);
+                                         TPaletteHandle *studioPaletteHandle,
+                                         TPaletteHandle *levelPaletteHandle,
+                                         TFrameHandle *frameHandle,
+                                         TXsheetHandle *xsheetHandle,
+                                         TXshLevelHandle *currentLevelHandle)
+    : QSplitter(parent) {
+  // style sheet
+  setObjectName("StudioPaletteViewer");
+  setFrameStyle(QFrame::StyledPanel);
 
-	setAcceptDrops(true);
-	setOrientation(Qt::Vertical);
+  setAcceptDrops(true);
+  setOrientation(Qt::Vertical);
 
-	//First Splitter Widget
-	QWidget *treeWidget = new QWidget(this);
-	QVBoxLayout *treeVLayout = new QVBoxLayout(treeWidget);
-	treeVLayout->setMargin(0);
-	treeVLayout->setSpacing(0);
+  // First Splitter Widget
+  QWidget *treeWidget      = new QWidget(this);
+  QVBoxLayout *treeVLayout = new QVBoxLayout(treeWidget);
+  treeVLayout->setMargin(0);
+  treeVLayout->setSpacing(0);
 
-	m_studioPaletteTreeViewer =
-		new StudioPaletteTreeViewer(treeWidget, studioPaletteHandle, levelPaletteHandle, xsheetHandle, currentLevelHandle);
+  m_studioPaletteTreeViewer = new StudioPaletteTreeViewer(
+      treeWidget, studioPaletteHandle, levelPaletteHandle, xsheetHandle,
+      currentLevelHandle);
 
-	treeVLayout->addWidget(m_studioPaletteTreeViewer);
-	treeWidget->setLayout(treeVLayout);
+  treeVLayout->addWidget(m_studioPaletteTreeViewer);
+  treeWidget->setLayout(treeVLayout);
 
-	//Second Splitter Widget
-	PaletteViewer *studioPaletteViewer = new PaletteViewer(this, PaletteViewerGUI::STUDIO_PALETTE);
-	studioPaletteViewer->setObjectName("PaletteViewerInStudioPalette");
-	studioPaletteViewer->setXsheetHandle(xsheetHandle);
-	studioPaletteViewer->setPaletteHandle(studioPaletteHandle);
-	studioPaletteViewer->setFrameHandle(frameHandle);
+  // Second Splitter Widget
+  PaletteViewer *studioPaletteViewer =
+      new PaletteViewer(this, PaletteViewerGUI::STUDIO_PALETTE);
+  studioPaletteViewer->setObjectName("PaletteViewerInStudioPalette");
+  studioPaletteViewer->setXsheetHandle(xsheetHandle);
+  studioPaletteViewer->setPaletteHandle(studioPaletteHandle);
+  studioPaletteViewer->setFrameHandle(frameHandle);
 
-	addWidget(treeWidget);
-	addWidget(studioPaletteViewer);
+  addWidget(treeWidget);
+  addWidget(studioPaletteViewer);
 
-	setFocusProxy(studioPaletteViewer);
+  setFocusProxy(studioPaletteViewer);
 }
 
 //-----------------------------------------------------------------------------
 
-StudioPaletteViewer::~StudioPaletteViewer()
-{
-}
+StudioPaletteViewer::~StudioPaletteViewer() {}
 
 //-----------------------------------------------------------------------------
 /*! In order to save current palette from the tool button in the PageViewer.
 */
-TFilePath StudioPaletteViewer::getCurrentItemPath()
-{
-	return m_studioPaletteTreeViewer->getCurrentItemPath();
+TFilePath StudioPaletteViewer::getCurrentItemPath() {
+  return m_studioPaletteTreeViewer->getCurrentItemPath();
 }

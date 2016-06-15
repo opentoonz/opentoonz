@@ -1,4 +1,4 @@
-#if defined _WIN32 // win32 or win64
+#if defined _WIN32  // win32 or win64
 #include "igs_resource_thread_win.cpp"
 #else
 #include "igs_resource_thread_unix.cpp"
@@ -19,5 +19,6 @@ cl /W4 /MD /EHa /O2 /wd4819 /DDEBUG_THREAD_WIN /I%INC% %SRC%.cxx /Fe%TGT%
 mt -manifest %TGT%.exe.manifest -outputresource:%TGT%.exe;1
 del %SRC%.obj %TGT%.exe.manifest
 # ------ rhel4 (32bits)  :21,22 w! tes_u32_thread.csh
-g++ -Wall -O2 -g -DDEBUG_THREAD_UNIX -I../../l01log/src igs_resource_thread.cxx -lpthread -o tes_u32_thread
+g++ -Wall -O2 -g -DDEBUG_THREAD_UNIX -I../../l01log/src igs_resource_thread.cxx
+-lpthread -o tes_u32_thread
 */

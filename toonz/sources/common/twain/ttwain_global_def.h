@@ -46,7 +46,6 @@ typedef void *TW_HANDLE;
 #define GLOBAL_FREE(P) free(P)
 #define GLOBAL_UNLOCK(P) (P)
 
-
 #endif
 #endif
 #endif /*__GLOBAL_DEF_H__*/

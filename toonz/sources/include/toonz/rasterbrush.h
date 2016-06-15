@@ -17,14 +17,15 @@
 
 /*!
 Presa un' immagine raster "completamente trasparente", la funzione "rasterBrush"
-disegna uno stroke raster di colore "color" seguendo i punti contenuti nel vettore
-"points". La funzione rasterBrush non inserisce punti aggiuntivi nel vettore per gestire la
+disegna uno stroke raster di colore "color" seguendo i punti contenuti nel
+vettore
+"points". La funzione rasterBrush non inserisce punti aggiuntivi nel vettore per
+gestire la
 continuita' dello stroke percio' il vettore "points" dovra' gia' contenerli.
 */
 
-DVAPI void rasterBrush(
-	const TRasterCM32P &raster,
-	const std::vector<TThickPoint> &points,
-	int styleId, bool doAntialias);
+DVAPI void rasterBrush(const TRasterCM32P &raster,
+                       const std::vector<TThickPoint> &points, int styleId,
+                       bool doAntialias);
 
 #endif

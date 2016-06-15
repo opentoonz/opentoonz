@@ -39,8 +39,7 @@ class QMatrix;
 //=============================================================================
 // Stage namespace
 
-namespace Stage
-{
+namespace Stage {
 //=============================================================================
 
 DVVAR extern const double inch;
@@ -60,28 +59,20 @@ DVAPI void visit(Visitor &visitor, const VisitArgs &args);
 
 //-----------------------------------------------------------------------------
 
-DVAPI void visit(Visitor &visitor,
-				 ToonzScene *scene,
-				 TXsheet *xsh, int row);
+DVAPI void visit(Visitor &visitor, ToonzScene *scene, TXsheet *xsh, int row);
 
 //-----------------------------------------------------------------------------
 
-DVAPI void visit(Visitor &visitor,
-				 TXshSimpleLevel *level,
-				 const TFrameId &fid,
-				 const OnionSkinMask &osm,
-				 bool isPlaying);
+DVAPI void visit(Visitor &visitor, TXshSimpleLevel *level, const TFrameId &fid,
+                 const OnionSkinMask &osm, bool isPlaying);
 
 //-----------------------------------------------------------------------------
 
-DVAPI void visit(Visitor &visitor,
-				 TXshLevel *level,
-				 const TFrameId &fid,
-				 const OnionSkinMask &osm,
-				 bool isPlaying);
+DVAPI void visit(Visitor &visitor, TXshLevel *level, const TFrameId &fid,
+                 const OnionSkinMask &osm, bool isPlaying);
 
 //-----------------------------------------------------------------------------
-} // namespace Stage
+}  // namespace Stage
 //=============================================================================
 
 const int c_noOnionSkin = -123238796;

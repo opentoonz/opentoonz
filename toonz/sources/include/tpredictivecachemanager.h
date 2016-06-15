@@ -27,37 +27,35 @@
 //--------------------------------------
 
 /*!
-The TPredictiveCacheManager is the TFxCacheManagerDelegate used to cache intermediate
+The TPredictiveCacheManager is the TFxCacheManagerDelegate used to cache
+intermediate
 render results due to predictive analysis of the scene schematic.
 */
 
-class DVAPI TPredictiveCacheManager
-	: public TFxCacheManagerDelegate
-{
-	T_RENDER_RESOURCE_MANAGER
+class DVAPI TPredictiveCacheManager : public TFxCacheManagerDelegate {
+  T_RENDER_RESOURCE_MANAGER
 
-	class Imp;
-	std::unique_ptr<Imp> m_imp;
+  class Imp;
+  std::unique_ptr<Imp> m_imp;
 
 public:
-	TPredictiveCacheManager();
-	~TPredictiveCacheManager();
+  TPredictiveCacheManager();
+  ~TPredictiveCacheManager();
 
-	static TPredictiveCacheManager *instance();
+  static TPredictiveCacheManager *instance();
 
-	int getMaxTileSize() const;
-	int getBPP() const;
+  int getMaxTileSize() const;
+  int getBPP() const;
 
-	void setMaxTileSize(int maxTileSize);
-	void setBPP(int bpp);
+  void setMaxTileSize(int maxTileSize);
+  void setBPP(int bpp);
 
-	void getResource(
-		TCacheResourceP &resource, const std::string &alias,
-		const TFxP &fx, double frame, const TRenderSettings &rs,
-		ResourceDeclaration *resData);
+  void getResource(TCacheResourceP &resource, const std::string &alias,
+                   const TFxP &fx, double frame, const TRenderSettings &rs,
+                   ResourceDeclaration *resData);
 
-	void onRenderStatusStart(int renderStatus);
-	void onRenderStatusEnd(int renderStatus);
+  void onRenderStatusStart(int renderStatus);
+  void onRenderStatusEnd(int renderStatus);
 };
 
-#endif //TPREDICTIVECACHEMANAGER_H
+#endif  // TPREDICTIVECACHEMANAGER_H

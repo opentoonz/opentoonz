@@ -24,49 +24,46 @@ class TButtonSet;
 
 //---------------------------------------------------------------
 
-class DVAPI TToolButtonInfo
-{
-	string m_name;
-	TRaster32P m_downIcon, m_upIcon;
-	TGenericCommandAction *m_action;
-	TButtonSet *m_buttonSet;
+class DVAPI TToolButtonInfo {
+  string m_name;
+  TRaster32P m_downIcon, m_upIcon;
+  TGenericCommandAction *m_action;
+  TButtonSet *m_buttonSet;
 
 public:
-	TToolButtonInfo(string name);
-	~TToolButtonInfo();
+  TToolButtonInfo(string name);
+  ~TToolButtonInfo();
 
-	void setAction(TGenericCommandAction *action);
-	void setIcon(TRaster32P upIcon, TRaster32P downIcon);
-	void setIcon(TRaster32P icon);
-	void setButtonSet(TButtonSet *bs);
+  void setAction(TGenericCommandAction *action);
+  void setIcon(TRaster32P upIcon, TRaster32P downIcon);
+  void setIcon(TRaster32P icon);
+  void setButtonSet(TButtonSet *bs);
 
-	TWidget *createToolButton(TWidget *parent);
-	string getName() const { return m_name; };
+  TWidget *createToolButton(TWidget *parent);
+  string getName() const { return m_name; };
 };
 
 //---------------------------------------------------------------
 
-class DVAPI TToolbar : public TWidget
-{
-	TWidget *m_dockWidget;
+class DVAPI TToolbar : public TWidget {
+  TWidget *m_dockWidget;
 
 public:
-	// static TGuiColor ToolbarColor;
+  // static TGuiColor ToolbarColor;
 
-	class DVAPI Space : public TWidget
-	{
-	public:
-		Space(TWidget *parent);
-		void draw();
-	};
+  class DVAPI Space : public TWidget {
+  public:
+    Space(TWidget *parent);
+    void draw();
+  };
 
-	TToolbar(TWidget *parent, string name);
+  TToolbar(TWidget *parent, string name);
 
-	void draw();
-	void configureNotify(const TDimension &size);
+  void draw();
+  void configureNotify(const TDimension &size);
 
-	void leftButtonDown(const TMouseEvent &);
-	void close();
+  void leftButtonDown(const TMouseEvent &);
+  void close();
 };
 
 #endif

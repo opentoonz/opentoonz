@@ -31,30 +31,26 @@
   to say one).
 */
 
-namespace t32bitsrv
-{
+namespace t32bitsrv {
 
 //*************************************************************************************
 //  Platform-specific Server Command Lines
 //*************************************************************************************
 
-static QString srvName()
-{
-	static QString name(tipc::applicationSpecificServerName("t32bitsrv"));
-	return name;
+static QString srvName() {
+  static QString name(tipc::applicationSpecificServerName("t32bitsrv"));
+  return name;
 }
 
 #ifdef _WIN32
-static QString srvCmdline()
-{
-	static QString cmd("srv/t32bitsrv.exe " + srvName());
-	return cmd;
+static QString srvCmdline() {
+  static QString cmd("srv/t32bitsrv.exe " + srvName());
+  return cmd;
 }
 #else
-static QString srvCmdline()
-{
-	return "\"" + QCoreApplication::applicationDirPath() +
-		   "/t32bitsrv\" " + srvName();
+static QString srvCmdline() {
+  return "\"" + QCoreApplication::applicationDirPath() + "/t32bitsrv\" " +
+         srvName();
 }
 #endif
 
@@ -62,19 +58,19 @@ static QString srvCmdline()
 //  Buffer data exchanger
 //*************************************************************************************
 
-class DVAPI BufferExchanger : public tipc::ShMemReader, public tipc::ShMemWriter
-{
-	UCHAR *m_buf;
-	UCHAR *m_data;
+class DVAPI BufferExchanger : public tipc::ShMemReader,
+                              public tipc::ShMemWriter {
+  UCHAR *m_buf;
+  UCHAR *m_data;
 
 public:
-	BufferExchanger(UCHAR *buf) : m_buf(buf), m_data(buf) {}
-	~BufferExchanger() {}
+  BufferExchanger(UCHAR *buf) : m_buf(buf), m_data(buf) {}
+  ~BufferExchanger() {}
 
-	UCHAR *buffer() const { return m_buf; }
+  UCHAR *buffer() const { return m_buf; }
 
-	int read(const char *srcBuf, int len);
-	int write(char *dstBuf, int len);
+  int read(const char *srcBuf, int len);
+  int write(char *dstBuf, int len);
 };
 
 //*************************************************************************************
@@ -82,27 +78,26 @@ public:
 //*************************************************************************************
 
 template <typename PIXEL>
-class DVAPI RasterExchanger : public tipc::ShMemReader, public tipc::ShMemWriter
-{
-	typedef PIXEL pix_type;
+class DVAPI RasterExchanger : public tipc::ShMemReader,
+                              public tipc::ShMemWriter {
+  typedef PIXEL pix_type;
 
-	TRasterPT<PIXEL> m_ras;
-	PIXEL *m_pix;
+  TRasterPT<PIXEL> m_ras;
+  PIXEL *m_pix;
 
 public:
-	RasterExchanger(TRasterP ras) : m_ras(ras)
-	{
-		m_ras->lock();
-		m_pix = m_ras->pixels(0);
-	}
-	~RasterExchanger() { m_ras->unlock(); }
+  RasterExchanger(TRasterP ras) : m_ras(ras) {
+    m_ras->lock();
+    m_pix = m_ras->pixels(0);
+  }
+  ~RasterExchanger() { m_ras->unlock(); }
 
-	TRasterP raster() const { return m_ras; }
+  TRasterP raster() const { return m_ras; }
 
-	int read(const char *srcBuf, int len);
-	int write(char *dstBuf, int len);
+  int read(const char *srcBuf, int len);
+  int write(char *dstBuf, int len);
 };
 
-} //namespace t32bitsrv
+}  // namespace t32bitsrv
 
-#endif //T32BITSRV_WRAP
+#endif  // T32BITSRV_WRAP

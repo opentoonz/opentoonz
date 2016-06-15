@@ -11,26 +11,25 @@
 //    CacheFxCommand
 //-----------------------------------------------------------------------------
 
-class CacheFxCommand : public QObject
-{
-	Q_OBJECT
+class CacheFxCommand : public QObject {
+  Q_OBJECT
 
 public:
-	CacheFxCommand();
-	~CacheFxCommand();
+  CacheFxCommand();
+  ~CacheFxCommand();
 
-	static CacheFxCommand *instance();
+  static CacheFxCommand *instance();
 
-	void onNewScene();
-	void onSceneLoaded();
+  void onNewScene();
+  void onSceneLoaded();
 
-	void onLevelChanged(const std::string &levelName);
+  void onLevelChanged(const std::string &levelName);
 
 public slots:
 
-	void onFxChanged();
-	void onXsheetChanged();
-	void onObjectChanged();
+  void onFxChanged();
+  void onXsheetChanged();
+  void onObjectChanged();
 };
 
 //=============================================================================

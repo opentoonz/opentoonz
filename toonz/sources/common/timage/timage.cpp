@@ -6,37 +6,24 @@
 
 #include "tpalette.h"
 
-void TImage::setPalette(TPalette *palette)
-{
-	if (m_palette == palette)
-		return;
-	if (palette)
-		palette->addRef();
-	if (m_palette)
-		m_palette->release();
-	m_palette = palette;
+void TImage::setPalette(TPalette *palette) {
+  if (m_palette == palette) return;
+  if (palette) palette->addRef();
+  if (m_palette) m_palette->release();
+  m_palette = palette;
 }
 
-TImage::~TImage()
-{
-	if (m_palette)
-		m_palette->release();
+TImage::~TImage() {
+  if (m_palette) m_palette->release();
 }
 
 #else
 
-class TPalette
-{
-};
+class TPalette {};
 
-void TImage::setPalette(TPalette *palette)
-{
-	assert(false);
-}
+void TImage::setPalette(TPalette *palette) { assert(false); }
 
-TImage::~TImage()
-{
-}
+TImage::~TImage() {}
 
 #endif
 
@@ -44,7 +31,4 @@ TImage::~TImage()
 
 DEFINE_CLASS_CODE(TImage, 4)
 
-TImage::TImage()
-	: TSmartObject(m_classCode), m_palette(0)
-{
-}
+TImage::TImage() : TSmartObject(m_classCode), m_palette(0) {}

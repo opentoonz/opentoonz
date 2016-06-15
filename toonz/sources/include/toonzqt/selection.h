@@ -23,63 +23,59 @@ class QWidget;
 // TSelection
 //-----------------------------------------------------------------------------
 
-class DVAPI TSelection
-{
+class DVAPI TSelection {
 public:
-	class View
-	{
-	public:
-		virtual ~View(){};
+  class View {
+  public:
+    virtual ~View(){};
 
-		virtual void onSelectionChanged() = 0;
-		virtual void enableCommands() {}
-	};
+    virtual void onSelectionChanged() = 0;
+    virtual void enableCommands() {}
+  };
 
 public:
-	TSelection();
-	virtual ~TSelection();
+  TSelection();
+  virtual ~TSelection();
 
-	// override this to define selection related commands
-	virtual void enableCommands()
-	{
-		if (m_view)
-			m_view->enableCommands();
-	}
+  // override this to define selection related commands
+  virtual void enableCommands() {
+    if (m_view) m_view->enableCommands();
+  }
 
-	// call selection handler enableCommand()
-	void enableCommand(CommandId cmdId, CommandHandlerInterface *handler);
+  // call selection handler enableCommand()
+  void enableCommand(CommandId cmdId, CommandHandlerInterface *handler);
 
-	// overridden enableCommands() will call enableCommand()
-	template <class T>
-	inline void enableCommand(T *target, CommandId cmdId, void (T::*method)())
-	{
-		enableCommand(cmdId, new CommandHandlerHelper<T>(target, method));
-	}
+  // overridden enableCommands() will call enableCommand()
+  template <class T>
+  inline void enableCommand(T *target, CommandId cmdId, void (T::*method)()) {
+    enableCommand(cmdId, new CommandHandlerHelper<T>(target, method));
+  }
 
-	template <class T, typename R>
-	inline void enableCommand(T *target, CommandId cmdId, void (T::*method)(R), R value)
-	{
-		enableCommand(cmdId, new CommandHandlerHelper2<T, R>(target, method, value));
-	}
+  template <class T, typename R>
+  inline void enableCommand(T *target, CommandId cmdId, void (T::*method)(R),
+                            R value) {
+    enableCommand(cmdId,
+                  new CommandHandlerHelper2<T, R>(target, method, value));
+  }
 
-	void makeCurrent();
-	void makeNotCurrent();
-	static TSelection *getCurrent();
-	static void setCurrent(TSelection *selection);
+  void makeCurrent();
+  void makeNotCurrent();
+  static TSelection *getCurrent();
+  static void setCurrent(TSelection *selection);
 
-	virtual bool isEmpty() const = 0;
-	virtual void selectNone() = 0;
+  virtual bool isEmpty() const = 0;
+  virtual void selectNone()    = 0;
 
-	virtual bool addMenuActions(QMenu *menu) { return false; }
-	void addMenuAction(QMenu *menu, CommandId cmdId);
+  virtual bool addMenuActions(QMenu *menu) { return false; }
+  void addMenuAction(QMenu *menu, CommandId cmdId);
 
-	void setView(View *view) { m_view = view; }
-	View *getView() const { return m_view; }
+  void setView(View *view) { m_view = view; }
+  View *getView() const { return m_view; }
 
-	void notifyView();
+  void notifyView();
 
 private:
-	View *m_view;
+  View *m_view;
 };
 
-#endif //TSELECTION_H
+#endif  // TSELECTION_H

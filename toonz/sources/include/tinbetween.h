@@ -19,17 +19,16 @@ class TVectorImageP;
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TInbetween
-{
-	class Imp;
-	std::unique_ptr<Imp> m_imp;
+class DVAPI TInbetween {
+  class Imp;
+  std::unique_ptr<Imp> m_imp;
 
 public:
-	TInbetween(const TVectorImageP firstImage, const TVectorImageP lastImage);
+  TInbetween(const TVectorImageP firstImage, const TVectorImageP lastImage);
 
-	virtual ~TInbetween();
+  virtual ~TInbetween();
 
-	TVectorImageP tween(double t) const;
+  TVectorImageP tween(double t) const;
 };
 
 #endif

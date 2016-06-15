@@ -20,46 +20,23 @@
 // TDrawingView
 //---------------------------------------------------------
 
-void TDrawingView::notify(TXshSimpleLevel *, TFrameId id)
-{
-}
+void TDrawingView::notify(TXshSimpleLevel *, TFrameId id) {}
 
-TDrawingView::TDrawingView(
-	TXshSimpleLevel *level,
-	TFrameId fid,
-	const TDimension &size,
-	TDrawingViewObserver *o)
-	: m_size(size)
-{
-}
+TDrawingView::TDrawingView(TXshSimpleLevel *level, TFrameId fid,
+                           const TDimension &size, TDrawingViewObserver *o)
+    : m_size(size) {}
 
-TDrawingView::~TDrawingView()
-{
-}
+TDrawingView::~TDrawingView() {}
 
-const TRaster32P TDrawingView::getRaster() const
-{
-	return TRaster32P();
-}
+const TRaster32P TDrawingView::getRaster() const { return TRaster32P(); }
 
-const TImageP TDrawingView::getImage() const
-{
-	return TImageP();
-}
+const TImageP TDrawingView::getImage() const { return TImageP(); }
 
-TImageP TDrawingView::build(TImageInfo &info)
-{
-	return TImageP();
-}
+TImageP TDrawingView::build(TImageInfo &info) { return TImageP(); }
 
-void TDrawingView::onImageBuilt(const string &id, const TImageP &img)
-{
-}
+void TDrawingView::onImageBuilt(const string &id, const TImageP &img) {}
 
-string TDrawingView::getDrawingId() const
-{
-	return "";
-}
+string TDrawingView::getDrawingId() const { return ""; }
 //=========================================================
 // TImageManager
 //---------------------------------------------------------
@@ -68,90 +45,53 @@ string TDrawingView::getDrawingId() const
 // TToolManager
 //---------------------------------------------------------
 
-class TToolManager::Imp
-{
+class TToolManager::Imp {
 public:
-	Imp() {}
+  Imp() {}
 };
 
-TToolManager::TToolManager()
-	: m_imp(new Imp())
-{
+TToolManager::TToolManager() : m_imp(new Imp()) {}
+
+TToolManager::~TToolManager() { delete m_imp; }
+
+TToolManager *TToolManager::instance() {
+  static TToolManager theInstance;
+  return &theInstance;
 }
 
-TToolManager::~TToolManager()
-{
-	delete m_imp;
-}
+TTool *TToolManager::getCurrentTool() const { return 0; }
 
-TToolManager *TToolManager::instance()
-{
-	static TToolManager theInstance;
-	return &theInstance;
-}
+void TToolManager::setCurrentTool(string toolName) {}
 
-TTool *TToolManager::getCurrentTool() const
-{
-	return 0;
-}
+int TToolManager::getCurrentTargetType() { return 0; }
 
-void TToolManager::setCurrentTool(string toolName)
-{
-}
-
-int TToolManager::getCurrentTargetType()
-{
-	return 0;
-}
-
-void TToolManager::setCurrentTargetType(int tt)
-{
-}
+void TToolManager::setCurrentTargetType(int tt) {}
 
 //=========================================================
 // TSelection
 //---------------------------------------------------------
 
-void TSelection::setCurrent(TSelection *)
-{
-}
+void TSelection::setCurrent(TSelection *) {}
 
 //=========================================================
 // TFramesMovieInfo
 //---------------------------------------------------------
 
-TFramesMovieInfo::TFramesMovieInfo()
-	: m_type("tif"), m_options(0)
-{
-}
+TFramesMovieInfo::TFramesMovieInfo() : m_type("tif"), m_options(0) {}
 
-TFramesMovieInfo::~TFramesMovieInfo()
-{
-}
+TFramesMovieInfo::~TFramesMovieInfo() {}
 
 //=========================================================
 // getxxxinfo()
 //---------------------------------------------------------
 
-TWriterInfo *getRasterMovieInfo(string, bool)
-{
-	return 0;
-}
+TWriterInfo *getRasterMovieInfo(string, bool) { return 0; }
 
-bool getFramesMovieInfo(struct TFramesMovieInfo &, bool)
-{
-	return true;
-}
+bool getFramesMovieInfo(struct TFramesMovieInfo &, bool) { return true; }
 
-TFlashMovieInfo *getFlashMovieInfo(bool)
-{
-	return 0;
-}
+TFlashMovieInfo *getFlashMovieInfo(bool) { return 0; }
 
-TFlashMovieInfo *getScrMovieInfo(bool)
-{
-	return 0;
-}
+TFlashMovieInfo *getScrMovieInfo(bool) { return 0; }
 
 //=========================================================
 // makeScreenSaver
@@ -163,7 +103,7 @@ void makeScreenSaver(TFilePath, TFilePath, string) {}
 // bigBoxSize[]
 //---------------------------------------------------------
 
-double bigBoxSize[3]; // per stage.cpp
+double bigBoxSize[3];  // per stage.cpp
 
 //=========================================================
 // TFxNode
@@ -204,14 +144,13 @@ private:
 // TSecurity
 //---------------------------------------------------------
 
-string TSecurity::getRegistryRoot(void)
-{
+string TSecurity::getRegistryRoot(void) {
 #ifdef WIN32
-	string reg = "SOFTWARE\\Digital Video\\Toonz\\5.0\\";
-	return reg;
+  string reg = "SOFTWARE\\Digital Video\\Toonz\\5.0\\";
+  return reg;
 #else
-	assert(false);
-	return "";
+  assert(false);
+  return "";
 #endif
 }
 
@@ -219,30 +158,20 @@ string TSecurity::getRegistryRoot(void)
 // TSelection
 //---------------------------------------------------------
 
-TSelection *TSelection::getCurrent()
-{
-	return 0;
-}
+TSelection *TSelection::getCurrent() { return 0; }
 
 //=========================================================
 // XshPasteBuffer
 //---------------------------------------------------------
 
-XshPasteBuffer::XshPasteBuffer(int, int)
-	: m_columnCount(0), m_rowCount(0)
-{
+XshPasteBuffer::XshPasteBuffer(int, int) : m_columnCount(0), m_rowCount(0) {}
+
+TXshCell &XshPasteBuffer::cell(int, int) {
+  static TXshCell empty;
+  return empty;
 }
 
-TXshCell &XshPasteBuffer::cell(int, int)
-{
-	static TXshCell empty;
-	return empty;
-}
-
-TDataP XshPasteBuffer::clone() const
-{
-	return TDataP();
-}
+TDataP XshPasteBuffer::clone() const { return TDataP(); }
 
 /*
 LevelThumbnail::LevelThumbnail(const TDimension &d, TXshSimpleLevel *)
@@ -253,18 +182,14 @@ LevelThumbnail::LevelThumbnail(const TDimension &d, TXshSimpleLevel *)
 
 void FxController::setCurrentFx(TFx *) {}
 FxController::FxController() {}
-FxController *FxController::instance()
-{
-	static FxController _instance;
-	return &_instance;
+FxController *FxController::instance() {
+  static FxController _instance;
+  return &_instance;
 }
 
 #ifndef WIN32
-//to avoid twin dep
-void postThreadMsg(TThread::Msg *)
-{
-	return;
-}
+// to avoid twin dep
+void postThreadMsg(TThread::Msg *) { return; }
 
 DEFINE_CLASS_CODE(TData, 16)
 

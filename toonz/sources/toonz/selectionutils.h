@@ -22,15 +22,19 @@ class TXsheet;
 //    Selection-related  utility functions
 //*********************************************************************************
 
-//! Returns the set of all level frames contained in the specified xsheet cells range
+//! Returns the set of all level frames contained in the specified xsheet cells
+//! range
 //! (r0 <= r <= r1 and c0 <= c <= c1).
 template <typename LevelType>
-void getSelectedFrames(const TXsheet &xsh, int r0, int c0, int r1, int c1,
-					   std::map<LevelType *, std::set<TFrameId>> &framesByLevel);
+void getSelectedFrames(
+    const TXsheet &xsh, int r0, int c0, int r1, int c1,
+    std::map<LevelType *, std::set<TFrameId>> &framesByLevel);
 
 //! Returns the set of all level frames contained in current selection.
-//! Recognized selection types include cell, cast, column and filmstrip selections.
+//! Recognized selection types include cell, cast, column and filmstrip
+//! selections.
 template <typename LevelType>
-void getSelectedFrames(std::map<LevelType *, std::set<TFrameId>> &framesByLevel);
+void getSelectedFrames(
+    std::map<LevelType *, std::set<TFrameId>> &framesByLevel);
 
-#endif // SELECTIONUTILS_H
+#endif  // SELECTIONUTILS_H

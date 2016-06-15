@@ -22,4 +22,4 @@ class QWidget;
 DVAPI void setToolCursor(QWidget *viewer, int cursorId);
 DVAPI QCursor getToolCursor(int cursorId);
 
-#endif // CURSORMANAGER_H
+#endif  // CURSORMANAGER_H

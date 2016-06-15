@@ -4,7 +4,7 @@
 #define SHADERINTERFACE_H
 
 // Glew includes
-#include <GL/glew.h> // Must be included before tgl.h
+#include <GL/glew.h>  // Must be included before tgl.h
 
 // TnzBase includes
 #include "tparamuiconcept.h"
@@ -68,170 +68,166 @@ class QGLShaderProgram;
   A loaded ShaderInterface allows access to shader parameters and
   acts as a factory object to compiled QGLShaderProgram instances.
 */
-class DVAPI ShaderInterface : public TPersist
-{
-public: // Enums
-	enum ParameterConceptType {
-		CONCEPT_NONE,
-		PERCENT,
-		LENGTH,
-		ANGLE,
-		POINT,
-		RADIUS_UI,
-		WIDTH_UI,
-		ANGLE_UI,
-		POINT_UI,
-		XY_UI,
-		VECTOR_UI,
-		POLAR_UI,
-		SIZE_UI,
-		QUAD_UI,
-		RECT_UI,
+class DVAPI ShaderInterface : public TPersist {
+public:  // Enums
+  enum ParameterConceptType {
+    CONCEPT_NONE,
+    PERCENT,
+    LENGTH,
+    ANGLE,
+    POINT,
+    RADIUS_UI,
+    WIDTH_UI,
+    ANGLE_UI,
+    POINT_UI,
+    XY_UI,
+    VECTOR_UI,
+    POLAR_UI,
+    SIZE_UI,
+    QUAD_UI,
+    RECT_UI,
 
-		CONCEPTSCOUNT,
-		UI_CONCEPTS = RADIUS_UI
-	};
+    CONCEPTSCOUNT,
+    UI_CONCEPTS = RADIUS_UI
+  };
 
-	enum ParameterType {
-		PARAMETER_UNKNOWN,
-		BOOL,
-		FLOAT,
-		VEC2,
-		VEC3,
-		VEC4,
-		INT,
-		IVEC2,
-		IVEC3,
-		IVEC4,
-		RGBA,
-		RGB,
-		TYPESCOUNT
-	};
+  enum ParameterType {
+    PARAMETER_UNKNOWN,
+    BOOL,
+    FLOAT,
+    VEC2,
+    VEC3,
+    VEC4,
+    INT,
+    IVEC2,
+    IVEC3,
+    IVEC4,
+    RGBA,
+    RGB,
+    TYPESCOUNT
+  };
 
-	enum HandledWorldTransformsType {
-		HWT_UNKNOWN,
-		ANY,
-		ISOTROPIC,
-		HWTCOUNT
-	};
+  enum HandledWorldTransformsType { HWT_UNKNOWN, ANY, ISOTROPIC, HWTCOUNT };
 
-public: // Sub-classes
-	class ParameterConcept : public TPersist
-	{
-		PERSIST_DECLARATION(ParameterConcept)
+public:  // Sub-classes
+  class ParameterConcept : public TPersist {
+    PERSIST_DECLARATION(ParameterConcept)
 
-	public:
-		ParameterConceptType m_type;		   //!< The concept type (typically composite)
-		QString m_label;					   //!< Name to be shown for ui concepts
-		std::vector<QString> m_parameterNames; //!< The involved parameters (by name)
+  public:
+    ParameterConceptType m_type;  //!< The concept type (typically composite)
+    QString m_label;              //!< Name to be shown for ui concepts
+    std::vector<QString>
+        m_parameterNames;  //!< The involved parameters (by name)
 
-	public:
-		ParameterConcept() : m_type(CONCEPT_NONE) {}
-		ParameterConcept(ParameterConceptType type, const QString &label)
-			: m_type(type), m_label(label) {}
+  public:
+    ParameterConcept() : m_type(CONCEPT_NONE) {}
+    ParameterConcept(ParameterConceptType type, const QString &label)
+        : m_type(type), m_label(label) {}
 
-		bool isUI() const { return m_type >= UI_CONCEPTS && m_type < CONCEPTSCOUNT; }
+    bool isUI() const {
+      return m_type >= UI_CONCEPTS && m_type < CONCEPTSCOUNT;
+    }
 
-	protected:
-		void saveData(TOStream &os);
-		void loadData(TIStream &is);
-	};
+  protected:
+    void saveData(TOStream &os);
+    void loadData(TIStream &is);
+  };
 
-	union ParameterValue {
-		GLboolean m_bool;
-		GLfloat m_float;
-		GLfloat m_vec2[2];
-		GLfloat m_vec3[3];
-		GLfloat m_vec4[4];
-		GLint m_int;
-		GLint m_ivec2[2];
-		GLint m_ivec3[3];
-		GLint m_ivec4[4];
-		GLubyte m_rgba[4];
-		GLubyte m_rgb[3];
-	};
+  union ParameterValue {
+    GLboolean m_bool;
+    GLfloat m_float;
+    GLfloat m_vec2[2];
+    GLfloat m_vec3[3];
+    GLfloat m_vec4[4];
+    GLint m_int;
+    GLint m_ivec2[2];
+    GLint m_ivec3[3];
+    GLint m_ivec4[4];
+    GLubyte m_rgba[4];
+    GLubyte m_rgb[3];
+  };
 
-	class Parameter : public TPersist
-	{
-		PERSIST_DECLARATION(Parameter)
+  class Parameter : public TPersist {
+    PERSIST_DECLARATION(Parameter)
 
-	public:
-		ParameterType m_type;
-		QString m_name;
+  public:
+    ParameterType m_type;
+    QString m_name;
 
-		ParameterValue m_default;
-		ParameterValue m_range[2];
+    ParameterValue m_default;
+    ParameterValue m_range[2];
 
-		ParameterConcept m_concept;
+    ParameterConcept m_concept;
 
-	public:
-		Parameter() : m_type(PARAMETER_UNKNOWN) {}
-		Parameter(ParameterType type, const QString &name)
-			: m_type(type), m_name(name) {}
+  public:
+    Parameter() : m_type(PARAMETER_UNKNOWN) {}
+    Parameter(ParameterType type, const QString &name)
+        : m_type(type), m_name(name) {}
 
-	protected:
-		void saveData(TOStream &os);
-		void loadData(TIStream &is);
-	};
+  protected:
+    void saveData(TOStream &os);
+    void loadData(TIStream &is);
+  };
 
-	class ShaderData : public TPersist
-	{
-		PERSIST_DECLARATION(ShaderData)
+  class ShaderData : public TPersist {
+    PERSIST_DECLARATION(ShaderData)
 
-	public:
-		QString m_name;				  //!< A name associated to the shader action
-		TFilePath m_path;			  //!< The shader program's file path
-		QGLShader::ShaderType m_type; //!< The shader type
+  public:
+    QString m_name;                //!< A name associated to the shader action
+    TFilePath m_path;              //!< The shader program's file path
+    QGLShader::ShaderType m_type;  //!< The shader type
 
-	public:
-		bool isValid() const { return !m_path.isEmpty(); }
+  public:
+    bool isValid() const { return !m_path.isEmpty(); }
 
-	protected:
-		void saveData(TOStream &os);
-		void loadData(TIStream &is);
-	};
+  protected:
+    void saveData(TOStream &os);
+    void loadData(TIStream &is);
+  };
 
-public: // Public methods
-	ShaderInterface();
+public:  // Public methods
+  ShaderInterface();
 
-	bool isValid() const;
+  bool isValid() const;
 
-	const std::vector<Parameter> &parameters() const;
-	const std::vector<QString> &inputPorts() const;
+  const std::vector<Parameter> &parameters() const;
+  const std::vector<QString> &inputPorts() const;
 
-	const ShaderData &mainShader() const;
-	const ShaderData &inputPortsShader() const;
-	const ShaderData &bboxShader() const;
+  const ShaderData &mainShader() const;
+  const ShaderData &inputPortsShader() const;
+  const ShaderData &bboxShader() const;
 
-	HandledWorldTransformsType hwtType() const;
+  HandledWorldTransformsType hwtType() const;
 
-	/*!
-    Returns a compiled shader program against current OpenGL context, and the
-    last modified date of the associated shader file.
-  */
-	std::pair<QGLShaderProgram *, QDateTime> makeProgram(const ShaderData &sd,
-														 int varyingsCount = 0, const GLchar **varyingNames = 0) const;
+  /*!
+Returns a compiled shader program against current OpenGL context, and the
+last modified date of the associated shader file.
+*/
+  std::pair<QGLShaderProgram *, QDateTime> makeProgram(
+      const ShaderData &sd, int varyingsCount = 0,
+      const GLchar **varyingNames = 0) const;
 
 protected:
-	void clear();
+  void clear();
 
-	void saveData(TOStream &os);
-	void loadData(TIStream &is);
+  void saveData(TOStream &os);
+  void loadData(TIStream &is);
 
 private:
-	PERSIST_DECLARATION(ShaderInterface)
+  PERSIST_DECLARATION(ShaderInterface)
 
-	ShaderData m_mainShader;					 //!< Main (fragment) shader data
-	std::vector<Parameter> m_parameters;		 //!< List of parameters for the shader
-	std::vector<ParameterConcept> m_parConcepts; //!< List of (composite) parameter concepts
+  ShaderData m_mainShader;              //!< Main (fragment) shader data
+  std::vector<Parameter> m_parameters;  //!< List of parameters for the shader
+  std::vector<ParameterConcept>
+      m_parConcepts;  //!< List of (composite) parameter concepts
 
-	std::vector<QString> m_ports;
-	ShaderData m_portsShader;		  //!< (Vertex) shader dedicated to input
-									  //!< ports' geometries calculation
-	ShaderData m_bboxShader;		  //!< (Vertex) shader dedicated to extracting
-									  //!< the fx's bbox
-	HandledWorldTransformsType m_hwt; //!< World transform types \a handled by
-									  //!< associated ShaderFx instances
+  std::vector<QString> m_ports;
+  ShaderData m_portsShader;  //!< (Vertex) shader dedicated to input
+                             //!< ports' geometries calculation
+  ShaderData m_bboxShader;   //!< (Vertex) shader dedicated to extracting
+                             //!< the fx's bbox
+  HandledWorldTransformsType m_hwt;  //!< World transform types \a handled by
+                                     //!< associated ShaderFx instances
 };
 
-#endif // SHADERINTERFACE_H
+#endif  // SHADERINTERFACE_H

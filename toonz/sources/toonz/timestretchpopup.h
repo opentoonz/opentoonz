@@ -18,40 +18,37 @@ class TSelection;
 // TimeStretchPopup
 //-----------------------------------------------------------------------------
 
-class TimeStretchPopup : public DVGui::Dialog
-{
-	Q_OBJECT
+class TimeStretchPopup : public DVGui::Dialog {
+  Q_OBJECT
 
-	QPushButton *m_okBtn;
-	QPushButton *m_cancelBtn;
+  QPushButton *m_okBtn;
+  QPushButton *m_cancelBtn;
 
-	QComboBox *m_stretchType;
-	DVGui::IntLineEdit *m_newRangeFld;
-	QLabel *m_oldRange;
+  QComboBox *m_stretchType;
+  DVGui::IntLineEdit *m_newRangeFld;
+  QLabel *m_oldRange;
 
 public:
-	enum STRETCH_TYPE {
-		eRegion = 0,
-		eFrameRange = 1,
-		eWholeXsheet = 2
-	};
+  enum STRETCH_TYPE { eRegion = 0, eFrameRange = 1, eWholeXsheet = 2 };
 
 private:
-	STRETCH_TYPE m_currentStretchType;
+  STRETCH_TYPE m_currentStretchType;
 
 public:
-	TimeStretchPopup();
+  TimeStretchPopup();
 
 protected:
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *);
 
 protected slots:
-	void setCurrentStretchType(int index);
-	void stretch();
-	void updateValues();
-	void updateValues(TSelection *selection);
-	void updateValues(TSelection *selection, TSelection *newSelection) { updateValues(newSelection); }
+  void setCurrentStretchType(int index);
+  void stretch();
+  void updateValues();
+  void updateValues(TSelection *selection);
+  void updateValues(TSelection *selection, TSelection *newSelection) {
+    updateValues(newSelection);
+  }
 };
 
-#endif // TIMESTRETCHPOPUP_H
+#endif  // TIMESTRETCHPOPUP_H

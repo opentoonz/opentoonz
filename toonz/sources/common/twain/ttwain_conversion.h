@@ -12,7 +12,7 @@ extern "C" {
 float TTWAIN_Fix32ToFloat(TW_FIX32 fix);
 TW_FIX32 TTWAIN_FloatToFix32(float fl);
 void TTWAIN_ConvertRevStrToRevNum(const char *rev_str, TW_UINT16 *maj_num,
-								  TW_UINT16 *min_num);
+                                  TW_UINT16 *min_num);
 
 #ifdef __cplusplus
 }

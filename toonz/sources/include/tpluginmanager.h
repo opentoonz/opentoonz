@@ -41,14 +41,13 @@ class TFilePath;
 
 //-----------------------------------------------------------------------------
 
-class DVAPI TPluginInfo
-{
-	std::string m_name;
+class DVAPI TPluginInfo {
+  std::string m_name;
 
 public:
-	TPluginInfo(std::string name = "") : m_name(name){};
-	~TPluginInfo(){};
-	std::string getName() const { return m_name; };
+  TPluginInfo(std::string name = "") : m_name(name){};
+  ~TPluginInfo(){};
+  std::string getName() const { return m_name; };
 };
 
 //-----------------------------------------------------------------------------
@@ -56,58 +55,52 @@ public:
 // L'entry point del plugin e' TLIBMAIN {....}
 //
 #ifdef _WIN32
-#define TLIBMAIN                     \
-	extern "C" __declspec(dllexport) \
-		const TPluginInfo *          \
-		TLibMain()
+#define TLIBMAIN extern "C" __declspec(dllexport) const TPluginInfo *TLibMain()
 #else
-#define TLIBMAIN \
-	extern "C" const TPluginInfo *TLibMain()
+#define TLIBMAIN extern "C" const TPluginInfo *TLibMain()
 #endif
 
 //-----------------------------------------------------------------------------
 
-class DVAPI TPluginManager
-{ // singleton
+class DVAPI TPluginManager {  // singleton
 
-	class Plugin;
+  class Plugin;
 
-	std::set<std::string> m_ignoreList;
-	typedef std::vector<const Plugin *> PluginTable;
-	PluginTable m_pluginTable;
-	std::set<TFilePath> m_loadedPlugins;
+  std::set<std::string> m_ignoreList;
+  typedef std::vector<const Plugin *> PluginTable;
+  PluginTable m_pluginTable;
+  std::set<TFilePath> m_loadedPlugins;
 
-	TPluginManager();
+  TPluginManager();
 
 public:
-	~TPluginManager();
-	static TPluginManager *instance();
+  ~TPluginManager();
+  static TPluginManager *instance();
 
-	// the name should be ignored? (name only; case insensitive. e.g. "tnzimage")
-	bool isIgnored(std::string name) const;
+  // the name should be ignored? (name only; case insensitive. e.g. "tnzimage")
+  bool isIgnored(std::string name) const;
 
-	// set names to ignore; clear previous list
-	void setIgnoredList(const std::set<std::string> &lst);
+  // set names to ignore; clear previous list
+  void setIgnoredList(const std::set<std::string> &lst);
 
-	// helper method.
-	void setIgnored(std::string name)
-	{
-		std::set<std::string> lst;
-		lst.insert(name);
-		setIgnoredList(lst);
-	}
+  // helper method.
+  void setIgnored(std::string name) {
+    std::set<std::string> lst;
+    lst.insert(name);
+    setIgnoredList(lst);
+  }
 
-	// try to load plugin specified by fp; check if already loaded
-	void loadPlugin(const TFilePath &fp);
+  // try to load plugin specified by fp; check if already loaded
+  void loadPlugin(const TFilePath &fp);
 
-	// load all plugins in dir
-	void loadPlugins(const TFilePath &dir);
+  // load all plugins in dir
+  void loadPlugins(const TFilePath &dir);
 
-	// load all plugins in <bin>/plugins/io and <bin>/plugins/fx
-	void loadStandardPlugins();
+  // load all plugins in <bin>/plugins/io and <bin>/plugins/fx
+  void loadStandardPlugins();
 
-	// unload plugins (automatically called atexit)
-	void unloadPlugins();
+  // unload plugins (automatically called atexit)
+  void unloadPlugins();
 };
 
 #endif

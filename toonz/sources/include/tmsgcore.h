@@ -22,14 +22,13 @@ class QTcpSocket;
 
 #undef ERROR
 
-namespace DVGui
-{
+namespace DVGui {
 
 enum MsgType {
-	INFORMATION,
-	WARNING,  //this one opens  a popup only if tmsg not visible
-	CRITICAL, //this one opens always a popup
-	QUESTION
+  INFORMATION,
+  WARNING,   // this one opens  a popup only if tmsg not visible
+  CRITICAL,  // this one opens always a popup
+  QUESTION
 };
 
 void DVAPI MsgBox(MsgType type, const QString &text);
@@ -39,37 +38,36 @@ void DVAPI warning(const QString &msg);
 void DVAPI info(const QString &msg);
 };
 
-class DVAPI TMsgCore : public QObject
-{
-	Q_OBJECT
+class DVAPI TMsgCore : public QObject {
+  Q_OBJECT
 
-	QTcpServer *m_tcpServer;
-	QTcpSocket *m_clientSocket;
-	std::set<QTcpSocket *> m_sockets;
-	void readFromSocket(QTcpSocket *socket);
+  QTcpServer *m_tcpServer;
+  QTcpSocket *m_clientSocket;
+  std::set<QTcpSocket *> m_sockets;
+  void readFromSocket(QTcpSocket *socket);
 
 public:
-	TMsgCore();
-	~TMsgCore();
-	static TMsgCore *instance();
+  TMsgCore();
+  ~TMsgCore();
+  static TMsgCore *instance();
 
-	//client side
-	// 'send' returns false if the tmessage is not active in the application (tipically, in console applications such as tcomposer)
-	bool send(DVGui::MsgType type, const QString &message);
-	void connectTo(const QString &address = "");
+  // client side
+  // 'send' returns false if the tmessage is not active in the application
+  // (tipically, in console applications such as tcomposer)
+  bool send(DVGui::MsgType type, const QString &message);
+  void connectTo(const QString &address = "");
 
-	//server side
-	bool openConnection();
-	QString getConnectionName();
+  // server side
+  bool openConnection();
+  QString getConnectionName();
 
-	Q_SIGNALS :
+Q_SIGNALS:
 
-		void
-		sendMessage(int type, const QString &message);
+  void sendMessage(int type, const QString &message);
 
 public Q_SLOTS:
 
-	void OnNewConnection();
-	void OnReadyRead();
-	void OnDisconnected();
+  void OnNewConnection();
+  void OnReadyRead();
+  void OnDisconnected();
 };

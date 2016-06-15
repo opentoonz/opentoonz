@@ -7,13 +7,14 @@
 
 // unit conversion
 inline double inToPixel(double val, double dpi) { return val * dpi; }
-inline double mmToPixel(double val, double dpi) { return (val * dpi) * (1.0 / 25.4); }
+inline double mmToPixel(double val, double dpi) {
+  return (val * dpi) * (1.0 / 25.4);
+}
 
-class TCleanupException : public TException
-{
+class TCleanupException : public TException {
 public:
-	TCleanupException(const char *msg) : TException(msg) {}
-	~TCleanupException() {}
+  TCleanupException(const char *msg) : TException(msg) {}
+  ~TCleanupException() {}
 };
 
 #ifndef MAX_DOT

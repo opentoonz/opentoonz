@@ -8,74 +8,53 @@
 #ifndef _SDEF_H_
 #define _SDEF_H_
 
-//typedef   signed char  SCHAR;
+// typedef   signed char  SCHAR;
 typedef unsigned char UCHAR;
 /*typedef unsigned short USHORT;
 typedef unsigned int   UINT;
 typedef unsigned long  ULONG;
 */
 
-typedef struct _UC_PIXEL {
-	unsigned char b, g, r, m;
-} UC_PIXEL;
-typedef struct _US_PIXEL {
-	unsigned short b, g, r, m;
-} US_PIXEL;
-typedef struct _I_PIXEL {
-	int b, g, r, m;
-} I_PIXEL;
+typedef struct _UC_PIXEL { unsigned char b, g, r, m; } UC_PIXEL;
+typedef struct _US_PIXEL { unsigned short b, g, r, m; } US_PIXEL;
+typedef struct _I_PIXEL { int b, g, r, m; } I_PIXEL;
 
-#define ASSIGN_PIXEL(d, s) \
-	{                      \
-		(d)->r = (s)->r;   \
-		(d)->g = (s)->g;   \
-		(d)->b = (s)->b;   \
-		(d)->m = (s)->m;   \
-	}
-#define NULL_PIXEL(d)                          \
-	{                                          \
-		(d)->r = (d)->g = (d)->b = (d)->m = 0; \
-	}
-#define COLOR_PIXEL(d, r, g, b, m) \
-	{                              \
-		(d)->r = (r);              \
-		(d)->g = (g);              \
-		(d)->b = (b);              \
-		(d)->m = (m);              \
-	}
+#define ASSIGN_PIXEL(d, s)                                                     \
+  {                                                                            \
+    (d)->r = (s)->r;                                                           \
+    (d)->g = (s)->g;                                                           \
+    (d)->b = (s)->b;                                                           \
+    (d)->m = (s)->m;                                                           \
+  }
+#define NULL_PIXEL(d)                                                          \
+  { (d)->r = (d)->g = (d)->b = (d)->m = 0; }
+#define COLOR_PIXEL(d, r, g, b, m)                                             \
+  {                                                                            \
+    (d)->r = (r);                                                              \
+    (d)->g = (g);                                                              \
+    (d)->b = (b);                                                              \
+    (d)->m = (m);                                                              \
+  }
 
+typedef struct { int x0, y0, x1, y1; } SRECT;
+typedef struct { double x0, y0, x1, y1; } SDRECT;
+typedef struct { int x0, y0, x1, y1; } SLINE;
+typedef struct { double x0, y0, x1, y1; } SDLINE;
+typedef struct { int x, y; } SPOINT;
+typedef struct { double x, y; } SDPOINT;
+typedef struct { int x, y, w; } SXYW;
 typedef struct {
-	int x0, y0, x1, y1;
-} SRECT;
-typedef struct {
-	double x0, y0, x1, y1;
-} SDRECT;
-typedef struct {
-	int x0, y0, x1, y1;
-} SLINE;
-typedef struct {
-	double x0, y0, x1, y1;
-} SDLINE;
-typedef struct {
-	int x, y;
-} SPOINT;
-typedef struct {
-	double x, y;
-} SDPOINT;
-typedef struct {
-	int x, y, w;
-} SXYW;
-typedef struct {
-	int x, y;
-	double w;
+  int x, y;
+  double w;
 } SXYDW;
 
 typedef struct {
-	int x, y;
-	double d;
+  int x, y;
+  double d;
 } SXYD;
 
-#define I_ROUND(x) ((int)(((int)(-0.9F) == 0 && (x) < 0.0F) ? ((x)-0.5F) : ((x) + 0.5F)))
+#define I_ROUND(x)                                                             \
+  ((int)(((int)(-0.9F) == 0 && (x) < 0.0F) ? ((x)-0.5F) : ((x) + 0.5F)))
 #define I_ROUNDP(x) ((int)((x) + 0.5F))
 #define UC_ROUND(x) ((unsigned char)((x) + 0.5F))
 #define US_ROUND(x) ((unsigned short)((x) + 0.5F))

@@ -1,6 +1,6 @@
 
 
-/* 
+/*
  * This file occurs to maintain some information about comments and descriptions
  */
 

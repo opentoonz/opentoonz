@@ -36,7 +36,7 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TStroke;
 class TRegion;
 class TVectorImage;
@@ -51,8 +51,10 @@ class TVectorRenderData;
  */
 void DVAPI tglDraw(const TVectorRenderData &rd, const TVectorImage *vim);
 void DVAPI tglDrawMask(const TVectorRenderData &rd, const TVectorImage *vim);
-void DVAPI tglDraw(const TVectorRenderData &rd, const TStroke *stroke, bool pushAttribs = true);
-void DVAPI tglDraw(const TVectorRenderData &rd, TRegion *r, bool pushAttribs = true);
+void DVAPI tglDraw(const TVectorRenderData &rd, const TStroke *stroke,
+                   bool pushAttribs = true);
+void DVAPI tglDraw(const TVectorRenderData &rd, TRegion *r,
+                   bool pushAttribs = true);
 
 //=============================================================================
 

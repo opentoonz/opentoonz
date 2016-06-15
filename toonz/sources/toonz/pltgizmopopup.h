@@ -12,52 +12,50 @@
 // ValueAdjuster
 //-----------------------------------------------------------------------------
 
-class ValueAdjuster : public QWidget
-{
-	Q_OBJECT
+class ValueAdjuster : public QWidget {
+  Q_OBJECT
 
-	DVGui::DoubleLineEdit *m_valueLineEdit;
+  DVGui::DoubleLineEdit *m_valueLineEdit;
 
 public:
 #if QT_VERSION >= 0x050500
-	ValueAdjuster(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  ValueAdjuster(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
-	ValueAdjuster(QWidget *parent = 0, Qt::WFlags flags = 0);
+  ValueAdjuster(QWidget *parent = 0, Qt::WFlags flags = 0);
 #endif
-	~ValueAdjuster();
+  ~ValueAdjuster();
 
 protected slots:
-	void onClickedPlus();
-	void onClickedMinus();
+  void onClickedPlus();
+  void onClickedMinus();
 
 signals:
-	void adjust(double factor);
+  void adjust(double factor);
 };
 
 //=============================================================================
 // ValueShifter
 //-----------------------------------------------------------------------------
 
-class ValueShifter : public QWidget
-{
-	Q_OBJECT
+class ValueShifter : public QWidget {
+  Q_OBJECT
 
-	DVGui::DoubleLineEdit *m_valueLineEdit;
+  DVGui::DoubleLineEdit *m_valueLineEdit;
 
 public:
 #if QT_VERSION >= 0x050500
-	ValueShifter(bool isHue, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  ValueShifter(bool isHue, QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
-	ValueShifter(bool isHue, QWidget *parent = 0, Qt::WFlags flags = 0);
+  ValueShifter(bool isHue, QWidget *parent = 0, Qt::WFlags flags = 0);
 #endif
-	~ValueShifter();
+  ~ValueShifter();
 
 protected slots:
-	void onClickedPlus();
-	void onClickedMinus();
+  void onClickedPlus();
+  void onClickedMinus();
 
 signals:
-	void adjust(double factor);
+  void adjust(double factor);
 };
 
 //=============================================================================
@@ -66,59 +64,57 @@ signals:
 
 // TODO: spostare il colorfield qui dentro
 
-class ColorFader : public QWidget
-{
-	Q_OBJECT
+class ColorFader : public QWidget {
+  Q_OBJECT
 
-	DVGui::DoubleLineEdit *m_valueLineEdit;
+  DVGui::DoubleLineEdit *m_valueLineEdit;
 
 public:
 #if QT_VERSION >= 0x050500
-	ColorFader(QString name = "", QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  ColorFader(QString name = "", QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
-	ColorFader(QString name = "", QWidget *parent = 0, Qt::WFlags flags = 0);
+  ColorFader(QString name = "", QWidget *parent = 0, Qt::WFlags flags = 0);
 #endif
-	~ColorFader();
+  ~ColorFader();
 
 protected slots:
-	void onClicked();
+  void onClicked();
 
 signals:
-	void valueChanged(double factor);
+  void valueChanged(double factor);
 };
 
 //=============================================================================
 // PltGizmoPopup
 //-----------------------------------------------------------------------------
 
-class PltGizmoPopup : public DVGui::Dialog
-{
-	Q_OBJECT
+class PltGizmoPopup : public DVGui::Dialog {
+  Q_OBJECT
 
-	DVGui::ColorField *m_colorFld;
+  DVGui::ColorField *m_colorFld;
 
 public:
-	PltGizmoPopup();
+  PltGizmoPopup();
 
-	~PltGizmoPopup();
+  ~PltGizmoPopup();
 
 public slots:
 
-	void adjustV(double p);
-	void adjustS(double p);
-	void adjustH(double p);
-	void adjustT(double p);
+  void adjustV(double p);
+  void adjustS(double p);
+  void adjustH(double p);
+  void adjustT(double p);
 
-	void shiftV(double p);
-	void shiftS(double p);
-	void shiftH(double p);
-	void shiftT(double p);
+  void shiftV(double p);
+  void shiftS(double p);
+  void shiftH(double p);
+  void shiftT(double p);
 
-	void zeroMatte();
-	void fullMatte();
+  void zeroMatte();
+  void fullMatte();
 
-	void onBlend();
-	void onFade(double p);
+  void onBlend();
+  void onFade(double p);
 };
 
-#endif // PLTGIZMOPOPUP_H
+#endif  // PLTGIZMOPOPUP_H

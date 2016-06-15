@@ -17,33 +17,31 @@
 
 class TFilePath;
 
-class DVAPI TStringTable
-{
+class DVAPI TStringTable {
 public:
-	static const TStringTable *instance();
-	static std::wstring translate(std::string);
+  static const TStringTable *instance();
+  static std::wstring translate(std::string);
 
-	class Item
-	{
-	public:
-		std::wstring m_name, m_help, m_tip;
-		Item() : m_name(), m_help(), m_tip(){};
-	};
+  class Item {
+  public:
+    std::wstring m_name, m_help, m_tip;
+    Item() : m_name(), m_help(), m_tip(){};
+  };
 
-	virtual const Item *getItem(std::string name) const = 0;
+  virtual const Item *getItem(std::string name) const = 0;
 
-	virtual std::pair<std::string, int> getDefaultFontNameAndSize() const = 0;
+  virtual std::pair<std::string, int> getDefaultFontNameAndSize() const = 0;
 
-	virtual std::string getDefaultMacFontName() const = 0;
+  virtual std::string getDefaultMacFontName() const = 0;
 
 protected:
-	TStringTable();
-	virtual ~TStringTable();
+  TStringTable();
+  virtual ~TStringTable();
 
 private:
-	// not implemented
-	TStringTable(const TStringTable &);
-	TStringTable &operator=(const TStringTable &);
+  // not implemented
+  TStringTable(const TStringTable &);
+  TStringTable &operator=(const TStringTable &);
 };
 
 #endif

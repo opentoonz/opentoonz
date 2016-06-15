@@ -15,21 +15,20 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TLabel : public TWidget
-{
-	wstring m_text;
-	bool m_border;
-	Alignment m_alignment;
+class DVAPI TLabel : public TWidget {
+  wstring m_text;
+  bool m_border;
+  Alignment m_alignment;
 
 public:
-	TLabel(TWidget *parent, string name = "label");
-	void draw();
+  TLabel(TWidget *parent, string name = "label");
+  void draw();
 
-	void setText(string s);
-	void setText(wstring s);
+  void setText(string s);
+  void setText(wstring s);
 
-	void setBorder(bool b) { m_border = b; };
-	void setAlignment(Alignment a) { m_alignment = a; };
+  void setBorder(bool b) { m_border = b; };
+  void setAlignment(Alignment a) { m_alignment = a; };
 };
 
 #endif

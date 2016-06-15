@@ -20,76 +20,78 @@
 class TXsheet;
 
 //=============================================================================
-//!The TXshChildLevel class provides a child level of xsheet and allows its management.
+//! The TXshChildLevel class provides a child level of xsheet and allows its
+//! management.
 /*!Inherits \b TXshLevel.
 \n A child level getChildLevel() is a xsheet reduced to level.
-   The class allows to edit xsheet getXsheet(), change xsheet setXsheet() and change
+   The class allows to edit xsheet getXsheet(), change xsheet setXsheet() and
+change
    scene xsheet setScene().
-   It's possibile change level name setName() and know how many frame are in level
+   It's possibile change level name setName() and know how many frame are in
+level
    getFrameCount().
-   
+
    The class provides methods to control child level icon, makeIcon(), getIcon()
    and invalidateIcon().
  */
 //=============================================================================
 
-class DVAPI TXshChildLevel : public TXshLevel
-{
-	PERSIST_DECLARATION(TXshChildLevel)
+class DVAPI TXshChildLevel : public TXshLevel {
+  PERSIST_DECLARATION(TXshChildLevel)
 
-	TXsheet *m_xsheet;
-	std::string m_iconId;
+  TXsheet *m_xsheet;
+  std::string m_iconId;
 
-	DECLARE_CLASS_CODE
+  DECLARE_CLASS_CODE
 public:
-	/*!
-    Constructs a TXshChildLevel with \b TXshLevel name \b name
-  */
-	TXshChildLevel(std::wstring name = L"");
+  /*!
+Constructs a TXshChildLevel with \b TXshLevel name \b name
+*/
+  TXshChildLevel(std::wstring name = L"");
 
-	/*!
-    Destroys the TXshChildLevel object.
-  */
-	~TXshChildLevel();
+  /*!
+Destroys the TXshChildLevel object.
+*/
+  ~TXshChildLevel();
 
-	/*!
-    Return the \b TXshChildLevel child level.
-  */
-	TXshChildLevel *getChildLevel() { return this; }
-	/*!
-    Return the level \b TXsheet.
-    \sa setXsheet()
-  */
-	TXsheet *getXsheet() { return m_xsheet; }
-	/*!
-    Set the level \b TXsheet to \b xsheet.
-    \sa getXsheet()
-  */
-	void setXsheet(TXsheet *xsheet);
+  /*!
+Return the \b TXshChildLevel child level.
+*/
+  TXshChildLevel *getChildLevel() { return this; }
+  /*!
+Return the level \b TXsheet.
+\sa setXsheet()
+*/
+  TXsheet *getXsheet() { return m_xsheet; }
+  /*!
+Set the level \b TXsheet to \b xsheet.
+\sa getXsheet()
+*/
+  void setXsheet(TXsheet *xsheet);
 
-	void loadData(TIStream &is);
-	void saveData(TOStream &os);
+  void loadData(TIStream &is);
+  void saveData(TOStream &os);
 
-	void load() {}
-	void save() {}
+  void load() {}
+  void save() {}
 
-	/*!
-    Override. Set level scene to \b scene.
-  */
-	void setScene(ToonzScene *scene);
-	/*!
-    Return the frame count.
-  */
-	int getFrameCount() const;
-	/*!
-    Set the vector \b fids to the frameId of level.
-  */
-	void getFids(std::vector<TFrameId> &fids) const;
+  /*!
+Override. Set level scene to \b scene.
+*/
+  void setScene(ToonzScene *scene);
+  /*!
+Return the frame count.
+*/
+  int getFrameCount() const;
+  /*!
+Set the vector \b fids to the frameId of level.
+*/
+  void getFids(std::vector<TFrameId> &fids) const;
 
 private:
-	// not implemented
-	TXshChildLevel(const TXshChildLevel &);
-	TXshChildLevel &operator=(const TXshChildLevel &);
+  // not implemented
+  TXshChildLevel(const TXshChildLevel &);
+  TXshChildLevel &operator=(const TXshChildLevel &);
 };
 
 #ifdef _WIN32

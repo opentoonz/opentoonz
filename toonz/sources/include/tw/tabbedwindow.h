@@ -43,33 +43,32 @@ public:
 
 */
 
-class DVAPI TTabbedWidget : public TWidget
-{
-	int m_currentPageIndex;
-	TGuiColor m_tabColor, m_tabHlColor;
+class DVAPI TTabbedWidget : public TWidget {
+  int m_currentPageIndex;
+  TGuiColor m_tabColor, m_tabHlColor;
 
 public:
-	TTabbedWidget(TWidget *parent, string name = "tabbedwidget");
+  TTabbedWidget(TWidget *parent, string name = "tabbedwidget");
 
-	void configureNotify(const TDimension &d);
+  void configureNotify(const TDimension &d);
 
-	int page2x0(int index) const;
-	int page2x1(int index) const;
-	int x2page(int x) const;
+  int page2x0(int index) const;
+  int page2x1(int index) const;
+  int x2page(int x) const;
 
-	virtual void drawTab(const TRect &rect, int index);
-	virtual void onPageChange(TWidget *oldPage, TWidget *newPage) {}
+  virtual void drawTab(const TRect &rect, int index);
+  virtual void onPageChange(TWidget *oldPage, TWidget *newPage) {}
 
-	TWidget *getCurrentPage() const;
+  TWidget *getCurrentPage() const;
 
-	void repaint();
+  void repaint();
 
-	void leftButtonDown(const TMouseEvent &e);
-	void leftButtonDrag(const TMouseEvent &e);
-	void leftButtonUp(const TMouseEvent &e);
-	void mouseMove(const TMouseEvent &e);
-	void enter(const TPoint &p);
-	void leave(const TPoint &p);
+  void leftButtonDown(const TMouseEvent &e);
+  void leftButtonDrag(const TMouseEvent &e);
+  void leftButtonUp(const TMouseEvent &e);
+  void mouseMove(const TMouseEvent &e);
+  void enter(const TPoint &p);
+  void leave(const TPoint &p);
 };
 
 #endif

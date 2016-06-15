@@ -17,8 +17,7 @@
 
 #include <set>
 
-namespace ToonzFolder
-{
+namespace ToonzFolder {
 
 DVAPI TFilePath getModulesDir();
 DVAPI TFilePath getTemplateModuleDir();
@@ -45,31 +44,29 @@ DVAPI TFilePath getCacheRootFolder();
 DVAPI TFilePath getProfileFolder();
 };
 
-class DVAPI FolderListenerManager
-{ // singleton
+class DVAPI FolderListenerManager {  // singleton
 
 public:
-	class Listener
-	{
-	public:
-		virtual void onFolderChanged(const TFilePath &path) = 0;
-		virtual ~Listener() {}
-	};
+  class Listener {
+  public:
+    virtual void onFolderChanged(const TFilePath &path) = 0;
+    virtual ~Listener() {}
+  };
 
 private:
-	std::set<Listener *> m_listeners;
+  std::set<Listener *> m_listeners;
 
-	FolderListenerManager();
+  FolderListenerManager();
 
 public:
-	static FolderListenerManager *instance();
+  static FolderListenerManager *instance();
 
-	~FolderListenerManager();
+  ~FolderListenerManager();
 
-	void notifyFolderChanged(const TFilePath &path);
+  void notifyFolderChanged(const TFilePath &path);
 
-	void addListener(Listener *listener);
-	void removeListener(Listener *listener);
+  void addListener(Listener *listener);
+  void removeListener(Listener *listener);
 };
 
 #endif

@@ -25,62 +25,56 @@ class TFilePath;
 // TSceneHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TSceneHandle : public QObject
-{
-	Q_OBJECT
+class DVAPI TSceneHandle : public QObject {
+  Q_OBJECT
 
-	ToonzScene *m_scene;
-	bool m_dirtyFlag;
+  ToonzScene *m_scene;
+  bool m_dirtyFlag;
 
 public:
-	TSceneHandle();
-	~TSceneHandle();
+  TSceneHandle();
+  ~TSceneHandle();
 
-	ToonzScene *getScene() const;
+  ToonzScene *getScene() const;
 
-	void setScene(ToonzScene *scene);
-	void notifySceneChanged(bool setDirty = true)
-	{
-		emit sceneChanged();
-		if (setDirty)
-			setDirtyFlag(true);
-	}
-	void notifySceneSwitched()
-	{
-		emit sceneSwitched();
-		setDirtyFlag(false);
-	}
-	void notifyCastChange() { emit castChanged(); }
-	void notifyCastFolderAdded(const TFilePath &path) { emit castFolderAdded(path); }
-	void notifyNameSceneChange() { emit nameSceneChanged(); }
+  void setScene(ToonzScene *scene);
+  void notifySceneChanged(bool setDirty = true) {
+    emit sceneChanged();
+    if (setDirty) setDirtyFlag(true);
+  }
+  void notifySceneSwitched() {
+    emit sceneSwitched();
+    setDirtyFlag(false);
+  }
+  void notifyCastChange() { emit castChanged(); }
+  void notifyCastFolderAdded(const TFilePath &path) {
+    emit castFolderAdded(path);
+  }
+  void notifyNameSceneChange() { emit nameSceneChanged(); }
 
-	void notifyPreferenceChanged() { emit preferenceChanged(); }
+  void notifyPreferenceChanged() { emit preferenceChanged(); }
 
-	void setDirtyFlag(bool dirtyFlag)
-	{
-		if (m_dirtyFlag == dirtyFlag)
-			return;
-		m_dirtyFlag = dirtyFlag;
-		emit nameSceneChanged();
-	}
-	bool getDirtyFlag() const { return m_dirtyFlag; }
+  void setDirtyFlag(bool dirtyFlag) {
+    if (m_dirtyFlag == dirtyFlag) return;
+    m_dirtyFlag = dirtyFlag;
+    emit nameSceneChanged();
+  }
+  bool getDirtyFlag() const { return m_dirtyFlag; }
 
 public slots:
-	void setDirtyFlag()
-	{
-		if (m_dirtyFlag == true)
-			return;
-		m_dirtyFlag = true;
-		emit nameSceneChanged();
-	}
+  void setDirtyFlag() {
+    if (m_dirtyFlag == true) return;
+    m_dirtyFlag = true;
+    emit nameSceneChanged();
+  }
 
 signals:
-	void sceneSwitched();
-	void sceneChanged();
-	void castChanged();
-	void castFolderAdded(const TFilePath &path);
-	void nameSceneChanged();
-	void preferenceChanged();
+  void sceneSwitched();
+  void sceneChanged();
+  void castChanged();
+  void castFolderAdded(const TFilePath &path);
+  void nameSceneChanged();
+  void preferenceChanged();
 };
 
-#endif //TSCENEHANDLE_H
+#endif  // TSCENEHANDLE_H

@@ -19,27 +19,26 @@
 //    TXshMeshColumn  declaration
 //*******************************************************************************
 
-class DVAPI TXshMeshColumn : public TXshCellColumn
-{
-	PERSIST_DECLARATION(TXshMeshColumn)
+class DVAPI TXshMeshColumn : public TXshCellColumn {
+  PERSIST_DECLARATION(TXshMeshColumn)
 
 public:
-	TXshMeshColumn();
+  TXshMeshColumn();
 
-	TXshColumn::ColumnType getColumnType() const { return eMeshType; }
-	TXshMeshColumn *getMeshColumn() { return this; }
+  TXshColumn::ColumnType getColumnType() const { return eMeshType; }
+  TXshMeshColumn *getMeshColumn() { return this; }
 
-	TXshColumn *clone() const;
+  TXshColumn *clone() const;
 
-	bool canSetCell(const TXshCell &cell) const;
+  bool canSetCell(const TXshCell &cell) const;
 
-	void loadData(TIStream &is);
-	void saveData(TOStream &is);
+  void loadData(TIStream &is);
+  void saveData(TOStream &is);
 
 private:
-	// Not copiable
-	TXshMeshColumn(const TXshMeshColumn &);
-	TXshMeshColumn &operator=(const TXshMeshColumn &);
+  // Not copiable
+  TXshMeshColumn(const TXshMeshColumn &);
+  TXshMeshColumn &operator=(const TXshMeshColumn &);
 };
 
 //---------------------------------------------------------------
@@ -50,4 +49,4 @@ template class DVAPI TSmartPointerT<TXshMeshColumn>;
 
 typedef TSmartPointerT<TXshMeshColumn> TXshMeshColumnP;
 
-#endif // TXSHMESHCOLUMN_H
+#endif  // TXSHMESHCOLUMN_H

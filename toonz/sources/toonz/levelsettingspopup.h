@@ -17,8 +17,7 @@ class QPushButton;
 class TXshLevel;
 class TSelection;
 
-namespace DVGui
-{
+namespace DVGui {
 class FileField;
 class DoubleField;
 class LineEdit;
@@ -32,69 +31,68 @@ class CheckBox;
 // LevelSettingsPopup
 //-----------------------------------------------------------------------------
 
-class LevelSettingsPopup : public DVGui::Dialog
-{
-	Q_OBJECT
+class LevelSettingsPopup : public DVGui::Dialog {
+  Q_OBJECT
 
-	TXshSimpleLevelP m_sl;
-	TXshPaletteLevelP m_pl;
-	TXshChildLevelP m_cl;
-	TXshSoundLevelP m_sdl;
+  TXshSimpleLevelP m_sl;
+  TXshPaletteLevelP m_pl;
+  TXshChildLevelP m_cl;
+  TXshSoundLevelP m_sdl;
 
-	DVGui::LineEdit *m_nameFld;
-	DVGui::FileField *m_pathFld;
-	QLabel *m_scanPathLabel;
-	DVGui::FileField *m_scanPathFld;
-	QLabel *m_typeLabel;
-	QComboBox *m_dpiTypeOm;
-	QLabel *m_dpiLabel;
-	DVGui::DoubleLineEdit *m_dpiFld;
-	DVGui::CheckBox *m_squarePixCB;
-	QLabel *m_widthLabel;
-	DVGui::MeasuredDoubleLineEdit *m_widthFld;
-	QLabel *m_heightLabel;
-	DVGui::MeasuredDoubleLineEdit *m_heightFld;
-	QPushButton *m_useCameraDpiBtn;
-	QLabel *m_cameraDpiLabel;
-	QLabel *m_imageDpiLabel;
-	QLabel *m_imageResLabel;
-	DVGui::CheckBox *m_doPremultiply;
-	DVGui::CheckBox *m_whiteTransp;
-	DVGui::CheckBox *m_doAntialias;
-	DVGui::IntLineEdit *m_antialiasSoftness;
+  DVGui::LineEdit *m_nameFld;
+  DVGui::FileField *m_pathFld;
+  QLabel *m_scanPathLabel;
+  DVGui::FileField *m_scanPathFld;
+  QLabel *m_typeLabel;
+  QComboBox *m_dpiTypeOm;
+  QLabel *m_dpiLabel;
+  DVGui::DoubleLineEdit *m_dpiFld;
+  DVGui::CheckBox *m_squarePixCB;
+  QLabel *m_widthLabel;
+  DVGui::MeasuredDoubleLineEdit *m_widthFld;
+  QLabel *m_heightLabel;
+  DVGui::MeasuredDoubleLineEdit *m_heightFld;
+  QPushButton *m_useCameraDpiBtn;
+  QLabel *m_cameraDpiLabel;
+  QLabel *m_imageDpiLabel;
+  QLabel *m_imageResLabel;
+  DVGui::CheckBox *m_doPremultiply;
+  DVGui::CheckBox *m_whiteTransp;
+  DVGui::CheckBox *m_doAntialias;
+  DVGui::IntLineEdit *m_antialiasSoftness;
 
-	QLabel *m_subsamplingLabel;
-	DVGui::IntLineEdit *m_subsamplingFld;
+  QLabel *m_subsamplingLabel;
+  DVGui::IntLineEdit *m_subsamplingFld;
 
 public:
-	LevelSettingsPopup();
+  LevelSettingsPopup();
 
 protected:
-	void showEvent(QShowEvent *e);
-	void hideEvent(QHideEvent *e);
+  void showEvent(QShowEvent *e);
+  void hideEvent(QHideEvent *e);
 
 public slots:
 
-	void onCastSelectionChanged();
-	void onSelectionSwitched(TSelection *oldSelection, TSelection *newSelection);
-	void updateLevelSettings();
-	void onNameChanged();
-	void onPathChanged();
-	void onScanPathChanged();
-	void onDpiTypeChanged(const QString &dpiPolicyStr);
-	void onDpiFieldChanged();
-	void onWidthFieldChanged();
-	void onHeightFieldChanged();
-	void onSquarePixelChanged(int);
-	void useCameraDpi();
-	void onSubsamplingChanged();
-	void onDoPremultiplyChanged(int);
-	void onDoAntialiasChanged(int);
-	void onAntialiasSoftnessChanged();
-	void onWhiteTranspChanged(int);
+  void onCastSelectionChanged();
+  void onSelectionSwitched(TSelection *oldSelection, TSelection *newSelection);
+  void updateLevelSettings();
+  void onNameChanged();
+  void onPathChanged();
+  void onScanPathChanged();
+  void onDpiTypeChanged(const QString &dpiPolicyStr);
+  void onDpiFieldChanged();
+  void onWidthFieldChanged();
+  void onHeightFieldChanged();
+  void onSquarePixelChanged(int);
+  void useCameraDpi();
+  void onSubsamplingChanged();
+  void onDoPremultiplyChanged(int);
+  void onDoAntialiasChanged(int);
+  void onAntialiasSoftnessChanged();
+  void onWhiteTranspChanged(int);
 
 protected slots:
-	void onSceneChanged();
+  void onSceneChanged();
 };
 
-#endif // LEVELSETTINGSPOPUP_H
+#endif  // LEVELSETTINGSPOPUP_H

@@ -15,14 +15,13 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TParamUndoManager : public TParamObserver
-{ // singleton
+class DVAPI TParamUndoManager : public TParamObserver {  // singleton
 protected:
-	TParamUndoManager() {}
-	virtual ~TParamUndoManager(){};
+  TParamUndoManager() {}
+  virtual ~TParamUndoManager(){};
 
 public:
-	static TParamUndoManager *instance();
+  static TParamUndoManager *instance();
 };
 
 #endif

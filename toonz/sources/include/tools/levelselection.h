@@ -39,69 +39,61 @@ class TVectorImage;
             primitives described by predefined filtering functions.
 */
 
-class DVAPI LevelSelection : public TSelection
-{
+class DVAPI LevelSelection : public TSelection {
 public:
-	enum FramesMode //!  Possible frames selection modes.
-	{
-		FRAMES_NONE,	 //!< No frame is selected.
-		FRAMES_CURRENT,  //!< Selects the (context-defined) current frame.
-		FRAMES_SELECTED, //!< Selects the frames specified in \p TTool::getSelectedFrames().
-		FRAMES_ALL,		 //!< Selects the whole level.
-	};
+  enum FramesMode     //!  Possible frames selection modes.
+  { FRAMES_NONE,      //!< No frame is selected.
+    FRAMES_CURRENT,   //!< Selects the (context-defined) current frame.
+    FRAMES_SELECTED,  //!< Selects the frames specified in \p
+                      //!TTool::getSelectedFrames().
+    FRAMES_ALL,       //!< Selects the whole level.
+  };
 
-	enum Filter //!  Possible selection filters.
-	{
-		EMPTY,			  //!< Selection is empty - everyting is filtered out.
-		WHOLE,			  //!< Selects everything - nothing is filtered out.
-		SELECTED_STYLES,  //!< Acts only entities with selected palette styles.
-		BOUNDARY_STROKES, //!< Acts only on boundary strokes (applies only to vector images).
-	};
+  enum Filter          //!  Possible selection filters.
+  { EMPTY,             //!< Selection is empty - everyting is filtered out.
+    WHOLE,             //!< Selects everything - nothing is filtered out.
+    SELECTED_STYLES,   //!< Acts only entities with selected palette styles.
+    BOUNDARY_STROKES,  //!< Acts only on boundary strokes (applies only to
+                       //!vector images).
+  };
 
-	typedef std::set<int> styles_container; //!< Container of style indexes used together with the
-											//!  \p SELECTED_STYLES filter.
+  typedef std::set<int>
+      styles_container;  //!< Container of style indexes used together with the
+                         //!  \p SELECTED_STYLES filter.
 public:
-	LevelSelection(); //!< Constructs an empty level selection.
+  LevelSelection();  //!< Constructs an empty level selection.
 
-	/*! \remark   The selection is hereby considered empty \a only if it either has
-                FramesMode FRAMES_NONE or Filter EMPTY. It is user's responsibility
-                to check whether nontrivial selections are empty or not.                      */
+  /*! \remark   The selection is hereby considered empty \a only if it either
+     has
+          FramesMode FRAMES_NONE or Filter EMPTY. It is user's responsibility
+          to check whether nontrivial selections are empty or not. */
 
-	bool isEmpty() const; //!< Returns whether the selection is empty.
-	void selectNone();	//!< Resets the selection to empty. This is functionally
-						  //!  equivalent to <TT>operator=(LevelSelection());</TT>
-	FramesMode framesMode() const
-	{
-		return m_framesMode;
-	}
-	FramesMode &framesMode() //!  Returns current frames selection mode.
-	{
-		return m_framesMode;
-	}
+  bool isEmpty() const;  //!< Returns whether the selection is empty.
+  void selectNone();  //!< Resets the selection to empty. This is functionally
+                      //!  equivalent to <TT>operator=(LevelSelection());</TT>
+  FramesMode framesMode() const { return m_framesMode; }
+  FramesMode &framesMode()  //!  Returns current frames selection mode.
+  {
+    return m_framesMode;
+  }
 
-	Filter filter() const
-	{
-		return m_filter;
-	}
-	Filter &filter() //!  Returns current styles selection mode.
-	{
-		return m_filter;
-	}
+  Filter filter() const { return m_filter; }
+  Filter &filter()  //!  Returns current styles selection mode.
+  {
+    return m_filter;
+  }
 
-	const styles_container &styles() const
-	{
-		return m_styles;
-	}
-	styles_container &styles()
-	{
-		return m_styles;
-	} //!< Returns selected palette styles used with the
-	  //!  \p SELECTED_STYLES filter.
+  const styles_container &styles() const { return m_styles; }
+  styles_container &styles() {
+    return m_styles;
+  }  //!< Returns selected palette styles used with the
+     //!  \p SELECTED_STYLES filter.
 private:
-	FramesMode m_framesMode; //!< Selected level frames.
-	Filter m_filter;		 //!< Selection filter.
+  FramesMode m_framesMode;  //!< Selected level frames.
+  Filter m_filter;          //!< Selection filter.
 
-	std::set<int> m_styles; //!< Selected palette styles used with the \p SELECTED_STYLES filter.
+  std::set<int> m_styles;  //!< Selected palette styles used with the \p
+                           //!SELECTED_STYLES filter.
 };
 
 //*******************************************************************************
@@ -124,7 +116,8 @@ DVAPI std::vector<int> getBoundaryStrokes(TVectorImage &vi);
   \brief    Applies a selection filter to a given vector image.
   \return   The stroke indexes included in the filtered selection.
 
-  \remark   In case the filter is LevelSelection::BOUNDARY_STROKES, the resulting
+  \remark   In case the filter is LevelSelection::BOUNDARY_STROKES, the
+  resulting
             selection is composed of all strokes which are <I>even partially</I>
             adjacent to a region with style index \p 0.
 
@@ -132,8 +125,9 @@ DVAPI std::vector<int> getBoundaryStrokes(TVectorImage &vi);
 */
 
 DVAPI std::vector<int> getSelectedStrokes(
-	TVectorImage &vi,					 //!< Vector image whose strokes will be selected.
-	const LevelSelection &levelSelection //!< Selection filter for the specified image.
-	);
+    TVectorImage &vi,  //!< Vector image whose strokes will be selected.
+    const LevelSelection
+        &levelSelection  //!< Selection filter for the specified image.
+    );
 
-#endif // LEVELSELECTION_H
+#endif  // LEVELSELECTION_H

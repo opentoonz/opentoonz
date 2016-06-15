@@ -13,8 +13,7 @@ NOTE: This stuff should be moved to ToonzQt's StyleEditor class.
       should be wider...
 */
 
-namespace RGBPicker
-{
+namespace RGBPicker {
 
 //*************************************************************************************
 //    RGB Picker open functions
@@ -23,6 +22,6 @@ namespace RGBPicker
 void setCurrentColor(const TPixel32 &color);
 void setCurrentColorWithUndo(const TPixel32 &color);
 
-} //namespace RGBPicker
+}  // namespace RGBPicker
 
-#endif //RGB_PICKER_H
+#endif  // RGB_PICKER_H

@@ -7,7 +7,7 @@
 #include "keyframedata.h"
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TXsheet;
 class TXshColumn;
 
@@ -15,25 +15,21 @@ class TXshColumn;
 // TCellKeyframeData
 //-----------------------------------------------------------------------------
 
-class TCellKeyframeData : public DvMimeData
-{
-	TCellData *m_cellData;
-	TKeyframeData *m_keyframeData;
+class TCellKeyframeData : public DvMimeData {
+  TCellData *m_cellData;
+  TKeyframeData *m_keyframeData;
 
 public:
-	TCellKeyframeData(TCellData *cellData = 0, TKeyframeData *keyframeData = 0);
-	TCellKeyframeData(const TCellKeyframeData *src);
-	~TCellKeyframeData();
+  TCellKeyframeData(TCellData *cellData = 0, TKeyframeData *keyframeData = 0);
+  TCellKeyframeData(const TCellKeyframeData *src);
+  ~TCellKeyframeData();
 
-	void setCellData(TCellData *data) { m_cellData = data; }
-	TCellData *getCellData() const { return m_cellData; }
-	void setKeyframeData(TKeyframeData *data) { m_keyframeData = data; }
-	TKeyframeData *getKeyframeData() const { return m_keyframeData; }
+  void setCellData(TCellData *data) { m_cellData = data; }
+  TCellData *getCellData() const { return m_cellData; }
+  void setKeyframeData(TKeyframeData *data) { m_keyframeData = data; }
+  TKeyframeData *getKeyframeData() const { return m_keyframeData; }
 
-	TCellKeyframeData *clone() const
-	{
-		return new TCellKeyframeData(this);
-	}
+  TCellKeyframeData *clone() const { return new TCellKeyframeData(this); }
 };
 
 #endif

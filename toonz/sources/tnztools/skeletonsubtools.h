@@ -13,237 +13,236 @@
 
 class SkeletonTool;
 
-namespace SkeletonSubtools
-{
+namespace SkeletonSubtools {
 
 //---------------------------------------------------------
 
-class DragTool
-{
-
-	SkeletonTool *m_tool;
+class DragTool {
+  SkeletonTool *m_tool;
 
 public:
-	DragTool(SkeletonTool *tool) : m_tool(tool) {}
-	virtual ~DragTool() {}
+  DragTool(SkeletonTool *tool) : m_tool(tool) {}
+  virtual ~DragTool() {}
 
-	virtual void draw() {}
+  virtual void draw() {}
 
-	virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &) = 0;
-	virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &) = 0;
-	virtual void leftButtonUp(const TPointD &pos, const TMouseEvent &) = 0;
+  virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &) = 0;
+  virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &) = 0;
+  virtual void leftButtonUp(const TPointD &pos, const TMouseEvent &)   = 0;
 
-	SkeletonTool *getTool() const { return m_tool; }
+  SkeletonTool *getTool() const { return m_tool; }
 };
 
 //---------------------------------------------------------
 
-class DragCenterTool : public DragTool
-{
-	TStageObjectId m_objId;
-	int m_frame;
+class DragCenterTool : public DragTool {
+  TStageObjectId m_objId;
+  int m_frame;
 
-	TPointD m_firstPos;
-	TPointD m_oldCenter;
-	TPointD m_center;
-	TAffine m_affine;
+  TPointD m_firstPos;
+  TPointD m_oldCenter;
+  TPointD m_center;
+  TAffine m_affine;
 
 public:
-	DragCenterTool(SkeletonTool *tool);
+  DragCenterTool(SkeletonTool *tool);
 
-	void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-	void leftButtonDrag(const TPointD &pos, const TMouseEvent &);
-	void leftButtonUp(const TPointD &pos, const TMouseEvent &);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &);
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
 };
 
 //---------------------------------------------------------
 
-class DragChannelTool : public DragTool
-{
+class DragChannelTool : public DragTool {
 protected:
-	TStageObjectValues m_before, m_after;
-	bool m_dragged;
+  TStageObjectValues m_before, m_after;
+  bool m_dragged;
 
 public:
-	DragChannelTool(SkeletonTool *tool, TStageObject::Channel a0);
-	DragChannelTool(SkeletonTool *tool, TStageObject::Channel a0, TStageObject::Channel a1);
+  DragChannelTool(SkeletonTool *tool, TStageObject::Channel a0);
+  DragChannelTool(SkeletonTool *tool, TStageObject::Channel a0,
+                  TStageObject::Channel a1);
 
-	void start();
+  void start();
 
-	TPointD getCenter();
+  TPointD getCenter();
 
-	double getOldValue(int index) const { return m_before.getValue(index); }
-	double getValue(int index) const { return m_after.getValue(index); }
-	void setValue(double v)
-	{
-		m_after.setValue(v);
-		m_after.applyValues();
-	}
-	void setValues(double v0, double v1)
-	{
-		m_after.setValues(v0, v1);
-		m_after.applyValues();
-	}
+  double getOldValue(int index) const { return m_before.getValue(index); }
+  double getValue(int index) const { return m_after.getValue(index); }
+  void setValue(double v) {
+    m_after.setValue(v);
+    m_after.applyValues();
+  }
+  void setValues(double v0, double v1) {
+    m_after.setValues(v0, v1);
+    m_after.applyValues();
+  }
 
-	void leftButtonUp(const TPointD &pos, const TMouseEvent &);
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
 };
 
 //---------------------------------------------------------
 
-class DragPositionTool : public DragChannelTool
-{
-	TPointD m_firstPos;
+class DragPositionTool : public DragChannelTool {
+  TPointD m_firstPos;
 
 public:
-	DragPositionTool(SkeletonTool *tool);
+  DragPositionTool(SkeletonTool *tool);
 
-	void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
 };
 
 //---------------------------------------------------------
 
-class DragRotationTool : public DragChannelTool
-{
-	TPointD m_lastPos;
-	TPointD m_center;
-	bool m_snapped;
+class DragRotationTool : public DragChannelTool {
+  TPointD m_lastPos;
+  TPointD m_center;
+  bool m_snapped;
 
 public:
-	DragRotationTool(SkeletonTool *tool, bool snapped);
+  DragRotationTool(SkeletonTool *tool, bool snapped);
 
-	void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-	void leftButtonDrag(const TPointD &pos, const TMouseEvent &);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &);
 };
 
 //---------------------------------------------------------
 
-class ParentChangeTool : public DragTool
-{
-	TTool::Viewer *m_viewer;
-	TPoint m_firstWinPos;
-	TPointD m_lastPos, m_lastPos2;
-	TPointD m_center;
-	int m_index;
-	int m_handle;
-	bool m_snapped;
-	int m_mode;
-	TAffine m_affine;
-	TStageObjectId m_objId;
-	TPointD m_oldCenter, m_oldOffset;
+class ParentChangeTool : public DragTool {
+  TTool::Viewer *m_viewer;
+  TPoint m_firstWinPos;
+  TPointD m_lastPos, m_lastPos2;
+  TPointD m_center;
+  int m_index;
+  int m_handle;
+  bool m_snapped;
+  int m_mode;
+  TAffine m_affine;
+  TStageObjectId m_objId;
+  TPointD m_oldCenter, m_oldOffset;
 
-	struct Peer {
-		TPointD m_pos;
-		int m_columnIndex;
-		int m_handle; // 0=centerB,-1,-2,....=H1,H2...
-		int m_name;   // per glPushName()
-	};
+  struct Peer {
+    TPointD m_pos;
+    int m_columnIndex;
+    int m_handle;  // 0=centerB,-1,-2,....=H1,H2...
+    int m_name;    // per glPushName()
+  };
 
-	struct Element {
-		int m_columnIndex;
-		TRectD m_bbox;
-		TAffine m_aff;
-		std::vector<Peer> m_peers;
-	};
-	std::map<int, Element> m_elements;
+  struct Element {
+    int m_columnIndex;
+    TRectD m_bbox;
+    TAffine m_aff;
+    std::vector<Peer> m_peers;
+  };
+  std::map<int, Element> m_elements;
 
-	double m_pixelSize;
+  double m_pixelSize;
 
 public:
-	ParentChangeTool(SkeletonTool *tool, TTool::Viewer *viewer);
+  ParentChangeTool(SkeletonTool *tool, TTool::Viewer *viewer);
 
-	void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-	void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
 
-	void draw();
+  void draw();
 };
 
 //---------------------------------------------------------
 
 class IKToolUndo;
 
-class IKTool : public DragTool
-{
-	TTool::Viewer *m_viewer;
-	TPointD m_pos;
-	Skeleton *m_skeleton;
-	int m_columnIndex;
-	IKEngine m_engine;
-	bool m_valid;
-	TAffine m_footPlacement, m_firstFootPlacement;
-	TStageObject *m_foot, *m_firstFoot;
-	bool m_IHateIK;
-	IKToolUndo *m_undo;
+class IKTool : public DragTool {
+  TTool::Viewer *m_viewer;
+  TPointD m_pos;
+  Skeleton *m_skeleton;
+  int m_columnIndex;
+  IKEngine m_engine;
+  bool m_valid;
+  TAffine m_footPlacement, m_firstFootPlacement;
+  TStageObject *m_foot, *m_firstFoot;
+  bool m_IHateIK;
+  IKToolUndo *m_undo;
 
-	struct Joint {
-		Skeleton::Bone *m_bone, *m_prevBone;
-		int m_prevColumnIndex;
-		double m_angleOffset;
-		double m_sign;
-		bool m_active;
-		TStageObjectValues m_oldValues;
-		Joint()
-			: m_bone(0), m_prevBone(0), m_angleOffset(0), m_sign(1), m_active(true) {}
-		Joint(Skeleton::Bone *bone, Skeleton::Bone *prevBone, double sign)
-			: m_bone(bone), m_prevBone(prevBone), m_angleOffset(0), m_sign(sign), m_active(true) {}
-	};
-	std::vector<Joint> m_joints;
-	bool isParentOf(int columnIndex, int childColumnIndex) const;
+  struct Joint {
+    Skeleton::Bone *m_bone, *m_prevBone;
+    int m_prevColumnIndex;
+    double m_angleOffset;
+    double m_sign;
+    bool m_active;
+    TStageObjectValues m_oldValues;
+    Joint()
+        : m_bone(0)
+        , m_prevBone(0)
+        , m_angleOffset(0)
+        , m_sign(1)
+        , m_active(true) {}
+    Joint(Skeleton::Bone *bone, Skeleton::Bone *prevBone, double sign)
+        : m_bone(bone)
+        , m_prevBone(prevBone)
+        , m_angleOffset(0)
+        , m_sign(sign)
+        , m_active(true) {}
+  };
+  std::vector<Joint> m_joints;
+  bool isParentOf(int columnIndex, int childColumnIndex) const;
 
 public:
-	IKTool(SkeletonTool *tool, TTool::Viewer *viewer, Skeleton *skeleton, int columnIndex);
-	~IKTool();
+  IKTool(SkeletonTool *tool, TTool::Viewer *viewer, Skeleton *skeleton,
+         int columnIndex);
+  ~IKTool();
 
-	void initEngine(const TPointD &pos);
-	void storeOldValues();
-	void computeIHateIK();
-	void setAngleOffsets();
-	void apply();
+  void initEngine(const TPointD &pos);
+  void storeOldValues();
+  void computeIHateIK();
+  void setAngleOffsets();
+  void apply();
 
-	void leftButtonDown(const TPointD &, const TMouseEvent &e);
-	void leftButtonDrag(const TPointD &, const TMouseEvent &e);
-	void leftButtonUp(const TPointD &, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &, const TMouseEvent &e);
+  void leftButtonDrag(const TPointD &, const TMouseEvent &e);
+  void leftButtonUp(const TPointD &, const TMouseEvent &e);
 
-	void draw();
+  void draw();
 };
 
 //---------------------------------------------------------
 
-class ChangeDrawingTool : public DragTool
-{
-	int m_oldY;
-	int m_dir;
-	TUndo *m_undo;
+class ChangeDrawingTool : public DragTool {
+  int m_oldY;
+  int m_dir;
+  TUndo *m_undo;
 
 public:
-	ChangeDrawingTool(SkeletonTool *tool, int d);
+  ChangeDrawingTool(SkeletonTool *tool, int d);
 
-	void leftButtonDown(const TPointD &, const TMouseEvent &e);
-	void leftButtonDrag(const TPointD &, const TMouseEvent &e);
-	void leftButtonUp(const TPointD &, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &, const TMouseEvent &e);
+  void leftButtonDrag(const TPointD &, const TMouseEvent &e);
+  void leftButtonUp(const TPointD &, const TMouseEvent &e);
 
-	bool changeDrawing(int delta);
+  bool changeDrawing(int delta);
 };
 
 //---------------------------------------------------------
 
-class CommandHandler : public QObject
-{
-	Q_OBJECT
-	Skeleton *m_skeleton;
-	std::set<int> *m_tempPinnedSet;
+class CommandHandler : public QObject {
+  Q_OBJECT
+  Skeleton *m_skeleton;
+  std::set<int> *m_tempPinnedSet;
 
 public:
-	CommandHandler();
-	~CommandHandler();
-	void setTempPinnedSet(std::set<int> *tempPinnedSet) { m_tempPinnedSet = tempPinnedSet; }
+  CommandHandler();
+  ~CommandHandler();
+  void setTempPinnedSet(std::set<int> *tempPinnedSet) {
+    m_tempPinnedSet = tempPinnedSet;
+  }
 
-	void setSkeleton(Skeleton *skeleton);
+  void setSkeleton(Skeleton *skeleton);
 public slots:
-	void clearPinnedRanges();
+  void clearPinnedRanges();
 };
 
-} // namespace SkeletonSubtools
+}  // namespace SkeletonSubtools
 
 #endif

@@ -10,19 +10,18 @@
 // SavePresetPopup
 //-----------------------------------------------------------------------------
 
-class SavePresetPopup : public DVGui::Dialog
-{
-	Q_OBJECT
+class SavePresetPopup : public DVGui::Dialog {
+  Q_OBJECT
 
-	DVGui::LineEdit *m_nameFld;
+  DVGui::LineEdit *m_nameFld;
 
 public:
-	SavePresetPopup();
-	~SavePresetPopup();
-	bool apply();
+  SavePresetPopup();
+  ~SavePresetPopup();
+  bool apply();
 
 protected slots:
-	void onOkBtn();
+  void onOkBtn();
 };
 
-#endif // SAVEPRESETPOPUP_H
+#endif  // SAVEPRESETPOPUP_H

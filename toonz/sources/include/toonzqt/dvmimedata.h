@@ -20,17 +20,15 @@
 // DvMimedata
 //-----------------------------------------------------------------------------
 
-class DVAPI DvMimeData : public QMimeData
-{
-
+class DVAPI DvMimeData : public QMimeData {
 public:
-	DvMimeData();
-	virtual ~DvMimeData();
+  DvMimeData();
+  virtual ~DvMimeData();
 
-	virtual DvMimeData *clone() const = 0;
-	virtual void releaseData() {}
+  virtual DvMimeData *clone() const = 0;
+  virtual void releaseData() {}
 };
 
 DVAPI QMimeData *cloneData(const QMimeData *data);
 
-#endif //DVMIMEDATA_INCLUDED
+#endif  // DVMIMEDATA_INCLUDED

@@ -17,73 +17,71 @@ class QFile;
 
 //-----------------------------------------------------------------------------
 
-class SVNLockDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNLockDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	QLabel *m_commentLabel;
-	QPlainTextEdit *m_commentTextEdit;
+  QLabel *m_commentLabel;
+  QPlainTextEdit *m_commentTextEdit;
 
-	QTreeWidget *m_treeWidget;
+  QTreeWidget *m_treeWidget;
 
-	QPushButton *m_lockButton;
-	QPushButton *m_cancelButton;
+  QPushButton *m_lockButton;
+  QPushButton *m_cancelButton;
 
-	QCheckBox *m_editSceneContentsCheckBox;
+  QCheckBox *m_editSceneContentsCheckBox;
 
-	QString m_workingDir;
-	QList<SVNStatus> m_status;
-	QStringList m_files;
-	QStringList m_filesToEdit;
-	QStringList m_sceneResources;
+  QString m_workingDir;
+  QList<SVNStatus> m_status;
+  QStringList m_files;
+  QStringList m_filesToEdit;
+  QStringList m_sceneResources;
 
-	VersionControlThread m_thread;
+  VersionControlThread m_thread;
 
-	bool m_lock;
-	bool m_hasError;
+  bool m_lock;
+  bool m_hasError;
 
-	int m_sceneIconAdded;
+  int m_sceneIconAdded;
 
-	QFile *m_targetTempFile;
+  QFile *m_targetTempFile;
 
 public:
-	SVNLockDialog(QWidget *parent, const QString &workingDir,
-				  const QStringList &filesToEdit, bool lock, int sceneIconAdded);
+  SVNLockDialog(QWidget *parent, const QString &workingDir,
+                const QStringList &filesToEdit, bool lock, int sceneIconAdded);
 
 private:
-	void switchToCloseButton();
-	void checkFiles();
+  void switchToCloseButton();
+  void checkFiles();
 
-	void initTreeWidget();
-	void executeCommand();
+  void initTreeWidget();
+  void executeCommand();
 
 protected slots:
 
-	void onStatusRetrieved(const QString &);
-	void onError(const QString &);
-	void onLockButtonClicked();
-	void onLockDone();
+  void onStatusRetrieved(const QString &);
+  void onError(const QString &);
+  void onLockButtonClicked();
+  void onLockDone();
 
-	void onSceneResourcesStatusRetrieved(const QString &);
+  void onSceneResourcesStatusRetrieved(const QString &);
 
-	void onEditSceneContentsToggled(bool checked);
+  void onEditSceneContentsToggled(bool checked);
 
 signals:
-	void done(const QStringList &);
+  void done(const QStringList &);
 };
 
 //-----------------------------------------------------------------------------
 
-class SVNLockInfoDialog : public DVGui::Dialog
-{
-	Q_OBJECT
-	SVNStatus m_status;
+class SVNLockInfoDialog : public DVGui::Dialog {
+  Q_OBJECT
+  SVNStatus m_status;
 
 public:
-	SVNLockInfoDialog(QWidget *parent, const SVNStatus &status);
+  SVNLockInfoDialog(QWidget *parent, const SVNStatus &status);
 };
 
-#endif // SVN_LOCK_DIALOG_H
+#endif  // SVN_LOCK_DIALOG_H

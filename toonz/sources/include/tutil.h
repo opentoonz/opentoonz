@@ -22,9 +22,8 @@ typedef std::pair<int, int> IntPair;
   \par x val to square
  */
 template <class T>
-inline T sq(T x)
-{
-	return x * x;
+inline T sq(T x) {
+  return x * x;
 }
 
 //! Calculates the floor of a value.
@@ -33,10 +32,7 @@ inline T sq(T x)
   \par x val to floor
   \ret largest integer that is less than or equal to x
  */
-inline int tfloor(double x)
-{
-	return ((int)(x) > (x) ? (int)(x)-1 : (int)(x));
-}
+inline int tfloor(double x) { return ((int)(x) > (x) ? (int)(x)-1 : (int)(x)); }
 
 //! Calculates the ceiling of a value.
 /*!
@@ -44,9 +40,8 @@ inline int tfloor(double x)
   \par x val to floor
   \ret smallest integer that is greater than or equal to x.
  */
-inline int tceil(double x)
-{
-	return ((int)(x) < (x) ? (int)(x) + 1 : (int)(x));
+inline int tceil(double x) {
+  return ((int)(x) < (x) ? (int)(x) + 1 : (int)(x));
 }
 
 //! Check if value is an integer.
@@ -55,40 +50,23 @@ inline int tceil(double x)
   \par x val to test
   \ret true if val is integer
  */
-inline bool isInt(double x)
-{
-	return (int)(x) == (x);
+inline bool isInt(double x) { return (int)(x) == (x); }
+
+inline int tfloor(int x, int step) {
+  return step * (x >= 0 ? (x / step) : -((-1 - x + step) / step));
 }
 
-inline int tfloor(int x, int step)
-{
-	return step * (x >= 0 ? (x / step) : -((-1 - x + step) / step));
+inline int tceil(int x, int step) {
+  return step * (x >= 0 ? ((x + step - 1) / step) : -((-x) / step));
 }
 
-inline int tceil(int x, int step)
-{
-	return step * (x >= 0 ? ((x + step - 1) / step) : -((-x) / step));
-}
+inline int intLE(double x) { return tfloor(x); }
 
-inline int intLE(double x)
-{
-	return tfloor(x);
-}
+inline int intGT(double x) { return tfloor(x) + 1; }
 
-inline int intGT(double x)
-{
-	return tfloor(x) + 1;
-}
+inline int intLT(double x) { return tceil(x) - 1; }
 
-inline int intLT(double x)
-{
-	return tceil(x) - 1;
-}
-
-inline int intGE(double x)
-{
-	return tceil(x);
-}
+inline int intGE(double x) { return tceil(x); }
 
 //! convert radiant to degree
 /*!
@@ -96,10 +74,7 @@ inline int intGE(double x)
   \par angle in radiant
   \ret angle in degree
  */
-inline double rad2degree(double rad)
-{
-	return rad * M_180_PI;
-}
+inline double rad2degree(double rad) { return rad * M_180_PI; }
 
 //! convert degree to radiant
 /*!
@@ -107,10 +82,7 @@ inline double rad2degree(double rad)
   \par angle in degree
   \ret angle in radiant
  */
-inline double degree2rad(double degree)
-{
-	return degree * M_PI_180;
-}
+inline double degree2rad(double degree) { return degree * M_PI_180; }
 
 //! Sign of argument.
 /*!
@@ -119,9 +91,8 @@ inline double degree2rad(double degree)
  \ret -1 if arg is negative, 1 if arg is positive, 0 if arg is zero
  */
 template <class T>
-inline int tsign(T arg)
-{
-	return arg < 0 ? -1 : arg > 0 ? 1 : 0;
+inline int tsign(T arg) {
+  return arg < 0 ? -1 : arg > 0 ? 1 : 0;
 }
 
 //! Check if two values are very similar.
@@ -132,9 +103,8 @@ inline int tsign(T arg)
   \par err max distance from value
   \ret bool if value are very similar.
  */
-inline bool areAlmostEqual(double a, double b, double err = TConsts::epsilon)
-{
-	return fabs(a - b) < err;
+inline bool areAlmostEqual(double a, double b, double err = TConsts::epsilon) {
+  return fabs(a - b) < err;
 }
 
 //! Check if two values are very similar.
@@ -146,17 +116,16 @@ inline bool areAlmostEqual(double a, double b, double err = TConsts::epsilon)
   \ret bool if value are very similar.
  */
 template <class T>
-inline bool areAlmostEqual(const T &a, const T &b, double err = TConsts::epsilon)
-{
-	return tdistance(a, b) < err;
+inline bool areAlmostEqual(const T &a, const T &b,
+                           double err = TConsts::epsilon) {
+  return tdistance(a, b) < err;
 }
 
 struct TDeleteObjectFunctor {
-	template <typename T>
-	void operator()(T *ptr)
-	{
-		delete ptr;
-	}
+  template <typename T>
+  void operator()(T *ptr) {
+    delete ptr;
+  }
 };
 
 //! Clear a container deleting all elements.
@@ -167,11 +136,10 @@ struct TDeleteObjectFunctor {
         to deduce template
  */
 template <class T>
-inline void clearPointerContainer(T &c) throw()
-{
-	T tmp;
-	std::for_each(c.begin(), c.end(), TDeleteObjectFunctor());
-	c.swap(tmp);
+inline void clearPointerContainer(T &c) throw() {
+  T tmp;
+  std::for_each(c.begin(), c.end(), TDeleteObjectFunctor());
+  c.swap(tmp);
 }
 
 #endif

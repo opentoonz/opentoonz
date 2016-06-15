@@ -20,32 +20,31 @@ class TFx;
 class TGenericCommandAction;
 class TFxParamViewData;
 
-class DVAPI TFxParamView : public TWidget, public TFxObserver
-{
-	TFxParamViewData *m_data;
+class DVAPI TFxParamView : public TWidget, public TFxObserver {
+  TFxParamViewData *m_data;
 
 public:
-	TFxParamView(TWidget *parent, string name = "fxParamView");
-	~TFxParamView();
+  TFxParamView(TWidget *parent, string name = "fxParamView");
+  ~TFxParamView();
 
-	void setFx(TFx *fx, const wstring &fxCaption);
+  void setFx(TFx *fx, const wstring &fxCaption);
 
-	//TFxObserver methods
-	void onChange(const TFxChange &);
-	void onChange(const TFxParamAdded &change);
-	void onChange(const TFxParamRemoved &change);
+  // TFxObserver methods
+  void onChange(const TFxChange &);
+  void onChange(const TFxParamAdded &change);
+  void onChange(const TFxParamRemoved &change);
 
-	void configureNotify(const TDimension &d);
-	void repaint();
+  void configureNotify(const TDimension &d);
+  void repaint();
 
-	void select(TParam *param, bool on);
+  void select(TParam *param, bool on);
 
-	// PROVVISORIO
-	void addAction(TGenericCommandAction *action);
-	void triggerActions();
+  // PROVVISORIO
+  void addAction(TGenericCommandAction *action);
+  void triggerActions();
 
-	void setCurrentFrame(int frame);
-	int getCurrentFrame() const;
+  void setCurrentFrame(int frame);
+  int getCurrentFrame() const;
 };
 
 #endif

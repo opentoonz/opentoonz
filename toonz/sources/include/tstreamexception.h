@@ -22,15 +22,14 @@ class TOStream;
 
 //===================================================================
 
-class DVAPI TIStreamException : public TException
-{
+class DVAPI TIStreamException : public TException {
 public:
-	TIStreamException(TIStream &is);
-	TIStreamException(TIStream &is, const TException &e);
-	TIStreamException(TIStream &is, std::wstring message);
-	TIStreamException(TIStream &is, std::string message);
+  TIStreamException(TIStream &is);
+  TIStreamException(TIStream &is, const TException &e);
+  TIStreamException(TIStream &is, std::wstring message);
+  TIStreamException(TIStream &is, std::string message);
 
-	~TIStreamException();
+  ~TIStreamException();
 };
 
 #endif

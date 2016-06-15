@@ -8,52 +8,51 @@
 
 //-------------------------------------------------------------------
 
-class GenericFileBrowserAction
-{
+class GenericFileBrowserAction {
 public:
-	virtual ~GenericFileBrowserAction() {}
-	virtual void sendCommand(const TFilePath &) = 0;
+  virtual ~GenericFileBrowserAction() {}
+  virtual void sendCommand(const TFilePath &) = 0;
 };
 
 //-------------------------------------------------------------------
 
 template <class T>
-class FileBrowserAction : public GenericFileBrowserAction
-{
+class FileBrowserAction : public GenericFileBrowserAction {
 public:
-	typedef void (T::*Method)(const TFilePath &);
-	FileBrowserAction(T *target, Method method) : m_target(target), m_method(method) {}
-	void sendCommand(const TFilePath &fp) { (m_target->*m_method)(fp); }
+  typedef void (T::*Method)(const TFilePath &);
+  FileBrowserAction(T *target, Method method)
+      : m_target(target), m_method(method) {}
+  void sendCommand(const TFilePath &fp) { (m_target->*m_method)(fp); }
+
 private:
-	T *m_target;
-	Method m_method;
+  T *m_target;
+  Method m_method;
 };
 
 //-------------------------------------------------------------------
 
-class FileBrowser : public TWidget
-{
+class FileBrowser : public TWidget {
 public:
-	FileBrowser(TWidget *parent, string name, const vector<string> &fileTypes);
-	~FileBrowser();
+  FileBrowser(TWidget *parent, string name, const vector<string> &fileTypes);
+  ~FileBrowser();
 
-	void setFilter(const vector<string> &fileTypes);
+  void setFilter(const vector<string> &fileTypes);
 
-	void configureNotify(const TDimension &d);
-	void setBackgroundColor(const TGuiColor &);
-	void draw();
+  void configureNotify(const TDimension &d);
+  void setBackgroundColor(const TGuiColor &);
+  void draw();
 
-	void setFileSelChangeAction(GenericFileBrowserAction *action);
-	void setFileDblClickAction(GenericFileBrowserAction *action);
+  void setFileSelChangeAction(GenericFileBrowserAction *action);
+  void setFileDblClickAction(GenericFileBrowserAction *action);
 
-	TFilePath getCurrentDir() const;
-	void setCurrentDir(const TFilePath &dirPath);
+  TFilePath getCurrentDir() const;
+  void setCurrentDir(const TFilePath &dirPath);
 
-	void selectParentDirectory();
+  void selectParentDirectory();
 
 private:
-	class Data;
-	Data *m_data;
+  class Data;
+  Data *m_data;
 };
 
 #endif

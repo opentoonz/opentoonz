@@ -18,18 +18,16 @@
 
 class TStopWatch;
 
-class DVAPI TGLArea : public TWidget
-{
+class DVAPI TGLArea : public TWidget {
+  void swapBuffers();
+  TStopWatch *m_stopwatch;
+  double m_framePerSecond;
 
-	void swapBuffers();
-	TStopWatch *m_stopwatch;
-	double m_framePerSecond;
+  void computeOcclusingRegion();
+  void deleteOcclusingRegion();
+  // void  redrawUncoveredArea(const TPoint &);
 
-	void computeOcclusingRegion();
-	void deleteOcclusingRegion();
-	//void  redrawUncoveredArea(const TPoint &);
-
-	std::vector<TRect> *m_arrayOfRectToRedraw;
+  std::vector<TRect> *m_arrayOfRectToRedraw;
 
 protected:
 // int m_lx, m_ly;
@@ -39,116 +37,109 @@ protected:
 #define PEZZA_DISABLE_REDRAW
 
 #if defined(MACOSX) && defined(PEZZA_DISABLE_REDRAW)
-	bool m_disableRedraw;
+  bool m_disableRedraw;
 #endif
 
-	TPoint m_lastPos;
-	TPointD m_pan;			 // world origin (win coords) (n. m_pan*2 are integer)
-	TPointD m_zoomFactor;	// "world pixel" dimension (win coords) (integer if >=1)
-	TDimensionD m_pixelSize; // 1/zoomFactor; win pixel dimension (world coords)
+  TPoint m_lastPos;
+  TPointD m_pan;  // world origin (win coords) (n. m_pan*2 are integer)
+  TPointD
+      m_zoomFactor;  // "world pixel" dimension (win coords) (integer if >=1)
+  TDimensionD m_pixelSize;  // 1/zoomFactor; win pixel dimension (world coords)
 
-	double m_zoomLevel; // m_zoomFactor = e^m_zoomLevel
+  double m_zoomLevel;  // m_zoomFactor = e^m_zoomLevel
 
-	// supported extensions
-	static bool m_bgraSupported;
+  // supported extensions
+  static bool m_bgraSupported;
 
-	bool m_isInsideScreen;
-	void onGLContextCreated();
+  bool m_isInsideScreen;
+  void onGLContextCreated();
 
 public:
-	class PickItem
-	{
-	public:
-		UINT m_label;
-		UINT m_zMin;
-		UINT m_zMax;
+  class PickItem {
+  public:
+    UINT m_label;
+    UINT m_zMin;
+    UINT m_zMax;
 
-		PickItem(UINT label, UINT zmin, UINT zmax)
-			: m_label(label), m_zMin(zmin), m_zMax(zmax)
-		{
-		}
+    PickItem(UINT label, UINT zmin, UINT zmax)
+        : m_label(label), m_zMin(zmin), m_zMax(zmax) {}
 
-		~PickItem() {}
-	private:
-		//not implemented
-		PickItem();
-	};
+    ~PickItem() {}
 
-	TGLArea(TWidget *parent, string name = "GLArea");
-	~TGLArea();
+  private:
+    // not implemented
+    PickItem();
+  };
 
-	void repaint();
-	void configureNotify(const TDimension &);
-	void create();
+  TGLArea(TWidget *parent, string name = "GLArea");
+  ~TGLArea();
 
-	void paintIncrementally();
+  void repaint();
+  void configureNotify(const TDimension &);
+  void create();
 
-	//  void rectwrite(const TRaster32P &ras, const TPoint &p);
-	void over(const TRaster32P &ras, const TPoint &p);
-	void over(const TRasterGR8P &ras, const TPoint &p);
+  void paintIncrementally();
 
-	inline TPointD win2world(const TPointD &p) const;
-	inline TPointD world2win(const TPointD &p) const;
+  //  void rectwrite(const TRaster32P &ras, const TPoint &p);
+  void over(const TRaster32P &ras, const TPoint &p);
+  void over(const TRasterGR8P &ras, const TPoint &p);
 
-	inline TAffine getWin2WorldMatrix() const;
-	inline TAffine getWorld2WinMatrix() const;
+  inline TPointD win2world(const TPointD &p) const;
+  inline TPointD world2win(const TPointD &p) const;
 
-	void scroll(const TPoint &d);  // viewport coordinates
-	void lookAt(const TPointD &d); // world coordinates of the desired window center
+  inline TAffine getWin2WorldMatrix() const;
+  inline TAffine getWorld2WinMatrix() const;
 
-	// n. zoomCenter : viewport coords
-	void setZoomLevel(double zlevel, const TPoint &zoomCenter);
-	void changeZoomLevel(double d, const TPoint &center);
-	virtual void onZoomChange() {}
+  void scroll(const TPoint &d);  // viewport coordinates
+  void lookAt(
+      const TPointD &d);  // world coordinates of the desired window center
 
-	void fitToWindow(const TRectD &worldRect);
+  // n. zoomCenter : viewport coords
+  void setZoomLevel(double zlevel, const TPoint &zoomCenter);
+  void changeZoomLevel(double d, const TPoint &center);
+  virtual void onZoomChange() {}
 
-	void middleButtonDown(const TMouseEvent &e);
-	void middleButtonDrag(const TMouseEvent &e);
-	void middleButtonUp(const TMouseEvent &e);
+  void fitToWindow(const TRectD &worldRect);
 
-	void draw();
-	virtual void drawIncrementally();
+  void middleButtonDown(const TMouseEvent &e);
+  void middleButtonDrag(const TMouseEvent &e);
+  void middleButtonUp(const TMouseEvent &e);
 
-	virtual void drawForPick() { draw(); }
+  void draw();
+  virtual void drawIncrementally();
 
-	void pick(const TPoint &point, vector<PickItem> &items);
+  virtual void drawForPick() { draw(); }
 
-	double getFramePerSecond() const { return m_framePerSecond; }
+  void pick(const TPoint &point, vector<PickItem> &items);
 
-	static bool isBGRASupported() { return m_bgraSupported; }
+  double getFramePerSecond() const { return m_framePerSecond; }
 
-	bool unProject(
-		TPointD &output,
+  static bool isBGRASupported() { return m_bgraSupported; }
 
-		const TPoint &mousePos,
-		const T3DPointD &planeOrigin,
-		const T3DPointD &u,
-		const T3DPointD &v) const;
+  bool unProject(TPointD &output,
 
-	void makeCurrent(); // Gl context
-	bool m_dontSwapBuffers;
+                 const TPoint &mousePos, const T3DPointD &planeOrigin,
+                 const T3DPointD &u, const T3DPointD &v) const;
+
+  void makeCurrent();  // Gl context
+  bool m_dontSwapBuffers;
 };
 
-inline TPointD TGLArea::win2world(const TPointD &p) const
-{
-	TPointD q = p - m_pan;
-	return TPointD(m_pixelSize.lx * q.x, m_pixelSize.ly * q.y);
+inline TPointD TGLArea::win2world(const TPointD &p) const {
+  TPointD q = p - m_pan;
+  return TPointD(m_pixelSize.lx * q.x, m_pixelSize.ly * q.y);
 }
 
-inline TPointD TGLArea::world2win(const TPointD &p) const
-{
-	return m_pan + TPointD(p.x * m_zoomFactor.x, p.y * m_zoomFactor.y);
+inline TPointD TGLArea::world2win(const TPointD &p) const {
+  return m_pan + TPointD(p.x * m_zoomFactor.x, p.y * m_zoomFactor.y);
 }
 
-inline TAffine TGLArea::getWin2WorldMatrix() const
-{
-	return TScale(m_pixelSize.lx, m_pixelSize.ly) * TTranslation(-m_pan);
+inline TAffine TGLArea::getWin2WorldMatrix() const {
+  return TScale(m_pixelSize.lx, m_pixelSize.ly) * TTranslation(-m_pan);
 }
 
-inline TAffine TGLArea::getWorld2WinMatrix() const
-{
-	return TTranslation(m_pan) * TScale(m_zoomFactor.x, m_zoomFactor.y);
+inline TAffine TGLArea::getWorld2WinMatrix() const {
+  return TTranslation(m_pan) * TScale(m_zoomFactor.x, m_zoomFactor.y);
 }
 
 #endif

@@ -18,16 +18,18 @@
 #endif
 
 /* Plugin Loader の inter-module interfaces:
-   toonzqt 以下のモジュールからアクセスするのに必要 (see: toonz/insertfxpopup.cpp)
+   toonzqt 以下のモジュールからアクセスするのに必要 (see:
+   toonz/insertfxpopup.cpp)
    implements in pluginhost.cpp */
 class TFx;
 
-class DVAPI PluginLoader
-{
+class DVAPI PluginLoader {
 public:
-	static std::map<std::string, QTreeWidgetItem *> create_menu_items(std::function<void(QTreeWidgetItem *)> &&, std::function<void(QTreeWidgetItem *)> &&);
-	static TFx *create_host(const std::string &id);
-	static bool load_entries(const std::string &basepath);
+  static std::map<std::string, QTreeWidgetItem *> create_menu_items(
+      std::function<void(QTreeWidgetItem *)> &&,
+      std::function<void(QTreeWidgetItem *)> &&);
+  static TFx *create_host(const std::string &id);
+  static bool load_entries(const std::string &basepath);
 };
 
 #endif

@@ -9,12 +9,11 @@
 // FxParamEditorPopup
 //-----------------------------------------------------------------------------
 
-class FxParamEditorPopup : public QDialog
-{
-	Q_OBJECT
+class FxParamEditorPopup : public QDialog {
+  Q_OBJECT
 
 public:
-	FxParamEditorPopup();
+  FxParamEditorPopup();
 };
 
-#endif // FXPARAMEDITORPOPUP_H
+#endif  // FXPARAMEDITORPOPUP_H

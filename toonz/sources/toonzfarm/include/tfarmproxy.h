@@ -26,69 +26,53 @@ using std::vector;
 
 //------------------------------------------------------------------------------
 
-class TFARMAPI TFarmProxy
-{
+class TFARMAPI TFarmProxy {
 public:
-	TFarmProxy(const QString &hostName, const QString &addr, int port)
-		: m_hostName(hostName), m_addr(addr), m_port(port)
-	{
-	}
+  TFarmProxy(const QString &hostName, const QString &addr, int port)
+      : m_hostName(hostName), m_addr(addr), m_port(port) {}
 
-	virtual ~TFarmProxy() {}
+  virtual ~TFarmProxy() {}
 
-	QString sendToStub(const QString &data);
-	static int extractArgs(const QString &s, vector<QString> &argv);
+  QString sendToStub(const QString &data);
+  static int extractArgs(const QString &s, vector<QString> &argv);
 
 protected:
-	QString m_hostName;
-	QString m_addr;
-	int m_port;
+  QString m_hostName;
+  QString m_addr;
+  int m_port;
 };
 
 //------------------------------------------------------------------------------
 
-class TFARMAPI TFarmProxyException : public TException
-{
+class TFARMAPI TFarmProxyException : public TException {
 public:
-	TFarmProxyException(
-		const QString &hostname,
-		const QString &addr,
-		int port,
-		const QString &msg)
-		: TException(msg.toStdString()), m_hostName(hostname), m_address(addr), m_port(port) {}
+  TFarmProxyException(const QString &hostname, const QString &addr, int port,
+                      const QString &msg)
+      : TException(msg.toStdString())
+      , m_hostName(hostname)
+      , m_address(addr)
+      , m_port(port) {}
 
-	QString getHostName() const
-	{
-		return m_hostName;
-	}
+  QString getHostName() const { return m_hostName; }
 
-	QString getAddress() const
-	{
-		return m_address;
-	}
+  QString getAddress() const { return m_address; }
 
-	int getPort() const
-	{
-		return m_port;
-	}
+  int getPort() const { return m_port; }
 
 protected:
-	QString m_hostName;
-	QString m_address;
-	int m_port;
+  QString m_hostName;
+  QString m_address;
+  int m_port;
 };
 
 //------------------------------------------------------------------------------
 
-class CantConnectToStub : public TFarmProxyException
-{
+class CantConnectToStub : public TFarmProxyException {
 public:
-	CantConnectToStub(
-		const QString &hostname,
-		const QString &addr,
-		int port) : TFarmProxyException(hostname, addr, port, "") {}
+  CantConnectToStub(const QString &hostname, const QString &addr, int port)
+      : TFarmProxyException(hostname, addr, port, "") {}
 
-	TString getMessage() const;
+  TString getMessage() const;
 };
 
 #endif

@@ -19,683 +19,638 @@
 #undef max
 //==================================================================
 
-bool isAlmostIsotropic(const TAffine &aff)
-{
-	return aff.isIsotropic(0.001);
-}
+bool isAlmostIsotropic(const TAffine &aff) { return aff.isIsotropic(0.001); }
 
 //==================================================================
 
-class FadeFx : public TStandardRasterFx
-{
-	FX_PLUGIN_DECLARATION(FadeFx)
-	TRasterFxPort m_input;
-	TDoubleParamP m_value;
+class FadeFx : public TStandardRasterFx {
+  FX_PLUGIN_DECLARATION(FadeFx)
+  TRasterFxPort m_input;
+  TDoubleParamP m_value;
 
 public:
-	FadeFx() : m_value(50)
-	{
-		m_value->setValueRange(0, 100);
-		bindParam(this, "value", m_value);
+  FadeFx() : m_value(50) {
+    m_value->setValueRange(0, 100);
+    bindParam(this, "value", m_value);
 
-		addInputPort("Source", m_input);
-	};
+    addInputPort("Source", m_input);
+  };
 
-	~FadeFx(){};
+  ~FadeFx(){};
 
-	bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info)
-	{
-		if (m_input.isConnected()) {
-			bool ret = m_input->doGetBBox(frame, bBox, info);
-			// devo scurire bgColor
-			return ret;
-		} else {
-			bBox = TRectD();
-			return false;
-		}
-	};
+  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+    if (m_input.isConnected()) {
+      bool ret = m_input->doGetBBox(frame, bBox, info);
+      // devo scurire bgColor
+      return ret;
+    } else {
+      bBox = TRectD();
+      return false;
+    }
+  };
 
-	void doCompute(TTile &tile, double frame, const TRenderSettings &ri)
-	{
-		if (!m_input.isConnected())
-			return;
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
+    if (!m_input.isConnected()) return;
 
-		m_input->compute(tile, frame, ri);
+    m_input->compute(tile, frame, ri);
 
-		double v = 1 - m_value->getValue(frame) / 100;
-		TRop::rgbmScale(tile.getRaster(), tile.getRaster(), 1, 1, 1, v);
-	}
+    double v = 1 - m_value->getValue(frame) / 100;
+    TRop::rgbmScale(tile.getRaster(), tile.getRaster(), 1, 1, 1, v);
+  }
 
-	bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) { return true; }
 };
 
 //==================================================================
 
-class SpiralFx : public TStandardZeraryFx
-{
-	FX_PLUGIN_DECLARATION(SpiralFx)
-	TDoubleParamP m_freq;
-	TDoubleParamP m_phase;
-	TSpectrumParamP m_spectrum;
+class SpiralFx : public TStandardZeraryFx {
+  FX_PLUGIN_DECLARATION(SpiralFx)
+  TDoubleParamP m_freq;
+  TDoubleParamP m_phase;
+  TSpectrumParamP m_spectrum;
 
 public:
-	SpiralFx()
-		: m_freq(0.1) // args, "Freq")
-		  ,
-		  m_phase(0.0) // args, "Phase")
-	{
+  SpiralFx()
+      : m_freq(0.1)   // args, "Freq")
+      , m_phase(0.0)  // args, "Phase")
+  {
+    // m_freq->setDefaultValue(0.1);
+    // m_phase->setDefaultValue(0.0);
+    const TPixel32 transparent(0, 0, 0, 0);
+    /*
+TPixel32 colors[] = {
+            TPixel32::Magenta,
+            TPixel32::Black,
+            TPixel32::Red,
+            TPixel32::Yellow,
+            transparent};
+*/
+    TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::Magenta),
+                                    TSpectrum::ColorKey(0.25, TPixel32::Black),
+                                    TSpectrum::ColorKey(0.5, TPixel32::Red),
+                                    TSpectrum::ColorKey(0.75, TPixel32::Yellow),
+                                    TSpectrum::ColorKey(1, transparent)};
 
-		// m_freq->setDefaultValue(0.1);
-		// m_phase->setDefaultValue(0.0);
-		const TPixel32 transparent(0, 0, 0, 0);
-		/*
-	 TPixel32 colors[] = {
-			TPixel32::Magenta, 
-			TPixel32::Black, 
-			TPixel32::Red, 
-			TPixel32::Yellow, 
-			transparent};    
- */
-		TSpectrum::ColorKey colors[] = {
-			TSpectrum::ColorKey(0, TPixel32::Magenta),
-			TSpectrum::ColorKey(0.25, TPixel32::Black),
-			TSpectrum::ColorKey(0.5, TPixel32::Red),
-			TSpectrum::ColorKey(0.75, TPixel32::Yellow),
-			TSpectrum::ColorKey(1, transparent)};
+    m_spectrum = TSpectrumParamP(tArrayCount(colors), colors);
 
-		m_spectrum = TSpectrumParamP(tArrayCount(colors), colors);
+    bindParam(this, "colors", m_spectrum);
+    bindParam(this, "freq", m_freq);
+    bindParam(this, "phase", m_phase);
+    m_freq->setValueRange(0, 1);
+    // m_spectrum->setDefaultValue(tArrayCount(colors), colors);
+  };
+  ~SpiralFx(){};
 
-		bindParam(this, "colors", m_spectrum);
-		bindParam(this, "freq", m_freq);
-		bindParam(this, "phase", m_phase);
-		m_freq->setValueRange(0, 1);
-		//m_spectrum->setDefaultValue(tArrayCount(colors), colors);
-	};
-	~SpiralFx(){};
+  bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info) {
+    bBox = TConsts::infiniteRectD;
+    return true;
+  };
 
-	bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info)
-	{
-		bBox = TConsts::infiniteRectD;
-		return true;
-	};
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
 
-	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
-
-	bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) { return true; }
 };
 
 //------------------------------------------------------------------
 
-namespace
-{
+namespace {
 template <class T>
 void doComputeT(TRasterPT<T> raster, TPointD posTrasf, const TAffine &aff,
-				const TSpectrumT<T> &spectrum, double freq, double phase)
-{
-	raster->lock();
-	for (int y = 0; y < raster->getLy(); y++) {
-		TPointD posAux = posTrasf;
-		T *pix = raster->pixels(y);
-		for (int x = 0; x < raster->getLx(); x++) {
-			double ang = 0.0;
-			if (posAux.x != 0 || posAux.y != 0)
-				ang = atan2(posAux.y, posAux.x);
-			double r = sqrt(posAux.x * posAux.x + posAux.y * posAux.y);
-			double v = 0.5 * (1 + sin(r * freq + ang + phase));
-			*pix++ = spectrum.getPremultipliedValue(v);
-			posAux.x += aff.a11;
-			posAux.y += aff.a21;
-		}
-		posTrasf.x += aff.a12;
-		posTrasf.y += aff.a22;
-	}
-	raster->unlock();
+                const TSpectrumT<T> &spectrum, double freq, double phase) {
+  raster->lock();
+  for (int y = 0; y < raster->getLy(); y++) {
+    TPointD posAux = posTrasf;
+    T *pix         = raster->pixels(y);
+    for (int x = 0; x < raster->getLx(); x++) {
+      double ang                              = 0.0;
+      if (posAux.x != 0 || posAux.y != 0) ang = atan2(posAux.y, posAux.x);
+      double r = sqrt(posAux.x * posAux.x + posAux.y * posAux.y);
+      double v = 0.5 * (1 + sin(r * freq + ang + phase));
+      *pix++   = spectrum.getPremultipliedValue(v);
+      posAux.x += aff.a11;
+      posAux.y += aff.a21;
+    }
+    posTrasf.x += aff.a12;
+    posTrasf.y += aff.a22;
+  }
+  raster->unlock();
 }
 }
 
 //==================================================================
 
-void SpiralFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
-{
-	double phase = m_phase->getValue(frame);
-	double freq = m_freq->getValue(frame);
+void SpiralFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
+  double phase = m_phase->getValue(frame);
+  double freq  = m_freq->getValue(frame);
 
-	TAffine aff = ri.m_affine.inv();
-	TPointD posTrasf = aff * tile.m_pos;
+  TAffine aff      = ri.m_affine.inv();
+  TPointD posTrasf = aff * tile.m_pos;
 
-	if (TRaster32P ras32 = tile.getRaster())
-		doComputeT<TPixel32>(ras32, posTrasf, aff, m_spectrum->getValue(frame), freq, phase);
-	else if (TRaster64P ras64 = tile.getRaster())
-		doComputeT<TPixel64>(ras64, posTrasf, aff, m_spectrum->getValue64(frame), freq, phase);
-	else
-		throw TException("SpiralFx: unsupported Pixel Type");
+  if (TRaster32P ras32 = tile.getRaster())
+    doComputeT<TPixel32>(ras32, posTrasf, aff, m_spectrum->getValue(frame),
+                         freq, phase);
+  else if (TRaster64P ras64 = tile.getRaster())
+    doComputeT<TPixel64>(ras64, posTrasf, aff, m_spectrum->getValue64(frame),
+                         freq, phase);
+  else
+    throw TException("SpiralFx: unsupported Pixel Type");
 }
 
 //------------------------------------------------------------------
 
-class MultiLinearGradientFx : public TStandardZeraryFx
-{
-	FX_PLUGIN_DECLARATION(MultiLinearGradientFx)
-	TDoubleParamP m_period;
-	TDoubleParamP m_count;
-	TDoubleParamP m_cycle;
-	TDoubleParamP m_wave_amplitude;
-	TDoubleParamP m_wave_freq;
-	TDoubleParamP m_wave_phase;
-	TSpectrumParamP m_colors;
+class MultiLinearGradientFx : public TStandardZeraryFx {
+  FX_PLUGIN_DECLARATION(MultiLinearGradientFx)
+  TDoubleParamP m_period;
+  TDoubleParamP m_count;
+  TDoubleParamP m_cycle;
+  TDoubleParamP m_wave_amplitude;
+  TDoubleParamP m_wave_freq;
+  TDoubleParamP m_wave_phase;
+  TSpectrumParamP m_colors;
 
 public:
-	MultiLinearGradientFx()
-		: m_period(100) //args, "Period")
-		  ,
-		  m_count(2) //args, "Count")
-		  ,
-		  m_cycle(0.0) //args, "Cycle")
-		  ,
-		  m_wave_amplitude(0.0) //args, "Cycle")
-		  ,
-		  m_wave_freq(0.0) //args, "Cycle")
-		  ,
-		  m_wave_phase(0.0) //args, "Cycle")
-							//    , m_colors (0) //args, "Colors")
-	{
-		TSpectrum::ColorKey colors[] = {
-			TSpectrum::ColorKey(0, TPixel32::White),
-			TSpectrum::ColorKey(0.33, TPixel32::Yellow),
-			TSpectrum::ColorKey(0.66, TPixel32::Red),
-			TSpectrum::ColorKey(1, TPixel32::White)};
-		m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+  MultiLinearGradientFx()
+      : m_period(100)          // args, "Period")
+      , m_count(2)             // args, "Count")
+      , m_cycle(0.0)           // args, "Cycle")
+      , m_wave_amplitude(0.0)  // args, "Cycle")
+      , m_wave_freq(0.0)       // args, "Cycle")
+      , m_wave_phase(0.0)      // args, "Cycle")
+  //    , m_colors (0) //args, "Colors")
+  {
+    TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
+                                    TSpectrum::ColorKey(0.33, TPixel32::Yellow),
+                                    TSpectrum::ColorKey(0.66, TPixel32::Red),
+                                    TSpectrum::ColorKey(1, TPixel32::White)};
+    m_colors = TSpectrumParamP(tArrayCount(colors), colors);
 
-		bindParam(this, "period", m_period);
-		bindParam(this, "count", m_count);
-		bindParam(this, "cycle", m_cycle);
-		bindParam(this, "wave_amplitude", m_wave_amplitude);
-		bindParam(this, "wave_frequency", m_wave_freq);
-		bindParam(this, "wave_phase", m_wave_phase);
-		bindParam(this, "colors", m_colors);
-		m_period->setValueRange(0, (std::numeric_limits<double>::max)());
-		m_cycle->setValueRange(0, (std::numeric_limits<double>::max)());
-		m_wave_amplitude->setValueRange(0, (std::numeric_limits<double>::max)());
-		m_count->setValueRange(0, (std::numeric_limits<double>::max)());
-		m_period->setMeasureName("fxLength");
-		m_wave_amplitude->setMeasureName("fxLength");
-	}
-	~MultiLinearGradientFx(){};
+    bindParam(this, "period", m_period);
+    bindParam(this, "count", m_count);
+    bindParam(this, "cycle", m_cycle);
+    bindParam(this, "wave_amplitude", m_wave_amplitude);
+    bindParam(this, "wave_frequency", m_wave_freq);
+    bindParam(this, "wave_phase", m_wave_phase);
+    bindParam(this, "colors", m_colors);
+    m_period->setValueRange(0, (std::numeric_limits<double>::max)());
+    m_cycle->setValueRange(0, (std::numeric_limits<double>::max)());
+    m_wave_amplitude->setValueRange(0, (std::numeric_limits<double>::max)());
+    m_count->setValueRange(0, (std::numeric_limits<double>::max)());
+    m_period->setMeasureName("fxLength");
+    m_wave_amplitude->setMeasureName("fxLength");
+  }
+  ~MultiLinearGradientFx(){};
 
-	bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info)
-	{
-		bBox = TConsts::infiniteRectD;
+  bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info) {
+    bBox = TConsts::infiniteRectD;
 
-		return true;
-		// si potrebbe/dovrebbe fare meglio
-	};
+    return true;
+    // si potrebbe/dovrebbe fare meglio
+  };
 
-	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
-	bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  bool canHandle(const TRenderSettings &info, double frame) { return true; }
 
-	void getParamUIs(TParamUIConcept *&concepts, int &length)
-	{
-		concepts = new TParamUIConcept[length = 1];
+  void getParamUIs(TParamUIConcept *&concepts, int &length) {
+    concepts = new TParamUIConcept[length = 1];
 
-		concepts[0].m_type = TParamUIConcept::WIDTH;
-		concepts[0].m_label = "Size";
-		concepts[0].m_params.push_back(m_period);
-	}
+    concepts[0].m_type  = TParamUIConcept::WIDTH;
+    concepts[0].m_label = "Size";
+    concepts[0].m_params.push_back(m_period);
+  }
 };
 
-class LinearGradientFx : public TStandardZeraryFx
-{
-	FX_PLUGIN_DECLARATION(LinearGradientFx)
-	TDoubleParamP m_period;
+class LinearGradientFx : public TStandardZeraryFx {
+  FX_PLUGIN_DECLARATION(LinearGradientFx)
+  TDoubleParamP m_period;
 
-	TDoubleParamP m_wave_amplitude;
-	TDoubleParamP m_wave_freq;
-	TDoubleParamP m_wave_phase;
-	TPixelParamP m_color1;
-	TPixelParamP m_color2;
+  TDoubleParamP m_wave_amplitude;
+  TDoubleParamP m_wave_freq;
+  TDoubleParamP m_wave_phase;
+  TPixelParamP m_color1;
+  TPixelParamP m_color2;
 
 public:
-	LinearGradientFx()
-		: m_period(100) //args, "Period")
-		  ,
-		  m_wave_amplitude(0.0) //args, "Cycle")
-		  ,
-		  m_wave_freq(0.0) //args, "Cycle")
-		  ,
-		  m_wave_phase(0.0) //args, "Cycle")
-		  ,
-		  m_color1(TPixel32::Black), m_color2(TPixel32::White)
-	//    , m_colors (0) //args, "Colors")
-	{
+  LinearGradientFx()
+      : m_period(100)          // args, "Period")
+      , m_wave_amplitude(0.0)  // args, "Cycle")
+      , m_wave_freq(0.0)       // args, "Cycle")
+      , m_wave_phase(0.0)      // args, "Cycle")
+      , m_color1(TPixel32::Black)
+      , m_color2(TPixel32::White)
+  //    , m_colors (0) //args, "Colors")
+  {
+    bindParam(this, "period", m_period);
+    bindParam(this, "wave_amplitude", m_wave_amplitude);
+    bindParam(this, "wave_frequency", m_wave_freq);
+    bindParam(this, "wave_phase", m_wave_phase);
+    bindParam(this, "color1", m_color1);
+    bindParam(this, "color2", m_color2);
+    m_period->setValueRange(0, std::numeric_limits<double>::max());
+    m_wave_amplitude->setValueRange(0, std::numeric_limits<double>::max());
+    m_period->setMeasureName("fxLength");
+    m_wave_amplitude->setMeasureName("fxLength");
+  }
+  ~LinearGradientFx(){};
 
-		bindParam(this, "period", m_period);
-		bindParam(this, "wave_amplitude", m_wave_amplitude);
-		bindParam(this, "wave_frequency", m_wave_freq);
-		bindParam(this, "wave_phase", m_wave_phase);
-		bindParam(this, "color1", m_color1);
-		bindParam(this, "color2", m_color2);
-		m_period->setValueRange(0, std::numeric_limits<double>::max());
-		m_wave_amplitude->setValueRange(0, std::numeric_limits<double>::max());
-		m_period->setMeasureName("fxLength");
-		m_wave_amplitude->setMeasureName("fxLength");
-	}
-	~LinearGradientFx(){};
+  bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info) {
+    bBox = TConsts::infiniteRectD;
 
-	bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info)
-	{
-		bBox = TConsts::infiniteRectD;
+    return true;
+    // si potrebbe/dovrebbe fare meglio
+  };
 
-		return true;
-		// si potrebbe/dovrebbe fare meglio
-	};
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  bool canHandle(const TRenderSettings &info, double frame) { return true; }
 
-	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
-	bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  void getParamUIs(TParamUIConcept *&concepts, int &length) {
+    concepts = new TParamUIConcept[length = 1];
 
-	void getParamUIs(TParamUIConcept *&concepts, int &length)
-	{
-		concepts = new TParamUIConcept[length = 1];
-
-		concepts[0].m_type = TParamUIConcept::WIDTH;
-		concepts[0].m_label = "Size";
-		concepts[0].m_params.push_back(m_period);
-	}
+    concepts[0].m_type  = TParamUIConcept::WIDTH;
+    concepts[0].m_label = "Size";
+    concepts[0].m_params.push_back(m_period);
+  }
 };
 
 //==================================================================
 
-namespace
-{
+namespace {
 template <class T>
-void doComputeT(TRasterPT<T> ras, TPointD posTrasf, const TSpectrumT<T> &spectrum,
-				double period, double count, double w_amplitude, double w_freq, double w_phase, double cycle, const TAffine &aff)
-{
-	double shift = 0;
-	double maxRadius = period * count / 2.;
-	double freq = 1.0 / period;
-	int j;
-	ras->lock();
-	for (j = 0; j < ras->getLy(); j++) {
-		TPointD posAux = posTrasf;
+void doComputeT(TRasterPT<T> ras, TPointD posTrasf,
+                const TSpectrumT<T> &spectrum, double period, double count,
+                double w_amplitude, double w_freq, double w_phase, double cycle,
+                const TAffine &aff) {
+  double shift     = 0;
+  double maxRadius = period * count / 2.;
+  double freq      = 1.0 / period;
+  int j;
+  ras->lock();
+  for (j = 0; j < ras->getLy(); j++) {
+    TPointD posAux = posTrasf;
 
-		//TPointD pos = tile.m_pos;
-		//pos.y += j;
-		T *pix = ras->pixels(j);
-		T *endPix = pix + ras->getLx();
-		while (pix < endPix) {
-			if (w_amplitude)
-				shift = w_amplitude * sin(w_freq * posAux.y + w_phase);
-			double radius = posAux.x + shift;
-			double t = 1;
-			if (fabs(radius) < maxRadius) {
-				t = (radius + maxRadius + cycle) * freq;
-				t -= floor(t);
-			} else if (radius < 0)
-				t = 0;
-			double polinomfactor = (-2 * t + 3) * (t * t);
-			//pos.x += 1.0;
-			*pix++ = spectrum.getPremultipliedValue(polinomfactor);
-			posAux.x += aff.a11;
-			posAux.y += aff.a21;
-		}
-		posTrasf.x += aff.a12;
-		posTrasf.y += aff.a22;
-	}
-	ras->unlock();
+    // TPointD pos = tile.m_pos;
+    // pos.y += j;
+    T *pix    = ras->pixels(j);
+    T *endPix = pix + ras->getLx();
+    while (pix < endPix) {
+      if (w_amplitude) shift = w_amplitude * sin(w_freq * posAux.y + w_phase);
+      double radius          = posAux.x + shift;
+      double t               = 1;
+      if (fabs(radius) < maxRadius) {
+        t = (radius + maxRadius + cycle) * freq;
+        t -= floor(t);
+      } else if (radius < 0)
+        t                  = 0;
+      double polinomfactor = (-2 * t + 3) * (t * t);
+      // pos.x += 1.0;
+      *pix++ = spectrum.getPremultipliedValue(polinomfactor);
+      posAux.x += aff.a11;
+      posAux.y += aff.a21;
+    }
+    posTrasf.x += aff.a12;
+    posTrasf.y += aff.a22;
+  }
+  ras->unlock();
 }
 }
 
 //==================================================================
 
-void LinearGradientFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
-{
-	assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster());
+void LinearGradientFx::doCompute(TTile &tile, double frame,
+                                 const TRenderSettings &ri) {
+  assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster());
 
-	double period = m_period->getValue(frame) / ri.m_shrinkX;
-	double count = 1.0;
-	double cycle = 0;
-	double w_amplitude = m_wave_amplitude->getValue(frame) / ri.m_shrinkX;
-	double w_freq = m_wave_freq->getValue(frame) * ri.m_shrinkX;
-	double w_phase = m_wave_phase->getValue(frame);
-	w_freq *= 0.01 * M_PI_180;
+  double period      = m_period->getValue(frame) / ri.m_shrinkX;
+  double count       = 1.0;
+  double cycle       = 0;
+  double w_amplitude = m_wave_amplitude->getValue(frame) / ri.m_shrinkX;
+  double w_freq      = m_wave_freq->getValue(frame) * ri.m_shrinkX;
+  double w_phase     = m_wave_phase->getValue(frame);
+  w_freq *= 0.01 * M_PI_180;
 
-	TSpectrum::ColorKey colors[] = {
-		TSpectrum::ColorKey(0, m_color1->getValue(frame)),
-		TSpectrum::ColorKey(1, m_color2->getValue(frame))};
-	TSpectrumParamP m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+  TSpectrum::ColorKey colors[] = {
+      TSpectrum::ColorKey(0, m_color1->getValue(frame)),
+      TSpectrum::ColorKey(1, m_color2->getValue(frame))};
+  TSpectrumParamP m_colors = TSpectrumParamP(tArrayCount(colors), colors);
 
-	TAffine aff = ri.m_affine.inv();
-	TPointD posTrasf = aff * tile.m_pos;
-	multiLinear(tile.getRaster(), posTrasf, m_colors, period, count, w_amplitude, w_freq, w_phase, cycle, aff, frame);
-	/*
-	if (TRaster32P ras32 = tile.getRaster())
-    doComputeT<TPixel32>(
-      ras32, posTrasf, 
-      m_colors->getValue(frame), 
-      period, count, w_amplitude, w_freq, w_phase, cycle, aff);
-  else if (TRaster64P ras64 = tile.getRaster())
-    doComputeT<TPixel64>(
-      ras64, posTrasf, 
-      m_colors->getValue64(frame), 
-      period, count, w_amplitude, w_freq, w_phase, cycle, aff);
-  else
-    throw TException("MultiLinearGradientFx: unsupported Pixel Type");
-    */
-}
-
-//==================================================================
-
-void MultiLinearGradientFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
-{
-	assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster());
-
-	double period = m_period->getValue(frame) / ri.m_shrinkX;
-	double count = m_count->getValue(frame);
-	double cycle = m_cycle->getValue(frame) / ri.m_shrinkX;
-	double w_amplitude = m_wave_amplitude->getValue(frame) / ri.m_shrinkX;
-	double w_freq = m_wave_freq->getValue(frame) * ri.m_shrinkX;
-	double w_phase = m_wave_phase->getValue(frame);
-	w_freq *= 0.01 * M_PI_180;
-
-	TAffine aff = ri.m_affine.inv();
-	TPointD posTrasf = aff * tile.m_pos;
-	multiLinear(tile.getRaster(), posTrasf, m_colors, period, count, w_amplitude, w_freq, w_phase, cycle, aff, frame);
-	/*
-	if (TRaster32P ras32 = tile.getRaster())
-    doComputeT<TPixel32>(
-      ras32, posTrasf, 
-      m_colors->getValue(frame), 
-      period, count, w_amplitude, w_freq, w_phase, cycle, aff);
-  else if (TRaster64P ras64 = tile.getRaster())
-    doComputeT<TPixel64>(
-      ras64, posTrasf, 
-      m_colors->getValue64(frame), 
-      period, count, w_amplitude, w_freq, w_phase, cycle, aff);
-  else
-    throw TException("MultiLinearGradientFx: unsupported Pixel Type");
-    */
-}
-
-//==================================================================
-
-class RadialGradientFx : public TStandardZeraryFx
-{
-	FX_PLUGIN_DECLARATION(RadialGradientFx)
-	TDoubleParamP m_period;
-	TDoubleParamP m_innerperiod;
-	TPixelParamP m_color1;
-	TPixelParamP m_color2;
-
-public:
-	RadialGradientFx()
-		: m_period(100.0), m_innerperiod(0.0) //args, "Period")
-		  ,
-		  m_color1(TPixel32::White), m_color2(TPixel32::Transparent)
-	//    , m_colors (0) //args, "Colors")
-	{
-		m_period->setMeasureName("fxLength");
-		m_innerperiod->setMeasureName("fxLength");
-		bindParam(this, "period", m_period);
-		bindParam(this, "innerperiod", m_innerperiod);
-		bindParam(this, "color1", m_color1);
-		bindParam(this, "color2", m_color2);
-		m_period->setValueRange(0.0, std::numeric_limits<double>::max());
-		m_innerperiod->setValueRange(0.0, std::numeric_limits<double>::max());
-	}
-	~RadialGradientFx(){};
-
-	bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info)
-	{
-		bBox = TConsts::infiniteRectD;
-		return true;
-		// si potrebbe/dovrebbe fare meglio
-	};
-
-	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
-	bool canHandle(const TRenderSettings &info, double frame) { return true; }
-
-	void getParamUIs(TParamUIConcept *&concepts, int &length)
-	{
-		concepts = new TParamUIConcept[length = 2];
-
-		concepts[0].m_type = TParamUIConcept::RADIUS;
-		concepts[0].m_label = "Inner Size";
-		concepts[0].m_params.push_back(m_innerperiod);
-
-		concepts[1].m_type = TParamUIConcept::RADIUS;
-		concepts[1].m_label = "Outer Size";
-		concepts[1].m_params.push_back(m_period);
-	}
-};
-
-//==================================================================
-
-class MultiRadialGradientFx : public TStandardZeraryFx
-{
-	FX_PLUGIN_DECLARATION(MultiRadialGradientFx)
-	TDoubleParamP m_period;
-	TDoubleParamP m_count;
-	TDoubleParamP m_cycle;
-	TSpectrumParamP m_colors;
-
-public:
-	MultiRadialGradientFx()
-		: m_period(100) //args, "Period")
-		  ,
-		  m_count(2) //args, "Count")
-		  ,
-		  m_cycle(0.0) //args, "Count")
-					   //    , m_colors (0) //args, "Colors")
-	{
-		m_period->setMeasureName("fxLength");
-		TSpectrum::ColorKey colors[] = {
-			TSpectrum::ColorKey(0, TPixel32::White),
-			TSpectrum::ColorKey(0.33, TPixel32::Yellow),
-			TSpectrum::ColorKey(0.66, TPixel32::Red),
-			TSpectrum::ColorKey(1, TPixel32::White)};
-
-		m_colors = TSpectrumParamP(tArrayCount(colors), colors);
-
-		bindParam(this, "period", m_period);
-		bindParam(this, "count", m_count);
-		bindParam(this, "cycle", m_cycle);
-		bindParam(this, "colors", m_colors);
-		m_period->setValueRange(0, (std::numeric_limits<double>::max)());
-		m_cycle->setValueRange(0, (std::numeric_limits<double>::max)());
-		m_count->setValueRange(0, (std::numeric_limits<double>::max)());
-	}
-	~MultiRadialGradientFx(){};
-
-	bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info)
-	{
-		bBox = TConsts::infiniteRectD;
-		return true;
-		// si potrebbe/dovrebbe fare meglio
-	};
-
-	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
-	bool canHandle(const TRenderSettings &info, double frame) { return true; }
-
-	void getParamUIs(TParamUIConcept *&concepts, int &length)
-	{
-		concepts = new TParamUIConcept[length = 1];
-
-		concepts[0].m_type = TParamUIConcept::RADIUS;
-		concepts[0].m_label = "Period";
-		concepts[0].m_params.push_back(m_period);
-	}
-};
-
-//------------------------------------------------------------------
-
-//==================================================================
-
-void MultiRadialGradientFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
-{
-	assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster());
-	double period = m_period->getValue(frame) / ri.m_shrinkX;
-	double count = m_count->getValue(frame);
-	double cycle = m_cycle->getValue(frame) / ri.m_shrinkX;
-
-	TAffine aff = ri.m_affine.inv();
-	TPointD posTrasf = aff * tile.m_pos;
-	multiRadial(tile.getRaster(), posTrasf, m_colors, period, count, cycle, aff, frame);
-}
-
-//==================================================================
-
-void RadialGradientFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
-{
-	assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster());
-	double period = m_period->getValue(frame) / ri.m_shrinkX;
-	double innerperiod = m_innerperiod->getValue(frame) / ri.m_shrinkX;
-	double count = 1.0;
-	double cycle = 0.0;
-	double inner = 0.0;
-	if (innerperiod < period)
-		inner = innerperiod / period;
-	else
-		inner = 1 - TConsts::epsilon;
-	TSpectrum::ColorKey colors[] = {
-		TSpectrum::ColorKey(0, m_color1->getValue(frame)),
-		TSpectrum::ColorKey(inner, m_color1->getValue(frame)),
-		TSpectrum::ColorKey(1, m_color2->getValue(frame))};
-	TSpectrumParamP m_colors = TSpectrumParamP(tArrayCount(colors), colors);
-	TAffine aff = ri.m_affine.inv();
-	TPointD posTrasf = aff * tile.m_pos;
-	multiRadial(tile.getRaster(), posTrasf, m_colors, period, count, cycle, aff, frame);
-}
-
-//------------------------------------------------------------------
-
-class LightSpotFx : public TStandardZeraryFx
-{
-	FX_PLUGIN_DECLARATION(LightSpotFx)
-	TDoubleParamP m_softness;
-	TDoubleParamP m_a;
-	TDoubleParamP m_b;
-	TPixelParamP m_color;
-
-public:
-	LightSpotFx()
-		: m_softness(0.2) //args, "Softness")
-		  ,
-		  m_a(200) //args, "A")
-		  ,
-		  m_b(100) //args, "B")
-		  ,
-		  m_color(TPixel::Magenta) //args, "Color")
-	{
-		m_a->setMeasureName("fxLength");
-		m_b->setMeasureName("fxLength");
-		bindParam(this, "softness", m_softness);
-		bindParam(this, "a", m_a);
-		bindParam(this, "b", m_b);
-		bindParam(this, "color", m_color);
-		/*
-	  m_a->setDefaultValue(200);
-	  m_b->setDefaultValue(100);
-    m_color->setDefaultValue(TPixel::Magenta);
+  TAffine aff      = ri.m_affine.inv();
+  TPointD posTrasf = aff * tile.m_pos;
+  multiLinear(tile.getRaster(), posTrasf, m_colors, period, count, w_amplitude,
+              w_freq, w_phase, cycle, aff, frame);
+  /*
+  if (TRaster32P ras32 = tile.getRaster())
+doComputeT<TPixel32>(
+ras32, posTrasf,
+m_colors->getValue(frame),
+period, count, w_amplitude, w_freq, w_phase, cycle, aff);
+else if (TRaster64P ras64 = tile.getRaster())
+doComputeT<TPixel64>(
+ras64, posTrasf,
+m_colors->getValue64(frame),
+period, count, w_amplitude, w_freq, w_phase, cycle, aff);
+else
+throw TException("MultiLinearGradientFx: unsupported Pixel Type");
 */
-	}
-	~LightSpotFx(){};
+}
 
-	bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info)
-	{
-		bBox = TConsts::infiniteRectD;
-		return true;
-		// si potrebbe/dovrebbe fare meglio
-	};
+//==================================================================
 
-	void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
-	bool canHandle(const TRenderSettings &info, double frame) { return true; }
+void MultiLinearGradientFx::doCompute(TTile &tile, double frame,
+                                      const TRenderSettings &ri) {
+  assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster());
 
-	void getParamUIs(TParamUIConcept *&concepts, int &length)
-	{
-		concepts = new TParamUIConcept[length = 1];
+  double period      = m_period->getValue(frame) / ri.m_shrinkX;
+  double count       = m_count->getValue(frame);
+  double cycle       = m_cycle->getValue(frame) / ri.m_shrinkX;
+  double w_amplitude = m_wave_amplitude->getValue(frame) / ri.m_shrinkX;
+  double w_freq      = m_wave_freq->getValue(frame) * ri.m_shrinkX;
+  double w_phase     = m_wave_phase->getValue(frame);
+  w_freq *= 0.01 * M_PI_180;
 
-		concepts[0].m_type = TParamUIConcept::RECT;
-		concepts[0].m_params.push_back(m_a);
-		concepts[0].m_params.push_back(m_b);
-	}
+  TAffine aff      = ri.m_affine.inv();
+  TPointD posTrasf = aff * tile.m_pos;
+  multiLinear(tile.getRaster(), posTrasf, m_colors, period, count, w_amplitude,
+              w_freq, w_phase, cycle, aff, frame);
+  /*
+  if (TRaster32P ras32 = tile.getRaster())
+doComputeT<TPixel32>(
+ras32, posTrasf,
+m_colors->getValue(frame),
+period, count, w_amplitude, w_freq, w_phase, cycle, aff);
+else if (TRaster64P ras64 = tile.getRaster())
+doComputeT<TPixel64>(
+ras64, posTrasf,
+m_colors->getValue64(frame),
+period, count, w_amplitude, w_freq, w_phase, cycle, aff);
+else
+throw TException("MultiLinearGradientFx: unsupported Pixel Type");
+*/
+}
+
+//==================================================================
+
+class RadialGradientFx : public TStandardZeraryFx {
+  FX_PLUGIN_DECLARATION(RadialGradientFx)
+  TDoubleParamP m_period;
+  TDoubleParamP m_innerperiod;
+  TPixelParamP m_color1;
+  TPixelParamP m_color2;
+
+public:
+  RadialGradientFx()
+      : m_period(100.0)
+      , m_innerperiod(0.0)  // args, "Period")
+      , m_color1(TPixel32::White)
+      , m_color2(TPixel32::Transparent)
+  //    , m_colors (0) //args, "Colors")
+  {
+    m_period->setMeasureName("fxLength");
+    m_innerperiod->setMeasureName("fxLength");
+    bindParam(this, "period", m_period);
+    bindParam(this, "innerperiod", m_innerperiod);
+    bindParam(this, "color1", m_color1);
+    bindParam(this, "color2", m_color2);
+    m_period->setValueRange(0.0, std::numeric_limits<double>::max());
+    m_innerperiod->setValueRange(0.0, std::numeric_limits<double>::max());
+  }
+  ~RadialGradientFx(){};
+
+  bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info) {
+    bBox = TConsts::infiniteRectD;
+    return true;
+    // si potrebbe/dovrebbe fare meglio
+  };
+
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+
+  void getParamUIs(TParamUIConcept *&concepts, int &length) {
+    concepts = new TParamUIConcept[length = 2];
+
+    concepts[0].m_type  = TParamUIConcept::RADIUS;
+    concepts[0].m_label = "Inner Size";
+    concepts[0].m_params.push_back(m_innerperiod);
+
+    concepts[1].m_type  = TParamUIConcept::RADIUS;
+    concepts[1].m_label = "Outer Size";
+    concepts[1].m_params.push_back(m_period);
+  }
+};
+
+//==================================================================
+
+class MultiRadialGradientFx : public TStandardZeraryFx {
+  FX_PLUGIN_DECLARATION(MultiRadialGradientFx)
+  TDoubleParamP m_period;
+  TDoubleParamP m_count;
+  TDoubleParamP m_cycle;
+  TSpectrumParamP m_colors;
+
+public:
+  MultiRadialGradientFx()
+      : m_period(100)  // args, "Period")
+      , m_count(2)     // args, "Count")
+      , m_cycle(0.0)   // args, "Count")
+  //    , m_colors (0) //args, "Colors")
+  {
+    m_period->setMeasureName("fxLength");
+    TSpectrum::ColorKey colors[] = {TSpectrum::ColorKey(0, TPixel32::White),
+                                    TSpectrum::ColorKey(0.33, TPixel32::Yellow),
+                                    TSpectrum::ColorKey(0.66, TPixel32::Red),
+                                    TSpectrum::ColorKey(1, TPixel32::White)};
+
+    m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+
+    bindParam(this, "period", m_period);
+    bindParam(this, "count", m_count);
+    bindParam(this, "cycle", m_cycle);
+    bindParam(this, "colors", m_colors);
+    m_period->setValueRange(0, (std::numeric_limits<double>::max)());
+    m_cycle->setValueRange(0, (std::numeric_limits<double>::max)());
+    m_count->setValueRange(0, (std::numeric_limits<double>::max)());
+  }
+  ~MultiRadialGradientFx(){};
+
+  bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info) {
+    bBox = TConsts::infiniteRectD;
+    return true;
+    // si potrebbe/dovrebbe fare meglio
+  };
+
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+
+  void getParamUIs(TParamUIConcept *&concepts, int &length) {
+    concepts = new TParamUIConcept[length = 1];
+
+    concepts[0].m_type  = TParamUIConcept::RADIUS;
+    concepts[0].m_label = "Period";
+    concepts[0].m_params.push_back(m_period);
+  }
 };
 
 //------------------------------------------------------------------
 
-namespace
-{
-template <class T>
-void doComputeT(TRasterPT<T> raster, TPointD posTrasf, const TAffine &aff, const T &pixelColor,
-				double softness, double a, double b)
-{
-	double aa = a * a;
-	double bb = b * b;
-	double invaa = 1 / aa;
-	double invbb = 1 / bb;
-	double num = 2 * (aa + bb);
-	double normax = num / (5 * aa + bb);
-	int j;
+//==================================================================
 
-	raster->lock();
-	for (j = 0; j < raster->getLy(); j++) {
-		TPointD posAux = posTrasf;
-		T *pix = raster->pixels(j);
-		T *endPix = pix + raster->getLx();
-		while (pix < endPix) {
-			double yyrot = (posAux.y) * (posAux.y);
-			double yvar = (yyrot)*invbb + 1;
-			double result;
-			double fact, xrot, tempvar, normtmp, outsideslope;
-			//pos.x += 1.0;
-			xrot = (posAux.x);
-			tempvar = xrot * xrot * invaa + yvar;
-			fact = tempvar * 0.5;
-			if (fact < 1) {
-				normtmp = num / (aa + bb + (xrot - a) * (xrot - a) + yyrot);
-				result = normtmp;
-			} else {
-				outsideslope = 1 / (1 + (fact - 1) * softness);
-				result = normax * outsideslope;
-			}
-			if (result > 1)
-				result = 1;
-			if (result < 0)
-				result = 0;
-			*pix++ = blend(T::Black, pixelColor, result);
-			posAux.x += aff.a11;
-			posAux.y += aff.a21;
-		}
-		posTrasf.x += aff.a12;
-		posTrasf.y += aff.a22;
-	}
-	raster->unlock();
+void MultiRadialGradientFx::doCompute(TTile &tile, double frame,
+                                      const TRenderSettings &ri) {
+  assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster());
+  double period = m_period->getValue(frame) / ri.m_shrinkX;
+  double count  = m_count->getValue(frame);
+  double cycle  = m_cycle->getValue(frame) / ri.m_shrinkX;
+
+  TAffine aff      = ri.m_affine.inv();
+  TPointD posTrasf = aff * tile.m_pos;
+  multiRadial(tile.getRaster(), posTrasf, m_colors, period, count, cycle, aff,
+              frame);
+}
+
+//==================================================================
+
+void RadialGradientFx::doCompute(TTile &tile, double frame,
+                                 const TRenderSettings &ri) {
+  assert((TRaster32P)tile.getRaster() || (TRaster64P)tile.getRaster());
+  double period      = m_period->getValue(frame) / ri.m_shrinkX;
+  double innerperiod = m_innerperiod->getValue(frame) / ri.m_shrinkX;
+  double count       = 1.0;
+  double cycle       = 0.0;
+  double inner       = 0.0;
+  if (innerperiod < period)
+    inner = innerperiod / period;
+  else
+    inner                      = 1 - TConsts::epsilon;
+  TSpectrum::ColorKey colors[] = {
+      TSpectrum::ColorKey(0, m_color1->getValue(frame)),
+      TSpectrum::ColorKey(inner, m_color1->getValue(frame)),
+      TSpectrum::ColorKey(1, m_color2->getValue(frame))};
+  TSpectrumParamP m_colors = TSpectrumParamP(tArrayCount(colors), colors);
+  TAffine aff              = ri.m_affine.inv();
+  TPointD posTrasf         = aff * tile.m_pos;
+  multiRadial(tile.getRaster(), posTrasf, m_colors, period, count, cycle, aff,
+              frame);
+}
+
+//------------------------------------------------------------------
+
+class LightSpotFx : public TStandardZeraryFx {
+  FX_PLUGIN_DECLARATION(LightSpotFx)
+  TDoubleParamP m_softness;
+  TDoubleParamP m_a;
+  TDoubleParamP m_b;
+  TPixelParamP m_color;
+
+public:
+  LightSpotFx()
+      : m_softness(0.2)           // args, "Softness")
+      , m_a(200)                  // args, "A")
+      , m_b(100)                  // args, "B")
+      , m_color(TPixel::Magenta)  // args, "Color")
+  {
+    m_a->setMeasureName("fxLength");
+    m_b->setMeasureName("fxLength");
+    bindParam(this, "softness", m_softness);
+    bindParam(this, "a", m_a);
+    bindParam(this, "b", m_b);
+    bindParam(this, "color", m_color);
+    /*
+m_a->setDefaultValue(200);
+m_b->setDefaultValue(100);
+m_color->setDefaultValue(TPixel::Magenta);
+*/
+  }
+  ~LightSpotFx(){};
+
+  bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info) {
+    bBox = TConsts::infiniteRectD;
+    return true;
+    // si potrebbe/dovrebbe fare meglio
+  };
+
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+
+  void getParamUIs(TParamUIConcept *&concepts, int &length) {
+    concepts = new TParamUIConcept[length = 1];
+
+    concepts[0].m_type = TParamUIConcept::RECT;
+    concepts[0].m_params.push_back(m_a);
+    concepts[0].m_params.push_back(m_b);
+  }
+};
+
+//------------------------------------------------------------------
+
+namespace {
+template <class T>
+void doComputeT(TRasterPT<T> raster, TPointD posTrasf, const TAffine &aff,
+                const T &pixelColor, double softness, double a, double b) {
+  double aa     = a * a;
+  double bb     = b * b;
+  double invaa  = 1 / aa;
+  double invbb  = 1 / bb;
+  double num    = 2 * (aa + bb);
+  double normax = num / (5 * aa + bb);
+  int j;
+
+  raster->lock();
+  for (j = 0; j < raster->getLy(); j++) {
+    TPointD posAux = posTrasf;
+    T *pix         = raster->pixels(j);
+    T *endPix      = pix + raster->getLx();
+    while (pix < endPix) {
+      double yyrot = (posAux.y) * (posAux.y);
+      double yvar  = (yyrot)*invbb + 1;
+      double result;
+      double fact, xrot, tempvar, normtmp, outsideslope;
+      // pos.x += 1.0;
+      xrot    = (posAux.x);
+      tempvar = xrot * xrot * invaa + yvar;
+      fact    = tempvar * 0.5;
+      if (fact < 1) {
+        normtmp = num / (aa + bb + (xrot - a) * (xrot - a) + yyrot);
+        result  = normtmp;
+      } else {
+        outsideslope = 1 / (1 + (fact - 1) * softness);
+        result       = normax * outsideslope;
+      }
+      if (result > 1) result = 1;
+      if (result < 0) result = 0;
+      *pix++                 = blend(T::Black, pixelColor, result);
+      posAux.x += aff.a11;
+      posAux.y += aff.a21;
+    }
+    posTrasf.x += aff.a12;
+    posTrasf.y += aff.a22;
+  }
+  raster->unlock();
 }
 }
 
 //==================================================================
 
-void LightSpotFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri)
-{
+void LightSpotFx::doCompute(TTile &tile, double frame,
+                            const TRenderSettings &ri) {
+  double a = m_a->getValue(frame) / ri.m_shrinkX;
+  double b = m_b->getValue(frame) / ri.m_shrinkX;
 
-	double a = m_a->getValue(frame) / ri.m_shrinkX;
-	double b = m_b->getValue(frame) / ri.m_shrinkX;
+  if (a == 0.0 || b == 0.0) {
+    if ((TRaster32P)tile.getRaster())
+      ((TRaster32P)tile.getRaster())->fill(TPixel32::Black);
+    else if ((TRaster64P)tile.getRaster())
+      ((TRaster64P)tile.getRaster())->fill(TPixel64::Black);
+    return;
+  }
 
-	if (a == 0.0 || b == 0.0) {
-		if ((TRaster32P)tile.getRaster())
-			((TRaster32P)tile.getRaster())->fill(TPixel32::Black);
-		else if ((TRaster64P)tile.getRaster())
-			((TRaster64P)tile.getRaster())->fill(TPixel64::Black);
-		return;
-	}
-
-	TAffine aff = ri.m_affine.inv();
-	TPointD posTrasf = aff * tile.m_pos;
-	const TPixel32 pixelColor = m_color->getValue(frame);
-	double softness = m_softness->getValue(frame);
-	if ((TRaster32P)tile.getRaster())
-		doComputeT<TPixel32>(tile.getRaster(), posTrasf, aff, pixelColor, softness, a, b);
-	else if ((TRaster64P)tile.getRaster())
-		doComputeT<TPixel64>(tile.getRaster(), posTrasf, aff, toPixel64(pixelColor), softness, a, b);
+  TAffine aff               = ri.m_affine.inv();
+  TPointD posTrasf          = aff * tile.m_pos;
+  const TPixel32 pixelColor = m_color->getValue(frame);
+  double softness           = m_softness->getValue(frame);
+  if ((TRaster32P)tile.getRaster())
+    doComputeT<TPixel32>(tile.getRaster(), posTrasf, aff, pixelColor, softness,
+                         a, b);
+  else if ((TRaster64P)tile.getRaster())
+    doComputeT<TPixel64>(tile.getRaster(), posTrasf, aff, toPixel64(pixelColor),
+                         softness, a, b);
 }
 
 //------------------------------------------------------------------
@@ -716,6 +671,4 @@ return &info;
 
 */
 
-DV_EXPORT_API void initStdFx()
-{
-}
+DV_EXPORT_API void initStdFx() {}

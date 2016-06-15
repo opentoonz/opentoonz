@@ -8,25 +8,24 @@
 
 //---------------------------------------------------------------------
 
-class TBaseServer
-{
+class TBaseServer {
 public:
-	TBaseServer(int port);
-	virtual ~TBaseServer();
+  TBaseServer(int port);
+  virtual ~TBaseServer();
 
-	void start();
-	void stop();
+  void start();
+  void stop();
 
-	virtual std::string exec(int argc, char *argv[]) = 0;
+  virtual std::string exec(int argc, char *argv[]) = 0;
 
 private:
-	int extractArgs(char *s, char *argv[]);
+  int extractArgs(char *s, char *argv[]);
 
-	int m_port;
-	int m_socketId;
-	bool m_stopped;
+  int m_port;
+  int m_socketId;
+  bool m_stopped;
 
-	//  TThread::Mutex m_mutex;
+  //  TThread::Mutex m_mutex;
 };
 
 #endif

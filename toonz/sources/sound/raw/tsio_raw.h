@@ -11,25 +11,23 @@
 The class TSoundTrackReaderRaw reads audio files having
 .raw extension (this kind of file contains only the sample)
 */
-class TSoundTrackReaderRaw : public TSoundTrackReader
-{
+class TSoundTrackReaderRaw : public TSoundTrackReader {
 public:
-	TSoundTrackReaderRaw(const TFilePath &fp);
-	~TSoundTrackReaderRaw() {}
+  TSoundTrackReaderRaw(const TFilePath &fp);
+  ~TSoundTrackReaderRaw() {}
 
-	/*!
-  Loads the .raw audio file whose path has been specified in the constructor.
-  It returns a TSoundTrackP created from the audio file 
-  */
-	TSoundTrackP load();
+  /*!
+Loads the .raw audio file whose path has been specified in the constructor.
+It returns a TSoundTrackP created from the audio file
+*/
+  TSoundTrackP load();
 
-	/*!
-  Returns a soundtrack reader able to read .raw audio files
-  */
-	static TSoundTrackReader *create(const TFilePath &fp)
-	{
-		return new TSoundTrackReaderRaw(fp);
-	}
+  /*!
+Returns a soundtrack reader able to read .raw audio files
+*/
+  static TSoundTrackReader *create(const TFilePath &fp) {
+    return new TSoundTrackReaderRaw(fp);
+  }
 };
 
 //==========================================================
@@ -38,25 +36,23 @@ public:
 The class TSoundTrackWriterRaw writes audio file having
 .raw extension (this kind of file contains only the sample)
 */
-class TSoundTrackWriterRaw : public TSoundTrackWriter
-{
+class TSoundTrackWriterRaw : public TSoundTrackWriter {
 public:
-	TSoundTrackWriterRaw(const TFilePath &fp);
-	~TSoundTrackWriterRaw() {}
+  TSoundTrackWriterRaw(const TFilePath &fp);
+  ~TSoundTrackWriterRaw() {}
 
-	/*!
-  Saves the informations of the soundtrack in .raw audio file
-  whose path has been specified in the constructor.
-  */
-	bool save(const TSoundTrackP &);
+  /*!
+Saves the informations of the soundtrack in .raw audio file
+whose path has been specified in the constructor.
+*/
+  bool save(const TSoundTrackP &);
 
-	/*!
-  Returns a soundtrack writer able to write .raw audio files
-  */
-	static TSoundTrackWriter *create(const TFilePath &fp)
-	{
-		return new TSoundTrackWriterRaw(fp);
-	}
+  /*!
+Returns a soundtrack writer able to write .raw audio files
+*/
+  static TSoundTrackWriter *create(const TFilePath &fp) {
+    return new TSoundTrackWriterRaw(fp);
+  }
 };
 
 #endif

@@ -25,55 +25,54 @@ class Ruler;
 
 class FlipConsole;
 class TXshLevel;
-class SceneViewerPanel : public TPanel, public FlipConsoleOwner
-{
-	Q_OBJECT
+class SceneViewerPanel : public TPanel, public FlipConsoleOwner {
+  Q_OBJECT
 
-	friend class SceneViewer;
-	SceneViewer *m_sceneViewer;
-	FlipConsole *m_flipConsole;
-	ViewerKeyframeNavigator *m_keyFrameButton;
+  friend class SceneViewer;
+  SceneViewer *m_sceneViewer;
+  FlipConsole *m_flipConsole;
+  ViewerKeyframeNavigator *m_keyFrameButton;
 
-	TPanelTitleBarButtonSet *m_referenceModeBs;
-	TPanelTitleBarButton *m_previewButton;
-	TPanelTitleBarButton *m_subcameraPreviewButton;
+  TPanelTitleBarButtonSet *m_referenceModeBs;
+  TPanelTitleBarButton *m_previewButton;
+  TPanelTitleBarButton *m_subcameraPreviewButton;
 
 public:
 #if QT_VERSION >= 0x050500
-	SceneViewerPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  SceneViewerPanel(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
-	SceneViewerPanel(QWidget *parent = 0, Qt::WFlags flags = 0);
+  SceneViewerPanel(QWidget *parent = 0, Qt::WFlags flags = 0);
 #endif
-	~SceneViewerPanel();
+  ~SceneViewerPanel();
 
-	void onDrawFrame(int frame, const ImagePainter::VisualSettings &settings);
+  void onDrawFrame(int frame, const ImagePainter::VisualSettings &settings);
 
 protected:
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
-	void resizeEvent(QResizeEvent *);
-	void initializeTitleBar(TPanelTitleBar *titleBar);
-	void createFrameToolBar();
-	void createPlayToolBar();
-	void addColorMaskButton(QWidget *parent, const char *iconSVGName, int id);
-	void enableFlipConsoleForCamerastand(bool on);
+  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *);
+  void resizeEvent(QResizeEvent *);
+  void initializeTitleBar(TPanelTitleBar *titleBar);
+  void createFrameToolBar();
+  void createPlayToolBar();
+  void addColorMaskButton(QWidget *parent, const char *iconSVGName, int id);
+  void enableFlipConsoleForCamerastand(bool on);
 
 public slots:
 
-	void changeWindowTitle();
-	void onSceneChanged();
-	void onXshLevelSwitched(TXshLevel *);
-	void updateFrameRange();
-	void updateFrameMarkers();
+  void changeWindowTitle();
+  void onSceneChanged();
+  void onXshLevelSwitched(TXshLevel *);
+  void updateFrameRange();
+  void updateFrameMarkers();
 
 protected slots:
 
-	void onFrameSwitched();
-	void onSceneSwitched();
-	void onFrameTypeChanged();
+  void onFrameSwitched();
+  void onSceneSwitched();
+  void onFrameTypeChanged();
 
-	void enableFullPreview(bool enabled);
-	void enableSubCameraPreview(bool enabled);
+  void enableFullPreview(bool enabled);
+  void enableSubCameraPreview(bool enabled);
 };
 
 #endif

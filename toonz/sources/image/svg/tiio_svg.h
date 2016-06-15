@@ -7,71 +7,65 @@
 
 #endif
 
-class TLevelReaderSvg : public TLevelReader
-{
+class TLevelReaderSvg : public TLevelReader {
 public:
-	TLevelReaderSvg(const TFilePath &path);
-	~TLevelReaderSvg() {}
+  TLevelReaderSvg(const TFilePath &path);
+  ~TLevelReaderSvg() {}
 
-	TLevelP loadInfo();
-	TImageReaderP getFrameReader(TFrameId fid);
+  TLevelP loadInfo();
+  TImageReaderP getFrameReader(TFrameId fid);
 
-	//QString getCreator();
-	//friend class TImageReaderPli;
+  // QString getCreator();
+  // friend class TImageReaderPli;
 
 private:
-	TLevelP m_level;
+  TLevelP m_level;
 
 public:
-	static TLevelReader *create(const TFilePath &f)
-	{
-		return new TLevelReaderSvg(f);
-	}
+  static TLevelReader *create(const TFilePath &f) {
+    return new TLevelReaderSvg(f);
+  }
 
 private:
-	// not implemented
-	TLevelReaderSvg(const TLevelReaderSvg &);
-	TLevelReaderSvg &operator=(const TLevelReaderSvg &);
+  // not implemented
+  TLevelReaderSvg(const TLevelReaderSvg &);
+  TLevelReaderSvg &operator=(const TLevelReaderSvg &);
 };
 
-namespace Tiio
-{
+namespace Tiio {
 
-class SvgWriterProperties : public TPropertyGroup
-{
+class SvgWriterProperties : public TPropertyGroup {
 public:
-	TEnumProperty m_strokeMode;
-	TEnumProperty m_outlineQuality;
-	SvgWriterProperties();
+  TEnumProperty m_strokeMode;
+  TEnumProperty m_outlineQuality;
+  SvgWriterProperties();
 };
 }
 
-class TLevelWriterSvg : public TLevelWriter
-{
-	//! object to manage a pli
-	// ParsedPli *m_pli;
+class TLevelWriterSvg : public TLevelWriter {
+  //! object to manage a pli
+  // ParsedPli *m_pli;
 
-	//! number of frame in pli
-	//  UINT  m_frameNumber;
+  //! number of frame in pli
+  //  UINT  m_frameNumber;
 
-	//  vettore da utilizzare per il calcolo della palette
-	// std::vector<TPixel> m_colorArray;
-
-public:
-	TLevelWriterSvg(const TFilePath &path, TPropertyGroup *winfo);
-
-	TImageWriterP getFrameWriter(TFrameId fid);
-
-	friend class TImageWriterSvg;
+  //  vettore da utilizzare per il calcolo della palette
+  // std::vector<TPixel> m_colorArray;
 
 public:
-	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo)
-	{
-		return new TLevelWriterSvg(f, winfo);
-	}
+  TLevelWriterSvg(const TFilePath &path, TPropertyGroup *winfo);
+
+  TImageWriterP getFrameWriter(TFrameId fid);
+
+  friend class TImageWriterSvg;
+
+public:
+  static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo) {
+    return new TLevelWriterSvg(f, winfo);
+  }
 
 private:
-	//not implemented
-	TLevelWriterSvg(const TLevelWriterSvg &);
-	TLevelWriterSvg &operator=(const TLevelWriterSvg &);
+  // not implemented
+  TLevelWriterSvg(const TLevelWriterSvg &);
+  TLevelWriterSvg &operator=(const TLevelWriterSvg &);
 };

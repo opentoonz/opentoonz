@@ -14,41 +14,43 @@
 
 /*
 namespace toonz {
-	struct nodal_rasterfx_handler_t;
-	struct host_interface_t;
-	struct plugin_probe_t;
+        struct nodal_rasterfx_handler_t;
+        struct host_interface_t;
+        struct plugin_probe_t;
 }
 */
 
 /* probe で得られる静的な plugin 情報 */
-class PluginDescription
-{
+class PluginDescription {
 public:
-	std::string name_;
-	std::string vendor_;
-	std::string id_;
-	std::string note_;
-	std::string url_;
-	std::string fullname_;
-	int clss_;
-	toonz_plugin_version_t plugin_ver_;
+  std::string name_;
+  std::string vendor_;
+  std::string id_;
+  std::string note_;
+  std::string url_;
+  std::string fullname_;
+  int clss_;
+  toonz_plugin_version_t plugin_ver_;
 
 public:
-	PluginDescription(const toonz::plugin_probe_t *const probe);
+  PluginDescription(const toonz::plugin_probe_t *const probe);
 
-	/* 'geometric' is known as 'Zerary' on toonz. we avoid using the word because nobody did not understand a meaning of the word */
-	bool is_geometric() const { return clss_ & TOONZ_PLUGIN_CLASS_MODIFIER_GEOMETRIC; }
+  /* 'geometric' is known as 'Zerary' on toonz. we avoid using the word because
+   * nobody did not understand a meaning of the word */
+  bool is_geometric() const {
+    return clss_ & TOONZ_PLUGIN_CLASS_MODIFIER_GEOMETRIC;
+  }
 };
 
 class PluginInformation;
 
 /* エフェクトのインスタンスを構築するためのクラス */
 struct PluginDeclaration : public TFxDeclaration {
-	PluginDeclaration(PluginInformation *pi);
-	TPersist *create() const final override;
+  PluginDeclaration(PluginInformation *pi);
+  TPersist *create() const final override;
 
 private:
-	PluginInformation *pi_;
+  PluginInformation *pi_;
 };
 
 class UIPage;
@@ -58,14 +60,13 @@ class ParamView;
 class ParamsPageSet;
 
 struct port_description_t {
-	bool input_;
-	std::string name_;
-	int type_;
+  bool input_;
+  std::string name_;
+  int type_;
 
 public:
-	port_description_t(bool input, const char *nm, int type) : input_(input), name_(nm), type_(type)
-	{
-	}
+  port_description_t(bool input, const char *nm, int type)
+      : input_(input), name_(nm), type_(type) {}
 };
 
 #if defined(_WIN32) || defined(_CYGWIN_)
@@ -74,132 +75,139 @@ typedef std::shared_ptr<std::remove_pointer<HMODULE>::type> library_t;
 typedef std::shared_ptr<void> library_t;
 #endif
 
-class PluginInformation
-{
+class PluginInformation {
 public:
-	PluginDeclaration *decl_;
-	PluginDescription *desc_;
+  PluginDeclaration *decl_;
+  PluginDescription *desc_;
 
-	library_t library_;
+  library_t library_;
 
-	toonz::nodal_rasterfx_handler_t *handler_;
-	toonz::host_interface_t *host_;
-	int (*ini_)(toonz::host_interface_t *);
-	void (*fin_)(void);
-	int ref_count_;
-	int param_page_num_;
-	std::unique_ptr<toonz_param_page_t[]> param_pages_;
+  toonz::nodal_rasterfx_handler_t *handler_;
+  toonz::host_interface_t *host_;
+  int (*ini_)(toonz::host_interface_t *);
+  void (*fin_)(void);
+  int ref_count_;
+  int param_page_num_;
+  std::unique_ptr<toonz_param_page_t[]> param_pages_;
 
-	std::vector<UIPage *> ui_pages_;
-	std::vector<ParamView *> param_views_;
-	std::map<std::string, port_description_t> port_mapper_;
+  std::vector<UIPage *> ui_pages_;
+  std::vector<ParamView *> param_views_;
+  std::map<std::string, port_description_t> port_mapper_;
 
-	std::vector<std::shared_ptr<void>> param_resources_;		 /* deep-copy に使う scratch area */
-	std::vector<std::shared_ptr<std::string>> param_string_tbl_; /* shared_ptr< void > では non-virtual destructor が呼ばれないので  */
+  std::vector<std::shared_ptr<void>>
+      param_resources_; /* deep-copy に使う scratch area */
+  std::vector<std::shared_ptr<std::string>>
+      param_string_tbl_; /* shared_ptr< void > では non-virtual destructor
+                            が呼ばれないので  */
 
 public:
-	PluginInformation() : desc_(NULL), library_(NULL), handler_(NULL), host_(NULL), ini_(NULL), fin_(NULL), ref_count_(1), param_page_num_(0)
-	{
-	}
+  PluginInformation()
+      : desc_(NULL)
+      , library_(NULL)
+      , handler_(NULL)
+      , host_(NULL)
+      , ini_(NULL)
+      , fin_(NULL)
+      , ref_count_(1)
+      , param_page_num_(0) {}
 
-	~PluginInformation();
+  ~PluginInformation();
 
-	void add_ref();
-	void release();
+  void add_ref();
+  void release();
 };
 
-class Loader : public QObject
-{
-	Q_OBJECT;
+class Loader : public QObject {
+  Q_OBJECT;
 
 public:
-	Loader();
+  Loader();
 
 protected:
-	void doLoad(const QString &file);
-	void walkDirectory_(const QString &file);
+  void doLoad(const QString &file);
+  void walkDirectory_(const QString &file);
 public slots:
-	void walkDirectory(const QString &file);
-	void walkDictionary(const QString &file);
+  void walkDirectory(const QString &file);
+  void walkDictionary(const QString &file);
 signals:
-	void load_finished(PluginInformation *pi);
-	void fixup();
+  void load_finished(PluginInformation *pi);
+  void fixup();
 };
 
-class PluginLoadController : public QObject
-{
-	Q_OBJECT;
-	QThread work_entity;
+class PluginLoadController : public QObject {
+  Q_OBJECT;
+  QThread work_entity;
 
 public:
-	PluginLoadController(const std::string &basedir, QObject *listener);
-	bool wait(int timeout_in_ms) { return work_entity.wait(timeout_in_ms); };
+  PluginLoadController(const std::string &basedir, QObject *listener);
+  bool wait(int timeout_in_ms) { return work_entity.wait(timeout_in_ms); };
 public slots:
-	void result(PluginInformation *pi);
-	void finished();
+  void result(PluginInformation *pi);
+  void finished();
 
 signals:
-	void start(const QString &filepath);
+  void start(const QString &filepath);
 };
 
-class RasterFxPluginHost : public TZeraryFx, public TPluginInterface
-{
-	PluginInformation *pi_;
+class RasterFxPluginHost : public TZeraryFx, public TPluginInterface {
+  PluginInformation *pi_;
 
-	std::vector<std::shared_ptr<TFxPort>> inputs_;
-	std::vector<std::shared_ptr<Param>> params_;
-	void *user_data_;
+  std::vector<std::shared_ptr<TFxPort>> inputs_;
+  std::vector<std::shared_ptr<Param>> params_;
+  void *user_data_;
 
-	static bool validateKeyName(const char *name);
+  static bool validateKeyName(const char *name);
 
 protected:
-	virtual RasterFxPluginHost *newInstance(PluginInformation *pi) const;
+  virtual RasterFxPluginHost *newInstance(PluginInformation *pi) const;
 
 public:
-	RasterFxPluginHost(PluginInformation *pinfo);
-	~RasterFxPluginHost();
+  RasterFxPluginHost(PluginInformation *pinfo);
+  ~RasterFxPluginHost();
 
-	void notify();
+  void notify();
 
-	const TPersistDeclaration *getDeclaration() const;
-	std::string getPluginId() const;
+  const TPersistDeclaration *getDeclaration() const;
+  std::string getPluginId() const;
 
-	bool doGetBBox(double frame, TRectD &bbox, const TRenderSettings &info);
-	void doCompute(TTile &tile, double frame, const TRenderSettings &info);
-	int getMemoryRequirement(const TRectD &rect, double frame, const TRenderSettings &info);
-	bool canHandle(const TRenderSettings &info, double frame);
-	bool addInputPort(const std::string &nm, std::shared_ptr<TFxPort> port);
-	bool addOutputPort(const std::string &nm, TRasterFxPort *port);
+  bool doGetBBox(double frame, TRectD &bbox, const TRenderSettings &info);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &info);
+  int getMemoryRequirement(const TRectD &rect, double frame,
+                           const TRenderSettings &info);
+  bool canHandle(const TRenderSettings &info, double frame);
+  bool addInputPort(const std::string &nm, std::shared_ptr<TFxPort> port);
+  bool addOutputPort(const std::string &nm, TRasterFxPort *port);
 
-	TFx *clone(bool recursive) const;
+  TFx *clone(bool recursive) const;
 
-	// UIPage
-	UIPage *createUIPage(const char *name);
-	void build(ParamsPageSet *);
-	std::string getUrl() const;
+  // UIPage
+  UIPage *createUIPage(const char *name);
+  void build(ParamsPageSet *);
+  std::string getUrl() const;
 
-	// setup
-	bool setParamStructure(int n, toonz_param_page_t *descs, int &err, void *&pos);
-	bool addPortDesc(port_description_t &&);
+  // setup
+  bool setParamStructure(int n, toonz_param_page_t *descs, int &err,
+                         void *&pos);
+  bool addPortDesc(port_description_t &&);
 
-	Param *createParam(const toonz_param_desc_t *);
-	Param *createParam(const char *name, toonz_param_type_enum e);
-	Param *getParam(const char *name) const;
-	ParamView *createParamView();
+  Param *createParam(const toonz_param_desc_t *);
+  Param *createParam(const char *name, toonz_param_type_enum e);
+  Param *getParam(const char *name) const;
+  ParamView *createParamView();
 
-	bool isPlugin() const { return true; }
-	bool isPluginZerary() const { return pi_->desc_->is_geometric(); }
+  bool isPlugin() const { return true; }
+  bool isPluginZerary() const { return pi_->desc_->is_geometric(); }
 
-	bool isZerary() const { return isPluginZerary(); };
-	void callStartRenderHandler();
-	void callEndRenderHandler();
-	void callStartRenderFrameHandler(const TRenderSettings *rs, double frame);
-	void callEndRenderFrameHandler(const TRenderSettings *rs, double frame);
-	void *getUserData();
-	void setUserData(void *user_data);
+  bool isZerary() const { return isPluginZerary(); };
+  void callStartRenderHandler();
+  void callEndRenderHandler();
+  void callStartRenderFrameHandler(const TRenderSettings *rs, double frame);
+  void callEndRenderFrameHandler(const TRenderSettings *rs, double frame);
+  void *getUserData();
+  void setUserData(void *user_data);
 
-	void createParamsByDesc();
-	void createPortsByDesc();
+  void createParamsByDesc();
+  void createPortsByDesc();
 };
 
 #endif
