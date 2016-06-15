@@ -133,12 +133,12 @@ public:
     int addStyle(int styleId);  //!< Adds the specified style Id to the page (at
                                 //!the \a back
                                 //!  of the page).
-                                /*!
-                      \warning  The supplied style must have been allocated with \a new.
-                      \warning  Style ownership is surrendered to the palette.
-                      \return   The insertion index in the page, or \p -1 on failure.
-                                In case of failure, the supplied style is \a deleted.
-                    */
+    /*!
+\warning  The supplied style must have been allocated with \a new.
+\warning  Style ownership is surrendered to the palette.
+\return   The insertion index in the page, or \p -1 on failure.
+    In case of failure, the supplied style is \a deleted.
+*/
     int addStyle(TColorStyle *style);  //!< Adds the specified style to the
                                        //!palette, and assigns it
                                        //!  to this page.
@@ -391,9 +391,9 @@ between RGBA color components.
   int getShortcutValue(
       int key) const;  //!< Returns the style id \a shortcut associated to key,
                        //!  or \p -1 if it couldn't be found.
-                       /*!
-                     
-                       */
+  /*!
+
+  */
   int getStyleShortcut(
       int styleId) const;  //!< Returns the shortcut associated to styleId, or
                            //!  or \p -1 if it couldn't be found.

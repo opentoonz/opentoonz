@@ -411,10 +411,10 @@ void rgb_to_lightness_image_(const T *image, const int height, const int width,
 }
 }
 namespace {  //--------------------------------------------------------
-             /*
-                     画像配列の高さ位置を、実際の範囲内にclampし、scanlineの先頭を返す
-                     TP is 'unsigned char *' or 'unsigned short *'
-               */
+/*
+        画像配列の高さ位置を、実際の範囲内にclampし、scanlineの先頭を返す
+        TP is 'unsigned char *' or 'unsigned short *'
+  */
 template <class TP>
 TP sl_top_clamped_in_h_(TP sl, const int height, const int width,
                         const int channels, const int yy) {
@@ -442,11 +442,11 @@ void paint_margin_(const int width, const int margin, std::vector<T> &track) {
 }
 }
 namespace {  //--------------------------------------------------------
-             /*
-                     T is 'unsigned char' or 'unsigned short'
-                     alphaは先に処理して結果(out_image_array)に入れ、
-                             その後rgbのために参照する
-               */
+/*
+        T is 'unsigned char' or 'unsigned short'
+        alphaは先に処理して結果(out_image_array)に入れ、
+                その後rgbのために参照する
+  */
 template <class T>
 void get_first_sl_ch_(
     const T *in_image_array,

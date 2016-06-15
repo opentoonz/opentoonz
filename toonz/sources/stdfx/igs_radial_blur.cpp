@@ -959,8 +959,8 @@ int igs::radial_blur::
                      const double yc, const double twist_radian,
                      const double twist_radius,
                      const double intensity /* 強度。ゼロより大きく2以下 */
-                                            /* radius円境界での平均値ぼかしゼロとするためintensityは2より小さい
-                                               */
+                     /* radius円境界での平均値ぼかしゼロとするためintensityは2より小さい
+                        */
                      ,
                      const double radius /* 平均値ぼかしの始まる半径 */
                      ,

@@ -400,9 +400,9 @@ void slitMesh(TTextureMesh &mesh,
   // Alter the face to host the duplicate
   TTextureMesh::face_type &fc = mesh.face(f);
 
-  (fc.edge(0) == e) ? fc.setEdge(0, eDup) : (fc.edge(1) == e)
-                                                ? fc.setEdge(1, eDup)
-                                                : fc.setEdge(2, eDup);
+  (fc.edge(0) == e)
+      ? fc.setEdge(0, eDup)
+      : (fc.edge(1) == e) ? fc.setEdge(1, eDup) : fc.setEdge(2, eDup);
 }
 
 //------------------------------------------------------------------------
@@ -435,9 +435,9 @@ void cutEdge(TTextureMesh &mesh, const EdgeCut &edgeCut) {
       {
         face_type &fc = mesh.face(f);
 
-        (fc.edge(0) == eFrom) ? fc.setEdge(0, eTo) : (fc.edge(1) == eFrom)
-                                                         ? fc.setEdge(1, eTo)
-                                                         : fc.setEdge(2, eTo);
+        (fc.edge(0) == eFrom)
+            ? fc.setEdge(0, eTo)
+            : (fc.edge(1) == eFrom) ? fc.setEdge(1, eTo) : fc.setEdge(2, eTo);
 
         edTo.addFace(f);
         edFrom.eraseFace(edFrom.facesBegin() + 1);

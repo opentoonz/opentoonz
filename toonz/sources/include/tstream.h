@@ -95,7 +95,7 @@ reimplementation of the TPersist::loadData() function.
   //!  \deprecated
   bool eos();  //!< \brief Returns \e true in case of end of string (a
                //!StreamTag::EndTag
-  //!  is encountered or the string is empty).
+               //!  is encountered or the string is empty).
 
   /*!
 \param      tagName Output name of a matched tag.
@@ -148,10 +148,10 @@ reimplementation of the TPersist::loadData() function.
                                                   //!stored version of the
                                                   //!opened document.
                                                   //!  \sa setVersion()
-                                                  /*!
-                                              \note After skipping the tag content, the stream is positioned immediately
-                                                    after the end tag.
-                                            */
+  /*!
+\note After skipping the tag content, the stream is positioned immediately
+    after the end tag.
+*/
   void skipCurrentTag();  //!< Silently ignores the content of currently opened
                           //!tag up to its end.
 

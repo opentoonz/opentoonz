@@ -236,8 +236,8 @@ public:
     std::map<TFrameId, QString>::const_iterator it = m_images.begin();
     for (; it != m_images.end(); ++it)  //, ++mit)
     {
-      QString id = "MergeColumnsUndo" + QString::number((uintptr_t) this) +
-                   "-" + QString::number(it->first.getNumber());
+      QString id = "MergeColumnsUndo" + QString::number((uintptr_t)this) + "-" +
+                   QString::number(it->first.getNumber());
       TImageCache::instance()->remove(id);
     }
   }

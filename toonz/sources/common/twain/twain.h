@@ -1434,10 +1434,10 @@ typedef struct {
  */
 #define DF_DSM2 0x10000000L /* added to the identity by the DSM  */
 #define DF_APP2                                                                \
-  0x20000000L /* Set by the App to indicate it would                           \
+  0x20000000L /* Set by the App to indicate it would \                         \
                                              prefer to use DSM2 */
 #define DF_DS2                                                                 \
-  0x40000000L           /* Set by the DS to indicate it would                  \
+  0x40000000L           /* Set by the DS to indicate it would \                \
                                                        prefer to use DSM2 */
 #define DG_MASK 0xFFFFL /* all Data Groups limited to 16 bit.  Added for 2.1   \
                            */

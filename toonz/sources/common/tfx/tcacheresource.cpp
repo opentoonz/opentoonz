@@ -791,8 +791,9 @@ int TCacheResource::size() const {
   // NOTE: It's better to store the size incrementally. This complies
   // with the possibility of specifying a bbox to fit the stored cells to...
 
-  return m_tileType == NONE ? 0 : m_tileType == RGBM64 ? (m_cellsCount << 11)
-                                                       : (m_cellsCount << 10);
+  return m_tileType == NONE ? 0
+                            : m_tileType == RGBM64 ? (m_cellsCount << 11)
+                                                   : (m_cellsCount << 10);
 }
 
 //****************************************************************************************************

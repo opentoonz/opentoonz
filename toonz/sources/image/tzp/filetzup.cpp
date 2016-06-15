@@ -804,7 +804,7 @@ TImageP image(rasImage);
   // char pltname[1024];
   USHORT *window = NIL;
   USHORT *palette; /*  [TOONZPALETTE_COUNT] */
-                   // int max_n_colors, max_n_pencils;
+  // int max_n_colors, max_n_pencils;
 
   /*
 CHECK_IMAGEDLL_LICENSE_AND_GET_IMG_LICENSE_ATTR

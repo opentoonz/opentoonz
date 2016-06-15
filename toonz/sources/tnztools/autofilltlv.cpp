@@ -1056,9 +1056,8 @@ static void find_best(int prob[], int *col, int to)
             (prob[to * F_reference.n + j] / 1000.0) *
             (prob[to * F_reference.n + j] / 1000.0) *
             /*   (prob[(F_work.n*F_reference.n)+to*F_reference.n+j]/1500.0)*
-             */ (
-                prob[2 * (F_work.n * F_reference.n) + to * F_reference.n + j] /
-                1500.0);
+             */ (prob[2 * (F_work.n * F_reference.n) + to * F_reference.n + j] /
+                 1500.0);
         numero++;
       }
     }

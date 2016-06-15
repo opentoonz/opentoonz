@@ -102,9 +102,9 @@ struct CenterlinePoint {
   void buildDirs(const TStroke &stroke);
 
   bool operator<(const CenterlinePoint &cp) const {
-    return m_chunkIdx < cp.m_chunkIdx ? true : m_chunkIdx > cp.m_chunkIdx
-                                                   ? false
-                                                   : m_t < cp.m_t;
+    return m_chunkIdx < cp.m_chunkIdx
+               ? true
+               : m_chunkIdx > cp.m_chunkIdx ? false : m_t < cp.m_t;
   }
 };
 

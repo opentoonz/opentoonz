@@ -417,7 +417,7 @@ public:
       , m_brightness(brightness)
       , m_contrast(contrast)
       , m_rasSize(ras->getLx() * ras->getLy() * ras->getPixelSize()) {
-    m_rasId = QString("BrightnessUndo") + QString::number((uintptr_t) this);
+    m_rasId = QString("BrightnessUndo") + QString::number((uintptr_t)this);
     TImageCache::instance()->add(m_rasId, TRasterImageP(ras));
   }
 

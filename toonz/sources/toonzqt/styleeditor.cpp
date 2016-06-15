@@ -1871,11 +1871,11 @@ public:
                SLOT(computeSize()));
   }
   bool loadIfNeeded() { return false; }  // serve?
-                                         /*
-                                     if(!m_loaded) {loadItems(); m_loaded=true;return true;}
-                                     else return false;
-                                   }
-                                         */
+  /*
+if(!m_loaded) {loadItems(); m_loaded=true;return true;}
+else return false;
+}
+  */
 
   int getChipCount() const { return styleManager()->getPatternCount(); }
 

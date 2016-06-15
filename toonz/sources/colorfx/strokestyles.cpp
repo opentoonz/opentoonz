@@ -78,11 +78,10 @@ TStrokeProp *TOptimizedStrokePropT<T>::clone(const TStroke *stroke) const {
 //-----------------------------------------------------------------------------
 
 template <class T>
-void TOptimizedStrokePropT<
-    T>::draw(const TVectorRenderData &rd) /*assenza di const non e' una
-                                             dimenticanza! Alcune sottoclassi
-                                             devono ridefinire questo metodo e
-                                             serbve che non sia const*/
+void TOptimizedStrokePropT<T>::draw(
+    const TVectorRenderData
+        &rd) /*assenza di const non e' una dimenticanza! Alcune sottoclassi
+                devono ridefinire questo metodo e serbve che non sia const*/
 {
   if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
       !convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))

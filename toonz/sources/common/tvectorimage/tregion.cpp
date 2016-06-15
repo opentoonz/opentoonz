@@ -869,9 +869,9 @@ int TRegion::Imp::leftScanlineIntersections(const TPointD &p,
                         (2 * int(forward) - 1),
              yaccel = y2_y1 - y1_y0;
 
-      return (yspeed_2 > 0.0) ? 1 : (yspeed_2 < 0.0)
-                                        ? -1
-                                        : tcg::numeric_ops::sign(yaccel);
+      return (yspeed_2 > 0.0)
+                 ? 1
+                 : (yspeed_2 < 0.0) ? -1 : tcg::numeric_ops::sign(yaccel);
     }
 
     int leftScanlineIntersections(const TQuadratic &q, double t0, double t1,

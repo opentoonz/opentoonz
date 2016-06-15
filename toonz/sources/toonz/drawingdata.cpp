@@ -186,7 +186,7 @@ void DrawingData::setLevelFrames(TXshSimpleLevel *sl,
 
     // Clone the image and store it in the image cache
     QString id = makeCacheId(
-        (uintptr_t) this,
+        (uintptr_t)this,
         it->getNumber());  // Cloning is necessary since the user may
     TImageCache::instance()->add(
         id, img->cloneImage());  // modify and save the original AFTER the copy

@@ -87,9 +87,10 @@ private:
 };
 
 #define DECLARE_CLASS_CODE                                                     \
+  \
 private:                                                                       \
   static const TSmartObject::ClassCode m_classCode;                            \
-                                                                               \
+  \
 public:                                                                        \
   inline static TINT32 getInstanceCount() {                                    \
     return TSmartObject::getInstanceCount(m_classCode);                        \

@@ -3102,9 +3102,9 @@ double NewtonRaphsonRootFind3D(const TThickCubic &cubic, const T3DPointD &p3D,
 
 //---------------------------------------------------------------------------
 int compareDouble(const void *e1, const void *e2) {
-  return (*(double *)e1 < *(double *)e2) ? -1 : (*(double *)e1 == *(double *)e2)
-                                                    ? 0
-                                                    : 1;
+  return (*(double *)e1 < *(double *)e2)
+             ? -1
+             : (*(double *)e1 == *(double *)e2) ? 0 : 1;
 }
 //---------------------------------------------------------------------------
 //! Ricalcola i valori di u[] sulla base del metodo di Newton Raphson

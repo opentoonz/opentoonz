@@ -407,7 +407,8 @@ public:
 
   int getSize() const {
     return sizeof(*this) +
-           /*(m_oldFillInformation.capacity()+m_newFillInformation.capacity())*sizeof(TFilledRegionInf) +*/ 500;
+           /*(m_oldFillInformation.capacity()+m_newFillInformation.capacity())*sizeof(TFilledRegionInf) +*/
+           500;
   }
   virtual QString getToolName() { return QString("Control Point Editor"); }
   int getHistoryType() { return HistoryType::ControlPointEditorTool; }

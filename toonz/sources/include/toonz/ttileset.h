@@ -88,7 +88,7 @@ public:
       return "TileCM" + QString::number((unsigned long)this);
     }
 #else
-    QString id() const { return "TileCM" + QString::number((UINT) this); }
+    QString id() const { return "TileCM" + QString::number((UINT)this); }
 #endif
 
     Tile *clone() const;

@@ -2261,7 +2261,8 @@ void TVectorImage::Imp::findIntersections() {
     for (
         j = i;
         j <
-        strokeSize /*&& (strokeArray[i]->getBBox().x1>= strokeArray[j]->getBBox().x0)*/;
+        strokeSize /*&& (strokeArray[i]->getBBox().x1>= strokeArray[j]->getBBox().x0)*/
+        ;
         j++) {
       TStroke *s2 = strokeArray[j]->m_s;
 

@@ -69,7 +69,7 @@ public:
      * でコンパイルできなかったのでキャストにしたがこのダウンキャスト本当に大丈夫か?
      */
     TRasterImageP ri = (TRasterImageP)sl->getFrame(m_fid, false)->cloneImage();
-    m_rasId = QString("BinarizeUndo") + QString::number((uintptr_t) this);
+    m_rasId = QString("BinarizeUndo") + QString::number((uintptr_t)this);
     TImageCache::instance()->add(m_rasId, ri);
     m_rasSize = ri->getRaster()->getLx() * ri->getRaster()->getLy() * 4;
   }

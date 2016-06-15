@@ -32,7 +32,7 @@ public:
     if (m_started) throw TException("The timer is already started");
 
     m_timerID = timeSetEvent(delay, m_timerRes, (LPTIMECALLBACK)ElapsedTimeCB,
-                             (DWORD) this, m_type | TIME_CALLBACK_FUNCTION);
+                             (DWORD)this, m_type | TIME_CALLBACK_FUNCTION);
 
     m_delay = delay;
     m_ticks = 0;

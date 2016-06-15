@@ -99,7 +99,7 @@ void TifReader::open(FILE *file) {
 #if 0
 	m_tiff = TIFFFdOpenNoCloseProc(fd, "", "rb");
 #else
-  m_tiff        = TIFFFdOpen(dup(fd), "", "rb");
+  m_tiff = TIFFFdOpen(dup(fd), "", "rb");
 #endif
   if (!m_tiff) {
     std::string str("Tiff file closed");

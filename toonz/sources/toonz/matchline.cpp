@@ -499,7 +499,7 @@ public:
         m_indexes(indexes) {
     int i;
     for (i = 0; i < fids.size(); i++) {
-      QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t) this) +
+      QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t)this) +
                    "-" + QString::number(i);
       TToonzImageP image = sl->getFrame(fids[i], false);
       assert(image);
@@ -511,7 +511,7 @@ public:
     int i;
 
     for (i = 0; i < m_fids.size(); i++) {
-      QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t) this) +
+      QString id = "DeleteMatchlineUndo" + QString::number((uintptr_t)this) +
                    "-" + QString::number(i);
       TImageP img = TImageCache::instance()->get(id, false)->cloneImage();
 
@@ -542,7 +542,7 @@ public:
     int i;
     for (i = 0; i < m_fids.size(); i++)
       TImageCache::instance()->remove("DeleteMatchlineUndo" +
-                                      QString::number((uintptr_t) this) + "-" +
+                                      QString::number((uintptr_t)this) + "-" +
                                       QString::number(i));
   }
 

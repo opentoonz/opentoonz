@@ -45,7 +45,7 @@
     assert(assertion);                                                         \
     failure_expr;                                                              \
   } else                                                                       \
-  (void)0
+    (void)0
 
 /*!
   \def      TCG_JOIN(A, B)

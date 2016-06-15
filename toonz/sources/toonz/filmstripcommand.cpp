@@ -1628,7 +1628,7 @@ public:
         // TImageCache::instance()->add("UndoInsertEmptyFrames"+QString::number((UINT)this),
         // img);
         TImageCache::instance()->add(
-            "UndoInsertEmptyFrames" + QString::number((uintptr_t) this), img);
+            "UndoInsertEmptyFrames" + QString::number((uintptr_t)this), img);
       }
     }
   }
@@ -1636,7 +1636,7 @@ public:
   ~UndoInsertEmptyFrames() {
     // TImageCache::instance()->remove("UndoInsertEmptyFrames"+QString::number((UINT)this));
     TImageCache::instance()->remove("UndoInsertEmptyFrames" +
-                                    QString::number((uintptr_t) this));
+                                    QString::number((uintptr_t)this));
   }
 
   void undo() const {
@@ -1658,7 +1658,7 @@ public:
       // (TToonzImageP)TImageCache::instance()->get("UndoInsertEmptyFrames"+QString::number((UINT)this),
       // true);
       TToonzImageP image = (TToonzImageP)TImageCache::instance()->get(
-          "UndoInsertEmptyFrames" + QString::number((uintptr_t) this), true);
+          "UndoInsertEmptyFrames" + QString::number((uintptr_t)this), true);
       if (!image) return;
       for (it = m_frames.begin(); it != m_frames.end(); ++it)
         m_level->setFrame(*it, image);

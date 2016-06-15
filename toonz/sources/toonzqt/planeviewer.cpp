@@ -44,8 +44,8 @@ private:
 bool PlaneViewerZoomer::zoom(bool zoomin, bool resetZoom) {
   PlaneViewer &planeViewer = static_cast<PlaneViewer &>(*getWidget());
 
-  resetZoom ? planeViewer.resetView() : zoomin ? planeViewer.zoomIn()
-                                               : planeViewer.zoomOut();
+  resetZoom ? planeViewer.resetView()
+            : zoomin ? planeViewer.zoomIn() : planeViewer.zoomOut();
 
   return true;
 }

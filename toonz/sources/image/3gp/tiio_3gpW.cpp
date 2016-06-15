@@ -487,13 +487,13 @@ TLevelWriter3gp::TLevelWriter3gp(const TFilePath &path, TPropertyGroup *winfo)
     DebugStr((ConstStr255Param) #cond " goto " #handler);                      \
     goto handler;                                                              \
   } else                                                                       \
-  0
+    0
 #else
 #define FailIf(cond, handler)                                                  \
   if (cond) {                                                                  \
     goto handler;                                                              \
   } else                                                                       \
-  0
+    0
 #endif
 
 #ifdef _DEBUG
@@ -503,14 +503,14 @@ TLevelWriter3gp::TLevelWriter3gp(const TFilePath &path, TPropertyGroup *winfo)
     { action; }                                                                \
     goto handler;                                                              \
   } else                                                                       \
-  0
+    0
 #else
 #define FailWithAction(cond, action, handler)                                  \
   if (cond) {                                                                  \
     { action; }                                                                \
     goto handler;                                                              \
   } else                                                                       \
-  0
+    0
 #endif
 
 void TLevelWriter3gp::saveSoundTrack(TSoundTrack *st) {

@@ -150,8 +150,8 @@ void RGBHistoGraph::setValues() {
   imgPainter.setCompositionMode(QPainter::CompositionMode_Plus);
 
   for (int chan = 0; chan < 3; chan++) {
-    imgPainter.setPen((chan == 0) ? Qt::red : (chan == 1) ? Qt::green
-                                                          : Qt::blue);
+    imgPainter.setPen((chan == 0) ? Qt::red
+                                  : (chan == 1) ? Qt::green : Qt::blue);
 
     for (int i = 0; i < COMBOHIST_RESOLUTION_W; i++) {
       int v = m_rgbValues[chan][i];

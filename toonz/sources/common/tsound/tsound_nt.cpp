@@ -497,12 +497,12 @@ bool TSoundOutputDeviceImp::doOpenDevice(const TSoundTrackFormat &format) {
   wf.cbSize          = 0;
 
   TThread::MutexLocker sl(&m_mutex);
-  CloseHandle(CreateThread(NULL, 0, MyWaveOutCallbackThread, (LPVOID) this, 0,
+  CloseHandle(CreateThread(NULL, 0, MyWaveOutCallbackThread, (LPVOID)this, 0,
                            &m_notifyThreadId));
 
   MMRESULT ret;
   if ((ret = waveOutOpen(&m_wout, WAVE_MAPPER, &wf, (DWORD)m_notifyThreadId,
-                         (DWORD) this, CALLBACK_THREAD)) != MMSYSERR_NOERROR) {
+                         (DWORD)this, CALLBACK_THREAD)) != MMSYSERR_NOERROR) {
     while (!PostThreadMessage(m_notifyThreadId, WM_QUIT, 0, 0))
       ;
   }

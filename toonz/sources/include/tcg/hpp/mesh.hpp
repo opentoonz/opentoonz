@@ -337,9 +337,9 @@ int TriMesh<V, E, F>::collapseEdge(int e) {
     {
       F &fc = this->face(*ft);
 
-      (fc.edge(0) == srcE) ? fc.setEdge(0, dstE) : (fc.edge(1) == srcE)
-                                                       ? fc.setEdge(1, dstE)
-                                                       : fc.setEdge(2, dstE);
+      (fc.edge(0) == srcE)
+          ? fc.setEdge(0, dstE)
+          : (fc.edge(1) == srcE) ? fc.setEdge(1, dstE) : fc.setEdge(2, dstE);
 
       dstEd.addFace(*ft);
       ft = srcEd.eraseFace(ft);  // here

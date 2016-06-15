@@ -312,7 +312,7 @@ public:
       , m_color(color)
       , m_intensity(intensity)
       , m_rasSize(ras->getLx() * ras->getLy() * ras->getPixelSize()) {
-    m_rasId = QString("LineFadeUndo") + QString::number((uintptr_t) this);
+    m_rasId = QString("LineFadeUndo") + QString::number((uintptr_t)this);
     TImageCache::instance()->add(m_rasId, TRasterImageP(ras));
   }
 

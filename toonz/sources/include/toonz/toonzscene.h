@@ -114,7 +114,7 @@ public:
 
   TFilePath getImportedLevelPath(const TFilePath path)
       const;  //!< Builds the path to be used during a level import
-  //!< operation.
+              //!< operation.
 
   /*! \details  If convertion is required, a new level file will be created
           and \p levelPath will be substituted with its new path.

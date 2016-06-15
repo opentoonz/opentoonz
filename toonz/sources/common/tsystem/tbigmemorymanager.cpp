@@ -278,7 +278,7 @@ bool TBigMemoryManager::putRaster(TRaster *ras, bool canPutOnDisk) {
       // non c'e' memoria; provo a comprimere
       /*TImageCache::instance()->doCompress(); 
     if (!(ras->m_buffer = (UCHAR *)malloc(size)))*/  // andata male pure cosi';
-                                                 // metto tutto su disco
+                                                     // metto tutto su disco
       // TImageCache::instance()->outputMap(size, "C:\\logCacheFailure");
       TINT64 availMemInKb = TSystem::getFreeMemorySize(true);
       if (availMemInKb > (size >> 10)) {

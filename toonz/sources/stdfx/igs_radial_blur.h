@@ -60,8 +60,8 @@ reference_margin(/* Twist時正確でない... */
                  const double yc, const double twist_radian,
                  const double twist_radius,
                  const double intensity = 0.2 /* 強度。ゼロより大きく2以下 */
-                                              /* radius円境界での平均値ぼかしゼロとするためintensityは2以下
-                                                 */
+                 /* radius円境界での平均値ぼかしゼロとするためintensityは2以下
+                    */
                  ,
                  const double radius = 0.0 /* 平均値ぼかしの始まる半径 */
                  ,
