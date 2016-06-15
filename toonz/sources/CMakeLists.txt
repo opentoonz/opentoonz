@@ -228,9 +228,8 @@ elseif(UNIX)
 
     find_package(TIFF REQUIRED)
     set(TIFF_LIB ${TIFF_LIBRARY})
-    # the libraries have not .pc nor preferred Find*.cmake. use custom modules.
-    # find_package(PNG REQUIRED)
-    set(PNG_LIB ${SDKROOT}/libpng-1.6.21/.libs/libpng16.so)
+    find_package(PNG REQUIRED)
+    set(PNG_LIB ${PNG_LIBRARY})
     message("******* libpng:" ${PNG_LIB})
     find_package(GLEW)
 
