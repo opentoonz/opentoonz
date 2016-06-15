@@ -55,7 +55,7 @@ void FarmServerListView::update()
 			new MyListItem(sid.m_id, sid.m_name, this);
 		}
 	} catch (TException &e) {
-		DVGui::warning(QString::fromStdString(toString(e.getMessage())));
+		DVGui::warning(QString::fromStdString(::to_string(e.getMessage())));
 	}
 }
 
@@ -73,7 +73,7 @@ void FarmServerListView::activate()
 		BatchesController::instance()->update();
 		static_cast<BatchServersViewer *>(parentWidget())->updateSelected();
 	} catch (TException &e) {
-		DVGui::warning(QString::fromStdString(toString(e.getMessage())));
+		DVGui::warning(QString::fromStdString(::to_string(e.getMessage())));
 	}
 }
 
@@ -91,7 +91,7 @@ void FarmServerListView::deactivate()
 		BatchesController::instance()->update();
 		static_cast<BatchServersViewer *>(parentWidget())->updateSelected();
 	} catch (TException &e) {
-		DVGui::warning(QString::fromStdString(toString(e.getMessage())));
+		DVGui::warning(QString::fromStdString(::to_string(e.getMessage())));
 	}
 }
 //-----------------------------------------------------------------------------
@@ -109,7 +109,7 @@ void FarmServerListView::openContextMenu(const QPoint &p)
 	try {
 		state = controller->queryServerState2(item->m_id);
 	} catch (TException &e) {
-		DVGui::warning(QString::fromStdString(toString(e.getMessage())));
+		DVGui::warning(QString::fromStdString(::to_string(e.getMessage())));
 		return;
 	}
 
@@ -181,7 +181,7 @@ void BatchServersViewer::updateServerInfo(const QString &id)
 	try {
 		controller->queryServerInfo(id, info);
 	} catch (TException &e) {
-		DVGui::warning(QString::fromStdString(toString(e.getMessage())));
+		DVGui::warning(QString::fromStdString(::to_string(e.getMessage())));
 	}
 
 	switch (info.m_state) {
@@ -223,7 +223,7 @@ void BatchServersViewer::updateServerInfo(const QString &id)
 			m_tasks->setText("<" + task.m_id + "> " + task.m_name);
 		} catch (TException &e) {
 			m_tasks->setText("");
-			DVGui::warning(QString::fromStdString(toString(e.getMessage())));
+			DVGui::warning(QString::fromStdString(::to_string(e.getMessage())));
 		}
 	}
 
@@ -361,7 +361,7 @@ void BatchServersViewer::onProcessWith(int index)
 		m_processWith->setCurrentIndex(0);
 		return;
 	} catch (TException &e) {
-		DVGui::warning(QString::fromStdString(toString(e.getMessage())));
+		DVGui::warning(QString::fromStdString(::to_string(e.getMessage())));
 		m_processWith->setCurrentIndex(0);
 		return;
 	}

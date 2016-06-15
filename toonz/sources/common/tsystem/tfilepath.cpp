@@ -20,10 +20,9 @@ const char wauxslash = '\\';
 
 #include "tfilepath.h"
 #include "tconvert.h"
-//#include "tsystem.h"
-#include <math.h>
-//#include <tcommon.h>   contenuto in tconvert.h
-#include <ctype.h>
+#include <cmath>
+#include <cctype>
+#include <sstream>
 
 bool TFilePath::m_underscoreFormatAllowed = true;
 
@@ -50,8 +49,7 @@ std::string TFrameId::expand(FrameFormat format) const
 		return "";
 	else if (m_frame == NO_FRAME)
 		return "-";
-	char buffer[80];
-	std::ostrstream o_buff(buffer, sizeof(buffer));
+	std::ostringstream o_buff;
 	if (format == FOUR_ZEROS || format == UNDERSCORE_FOUR_ZEROS) {
 		o_buff.fill('0');
 		o_buff.width(4);
@@ -62,8 +60,7 @@ std::string TFrameId::expand(FrameFormat format) const
 	}
 	if (m_letter != '\0')
 		o_buff << m_letter;
-	int len = o_buff.pcount();
-	return std::string(buffer, len);
+	return o_buff.str();
 }
 
 //-------------------------------------------------------------------
@@ -118,9 +115,9 @@ inline int getLastSlash(const std::wstring &path)
 void TFilePath::setPath(string path)
 {
 bool isUncName = false;
-  // elimino i '//', './' e '/' finali; raddrizzo gli slash 'storti'. 
+  // elimino i '//', './' e '/' finali; raddrizzo gli slash 'storti'.
   // se il path comincia con  "<alpha>:" aggiungo uno slash
-  int length =path.length();   
+  int length =path.length();
   int pos = 0;
   if(path.length()>=2 && isalpha(path[0]) && path[1] == ':')
     {
@@ -142,13 +139,13 @@ bool isUncName = false;
     if(path[pos] == '.')
     {
       pos++;
-      if(pos>=length) 
+      if(pos>=length)
       {
         if(pos>1) m_path.append(1,'.');
       }
       else if(!isSlash(path[pos])) m_path.append(path,pos-1,2);
       else {
-         while(pos+1<length && isSlash(path[pos+1])) 
+         while(pos+1<length && isSlash(path[pos+1]))
            pos++;
       }
     }
@@ -170,7 +167,7 @@ bool isUncName = false;
          m_path.length()==3 && isalpha(m_path[0]) && m_path[1] == ':' && m_path[2] == slash)
       && m_path.length()>1 && m_path[m_path.length()-1] == slash)
       m_path.erase(m_path.length()-1, 1);
-  
+
   if (isUncName && m_path.find_last_of('\\') == 1) // e' indicato solo il nome della macchina...
     m_path.append(1, slash);
 }
@@ -182,9 +179,9 @@ void append(string &out, wchar_t c)
 {
   if(32 <= c && c<=127 && c!='&') out.append(1, (char)c);
   else if(c=='&') out.append("&amp;");
-  else 
+  else
     {
-     ostrstream ss;
+     ostringstream ss;
      ss << "&#" <<  c << ";" << '\0';
      out += ss.str();
      ss.freeze(0);
@@ -259,14 +256,14 @@ void TFilePath::setPath(std::wstring path)
 
 TFilePath::TFilePath(const char *path)
 {
-	setPath(toWideString(path));
+	setPath(::to_wstring(path));
 }
 
 //-----------------------------------------------------------------------------
 
 TFilePath::TFilePath(const std::string &path)
 {
-	setPath(toWideString(path));
+	setPath(::to_wstring(path));
 }
 
 //-----------------------------------------------------------------------------
@@ -422,7 +419,7 @@ const std::wstring TFilePath::getWideString() const
     {
      char c = m_path[i];
      if(c!='&') s.append(1, (unsigned short)c);
-     else 
+     else
        {
         i++;
         if(m_path[i] == '#')
@@ -442,7 +439,7 @@ const std::wstring TFilePath::getWideString() const
                 break;
               i++;
              }
-           s.append(1, w);           
+           s.append(1, w);
           }
        }
     }
@@ -471,7 +468,7 @@ QString TFilePath::getQString() const
 std::ostream &operator<<(std::ostream &out, const TFilePath &path)
 {
 	std::wstring w = path.getWideString();
-	return out << toString(w) << " ";
+	return out << ::to_string(w) << " ";
 	//  string w = path.getString();
 	//  return out << w << " ";
 }
@@ -484,9 +481,9 @@ TFilePath TFilePath::operator+ (const TFilePath &fp) const
 assert(!fp.isAbsolute());
 if(fp.isEmpty()) return *this;
 else if(isEmpty()) return fp;
-else if(m_path.length()!=1 || m_path[0] != slash) 
+else if(m_path.length()!=1 || m_path[0] != slash)
   return TFilePath(m_path + slash + fp.m_path);
-else 
+else
   return TFilePath(m_path + fp.m_path);
 }
 */
@@ -542,7 +539,7 @@ std::string TFilePath::getDottedType() const // ritorna l'estensione con PUNTO (
 	if (i == (int)std::wstring::npos)
 		return "";
 
-	return toLower(toString(str.substr(i)));
+	return toLower(::to_string(str.substr(i)));
 }
 
 //-----------------------------------------------------------------------------
@@ -554,7 +551,7 @@ std::string TFilePath::getUndottedType() const // ritorna l'estensione senza PUN
 	i = str.rfind(L".");
 	if (i == std::wstring::npos || i == str.length() - 1)
 		return "";
-	return toLower(toString(str.substr(i + 1)));
+	return toLower(::to_string(str.substr(i + 1)));
 }
 
 //-----------------------------------------------------------------------------
@@ -581,14 +578,14 @@ std::wstring TFilePath::getWideName() const // noDot! noSlash!
 
 std::string TFilePath::getName() const // noDot! noSlash!
 {
-	return toString(getWideName());
+	return ::to_string(getWideName());
 }
 
 //-----------------------------------------------------------------------------
 // es. TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
 std::string TFilePath::getLevelName() const
 {
-	return toString(getLevelNameW());
+	return ::to_string(getLevelNameW());
 }
 
 //-----------------------------------------------------------------------------
@@ -674,7 +671,7 @@ TFrameId TFilePath::getFrame() const
 		letter = str[k++] + ('a' - L'a');
 
 	if (number == 0 || k < i) // || letter!='\0')
-		throw(toString(m_path) + ": malformed frame name.");
+		throw(::to_string(m_path) + ": malformed frame name.");
 	return TFrameId(number, letter);
 }
 
@@ -692,18 +689,18 @@ TFilePath TFilePath::withType(const std::string &type) const
 		if (type == "")
 			return *this;
 		else if (type[0] == '.')
-			return TFilePath(m_path + toWideString(type));
+			return TFilePath(m_path + ::to_wstring(type));
 		else
-			return TFilePath(m_path + toWideString("." + type));
+			return TFilePath(m_path + ::to_wstring("." + type));
 	} else
 	// il path originale ha gia' il tipo
 	{
 		if (type == "")
 			return TFilePath(m_path.substr(0, i + j + 1));
 		else if (type[0] == '.')
-			return TFilePath(m_path.substr(0, i + j + 1) + toWideString(type));
+			return TFilePath(m_path.substr(0, i + j + 1) + ::to_wstring(type));
 		else
-			return TFilePath(m_path.substr(0, i + j + 2) + toWideString(type));
+			return TFilePath(m_path.substr(0, i + j + 2) + ::to_wstring(type));
 	}
 }
 
@@ -711,7 +708,7 @@ TFilePath TFilePath::withType(const std::string &type) const
 
 TFilePath TFilePath::withName(const std::string &name) const
 {
-	return withName(toWideString(name));
+	return withName(::to_wstring(name));
 }
 
 //-----------------------------------------------------------------------------
@@ -770,7 +767,7 @@ TFilePath TFilePath::withFrame(const TFrameId &frame, TFrameId::FrameFormat form
 		if (frame.isEmptyFrame() || frame.isNoFrame())
 			return *this;
 		else
-			return TFilePath(m_path + toWideString(ch + frame.expand(format)));
+			return TFilePath(m_path + ::to_wstring(ch + frame.expand(format)));
 	}
 
 	std::string frameString;
@@ -782,14 +779,14 @@ TFilePath TFilePath::withFrame(const TFrameId &frame, TFrameId::FrameFormat form
 	int k = str.substr(0, j).rfind(L'.');
 
 	if (k != (int)std::wstring::npos)
-		return TFilePath(m_path.substr(0, k + i + 1) + toWideString(frameString) + str.substr(j));
+		return TFilePath(m_path.substr(0, k + i + 1) + ::to_wstring(frameString) + str.substr(j));
 	else if (m_underscoreFormatAllowed) {
 		k = str.substr(0, j).rfind(L'_');
 		if (k != (int)std::wstring::npos &&
 			(k == j - 1 || isNumbers(str, k, j))) /*-- "_." の並びか、"_[数字]."の並びのとき --*/
-			return TFilePath(m_path.substr(0, k + i + 1) + ((frame.isNoFrame()) ? L"" : toWideString("_" + frame.expand(format))) + str.substr(j));
+			return TFilePath(m_path.substr(0, k + i + 1) + ((frame.isNoFrame()) ? L"" : ::to_wstring("_" + frame.expand(format))) + str.substr(j));
 	}
-	return TFilePath(m_path.substr(0, j + i + 1) + toWideString(frameString) + str.substr(j));
+	return TFilePath(m_path.substr(0, j + i + 1) + ::to_wstring(frameString) + str.substr(j));
 }
 
 //-----------------------------------------------------------------------------

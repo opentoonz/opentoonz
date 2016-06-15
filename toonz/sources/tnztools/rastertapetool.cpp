@@ -221,10 +221,10 @@ public:
 		params.m_closingDistance = (int)(m_distance.getValue());
 		params.m_spotAngle = (int)(m_angle.getValue());
 		params.m_opacity = m_opacity.getValue();
-		std::string inkString = toString(m_inkIndex.getValue());
+		std::string inkString = ::to_string(m_inkIndex.getValue());
 		int inkIndex = TTool::getApplication()->getCurrentLevelStyleIndex(); //TApp::instance()->getCurrentPalette()->getStyleIndex();
 		if (isInt(inkString))
-			inkIndex = toInt(inkString);
+			inkIndex = std::stoi(inkString);
 		params.m_inkIndex = inkIndex;
 
 		TPoint delta;
@@ -493,7 +493,7 @@ public:
 	bool onPropertyChanged(std::string propertyName)
 	{
 		if (propertyName == m_closeType.getName()) {
-			AutocloseVectorType = toString(m_closeType.getValue());
+			AutocloseVectorType = ::to_string(m_closeType.getValue());
 			resetMulti();
 		}
 
@@ -668,7 +668,7 @@ public:
 	void onActivate()
 	{
 		if (m_firstTime) {
-			m_closeType.setValue(toWideString((AutocloseVectorType.getValue())));
+			m_closeType.setValue(::to_wstring(AutocloseVectorType.getValue()));
 			m_distance.setValue(AutocloseDistance);
 			m_angle.setValue(AutocloseAngle);
 			m_opacity.setValue(AutocloseOpacity);

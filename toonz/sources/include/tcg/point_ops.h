@@ -5,7 +5,6 @@
 
 // tcg includes
 #include "point.h"
-#include "consts.h"
 #include "numeric_ops.h"
 
 /*!
@@ -308,7 +307,7 @@ inline typename point_traits<Point>::value_type rad(const Point &p)
 template <typename Point>
 inline typename point_traits<Point>::value_type angle(const Point &v1, const Point &v2)
 {
-	return numeric_ops::mod<typename point_traits<Point>::value_type>(rad(v2) - rad(v1), -consts::pi, consts::pi);
+	return numeric_ops::mod<typename point_traits<Point>::value_type>(rad(v2) - rad(v1), -M_PI, M_PI);
 }
 
 //-------------------------------------------------------------------------------------------

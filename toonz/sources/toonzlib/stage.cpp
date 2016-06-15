@@ -715,28 +715,6 @@ void StageBuilder::visit(PlayerSet &players, Visitor &visitor, bool isPlaying)
 
 //=============================================================================
 
-#ifdef _DEBUG
-// debug
-class DummyVisitor : public Visitor
-{
-	std::ostrstream m_ss;
-
-public:
-	void onImage(const Stage::Player &data) { m_ss << "img "; }
-	void beginMask() { m_ss << "beginMask "; }
-	void endMask() { m_ss << "endMask "; }
-	void enableMask() { m_ss << "enableMask "; }
-	void disableMask() { m_ss << "disableMask "; }
-	std::string getLog()
-	{
-		m_ss << '\0';
-		std::string log = m_ss.str();
-		m_ss.freeze(0);
-		return log;
-	}
-};
-#endif
-
 //=============================================================================
 /*! Declare a \b StageBuilder object and recall \b StageBuilder::addFrame() and
 		\b StageBuilder::visit().

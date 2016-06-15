@@ -397,7 +397,7 @@ void DvDirTreeView::dropEvent(QDropEvent *e)
 		TFilePath dstFp = folderNode->getPath();
 
 		TFilePath path = dstFp + TFilePath(srcFp.getLevelNameW());
-		NameBuilder *nameBuilder = NameBuilder::getBuilder(toWideString(path.getName()));
+		NameBuilder *nameBuilder = NameBuilder::getBuilder(::to_wstring(path.getName()));
 		std::wstring levelNameOut;
 		do
 			levelNameOut = nameBuilder->getNext();

@@ -1324,7 +1324,8 @@ void IoCmd::newScene()
 	TImageStyle::setCurrentScene(scene);
 
 	TCamera *camera = scene->getCurrentCamera();
-	TDimension res(768, 576);
+	TDimension res(1920, 1080);
+	//TDimension res(768, 576);
 	camera->setRes(res);
 	camera->setSize(TDimensionD((double)res.lx / cameraDpi, (double)res.ly / cameraDpi));
 	scene->getProperties()->setBgColor(TPixel32::White);
@@ -1514,7 +1515,7 @@ bool IoCmd::saveLevel(const TFilePath &path)
 	std::string dotts = sl->getPath().getDots();
 	TFilePath realPath = path;
 	if (realPath.getType() == "")
-		realPath = TFilePath(realPath.getWideString() + toWideString(dotts + ext));
+		realPath = TFilePath(realPath.getWideString() + ::to_wstring(dotts + ext));
 
 	saveLevel(realPath, sl, false);
 	RecentFiles::instance()->addFilePath(toQString(realPath), RecentFiles::Level);
@@ -1632,7 +1633,7 @@ bool IoCmd::saveLevel(TXshSimpleLevel *sl)
 }
 
 //===========================================================================
-// IoCmd::saveAll() save current scene and all of its levels
+// IoCmd::saveSound(soundPath, soundColumn, overwrite)
 //---------------------------------------------------------------------------
 
 bool IoCmd::saveAll()
@@ -1688,75 +1689,6 @@ bool IoCmd::saveSound(const TFilePath &fp, TXshSoundLevel *sl, bool overwrite)
 bool IoCmd::saveSound(TXshSoundLevel *sl)
 {
 	return saveSound(sl->getPath(), sl, true);
-}
-
-//===========================================================================
-// IoCmd::loadColorModel(soundColumn)
-//---------------------------------------------------------------------------
-
-bool IoCmd::loadColorModel(const TFilePath &fp, int frame)
-{
-	TPaletteHandle *paletteHandle = TApp::instance()->getPaletteController()->getCurrentPalette();
-	TPalette *palette = paletteHandle->getPalette();
-
-	if (!palette || palette->isCleanupPalette()) {
-		error(QObject::tr("Cannot load Color Model in current palette."));
-		return false;
-	}
-
-	ResourceImportDialog importDialog;
-	importDialog.setIsLastResource(true);
-	TFilePath path = fp;
-	if (!path.isLevelName())
-		path = TFilePath(path.getLevelNameW()).withParentDir(path.getParentDir());
-
-	if (!TSystem::doesExistFileOrLevel(path))
-		return false;
-
-	bool importFlag = false;
-	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	if (scene->isExternPath(path)) {
-		// extern resource: import or link?
-		int ret = importDialog.askImportQuestion(path);
-		if (ret == ResourceImportDialog::A_CANCEL)
-			return true;
-
-		importFlag = (ret == ResourceImportDialog::A_IMPORT);
-	}
-
-	QString question(QObject::tr("The color model palette is different from the destination palette.\nWhat do you want to do? "));
-	QList<QString> list;
-	list.append(QObject::tr("Overwrite the destination palette."));
-	list.append(QObject::tr("Keep the destination palette and apply it to the color model."));
-
-	int ret = DVGui::RadioButtonMsgBox(DVGui::WARNING, question, list);
-	if (ret == 0)
-		return false;
-
-	bool replace = false;
-	if (ret == 2)
-		replace = true;
-
-	try {
-		path = importDialog.process(scene, 0, path);
-	} catch (std::string msg) {
-		error(QString::fromStdString(msg));
-		return true;
-	}
-
-	int isLoaded = PaletteCmd::loadReferenceImage(paletteHandle, replace, path, frame, scene);
-	if (isLoaded != 0)
-		return false;
-
-	TXshLevel *level = TApp::instance()->getCurrentLevel()->getLevel();
-	if (!level)
-		return true;
-
-	std::vector<TFrameId> fids;
-	level->getFids(fids);
-	invalidateIcons(level, fids);
-
-	return true;
 }
 
 //=========================================================================

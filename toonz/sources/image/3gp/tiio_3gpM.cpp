@@ -115,7 +115,7 @@ string buildQTErrorString(int ec)
 		return "unable to set movie box";
 
 	default: {
-		return "unknown error ('" + toString(ec) + "')";
+		return "unknown error ('" + std::to_string(ec) + "')";
 	}
 	}
 }
@@ -807,8 +807,7 @@ if (m_gworld)
 		OSErr myErr = noErr;
 		//UCHAR myCancelled = FALSE;
 
-		const char *pStr = toString(m_path.getWideString()).c_str();
-		getFSSpecFromPosixPath(pStr, &fspec, true);
+		getFSSpecFromPosixPath(::to_string(m_path).c_str(), &fspec, true);
 
 		myFlags = createMovieFileDeleteCurFile; // |
 												//movieFileSpecValid | movieToFileOnlyExport;
@@ -865,10 +864,9 @@ TLevelReader3gp::TLevelReader3gp(const TFilePath &path)
 		return;
 	}
 
-	const char *pStr = toString(m_path.getWideString()).c_str();
-	FSMakeFSSpec(0, 0, (const unsigned char *)pStr, &fspec);
-	getFSSpecFromPosixPath(pStr, &fspec, false);
-	pStr = 0;
+	std::string const str_path = ::to_string(m_path).c_str();
+	FSMakeFSSpec(0, 0, reinterpret_cast<unsigned char const*>(str_path.c_str()), &fspec);
+	getFSSpecFromPosixPath(str_path.c_str(), &fspec, false);
 
 	if ((err = OpenMovieFile(&fspec, &m_refNum, fsRdPerm))) {
 		m_IOError = QTUnableToOpenFile;

@@ -8,6 +8,8 @@
 #include "tfarmproxy.h"
 #include "tfilepath_io.h"
 
+#include <strstream>
+
 namespace
 {
 

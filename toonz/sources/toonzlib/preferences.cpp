@@ -900,7 +900,7 @@ void setCurrentUnits(std::string measureName, std::string units)
 	TMeasure *m = TMeasureManager::instance()->get(measureName);
 	if (!m)
 		return;
-	TUnit *u = m->getUnit(toWideString(units));
+	TUnit *u = m->getUnit(::to_wstring(units));
 	if (!u)
 		return;
 	m->setCurrentUnit(u);

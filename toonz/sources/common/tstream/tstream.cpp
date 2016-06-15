@@ -15,6 +15,7 @@
 
 #include <sstream>
 #include <memory>
+#include <strstream>
 
 using namespace std;
 
@@ -222,7 +223,7 @@ public:
 	ostream *m_os;
 	bool m_chanOwner;
 	bool m_compressed;
-	ostrstream m_ostrstream;
+        ostringstream m_ostringstream;
 
 	vector<std::string> m_tagStack;
 	int m_tab;
@@ -243,7 +244,7 @@ TOStream::TOStream(const TFilePath &fp, bool compressed)
 	m_imp->m_filepath = fp;
 
 	if (compressed) {
-		m_imp->m_os = &m_imp->m_ostrstream;
+		m_imp->m_os = &m_imp->m_ostringstream;
 		m_imp->m_compressed = true;
 		m_imp->m_chanOwner = false;
 	} else {
@@ -304,7 +305,9 @@ TOStream::~TOStream()
 			m_imp->m_justStarted = true;
 		} else {
 			if (m_imp->m_compressed) {
-				const void *in = (const void *)m_imp->m_ostrstream.str();
+			        std::string tmp = m_imp->m_ostringstream.str();
+			        const void *in = (const void *)tmp.c_str();
+
 				size_t in_len = strlen((char *)in);
 
 				size_t out_len = LZ4F_compressFrameBound(in_len, NULL);
@@ -323,8 +326,6 @@ TOStream::~TOStream()
 					v = out_len;
 					os.write((char *)&v, sizeof v);
 					os.write((char *)out, out_len);
-
-					m_imp->m_ostrstream.freeze(0);
 				}
 
 				free(out);
@@ -428,13 +429,13 @@ TOStream &TOStream::operator<<(QString _v)
 
 TOStream &TOStream::operator<<(std::wstring v)
 {
-	return operator<<(toString(v));
+	return operator<<(::to_string(v));
 	/*
   ostream &os = *(m_imp->m_os);
   int len = v.length();
   if(len==0)
   {
-    os << "\"" << "\"" << " "; 
+    os << "\"" << "\"" << " ";
     m_imp->m_justStarted = false;
     return *this;
   }
@@ -459,7 +460,7 @@ TOStream &TOStream::operator<<(std::wstring v)
          os << "\\n";
        else if(iswprint(v[i]))
          os << v[i];
-       else 
+       else
          {os.put('\\'); os << (int)v[i];}
      os << "\" ";
     }
@@ -634,7 +635,7 @@ bool TOStream::checkStatus() const
 }
 
 //===============================================================
-/*! 
+/*!
 	This class contains TIStream's attributes.
 	It is created by memory allocation in the TIStream's constructor.
 */
@@ -974,7 +975,7 @@ TIStream::TIStream(const TFilePath &fp)
 		if (check_len != out_len)
 			throw TException("corrupted file");
 
-		m_imp->m_is = new istrstream((char *)out, out_len);
+		m_imp->m_is = new istringstream((char *)out, out_len);
 	}
 
 	m_imp->m_chanOwner = true;
@@ -1019,36 +1020,8 @@ TIStream &TIStream::operator>>(std::wstring &v)
 {
 	string s;
 	operator>>(s);
-	v = toWideString(s);
+	v = ::to_wstring(s);
 	return *this;
-
-	/*
-  int len = s.length();
-  for(int i=0;i<len;)
-    {
-     if(s[i] != '&')
-       {v.append(1, (wchar_t)s[i]);i++;}
-     else if(s.substr(i, 5) == "&amp;")
-       {v.append(1, L'&');i+=5;}
-     else if(i+1<len && s[i+1]=='#')
-       {
-        int c = 0;
-        i+=2;
-        while(i<len && '0'<=s[i] && s[i]<='9')
-          {
-           c = c*10+s[i]-'0';
-           i++;
-          }
-        if(i<len && s[i]==';') i++;
-        v.append(1, (wchar_t)c);
-       }
-     else
-       {
-        i++;
-       }
-    }
-  return *this;
-*/
 }
 
 //---------------------------------------------------------------
@@ -1344,7 +1317,7 @@ bool TIStream::getTagParam(string paramName, int &value)
 	string svalue;
 	if (!getTagParam(paramName, svalue))
 		return false;
-	istrstream is(svalue.c_str(), svalue.length());
+	istringstream is(svalue.c_str(), svalue.length());
 	value = 0;
 	is >> value;
 	return true;

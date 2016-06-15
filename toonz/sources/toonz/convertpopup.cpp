@@ -53,6 +53,7 @@ TEnv::IntVar ConvertPopupSkipExisting("ConvertPopupSkipExisting", 0);
 /*-- フレーム番号の前のドットを取る --*/
 TEnv::IntVar ConvertPopupRemoveDot("ConvertPopupRemoveDot", 1);
 TEnv::IntVar ConvertPopupSaveToNopaint("ConvertPopupSaveToNopaint", 1);
+TEnv::IntVar ConvertPopupAppendDefaultPalette("ConvertPopupAppendDefaultPalette", 0);
 
 //=============================================================================
 // convertPopup
@@ -406,9 +407,10 @@ ConvertPopup::ConvertPopup(bool specifyInput)
 									  ConvertPopupBgColorG,
 									  ConvertPopupBgColorB,
 									  ConvertPopupBgColorA));
-	m_skip->setChecked(ConvertPopupSkipExisting ? 1 : 0);
-	m_removeDotBeforeFrameNumber->setChecked(ConvertPopupRemoveDot ? 1 : 0);
-	m_saveBackupToNopaint->setChecked(ConvertPopupSaveToNopaint ? 1 : 0);
+	m_skip->setChecked( ConvertPopupSkipExisting != 0 );
+	m_removeDotBeforeFrameNumber->setChecked( ConvertPopupRemoveDot != 0 );
+	m_saveBackupToNopaint->setChecked( ConvertPopupSaveToNopaint != 0 );
+	m_appendDefaultPalette->setChecked( ConvertPopupAppendDefaultPalette != 0 );
 
 	//--- signal-slot connections
 	qRegisterMetaType<TFilePath>("TFilePath");
@@ -491,6 +493,7 @@ QFrame *ConvertPopup::createTlvSettings()
 	m_unpaintedSuffix = new DVGui::LineEdit("_np");
 	m_applyAutoclose = new QCheckBox(tr("Apply Autoclose"));
 	m_saveBackupToNopaint = new QCheckBox(tr("Save Backup to \"nopaint\" Folder"));
+	m_appendDefaultPalette = new QCheckBox(tr("Append Default Palette"));
 	m_antialias = new QComboBox();
 	m_antialiasIntensity = new DVGui::IntLineEdit(0, 50, 0, 100);
 	m_palettePath = new DVGui::FileField(0, QString(CreateNewPalette), true);
@@ -506,6 +509,8 @@ QFrame *ConvertPopup::createTlvSettings()
 	items << TlvMode_Unpainted << TlvMode_UnpaintedFromNonAA << TlvMode_PaintedFromTwoImages << TlvMode_PaintedFromNonAA;
 	m_tlvMode->addItems(items);
 	m_antialiasIntensity->setEnabled(false);
+	
+	m_appendDefaultPalette->setToolTip(tr("When activated, styles of the default palette\n($TOONZSTUDIOPALETTE\\cleanup_default.tpl) will \nbe appended to the palette after conversion in \norder to save the effort of creating styles \nbefore color designing."));
 
 	m_palettePath->setMinimumWidth(300);
 	m_palettePath->setFileMode(QFileDialog::ExistingFile);
@@ -533,7 +538,8 @@ QFrame *ConvertPopup::createTlvSettings()
 		gridLay->addWidget(new QLabel(tr("Tolerance:")), 4, 2, Qt::AlignRight | Qt::AlignVCenter);
 		gridLay->addWidget(m_tolerance, 4, 3);
 
-		gridLay->addWidget(m_saveBackupToNopaint, 5, 1, 1, 3);
+		gridLay->addWidget(m_appendDefaultPalette, 5, 1, 1, 3);
+		gridLay->addWidget(m_saveBackupToNopaint, 6, 1, 1, 3);
 	}
 	gridLay->setColumnStretch(0, 0);
 	gridLay->setColumnStretch(1, 1);
@@ -760,7 +766,8 @@ Convert2Tlv *ConvertPopup::makeTlvConverter(const TFilePath &sourceFilePath)
 											 m_tolerance->getValue(),
 											 m_antialias->currentIndex(),
 											 m_antialiasIntensity->getValue(),
-											 getTlvMode() == TlvMode_UnpaintedFromNonAA);
+											 getTlvMode() == TlvMode_UnpaintedFromNonAA,
+											 m_appendDefaultPalette->isChecked());
 	return converter;
 }
 
@@ -988,9 +995,10 @@ void ConvertPopup::apply()
 	ConvertPopupBgColorG = (int)bgCol.g;
 	ConvertPopupBgColorB = (int)bgCol.b;
 	ConvertPopupBgColorA = (int)bgCol.m;
-	ConvertPopupSkipExisting = (int)m_skip->isChecked();
-	ConvertPopupRemoveDot = (int)m_removeDotBeforeFrameNumber->isChecked();
-	ConvertPopupSaveToNopaint = (int)m_saveBackupToNopaint->isChecked();
+	ConvertPopupSkipExisting = m_skip->isChecked() ? 1 : 0;
+	ConvertPopupRemoveDot = m_removeDotBeforeFrameNumber->isChecked() ? 1 : 0;
+	ConvertPopupSaveToNopaint = m_saveBackupToNopaint->isChecked() ? 1 : 0;
+	ConvertPopupAppendDefaultPalette = m_appendDefaultPalette->isChecked() ? 1 : 0;
 
 	// parameters are ok: close the dialog first
 	close();

@@ -380,7 +380,7 @@ void ToolOptionControlBuilder::visit(TEnumProperty *p)
 		QSignalMapper *signalMapper = 0;
 		int index = 0;
 		for (it = range.begin(); it != range.end(); ++it, ++index) {
-			std::string item = toString(*it);
+			std::string item = ::to_string(*it);
 			std::string itemActionName = actionName + ":" + item;
 			a = CommandManager::instance()->getAction(itemActionName.c_str());
 			if (a) {
@@ -804,7 +804,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(QWidget *parent, TTool *tool, TProperty
 		QSignalMapper *signalMapper = 0;
 		int index = 0;
 		for (it = range.begin(); it != range.end(); ++it, ++index) {
-			std::string item = toString(*it);
+			std::string item = ::to_string(*it);
 			std::string itemActionName = actionName + ":" + item;
 			a = CommandManager::instance()->getAction(itemActionName.c_str());
 			if (a) {

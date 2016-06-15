@@ -69,7 +69,7 @@ public:
 			sigma = 257.0 * 2.0 * sigma * sigma * sigma * sigma;
 		for (int i = 0; i < PIXEL::maxChannelValue + 1; i++) {
 			noise_buf[i] = sigma * sqrt(-log(1.0 - random.getFloat())) *
-						   cos(TConsts::pi * (2.0 * random.getFloat() - 1.0));
+						   cos(M_PI * (2.0 * random.getFloat() - 1.0));
 		}
 	}
 	double get_value(int index)
@@ -196,7 +196,7 @@ std::string NoiseFx::getAlias(double frame, const TRenderSettings &info) const
 	}
 
 	if (addframe)
-		alias += toString(frame) + ",";
+		alias += std::to_string(frame) + ",";
 	alias += paramalias + "]";
 
 	return alias;

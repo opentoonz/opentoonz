@@ -23,16 +23,8 @@ TOfflineGL::Imp *MacOfflineGenerator1(const TDimension &dim)
 }
 #endif
 
-//#include <typeinfo>
-
-//#include <ctype.h>
-//#include <stdlib.h>
-
-//using namespace std;
-
 #include <map>
-//#include <fstream.h>
-//#include <strstream.h>
+#include <sstream>
 
 using namespace TEnv;
 
@@ -113,7 +105,7 @@ public:
 			std::cout << "varName:" << varName << " TOONZROOT not set..." << std::endl;
 			return "";
 		}
-		return toString(systemVarPath);
+		return ::to_string(systemVarPath);
 /*
 			char *value = getenv(varName.c_str());
 			if (!value)
@@ -225,10 +217,10 @@ TFilePath EnvGlobals::getSystemPath(int id)
   if(it != m_systemPaths.end()) return it->second;
   switch(id)
     {
-     case StuffDir:        return TFilePath(); 
+     case StuffDir:        return TFilePath();
      case ConfigDir:       return getSystemPath(StuffDir) + "config";
      case ProfilesDir:      return getSystemPath(StuffDir) + "profiles";
-     default: return TFilePath();      
+     default: return TFilePath();
     }
 }
 
@@ -644,21 +636,17 @@ std::istream &operator>>(std::istream &is, TRect &rect)
 template <class T>
 std::string toString2(T value)
 {
-	std::ostrstream ss;
+	std::ostringstream ss;
 	ss << value << '\0';
-	std::string s(ss.str());
-	ss.freeze(false);
-	return s;
+	return ss.str();
 }
 
 template <>
 std::string toString2(TRect value)
 {
-	std::ostrstream ss;
+	std::ostringstream ss;
 	ss << value.x0 << " " << value.y0 << " " << value.x1 << " " << value.y1 << '\0';
-	std::string s = ss.str();
-	ss.freeze(false);
-	return s;
+	return ss.str();
 }
 
 template <class T>
@@ -666,7 +654,7 @@ void fromString(std::string s, T &value)
 {
 	if (s.empty())
 		return;
-	std::istrstream is(s.c_str(), s.size());
+	std::istringstream is(s);
 	is >> value;
 }
 
@@ -679,7 +667,7 @@ void fromString(std::string s, std::string &value)
 
 //-------------------------------------------------------------------
 
-IntVar::IntVar(std::string name, int defValue) : Variable(name, toString(defValue)) {}
+IntVar::IntVar(std::string name, int defValue) : Variable(name, std::to_string(defValue)) {}
 IntVar::IntVar(std::string name) : Variable(name) {}
 IntVar::operator int() const
 {
@@ -687,11 +675,11 @@ IntVar::operator int() const
 	fromString(getValue(), v);
 	return v;
 }
-void IntVar::operator=(int v) { assignValue(toString(v)); }
+void IntVar::operator=(int v) { assignValue(std::to_string(v)); }
 
 //-------------------------------------------------------------------
 
-DoubleVar::DoubleVar(std::string name, double defValue) : Variable(name, toString(defValue)) {}
+DoubleVar::DoubleVar(std::string name, double defValue) : Variable(name, std::to_string(defValue)) {}
 DoubleVar::DoubleVar(std::string name) : Variable(name) {}
 DoubleVar::operator double() const
 {
@@ -699,7 +687,7 @@ DoubleVar::operator double() const
 	fromString(getValue(), v);
 	return v;
 }
-void DoubleVar::operator=(double v) { assignValue(toString(v)); }
+void DoubleVar::operator=(double v) { assignValue(std::to_string(v)); }
 
 //-------------------------------------------------------------------
 
@@ -715,7 +703,7 @@ void StringVar::operator=(const std::string &v) { assignValue(v); }
 
 //-------------------------------------------------------------------
 
-FilePathVar::FilePathVar(std::string name, const TFilePath &defValue) : Variable(name, toString(defValue)) {}
+FilePathVar::FilePathVar(std::string name, const TFilePath &defValue) : Variable(name, ::to_string(defValue)) {}
 FilePathVar::FilePathVar(std::string name) : Variable(name) {}
 FilePathVar::operator TFilePath() const
 {
@@ -723,7 +711,7 @@ FilePathVar::operator TFilePath() const
 	fromString(getValue(), v);
 	return TFilePath(v);
 }
-void FilePathVar::operator=(const TFilePath &v) { assignValue(toString(v)); }
+void FilePathVar::operator=(const TFilePath &v) { assignValue(::to_string(v)); }
 
 //-------------------------------------------------------------------
 

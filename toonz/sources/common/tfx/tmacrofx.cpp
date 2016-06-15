@@ -398,8 +398,8 @@ TMacroFx *TMacroFx::create(const std::vector<TFxP> &fxs)
 		for (; k < count; k++) {
 			TFxPort *port = fx->getInputPort(k);
 			std::string portName = fx->getInputPortName(k);
-			std::string fxId = toString(fx->getFxId());
-			portName += "_" + toString(macroFx->getInputPortCount()) + "_" + fxId;
+			std::string fxId = ::to_string(fx->getFxId());
+			portName += "_" + std::to_string(macroFx->getInputPortCount()) + "_" + fxId;
 			TFx *portFx = port->getFx();
 			if (portFx) {
 				// se la porta k-esima del nodo di ingresso i-esimo e' collegata
@@ -478,7 +478,7 @@ void TMacroFx::compatibilityTranslatePort(int major, int minor, std::string &por
 	const std::string &fxId = portName.substr(portName.find_last_of('_') + 1,
 											  std::string::npos);
 
-	if (TFx *fx = getFxById(toWideString(fxId))) {
+	if (TFx *fx = getFxById(::to_wstring(fxId))) {
 		size_t opnEnd = portName.find_first_of('_');
 
 		std::string originalPortName = portName.substr(0, opnEnd);
@@ -533,7 +533,7 @@ void TMacroFx::loadData(TIStream &is)
 					} else {
 						name = is.getTagAttribute("name_inFx");
 						if (tnzVersion < VersionNumber(1, 17) && tnzVersion != VersionNumber(0, 0))
-							name.insert(name.find("_"), "_" + toString(i));
+							name.insert(name.find("_"), "_" + std::to_string(i));
 
 						compatibilityTranslatePort(tnzVersion.first, tnzVersion.second, name);
 
@@ -545,7 +545,7 @@ void TMacroFx::loadData(TIStream &is)
 
 						for (int i = 0; i < (int)m_fxs.size(); i++) {
 							std::wstring fxId = m_fxs[i]->getFxId();
-							if (fxId == toWideString(inFxId)) {
+							if (fxId == ::to_wstring(inFxId)) {
 								if (TFxPort *port = m_fxs[i]->getInputPort(inPortName))
 									addInputPort(name, *port);
 							}

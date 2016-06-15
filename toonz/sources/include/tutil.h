@@ -98,7 +98,7 @@ inline int intGE(double x)
  */
 inline double rad2degree(double rad)
 {
-	return rad * TConsts::invOf_pi_180;
+	return rad * M_180_PI;
 }
 
 //! convert degree to radiant
@@ -109,7 +109,7 @@ inline double rad2degree(double rad)
  */
 inline double degree2rad(double degree)
 {
-	return degree * TConsts::pi_180;
+	return degree * M_PI_180;
 }
 
 //! Sign of argument.

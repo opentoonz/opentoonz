@@ -86,7 +86,7 @@ void fetchElement(int &dst, int index, int &argc, char *argv[])
 {
 	string s = argv[index];
 	if (isInt(s))
-		dst = toInt(s);
+		dst = std::stoi(s);
 	else
 		throw UsageError("expected int");
 	fetchElement(index, argc, argv);

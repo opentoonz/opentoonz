@@ -331,7 +331,7 @@ std::string Iwa_TiledParticlesFx::getAlias(double frame, const TRenderSettings &
 		paramalias += param->getName() + "=" + param->getValueAlias(frame, 3);
 	}
 
-	return alias + toString(frame) + "," + toString(getIdentifier()) + paramalias + "]";
+	return alias + std::to_string(frame) + "," + std::to_string(getIdentifier()) + paramalias + "]";
 }
 
 //------------------------------------------------------------------

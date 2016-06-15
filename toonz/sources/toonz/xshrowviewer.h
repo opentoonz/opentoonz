@@ -49,6 +49,7 @@ class RowArea : public QWidget
 	void drawPlayRange(QPainter &p, int r0, int r1);
 	void drawCurrentRowGadget(QPainter &p, int r0, int r1);
 	void drawOnionSkinSelection(QPainter &p);
+	void drawPinnedCenterKeys(QPainter &p, int r0, int r1);
 
 	DragTool *getDragTool() const;
 	void setDragTool(DragTool *dragTool);

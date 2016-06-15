@@ -362,14 +362,14 @@ bool TCacheResource::checkTile(const TTile &tile) const
 
 inline std::string TCacheResource::getCellName(int idxX, int idxY) const
 {
-	return "cell" + toString(idxX) + "," + toString(idxY);
+	return "cell" + std::to_string(idxX) + "," + std::to_string(idxY);
 }
 
 //----------------------------------------------------------------
 
 inline std::string TCacheResource::getCellCacheId(int idxX, int idxY) const
 {
-	return "TCacheResource" + toString(m_id) + getCellName(idxX, idxY);
+	return "TCacheResource" + std::to_string(m_id) + getCellName(idxX, idxY);
 }
 
 //----------------------------------------------------------------

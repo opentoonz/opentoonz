@@ -39,7 +39,7 @@ public:
 		double radius = m_radius->getValue(frame) * scale;
 		double blur = 0.001 * m_blur->getValue(frame) / scale;
 
-		double intensity = blur * (TConsts::pi / 180);
+		double intensity = blur * M_PI_180;
 
 		TPointD p1 = bBox.getP00() - point;
 		TPointD p2 = bBox.getP01() - point;
@@ -56,8 +56,8 @@ public:
 			blurangle = intensity * ((dist - radius));
 		else
 			blurangle = 0;
-		if (blurangle > TConsts::pi)
-			blurangle = TConsts::pi;
+		if (blurangle > M_PI)
+			blurangle = M_PI;
 		return tround(4 * blurangle * dist);
 	}
 
@@ -128,7 +128,7 @@ void doSpinBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin, double 
 	double CROP_VAL = (double)MAX_CHANNEL_VALUE;
 	CHANNEL_TYPE U_CROP_VAL = MAX_CHANNEL_VALUE;
 
-	double intensity = blur * (TConsts::pi / 180);
+	double intensity = blur * M_PI_180;
 	int cx = lx / 2 + dx;
 	int cy = ly / 2 + dy;
 
@@ -152,8 +152,8 @@ void doSpinBlur(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin, double 
 				blurangle = intensity * ((dist - radius));
 			else
 				blurangle = 0;
-			if (blurangle > TConsts::pi)
-				blurangle = TConsts::pi;
+			if (blurangle > M_PI)
+				blurangle = M_PI;
 			range = (int)(4 * blurangle * dist);
 			if (range >= 1) {
 				angle = atan2((double)vy, (double)vx) - blurangle;

@@ -3671,7 +3671,7 @@ void UndoGroupFxs::initialize()
 
 void UndoGroupFxs::redo() const
 {
-	const std::wstring groupName = L"Group " + toWideString(m_groupId);
+	const std::wstring groupName = L"Group " + std::to_wstring(m_groupId);
 
 	std::vector<GroupData>::const_iterator gt, gEnd = m_groupData.end();
 	for (gt = m_groupData.begin(); gt != gEnd; ++gt) {

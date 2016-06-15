@@ -24,7 +24,7 @@ using namespace std;
 FILE *fopen(const TFilePath &fp, string mode)
 {
 	FILE *pFile;
-	errno_t err = _wfopen_s(&pFile, fp.getWideString().c_str(), toWideString(mode).c_str());
+	errno_t err = _wfopen_s(&pFile, fp.getWideString().c_str(), ::to_wstring(mode).c_str());
 	if (err == -1)
 		return NULL;
 	return pFile;

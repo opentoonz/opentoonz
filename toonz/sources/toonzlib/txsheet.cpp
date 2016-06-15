@@ -58,14 +58,14 @@ string getColumnDefaultName(TXsheet *xsh, int col, QString oldName)
 					bool isNumber = true;
 					oldName.right(oldName.size() - 3).toInt(&isNumber);
 					if (oldName.left(3) == "Col" && isNumber)
-						return toString(level->getName());
+						return ::to_string(level->getName());
 					else
 						return "";
 				}
 			}
 		}
 	}
-	return "Col" + toString(col + 1);
+	return "Col" + std::to_string(col + 1);
 }
 
 //-----------------------------------------------------------------------------

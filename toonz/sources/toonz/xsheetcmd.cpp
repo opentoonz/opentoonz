@@ -1319,10 +1319,10 @@ void readParameters()
 				std::string s;
 				s = is.getTagAttribute("rows");
 				if (s != "" && isInt(s))
-					rowsPerPage = toInt(s);
+					rowsPerPage = std::stoi(s);
 				s = is.getTagAttribute("columns");
 				if (s != "" && isInt(s))
-					columnsPerPage = toInt(s);
+					columnsPerPage = std::stoi(s);
 			} else if (tagName == "info") {
 				std::string name = is.getTagAttribute("name");
 				std::string value = is.getTagAttribute("value");
@@ -1523,9 +1523,9 @@ void XsheetWriter::cell(ostream &os, int r, int c)
 			std::string levelName;
 			if (level->getChildLevel()) {
 				int index = getChildLevelIndex(level->getChildLevel());
-				levelName = index >= 0 ? "Sub" + toString(index + 1) : "";
+				levelName = index >= 0 ? "Sub" + std::to_string(index + 1) : "";
 			} else
-				levelName = toString(level->getName());
+				levelName = ::to_string(level->getName());
 			os << levelName << " " << cell.m_frameId.getNumber();
 		}
 		os << "</td>" << endl;
@@ -1610,7 +1610,7 @@ void makeHtml(TFilePath fp)
 	ToonzScene *scene = app->getCurrentScene()->getScene();
 
 	std::string sceneName = scene->getScenePath().getName();
-	std::string projectName = toString(scene->getProject()->getName());
+	std::string projectName = ::to_string(scene->getProject()->getName());
 
 	Tofstream os(fp);
 
@@ -1654,13 +1654,13 @@ void makeHtml(TFilePath fp)
 		TXshLevel *level = levels[i];
 		if (!level->getSimpleLevel())
 			continue;
-		os << "<dt>" << toString(level->getName()) << "</dt>" << endl;
+		os << "<dt>" << ::to_string(level->getName()) << "</dt>" << endl;
 		os << "<dd>" << endl;
 		TFilePath fp = level->getPath();
-		os << toString(fp.getWideString());
+		os << ::to_string(fp);
 		TFilePath fp2 = scene->decodeFilePath(fp);
 		if (fp != fp2)
-			os << "<br>" << toString(fp2.getWideString());
+			os << "<br>" << ::to_string(fp2);
 		os << "</dd>" << endl;
 	}
 	os << "</dl>" << endl;

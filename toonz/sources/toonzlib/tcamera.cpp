@@ -9,7 +9,8 @@
 // TCamera
 
 TCamera::TCamera()
-	: m_size(12, 9), m_res(768, 576), m_xPrevalence(true)
+	//: m_size(12, 9), m_res(768, 576), m_xPrevalence(true)
+	: m_size(30, 16.875), m_res(1920, 1080), m_xPrevalence(true)
 {
 }
 

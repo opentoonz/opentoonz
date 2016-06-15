@@ -127,13 +127,7 @@ QScriptValue FilePath::concat(const QScriptValue &value) const
 	err = checkFilePath(context(), value, fp);
 	if (err.isError())
 		return err;
-	/*
-    if(!isDirectory())
-    {
-      QScriptValue v = toString();
-      return context()->throwError(tr("%1 is not a directory").arg(toString().toString()));
-    }
-    */
+
 	if (fp.isAbsolute())
 		return context()->throwError(tr("can't concatenate an absolute path : %1").arg(value.toString()));
 	fp = getToonzFilePath() + fp;

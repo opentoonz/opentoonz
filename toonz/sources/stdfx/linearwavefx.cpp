@@ -146,7 +146,7 @@ public:
 		double w_amplitude = m_amplitude->getValue(frame) / info.m_shrinkX;
 		double w_freq = m_frequency->getValue(frame) * info.m_shrinkX;
 		double w_phase = m_phase->getValue(frame);
-		w_freq = (w_freq * 0.01 * TConsts::pi) / 180;
+		w_freq *= 0.01 * M_PI_180;
 		double angle = -m_angle->getValue(frame);
 
 		//The warper is calculated on a standard reference, with fixed dpi. This makes sure

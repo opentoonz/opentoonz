@@ -261,7 +261,7 @@ class PolylineReader
 
 public:
 	PolylineReader(TVectorImageP vi, const NewOutlineConfiguration &conf)
-		: m_vi(vi), m_conf(conf), m_adherenceTol(2.0 * (1.0 - m_conf.m_adherenceTol)), m_angleTol(cos(TConsts::pi * m_conf.m_angleTol)), m_relativeTol(conf.m_relativeTol), m_mergeTol(m_conf.m_mergeTol) {}
+		: m_vi(vi), m_conf(conf), m_adherenceTol(2.0 * (1.0 - m_conf.m_adherenceTol)), m_angleTol(cos(M_PI * m_conf.m_angleTol)), m_relativeTol(conf.m_relativeTol), m_mergeTol(m_conf.m_mergeTol) {}
 
 	void setEvaluator(const RasterEdgeEvaluator<RanIt> *eval) { m_eval = eval; }
 

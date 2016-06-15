@@ -60,7 +60,7 @@ public:
 			m_unitName = "";
 		} else {
 			if (m_unitName != "")
-				m_unit = measure->getUnit(toWideString(m_unitName));
+				m_unit = measure->getUnit(::to_wstring(m_unitName));
 			else
 				m_unit = 0;
 			if (!m_unit) {
@@ -1189,7 +1189,7 @@ void TDoubleParam::loadData(TIStream &is)
 				continue;
 			TDoubleKeyframe::FileParams params;
 			params.m_path = TFilePath(is.getTagAttribute("path"));
-			params.m_fieldIndex = toInt(is.getTagAttribute("index"));
+			params.m_fieldIndex = std::stoi(is.getTagAttribute("index"));
 			TActualDoubleKeyframe k1, k2;
 			k1.m_frame = -1000;
 			k2.m_frame = 1000;
@@ -1276,7 +1276,7 @@ string TDoubleParam::getStreamTag() const
 
 string TDoubleParam::getValueAlias(double frame, int precision)
 {
-	return toString(getValue(frame), precision);
+	return ::to_string(getValue(frame), precision);
 }
 
 //-------------------------------------------------------------------

@@ -309,14 +309,14 @@ public:
 
 	TFx *getFx(const Token &token) const
 	{
-		return m_xsh->getFxDag()->getFxById(toWideString(toLower(token.getText())));
+		return m_xsh->getFxDag()->getFxById(::to_wstring(toLower(token.getText())));
 	}
 	TParam *getParam(const TFx *fx, const Token &token) const
 	{
 		int i;
 		for (i = 0; i < fx->getParams()->getParamCount(); i++) {
 			TParam *param = fx->getParams()->getParam(i);
-			std::string paramName = toString(TStringTable::translate(fx->getFxType() + "." + param->getName()));
+			std::string paramName = ::to_string(TStringTable::translate(fx->getFxType() + "." + param->getName()));
 			int i = paramName.find(" ");
 			while (i != std::string::npos) {
 				paramName.erase(i, 1);

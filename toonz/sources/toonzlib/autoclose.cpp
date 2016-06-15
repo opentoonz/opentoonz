@@ -34,7 +34,7 @@ public:
 
 	double m_csp, m_snp, m_csm, m_snm, m_csa, m_sna, m_csb, m_snb;
 
-	Imp(const TRasterP &r, int distance = 10, double angle = (180 * TConsts::pi) / 360.0, int index = 0, int opacity = 0)
+	Imp(const TRasterP &r, int distance = 10, double angle = M_PI_2, int index = 0, int opacity = 0)
 		: m_raster(r), m_spotAngle(angle), m_closingDistance(distance), m_inkIndex(index), m_opacity(opacity)
 	{
 	}

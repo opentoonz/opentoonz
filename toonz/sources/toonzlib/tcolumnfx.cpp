@@ -482,7 +482,7 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 		if (sandorData && sandorData->m_type == BlendTz) {
 			BlendParam param;
 
-			param.intensity = toDouble(std::string(sandorData->m_argv[3])) * scale * dpi;
+			param.intensity = std::stod(std::string(sandorData->m_argv[3])) * scale * dpi;
 			param.smoothness = sandorData->m_blendParams.m_smoothness;
 			param.stopAtCountour = sandorData->m_blendParams.m_noBlending;
 
@@ -574,8 +574,8 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 					const char *argv[12];
 					memcpy(argv, sandorData->m_argv, 12 * sizeof(const char *));
 
-					double thickness = toDouble(std::string(sandorData->m_argv[7])) * scale * dpi;
-					argv[7] = strsave(toString(thickness).c_str());
+					double thickness = std::stod(std::string(sandorData->m_argv[7])) * scale * dpi;
+					argv[7] = strsave(std::to_string(thickness).c_str());
 
 					calligraph(oldRasterIn, oldRasterOut, sandorData->m_border, sandorData->m_argc,
 							   argv, sandorData->m_shrink, sandorData->m_type == OutBorder);
@@ -586,16 +586,16 @@ TImageP applyCmappedFx(TToonzImageP &ti, const std::vector<TRasterFxRenderDataP>
 					const char *argv[12];
 					memcpy(argv, sandorData->m_argv, 12 * sizeof(const char *));
 
-					double distance = toDouble(std::string(sandorData->m_argv[6])) * scale * dpi;
-					argv[6] = strsave(toString(distance).c_str());
-					distance = toDouble(std::string(sandorData->m_argv[7])) * scale * dpi;
-					argv[7] = strsave(toString(distance).c_str());
-					double density = toDouble(std::string(sandorData->m_argv[8])) / sq(scale * dpi);
-					argv[8] = strsave(toString(density).c_str());
-					double size = toDouble(std::string(sandorData->m_argv[1])) * scale * dpi;
-					argv[1] = strsave(toString(size).c_str());
-					size = toDouble(std::string(sandorData->m_argv[2])) * scale * dpi;
-					argv[2] = strsave(toString(size).c_str());
+					double distance = std::stod(std::string(sandorData->m_argv[6])) * scale * dpi;
+					argv[6] = strsave(std::to_string(distance).c_str());
+					distance = std::stod(std::string(sandorData->m_argv[7])) * scale * dpi;
+					argv[7] = strsave(std::to_string(distance).c_str());
+					double density = std::stod(std::string(sandorData->m_argv[8])) / sq(scale * dpi);
+					argv[8] = strsave(std::to_string(density).c_str());
+					double size = std::stod(std::string(sandorData->m_argv[1])) * scale * dpi;
+					argv[1] = strsave(std::to_string(size).c_str());
+					size = std::stod(std::string(sandorData->m_argv[2])) * scale * dpi;
+					argv[2] = strsave(std::to_string(size).c_str());
 					RASTER *imgContour = TRop::convertRaster50to46(sandorData->m_controller, 0);
 					patternmap(oldRasterIn, oldRasterOut, sandorData->m_border, sandorData->m_argc,
 							   argv, sandorData->m_shrink, imgContour);
@@ -1437,7 +1437,7 @@ std::wstring TLevelColumnFx::getColumnId() const
 {
 	if (!m_levelColumn)
 		return L"Col?";
-	return L"Col" + toWideString(m_levelColumn->getIndex() + 1);
+	return L"Col" + std::to_wstring(m_levelColumn->getIndex() + 1);
 }
 
 //-------------------------------------------------------------------
@@ -1447,7 +1447,7 @@ std::wstring TLevelColumnFx::getColumnName() const
 	if (!m_levelColumn)
 		return L"";
 	int idx = getColumnIndex();
-	return toWideString(m_levelColumn->getXsheet()->getStageObject(TStageObjectId::ColumnId(idx))->getName());
+	return ::to_wstring(m_levelColumn->getXsheet()->getStageObject(TStageObjectId::ColumnId(idx))->getName());
 }
 
 //-------------------------------------------------------------------
@@ -1488,7 +1488,7 @@ std::string TLevelColumnFx::getAlias(double frame, const TRenderSettings &info) 
 	if (sl->getType() == PLI_XSHLEVEL || sl->getType() == TZP_XSHLEVEL) {
 		TPalette *palette = cell.getPalette();
 		if (palette && palette->isAnimated())
-			rdata += "animatedPlt" + toString(frame);
+			rdata += "animatedPlt" + std::to_string(frame);
 	}
 
 	if (Preferences::instance()->isIgnoreAlphaonColumn1Enabled()) {
@@ -1499,7 +1499,7 @@ std::string TLevelColumnFx::getAlias(double frame, const TRenderSettings &info) 
 			rdata += "column_0";
 	}
 
-	return getFxType() + "[" + toString(fp.getWideString()) + "," + rdata + "]";
+	return getFxType() + "[" + ::to_string(fp.getWideString()) + "," + rdata + "]";
 }
 
 //-------------------------------------------------------------------
@@ -1682,7 +1682,7 @@ std::wstring TPaletteColumnFx::getColumnName() const
 {
 	if (!m_paletteColumn)
 		return L"Col?";
-	return L"Col" + toWideString(m_paletteColumn->getIndex() + 1);
+	return L"Col" + std::to_wstring(m_paletteColumn->getIndex() + 1);
 }
 
 //-------------------------------------------------------------------
@@ -1691,7 +1691,7 @@ std::wstring TPaletteColumnFx::getColumnId() const
 {
 	if (!m_paletteColumn)
 		return L"Col?";
-	return L"Col" + toWideString(m_paletteColumn->getIndex() + 1);
+	return L"Col" + std::to_wstring(m_paletteColumn->getIndex() + 1);
 }
 
 //-------------------------------------------------------------------
@@ -1699,7 +1699,7 @@ std::wstring TPaletteColumnFx::getColumnId() const
 std::string TPaletteColumnFx::getAlias(double frame, const TRenderSettings &info) const
 {
 	TFilePath palettePath = getPalettePath(frame);
-	return "TPaletteColumnFx[" + toString(palettePath.getWideString()) + "]";
+	return "TPaletteColumnFx[" + ::to_string(palettePath.getWideString()) + "]";
 }
 
 //-------------------------------------------------------------------

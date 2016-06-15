@@ -112,7 +112,7 @@ void PosPathKeyframesUpdater::update(double &s)
 // TStageObjectSpline
 
 TStageObjectSpline::TStageObjectSpline()
-	: TSmartObject(m_classCode), m_stroke(0), m_dagNodePos(TConst::nowhere), m_id(-1), m_idBase(toString(idBaseCode++)), m_name(""), m_isOpened(false)
+	: TSmartObject(m_classCode), m_stroke(0), m_dagNodePos(TConst::nowhere), m_id(-1), m_idBase(std::to_string(idBaseCode++)), m_name(""), m_isOpened(false)
 {
 	double d = 30;
 	std::vector<TThickPoint> points;
@@ -256,7 +256,7 @@ int TStageObjectSpline::getId() const
 std::string TStageObjectSpline::getName() const
 {
 	if (m_name == "")
-		return "Path" + toString(m_id + 1);
+		return "Path" + std::to_string(m_id + 1);
 	return m_name;
 }
 

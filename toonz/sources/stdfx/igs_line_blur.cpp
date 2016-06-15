@@ -1160,7 +1160,7 @@ double calculator_geometry::get_d_radian(double d_xv, double d_yv)
 	}
 	/* 第2象限 (第1象限に置き換えて... 0 <= angle < 90) */
 	else if ((d_xv <= 0.0) && (0.0 < d_yv)) {
-		d_radian = atan(-d_xv / d_yv) + M_PI / 2.0;
+		d_radian = atan(-d_xv / d_yv) + M_PI_2;
 	}
 	/* 第3象限 (第1象限に置き換えて... 0 <= angle < 90) */
 	else if ((d_xv < 0.0) && (d_yv <= 0.0)) {
@@ -1168,7 +1168,7 @@ double calculator_geometry::get_d_radian(double d_xv, double d_yv)
 	}
 	/* 第4象限 (第1象限に置き換えて... 0 <= angle < 90) */
 	else if ((0.0 <= d_xv) && (d_yv < 0.0)) {
-		d_radian = atan(d_xv / -d_yv) + M_PI + M_PI / 2.0;
+		d_radian = atan(d_xv / -d_yv) + M_PI + M_PI_2;
 	}
 	return d_radian;
 }

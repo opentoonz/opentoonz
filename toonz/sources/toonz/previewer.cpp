@@ -314,7 +314,7 @@ void Previewer::Imp::updateCamera()
 		//All previously rendered frames must be erased
 		std::map<int, FrameInfo>::iterator it;
 		for (it = m_frames.begin(); it != m_frames.end(); ++it)
-			TImageCache::instance()->remove(m_cachePrefix + toString(it->first));
+			TImageCache::instance()->remove(m_cachePrefix + std::to_string(it->first));
 
 		m_frames.clear();
 	}
@@ -339,7 +339,7 @@ void Previewer::Imp::updateRenderSettings()
 
 		std::map<int, FrameInfo>::iterator it;
 		for (it = m_frames.begin(); it != m_frames.end(); ++it)
-			TImageCache::instance()->remove(m_cachePrefix + toString(it->first));
+			TImageCache::instance()->remove(m_cachePrefix + std::to_string(it->first));
 
 		m_frames.clear();
 	}
@@ -355,7 +355,7 @@ void Previewer::Imp::updateFrameRange()
 	std::map<int, FrameInfo>::iterator it, jt = m_frames.lower_bound(newFrameCount);
 	for (it = jt; it != m_frames.end(); ++it)
 		//Release all associated cached images
-		TImageCache::instance()->remove(m_cachePrefix + toString(it->first));
+		TImageCache::instance()->remove(m_cachePrefix + std::to_string(it->first));
 
 	m_frames.erase(jt, m_frames.end());
 
@@ -460,7 +460,7 @@ void Previewer::Imp::updateAliasKeyword(const std::string &keyword)
 			it->second.m_renderedRegion = QRegion();
 
 			//No need to release the cached image... eventually, clear it
-			TRasterImageP ri = TImageCache::instance()->get(m_cachePrefix + toString(it->first), true);
+			TRasterImageP ri = TImageCache::instance()->get(m_cachePrefix + std::to_string(it->first), true);
 			if (ri)
 				ri->getRaster()->clear();
 		}
@@ -517,7 +517,7 @@ void Previewer::Imp::refreshFrame(int frame)
 	it->second.m_renderId = m_renderer.nextRenderId();
 	std::string contextName("P");
 	contextName += m_subcamera ? "SC" : "FU";
-	contextName += ::toString(frame);
+	contextName += std::to_string(frame);
 	TPassiveCacheManager::instance()->setContextName(it->second.m_renderId, contextName);
 
 	//Start the render
@@ -536,7 +536,7 @@ void Previewer::Imp::remove(int frame)
 	}
 
 	//Remove the associated image from cache
-	TImageCache::instance()->remove(m_cachePrefix + toString(frame));
+	TImageCache::instance()->remove(m_cachePrefix + std::to_string(frame));
 }
 
 //-----------------------------------------------------------------------------
@@ -548,7 +548,7 @@ void Previewer::Imp::remove()
 	//Remove all cached images
 	std::map<int, FrameInfo>::iterator it;
 	for (it = m_frames.begin(); it != m_frames.end(); ++it)
-		TImageCache::instance()->remove(m_cachePrefix + toString(it->first));
+		TImageCache::instance()->remove(m_cachePrefix + std::to_string(it->first));
 
 	m_frames.clear();
 }
@@ -666,7 +666,7 @@ void Previewer::Imp::doOnRenderRasterCompleted(const RenderData &renderData)
 
 	//Store the rendered image in the cache - this is done in the MAIN thread due
 	//to the necessity of accessing it->second.m_rectUnderRender for raster extraction.
-	std::string str = m_cachePrefix + toString(frame);
+	std::string str = m_cachePrefix + std::to_string(frame);
 
 	TRasterImageP ri(TImageCache::instance()->get(str, true));
 	TRasterP cachedRas(ri ? ri->getRaster() : TRasterP());
@@ -859,7 +859,7 @@ bool Previewer::Imp::doSaveRenderedFrames(TFilePath fp)
 			TSystem::mkDir(parent);
 			DvDirModel::instance()->refreshFolder(parent.getParentDir());
 		} catch (TException &e) {
-			error("Cannot create " + toQString(fp.getParentDir()) + " : " + QString(toString(e.getMessage()).c_str()));
+			error("Cannot create " + toQString(fp.getParentDir()) + " : " + QString(::to_string(e.getMessage()).c_str()));
 			return false;
 		} catch (...) {
 			error("Cannot create " + toQString(fp.getParentDir()));
@@ -877,7 +877,7 @@ bool Previewer::Imp::doSaveRenderedFrames(TFilePath fp)
 	try {
 		m_lw = TLevelWriterP(fp, outputSettings->getFileFormatProperties(fp.getType()));
 	} catch (TImageException &e) {
-		error(QString::fromStdString(toString(e.getMessage())));
+		error(QString::fromStdString(::to_string(e.getMessage())));
 		return false;
 	}
 
@@ -916,7 +916,7 @@ void Previewer::Imp::saveFrame()
 			m_pbStatus[currFrameToSave] != FlipSlider::PBFrameFinished)
 			continue;
 
-		TImageP img = TImageCache::instance()->get(m_cachePrefix + toString(currFrameToSave), false);
+		TImageP img = TImageCache::instance()->get(m_cachePrefix + std::to_string(currFrameToSave), false);
 		if (!img)
 			continue;
 
@@ -935,11 +935,11 @@ void Previewer::Imp::saveFrame()
 
 	//Output the save result
 	QString str = "Saved " +
-				  QString(toString(savedFrames).c_str()) +
+				  QString(std::to_string(savedFrames).c_str()) +
 				  " frames out of " +
-				  QString(toString(frameCount).c_str()) +
+					QString(std::to_string(frameCount).c_str()) +
 				  " in " +
-				  QString(toString(m_lw->getFilePath().getWideString()).c_str());
+					QString(::to_string(m_lw->getFilePath()).c_str());
 
 	if (!Pd)
 		str = "Canceled! " + str;
@@ -1110,7 +1110,7 @@ TRasterP Previewer::getRaster(int frame, bool renderIfNeeded) const
 	if (it != m_imp->m_frames.end()) {
 		if (frame < m_imp->m_pbStatus.size()) {
 			if (m_imp->m_pbStatus[frame] == FlipSlider::PBFrameFinished || !renderIfNeeded) {
-				std::string str = m_imp->m_cachePrefix + toString(frame);
+				std::string str = m_imp->m_cachePrefix + std::to_string(frame);
 				TRasterImageP rimg = (TRasterImageP)TImageCache::instance()->get(str, false);
 				if (rimg) {
 					TRasterP ras = rimg->getRaster();
@@ -1127,7 +1127,7 @@ TRasterP Previewer::getRaster(int frame, bool renderIfNeeded) const
 		}
 
 		//Retrieve the cached image, if any
-		std::string str = m_imp->m_cachePrefix + toString(frame);
+		std::string str = m_imp->m_cachePrefix + std::to_string(frame);
 		TRasterImageP rimg = (TRasterImageP)TImageCache::instance()->get(str, false);
 		if (rimg) {
 			TRasterP ras = rimg->getRaster();
@@ -1174,7 +1174,7 @@ bool Previewer::isBusy() const
 void Previewer::onImageChange(TXshLevel *xl, const TFrameId &fid)
 {
 	TFilePath fp = xl->getPath().withFrame(fid);
-	std::string levelKeyword = toString(fp.getWideString());
+	std::string levelKeyword = ::to_string(fp);
 
 	//Inform the cache managers of level invalidation
 	if (!m_imp->m_subcamera)
@@ -1252,7 +1252,7 @@ void Previewer::updateView()
 void Previewer::onLevelChange(TXshLevel *xl)
 {
 	TFilePath fp = xl->getPath();
-	std::string levelKeyword = toString(fp.getWideString());
+	std::string levelKeyword = ::to_string(fp);
 
 	//Inform the cache managers of level invalidation
 	if (!m_imp->m_subcamera)
@@ -1274,7 +1274,7 @@ void Previewer::onLevelChanged()
 
 	std::string levelKeyword;
 	TFilePath fp = xl->getPath();
-	levelKeyword = toString(fp.withType("").getWideString());
+	levelKeyword = ::to_string(fp.withType(""));
 
 	//Inform the cache managers of level invalidation
 	if (!m_imp->m_subcamera)

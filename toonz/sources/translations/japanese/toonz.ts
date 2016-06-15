@@ -838,7 +838,7 @@ What do you want to do?</source>
     <name>CommandListTree</name>
     <message>
         <source>----Separator----</source>
-        <translation type="unfinished"></translation>
+        <translation>----セパレータ----</translation>
     </message>
 </context>
 <context>
@@ -1073,6 +1073,20 @@ What do you want to do?</source>
     <message>
         <source>Palette:</source>
         <translation>パレット :</translation>
+    </message>
+    <message>
+        <source>Append Default Palette</source>
+        <translation>デフォルトパレットを追加する</translation>
+    </message>
+    <message>
+        <source>When activated, styles of the default palette
+($TOONZSTUDIOPALETTE\cleanup_default.tpl) will 
+be appended to the palette after conversion in 
+order to save the effort of creating styles 
+before color designing.</source>
+        <translation>このオプションがONのとき、デフォルトパレット ($TOONZSTUDIOPALETTE\cleanup_default.tpl)
+のスタイルが変換後のパレットに追加されます。色見本を作成する際に、スタイルを新規作成する
+手間を省くことができます。</translation>
     </message>
 </context>
 <context>
@@ -4229,11 +4243,15 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Save All</source>
-        <translation type="unfinished"></translation>
+        <translation>シーンとレベルを全て保存 （&amp;S）</translation>
     </message>
     <message>
         <source>Toggle Edit in Place</source>
-        <translation type="unfinished"></translation>
+        <translation>親シートの内容をビューアに表示/非表示</translation>
+    </message>
+    <message>
+        <source>Refresh Folder Tree</source>
+        <translation>フォルダ構成の再読み込み</translation>
     </message>
 </context>
 <context>
@@ -4307,47 +4325,48 @@ Gaps</source>
     <name>MenuBarPopup</name>
     <message>
         <source>Customize Menu Bar of Room &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot;ワークスペースのメニューバーをカスタマイズ</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <source>%1 Menu Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 のメニューバー</translation>
     </message>
     <message>
         <source>Menu Items</source>
-        <translation type="unfinished"></translation>
+        <translation>コマンド一覧</translation>
     </message>
     <message>
         <source>N.B. If you put unique title to submenu, it may not be translated to another language.
 N.B. Duplicated commands will be ignored. Only the last one will appear in the menu bar.</source>
-        <translation type="unfinished"></translation>
+        <translation>※ サブメニューに特別な名前を付けると、他の言語での表示時にも翻訳されないことがあります。
+※ 重複したコマンドは無視され、最後に追加されたものだけがメニューバーに表示されます。</translation>
     </message>
 </context>
 <context>
     <name>MenuBarTree</name>
     <message>
         <source>Insert Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>メニューを挿入</translation>
     </message>
     <message>
         <source>Insert Submenu</source>
-        <translation type="unfinished"></translation>
+        <translation>サブメニューを挿入</translation>
     </message>
     <message>
         <source>Remove &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot;を削除</translation>
     </message>
     <message>
         <source>New Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>新規メニュー</translation>
     </message>
 </context>
 <context>
@@ -5445,7 +5464,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Show Keyframes on Cell Area</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムシートのコマ領域にキーフレームを表示</translation>
+    </message>
+    <message>
+        <source>Rooms *:</source>
+        <translation>ワークスペースレイアウト *：</translation>
     </message>
 </context>
 <context>
@@ -6997,51 +7020,55 @@ Are you sure to </source>
     </message>
     <message>
         <source>Move Keyframe</source>
-        <translation type="unfinished"></translation>
+        <translation>キーフレームを移動</translation>
     </message>
     <message>
         <source>Move keyframe handle  : %1  Handle of the keyframe %2</source>
-        <translation type="unfinished"></translation>
+        <translation>キーフレームハンドルを移動： フレーム %2 のハンドル %1</translation>
     </message>
     <message>
         <source>Toggle cycle of  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 のアニメーションの繰り返しをトグル</translation>
     </message>
     <message>
         <source>[Drag] to move position</source>
-        <translation type="unfinished"></translation>
+        <translation>[ドラッグ] 移動</translation>
     </message>
     <message>
         <source>----Separator----</source>
-        <translation type="unfinished"></translation>
+        <translation>----セパレータ----</translation>
     </message>
     <message>
         <source>[Drag] to move position, [Double Click] to edit title</source>
-        <translation type="unfinished"></translation>
+        <translation>[ドラッグ] 移動 [ダブルクリック] タイトルを編集</translation>
     </message>
     <message>
         <source>Incorrect file</source>
-        <translation type="unfinished"></translation>
+        <translation>不正なファイル</translation>
     </message>
     <message>
         <source>[Drag&amp;Drop] to copy separator to menu bar</source>
-        <translation type="unfinished"></translation>
+        <translation>[ドラッグ &amp; ドロップ] セパレータをメニューバーにコピー (&amp;D)</translation>
     </message>
     <message>
         <source>[Drag&amp;Drop] to copy command to menu bar</source>
-        <translation type="unfinished"></translation>
+        <translation>[ドラッグ &amp; ドロップ] コマンドをメニューバーにコピー (&amp;D)</translation>
     </message>
     <message>
         <source>Cannot open menubar settings template file. Re-installing Toonz will solve this problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>メニューバー設定テンプレートファイルが見つかりません： OpenToonzを再インストールすると問題が解決します。</translation>
     </message>
     <message>
         <source>Visit Web Site</source>
-        <translation type="unfinished">ウェブサイトを開く</translation>
+        <translation>ウェブサイトを開く</translation>
     </message>
     <message>
         <source>https://opentoonz.github.io/e/</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Add color model&apos;s palette to the destination palette.</source>
+        <translation>カラーモデルのパレットを、対象のパレットに追加する。</translation>
     </message>
 </context>
 <context>
@@ -7182,15 +7209,15 @@ The audio file will not be included in the rendered clip.</source>
     </message>
     <message>
         <source>Are you sure you want to remove room %1</source>
-        <translation>%1 ワークスペースを削除してもよろしいですか？</translation>
+        <translation>%1 ワークスペースを削除してもよろしいですか</translation>
     </message>
     <message>
         <source>Delete Room &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>ワークスペース&quot;%1&quot;を削除</translation>
     </message>
     <message>
         <source>Customize Menu Bar of Room &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot;ワークスペースのメニューバーをカスタマイズ</translation>
     </message>
 </context>
 <context>
@@ -8537,19 +8564,19 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Failed to load menu %1</source>
-        <translation type="unfinished"></translation>
+        <translation>メニュー %1 の読み込みに失敗しました</translation>
     </message>
     <message>
         <source>Failed to add command %1</source>
-        <translation type="unfinished"></translation>
+        <translation>コマンド %1 の追加に失敗しました</translation>
     </message>
     <message>
         <source>Cannot open menubar settings file %1</source>
-        <translation type="unfinished"></translation>
+        <translation>メニューバー設定ファイル %1 を開けませんでした</translation>
     </message>
     <message>
         <source>Failed to create menubar</source>
-        <translation type="unfinished"></translation>
+        <translation>メニューバーの作成に失敗しました</translation>
     </message>
 </context>
 <context>
@@ -8932,7 +8959,7 @@ Click the arrow button to create a new sub-xsheet</source>
     <name>TopBar</name>
     <message>
         <source>Lock Rooms Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>ワークスペースタブをロック</translation>
     </message>
 </context>
 <context>
@@ -9379,7 +9406,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Double Click to Toggle Onion Skin</source>
-        <translation type="unfinished"></translation>
+        <translation>[ダブルクリック] オニオンスキン表示/非表示</translation>
     </message>
 </context>
 <context>

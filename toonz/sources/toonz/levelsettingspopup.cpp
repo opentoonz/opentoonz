@@ -435,7 +435,7 @@ void LevelSettingsPopup::updateLevelSettings()
 
 	// name
 	if (selectedLevel) {
-		m_nameFld->setText(toString(selectedLevel->getName()).c_str());
+		m_nameFld->setText(::to_string(selectedLevel->getName()).c_str());
 		m_nameFld->setEnabled(true);
 	} else {
 		m_nameFld->setText(tr(""));
@@ -670,7 +670,7 @@ void LevelSettingsPopup::onPathChanged()
 	if (sl) {
 		QString question;
 
-		question = "The path you entered for the level " + QString(toString(sl->getName()).c_str()) +
+		question = "The path you entered for the level " + QString(::to_string(sl->getName()).c_str()) +
 				   "is already used: this may generate some conflicts in the file management.\nAre you sure you want to assign the same path to two different levels?";
 		int ret = DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"));
 		if (ret == 0 || ret == 2) {
@@ -831,7 +831,7 @@ void LevelSettingsPopup::onDpiFieldChanged()
 			j++;
 	}
 	if (i < j) {
-		dpi.x = toDouble(s.substr(i, j - i));
+		dpi.x = std::stod(s.substr(i, j - i));
 		i = j;
 		while (i < len && s[i] == ' ')
 			i++;
@@ -839,7 +839,7 @@ void LevelSettingsPopup::onDpiFieldChanged()
 			i++;
 			while (i < len && s[i] == ' ')
 				i++;
-			dpi.y = toDouble(s.substr(i));
+			dpi.y = std::stod(s.substr(i));
 		}
 	}
 

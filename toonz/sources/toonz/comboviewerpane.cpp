@@ -576,7 +576,7 @@ void ComboViewerPanel::changeWindowTitle()
 			sceneName += QString(" *");
 		name = tr("Scene: ") + sceneName;
 		if (frame >= 0)
-			name = name + tr("   ::   Frame: ") + tr(toString(frame + 1).c_str());
+			name = name + tr("   ::   Frame: ") + tr(std::to_string(frame + 1).c_str());
 		int col = app->getCurrentColumn()->getColumnIndex();
 		if (col < 0) {
 			setWindowTitle(name);

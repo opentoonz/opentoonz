@@ -38,7 +38,7 @@ int KaleidoDistorter::invMap(const TPointD &p, TPointD *results) const
 	// Build p's angular position
 	double qAngle = atan2(q.y, q.x);
 	if (qAngle < 0.0)
-		qAngle += 2.0 * TConsts::pi;
+		qAngle += 2.0 * M_PI;
 
 	assert(qAngle >= 0.0);
 
@@ -120,7 +120,7 @@ private:
 void KaleidoFx::buildSectionRect(TRectD &inRect, double angle)
 {
 	inRect.y0 = std::max(inRect.y0, 0.0);
-	if (angle <= TConsts::pi_2) {
+	if (angle <= M_PI_2) {
 		inRect.x0 = std::max(inRect.x0, 0.0);
 		inRect.y1 = std::min(inRect.y1, inRect.x1 * tan(angle));
 	}
@@ -144,7 +144,7 @@ TAffine KaleidoFx::buildInputReference(
 	const TRectD &outRect, const TRenderSettings &outInfo)
 {
 	double scale = fabs(sqrt(outInfo.m_affine.det()));
-	double angle = TConsts::pi / m_count->getValue();
+	double angle = M_PI / m_count->getValue();
 
 	inInfo.m_affine = TRotation(-m_angle->getValue(frame) - angle) *
 					  TScale(scale).place(m_center->getValue(frame), TPointD());
@@ -178,7 +178,7 @@ bool KaleidoFx::doGetBBox(double frame, TRectD &bBox, const TRenderSettings &inf
 	if (!m_input.getFx())
 		return false;
 
-	double angle = TConsts::pi / m_count->getValue();
+	double angle = M_PI / m_count->getValue();
 
 	TRenderSettings inInfo(info);
 	inInfo.m_affine = TRotation(-m_angle->getValue(frame) - angle) *
@@ -267,7 +267,7 @@ void KaleidoFx::doCompute(TTile &tile, double frame, const TRenderSettings &info
 	m_input->allocateAndCompute(inTile, inRect.getP00(), inDim, tile.getRaster(), frame, inInfo);
 
 	// Now, perform kaleido
-	double angle = TConsts::pi / m_count->getValue();
+	double angle = M_PI / m_count->getValue();
 	KaleidoDistorter distorter(angle, outRefToInRef, -inRect.getP00());
 
 	TRasterP inRas(inTile.getRaster());

@@ -57,7 +57,7 @@ double localComputeStep(const TQuadratic &quad, double pixelSize)
 
 	double A_len = norm(A);
 	if (A_len > 0)
-		step = TConsts::sqrt2 * sqrt(pixelSize / A_len);
+		step = sqrt(2 * pixelSize / A_len);
 
 	return step;
 }

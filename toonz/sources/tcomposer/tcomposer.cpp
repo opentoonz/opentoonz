@@ -238,7 +238,7 @@ QString TaskId;
 
 void tcomposerRunOutOfContMemHandler(unsigned long size)
 {
-	string msg("Run out of contiguous memory: tried to allocate " + toString(size >> 10) + " KB");
+	string msg("Run out of contiguous memory: tried to allocate " + std::to_string(size >> 10) + " KB");
 	cout << msg << endl;
 	m_userLog->error(msg);
 
@@ -277,9 +277,9 @@ bool MyMovieRenderListener::onFrameCompleted(int frame)
 	TFilePath fp = m_fp.withFrame(frame + 1);
 	string msg;
 	if (m_stereo)
-		msg = toString(fp.withName(fp.getName() + "_l").getWideString()) + " and " + toString(fp.withName(fp.getName() + "_r").getWideString()) + " computed";
+		msg = ::to_string(fp.withName(fp.getName() + "_l")) + " and " + ::to_string(fp.withName(fp.getName() + "_r")) + " computed";
 	else
-		msg = toString(fp.getWideString()) + " computed";
+		msg = ::to_string(fp) + " computed";
 	cout << msg << endl;
 	m_userLog->info(msg);
 	DVGui::info(QString::fromStdString(msg));
@@ -287,7 +287,7 @@ bool MyMovieRenderListener::onFrameCompleted(int frame)
 		try {
 			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount, m_frameCount, frame + 1, FrameDone);
 		} catch (...) {
-			msg = "Unable to connect to " + toString(FarmControllerPort) + "@" + FarmControllerName.toStdString();
+			msg = "Unable to connect to " + std::to_string(FarmControllerPort) + "@" + FarmControllerName.toStdString();
 			cout << msg;
 			m_userLog->error(msg);
 		}
@@ -304,10 +304,10 @@ bool MyMovieRenderListener::onFrameFailed(int frame, TException &e)
 {
 	TFilePath fp = m_fp.withFrame(frame + 1);
 	string msg;
-	msg = toString(fp.getWideString()) + " failed";
+	msg = ::to_string(fp) + " failed";
 
 	if (!e.getMessage().empty())
-		msg += ": " + toString(e.getMessage());
+		msg += ": " + ::to_string(e.getMessage());
 
 	cout << msg << endl;
 	m_userLog->error(msg);
@@ -315,7 +315,7 @@ bool MyMovieRenderListener::onFrameFailed(int frame, TException &e)
 		try {
 			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount, m_frameCount, frame + 1, FrameFailed);
 		} catch (...) {
-			msg = "Unable to connect to " + toString(FarmControllerPort) + "@" + FarmControllerName.toStdString();
+			msg = "Unable to connect to " + std::to_string(FarmControllerPort) + "@" + FarmControllerName.toStdString();
 			cout << msg;
 			m_userLog->error(msg);
 		}
@@ -360,14 +360,14 @@ public:
 bool MyMultimediaRenderListener::onFrameCompleted(int frame, int column)
 {
 	int actualFrame = frame + 1;
-	string msg = toString(m_fp.getWideString()) + ", column " + toString(column) + ", frame " + toString(actualFrame) + " computed";
+	string msg = ::to_string(m_fp) + ", column " + std::to_string(column) + ", frame " + std::to_string(actualFrame) + " computed";
 	cout << msg << endl;
 	m_userLog->info(msg);
 	if (FarmController) {
 		try {
 			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount, m_frameCount, actualFrame, FrameDone);
 		} catch (...) {
-			msg = "Unable to connect to " + toString(FarmControllerPort) + "@" + FarmControllerName.toStdString();
+			msg = "Unable to connect to " + std::to_string(FarmControllerPort) + "@" + FarmControllerName.toStdString();
 			cout << msg;
 			m_userLog->error(msg);
 		}
@@ -382,10 +382,10 @@ bool MyMultimediaRenderListener::onFrameCompleted(int frame, int column)
 bool MyMultimediaRenderListener::onFrameFailed(int frame, int column, TException &e)
 {
 	int actualFrame = frame + 1;
-	string msg = toString(m_fp.getWideString()) + ", column " + toString(column) + ", frame " + toString(actualFrame) + " failed";
+	string msg = ::to_string(m_fp) + ", column " + std::to_string(column) + ", frame " + std::to_string(actualFrame) + " failed";
 
 	if (!e.getMessage().empty())
-		msg += ": " + toString(e.getMessage());
+		msg += ": " + ::to_string(e.getMessage());
 
 	cout << msg << endl;
 	m_userLog->error(msg);
@@ -393,7 +393,7 @@ bool MyMultimediaRenderListener::onFrameFailed(int frame, int column, TException
 		try {
 			FarmController->taskProgress(TaskId, m_frameCompletedCount + m_frameFailedCount, m_frameCount, actualFrame, FrameFailed);
 		} catch (...) {
-			msg = "Unable to connect to " + toString(FarmControllerPort) + "@" + FarmControllerName.toStdString();
+			msg = "Unable to connect to " + std::to_string(FarmControllerPort) + "@" + FarmControllerName.toStdString();
 			cout << msg;
 			m_userLog->error(msg);
 		}
@@ -439,7 +439,7 @@ std::pair<int, int> generateMovie(ToonzScene *scene,
 		TPropertyGroup *props = scene->getProperties()->getOutputProperties()->getFileFormatProperties(ext);
 		string codecName = props->getProperty(0)->getValueAsString();
 		TDimension res = scene->getCurrentCamera()->getRes();
-		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
+		if (!AviCodecRestrictions::canWriteMovie(::to_wstring(codecName), res)) {
 			string msg("The resolution of the output camera does not fit with the options chosen for the output file format.");
 			m_userLog->error(msg);
 			exit(1);
@@ -631,9 +631,9 @@ int main(int argc, char *argv[])
 	// controllo se la xxxroot e' definita e corrisponde ad un file esistente
 	TFilePath fp = TEnv::getStuffDir();
 	if (fp == TFilePath())
-		fatalError(string("Undefined: \"") + toString(TEnv::getRootVarPath().getWideString()) + "\"");
+		fatalError(string("Undefined: \"") + ::to_string(TEnv::getRootVarPath()) + "\"");
 	if (!TFileStatus(fp).isDirectory())
-		fatalError(string("Directory \"") + toString(fp.getWideString()) + "\" not found or not readable");
+		fatalError(string("Directory \"") + ::to_string(fp) + "\" not found or not readable");
 
 	TFilePath lRootDir = fp + "toonzfarm";
 	TFilePath logFilePath = lRootDir + "tcomposer.log";
@@ -690,7 +690,7 @@ int main(int argc, char *argv[])
 		if (pos == string::npos)
 			UseRenderFarm = false;
 		else {
-			FarmControllerPort = toInt(fdata.substr(0, pos));
+			FarmControllerPort = std::stoi(fdata.substr(0, pos));
 			FarmControllerName = QString::fromStdString(fdata.substr(pos + 1));
 		}
 	}
@@ -760,12 +760,12 @@ int main(int argc, char *argv[])
 			scene->load(srcFilePath);
 			Sw2.stop();
 		} catch (TException &e) {
-			cout << toString(e.getMessage()) << endl;
-			m_userLog->error(toString(e.getMessage()));
+			cout << ::to_string(e.getMessage()) << endl;
+			m_userLog->error(::to_string(e.getMessage()));
 			return -2;
 		} catch (...) {
 			string msg;
-			msg = "There were problems loading the scene " + toString(srcFilePath.getWideString()) +
+			msg = "There were problems loading the scene " + ::to_string(srcFilePath) +
 				  ".\n Some files may be missing.";
 			cout << msg << endl;
 			m_userLog->error(msg);
@@ -878,9 +878,9 @@ int main(int argc, char *argv[])
 			maxTileSize = maxTileSizes[maxTileSizeIndex];
 		}
 
-		m_userLog->info("Threads count: " + toString(threadCount));
+		m_userLog->info("Threads count: " + std::to_string(threadCount));
 		if (maxTileSize != (std::numeric_limits<int>::max)())
-			m_userLog->info("Render tile: " + toString(maxTileSize));
+			m_userLog->info("Render tile: " + std::to_string(maxTileSize));
 
 		//Disable the Passive cache manager. It has no sense if it cannot write on disk...
 		//TCacheResourcePool::instance();   //Needs to be instanced before TPassiveCacheManager...
@@ -903,27 +903,19 @@ int main(int argc, char *argv[])
 
 		Sw1.stop();
 
-		m_userLog->info("Raster Allocation Peak: " + toString(TBigMemoryManager::instance()->getAllocationPeak()) + " KB");
-		m_userLog->info("Raster Allocation Mean: " + toString(TBigMemoryManager::instance()->getAllocationMean()) + " KB");
+		m_userLog->info("Raster Allocation Peak: " + std::to_string(TBigMemoryManager::instance()->getAllocationPeak()) + " KB");
+		m_userLog->info("Raster Allocation Mean: " + std::to_string(TBigMemoryManager::instance()->getAllocationMean()) + " KB");
 
-		msg = "Compositing completed in " + toString(Sw1.getTotalTime() / 1000.0, 2) + " seconds";
-		string msg2 = "\n" + toString(Sw2.getTotalTime() / 1000.0, 2) + " seconds spent on loading" + "\n" +
-					  toString(TStopWatch::global(0).getTotalTime() / 1000.0, 2) + " seconds spent on saving" + "\n" +
-					  toString(TStopWatch::global(8).getTotalTime() / 1000.0, 2) + " seconds spent on rendering" + "\n";
+		msg = "Compositing completed in " + ::to_string(Sw1.getTotalTime() / 1000.0, 2) + " seconds";
+		string msg2 = "\n" + ::to_string(Sw2.getTotalTime() / 1000.0, 2) + " seconds spent on loading" + "\n" +
+					  ::to_string(TStopWatch::global(0).getTotalTime() / 1000.0, 2) + " seconds spent on saving" + "\n" +
+					  ::to_string(TStopWatch::global(8).getTotalTime() / 1000.0, 2) + " seconds spent on rendering" + "\n";
 		cout << msg + msg2;
 		m_userLog->info(msg + msg2);
 		DVGui::info(QString::fromStdString(msg));
 		TImageCache::instance()->clear(true);
-		/*
-    cout << "Compositing completed in " + toString(Sw1.getTotalTime()/1000.0, 2) + " seconds";
-    cout << endl;
-    
-    cout << toString(Sw2.getTotalTime()/1000.0, 2) << " seconds spent on loading" << endl;
-    cout << toString(TStopWatch::global(0).getTotalTime()/1000.0, 2) << " seconds spent on saving" << endl;
-    cout << toString(TStopWatch::global(8).getTotalTime()/1000.0, 2) << " seconds spent on rendering" << endl;
-    cout << endl;*/
 	} catch (TException &e) {
-		msg = "Untrapped exception: " + toString(e.getMessage()),
+		msg = "Untrapped exception: " + ::to_string(e.getMessage()),
 		cout << msg << endl;
 		m_userLog->error(msg);
 		TImageCache::instance()->clear(true);

@@ -120,7 +120,7 @@ TSoundTrackP TSoundTrack::create(
 
 	default:
 		std::string s;
-		s = "Type " + toString((int)sampleRate) + " Hz " + toString(bitPerSample) + " bits ";
+		s = "Type " + std::to_string(sampleRate) + " Hz " + std::to_string(bitPerSample) + " bits ";
 		if (channelCount == 1)
 			s += "mono: ";
 		else
@@ -185,7 +185,7 @@ TSoundTrackP TSoundTrack::create(
 
 	default:
 		std::string s;
-		s = "Type " + toString((int)sampleRate) + " Hz " + toString(bitPerSample) + " bits ";
+		s = "Type " + std::to_string(sampleRate) + " Hz " + std::to_string(bitPerSample) + " bits ";
 		if (channelCount == 1)
 			s += "mono: ";
 		else

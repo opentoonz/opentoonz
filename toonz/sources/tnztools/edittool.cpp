@@ -427,7 +427,7 @@ public:
 		if (a2 < eps || b2 < eps)
 			return;
 
-		double dang = 180 * asin(cross(a, b) / sqrt(a2 * b2)) / TConsts::pi;
+		double dang = asin(cross(a, b) / sqrt(a2 * b2)) * M_180_PI;
 		setValue(getValue(0) + dang);
 	}
 };

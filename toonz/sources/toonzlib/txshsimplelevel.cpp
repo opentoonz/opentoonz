@@ -191,7 +191,7 @@ bool TXshSimpleLevel::m_fillFullColorRaster = false;
 //-----------------------------------------------------------------------------
 
 TXshSimpleLevel::TXshSimpleLevel(const std::wstring &name)
-	: TXshLevel(m_classCode, name), m_properties(new LevelProperties), m_palette(0), m_idBase(toString(idBaseCode++)), m_editableRangeUserInfo(L""), m_isSubsequence(false), m_16BitChannelLevel(false), m_isReadOnly(false), m_temporaryHookMerged(false)
+	: TXshLevel(m_classCode, name), m_properties(new LevelProperties), m_palette(0), m_idBase(std::to_string(idBaseCode++)), m_editableRangeUserInfo(L""), m_isSubsequence(false), m_16BitChannelLevel(false), m_isReadOnly(false), m_temporaryHookMerged(false)
 {
 }
 
@@ -301,7 +301,7 @@ std::wstring TXshSimpleLevel::getEditableFileName()
 	getIndexesRangefromFids(this, m_editableRange, from, to);
 	if (from == -1 && to == -1)
 		return L"";
-	fileName += L"_" + toWideString(from + 1) + L"-" + toWideString(to + 1);
+	fileName += L"_" + std::to_wstring(from + 1) + L"-" + std::to_wstring(to + 1);
 	return fileName;
 }
 
@@ -741,7 +741,7 @@ std::string TXshSimpleLevel::getIconId(const TFrameId &fid, int frameStatus) con
 
 std::string TXshSimpleLevel::getIconId(const TFrameId &fid, const TDimension &size) const
 {
-	return getImageId(fid) + ":" + toString(size.lx) + "x" + toString(size.ly);
+	return getImageId(fid) + ":" + std::to_string(size.lx) + "x" + std::to_string(size.ly);
 }
 
 //-----------------------------------------------------------------------------
@@ -767,7 +767,8 @@ TImageP buildIcon(const TImageP &img, const TDimension &size)
 	TRaster32P raster(size);
 	if (TVectorImageP vi = img) {
 		TOfflineGL *glContext = new TOfflineGL(size);
-		TDimension cameraSize(768, 576);
+		//TDimension cameraSize(768, 576);
+		TDimension cameraSize(1920, 1080);
 		TPalette *vPalette = img->getPalette();
 		assert(vPalette);
 		const TVectorRenderData rd(
@@ -967,9 +968,9 @@ void TXshSimpleLevel::loadData(TIStream &is)
 				int antialiasSoftness = 0;
 				LevelProperties::DpiPolicy dpiPolicy = LevelProperties::DP_ImageDpi;
 				if (is.getTagParam("dpix", v))
-					xdpi = toDouble(v);
+					xdpi = std::stod(v);
 				if (is.getTagParam("dpiy", v))
-					ydpi = toDouble(v);
+					ydpi = std::stod(v);
 				if (xdpi != 0 && ydpi != 0)
 					dpiPolicy = LevelProperties::DP_CustomDpi;
 				std::string dpiType = is.getTagAttribute("dpiType");
@@ -978,13 +979,13 @@ void TXshSimpleLevel::loadData(TIStream &is)
 				if (is.getTagParam("type", v) && v == "s")
 					type = TZI_XSHLEVEL;
 				if (is.getTagParam("subsampling", v))
-					subsampling = toInt(v);
+					subsampling = std::stoi(v);
 				if (is.getTagParam("premultiply", v))
-					doPremultiply = toInt(v);
+					doPremultiply = std::stoi(v);
 				if (is.getTagParam("antialias", v))
-					antialiasSoftness = toInt(v);
+					antialiasSoftness = std::stoi(v);
 				if (is.getTagParam("whiteTransp", v))
-					whiteTransp = toInt(v);
+					whiteTransp = std::stoi(v);
 
 				m_properties->setDpiPolicy(dpiPolicy);
 				m_properties->setDpi(TPointD(xdpi, ydpi));
@@ -1013,7 +1014,7 @@ void TXshSimpleLevel::loadData(TIStream &is)
 				type = OVL_XSHLEVEL;
 				m_properties->setDpi(TPointD(xdpi, ydpi));
 				setType(type);
-				setPath(TFilePath("+drawings/") + (getName() + L"." + toWideString("bmp")), true);
+				setPath(TFilePath("+drawings/") + (getName() + L"." + ::to_wstring("bmp")), true);
 			} else if (token == L"__raster") // obsoleto (Tab2.2)
 			{
 				double xdpi = 1, ydpi = 1;
@@ -1023,7 +1024,7 @@ void TXshSimpleLevel::loadData(TIStream &is)
 				type = OVL_XSHLEVEL;
 				m_properties->setDpi(TPointD(xdpi, ydpi));
 				setType(type);
-				setPath(TFilePath("+drawings/") + (getName() + L"." + toWideString(extension)), true);
+				setPath(TFilePath("+drawings/") + (getName() + L"." + ::to_wstring(extension)), true);
 			} else {
 				m_name = token;
 				setName(m_name);
@@ -1377,23 +1378,23 @@ void TXshSimpleLevel::saveData(TOStream &os)
 	if (getProperties()->getDpiPolicy() == LevelProperties::DP_CustomDpi) {
 		TPointD dpi = getProperties()->getDpi();
 		if (dpi.x != 0 && dpi.y != 0) {
-			attr["dpix"] = toString(dpi.x);
-			attr["dpiy"] = toString(dpi.y);
+			attr["dpix"] = std::to_string(dpi.x);
+			attr["dpiy"] = std::to_string(dpi.y);
 		}
 	} else {
 		attr["dpiType"] = "image";
 	}
 
 	if (getProperties()->getSubsampling() != 1) {
-		attr["subsampling"] = toString(getProperties()->getSubsampling());
+		attr["subsampling"] = std::to_string(getProperties()->getSubsampling());
 	}
 	if (getProperties()->antialiasSoftness() > 0) {
-		attr["antialias"] = toString(getProperties()->antialiasSoftness());
+		attr["antialias"] = std::to_string(getProperties()->antialiasSoftness());
 	}
 	if (getProperties()->doPremultiply()) {
-		attr["premultiply"] = toString(getProperties()->doPremultiply());
+		attr["premultiply"] = std::to_string(getProperties()->doPremultiply());
 	} else if (getProperties()->whiteTransp()) {
-		attr["whiteTransp"] = toString(getProperties()->whiteTransp());
+		attr["whiteTransp"] = std::to_string(getProperties()->whiteTransp());
 	}
 
 	if (m_type == TZI_XSHLEVEL)
@@ -1412,7 +1413,7 @@ void TXshSimpleLevel::save()
 {
 	assert(getScene());
 	TFilePath path = getScene()->decodeFilePath(m_path);
-	TSystem::outputDebug("save() : " + toString(m_path) + " = " + toString(path) + "\n");
+	TSystem::outputDebug("save() : " + ::to_string(m_path) + " = " + ::to_string(path) + "\n");
 
 	if (getProperties()->getDirtyFlag() == false &&
 		getPalette()->getDirtyFlag() == false &&
@@ -2028,20 +2029,20 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids)
 
 	{
 		for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i)
-			im->rebind(getImageId(jt->first), "^" + toString(i));
+			im->rebind(getImageId(jt->first), "^" + std::to_string(i));
 
 		for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i)
-			im->rebind("^" + toString(i), getImageId(jt->second));
+			im->rebind("^" + std::to_string(i), getImageId(jt->second));
 	}
 
 	if (getType() == PLI_XSHLEVEL) {
 		for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
 			const std::string &id = rasterized(getImageId(jt->first));
 			if (im->isBound(id))
-				im->rebind(id, rasterized("^" + toString(i)));
+				im->rebind(id, rasterized("^" + std::to_string(i)));
 		}
 		for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
-			const std::string &id = rasterized("^" + toString(i));
+			const std::string &id = rasterized("^" + std::to_string(i));
 			if (im->isBound(id))
 				im->rebind(id, rasterized(getImageId(jt->second)));
 		}
@@ -2051,10 +2052,10 @@ void TXshSimpleLevel::renumber(const std::vector<TFrameId> &fids)
 		for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
 			const std::string &id = filled(getImageId(jt->first));
 			if (im->isBound(id))
-				im->rebind(id, filled("^" + toString(i)));
+				im->rebind(id, filled("^" + std::to_string(i)));
 		}
 		for (i = 0, jt = table.begin(); jt != table.end(); ++jt, ++i) {
-			const std::string &id = filled("^" + toString(i));
+			const std::string &id = filled("^" + std::to_string(i));
 			if (im->isBound(id))
 				im->rebind(id, filled(getImageId(jt->second)));
 		}

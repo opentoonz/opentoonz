@@ -235,7 +235,7 @@ int readData(int sock, QString &data)
 	for (int i = x1; i < x2; ++i)
 		ssize.push_back(buff[i]);
 
-	int size = toInt(ssize);
+	int size = std::stoi(ssize);
 
 	data = QString(buff + x2 + sizeof("#$#THE") - 1);
 	size -= data.size();

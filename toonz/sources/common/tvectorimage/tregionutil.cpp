@@ -70,7 +70,7 @@ void print(list<Intersection> &intersectionList, char *str)
     TColorStyle* fs = it1->m_edge.m_fillStyle;
     if (fs==0)
       of<<"NO color: "<< endl;
-    else 
+    else
       {
       TFillStyleP fp = fs->getFillStyle();
       if (fp)
@@ -1413,10 +1413,10 @@ for (it=strokeList.begin(); it!=strokeList.end(); ++it)
 	TPointD curTan = getTangent(*it);
   double angle0 = getAngle(lastTan, curTan);
   double angle1 = getAngle(lastTan, tanRef);
- 
+
   if (areAlmostEqual(angle0, angle1, 1e-8))
 	  {
-		double angle = getNearAngle( it->m_edge.m_s,  it->m_edge.m_w0,  it->m_gettingOut, 
+		double angle = getNearAngle( it->m_edge.m_s,  it->m_edge.m_w0,  it->m_gettingOut,
 		                            item.m_edge.m_s, item.m_edge.m_w0, item.m_gettingOut);
     angle1 += angle; if (angle1>360) angle1-=360;
     }
@@ -1493,7 +1493,7 @@ void addBranches(IntersectionData &intData, Intersection &intersection, const ve
 	it2 = it1; it2++;
 	for (; it2!=intersection.m_strokeList.end(); ++it1, ++it2)
     {
-    if ((*it1).m_gettingOut!=(*it2).m_gettingOut &&((*it1).m_edge.m_index==jj && (*it2).m_edge.m_index==ii) || 
+    if ((*it1).m_gettingOut!=(*it2).m_gettingOut &&((*it1).m_edge.m_index==jj && (*it2).m_edge.m_index==ii) ||
 		    ((*it1).m_edge.m_index==ii && (*it2).m_edge.m_index==jj))
       {
 			IntersectedStroke& el1 = (*it1);
@@ -2022,12 +2022,11 @@ void printStrokes1(vector<VIStroke *> &v, int size)
 #ifdef _DEBUG
 static void printTime(TStopWatch &sw, string name)
 {
-	ostrstream ss;
+	ostringstream ss;
 	ss << name << " : ";
 	sw.print(ss);
 	ss << '\n' << '\0';
-	string s = ss.str();
-	ss.freeze(false);
+	string s(ss.str());
 	//TSystem::outputDebug(s);
 }
 #endif
@@ -2052,7 +2051,7 @@ int TVectorImage::Imp::computeRegions()
   for( i=0; i<n;++i) vv[i] = i;
   m_intersectionData.m_computedAlmostOnce = true;
   notifyChangedStrokes(vv,vector<TStroke*>(), false);
-  
+
   return true;
   }*/
 
@@ -2176,11 +2175,11 @@ class Branch
 			return m_next?m_next:m_intersection->m_branchList;
 			}
 	}
-	
-	 
+
+
 class Intersection
   {
-	private: 
+	private:
 	TPointD m_intersectionPoint;
   int m_intersectionCount;
   Branch *m_branchList;

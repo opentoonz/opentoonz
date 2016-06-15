@@ -119,7 +119,7 @@ void Iwa_DirectionalBlurFx::doCompute(TTile &tile,
 	}
 
 	TPointD blurVector;
-	double angle = m_angle->getValue(frame) * (TConsts::pi / 180);
+	double angle = m_angle->getValue(frame) * M_PI_180;
 	double intensity = m_intensity->getValue(frame);
 	bool bidirectional = m_bidirectional->getValue();
 
@@ -567,7 +567,7 @@ bool Iwa_DirectionalBlurFx::doGetBBox(double frame,
 		return ret;
 
 	TPointD blur;
-	double angle = m_angle->getValue(frame) * (TConsts::pi / 180);
+	double angle = m_angle->getValue(frame) * M_PI_180;
 	double intensity = m_intensity->getValue(frame);
 	bool bidirectional = m_bidirectional->getValue();
 

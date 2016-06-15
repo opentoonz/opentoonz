@@ -750,7 +750,7 @@ public:
 	void addPrimitive(Primitive *p)
 	{
 		// TODO: aggiungere il controllo per evitare nomi ripetuti
-		std::wstring name = toWideString(p->getName());
+		std::wstring name = ::to_wstring(p->getName());
 		//wstring name = TStringTable::translate(p->getName());
 
 		m_primitiveTable[name] = p;
@@ -838,9 +838,9 @@ public:
 			m_param.m_selective.setValue(GeometricSelective ? 1 : 0);
 			m_param.m_autogroup.setValue(GeometricGroupIt ? 1 : 0);
 			m_param.m_autofill.setValue(GeometricAutofill ? 1 : 0);
-			std::wstring typeCode = toWideString((GeometricType.getValue()));
+			std::wstring typeCode = ::to_wstring(GeometricType.getValue());
 			m_param.m_type.setValue(typeCode);
-			GeometricType = toString(typeCode);
+			GeometricType = ::to_string(typeCode);
 			m_typeCode = typeCode;
 			changeType(typeCode);
 			m_param.m_edgeCount.setValue(GeometricEdgeCount);
@@ -900,7 +900,7 @@ public:
 				GeometricSize = m_param.m_toolSize.getValue();
 		} else if (propertyName == m_param.m_type.getName()) {
 			std::wstring typeCode = m_param.m_type.getValue();
-			GeometricType = toString(typeCode);
+			GeometricType = ::to_string(typeCode);
 			if (typeCode != m_typeCode) {
 				m_typeCode = typeCode;
 				changeType(typeCode);
@@ -1116,7 +1116,7 @@ void RectanglePrimitive::leftButtonDrag(const TPointD &realPos, const TMouseEven
 
 	TPointD pos;
 	if (e.isShiftPressed()) {
-		double distance = tdistance(realPos, m_startPoint) / TConsts::sqrt2;
+		double distance = tdistance(realPos, m_startPoint) * M_SQRT1_2;
 		pos.x = (realPos.x > m_startPoint.x) ? m_startPoint.x + distance
 											 : m_startPoint.x - distance;
 		pos.y = (realPos.y > m_startPoint.y) ? m_startPoint.y + distance
@@ -1845,7 +1845,7 @@ void EllipsePrimitive::leftButtonDrag(const TPointD &realPos, const TMouseEvent 
 
 	TPointD pos;
 	if (e.isShiftPressed()) {
-		double distance = tdistance(realPos, m_startPoint) / TConsts::sqrt2;
+		double distance = tdistance(realPos, m_startPoint) * M_SQRT1_2;
 		pos.x = (realPos.x > m_startPoint.x) ? m_startPoint.x + distance : m_startPoint.x - distance;
 		pos.y = (realPos.y > m_startPoint.y) ? m_startPoint.y + distance : m_startPoint.y - distance;
 	} else {
@@ -2082,12 +2082,12 @@ void PolygonPrimitive::draw()
 		return;
 	tglColor(m_isEditing ? m_color : TPixel32::Green);
 
-	int edgeCount = atoi(toString(m_param->m_edgeCount.getValue()).c_str());
+	int edgeCount = m_param->m_edgeCount.getValue();
 	if (edgeCount == 0)
 		return;
 
-	double angleDiff = TConsts::pi * 2.0 / edgeCount;
-	double angle = (3 * TConsts::pi + angleDiff) * 0.5;
+	double angleDiff = M_2PI / edgeCount;
+	double angle = (3 * M_PI + angleDiff) * 0.5;
 
 	glBegin(GL_LINE_LOOP);
 	for (int i = 0; i < edgeCount; i++) {
@@ -2141,12 +2141,12 @@ TStroke *PolygonPrimitive::makeStroke() const
 {
 	double thick = getThickness();
 
-	int edgeCount = atoi(toString(m_param->m_edgeCount.getValue()).c_str());
+	int edgeCount = m_param->m_edgeCount.getValue();
 	if (edgeCount == 0)
 		return 0;
 
-	double angleDiff = TConsts::pi * 2.0 / (double)edgeCount;
-	double angle = (3 * TConsts::pi + angleDiff) * 0.5;
+	double angleDiff = M_2PI / (double)edgeCount;
+	double angle = (3 * M_PI + angleDiff) * 0.5;
 
 	TStroke *stroke = 0;
 	if (m_param->m_targetType & TTool::Vectors) {

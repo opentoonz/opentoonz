@@ -1218,7 +1218,7 @@ void StageSchematicNodeDock::onModifyHandle(int increase)
 
 	int index;
 	if (handle[0] == 'H' && handle.length()>1)
-		index = -(toInt(handle.substr(1)));
+		index = -(std::stoi(handle.substr(1)));
 	else
 		index = handle[0] - 'A';
 	index += -increase;//==1 ? -1 : 1;
@@ -1227,7 +1227,7 @@ void StageSchematicNodeDock::onModifyHandle(int increase)
 	index = tcrop(index, min, 25);
 
 	if (index >= 0) handle = std::string(1, (char)('A' + index));
-	else handle = "H" + toString(-index);
+	else handle = "H" + std::to_string(-index);
 
 	if (m_isParentPort)
 		TStageObjectCmd::setHandle(getNode()->getStageObject()->getId(), handle, stageScene->getXsheetHandle());

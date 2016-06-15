@@ -51,7 +51,7 @@ using namespace std;
 
 inline ostream &operator<<(ostream &out, const wstring &w)
 {
-	return out << toString(w);
+	return out << ::to_string(w);
 }
 
 //------------------------------------------------------------------------
@@ -413,7 +413,7 @@ void cleanupLevel(TXshSimpleLevel *xl, std::set<TFrameId> fidsInXsheet,
 	TFilePath fp = scene->decodeFilePath(xl->getPath());
 	TSystem::touchParentDir(fp);
 	cout << "cleanupping " << xl->getName() << " path=" << fp << endl;
-	string info = "cleanupping " + toString(xl->getPath());
+	string info = "cleanupping " + ::to_string(xl->getPath());
 	LevelUpdater updater(xl);
 	m_userLog.info(info);
 	DVGui::info(QString::fromStdString(info));
@@ -539,9 +539,9 @@ int main(int argc, char *argv[])
 
 	TFilePath fproot = TEnv::getStuffDir();
 	if (fproot == TFilePath())
-		fatalError(string("Undefined: \"") + toString(TEnv::getRootVarPath().getWideString()) + "\"");
+		fatalError(string("Undefined: \"") + ::to_string(TEnv::getRootVarPath()) + "\"");
 	if (!TFileStatus(fproot).isDirectory())
-		fatalError(string("Directory \"") + toString(fproot.getWideString()) + "\" not found or not readable");
+		fatalError(string("Directory \"") + ::to_string(fproot) + "\" not found or not readable");
 
 	TFilePath lRootDir = TEnv::getStuffDir() + "toonzfarm";
 	TFilePath logFilePath = lRootDir + "tcleanup.log";
@@ -586,7 +586,7 @@ int main(int argc, char *argv[])
 		if (pos == string::npos)
 			UseRenderFarm = false;
 		else {
-			FarmControllerPort = toInt(fdata.substr(0, pos));
+			FarmControllerPort = std::stoi(fdata.substr(0, pos));
 			FarmControllerName = fdata.substr(pos + 1);
 		}
 	}

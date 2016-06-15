@@ -534,7 +534,7 @@ void RGBPickerTool::pickStroke()
 bool RGBPickerTool::onPropertyChanged(std::string propertyName)
 {
 	if (propertyName == m_pickType.getName())
-		PickVectorType = toString(m_pickType.getValue());
+		PickVectorType = ::to_string(m_pickType.getValue());
 	else if (propertyName == m_passivePick.getName())
 		PickPassive = m_passivePick.getValue();
 	return true;
@@ -545,7 +545,7 @@ bool RGBPickerTool::onPropertyChanged(std::string propertyName)
 void RGBPickerTool::onActivate()
 {
 	if (m_firstTime) {
-		m_pickType.setValue(toWideString((PickVectorType.getValue())));
+		m_pickType.setValue(::to_wstring(PickVectorType.getValue()));
 		m_passivePick.setValue(PickPassive ? 1 : 0);
 		m_firstTime = false;
 	}

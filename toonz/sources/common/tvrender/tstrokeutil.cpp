@@ -188,7 +188,7 @@ void detectEdges(const std::vector<TPointD> &pointArray, std::vector<UINT> &edge
 	const double dMin2 = dMin * dMin;
 	const double dMax2 = dMax * dMax;
 	std::vector<double> sharpnessArray;
-	sharpnessArray.push_back(TConsts::pi); //  il primo punto e' un corner
+	sharpnessArray.push_back(M_PI); //  il primo punto e' un corner
 	int nodeCount;
 	for (nodeCount = 1; nodeCount < size - 1; ++nodeCount) { //  scorre la sharpPointArray escludendo gli estremi
 		sharpnessArray.push_back(0);
@@ -219,7 +219,7 @@ void detectEdges(const std::vector<TPointD> &pointArray, std::vector<UINT> &edge
 				if (alpha > alphaMax)
 					continue;
 
-				double sharpness = TConsts::pi - alpha;
+				double sharpness = M_PI - alpha;
 
 				if (sharpnessArray[nodeCount] < sharpness)
 					sharpnessArray[nodeCount] = sharpness;

@@ -57,7 +57,7 @@ struct bowlPotential {
 		if (radiusToTest > m_radiusOuter)
 			return 0.0;
 
-		return 0.5 * (1.0 + cos((radiusToTest - m_radiusInner) / (m_radiusOuter - m_radiusInner) * TConsts::pi));
+		return 0.5 * (1.0 + cos((radiusToTest - m_radiusInner) / (m_radiusOuter - m_radiusInner) * M_PI));
 	}
 
 	virtual double gradient(double radiusToTest)
@@ -66,7 +66,7 @@ struct bowlPotential {
 		if (radiusToTest <= m_radiusInner || radiusToTest > m_radiusOuter)
 			return 0.0;
 
-		double den = TConsts::pi / (m_radiusOuter - m_radiusInner);
+		double den = M_PI / (m_radiusOuter - m_radiusInner);
 
 		return -0.5 * den * sin(den * (radiusToTest - m_radiusInner));
 	}
@@ -542,7 +542,7 @@ double TStrokeBenderDeformation::getDelta(const TStroke &s, double w) const
 	double totalLenght = s.getLength();
 
 	if (totalLenght != 0) {
-		double val = s.getLength(w) / totalLenght * TConsts::pi * 10.0;
+		double val = s.getLength(w) / totalLenght * (M_PI * 10.0);
 
 		return sin(val);
 	}
@@ -598,7 +598,7 @@ double TStrokeTwirlDeformation::getDelta(const TStroke &stroke, double s) const
     
     if(totalLenght != 0)
     {
-      double val =  stroke.getLength(s)/totalLenght * TConsts::pi *11.0;
+      double val =  stroke.getLength(s)/totalLenght * (M_PI * 11.0);
       
       return sin(val);
     }

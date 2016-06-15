@@ -147,7 +147,7 @@ TFilePath duplicate(const TFilePath &levelPath)
 		return TFilePath();
 	}
 
-	NameBuilder *nameBuilder = NameBuilder::getBuilder(toWideString(levelPath.getName()));
+	NameBuilder *nameBuilder = NameBuilder::getBuilder(::to_wstring(levelPath.getName()));
 	std::wstring levelNameOut;
 	do
 		levelNameOut = nameBuilder->getNext();
@@ -610,10 +610,8 @@ void convert(const TFilePath &source, const TFilePath &dest,
 		res.ly = info->m_ly;
 
 		std::string codecName = prop->getProperty(0)->getValueAsString();
-		if (!AviCodecRestrictions::canWriteMovie(toWideString(codecName), res)) {
+		if (!AviCodecRestrictions::canWriteMovie(::to_wstring(codecName), res)) {
 			return;
-			//QString msg=QObject::tr("The image resolution does not fit the chosen output file format.");
-			//DVGui::MsgBox(DVGui::WARNING,msg);
 		}
 	}
 #endif

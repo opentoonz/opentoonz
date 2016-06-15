@@ -14,6 +14,7 @@
 
 #include <string>
 #include <map>
+#include <sstream>
 
 #include <QString>
 #include <QProcess>
@@ -128,14 +129,6 @@ TFilePath getLocalRoot()
 }
 
 //--------------------------------------------------------------------
-/*
-TFilePath getAppsCfgFilePath()
-{
-  TFilePath appsRoot = getLocalRoot();
-  return appsRoot + "config" + "apppath.cfg";
-}
-*/
-//--------------------------------------------------------------------
 
 TFilePath getBinRoot()
 {
@@ -147,19 +140,6 @@ TFilePath getBinRoot()
 }
 
 //--------------------------------------------------------------------
-/*
-string myGetHostName()
-{
-#ifdef _WIN32
-  return TSystem::getHostName();
-#else
-  char hostName[MAXHOSTNAMELEN];
-  gethostname((char*)&hostName, MAXHOSTNAMELEN);
-  return hostName;
-#endif
-}
-*/
-//--------------------------------------------------------------------
 
 bool dirExists(const TFilePath &dirFp)
 {
@@ -168,7 +148,7 @@ bool dirExists(const TFilePath &dirFp)
 	TFileStatus fs(dirFp);
 	exists = fs.isDirectory();
 #else
-	int acc = access(toString(dirFp.getWideString()).c_str(), 00); // 00 == solo esistenza
+	int acc = access(::to_string(dirFp).c_str(), 00); // 00 == solo esistenza
 	exists = acc != -1;
 #endif
 	return exists;
@@ -183,7 +163,7 @@ bool myDoesExists(const TFilePath &fp)
 	TFileStatus fs(fp);
 	exists = fs.doesExist();
 #else
-	int acc = access(toString(fp.getWideString()).c_str(), 00); // 00 == solo esistenza
+	int acc = access(::to_string(fp).c_str(), 00); // 00 == solo esistenza
 	exists = acc != -1;
 #endif
 	return exists;
@@ -515,39 +495,9 @@ FarmServer::~FarmServer()
 }
 
 //------------------------------------------------------------------------------
-
-inline std::string toString(unsigned long value)
-{
-	std::ostrstream ss;
-	ss << value << '\0';
-	std::string s = ss.str();
-	ss.freeze(false);
-	return s;
-}
-
-//------------------------------------------------------------------------------
-/*
-void FarmServer::setAppPaths(const vector<TFilePath> &appPaths)
-{
-  m_appPaths = appPaths;
-}
-*/
-//------------------------------------------------------------------------------
 QString FarmServer::execute(const vector<QString> &argv)
 {
-	/*
-#ifdef _DEBUG
-  std::cout << endl << "executing " << argv[0].c_str() << endl << endl;
-#endif
-*/
-
 	if (argv.size() > 0) {
-		/*
-#ifdef _DEBUG
-    for (int i=0; i<argv.size(); ++i)
-      std::cout << argv[i] << " ";
-#endif
-*/
 		if (argv[0] == "addTask" && argv.size() == 3) {
 			//assert(!"Da fare");
 			int ret = addTask(argv[1], argv[2]);
@@ -790,7 +740,7 @@ bool loadServerData(const QString &hostname, QString &addr, int &port)
 	TFilePath fp = rootDir + "config" + "servers.txt";
 
 #ifndef _WIN32
-	int acc = access(toString(fp.getWideString()).c_str(), 00); // 00 == solo esistenza
+	int acc = access(::to_string(fp).c_str(), 00); // 00 == solo esistenza
 	bool fileExists = acc != -1;
 	if (!fileExists)
 		return false;
@@ -800,26 +750,22 @@ bool loadServerData(const QString &hostname, QString &addr, int &port)
 	if (!is.good())
 		return false;
 	while (!is.eof()) {
-		/*
-    char line[256];
-    is.getline(line, 256);
-    */
 		std::string line = getLine(is);
-		std::istrstream iss(line.c_str());
+		std::istringstream iss(line);
 
-		char name[80];
-		char ipAddress[80];
+		std::string name;
+		std::string ipAddress;
 
 		iss >> name >> ipAddress >> port;
 		if (name[0] == '#')
 			continue;
 #if QT_VERSION >= 0x050500
-		if (STRICMP(hostname.toUtf8(), name) == 0)
+		if (STRICMP(hostname.toUtf8(), name.c_str()) == 0)
 #else
-		if (STRICMP(hostname.toAscii(), name) == 0)
+		if (STRICMP(hostname.toAscii(), name.c_str()) == 0)
 #endif
 		{
-			addr = QString(ipAddress);
+			addr = QString(ipAddress.c_str());
 			return true;
 		}
 	}
@@ -859,7 +805,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	}
 
 	TFilePath gRootDir = getGlobalRoot();
-	if (toString(gRootDir.getWideString()) == "") {
+	if (::to_string(gRootDir) == "") {
 		std::string errMsg("Unable to get TFARMGLOBALROOT environment variable");
 		addToMessageLog(errMsg);
 
@@ -877,7 +823,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	if (!gRootDirExists) {
 		std::string errMsg("Unable to start the Server");
 		errMsg += "\n";
-		errMsg += "The directory " + toString(gRootDir.getWideString()) + " specified as Global Root does not exist";
+		errMsg += "The directory " + ::to_string(gRootDir) + " specified as Global Root does not exist";
 		;
 
 		addToMessageLog(errMsg);
@@ -902,7 +848,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	} catch (TException &e) {
 		std::string errMsg("Unable to start the Server");
 		errMsg += "\n";
-		errMsg += toString(e.getMessage());
+		errMsg += ::to_string(e.getMessage());
 		addToMessageLog(errMsg);
 		setStatus(TService::Stopped, NO_ERROR, 0); // exit the program
 	}
@@ -946,7 +892,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 
 	try {
 		m_farmServer->getController()->attachServer(TSystem::getHostName(), m_addr, m_port);
-	} catch (TException & /*e*/) {
+	} catch (TException const&) {
 	}
 
 #ifdef _WIN32
@@ -965,24 +911,6 @@ void FarmServerService::onStart(int argc, char *argv[])
 	// Per tutti i programmi il cui path non e' contenuto nel file di configurazione
 	// si assume che il path del folder del programma sia specificato
 	// nella variabile di sistema PATH
-
-	/*
-  vector<TFilePath> appPaths;
-  TFilePath appsCfgFile = getAppsCfgFilePath();
-
-  Tifstream isAppCfgFile(appsCfgFile);
-  if (!isAppCfgFile.good())
-    std::cout << "Error: " << appsCfgFile << endl;
-  while (!isAppCfgFile.eof())
-  {
-    std::string line = getLine(isAppCfgFile);
-    istrstream iss(line.c_str());
-    TFilePath appPath = TFilePath(line);
-    appPaths.push_back(appPath);
-  }
-
-  m_farmServer->setAppPaths(appPaths);
-  */
 
 	QEventLoop eventLoop;
 
@@ -1033,7 +961,7 @@ void FarmServerService::onStart(int argc, char *argv[])
 	}
 
 	std::string msg("Exiting with code ");
-	msg += toString(ret);
+	msg += std::to_string(ret);
 	msg += "\n";
 	m_userLog->info(QString::fromStdString(msg));
 }
@@ -1071,7 +999,7 @@ void FarmServerService::loadDiskMountingPoints(const TFilePath &fp)
 {
 	Tifstream is(fp);
 	if (!is)
-		throw std::string("File " + toString(fp.getWideString()) + " not found");
+		throw std::string("File " + ::to_string(fp) + " not found");
 	char buffer[1024];
 	while (is.getline(buffer, sizeof(buffer))) {
 		char *s = buffer;

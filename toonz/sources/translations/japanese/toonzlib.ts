@@ -328,6 +328,10 @@
         <source>Move Center   %1  Frame %2</source>
         <translation>センター位置を移動   %1  フレーム %2</translation>
     </message>
+    <message>
+        <source>color model</source>
+        <translation>カラーモデル</translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>

@@ -59,7 +59,7 @@ TProperty *TDoubleParamRelayProperty::clone() const
 
 std::string TDoubleParamRelayProperty::getValueAsString()
 {
-	return m_param ? toString(m_param->getValue(m_frame)) : "";
+	return m_param ? std::to_string(m_param->getValue(m_frame)) : "";
 }
 
 //-------------------------------------------------------------------

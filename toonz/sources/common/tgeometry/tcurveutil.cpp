@@ -513,7 +513,7 @@ double computeStep(const TQuadratic &quad, double pixelSize)
   */
 
 	if (A_len > 0)
-		step = TConsts::sqrt2 * sqrt(pixelSize / A_len);
+		step = sqrt(2 * pixelSize / A_len);
 
 	return step;
 }

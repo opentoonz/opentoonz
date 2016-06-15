@@ -33,7 +33,7 @@ void TDoubleKeyframe::saveData(TOStream &os) const
 	if (!m_linkedHandles)
 		attr["lnk"] = "no";
 	if (m_step > 1)
-		attr["step"] = toString(m_step);
+		attr["step"] = std::to_string(m_step);
 	os.openChild(typeCodes[m_type], attr);
 	switch (m_prevType) {
 	case Linear:

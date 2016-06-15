@@ -289,11 +289,10 @@ TINT64 TSystem::getDiskSize(const TFilePath &diskName)
 	}
 #ifndef _WIN32
 	struct statfs buf;
-	wstring str_diskname = diskName.getWideString();
 #ifdef __sgi
-	statfs(toString(str_diskname).c_str(), &buf, sizeof(struct statfs), 0);
+	statfs(::to_string(diskName).c_str(), &buf, sizeof(struct statfs), 0);
 #else
-	statfs(toString(str_diskname).c_str(), &buf);
+	statfs(::to_string(diskName).c_str(), &buf);
 #endif
 	size = (TINT64)((buf.f_blocks * buf.f_bsize) >> 10);
 #else
@@ -329,11 +328,10 @@ TINT64 TSystem::getFreeDiskSize(const TFilePath &diskName)
 	}
 #ifndef _WIN32
 	struct statfs buf;
-	wstring str_diskname = diskName.getWideString();
 #ifdef __sgi
-	statfs(str_diskname.c_str(), &buf, sizeof(struct statfs), 0);
+	statfs(diskName.getWideString().c_str(), &buf, sizeof(struct statfs), 0);
 #else
-	statfs(toString(str_diskname).c_str(), &buf);
+	statfs(::to_string(diskName).c_str(), &buf);
 #endif
 	size = (TINT64)(buf.f_bfree * buf.f_bsize) >> 10;
 #else
@@ -450,7 +448,7 @@ void TSystem::moveFileToRecycleBin(const TFilePath &fp)
 		return;
 	}
 	//TFilePath dest = TFilePath(path)+(fp.getName()+fp.getDottedType());
-	string fullNameWithExt = toString(fp.getWideString());
+	string fullNameWithExt = ::to_string(fp);
 	int i = fullNameWithExt.rfind("/");
 	string nameWithExt = fullNameWithExt.substr(i + 1);
 	TFilePath dest = TFilePath((char *)path) + nameWithExt;
@@ -517,11 +515,10 @@ void TSystem::touchFile(const TFilePath &path)
 	// string filename = path.getFullPath();
 	if (TFileStatus(path).doesExist()) {
 		int ret;
-#if defined(MACOSX) || defined(LINUX)
-		wstring str_file = path.getWideString();
-		ret = utimes(toString(str_file).c_str(), 0);
-#else
+#ifdef _WIN32
 		ret = _wutime(path.getWideString().c_str(), 0);
+#else
+		ret = utimes(::to_string(path).c_str(), 0);
 #endif
 		if (0 != ret)
 			throw TSystemException(path, errno);

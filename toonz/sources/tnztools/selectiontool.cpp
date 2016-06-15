@@ -502,7 +502,7 @@ void DragSelectionTool::Rotation::leftButtonDrag(const TPointD &pos, const TMous
 	double scale = 1;
 	if (a2 <= epsilon || b2 <= epsilon)
 		return;
-	dang = -180 * asin(cross(a, b) / sqrt(a2 * b2)) / TConsts::pi;
+	dang = asin(cross(a, b) / sqrt(a2 * b2)) * -M_180_PI;
 	if (e.isShiftPressed()) {
 		m_dstAng += dang;
 		double ang = tfloor((int)(m_dstAng + 22.5), 45);
@@ -1260,7 +1260,7 @@ void SelectionTool::drawCommandHandle(const TImage *image)
 void SelectionTool::onActivate()
 {
 	if (m_firstTime) {
-		m_strokeSelectionType.setValue(toWideString(SelectionType.getValue()));
+		m_strokeSelectionType.setValue(::to_wstring(SelectionType.getValue()));
 		m_firstTime = false;
 	}
 	if (isLevelType() || isSelectedFramesType())
@@ -1293,7 +1293,7 @@ void SelectionTool::onSelectionChanged()
 bool SelectionTool::onPropertyChanged(std::string propertyName)
 {
 	if (propertyName == m_strokeSelectionType.getName()) {
-		SelectionType = toString(m_strokeSelectionType.getValue());
+		SelectionType = ::to_string(m_strokeSelectionType.getValue());
 		return true;
 	}
 	return false;

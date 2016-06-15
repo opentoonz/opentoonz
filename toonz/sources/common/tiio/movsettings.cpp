@@ -126,12 +126,12 @@ void visitAtoms(const QTAtomContainer &atoms, const QTAtom &parent, TPropertyGro
 					while ((i + 1) < size && atomData[i + 1] == 0)
 						i++, count++;
 					if (count > 1) {
-						num = toString(count);
+						num = std::to_string(count);
 						strapp = strapp + "z " + num + " ";
 						continue;
 					}
 				}
-				num = toString(atomData[i]);
+				num = std::to_string(atomData[i]);
 
 				strapp = strapp + string(num) + " ";
 			}
@@ -141,7 +141,7 @@ void visitAtoms(const QTAtomContainer &atoms, const QTAtom &parent, TPropertyGro
 			//for (i=0; i<size; i++)
 			//  buffer[i] = atomData[i]+1;
 
-			wstring data = toWideString(strapp);
+			wstring data = ::to_wstring(strapp);
 
 			pg.add(new TStringProperty(str, data));
 		}
@@ -219,7 +219,7 @@ void visitprops(TPropertyGroup &pg, int &index, QTAtomContainer &atoms, QTAtom p
 		QTAtom newAtom;
 		if (sonCount == 0) {
 			wstring appow = p->getValue();
-			string appo = toString(appow);
+			string appo = ::to_string(appow);
 			const char *str = appo.c_str();
 
 			vector<UCHAR> buf;

@@ -239,7 +239,7 @@ void RenderController::generateMovie(TFilePath outPath, bool emitSignal)
 					break;
 			}
 		}
-	} catch (TException &e) {
+	} catch (TException const&) {
 		QString msg;
 		msg = QObject::tr("There were problems loading the scene %1.\n Some files may be missing.").arg(QString::fromStdWString(fp.getWideString()));
 

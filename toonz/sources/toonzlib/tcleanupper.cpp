@@ -471,8 +471,8 @@ bool TCleanupper::getResampleValues(const TRasterImageP &image, TAffine &aff, do
 
 	// Build the image transform as deduced by the autocenter
 	if (m_parameters->m_autocenterType == AUTOCENTER_CTR && skew) {
-		pre_aff.a11 = cos(skew * TConsts::pi_180);
-		pre_aff.a21 = sin(skew * TConsts::pi_180);
+		pre_aff.a11 = cos(skew * M_PI_180);
+		pre_aff.a21 = sin(skew * M_PI_180);
 	}
 
 	aff = (TScale(scalex, scaley) * pre_aff) * TRotation(angle);
@@ -807,8 +807,8 @@ TRasterImageP TCleanupper::autocenterOnly(
 		autocentered = true;
 
 	if (m_parameters->m_autocenterType == AUTOCENTER_CTR && skew) {
-		aff.a11 = cos(skew * TConsts::pi_180);
-		aff.a21 = sin(skew * TConsts::pi_180);
+		aff.a11 = cos(skew * M_PI_180);
+		aff.a21 = sin(skew * M_PI_180);
 	}
 
 	aff = aff * TRotation(angle);
@@ -960,7 +960,7 @@ bool TCleanupper::doAutocenter(
 				&angle, &cx, &cy, &fdg_info.dots[0], fdg_info.dots.size())) {
 			return false;
 		} else {
-			angle *= TConsts::invOf_pi_180;
+			angle *= M_180_PI;
 			cxin = cx;
 			cyin = cy;
 			double dist = (double)mmToPixel(fdg_info.dist_ctr_to_ctr_hole, xdpi * scalex);

@@ -88,4 +88,6 @@ Anamorphic Un-squeezed 2K, 1828x778, 2.35
 
 Anamorphic Un-squeezed 4K, 3656x1556, 2.35
 
+DCI 2K, 2048x1080, 256/135
 
+DCI 4K, 4096x2160, 256/135

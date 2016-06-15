@@ -100,12 +100,12 @@ std::string TGeometryFx::getAlias(double frame, const TRenderSettings &info) con
 	}
 
 	return alias +
-		   (areAlmostEqual(affine.a11, 0) ? "0" : ::toString(affine.a11, 5)) + "," +
-		   (areAlmostEqual(affine.a12, 0) ? "0" : ::toString(affine.a12, 5)) + "," +
-		   (areAlmostEqual(affine.a13, 0) ? "0" : ::toString(affine.a13, 5)) + "," +
-		   (areAlmostEqual(affine.a21, 0) ? "0" : ::toString(affine.a21, 5)) + "," +
-		   (areAlmostEqual(affine.a22, 0) ? "0" : ::toString(affine.a22, 5)) + "," +
-		   (areAlmostEqual(affine.a23, 0) ? "0" : ::toString(affine.a23, 5)) + "]";
+		   (areAlmostEqual(affine.a11, 0) ? "0" : ::to_string(affine.a11, 5)) + "," +
+		   (areAlmostEqual(affine.a12, 0) ? "0" : ::to_string(affine.a12, 5)) + "," +
+		   (areAlmostEqual(affine.a13, 0) ? "0" : ::to_string(affine.a13, 5)) + "," +
+		   (areAlmostEqual(affine.a21, 0) ? "0" : ::to_string(affine.a21, 5)) + "," +
+		   (areAlmostEqual(affine.a22, 0) ? "0" : ::to_string(affine.a22, 5)) + "," +
+		   (areAlmostEqual(affine.a23, 0) ? "0" : ::to_string(affine.a23, 5)) + "]";
 }
 
 //--------------------------------------------------

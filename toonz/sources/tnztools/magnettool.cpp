@@ -60,7 +60,7 @@ inline  double computeStep(const TQuadratic& quad, double invOfPixelSize)
   
   TPointD A = quad.getP0() - 2.0*quad.getP1() + quad.getP2(); // 2*A is the acceleration of the curve
   double  A_len = norm(A);
-  if (A_len > 0)  step = TConsts::sqrt2 * sqrt(invOfPixelSize/A_len); 
+  if (A_len > 0)  step = sqrt(2 * invOfPixelSize / A_len); 
   
   return  step;
 }

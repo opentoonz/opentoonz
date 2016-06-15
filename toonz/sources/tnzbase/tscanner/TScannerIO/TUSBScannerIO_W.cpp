@@ -5,6 +5,8 @@
 
 #include <windows.h>
 
+#include <strstream>
+
 class TUSBScannerIOPD
 {
 public:

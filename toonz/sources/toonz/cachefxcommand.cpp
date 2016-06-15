@@ -288,7 +288,7 @@ void buildNodeTreeDescription(std::string &desc, const TFxP &root)
 		}
 	}
 
-	desc += ::toString(root->getIdentifier()) + ";";
+	desc += std::to_string(root->getIdentifier()) + ";";
 
 	unsigned int count = root->getInputPortCount();
 	for (unsigned int i = 0; i < count; ++i)

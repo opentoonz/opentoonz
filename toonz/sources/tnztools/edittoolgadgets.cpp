@@ -570,7 +570,7 @@ void AngleFxGadget::leftButtonDrag(const TPointD &pos, const TMouseEvent &)
 {
 	TPointD d = pos - m_pos;
 	double phi = atan2(d.y, d.x);
-	setValue(m_param, TConsts::invOf_pi_180 * phi);
+	setValue(m_param, phi * M_180_PI);
 }
 
 //---------------------------------------------------------------------------
@@ -883,7 +883,7 @@ public:
 		glPopName();
 
 		if (isSelected()) {
-			double phiRad = TConsts::pi_180 * phi;
+			double phiRad = phi * M_PI_180;
 			TPointD toolTipPos = m_pos + r * TPointD(cos(phiRad), sin(phiRad));
 			drawTooltip(toolTipPos, getLabel());
 		}
@@ -895,7 +895,7 @@ public:
 		TPointD d = pos - m_pos;
 		double phi = atan2(d.y, d.x);
 		double length = norm(d);
-		setValue(m_phiParam, TConsts::invOf_pi_180 * phi);
+		setValue(m_phiParam, phi * M_180_PI);
 		setValue(m_lengthParam, length);
 	}
 	void leftButtonUp(const TPointD &pos, const TMouseEvent &) {}

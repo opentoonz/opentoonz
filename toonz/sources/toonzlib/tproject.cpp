@@ -505,7 +505,7 @@ wstring TProject::getFolderNameFromPath(const TFilePath &folderDir)
 	if (index < 0)
 		return L"";
 	if (getFolder(index).isAbsolute())
-		return toWideString("+" + getFolderName(index));
+		return ::to_wstring("+" + getFolderName(index));
 	else
 		return folderDir.getWideName();
 }
@@ -562,7 +562,7 @@ bool TProject::save(const TFilePath &projectPath)
 		std::map<std::string, string> attr;
 		string folderName = getFolderName(i);
 		attr["name"] = folderName;
-		attr["path"] = toString(folderRelativePath); // escape()
+		attr["path"] = ::to_string(folderRelativePath); // escape()
 		if (getUseScenePath(folderName))
 			attr["useScenePath"] = "yes";
 		os.openCloseChild("folder", attr);
@@ -947,7 +947,7 @@ void TProjectManager::getFolderNames(std::vector<std::string> &names)
 void TProjectManager::setCurrentProjectPath(const TFilePath &fp)
 {
 	assert(TProject::isAProjectPath(fp));
-	currentProjectPath = toString(fp.getWideString());
+	currentProjectPath = ::to_string(fp.getWideString());
 	currentProject = TProjectP();
 	notifyListeners();
 }
@@ -971,7 +971,7 @@ TFilePath TProjectManager::getCurrentProjectPath()
 	if (!TFileStatus(fp).doesExist())
 		fp = projectNameToProjectPath(TProject::SandboxProjectName);
 	fp = getLatestVersionProjectPath(fp);
-	string s = toString(fp);
+	string s = ::to_string(fp);
 	if (s != (string)currentProjectPath)
 		currentProjectPath = s;
 	return fp;

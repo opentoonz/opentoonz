@@ -5,6 +5,8 @@
 
 #include "tconvert.h"
 
+#include <cstdint>
+
 #undef DVAPI
 #undef DVVAR
 
@@ -149,7 +151,7 @@ public:
 
 	std::string getValueAsString()
 	{
-		return toString(m_value);
+		return std::to_string(m_value);
 	}
 
 	void accept(Visitor &v) { v.visit(this); }
@@ -208,7 +210,7 @@ public:
 	}
 	std::string getValueAsString()
 	{
-		return toString(m_value.first) + "," + toString(m_value.second);
+		return std::to_string(m_value.first) + "," + std::to_string(m_value.second);
 	}
 	void accept(Visitor &v) { v.visit(this); };
 
@@ -259,7 +261,7 @@ public:
 	}
 	std::string getValueAsString()
 	{
-		return toString(m_value.first) + "," + toString(m_value.second);
+		return std::to_string(m_value.first) + "," + std::to_string(m_value.second);
 	}
 	void accept(Visitor &v) { v.visit(this); };
 
@@ -285,7 +287,7 @@ public:
 	bool getValue() const { return m_value; }
 	std::string getValueAsString()
 	{
-		return toString(m_value);
+		return std::to_string(m_value);
 	}
 	void accept(Visitor &v) { v.visit(this); };
 
@@ -309,7 +311,7 @@ public:
 	std::wstring getValue() const { return m_value; }
 	std::string getValueAsString()
 	{
-		return toString(m_value);
+		return ::to_string(m_value);
 	}
 	void accept(Visitor &v) { v.visit(this); };
 
@@ -334,7 +336,7 @@ public:
 
 	std::string getValueAsString()
 	{
-		return toString(m_value);
+		return ::to_string(m_value);
 	}
 
 	void accept(Visitor &v) { v.visit(this); };
@@ -360,7 +362,7 @@ public:
 
 	std::string getValueAsString()
 	{
-		return toString((unsigned long long)m_value);
+		return ::to_string(m_value);
 	}
 
 	void accept(Visitor &v) { v.visit(this); };
@@ -439,7 +441,7 @@ public:
 
 	const Range &getRange() const { return m_range; }
 	std::wstring getValue() const { return (m_index < 0) ? L"" : m_range[m_index]; }
-	std::string getValueAsString() { return toString(m_range[m_index]); }
+	std::string getValueAsString() { return ::to_string(m_range[m_index]); }
 	int getIndex() const { return m_index; }
 
 	void accept(Visitor &v) { v.visit(this); }
