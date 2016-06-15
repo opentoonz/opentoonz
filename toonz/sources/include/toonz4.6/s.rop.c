@@ -13454,7 +13454,8 @@ pencil_index << info.pencil_offs | info.offset_mask;
               /*---------------------------------------------------------------------------*/
 E 84
 
-D 84 void clone_raster(RASTER * rin, RASTER * rout)
+D 84 void
+          clone_raster(RASTER * rin, RASTER * rout)
 E 84
 I 84 void
           rop_custom_fill_cmap_penramp(
