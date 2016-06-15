@@ -106,15 +106,15 @@ MenuBarTree::MenuBarTree(TFilePath & path, QWidget* parent)
 	setColumnCount(1);
 	header()->close();
 
-	/*- m_pathが存在するならファイルから読み込む。無ければテンプレートを読み込む -*/
+	/*- Load m_path if it does exist. If not, then load from the template. -*/
 	TFilePath fp;
 	if (TFileStatus(path).isWritable())
 		fp = m_path;
 	else
 	{
-		fp = m_path.withParentDir(ToonzFolder::getTemplateModuleDir());
+		fp = m_path.withParentDir(ToonzFolder::getTemplateRoomsDir());
 		if (!TFileStatus(path).isReadable())
-			fp = ToonzFolder::getTemplateModuleDir() + "menubar_template.xml";
+			fp = ToonzFolder::getTemplateRoomsDir() + "menubar_template.xml";
 	}
 
 	loadMenuTree(fp);
@@ -477,7 +477,7 @@ MenuBarPopup::MenuBarPopup(Room* room)
 	
 	/*- get menubar setting file path -*/
 	std::string mbFileName = room->getPath().getName() + "_menubar.xml";
-	TFilePath mbPath = ToonzFolder::getMyModuleDir() + mbFileName;
+	TFilePath mbPath = ToonzFolder::getMyRoomsDir() + mbFileName;
 	
 	m_commandListTree = new CommandListTree(this);
 	m_menuBarTree = new MenuBarTree(mbPath, this);
@@ -546,7 +546,6 @@ MenuBarPopup::MenuBarPopup(Room* room)
 
 void MenuBarPopup::onOkPressed()
 {
-	/*- TODO: xmlにツリーの状態を書き込む -*/
 	m_menuBarTree->saveMenuTree();
 
 	accept();

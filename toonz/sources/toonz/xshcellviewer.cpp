@@ -797,6 +797,9 @@ void CellArea::drawCells(QPainter &p, const QRect toBeUpdated)
 	}
 
 	// smart tab
+	// initialize the rectangles first
+	m_levelExtenderRect = QRect();
+	m_upperLevelExtenderRect = QRect();
 	int smartTabPosOffset = (Preferences::instance()->isShowKeyframesOnXsheetCellAreaEnabled()) ? 31 : 20;
 	if (!cellSelection->isEmpty() && !m_viewer->areSoundCellsSelected()) {
 		m_levelExtenderRect = QRect(xS1 - smartTabPosOffset, yS1 + 1, 19, 8);
