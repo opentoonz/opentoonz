@@ -15,31 +15,29 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TLogViewer : public TWidget
-{
-	class Data;
-	Data *m_data;
+class DVAPI TLogViewer : public TWidget {
+  class Data;
+  Data *m_data;
 
 public:
-	TLogViewer(TWidget *parent, string name = "logViewer");
-	~TLogViewer();
+  TLogViewer(TWidget *parent, string name = "logViewer");
+  ~TLogViewer();
 
-	void configureNotify(const TDimension &);
-	void draw();
+  void configureNotify(const TDimension &);
+  void draw();
 
-	void activate(bool on);
+  void activate(bool on);
 };
 
-class DVAPI TLogViewerPopup : public TPopup
-{
-	TLogViewer *m_viewer;
+class DVAPI TLogViewerPopup : public TPopup {
+  TLogViewer *m_viewer;
 
 public:
-	TLogViewerPopup(TWidget *parent, string name = "logViewerPopup");
-	~TLogViewerPopup();
+  TLogViewerPopup(TWidget *parent, string name = "logViewerPopup");
+  ~TLogViewerPopup();
 
-	void configureNotify(const TDimension &);
-	TDimension getPreferredSize() const;
+  void configureNotify(const TDimension &);
+  TDimension getPreferredSize() const;
 };
 
 #endif

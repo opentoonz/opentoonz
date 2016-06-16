@@ -17,24 +17,21 @@
 参考:「ANSI C/C++辞典」 平林雅英 共立出版株式会社
 */
 
-namespace igs
-{
-namespace math
-{
-class random
-{
+namespace igs {
+namespace math {
+class random {
 public:
-	random();
+  random();
 
-	/* 乱数種 seed(0〜std::numeric_limits<long>::max()) */
-	void seed(unsigned long seed);
-	unsigned long seed(void) const;
+  /* 乱数種 seed(0〜std::numeric_limits<long>::max()) */
+  void seed(unsigned long seed);
+  unsigned long seed(void) const;
 
-	/* 乱数生成 0〜std::numeric_limits<long>::max() */
-	long next(void);
-	double next_d(void); /* 0 ... 1 */
+  /* 乱数生成 0〜std::numeric_limits<long>::max() */
+  long next(void);
+  double next_d(void); /* 0 ... 1 */
 private:
-	unsigned long seed_;
+  unsigned long seed_;
 };
 }
 }

@@ -48,233 +48,226 @@ class StyleNameEditor;
   \brief    Contains classes pertaining the GUI of a Toonz Palette Viewer.
   */
 
-namespace PaletteViewerGUI
-{
+namespace PaletteViewerGUI {
 
 // class for managing the palette's default style chip size
-class DVAPI ChipSizeManager
-{
+class DVAPI ChipSizeManager {
 public:
-	int chipSize_Palette;
-	int chipSize_Cleanup;
-	int chipSize_Studio;
-	static ChipSizeManager *instance()
-	{
-		static ChipSizeManager _instance;
-		return &_instance;
-	}
+  int chipSize_Palette;
+  int chipSize_Cleanup;
+  int chipSize_Studio;
+  static ChipSizeManager *instance() {
+    static ChipSizeManager _instance;
+    return &_instance;
+  }
 
 private:
-	ChipSizeManager() : chipSize_Palette(2),
-						chipSize_Cleanup(2),
-						chipSize_Studio(2)
-	{
-	}
+  ChipSizeManager()
+      : chipSize_Palette(2), chipSize_Cleanup(2), chipSize_Studio(2) {}
 };
 
-enum PaletteViewType //! Possible palette contents of a Palette Viewer.
-{
-	LEVEL_PALETTE,   //!< Content palette is from a level.
-	CLEANUP_PALETTE, //!< Content palette is from cleanup settings.
-	STUDIO_PALETTE   //!< Content palette is from a Studio Palette panel.
+enum PaletteViewType  //! Possible palette contents of a Palette Viewer.
+{ LEVEL_PALETTE,      //!< Content palette is from a level.
+  CLEANUP_PALETTE,    //!< Content palette is from cleanup settings.
+  STUDIO_PALETTE      //!< Content palette is from a Studio Palette panel.
 };
 
 //****************************************************************************
 //    PageViewer  declaration
 //****************************************************************************
 
-class DVAPI PageViewer : public QFrame,
-						 public TSelection::View
-{
-	Q_OBJECT
+class DVAPI PageViewer : public QFrame, public TSelection::View {
+  Q_OBJECT
 
-	QColor m_textColor; //text color used for list view
-	Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
+  QColor m_textColor;  // text color used for list view
+  Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
 
 public:
-	enum ViewMode //! Possible view modes for a Palette Viewer.
-	{
-		SmallChips,		   //!< Small icons.
-		MediumChips,	   //!< Medium icons.
-		LargeChips,		   //!< Large icons with style names.
-		List,			   //!< Top-down list of all icons.
-		SmallChipsWithName //!< Small icons with overlayed style names (if user-defined).
-	};
+  enum ViewMode         //! Possible view modes for a Palette Viewer.
+  { SmallChips,         //!< Small icons.
+    MediumChips,        //!< Medium icons.
+    LargeChips,         //!< Large icons with style names.
+    List,               //!< Top-down list of all icons.
+    SmallChipsWithName  //!< Small icons with overlayed style names (if
+                        //!user-defined).
+  };
 
-	// for displaying the linked style name from studio palette
-	enum NameDisplayMode { Style,
-						   Original,
-						   StyleAndOriginal };
+  // for displaying the linked style name from studio palette
+  enum NameDisplayMode { Style, Original, StyleAndOriginal };
 
 public:
-	PageViewer(QWidget *parent = 0, PaletteViewType viewType = LEVEL_PALETTE, bool hasPasteColors = true);
-	~PageViewer();
+  PageViewer(QWidget *parent = 0, PaletteViewType viewType = LEVEL_PALETTE,
+             bool hasPasteColors = true);
+  ~PageViewer();
 
-	void setPaletteHandle(TPaletteHandle *paletteHandle);
-	TPaletteHandle *getPaletteHandle() const;
+  void setPaletteHandle(TPaletteHandle *paletteHandle);
+  TPaletteHandle *getPaletteHandle() const;
 
-	void setXsheetHandle(TXsheetHandle *xsheetHandle);
-	TXsheetHandle *getXsheetHandle() const;
+  void setXsheetHandle(TXsheetHandle *xsheetHandle);
+  TXsheetHandle *getXsheetHandle() const;
 
-	void setFrameHandle(TFrameHandle *xsheetHandle);
-	TFrameHandle *getFrameHandle() const;
+  void setFrameHandle(TFrameHandle *xsheetHandle);
+  TFrameHandle *getFrameHandle() const;
 
-	// for clearing the cache when execute paste style command on styleSelection
-	void setLevelHandle(TXshLevelHandle *levelHandle);
+  // for clearing the cache when execute paste style command on styleSelection
+  void setLevelHandle(TXshLevelHandle *levelHandle);
 
-	void setCurrentStyleIndex(int index);
-	int getCurrentStyleIndex() const;
+  void setCurrentStyleIndex(int index);
+  int getCurrentStyleIndex() const;
 
-	void setPage(TPalette::Page *page);
-	TPalette::Page *getPage() const { return m_page; }
+  void setPage(TPalette::Page *page);
+  TPalette::Page *getPage() const { return m_page; }
 
-	void setChangeStyleCommand(ChangeStyleCommand *changeStyleCommand) { m_changeStyleCommand = changeStyleCommand; };
-	ChangeStyleCommand *getChangeStyleCommand() const { return m_changeStyleCommand; }
+  void setChangeStyleCommand(ChangeStyleCommand *changeStyleCommand) {
+    m_changeStyleCommand = changeStyleCommand;
+  };
+  ChangeStyleCommand *getChangeStyleCommand() const {
+    return m_changeStyleCommand;
+  }
 
-	int getChipCount() const;
+  int getChipCount() const;
 
-	ViewMode getViewMode() const { return m_viewMode; }
-	void setViewMode(ViewMode mode);
-	void setNameDisplayMode(NameDisplayMode mode);
+  ViewMode getViewMode() const { return m_viewMode; }
+  void setViewMode(ViewMode mode);
+  void setNameDisplayMode(NameDisplayMode mode);
 
-	PaletteViewerGUI::PaletteViewType getViewType() const { return m_viewType; }
+  PaletteViewerGUI::PaletteViewType getViewType() const { return m_viewType; }
 
-	int posToIndex(const QPoint &pos) const;
+  int posToIndex(const QPoint &pos) const;
 
-	QRect getItemRect(int index) const;
-	QRect getColorChipRect(int index) const;
-	QRect getColorNameRect(int index) const;
+  QRect getItemRect(int index) const;
+  QRect getColorChipRect(int index) const;
+  QRect getColorNameRect(int index) const;
 
-	void drop(int indexInPage, const QMimeData *mimeData);
-	void createDropPage();
-	void onSelectionChanged() { update(); }
+  void drop(int indexInPage, const QMimeData *mimeData);
+  void createDropPage();
+  void onSelectionChanged() { update(); }
 
-	TStyleSelection *getSelection() const { return m_styleSelection; }
-	void clearSelection();
+  TStyleSelection *getSelection() const { return m_styleSelection; }
+  void clearSelection();
 
-	// update the "lock"s for commands when the StyleSelection becomes current and when the current palettte changed
-	void updateCommandLocks();
+  // update the "lock"s for commands when the StyleSelection becomes current and
+  // when the current palettte changed
+  void updateCommandLocks();
 
-	void setTextColor(const QColor &color) { m_textColor = color; }
-	QColor getTextColor() const { return m_textColor; }
+  void setTextColor(const QColor &color) { m_textColor = color; }
+  QColor getTextColor() const { return m_textColor; }
 
 public slots:
 
-	void computeSize();
-	void onFrameChanged();
-	void onStyleRenamed();
+  void computeSize();
+  void onFrameChanged();
+  void onStyleRenamed();
 
-	void addNewColor();
-	void addNewPage();
+  void addNewColor();
+  void addNewPage();
 
 protected:
-	QSize getChipSize() const;
-	void drawColorChip(QPainter &p, QRect &chipRect, TColorStyle *style);
-	void drawColorName(QPainter &p, QRect &nameRect, TColorStyle *style, int styleIndex);
-	void drawToggleLink(QPainter &p, QRect &chipRect, TColorStyle *style);
+  QSize getChipSize() const;
+  void drawColorChip(QPainter &p, QRect &chipRect, TColorStyle *style);
+  void drawColorName(QPainter &p, QRect &nameRect, TColorStyle *style,
+                     int styleIndex);
+  void drawToggleLink(QPainter &p, QRect &chipRect, TColorStyle *style);
 
-	// event handlers
-	void paintEvent(QPaintEvent *);
+  // event handlers
+  void paintEvent(QPaintEvent *);
 
-	void resizeEvent(QResizeEvent *);
+  void resizeEvent(QResizeEvent *);
 
-	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
+  void mousePressEvent(QMouseEvent *event);
+  void mouseMoveEvent(QMouseEvent *event);
+  void mouseReleaseEvent(QMouseEvent *event);
 
-	void mouseDoubleClickEvent(QMouseEvent *event);
-	void contextMenuEvent(QContextMenuEvent *event);
+  void mouseDoubleClickEvent(QMouseEvent *event);
+  void contextMenuEvent(QContextMenuEvent *event);
 
-	void keyPressEvent(QKeyEvent *event);
-	void dragEnterEvent(QDragEnterEvent *event);
-	void dragMoveEvent(QDragMoveEvent *event);
-	void dropEvent(QDropEvent *event);
-	void dragLeaveEvent(QDragLeaveEvent *event);
-	void startDragDrop();
-	void createMenuAction(QMenu &menu, const char *id, QString name, const char *slot);
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
+  void keyPressEvent(QKeyEvent *event);
+  void dragEnterEvent(QDragEnterEvent *event);
+  void dragMoveEvent(QDragMoveEvent *event);
+  void dropEvent(QDropEvent *event);
+  void dragLeaveEvent(QDragLeaveEvent *event);
+  void startDragDrop();
+  void createMenuAction(QMenu &menu, const char *id, QString name,
+                        const char *slot);
+  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *);
 
-	bool event(QEvent *e);
+  bool event(QEvent *e);
 
-	void select(int indexInPage, QMouseEvent *event);
+  void select(int indexInPage, QMouseEvent *event);
 
-	void zoomInChip();
-	void zoomOutChip();
+  void zoomInChip();
+  void zoomOutChip();
 
 protected slots:
 
-	void toggleLink();
-	void eraseToggleLink();
-	void removeLink();
+  void toggleLink();
+  void eraseToggleLink();
+  void removeLink();
 
 private:
-	DVGui::LineEdit *m_renameTextField;
-	QPoint m_dragStartPosition;
+  DVGui::LineEdit *m_renameTextField;
+  QPoint m_dragStartPosition;
 
-	TPalette::Page *m_page;
-	QPoint m_chipsOrigin;
-	int m_chipPerRow;
-	ViewMode m_viewMode;
-	NameDisplayMode m_nameDisplayMode;
-	int m_dropPositionIndex;
-	bool m_dropPageCreated;
-	bool m_startDrag;
+  TPalette::Page *m_page;
+  QPoint m_chipsOrigin;
+  int m_chipPerRow;
+  ViewMode m_viewMode;
+  NameDisplayMode m_nameDisplayMode;
+  int m_dropPositionIndex;
+  bool m_dropPageCreated;
+  bool m_startDrag;
 
-	TStyleSelection *m_styleSelection;
-	TFrameHandle *m_frameHandle;
-	bool m_hasPasteColors;
-	PaletteViewType m_viewType;
+  TStyleSelection *m_styleSelection;
+  TFrameHandle *m_frameHandle;
+  bool m_hasPasteColors;
+  PaletteViewType m_viewType;
 
-	ChangeStyleCommand *m_changeStyleCommand;
+  ChangeStyleCommand *m_changeStyleCommand;
 
-	QShortcut *m_zoomInShortCut;
-	QShortcut *m_zoomOutShortCut;
-	StyleNameEditor *m_styleNameEditor;
+  QShortcut *m_zoomInShortCut;
+  QShortcut *m_zoomOutShortCut;
+  StyleNameEditor *m_styleNameEditor;
 
 signals:
-	void changeWindowTitleSignal();
+  void changeWindowTitleSignal();
 };
 
 //****************************************************************************
 //    PaletteTabBar  declaration
 //****************************************************************************
 
-class DVAPI PaletteTabBar : public QTabBar
-{
-	Q_OBJECT
+class DVAPI PaletteTabBar : public QTabBar {
+  Q_OBJECT
 
 public:
-	PaletteTabBar(QWidget *parent, bool hasPageCommand);
+  PaletteTabBar(QWidget *parent, bool hasPageCommand);
 
-	void setPageViewer(PageViewer *pageViewer)
-	{
-		m_pageViewer = pageViewer;
-	}
+  void setPageViewer(PageViewer *pageViewer) { m_pageViewer = pageViewer; }
 
 public slots:
 
-	void updateTabName();
+  void updateTabName();
 
 signals:
 
-	void tabTextChanged(int index);
-	void movePage(int srcIndex, int dstIndex);
+  void tabTextChanged(int index);
+  void movePage(int srcIndex, int dstIndex);
 
 protected:
-	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mouseDoubleClickEvent(QMouseEvent *event);
-	void dragEnterEvent(QDragEnterEvent *event);
-	void dragMoveEvent(QDragMoveEvent *event);
-	void dropEvent(QDropEvent *event);
+  void mousePressEvent(QMouseEvent *event);
+  void mouseMoveEvent(QMouseEvent *event);
+  void mouseDoubleClickEvent(QMouseEvent *event);
+  void dragEnterEvent(QDragEnterEvent *event);
+  void dragMoveEvent(QDragMoveEvent *event);
+  void dropEvent(QDropEvent *event);
 
 private:
-	DVGui::LineEdit *m_renameTextField;
-	int m_renameTabIndex;
-	PageViewer *m_pageViewer;
+  DVGui::LineEdit *m_renameTextField;
+  int m_renameTabIndex;
+  PageViewer *m_pageViewer;
 
-	bool m_hasPageCommand;
+  bool m_hasPageCommand;
 };
 
 //****************************************************************************
@@ -282,45 +275,45 @@ private:
 //****************************************************************************
 
 /*!
-	\brief    Special placeholder toolbar icon for \a starting a palette move
-	through drag & drop.
+        \brief    Special placeholder toolbar icon for \a starting a palette
+   move
+        through drag & drop.
 
-	\details  This widget is currently employed as a mere mouse event filter
-	to propagate drag & drop starts to a PaletteViewer ancestor
-	in the widgets hierarchy.
-	*/
+        \details  This widget is currently employed as a mere mouse event filter
+        to propagate drag & drop starts to a PaletteViewer ancestor
+        in the widgets hierarchy.
+        */
 
-class DVAPI PaletteIconWidget : public QWidget
-{
-	Q_OBJECT
+class DVAPI PaletteIconWidget : public QWidget {
+  Q_OBJECT
 
 public:
 #if QT_VERSION >= 0x050500
-	PaletteIconWidget(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  PaletteIconWidget(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
-	PaletteIconWidget(QWidget *parent = 0, Qt::WFlags flags = 0);
+  PaletteIconWidget(QWidget *parent = 0, Qt::WFlags flags = 0);
 #endif
-	~PaletteIconWidget();
+  ~PaletteIconWidget();
 
 signals:
 
-	void startDrag(); //!< Emitted \a once whenever the icon is sensibly dragged
-					  //!  by the user.
+  void startDrag();  //!< Emitted \a once whenever the icon is sensibly dragged
+                     //!  by the user.
 protected:
-	void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *);
 
-	void enterEvent(QEvent *event);
-	void leaveEvent(QEvent *event);
+  void enterEvent(QEvent *event);
+  void leaveEvent(QEvent *event);
 
-	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
+  void mousePressEvent(QMouseEvent *event);
+  void mouseMoveEvent(QMouseEvent *event);
 
 private:
-	QPoint m_mousePressPos; //!< Mouse position at mouse press.
-	bool m_isOver,			//!< Whether mouse is hovering on this widget.
-		m_dragged;			//!< Whether user has started a drag operation on the icon.
+  QPoint m_mousePressPos;  //!< Mouse position at mouse press.
+  bool m_isOver,           //!< Whether mouse is hovering on this widget.
+      m_dragged;  //!< Whether user has started a drag operation on the icon.
 };
 
-} // namespace PaletteViewerGUI
+}  // namespace PaletteViewerGUI
 
-#endif // PALETTEVIEWERGUI_H
+#endif  // PALETTEVIEWERGUI_H

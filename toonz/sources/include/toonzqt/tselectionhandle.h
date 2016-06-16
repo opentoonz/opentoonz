@@ -28,33 +28,32 @@ class CommandHandlerInterface;
 // TSelectionHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TSelectionHandle : public QObject
-{
-	Q_OBJECT
+class DVAPI TSelectionHandle : public QObject {
+  Q_OBJECT
 
-	std::vector<TSelection *> m_selectionStack;
-	std::vector<std::string> m_enabledCommandIds;
+  std::vector<TSelection *> m_selectionStack;
+  std::vector<std::string> m_enabledCommandIds;
 
 public:
-	TSelectionHandle();
-	~TSelectionHandle();
+  TSelectionHandle();
+  ~TSelectionHandle();
 
-	TSelection *getSelection() const;
-	void setSelection(TSelection *selection);
+  TSelection *getSelection() const;
+  void setSelection(TSelection *selection);
 
-	void pushSelection();
-	void popSelection();
+  void pushSelection();
+  void popSelection();
 
-	// called by TSelection::enableCommand
-	void enableCommand(std::string cmdId, CommandHandlerInterface *handler);
+  // called by TSelection::enableCommand
+  void enableCommand(std::string cmdId, CommandHandlerInterface *handler);
 
-	void notifySelectionChanged();
+  void notifySelectionChanged();
 
-	static TSelectionHandle *getCurrent();
+  static TSelectionHandle *getCurrent();
 
 signals:
-	void selectionSwitched(TSelection *oldSelection, TSelection *newSelection);
-	void selectionChanged(TSelection *selection);
+  void selectionSwitched(TSelection *oldSelection, TSelection *newSelection);
+  void selectionChanged(TSelection *selection);
 };
 
-#endif //TSELECTIONHANDLE_H
+#endif  // TSELECTIONHANDLE_H

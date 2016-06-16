@@ -10,8 +10,7 @@
 
 #include <vector>
 
-namespace ToonzExt
-{
+namespace ToonzExt {
 
 //---------------------------------------------------------------------------
 /**
@@ -19,70 +18,52 @@ namespace ToonzExt
    *@brief This class mantains interal data for Dragger manipulator.
    */
 CompositeStatus::CompositeStatus()
-	: dbImpl_(new std::map<std::string, CompositeStatus *>), db_(*dbImpl_)
-{
+    : dbImpl_(new std::map<std::string, CompositeStatus *>), db_(*dbImpl_) {}
+
+//---------------------------------------------------------------------------
+
+CompositeStatus::~CompositeStatus() {
+  iterator it = db_.begin(), end = db_.end();
+
+  while (it != end) {
+    delete it->second;
+    ++it;
+  }
+
+  delete dbImpl_;
 }
 
 //---------------------------------------------------------------------------
 
-CompositeStatus::~CompositeStatus()
-{
-	iterator
-		it = db_.begin(),
-		end = db_.end();
+void CompositeStatus::add(CompositeStatus *status, const std::string &name) {
+  if (!status) return;
 
-	while (it != end) {
-		delete it->second;
-		++it;
-	}
+  CompositeStatus *tmp = this->find(name);
 
-	delete dbImpl_;
+  if (tmp) delete tmp;
+
+  db_[name] = status;
 }
 
 //---------------------------------------------------------------------------
 
-void CompositeStatus::add(CompositeStatus *status,
-						  const std::string &name)
-{
-	if (!status)
-		return;
+void CompositeStatus::remove(const std::string &name) {
+  iterator found = db_.find(name), end = db_.end();
 
-	CompositeStatus
-		*tmp = this->find(name);
-
-	if (tmp)
-		delete tmp;
-
-	db_[name] = status;
+  if (found != end) {
+    delete found->second;
+    db_.erase(found);
+  }
 }
 
 //---------------------------------------------------------------------------
 
-void CompositeStatus::remove(const std::string &name)
-{
-	iterator
-		found = db_.find(name),
-		end = db_.end();
+CompositeStatus *CompositeStatus::find(const std::string &name) const {
+  const_iterator found = db_.find(name), end = db_.end();
 
-	if (found != end) {
-		delete found->second;
-		db_.erase(found);
-	}
-}
+  if (found != end) return found->second;
 
-//---------------------------------------------------------------------------
-
-CompositeStatus *
-CompositeStatus::find(const std::string &name) const
-{
-	const_iterator
-		found = db_.find(name),
-		end = db_.end();
-
-	if (found != end)
-		return found->second;
-
-	return 0;
+  return 0;
 }
 
 //---------------------------------------------------------------------------

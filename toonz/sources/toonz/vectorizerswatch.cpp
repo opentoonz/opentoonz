@@ -32,166 +32,162 @@
 //    Local namespace stuff
 //*****************************************************************************
 
-namespace
-{
+namespace {
 
-inline void getCurrentXsheetPosition(int &row, int &col)
-{
-	TApp *app = TApp::instance();
-	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+inline void getCurrentXsheetPosition(int &row, int &col) {
+  TApp *app    = TApp::instance();
+  TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 
-	row = app->getCurrentFrame()->getFrame();
-	col = app->getCurrentColumn()->getColumnIndex();
+  row = app->getCurrentFrame()->getFrame();
+  col = app->getCurrentColumn()->getColumnIndex();
 }
 
 //-----------------------------------------------------------------------------
 
-inline TImageP getXsheetImage(int row, int col)
-{
-	TApp *app = TApp::instance();
-	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+inline TImageP getXsheetImage(int row, int col) {
+  TApp *app    = TApp::instance();
+  TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 
-	const TXshCell &cell = xsh->getCell(row, col);
-	TXshSimpleLevel *sl = cell.getSimpleLevel();
+  const TXshCell &cell = xsh->getCell(row, col);
+  TXshSimpleLevel *sl  = cell.getSimpleLevel();
 
-	return sl ? sl->getFullsampledFrame(cell.getFrameId(), ImageManager::dontPutInCache) : TImageP();
+  return sl
+             ? sl->getFullsampledFrame(cell.getFrameId(),
+                                       ImageManager::dontPutInCache)
+             : TImageP();
 }
 
 //-----------------------------------------------------------------------------
 
-std::auto_ptr<VectorizerConfiguration> getCurrentVectorizerConfiguration(int row, int col)
-{
-	typedef std::auto_ptr<VectorizerConfiguration> result_type;
+std::auto_ptr<VectorizerConfiguration> getCurrentVectorizerConfiguration(
+    int row, int col) {
+  typedef std::auto_ptr<VectorizerConfiguration> result_type;
 
-	TApp *app = TApp::instance();
-	TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+  TApp *app    = TApp::instance();
+  TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
 
-	const ToonzScene *scene = app->getCurrentScene()->getScene();
-	assert(scene);
+  const ToonzScene *scene = app->getCurrentScene()->getScene();
+  assert(scene);
 
-	const VectorizerParameters *vParams = scene->getProperties()->getVectorizerParameters();
-	assert(vParams);
+  const VectorizerParameters *vParams =
+      scene->getProperties()->getVectorizerParameters();
+  assert(vParams);
 
-	const TXshCell &cell = xsh->getCell(row, col);
-	TXshSimpleLevel *sl = cell.getSimpleLevel();
+  const TXshCell &cell = xsh->getCell(row, col);
+  TXshSimpleLevel *sl  = cell.getSimpleLevel();
 
-	if (!sl)
-		return result_type();
+  if (!sl) return result_type();
 
-	int framesCount = sl->getFrameCount();
-	double vFrame = (framesCount <= 1) ? 0.0 : tcrop((cell.getFrameId().getNumber() - 1) / double(framesCount - 1), 0.0, 1.0);
+  int framesCount = sl->getFrameCount();
+  double vFrame =
+      (framesCount <= 1)
+          ? 0.0
+          : tcrop((cell.getFrameId().getNumber() - 1) / double(framesCount - 1),
+                  0.0, 1.0);
 
-	return result_type(vParams->getCurrentConfiguration(vFrame));
+  return result_type(vParams->getCurrentConfiguration(vFrame));
 }
 
-} //Local namespace
+}  // Local namespace
 
 //*****************************************************************************
 //    VectorizationSwatchData declaration
 //*****************************************************************************
 
-namespace
-{
+namespace {
 
 /*!
   VectorizationSwatchData is the 'server' singleton data class used to
   vectorize within swatch areas.
 */
 struct VectorizationBuilder : public TThread::Executor {
-	int m_row, m_col;
-	bool m_done, m_submitted;
+  int m_row, m_col;
+  bool m_done, m_submitted;
 
-	TImageP m_image;
+  TImageP m_image;
 
-	QList<VectorizerSwatchArea *> m_listeners;
+  QList<VectorizerSwatchArea *> m_listeners;
 
 public:
-	VectorizationBuilder()
-		: m_row(-1), m_col(-1), m_image(), m_done(false), m_submitted(false)
-	{
-		setMaxActiveTasks(1);
-	}
+  VectorizationBuilder()
+      : m_row(-1), m_col(-1), m_image(), m_done(false), m_submitted(false) {
+    setMaxActiveTasks(1);
+  }
 
-	static VectorizationBuilder *instance()
-	{
-		static VectorizationBuilder theInstance;
-		return &theInstance;
-	}
+  static VectorizationBuilder *instance() {
+    static VectorizationBuilder theInstance;
+    return &theInstance;
+  }
 
-	void addListener(VectorizerSwatchArea *listener);
-	void removeListener(VectorizerSwatchArea *listener);
+  void addListener(VectorizerSwatchArea *listener);
+  void removeListener(VectorizerSwatchArea *listener);
 
-	bool update(TImageP &img);
-	bool invalidate(TImageP &img);
+  bool update(TImageP &img);
+  bool invalidate(TImageP &img);
 
-	void notifyDone(TImageP img);
+  void notifyDone(TImageP img);
 };
 
-} //Local namespace
+}  // Local namespace
 
 //*****************************************************************************
 //    VectorizationBuilder implementation
 //*****************************************************************************
 
-void VectorizationBuilder::addListener(VectorizerSwatchArea *listener)
-{
-	m_listeners.push_back(listener);
+void VectorizationBuilder::addListener(VectorizerSwatchArea *listener) {
+  m_listeners.push_back(listener);
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizationBuilder::removeListener(VectorizerSwatchArea *listener)
-{
-	m_listeners.removeOne(listener);
-	if (m_listeners.empty()) {
-		m_image = TImageP();
-		m_row = m_col = -1;
-		m_done = false;
-	}
+void VectorizationBuilder::removeListener(VectorizerSwatchArea *listener) {
+  m_listeners.removeOne(listener);
+  if (m_listeners.empty()) {
+    m_image = TImageP();
+    m_row = m_col = -1;
+    m_done        = false;
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-bool VectorizationBuilder::update(TImageP &img)
-{
-	int row, col;
-	getCurrentXsheetPosition(row, col);
+bool VectorizationBuilder::update(TImageP &img) {
+  int row, col;
+  getCurrentXsheetPosition(row, col);
 
-	bool computing = false;
-	if (row != m_row || col != m_col) {
-		m_row = row, m_col = col;
-		m_done = false;
-		addTask(new VectorizationSwatchTask(row, col));
-		computing = true;
-	}
+  bool computing = false;
+  if (row != m_row || col != m_col) {
+    m_row = row, m_col = col;
+    m_done = false;
+    addTask(new VectorizationSwatchTask(row, col));
+    computing = true;
+  }
 
-	img = m_image;
-	return computing;
+  img = m_image;
+  return computing;
 }
 
 //-----------------------------------------------------------------------------
 
-bool VectorizationBuilder::invalidate(TImageP &img)
-{
-	m_row = m_col = -1;
-	m_done = false;
-	return update(img);
+bool VectorizationBuilder::invalidate(TImageP &img) {
+  m_row = m_col = -1;
+  m_done        = false;
+  return update(img);
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizationBuilder::notifyDone(TImageP img)
-{
-	m_image = img;
+void VectorizationBuilder::notifyDone(TImageP img) {
+  m_image = img;
 
-	QList<VectorizerSwatchArea *>::iterator it;
-	for (it = m_listeners.begin(); it != m_listeners.end(); ++it) {
-		VectorizerSwatchArea::Swatch *swatch = (*it)->rightSwatch();
+  QList<VectorizerSwatchArea *>::iterator it;
+  for (it = m_listeners.begin(); it != m_listeners.end(); ++it) {
+    VectorizerSwatchArea::Swatch *swatch = (*it)->rightSwatch();
 
-		swatch->image() = img;
-		swatch->setDrawInProgress(false);
-		swatch->update();
-	}
+    swatch->image() = img;
+    swatch->setDrawInProgress(false);
+    swatch->update();
+  }
 }
 
 //*****************************************************************************
@@ -199,94 +195,94 @@ void VectorizationBuilder::notifyDone(TImageP img)
 //*****************************************************************************
 
 VectorizationSwatchTask::VectorizationSwatchTask(int row, int col)
-	: m_row(row), m_col(col)
-{
-	//Establish connections to default slots; the started one must be blocking,
-	//so that run() awaits until it has been performed.
+    : m_row(row), m_col(col) {
+  // Establish connections to default slots; the started one must be blocking,
+  // so that run() awaits until it has been performed.
 
-	connect(this, SIGNAL(myStarted(TThread::RunnableP)), SLOT(onStarted(TThread::RunnableP)),
-			Qt::BlockingQueuedConnection);
-	connect(this, SIGNAL(finished(TThread::RunnableP)), SLOT(onFinished(TThread::RunnableP)));
+  connect(this, SIGNAL(myStarted(TThread::RunnableP)),
+          SLOT(onStarted(TThread::RunnableP)), Qt::BlockingQueuedConnection);
+  connect(this, SIGNAL(finished(TThread::RunnableP)),
+          SLOT(onFinished(TThread::RunnableP)));
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizationSwatchTask::onStarted(TThread::RunnableP task)
-{
-	VectorizationBuilder *builder = VectorizationBuilder::instance();
+void VectorizationSwatchTask::onStarted(TThread::RunnableP task) {
+  VectorizationBuilder *builder = VectorizationBuilder::instance();
 
-	if (builder->m_done || builder->m_row != m_row || builder->m_col != m_col)
-		return;
+  if (builder->m_done || builder->m_row != m_row || builder->m_col != m_col)
+    return;
 
-	// Retrieve the image to be vectorized
-	m_image = getXsheetImage(m_row, m_col);
+  // Retrieve the image to be vectorized
+  m_image = getXsheetImage(m_row, m_col);
 
-	// Build the vectorization configuration
-	m_config = getCurrentVectorizerConfiguration(m_row, m_col);
+  // Build the vectorization configuration
+  m_config = getCurrentVectorizerConfiguration(m_row, m_col);
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizationSwatchTask::run()
-{
-	emit myStarted(this);
+void VectorizationSwatchTask::run() {
+  emit myStarted(this);
 
-	if (!m_image || !m_config.get())
-		return;
+  if (!m_image || !m_config.get()) return;
 
-	//The task must be performed - retrieve and prepare configuration data
-	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  // The task must be performed - retrieve and prepare configuration data
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
 
-	VectorizerConfiguration *c = m_config.get();
+  VectorizerConfiguration *c = m_config.get();
 
-	// Build additional configuration data
-	TPaletteP palette;
-	TPointD center, dpi;
+  // Build additional configuration data
+  TPaletteP palette;
+  TPointD center, dpi;
 
-	if (TToonzImageP ti = m_image) {
-		palette = ti->getPalette();
-		center = ti->getRaster()->getCenterD();
-		ti->getDpi(dpi.x, dpi.y);
-	} else if (TRasterImageP ri = m_image) {
-		palette = new TPalette;
-		center = ri->getRaster()->getCenterD();
-		ri->getDpi(dpi.x, dpi.y);
-	}
+  if (TToonzImageP ti = m_image) {
+    palette = ti->getPalette();
+    center  = ti->getRaster()->getCenterD();
+    ti->getDpi(dpi.x, dpi.y);
+  } else if (TRasterImageP ri = m_image) {
+    palette = new TPalette;
+    center  = ri->getRaster()->getCenterD();
+    ri->getDpi(dpi.x, dpi.y);
+  }
 
-	// In case the image has no dpi, use the standard dpi (same one the PlaneViewer will show
-	// the raster image with)
-	if (dpi.x == 0.0 || dpi.y == 0.0)
-		dpi.x = dpi.y = Stage::inch;
+  // In case the image has no dpi, use the standard dpi (same one the
+  // PlaneViewer will show
+  // the raster image with)
+  if (dpi.x == 0.0 || dpi.y == 0.0) dpi.x = dpi.y = Stage::inch;
 
-	// The vectorized image must feel the same visualization transform as m_image.
-	// We're transforming the image itself, rather than having it transformed at every paint event.
+  // The vectorized image must feel the same visualization transform as m_image.
+  // We're transforming the image itself, rather than having it transformed at
+  // every paint event.
 
-	// NOTE: It would be best if the transform was the same found from the VectorizerPopup...
-	// Unfortunately, this would mean accessing the level's dpi value, thus having to rewrite quite
-	// some code around here...
-	c->m_affine = TScale(Stage::inch / dpi.x, Stage::inch / dpi.y) * TTranslation(-center);
-	c->m_thickScale = Stage::inch / dpi.x;
+  // NOTE: It would be best if the transform was the same found from the
+  // VectorizerPopup...
+  // Unfortunately, this would mean accessing the level's dpi value, thus having
+  // to rewrite quite
+  // some code around here...
+  c->m_affine =
+      TScale(Stage::inch / dpi.x, Stage::inch / dpi.y) * TTranslation(-center);
+  c->m_thickScale = Stage::inch / dpi.x;
 
-	// Vectorize the image
-	VectorizerCore vectorizer;
-	TVectorImageP vi = vectorizer.vectorize(m_image, *c, palette.getPointer());
-	vi->setPalette(palette.getPointer());
+  // Vectorize the image
+  VectorizerCore vectorizer;
+  TVectorImageP vi = vectorizer.vectorize(m_image, *c, palette.getPointer());
+  vi->setPalette(palette.getPointer());
 
-	m_image = vi;
+  m_image = vi;
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizationSwatchTask::onFinished(TThread::RunnableP task)
-{
-	if (m_image) {
-		VectorizationBuilder *builder = VectorizationBuilder::instance();
+void VectorizationSwatchTask::onFinished(TThread::RunnableP task) {
+  if (m_image) {
+    VectorizationBuilder *builder = VectorizationBuilder::instance();
 
-		if (builder->m_row == m_row && builder->m_col == m_col) {
-			builder->m_done = true;
-			builder->notifyDone(m_image);
-		}
-	}
+    if (builder->m_row == m_row && builder->m_col == m_col) {
+      builder->m_done = true;
+      builder->notifyDone(m_image);
+    }
+  }
 }
 
 //*****************************************************************************
@@ -294,251 +290,238 @@ void VectorizationSwatchTask::onFinished(TThread::RunnableP task)
 //*****************************************************************************
 
 VectorizerSwatchArea::Swatch::Swatch(VectorizerSwatchArea *area)
-	: PlaneViewer(area), m_area(area), m_drawVectors(false), m_drawInProgress(false)
-{
-	setBgColor(TPixel32::White, TPixel32::White);
+    : PlaneViewer(area)
+    , m_area(area)
+    , m_drawVectors(false)
+    , m_drawInProgress(false) {
+  setBgColor(TPixel32::White, TPixel32::White);
 }
 
 //-----------------------------------------------------------------------------
 
-bool VectorizerSwatchArea::Swatch::event(QEvent *e)
-{
-	bool ret = PlaneViewer::event(e);
-	const TAffine &aff = (e->type() == QEvent::Resize) ? m_area->leftSwatch()->viewAff() : viewAff();
-	m_area->updateView(aff);
-	return ret;
+bool VectorizerSwatchArea::Swatch::event(QEvent *e) {
+  bool ret           = PlaneViewer::event(e);
+  const TAffine &aff = (e->type() == QEvent::Resize)
+                           ? m_area->leftSwatch()->viewAff()
+                           : viewAff();
+  m_area->updateView(aff);
+  return ret;
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::Swatch::paintGL()
-{
-	if (isEnabled()) {
-		drawBackground();
+void VectorizerSwatchArea::Swatch::paintGL() {
+  if (isEnabled()) {
+    drawBackground();
 
-		if (m_img) {
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    if (m_img) {
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-			pushGLWorldCoordinates();
-			draw(m_img);
-			if (m_drawVectors)
-				drawVectors();
-			popGLCoordinates();
+      pushGLWorldCoordinates();
+      draw(m_img);
+      if (m_drawVectors) drawVectors();
+      popGLCoordinates();
 
-			glDisable(GL_BLEND);
-		}
-		if (m_drawInProgress)
-			drawInProgress();
-	} else {
-		glClearColor(0.6, 0.6, 0.6, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
+      glDisable(GL_BLEND);
+    }
+    if (m_drawInProgress) drawInProgress();
+  } else {
+    glClearColor(0.6, 0.6, 0.6, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::Swatch::drawVectors()
-{
-	TVectorImageP vi(m_img);
-	if (vi) {
-		glColor3d(1.0, 0.0, 0.0);
+void VectorizerSwatchArea::Swatch::drawVectors() {
+  TVectorImageP vi(m_img);
+  if (vi) {
+    glColor3d(1.0, 0.0, 0.0);
 
-		double pixelSize = sqrt(tglGetPixelSize2());
-		for (int i = 0; i < (int)vi->getStrokeCount(); ++i) {
-			TStroke *stroke = vi->getStroke(i);
-			drawStrokeCenterline(*stroke, pixelSize);
-		}
-	}
+    double pixelSize = sqrt(tglGetPixelSize2());
+    for (int i = 0; i < (int)vi->getStrokeCount(); ++i) {
+      TStroke *stroke = vi->getStroke(i);
+      drawStrokeCenterline(*stroke, pixelSize);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::Swatch::drawInProgress()
-{
-	glColor3d(1.0, 0.0, 0.0);
-	glLineWidth(3.0);
+void VectorizerSwatchArea::Swatch::drawInProgress() {
+  glColor3d(1.0, 0.0, 0.0);
+  glLineWidth(3.0);
 
-	pushGLWinCoordinates();
+  pushGLWinCoordinates();
 
-	glBegin(GL_LINE_STRIP);
+  glBegin(GL_LINE_STRIP);
 
-	glVertex2d(0.5, 0.5);
-	glVertex2d(width() - 0.5, 0.5);
-	glVertex2d(width() - 0.5, height() - 0.5);
-	glVertex2d(0.5, height() - 0.5);
-	glVertex2d(0.5, 0.5);
+  glVertex2d(0.5, 0.5);
+  glVertex2d(width() - 0.5, 0.5);
+  glVertex2d(width() - 0.5, height() - 0.5);
+  glVertex2d(0.5, height() - 0.5);
+  glVertex2d(0.5, 0.5);
 
-	glEnd();
+  glEnd();
 
-	popGLCoordinates();
+  popGLCoordinates();
 
-	glLineWidth(1.0);
+  glLineWidth(1.0);
 }
 
 //*****************************************************************************
 //    VectorizerPopup::SwatchArea implementation
 //*****************************************************************************
 
-VectorizerSwatchArea::VectorizerSwatchArea(QWidget *parent)
-{
-	m_leftSwatch = new Swatch(this);
-	m_rightSwatch = new Swatch(this);
+VectorizerSwatchArea::VectorizerSwatchArea(QWidget *parent) {
+  m_leftSwatch  = new Swatch(this);
+  m_rightSwatch = new Swatch(this);
 
-	m_leftSwatch->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
-	m_rightSwatch->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+  m_leftSwatch->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,
+                                          QSizePolicy::MinimumExpanding));
+  m_rightSwatch->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,
+                                           QSizePolicy::MinimumExpanding));
 
-	QHBoxLayout *lay = new QHBoxLayout;
-	setLayout(lay);
-	lay->addWidget(m_leftSwatch);
-	lay->addWidget(m_rightSwatch);
-	lay->setMargin(0);
+  QHBoxLayout *lay = new QHBoxLayout;
+  setLayout(lay);
+  lay->addWidget(m_leftSwatch);
+  lay->addWidget(m_rightSwatch);
+  lay->setMargin(0);
 
-	setMinimumHeight(150);
+  setMinimumHeight(150);
 
-	//The followings help in re-establishing focus for wheel events
-	m_leftSwatch->setFocusPolicy(Qt::WheelFocus);
-	m_rightSwatch->setFocusPolicy(Qt::WheelFocus);
+  // The followings help in re-establishing focus for wheel events
+  m_leftSwatch->setFocusPolicy(Qt::WheelFocus);
+  m_rightSwatch->setFocusPolicy(Qt::WheelFocus);
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::updateView(const TAffine &aff)
-{
-	if (m_leftSwatch->viewAff() != aff)
-		m_leftSwatch->viewAff() = aff, m_leftSwatch->update();
-	if (m_rightSwatch->viewAff() != aff)
-		m_rightSwatch->viewAff() = aff, m_rightSwatch->update();
+void VectorizerSwatchArea::updateView(const TAffine &aff) {
+  if (m_leftSwatch->viewAff() != aff)
+    m_leftSwatch->viewAff() = aff, m_leftSwatch->update();
+  if (m_rightSwatch->viewAff() != aff)
+    m_rightSwatch->viewAff() = aff, m_rightSwatch->update();
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::resetView()
-{
-	m_leftSwatch->resetView();
-	m_rightSwatch->resetView();
+void VectorizerSwatchArea::resetView() {
+  m_leftSwatch->resetView();
+  m_rightSwatch->resetView();
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::updateContents()
-{
-	if (!isEnabled() || !isVisible())
-		return;
+void VectorizerSwatchArea::updateContents() {
+  if (!isEnabled() || !isVisible()) return;
 
-	//Retrieve current image
-	int row, col;
-	getCurrentXsheetPosition(row, col);
-	TImageP img = getXsheetImage(row, col);
+  // Retrieve current image
+  int row, col;
+  getCurrentXsheetPosition(row, col);
+  TImageP img = getXsheetImage(row, col);
 
-	//Update the image to be vectorized
-	if ((!img) || TVectorImageP(img)) {
-		m_leftSwatch->image() = TImageP();
-		m_rightSwatch->image() = TImageP();
-	} else {
-		m_leftSwatch->image() = img;
-		if (VectorizationBuilder::instance()->update(m_rightSwatch->image()))
-			m_rightSwatch->setDrawInProgress(true);
-	}
+  // Update the image to be vectorized
+  if ((!img) || TVectorImageP(img)) {
+    m_leftSwatch->image()  = TImageP();
+    m_rightSwatch->image() = TImageP();
+  } else {
+    m_leftSwatch->image() = img;
+    if (VectorizationBuilder::instance()->update(m_rightSwatch->image()))
+      m_rightSwatch->setDrawInProgress(true);
+  }
 
-	m_leftSwatch->update();
-	m_rightSwatch->update();
+  m_leftSwatch->update();
+  m_rightSwatch->update();
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::invalidateContents()
-{
-	if (!isEnabled() || !isVisible())
-		return;
+void VectorizerSwatchArea::invalidateContents() {
+  if (!isEnabled() || !isVisible()) return;
 
-	//Retrieve current image
-	int row, col;
-	getCurrentXsheetPosition(row, col);
-	TImageP img = getXsheetImage(row, col);
+  // Retrieve current image
+  int row, col;
+  getCurrentXsheetPosition(row, col);
+  TImageP img = getXsheetImage(row, col);
 
-	//Update the image to be vectorized
-	if ((!img) || TVectorImageP(img)) {
-		m_leftSwatch->image() = TImageP();
-		m_rightSwatch->image() = TImageP();
-	} else {
-		m_leftSwatch->image() = img;
-		if (VectorizationBuilder::instance()->invalidate(m_rightSwatch->image()))
-			m_rightSwatch->setDrawInProgress(true);
-	}
+  // Update the image to be vectorized
+  if ((!img) || TVectorImageP(img)) {
+    m_leftSwatch->image()  = TImageP();
+    m_rightSwatch->image() = TImageP();
+  } else {
+    m_leftSwatch->image() = img;
+    if (VectorizationBuilder::instance()->invalidate(m_rightSwatch->image()))
+      m_rightSwatch->setDrawInProgress(true);
+  }
 
-	m_leftSwatch->update();
-	m_rightSwatch->update();
+  m_leftSwatch->update();
+  m_rightSwatch->update();
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::enablePreview(bool enable)
-{
-	setEnabled(enable);
+void VectorizerSwatchArea::enablePreview(bool enable) {
+  setEnabled(enable);
 
-	if (!isVisible())
-		return;
+  if (!isVisible()) return;
 
-	if (enable) {
-		connectUpdates();
-		updateContents();
-	} else
-		disconnectUpdates();
+  if (enable) {
+    connectUpdates();
+    updateContents();
+  } else
+    disconnectUpdates();
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::enableDrawCenterlines(bool enable)
-{
-	m_rightSwatch->setDrawVectors(enable);
-	m_rightSwatch->update();
+void VectorizerSwatchArea::enableDrawCenterlines(bool enable) {
+  m_rightSwatch->setDrawVectors(enable);
+  m_rightSwatch->update();
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::connectUpdates()
-{
-	TFrameHandle *frameHandle = TApp::instance()->getCurrentFrame();
-	TXshLevelHandle *levelHandle = TApp::instance()->getCurrentLevel();
+void VectorizerSwatchArea::connectUpdates() {
+  TFrameHandle *frameHandle    = TApp::instance()->getCurrentFrame();
+  TXshLevelHandle *levelHandle = TApp::instance()->getCurrentLevel();
 
-	connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(updateContents()));
-	connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this, SLOT(updateContents()));
-	connect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(invalidateContents()));
+  connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(updateContents()));
+  connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+          SLOT(updateContents()));
+  connect(levelHandle, SIGNAL(xshLevelChanged()), this,
+          SLOT(invalidateContents()));
 
-	VectorizationBuilder::instance()->addListener(this);
+  VectorizationBuilder::instance()->addListener(this);
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::disconnectUpdates()
-{
-	TFrameHandle *frameHandle = TApp::instance()->getCurrentFrame();
-	TXshLevelHandle *levelHandle = TApp::instance()->getCurrentLevel();
+void VectorizerSwatchArea::disconnectUpdates() {
+  TFrameHandle *frameHandle    = TApp::instance()->getCurrentFrame();
+  TXshLevelHandle *levelHandle = TApp::instance()->getCurrentLevel();
 
-	disconnect(frameHandle, 0, this, 0);
-	disconnect(levelHandle, 0, this, 0);
+  disconnect(frameHandle, 0, this, 0);
+  disconnect(levelHandle, 0, this, 0);
 
-	VectorizationBuilder::instance()->removeListener(this);
+  VectorizationBuilder::instance()->removeListener(this);
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::showEvent(QShowEvent *se)
-{
-	if (isEnabled()) {
-		connectUpdates();
-		updateContents();
-	}
+void VectorizerSwatchArea::showEvent(QShowEvent *se) {
+  if (isEnabled()) {
+    connectUpdates();
+    updateContents();
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-void VectorizerSwatchArea::hideEvent(QHideEvent *he)
-{
-	m_leftSwatch->image() = TImageP();
-	m_rightSwatch->image() = TImageP();
+void VectorizerSwatchArea::hideEvent(QHideEvent *he) {
+  m_leftSwatch->image()  = TImageP();
+  m_rightSwatch->image() = TImageP();
 
-	if (isEnabled())
-		disconnectUpdates();
+  if (isEnabled()) disconnectUpdates();
 }

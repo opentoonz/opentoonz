@@ -26,20 +26,19 @@ class TZeraryColumnFx;
   these column fxs accessible from the actual zerary fx in order to
   allow complete traversability of an fxs tree.
 */
-class TZeraryFx : public TRasterFx
-{
+class TZeraryFx : public TRasterFx {
 public:
-	friend class TZeraryColumnFx; // Defined in ToonzLib
+  friend class TZeraryColumnFx;  // Defined in ToonzLib
 
 public:
-	TZeraryFx() : m_columnFx() {}
+  TZeraryFx() : m_columnFx() {}
 
-	//! Returns the associated column fx, if any.
-	TZeraryColumnFx *getColumnFx() const { return m_columnFx; }
+  //! Returns the associated column fx, if any.
+  TZeraryColumnFx *getColumnFx() const { return m_columnFx; }
 
 private:
-	TZeraryColumnFx *m_columnFx; //!< The associated column fx. Note that
-								 //!< it is never cloned, as expected.
+  TZeraryColumnFx *m_columnFx;  //!< The associated column fx. Note that
+                                //!< it is never cloned, as expected.
 };
 
-#endif // TZERARYFX_H
+#endif  // TZERARYFX_H

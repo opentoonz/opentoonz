@@ -3,16 +3,16 @@
 #ifndef CLEANUPPREVIEW_H
 #define CLEANUPPREVIEW_H
 
-//STL includes
+// STL includes
 #include <vector>
 
-//ToonzLib includes
+// ToonzLib includes
 #include "toonz/txshsimplelevel.h"
 
-//ToonzQt includes
+// ToonzQt includes
 #include "toonzqt/menubarcommand.h"
 
-//Qt includes
+// Qt includes
 #include <QTimer>
 
 //========================================================
@@ -28,67 +28,65 @@ class TTool;
 //    PreviewToggleCommand declaration
 //**********************************************************************************
 
-class PreviewToggleCommand : public MenuItemHandler
-{
-	Q_OBJECT
+class PreviewToggleCommand : public MenuItemHandler {
+  Q_OBJECT
 
-	TXshSimpleLevelP m_sl;		  //!< Level under cleanup focus
-	std::vector<TFrameId> m_fids; //!< Previewed frames of said level
+  TXshSimpleLevelP m_sl;         //!< Level under cleanup focus
+  std::vector<TFrameId> m_fids;  //!< Previewed frames of said level
 
-	QTimer m_timer; //!< Processing timer - allows processing only
-					//!< after half a sec. without parameter changes
+  QTimer m_timer;  //!< Processing timer - allows processing only
+                   //!< after half a sec. without parameter changes
 public:
-	PreviewToggleCommand();
+  PreviewToggleCommand();
 
-	void execute();
+  void execute();
 
 protected:
-	friend class CameraTestToggleCommand;
+  friend class CameraTestToggleCommand;
 
-	void enable();
-	void disable();
+  void enable();
+  void disable();
 
-	void clean();
+  void clean();
 
 protected slots:
 
-	void onPreviewDataChanged();
-	void onModelChanged(bool needsPostProcess);
-	void postProcess();
+  void onPreviewDataChanged();
+  void onModelChanged(bool needsPostProcess);
+  void postProcess();
 };
 
 //**********************************************************************************
 //    CameraTestToggleCommand declaration
 //**********************************************************************************
 
-class CameraTestToggleCommand : public MenuItemHandler
-{
-	Q_OBJECT
+class CameraTestToggleCommand : public MenuItemHandler {
+  Q_OBJECT
 
-	TTool *m_oldTool;
+  TTool *m_oldTool;
 
-	TXshSimpleLevelP m_sl;
-	std::vector<TFrameId> m_fids;
+  TXshSimpleLevelP m_sl;
+  std::vector<TFrameId> m_fids;
 
-	QTimer m_timer;
+  QTimer m_timer;
 
 public:
-	CameraTestToggleCommand();
+  CameraTestToggleCommand();
 
-	void execute();
+  void execute();
 
 protected:
-	friend class PreviewToggleCommand;
+  friend class PreviewToggleCommand;
 
-	void enable();
-	void disable();
+  void enable();
+  void disable();
 
-	void clean();
+  void clean();
 
 protected slots:
 
-	void onPreviewDataChanged();
-	void postProcess();
+  void onPreviewDataChanged();
+  void postProcess();
 };
 
-#endif //CLEANUPPREVIEW_H
+#endif  // CLEANUPPREVIEW_H

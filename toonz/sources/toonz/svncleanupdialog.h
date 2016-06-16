@@ -11,22 +11,21 @@ class QLabel;
 
 //-----------------------------------------------------------------------------
 
-class SVNCleanupDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNCleanupDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QPushButton *m_closeButton;
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QPushButton *m_closeButton;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	VersionControlThread m_thread;
+  VersionControlThread m_thread;
 
 public:
-	SVNCleanupDialog(QWidget *parent, const QString &workingDir);
+  SVNCleanupDialog(QWidget *parent, const QString &workingDir);
 
 protected slots:
-	void onCleanupDone();
-	void onError(const QString &);
+  void onCleanupDone();
+  void onError(const QString &);
 };
 
-#endif // SVN_CLEANUP_DIALOG_H
+#endif  // SVN_CLEANUP_DIALOG_H

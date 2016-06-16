@@ -5,19 +5,18 @@
 
 #include "tscanner.h"
 
-class TScannerTwain : public TScanner
-{
+class TScannerTwain : public TScanner {
 public:
-	TScannerTwain();
-	~TScannerTwain();
+  TScannerTwain();
+  ~TScannerTwain();
 
-	bool isDeviceAvailable();
-	bool isDeviceSelected();
-	void selectDevice();
+  bool isDeviceAvailable();
+  bool isDeviceSelected();
+  void selectDevice();
 
-	void updateParameters(TScannerParameters &); // vedi TScanner
-	void acquire(const TScannerParameters &param, int paperCount);
-	bool isAreaSupported();
+  void updateParameters(TScannerParameters &);  // vedi TScanner
+  void acquire(const TScannerParameters &param, int paperCount);
+  bool isAreaSupported();
 };
 
 #endif

@@ -13,8 +13,7 @@
 #pragma warning(disable : 4251)
 
 #include <typeinfo>
-namespace std
-{
+namespace std {
 using ::type_info;
 }
 #endif
@@ -42,73 +41,63 @@ typedef TLevelReader *TLevelReaderCreateProc(const TFilePath &path);
 
 //---------------------------------------------------------
 
-class DVAPI TLevelReader : public TSmartObject
-{
-
-	DECLARE_CLASS_CODE
+class DVAPI TLevelReader : public TSmartObject {
+  DECLARE_CLASS_CODE
 
 protected:
-	TImageInfo *m_info;
-	TFilePath m_path;
-	TContentHistory *m_contentHistory;
+  TImageInfo *m_info;
+  TFilePath m_path;
+  TContentHistory *m_contentHistory;
 
 public:
-	TLevelReader(const TFilePath &path);
-	virtual ~TLevelReader();
+  TLevelReader(const TFilePath &path);
+  virtual ~TLevelReader();
 
 private:
-	// not implemented
-	TLevelReader(const TLevelReader &);
-	TLevelReader &operator=(const TLevelReader &src);
+  // not implemented
+  TLevelReader(const TLevelReader &);
+  TLevelReader &operator=(const TLevelReader &src);
 
 public:
-	virtual TLevelP loadInfo();
-	virtual QString getCreator() { return ""; }
+  virtual TLevelP loadInfo();
+  virtual QString getCreator() { return ""; }
 
-	virtual void doReadPalette(bool) {}
-	virtual void enableRandomAccessRead(bool) {}
-	virtual TImageReaderP getFrameReader(TFrameId);
+  virtual void doReadPalette(bool) {}
+  virtual void enableRandomAccessRead(bool) {}
+  virtual TImageReaderP getFrameReader(TFrameId);
 
-	// TLevelReader keeps ownership: DO NOT DELETE
-	virtual const TImageInfo *getImageInfo(TFrameId);
-	virtual const TImageInfo *getImageInfo();
+  // TLevelReader keeps ownership: DO NOT DELETE
+  virtual const TImageInfo *getImageInfo(TFrameId);
+  virtual const TImageInfo *getImageInfo();
 
-	TImageReaderP getFrameReader(int f)
-	{
-		return getFrameReader(TFrameId(f));
-	};
+  TImageReaderP getFrameReader(int f) { return getFrameReader(TFrameId(f)); };
 
-	virtual TSoundTrack *loadSoundTrack();
+  virtual TSoundTrack *loadSoundTrack();
 
-	TFilePath getFilePath() const { return m_path; }
+  TFilePath getFilePath() const { return m_path; }
 
-	static void getSupportedFormats(QStringList &names);
+  static void getSupportedFormats(QStringList &names);
 
-	enum FormatType {
-		UnsupportedFormat,
-		RasterLevel,
-		VectorLevel
-	};
+  enum FormatType { UnsupportedFormat, RasterLevel, VectorLevel };
 
-	static FormatType getFormatType(std::string extension);
+  static FormatType getFormatType(std::string extension);
 
-	static void define(
-		QString extension,
-		int reader,
-		// nel caso in cui ci siano piu' lettori per lo stesso formato
-		// (es. flash)
+  static void define(
+      QString extension, int reader,
+      // nel caso in cui ci siano piu' lettori per lo stesso formato
+      // (es. flash)
 
-		TLevelReaderCreateProc *proc);
+      TLevelReaderCreateProc *proc);
 
-	static inline void define(
-		QString extension,
-		TLevelReaderCreateProc *proc) { define(extension, 0, proc); }
+  static inline void define(QString extension, TLevelReaderCreateProc *proc) {
+    define(extension, 0, proc);
+  }
 
-	//! TLevelReader keeps the ownership of TContentHistory. Don't delete it
-	const TContentHistory *getContentHistory() const { return m_contentHistory; }
+  //! TLevelReader keeps the ownership of TContentHistory. Don't delete it
+  const TContentHistory *getContentHistory() const { return m_contentHistory; }
 
 private:
-	TFrameId::FrameFormat m_frameFormat;
+  TFrameId::FrameFormat m_frameFormat;
 };
 
 //-----------------------------------------------------------
@@ -117,13 +106,12 @@ private:
 template class DVAPI TSmartPointerT<TLevelReader>;
 #endif
 
-class DVAPI TLevelReaderP : public TSmartPointerT<TLevelReader>
-{
+class DVAPI TLevelReaderP : public TSmartPointerT<TLevelReader> {
 public:
-	// il costruttore "non banale"
-	TLevelReaderP(const TFilePath &filepath, int reader = 0);
-	// il costruttore di default
-	TLevelReaderP() {}
+  // il costruttore "non banale"
+  TLevelReaderP(const TFilePath &filepath, int reader = 0);
+  // il costruttore di default
+  TLevelReaderP() {}
 };
 
 //===========================================================
@@ -131,92 +119,90 @@ public:
 class TLevelWriter;
 class TPropertyGroup;
 
-typedef TLevelWriter *TLevelWriterCreateProc(const TFilePath &path, TPropertyGroup *);
+typedef TLevelWriter *TLevelWriterCreateProc(const TFilePath &path,
+                                             TPropertyGroup *);
 
 typedef TPropertyGroup *TWriterInfoCreateProc(const std::string &ext);
 
 //-----------------------------------------------------------
 
-class DVAPI TLevelWriter : public TSmartObject
-{
-
-	DECLARE_CLASS_CODE
+class DVAPI TLevelWriter : public TSmartObject {
+  DECLARE_CLASS_CODE
 
 protected:
-	TFilePath m_path;
-	double m_frameRate;
-	TPropertyGroup *m_properties;
-	TContentHistory *m_contentHistory;
-	QString m_creator;
+  TFilePath m_path;
+  double m_frameRate;
+  TPropertyGroup *m_properties;
+  TContentHistory *m_contentHistory;
+  QString m_creator;
 
 public:
-	TLevelWriter(const TFilePath &path, TPropertyGroup *winfo = 0); //ottiene l'ownership
-	virtual ~TLevelWriter();
+  TLevelWriter(const TFilePath &path,
+               TPropertyGroup *winfo = 0);  // ottiene l'ownership
+  virtual ~TLevelWriter();
 
-	void setCreator(const QString &creator) { m_creator = creator; }
+  void setCreator(const QString &creator) { m_creator = creator; }
 
-	virtual void setPalette(TPalette *){};
+  virtual void setPalette(TPalette *){};
 
-	virtual void setOverwritePaletteFlag(bool overwrite){};
+  virtual void setOverwritePaletteFlag(bool overwrite){};
 
-	//! Maps a list of existing level frames to a new list of frames.
-	/*!
-    This function allows an existing level to reorganize (or discard)
-    its \a disk content. It is typically implemented by TLevelWriters
-    that support <I> random access writing <\I>, which can therefore
-    write new frames on top of an existing level.
-    \n\n
-    This function requires that frames present on disk \a and in the
-    table be remapped, while frames on disk \a not in the table be
-    \b deleted. Eventual frames present in the table but not on disk
-    are ignored.
-    \n\n
-    The default implementation provides renumbering for standard
-    Toonz multi-file level types (levelName.####c.ext), and does nothing
-    if the specified path is not compatible with the multi-file format.
-  */
-	virtual void renumberFids(const std::map<TFrameId, TFrameId> &table);
+  //! Maps a list of existing level frames to a new list of frames.
+  /*!
+This function allows an existing level to reorganize (or discard)
+its \a disk content. It is typically implemented by TLevelWriters
+that support <I> random access writing <\I>, which can therefore
+write new frames on top of an existing level.
+\n\n
+This function requires that frames present on disk \a and in the
+table be remapped, while frames on disk \a not in the table be
+\b deleted. Eventual frames present in the table but not on disk
+are ignored.
+\n\n
+The default implementation provides renumbering for standard
+Toonz multi-file level types (levelName.####c.ext), and does nothing
+if the specified path is not compatible with the multi-file format.
+*/
+  virtual void renumberFids(const std::map<TFrameId, TFrameId> &table);
 
-	// Usate per le TLV
-	// Introdotte per le TLV (versione 13) che salvano l'iconcina
-	// nel file stesso.
-	virtual void setIconSize(TDimension){};
-	virtual TDimension getIconSize() const { return TDimension(); };
+  // Usate per le TLV
+  // Introdotte per le TLV (versione 13) che salvano l'iconcina
+  // nel file stesso.
+  virtual void setIconSize(TDimension){};
+  virtual TDimension getIconSize() const { return TDimension(); };
+
 private:
-	// not implemented
-	TLevelWriter(const TLevelWriter &);
-	TLevelWriter &operator=(const TLevelWriter &src);
+  // not implemented
+  TLevelWriter(const TLevelWriter &);
+  TLevelWriter &operator=(const TLevelWriter &src);
 
 public:
-	virtual TImageWriterP getFrameWriter(TFrameId);
+  virtual TImageWriterP getFrameWriter(TFrameId);
 
-	TImageWriterP getFrameWriter(int f)
-	{
-		return getFrameWriter(TFrameId(f));
-	}
+  TImageWriterP getFrameWriter(int f) { return getFrameWriter(TFrameId(f)); }
 
-	TPropertyGroup *getProperties() { return m_properties; }
+  TPropertyGroup *getProperties() { return m_properties; }
 
-	void save(const TLevelP &level);
-	virtual void saveSoundTrack(TSoundTrack *st);
+  void save(const TLevelP &level);
+  virtual void saveSoundTrack(TSoundTrack *st);
 
-	virtual void setFrameRate(double fps);
+  virtual void setFrameRate(double fps);
 
-	TFilePath getFilePath() const { return m_path; }
+  TFilePath getFilePath() const { return m_path; }
 
-	static void getSupportedFormats(QStringList &names, bool onlyRenderFormats);
+  static void getSupportedFormats(QStringList &names, bool onlyRenderFormats);
 
-	// note gets the contentHistory. can be 0
-	const TContentHistory *getContentHistory() const { return m_contentHistory; }
-	TContentHistory *getContentHistory() { return m_contentHistory; }
+  // note gets the contentHistory. can be 0
+  const TContentHistory *getContentHistory() const { return m_contentHistory; }
+  TContentHistory *getContentHistory() { return m_contentHistory; }
 
-	// destroys the old contentHistory and replaces it with the new one. Gets ownership
-	// note. set the content history first
-	void setContentHistory(TContentHistory *contentHistory);
+  // destroys the old contentHistory and replaces it with the new one. Gets
+  // ownership
+  // note. set the content history first
+  void setContentHistory(TContentHistory *contentHistory);
 
-	static void define(
-		QString extension,
-		TLevelWriterCreateProc *proc, bool isRenderFormat);
+  static void define(QString extension, TLevelWriterCreateProc *proc,
+                     bool isRenderFormat);
 };
 
 //-----------------------------------------------------------
@@ -225,37 +211,36 @@ public:
 template class DVAPI TSmartPointerT<TLevelWriter>;
 #endif
 
-class DVAPI TLevelWriterP : public TSmartPointerT<TLevelWriter>
-{
+class DVAPI TLevelWriterP : public TSmartPointerT<TLevelWriter> {
 public:
-	// il costruttore "non banale"
-	TLevelWriterP(const TFilePath &filepath, TPropertyGroup *winfo = 0); //non si prende l'ownership del TPropertyGroup
-	// il costruttore di default
-	TLevelWriterP() {}
+  // il costruttore "non banale"
+  TLevelWriterP(const TFilePath &filepath,
+                TPropertyGroup *winfo =
+                    0);  // non si prende l'ownership del TPropertyGroup
+  // il costruttore di default
+  TLevelWriterP() {}
 };
 
 //==============================================================================
 
 //  Some useful utility inlines
 
-inline bool isMovieType(std::string type)
-{
-	return (type == "mov" || type == "avi" || type == "3gp");
+inline bool isMovieType(std::string type) {
+  return (type == "mov" || type == "avi" || type == "3gp");
 }
 
 //-----------------------------------------------------------
 
-inline bool isMovieType(const TFilePath &fp)
-{
-	std::string type(fp.getType());
-	return isMovieType(type);
+inline bool isMovieType(const TFilePath &fp) {
+  std::string type(fp.getType());
+  return isMovieType(type);
 }
 
 //-----------------------------------------------------------
 
-inline bool doesSupportRandomAccess(const TFilePath &fp, bool isToonzOutput = false)
-{
-	return (fp.getDots() == "..") || (isToonzOutput && fp.getType() == "mov");
+inline bool doesSupportRandomAccess(const TFilePath &fp,
+                                    bool isToonzOutput = false) {
+  return (fp.getDots() == "..") || (isToonzOutput && fp.getType() == "mov");
 }
 
 #endif

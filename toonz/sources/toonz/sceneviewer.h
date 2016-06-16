@@ -13,7 +13,7 @@
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/flipconsole.h"
-//iwsw commented out temporarily
+// iwsw commented out temporarily
 //#include "toonzqt/ghibli_3dlut_util.h"
 
 // TnzTools includes
@@ -34,340 +34,340 @@ class Ruler;
 class QMenu;
 class SceneViewer;
 
-namespace ImageUtils
-{
+namespace ImageUtils {
 class FullScreenWidget;
 }
 
 //=====================================================================
 
-class ToggleCommandHandler : public MenuItemHandler
-{
-	int m_status;
+class ToggleCommandHandler : public MenuItemHandler {
+  int m_status;
 
 public:
-	ToggleCommandHandler(CommandId id, bool startStatus);
+  ToggleCommandHandler(CommandId id, bool startStatus);
 
-	bool getStatus() const { return m_status; }
-	//For reproducing the UI toggle when launch
-	void setStatus(bool status) { m_status = status; }
-	void execute();
+  bool getStatus() const { return m_status; }
+  // For reproducing the UI toggle when launch
+  void setStatus(bool status) { m_status = status; }
+  void execute();
 };
 
 //=============================================================================
 // SceneViewer
 //-----------------------------------------------------------------------------
 
-class SceneViewer : public QGLWidget, public TTool::Viewer, public Previewer::Listener
-{
-	Q_OBJECT
+class SceneViewer : public QGLWidget,
+                    public TTool::Viewer,
+                    public Previewer::Listener {
+  Q_OBJECT
 
-	qreal m_pressure;
-	QPoint m_lastMousePos;
-	QPoint m_pos;
-	Qt::MouseButton m_mouseButton;
+  qreal m_pressure;
+  QPoint m_lastMousePos;
+  QPoint m_pos;
+  Qt::MouseButton m_mouseButton;
 
-	bool m_foregroundDrawing;
-	bool m_tabletEvent;
-	//used to handle wrong mouse drag events!
-	bool m_buttonClicked;
+  bool m_foregroundDrawing;
+  bool m_tabletEvent;
+  // used to handle wrong mouse drag events!
+  bool m_buttonClicked;
+  bool m_shownOnce = false;
+  int m_referenceMode;
+  int m_previewMode;
+  bool m_isMouseEntered, m_forceGlFlush;
 
-	int m_referenceMode;
-	int m_previewMode;
-	bool m_isMouseEntered, m_forceGlFlush;
-
-	/*!  FreezedStatus:
+  /*!  FreezedStatus:
 *  \li NO_FREEZED freezed is not active;
 *  \li NORMAL_FREEZED freezed is active: show grab image;
 *  \li UPDATE_FREEZED freezed is active: draw last unfreezed image and grab view;
 */
-	enum FreezedStatus {
-		NO_FREEZED = 0,
-		NORMAL_FREEZED = 1,
-		UPDATE_FREEZED = 2,
-	} m_freezedStatus;
-	TRaster32P m_viewGrabImage;
+  enum FreezedStatus {
+    NO_FREEZED     = 0,
+    NORMAL_FREEZED = 1,
+    UPDATE_FREEZED = 2,
+  } m_freezedStatus;
+  TRaster32P m_viewGrabImage;
 
-	int m_FPS;
+  int m_FPS;
 
-	ImagePainter::CompareSettings m_compareSettings;
-	Ruler *m_hRuler;
-	Ruler *m_vRuler;
+  ImagePainter::CompareSettings m_compareSettings;
+  Ruler *m_hRuler;
+  Ruler *m_vRuler;
 
-	TPointD m_pan3D;
-	double m_zoomScale3D;
-	double m_phi3D;
-	double m_theta3D;
-	double m_minZ;
+  TPointD m_pan3D;
+  double m_zoomScale3D;
+  double m_phi3D;
+  double m_theta3D;
+  double m_minZ;
 
-	// current pan/zoom matrix (two different matrices are used for editing scenes and leves)
-	TAffine m_viewAff[2];
-	int m_viewMode;
+  // current pan/zoom matrix (two different matrices are used for editing scenes
+  // and leves)
+  TAffine m_viewAff[2];
+  int m_viewMode;
 
-	TPointD m_dpiScale;
+  TPointD m_dpiScale;
 
-	int m_tableDLId; //To compute table DisplayList only if necessary.
+  int m_tableDLId;  // To compute table DisplayList only if necessary.
 
-	int m_groupIndexToBeEntered;
+  int m_groupIndexToBeEntered;
 
-	double m_pixelSize;
-	bool m_eraserPointerOn;
-	QString m_backupTool;
-	TRectD m_clipRect;
+  double m_pixelSize;
+  bool m_eraserPointerOn;
+  QString m_backupTool;
+  TRectD m_clipRect;
 
-	bool m_isPicking;
+  bool m_isPicking;
 
-	TRaster32P m_3DSideL;
-	TRaster32P m_3DSideR;
-	TRaster32P m_3DTop;
+  TRaster32P m_3DSideL;
+  TRaster32P m_3DSideR;
+  TRaster32P m_3DTop;
 
-	TPointD m_sideRasterPos;
-	TPointD m_topRasterPos;
-	QString m_toolDisableReason;
+  TPointD m_sideRasterPos;
+  TPointD m_topRasterPos;
+  QString m_toolDisableReason;
 
-	bool m_editPreviewSubCamera;
+  bool m_editPreviewSubCamera;
 
-	enum Device3D {
-		NONE,
-		SIDE_LEFT_3D,
-		SIDE_RIGHT_3D,
-		TOP_3D,
-	} m_current3DDevice;
+  enum Device3D {
+    NONE,
+    SIDE_LEFT_3D,
+    SIDE_RIGHT_3D,
+    TOP_3D,
+  } m_current3DDevice;
 
-	//iwsw commented out temporarily
-	//Ghibli3DLutUtil * m_ghibli3DLutUtil;
+  // iwsw commented out temporarily
+  // Ghibli3DLutUtil * m_ghibli3DLutUtil;
 public:
-	//iwsw commented out temporarily
-	//Ghibli3DLutUtil* get3DLutUtil(){ return m_ghibli3DLutUtil; }
-	enum ReferenceMode {
-		NORMAL_REFERENCE = 1,
-		CAMERA3D_REFERENCE = 2,
-		CAMERA_REFERENCE = 3,
-		LEVEL_MODE = 128,
-	};
+  // iwsw commented out temporarily
+  // Ghibli3DLutUtil* get3DLutUtil(){ return m_ghibli3DLutUtil; }
+  enum ReferenceMode {
+    NORMAL_REFERENCE   = 1,
+    CAMERA3D_REFERENCE = 2,
+    CAMERA_REFERENCE   = 3,
+    LEVEL_MODE         = 128,
+  };
 
-	// Zoom/Pan matrices are selected by ViewMode
-	enum ViewMode {
-		SCENE_VIEWMODE = 0,
-		LEVEL_VIEWMODE = 1
-	};
+  // Zoom/Pan matrices are selected by ViewMode
+  enum ViewMode { SCENE_VIEWMODE = 0, LEVEL_VIEWMODE = 1 };
 
-	enum PreviewMode {
-		NO_PREVIEW = 0,
-		FULL_PREVIEW = 1,
-		SUBCAMERA_PREVIEW = 2
-	};
+  enum PreviewMode { NO_PREVIEW = 0, FULL_PREVIEW = 1, SUBCAMERA_PREVIEW = 2 };
 
-	SceneViewer(ImageUtils::FullScreenWidget *parent);
-	~SceneViewer();
+  SceneViewer(ImageUtils::FullScreenWidget *parent);
+  ~SceneViewer();
 
-	double getPixelSize() const { return m_pixelSize; }
+  double getPixelSize() const { return m_pixelSize; }
 
-	// Previewer::Listener
-	TRectD getPreviewRect() const;
-	void onRenderStarted(int frame);
-	void onRenderCompleted(int frame);
-	void onPreviewUpdate();
+  // Previewer::Listener
+  TRectD getPreviewRect() const;
+  void onRenderStarted(int frame);
+  void onRenderCompleted(int frame);
+  void onPreviewUpdate();
 
-	void startForegroundDrawing();
-	void endForegroundDrawing();
-	bool isPreviewEnabled() const { return m_previewMode != NO_PREVIEW; }
-	int getPreviewMode() const { return m_previewMode; }
+  void startForegroundDrawing();
+  void endForegroundDrawing();
+  bool isPreviewEnabled() const { return m_previewMode != NO_PREVIEW; }
+  int getPreviewMode() const { return m_previewMode; }
 
-	void setVisual(const ImagePainter::VisualSettings &settings);
+  void setVisual(const ImagePainter::VisualSettings &settings);
 
-	TRect getActualClipRect(const TAffine &aff);
+  TRect getActualClipRect(const TAffine &aff);
 
-	//! Return the view matrix.
-	//! The view matrix is a matrix contained in \b m_viewAff; if the SceneViewer in showing images
-	//! in Camera view Mode (m_referenceMode = CAMERA_REFERENCE) the returned affine is composed with camera
-	//! transformation.
-	TAffine getViewMatrix() const;
-	//! Return the view matrix.
-	//! The view matrix is a matrix contained in \b m_viewAff
-	TAffine getSceneMatrix() const;
+  //! Return the view matrix.
+  //! The view matrix is a matrix contained in \b m_viewAff; if the SceneViewer
+  //! in showing images
+  //! in Camera view Mode (m_referenceMode = CAMERA_REFERENCE) the returned
+  //! affine is composed with camera
+  //! transformation.
+  TAffine getViewMatrix() const;
+  //! Return the view matrix.
+  //! The view matrix is a matrix contained in \b m_viewAff
+  TAffine getSceneMatrix() const;
 
-	void setViewMatrix(const TAffine &aff, int viewMode);
+  void setViewMatrix(const TAffine &aff, int viewMode);
 
-	int getFPS() { return m_FPS; }
+  int getFPS() { return m_FPS; }
 
-	void setRulers(Ruler *v, Ruler *h)
-	{
-		m_vRuler = v;
-		m_hRuler = h;
-	}
+  void setRulers(Ruler *v, Ruler *h) {
+    m_vRuler = v;
+    m_hRuler = h;
+  }
 
-	bool is3DView() const;
-	TDimension getViewportSize() const { return TDimension(width(), height()); }
+  bool is3DView() const;
+  TDimension getViewportSize() const { return TDimension(width(), height()); }
 
-	void invalidateAll();
-	void GLInvalidateAll();
-	void GLInvalidateRect(const TRectD &rect);
-	void invalidateToolStatus();
+  void invalidateAll();
+  void GLInvalidateAll();
+  void GLInvalidateRect(const TRectD &rect);
+  void invalidateToolStatus();
 
-	TPointD getPan3D() const { return m_pan3D; }
-	double getZoomScale3D() const { return m_zoomScale3D; }
+  TPointD getPan3D() const { return m_pan3D; }
+  double getZoomScale3D() const { return m_zoomScale3D; }
 
-	double projectToZ(const TPoint &delta);
+  double projectToZ(const TPoint &delta);
 
-	TPointD getDpiScale() const { return m_dpiScale; }
-	void zoomQt(bool forward, bool reset);
-	TAffine getNormalZoomScale();
+  TPointD getDpiScale() const { return m_dpiScale; }
+  void zoomQt(bool forward, bool reset);
+  TAffine getNormalZoomScale();
 
-	bool canSwapCompared() const;
+  bool canSwapCompared() const;
 
-	bool isEditPreviewSubcamera() const { return m_editPreviewSubCamera; }
-	void setEditPreviewSubcamera(bool enabled) { m_editPreviewSubCamera = enabled; }
+  bool isEditPreviewSubcamera() const { return m_editPreviewSubCamera; }
+  void setEditPreviewSubcamera(bool enabled) {
+    m_editPreviewSubCamera = enabled;
+  }
 
-	// panning by dragging the navigator in the levelstrip
-	void navigatorPan(const QPoint &delta);
-	// a factor for getting pixel-based zoom ratio
-	double getDpiFactor();
-	// when showing the viewer with full-screen mode,
-	// add a zoom factor which can show image fitting with the screen size
-	double getZoomScaleFittingWithScreen();
-	// return the viewer geometry in order to avoid picking the style outside of the viewer
-	// when using the stylepicker and the finger tools
-	virtual TRectD getGeometry() const;
+  // panning by dragging the navigator in the levelstrip
+  void navigatorPan(const QPoint &delta);
+  // a factor for getting pixel-based zoom ratio
+  double getDpiFactor();
+  // when showing the viewer with full-screen mode,
+  // add a zoom factor which can show image fitting with the screen size
+  double getZoomScaleFittingWithScreen();
+  // return the viewer geometry in order to avoid picking the style outside of
+  // the viewer
+  // when using the stylepicker and the finger tools
+  virtual TRectD getGeometry() const;
 
-	void setFocus(Qt::FocusReason reason) { QWidget::setFocus(reason); };
+  void setFocus(Qt::FocusReason reason) { QWidget::setFocus(reason); };
 
 public:
-	//SceneViewer's gadget public functions
-	TPointD winToWorld(const QPoint &pos) const;
-	TPointD winToWorld(const TPoint &winPos) const;
+  // SceneViewer's gadget public functions
+  TPointD winToWorld(const QPoint &pos) const;
+  TPointD winToWorld(const TPoint &winPos) const;
 
-	TPoint worldToPos(const TPointD &worldPos) const;
-
-protected:
-	//Paint vars
-	TAffine m_drawCameraAff;
-	TAffine m_drawTableAff;
-	bool m_draw3DMode;
-	bool m_drawCameraTest;
-	bool m_drawIsTableVisible;
-	bool m_drawEditingLevel;
-	TRect m_actualClipRect;
-
-	//Paint methods
-	void drawBuildVars();
-	void drawEnableScissor();
-	void drawDisableScissor();
-	void drawBackground();
-	void drawCameraStand();
-	void drawPreview();
-	void drawOverlay();
-
-	void drawScene();
-	void drawToolGadgets();
+  TPoint worldToPos(const TPointD &worldPos) const;
 
 protected:
-	void mult3DMatrix();
+  // Paint vars
+  TAffine m_drawCameraAff;
+  TAffine m_drawTableAff;
+  bool m_draw3DMode;
+  bool m_drawCameraTest;
+  bool m_drawIsTableVisible;
+  bool m_drawEditingLevel;
+  TRect m_actualClipRect;
 
-	void initializeGL();
-	void resizeGL(int width, int height);
+  // Paint methods
+  void drawBuildVars();
+  void drawEnableScissor();
+  void drawDisableScissor();
+  void drawBackground();
+  void drawCameraStand();
+  void drawPreview();
+  void drawOverlay();
 
-	void paintGL();
+  void drawScene();
+  void drawToolGadgets();
 
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
+protected:
+  void mult3DMatrix();
 
-	void tabletEvent(QTabletEvent *);
-	void leaveEvent(QEvent *);
-	void enterEvent(QEvent *);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mousePressEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	void mouseDoubleClickEvent(QMouseEvent *event);
-	void wheelEvent(QWheelEvent *);
-	void keyPressEvent(QKeyEvent *event);
-	void keyReleaseEvent(QKeyEvent *event);
-	void contextMenuEvent(QContextMenuEvent *event);
-	void inputMethodEvent(QInputMethodEvent *);
-	void drawCompared();
-	bool event(QEvent *event);
+  void initializeGL();
+  void resizeGL(int width, int height);
 
-	// delta.x: right panning, pixel; delta.y: down panning, pixel
-	void panQt(const QPoint &delta);
+  void paintGL();
 
-	// center: window coordinate, pixels, topleft origin
-	void zoomQt(const QPoint &center, double scaleFactor);
+  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *);
 
-	// overriden from TTool::Viewer
-	void pan(const TPoint &delta)
-	{
-		panQt(QPoint(delta.x, delta.y));
-	}
+  void tabletEvent(QTabletEvent *);
+  void leaveEvent(QEvent *);
+  void enterEvent(QEvent *);
+  void mouseMoveEvent(QMouseEvent *event);
+  void mousePressEvent(QMouseEvent *event);
+  void mouseReleaseEvent(QMouseEvent *event);
+  void mouseDoubleClickEvent(QMouseEvent *event);
+  void wheelEvent(QWheelEvent *);
+  void keyPressEvent(QKeyEvent *event);
+  void keyReleaseEvent(QKeyEvent *event);
+  void contextMenuEvent(QContextMenuEvent *event);
+  void inputMethodEvent(QInputMethodEvent *);
+  void drawCompared();
+  bool event(QEvent *event);
 
-	// overriden from TTool::Viewer
-	void zoom(const TPointD &center, double factor);
+  // delta.x: right panning, pixel; delta.y: down panning, pixel
+  void panQt(const QPoint &delta);
 
-	void rotate(const TPointD &center, double angle);
-	void rotate3D(double dPhi, double dTheta);
+  // center: window coordinate, pixels, topleft origin
+  void zoomQt(const QPoint &center, double scaleFactor);
 
-	TAffine getToolMatrix() const;
+  // overriden from TTool::Viewer
+  void pan(const TPoint &delta) { panQt(QPoint(delta.x, delta.y)); }
 
-	//! return the column index of the drawing intersecting point \b p
-	//! (window coordinate, pixels, bottom-left origin)
-	int pick(const TPoint &point);
+  // overriden from TTool::Viewer
+  void zoom(const TPointD &center, double factor);
 
-	//! return the column indexes of the drawings intersecting point \b p
-	//! (window coordinate, pixels, bottom-left origin)
-	int posToColumnIndex(const TPoint &p, double distance, bool includeInvisible = true) const;
-	void posToColumnIndexes(const TPoint &p, std::vector<int> &indexes, double distance, bool includeInvisible = true) const;
+  void rotate(const TPointD &center, double angle);
+  void rotate3D(double dPhi, double dTheta);
 
-	//! return the row of the drawings intersecting point \b p (used with onion skins)
-	//! (window coordinate, pixels, bottom-left origin)
-	int posToRow(const TPoint &p, double distance, bool includeInvisible = true) const;
+  TAffine getToolMatrix() const;
 
-	void dragEnterEvent(QDragEnterEvent *event);
-	void dropEvent(QDropEvent *event);
+  //! return the column index of the drawing intersecting point \b p
+  //! (window coordinate, pixels, bottom-left origin)
+  int pick(const TPoint &point);
 
-	void resetInputMethod();
+  //! return the column indexes of the drawings intersecting point \b p
+  //! (window coordinate, pixels, bottom-left origin)
+  int posToColumnIndex(const TPoint &p, double distance,
+                       bool includeInvisible = true) const;
+  void posToColumnIndexes(const TPoint &p, std::vector<int> &indexes,
+                          double distance, bool includeInvisible = true) const;
 
-	void set3DLeftSideView();
-	void set3DRightSideView();
-	void set3DTopView();
+  //! return the row of the drawings intersecting point \b p (used with onion
+  //! skins)
+  //! (window coordinate, pixels, bottom-left origin)
+  int posToRow(const TPoint &p, double distance,
+               bool includeInvisible = true) const;
 
-	void setFocus() { QWidget::setFocus(); };
+  void dragEnterEvent(QDragEnterEvent *event);
+  void dropEvent(QDropEvent *event);
+
+  void resetInputMethod();
+
+  void set3DLeftSideView();
+  void set3DRightSideView();
+  void set3DTopView();
+
+  void setFocus() { QWidget::setFocus(); };
 
 public slots:
 
-	void resetSceneViewer();
-	void setActualPixelSize();
-	void onXsheetChanged();
-	void onObjectSwitched();
-	// when tool options are changed, update tooltip immediately
-	void onToolChanged();
-	void onToolSwitched();
-	void onSceneChanged();
-	void onLevelChanged();
-	// when level is switched, update m_dpiScale in order to show white background for Ink&Paint work properly
-	void onLevelSwitched();
-	void onFrameSwitched();
+  void resetSceneViewer();
+  void setActualPixelSize();
+  void onXsheetChanged();
+  void onObjectSwitched();
+  // when tool options are changed, update tooltip immediately
+  void onToolChanged();
+  void onToolSwitched();
+  void onSceneChanged();
+  void onLevelChanged();
+  // when level is switched, update m_dpiScale in order to show white background
+  // for Ink&Paint work properly
+  void onLevelSwitched();
+  void onFrameSwitched();
 
-	void setReferenceMode(int referenceMode);
-	void enablePreview(int previewMode);
-	void freeze(bool on);
+  void setReferenceMode(int referenceMode);
+  void enablePreview(int previewMode);
+  void freeze(bool on);
 
-	void onButtonPressed(FlipConsole::EGadget button);
-	void fitToCamera();
-	void swapCompared();
-	void regeneratePreviewFrame();
-	void regeneratePreview();
+  void onButtonPressed(FlipConsole::EGadget button);
+  void fitToCamera();
+  void swapCompared();
+  void regeneratePreviewFrame();
+  void regeneratePreview();
 
-	// delete preview-subcamera executed from context menu
-	void doDeleteSubCamera();
+  // delete preview-subcamera executed from context menu
+  void doDeleteSubCamera();
 
 signals:
 
-	void onZoomChanged();
-	void freezeStateChanged(bool);
-	void previewStatusChanged();
-	// when pan/zoom on the viewer, notify to level strip in order to update the navigator
-	void refreshNavi();
-	// for updating the titlebar
-	void previewToggled();
+  void onZoomChanged();
+  void freezeStateChanged(bool);
+  void previewStatusChanged();
+  // when pan/zoom on the viewer, notify to level strip in order to update the
+  // navigator
+  void refreshNavi();
+  // for updating the titlebar
+  void previewToggled();
 };
 
-#endif // SCENEVIEWER_H
+#endif  // SCENEVIEWER_H

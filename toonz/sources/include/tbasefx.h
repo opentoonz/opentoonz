@@ -22,10 +22,9 @@
 //************************************************************************
 
 //! Defines built-in Toonz fxs.
-class DVAPI TBaseRasterFx : public TRasterFx
-{
+class DVAPI TBaseRasterFx : public TRasterFx {
 public:
-	std::string getPluginId() const { return "Base"; }
+  std::string getPluginId() const { return "Base"; }
 };
 
 //************************************************************************
@@ -33,10 +32,9 @@ public:
 //************************************************************************
 
 //! Defines built-in Toonz zerary fxs.
-class DVAPI TBaseZeraryFx : public TZeraryFx
-{
+class DVAPI TBaseZeraryFx : public TZeraryFx {
 public:
-	std::string getPluginId() const { return "Base"; }
+  std::string getPluginId() const { return "Base"; }
 };
 
-#endif // TBASEFX_INCLUDED
+#endif  // TBASEFX_INCLUDED

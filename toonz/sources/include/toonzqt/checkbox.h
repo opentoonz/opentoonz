@@ -19,33 +19,31 @@
 
 //=============================================================================
 
-namespace DVGui
-{
+namespace DVGui {
 
 //=============================================================================
 /*! \brief It's a \b QCheckBox that change state also with click in text.
 
-		Inherits \b QCheckBox.
+                Inherits \b QCheckBox.
 */
 
-class DVAPI CheckBox : public QCheckBox
-{
-	Q_OBJECT
+class DVAPI CheckBox : public QCheckBox {
+  Q_OBJECT
 
 public:
-	CheckBox(QWidget *parent = 0);
-	CheckBox(const QString &text, QWidget *parent = 0);
+  CheckBox(QWidget *parent = 0);
+  CheckBox(const QString &text, QWidget *parent = 0);
 
-	~CheckBox() {}
+  ~CheckBox() {}
 
 protected:
-	void mousePressEvent(QMouseEvent *e);
-	void mouseReleaseEvent(QMouseEvent *e);
-	void mouseMoveEvent(QMouseEvent *);
+  void mousePressEvent(QMouseEvent *e);
+  void mouseReleaseEvent(QMouseEvent *e);
+  void mouseMoveEvent(QMouseEvent *);
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+}  // namespace DVGui
 //-----------------------------------------------------------------------------
 
-#endif // CHECKBOX_H
+#endif  // CHECKBOX_H

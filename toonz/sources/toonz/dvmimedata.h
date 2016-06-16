@@ -9,16 +9,14 @@
 // DvMimedata
 //-----------------------------------------------------------------------------
 
-class DvMimeData : public QMimeData
-{
-
+class DvMimeData : public QMimeData {
 public:
-	DvMimeData();
-	~DvMimeData();
+  DvMimeData();
+  ~DvMimeData();
 
-	virtual DvMimeData *clone() const = 0;
+  virtual DvMimeData *clone() const = 0;
 };
 
 QMimeData *cloneData(const QMimeData *data);
 
-#endif //DVMIMEDATA_INCLUDED
+#endif  // DVMIMEDATA_INCLUDED

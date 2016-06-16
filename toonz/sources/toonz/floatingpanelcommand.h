@@ -8,22 +8,19 @@
 
 class TPanel;
 
-// usage: OpenFloatingPanel openMyWidget(MI_OpenMyWidget, "paneName" , tr("My Widget"));
+// usage: OpenFloatingPanel openMyWidget(MI_OpenMyWidget, "paneName" , tr("My
+// Widget"));
 // the "paneName" create the right widget and set it to the pane
 
-class OpenFloatingPanel : public MenuItemHandler
-{
-	QString m_title;
-	std::string m_panelType;
+class OpenFloatingPanel : public MenuItemHandler {
+  QString m_title;
+  std::string m_panelType;
 
 public:
-	OpenFloatingPanel(
-		CommandId id,
-		const std::string &panelType,
-		QString title);
-	void execute();
+  OpenFloatingPanel(CommandId id, const std::string &panelType, QString title);
+  void execute();
 
-	static TPanel *getOrOpenFloatingPanel(const std::string &panelType);
+  static TPanel *getOrOpenFloatingPanel(const std::string &panelType);
 };
 
 #endif

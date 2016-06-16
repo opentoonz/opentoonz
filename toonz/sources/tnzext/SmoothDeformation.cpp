@@ -30,69 +30,55 @@ REGISTER(SmoothDeformation, 1);
 
 //-----------------------------------------------------------------------------
 
-SmoothDeformation::SmoothDeformation()
-{
-	setPotential(new NotSimmetricBezierPotential);
-	shortcutKey_ = ContextStatus::ALT;
+SmoothDeformation::SmoothDeformation() {
+  setPotential(new NotSimmetricBezierPotential);
+  shortcutKey_ = ContextStatus::ALT;
 }
 
 //-----------------------------------------------------------------------------
 
-SmoothDeformation::~SmoothDeformation()
-{
+SmoothDeformation::~SmoothDeformation() {}
+
+//-----------------------------------------------------------------------------
+
+void SmoothDeformation::draw(Designer *designer) {
+  StrokeDeformationImpl::draw(0);
+  designer->draw(this);
 }
 
 //-----------------------------------------------------------------------------
 
-void SmoothDeformation::draw(Designer *designer)
-{
-	StrokeDeformationImpl::draw(0);
-	designer->draw(this);
-}
+bool SmoothDeformation::check_(const ContextStatus *status) {
+  assert(status && "Not status available");
 
-//-----------------------------------------------------------------------------
+  if (!isASpireCorner(status->stroke2change_, status->w_, status->cornerSize_,
+                      &this->getSpiresList()))
+    return true;
 
-bool SmoothDeformation::check_(const ContextStatus *status)
-{
-	assert(status && "Not status available");
-
-	if (!isASpireCorner(status->stroke2change_,
-						status->w_,
-						status->cornerSize_,
-						&this->getSpiresList()))
-		return true;
-
-	return false;
+  return false;
 }
 
 //-----------------------------------------------------------------------------
 
 bool SmoothDeformation::findExtremes_(const ContextStatus *status,
-									  Interval &ret)
-{
-	return ToonzExt::findNearestSpireCorners(status->stroke2change_,
-											 status->w_,
-											 ret,
-											 status->cornerSize_,
-											 &this->getSpiresList());
+                                      Interval &ret) {
+  return ToonzExt::findNearestSpireCorners(status->stroke2change_, status->w_,
+                                           ret, status->cornerSize_,
+                                           &this->getSpiresList());
 }
 
 //-----------------------------------------------------------------------------
 
-double
-SmoothDeformation::findActionLength()
-{
-	// this means that all length needs to be used
-	return 2.0 * stroke2manipulate_->getLength();
+double SmoothDeformation::findActionLength() {
+  // this means that all length needs to be used
+  return 2.0 * stroke2manipulate_->getLength();
 }
 
 //-----------------------------------------------------------------------------
 
-SmoothDeformation *
-SmoothDeformation::instance()
-{
-	static SmoothDeformation singleton;
-	return &singleton;
+SmoothDeformation *SmoothDeformation::instance() {
+  static SmoothDeformation singleton;
+  return &singleton;
 }
 
 //-----------------------------------------------------------------------------

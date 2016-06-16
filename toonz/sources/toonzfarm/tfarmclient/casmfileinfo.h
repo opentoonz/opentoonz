@@ -7,14 +7,13 @@
 
 //------------------------------------------------------------------------------
 
-class CasmFileInfo
-{
+class CasmFileInfo {
 public:
-	CasmFileInfo(const TFilePath &fp);
-	void getFrameRange(int &startFrame, int &endFrame, bool &interlaced);
+  CasmFileInfo(const TFilePath &fp);
+  void getFrameRange(int &startFrame, int &endFrame, bool &interlaced);
 
 private:
-	TFilePath m_fp;
+  TFilePath m_fp;
 };
 
 #endif

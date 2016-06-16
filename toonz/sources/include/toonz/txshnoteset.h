@@ -18,60 +18,57 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TIStream;
 class TOStream;
 
 //=============================================================================
 // TXshNoteSet
 
-class DVAPI TXshNoteSet
-{
+class DVAPI TXshNoteSet {
 public:
-	struct Note {
-		//!Default colors are defined in TSceneProperties
-		int m_colorIndex;
-		//!Is html test, contains font inforamtion.
-		QString m_text;
-		int m_row;
-		int m_col;
-		//!Top left point of note rect in cell.
-		TPointD m_pos;
+  struct Note {
+    //! Default colors are defined in TSceneProperties
+    int m_colorIndex;
+    //! Is html test, contains font inforamtion.
+    QString m_text;
+    int m_row;
+    int m_col;
+    //! Top left point of note rect in cell.
+    TPointD m_pos;
 
-		Note()
-			: m_colorIndex(0), m_text(), m_row(0), m_col(0), m_pos(TPointD(5, 5))
-		{
-		}
-		~Note() {}
-	};
-	QList<Note> m_notes;
+    Note()
+        : m_colorIndex(0), m_text(), m_row(0), m_col(0), m_pos(TPointD(5, 5)) {}
+    ~Note() {}
+  };
+  QList<Note> m_notes;
 
-	TXshNoteSet();
-	~TXshNoteSet() {}
+  TXshNoteSet();
+  ~TXshNoteSet() {}
 
-	int addNote(Note note);
-	void removeNote(int index);
+  int addNote(Note note);
+  void removeNote(int index);
 
-	int getCount() const;
+  int getCount() const;
 
-	int getNoteColorIndex(int noteIndex) const;
-	void setNoteColorIndex(int noteIndex, int colorIndex);
+  int getNoteColorIndex(int noteIndex) const;
+  void setNoteColorIndex(int noteIndex, int colorIndex);
 
-	//!Return html text, text with font information.
-	QString getNoteHtmlText(int noteIndex) const;
-	void setNoteHtmlText(int noteIndex, QString text);
+  //! Return html text, text with font information.
+  QString getNoteHtmlText(int noteIndex) const;
+  void setNoteHtmlText(int noteIndex, QString text);
 
-	int getNoteRow(int noteIndex) const;
-	void setNoteRow(int noteIndex, int row);
+  int getNoteRow(int noteIndex) const;
+  void setNoteRow(int noteIndex, int row);
 
-	int getNoteCol(int noteIndex) const;
-	void setNoteCol(int noteIndex, int col);
+  int getNoteCol(int noteIndex) const;
+  void setNoteCol(int noteIndex, int col);
 
-	TPointD getNotePos(int noteIndex) const;
-	void setNotePos(int noteIndex, TPointD pos);
+  TPointD getNotePos(int noteIndex) const;
+  void setNotePos(int noteIndex, TPointD pos);
 
-	void loadData(TIStream &is);
-	void saveData(TOStream &os);
+  void loadData(TIStream &is);
+  void saveData(TOStream &os);
 };
 
-#endif //TXSHNOTESET_INCLUDED
+#endif  // TXSHNOTESET_INCLUDED

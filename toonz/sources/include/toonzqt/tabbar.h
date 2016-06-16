@@ -22,37 +22,36 @@
 
 //=============================================================================
 
-namespace DVGui
-{
+namespace DVGui {
 
 //=============================================================================
 /*! \brief The TabBar class allows to show a tabar with icon in tab.
 
-		Inherits \b QTabar.
+                Inherits \b QTabar.
 
-		This object, more than \b QTabBar, allows to show icon in tab using \b addIconTab(),
-		it's anyhow possible add text tab using \b addSimpleTab().
+                This object, more than \b QTabBar, allows to show icon in tab
+   using \b addIconTab(),
+                it's anyhow possible add text tab using \b addSimpleTab().
 */
-class DVAPI TabBar : public QTabBar
-{
-	Q_OBJECT
+class DVAPI TabBar : public QTabBar {
+  Q_OBJECT
 
-	std::vector<QPixmap> m_pixmaps;
+  std::vector<QPixmap> m_pixmaps;
 
 public:
-	TabBar(QWidget *parent = 0);
-	~TabBar();
+  TabBar(QWidget *parent = 0);
+  ~TabBar();
 
-	void addIconTab(const char *iconPrefixName, const QString &tooltip);
-	void addSimpleTab(const QString &text);
-	void clearTabBar();
+  void addIconTab(const char *iconPrefixName, const QString &tooltip);
+  void addSimpleTab(const QString &text);
+  void clearTabBar();
 
 protected:
-	void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event);
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+}  // namespace DVGui
 //-----------------------------------------------------------------------------
 
-#endif // TABBAR_H
+#endif  // TABBAR_H

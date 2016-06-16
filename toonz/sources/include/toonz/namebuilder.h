@@ -19,40 +19,37 @@
 
 //-------------------------------------------------------------------
 
-class DVAPI NameBuilder
-{
+class DVAPI NameBuilder {
 public:
-	virtual ~NameBuilder() {}
-	virtual std::wstring getNext() = 0;
+  virtual ~NameBuilder() {}
+  virtual std::wstring getNext() = 0;
 
-	static NameBuilder *getBuilder(std::wstring levelName = L"");
+  static NameBuilder *getBuilder(std::wstring levelName = L"");
 
-	// NameBuilder::getBuilder() restituisce un NameCreator
-	// NameBuilder::getBuilder("pippo") restituisce un NameModifier
+  // NameBuilder::getBuilder() restituisce un NameCreator
+  // NameBuilder::getBuilder("pippo") restituisce un NameModifier
 };
 
 //-------------------------------------------------------------------
 
 // NameCreator genera la sequenza 'A', 'B', ...
-class DVAPI NameCreator : public NameBuilder
-{
-	std::vector<int> m_s;
+class DVAPI NameCreator : public NameBuilder {
+  std::vector<int> m_s;
 
 public:
-	NameCreator() {}
-	std::wstring getNext();
+  NameCreator() {}
+  std::wstring getNext();
 };
 
 //-------------------------------------------------------------------
 
-class DVAPI NameModifier : public NameBuilder
-{
-	std::wstring m_nameBase;
-	int m_index;
+class DVAPI NameModifier : public NameBuilder {
+  std::wstring m_nameBase;
+  int m_index;
 
 public:
-	NameModifier(std::wstring name);
-	std::wstring getNext();
+  NameModifier(std::wstring name);
+  std::wstring getNext();
 };
 
 //-------------------------------------------------------------------

@@ -3,7 +3,7 @@
 #ifndef MESHIFYPOPUP_H
 #define MESHIFYPOPUP_H
 
-//TnzQt includes
+// TnzQt includes
 #include "toonzqt/dvdialog.h"
 
 // TnzLib includes
@@ -19,8 +19,7 @@
 
 class TXshSimpleLevel;
 
-namespace DVGui
-{
+namespace DVGui {
 class MeasuredDoubleField;
 class DoubleLineEdit;
 class IntLineEdit;
@@ -39,46 +38,47 @@ class QPushButton;
             Plastic Tool.
 */
 
-class MeshifyPopup : public DVGui::Dialog
-{
-	Q_OBJECT
+class MeshifyPopup : public DVGui::Dialog {
+  Q_OBJECT
 
 public:
-	MeshifyPopup();
+  MeshifyPopup();
 
 protected:
-	void showEvent(QShowEvent *se);
-	void hideEvent(QHideEvent *se);
+  void showEvent(QShowEvent *se);
+  void hideEvent(QHideEvent *se);
 
-	void acquirePreview();
-	void updateMeshPreview();
+  void acquirePreview();
+  void updateMeshPreview();
 
 protected slots:
 
-	void onCellSwitched();
-	void onParamsChanged(bool dragging = false);
+  void onCellSwitched();
+  void onParamsChanged(bool dragging = false);
 
-	void apply();
-
-private:
-	class Swatch;
+  void apply();
 
 private:
-	// GUI memebers
+  class Swatch;
 
-	DVGui::MeasuredDoubleField *m_edgesLength; //!< Target length of mesh edges.
-	DVGui::DoubleLineEdit *m_rasterizationDpi; //!< Dpi used for pli and sub-xsheet rendering.
-	DVGui::IntLineEdit *m_margin;			   //!< Mesh margin to the original shape (in pixels).
+private:
+  // GUI memebers
 
-	Swatch *m_viewer;	 //!< Swatch viewer used to preview meshification results.
-	QPushButton *m_okBtn; //!< "Ok" button at bottom.
+  DVGui::MeasuredDoubleField *m_edgesLength;  //!< Target length of mesh edges.
+  DVGui::DoubleLineEdit
+      *m_rasterizationDpi;  //!< Dpi used for pli and sub-xsheet rendering.
+  DVGui::IntLineEdit
+      *m_margin;  //!< Mesh margin to the original shape (in pixels).
 
-	// Preview-related members
+  Swatch *m_viewer;  //!< Swatch viewer used to preview meshification results.
+  QPushButton *m_okBtn;  //!< "Ok" button at bottom.
 
-	int m_r,		 //!< Current xsheet row.
-		m_c;		 //!< Current xsheet column.
-	TXshCell m_cell; //!< Xsheet cell to be previewed (may not correspond
-					 //!  to <TT>(m_r, m_c)</TT> due to redirection!).
+  // Preview-related members
+
+  int m_r,          //!< Current xsheet row.
+      m_c;          //!< Current xsheet column.
+  TXshCell m_cell;  //!< Xsheet cell to be previewed (may not correspond
+                    //!  to <TT>(m_r, m_c)</TT> due to redirection!).
 };
 
-#endif // MESHIFYPOPUP_H
+#endif  // MESHIFYPOPUP_H

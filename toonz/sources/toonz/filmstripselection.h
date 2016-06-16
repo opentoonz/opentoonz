@@ -13,51 +13,52 @@ class TXshSimpleLevel;
 // TFilmStripSelection
 //-----------------------------------------------------------------------------
 
-class TFilmstripSelection : public TSelection
-{
+class TFilmstripSelection : public TSelection {
 public:
-	typedef std::pair<TFrameId, TFrameId> InbetweenRange;
+  typedef std::pair<TFrameId, TFrameId> InbetweenRange;
 
 private:
-	std::set<TFrameId> m_selectedFrames;
-	InbetweenRange m_inbetweenRange;
+  std::set<TFrameId> m_selectedFrames;
+  InbetweenRange m_inbetweenRange;
 
-	void updateInbetweenRange();
+  void updateInbetweenRange();
 
 public:
-	TFilmstripSelection();
-	~TFilmstripSelection();
+  TFilmstripSelection();
+  ~TFilmstripSelection();
 
-	void enableCommands();
+  void enableCommands();
 
-	bool isEmpty() const;
+  bool isEmpty() const;
 
-	void selectNone();
-	void select(const TFrameId &fid, bool selected = true);
-	bool isSelected(const TFrameId &fid) const;
+  void selectNone();
+  void select(const TFrameId &fid, bool selected = true);
+  bool isSelected(const TFrameId &fid) const;
 
-	const std::set<TFrameId> &getSelectedFids() const { return m_selectedFrames; }
+  const std::set<TFrameId> &getSelectedFids() const { return m_selectedFrames; }
 
-	InbetweenRange getInbetweenRange() const { return m_inbetweenRange; }
-	bool isInInbetweenRange(const TFrameId &fid) const { return m_inbetweenRange.first < fid && fid < m_inbetweenRange.second; }
+  InbetweenRange getInbetweenRange() const { return m_inbetweenRange; }
+  bool isInInbetweenRange(const TFrameId &fid) const {
+    return m_inbetweenRange.first < fid && fid < m_inbetweenRange.second;
+  }
 
-	void selectAll();
-	void invertSelection();
-	void copyFrames();
-	void cutFrames();
-	void pasteFrames();
-	void mergeFrames();
-	void pasteInto();
-	void deleteFrames();
-	void insertEmptyFrames();
-	void addFrames();
-	void reverseFrames();
-	void swingFrames();
-	void stepFrames(int step);
-	void eachFrames(int step);
-	void duplicateFrames();
-	void exposeFrames();
-	void renumberFrames();
+  void selectAll();
+  void invertSelection();
+  void copyFrames();
+  void cutFrames();
+  void pasteFrames();
+  void mergeFrames();
+  void pasteInto();
+  void deleteFrames();
+  void insertEmptyFrames();
+  void addFrames();
+  void reverseFrames();
+  void swingFrames();
+  void stepFrames(int step);
+  void eachFrames(int step);
+  void duplicateFrames();
+  void exposeFrames();
+  void renumberFrames();
 };
 
-#endif // TFILMSTRIPSELECTION_H
+#endif  // TFILMSTRIPSELECTION_H

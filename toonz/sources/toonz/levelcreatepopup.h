@@ -11,50 +11,49 @@
 // forward declaration
 class QLabel;
 class QComboBox;
-//class DVGui::MeasuredDoubleLineEdit;
+// class DVGui::MeasuredDoubleLineEdit;
 
 //=============================================================================
 // LevelCreatePopup
 //-----------------------------------------------------------------------------
 
-class LevelCreatePopup : public DVGui::Dialog
-{
-	Q_OBJECT
+class LevelCreatePopup : public DVGui::Dialog {
+  Q_OBJECT
 
-	DVGui::LineEdit *m_nameFld;
-	DVGui::IntLineEdit *m_fromFld;
-	DVGui::IntLineEdit *m_toFld;
-	QComboBox *m_levelTypeOm;
-	DVGui::IntLineEdit *m_stepFld;
-	DVGui::IntLineEdit *m_incFld;
-	DVGui::FileField *m_pathFld;
-	QLabel *m_widthLabel;
-	QLabel *m_heightLabel;
-	QLabel *m_dpiLabel;
-	DVGui::MeasuredDoubleLineEdit *m_widthFld;
-	DVGui::MeasuredDoubleLineEdit *m_heightFld;
-	DVGui::DoubleLineEdit *m_dpiFld;
+  DVGui::LineEdit *m_nameFld;
+  DVGui::IntLineEdit *m_fromFld;
+  DVGui::IntLineEdit *m_toFld;
+  QComboBox *m_levelTypeOm;
+  DVGui::IntLineEdit *m_stepFld;
+  DVGui::IntLineEdit *m_incFld;
+  DVGui::FileField *m_pathFld;
+  QLabel *m_widthLabel;
+  QLabel *m_heightLabel;
+  QLabel *m_dpiLabel;
+  DVGui::MeasuredDoubleLineEdit *m_widthFld;
+  DVGui::MeasuredDoubleLineEdit *m_heightFld;
+  DVGui::DoubleLineEdit *m_dpiFld;
 
 public:
-	LevelCreatePopup();
+  LevelCreatePopup();
 
-	void setSizeWidgetEnable(bool isEnable);
-	int getLevelType() const;
+  void setSizeWidgetEnable(bool isEnable);
+  int getLevelType() const;
 
-	void update();
-	bool apply();
+  void update();
+  bool apply();
 
 protected:
-	// set m_pathFld to the default path
-	void updatePath();
+  // set m_pathFld to the default path
+  void updatePath();
 
-	void showEvent(QShowEvent *);
+  void showEvent(QShowEvent *);
 
 public slots:
-	void onLevelTypeChanged(const QString &text);
-	void onOkBtn();
+  void onLevelTypeChanged(const QString &text);
+  void onOkBtn();
 
-	void onApplyButton();
+  void onApplyButton();
 };
 
-#endif // LEVELCREATEPOPUP_H
+#endif  // LEVELCREATEPOPUP_H

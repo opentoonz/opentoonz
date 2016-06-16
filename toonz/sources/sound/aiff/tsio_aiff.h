@@ -8,28 +8,26 @@
 //==========================================================
 /*!
 The class TSoundTrackReaderAiff reads audio files having
-.aiff extension 
+.aiff extension
 */
 
-class TSoundTrackReaderAiff : public TSoundTrackReader
-{
+class TSoundTrackReaderAiff : public TSoundTrackReader {
 public:
-	TSoundTrackReaderAiff(const TFilePath &fp);
-	~TSoundTrackReaderAiff() {}
+  TSoundTrackReaderAiff(const TFilePath &fp);
+  ~TSoundTrackReaderAiff() {}
 
-	/*!
-  Loads the .aiff audio file whose path has been specified in the constructor.
-  It returns a TSoundTrackP created from the audio file 
-  */
-	TSoundTrackP load();
+  /*!
+Loads the .aiff audio file whose path has been specified in the constructor.
+It returns a TSoundTrackP created from the audio file
+*/
+  TSoundTrackP load();
 
-	/*!
-  Returns a soundtrack reader able to read .aiff audio files
-  */
-	static TSoundTrackReader *create(const TFilePath &fp)
-	{
-		return new TSoundTrackReaderAiff(fp);
-	}
+  /*!
+Returns a soundtrack reader able to read .aiff audio files
+*/
+  static TSoundTrackReader *create(const TFilePath &fp) {
+    return new TSoundTrackReaderAiff(fp);
+  }
 };
 
 //==========================================================
@@ -37,25 +35,23 @@ public:
 The class TSoundTrackWriterAiff writes audio file having
 .aiff extension
 */
-class TSoundTrackWriterAiff : public TSoundTrackWriter
-{
+class TSoundTrackWriterAiff : public TSoundTrackWriter {
 public:
-	TSoundTrackWriterAiff(const TFilePath &fp);
-	~TSoundTrackWriterAiff() {}
+  TSoundTrackWriterAiff(const TFilePath &fp);
+  ~TSoundTrackWriterAiff() {}
 
-	/*!
-  Saves the informations of the soundtrack in .aiff audio file
-  whose path has been specified in the constructor.
-  */
-	bool save(const TSoundTrackP &);
+  /*!
+Saves the informations of the soundtrack in .aiff audio file
+whose path has been specified in the constructor.
+*/
+  bool save(const TSoundTrackP &);
 
-	/*!
-  Returns a soundtrack writer able to write .aiff audio files
-  */
-	static TSoundTrackWriter *create(const TFilePath &fp)
-	{
-		return new TSoundTrackWriterAiff(fp);
-	}
+  /*!
+Returns a soundtrack writer able to write .aiff audio files
+*/
+  static TSoundTrackWriter *create(const TFilePath &fp) {
+    return new TSoundTrackWriterAiff(fp);
+  }
 };
 
 #endif

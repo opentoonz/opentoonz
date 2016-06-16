@@ -56,501 +56,434 @@ using namespace ToonzExt;
 // viene usato??
 class TGlobalChange;
 
-namespace
-{
+namespace {
 
 struct GLMatrixGuard {
-	GLMatrixGuard() { glPushMatrix(); }
-	~GLMatrixGuard() { glPopMatrix(); }
+  GLMatrixGuard() { glPushMatrix(); }
+  ~GLMatrixGuard() { glPopMatrix(); }
 };
 
-} // namespace
+}  // namespace
 
 //-----------------------------------------------------------------------------
 
 PinchTool::PinchTool()
-	: TTool("T_Pinch"), m_active(false), m_cursorEnabled(false), m_draw(false), m_undo(0), m_showSelector(true), m_toolRange("Size:", 1.0, 1000.0, 500.0) // W_ToolOptions_PinchTool
-	  ,
-	  m_toolCornerSize("Corner:", 1.0, 180.0, 160.0) // W_ToolOptions_PinchCorner
-	  ,
-	  m_autoOrManual("Manual", false) // W_ToolOptions_PinchManual
-	  ,
-	  m_deformation(new ToonzExt::StrokeDeformation), m_selector(500, 10, 1000)
-{
-	bind(TTool::Vectors);
+    : TTool("T_Pinch")
+    , m_active(false)
+    , m_cursorEnabled(false)
+    , m_draw(false)
+    , m_undo(0)
+    , m_showSelector(true)
+    , m_toolRange("Size:", 1.0, 1000.0, 500.0)  // W_ToolOptions_PinchTool
+    , m_toolCornerSize("Corner:", 1.0, 180.0,
+                       160.0)          // W_ToolOptions_PinchCorner
+    , m_autoOrManual("Manual", false)  // W_ToolOptions_PinchManual
+    , m_deformation(new ToonzExt::StrokeDeformation)
+    , m_selector(500, 10, 1000) {
+  bind(TTool::Vectors);
 
-	m_prop.bind(m_toolCornerSize);
-	m_prop.bind(m_autoOrManual);
-	m_prop.bind(m_toolRange);
+  m_prop.bind(m_toolCornerSize);
+  m_prop.bind(m_autoOrManual);
+  m_prop.bind(m_toolRange);
 
-	CornerDeformation::instance()->setCursorId(ToolCursor::PinchWaveCursor);
-	SmoothDeformation::instance()->setCursorId(ToolCursor::PinchCursor);
-	StraightCornerDeformation::instance()->setCursorId(ToolCursor::PinchAngleCursor);
-	assert(m_deformation && "Can not create a deformation CATASTROFIC!!!");
+  CornerDeformation::instance()->setCursorId(ToolCursor::PinchWaveCursor);
+  SmoothDeformation::instance()->setCursorId(ToolCursor::PinchCursor);
+  StraightCornerDeformation::instance()->setCursorId(
+      ToolCursor::PinchAngleCursor);
+  assert(m_deformation && "Can not create a deformation CATASTROFIC!!!");
 
-	TMouseEvent dummy;
-	updateInterfaceStatus(dummy);
-	m_autoOrManual.setId("Manual");
+  TMouseEvent dummy;
+  updateInterfaceStatus(dummy);
+  m_autoOrManual.setId("Manual");
 }
 
 //-----------------------------------------------------------------------------
 
-PinchTool::~PinchTool()
-{
-	delete m_deformation;
-	m_deformation = 0;
+PinchTool::~PinchTool() {
+  delete m_deformation;
+  m_deformation = 0;
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::updateTranslation()
-{
-	m_toolRange.setQStringName(tr("Size:"));
-	m_toolCornerSize.setQStringName(tr("Corner:"));
-	m_autoOrManual.setQStringName(tr("Manual"));
+void PinchTool::updateTranslation() {
+  m_toolRange.setQStringName(tr("Size:"));
+  m_toolCornerSize.setQStringName(tr("Corner:"));
+  m_autoOrManual.setQStringName(tr("Manual"));
 }
 
 //-----------------------------------------------------------------------------
 
-TStroke *PinchTool::getClosestStroke(const TPointD &pos, double &w) const
-{
-	TVectorImageP vi = TImageP(getImage(false));
-	if (!vi)
-		return 0;
-	double dist = 0;
-	UINT index;
-	if (vi->getNearestStroke(pos, w, index, dist, true))
-		return vi->getStroke(index);
-	else
-		return 0;
+TStroke *PinchTool::getClosestStroke(const TPointD &pos, double &w) const {
+  TVectorImageP vi = TImageP(getImage(false));
+  if (!vi) return 0;
+  double dist = 0;
+  UINT index;
+  if (vi->getNearestStroke(pos, w, index, dist, true))
+    return vi->getStroke(index);
+  else
+    return 0;
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::updateInterfaceStatus(const TMouseEvent &event)
-{
-	assert(getPixelSize() > 0 && "Pixel size is lower than 0!!!");
+void PinchTool::updateInterfaceStatus(const TMouseEvent &event) {
+  assert(getPixelSize() > 0 && "Pixel size is lower than 0!!!");
 
-	m_status.isManual_ = m_autoOrManual.getValue();
-	m_status.pixelSize_ = getPixelSize();
-	m_status.cornerSize_ = (int)m_toolCornerSize.getValue();
-	m_status.lengthOfAction_ = m_toolRange.getValue();
-	m_status.deformerSensibility_ = 0.01 * getPixelSize();
+  m_status.isManual_            = m_autoOrManual.getValue();
+  m_status.pixelSize_           = getPixelSize();
+  m_status.cornerSize_          = (int)m_toolCornerSize.getValue();
+  m_status.lengthOfAction_      = m_toolRange.getValue();
+  m_status.deformerSensibility_ = 0.01 * getPixelSize();
 
-	m_status.key_event_ = ContextStatus::NONE;
+  m_status.key_event_ = ContextStatus::NONE;
 
-	// mutual exclusive
-	if (event.isCtrlPressed())
-		m_status.key_event_ = ContextStatus::CTRL;
-	if (event.isShiftPressed())
-		m_status.key_event_ = ContextStatus::SHIFT;
+  // mutual exclusive
+  if (event.isCtrlPressed()) m_status.key_event_  = ContextStatus::CTRL;
+  if (event.isShiftPressed()) m_status.key_event_ = ContextStatus::SHIFT;
 
-	// TODO:  **DEVE** essere fatto dentro la costruzione di TMouseEvent
-	// nel codice di Toonz/Tab/ecc. **NON** ci devono essere ifdef MACOSX se e' possibile
-	// evitarlo. Qua sotto ci deve essere solo if(event.isShiftPressed)
-	/*#ifdef MACOSX
-  if(event.isLockPressed() )
+  // TODO:  **DEVE** essere fatto dentro la costruzione di TMouseEvent
+  // nel codice di Toonz/Tab/ecc. **NON** ci devono essere ifdef MACOSX se e'
+  // possibile
+  // evitarlo. Qua sotto ci deve essere solo if(event.isShiftPressed)
+  /*#ifdef MACOSX
+if(event.isLockPressed() )
 #else*/
-	if (event.isAltPressed())
-		//#endif
-		m_status.key_event_ = ContextStatus::ALT;
+  if (event.isAltPressed())
+    //#endif
+    m_status.key_event_ = ContextStatus::ALT;
 
-	m_selector.setStroke(0);
-	m_selector.setVisibility(m_status.isManual_ && m_showSelector);
-	m_selector.setLength(m_status.lengthOfAction_);
+  m_selector.setStroke(0);
+  m_selector.setVisibility(m_status.isManual_ && m_showSelector);
+  m_selector.setLength(m_status.lengthOfAction_);
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::updateStrokeStatus(TStroke *stroke, double w)
-{
-	assert(stroke && "Stroke is null!!!");
-	assert(0.0 <= w && w <= 1.0 && "Stroke's parameter is out of range [0,1]!!!");
+void PinchTool::updateStrokeStatus(TStroke *stroke, double w) {
+  assert(stroke && "Stroke is null!!!");
+  assert(0.0 <= w && w <= 1.0 && "Stroke's parameter is out of range [0,1]!!!");
 
-	if (!stroke || w < 0.0 || w > 1.0)
-		return;
+  if (!stroke || w < 0.0 || w > 1.0) return;
 
-	// start update the status
-	m_status.stroke2change_ = stroke;
-	m_status.w_ = w;
+  // start update the status
+  m_status.stroke2change_ = stroke;
+  m_status.w_             = w;
 
-	assert(stroke->getLength() >= 0.0 && "Wrong length in stroke!!!");
+  assert(stroke->getLength() >= 0.0 && "Wrong length in stroke!!!");
 }
 
 //-----------------------------------------------------------------------------
 
-int PinchTool::updateCursor() const
-{
-	if (!(TVectorImageP)getImage(false))
-		return ToolCursor::CURSOR_NO;
+int PinchTool::updateCursor() const {
+  if (!(TVectorImageP)getImage(false)) return ToolCursor::CURSOR_NO;
 
-	return m_deformation->getCursorId();
+  return m_deformation->getCursorId();
 }
 
 //---------------------------------------------------------------------------
 
-void PinchTool::leftButtonDown(const TPointD &pos,
-							   const TMouseEvent &event)
-{
-	m_curr = m_down = pos;
+void PinchTool::leftButtonDown(const TPointD &pos, const TMouseEvent &event) {
+  m_curr = m_down = pos;
 
-	if (!m_active &&
-		!m_selector.isSelected()) {
-		m_active = false;
+  if (!m_active && !m_selector.isSelected()) {
+    m_active = false;
 
-		assert(m_undo == 0);
+    assert(m_undo == 0);
 
-		StrokeDeformation *
-			deformation = m_deformation;
+    StrokeDeformation *deformation = m_deformation;
 
-		TVectorImageP
-			vi = TImageP(getImage(true));
+    TVectorImageP vi = TImageP(getImage(true));
 
-		if (!vi)
-			return;
+    if (!vi) return;
 
-		m_active = true;
+    m_active = true;
 
-		ContextStatus
-			*status = &m_status;
+    ContextStatus *status = &m_status;
 
-		// reset status
-		status->init();
+    // reset status
+    status->init();
 
-		double
-			w,
-			dist2;
+    double w, dist2;
 
-		// find nearest stroke
-		if (vi->getNearestStroke(m_down,
-								 w,
-								 m_n,
-								 dist2, true)) {
+    // find nearest stroke
+    if (vi->getNearestStroke(m_down, w, m_n, dist2, true)) {
+      TStroke *stroke = vi->getStroke(m_n);
+      assert(stroke && "Not valid stroke found!!!");
+      if (!stroke) return;
 
-			TStroke
-				*stroke = vi->getStroke(m_n);
-			assert(stroke && "Not valid stroke found!!!");
-			if (!stroke)
-				return;
+      updateStrokeStatus(stroke, w);
 
-			updateStrokeStatus(stroke,
-							   w);
+      // set parameters from sliders
+      updateInterfaceStatus(event);
 
-			// set parameters from sliders
-			updateInterfaceStatus(event);
+      deformation->activate(status);
 
-			deformation->activate(status);
+      // stroke can be changed (replaced by another) during deformation activate
+      if (TTool::getApplication()->getCurrentObject()->isSpline())
+        m_undo = new ToolUtils::UndoPath(
+            getXsheet()->getStageObject(getObjectId())->getSpline());
+      else {
+        TXshSimpleLevel *sl =
+            TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
+        assert(sl);
+        TFrameId id = getCurrentFid();
+        m_undo      = new UndoModifyStrokeAndPaint(sl, id, m_n);
+      }
+    }
+  }
 
-			// stroke can be changed (replaced by another) during deformation activate
-			if (TTool::getApplication()->getCurrentObject()->isSpline())
-				m_undo = new ToolUtils::UndoPath(getXsheet()->getStageObject(getObjectId())->getSpline());
-			else {
-				TXshSimpleLevel *sl = TTool::getApplication()->getCurrentLevel()->getSimpleLevel();
-				assert(sl);
-				TFrameId id = getCurrentFid();
-				m_undo = new UndoModifyStrokeAndPaint(sl, id, m_n);
-			}
-		}
-	}
+  m_selector.mouseDown(m_curr);
+  m_prev = m_curr;
 
-	m_selector.mouseDown(m_curr);
-	m_prev = m_curr;
-
-	invalidate();
+  invalidate();
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::leftButtonDrag(const TPointD &pos,
-							   const TMouseEvent &e)
-{
-	m_curr = pos;
+void PinchTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  m_curr = pos;
 
-	if (m_selector.isSelected()) {
-		m_selector.mouseDrag(m_curr);
-		TDoubleProperty::Range
-			prop_range = m_toolRange.getRange();
-		double
-			val_in_range = m_selector.getLength();
+  if (m_selector.isSelected()) {
+    m_selector.mouseDrag(m_curr);
+    TDoubleProperty::Range prop_range = m_toolRange.getRange();
+    double val_in_range               = m_selector.getLength();
 
-		// set value in range
-		val_in_range = std::max(std::min(val_in_range, prop_range.second), prop_range.first);
-		try {
-			m_toolRange.setValue(val_in_range);
-			TTool::getApplication()->getCurrentTool()->notifyToolChanged();
-		} catch (TDoubleProperty::RangeError &) {
-			m_toolRange.setValue((prop_range.first + prop_range.second) * 0.5);
-			TTool::getApplication()->getCurrentTool()->notifyToolChanged();
-		}
+    // set value in range
+    val_in_range =
+        std::max(std::min(val_in_range, prop_range.second), prop_range.first);
+    try {
+      m_toolRange.setValue(val_in_range);
+      TTool::getApplication()->getCurrentTool()->notifyToolChanged();
+    } catch (TDoubleProperty::RangeError &) {
+      m_toolRange.setValue((prop_range.first + prop_range.second) * 0.5);
+      TTool::getApplication()->getCurrentTool()->notifyToolChanged();
+    }
 
-		m_selector.setLength(m_toolRange.getValue());
-	} else {
-		TVectorImageP
-			vi(getImage(true));
+    m_selector.setLength(m_toolRange.getValue());
+  } else {
+    TVectorImageP vi(getImage(true));
 
-		ContextStatus
-			*status = &m_status;
-		if (!vi ||
-			!status->stroke2change_ ||
-			!m_active)
-			return;
+    ContextStatus *status = &m_status;
+    if (!vi || !status->stroke2change_ || !m_active) return;
 
-		QMutexLocker lock(vi->getMutex());
+    QMutexLocker lock(vi->getMutex());
 
-		//assert( status->stroke2change_->getLength() >= 0.0 );
+    // assert( status->stroke2change_->getLength() >= 0.0 );
 
-		StrokeDeformation *
-			deformation = m_deformation;
+    StrokeDeformation *deformation = m_deformation;
 
-		TPointD
-			delta = m_curr - m_prev;
+    TPointD delta = m_curr - m_prev;
 
-		deformation->update(delta);
-	}
+    deformation->update(delta);
+  }
 
-	m_prev = m_curr;
+  m_prev = m_curr;
 
-	//moveCursor(pos);
-	invalidate();
+  // moveCursor(pos);
+  invalidate();
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::leftButtonUp(const TPointD &pos,
-							 const TMouseEvent &e)
-{
+void PinchTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
+  if (!m_active || m_selector.isSelected()) return;
 
-	if (!m_active ||
-		m_selector.isSelected())
-		return;
+  m_active = false;
 
-	m_active = false;
+  TVectorImageP vi(getImage(true));
 
-	TVectorImageP
-		vi(getImage(true));
+  ContextStatus *status = &m_status;
 
-	ContextStatus
-		*status = &m_status;
+  if (!vi || !status->stroke2change_) {
+    delete m_undo;
+    m_undo = 0;
+    return;
+  }
 
-	if (!vi ||
-		!status->stroke2change_) {
-		delete m_undo;
-		m_undo = 0;
-		return;
-	}
-
-	// if mouse position is unchanged doesn't modify current stroke
-	if (areAlmostEqual(m_down,
-					   pos,
-					   PickRadius * status->pixelSize_)) {
-		assert(m_undo);
-		delete m_undo;
-		m_undo = 0;
+  // if mouse position is unchanged doesn't modify current stroke
+  if (areAlmostEqual(m_down, pos, PickRadius * status->pixelSize_)) {
+    assert(m_undo);
+    delete m_undo;
+    m_undo = 0;
 
 // to avoid red line tool on stroke
 #ifdef _WIN32
-		invalidate(status->stroke2change_->getBBox().enlarge(status->pixelSize_ * 13));
+    invalidate(
+        status->stroke2change_->getBBox().enlarge(status->pixelSize_ * 13));
 #else
-		invalidate();
+    invalidate();
 #endif
-		m_deformation->deactivate();
-		status->stroke2change_ = 0;
-		return;
-	}
+    m_deformation->deactivate();
+    status->stroke2change_ = 0;
+    return;
+  }
 
-	QMutexLocker lock(vi->getMutex());
+  QMutexLocker lock(vi->getMutex());
 
-	TStroke *deactivateStroke = m_deformation->deactivate();
-	deactivateStroke->outlineOptions() = status->stroke2change_->outlineOptions();
-	replaceStroke(status->stroke2change_,
-				  deactivateStroke,
-				  m_n,
-				  vi);
+  TStroke *deactivateStroke          = m_deformation->deactivate();
+  deactivateStroke->outlineOptions() = status->stroke2change_->outlineOptions();
+  replaceStroke(status->stroke2change_, deactivateStroke, m_n, vi);
 
-	status->stroke2change_ = 0;
+  status->stroke2change_ = 0;
 
-	vi->notifyChangedStrokes(m_n);
+  vi->notifyChangedStrokes(m_n);
 
 #ifdef _DEBUG
-	vi->checkIntersections();
+  vi->checkIntersections();
 #endif
-	invalidate();
+  invalidate();
 #ifdef _DEBUG
-	vi->checkIntersections();
+  vi->checkIntersections();
 #endif
 
-	moveCursor(pos);
+  moveCursor(pos);
 
-	notifyImageChanged();
+  notifyImageChanged();
 
-	assert(m_undo);
-	TUndoManager::manager()->add(m_undo);
-	m_undo = 0;
+  assert(m_undo);
+  TUndoManager::manager()->add(m_undo);
+  m_undo = 0;
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::onEnter()
-{
-	m_draw = true;
-	// per sicurezza
-	//m_status.stroke2change_ = 0;
-	//m_selector.setStroke(0);
+void PinchTool::onEnter() {
+  m_draw = true;
+  // per sicurezza
+  // m_status.stroke2change_ = 0;
+  // m_selector.setStroke(0);
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::onLeave()
-{
-	if (!m_active)
-		m_draw = false;
-	m_status.stroke2change_ = 0;
+void PinchTool::onLeave() {
+  if (!m_active) m_draw   = false;
+  m_status.stroke2change_ = 0;
 
-	// Abbiamo dovuto commentarlo perche' stranamente
-	// l'onLeave viene chiamata anche quando viene premuto il tasto del mouse
-	// per iniziare a fare drag utilizzando il Selector
-	// setStroke al suo interno resetta lo status del Selector (lo mette a NONE)
+  // Abbiamo dovuto commentarlo perche' stranamente
+  // l'onLeave viene chiamata anche quando viene premuto il tasto del mouse
+  // per iniziare a fare drag utilizzando il Selector
+  // setStroke al suo interno resetta lo status del Selector (lo mette a NONE)
 
-	//  m_selector.setStroke(0);
+  //  m_selector.setStroke(0);
 
-	m_deformation->reset();
+  m_deformation->reset();
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::onImageChanged()
-{
-	m_status.stroke2change_ = 0;
-	m_deformation->reset();
+void PinchTool::onImageChanged() {
+  m_status.stroke2change_ = 0;
+  m_deformation->reset();
 
-	double w = 0;
-	TStroke *stroke = getClosestStroke(convert(m_lastMouseEvent.m_pos), w);
-	if (stroke) {
+  double w        = 0;
+  TStroke *stroke = getClosestStroke(convert(m_lastMouseEvent.m_pos), w);
+  if (stroke) {
+    // set parameters from sliders
+    updateInterfaceStatus(m_lastMouseEvent);
 
-		// set parameters from sliders
-		updateInterfaceStatus(m_lastMouseEvent);
+    // update information about current stroke
+    updateStrokeStatus(stroke, w);
+  }
 
-		// update information about current stroke
-		updateStrokeStatus(stroke, w);
-	}
-
-	m_selector.setStroke(stroke);
-	invalidate();
+  m_selector.setStroke(stroke);
+  invalidate();
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::draw()
-{
-	GLMatrixGuard guard;
+void PinchTool::draw() {
+  GLMatrixGuard guard;
 
-	TVectorImageP img(getImage(true));
-	if (!img || img->getStrokeCount() == 0) //Controllo che il numero degli stroke nell'immagine sia != 0
-		return;
-	if (!m_draw)
-		return;
+  TVectorImageP img(getImage(true));
+  if (!img ||
+      img->getStrokeCount() ==
+          0)  // Controllo che il numero degli stroke nell'immagine sia != 0
+    return;
+  if (!m_draw) return;
 
-	ContextStatus *
-		status = &m_status;
-	if (!status)
-		return;
+  ContextStatus *status = &m_status;
+  if (!status) return;
 
-	StrokeDeformation *
-		deformation = m_deformation;
+  StrokeDeformation *deformation = m_deformation;
 
-	OverallDesigner
-	designer((int)m_curr.x,
-			 (int)m_curr.y);
+  OverallDesigner designer((int)m_curr.x, (int)m_curr.y);
 
-	// m_active == true means that a button down is done (drag)
-	if (!m_active) {
-		if (m_cursorEnabled) {
-			glColor3d(1, 0, 1);
-			if (m_cursor.thick > 0)
-				tglDrawCircle(m_cursor,
-							  m_cursor.thick);
-			tglDrawCircle(m_cursor,
-						  m_cursor.thick + 4 * status->pixelSize_);
-		}
-	}
+  // m_active == true means that a button down is done (drag)
+  if (!m_active) {
+    if (m_cursorEnabled) {
+      glColor3d(1, 0, 1);
+      if (m_cursor.thick > 0) tglDrawCircle(m_cursor, m_cursor.thick);
+      tglDrawCircle(m_cursor, m_cursor.thick + 4 * status->pixelSize_);
+    }
+  }
 
-	// internal deformer can be changed during draw
-	if (!m_selector.isSelected())
-		deformation->draw(&designer);
+  // internal deformer can be changed during draw
+  if (!m_selector.isSelected()) deformation->draw(&designer);
 
-	m_selector.draw(&designer);
-	CHECK_ERRORS_BY_GL;
+  m_selector.draw(&designer);
+  CHECK_ERRORS_BY_GL;
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::invalidateCursorArea()
-{
-	double r = m_cursor.thick + 6;
-	TPointD d(r, r);
-	invalidate(TRectD(m_cursor - d, m_cursor + d));
+void PinchTool::invalidateCursorArea() {
+  double r = m_cursor.thick + 6;
+  TPointD d(r, r);
+  invalidate(TRectD(m_cursor - d, m_cursor + d));
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::mouseMove(const TPointD &pos,
-						  const TMouseEvent &event)
-{
-	if (m_active)
-		return;
+void PinchTool::mouseMove(const TPointD &pos, const TMouseEvent &event) {
+  if (m_active) return;
 
-	if (!m_draw)
-		m_draw = true;
+  if (!m_draw) m_draw = true;
 
-	ContextStatus *status = &m_status;
-	m_curr = pos;
+  ContextStatus *status = &m_status;
+  m_curr                = pos;
 
-	const int pixelRange = 3;
-	if (abs(m_lastMouseEvent.m_pos.x - event.m_pos.x) < pixelRange &&
-		abs(m_lastMouseEvent.m_pos.y - event.m_pos.y) < pixelRange &&
-		m_lastMouseEvent.getModifiersMask() == event.getModifiersMask())
-		return;
+  const int pixelRange = 3;
+  if (abs(m_lastMouseEvent.m_pos.x - event.m_pos.x) < pixelRange &&
+      abs(m_lastMouseEvent.m_pos.y - event.m_pos.y) < pixelRange &&
+      m_lastMouseEvent.getModifiersMask() == event.getModifiersMask())
+    return;
 
-	m_lastMouseEvent = event;
-	double w = 0;
-	TStroke *stroke = getClosestStroke(pos, w);
-	if (stroke) {
-		// set parameters from sliders
-		updateInterfaceStatus(event);
+  m_lastMouseEvent = event;
+  double w         = 0;
+  TStroke *stroke  = getClosestStroke(pos, w);
+  if (stroke) {
+    // set parameters from sliders
+    updateInterfaceStatus(event);
 
-		// update information about current stroke
-		updateStrokeStatus(stroke, w);
+    // update information about current stroke
+    updateStrokeStatus(stroke, w);
 
-		// retrieve the currect m_deformation and
-		// prepare to design and modify
-		if (m_deformation)
-			m_deformation->check(status);
+    // retrieve the currect m_deformation and
+    // prepare to design and modify
+    if (m_deformation) m_deformation->check(status);
 
-		m_selector.setStroke(stroke);
-		m_selector.mouseMove(m_curr);
-	} else {
-		m_status.stroke2change_ = 0;
-		m_selector.setStroke(0);
-		return;
-	}
+    m_selector.setStroke(stroke);
+    m_selector.mouseMove(m_curr);
+  } else {
+    m_status.stroke2change_ = 0;
+    m_selector.setStroke(0);
+    return;
+  }
 
-	m_prev = m_curr;
-	m_cursorEnabled = moveCursor(pos);
+  m_prev          = m_curr;
+  m_cursorEnabled = moveCursor(pos);
 
-	if (m_cursorEnabled)
-		invalidate();
+  if (m_cursorEnabled) invalidate();
 
-	//  TNotifier::instance()->notify(TToolChange());
+  //  TNotifier::instance()->notify(TToolChange());
 }
 
 //-----------------------------------------------------------------------------
 
-bool PinchTool::keyDown(int key,
-						TUINT32 flags,
-						const TPoint &pos)
-{
-	if (!m_active)
-		m_deformation->reset();
+bool PinchTool::keyDown(int key, TUINT32 flags, const TPoint &pos) {
+  if (!m_active) m_deformation->reset();
 
 #if 0
   char c = (char)key;
@@ -596,56 +529,50 @@ bool PinchTool::keyDown(int key,
     }
   }
 #endif
-	return true;
+  return true;
 }
 
 //-----------------------------------------------------------------------------
 
-bool PinchTool::moveCursor(const TPointD &pos)
-{
-	double w = 0.0;
-	TStroke *stroke = getClosestStroke(pos, w);
-	if (!stroke)
-		return false;
+bool PinchTool::moveCursor(const TPointD &pos) {
+  double w        = 0.0;
+  TStroke *stroke = getClosestStroke(pos, w);
+  if (!stroke) return false;
 
-	m_cursor = stroke->getThickPoint(w);
-	return true;
+  m_cursor = stroke->getThickPoint(w);
+  return true;
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::onActivate()
-{
-	//  getApplication()->editImageOrSpline();
-	//  TNotifier::instance()->attach(this);
-	// per sicurezza
-	m_status.stroke2change_ = 0;
-	m_selector.setStroke(0);
+void PinchTool::onActivate() {
+  //  getApplication()->editImageOrSpline();
+  //  TNotifier::instance()->attach(this);
+  // per sicurezza
+  m_status.stroke2change_ = 0;
+  m_selector.setStroke(0);
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::onDeactivate()
-{
-	m_draw = false;
-	delete m_undo;
-	m_undo = 0;
-	m_active = false;
-	m_deformation->reset();
-	//  TNotifier::instance()->detach(this);
+void PinchTool::onDeactivate() {
+  m_draw = false;
+  delete m_undo;
+  m_undo   = 0;
+  m_active = false;
+  m_deformation->reset();
+  //  TNotifier::instance()->detach(this);
 }
 
 //-----------------------------------------------------------------------------
 
-void PinchTool::update(const TGlobalChange &)
-{
-	m_cursor = TConsts::natp;
-	m_selector.setStroke(0);
-	m_selector.setVisibility(m_autoOrManual.getValue() && m_showSelector);
-	if (m_deformation)
-		delete m_deformation->deactivate();
-	// per sicurezza
-	m_status.stroke2change_ = 0;
+void PinchTool::update(const TGlobalChange &) {
+  m_cursor = TConsts::natp;
+  m_selector.setStroke(0);
+  m_selector.setVisibility(m_autoOrManual.getValue() && m_showSelector);
+  if (m_deformation) delete m_deformation->deactivate();
+  // per sicurezza
+  m_status.stroke2change_ = 0;
 }
 
 //-----------------------------------------------------------------------------

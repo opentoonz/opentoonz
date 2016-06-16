@@ -27,203 +27,196 @@
 //    TXshSimpleLevel Texture Utilities  locals
 //********************************************************************************************
 
-namespace
-{
+namespace {
 
-TRasterImageP convert32(const TImageP &img)
-{
-	struct locals {
-		static TRasterImageP depremultiplied(const TRasterImageP &ri)
-		{
-			assert(ri->getRaster());
+TRasterImageP convert32(const TImageP &img) {
+  struct locals {
+    static TRasterImageP depremultiplied(const TRasterImageP &ri) {
+      assert(ri->getRaster());
 
-			TRop::depremultiply(ri->getRaster());
-			return ri;
-		}
-	}; // locals
+      TRop::depremultiply(ri->getRaster());
+      return ri;
+    }
+  };  // locals
 
-	if (TRasterImageP ri = img) {
-		TRasterP ras(ri->getRaster());
+  if (TRasterImageP ri = img) {
+    TRasterP ras(ri->getRaster());
 
-		TRaster32P ras32;
-		{
-			if (TRaster32P(ras))
-				ras32 = ras->clone();
-			else {
-				ras32 = TRaster32P(ras->getSize());
-				TRop::convert(ras32, ras);
-			}
-		}
+    TRaster32P ras32;
+    {
+      if (TRaster32P(ras))
+        ras32 = ras->clone();
+      else {
+        ras32 = TRaster32P(ras->getSize());
+        TRop::convert(ras32, ras);
+      }
+    }
 
-		TPointD dpi;
-		ri->getDpi(dpi.x, dpi.y);
+    TPointD dpi;
+    ri->getDpi(dpi.x, dpi.y);
 
-		TRasterImageP ri32(ras32);
-		ri32->setDpi(dpi.x, dpi.y);
-		ri32->setSubsampling(ri->getSubsampling());
-		ri32->setOffset(ri->getOffset());
+    TRasterImageP ri32(ras32);
+    ri32->setDpi(dpi.x, dpi.y);
+    ri32->setSubsampling(ri->getSubsampling());
+    ri32->setOffset(ri->getOffset());
 
-		return locals::depremultiplied(ri32);
-	}
+    return locals::depremultiplied(ri32);
+  }
 
-	if (TToonzImageP ti = img) {
-		TRasterCM32P rasCM32(ti->getRaster());
+  if (TToonzImageP ti = img) {
+    TRasterCM32P rasCM32(ti->getRaster());
 
-		TRaster32P ras32(rasCM32->getSize());
-		TRop::convert(ras32, rasCM32, ti->getPalette());
+    TRaster32P ras32(rasCM32->getSize());
+    TRop::convert(ras32, rasCM32, ti->getPalette());
 
-		TPointD dpi;
-		ti->getDpi(dpi.x, dpi.y);
+    TPointD dpi;
+    ti->getDpi(dpi.x, dpi.y);
 
-		TRasterImageP ri32(ras32);
-		ri32->setDpi(dpi.x, dpi.y);
-		ri32->setSubsampling(ti->getSubsampling());
-		ri32->setOffset(ti->getOffset());
+    TRasterImageP ri32(ras32);
+    ri32->setDpi(dpi.x, dpi.y);
+    ri32->setSubsampling(ti->getSubsampling());
+    ri32->setOffset(ti->getOffset());
 
-		return locals::depremultiplied(ri32);
-	}
+    return locals::depremultiplied(ri32);
+  }
 
-	return TRasterImageP();
+  return TRasterImageP();
 }
 
 //-----------------------------------------------------------------------------
 
-TRasterImageP getTexture(const TXshSimpleLevel *sl, const TFrameId &fid, int subsampling)
-{
-	if (sl->getType() != PLI_XSHLEVEL) {
-		TImageP texImg = sl->getFrame(fid, ImageManager::dontPutInCache, subsampling);
-		return convert32(texImg);
-	}
+TRasterImageP getTexture(const TXshSimpleLevel *sl, const TFrameId &fid,
+                         int subsampling) {
+  if (sl->getType() != PLI_XSHLEVEL) {
+    TImageP texImg =
+        sl->getFrame(fid, ImageManager::dontPutInCache, subsampling);
+    return convert32(texImg);
+  }
 
-	// Vector case
-	std::string id = sl->getImageId(fid) + "_rasterized";
+  // Vector case
+  std::string id = sl->getImageId(fid) + "_rasterized";
 
-	ImageLoader::BuildExtData extData(sl, fid);
-	TRasterImageP ri(ImageManager::instance()->getImage(id, ImageManager::dontPutInCache, &extData));
+  ImageLoader::BuildExtData extData(sl, fid);
+  TRasterImageP ri(ImageManager::instance()->getImage(
+      id, ImageManager::dontPutInCache, &extData));
 
-	return ri;
+  return ri;
 }
 
-} // namespace
+}  // namespace
 
 //********************************************************************************************
 //    TXshSimpleLevel Texture Utilities  implementation
 //********************************************************************************************
 
-DrawableTextureDataP texture_utils::getTextureData(
-	const TXshSimpleLevel *sl, const TFrameId &fid, int subsampling)
-{
-	const std::string &texId = sl->getImageId(fid);
+DrawableTextureDataP texture_utils::getTextureData(const TXshSimpleLevel *sl,
+                                                   const TFrameId &fid,
+                                                   int subsampling) {
+  const std::string &texId = sl->getImageId(fid);
 
-	// Now, we must associate a texture
-	DrawableTextureDataP data(TTexturesStorage::instance()->getTextureData(texId));
-	if (data)
-		return data;
+  // Now, we must associate a texture
+  DrawableTextureDataP data(
+      TTexturesStorage::instance()->getTextureData(texId));
+  if (data) return data;
 
-	// There was no associated texture. We must bind the texture and repeat
+  // There was no associated texture. We must bind the texture and repeat
 
-	// First, retrieve the image to be used as texture
-	TRasterImageP ri(::getTexture(sl, fid, subsampling));
-	if (!ri)
-		return DrawableTextureDataP();
+  // First, retrieve the image to be used as texture
+  TRasterImageP ri(::getTexture(sl, fid, subsampling));
+  if (!ri) return DrawableTextureDataP();
 
-	TRaster32P ras(ri->getRaster());
-	assert(ras);
+  TRaster32P ras(ri->getRaster());
+  assert(ras);
 
-	TRectD geom(0, 0, ras->getLx(), ras->getLy());
-	geom = TScale(ri->getSubsampling()) *
-		   TTranslation(convert(ri->getOffset()) - ras->getCenterD()) *
-		   geom;
+  TRectD geom(0, 0, ras->getLx(), ras->getLy());
+  geom = TScale(ri->getSubsampling()) *
+         TTranslation(convert(ri->getOffset()) - ras->getCenterD()) * geom;
 
-	return TTexturesStorage::instance()->loadTexture(texId, ras, geom);
+  return TTexturesStorage::instance()->loadTexture(texId, ras, geom);
 }
 
 //-----------------------------------------------------------------------------
 
-void texture_utils::invalidateTexture(const TXshSimpleLevel *sl, const TFrameId &fid)
-{
-	const std::string &texId = sl->getImageId(fid);
-	TTexturesStorage::instance()->unloadTexture(texId);
+void texture_utils::invalidateTexture(const TXshSimpleLevel *sl,
+                                      const TFrameId &fid) {
+  const std::string &texId = sl->getImageId(fid);
+  TTexturesStorage::instance()->unloadTexture(texId);
 }
 
 //-----------------------------------------------------------------------------
 
-void texture_utils::invalidateTextures(const TXshSimpleLevel *sl)
-{
-	int f, fCount = sl->getFrameCount();
+void texture_utils::invalidateTextures(const TXshSimpleLevel *sl) {
+  int f, fCount = sl->getFrameCount();
 
-	for (f = 0; f != fCount; ++f)
-		invalidateTexture(sl, sl->getFrameId(f));
+  for (f = 0; f != fCount; ++f) invalidateTexture(sl, sl->getFrameId(f));
 }
 
 //********************************************************************************************
 //    TXsheet Texture Utilities  locals
 //********************************************************************************************
 
-namespace
-{
+namespace {
 
-std::string getImageId(const TXsheet *xsh, int frame)
-{
-	return "X" + toString(xsh->id()) + "_" + toString(frame);
+std::string getImageId(const TXsheet *xsh, int frame) {
+  return "X" + std::to_string(xsh->id()) + "_" + std::to_string(frame);
 }
 
-} // namespace
+}  // namespace
 
 //********************************************************************************************
 //    TXsheet Texture Utilities  implementation
 //********************************************************************************************
 
-DrawableTextureDataP texture_utils::getTextureData(const TXsheet *xsh, int frame)
-{
-	// Check if an xsheet texture already exists
-	const std::string &texId = ::getImageId(xsh, frame);
+DrawableTextureDataP texture_utils::getTextureData(const TXsheet *xsh,
+                                                   int frame) {
+  // Check if an xsheet texture already exists
+  const std::string &texId = ::getImageId(xsh, frame);
 
-	DrawableTextureDataP data(TTexturesStorage::instance()->getTextureData(texId));
-	if (data)
-		return data;
+  DrawableTextureDataP data(
+      TTexturesStorage::instance()->getTextureData(texId));
+  if (data) return data;
 
-	// No available texture - we must build and load it
-	TRaster32P tex(1024, 1024); // Fixed texture size. It's the same that currently happens with
-								// vector images' textures - and justified since this is camstand
-								// mode, and besides we want to make sure that textures are limited.
+  // No available texture - we must build and load it
+  TRaster32P tex(
+      1024,
+      1024);  // Fixed texture size. It's the same that currently happens with
+              // vector images' textures - and justified since this is camstand
+  // mode, and besides we want to make sure that textures are limited.
 
-	// Retrieve the sub-xsheet bbox (world coordinates of the sub-xsheet)
-	TRectD bbox(xsh->getBBox(frame));
+  // Retrieve the sub-xsheet bbox (world coordinates of the sub-xsheet)
+  TRectD bbox(xsh->getBBox(frame));
 
-	// Since xsh represents a sub-xsheet, its camera affine must be applied
-	const TAffine &cameraAff = xsh->getPlacement(xsh->getStageObjectTree()->getCurrentCameraId(), frame);
-	bbox = (cameraAff.inv() * bbox).enlarge(1.0);
+  // Since xsh represents a sub-xsheet, its camera affine must be applied
+  const TAffine &cameraAff =
+      xsh->getPlacement(xsh->getStageObjectTree()->getCurrentCameraId(), frame);
+  bbox = (cameraAff.inv() * bbox).enlarge(1.0);
 
-	// Render the xsheet on the specified bbox
+  // Render the xsheet on the specified bbox
 
-	// The call below will change context (I know, it's a shame :( )
-	TGlContext currentContext = tglGetCurrentContext();
-	{
-		tglDoneCurrent(currentContext);
-		xsh->getScene()->renderFrame(tex, frame, xsh, bbox, TAffine());
-		tglMakeCurrent(currentContext);
-	}
+  // The call below will change context (I know, it's a shame :( )
+  TGlContext currentContext = tglGetCurrentContext();
+  {
+    tglDoneCurrent(currentContext);
+    xsh->getScene()->renderFrame(tex, frame, xsh, bbox, TAffine());
+    tglMakeCurrent(currentContext);
+  }
 
-	TRop::depremultiply(tex); // Stored textures are rendered nonpremultiplied
+  TRop::depremultiply(tex);  // Stored textures are rendered nonpremultiplied
 
-	// Store the texture for future retrieval
-	return TTexturesStorage::instance()->loadTexture(texId, tex, bbox);
+  // Store the texture for future retrieval
+  return TTexturesStorage::instance()->loadTexture(texId, tex, bbox);
 }
 
 //-----------------------------------------------------------------------------
 
-void texture_utils::invalidateTexture(const TXsheet *xsh, int frame)
-{
-	const std::string &texId = ::getImageId(xsh, frame);
-	TTexturesStorage::instance()->unloadTexture(texId);
+void texture_utils::invalidateTexture(const TXsheet *xsh, int frame) {
+  const std::string &texId = ::getImageId(xsh, frame);
+  TTexturesStorage::instance()->unloadTexture(texId);
 }
 
 //-----------------------------------------------------------------------------
 
-void texture_utils::invalidateTextures(const TXsheet *xsh)
-{
-	int f, fCount = xsh->getFrameCount();
-	for (f = 0; f != fCount; ++f)
-		invalidateTexture(xsh, f);
+void texture_utils::invalidateTextures(const TXsheet *xsh) {
+  int f, fCount = xsh->getFrameCount();
+  for (f = 0; f != fCount; ++f) invalidateTexture(xsh, f);
 }

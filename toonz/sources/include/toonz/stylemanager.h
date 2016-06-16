@@ -31,53 +31,52 @@ class QImage;
 //    CustomStyleManager declaration
 //********************************************************************************
 
-class DVAPI CustomStyleManager : public QObject
-{
-	Q_OBJECT
+class DVAPI CustomStyleManager : public QObject {
+  Q_OBJECT
 
 public:
-	struct DVAPI PatternData {
-		QImage *m_image;
-		std::string m_patternName;
-		bool m_isVector;
+  struct DVAPI PatternData {
+    QImage *m_image;
+    std::string m_patternName;
+    bool m_isVector;
 
-		PatternData() : m_image(0), m_patternName(""), m_isVector(false) {}
-	};
+    PatternData() : m_image(0), m_patternName(""), m_isVector(false) {}
+  };
 
-	class StyleLoaderTask;
-	friend class CustomStyleManager::StyleLoaderTask;
+  class StyleLoaderTask;
+  friend class CustomStyleManager::StyleLoaderTask;
 
 private:
-	QList<PatternData> m_patterns;
-	TFilePath m_rootPath;
-	TFilePath m_stylesFolder;
-	QString m_filters;
-	QSize m_chipSize;
+  QList<PatternData> m_patterns;
+  TFilePath m_rootPath;
+  TFilePath m_stylesFolder;
+  QString m_filters;
+  QSize m_chipSize;
 
-	TThread::Executor m_executor;
-	bool m_started;
+  TThread::Executor m_executor;
+  bool m_started;
 
 public:
-	CustomStyleManager(const TFilePath &stylesFolder,
-					   QString filters = QString(), QSize chipSize = QSize(30, 30));
+  CustomStyleManager(const TFilePath &stylesFolder, QString filters = QString(),
+                     QSize chipSize = QSize(30, 30));
 
-	const TFilePath &stylesFolder() const { return m_stylesFolder; }
-	QSize getChipSize() const { return m_chipSize; }
+  const TFilePath &stylesFolder() const { return m_stylesFolder; }
+  QSize getChipSize() const { return m_chipSize; }
 
-	int getPatternCount();
-	PatternData getPattern(int index);
+  int getPatternCount();
+  PatternData getPattern(int index);
 
-	static TFilePath getRootPath();
-	static void setRootPath(const TFilePath &rootPath);
+  static TFilePath getRootPath();
+  static void setRootPath(const TFilePath &rootPath);
 
-	void loadItems();
+  void loadItems();
 
 private:
-	void addPattern(const TFilePath &path);
+  void addPattern(const TFilePath &path);
 
 signals:
 
-	void patternAdded();
+  void patternAdded();
 };
 
-#endif //STYLEMANAGER_H
+#endif  // STYLEMANAGER_H

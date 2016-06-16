@@ -21,8 +21,8 @@
 // General Public License for more details.
 
 /** \file
-		\brief Declares the Noise1234 class for producing Perlin noise.
-		\author Stefan Gustavson (stegu@itn.liu.se)
+                \brief Declares the Noise1234 class for producing Perlin noise.
+                \author Stefan Gustavson (stegu@itn.liu.se)
 */
 
 /*
@@ -35,32 +35,30 @@
  * on some platforms. A templatized version of Noise1234 could be useful.
  */
 
-class Noise1234
-{
-
+class Noise1234 {
 public:
-	Noise1234() {}
-	~Noise1234() {}
+  Noise1234() {}
+  ~Noise1234() {}
 
-	/** 1D, 2D, 3D and 4D float Perlin noise, SL "noise()"
- */
-	static float noise(float x);
-	static float noise(float x, float y);
-	static float noise(float x, float y, float z);
-	static float noise(float x, float y, float z, float w);
+  /** 1D, 2D, 3D and 4D float Perlin noise, SL "noise()"
+*/
+  static float noise(float x);
+  static float noise(float x, float y);
+  static float noise(float x, float y, float z);
+  static float noise(float x, float y, float z, float w);
 
-	/** 1D, 2D, 3D and 4D float Perlin periodic noise, SL "pnoise()"
- */
-	static float pnoise(float x, int px);
-	static float pnoise(float x, float y, int px, int py);
-	static float pnoise(float x, float y, float z, int px, int py, int pz);
-	static float pnoise(float x, float y, float z, float w,
-						int px, int py, int pz, int pw);
+  /** 1D, 2D, 3D and 4D float Perlin periodic noise, SL "pnoise()"
+*/
+  static float pnoise(float x, int px);
+  static float pnoise(float x, float y, int px, int py);
+  static float pnoise(float x, float y, float z, int px, int py, int pz);
+  static float pnoise(float x, float y, float z, float w, int px, int py,
+                      int pz, int pw);
 
 private:
-	static unsigned char perm[];
-	static float grad(int hash, float x);
-	static float grad(int hash, float x, float y);
-	static float grad(int hash, float x, float y, float z);
-	static float grad(int hash, float x, float y, float z, float t);
+  static unsigned char perm[];
+  static float grad(int hash, float x);
+  static float grad(int hash, float x, float y);
+  static float grad(int hash, float x, float y, float z);
+  static float grad(int hash, float x, float y, float z, float t);
 };

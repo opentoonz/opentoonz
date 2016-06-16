@@ -3,10 +3,9 @@
 #include "toonz/observer.h"
 // OBSOLETO??
 
-TNotifier *TNotifier::instance()
-{
-	static TNotifier theNotifier;
-	return &theNotifier;
+TNotifier *TNotifier::instance() {
+  static TNotifier theNotifier;
+  return &theNotifier;
 }
 
 /*
@@ -34,12 +33,11 @@ void TNotifier::detach(TChangeObserver*observer)
 }
 */
 
-void TNotifier::notify(const TGlobalChange &c)
-{
-	m_globalObs.notify(c);
-	if (c.isSceneChanged()) {
-		m_newSceneNotifiedObs.clear();
-		for (int i = 0; i < (int)m_globalObs.m_observers.size(); i++)
-			m_newSceneNotifiedObs.insert(m_globalObs.m_observers[i]);
-	}
+void TNotifier::notify(const TGlobalChange &c) {
+  m_globalObs.notify(c);
+  if (c.isSceneChanged()) {
+    m_newSceneNotifiedObs.clear();
+    for (int i = 0; i < (int)m_globalObs.m_observers.size(); i++)
+      m_newSceneNotifiedObs.insert(m_globalObs.m_observers[i]);
+  }
 }

@@ -24,44 +24,39 @@ class TXsheetFx;
 class TOStream;
 class TIStream;
 
-class DVAPI TFxSet
-{
-
+class DVAPI TFxSet {
 protected:
-	std::set<TFx *> m_fxs;
-	// TXsheetFx *m_xsheetFx;
+  std::set<TFx *> m_fxs;
+  // TXsheetFx *m_xsheetFx;
 
 public:
-	TFxSet();
-	virtual ~TFxSet();
+  TFxSet();
+  virtual ~TFxSet();
 
-	void addFx(TFx *fx);
-	bool removeFx(TFx *fx);
-	bool containsFx(TFx *fx)
-	{
-		return m_fxs.count(fx) > 0;
-	}
+  void addFx(TFx *fx);
+  bool removeFx(TFx *fx);
+  bool containsFx(TFx *fx) { return m_fxs.count(fx) > 0; }
 
-	// n.b. aggiunge m_fxs a fxs senza fare clear di quest'ultimo
-	void getFxs(std::set<TFx *> &fxs);
+  // n.b. aggiunge m_fxs a fxs senza fare clear di quest'ultimo
+  void getFxs(std::set<TFx *> &fxs);
 
-	int getFxCount() const;
-	TFx *getFx(int index) const;
-	TFx *getFx(const std::string &id) const;
+  int getFxCount() const;
+  TFx *getFx(int index) const;
+  TFx *getFx(const std::string &id) const;
 
-	//TXsheetFx *getXsheetFx() const {
-	//  return m_xsheetFx;
-	//}
+  // TXsheetFx *getXsheetFx() const {
+  //  return m_xsheetFx;
+  //}
 
-	void clear();
+  void clear();
 
-	virtual void saveData(TOStream &os, int occupiedColumnCount);
-	virtual void loadData(TIStream &os);
+  virtual void saveData(TOStream &os, int occupiedColumnCount);
+  virtual void loadData(TIStream &os);
 
 private:
-	// not implemented
-	TFxSet(const TFxSet &);
-	TFxSet &operator=(const TFxSet &);
+  // not implemented
+  TFxSet(const TFxSet &);
+  TFxSet &operator=(const TFxSet &);
 };
 
 // helper functions

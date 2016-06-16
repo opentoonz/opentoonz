@@ -25,8 +25,7 @@
 class TUnit;
 class TDoubleParam;
 
-namespace TSyntax
-{
+namespace TSyntax {
 class Grammar;
 class CalculatorNodeVisitor;
 class Calculator;
@@ -42,56 +41,58 @@ class Calculator;
 /*!
   An expression is a sequence of characthers and contains:
 
-  \li a \e CalcNode that is a basic element of the expression that must be evaluated;
-  \li a \e Grammar that is a sequence of string patterns that define operations on nodes;
-  \li a \e Builder that is a sequence or a tree of calcnodes and operations on that;
+  \li a \e CalcNode that is a basic element of the expression that must be
+  evaluated;
+  \li a \e Grammar that is a sequence of string patterns that define operations
+  on nodes;
+  \li a \e Builder that is a sequence or a tree of calcnodes and operations on
+  that;
 */
-class DVAPI TExpression
-{
-	class Imp;
-	std::unique_ptr<Imp> m_imp;
+class DVAPI TExpression {
+  class Imp;
+  std::unique_ptr<Imp> m_imp;
 
 public:
-	TExpression();
-	~TExpression();
+  TExpression();
+  ~TExpression();
 
-	TExpression(const TExpression &);
-	TExpression &operator=(TExpression);
+  TExpression(const TExpression &);
+  TExpression &operator=(TExpression);
 
-	//! Sets the expression's grammar - does \b not acquire ownership.
-	void setGrammar(const TSyntax::Grammar *grammar);
-	const TSyntax::Grammar *getGrammar() const;
+  //! Sets the expression's grammar - does \b not acquire ownership.
+  void setGrammar(const TSyntax::Grammar *grammar);
+  const TSyntax::Grammar *getGrammar() const;
 
-	/*!
-    Sets the expression's text - a mix of mathematical expressions
-    and grammar-recognized patterns that is able to calculate the
-    expression's value at a given frame.
+  /*!
+Sets the expression's text - a mix of mathematical expressions
+and grammar-recognized patterns that is able to calculate the
+expression's value at a given frame.
+*/
+  void setText(std::string text);
+  std::string getText() const;
+
+  TSyntax::Calculator *getCalculator();
+
+  /*!
+          Returns whether the expression is valid according to actual
+grammar syntax (i.e. it has at least one calculator node).
   */
-	void setText(std::string text);
-	std::string getText() const;
+  bool isValid();
 
-	TSyntax::Calculator *getCalculator();
+  std::string getError() const;
+  std::pair<int, int> getErrorPos() const;
 
-	/*!
-		Returns whether the expression is valid according to actual
-      grammar syntax (i.e. it has at least one calculator node).
-	*/
-	bool isValid();
+  void accept(TSyntax::CalculatorNodeVisitor &visitor);
 
-	std::string getError() const;
-	std::pair<int, int> getErrorPos() const;
+  void setOwnerParameter(TDoubleParam *param);
+  TDoubleParam *getOwnerParameter() const;
 
-	void accept(TSyntax::CalculatorNodeVisitor &visitor);
-
-	void setOwnerParameter(TDoubleParam *param);
-	TDoubleParam *getOwnerParameter() const;
-
-	bool isCycling() const;
+  bool isCycling() const;
 
 private:
-	// The expression is parsed lazily - ie when a getters attempts to
-	// evaluate the expression and it was not yet parsed
-	void parse();
+  // The expression is parsed lazily - ie when a getters attempts to
+  // evaluate the expression and it was not yet parsed
+  void parse();
 };
 
 #endif

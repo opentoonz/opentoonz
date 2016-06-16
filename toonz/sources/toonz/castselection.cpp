@@ -25,48 +25,38 @@
 //
 //-----------------------------------------------------------------------------
 
-CastSelection::CastSelection()
-	: m_browser(0)
-{
+CastSelection::CastSelection() : m_browser(0) {}
+
+//-----------------------------------------------------------------------------
+
+CastSelection::~CastSelection() {}
+
+//-----------------------------------------------------------------------------
+
+void CastSelection::getSelectedLevels(std::vector<TXshLevel *> &levels) {
+  assert(m_browser);
+  CastItems const &castItems = m_browser->getCastItems();
+  for (int i = 0; i < castItems.getItemCount(); i++) {
+    if (!isSelected(i)) continue;
+    TXshLevel *level  = castItems.getItem(i)->getSimpleLevel();
+    if (!level) level = castItems.getItem(i)->getPaletteLevel();
+    if (!level) level = castItems.getItem(i)->getSoundLevel();
+    if (level) levels.push_back(level);
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-CastSelection::~CastSelection()
-{
-}
-
-//-----------------------------------------------------------------------------
-
-void CastSelection::getSelectedLevels(std::vector<TXshLevel *> &levels)
-{
-	assert(m_browser);
-	CastItems const& castItems = m_browser->getCastItems();
-	for (int i = 0; i < castItems.getItemCount(); i++) {
-		if (!isSelected(i))
-			continue;
-		TXshLevel *level = castItems.getItem(i)->getSimpleLevel();
-		if (!level)
-			level = castItems.getItem(i)->getPaletteLevel();
-		if (!level)
-			level = castItems.getItem(i)->getSoundLevel();
-		if (level)
-			levels.push_back(level);
-	}
-}
-
-//-----------------------------------------------------------------------------
-
-void CastSelection::enableCommands()
-{
-	DvItemSelection::enableCommands();
-	assert(m_browser);
-	if (m_browser) {
-		enableCommand(m_browser, MI_ExposeResource, &CastBrowser::expose);
-		enableCommand(m_browser, MI_EditLevel, &CastBrowser::edit);
-		// enableCommand(m_browser, MI_ConvertToVectors,     &CastBrowser::vectorize);
-		enableCommand(m_browser, MI_ShowFolderContents, &CastBrowser::showFolderContents);
-	}
+void CastSelection::enableCommands() {
+  DvItemSelection::enableCommands();
+  assert(m_browser);
+  if (m_browser) {
+    enableCommand(m_browser, MI_ExposeResource, &CastBrowser::expose);
+    enableCommand(m_browser, MI_EditLevel, &CastBrowser::edit);
+    // enableCommand(m_browser, MI_ConvertToVectors, &CastBrowser::vectorize);
+    enableCommand(m_browser, MI_ShowFolderContents,
+                  &CastBrowser::showFolderContents);
+  }
 }
 
 // TODO: da qui in avanti: spostare in un altro file
@@ -77,57 +67,51 @@ void CastSelection::enableCommands()
 //
 //-----------------------------------------------------------------------------
 
-QString LevelCastItem::getName() const
-{
-	return QString::fromStdWString(m_level->getName());
+QString LevelCastItem::getName() const {
+  return QString::fromStdWString(m_level->getName());
 }
 
 //-----------------------------------------------------------------------------
 
-QString LevelCastItem::getToolTip() const
-{
-	TFilePath path = m_level->getPath();
-	return QString::fromStdWString(path.withoutParentDir().getWideString());
+QString LevelCastItem::getToolTip() const {
+  TFilePath path = m_level->getPath();
+  return QString::fromStdWString(path.withoutParentDir().getWideString());
 }
 
 //-----------------------------------------------------------------------------
 
-int LevelCastItem::getFrameCount() const
-{
-	return m_level->getFrameCount();
+int LevelCastItem::getFrameCount() const { return m_level->getFrameCount(); }
+
+//-----------------------------------------------------------------------------
+
+QPixmap LevelCastItem::getPixmap(bool isSelected) const {
+  TXshSimpleLevel *sl = m_level->getSimpleLevel();
+  if (!sl) return QPixmap();
+  ToonzScene *scene = sl->getScene();
+  assert(scene);
+  if (!scene) return QPixmap();
+  bool onDemand = false;
+  if (Preferences::instance()->getColumnIconLoadingPolicy() ==
+      Preferences::LoadOnDemand)
+    onDemand   = !isSelected;
+  QPixmap icon = IconGenerator::instance()->getIcon(sl, sl->getFirstFid(),
+                                                    false, onDemand);
+  return scalePixmapKeepingAspectRatio(icon, m_itemPixmapSize, Qt::transparent);
 }
 
 //-----------------------------------------------------------------------------
 
-QPixmap LevelCastItem::getPixmap(bool isSelected) const
-{
-	TXshSimpleLevel *sl = m_level->getSimpleLevel();
-	if (!sl)
-		return QPixmap();
-	ToonzScene *scene = sl->getScene();
-	assert(scene);
-	if (!scene)
-		return QPixmap();
-	bool onDemand = false;
-	if (Preferences::instance()->getColumnIconLoadingPolicy() == Preferences::LoadOnDemand)
-		onDemand = !isSelected;
-	QPixmap icon = IconGenerator::instance()->getIcon(sl, sl->getFirstFid(), false, onDemand);
-	return scalePixmapKeepingAspectRatio(icon, m_itemPixmapSize, Qt::transparent);
-}
-
-//-----------------------------------------------------------------------------
-
-bool LevelCastItem::exists() const
-{
-	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	return TSystem::doesExistFileOrLevel(scene->decodeFilePath(m_level->getPath())) || !getPixmap(false).isNull();
+bool LevelCastItem::exists() const {
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  return TSystem::doesExistFileOrLevel(
+             scene->decodeFilePath(m_level->getPath())) ||
+         !getPixmap(false).isNull();
 }
 
 //-------------------------------------------------------
 
-TXshSimpleLevel *LevelCastItem::getSimpleLevel() const
-{
-	return m_level ? m_level->getSimpleLevel() : 0;
+TXshSimpleLevel *LevelCastItem::getSimpleLevel() const {
+  return m_level ? m_level->getSimpleLevel() : 0;
 }
 
 //=============================================================================
@@ -136,38 +120,35 @@ TXshSimpleLevel *LevelCastItem::getSimpleLevel() const
 //
 //-----------------------------------------------------------------------------
 
-QString SoundCastItem::getName() const
-{
-	return QString::fromStdWString(m_soundLevel->getName());
+QString SoundCastItem::getName() const {
+  return QString::fromStdWString(m_soundLevel->getName());
 }
 
 //-----------------------------------------------------------------------------
 
-QString SoundCastItem::getToolTip() const
-{
-	TFilePath path = m_soundLevel->getPath();
-	return QString::fromStdWString(path.withoutParentDir().getWideString());
+QString SoundCastItem::getToolTip() const {
+  TFilePath path = m_soundLevel->getPath();
+  return QString::fromStdWString(path.withoutParentDir().getWideString());
 }
 //-----------------------------------------------------------------------------
 
-int SoundCastItem::getFrameCount() const
-{
-	return m_soundLevel->getFrameCount();
+int SoundCastItem::getFrameCount() const {
+  return m_soundLevel->getFrameCount();
 }
 //-----------------------------------------------------------------------------
 
-QPixmap SoundCastItem::getPixmap(bool isSelected) const
-{
-	static QPixmap loudspeaker(":Resources/audio.png");
-	return scalePixmapKeepingAspectRatio(loudspeaker, m_itemPixmapSize, Qt::transparent);
+QPixmap SoundCastItem::getPixmap(bool isSelected) const {
+  static QPixmap loudspeaker(":Resources/audio.png");
+  return scalePixmapKeepingAspectRatio(loudspeaker, m_itemPixmapSize,
+                                       Qt::transparent);
 }
 
 //-----------------------------------------------------------------------------
 
-bool SoundCastItem::exists() const
-{
-	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	return TSystem::doesExistFileOrLevel(scene->decodeFilePath(m_soundLevel->getPath()));
+bool SoundCastItem::exists() const {
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  return TSystem::doesExistFileOrLevel(
+      scene->decodeFilePath(m_soundLevel->getPath()));
 }
 
 //=============================================================================
@@ -176,35 +157,32 @@ bool SoundCastItem::exists() const
 //
 //-----------------------------------------------------------------------------
 
-QString PaletteCastItem::getName() const
-{
-	return QString::fromStdWString(m_paletteLevel->getName());
+QString PaletteCastItem::getName() const {
+  return QString::fromStdWString(m_paletteLevel->getName());
 }
 //-----------------------------------------------------------------------------
 
-QString PaletteCastItem::getToolTip() const
-{
-	TFilePath path = m_paletteLevel->getPath();
-	return QString::fromStdWString(path.withoutParentDir().getWideString());
+QString PaletteCastItem::getToolTip() const {
+  TFilePath path = m_paletteLevel->getPath();
+  return QString::fromStdWString(path.withoutParentDir().getWideString());
 }
 //-----------------------------------------------------------------------------
 
-int PaletteCastItem::getFrameCount() const
-{
-	return m_paletteLevel->getFrameCount();
+int PaletteCastItem::getFrameCount() const {
+  return m_paletteLevel->getFrameCount();
 }
 //-----------------------------------------------------------------------------
 
-QPixmap PaletteCastItem::getPixmap(bool isSelected) const
-{
-	static QPixmap palette(":Resources/paletteicon.png");
-	return scalePixmapKeepingAspectRatio(palette, m_itemPixmapSize, Qt::transparent);
+QPixmap PaletteCastItem::getPixmap(bool isSelected) const {
+  static QPixmap palette(":Resources/paletteicon.png");
+  return scalePixmapKeepingAspectRatio(palette, m_itemPixmapSize,
+                                       Qt::transparent);
 }
 
-bool PaletteCastItem::exists() const
-{
-	ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-	return TSystem::doesExistFileOrLevel(scene->decodeFilePath(m_paletteLevel->getPath()));
+bool PaletteCastItem::exists() const {
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  return TSystem::doesExistFileOrLevel(
+      scene->decodeFilePath(m_paletteLevel->getPath()));
 }
 
 //=============================================================================
@@ -213,71 +191,52 @@ bool PaletteCastItem::exists() const
 //
 //-----------------------------------------------------------------------------
 
-CastItems::CastItems()
-	: QMimeData()
-{
+CastItems::CastItems() : QMimeData() {}
+
+//-----------------------------------------------------------------------------
+
+CastItems::~CastItems() { clear(); }
+
+//-----------------------------------------------------------------------------
+
+void CastItems::clear() { clearPointerContainer(m_items); }
+
+//-----------------------------------------------------------------------------
+
+void CastItems::addItem(CastItem *item) { m_items.push_back(item); }
+
+//-----------------------------------------------------------------------------
+
+CastItem *CastItems::getItem(int index) const {
+  assert(0 <= index && index < (int)m_items.size());
+  return m_items[index];
 }
 
 //-----------------------------------------------------------------------------
 
-CastItems::~CastItems()
-{
-	clear();
+bool CastItems::hasFormat(const QString &mimeType) const {
+  return mimeType == getMimeFormat();
 }
 
 //-----------------------------------------------------------------------------
 
-void CastItems::clear()
-{
-	clearPointerContainer(m_items);
+QString CastItems::getMimeFormat() { return "application/vnd.toonz.levels"; }
+
+//-----------------------------------------------------------------------------
+
+QStringList CastItems::formats() const {
+  return QStringList(QString("application/vnd.toonz.levels"));
 }
 
 //-----------------------------------------------------------------------------
 
-void CastItems::addItem(CastItem *item)
-{
-	m_items.push_back(item);
-}
-
-//-----------------------------------------------------------------------------
-
-CastItem *CastItems::getItem(int index) const
-{
-	assert(0 <= index && index < (int)m_items.size());
-	return m_items[index];
-}
-
-//-----------------------------------------------------------------------------
-
-bool CastItems::hasFormat(const QString &mimeType) const
-{
-	return mimeType == getMimeFormat();
-}
-
-//-----------------------------------------------------------------------------
-
-QString CastItems::getMimeFormat()
-{
-	return "application/vnd.toonz.levels";
-}
-
-//-----------------------------------------------------------------------------
-
-QStringList CastItems::formats() const
-{
-	return QStringList(QString("application/vnd.toonz.levels"));
-}
-
-//-----------------------------------------------------------------------------
-
-CastItems *CastItems::getSelectedItems(const std::set<int> &indices) const
-{
-	CastItems *c = new CastItems();
-	std::set<int>::const_iterator it;
-	for (it = indices.begin(); it != indices.end(); ++it) {
-		int index = *it;
-		if (0 <= index && index < getItemCount())
-			c->addItem(getItem(index)->clone());
-	}
-	return c;
+CastItems *CastItems::getSelectedItems(const std::set<int> &indices) const {
+  CastItems *c = new CastItems();
+  std::set<int>::const_iterator it;
+  for (it = indices.begin(); it != indices.end(); ++it) {
+    int index = *it;
+    if (0 <= index && index < getItemCount())
+      c->addItem(getItem(index)->clone());
+  }
+  return c;
 }

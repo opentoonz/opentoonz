@@ -26,57 +26,56 @@ class TRandom;
 
 //-----------------------------------------------------------------------
 
-class Iwa_ParticlesManager : public TRenderResourceManager
-{
-	T_RENDER_RESOURCE_MANAGER
+class Iwa_ParticlesManager : public TRenderResourceManager {
+  T_RENDER_RESOURCE_MANAGER
 
 public:
-	struct FxData;
+  struct FxData;
 
-	struct FrameData {
-		FxData *m_fxData;
-		double m_frame;
-		TRandom m_random;
-		std::list<Iwa_Particle> m_particles;
-		bool m_calculated;
-		int m_maxTrail;
-		int m_totalParticles;
+  struct FrameData {
+    FxData *m_fxData;
+    double m_frame;
+    TRandom m_random;
+    std::list<Iwa_Particle> m_particles;
+    bool m_calculated;
+    int m_maxTrail;
+    int m_totalParticles;
 
-		/*- しきつめ情報 -*/
-		QList<ParticleOrigin> m_particleOrigins;
+    /*- しきつめ情報 -*/
+    QList<ParticleOrigin> m_particleOrigins;
 
-		FrameData(FxData *fxData);
-		~FrameData();
+    FrameData(FxData *fxData);
+    ~FrameData();
 
-		void buildMaxTrail();
-		void clear();
-	};
+    void buildMaxTrail();
+    void clear();
+  };
 
-	struct FxData : public TSmartObject {
-		DECLARE_CLASS_CODE
+  struct FxData : public TSmartObject {
+    DECLARE_CLASS_CODE
 
-		QThreadStorage<FrameData *> m_frames;
+    QThreadStorage<FrameData *> m_frames;
 
-		FxData();
-	};
+    FxData();
+  };
 
 public:
-	Iwa_ParticlesManager();
-	~Iwa_ParticlesManager();
+  Iwa_ParticlesManager();
+  ~Iwa_ParticlesManager();
 
-	static Iwa_ParticlesManager *instance();
+  static Iwa_ParticlesManager *instance();
 
-	FrameData *data(unsigned long fxId);
+  FrameData *data(unsigned long fxId);
 
-	bool isCached(unsigned long fxId);
+  bool isCached(unsigned long fxId);
 
 private:
-	std::map<unsigned long, FxData *> m_fxs;
-	QMutex m_mutex;
+  std::map<unsigned long, FxData *> m_fxs;
+  QMutex m_mutex;
 
-	int m_renderStatus;
+  int m_renderStatus;
 
-	void onRenderStatusStart(int renderStatus);
+  void onRenderStatusStart(int renderStatus);
 };
 
 #endif

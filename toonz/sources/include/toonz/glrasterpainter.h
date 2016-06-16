@@ -14,12 +14,14 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-namespace GLRasterPainter
-{
+namespace GLRasterPainter {
 
-DVAPI void drawRaster(const TAffine &aff, const TRasterImageP &ri, bool premultiplies = false);
-DVAPI void drawRaster(const TAffine &aff, const TToonzImageP &ti, bool showSavebox);
-DVAPI void drawRaster(const TAffine &aff, UCHAR *buffer, int wrap, int bpp, const TDimension &rasSize,
-					  bool premultiplied);
-DVAPI void drawRaster(const TImageP &image, const TDimension &viewerSize, const TAffine &aff, bool showSavebox, bool premultiplied);
+DVAPI void drawRaster(const TAffine &aff, const TRasterImageP &ri,
+                      bool premultiplies = false);
+DVAPI void drawRaster(const TAffine &aff, const TToonzImageP &ti,
+                      bool showSavebox);
+DVAPI void drawRaster(const TAffine &aff, UCHAR *buffer, int wrap, int bpp,
+                      const TDimension &rasSize, bool premultiplied);
+DVAPI void drawRaster(const TImageP &image, const TDimension &viewerSize,
+                      const TAffine &aff, bool showSavebox, bool premultiplied);
 }

@@ -8,70 +8,53 @@ using namespace ToonzExt;
 
 // REGISTER(SelfLoopDeformation);
 
-SelfLoopDeformation::SelfLoopDeformation()
-{
+SelfLoopDeformation::SelfLoopDeformation() {}
+
+//--------------------------------------------------------------------
+
+SelfLoopDeformation::~SelfLoopDeformation() {}
+
+//--------------------------------------------------------------------
+
+void SelfLoopDeformation::activate_impl(Context *, DraggerStatus *) {
+  assert(!"SelfLoopDeformation::activate not yet implemented!");
 }
 
 //--------------------------------------------------------------------
 
-SelfLoopDeformation::~SelfLoopDeformation()
-{
+bool SelfLoopDeformation::check(Context *dragger, DraggerStatus *status) {
+  assert(status && dragger && "Not dragger or status available");
+  assert(!"SelfLoopDeformation::check not yet implemented!");
+  //  lengthOfAction_ = status->lengthOfAction_;
+  //  deformerSensibility_ = status->deformerSensibility_;
+  //  stroke2move_ = status->stroke2change_;
+  TStroke *s = stroke2move_;
+  //  double &w = status->w_;
+
+  if (s->isSelfLoop()) {
+    //    dragger->changeDeformation(SelfLoopDeformation::instance());
+    //    SelfLoopDeformation::instance()->activate(dragger,
+    //                                              status);
+    return true;
+  }
+  return false;
 }
 
 //--------------------------------------------------------------------
 
-void SelfLoopDeformation::activate_impl(Context *,
-										DraggerStatus *)
-{
-	assert(!"SelfLoopDeformation::activate not yet implemented!");
-}
+void SelfLoopDeformation::update_impl(Context *, const TPointD &delta) {}
 
 //--------------------------------------------------------------------
 
-bool SelfLoopDeformation::check(Context *dragger,
-								DraggerStatus *status)
-{
-	assert(status && dragger && "Not dragger or status available");
-	assert(!"SelfLoopDeformation::check not yet implemented!");
-	//  lengthOfAction_ = status->lengthOfAction_;
-	//  deformerSensibility_ = status->deformerSensibility_;
-	//  stroke2move_ = status->stroke2change_;
-	TStroke *s = stroke2move_;
-	//  double &w = status->w_;
-
-	if (s->isSelfLoop()) {
-		//    dragger->changeDeformation(SelfLoopDeformation::instance());
-		//    SelfLoopDeformation::instance()->activate(dragger,
-		//                                              status);
-		return true;
-	}
-	return false;
-}
+void SelfLoopDeformation::deactivate_impl(Context *) {}
 
 //--------------------------------------------------------------------
 
-void SelfLoopDeformation::update_impl(Context *,
-									  const TPointD &delta)
-{
-}
+void SelfLoopDeformation::draw(Designer *dr) {}
 
 //--------------------------------------------------------------------
 
-void SelfLoopDeformation::deactivate_impl(Context *)
-{
-}
-
-//--------------------------------------------------------------------
-
-void SelfLoopDeformation::draw(Designer *dr)
-{
-}
-
-//--------------------------------------------------------------------
-
-SelfLoopDeformation *
-SelfLoopDeformation::instance()
-{
-	static SelfLoopDeformation singleton;
-	return &singleton;
+SelfLoopDeformation *SelfLoopDeformation::instance() {
+  static SelfLoopDeformation singleton;
+  return &singleton;
 }

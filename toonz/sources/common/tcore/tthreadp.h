@@ -13,30 +13,30 @@
 //    TThreadMessageDispatcher class
 //--------------------------------------
 
-//NOTE: This class should eventually be moved to tthreadmessagep.h...
-class TThreadMessageDispatcher : public QObject //singleton
+// NOTE: This class should eventually be moved to tthreadmessagep.h...
+class TThreadMessageDispatcher : public QObject  // singleton
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	TThreadMessageDispatcher();
-	Q_SIGNALS : void signaled(TThread::Message *msg);
-	void blockingSignaled(TThread::Message *msg);
+  TThreadMessageDispatcher();
+Q_SIGNALS:
+  void signaled(TThread::Message *msg);
+  void blockingSignaled(TThread::Message *msg);
 protected Q_SLOTS:
-	void onSignal(TThread::Message *msg);
+  void onSignal(TThread::Message *msg);
 
 public:
-	void emitSignaled(TThread::Message *msg);
-	void emitBlockingSignaled(TThread::Message *msg);
-	static void init();
-	static TThreadMessageDispatcher *instance();
+  void emitSignaled(TThread::Message *msg);
+  void emitBlockingSignaled(TThread::Message *msg);
+  static void init();
+  static TThreadMessageDispatcher *instance();
 };
 
 //=====================================================================
 
-namespace TThread
-{
-//Forward declarations
+namespace TThread {
+// Forward declarations
 class ExecutorId;
 class ExecutorImpSlots;
 }
@@ -47,28 +47,30 @@ class ExecutorImpSlots;
 //    ExecutorImpSlots class
 //------------------------------
 
-class TThread::ExecutorImpSlots : public QObject
-{
-	Q_OBJECT
+class TThread::ExecutorImpSlots : public QObject {
+  Q_OBJECT
 
 public:
-	ExecutorImpSlots();
-	~ExecutorImpSlots();
+  ExecutorImpSlots();
+  ~ExecutorImpSlots();
 
-	//The following is provided to ensure that point #3 in Qt reference in page "Thread support in Qt"
-	//is satisfied:
+  // The following is provided to ensure that point #3 in Qt reference in page
+  // "Thread support in Qt"
+  // is satisfied:
 
-	//      "You must ensure that all objects created in
-	//        a thread are deleted before you delete the QThread."
+  //      "You must ensure that all objects created in
+  //        a thread are deleted before you delete the QThread."
 
-	//So, specifically, thread creation should happen only in the main thread, not in worker threads.
-	void emitRefreshAssignments();
+  // So, specifically, thread creation should happen only in the main thread,
+  // not in worker threads.
+  void emitRefreshAssignments();
 
-	Q_SIGNALS : void refreshAssignments();
+Q_SIGNALS:
+  void refreshAssignments();
 
 public Q_SLOTS:
-	void onTerminated();
-	void onRefreshAssignments();
+  void onTerminated();
+  void onRefreshAssignments();
 };
 
 #endif

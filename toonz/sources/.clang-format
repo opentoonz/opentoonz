@@ -1,0 +1,14 @@
+BasedOnStyle: Google
+Standard: C++11
+UseTab: Never
+AccessModifierOffset: -2
+AlignAfterOpenBracket: true
+AlignConsecutiveAssignments: true
+AlignEscapedNewlinesLeft: false
+AlignTrailingComments: true
+IndentCaseLabels: false
+BreakConstructorInitializersBeforeComma: true
+PointerAlignment: Left
+SortIncludes: false
+
+

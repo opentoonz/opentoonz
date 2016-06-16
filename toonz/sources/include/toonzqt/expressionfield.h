@@ -25,66 +25,65 @@ class QModelIndex;
 
 //=============================================================================
 
-namespace DVGui
-{
+namespace DVGui {
 
 //=============================================================================
 /*! \class DVGui::ExpressionField
-		\brief The ExpressionField allows to edit expressions (i.e. formulas as '34*(5-2)')
+                \brief The ExpressionField allows to edit expressions (i.e.
+   formulas as '34*(5-2)')
 
-		Inherits \b QWidget.
+                Inherits \b QWidget.
 
 */
 
-class DVAPI ExpressionField : public QTextEdit
-{
-	Q_OBJECT
-	bool m_editing;
-	const TSyntax::Grammar *m_grammar;
+class DVAPI ExpressionField : public QTextEdit {
+  Q_OBJECT
+  bool m_editing;
+  const TSyntax::Grammar *m_grammar;
 
-	class SyntaxHighlighter;
-	SyntaxHighlighter *m_syntaxHighlighter;
+  class SyntaxHighlighter;
+  SyntaxHighlighter *m_syntaxHighlighter;
 
-	QListView *m_completerPopup;
-	int m_completerStartPos;
-	TSyntax::Grammar::Suggestions m_suggestions;
+  QListView *m_completerPopup;
+  int m_completerStartPos;
+  TSyntax::Grammar::Suggestions m_suggestions;
 
 public:
-	ExpressionField(QWidget *parent = 0);
-	~ExpressionField();
+  ExpressionField(QWidget *parent = 0);
+  ~ExpressionField();
 
-	void setExpression(std::string expression);
-	std::string getExpression() const;
+  void setExpression(std::string expression);
+  std::string getExpression() const;
 
-	void setGrammar(const TSyntax::Grammar *grammar);
-	const TSyntax::Grammar *getGrammar() const { return m_grammar; }
+  void setGrammar(const TSyntax::Grammar *grammar);
+  const TSyntax::Grammar *getGrammar() const { return m_grammar; }
 
 private:
-	void openCompleterPopup();
-	bool updateCompleterPopup();
-	void insertCompletion();
-	int computeSuggestions();
+  void openCompleterPopup();
+  bool updateCompleterPopup();
+  void insertCompletion();
+  int computeSuggestions();
 
 protected:
-	bool event(QEvent *e);
-	void keyPressEvent(QKeyEvent *e);
-	void focusInEvent(QFocusEvent *e);
-	void focusOutEvent(QFocusEvent *e);
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
-	bool eventFilter(QObject *obj, QEvent *e);
+  bool event(QEvent *e);
+  void keyPressEvent(QKeyEvent *e);
+  void focusInEvent(QFocusEvent *e);
+  void focusOutEvent(QFocusEvent *e);
+  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *);
+  bool eventFilter(QObject *obj, QEvent *e);
 
 private slots:
-	void onTextChanged();
-	void onCursorPositionChanged();
-	void insertCompletion(const QModelIndex &index);
+  void onTextChanged();
+  void onCursorPositionChanged();
+  void insertCompletion(const QModelIndex &index);
 
 signals:
-	void expressionChanged();
+  void expressionChanged();
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+}  // namespace DVGui
 //-----------------------------------------------------------------------------
 
-#endif // FILEFIELD_H
+#endif  // FILEFIELD_H

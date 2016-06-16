@@ -33,9 +33,9 @@ struct PlasticDeformerDataGroup;
 */
 
 DVAPI void transform(
-	const TMeshImageP &image, //!< Mesh image to be transformed.
-	const TAffine &aff		  //!< Affine transform to be applied on the input image.
-	);
+    const TMeshImageP &image,  //!< Mesh image to be transformed.
+    const TAffine &aff  //!< Affine transform to be applied on the input image.
+    );
 
 //---------------------------------------------------------------------------
 
@@ -47,9 +47,10 @@ DVAPI void transform(
 */
 
 DVAPI void tglDrawEdges(
-	const TMeshImage &image,						  //!< Input mesh image whose edges will be drawn.
-	const PlasticDeformerDataGroup *deformerDatas = 0 //!< Optional data about a deformation of the input image.
-	);
+    const TMeshImage &image,  //!< Input mesh image whose edges will be drawn.
+    const PlasticDeformerDataGroup *deformerDatas =
+        0  //!< Optional data about a deformation of the input image.
+    );
 
 //---------------------------------------------------------------------------
 
@@ -61,25 +62,31 @@ DVAPI void tglDrawEdges(
 */
 
 DVAPI void tglDrawFaces(
-	const TMeshImage &image,						  //!< Input mesh image whose faces will be drawn.
-	const PlasticDeformerDataGroup *deformerDatas = 0 //!< Optional data about a deformation of the input image.
-	);
+    const TMeshImage &image,  //!< Input mesh image whose faces will be drawn.
+    const PlasticDeformerDataGroup *deformerDatas =
+        0  //!< Optional data about a deformation of the input image.
+    );
 
 //---------------------------------------------------------------------------
 
 /*!
-  \brief    Draws the <I>stacking order</I> information of the input mesh image's
+  \brief    Draws the <I>stacking order</I> information of the input mesh
+  image's
             faces, on current OpenGL context.
 */
 
 DVAPI void tglDrawSO(
-	const TMeshImage &image,						   //!< Input mesh image whose SO will be drawn.
-	double minColor[4],								   //!< RGBM color quadruple (in [0, 1]) corresponding to the lowest SO value.
-	double maxColor[4],								   //!< RGBM color quadruple corresponding to the highest SO value.
-	const PlasticDeformerDataGroup *deformerDatas = 0, //!< Deformation data structure containing SO data.
-	bool deformedDomain = false						   //!< Whether the image data must be drawn \a deformed
-													   //!  by the specified deformerDatas, or not.
-	);
+    const TMeshImage &image,  //!< Input mesh image whose SO will be drawn.
+    double minColor[4],  //!< RGBM color quadruple (in [0, 1]) corresponding to
+                         //!the lowest SO value.
+    double maxColor[4],  //!< RGBM color quadruple corresponding to the highest
+                         //!SO value.
+    const PlasticDeformerDataGroup *deformerDatas =
+        0,  //!< Deformation data structure containing SO data.
+    bool deformedDomain =
+        false  //!< Whether the image data must be drawn \a deformed
+               //!  by the specified deformerDatas, or not.
+    );
 
 //---------------------------------------------------------------------------
 
@@ -89,13 +96,18 @@ DVAPI void tglDrawSO(
 */
 
 DVAPI void tglDrawRigidity(
-	const TMeshImage &image,						   //!< Input mesh image whose rigidity will be drawn.
-	double minColor[4],								   //!< RGBM color quadruple (in [0, 1]) corresponding to the lowest rigidity value.
-	double maxColor[4],								   //!< RGBM color quadruple corresponding to the highest rigidity value.
-	const PlasticDeformerDataGroup *deformerDatas = 0, //!< Data structure of an optional deformation of the input image.
-	bool deformedDomain = false						   //!< Whether the image data must be drawn \a deformed
-													   //!  by the specified deformerDatas, or not.
-	);
+    const TMeshImage
+        &image,          //!< Input mesh image whose rigidity will be drawn.
+    double minColor[4],  //!< RGBM color quadruple (in [0, 1]) corresponding to
+                         //!the lowest rigidity value.
+    double maxColor[4],  //!< RGBM color quadruple corresponding to the highest
+                         //!rigidity value.
+    const PlasticDeformerDataGroup *deformerDatas =
+        0,  //!< Data structure of an optional deformation of the input image.
+    bool deformedDomain =
+        false  //!< Whether the image data must be drawn \a deformed
+               //!  by the specified deformerDatas, or not.
+    );
 
 //---------------------------------------------------------------------------
 
@@ -107,10 +119,13 @@ DVAPI void tglDrawRigidity(
 */
 
 DVAPI void tglDraw(
-	const TMeshImage &image,					  //!< Mesh image to be drawn.
-	const DrawableTextureData &texData,			  //!< Textures data to use for texturing.
-	const TAffine &meshToTexAffine,				  //!< Transform from mesh to texture coordinates.
-	const PlasticDeformerDataGroup &deformerDatas //!< Data structure of a deformation of the input image.
-	);
+    const TMeshImage &image,  //!< Mesh image to be drawn.
+    const DrawableTextureData
+        &texData,  //!< Textures data to use for texturing.
+    const TAffine
+        &meshToTexAffine,  //!< Transform from mesh to texture coordinates.
+    const PlasticDeformerDataGroup
+        &deformerDatas  //!< Data structure of a deformation of the input image.
+    );
 
-#endif // MESHUTILS_H
+#endif  // MESHUTILS_H

@@ -19,29 +19,29 @@
 #endif
 
 //=============================================================================
-//!The TXshSoundTextColumn class provides a sound column in xsheet and allows its management through cell concept.
+//! The TXshSoundTextColumn class provides a sound column in xsheet and allows
+//! its management through cell concept.
 /*!Inherits \b TXshCellColumn. */
 //=============================================================================
 
-class DVAPI TXshSoundTextColumn : public TXshCellColumn
-{
-	PERSIST_DECLARATION(TXshSoundTextColumn)
+class DVAPI TXshSoundTextColumn : public TXshCellColumn {
+  PERSIST_DECLARATION(TXshSoundTextColumn)
 
 public:
-	TXshSoundTextColumn();
-	~TXshSoundTextColumn();
+  TXshSoundTextColumn();
+  ~TXshSoundTextColumn();
 
-	TXshColumn::ColumnType getColumnType() const;
-	TXshSoundTextColumn *getSoundTextColumn() { return this; }
+  TXshColumn::ColumnType getColumnType() const;
+  TXshSoundTextColumn *getSoundTextColumn() { return this; }
 
-	void createSoundTextLevel(int row, QList<QString> textList);
+  void createSoundTextLevel(int row, QList<QString> textList);
 
-	bool canSetCell(const TXshCell &cell) const;
+  bool canSetCell(const TXshCell &cell) const;
 
-	TXshColumn *clone() const;
+  TXshColumn *clone() const;
 
-	void loadData(TIStream &is);
-	void saveData(TOStream &os);
+  void loadData(TIStream &is);
+  void saveData(TOStream &os);
 };
 
 #ifdef _WIN32
@@ -49,4 +49,4 @@ template class DV_EXPORT_API TSmartPointerT<TXshSoundTextColumn>;
 #endif
 typedef TSmartPointerT<TXshSoundTextColumn> TXshSoundTextColumnP;
 
-#endif //TXSHSOUNDTEXTCOLUMN_INCLUDED
+#endif  // TXSHSOUNDTEXTCOLUMN_INCLUDED

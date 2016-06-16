@@ -21,28 +21,27 @@ class ShortcutItem;
 // Per cancellarlo bisogna chiamare removeShortcut()
 //-----------------------------------------------------------------------------
 
-class ShortcutViewer : public QWidget
-{
-	Q_OBJECT
-	QAction *m_action;
+class ShortcutViewer : public QWidget {
+  Q_OBJECT
+  QAction *m_action;
 
 public:
-	ShortcutViewer(QWidget *parent);
-	~ShortcutViewer();
+  ShortcutViewer(QWidget *parent);
+  ~ShortcutViewer();
 
 protected:
-	void paintEvent(QPaintEvent *);
-	bool event(QEvent *event);
-	void keyPressEvent(QKeyEvent *event);
-	void enterEvent(QEvent *event);
-	void leaveEvent(QEvent *event);
+  void paintEvent(QPaintEvent *);
+  bool event(QEvent *event);
+  void keyPressEvent(QKeyEvent *event);
+  void enterEvent(QEvent *event);
+  void leaveEvent(QEvent *event);
 
 public slots:
-	void setAction(QAction *action);
-	void removeShortcut();
+  void setAction(QAction *action);
+  void removeShortcut();
 
 signals:
-	void shortcutChanged();
+  void shortcutChanged();
 };
 
 //=============================================================================
@@ -52,25 +51,27 @@ signals:
 // Serve per selezionare la QAction corrente
 //-----------------------------------------------------------------------------
 
-class ShortcutTree : public QTreeWidget
-{
-	Q_OBJECT
-	std::vector<ShortcutItem *> m_items;
+class ShortcutTree : public QTreeWidget {
+  Q_OBJECT
+  std::vector<ShortcutItem *> m_items;
 
 public:
-	ShortcutTree(QWidget *parent = 0);
-	~ShortcutTree();
+  ShortcutTree(QWidget *parent = 0);
+  ~ShortcutTree();
 
 protected:
-	// aggiunge un blocco di QAction. commandType e' un CommandType::MenubarCommandType
-	void addFolder(const QString &title, int commandType, QTreeWidgetItem *folder = 0);
+  // aggiunge un blocco di QAction. commandType e' un
+  // CommandType::MenubarCommandType
+  void addFolder(const QString &title, int commandType,
+                 QTreeWidgetItem *folder = 0);
 
 public slots:
-	void onCurrentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
-	void onShortcutChanged();
+  void onCurrentItemChanged(QTreeWidgetItem *current,
+                            QTreeWidgetItem *previous);
+  void onShortcutChanged();
 
 signals:
-	void actionSelected(QAction *);
+  void actionSelected(QAction *);
 };
 
 //=============================================================================
@@ -79,16 +80,15 @@ signals:
 // Questo e' il popup che l'utente utilizza per modificare gli shortcut
 //-----------------------------------------------------------------------------
 
-class ShortcutPopup : public DVGui::Dialog
-{
-	Q_OBJECT
-	QPushButton *m_removeBtn;
-	ShortcutViewer *m_sViewer;
-	ShortcutTree *m_list;
+class ShortcutPopup : public DVGui::Dialog {
+  Q_OBJECT
+  QPushButton *m_removeBtn;
+  ShortcutViewer *m_sViewer;
+  ShortcutTree *m_list;
 
 public:
-	ShortcutPopup();
-	~ShortcutPopup();
+  ShortcutPopup();
+  ~ShortcutPopup();
 };
 
-#endif //  SHORTCUTPOPUP_H
+#endif  //  SHORTCUTPOPUP_H

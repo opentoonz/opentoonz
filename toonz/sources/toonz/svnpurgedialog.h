@@ -12,39 +12,38 @@ class QLabel;
 
 //-----------------------------------------------------------------------------
 
-class SVNPurgeDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNPurgeDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QString m_workingDir;
+  QString m_workingDir;
 
-	QPushButton *m_purgeButton;
-	QPushButton *m_cancelButton;
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QPushButton *m_purgeButton;
+  QPushButton *m_cancelButton;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	QList<SVNStatus> m_status;
+  QList<SVNStatus> m_status;
 
-	VersionControlThread m_thread;
+  VersionControlThread m_thread;
 
-	QStringList m_filesToPurge;
+  QStringList m_filesToPurge;
 
 public:
-	SVNPurgeDialog(QWidget *parent, const QString &workingDir);
+  SVNPurgeDialog(QWidget *parent, const QString &workingDir);
 
 private:
-	void switchToCloseButton();
-	void checkFiles();
-	void updateFileBrowser();
+  void switchToCloseButton();
+  void checkFiles();
+  void updateFileBrowser();
 
 protected slots:
 
-	void onPurgeClicked();
-	void onStatusRetrieved(const QString &);
-	void onError(const QString &);
+  void onPurgeClicked();
+  void onStatusRetrieved(const QString &);
+  void onError(const QString &);
 
 signals:
-	void done(const QStringList &);
+  void done(const QStringList &);
 };
 
-#endif // SVN_PURGE_DIALOG_H
+#endif  // SVN_PURGE_DIALOG_H

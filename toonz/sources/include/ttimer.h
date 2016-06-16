@@ -19,91 +19,93 @@
 
 //-------------------------------------------------------------------
 
-class DVAPI TGenericTimerAction
-{
+class DVAPI TGenericTimerAction {
 public:
-	virtual ~TGenericTimerAction() {}
-	virtual void sendCommand(TUINT64 tick) = 0;
+  virtual ~TGenericTimerAction() {}
+  virtual void sendCommand(TUINT64 tick) = 0;
 };
 
 //-------------------------------------------------------------------
 
 template <class T>
-class TTimerAction : public TGenericTimerAction
-{
+class TTimerAction : public TGenericTimerAction {
 public:
-	typedef void (T::*Method)(TUINT64 tick);
-	TTimerAction(T *target, Method method) : m_target(target), m_method(method) {}
-	void sendCommand(TUINT64 tick) { (m_target->*m_method)(tick); }
+  typedef void (T::*Method)(TUINT64 tick);
+  TTimerAction(T *target, Method method) : m_target(target), m_method(method) {}
+  void sendCommand(TUINT64 tick) { (m_target->*m_method)(tick); }
+
 private:
-	T *m_target;
-	Method m_method;
+  T *m_target;
+  Method m_method;
 };
 
 //------------------------------------------------------------------------------
 //! THis class is manages general time events.
 /*!
-		This class defines a timer, 
-		i.e a system which, at user defined time steps, sends events through a callback function.
-	*/
-class DVAPI TTimer
-{
+                This class defines a timer,
+                i.e a system which, at user defined time steps, sends events
+   through a callback function.
+        */
+class DVAPI TTimer {
 public:
-	/*!
-		Specifies which is the type of timer of this object.
-	*/
-	enum Type {
-		OneShot, /*!< This type of timer sends timer events only at a single time. */
-		Periodic /*!< This type of timer sends timer events periodically. */
-	};
+  /*!
+          Specifies which is the type of timer of this object.
+  */
+  enum Type {
+    OneShot, /*!< This type of timer sends timer events only at a single time.
+                */
+    Periodic /*!< This type of timer sends timer events periodically. */
+  };
 
-	/*!
-		Creates a timer with name \p name, resolution \p timerRes and type \p type.
-		Resolution is expressed in milliseconds.
-	*/
-	TTimer(const std::string &name, UINT timerRes, Type type);
-	/*!
-		Deletes the timer.
-	*/
-	~TTimer();
+  /*!
+          Creates a timer with name \p name, resolution \p timerRes and type \p
+     type.
+          Resolution is expressed in milliseconds.
+  */
+  TTimer(const std::string &name, UINT timerRes, Type type);
+  /*!
+          Deletes the timer.
+  */
+  ~TTimer();
 
-	/*!
-		Starts the timer after \p delay milliseconds.
-	*/
-	void start(UINT delay); // delay expressed in milliseconds
-							/*!
-		Stops the timer immediately. 
-		Doesn't delete the timer.
-	*/
-	void stop();
-	/*!
-		Returns \p true if the timer is started.
-	*/
-	bool isStarted() const;
-	/*!
-		Returns the name of the timer.
-	*/
-	std::string getName() const;
-	/*!
-		Asks the timer for number of events so far.
-	*/
-	TUINT64 getTicks() const;
-	/*!
-		Returns the initial start delay of the timer. 
-	*/
-	UINT getDelay() const;
-	/*!
-		Sets the callback function, i.e. the function to be called every timer's shot.
-	*/
-	void setAction(TGenericTimerAction *action);
+  /*!
+          Starts the timer after \p delay milliseconds.
+  */
+  void start(UINT delay);  // delay expressed in milliseconds
+                           /*!
+Stops the timer immediately.
+Doesn't delete the timer.
+*/
+  void stop();
+  /*!
+          Returns \p true if the timer is started.
+  */
+  bool isStarted() const;
+  /*!
+          Returns the name of the timer.
+  */
+  std::string getName() const;
+  /*!
+          Asks the timer for number of events so far.
+  */
+  TUINT64 getTicks() const;
+  /*!
+          Returns the initial start delay of the timer.
+  */
+  UINT getDelay() const;
+  /*!
+          Sets the callback function, i.e. the function to be called every
+     timer's shot.
+  */
+  void setAction(TGenericTimerAction *action);
 
-	class Imp;
+  class Imp;
 
 private:
-	std::unique_ptr<Imp> m_imp;
+  std::unique_ptr<Imp> m_imp;
 
-	TTimer(const TTimer &);
-	void operator=(const TTimer &);
+  TTimer(const TTimer &);
+  void operator=(const TTimer &);
 };
 
 #endif

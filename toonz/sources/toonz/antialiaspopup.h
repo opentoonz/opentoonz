@@ -8,8 +8,7 @@ class QSlider;
 class ImageViewer;
 class TSelection;
 
-namespace DVGui
-{
+namespace DVGui {
 class IntField;
 }
 
@@ -17,32 +16,31 @@ class IntField;
 // AntialiasPopup
 //-----------------------------------------------------------------------------
 
-class AntialiasPopup : public DVGui::Dialog
-{
-	Q_OBJECT
+class AntialiasPopup : public DVGui::Dialog {
+  Q_OBJECT
 
-	DVGui::IntField *m_thresholdField;
-	DVGui::IntField *m_softnessField;
-	QPushButton *m_okBtn;
-	TRasterP m_startRas;
+  DVGui::IntField *m_thresholdField;
+  DVGui::IntField *m_softnessField;
+  QPushButton *m_okBtn;
+  TRasterP m_startRas;
 
 private:
-	class Swatch;
-	Swatch *m_viewer;
+  class Swatch;
+  Swatch *m_viewer;
 
 public:
-	AntialiasPopup();
+  AntialiasPopup();
 
 protected:
-	void showEvent(QShowEvent *e);
-	void hideEvent(QHideEvent *e);
+  void showEvent(QShowEvent *e);
+  void hideEvent(QHideEvent *e);
 
 protected slots:
 
-	void setCurrentSampleRaster();
+  void setCurrentSampleRaster();
 
 public slots:
 
-	void apply();
-	void onValuesChanged(bool dragging);
+  void apply();
+  void onValuesChanged(bool dragging);
 };

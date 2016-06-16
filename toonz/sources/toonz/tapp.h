@@ -31,185 +31,205 @@ class ComboViewerPanel;
 //-----------------------------------------------------------------------------
 //! This is the instance of the main application.
 
-/*! This class is a singleton and is used to initialize the main application window.
-		It defines the basic signals used in the application, as the status changing of 
-		the scene and connects them to the basic handlers.
-	\n	It is also used to retrieve a pointer to the current state of the application,
-		as the pointer to the main window, a pointer to the current scene or a pointer
-		to the current selection, etc...
-	\n	For example to get the pointer to the main window in any part of the code one has to write:
+/*! This class is a singleton and is used to initialize the main application
+window.
+                It defines the basic signals used in the application, as the
+status changing of
+                the scene and connects them to the basic handlers.
+        \n	It is also used to retrieve a pointer to the current state of
+the application,
+                as the pointer to the main window, a pointer to the current
+scene or a pointer
+                to the current selection, etc...
+        \n	For example to get the pointer to the main window in any part
+of the code one has to write:
 
-	\code
+        \code
 // A pointer to the main windows is
 
 QMainWindow * mainwindow = TApp::instance()->getMainWindow();
 
 // To get the current object id
 
-TStageObjectId currentObjectId = TApp::instance()->getCurrentObject()->getObjectId();
+TStageObjectId currentObjectId =
+TApp::instance()->getCurrentObject()->getObjectId();
 
-		\endcode
-		This class is used to take care of changes on the state of the application and to 
-		notify through event handling to the rest of the code.
-	*/
-class TApp : public QObject, public TTool::Application //Singleton
+                \endcode
+                This class is used to take care of changes on the state of the
+application and to
+                notify through event handling to the rest of the code.
+        */
+class TApp : public QObject,
+             public TTool::Application  // Singleton
 {
-	Q_OBJECT
+  Q_OBJECT
 
-	TSceneHandle *m_currentScene;
-	TXsheetHandle *m_currentXsheet;
-	TFrameHandle *m_currentFrame;
-	TColumnHandle *m_currentColumn;
-	TXshLevelHandle *m_currentLevel;
-	ToolHandle *m_currentTool;
-	TObjectHandle *m_currentObject;
-	TSelectionHandle *m_currentSelection;
-	TOnionSkinMaskHandle *m_currentOnionSkinMask;
-	TFxHandle *m_currentFx;
+  TSceneHandle *m_currentScene;
+  TXsheetHandle *m_currentXsheet;
+  TFrameHandle *m_currentFrame;
+  TColumnHandle *m_currentColumn;
+  TXshLevelHandle *m_currentLevel;
+  ToolHandle *m_currentTool;
+  TObjectHandle *m_currentObject;
+  TSelectionHandle *m_currentSelection;
+  TOnionSkinMaskHandle *m_currentOnionSkinMask;
+  TFxHandle *m_currentFx;
 
-	PaletteController *m_paletteController;
+  PaletteController *m_paletteController;
 
-	QMainWindow *m_mainWindow;
+  QMainWindow *m_mainWindow;
 
-	//keep a pointer of the inknpaint viewer in order to enable navigator pan in the filmstrip
-	ComboViewerPanel *m_inknPaintViewerPanel;
+  // keep a pointer of the inknpaint viewer in order to enable navigator pan in
+  // the filmstrip
+  ComboViewerPanel *m_inknPaintViewerPanel;
 
-	int m_autosavePeriod; // minutes
-	bool m_autosaveSuspended;
-	QTimer *m_autosaveTimer;
+  int m_autosavePeriod;  // minutes
+  bool m_autosaveSuspended;
+  QTimer *m_autosaveTimer;
 
-	TApp();
+  TApp();
 
-	bool m_isStarting;
-	bool m_isPenCloseToTablet;
+  bool m_isStarting;
+  bool m_isPenCloseToTablet;
 
 public:
-	/*!
-		A static pointer to the main application.
-	*/
-	static TApp *instance();
+  /*!
+          A static pointer to the main application.
+  */
+  static TApp *instance();
 
-	~TApp();
-	/*!
-		Returns a pointer to the current scene.
-	*/
-	TSceneHandle *getCurrentScene() const { return m_currentScene; }
-	/*!
-		Returns a pointer to the current Xsheet.
-	*/
-	TXsheetHandle *getCurrentXsheet() const { return m_currentXsheet; }
-	/*!
-		Returns a pointer to the current frame.
-	*/
-	TFrameHandle *getCurrentFrame() const { return m_currentFrame; }
-	/*!
-		Returns a pointer to the current column.
-	*/
-	TColumnHandle *getCurrentColumn() const { return m_currentColumn; }
-	/*!
-		Returns a pointer to the current level.
-	*/
-	TXshLevelHandle *getCurrentLevel() const { return m_currentLevel; }
-	/*!
-		Returns a pointer to the current tool used.
-	*/
-	ToolHandle *getCurrentTool() const { return m_currentTool; }
-	/*!
-		Returns a pointer to the current object in use.
-	*/
-	TObjectHandle *getCurrentObject() const { return m_currentObject; }
-	/*!
-		Returns a pointer to the current selection.
-	*/
-	TSelectionHandle *getCurrentSelection() const { return m_currentSelection; }
-	/*!
-		Returns a pointer to the current layer's mask.
-	*/
-	TOnionSkinMaskHandle *
-	getCurrentOnionSkin() const { return m_currentOnionSkinMask; }
-	/*!
-		Returns a pointer to the current effect.
-	*/
-	TFxHandle *getCurrentFx() const { return m_currentFx; }
+  ~TApp();
+  /*!
+          Returns a pointer to the current scene.
+  */
+  TSceneHandle *getCurrentScene() const { return m_currentScene; }
+  /*!
+          Returns a pointer to the current Xsheet.
+  */
+  TXsheetHandle *getCurrentXsheet() const { return m_currentXsheet; }
+  /*!
+          Returns a pointer to the current frame.
+  */
+  TFrameHandle *getCurrentFrame() const { return m_currentFrame; }
+  /*!
+          Returns a pointer to the current column.
+  */
+  TColumnHandle *getCurrentColumn() const { return m_currentColumn; }
+  /*!
+          Returns a pointer to the current level.
+  */
+  TXshLevelHandle *getCurrentLevel() const { return m_currentLevel; }
+  /*!
+          Returns a pointer to the current tool used.
+  */
+  ToolHandle *getCurrentTool() const { return m_currentTool; }
+  /*!
+          Returns a pointer to the current object in use.
+  */
+  TObjectHandle *getCurrentObject() const { return m_currentObject; }
+  /*!
+          Returns a pointer to the current selection.
+  */
+  TSelectionHandle *getCurrentSelection() const { return m_currentSelection; }
+  /*!
+          Returns a pointer to the current layer's mask.
+  */
+  TOnionSkinMaskHandle *getCurrentOnionSkin() const {
+    return m_currentOnionSkinMask;
+  }
+  /*!
+          Returns a pointer to the current effect.
+  */
+  TFxHandle *getCurrentFx() const { return m_currentFx; }
 
-	PaletteController *getPaletteController() const { return m_paletteController; }
-	/*!
-		Sets a pointer to the main window..
-	*/
+  PaletteController *getPaletteController() const {
+    return m_paletteController;
+  }
+  /*!
+          Sets a pointer to the main window..
+  */
 
-	// Current Palette (PaletteController) methods
+  // Current Palette (PaletteController) methods
 
-	TPaletteHandle *getCurrentPalette() const;
+  TPaletteHandle *getCurrentPalette() const;
 
-	TColorStyle *getCurrentLevelStyle() const;
+  TColorStyle *getCurrentLevelStyle() const;
 
-	int getCurrentLevelStyleIndex() const;
+  int getCurrentLevelStyleIndex() const;
 
-	void setCurrentLevelStyleIndex(int index);
+  void setCurrentLevelStyleIndex(int index);
 
-	void setMainWindow(QMainWindow *mainWindow) { m_mainWindow = mainWindow; }
-	/*!
-		Returns a pointer to the main window.
-	*/
-	QMainWindow *getMainWindow() const { return m_mainWindow; }
-	/*!
-		Returns a pointer to the current room. The current room is the window environment in use, 
-		i.e. the drawing tab, the animation tab, the pltedit tab etc...
-	*/
-	TMainWindow *getCurrentRoom() const;
-	/*!
-		Returns the current image type that can be a raster or a vector image. \sa TImage::Type.
-	*/
-	int getCurrentImageType();
-	/*!
-		Initializes the main window application. It is called in the main function 
-		after the environment initialization.
-	*/
-	void init();
+  void setMainWindow(QMainWindow *mainWindow) { m_mainWindow = mainWindow; }
+  /*!
+          Returns a pointer to the main window.
+  */
+  QMainWindow *getMainWindow() const { return m_mainWindow; }
+  /*!
+          Returns a pointer to the current room. The current room is the window
+     environment in use,
+          i.e. the drawing tab, the animation tab, the pltedit tab etc...
+  */
+  TMainWindow *getCurrentRoom() const;
+  /*!
+          Returns the current image type that can be a raster or a vector image.
+     \sa TImage::Type.
+  */
+  int getCurrentImageType();
+  /*!
+          Initializes the main window application. It is called in the main
+     function
+          after the environment initialization.
+  */
+  void init();
 
-	QString getCurrentRoomName() const;
+  QString getCurrentRoomName() const;
 
-	//keep a pointer of the inknpaint viewer in order to enable navigator pan in the filmstrip
-	void setInknPaintViewerPanel(ComboViewerPanel *panel) { m_inknPaintViewerPanel = panel; }
-	ComboViewerPanel *getInknPaintViewerPanel() const { return m_inknPaintViewerPanel; }
+  // keep a pointer of the inknpaint viewer in order to enable navigator pan in
+  // the filmstrip
+  void setInknPaintViewerPanel(ComboViewerPanel *panel) {
+    m_inknPaintViewerPanel = panel;
+  }
+  ComboViewerPanel *getInknPaintViewerPanel() const {
+    return m_inknPaintViewerPanel;
+  }
 
-	bool isApplicationStarting() { return m_isStarting; }
+  bool isApplicationStarting() { return m_isStarting; }
 
-	bool isPenCloseToTablet() const { return m_isPenCloseToTablet; }
+  bool isPenCloseToTablet() const { return m_isPenCloseToTablet; }
 
-	void writeSettings();
+  void writeSettings();
 
 protected:
-	bool eventFilter(QObject *obj, QEvent *event);
+  bool eventFilter(QObject *obj, QEvent *event);
 
 private:
-	void updateXshLevel();
-	void updateCurrentFrame();
+  void updateXshLevel();
+  void updateCurrentFrame();
 
 protected slots:
-	void onXsheetChanged();
-	void onSceneSwitched();
-	void onXsheetSwitched();
-	void onXsheetSoundChanged();
-	void onFrameSwitched();
-	void onFxSwitched();
-	void onColumnIndexSwitched();
-	void onXshLevelSwitched(TXshLevel *);
-	void onXshLevelChanged();
-	void onObjectSwitched();
-	void onSplineChanged();
-	void onSceneChanged();
+  void onXsheetChanged();
+  void onSceneSwitched();
+  void onXsheetSwitched();
+  void onXsheetSoundChanged();
+  void onFrameSwitched();
+  void onFxSwitched();
+  void onColumnIndexSwitched();
+  void onXshLevelSwitched(TXshLevel *);
+  void onXshLevelChanged();
+  void onObjectSwitched();
+  void onSplineChanged();
+  void onSceneChanged();
 
-	void onImageChanged();
+  void onImageChanged();
 
-	void onPaletteChanged();
-	void onLevelColorStyleChanged();
-	void onLevelColorStyleSwitched();
+  void onPaletteChanged();
+  void onLevelColorStyleChanged();
+  void onLevelColorStyleSwitched();
 
-	void autosave();
-	void onToolEditingFinished();
-	void onStartAutoSave();
-	void onStopAutoSave();
+  void autosave();
+  void onToolEditingFinished();
+  void onStartAutoSave();
+  void onStopAutoSave();
 };
 
-#endif //TAPP_H
+#endif  // TAPP_H

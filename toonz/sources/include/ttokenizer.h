@@ -20,92 +20,75 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-namespace TSyntax
-{
+namespace TSyntax {
 
 //-------------------------------------------------------------------
 
-class DVAPI Token
-{
+class DVAPI Token {
 public:
-	enum Type { None,
-				Space,
-				Ident,
-				Number,
-				Punct,
-				Eos };
+  enum Type { None, Space, Ident, Number, Punct, Eos };
 
-	Token(int pos = 0)
-		: m_text(""), m_type(None), m_pos(pos)
-	{
-	}
-	Token(int p0, int p1)
-		: m_text(p1 - p0 + 1, ' '), m_type(Space), m_pos(p0)
-	{
-	}
+  Token(int pos = 0) : m_text(""), m_type(None), m_pos(pos) {}
+  Token(int p0, int p1) : m_text(p1 - p0 + 1, ' '), m_type(Space), m_pos(p0) {}
 
-	Token(std::string text, Type type, int pos)
-		: m_text(text), m_type(type), m_pos(pos)
-	{
-	}
+  Token(std::string text, Type type, int pos)
+      : m_text(text), m_type(type), m_pos(pos) {}
 
-	Type getType() const { return m_type; }
+  Type getType() const { return m_type; }
 
-	std::string getText() const { return m_text; }
-	int getIntValue() const;
-	double getDoubleValue() const;
+  std::string getText() const { return m_text; }
+  int getIntValue() const;
+  double getDoubleValue() const;
 
-	int getPos() const { return m_pos; }
-	int getPos1() const { return m_pos + m_text.length() - 1; }
+  int getPos() const { return m_pos; }
+  int getPos1() const { return m_pos + m_text.length() - 1; }
 
 private:
-	std::string m_text;
-	int m_pos;
-	Type m_type;
+  std::string m_text;
+  int m_pos;
+  Type m_type;
 };
 
 //-------------------------------------------------------------------
 
-class DVAPI Tokenizer
-{
-
-	std::string m_buffer;
-	std::vector<Token> m_tokens;
-	int m_index;
+class DVAPI Tokenizer {
+  std::string m_buffer;
+  std::vector<Token> m_tokens;
+  int m_index;
 
 public:
-	Tokenizer();
-	Tokenizer(std::string buffer);
-	~Tokenizer();
+  Tokenizer();
+  Tokenizer(std::string buffer);
+  ~Tokenizer();
 
-	void setBuffer(std::string buffer);
-	std::string getBuffer() const { return m_buffer; }
+  void setBuffer(std::string buffer);
+  std::string getBuffer() const { return m_buffer; }
 
-	int getTokenCount() const;
-	const Token &getToken(int index) const;
+  int getTokenCount() const;
+  const Token &getToken(int index) const;
 
-	//! get the token containing the pos-th character in the input string
-	Token getTokenFromPos(int pos) const;
+  //! get the token containing the pos-th character in the input string
+  Token getTokenFromPos(int pos) const;
 
-	//! reset the token index. (set it to 0)
-	void reset();
+  //! reset the token index. (set it to 0)
+  void reset();
 
-	//! return the current token (possibly Eos)
-	const Token &getToken();
+  //! return the current token (possibly Eos)
+  const Token &getToken();
 
-	//! same as getToken(), but post-increment the token index (if !eos())
-	Token nextToken();
+  //! same as getToken(), but post-increment the token index (if !eos())
+  Token nextToken();
 
-	//! return true if the current token is the last one
-	bool eos() const;
+  //! return true if the current token is the last one
+  bool eos() const;
 
-	//! to read all the sequence:
-	//! while(!tokenizer.eos()) {token = tokenizer.nextToken();...}
+  //! to read all the sequence:
+  //! while(!tokenizer.eos()) {token = tokenizer.nextToken();...}
 };
 
 //-------------------------------------------------------------------
 
-} // namespace TSyntax
+}  // namespace TSyntax
 
 #ifdef _WIN32
 #pragma warning(pop)

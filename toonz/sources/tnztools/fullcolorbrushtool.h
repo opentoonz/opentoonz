@@ -20,104 +20,100 @@ class FullColorBrushToolNotifier;
 //    FullColor Brush Tool declaration
 //************************************************************************
 
-class FullColorBrushTool : public TTool
-{
-	Q_DECLARE_TR_FUNCTIONS(FullColorBrushTool)
+class FullColorBrushTool : public TTool {
+  Q_DECLARE_TR_FUNCTIONS(FullColorBrushTool)
 
 public:
-	FullColorBrushTool(std::string name);
+  FullColorBrushTool(std::string name);
 
-	ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const { return TTool::LevelWriteTool; }
 
-	ToolOptionsBox *createOptionsBox();
+  ToolOptionsBox *createOptionsBox();
 
-	void updateTranslation();
+  void updateTranslation();
 
-	void onActivate();
-	void onDeactivate();
+  void onActivate();
+  void onDeactivate();
 
-	bool preLeftButtonDown();
-	void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-	void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
-	void mouseMove(const TPointD &pos, const TMouseEvent &e);
+  bool preLeftButtonDown();
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
+  void mouseMove(const TPointD &pos, const TMouseEvent &e);
 
-	void draw();
+  void draw();
 
-	void onEnter();
-	void onLeave();
+  void onEnter();
+  void onLeave();
 
-	int getCursorId() const { return ToolCursor::PenCursor; }
+  int getCursorId() const { return ToolCursor::PenCursor; }
 
-	TPropertyGroup *getProperties(int targetType);
-	bool onPropertyChanged(std::string propertyName);
+  TPropertyGroup *getProperties(int targetType);
+  bool onPropertyChanged(std::string propertyName);
 
-	void onImageChanged();
-	void setWorkAndBackupImages();
-	void updateWorkAndBackupRasters(const TRect &rect);
+  void onImageChanged();
+  void setWorkAndBackupImages();
+  void updateWorkAndBackupRasters(const TRect &rect);
 
-	void initPresets();
-	void loadPreset();
-	void addPreset(QString name);
-	void removePreset();
+  void initPresets();
+  void loadPreset();
+  void addPreset(QString name);
+  void removePreset();
 
-	void onCanvasSizeChanged();
+  void onCanvasSizeChanged();
 
 protected:
-	TPropertyGroup m_prop;
+  TPropertyGroup m_prop;
 
-	TIntPairProperty m_thickness;
-	TBoolProperty m_pressure;
-	TDoublePairProperty m_opacity;
-	TDoubleProperty m_hardness;
-	TEnumProperty m_preset;
+  TIntPairProperty m_thickness;
+  TBoolProperty m_pressure;
+  TDoublePairProperty m_opacity;
+  TDoubleProperty m_hardness;
+  TEnumProperty m_preset;
 
-	TPixel32 m_currentColor;
-	int m_styleId,
-		m_minThick,
-		m_maxThick;
+  TPixel32 m_currentColor;
+  int m_styleId, m_minThick, m_maxThick;
 
-	double m_oldOpacity;
+  double m_oldOpacity;
 
-	TPointD m_dpiScale,
-		m_mousePos, //!< Current mouse position, in world coordinates.
-		m_brushPos; //!< World position the brush will be painted at.
+  TPointD m_dpiScale,
+      m_mousePos,  //!< Current mouse position, in world coordinates.
+      m_brushPos;  //!< World position the brush will be painted at.
 
-	TRasterP m_backUpRas;
-	TRaster32P m_workRaster;
+  TRasterP m_backUpRas;
+  TRaster32P m_workRaster;
 
-	TRect m_strokeRect,
-		m_lastRect;
+  TRect m_strokeRect, m_lastRect;
 
-	QRadialGradient m_brushPad;
+  QRadialGradient m_brushPad;
 
-	std::vector<TThickPoint> m_points;
-	BluredBrush *m_brush;
+  std::vector<TThickPoint> m_points;
+  BluredBrush *m_brush;
 
-	TTileSetFullColor *m_tileSet;
-	TTileSaverFullColor *m_tileSaver;
+  TTileSetFullColor *m_tileSet;
+  TTileSaverFullColor *m_tileSaver;
 
-	BrushPresetManager m_presetsManager; //!< Manager for presets of this tool instance
-	FullColorBrushToolNotifier *m_notifier;
+  BrushPresetManager
+      m_presetsManager;  //!< Manager for presets of this tool instance
+  FullColorBrushToolNotifier *m_notifier;
 
-	bool m_presetsLoaded;
-	bool m_firstTime;
+  bool m_presetsLoaded;
+  bool m_firstTime;
 };
 
 //------------------------------------------------------------
 
-class FullColorBrushToolNotifier : public QObject
-{
-	Q_OBJECT
+class FullColorBrushToolNotifier : public QObject {
+  Q_OBJECT
 
-	FullColorBrushTool *m_tool;
+  FullColorBrushTool *m_tool;
 
 public:
-	FullColorBrushToolNotifier(FullColorBrushTool *tool);
+  FullColorBrushToolNotifier(FullColorBrushTool *tool);
 
 protected slots:
 
-	void onCanvasSizeChanged() { m_tool->onCanvasSizeChanged(); }
+  void onCanvasSizeChanged() { m_tool->onCanvasSizeChanged(); }
 };
 
-#endif //FULLCOLORBRUSHTOOL_H
+#endif  // FULLCOLORBRUSHTOOL_H

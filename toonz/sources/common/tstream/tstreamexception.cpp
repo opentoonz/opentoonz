@@ -5,48 +5,33 @@
 #include "tconvert.h"
 #include "tstream.h"
 
-namespace
-{
+namespace {
 
-	std::wstring getLocation(TIStream &is)
-{
-	return L"File: " +
-		   is.getFilePath().getWideString() +
-		   L":" + toWideString(is.getLine());
+std::wstring getLocation(TIStream &is) {
+  return L"File: " + is.getFilePath().getWideString() + L":" +
+         std::to_wstring(is.getLine());
 }
 
-std::wstring message(TIStream &is, std::wstring msg)
-{
-	return getLocation(is) + L"\n" + msg;
+std::wstring message(TIStream &is, std::wstring msg) {
+  return getLocation(is) + L"\n" + msg;
 }
 
-std::wstring message(TIStream &is, std::string msg)
-{
-	return message(is, toWideString(msg));
+std::wstring message(TIStream &is, std::string msg) {
+  return message(is, ::to_wstring(msg));
 }
 
-} // namespace
+}  // namespace
 
 TIStreamException::TIStreamException(TIStream &is)
-	: TException(message(is, L"unknown exception"))
-{
-}
+    : TException(message(is, L"unknown exception")) {}
 
 TIStreamException::TIStreamException(TIStream &is, const TException &e)
-	: TException(message(is, e.getMessage()))
-{
-}
+    : TException(message(is, e.getMessage())) {}
 
 TIStreamException::TIStreamException(TIStream &is, std::wstring msg)
-	: TException(message(is, msg))
-{
-}
+    : TException(message(is, msg)) {}
 
 TIStreamException::TIStreamException(TIStream &is, std::string msg)
-	: TException(message(is, msg))
-{
-}
+    : TException(message(is, msg)) {}
 
-TIStreamException::~TIStreamException()
-{
-}
+TIStreamException::~TIStreamException() {}

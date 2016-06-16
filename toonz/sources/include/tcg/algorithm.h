@@ -16,8 +16,7 @@
             in the standard \p \<algorithm\> and in \p boost::algorithm.
 */
 
-namespace tcg
-{
+namespace tcg {
 
 //***************************************************************************
 //    Binary find  algorithms
@@ -31,12 +30,12 @@ namespace tcg
             the specified one.
 */
 template <typename RanIt, typename T>
-RanIt binary_find(RanIt begin,	//!< Start of the sorted range.
-				  RanIt end,	  //!< End of the sorted range.
-				  const T &value) //!< Value to look up.
+RanIt binary_find(RanIt begin,     //!< Start of the sorted range.
+                  RanIt end,       //!< End of the sorted range.
+                  const T &value)  //!< Value to look up.
 {
-	RanIt it = std::lower_bound(begin, end, value);
-	return (it != end && !(value < *it)) ? it : end;
+  RanIt it = std::lower_bound(begin, end, value);
+  return (it != end && !(value < *it)) ? it : end;
 }
 
 //---------------------------------------------------------------------
@@ -49,13 +48,13 @@ RanIt binary_find(RanIt begin,	//!< Start of the sorted range.
             the specified one.
 */
 template <typename RanIt, typename T, typename Compare>
-RanIt binary_find(RanIt begin,	//!< Start of the sorted range.
-				  RanIt end,	  //!< End of the sorted range.
-				  const T &value, //!< Value to look up.
-				  Compare comp)   //!< Comparator functor sorting the range.
+RanIt binary_find(RanIt begin,     //!< Start of the sorted range.
+                  RanIt end,       //!< End of the sorted range.
+                  const T &value,  //!< Value to look up.
+                  Compare comp)    //!< Comparator functor sorting the range.
 {
-	RanIt it = std::lower_bound(begin, end, value, comp);
-	return (it != end && !comp(value, *it)) ? it : end;
+  RanIt it = std::lower_bound(begin, end, value, comp);
+  return (it != end && !comp(value, *it)) ? it : end;
 }
 
 //***************************************************************************
@@ -76,28 +75,27 @@ RanIt binary_find(RanIt begin,	//!< Start of the sorted range.
             during computation.
 */
 template <typename ForIt, typename Func, typename Comp>
-ForIt min_transform(ForIt begin, //!< Start of the input iterators range.
-					ForIt end,   //!< End of the input iterators range.
-					Func func,   //!< The transforming function.
-					Comp comp)   //!< The comparator object for transformed values.
+ForIt min_transform(
+    ForIt begin,  //!< Start of the input iterators range.
+    ForIt end,    //!< End of the input iterators range.
+    Func func,    //!< The transforming function.
+    Comp comp)    //!< The comparator object for transformed values.
 {
-	typedef typename tcg::function_traits<Func>::ret_type ret_type;
-	typedef typename tcg::remove_cref<ret_type>::type value_type;
+  typedef typename tcg::function_traits<Func>::ret_type ret_type;
+  typedef typename tcg::remove_cref<ret_type>::type value_type;
 
-	if (begin == end)
-		return end;
+  if (begin == end) return end;
 
-	ForIt minPos = begin;
-	value_type minimum = func(*begin);
+  ForIt minPos       = begin;
+  value_type minimum = func(*begin);
 
-	for (; begin != end; ++begin) {
-		const value_type &candidate = func(*begin);
+  for (; begin != end; ++begin) {
+    const value_type &candidate = func(*begin);
 
-		if (comp(candidate, minimum))
-			minPos = begin, minimum = candidate;
-	}
+    if (comp(candidate, minimum)) minPos = begin, minimum = candidate;
+  }
 
-	return minPos;
+  return minPos;
 }
 
 //---------------------------------------------------------------------
@@ -112,14 +110,14 @@ ForIt min_transform(ForIt begin, //!< Start of the input iterators range.
             transformed values.
 */
 template <typename ForIt, typename Func>
-ForIt min_transform(ForIt begin, //!< Start of the input iterators range.
-					ForIt end,   //!< End of the input iterators range.
-					Func func)   //!< The transforming function.
+ForIt min_transform(ForIt begin,  //!< Start of the input iterators range.
+                    ForIt end,    //!< End of the input iterators range.
+                    Func func)    //!< The transforming function.
 {
-	typedef typename tcg::function_traits<Func>::ret_type ret_type;
-	typedef typename tcg::remove_cref<ret_type>::type value_type;
+  typedef typename tcg::function_traits<Func>::ret_type ret_type;
+  typedef typename tcg::remove_cref<ret_type>::type value_type;
 
-	return min_transform(begin, end, func, std::less<value_type>());
+  return min_transform(begin, end, func, std::less<value_type>());
 }
 
 //---------------------------------------------------------------------
@@ -133,28 +131,27 @@ ForIt min_transform(ForIt begin, //!< Start of the input iterators range.
   \sa       See min_transform() for a detailed explanation.
 */
 template <typename ForIt, typename Func, typename Comp>
-ForIt max_transform(ForIt begin, //!< Start of the input iterators range.
-					ForIt end,   //!< End of the input iterators range.
-					Func func,   //!< The transforming function.
-					Comp comp)   //!< The comparator object for transformed values.
+ForIt max_transform(
+    ForIt begin,  //!< Start of the input iterators range.
+    ForIt end,    //!< End of the input iterators range.
+    Func func,    //!< The transforming function.
+    Comp comp)    //!< The comparator object for transformed values.
 {
-	typedef typename tcg::function_traits<Func>::ret_type ret_type;
-	typedef typename tcg::remove_cref<ret_type>::type value_type;
+  typedef typename tcg::function_traits<Func>::ret_type ret_type;
+  typedef typename tcg::remove_cref<ret_type>::type value_type;
 
-	if (begin == end)
-		return end;
+  if (begin == end) return end;
 
-	ForIt maxPos = begin;
-	value_type maximum = func(*begin);
+  ForIt maxPos       = begin;
+  value_type maximum = func(*begin);
 
-	for (; begin != end; ++begin) {
-		const value_type &candidate = func(*begin);
+  for (; begin != end; ++begin) {
+    const value_type &candidate = func(*begin);
 
-		if (comp(maximum, candidate))
-			maxPos = begin, maximum = candidate;
-	}
+    if (comp(maximum, candidate)) maxPos = begin, maximum = candidate;
+  }
 
-	return maxPos;
+  return maxPos;
 }
 
 //---------------------------------------------------------------------
@@ -168,16 +165,16 @@ ForIt max_transform(ForIt begin, //!< Start of the input iterators range.
   \sa       See min_transform() for a detailed explanation.
 */
 template <typename ForIt, typename Func>
-ForIt max_transform(ForIt begin, //!< Start of the input iterators range.
-					ForIt end,   //!< End of the input iterators range.
-					Func func)   //!< The transforming function.
+ForIt max_transform(ForIt begin,  //!< Start of the input iterators range.
+                    ForIt end,    //!< End of the input iterators range.
+                    Func func)    //!< The transforming function.
 {
-	typedef typename tcg::function_traits<Func>::ret_type ret_type;
-	typedef typename tcg::remove_cref<ret_type>::type value_type;
+  typedef typename tcg::function_traits<Func>::ret_type ret_type;
+  typedef typename tcg::remove_cref<ret_type>::type value_type;
 
-	return max_transform(begin, end, func, std::less<value_type>());
+  return max_transform(begin, end, func, std::less<value_type>());
 }
 
-} // namespace tcg
+}  // namespace tcg
 
-#endif // TCG_ALGORITHM_H
+#endif  // TCG_ALGORITHM_H

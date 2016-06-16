@@ -8,32 +8,30 @@
 class ToonzScene;
 class TXshSimpleLevel;
 
-namespace TScriptBinding
-{
+namespace TScriptBinding {
 
-class DVAPI ToonzRasterConverter : public Wrapper
-{
-	Q_OBJECT
-	bool m_flatSource;
+class DVAPI ToonzRasterConverter : public Wrapper {
+  Q_OBJECT
+  bool m_flatSource;
 
 public:
-	ToonzRasterConverter();
-	~ToonzRasterConverter();
+  ToonzRasterConverter();
+  ~ToonzRasterConverter();
 
-	Q_INVOKABLE QScriptValue toString();
-	WRAPPER_STD_METHODS(ToonzRasterConverter)
+  Q_INVOKABLE QScriptValue toString();
+  WRAPPER_STD_METHODS(ToonzRasterConverter)
 
-	Q_PROPERTY(bool flatSource READ getFlatSource WRITE setFlatSource)
-	bool getFlatSource() const { return m_flatSource; }
-	void setFlatSource(bool v) { m_flatSource = v; }
+  Q_PROPERTY(bool flatSource READ getFlatSource WRITE setFlatSource)
+  bool getFlatSource() const { return m_flatSource; }
+  void setFlatSource(bool v) { m_flatSource = v; }
 
-	// Q_INVOKABLE QScriptValue convert(QScriptValue img);
-	Q_INVOKABLE int foo(int x) { return x * 2; }
+  // Q_INVOKABLE QScriptValue convert(QScriptValue img);
+  Q_INVOKABLE int foo(int x) { return x * 2; }
 
-	QScriptValue convert(QScriptContext *context, QScriptEngine *engine);
+  QScriptValue convert(QScriptContext *context, QScriptEngine *engine);
 };
 
-} // namespace TScriptBinding
+}  // namespace TScriptBinding
 
 Q_DECLARE_METATYPE(TScriptBinding::ToonzRasterConverter *)
 

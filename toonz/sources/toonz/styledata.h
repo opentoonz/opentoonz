@@ -12,22 +12,20 @@ class TColorStyle;
 // StyleData
 //-----------------------------------------------------------------------------
 
-class StyleData : public DvMimeData
-{
-
-	std::vector<std::pair<int, TColorStyle *>> m_styles;
+class StyleData : public DvMimeData {
+  std::vector<std::pair<int, TColorStyle *>> m_styles;
 
 public:
-	StyleData();
-	~StyleData();
+  StyleData();
+  ~StyleData();
 
-	StyleData *clone() const;
+  StyleData *clone() const;
 
-	void addStyle(int styleIndex, TColorStyle *style); // gets ownership
+  void addStyle(int styleIndex, TColorStyle *style);  // gets ownership
 
-	int getStyleCount() const { return (int)m_styles.size(); }
-	TColorStyle *getStyle(int index) const;
-	int getStyleIndex(int index) const;
+  int getStyleCount() const { return (int)m_styles.size(); }
+  TColorStyle *getStyle(int index) const;
+  int getStyleIndex(int index) const;
 };
 
 #endif

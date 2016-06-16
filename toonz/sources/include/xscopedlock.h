@@ -3,15 +3,14 @@
 #ifndef XSCOPEDLOCK_H
 #define XSCOPEDLOCK_H
 
-class XScopedLock
-{
+class XScopedLock {
 private:
-	class Imp;
-	Imp *m_imp;
+  class Imp;
+  Imp *m_imp;
 
 public:
-	XScopedLock();
-	~XScopedLock();
+  XScopedLock();
+  ~XScopedLock();
 };
 
 #endif

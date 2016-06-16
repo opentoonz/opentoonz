@@ -34,8 +34,7 @@ class CameraSettingsWidget;
 class QLabel;
 class QCheckBox;
 
-namespace DVGui
-{
+namespace DVGui {
 class LineEdit;
 class DoubleLineEdit;
 class IntLineEdit;
@@ -43,40 +42,39 @@ class MeasuredDoubleLineEdit;
 class CheckBox;
 }
 
-class DVAPI CleanupCameraSettingsWidget : public QFrame
-{
-	Q_OBJECT
-	CameraSettingsWidget *m_cameraWidget;
+class DVAPI CleanupCameraSettingsWidget : public QFrame {
+  Q_OBJECT
+  CameraSettingsWidget *m_cameraWidget;
 
 public:
-	DVGui::MeasuredDoubleLineEdit *m_offsX, *m_offsY;
-	/*--- オフセットを軸毎にロックする ---*/
-	QCheckBox *m_offsx_lock, *m_offsy_lock;
+  DVGui::MeasuredDoubleLineEdit *m_offsX, *m_offsY;
+  /*--- オフセットを軸毎にロックする ---*/
+  QCheckBox *m_offsx_lock, *m_offsy_lock;
 
 public:
-	CleanupCameraSettingsWidget();
-	~CleanupCameraSettingsWidget();
+  CleanupCameraSettingsWidget();
+  ~CleanupCameraSettingsWidget();
 
-	QSize sizeHint() const { return minimumSize(); }
+  QSize sizeHint() const { return minimumSize(); }
 
-	void setCameraPresetListFile(const TFilePath &fp);
+  void setCameraPresetListFile(const TFilePath &fp);
 
-	// CleanupParameters => CleanupCameraSettingsWidget fields
-	void setFields(const CleanupParameters *cleanupParameters);
+  // CleanupParameters => CleanupCameraSettingsWidget fields
+  void setFields(const CleanupParameters *cleanupParameters);
 
-	// CleanupCameraSettingsWidget fields => CleanupParameters
-	void getFields(CleanupParameters *cleanupParameters);
+  // CleanupCameraSettingsWidget fields => CleanupParameters
+  void getFields(CleanupParameters *cleanupParameters);
 
-	double getClosestFieldValue() const;
+  double getClosestFieldValue() const;
 
-	void setImageInfo(const TFilePath &imgPath);
-	void setImageInfo(int w, int h, double dpix, double dpiy);
+  void setImageInfo(const TFilePath &imgPath);
+  void setImageInfo(int w, int h, double dpix, double dpiy);
 
-	// needed by the "use level settings" button
-	void setCurrentLevel(TXshLevel *);
+  // needed by the "use level settings" button
+  void setCurrentLevel(TXshLevel *);
 
 signals:
-	void cleanupSettingsChanged();
+  void cleanupSettingsChanged();
 };
 
 #endif

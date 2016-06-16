@@ -25,4 +25,4 @@ class TFilePath;
 
 void DVAPI loadShaderInterfaces(const TFilePath &shaderInterfacesFolder);
 
-#endif // SHADERFX_H
+#endif  // SHADERFX_H

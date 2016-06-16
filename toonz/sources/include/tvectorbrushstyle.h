@@ -22,55 +22,56 @@
 //    Vector Brush Style  declaration
 //**********************************************************************
 
-class DVAPI TVectorBrushStyle : public TColorStyle
-{
-	static TFilePath m_rootDir;
+class DVAPI TVectorBrushStyle : public TColorStyle {
+  static TFilePath m_rootDir;
 
-	std::string m_brushName;
-	TVectorImageP m_brush;
-	int m_colorCount;
+  std::string m_brushName;
+  TVectorImageP m_brush;
+  int m_colorCount;
 
 public:
-	TVectorBrushStyle();
-	TVectorBrushStyle(const std::string &brushName, TVectorImageP vi = TVectorImageP());
-	~TVectorBrushStyle();
+  TVectorBrushStyle();
+  TVectorBrushStyle(const std::string &brushName,
+                    TVectorImageP vi = TVectorImageP());
+  ~TVectorBrushStyle();
 
-	TColorStyle *clone() const;
-	QString getDescription() const;
+  TColorStyle *clone() const;
+  QString getDescription() const;
 
-	static TFilePath getRootDir() { return m_rootDir; }
-	static void setRootDir(const TFilePath &path) { m_rootDir = path + "vector brushes"; }
+  static TFilePath getRootDir() { return m_rootDir; }
+  static void setRootDir(const TFilePath &path) {
+    m_rootDir = path + "vector brushes";
+  }
 
-	void loadBrush(const std::string &brushName);
+  void loadBrush(const std::string &brushName);
 
-	int getTagId() const { return 3000; }
+  int getTagId() const { return 3000; }
 
-	TVectorImageP getImage() const { return m_brush; }
+  TVectorImageP getImage() const { return m_brush; }
 
-	bool isRegionStyle() const { return false; }
-	bool isStrokeStyle() const { return true; }
+  bool isRegionStyle() const { return false; }
+  bool isStrokeStyle() const { return true; }
 
-	TStrokeProp *makeStrokeProp(const TStroke *stroke);
-	TRegionProp *makeRegionProp(const TRegion *region)
-	{
-		assert(false);
-		return 0;
-	}
+  TStrokeProp *makeStrokeProp(const TStroke *stroke);
+  TRegionProp *makeRegionProp(const TRegion *region) {
+    assert(false);
+    return 0;
+  }
 
-	bool hasMainColor() const { return true; }
-	TPixel32 getMainColor() const;
-	void setMainColor(const TPixel32 &color);
+  bool hasMainColor() const { return true; }
+  TPixel32 getMainColor() const;
+  void setMainColor(const TPixel32 &color);
 
-	int getColorParamCount() const;
-	TPixel32 getColorParamValue(int index) const;
-	void setColorParamValue(int index, const TPixel32 &color);
+  int getColorParamCount() const;
+  TPixel32 getColorParamValue(int index) const;
+  void setColorParamValue(int index, const TPixel32 &color);
 
 protected:
-	void loadData(TInputStreamInterface &);
-	void saveData(TOutputStreamInterface &) const;
+  void loadData(TInputStreamInterface &);
+  void saveData(TOutputStreamInterface &) const;
 
 private:
-	int getColorStyleId(int index) const;
+  int getColorStyleId(int index) const;
 };
 
-#endif //T_VECTOR_BRUSH_STYLE_H
+#endif  // T_VECTOR_BRUSH_STYLE_H

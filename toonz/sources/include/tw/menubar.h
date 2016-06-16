@@ -18,47 +18,42 @@
 
 //--------------------------------------------------------
 
-class DVAPI TMenubar : public TWidget
-{
-
+class DVAPI TMenubar : public TWidget {
 public:
-	TMenubar(TWidget *parent, string name = "menubar");
-	void configureNotify(const TDimension &);
-	void draw();
+  TMenubar(TWidget *parent, string name = "menubar");
+  void configureNotify(const TDimension &);
+  void draw();
 
-	int getMinWidth();
+  int getMinWidth();
 };
 
 //--------------------------------------------------------
 
-class DVAPI TMenubarItem : public TWidget, public TPopupMenuListener
-{
-	bool m_highlighted, m_pressed;
-	TPopupMenu *m_popupMenu;
-	wstring m_title;
+class DVAPI TMenubarItem : public TWidget, public TPopupMenuListener {
+  bool m_highlighted, m_pressed;
+  TPopupMenu *m_popupMenu;
+  wstring m_title;
 
 protected:
-	/*virtual*/ void create();
+  /*virtual*/ void create();
 
 public:
-	TMenubarItem(
-		TMenubar *menubar,
-		string name);
+  TMenubarItem(TMenubar *menubar, string name);
 
-	void draw();
-	void enter(const TPoint &p);
-	void leave(const TPoint &p);
-	void leftButtonDown(const TMouseEvent &e);
-	void leftButtonUp(const TMouseEvent &e);
+  void draw();
+  void enter(const TPoint &p);
+  void leave(const TPoint &p);
+  void leftButtonDown(const TMouseEvent &e);
+  void leftButtonUp(const TMouseEvent &e);
 
-	TPopupMenu *getMenu() const { return m_popupMenu; }
-	TPopupMenuItem *addItem(string cmdname);
-	// TPopupMenuItem *addItem(string cmdname, string title, string help);
-	void addSeparator();
+  TPopupMenu *getMenu() const { return m_popupMenu; }
+  TPopupMenuItem *addItem(string cmdname);
+  // TPopupMenuItem *addItem(string cmdname, string title, string help);
+  void addSeparator();
 
-	void onMenuSelect(TPopupMenuItem *);
+  void onMenuSelect(TPopupMenuItem *);
 
-	TDimension getPreferredSize() const;
+  TDimension getPreferredSize() const;
 };
 
 #endif

@@ -18,8 +18,7 @@ class TCamera;
 class CameraSettingsWidget;
 class TXshLevel;
 
-namespace DVGui
-{
+namespace DVGui {
 class LineEdit;
 class DoubleLineEdit;
 class CheckBox;
@@ -31,42 +30,43 @@ class MeasuredDoubleLineEdit;
 // CameraSettingsPopup
 //-----------------------------------------------------------------------------
 
-class CameraSettingsPopup : public QDialog
-{
-	Q_OBJECT
-	static std::map<TStageObjectId, CameraSettingsPopup *> m_popups;
+class CameraSettingsPopup : public QDialog {
+  Q_OBJECT
+  static std::map<TStageObjectId, CameraSettingsPopup *> m_popups;
 
-	DVGui::LineEdit *m_nameFld;
-	CameraSettingsWidget *m_cameraSettingsWidget;
-	TStageObjectId m_cameraId; // if == NoneId then use the current camera
+  DVGui::LineEdit *m_nameFld;
+  CameraSettingsWidget *m_cameraSettingsWidget;
+  TStageObjectId m_cameraId;  // if == NoneId then use the current camera
 
-	TStageObject *getCameraObject();
-	TCamera *getCamera();
-	void updateWindowTitle();
+  TStageObject *getCameraObject();
+  TCamera *getCamera();
+  void updateWindowTitle();
 
 public:
-	CameraSettingsPopup();
+  CameraSettingsPopup();
 
-	void attachToCamera(const TStageObjectId &id) { m_cameraId = id; }
+  void attachToCamera(const TStageObjectId &id) { m_cameraId = id; }
 
-	// create a popup attached to camera id (or return the already existent one)
-	static CameraSettingsPopup *createPopup(const TStageObjectId &id);
+  // create a popup attached to camera id (or return the already existent one)
+  static CameraSettingsPopup *createPopup(const TStageObjectId &id);
 
 protected:
-	void showEvent(QShowEvent *e);
-	void hideEvent(QHideEvent *e);
-	void moveEvent(QMoveEvent *e);
+  void showEvent(QShowEvent *e);
+  void hideEvent(QHideEvent *e);
+  void moveEvent(QMoveEvent *e);
 
 protected slots:
 
-	void onChanged();
-	void onNameChanged();
-	void updateFields();
-	void updateFields(bool) { updateFields(); } // to be connected to objectChanged(bool)
-	void onLevelSwitched(TXshLevel *);
+  void onChanged();
+  void onNameChanged();
+  void updateFields();
+  void updateFields(bool) {
+    updateFields();
+  }  // to be connected to objectChanged(bool)
+  void onLevelSwitched(TXshLevel *);
 
 signals:
-	void changed();
+  void changed();
 };
 
-#endif // CAMERASETTINGSPOPUP_H
+#endif  // CAMERASETTINGSPOPUP_H

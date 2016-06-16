@@ -29,15 +29,15 @@ class TRegion;
 
 //! structure with information about texture to create
 struct TextureInfoForGL {
-	//  GLenum target,
-	//  GLint level,
-	GLint internalformat;
-	GLsizei width;
-	GLsizei height;
-	// GLint border,
-	GLenum format;
-	GLenum type;
-	const GLvoid *pixels;
+  //  GLenum target,
+  //  GLint level,
+  GLint internalformat;
+  GLsizei width;
+  GLsizei height;
+  // GLint border,
+  GLenum format;
+  GLenum type;
+  const GLvoid *pixels;
 };
 
 //=============================================================================
@@ -45,40 +45,30 @@ struct TextureInfoForGL {
 /**
  *
  */
-DVAPI TRasterP prepareTexture(const TRasterP &ras,
-							  TextureInfoForGL &texinfo);
+DVAPI TRasterP prepareTexture(const TRasterP &ras, TextureInfoForGL &texinfo);
 
 /**
  *
  */
-DVAPI double computeStep(const TStroke &s,
-						 double pixelSize);
+DVAPI double computeStep(const TStroke &s, double pixelSize);
 
 /**
  *  Draw stroke centerline between parameters from and to.
  */
-DVAPI void drawStrokeCenterline(const TStroke &stroke,
-								double pixelSize,
-								double from = 0.0,
-								double to = 1.0);
+DVAPI void drawStrokeCenterline(const TStroke &stroke, double pixelSize,
+                                double from = 0.0, double to = 1.0);
 
-DVAPI void stroke2polyline(std::vector<TPointD> &pnts,
-						   const TStroke &stroke,
-						   double pixelSize,
-						   double w0 = 0.0,
-						   double w1 = 1.0,
-						   bool lastRepeatable = false);
+DVAPI void stroke2polyline(std::vector<TPointD> &pnts, const TStroke &stroke,
+                           double pixelSize, double w0 = 0.0, double w1 = 1.0,
+                           bool lastRepeatable = false);
 
-DVAPI void region2polyline(std::vector<T3DPointD> &pnts,
-						   const TRegion *region,
-						   double pixeSize);
+DVAPI void region2polyline(std::vector<T3DPointD> &pnts, const TRegion *region,
+                           double pixeSize);
 
-DVAPI TStroke *makeEllipticStroke(double thick,
-								  TPointD center,
-								  double radiusX,
-								  double radiusY);
+DVAPI TStroke *makeEllipticStroke(double thick, TPointD center, double radiusX,
+                                  double radiusY);
 
-#endif // DRAWUTIL_H
+#endif  // DRAWUTIL_H
 //-----------------------------------------------------------------------------
 //  End Of File
 //-----------------------------------------------------------------------------

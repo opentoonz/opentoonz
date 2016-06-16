@@ -24,76 +24,75 @@ class TRasterImageP;
 
 //------------------------------------------------------
 
-class DVAPI TGLContextManager
-{
+class DVAPI TGLContextManager {
 public:
-	virtual void store() = 0;
-	virtual void restore() = 0;
+  virtual void store()   = 0;
+  virtual void restore() = 0;
 };
 
 //------------------------------------------------------
 
-class DVAPI TOfflineGL
-{
-
+class DVAPI TOfflineGL {
 public:
-	class Imp
-	{
-	protected:
-		int m_lx, m_ly;
+  class Imp {
+  protected:
+    int m_lx, m_ly;
 
-	public:
-		Imp(int lx, int ly) : m_lx(lx), m_ly(ly) {}
-		virtual ~Imp(){};
-		virtual void makeCurrent() = 0;
-		virtual void doneCurrent() = 0; // Da implementare in Imp
-		virtual void createContext(TDimension rasterSize, std::shared_ptr<Imp> shared) = 0;
-		virtual void getRaster(TRaster32P) = 0;
-		virtual int getLx() const { return m_lx; }
-		virtual int getLy() const { return m_ly; }
-	};
-	typedef std::shared_ptr<Imp> ImpGenerator(const TDimension &dim, std::shared_ptr<Imp> shared);
-	static ImpGenerator *defineImpGenerator(ImpGenerator *impGenerator);
+  public:
+    Imp(int lx, int ly) : m_lx(lx), m_ly(ly) {}
+    virtual ~Imp(){};
+    virtual void makeCurrent() = 0;
+    virtual void doneCurrent() = 0;  // Da implementare in Imp
+    virtual void createContext(TDimension rasterSize,
+                               std::shared_ptr<Imp> shared) = 0;
+    virtual void getRaster(TRaster32P)                      = 0;
+    virtual int getLx() const { return m_lx; }
+    virtual int getLy() const { return m_ly; }
+  };
+  typedef std::shared_ptr<Imp> ImpGenerator(const TDimension &dim,
+                                            std::shared_ptr<Imp> shared);
+  static ImpGenerator *defineImpGenerator(ImpGenerator *impGenerator);
 
-	TOfflineGL(TDimension dim, const TOfflineGL *shared = 0);
-	TOfflineGL(const TRaster32P &raster, const TOfflineGL *shared = 0);
+  TOfflineGL(TDimension dim, const TOfflineGL *shared = 0);
+  TOfflineGL(const TRaster32P &raster, const TOfflineGL *shared = 0);
 
-	~TOfflineGL();
+  ~TOfflineGL();
 
-	void makeCurrent();
-	void doneCurrent();
+  void makeCurrent();
+  void doneCurrent();
 
-	static void setContextManager(TGLContextManager *contextManager);
+  static void setContextManager(TGLContextManager *contextManager);
 
-	void initMatrix();
+  void initMatrix();
 
-	void clear(TPixel32 color);
+  void clear(TPixel32 color);
 
-	void draw(TVectorImageP image, const TVectorRenderData &rd, bool doInitMatrix = false);
+  void draw(TVectorImageP image, const TVectorRenderData &rd,
+            bool doInitMatrix = false);
 
-	void draw(TRasterImageP image, const TAffine &aff, bool doInitMatrix = false);
+  void draw(TRasterImageP image, const TAffine &aff, bool doInitMatrix = false);
 
-	void flush();
+  void flush();
 
-	TRaster32P getRaster(); // Ritorna il raster copiandolo dal buffer offline
-	void getRaster(TRaster32P raster);
-	void getRaster(TRasterP raster);
+  TRaster32P getRaster();  // Ritorna il raster copiandolo dal buffer offline
+  void getRaster(TRaster32P raster);
+  void getRaster(TRasterP raster);
 
-	int getLx() const;
-	int getLy() const;
-	TDimension getSize() const { return TDimension(getLx(), getLy()); };
-	TRect getBounds() const { return TRect(0, 0, getLx() - 1, getLy() - 1); };
+  int getLx() const;
+  int getLy() const;
+  TDimension getSize() const { return TDimension(getLx(), getLy()); };
+  TRect getBounds() const { return TRect(0, 0, getLx() - 1, getLy() - 1); };
 
-	static TOfflineGL *getStock(TDimension dim);
-	// si usa cosi': TOfflineGL *ogl = TOfflineGL::getStock(d);
-	// non bisogna liberare ogl
-	std::shared_ptr<Imp> m_imp;
+  static TOfflineGL *getStock(TDimension dim);
+  // si usa cosi': TOfflineGL *ogl = TOfflineGL::getStock(d);
+  // non bisogna liberare ogl
+  std::shared_ptr<Imp> m_imp;
 
 private:
 private:
-	// not implemented
-	TOfflineGL(const TOfflineGL &);
-	TOfflineGL &operator=(const TOfflineGL &);
+  // not implemented
+  TOfflineGL(const TOfflineGL &);
+  TOfflineGL &operator=(const TOfflineGL &);
 };
 
 #endif

@@ -11,8 +11,7 @@
 
 /*----------------  prototipi di funzioni  ---------------------*/
 
-namespace MetNum
-{
+namespace MetNum {
 
 double **AllocMatrix(int n, int m);
 void FreeMatrix(int n, double **A);

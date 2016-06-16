@@ -29,36 +29,34 @@ class TXsheet;
 //=============================================================================
 /*!ResourceImportStrategy allows to control the resource import behaviour during
    load operation. It can be statically defined (i.e. DONT_IMPORT).
-   Subclass it to provide dialog boxes. 
-   All the actual file copies are recorded (ImportLog). 
+   Subclass it to provide dialog boxes.
+   All the actual file copies are recorded (ImportLog).
    \sa ResourceImportMap, ResourceImportDialog (defined in toonz)
 */
 //=============================================================================
 
-class DVAPI ResourceImportStrategy
-{
+class DVAPI ResourceImportStrategy {
 public:
-	typedef std::map<TFilePath, TFilePath> ImportLog;
-	enum { DONT_IMPORT,
-		   IMPORT_AND_OVERWRITE,
-		   IMPORT_AND_RENAME };
+  typedef std::map<TFilePath, TFilePath> ImportLog;
+  enum { DONT_IMPORT, IMPORT_AND_OVERWRITE, IMPORT_AND_RENAME };
 
-	ResourceImportStrategy(int strategy);
-	virtual bool aborted() { return false; }
+  ResourceImportStrategy(int strategy);
+  virtual bool aborted() { return false; }
 
-	// note: this attribute is automatically initialized (from the preferences)
-	bool isChildFolderEnabled() const { return m_childFolderEnabled; }
-	void setChildFolderEnabled(bool enabled) { m_childFolderEnabled = enabled; }
+  // note: this attribute is automatically initialized (from the preferences)
+  bool isChildFolderEnabled() const { return m_childFolderEnabled; }
+  void setChildFolderEnabled(bool enabled) { m_childFolderEnabled = enabled; }
 
-	// accepts and returns coded file (e.g. +drawings/folder/a.pli)
-	virtual TFilePath process(ToonzScene *dstScene, ToonzScene *srcScene, TFilePath srcFile) = 0;
+  // accepts and returns coded file (e.g. +drawings/folder/a.pli)
+  virtual TFilePath process(ToonzScene *dstScene, ToonzScene *srcScene,
+                            TFilePath srcFile) = 0;
 
-	const ImportLog &getImportLog() const { return m_importLog; }
+  const ImportLog &getImportLog() const { return m_importLog; }
 
 private:
-	bool m_childFolderEnabled;
-	int m_strategy;
-	ImportLog m_importLog;
+  bool m_childFolderEnabled;
+  int m_strategy;
+  ImportLog m_importLog;
 };
 
 //=============================================================================
@@ -68,281 +66,290 @@ private:
 
 class TXshSoundLevel;
 
-class DVAPI ResourceProcessor
-{
+class DVAPI ResourceProcessor {
 public:
-	virtual void process(TXshSimpleLevel *sl) {}
-	virtual void process(TXshPaletteLevel *sl) {}
-	virtual void process(TXshSoundLevel *sl) {}
-	virtual bool aborted() const { return false; }
+  virtual void process(TXshSimpleLevel *sl) {}
+  virtual void process(TXshPaletteLevel *sl) {}
+  virtual void process(TXshSoundLevel *sl) {}
+  virtual bool aborted() const { return false; }
 };
 
 //=============================================================================
-//!The SceneResource class is the base class of scene resource.
-/*!The class contains a pointer to scene, a boolean to know if scene is 
+//! The SceneResource class is the base class of scene resource.
+/*!The class contains a pointer to scene, a boolean to know if scene is
    untiltled and a path to know old save path.
 */
 //=============================================================================
 
-class DVAPI SceneResource
-{
+class DVAPI SceneResource {
 protected:
-	ToonzScene *m_scene;
-	bool m_untitledScene;
-	TFilePath m_oldSavePath;
+  ToonzScene *m_scene;
+  bool m_untitledScene;
+  TFilePath m_oldSavePath;
 
 public:
-	/*!
-    Constructs SceneResource with default value and \b scene.
-  */
-	SceneResource(ToonzScene *scene);
-	/*!
-    Destroys the SceneResource object.
-  */
-	virtual ~SceneResource();
+  /*!
+Constructs SceneResource with default value and \b scene.
+*/
+  SceneResource(ToonzScene *scene);
+  /*!
+Destroys the SceneResource object.
+*/
+  virtual ~SceneResource();
 
-	//! save the resource to the disk using the updated path. Note: it calls SceneResource::updatePath(fp) before
-	virtual void save() = 0;
-	//! change the resource internal path, according to the scene
-	virtual void updatePath() = 0;
-	//! change back the resource internal path to its original value
-	virtual void rollbackPath() = 0;
+  //! save the resource to the disk using the updated path. Note: it calls
+  //! SceneResource::updatePath(fp) before
+  virtual void save() = 0;
+  //! change the resource internal path, according to the scene
+  virtual void updatePath() = 0;
+  //! change back the resource internal path to its original value
+  virtual void rollbackPath() = 0;
 
-	//! visitor pattern
-	virtual void accept(ResourceProcessor *processor) = 0;
-	/*!
-    If scene is untitled update save path.
-  */
-	void updatePath(TFilePath &fp);
+  //! visitor pattern
+  virtual void accept(ResourceProcessor *processor) = 0;
+  /*!
+If scene is untitled update save path.
+*/
+  void updatePath(TFilePath &fp);
 
-	virtual bool isDirty() = 0;
-	virtual QString getResourceName() = 0;
+  virtual bool isDirty()            = 0;
+  virtual QString getResourceName() = 0;
 };
 
 //=============================================================================
-//!The ScenePalette class provides a container for scene palette resource and allows its management.
+//! The ScenePalette class provides a container for scene palette resource and
+//! allows its management.
 /*!Inherits \b SceneResource.
 \n The class, more than \b SceneResources, contains a pointer to a palette level
    \b TXshPaletteLevel, two path for old save path, one decoded and one no,
-   two path for old scanned path, one decoded and one no. The class allows to save
-   simple level save() and to update or to restore old path (save and scan) updatePath()
+   two path for old scanned path, one decoded and one no. The class allows to
+save
+   simple level save() and to update or to restore old path (save and scan)
+updatePath()
    rollbackPath().
 */
 //=============================================================================
 
-class DVAPI ScenePalette : public SceneResource
-{
-	TXshPaletteLevel *m_pl;
-	TFilePath m_oldPath, m_oldActualPath;
+class DVAPI ScenePalette : public SceneResource {
+  TXshPaletteLevel *m_pl;
+  TFilePath m_oldPath, m_oldActualPath;
 
 public:
-	/*!
-    Constructs SceneLevel with \b ToonzScene \b scene and \b TXshPaletteLevel \b pl.
-  */
-	ScenePalette(ToonzScene *scene, TXshPaletteLevel *pl);
-	/*!
-    Save simple level in right path.
-  */
-	void save();
-	/*!
-    Update simple level path.
-  */
-	void updatePath();
-	/*!
-    Set simple level path to old path.
-  */
-	void rollbackPath();
+  /*!
+Constructs SceneLevel with \b ToonzScene \b scene and \b TXshPaletteLevel \b pl.
+*/
+  ScenePalette(ToonzScene *scene, TXshPaletteLevel *pl);
+  /*!
+Save simple level in right path.
+*/
+  void save();
+  /*!
+Update simple level path.
+*/
+  void updatePath();
+  /*!
+Set simple level path to old path.
+*/
+  void rollbackPath();
 
-	void accept(ResourceProcessor *processor) { processor->process(m_pl); }
+  void accept(ResourceProcessor *processor) { processor->process(m_pl); }
 
-	bool isDirty();
-	QString getResourceName();
+  bool isDirty();
+  QString getResourceName();
 };
 
 //=============================================================================
-//!The SceneLevel class provides a container for scene level resource and allows its management.
+//! The SceneLevel class provides a container for scene level resource and
+//! allows its management.
 /*!Inherits \b SceneResource.
 \n The class, more than \b SceneResources, contains a pointer to a simple level
    \b TXshSimpleLevel, two path for old save path, one decoded and one no,
-   two path for old scanned path, one decoded and one no. The class allows to save
-   simple level save() and to update or to restore old path (save and scan) updatePath()
+   two path for old scanned path, one decoded and one no. The class allows to
+save
+   simple level save() and to update or to restore old path (save and scan)
+updatePath()
    rollbackPath().
 */
 //=============================================================================
 
-class DVAPI SceneLevel : public SceneResource
-{
-	TXshSimpleLevel *m_sl;
-	TFilePath m_oldPath, m_oldActualPath;
-	TFilePath m_oldScannedPath, m_oldActualScannedPath;
-	TFilePath m_oldRefImgPath, m_oldActualRefImgPath;
+class DVAPI SceneLevel : public SceneResource {
+  TXshSimpleLevel *m_sl;
+  TFilePath m_oldPath, m_oldActualPath;
+  TFilePath m_oldScannedPath, m_oldActualScannedPath;
+  TFilePath m_oldRefImgPath, m_oldActualRefImgPath;
 
 public:
-	/*!
-    Constructs SceneLevel with \b ToonzScene \b scene and \b TXshSimpleLevel \b sl.
-  */
-	SceneLevel(ToonzScene *scene, TXshSimpleLevel *sl);
-	/*!
-    Save simple level in right path.
-  */
-	void save();
-	/*!
-    Update simple level path.
-  */
-	void updatePath();
-	/*!
-    Set simple level path to old path.
-  */
-	void rollbackPath();
+  /*!
+Constructs SceneLevel with \b ToonzScene \b scene and \b TXshSimpleLevel \b sl.
+*/
+  SceneLevel(ToonzScene *scene, TXshSimpleLevel *sl);
+  /*!
+Save simple level in right path.
+*/
+  void save();
+  /*!
+Update simple level path.
+*/
+  void updatePath();
+  /*!
+Set simple level path to old path.
+*/
+  void rollbackPath();
 
-	void accept(ResourceProcessor *processor) { processor->process(m_sl); }
+  void accept(ResourceProcessor *processor) { processor->process(m_sl); }
 
-	bool isDirty();
-	QString getResourceName();
+  bool isDirty();
+  QString getResourceName();
 };
 
 //=============================================================================
-//!The SceneSoundtrack class provides a container for scene sound track resource and allows its management.
+//! The SceneSoundtrack class provides a container for scene sound track
+//! resource and allows its management.
 /*!Inherits \b SceneResource.
 \n The class, more than \b SceneResources, contains a pointer to a sound column
    \b TXshSoundColumn, two path for old save path, one decoded and one no.
-   The class allows to save sound track save() and to update or to restore old path
+   The class allows to save sound track save() and to update or to restore old
+path
    updatePath(), rollbackPath().
 */
 //=============================================================================
 
-class DVAPI SceneSound : public SceneResource
-{
-	TXshSoundLevel *m_sl;
-	TFilePath m_oldPath, m_oldActualPath;
+class DVAPI SceneSound : public SceneResource {
+  TXshSoundLevel *m_sl;
+  TFilePath m_oldPath, m_oldActualPath;
 
 public:
-	/*!
-    Constructs SceneSoundtrack with \b ToonzScene \b scene and \b TXshSoundLevel \b sl.
-  */
-	SceneSound(ToonzScene *scene, TXshSoundLevel *sl);
+  /*!
+Constructs SceneSoundtrack with \b ToonzScene \b scene and \b TXshSoundLevel \b
+sl.
+*/
+  SceneSound(ToonzScene *scene, TXshSoundLevel *sl);
 
-	/*!
-    Save sound column in right path.
-  */
-	void save();
-	/*!
-    Update sound track path.
-  */
-	void updatePath();
-	/*!
-    Set sound track path to old path.
-  */
-	void rollbackPath();
+  /*!
+Save sound column in right path.
+*/
+  void save();
+  /*!
+Update sound track path.
+*/
+  void updatePath();
+  /*!
+Set sound track path to old path.
+*/
+  void rollbackPath();
 
-	void accept(ResourceProcessor *processor) { processor->process(m_sl); }
+  void accept(ResourceProcessor *processor) { processor->process(m_sl); }
 
-	bool isDirty() { return false; }
-	QString getResourceName() { return QString(); }
+  bool isDirty() { return false; }
+  QString getResourceName() { return QString(); }
 };
 
 //=============================================================================
-//!The SceneResources class provides scene resources and allows their management.
-/*!The class contains a vector of pointer to \b SceneResource, a pointer to scene,
-   a pointer to xsheet, a boolean to know if commit is done and a boolean to know
+//! The SceneResources class provides scene resources and allows their
+//! management.
+/*!The class contains a vector of pointer to \b SceneResource, a pointer to
+   scene,
+   a pointer to xsheet, a boolean to know if commit is done and a boolean to
+   know
    if scene is untitled.
-   The class allows to save scene resources save(), and to update or to restore old
+   The class allows to save scene resources save(), and to update or to restore
+   old
    scene resources paths updatePaths(), rollbackPaths().
 */
 //=============================================================================
 
-class DVAPI SceneResources
-{
-	std::vector<SceneResource *> m_resources;
-	ToonzScene *m_scene;
-	TXsheet *m_subXsheet;
-	bool m_commitDone;
-	bool m_wasUntitled;
+class DVAPI SceneResources {
+  std::vector<SceneResource *> m_resources;
+  ToonzScene *m_scene;
+  TXsheet *m_subXsheet;
+  bool m_commitDone;
+  bool m_wasUntitled;
 
-	/*!
-    Set the vector of pointer to \b SceneResource to scene resources.
-  */
-	void getResources();
+  /*!
+Set the vector of pointer to \b SceneResource to scene resources.
+*/
+  void getResources();
 
 public:
-	// n.b. se subXsheet != 0 salva solo le risorse utilizzate nel subxsheet
-	/*!
-    Constructs SceneResources with \b ToonzScene \b scene and
-    \b TXsheet \b subXsheet.
-  */
-	SceneResources(ToonzScene *scene, TXsheet *subXsheet);
-	/*!
-    Destroys the SceneResources object.
-  */
-	~SceneResources();
-	/*
-    !Save all scene resources in according to \b newScenePath.
-  \n 
-    Set scene save path to \b newScenePath, call \b save()
-    for all scene resources and reset scene save path to
-    old save path.
-    If pointer to subXsheet is different from zero save only resources
-    used in subXsheet.
-  */
-	void save(const TFilePath newScenePath);
+  // n.b. se subXsheet != 0 salva solo le risorse utilizzate nel subxsheet
+  /*!
+Constructs SceneResources with \b ToonzScene \b scene and
+\b TXsheet \b subXsheet.
+*/
+  SceneResources(ToonzScene *scene, TXsheet *subXsheet);
+  /*!
+Destroys the SceneResources object.
+*/
+  ~SceneResources();
+  /*
+!Save all scene resources in according to \b newScenePath.
+\n
+Set scene save path to \b newScenePath, call \b save()
+for all scene resources and reset scene save path to
+old save path.
+If pointer to subXsheet is different from zero save only resources
+used in subXsheet.
+*/
+  void save(const TFilePath newScenePath);
 
-	/*!
-    Update all resouces paths.
-  */
-	void updatePaths();
-	/*!
-    Set all resouces paths to old paths.
-  */
-	void rollbackPaths();
-	/*!
-    Set boolean \b m_commitDone to true.
-  \n
-    If doesn't make \b commit() destroyer calls \b rollbackPaths().
-  */
-	void commit() { m_commitDone = true; }
+  /*!
+Update all resouces paths.
+*/
+  void updatePaths();
+  /*!
+Set all resouces paths to old paths.
+*/
+  void rollbackPaths();
+  /*!
+Set boolean \b m_commitDone to true.
+\n
+If doesn't make \b commit() destroyer calls \b rollbackPaths().
+*/
+  void commit() { m_commitDone = true; }
 
-	void accept(ResourceProcessor *processor, bool autoCommit = true);
+  void accept(ResourceProcessor *processor, bool autoCommit = true);
 
-	//return the name list of dirty resources
-	void getDirtyResources(std::vector<QString> &dirtyResources);
+  // return the name list of dirty resources
+  void getDirtyResources(std::vector<QString> &dirtyResources);
 
 private:
-	// not implemented
-	SceneResources(const SceneResources &);
-	SceneResources &operator=(const SceneResources &);
+  // not implemented
+  SceneResources(const SceneResources &);
+  SceneResources &operator=(const SceneResources &);
 };
 
 //=============================================================================
 
-class DVAPI ResourceImporter : public ResourceProcessor
-{
+class DVAPI ResourceImporter : public ResourceProcessor {
 public:
-	ResourceImporter(ToonzScene *scene, TProject *dstProject, ResourceImportStrategy &strategy);
-	~ResourceImporter();
+  ResourceImporter(ToonzScene *scene, TProject *dstProject,
+                   ResourceImportStrategy &strategy);
+  ~ResourceImporter();
 
-	// se serve modifica path. path non deve esistere su disco
-	// ritorna true se ha modificato path;
-	// n.b. path puo' essere della forma +drawings/xxx.pli
-	bool makeUnique(TFilePath &path);
+  // se serve modifica path. path non deve esistere su disco
+  // ritorna true se ha modificato path;
+  // n.b. path puo' essere della forma +drawings/xxx.pli
+  bool makeUnique(TFilePath &path);
 
-	TFilePath getImportedScenePath() const;
+  TFilePath getImportedScenePath() const;
 
-	TFilePath codePath(const TFilePath &oldCodedPath, const TFilePath &newActualPath);
+  TFilePath codePath(const TFilePath &oldCodedPath,
+                     const TFilePath &newActualPath);
 
-	void process(TXshSimpleLevel *sl);
-	void process(TXshPaletteLevel *sl);
-	void process(TXshSoundLevel *sl);
+  void process(TXshSimpleLevel *sl);
+  void process(TXshPaletteLevel *sl);
+  void process(TXshSoundLevel *sl);
 
-	bool aborted() const { return m_importStrategy.aborted(); }
+  bool aborted() const { return m_importStrategy.aborted(); }
 
-	static std::string extractPsdSuffix(TFilePath &path);
-	static TFilePath buildPsd(const TFilePath &path, const std::string &suffix);
+  static std::string extractPsdSuffix(TFilePath &path);
+  static TFilePath buildPsd(const TFilePath &path, const std::string &suffix);
 
 private:
-	ToonzScene *m_scene;
-	TProject *m_dstProject;
-	ToonzScene *m_dstScene;
-	ResourceImportStrategy &m_importStrategy;
+  ToonzScene *m_scene;
+  TProject *m_dstProject;
+  ToonzScene *m_dstScene;
+  ResourceImportStrategy &m_importStrategy;
 };
 
 //=============================================================================
@@ -350,26 +357,25 @@ private:
 // Rende tutte le risorse locali: tutte quelle con path assoluto
 // vengono copiate dentro il progetto
 
-class DVAPI ResourceCollector : public ResourceProcessor
-{
-	ToonzScene *m_scene;
-	int m_count;
-	std::map<TFilePath, TFilePath> m_collectedFiles;
+class DVAPI ResourceCollector : public ResourceProcessor {
+  ToonzScene *m_scene;
+  int m_count;
+  std::map<TFilePath, TFilePath> m_collectedFiles;
 
 public:
-	ResourceCollector(ToonzScene *scene);
-	~ResourceCollector();
+  ResourceCollector(ToonzScene *scene);
+  ~ResourceCollector();
 
-	// se serve modifica path. path non deve esistere su disco
-	// ritorna true se ha modificato path;
-	// n.b. path e' della forma +drawings/xxx.pli
-	bool makeUnique(TFilePath &path);
+  // se serve modifica path. path non deve esistere su disco
+  // ritorna true se ha modificato path;
+  // n.b. path e' della forma +drawings/xxx.pli
+  bool makeUnique(TFilePath &path);
 
-	int getCollectedResourceCount() const { return m_count; }
+  int getCollectedResourceCount() const { return m_count; }
 
-	void process(TXshSimpleLevel *sl);
-	void process(TXshSoundLevel *sl);
-	void process(TXshPaletteLevel *pl);
+  void process(TXshSimpleLevel *sl);
+  void process(TXshSoundLevel *sl);
+  void process(TXshPaletteLevel *pl);
 };
 
 #endif
