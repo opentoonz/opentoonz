@@ -25,60 +25,58 @@ class TScrollbar;
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TFilmStripPanel : public TWidget
-{
+class DVAPI TFilmStripPanel : public TWidget {
 protected:
-	TPoint m_lastPos;
-	int m_offset;
-	TScrollbar *m_scrollbar;
-	TLevelP m_level;
+  TPoint m_lastPos;
+  int m_offset;
+  TScrollbar *m_scrollbar;
+  TLevelP m_level;
 
-	TUINT32 m_loaderId;
-	TLevelReaderP m_levelReader;
+  TUINT32 m_loaderId;
+  TLevelReaderP m_levelReader;
 
-	bool m_loaded;
-	TThread::Mutex m_mutex;
+  bool m_loaded;
+  TThread::Mutex m_mutex;
 
-	friend class FilmStripLoader;
-
-public:
-	static const int m_xsize;
-	static const int m_ysize;
-	static const int m_frameHeight;
+  friend class FilmStripLoader;
 
 public:
-	TFilmStripPanel(TWidget *parent, string name = "FilmStripPanel");
-	~TFilmStripPanel();
+  static const int m_xsize;
+  static const int m_ysize;
+  static const int m_frameHeight;
 
-	void repaint();
-	void draw();
+public:
+  TFilmStripPanel(TWidget *parent, string name = "FilmStripPanel");
+  ~TFilmStripPanel();
 
-	void leftButtonDown(const TMouseEvent &);
-	void leftButtonDrag(const TMouseEvent &);
-	void leftButtonUp(const TMouseEvent &);
+  void repaint();
+  void draw();
 
-	void onDrop(string s);
-	void onTimer(int);
+  void leftButtonDown(const TMouseEvent &);
+  void leftButtonDrag(const TMouseEvent &);
+  void leftButtonUp(const TMouseEvent &);
 
-	void setScrollbar(TScrollbar *sb);
+  void onDrop(string s);
+  void onTimer(int);
 
-	void setLevel(TLevelP level);
-	TLevelP getLevel() { return m_level; };
-	void onScrollbarMove(int value);
+  void setScrollbar(TScrollbar *sb);
 
-	void updateScrollbar();
+  void setLevel(TLevelP level);
+  TLevelP getLevel() { return m_level; };
+  void onScrollbarMove(int value);
+
+  void updateScrollbar();
 };
 
-class DVAPI TFilmStrip : public TWidget
-{
-	TFilmStripPanel *m_panel;
-	TScrollbar *m_scrollbar;
+class DVAPI TFilmStrip : public TWidget {
+  TFilmStripPanel *m_panel;
+  TScrollbar *m_scrollbar;
 
 public:
-	TFilmStrip(TWidget *parent, string name = "FilmStrip");
+  TFilmStrip(TWidget *parent, string name = "FilmStrip");
 
-	void configureNotify(const TDimension &d);
-	void drop(string s) { m_panel->onDrop(s); };
+  void configureNotify(const TDimension &d);
+  void drop(string s) { m_panel->onDrop(s); };
 };
 
 #endif

@@ -18,13 +18,13 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TStroke;
 class TStageObject;
 class TDoubleParam;
 
 //=============================================================================
-//!The TStageObjectSpline class define stage object motion path.
+//! The TStageObjectSpline class define stage object motion path.
 /*!Inherits \b TSmartObject and \b TPersist.
 \n The motion path is defined by spline build as \b TStroke getStroke(),
    and node position getDagNodePos(); spline can be set using setStroke()
@@ -33,63 +33,62 @@ class TDoubleParam;
 */
 //=============================================================================
 
-class DVAPI TStageObjectSpline : public TSmartObject, public TPersist
-{
-	PERSIST_DECLARATION(TStageObjectSpline)
-	TStroke *m_stroke;
-	DECLARE_CLASS_CODE
-	TPointD m_dagNodePos;
+class DVAPI TStageObjectSpline : public TSmartObject, public TPersist {
+  PERSIST_DECLARATION(TStageObjectSpline)
+  TStroke *m_stroke;
+  DECLARE_CLASS_CODE
+  TPointD m_dagNodePos;
 
-	int m_id;
-	std::string m_idBase;
-	std::string m_name;
-	bool m_isOpened;
-	std::vector<TDoubleParam *> m_posPathParams;
+  int m_id;
+  std::string m_idBase;
+  std::string m_name;
+  bool m_isOpened;
+  std::vector<TDoubleParam *> m_posPathParams;
 
 public:
-	TStageObjectSpline();
-	~TStageObjectSpline();
+  TStageObjectSpline();
+  ~TStageObjectSpline();
 
-	TStageObjectSpline *clone() const;
+  TStageObjectSpline *clone() const;
 
-	/*!
-    Return spline stroke.
-    \sa setStroke()
-  */
-	const TStroke *getStroke() const;
-	/*!
-    Set spline stroke to \b stroke.
-    \sa getStroke()
-  */
-	void setStroke(TStroke *stroke); //! keeps ownership
+  /*!
+Return spline stroke.
+\sa setStroke()
+*/
+  const TStroke *getStroke() const;
+  /*!
+Set spline stroke to \b stroke.
+\sa getStroke()
+*/
+  void setStroke(TStroke *stroke);  //! keeps ownership
 
-	TPointD getDagNodePos() const { return m_dagNodePos; }
-	void setDagNodePos(const TPointD &pos) { m_dagNodePos = pos; }
+  TPointD getDagNodePos() const { return m_dagNodePos; }
+  void setDagNodePos(const TPointD &pos) { m_dagNodePos = pos; }
 
-	int getId() const;
-	void setId(int id);
-	std::string getName() const;
-	void setName(const std::string &name) { m_name = name; }
+  int getId() const;
+  void setId(int id);
+  std::string getName() const;
+  void setName(const std::string &name) { m_name = name; }
 
-	bool isOpened() const { return m_isOpened; }
-	void setIsOpened(bool value) { m_isOpened = value; }
+  bool isOpened() const { return m_isOpened; }
+  void setIsOpened(bool value) { m_isOpened = value; }
 
-	void loadData(TIStream &is);
-	void saveData(TOStream &os);
+  void loadData(TIStream &is);
+  void saveData(TOStream &os);
 
-	std::string getIconId();
+  std::string getIconId();
 
-	//! add the PosPath param if you want to update keyframes values
-	//! when the stroke changes. addParam() calls param->addRef()
-	void addParam(TDoubleParam *param);
-	void removeParam(TDoubleParam *param);
+  //! add the PosPath param if you want to update keyframes values
+  //! when the stroke changes. addParam() calls param->addRef()
+  void addParam(TDoubleParam *param);
+  void removeParam(TDoubleParam *param);
 
 private:
-	// not implemented: can't copy a TStageObjectSpline
-	TStageObjectSpline &operator=(const TStageObjectSpline &);
-	TStageObjectSpline(const TStageObjectSpline &);
+  // not implemented: can't copy a TStageObjectSpline
+  TStageObjectSpline &operator=(const TStageObjectSpline &);
+  TStageObjectSpline(const TStageObjectSpline &);
 
-	void updatePosPathKeyframes(TStroke *oldSpline, TStroke *newSpline);
+  void updatePosPathKeyframes(TStroke *oldSpline, TStroke *newSpline);
 };
 
 #ifdef _WIN32

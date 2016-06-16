@@ -14,8 +14,7 @@
 
 class TUndo;
 
-namespace ToonzExt
-{
+namespace ToonzExt {
 class StrokeDeformation;
 }
 
@@ -35,77 +34,70 @@ class StrokeDeformation;
 //
 //=============================================================================
 
-class DVAPI PinchTool : public TTool
-{
-	Q_DECLARE_TR_FUNCTIONS(PinchTool)
+class DVAPI PinchTool : public TTool {
+  Q_DECLARE_TR_FUNCTIONS(PinchTool)
 
-	TMouseEvent m_lastMouseEvent;
-	ToonzExt::StrokeDeformation *m_deformation;
-	ToonzExt::ContextStatus m_status;
-	ToonzExt::Selector m_selector;
-	TUndo *m_undo;
-	bool m_draw, m_active, m_cursorEnabled;
-	TThickPoint m_cursor;
-	TPointD m_prev, m_curr, m_down;
-	unsigned int m_n;
+  TMouseEvent m_lastMouseEvent;
+  ToonzExt::StrokeDeformation *m_deformation;
+  ToonzExt::ContextStatus m_status;
+  ToonzExt::Selector m_selector;
+  TUndo *m_undo;
+  bool m_draw, m_active, m_cursorEnabled;
+  TThickPoint m_cursor;
+  TPointD m_prev, m_curr, m_down;
+  unsigned int m_n;
 
-	bool m_showSelector;
+  bool m_showSelector;
 
-	TDoubleProperty m_toolRange;
-	TDoubleProperty m_toolCornerSize;
-	TBoolProperty m_autoOrManual;
-	TPropertyGroup m_prop;
+  TDoubleProperty m_toolRange;
+  TDoubleProperty m_toolCornerSize;
+  TBoolProperty m_autoOrManual;
+  TPropertyGroup m_prop;
 
-	void updateInterfaceStatus(const TMouseEvent &);
-	void updateStrokeStatus(TStroke *stroke, double w);
-	int updateCursor() const;
-	TStroke *getClosestStroke(const TPointD &pos, double &w) const;
+  void updateInterfaceStatus(const TMouseEvent &);
+  void updateStrokeStatus(TStroke *stroke, double w);
+  int updateCursor() const;
+  TStroke *getClosestStroke(const TPointD &pos, double &w) const;
 
 public:
-	PinchTool();
-	virtual ~PinchTool();
+  PinchTool();
+  virtual ~PinchTool();
 
-	ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const { return TTool::LevelWriteTool; }
 
-	void setShowSelector(bool show) { m_showSelector = show; }
+  void setShowSelector(bool show) { m_showSelector = show; }
 
-	void onEnter();
-	void onLeave();
+  void onEnter();
+  void onLeave();
 
-	void updateTranslation();
+  void updateTranslation();
 
-	void draw();
+  void draw();
 
-	void leftButtonDown(const TPointD &pos,
-						const TMouseEvent &);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
 
-	void leftButtonDrag(const TPointD &pos,
-						const TMouseEvent &e);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
 
-	void leftButtonUp(const TPointD &pos,
-					  const TMouseEvent &e);
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
 
-	void invalidateCursorArea();
+  void invalidateCursorArea();
 
-	void mouseMove(const TPointD &pos,
-				   const TMouseEvent &e);
+  void mouseMove(const TPointD &pos, const TMouseEvent &e);
 
-	bool moveCursor(const TPointD &pos);
+  bool moveCursor(const TPointD &pos);
 
-	bool keyDown(int key,
-				 TUINT32 flags,
-				 const TPoint &pos);
+  bool keyDown(int key, TUINT32 flags, const TPoint &pos);
 
-	void onActivate();
-	void onDeactivate();
+  void onActivate();
+  void onDeactivate();
 
-	// viene usato??
-	void update(const TGlobalChange &);
+  // viene usato??
+  void update(const TGlobalChange &);
 
-	void onImageChanged();
+  void onImageChanged();
 
-	int getCursorId() const { return updateCursor(); }
-	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  int getCursorId() const { return updateCursor(); }
+  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 };
 
-#endif //PINCHTOOL_H
+#endif  // PINCHTOOL_H

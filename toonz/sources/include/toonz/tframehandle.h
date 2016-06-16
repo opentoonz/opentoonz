@@ -27,103 +27,99 @@ class TXsheet;
 // TFrameHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TFrameHandle : public QObject
-{
-	Q_OBJECT
+class DVAPI TFrameHandle : public QObject {
+  Q_OBJECT
 
 public:
-	enum FrameType { SceneFrame,
-					 LevelFrame };
+  enum FrameType { SceneFrame, LevelFrame };
 
 private:
-	int m_frame;	// valid if m_frameType == SceneFrame
-	TFrameId m_fid; // valid if m_frameType == LevelFrame
+  int m_frame;     // valid if m_frameType == SceneFrame
+  TFrameId m_fid;  // valid if m_frameType == LevelFrame
 
-	int m_sceneFrameSize,
-		m_frame0,
-		m_frame1;
+  int m_sceneFrameSize, m_frame0, m_frame1;
 
-	std::vector<TFrameId> m_fids;
+  std::vector<TFrameId> m_fids;
 
-	int m_timerId;
-	int m_previewFrameRate;
-	FrameType m_frameType;
-	bool m_looping, m_isPlaying;
+  int m_timerId;
+  int m_previewFrameRate;
+  FrameType m_frameType;
+  bool m_looping, m_isPlaying;
 
-	// audio scrub
-	TXshSoundColumn *m_audioColumn;
-	TXsheet *m_xsheet;
-	std::pair<int, int> m_scrubRange;
-	double m_fps;
-	QTime m_clock;
+  // audio scrub
+  TXshSoundColumn *m_audioColumn;
+  TXsheet *m_xsheet;
+  std::pair<int, int> m_scrubRange;
+  double m_fps;
+  QTime m_clock;
 
-	//void startPlaying(bool looping);
-	//void stopPlaying();
-	void setTimer(int frameRate);
+  // void startPlaying(bool looping);
+  // void stopPlaying();
+  void setTimer(int frameRate);
 
-	bool scrub(int r0, int r1, double framePerSecond);
+  bool scrub(int r0, int r1, double framePerSecond);
 
 public:
-	TFrameHandle();
-	~TFrameHandle();
+  TFrameHandle();
+  ~TFrameHandle();
 
-	void setCurrentFrame(int index);
+  void setCurrentFrame(int index);
 
-	// if m_frameType == SceneFrame
-	int getFrame() const;
-	void setFrame(int frame); // => m_frameType = SceneFrame
+  // if m_frameType == SceneFrame
+  int getFrame() const;
+  void setFrame(int frame);  // => m_frameType = SceneFrame
 
-	// if m_frameType == LevelFrame
-	TFrameId getFid() const;
-	void setFid(const TFrameId &id); // => m_frameType = LevelFrame
+  // if m_frameType == LevelFrame
+  TFrameId getFid() const;
+  void setFid(const TFrameId &id);  // => m_frameType = LevelFrame
 
-	bool isPlaying() const { return m_isPlaying; }
-	bool isScrubbing() const { return m_scrubRange.first <= m_scrubRange.second; }
+  bool isPlaying() const { return m_isPlaying; }
+  bool isScrubbing() const { return m_scrubRange.first <= m_scrubRange.second; }
 
-	FrameType getFrameType() const { return m_frameType; }
-	// void setFrameType(FrameType frameType);
+  FrameType getFrameType() const { return m_frameType; }
+  // void setFrameType(FrameType frameType);
 
-	void scrubColumn(int r0, int r1, TXshSoundColumn *audioColumn, double framePerSecond = 25);
-	void scrubXsheet(int r0, int r1, TXsheet *xsh, double framePerSecond = 25);
-	void stopScrubbing();
+  void scrubColumn(int r0, int r1, TXshSoundColumn *audioColumn,
+                   double framePerSecond = 25);
+  void scrubXsheet(int r0, int r1, TXsheet *xsh, double framePerSecond = 25);
+  void stopScrubbing();
 
-	bool isEditingLevel() const { return getFrameType() == LevelFrame; }
-	bool isEditingScene() const { return getFrameType() == SceneFrame; }
+  bool isEditingLevel() const { return getFrameType() == LevelFrame; }
+  bool isEditingScene() const { return getFrameType() == SceneFrame; }
 
-	// i  metodi seguenti funzionano sia con LevelFrame sia con SceneFrame
-	int getMaxFrameIndex() const;
-	int getFrameIndex() const;
-	QString getFrameIndexName(int index) const;
-	void setFrameIndex(int index);
-	void setFrameIndexByName(const QString &str);
+  // i  metodi seguenti funzionano sia con LevelFrame sia con SceneFrame
+  int getMaxFrameIndex() const;
+  int getFrameIndex() const;
+  QString getFrameIndexName(int index) const;
+  void setFrameIndex(int index);
+  void setFrameIndexByName(const QString &str);
 
-	void setSceneFrameSize(int frameSize) { m_sceneFrameSize = frameSize; }
-	void setFrameRange(int f0, int f1)
-	{
-		m_frame0 = f0;
-		m_frame1 = f1;
-	}
-	void setFrameIds(const std::vector<TFrameId> &fids) { m_fids = fids; }
-	int getStartFrame() { return m_frame0; }
-	int getEndFrame() { return m_frame1; }
+  void setSceneFrameSize(int frameSize) { m_sceneFrameSize = frameSize; }
+  void setFrameRange(int f0, int f1) {
+    m_frame0 = f0;
+    m_frame1 = f1;
+  }
+  void setFrameIds(const std::vector<TFrameId> &fids) { m_fids = fids; }
+  int getStartFrame() { return m_frame0; }
+  int getEndFrame() { return m_frame1; }
 
 public slots:
 
-	void nextFrame();
-	void prevFrame();
-	void firstFrame();
-	void lastFrame();
-	void setPlaying(bool isPlaying);
+  void nextFrame();
+  void prevFrame();
+  void firstFrame();
+  void lastFrame();
+  void setPlaying(bool isPlaying);
 
 signals:
-	void frameSwitched();
-	void scrubStarted();
-	void scrubStopped();
-	void frameTypeChanged();
-	void isPlayingStatusChanged();
+  void frameSwitched();
+  void scrubStarted();
+  void scrubStopped();
+  void frameTypeChanged();
+  void isPlayingStatusChanged();
 
 protected:
-	void timerEvent(QTimerEvent *event);
+  void timerEvent(QTimerEvent *event);
 };
 
-#endif //TFRAMEHANDLE_H
+#endif  // TFRAMEHANDLE_H

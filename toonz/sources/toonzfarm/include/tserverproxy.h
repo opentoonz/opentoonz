@@ -7,18 +7,17 @@
 
 //-----------------------------------------------------------------------------
 
-class TServerProxy
-{
+class TServerProxy {
 public:
-	TServerProxy(const std::string hostName, int portId);
-	~TServerProxy();
+  TServerProxy(const std::string hostName, int portId);
+  ~TServerProxy();
 
-	bool testConnection() const;
-	int exec(int argc, char *argv[], std::string &reply);
+  bool testConnection() const;
+  int exec(int argc, char *argv[], std::string &reply);
 
 private:
-	std::string m_hostName;
-	int m_portId;
+  std::string m_hostName;
+  int m_portId;
 };
 
 #endif

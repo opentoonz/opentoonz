@@ -28,53 +28,55 @@ class QString;
 // ToolHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI ToolHandle : public QObject
-{
-	Q_OBJECT
+class DVAPI ToolHandle : public QObject {
+  Q_OBJECT
 
-	TTool *m_tool;
-	QString m_toolName;
-	int m_toolTargetType;
-	QString m_storedToolName;
-	QTime m_storedToolTime;
-	QString m_oldToolName;
-	bool m_toolIsBusy;
+  TTool *m_tool;
+  QString m_toolName;
+  int m_toolTargetType;
+  QString m_storedToolName;
+  QTime m_storedToolTime;
+  QString m_oldToolName;
+  bool m_toolIsBusy;
 
 public:
-	ToolHandle();
-	~ToolHandle();
+  ToolHandle();
+  ~ToolHandle();
 
-	TTool *getTool() const;
-	void setTool(TTool *tool);
+  TTool *getTool() const;
+  void setTool(TTool *tool);
 
-	void setTool(QString name);
-	void setTargetType(int targetType);
+  void setTool(QString name);
+  void setTargetType(int targetType);
 
-	// used to change tool for a short while (e.g. while keeping pressed a short-key)
-	void storeTool();
-	void restoreTool();
+  // used to change tool for a short while (e.g. while keeping pressed a
+  // short-key)
+  void storeTool();
+  void restoreTool();
 
-	// used to set a tool that is not listed in the toolbar (e.g. the ShiftTraceTool).
-	void setPseudoTool(QString name);
-	void unsetPseudoTool();
-	void setToolBusy(bool value);
-	bool isToolBusy() { return m_toolIsBusy; }
+  // used to set a tool that is not listed in the toolbar (e.g. the
+  // ShiftTraceTool).
+  void setPseudoTool(QString name);
+  void unsetPseudoTool();
+  void setToolBusy(bool value);
+  bool isToolBusy() { return m_toolIsBusy; }
 
-	/*! Notify tool parameters change (out of toolOption bar).*/
-	void notifyToolChanged() { emit toolChanged(); }
+  /*! Notify tool parameters change (out of toolOption bar).*/
+  void notifyToolChanged() { emit toolChanged(); }
 
-	void notifyToolCursorTypeChanged() { emit toolCursorTypeChanged(); }
+  void notifyToolCursorTypeChanged() { emit toolCursorTypeChanged(); }
 signals:
-	void toolSwitched();
-	void toolChanged();
-	void toolEditingFinished();
-	//used for changing the tool cursor when the options changed with short cut keys assigned for tool options.
-	void toolCursorTypeChanged();
+  void toolSwitched();
+  void toolChanged();
+  void toolEditingFinished();
+  // used for changing the tool cursor when the options changed with short cut
+  // keys assigned for tool options.
+  void toolCursorTypeChanged();
 
 public slots:
-	// void changeTool(QAction* action);
-	void onImageChanged(TImage::Type type);
-	void updateMatrix();
+  // void changeTool(QAction* action);
+  void onImageChanged(TImage::Type type);
+  void updateMatrix();
 };
 
-#endif //TOOLEHANDLE_H
+#endif  // TOOLEHANDLE_H

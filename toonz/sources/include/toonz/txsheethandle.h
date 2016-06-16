@@ -24,26 +24,25 @@ class TXsheet;
 // TXsheetHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TXsheetHandle : public QObject
-{
-	Q_OBJECT
+class DVAPI TXsheetHandle : public QObject {
+  Q_OBJECT
 
-	TXsheet *m_xsheet;
+  TXsheet *m_xsheet;
 
 public:
-	TXsheetHandle();
-	~TXsheetHandle();
+  TXsheetHandle();
+  ~TXsheetHandle();
 
-	TXsheet *getXsheet() const;
-	void setXsheet(TXsheet *xsheet);
-	void notifyXsheetChanged() { emit xsheetChanged(); }
-	void notifyXsheetSwitched() { emit xsheetSwitched(); }
-	void notifyXsheetSoundChanged() { emit xsheetSoundChanged(); }
+  TXsheet *getXsheet() const;
+  void setXsheet(TXsheet *xsheet);
+  void notifyXsheetChanged() { emit xsheetChanged(); }
+  void notifyXsheetSwitched() { emit xsheetSwitched(); }
+  void notifyXsheetSoundChanged() { emit xsheetSoundChanged(); }
 
 signals:
-	void xsheetSwitched();
-	void xsheetChanged();
-	void xsheetSoundChanged();
+  void xsheetSwitched();
+  void xsheetChanged();
+  void xsheetSoundChanged();
 };
 
-#endif //TXSHEETHANDLE_H
+#endif  // TXSHEETHANDLE_H

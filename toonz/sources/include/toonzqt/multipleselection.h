@@ -23,53 +23,43 @@
 */
 
 template <typename T>
-class MultipleSelection : public TSelection
-{
+class MultipleSelection : public TSelection {
 public:
-	typedef T object_type;
-	typedef std::vector<T> objects_container;
+  typedef T object_type;
+  typedef std::vector<T> objects_container;
 
 public:
-	MultipleSelection() {}
-	MultipleSelection(const T &t) : m_objects(1, t) {}
-	MultipleSelection(const std::vector<T> &objects)
-		: m_objects(objects)
-	{
-		std::sort(m_objects.begin(), m_objects.end());
-	}
+  MultipleSelection() {}
+  MultipleSelection(const T &t) : m_objects(1, t) {}
+  MultipleSelection(const std::vector<T> &objects) : m_objects(objects) {
+    std::sort(m_objects.begin(), m_objects.end());
+  }
 
-	bool isEmpty() const { return m_objects.empty(); }
-	void selectNone()
-	{
-		m_objects.clear();
-		notifyView();
-	}
+  bool isEmpty() const { return m_objects.empty(); }
+  void selectNone() {
+    m_objects.clear();
+    notifyView();
+  }
 
-	bool contains(int v) const
-	{
-		return std::binary_search(m_objects.begin(), m_objects.end(), v);
-	}
+  bool contains(int v) const {
+    return std::binary_search(m_objects.begin(), m_objects.end(), v);
+  }
 
-	bool contains(const MultipleSelection &other) const
-	{
-		return std::includes(m_objects.begin(), m_objects.end(),
-							 other.m_objects.begin(), other.m_objects.end());
-	}
+  bool contains(const MultipleSelection &other) const {
+    return std::includes(m_objects.begin(), m_objects.end(),
+                         other.m_objects.begin(), other.m_objects.end());
+  }
 
-	const objects_container &objects() const { return m_objects; }
-	void setObjects(const objects_container &objects)
-	{
-		m_objects = objects;
-		std::sort(m_objects.begin(), m_objects.end());
-	}
+  const objects_container &objects() const { return m_objects; }
+  void setObjects(const objects_container &objects) {
+    m_objects = objects;
+    std::sort(m_objects.begin(), m_objects.end());
+  }
 
-	bool hasSingleObject() const
-	{
-		return (m_objects.size() == 1);
-	}
+  bool hasSingleObject() const { return (m_objects.size() == 1); }
 
 protected:
-	objects_container m_objects; //!< Selected objects
+  objects_container m_objects;  //!< Selected objects
 };
 
-#endif // MULTIPLESELECTION_H
+#endif  // MULTIPLESELECTION_H

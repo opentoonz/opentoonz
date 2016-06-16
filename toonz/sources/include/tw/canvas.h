@@ -16,14 +16,13 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TCanvas : public TWidget
-{
+class DVAPI TCanvas : public TWidget {
 protected:
 public:
-	TCanvas(TWidget *parent, string name = "canvas");
-	~TCanvas();
+  TCanvas(TWidget *parent, string name = "canvas");
+  ~TCanvas();
 
-	virtual void draw();
+  virtual void draw();
 };
 
 #endif

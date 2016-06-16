@@ -3,7 +3,7 @@
 #ifndef POPUP_BUTTON_H
 #define POPUP_BUTTON_H
 
-//DVAPI includes
+// DVAPI includes
 #include "tcommon.h"
 
 #undef DVAPI
@@ -16,14 +16,14 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-//Qt includes
+// Qt includes
 #include <QPushButton>
 #include <QString>
 #include <QIcon>
 #include <QPushButton>
 #include <QList>
 
-//Forward declarations
+// Forward declarations
 class QAction;
 
 //********************************************************************************
@@ -38,38 +38,38 @@ class QAction;
   selectable enum values.
 */
 
-class DVAPI PopupButton : public QPushButton
-{
-	Q_OBJECT
+class DVAPI PopupButton : public QPushButton {
+  Q_OBJECT
 
-	QList<QAction *> m_actions;
-	int m_index;
+  QList<QAction *> m_actions;
+  int m_index;
 
 public:
-	PopupButton(QWidget *parent = 0);
+  PopupButton(QWidget *parent = 0);
 
-	int currentIndex() const;
-	const QAction *currentItem() const;
-	int count() const;
+  int currentIndex() const;
+  const QAction *currentItem() const;
+  int count() const;
 
-	QAction *addItem(const QString &text);
-	QAction *addItem(const QIcon &icon, const QString &text = QString());
-	QAction *addSeparator();
+  QAction *addItem(const QString &text);
+  QAction *addItem(const QIcon &icon, const QString &text = QString());
+  QAction *addSeparator();
 
-	int findText(const QString &text, Qt::CaseSensitivity cs = Qt::CaseSensitive) const;
+  int findText(const QString &text,
+               Qt::CaseSensitivity cs = Qt::CaseSensitive) const;
 
 signals:
 
-	void activated(int index);
-	void currentIndexChanged(int index);
+  void activated(int index);
+  void currentIndexChanged(int index);
 
 public slots:
 
-	void setCurrentIndex(int index);
+  void setCurrentIndex(int index);
 
 private slots:
 
-	void onIndexChange();
+  void onIndexChange();
 };
 
-#endif //POPUP_BUTTON_H
+#endif  // POPUP_BUTTON_H

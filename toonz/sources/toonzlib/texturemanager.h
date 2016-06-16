@@ -6,19 +6,18 @@
 #include "tgeometry.h"
 #include "tgl.h"
 
-class TextureManager
-{
-	TDimension m_textureSize;
-	bool m_isRGBM;
-	static TextureManager *m_instance;
+class TextureManager {
+  TDimension m_textureSize;
+  bool m_isRGBM;
+  static TextureManager *m_instance;
 
-	TextureManager();
+  TextureManager();
 
 public:
-	static TextureManager *instance();
-	TDimension getMaxSize(bool isRGBM);
-	void getFmtAndType(bool isRGBM, GLenum &fmt, GLenum &type);
-	TDimension selectTexture(TDimension reqSize, bool isRGBM);
+  static TextureManager *instance();
+  TDimension getMaxSize(bool isRGBM);
+  void getFmtAndType(bool isRGBM, GLenum &fmt, GLenum &type);
+  TDimension selectTexture(TDimension reqSize, bool isRGBM);
 };
 
-#endif //TEXTURE_MANAGER
+#endif  // TEXTURE_MANAGER

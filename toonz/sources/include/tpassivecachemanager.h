@@ -20,116 +20,118 @@ typedef void (*TreeDescriptor)(std::string &desc, const TFxP &root);
 //-----------------------------------
 
 /*!
-The TPassiveCacheManager is the cache delegate manager that allows render processes to cache
+The TPassiveCacheManager is the cache delegate manager that allows render
+processes to cache
 fx results from externally specified schematic nodes for future reuse.
-Observe that this manager takes no effort in verifying the usefulness of caching an fx, as the
-expected behaviour for such cached results is that of being recycled on future, \a unpredictable render
-instances under the same passive cache management. Active, predictive caching takes place
-under control of another manager class - namely, the TFxCacheManager - for single render instances.
+Observe that this manager takes no effort in verifying the usefulness of caching
+an fx, as the
+expected behaviour for such cached results is that of being recycled on future,
+\a unpredictable render
+instances under the same passive cache management. Active, predictive caching
+takes place
+under control of another manager class - namely, the TFxCacheManager - for
+single render instances.
 */
 
-class DVAPI TPassiveCacheManager : public TFxCacheManagerDelegate
-{
-	T_RENDER_RESOURCE_MANAGER
+class DVAPI TPassiveCacheManager : public TFxCacheManagerDelegate {
+  T_RENDER_RESOURCE_MANAGER
 
 private:
-	struct FxData {
-		TFxP m_fx;
-		UCHAR m_storageFlag;
-		int m_passiveCacheId;
-		//std::set<TCacheResourceP> m_resources;
-		std::string m_treeDescription;
+  struct FxData {
+    TFxP m_fx;
+    UCHAR m_storageFlag;
+    int m_passiveCacheId;
+    // std::set<TCacheResourceP> m_resources;
+    std::string m_treeDescription;
 
-		FxData();
-		~FxData();
+    FxData();
+    ~FxData();
 
-		/*void insert(const TCacheResourceP& resource);
-    std::set<TCacheResourceP>::iterator erase(const std::set<TCacheResourceP>::iterator& it);
-    void clear();*/
-	};
+    /*void insert(const TCacheResourceP& resource);
+std::set<TCacheResourceP>::iterator erase(const
+std::set<TCacheResourceP>::iterator& it);
+void clear();*/
+  };
 
-	class ResourcesContainer;
+  class ResourcesContainer;
 
 private:
-	QMutex m_mutex;
+  QMutex m_mutex;
 
-	std::vector<FxData> m_fxDataVector;
-	std::set<std::string> m_invalidatedLevels;
-	ResourcesContainer *m_resources;
-	std::map<std::string, UCHAR> m_contextNames;
-	std::map<unsigned long, std::string> m_contextNamesByRenderId;
+  std::vector<FxData> m_fxDataVector;
+  std::set<std::string> m_invalidatedLevels;
+  ResourcesContainer *m_resources;
+  std::map<std::string, UCHAR> m_contextNames;
+  std::map<unsigned long, std::string> m_contextNamesByRenderId;
 
-	bool m_updatingPassiveCacheIds;
-	int m_currentPassiveCacheId;
+  bool m_updatingPassiveCacheIds;
+  int m_currentPassiveCacheId;
 
-	bool m_enabled;
+  bool m_enabled;
 
 public:
-	TPassiveCacheManager();
-	~TPassiveCacheManager();
+  TPassiveCacheManager();
+  ~TPassiveCacheManager();
 
-	static TPassiveCacheManager *instance();
+  static TPassiveCacheManager *instance();
 
-	void setContextName(unsigned long renderId, const std::string &name);
-	void releaseContextNamesWithPrefix(const std::string &prefix);
+  void setContextName(unsigned long renderId, const std::string &name);
+  void releaseContextNamesWithPrefix(const std::string &prefix);
 
-	TFx *getNotAllowingAncestor(TFx *fx);
+  TFx *getNotAllowingAncestor(TFx *fx);
 
-	void setEnabled(bool enabled);
-	bool isEnabled() const;
+  void setEnabled(bool enabled);
+  bool isEnabled() const;
 
-	void reset();
+  void reset();
 
-	enum StorageFlag { NONE = 0x0,
-					   IN_MEMORY = 0x1,
-					   ON_DISK = 0x2 };
-	void setStorageMode(StorageFlag mode);
-	StorageFlag getStorageMode() const;
+  enum StorageFlag { NONE = 0x0, IN_MEMORY = 0x1, ON_DISK = 0x2 };
+  void setStorageMode(StorageFlag mode);
+  StorageFlag getStorageMode() const;
 
-	int declareCached(TFx *fx, int passiveCacheId);
-	void onSceneLoaded();
-	int getPassiveCacheId(TFx *fx);
+  int declareCached(TFx *fx, int passiveCacheId);
+  void onSceneLoaded();
+  int getPassiveCacheId(TFx *fx);
 
-	void enableCache(TFx *fx);
-	void disableCache(TFx *fx);
-	bool cacheEnabled(TFx *fx);
-	void toggleCache(TFx *fx);
+  void enableCache(TFx *fx);
+  void disableCache(TFx *fx);
+  bool cacheEnabled(TFx *fx);
+  void toggleCache(TFx *fx);
 
-	StorageFlag getStorageMode(TFx *fx);
+  StorageFlag getStorageMode(TFx *fx);
 
-	void invalidateLevel(const std::string &levelName);
-	void forceInvalidate();
+  void invalidateLevel(const std::string &levelName);
+  void forceInvalidate();
 
-	void getResource(
-		TCacheResourceP &resource, const std::string &alias,
-		const TFxP &fx, double frame, const TRenderSettings &rs,
-		ResourceDeclaration *resData);
+  void getResource(TCacheResourceP &resource, const std::string &alias,
+                   const TFxP &fx, double frame, const TRenderSettings &rs,
+                   ResourceDeclaration *resData);
 
-	void onRenderInstanceStart(unsigned long renderId);
-	void onRenderInstanceEnd(unsigned long renderId);
+  void onRenderInstanceStart(unsigned long renderId);
+  void onRenderInstanceEnd(unsigned long renderId);
 
-	void onRenderStatusEnd(int renderStatus);
+  void onRenderStatusEnd(int renderStatus);
 
-	bool renderHasOwnership() { return false; }
+  bool renderHasOwnership() { return false; }
 
 public:
-	void setTreeDescriptor(TreeDescriptor callback);
+  void setTreeDescriptor(TreeDescriptor callback);
 
-	void onFxChanged(const TFxP &fx);
-	void onXsheetChanged();
-
-private:
-	TreeDescriptor m_descriptorCallback;
-	StorageFlag m_currStorageFlag;
+  void onFxChanged(const TFxP &fx);
+  void onXsheetChanged();
 
 private:
-	void touchFxData(int &idx);
+  TreeDescriptor m_descriptorCallback;
+  StorageFlag m_currStorageFlag;
 
-	int getNewPassiveCacheId();
-	int updatePassiveCacheId(int id);
+private:
+  void touchFxData(int &idx);
 
-	std::string getContextName();
-	void releaseOldResources();
+  int getNewPassiveCacheId();
+  int updatePassiveCacheId(int id);
+
+  std::string getContextName();
+  void releaseOldResources();
 };
 
-#endif //TPASSIVECACHEMANAGER_INCLUDED
+#endif  // TPASSIVECACHEMANAGER_INCLUDED

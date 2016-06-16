@@ -12,64 +12,60 @@ class TImageReaderMov;
 
 bool IsQuickTimeInstalled();
 
-class TLevelWriterMov : public TLevelWriter
-{
+class TLevelWriterMov : public TLevelWriter {
 public:
-	TLevelWriterMov(const TFilePath &path, TWriterInfo *winfo);
-	~TLevelWriterMov();
-	TImageWriterP getFrameWriter(TFrameId fid);
-	friend class TImageWriterMov;
+  TLevelWriterMov(const TFilePath &path, TWriterInfo *winfo);
+  ~TLevelWriterMov();
+  TImageWriterP getFrameWriter(TFrameId fid);
+  friend class TImageWriterMov;
 
 public:
-	static TLevelWriter *create(const TFilePath &f, TWriterInfo *winfo)
-	{
-		return new TLevelWriterMov(f, winfo);
-	};
-	void saveSoundTrack(TSoundTrack *st);
+  static TLevelWriter *create(const TFilePath &f, TWriterInfo *winfo) {
+    return new TLevelWriterMov(f, winfo);
+  };
+  void saveSoundTrack(TSoundTrack *st);
 };
 
-class TLevelReaderMov : public TLevelReader
-{
+class TLevelReaderMov : public TLevelReader {
 public:
-	TLevelReaderMov(const TFilePath &path);
-	~TLevelReaderMov();
-	TImageReaderP getFrameReader(TFrameId fid);
-	friend class TImageReaderMov;
-	TLevelP loadInfo();
+  TLevelReaderMov(const TFilePath &path);
+  ~TLevelReaderMov();
+  TImageReaderP getFrameReader(TFrameId fid);
+  friend class TImageReaderMov;
+  TLevelP loadInfo();
 
-	int m_IOError;
+  int m_IOError;
 
 private:
-	TThread::Mutex m_mutex;
-	short m_refNum;
-	short m_resId;
-	long m_depth;
-	int m_lx, m_ly;
-	oqt_t *m_fileMov;
-	int m_lastFrameDecoded;
+  TThread::Mutex m_mutex;
+  short m_refNum;
+  short m_resId;
+  long m_depth;
+  int m_lx, m_ly;
+  oqt_t *m_fileMov;
+  int m_lastFrameDecoded;
 
 public:
-	static TLevelReader *create(const TFilePath &f)
-	{
-		return new TLevelReaderMov(f);
-	};
+  static TLevelReader *create(const TFilePath &f) {
+    return new TLevelReaderMov(f);
+  };
 };
 
 //-----------------------------------------------------------------------------
 
-class TWriterInfoMov : public TWriterInfo
-{
-	//friend TImageWriterMov;
+class TWriterInfoMov : public TWriterInfo {
+  // friend TImageWriterMov;
 public:
-	static TWriterInfo *create(const string &ext) { return new TWriterInfoMov(); }
-	~TWriterInfoMov() {}
-	TWriterInfo *clone() const { return new TWriterInfoMov(); }
+  static TWriterInfo *create(const string &ext) { return new TWriterInfoMov(); }
+  ~TWriterInfoMov() {}
+  TWriterInfo *clone() const { return new TWriterInfoMov(); }
+
 private:
-	TWriterInfoMov() {}
+  TWriterInfoMov() {}
 
-	TWriterInfoMov(const TWriterInfoMov &);
+  TWriterInfoMov(const TWriterInfoMov &);
 
-	TWriterInfoMov &operator=(const TWriterInfoMov &); // not implemented
+  TWriterInfoMov &operator=(const TWriterInfoMov &);  // not implemented
 };
 
-#endif //TIIO_MOV_H
+#endif  // TIIO_MOV_H

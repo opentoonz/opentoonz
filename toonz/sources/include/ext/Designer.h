@@ -19,8 +19,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-namespace ToonzExt
-{
+namespace ToonzExt {
 class SmoothDeformation;
 class CornerDeformation;
 class StraightCornerDeformation;
@@ -30,36 +29,28 @@ class Selector;
 /**
    * @brief This class is a visitor to manage properly Draw method.
    */
-class DVAPI
-	Designer
-{
+class DVAPI Designer {
 public:
-	Designer();
-	virtual ~Designer();
-	/**
-     */
-	virtual void
-	draw(SmoothDeformation *);
+  Designer();
+  virtual ~Designer();
+  /**
+*/
+  virtual void draw(SmoothDeformation *);
 
-	/**
-     */
-	virtual void
-	draw(CornerDeformation *);
+  /**
+*/
+  virtual void draw(CornerDeformation *);
 
-	virtual void
-	draw(StraightCornerDeformation *);
+  virtual void draw(StraightCornerDeformation *);
 
-	virtual void
-	draw(StrokeDeformation *);
+  virtual void draw(StrokeDeformation *);
 
-	virtual void
-	draw(Selector *);
+  virtual void draw(Selector *);
 
-	double
-	getPixelSize2() const;
+  double getPixelSize2() const;
 };
 }
-#endif // !defined(DESIGNER_H)
+#endif  // !defined(DESIGNER_H)
 //-----------------------------------------------------------------------------
 //  End Of File
 //-----------------------------------------------------------------------------

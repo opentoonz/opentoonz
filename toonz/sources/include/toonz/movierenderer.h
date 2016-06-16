@@ -39,53 +39,49 @@ In a more generic view, the term 'movie' represents here a generic sequence
 of images, which may even be kept in memory rather than written to file.
 */
 
-class DVAPI MovieRenderer : public QObject
-{
-	Q_OBJECT
+class DVAPI MovieRenderer : public QObject {
+  Q_OBJECT
 
-	class Imp;
-	Imp *m_imp;
-
-public:
-	class Listener
-	{
-	public:
-		virtual bool onFrameCompleted(int frame) = 0;
-		virtual bool onFrameFailed(int frame, TException &e) = 0;
-		virtual void onSequenceCompleted(const TFilePath &fp) = 0;
-		virtual ~Listener() {}
-	};
+  class Imp;
+  Imp *m_imp;
 
 public:
-	MovieRenderer(ToonzScene *scene,
-				  const TFilePath &moviePath,
-				  int threadCount = 1,
-				  bool cacheResults = true);
+  class Listener {
+  public:
+    virtual bool onFrameCompleted(int frame) = 0;
+    virtual bool onFrameFailed(int frame, TException &e) = 0;
+    virtual void onSequenceCompleted(const TFilePath &fp) = 0;
+    virtual ~Listener() {}
+  };
 
-	~MovieRenderer();
+public:
+  MovieRenderer(ToonzScene *scene, const TFilePath &moviePath,
+                int threadCount = 1, bool cacheResults = true);
 
-	void setRenderSettings(const TRenderSettings &renderData);
-	void setDpi(double xDpi, double yDpi);
+  ~MovieRenderer();
 
-	void addListener(Listener *listener);
+  void setRenderSettings(const TRenderSettings &renderData);
+  void setDpi(double xDpi, double yDpi);
 
-	void enablePrecomputing(bool on);
-	bool isPrecomputingEnabled() const;
+  void addListener(Listener *listener);
 
-	TRenderer *getTRenderer();
+  void enablePrecomputing(bool on);
+  bool isPrecomputingEnabled() const;
 
-	void addFrame(double frame, const TFxPair &fx);
+  TRenderer *getTRenderer();
 
-	void start();
+  void addFrame(double frame, const TFxPair &fx);
+
+  void start();
 
 public slots:
 
-	void onCanceled();
+  void onCanceled();
 
 private:
-	// not implemented
-	MovieRenderer(const MovieRenderer &);
-	MovieRenderer &operator=(const MovieRenderer &);
+  // not implemented
+  MovieRenderer(const MovieRenderer &);
+  MovieRenderer &operator=(const MovieRenderer &);
 };
 
 #endif

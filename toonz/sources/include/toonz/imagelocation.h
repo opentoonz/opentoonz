@@ -33,29 +33,24 @@ class TStageObjectSpline;
 //
 // TImageLocation
 //
-class DVAPI TImageLocation
-{
+class DVAPI TImageLocation {
 public:
-	int m_row, m_col;
-	TFrameId m_fid;
-	// TStageObjectId m_pid;
-	wstring m_levelName;
-	TStageObjectSpline *m_spline;
+  int m_row, m_col;
+  TFrameId m_fid;
+  // TStageObjectId m_pid;
+  wstring m_levelName;
+  TStageObjectSpline *m_spline;
 
-	enum Type {
-		None,
-		XsheetImage,
-		LevelStripImage,
-		PathImage
-	};
+  enum Type { None, XsheetImage, LevelStripImage, PathImage };
 
-	Type m_type;
+  Type m_type;
 
-	TImageLocation();
-	TImageLocation(int row, int col); // XsheetImage
-	// TImageLocation(const TStageObjectId &pid); // PathImage
-	TImageLocation(TStageObjectSpline *spline);				// PathImage
-	TImageLocation(std::wstring levelName, const TFrameId &fid); // LevelStripImage
+  TImageLocation();
+  TImageLocation(int row, int col);  // XsheetImage
+  // TImageLocation(const TStageObjectId &pid); // PathImage
+  TImageLocation(TStageObjectSpline *spline);  // PathImage
+  TImageLocation(std::wstring levelName,
+                 const TFrameId &fid);  // LevelStripImage
 };
 
 #endif

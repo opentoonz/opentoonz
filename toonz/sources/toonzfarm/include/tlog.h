@@ -24,8 +24,7 @@ class TFilePath;
 #define TFARMAPI
 #endif
 
-namespace TSysLog
-{
+namespace TSysLog {
 TFARMAPI void success(const QString &msg);
 TFARMAPI void warning(const QString &msg);
 TFARMAPI void error(const QString &msg);
@@ -34,20 +33,19 @@ TFARMAPI void info(const QString &msg);
 
 //------------------------------------------------------------------------------
 
-class TFARMAPI TUserLog
-{
+class TFARMAPI TUserLog {
 public:
-	TUserLog(); // used to redirect log messages to the console
-	TUserLog(const TFilePath &fp);
-	~TUserLog();
+  TUserLog();  // used to redirect log messages to the console
+  TUserLog(const TFilePath &fp);
+  ~TUserLog();
 
-	void warning(const QString &msg);
-	void error(const QString &msg);
-	void info(const QString &msg);
+  void warning(const QString &msg);
+  void error(const QString &msg);
+  void info(const QString &msg);
 
 private:
-	class Imp;
-	std::unique_ptr<Imp> m_imp;
+  class Imp;
+  std::unique_ptr<Imp> m_imp;
 };
 
 #endif

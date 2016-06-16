@@ -3,17 +3,16 @@
 #ifndef ADJUST_LEVELS_POPUP_H
 #define ADJUST_LEVELS_POPUP_H
 
-//tnzcore includes
+// tnzcore includes
 #include "traster.h"
 
-//toonzQt includes
+// toonzQt includes
 #include "toonzqt/dvdialog.h"
 #include "toonzqt/planeviewer.h"
 #include "toonzqt/marksbar.h"
 
 class Histogram;
-namespace DVGui
-{
+namespace DVGui {
 class IntLineEdit;
 }
 
@@ -25,83 +24,81 @@ class QPushButton;
 //    EditableMarksBar  declaration
 //**************************************************************
 
-class EditableMarksBar : public QFrame
-{
-	Q_OBJECT
+class EditableMarksBar : public QFrame {
+  Q_OBJECT
 
-	MarksBar *m_marksBar;
-	DVGui::IntLineEdit *m_fields[2];
-
-public:
-	EditableMarksBar(QWidget *parent = 0);
-	~EditableMarksBar();
+  MarksBar *m_marksBar;
+  DVGui::IntLineEdit *m_fields[2];
 
 public:
-	const QVector<int> &marks() const { return m_marksBar->values(); }
+  EditableMarksBar(QWidget *parent = 0);
+  ~EditableMarksBar();
 
-	const MarksBar *marksBar() const { return m_marksBar; }
-	MarksBar *marksBar() { return m_marksBar; }
+public:
+  const QVector<int> &marks() const { return m_marksBar->values(); }
 
-	void getValues(int *values) const;
+  const MarksBar *marksBar() const { return m_marksBar; }
+  MarksBar *marksBar() { return m_marksBar; }
+
+  void getValues(int *values) const;
 
 signals:
 
-	void paramsChanged();
+  void paramsChanged();
 
 protected slots:
 
-	void onFieldEdited();
+  void onFieldEdited();
 
 public slots:
 
-	void updateFields();
+  void updateFields();
 };
 
 //**************************************************************
 //    Adjust-Levels Popup  declaration
 //**************************************************************
 
-class AdjustLevelsPopup : public DVGui::Dialog
-{
-	Q_OBJECT
+class AdjustLevelsPopup : public DVGui::Dialog {
+  Q_OBJECT
 
-	Histogram *m_histogram;
-	QPushButton *m_okBtn;
+  Histogram *m_histogram;
+  QPushButton *m_okBtn;
 
-	EditableMarksBar *m_marksBar[10];
+  EditableMarksBar *m_marksBar[10];
 
-	TRasterP m_inputRas;
+  TRasterP m_inputRas;
 
-	double m_thresholdD;
-	int m_threshold;
+  double m_thresholdD;
+  int m_threshold;
 
 private:
-	class Swatch;
-	Swatch *m_viewer;
+  class Swatch;
+  Swatch *m_viewer;
 
 public:
-	AdjustLevelsPopup();
+  AdjustLevelsPopup();
 
 protected:
-	void showEvent(QShowEvent *se);
-	void hideEvent(QHideEvent *se);
+  void showEvent(QShowEvent *se);
+  void hideEvent(QHideEvent *se);
 
-	void acquireRaster();
-	void updateProcessedImage();
-	void getParameters(int *in0, int *in1, int *out0, int *out1);
+  void acquireRaster();
+  void updateProcessedImage();
+  void getParameters(int *in0, int *in1, int *out0, int *out1);
 
-	void setThreshold(double t);
+  void setThreshold(double t);
 
 protected slots:
 
-	void clampRange();
-	void autoAdjust();
-	void reset();
+  void clampRange();
+  void autoAdjust();
+  void reset();
 
-	void onSelectionChanged();
-	void onParamsChanged();
+  void onSelectionChanged();
+  void onParamsChanged();
 
-	void apply();
+  void apply();
 };
 
-#endif //ADJUST_LEVELS_POPUP_H
+#endif  // ADJUST_LEVELS_POPUP_H

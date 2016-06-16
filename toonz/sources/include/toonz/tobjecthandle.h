@@ -26,43 +26,45 @@ class TStageObjectSpline;
 //-----------------------------------------------------------------------------
 /*!
   Mantiene un riferimento ad un particolare oggetto (da editare)
-  L'oggetto e' una objectId : puo' essere il tavolo, la camera, una colonna o una
+  L'oggetto e' una objectId : puo' essere il tavolo, la camera, una colonna o
+  una
   pegbar propriamente detta.
   Puo' anche essere la spline associata all'oggetto
 */
 
-class DVAPI TObjectHandle : public QObject
-{
-	Q_OBJECT
+class DVAPI TObjectHandle : public QObject {
+  Q_OBJECT
 
-	TStageObjectId m_objectId;
-	bool m_isSpline;
-	TVectorImage *m_splineImage;
-	TStageObjectSpline *m_currentSpline;
+  TStageObjectId m_objectId;
+  bool m_isSpline;
+  TVectorImage *m_splineImage;
+  TStageObjectSpline *m_currentSpline;
 
 public:
-	TObjectHandle();
-	~TObjectHandle();
+  TObjectHandle();
+  ~TObjectHandle();
 
-	TStageObjectId getObjectId();
-	void setObjectId(TStageObjectId objectId);
+  TStageObjectId getObjectId();
+  void setObjectId(TStageObjectId objectId);
 
-	void notifyObjectIdChanged(bool isDragging) { emit objectChanged(isDragging); }
-	void notifyObjectIdSwitched() { emit objectSwitched(); }
+  void notifyObjectIdChanged(bool isDragging) {
+    emit objectChanged(isDragging);
+  }
+  void notifyObjectIdSwitched() { emit objectSwitched(); }
 
-	bool isSpline() const { return m_isSpline; }
-	void setIsSpline(bool isSpline);
+  bool isSpline() const { return m_isSpline; }
+  void setIsSpline(bool isSpline);
 
-	TVectorImage *getSplineImage() const { return m_splineImage; }
-	void setSplineObject(TStageObjectSpline *splineObject);
+  TVectorImage *getSplineImage() const { return m_splineImage; }
+  void setSplineObject(TStageObjectSpline *splineObject);
 
 signals:
-	void objectSwitched();
-	void objectChanged(bool isDragging);
-	void splineChanged();
+  void objectSwitched();
+  void objectChanged(bool isDragging);
+  void splineChanged();
 
 public slots:
-	void commitSplineChanges();
+  void commitSplineChanges();
 };
 
-#endif //TOBJECTHANDLE_H
+#endif  // TOBJECTHANDLE_H

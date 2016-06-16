@@ -11,8 +11,7 @@ class QSlider;
 class ImageViewer;
 class TSelection;
 
-namespace DVGui
-{
+namespace DVGui {
 class ColorField;
 class IntField;
 }
@@ -21,35 +20,34 @@ class IntField;
 // LinesFadePopup
 //-----------------------------------------------------------------------------
 
-class LinesFadePopup : public DVGui::Dialog
-{
-	Q_OBJECT
+class LinesFadePopup : public DVGui::Dialog {
+  Q_OBJECT
 
-	DVGui::ColorField *m_linesColorField;
-	DVGui::IntField *m_intensity;
-	QPushButton *m_okBtn;
-	TRaster32P m_startRas;
+  DVGui::ColorField *m_linesColorField;
+  DVGui::IntField *m_intensity;
+  QPushButton *m_okBtn;
+  TRaster32P m_startRas;
 
 private:
-	class Swatch;
-	Swatch *m_viewer;
+  class Swatch;
+  Swatch *m_viewer;
 
 public:
-	LinesFadePopup();
+  LinesFadePopup();
 
 protected:
-	void showEvent(QShowEvent *e);
-	void hideEvent(QHideEvent *e);
+  void showEvent(QShowEvent *e);
+  void hideEvent(QHideEvent *e);
 
 protected slots:
 
-	void setCurrentSampleRaster();
+  void setCurrentSampleRaster();
 
 public slots:
 
-	void apply();
-	void onLinesColorChanged(const TPixel32 &, bool);
-	void onIntensityChanged(bool isDragging);
+  void apply();
+  void onLinesColorChanged(const TPixel32 &, bool);
+  void onIntensityChanged(bool isDragging);
 };
 
-#endif // LINESFADEPOPUP_H
+#endif  // LINESFADEPOPUP_H

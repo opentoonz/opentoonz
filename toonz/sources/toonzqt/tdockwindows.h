@@ -21,7 +21,7 @@
 
 //========================================================================
 
-//Forward declarations
+// Forward declarations
 class TDockWidget;
 
 //========================================================================
@@ -36,31 +36,30 @@ for DockLayout.
 
 \sa TDockWidget class.
 */
-class DVAPI TMainWindow : public QWidget
-{
-	Q_OBJECT //Just needed by qobject_cast, for now
+class DVAPI TMainWindow : public QWidget {
+  Q_OBJECT  // Just needed by qobject_cast, for now
 
-		DockLayout *m_layout;
-	QWidget *m_menu;
+      DockLayout *m_layout;
+  QWidget *m_menu;
 
 public:
-	TMainWindow(QWidget *parent = 0, Qt::WindowFlags flags = 0);
-	virtual ~TMainWindow();
+  TMainWindow(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  virtual ~TMainWindow();
 
-	void addDockWidget(TDockWidget *item);
-	void removeDockWidget(TDockWidget *item);
+  void addDockWidget(TDockWidget *item);
+  void removeDockWidget(TDockWidget *item);
 
-	void setMenuWidget(QWidget *menubar);
-	QWidget *menuWidget() const { return m_menu; }
+  void setMenuWidget(QWidget *menubar);
+  QWidget *menuWidget() const { return m_menu; }
 
-	//Style options
-	void setDecoAllocator(DockDecoAllocator *allocator);
-	void setSeparatorsThickness(int thick);
+  // Style options
+  void setDecoAllocator(DockDecoAllocator *allocator);
+  void setSeparatorsThickness(int thick);
 
-	DockLayout *dockLayout() const { return m_layout; }
+  DockLayout *dockLayout() const { return m_layout; }
 
 protected:
-	virtual void resizeEvent(QResizeEvent *event);
+  virtual void resizeEvent(QResizeEvent *event);
 };
 
 //========================================================================
@@ -76,48 +75,47 @@ content widget.
 
 \sa TMainWindow class.
 */
-class DVAPI TDockWidget : public DockWidget
-{
-	Q_OBJECT //Needed by qobject_cast
+class DVAPI TDockWidget : public DockWidget {
+  Q_OBJECT  // Needed by qobject_cast
 
-		QWidget *m_titlebar;
-	QWidget *m_widget;
+      QWidget *m_titlebar;
+  QWidget *m_widget;
 
-	int m_margin;
+  int m_margin;
 
 public:
-	TDockWidget(const QString &title, QWidget *parent = 0, Qt::WindowFlags flags = 0);
-	TDockWidget(QWidget *parent = 0, Qt::WindowFlags flags = 0);
-	~TDockWidget() {}
+  TDockWidget(const QString &title, QWidget *parent = 0,
+              Qt::WindowFlags flags = 0);
+  TDockWidget(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  ~TDockWidget() {}
 
-	void setTitleBarWidget(QWidget *titlebar);
-	QWidget *titleBarWidget() const { return m_titlebar; }
-	void setFloatingMargin(int margin) { m_margin = margin; }
-	int getFloatingMargin() const { return m_margin; }
+  void setTitleBarWidget(QWidget *titlebar);
+  QWidget *titleBarWidget() const { return m_titlebar; }
+  void setFloatingMargin(int margin) { m_margin = margin; }
+  int getFloatingMargin() const { return m_margin; }
 
-	void setWidget(QWidget *widget);
-	QWidget *widget() const { return m_widget; }
+  void setWidget(QWidget *widget);
+  QWidget *widget() const { return m_widget; }
 
-	void setFloating(bool status = true);
-	void setMaximized(bool status = true);
+  void setFloating(bool status = true);
+  void setMaximized(bool status = true);
 
-	enum Orientation { horizontal = 0,
-					   vertical = 1 };
-	void setOrientation(bool direction = vertical);
-	bool getOrientation() const;
+  enum Orientation { horizontal = 0, vertical = 1 };
+  void setOrientation(bool direction = vertical);
+  bool getOrientation() const;
 
 private:
-	QSize getDockedMinimumSize();
-	QSize getDockedMaximumSize();
-	void setFloatingAppearance();
-	void setDockedAppearance();
+  QSize getDockedMinimumSize();
+  QSize getDockedMaximumSize();
+  void setFloatingAppearance();
+  void setDockedAppearance();
 
-	void selectDockPlaceholder(QMouseEvent *me);
+  void selectDockPlaceholder(QMouseEvent *me);
 
-	bool isDragGrip(QPoint p);
-	int isResizeGrip(QPoint p);
+  bool isDragGrip(QPoint p);
+  int isResizeGrip(QPoint p);
 
-	void windowTitleEvent(QEvent *e);
+  void windowTitleEvent(QEvent *e);
 };
 
-#endif //TDOCKWINDOWS_H
+#endif  // TDOCKWINDOWS_H

@@ -16,203 +16,182 @@ class TTextField;
 class TLabel;
 class TButton;
 
-namespace TFarmStuff
-{
+namespace TFarmStuff {
 
 //------------------------------------------------------------------------------
 
-class TFarmPage : public TWidget
-{
+class TFarmPage : public TWidget {
 public:
-	TFarmPage(TWidget *parent, const std::string &name) : TWidget(parent, name) {}
-	virtual ~TFarmPage() {}
+  TFarmPage(TWidget *parent, const std::string &name) : TWidget(parent, name) {}
+  virtual ~TFarmPage() {}
 
-	virtual void onActivate() {}
-	virtual void onDeactivate() {}
+  virtual void onActivate() {}
+  virtual void onDeactivate() {}
 
-	virtual void update() {}
+  virtual void update() {}
 };
 
 //------------------------------------------------------------------------------
 
-class TaskInfoPage : public TFarmPage
-{
+class TaskInfoPage : public TFarmPage {
 public:
-	TaskInfoPage(TWidget *parent);
-	~TaskInfoPage();
+  TaskInfoPage(TWidget *parent);
+  ~TaskInfoPage();
 
-	void configureNotify(const TDimension &size);
-	void rightButtonDown(const TMouseEvent &e);
+  void configureNotify(const TDimension &size);
+  void rightButtonDown(const TMouseEvent &e);
 
-	void onActivate();
-	void onDeactivate();
-	void update();
+  void onActivate();
+  void onDeactivate();
+  void update();
 
-	void showTaskInfo(const std::string &id);
+  void showTaskInfo(const std::string &id);
 
 private:
-	class Data;
-	Data *m_data;
+  class Data;
+  Data *m_data;
 };
 
 //------------------------------------------------------------------------------
 
-class SubmitPageTask
-{
+class SubmitPageTask {
 public:
-	virtual ~SubmitPageTask() {}
+  virtual ~SubmitPageTask() {}
 
-	/*
-  virtual void setFileArg(const std::string &fp) = 0;
-  virtual void setCommandLine(const std::string &cmdLine) = 0;
-  virtual void setDefaultValue() = 0;
+  /*
+virtual void setFileArg(const std::string &fp) = 0;
+virtual void setCommandLine(const std::string &cmdLine) = 0;
+virtual void setDefaultValue() = 0;
 */
 
-	virtual std::string getCommandLine() const = 0;
+  virtual std::string getCommandLine() const = 0;
 
-	virtual std::string getFilePath()
-	{
-		return m_filePath;
-	}
+  virtual std::string getFilePath() { return m_filePath; }
 
-	virtual void setFilePath(const std::string &filePath)
-	{
-		m_filePath = filePath;
-	}
+  virtual void setFilePath(const std::string &filePath) {
+    m_filePath = filePath;
+  }
 
-	virtual std::string getName()
-	{
-		return m_name;
-	}
+  virtual std::string getName() { return m_name; }
 
-	virtual void setName(const std::string &name)
-	{
-		m_name = name;
-	}
+  virtual void setName(const std::string &name) { m_name = name; }
 
-	/*
-  virtual map<std::string, string> getDependencies();
-  virtual void setDependencies(const map<std::string, string> &tasks);
+  /*
+virtual map<std::string, string> getDependencies();
+virtual void setDependencies(const map<std::string, string> &tasks);
 */
-	static SubmitPageTask *create(const std::string &type);
+  static SubmitPageTask *create(const std::string &type);
 
 protected:
-	std::string m_filePath;
-	std::string m_name;
-	std::map<std::string, std::string> m_depTasks;
+  std::string m_filePath;
+  std::string m_name;
+  std::map<std::string, std::string> m_depTasks;
 };
 
 //------------------------------------------------------------------------------
 
-class SubmitPage : public TFarmPage
-{
+class SubmitPage : public TFarmPage {
 public:
-	SubmitPage(TWidget *parent);
-	~SubmitPage();
+  SubmitPage(TWidget *parent);
+  ~SubmitPage();
 
-	void configureNotify(const TDimension &size);
+  void configureNotify(const TDimension &size);
 
-	void onActivate();
-	void onDeactivate();
+  void onActivate();
+  void onDeactivate();
 
-	SubmitPageTask *getTask() const;
-	void setTask(SubmitPageTask *task);
-	void onTextField(const std::string &name, bool isName);
+  SubmitPageTask *getTask() const;
+  void setTask(SubmitPageTask *task);
+  void onTextField(const std::string &name, bool isName);
 
-	class Data;
-	Data *m_data;
+  class Data;
+  Data *m_data;
 };
 
 //------------------------------------------------------------------------------
 
-class TaskConfigPanel : public TWidget
-{
+class TaskConfigPanel : public TWidget {
 public:
-	TaskConfigPanel(TWidget *parent) : TWidget(parent) {}
+  TaskConfigPanel(TWidget *parent) : TWidget(parent) {}
 
-	virtual void setTask(SubmitPageTask *task) = 0;
-	virtual SubmitPageTask *getTask() const = 0;
+  virtual void setTask(SubmitPageTask *task) = 0;
+  virtual SubmitPageTask *getTask() const    = 0;
 };
 
 //------------------------------------------------------------------------------
 
-class SubmitRenderPopup : public TModalPopup
-{
+class SubmitRenderPopup : public TModalPopup {
 public:
-	SubmitRenderPopup(TWidget *parent, std::string name);
-	~SubmitRenderPopup();
+  SubmitRenderPopup(TWidget *parent, std::string name);
+  ~SubmitRenderPopup();
 
-	void onOk();
+  void onOk();
 
-	TDimension getPreferredSize() const;
+  TDimension getPreferredSize() const;
 
-	void configureNotify(const TDimension &d);
-	bool onNcPaint(bool is_active, const TDimension &size, const TRect &titlebar);
+  void configureNotify(const TDimension &d);
+  bool onNcPaint(bool is_active, const TDimension &size, const TRect &titlebar);
 
-	void popup(const TPoint &p, const TFilePath &fp);
-	void onIntFieldChange(const TNumField::Event &e);
-	void draw();
+  void popup(const TPoint &p, const TFilePath &fp);
+  void onIntFieldChange(const TNumField::Event &e);
+  void draw();
 
 private:
-	class Data;
-	Data *m_data;
+  class Data;
+  Data *m_data;
 };
 
 //------------------------------------------------------------------------------
 
-class SubmitCleanupPopup : public TModalPopup
-{
+class SubmitCleanupPopup : public TModalPopup {
 public:
-	SubmitCleanupPopup(TWidget *parent, std::string name);
-	~SubmitCleanupPopup();
+  SubmitCleanupPopup(TWidget *parent, std::string name);
+  ~SubmitCleanupPopup();
 
-	void onOk();
+  void onOk();
 
-	TDimension getPreferredSize() const;
+  TDimension getPreferredSize() const;
 
-	void configureNotify(const TDimension &d);
-	bool onNcPaint(bool is_active, const TDimension &size, const TRect &titlebar);
+  void configureNotify(const TDimension &d);
+  bool onNcPaint(bool is_active, const TDimension &size, const TRect &titlebar);
 
-	void popup(const TPoint &p, const TFilePath &fp);
-	void onIntFieldChange(const TNumField::Event &e);
-	void draw();
+  void popup(const TPoint &p, const TFilePath &fp);
+  void onIntFieldChange(const TNumField::Event &e);
+  void draw();
 
 private:
-	class Data;
-	Data *m_data;
+  class Data;
+  Data *m_data;
 };
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-class GRootEnvVarPopup : public TModalPopup
-{
+class GRootEnvVarPopup : public TModalPopup {
 public:
-	GRootEnvVarPopup(TWidget *parent, std::string name);
-	~GRootEnvVarPopup();
+  GRootEnvVarPopup(TWidget *parent, std::string name);
+  ~GRootEnvVarPopup();
 
-	void onOk();
+  void onOk();
 
-	TDimension getPreferredSize() const;
+  TDimension getPreferredSize() const;
 
-	void configureNotify(const TDimension &d);
-	void draw();
+  void configureNotify(const TDimension &d);
+  void draw();
 
-	//bool onNcPaint(bool is_active, const TDimension &size, const TRect &titlebar);
+  // bool onNcPaint(bool is_active, const TDimension &size, const TRect
+  // &titlebar);
 
-	void popup(const TPoint &p, bool missingvar);
+  void popup(const TPoint &p, bool missingvar);
 
-	bool canceled()
-	{
-		return m_canceled;
-	}
+  bool canceled() { return m_canceled; }
 
-	TLabel *m_grootVarLabel;
-	TTextField *m_grootVar;
-	TButton *m_okBtn;
-	TButton *m_cancelBtn;
+  TLabel *m_grootVarLabel;
+  TTextField *m_grootVar;
+  TButton *m_okBtn;
+  TButton *m_cancelBtn;
 
-	bool m_canceled;
-	bool m_missingvar;
+  bool m_canceled;
+  bool m_missingvar;
 };
 
 //------------------------------------------------------------------------------
@@ -229,18 +208,16 @@ void getControllerData(QString &hostName, QString &ipAddr, int &port);
 
 //------------------------------------------------------------------------------
 
-class TMissingGRootFolder : public TException
-{
+class TMissingGRootFolder : public TException {
 public:
-	TMissingGRootFolder() : TException() {}
+  TMissingGRootFolder() : TException() {}
 };
 
 //------------------------------------------------------------------------------
 
-class TMissingGRootEnvironmentVariable : public TException
-{
+class TMissingGRootEnvironmentVariable : public TException {
 public:
-	TMissingGRootEnvironmentVariable() : TException() {}
+  TMissingGRootEnvironmentVariable() : TException() {}
 };
 
-} // namespace TFarmStuff
+}  // namespace TFarmStuff

@@ -27,14 +27,13 @@ class TParam;
 //
 //  Fx Arguments
 //
-class DVAPI ITFxArguments
-{
+class DVAPI ITFxArguments {
 public:
-	ITFxArguments(){};
-	virtual ~ITFxArguments(){};
+  ITFxArguments(){};
+  virtual ~ITFxArguments(){};
 
-	virtual void add(TParam *) = 0;
-	virtual void add(TRasterFxPort *) = 0;
+  virtual void add(TParam *)        = 0;
+  virtual void add(TRasterFxPort *) = 0;
 };
 
 //----------------------------------------------------------
@@ -42,30 +41,29 @@ public:
 //
 //  RasterPort
 //
-class DVAPI TRasterFxPort
-{
-	TRasterFx *m_fx;
-	string m_name;
+class DVAPI TRasterFxPort {
+  TRasterFx *m_fx;
+  string m_name;
 
 public:
-	TRasterFxPort(ITFxArguments *args, string name)
-		: m_name(name), m_fx(0) { args->add(this); };
-	~TRasterFxPort(){};
+  TRasterFxPort(ITFxArguments *args, string name) : m_name(name), m_fx(0) {
+    args->add(this);
+  };
+  ~TRasterFxPort(){};
 
-	string getName() const { return m_name; };
-	TRasterFx *operator->() const
-	{
-		assert(m_fx != 0);
-		return m_fx;
-	};
-	bool isConnected() const { return m_fx != 0; };
+  string getName() const { return m_name; };
+  TRasterFx *operator->() const {
+    assert(m_fx != 0);
+    return m_fx;
+  };
+  bool isConnected() const { return m_fx != 0; };
 
-	void setRasterFx(TRasterFx *fx) { m_fx = fx; };
+  void setRasterFx(TRasterFx *fx) { m_fx = fx; };
 
 private:
-	// not implemented
-	TRasterFxPort(const TRasterFxPort &);
-	TRasterFxPort &operator=(const TRasterFxPort &);
+  // not implemented
+  TRasterFxPort(const TRasterFxPort &);
+  TRasterFxPort &operator=(const TRasterFxPort &);
 };
 
 //----------------------------------------------------------
@@ -73,33 +71,27 @@ private:
 //
 // RasterFx
 //
-class DVAPI TRasterFx
-{
+class DVAPI TRasterFx {
 public:
-	TRasterFx(){};
-	virtual ~TRasterFx(){};
+  TRasterFx(){};
+  virtual ~TRasterFx(){};
 
-	virtual bool getBBox(
-		double frame,
-		TRectD &bBox, // n.b Input/Output
-		TPixel32 &bgColor) = 0;
+  virtual bool getBBox(double frame,
+                       TRectD &bBox,  // n.b Input/Output
+                       TPixel32 &bgColor) = 0;
 
-	virtual string getName() const = 0;
+  virtual string getName() const = 0;
 
-	virtual TRect getInvalidRect(const TRect &max) = 0;
+  virtual TRect getInvalidRect(const TRect &max) = 0;
 
-	virtual void compute(
-		double frame,
-		const TTile &tile) = 0;
+  virtual void compute(double frame, const TTile &tile) = 0;
 
-	virtual void allocateAndCompute(
-		double frame,
-		const TDimension size, const TPointD &pos,
-		TTile &tile);
+  virtual void allocateAndCompute(double frame, const TDimension size,
+                                  const TPointD &pos, TTile &tile);
 
 private:
-	TRasterFx(const TRasterFx &);
-	TRasterFx &operator=(const TRasterFx &);
+  TRasterFx(const TRasterFx &);
+  TRasterFx &operator=(const TRasterFx &);
 };
 
 //----------------------------------------------------------

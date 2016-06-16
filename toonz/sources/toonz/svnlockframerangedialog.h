@@ -15,253 +15,247 @@ class QPlainTextEdit;
 
 //-----------------------------------------------------------------------------
 
-class SVNLockFrameRangeDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNLockFrameRangeDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	QLabel *m_commentLabel;
-	QPlainTextEdit *m_commentTextEdit;
+  QLabel *m_commentLabel;
+  QPlainTextEdit *m_commentTextEdit;
 
-	QLabel *m_fromLabel;
-	QLabel *m_toLabel;
-	DVGui::IntLineEdit *m_fromLineEdit;
-	DVGui::IntLineEdit *m_toLineEdit;
+  QLabel *m_fromLabel;
+  QLabel *m_toLabel;
+  DVGui::IntLineEdit *m_fromLineEdit;
+  DVGui::IntLineEdit *m_toLineEdit;
 
-	QPushButton *m_lockButton;
-	QPushButton *m_cancelButton;
+  QPushButton *m_lockButton;
+  QPushButton *m_cancelButton;
 
-	QString m_workingDir;
-	QString m_file;
+  QString m_workingDir;
+  QString m_file;
 
-	QString m_propertyValue;
+  QString m_propertyValue;
 
-	VersionControlThread m_thread;
+  VersionControlThread m_thread;
 
-	bool m_hasError;
+  bool m_hasError;
 
-	bool m_fromIsValid;
-	bool m_toIsValid;
+  bool m_fromIsValid;
+  bool m_toIsValid;
 
-	QList<SVNPartialLockInfo> m_lockInfos;
+  QList<SVNPartialLockInfo> m_lockInfos;
 
 public:
-	SVNLockFrameRangeDialog(QWidget *parent, const QString &workingDir,
-							const QString &file, int frameCount);
+  SVNLockFrameRangeDialog(QWidget *parent, const QString &workingDir,
+                          const QString &file, int frameCount);
 
 private:
-	void switchToCloseButton();
+  void switchToCloseButton();
 
 protected slots:
-	void onError(const QString &);
-	void onPropGetDone(const QString &);
-	void onPropSetDone();
+  void onError(const QString &);
+  void onPropGetDone(const QString &);
+  void onPropSetDone();
 
-	void onLockButtonClicked();
-	void onCancelButtonClicked();
+  void onLockButtonClicked();
+  void onCancelButtonClicked();
 
-	void onLockDone();
+  void onLockDone();
 
-	void finish();
+  void finish();
 
-	void onFromLineEditTextChanged();
-	void onToLineEditTextChanged();
+  void onFromLineEditTextChanged();
+  void onToLineEditTextChanged();
 
 signals:
-	void done(const QStringList &);
+  void done(const QStringList &);
 };
 
 //-----------------------------------------------------------------------------
 
-class SVNLockMultiFrameRangeDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNLockMultiFrameRangeDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	QLabel *m_commentLabel;
-	QPlainTextEdit *m_commentTextEdit;
+  QLabel *m_commentLabel;
+  QPlainTextEdit *m_commentTextEdit;
 
-	QLabel *m_fromLabel;
-	QLabel *m_toLabel;
-	DVGui::IntLineEdit *m_fromLineEdit;
-	DVGui::IntLineEdit *m_toLineEdit;
+  QLabel *m_fromLabel;
+  QLabel *m_toLabel;
+  DVGui::IntLineEdit *m_fromLineEdit;
+  DVGui::IntLineEdit *m_toLineEdit;
 
-	QPushButton *m_lockButton;
-	QPushButton *m_cancelButton;
+  QPushButton *m_lockButton;
+  QPushButton *m_cancelButton;
 
-	QString m_workingDir;
-	QStringList m_files;
-	QStringList m_filesToLock;
+  QString m_workingDir;
+  QStringList m_files;
+  QStringList m_filesToLock;
 
-	VersionControlThread m_thread;
+  VersionControlThread m_thread;
 
-	bool m_hasError;
+  bool m_hasError;
 
-	bool m_fromIsValid;
-	bool m_toIsValid;
+  bool m_fromIsValid;
+  bool m_toIsValid;
 
-	QList<SVNStatus> m_status;
-	QList<SVNPartialLockInfo> m_lockInfos;
+  QList<SVNStatus> m_status;
+  QList<SVNPartialLockInfo> m_lockInfos;
 
 public:
-	SVNLockMultiFrameRangeDialog(QWidget *parent, const QString &workingDir,
-								 const QStringList &files);
+  SVNLockMultiFrameRangeDialog(QWidget *parent, const QString &workingDir,
+                               const QStringList &files);
 
 private:
-	void switchToCloseButton();
+  void switchToCloseButton();
 
 protected slots:
-	void onError(const QString &);
+  void onError(const QString &);
 
-	void onLockButtonClicked();
+  void onLockButtonClicked();
 
-	void onStatusRetrieved(const QString &);
+  void onStatusRetrieved(const QString &);
 
-	void onFromLineEditTextChanged();
-	void onToLineEditTextChanged();
+  void onFromLineEditTextChanged();
+  void onToLineEditTextChanged();
 
-	void onLockDone();
+  void onLockDone();
 
 signals:
-	void done(const QStringList &);
+  void done(const QStringList &);
 };
 
 //-----------------------------------------------------------------------------
 
-class SVNUnlockFrameRangeDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNUnlockFrameRangeDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	QPushButton *m_unlockButton;
-	QPushButton *m_cancelButton;
+  QPushButton *m_unlockButton;
+  QPushButton *m_cancelButton;
 
-	QString m_workingDir;
-	QString m_file;
+  QString m_workingDir;
+  QString m_file;
 
-	QString m_propertyValue;
+  QString m_propertyValue;
 
-	VersionControlThread m_thread;
+  VersionControlThread m_thread;
 
-	bool m_hasError;
+  bool m_hasError;
 
-	QList<SVNPartialLockInfo> m_lockInfos;
-	SVNPartialLockInfo m_myInfo;
+  QList<SVNPartialLockInfo> m_lockInfos;
+  SVNPartialLockInfo m_myInfo;
 
 public:
-	SVNUnlockFrameRangeDialog(QWidget *parent, const QString &workingDir,
-							  const QString &file);
+  SVNUnlockFrameRangeDialog(QWidget *parent, const QString &workingDir,
+                            const QString &file);
 
 private:
-	void switchToCloseButton();
+  void switchToCloseButton();
 
 protected slots:
-	void onError(const QString &);
-	void onPropGetDone(const QString &);
-	void onPropSetDone();
+  void onError(const QString &);
+  void onPropGetDone(const QString &);
+  void onPropSetDone();
 
-	void onUnlockButtonClicked();
+  void onUnlockButtonClicked();
 
-	void onCommitDone();
-	void onUpdateDone();
-	void onLockDone();
+  void onCommitDone();
+  void onUpdateDone();
+  void onLockDone();
 
 signals:
-	void done(const QStringList &);
+  void done(const QStringList &);
 };
 
 //-----------------------------------------------------------------------------
 
-class SVNUnlockMultiFrameRangeDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNUnlockMultiFrameRangeDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	QPushButton *m_unlockButton;
-	QPushButton *m_cancelButton;
+  QPushButton *m_unlockButton;
+  QPushButton *m_cancelButton;
 
-	QString m_workingDir;
-	QStringList m_files;
+  QString m_workingDir;
+  QStringList m_files;
 
-	VersionControlThread m_thread;
+  VersionControlThread m_thread;
 
-	bool m_hasError;
+  bool m_hasError;
 
-	QList<SVNStatus> m_status;
-	QStringList m_filesToUnlock;
+  QList<SVNStatus> m_status;
+  QStringList m_filesToUnlock;
 
 public:
-	SVNUnlockMultiFrameRangeDialog(QWidget *parent, const QString &workingDir,
-								   const QStringList &files);
+  SVNUnlockMultiFrameRangeDialog(QWidget *parent, const QString &workingDir,
+                                 const QStringList &files);
 
 private:
-	void switchToCloseButton();
+  void switchToCloseButton();
 
 protected slots:
-	void onError(const QString &);
+  void onError(const QString &);
 
-	void onStatusRetrieved(const QString &);
+  void onStatusRetrieved(const QString &);
 
-	void onUnlockButtonClicked();
+  void onUnlockButtonClicked();
 
-	void onUnlockDone();
+  void onUnlockDone();
 
 signals:
-	void done(const QStringList &);
+  void done(const QStringList &);
 };
 
 //-----------------------------------------------------------------------------
 
-class SVNFrameRangeLockInfoDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNFrameRangeLockInfoDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QString m_workingDir;
-	QString m_file;
+  QString m_workingDir;
+  QString m_file;
 
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	VersionControlThread m_thread;
+  VersionControlThread m_thread;
 
 public:
-	SVNFrameRangeLockInfoDialog(QWidget *parent, const QString &workingDir,
-								const QString &file);
+  SVNFrameRangeLockInfoDialog(QWidget *parent, const QString &workingDir,
+                              const QString &file);
 
 protected slots:
-	void onError(const QString &);
-	void onPropGetDone(const QString &);
+  void onError(const QString &);
+  void onPropGetDone(const QString &);
 };
 
 //-----------------------------------------------------------------------------
 
-class SVNMultiFrameRangeLockInfoDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNMultiFrameRangeLockInfoDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QString m_workingDir;
-	QStringList m_files;
+  QString m_workingDir;
+  QStringList m_files;
 
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	VersionControlThread m_thread;
+  VersionControlThread m_thread;
 
 public:
-	SVNMultiFrameRangeLockInfoDialog(QWidget *parent, const QString &workingDir,
-									 const QStringList &files);
+  SVNMultiFrameRangeLockInfoDialog(QWidget *parent, const QString &workingDir,
+                                   const QStringList &files);
 
 protected slots:
-	void onError(const QString &);
-	void onStatusRetrieved(const QString &);
+  void onError(const QString &);
+  void onStatusRetrieved(const QString &);
 };
 
-#endif // SVN_LOCK_FRAME_RANGE_DIALOG_H
+#endif  // SVN_LOCK_FRAME_RANGE_DIALOG_H

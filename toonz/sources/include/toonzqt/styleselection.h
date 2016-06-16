@@ -28,84 +28,76 @@ class TXshLevelHandle;
 // TStyleSelection
 //-----------------------------------------------------------------------------
 
-class DVAPI TStyleSelection : public TSelection
-{
-	TPaletteHandle *m_paletteHandle;
+class DVAPI TStyleSelection : public TSelection {
+  TPaletteHandle *m_paletteHandle;
 
-	//Used to change level palette; in other palette (cleanup, ...) xsheetHandle is not necessary.
-	TXsheetHandle *m_xsheetHandle;
-	//for clearing cache when the pastestyle command is executed
-	TXshLevelHandle *m_levelHandle;
+  // Used to change level palette; in other palette (cleanup, ...) xsheetHandle
+  // is not necessary.
+  TXsheetHandle *m_xsheetHandle;
+  // for clearing cache when the pastestyle command is executed
+  TXshLevelHandle *m_levelHandle;
 
-	int m_pageIndex;
-	std::set<int> m_styleIndicesInPage;
+  int m_pageIndex;
+  std::set<int> m_styleIndicesInPage;
 
 public:
-	TStyleSelection();
-	TStyleSelection(TStyleSelection *styleSelection)
-		: m_paletteHandle(styleSelection->getPaletteHandle()), m_pageIndex(styleSelection->getPageIndex()), m_styleIndicesInPage(styleSelection->getIndicesInPage())
-	{
-	}
-	~TStyleSelection();
+  TStyleSelection();
+  TStyleSelection(TStyleSelection *styleSelection)
+      : m_paletteHandle(styleSelection->getPaletteHandle())
+      , m_pageIndex(styleSelection->getPageIndex())
+      , m_styleIndicesInPage(styleSelection->getIndicesInPage()) {}
+  ~TStyleSelection();
 
-	void select(int pageIndex);
-	void select(int pageIndex, int styleIndexInPage, bool on);
-	bool isSelected(int pageIndex, int styleIndexInPage) const;
-	bool isPageSelected(int pageIndex) const;
-	bool canHandleStyles();
-	void selectNone();
-	bool isEmpty() const;
-	int getStyleCount() const;
-	TPaletteHandle *getPaletteHandle() const
-	{
-		return m_paletteHandle;
-	}
-	void setPaletteHandle(TPaletteHandle *paletteHandle)
-	{
-		m_paletteHandle = paletteHandle;
-	}
-	TPalette *getPalette() const
-	{
-		return m_paletteHandle->getPalette();
-	}
-	int getPageIndex() const
-	{
-		return m_pageIndex;
-	}
-	const std::set<int> &getIndicesInPage() const
-	{
-		return m_styleIndicesInPage;
-	}
+  void select(int pageIndex);
+  void select(int pageIndex, int styleIndexInPage, bool on);
+  bool isSelected(int pageIndex, int styleIndexInPage) const;
+  bool isPageSelected(int pageIndex) const;
+  bool canHandleStyles();
+  void selectNone();
+  bool isEmpty() const;
+  int getStyleCount() const;
+  TPaletteHandle *getPaletteHandle() const { return m_paletteHandle; }
+  void setPaletteHandle(TPaletteHandle *paletteHandle) {
+    m_paletteHandle = paletteHandle;
+  }
+  TPalette *getPalette() const { return m_paletteHandle->getPalette(); }
+  int getPageIndex() const { return m_pageIndex; }
+  const std::set<int> &getIndicesInPage() const { return m_styleIndicesInPage; }
 
-	void getIndices(std::set<int> &indices) const;
+  void getIndices(std::set<int> &indices) const;
 
-	//Used to change level palette; in other palette (cleanup, ...) xsheetHandle is not necessary.
-	void setXsheetHandle(TXsheetHandle *xsheetHandle) { m_xsheetHandle = xsheetHandle; }
-	TXsheetHandle *getXsheetHandle() const { return m_xsheetHandle; }
-	void setLevelHandle(TXshLevelHandle *levelHandle) { m_levelHandle = levelHandle; }
+  // Used to change level palette; in other palette (cleanup, ...) xsheetHandle
+  // is not necessary.
+  void setXsheetHandle(TXsheetHandle *xsheetHandle) {
+    m_xsheetHandle = xsheetHandle;
+  }
+  TXsheetHandle *getXsheetHandle() const { return m_xsheetHandle; }
+  void setLevelHandle(TXshLevelHandle *levelHandle) {
+    m_levelHandle = levelHandle;
+  }
 
-	// commands
-	void cutStyles();
-	void copyStyles();
-	void pasteStyles();
-	void pasteStylesValues(bool pasteName, bool pasteColor = true);
-	void pasteStylesValue();
-	void pasteStylesColor();
-	void pasteStylesName();
-	void deleteStyles();
-	void eraseUnsedStyle();
-	void blendStyles();
-	void toggleLink();
-	void eraseToggleLink();
+  // commands
+  void cutStyles();
+  void copyStyles();
+  void pasteStyles();
+  void pasteStylesValues(bool pasteName, bool pasteColor = true);
+  void pasteStylesValue();
+  void pasteStylesColor();
+  void pasteStylesName();
+  void deleteStyles();
+  void eraseUnsedStyle();
+  void blendStyles();
+  void toggleLink();
+  void eraseToggleLink();
 
-	void enableCommands();
+  void enableCommands();
 
-	void toggleKeyframe(int frame);
+  void toggleKeyframe(int frame);
 
-	// remove link from the studio palette (if linked)
-	bool removeLink();
-	// get back the style from the studio palette (if linked)
-	void getBackOriginalStyle();
+  // remove link from the studio palette (if linked)
+  bool removeLink();
+  // get back the style from the studio palette (if linked)
+  void getBackOriginalStyle();
 };
 
-#endif //STYLESELECTION_INCLUDED
+#endif  // STYLESELECTION_INCLUDED

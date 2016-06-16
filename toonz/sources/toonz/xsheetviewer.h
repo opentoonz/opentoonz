@@ -30,8 +30,7 @@ class TSelection;
 class TXshCell;
 class TStageObjectId;
 
-namespace XsheetGUI
-{
+namespace XsheetGUI {
 
 //=============================================================================
 // Constant definition
@@ -40,45 +39,45 @@ namespace XsheetGUI
 extern const int ColumnWidth;
 extern const int RowHeight;
 
-const int NoteWidth = 70;
+const int NoteWidth  = 70;
 const int NoteHeight = 18;
 
-//TZP column
+// TZP column
 const QColor LevelColumnColor(127, 219, 127);
 const QColor LevelColumnBorderColor(47, 82, 47);
 const QColor SelectedLevelColumnColor(191, 237, 191);
 
-//PLI column
+// PLI column
 const QColor VectorColumnColor(212, 212, 133);
 const QColor VectorColumnBorderColor(79, 79, 49);
 const QColor SelectedVectorColumnColor(234, 234, 194);
 
-//SubXsheet column
+// SubXsheet column
 const QColor ChildColumnColor(214, 154, 219);
 const QColor ChildColumnBorderColor(80, 57, 82);
 const QColor SelectedChildColumnColor(235, 205, 237);
 
-//Raster image column
+// Raster image column
 const QColor FullcolorColumnColor(154, 214, 219);
 const QColor FullcolorColumnBorderColor(57, 80, 82);
 const QColor SelectedFullcolorColumnColor(205, 235, 237);
 
-//Palette column
+// Palette column
 const QColor PaletteColumnColor(42, 171, 154);
 const QColor PaletteColumnBorderColor(15, 62, 56);
 const QColor SelectedPaletteColumnColor(146, 221, 202);
 
-//Fx column
+// Fx column
 const QColor FxColumnColor(130, 129, 93);
 const QColor FxColumnBorderColor(48, 48, 35);
 const QColor SelectedFxColumnColor(193, 192, 174);
 
-//Reference column
+// Reference column
 const QColor ReferenceColumnColor(171, 171, 171);
 const QColor ReferenceColumnBorderColor(62, 62, 62);
 const QColor SelectedReferenceColumnColor(213, 213, 213);
 
-//Sound column
+// Sound column
 const QColor SoundColumnColor(175, 185, 115);
 const QColor SoundColumnBorderColor(110, 130, 90);
 const QColor SelectedSoundColumnColor(215, 215, 180);
@@ -99,465 +98,579 @@ const QColor MeshColumnColor(200, 130, 255);
 const QColor MeshColumnBorderColor(105, 70, 135);
 const QColor SelectedMeshColumnColor(216, 180, 245);
 
-//Empty column
+// Empty column
 const QColor EmptyColumnColor(124, 124, 124);
-//Occupied column
+// Occupied column
 const QColor NotEmptyColumnColor(164, 164, 164);
 
 const QColor SelectedEmptyCellColor(210, 210, 210);
 const QColor SmartTabColor(255, 255, 255, 150);
 
 const QColor XsheetBGColor(212, 208, 200);
-//Xsheet horizontal lines
+// Xsheet horizontal lines
 const QColor NormalHLineColor(146, 144, 146);
 const QColor IntervalHLineColor(0, 255, 246);
 
-//column header
+// column header
 const QColor EmptyColumnHeadColor(200, 200, 200);
 const QColor MaskColumnHeadColor(233, 118, 116);
 const QColor PreviewVisibleColor(200, 200, 100);
 const QColor CamStandVisibleColor(235, 144, 107);
 
-//RowArea
+// RowArea
 const QColor RowAreaBGColor(164, 164, 164);
 const QColor CurrentFrameBGColor(210, 210, 210);
 
-} // namespace XsheetGUI;
+}  // namespace XsheetGUI;
 
 //=============================================================================
 // XsheetScrollArea
 //-----------------------------------------------------------------------------
 
-class XsheetScrollArea : public QScrollArea
-{
-	Q_OBJECT
+class XsheetScrollArea : public QScrollArea {
+  Q_OBJECT
 
 public:
 #if QT_VERSION >= 0x050500
-	XsheetScrollArea(QWidget *parent = 0, Qt::WindowFlags flags = 0)
+  XsheetScrollArea(QWidget *parent = 0, Qt::WindowFlags flags = 0)
 #else
-	XsheetScrollArea(QWidget *parent = 0, Qt::WFlags flags = 0)
+  XsheetScrollArea(QWidget *parent = 0, Qt::WFlags flags = 0)
 #endif
-		: QScrollArea(parent)
-	{
-		setObjectName("xsheetScrollArea");
-		setFrameStyle(QFrame::StyledPanel);
-	}
-	~XsheetScrollArea() {}
+      : QScrollArea(parent) {
+    setObjectName("xsheetScrollArea");
+    setFrameStyle(QFrame::StyledPanel);
+  }
+  ~XsheetScrollArea() {}
 
 protected:
-	void keyPressEvent(QKeyEvent *event)
-	{
-		event->ignore();
-	}
-	void wheelEvent(QWheelEvent *event)
-	{
-		event->ignore();
-	}
+  void keyPressEvent(QKeyEvent *event) { event->ignore(); }
+  void wheelEvent(QWheelEvent *event) { event->ignore(); }
 };
 
 //=============================================================================
 // XsheetViewer
 //-----------------------------------------------------------------------------
 
-//! Note: some refactoring is needed. XsheetViewer is going to derive from SpreadsheetViewer.
+//! Note: some refactoring is needed. XsheetViewer is going to derive from
+//! SpreadsheetViewer.
 
-class XsheetViewer : public QFrame, public Spreadsheet::FrameScroller
-{
-	Q_OBJECT
+class XsheetViewer : public QFrame, public Spreadsheet::FrameScroller {
+  Q_OBJECT
 
-	QColor m_lightLightBgColor;
-	QColor m_lightBgColor;
-	QColor m_bgColor; //row area backgroound
-	QColor m_darkBgColor;
-	QColor m_lightLineColor; //horizontal lines (146,144,146)
-	QColor m_darkLineColor;
+  QColor m_lightLightBgColor;
+  QColor m_lightBgColor;
+  QColor m_bgColor;  // row area backgroound
+  QColor m_darkBgColor;
+  QColor m_lightLineColor;  // horizontal lines (146,144,146)
+  QColor m_darkLineColor;
 
-	Q_PROPERTY(QColor LightLightBGColor READ getLightLightBGColor WRITE setLightLightBGColor)
-	Q_PROPERTY(QColor LightBGColor READ getLightBGColor WRITE setLightBGColor)
-	Q_PROPERTY(QColor BGColor READ getBGColor WRITE setBGColor)
-	Q_PROPERTY(QColor DarkBGColor READ getDarkBGColor WRITE setDarkBGColor)
-	Q_PROPERTY(QColor LightLineColor READ getLightLineColor WRITE setLightLineColor)
-	Q_PROPERTY(QColor DarkLineColor READ getDarkLineColor WRITE setDarkLineColor)
+  Q_PROPERTY(QColor LightLightBGColor READ getLightLightBGColor WRITE
+                 setLightLightBGColor)
+  Q_PROPERTY(QColor LightBGColor READ getLightBGColor WRITE setLightBGColor)
+  Q_PROPERTY(QColor BGColor READ getBGColor WRITE setBGColor)
+  Q_PROPERTY(QColor DarkBGColor READ getDarkBGColor WRITE setDarkBGColor)
+  Q_PROPERTY(
+      QColor LightLineColor READ getLightLineColor WRITE setLightLineColor)
+  Q_PROPERTY(QColor DarkLineColor READ getDarkLineColor WRITE setDarkLineColor)
 
-	//Row
-	QColor m_currentRowBgColor;		//current frame / column (210,210,210)
-	QColor m_markerLineColor;		//marker lines (0, 255, 246)
-	QColor m_textColor;				//text color (black)
-	QColor m_previewFrameTextColor; //frame number in preview range (blue)
-	Q_PROPERTY(QColor CurrentRowBgColor READ getCurrentRowBgColor WRITE setCurrentRowBgColor)
-	Q_PROPERTY(QColor MarkerLineColor READ getMarkerLineColor WRITE setMarkerLineColor)
-	Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
-	Q_PROPERTY(QColor PreviewFrameTextColor READ getPreviewFrameTextColor WRITE setPreviewFrameTextColor)
-	//Column
-	QColor m_emptyColumnHeadColor;	//empty column header (200,200,200)
-	QColor m_selectedColumnTextColor; //selected column text (red)
-	Q_PROPERTY(QColor EmptyColumnHeadColor READ getEmptyColumnHeadColor WRITE setEmptyColumnHeadColor)
-	Q_PROPERTY(QColor SelectedColumnTextColor READ getSelectedColumnTextColor WRITE setSelectedColumnTextColor)
-	//Cell
-	QColor m_emptyCellColor;		 //empty cell (124,124,124)
-	QColor m_notEmptyColumnColor;	//occupied column (164,164,164)
-	QColor m_selectedEmptyCellColor; //selected empty cell (210,210,210)
-	Q_PROPERTY(QColor EmptyCellColor READ getEmptyCellColor WRITE setEmptyCellColor)
-	Q_PROPERTY(QColor NotEmptyColumnColor READ getNotEmptyColumnColor WRITE setNotEmptyColumnColor)
-	Q_PROPERTY(QColor SelectedEmptyCellColor READ getSelectedEmptyCellColor WRITE setSelectedEmptyCellColor)
+  // Row
+  QColor m_currentRowBgColor;      // current frame / column (210,210,210)
+  QColor m_markerLineColor;        // marker lines (0, 255, 246)
+  QColor m_textColor;              // text color (black)
+  QColor m_previewFrameTextColor;  // frame number in preview range (blue)
+  Q_PROPERTY(QColor CurrentRowBgColor READ getCurrentRowBgColor WRITE
+                 setCurrentRowBgColor)
+  Q_PROPERTY(
+      QColor MarkerLineColor READ getMarkerLineColor WRITE setMarkerLineColor)
+  Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
+  Q_PROPERTY(QColor PreviewFrameTextColor READ getPreviewFrameTextColor WRITE
+                 setPreviewFrameTextColor)
+  // Column
+  QColor m_emptyColumnHeadColor;     // empty column header (200,200,200)
+  QColor m_selectedColumnTextColor;  // selected column text (red)
+  Q_PROPERTY(QColor EmptyColumnHeadColor READ getEmptyColumnHeadColor WRITE
+                 setEmptyColumnHeadColor)
+  Q_PROPERTY(QColor SelectedColumnTextColor READ getSelectedColumnTextColor
+                 WRITE setSelectedColumnTextColor)
+  // Cell
+  QColor m_emptyCellColor;          // empty cell (124,124,124)
+  QColor m_notEmptyColumnColor;     // occupied column (164,164,164)
+  QColor m_selectedEmptyCellColor;  // selected empty cell (210,210,210)
+  Q_PROPERTY(
+      QColor EmptyCellColor READ getEmptyCellColor WRITE setEmptyCellColor)
+  Q_PROPERTY(QColor NotEmptyColumnColor READ getNotEmptyColumnColor WRITE
+                 setNotEmptyColumnColor)
+  Q_PROPERTY(QColor SelectedEmptyCellColor READ getSelectedEmptyCellColor WRITE
+                 setSelectedEmptyCellColor)
 
-	//TZP column
-	QColor m_levelColumnColor;		   //(127,219,127)
-	QColor m_levelColumnBorderColor;   //(47,82,47)
-	QColor m_selectedLevelColumnColor; //(191,237,191)
-	Q_PROPERTY(QColor LevelColumnColor READ getLevelColumnColor WRITE setLevelColumnColor)
-	Q_PROPERTY(QColor LevelColumnBorderColor READ getLevelColumnBorderColor WRITE setLevelColumnBorderColor)
-	Q_PROPERTY(QColor SelectedLevelColumnColor READ getSelectedLevelColumnColor WRITE setSelectedLevelColumnColor)
-	//PLI column
-	QColor m_vectorColumnColor;			//(212,212,133)
-	QColor m_vectorColumnBorderColor;   //(79,79,49)
-	QColor m_selectedVectorColumnColor; //(234,234,194)
-	Q_PROPERTY(QColor VectorColumnColor READ getVectorColumnColor WRITE setVectorColumnColor)
-	Q_PROPERTY(QColor VectorColumnBorderColor READ getVectorColumnBorderColor WRITE setVectorColumnBorderColor)
-	Q_PROPERTY(QColor SelectedVectorColumnColor READ getSelectedVectorColumnColor WRITE setSelectedVectorColumnColor)
-	//subXsheet column
-	QColor m_childColumnColor;		   //(214,154,219)
-	QColor m_childColumnBorderColor;   //(80,57,82)
-	QColor m_selectedChildColumnColor; //(235,205,237)
-	Q_PROPERTY(QColor ChildColumnColor READ getChildColumnColor WRITE setChildColumnColor)
-	Q_PROPERTY(QColor ChildColumnBorderColor READ getChildColumnBorderColor WRITE setChildColumnBorderColor)
-	Q_PROPERTY(QColor SelectedChildColumnColor READ getSelectedChildColumnColor WRITE setSelectedChildColumnColor)
-	//Raster image column
-	QColor m_fullcolorColumnColor;		   //(154,214,219)
-	QColor m_fullcolorColumnBorderColor;   //(57,80,82)
-	QColor m_selectedFullcolorColumnColor; //(205,235,237)
-	Q_PROPERTY(QColor FullcolorColumnColor READ getFullcolorColumnColor WRITE setFullcolorColumnColor)
-	Q_PROPERTY(QColor FullcolorColumnBorderColor READ getFullcolorColumnBorderColor WRITE setFullcolorColumnBorderColor)
-	Q_PROPERTY(QColor SelectedFullcolorColumnColor READ getSelectedFullcolorColumnColor WRITE setSelectedFullcolorColumnColor)
-	//Fx column
-	QColor m_fxColumnColor;			//(130,129,93)
-	QColor m_fxColumnBorderColor;   //(48,48,35)
-	QColor m_selectedFxColumnColor; //(193,192,174)
-	Q_PROPERTY(QColor FxColumnColor READ getFxColumnColor WRITE setFxColumnColor)
-	Q_PROPERTY(QColor FxColumnBorderColor READ getFxColumnBorderColor WRITE setFxColumnBorderColor)
-	Q_PROPERTY(QColor SelectedFxColumnColor READ getSelectedFxColumnColor WRITE setSelectedFxColumnColor)
-	//Reference column
-	QColor m_referenceColumnColor;		   //(171,171,171)
-	QColor m_referenceColumnBorderColor;   //(62,62,62)
-	QColor m_selectedReferenceColumnColor; //(213,213,213)
-	Q_PROPERTY(QColor ReferenceColumnColor READ getReferenceColumnColor WRITE setReferenceColumnColor)
-	Q_PROPERTY(QColor ReferenceColumnBorderColor READ getReferenceColumnBorderColor WRITE setReferenceColumnBorderColor)
-	Q_PROPERTY(QColor SelectedReferenceColumnColor READ getSelectedReferenceColumnColor WRITE setSelectedReferenceColumnColor)
-	//Palette column
-	QColor m_paletteColumnColor;		 //(42,171,154)
-	QColor m_paletteColumnBorderColor;   //(15,62,56)
-	QColor m_selectedPaletteColumnColor; //(146,221,202)
-	Q_PROPERTY(QColor PaletteColumnColor READ getPaletteColumnColor WRITE setPaletteColumnColor)
-	Q_PROPERTY(QColor PaletteColumnBorderColor READ getPaletteColumnBorderColor WRITE setPaletteColumnBorderColor)
-	Q_PROPERTY(QColor SelectedPaletteColumnColor READ getSelectedPaletteColumnColor WRITE setSelectedPaletteColumnColor)
-	//Mesh column
-	QColor m_meshColumnColor;
-	QColor m_meshColumnBorderColor;
-	QColor m_selectedMeshColumnColor;
-	Q_PROPERTY(QColor MeshColumnColor READ getMeshColumnColor WRITE setMeshColumnColor)
-	Q_PROPERTY(QColor MeshColumnBorderColor READ getMeshColumnBorderColor WRITE setMeshColumnBorderColor)
-	Q_PROPERTY(QColor SelectedMeshColumnColor READ getSelectedMeshColumnColor WRITE setSelectedMeshColumnColor)
-	
-	//for making the column head lighter (255,255,255,50);
-	QColor m_columnHeadPastelizer;
-	Q_PROPERTY(QColor ColumnHeadPastelizer READ getColumnHeadPastelizer WRITE setColumnHeadPastelizer)
-	//selected column head (190,210,240,170);
-	QColor m_selectedColumnHead;
-	Q_PROPERTY(QColor SelectedColumnHead READ getSelectedColumnHead WRITE setSelectedColumnHead)
+  // TZP column
+  QColor m_levelColumnColor;          //(127,219,127)
+  QColor m_levelColumnBorderColor;    //(47,82,47)
+  QColor m_selectedLevelColumnColor;  //(191,237,191)
+  Q_PROPERTY(QColor LevelColumnColor READ getLevelColumnColor WRITE
+                 setLevelColumnColor)
+  Q_PROPERTY(QColor LevelColumnBorderColor READ getLevelColumnBorderColor WRITE
+                 setLevelColumnBorderColor)
+  Q_PROPERTY(QColor SelectedLevelColumnColor READ getSelectedLevelColumnColor
+                 WRITE setSelectedLevelColumnColor)
+  // PLI column
+  QColor m_vectorColumnColor;          //(212,212,133)
+  QColor m_vectorColumnBorderColor;    //(79,79,49)
+  QColor m_selectedVectorColumnColor;  //(234,234,194)
+  Q_PROPERTY(QColor VectorColumnColor READ getVectorColumnColor WRITE
+                 setVectorColumnColor)
+  Q_PROPERTY(QColor VectorColumnBorderColor READ getVectorColumnBorderColor
+                 WRITE setVectorColumnBorderColor)
+  Q_PROPERTY(QColor SelectedVectorColumnColor READ getSelectedVectorColumnColor
+                 WRITE setSelectedVectorColumnColor)
+  // subXsheet column
+  QColor m_childColumnColor;          //(214,154,219)
+  QColor m_childColumnBorderColor;    //(80,57,82)
+  QColor m_selectedChildColumnColor;  //(235,205,237)
+  Q_PROPERTY(QColor ChildColumnColor READ getChildColumnColor WRITE
+                 setChildColumnColor)
+  Q_PROPERTY(QColor ChildColumnBorderColor READ getChildColumnBorderColor WRITE
+                 setChildColumnBorderColor)
+  Q_PROPERTY(QColor SelectedChildColumnColor READ getSelectedChildColumnColor
+                 WRITE setSelectedChildColumnColor)
+  // Raster image column
+  QColor m_fullcolorColumnColor;          //(154,214,219)
+  QColor m_fullcolorColumnBorderColor;    //(57,80,82)
+  QColor m_selectedFullcolorColumnColor;  //(205,235,237)
+  Q_PROPERTY(QColor FullcolorColumnColor READ getFullcolorColumnColor WRITE
+                 setFullcolorColumnColor)
+  Q_PROPERTY(
+      QColor FullcolorColumnBorderColor READ getFullcolorColumnBorderColor WRITE
+          setFullcolorColumnBorderColor)
+  Q_PROPERTY(
+      QColor SelectedFullcolorColumnColor READ getSelectedFullcolorColumnColor
+          WRITE setSelectedFullcolorColumnColor)
+  // Fx column
+  QColor m_fxColumnColor;          //(130,129,93)
+  QColor m_fxColumnBorderColor;    //(48,48,35)
+  QColor m_selectedFxColumnColor;  //(193,192,174)
+  Q_PROPERTY(QColor FxColumnColor READ getFxColumnColor WRITE setFxColumnColor)
+  Q_PROPERTY(QColor FxColumnBorderColor READ getFxColumnBorderColor WRITE
+                 setFxColumnBorderColor)
+  Q_PROPERTY(QColor SelectedFxColumnColor READ getSelectedFxColumnColor WRITE
+                 setSelectedFxColumnColor)
+  // Reference column
+  QColor m_referenceColumnColor;          //(171,171,171)
+  QColor m_referenceColumnBorderColor;    //(62,62,62)
+  QColor m_selectedReferenceColumnColor;  //(213,213,213)
+  Q_PROPERTY(QColor ReferenceColumnColor READ getReferenceColumnColor WRITE
+                 setReferenceColumnColor)
+  Q_PROPERTY(
+      QColor ReferenceColumnBorderColor READ getReferenceColumnBorderColor WRITE
+          setReferenceColumnBorderColor)
+  Q_PROPERTY(
+      QColor SelectedReferenceColumnColor READ getSelectedReferenceColumnColor
+          WRITE setSelectedReferenceColumnColor)
+  // Palette column
+  QColor m_paletteColumnColor;          //(42,171,154)
+  QColor m_paletteColumnBorderColor;    //(15,62,56)
+  QColor m_selectedPaletteColumnColor;  //(146,221,202)
+  Q_PROPERTY(QColor PaletteColumnColor READ getPaletteColumnColor WRITE
+                 setPaletteColumnColor)
+  Q_PROPERTY(QColor PaletteColumnBorderColor READ getPaletteColumnBorderColor
+                 WRITE setPaletteColumnBorderColor)
+  Q_PROPERTY(
+      QColor SelectedPaletteColumnColor READ getSelectedPaletteColumnColor WRITE
+          setSelectedPaletteColumnColor)
+  // Mesh column
+  QColor m_meshColumnColor;
+  QColor m_meshColumnBorderColor;
+  QColor m_selectedMeshColumnColor;
+  Q_PROPERTY(
+      QColor MeshColumnColor READ getMeshColumnColor WRITE setMeshColumnColor)
+  Q_PROPERTY(QColor MeshColumnBorderColor READ getMeshColumnBorderColor WRITE
+                 setMeshColumnBorderColor)
+  Q_PROPERTY(QColor SelectedMeshColumnColor READ getSelectedMeshColumnColor
+                 WRITE setSelectedMeshColumnColor)
 
-	XsheetScrollArea *m_cellScrollArea;
-	XsheetScrollArea *m_columnScrollArea;
-	XsheetScrollArea *m_rowScrollArea;
-	XsheetScrollArea *m_noteScrollArea;
+  // for making the column head lighter (255,255,255,50);
+  QColor m_columnHeadPastelizer;
+  Q_PROPERTY(QColor ColumnHeadPastelizer READ getColumnHeadPastelizer WRITE
+                 setColumnHeadPastelizer)
+  // selected column head (190,210,240,170);
+  QColor m_selectedColumnHead;
+  Q_PROPERTY(QColor SelectedColumnHead READ getSelectedColumnHead WRITE
+                 setSelectedColumnHead)
 
-	XsheetGUI::ColumnArea *m_columnArea;
-	XsheetGUI::RowArea *m_rowArea;
-	XsheetGUI::CellArea *m_cellArea;
-	XsheetGUI::NoteArea *m_noteArea;
+  XsheetScrollArea *m_cellScrollArea;
+  XsheetScrollArea *m_columnScrollArea;
+  XsheetScrollArea *m_rowScrollArea;
+  XsheetScrollArea *m_noteScrollArea;
 
-	int m_x0, m_y0;
-	int m_timerId;
-	QPoint m_autoPanSpeed;
-	QPoint m_lastAutoPanPos;
+  XsheetGUI::ColumnArea *m_columnArea;
+  XsheetGUI::RowArea *m_rowArea;
+  XsheetGUI::CellArea *m_cellArea;
+  XsheetGUI::NoteArea *m_noteArea;
 
-	TColumnSelection *m_columnSelection;
-	TCellKeyframeSelection *m_cellKeyframeSelection;
+  int m_x0, m_y0;
+  int m_timerId;
+  QPoint m_autoPanSpeed;
+  QPoint m_lastAutoPanPos;
 
-	int m_scrubCol, m_scrubRow0, m_scrubRow1;
+  TColumnSelection *m_columnSelection;
+  TCellKeyframeSelection *m_cellKeyframeSelection;
 
-	bool m_isCurrentFrameSwitched;
-	bool m_isCurrentColumnSwitched;
+  int m_scrubCol, m_scrubRow0, m_scrubRow1;
 
-	XsheetGUI::DragTool *m_dragTool;
+  bool m_isCurrentFrameSwitched;
+  bool m_isCurrentColumnSwitched;
 
-	bool m_isComputingSize;
+  XsheetGUI::DragTool *m_dragTool;
 
-	QList<XsheetGUI::NoteWidget *> m_noteWidgets;
-	int m_currentNoteIndex;
+  bool m_isComputingSize;
 
-	Qt::KeyboardModifiers m_qtModifiers;
+  QList<XsheetGUI::NoteWidget *> m_noteWidgets;
+  int m_currentNoteIndex;
+
+  Qt::KeyboardModifiers m_qtModifiers;
 
 public:
-	enum FrameDisplayStyle {
-		Frame = 0,
-		SecAndFrame,
-		SixSecSheet,
-		ThreeSecSheet
-	};
+  enum FrameDisplayStyle { Frame = 0, SecAndFrame, SixSecSheet, ThreeSecSheet };
 
 private:
-	FrameDisplayStyle m_frameDisplayStyle;
+  FrameDisplayStyle m_frameDisplayStyle;
 
-	FrameDisplayStyle to_enum(int n)
-	{
-		switch (n) {
-		case 0:
-			return Frame;
-		case 1:
-			return SecAndFrame;
-		case 2:
-			return SixSecSheet;
-		default:
-			return ThreeSecSheet;
-		}
-	}
+  FrameDisplayStyle to_enum(int n) {
+    switch (n) {
+    case 0:
+      return Frame;
+    case 1:
+      return SecAndFrame;
+    case 2:
+      return SixSecSheet;
+    default:
+      return ThreeSecSheet;
+    }
+  }
 
 public:
 #if QT_VERSION >= 0x050500
-	XsheetViewer(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  XsheetViewer(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
-	XsheetViewer(QWidget *parent = 0, Qt::WFlags flags = 0);
+  XsheetViewer(QWidget *parent = 0, Qt::WFlags flags = 0);
 #endif
-	~XsheetViewer();
+  ~XsheetViewer();
 
-	TColumnSelection *getColumnSelection() const { return m_columnSelection; }
-	TCellSelection *getCellSelection() const { return m_cellKeyframeSelection->getCellSelection(); }
-	TKeyframeSelection *getKeyframeSelection() const { return m_cellKeyframeSelection->getKeyframeSelection(); }
-	TCellKeyframeSelection *getCellKeyframeSelection() const { return m_cellKeyframeSelection; }
+  TColumnSelection *getColumnSelection() const { return m_columnSelection; }
+  TCellSelection *getCellSelection() const {
+    return m_cellKeyframeSelection->getCellSelection();
+  }
+  TKeyframeSelection *getKeyframeSelection() const {
+    return m_cellKeyframeSelection->getKeyframeSelection();
+  }
+  TCellKeyframeSelection *getCellKeyframeSelection() const {
+    return m_cellKeyframeSelection;
+  }
 
-	bool areCellsSelectedEmpty();
-	/*! Return true if selection contain only sound cell.*/
-	bool areSoundCellsSelected();
-	bool areSoundTextCellsSelected();
+  bool areCellsSelectedEmpty();
+  /*! Return true if selection contain only sound cell.*/
+  bool areSoundCellsSelected();
+  bool areSoundTextCellsSelected();
 
-	XsheetGUI::DragTool *getDragTool() const { return m_dragTool; };
-	void setDragTool(XsheetGUI::DragTool *dragTool);
+  XsheetGUI::DragTool *getDragTool() const { return m_dragTool; };
+  void setDragTool(XsheetGUI::DragTool *dragTool);
 
-	void dragToolClick(QMouseEvent *);
-	void dragToolDrag(QMouseEvent *);
-	void dragToolRelease(QMouseEvent *); // n.b. cancella il dragtool
+  void dragToolClick(QMouseEvent *);
+  void dragToolDrag(QMouseEvent *);
+  void dragToolRelease(QMouseEvent *);  // n.b. cancella il dragtool
 
-	void dragToolLeave(QEvent *); // n.b. cancella il dragtool
+  void dragToolLeave(QEvent *);  // n.b. cancella il dragtool
 
-	void dragToolClick(QDropEvent *);
-	void dragToolDrag(QDropEvent *);
-	void dragToolRelease(QDropEvent *); // n.b. cancella il dragtool
+  void dragToolClick(QDropEvent *);
+  void dragToolDrag(QDropEvent *);
+  void dragToolRelease(QDropEvent *);  // n.b. cancella il dragtool
 
-	void setQtModifiers(Qt::KeyboardModifiers value) { m_qtModifiers = value; }
+  void setQtModifiers(Qt::KeyboardModifiers value) { m_qtModifiers = value; }
 
-	void setScrubHighlight(int row, int starRow, int col);
-	void resetScrubHighlight();
-	void getScrubHeighlight(int &R0, int &R1);
-	bool isScrubHighlighted(int row, int col);
+  void setScrubHighlight(int row, int starRow, int col);
+  void resetScrubHighlight();
+  void getScrubHeighlight(int &R0, int &R1);
+  bool isScrubHighlighted(int row, int col);
 
-	TXsheet *getXsheet() const;
-	int getCurrentColumn() const;
-	int getCurrentRow() const;
-	//! Restituisce la \b objectId corrispondente alla colonna \b col
-	TStageObjectId getObjectId(int col) const;
+  TXsheet *getXsheet() const;
+  int getCurrentColumn() const;
+  int getCurrentRow() const;
+  //! Restituisce la \b objectId corrispondente alla colonna \b col
+  TStageObjectId getObjectId(int col) const;
 
-	void setCurrentColumn(int col);
-	void setCurrentRow(int row);
+  void setCurrentColumn(int col);
+  void setCurrentRow(int row);
 
-	void scroll(QPoint delta);
-	void onPrepareToScroll(int dy);
+  void scroll(QPoint delta);
+  void onPrepareToScroll(int dy);
 
-	void setAutoPanSpeed(const QPoint &speed);
-	void setAutoPanSpeed(const QRect &widgetBounds, const QPoint &mousePos);
-	void stopAutoPan() { setAutoPanSpeed(QPoint()); }
-	bool isAutoPanning() const { return m_autoPanSpeed.x() != 0 || m_autoPanSpeed.y() != 0; }
+  void setAutoPanSpeed(const QPoint &speed);
+  void setAutoPanSpeed(const QRect &widgetBounds, const QPoint &mousePos);
+  void stopAutoPan() { setAutoPanSpeed(QPoint()); }
+  bool isAutoPanning() const {
+    return m_autoPanSpeed.x() != 0 || m_autoPanSpeed.y() != 0;
+  }
 
-	int xToColumn(int x) const;
-	int yToRow(int y) const;
-	int columnToX(int col) const;
-	int rowToY(int row) const;
+  int xToColumn(int x) const;
+  int yToRow(int y) const;
+  int columnToX(int col) const;
+  int rowToY(int row) const;
 
-	void updateCells() { m_cellArea->update(m_cellArea->visibleRegion()); }
-	void updateRows() { m_rowArea->update(m_rowArea->visibleRegion()); }
-	void updateColumns() { m_columnArea->update(m_columnArea->visibleRegion()); }
+  void updateCells() { m_cellArea->update(m_cellArea->visibleRegion()); }
+  void updateRows() { m_rowArea->update(m_rowArea->visibleRegion()); }
+  void updateColumns() { m_columnArea->update(m_columnArea->visibleRegion()); }
 
-	bool refreshContentSize(int scrollDx, int scrollDy);
+  bool refreshContentSize(int scrollDx, int scrollDy);
 
-	void updateAreeSize();
+  void updateAreeSize();
 
-	// provvisorio
-	QScrollArea *getFrameScrollArea() const { return m_cellScrollArea; }
+  // provvisorio
+  QScrollArea *getFrameScrollArea() const { return m_cellScrollArea; }
 
-	QList<XsheetGUI::NoteWidget *> getNotesWidget() const;
-	void addNoteWidget(XsheetGUI::NoteWidget *w);
-	int getCurrentNoteIndex() const;
-	//! Clear notes widgets std::vector.
-	void clearNoteWidgets();
-	//! Update notes widgets and update cell.
-	void updateNoteWidgets();
-	//! Discard Note Widget
-	void discardNoteWidget();
+  QList<XsheetGUI::NoteWidget *> getNotesWidget() const;
+  void addNoteWidget(XsheetGUI::NoteWidget *w);
+  int getCurrentNoteIndex() const;
+  //! Clear notes widgets std::vector.
+  void clearNoteWidgets();
+  //! Update notes widgets and update cell.
+  void updateNoteWidgets();
+  //! Discard Note Widget
+  void discardNoteWidget();
 
-	void setCurrentNoteIndex(int currentNoteIndex);
+  void setCurrentNoteIndex(int currentNoteIndex);
 
-	//scroll the cell area to make a cell at (row,col) visible
-	void scrollTo(int row, int col);
+  // scroll the cell area to make a cell at (row,col) visible
+  void scrollTo(int row, int col);
 
-	//QProperty
-	void setLightLightBGColor(const QColor &color) { m_lightLightBgColor = color; }
-	QColor getLightLightBGColor() const { return m_lightLightBgColor; }
-	void setLightBGColor(const QColor &color) { m_lightBgColor = color; }
-	QColor getLightBGColor() const { return m_lightBgColor; }
-	void setBGColor(const QColor &color) { m_bgColor = color; }
-	QColor getBGColor() const { return m_bgColor; }
-	void setDarkBGColor(const QColor &color) { m_darkBgColor = color; }
-	QColor getDarkBGColor() const { return m_darkBgColor; }
-	void setLightLineColor(const QColor &color) { m_lightLineColor = color; }
-	QColor getLightLineColor() const { return m_lightLineColor; }
-	void setDarkLineColor(const QColor &color) { m_darkLineColor = color; }
-	QColor getDarkLineColor() const { return m_darkLineColor; }
+  // QProperty
+  void setLightLightBGColor(const QColor &color) {
+    m_lightLightBgColor = color;
+  }
+  QColor getLightLightBGColor() const { return m_lightLightBgColor; }
+  void setLightBGColor(const QColor &color) { m_lightBgColor = color; }
+  QColor getLightBGColor() const { return m_lightBgColor; }
+  void setBGColor(const QColor &color) { m_bgColor = color; }
+  QColor getBGColor() const { return m_bgColor; }
+  void setDarkBGColor(const QColor &color) { m_darkBgColor = color; }
+  QColor getDarkBGColor() const { return m_darkBgColor; }
+  void setLightLineColor(const QColor &color) { m_lightLineColor = color; }
+  QColor getLightLineColor() const { return m_lightLineColor; }
+  void setDarkLineColor(const QColor &color) { m_darkLineColor = color; }
+  QColor getDarkLineColor() const { return m_darkLineColor; }
 
-	//Row
-	void setCurrentRowBgColor(const QColor &color) { m_currentRowBgColor = color; }
-	QColor getCurrentRowBgColor() const { return m_currentRowBgColor; }
-	void setMarkerLineColor(const QColor &color) { m_markerLineColor = color; }
-	QColor getMarkerLineColor() const { return m_markerLineColor; }
-	void setTextColor(const QColor &color) { m_textColor = color; }
-	QColor getTextColor() const { return m_textColor; }
-	void setPreviewFrameTextColor(const QColor &color) { m_previewFrameTextColor = color; }
-	QColor getPreviewFrameTextColor() const { return m_previewFrameTextColor; }
-	//Column
-	void setEmptyColumnHeadColor(const QColor &color) { m_emptyColumnHeadColor = color; }
-	QColor getEmptyColumnHeadColor() const { return m_emptyColumnHeadColor; }
-	void setSelectedColumnTextColor(const QColor &color) { m_selectedColumnTextColor = color; }
-	QColor getSelectedColumnTextColor() const { return m_selectedColumnTextColor; }
-	//Cell
-	void setEmptyCellColor(const QColor &color) { m_emptyCellColor = color; }
-	QColor getEmptyCellColor() const { return m_emptyCellColor; }
-	void setNotEmptyColumnColor(const QColor &color) { m_notEmptyColumnColor = color; }
-	QColor getNotEmptyColumnColor() const { return m_notEmptyColumnColor; }
-	void setSelectedEmptyCellColor(const QColor &color) { m_selectedEmptyCellColor = color; }
-	QColor getSelectedEmptyCellColor() const { return m_selectedEmptyCellColor; }
+  // Row
+  void setCurrentRowBgColor(const QColor &color) {
+    m_currentRowBgColor = color;
+  }
+  QColor getCurrentRowBgColor() const { return m_currentRowBgColor; }
+  void setMarkerLineColor(const QColor &color) { m_markerLineColor = color; }
+  QColor getMarkerLineColor() const { return m_markerLineColor; }
+  void setTextColor(const QColor &color) { m_textColor = color; }
+  QColor getTextColor() const { return m_textColor; }
+  void setPreviewFrameTextColor(const QColor &color) {
+    m_previewFrameTextColor = color;
+  }
+  QColor getPreviewFrameTextColor() const { return m_previewFrameTextColor; }
+  // Column
+  void setEmptyColumnHeadColor(const QColor &color) {
+    m_emptyColumnHeadColor = color;
+  }
+  QColor getEmptyColumnHeadColor() const { return m_emptyColumnHeadColor; }
+  void setSelectedColumnTextColor(const QColor &color) {
+    m_selectedColumnTextColor = color;
+  }
+  QColor getSelectedColumnTextColor() const {
+    return m_selectedColumnTextColor;
+  }
+  // Cell
+  void setEmptyCellColor(const QColor &color) { m_emptyCellColor = color; }
+  QColor getEmptyCellColor() const { return m_emptyCellColor; }
+  void setNotEmptyColumnColor(const QColor &color) {
+    m_notEmptyColumnColor = color;
+  }
+  QColor getNotEmptyColumnColor() const { return m_notEmptyColumnColor; }
+  void setSelectedEmptyCellColor(const QColor &color) {
+    m_selectedEmptyCellColor = color;
+  }
+  QColor getSelectedEmptyCellColor() const { return m_selectedEmptyCellColor; }
 
-	//TZP column
-	void setLevelColumnColor(const QColor &color) { m_levelColumnColor = color; }
-	void setLevelColumnBorderColor(const QColor &color) { m_levelColumnBorderColor = color; }
-	void setSelectedLevelColumnColor(const QColor &color) { m_selectedLevelColumnColor = color; }
-	QColor getLevelColumnColor() const { return m_levelColumnColor; }
-	QColor getLevelColumnBorderColor() const { return m_levelColumnBorderColor; }
-	QColor getSelectedLevelColumnColor() const { return m_selectedLevelColumnColor; }
-	//PLI column
-	void setVectorColumnColor(const QColor &color) { m_vectorColumnColor = color; }
-	void setVectorColumnBorderColor(const QColor &color) { m_vectorColumnBorderColor = color; }
-	void setSelectedVectorColumnColor(const QColor &color) { m_selectedVectorColumnColor = color; }
-	QColor getVectorColumnColor() const { return m_vectorColumnColor; }
-	QColor getVectorColumnBorderColor() const { return m_vectorColumnBorderColor; }
-	QColor getSelectedVectorColumnColor() const { return m_selectedVectorColumnColor; }
-	//subXsheet column
-	void setChildColumnColor(const QColor &color) { m_childColumnColor = color; }
-	void setChildColumnBorderColor(const QColor &color) { m_childColumnBorderColor = color; }
-	void setSelectedChildColumnColor(const QColor &color) { m_selectedChildColumnColor = color; }
-	QColor getChildColumnColor() const { return m_childColumnColor; }
-	QColor getChildColumnBorderColor() const { return m_childColumnBorderColor; }
-	QColor getSelectedChildColumnColor() const { return m_selectedChildColumnColor; }
-	//Raster image column
-	void setFullcolorColumnColor(const QColor &color) { m_fullcolorColumnColor = color; }
-	void setFullcolorColumnBorderColor(const QColor &color) { m_fullcolorColumnBorderColor = color; }
-	void setSelectedFullcolorColumnColor(const QColor &color) { m_selectedFullcolorColumnColor = color; }
-	QColor getFullcolorColumnColor() const { return m_fullcolorColumnColor; }
-	QColor getFullcolorColumnBorderColor() const { return m_fullcolorColumnBorderColor; }
-	QColor getSelectedFullcolorColumnColor() const { return m_selectedFullcolorColumnColor; }
-	//Fx column
-	void setFxColumnColor(const QColor &color) { m_fxColumnColor = color; }
-	void setFxColumnBorderColor(const QColor &color) { m_fxColumnBorderColor = color; }
-	void setSelectedFxColumnColor(const QColor &color) { m_selectedFxColumnColor = color; }
-	QColor getFxColumnColor() const { return m_fxColumnColor; }
-	QColor getFxColumnBorderColor() const { return m_fxColumnBorderColor; }
-	QColor getSelectedFxColumnColor() const { return m_selectedFxColumnColor; }
-	//Reference column
-	void setReferenceColumnColor(const QColor &color) { m_referenceColumnColor = color; }
-	void setReferenceColumnBorderColor(const QColor &color) { m_referenceColumnBorderColor = color; }
-	void setSelectedReferenceColumnColor(const QColor &color) { m_selectedReferenceColumnColor = color; }
-	QColor getReferenceColumnColor() const { return m_referenceColumnColor; }
-	QColor getReferenceColumnBorderColor() const { return m_referenceColumnBorderColor; }
-	QColor getSelectedReferenceColumnColor() const { return m_selectedReferenceColumnColor; }
-	//Palette column
-	void setPaletteColumnColor(const QColor &color) { m_paletteColumnColor = color; }
-	void setPaletteColumnBorderColor(const QColor &color) { m_paletteColumnBorderColor = color; }
-	void setSelectedPaletteColumnColor(const QColor &color) { m_selectedPaletteColumnColor = color; }
-	QColor getPaletteColumnColor() const { return m_paletteColumnColor; }
-	QColor getPaletteColumnBorderColor() const { return m_paletteColumnBorderColor; }
-	QColor getSelectedPaletteColumnColor() const { return m_selectedPaletteColumnColor; }
-	//Mesh column
-	void setMeshColumnColor(const QColor &color) { m_meshColumnColor = color; }
-	void setMeshColumnBorderColor(const QColor &color) { m_meshColumnBorderColor = color; }
-	void setSelectedMeshColumnColor(const QColor &color) { m_selectedMeshColumnColor = color; }
-	QColor getMeshColumnColor() const { return m_meshColumnColor; }
-	QColor getMeshColumnBorderColor() const { return m_meshColumnBorderColor; }
-	QColor getSelectedMeshColumnColor() const { return m_selectedMeshColumnColor; }
-	
-	void setColumnHeadPastelizer(const QColor &color) { m_columnHeadPastelizer = color; }
-	QColor getColumnHeadPastelizer() const { return m_columnHeadPastelizer; }
-	void setSelectedColumnHead(const QColor &color) { m_selectedColumnHead = color; }
-	QColor getSelectedColumnHead() const { return m_selectedColumnHead; }
+  // TZP column
+  void setLevelColumnColor(const QColor &color) { m_levelColumnColor = color; }
+  void setLevelColumnBorderColor(const QColor &color) {
+    m_levelColumnBorderColor = color;
+  }
+  void setSelectedLevelColumnColor(const QColor &color) {
+    m_selectedLevelColumnColor = color;
+  }
+  QColor getLevelColumnColor() const { return m_levelColumnColor; }
+  QColor getLevelColumnBorderColor() const { return m_levelColumnBorderColor; }
+  QColor getSelectedLevelColumnColor() const {
+    return m_selectedLevelColumnColor;
+  }
+  // PLI column
+  void setVectorColumnColor(const QColor &color) {
+    m_vectorColumnColor = color;
+  }
+  void setVectorColumnBorderColor(const QColor &color) {
+    m_vectorColumnBorderColor = color;
+  }
+  void setSelectedVectorColumnColor(const QColor &color) {
+    m_selectedVectorColumnColor = color;
+  }
+  QColor getVectorColumnColor() const { return m_vectorColumnColor; }
+  QColor getVectorColumnBorderColor() const {
+    return m_vectorColumnBorderColor;
+  }
+  QColor getSelectedVectorColumnColor() const {
+    return m_selectedVectorColumnColor;
+  }
+  // subXsheet column
+  void setChildColumnColor(const QColor &color) { m_childColumnColor = color; }
+  void setChildColumnBorderColor(const QColor &color) {
+    m_childColumnBorderColor = color;
+  }
+  void setSelectedChildColumnColor(const QColor &color) {
+    m_selectedChildColumnColor = color;
+  }
+  QColor getChildColumnColor() const { return m_childColumnColor; }
+  QColor getChildColumnBorderColor() const { return m_childColumnBorderColor; }
+  QColor getSelectedChildColumnColor() const {
+    return m_selectedChildColumnColor;
+  }
+  // Raster image column
+  void setFullcolorColumnColor(const QColor &color) {
+    m_fullcolorColumnColor = color;
+  }
+  void setFullcolorColumnBorderColor(const QColor &color) {
+    m_fullcolorColumnBorderColor = color;
+  }
+  void setSelectedFullcolorColumnColor(const QColor &color) {
+    m_selectedFullcolorColumnColor = color;
+  }
+  QColor getFullcolorColumnColor() const { return m_fullcolorColumnColor; }
+  QColor getFullcolorColumnBorderColor() const {
+    return m_fullcolorColumnBorderColor;
+  }
+  QColor getSelectedFullcolorColumnColor() const {
+    return m_selectedFullcolorColumnColor;
+  }
+  // Fx column
+  void setFxColumnColor(const QColor &color) { m_fxColumnColor = color; }
+  void setFxColumnBorderColor(const QColor &color) {
+    m_fxColumnBorderColor = color;
+  }
+  void setSelectedFxColumnColor(const QColor &color) {
+    m_selectedFxColumnColor = color;
+  }
+  QColor getFxColumnColor() const { return m_fxColumnColor; }
+  QColor getFxColumnBorderColor() const { return m_fxColumnBorderColor; }
+  QColor getSelectedFxColumnColor() const { return m_selectedFxColumnColor; }
+  // Reference column
+  void setReferenceColumnColor(const QColor &color) {
+    m_referenceColumnColor = color;
+  }
+  void setReferenceColumnBorderColor(const QColor &color) {
+    m_referenceColumnBorderColor = color;
+  }
+  void setSelectedReferenceColumnColor(const QColor &color) {
+    m_selectedReferenceColumnColor = color;
+  }
+  QColor getReferenceColumnColor() const { return m_referenceColumnColor; }
+  QColor getReferenceColumnBorderColor() const {
+    return m_referenceColumnBorderColor;
+  }
+  QColor getSelectedReferenceColumnColor() const {
+    return m_selectedReferenceColumnColor;
+  }
+  // Palette column
+  void setPaletteColumnColor(const QColor &color) {
+    m_paletteColumnColor = color;
+  }
+  void setPaletteColumnBorderColor(const QColor &color) {
+    m_paletteColumnBorderColor = color;
+  }
+  void setSelectedPaletteColumnColor(const QColor &color) {
+    m_selectedPaletteColumnColor = color;
+  }
+  QColor getPaletteColumnColor() const { return m_paletteColumnColor; }
+  QColor getPaletteColumnBorderColor() const {
+    return m_paletteColumnBorderColor;
+  }
+  QColor getSelectedPaletteColumnColor() const {
+    return m_selectedPaletteColumnColor;
+  }
+  // Mesh column
+  void setMeshColumnColor(const QColor &color) { m_meshColumnColor = color; }
+  void setMeshColumnBorderColor(const QColor &color) {
+    m_meshColumnBorderColor = color;
+  }
+  void setSelectedMeshColumnColor(const QColor &color) {
+    m_selectedMeshColumnColor = color;
+  }
+  QColor getMeshColumnColor() const { return m_meshColumnColor; }
+  QColor getMeshColumnBorderColor() const { return m_meshColumnBorderColor; }
+  QColor getSelectedMeshColumnColor() const {
+    return m_selectedMeshColumnColor;
+  }
 
-	void getCellTypeAndColors(int &ltype, QColor &cellColor, QColor &sideColor,
-							  const TXshCell &cell, bool isSelected = false);
-	void getColumnColor(QColor &color, QColor &sidecolor, int index, TXsheet *xsh);
+  void setColumnHeadPastelizer(const QColor &color) {
+    m_columnHeadPastelizer = color;
+  }
+  QColor getColumnHeadPastelizer() const { return m_columnHeadPastelizer; }
+  void setSelectedColumnHead(const QColor &color) {
+    m_selectedColumnHead = color;
+  }
+  QColor getSelectedColumnHead() const { return m_selectedColumnHead; }
 
-	// convert the last one digit of the frame number to alphabet
-	// Ex.  12 -> 1B    21 -> 2A   30 -> 3
-	QString getFrameNumberWithLetters(int frame);
+  void getCellTypeAndColors(int &ltype, QColor &cellColor, QColor &sideColor,
+                            const TXshCell &cell, bool isSelected = false);
+  void getColumnColor(QColor &color, QColor &sidecolor, int index,
+                      TXsheet *xsh);
 
-	void setFrameDisplayStyle(FrameDisplayStyle style);
-	FrameDisplayStyle getFrameDisplayStyle()
-	{
-		return m_frameDisplayStyle;
-	}
+  // convert the last one digit of the frame number to alphabet
+  // Ex.  12 -> 1B    21 -> 2A   30 -> 3
+  QString getFrameNumberWithLetters(int frame);
+
+  void setFrameDisplayStyle(FrameDisplayStyle style);
+  FrameDisplayStyle getFrameDisplayStyle() { return m_frameDisplayStyle; }
 
 protected:
-	void scrollToColumn(int col);
-	void scrollToHorizontalRange(int x0, int x1);
-	void scrollToRow(int row);
-	void scrollToVerticalRange(int y0, int y1);
+  void scrollToColumn(int col);
+  void scrollToHorizontalRange(int x0, int x1);
+  void scrollToRow(int row);
+  void scrollToVerticalRange(int y0, int y1);
 
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
-	void resizeEvent(QResizeEvent *event);
-	void keyPressEvent(QKeyEvent *event);
-	//display the upper-directional smart tab only when the ctrl key is pressed
-	void keyReleaseEvent(QKeyEvent *event);
-	void enterEvent(QEvent *);
-	void wheelEvent(QWheelEvent *event);
-	void timerEvent(QTimerEvent *);
+  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *);
+  void resizeEvent(QResizeEvent *event);
+  void keyPressEvent(QKeyEvent *event);
+  // display the upper-directional smart tab only when the ctrl key is pressed
+  void keyReleaseEvent(QKeyEvent *event);
+  void enterEvent(QEvent *);
+  void wheelEvent(QWheelEvent *event);
+  void timerEvent(QTimerEvent *);
 
 public slots:
-	void onSceneSwitched();
-	void onXsheetChanged();
-	void onCurrentFrameSwitched();
-	void onPlayingStatusChanged();
-	void onCurrentColumnSwitched();
-	void onSelectionSwitched(TSelection *oldSelection, TSelection *newSelection);
+  void onSceneSwitched();
+  void onXsheetChanged();
+  void onCurrentFrameSwitched();
+  void onPlayingStatusChanged();
+  void onCurrentColumnSwitched();
+  void onSelectionSwitched(TSelection *oldSelection, TSelection *newSelection);
 
-	void onSelectionChanged(TSelection *selection);
+  void onSelectionChanged(TSelection *selection);
 
-	void updateAllAree(bool isDragging = false);
-	void updateColumnArea();
-	void updateCellColumnAree();
-	void updateCellRowAree();
+  void updateAllAree(bool isDragging = false);
+  void updateColumnArea();
+  void updateCellColumnAree();
+  void updateCellRowAree();
 
-	void onScrubStopped();
+  void onScrubStopped();
 
-	//!Aggiorna il "titolo" del widget.
-	void changeWindowTitle();
+  //! Aggiorna il "titolo" del widget.
+  void changeWindowTitle();
 
-	void resetXsheetNotes();
+  void resetXsheetNotes();
 };
 
-#endif // XSHEETVIEWER_H
+#endif  // XSHEETVIEWER_H

@@ -22,22 +22,21 @@ class TPaletteHandle;
 
 //=============================================================================
 
-namespace DVGui
-{
+namespace DVGui {
 
-class DVAPI StyleIndexLineEdit : public LineEdit
-{
-	TPaletteHandle *m_pltHandle;
+class DVAPI StyleIndexLineEdit : public LineEdit {
+  TPaletteHandle *m_pltHandle;
 
 public:
-	StyleIndexLineEdit();
-	~StyleIndexLineEdit();
+  StyleIndexLineEdit();
+  ~StyleIndexLineEdit();
 
-	void setPaletteHandle(TPaletteHandle *pltHandle) { m_pltHandle = pltHandle; }
-	TPaletteHandle *getPaletteHandle() { return m_pltHandle; }
+  void setPaletteHandle(TPaletteHandle *pltHandle) { m_pltHandle = pltHandle; }
+  TPaletteHandle *getPaletteHandle() { return m_pltHandle; }
+
 protected:
-	void paintEvent(QPaintEvent *pe);
+  void paintEvent(QPaintEvent *pe);
 };
-} //namspace
+}  // namspace
 
 #endif

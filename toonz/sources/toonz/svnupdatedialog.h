@@ -17,80 +17,81 @@ class QCheckBox;
 
 //-----------------------------------------------------------------------------
 
-class SVNUpdateDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNUpdateDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QPushButton *m_closeButton;
-	QPushButton *m_cancelButton;
-	QPushButton *m_updateButton; // only in update to revision
+  QPushButton *m_closeButton;
+  QPushButton *m_cancelButton;
+  QPushButton *m_updateButton;  // only in update to revision
 
-	VersionControlThread m_thread;
+  VersionControlThread m_thread;
 
-	QCheckBox *m_updateSceneContentsCheckBox;
+  QCheckBox *m_updateSceneContentsCheckBox;
 
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	QString m_workingDir;
+  QString m_workingDir;
 
-	QList<SVNStatus> m_status;
-	QStringList m_files;
+  QList<SVNStatus> m_status;
+  QStringList m_files;
 
-	QList<QString> m_filesToUpdate;
-	QList<QString> m_filesWithConflict;
+  QList<QString> m_filesToUpdate;
+  QList<QString> m_filesWithConflict;
 
-	QList<QString> m_sceneResources;
+  QList<QString> m_sceneResources;
 
-	bool m_updateToRevision;
-	bool m_nonRecursive;
+  bool m_updateToRevision;
+  bool m_nonRecursive;
 
-	QTextEdit *m_output;
+  QTextEdit *m_output;
 
-	DateChooserWidget *m_dateChooserWidget;
-	ConflictWidget *m_conflictWidget;
+  DateChooserWidget *m_dateChooserWidget;
+  ConflictWidget *m_conflictWidget;
 
-	int m_sceneIconsCount;
+  int m_sceneIconsCount;
 
-	// Used to choose to display "Get scene contents"
-	// If there is some missing .tnz files don't display "Get Scene Contents" checkbox.
-	bool m_someSceneIsMissing;
+  // Used to choose to display "Get scene contents"
+  // If there is some missing .tnz files don't display "Get Scene Contents"
+  // checkbox.
+  bool m_someSceneIsMissing;
 
 private:
-	void updateFiles();
+  void updateFiles();
 
-	void checkFiles();
+  void checkFiles();
 
-	void switchToCloseButton();
+  void switchToCloseButton();
 
 public:
-	SVNUpdateDialog(QWidget *parent, const QString &workingDir,
-					const QStringList &filesToUpdate, int sceneIconsCount, bool isFolderOnly, bool updateToRevision, bool nonRecursive);
+  SVNUpdateDialog(QWidget *parent, const QString &workingDir,
+                  const QStringList &filesToUpdate, int sceneIconsCount,
+                  bool isFolderOnly, bool updateToRevision, bool nonRecursive);
 
 protected slots:
 
-	void onError(const QString &);
+  void onError(const QString &);
 
-	void onUpdateDone(const QString &);
+  void onUpdateDone(const QString &);
 
-	void onConflictSetted();
+  void onConflictSetted();
 
-	void onUpdateToMineDone();
-	void onConflictResolved();
+  void onUpdateToMineDone();
+  void onConflictResolved();
 
-	// Only for update to revision
-	void onUpdateToRevisionButtonClicked();
+  // Only for update to revision
+  void onUpdateToRevisionButtonClicked();
 
-	void onUpdateButtonClicked();
+  void onUpdateButtonClicked();
 
-	void addOutputText(const QString &text);
+  void addOutputText(const QString &text);
 
-	void onStatusRetrieved(const QString &);
+  void onStatusRetrieved(const QString &);
 
-	void onUpdateSceneContentsToggled(bool);
+  void onUpdateSceneContentsToggled(bool);
 
 signals:
-	void done(const QStringList &);
+  void done(const QStringList &);
 };
 
-#endif // SVN_REVERT_DIALOG_H
+#endif  // SVN_REVERT_DIALOG_H

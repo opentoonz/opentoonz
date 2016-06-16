@@ -25,25 +25,24 @@ class OnionSkinMask;
 // TOnionSkinMaskHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TOnionSkinMaskHandle : public QObject
-{
-	Q_OBJECT
+class DVAPI TOnionSkinMaskHandle : public QObject {
+  Q_OBJECT
 
-	OnionSkinMask m_onionSkinMask;
+  OnionSkinMask m_onionSkinMask;
 
 public:
-	TOnionSkinMaskHandle();
-	~TOnionSkinMaskHandle();
+  TOnionSkinMaskHandle();
+  ~TOnionSkinMaskHandle();
 
-	const OnionSkinMask &getOnionSkinMask() const;
-	void setOnionSkinMask(const OnionSkinMask &onionSkinMask);
+  const OnionSkinMask &getOnionSkinMask() const;
+  void setOnionSkinMask(const OnionSkinMask &onionSkinMask);
 
-	void notifyOnionSkinMaskChanged() { emit onionSkinMaskChanged(); }
-	void clear();
+  void notifyOnionSkinMaskChanged() { emit onionSkinMaskChanged(); }
+  void clear();
 
 signals:
-	void onionSkinMaskChanged();
-	void onionSkinMaskSwitched();
+  void onionSkinMaskChanged();
+  void onionSkinMaskSwitched();
 };
 
-#endif //TONIONSKINMASKHANDLE_H
+#endif  // TONIONSKINMASKHANDLE_H

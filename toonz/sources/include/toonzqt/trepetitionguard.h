@@ -15,21 +15,16 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TRepetitionGuard
-{
-	static int m_counter;
-	bool m_counterCheck;
+class DVAPI TRepetitionGuard {
+  static int m_counter;
+  bool m_counterCheck;
 
 public:
-	TRepetitionGuard()
-		: m_counterCheck(m_counter == 0)
-	{
-		++m_counter;
-	}
+  TRepetitionGuard() : m_counterCheck(m_counter == 0) { ++m_counter; }
 
-	~TRepetitionGuard() { --m_counter; }
+  ~TRepetitionGuard() { --m_counter; }
 
-	bool hasLock() { return m_counterCheck; }
+  bool hasLock() { return m_counterCheck; }
 };
 
-#endif // TREPETITION_GUARD
+#endif  // TREPETITION_GUARD

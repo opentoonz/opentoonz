@@ -34,107 +34,117 @@ class TXshSimpleLevel;
   OnionSkinMask is the class encapsulating onion skin data in Toonz.
 */
 
-class DVAPI OnionSkinMask
-{
+class DVAPI OnionSkinMask {
 public:
-	enum ShiftTraceStatus {
-		DISABLED,
-		EDITING_GHOST,
-		ENABLED,
-		ENABLED_WITHOUT_GHOST_MOVEMENTS
-	};
+  enum ShiftTraceStatus {
+    DISABLED,
+    EDITING_GHOST,
+    ENABLED,
+    ENABLED_WITHOUT_GHOST_MOVEMENTS
+  };
 
 public:
-	OnionSkinMask() : m_enabled(false), m_wholeScene(false) {}
+  OnionSkinMask() : m_enabled(false), m_wholeScene(false) {}
 
-	void clear();
+  void clear();
 
-	//! Fills in the output vector with the absolute frames to be onion-skinned.
-	void getAll(int currentRow, std::vector<int> &output) const;
+  //! Fills in the output vector with the absolute frames to be onion-skinned.
+  void getAll(int currentRow, std::vector<int> &output) const;
 
-	int getMosCount() const { return m_mos.size(); } //!< Returns the Mobile OS frames count
-	int getFosCount() const { return m_fos.size(); } //!< Returns the Fixed OS frames count
+  int getMosCount() const {
+    return m_mos.size();
+  }  //!< Returns the Mobile OS frames count
+  int getFosCount() const {
+    return m_fos.size();
+  }  //!< Returns the Fixed OS frames count
 
-	int getMos(int index) const
-	{
-		assert(0 <= index && index < (int)m_mos.size());
-		return m_mos[index];
-	}
+  int getMos(int index) const {
+    assert(0 <= index && index < (int)m_mos.size());
+    return m_mos[index];
+  }
 
-	int getFos(int index) const
-	{
-		assert(0 <= index && index < (int)m_fos.size());
-		return m_fos[index];
-	}
+  int getFos(int index) const {
+    assert(0 <= index && index < (int)m_fos.size());
+    return m_fos[index];
+  }
 
-	void setMos(int drow, bool on); //!< Sets a Mobile OS frame shifted by drow around current xsheet frame
-	void setFos(int row, bool on);  //!< Sets a Fixed OS frame to the specified xsheet row
+  void setMos(int drow, bool on);  //!< Sets a Mobile OS frame shifted by drow
+                                   //!around current xsheet frame
+  void setFos(int row,
+              bool on);  //!< Sets a Fixed OS frame to the specified xsheet row
 
-	bool isMos(int drow) const;
-	bool isFos(int row) const;
+  bool isMos(int drow) const;
+  bool isFos(int row) const;
 
-	bool getMosRange(int &drow0, int &drow1) const;
+  bool getMosRange(int &drow0, int &drow1) const;
 
-	bool isEmpty() const { return m_mos.empty() && m_fos.empty(); }
+  bool isEmpty() const { return m_mos.empty() && m_fos.empty(); }
 
-	bool isEnabled() const { return m_enabled; }
-	void enable(bool on) { m_enabled = on; }
+  bool isEnabled() const { return m_enabled; }
+  void enable(bool on) { m_enabled = on; }
 
-	bool isWholeScene() const { return m_wholeScene; }
-	void setIsWholeScene(bool wholeScene) { m_wholeScene = wholeScene; }
+  bool isWholeScene() const { return m_wholeScene; }
+  void setIsWholeScene(bool wholeScene) { m_wholeScene = wholeScene; }
 
-	/*!
-    Returns the fade (transparency) value, in the [0.0, 1.0] range, corresponding to the specified
-    distance from current frame. In case distance == 0, the returned value is 0.9, ie \a almost opaque,
-    since underlying onion-skinned drawings must be visible.
-  */
-	static double getOnionSkinFade(int distance);
+  /*!
+Returns the fade (transparency) value, in the [0.0, 1.0] range, corresponding to
+the specified
+distance from current frame. In case distance == 0, the returned value is 0.9,
+ie \a almost opaque,
+since underlying onion-skinned drawings must be visible.
+*/
+  static double getOnionSkinFade(int distance);
 
-	// Shift & Trace  stuff
+  // Shift & Trace  stuff
 
-	ShiftTraceStatus getShiftTraceStatus() const { return m_shiftTraceStatus; }
-	void setShiftTraceStatus(ShiftTraceStatus status) { m_shiftTraceStatus = status; }
+  ShiftTraceStatus getShiftTraceStatus() const { return m_shiftTraceStatus; }
+  void setShiftTraceStatus(ShiftTraceStatus status) {
+    m_shiftTraceStatus = status;
+  }
 
-	bool isShiftTraceEnabled() const { return m_shiftTraceStatus != DISABLED; }
+  bool isShiftTraceEnabled() const { return m_shiftTraceStatus != DISABLED; }
 
-	const TAffine getShiftTraceGhostAff(int index) const { return m_ghostAff[index]; }
-	void setShiftTraceGhostAff(int index, const TAffine &aff);
+  const TAffine getShiftTraceGhostAff(int index) const {
+    return m_ghostAff[index];
+  }
+  void setShiftTraceGhostAff(int index, const TAffine &aff);
 
-	const TPointD getShiftTraceGhostCenter(int index) const { return m_ghostCenter[index]; }
-	void setShiftTraceGhostCenter(int index, const TPointD &center);
+  const TPointD getShiftTraceGhostCenter(int index) const {
+    return m_ghostCenter[index];
+  }
+  void setShiftTraceGhostCenter(int index, const TPointD &center);
 
 private:
-	std::vector<int> m_fos, m_mos; //!< Fixed and Mobile Onion Skin indices
-	bool m_enabled;				   //!< Whether onion skin is enabled
-	bool m_wholeScene;			   //!< Whether the OS works on the entire scene
+  std::vector<int> m_fos, m_mos;  //!< Fixed and Mobile Onion Skin indices
+  bool m_enabled;                 //!< Whether onion skin is enabled
+  bool m_wholeScene;              //!< Whether the OS works on the entire scene
 
-	ShiftTraceStatus m_shiftTraceStatus;
-	TAffine m_ghostAff[2];
-	TPointD m_ghostCenter[2];
+  ShiftTraceStatus m_shiftTraceStatus;
+  TAffine m_ghostAff[2];
+  TPointD m_ghostCenter[2];
 };
 
 //***************************************************************************
 //    OnionSkinMaskModifier  declaration
 //***************************************************************************
 
-class DVAPI OnionSkinMaskModifier
-{
+class DVAPI OnionSkinMaskModifier {
 public:
-	OnionSkinMaskModifier(OnionSkinMask mask, int currentRow);
+  OnionSkinMaskModifier(OnionSkinMask mask, int currentRow);
 
-	const OnionSkinMask &getMask() const { return m_curMask; }
+  const OnionSkinMask &getMask() const { return m_curMask; }
 
-	void click(int row, bool isFos);
-	void drag(int row);
-	void release(int row);
+  void click(int row, bool isFos);
+  void drag(int row);
+  void release(int row);
 
 private:
-	OnionSkinMask m_oldMask, m_curMask;
+  OnionSkinMask m_oldMask, m_curMask;
 
-	int m_firstRow, m_lastRow;
-	int m_curRow;
+  int m_firstRow, m_lastRow;
+  int m_curRow;
 
-	int m_status;
+  int m_status;
 };
 
-#endif // ONION_SKIN_MASK_INCLUDED
+#endif  // ONION_SKIN_MASK_INCLUDED

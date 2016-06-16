@@ -19,52 +19,51 @@ class TRandom;
 
 //-----------------------------------------------------------------------
 
-class ParticlesManager : public TRenderResourceManager
-{
-	T_RENDER_RESOURCE_MANAGER
+class ParticlesManager : public TRenderResourceManager {
+  T_RENDER_RESOURCE_MANAGER
 
 public:
-	struct FxData;
+  struct FxData;
 
-	struct FrameData {
-		FxData *m_fxData;
-		double m_frame;
-		TRandom m_random;
-		std::list<Particle> m_particles;
-		bool m_calculated;
-		int m_maxTrail;
-		int m_totalParticles;
+  struct FrameData {
+    FxData *m_fxData;
+    double m_frame;
+    TRandom m_random;
+    std::list<Particle> m_particles;
+    bool m_calculated;
+    int m_maxTrail;
+    int m_totalParticles;
 
-		FrameData(FxData *fxData);
-		~FrameData();
+    FrameData(FxData *fxData);
+    ~FrameData();
 
-		void buildMaxTrail();
-		void clear();
-	};
+    void buildMaxTrail();
+    void clear();
+  };
 
-	struct FxData : public TSmartObject {
-		DECLARE_CLASS_CODE
+  struct FxData : public TSmartObject {
+    DECLARE_CLASS_CODE
 
-		QThreadStorage<FrameData *> m_frames;
+    QThreadStorage<FrameData *> m_frames;
 
-		FxData();
-	};
+    FxData();
+  };
 
 public:
-	ParticlesManager();
-	~ParticlesManager();
+  ParticlesManager();
+  ~ParticlesManager();
 
-	static ParticlesManager *instance();
+  static ParticlesManager *instance();
 
-	FrameData *data(unsigned long fxId);
+  FrameData *data(unsigned long fxId);
 
 private:
-	std::map<unsigned long, FxData *> m_fxs;
-	QMutex m_mutex;
+  std::map<unsigned long, FxData *> m_fxs;
+  QMutex m_mutex;
 
-	int m_renderStatus;
+  int m_renderStatus;
 
-	void onRenderStatusStart(int renderStatus);
+  void onRenderStatusStart(int renderStatus);
 };
 
 #endif

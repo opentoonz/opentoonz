@@ -30,54 +30,52 @@
 
 class TTcpIpServerImp;
 
-class TFARMAPI TTcpIpServer : public QThread
-{
-	int m_exitCode;
+class TFARMAPI TTcpIpServer : public QThread {
+  int m_exitCode;
 
 public:
-	TTcpIpServer(int port);
-	virtual ~TTcpIpServer();
+  TTcpIpServer(int port);
+  virtual ~TTcpIpServer();
 
-	int getPort() const;
+  int getPort() const;
 
-	void run();
-	int shutdown();
+  void run();
+  int shutdown();
 
-	virtual void onReceive(int socket, const QString &data) = 0;
+  virtual void onReceive(int socket, const QString &data) = 0;
 
-	void sendReply(int socket, const QString &reply);
+  void sendReply(int socket, const QString &reply);
 
-	int getExitCode() const;
+  int getExitCode() const;
 
 private:
-	std::shared_ptr<TTcpIpServerImp> m_imp;
+  std::shared_ptr<TTcpIpServerImp> m_imp;
 };
 
 //---------------------------------------------------------------------
 
 enum {
-	OK,
-	STARTUP_FAILED,
-	HOST_UNKNOWN,
-	SOCKET_CREATION_FAILED,
-	CONNECTION_FAILED,
-	CONNECTION_REFUSED,
-	CONNECTION_TIMEDOUT,
-	SEND_FAILED,
-	RECEIVE_FAILED
+  OK,
+  STARTUP_FAILED,
+  HOST_UNKNOWN,
+  SOCKET_CREATION_FAILED,
+  CONNECTION_FAILED,
+  CONNECTION_REFUSED,
+  CONNECTION_TIMEDOUT,
+  SEND_FAILED,
+  RECEIVE_FAILED
 };
 
-class TFARMAPI TTcpIpClient
-{
+class TFARMAPI TTcpIpClient {
 public:
-	TTcpIpClient();
-	~TTcpIpClient();
+  TTcpIpClient();
+  ~TTcpIpClient();
 
-	int connect(const QString &name, const QString &addr, int port, int &sock);
-	int disconnect(int sock);
+  int connect(const QString &name, const QString &addr, int port, int &sock);
+  int disconnect(int sock);
 
-	int send(int sock, const QString &data);
-	int send(int sock, const QString &data, QString &reply);
+  int send(int sock, const QString &data);
+  int send(int sock, const QString &data, QString &reply);
 };
 
 #endif

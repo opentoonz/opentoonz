@@ -46,55 +46,53 @@
 
  */
 
-class DVAPI TSegmentAdjuster
-{
+class DVAPI TSegmentAdjuster {
 public:
-	class End
-	{
-	public:
-		TStroke *m_stroke;
-		double m_w;
-		double m_wmin, m_wmax;
-		End() : m_stroke(0), m_w(0), m_wmin(0), m_wmax(1) {}
-		End(TStroke *stroke, double w) : m_stroke(stroke), m_w(w), m_wmin(0), m_wmax(1) {}
-		End(TStroke *stroke, double w, double wmin, double wmax)
-			: m_stroke(stroke), m_w(w), m_wmin(wmin), m_wmax(wmax) {}
-		TPointD getPoint() const { return m_stroke->getPoint(m_w); }
-		TPointD getSpeed() const { return m_stroke->getSpeed(m_w); }
-	};
+  class End {
+  public:
+    TStroke *m_stroke;
+    double m_w;
+    double m_wmin, m_wmax;
+    End() : m_stroke(0), m_w(0), m_wmin(0), m_wmax(1) {}
+    End(TStroke *stroke, double w)
+        : m_stroke(stroke), m_w(w), m_wmin(0), m_wmax(1) {}
+    End(TStroke *stroke, double w, double wmin, double wmax)
+        : m_stroke(stroke), m_w(w), m_wmin(wmin), m_wmax(wmax) {}
+    TPointD getPoint() const { return m_stroke->getPoint(m_w); }
+    TPointD getSpeed() const { return m_stroke->getSpeed(m_w); }
+  };
 
-	TSegmentAdjuster();
+  TSegmentAdjuster();
 
-	// debug
-	void enableTrace(bool enabled) { m_traceEnabled = enabled; }
-	void draw();
-	void clear() { m_links.clear(); }
+  // debug
+  void enableTrace(bool enabled) { m_traceEnabled = enabled; }
+  void draw();
+  void clear() { m_links.clear(); }
 
-	void compute(End &a, End &b);
+  void compute(End &a, End &b);
 
 private:
-	End m_a, m_b, m_c, m_d;
-	std::vector<std::pair<TPointD, TPointD>> m_links;
-	bool m_traceEnabled;
+  End m_a, m_b, m_c, m_d;
+  std::vector<std::pair<TPointD, TPointD>> m_links;
+  bool m_traceEnabled;
 
-	inline double fun(double u, double v) const
-	{
-		return norm2(m_a.m_stroke->getPoint(u) - m_b.m_stroke->getPoint(v));
-	}
+  inline double fun(double u, double v) const {
+    return norm2(m_a.m_stroke->getPoint(u) - m_b.m_stroke->getPoint(v));
+  }
 
-	inline void gradient(double &dfdu, double &dfdv, double u, double v)
-	{
-		const double h = 0.0001;
-		dfdu = (fun(u + h, v) - fun(u - h, v)) / (2 * h);
-		dfdv = (fun(u, v + h) - fun(u, v - h)) / (2 * h);
-	}
+  inline void gradient(double &dfdu, double &dfdv, double u, double v) {
+    const double h = 0.0001;
+    dfdu           = (fun(u + h, v) - fun(u - h, v)) / (2 * h);
+    dfdv           = (fun(u, v + h) - fun(u, v - h)) / (2 * h);
+  }
 
-	inline static double dsda(TStroke *stroke, double w, double dwda)
-	{
-		const double h = 0.0001;
-		return norm(stroke->getPoint(w + dwda * h) - stroke->getPoint(w - dwda * h)) / (2 * h);
-	}
+  inline static double dsda(TStroke *stroke, double w, double dwda) {
+    const double h = 0.0001;
+    return norm(stroke->getPoint(w + dwda * h) -
+                stroke->getPoint(w - dwda * h)) /
+           (2 * h);
+  }
 };
 //---------------------------------------------------------------------------------------
 
-#endif // T_SEGMENTADJUSTER_H
+#endif  // T_SEGMENTADJUSTER_H

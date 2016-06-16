@@ -16,53 +16,52 @@ class SceneViewer;
 /*! La classe si occupa della visualizzazione e della gestione
     di una linea guida (puo' essere orizzontale o verticale)
 */
-class Ruler : public QWidget
-{
-	Q_OBJECT
+class Ruler : public QWidget {
+  Q_OBJECT
 
-	QColor m_parentBgColor;
+  QColor m_parentBgColor;
 
-	Q_PROPERTY(QColor ParentBGColor READ getParentBGColor WRITE setParentBGColor)
+  Q_PROPERTY(QColor ParentBGColor READ getParentBGColor WRITE setParentBGColor)
 
-	QColor m_scaleColor;
-	Q_PROPERTY(QColor ScaleColor READ getScaleColor WRITE setScaleColor)
+  QColor m_scaleColor;
+  Q_PROPERTY(QColor ScaleColor READ getScaleColor WRITE setScaleColor)
 
-	void setParentBGColor(const QColor &color) { m_parentBgColor = color; }
-	QColor getParentBGColor() const { return m_parentBgColor; }
+  void setParentBGColor(const QColor &color) { m_parentBgColor = color; }
+  QColor getParentBGColor() const { return m_parentBgColor; }
 
-	void setScaleColor(const QColor &color) { m_scaleColor = color; }
-	QColor getScaleColor() const { return m_scaleColor; }
+  void setScaleColor(const QColor &color) { m_scaleColor = color; }
+  QColor getScaleColor() const { return m_scaleColor; }
 
-	SceneViewer *m_viewer;
-	bool m_vertical;
-	bool m_moving;
-	bool m_hiding;
+  SceneViewer *m_viewer;
+  bool m_vertical;
+  bool m_moving;
+  bool m_hiding;
 
-	typedef TSceneProperties::Guides Guides;
+  typedef TSceneProperties::Guides Guides;
 
 public:
-	Ruler(QWidget *parent, SceneViewer *viewer, bool vertical);
-	Guides &getGuides() const;
+  Ruler(QWidget *parent, SceneViewer *viewer, bool vertical);
+  Guides &getGuides() const;
 
-	int getGuideCount() const;
-	double getGuide(int index) const;
+  int getGuideCount() const;
+  double getGuide(int index) const;
 
-	double getUnit() const;
-	void getIndices(double origin, double iunit, int size,
-					int &i0, int &i1, int &ic) const;
+  double getUnit() const;
+  void getIndices(double origin, double iunit, int size, int &i0, int &i1,
+                  int &ic) const;
 
-	double getZoomScale() const;
-	double getPan() const;
+  double getZoomScale() const;
+  double getPan() const;
 
-	void drawVertical(QPainter &);
-	void drawHorizontal(QPainter &);
-	void paintEvent(QPaintEvent *);
+  void drawVertical(QPainter &);
+  void drawHorizontal(QPainter &);
+  void paintEvent(QPaintEvent *);
 
-	double posToValue(const QPoint &p) const;
+  double posToValue(const QPoint &p) const;
 
-	void mousePressEvent(QMouseEvent *e);
-	void mouseMoveEvent(QMouseEvent *e);
-	void mouseReleaseEvent(QMouseEvent *e);
+  void mousePressEvent(QMouseEvent *e);
+  void mouseMoveEvent(QMouseEvent *e);
+  void mouseReleaseEvent(QMouseEvent *e);
 };
 
 #endif

@@ -13,8 +13,7 @@
             and deleter concepts.
 */
 
-namespace tcg
-{
+namespace tcg {
 
 //*********************************************************************************
 //    Deleter  objects
@@ -22,34 +21,32 @@ namespace tcg
 
 template <typename T>
 struct deleter {
-	void operator()(T *ptr) const { delete ptr; }
+  void operator()(T *ptr) const { delete ptr; }
 };
 
 template <typename T>
 struct deleter<T[]> {
-	void operator()(T *ptr) const { delete[] ptr; }
+  void operator()(T *ptr) const { delete[] ptr; }
 };
 
 template <typename T>
 struct dtor {
-	void operator()(T *ptr) const { ptr->~T(); }
+  void operator()(T *ptr) const { ptr->~T(); }
 };
 
 template <typename T>
 struct dtor<T[]> {
-	int m_count;
+  int m_count;
 
-	dtor(int count) : m_count(count) {}
+  dtor(int count) : m_count(count) {}
 
-	void operator()(T *ptr) const
-	{
-		for (int t = 0; t != m_count; ++t)
-			ptr[t].~T();
-	}
+  void operator()(T *ptr) const {
+    for (int t = 0; t != m_count; ++t) ptr[t].~T();
+  }
 };
 
 struct freer {
-	void operator()(void *ptr) const { free(ptr); }
+  void operator()(void *ptr) const { free(ptr); }
 };
 
 /*!
@@ -60,36 +57,33 @@ struct freer {
 */
 
 template <typename T>
-class deleter_concept
-{
+class deleter_concept {
 public:
-	typedef typename tcg::traits<T>::pointer_type pointer_type;
+  typedef typename tcg::traits<T>::pointer_type pointer_type;
 
 public:
-	virtual ~deleter_concept() {}
+  virtual ~deleter_concept() {}
 
-	virtual deleter_concept *clone() const = 0;
-	virtual void operator()(pointer_type ptr) = 0;
+  virtual deleter_concept *clone() const    = 0;
+  virtual void operator()(pointer_type ptr) = 0;
 };
 
 //--------------------------------------------------------------------------------
 
 template <typename T>
-class deleter_model : public deleter_concept<T>
-{
+class deleter_model : public deleter_concept<T> {
 public:
-	deleter_concept<T> *clone() const { return new deleter_model<T>(*this); }
-	void operator()(T *ptr) { delete ptr; }
+  deleter_concept<T> *clone() const { return new deleter_model<T>(*this); }
+  void operator()(T *ptr) { delete ptr; }
 };
 
 template <typename T>
-class deleter_model<T[]> : public deleter_concept<T[]>
-{
+class deleter_model<T[]> : public deleter_concept<T[]> {
 public:
-	deleter_concept<T[]> *clone() const { return new deleter_model<T[]>(*this); }
-	void operator()(T *ptr) { delete[] ptr; }
+  deleter_concept<T[]> *clone() const { return new deleter_model<T[]>(*this); }
+  void operator()(T *ptr) { delete[] ptr; }
 };
 
-} // namespace tcg
+}  // namespace tcg
 
-#endif // TCG_DELETER_TYPES_H
+#endif  // TCG_DELETER_TYPES_H

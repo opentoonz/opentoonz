@@ -7,21 +7,19 @@
 //#include "timage_io.h"
 #include "tproperty.h"
 
-namespace Tiio
-{
+namespace Tiio {
 
 Tiio::ReaderMaker makeSgiReader;
 Tiio::WriterMaker makeSgiWriter;
 
-class SgiWriterProperties : public TPropertyGroup
-{
+class SgiWriterProperties : public TPropertyGroup {
 public:
-	TEnumProperty m_pixelSize;
-	TBoolProperty m_compressed;
-	TEnumProperty m_endianess;
-	SgiWriterProperties();
+  TEnumProperty m_pixelSize;
+  TBoolProperty m_compressed;
+  TEnumProperty m_endianess;
+  SgiWriterProperties();
 };
 
-} // namespace
+}  // namespace
 
 #endif

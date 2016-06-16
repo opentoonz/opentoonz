@@ -43,53 +43,61 @@ class TFrameHandle;
             widget showing the current frame number, and a pair of directional
             arrow buttons that move to adjacent frames.
 
-  \remark   The text field actually visualizes the internal integer \p m_frame \a +1
+  \remark   The text field actually visualizes the internal integer \p m_frame
+  \a +1
             (e.g. when \p m_frame is 0 then 1 is visualized).
 */
 
-class DVAPI FrameNavigator : public QToolBar
-{
-	Q_OBJECT
+class DVAPI FrameNavigator : public QToolBar {
+  Q_OBJECT
 
-	TFrameHandle *m_frameHandle;
+  TFrameHandle *m_frameHandle;
 
-	int m_frame;
-	DVGui::IntLineEdit *m_lineEdit;
+  int m_frame;
+  DVGui::IntLineEdit *m_lineEdit;
 
 public:
-	FrameNavigator(QWidget *parent = 0);
-	~FrameNavigator() {}
+  FrameNavigator(QWidget *parent = 0);
+  ~FrameNavigator() {}
 
-	int getFrame() const { return m_frame; }
+  int getFrame() const { return m_frame; }
 
-	void setFrameHandle(TFrameHandle *); //!< Attaches the navigator to the specified frameHandle.
-										 //!  \remark    Detaches from any previously attached frame handle.
+  void setFrameHandle(TFrameHandle *);  //!< Attaches the navigator to the
+                                        //!specified frameHandle.
+  //!  \remark    Detaches from any previously attached frame handle.
 
-	bool anyWidgetHasFocus();
+  bool anyWidgetHasFocus();
 signals:
 
-	void frameSwitched();
+  void frameSwitched();
 
 public slots:
 
-	void setFrame(int frame, bool notifyFrameHandler); //!< Sets the navigator's current frame.
-													   //!  \deprecated  Remove the bool.
-	void prevFrame() { setFrame(m_frame - 1, true); }  //!< Move to previous frame.
-	void nextFrame() { setFrame(m_frame + 1, true); }  //!< Move to next frame.
+  void setFrame(
+      int frame,
+      bool notifyFrameHandler);  //!< Sets the navigator's current frame.
+                                 //!  \deprecated  Remove the bool.
+  void prevFrame() {
+    setFrame(m_frame - 1, true);
+  }  //!< Move to previous frame.
+  void nextFrame() { setFrame(m_frame + 1, true); }  //!< Move to next frame.
 
 protected:
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *);
 
-	void updateFrame(int frame); //!< Changes frame without emitting any signal and notifying the frameHandle.
+  void updateFrame(int frame);  //!< Changes frame without emitting any signal
+                                //!and notifying the frameHandle.
 
 protected slots:
 
-	/*!
-    \details  Copies the value in the frame's line edit widget to the internal current frame value.
-  */
-	void onEditingFinished(); //!< Slot invoked whenever current frame's text editing is finished.
-	void onFrameSwitched();
+  /*!
+\details  Copies the value in the frame's line edit widget to the internal
+current frame value.
+*/
+  void onEditingFinished();  //!< Slot invoked whenever current frame's text
+                             //!editing is finished.
+  void onFrameSwitched();
 };
 
-#endif // FRAMENVIGATORTOOLBAR_H
+#endif  // FRAMENVIGATORTOOLBAR_H

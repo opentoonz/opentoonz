@@ -3,10 +3,10 @@
 #ifndef TIPC_MESSAGE_H
 #define TIPC_MESSAGE_H
 
-//Toonz includes
+// Toonz includes
 #include "tcommon.h"
 
-//Qt includes
+// Qt includes
 #include <QDataStream>
 #include <QLocalSocket>
 
@@ -22,44 +22,43 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-namespace tipc
-{
+namespace tipc {
 
 //********************************************************
 //    TIPC Message Parser declaration
 //********************************************************
 
-class MessageParser
-{
-	friend class Server;
+class MessageParser {
+  friend class Server;
 
-	QLocalSocket *m_socket;
-	tipc::Stream *m_stream;
+  QLocalSocket *m_socket;
+  tipc::Stream *m_stream;
 
 public:
-	virtual QString header() const = 0;
-	virtual void operator()(Message &msg) = 0;
+  virtual QString header() const        = 0;
+  virtual void operator()(Message &msg) = 0;
 
-	QLocalSocket *socket() { return m_socket; }
-	tipc::Stream *stream() { return m_stream; }
+  QLocalSocket *socket() { return m_socket; }
+  tipc::Stream *stream() { return m_stream; }
 };
 
 //********************************************************
 //    Default Message Types declaration
 //********************************************************
 
-enum DefMsgEnum { SHMEM_REQUEST,
-				  SHMEM_RELEASE,
-				  TMPFILE_REQUEST,
-				  TMPFILE_RELEASE,
-				  QUIT_ON_ERROR };
+enum DefMsgEnum {
+  SHMEM_REQUEST,
+  SHMEM_RELEASE,
+  TMPFILE_REQUEST,
+  TMPFILE_RELEASE,
+  QUIT_ON_ERROR
+};
 
 template <DefMsgEnum msgType>
-class DVAPI DefaultMessageParser : public MessageParser
-{
+class DVAPI DefaultMessageParser : public MessageParser {
 public:
-	QString header() const;
-	void operator()(Message &msg);
+  QString header() const;
+  void operator()(Message &msg);
 };
 
 //------------------------------------------------------------------------------
@@ -95,6 +94,6 @@ QUIT_ON_ERROR
 
 //------------------------------------------------------------------------------
 
-} //namespace tipc
+}  // namespace tipc
 
-#endif //TIPC_MESSAGE_H
+#endif  // TIPC_MESSAGE_H

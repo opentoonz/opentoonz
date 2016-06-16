@@ -8,8 +8,7 @@
 class TFilePath;
 class TPalette;
 
-namespace StudioPaletteCmd
-{
+namespace StudioPaletteCmd {
 
 void loadIntoCurrentPalette();
 void loadIntoCurrentPalette(const TFilePath &fp);
@@ -23,9 +22,8 @@ void updateAllLinkedStyles();
 
 void deletePalette(const TFilePath &fp);
 void movePalette(const TFilePath &dstPath, const TFilePath &srcPath);
-TFilePath createPalette(const TFilePath &folderPath,
-						string paletteName,
-						const TPalette *palette);
+TFilePath createPalette(const TFilePath &folderPath, string paletteName,
+                        const TPalette *palette);
 
 TFilePath addFolder(const TFilePath &parentFolderPath);
 void deleteFolder(const TFilePath &folderPath);

@@ -3,8 +3,7 @@
 #ifndef TLIN_BASICOPS_H
 #define TLIN_BASICOPS_H
 
-namespace tlin
-{
+namespace tlin {
 
 //------------------------------------------------------------------------------
 
@@ -26,6 +25,6 @@ void sub(const _IN1 &, const _IN2 &, _OUT &);
 template <typename _T>
 void transpose(const _T &);
 
-} //namespace tlin
+}  // namespace tlin
 
-#endif //TLIN_BASICOPS_H
+#endif  // TLIN_BASICOPS_H

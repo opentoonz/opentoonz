@@ -24,48 +24,44 @@ extern "C" {
 #define DVAPI DV_IMPORT_API
 #endif
 
-namespace Tiio
-{
+namespace Tiio {
 
-class DVAPI JpgReader : public Tiio::Reader
-{
-	struct jpeg_decompress_struct m_cinfo;
-	struct jpeg_error_mgr m_jerr;
-	FILE *m_chan;
-	JSAMPARRAY m_buffer;
-	bool m_isOpen;
+class DVAPI JpgReader : public Tiio::Reader {
+  struct jpeg_decompress_struct m_cinfo;
+  struct jpeg_error_mgr m_jerr;
+  FILE *m_chan;
+  JSAMPARRAY m_buffer;
+  bool m_isOpen;
 
 public:
-	JpgReader();
-	~JpgReader();
+  JpgReader();
+  ~JpgReader();
 
-	Tiio::RowOrder getRowOrder() const;
+  Tiio::RowOrder getRowOrder() const;
 
-	void open(FILE *file);
+  void open(FILE *file);
 
-	void readLine(char *buffer, int x0, int x1, int shrink);
-	int skipLines(int lineCount);
+  void readLine(char *buffer, int x0, int x1, int shrink);
+  int skipLines(int lineCount);
 };
 
 DVAPI Tiio::ReaderMaker makeJpgReader;
 DVAPI Tiio::WriterMaker makeJpgWriter;
 
-class DVAPI JpgWriterProperties : public TPropertyGroup
-{
+class DVAPI JpgWriterProperties : public TPropertyGroup {
 public:
-	TIntProperty m_quality;
-	TIntProperty m_smoothing;
+  TIntProperty m_quality;
+  TIntProperty m_smoothing;
 
-	static const std::string QUALITY;
+  static const std::string QUALITY;
 
-	JpgWriterProperties()
-		: m_quality(QUALITY, 0, 100, 90), m_smoothing("Smoothing", 0, 100, 0)
-	{
-		bind(m_quality);
-		bind(m_smoothing);
-	}
+  JpgWriterProperties()
+      : m_quality(QUALITY, 0, 100, 90), m_smoothing("Smoothing", 0, 100, 0) {
+    bind(m_quality);
+    bind(m_smoothing);
+  }
 };
 
-} // namespace
+}  // namespace
 
 #endif

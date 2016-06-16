@@ -12,157 +12,149 @@ class TPalette;
 
 //-------------------------------------------------------------------
 
-class Thumbnail
-{
+class Thumbnail {
 public:
-	class Frame
-	{
-	public:
-		Frame(const TFrameId &fid) : m_fid(fid) {}
-		const TFrameId m_fid;
-		TRaster32P m_raster;
-	};
+  class Frame {
+  public:
+    Frame(const TFrameId &fid) : m_fid(fid) {}
+    const TFrameId m_fid;
+    TRaster32P m_raster;
+  };
 
-	enum Type {
-		LEVEL,
-		SCENE
-	};
+  enum Type { LEVEL, SCENE };
 
 protected:
-	vector<Frame *> m_frames;
+  vector<Frame *> m_frames;
 
-	int m_currentFrameIndex;
-	bool m_iconLoaded;
-	bool m_playing;
+  int m_currentFrameIndex;
+  bool m_iconLoaded;
+  bool m_playing;
 
-	TDimension m_size;
-	TRaster32P m_raster;
+  TDimension m_size;
+  TRaster32P m_raster;
 
 public:
-	Thumbnail(const TDimension &size);
-	virtual ~Thumbnail();
+  Thumbnail(const TDimension &size);
+  virtual ~Thumbnail();
 
-	void addFrame(const TFrameId &fid);
+  void addFrame(const TFrameId &fid);
 
-	bool isIconLoaded() const { return m_iconLoaded; }
-	bool isPlaying() const { return m_playing; }
+  bool isIconLoaded() const { return m_iconLoaded; }
+  bool isPlaying() const { return m_playing; }
 
-	// post: assert(m_iconLoaded); assert(m_raster);
-	virtual void loadIcon() = 0;
+  // post: assert(m_iconLoaded); assert(m_raster);
+  virtual void loadIcon() = 0;
 
-	// pre: 0<=index && index<m_frames.size()
-	// post: assert(m_frames[index]);
-	virtual void loadFrame(int index) = 0;
+  // pre: 0<=index && index<m_frames.size()
+  // post: assert(m_frames[index]);
+  virtual void loadFrame(int index) = 0;
 
-	virtual void setPlaying(bool on) = 0;
+  virtual void setPlaying(bool on) = 0;
 
-	virtual string getName() const { return ""; }
-	virtual TFilePath getPath() const { return "__none__"; }
+  virtual string getName() const { return ""; }
+  virtual TFilePath getPath() const { return "__none__"; }
 
-	virtual Type getType() const = 0;
+  virtual Type getType() const = 0;
 
-	// pre: assert(!m_playing);
-	virtual void setName(string name) {}
+  // pre: assert(!m_playing);
+  virtual void setName(string name) {}
 
-	const TRaster32P &getRaster() const { return m_raster; }
-	TDimension getSize() const { return m_size; }
+  const TRaster32P &getRaster() const { return m_raster; }
+  TDimension getSize() const { return m_size; }
 
-	bool nextFrame() { return gotoFrame(m_currentFrameIndex + 1); }
-	int getCurrentFrameIndex() { return m_currentFrameIndex; }
+  bool nextFrame() { return gotoFrame(m_currentFrameIndex + 1); }
+  int getCurrentFrameIndex() { return m_currentFrameIndex; }
 
-	// pre: assert(m_playing)
-	bool gotoFrame(int index);
+  // pre: assert(m_playing)
+  bool gotoFrame(int index);
 
-	TAffine getAffine(const TDimension &cameraSize) const;
-	virtual bool startDragDrop() { return false; }
+  TAffine getAffine(const TDimension &cameraSize) const;
+  virtual bool startDragDrop() { return false; }
 
 private:
-	// not implemented
-	Thumbnail(const Thumbnail &);
-	Thumbnail &operator=(const Thumbnail &);
+  // not implemented
+  Thumbnail(const Thumbnail &);
+  Thumbnail &operator=(const Thumbnail &);
 };
 
 //============================================================
 
-class LevelThumbnail : public Thumbnail
-{
+class LevelThumbnail : public Thumbnail {
 protected:
-	TXshLevel *m_level;
+  TXshLevel *m_level;
 
 public:
-	LevelThumbnail(const TDimension &size, TXshLevel *level);
-	~LevelThumbnail();
+  LevelThumbnail(const TDimension &size, TXshLevel *level);
+  ~LevelThumbnail();
 
-	void loadIcon();
-	void loadFrame(int index);
-	void setPlaying(bool on);
+  void loadIcon();
+  void loadFrame(int index);
+  void setPlaying(bool on);
 
-	string getName() const;
-	TFilePath getPath() const;
+  string getName() const;
+  TFilePath getPath() const;
 
-	void setName(string name);
+  void setName(string name);
 
-	Type getType() const { return LEVEL; };
+  Type getType() const { return LEVEL; };
 
 private:
-	// not implemented
-	LevelThumbnail(const LevelThumbnail &);
-	LevelThumbnail &operator=(const LevelThumbnail &);
+  // not implemented
+  LevelThumbnail(const LevelThumbnail &);
+  LevelThumbnail &operator=(const LevelThumbnail &);
 };
 
 //============================================================
 
-class SceneThumbnail : public Thumbnail
-{
+class SceneThumbnail : public Thumbnail {
 protected:
-	string m_name;
-	TXsheet *m_xsheet;
-	TPalette *m_palette;
+  string m_name;
+  TXsheet *m_xsheet;
+  TPalette *m_palette;
 
 public:
-	SceneThumbnail(const TDimension &size, TXsheet *xsheet, TPalette *palette);
-	~SceneThumbnail();
+  SceneThumbnail(const TDimension &size, TXsheet *xsheet, TPalette *palette);
+  ~SceneThumbnail();
 
-	void loadIcon();
-	void loadFrame(int index);
-	void setPlaying(bool on);
+  void loadIcon();
+  void loadFrame(int index);
+  void setPlaying(bool on);
 
-	string getName() const;
-	TFilePath getPath() const;
+  string getName() const;
+  TFilePath getPath() const;
 
-	Type getType() const { return SCENE; };
+  Type getType() const { return SCENE; };
 
-	void setName(string name);
+  void setName(string name);
 
 private:
-	// not implemented
-	SceneThumbnail(const LevelThumbnail &);
-	SceneThumbnail &operator=(const LevelThumbnail &);
+  // not implemented
+  SceneThumbnail(const LevelThumbnail &);
+  SceneThumbnail &operator=(const LevelThumbnail &);
 };
 
 //============================================================
 
-class FileThumbnail : public Thumbnail
-{
+class FileThumbnail : public Thumbnail {
 protected:
-	TFilePath m_filepath;
+  TFilePath m_filepath;
 
 public:
-	FileThumbnail(const TDimension &size, const TFilePath &path);
+  FileThumbnail(const TDimension &size, const TFilePath &path);
 
-	string getName() const { return m_filepath.getName(); }
-	TFilePath getPath() const { return m_filepath; }
+  string getName() const { return m_filepath.getName(); }
+  TFilePath getPath() const { return m_filepath; }
 
-	void setName(string name);
+  void setName(string name);
 
-	static FileThumbnail *create(const TDimension &size, const TFilePath &path);
+  static FileThumbnail *create(const TDimension &size, const TFilePath &path);
 
-	bool startDragDrop();
+  bool startDragDrop();
 
 private:
-	// not implemented
-	FileThumbnail(const FileThumbnail &);
-	FileThumbnail &operator=(const FileThumbnail &);
+  // not implemented
+  FileThumbnail(const FileThumbnail &);
+  FileThumbnail &operator=(const FileThumbnail &);
 };
 
 #endif

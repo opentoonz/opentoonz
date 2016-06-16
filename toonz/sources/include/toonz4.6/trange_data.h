@@ -3,9 +3,7 @@
 #ifndef _TRANGE_DATA_INCLUDED_
 #define _TRANGE_DATA_INCLUDED_
 
-typedef struct TRANGE_DATA {
-	int from, to, step, inc;
-} TRANGE_DATA;
+typedef struct TRANGE_DATA { int from, to, step, inc; } TRANGE_DATA;
 
 #define TRANGE_AUTO_STEP (-1)
 #define TRANGE_AUTO_INC (-2)

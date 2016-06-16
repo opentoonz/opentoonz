@@ -8,50 +8,45 @@
 
 class TXshSimpleLevel;
 
-namespace ScriptWrapper
-{
+namespace ScriptWrapper {
 
-class Cell : public QObject
-{
-	Q_OBJECT
+class Cell : public QObject {
+  Q_OBJECT
 public:
-	Cell();
+  Cell();
 };
 
-class Xsheet : public QObject
-{
-	Q_OBJECT
+class Xsheet : public QObject {
+  Q_OBJECT
 public:
-	Xsheet();
+  Xsheet();
 };
 
-class Level : public QObject
-{
-	Q_OBJECT
-	QString m_name;
+class Level : public QObject {
+  Q_OBJECT
+  QString m_name;
 
 public:
-	Level();
-	Level(TXshSimpleLevel *);
-	~Level();
+  Level();
+  Level(TXshSimpleLevel *);
+  ~Level();
 
-	QString getName() const { return m_name; }
-	void setName(const QString &name) { m_name = name; }
+  QString getName() const { return m_name; }
+  void setName(const QString &name) { m_name = name; }
 
-	TXshSimpleLevel *getLevel() const;
+  TXshSimpleLevel *getLevel() const;
 
-	Q_PROPERTY(QString name READ getName WRITE setName)
+  Q_PROPERTY(QString name READ getName WRITE setName)
 
 private:
 };
 
-class Scene : public QObject
-{
-	Q_OBJECT
+class Scene : public QObject {
+  Q_OBJECT
 public:
-	Scene();
+  Scene();
 };
 
-} // namespace ScriptWrapper
+}  // namespace ScriptWrapper
 
 #endif

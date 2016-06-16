@@ -13,8 +13,7 @@
 class ToonzScene;
 class TFilePath;
 
-namespace DVGui
-{
+namespace DVGui {
 class CheckBox;
 class LineEdit;
 }
@@ -41,82 +40,85 @@ class QPushButton;
   Additionally, the dialog could be \t CANCELED, either by closing it
   or pressing the "Cancel" button.
 */
-class OverwriteDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class OverwriteDialog : public DVGui::Dialog {
+  Q_OBJECT
 
 public:
-	enum Resolution { CANCELED = 0x0,
-					  KEEP_OLD = 0x1,
-					  OVERWRITE = 0x2,
-					  RENAME = 0x4,
-					  ALL_RESOLUTIONS = KEEP_OLD | OVERWRITE | RENAME };
-	enum Flags { NO_FLAG = 0x0,
-				 APPLY_TO_ALL_FLAG = 0x1 };
+  enum Resolution {
+    CANCELED        = 0x0,
+    KEEP_OLD        = 0x1,
+    OVERWRITE       = 0x2,
+    RENAME          = 0x4,
+    ALL_RESOLUTIONS = KEEP_OLD | OVERWRITE | RENAME
+  };
+  enum Flags { NO_FLAG = 0x0, APPLY_TO_ALL_FLAG = 0x1 };
 
 public:
-	struct ExistsFunc {
-		virtual QString conflictString(const TFilePath &fp) const = 0;
-		virtual bool operator()(const TFilePath &fp) const = 0;
-	};
+  struct ExistsFunc {
+    virtual QString conflictString(const TFilePath &fp) const = 0;
+    virtual bool operator()(const TFilePath &fp) const        = 0;
+  };
 
-	struct DecodeFileExistsFunc : public ExistsFunc {
-		ToonzScene *m_scene;
-		DecodeFileExistsFunc(ToonzScene *scene) : m_scene(scene) {}
+  struct DecodeFileExistsFunc : public ExistsFunc {
+    ToonzScene *m_scene;
+    DecodeFileExistsFunc(ToonzScene *scene) : m_scene(scene) {}
 
-		QString conflictString(const TFilePath &fp) const;
-		bool operator()(const TFilePath &fp) const;
-	};
+    QString conflictString(const TFilePath &fp) const;
+    bool operator()(const TFilePath &fp) const;
+  };
 
 public:
-	OverwriteDialog();
+  OverwriteDialog();
 
-	bool cancelPressed() const { return m_cancelPressed; }
+  bool cancelPressed() const { return m_cancelPressed; }
 
-	Resolution execute(TFilePath &filePath,
-					   const ExistsFunc &exists,
-					   Resolution acceptedRes = ALL_RESOLUTIONS,
-					   Flags flags = NO_FLAG);
+  Resolution execute(TFilePath &filePath, const ExistsFunc &exists,
+                     Resolution acceptedRes = ALL_RESOLUTIONS,
+                     Flags flags            = NO_FLAG);
 
-	//--------------------- Legacy Functions ------------------------
+  //--------------------- Legacy Functions ------------------------
 
-	// The following functions are deprecated and retained for backward compatibility only
+  // The following functions are deprecated and retained for backward
+  // compatibility only
 
-	//! Returns the resolution type chosen by the user
-	Resolution getChoice() const { return m_choice; }
+  //! Returns the resolution type chosen by the user
+  Resolution getChoice() const { return m_choice; }
 
-	//! Returns the suffix to be added at the base file name when the chosen
-	//! resolution type is \t KEEP_OLD.
-	std::wstring getSuffix();
+  //! Returns the suffix to be added at the base file name when the chosen
+  //! resolution type is \t KEEP_OLD.
+  std::wstring getSuffix();
 
-	//! Resets state variables
-	void reset();
+  //! Resets state variables
+  void reset();
 
-	/*! this method has to be called for each filepath to be imported. Only if necessary, it opens a popup. 
-  put parameter multiLoad to true only if you are importing more then one level (so that the button 'apply to all' appears in the dialog)*/
-	std::wstring execute(ToonzScene *scene, const TFilePath &levelPath, bool multiLoad);
+  /*! this method has to be called for each filepath to be imported. Only if
+necessary, it opens a popup.
+put parameter multiLoad to true only if you are importing more then one level
+(so that the button 'apply to all' appears in the dialog)*/
+  std::wstring execute(ToonzScene *scene, const TFilePath &levelPath,
+                       bool multiLoad);
 
 protected slots:
 
-	void applyToAll();
-	void cancel();
-	void onButtonClicked(int);
+  void applyToAll();
+  void cancel();
+  void onButtonClicked(int);
 
 private:
-	bool m_applyToAll;
-	bool m_cancelPressed;
+  bool m_applyToAll;
+  bool m_cancelPressed;
 
-	Resolution m_choice;
+  Resolution m_choice;
 
-	QLabel *m_label;
-	QRadioButton *m_overwrite;
-	QRadioButton *m_keep;
-	QRadioButton *m_rename;
-	DVGui::LineEdit *m_suffix;
-	QPushButton *m_okBtn, *m_okToAllBtn, *m_cancelBtn;
+  QLabel *m_label;
+  QRadioButton *m_overwrite;
+  QRadioButton *m_keep;
+  QRadioButton *m_rename;
+  DVGui::LineEdit *m_suffix;
+  QPushButton *m_okBtn, *m_okToAllBtn, *m_cancelBtn;
 
 private:
-	TFilePath addSuffix(const TFilePath &src) const;
+  TFilePath addSuffix(const TFilePath &src) const;
 };
 
-#endif // OVERWRITEPOPUP_H
+#endif  // OVERWRITEPOPUP_H

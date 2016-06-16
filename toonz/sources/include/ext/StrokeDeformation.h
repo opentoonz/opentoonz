@@ -36,8 +36,7 @@ class TStroke;
 #pragma warning(disable : 4251)
 #endif
 
-namespace ToonzExt
-{
+namespace ToonzExt {
 class Designer;
 class Potential;
 class StrokeParametricDeformer;
@@ -46,16 +45,16 @@ class StrokeDeformationImpl;
 //===========================================================================
 
 /**
-   * @brief This class is the interface for manipulation 
+   * @brief This class is the interface for manipulation
    *        algorihms.
    *
    * StrokeDeformation is a wrapper for for StrokeDeformationImpl,
-   * its function is to verify state and parameteres before 
+   * its function is to verify state and parameteres before
    * to call the implementation methods of deformation.
-   * 
+   *
    * There is an internal status to verify that actions:
    * @arg @c CREATED on constructor
-   * @arg @c ACTIVE on active 
+   * @arg @c ACTIVE on active
    * @arg @c UPDATING on updating
    * @arg @c DEACTIVE on deactive
    *
@@ -63,136 +62,110 @@ class StrokeDeformationImpl;
    * ContextStatus contains information about deformation parameter,
    * and it occurs to reduce the number of parameters required.
    */
-class DVAPI
-	StrokeDeformation
-{
+class DVAPI StrokeDeformation {
 private:
-	StrokeDeformationImpl *
-		deformationImpl_;
+  StrokeDeformationImpl *deformationImpl_;
 
-	/**
-     * @brief Internal status.
-     */
-	enum StrokeDeformationState {
-		CREATED,
-		ACTIVE,
-		UPDATING,
-		DEACTIVE,
-		RESETTED
-	};
+  /**
+*@brief Internal status.
+*/
+  enum StrokeDeformationState { CREATED, ACTIVE, UPDATING, DEACTIVE, RESETTED };
 
-	StrokeDeformationState
-		state_;
+  StrokeDeformationState state_;
 
-	/**
-     * @brief Recover from an invalid state
-     */
-	void
-	recover();
+  /**
+*@brief Recover from an invalid state
+*/
+  void recover();
 
-	/**
-     * @brief Retrieve the current deformator.
-     */
-	StrokeDeformationImpl *
-	retrieveDeformator(const ContextStatus *status);
+  /**
+*@brief Retrieve the current deformator.
+*/
+  StrokeDeformationImpl *retrieveDeformator(const ContextStatus *status);
 
 public:
-	StrokeDeformation();
+  StrokeDeformation();
 
-	~StrokeDeformation();
+  ~StrokeDeformation();
 
-	/**
-     * @brief Init deformation and add control points.
-     */
-	void
-	activate(const ContextStatus *);
+  /**
+*@brief Init deformation and add control points.
+*/
+  void activate(const ContextStatus *);
 
-	/**
-     * @brief Modify stroke.
-     */
-	void
-	update(const TPointD &delta);
+  /**
+*@brief Modify stroke.
+*/
+  void update(const TPointD &delta);
 
-	/**
-     * @brief Return a stroke deformed.
-     * @return A stroke deformed.
-     */
-	TStroke *
-	deactivate();
+  /**
+*@brief Return a stroke deformed.
+*@return A stroke deformed.
+*/
+  TStroke *deactivate();
 
-	/**
-     * @brief Clear inner status of Deformation.
-     */
-	void
-	reset();
+  /**
+*@brief Clear inner status of Deformation.
+*/
+  void reset();
 
-	/**
-     * @brief Just select correct Deformation.
-     */
-	void
-	check(const ContextStatus *);
+  /**
+*@brief Just select correct Deformation.
+*/
+  void check(const ContextStatus *);
 
-	/**
-     * @brief Apply a designer on current deformation.
-     */
-	void
-	draw(Designer *);
+  /**
+*@brief Apply a designer on current deformation.
+*/
+  void draw(Designer *);
 
-	/**
-     * @brief Retrieve valid extremes for current manipulator/deformator.
-     */
-	ToonzExt::Interval
-	getExtremes() const;
+  /**
+*@brief Retrieve valid extremes for current manipulator/deformator.
+*/
+  ToonzExt::Interval getExtremes() const;
 
-	/**
-     * @brief Return the stroke selected from user.
-     */
-	const TStroke *
-	getStroke() const;
+  /**
+*@brief Return the stroke selected from user.
+*/
+  const TStroke *getStroke() const;
 
-	/**
-     * @brief Return the stroke selected from user.
-     */
-	const TStroke *
-	getCopiedStroke() const;
+  /**
+*@brief Return the stroke selected from user.
+*/
+  const TStroke *getCopiedStroke() const;
 
-	/**
-     * @brief Return a reference to the stroke created to be manipulated.
-     * @note This stroke is different from stroke selected by user.
-     * @sa getStroke
-     */
-	const TStroke *
-	getTransformedStroke() const;
+  /**
+*@brief Return a reference to the stroke created to be manipulated.
+*@note This stroke is different from stroke selected by user.
+*@sa getStroke
+*/
+  const TStroke *getTransformedStroke() const;
 
-	/**
-     * @brief Return the internal status of current deformation.
-     * @sa ContextStatus
-     */
-	const ContextStatus *
-	getStatus() const;
+  /**
+*@brief Return the internal status of current deformation.
+*@sa ContextStatus
+*/
+  const ContextStatus *getStatus() const;
 
-	/**
-     * @brief Retrieve cursor associated to current deformator.
-     */
-	int
-	getCursorId() const;
+  /**
+*@brief Retrieve cursor associated to current deformator.
+*/
+  int getCursorId() const;
 
 #ifdef _DEBUG
-	/**
-     * @brief Return the potential used in implementation.
-     * @note This is useful just for debug, please do not use directly.
-     * @sa Potential
-     */
-	const Potential *
-	getPotential() const;
+  /**
+*@brief Return the potential used in implementation.
+*@note This is useful just for debug, please do not use directly.
+*@sa Potential
+*/
+  const Potential *getPotential() const;
 
-	/**
-     * @brief Return the potential used in implementation.
-     * @note This is useful just for debug, please do not use directly.
-     * @sa Potential
-     */
-	const StrokeDeformationImpl *
-	getDeformationImpl() const;
+  /**
+*@brief Return the potential used in implementation.
+*@note This is useful just for debug, please do not use directly.
+*@sa Potential
+*/
+  const StrokeDeformationImpl *getDeformationImpl() const;
 #endif
 };
 }

@@ -2,7 +2,7 @@
 
 #if (defined(x64) || defined(__LP64__))
 
-//Toonz includes
+// Toonz includes
 #include "tfilepath.h"
 #include "trasterimage.h"
 #include "tstream.h"
@@ -10,11 +10,11 @@
 #include "trop.h"
 #include "tsound.h"
 
-//tipc includes
+// tipc includes
 #include "tipc.h"
 #include "t32bitsrv_wrap.h"
 
-//Qt includes
+// Qt includes
 #include <QSharedMemory>
 #include <QMutexLocker>
 #include <QDataStream>
@@ -30,122 +30,116 @@
 //    Generic stuff implementation
 //******************************************************************************
 
-bool IsQuickTimeInstalled()
-{
+bool IsQuickTimeInstalled() {
 #if !defined(__OSX__)
-	//NOTE: This is *NOT* the same function as Tiio::isQuickTimeInstalled !!
-	//There actually are 2 distinct functions with essentially the same name, one
-	//in tnzcore lib, the other in image. The core version is currently NEVER USED
-	//throughout Toonz, even if it's EXPORT-defined.
-	QLocalSocket socket;
-	if (!tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), 3000, t32bitsrv::srvCmdline()))
-		return false;
+  // NOTE: This is *NOT* the same function as Tiio::isQuickTimeInstalled !!
+  // There actually are 2 distinct functions with essentially the same name, one
+  // in tnzcore lib, the other in image. The core version is currently NEVER
+  // USED
+  // throughout Toonz, even if it's EXPORT-defined.
+  QLocalSocket socket;
+  if (!tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), 3000,
+                                  t32bitsrv::srvCmdline()))
+    return false;
 
-	tipc::Stream stream(&socket);
-	tipc::Message msg;
+  tipc::Stream stream(&socket);
+  tipc::Message msg;
 
-	stream << (msg << QString("$isQTInstalled"));
+  stream << (msg << QString("$isQTInstalled"));
 
-	if (tipc::readMessage(stream, msg) != "yes")
-		return false;
-	return true;
+  if (tipc::readMessage(stream, msg) != "yes") return false;
+  return true;
 #else
-	return false;
+  return false;
 #endif
 };
 
 //---------------------------------------------------------------------
 
-Tiio::MovWriterProperties::MovWriterProperties()
-{
-	QLocalSocket socket;
-	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
+Tiio::MovWriterProperties::MovWriterProperties() {
+  QLocalSocket socket;
+  tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1,
+                             t32bitsrv::srvCmdline());
 
-	tipc::Stream stream(&socket);
-	tipc::Message msg;
+  tipc::Stream stream(&socket);
+  tipc::Message msg;
 
-	//Retrieve a temporary file to pass the data
-	QString fp;
-	{
-		stream << (msg << QString("$tmpfile_request") << QString("MovWriterProps"));
+  // Retrieve a temporary file to pass the data
+  QString fp;
+  {
+    stream << (msg << QString("$tmpfile_request") << QString("MovWriterProps"));
 
-		if (tipc::readMessage(stream, msg) != "ok")
-			goto err;
+    if (tipc::readMessage(stream, msg) != "ok") goto err;
 
-		msg >> fp;
-		assert(!fp.isEmpty());
-	}
+    msg >> fp;
+    assert(!fp.isEmpty());
+  }
 
-	//Make the server write the data to the file
-	{
-		stream << (msg << tipc::clr << QString("$defaultMovProps") << fp);
-		if (tipc::readMessage(stream, msg) != "ok")
-			goto err;
+  // Make the server write the data to the file
+  {
+    stream << (msg << tipc::clr << QString("$defaultMovProps") << fp);
+    if (tipc::readMessage(stream, msg) != "ok") goto err;
 
-		//Load the data
-		TFilePath tfp(fp.toStdWString());
-		TIStream is(tfp);
-		loadData(is);
-	}
+    // Load the data
+    TFilePath tfp(fp.toStdWString());
+    TIStream is(tfp);
+    loadData(is);
+  }
 
-	//Release the temporary file
-	{
-		stream << (msg << tipc::clr << QString("$tmpfile_release") << QString("MovWriterProps"));
-		if (tipc::readMessage(stream, msg) != "ok")
-			goto err;
-	}
+  // Release the temporary file
+  {
+    stream << (msg << tipc::clr << QString("$tmpfile_release")
+                   << QString("MovWriterProps"));
+    if (tipc::readMessage(stream, msg) != "ok") goto err;
+  }
 
-	return;
+  return;
 
 err:
 
-	throw TException("Server error");
+  throw TException("Server error");
 }
 
 //******************************************************************************
 //    TImageWriterMov Proxy implementation
 //******************************************************************************
 
-class TImageWriterMovProxy : public TImageWriter
-{
-	TLevelWriterMov *m_lw;
+class TImageWriterMovProxy : public TImageWriter {
+  TLevelWriterMov *m_lw;
 
 public:
-	int m_frameIndex;
+  int m_frameIndex;
 
 public:
-	TImageWriterMovProxy(const TFilePath &fp, int frameIndex, TLevelWriterMov *lw);
-	~TImageWriterMovProxy();
+  TImageWriterMovProxy(const TFilePath &fp, int frameIndex,
+                       TLevelWriterMov *lw);
+  ~TImageWriterMovProxy();
 
-	bool is64bitOutputSupported() { return false; }
-	void save(const TImageP &);
+  bool is64bitOutputSupported() { return false; }
+  void save(const TImageP &);
 
 private:
-	//not implemented
-	TImageWriterMovProxy(const TImageWriterMovProxy &);
-	TImageWriterMovProxy &operator=(const TImageWriterMovProxy &src);
+  // not implemented
+  TImageWriterMovProxy(const TImageWriterMovProxy &);
+  TImageWriterMovProxy &operator=(const TImageWriterMovProxy &src);
 };
 
 //------------------------------------------------------------------
 
-TImageWriterMovProxy::TImageWriterMovProxy(const TFilePath &fp, int frameIndex, TLevelWriterMov *lw)
-	: TImageWriter(fp), m_lw(lw), m_frameIndex(frameIndex)
-{
-	m_lw->addRef();
+TImageWriterMovProxy::TImageWriterMovProxy(const TFilePath &fp, int frameIndex,
+                                           TLevelWriterMov *lw)
+    : TImageWriter(fp), m_lw(lw), m_frameIndex(frameIndex) {
+  m_lw->addRef();
 }
 
 //------------------------------------------------------------------
 
-TImageWriterMovProxy::~TImageWriterMovProxy()
-{
-	m_lw->release();
-}
+TImageWriterMovProxy::~TImageWriterMovProxy() { m_lw->release(); }
 
 //------------------------------------------------------------------
 
-void TImageWriterMovProxy::save(const TImageP &img)
-{
-	m_lw->save(img, m_frameIndex);
+void TImageWriterMovProxy::save(const TImageP &img) {
+  m_lw->save(img, m_frameIndex);
 }
 
 //******************************************************************************
@@ -153,361 +147,357 @@ void TImageWriterMovProxy::save(const TImageP &img)
 //******************************************************************************
 
 TLevelWriterMov::TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo)
-	: TLevelWriter(path, winfo)
-{
-	static TAtomicVar count;
-	unsigned int currCount = ++count;
-	m_id = currCount;
+    : TLevelWriter(path, winfo) {
+  static TAtomicVar count;
+  unsigned int currCount = ++count;
+  m_id                   = currCount;
 
-	QLocalSocket socket;
-	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
+  QLocalSocket socket;
+  tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1,
+                             t32bitsrv::srvCmdline());
 
-	tipc::Stream stream(&socket);
-	tipc::Message msg;
+  tipc::Stream stream(&socket);
+  tipc::Message msg;
 
-	QString res, propsFp;
-	if (winfo) {
-		//Request a temporary file to store the infos to
-		stream << (msg << QString("$tmpfile_request") << QString("initLWMov") + QString::number(currCount));
-		if (tipc::readMessage(stream, msg) != "ok")
-			goto err;
+  QString res, propsFp;
+  if (winfo) {
+    // Request a temporary file to store the infos to
+    stream << (msg << QString("$tmpfile_request")
+                   << QString("initLWMov") + QString::number(currCount));
+    if (tipc::readMessage(stream, msg) != "ok") goto err;
 
-		msg >> propsFp >> tipc::clr;
-		assert(!propsFp.isEmpty());
+    msg >> propsFp >> tipc::clr;
+    assert(!propsFp.isEmpty());
 
-		TFilePath propsTfp(propsFp.toStdWString());
-		{
-			TOStream os(propsTfp);
-			winfo->saveData(os);
-		}
-	}
+    TFilePath propsTfp(propsFp.toStdWString());
+    {
+      TOStream os(propsTfp);
+      winfo->saveData(os);
+    }
+  }
 
-	//Pass fp to the server
-	stream << (msg << QString("$initLWMov") << m_id << QString::fromStdWString(path.getWideString()) << propsFp);
-	if (tipc::readMessage(stream, msg) != "ok")
-		goto err;
+  // Pass fp to the server
+  stream << (msg << QString("$initLWMov") << m_id
+                 << QString::fromStdWString(path.getWideString()) << propsFp);
+  if (tipc::readMessage(stream, msg) != "ok") goto err;
 
-	if (winfo) {
-		stream << (msg << tipc::clr << QString("$tmpfile_release")
-					   << QString("initLWMov") + QString::number(currCount));
-		if (tipc::readMessage(stream, msg) != "ok")
-			goto err;
-	}
+  if (winfo) {
+    stream << (msg << tipc::clr << QString("$tmpfile_release")
+                   << QString("initLWMov") + QString::number(currCount));
+    if (tipc::readMessage(stream, msg) != "ok") goto err;
+  }
 
-	return;
+  return;
 
 err:
 
-	throw TException("Unable to write file");
+  throw TException("Unable to write file");
 }
 
 //------------------------------------------------------------------
 
-TLevelWriterMov::~TLevelWriterMov()
-{
-	QLocalSocket socket;
-	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
+TLevelWriterMov::~TLevelWriterMov() {
+  QLocalSocket socket;
+  tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1,
+                             t32bitsrv::srvCmdline());
 
-	tipc::Stream stream(&socket);
-	tipc::Message msg;
-	QString res;
+  tipc::Stream stream(&socket);
+  tipc::Message msg;
+  QString res;
 
-	stream << (msg << QString("$closeLWMov") << m_id);
-	if (tipc::readMessage(stream, msg) != "ok")
-		throw TException("Unable to write file");
+  stream << (msg << QString("$closeLWMov") << m_id);
+  if (tipc::readMessage(stream, msg) != "ok")
+    throw TException("Unable to write file");
 }
 
 //------------------------------------------------------------------
 
-void TLevelWriterMov::setFrameRate(double fps)
-{
-	TLevelWriter::setFrameRate(fps);
+void TLevelWriterMov::setFrameRate(double fps) {
+  TLevelWriter::setFrameRate(fps);
 
-	QLocalSocket socket;
-	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
+  QLocalSocket socket;
+  tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1,
+                             t32bitsrv::srvCmdline());
 
-	tipc::Stream stream(&socket);
-	tipc::Message msg;
-	QString res;
+  tipc::Stream stream(&socket);
+  tipc::Message msg;
+  QString res;
 
-	stream << (msg << QString("$LWMovSetFrameRate") << m_id << fps);
-	if (tipc::readMessage(stream, msg) != "ok")
-		throw TException("Unexpected error");
+  stream << (msg << QString("$LWMovSetFrameRate") << m_id << fps);
+  if (tipc::readMessage(stream, msg) != "ok")
+    throw TException("Unexpected error");
 }
 
 //------------------------------------------------------------------
 
-TImageWriterP TLevelWriterMov::getFrameWriter(TFrameId fid)
-{
-	if (fid.getLetter() != 0)
-		return TImageWriterP(0);
+TImageWriterP TLevelWriterMov::getFrameWriter(TFrameId fid) {
+  if (fid.getLetter() != 0) return TImageWriterP(0);
 
-	int index = fid.getNumber() - 1;
-	return new TImageWriterMovProxy(m_path, index, this);
+  int index = fid.getNumber() - 1;
+  return new TImageWriterMovProxy(m_path, index, this);
 }
 
 //------------------------------------------------------------------
 
-void TLevelWriterMov::save(const TImageP &img, int frameIndex)
-{
-	TRasterImageP ri(img);
-	if (!img)
-		throw TImageException(getFilePath(), "Unsupported image type");
+void TLevelWriterMov::save(const TImageP &img, int frameIndex) {
+  TRasterImageP ri(img);
+  if (!img) throw TImageException(getFilePath(), "Unsupported image type");
 
-	TRasterP ras(ri->getRaster());
+  TRasterP ras(ri->getRaster());
 
-	int lx = ras->getLx(), ly = ras->getLy(), pixSize = ras->getPixelSize();
-	if (pixSize != 4)
-		throw TImageException(getFilePath(), "Unsupported pixel type");
+  int lx = ras->getLx(), ly = ras->getLy(), pixSize = ras->getPixelSize();
+  if (pixSize != 4)
+    throw TImageException(getFilePath(), "Unsupported pixel type");
 
-	int size = lx * ly * pixSize;
+  int size = lx * ly * pixSize;
 
-	//Send messages
-	QLocalSocket socket;
-	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
+  // Send messages
+  QLocalSocket socket;
+  tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1,
+                             t32bitsrv::srvCmdline());
 
-	tipc::Stream stream(&socket);
-	tipc::Message msg;
+  tipc::Stream stream(&socket);
+  tipc::Message msg;
 
-	//Send the write message.
-	stream << (msg << QString("$LWMovImageWrite") << m_id << frameIndex << lx << ly);
+  // Send the write message.
+  stream << (msg << QString("$LWMovImageWrite") << m_id << frameIndex << lx
+                 << ly);
 
-	//Send the data through a shared memory segment
-	{
-		t32bitsrv::RasterExchanger<TPixel32> exch(ras);
-		tipc::writeShMemBuffer(stream, msg << tipc::clr, size, &exch);
-	}
+  // Send the data through a shared memory segment
+  {
+    t32bitsrv::RasterExchanger<TPixel32> exch(ras);
+    tipc::writeShMemBuffer(stream, msg << tipc::clr, size, &exch);
+  }
 
-	if (tipc::readMessage(stream, msg) != "ok")
-		throw TImageException(getFilePath(), "Couln't save image");
+  if (tipc::readMessage(stream, msg) != "ok")
+    throw TImageException(getFilePath(), "Couln't save image");
 }
 
 //------------------------------------------------------------------
 
-void TLevelWriterMov::saveSoundTrack(TSoundTrack *st)
-{
-	if (st == 0)
-		return;
+void TLevelWriterMov::saveSoundTrack(TSoundTrack *st) {
+  if (st == 0) return;
 
-	//Prepare connection
-	QLocalSocket socket;
-	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
+  // Prepare connection
+  QLocalSocket socket;
+  tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1,
+                             t32bitsrv::srvCmdline());
 
-	unsigned int size = st->getSampleSize() * st->getSampleCount();
+  unsigned int size = st->getSampleSize() * st->getSampleCount();
 
-	//Send the saveSoundTract command to the server
-	tipc::Stream stream(&socket);
-	tipc::Message msg;
+  // Send the saveSoundTract command to the server
+  tipc::Stream stream(&socket);
+  tipc::Message msg;
 
-	stream << (msg << QString("$LWMovSaveSoundTrack") << m_id << st->getSampleRate() << st->getBitPerSample()
-				   << st->getChannelCount() << st->getSampleCount() << st->getFormat().m_signedSample);
+  stream << (msg << QString("$LWMovSaveSoundTrack") << m_id
+                 << st->getSampleRate() << st->getBitPerSample()
+                 << st->getChannelCount() << st->getSampleCount()
+                 << st->getFormat().m_signedSample);
 
-	t32bitsrv::BufferExchanger exch((UCHAR *)st->getRawData());
-	tipc::writeShMemBuffer(stream, msg << tipc::clr, size, &exch);
+  t32bitsrv::BufferExchanger exch((UCHAR *)st->getRawData());
+  tipc::writeShMemBuffer(stream, msg << tipc::clr, size, &exch);
 
-	QString res(tipc::readMessage(stream, msg));
-	assert(res == "ok");
+  QString res(tipc::readMessage(stream, msg));
+  assert(res == "ok");
 }
 
 //******************************************************************************
 //    TImageReaderMov Proxy implementation
 //******************************************************************************
 
-class TImageReaderMovProxy : public TImageReader
-{
-	TLevelReaderMov *m_lr;
-	TImageInfo *m_info;
+class TImageReaderMovProxy : public TImageReader {
+  TLevelReaderMov *m_lr;
+  TImageInfo *m_info;
 
 public:
-	int m_frameIndex;
+  int m_frameIndex;
 
 public:
-	TImageReaderMovProxy(const TFilePath &fp, int frameIndex, TLevelReaderMov *lr, TImageInfo *info);
-	~TImageReaderMovProxy() { m_lr->release(); }
+  TImageReaderMovProxy(const TFilePath &fp, int frameIndex, TLevelReaderMov *lr,
+                       TImageInfo *info);
+  ~TImageReaderMovProxy() { m_lr->release(); }
 
-	TImageP load();
-	void load(const TRasterP &rasP, const TPoint &pos = TPoint(0, 0), int shrinkX = 1, int shrinkY = 1);
+  TImageP load();
+  void load(const TRasterP &rasP, const TPoint &pos = TPoint(0, 0),
+            int shrinkX = 1, int shrinkY = 1);
 
-	TDimension getSize() const { return m_lr->getSize(); }
-	TRect getBBox() const { return m_lr->getBBox(); }
+  TDimension getSize() const { return m_lr->getSize(); }
+  TRect getBBox() const { return m_lr->getBBox(); }
 
-	const TImageInfo *getImageInfo() const { return m_info; }
+  const TImageInfo *getImageInfo() const { return m_info; }
 
 private:
-	//not implemented
-	TImageReaderMovProxy(const TImageReaderMovProxy &);
-	TImageReaderMovProxy &operator=(const TImageReaderMovProxy &src);
+  // not implemented
+  TImageReaderMovProxy(const TImageReaderMovProxy &);
+  TImageReaderMovProxy &operator=(const TImageReaderMovProxy &src);
 };
 
 //------------------------------------------------------------------
 
 TImageReaderMovProxy::TImageReaderMovProxy(const TFilePath &fp, int frameIndex,
-										   TLevelReaderMov *lr, TImageInfo *info)
-	: TImageReader(fp), m_lr(lr), m_frameIndex(frameIndex), m_info(info)
-{
-	m_lr->addRef();
+                                           TLevelReaderMov *lr,
+                                           TImageInfo *info)
+    : TImageReader(fp), m_lr(lr), m_frameIndex(frameIndex), m_info(info) {
+  m_lr->addRef();
 }
 
 //------------------------------------------------------------------
 
-TImageP TImageReaderMovProxy::load()
-{
-	TRaster32P ras(m_lr->getSize());
-	m_lr->load(ras, m_frameIndex, TPointI(), 1, 1);
-	return TRasterImageP(ras);
+TImageP TImageReaderMovProxy::load() {
+  TRaster32P ras(m_lr->getSize());
+  m_lr->load(ras, m_frameIndex, TPointI(), 1, 1);
+  return TRasterImageP(ras);
 }
 
 //------------------------------------------------------------------
 
-void TImageReaderMovProxy::load(const TRasterP &rasP, const TPoint &pos, int shrinkX, int shrinkY)
-{
-	//NOTE: The original implementation is different. But is also does not make sense...
-	//I've substituted it with the lrm plain call.
-	m_lr->load(rasP, m_frameIndex, pos, shrinkX, shrinkY);
+void TImageReaderMovProxy::load(const TRasterP &rasP, const TPoint &pos,
+                                int shrinkX, int shrinkY) {
+  // NOTE: The original implementation is different. But is also does not make
+  // sense...
+  // I've substituted it with the lrm plain call.
+  m_lr->load(rasP, m_frameIndex, pos, shrinkX, shrinkY);
 }
 
 //******************************************************************************
 //    TLevelReaderMov Proxy implementation
 //******************************************************************************
 
-TLevelReaderMov::TLevelReaderMov(const TFilePath &path)
-	: TLevelReader(path)
-{
-	static TAtomicVar count;
-	unsigned int currCount = ++count;
-	m_id = currCount;
+TLevelReaderMov::TLevelReaderMov(const TFilePath &path) : TLevelReader(path) {
+  static TAtomicVar count;
+  unsigned int currCount = ++count;
+  m_id                   = currCount;
 
-	QLocalSocket socket;
-	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
+  QLocalSocket socket;
+  tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1,
+                             t32bitsrv::srvCmdline());
 
-	tipc::Stream stream(&socket);
-	tipc::Message msg;
+  tipc::Stream stream(&socket);
+  tipc::Message msg;
 
-	stream << (msg << QString("$initLRMov") << m_id << QString::fromStdWString(path.getWideString()));
-	if (tipc::readMessage(stream, msg) != "ok")
-		throw TImageException(path, "Couldn't open file");
+  stream << (msg << QString("$initLRMov") << m_id
+                 << QString::fromStdWString(path.getWideString()));
+  if (tipc::readMessage(stream, msg) != "ok")
+    throw TImageException(path, "Couldn't open file");
 
-	double frameRate;
-	msg >> m_lx >> m_ly >> frameRate >> tipc::clr;
+  double frameRate;
+  msg >> m_lx >> m_ly >> frameRate >> tipc::clr;
 
-	m_info = new TImageInfo;
-	m_info->m_lx = m_lx;
-	m_info->m_ly = m_ly;
-	m_info->m_frameRate = frameRate;
+  m_info              = new TImageInfo;
+  m_info->m_lx        = m_lx;
+  m_info->m_ly        = m_ly;
+  m_info->m_frameRate = frameRate;
 }
 
 //------------------------------------------------------------------
 
-TLevelReaderMov::~TLevelReaderMov()
-{
-	QLocalSocket socket;
-	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
+TLevelReaderMov::~TLevelReaderMov() {
+  QLocalSocket socket;
+  tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1,
+                             t32bitsrv::srvCmdline());
 
-	tipc::Stream stream(&socket);
-	tipc::Message msg;
+  tipc::Stream stream(&socket);
+  tipc::Message msg;
 
-	stream << (msg << QString("$closeLRMov") << m_id);
-	QString res(tipc::readMessage(stream, msg));
-	assert(res == "ok");
+  stream << (msg << QString("$closeLRMov") << m_id);
+  QString res(tipc::readMessage(stream, msg));
+  assert(res == "ok");
 }
 
 //------------------------------------------------------------------
 
-TImageReaderP TLevelReaderMov::getFrameReader(TFrameId fid)
-{
-	if (fid.getLetter() != 0)
-		return TImageReaderP(0);
+TImageReaderP TLevelReaderMov::getFrameReader(TFrameId fid) {
+  if (fid.getLetter() != 0) return TImageReaderP(0);
 
-	int index = fid.getNumber() - 1;
-	return new TImageReaderMovProxy(m_path, index, this, m_info);
+  int index = fid.getNumber() - 1;
+  return new TImageReaderMovProxy(m_path, index, this, m_info);
 }
 
 //------------------------------------------------------------------
 
-TLevelP TLevelReaderMov::loadInfo()
-{
-	QLocalSocket socket;
-	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
+TLevelP TLevelReaderMov::loadInfo() {
+  QLocalSocket socket;
+  tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1,
+                             t32bitsrv::srvCmdline());
 
-	tipc::Stream stream(&socket);
-	tipc::Message msg;
+  tipc::Stream stream(&socket);
+  tipc::Message msg;
 
-	TLevelP level;
-	{
-		QString shMemId(tipc::uniqueId());
+  TLevelP level;
+  {
+    QString shMemId(tipc::uniqueId());
 
-		//Send the appropriate command
-		stream << (msg << QString("$LRMovLoadInfo") << m_id << shMemId);
-		if (tipc::readMessage(stream, msg) != "ok")
-			goto err;
+    // Send the appropriate command
+    stream << (msg << QString("$LRMovLoadInfo") << m_id << shMemId);
+    if (tipc::readMessage(stream, msg) != "ok") goto err;
 
-		int frameCount;
+    int frameCount;
 
-		msg >> frameCount >> tipc::clr;
+    msg >> frameCount >> tipc::clr;
 
-		//Read the data in the shared memory segment
-		QSharedMemory shmem(shMemId);
-		shmem.attach();
-		shmem.lock();
+    // Read the data in the shared memory segment
+    QSharedMemory shmem(shMemId);
+    shmem.attach();
+    shmem.lock();
 
-		int *f, *fBegin = (int *)shmem.data(), *fEnd = fBegin + frameCount;
-		assert(fBegin);
+    int *f, *fBegin = (int *)shmem.data(), *fEnd = fBegin + frameCount;
+    assert(fBegin);
 
-		for (f = fBegin; f < fEnd; ++f)
-			level->setFrame(*f, TImageP());
+    for (f = fBegin; f < fEnd; ++f) level->setFrame(*f, TImageP());
 
-		shmem.unlock();
-		shmem.detach();
+    shmem.unlock();
+    shmem.detach();
 
-		//Release the shared memory segment
-		stream << (msg << QString("$shmem_release") << shMemId);
-		if (tipc::readMessage(stream, msg) != "ok")
-			goto err;
-	}
+    // Release the shared memory segment
+    stream << (msg << QString("$shmem_release") << shMemId);
+    if (tipc::readMessage(stream, msg) != "ok") goto err;
+  }
 
-	return level;
+  return level;
 
 err:
 
-	throw TException("Couldn't read movie data");
-	return TLevelP();
+  throw TException("Couldn't read movie data");
+  return TLevelP();
 }
 
 //------------------------------------------------------------------
 
-void TLevelReaderMov::enableRandomAccessRead(bool enable)
-{
-	QLocalSocket socket;
-	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
+void TLevelReaderMov::enableRandomAccessRead(bool enable) {
+  QLocalSocket socket;
+  tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1,
+                             t32bitsrv::srvCmdline());
 
-	tipc::Stream stream(&socket);
-	tipc::Message msg;
+  tipc::Stream stream(&socket);
+  tipc::Message msg;
 
-	stream << (msg << QString("$LRMovEnableRandomAccessRead") << m_id << QString(enable ? "true" : "false"));
-	QString res(tipc::readMessage(stream, msg));
-	assert(res == "ok");
+  stream << (msg << QString("$LRMovEnableRandomAccessRead") << m_id
+                 << QString(enable ? "true" : "false"));
+  QString res(tipc::readMessage(stream, msg));
+  assert(res == "ok");
 }
 
 //------------------------------------------------------------------
 
-void TLevelReaderMov::load(const TRasterP &ras, int frameIndex, const TPoint &pos,
-						   int shrinkX, int shrinkY)
-{
-	QLocalSocket socket;
-	tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1, t32bitsrv::srvCmdline());
+void TLevelReaderMov::load(const TRasterP &ras, int frameIndex,
+                           const TPoint &pos, int shrinkX, int shrinkY) {
+  QLocalSocket socket;
+  tipc::startSlaveConnection(&socket, t32bitsrv::srvName(), -1,
+                             t32bitsrv::srvCmdline());
 
-	tipc::Stream stream(&socket);
-	tipc::Message msg;
+  tipc::Stream stream(&socket);
+  tipc::Message msg;
 
-	unsigned int size = ras->getLx() * ras->getLy() * ras->getPixelSize();
+  unsigned int size = ras->getLx() * ras->getLy() * ras->getPixelSize();
 
-	//Send the appropriate command to the 32-bit server
-	stream << (msg << QString("$LRMovImageRead") << m_id << ras->getLx() << ras->getLy() << ras->getPixelSize()
-				   << frameIndex << pos.x << pos.y << shrinkX << shrinkY);
+  // Send the appropriate command to the 32-bit server
+  stream << (msg << QString("$LRMovImageRead") << m_id << ras->getLx()
+                 << ras->getLy() << ras->getPixelSize() << frameIndex << pos.x
+                 << pos.y << shrinkX << shrinkY);
 
-	t32bitsrv::RasterExchanger<TPixel32> exch(ras);
-	if (!tipc::readShMemBuffer(stream, msg << tipc::clr, &exch))
-		throw TException("Couldn't load image");
+  t32bitsrv::RasterExchanger<TPixel32> exch(ras);
+  if (!tipc::readShMemBuffer(stream, msg << tipc::clr, &exch))
+    throw TException("Couldn't load image");
 }
 
-#endif //x64
+#endif  // x64

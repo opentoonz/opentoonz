@@ -29,8 +29,7 @@ class CleanupSwatch;
 class CleanupCameraSettingsWidget;
 class CleanupPaletteViewer;
 
-namespace DVGui
-{
+namespace DVGui {
 
 class CheckBox;
 class DoubleLineEdit;
@@ -46,135 +45,133 @@ class IntField;
 //    CleanupSettingsPopup declaration
 //*****************************************************************************
 
-class CleanupSettings : public QWidget
-{
-	Q_OBJECT
+class CleanupSettings : public QWidget {
+  Q_OBJECT
 
-	CleanupTab *m_cleanupTab;
-	ProcessingTab *m_processingTab;
-	CameraTab *m_cameraTab;
+  CleanupTab *m_cleanupTab;
+  ProcessingTab *m_processingTab;
+  CameraTab *m_cameraTab;
 
-	CleanupSwatch *m_swatch;
-	QAction *m_swatchAct, *m_opacityAct;
+  CleanupSwatch *m_swatch;
+  QAction *m_swatchAct, *m_opacityAct;
 
-	CleanupParameters m_backupParams;
+  CleanupParameters m_backupParams;
 
-	bool m_attached; //!< Whether the settomgs are attached to the
-	//!< cleanup model
+  bool m_attached;  //!< Whether the settomgs are attached to the
+                    //!< cleanup model
 public:
-	CleanupSettings(QWidget *parent = 0);
+  CleanupSettings(QWidget *parent = 0);
 
 signals:
 
-	/*! \details   The window title may change to reflect updates of the underlying
-                 cleanup settings model.                                            */
-	void windowTitleChanged(const QString &title); //!< Signals a change of the window title.
+  /*! \details   The window title may change to reflect updates of the
+     underlying
+           cleanup settings model.                                            */
+  void windowTitleChanged(
+      const QString &title);  //!< Signals a change of the window title.
 
 public slots:
 
-	void updateGui(bool postProcessPreviews);
+  void updateGui(bool postProcessPreviews);
 
-	void enableSwatch(bool);
-	void enableOpacityCheck(bool);
+  void enableSwatch(bool);
+  void enableOpacityCheck(bool);
 
 protected:
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *);
 
 private slots:
 
-	void onImageSwitched();
-	void onPreviewDataChanged();
-	void postProcess();
-	void onClnLoaded();
-	void onRestoreSceneSettings();
+  void onImageSwitched();
+  void onPreviewDataChanged();
+  void postProcess();
+  void onClnLoaded();
+  void onRestoreSceneSettings();
 };
 
 //**********************************************************************
 //    Cleanup Tab declaration
 //**********************************************************************
 
-class CleanupTab : public QFrame
-{
-	Q_OBJECT
+class CleanupTab : public QFrame {
+  Q_OBJECT
 
-	DVGui::CheckBox *m_autoCenter, *m_flipX, *m_flipY;
-	QComboBox *m_pegHolesOm, *m_fieldGuideOm, *m_rotateOm;
+  DVGui::CheckBox *m_autoCenter, *m_flipX, *m_flipY;
+  QComboBox *m_pegHolesOm, *m_fieldGuideOm, *m_rotateOm;
 
-	DVGui::FileField *m_pathField;
-	TFilePath m_path; //!< Actual params' path, may be different
-					  //!< from the field
+  DVGui::FileField *m_pathField;
+  TFilePath m_path;  //!< Actual params' path, may be different
+                     //!< from the field
 
 public:
-	CleanupTab();
+  CleanupTab();
 
-	void updateGui(CleanupParameters *params, CleanupParameters *oldParams);
+  void updateGui(CleanupParameters *params, CleanupParameters *oldParams);
 
 private slots:
 
-	void onGenericSettingsChange();
-	void onPathChange();
+  void onGenericSettingsChange();
+  void onPathChange();
 
 private:
-	QString pathString(const TFilePath &path, bool lpNone);
+  QString pathString(const TFilePath &path, bool lpNone);
 };
 
 //**********************************************************************
 //    ProcessingTab declaration
 //**********************************************************************
 
-class ProcessingTab : public QFrame
-{
-	Q_OBJECT
+class ProcessingTab : public QFrame {
+  Q_OBJECT
 
-	CleanupPaletteViewer *m_paletteViewer;
+  CleanupPaletteViewer *m_paletteViewer;
 
-	QComboBox *m_lineProcessing;
-	QLabel *m_antialiasLabel;
-	QComboBox *m_antialias;
-	QLabel *m_sharpLabel;
-	DVGui::DoubleField *m_sharpness;
-	QLabel *m_despeckLabel;
-	DVGui::IntField *m_despeckling;
-	QLabel *m_aaValueLabel;
-	DVGui::IntField *m_aaValue;
-	QLabel *m_autoadjustLabel;
-	QComboBox *m_autoadjustOm;
-	DVGui::Separator *m_paletteSep;
-	QWidget *m_settingsFrame;
+  QComboBox *m_lineProcessing;
+  QLabel *m_antialiasLabel;
+  QComboBox *m_antialias;
+  QLabel *m_sharpLabel;
+  DVGui::DoubleField *m_sharpness;
+  QLabel *m_despeckLabel;
+  DVGui::IntField *m_despeckling;
+  QLabel *m_aaValueLabel;
+  DVGui::IntField *m_aaValue;
+  QLabel *m_autoadjustLabel;
+  QComboBox *m_autoadjustOm;
+  DVGui::Separator *m_paletteSep;
+  QWidget *m_settingsFrame;
 
 public:
-	ProcessingTab();
+  ProcessingTab();
 
-	void updateGui(CleanupParameters *params, CleanupParameters *oldParams);
+  void updateGui(CleanupParameters *params, CleanupParameters *oldParams);
 
 private:
-	void updateVisibility();
+  void updateVisibility();
 
 private slots:
 
-	void onGenericSettingsChange();
-	void onSharpnessChange(bool dragging);
+  void onGenericSettingsChange();
+  void onSharpnessChange(bool dragging);
 };
 
 //**********************************************************************
 //    CameraTab declaration
 //**********************************************************************
 
-class CameraTab : public CleanupCameraSettingsWidget
-{
-	Q_OBJECT
+class CameraTab : public CleanupCameraSettingsWidget {
+  Q_OBJECT
 
 public:
-	CameraTab();
+  CameraTab();
 
-	void updateGui(CleanupParameters *params, CleanupParameters *oldParams);
-	void updateImageInfo();
+  void updateGui(CleanupParameters *params, CleanupParameters *oldParams);
+  void updateImageInfo();
 
 private slots:
 
-	void onLevelSwitched();
-	void onGenericSettingsChange();
+  void onLevelSwitched();
+  void onGenericSettingsChange();
 };
 
-#endif // CLEANUPSETTINGSPOPUP__H
+#endif  // CLEANUPSETTINGSPOPUP__H

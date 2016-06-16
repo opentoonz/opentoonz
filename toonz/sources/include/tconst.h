@@ -15,8 +15,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-namespace TConst
-{
+namespace TConst {
 
 const TPointD nowhere(0.1234e10, 0.5678e10);
 };

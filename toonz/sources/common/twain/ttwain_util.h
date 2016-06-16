@@ -21,7 +21,8 @@ void TTWAIN_SetAvailable(TWAINAVAILABLE status);
 char *TTWAIN_GetLastError(TUINT32 *rc, TUINT32 *cc);
 
 int TTWAIN_GetResolution(float *min, float *max, float *step, float *def);
-int TTWAIN_GetOpticalResolution(float *min, float *max, float *step, float *def);
+int TTWAIN_GetOpticalResolution(float *min, float *max, float *step,
+                                float *def);
 
 int TTWAIN_GetBrightness(float *min, float *max, float *step, float *def);
 int TTWAIN_GetContrast(float *min, float *max, float *step, float *def);
@@ -101,13 +102,14 @@ int TTWAIN_IsDeviceOnLine(void); /* -1 unknown, 0 no, 1 yes      */
 char *TTWAIN_GetManufacturer(void);  /*                              */
 char *TTWAIN_GetProductFamily(void); /* return an internal static var*/
 char *TTWAIN_GetProductName(void);   /* don't free ret. value        */
-char *TTWAIN_GetVersion(void);		 /*                              */
+char *TTWAIN_GetVersion(void);       /*                              */
 char *TTWAIN_GetTwainVersion(void);  /*                              */
 
 int TTWAIN_Native2Raster(void *handle, void *the_ras, int *lx, int *ly);
 
 int TTWAIN_SetXferMech(TTWAIN_TRANSFER_MECH mech, void *ptr, TUINT32 size,
-					   int preferredLx, int preferredLy, TUINT32 numberOfImages);
+                       int preferredLx, int preferredLy,
+                       TUINT32 numberOfImages);
 /*            NATIVE  BUFFERED	       FILE
 mech          the transfer mechanism
 ptr	       0       memory buffer      ?Not Impl.  filename ?
@@ -121,8 +123,8 @@ numberOfImages 1,2,.... or -1 for all in the ADF
 #ifdef NOTES
 here
 /* The XScaling cap. should be negotiated before the YScaling, this is because
-   some Sources may set the YScaling capability whenever XScaling capability 
-   is set, to maintain a square aspect ratio for Applications that do not 
+   some Sources may set the YScaling capability whenever XScaling capability
+   is set, to maintain a square aspect ratio for Applications that do not
    bother to negotiate YScaling capability. (note from Twain Spec 1.9 draft)
 */
 #endif

@@ -51,24 +51,12 @@ typedef unsigned long ULONG;
 
 /*---------------------------------------------------------------------------*/
 
-typedef struct {
-	int x0, y0, x1, y1;
-} TRECT;
-typedef struct {
-	double x0, y0, x1, y1;
-} TDRECT;
-typedef struct {
-	int x0, y0, x1, y1;
-} TLINE;
-typedef struct {
-	double x0, y0, x1, y1;
-} TDLINE;
-typedef struct {
-	int x, y;
-} TPOINT;
-typedef struct {
-	double x, y;
-} TDPOINT;
+typedef struct { int x0, y0, x1, y1; } TRECT;
+typedef struct { double x0, y0, x1, y1; } TDRECT;
+typedef struct { int x0, y0, x1, y1; } TLINE;
+typedef struct { double x0, y0, x1, y1; } TDLINE;
+typedef struct { int x, y; } TPOINT;
+typedef struct { double x, y; } TDPOINT;
 
 /*---------------------------------------------------------------------------*/
 
@@ -103,7 +91,8 @@ typedef struct {
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #endif
 
-#define ROUND(x) ((int)(((int)(-0.9F) == 0 && (x) < 0.0F) ? ((x)-0.5F) : ((x) + 0.5F)))
+#define ROUND(x)                                                               \
+  ((int)(((int)(-0.9F) == 0 && (x) < 0.0F) ? ((x)-0.5F) : ((x) + 0.5F)))
 /* solo per argomenti positivi: */
 #define ROUNDP(x) ((int)((x) + 0.5F))
 
@@ -112,16 +101,14 @@ typedef struct {
 #define FLOOR(x) ((int)(x) > (x) ? (int)(x)-1 : (int)(x))
 #define CEIL(x) ((int)(x) < (x) ? (int)(x) + 1 : (int)(x))
 
-#define NOT_LESS_THAN(MIN, X) \
-	{                         \
-		if ((X) < (MIN))      \
-			(X) = (MIN);      \
-	}
-#define NOT_MORE_THAN(MAX, X) \
-	{                         \
-		if ((X) > (MAX))      \
-			(X) = (MAX);      \
-	}
+#define NOT_LESS_THAN(MIN, X)                                                  \
+  {                                                                            \
+    if ((X) < (MIN)) (X) = (MIN);                                              \
+  }
+#define NOT_MORE_THAN(MAX, X)                                                  \
+  {                                                                            \
+    if ((X) > (MAX)) (X) = (MAX);                                              \
+  }
 
 #define CROP(X, MIN, MAX) (X < MIN ? MIN : (X > MAX ? MAX : X))
 
@@ -135,9 +122,9 @@ typedef struct {
 /*---------------------------------------------------------------------------*/
 
 static const char *const TALLOC_MSG_ =
-	"Out of memory allocating %d bytes (%s line %d)";
+    "Out of memory allocating %d bytes (%s line %d)";
 static const char *const TREALLOC_MSG_ =
-	"Out of memory reallocating %d bytes (%s line %d)";
+    "Out of memory reallocating %d bytes (%s line %d)";
 
 #if defined(WIN32) && defined(_DEBUG)
 #define WIN32_DBG_NBFL_ , _NORMAL_BLOCK, __FILE__, __LINE__
@@ -156,45 +143,45 @@ static const char *const TREALLOC_MSG_ =
 #endif
 
 #define TMALLOC(ptr, elem)                                                     \
-	{                                                                          \
-		(ptr) = (void *)TMALLOC_FUN_((elem) * sizeof(*(ptr)) WIN32_DBG_NBFL_); \
-		if (!ptr)                                                              \
-			tmsg_error(TALLOC_MSG_, (int)((elem) * sizeof(*(ptr))), __FILE__,  \
-					   __LINE__);                                              \
-	}
-#define TCALLOC(ptr, elem)                                                    \
-	{                                                                         \
-		(ptr) = (void *)TCALLOC_FUN_((elem), sizeof(*(ptr)) WIN32_DBG_NBFL_); \
-		if (!ptr)                                                             \
-			tmsg_error(TALLOC_MSG_, (int)((elem) * sizeof(*(ptr))), __FILE__, \
-					   __LINE__);                                             \
-	}
-#define TREALLOC(ptr, elem)                                                        \
-	{                                                                              \
-		if (ptr)                                                                   \
-			(ptr) = (void *)TREALLOC_FUN_((ptr), (elem) * sizeof(*(ptr))           \
-															  WIN32_DBG_NBFL_);    \
-		else                                                                       \
-			(ptr) = (void *)TMALLOC_FUN_((elem) * sizeof(*(ptr)) WIN32_DBG_NBFL_); \
-		if (!ptr)                                                                  \
-			tmsg_error(TREALLOC_MSG_, (int)((elem) * sizeof(*(ptr))), __FILE__,    \
-					   __LINE__);                                                  \
-	}
+  {                                                                            \
+    (ptr) = (void *)TMALLOC_FUN_((elem) * sizeof(*(ptr)) WIN32_DBG_NBFL_);     \
+    if (!ptr)                                                                  \
+      tmsg_error(TALLOC_MSG_, (int)((elem) * sizeof(*(ptr))), __FILE__,        \
+                 __LINE__);                                                    \
+  }
+#define TCALLOC(ptr, elem)                                                     \
+  {                                                                            \
+    (ptr) = (void *)TCALLOC_FUN_((elem), sizeof(*(ptr)) WIN32_DBG_NBFL_);      \
+    if (!ptr)                                                                  \
+      tmsg_error(TALLOC_MSG_, (int)((elem) * sizeof(*(ptr))), __FILE__,        \
+                 __LINE__);                                                    \
+  }
+#define TREALLOC(ptr, elem)                                                    \
+  {                                                                            \
+    if (ptr)                                                                   \
+      (ptr) = (void *)TREALLOC_FUN_((ptr),                                     \
+                                    (elem) * sizeof(*(ptr)) WIN32_DBG_NBFL_);  \
+    else                                                                       \
+      (ptr) = (void *)TMALLOC_FUN_((elem) * sizeof(*(ptr)) WIN32_DBG_NBFL_);   \
+    if (!ptr)                                                                  \
+      tmsg_error(TREALLOC_MSG_, (int)((elem) * sizeof(*(ptr))), __FILE__,      \
+                 __LINE__);                                                    \
+  }
 
-#define TFREE(ptr)                          \
-	{                                       \
-		if (ptr) {                          \
-			TFREE_FUN_((ptr)WIN32_DBG_NB_); \
-			ptr = NIL;                      \
-		}                                   \
-	}
+#define TFREE(ptr)                                                             \
+  {                                                                            \
+    if (ptr) {                                                                 \
+      TFREE_FUN_((ptr)WIN32_DBG_NB_);                                          \
+      ptr = NIL;                                                               \
+    }                                                                          \
+  }
 
 /*---------------------------------------------------------------------------*/
 
-#define STR_ASSIGN(DST, SRC)          \
-	{                                 \
-		TFREE(DST);                   \
-		DST = SRC ? strsave(SRC) : 0; \
-	}
+#define STR_ASSIGN(DST, SRC)                                                   \
+  {                                                                            \
+    TFREE(DST);                                                                \
+    DST = SRC ? strsave(SRC) : 0;                                              \
+  }
 
 #endif

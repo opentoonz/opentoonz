@@ -84,95 +84,92 @@ class QStackedWidget;
 //    ToolOptionToolBar  declaration
 //***********************************************************************************************
 
-class ToolOptionToolBar : public QToolBar
-{
+class ToolOptionToolBar : public QToolBar {
 public:
-	ToolOptionToolBar(QWidget *parent = 0);
+  ToolOptionToolBar(QWidget *parent = 0);
 
-	void addSpacing(int width);
+  void addSpacing(int width);
 };
 
 //***********************************************************************************************
 //    ToolOptionsBox  declaration
 //***********************************************************************************************
 
-class ToolOptionsBox : public QFrame
-{
-	Q_OBJECT
+class ToolOptionsBox : public QFrame {
+  Q_OBJECT
 
 protected:
-	QMap<std::string, ToolOptionControl *> m_controls; //!< property name -> ToolOptionControl
-	QMap<std::string, QLabel *> m_labels;
+  QMap<std::string, ToolOptionControl *>
+      m_controls;  //!< property name -> ToolOptionControl
+  QMap<std::string, QLabel *> m_labels;
 
-	QHBoxLayout *m_layout;
+  QHBoxLayout *m_layout;
 
 public:
-	ToolOptionsBox(QWidget *parent);
-	~ToolOptionsBox();
+  ToolOptionsBox(QWidget *parent);
+  ~ToolOptionsBox();
 
-	virtual void updateStatus(); //!< Invokes updateStatus() on all registered controls
-	virtual void onStageObjectChange() {}
+  virtual void
+  updateStatus();  //!< Invokes updateStatus() on all registered controls
+  virtual void onStageObjectChange() {}
 
-	QHBoxLayout *hLayout() { return m_layout; }
-	void addControl(ToolOptionControl *control);
+  QHBoxLayout *hLayout() { return m_layout; }
+  void addControl(ToolOptionControl *control);
 
-	ToolOptionControl *control(const std::string &controlName) const;
+  ToolOptionControl *control(const std::string &controlName) const;
 
-	QLabel *addLabel(QString name);
-	void addLabel(std::string propName, QLabel *label);
-	void addSeparator();
+  QLabel *addLabel(QString name);
+  void addLabel(std::string propName, QLabel *label);
+  void addSeparator();
 };
 
 //***********************************************************************************************
 //    ToolOptionControlBuilder  declaration
 //***********************************************************************************************
 
-class ToolOptionControlBuilder : public TProperty::Visitor
-{
-	ToolOptionsBox *m_panel;
-	TTool *m_tool;
-	TPaletteHandle *m_pltHandle;
-	ToolHandle *m_toolHandle;
+class ToolOptionControlBuilder : public TProperty::Visitor {
+  ToolOptionsBox *m_panel;
+  TTool *m_tool;
+  TPaletteHandle *m_pltHandle;
+  ToolHandle *m_toolHandle;
 
-	int m_singleValueWidgetType;
-	int m_enumWidgetType;
+  int m_singleValueWidgetType;
+  int m_enumWidgetType;
 
 public:
-	ToolOptionControlBuilder(ToolOptionsBox *panel, TTool *tool, TPaletteHandle *pltHandle, ToolHandle *toolHandle = 0);
+  ToolOptionControlBuilder(ToolOptionsBox *panel, TTool *tool,
+                           TPaletteHandle *pltHandle,
+                           ToolHandle *toolHandle = 0);
 
-	enum SingleValueWidgetType { SLIDER = 0,
-								 FIELD };
-	void setSingleValueWidgetType(int type) { m_singleValueWidgetType = type; }
+  enum SingleValueWidgetType { SLIDER = 0, FIELD };
+  void setSingleValueWidgetType(int type) { m_singleValueWidgetType = type; }
 
-	enum EnumWidgetType { COMBOBOX = 0,
-						  POPUPBUTTON };
-	void setEnumWidgetType(int type) { m_enumWidgetType = type; }
+  enum EnumWidgetType { COMBOBOX = 0, POPUPBUTTON };
+  void setEnumWidgetType(int type) { m_enumWidgetType = type; }
 
 private:
-	QHBoxLayout *hLayout() { return m_panel->hLayout(); }
-	QLabel *addLabel(TProperty *p);
+  QHBoxLayout *hLayout() { return m_panel->hLayout(); }
+  QLabel *addLabel(TProperty *p);
 
-	void visit(TDoubleProperty *p);
-	void visit(TDoublePairProperty *p);
-	void visit(TIntPairProperty *p);
-	void visit(TIntProperty *p);
-	void visit(TBoolProperty *p);
-	void visit(TStringProperty *p);
-	void visit(TEnumProperty *p);
-	void visit(TStyleIndexProperty *p);
-	void visit(TPointerProperty *p);
+  void visit(TDoubleProperty *p);
+  void visit(TDoublePairProperty *p);
+  void visit(TIntPairProperty *p);
+  void visit(TIntProperty *p);
+  void visit(TBoolProperty *p);
+  void visit(TStringProperty *p);
+  void visit(TEnumProperty *p);
+  void visit(TStyleIndexProperty *p);
+  void visit(TPointerProperty *p);
 };
 
 //***********************************************************************************************
 //    GenericToolOptionsBox  declaration
 //***********************************************************************************************
 
-class GenericToolOptionsBox : public ToolOptionsBox
-{
+class GenericToolOptionsBox : public ToolOptionsBox {
 public:
-	GenericToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
-						  int propertyGroupIdx = 0,
-						  ToolHandle *toolHandle = 0);
+  GenericToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                        int propertyGroupIdx = 0, ToolHandle *toolHandle = 0);
 };
 
 //=============================================================================
@@ -181,88 +178,87 @@ public:
 //
 //=============================================================================
 
-class ArrowToolOptionsBox : public ToolOptionsBox
-{
-	Q_OBJECT
+class ArrowToolOptionsBox : public ToolOptionsBox {
+  Q_OBJECT
 
-	TPropertyGroup *m_pg;
-	bool m_splined;
-	TTool *m_tool;
-	TFrameHandle *m_frameHandle;
-	TObjectHandle *m_objHandle;
-	TXsheetHandle *m_xshHandle;
+  TPropertyGroup *m_pg;
+  bool m_splined;
+  TTool *m_tool;
+  TFrameHandle *m_frameHandle;
+  TObjectHandle *m_objHandle;
+  TXsheetHandle *m_xshHandle;
 
-	QStackedWidget *m_mainStackedWidget;
+  QStackedWidget *m_mainStackedWidget;
 
-	//General
-	ToolOptionCombo *m_chooseActiveAxisCombo;
-	ToolOptionCombo *m_pickCombo;
-	//enable to choose the target pegbar from the combobox
-	QComboBox *m_currentStageObjectCombo;
+  // General
+  ToolOptionCombo *m_chooseActiveAxisCombo;
+  ToolOptionCombo *m_pickCombo;
+  // enable to choose the target pegbar from the combobox
+  QComboBox *m_currentStageObjectCombo;
 
-	//Position
-	PegbarChannelField *m_motionPathPosField;
-	PegbarChannelField *m_ewPosField;
-	PegbarChannelField *m_nsPosField;
-	QLabel *m_ewPosLabel;
-	QLabel *m_nsPosLabel;
-	PegbarChannelField *m_zField;
-	NoScaleField *m_noScaleZField;
-	ToolOptionCheckbox *m_lockEWPosCheckbox;
-	ToolOptionCheckbox *m_lockNSPosCheckbox;
+  // Position
+  PegbarChannelField *m_motionPathPosField;
+  PegbarChannelField *m_ewPosField;
+  PegbarChannelField *m_nsPosField;
+  QLabel *m_ewPosLabel;
+  QLabel *m_nsPosLabel;
+  PegbarChannelField *m_zField;
+  NoScaleField *m_noScaleZField;
+  ToolOptionCheckbox *m_lockEWPosCheckbox;
+  ToolOptionCheckbox *m_lockNSPosCheckbox;
 
-	//SO = Stacked Order
-	QLabel *m_soLabel;
-	PegbarChannelField *m_soField;
+  // SO = Stacked Order
+  QLabel *m_soLabel;
+  PegbarChannelField *m_soField;
 
-	//Rotation
-	PegbarChannelField *m_rotationField;
+  // Rotation
+  PegbarChannelField *m_rotationField;
 
-	//Scale
-	PegbarChannelField *m_globalScaleField;
-	PegbarChannelField *m_scaleHField;
-	PegbarChannelField *m_scaleVField;
-	ToolOptionCheckbox *m_lockScaleHCheckbox;
-	ToolOptionCheckbox *m_lockScaleVCheckbox;
-	ToolOptionCombo *m_maintainCombo;
+  // Scale
+  PegbarChannelField *m_globalScaleField;
+  PegbarChannelField *m_scaleHField;
+  PegbarChannelField *m_scaleVField;
+  ToolOptionCheckbox *m_lockScaleHCheckbox;
+  ToolOptionCheckbox *m_lockScaleVCheckbox;
+  ToolOptionCombo *m_maintainCombo;
 
-	//Shear
-	PegbarChannelField *m_shearHField;
-	PegbarChannelField *m_shearVField;
-	ToolOptionCheckbox *m_lockShearHCheckbox;
-	ToolOptionCheckbox *m_lockShearVCheckbox;
+  // Shear
+  PegbarChannelField *m_shearHField;
+  PegbarChannelField *m_shearVField;
+  ToolOptionCheckbox *m_lockShearHCheckbox;
+  ToolOptionCheckbox *m_lockShearVCheckbox;
 
-	//Center Position
-	PegbarCenterField *m_ewCenterField;
-	PegbarCenterField *m_nsCenterField;
-	ToolOptionCheckbox *m_lockEWCenterCheckbox;
-	ToolOptionCheckbox *m_lockNSCenterCheckbox;
+  // Center Position
+  PegbarCenterField *m_ewCenterField;
+  PegbarCenterField *m_nsCenterField;
+  ToolOptionCheckbox *m_lockEWCenterCheckbox;
+  ToolOptionCheckbox *m_lockNSCenterCheckbox;
 
-	ToolOptionCheckbox *m_globalKey;
+  ToolOptionCheckbox *m_globalKey;
 
 public:
-	ArrowToolOptionsBox(QWidget *parent, TTool *tool, TPropertyGroup *pg,
-						TFrameHandle *frameHandle, TObjectHandle *objHandle, TXsheetHandle *xshHandle,
-						ToolHandle *toolHandle);
+  ArrowToolOptionsBox(QWidget *parent, TTool *tool, TPropertyGroup *pg,
+                      TFrameHandle *frameHandle, TObjectHandle *objHandle,
+                      TXsheetHandle *xshHandle, ToolHandle *toolHandle);
 
-	void updateStatus();
-	void onStageObjectChange();
+  void updateStatus();
+  void onStageObjectChange();
 
 protected:
-	void showEvent(QShowEvent *);
-	void hideEvent(QShowEvent *);
+  void showEvent(QShowEvent *);
+  void hideEvent(QShowEvent *);
 
-	void setSplined(bool on);
-	bool isCurrentObjectSplined() const;
+  void setSplined(bool on);
+  bool isCurrentObjectSplined() const;
 
 protected slots:
-	void onFrameSwitched() { updateStatus(); }
-	//update the object list in combobox
-	void updateStageObjectComboItems();
-	//syncronize the current item in the combobox to the selected stage object
-	void syncCurrentStageObjectComboItem();
-	//change the current stage object when user changes it via combobox by hand
-	void onCurrentStageObjectComboActivated(int index);
+  void onFrameSwitched() { updateStatus(); }
+  // update the object list in combobox
+  void updateStageObjectComboItems();
+  // syncronize the current item in the combobox to the selected stage object
+  void syncCurrentStageObjectComboItem();
+  // change the current stage object when user changes it via combobox by hand
+  void onCurrentStageObjectComboActivated(int index);
 };
 
 //=============================================================================
@@ -271,41 +267,41 @@ protected slots:
 //
 //=============================================================================
 
-class SelectionToolOptionsBox : public ToolOptionsBox, public TProperty::Listener
-{
-	Q_OBJECT
+class SelectionToolOptionsBox : public ToolOptionsBox,
+                                public TProperty::Listener {
+  Q_OBJECT
 
-	TTool *m_tool;
+  TTool *m_tool;
 
-	ToolOptionCheckbox *m_setSaveboxCheckbox;
-	bool m_isVectorSelction;
-	QLabel *m_scaleXLabel;
-	SelectionScaleField *m_scaleXField;
-	QLabel *m_scaleYLabel;
-	SelectionScaleField *m_scaleYField;
-	DVGui::CheckBox *m_scaleLink;
-	SelectionRotationField *m_rotationField;
-	QLabel *m_moveXLabel;
-	SelectionMoveField *m_moveXField;
-	QLabel *m_moveYLabel;
-	SelectionMoveField *m_moveYField;
-	ThickChangeField *m_thickChangeField;
+  ToolOptionCheckbox *m_setSaveboxCheckbox;
+  bool m_isVectorSelction;
+  QLabel *m_scaleXLabel;
+  SelectionScaleField *m_scaleXField;
+  QLabel *m_scaleYLabel;
+  SelectionScaleField *m_scaleYField;
+  DVGui::CheckBox *m_scaleLink;
+  SelectionRotationField *m_rotationField;
+  QLabel *m_moveXLabel;
+  SelectionMoveField *m_moveXField;
+  QLabel *m_moveYLabel;
+  SelectionMoveField *m_moveYField;
+  ThickChangeField *m_thickChangeField;
 
-	ToolOptionPopupButton *m_capStyle;
-	ToolOptionPopupButton *m_joinStyle;
-	ToolOptionIntSlider *m_miterField;
+  ToolOptionPopupButton *m_capStyle;
+  ToolOptionPopupButton *m_joinStyle;
+  ToolOptionIntSlider *m_miterField;
 
 public:
-	SelectionToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
-							ToolHandle *toolHandle);
+  SelectionToolOptionsBox(QWidget *parent, TTool *tool,
+                          TPaletteHandle *pltHandle, ToolHandle *toolHandle);
 
-	void updateStatus();
-	void onPropertyChanged();
+  void updateStatus();
+  void onPropertyChanged();
 
 protected slots:
-	void onScaleXValueChanged();
-	void onScaleYValueChanged();
-	void onSetSaveboxCheckboxChanged(bool);
+  void onScaleXValueChanged();
+  void onScaleYValueChanged();
+  void onSetSaveboxCheckboxChanged(bool);
 };
 
 //=============================================================================
@@ -314,29 +310,28 @@ protected slots:
 //
 //=============================================================================
 
-class GeometricToolOptionsBox : public ToolOptionsBox
-{
-	Q_OBJECT
+class GeometricToolOptionsBox : public ToolOptionsBox {
+  Q_OBJECT
 
-	int m_targetType;
+  int m_targetType;
 
-	QLabel *m_poligonSideLabel, *m_hardnessLabel;
-	ToolOptionSlider *m_hardnessField;
-	ToolOptionIntSlider *m_poligonSideField;
-	ToolOptionCombo *m_shapeField;
-	ToolOptionCheckbox *m_pencilMode;
-	ToolOptionIntSlider *m_miterField;
+  QLabel *m_poligonSideLabel, *m_hardnessLabel;
+  ToolOptionSlider *m_hardnessField;
+  ToolOptionIntSlider *m_poligonSideField;
+  ToolOptionCombo *m_shapeField;
+  ToolOptionCheckbox *m_pencilMode;
+  ToolOptionIntSlider *m_miterField;
 
 public:
-	GeometricToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
-							ToolHandle *toolHandle);
+  GeometricToolOptionsBox(QWidget *parent, TTool *tool,
+                          TPaletteHandle *pltHandle, ToolHandle *toolHandle);
 
-	void updateStatus();
+  void updateStatus();
 
 protected slots:
-	void onShapeValueChanged();
-	void onPencilModeToggled(bool);
-	void onJoinStyleChanged(int);
+  void onShapeValueChanged();
+  void onPencilModeToggled(bool);
+  void onJoinStyleChanged(int);
 };
 
 //=============================================================================
@@ -345,20 +340,19 @@ protected slots:
 //
 //=============================================================================
 
-class TypeToolOptionsBox : public ToolOptionsBox
-{
-	Q_OBJECT
+class TypeToolOptionsBox : public ToolOptionsBox {
+  Q_OBJECT
 
-	TTool *m_tool;
+  TTool *m_tool;
 
 public:
-	TypeToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
-					   ToolHandle *toolHandle);
+  TypeToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                     ToolHandle *toolHandle);
 
-	void updateStatus();
+  void updateStatus();
 
 protected slots:
-	void onFieldChanged();
+  void onFieldChanged();
 };
 
 //=============================================================================
@@ -367,21 +361,20 @@ protected slots:
 //
 //=============================================================================
 
-class PaintbrushToolOptionsBox : public ToolOptionsBox
-{
-	Q_OBJECT
+class PaintbrushToolOptionsBox : public ToolOptionsBox {
+  Q_OBJECT
 
-	ToolOptionCombo *m_colorMode;
-	ToolOptionCheckbox *m_selectiveMode;
+  ToolOptionCombo *m_colorMode;
+  ToolOptionCheckbox *m_selectiveMode;
 
 public:
-	PaintbrushToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
-							 ToolHandle *toolHandle);
+  PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,
+                           TPaletteHandle *pltHandle, ToolHandle *toolHandle);
 
-	void updateStatus();
+  void updateStatus();
 
 protected slots:
-	void onColorModeChanged();
+  void onColorModeChanged();
 };
 
 //=============================================================================
@@ -390,27 +383,27 @@ protected slots:
 //
 //=============================================================================
 
-class FillToolOptionsBox : public ToolOptionsBox
-{
-	Q_OBJECT
+class FillToolOptionsBox : public ToolOptionsBox {
+  Q_OBJECT
 
-	int m_targetType;
-	QLabel *m_fillDepthLabel;
-	ToolOptionCombo *m_colorMode, *m_toolType;
-	ToolOptionCheckbox *m_selectiveMode, *m_segmentMode, *m_onionMode, *m_multiFrameMode;
-	ToolOptionPairSlider *m_fillDepthField;
+  int m_targetType;
+  QLabel *m_fillDepthLabel;
+  ToolOptionCombo *m_colorMode, *m_toolType;
+  ToolOptionCheckbox *m_selectiveMode, *m_segmentMode, *m_onionMode,
+      *m_multiFrameMode;
+  ToolOptionPairSlider *m_fillDepthField;
 
 public:
-	FillToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
-					   ToolHandle *toolHandle);
+  FillToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                     ToolHandle *toolHandle);
 
-	void updateStatus();
+  void updateStatus();
 
 protected slots:
-	void onColorModeChanged();
-	void onToolTypeChanged();
-	void onOnionModeToggled(bool);
-	void onMultiFrameModeToggled(bool);
+  void onColorModeChanged();
+  void onToolTypeChanged();
+  void onOnionModeToggled(bool);
+  void onMultiFrameModeToggled(bool);
 };
 
 //=============================================================================
@@ -419,36 +412,35 @@ protected slots:
 //
 //=============================================================================
 
-class BrushToolOptionsBox : public ToolOptionsBox
-{
-	Q_OBJECT
+class BrushToolOptionsBox : public ToolOptionsBox {
+  Q_OBJECT
 
-	TTool *m_tool;
+  TTool *m_tool;
 
-	ToolOptionCheckbox *m_pencilMode;
-	QLabel *m_hardnessLabel;
-	ToolOptionSlider *m_hardnessField;
-	ToolOptionPopupButton *m_joinStyleCombo;
-	ToolOptionIntSlider *m_miterField;
-	ToolOptionCombo *m_presetCombo;
-	QPushButton *m_addPresetButton;
-	QPushButton *m_removePresetButton;
+  ToolOptionCheckbox *m_pencilMode;
+  QLabel *m_hardnessLabel;
+  ToolOptionSlider *m_hardnessField;
+  ToolOptionPopupButton *m_joinStyleCombo;
+  ToolOptionIntSlider *m_miterField;
+  ToolOptionCombo *m_presetCombo;
+  QPushButton *m_addPresetButton;
+  QPushButton *m_removePresetButton;
 
 private:
-	class PresetNamePopup;
-	PresetNamePopup *m_presetNamePopup;
+  class PresetNamePopup;
+  PresetNamePopup *m_presetNamePopup;
 
 public:
-	BrushToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
-						ToolHandle *toolHandle);
+  BrushToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                      ToolHandle *toolHandle);
 
-	void updateStatus();
+  void updateStatus();
 
 protected slots:
 
-	void onPencilModeToggled(bool);
-	void onAddPreset();
-	void onRemovePreset();
+  void onPencilModeToggled(bool);
+  void onAddPreset();
+  void onRemovePreset();
 };
 
 //=============================================================================
@@ -457,25 +449,24 @@ protected slots:
 //
 //=============================================================================
 
-class EraserToolOptionsBox : public ToolOptionsBox
-{
-	Q_OBJECT
+class EraserToolOptionsBox : public ToolOptionsBox {
+  Q_OBJECT
 
-	ToolOptionCheckbox *m_pencilMode, *m_invertMode, *m_multiFrameMode;
-	ToolOptionCombo *m_toolType, *m_colorMode;
-	QLabel *m_hardnessLabel;
-	ToolOptionSlider *m_hardnessField;
+  ToolOptionCheckbox *m_pencilMode, *m_invertMode, *m_multiFrameMode;
+  ToolOptionCombo *m_toolType, *m_colorMode;
+  QLabel *m_hardnessLabel;
+  ToolOptionSlider *m_hardnessField;
 
 public:
-	EraserToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
-						 ToolHandle *toolHandle);
+  EraserToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                       ToolHandle *toolHandle);
 
-	void updateStatus();
+  void updateStatus();
 
 protected slots:
-	void onPencilModeToggled(bool);
-	void onToolTypeChanged();
-	void onColorModeChanged();
+  void onPencilModeToggled(bool);
+  void onToolTypeChanged();
+  void onColorModeChanged();
 };
 
 //=============================================================================
@@ -484,41 +475,31 @@ protected slots:
 //
 //=============================================================================
 
-class RulerToolOptionsBox : public ToolOptionsBox
-{
-	Q_OBJECT
+class RulerToolOptionsBox : public ToolOptionsBox {
+  Q_OBJECT
 
-	MeasuredValueField *m_Xfld;
-	MeasuredValueField *m_Yfld;
-	MeasuredValueField *m_Wfld;
-	MeasuredValueField *m_Hfld;
-	MeasuredValueField *m_Afld;
-	MeasuredValueField *m_Lfld;
+  MeasuredValueField *m_Xfld;
+  MeasuredValueField *m_Yfld;
+  MeasuredValueField *m_Wfld;
+  MeasuredValueField *m_Hfld;
+  MeasuredValueField *m_Afld;
+  MeasuredValueField *m_Lfld;
 
-	QLabel *m_XpixelFld;
-	QLabel *m_YpixelFld;
-	QLabel *m_WpixelFld;
-	QLabel *m_HpixelFld;
+  QLabel *m_XpixelFld;
+  QLabel *m_YpixelFld;
+  QLabel *m_WpixelFld;
+  QLabel *m_HpixelFld;
 
-	TTool *m_tool;
+  TTool *m_tool;
 
 public:
-	RulerToolOptionsBox(QWidget *parent,
-						TTool *tool);
+  RulerToolOptionsBox(QWidget *parent, TTool *tool);
 
-	void updateValues(bool isRasterLevelEditing,
-					  double X,
-					  double Y,
-					  double W,
-					  double H,
-					  double A,
-					  double L,
-					  int Xpix = 0,
-					  int Ypix = 0,
-					  int Wpix = 0,
-					  int Hpix = 0);
+  void updateValues(bool isRasterLevelEditing, double X, double Y, double W,
+                    double H, double A, double L, int Xpix = 0, int Ypix = 0,
+                    int Wpix = 0, int Hpix = 0);
 
-	void resetValues();
+  void resetValues();
 };
 
 //=============================================================================
@@ -527,25 +508,24 @@ public:
 //
 //=============================================================================
 
-class TapeToolOptionsBox : public ToolOptionsBox
-{
-	Q_OBJECT
+class TapeToolOptionsBox : public ToolOptionsBox {
+  Q_OBJECT
 
-	ToolOptionCheckbox *m_smoothMode, *m_joinStrokesMode;
-	ToolOptionCombo *m_toolMode, *m_typeMode;
-	QLabel *m_autocloseLabel;
-	ToolOptionSlider *m_autocloseField;
+  ToolOptionCheckbox *m_smoothMode, *m_joinStrokesMode;
+  ToolOptionCombo *m_toolMode, *m_typeMode;
+  QLabel *m_autocloseLabel;
+  ToolOptionSlider *m_autocloseField;
 
 public:
-	TapeToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
-					   ToolHandle *toolHandle);
+  TapeToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
+                     ToolHandle *toolHandle);
 
-	void updateStatus();
+  void updateStatus();
 
 protected slots:
-	void onToolTypeChanged();
-	void onToolModeChanged();
-	void onJoinStrokesModeChanged();
+  void onToolTypeChanged();
+  void onToolModeChanged();
+  void onJoinStrokesModeChanged();
 };
 
 //=============================================================================
@@ -554,19 +534,19 @@ protected slots:
 //
 //=============================================================================
 
-class RGBPickerToolOptionsBox : public ToolOptionsBox
-{
-	Q_OBJECT
-	ToolOptionCheckbox *m_realTimePickMode;
-	//label with background color
-	RGBLabel *m_currentRGBLabel;
+class RGBPickerToolOptionsBox : public ToolOptionsBox {
+  Q_OBJECT
+  ToolOptionCheckbox *m_realTimePickMode;
+  // label with background color
+  RGBLabel *m_currentRGBLabel;
 
 public:
-	RGBPickerToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
-							ToolHandle *toolHandle, PaletteController *paletteController);
-	void updateStatus();
+  RGBPickerToolOptionsBox(QWidget *parent, TTool *tool,
+                          TPaletteHandle *pltHandle, ToolHandle *toolHandle,
+                          PaletteController *paletteController);
+  void updateStatus();
 protected slots:
-	void updateRealTimePickLabel(const QColor &);
+  void updateRealTimePickLabel(const QColor &);
 };
 
 //=============================================================================
@@ -575,50 +555,49 @@ protected slots:
 //
 //=============================================================================
 
-class StylePickerToolOptionsBox : public ToolOptionsBox
-{
-	Q_OBJECT
-	ToolOptionCheckbox *m_realTimePickMode;
+class StylePickerToolOptionsBox : public ToolOptionsBox {
+  Q_OBJECT
+  ToolOptionCheckbox *m_realTimePickMode;
 
-	QLabel *m_currentStyleLabel;
+  QLabel *m_currentStyleLabel;
 
 public:
-	StylePickerToolOptionsBox(QWidget *parent, TTool *tool, TPaletteHandle *pltHandle,
-							  ToolHandle *toolHandle, PaletteController *paletteController);
-	void updateStatus();
+  StylePickerToolOptionsBox(QWidget *parent, TTool *tool,
+                            TPaletteHandle *pltHandle, ToolHandle *toolHandle,
+                            PaletteController *paletteController);
+  void updateStatus();
 protected slots:
-	void updateRealTimePickLabel(const int, const int, const int);
+  void updateRealTimePickLabel(const int, const int, const int);
 };
 
 //-----------------------------------------------------------------------------
 
-class DVAPI ToolOptions : public QFrame
-{
-	Q_OBJECT
+class DVAPI ToolOptions : public QFrame {
+  Q_OBJECT
 
-	int m_width, m_height;
-	std::map<TTool *, ToolOptionsBox *> m_panels;
-	QWidget *m_panel;
+  int m_width, m_height;
+  std::map<TTool *, ToolOptionsBox *> m_panels;
+  QWidget *m_panel;
 
 public:
-	ToolOptions();
-	~ToolOptions();
+  ToolOptions();
+  ~ToolOptions();
 
-	QWidget *getPanel() const { return m_panel; }
+  QWidget *getPanel() const { return m_panel; }
 
 protected:
-	void showEvent(QShowEvent *);
-	void hideEvent(QShowEvent *);
+  void showEvent(QShowEvent *);
+  void hideEvent(QShowEvent *);
 
 public slots:
 
-	void onToolSwitched();
-	void onToolChanged();
-	void onStageObjectChange();
+  void onToolSwitched();
+  void onToolChanged();
+  void onStageObjectChange();
 
-	//signals:
+  // signals:
 
-	//  void toolOptionChange();
+  //  void toolOptionChange();
 };
 
-#endif // PANE_H
+#endif  // PANE_H
