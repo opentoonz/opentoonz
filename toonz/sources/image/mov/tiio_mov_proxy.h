@@ -3,7 +3,7 @@
 #ifndef TIIO_MOV_PROXY_H
 #define TIIO_MOV_PROXY_H
 
-#if defined(x64) || defined(__LP64__)
+#if defined(x64) || defined(__LP64__) || defined(LINUX)
 
 // Qt includes
 #include <QString>
