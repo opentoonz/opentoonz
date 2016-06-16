@@ -325,7 +325,7 @@ Preferences::Preferences()
   getValue(*m_settings, "taskchunksize", m_chunkSize);
   getValue(*m_settings, "xsheetStep", m_xsheetStep);
 
-  int r = 0, g = 0, b = 0;
+  int r = 0, g = 255, b = 0;
   getValue(*m_settings, "frontOnionColor.r", r);
   getValue(*m_settings, "frontOnionColor.g", g);
   getValue(*m_settings, "frontOnionColor.b", b);
@@ -333,7 +333,7 @@ Preferences::Preferences()
 
   getValue(*m_settings, "onionPaperThickness", m_onionPaperThickness);
 
-  r = 0, g = 0, b = 0;
+  r = 255, g = 0, b = 0;
   getValue(*m_settings, "backOnionColor.r", r);
   getValue(*m_settings, "backOnionColor.g", g);
   getValue(*m_settings, "backOnionColor.b", b);
