@@ -673,19 +673,19 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Step 1</source>
-        <translation>第 1 步</translation>
+        <translation>步长为1</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>第 2 步</translation>
+        <translation>步长为2</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>第 3 步</translation>
+        <translation>步长为3</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>第 3 步</translation>
+        <translation>步长为4</translation>
     </message>
     <message>
         <source>Function Curves</source>
