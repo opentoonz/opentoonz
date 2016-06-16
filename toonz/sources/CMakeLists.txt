@@ -130,10 +130,10 @@ macro(_find_toonz_library OUT_LIB_LIST IN_LIB_LIST)
     foreach(arg ${IN_LIB_LIST})
         unset(COREPATH CACHE)
         # find しても cmake が走るときにはできていないので完全なパス名を生成して返すだけ
-        if(WIN32 OR UNIX)
-            set(LIBPATH ${arg})
-        else()
+        if(APPLE)
             set(LIBPATH ${CMAKE_CURRENT_BINARY_DIR}/../${arg}/lib${arg}${CMAKE_SHARED_LIBRARY_SUFFIX})
+        else()
+            set(LIBPATH ${arg})
         endif()
         set(OUTLIST ${OUTLIST} ${LIBPATH})
     endforeach()
@@ -276,8 +276,10 @@ if(WIN32 OR APPLE)
     find_path(BOOST_ROOT include/boost boost HINTS ${THIRDPARTY_LIBS_HINTS}
         PATH_SUFFIXES boost/boost_1_60_0/ boost/boost_1_59_0/
         boost/boost_1_58_0/ boost/boost_1_57_0/ boost/boost_1_56_0/ boost155/1.55.0_1/ boost/boost_1_55_0/ )
+    find_package(Boost 1.55 REQUIRED)
+else()
+    find_package(Boost)
 endif()
-find_package(Boost 1.55 REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR} ${LZ4_LIB_INCLUDE_DIRS} ${USB_LIB_INCLUDE_DIRS} ${SUPERLU_INCLUDE_DIR} ${JPEG_INCLUDE_DIR})
 

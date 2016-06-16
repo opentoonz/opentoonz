@@ -64,14 +64,14 @@ else()
     set(SOURCES ${SOURCES}
         mov/tiio_movM.cpp
         3gp/tiio_3gpM.cpp)
-elseif (UNIX)
+elseif(UNIX)
     set(HEADERS ${HEADERS}
         3gp/tiio_3gp_proxy.h
         mov/tiio_mov_proxy.h)
     set(SOURCES ${SOURCES}
         mov/tiio_mov_proxy.cpp
         3gp/tiio_3gp_proxy.cpp)
-endif ()
+endif()
 
 add_library(image SHARED ${HEADERS} ${SOURCES})
 add_definitions(-DTNZIMAGE_DLL -D_USRDLL -DIMAGE_EXPORTS)
