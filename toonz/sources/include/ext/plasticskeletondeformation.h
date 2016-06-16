@@ -165,8 +165,8 @@ private:
 public:
   typedef tcg::any_it<int, int, void *>::bidirectional skelId_iterator;
   typedef tcg::any_it<std::pair<const QString *, SkVD *>,
-                      std::pair<const QString *, SkVD *>,
-                      void *>::bidirectional vd_iterator;
+                      std::pair<const QString *, SkVD *>, void *>::bidirectional
+      vd_iterator;
   typedef tcg::any_it<std::pair<int, int>, std::pair<int, int>,
                       void *>::bidirectional vx_iterator;
 

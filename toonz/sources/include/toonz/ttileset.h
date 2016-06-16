@@ -133,7 +133,7 @@ public:
     }
 #else
     QString id() const {
-      return "TTileSet32::Tile" + QString::number((UINT) this);
+      return "TTileSet32::Tile" + QString::number((UINT)this);
     }
 #endif
 

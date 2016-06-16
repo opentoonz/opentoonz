@@ -11903,7 +11903,8 @@ static void rop_copy_90_gr8_rgbm(RASTER *rin, RASTER *rout,
           /*---------------------------------------------------------------------------*/
 I 6
 
-I 25 void rop_add_white_to_cmap(RASTER * ras) {
+I 25 void
+      rop_add_white_to_cmap(RASTER * ras) {
         int i;
         UCHAR m, white;
 
@@ -13846,7 +13847,8 @@ void release_raster(RASTER * raster) {
 I 89
     /*---------------------------------------------------------------------------*/
 
-    void rop_clear_extra(RASTER * raster) {
+    void
+    rop_clear_extra(RASTER * raster) {
   if (raster->extra_mask && raster->type != RAS_CM24) {
     if (!(raster->native_extra || raster->extra)) {
       tmsg_error("release_extra, missing extra buffer");
@@ -14197,6 +14199,6 @@ static void rop_mirror_v_cm24_rgbm(RASTER * rin, RASTER * rout) {
       }
       free(auxbuf);
     }
-E 98
+  E 98
 E 87
 E 84
