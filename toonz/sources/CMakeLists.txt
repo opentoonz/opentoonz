@@ -267,7 +267,7 @@ elseif(UNIX)
     message("LZO:" ${LZO_INCLUDE_DIR})
 
     pkg_check_modules(FREETYPE REQUIRED freetype2)
-    pkg_check_modules(SDL_LIB REQUIRED sdl)
+    pkg_check_modules(SDL_LIB REQUIRED sdl2)
 endif()
 
 include_directories(BEFORE ${TIFF_INCLUDE_DIR} ${PNG_INCLUDE_DIRS})
