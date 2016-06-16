@@ -80,7 +80,7 @@ endif()
 include_directories(include)
 
 # Find the QtWidgets library
-find_package(Qt5 5.6 REQUIRED
+find_package(Qt5 REQUIRED
     Core
     Gui
     Network
