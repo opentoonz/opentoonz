@@ -1669,80 +1669,6 @@ void MainWindow::defineActions() {
 #ifdef LINETEST
   createMenuLevelAction(MI_Capture, tr("&Capture"), "Space");
 #endif
-<<<<<<< HEAD
-	QAction *action = createMenuLevelAction(MI_CanvasSize, tr("&Canvas Size..."), "");
-	if (action)
-		action->setDisabled(true);
-	createMenuLevelAction(MI_FileInfo, tr("&Info..."), "");
-	createRightClickMenuAction(MI_ViewFile, tr("&View..."), "");
-	createMenuLevelAction(MI_RemoveUnused, tr("&Remove All Unused Levels"), "");
-	createMenuLevelAction(MI_ReplaceParentDirectory, tr("&Replace Parent Directory..."), "");
-
-	createMenuXsheetAction(MI_SceneSettings, tr("&Scene Settings..."), "");
-	createMenuXsheetAction(MI_CameraSettings, tr("&Camera Settings..."), "");
-	createMiscAction(MI_CameraStage, tr("&Camera Settings..."), "");
-
-	createMenuXsheetAction(MI_OpenChild, tr("&Open Sub-xsheet"), "");
-	createMenuXsheetAction(MI_CloseChild, tr("&Close Sub-xsheet"), "");
-	createMenuXsheetAction(MI_ExplodeChild, tr("Explode Sub-xsheet"), "");
-	createMenuXsheetAction(MI_Collapse, tr("Collapse"), "");
-	createMenuXsheetAction(MI_ToggleEditInPlace, tr("Toggle Edit in Place"), "");
-	createMenuXsheetAction(MI_SaveSubxsheetAs, tr("&Save Sub-xsheet As..."), "");
-	createMenuXsheetAction(MI_Resequence, tr("Resequence"), "");
-	createMenuXsheetAction(MI_CloneChild, tr("Clone Sub-xsheet"), "");
-
-	createMenuXsheetAction(MI_ApplyMatchLines, tr("&Apply Match Lines..."), "");
-	createMenuXsheetAction(MI_MergeCmapped, tr("&Merge Tlv Levels..."), "");
-	createMenuXsheetAction(MI_DeleteMatchLines, tr("&Delete Match Lines"), "");
-	createMenuXsheetAction(MI_DeleteInk, tr("&Delete Lines..."), "");
-	createMenuXsheetAction(MI_MergeColumns, tr("&Merge Levels"), "");
-	createMenuXsheetAction(MI_InsertFx, tr("&New FX..."), "Ctrl+F");
-	createMenuXsheetAction(MI_NewOutputFx, tr("&New Output"), "Ctrl+F");
-	createRightClickMenuAction(MI_FxParamEditor, tr("&Edit FX..."), "Ctrl+K");
-
-	createMenuXsheetAction(MI_InsertSceneFrame, tr("Insert Frame"), "");
-	createMenuXsheetAction(MI_RemoveSceneFrame, tr("Remove Frame"), "");
-	createMenuXsheetAction(MI_InsertGlobalKeyframe, tr("Insert Multiple Keys"), "");
-	createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"), "");
-	
-
-	createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
-	createMenuCellsAction(MI_Swing, tr("&Swing"), "");
-	createMenuCellsAction(MI_Random, tr("&Random"), "");
-	createMenuCellsAction(MI_Increment, tr("&Autoexpose"), "");
-	createMenuCellsAction(MI_Dup, tr("&Repeat..."), "");
-	createMenuCellsAction(MI_ResetStep, tr("&Reset Step"), "");
-	createMenuCellsAction(MI_IncreaseStep, tr("&Increase Step"), "");
-	createMenuCellsAction(MI_DecreaseStep, tr("&Decrease Step"), "");
-	createMenuCellsAction(MI_Step2, tr("&Step 2"), "");
-	createMenuCellsAction(MI_Step3, tr("&Step 3"), "");
-	createMenuCellsAction(MI_Step4, tr("&Step 4"), "");
-	createMenuCellsAction(MI_Each2, tr("&Each 2"), "");
-	createMenuCellsAction(MI_Each3, tr("&Each 3"), "");
-	createMenuCellsAction(MI_Each4, tr("&Each 4"), "");
-	createMenuCellsAction(MI_Rollup, tr("&Roll Up"), "");
-	createMenuCellsAction(MI_Rolldown, tr("&Roll Down"), "");
-	createMenuCellsAction(MI_TimeStretch, tr("&Time Stretch..."), "");
-	createMenuCellsAction(MI_Duplicate, tr("&Duplicate Drawing  "), "D");
-	createMenuCellsAction(MI_Autorenumber, tr("&Autorenumber"), "");
-	createMenuCellsAction(MI_CloneLevel, tr("&Clone"), "");
-	createMenuCellsAction(MI_DrawingSubForward, tr("Drawing Substitution Forward"), ".");
-	createMenuCellsAction(MI_DrawingSubBackward, tr("Drawing Substitution Backward"), ",");
-	createMenuCellsAction(MI_DrawingSubGroupForward, tr("Similar Drawing Substitution Forward"), "Ctrl+.");
-	createMenuCellsAction(MI_DrawingSubGroupBackward, tr("Similar Drawing Substitution Backward"), "Ctrl+,");
-
-	createMenuCellsAction(MI_Reframe1, tr("1's"), "");
-	createMenuCellsAction(MI_Reframe2, tr("2's"), "");
-	createMenuCellsAction(MI_Reframe3, tr("3's"), "");
-	createMenuCellsAction(MI_Reframe4, tr("4's"), "");
-
-	createRightClickMenuAction(MI_SetKeyframes, tr("&Set Key"), "");
-
-	createToggle(MI_ViewCamera, tr("&Camera Box"), "", ViewCameraToggleAction ? 1 : 0, MenuViewCommandType);
-	createToggle(MI_ViewTable, tr("&Table"), "", ViewTableToggleAction ? 1 : 0, MenuViewCommandType);
-	createToggle(MI_FieldGuide, tr("&Field Guide"), "", FieldGuideToggleAction ? 1 : 0, MenuViewCommandType);
-	createToggle(MI_ViewBBox, tr("&Raster Bounding Box"), "", ViewBBoxToggleAction ? 1 : 0, MenuViewCommandType);
-=======
   QAction *action =
       createMenuLevelAction(MI_CanvasSize, tr("&Canvas Size..."), "");
   if (action) action->setDisabled(true);
@@ -1801,6 +1727,11 @@ void MainWindow::defineActions() {
   createMenuCellsAction(MI_Duplicate, tr("&Duplicate Drawing  "), "D");
   createMenuCellsAction(MI_Autorenumber, tr("&Autorenumber"), "");
   createMenuCellsAction(MI_CloneLevel, tr("&Clone"), "");
+  createMenuCellsAction(MI_DrawingSubForward, tr("Drawing Substitution Forward"), ".");
+	createMenuCellsAction(MI_DrawingSubBackward, tr("Drawing Substitution Backward"), ",");
+	createMenuCellsAction(MI_DrawingSubGroupForward, tr("Similar Drawing Substitution Forward"), "Ctrl+.");
+	createMenuCellsAction(MI_DrawingSubGroupBackward, tr("Similar Drawing Substitution Backward"), "Ctrl+,");
+
 
   createMenuCellsAction(MI_Reframe1, tr("1's"), "");
   createMenuCellsAction(MI_Reframe2, tr("2's"), "");
@@ -1817,7 +1748,6 @@ void MainWindow::defineActions() {
                FieldGuideToggleAction ? 1 : 0, MenuViewCommandType);
   createToggle(MI_ViewBBox, tr("&Raster Bounding Box"), "",
                ViewBBoxToggleAction ? 1 : 0, MenuViewCommandType);
->>>>>>> master
 #ifdef LINETEST
   createToggle(MI_CapturePanelFieldGuide, tr("&Field Guide in Capture Window"),
                "", CapturePanelFieldGuideToggleAction ? 1 : 0,
