@@ -568,7 +568,7 @@ DvDirTreeView {
 }
 
 /*---------------------------------------------------------------------------*/ 
-/* Cleanup Settings, LoadLevel, PsdSettingsPopup, FxSettingsPopup */
+/* Cleanup Settings, LoadLevel, PsdSettingsPopup, FxSettingsPopup, RenameAsToonzPopup */
 /*---------------------------------------------------------------------------*/
 #CleanupSettingsFrame, 
 #LoadLevelFrame,
@@ -580,7 +580,8 @@ DvDirTreeView {
 #LoadLevelHeadLabel, 
 #PsdSettingsHeadLabel, 
 #PsdSettingsGroupBox::title, 
-#FxSettingsPreviewShowLabel {
+#FxSettingsPreviewShowLabel,
+#RenameAsToonzPopupLabel {
 	color: rgb(0,0,64);
 }
 
@@ -993,6 +994,16 @@ SpreadsheetViewer {
 			}
 		}
 	}
+}
+
+
+/*------ Script Console ------*/
+
+#ScriptConsole {
+	border: 1px inset;
+    background-color: rgb(220,220,220);
+    color: black;
+    font-family: "Courier";
 }
 
 /*------ Topbar and Menubar of the MainWindow ------*/
