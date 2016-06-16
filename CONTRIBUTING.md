@@ -40,5 +40,5 @@ so we cannot reproduce them. We believe you can fix the bug and send us the fix.
 ## Features
 
 If you had an idea about a new feature, please implement it and send a pull-request to us.
-Even if you cannot implement the feature, you can add a task in [issues](https://github.com/opentoonz/opentoonz/issues).
+Even if you cannot implement the feature, you can open a topic in [issues](https://github.com/opentoonz/opentoonz/issues).
 It enables us to discuss about implementaions of the feature there.
