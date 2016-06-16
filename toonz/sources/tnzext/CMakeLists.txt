@@ -75,7 +75,7 @@ endif()
 add_library(tnzext SHARED ${HEADERS} ${SOURCES} ${OBJCSOURCES})
 
 if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzext${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzext.dylib")
 endif()
 
 add_definitions(-DTNZEXT_EXPORTS)
@@ -96,8 +96,8 @@ if(WIN32)
         tnzcore tnzbase)
 elseif(APPLE)
     set(EXTRA_LIBS
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore${CMAKE_SHARED_LIBRARY_SUFFIX}
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase${CMAKE_SHARED_LIBRARY_SUFFIX})
+        ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.dylib
+        ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.dylib)
 
     target_link_libraries(tnzext
         Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network

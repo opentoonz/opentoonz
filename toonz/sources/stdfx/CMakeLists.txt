@@ -247,7 +247,7 @@ set(SOURCES
 add_library(tnzstdfx SHARED ${HEADERS} ${SOURCES} ${OBJCSOURCES})
 add_definitions(-D_USRDLL -DTNZSTDFX_EXPORTS)
 if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzstdfx${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzstdfx.dylib")
 endif()
 
 message("subdir: tnzstdfx")

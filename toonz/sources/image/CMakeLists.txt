@@ -76,7 +76,7 @@ endif()
 add_library(image SHARED ${HEADERS} ${SOURCES})
 add_definitions(-DTNZIMAGE_DLL -D_USRDLL -DIMAGE_EXPORTS)
 if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libimage${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libimage.dylib")
 endif()
 
 message("subdir: image")
