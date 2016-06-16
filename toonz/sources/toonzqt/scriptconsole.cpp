@@ -9,6 +9,11 @@
 
 ScriptConsole::ScriptConsole(QWidget *parent)
     : QTextEdit(parent), m_commandIndex(0) {
+  
+  setObjectName("ScriptConsole");
+  //setStyleSheet("background-color: rgb(220,220,220); color: black;");
+ // setTextColor(Qt::black);
+
   m_prompt = ">> ";
 
   append(m_prompt);
