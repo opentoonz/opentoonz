@@ -328,6 +328,10 @@
         <source>Move Center   %1  Frame %2</source>
         <translation>移动中心   %1  帧 %2</translation>
     </message>
+    <message>
+        <source>color model</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TScriptBinding::CenterlineVectorizer</name>

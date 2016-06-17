@@ -9,6 +9,9 @@
 
 ScriptConsole::ScriptConsole(QWidget *parent)
     : QTextEdit(parent), m_commandIndex(0) {
+  
+  setObjectName("ScriptConsole");
+
   m_prompt = ">> ";
 
   append(m_prompt);

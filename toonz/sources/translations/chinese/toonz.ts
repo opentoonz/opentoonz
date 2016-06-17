@@ -1077,6 +1077,18 @@ What do you want to do?</source>
         <source>Palette:</source>
         <translation>调色板：</translation>
     </message>
+    <message>
+        <source>Append Default Palette</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When activated, styles of the default palette
+($TOONZSTUDIOPALETTE\cleanup_default.tpl) will 
+be appended to the palette after conversion in 
+order to save the effort of creating styles 
+before color designing.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DVGui::ProgressDialog</name>
@@ -4245,6 +4257,10 @@ Do you want to create it?</source>
         <source>&amp;About OpenToonz...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Refresh Folder Tree</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -5456,6 +5472,10 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Show Keyframes on Cell Area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rooms *:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7065,6 +7085,10 @@ undefined error.</source>
     </message>
     <message>
         <source>https://opentoonz.github.io/e/</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add color model&apos;s palette to the destination palette.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9406,6 +9430,10 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Double Click to Toggle Onion Skin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pinned Center : Col%1%2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

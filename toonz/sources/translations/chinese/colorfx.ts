@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>Noise</source>
-        <translation>噪音</translation>
+        <translation>杂色</translation>
     </message>
 </context>
 <context>
@@ -39,7 +39,7 @@
     <name>OutlineViewerStyle</name>
     <message>
         <source>OutlineViewer(OnlyDebug)</source>
-        <translation>轮廓线查看器（仅用于 Debug）</translation>
+        <translation>轮廓线查看器(仅调试)</translation>
     </message>
     <message>
         <source>Control Point</source>
@@ -125,11 +125,11 @@
     <name>TBlendStrokeStyle2</name>
     <message>
         <source>Fade</source>
-        <translation>变淡</translation>
+        <translation>淡化</translation>
     </message>
     <message>
         <source>Border Fade</source>
-        <translation>边界变淡</translation>
+        <translation>边界淡化</translation>
     </message>
     <message>
         <source>Fade In</source>
@@ -144,7 +144,7 @@
     <name>TBraidStrokeStyle</name>
     <message>
         <source>Plait</source>
-        <translation>回绕</translation>
+        <translation>编织</translation>
     </message>
     <message>
         <source>Twirl</source>
@@ -155,14 +155,14 @@
     <name>TBubbleStrokeStyle</name>
     <message>
         <source>Bubbles</source>
-        <translation>泡</translation>
+        <translation>泡泡</translation>
     </message>
 </context>
 <context>
     <name>TChainStrokeStyle</name>
     <message>
         <source>Chain</source>
-        <translation>链</translation>
+        <translation>链条</translation>
     </message>
 </context>
 <context>
@@ -204,14 +204,14 @@
     </message>
     <message>
         <source>Noise</source>
-        <translation>噪音</translation>
+        <translation>杂色</translation>
     </message>
 </context>
 <context>
     <name>TCheckedFillStyle</name>
     <message>
         <source>Square</source>
-        <translation>四方</translation>
+        <translation>格子纹</translation>
     </message>
     <message>
         <source>Horiz Dist</source>
@@ -238,7 +238,7 @@
     <name>TChessFillStyle</name>
     <message>
         <source>Chessboard</source>
-        <translation>棋盘</translation>
+        <translation>棋盘格</translation>
     </message>
     <message>
         <source>Horiz Size</source>
@@ -295,22 +295,22 @@
     <name>TDottedFillStyle</name>
     <message>
         <source>Polka Dots</source>
-        <translation>水玉</translation>
+        <translation>波尔卡圆点</translation>
     </message>
     <message>
         <source>Dot Size</source>
-        <translation>水玉的大小</translation>
+        <translation>圆点大小</translation>
     </message>
     <message>
         <source>Dot Distance</source>
-        <translation>水玉的距离</translation>
+        <translation>圆点距离</translation>
     </message>
 </context>
 <context>
     <name>TDottedLineStrokeStyle</name>
     <message>
         <source>Vanishing</source>
-        <translation>隐没</translation>
+        <translation>衰减</translation>
     </message>
     <message>
         <source>Fade In</source>
@@ -326,7 +326,7 @@
     </message>
     <message>
         <source>Gap</source>
-        <translation>空白</translation>
+        <translation>间隙</translation>
     </message>
 </context>
 <context>
@@ -359,7 +359,7 @@
     <name>TFurStrokeStyle</name>
     <message>
         <source>Herringbone</source>
-        <translation>鲱骨形</translation>
+        <translation>人字形</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -374,7 +374,7 @@
     <name>TGraphicPenStrokeStyle</name>
     <message>
         <source>Dashes</source>
-        <translation>长划</translation>
+        <translation>长划线</translation>
     </message>
     <message>
         <source>Density</source>
@@ -426,7 +426,7 @@
     <name>TMosaicFillStyle</name>
     <message>
         <source>Stained Glass</source>
-        <translation>有色玻璃</translation>
+        <translation>花窗玻璃</translation>
     </message>
     <message>
         <source>Size</source>
@@ -434,7 +434,7 @@
     </message>
     <message>
         <source>Distortion</source>
-        <translation>扩缩</translation>
+        <translation>歪曲</translation>
     </message>
     <message>
         <source>Min Thick</source>
@@ -461,11 +461,11 @@
     </message>
     <message>
         <source>Thickness</source>
-        <translation>太さ</translation>
+        <translation>粗细</translation>
     </message>
     <message>
         <source>Noise</source>
-        <translation>噪音</translation>
+        <translation>杂色</translation>
     </message>
 </context>
 <context>
@@ -491,11 +491,11 @@
     </message>
     <message>
         <source>Shininess</source>
-        <translation>亮泽度</translation>
+        <translation>光泽度</translation>
     </message>
     <message>
         <source>Plastic</source>
-        <translation></translation>
+        <translation>塑料</translation>
     </message>
 </context>
 <context>
@@ -510,18 +510,18 @@
     </message>
     <message>
         <source>Distortion</source>
-        <translation>收缩</translation>
+        <translation>歪曲</translation>
     </message>
     <message>
         <source>Thickness</source>
-        <translation></translation>
+        <translation>粗细</translation>
     </message>
 </context>
 <context>
     <name>TPointShadowFillStyle</name>
     <message>
         <source>Sponge Shading</source>
-        <translation></translation>
+        <translation>海绵着色</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -544,7 +544,7 @@
     <name>TRadGradFillStyle</name>
     <message>
         <source>Radial Gradient</source>
-        <translation>圆形渐变</translation>
+        <translation>径向渐变</translation>
     </message>
     <message>
         <source>X Position</source>
@@ -567,7 +567,7 @@
     <name>TRopeStrokeStyle</name>
     <message>
         <source>Rope</source>
-        <translation>绳子</translation>
+        <translation>绳索</translation>
     </message>
     <message>
         <source>Tilt</source>
@@ -589,7 +589,7 @@
     <name>TSawToothStrokeStyle</name>
     <message>
         <source>Jagged</source>
-        <translation>犬牙交错</translation>
+        <translation>锯齿状</translation>
     </message>
     <message>
         <source>Distance</source>
@@ -600,7 +600,7 @@
     <name>TSinStrokeStyle</name>
     <message>
         <source>Wave</source>
-        <translation>波浪</translation>
+        <translation>波形</translation>
     </message>
     <message>
         <source>Frequency</source>
@@ -641,7 +641,7 @@
     <name>TStripeFillStyle</name>
     <message>
         <source>Banded</source>
-        <translation></translation>
+        <translation>带状</translation>
     </message>
     <message>
         <source>Distance</source>
@@ -660,7 +660,7 @@
     <name>TTissueStrokeStyle</name>
     <message>
         <source>Gauze</source>
-        <translation>网</translation>
+        <translation>纱网</translation>
     </message>
     <message>
         <source>Density</source>
@@ -690,14 +690,14 @@
     <name>TZigzTSinStrokeStyleagStrokeStyle</name>
     <message>
         <source>Thickness</source>
-        <translation>大小</translation>
+        <translation>粗细</translation>
     </message>
 </context>
 <context>
     <name>TZigzagStrokeStyle</name>
     <message>
         <source>Zigzag</source>
-        <translation>之字形</translation>
+        <translation>水波</translation>
     </message>
     <message>
         <source>Min Distance</source>
@@ -717,7 +717,7 @@
     </message>
     <message>
         <source>Thickness</source>
-        <translation>大小</translation>
+        <translation>粗细</translation>
     </message>
 </context>
 </TS>

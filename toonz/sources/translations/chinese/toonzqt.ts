@@ -44,7 +44,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>取笑</translation>
+        <translation>取消</translation>
     </message>
 </context>
 <context>
@@ -62,11 +62,11 @@
     <name>CameraSettingsWidget</name>
     <message>
         <source>Width:</source>
-        <translation type="vanished">宽：</translation>
+        <translation type="vanished">宽度：</translation>
     </message>
     <message>
         <source>Height:</source>
-        <translation type="vanished">高：</translation>
+        <translation type="vanished">高度：</translation>
     </message>
     <message>
         <source>XPx:</source>
@@ -128,7 +128,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">预设名中不能使用 &apos;,&apos;(逗号)。</translation>
     </message>
 </context>
 <context>
@@ -174,7 +174,7 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="vanished">名字：</translation>
+        <translation type="vanished">名称：</translation>
     </message>
     <message>
         <source>Path:</source>
@@ -212,7 +212,7 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui</name>
     <message>
         <source>OK</source>
-        <translation>好</translation>
+        <translation>确定</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -292,7 +292,7 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::LineEdit</name>
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation>文件名不可以包含后面的任一字符： /\:*?&quot;&lt;&gt;|。</translation>
+        <translation>文件名不可以包含如下的任一字符： /\:*?&quot;&lt;&gt;|。</translation>
     </message>
 </context>
 <context>
@@ -459,11 +459,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>&amp;Checkered Background</source>
-        <translation>方格纹背景(&amp;C)</translation>
+        <translation>棋盘格背景(&amp;C)</translation>
     </message>
     <message>
         <source>Set the playback frame rate</source>
-        <translation>设定回放帧率</translation>
+        <translation>设置回放帧率</translation>
     </message>
     <message>
         <source>&amp;First Frame</source>
@@ -532,11 +532,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source> FPS	</source>
-        <translation>FPS→</translation>
+        <translation> FPS→</translation>
     </message>
     <message>
         <source> Frame  </source>
-        <translation type="vanished">帧</translation>
+        <translation type="vanished"> 帧  </translation>
     </message>
     <message>
         <source>Set the current frame</source>
@@ -564,11 +564,11 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Display Areas as Filled</source>
-        <translation>显示区域已填充</translation>
+        <translation>将区域显示为已填充</translation>
     </message>
     <message>
         <source>&amp;Display Areas as Filled</source>
-        <translation>显示区域已填充(&amp;D)</translation>
+        <translation>将区域显示为已填充(&amp;D)</translation>
     </message>
 </context>
 <context>
@@ -673,19 +673,19 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Step 1</source>
-        <translation>步长为1</translation>
+        <translation>第 1 步</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>步长为2</translation>
+        <translation>第 2 步</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>步长为3</translation>
+        <translation>第 3 步</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>步长为4</translation>
+        <translation>第 3 步</translation>
     </message>
     <message>
         <source>Function Curves</source>
@@ -850,19 +850,19 @@ Possibly the preset file has been corrupted</source>
     </message>
     <message>
         <source>Step 1</source>
-        <translation>第1步</translation>
+        <translation>第 1 步</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>第2步</translation>
+        <translation>第 2 步</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>第3步</translation>
+        <translation>第 3 步</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>第4步</translation>
+        <translation>第 4 步</translation>
     </message>
 </context>
 <context>
@@ -1090,7 +1090,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     </message>
     <message>
         <source>&amp;Checkered Background</source>
-        <translation>方格纹背景(&amp;C)</translation>
+        <translation>棋盘格背景(&amp;C)</translation>
     </message>
     <message>
         <source> : </source>
@@ -1910,11 +1910,11 @@ Are you sure?</source>
     </message>
     <message>
         <source>&amp;Schematic Toggle</source>
-        <translation type="vanished">开关简图</translation>
+        <translation type="vanished">开关简图(&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Swtich output port display mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">切换输出端口显示模式(&amp;S)</translation>
     </message>
 </context>
 <context>

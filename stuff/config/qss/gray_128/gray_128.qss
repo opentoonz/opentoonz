@@ -497,7 +497,7 @@ DvDirTreeView {
   alternate-background-color: #8d8d8d;
 }
 /*---------------------------------------------------------------------------*/
-/* Cleanup Settings, LoadLevel, PsdSettingsPopup, FxSettingsPopup */
+/* Cleanup Settings, LoadLevel, PsdSettingsPopup, FxSettingsPopup, RenameAsToonzPopup */
 /*---------------------------------------------------------------------------*/
 #CleanupSettingsFrame,
 #LoadLevelFrame,
@@ -508,7 +508,8 @@ DvDirTreeView {
 #LoadLevelHeadLabel,
 #PsdSettingsHeadLabel,
 #PsdSettingsGroupBox::title,
-#FxSettingsPreviewShowLabel {
+#FxSettingsPreviewShowLabel,
+#RenameAsToonzPopupLabel {
   color: #000040;
 }
 #PsdSettingsGroupBox {
@@ -907,6 +908,13 @@ SpreadsheetViewer {
 }
 #EditToolLockButton::indicator:checked:hover {
   image: url("imgs/cam_lock_hover.png");
+}
+/*------ Script Console ------*/
+#ScriptConsole {
+  border: 1px inset;
+  background-color: #dcdcdc;
+  color: black;
+  font-family: "Courier";
 }
 /*------ Topbar and Menubar of the MainWindow ------*/
 #TopBar {

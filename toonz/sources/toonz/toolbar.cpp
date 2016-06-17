@@ -10,16 +10,23 @@
 #include "toonzqt/menubarcommand.h"
 #include "menubarcommandids.h"
 
+// TnzBase includes
+#include "tenv.h"
+
 #include <QPainter>
 #include <QAction>
 #include <QToolButton>
 #include <QVBoxLayout>
 
+TEnv::IntVar ShowAllToolsToggle("ShowAllToolsToggle", 0);
+
 //=============================================================================
 // Toolbar
 //-----------------------------------------------------------------------------
 
-Toolbar::Toolbar(QWidget *parent, bool isVertical) : QToolBar(parent) {
+Toolbar::Toolbar(QWidget *parent, bool isVertical)
+    : QToolBar(parent)
+    , m_isExpanded(ShowAllToolsToggle !=0) {
   // Fondamentale per lo style sheet
   setObjectName("toolBar");
 
@@ -103,23 +110,23 @@ Toolbar::Toolbar(QWidget *parent, bool isVertical) : QToolBar(parent) {
 
   m_expandButton = new QToolButton(this);
   m_expandButton->setCheckable(true);
-  m_expandButton->setChecked(false);
+  m_expandButton->setChecked(m_isExpanded);
   m_expandButton->setArrowType((isVertical) ? Qt::DownArrow : Qt::RightArrow);
 
   addWidget(m_expandButton);
 
-  // toolbar is shrinked at the beginning
-  updateToolbar(false);
-
+  // toolbar is expanded or shrinked according to env at the beginning
+  updateToolbar();
+  
   connect(m_expandButton, SIGNAL(toggled(bool)), this,
-          SLOT(updateToolbar(bool)));
+          SLOT(setIsExpanded(bool)));
 }
 
 //-----------------------------------------------------------------------------
 /*! Layout the tool buttons according to the state of the expandButton
 */
-void Toolbar::updateToolbar(bool expand) {
-  if (expand) {
+void Toolbar::updateToolbar() {
+  if (m_isExpanded) {
     insertAction(CommandManager::instance()->getAction(T_Fill),
                  CommandManager::instance()->getAction(T_Type));
     insertAction(CommandManager::instance()->getAction(T_Hand),
@@ -165,6 +172,14 @@ void Toolbar::updateToolbar(bool expand) {
         (orientation() == Qt::Vertical) ? Qt::DownArrow : Qt::RightArrow);
   }
   update();
+}
+
+//----------------------------------------------------------------------------
+
+void Toolbar::setIsExpanded(bool expand) {
+  m_isExpanded = expand;
+  ShowAllToolsToggle = (expand) ? 1 : 0;
+  updateToolbar();
 }
 
 //-----------------------------------------------------------------------------

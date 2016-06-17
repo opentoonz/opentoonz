@@ -1607,7 +1607,7 @@ RenameAsToonzPopup::RenameAsToonzPopup(const QString name, int frames)
     lbl = new QLabel(
         QString(tr("Creating an animation level of %1 frames").arg(frames)));
   lbl->setFixedHeight(20);
-  lbl->setStyleSheet("color:rgb(0, 0, 190)");
+  lbl->setObjectName("RenameAsToonzPopupLabel");
 
   m_name = new LineEdit(frames == -1 ? "" : name);
   m_name->setFixedHeight(20);
