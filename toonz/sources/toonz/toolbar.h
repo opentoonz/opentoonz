@@ -12,10 +12,13 @@ class Toolbar : public QToolBar {
 
   QToolButton *m_expandButton;
   QAction *m_sep1, *m_sep2;
+  bool m_isExpanded;
 
 public:
   Toolbar(QWidget *parent, bool isVertical = true);
   ~Toolbar();
+
+  bool isExpanded(){ return m_isExpanded; }
 
 protected:
   bool addAction(QAction *act);
@@ -26,6 +29,7 @@ protected:
 protected slots:
   void onToolChanged();
   void updateToolbar(bool expand);
+  void setIsExpanded(bool expand);
 };
 
 #endif  // TOOLBAR_H
