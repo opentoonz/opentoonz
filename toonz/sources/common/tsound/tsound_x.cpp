@@ -383,27 +383,28 @@ void TSoundOutputDevice::stop() {
 //------------------------------------------------------------------------------
 
 #if 0
-double TSoundOutputDevice::getVolume()
-{
+double TSoundOutputDevice::getVolume() {
 #ifdef __sgi
-	ALpv pv[1];
-	ALfixed value[2];
+  ALpv pv[1];
+  ALfixed value[2];
 
-	try {
-		supportsVolume();
-	} catch (TSoundDeviceException &e) {
-		throw TSoundDeviceException(e.getType(), e.getMessage());
-	}
+  try {
+    supportsVolume();
+  } catch (TSoundDeviceException &e) {
+    throw TSoundDeviceException(e.getType(), e.getMessage());
+  }
 
-	pv[0].param = AL_GAIN;
-	pv[0].value.ptr = value;
-	pv[0].sizeIn = 8;
-	alGetParams(AL_DEFAULT_OUTPUT, pv, 1);
+  pv[0].param     = AL_GAIN;
+  pv[0].value.ptr = value;
+  pv[0].sizeIn    = 8;
+  alGetParams(AL_DEFAULT_OUTPUT, pv, 1);
 
-	double val = (((alFixedToDouble(value[0]) + alFixedToDouble(value[1])) / 2.) + 60.) / 8.05;
-	return val;
+  double val =
+      (((alFixedToDouble(value[0]) + alFixedToDouble(value[1])) / 2.) + 60.) /
+      8.05;
+  return val;
 #else
-	return 0.0f;
+  return 0.0f;
 #endif
 }
 #endif
@@ -411,27 +412,25 @@ double TSoundOutputDevice::getVolume()
 //------------------------------------------------------------------------------
 
 #if 0
-bool TSoundOutputDevice::setVolume(double volume)
-{
-	ALpv pv[1];
-	ALfixed value[2];
+bool TSoundOutputDevice::setVolume(double volume) {
+  ALpv pv[1];
+  ALfixed value[2];
 
-	try {
-		supportsVolume();
-	} catch (TSoundDeviceException &e) {
-		throw TSoundDeviceException(e.getType(), e.getMessage());
-	}
+  try {
+    supportsVolume();
+  } catch (TSoundDeviceException &e) {
+    throw TSoundDeviceException(e.getType(), e.getMessage());
+  }
 
-	double val = -60. + 8.05 * volume;
-	value[0] = alDoubleToFixed(val);
-	value[1] = alDoubleToFixed(val);
+  double val = -60. + 8.05 * volume;
+  value[0]   = alDoubleToFixed(val);
+  value[1]   = alDoubleToFixed(val);
 
-	pv[0].param = AL_GAIN;
-	pv[0].value.ptr = value;
-	pv[0].sizeIn = 8;
-	if (alSetParams(AL_DEFAULT_OUTPUT, pv, 1) < 0)
-		return false;
-	return true;
+  pv[0].param     = AL_GAIN;
+  pv[0].value.ptr = value;
+  pv[0].sizeIn    = 8;
+  if (alSetParams(AL_DEFAULT_OUTPUT, pv, 1) < 0) return false;
+  return true;
 }
 #endif
 
@@ -441,22 +440,21 @@ bool TSoundOutputDevice::setVolume(double volume)
 bool TSoundOutputDevice::supportsVolume()
 {
 #ifdef __sgi
-	ALparamInfo pinfo;
-	int ret;
-	ret = alGetParamInfo(AL_DEFAULT_OUTPUT, AL_GAIN, &pinfo);
-	double min = alFixedToDouble(pinfo.min.ll);
-	double max = alFixedToDouble(pinfo.max.ll);
-	if ((ret != -1) && (min != max) && (max != 0.0))
-		return true;
-	else if ((ret == AL_BAD_PARAM) || ((min == max) && (max == 0.0)))
-		throw TSoundDeviceException(
-			TSoundDeviceException::UnableVolume,
-			"It is impossible to chamge setting of volume");
-	else
-		throw TSoundDeviceException(
-			TSoundDeviceException::NoMixer, "Output device is not accessible");
+  ALparamInfo pinfo;
+  int ret;
+  ret        = alGetParamInfo(AL_DEFAULT_OUTPUT, AL_GAIN, &pinfo);
+  double min = alFixedToDouble(pinfo.min.ll);
+  double max = alFixedToDouble(pinfo.max.ll);
+  if ((ret != -1) && (min != max) && (max != 0.0))
+    return true;
+  else if ((ret == AL_BAD_PARAM) || ((min == max) && (max == 0.0)))
+    throw TSoundDeviceException(TSoundDeviceException::UnableVolume,
+                                "It is impossible to chamge setting of volume");
+  else
+    throw TSoundDeviceException(TSoundDeviceException::NoMixer,
+                                "Output device is not accessible");
 #else
-	return true;
+  return true;
 #endif
 }
 #endif
