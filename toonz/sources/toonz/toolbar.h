@@ -14,12 +14,11 @@ class Toolbar : public QToolBar {
   QAction *m_sep1, *m_sep2;
   bool m_isExpanded;
 
+  void updateToolbar();
 public:
   Toolbar(QWidget *parent, bool isVertical = true);
   ~Toolbar();
-
-  bool isExpanded(){ return m_isExpanded; }
-
+  
 protected:
   bool addAction(QAction *act);
 
@@ -28,7 +27,6 @@ protected:
 
 protected slots:
   void onToolChanged();
-  void updateToolbar(bool expand);
   void setIsExpanded(bool expand);
 };
 

@@ -110,17 +110,14 @@ Toolbar::Toolbar(QWidget *parent, bool isVertical)
 
   m_expandButton = new QToolButton(this);
   m_expandButton->setCheckable(true);
-  m_expandButton->setChecked(isExpanded());
+  m_expandButton->setChecked(m_isExpanded);
   m_expandButton->setArrowType((isVertical) ? Qt::DownArrow : Qt::RightArrow);
 
   addWidget(m_expandButton);
 
   // toolbar is expanded or shrinked according to env at the beginning
-  updateToolbar(isExpanded());
-
-  connect(m_expandButton, SIGNAL(toggled(bool)), this,
-          SLOT(updateToolbar(bool)));
-
+  updateToolbar();
+  
   connect(m_expandButton, SIGNAL(toggled(bool)), this,
           SLOT(setIsExpanded(bool)));
 }
@@ -128,8 +125,8 @@ Toolbar::Toolbar(QWidget *parent, bool isVertical)
 //-----------------------------------------------------------------------------
 /*! Layout the tool buttons according to the state of the expandButton
 */
-void Toolbar::updateToolbar(bool expand) {
-  if (expand) {
+void Toolbar::updateToolbar() {
+  if (m_isExpanded) {
     insertAction(CommandManager::instance()->getAction(T_Fill),
                  CommandManager::instance()->getAction(T_Type));
     insertAction(CommandManager::instance()->getAction(T_Hand),
@@ -182,6 +179,7 @@ void Toolbar::updateToolbar(bool expand) {
 void Toolbar::setIsExpanded(bool expand) {
   m_isExpanded = expand;
   ShowAllToolsToggle = (expand) ? 1 : 0;
+  updateToolbar();
 }
 
 //-----------------------------------------------------------------------------
