@@ -14,102 +14,100 @@ class QCheckBox;
 
 //-----------------------------------------------------------------------------
 
-class SVNRevertDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNRevertDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	QString m_workingDir;
-	QStringList m_files;
+  QString m_workingDir;
+  QStringList m_files;
 
-	QPushButton *m_revertButton;
-	QPushButton *m_cancelButton;
+  QPushButton *m_revertButton;
+  QPushButton *m_cancelButton;
 
-	QTreeWidget *m_treeWidget;
+  QTreeWidget *m_treeWidget;
 
-	VersionControlThread m_thread;
+  VersionControlThread m_thread;
 
-	QList<SVNStatus> m_status;
+  QList<SVNStatus> m_status;
 
-	QList<QString> m_filesToRevert;
-	QStringList m_sceneResources;
+  QList<QString> m_filesToRevert;
+  QStringList m_sceneResources;
 
-	QCheckBox *m_revertSceneContentsCheckBox;
+  QCheckBox *m_revertSceneContentsCheckBox;
 
-	// Perform a revert on one or more folder
-	bool m_folderOnly;
+  // Perform a revert on one or more folder
+  bool m_folderOnly;
 
-	int m_sceneIconAdded;
+  int m_sceneIconAdded;
 
 public:
-	SVNRevertDialog(QWidget *parent,
-					const QString &workingDir, const QStringList &files, bool folderOnly = false,
-					int sceneIconAdded = 0);
+  SVNRevertDialog(QWidget *parent, const QString &workingDir,
+                  const QStringList &files, bool folderOnly = false,
+                  int sceneIconAdded = 0);
 
-	void checkFiles();
+  void checkFiles();
 
 private:
-	void switchToCloseButton();
+  void switchToCloseButton();
 
-	void revertFiles();
+  void revertFiles();
 
-	void initTreeWidget();
+  void initTreeWidget();
 
 protected slots:
 
-	void onRevertButtonClicked();
-	void onRevertDone();
+  void onRevertButtonClicked();
+  void onRevertDone();
 
-	void onError(const QString &);
-	void onStatusRetrieved(const QString &);
+  void onError(const QString &);
+  void onStatusRetrieved(const QString &);
 
-	void onRevertSceneContentsToggled(bool checked);
+  void onRevertSceneContentsToggled(bool checked);
 
 signals:
-	void done(const QStringList &);
+  void done(const QStringList &);
 };
 
 //-----------------------------------------------------------------------------
 
-class SVNRevertFrameRangeDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNRevertFrameRangeDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	QString m_workingDir;
-	QString m_file;
-	QString m_tempFileName;
+  QString m_workingDir;
+  QString m_file;
+  QString m_tempFileName;
 
-	QPushButton *m_revertButton;
-	QPushButton *m_cancelButton;
+  QPushButton *m_revertButton;
+  QPushButton *m_cancelButton;
 
-	VersionControlThread m_thread;
-	QList<SVNStatus> m_status;
-	QList<QString> m_filesToRevert;
-	QStringList m_files;
+  VersionControlThread m_thread;
+  QList<SVNStatus> m_status;
+  QList<QString> m_filesToRevert;
+  QStringList m_files;
 
 public:
-	SVNRevertFrameRangeDialog(QWidget *parent,
-							  const QString &workingDir, const QString &file, const QString &tempFileName);
+  SVNRevertFrameRangeDialog(QWidget *parent, const QString &workingDir,
+                            const QString &file, const QString &tempFileName);
 
 private:
-	void switchToCloseButton();
-	void revertFiles();
+  void switchToCloseButton();
+  void revertFiles();
 
-	void checkFiles();
+  void checkFiles();
 
 protected slots:
-	void onRevertButtonClicked();
-	void onError(const QString &);
-	void onStatusRetrieved(const QString &);
-	void onRevertDone();
+  void onRevertButtonClicked();
+  void onError(const QString &);
+  void onStatusRetrieved(const QString &);
+  void onRevertDone();
 
 signals:
-	void done(const QStringList &);
+  void done(const QStringList &);
 };
 
-#endif // SVN_REVERT_DIALOG_H
+#endif  // SVN_REVERT_DIALOG_H

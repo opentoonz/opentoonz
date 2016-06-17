@@ -8,14 +8,13 @@
 
 //===========================================================================
 
-namespace Tiio
-{
+namespace Tiio {
 
 //===========================================================================
 
 Tiio::Reader *makePltReader();
 Tiio::Writer *makePltWriter();
 
-} // namespace
+}  // namespace
 
 #endif

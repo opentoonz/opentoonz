@@ -18,59 +18,56 @@
 #include <type_traits>
 #endif
 
-namespace tcg
-{
+namespace tcg {
 
 template <typename X, typename Y>
 struct type_match {
-	enum { value = false };
+  enum { value = false };
 };
 
 template <typename X>
 struct type_match<X, X> {
-	enum { value = true };
+  enum { value = true };
 };
 
 //------------------------------------------------------------------------
 
 template <typename X, typename Y>
 struct type_mismatch {
-	enum { value = true };
+  enum { value = true };
 };
 
 template <typename X>
 struct type_mismatch<X, X> {
-	enum { value = false };
+  enum { value = false };
 };
 
 //========================================================================
 
 template <typename T, typename B>
 struct enable_if_exists {
-	typedef B type;
+  typedef B type;
 };
 
 //========================================================================
 
 template <bool, typename T = void>
-struct enable_if {
-};
+struct enable_if {};
 
 template <typename T>
 struct enable_if<true, T> {
-	typedef T type;
+  typedef T type;
 };
 
 //========================================================================
 
 template <bool, typename T = void>
 struct disable_if {
-	typedef T type;
+  typedef T type;
 };
 
 template <typename T>
-struct disable_if<true, T> {
-};
+struct disable_if<true, T> {};
 
 //========================================================================
 
@@ -79,26 +76,26 @@ struct choose_if;
 
 template <typename TrueT, typename FalseT>
 struct choose_if<true, TrueT, FalseT> {
-	typedef TrueT type;
+  typedef TrueT type;
 };
 
 template <typename TrueT, typename FalseT>
 struct choose_if<false, TrueT, FalseT> {
-	typedef FalseT type;
+  typedef FalseT type;
 };
 
 //========================================================================
 
 template <typename T, typename MatchT, typename NotMatchedT = void>
 struct choose_if_match {
-	typedef NotMatchedT type;
+  typedef NotMatchedT type;
 };
 
 template <typename MatchT, typename NotMatchedT>
 struct choose_if_match<MatchT, MatchT, NotMatchedT> {
-	typedef MatchT type;
+  typedef MatchT type;
 };
 
-} // namespace tcg
+}  // namespace tcg
 
-#endif // TCG_SFINAE_H
+#endif  // TCG_SFINAE_H

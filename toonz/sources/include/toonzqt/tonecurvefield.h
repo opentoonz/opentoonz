@@ -25,8 +25,7 @@ class QStackedWidget;
 class FxHistogramRender;
 
 //=============================================================================
-namespace DVGui
-{
+namespace DVGui {
 
 // forward declaration
 class IntPairField;
@@ -36,123 +35,123 @@ class CheckBox;
 // ChennelCurveEditor
 //-----------------------------------------------------------------------------
 
-class DVAPI ChennelCurveEditor : public QWidget
-{
-	Q_OBJECT
+class DVAPI ChennelCurveEditor : public QWidget {
+  Q_OBJECT
 
-	HistogramView *m_histogramView;
-	ChannelBar *m_verticalChannelBar;
+  HistogramView *m_histogramView;
+  ChannelBar *m_verticalChannelBar;
 
-	QList<QPointF> m_points;
-	int m_currentControlPointIndex;
+  QList<QPointF> m_points;
+  int m_currentControlPointIndex;
 
-	Qt::MouseButton m_mouseButton;
+  Qt::MouseButton m_mouseButton;
 
-	int m_curveHeight;
+  int m_curveHeight;
 
-	int m_LeftRightMargin;
-	int m_TopMargin;
-	int m_BottomMargin;
+  int m_LeftRightMargin;
+  int m_TopMargin;
+  int m_BottomMargin;
 
-	bool m_isLinear;
+  bool m_isLinear;
 
 public:
-	ChennelCurveEditor(QWidget *parent = 0, HistogramView *histogramView = 0);
+  ChennelCurveEditor(QWidget *parent = 0, HistogramView *histogramView = 0);
 
-	void setPoints(QList<TPointD> points);
-	QList<TPointD> getPoints();
+  void setPoints(QList<TPointD> points);
+  QList<TPointD> getPoints();
 
-	int getCurrentControlPointIndex() { return m_currentControlPointIndex; };
-	void setCurrentControlPointIndex(int index) { m_currentControlPointIndex = index; };
+  int getCurrentControlPointIndex() { return m_currentControlPointIndex; };
+  void setCurrentControlPointIndex(int index) {
+    m_currentControlPointIndex = index;
+  };
 
-	bool eventFilter(QObject *object, QEvent *event);
+  bool eventFilter(QObject *object, QEvent *event);
 
-	void setFirstLastXPosition(std::pair<int, int> values, bool isDragging);
+  void setFirstLastXPosition(std::pair<int, int> values, bool isDragging);
 
-	void setLinear(bool isLinear);
+  void setLinear(bool isLinear);
 
 protected:
-	QPointF strokeToViewPoint(const TPointD p);
-	TPointD viewToStrokePoint(const QPointF &p);
-	int getClosestPointIndex(const QPointF &pos, double &minDistance2) const;
+  QPointF strokeToViewPoint(const TPointD p);
+  TPointD viewToStrokePoint(const QPointF &p);
+  int getClosestPointIndex(const QPointF &pos, double &minDistance2) const;
 
-	bool isCentralControlPoint(int index) { return index % 3 == 0; }
-	bool isLeftControlPoint(int index) { return index % 3 == 2; }
-	bool isRightControlPoint(int index) { return index % 3 == 1; }
+  bool isCentralControlPoint(int index) { return index % 3 == 0; }
+  bool isLeftControlPoint(int index) { return index % 3 == 2; }
+  bool isRightControlPoint(int index) { return index % 3 == 1; }
 
-	void movePoint(int index, const QPointF delta);
-	void setPoint(int index, const QPointF point);
-	QPointF checkPoint(const QPointF p);
+  void movePoint(int index, const QPointF delta);
+  void setPoint(int index, const QPointF point);
+  QPointF checkPoint(const QPointF p);
 
-	void moveCurrentControlPoint(const QPointF delta);
-	void moveCentralControlPoint(int index, const QPointF delta);
-	//	bool eraseControlPointWhileMove(int index, const QPointF delta);
+  void moveCurrentControlPoint(const QPointF delta);
+  void moveCentralControlPoint(int index, const QPointF delta);
+  //	bool eraseControlPointWhileMove(int index, const QPointF delta);
 
-	void addControlPoint(double percent);
+  void addControlPoint(double percent);
 
-	void removeControlPoint(int index);
-	void removeCurrentControlPoint();
+  void removeControlPoint(int index);
+  void removeCurrentControlPoint();
 
-	QPainterPath getPainterPath();
+  QPainterPath getPainterPath();
 
-	void paintEvent(QPaintEvent *);
-	void mouseMoveEvent(QMouseEvent *);
-	void mousePressEvent(QMouseEvent *);
-	void mouseReleaseEvent(QMouseEvent *);
-	void keyPressEvent(QKeyEvent *e);
-	void enterEvent(QEvent *);
-	void leaveEvent(QEvent *);
+  void paintEvent(QPaintEvent *);
+  void mouseMoveEvent(QMouseEvent *);
+  void mousePressEvent(QMouseEvent *);
+  void mouseReleaseEvent(QMouseEvent *);
+  void keyPressEvent(QKeyEvent *e);
+  void enterEvent(QEvent *);
+  void leaveEvent(QEvent *);
 
-	void focusInEvent(QFocusEvent *fe);
-	void focusOutEvent(QFocusEvent *fe);
+  void focusInEvent(QFocusEvent *fe);
+  void focusOutEvent(QFocusEvent *fe);
 
 signals:
-	void focusOut();
-	void controlPointChanged(bool isDragging);
-	void controlPointAdded(int index);
-	void controlPointRemoved(int index);
+  void focusOut();
+  void controlPointChanged(bool isDragging);
+  void controlPointAdded(int index);
+  void controlPointRemoved(int index);
 
-	void firstLastXPostionChanged(int, int);
+  void firstLastXPostionChanged(int, int);
 };
 
 //=============================================================================
 // ToneCurveField
 //-----------------------------------------------------------------------------
 
-class DVAPI ToneCurveField : public QWidget
-{
-	Q_OBJECT
+class DVAPI ToneCurveField : public QWidget {
+  Q_OBJECT
 
-	QStackedWidget *m_toneCurveStackedWidget;
-	QStackedWidget *m_sliderStackedWidget;
-	QComboBox *m_channelListChooser;
-	CheckBox *m_isLinearCheckBox;
+  QStackedWidget *m_toneCurveStackedWidget;
+  QStackedWidget *m_sliderStackedWidget;
+  QComboBox *m_channelListChooser;
+  CheckBox *m_isLinearCheckBox;
 
 public:
-	ToneCurveField(QWidget *parent = 0, FxHistogramRender *fxHistogramRender = 0);
+  ToneCurveField(QWidget *parent = 0, FxHistogramRender *fxHistogramRender = 0);
 
-	void setCurrentChannel(int currentChannel);
-	ChennelCurveEditor *getChannelEditor(int channel) const;
-	ChennelCurveEditor *getCurrentChannelEditor() const;
-	IntPairField *getCurrentSlider() const;
+  void setCurrentChannel(int currentChannel);
+  ChennelCurveEditor *getChannelEditor(int channel) const;
+  ChennelCurveEditor *getCurrentChannelEditor() const;
+  IntPairField *getCurrentSlider() const;
 
-	int getChannelCount() { return m_toneCurveStackedWidget->count(); }
+  int getChannelCount() { return m_toneCurveStackedWidget->count(); }
 
-	void setIsLinearCheckBox(bool isChecked);
+  void setIsLinearCheckBox(bool isChecked);
 
 protected slots:
-	void sliderValueChanged(bool);
-	void onFirstLastXPostionChanged(int, int);
+  void sliderValueChanged(bool);
+  void onFirstLastXPostionChanged(int, int);
 
 public slots:
-	void setLinear(bool);
+  void setLinear(bool);
 
-	void setLinearManually(bool);
+  void setLinearManually(bool);
 
 signals:
-	void currentChannelIndexChanged(int);
-	void isLinearChanged(bool);
+  void currentChannelIndexChanged(int);
+  void isLinearChanged(bool);
 };
 }
 
-#endif // TONECURVEFIELD_H
+#endif  // TONECURVEFIELD_H

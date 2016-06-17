@@ -28,129 +28,105 @@
 
 class TStroke;
 
-namespace ToonzExt
-{
+namespace ToonzExt {
 class Potential;
 /**
    * @brief This class implements new deformer.
-   *  
+   *
    * New stroke deformer doesn't change last point of stroke.
    */
-class DVAPI StrokeParametricDeformer
-	: public TStrokeDeformation
-{
+class DVAPI StrokeParametricDeformer : public TStrokeDeformation {
 public:
-	StrokeParametricDeformer(double actionLenght,
-							 double startParameter,
-							 TStroke *s,
-							 Potential *);
+  StrokeParametricDeformer(double actionLenght, double startParameter,
+                           TStroke *s, Potential *);
 
-	~StrokeParametricDeformer();
+  ~StrokeParametricDeformer();
 
-	/**
-     * @brief Set mouse movement from last valid position.
-     * @param vx  horyzontal
-     * @param vy  vertical
-     */
-	void
-	setMouseMove(double vx,
-				 double vy);
+  /**
+*@brief Set mouse movement from last valid position.
+*@param vx  horyzontal
+*@param vy  vertical
+*/
+  void setMouseMove(double vx, double vy);
 
-	/**
-     * @brief Return displacement to use with function increaseControlPoints
-     * @param stroke to test
-     * @param w stroke parameter 
-     * @return displacement to apply to obtain deformation
-     * @sa increaseControlPoints
-     */
-	TThickPoint
-	getDisplacement(const TStroke &stroke,
-					double w) const;
+  /**
+*@brief Return displacement to use with function increaseControlPoints
+*@param stroke to test
+*@param w stroke parameter
+*@return displacement to apply to obtain deformation
+*@sa increaseControlPoints
+*/
+  TThickPoint getDisplacement(const TStroke &stroke, double w) const;
 
-	/**
-     * @brief Return displacement to use with function  modifyControlPoints
-     * @param stroke to test
-     * @param n control point to get
-     * @return displacement to apply to obtain deformation
-     * @sa modifyControlPoints
-     */
-	TThickPoint
-	getDisplacementForControlPoint(const TStroke &stroke,
-								   UINT n) const;
-	TThickPoint
-	getDisplacementForControlPointLen(const TStroke &stroke,
-									  double cpLen) const;
+  /**
+*@brief Return displacement to use with function  modifyControlPoints
+*@param stroke to test
+*@param n control point to get
+*@return displacement to apply to obtain deformation
+*@sa modifyControlPoints
+*/
+  TThickPoint getDisplacementForControlPoint(const TStroke &stroke,
+                                             UINT n) const;
+  TThickPoint getDisplacementForControlPointLen(const TStroke &stroke,
+                                                double cpLen) const;
 
-	/**    
-     * @brief This method compute the delta (gradient) referred to stroke in
-     *        at parameter w.
-     *
-     *  This value is the result of \f$ \frac{getDisplacement(stroke,w)}{dw} \f$.
-     * @note Sometimes this value can be approximated.
-     * @param stroke Stroke to test
-     * @param w Stroke parameter
-     * @return the @b gradient in w
-     */
-	double
-	getDelta(const TStroke &stroke,
-			 double w) const;
+  /**
+*@brief This method compute the delta (gradient) referred to stroke in
+*       at parameter w.
+*
+* This value is the result of \f$ \frac{getDisplacement(stroke,w)}{dw} \f$.
+*@note Sometimes this value can be approximated.
+*@param stroke Stroke to test
+*@param w Stroke parameter
+*@return the @b gradient in w
+*/
+  double getDelta(const TStroke &stroke, double w) const;
 
-	/**
-     * @brief Max diff of delta (This value indicates when it's necessary
-     *   to insert control point)
-     * @return max displacement permitted
-     */
-	double
-	getMaxDiff() const;
+  /**
+*@brief Max diff of delta (This value indicates when it's necessary
+*  to insert control point)
+*@return max displacement permitted
+*/
+  double getMaxDiff() const;
 
-	// just for debug
-	const Potential *
-	getPotential() const
-	{
-		return pot_;
-	}
+  // just for debug
+  const Potential *getPotential() const { return pot_; }
 
-	/**
-     * @brief Change sensibility of deformer (just for debug).
-     */
-	void
-	setDiff(double diff)
-	{
-		diff_ = diff;
-	}
+  /**
+*@brief Change sensibility of deformer (just for debug).
+*/
+  void setDiff(double diff) { diff_ = diff; }
 
-	/**
-     * @brief Retrieve the parameters range where is applied deformation.
-     */
-	void
-	getRange(double &from,
-			 double &to);
+  /**
+*@brief Retrieve the parameters range where is applied deformation.
+*/
+  void getRange(double &from, double &to);
 
 private:
-	StrokeParametricDeformer(const StrokeParametricDeformer &);
-	StrokeParametricDeformer &operator=(const StrokeParametricDeformer &);
+  StrokeParametricDeformer(const StrokeParametricDeformer &);
+  StrokeParametricDeformer &operator=(const StrokeParametricDeformer &);
 
-	// mouse incremental movement
-	double vx_, vy_;
+  // mouse incremental movement
+  double vx_, vy_;
 
-	// parameter where is applicated action
-	double startParameter_;
+  // parameter where is applicated action
+  double startParameter_;
 
-	// like startParameter_ but recover lenght
-	double startLenght_;
+  // like startParameter_ but recover lenght
+  double startLenght_;
 
-	// how many traits move
-	double actionLenght_;
+  // how many traits move
+  double actionLenght_;
 
-	// deformation shape
-	Potential *pot_;
+  // deformation shape
+  Potential *pot_;
 
-	// sensibility of deformer
-	// Indica il valore minimo a partire dal quale
-	//  l'inseritore comincia a mettere punti di controllo
-	double diff_;
+  // sensibility of deformer
+  // Indica il valore minimo a partire dal quale
+  //  l'inseritore comincia a mettere punti di controllo
+  double diff_;
 
-	TStroke *ref_copy_;
+  TStroke *ref_copy_;
 };
 }
 

@@ -4,7 +4,7 @@
 #define TQUICKTIME_INCLUDED
 
 struct PixelXRGB {
-	UCHAR x, r, g, b;
+  UCHAR x, r, g, b;
 };
 
 #endif

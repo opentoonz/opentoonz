@@ -9,40 +9,38 @@ class OnionSkinMask;
 class QMenu;
 
 //=============================================================================
-namespace OnioniSkinMaskGUI
-{
+namespace OnioniSkinMaskGUI {
 //-----------------------------------------------------------------------------
 
-//Da fare per la filmstrip!!
+// Da fare per la filmstrip!!
 void addOnionSkinCommand(QMenu *, bool isFilmStrip = false);
 
 //=============================================================================
 // OnionSkinSwitcher
 //-----------------------------------------------------------------------------
 
-class OnionSkinSwitcher : public QObject
-{
-	Q_OBJECT
+class OnionSkinSwitcher : public QObject {
+  Q_OBJECT
 
 public:
-	OnionSkinSwitcher() {}
+  OnionSkinSwitcher() {}
 
-	OnionSkinMask getMask() const;
+  OnionSkinMask getMask() const;
 
-	void setMask(const OnionSkinMask &mask);
+  void setMask(const OnionSkinMask &mask);
 
-	bool isActive() const;
-	bool isWholeScene() const;
+  bool isActive() const;
+  bool isWholeScene() const;
 
 public slots:
-	void activate();
-	void deactivate();
-	void setWholeScene();
-	void setSingleLevel();
+  void activate();
+  void deactivate();
+  void setWholeScene();
+  void setSingleLevel();
 };
 
 //-----------------------------------------------------------------------------
-} //namespace OnioniSkinMaskGUI
+}  // namespace OnioniSkinMaskGUI
 //-----------------------------------------------------------------------------
 
-#endif //ONIONSKINMASKGUI
+#endif  // ONIONSKINMASKGUI

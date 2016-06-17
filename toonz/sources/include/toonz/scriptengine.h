@@ -23,58 +23,59 @@ class Foo;
 class QScriptValue;
 class QScriptEngine;
 
-class DVAPI ScriptCommand
-{
+class DVAPI ScriptCommand {
 public:
-	ScriptCommand() {}
-	virtual ~ScriptCommand() {}
+  ScriptCommand() {}
+  virtual ~ScriptCommand() {}
 
-	virtual void execute() = 0;
+  virtual void execute() = 0;
 };
 
-class DVAPI ScriptEngine : public QObject
-{
-	Q_OBJECT
-	QScriptEngine *m_engine;
-	class Executor;
-	friend class Executor;
-	Executor *m_executor;
-	class MainThreadEvaluationData;
-	MainThreadEvaluationData *m_mainThreadEvaluationData;
-	QScriptValue *m_voidValue;
+class DVAPI ScriptEngine : public QObject {
+  Q_OBJECT
+  QScriptEngine *m_engine;
+  class Executor;
+  friend class Executor;
+  Executor *m_executor;
+  class MainThreadEvaluationData;
+  MainThreadEvaluationData *m_mainThreadEvaluationData;
+  QScriptValue *m_voidValue;
 
 public:
-	ScriptEngine();
-	~ScriptEngine();
+  ScriptEngine();
+  ~ScriptEngine();
 
-	void evaluate(const QString &cmd);
-	void interrupt();
-	bool isEvaluating() const;
+  void evaluate(const QString &cmd);
+  void interrupt();
+  bool isEvaluating() const;
 
-	enum OutputType {
-		SimpleText,
-		Warning,
-		ExecutionError,
-		SyntaxError,
-		EvaluationResult,
-		UndefinedEvaluationResult
-	};
-	void emitOutput(OutputType type, const QString &value) { emit output((int)type, value); }
+  enum OutputType {
+    SimpleText,
+    Warning,
+    ExecutionError,
+    SyntaxError,
+    EvaluationResult,
+    UndefinedEvaluationResult
+  };
+  void emitOutput(OutputType type, const QString &value) {
+    emit output((int)type, value);
+  }
 
-	const QScriptValue &evaluateOnMainThread(const QScriptValue &fun, const QScriptValue &arguments);
+  const QScriptValue &evaluateOnMainThread(const QScriptValue &fun,
+                                           const QScriptValue &arguments);
 
-	QScriptEngine *getQScriptEngine() const { return m_engine; }
-	const QScriptValue &voidValue() const { return *m_voidValue; }
+  QScriptEngine *getQScriptEngine() const { return m_engine; }
+  const QScriptValue &voidValue() const { return *m_voidValue; }
 
 protected slots:
-	void onTerminated();
-	void onMainThreadEvaluationPosted();
+  void onTerminated();
+  void onMainThreadEvaluationPosted();
 
 signals:
-	void evaluationDone();
-	void output(int type, const QString &);
+  void evaluationDone();
+  void output(int type, const QString &);
 
-	void mainThreadEvaluationPosted();
+  void mainThreadEvaluationPosted();
 };
 
 Q_DECLARE_METATYPE(ScriptEngine *)

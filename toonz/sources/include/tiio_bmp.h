@@ -13,23 +13,21 @@
 #define DVAPI DV_IMPORT_API
 #endif
 
-namespace Tiio
-{
+namespace Tiio {
 
 DVAPI Tiio::ReaderMaker makeBmpReader;
 DVAPI Tiio::WriterMaker makeBmpWriter;
 
-//DVAPI TPropertyGroup *makeBmpWriterProperties();
+// DVAPI TPropertyGroup *makeBmpWriterProperties();
 
-class BmpWriterProperties : public TPropertyGroup
-{
+class BmpWriterProperties : public TPropertyGroup {
 public:
-	TEnumProperty m_pixelSize;
-	//TBoolProperty m_compressed;
+  TEnumProperty m_pixelSize;
+  // TBoolProperty m_compressed;
 
-	BmpWriterProperties();
+  BmpWriterProperties();
 };
 
-} // namespace
+}  // namespace
 
 #endif

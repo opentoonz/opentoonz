@@ -8,113 +8,97 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 
-void ToonzExt::SquarePotential::setParameters_(const TStroke *ref,
-											   double par,
-											   double al)
-{
-	ref_ = ref;
-	par_ = par;
-	actionLength_ = al;
-	assert(ref_);
+void ToonzExt::SquarePotential::setParameters_(const TStroke *ref, double par,
+                                               double al) {
+  ref_          = ref;
+  par_          = par;
+  actionLength_ = al;
+  assert(ref_);
 
-	strokeLength_ = ref->getLength();
-	lenghtAtParam_ = ref->getLength(par);
+  strokeLength_  = ref->getLength();
+  lenghtAtParam_ = ref->getLength(par);
 
-	// lunghezza dal pto di click all'inizio della curva
-	leftFactor_ = min(lenghtAtParam_,
-					  actionLength_ * 0.5); //lenghtAtParam_ / strokeLength_;
+  // lunghezza dal pto di click all'inizio della curva
+  leftFactor_ = min(lenghtAtParam_,
+                    actionLength_ * 0.5);  // lenghtAtParam_ / strokeLength_;
 
-	// lunghezza dal pto di click alla fine
-	rightFactor_ = min(strokeLength_ - lenghtAtParam_,
-					   actionLength_ * 0.5);
+  // lunghezza dal pto di click alla fine
+  rightFactor_ = min(strokeLength_ - lenghtAtParam_, actionLength_ * 0.5);
 
-	// considero come intervallo di mapping [-range,range].
-	//  4 ha come valore c.a. 10exp-6
-	//  cioé sposterei un pixel su un movimento di un milione di pixel
-	range_ = 2.8;
+  // considero come intervallo di mapping [-range,range].
+  //  4 ha come valore c.a. 10exp-6
+  //  cioé sposterei un pixel su un movimento di un milione di pixel
+  range_ = 2.8;
 }
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::SquarePotential::~SquarePotential()
-{
-}
+ToonzExt::SquarePotential::~SquarePotential() {}
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::SquarePotential::value_(double value2test) const
-{
-	return this->compute_value(value2test);
+double ToonzExt::SquarePotential::value_(double value2test) const {
+  return this->compute_value(value2test);
 }
 
 //-----------------------------------------------------------------------------
 
 // normalization of parameter in range interval
-double ToonzExt::SquarePotential::compute_shape(double value2test) const
-{
-	double x = ref_->getLength(value2test);
-	double shape = this->actionLength_ * 0.5;
-	if (isAlmostZero(shape))
-		shape = 1.0;
-	x = ((x - lenghtAtParam_) * range_) / shape;
-	return x;
+double ToonzExt::SquarePotential::compute_shape(double value2test) const {
+  double x                       = ref_->getLength(value2test);
+  double shape                   = this->actionLength_ * 0.5;
+  if (isAlmostZero(shape)) shape = 1.0;
+  x                              = ((x - lenghtAtParam_) * range_) / shape;
+  return x;
 }
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::SquarePotential::compute_value(double value2test) const
-{
-	// use
-	//     2
-	//  1-x
-	//
+double ToonzExt::SquarePotential::compute_value(double value2test) const {
+  // use
+  //     2
+  //  1-x
+  //
 
-	double x = 0.0;
-	double res = 0.0;
+  double x   = 0.0;
+  double res = 0.0;
 
-	// lenght  at parameter
-	x = ref_->getLength(value2test);
+  // lenght  at parameter
+  x = ref_->getLength(value2test);
 
-	double tmp_al = actionLength_ * 0.5;
+  double tmp_al = actionLength_ * 0.5;
 
-	// compute correct parameter considering offset
-	// try to have a square curve like shape
-	//
-	//       2
-	//  m = x
-	//
-	if (leftFactor_ == 0.0)
-		x = 1.0 - x / tmp_al;
-	else if (rightFactor_ == 0.0)
-		x = (x - (strokeLength_ - tmp_al)) / tmp_al;
-	else {
-		if (x <= lenghtAtParam_ &&
-			((lenghtAtParam_ - x) <= leftFactor_))
-			x = (x - (lenghtAtParam_ - leftFactor_)) / leftFactor_;
-		else if (x > lenghtAtParam_ &&
-				 ((x - lenghtAtParam_) < rightFactor_))
-			x = (rightFactor_ - (x - lenghtAtParam_)) / rightFactor_;
-		else
-			x = -1;
-	}
+  // compute correct parameter considering offset
+  // try to have a square curve like shape
+  //
+  //       2
+  //  m = x
+  //
+  if (leftFactor_ == 0.0)
+    x = 1.0 - x / tmp_al;
+  else if (rightFactor_ == 0.0)
+    x = (x - (strokeLength_ - tmp_al)) / tmp_al;
+  else {
+    if (x <= lenghtAtParam_ && ((lenghtAtParam_ - x) <= leftFactor_))
+      x = (x - (lenghtAtParam_ - leftFactor_)) / leftFactor_;
+    else if (x > lenghtAtParam_ && ((x - lenghtAtParam_) < rightFactor_))
+      x = (rightFactor_ - (x - lenghtAtParam_)) / rightFactor_;
+    else
+      x = -1;
+  }
 
-	if (x < 0.0)
-		return 0.0;
-	//assert( 0.0 <= x &&
-	//  x <= 1.0 + TConsts::epsilon );
-	res = sq(x);
+  if (x < 0.0) return 0.0;
+  // assert( 0.0 <= x &&
+  //  x <= 1.0 + TConsts::epsilon );
+  res = sq(x);
 
-	return res;
+  return res;
 }
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::Potential *
-ToonzExt::SquarePotential::clone()
-{
-	return new SquarePotential;
+ToonzExt::Potential *ToonzExt::SquarePotential::clone() {
+  return new SquarePotential;
 }
 
 //-----------------------------------------------------------------------------

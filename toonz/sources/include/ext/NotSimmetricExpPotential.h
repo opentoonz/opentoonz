@@ -9,10 +9,10 @@
 
 /**
  * @brief This class is to use a not symmetric exponential potential.
- * 
+ *
  *  @code
  *          __|_
- *        /   | |  
+ *        /   | |
  *    __/     |  \___
  *
  *                                         2
@@ -21,11 +21,11 @@
  *                    {
  *      potential(x)= {
  *                    {                     2
- *                    {   -[(x  - t) / d2] 
+ *                    {   -[(x  - t) / d2]
  *                    {  e [             ] for x >= 0
- *                     
+ *
  * con d   min( length_at_param, action_length *0.5)
- *      1 
+ *      1
  * ed  d   min( curve_lenght - length_at_param, action_length *0.5)
  *      2
  *  @endcode
@@ -45,42 +45,33 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-namespace ToonzExt
-{
-class DVAPI
-	NotSimmetricExpPotential
-	: public Potential
-{
+namespace ToonzExt {
+class DVAPI NotSimmetricExpPotential : public Potential {
 public:
-	virtual ~NotSimmetricExpPotential();
+  virtual ~NotSimmetricExpPotential();
 
-	// chiama compute_value ma effettua un controllo del parametro
-	virtual double
-	value_(double radiusToTest) const;
+  // chiama compute_value ma effettua un controllo del parametro
+  virtual double value_(double radiusToTest) const;
 
-	virtual void
-	setParameters_(const TStroke *ref,
-				   double par,
-				   double al);
-	Potential *
-	clone();
+  virtual void setParameters_(const TStroke *ref, double par, double al);
+  Potential *clone();
 
 private:
-	double compute_shape(double) const; // funzione ausiliaria per
-	// il calcolo del parametro
-	// da usare
+  double compute_shape(double) const;  // funzione ausiliaria per
+  // il calcolo del parametro
+  // da usare
 
-	double compute_value(double) const; // funzione ausiliaria per
-	// il calcolo del potenziale senza
-	// controllo del parametro
-	const TStroke *ref_;
-	double range_; // range of mapping
-	double par_;
-	double actionLength_;  // lunghezza dell'azione
-	double strokeLength_;  // lunghezza stroke
-	double lenghtAtParam_; // lunghezza nel pto di movimento
-	double leftFactor_;	// fattore di shape x la curva a sinistra
-	double rightFactor_;   // fattore di shape x la curva a dx
+  double compute_value(double) const;  // funzione ausiliaria per
+  // il calcolo del potenziale senza
+  // controllo del parametro
+  const TStroke *ref_;
+  double range_;  // range of mapping
+  double par_;
+  double actionLength_;   // lunghezza dell'azione
+  double strokeLength_;   // lunghezza stroke
+  double lenghtAtParam_;  // lunghezza nel pto di movimento
+  double leftFactor_;     // fattore di shape x la curva a sinistra
+  double rightFactor_;    // fattore di shape x la curva a dx
 };
 }
 #endif /* NOT_SIMMETRIC_EXP_POTENTIAL_H */

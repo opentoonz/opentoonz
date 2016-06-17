@@ -33,8 +33,7 @@ class TFilePath;
 class TXshSimpleLevel;
 class TXshLevel;
 
-namespace DVGui
-{
+namespace DVGui {
 class LineEdit;
 class DoubleLineEdit;
 class IntLineEdit;
@@ -44,151 +43,146 @@ class CheckBox;
 
 //---------------------------------------------------------------
 
-class SimpleExpValidator : public QValidator
-{
+class SimpleExpValidator : public QValidator {
 public:
-	SimpleExpValidator(QObject *parent) : QValidator(parent){};
-	State validate(QString &input, int &pos) const;
+  SimpleExpValidator(QObject *parent) : QValidator(parent){};
+  State validate(QString &input, int &pos) const;
 };
 
 //---------------------------------------------------------------
 // for A/R input field
-class SimpleExpField : public QLineEdit
-{
-	SimpleExpValidator *m_validator;
-	QString m_previousValue;
+class SimpleExpField : public QLineEdit {
+  SimpleExpValidator *m_validator;
+  QString m_previousValue;
 
 public:
-	SimpleExpField(QWidget *parent);
+  SimpleExpField(QWidget *parent);
 
-	void setValue(double);
-	void setValue(double, int, int);
-	double getValue();
+  void setValue(double);
+  void setValue(double, int, int);
+  double getValue();
 
 protected:
-	void focusInEvent(QFocusEvent *event);
-	void focusOutEvent(QFocusEvent *event);
+  void focusInEvent(QFocusEvent *event);
+  void focusOutEvent(QFocusEvent *event);
 };
 
 //---------------------------------------------------------------
 
-class DVAPI CameraSettingsWidget : public QFrame
-{
-	Q_OBJECT
+class DVAPI CameraSettingsWidget : public QFrame {
+  Q_OBJECT
 
-	bool m_forCleanup;
+  bool m_forCleanup;
 
-	QRadioButton *m_xPrev, *m_yPrev, *m_arPrev;
-	QRadioButton *m_inchPrev, *m_dotPrev;
+  QRadioButton *m_xPrev, *m_yPrev, *m_arPrev;
+  QRadioButton *m_inchPrev, *m_dotPrev;
 
-	DVGui::MeasuredDoubleLineEdit *m_lxFld, *m_lyFld;
-	SimpleExpField *m_arFld;
-	double m_arValue;
-	DVGui::IntLineEdit *m_xResFld, *m_yResFld;
-	DVGui::DoubleLineEdit *m_xDpiFld, *m_yDpiFld;
+  DVGui::MeasuredDoubleLineEdit *m_lxFld, *m_lyFld;
+  SimpleExpField *m_arFld;
+  double m_arValue;
+  DVGui::IntLineEdit *m_xResFld, *m_yResFld;
+  DVGui::DoubleLineEdit *m_xDpiFld, *m_yDpiFld;
 
-	QPushButton *m_fspChk; // Force Squared Pixel => dpix == dpiy
+  QPushButton *m_fspChk;  // Force Squared Pixel => dpix == dpiy
 
-	QPushButton *m_useLevelSettingsBtn;
-	QComboBox *m_presetListOm;
-	QPushButton *m_addPresetBtn, *m_removePresetBtn;
+  QPushButton *m_useLevelSettingsBtn;
+  QComboBox *m_presetListOm;
+  QPushButton *m_addPresetBtn, *m_removePresetBtn;
 
-	DVGui::MeasuredDoubleLineEdit *m_offsX, *m_offsY;
+  DVGui::MeasuredDoubleLineEdit *m_offsX, *m_offsY;
 
-	QString m_presetListFile;
+  QString m_presetListFile;
 
-	// needed by "use level settings"
-	TXshSimpleLevel *m_currentLevel;
+  // needed by "use level settings"
+  TXshSimpleLevel *m_currentLevel;
 
-	void savePresetList();
-	void loadPresetList();
-	bool parsePresetString(const QString &str, QString &name, int &xres, int &yres, QString &ar);
+  void savePresetList();
+  void loadPresetList();
+  bool parsePresetString(const QString &str, QString &name, int &xres,
+                         int &yres, QString &ar);
 
-	bool parsePresetString(const QString &str,
-						   QString &name,
-						   int &xres,
-						   int &yres,
-						   double &fx,
-						   double &fy,
-						   QString &xoffset,
-						   QString &yoffset,
-						   double &ar,
-						   bool forCleanup = false);
+  bool parsePresetString(const QString &str, QString &name, int &xres,
+                         int &yres, double &fx, double &fy, QString &xoffset,
+                         QString &yoffset, double &ar, bool forCleanup = false);
 
 public:
-	CameraSettingsWidget(bool forCleanup = false);
-	~CameraSettingsWidget();
+  CameraSettingsWidget(bool forCleanup = false);
+  ~CameraSettingsWidget();
 
-	void setPresetListFile(const TFilePath &fp);
+  void setPresetListFile(const TFilePath &fp);
 
-	// Defines the level referred by the button "Use level settings".
-	// Calling setCurrentLevel(0) disables the button
-	void setCurrentLevel(TXshLevel *);
+  // Defines the level referred by the button "Use level settings".
+  // Calling setCurrentLevel(0) disables the button
+  void setCurrentLevel(TXshLevel *);
 
-	// camera => widget fields (i.e. initialize widget)
-	void setFields(const TCamera *camera);
+  // camera => widget fields (i.e. initialize widget)
+  void setFields(const TCamera *camera);
 
-	// widget fields => camera
-	void getFields(TCamera *camera);
+  // widget fields => camera
+  void getFields(TCamera *camera);
 
-	QSize sizeHint() const { return minimumSize(); }
+  QSize sizeHint() const { return minimumSize(); }
 
-	// The aspect ratio can be expressed as a fraction (e.g. "4/3")
-	// The following methods convert code/decode the value
-	static double aspectRatioStringToValue(const QString &s);
-	/*--- カメラの縦横ピクセル値を入力できるようにし、valueがX/Yの値に近かったら、"X/Y"と表示する ---*/
-	static QString aspectRatioValueToString(double ar, int width = 0, int height = 0);
+  // The aspect ratio can be expressed as a fraction (e.g. "4/3")
+  // The following methods convert code/decode the value
+  static double aspectRatioStringToValue(const QString &s);
+  /*---
+   * カメラの縦横ピクセル値を入力できるようにし、valueがX/Yの値に近かったら、"X/Y"と表示する
+   * ---*/
+  static QString aspectRatioValueToString(double ar, int width = 0,
+                                          int height = 0);
 
-	// the current camera dimension (in inches)
-	TDimensionD getSize() const;
+  // the current camera dimension (in inches)
+  TDimensionD getSize() const;
 
-	// the current camera resolution (in pixels)
-	TDimension getRes() const;
+  // the current camera resolution (in pixels)
+  TDimension getRes() const;
 
-	/*--- cleanupCameraSettingsWidgetからポインタを受け取る ---*/
-	void setOffsetWidgetPointers(DVGui::MeasuredDoubleLineEdit *offsX, DVGui::MeasuredDoubleLineEdit *offsY)
-	{
-		m_offsX = offsX;
-		m_offsY = offsY;
-	}
+  /*--- cleanupCameraSettingsWidgetからポインタを受け取る ---*/
+  void setOffsetWidgetPointers(DVGui::MeasuredDoubleLineEdit *offsX,
+                               DVGui::MeasuredDoubleLineEdit *offsY) {
+    m_offsX = offsX;
+    m_offsY = offsY;
+  }
 
 protected:
-	bool eventFilter(QObject *obj, QEvent *e);
+  bool eventFilter(QObject *obj, QEvent *e);
 
-	void hComputeLx();
-	void hComputeLy();
-	void vComputeLx();
-	void vComputeLy();
-	void computeAr();
-	void computeXRes();
-	void computeYRes();
-	void computeXDpi();
-	void computeYDpi();
-	void computeResOrDpi();
+  void hComputeLx();
+  void hComputeLy();
+  void vComputeLx();
+  void vComputeLy();
+  void computeAr();
+  void computeXRes();
+  void computeYRes();
+  void computeXDpi();
+  void computeYDpi();
+  void computeResOrDpi();
 
-	void updatePresetListOm();
+  void updatePresetListOm();
 
-	void setArFld(double ar);
+  void setArFld(double ar);
 
 protected slots:
-	void onLxChanged();
-	void onLyChanged();
-	void onArChanged();
-	void onXResChanged();
-	void onYResChanged();
-	void onXDpiChanged();
-	void onYDpiChanged();
-	void onFspChanged(bool checked);
-	void onPrevToggled(bool checked);
-	void onPresetSelected(const QString &);
-	void addPreset();
-	void removePreset();
-	void useLevelSettings();
+  void onLxChanged();
+  void onLyChanged();
+  void onArChanged();
+  void onXResChanged();
+  void onYResChanged();
+  void onXDpiChanged();
+  void onYDpiChanged();
+  void onFspChanged(bool checked);
+  void onPrevToggled(bool checked);
+  void onPresetSelected(const QString &);
+  void addPreset();
+  void removePreset();
+  void useLevelSettings();
 
 signals:
-	void changed();			  // some value has been changed
-	void levelSettingsUsed(); // the "Use level settings" button has been pressed.
-							  // Note: a changed() signal is always emitted after levelSettingsUsed()
+  void changed();  // some value has been changed
+  void
+  levelSettingsUsed();  // the "Use level settings" button has been pressed.
+  // Note: a changed() signal is always emitted after levelSettingsUsed()
 };
 
 #endif

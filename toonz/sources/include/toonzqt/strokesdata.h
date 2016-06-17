@@ -26,45 +26,33 @@ class FullColorImageData;
 // StrokesData
 //-----------------------------------------------------------------------------
 
-class DVAPI StrokesData : public DvMimeData
-{
-
+class DVAPI StrokesData : public DvMimeData {
 public:
-	TVectorImageP m_image;
+  TVectorImageP m_image;
 
-	StrokesData()
-	{
-	}
-	StrokesData(const StrokesData *src)
-		: m_image(src->m_image)
-	{
-	}
-	StrokesData(TVectorImage *image)
-		: m_image(image)
-	{
-	}
-	~StrokesData()
-	{
-	}
+  StrokesData() {}
+  StrokesData(const StrokesData *src) : m_image(src->m_image) {}
+  StrokesData(TVectorImage *image) : m_image(image) {}
+  ~StrokesData() {}
 
-	StrokesData *clone() const
-	{
-		TVectorImage *vi = 0;
-		if (m_image)
-			vi = dynamic_cast<TVectorImage *>(m_image->cloneImage());
-		return new StrokesData(vi);
-	}
+  StrokesData *clone() const {
+    TVectorImage *vi = 0;
+    if (m_image) vi  = dynamic_cast<TVectorImage *>(m_image->cloneImage());
+    return new StrokesData(vi);
+  }
 
-	// data <- image; copia gli stroke indicati da indices
-	void setImage(TVectorImageP image, const std::set<int> &indices);
+  // data <- image; copia gli stroke indicati da indices
+  void setImage(TVectorImageP image, const std::set<int> &indices);
 
-	// image <- data;
-	// se insert==true aggiunge le nuove strokes e mette in indices[] i nuovi indici
-	// se insert==false rimpiazza le strokes indicati da indices[]
-	void getImage(TVectorImageP image, std::set<int> &indices, bool insert) const;
+  // image <- data;
+  // se insert==true aggiunge le nuove strokes e mette in indices[] i nuovi
+  // indici
+  // se insert==false rimpiazza le strokes indicati da indices[]
+  void getImage(TVectorImageP image, std::set<int> &indices, bool insert) const;
 
-	ToonzImageData *toToonzImageData(const TToonzImageP &imageToPaste) const;
-	FullColorImageData *toFullColorImageData(const TRasterImageP &imageToPaste) const;
+  ToonzImageData *toToonzImageData(const TToonzImageP &imageToPaste) const;
+  FullColorImageData *toFullColorImageData(
+      const TRasterImageP &imageToPaste) const;
 };
 
-#endif // STROKES_DATA_H
+#endif  // STROKES_DATA_H

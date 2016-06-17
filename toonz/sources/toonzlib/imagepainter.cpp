@@ -23,605 +23,632 @@ using namespace ImagePainter;
 TEnv::IntVar FlipBookWhiteBgToggle("FlipBookWhiteBgToggle", 1);
 TEnv::IntVar FlipBookBlackBgToggle("FlipBookBlackBgToggle", 0);
 TEnv::IntVar FlipBookCheckBgToggle("FlipBookCheckBgToggle", 0);
-namespace
-{
+namespace {
 
 //-----------------------------------------------------------------------------
 
-TRaster32P keepChannels(const TRasterP &rin, TPalette *palette, UCHAR channel)
-{
-	TRaster32P rout(rin->getSize());
+TRaster32P keepChannels(const TRasterP &rin, TPalette *palette, UCHAR channel) {
+  TRaster32P rout(rin->getSize());
 
-	if ((TRasterCM32P)rin)
-		TRop::convert(rout, (TRasterCM32P)rin, TPaletteP(palette));
-	else
-		TRop::copy(rout, rin);
+  if ((TRasterCM32P)rin)
+    TRop::convert(rout, (TRasterCM32P)rin, TPaletteP(palette));
+  else
+    TRop::copy(rout, rin);
 
-	TPixel32 *pix = (TPixel32 *)rout->getRawData();
+  TPixel32 *pix = (TPixel32 *)rout->getRawData();
 
-	assert(channel & TRop::MChan);
-	int i;
+  assert(channel & TRop::MChan);
+  int i;
 
-	for (i = 0; i < rout->getLx() * rout->getLy(); i++, pix++) {
-		if (!(channel & TRop::RChan))
-			pix->r = 0;
-		if (!(channel & TRop::GChan))
-			pix->g = 0;
-		if (!(channel & TRop::BChan))
-			pix->b = 0;
-	}
-	return rout;
+  for (i = 0; i < rout->getLx() * rout->getLy(); i++, pix++) {
+    if (!(channel & TRop::RChan)) pix->r = 0;
+    if (!(channel & TRop::GChan)) pix->g = 0;
+    if (!(channel & TRop::BChan)) pix->b = 0;
+  }
+  return rout;
 }
 
 //-----------------------------------------------------------------------------
 
-inline void quickput(const TRasterP &rout, const TRasterP &rin, const TPaletteP &palette, const TAffine &aff, bool useChecks)
-{
-	if (TRasterCM32P srcCM32 = rin) {
-		if (useChecks) {
-			bool inksOnly = false;
-			TPixel32 colorscale = TPixel32(0, 0, 0, 255);
-			int tc = ToonzCheck::instance()->getChecks();
-			int index = ToonzCheck::instance()->getColorIndex();
+inline void quickput(const TRasterP &rout, const TRasterP &rin,
+                     const TPaletteP &palette, const TAffine &aff,
+                     bool useChecks) {
+  if (TRasterCM32P srcCM32 = rin) {
+    if (useChecks) {
+      bool inksOnly       = false;
+      TPixel32 colorscale = TPixel32(0, 0, 0, 255);
+      int tc              = ToonzCheck::instance()->getChecks();
+      int index           = ToonzCheck::instance()->getColorIndex();
 
-			if (tc & ToonzCheck::eGap) {
-				srcCM32 = srcCM32->clone();
-				AreaFiller(srcCM32).rectFill(srcCM32->getBounds(), 1, true, true, false);
-			}
+      if (tc & ToonzCheck::eGap) {
+        srcCM32 = srcCM32->clone();
+        AreaFiller(srcCM32).rectFill(srcCM32->getBounds(), 1, true, true,
+                                     false);
+      }
 
-			if (tc == 0 || tc == ToonzCheck::eBlackBg)
-				TRop::quickPut(rout, srcCM32, palette, aff, colorscale, inksOnly);
-			else {
-				TRop::CmappedQuickputSettings settings;
-				settings.m_globalColorScale = colorscale;
-				settings.m_inksOnly = inksOnly;
-				settings.m_transparencyCheck = tc & (ToonzCheck::eTransparency | ToonzCheck::eGap);
-				settings.m_blackBgCheck = tc & ToonzCheck::eBlackBg;
-				settings.m_inkIndex = tc & ToonzCheck::eInk ? index : (tc & ToonzCheck::eInk1 ? 1 : -1);
-				settings.m_paintIndex = tc & ToonzCheck::ePaint ? index : -1;
-				Preferences::instance()->getTranspCheckData(settings.m_transpCheckBg,
-															settings.m_transpCheckInk,
-															settings.m_transpCheckPaint);
-				TRop::quickPut(rout, srcCM32, palette, aff, settings);
-			}
-			srcCM32 = TRasterCM32P();
+      if (tc == 0 || tc == ToonzCheck::eBlackBg)
+        TRop::quickPut(rout, srcCM32, palette, aff, colorscale, inksOnly);
+      else {
+        TRop::CmappedQuickputSettings settings;
+        settings.m_globalColorScale = colorscale;
+        settings.m_inksOnly         = inksOnly;
+        settings.m_transparencyCheck =
+            tc & (ToonzCheck::eTransparency | ToonzCheck::eGap);
+        settings.m_blackBgCheck = tc & ToonzCheck::eBlackBg;
+        settings.m_inkIndex =
+            tc & ToonzCheck::eInk ? index : (tc & ToonzCheck::eInk1 ? 1 : -1);
+        settings.m_paintIndex = tc & ToonzCheck::ePaint ? index : -1;
+        Preferences::instance()->getTranspCheckData(
+            settings.m_transpCheckBg, settings.m_transpCheckInk,
+            settings.m_transpCheckPaint);
+        TRop::quickPut(rout, srcCM32, palette, aff, settings);
+      }
+      srcCM32 = TRasterCM32P();
 
-		} else
-			TRop::quickPut(rout, rin, palette, aff);
-	} else
-		TRop::quickPut(rout, rin, aff);
+    } else
+      TRop::quickPut(rout, rin, palette, aff);
+  } else
+    TRop::quickPut(rout, rin, aff);
 }
 
 //-----------------------------------------------------------------------------
 
-TPixel32 *getBuffer(const TRect &rect)
-{
-	static std::vector<char> buffer;
-	int size = rect.getLx() * rect.getLy() * 4;
-	if (size > (int)buffer.size())
-		buffer.resize(size);
-	return (TPixel32 *)&buffer[0];
+TPixel32 *getBuffer(const TRect &rect) {
+  static std::vector<char> buffer;
+  int size = rect.getLx() * rect.getLy() * 4;
+  if (size > (int)buffer.size()) buffer.resize(size);
+  return (TPixel32 *)&buffer[0];
 }
 
 //-----------------------------------------------------------------------------
 
-TRaster32P getCheckBoard(const TRect &rect, const TAffine &aff, TSceneProperties *sprop)
-{
-	double scale = sqrt(fabs(aff.det()));
-	TPixel32 col1, col2;
-	Preferences::instance()->getChessboardColors(col1, col2);
-	TRaster32P ras(rect.getLx(), rect.getLy(), rect.getLx(), getBuffer(rect));
-	TRop::checkBoard(ras, col1, col2, TDimensionD(50 * scale, 50 * scale), TPointD(-aff.a13, -aff.a23));
-	return ras;
+TRaster32P getCheckBoard(const TRect &rect, const TAffine &aff,
+                         TSceneProperties *sprop) {
+  double scale = sqrt(fabs(aff.det()));
+  TPixel32 col1, col2;
+  Preferences::instance()->getChessboardColors(col1, col2);
+  TRaster32P ras(rect.getLx(), rect.getLy(), rect.getLx(), getBuffer(rect));
+  TRop::checkBoard(ras, col1, col2, TDimensionD(50 * scale, 50 * scale),
+                   TPointD(-aff.a13, -aff.a23));
+  return ras;
 }
 
 //-----------------------------------------------------------------------------
 
-void drawCompareLines(const TDimension &dim, double compareX, double compareY)
-{
-	glPushMatrix();
-	glLoadIdentity();
+void drawCompareLines(const TDimension &dim, double compareX, double compareY) {
+  glPushMatrix();
+  glLoadIdentity();
 
-	glColor3d(0.0, 0.0, 0.0);
+  glColor3d(0.0, 0.0, 0.0);
 
-	glBegin(GL_LINES);
-	glVertex2d(dim.lx * compareX - 1, 0);
-	glVertex2d(dim.lx * compareX - 1, dim.ly - 1);
-	glVertex2d(dim.lx * compareX + 1, 0);
-	glVertex2d(dim.lx * compareX + 1, dim.ly - 1);
+  glBegin(GL_LINES);
+  glVertex2d(dim.lx * compareX - 1, 0);
+  glVertex2d(dim.lx * compareX - 1, dim.ly - 1);
+  glVertex2d(dim.lx * compareX + 1, 0);
+  glVertex2d(dim.lx * compareX + 1, dim.ly - 1);
 
-	glVertex2d(0, dim.ly * compareY - 1);
-	glVertex2d(dim.lx - 1, dim.ly * compareY - 1);
-	glVertex2d(0, dim.ly * compareY + 1);
-	glVertex2d(dim.lx - 1, dim.ly * compareY + 1);
-	glEnd();
-	glColor3d(1.0, 0.0, 0.0);
-	glBegin(GL_LINES);
-	glVertex2d(dim.lx * compareX, 0);
-	glVertex2d(dim.lx * compareX, dim.ly - 1);
+  glVertex2d(0, dim.ly * compareY - 1);
+  glVertex2d(dim.lx - 1, dim.ly * compareY - 1);
+  glVertex2d(0, dim.ly * compareY + 1);
+  glVertex2d(dim.lx - 1, dim.ly * compareY + 1);
+  glEnd();
+  glColor3d(1.0, 0.0, 0.0);
+  glBegin(GL_LINES);
+  glVertex2d(dim.lx * compareX, 0);
+  glVertex2d(dim.lx * compareX, dim.ly - 1);
 
-	glVertex2d(0, dim.ly * compareY);
-	glVertex2d(dim.lx - 1, dim.ly * compareY);
-	glEnd();
-	glPopMatrix();
+  glVertex2d(0, dim.ly * compareY);
+  glVertex2d(dim.lx - 1, dim.ly * compareY);
+  glEnd();
+  glPopMatrix();
 }
 
 //-----------------------------------------------------------------------------
 
-class Painter
-{
+class Painter {
+  TDimension m_dim;
+  TDimension m_imageSize;
+  TAffine m_aff;
+  TAffine m_finalAff;
 
-	TDimension m_dim;
-	TDimension m_imageSize;
-	TAffine m_aff;
-	TAffine m_finalAff;
-
-	TPalette *m_palette;
-	TRectD m_bbox;
-	TRasterP m_raster;
-	bool m_useTexture;
-	bool m_drawExternalBG;
-	VisualSettings m_vSettings;
+  TPalette *m_palette;
+  TRectD m_bbox;
+  TRasterP m_raster;
+  bool m_useTexture;
+  bool m_drawExternalBG;
+  VisualSettings m_vSettings;
 
 public:
-	Painter(
-		const TDimension &dim,
-		const TDimension &imageSize,
-		const TAffine &viewAff,
-		TPalette *palette,
-		const VisualSettings &visualSettings);
+  Painter(const TDimension &dim, const TDimension &imageSize,
+          const TAffine &viewAff, TPalette *palette,
+          const VisualSettings &visualSettings);
 
-	void flushRasterImages(const TRect &loadbox, double compareX, double compareY, bool swapCompared);
-	void doFlushRasterImages(const TRasterP &rin, int bg, const TPointD &offs = TPointD());
-	void onVectorImage(TVectorImage *vi);
-	void onRasterImage(TRasterImage *ri);
-	void onToonzImage(TToonzImage *ti);
-	void drawBlank();
-	TRaster32P buildCheckboard(int bg, const TDimension &dim);
+  void flushRasterImages(const TRect &loadbox, double compareX, double compareY,
+                         bool swapCompared);
+  void doFlushRasterImages(const TRasterP &rin, int bg,
+                           const TPointD &offs = TPointD());
+  void onVectorImage(TVectorImage *vi);
+  void onRasterImage(TRasterImage *ri);
+  void onToonzImage(TToonzImage *ti);
+  void drawBlank();
+  TRaster32P buildCheckboard(int bg, const TDimension &dim);
 };
 
 //-----------------------------------------------------------------------------
 
-Painter::Painter(
-	const TDimension &dim,
-	const TDimension &imageSize,
-	const TAffine &viewAff,
-	TPalette *palette,
-	const VisualSettings &visualSettings)
-	: m_dim(dim), m_imageSize(imageSize), m_aff(viewAff), m_palette(palette), m_bbox(), m_raster(), m_vSettings(visualSettings)
+Painter::Painter(const TDimension &dim, const TDimension &imageSize,
+                 const TAffine &viewAff, TPalette *palette,
+                 const VisualSettings &visualSettings)
+    : m_dim(dim)
+    , m_imageSize(imageSize)
+    , m_aff(viewAff)
+    , m_palette(palette)
+    , m_bbox()
+    , m_raster()
+    , m_vSettings(visualSettings)
 //, m_channel(visualSettings.m_colorMask)
 //, m_greytones(visualSettings.m_greytones)
 //, m_sceneProperties(visualSettings.m_sceneProperties)
 //, m_useTexture(visualSettings.m_useTexture)
 //, m_drawExternalBG(visualSettings.m_drawExternalBG)
-{
-}
+{}
 
 //-----------------------------------------------------------------------------
 
-void Painter::flushRasterImages(const TRect &loadbox, double compareX, double compareY, bool swapCompare)
-{
-	if (!m_raster)
-		return;
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_DITHER);
-	glDisable(GL_LOGIC_OP);
-	glDisable(GL_STENCIL_TEST);
+void Painter::flushRasterImages(const TRect &loadbox, double compareX,
+                                double compareY, bool swapCompare) {
+  if (!m_raster) return;
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_DITHER);
+  glDisable(GL_LOGIC_OP);
+  glDisable(GL_STENCIL_TEST);
 
 #ifdef GL_EXT_convolution
-	glDisable(GL_CONVOLUTION_1D_EXT);
-	glDisable(GL_CONVOLUTION_2D_EXT);
-	glDisable(GL_SEPARABLE_2D_EXT);
+  glDisable(GL_CONVOLUTION_1D_EXT);
+  glDisable(GL_CONVOLUTION_2D_EXT);
+  glDisable(GL_SEPARABLE_2D_EXT);
 #endif
 
 #ifdef GL_EXT_histogram
-	glDisable(GL_HISTOGRAM_EXT);
-	glDisable(GL_MINMAX_EXT);
+  glDisable(GL_HISTOGRAM_EXT);
+  glDisable(GL_MINMAX_EXT);
 #endif
 
 #ifdef GL_EXT_texture3D
-	glDisable(GL_TEXTURE_3D_EXT);
+  glDisable(GL_TEXTURE_3D_EXT);
 #endif
 
-	UCHAR m = m_vSettings.m_colorMask;
-	bool showBg = (m == 0 ||
-				   (m & TRop::MChan && !m_vSettings.m_greytones &&
-					(m & TRop::RChan || m & TRop::GChan || m & TRop::BChan)));
+  UCHAR m = m_vSettings.m_colorMask;
+  bool showBg =
+      (m == 0 || (m & TRop::MChan && !m_vSettings.m_greytones &&
+                  (m & TRop::RChan || m & TRop::GChan || m & TRop::BChan)));
 
-	int bg = showBg ? m_vSettings.m_bg : 0x40000;
+  int bg = showBg ? m_vSettings.m_bg : 0x40000;
 
-	if (m_vSettings.m_drawExternalBG) {
-		if (m_vSettings.m_colorMask != 0) {
-			glClearColor(0, 0, 0, 1.0);
-			glClear(GL_COLOR_BUFFER_BIT);
-		} else {
-			TPixel bgColor = Preferences::instance()->getPreviewBgColor();
-			glClearColor(bgColor.r / 255.0f, bgColor.g / 255.0f, bgColor.b / 255.0f, 1.0);
-			glClear(GL_COLOR_BUFFER_BIT);
-		}
-	}
-	UCHAR chan = m_vSettings.m_colorMask;
-	if (chan != 0 && !(chan & TRop::MChan) && !(chan != TRop::MChan && chan & TRop::MChan) && !m_vSettings.m_greytones)
-		glColorMask((chan & TRop::RChan) ? GL_TRUE : GL_FALSE,
-					(chan & TRop::GChan) ? GL_TRUE : GL_FALSE,
-					(chan & TRop::BChan) ? GL_TRUE : GL_FALSE,
-					GL_TRUE);
+  if (m_vSettings.m_drawExternalBG) {
+    if (m_vSettings.m_colorMask != 0) {
+      glClearColor(0, 0, 0, 1.0);
+      glClear(GL_COLOR_BUFFER_BIT);
+    } else {
+      TPixel bgColor = Preferences::instance()->getPreviewBgColor();
+      glClearColor(bgColor.r / 255.0f, bgColor.g / 255.0f, bgColor.b / 255.0f,
+                   1.0);
+      glClear(GL_COLOR_BUFFER_BIT);
+    }
+  }
+  UCHAR chan = m_vSettings.m_colorMask;
+  if (chan != 0 && !(chan & TRop::MChan) &&
+      !(chan != TRop::MChan && chan & TRop::MChan) && !m_vSettings.m_greytones)
+    glColorMask((chan & TRop::RChan) ? GL_TRUE : GL_FALSE,
+                (chan & TRop::GChan) ? GL_TRUE : GL_FALSE,
+                (chan & TRop::BChan) ? GL_TRUE : GL_FALSE, GL_TRUE);
 
-	if (compareX != DefaultCompareValue || compareY != DefaultCompareValue) {
+  if (compareX != DefaultCompareValue || compareY != DefaultCompareValue) {
+    glEnable(GL_SCISSOR_TEST);
+    // draw right/down part of the screen...
+    if (swapCompare)
+      glScissor(0, 0,
+                m_dim.lx * (compareX == DefaultCompareValue ? 1 : compareX),
+                m_dim.ly * (compareY == DefaultCompareValue ? 1 : compareY));
+    else
+      glScissor(m_dim.lx * (compareX == DefaultCompareValue ? 0 : compareX),
+                m_dim.ly * (compareY == DefaultCompareValue ? 0 : compareY),
+                m_dim.lx, m_dim.ly);
+    doFlushRasterImages(m_raster, bg, convert(loadbox.getP00()));
 
-		glEnable(GL_SCISSOR_TEST);
-		//draw right/down part of the screen...
-		if (swapCompare)
-			glScissor(0, 0, m_dim.lx * (compareX == DefaultCompareValue ? 1 : compareX), m_dim.ly * (compareY == DefaultCompareValue ? 1 : compareY));
-		else
-			glScissor(m_dim.lx * (compareX == DefaultCompareValue ? 0 : compareX), m_dim.ly * (compareY == DefaultCompareValue ? 0 : compareY), m_dim.lx, m_dim.ly);
-		doFlushRasterImages(m_raster, bg, convert(loadbox.getP00()));
+    TImageP refimg =
+        TImageCache::instance()->get(QString("TnzCompareImg"), false);
+    if ((TToonzImageP)refimg || (TRasterImageP)refimg) {
+      // draw left/up part of the screen...
+      TRasterP raux, rref;
+      if ((TToonzImageP)refimg)
+        rref = ((TToonzImageP)refimg)->getCMapped();
+      else
+        rref = ((TRasterImageP)refimg)->getRaster();
 
-		TImageP refimg = TImageCache::instance()->get(QString("TnzCompareImg"), false);
-		if ((TToonzImageP)refimg || (TRasterImageP)refimg) {
-			//draw left/up part of the screen...
-			TRasterP raux, rref;
-			if ((TToonzImageP)refimg)
-				rref = ((TToonzImageP)refimg)->getCMapped();
-			else
-				rref = ((TRasterImageP)refimg)->getRaster();
+      TRect rect = loadbox;
+      raux       = loadbox != TRect() ? rref->extract(rect) : rref;
 
-			TRect rect = loadbox;
-			raux = loadbox != TRect() ? rref->extract(rect) : rref;
+      TPointD cmpOffs = TPointD(
+          0.5 * (((m_imageSize.lx == 0) ? m_raster->getLx() : m_imageSize.lx) -
+                 rref->getLx()),
+          0.5 * (((m_imageSize.ly == 0) ? m_raster->getLy() : m_imageSize.ly) -
+                 rref->getLy()));
 
-			TPointD cmpOffs = TPointD(0.5 * (((m_imageSize.lx == 0) ? m_raster->getLx() : m_imageSize.lx) - rref->getLx()),
-									  0.5 * (((m_imageSize.ly == 0) ? m_raster->getLy() : m_imageSize.ly) - rref->getLy()));
+      if (swapCompare)
+        glScissor(m_dim.lx * (compareX == DefaultCompareValue ? 0 : compareX),
+                  m_dim.ly * (compareY == DefaultCompareValue ? 0 : compareY),
+                  m_dim.lx, m_dim.ly);
+      else
+        glScissor(0, 0,
+                  m_dim.lx * (compareX == DefaultCompareValue ? 1 : compareX),
+                  m_dim.ly * (compareY == DefaultCompareValue ? 1 : compareY));
+      doFlushRasterImages(raux, bg, cmpOffs + convert(loadbox.getP00()));
+    }
+    glDisable(GL_SCISSOR_TEST);
+  } else
+    doFlushRasterImages(m_raster, bg, convert(loadbox.getP00()));
 
-			if (swapCompare)
-				glScissor(m_dim.lx * (compareX == DefaultCompareValue ? 0 : compareX), m_dim.ly * (compareY == DefaultCompareValue ? 0 : compareY), m_dim.lx, m_dim.ly);
-			else
-				glScissor(0, 0, m_dim.lx * (compareX == DefaultCompareValue ? 1 : compareX), m_dim.ly * (compareY == DefaultCompareValue ? 1 : compareY));
-			doFlushRasterImages(raux, bg, cmpOffs + convert(loadbox.getP00()));
-		}
-		glDisable(GL_SCISSOR_TEST);
-	} else
-		doFlushRasterImages(m_raster, bg, convert(loadbox.getP00()));
-
-	m_raster = TRasterP();
-	m_palette = 0;
+  m_raster  = TRasterP();
+  m_palette = 0;
 }
 
 //-----------------------------------------------------------------------------
 
-TRaster32P Painter::buildCheckboard(int bg, const TDimension &dim)
-{
-	TRaster32P checkBoard = TRaster32P(100, 100);
-	if (bg == 0x100000) {
-		TPixel col1, col2;
-		Preferences::instance()->getChessboardColors(col1, col2);
-		TPointD p = TPointD(0, 0);
-		if (m_vSettings.m_useTexture)
-			p = TPointD(m_bbox.x0 > 0 ? 0 : -m_bbox.x0, m_bbox.y0 > 0 ? 0 : -m_bbox.y0);
+TRaster32P Painter::buildCheckboard(int bg, const TDimension &dim) {
+  TRaster32P checkBoard = TRaster32P(100, 100);
+  if (bg == 0x100000) {
+    TPixel col1, col2;
+    Preferences::instance()->getChessboardColors(col1, col2);
+    TPointD p = TPointD(0, 0);
+    if (m_vSettings.m_useTexture)
+      p = TPointD(m_bbox.x0 > 0 ? 0 : -m_bbox.x0,
+                  m_bbox.y0 > 0 ? 0 : -m_bbox.y0);
 
-		assert(checkBoard.getPointer());
-		TRop::checkBoard(checkBoard, col1, col2, TDimensionD(50, 50), p);
-	} else {
-		TPixel pix = bg == 0x40000 ? TPixel::Black : TPixel::White;
-		assert(checkBoard.getPointer());
-		checkBoard->fill(pix);
-	}
+    assert(checkBoard.getPointer());
+    TRop::checkBoard(checkBoard, col1, col2, TDimensionD(50, 50), p);
+  } else {
+    TPixel pix = bg == 0x40000 ? TPixel::Black : TPixel::White;
+    assert(checkBoard.getPointer());
+    checkBoard->fill(pix);
+  }
 
-	//TRaster32P textureBackGround;
+  // TRaster32P textureBackGround;
 
-	//if(m_vSettings.m_useTexture)
-	//  textureBackGround = TRaster32P(dim.lx,dim.ly);
+  // if(m_vSettings.m_useTexture)
+  //  textureBackGround = TRaster32P(dim.lx,dim.ly);
 
-	assert(checkBoard.getPointer());
-	int lx = (m_imageSize.lx == 0 ? dim.lx : m_imageSize.lx);
-	int ly = (m_imageSize.ly == 0 ? dim.ly : m_imageSize.ly);
-	int x, y;
+  assert(checkBoard.getPointer());
+  int lx = (m_imageSize.lx == 0 ? dim.lx : m_imageSize.lx);
+  int ly = (m_imageSize.ly == 0 ? dim.ly : m_imageSize.ly);
+  int x, y;
 
-	TRaster32P checkBoardRas(lx, ly);
-	for (y = 0; y < ly; y += 100) {
-		for (x = 0; x < lx; x += 100) {
-			//TAffine checkTrans = TTranslation(x,y);
-			//if(m_vSettings.m_useTexture)
-			//  quickput(textureBackGround, checkBoard, m_palette, checkTrans);
-			// else
-			quickput(checkBoardRas, checkBoard, m_palette, TTranslation(x, y), false);
-		}
-	}
+  TRaster32P checkBoardRas(lx, ly);
+  for (y = 0; y < ly; y += 100) {
+    for (x = 0; x < lx; x += 100) {
+      // TAffine checkTrans = TTranslation(x,y);
+      // if(m_vSettings.m_useTexture)
+      //  quickput(textureBackGround, checkBoard, m_palette, checkTrans);
+      // else
+      quickput(checkBoardRas, checkBoard, m_palette, TTranslation(x, y), false);
+    }
+  }
 
-	return checkBoardRas;
+  return checkBoardRas;
 }
 
 //---------------------------------------------------------------------
 
-void Painter::doFlushRasterImages(const TRasterP &rin, int bg, const TPointD &offs)
-{
-	if (!rin)
-		return;
-	TRectD viewRect(0.0, 0.0, m_dim.lx - 1, m_dim.ly - 1);
-	TRectD bbox;
-	if (m_vSettings.m_useTexture)
-		bbox = m_bbox;
-	else {
-		double delta = sqrt(fabs(m_finalAff.det()));
-		bbox = m_bbox.enlarge(delta) * viewRect;
-	}
+void Painter::doFlushRasterImages(const TRasterP &rin, int bg,
+                                  const TPointD &offs) {
+  if (!rin) return;
+  TRectD viewRect(0.0, 0.0, m_dim.lx - 1, m_dim.ly - 1);
+  TRectD bbox;
+  if (m_vSettings.m_useTexture)
+    bbox = m_bbox;
+  else {
+    double delta = sqrt(fabs(m_finalAff.det()));
+    bbox         = m_bbox.enlarge(delta) * viewRect;
+  }
 
-	UCHAR chan = m_vSettings.m_colorMask;
-	TRect rect(tfloor(bbox.x0), tfloor(bbox.y0), tceil(bbox.x1), tceil(bbox.y1));
-	if (rect.isEmpty())
-		return;
+  UCHAR chan = m_vSettings.m_colorMask;
+  TRect rect(tfloor(bbox.x0), tfloor(bbox.y0), tceil(bbox.x1), tceil(bbox.y1));
+  if (rect.isEmpty()) return;
 
-	TRaster32P ras;
-	TRasterP _rin = rin;
-	TAffine aff;
-	if (m_vSettings.m_useTexture) {
-		ras = _rin;
-		aff = m_aff;
-		//ras->clear();
-	} else {
-		int lx = rect.getLx(), ly = rect.getLy();
+  TRaster32P ras;
+  TRasterP _rin = rin;
+  TAffine aff;
+  if (m_vSettings.m_useTexture) {
+    ras = _rin;
+    aff = m_aff;
+    // ras->clear();
+  } else {
+    int lx = rect.getLx(), ly = rect.getLy();
 
-		// Following lines are used to solve a problem that occurs with some graphics cards!
-		// It seems that the glReadPixels() function is very slow if the lx lenght
-		// isn't a multiple of 8!
-		TDimension backgroundDim(lx, ly);
-		backgroundDim.lx = (lx & 0x7) == 0 ? lx : lx + 8 - (lx & 0x7);
+    // Following lines are used to solve a problem that occurs with some
+    // graphics cards!
+    // It seems that the glReadPixels() function is very slow if the lx lenght
+    // isn't a multiple of 8!
+    TDimension backgroundDim(lx, ly);
+    backgroundDim.lx = (lx & 0x7) == 0 ? lx : lx + 8 - (lx & 0x7);
 
-		static std::vector<char> buffer;
-		int size = backgroundDim.lx * backgroundDim.ly * 4;
-		if (size > (int)buffer.size())
-			buffer.resize(size);
+    static std::vector<char> buffer;
+    int size = backgroundDim.lx * backgroundDim.ly * 4;
+    if (size > (int)buffer.size()) buffer.resize(size);
 
-		TRaster32P backgroundRas(backgroundDim.lx, backgroundDim.ly, backgroundDim.lx, (TPixel32 *)&buffer[0]);
-		glReadPixels(rect.x0, rect.y0, backgroundDim.lx, backgroundDim.ly,
-					 TGL_FMT, TGL_TYPE, backgroundRas->getRawData());
-		TRect r = rect - rect.getP00();
-		ras = backgroundRas->extract(r);
+    TRaster32P backgroundRas(backgroundDim.lx, backgroundDim.ly,
+                             backgroundDim.lx, (TPixel32 *)&buffer[0]);
+    glReadPixels(rect.x0, rect.y0, backgroundDim.lx, backgroundDim.ly, TGL_FMT,
+                 TGL_TYPE, backgroundRas->getRawData());
+    TRect r = rect - rect.getP00();
+    ras     = backgroundRas->extract(r);
 
-		aff = TTranslation(-rect.x0, -rect.y0) * m_finalAff;
-		aff *= TTranslation(TPointD(0.5, 0.5)); //very quick and very dirty fix: in camerastand the images seems shifted of an half pixel...it's a quickput approximation?
-	}
+    aff = TTranslation(-rect.x0, -rect.y0) * m_finalAff;
+    aff *= TTranslation(TPointD(0.5, 0.5));  // very quick and very dirty fix:
+                                             // in camerastand the images seems
+                                             // shifted of an half pixel...it's
+                                             // a quickput approximation?
+  }
 
-	ras->lock();
+  ras->lock();
 
-	bool showChannelsOnMatte = (chan != TRop::MChan && chan != 0 && !m_vSettings.m_greytones);
-	if ((!showChannelsOnMatte && !m_vSettings.m_useTexture && chan != 0) ||
-		(!showChannelsOnMatte && m_vSettings.m_useTexture && (chan == TRop::MChan || m_vSettings.m_greytones))) {
-		TRasterP app = _rin->create(_rin->getLx(), _rin->getLy());
-		try {
-			TRop::setChannel(_rin, app, chan, m_vSettings.m_greytones);
-			if (!m_vSettings.m_useTexture)
-				_rin = app;
-			else
-				ras = app;
-		} catch (...) {
-		}
-	}
+  bool showChannelsOnMatte =
+      (chan != TRop::MChan && chan != 0 && !m_vSettings.m_greytones);
+  if ((!showChannelsOnMatte && !m_vSettings.m_useTexture && chan != 0) ||
+      (!showChannelsOnMatte && m_vSettings.m_useTexture &&
+       (chan == TRop::MChan || m_vSettings.m_greytones))) {
+    TRasterP app = _rin->create(_rin->getLx(), _rin->getLy());
+    try {
+      TRop::setChannel(_rin, app, chan, m_vSettings.m_greytones);
+      if (!m_vSettings.m_useTexture)
+        _rin = app;
+      else
+        ras = app;
+    } catch (...) {
+    }
+  }
 
-	if (m_vSettings.m_useTexture) {
-		TRaster32P checkBoardRas = buildCheckboard(bg, _rin->getSize());
-		GLRasterPainter::drawRaster(aff, checkBoardRas->getRawData(), checkBoardRas->getWrap(), 4, checkBoardRas->getSize(), true);
-		if (showChannelsOnMatte)
-			ras = keepChannels(_rin, m_palette, chan);
-		GLRasterPainter::drawRaster(aff, ras->getRawData(), ras->getWrap(), 4, ras->getSize(), true);
-		ras->unlock();
-	} else {
-		if (bg == 0x100000)
-			quickput(ras, buildCheckboard(bg, _rin->getSize()), m_palette, aff, false);
-		else {
-			int lx = (m_imageSize.lx == 0 ? _rin->getLx() : m_imageSize.lx);
-			int ly = (m_imageSize.ly == 0 ? _rin->getLy() : m_imageSize.ly);
+  if (m_vSettings.m_useTexture) {
+    TRaster32P checkBoardRas = buildCheckboard(bg, _rin->getSize());
+    GLRasterPainter::drawRaster(aff, checkBoardRas->getRawData(),
+                                checkBoardRas->getWrap(), 4,
+                                checkBoardRas->getSize(), true);
+    if (showChannelsOnMatte) ras = keepChannels(_rin, m_palette, chan);
+    GLRasterPainter::drawRaster(aff, ras->getRawData(), ras->getWrap(), 4,
+                                ras->getSize(), true);
+    ras->unlock();
+  } else {
+    if (bg == 0x100000)
+      quickput(ras, buildCheckboard(bg, _rin->getSize()), m_palette, aff,
+               false);
+    else {
+      int lx = (m_imageSize.lx == 0 ? _rin->getLx() : m_imageSize.lx);
+      int ly = (m_imageSize.ly == 0 ? _rin->getLy() : m_imageSize.ly);
 
-			TRect rect = convert(aff * TRectD(0, 0, lx - 1, ly - 1));
-			TRaster32P raux = ras->extract(rect);
-			raux->fill(bg == 0x40000 ? TPixel::Black : TPixel::White);
-		}
+      TRect rect      = convert(aff * TRectD(0, 0, lx - 1, ly - 1));
+      TRaster32P raux = ras->extract(rect);
+      raux->fill(bg == 0x40000 ? TPixel::Black : TPixel::White);
+    }
 
-		if (showChannelsOnMatte)
-			quickput(ras, keepChannels(_rin, m_palette, chan), m_palette, m_vSettings.m_useTexture ? TAffine() : aff * TTranslation(offs), m_vSettings.m_useChecks);
-		else
-			quickput(ras, _rin, m_palette, aff * TTranslation(offs), m_vSettings.m_useChecks);
+    if (showChannelsOnMatte)
+      quickput(ras, keepChannels(_rin, m_palette, chan), m_palette,
+               m_vSettings.m_useTexture ? TAffine() : aff * TTranslation(offs),
+               m_vSettings.m_useChecks);
+    else
+      quickput(ras, _rin, m_palette, aff * TTranslation(offs),
+               m_vSettings.m_useChecks);
 
-		glDisable(GL_BLEND);
+    glDisable(GL_BLEND);
 
-		glPushMatrix();
-		glLoadIdentity();
+    glPushMatrix();
+    glLoadIdentity();
 
-		glRasterPos2d(rect.x0, rect.y0);
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    glRasterPos2d(rect.x0, rect.y0);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
-		glDrawPixels(ras->getWrap(), ras->getLy(),
-					 TGL_FMT, TGL_TYPE, ras->getRawData());
+    glDrawPixels(ras->getWrap(), ras->getLy(), TGL_FMT, TGL_TYPE,
+                 ras->getRawData());
 
-		CHECK_ERRORS_BY_GL
+    CHECK_ERRORS_BY_GL
 
-		ras->unlock();
-		glPopMatrix();
-	}
+    ras->unlock();
+    glPopMatrix();
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-void Painter::onVectorImage(TVectorImage *vi)
-{
-	TRect clipRect = m_dim;
-	clipRect -= TPoint(m_dim.lx * 0.5, m_dim.ly * 0.5);
+void Painter::onVectorImage(TVectorImage *vi) {
+  TRect clipRect = m_dim;
+  clipRect -= TPoint(m_dim.lx * 0.5, m_dim.ly * 0.5);
 
-	bool thereIsColorFilter = (m_vSettings.m_colorMask != 0 && m_vSettings.m_colorMask != TRop::MChan);
+  bool thereIsColorFilter =
+      (m_vSettings.m_colorMask != 0 && m_vSettings.m_colorMask != TRop::MChan);
 
-	if (m_vSettings.m_bg == 0x100000 && !thereIsColorFilter) {
-		TRaster32P check = getCheckBoard(clipRect, m_aff, m_vSettings.m_sceneProperties);
+  if (m_vSettings.m_bg == 0x100000 && !thereIsColorFilter) {
+    TRaster32P check =
+        getCheckBoard(clipRect, m_aff, m_vSettings.m_sceneProperties);
 
-		glDisable(GL_BLEND);
+    glDisable(GL_BLEND);
 
-		glPushMatrix();
-		glLoadIdentity();
-		glRasterPos2d(0, 0);
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    glPushMatrix();
+    glLoadIdentity();
+    glRasterPos2d(0, 0);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
-		glDrawPixels(check->getLx(), check->getLy(), TGL_FMT, TGL_TYPE, check->getRawData());
-		glPopMatrix();
-	} else {
-		if (m_vSettings.m_bg == 0x40000 || thereIsColorFilter)
-			glClearColor(0.0, 0.0, 0.0, 1.0);
-		else if (m_vSettings.m_bg == 0x80000)
-			glClearColor(1.0, 1.0, 1.0, 1.0);
+    glDrawPixels(check->getLx(), check->getLy(), TGL_FMT, TGL_TYPE,
+                 check->getRawData());
+    glPopMatrix();
+  } else {
+    if (m_vSettings.m_bg == 0x40000 || thereIsColorFilter)
+      glClearColor(0.0, 0.0, 0.0, 1.0);
+    else if (m_vSettings.m_bg == 0x80000)
+      glClearColor(1.0, 1.0, 1.0, 1.0);
 
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
+    glClear(GL_COLOR_BUFFER_BIT);
+  }
 
-	TVectorRenderData rd(m_aff,
-						 clipRect,
-						 vi->getPalette(),
-						 0,
-						 true // alfa enabled
-						 );
-	if (m_vSettings.m_useChecks) {
-		ToonzCheck *tc = ToonzCheck::instance();
-		int checks = tc->getChecks(); // &ToonzCheck::eBlackBg
-		rd.m_inkCheckEnabled = checks & ToonzCheck::eInk;
-		rd.m_paintCheckEnabled = checks & ToonzCheck::ePaint;
-		rd.m_colorCheckIndex = tc->getColorIndex();
-	}
-	tglDraw(rd, vi);
+  TVectorRenderData rd(m_aff, clipRect, vi->getPalette(), 0,
+                       true  // alfa enabled
+                       );
+  if (m_vSettings.m_useChecks) {
+    ToonzCheck *tc         = ToonzCheck::instance();
+    int checks             = tc->getChecks();  // &ToonzCheck::eBlackBg
+    rd.m_inkCheckEnabled   = checks & ToonzCheck::eInk;
+    rd.m_paintCheckEnabled = checks & ToonzCheck::ePaint;
+    rd.m_colorCheckIndex   = tc->getColorIndex();
+  }
+  tglDraw(rd, vi);
 }
 
 //-----------------------------------------------------------------------------
 
-void Painter::onRasterImage(TRasterImage *ri)
-{
-	TDimension imageSize = (m_imageSize.lx == 0 ? ri->getRaster()->getSize() : m_imageSize);
+void Painter::onRasterImage(TRasterImage *ri) {
+  TDimension imageSize =
+      (m_imageSize.lx == 0 ? ri->getRaster()->getSize() : m_imageSize);
 
-	m_finalAff = m_vSettings.m_useTexture ? m_aff
-										  : TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * m_aff * TTranslation(-TPointD(0.5 * imageSize.lx, 0.5 * imageSize.ly));
+  m_finalAff =
+      m_vSettings.m_useTexture
+          ? m_aff
+          : TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * m_aff *
+                TTranslation(-TPointD(0.5 * imageSize.lx, 0.5 * imageSize.ly));
 
-	TRectD bbox = TRectD(0, 0, imageSize.lx - 1, imageSize.ly - 1);
-	m_bbox = m_vSettings.m_useTexture ? bbox : m_finalAff * bbox;
+  TRectD bbox = TRectD(0, 0, imageSize.lx - 1, imageSize.ly - 1);
+  m_bbox      = m_vSettings.m_useTexture ? bbox : m_finalAff * bbox;
 
-	if (!m_bbox.overlaps(TRectD(0, 0, m_dim.lx - 1, m_dim.ly - 1)))
-		return;
-	m_raster = ri->getRaster();
+  if (!m_bbox.overlaps(TRectD(0, 0, m_dim.lx - 1, m_dim.ly - 1))) return;
+  m_raster = ri->getRaster();
 }
 
 //-----------------------------------------------------------------------------
 
-void Painter::onToonzImage(TToonzImage *ti)
-{
-	TDimension imageSize = (m_imageSize.lx == 0 ? ti->getRaster()->getSize() : m_imageSize);
+void Painter::onToonzImage(TToonzImage *ti) {
+  TDimension imageSize =
+      (m_imageSize.lx == 0 ? ti->getRaster()->getSize() : m_imageSize);
 
-	m_finalAff = m_vSettings.m_useTexture ? m_aff
-										  : TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * m_aff * TTranslation(-TPointD(0.5 * imageSize.lx, 0.5 * imageSize.ly));
+  m_finalAff =
+      m_vSettings.m_useTexture
+          ? m_aff
+          : TTranslation(m_dim.lx * 0.5, m_dim.ly * 0.5) * m_aff *
+                TTranslation(-TPointD(0.5 * imageSize.lx, 0.5 * imageSize.ly));
 
-	TRectD bbox = TRectD(0, 0, imageSize.lx - 1, imageSize.ly - 1);
-	m_bbox = m_vSettings.m_useTexture ? bbox : m_finalAff * bbox;
-	if (!m_bbox.overlaps(TRectD(0, 0, m_dim.lx - 1, m_dim.ly - 1)))
-		return;
-	m_raster = ti->getRaster();
+  TRectD bbox = TRectD(0, 0, imageSize.lx - 1, imageSize.ly - 1);
+  m_bbox      = m_vSettings.m_useTexture ? bbox : m_finalAff * bbox;
+  if (!m_bbox.overlaps(TRectD(0, 0, m_dim.lx - 1, m_dim.ly - 1))) return;
+  m_raster = ti->getRaster();
 }
 
 //-----------------------------------------------------------------------------
 
-void Painter::drawBlank()
-{
-	TPixel bgColor = Preferences::instance()->getPreviewBgColor();
-	glClearColor(bgColor.r / 255.0f, bgColor.g / 255.0f, bgColor.b / 255.0f, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glPushMatrix();
-	glLoadIdentity();
-	tglColor(m_vSettings.m_blankColor);
-	tglFillRect(m_bbox);
-	glPopMatrix();
+void Painter::drawBlank() {
+  TPixel bgColor = Preferences::instance()->getPreviewBgColor();
+  glClearColor(bgColor.r / 255.0f, bgColor.g / 255.0f, bgColor.b / 255.0f, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glPushMatrix();
+  glLoadIdentity();
+  tglColor(m_vSettings.m_blankColor);
+  tglFillRect(m_bbox);
+  glPopMatrix();
 }
 
-} //namespace
+}  // namespace
 
 //=============================================================================
 
 ImagePainter::VisualSettings::VisualSettings()
-	: m_colorMask(0), m_greytones(false), m_doCompare(false), m_defineLoadbox(false), m_useLoadbox(false), m_blankColor(TPixel::Transparent), m_useTexture(false), m_drawExternalBG(false), m_showBBox(false), m_sceneProperties(0), m_recomputeIfNeeded(true), m_drawBlankFrame(false), m_useChecks(false)
-{
-	if (FlipBookBlackBgToggle)
-		m_bg = 0x40000;
-	if (FlipBookWhiteBgToggle)
-		m_bg = 0x80000;
-	if (FlipBookCheckBgToggle)
-		m_bg = 0x100000;
+    : m_colorMask(0)
+    , m_greytones(false)
+    , m_doCompare(false)
+    , m_defineLoadbox(false)
+    , m_useLoadbox(false)
+    , m_blankColor(TPixel::Transparent)
+    , m_useTexture(false)
+    , m_drawExternalBG(false)
+    , m_showBBox(false)
+    , m_sceneProperties(0)
+    , m_recomputeIfNeeded(true)
+    , m_drawBlankFrame(false)
+    , m_useChecks(false) {
+  if (FlipBookBlackBgToggle) m_bg = 0x40000;
+  if (FlipBookWhiteBgToggle) m_bg = 0x80000;
+  if (FlipBookCheckBgToggle) m_bg = 0x100000;
 }
 
 //-----------------------------------------------------------------------------
 
-bool ImagePainter::VisualSettings::needRepaint(const VisualSettings &vs) const
-{
-	return !(m_colorMask == vs.m_colorMask &&
-			 m_greytones == vs.m_greytones &&
-			 m_bg == vs.m_bg &&
-			 m_doCompare == vs.m_doCompare &&
-			 m_defineLoadbox == vs.m_defineLoadbox &&
-			 m_useLoadbox == vs.m_useLoadbox &&
-			 m_useTexture == vs.m_useTexture &&
-			 m_drawExternalBG == vs.m_drawExternalBG);
+bool ImagePainter::VisualSettings::needRepaint(const VisualSettings &vs) const {
+  return !(m_colorMask == vs.m_colorMask && m_greytones == vs.m_greytones &&
+           m_bg == vs.m_bg && m_doCompare == vs.m_doCompare &&
+           m_defineLoadbox == vs.m_defineLoadbox &&
+           m_useLoadbox == vs.m_useLoadbox && m_useTexture == vs.m_useTexture &&
+           m_drawExternalBG == vs.m_drawExternalBG);
 }
 
 //=============================================================================
 
 ImagePainter::CompareSettings::CompareSettings()
-	: m_compareX(0.5), m_compareY(DefaultCompareValue), m_dragCompareX(false), m_dragCompareY(false), m_swapCompared(false)
-{
-}
+    : m_compareX(0.5)
+    , m_compareY(DefaultCompareValue)
+    , m_dragCompareX(false)
+    , m_dragCompareY(false)
+    , m_swapCompared(false) {}
 
 //=============================================================================
 
 void ImagePainter::paintImage(const TImageP &image, const TDimension &imageSize,
-							  const TDimension &viewerSize,
-							  const TAffine &aff,
-							  const VisualSettings &visualSettings,
-							  const CompareSettings &compareSettings,
-							  const TRect &loadbox)
-{
-	glDisable(GL_DEPTH_TEST);
+                              const TDimension &viewerSize, const TAffine &aff,
+                              const VisualSettings &visualSettings,
+                              const CompareSettings &compareSettings,
+                              const TRect &loadbox) {
+  glDisable(GL_DEPTH_TEST);
 
-	if (visualSettings.m_drawExternalBG) {
-		glClearColor(0.0, 0.0, 0.0, 0.0);
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
+  if (visualSettings.m_drawExternalBG) {
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+  }
 
-	GLenum error = glGetError();
-	//assert(error==GL_NO_ERROR);
-	if (error != GL_NO_ERROR) {
-		printf("ImagePainter::paintImage() gl_error:%d\n", error);
-	}
+  GLenum error = glGetError();
+  // assert(error==GL_NO_ERROR);
+  if (error != GL_NO_ERROR) {
+    printf("ImagePainter::paintImage() gl_error:%d\n", error);
+  }
 
-	if (!image)
-		return;
+  if (!image) return;
 
-	TRasterImageP rimg = (TRasterImageP)image;
-	TVectorImageP vimg = (TVectorImageP)image;
-	TToonzImageP timg = (TToonzImageP)image;
+  TRasterImageP rimg = (TRasterImageP)image;
+  TVectorImageP vimg = (TVectorImageP)image;
+  TToonzImageP timg  = (TToonzImageP)image;
 
-	TRect clipRect(viewerSize);
-	clipRect -= TPoint(viewerSize.lx * 0.5, viewerSize.ly * 0.5);
-	Painter painter(viewerSize, imageSize, aff, image->getPalette(), visualSettings);
+  TRect clipRect(viewerSize);
+  clipRect -= TPoint(viewerSize.lx * 0.5, viewerSize.ly * 0.5);
+  Painter painter(viewerSize, imageSize, aff, image->getPalette(),
+                  visualSettings);
 
-	if (rimg)
-		painter.onRasterImage(rimg.getPointer());
-	else if (vimg)
-		painter.onVectorImage(vimg.getPointer());
-	else if (timg)
-		painter.onToonzImage(timg.getPointer());
+  if (rimg)
+    painter.onRasterImage(rimg.getPointer());
+  else if (vimg)
+    painter.onVectorImage(vimg.getPointer());
+  else if (timg)
+    painter.onToonzImage(timg.getPointer());
 
-	if (visualSettings.m_blankColor != TPixel::Transparent) {
-		painter.drawBlank();
-		return;
-	}
+  if (visualSettings.m_blankColor != TPixel::Transparent) {
+    painter.drawBlank();
+    return;
+  }
 
-	//if I have a color filter applied using a glmask, , drawing of images must be done on black bg!
-	if (!vimg)
-		painter.flushRasterImages(loadbox,
-								  visualSettings.m_doCompare ? compareSettings.m_compareX : DefaultCompareValue,
-								  visualSettings.m_doCompare ? compareSettings.m_compareY : DefaultCompareValue,
-								  compareSettings.m_swapCompared);
+  // if I have a color filter applied using a glmask, , drawing of images must
+  // be done on black bg!
+  if (!vimg)
+    painter.flushRasterImages(
+        loadbox, visualSettings.m_doCompare ? compareSettings.m_compareX
+                                            : DefaultCompareValue,
+        visualSettings.m_doCompare ? compareSettings.m_compareY
+                                   : DefaultCompareValue,
+        compareSettings.m_swapCompared);
 
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+  glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-	if (visualSettings.m_doCompare)
-		drawCompareLines(viewerSize, compareSettings.m_compareX, compareSettings.m_compareY);
+  if (visualSettings.m_doCompare)
+    drawCompareLines(viewerSize, compareSettings.m_compareX,
+                     compareSettings.m_compareY);
 }

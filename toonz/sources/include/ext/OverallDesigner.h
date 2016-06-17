@@ -22,31 +22,21 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-namespace ToonzExt
-{
-class DVAPI
-	OverallDesigner
-	: public Designer
-{
-	int
-		x_,
-		y_;
-	double
-		scale_,
-		pixelSize_;
+namespace ToonzExt {
+class DVAPI OverallDesigner : public Designer {
+  int x_, y_;
+  double scale_, pixelSize_;
 
-	void
-	setPosition();
+  void setPosition();
 
 public:
-	OverallDesigner(int x,
-					int y);
-	virtual ~OverallDesigner();
-	void draw(SmoothDeformation *);
-	void draw(CornerDeformation *);
-	void draw(StraightCornerDeformation *);
-	void draw(StrokeDeformation *);
-	void draw(Selector *);
+  OverallDesigner(int x, int y);
+  virtual ~OverallDesigner();
+  void draw(SmoothDeformation *);
+  void draw(CornerDeformation *);
+  void draw(StraightCornerDeformation *);
+  void draw(StrokeDeformation *);
+  void draw(Selector *);
 };
 }
 #endif /* OVERALLDESIGNER_H */

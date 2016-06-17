@@ -33,97 +33,78 @@
 
 class TFilePath;
 
-class DVAPI TLogger
-{ // singleton
-	class Imp;
-	std::unique_ptr<Imp> m_imp;
+class DVAPI TLogger {  // singleton
+  class Imp;
+  std::unique_ptr<Imp> m_imp;
 
-	TLogger();
+  TLogger();
 
 public:
-	~TLogger();
+  ~TLogger();
 
-	static TLogger *instance();
+  static TLogger *instance();
 
-	enum MessageType {
-		Debug = 1,
-		Info,
-		Warning,
-		Error
-	};
+  enum MessageType { Debug = 1, Info, Warning, Error };
 
-	class DVAPI Message
-	{
-		MessageType m_type;
-		std::string m_timestamp;
-		std::string m_text;
+  class DVAPI Message {
+    MessageType m_type;
+    std::string m_timestamp;
+    std::string m_text;
 
-	public:
-		Message(MessageType type, std::string text);
-		MessageType getType() const { return m_type; }
-		std::string getTimestamp() const { return m_timestamp; }
-		std::string getText() const { return m_text; }
-	};
+  public:
+    Message(MessageType type, std::string text);
+    MessageType getType() const { return m_type; }
+    std::string getTimestamp() const { return m_timestamp; }
+    std::string getText() const { return m_text; }
+  };
 
-	class Listener
-	{
-	public:
-		virtual void onLogChanged() = 0;
-		virtual ~Listener() {}
-	};
+  class Listener {
+  public:
+    virtual void onLogChanged() = 0;
+    virtual ~Listener() {}
+  };
 
-	void addMessage(const Message &msg);
-	void clearMessages();
-	int getMessageCount() const;
-	Message getMessage(int index) const;
+  void addMessage(const Message &msg);
+  void clearMessages();
+  int getMessageCount() const;
+  Message getMessage(int index) const;
 
-	void addListener(Listener *listener);
-	void removeListener(Listener *listener);
+  void addListener(Listener *listener);
+  void removeListener(Listener *listener);
 
-	class DVAPI Stream
-	{
-		MessageType m_type;
-		std::string m_text;
+  class DVAPI Stream {
+    MessageType m_type;
+    std::string m_text;
 
-	public:
-		Stream(MessageType type);
-		~Stream();
+  public:
+    Stream(MessageType type);
+    ~Stream();
 
-		Stream &operator<<(std::string v);
-		Stream &operator<<(int v);
-		Stream &operator<<(double v);
-		Stream &operator<<(const TFilePath &v);
-	};
+    Stream &operator<<(std::string v);
+    Stream &operator<<(int v);
+    Stream &operator<<(double v);
+    Stream &operator<<(const TFilePath &v);
+  };
 
-	class DVAPI NullStream
-	{
-	public:
-		NullStream() {}
-		~NullStream() {}
+  class DVAPI NullStream {
+  public:
+    NullStream() {}
+    ~NullStream() {}
 
-		NullStream &operator<<(std::string) { return *this; }
-		NullStream &operator<<(int) { return *this; }
-		NullStream &operator<<(double) { return *this; }
-		NullStream &operator<<(const TFilePath &) { return *this; }
-	};
+    NullStream &operator<<(std::string) { return *this; }
+    NullStream &operator<<(int) { return *this; }
+    NullStream &operator<<(double) { return *this; }
+    NullStream &operator<<(const TFilePath &) { return *this; }
+  };
 
 #ifdef NDEBUG
-	static NullStream debug()
-	{
-		return NullStream();
-	}
+  static NullStream debug() { return NullStream(); }
 #else
-	static Stream debug()
-	{
-		return Stream(Debug);
-	}
+  static Stream debug() { return Stream(Debug); }
 #endif
-	static Stream info()
-	{
-		return Stream(Info);
-	}
-	static Stream warning() { return Stream(Warning); }
-	static Stream error() { return Stream(Error); }
+  static Stream info() { return Stream(Info); }
+  static Stream warning() { return Stream(Warning); }
+  static Stream error() { return Stream(Error); }
 };
 
 #endif

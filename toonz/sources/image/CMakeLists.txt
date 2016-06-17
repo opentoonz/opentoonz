@@ -64,6 +64,13 @@ else()
     set(SOURCES ${SOURCES}
         mov/tiio_movM.cpp
         3gp/tiio_3gpM.cpp)
+elseif(UNIX)
+    set(HEADERS ${HEADERS}
+        3gp/tiio_3gp_proxy.h
+        mov/tiio_mov_proxy.h)
+    set(SOURCES ${SOURCES}
+        mov/tiio_mov_proxy.cpp
+        3gp/tiio_3gp_proxy.cpp)
 endif()
 
 add_library(image SHARED ${HEADERS} ${SOURCES})
@@ -95,7 +102,7 @@ if(WIN32)
     set(EXTRA_LIBS
         ${TNZLIBS}
         vfw32.lib)
-else()
+elseif(APPLE)
     if(PLATFORM EQUAL 32)
         find_library(CORE_SERVICES_LIB CoreServices)
         set(OSX_10_6_SDK_PATH "")
@@ -113,6 +120,10 @@ else()
         ${CARBON_LIB}
         ${CORE_SERVICES_LIB}
         ${QD_LIB})
+else()
+    # Generic Unix
+    set(EXTRA_LIBS
+        ${TNZLIBS})
 endif()
 
 target_link_libraries(image Qt5::Core Qt5::Network ${Z_LIB} ${GLUT_LIB} ${GL_LIB} ${JPEG_LIB} ${TIFF_LIB} ${PNG_LIB} ${EXTRA_LIBS})

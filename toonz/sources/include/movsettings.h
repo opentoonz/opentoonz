@@ -50,7 +50,7 @@
 //#include "tlevel_io.h"
 #include "tproperty.h"
 
-#else // _WIN32
+#else  // _WIN32
 
 #define list List
 #define map Map
@@ -66,13 +66,15 @@
 #undef iterator
 #undef float_t
 
-#endif // !_WIN32
+#endif  // !_WIN32
 
 void DVAPI fromPropertiesToAtoms(TPropertyGroup &pg, QTAtomContainer &atoms);
-void DVAPI fromAtomsToProperties(const QTAtomContainer &atoms, TPropertyGroup &pg);
+void DVAPI fromAtomsToProperties(const QTAtomContainer &atoms,
+                                 TPropertyGroup &pg);
 
-#endif //!64 bit
+#endif  //! 64 bit
 
-void DVAPI openMovSettingsPopup(TPropertyGroup *props, bool macBringToFront = false);
+void DVAPI openMovSettingsPopup(TPropertyGroup *props,
+                                bool macBringToFront = false);
 
 #endif

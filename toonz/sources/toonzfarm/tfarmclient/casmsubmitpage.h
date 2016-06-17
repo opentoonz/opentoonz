@@ -5,20 +5,19 @@
 
 #include "tabPage.h"
 
-class CasmSubmitPage : public TabPage
-{
+class CasmSubmitPage : public TabPage {
 public:
-	CasmSubmitPage(TWidget *parent);
-	~CasmSubmitPage();
+  CasmSubmitPage(TWidget *parent);
+  ~CasmSubmitPage();
 
-	void configureNotify(const TDimension &size);
+  void configureNotify(const TDimension &size);
 
-	void onActivate();
-	void onDeactivate();
+  void onActivate();
+  void onDeactivate();
 
 private:
-	class Data;
-	Data *m_data;
+  class Data;
+  Data *m_data;
 };
 
 #endif

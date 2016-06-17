@@ -18,20 +18,19 @@
 
 //-------------------------------------------------------------------
 
-class DVAPI TClipboard
-{ // singleton
-	static TClipboard *m_instance;
-	TClipboard();
-	~TClipboard();
+class DVAPI TClipboard {  // singleton
+  static TClipboard *m_instance;
+  TClipboard();
+  ~TClipboard();
 
 public:
-	static TClipboard *instance();
-	//! la clipboard mantiene l'ownership
+  static TClipboard *instance();
+  //! la clipboard mantiene l'ownership
 
-	TDataP getData() const;
+  TDataP getData() const;
 
-	//! la clipboard acquisisce l'ownership
-	void setData(const TDataP &data);
+  //! la clipboard acquisisce l'ownership
+  void setData(const TDataP &data);
 };
 
 //-------------------------------------------------------------------

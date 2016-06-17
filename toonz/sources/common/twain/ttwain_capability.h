@@ -12,10 +12,13 @@ extern "C" {
 /*---------------------------------------------------------------------------*/
 /*	      GET CAP							     */
 /*---------------------------------------------------------------------------*/
-int TTWAIN_GetCap(TW_UINT16 cap_id, TW_UINT16 conType, void *data, TUINT32 *cont_size);
-int TTWAIN_GetCapCurrent(TW_UINT16 cap_id, TW_UINT16 conType, void *data, TUINT32 *cont_size);
+int TTWAIN_GetCap(TW_UINT16 cap_id, TW_UINT16 conType, void *data,
+                  TUINT32 *cont_size);
+int TTWAIN_GetCapCurrent(TW_UINT16 cap_id, TW_UINT16 conType, void *data,
+                         TUINT32 *cont_size);
 int TTWAIN_GetCapQuery(TW_UINT16 cap_id, TW_UINT16 *pattern);
-int TTWAIN_SetCap(TW_UINT16 cap_id, TW_UINT16 conType, TW_UINT16 itemType, TW_UINT32 *value);
+int TTWAIN_SetCap(TW_UINT16 cap_id, TW_UINT16 conType, TW_UINT16 itemType,
+                  TW_UINT32 *value);
 
 #ifdef __cplusplus
 }

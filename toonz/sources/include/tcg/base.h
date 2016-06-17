@@ -3,8 +3,7 @@
 #ifndef TCG_BASE_H
 #define TCG_BASE_H
 
-namespace tcg
-{
+namespace tcg {
 
 /*!
   \file   tcg_base.h
@@ -19,8 +18,7 @@ namespace tcg
   \brief  The empty_type can be used as default template parameter in cases
           where the template parameter may be omitted.
 */
-struct empty_type {
-};
+struct empty_type {};
 
 //------------------------------------------------------------------------
 
@@ -35,15 +33,17 @@ struct empty_type {
 
 template <typename B = empty_type>
 struct noncopyable : public B {
-	noncopyable() {}
-	//noncopyable(const B& b) : B(b) {}                 // Would introduce additional copies
-	// along the inheritance chain. Not worth it.
+  noncopyable() {}
+  // noncopyable(const B& b) : B(b) {}                 // Would introduce
+  // additional copies
+  // along the inheritance chain. Not worth it.
 protected:
-	~noncopyable() {} //!< Protected destructor since the class
-					  //!  is intended for nonvirtual inheritance.
+  ~noncopyable() {}  //!< Protected destructor since the class
+                     //!  is intended for nonvirtual inheritance.
 private:
-	noncopyable(const noncopyable &);			 //!< Non-accessible copy constructor.
-	noncopyable &operator=(const noncopyable &); //!< Non-accessible assignment operator.
+  noncopyable(const noncopyable &);  //!< Non-accessible copy constructor.
+  noncopyable &operator=(
+      const noncopyable &);  //!< Non-accessible assignment operator.
 };
 
 //------------------------------------------------------------------------
@@ -63,14 +63,14 @@ private:
                   enough control of the involved class to add a base class.
 */
 
-class polymorphic : noncopyable<> // Noncopyable to prevent slicing
+class polymorphic : noncopyable<>  // Noncopyable to prevent slicing
 {
 protected:
-	polymorphic() {} //!< Protected constructor to ensure that the
-	//!  class is only used as base class.
+  polymorphic() {}  //!< Protected constructor to ensure that the
+                    //!  class is only used as base class.
 public:
-	virtual ~polymorphic() {} //!< A virtual destructor as every good base
-							  //!  class must have.
+  virtual ~polymorphic() {}  //!< A virtual destructor as every good base
+                             //!  class must have.
 };
 
 //------------------------------------------------------------------------
@@ -83,36 +83,36 @@ public:
   Boost.Spirit.Safe_Bool.
 */
 
-template <typename T, typename B = empty_type> // B is used for base class chaining, to deal with
-class safe_bool : public B					   // the empty class optimization
+template <typename T, typename B = empty_type>  // B is used for base class
+                                                // chaining, to deal with
+                                                class safe_bool
+    : public B  // the empty class optimization
 {
-	class dummy
-	{
-	};
-	struct detail {
-		dummy *member;
-	};
+  class dummy {};
+  struct detail {
+    dummy *member;
+  };
 
 public:
-	typedef dummy *detail::*bool_type;
+  typedef dummy *detail::*bool_type;
 
 public:
-	safe_bool() {}
-	//safe_bool(const B& b) : B(b) {}         // Would introduce additional copies
-	// along the inheritance chain. Not worth it.
-	operator bool_type() const
-	{
-		return static_cast<const T *>(this)->operator_bool() ? &detail::member : 0;
-	}
+  safe_bool() {}
+  // safe_bool(const B& b) : B(b) {}         // Would introduce additional
+  // copies
+  // along the inheritance chain. Not worth it.
+  operator bool_type() const {
+    return static_cast<const T *>(this)->operator_bool() ? &detail::member : 0;
+  }
 
 protected:
-	~safe_bool() {} //!< Protected destructor since the class
-					//!  is intended for nonvirtual inheritance.
+  ~safe_bool() {}  //!< Protected destructor since the class
+                   //!  is intended for nonvirtual inheritance.
 private:
-	bool operator==(const safe_bool &);
-	bool operator!=(const safe_bool &);
+  bool operator==(const safe_bool &);
+  bool operator!=(const safe_bool &);
 };
 
-} // namespace tcg
+}  // namespace tcg
 
-#endif // TCG_BASE_H
+#endif  // TCG_BASE_H

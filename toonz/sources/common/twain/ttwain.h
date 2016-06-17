@@ -36,52 +36,53 @@ extern "C" {
 #endif
 
 typedef enum TTWAIN_PIXTYPE {
-	TTWAIN_BW,	/* 1-bit per pixel, B&W     */
-	TTWAIN_WB,	/* 1-bit per pixel, W&B     */
-	TTWAIN_GRAY8, /* 1,4, or 8-bit grayscale  */
-	TTWAIN_RGB24, /* 24-bit RGB color         */
-	TTWAIN_PIXTYPE_HOWMANY,
-	TTWAIN_PIXUNKNOWN = -1,
+  TTWAIN_BW,    /* 1-bit per pixel, B&W     */
+  TTWAIN_WB,    /* 1-bit per pixel, W&B     */
+  TTWAIN_GRAY8, /* 1,4, or 8-bit grayscale  */
+  TTWAIN_RGB24, /* 24-bit RGB color         */
+  TTWAIN_PIXTYPE_HOWMANY,
+  TTWAIN_PIXUNKNOWN = -1,
 } TTWAIN_PIXTYPE;
 
 typedef enum TTWAIN_BITORDER {
-	TTWAIN_LSBFIRST = TWBO_LSBFIRST,
-	TTWAIN_MSBFIRST = TWBO_MSBFIRST
+  TTWAIN_LSBFIRST = TWBO_LSBFIRST,
+  TTWAIN_MSBFIRST = TWBO_MSBFIRST
 } TTWAIN_BITORDER;
 
 typedef enum TWAINAVAILABLE {
-	AVAIABLE_DONTKNOW = -1,
-	AVAIABLE_YES,
-	AVAIABLE_NO
+  AVAIABLE_DONTKNOW = -1,
+  AVAIABLE_YES,
+  AVAIABLE_NO
 } TWAINAVAILABLE;
 
 typedef enum TTWAIN_TRANSFER_MECH {
-	TTWAIN_TRANSFERMODE_NATIVE = TWSX_NATIVE,
-	TTWAIN_TRANSFERMODE_MEMORY = TWSX_MEMORY,
-	TTWAIN_TRANSFERMODE_FILE = TWSX_FILE
+  TTWAIN_TRANSFERMODE_NATIVE = TWSX_NATIVE,
+  TTWAIN_TRANSFERMODE_MEMORY = TWSX_MEMORY,
+  TTWAIN_TRANSFERMODE_FILE   = TWSX_FILE
 } TTWAIN_TRANSFER_MECH;
 
 typedef enum TTWAIN_USAGE_MODE {
-	TTWAIN_MODE_LEASHED,
-	TTWAIN_MODE_UNLEASHED
+  TTWAIN_MODE_LEASHED,
+  TTWAIN_MODE_UNLEASHED
 } TTWAIN_USAGE_MODE;
 
-/* application should return 0 to stop the scanning process, any other value elsewhere */
-typedef int TTWAIN_ONDONE_CB(UCHAR *buffer, TTWAIN_PIXTYPE pixelType,
-							 int lx, int ly, int wrap,
-							 float xdpi, float ydpi,
-							 void *usrData);
+/* application should return 0 to stop the scanning process, any other value
+ * elsewhere */
+typedef int TTWAIN_ONDONE_CB(UCHAR *buffer, TTWAIN_PIXTYPE pixelType, int lx,
+                             int ly, int wrap, float xdpi, float ydpi,
+                             void *usrData);
 
 typedef void TTWAIN_ONERROR_CB(void *usrData, void *alwaysZero);
 
 int TTWAIN_IsAvailable(void);
-void TWAIN_RegisterApp(int majorNum, int minorNum, /* app. revision*/
-					   int nLanguage,			   /* (human) language (use TWLG_xxx from TWAIN.H) */
-					   int nCountry,			   /* country (use TWCY_xxx from TWAIN.H)	     */
-					   char *version,			   /* version info string                          */
-					   char *manufacter,		   /* name of manufacter			     */
-					   char *family,			   /* product family				     */
-					   char *product);			   /* specific product			     */
+void TWAIN_RegisterApp(
+    int majorNum, int minorNum, /* app. revision*/
+    int nLanguage,    /* (human) language (use TWLG_xxx from TWAIN.H) */
+    int nCountry,     /* country (use TWCY_xxx from TWAIN.H)	     */
+    char *version,    /* version info string                          */
+    char *manufacter, /* name of manufacter			     */
+    char *family,     /* product family				     */
+    char *product);   /* specific product			     */
 int TTWAIN_SelectImageSource(void *hwnd);
 /*---------------------------------------------------------------------------*/
 void *TTWAIN_AcquireNative(void *hwnd);
@@ -90,9 +91,9 @@ void TTWAIN_StopAcquire(void);
 
 /*
 nb. AcquireMemory returns: an upside-down bitmap :)
-nb. AcquireNative returns: 
-			  under Windows an HBITMAP
-			  under Mac     a  PICT
+nb. AcquireNative returns:
+                          under Windows an HBITMAP
+                          under Mac     a  PICT
 */
 /*---------------------------------------------------------------------------*/
 void TTWAIN_SetTwainUsage(TTWAIN_USAGE_MODE um);

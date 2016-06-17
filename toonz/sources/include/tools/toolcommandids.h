@@ -31,4 +31,4 @@
 #define T_Ruler "T_Ruler"
 #define T_Finger "T_Finger"
 
-#endif // TOOL_COMMAND_IDS_H
+#endif  // TOOL_COMMAND_IDS_H

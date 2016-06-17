@@ -13,38 +13,37 @@ class ExportScenePopup;
 // FileSelection
 //-----------------------------------------------------------------------------
 
-class FileSelection : public DvItemSelection
-{
-	QList<InfoViewer *> m_infoViewers;
-	ExportScenePopup *m_exportScenePopup;
+class FileSelection : public DvItemSelection {
+  QList<InfoViewer *> m_infoViewers;
+  ExportScenePopup *m_exportScenePopup;
 
 public:
-	FileSelection();
-	~FileSelection();
+  FileSelection();
+  ~FileSelection();
 
-	void getSelectedFiles(std::vector<TFilePath> &files);
+  void getSelectedFiles(std::vector<TFilePath> &files);
 
-	// commands
-	void enableCommands();
+  // commands
+  void enableCommands();
 
-	void duplicateFiles();
-	void deleteFiles();
-	void copyFiles();
-	void pasteFiles();
-	void showFolderContents();
-	void viewFileInfo();
-	void viewFile();
-	void convertFiles();
+  void duplicateFiles();
+  void deleteFiles();
+  void copyFiles();
+  void pasteFiles();
+  void showFolderContents();
+  void viewFileInfo();
+  void viewFile();
+  void convertFiles();
 
-	void premultiplyFiles();
+  void premultiplyFiles();
 
-	void addToBatchRenderList();
-	void addToBatchCleanupList();
+  void addToBatchRenderList();
+  void addToBatchCleanupList();
 
-	void collectAssets();
-	void importScenes();
-	void exportScenes();
-	void selectAll();
+  void collectAssets();
+  void importScenes();
+  void exportScenes();
+  void selectAll();
 };
 
-#endif //FILESELECTION_H
+#endif  // FILESELECTION_H

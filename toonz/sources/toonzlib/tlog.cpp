@@ -25,228 +25,198 @@
 #include "tmsgcore.h"
 
 using namespace TSysLog;
-namespace
-{
+namespace {
 
-enum LEVEL {
-	LEVEL_SUCCESS,
-	LEVEL_ERROR,
-	LEVEL_WARNING,
-	LEVEL_INFO
-};
+enum LEVEL { LEVEL_SUCCESS, LEVEL_ERROR, LEVEL_WARNING, LEVEL_INFO };
 
 #ifdef _WIN32
-WORD Level2WinEventType(LEVEL level)
-{
-	switch (level) {
-	case LEVEL_SUCCESS:
-		return EVENTLOG_SUCCESS; // Success event
-	case LEVEL_ERROR:
-		return EVENTLOG_ERROR_TYPE; // Error event
-	case LEVEL_WARNING:
-		return EVENTLOG_WARNING_TYPE; //Warning event
-	case LEVEL_INFO:
-		return EVENTLOG_INFORMATION_TYPE; // Information event
-										  //      case : return EVENTLOG_AUDIT_SUCCESS Success audit event
-										  //      case : return EVENTLOG_AUDIT_FAILURE Failure audit event
-	default:
-		return LEVEL_WARNING;
-	}
+WORD Level2WinEventType(LEVEL level) {
+  switch (level) {
+  case LEVEL_SUCCESS:
+    return EVENTLOG_SUCCESS;  // Success event
+  case LEVEL_ERROR:
+    return EVENTLOG_ERROR_TYPE;  // Error event
+  case LEVEL_WARNING:
+    return EVENTLOG_WARNING_TYPE;  // Warning event
+  case LEVEL_INFO:
+    return EVENTLOG_INFORMATION_TYPE;  // Information event
+  //      case : return EVENTLOG_AUDIT_SUCCESS Success audit event
+  //      case : return EVENTLOG_AUDIT_FAILURE Failure audit event
+  default:
+    return LEVEL_WARNING;
+  }
 }
 #else
-int Level2XPriority(LEVEL level)
-{
-	switch (level) {
-	case LEVEL_SUCCESS:
-		return LOG_INFO;
-	case LEVEL_ERROR:
-		return LOG_ERR; // Errors.
-	case LEVEL_WARNING:
-		return LOG_WARNING; // Warning messages.
-	case LEVEL_INFO:
-		return LOG_INFO; // Informational messages.
-	default:
-		return LEVEL_WARNING;
-	}
+int Level2XPriority(LEVEL level) {
+  switch (level) {
+  case LEVEL_SUCCESS:
+    return LOG_INFO;
+  case LEVEL_ERROR:
+    return LOG_ERR;  // Errors.
+  case LEVEL_WARNING:
+    return LOG_WARNING;  // Warning messages.
+  case LEVEL_INFO:
+    return LOG_INFO;  // Informational messages.
+  default:
+    return LEVEL_WARNING;
+  }
 }
 #endif
 
-void notify(LEVEL level, const std::string &msg)
-{
+void notify(LEVEL level, const std::string &msg) {
 #ifdef _WIN32
-	TCHAR buf[_MAX_PATH + 1];
+  TCHAR buf[_MAX_PATH + 1];
 
-	GetModuleFileName(0, buf, _MAX_PATH);
+  GetModuleFileName(0, buf, _MAX_PATH);
 
-	HANDLE handle = RegisterEventSource(NULL,							   // uses local computer
-										TFilePath(buf).getName().c_str()); // source name
+  HANDLE handle =
+      RegisterEventSource(NULL,  // uses local computer
+                          TFilePath(buf).getName().c_str());  // source name
 
-	LPCTSTR lpszStrings[2];
-	TCHAR szMsg[256];
-	DWORD dwErr = 1;
-	_stprintf(szMsg, TEXT("%s error: %d"), "appname", dwErr);
+  LPCTSTR lpszStrings[2];
+  TCHAR szMsg[256];
+  DWORD dwErr = 1;
+  _stprintf(szMsg, TEXT("%s error: %d"), "appname", dwErr);
 
-	lpszStrings[0] =
-		lpszStrings[1] = msg.c_str();
-	ReportEvent(handle,					   // event log handle
-				Level2WinEventType(level), // event type
-				0,						   // category zero
-				dwErr,					   // event identifier
-				NULL,					   // no user security identifier
-				1,						   // one substitution string
-				0,						   // no data
-				lpszStrings,			   // pointer to string array
-				NULL);					   // pointer to data
+  lpszStrings[0] = lpszStrings[1] = msg.c_str();
+  ReportEvent(handle,                     // event log handle
+              Level2WinEventType(level),  // event type
+              0,                          // category zero
+              dwErr,                      // event identifier
+              NULL,                       // no user security identifier
+              1,                          // one substitution string
+              0,                          // no data
+              lpszStrings,                // pointer to string array
+              NULL);                      // pointer to data
 
-	DeregisterEventSource(handle);
+  DeregisterEventSource(handle);
 
 #else
-	syslog(Level2XPriority(level), msg.c_str());
+  syslog(Level2XPriority(level), msg.c_str());
 #endif
 }
 
 static TThread::Mutex MyMutex;
-} //namespace
+}  // namespace
 
 //------------------------------------------------------------------------------
 
-void TSysLog::success(const std::string &msg)
-{
-	QMutexLocker sl(&MyMutex);
-	notify(LEVEL_SUCCESS, msg);
+void TSysLog::success(const std::string &msg) {
+  QMutexLocker sl(&MyMutex);
+  notify(LEVEL_SUCCESS, msg);
 }
 
 //------------------------------------------------------------------------------
 
-void TSysLog::warning(const std::string &msg)
-{
-	QMutexLocker sl(&MyMutex);
-	notify(LEVEL_WARNING, msg);
+void TSysLog::warning(const std::string &msg) {
+  QMutexLocker sl(&MyMutex);
+  notify(LEVEL_WARNING, msg);
 }
 
 //------------------------------------------------------------------------------
 
-void TSysLog::error(const std::string &msg)
-{
-	QMutexLocker sl(&MyMutex);
-	notify(LEVEL_ERROR, msg);
+void TSysLog::error(const std::string &msg) {
+  QMutexLocker sl(&MyMutex);
+  notify(LEVEL_ERROR, msg);
 }
 
 //------------------------------------------------------------------------------
 
-void TSysLog::info(const std::string &msg)
-{
-	QMutexLocker sl(&MyMutex);
-	notify(LEVEL_INFO, msg);
+void TSysLog::info(const std::string &msg) {
+  QMutexLocker sl(&MyMutex);
+  notify(LEVEL_INFO, msg);
 }
 
 //==============================================================================
 
-class TUserLogAppend::Imp
-{
+class TUserLogAppend::Imp {
 public:
-	Imp() : m_os(&std::cout), m_streamOwner(false) {}
+  Imp() : m_os(&std::cout), m_streamOwner(false) {}
 
-	Imp(const TFilePath &fp)
-		: m_streamOwner(true)
-	{
-		TFileStatus fs(fp);
-		if (fs.doesExist())
-			m_os = new Tofstream(fp, true);
-		else
-			m_os = new Tofstream(fp);
-	}
+  Imp(const TFilePath &fp) : m_streamOwner(true) {
+    TFileStatus fs(fp);
+    if (fs.doesExist())
+      m_os = new Tofstream(fp, true);
+    else
+      m_os = new Tofstream(fp);
+  }
 
-	~Imp()
-	{
-		if (m_streamOwner)
-			delete m_os;
-	}
+  ~Imp() {
+    if (m_streamOwner) delete m_os;
+  }
 
-	void write(const std::string &msg);
+  void write(const std::string &msg);
 
-	TThread::Mutex m_mutex;
-	std::ostream *m_os;
-	bool m_streamOwner;
+  TThread::Mutex m_mutex;
+  std::ostream *m_os;
+  bool m_streamOwner;
 };
 
 //------------------------------------------------------------------------------
 
-void TUserLogAppend::Imp::write(const std::string &msg)
-{
-	QMutexLocker sl(&m_mutex);
-	*m_os << msg.c_str();
-	m_os->flush();
+void TUserLogAppend::Imp::write(const std::string &msg) {
+  QMutexLocker sl(&m_mutex);
+  *m_os << msg.c_str();
+  m_os->flush();
 }
 
 //--------------------------------------------------------------------
 
-namespace
-{
+namespace {
 
 //--------------------------------------------------------------------
 
-std::string myGetCurrentTime()
-{
-	QString tmp = QTime::currentTime().toString("hh:mm:ss");
-	return tmp.toStdString();
+std::string myGetCurrentTime() {
+  QString tmp = QTime::currentTime().toString("hh:mm:ss");
+  return tmp.toStdString();
 }
 
-} // namespace
+}  // namespace
 
 //------------------------------------------------------------------------------
 
-TUserLogAppend::TUserLogAppend() : m_imp(new Imp())
-{
-}
+TUserLogAppend::TUserLogAppend() : m_imp(new Imp()) {}
 
 //------------------------------------------------------------------------------
 
-TUserLogAppend::TUserLogAppend(const TFilePath &fp) : m_imp(new Imp(fp))
-{
-}
+TUserLogAppend::TUserLogAppend(const TFilePath &fp) : m_imp(new Imp(fp)) {}
 
 //------------------------------------------------------------------------------
 
-TUserLogAppend::~TUserLogAppend()
-{
-}
+TUserLogAppend::~TUserLogAppend() {}
 
 //------------------------------------------------------------------------------
 
-void TUserLogAppend::warning(const std::string &msg)
-{
-	DVGui::warning(QString::fromStdString(msg));
+void TUserLogAppend::warning(const std::string &msg) {
+  DVGui::warning(QString::fromStdString(msg));
 
-	std::string fullMsg(myGetCurrentTime());
-	fullMsg += " WRN:";
-	fullMsg += "\n";
-	fullMsg += msg;
-	fullMsg += "\n";
-	m_imp->write(fullMsg);
+  std::string fullMsg(myGetCurrentTime());
+  fullMsg += " WRN:";
+  fullMsg += "\n";
+  fullMsg += msg;
+  fullMsg += "\n";
+  m_imp->write(fullMsg);
 }
 
 //------------------------------------------------------------------------------
 
-void TUserLogAppend::error(const std::string &msg)
-{
-	DVGui::error(QString::fromStdString(msg));
-	std::string fullMsg(myGetCurrentTime());
-	fullMsg += " ERR:";
-	fullMsg += "\n";
-	fullMsg += msg;
-	fullMsg += "\n";
-	m_imp->write(fullMsg);
+void TUserLogAppend::error(const std::string &msg) {
+  DVGui::error(QString::fromStdString(msg));
+  std::string fullMsg(myGetCurrentTime());
+  fullMsg += " ERR:";
+  fullMsg += "\n";
+  fullMsg += msg;
+  fullMsg += "\n";
+  m_imp->write(fullMsg);
 }
 
 //------------------------------------------------------------------------------
 
-void TUserLogAppend::info(const std::string &msg)
-{
-	std::string fullMsg("");
-	//fullMsg += " INF:";
-	//fullMsg += "\n";
-	fullMsg += msg;
-	fullMsg += "\n";
-	m_imp->write(fullMsg);
+void TUserLogAppend::info(const std::string &msg) {
+  std::string fullMsg("");
+  // fullMsg += " INF:";
+  // fullMsg += "\n";
+  fullMsg += msg;
+  fullMsg += "\n";
+  m_imp->write(fullMsg);
 }

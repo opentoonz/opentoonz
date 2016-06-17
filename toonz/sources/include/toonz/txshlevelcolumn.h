@@ -16,78 +16,79 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TLevelColumnFx;
 class TXshCell;
 
 //=============================================================================
-//!The TXshLevelColumn class provides a column of levels in xsheet and allows its management.
+//! The TXshLevelColumn class provides a column of levels in xsheet and allows
+//! its management.
 /*!Inherits \b TXshCellColumn.
-\n The class defines column of levels getLevelColumn(), more than \b TXshCellColumn has
-   a pointer to \b TLevelColumnFx getLevelColumnFx() and a \b string to identify icon.
-   The string is an icon identification helpful to level icon management, getIcon()
+\n The class defines column of levels getLevelColumn(), more than \b
+TXshCellColumn has
+   a pointer to \b TLevelColumnFx getLevelColumnFx() and a \b string to identify
+icon.
+   The string is an icon identification helpful to level icon management,
+getIcon()
    updateIcon().
 */
 //=============================================================================
 
-class DVAPI TXshLevelColumn : public TXshCellColumn
-{
-	PERSIST_DECLARATION(TXshLevelColumn)
-	TLevelColumnFx *m_fx;
-	std::string m_iconId;
+class DVAPI TXshLevelColumn : public TXshCellColumn {
+  PERSIST_DECLARATION(TXshLevelColumn)
+  TLevelColumnFx *m_fx;
+  std::string m_iconId;
 
-	bool m_iconVisible;
+  bool m_iconVisible;
 
 public:
-	bool isIconVisible() { return m_iconVisible; }
-	void setIconVisible(bool visible)
-	{
-		m_iconVisible = visible;
-	}
+  bool isIconVisible() { return m_iconVisible; }
+  void setIconVisible(bool visible) { m_iconVisible = visible; }
 
-	/*!
-    Constructs a TXshLevelColumn with default value.
-  */
-	TXshLevelColumn();
-	/*!
-    Destroys the TXshLevelColumn object.
-  */
-	~TXshLevelColumn();
+  /*!
+Constructs a TXshLevelColumn with default value.
+*/
+  TXshLevelColumn();
+  /*!
+Destroys the TXshLevelColumn object.
+*/
+  ~TXshLevelColumn();
 
-	TXshColumn::ColumnType getColumnType() const;
+  TXshColumn::ColumnType getColumnType() const;
 
-	/*!
-    Return true if \b cell is empty or level of \b cell isn't a \b TXshZeraryFxLevel.
-  */
-	bool canSetCell(const TXshCell &cell) const;
+  /*!
+Return true if \b cell is empty or level of \b cell isn't a \b
+TXshZeraryFxLevel.
+*/
+  bool canSetCell(const TXshCell &cell) const;
 
-	/*!
-    Return \b TXshLevelColumn.
-  */
-	TXshLevelColumn *getLevelColumn() { return this; }
+  /*!
+Return \b TXshLevelColumn.
+*/
+  TXshLevelColumn *getLevelColumn() { return this; }
 
-	/*!
-    Clone column and return a pointer to the new \b TXshColumn cloned.
-  */
-	TXshColumn *clone() const;
+  /*!
+Clone column and return a pointer to the new \b TXshColumn cloned.
+*/
+  TXshColumn *clone() const;
 
-	void loadData(TIStream &is);
-	void saveData(TOStream &os);
+  void loadData(TIStream &is);
+  void saveData(TOStream &os);
 
-	/*!
-    Return a pointer to \b TLevelColumnFx \b m_fx.
-  */
-	TLevelColumnFx *getLevelColumnFx() const;
+  /*!
+Return a pointer to \b TLevelColumnFx \b m_fx.
+*/
+  TLevelColumnFx *getLevelColumnFx() const;
 
-	/*!
-    Return \b TFx.
-  */
-	TFx *getFx() const;
+  /*!
+Return \b TFx.
+*/
+  TFx *getFx() const;
 
 private:
-	// not implemented
-	TXshLevelColumn(const TXshLevelColumn &);
-	TXshLevelColumn &operator=(const TXshLevelColumn &);
+  // not implemented
+  TXshLevelColumn(const TXshLevelColumn &);
+  TXshLevelColumn &operator=(const TXshLevelColumn &);
 };
 
 #ifdef _WIN32

@@ -35,126 +35,118 @@ class QImage;
 
 //=============================================================================
 
-namespace DVGui
-{
+namespace DVGui {
 
 class ColorField;
 //-----------------------------------------------------------------------------
 
-class DvMiniToolBar : public QFrame
-{
-	QPoint m_dragPos;
+class DvMiniToolBar : public QFrame {
+  QPoint m_dragPos;
 
 public:
-	DvMiniToolBar(QWidget *parent = 0);
-	~DvMiniToolBar();
+  DvMiniToolBar(QWidget *parent = 0);
+  ~DvMiniToolBar();
 
 protected:
-	void mousePressEvent(QMouseEvent *);
-	void mouseMoveEvent(QMouseEvent *);
+  void mousePressEvent(QMouseEvent *);
+  void mouseMoveEvent(QMouseEvent *);
 };
 
 //-----------------------------------------------------------------------------
 
-class DvTextEditButton : public QWidget
-{
-	Q_OBJECT
+class DvTextEditButton : public QWidget {
+  Q_OBJECT
 
 public:
-	DvTextEditButton(QWidget *parent = 0);
-	~DvTextEditButton();
+  DvTextEditButton(QWidget *parent = 0);
+  ~DvTextEditButton();
 
 protected:
-	void paintEvent(QPaintEvent *);
-	void mousePressEvent(QMouseEvent *);
+  void paintEvent(QPaintEvent *);
+  void mousePressEvent(QMouseEvent *);
 
 signals:
-	void clicked();
+  void clicked();
 };
 
 //-----------------------------------------------------------------------------
 
-class DVAPI DvTextEdit : public QTextEdit
-{
-	Q_OBJECT
+class DVAPI DvTextEdit : public QTextEdit {
+  Q_OBJECT
 
-	bool m_paintMode;
+  bool m_paintMode;
 
-	bool m_miniToolBarEnabled;
+  bool m_miniToolBarEnabled;
 
-	QPoint m_mousePos;
+  QPoint m_mousePos;
 
-	QComboBox *m_sizeComboBox;
-	QFontComboBox *m_fontComboBox;
+  QComboBox *m_sizeComboBox;
+  QFontComboBox *m_fontComboBox;
 
-	QActionGroup *m_alignActionGroup;
+  QActionGroup *m_alignActionGroup;
 
-	QAction *m_boldAction,
-		*m_italicAction,
-		*m_underlineAction,
-		*m_alignLeftAction,
-		*m_alignRightAction,
-		*m_alignCenterAction;
+  QAction *m_boldAction, *m_italicAction, *m_underlineAction,
+      *m_alignLeftAction, *m_alignRightAction, *m_alignCenterAction;
 
-	ColorField *m_colorField;
+  ColorField *m_colorField;
 
-	DvMiniToolBar *m_miniToolBar;
-	DvTextEditButton *m_button;
+  DvMiniToolBar *m_miniToolBar;
+  DvTextEditButton *m_button;
 
 public:
-	DvTextEdit(QWidget *parent = 0);
-	~DvTextEdit();
+  DvTextEdit(QWidget *parent = 0);
+  ~DvTextEdit();
 
-	void setMiniToolBarEnabled(bool value) { m_miniToolBarEnabled = value; }
-	void changeFont(const QFont &f);
+  void setMiniToolBarEnabled(bool value) { m_miniToolBarEnabled = value; }
+  void changeFont(const QFont &f);
 
 protected:
-	void createActions();
-	void createMiniToolBar();
+  void createActions();
+  void createMiniToolBar();
 
-	void showMiniToolBar(const QPoint &pos);
-	void hideMiniToolBar();
+  void showMiniToolBar(const QPoint &pos);
+  void hideMiniToolBar();
 
-	void mousePressEvent(QMouseEvent *);
-	void mouseMoveEvent(QMouseEvent *);
-	void mouseReleaseEvent(QMouseEvent *);
-	void wheelEvent(QWheelEvent *);
+  void mousePressEvent(QMouseEvent *);
+  void mouseMoveEvent(QMouseEvent *);
+  void mouseReleaseEvent(QMouseEvent *);
+  void wheelEvent(QWheelEvent *);
 
-	void focusInEvent(QFocusEvent *);
-	void focusOutEvent(QFocusEvent *);
+  void focusInEvent(QFocusEvent *);
+  void focusOutEvent(QFocusEvent *);
 
-	void dragMoveEvent(QDragMoveEvent *);
+  void dragMoveEvent(QDragMoveEvent *);
 
 private:
-	void fontChanged(const QFont &f);
-	void colorChanged(const QColor &c);
-	void alignmentChanged(Qt::Alignment a);
+  void fontChanged(const QFont &f);
+  void colorChanged(const QColor &c);
+  void alignmentChanged(Qt::Alignment a);
 
-	void mergeFormatOnWordOrSelection(const QTextCharFormat &format);
+  void mergeFormatOnWordOrSelection(const QTextCharFormat &format);
 
 protected slots:
 
-	void onCurrentCharFormatChanged(const QTextCharFormat &format);
-	void onCursorPositionChanged();
-	void onSelectionChanged();
+  void onCurrentCharFormatChanged(const QTextCharFormat &format);
+  void onCursorPositionChanged();
+  void onSelectionChanged();
 
-	void onShowMiniToolBarClicked();
+  void onShowMiniToolBarClicked();
 
-	void setTextFamily(const QString &);
-	void setTextColor(const TPixel32 &color, bool isDragging);
-	void setTextBold();
-	void setTextItalic();
-	void setTextUnderline();
-	void setTextSize(const QString &p);
-	void setTextAlign(QAction *);
+  void setTextFamily(const QString &);
+  void setTextColor(const TPixel32 &color, bool isDragging);
+  void setTextBold();
+  void setTextItalic();
+  void setTextUnderline();
+  void setTextSize(const QString &p);
+  void setTextAlign(QAction *);
 
 signals:
 
-	void focusIn();
+  void focusIn();
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+}  // namespace DVGui
 //-----------------------------------------------------------------------------
 
-#endif //DVTEXTEDIT_H
+#endif  // DVTEXTEDIT_H

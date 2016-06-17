@@ -15,34 +15,32 @@
 #define DVAPI DV_IMPORT_API
 #endif
 
-class DVAPI TTest
-{
-
-	int m_levelInstanceCount;
-	int m_imageInstanceCount;
-	int m_rasterInstanceCount;
-	int m_imageReaderInstanceCount;
-	int m_imageWriterInstanceCount;
-	int m_levelReaderInstanceCount;
-	int m_levelWriterInstanceCount;
-	int m_paramInstanceCount;
-	int m_fxInstanceCount;
+class DVAPI TTest {
+  int m_levelInstanceCount;
+  int m_imageInstanceCount;
+  int m_rasterInstanceCount;
+  int m_imageReaderInstanceCount;
+  int m_imageWriterInstanceCount;
+  int m_levelReaderInstanceCount;
+  int m_levelWriterInstanceCount;
+  int m_paramInstanceCount;
+  int m_fxInstanceCount;
 
 public:
-	TTest(const std::string &testName);
-	virtual ~TTest();
+  TTest(const std::string &testName);
+  virtual ~TTest();
 
-	void setInstanceCount();
-	void verifyInstanceCount();
+  void setInstanceCount();
+  void verifyInstanceCount();
 
-	virtual void test() = 0;
-	virtual void before() { setInstanceCount(); };
-	virtual void after(){};
+  virtual void test() = 0;
+  virtual void before() { setInstanceCount(); };
+  virtual void after(){};
 
-	static void runTests(std::string filename);
+  static void runTests(std::string filename);
 };
 
-//Utility
+// Utility
 
 DVAPI TFilePath getTestFile(std::string name);
 

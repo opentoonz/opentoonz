@@ -13,7 +13,7 @@
 /*!
   \def      TCG_ASSERT(assertion, failure_expr)
 
-  \brief    The TCG_ASSERT instruction is an assertion that also provides 
+  \brief    The TCG_ASSERT instruction is an assertion that also provides
             a valid failure statement in case the asserted expression fails.
 
   \details  Assert statements are used to enforce pre- and post-conditions to
@@ -25,7 +25,8 @@
 
             However, there exist cases in which at the same time:
 
-              \li It is \a known that a pre/post-condition could be possibly broken
+              \li It is \a known that a pre/post-condition could be possibly
+  broken
               \li It should still be considered an error
               \li Yet, a worst-case bail-out policy must be provided
 
@@ -34,16 +35,17 @@
               \li Feel offended - it should <B>really not<\B> happen. Errors in
                   meeting requirements should never be tolerated
               \li Use TCG_ASSERT. It does not solve things, but is a simple
-                  statement and defines a trackable (grep-able) string in the project
+                  statement and defines a trackable (grep-able) string in the
+  project
 */
 
-#define TCG_ASSERT(assertion, failure_expr) \
-                                            \
-	if (!(assertion)) {                     \
-		assert(assertion);                  \
-		failure_expr;                       \
-	} else                                  \
-	(void)0
+#define TCG_ASSERT(assertion, failure_expr)                                    \
+                                                                               \
+  if (!(assertion)) {                                                          \
+    assert(assertion);                                                         \
+    failure_expr;                                                              \
+  } else                                                                       \
+    (void)0
 
 /*!
   \def      TCG_JOIN(A, B)
@@ -52,7 +54,7 @@
   \sa       Taken from BOOST_JOIN(A, B)
 */
 #define TCG_DO_JOIN2(A, B) A##B
-#define TCG_DO_JOIN(A, B) TCG_DO_JOIN2(A, B) // Argument macro expansion here
+#define TCG_DO_JOIN(A, B) TCG_DO_JOIN2(A, B)  // Argument macro expansion here
 #define TCG_JOIN(A, B) TCG_DO_JOIN(A, B)
 
 /*!
@@ -65,10 +67,10 @@
 
 // See http://stackoverflow.com/questions/9229601/what-is-in-c-code
 
-#define TCG_STATIC_ASSERT(expr)                      \
-	struct TCG_JOIN(_tcg_static_assert_, __LINE__) { \
-		int : -int(!(expr));                         \
-	}
+#define TCG_STATIC_ASSERT(expr)                                                \
+  struct TCG_JOIN(_tcg_static_assert_, __LINE__) {                             \
+    int : -int(!(expr));                                                       \
+  }
 
 /*!
   \def      TCG_DEBUG(expr)
@@ -88,7 +90,8 @@
 #define TCG_DEBUG2(expr1, expr2) expr1, expr2
 #define TCG_DEBUG3(expr1, exrp2, expr3) expr1, expr2, expr3
 #define TCG_DEBUG4(expr1, expr2, expr3, expr4) expr1, expr2, expr3, expr4
-#define TCG_DEBUG5(expr1, expr2, expr3, expr4, expr5) expr1, expr2, expr3, expr4, expr5
+#define TCG_DEBUG5(expr1, expr2, expr3, expr4, expr5)                          \
+  expr1, expr2, expr3, expr4, expr5
 #endif
 
-#endif // TCG_MACROS_H
+#endif  // TCG_MACROS_H

@@ -55,209 +55,245 @@ const int BackgroundStyle = 0;
 
 //-----------------------------------------------------------------------------
 
-namespace
-{
+namespace {
 
-class FingerUndo : public TRasterUndo
-{
-	std::vector<TThickPoint> m_points;
-	int m_styleId;
-	bool m_invert;
+class FingerUndo : public TRasterUndo {
+  std::vector<TThickPoint> m_points;
+  int m_styleId;
+  bool m_invert;
 
 public:
-	FingerUndo(TTileSetCM32 *tileSet,
-			   const std::vector<TThickPoint> &points,
-			   int styleId, bool invert,
-			   TXshSimpleLevel *level,
-			   const TFrameId &frameId)
-		: TRasterUndo(tileSet, level, frameId, false, false, 0), m_points(points), m_styleId(styleId), m_invert(invert)
-	{
-	}
+  FingerUndo(TTileSetCM32 *tileSet, const std::vector<TThickPoint> &points,
+             int styleId, bool invert, TXshSimpleLevel *level,
+             const TFrameId &frameId)
+      : TRasterUndo(tileSet, level, frameId, false, false, 0)
+      , m_points(points)
+      , m_styleId(styleId)
+      , m_invert(invert) {}
 
-	void redo() const
-	{
-		TToonzImageP image = m_level->getFrame(m_frameId, true);
-		TRasterCM32P ras = image->getRaster();
-		RasterStrokeGenerator m_rasterTrack(ras, FINGER, INK, m_styleId, m_points[0], m_invert, 0, false);
-		m_rasterTrack.setPointsSequence(m_points);
-		m_rasterTrack.generateStroke(true);
-		image->setSavebox(image->getSavebox() + m_rasterTrack.getBBox(m_rasterTrack.getPointsSequence()));
+  void redo() const {
+    TToonzImageP image = m_level->getFrame(m_frameId, true);
+    TRasterCM32P ras   = image->getRaster();
+    RasterStrokeGenerator m_rasterTrack(ras, FINGER, INK, m_styleId,
+                                        m_points[0], m_invert, 0, false);
+    m_rasterTrack.setPointsSequence(m_points);
+    m_rasterTrack.generateStroke(true);
+    image->setSavebox(image->getSavebox() +
+                      m_rasterTrack.getBBox(m_rasterTrack.getPointsSequence()));
 
-		ToolUtils::updateSaveBox();
+    ToolUtils::updateSaveBox();
 
-		TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
-		notifyImageChanged();
-	}
+    TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
+    notifyImageChanged();
+  }
 
-	int getSize() const
-	{
-		return sizeof(*this) + TRasterUndo::getSize();
-	}
+  int getSize() const { return sizeof(*this) + TRasterUndo::getSize(); }
 
-	virtual QString getToolName()
-	{
-		return QString("Finger Tool");
-	}
-	int getHistoryType()
-	{
-		return HistoryType::FingerTool;
-	}
+  virtual QString getToolName() { return QString("Finger Tool"); }
+  int getHistoryType() { return HistoryType::FingerTool; }
 };
 
 //-------------------------------------------------------------------------------------------
 
-void drawLine(const TPointD &point, const TPointD &centre, bool horizontal, bool isDecimal)
-{
-	if (!isDecimal) {
-		if (horizontal) {
-			tglDrawSegment(TPointD(point.x - 1.5, point.y + 0.5) + centre, TPointD(point.x - 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y - 0.5, -point.x + 1.5) + centre, TPointD(point.y - 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y + 0.5) + centre, TPointD(-point.x - 0.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x + 0.5) + centre);
+void drawLine(const TPointD &point, const TPointD &centre, bool horizontal,
+              bool isDecimal) {
+  if (!isDecimal) {
+    if (horizontal) {
+      tglDrawSegment(TPointD(point.x - 1.5, point.y + 0.5) + centre,
+                     TPointD(point.x - 0.5, point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(point.y - 0.5, -point.x + 1.5) + centre,
+                     TPointD(point.y - 0.5, -point.x + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.x + 0.5, -point.y + 0.5) + centre,
+                     TPointD(-point.x - 0.5, -point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre,
+                     TPointD(-point.y - 0.5, point.x + 0.5) + centre);
 
-			tglDrawSegment(TPointD(point.y - 0.5, point.x + 0.5) + centre, TPointD(point.y - 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 0.5, -point.y + 0.5) + centre, TPointD(point.x - 1.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre, TPointD(-point.y - 0.5, -point.x + 1.5) + centre);
-			tglDrawSegment(TPointD(-point.x - 0.5, point.y + 0.5) + centre, TPointD(-point.x + 0.5, point.y + 0.5) + centre);
-		} else {
-			tglDrawSegment(TPointD(point.x - 1.5, point.y + 1.5) + centre, TPointD(point.x - 1.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 1.5, point.y + 0.5) + centre, TPointD(point.x - 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 1.5) + centre, TPointD(point.y - 0.5, -point.x + 1.5) + centre);
-			tglDrawSegment(TPointD(point.y - 0.5, -point.x + 1.5) + centre, TPointD(point.y - 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 0.5) + centre, TPointD(-point.x + 0.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y + 0.5) + centre, TPointD(-point.x - 0.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 1.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x + 0.5) + centre);
+      tglDrawSegment(TPointD(point.y - 0.5, point.x + 0.5) + centre,
+                     TPointD(point.y - 0.5, point.x - 0.5) + centre);
+      tglDrawSegment(TPointD(point.x - 0.5, -point.y + 0.5) + centre,
+                     TPointD(point.x - 1.5, -point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre,
+                     TPointD(-point.y - 0.5, -point.x + 1.5) + centre);
+      tglDrawSegment(TPointD(-point.x - 0.5, point.y + 0.5) + centre,
+                     TPointD(-point.x + 0.5, point.y + 0.5) + centre);
+    } else {
+      tglDrawSegment(TPointD(point.x - 1.5, point.y + 1.5) + centre,
+                     TPointD(point.x - 1.5, point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(point.x - 1.5, point.y + 0.5) + centre,
+                     TPointD(point.x - 0.5, point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(point.y + 0.5, -point.x + 1.5) + centre,
+                     TPointD(point.y - 0.5, -point.x + 1.5) + centre);
+      tglDrawSegment(TPointD(point.y - 0.5, -point.x + 1.5) + centre,
+                     TPointD(point.y - 0.5, -point.x + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 0.5) + centre,
+                     TPointD(-point.x + 0.5, -point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.x + 0.5, -point.y + 0.5) + centre,
+                     TPointD(-point.x - 0.5, -point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.y - 1.5, point.x - 0.5) + centre,
+                     TPointD(-point.y - 0.5, point.x - 0.5) + centre);
+      tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre,
+                     TPointD(-point.y - 0.5, point.x + 0.5) + centre);
 
-			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre, TPointD(point.y - 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.y - 0.5, point.x - 0.5) + centre, TPointD(point.y - 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 1.5, -point.y - 0.5) + centre, TPointD(point.x - 1.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 1.5, -point.y + 0.5) + centre, TPointD(point.x - 0.5, -point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 1.5, -point.x + 1.5) + centre, TPointD(-point.y - 0.5, -point.x + 1.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 1.5) + centre, TPointD(-point.y - 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 1.5) + centre, TPointD(-point.x + 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre, TPointD(-point.x - 0.5, point.y + 0.5) + centre);
-		}
-	} else {
-		if (horizontal) {
-			tglDrawSegment(TPointD(point.x - 0.5, point.y + 0.5) + centre, TPointD(point.x + 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre, TPointD(point.y + 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 0.5) + centre, TPointD(point.y + 0.5, -point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.x + 0.5, -point.y - 0.5) + centre, TPointD(point.x - 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x - 0.5, -point.y - 0.5) + centre, TPointD(-point.x + 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre, TPointD(-point.y - 0.5, -point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre, TPointD(-point.x - 0.5, point.y + 0.5) + centre);
-		} else {
-			tglDrawSegment(TPointD(point.x - 0.5, point.y + 1.5) + centre, TPointD(point.x - 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 0.5, point.y + 0.5) + centre, TPointD(point.x + 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 1.5, point.x - 0.5) + centre, TPointD(point.y + 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre, TPointD(point.y + 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 1.5, -point.x + 0.5) + centre, TPointD(point.y + 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(point.y + 0.5, -point.x + 0.5) + centre, TPointD(point.y + 0.5, -point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 0.5, -point.y - 1.5) + centre, TPointD(point.x - 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(point.x - 0.5, -point.y - 0.5) + centre, TPointD(point.x + 0.5, -point.y - 0.5) + centre);
+      tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre,
+                     TPointD(point.y - 0.5, point.x - 0.5) + centre);
+      tglDrawSegment(TPointD(point.y - 0.5, point.x - 0.5) + centre,
+                     TPointD(point.y - 0.5, point.x + 0.5) + centre);
+      tglDrawSegment(TPointD(point.x - 1.5, -point.y - 0.5) + centre,
+                     TPointD(point.x - 1.5, -point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(point.x - 1.5, -point.y + 0.5) + centre,
+                     TPointD(point.x - 0.5, -point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.y - 1.5, -point.x + 1.5) + centre,
+                     TPointD(-point.y - 0.5, -point.x + 1.5) + centre);
+      tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 1.5) + centre,
+                     TPointD(-point.y - 0.5, -point.x + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.x + 0.5, point.y + 1.5) + centre,
+                     TPointD(-point.x + 0.5, point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre,
+                     TPointD(-point.x - 0.5, point.y + 0.5) + centre);
+    }
+  } else {
+    if (horizontal) {
+      tglDrawSegment(TPointD(point.x - 0.5, point.y + 0.5) + centre,
+                     TPointD(point.x + 0.5, point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre,
+                     TPointD(point.y + 0.5, point.x + 0.5) + centre);
+      tglDrawSegment(TPointD(point.y + 0.5, -point.x + 0.5) + centre,
+                     TPointD(point.y + 0.5, -point.x - 0.5) + centre);
+      tglDrawSegment(TPointD(point.x + 0.5, -point.y - 0.5) + centre,
+                     TPointD(point.x - 0.5, -point.y - 0.5) + centre);
+      tglDrawSegment(TPointD(-point.x - 0.5, -point.y - 0.5) + centre,
+                     TPointD(-point.x + 0.5, -point.y - 0.5) + centre);
+      tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre,
+                     TPointD(-point.y - 0.5, -point.x - 0.5) + centre);
+      tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre,
+                     TPointD(-point.y - 0.5, point.x + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre,
+                     TPointD(-point.x - 0.5, point.y + 0.5) + centre);
+    } else {
+      tglDrawSegment(TPointD(point.x - 0.5, point.y + 1.5) + centre,
+                     TPointD(point.x - 0.5, point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(point.x - 0.5, point.y + 0.5) + centre,
+                     TPointD(point.x + 0.5, point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(point.y + 1.5, point.x - 0.5) + centre,
+                     TPointD(point.y + 0.5, point.x - 0.5) + centre);
+      tglDrawSegment(TPointD(point.y + 0.5, point.x - 0.5) + centre,
+                     TPointD(point.y + 0.5, point.x + 0.5) + centre);
+      tglDrawSegment(TPointD(point.y + 1.5, -point.x + 0.5) + centre,
+                     TPointD(point.y + 0.5, -point.x + 0.5) + centre);
+      tglDrawSegment(TPointD(point.y + 0.5, -point.x + 0.5) + centre,
+                     TPointD(point.y + 0.5, -point.x - 0.5) + centre);
+      tglDrawSegment(TPointD(point.x - 0.5, -point.y - 1.5) + centre,
+                     TPointD(point.x - 0.5, -point.y - 0.5) + centre);
+      tglDrawSegment(TPointD(point.x - 0.5, -point.y - 0.5) + centre,
+                     TPointD(point.x + 0.5, -point.y - 0.5) + centre);
 
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 1.5) + centre, TPointD(-point.x + 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 0.5) + centre, TPointD(-point.x - 0.5, -point.y - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 1.5, -point.x + 0.5) + centre, TPointD(-point.y - 0.5, -point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre, TPointD(-point.y - 0.5, -point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 1.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x - 0.5) + centre);
-			tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre, TPointD(-point.y - 0.5, point.x + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 1.5) + centre, TPointD(-point.x + 0.5, point.y + 0.5) + centre);
-			tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre, TPointD(-point.x - 0.5, point.y + 0.5) + centre);
-		}
-	}
+      tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 1.5) + centre,
+                     TPointD(-point.x + 0.5, -point.y - 0.5) + centre);
+      tglDrawSegment(TPointD(-point.x + 0.5, -point.y - 0.5) + centre,
+                     TPointD(-point.x - 0.5, -point.y - 0.5) + centre);
+      tglDrawSegment(TPointD(-point.y - 1.5, -point.x + 0.5) + centre,
+                     TPointD(-point.y - 0.5, -point.x + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.y - 0.5, -point.x + 0.5) + centre,
+                     TPointD(-point.y - 0.5, -point.x - 0.5) + centre);
+      tglDrawSegment(TPointD(-point.y - 1.5, point.x - 0.5) + centre,
+                     TPointD(-point.y - 0.5, point.x - 0.5) + centre);
+      tglDrawSegment(TPointD(-point.y - 0.5, point.x - 0.5) + centre,
+                     TPointD(-point.y - 0.5, point.x + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.x + 0.5, point.y + 1.5) + centre,
+                     TPointD(-point.x + 0.5, point.y + 0.5) + centre);
+      tglDrawSegment(TPointD(-point.x + 0.5, point.y + 0.5) + centre,
+                     TPointD(-point.x - 0.5, point.y + 0.5) + centre);
+    }
+  }
 }
 
 //-------------------------------------------------------------------------------------------------------
 
-void drawEmptyCircle(int thick, const TPointD &mousePos, bool isPencil, bool isLxEven, bool isLyEven)
-{
-	TPointD pos = mousePos;
-	if (isLxEven)
-		pos.x += 0.5;
-	if (isLyEven)
-		pos.y += 0.5;
-	if (!isPencil)
-		tglDrawCircle(pos, (thick + 1) * 0.5);
-	else {
-		int x = 0, y = tround((thick * 0.5) - 0.5);
-		int d = 3 - 2 * (int)(thick * 0.5);
-		bool horizontal = true, isDecimal = thick % 2 != 0;
-		drawLine(TPointD(x, y), pos, horizontal, isDecimal);
-		while (y > x) {
-			if (d < 0) {
-				d = d + 4 * x + 6;
-				horizontal = true;
-			} else {
-				d = d + 4 * (x - y) + 10;
-				horizontal = false;
-				y--;
-			}
-			x++;
-			drawLine(TPointD(x, y), pos, horizontal, isDecimal);
-		}
-	}
+void drawEmptyCircle(int thick, const TPointD &mousePos, bool isPencil,
+                     bool isLxEven, bool isLyEven) {
+  TPointD pos = mousePos;
+  if (isLxEven) pos.x += 0.5;
+  if (isLyEven) pos.y += 0.5;
+  if (!isPencil)
+    tglDrawCircle(pos, (thick + 1) * 0.5);
+  else {
+    int x = 0, y = tround((thick * 0.5) - 0.5);
+    int d           = 3 - 2 * (int)(thick * 0.5);
+    bool horizontal = true, isDecimal = thick % 2 != 0;
+    drawLine(TPointD(x, y), pos, horizontal, isDecimal);
+    while (y > x) {
+      if (d < 0) {
+        d          = d + 4 * x + 6;
+        horizontal = true;
+      } else {
+        d          = d + 4 * (x - y) + 10;
+        horizontal = false;
+        y--;
+      }
+      x++;
+      drawLine(TPointD(x, y), pos, horizontal, isDecimal);
+    }
+  }
 }
 
-} //namespace
+}  // namespace
 
 //-----------------------------------------------------------------------------
 
-class FingerTool : public TTool
-{
-	Q_DECLARE_TR_FUNCTIONS(FingerTool)
+class FingerTool : public TTool {
+  Q_DECLARE_TR_FUNCTIONS(FingerTool)
 
-	RasterStrokeGenerator *m_rasterTrack;
+  RasterStrokeGenerator *m_rasterTrack;
 
-	bool m_firstTime;
+  bool m_firstTime;
 
-	double m_pointSize, m_distance2;
+  double m_pointSize, m_distance2;
 
-	bool m_selecting;
-	TTileSaverCM32 *m_tileSaver;
+  bool m_selecting;
+  TTileSaverCM32 *m_tileSaver;
 
-	TPointD m_mousePos;
+  TPointD m_mousePos;
 
-	TIntProperty m_toolSize;
-	TBoolProperty m_invert;
-	TPropertyGroup m_prop;
-	int m_cursor;
+  TIntProperty m_toolSize;
+  TBoolProperty m_invert;
+  TPropertyGroup m_prop;
+  int m_cursor;
 
-	/*---	作業中のFrameIdをクリック時に保存し、マウスリリース時（Undoの登録時）
-			に別のフレームに移動している場合があるため ---*/
-	TFrameId m_workingFrameId;
+  /*---	作業中のFrameIdをクリック時に保存し、マウスリリース時（Undoの登録時）
+                  に別のフレームに移動している場合があるため ---*/
+  TFrameId m_workingFrameId;
 
-	/*-- 最初のクリックでStyleを切り替える --*/
-	void pick(const TPointD &pos);
+  /*-- 最初のクリックでStyleを切り替える --*/
+  void pick(const TPointD &pos);
 
 public:
-	FingerTool();
+  FingerTool();
 
-	void draw();
-	void update(TToonzImageP ti, TRectD area);
+  void draw();
+  void update(TToonzImageP ti, TRectD area);
 
-	void updateTranslation();
+  void updateTranslation();
 
-	void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-	void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-	void mouseMove(const TPointD &pos, const TMouseEvent &e);
-	void onEnter();
-	void onLeave();
-	void onActivate();
-	void onDeactivate();
-	bool onPropertyChanged(std::string propertyName);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
+  void mouseMove(const TPointD &pos, const TMouseEvent &e);
+  void onEnter();
+  void onLeave();
+  void onActivate();
+  void onDeactivate();
+  bool onPropertyChanged(std::string propertyName);
 
-	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
-	ToolType getToolType() const { return TTool::LevelWriteTool; }
-	int getCursorId() const { return m_cursor; }
+  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  int getCursorId() const { return m_cursor; }
 
-	int getColorClass() const { return 2; }
+  int getColorClass() const { return 2; }
 
-	/*-- ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う --*/
-	void finishBrush();
+  /*--
+   * ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う
+   * --*/
+  void finishBrush();
 };
 
 FingerTool fingerTool;
@@ -269,45 +305,52 @@ FingerTool fingerTool;
 //-----------------------------------------------------------------------------
 
 FingerTool::FingerTool()
-	: TTool("T_Finger"), m_rasterTrack(0), m_pointSize(-1), m_selecting(false), m_tileSaver(0), m_cursor(ToolCursor::EraserCursor), m_toolSize("Size:", 1, 100, 10, false), m_invert("Invert", false), m_firstTime(true), m_workingFrameId(TFrameId())
-{
-	bind(TTool::ToonzImage);
+    : TTool("T_Finger")
+    , m_rasterTrack(0)
+    , m_pointSize(-1)
+    , m_selecting(false)
+    , m_tileSaver(0)
+    , m_cursor(ToolCursor::EraserCursor)
+    , m_toolSize("Size:", 1, 100, 10, false)
+    , m_invert("Invert", false)
+    , m_firstTime(true)
+    , m_workingFrameId(TFrameId()) {
+  bind(TTool::ToonzImage);
 
-	m_prop.bind(m_toolSize);
-	m_prop.bind(m_invert);
+  m_prop.bind(m_toolSize);
+  m_prop.bind(m_invert);
 
-	m_invert.setId("Invert");
+  m_invert.setId("Invert");
 }
 
 //-----------------------------------------------------------------------------
 
-void FingerTool::updateTranslation()
-{
-	m_toolSize.setQStringName(tr("Size:"));
-	m_invert.setQStringName(tr("Invert", NULL));
+void FingerTool::updateTranslation() {
+  m_toolSize.setQStringName(tr("Size:"));
+  m_invert.setQStringName(tr("Invert", NULL));
 }
 
 //-----------------------------------------------------------------------------
 
-void FingerTool::draw()
-{
-	if (m_pointSize == -1) {
-		return;
-	}
+void FingerTool::draw() {
+  if (m_pointSize == -1) {
+    return;
+  }
 
-	TToonzImageP ti = (TToonzImageP)getImage(false);
-	if (!ti)
-		return;
-	TRasterP ras = ti->getRaster();
-	int lx = ras->getLx();
-	int ly = ras->getLy();
+  TToonzImageP ti = (TToonzImageP)getImage(false);
+  if (!ti) return;
+  TRasterP ras = ti->getRaster();
+  int lx       = ras->getLx();
+  int ly       = ras->getLy();
 
-	if ((ToonzCheck::instance()->getChecks() & ToonzCheck::eInk) || (ToonzCheck::instance()->getChecks() & ToonzCheck::ePaint))
-		glColor3d(0.5, 0.8, 0.8);
-	else
-		glColor3d(1.0, 0.0, 0.0);
+  if ((ToonzCheck::instance()->getChecks() & ToonzCheck::eInk) ||
+      (ToonzCheck::instance()->getChecks() & ToonzCheck::ePaint))
+    glColor3d(0.5, 0.8, 0.8);
+  else
+    glColor3d(1.0, 0.0, 0.0);
 
-	drawEmptyCircle(m_toolSize.getValue(), m_mousePos, true, lx % 2 == 0, ly % 2 == 0);
+  drawEmptyCircle(m_toolSize.getValue(), m_mousePos, true, lx % 2 == 0,
+                  ly % 2 == 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -316,249 +359,237 @@ const UINT pointCount = 20;
 
 //-----------------------------------------------------------------------------
 
-bool FingerTool::onPropertyChanged(std::string propertyName)
-{
-	/*-- サイズ --*/
-	if (propertyName == m_toolSize.getName()) {
-		FingerSize = m_toolSize.getValue();
-		double x = m_toolSize.getValue();
+bool FingerTool::onPropertyChanged(std::string propertyName) {
+  /*-- サイズ --*/
+  if (propertyName == m_toolSize.getName()) {
+    FingerSize = m_toolSize.getValue();
+    double x   = m_toolSize.getValue();
 
-		double minRange = 1;
-		double maxRange = 100;
+    double minRange = 1;
+    double maxRange = 100;
 
-		double minSize = 0.01;
-		double maxSize = 100;
+    double minSize = 0.01;
+    double maxSize = 100;
 
-		m_pointSize = (x - minRange) / (maxRange - minRange) * (maxSize - minSize) + minSize;
-		invalidate();
-	}
+    m_pointSize =
+        (x - minRange) / (maxRange - minRange) * (maxSize - minSize) + minSize;
+    invalidate();
+  }
 
-	//Invert
-	else if (propertyName == m_invert.getName()) {
-		FingerInvert = (int)(m_invert.getValue());
-	}
+  // Invert
+  else if (propertyName == m_invert.getName()) {
+    FingerInvert = (int)(m_invert.getValue());
+  }
 
-	return true;
+  return true;
 }
 
 //-----------------------------------------------------------------------------
 
-void FingerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e)
-{
-	pick(pos);
+void FingerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  pick(pos);
 
-	m_selecting = true;
-	TImageP image(getImage(true));
+  m_selecting = true;
+  TImageP image(getImage(true));
 
-	if (TToonzImageP ti = image) {
-		TRasterCM32P ras = ti->getRaster();
-		if (ras) {
-			int thickness = m_toolSize.getValue();
-			int styleId = TTool::getApplication()->getCurrentLevelStyleIndex();
-			TTileSetCM32 *tileSet = new TTileSetCM32(ras->getSize());
-			m_tileSaver = new TTileSaverCM32(ras, tileSet);
-			m_rasterTrack = new RasterStrokeGenerator(ras,
-													  FINGER,
-													  INK,
-													  styleId,
-													  TThickPoint(pos + convert(ras->getCenter()), thickness),
-													  m_invert.getValue(),
-													  0,
-													  false);
+  if (TToonzImageP ti = image) {
+    TRasterCM32P ras = ti->getRaster();
+    if (ras) {
+      int thickness = m_toolSize.getValue();
+      int styleId   = TTool::getApplication()->getCurrentLevelStyleIndex();
+      TTileSetCM32 *tileSet = new TTileSetCM32(ras->getSize());
+      m_tileSaver           = new TTileSaverCM32(ras, tileSet);
+      m_rasterTrack         = new RasterStrokeGenerator(
+          ras, FINGER, INK, styleId,
+          TThickPoint(pos + convert(ras->getCenter()), thickness),
+          m_invert.getValue(), 0, false);
 
-			/*-- 作業中Fidを現在のFIDにする --*/
-			m_workingFrameId = getFrameId();
+      /*-- 作業中Fidを現在のFIDにする --*/
+      m_workingFrameId = getFrameId();
 
-			m_tileSaver->save(m_rasterTrack->getLastRect());
-			TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true);
-			invalidate();
-		}
-	}
+      m_tileSaver->save(m_rasterTrack->getLastRect());
+      TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true);
+      invalidate();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-void FingerTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e)
-{
-	if (!m_selecting)
-		return;
+void FingerTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  if (!m_selecting) return;
 
-	m_mousePos = pos;
-	if (TToonzImageP ri = TImageP(getImage(true))) {
-		/*---	マウスを動かしながらショートカットで切り替わった場合、
-				いきなりleftButtonDragから呼ばれることがあり、
-				m_rasterTrackが無くて落ちることがある。 ---*/
-		if (m_rasterTrack) {
-			int thickness = m_toolSize.getValue();
-			bool isAdded = m_rasterTrack->add(TThickPoint(pos + convert(ri->getRaster()->getCenter()), thickness));
-			if (isAdded) {
-				m_tileSaver->save(m_rasterTrack->getLastRect());
-				TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true);
-				invalidate();
-			}
-		}
-	}
+  m_mousePos = pos;
+  if (TToonzImageP ri = TImageP(getImage(true))) {
+    /*---	マウスを動かしながらショートカットで切り替わった場合、
+                    いきなりleftButtonDragから呼ばれることがあり、
+                    m_rasterTrackが無くて落ちることがある。 ---*/
+    if (m_rasterTrack) {
+      int thickness = m_toolSize.getValue();
+      bool isAdded  = m_rasterTrack->add(
+          TThickPoint(pos + convert(ri->getRaster()->getCenter()), thickness));
+      if (isAdded) {
+        m_tileSaver->save(m_rasterTrack->getLastRect());
+        TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true);
+        invalidate();
+      }
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-void FingerTool::leftButtonUp(const TPointD &pos, const TMouseEvent &)
-{
-	if (!m_selecting)
-		return;
+void FingerTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
+  if (!m_selecting) return;
 
-	m_mousePos = pos;
+  m_mousePos = pos;
 
-	finishBrush();
+  finishBrush();
 }
 
 //-----------------------------------------------------------------------------
 
-void FingerTool::mouseMove(const TPointD &pos, const TMouseEvent &e)
-{
-	m_mousePos = pos;
-	TPointD pp(tround(pos.x), tround(pos.y));
-	m_mousePos = pp;
-	invalidate();
+void FingerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
+  m_mousePos = pos;
+  TPointD pp(tround(pos.x), tround(pos.y));
+  m_mousePos = pp;
+  invalidate();
 }
 
 //-----------------------------------------------------------------------------
 
-void FingerTool::onEnter()
-{
-	if (m_firstTime) {
-		m_invert.setValue(FingerInvert ? 1 : 0);
-		m_toolSize.setValue(FingerSize);
-		m_firstTime = false;
-	}
-	double x = m_toolSize.getValue();
+void FingerTool::onEnter() {
+  if (m_firstTime) {
+    m_invert.setValue(FingerInvert ? 1 : 0);
+    m_toolSize.setValue(FingerSize);
+    m_firstTime = false;
+  }
+  double x = m_toolSize.getValue();
 
-	double minRange = 1;
-	double maxRange = 100;
+  double minRange = 1;
+  double maxRange = 100;
 
-	double minSize = 0.01;
-	double maxSize = 100;
+  double minSize = 0.01;
+  double maxSize = 100;
 
-	m_pointSize = (x - minRange) / (maxRange - minRange) * (maxSize - minSize) + minSize;
+  m_pointSize =
+      (x - minRange) / (maxRange - minRange) * (maxSize - minSize) + minSize;
 
-	if ((TToonzImageP)getImage(false))
-		m_cursor = ToolCursor::PenCursor;
-	else
-		m_cursor = ToolCursor::CURSOR_NO;
+  if ((TToonzImageP)getImage(false))
+    m_cursor = ToolCursor::PenCursor;
+  else
+    m_cursor = ToolCursor::CURSOR_NO;
 }
 
 //-----------------------------------------------------------------------------
 
-void FingerTool::onLeave()
-{
-	m_pointSize = -1;
-}
+void FingerTool::onLeave() { m_pointSize = -1; }
 
 //-----------------------------------------------------------------------------
 
-void FingerTool::onActivate()
-{
-	onEnter();
-}
+void FingerTool::onActivate() { onEnter(); }
 
 //-----------------------------------------------------------------------------
 
-void FingerTool::onDeactivate()
-{
-	/*--- マウスドラッグ中(m_selecting=true)にツールが切り替わったときに線を終わらせる ---*/
-	if (m_selecting)
-		finishBrush();
+void FingerTool::onDeactivate() {
+  /*---
+   * マウスドラッグ中(m_selecting=true)にツールが切り替わったときに線を終わらせる
+   * ---*/
+  if (m_selecting) finishBrush();
 }
 
 //-----------------------------------------------------------------------------
-/*! ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う
+/*!
+ * ドラッグ中にツールが切り替わった場合に備え、onDeactivateにもMouseReleaseと同じ処理を行う
 */
-void FingerTool::finishBrush()
-{
-	if (TToonzImageP ti = (TToonzImageP)getImage(true)) {
-		if (m_rasterTrack) {
-			int thickness = m_toolSize.getValue();
-			bool isAdded = m_rasterTrack->add(TThickPoint(m_mousePos + convert(ti->getRaster()->getCenter()), thickness));
-			if (isAdded) {
-				m_tileSaver->save(m_rasterTrack->getLastRect());
-				TRect modifiedBbox = m_rasterTrack->generateLastPieceOfStroke(true, true);
-			}
+void FingerTool::finishBrush() {
+  if (TToonzImageP ti = (TToonzImageP)getImage(true)) {
+    if (m_rasterTrack) {
+      int thickness = m_toolSize.getValue();
+      bool isAdded  = m_rasterTrack->add(TThickPoint(
+          m_mousePos + convert(ti->getRaster()->getCenter()), thickness));
+      if (isAdded) {
+        m_tileSaver->save(m_rasterTrack->getLastRect());
+        TRect modifiedBbox =
+            m_rasterTrack->generateLastPieceOfStroke(true, true);
+      }
 
-			TTool::Application *app = TTool::getApplication();
-			TXshLevel *level = app->getCurrentLevel()->getLevel();
-			TXshSimpleLevelP simLevel = level->getSimpleLevel();
+      TTool::Application *app   = TTool::getApplication();
+      TXshLevel *level          = app->getCurrentLevel()->getLevel();
+      TXshSimpleLevelP simLevel = level->getSimpleLevel();
 
-			TFrameId frameId = m_workingFrameId.isEmptyFrame() ? getCurrentFid() : m_workingFrameId;
+      TFrameId frameId =
+          m_workingFrameId.isEmptyFrame() ? getCurrentFid() : m_workingFrameId;
 
-			TUndoManager::manager()->add(new FingerUndo(m_tileSaver->getTileSet(),
-														m_rasterTrack->getPointsSequence(),
-														m_rasterTrack->getStyleId(),
-														m_rasterTrack->isSelective(),
-														simLevel.getPointer(),
-														frameId));
-			ToolUtils::updateSaveBox();
+      TUndoManager::manager()->add(new FingerUndo(
+          m_tileSaver->getTileSet(), m_rasterTrack->getPointsSequence(),
+          m_rasterTrack->getStyleId(), m_rasterTrack->isSelective(),
+          simLevel.getPointer(), frameId));
+      ToolUtils::updateSaveBox();
 
-			/*! FIdを指定して、作業中にフレームが動いても、
-				クリック時のFidのサムネイルが更新されるようにする。
-			*/
-			notifyImageChanged(frameId);
+      /*! FIdを指定して、作業中にフレームが動いても、
+              クリック時のFidのサムネイルが更新されるようにする。
+      */
+      notifyImageChanged(frameId);
 
-			invalidate();
-			delete m_rasterTrack;
-			m_rasterTrack = 0;
-			delete m_tileSaver;
+      invalidate();
+      delete m_rasterTrack;
+      m_rasterTrack = 0;
+      delete m_tileSaver;
 
-			/*-- 作業中fIdをリセット --*/
-			m_workingFrameId = TFrameId();
-		}
-	}
-	m_selecting = false;
+      /*-- 作業中fIdをリセット --*/
+      m_workingFrameId = TFrameId();
+    }
+  }
+  m_selecting = false;
 }
 
-void FingerTool::pick(const TPointD &pos)
-{
-	int modeValue = 2; //LINES
+void FingerTool::pick(const TPointD &pos) {
+  int modeValue = 2;  // LINES
 
-	TImageP image = getImage(false);
-	TToonzImageP ti = image;
-	TVectorImageP vi = image;
-	TXshSimpleLevel *level = getApplication()->getCurrentLevel()->getSimpleLevel();
-	if (!ti || !level)
-		return;
+  TImageP image    = getImage(false);
+  TToonzImageP ti  = image;
+  TVectorImageP vi = image;
+  TXshSimpleLevel *level =
+      getApplication()->getCurrentLevel()->getSimpleLevel();
+  if (!ti || !level) return;
 
-	/*--- 画面外をpickしても拾えないようにする ---*/
-	if (!m_viewer->getGeometry().contains(pos))
-		return;
+  /*--- 画面外をpickしても拾えないようにする ---*/
+  if (!m_viewer->getGeometry().contains(pos)) return;
 
-	int subsampling = level->getImageSubsampling(getCurrentFid());
+  int subsampling = level->getImageSubsampling(getCurrentFid());
 
-	StylePicker picker(image);
+  StylePicker picker(image);
 
-	int styleId = picker.pickStyleId(TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5),
-									 getPixelSize() * getPixelSize(),
-									 modeValue);
+  int styleId =
+      picker.pickStyleId(TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5),
+                         getPixelSize() * getPixelSize(), modeValue);
 
-	if (styleId < 0)
-		return;
+  if (styleId < 0) return;
 
-	if (modeValue == 2) //LINES
-	{
-		/*--- pickLineモードのとき、取得Styleが0の場合はカレントStyleを変えない。 ---*/
-		if (styleId == 0)
-			return;
+  if (modeValue == 2)  // LINES
+  {
+    /*--- pickLineモードのとき、取得Styleが0の場合はカレントStyleを変えない。
+     * ---*/
+    if (styleId == 0) return;
 
-		/*--- pickLineモードのとき、PurePaintの部分をクリックしてもカレントStyleを変えない ---*/
-		if (ti && picker.pickTone(TScale(1.0 / subsampling) * pos + TPointD(-0.5, -0.5)) == 255)
-			return;
-	}
+    /*---
+     * pickLineモードのとき、PurePaintの部分をクリックしてもカレントStyleを変えない
+     * ---*/
+    if (ti &&
+        picker.pickTone(TScale(1.0 / subsampling) * pos +
+                        TPointD(-0.5, -0.5)) == 255)
+      return;
+  }
 
-	/*--- Styleを選択している場合は選択を解除する ---*/
-	TSelection *selection = TTool::getApplication()->getCurrentSelection()->getSelection();
-	if (selection) {
-		TStyleSelection *styleSelection = dynamic_cast<TStyleSelection *>(selection);
-		if (styleSelection)
-			styleSelection->selectNone();
-	}
+  /*--- Styleを選択している場合は選択を解除する ---*/
+  TSelection *selection =
+      TTool::getApplication()->getCurrentSelection()->getSelection();
+  if (selection) {
+    TStyleSelection *styleSelection =
+        dynamic_cast<TStyleSelection *>(selection);
+    if (styleSelection) styleSelection->selectNone();
+  }
 
-	getApplication()->setCurrentLevelStyleIndex(styleId);
+  getApplication()->setCurrentLevelStyleIndex(styleId);
 }

@@ -28,41 +28,45 @@ class TPalette;
 //*******************************************************************************
 
 struct DVAPI TargetColor {
-	TPixel32 m_color;
-	int m_index;
-	int m_brightness;
-	int m_contrast;
-	double m_hRange;
-	double m_threshold;
+  TPixel32 m_color;
+  int m_index;
+  int m_brightness;
+  int m_contrast;
+  double m_hRange;
+  double m_threshold;
 
 public:
-	TargetColor(const TPixel32 &color, int index, int brightness, int contrast, double hRange, double threshold)
-		: m_color(color), m_index(index), m_brightness(brightness), m_contrast(contrast), m_hRange(hRange), m_threshold(threshold) {}
+  TargetColor(const TPixel32 &color, int index, int brightness, int contrast,
+              double hRange, double threshold)
+      : m_color(color)
+      , m_index(index)
+      , m_brightness(brightness)
+      , m_contrast(contrast)
+      , m_hRange(hRange)
+      , m_threshold(threshold) {}
 };
 
 //*******************************************************************************
 //    TargetColors declaration
 //*******************************************************************************
 
-class DVAPI TargetColors
-{
-	std::vector<TargetColor> m_colors;
+class DVAPI TargetColors {
+  std::vector<TargetColor> m_colors;
 
 public:
-	TargetColors();
-	~TargetColors();
+  TargetColors();
+  ~TargetColors();
 
-	void update(TPalette *palette, bool noAntialias);
+  void update(TPalette *palette, bool noAntialias);
 
-	int getColorCount() const;
-	const TargetColor &getColor(int i) const;
+  int getColorCount() const;
+  const TargetColor &getColor(int i) const;
 
-	TargetColors(const TargetColors &c) { m_colors = c.m_colors; }
-	TargetColors operator=(const TargetColors &c)
-	{
-		m_colors = c.m_colors;
-		return *this;
-	}
+  TargetColors(const TargetColors &c) { m_colors = c.m_colors; }
+  TargetColors operator=(const TargetColors &c) {
+    m_colors = c.m_colors;
+    return *this;
+  }
 };
 
 #endif

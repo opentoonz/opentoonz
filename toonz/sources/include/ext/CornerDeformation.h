@@ -25,33 +25,22 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-namespace ToonzExt
-{
-class DVAPI
-	CornerDeformation
-	: public StrokeDeformationImpl
-{
-
-	CornerDeformation();
+namespace ToonzExt {
+class DVAPI CornerDeformation : public StrokeDeformationImpl {
+  CornerDeformation();
 
 public:
-	virtual ~CornerDeformation();
+  virtual ~CornerDeformation();
 
-	bool
-	check_(const ContextStatus *status);
+  bool check_(const ContextStatus *status);
 
-	bool
-	findExtremes_(const ContextStatus *,
-				  Interval &);
+  bool findExtremes_(const ContextStatus *, Interval &);
 
-	double
-	findActionLength();
+  double findActionLength();
 
-	virtual void
-	draw(Designer *);
+  virtual void draw(Designer *);
 
-	static CornerDeformation *
-	instance();
+  static CornerDeformation *instance();
 };
 }
 #endif /* CORNERDEFORMATION_H */

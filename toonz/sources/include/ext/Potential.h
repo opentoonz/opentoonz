@@ -31,68 +31,58 @@ class TStroke;
 #pragma warning(disable : 4290)
 #endif
 
-namespace ToonzExt
-{
+namespace ToonzExt {
 /**
-  * @brief Potential is an abstraction to maintain a 
-  * mathematical potential function. 
+  * @brief Potential is an abstraction to maintain a
+  * mathematical potential function.
   *
-  * It is used from StrokeDeformation to change 
+  * It is used from StrokeDeformation to change
   * the behaviour of deformation that user need to do.
   */
-class DVAPI
-	Potential
-{
-	bool isValid_;
+class DVAPI Potential {
+  bool isValid_;
 
 protected:
-	/**
-     * @brief The value of potential at parameter w on
-     *  the stroke.
-     * @param w The parameter on stroke.
-     */
-	virtual double
-	value_(double w) const = 0;
+  /**
+*@brief The value of potential at parameter w on
+* the stroke.
+*@param w The parameter on stroke.
+*/
+  virtual double value_(double w) const = 0;
 
-	/**
-     * @brief Change the parameter of object that has been created.
-     *
-     * This method is the real implementation that a potential
-     * needs to implement.
-     * @param theStroke The stroke to change.
-     * @param w The parameter on stroke.
-     * @param actionLength How many stroke to change.
-     */
-	virtual void
-	setParameters_(const TStroke *theStroke,
-				   double w,
-				   double actionLength) = 0;
+  /**
+*@brief Change the parameter of object that has been created.
+*
+*This method is the real implementation that a potential
+*needs to implement.
+*@param theStroke The stroke to change.
+*@param w The parameter on stroke.
+*@param actionLength How many stroke to change.
+*/
+  virtual void setParameters_(const TStroke *theStroke, double w,
+                              double actionLength) = 0;
 
 public:
-	Potential();
+  Potential();
 
-	/**
-     * @brief Just a wrapper for setParameters_.
-     * @sa setParameters_
-     */
-	void
-	setParameters(const TStroke *ref,
-				  double w,
-				  double actionLength);
+  /**
+*@brief Just a wrapper for setParameters_.
+*@sa setParameters_
+*/
+  void setParameters(const TStroke *ref, double w, double actionLength);
 
-	/**
-     * @brief Just a wrapper for value_.
-     * @sa value_
-     */
-	double
-	value(double at) const;
+  /**
+*@brief Just a wrapper for value_.
+*@sa value_
+*/
+  double value(double at) const;
 
-	/**
-     * @brief This is method required to use a Prototype Pattern.
-     */
-	virtual Potential *clone() = 0;
+  /**
+*@brief This is method required to use a Prototype Pattern.
+*/
+  virtual Potential *clone() = 0;
 
-	virtual ~Potential() {}
+  virtual ~Potential() {}
 };
 }
 

@@ -20,82 +20,77 @@
 #endif
 
 //=========================================================
-namespace TEnv
-{
+namespace TEnv {
 
 //-------------------------------------------------------
 
-class DVAPI Variable
-{
+class DVAPI Variable {
 public:
-	class Imp;
-	Imp *m_imp;
+  class Imp;
+  Imp *m_imp;
 
 public:
-	Variable(std::string name, std::string defaultValue);
-	Variable(std::string name);
-	virtual ~Variable();
+  Variable(std::string name, std::string defaultValue);
+  Variable(std::string name);
+  virtual ~Variable();
 
-	std::string getName() const;
-	std::string getValue() const;
+  std::string getName() const;
+  std::string getValue() const;
 
-	void assignValue(std::string str);
+  void assignValue(std::string str);
 };
 
-class DVAPI IntVar : public Variable
-{
+class DVAPI IntVar : public Variable {
 public:
-	IntVar(std::string name, int defValue);
-	IntVar(std::string name);
-	operator int() const;
-	void operator=(int v);
+  IntVar(std::string name, int defValue);
+  IntVar(std::string name);
+  operator int() const;
+  void operator=(int v);
 };
 
-class DVAPI DoubleVar : public Variable
-{
+class DVAPI DoubleVar : public Variable {
 public:
-	DoubleVar(std::string name, double defValue);
-	DoubleVar(std::string name);
-	operator double() const;
-	void operator=(double v);
+  DoubleVar(std::string name, double defValue);
+  DoubleVar(std::string name);
+  operator double() const;
+  void operator=(double v);
 };
 
-class DVAPI StringVar : public Variable
-{
+class DVAPI StringVar : public Variable {
 public:
-	StringVar(std::string name, const std::string &defValue);
-	StringVar(std::string name);
-	operator std::string() const;
-	void operator=(const std::string &v);
+  StringVar(std::string name, const std::string &defValue);
+  StringVar(std::string name);
+  operator std::string() const;
+  void operator=(const std::string &v);
 };
 
-class DVAPI FilePathVar : public Variable
-{
+class DVAPI FilePathVar : public Variable {
 public:
-	FilePathVar(std::string name, const TFilePath &defValue);
-	FilePathVar(std::string name);
-	operator TFilePath() const;
-	void operator=(const TFilePath &v);
+  FilePathVar(std::string name, const TFilePath &defValue);
+  FilePathVar(std::string name);
+  operator TFilePath() const;
+  void operator=(const TFilePath &v);
 };
 
-class DVAPI RectVar : public Variable
-{
+class DVAPI RectVar : public Variable {
 public:
-	RectVar(std::string name, const TRect &defValue);
-	RectVar(std::string name);
-	operator TRect() const;
-	void operator=(const TRect &v);
+  RectVar(std::string name, const TRect &defValue);
+  RectVar(std::string name);
+  operator TRect() const;
+  void operator=(const TRect &v);
 };
 
 //-------------------------------------------------------
 
 // NOTA BENE: bisogna chiamare setApplication() il prima possibile
-// questa operazione inizializza il registry root (su Windows) e definisce il file dove
+// questa operazione inizializza il registry root (su Windows) e definisce il
+// file dove
 // vengono lette e scritte le variabili di environment
 //
 // es.:  TEnv::setApplication("Toonz","5.0");
 //
-DVAPI void setApplication(std::string applicationName, std::string version, std::string revision = std::string());
+DVAPI void setApplication(std::string applicationName, std::string version,
+                          std::string revision = std::string());
 
 DVAPI std::string getApplicationName();
 DVAPI std::string getApplicationVersion();
@@ -134,7 +129,7 @@ DVAPI TFilePathSet getSystemVarPathSetValue(std::string varName);
 
 DVAPI TFilePath getStuffDir();
 DVAPI TFilePath getConfigDir();
-//DVAPI TFilePath getProfilesDir();
+// DVAPI TFilePath getProfilesDir();
 
 // per l'utilizzo di ToonzLib senza che sia definita una TOONZROOT
 // bisogna chiamare TEnv::setStuffDir(stuffdir) prima di ogni altra operazione
@@ -155,9 +150,11 @@ DVAPI void saveAllEnvVariables();
 
 
 
-  // bisogna assegnare (in qualsiasi ordine) tutti i vari nomi dei registry alle varie
-  // directory di sistema. 
-  // StuffDir e' obbligatoria, tutte le altre hanno un valore di default relativo a StuffDir
+  // bisogna assegnare (in qualsiasi ordine) tutti i vari nomi dei registry alle
+  varie
+  // directory di sistema.
+  // StuffDir e' obbligatoria, tutte le altre hanno un valore di default
+  relativo a StuffDir
   DVAPI void defineSystemPath(SystemFileId id, const TFilePath &registryName);
 
   // restituisce il file (non la variabile di registro)
@@ -168,7 +165,7 @@ DVAPI void saveAllEnvVariables();
 
 //=========================================================
 
-} // namespace TEnv
+}  // namespace TEnv
 
 //=========================================================
 

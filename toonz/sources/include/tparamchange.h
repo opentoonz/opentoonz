@@ -28,39 +28,38 @@ class TParam;
 //    TParamChange  declaration
 //*****************************************************************************************
 
-class DVAPI TParamChange
-{
+class DVAPI TParamChange {
 public:
-	TParam *m_param; //!< (not owned) The parameter being changed
+  TParam *m_param;  //!< (not owned) The parameter being changed
 
-	double m_firstAffectedFrame,
-		m_lastAffectedFrame; //!< First and last frames affected by the change
+  double m_firstAffectedFrame,
+      m_lastAffectedFrame;  //!< First and last frames affected by the change
 
-	bool m_keyframeChanged; //!< Whether a keyframe has been altered by the change
-	bool m_dragging;		//!< Whether the change is about a mouse being dragged
-	bool m_undoing;			//!< Whether the change is happening within an undo operation
+  bool
+      m_keyframeChanged;  //!< Whether a keyframe has been altered by the change
+  bool m_dragging;        //!< Whether the change is about a mouse being dragged
+  bool m_undoing;  //!< Whether the change is happening within an undo operation
 
-	static double m_minFrame;
-	static double m_maxFrame;
+  static double m_minFrame;
+  static double m_maxFrame;
 
 public:
-	TParamChange(TParam *param,
-				 double firstAffectedFrame, double lastAffectedFrame,
-				 bool keyframeChanged, bool dragging, bool undoing);
+  TParamChange(TParam *param, double firstAffectedFrame,
+               double lastAffectedFrame, bool keyframeChanged, bool dragging,
+               bool undoing);
 
-	virtual ~TParamChange() {}
+  virtual ~TParamChange() {}
 };
 
 //*****************************************************************************************
 //    TParamObserver  definition
 //*****************************************************************************************
 
-class DVAPI TParamObserver
-{
+class DVAPI TParamObserver {
 public:
-	virtual ~TParamObserver() {}
+  virtual ~TParamObserver() {}
 
-	virtual void onChange(const TParamChange &) = 0;
+  virtual void onChange(const TParamChange &) = 0;
 };
 
-#endif // TPARAMCHANGE_INCLUDED
+#endif  // TPARAMCHANGE_INCLUDED

@@ -30,180 +30,150 @@ class QLabel;
 //    PreferencesPopup  definition
 //**********************************************************************************
 
-class PreferencesPopup : public QDialog
-{
-	Q_OBJECT
+class PreferencesPopup : public QDialog {
+  Q_OBJECT
 
 public:
-	PreferencesPopup();
+  PreferencesPopup();
 
 private:
-	class FormatProperties;
+  class FormatProperties;
 
 private:
-	Preferences *m_pref;
+  Preferences *m_pref;
 
-	FormatProperties *m_formatProperties;
+  FormatProperties *m_formatProperties;
 
-	DVGui::ColorField *m_blankColor,
-		*m_frontOnionColor,
-		*m_backOnionColor,
-		*m_transpCheckBgColor,
-		*m_transpCheckInkColor,
-		*m_transpCheckPaintColor,
-		*m_viewerBgColorFld,
-		*m_previewBgColorFld,
-		*m_chessboardColor1Fld,
-		*m_chessboardColor2Fld;
+  DVGui::ColorField *m_blankColor, *m_frontOnionColor, *m_backOnionColor,
+      *m_transpCheckBgColor, *m_transpCheckInkColor, *m_transpCheckPaintColor,
+      *m_viewerBgColorFld, *m_previewBgColorFld, *m_chessboardColor1Fld,
+      *m_chessboardColor2Fld;
 
-	QComboBox *m_keyframeType,
-		*m_cellsDragBehaviour,
-		*m_defScanLevelType,
-		*m_defLevelType,
-		*m_autocreationType,
-		*m_levelFormatNames,
-		*m_columnIconOm;
+  QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType,
+      *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
+      *m_columnIconOm;
 
-	DVGui::MeasuredDoubleLineEdit
-		*m_defLevelWidth,
-		*m_defLevelHeight;
+  DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
-	DVGui::DoubleLineEdit *m_defLevelDpi;
+  DVGui::DoubleLineEdit *m_defLevelDpi;
 
-	DVGui::IntLineEdit *m_minuteFld,
-		*m_chunkSizeFld,
-		*m_iconSizeLx,
-		*m_iconSizeLy,
-		*m_viewShrink,
-		*m_viewStep,
-		*m_blanksCount,
-		*m_onionPaperThickness,
-		*m_animationStepField,
-		*m_undoMemorySize,
-		*m_xsheetStep;
+  DVGui::IntLineEdit *m_minuteFld, *m_chunkSizeFld, *m_iconSizeLx,
+      *m_iconSizeLy, *m_viewShrink, *m_viewStep, *m_blanksCount,
+      *m_onionPaperThickness, *m_animationStepField, *m_undoMemorySize,
+      *m_xsheetStep;
 
-	QPushButton *m_addLevelFormat,
-		*m_removeLevelFormat,
-		*m_editLevelFormat;
+  QPushButton *m_addLevelFormat, *m_removeLevelFormat, *m_editLevelFormat;
 
-	DVGui::CheckBox *m_inksOnly,
-		*m_enableVersionControl,
-		*m_levelsBackup,
-		*m_onionSkinVisibility;
+  DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
+      *m_onionSkinVisibility;
 
 private:
-	//QWidget* create(const QString& lbl, bool def, const char* slot);
-	void rebuildFormatsList();
+  // QWidget* create(const QString& lbl, bool def, const char* slot);
+  void rebuildFormatsList();
 
 private slots:
 
-	void onUnitChanged(int index);
-	void onCameraUnitChanged(int index);
-	void onRoomChoiceChanged(int index);
-	void onScanLevelTypeChanged(const QString &text);
-	void onMinuteChanged();
-	void onIconSizeChanged();
-	void onViewValuesChanged();
-	void onAutoExposeChanged(int index);
-	void onSubsceneFolderChanged(int index);
-	void onViewGeneratedMovieChanged(int index);
-	void onXsheetStepChanged();
-	void onXsheetAutopanChanged(int index);
-	void onIgnoreAlphaonColumn1Changed(int index);
-	void onRewindAfterPlayback(int index);
-	void onPreviewAlwaysOpenNewFlip(int index);
-	void onRasterOptimizedMemoryChanged(int index);
-	void onSaveUnpaintedInCleanupChanged(int index);
-	void onMinimizeSaveboxAfterEditing(int index);
-	void onAutoSaveChanged(int index);
-	void onDefaultViewerChanged(int index);
-	void onBlankCountChanged();
-	void onBlankColorChanged(const TPixel32 &, bool isDragging);
-	void onAskForOverrideRender(int index);
-	void onKeyframeTypeChanged(int index);
-	void onAutocreationTypeChanged(int index);
-	void onAnimationStepChanged();
-	void onOnionPaperThicknessChanged();
-	void onTranspCheckDataChanged(const TPixel32 &, bool isDragging);
-	void onOnionDataChanged(const TPixel32 &, bool isDragging);
-	void onOnionDataChanged(int);
-	void onLanguageTypeChanged(int);
-	void onStyleSheetTypeChanged(int);
-	void onUndoMemorySizeChanged();
-	void onSVNEnabledChanged(int);
-	void onAutomaticSVNRefreshChanged(int);
-	void onDragCellsBehaviourChanged(int);
-	void onLevelsBackupChanged(int);
-	void onSceneNumberingChanged(int);
-	void onChunkSizeChanged();
-	void onDefLevelTypeChanged(int);
-	void onDefLevelParameterChanged();
-	void onGetFillOnlySavebox(int index);
-	void onFitToFlipbook(int);
-	void onAddLevelFormat();
-	void onRemoveLevelFormat();
-	void onEditLevelFormat();
-	void onLevelFormatEdited();
-	void onShow0ThickLinesChanged(int);
-	void onRegionAntialiasChanged(int);
+  void onUnitChanged(int index);
+  void onCameraUnitChanged(int index);
+  void onRoomChoiceChanged(int index);
+  void onScanLevelTypeChanged(const QString &text);
+  void onMinuteChanged();
+  void onIconSizeChanged();
+  void onViewValuesChanged();
+  void onAutoExposeChanged(int index);
+  void onSubsceneFolderChanged(int index);
+  void onViewGeneratedMovieChanged(int index);
+  void onXsheetStepChanged();
+  void onXsheetAutopanChanged(int index);
+  void onIgnoreAlphaonColumn1Changed(int index);
+  void onRewindAfterPlayback(int index);
+  void onPreviewAlwaysOpenNewFlip(int index);
+  void onRasterOptimizedMemoryChanged(int index);
+  void onSaveUnpaintedInCleanupChanged(int index);
+  void onMinimizeSaveboxAfterEditing(int index);
+  void onAutoSaveChanged(int index);
+  void onDefaultViewerChanged(int index);
+  void onBlankCountChanged();
+  void onBlankColorChanged(const TPixel32 &, bool isDragging);
+  void onAskForOverrideRender(int index);
+  void onKeyframeTypeChanged(int index);
+  void onAutocreationTypeChanged(int index);
+  void onAnimationStepChanged();
+  void onOnionPaperThicknessChanged();
+  void onTranspCheckDataChanged(const TPixel32 &, bool isDragging);
+  void onOnionDataChanged(const TPixel32 &, bool isDragging);
+  void onOnionDataChanged(int);
+  void onLanguageTypeChanged(int);
+  void onStyleSheetTypeChanged(int);
+  void onUndoMemorySizeChanged();
+  void onSVNEnabledChanged(int);
+  void onAutomaticSVNRefreshChanged(int);
+  void onDragCellsBehaviourChanged(int);
+  void onLevelsBackupChanged(int);
+  void onSceneNumberingChanged(int);
+  void onChunkSizeChanged();
+  void onDefLevelTypeChanged(int);
+  void onDefLevelParameterChanged();
+  void onGetFillOnlySavebox(int index);
+  void onFitToFlipbook(int);
+  void onAddLevelFormat();
+  void onRemoveLevelFormat();
+  void onEditLevelFormat();
+  void onLevelFormatEdited();
+  void onShow0ThickLinesChanged(int);
+  void onRegionAntialiasChanged(int);
 
 #ifdef LINETEST
-	void onLineTestFpsCapture(int);
+  void onLineTestFpsCapture(int);
 #endif
 
-	void onMoveCurrentFrameChanged(int index);
-	void setViewerBgColor(const TPixel32 &, bool);
-	void setPreviewBgColor(const TPixel32 &, bool);
-	void setChessboardColor1(const TPixel32 &, bool);
-	void setChessboardColor2(const TPixel32 &, bool);
-	void onColumnIconChange(const QString &);
-	void onReplaceAfterSaveLevelAsChanged(int index);
-	void onOnionSkinVisibilityChanged(int);
-	void onActualPixelOnSceneModeChanged(int);
-	void onMultiLayerStylePickerChanged(int);
-	void onLevelNameOnEachMarkerChanged(int);
-	void onInitialLoadTlvCachingBehaviorChanged(int index);
-	void onViewerZoomCenterChanged(int index);
-	void onRemoveSceneNumberFromLoadedLevelNameChanged(int index);
-	void onShowRasterImageDarkenBlendedInViewerChanged(int index);
-	void onShowFrameNumberWithLettersChanged(int index);
-	void onPaletteTypeForRasterColorModelChanged(int index);
-	void onShowKeyframesOnCellAreaChanged(int);
+  void onMoveCurrentFrameChanged(int index);
+  void setViewerBgColor(const TPixel32 &, bool);
+  void setPreviewBgColor(const TPixel32 &, bool);
+  void setChessboardColor1(const TPixel32 &, bool);
+  void setChessboardColor2(const TPixel32 &, bool);
+  void onColumnIconChange(const QString &);
+  void onReplaceAfterSaveLevelAsChanged(int index);
+  void onOnionSkinVisibilityChanged(int);
+  void onActualPixelOnSceneModeChanged(int);
+  void onMultiLayerStylePickerChanged(int);
+  void onLevelNameOnEachMarkerChanged(int);
+  void onInitialLoadTlvCachingBehaviorChanged(int index);
+  void onViewerZoomCenterChanged(int index);
+  void onRemoveSceneNumberFromLoadedLevelNameChanged(int index);
+  void onShowRasterImageDarkenBlendedInViewerChanged(int index);
+  void onShowFrameNumberWithLettersChanged(int index);
+  void onPaletteTypeForRasterColorModelChanged(int index);
+  void onShowKeyframesOnCellAreaChanged(int);
 };
 
 //**********************************************************************************
 //    PreferencesPopup::FormatProperties  definition
 //**********************************************************************************
 
-class PreferencesPopup::FormatProperties : public DVGui::Dialog
-{
-	Q_OBJECT
+class PreferencesPopup::FormatProperties : public DVGui::Dialog {
+  Q_OBJECT
 
 public:
-	FormatProperties(PreferencesPopup *parent);
+  FormatProperties(PreferencesPopup *parent);
 
-	void setLevelFormat(const Preferences::LevelFormat &lf);
-	Preferences::LevelFormat levelFormat() const;
+  void setLevelFormat(const Preferences::LevelFormat &lf);
+  Preferences::LevelFormat levelFormat() const;
 
 private:
-	QComboBox *m_dpiPolicy;
+  QComboBox *m_dpiPolicy;
 
-	DVGui::LineEdit *m_name,
-		*m_regExp;
+  DVGui::LineEdit *m_name, *m_regExp;
 
-	DVGui::DoubleLineEdit *m_dpi;
+  DVGui::DoubleLineEdit *m_dpi;
 
-	DVGui::IntLineEdit *m_priority,
-		*m_subsampling,
-		*m_antialias;
+  DVGui::IntLineEdit *m_priority, *m_subsampling, *m_antialias;
 
-	DVGui::CheckBox *m_premultiply,
-		*m_whiteTransp,
-		*m_doAntialias;
+  DVGui::CheckBox *m_premultiply, *m_whiteTransp, *m_doAntialias;
 
 private slots:
 
-	void updateEnabledStatus();
+  void updateEnabledStatus();
 };
 
-#endif // PREFERENCESPOPUP_H
+#endif  // PREFERENCESPOPUP_H

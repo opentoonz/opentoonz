@@ -26,140 +26,142 @@ using namespace PaletteViewerGUI;
 
 //-----------------------------------------------------------------------------
 
-class DVAPI ChangeStyleCommand
-{
+class DVAPI ChangeStyleCommand {
 public:
-	ChangeStyleCommand() {}
-	virtual ~ChangeStyleCommand() {}
-	virtual bool onStyleChanged() = 0;
+  ChangeStyleCommand() {}
+  virtual ~ChangeStyleCommand() {}
+  virtual bool onStyleChanged() = 0;
 };
 
-//DAFARE: non mi piace, forse e' meglio un comando esterno!!
+// DAFARE: non mi piace, forse e' meglio un comando esterno!!
 class TXsheetHandle;
 
 //=============================================================================
 // PaletteViewer
 //-----------------------------------------------------------------------------
 
-class DVAPI PaletteViewer : public QFrame
-{
-	Q_OBJECT
+class DVAPI PaletteViewer : public QFrame {
+  Q_OBJECT
 
 public:
-	PaletteViewer(QWidget *parent = 0, PaletteViewType viewType = LEVEL_PALETTE,
-				  bool hasSaveToolBar = true, bool hasPageCommand = true, bool hasPasteColors = true);
-	~PaletteViewer();
+  PaletteViewer(QWidget *parent = 0, PaletteViewType viewType = LEVEL_PALETTE,
+                bool hasSaveToolBar = true, bool hasPageCommand = true,
+                bool hasPasteColors = true);
+  ~PaletteViewer();
 
-	const TPaletteHandle *getPaletteHandle() const { return m_paletteHandle; }
-	void setPaletteHandle(TPaletteHandle *paletteHandle);
+  const TPaletteHandle *getPaletteHandle() const { return m_paletteHandle; }
+  void setPaletteHandle(TPaletteHandle *paletteHandle);
 
-	const TFrameHandle *getFrameHandle() const { return m_frameHandle; }
-	void setFrameHandle(TFrameHandle *frameHandle);
+  const TFrameHandle *getFrameHandle() const { return m_frameHandle; }
+  void setFrameHandle(TFrameHandle *frameHandle);
 
-	const TXsheetHandle *getXsheetHandle() const { return m_xsheetHandle; }
-	void setXsheetHandle(TXsheetHandle *xsheetHandle);
+  const TXsheetHandle *getXsheetHandle() const { return m_xsheetHandle; }
+  void setXsheetHandle(TXsheetHandle *xsheetHandle);
 
-	// for clearing level cache after "paste style" command called from style selection
-	void setLevelHandle(TXshLevelHandle *levelHandle);
+  // for clearing level cache after "paste style" command called from style
+  // selection
+  void setLevelHandle(TXshLevelHandle *levelHandle);
 
-	TPalette *getPalette();
+  TPalette *getPalette();
 
-	void setChangeStyleCommand(ChangeStyleCommand *); // gets ownership
-	ChangeStyleCommand *getChangeStyleCommand() const { return m_changeStyleCommand; }
+  void setChangeStyleCommand(ChangeStyleCommand *);  // gets ownership
+  ChangeStyleCommand *getChangeStyleCommand() const {
+    return m_changeStyleCommand;
+  }
 
-	int getViewMode() const { return m_pageViewer->getViewMode(); }
-	void setViewMode(int mode) { m_pageViewer->setViewMode((PaletteViewerGUI::PageViewer::ViewMode)mode); }
+  int getViewMode() const { return m_pageViewer->getViewMode(); }
+  void setViewMode(int mode) {
+    m_pageViewer->setViewMode((PaletteViewerGUI::PageViewer::ViewMode)mode);
+  }
 
-	void updateView();
+  void updateView();
 
-	void enableSaveAction(bool enable);
-
-protected:
-	TPaletteHandle *m_paletteHandle;
-	TFrameHandle *m_frameHandle;
-	TXsheetHandle *m_xsheetHandle;
-
-	QScrollArea *m_pageViewerScrollArea;
-	PaletteViewerGUI::PageViewer *m_pageViewer;
-	TabBarContainter *m_tabBarContainer;
-	PaletteTabBar *m_pagesBar;
-
-	QToolBar *m_paletteToolBar;
-	QToolBar *m_savePaletteToolBar;
-
-	int m_indexPageToDelete;
-
-	PaletteViewType m_viewType;
-
-	PaletteKeyframeNavigator *m_keyFrameButton;
-
-	ChangeStyleCommand *m_changeStyleCommand;
-
-	bool m_hasSavePaletteToolbar;
-	bool m_hasPageCommand;
-
-	bool m_isSaveActionEnabled;
-
-	QAction *m_lockPaletteAction;
-	QToolButton *m_lockPaletteToolButton;
+  void enableSaveAction(bool enable);
 
 protected:
-	void createTabBar();
+  TPaletteHandle *m_paletteHandle;
+  TFrameHandle *m_frameHandle;
+  TXsheetHandle *m_xsheetHandle;
 
-	void createToolBar()
-	{
-		createPaletteToolBar();
-		createSavePaletteToolBar();
-	}
-	void createPaletteToolBar();
-	void createSavePaletteToolBar();
+  QScrollArea *m_pageViewerScrollArea;
+  PaletteViewerGUI::PageViewer *m_pageViewer;
+  TabBarContainter *m_tabBarContainer;
+  PaletteTabBar *m_pagesBar;
 
-	void updateTabBar();
+  QToolBar *m_paletteToolBar;
+  QToolBar *m_savePaletteToolBar;
 
-	void updateToolBar()
-	{
-		updatePaletteToolBar();
-		updateSavePaletteToolBar();
-	}
-	void updatePaletteToolBar();
-	void updateSavePaletteToolBar();
+  int m_indexPageToDelete;
 
-	void resizeEvent(QResizeEvent *event);
-	void contextMenuEvent(QContextMenuEvent *event);
+  PaletteViewType m_viewType;
 
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
+  PaletteKeyframeNavigator *m_keyFrameButton;
 
-	void dragEnterEvent(QDragEnterEvent *event);
-	void dropEvent(QDropEvent *event);
+  ChangeStyleCommand *m_changeStyleCommand;
 
-	void clearStyleSelection();
+  bool m_hasSavePaletteToolbar;
+  bool m_hasPageCommand;
+
+  bool m_isSaveActionEnabled;
+
+  QAction *m_lockPaletteAction;
+  QToolButton *m_lockPaletteToolButton;
+
+protected:
+  void createTabBar();
+
+  void createToolBar() {
+    createPaletteToolBar();
+    createSavePaletteToolBar();
+  }
+  void createPaletteToolBar();
+  void createSavePaletteToolBar();
+
+  void updateTabBar();
+
+  void updateToolBar() {
+    updatePaletteToolBar();
+    updateSavePaletteToolBar();
+  }
+  void updatePaletteToolBar();
+  void updateSavePaletteToolBar();
+
+  void resizeEvent(QResizeEvent *event);
+  void contextMenuEvent(QContextMenuEvent *event);
+
+  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *);
+
+  void dragEnterEvent(QDragEnterEvent *event);
+  void dropEvent(QDropEvent *event);
+
+  void clearStyleSelection();
 
 protected slots:
 
-	void setPageView(int currentIndexPage);
+  void setPageView(int currentIndexPage);
 
-	void addNewPage();
-	void addNewColor();
-	void deletePage();
+  void addNewPage();
+  void addNewColor();
+  void deletePage();
 
-	void saveStudioPalette();
+  void saveStudioPalette();
 
-	void onColorStyleSwitched();
-	void onPaletteChanged();
-	void onPaletteSwitched();
-	void onFrameSwitched();
-	void onTabTextChanged(int tabIndex);
-	void onViewMode(QAction *);
+  void onColorStyleSwitched();
+  void onPaletteChanged();
+  void onPaletteSwitched();
+  void onFrameSwitched();
+  void onTabTextChanged(int tabIndex);
+  void onViewMode(QAction *);
 
-	void changeWindowTitle();
+  void changeWindowTitle();
 
-	void movePage(int srcIndex, int dstIndex);
+  void movePage(int srcIndex, int dstIndex);
 
-	void startDragDrop();
+  void startDragDrop();
 
-	void onNameDisplayMode(QAction *);
-	void setIsLocked(bool lock);
+  void onNameDisplayMode(QAction *);
+  void setIsLocked(bool lock);
 };
 
-#endif // PALETTEVIEWER_H
+#endif  // PALETTEVIEWER_H

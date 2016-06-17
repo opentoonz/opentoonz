@@ -28,38 +28,33 @@
             skeleton containing the indexed vertexes.
 */
 
-class DVAPI PlasticVertexSelection : public MultipleSelection<int>
-{
-	typedef MultipleSelection<int> base_type;
+class DVAPI PlasticVertexSelection : public MultipleSelection<int> {
+  typedef MultipleSelection<int> base_type;
 
-	int m_skelId; //!< Skeleton Id containing the vertex
+  int m_skelId;  //!< Skeleton Id containing the vertex
 
 public:
-	PlasticVertexSelection(int vIdx = -1, int skelId = -1)
-		: m_skelId(skelId)
-	{
-		if (vIdx >= 0)
-			m_objects.push_back(vIdx);
-	}
+  PlasticVertexSelection(int vIdx = -1, int skelId = -1) : m_skelId(skelId) {
+    if (vIdx >= 0) m_objects.push_back(vIdx);
+  }
 
-	//! Constructs from a list of vertex indices
-	//! \warning The user is responsible for ensuring that the list #does not contain negative indices#
-	PlasticVertexSelection(const std::vector<int> &vIdxs, int skelId = -1)
-		: base_type(vIdxs), m_skelId(skelId) {}
+  //! Constructs from a list of vertex indices
+  //! \warning The user is responsible for ensuring that the list #does not
+  //! contain negative indices#
+  PlasticVertexSelection(const std::vector<int> &vIdxs, int skelId = -1)
+      : base_type(vIdxs), m_skelId(skelId) {}
 
-	void selectNone()
-	{
-		m_skelId = -1;
-		base_type::selectNone();
-	}
+  void selectNone() {
+    m_skelId = -1;
+    base_type::selectNone();
+  }
 
-	operator int() const
-	{
-		return (objects().size() == 1) ? objects().front() : -1;
-	}
+  operator int() const {
+    return (objects().size() == 1) ? objects().front() : -1;
+  }
 
-	int skeletonId() const { return m_skelId; }
-	int &skeletonId() { return m_skelId; }
+  int skeletonId() const { return m_skelId; }
+  int &skeletonId() { return m_skelId; }
 };
 
-#endif // PLASTICVERTEXSELECTION_H
+#endif  // PLASTICVERTEXSELECTION_H

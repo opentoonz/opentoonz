@@ -12,8 +12,7 @@
   \brief    Contains utilities to be used with Boost.Range objects.
 */
 
-namespace tcg
-{
+namespace tcg {
 
 //***************************************************************************
 //    Range  utilities
@@ -27,11 +26,9 @@ namespace tcg
 */
 
 template <typename C, typename Rng>
-C &substitute(C &c, const Rng &rng)
-{
-	C(boost::begin(rng), boost::end(rng))
-		.swap(c);
-	return c;
+C &substitute(C &c, const Rng &rng) {
+  C(boost::begin(rng), boost::end(rng)).swap(c);
+  return c;
 }
 
 //------------------------------------------------------------------------
@@ -45,12 +42,11 @@ C &substitute(C &c, const Rng &rng)
 */
 
 template <typename C, typename Rng>
-C &insert2(C &c, const Rng &rng)
-{
-	c.insert(boost::begin(rng), boost::end(rng));
-	return c;
+C &insert2(C &c, const Rng &rng) {
+  c.insert(boost::begin(rng), boost::end(rng));
+  return c;
 }
 
-} // namespace tcg
+}  // namespace tcg
 
-#endif // TCG_BOOST_RANGE_UTILITY_H
+#endif  // TCG_BOOST_RANGE_UTILITY_H

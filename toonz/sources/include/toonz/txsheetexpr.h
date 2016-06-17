@@ -16,7 +16,7 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class TXsheet;
 class TDoubleParam;
 class TExpression;
@@ -25,4 +25,4 @@ DVAPI TSyntax::Grammar *createXsheetGrammar(TXsheet *xsh);
 DVAPI bool dependsOn(TExpression &expr, TDoubleParam *possiblyDependentParam);
 DVAPI bool dependsOn(TDoubleParam *param, TDoubleParam *possiblyDependentParam);
 
-#endif //XSHEETEXPR_INCLUDED
+#endif  // XSHEETEXPR_INCLUDED

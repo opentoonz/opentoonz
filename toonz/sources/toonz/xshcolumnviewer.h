@@ -15,8 +15,7 @@ class TStageObjectId;
 class TXshColumn;
 
 //=============================================================================
-namespace XsheetGUI
-{
+namespace XsheetGUI {
 
 class DragTool;
 
@@ -24,233 +23,226 @@ class DragTool;
 // MotionPathMenu
 //-----------------------------------------------------------------------------
 
-class MotionPathMenu : public QWidget
-{
-	Q_OBJECT
+class MotionPathMenu : public QWidget {
+  Q_OBJECT
 
-	QRect m_mDeleteRect;
-	QRect m_mNormalRect;
-	QRect m_mRotateRect;
-	QPoint m_pos;
+  QRect m_mDeleteRect;
+  QRect m_mNormalRect;
+  QRect m_mRotateRect;
+  QPoint m_pos;
 
 public:
 #if QT_VERSION >= 0x050500
-	MotionPathMenu(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+  MotionPathMenu(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 #else
-	MotionPathMenu(QWidget *parent = 0, Qt::WFlags flags = 0);
+  MotionPathMenu(QWidget *parent = 0, Qt::WFlags flags = 0);
 #endif
 
-	~MotionPathMenu();
+  ~MotionPathMenu();
 
 protected:
-	void paintEvent(QPaintEvent *);
-	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	void leaveEvent(QEvent *event);
+  void paintEvent(QPaintEvent *);
+  void mousePressEvent(QMouseEvent *event);
+  void mouseMoveEvent(QMouseEvent *event);
+  void mouseReleaseEvent(QMouseEvent *event);
+  void leaveEvent(QEvent *event);
 };
 
 //=============================================================================
 // ChangeParentObjectWidget
 //-----------------------------------------------------------------------------
 
-class ChangeObjectWidget : public QListWidget
-{
-	Q_OBJECT
+class ChangeObjectWidget : public QListWidget {
+  Q_OBJECT
 
 protected:
-	TObjectHandle *m_objectHandle;
-	TXsheetHandle *m_xsheetHandle;
-	int m_width;
+  TObjectHandle *m_objectHandle;
+  TXsheetHandle *m_xsheetHandle;
+  int m_width;
 
 public:
-	ChangeObjectWidget(QWidget *parent = 0);
-	~ChangeObjectWidget();
+  ChangeObjectWidget(QWidget *parent = 0);
+  ~ChangeObjectWidget();
 
-	void show(const QPoint &pos);
-	void setObjectHandle(TObjectHandle *objectHandle);
-	void setXsheetHandle(TXsheetHandle *xsheetHandle);
+  void show(const QPoint &pos);
+  void setObjectHandle(TObjectHandle *objectHandle);
+  void setXsheetHandle(TXsheetHandle *xsheetHandle);
 
-	virtual void refresh(){};
+  virtual void refresh(){};
 
 protected:
-	void mouseMoveEvent(QMouseEvent *event);
-	void focusOutEvent(QFocusEvent *e);
-	void focusInEvent(QFocusEvent *e) {}
-	void selectCurrent(const QString &text);
+  void mouseMoveEvent(QMouseEvent *event);
+  void focusOutEvent(QFocusEvent *e);
+  void focusInEvent(QFocusEvent *e) {}
+  void selectCurrent(const QString &text);
 
 protected slots:
-	virtual void onTextChanged(const QString &) = 0;
+  virtual void onTextChanged(const QString &) = 0;
 };
 
 //=============================================================================
 // ChangeObjectParent
 //-----------------------------------------------------------------------------
 
-class ChangeObjectParent : public ChangeObjectWidget
-{
-	Q_OBJECT
+class ChangeObjectParent : public ChangeObjectWidget {
+  Q_OBJECT
 
 public:
-	ChangeObjectParent(QWidget *parent = 0);
-	~ChangeObjectParent();
+  ChangeObjectParent(QWidget *parent = 0);
+  ~ChangeObjectParent();
 
-	void refresh();
+  void refresh();
 
 protected slots:
-	void onTextChanged(const QString &);
+  void onTextChanged(const QString &);
 };
 
 //=============================================================================
 // ChangeObjectHandle
 //-----------------------------------------------------------------------------
 
-class ChangeObjectHandle : public ChangeObjectWidget
-{
-	Q_OBJECT
+class ChangeObjectHandle : public ChangeObjectWidget {
+  Q_OBJECT
 
 public:
-	ChangeObjectHandle(QWidget *parent = 0);
-	~ChangeObjectHandle();
+  ChangeObjectHandle(QWidget *parent = 0);
+  ~ChangeObjectHandle();
 
-	void refresh();
+  void refresh();
 
 protected slots:
-	void onTextChanged(const QString &);
+  void onTextChanged(const QString &);
 };
 
 //=============================================================================
 // RenameColumnField
 //-----------------------------------------------------------------------------
 
-class RenameColumnField : public QLineEdit
-{
-	Q_OBJECT
+class RenameColumnField : public QLineEdit {
+  Q_OBJECT
 
-	int m_col;
+  int m_col;
 
-	TXsheetHandle *m_xsheetHandle;
+  TXsheetHandle *m_xsheetHandle;
 
 public:
-	RenameColumnField(QWidget *parent, XsheetViewer *viewer);
-	~RenameColumnField() {}
+  RenameColumnField(QWidget *parent, XsheetViewer *viewer);
+  ~RenameColumnField() {}
 
-	void setXsheetHandle(TXsheetHandle *xsheetHandle) { m_xsheetHandle = xsheetHandle; }
+  void setXsheetHandle(TXsheetHandle *xsheetHandle) {
+    m_xsheetHandle = xsheetHandle;
+  }
 
-	void show(QPoint pos, int col);
+  void show(QPoint pos, int col);
 
 protected:
-	void focusOutEvent(QFocusEvent *);
+  void focusOutEvent(QFocusEvent *);
 
 protected slots:
-	void renameColumn();
+  void renameColumn();
 };
 
 //=============================================================================
 // ColumnArea
 //-----------------------------------------------------------------------------
 
-class ColumnTransparencyPopup : public QWidget
-{
-	Q_OBJECT
+class ColumnTransparencyPopup : public QWidget {
+  Q_OBJECT
 
-	QSlider *m_slider;
-	QLineEdit *m_value;
-	TXshColumn *m_column;
+  QSlider *m_slider;
+  QLineEdit *m_value;
+  TXshColumn *m_column;
 
 public:
-	ColumnTransparencyPopup(QWidget *parent);
-	void setColumn(TXshColumn *column);
+  ColumnTransparencyPopup(QWidget *parent);
+  void setColumn(TXshColumn *column);
 
 protected:
-	//void mouseMoveEvent ( QMouseEvent * e );
-	void mouseReleaseEvent(QMouseEvent *e);
+  // void mouseMoveEvent ( QMouseEvent * e );
+  void mouseReleaseEvent(QMouseEvent *e);
 
 protected slots:
-	void onSliderReleased();
-	void onSliderChange(int val);
-	void onSliderValueChanged(int);
-	void onValueChanged(const QString &);
+  void onSliderReleased();
+  void onSliderChange(int val);
+  void onSliderValueChanged(int);
+  void onValueChanged(const QString &);
 };
 
-//!La classe si occupa della visualizzazione dell'area che gestisce le colonne.
-class ColumnArea : public QWidget
-{
-	Q_OBJECT
+//! La classe si occupa della visualizzazione dell'area che gestisce le colonne.
+class ColumnArea : public QWidget {
+  Q_OBJECT
 
-	enum { ToggleTransparency = 1,
-		   TogglePreviewVisible,
-		   ToggleLock };
+  enum { ToggleTransparency = 1, TogglePreviewVisible, ToggleLock };
 
-	ColumnTransparencyPopup *m_columnTransparencyPopup;
-	QTimer *m_transparencyPopupTimer;
-	int m_doOnRelease;
-	XsheetViewer *m_viewer;
-	int m_col;
-	QRect m_indexBox;
-	QRect m_tabBox;
-	QRect m_nameBox;
-	QRect m_linkBox;
-	QRect m_prevViewBox;
-	QRect m_tableViewBox;
-	QRect m_lockBox;
+  ColumnTransparencyPopup *m_columnTransparencyPopup;
+  QTimer *m_transparencyPopupTimer;
+  int m_doOnRelease;
+  XsheetViewer *m_viewer;
+  int m_col;
+  QRect m_indexBox;
+  QRect m_tabBox;
+  QRect m_nameBox;
+  QRect m_linkBox;
+  QRect m_prevViewBox;
+  QRect m_tableViewBox;
+  QRect m_lockBox;
 
-	bool m_isPanning;
+  bool m_isPanning;
 
-	QPoint m_pos;
-	QString m_tooltip;
+  QPoint m_pos;
+  QString m_tooltip;
 
-	RenameColumnField *m_renameColumnField;
+  RenameColumnField *m_renameColumnField;
 #ifndef LINETEST
-	ChangeObjectParent *m_changeObjectParent;
-	ChangeObjectHandle *m_changeObjectHandle;
+  ChangeObjectParent *m_changeObjectParent;
+  ChangeObjectHandle *m_changeObjectHandle;
 #else
-	MotionPathMenu *m_motionPathMenu;
+  MotionPathMenu *m_motionPathMenu;
 #endif
 
-	QAction *m_subsampling1;
-	QAction *m_subsampling2;
-	QAction *m_subsampling3;
-	QAction *m_subsampling4;
+  QAction *m_subsampling1;
+  QAction *m_subsampling2;
+  QAction *m_subsampling3;
+  QAction *m_subsampling4;
 
-	DragTool *getDragTool() const;
-	void setDragTool(DragTool *dragTool);
-	void startTransparencyPopupTimer(QMouseEvent *e);
+  DragTool *getDragTool() const;
+  void setDragTool(DragTool *dragTool);
+  void startTransparencyPopupTimer(QMouseEvent *e);
 
 public:
 #if QT_VERSION >= 0x050500
-	ColumnArea(XsheetViewer *parent, Qt::WindowFlags flags = 0);
+  ColumnArea(XsheetViewer *parent, Qt::WindowFlags flags = 0);
 #else
-	ColumnArea(XsheetViewer *parent, Qt::WFlags flags = 0);
+  ColumnArea(XsheetViewer *parent, Qt::WFlags flags = 0);
 #endif
-	~ColumnArea();
+  ~ColumnArea();
 
-	void drawLevelColumnHead(QPainter &p, int col);
-	void drawSoundColumnHead(QPainter &p, int col);
-	void drawPaletteColumnHead(QPainter &p, int col);
-	void drawSoundTextColumnHead(QPainter &p, int col);
+  void drawLevelColumnHead(QPainter &p, int col);
+  void drawSoundColumnHead(QPainter &p, int col);
+  void drawPaletteColumnHead(QPainter &p, int col);
+  void drawSoundTextColumnHead(QPainter &p, int col);
 
-	QPixmap getColumnIcon(int columnIndex);
+  QPixmap getColumnIcon(int columnIndex);
 
 protected:
-	void select(int columnIndex, QMouseEvent *event);
+  void select(int columnIndex, QMouseEvent *event);
 
-	void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *);
 
-	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	void mouseDoubleClickEvent(QMouseEvent *event);
-	void contextMenuEvent(QContextMenuEvent *event);
-	bool event(QEvent *event);
+  void mousePressEvent(QMouseEvent *event);
+  void mouseMoveEvent(QMouseEvent *event);
+  void mouseReleaseEvent(QMouseEvent *event);
+  void mouseDoubleClickEvent(QMouseEvent *event);
+  void contextMenuEvent(QContextMenuEvent *event);
+  bool event(QEvent *event);
 
 protected slots:
-	void onSubSampling(QAction *);
-	void openTransparencyPopup();
+  void onSubSampling(QAction *);
+  void openTransparencyPopup();
 };
 
 //-----------------------------------------------------------------------------
-} // namespace XsheetGUI;
+}  // namespace XsheetGUI;
 //-----------------------------------------------------------------------------
 
-#endif // XSHCOLUMNVIEWER_H
+#endif  // XSHCOLUMNVIEWER_H

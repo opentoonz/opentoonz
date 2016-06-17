@@ -17,21 +17,19 @@
 
 //-------------------------------------------------------------------
 
-namespace TDebugMessage
-{
+namespace TDebugMessage {
 
-class Manager
-{
+class Manager {
 public:
-	virtual std::ostream &getStream() = 0;
-	virtual void flush(int code = 0) = 0;
-	virtual ~Manager() {}
+  virtual std::ostream &getStream() = 0;
+  virtual void flush(int code = 0) = 0;
+  virtual ~Manager() {}
 };
 
 DVAPI void setManager(Manager *manager);
 DVAPI std::ostream &getStream();
 DVAPI void flush(int code = 0);
 
-} // namespace
+}  // namespace
 
 #endif

@@ -18,13 +18,14 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-namespace TColorUtils
-{
+namespace TColorUtils {
 
 /*-- 似ている色をまとめて1つのStyleにする --*/
-DVAPI void buildPalette(std::set<TPixel32> &palette, const TRaster32P &raster, int maxColorCount);
+DVAPI void buildPalette(std::set<TPixel32> &palette, const TRaster32P &raster,
+                        int maxColorCount);
 /*-- 全ての異なるピクセルの色を別のStyleにする --*/
-DVAPI void buildPrecisePalette(std::set<TPixel32> &palette, const TRaster32P &raster, int maxColorCount);
+DVAPI void buildPrecisePalette(std::set<TPixel32> &palette,
+                               const TRaster32P &raster, int maxColorCount);
 }
 
 //------------------------------------------------------------------------------

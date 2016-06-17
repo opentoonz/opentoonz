@@ -22,7 +22,7 @@
 /*
 //=============================================================================
 namespace {
-	QSet<ViewerPopup*> openViewers;
+        QSet<ViewerPopup*> openViewers;
 }
 //-----------------------------------------------------------------------------
 
@@ -33,7 +33,8 @@ namespace {
 ViewerPopup::ViewerPopup(QWidget *parent , Qt::WFlags flags)
 : FlipBook(parent, flags, QString(tr("FlipBook")))
 {
-  connect(parentWidget(), SIGNAL(visibilityChanged(bool)), this, SLOT(onVisibilityChange(bool)));
+  connect(parentWidget(), SIGNAL(visibilityChanged(bool)), this,
+SLOT(onVisibilityChange(bool)));
   openViewers.insert(this);
 }
 
@@ -41,20 +42,20 @@ ViewerPopup::ViewerPopup(QWidget *parent , Qt::WFlags flags)
 
 //-----------------------------------------------------------------------------
 
-void ViewerPopup::onVisibilityChange (bool visible) 
+void ViewerPopup::onVisibilityChange (bool visible)
 {
-	if (!visible) 
-		openViewers.remove(this);
-	else if (openViewers.empty())
-		openViewers.insert(this);  
+        if (!visible)
+                openViewers.remove(this);
+        else if (openViewers.empty())
+                openViewers.insert(this);
 }
 
 
 
 TFilePath getFirstFullPath(const TFilePath &levelPath)
 {
-	TLevelReaderP lr = TLevelReaderP(levelPath);
-  if (!lr) return TFilePath();    
+        TLevelReaderP lr = TLevelReaderP(levelPath);
+  if (!lr) return TFilePath();
   TLevelP level =  lr->loadInfo();
   if(!level || level->getFrameCount()==0) return TFilePath();
   TLevel::Iterator it = level->begin();
@@ -73,4 +74,5 @@ TFilePath getFirstFullPath(const TFilePath &levelPath)
 // openFileViewerCommand
 //-----------------------------------------------------------------------------
 
-OpenFloatingPanel openFileViewerCommand(MI_OpenFileViewer, "FlipBook", QObject::tr("FlipBook"));
+OpenFloatingPanel openFileViewerCommand(MI_OpenFileViewer, "FlipBook",
+                                        QObject::tr("FlipBook"));

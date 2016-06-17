@@ -17,112 +17,97 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::StrokeParametricDeformer::StrokeParametricDeformer(double actionLenght,
-															 double startParameter,
-															 TStroke *s,
-															 Potential *pot)
-	: startParameter_(startParameter), actionLenght_(actionLenght), vx_(1.0), vy_(1.0), pot_(0)
-{
-	diff_ = 0.001;
+ToonzExt::StrokeParametricDeformer::StrokeParametricDeformer(
+    double actionLenght, double startParameter, TStroke *s, Potential *pot)
+    : startParameter_(startParameter)
+    , actionLenght_(actionLenght)
+    , vx_(1.0)
+    , vy_(1.0)
+    , pot_(0) {
+  diff_ = 0.001;
 
-	try {
-		ref_copy_ = new TStroke(*s);
-	} catch (std::bad_alloc &) {
-		throw std::invalid_argument("Not possible to have a copy of stroke!!!");
-	}
+  try {
+    ref_copy_ = new TStroke(*s);
+  } catch (std::bad_alloc &) {
+    throw std::invalid_argument("Not possible to have a copy of stroke!!!");
+  }
 
-	assert(0.0 <= startParameter_ &&
-		   startParameter_ <= 1.0);
+  assert(0.0 <= startParameter_ && startParameter_ <= 1.0);
 
-	//double
-	//  max_length = s->getLength();
+  // double
+  //  max_length = s->getLength();
 
-	//  if( actionLenght == -1 )
-	//  {
-	//    assert(false && "Rispristina la vecchia gestione");
-	//    actionLenght_ = 2.0 * max_length;
-	//  }
-	//  else
-	//  {
-	assert(0.0 <= actionLenght_);
-	// && actionLenght_ <= max_length );
+  //  if( actionLenght == -1 )
+  //  {
+  //    assert(false && "Rispristina la vecchia gestione");
+  //    actionLenght_ = 2.0 * max_length;
+  //  }
+  //  else
+  //  {
+  assert(0.0 <= actionLenght_);
+  // && actionLenght_ <= max_length );
 
-	if (0.0 > actionLenght_)
-		actionLenght_ = 0.0;
-	//else if ( actionLenght_ > max_length )
-	//  actionLenght_ = max_length;
-	//}
+  if (0.0 > actionLenght_) actionLenght_ = 0.0;
+  // else if ( actionLenght_ > max_length )
+  //  actionLenght_ = max_length;
+  //}
 
-	pot_ = pot;
-	if (!pot_)
-		throw std::invalid_argument("Not Possible to have a ref of Potential!!!");
+  pot_ = pot;
+  if (!pot_)
+    throw std::invalid_argument("Not Possible to have a ref of Potential!!!");
 
-	pot_->setParameters(ref_copy_,
-						startParameter_,
-						actionLenght_);
-	assert(pot_);
-	startLenght_ = startParameter_;
+  pot_->setParameters(ref_copy_, startParameter_, actionLenght_);
+  assert(pot_);
+  startLenght_ = startParameter_;
 }
 
 //-----------------------------------------------------------------------------
 
-void ToonzExt::StrokeParametricDeformer::setMouseMove(double vx,
-													  double vy)
-{
-	vx_ = vx;
-	vy_ = vy;
+void ToonzExt::StrokeParametricDeformer::setMouseMove(double vx, double vy) {
+  vx_ = vx;
+  vy_ = vy;
 }
 
 //-----------------------------------------------------------------------------
 
-ToonzExt::StrokeParametricDeformer::~StrokeParametricDeformer()
-{
-	delete pot_;
-	delete ref_copy_;
+ToonzExt::StrokeParametricDeformer::~StrokeParametricDeformer() {
+  delete pot_;
+  delete ref_copy_;
 }
 
 //-----------------------------------------------------------------------------
 
-TThickPoint
-ToonzExt::StrokeParametricDeformer::getDisplacement(const TStroke &stroke,
-													double w) const
-{
-	// conversion in absolute system for shape deformation
-	double val = pot_->value(w);
+TThickPoint ToonzExt::StrokeParametricDeformer::getDisplacement(
+    const TStroke &stroke, double w) const {
+  // conversion in absolute system for shape deformation
+  double val = pot_->value(w);
 
-	assert(val >= 0);
+  assert(val >= 0);
 
-	// amplify movement
-	return TThickPoint(vx_ * val, vy_ * val, 0.0);
+  // amplify movement
+  return TThickPoint(vx_ * val, vy_ * val, 0.0);
 }
 
 //-----------------------------------------------------------------------------
 
-TThickPoint
-ToonzExt::StrokeParametricDeformer::getDisplacementForControlPoint(
-	const TStroke &stroke,
-	UINT n) const
-{
-	double w = stroke.getParameterAtControlPoint(n);
-	return this->getDisplacement(stroke, w);
+TThickPoint ToonzExt::StrokeParametricDeformer::getDisplacementForControlPoint(
+    const TStroke &stroke, UINT n) const {
+  double w = stroke.getParameterAtControlPoint(n);
+  return this->getDisplacement(stroke, w);
 }
 
 //-----------------------------------------------------------------------------
 
 TThickPoint
 ToonzExt::StrokeParametricDeformer::getDisplacementForControlPointLen(
-	const TStroke &stroke,
-	double cpLen) const
-{
-	return this->getDisplacement(stroke, cpLen);
+    const TStroke &stroke, double cpLen) const {
+  return this->getDisplacement(stroke, cpLen);
 }
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::StrokeParametricDeformer::getDelta(const TStroke &stroke,
-											 double w) const
-{
+double ToonzExt::StrokeParametricDeformer::getDelta(const TStroke &stroke,
+                                                    double w) const {
 #if 0
   double  w0 = w;
   if(w0 == 1.0)
@@ -161,34 +146,28 @@ ToonzExt::StrokeParametricDeformer::getDelta(const TStroke &stroke,
   //return pot_->gradient(w);
   */
 #endif
-	return this->getDisplacement(stroke, w).y;
+  return this->getDisplacement(stroke, w).y;
 }
 
 //-----------------------------------------------------------------------------
 
-double
-ToonzExt::StrokeParametricDeformer::getMaxDiff() const
-{
-	return diff_;
-}
+double ToonzExt::StrokeParametricDeformer::getMaxDiff() const { return diff_; }
 
 //-----------------------------------------------------------------------------
 
-void ToonzExt::StrokeParametricDeformer::getRange(double &from,
-												  double &to)
-{
-	double x = ref_copy_->getLength(startParameter_);
-	double delta = x - actionLenght_ * 0.5;
-	if (delta > 0)
-		from = ref_copy_->getParameterAtLength(delta);
-	else
-		from = 0.0;
+void ToonzExt::StrokeParametricDeformer::getRange(double &from, double &to) {
+  double x     = ref_copy_->getLength(startParameter_);
+  double delta = x - actionLenght_ * 0.5;
+  if (delta > 0)
+    from = ref_copy_->getParameterAtLength(delta);
+  else
+    from = 0.0;
 
-	delta = x + actionLenght_ * 0.5;
-	if (delta < ref_copy_->getLength())
-		to = ref_copy_->getParameterAtLength(delta);
-	else
-		to = 1.0;
+  delta = x + actionLenght_ * 0.5;
+  if (delta < ref_copy_->getLength())
+    to = ref_copy_->getParameterAtLength(delta);
+  else
+    to = 1.0;
 }
 
 //-----------------------------------------------------------------------------

@@ -19,9 +19,9 @@ class SelectionTool;
 //-----------------------------------------------------------------------------
 
 enum SelectionType {
-	RECT_SELECTION_IDX,
-	FREEHAND_SELECTION_IDX,
-	POLYLINE_SELECTION_IDX,
+  RECT_SELECTION_IDX,
+  FREEHAND_SELECTION_IDX,
+  POLYLINE_SELECTION_IDX,
 };
 
 #define RECT_SELECTION L"Rectangular"
@@ -32,82 +32,83 @@ enum SelectionType {
 // FreeDeformer
 //-----------------------------------------------------------------------------
 
-class FreeDeformer
-{
+class FreeDeformer {
 protected:
-	TPointD m_originalP00;
-	TPointD m_originalP11;
+  TPointD m_originalP00;
+  TPointD m_originalP11;
 
-	std::vector<TPointD> m_newPoints;
+  std::vector<TPointD> m_newPoints;
 
 public:
-	FreeDeformer() {}
-	virtual ~FreeDeformer() {}
+  FreeDeformer() {}
+  virtual ~FreeDeformer() {}
 
-	/*! Set \b index point to \b p, with index from 0 to 3. */
-	virtual void setPoint(int index, const TPointD &p) = 0;
-	/*! Helper function. */
-	virtual void setPoints(const TPointD &p0, const TPointD &p1, const TPointD &p2, const TPointD &p3) = 0;
-	virtual void deformImage() = 0;
+  /*! Set \b index point to \b p, with index from 0 to 3. */
+  virtual void setPoint(int index, const TPointD &p) = 0;
+  /*! Helper function. */
+  virtual void setPoints(const TPointD &p0, const TPointD &p1,
+                         const TPointD &p2, const TPointD &p3) = 0;
+  virtual void deformImage() = 0;
 };
 
 //=============================================================================
 // DragSelectionTool
 //-----------------------------------------------------------------------------
-namespace DragSelectionTool
-{
+namespace DragSelectionTool {
 //-----------------------------------------------------------------------------
 
 //=============================================================================
 // FourPoints
 //-----------------------------------------------------------------------------
 
-class FourPoints
-{
-	TPointD m_p00, m_p01, m_p10, m_p11;
+class FourPoints {
+  TPointD m_p00, m_p01, m_p10, m_p11;
 
 public:
-	FourPoints(TPointD p00, TPointD p01, TPointD p10, TPointD p11)
-		: m_p00(p00), m_p01(p01), m_p10(p10), m_p11(p11)
-	{
-	}
-	FourPoints() : m_p00(TPointD()), m_p01(TPointD()), m_p10(TPointD()), m_p11(TPointD()) {}
+  FourPoints(TPointD p00, TPointD p01, TPointD p10, TPointD p11)
+      : m_p00(p00), m_p01(p01), m_p10(p10), m_p11(p11) {}
+  FourPoints()
+      : m_p00(TPointD())
+      , m_p01(TPointD())
+      , m_p10(TPointD())
+      , m_p11(TPointD()) {}
 
-	void setP00(TPointD p) { m_p00 = p; }
-	void setP01(TPointD p) { m_p01 = p; }
-	void setP10(TPointD p) { m_p10 = p; }
-	void setP11(TPointD p) { m_p11 = p; }
+  void setP00(TPointD p) { m_p00 = p; }
+  void setP01(TPointD p) { m_p01 = p; }
+  void setP10(TPointD p) { m_p10 = p; }
+  void setP11(TPointD p) { m_p11 = p; }
 
-	TPointD getP00() const { return m_p00; }
-	TPointD getP01() const { return m_p01; }
-	TPointD getP10() const { return m_p10; }
-	TPointD getP11() const { return m_p11; }
+  TPointD getP00() const { return m_p00; }
+  TPointD getP01() const { return m_p01; }
+  TPointD getP10() const { return m_p10; }
+  TPointD getP11() const { return m_p11; }
 
-	/*! Order four point from BottomLeft to TopRight. */
-	FourPoints orderedPoints() const;
-	TPointD getBottomLeft() const { return orderedPoints().getP00(); }
-	TPointD getBottomRight() const { return orderedPoints().getP10(); }
-	TPointD getTopRight() const { return orderedPoints().getP11(); }
-	TPointD getTopLeft() const { return orderedPoints().getP01(); }
+  /*! Order four point from BottomLeft to TopRight. */
+  FourPoints orderedPoints() const;
+  TPointD getBottomLeft() const { return orderedPoints().getP00(); }
+  TPointD getBottomRight() const { return orderedPoints().getP10(); }
+  TPointD getTopRight() const { return orderedPoints().getP11(); }
+  TPointD getTopLeft() const { return orderedPoints().getP01(); }
 
-	/*! Point = index: P00 =  0; P10 = 1; P11 = 2; P01 = 3; P0M = 4; P1M = 5; PM1 = 6; P0M = 7. */
-	TPointD getPoint(int index) const;
-	/*! Point = index: P00 =  0; P10 = 1; P11 = 2; P01 = 3. */
-	void setPoint(int index, const TPointD &p);
+  /*! Point = index: P00 =  0; P10 = 1; P11 = 2; P01 = 3; P0M = 4; P1M = 5; PM1
+   * = 6; P0M = 7. */
+  TPointD getPoint(int index) const;
+  /*! Point = index: P00 =  0; P10 = 1; P11 = 2; P01 = 3. */
+  void setPoint(int index, const TPointD &p);
 
-	FourPoints enlarge(double d);
-	bool isEmpty();
-	void empty();
-	bool contains(TPointD p);
-	TRectD getBox() const;
-	FourPoints &operator=(const TRectD &r);
-	bool operator==(const FourPoints &p) const;
-	FourPoints operator*(const TAffine &aff) const;
+  FourPoints enlarge(double d);
+  bool isEmpty();
+  void empty();
+  bool contains(TPointD p);
+  TRectD getBox() const;
+  FourPoints &operator=(const TRectD &r);
+  bool operator==(const FourPoints &p) const;
+  FourPoints operator*(const TAffine &aff) const;
 };
 
 //=============================================================================
 void drawFourPoints(const FourPoints &rect, const TPixel32 &color,
-					unsigned short stipple, bool doContrast);
+                    unsigned short stipple, bool doContrast);
 //-----------------------------------------------------------------------------
 
 //=============================================================================
@@ -115,185 +116,188 @@ void drawFourPoints(const FourPoints &rect, const TPixel32 &color,
 //-----------------------------------------------------------------------------
 
 struct DeformValues {
-	double m_rotationAngle, m_maxSelectionThickness;
-	TPointD m_scaleValue, m_moveValue;
-	bool m_isSelectionModified;
+  double m_rotationAngle, m_maxSelectionThickness;
+  TPointD m_scaleValue, m_moveValue;
+  bool m_isSelectionModified;
 
-	DeformValues(double rotationAngle = 0, double maxSelectionThickness = 0,
-				 TPointD scaleValue = TPointD(1, 1), TPointD moveValue = TPointD(), bool isSelectionModified = false)
-		: m_rotationAngle(rotationAngle), m_maxSelectionThickness(maxSelectionThickness), m_scaleValue(scaleValue), m_moveValue(moveValue), m_isSelectionModified(isSelectionModified)
-	{
-	}
+  DeformValues(double rotationAngle = 0, double maxSelectionThickness = 0,
+               TPointD scaleValue = TPointD(1, 1),
+               TPointD moveValue = TPointD(), bool isSelectionModified = false)
+      : m_rotationAngle(rotationAngle)
+      , m_maxSelectionThickness(maxSelectionThickness)
+      , m_scaleValue(scaleValue)
+      , m_moveValue(moveValue)
+      , m_isSelectionModified(isSelectionModified) {}
 
-	void reset()
-	{
-		m_rotationAngle = 0;
-		m_maxSelectionThickness = 0;
-		m_scaleValue = TPointD(1, 1);
-		m_moveValue = TPointD();
-		m_isSelectionModified = false;
-	}
+  void reset() {
+    m_rotationAngle         = 0;
+    m_maxSelectionThickness = 0;
+    m_scaleValue            = TPointD(1, 1);
+    m_moveValue             = TPointD();
+    m_isSelectionModified   = false;
+  }
 };
 
 //=============================================================================
 // DragTool
 //-----------------------------------------------------------------------------
 
-class DragTool
-{
+class DragTool {
 protected:
-	SelectionTool *m_tool;
+  SelectionTool *m_tool;
 
 public:
-	DragTool(SelectionTool *tool)
-		: m_tool(tool)
-	{
-	}
-	virtual ~DragTool() {}
+  DragTool(SelectionTool *tool) : m_tool(tool) {}
+  virtual ~DragTool() {}
 
-	SelectionTool *getTool() const { return m_tool; }
+  SelectionTool *getTool() const { return m_tool; }
 
-	virtual void transform(TAffine aff, double angle){};
-	virtual void transform(TAffine aff){};
-	virtual TPointD transform(int index, TPointD newPos) { return TPointD(); };
-	virtual void addTransformUndo(){};
+  virtual void transform(TAffine aff, double angle){};
+  virtual void transform(TAffine aff){};
+  virtual TPointD transform(int index, TPointD newPos) { return TPointD(); };
+  virtual void addTransformUndo(){};
 
-	virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &) = 0;
-	virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &) = 0;
-	virtual void leftButtonUp(const TPointD &pos, const TMouseEvent &) = 0;
-	virtual void draw() = 0;
+  virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &) = 0;
+  virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &) = 0;
+  virtual void leftButtonUp(const TPointD &pos, const TMouseEvent &)   = 0;
+  virtual void draw() = 0;
 };
 
 //=============================================================================
 // DeformTool
 //-----------------------------------------------------------------------------
 
-class DeformTool : public DragTool
-{
+class DeformTool : public DragTool {
 protected:
-	TPointD m_curPos;
-	bool m_isDragging;
-	TPointD m_startScaleValue;
-	TPointD m_startPos;
+  TPointD m_curPos;
+  bool m_isDragging;
+  TPointD m_startScaleValue;
+  TPointD m_startPos;
 
 public:
-	DeformTool(SelectionTool *tool);
+  DeformTool(SelectionTool *tool);
 
-	virtual void applyTransform(FourPoints bbox) = 0;
-	virtual void applyTransform(TAffine aff){};
-	virtual void addTransformUndo() = 0;
+  virtual void applyTransform(FourPoints bbox) = 0;
+  virtual void applyTransform(TAffine aff){};
+  virtual void addTransformUndo() = 0;
 
-	int getSimmetricPointIndex(int index) const;
-	/*! Return before point \b index between possible point index {0,4,1,5,2,6,3,7}, include middle point. */
-	int getBeforePointIndex(int index) const;
-	/*! Return next point \b index between possible point index {0,4,1,5,2,6,3,7}, include middle point. */
-	int getNextPointIndex(int index) const;
-	/*! Return before vertex \b index between possible point vertex index {0,1,2,3}*/
-	int getBeforeVertexIndex(int index) const;
-	/*! Return next vertex \b index between possible point vertex index {0,1,2,3}*/
-	int getNextVertexIndex(int index) const;
+  int getSimmetricPointIndex(int index) const;
+  /*! Return before point \b index between possible point index
+   * {0,4,1,5,2,6,3,7}, include middle point. */
+  int getBeforePointIndex(int index) const;
+  /*! Return next point \b index between possible point index {0,4,1,5,2,6,3,7},
+   * include middle point. */
+  int getNextPointIndex(int index) const;
+  /*! Return before vertex \b index between possible point vertex index
+   * {0,1,2,3}*/
+  int getBeforeVertexIndex(int index) const;
+  /*! Return next vertex \b index between possible point vertex index
+   * {0,1,2,3}*/
+  int getNextVertexIndex(int index) const;
 
-	TPointD getStartPos() const { return m_startPos; }
-	void setStartPos(const TPointD &pos) { m_startPos = pos; }
-	TPointD getCurPos() const { return m_curPos; }
-	void setCurPos(const TPointD &pos) { m_curPos = pos; }
-	bool isDragging() const { return m_isDragging; }
-	TPointD getStartScaleValue() const { return m_startScaleValue; }
+  TPointD getStartPos() const { return m_startPos; }
+  void setStartPos(const TPointD &pos) { m_startPos = pos; }
+  TPointD getCurPos() const { return m_curPos; }
+  void setCurPos(const TPointD &pos) { m_curPos = pos; }
+  bool isDragging() const { return m_isDragging; }
+  TPointD getStartScaleValue() const { return m_startScaleValue; }
 
-	void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-	virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) = 0;
-	void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
-	virtual void draw() = 0;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
+  virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) = 0;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
+  virtual void draw() = 0;
 };
 
 //=============================================================================
 // Rotation
 //-----------------------------------------------------------------------------
 
-class Rotation
-{
-	double m_curAng, m_dstAng;
-	DeformTool *m_deformTool;
+class Rotation {
+  double m_curAng, m_dstAng;
+  DeformTool *m_deformTool;
 
 public:
-	Rotation(DeformTool *deformTool);
-	TPointD getStartCenter() const;
-	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-	void draw();
+  Rotation(DeformTool *deformTool);
+  TPointD getStartCenter() const;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void draw();
 };
 
 //=============================================================================
 // FreeDeform
 //-----------------------------------------------------------------------------
 
-class FreeDeform
-{
-	DeformTool *m_deformTool;
+class FreeDeform {
+  DeformTool *m_deformTool;
 
 public:
-	FreeDeform(DeformTool *deformTool);
-	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  FreeDeform(DeformTool *deformTool);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
 };
 
 //=============================================================================
 // MoveSelection
 //-----------------------------------------------------------------------------
 
-class MoveSelection
-{
-	DeformTool *m_deformTool;
-	TPointD m_lastDelta, m_firstPos;
+class MoveSelection {
+  DeformTool *m_deformTool;
+  TPointD m_lastDelta, m_firstPos;
 
 public:
-	MoveSelection(DeformTool *deformTool);
-	void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  MoveSelection(DeformTool *deformTool);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
 };
 
 //=============================================================================
 // Scale
 //-----------------------------------------------------------------------------
 
-class Scale
-{
-	TPointD m_startCenter;
-	bool m_isShiftPressed;
-	bool m_isAltPressed;
-	bool m_scaleInCenter;
-	std::vector<FourPoints> m_startBboxs;
+class Scale {
+  TPointD m_startCenter;
+  bool m_isShiftPressed;
+  bool m_isAltPressed;
+  bool m_scaleInCenter;
+  std::vector<FourPoints> m_startBboxs;
 
-	DeformTool *m_deformTool;
+  DeformTool *m_deformTool;
 
 public:
-	enum Type { GLOBAL = 0,
-				HORIZONTAL = 1,
-				VERTICAL = 2 };
-	int m_type;
-	Scale(DeformTool *deformTool, int type);
+  enum Type { GLOBAL = 0, HORIZONTAL = 1, VERTICAL = 2 };
+  int m_type;
+  Scale(DeformTool *deformTool, int type);
 
-	/*! Return intersection between straight line in \b point0, \b point1 and straight line for
-      \b p parallel to straight line in \b point2, \b point3. */
-	TPointD getIntersectionPoint(const TPointD &point0, const TPointD &point1,
-								 const TPointD &point2, const TPointD &point3, const TPointD &p) const;
-	/*! Scale \b index point of \b bbox in \b pos and return scaled bbox. */
-	FourPoints bboxScale(int index, const FourPoints &oldBbox, const TPointD &pos);
-	/*! Compute new scale value take care of new position of \b movedIndex point in \b bbox. */
-	TPointD computeScaleValue(int movedIndex, const FourPoints newBbox);
-	/*! Return \b index point scaled in \b center of \b scaleValue. */
-	TPointD getScaledPoint(int index, const FourPoints &oldBbox, const TPointD scaleValue, const TPointD center);
-	/*! Compute new center after scale of \b bbox \b index point. */
-	TPointD getNewCenter(int index, const FourPoints bbox, const TPointD scaleValue);
-	/*! Scale \b bbox \b index point in pos and if \b m_scaleInCenter is true scale in \b center \b bbox simmetric point;
-      compute scaleValue. */
-	FourPoints bboxScaleInCenter(int index, const FourPoints &oldBbox, const TPointD newPos, TPointD &scaleValue,
-								 const TPointD center, bool recomputeScaleValue);
+  /*! Return intersection between straight line in \b point0, \b point1 and
+straight line for
+\b p parallel to straight line in \b point2, \b point3. */
+  TPointD getIntersectionPoint(const TPointD &point0, const TPointD &point1,
+                               const TPointD &point2, const TPointD &point3,
+                               const TPointD &p) const;
+  /*! Scale \b index point of \b bbox in \b pos and return scaled bbox. */
+  FourPoints bboxScale(int index, const FourPoints &oldBbox,
+                       const TPointD &pos);
+  /*! Compute new scale value take care of new position of \b movedIndex point
+   * in \b bbox. */
+  TPointD computeScaleValue(int movedIndex, const FourPoints newBbox);
+  /*! Return \b index point scaled in \b center of \b scaleValue. */
+  TPointD getScaledPoint(int index, const FourPoints &oldBbox,
+                         const TPointD scaleValue, const TPointD center);
+  /*! Compute new center after scale of \b bbox \b index point. */
+  TPointD getNewCenter(int index, const FourPoints bbox,
+                       const TPointD scaleValue);
+  /*! Scale \b bbox \b index point in pos and if \b m_scaleInCenter is true
+scale in \b center \b bbox simmetric point;
+compute scaleValue. */
+  FourPoints bboxScaleInCenter(int index, const FourPoints &oldBbox,
+                               const TPointD newPos, TPointD &scaleValue,
+                               const TPointD center, bool recomputeScaleValue);
 
-	void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-	void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
 
-	std::vector<FourPoints> getStartBboxs() const { return m_startBboxs; }
-	TPointD getStartCenter() const { return m_startCenter; }
-	bool scaleInCenter() const { return m_scaleInCenter; }
+  std::vector<FourPoints> getStartBboxs() const { return m_startBboxs; }
+  TPointD getStartCenter() const { return m_startCenter; }
+  bool scaleInCenter() const { return m_scaleInCenter; }
 };
 };
 
@@ -310,139 +314,143 @@ DragSelectionTool::DragTool *createNewScaleTool(SelectionTool *st, int type);
 // SelectionTool
 //-----------------------------------------------------------------------------
 
-class SelectionTool : public TTool, public TSelection::View
-{
-	Q_DECLARE_TR_FUNCTIONS(SelectionTool)
+class SelectionTool : public TTool, public TSelection::View {
+  Q_DECLARE_TR_FUNCTIONS(SelectionTool)
 
 protected:
-	bool m_firstTime;
-	DragSelectionTool::DragTool *m_dragTool;
+  bool m_firstTime;
+  DragSelectionTool::DragTool *m_dragTool;
 
-	StrokeGenerator m_track;
-	std::vector<TPointD> m_polyline;
-	TPointD m_mousePosition;
-	TStroke *m_stroke;
+  StrokeGenerator m_track;
+  std::vector<TPointD> m_polyline;
+  TPointD m_mousePosition;
+  TStroke *m_stroke;
 
-	//To modify selection
-	TPointD m_curPos;
-	TPointD m_firstPos;
+  // To modify selection
+  TPointD m_curPos;
+  TPointD m_firstPos;
 
-	bool m_selecting;
-	bool m_justSelected;
-	bool m_shiftPressed;
+  bool m_selecting;
+  bool m_justSelected;
+  bool m_shiftPressed;
 
-	enum { Outside,
-		   Inside,
-		   DEFORM,
-		   ROTATION,
-		   MOVE_CENTER,
-		   SCALE,
-		   SCALE_X,
-		   SCALE_Y,
-		   GLOBAL_THICKNESS,
-		   ADD_SELECTION } m_what; //RV
-	enum { P00 = 0,
-		   P10 = 1,
-		   P11 = 2,
-		   P01 = 3,
-		   PM0 = 4,
-		   P1M = 5,
-		   PM1 = 6,
-		   P0M = 7,
-		   NONE } m_selectedPoint; //RV
+  enum {
+    Outside,
+    Inside,
+    DEFORM,
+    ROTATION,
+    MOVE_CENTER,
+    SCALE,
+    SCALE_X,
+    SCALE_Y,
+    GLOBAL_THICKNESS,
+    ADD_SELECTION
+  } m_what;  // RV
+  enum {
+    P00 = 0,
+    P10 = 1,
+    P11 = 2,
+    P01 = 3,
+    PM0 = 4,
+    P1M = 5,
+    PM1 = 6,
+    P0M = 7,
+    NONE
+  } m_selectedPoint;  // RV
 
-	int m_cursorId;
+  int m_cursorId;
 
-	bool m_leftButtonMousePressed;
+  bool m_leftButtonMousePressed;
 
-	DragSelectionTool::FourPoints m_selectingRect;
+  DragSelectionTool::FourPoints m_selectingRect;
 
-	std::vector<DragSelectionTool::FourPoints> m_bboxs;
-	std::vector<TPointD> m_centers;
-	std::vector<FreeDeformer *> m_freeDeformers;
+  std::vector<DragSelectionTool::FourPoints> m_bboxs;
+  std::vector<TPointD> m_centers;
+  std::vector<FreeDeformer *> m_freeDeformers;
 
-	TEnumProperty m_strokeSelectionType;
-	TPropertyGroup m_prop;
+  TEnumProperty m_strokeSelectionType;
+  TPropertyGroup m_prop;
 
-	virtual void updateAction(TPointD pos, const TMouseEvent &e);
+  virtual void updateAction(TPointD pos, const TMouseEvent &e);
 
-	virtual void modifySelectionOnClick(TImageP image, const TPointD &pos, const TMouseEvent &e) = 0;
+  virtual void modifySelectionOnClick(TImageP image, const TPointD &pos,
+                                      const TMouseEvent &e) = 0;
 
-	virtual void doOnActivate() = 0;
-	virtual void doOnDeactivate() = 0;
+  virtual void doOnActivate()   = 0;
+  virtual void doOnDeactivate() = 0;
 
-	//Metodi per disegnare la linea della selezione Freehand
-	void startFreehand(const TPointD &pos);
-	void freehandDrag(const TPointD &pos);
-	void closeFreehand(const TPointD &pos);
+  // Metodi per disegnare la linea della selezione Freehand
+  void startFreehand(const TPointD &pos);
+  void freehandDrag(const TPointD &pos);
+  void closeFreehand(const TPointD &pos);
 
-	//Metodi per disegnare la linea della selezione Polyline
-	void addPointPolyline(const TPointD &pos);
-	void closePolyline(const TPointD &pos);
+  // Metodi per disegnare la linea della selezione Polyline
+  void addPointPolyline(const TPointD &pos);
+  void closePolyline(const TPointD &pos);
 
-	void updateTranslation();
+  void updateTranslation();
 
-	void drawPolylineSelection();
-	void drawRectSelection(const TImage *image);
-	void drawCommandHandle(const TImage *image);
+  void drawPolylineSelection();
+  void drawRectSelection(const TImage *image);
+  void drawCommandHandle(const TImage *image);
 
 public:
-	DragSelectionTool::DeformValues m_deformValues;
+  DragSelectionTool::DeformValues m_deformValues;
 
-	SelectionTool(int targetType);
-	~SelectionTool();
+  SelectionTool(int targetType);
+  ~SelectionTool();
 
-	ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const { return TTool::LevelWriteTool; }
 
-	TPointD getCenter(int index = 0) const;
-	void setCenter(const TPointD &center, int index = 0);
+  TPointD getCenter(int index = 0) const;
+  void setCenter(const TPointD &center, int index = 0);
 
-	int getBBoxsCount() const;
-	DragSelectionTool::FourPoints getBBox(int index = 0) const;
-	virtual void setBBox(const DragSelectionTool::FourPoints &points, int index = 0);
+  int getBBoxsCount() const;
+  DragSelectionTool::FourPoints getBBox(int index = 0) const;
+  virtual void setBBox(const DragSelectionTool::FourPoints &points,
+                       int index = 0);
 
-	FreeDeformer *getFreeDeformer(int index = 0) const;
-	virtual void setNewFreeDeformer() = 0;
-	void clearDeformers();
+  FreeDeformer *getFreeDeformer(int index = 0) const;
+  virtual void setNewFreeDeformer()       = 0;
+  void clearDeformers();
 
-	int getSelectedPoint() const { return m_selectedPoint; }
+  int getSelectedPoint() const { return m_selectedPoint; }
 
-	virtual bool isConstantThickness() const { return true; }
-	virtual bool isLevelType() const { return false; }
-	virtual bool isSelectedFramesType() const { return false; }
-	virtual bool isSameStyleType() const { return false; }
-	virtual bool isModifiableSelectionType() const
-	{
-		return !(isLevelType() || isSelectedFramesType());
-	}
-	virtual bool isFloating() const { return false; }
+  virtual bool isConstantThickness() const { return true; }
+  virtual bool isLevelType() const { return false; }
+  virtual bool isSelectedFramesType() const { return false; }
+  virtual bool isSameStyleType() const { return false; }
+  virtual bool isModifiableSelectionType() const {
+    return !(isLevelType() || isSelectedFramesType());
+  }
+  virtual bool isFloating() const { return false; }
 
-	virtual QSet<int> getSelectedStyles() const { return QSet<int>(); }
+  virtual QSet<int> getSelectedStyles() const { return QSet<int>(); }
 
-	virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-	virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &) = 0;
-	virtual void leftButtonUp(const TPointD &pos, const TMouseEvent &) = 0;
-	void mouseMove(const TPointD &pos, const TMouseEvent &e);
-	virtual void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) = 0;
-	bool keyDown(int key, TUINT32 flags, const TPoint &pos);
+  virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &);
+  virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &) = 0;
+  virtual void leftButtonUp(const TPointD &pos, const TMouseEvent &)   = 0;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e);
+  virtual void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) = 0;
+  bool keyDown(int key, TUINT32 flags, const TPoint &pos);
 
-	int getCursorId() const;
+  int getCursorId() const;
 
-	virtual void draw() = 0;
+  virtual void draw() = 0;
 
-	virtual TSelection *getSelection() = 0;
-	virtual bool isSelectionEmpty() = 0;
+  virtual TSelection *getSelection() = 0;
+  virtual bool isSelectionEmpty()    = 0;
 
-	virtual void computeBBox() = 0;
+  virtual void computeBBox() = 0;
 
-	void onActivate();
-	void onDeactivate();
-	virtual void onImageChanged() = 0;
-	void onSelectionChanged();
+  void onActivate();
+  void onDeactivate();
+  virtual void onImageChanged() = 0;
+  void onSelectionChanged();
 
-	TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
 
-	bool onPropertyChanged(std::string propertyName);
+  bool onPropertyChanged(std::string propertyName);
 };
 
-#endif //SELECTIONTOOL_INCLUDED
+#endif  // SELECTIONTOOL_INCLUDED

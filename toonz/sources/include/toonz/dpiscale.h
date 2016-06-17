@@ -16,7 +16,7 @@
 #endif
 
 //=============================================================================
-//forward declarations
+// forward declarations
 class ToonzScene;
 class TXshSimpleLevel;
 class TFrameId;
@@ -27,9 +27,8 @@ class TCamera;
 /*!
   Return Dpi \b TAffine of \b level frame \b fid.
 */
-DVAPI TAffine getDpiAffine(TXshSimpleLevel *level,
-						   const TFrameId &fid,
-						   bool forceFullSubsampling = false);
+DVAPI TAffine getDpiAffine(TXshSimpleLevel *level, const TFrameId &fid,
+                           bool forceFullSubsampling = false);
 
 /*!
   Return Dpi \b TAffine of \b camera.

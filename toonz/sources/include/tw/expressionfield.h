@@ -21,42 +21,36 @@
 #endif
 
 // forward declaration
-namespace TSyntax
-{
+namespace TSyntax {
 class Parser;
 class Grammar;
 }
 
-class DVAPI TExpressionField : public TTextField
-{
+class DVAPI TExpressionField : public TTextField {
 public:
-	class Listener
-	{
-	public:
-		virtual void onExpressionChange(string s, bool isValid) = 0;
-		virtual ~Listener() {}
-	};
+  class Listener {
+  public:
+    virtual void onExpressionChange(string s, bool isValid) = 0;
+    virtual ~Listener() {}
+  };
 
-	TSyntax::Parser *m_parser;
-	Listener *m_listener;
-	void apply();
+  TSyntax::Parser *m_parser;
+  Listener *m_listener;
+  void apply();
 
 public:
-	TExpressionField(TWidget *parent, string name = "expressionField");
-	~TExpressionField();
+  TExpressionField(TWidget *parent, string name = "expressionField");
+  ~TExpressionField();
 
-	void setGrammar(TSyntax::Grammar *grammar);
-	TSyntax::Grammar *getGrammar() const;
+  void setGrammar(TSyntax::Grammar *grammar);
+  TSyntax::Grammar *getGrammar() const;
 
-	void setListener(Listener *listener)
-	{
-		m_listener = listener;
-	}
+  void setListener(Listener *listener) { m_listener = listener; }
 
-	void keyDown(int key, TUINT32 status, const TPoint &p);
-	void drawFieldText(const TPoint &origin, wstring text);
+  void keyDown(int key, TUINT32 status, const TPoint &p);
+  void drawFieldText(const TPoint &origin, wstring text);
 
-	string getError() const;
+  string getError() const;
 };
 
 #ifdef WIN32

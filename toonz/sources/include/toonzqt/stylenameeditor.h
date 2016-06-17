@@ -9,31 +9,29 @@ class QLineEdit;
 class QPushButton;
 class TPaletteHandle;
 
-class StyleNameEditor : public QDialog //singleton
+class StyleNameEditor : public QDialog  // singleton
 {
-	Q_OBJECT
+  Q_OBJECT
 
-	TPaletteHandle *m_paletteHandle;
+  TPaletteHandle *m_paletteHandle;
 
-	QLineEdit *m_styleName;
-	QPushButton *m_okButton,
-		*m_applyButton,
-		*m_cancelButton;
+  QLineEdit *m_styleName;
+  QPushButton *m_okButton, *m_applyButton, *m_cancelButton;
 
 public:
-	StyleNameEditor(QWidget *parent = 0);
-	void setPaletteHandle(TPaletteHandle *ph);
+  StyleNameEditor(QWidget *parent = 0);
+  void setPaletteHandle(TPaletteHandle *ph);
 
 protected:
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
-	void enterEvent(QEvent *);
+  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *);
+  void enterEvent(QEvent *);
 
 protected slots:
-	void onStyleSwitched();
-	void onOkPressed();
-	void onApplyPressed();
-	void onCancelPressed();
+  void onStyleSwitched();
+  void onOkPressed();
+  void onApplyPressed();
+  void onCancelPressed();
 };
 
 #endif

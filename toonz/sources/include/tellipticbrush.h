@@ -28,11 +28,11 @@ class TStroke;
 
 //=============================================================================
 
-/*!       
+/*!
 
           |     /
         __b__ / \  angle in degree
-       /  |  \   | 
+       /  |  \   |
   ----|---o---a--|-- >
        \__|__/
           |
@@ -44,43 +44,42 @@ class TStroke;
 
 //=============================================================================
 
-class DVAPI TEllipticBrush : public TBrush
-{
-	struct Imp;
-	Imp *m_imp;
+class DVAPI TEllipticBrush : public TBrush {
+  struct Imp;
+  Imp *m_imp;
 
 public:
-	//  TEllipticBrush(double a = 1,double b = 1, double angleInDegree = 0);  //  per brush ellittico
-	TEllipticBrush();
-	TEllipticBrush(const TEllipticBrush &brush);
+  //  TEllipticBrush(double a = 1,double b = 1, double angleInDegree = 0);  //
+  //  per brush ellittico
+  TEllipticBrush();
+  TEllipticBrush(const TEllipticBrush &brush);
 
-	virtual ~TEllipticBrush();
+  virtual ~TEllipticBrush();
 
-	void makeOutline(const TStroke &stroke,
-					 TStrokeOutline &outline,
-					 const OutlineParameter &param);
-	void draw();
-	/*  
+  void makeOutline(const TStroke &stroke, TStrokeOutline &outline,
+                   const OutlineParameter &param);
+  void draw();
+  /*
 //  per brush ellittico
-  void setAngle(double angleInDegree);
-  double getAngle() const;
+void setAngle(double angleInDegree);
+double getAngle() const;
 
-  double getSemiAxisA() const;
-  void setSemiAxisA(double);
+double getSemiAxisA() const;
+void setSemiAxisA(double);
 
-  double getSemiAxisB() const;
-  void setSemiAxisB(double);
+double getSemiAxisB() const;
+void setSemiAxisB(double);
 */
-	TBrush *clone();
+  TBrush *clone();
 
 private:
-	// not implemented
-	TEllipticBrush &operator=(const TEllipticBrush &brush);
+  // not implemented
+  TEllipticBrush &operator=(const TEllipticBrush &brush);
 };
 
-#endif //PER_VECCHIO_ELLIPTIC_BRUSH
+#endif  // PER_VECCHIO_ELLIPTIC_BRUSH
 
-#endif // !defined(TELLIPTIC_BRUSH_H)
+#endif  // !defined(TELLIPTIC_BRUSH_H)
 //-----------------------------------------------------------------------------
 // End Of File
 //-----------------------------------------------------------------------------

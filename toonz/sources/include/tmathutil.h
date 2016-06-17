@@ -24,29 +24,26 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-enum TMathError {
-	INFINITE_SOLUTIONS = -1
-};
+enum TMathError { INFINITE_SOLUTIONS = -1 };
 
 //-----------------------------------------------------------------------------
 
-class DVAPI TMathException : public TException
-{
-	TString m_msg;
+class DVAPI TMathException : public TException {
+  TString m_msg;
 
 public:
-	TMathException(std::string msg);
-	virtual ~TMathException() {}
-	virtual TString getMessage() const { return m_msg; }
+  TMathException(std::string msg);
+  virtual ~TMathException() {}
+  virtual TString getMessage() const { return m_msg; }
 };
 
 //-----------------------------------------------------------------------------
 
-/*! 
+/*!
   Decompose a square matrix [A] dim(A)=[n x n]  using the LU method.
   A is a matrix stored for row.
   \par A array of coeff
-  \par n size of matrix 
+  \par n size of matrix
   \par indx array with permutation from pivoting
   \par d +1/-1 and depend wheter the number of row interchanges (even or odd)
   \note If error a TException is thrown.
@@ -56,7 +53,7 @@ DVAPI void tLUDecomposition(double *A, int n, int *indx, double &d);
 
 //-----------------------------------------------------------------------------
 
-/*! 
+/*!
   Use the back-substitution method to solve the linear
   system A*x=b.
   \par A matrix exited from tLUDecomposition
@@ -75,8 +72,8 @@ DVAPI void tbackSubstitution(double *A, int n, int *indx, double *b);
   Solve the system A*x=b.
   It`s needed to insert b in res.
   A and res are modifyed in the routine.
-  \par A matrix 
-  \par n size of matrix 
+  \par A matrix
+  \par n size of matrix
   \note A is square [n x n]
   \include mathutils_ex1.cpp
  */
@@ -91,17 +88,16 @@ DVAPI void tsolveSistem(double *A, int n, double *res);
   \note A is square [n x n]
   \include mathutils_ex1.cpp
  */
-inline void tsolveSistem(std::vector<double> &A, std::vector<double> &res)
-{
-	assert(res.size() * res.size() == A.size());
-	tsolveSistem(&A[0], res.size(), &res[0]);
+inline void tsolveSistem(std::vector<double> &A, std::vector<double> &res) {
+  assert(res.size() * res.size() == A.size());
+  tsolveSistem(&A[0], res.size(), &res[0]);
 }
 
 //-----------------------------------------------------------------------------
 
 /*!
   Find determinant of square matrix A
-  \par A is matrix to test 
+  \par A is matrix to test
   \par n size of matrix
  */
 DVAPI double tdet(double *A, int n);
@@ -109,7 +105,7 @@ DVAPI double tdet(double *A, int n);
 //-----------------------------------------------------------------------------
 
 /*!
-  Find determinant of square matrix A [n x n], using information 
+  Find determinant of square matrix A [n x n], using information
   from tLUDecomposition decomposition.
   \par LUa output matrix from tLUDecomposition
   \par n size of matrix
@@ -125,7 +121,8 @@ DVAPI double tdet(double *LUa, int n, double d);
   \par poly is a vector with coeff of polynomious in crescent order.
   \ret sol is the vector of solution and contain real found solution.
  */
-DVAPI int rootFinding(const std::vector<double> &poly, std::vector<double> &sol);
+DVAPI int rootFinding(const std::vector<double> &poly,
+                      std::vector<double> &sol);
 
 //-----------------------------------------------------------------------------
 
@@ -135,9 +132,8 @@ DVAPI int rootFinding(const std::vector<double> &poly, std::vector<double> &sol)
   \par eps tolerance required
   \ret true if value is nearest to zero
  */
-inline bool isAlmostZero(double val, double eps = TConsts::epsilon)
-{
-	return -eps < val && val < eps;
+inline bool isAlmostZero(double val, double eps = TConsts::epsilon) {
+  return -eps < val && val < eps;
 }
 
 //-----------------------------------------------------------------------------
@@ -150,7 +146,8 @@ inline bool isAlmostZero(double val, double eps = TConsts::epsilon)
   \par greater extreme
   \ret number of root
  */
-DVAPI int numberOfRootsInInterval(int order, const double *polyH, double min, double max);
+DVAPI int numberOfRootsInInterval(int order, const double *polyH, double min,
+                                  double max);
 
 //-----------------------------------------------------------------------------
 
@@ -177,7 +174,7 @@ DVAPI double quadraticRoot(double a, double b, double c);
 
 //-----------------------------------------------------------------------------
 
-#endif // #ifndef TMATH_UTIL_H
+#endif  // #ifndef TMATH_UTIL_H
 //-----------------------------------------------------------------------------
 // End Of File
 //-----------------------------------------------------------------------------

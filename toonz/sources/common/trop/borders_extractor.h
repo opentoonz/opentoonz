@@ -8,10 +8,8 @@
 
 #include "raster_edge_iterator.h"
 
-namespace TRop
-{
-namespace borders
-{
+namespace TRop {
+namespace borders {
 
 //*******************************************************************
 //    Pixel Selector model
@@ -37,61 +35,67 @@ namespace borders
   completely transparent (virtual pixels outside the raster boundaries are).
 */
 template <typename Pix, typename Val>
-class pixel_selector
-{
+class pixel_selector {
 public:
-	typedef Pix pixel_type; //!< The pixel type naming the selector
-	typedef Val value_type; //!< A value type representing pixel contents.
-							//!< Typically the pixel itself.
+  typedef Pix pixel_type;  //!< The pixel type naming the selector
+  typedef Val value_type;  //!< A value type representing pixel contents.
+                           //!< Typically the pixel itself.
 
 public:
-	value_type value(const pixel_type &pix) const;
-	bool equal(const pixel_type &a, const pixel_type &b) const
-	{
-		return value(a) == value(b);
-	}
+  value_type value(const pixel_type &pix) const;
+  bool equal(const pixel_type &a, const pixel_type &b) const {
+    return value(a) == value(b);
+  }
 
-	value_type transparent() const;
-	bool transparent(const pixel_type &pix) const
-	{
-		return value(pix) == transparent();
-	}
+  value_type transparent() const;
+  bool transparent(const pixel_type &pix) const {
+    return value(pix) == transparent();
+  }
 
-	//! Returns whether a border point must be read or not (corners are always read).
-	bool skip(const value_type &prevLeftValue, const value_type &leftValue) const { return true; }
+  //! Returns whether a border point must be read or not (corners are always
+  //! read).
+  bool skip(const value_type &prevLeftValue,
+            const value_type &leftValue) const {
+    return true;
+  }
 };
 
 //----------------------------------------------------------------------------------
 
-enum RunType { _BORDER_LEFT = 0x20,
-			   _BORDER_RIGHT = 0x10,
-			   _HIERARCHY_INCREASE = 0x8,
-			   _HIERARCHY_DECREASE = 0x4 };
+enum RunType {
+  _BORDER_LEFT        = 0x20,
+  _BORDER_RIGHT       = 0x10,
+  _HIERARCHY_INCREASE = 0x8,
+  _HIERARCHY_DECREASE = 0x4
+};
 
 //----------------------------------------------------------------------------------
 
 /*!
   Reads the borders of the input raster, according to the specified selector.
-  Outputs the borders by supplying a container reader with the raster edge iterators
+  Outputs the borders by supplying a container reader with the raster edge
+  iterators
   corresponding to border vertices. The runsmap used in the process can be
   returned in output.
 */
 template <typename Pixel, typename PixelSelector, typename ContainerReader>
 void readBorders(const TRasterPT<Pixel> &raster, const PixelSelector &selector,
-				 ContainerReader &reader, RunsMapP *rasterRunsMap = 0);
+                 ContainerReader &reader, RunsMapP *rasterRunsMap = 0);
 
 //=====================================================================================
 
 template <typename PixelSelector, typename Mesh, typename ContainersReader>
-void readMeshes(const TRasterPT<typename PixelSelector::pixel_type> &raster, const PixelSelector &selector,
-				ContainersReader &meshesDataReader, RunsMapP *rasterRunsMap = 0);
+void readMeshes(const TRasterPT<typename PixelSelector::pixel_type> &raster,
+                const PixelSelector &selector,
+                ContainersReader &meshesDataReader,
+                RunsMapP *rasterRunsMap = 0);
 }
-} //namespace TRop::borders
+}  // namespace TRop::borders
 
-#endif //BORDERS_EXTRACTOR_H
+#endif  // BORDERS_EXTRACTOR_H
 
 //=====================================================================================
 
 #ifdef INCLUDE_HPP
 #include "borders_extractor.hpp"
-#endif //INCLUDE_HPP
+#endif  // INCLUDE_HPP

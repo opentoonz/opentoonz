@@ -28,89 +28,86 @@ class LineTestViewer : public QWidget
 class LineTestViewer : public QOpenGLWidget
 #endif
 {
-	Q_OBJECT
+  Q_OBJECT
 
-	QPoint m_pos;
-	Qt::MouseButton m_mouseButton;
+  QPoint m_pos;
+  Qt::MouseButton m_mouseButton;
 
 #ifndef USE_QPAINTER
-	//bool m_pboSupported;
-	GLuint m_textureId;
-	GLuint m_pboId;
+  // bool m_pboSupported;
+  GLuint m_textureId;
+  GLuint m_pboId;
 #endif
 
-	//!Used to zoom and pan
-	TAffine m_viewAffine;
+  //! Used to zoom and pan
+  TAffine m_viewAffine;
 
 public:
-	LineTestViewer(QWidget *parent = 0);
-	~LineTestViewer();
+  LineTestViewer(QWidget *parent = 0);
+  ~LineTestViewer();
 
-	TPointD LineTestViewer::winToWorld(const QPoint &pos) const;
-	// note: winPos in pixel, top-left origin;
-	// when no camera movements have been defined then worldPos = 0 at camera center
-	TPointD winToWorld(const TPoint &winPos) const;
+  TPointD LineTestViewer::winToWorld(const QPoint &pos) const;
+  // note: winPos in pixel, top-left origin;
+  // when no camera movements have been defined then worldPos = 0 at camera
+  // center
+  TPointD winToWorld(const TPoint &winPos) const;
 
-	// overriden from TTool::Viewer
-	void pan(const TPoint &delta)
-	{
-		panQt(QPoint(delta.x, delta.y));
-	}
-	// overriden from TTool::Viewer
-	void zoom(const TPointD &center, double factor)
-	{
-		zoomQt(QPoint(center.x, height() - center.y), factor);
-	}
+  // overriden from TTool::Viewer
+  void pan(const TPoint &delta) { panQt(QPoint(delta.x, delta.y)); }
+  // overriden from TTool::Viewer
+  void zoom(const TPointD &center, double factor) {
+    zoomQt(QPoint(center.x, height() - center.y), factor);
+  }
 
-	void resetInputMethod();
+  void resetInputMethod();
 
-	void setFocus() { QWidget::setFocus(); };
+  void setFocus() { QWidget::setFocus(); };
 
-	TAffine getViewMatrix() const;
+  TAffine getViewMatrix() const;
 
-	TAffine getNormalZoomScale();
+  TAffine getNormalZoomScale();
 
-	void zoomQt(bool forward, bool reset);
+  void zoomQt(bool forward, bool reset);
 
 protected:
 #ifdef USE_QPAINTER
-	void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *);
 #else
-	void paintGL();
-	void initializeGL();
-	void resizeGL(int width, int height);
-	//void checkPBOSupport();
-	void paintRaster(TRasterP ras);
+  void paintGL();
+  void initializeGL();
+  void resizeGL(int width, int height);
+  // void checkPBOSupport();
+  void paintRaster(TRasterP ras);
 #endif
 
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *);
 
-	void leaveEvent(QEvent *);
-	void enterEvent(QEvent *);
-	void mouseMoveEvent(QMouseEvent *event);
+  void leaveEvent(QEvent *);
+  void enterEvent(QEvent *);
+  void mouseMoveEvent(QMouseEvent *event);
 
-	void mousePressEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	void wheelEvent(QWheelEvent *e);
-	void contextMenuEvent(QContextMenuEvent *event);
-	void keyPressEvent(QKeyEvent *event);
+  void mousePressEvent(QMouseEvent *event);
+  void mouseReleaseEvent(QMouseEvent *event);
+  void wheelEvent(QWheelEvent *e);
+  void contextMenuEvent(QContextMenuEvent *event);
+  void keyPressEvent(QKeyEvent *event);
 
-	void panQt(const QPoint &delta);
-	void zoomQt(const QPoint &center, double factor);
+  void panQt(const QPoint &delta);
+  void zoomQt(const QPoint &center, double factor);
 
 public slots:
-	void onButtonPressed(FlipConsole::EGadget button);
-	void resetView();
+  void onButtonPressed(FlipConsole::EGadget button);
+  void resetView();
 
 protected slots:
-	void onFrameSwitched();
-	void onXsheetChanged();
-	void onSceneSwitched();
+  void onFrameSwitched();
+  void onXsheetChanged();
+  void onSceneSwitched();
 signals:
-	void onZoomChanged();
+  void onZoomChanged();
 };
 
-#endif // LINETEST
+#endif  // LINETEST
 
-#endif // LINETESTVIEWER_H
+#endif  // LINETESTVIEWER_H

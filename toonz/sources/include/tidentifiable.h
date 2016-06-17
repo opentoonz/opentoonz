@@ -17,22 +17,21 @@
 
 //=========================================================
 
-class DVAPI TIdentifiable
-{
-	unsigned long m_id;
+class DVAPI TIdentifiable {
+  unsigned long m_id;
 
 public:
-	TIdentifiable();
-	virtual ~TIdentifiable();
-	TIdentifiable(const TIdentifiable &);
-	const TIdentifiable &operator=(const TIdentifiable &);
+  TIdentifiable();
+  virtual ~TIdentifiable();
+  TIdentifiable(const TIdentifiable &);
+  const TIdentifiable &operator=(const TIdentifiable &);
 
-	unsigned long getIdentifier() const { return m_id; }
-	void setIdentifier(unsigned long id);
-	void setNewIdentifier();
+  unsigned long getIdentifier() const { return m_id; }
+  void setIdentifier(unsigned long id);
+  void setNewIdentifier();
 
-	void storeByIdentifier();
-	static TIdentifiable *fetchByIdentifier(unsigned long id);
+  void storeByIdentifier();
+  static TIdentifiable *fetchByIdentifier(unsigned long id);
 };
 
 #endif

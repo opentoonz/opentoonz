@@ -19,40 +19,40 @@
 
 //=============================================================================
 
-namespace DVGui
-{
+namespace DVGui {
 
 //=============================================================================
 /*! \brief It is a \b QLineEdit which lost focus when enter is pressed and emit
-					 focusIn signal when line edit take focus.
+                                         focusIn signal when line edit take
+   focus.
 
-		Inherits \b QLineEdit.
+                Inherits \b QLineEdit.
 */
-class DVAPI LineEdit : public QLineEdit
-{
-	Q_OBJECT
+class DVAPI LineEdit : public QLineEdit {
+  Q_OBJECT
 
-	bool m_isReturnPressed;
-	bool m_forbiddenSpecialChars;
+  bool m_isReturnPressed;
+  bool m_forbiddenSpecialChars;
 
 public:
-	LineEdit(QWidget *parent = 0, bool forbiddenSpecialChars = false);
-	LineEdit(const QString &contents, QWidget *parent = 0, bool forbiddenSpecialChars = false);
+  LineEdit(QWidget *parent = 0, bool forbiddenSpecialChars = false);
+  LineEdit(const QString &contents, QWidget *parent = 0,
+           bool forbiddenSpecialChars = false);
 
-	bool isReturnPressed() const { return m_isReturnPressed; }
+  bool isReturnPressed() const { return m_isReturnPressed; }
 
-	~LineEdit() {}
+  ~LineEdit() {}
 
 protected:
-	void focusInEvent(QFocusEvent *event);
-	void keyPressEvent(QKeyEvent *event);
+  void focusInEvent(QFocusEvent *event);
+  void keyPressEvent(QKeyEvent *event);
 
 signals:
-	void focusIn();
+  void focusIn();
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+}  // namespace DVGui
 //-----------------------------------------------------------------------------
 
-#endif // LINEEDIT_H
+#endif  // LINEEDIT_H

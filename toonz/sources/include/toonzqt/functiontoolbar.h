@@ -30,8 +30,7 @@
 class TDoubleParam;
 class TFrameHandle;
 
-namespace DVGui
-{
+namespace DVGui {
 class MeasuredDoubleLineEdit;
 }
 
@@ -41,16 +40,13 @@ class FunctionSelection;
 
 //============================================================
 
-namespace DVGui
-{
-class ToolBar : public QToolBar
-{
+namespace DVGui {
+class ToolBar : public QToolBar {
 public:
-	ToolBar(QWidget *parent = 0) : QToolBar(parent)
-	{
-		setFixedHeight(22);			// ;_;
-		setIconSize(QSize(23, 17)); //
-	}
+  ToolBar(QWidget *parent = 0) : QToolBar(parent) {
+    setFixedHeight(22);          // ;_;
+    setIconSize(QSize(23, 17));  //
+  }
 };
 }
 
@@ -58,53 +54,53 @@ public:
 //    FunctionToolbar  declaration
 //*************************************************************************
 
-class FunctionToolbar : public DVGui::ToolBar, public TParamObserver
-{
-	Q_OBJECT
+class FunctionToolbar : public DVGui::ToolBar, public TParamObserver {
+  Q_OBJECT
 
-	QToolBar *m_valueToolbar,
-		*m_keyframeToolbar;
+  QToolBar *m_valueToolbar, *m_keyframeToolbar;
 
-	DVGui::MeasuredDoubleLineEdit *m_valueFld;
-	FrameNavigator *m_frameNavigator;
-	FunctionKeyframeNavigator *m_keyframeNavigator;
-	DVGui::LineEdit *m_stepFld;
+  DVGui::MeasuredDoubleLineEdit *m_valueFld;
+  FrameNavigator *m_frameNavigator;
+  FunctionKeyframeNavigator *m_keyframeNavigator;
+  DVGui::LineEdit *m_stepFld;
 
-	TDoubleParam *m_curve;
-	TFrameHandle *m_frameHandle;
+  TDoubleParam *m_curve;
+  TFrameHandle *m_frameHandle;
 
-	FunctionSelection *m_selection;
+  FunctionSelection *m_selection;
 
-	// in una toolbar ogni widget ha un'action associata
-	QAction *m_valueFldAction;			// brutto: da eliminare. serve solo per fare show/hide
-	QAction *m_keyframeNavigatorAction; // brutto: da eliminare. serve solo per fare show/hide
+  // in una toolbar ogni widget ha un'action associata
+  QAction
+      *m_valueFldAction;  // brutto: da eliminare. serve solo per fare show/hide
+  QAction *m_keyframeNavigatorAction;  // brutto: da eliminare. serve solo per
+                                       // fare show/hide
 
 public:
-	FunctionToolbar(QWidget *parent = 0);
-	~FunctionToolbar();
+  FunctionToolbar(QWidget *parent = 0);
+  ~FunctionToolbar();
 
-	void setSelection(FunctionSelection *);
-	void setFrameHandle(TFrameHandle *frameHandle);
+  void setSelection(FunctionSelection *);
+  void setFrameHandle(TFrameHandle *frameHandle);
 
-	void onChange(const TParamChange &);
+  void onChange(const TParamChange &);
 
-	bool anyWidgetHasFocus();
+  bool anyWidgetHasFocus();
 
 signals:
 
-	void numericalColumnToggled();
+  void numericalColumnToggled();
 
 public slots:
 
-	void setCurve(TDoubleParam *curve);
-	void setFrame(double frame);
+  void setCurve(TDoubleParam *curve);
+  void setFrame(double frame);
 
 private slots:
 
-	void onValueFieldChanged();
-	void onFrameSwitched();
-	void onNavFrameSwitched();
-	void onSelectionChanged();
+  void onValueFieldChanged();
+  void onFrameSwitched();
+  void onNavFrameSwitched();
+  void onSelectionChanged();
 };
 
-#endif // FUNCTIONTOOLBAR_INCLUDED
+#endif  // FUNCTIONTOOLBAR_INCLUDED

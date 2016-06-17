@@ -13,39 +13,38 @@
 //    Toonz wrapper for tcg
 //*************************************************************************************
 
-namespace tcg
-{
+namespace tcg {
 
 template <>
 struct point_traits<TPoint> {
-	typedef TPoint point_type;
-	typedef int value_type;
-	typedef double float_type;
+  typedef TPoint point_type;
+  typedef int value_type;
+  typedef double float_type;
 
-	inline static value_type x(const point_type &p) { return p.x; }
-	inline static value_type y(const point_type &p) { return p.y; }
+  inline static value_type x(const point_type &p) { return p.x; }
+  inline static value_type y(const point_type &p) { return p.y; }
 };
 
 template <>
 struct point_traits<TPointD> {
-	typedef TPointD point_type;
-	typedef double value_type;
-	typedef double float_type;
+  typedef TPointD point_type;
+  typedef double value_type;
+  typedef double float_type;
 
-	inline static value_type x(const point_type &p) { return p.x; }
-	inline static value_type y(const point_type &p) { return p.y; }
+  inline static value_type x(const point_type &p) { return p.x; }
+  inline static value_type y(const point_type &p) { return p.y; }
 };
 
 template <>
 struct point_traits<TThickPoint> {
-	typedef TThickPoint point_type;
-	typedef double value_type;
-	typedef double float_type;
+  typedef TThickPoint point_type;
+  typedef double value_type;
+  typedef double float_type;
 
-	inline static value_type x(const point_type &p) { return p.x; }
-	inline static value_type y(const point_type &p) { return p.y; }
+  inline static value_type x(const point_type &p) { return p.x; }
+  inline static value_type y(const point_type &p) { return p.y; }
 };
 
-} // namespace tcg
+}  // namespace tcg
 
-#endif // TCG_WRAP_H
+#endif  // TCG_WRAP_H

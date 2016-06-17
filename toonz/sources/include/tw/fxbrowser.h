@@ -23,54 +23,48 @@ class TFilePath;
 
 //--------------------------------------------------------------------
 
-class FxBuilder
-{
+class FxBuilder {
 public:
-	virtual ~FxBuilder() {}
-	virtual TFx *create() = 0;
+  virtual ~FxBuilder() {}
+  virtual TFx *create() = 0;
 };
 
 //--------------------------------------------------------------------
 
-class DVAPI TFxBrowser : public TTreeView
-{
+class DVAPI TFxBrowser : public TTreeView {
 public:
-	class DoubleClickListener
-	{
-	public:
-		virtual void onDoubleClick() = 0;
-		virtual ~DoubleClickListener() {}
-	};
+  class DoubleClickListener {
+  public:
+    virtual void onDoubleClick() = 0;
+    virtual ~DoubleClickListener() {}
+  };
 
-	class FxLoader;
-	class MacroFxFolderItem;
+  class FxLoader;
+  class MacroFxFolderItem;
 
 private:
-	string m_selectedFxId;
-	DoubleClickListener *m_doubleClickListener;
-	FxLoader *m_fxLoader;
-	MacroFxFolderItem *m_macroFxFolderItem;
+  string m_selectedFxId;
+  DoubleClickListener *m_doubleClickListener;
+  FxLoader *m_fxLoader;
+  MacroFxFolderItem *m_macroFxFolderItem;
 
 public:
-	TFxBrowser(
-		TWidget *parent,
-		const TFilePath &fxListPath,
-		const TFilePath &fxPresetFolder,
-		string name = "fxBrowser");
+  TFxBrowser(TWidget *parent, const TFilePath &fxListPath,
+             const TFilePath &fxPresetFolder, string name = "fxBrowser");
 
-	~TFxBrowser();
+  ~TFxBrowser();
 
-	string getSelectedFxId() const;
-	FxBuilder *getSelectedFxBuilder() const;
+  string getSelectedFxId() const;
+  FxBuilder *getSelectedFxBuilder() const;
 
-	void onSelect(TTreeViewItem *item);
-	void leftButtonDoubleClick(const TMouseEvent &e);
-	void rightButtonDown(const TMouseEvent &) {}
-	void mouseWheel(const TMouseEvent &, int wheel);
+  void onSelect(TTreeViewItem *item);
+  void leftButtonDoubleClick(const TMouseEvent &e);
+  void rightButtonDown(const TMouseEvent &) {}
+  void mouseWheel(const TMouseEvent &, int wheel);
 
-	void setDoubleClickListener(DoubleClickListener *listener);
+  void setDoubleClickListener(DoubleClickListener *listener);
 
-	void updatePresets();
+  void updatePresets();
 };
 
 #endif

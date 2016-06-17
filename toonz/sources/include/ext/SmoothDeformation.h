@@ -24,31 +24,21 @@
 
 #include "StrokeDeformationImpl.h"
 
-namespace ToonzExt
-{
-class DVAPI
-	SmoothDeformation
-	: public StrokeDeformationImpl
-{
-	SmoothDeformation();
+namespace ToonzExt {
+class DVAPI SmoothDeformation : public StrokeDeformationImpl {
+  SmoothDeformation();
 
 public:
-	virtual ~SmoothDeformation();
+  virtual ~SmoothDeformation();
 
-	bool
-	check_(const ContextStatus *status);
+  bool check_(const ContextStatus *status);
 
-	bool
-	findExtremes_(const ContextStatus *,
-				  Interval &);
-	double
-	findActionLength();
+  bool findExtremes_(const ContextStatus *, Interval &);
+  double findActionLength();
 
-	virtual void
-	draw(Designer *);
+  virtual void draw(Designer *);
 
-	static SmoothDeformation *
-	instance();
+  static SmoothDeformation *instance();
 };
 }
 #endif /* SMOOTH_DEFORMATION_H */

@@ -17,25 +17,24 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-//forward declaration
+// forward declaration
 class TPalette;
 class ToonzScene;
 
-class DVAPI FullColorPalette : public QObject
-{
-	Q_OBJECT
+class DVAPI FullColorPalette : public QObject {
+  Q_OBJECT
 
-	TPalette *m_palette;
-	const TFilePath m_fullcolorPalettePath;
+  TPalette *m_palette;
+  const TFilePath m_fullcolorPalettePath;
 
-	FullColorPalette();
+  FullColorPalette();
 
 public:
-	static FullColorPalette *instance();
-	~FullColorPalette();
-	void clear();
-	TPalette *getPalette(ToonzScene *scene);
-	void savePalette(ToonzScene *scene);
+  static FullColorPalette *instance();
+  ~FullColorPalette();
+  void clear();
+  TPalette *getPalette(ToonzScene *scene);
+  void savePalette(ToonzScene *scene);
 };
 
-#endif // FULLCOLOR_PALETTE
+#endif  // FULLCOLOR_PALETTE

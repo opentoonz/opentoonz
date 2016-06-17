@@ -3,7 +3,7 @@
 /*------------------------  modulo metnum.cpp  --------------------------
  * SCOPO
  * Implementazione di alcuni algoritmi relativi a metodi numerici.
- * 
+ *
  * Autore: P. Foggia (1991)
  *---------------------------------------------------------------------*/
 
@@ -36,28 +36,24 @@ using namespace MetNum;
 /* di errore possono essere la mancanza di memoria oppure il passaggio   */
 /* di un valore < 1 per n o m.                                           */
 /*-----------------------------------------------------------------------*/
-double **MetNum::AllocMatrix(int n, int m)
-{
-	double **A;
-	int i, j;
+double **MetNum::AllocMatrix(int n, int m) {
+  double **A;
+  int i, j;
 
-	if ((n < 1) || (m < 1))
-		return NULL;
+  if ((n < 1) || (m < 1)) return NULL;
 
-	A = new double *[n];
-	if (A == NULL)
-		return NULL;
+  A = new double *[n];
+  if (A == NULL) return NULL;
 
-	for (i = 0; i < n; i++) {
-		if ((A[i] = new double[m]) == NULL) {
-			for (j = 0; j < i; j++)
-				delete[] A[j];
-			delete[] A;
-			return NULL;
-		}
-	}
+  for (i = 0; i < n; i++) {
+    if ((A[i] = new double[m]) == NULL) {
+      for (j = 0; j < i; j++) delete[] A[j];
+      delete[] A;
+      return NULL;
+    }
+  }
 
-	return A;
+  return A;
 }
 
 /*--------------------------- FreeMatrix() ------------------------------*/
@@ -71,13 +67,11 @@ double **MetNum::AllocMatrix(int n, int m)
 /* int n               numero di righe                                   */
 /* double **A           puntatore alla matrice da deallocare              */
 /*-----------------------------------------------------------------------*/
-void MetNum::FreeMatrix(int n, double **A)
-{
-	int i;
+void MetNum::FreeMatrix(int n, double **A) {
+  int i;
 
-	for (i = 0; i < n; i++)
-		delete[] A[i];
-	delete[] A;
+  for (i = 0; i < n; i++) delete[] A[i];
+  delete[] A;
 }
 
 /*-----------------------  AllocTriangMatrix()  -------------------------*/
@@ -100,28 +94,24 @@ void MetNum::FreeMatrix(int n, double **A)
 /* di errore possono essere la mancanza di memoria oppure il passaggio   */
 /* di un valore < 1 per n                                                */
 /*-----------------------------------------------------------------------*/
-double **MetNum::AllocTriangMatrix(int n)
-{
-	double **A;
-	int i, j;
+double **MetNum::AllocTriangMatrix(int n) {
+  double **A;
+  int i, j;
 
-	if (n < 1)
-		return NULL;
+  if (n < 1) return NULL;
 
-	A = new double *[n];
-	if (A == NULL)
-		return NULL;
+  A = new double *[n];
+  if (A == NULL) return NULL;
 
-	for (i = 0; i < n; i++) {
-		if ((A[i] = new double[i + 1]) == NULL) {
-			for (j = 0; j < i; j++)
-				delete[] A[j];
-			delete[] A;
-			return NULL;
-		}
-	}
+  for (i = 0; i < n; i++) {
+    if ((A[i] = new double[i + 1]) == NULL) {
+      for (j = 0; j < i; j++) delete[] A[j];
+      delete[] A;
+      return NULL;
+    }
+  }
 
-	return A;
+  return A;
 }
 
 /*-------------------------  Approx()  -----------------------------------*/
@@ -155,47 +145,40 @@ double **MetNum::AllocTriangMatrix(int n)
 /*                 -2      memoria insufficiente                          */
 /*                 -3      errore nella risoluzione del sistema           */
 /*------------------------------------------------------------------------*/
-int MetNum::Approx(int n, int m, double **x, double y[], double c[])
-{
-	int i, j, k;
-	double **A;
-	int retval;
+int MetNum::Approx(int n, int m, double **x, double y[], double c[]) {
+  int i, j, k;
+  double **A;
+  int retval;
 
-	/* controllo sui parametri di input */
-	if ((n < 1) || (m < 1))
-		return -1;
+  /* controllo sui parametri di input */
+  if ((n < 1) || (m < 1)) return -1;
 
-	/* allocazione della memoria per la matrice */
-	if ((A = AllocTriangMatrix(m)) == NULL)
-		return -2;
+  /* allocazione della memoria per la matrice */
+  if ((A = AllocTriangMatrix(m)) == NULL) return -2;
 
-	/* prepara la matrice dei coefficienti */
-	for (i = 0; i < m; i++)
-		for (j = 0; j <= i; j++) /* la matrice  simmetrica */
-		{
-			A[i][j] = 0;
-			for (k = 0; k < n; k++)
-				A[i][j] += x[i][k] * x[j][k];
-		}
+  /* prepara la matrice dei coefficienti */
+  for (i = 0; i < m; i++)
+    for (j = 0; j <= i; j++) /* la matrice  simmetrica */
+    {
+      A[i][j] = 0;
+      for (k = 0; k < n; k++) A[i][j] += x[i][k] * x[j][k];
+    }
 
-	/* prepara il vettore dei termini noti */
-	for (i = 0; i < m; i++) {
-		c[i] = 0;
-		for (k = 0; k < n; k++)
-			c[i] += x[i][k] * y[k];
-	}
+  /* prepara il vettore dei termini noti */
+  for (i = 0; i < m; i++) {
+    c[i] = 0;
+    for (k = 0; k < n; k++) c[i] += x[i][k] * y[k];
+  }
 
-	/* risolve il sistema */
-	if (Cholesky(m, A) ||
-		CholForw(m, A, c, c) ||
-		CholBack(m, A, c, c))
-		retval = -3;
-	else
-		retval = 0;
+  /* risolve il sistema */
+  if (Cholesky(m, A) || CholForw(m, A, c, c) || CholBack(m, A, c, c))
+    retval = -3;
+  else
+    retval = 0;
 
-	FreeMatrix(m, A);
+  FreeMatrix(m, A);
 
-	return retval;
+  return retval;
 }
 
 /*---------------------------  Cholesky  ---------------------------------*/
@@ -222,34 +205,30 @@ int MetNum::Approx(int n, int m, double **x, double y[], double c[])
 /*             k>0        la matrice non  simmetrica def. positiva;      */
 /*                        la riga k non  accettabile                     */
 /*------------------------------------------------------------------------*/
-int MetNum::Cholesky(int n, double **A)
-{
-	int i, j, k;
-	double acc, radq;
+int MetNum::Cholesky(int n, double **A) {
+  int i, j, k;
+  double acc, radq;
 
-	if (n < 1)
-		return -1;
+  if (n < 1) return -1;
 
-	for (j = 0; j < n; j++) {
-		acc = A[j][j];
-		for (k = 0; k < j; k++)
-			acc -= A[j][k] * A[j][k];
+  for (j = 0; j < n; j++) {
+    acc = A[j][j];
+    for (k = 0; k < j; k++) acc -= A[j][k] * A[j][k];
 
-		if (acc <= 0) {
-			return j + 1;
-		}
+    if (acc <= 0) {
+      return j + 1;
+    }
 
-		radq = sqrt(acc);
-		A[j][j] = radq;
-		for (i = j + 1; i < n; i++) {
-			acc = A[i][j];
-			for (k = 0; k < j; k++)
-				acc -= A[i][k] * A[j][k];
-			A[i][j] = acc / radq;
-		}
-	}
+    radq    = sqrt(acc);
+    A[j][j] = radq;
+    for (i = j + 1; i < n; i++) {
+      acc = A[i][j];
+      for (k  = 0; k < j; k++) acc -= A[i][k] * A[j][k];
+      A[i][j] = acc / radq;
+    }
+  }
 
-	return 0;
+  return 0;
 }
 
 /*-------------------------  CholForw  ---------------------------------*/
@@ -280,23 +259,19 @@ int MetNum::Cholesky(int n, double **A)
 /*             -1          n<1                                          */
 /*              k>0        la riga k ha uno 0 sulla diagonale           */
 /*----------------------------------------------------------------------*/
-int MetNum::CholForw(int n, double **A, double b[], double x[])
-{
-	int i, j;
+int MetNum::CholForw(int n, double **A, double b[], double x[]) {
+  int i, j;
 
-	if (n < 1)
-		return -1;
+  if (n < 1) return -1;
 
-	for (i = 0; i < n; i++) {
-		if (fabs(A[i][i]) <= n * DBL_EPSILON)
-			return i + 1;
-		x[i] = b[i];
-		for (j = 0; j < i; j++)
-			x[i] -= A[i][j] * x[j];
-		x[i] /= A[i][i];
-	}
+  for (i = 0; i < n; i++) {
+    if (fabs(A[i][i]) <= n * DBL_EPSILON) return i + 1;
+    x[i] = b[i];
+    for (j = 0; j < i; j++) x[i] -= A[i][j] * x[j];
+    x[i] /= A[i][i];
+  }
 
-	return 0;
+  return 0;
 }
 
 /*-------------------------  CholBack  ---------------------------------*/
@@ -328,21 +303,17 @@ int MetNum::CholForw(int n, double **A, double b[], double x[])
 /*             -1          n<1                                          */
 /*              k>0        la riga k ha uno 0 sulla diagonale           */
 /*----------------------------------------------------------------------*/
-int MetNum::CholBack(int n, double **A, double b[], double x[])
-{
-	int i, j;
+int MetNum::CholBack(int n, double **A, double b[], double x[]) {
+  int i, j;
 
-	if (n < 1)
-		return -1;
+  if (n < 1) return -1;
 
-	for (i = n - 1; i >= 0; i--) {
-		if (fabs(A[i][i]) <= n * DBL_EPSILON)
-			return i + 1;
-		x[i] = b[i];
-		for (j = i + 1; j < n; j++)
-			x[i] -= A[j][i] * x[j];
-		x[i] /= A[i][i];
-	}
+  for (i = n - 1; i >= 0; i--) {
+    if (fabs(A[i][i]) <= n * DBL_EPSILON) return i + 1;
+    x[i] = b[i];
+    for (j = i + 1; j < n; j++) x[i] -= A[j][i] * x[j];
+    x[i] /= A[i][i];
+  }
 
-	return 0;
+  return 0;
 }

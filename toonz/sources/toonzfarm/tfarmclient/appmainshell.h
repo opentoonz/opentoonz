@@ -7,35 +7,34 @@
 
 //==============================================================================
 
-class AppMainshell : public TMainshell
-{
+class AppMainshell : public TMainshell {
 public:
-	AppMainshell();
-	~AppMainshell();
+  AppMainshell();
+  ~AppMainshell();
 
-	static AppMainshell *instance();
+  static AppMainshell *instance();
 
-	void init();
-	bool beforeShow();
-	void configureNotify(const TDimension &size);
+  void init();
+  bool beforeShow();
+  void configureNotify(const TDimension &size);
 
-	void openProgressBar(string name);
-	void closeProgressBar();
-	bool setProgressBarFraction(int num, int den);
+  void openProgressBar(string name);
+  void closeProgressBar();
+  bool setProgressBarFraction(int num, int den);
 
-	void repaint();
+  void repaint();
 
-	void close();
+  void close();
 
-	TDimension getPreferredSize();
-	int getMainIconId();
+  TDimension getPreferredSize();
+  int getMainIconId();
 
-	void onTimer(int);
-	string getAppId() const { return "TFarm"; }
+  void onTimer(int);
+  string getAppId() const { return "TFarm"; }
 
 private:
-	class Data;
-	Data *m_data;
+  class Data;
+  Data *m_data;
 };
 
 #endif

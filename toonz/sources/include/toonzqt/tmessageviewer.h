@@ -21,40 +21,39 @@ class MySortFilterProxyModel;
 class QCheckBox;
 class QStandardItemModel;
 
-class DVAPI TMessageRepository : public QObject
-{
-	QStandardItemModel *m_sim;
+class DVAPI TMessageRepository : public QObject {
+  QStandardItemModel *m_sim;
 
-	Q_OBJECT
+  Q_OBJECT
 public:
-	static TMessageRepository *instance();
-	TMessageRepository();
-	QStandardItemModel *getModel() const { return m_sim; }
-	void clear();
+  static TMessageRepository *instance();
+  TMessageRepository();
+  QStandardItemModel *getModel() const { return m_sim; }
+  void clear();
 
 public slots:
-	void messageReceived(int, const QString &);
+  void messageReceived(int, const QString &);
 
 signals:
-	void openMessageCenter(); // TMessageRepository emits this signal to indicate that the TMessageViewer should be made visible
+  void openMessageCenter();  // TMessageRepository emits this signal to indicate
+                             // that the TMessageViewer should be made visible
 };
 
 //---------------------------------------------------------------------------------------
 
-class DVAPI TMessageViewer : public QFrame
-{
-	Q_OBJECT
+class DVAPI TMessageViewer : public QFrame {
+  Q_OBJECT
 
 protected:
-	static std::vector<TMessageViewer *> m_tmsgViewers;
-	MySortFilterProxyModel *m_proxyModel;
-	void rowsInserted(const QModelIndex &parent, int start, int end);
+  static std::vector<TMessageViewer *> m_tmsgViewers;
+  MySortFilterProxyModel *m_proxyModel;
+  void rowsInserted(const QModelIndex &parent, int start, int end);
 
 public:
-	QCheckBox *m_redCheck, *m_greenCheck, *m_yellowCheck;
-	TMessageViewer(QWidget *);
-	static bool isTMsgVisible();
+  QCheckBox *m_redCheck, *m_greenCheck, *m_yellowCheck;
+  TMessageViewer(QWidget *);
+  static bool isTMsgVisible();
 public slots:
-	void onClicked(bool);
-	void refreshFilter(int);
+  void onClicked(bool);
+  void refreshFilter(int);
 };

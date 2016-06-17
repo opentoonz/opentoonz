@@ -23,26 +23,25 @@ class TXshColumn;
 // TColumnHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TColumnHandle : public QObject
-{
-	Q_OBJECT
+class DVAPI TColumnHandle : public QObject {
+  Q_OBJECT
 
-	TXshColumn *m_column;
-	int m_columnIndex;
+  TXshColumn *m_column;
+  int m_columnIndex;
 
 public:
-	TColumnHandle();
-	~TColumnHandle();
+  TColumnHandle();
+  ~TColumnHandle();
 
-	TXshColumn *getColumn() const;
-	void setColumn(TXshColumn *column);
+  TXshColumn *getColumn() const;
+  void setColumn(TXshColumn *column);
 
-	int getColumnIndex() const { return m_columnIndex; }
-	void setColumnIndex(int index);
+  int getColumnIndex() const { return m_columnIndex; }
+  void setColumnIndex(int index);
 
 signals:
 
-	void columnIndexSwitched();
+  void columnIndexSwitched();
 };
 
-#endif //TCOLUMNHANDLE_H
+#endif  // TCOLUMNHANDLE_H
