@@ -8,12 +8,12 @@
 #define SLASH_CHAR '/'
 
 struct field_desc {
-	char present;
-	short pos, len;
+  char present;
+  short pos, len;
 };
 
 struct name_desc {
-	struct field_desc path, name, frame, suffix, type;
+  struct field_desc path, name, frame, suffix, type;
 };
 
 //---------------------------------------------------------------------

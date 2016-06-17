@@ -18,7 +18,8 @@ void apply_lut(const TRasterImageP &image, UCHAR lut[256]);
 void histo_l_algo(const TRasterImageP &image, int reference);
 
 int eval_image_th(const TRasterImageP &image, int *threshold, float *linewidth);
-// void thresh_image (const TRasterImageP &image, int threshold, int oversample_factor);
+// void thresh_image (const TRasterImageP &image, int threshold, int
+// oversample_factor);
 
 void autoadj_set_black_value(int black);
 

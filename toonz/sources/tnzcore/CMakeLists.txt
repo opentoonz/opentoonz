@@ -246,10 +246,20 @@ if(WIN32)
     set(SOURCES ${SOURCES}
         ../common/tsound/tsound_nt.cpp
         ../common/tvrender/tfont_nt.cpp)
-else()
+elseif(APPLE)
     set(SOURCES ${SOURCES}
         ../common/tsound/tsound_mac.cpp
         ../common/tvrender/tfont_mac.cpp)
+elseif(UNIX)
+    set(SOURCES ${SOURCES}
+        ../common/tvrender/tfont_qt.cpp)
+    if(SDL_LIB_FOUND)
+        set(SOURCES ${SOURCES}
+            ../common/tsound/tsound_sdl.cpp)
+    else()
+        set(SOURCES ${SOURCES}
+            ../common/tsound/tsound_x.cpp)
+    endif()
 endif()
 
 add_translation(tnzcore ${HEADERS} ${SOURCES})
@@ -281,7 +291,7 @@ if(WIN32)
         winmm.lib
         opengl32.lib
         glu32.lib)
-else()
+elseif(APPLE)
     find_library(AUDIOUNIT_LIB AudioUnit)
     find_library(AUDIOTB_LIB AudioToolbox)
     find_library(CARBON_LIB Carbon)
@@ -290,6 +300,11 @@ else()
         ${AUDIOUNIT_LIB}
         ${AUDIOTB_LIB}
         ${CARBON_LIB})
+elseif(UNIX)
+    set(QT_LIB)  # avoid warning
+    include_directories(${FREETYPE_INCLUDE_DIRS})
+    set(EXTRA_LIBS
+        ${GLU_LIB})
 endif()
 
 target_link_libraries(tnzcore

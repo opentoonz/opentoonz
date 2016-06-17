@@ -34,7 +34,8 @@ int w = 0, h = 0;
 
 int type = getTypeFromExt(getFilePath().getType());
 
-void *buffer = img_read_quantel(getFilePath().getWideString().c_str(), &w, &h, type);
+void *buffer = img_read_quantel(getFilePath().getWideString().c_str(), &w, &h,
+type);
 if (buffer)
   {
   TRaster32P raster(w, h, w, (TPixel32*)buffer);
@@ -50,7 +51,8 @@ TDimension TImageReaderQuantel::getSize() const
 {
 int w, h;
 
-img_read_quantel_info(getFilePath().getWideString().c_str(), &w, &h, getTypeFromExt(getFilePath().getType()));
+img_read_quantel_info(getFilePath().getWideString().c_str(), &w, &h,
+getTypeFromExt(getFilePath().getType()));
 return TDimension(w, h);
 }
 
@@ -59,7 +61,8 @@ return TDimension(w, h);
 TRect TImageReaderQuantel::getBBox() const
 {
 int w, h;
-img_read_quantel_info(getFilePath().getWideString().c_str(), &w, &h, getTypeFromExt(getFilePath().getType()));
+img_read_quantel_info(getFilePath().getWideString().c_str(), &w, &h,
+getTypeFromExt(getFilePath().getType()));
 return TRect(0,0,w-1, h-1);
 }
 
@@ -78,7 +81,8 @@ if (raster->getLx() != raster->getWrap())
 
 int type = getTypeFromExt(getFilePath().getType());
 
-if (!img_write_quantel(getFilePath().getWideString().c_str(), raster->getRawData(), raster->getLx(), raster->getLy(), type))
+if (!img_write_quantel(getFilePath().getWideString().c_str(),
+raster->getRawData(), raster->getLx(), raster->getLy(), type))
   throw TException("error writing file");
 }
 

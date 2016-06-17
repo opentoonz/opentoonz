@@ -15,17 +15,16 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TBinarizer
-{
-	bool m_alphaEnabled;
+class DVAPI TBinarizer {
+  bool m_alphaEnabled;
 
 private:
 public:
-	TBinarizer();
-	void process(const TRaster32P &ras);
+  TBinarizer();
+  void process(const TRaster32P &ras);
 
-	void enableAlpha(bool enabled) { m_alphaEnabled = enabled; }
-	bool isAlphaEnabled() const { return m_alphaEnabled; }
+  void enableAlpha(bool enabled) { m_alphaEnabled = enabled; }
+  bool isAlphaEnabled() const { return m_alphaEnabled; }
 };
 
-#endif // TBINARIZER_H
+#endif  // TBINARIZER_H

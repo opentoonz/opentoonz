@@ -22,104 +22,102 @@ class TFilePath;
 // {
 //     class RenderData;
 // };
-//class TRenderPort::RenderData;
+// class TRenderPort::RenderData;
 
 //=============================================================================
 // Previewer
 //-----------------------------------------------------------------------------
 
-class Previewer : public QObject, public TFxObserver
-{
-	Q_OBJECT
+class Previewer : public QObject, public TFxObserver {
+  Q_OBJECT
 
-	class Imp;
-	std::unique_ptr<Imp> m_imp;
+  class Imp;
+  std::unique_ptr<Imp> m_imp;
 
-	Previewer(bool subcamera);
-	~Previewer();
+  Previewer(bool subcamera);
+  ~Previewer();
 
-	// not implemented
-	Previewer(const Previewer &);
-	void operator=(const Previewer &);
-
-public:
-	class Listener
-	{
-	public:
-		QTimer m_refreshTimer;
-
-		Listener();
-		virtual ~Listener() {}
-
-		void requestTimedRefresh();
-		virtual TRectD getPreviewRect() const = 0;
-
-		virtual void onRenderStarted(int frame){};
-		virtual void onRenderCompleted(int frame){};
-		virtual void onRenderFailed(int frame){};
-
-		virtual void onPreviewUpdate() {}
-	};
+  // not implemented
+  Previewer(const Previewer &);
+  void operator=(const Previewer &);
 
 public:
-	static Previewer *instance(bool subcameraPreview = false);
+  class Listener {
+  public:
+    QTimer m_refreshTimer;
 
-	static void clearAll();
+    Listener();
+    virtual ~Listener() {}
 
-	static void suspendRendering(bool suspend);
+    void requestTimedRefresh();
+    virtual TRectD getPreviewRect() const = 0;
 
-	void addListener(Listener *);
-	void removeListener(Listener *);
+    virtual void onRenderStarted(int frame){};
+    virtual void onRenderCompleted(int frame){};
+    virtual void onRenderFailed(int frame){};
 
-	TRasterP getRaster(int frame, bool renderIfNeeded = true) const;
-	bool isFrameReady(int frame) const;
+    virtual void onPreviewUpdate() {}
+  };
 
-	bool doSaveRenderedFrames(TFilePath fp);
+public:
+  static Previewer *instance(bool subcameraPreview = false);
 
-	bool isActive() const;
-	bool isBusy() const;
+  static void clearAll();
 
-	void onChange(const TFxChange &change);
+  static void suspendRendering(bool suspend);
 
-	void onImageChange(TXshLevel *xl, const TFrameId &fid);
-	void onLevelChange(TXshLevel *xl);
+  void addListener(Listener *);
+  void removeListener(Listener *);
 
-	void clear(int frame);
-	void clear();
+  TRasterP getRaster(int frame, bool renderIfNeeded = true) const;
+  bool isFrameReady(int frame) const;
 
-	std::vector<UCHAR> &getProgressBarStatus() const;
+  bool doSaveRenderedFrames(TFilePath fp);
+
+  bool isActive() const;
+  bool isBusy() const;
+
+  void onChange(const TFxChange &change);
+
+  void onImageChange(TXshLevel *xl, const TFrameId &fid);
+  void onLevelChange(TXshLevel *xl);
+
+  void clear(int frame);
+  void clear();
+
+  std::vector<UCHAR> &getProgressBarStatus() const;
 
 private:
-	friend class Imp;
-	void emitStartedFrame(const TRenderPort::RenderData &renderData);
-	void emitRenderedFrame(const TRenderPort::RenderData &renderData);
-	void emitFailedFrame(const TRenderPort::RenderData &renderData);
+  friend class Imp;
+  void emitStartedFrame(const TRenderPort::RenderData &renderData);
+  void emitRenderedFrame(const TRenderPort::RenderData &renderData);
+  void emitFailedFrame(const TRenderPort::RenderData &renderData);
 
 signals:
 
-	void activedChanged();
-	void startedFrame(TRenderPort::RenderData renderData);
-	void renderedFrame(TRenderPort::RenderData renderData);
-	void failedFrame(TRenderPort::RenderData renderData);
+  void activedChanged();
+  void startedFrame(TRenderPort::RenderData renderData);
+  void renderedFrame(TRenderPort::RenderData renderData);
+  void failedFrame(TRenderPort::RenderData renderData);
 
 public slots:
 
-	void saveFrame();
-	void saveRenderedFrames();
+  void saveFrame();
+  void saveRenderedFrames();
 
-	void update();
-	void updateView();
+  void update();
+  void updateView();
 
-	void onLevelChanged();
-	void onFxChanged();
-	void onXsheetChanged();
-	void onObjectChanged();
+  void onLevelChanged();
+  void onFxChanged();
+  void onXsheetChanged();
+  void onObjectChanged();
 
 protected slots:
 
-	void onStartedFrame(TRenderPort::RenderData renderData);
-	void onRenderedFrame(TRenderPort::RenderData renderData);
-	void onFailedFrame(TRenderPort::RenderData renderData);
+  void onStartedFrame(TRenderPort::RenderData renderData);
+  void onRenderedFrame(TRenderPort::RenderData renderData);
+  void onFailedFrame(TRenderPort::RenderData renderData);
 };
 
 #endif

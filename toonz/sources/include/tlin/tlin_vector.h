@@ -10,19 +10,18 @@
 */
 
 template <typename T>
-class vector
-{
+class vector {
 public:
-	vector(int size);
-	~vector();
+  vector(int size);
+  ~vector();
 
-	vector(const vector &);
-	vector &operator=(const vector &);
+  vector(const vector &);
+  vector &operator=(const vector &);
 
-	int size() const;
+  int size() const;
 
-	T &operator[](int i);
-	const T &operator[](int i) const;
+  T &operator[](int i);
+  const T &operator[](int i) const;
 };
 
-#endif //TLIN_MATRIX_H
+#endif  // TLIN_MATRIX_H

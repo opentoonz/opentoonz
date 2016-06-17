@@ -13,95 +13,90 @@ class TimeStretchPopup;
 // TCellSelection
 //-----------------------------------------------------------------------------
 
-class TCellSelection : public TSelection
-{
-	TimeStretchPopup *m_timeStretchPopup;
+class TCellSelection : public TSelection {
+  TimeStretchPopup *m_timeStretchPopup;
 
 public:
-	class Range
-	{
-	public:
-		int m_c0, m_r0, m_c1, m_r1;
-		Range();
-		bool isEmpty() const;
-		bool contains(int r, int c) const;
-		int getRowCount() const;
-		int getColCount() const;
-	};
+  class Range {
+  public:
+    int m_c0, m_r0, m_c1, m_r1;
+    Range();
+    bool isEmpty() const;
+    bool contains(int r, int c) const;
+    int getRowCount() const;
+    int getColCount() const;
+  };
 
 private:
-	Range m_range;
+  Range m_range;
 
 public:
-	TCellSelection();
-	TCellSelection(Range range)
-		: m_range(range)
-	{
-	}
-	~TCellSelection();
+  TCellSelection();
+  TCellSelection(Range range) : m_range(range) {}
+  ~TCellSelection();
 
-	void enableCommands();
+  void enableCommands();
 
-	bool isEmpty() const;
+  bool isEmpty() const;
 
-	void copyCells();
-	void pasteCells();
-	void deleteCells();
-	void cutCells();
-	void cutCells(bool withoutCopy);
+  void copyCells();
+  void pasteCells();
+  void deleteCells();
+  void cutCells();
+  void cutCells(bool withoutCopy);
 
-	/*- セルの上書きペースト -*/
-	void overWritePasteCells();
+  /*- セルの上書きペースト -*/
+  void overWritePasteCells();
 
-	//! \note: puo' anche essere r0>r1 o c0>c1
-	void selectCells(int r0, int c0, int r1, int c1);
-	void selectCell(int row, int col);
-	void selectNone();
+  //! \note: puo' anche essere r0>r1 o c0>c1
+  void selectCells(int r0, int c0, int r1, int c1);
+  void selectCell(int row, int col);
+  void selectNone();
 
-	void getSelectedCells(int &r0, int &c0, int &r1, int &c1) const;
-	Range getSelectedCells() const;
+  void getSelectedCells(int &r0, int &c0, int &r1, int &c1) const;
+  Range getSelectedCells() const;
 
-	bool isCellSelected(int r, int c) const;
-	bool isRowSelected(int row) const;
-	bool isColSelected(int col) const;
+  bool isCellSelected(int r, int c) const;
+  bool isRowSelected(int row) const;
+  bool isColSelected(int col) const;
 
-	bool areAllColSelectedLocked() const;
+  bool areAllColSelectedLocked() const;
 
-	//commands
-	void reverseCells();
-	void swingCells();
-	void incrementCells();
-	void randomCells();
-	void stepCells(int count);
-	void eachCells(int count);
-	void resetStepCells();
-	void increaseStepCells();
-	void decreaseStepCells();
-	void step2Cells() { stepCells(2); }
-	void step3Cells() { stepCells(3); }
-	void step4Cells() { stepCells(4); }
-	void each2Cells() { eachCells(2); }
-	void each3Cells() { eachCells(3); }
-	void each4Cells() { eachCells(4); }
-	void rollupCells();
-	void rolldownCells();
+  // commands
+  void reverseCells();
+  void swingCells();
+  void incrementCells();
+  void randomCells();
+  void stepCells(int count);
+  void eachCells(int count);
+  void resetStepCells();
+  void increaseStepCells();
+  void decreaseStepCells();
+  void step2Cells() { stepCells(2); }
+  void step3Cells() { stepCells(3); }
+  void step4Cells() { stepCells(4); }
+  void each2Cells() { eachCells(2); }
+  void each3Cells() { eachCells(3); }
+  void each4Cells() { eachCells(4); }
+  void rollupCells();
+  void rolldownCells();
 
-	void setKeyframes();
-	void pasteKeyframesInto();
+  void setKeyframes();
+  void pasteKeyframesInto();
 
-	void cloneLevel();
-	void insertCells();
+  void cloneLevel();
+  void insertCells();
 
-	void openTimeStretchPopup();
+  void openTimeStretchPopup();
 
-	void dRenumberCells();
-	void dPasteCells();
+  void dRenumberCells();
+  void dPasteCells();
 
-	void reframeCells(int count);
-	void reframe1Cells() { reframeCells(1); }
-	void reframe2Cells() { reframeCells(2); }
-	void reframe3Cells() { reframeCells(3); }
-	void reframe4Cells() { reframeCells(4); }
+  void reframeCells(int count);
+  void reframe1Cells() { reframeCells(1); }
+  void reframe2Cells() { reframeCells(2); }
+  void reframe3Cells() { reframeCells(3); }
+  void reframe4Cells() { reframeCells(4); }
 };
 
-#endif //TCELLSELECTION_H
+#endif  // TCELLSELECTION_H

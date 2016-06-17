@@ -8,8 +8,9 @@
 //#include "tcurves.h"
 //#include "tflash.h"
 
-//bool computeSweepBoundary(	const std::vector<TStroke*> &strokes,
-//							std::vector< std::vector<TQuadratic*> > &outlines );
+// bool computeSweepBoundary(	const std::vector<TStroke*> &strokes,
+//							std::vector<
+//std::vector<TQuadratic*> > &outlines );
 
 #undef DVAPI
 #undef DVVAR
@@ -21,7 +22,8 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-bool DVAPI computeSweepBoundary(const std::vector<TStroke *> &strokes,
-								std::vector<std::vector<TQuadratic *>> &outlines);
+bool DVAPI
+computeSweepBoundary(const std::vector<TStroke *> &strokes,
+                     std::vector<std::vector<TQuadratic *>> &outlines);
 
-#endif //TSWEEPBOUNDARY_INCLUDED
+#endif  // TSWEEPBOUNDARY_INCLUDED

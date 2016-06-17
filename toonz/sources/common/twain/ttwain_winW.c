@@ -12,19 +12,18 @@ static HWND Dummy = 0; /* proxy window */
 
 extern int TTWAIN_MessageHook(void *lpmsg);
 
-static HWND CreateDummyWindow(void)
-{
-	HWND hwnd;
-	hwnd = CreateWindow("STATIC",					  // class
-						"Acquire Dummy",			  // title
-						WS_POPUPWINDOW,				  // style
-						CW_USEDEFAULT, CW_USEDEFAULT, // x, y
-						CW_USEDEFAULT, CW_USEDEFAULT, // width, height
-						HWND_DESKTOP,				  // parent window
-						NULL,						  // hmenu
-						HINSTLIB0,					  // hinst
-						NULL);						  // lpvparam
-	return hwnd;
+static HWND CreateDummyWindow(void) {
+  HWND hwnd;
+  hwnd = CreateWindow("STATIC",                      // class
+                      "Acquire Dummy",               // title
+                      WS_POPUPWINDOW,                // style
+                      CW_USEDEFAULT, CW_USEDEFAULT,  // x, y
+                      CW_USEDEFAULT, CW_USEDEFAULT,  // width, height
+                      HWND_DESKTOP,                  // parent window
+                      NULL,                          // hmenu
+                      HINSTLIB0,                     // hinst
+                      NULL);                         // lpvparam
+  return hwnd;
 }
 /*---------------------------------------------------------------------------*/
 void *TTWAIN_GetValidHwndPD(void *_hwnd)
@@ -36,63 +35,61 @@ void *TTWAIN_GetValidHwndPD(void *_hwnd)
 // If hwnd is an invalid window handle (other than NULL)
 // an error box is displayed.
 {
-	HWND hwnd = (HWND)_hwnd;
-	if (!IsWindow(hwnd)) {
-		if (hwnd != NULL) {
-			assert(!"Window handle is invalid");
-			hwnd = NULL;
-		}
-		if (!Dummy) {
-			Dummy = CreateDummyWindow();
-			if (!IsWindow(Dummy)) {
-				assert(!"Unable to create Dummy window");
-				Dummy = NULL;
-			}
-		}
-		hwnd = Dummy;
-	}
-	return (void *)hwnd;
+  HWND hwnd = (HWND)_hwnd;
+  if (!IsWindow(hwnd)) {
+    if (hwnd != NULL) {
+      assert(!"Window handle is invalid");
+      hwnd = NULL;
+    }
+    if (!Dummy) {
+      Dummy = CreateDummyWindow();
+      if (!IsWindow(Dummy)) {
+        assert(!"Unable to create Dummy window");
+        Dummy = NULL;
+      }
+    }
+    hwnd = Dummy;
+  }
+  return (void *)hwnd;
 }
 /*---------------------------------------------------------------------------*/
-void TTWAIN_EmptyMessageQueuePD(void)
-{
-	MSG msg;
+void TTWAIN_EmptyMessageQueuePD(void) {
+  MSG msg;
 #ifdef _DEBUG
-	OutputDebugString("EmptyMsgQ<");
+  OutputDebugString("EmptyMsgQ<");
 #endif
-	while (PeekMessage((LPMSG)&msg, NULL, 0, 0, PM_REMOVE)) {
-		if (!TTWAIN_MessageHook((LPMSG)&msg)) {
-			TranslateMessage((LPMSG)&msg);
-			DispatchMessage((LPMSG)&msg);
+  while (PeekMessage((LPMSG)&msg, NULL, 0, 0, PM_REMOVE)) {
+    if (!TTWAIN_MessageHook((LPMSG)&msg)) {
+      TranslateMessage((LPMSG)&msg);
+      DispatchMessage((LPMSG)&msg);
 #ifdef _DEBUG
-			OutputDebugString("-");
+      OutputDebugString("-");
 #endif
-		} else {
+    } else {
 #ifdef _DEBUG
-			OutputDebugString("T");
+      OutputDebugString("T");
 #endif
-		}
-	}
+    }
+  }
 #ifdef _DEBUG
-	OutputDebugString(">\n");
+  OutputDebugString(">\n");
 #endif
 }
 
-void TTWAIN_ModalEventLoopPD(void)
-{
-	MSG msg;
-	// Clear global breakout flag
-	TTwainData.breakModalLoop = FALSE;
+void TTWAIN_ModalEventLoopPD(void) {
+  MSG msg;
+  // Clear global breakout flag
+  TTwainData.breakModalLoop = FALSE;
 
-	while ((TTWAIN_GetState() >= TWAIN_SOURCE_ENABLED) && !TTwainData.breakModalLoop && GetMessage((LPMSG)&msg, NULL, 0, 0)) {
-		if (!TTWAIN_MessageHook((LPMSG)&msg)) {
-			TranslateMessage((LPMSG)&msg);
-			DispatchMessage((LPMSG)&msg);
-		}
-	} // while
-	TTwainData.breakModalLoop = FALSE;
+  while ((TTWAIN_GetState() >= TWAIN_SOURCE_ENABLED) &&
+         !TTwainData.breakModalLoop && GetMessage((LPMSG)&msg, NULL, 0, 0)) {
+    if (!TTWAIN_MessageHook((LPMSG)&msg)) {
+      TranslateMessage((LPMSG)&msg);
+      DispatchMessage((LPMSG)&msg);
+    }
+  }  // while
+  TTwainData.breakModalLoop = FALSE;
 }
-int TTWAIN_EnableWindowPD(void *hwnd, int flag)
-{
-	return EnableWindow(hwnd, flag);
+int TTWAIN_EnableWindowPD(void *hwnd, int flag) {
+  return EnableWindow(hwnd, flag);
 }

@@ -22,125 +22,120 @@
 class TVectorImage;
 class TPropertyGroup;
 
-namespace Tiio
-{
+namespace Tiio {
 
 //-------------------------------------------------------------------
 
-enum RowOrder { BOTTOM2TOP,
-				TOP2BOTTOM };
+enum RowOrder { BOTTOM2TOP, TOP2BOTTOM };
 
 //-------------------------------------------------------------------
 
 //-------------------------------------------------------------------
 
-class DVAPI Exception
-{
-};
+class DVAPI Exception {};
 
 //-------------------------------------------------------------------
 
-class DVAPI Reader
-{
-
+class DVAPI Reader {
 protected:
-	TImageInfo m_info;
+  TImageInfo m_info;
 
 public:
-	Reader();
-	virtual ~Reader();
+  Reader();
+  virtual ~Reader();
 
-	virtual void open(FILE *file) = 0;
+  virtual void open(FILE *file) = 0;
 
-	const TImageInfo &getImageInfo() const { return m_info; }
+  const TImageInfo &getImageInfo() const { return m_info; }
 
-	virtual TPropertyGroup *getProperties() const { return 0; }
+  virtual TPropertyGroup *getProperties() const { return 0; }
 
-	void readLine(char *buffer) { readLine(buffer, 0, m_info.m_lx - 1, 1); }
-	void readLine(short *buffer) { readLine(buffer, 0, m_info.m_lx - 1, 1); }
-	virtual void readLine(char *buffer, int x0, int x1, int shrink) = 0;
-	virtual void readLine(short *, int, int, int) { assert(false); }
-	// Returns skipped lines number.
-	// If not implemented returns 0;
-	virtual int skipLines(int lineCount) = 0;
+  void readLine(char *buffer) { readLine(buffer, 0, m_info.m_lx - 1, 1); }
+  void readLine(short *buffer) { readLine(buffer, 0, m_info.m_lx - 1, 1); }
+  virtual void readLine(char *buffer, int x0, int x1, int shrink) = 0;
+  virtual void readLine(short *, int, int, int) { assert(false); }
+  // Returns skipped lines number.
+  // If not implemented returns 0;
+  virtual int skipLines(int lineCount) = 0;
 
-	virtual RowOrder getRowOrder() const { return BOTTOM2TOP; }
-	virtual bool read16BitIsEnabled() const { return false; }
+  virtual RowOrder getRowOrder() const { return BOTTOM2TOP; }
+  virtual bool read16BitIsEnabled() const { return false; }
 
-	// this function enables/disables the 64 bit reading.
-	//If disabled, 64 bit images will be automatically  scaled down to 32 bit.
-	//The default behaviour for formats that support 64 bit images is "Enabled"
+  // this function enables/disables the 64 bit reading.
+  // If disabled, 64 bit images will be automatically  scaled down to 32 bit.
+  // The default behaviour for formats that support 64 bit images is "Enabled"
 
-	virtual void enable16BitRead(bool) {}
+  virtual void enable16BitRead(bool) {}
 
-	virtual void getTzpPaletteColorNames(std::map<int, std::pair<std::string, std::string>> &pltColorNames) const { assert(false); }
+  virtual void getTzpPaletteColorNames(
+      std::map<int, std::pair<std::string, std::string>> &pltColorNames) const {
+    assert(false);
+  }
 
 private:
-	// not implemented
-	Reader(const Reader &);
-	Reader &operator=(const Reader &);
+  // not implemented
+  Reader(const Reader &);
+  Reader &operator=(const Reader &);
 };
 
 //-------------------------------------------------------------------
 
-class DVAPI Writer
-{
-
+class DVAPI Writer {
 protected:
-	TImageInfo m_info;
-	TPropertyGroup *m_properties;
-	static int m_bwThreshold;
+  TImageInfo m_info;
+  TPropertyGroup *m_properties;
+  static int m_bwThreshold;
 
 public:
-	static void getSupportedFormats(QStringList &formats, bool onlyRenderFormats);
-	static void setBlackAndWhiteThreshold(int threshold) { m_bwThreshold = threshold; }
+  static void getSupportedFormats(QStringList &formats, bool onlyRenderFormats);
+  static void setBlackAndWhiteThreshold(int threshold) {
+    m_bwThreshold = threshold;
+  }
 
-	Writer();
-	virtual ~Writer();
+  Writer();
+  virtual ~Writer();
 
-	virtual void open(FILE *file, const TImageInfo &inafo) = 0;
+  virtual void open(FILE *file, const TImageInfo &inafo) = 0;
 
-	TPropertyGroup *getProperties() { return m_properties; }
+  TPropertyGroup *getProperties() { return m_properties; }
 
-	virtual void writeLine(char *buffer) = 0;
-	virtual void writeLine(short *) { assert(false); }
+  virtual void writeLine(char *buffer) = 0;
+  virtual void writeLine(short *) { assert(false); }
 
-	virtual void flush() {}
+  virtual void flush() {}
 
-	virtual RowOrder getRowOrder() const { return BOTTOM2TOP; }
-	virtual bool write64bitSupported() const { return false; }
+  virtual RowOrder getRowOrder() const { return BOTTOM2TOP; }
+  virtual bool write64bitSupported() const { return false; }
 
-	void setProperties(TPropertyGroup *properties);
+  void setProperties(TPropertyGroup *properties);
 
 private:
-	// not implemented
-	Writer(const Writer &);
-	Writer &operator=(const Writer &);
+  // not implemented
+  Writer(const Writer &);
+  Writer &operator=(const Writer &);
 };
 
 //-------------------------------------------------------------------
 
-class DVAPI VectorReader
-{
+class DVAPI VectorReader {
 public:
-	VectorReader() {}
-	virtual ~VectorReader() {}
+  VectorReader() {}
+  virtual ~VectorReader() {}
 
-	virtual void open(FILE *file) = 0;
+  virtual void open(FILE *file) = 0;
 
-	virtual TVectorImage *read() = 0;
+  virtual TVectorImage *read() = 0;
 };
 
 //-------------------------------------------------------------------
 
-class DVAPI VectorWriter
-{
+class DVAPI VectorWriter {
 public:
-	VectorWriter() {}
-	virtual ~VectorWriter() {}
+  VectorWriter() {}
+  virtual ~VectorWriter() {}
 
-	virtual void open(FILE *file) = 0;
-	virtual void write(TVectorImage *) = 0;
+  virtual void open(FILE *file)      = 0;
+  virtual void write(TVectorImage *) = 0;
 };
 
 //-------------------------------------------------------------------
@@ -164,10 +159,13 @@ DVAPI TPropertyGroup *makeWriterProperties(std::string ext);
 //-------------------------------------------------------------------
 
 DVAPI void defineReaderMaker(const char *ext, Tiio::ReaderMaker *fn);
-DVAPI void defineWriterMaker(const char *ext, Tiio::WriterMaker *fn, bool isRenderFormat);
+DVAPI void defineWriterMaker(const char *ext, Tiio::WriterMaker *fn,
+                             bool isRenderFormat);
 
-DVAPI void defineVectorReaderMaker(const char *ext, Tiio::VectorReaderMaker *fn);
-DVAPI void defineVectorWriterMaker(const char *ext, Tiio::VectorWriterMaker *fn, bool isRenderFormat);
+DVAPI void defineVectorReaderMaker(const char *ext,
+                                   Tiio::VectorReaderMaker *fn);
+DVAPI void defineVectorWriterMaker(const char *ext, Tiio::VectorWriterMaker *fn,
+                                   bool isRenderFormat);
 
 DVAPI void defineWriterProperties(const char *ext, TPropertyGroup *);
 
@@ -175,6 +173,6 @@ DVAPI bool isQuicktimeInstalled();
 
 //-------------------------------------------------------------------
 
-} // namespace
+}  // namespace
 
 #endif

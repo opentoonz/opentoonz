@@ -17,41 +17,38 @@
 
 class TFilePath;
 
-class DVAPI TItemBrowser : public TWidget
-{
-	class Data;
-	Data *m_data;
+class DVAPI TItemBrowser : public TWidget {
+  class Data;
+  Data *m_data;
 
 public:
-	TItemBrowser(TWidget *parent, const TFilePath &rootDir, string name = "ItemBrowser");
-	~TItemBrowser();
+  TItemBrowser(TWidget *parent, const TFilePath &rootDir,
+               string name = "ItemBrowser");
+  ~TItemBrowser();
 
-	void setBorder(int dx, int dy);
+  void setBorder(int dx, int dy);
 
-	void setItemSize(const TDimension &d);
-	TDimension getItemSize() const;
+  void setItemSize(const TDimension &d);
+  TDimension getItemSize() const;
 
-	virtual int getItemCount() const = 0;
-	virtual void drawItem(
-		TWidget *w,
-		const TRect &rect,
-		int index,
-		bool selected) const = 0;
-	virtual bool isItemWide(int index) const { return false; };
-	virtual void loadItems(const TFilePath &rootDir) {}
+  virtual int getItemCount() const = 0;
+  virtual void drawItem(TWidget *w, const TRect &rect, int index,
+                        bool selected) const = 0;
+  virtual bool isItemWide(int index) const { return false; };
+  virtual void loadItems(const TFilePath &rootDir) {}
 
-	virtual void onSelect(int index) {}
+  virtual void onSelect(int index) {}
 
-	void select(int index);
-	void notifyItemCountChange();
+  void select(int index);
+  void notifyItemCountChange();
 
-	void configureNotify(const TDimension &);
+  void configureNotify(const TDimension &);
 
-	void update();
+  void update();
 
-	virtual void onKey(int key, int index){};
-	virtual wstring getTooltipString(int) { return wstring(); }
-	virtual string getContextHelpReference(int) { return string(); }
+  virtual void onKey(int key, int index){};
+  virtual wstring getTooltipString(int) { return wstring(); }
+  virtual string getContextHelpReference(int) { return string(); }
 };
 
 #endif

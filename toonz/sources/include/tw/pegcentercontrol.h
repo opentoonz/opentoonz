@@ -15,27 +15,26 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TPegCenterControl : public TWidget
-{
-	TUINT32 m_status, m_oldStatus;
-	int m_clickPos;
-	bool m_dragging;
+class DVAPI TPegCenterControl : public TWidget {
+  TUINT32 m_status, m_oldStatus;
+  int m_clickPos;
+  bool m_dragging;
 
 protected:
 public:
-	TPegCenterControl(TWidget *parent, string name = "canvas");
-	~TPegCenterControl();
+  TPegCenterControl(TWidget *parent, string name = "canvas");
+  ~TPegCenterControl();
 
-	virtual void draw();
+  virtual void draw();
 
-	void leftButtonDown(const TMouseEvent &e);
-	void leftButtonDrag(const TMouseEvent &e);
-	void leftButtonUp(const TMouseEvent &e);
+  void leftButtonDown(const TMouseEvent &e);
+  void leftButtonDrag(const TMouseEvent &e);
+  void leftButtonUp(const TMouseEvent &e);
 
-	void configureNotify(const TDimension &d);
+  void configureNotify(const TDimension &d);
 
-	void setStatus(TUINT32 status);
-	TUINT32 getStatus() const;
+  void setStatus(TUINT32 status);
+  TUINT32 getStatus() const;
 };
 
 #endif

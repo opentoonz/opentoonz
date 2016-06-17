@@ -27,170 +27,115 @@
 #pragma warning(disable : 4251)
 #endif
 
-namespace ToonzExt
-{
-class DVAPI
-	StrokeDeformationImpl
-{
+namespace ToonzExt {
+class DVAPI StrokeDeformationImpl {
 private:
-	bool
-	init(const ContextStatus *);
+  bool init(const ContextStatus *);
 
-	bool
-	computeStroke2Transform(const ContextStatus *s,
-							TStroke *&stroke2transform,
-							double &w,
-							ToonzExt::Interval &extremes);
+  bool computeStroke2Transform(const ContextStatus *s,
+                               TStroke *&stroke2transform, double &w,
+                               ToonzExt::Interval &extremes);
 
-	ToonzExt::Potential
-		*potential_;
+  ToonzExt::Potential *potential_;
 
-	static TStroke *
-		copyOfLastSelectedStroke_; // deep copy stroke selected previously
+  static TStroke
+      *copyOfLastSelectedStroke_;  // deep copy stroke selected previously
 
-	int
-		cursorId_;
+  int cursorId_;
 
 protected:
-	TStroke
-		*stroke2manipulate_;
+  TStroke *stroke2manipulate_;
 
-	static TStroke *&
-	getLastSelectedStroke();
+  static TStroke *&getLastSelectedStroke();
 
-	static void
-	setLastSelectedStroke(TStroke *);
+  static void setLastSelectedStroke(TStroke *);
 
-	static int &
-	getLastSelectedDegree();
+  static int &getLastSelectedDegree();
 
-	static void
-	setLastSelectedDegree(int degree);
+  static void setLastSelectedDegree(int degree);
 
-	static ToonzExt::Intervals &
-	getSpiresList();
+  static ToonzExt::Intervals &getSpiresList();
 
-	static ToonzExt::Intervals &
-	getStraightsList();
+  static ToonzExt::Intervals &getStraightsList();
 
-	ToonzExt::StrokeParametricDeformer
-		*deformer_;
+  ToonzExt::StrokeParametricDeformer *deformer_;
 
-	int
-		shortcutKey_;
+  int shortcutKey_;
 
-	double
-		old_w0_;
+  double old_w0_;
 
-	TPointD
-		old_w0_pos_;
+  TPointD old_w0_pos_;
 
-	// ref to simplify access
-	std::vector<TStroke *>
-		strokes_;
+  // ref to simplify access
+  std::vector<TStroke *> strokes_;
 
-	StrokeDeformationImpl();
+  StrokeDeformationImpl();
 
-	/**
-    * Is this the correct deformation?
-    */
-	virtual bool
-	check_(const ContextStatus *) = 0;
+  /**
+* Is this the correct deformation?
+*/
+  virtual bool check_(const ContextStatus *) = 0;
 
-	/**
-    * Retrieve the nearest extremes to point selected.
-    */
-	virtual bool
-	findExtremes_(const ContextStatus *,
-				  Interval &) = 0;
+  /**
+* Retrieve the nearest extremes to point selected.
+*/
+  virtual bool findExtremes_(const ContextStatus *, Interval &) = 0;
 
-	virtual double
-	findActionLength() = 0;
+  virtual double findActionLength() = 0;
 
 public:
-	virtual ~StrokeDeformationImpl();
+  virtual ~StrokeDeformationImpl();
 
-	ToonzExt::Interval
-	getExtremes();
+  ToonzExt::Interval getExtremes();
 
-	static const ContextStatus *&
-	getImplStatus();
+  static const ContextStatus *&getImplStatus();
 
-	const TStroke *
-	getStrokeSelected() const
-	{
-		if (getImplStatus())
-			return this->getImplStatus()->stroke2change_;
-		return 0;
-	}
+  const TStroke *getStrokeSelected() const {
+    if (getImplStatus()) return this->getImplStatus()->stroke2change_;
+    return 0;
+  }
 
-	const TStroke *
-	getCopiedStroke() const
-	{
-		return this->getStrokeSelected();
-	}
+  const TStroke *getCopiedStroke() const { return this->getStrokeSelected(); }
 
-	/**
-     * Wrapper for activate.
-     */
-	virtual bool
-	activate_impl(const ContextStatus *);
+  /**
+*Wrapper for activate.
+*/
+  virtual bool activate_impl(const ContextStatus *);
 
-	/**
-    * Modify stroke.
-    */
-	virtual void
-	update_impl(const TPointD &delta);
+  /**
+* Modify stroke.
+*/
+  virtual void update_impl(const TPointD &delta);
 
-	/**
-    * Reduce control points and change stroke.
-    */
-	virtual TStroke *
-	deactivate_impl();
+  /**
+* Reduce control points and change stroke.
+*/
+  virtual TStroke *deactivate_impl();
 
-	bool
-	check(const ContextStatus *);
+  bool check(const ContextStatus *);
 
-	/**
-    * Restore last good status.
-    */
-	virtual void
-	reset();
+  /**
+* Restore last good status.
+*/
+  virtual void reset();
 
-	void
-	setPotential(Potential *);
+  void setPotential(Potential *);
 
-	/**
-     * Apply a designer on current deformation.
-     */
-	virtual void
-	draw(Designer *);
+  /**
+*Apply a designer on current deformation.
+*/
+  virtual void draw(Designer *);
 
-	TStroke *
-	getTransformedStroke();
+  TStroke *getTransformedStroke();
 
-	ToonzExt::Potential *
-	getPotential();
+  ToonzExt::Potential *getPotential();
 
-	TPointD &
-	oldW0();
+  TPointD &oldW0();
 
-	int
-	getShortcutKey() const
-	{
-		return shortcutKey_;
-	}
+  int getShortcutKey() const { return shortcutKey_; }
 
-	int
-	getCursorId() const
-	{
-		return cursorId_;
-	}
-	void
-	setCursorId(int id)
-	{
-		cursorId_ = id;
-	}
+  int getCursorId() const { return cursorId_; }
+  void setCursorId(int id) { cursorId_ = id; }
 };
 }
 

@@ -18,8 +18,7 @@ class TFilePath;
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-namespace TSysLog
-{
+namespace TSysLog {
 void success(const std::string &msg);
 void warning(const std::string &msg);
 void error(const std::string &msg);
@@ -28,20 +27,19 @@ void info(const std::string &msg);
 
 //------------------------------------------------------------------------------
 
-class DVAPI TUserLogAppend
-{
+class DVAPI TUserLogAppend {
 public:
-	TUserLogAppend(); // used to redirect log messages to the console
-	TUserLogAppend(const TFilePath &fp);
-	~TUserLogAppend();
+  TUserLogAppend();  // used to redirect log messages to the console
+  TUserLogAppend(const TFilePath &fp);
+  ~TUserLogAppend();
 
-	void warning(const std::string &msg);
-	void error(const std::string &msg);
-	void info(const std::string &msg);
+  void warning(const std::string &msg);
+  void error(const std::string &msg);
+  void info(const std::string &msg);
 
 private:
-	class Imp;
-	std::unique_ptr<Imp> m_imp;
+  class Imp;
+  std::unique_ptr<Imp> m_imp;
 };
 
 #endif

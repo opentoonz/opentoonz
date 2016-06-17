@@ -26,7 +26,7 @@
 
 //-------------------------------
 
-//Forward Declarations
+// Forward Declarations
 class DockLayout;
 class DockWidget;
 
@@ -42,18 +42,17 @@ class Region;
 //    Docking Lock Check
 //--------------------------
 
-//!Singleton for docking system lock.
-class DVAPI DockingCheck
-{
-	bool m_enabled;
-	QAction *m_toggle;
-	DockingCheck() : m_enabled(false), m_toggle(0) {}
+//! Singleton for docking system lock.
+class DVAPI DockingCheck {
+  bool m_enabled;
+  QAction *m_toggle;
+  DockingCheck() : m_enabled(false), m_toggle(0) {}
 
 public:
-	static DockingCheck *instance();
-	void setToggle(QAction *toggle);
-	bool isEnabled() const { return m_enabled; }
-	void setIsEnabled(bool on);
+  static DockingCheck *instance();
+  void setToggle(QAction *toggle);
+  bool isEnabled() const { return m_enabled; }
+  void setIsEnabled(bool on);
 };
 
 //========================================================================
@@ -62,79 +61,89 @@ public:
 //    Dock Layout
 //-------------------
 
-//!DockLayout inherits the abstract QLayout to provide a docking system for widgets.
+//! DockLayout inherits the abstract QLayout to provide a docking system for
+//! widgets.
 /*!
-  \b IMPORTANT NOTE: Observe that the addWidget() method expects only widgets of type DockWidget, so any other
+  \b IMPORTANT NOTE: Observe that the addWidget() method expects only widgets of
+  type DockWidget, so any other
   widget type added to this kind of Layout will cause a run-time error.
 
   \sa DockWidget and DockSeparator classes.
 */
-class DVAPI DockLayout : public QLayout
-{
-	std::vector<QLayoutItem *> m_items;
-	std::deque<Region *> m_regions;
+class DVAPI DockLayout : public QLayout {
+  std::vector<QLayoutItem *> m_items;
+  std::deque<Region *> m_regions;
 
-	DockWidget *m_maximizedDock; //Let the layout know if there is a maximized widget
+  DockWidget
+      *m_maximizedDock;  // Let the layout know if there is a maximized widget
 
-	//Decoration-related allocator (separators)
-	DockDecoAllocator *m_decoAllocator;
+  // Decoration-related allocator (separators)
+  DockDecoAllocator *m_decoAllocator;
 
 public:
-	DockLayout();
-	virtual ~DockLayout();
+  DockLayout();
+  virtual ~DockLayout();
 
-	//QLayout item handling (see Qt reference)
-	int count(void) const;
-	void addItem(QLayoutItem *item);
-	QSize sizeHint() const;
-	QSize minimumSize() const;
-	QSize maximumSize() const;
-	QLayoutItem *itemAt(int) const;
-	QWidget *widgetAt(int) const;
-	QLayoutItem *takeAt(int);
-	void setGeometry(const QRect &rect);
+  // QLayout item handling (see Qt reference)
+  int count(void) const;
+  void addItem(QLayoutItem *item);
+  QSize sizeHint() const;
+  QSize minimumSize() const;
+  QSize maximumSize() const;
+  QLayoutItem *itemAt(int) const;
+  QWidget *widgetAt(int) const;
+  QLayoutItem *takeAt(int);
+  void setGeometry(const QRect &rect);
 
-	void update();									  //Re-applies partition found
-	void redistribute();							  //Calculates partition
-	void applyTransform(const QTransform &transform); //Applies tranformation to known parition - Da rimuovere, non serve...
+  void update();        // Re-applies partition found
+  void redistribute();  // Calculates partition
+  void applyTransform(const QTransform &transform);  // Applies tranformation to
+                                                     // known parition - Da
+                                                     // rimuovere, non serve...
 
-	DockWidget *getMaximized() { return m_maximizedDock; }
-	void setMaximized(DockWidget *item, bool state = true); //Let DockLayout handle maximization requests
+  DockWidget *getMaximized() { return m_maximizedDock; }
+  void setMaximized(
+      DockWidget *item,
+      bool state = true);  // Let DockLayout handle maximization requests
 
-	//Docking and undocking methods.
-	Region *dockItem(DockWidget *item, Region *r = 0, int idx = 0);
-	void dockItem(DockWidget *item, DockPlaceholder *place);
-	void dockItem(DockWidget *item, DockWidget *target, int regionSide);
-	bool undockItem(DockWidget *item);
-	void calculateDockPlaceholders(DockWidget *item);
+  // Docking and undocking methods.
+  Region *dockItem(DockWidget *item, Region *r = 0, int idx = 0);
+  void dockItem(DockWidget *item, DockPlaceholder *place);
+  void dockItem(DockWidget *item, DockWidget *target, int regionSide);
+  bool undockItem(DockWidget *item);
+  void calculateDockPlaceholders(DockWidget *item);
 
-	//Query methods
-	Region *rootRegion() const { return m_regions.size() ? m_regions.front() : 0; }
-	const std::deque<Region *> &regions() const { return m_regions; }
-	Region *region(int i) const { return m_regions[i]; }
-	Region *find(DockWidget *item) const;
-	QWidget *containerOf(QPoint point) const;
+  // Query methods
+  Region *rootRegion() const {
+    return m_regions.size() ? m_regions.front() : 0;
+  }
+  const std::deque<Region *> &regions() const { return m_regions; }
+  Region *region(int i) const { return m_regions[i]; }
+  Region *find(DockWidget *item) const;
+  QWidget *containerOf(QPoint point) const;
 
-	//Save and load DockLayout states
-	typedef std::pair<std::vector<QRect>, QString> State;
+  // Save and load DockLayout states
+  typedef std::pair<std::vector<QRect>, QString> State;
 
-	State saveState();
-	bool restoreState(const State &state);
+  State saveState();
+  bool restoreState(const State &state);
 
-	//Decorations allocator
-	void setDecoAllocator(DockDecoAllocator *decoAllocator);
+  // Decorations allocator
+  void setDecoAllocator(DockDecoAllocator *decoAllocator);
 
 private:
-	void applyGeometry();
-	inline void updateSeparatorCursors();
-	Region *dockItemPrivate(DockWidget *item, Region *r, int idx);
+  void applyGeometry();
+  inline void updateSeparatorCursors();
+  Region *dockItemPrivate(DockWidget *item, Region *r, int idx);
 
-	//Insertion and removal check - called internally by dock/undockItem
-	bool isPossibleInsertion(DockWidget *item, Region *parentRegion, int insertionIdx);
-	bool isPossibleRemoval(DockWidget *item, Region *parentRegion, int removalIdx);
+  // Insertion and removal check - called internally by dock/undockItem
+  bool isPossibleInsertion(DockWidget *item, Region *parentRegion,
+                           int insertionIdx);
+  bool isPossibleRemoval(DockWidget *item, Region *parentRegion,
+                         int removalIdx);
 
-	//Internal save function
-	void writeRegion(Region *r, QString &hierarchy);
+  // Internal save function
+  void writeRegion(Region *r, QString &hierarchy);
 };
 
 //========================================================================
@@ -143,7 +152,7 @@ private:
 //    Dock Widget
 //-----------------------
 
-//!Dockable widgets are widget containers handled by DockLayout class.
+//! Dockable widgets are widget containers handled by DockLayout class.
 /*!
   DockLayouts accept only dock widgets of this class; so if you want to
   place a given widget under this kind of layout, a DockWidget shell for
@@ -154,114 +163,124 @@ private:
 
   \sa DockLayout and DockPlaceholder classes.
 */
-class DVAPI DockWidget : public QWidget
-{
-	friend class DockLayout;	  //DockLayout is granted access to placeholders' privates
-	friend class DockPlaceholder; //As above.
-								  //friend Region;          //Regions need access to m_saveIndex field.
+class DVAPI DockWidget : public QWidget {
+  friend class DockLayout;  // DockLayout is granted access to placeholders'
+                            // privates
+  friend class DockPlaceholder;  // As above.
+  // friend Region;          //Regions need access to m_saveIndex field.
 
 protected:
-	//Private attributes for dragging purposes
-	bool m_floating;  //Whether this window is floating or docked
-	bool m_dragging;  //Whether this window is being dragged
-	bool m_undocking; //Still docked, but after a mouse button press on a title bar.
-	//NOTE: m_dragging ==> !m_undocking; m_dragging=>m_floating.
+  // Private attributes for dragging purposes
+  bool m_floating;   // Whether this window is floating or docked
+  bool m_dragging;   // Whether this window is being dragged
+  bool m_undocking;  // Still docked, but after a mouse button press on a title
+                     // bar.
+  // NOTE: m_dragging ==> !m_undocking; m_dragging=>m_floating.
 
-	//Private infos for resizing purposes
-	bool m_resizing;  //Whether this window is being resized
-	int m_marginType; //Type of resize to consider
+  // Private infos for resizing purposes
+  bool m_resizing;   // Whether this window is being resized
+  int m_marginType;  // Type of resize to consider
 
-	//Maximization
-	bool m_maximized;
+  // Maximization
+  bool m_maximized;
 
 private:
-	QPoint m_dragInitialPos;
-	QPoint m_dragMouseInitialPos;
+  QPoint m_dragInitialPos;
+  QPoint m_dragMouseInitialPos;
 
-	//Widget and Layout links
-	DockLayout *m_parentLayout;
+  // Widget and Layout links
+  DockLayout *m_parentLayout;
 
-	//Decoration-related allocator (placeholders)
-	DockDecoAllocator *m_decoAllocator;
+  // Decoration-related allocator (placeholders)
+  DockDecoAllocator *m_decoAllocator;
 
-	int m_saveIndex;
+  int m_saveIndex;
 
 protected:
-	//Protected infos for docking purposes
-	std::vector<DockPlaceholder *> m_placeholders;
-	DockPlaceholder *m_selectedPlace;
+  // Protected infos for docking purposes
+  std::vector<DockPlaceholder *> m_placeholders;
+  DockPlaceholder *m_selectedPlace;
 
 public:
-	DockWidget(QWidget *parent = 0, Qt::WindowFlags flags = Qt::Tool);
-	virtual ~DockWidget();
+  DockWidget(QWidget *parent = 0, Qt::WindowFlags flags = Qt::Tool);
+  virtual ~DockWidget();
 
-	//Returns the DockLayout owning \b this dock widget
-	DockLayout *parentLayout() const { return m_parentLayout; }
+  // Returns the DockLayout owning \b this dock widget
+  DockLayout *parentLayout() const { return m_parentLayout; }
 
-	bool isFloating() const { return m_floating; }
-	bool isMaximized() const { return m_maximized; }
+  bool isFloating() const { return m_floating; }
+  bool isMaximized() const { return m_maximized; }
 
-	//Query functions
-	QWidget *hoveredWidget(QMouseEvent *me);
-	DockPlaceholder *placeAdjacentTo(DockWidget *dockWidget, int boundary);
-	DockPlaceholder *placeOfSeparator(DockSeparator *);
-	const std::vector<DockPlaceholder *> &placeholders() const { return m_placeholders; }
+  // Query functions
+  QWidget *hoveredWidget(QMouseEvent *me);
+  DockPlaceholder *placeAdjacentTo(DockWidget *dockWidget, int boundary);
+  DockPlaceholder *placeOfSeparator(DockSeparator *);
+  const std::vector<DockPlaceholder *> &placeholders() const {
+    return m_placeholders;
+  }
 
-	//Re-implementable functions for custom dock widgets.
+  // Re-implementable functions for custom dock widgets.
 
-	//!Returns the minimum size of the dock widget when docked. This function should be
-	//!reimlemented whenever minimum size changes between floating and docked appearance.
-	virtual QSize getDockedMinimumSize() { return minimumSize(); }
+  //! Returns the minimum size of the dock widget when docked. This function
+  //! should be
+  //! reimlemented whenever minimum size changes between floating and docked
+  //! appearance.
+  virtual QSize getDockedMinimumSize() { return minimumSize(); }
 
-	//!Returns the maximum size of the dock widget when docked. This function should be
-	//!reimlemented whenever minimum size changes between floating and docked appearance.
-	virtual QSize getDockedMaximumSize() { return maximumSize(); }
+  //! Returns the maximum size of the dock widget when docked. This function
+  //! should be
+  //! reimlemented whenever minimum size changes between floating and docked
+  //! appearance.
+  virtual QSize getDockedMaximumSize() { return maximumSize(); }
 
-	//!This function is called in order to show the dock widget in its floating status. No show() or update()
-	//!is needed in its body.
-	//!It can be reimplemented to build custom-styled dock widgets.
-	virtual void setFloatingAppearance() { setWindowFlags(Qt::Tool); }
+  //! This function is called in order to show the dock widget in its floating
+  //! status. No show() or update()
+  //! is needed in its body.
+  //! It can be reimplemented to build custom-styled dock widgets.
+  virtual void setFloatingAppearance() { setWindowFlags(Qt::Tool); }
 
-	//!This function is called in order to show the dock widget in its docked status. No show() or update()
-	//!is needed in its body.
-	//!It can be reimplemented to build custom-styled dock widgets.
-	virtual void setDockedAppearance() {}
+  //! This function is called in order to show the dock widget in its docked
+  //! status. No show() or update()
+  //! is needed in its body.
+  //! It can be reimplemented to build custom-styled dock widgets.
+  virtual void setDockedAppearance() {}
 
-	virtual bool isDragGrip(QPoint p);
-	virtual int isResizeGrip(QPoint)
-	{
-		return 0; //Native deco widgets handle margins and resizes on their own
-	}
+  virtual bool isDragGrip(QPoint p);
+  virtual int isResizeGrip(QPoint) {
+    return 0;  // Native deco widgets handle margins and resizes on their own
+  }
 
-	enum { leftMargin = 0x1,
-		   rightMargin = 0x2,
-		   topMargin = 0x4,
-		   bottomMargin = 0x8 };
+  enum {
+    leftMargin   = 0x1,
+    rightMargin  = 0x2,
+    topMargin    = 0x4,
+    bottomMargin = 0x8
+  };
 
-	//Placeholders-related methods
-	virtual void selectDockPlaceholder(QMouseEvent *me);
-	void clearDockPlaceholders();
+  // Placeholders-related methods
+  virtual void selectDockPlaceholder(QMouseEvent *me);
+  void clearDockPlaceholders();
 
-	//Decorations allocator
-	void setDecoAllocator(DockDecoAllocator *decoAllocator);
+  // Decorations allocator
+  void setDecoAllocator(DockDecoAllocator *decoAllocator);
 
-	//reimpremented in FlipbookPanel
-	virtual void onDock(bool docked) {}
+  // reimpremented in FlipbookPanel
+  virtual void onDock(bool docked) {}
 
 private:
-	//Event handling
-	//Basic events
-	bool event(QEvent *e);
-	void mousePressEvent(QMouseEvent *me);
-	void mouseReleaseEvent(QMouseEvent *me);
-	void mouseMoveEvent(QMouseEvent *me);
-	void hoverMoveEvent(QHoverEvent *he);
+  // Event handling
+  // Basic events
+  bool event(QEvent *e);
+  void mousePressEvent(QMouseEvent *me);
+  void mouseReleaseEvent(QMouseEvent *me);
+  void mouseMoveEvent(QMouseEvent *me);
+  void hoverMoveEvent(QHoverEvent *he);
 
 protected:
-	//Customizable events
-	virtual void wheelEvent(QWheelEvent *we);
-	virtual void mouseDoubleClickEvent(QMouseEvent *me);
-	virtual void windowTitleEvent(QEvent *) {}
+  // Customizable events
+  virtual void wheelEvent(QWheelEvent *we);
+  virtual void mouseDoubleClickEvent(QMouseEvent *me);
+  virtual void windowTitleEvent(QEvent *) {}
 };
 
 //========================================================================
@@ -270,66 +289,77 @@ protected:
 //    DockSeparator
 //---------------------
 
-//!Separators are interposition widgets among docked DockWidgets of a DockLayout.
+//! Separators are interposition widgets among docked DockWidgets of a
+//! DockLayout.
 /*!
-  A DockSeparator has the role of separating sister Regions; it is always owned by a parent
-  Region and inherits its subdivision (here separation) direction. It also provides basical
-  interaction with the user, allowing itself to be shifted along separation direction until
+  A DockSeparator has the role of separating sister Regions; it is always owned
+  by a parent
+  Region and inherits its subdivision (here separation) direction. It also
+  provides basical
+  interaction with the user, allowing itself to be shifted along separation
+  direction until
   geometric constraints are met.
-  DockSeparator class can be inherited to build custom separators - in that case, a
-  heir of DockDecoAllocator class allocating the new separator class must be assigned to
+  DockSeparator class can be inherited to build custom separators - in that
+  case, a
+  heir of DockDecoAllocator class allocating the new separator class must be
+  assigned to
   the DockLayout.
-  It is also possible to specify the Separators' thickness used in a DockLayout through the
+  It is also possible to specify the Separators' thickness used in a DockLayout
+  through the
   QLayout::setSpacing(int) method.
 
-  \b NOTE: Observe that Separators' geometry is owned by the DockLayout to which it belongs; it
-  is discouraged (but not forbidden) to manually modify it. You may, for example, modify the
+  \b NOTE: Observe that Separators' geometry is owned by the DockLayout to which
+  it belongs; it
+  is discouraged (but not forbidden) to manually modify it. You may, for
+  example, modify the
   geometry of a DockSeparator when dragging a dock widget over it.
-  In any case, the layout will automatically regenerate Separators' geometry at each update of
+  In any case, the layout will automatically regenerate Separators' geometry at
+  each update of
   the layout.
 
   \sa DockLayout and DockWidget classes.
 */
 
-class DockSeparator : public QWidget
-{
-	friend class DockLayout; //Layout updates each DockSeparator during DockLayout::applyGeometry()
-	friend class Region;	 //Region may update a DockSeparator's parent during removeItem()
+class DockSeparator : public QWidget {
+  friend class DockLayout;  // Layout updates each DockSeparator during
+                            // DockLayout::applyGeometry()
+  friend class Region;  // Region may update a DockSeparator's parent during
+                        // removeItem()
 
-	DockLayout *m_owner;
+  DockLayout *m_owner;
 
-	//Event-related infos
-	bool m_pressed;
-	QPoint m_oldOrigin;
-	QPoint m_oldPos;
+  // Event-related infos
+  bool m_pressed;
+  QPoint m_oldOrigin;
+  QPoint m_oldPos;
 
-	//Structural infos
-	Region *m_parentRegion;
-	int m_index;
-	bool m_orientation;
+  // Structural infos
+  Region *m_parentRegion;
+  int m_index;
+  bool m_orientation;
 
-	//Constraint infos
-	double m_leftBound;
-	double m_rightBound;
+  // Constraint infos
+  double m_leftBound;
+  double m_rightBound;
 
 public:
-	DockSeparator(DockLayout *owner, bool orientation, Region *parentRegion);
-	virtual ~DockSeparator() {}
+  DockSeparator(DockLayout *owner, bool orientation, Region *parentRegion);
+  virtual ~DockSeparator() {}
 
-	//Structural getters
-	bool getOrientation() const { return m_orientation; }
-	Region *getParentRegion() const { return m_parentRegion; }
-	int getIndex() const { return m_index; }
+  // Structural getters
+  bool getOrientation() const { return m_orientation; }
+  Region *getParentRegion() const { return m_parentRegion; }
+  int getIndex() const { return m_index; }
 
-	//Public setters
-	void shift(int dx);
+  // Public setters
+  void shift(int dx);
 
 private:
-	void calculateBounds();
+  void calculateBounds();
 
-	void mousePressEvent(QMouseEvent *me);
-	void mouseReleaseEvent(QMouseEvent *me);
-	void mouseMoveEvent(QMouseEvent *me);
+  void mousePressEvent(QMouseEvent *me);
+  void mouseReleaseEvent(QMouseEvent *me);
+  void mouseMoveEvent(QMouseEvent *me);
 };
 
 //========================================================================
@@ -338,77 +368,83 @@ private:
 //    Dock Placeholder
 //---------------------------
 
-//!A dock placeholder contains the necessary informations about a possible
-//!docking solution.
+//! A dock placeholder contains the necessary informations about a possible
+//! docking solution.
 
 /*!
   Dock placeholders are top-level widgets used by a DockLayout to draw docking
   solutions for a dragged DockWidget. They are actually generated when
   dragging of a DockWidget begins: if it belongs to a parent DockLayout, docking
   possibilities are calculated and stored into the layout.
-  Placeholders selection and activation depend on the dragged dock window and therefore
+  Placeholders selection and activation depend on the dragged dock window and
+  therefore
   are of its own responsibility.
-  You may, however, inherit this class to provide custom placeholders; in this case,
-  a DockDecoAllocator class reimplementing allocation of placeholders must be assigned to
+  You may, however, inherit this class to provide custom placeholders; in this
+  case,
+  a DockDecoAllocator class reimplementing allocation of placeholders must be
+  assigned to
   the owner dock widget.
 
   \sa DockLayout and DockWidget classes
 */
-class DockPlaceholder : public QWidget
-{
-	friend class DockLayout; //DockLayout is granted access to placeholders' privates
+class DockPlaceholder : public QWidget {
+  friend class DockLayout;  // DockLayout is granted access to placeholders'
+                            // privates
 
-	//Docking informations - private
-	Region *m_region;
-	int m_idx;
+  // Docking informations - private
+  Region *m_region;
+  int m_idx;
 
-	//Docking informations - public
-	int m_attributes;
+  // Docking informations - public
+  int m_attributes;
 
-	//Owner
-	DockSeparator *m_separator;
-	DockWidget *m_owner;
+  // Owner
+  DockSeparator *m_separator;
+  DockWidget *m_owner;
 
 public:
-	DockPlaceholder(DockWidget *owner, Region *r, int idx, int attributes = 0);
-	virtual ~DockPlaceholder() {}
+  DockPlaceholder(DockWidget *owner, Region *r, int idx, int attributes = 0);
+  virtual ~DockPlaceholder() {}
 
-	//Member access methods
+  // Member access methods
 
-	//!Returns DockSeparator on which docking takes place (if any)
-	DockSeparator *getSeparator() const;
-	//!Returns dockWidget owner
-	DockWidget *getDockWidget() const { return m_owner; }
-	//!Returns Region owner
-	Region *getParentRegion() const { return m_region; }
-	//!Returns insertion index into parent region
-	int getInsertionIdx() const { return m_idx; }
+  //! Returns DockSeparator on which docking takes place (if any)
+  DockSeparator *getSeparator() const;
+  //! Returns dockWidget owner
+  DockWidget *getDockWidget() const { return m_owner; }
+  //! Returns Region owner
+  Region *getParentRegion() const { return m_region; }
+  //! Returns insertion index into parent region
+  int getInsertionIdx() const { return m_idx; }
 
-	enum { left = 0,
-		   right = 1,
-		   top = 2,
-		   bottom = 3,
-		   sepHor = 4,
-		   sepVert = 5,
-		   root = 6 };
-	int getAttribute() const { return m_attributes; }
-	void setAttribute(int attribute) { m_attributes = attribute; }
+  enum {
+    left    = 0,
+    right   = 1,
+    top     = 2,
+    bottom  = 3,
+    sepHor  = 4,
+    sepVert = 5,
+    root    = 6
+  };
+  int getAttribute() const { return m_attributes; }
+  void setAttribute(int attribute) { m_attributes = attribute; }
 
-	//Geometry functions
-	QRect parentGeometry() const;
-	virtual void buildGeometry();
+  // Geometry functions
+  QRect parentGeometry() const;
+  virtual void buildGeometry();
 
-	//Query functions
-	//!A root placeholder is passed only if no item is currently docked (special case)
-	bool isRoot() const { return m_attributes == root; }
-	DockPlaceholder *parentPlaceholder();
-	DockPlaceholder *greatestPlaceholder();
-	DockPlaceholder *childPlaceholder(QPoint p);
-	DockPlaceholder *smallestPlaceholder(QPoint p);
+  // Query functions
+  //! A root placeholder is passed only if no item is currently docked (special
+  //! case)
+  bool isRoot() const { return m_attributes == root; }
+  DockPlaceholder *parentPlaceholder();
+  DockPlaceholder *greatestPlaceholder();
+  DockPlaceholder *childPlaceholder(QPoint p);
+  DockPlaceholder *smallestPlaceholder(QPoint p);
 
 private:
-	//!Let wheel events also be propagated to owner dock widget
-	void wheelEvent(QWheelEvent *we) { m_owner->wheelEvent(we); }
+  //! Let wheel events also be propagated to owner dock widget
+  void wheelEvent(QWheelEvent *we) { m_owner->wheelEvent(we); }
 };
 
 //===========================================
@@ -417,9 +453,9 @@ private:
 //    Class Region
 //--------------------
 
-//!Regions represent any rectangular space inside a DockLayout.
-//!Normally there is no reason to deal with Regions, unless you want to
-//!build complex docking systems or manually dock widgets into your code.
+//! Regions represent any rectangular space inside a DockLayout.
+//! Normally there is no reason to deal with Regions, unless you want to
+//! build complex docking systems or manually dock widgets into your code.
 
 /*!
   Regions are rectangular areas of the DockLayout's contentsRect() which
@@ -434,98 +470,94 @@ private:
   \sa DockLayout, DockWidget, DockSeparator and DockPlaceholder classes.
 */
 
-class Region
-{
-	friend class DockLayout;	//Layout is the main operating class over rectangular regions - need full access
-	friend class DockSeparator; //Separators need access to extremal sizes methods when moving themselves
+class Region {
+  friend class DockLayout;  // Layout is the main operating class over
+                            // rectangular regions - need full access
+  friend class DockSeparator;  // Separators need access to extremal sizes
+                               // methods when moving themselves
 
-	DockLayout *m_owner;
-	DockWidget *m_item;
-	Region *m_parent;
-	std::deque<Region *> m_childList;
-	std::deque<DockSeparator *> m_separators;
+  DockLayout *m_owner;
+  DockWidget *m_item;
+  Region *m_parent;
+  std::deque<Region *> m_childList;
+  std::deque<DockSeparator *> m_separators;
 
-	std::vector<DockPlaceholder *> m_placeholders;
+  std::vector<DockPlaceholder *> m_placeholders;
 
-	QRectF m_rect;
-	bool m_orientation;
+  QRectF m_rect;
+  bool m_orientation;
 
-	int m_minimumSize[2];
-	int m_maximumSize[2];
+  int m_minimumSize[2];
+  int m_maximumSize[2];
 
-	int m_saveIndex;
+  int m_saveIndex;
 
 public:
-	Region(DockLayout *owner, DockWidget *item = 0)
-		: m_owner(owner), m_item(item), m_parent(0), m_orientation(0) {}
-	~Region();
+  Region(DockLayout *owner, DockWidget *item = 0)
+      : m_owner(owner), m_item(item), m_parent(0), m_orientation(0) {}
+  ~Region();
 
-	enum { inf = 1000000 };
-	enum { horizontal = 0,
-		   vertical = 1 };
-	enum { left = 0x1,
-		   right = 0x2,
-		   top = 0x4,
-		   bottom = 0x8 };
+  enum { inf = 1000000 };
+  enum { horizontal = 0, vertical = 1 };
+  enum { left = 0x1, right = 0x2, top = 0x4, bottom = 0x8 };
 
-	//Getters - public
-	bool getOrientation() const { return m_orientation; }
-	QRectF getGeometry() const { return m_rect; }
-	QSizeF getSize() const { return QSizeF(m_rect.width(), m_rect.height()); }
-	Region *getParent() const { return m_parent; }
-	DockWidget *getItem() const { return m_item; }
+  // Getters - public
+  bool getOrientation() const { return m_orientation; }
+  QRectF getGeometry() const { return m_rect; }
+  QSizeF getSize() const { return QSizeF(m_rect.width(), m_rect.height()); }
+  Region *getParent() const { return m_parent; }
+  DockWidget *getItem() const { return m_item; }
 
-	const std::deque<Region *> &getChildList() const { return m_childList; }
-	Region *childRegion(int i) const { return m_childList[i]; }
+  const std::deque<Region *> &getChildList() const { return m_childList; }
+  Region *childRegion(int i) const { return m_childList[i]; }
 
-	const std::deque<DockSeparator *> &separators() const { return m_separators; }
-	DockSeparator *separator(int i) const { return m_separators[i]; }
+  const std::deque<DockSeparator *> &separators() const { return m_separators; }
+  DockSeparator *separator(int i) const { return m_separators[i]; }
 
-	std::vector<DockPlaceholder *> &placeholders() { return m_placeholders; }
-	DockPlaceholder *placeholder(int i) const { return m_placeholders[i]; }
+  std::vector<DockPlaceholder *> &placeholders() { return m_placeholders; }
+  DockPlaceholder *placeholder(int i) const { return m_placeholders[i]; }
 
-	unsigned int find(const Region *subRegion) const;
+  unsigned int find(const Region *subRegion) const;
 
 private:
-	//Setters - private
-	void setOrientation(bool orientation) { m_orientation = orientation; }
-	void setGeometry(const QRectF &rect) { m_rect = rect; }
-	void setSize(const QSizeF &size) { m_rect.setSize(size); }
-	void setParent(Region *parent) { m_parent = parent; }
-	void setItem(DockWidget *item) { m_item = item; }
+  // Setters - private
+  void setOrientation(bool orientation) { m_orientation = orientation; }
+  void setGeometry(const QRectF &rect) { m_rect = rect; }
+  void setSize(const QSizeF &size) { m_rect.setSize(size); }
+  void setParent(Region *parent) { m_parent = parent; }
+  void setItem(DockWidget *item) { m_item = item; }
 
-	//Insertion and removal methods
-	void insertSubRegion(Region *subregion, int idx);
-	Region *insertItem(DockWidget *item, int idx);
-	void removeItem(DockWidget *item);
-	void insertSeparator(DockSeparator *sep);
-	void removeSeparator();
+  // Insertion and removal methods
+  void insertSubRegion(Region *subregion, int idx);
+  Region *insertItem(DockWidget *item, int idx);
+  void removeItem(DockWidget *item);
+  void insertSeparator(DockSeparator *sep);
+  void removeSeparator();
 
-	//Extremal region sizes
-	//!Returns cached occupied space in \b this region along given \b direction.
-	inline int getMaximumSize(bool direction) const
-	{
-		return m_maximumSize[direction];
-	}
-	//!Returns cached occupied space in \b this region along given \b direction.
-	inline int getMinimumSize(bool direction) const
-	{
-		return m_minimumSize[direction];
-	}
+  // Extremal region sizes
+  //! Returns cached occupied space in \b this region along given \b direction.
+  inline int getMaximumSize(bool direction) const {
+    return m_maximumSize[direction];
+  }
+  //! Returns cached occupied space in \b this region along given \b direction.
+  inline int getMinimumSize(bool direction) const {
+    return m_minimumSize[direction];
+  }
 
-	bool addItemSize(DockWidget *item);
-	bool subItemSize(DockWidget *item);
-	void calculateExtremalSizes();
-	int calculateMinimumSize(bool direction, bool recalcChildren);
-	int calculateMaximumSize(bool direction, bool recalcChildren);
+  bool addItemSize(DockWidget *item);
+  bool subItemSize(DockWidget *item);
+  void calculateExtremalSizes();
+  int calculateMinimumSize(bool direction, bool recalcChildren);
+  int calculateMaximumSize(bool direction, bool recalcChildren);
 
-	//Redistribution function.
-	//The main feature of a Region consists of the redistribute() method, which
-	//extracts the optimal layout among the branching regions with \b this
-	//root. However, only the full redistribute() method in DockLayout is made public.
-	void redistribute();
-	void restoreGeometry();
-	//void updateSeparators();
+  // Redistribution function.
+  // The main feature of a Region consists of the redistribute() method, which
+  // extracts the optimal layout among the branching regions with \b this
+  // root. However, only the full redistribute() method in DockLayout is made
+  // public.
+  void redistribute();
+  void restoreGeometry();
+  // void updateSeparators();
 };
 
 //========================================================================
@@ -534,8 +566,8 @@ private:
 //    Dock Allocator
 //----------------------
 
-//!DockDecoAllocator class handles the allocation of decoration elements used
-//!by our dock manager.
+//! DockDecoAllocator class handles the allocation of decoration elements used
+//! by our dock manager.
 /*!
   In order to implement custom appearances for the docking system, it
   is possible to customize both DockSeparator and DockPlaceholder classes. Since
@@ -547,20 +579,22 @@ private:
 
   \sa DockLayout, DockWidget, DockSeparator and DockPlaceholder classes.
 */
-class DockDecoAllocator
-{
-	friend class DockLayout;
+class DockDecoAllocator {
+  friend class DockLayout;
 
 public:
-	DockDecoAllocator() {}
-	virtual ~DockDecoAllocator() {}
+  DockDecoAllocator() {}
+  virtual ~DockDecoAllocator() {}
 
-	//Customizabile allocators
-	virtual DockSeparator *newSeparator(DockLayout *owner, bool orientation, Region *parentRegion);
-	virtual DockPlaceholder *newPlaceholder(DockWidget *owner, Region *r, int idx, int attributes);
+  // Customizabile allocators
+  virtual DockSeparator *newSeparator(DockLayout *owner, bool orientation,
+                                      Region *parentRegion);
+  virtual DockPlaceholder *newPlaceholder(DockWidget *owner, Region *r, int idx,
+                                          int attributes);
 
 private:
-	DockPlaceholder *newPlaceBuilt(DockWidget *owner, Region *r, int idx, int attributes);
+  DockPlaceholder *newPlaceBuilt(DockWidget *owner, Region *r, int idx,
+                                 int attributes);
 };
 
-#endif // SIMPLEQTTEST_H
+#endif  // SIMPLEQTTEST_H

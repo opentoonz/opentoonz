@@ -21,24 +21,23 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI UpdateChecker : public QObject
-{
-	Q_OBJECT
+class DVAPI UpdateChecker : public QObject {
+  Q_OBJECT
 
-	QSharedPointer<QNetworkAccessManager> manager_;
+  QSharedPointer<QNetworkAccessManager> manager_;
 
-	QString m_latestVersion;
+  QString m_latestVersion;
 
 public:
-	UpdateChecker(QUrl const& updateUrl);
+  UpdateChecker(QUrl const& updateUrl);
 
-	QString getLatestVersion() const { return m_latestVersion; }
+  QString getLatestVersion() const { return m_latestVersion; }
 
 protected slots:
-	void httpRequestFinished(QNetworkReply *);
+  void httpRequestFinished(QNetworkReply*);
 
 signals:
-	void done(bool error);
+  void done(bool error);
 };
 
-#endif // UPDATE_CHECKER_H
+#endif  // UPDATE_CHECKER_H

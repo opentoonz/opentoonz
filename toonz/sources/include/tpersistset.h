@@ -6,7 +6,7 @@
 // TnzCore includes
 #include "tpersist.h"
 
-//STD includes
+// STD includes
 #include <vector>
 
 #include <memory>
@@ -25,25 +25,24 @@
   configuration options, without discarding the other objects.
 */
 
-class DVAPI TPersistSet : public TPersist
-{
-	PERSIST_DECLARATION(TPersistSet)
+class DVAPI TPersistSet : public TPersist {
+  PERSIST_DECLARATION(TPersistSet)
 
-	std::vector<TPersist *> m_objects; //!< #owned# Stored objects.
+  std::vector<TPersist *> m_objects;  //!< #owned# Stored objects.
 
 public:
-	~TPersistSet(); //!< Destroys the stored objects.
+  ~TPersistSet();  //!< Destroys the stored objects.
 
-	const std::vector<TPersist *> &objects() const
-	{
-		return m_objects;
-	} //!< Returns the stored objects list
+  const std::vector<TPersist *> &objects() const {
+    return m_objects;
+  }  //!< Returns the stored objects list
 
-	void insert(std::auto_ptr<TPersist> object); //!< Overwrites an object type instance with
-												 //!  the supplied one.
+  void insert(std::auto_ptr<TPersist>
+                  object);  //!< Overwrites an object type instance with
+                            //!  the supplied one.
 public:
-	void saveData(TOStream &os); //!< Saves data to stream
-	void loadData(TIStream &is); //!< Loads data from stream
+  void saveData(TOStream &os);  //!< Saves data to stream
+  void loadData(TIStream &is);  //!< Loads data from stream
 };
 
-#endif // TPERSISTSET_H
+#endif  // TPERSISTSET_H

@@ -10,31 +10,30 @@ class TStageObjectId;
 class SceneViewer;
 class TXshColumn;
 
-class SceneViewerContextMenu : public QMenu
-{
-	Q_OBJECT
-	SceneViewer *m_viewer;
-	int m_groupIndexToBeEntered;
+class SceneViewerContextMenu : public QMenu {
+  Q_OBJECT
+  SceneViewer *m_viewer;
+  int m_groupIndexToBeEntered;
 
-	void addShowHideCommand(QMenu *menu, TXshColumn *column);
-	void addSelectCommand(QMenu *menu, const TStageObjectId &id);
+  void addShowHideCommand(QMenu *menu, TXshColumn *column);
+  void addSelectCommand(QMenu *menu, const TStageObjectId &id);
 
 public:
-	SceneViewerContextMenu(SceneViewer *parent);
-	~SceneViewerContextMenu();
+  SceneViewerContextMenu(SceneViewer *parent);
+  ~SceneViewerContextMenu();
 
-	void addEnterGroupCommands(const TPointD &pos);
-	void addLevelCommands(std::vector<int> &indices);
+  void addEnterGroupCommands(const TPointD &pos);
+  void addLevelCommands(std::vector<int> &indices);
 
 public slots:
 
-	void savePreviewedFrames();
+  void savePreviewedFrames();
 
-	void enterVectorImageGroup();
-	void exitVectorImageGroup();
+  void enterVectorImageGroup();
+  void exitVectorImageGroup();
 
-	void onShowHide();
-	void onSetCurrent();
+  void onShowHide();
+  void onSetCurrent();
 };
 
 #endif

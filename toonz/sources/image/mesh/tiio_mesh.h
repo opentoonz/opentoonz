@@ -9,45 +9,44 @@
 //    TLevelWriterMesh  declaration
 //*****************************************************************************************
 
-class TLevelWriterMesh : public TLevelWriter
-{
+class TLevelWriterMesh : public TLevelWriter {
 public:
-	TLevelWriterMesh(const TFilePath &path, TPropertyGroup *winfo);
-	~TLevelWriterMesh();
+  TLevelWriterMesh(const TFilePath &path, TPropertyGroup *winfo);
+  ~TLevelWriterMesh();
 
-	TImageWriterP getFrameWriter(TFrameId fid);
+  TImageWriterP getFrameWriter(TFrameId fid);
 
 public:
-	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo)
-	{
-		return new TLevelWriterMesh(f, winfo);
-	}
+  static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo) {
+    return new TLevelWriterMesh(f, winfo);
+  }
 
 private:
-	//not implemented
-	TLevelWriterMesh(const TLevelWriterMesh &);
-	TLevelWriterMesh &operator=(const TLevelWriterMesh &);
+  // not implemented
+  TLevelWriterMesh(const TLevelWriterMesh &);
+  TLevelWriterMesh &operator=(const TLevelWriterMesh &);
 };
 
 //*****************************************************************************************
 //    TLevelReaderMesh  declaration
 //*****************************************************************************************
 
-class TLevelReaderMesh : public TLevelReader
-{
+class TLevelReaderMesh : public TLevelReader {
 public:
-	TLevelReaderMesh(const TFilePath &path);
-	~TLevelReaderMesh();
+  TLevelReaderMesh(const TFilePath &path);
+  ~TLevelReaderMesh();
 
-	TImageReaderP getFrameReader(TFrameId fid);
+  TImageReaderP getFrameReader(TFrameId fid);
 
 public:
-	static TLevelReader *create(const TFilePath &f) { return new TLevelReaderMesh(f); }
+  static TLevelReader *create(const TFilePath &f) {
+    return new TLevelReaderMesh(f);
+  }
 
 private:
-	// not implemented
-	TLevelReaderMesh(const TLevelReaderMesh &);
-	TLevelReaderMesh &operator=(const TLevelReaderMesh &);
+  // not implemented
+  TLevelReaderMesh(const TLevelReaderMesh &);
+  TLevelReaderMesh &operator=(const TLevelReaderMesh &);
 };
 
 #endif TIIO_MESH_H

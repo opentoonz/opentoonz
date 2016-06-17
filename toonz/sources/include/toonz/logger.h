@@ -15,32 +15,30 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI Logger
-{ // singleton
+class DVAPI Logger {  // singleton
 public:
-	class Listener
-	{
-	public:
-		virtual void onAdd() = 0;
-		virtual ~Listener() {}
-	};
+  class Listener {
+  public:
+    virtual void onAdd() = 0;
+    virtual ~Listener() {}
+  };
 
 private:
-	Logger();
-	std::vector<Listener *> m_listeners;
-	std::vector<std::wstring> m_rows;
+  Logger();
+  std::vector<Listener *> m_listeners;
+  std::vector<std::wstring> m_rows;
 
 public:
-	static Logger *instance();
+  static Logger *instance();
 
-	void add(std::wstring s);
-	void clear();
+  void add(std::wstring s);
+  void clear();
 
-	int getRowCount() const;
-	std::wstring getRow(int i) const;
+  int getRowCount() const;
+  std::wstring getRow(int i) const;
 
-	void addListener(Listener *listener);
-	void removeListener(Listener *listener);
+  void addListener(Listener *listener);
+  void removeListener(Listener *listener);
 };
 
 #endif

@@ -21,30 +21,31 @@ class TXshSimpleLevel;
 // TXshLevelHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TXshLevelHandle : public QObject
-{
-	Q_OBJECT
+class DVAPI TXshLevelHandle : public QObject {
+  Q_OBJECT
 
-	TXshLevel *m_level;
+  TXshLevel *m_level;
 
 public:
-	TXshLevelHandle();
-	~TXshLevelHandle();
+  TXshLevelHandle();
+  ~TXshLevelHandle();
 
-	TXshLevel *getLevel() const;
-	TXshSimpleLevel *getSimpleLevel() const; // helper function: getLevel()->getSimpleLevel(), controllando che getLevel() !=0
+  TXshLevel *getLevel() const;
+  TXshSimpleLevel *getSimpleLevel() const;  // helper function:
+                                            // getLevel()->getSimpleLevel(),
+                                            // controllando che getLevel() !=0
 
-	void setLevel(TXshLevel *level);
+  void setLevel(TXshLevel *level);
 
-	void notifyLevelChange() { emit xshLevelChanged(); }
-	void notifyLevelViewChange() { emit xshLevelViewChanged(); }
-	void notifyLevelTitleChange() { emit xshLevelTitleChanged(); }
-	void notifyCanvasSizeChange() { emit xshCanvasSizeChanged(); }
+  void notifyLevelChange() { emit xshLevelChanged(); }
+  void notifyLevelViewChange() { emit xshLevelViewChanged(); }
+  void notifyLevelTitleChange() { emit xshLevelTitleChanged(); }
+  void notifyCanvasSizeChange() { emit xshCanvasSizeChanged(); }
 
 signals:
-	void xshLevelSwitched(TXshLevel *oldLevel);
-	void xshLevelChanged();
-	void xshLevelViewChanged();
-	void xshLevelTitleChanged();
-	void xshCanvasSizeChanged();
+  void xshLevelSwitched(TXshLevel *oldLevel);
+  void xshLevelChanged();
+  void xshLevelViewChanged();
+  void xshLevelTitleChanged();
+  void xshCanvasSizeChanged();
 };

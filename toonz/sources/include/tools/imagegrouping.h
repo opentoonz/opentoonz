@@ -19,58 +19,51 @@ class QMenu;
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TGroupCommand : public QObject
-{
-	Q_OBJECT
+class DVAPI TGroupCommand : public QObject {
+  Q_OBJECT
 public:
-	enum { NONE = 0,
-		   FRONT = 1,
-		   FORWARD = 2,
-		   BACKWARD = 4,
-		   BACK = 8,
-		   GROUP = 16,
-		   UNGROUP = 32 };
+  enum {
+    NONE     = 0,
+    FRONT    = 1,
+    FORWARD  = 2,
+    BACKWARD = 4,
+    BACK     = 8,
+    GROUP    = 16,
+    UNGROUP  = 32
+  };
 
-	StrokeSelection *m_sel;
+  StrokeSelection *m_sel;
 
-	TGroupCommand() : m_sel(0) {}
+  TGroupCommand() : m_sel(0) {}
 
-	void setSelection(StrokeSelection *sel) { m_sel = sel; }
-	UCHAR getGroupingOptions();
+  void setSelection(StrokeSelection *sel) { m_sel = sel; }
+  UCHAR getGroupingOptions();
 
-	void addMenuItems(QMenu *menu);
+  void addMenuItems(QMenu *menu);
 
-	void back()
-	{
-		if (!(getGroupingOptions() & BACK))
-			return;
-		moveGroup(BACK);
-	}
-	void backward()
-	{
-		if (!(getGroupingOptions() & BACKWARD))
-			return;
-		moveGroup(BACKWARD);
-	}
-	void front()
-	{
-		if (!(getGroupingOptions() & FRONT))
-			return;
-		moveGroup(FRONT);
-	}
-	void forward()
-	{
-		if (!(getGroupingOptions() & FORWARD))
-			return;
-		moveGroup(FORWARD);
-	}
-	void group();
-	void ungroup();
-	void enterGroup();
-	void exitGroup();
+  void back() {
+    if (!(getGroupingOptions() & BACK)) return;
+    moveGroup(BACK);
+  }
+  void backward() {
+    if (!(getGroupingOptions() & BACKWARD)) return;
+    moveGroup(BACKWARD);
+  }
+  void front() {
+    if (!(getGroupingOptions() & FRONT)) return;
+    moveGroup(FRONT);
+  }
+  void forward() {
+    if (!(getGroupingOptions() & FORWARD)) return;
+    moveGroup(FORWARD);
+  }
+  void group();
+  void ungroup();
+  void enterGroup();
+  void exitGroup();
 
 private:
-	void moveGroup(UCHAR moveType);
+  void moveGroup(UCHAR moveType);
 };
 
 #endif

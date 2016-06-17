@@ -26,77 +26,69 @@
 
 //---------------------------------------------------------
 
-class DVAPI TToneCurveParam : public TParam
-{
+class DVAPI TToneCurveParam : public TParam {
+  PERSIST_DECLARATION(TToneCurveParam)
 
-	PERSIST_DECLARATION(TToneCurveParam)
+  TParamSetP m_rgbaParamSet;
+  TParamSetP m_rgbParamSet;
+  TParamSetP m_rParamSet;
+  TParamSetP m_gParamSet;
+  TParamSetP m_bParamSet;
+  TParamSetP m_aParamSet;
 
-	TParamSetP m_rgbaParamSet;
-	TParamSetP m_rgbParamSet;
-	TParamSetP m_rParamSet;
-	TParamSetP m_gParamSet;
-	TParamSetP m_bParamSet;
-	TParamSetP m_aParamSet;
+  TBoolParamP m_isLinear;
 
-	TBoolParamP m_isLinear;
-
-	enum ToneChannel {
-		RGBA = 0,
-		RGB,
-		Red,
-		Green,
-		Blue,
-		Alpha
-	} m_toneChannel;
+  enum ToneChannel { RGBA = 0, RGB, Red, Green, Blue, Alpha } m_toneChannel;
 
 public:
-	TToneCurveParam();
-	TToneCurveParam(const TToneCurveParam &src);
-	~TToneCurveParam() {}
+  TToneCurveParam();
+  TToneCurveParam(const TToneCurveParam &src);
+  ~TToneCurveParam() {}
 
-	TParamSetP getParamSet(ToneChannel channel) const;
-	TParamSetP getCurrentParamSet() const;
-	TBoolParamP getIsLinearParam() const { return m_isLinear; }
+  TParamSetP getParamSet(ToneChannel channel) const;
+  TParamSetP getCurrentParamSet() const;
+  TBoolParamP getIsLinearParam() const { return m_isLinear; }
 
-	void setCurrentChannel(ToneChannel channel);
-	ToneChannel getCurrentChannel() const { return m_toneChannel; }
+  void setCurrentChannel(ToneChannel channel);
+  ToneChannel getCurrentChannel() const { return m_toneChannel; }
 
-	TParam *clone() const { return new TToneCurveParam(*this); }
-	void copy(TParam *src);
+  TParam *clone() const { return new TToneCurveParam(*this); }
+  void copy(TParam *src);
 
-	void addObserver(TParamObserver *);
-	void removeObserver(TParamObserver *);
+  void addObserver(TParamObserver *);
+  void removeObserver(TParamObserver *);
 
-	QList<TPointD> getValue(double frame) const;
-	void setValue(double frame, const QList<TPointD> &value, bool undoing = false);
-	void setDefaultValue(const QList<TPointD> &value);
+  QList<TPointD> getValue(double frame) const;
+  void setValue(double frame, const QList<TPointD> &value,
+                bool undoing = false);
+  void setDefaultValue(const QList<TPointD> &value);
 
-	bool isLinear() const;
-	void setIsLinear(bool isLinear);
+  bool isLinear() const;
+  void setIsLinear(bool isLinear);
 
-	void addValue(double frame, const QList<TPointD> &value, int index);
-	void removeValue(double frame, int index);
+  void addValue(double frame, const QList<TPointD> &value, int index);
+  void removeValue(double frame, int index);
 
-	//  virtual void enableNotification(bool on) {}
-	//  virtual bool isNotificationEnabled() const { return true;}
+  //  virtual void enableNotification(bool on) {}
+  //  virtual bool isNotificationEnabled() const { return true;}
 
-	std::string getValueAlias(double frame, int precision);
+  std::string getValueAlias(double frame, int precision);
 
-	bool isAnimatable() const { return true; };
-	bool isKeyframe(double frame) const;
-	void deleteKeyframe(double frame);
-	void clearKeyframes();
-	void assignKeyframe(double frame, const TSmartPointerT<TParam> &src,
-						double srcFrame, bool changedOnly = false);
+  bool isAnimatable() const { return true; };
+  bool isKeyframe(double frame) const;
+  void deleteKeyframe(double frame);
+  void clearKeyframes();
+  void assignKeyframe(double frame, const TSmartPointerT<TParam> &src,
+                      double srcFrame, bool changedOnly = false);
 
-	void getKeyframes(std::set<double> &frames) const;
-	bool hasKeyframes() const;
-	int getNextKeyframe(double frame) const;
-	int getPrevKeyframe(double frame) const;
-	double keyframeIndexToFrame(int index) const;
+  void getKeyframes(std::set<double> &frames) const;
+  bool hasKeyframes() const;
+  int getNextKeyframe(double frame) const;
+  int getPrevKeyframe(double frame) const;
+  double keyframeIndexToFrame(int index) const;
 
-	void loadData(TIStream &is);
-	void saveData(TOStream &os);
+  void loadData(TIStream &is);
+  void saveData(TOStream &os);
 };
 
 #ifdef _WIN32
@@ -104,13 +96,15 @@ template class DVAPI TSmartPointerT<TToneCurveParam>;
 template class DVAPI TDerivedSmartPointerT<TToneCurveParam, TParam>;
 #endif
 
-class DVAPI TToneCurveParamP : public TDerivedSmartPointerT<TToneCurveParam, TParam>
-{
+class DVAPI TToneCurveParamP
+    : public TDerivedSmartPointerT<TToneCurveParam, TParam> {
 public:
-	TToneCurveParamP() {}
-	TToneCurveParamP(TToneCurveParam *p) : TDerivedSmartPointerT<TToneCurveParam, TParam>(p) {}
-	TToneCurveParamP(const TParamP &p) : TDerivedSmartPointerT<TToneCurveParam, TParam>(p) {}
-	operator TParamP() const { return TParamP(m_pointer); }
+  TToneCurveParamP() {}
+  TToneCurveParamP(TToneCurveParam *p)
+      : TDerivedSmartPointerT<TToneCurveParam, TParam>(p) {}
+  TToneCurveParamP(const TParamP &p)
+      : TDerivedSmartPointerT<TToneCurveParam, TParam>(p) {}
+  operator TParamP() const { return TParamP(m_pointer); }
 };
 
 #endif

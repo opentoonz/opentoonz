@@ -8,8 +8,7 @@
 #include <set>
 #include <QList>
 
-namespace SubsceneCmd
-{
+namespace SubsceneCmd {
 
 void collapse(std::set<int> &indices);
 void collapse(const QList<TStageObjectId> &objects);

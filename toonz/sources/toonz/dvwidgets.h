@@ -14,95 +14,87 @@
 class QLabel;
 
 //=============================================================================
-namespace DVGui
-{
+namespace DVGui {
 //=============================================================================
 
-class PropertyWidget
-{
-
+class PropertyWidget {
 protected:
-	TProperty *m_property;
+  TProperty *m_property;
 
 public:
-	PropertyWidget(TProperty *prop) : m_property(prop) {}
+  PropertyWidget(TProperty *prop) : m_property(prop) {}
 
-	void setProperty(TProperty *prop)
-	{
-		m_property = prop;
-		onPropertyChanged();
-	}
+  void setProperty(TProperty *prop) {
+    m_property = prop;
+    onPropertyChanged();
+  }
 
 private:
-	virtual void onPropertyChanged() = 0;
+  virtual void onPropertyChanged() = 0;
 };
 
 //-----------------------------------------------------------------------------
 
-class PropertyComboBox : public QComboBox, public PropertyWidget
-{
-	Q_OBJECT
+class PropertyComboBox : public QComboBox, public PropertyWidget {
+  Q_OBJECT
 
 public:
-	PropertyComboBox(QWidget *parent, TEnumProperty *prop);
+  PropertyComboBox(QWidget *parent, TEnumProperty *prop);
 
 protected slots:
-	void onCurrentIndexChanged(const QString &text);
+  void onCurrentIndexChanged(const QString &text);
 
 private:
-	void onPropertyChanged();
+  void onPropertyChanged();
 };
 
 //-----------------------------------------------------------------------------
 
-class PropertyCheckBox : public CheckBox, public PropertyWidget
-{
-	Q_OBJECT
+class PropertyCheckBox : public CheckBox, public PropertyWidget {
+  Q_OBJECT
 
 public:
-	PropertyCheckBox(const QString &text, QWidget *parent, TBoolProperty *prop);
+  PropertyCheckBox(const QString &text, QWidget *parent, TBoolProperty *prop);
 
 protected slots:
-	void onStateChanged(int state);
+  void onStateChanged(int state);
 
 private:
-	void onPropertyChanged();
+  void onPropertyChanged();
 };
 
 //-----------------------------------------------------------------------------
 
-class PropertyLineEdit : public LineEdit, public PropertyWidget
-{
-	Q_OBJECT
+class PropertyLineEdit : public LineEdit, public PropertyWidget {
+  Q_OBJECT
 
 public:
-	PropertyLineEdit(QWidget *parent, TStringProperty *prop);
+  PropertyLineEdit(QWidget *parent, TStringProperty *prop);
 
 protected slots:
-	void onTextChanged(const QString &text);
+  void onTextChanged(const QString &text);
 
 private:
-	void onPropertyChanged();
+  void onPropertyChanged();
 };
 
 //-----------------------------------------------------------------------------
 
-class PropertyIntField : public IntField, public PropertyWidget
-{
-	Q_OBJECT
+class PropertyIntField : public IntField, public PropertyWidget {
+  Q_OBJECT
 
 public:
-	PropertyIntField(QWidget *parent, TIntProperty *prop);
+  PropertyIntField(QWidget *parent, TIntProperty *prop);
 
 protected slots:
-	void onValueChanged(bool isDragging);
+  void onValueChanged(bool isDragging);
 
 private:
-	void onPropertyChanged();
+  void onPropertyChanged();
 };
 
 //-----------------------------------------------------------------------------
-} //namespace DVGui
+}  // namespace DVGui
 //-----------------------------------------------------------------------------
 
-#endif // DVWIDGETS_H
+#endif  // DVWIDGETS_H

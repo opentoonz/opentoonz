@@ -21,82 +21,78 @@
 
 bool IsQuickTimeInstalled();
 
-class TLevelWriterMov : public TLevelWriter
-{
-
-	std::vector<std::pair<int, TimeValue>> m_savedFrames;
+class TLevelWriterMov : public TLevelWriter {
+  std::vector<std::pair<int, TimeValue>> m_savedFrames;
 
 public:
-	TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo);
-	~TLevelWriterMov();
-	TImageWriterP getFrameWriter(TFrameId fid);
+  TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo);
+  ~TLevelWriterMov();
+  TImageWriterP getFrameWriter(TFrameId fid);
 
-	int m_IOError;
+  int m_IOError;
 
-	void save(const TImageP &img, int frameIndex);
+  void save(const TImageP &img, int frameIndex);
 
 private:
-	Movie m_movie;
-	Track m_videoTrack;
-	Media m_videoMedia;
-	Track m_soundTrack;
-	Media m_soundMedia;
+  Movie m_movie;
+  Track m_videoTrack;
+  Media m_videoMedia;
+  Track m_soundTrack;
+  Media m_soundMedia;
 
-	GWorldPtr m_gworld;
-	PixMapHandle m_pixmap;
-	//Handle       m_compressedData;
-	short m_refNum;
+  GWorldPtr m_gworld;
+  PixMapHandle m_pixmap;
+  // Handle       m_compressedData;
+  short m_refNum;
 
-	PixelXRGB *buf;
-	int buf_lx;
-	int buf_ly;
-	int m_firstFrame;
-	TThread::Mutex m_mutex;
-	ComponentInstance m_ci;
+  PixelXRGB *buf;
+  int buf_lx;
+  int buf_ly;
+  int m_firstFrame;
+  TThread::Mutex m_mutex;
+  ComponentInstance m_ci;
 
 public:
-	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo)
-	{
-		return new TLevelWriterMov(f, winfo);
-	};
-	void saveSoundTrack(TSoundTrack *st);
+  static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo) {
+    return new TLevelWriterMov(f, winfo);
+  };
+  void saveSoundTrack(TSoundTrack *st);
 };
 
-class TLevelReaderMov : public TLevelReader
-{
-	bool m_readAsToonzOutput;
+class TLevelReaderMov : public TLevelReader {
+  bool m_readAsToonzOutput;
 
 public:
-	TLevelReaderMov(const TFilePath &path);
-	~TLevelReaderMov();
-	TImageReaderP getFrameReader(TFrameId fid);
-	//friend class TImageReaderMov;
-	TLevelP loadInfo();
+  TLevelReaderMov(const TFilePath &path);
+  ~TLevelReaderMov();
+  TImageReaderP getFrameReader(TFrameId fid);
+  // friend class TImageReaderMov;
+  TLevelP loadInfo();
 
-	void enableRandomAccessRead(bool enable) { m_readAsToonzOutput = enable; }
-	void load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX = 1, int shrinkY = 1);
-	TDimension getSize() const { return TDimension(m_lx, m_ly); }
-	TRect getBBox() const { return TRect(0, 0, m_lx - 1, m_ly - 1); }
+  void enableRandomAccessRead(bool enable) { m_readAsToonzOutput = enable; }
+  void load(const TRasterP &rasP, int frameIndex, const TPoint &pos,
+            int shrinkX = 1, int shrinkY = 1);
+  TDimension getSize() const { return TDimension(m_lx, m_ly); }
+  TRect getBBox() const { return TRect(0, 0, m_lx - 1, m_ly - 1); }
 
-	int m_IOError;
+  int m_IOError;
 
 private:
-	short m_refNum;
-	Movie m_movie;
-	short m_resId;
-	Track m_track;
-	long m_depth;
-	map<int, TimeValue> currentTimes;
-	int m_lx, m_ly;
+  short m_refNum;
+  Movie m_movie;
+  short m_resId;
+  Track m_track;
+  long m_depth;
+  map<int, TimeValue> currentTimes;
+  int m_lx, m_ly;
 
 public:
-	static TLevelReader *create(const TFilePath &f)
-	{
-		return new TLevelReaderMov(f);
-	};
-	TThread::Mutex m_mutex;
+  static TLevelReader *create(const TFilePath &f) {
+    return new TLevelReaderMov(f);
+  };
+  TThread::Mutex m_mutex;
 
-	TLevelP loadToonzOutputFormatInfo();
+  TLevelP loadToonzOutputFormatInfo();
 };
 
 //------------------------------------------------------------------------------
@@ -109,7 +105,7 @@ public:
   TWriterInfo *clone() const;
 private:
   TWriterInfoMov();
-  
+
 
   TWriterInfoMov(const TWriterInfoMov&);
 
@@ -122,26 +118,24 @@ private:
 };
 */
 
-namespace Tiio
-{
+namespace Tiio {
 
-class MovWriterProperties : public TPropertyGroup
-{
-	//  std::map<wstring, CodecType> m_codecMap;
-	//  std::map<wstring, CodecQ> m_qualityMap;
+class MovWriterProperties : public TPropertyGroup {
+  //  std::map<wstring, CodecType> m_codecMap;
+  //  std::map<wstring, CodecQ> m_qualityMap;
 
 public:
-	MovWriterProperties();
-	//	TPropertyGroup* clone() const;
-	//  TEnumProperty m_codec;
-	//  TEnumProperty m_quality;
-	//	CodecType getCurrentCodec()const;
-	//  wstring getCurrentNameFromCodec(CodecType &cCodec)const;
-	//  wstring getCurrentQualityFromCodeQ(CodecQ &cCodeQ)const;
-	//	CodecQ getCurrentQuality()const;
+  MovWriterProperties();
+  //	TPropertyGroup* clone() const;
+  //  TEnumProperty m_codec;
+  //  TEnumProperty m_quality;
+  //	CodecType getCurrentCodec()const;
+  //  wstring getCurrentNameFromCodec(CodecType &cCodec)const;
+  //  wstring getCurrentQualityFromCodeQ(CodecQ &cCodeQ)const;
+  //	CodecQ getCurrentQuality()const;
 };
 }
 
-#endif //__LP64__
+#endif  //__LP64__
 
-#endif //TIIO_MOV_H
+#endif  // TIIO_MOV_H

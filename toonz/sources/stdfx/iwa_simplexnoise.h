@@ -28,81 +28,63 @@
 #define IWA_SIMPLEXNOISE_H
 
 struct Grad {
-	int x, y, z, w;
-	Grad(int x_, int y_, int z_)
-		: x(x_), y(y_), z(z_), w(0) {}
-	Grad(int x_, int y_, int z_, int w_)
-		: x(x_), y(y_), z(z_), w(w_) {}
+  int x, y, z, w;
+  Grad(int x_, int y_, int z_) : x(x_), y(y_), z(z_), w(0) {}
+  Grad(int x_, int y_, int z_, int w_) : x(x_), y(y_), z(z_), w(w_) {}
 };
 
 struct CellIds {
-	int i, j, k;
-	int i1, j1, k1;
-	int i2, j2, k2;
-	CellIds(int _i = 0, int _j = 0, int _k = 0,
-			int _i1 = 0, int _j1 = 0, int _k1 = 0,
-			int _i2 = 0, int _j2 = 0, int _k2 = 0)
-	{
-		i = _i;
-		j = _j;
-		k = _k;
-		i1 = _i1;
-		j1 = _j1;
-		k1 = _k1;
-		i2 = _i2;
-		j2 = _j2;
-		k2 = _k2;
-	}
+  int i, j, k;
+  int i1, j1, k1;
+  int i2, j2, k2;
+  CellIds(int _i = 0, int _j = 0, int _k = 0, int _i1 = 0, int _j1 = 0,
+          int _k1 = 0, int _i2 = 0, int _j2 = 0, int _k2 = 0) {
+    i  = _i;
+    j  = _j;
+    k  = _k;
+    i1 = _i1;
+    j1 = _j1;
+    k1 = _k1;
+    i2 = _i2;
+    j2 = _j2;
+    k2 = _k2;
+  }
 
-	bool operator==(const CellIds &right) const
-	{
-		return i == right.i &&
-			   j == right.j &&
-			   k == right.k &&
-			   i1 == right.i1 &&
-			   j1 == right.j1 &&
-			   k1 == right.k1 &&
-			   i2 == right.i2 &&
-			   j2 == right.j2 &&
-			   k2 == right.k2;
-	}
+  bool operator==(const CellIds &right) const {
+    return i == right.i && j == right.j && k == right.k && i1 == right.i1 &&
+           j1 == right.j1 && k1 == right.k1 && i2 == right.i2 &&
+           j2 == right.j2 && k2 == right.k2;
+  }
 };
 
-class SimplexNoise
-{
-	// This method is a *lot* faster than using (int)Math.floor(x)
-	static int fastfloor(double x)
-	{
-		int xi = (int)x;
-		return x < xi ? xi - 1 : xi;
-	}
+class SimplexNoise {
+  // This method is a *lot* faster than using (int)Math.floor(x)
+  static int fastfloor(double x) {
+    int xi = (int)x;
+    return x < xi ? xi - 1 : xi;
+  }
 
-	static double dot(Grad g, double x, double y)
-	{
-		return g.x * x + g.y * y;
-	}
+  static double dot(Grad g, double x, double y) { return g.x * x + g.y * y; }
 
-	static double dot(Grad g, double x, double y, double z)
-	{
-		return g.x * x + g.y * y + g.z * z;
-	}
+  static double dot(Grad g, double x, double y, double z) {
+    return g.x * x + g.y * y + g.z * z;
+  }
 
-	static double dot(Grad g, double x, double y, double z, double w)
-	{
-		return g.x * x + g.y * y + g.z * z + g.w * w;
-	}
+  static double dot(Grad g, double x, double y, double z, double w) {
+    return g.x * x + g.y * y + g.z * z + g.w * w;
+  }
 
 public:
-	SimplexNoise();
-	// 2D simplex noise
-	static double noise(double xin, double yin);
-	// 3D simplex noise
-	static double noise(double xin, double yin, double zin);
-	// 4D simplex noise
-	static double noise(double x, double y, double z, double w);
+  SimplexNoise();
+  // 2D simplex noise
+  static double noise(double xin, double yin);
+  // 3D simplex noise
+  static double noise(double xin, double yin, double zin);
+  // 4D simplex noise
+  static double noise(double x, double y, double z, double w);
 
-	/*- セルまたぎを防ぐために、現在の所属セルを得る -*/
-	static CellIds getCellIds(double xin, double yin, double zin);
+  /*- セルまたぎを防ぐために、現在の所属セルを得る -*/
+  static CellIds getCellIds(double xin, double yin, double zin);
 };
 
 #endif

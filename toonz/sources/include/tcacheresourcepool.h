@@ -30,89 +30,89 @@ class TFilePath;
 
 //============================================================================
 
-class DVAPI TCacheResourcePool : public QObject
-{
-	Q_OBJECT
+class DVAPI TCacheResourcePool : public QObject {
+  Q_OBJECT
 
-	THDCacheResourcePool *m_hdPool;
-	TFilePath m_path;
+  THDCacheResourcePool *m_hdPool;
+  TFilePath m_path;
 
-	typedef std::map<std::string, TCacheResource *> MemResources;
-	MemResources m_memResources;
-	QMutex m_memMutex;
+  typedef std::map<std::string, TCacheResource *> MemResources;
+  MemResources m_memResources;
+  QMutex m_memMutex;
 
-	unsigned int m_searchCount;
-	bool m_foundIterator;
-	MemResources::iterator m_searchIterator;
+  unsigned int m_searchCount;
+  bool m_foundIterator;
+  MemResources::iterator m_searchIterator;
 
-	TCacheResourcePool();
-	~TCacheResourcePool();
-
-public:
-	//General functions
-
-	static TCacheResourcePool *instance();
-
-	void setPath(QString cacheRoot, QString projectName, QString sceneName);
-	const TFilePath &getPath() const;
-	void reset();
-
-	void beginCachedSearch();
-	void endCachedSearch();
+  TCacheResourcePool();
+  ~TCacheResourcePool();
 
 public:
-	//Pool management functions
+  // General functions
 
-	void flushResources();
+  static TCacheResourcePool *instance();
 
-	unsigned int getCurrentSize() const;
-	unsigned int getSizeAccessedAfterDays(int days) const;
+  void setPath(QString cacheRoot, QString projectName, QString sceneName);
+  const TFilePath &getPath() const;
+  void reset();
 
-	void clear();
-	void clear(QString cacheRoot, QString projectName, QString sceneName);
+  void beginCachedSearch();
+  void endCachedSearch();
 
-	void clearKeyword(const std::string &keyword);
+public:
+  // Pool management functions
 
-	void addReference(TCacheResourceP resource, QString flag);
-	void releaseReference(TCacheResourceP resource, QString flag);
-	void releaseReferences(QString flag);
+  void flushResources();
 
-	void clearFxResources(std::wstring fxId);
+  unsigned int getCurrentSize() const;
+  unsigned int getSizeAccessedAfterDays(int days) const;
 
-	void clearAccessedUpToSize(int MB);
-	void clearAccessedAfterDays(int days);
-	void clearAccessedAfterSessions(int sessionsCount);
+  void clear();
+  void clear(QString cacheRoot, QString projectName, QString sceneName);
 
-	//Automatic management functions
+  void clearKeyword(const std::string &keyword);
 
-	void setMaximumSize(int MB);
-	int getMaximumSize() const;
+  void addReference(TCacheResourceP resource, QString flag);
+  void releaseReference(TCacheResourceP resource, QString flag);
+  void releaseReferences(QString flag);
 
-	void setResourcesAccessTimeOut(int days);
-	int getResourcesAccessTimeOut() const;
+  void clearFxResources(std::wstring fxId);
 
-	//void setAutomaticCleanupInterval(int days, int minutes);
+  void clearAccessedUpToSize(int MB);
+  void clearAccessedAfterDays(int days);
+  void clearAccessedAfterSessions(int sessionsCount);
+
+  // Automatic management functions
+
+  void setMaximumSize(int MB);
+  int getMaximumSize() const;
+
+  void setResourcesAccessTimeOut(int days);
+  int getResourcesAccessTimeOut() const;
+
+  // void setAutomaticCleanupInterval(int days, int minutes);
 
 private:
-	//Resources interaction functions
+  // Resources interaction functions
 
-	friend class TCacheResource;
-	friend class TCacheResourceP;
+  friend class TCacheResource;
+  friend class TCacheResourceP;
 
-	TCacheResource *getResource(const std::string &name, bool createIfNone);
-	void releaseResource(TCacheResource *resource);
+  TCacheResource *getResource(const std::string &name, bool createIfNone);
+  void releaseResource(TCacheResource *resource);
 
-	void invalidateAll();
+  void invalidateAll();
 
 private:
-	//HD Pool functions
+  // HD Pool functions
 
-	bool isHDActive();
-	void startBacking(TCacheResource *resource);
-	void saveResourceInfos(TCacheResource *resource);
-	void touchBackingPath(TCacheResource *resource);
-	QString getPoolRoot(QString cacheRoot, QString projectName, QString sceneName);
-	void clearResource(QString path);
+  bool isHDActive();
+  void startBacking(TCacheResource *resource);
+  void saveResourceInfos(TCacheResource *resource);
+  void touchBackingPath(TCacheResource *resource);
+  QString getPoolRoot(QString cacheRoot, QString projectName,
+                      QString sceneName);
+  void clearResource(QString path);
 };
 
-#endif //TCACHERESOURCEPOOL_INCLUDED
+#endif  // TCACHERESOURCEPOOL_INCLUDED

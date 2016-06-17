@@ -23,21 +23,21 @@
 
 class TParamSetImp;
 
-class TParamSetChange : public TParamChange
-{
+class TParamSetChange : public TParamChange {
 public:
-	std::vector<TParamChange *> m_paramChanges;
+  std::vector<TParamChange *> m_paramChanges;
 
 public:
-	TParamSetChange(TParam *param, double firstAffectedFrame, double lastAffectedFrame,
-		const std::vector<TParamChange *> &paramChanges)
-		: TParamChange(param, firstAffectedFrame, lastAffectedFrame, true, false, false), m_paramChanges(paramChanges)
-	{
-	}
+  TParamSetChange(TParam *param, double firstAffectedFrame,
+                  double lastAffectedFrame,
+                  const std::vector<TParamChange *> &paramChanges)
+      : TParamChange(param, firstAffectedFrame, lastAffectedFrame, true, false,
+                     false)
+      , m_paramChanges(paramChanges) {}
 
-	~TParamSetChange() { clearPointerContainer(m_paramChanges); }
+  ~TParamSetChange() { clearPointerContainer(m_paramChanges); }
 
-	TParamChange *clone() const { return new TParamSetChange(*this); }
+  TParamChange *clone() const { return new TParamSetChange(*this); }
 };
 
 //------------------------------------------------------------------------------
@@ -47,64 +47,61 @@ public:
 #pragma warning(disable : 4251)
 #endif
 
-class DVAPI TParamSet : public TParam
-{
-	PERSIST_DECLARATION(TParamSet)
+class DVAPI TParamSet : public TParam {
+  PERSIST_DECLARATION(TParamSet)
 public:
-	TParamSet(std::string name = "");
-	TParamSet(const TParamSet &src);
-	~TParamSet();
+  TParamSet(std::string name = "");
+  TParamSet(const TParamSet &src);
+  ~TParamSet();
 
-	void addParam(const TParamP &param, const std::string &name);
-	void insertParam(const TParamP &param, const std::string &name, int index);
-	void removeParam(const TParamP &param);
-	void removeAllParam();
+  void addParam(const TParamP &param, const std::string &name);
+  void insertParam(const TParamP &param, const std::string &name, int index);
+  void removeParam(const TParamP &param);
+  void removeAllParam();
 
-	int getParamCount() const;
-	TParamP getParam(int index) const;
-	std::string getParamName(int index) const;
-	int getParamIdx(const std::string &name) const;
+  int getParamCount() const;
+  TParamP getParam(int index) const;
+  std::string getParamName(int index) const;
+  int getParamIdx(const std::string &name) const;
 
-	void getAnimatableParams(std::vector<TParamP> &params, bool recursive = true);
+  void getAnimatableParams(std::vector<TParamP> &params, bool recursive = true);
 
-	void addObserver(TParamObserver *observer);
-	void removeObserver(TParamObserver *observer);
+  void addObserver(TParamObserver *observer);
+  void removeObserver(TParamObserver *observer);
 
-	void beginParameterChange();
-	void endParameterChange();
+  void beginParameterChange();
+  void endParameterChange();
 
-	void enableDragging(bool on);
-	void enableNotification(bool on);
-	bool isNotificationEnabled() const;
+  void enableDragging(bool on);
+  void enableNotification(bool on);
+  bool isNotificationEnabled() const;
 
-	bool isAnimatable() const { return true; }
-	bool isKeyframe(double frame) const;
-	void deleteKeyframe(double frame);
-	void clearKeyframes();
-	void assignKeyframe(
-		double frame,
-		const TSmartPointerT<TParam> &src, double srcFrame,
-		bool changedOnly = false);
+  bool isAnimatable() const { return true; }
+  bool isKeyframe(double frame) const;
+  void deleteKeyframe(double frame);
+  void clearKeyframes();
+  void assignKeyframe(double frame, const TSmartPointerT<TParam> &src,
+                      double srcFrame, bool changedOnly = false);
 
-	void getKeyframes(std::set<double> &frames) const;
-	int getKeyframeCount() const;
+  void getKeyframes(std::set<double> &frames) const;
+  int getKeyframeCount() const;
 
-	double keyframeIndexToFrame(int index) const;
+  double keyframeIndexToFrame(int index) const;
 
-	virtual TParam *clone() const;
-	virtual void copy(TParam *src);
-	virtual void loadData(TIStream &);
-	virtual void saveData(TOStream &);
+  virtual TParam *clone() const;
+  virtual void copy(TParam *src);
+  virtual void loadData(TIStream &);
+  virtual void saveData(TOStream &);
 
-	int getNextKeyframe(double frame) const;
-	int getPrevKeyframe(double frame) const;
+  int getNextKeyframe(double frame) const;
+  int getPrevKeyframe(double frame) const;
 
-	bool hasKeyframes() const;
+  bool hasKeyframes() const;
 
-	std::string getValueAlias(double frame, int precision);
+  std::string getValueAlias(double frame, int precision);
 
 private:
-	TParamSetImp *m_imp = nullptr;
+  TParamSetImp *m_imp = nullptr;
 };
 
 #ifdef _WIN32
@@ -120,13 +117,12 @@ typedef TDerivedSmartPointerT<TParamSet, TParam> TParamSetP;
 
 //------------------------------------------------------------------------------
 
-class TPointParamObserver
-{
+class TPointParamObserver {
 public:
-	TPointParamObserver() {}
-	virtual ~TPointParamObserver() {}
+  TPointParamObserver() {}
+  virtual ~TPointParamObserver() {}
 
-	virtual void onChange(const TParamChange &) = 0;
+  virtual void onChange(const TParamChange &) = 0;
 };
 
 //------------------------------------------------------------------------------
@@ -141,32 +137,31 @@ template class DVAPI TPersistDeclarationT<TPointParam>;
 class TPointParamImp;
 class TDoubleParamP;
 
-class DVAPI TPointParam : public TParamSet
-{
-	PERSIST_DECLARATION(TPointParam)
-	TPointParamImp *m_data;
-	bool m_from_plugin;
+class DVAPI TPointParam : public TParamSet {
+  PERSIST_DECLARATION(TPointParam)
+  TPointParamImp *m_data;
+  bool m_from_plugin;
 
 public:
-	TPointParam(const TPointD &p = TPointD(), bool from_plugin = false);
-	TPointParam(const TPointParam &src);
-	~TPointParam();
+  TPointParam(const TPointD &p = TPointD(), bool from_plugin = false);
+  TPointParam(const TPointParam &src);
+  ~TPointParam();
 
-	TParam *clone() const { return new TPointParam(*this); }
-	void copy(TParam *src);
+  TParam *clone() const { return new TPointParam(*this); }
+  void copy(TParam *src);
 
-	TPointD getDefaultValue() const;
-	TPointD getValue(double frame) const;
-	bool setValue(double frame, const TPointD &p);
-	void setDefaultValue(const TPointD &p);
+  TPointD getDefaultValue() const;
+  TPointD getValue(double frame) const;
+  bool setValue(double frame, const TPointD &p);
+  void setDefaultValue(const TPointD &p);
 
-	void loadData(TIStream &is);
-	void saveData(TOStream &os);
+  void loadData(TIStream &is);
+  void saveData(TOStream &os);
 
-	TDoubleParamP &getX();
-	TDoubleParamP &getY();
+  TDoubleParamP &getX();
+  TDoubleParamP &getY();
 
-	bool isFromPlugin() const { return m_from_plugin; }
+  bool isFromPlugin() const { return m_from_plugin; }
 };
 
 DEFINE_PARAM_SMARTPOINTER(TPointParam, TPointD)
@@ -178,64 +173,61 @@ class TPixelParam;
 template class DVAPI TPersistDeclarationT<TPixelParam>;
 #endif
 
-class TPixelParamObserver
-{
+class TPixelParamObserver {
 public:
-	TPixelParamObserver() {}
-	virtual ~TPixelParamObserver() {}
-	virtual void onChange(const TParamChange &) = 0;
+  TPixelParamObserver() {}
+  virtual ~TPixelParamObserver() {}
+  virtual void onChange(const TParamChange &) = 0;
 };
 
 //------------------------------------------------------------------------------
 
 class TPixelParamImp;
 
-class DVAPI TPixelParam : public TParamSet
-{
-	PERSIST_DECLARATION(TPixelParam)
-	TPixelParamImp *m_data;
+class DVAPI TPixelParam : public TParamSet {
+  PERSIST_DECLARATION(TPixelParam)
+  TPixelParamImp *m_data;
 
 public:
-	TPixelParam(const TPixel32 &pix = TPixel32::Black);
-	TPixelParam(const TPixelParam &);
-	~TPixelParam();
+  TPixelParam(const TPixel32 &pix = TPixel32::Black);
+  TPixelParam(const TPixelParam &);
+  ~TPixelParam();
 
-	TParam *clone() const { return new TPixelParam(*this); }
-	void copy(TParam *src);
+  TParam *clone() const { return new TPixelParam(*this); }
+  void copy(TParam *src);
 
-	TPixel32 getDefaultValue() const;
-	TPixelD getValueD(double frame) const;
-	TPixel32 getValue(double frame) const;
-	TPixel64 getValue64(double frame) const;
-	TPixel32 getPremultipliedValue(double frame) const;
+  TPixel32 getDefaultValue() const;
+  TPixelD getValueD(double frame) const;
+  TPixel32 getValue(double frame) const;
+  TPixel64 getValue64(double frame) const;
+  TPixel32 getPremultipliedValue(double frame) const;
 
-	void setDefaultValue(const TPixel32 &pix);
-	bool setValueD(double frame, const TPixelD &pix);
-	bool setValue(double frame, const TPixel32 &pix);
-	bool setValue64(double frame, const TPixel64 &pix);
+  void setDefaultValue(const TPixel32 &pix);
+  bool setValueD(double frame, const TPixelD &pix);
+  bool setValue(double frame, const TPixel32 &pix);
+  bool setValue64(double frame, const TPixel64 &pix);
 
-	void enableMatte(bool on);
+  void enableMatte(bool on);
 
-	bool isMatteEnabled() const;
-	void loadData(TIStream &is);
-	void saveData(TOStream &os);
+  bool isMatteEnabled() const;
+  void loadData(TIStream &is);
+  void saveData(TOStream &os);
 
-	TDoubleParamP &getRed();
-	TDoubleParamP &getGreen();
-	TDoubleParamP &getBlue();
-	TDoubleParamP &getMatte();
+  TDoubleParamP &getRed();
+  TDoubleParamP &getGreen();
+  TDoubleParamP &getBlue();
+  TDoubleParamP &getMatte();
 };
 
 DEFINE_PARAM_SMARTPOINTER(TPixelParam, TPixel32)
 
 //------------------------------------------------------------------------------
 
-class TRangeParamObserver
-{
+class TRangeParamObserver {
 public:
-	TRangeParamObserver() {}
-	virtual ~TRangeParamObserver() {}
-	virtual void onChange(const TParamChange &) = 0;
+  TRangeParamObserver() {}
+  virtual ~TRangeParamObserver() {}
+  virtual void onChange(const TParamChange &) = 0;
 };
 
 //------------------------------------------------------------------------------
@@ -250,30 +242,29 @@ template class DVAPI TPersistDeclarationT<TRangeParam>;
 class TRangeParamImp;
 class TDoubleParamP;
 
-class DVAPI TRangeParam : public TParamSet
-{
-	PERSIST_DECLARATION(TRangeParam)
-	TRangeParamImp *m_data;
+class DVAPI TRangeParam : public TParamSet {
+  PERSIST_DECLARATION(TRangeParam)
+  TRangeParamImp *m_data;
 
 public:
-	TRangeParam(const DoublePair &range = DoublePair(0, 0));
-	TRangeParam(const TRangeParam &src);
-	~TRangeParam();
+  TRangeParam(const DoublePair &range = DoublePair(0, 0));
+  TRangeParam(const TRangeParam &src);
+  ~TRangeParam();
 
-	TParam *clone() const { return new TRangeParam(*this); }
-	void copy(TParam *src);
+  TParam *clone() const { return new TRangeParam(*this); }
+  void copy(TParam *src);
 
-	DoublePair getDefaultValue() const;
-	DoublePair getValue(double frame) const;
-	bool setValue(double frame, const DoublePair &v);
-	void setDefaultValue(const DoublePair &v);
+  DoublePair getDefaultValue() const;
+  DoublePair getValue(double frame) const;
+  bool setValue(double frame, const DoublePair &v);
+  void setDefaultValue(const DoublePair &v);
 
-	void loadData(TIStream &is);
-	void saveData(TOStream &os);
-	int getKeyframeCount() const;
+  void loadData(TIStream &is);
+  void saveData(TOStream &os);
+  int getKeyframeCount() const;
 
-	TDoubleParamP &getMin();
-	TDoubleParamP &getMax();
+  TDoubleParamP &getMin();
+  TDoubleParamP &getMax();
 };
 
 DEFINE_PARAM_SMARTPOINTER(TRangeParam, DoublePair)

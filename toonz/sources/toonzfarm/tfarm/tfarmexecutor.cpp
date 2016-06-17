@@ -4,39 +4,32 @@
 #include <QStringList>
 //------------------------------------------------------------------------------
 
-TFarmExecutor::TFarmExecutor(int port)
-	: TTcpIpServer(port)
-{
+TFarmExecutor::TFarmExecutor(int port) : TTcpIpServer(port) {}
+
+//------------------------------------------------------------------------------
+
+int extractArgs(const QString &s, std::vector<QString> &argv) {
+  argv.clear();
+  if (s == "") return 0;
+
+  QStringList sl = s.split(',');
+  int i;
+  for (i = 0; i < sl.size(); i++) argv.push_back(sl.at(i));
+
+  return argv.size();
 }
 
 //------------------------------------------------------------------------------
 
-int extractArgs(const QString &s, std::vector<QString> &argv)
-{
-	argv.clear();
-	if (s == "")
-		return 0;
+void TFarmExecutor::onReceive(int socket, const QString &data) {
+  QString reply;
 
-	QStringList sl = s.split(',');
-	int i;
-	for (i = 0; i < sl.size(); i++)
-		argv.push_back(sl.at(i));
+  try {
+    std::vector<QString> argv;
+    extractArgs(data, argv);
+    reply = execute(argv);
+  } catch (...) {
+  }
 
-	return argv.size();
-}
-
-//------------------------------------------------------------------------------
-
-void TFarmExecutor::onReceive(int socket, const QString &data)
-{
-	QString reply;
-
-	try {
-		std::vector<QString> argv;
-		extractArgs(data, argv);
-		reply = execute(argv);
-	} catch (...) {
-	}
-
-	sendReply(socket, reply);
+  sendReply(socket, reply);
 }

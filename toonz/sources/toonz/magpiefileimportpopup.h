@@ -8,66 +8,63 @@
 
 class FlipBook;
 
-namespace DVGui
-{
+namespace DVGui {
 class IntLineEdit;
 class FileField;
 class LineEdit;
 }
 
-class MagpieInfo
-{
-	QList<QString> m_actorActs;
-	QList<QString> m_comments;
-	QList<QString> m_actsIdentifier;
-	QString m_fileName;
+class MagpieInfo {
+  QList<QString> m_actorActs;
+  QList<QString> m_comments;
+  QList<QString> m_actsIdentifier;
+  QString m_fileName;
 
 public:
-	MagpieInfo(TFilePath path);
+  MagpieInfo(TFilePath path);
 
-	int getFrameCount() const { return m_comments.size(); }
+  int getFrameCount() const { return m_comments.size(); }
 
-	QList<QString> getComments() const { return m_comments; }
-	QList<QString> getActorActs() const { return m_actorActs; }
-	QList<QString> getActsIdentifier() const { return m_actsIdentifier; }
-	QString getFileName() const { return m_fileName; }
+  QList<QString> getComments() const { return m_comments; }
+  QList<QString> getActorActs() const { return m_actorActs; }
+  QList<QString> getActsIdentifier() const { return m_actsIdentifier; }
+  QString getFileName() const { return m_fileName; }
 };
 
 //=============================================================================
 // MagpieFileImportPopup
 //-----------------------------------------------------------------------------
 
-class MagpieFileImportPopup : public DVGui::Dialog
-{
-	Q_OBJECT
+class MagpieFileImportPopup : public DVGui::Dialog {
+  Q_OBJECT
 
-	MagpieInfo *m_info;
+  MagpieInfo *m_info;
 
-	DVGui::FileField *m_levelField;
-	DVGui::IntLineEdit *m_fromField;
-	DVGui::IntLineEdit *m_toField;
+  DVGui::FileField *m_levelField;
+  DVGui::IntLineEdit *m_fromField;
+  DVGui::IntLineEdit *m_toField;
 
-	QList<QPair<QLabel *, DVGui::IntLineEdit *>> m_actFields;
+  QList<QPair<QLabel *, DVGui::IntLineEdit *>> m_actFields;
 
-	FlipBook *m_flipbook;
-	TFilePath m_levelPath;
+  FlipBook *m_flipbook;
+  TFilePath m_levelPath;
 
 public:
-	MagpieFileImportPopup();
+  MagpieFileImportPopup();
 
-	void setFilePath(TFilePath path);
+  void setFilePath(TFilePath path);
 
 protected:
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *);
 
 protected slots:
-	void onLevelPathChanged();
-	void onOkPressed();
+  void onLevelPathChanged();
+  void onOkPressed();
 
 signals:
-	void closeButtonPressed();
-	void doubleClick();
+  void closeButtonPressed();
+  void doubleClick();
 };
 
-#endif // MAGPIEFILEIMPORTPOPUP_H
+#endif  // MAGPIEFILEIMPORTPOPUP_H

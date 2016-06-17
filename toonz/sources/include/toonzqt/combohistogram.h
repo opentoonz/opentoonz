@@ -42,136 +42,127 @@ class QLabel;
 // 120405
 //-----------------------------------------------------------------------------
 
-class DVAPI ComboHistoRGBLabel : public QWidget
-{
-	QColor m_color;
+class DVAPI ComboHistoRGBLabel : public QWidget {
+  QColor m_color;
 
 public:
-	ComboHistoRGBLabel(QColor color, QWidget *parent);
+  ComboHistoRGBLabel(QColor color, QWidget *parent);
 
-	~ComboHistoRGBLabel() {}
+  ~ComboHistoRGBLabel() {}
 
-	void setColorAndUpdate(QColor color);
+  void setColorAndUpdate(QColor color);
 
 protected:
-	void paintEvent(QPaintEvent *pe);
+  void paintEvent(QPaintEvent *pe);
 };
 
 //-----------------------------------------------------------------------------
 
-class DVAPI ChannelHistoGraph : public QWidget
-{
-	Q_OBJECT
+class DVAPI ChannelHistoGraph : public QWidget {
+  Q_OBJECT
 
-	QVector<int> m_values;
+  QVector<int> m_values;
 
-	int m_pickedValue;
+  int m_pickedValue;
 
 public:
-	int *m_channelValuePtr;
+  int *m_channelValuePtr;
 
-	ChannelHistoGraph(QWidget *parent = 0, int *channelValue = 0);
-	~ChannelHistoGraph();
+  ChannelHistoGraph(QWidget *parent = 0, int *channelValue = 0);
+  ~ChannelHistoGraph();
 
-	virtual void setValues();
+  virtual void setValues();
 
-	void showCurrentChannelValue(int val);
+  void showCurrentChannelValue(int val);
 
 protected:
-	virtual void paintEvent(QPaintEvent *event);
+  virtual void paintEvent(QPaintEvent *event);
 };
 
 //-----------------------------------------------------------------------------
 
-class DVAPI RGBHistoGraph : public ChannelHistoGraph
-{
-	Q_OBJECT
+class DVAPI RGBHistoGraph : public ChannelHistoGraph {
+  Q_OBJECT
 
-	QVector<int> m_rgbValues[3];
+  QVector<int> m_rgbValues[3];
 
-	QImage m_histoImg;
+  QImage m_histoImg;
 
 public:
-	RGBHistoGraph(QWidget *parent = 0, int *channelValue = 0);
-	~RGBHistoGraph();
+  RGBHistoGraph(QWidget *parent = 0, int *channelValue = 0);
+  ~RGBHistoGraph();
 
-	void setValues();
+  void setValues();
 
 protected:
-	void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event);
 };
 //-----------------------------------------------------------------------------
 
-class DVAPI ChannelColorBar : public QWidget
-{
-	Q_OBJECT
-	QColor m_color;
+class DVAPI ChannelColorBar : public QWidget {
+  Q_OBJECT
+  QColor m_color;
 
 public:
-	ChannelColorBar(QWidget *parent = 0, QColor m_color = QColor());
-	~ChannelColorBar() {}
+  ChannelColorBar(QWidget *parent = 0, QColor m_color = QColor());
+  ~ChannelColorBar() {}
 
 protected:
-	void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event);
 };
 
 //-----------------------------------------------------------------------------
 
-class DVAPI ChannelHisto : public QWidget
-{
-	Q_OBJECT
+class DVAPI ChannelHisto : public QWidget {
+  Q_OBJECT
 
-	ChannelHistoGraph *m_histogramGraph;
-	ChannelColorBar *m_colorBar;
+  ChannelHistoGraph *m_histogramGraph;
+  ChannelColorBar *m_colorBar;
 
 public:
-	ChannelHisto(int channelIndex, int *channelValue, QWidget *parent = 0);
-	~ChannelHisto() {}
+  ChannelHisto(int channelIndex, int *channelValue, QWidget *parent = 0);
+  ~ChannelHisto() {}
 
-	void refleshValue()
-	{
-		m_histogramGraph->setValues();
-	}
+  void refleshValue() { m_histogramGraph->setValues(); }
 
-	void showCurrentChannelValue(int val);
+  void showCurrentChannelValue(int val);
 
 protected slots:
-	void onShowAlphaButtonToggled(bool visible);
+  void onShowAlphaButtonToggled(bool visible);
 };
 
 //-----------------------------------------------------------------------------
 
-class DVAPI ComboHistogram : public QWidget
-{
-	Q_OBJECT
+class DVAPI ComboHistogram : public QWidget {
+  Q_OBJECT
 
-	TRasterP m_raster;
-	TPaletteP m_palette;
+  TRasterP m_raster;
+  TPaletteP m_palette;
 
-	//rgba channels
-	int m_channelValue[4][COMBOHIST_RESOLUTION_W];
+  // rgba channels
+  int m_channelValue[4][COMBOHIST_RESOLUTION_W];
 
-	//rgba channels + composited
-	ChannelHisto *m_histograms[5];
+  // rgba channels + composited
+  ChannelHisto *m_histograms[5];
 
-	ComboHistoRGBLabel *m_rgbLabel;
+  ComboHistoRGBLabel *m_rgbLabel;
 
-	ComboHistoRGBLabel *m_rectAverageRgbLabel;
+  ComboHistoRGBLabel *m_rectAverageRgbLabel;
 
-	QLabel *m_xPosLabel;
-	QLabel *m_yPosLabel;
+  QLabel *m_xPosLabel;
+  QLabel *m_yPosLabel;
 
 public:
-	ComboHistogram(QWidget *parent = 0);
-	~ComboHistogram();
+  ComboHistogram(QWidget *parent = 0);
+  ~ComboHistogram();
 
-	TRasterP getRaster() const { return m_raster; }
-	void setRaster(const TRasterP &raster, const TPaletteP &palette = 0);
-	void updateInfo(const TPixel32 &pix, const TPointD &imagePos);
-	void updateAverageColor(const TPixel32 &pix);
+  TRasterP getRaster() const { return m_raster; }
+  void setRaster(const TRasterP &raster, const TPaletteP &palette = 0);
+  void updateInfo(const TPixel32 &pix, const TPointD &imagePos);
+  void updateAverageColor(const TPixel32 &pix);
 
 protected:
-	void computeChannelsValue();
+  void computeChannelsValue();
 };
 
 #endif

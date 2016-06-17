@@ -18,35 +18,34 @@ class ScriptEngine;
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI ScriptConsole : public QTextEdit
-{
-	Q_OBJECT
-	ScriptEngine *m_engine;
+class DVAPI ScriptConsole : public QTextEdit {
+  Q_OBJECT
+  ScriptEngine *m_engine;
 
-	QList<QString> m_commands;
-	int m_commandIndex;
-	QString m_currentCommand;
+  QList<QString> m_commands;
+  int m_commandIndex;
+  QString m_currentCommand;
 
-	QString m_prompt;
+  QString m_prompt;
 
 public:
-	ScriptConsole(QWidget *parent = 0);
-	~ScriptConsole();
+  ScriptConsole(QWidget *parent = 0);
+  ~ScriptConsole();
 
-	void executeCommand(const QString &cmd);
-	ScriptEngine *getEngine() const { return m_engine; }
+  void executeCommand(const QString &cmd);
+  ScriptEngine *getEngine() const { return m_engine; }
 
 protected:
-	void keyPressEvent(QKeyEvent *e);
-	void onReturnKeyPress();
+  void keyPressEvent(QKeyEvent *e);
+  void onReturnKeyPress();
 
-	bool canInsertFromMimeData(const QMimeData *source) const;
-	void insertFromMimeData(const QMimeData *source);
+  bool canInsertFromMimeData(const QMimeData *source) const;
+  void insertFromMimeData(const QMimeData *source);
 
 public slots:
-	void onEvaluationDone();
-	void output(int, const QString &msg);
-	void onCursorPositionChanged();
+  void onEvaluationDone();
+  void output(int, const QString &msg);
+  void onCursorPositionChanged();
 };
 
-#endif // SCRIPTCONSOLE_H
+#endif  // SCRIPTCONSOLE_H

@@ -25,40 +25,30 @@
 #include <vector>
 #include <string>
 
-namespace ToonzExt
-{
+namespace ToonzExt {
 
 /**
    * This class mantains interal data for Dragger manipulator.
    */
-class DVAPI
-	CompositeStatus
-{
+class DVAPI CompositeStatus {
 private:
-	std::map<std::string,
-			 CompositeStatus *> *dbImpl_;
+  std::map<std::string, CompositeStatus *> *dbImpl_;
 
-	std::map<std::string,
-			 CompositeStatus *> &db_;
+  std::map<std::string, CompositeStatus *> &db_;
 
-	typedef std::map<std::string,
-					 CompositeStatus *>::iterator iterator;
-	typedef std::map<std::string,
-					 CompositeStatus *>::const_iterator const_iterator;
+  typedef std::map<std::string, CompositeStatus *>::iterator iterator;
+  typedef std::map<std::string, CompositeStatus *>::const_iterator
+      const_iterator;
 
 public:
-	CompositeStatus();
-	virtual ~CompositeStatus();
+  CompositeStatus();
+  virtual ~CompositeStatus();
 
-	void
-	add(CompositeStatus *,
-		const std::string &name);
+  void add(CompositeStatus *, const std::string &name);
 
-	void
-	remove(const std::string &name);
+  void remove(const std::string &name);
 
-	CompositeStatus *
-	find(const std::string &name) const;
+  CompositeStatus *find(const std::string &name) const;
 };
 
 //---------------------------------------------------------------------------

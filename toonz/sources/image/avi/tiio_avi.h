@@ -20,44 +20,45 @@ class VDVideoDecompressor;
 //
 //===========================================================
 
-class TLevelWriterAvi : public TLevelWriter
-{
+class TLevelWriterAvi : public TLevelWriter {
 public:
-	TLevelWriterAvi(const TFilePath &path, TPropertyGroup *winfo);
-	~TLevelWriterAvi();
-	TImageWriterP getFrameWriter(TFrameId fid);
+  TLevelWriterAvi(const TFilePath &path, TPropertyGroup *winfo);
+  ~TLevelWriterAvi();
+  TImageWriterP getFrameWriter(TFrameId fid);
 
-	void saveSoundTrack(TSoundTrack *st);
-	void save(const TImageP &image, int frameIndex);
-	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo) { return new TLevelWriterAvi(f, winfo); }
+  void saveSoundTrack(TSoundTrack *st);
+  void save(const TImageP &image, int frameIndex);
+  static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo) {
+    return new TLevelWriterAvi(f, winfo);
+  }
 
 private:
-	TThread::Mutex m_mutex;
+  TThread::Mutex m_mutex;
 #ifdef _WIN32
-	PAVIFILE m_aviFile;
-	PAVISTREAM m_videoStream;
-	PAVISTREAM m_audioStream;
-	TSoundTrack *m_st;
-	HIC m_hic;
-	BITMAPINFO *m_bitmapinfo;
-	BITMAPINFO *m_outputFmt;
-	AVISTREAMINFO m_audioStreamInfo;
-	void *m_buffer;
-	bool m_initDone;
-	int IOError;
-	int m_bpp;
-	long m_maxDataSize;
-	std::list<int> m_delayedFrames;
-	int m_firstframe;
+  PAVIFILE m_aviFile;
+  PAVISTREAM m_videoStream;
+  PAVISTREAM m_audioStream;
+  TSoundTrack *m_st;
+  HIC m_hic;
+  BITMAPINFO *m_bitmapinfo;
+  BITMAPINFO *m_outputFmt;
+  AVISTREAMINFO m_audioStreamInfo;
+  void *m_buffer;
+  bool m_initDone;
+  int IOError;
+  int m_bpp;
+  long m_maxDataSize;
+  std::list<int> m_delayedFrames;
+  int m_firstframe;
 #endif
 
-	void doSaveSoundTrack();
-	void searchForCodec();
+  void doSaveSoundTrack();
+  void searchForCodec();
 #ifdef _WIN32
-	int compressFrame(BITMAPINFOHEADER *outHeader, void **bufferOut, int frameIndex,
-					  DWORD flagsIn, DWORD &flagsOut);
+  int compressFrame(BITMAPINFOHEADER *outHeader, void **bufferOut,
+                    int frameIndex, DWORD flagsIn, DWORD &flagsOut);
 #endif
-	void createBitmap(int lx, int ly);
+  void createBitmap(int lx, int ly);
 };
 
 //===========================================================
@@ -66,30 +67,33 @@ private:
 //
 //===========================================================
 
-class TLevelReaderAvi : public TLevelReader
-{
+class TLevelReaderAvi : public TLevelReader {
 public:
-	TLevelReaderAvi(const TFilePath &path);
-	~TLevelReaderAvi();
-	TImageReaderP getFrameReader(TFrameId fid);
+  TLevelReaderAvi(const TFilePath &path);
+  ~TLevelReaderAvi();
+  TImageReaderP getFrameReader(TFrameId fid);
 
-	static TLevelReader *create(const TFilePath &f) { return new TLevelReaderAvi(f); }
-	TLevelP loadInfo();
-	TImageP load(int frameIndex);
-	TDimension getSize();
-	TThread::Mutex m_mutex;
-	void *m_decompressedBuffer;
+  static TLevelReader *create(const TFilePath &f) {
+    return new TLevelReaderAvi(f);
+  }
+  TLevelP loadInfo();
+  TImageP load(int frameIndex);
+  TDimension getSize();
+  TThread::Mutex m_mutex;
+  void *m_decompressedBuffer;
 
 #ifdef _WIN32
 private:
-	PAVISTREAM m_videoStream;
-	BITMAPINFO *m_srcBitmapInfo, *m_dstBitmapInfo;
-	HIC m_hic;
-	int IOError, m_prevFrame;
+  PAVISTREAM m_videoStream;
+  BITMAPINFO *m_srcBitmapInfo, *m_dstBitmapInfo;
+  HIC m_hic;
+  int IOError, m_prevFrame;
 
-	int readFrameFromStream(void *bufferOut, DWORD &bufferSize, int frameIndex) const;
-	DWORD decompressFrame(void *srcBuffer, int srcSize, void *dstBuffer, int currentFrame, int desiredFrame);
-	HIC findCandidateDecompressor();
+  int readFrameFromStream(void *bufferOut, DWORD &bufferSize,
+                          int frameIndex) const;
+  DWORD decompressFrame(void *srcBuffer, int srcSize, void *dstBuffer,
+                        int currentFrame, int desiredFrame);
+  HIC findCandidateDecompressor();
 #endif
 };
 
@@ -99,15 +103,13 @@ private:
 //
 //===========================================================
 
-namespace Tiio
-{
-class AviWriterProperties : public TPropertyGroup
-{
+namespace Tiio {
+class AviWriterProperties : public TPropertyGroup {
 public:
-	AviWriterProperties();
-	TEnumProperty m_codec;
-	static TEnumProperty m_defaultCodec;
+  AviWriterProperties();
+  TEnumProperty m_codec;
+  static TEnumProperty m_defaultCodec;
 };
 }
 
-#endif //TIIO_AVI_H
+#endif  // TIIO_AVI_H

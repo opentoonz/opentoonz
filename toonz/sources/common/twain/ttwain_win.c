@@ -7,25 +7,15 @@
 extern "C" {
 #endif
 
-void *TTWAIN_GetValidHwnd(void *hwnd)
-{
-	return TTWAIN_GetValidHwndPD(hwnd);
+void *TTWAIN_GetValidHwnd(void *hwnd) { return TTWAIN_GetValidHwndPD(hwnd); }
+
+int TTWAIN_EnableWindow(void *hwnd, int flag) {
+  return TTWAIN_EnableWindowPD(hwnd, flag);
 }
 
-int TTWAIN_EnableWindow(void *hwnd, int flag)
-{
-	return TTWAIN_EnableWindowPD(hwnd, flag);
-}
+void TTWAIN_EmptyMessageQueue(void) { TTWAIN_EmptyMessageQueuePD(); }
 
-void TTWAIN_EmptyMessageQueue(void)
-{
-	TTWAIN_EmptyMessageQueuePD();
-}
-
-void TTWAIN_ModalEventLoop(void)
-{
-	TTWAIN_ModalEventLoopPD();
-}
+void TTWAIN_ModalEventLoop(void) { TTWAIN_ModalEventLoopPD(); }
 
 #ifdef __cplusplus
 }

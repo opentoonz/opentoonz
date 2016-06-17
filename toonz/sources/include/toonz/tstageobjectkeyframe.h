@@ -14,15 +14,15 @@
 //***********************************************************************************
 
 struct TStageObject::Keyframe {
-	TDoubleKeyframe m_channels[T_ChannelCount]; //!< Keyframe per standard stage object channel
-	SkDKey m_skeletonKeyframe;					//!< Keyframes for the eventual plastic
-												//!< deformation
+  TDoubleKeyframe m_channels[T_ChannelCount];  //!< Keyframe per standard stage
+                                               //!object channel
+  SkDKey m_skeletonKeyframe;  //!< Keyframes for the eventual plastic
+                              //!< deformation
 
-	bool m_isKeyframe;			//!< False, in case each channel value was interpolated
-	double m_easeIn, m_easeOut; //!< Uniform Ease parameters, <0 in case the
-								//!< parameters have different eases
-	Keyframe()
-		: m_isKeyframe(false), m_easeIn(0), m_easeOut(0) {}
+  bool m_isKeyframe;  //!< False, in case each channel value was interpolated
+  double m_easeIn, m_easeOut;  //!< Uniform Ease parameters, <0 in case the
+                               //!< parameters have different eases
+  Keyframe() : m_isKeyframe(false), m_easeIn(0), m_easeOut(0) {}
 };
 
-#endif // T_STAGE_OBJECT_KEYFRAME_INCLUDED
+#endif  // T_STAGE_OBJECT_KEYFRAME_INCLUDED

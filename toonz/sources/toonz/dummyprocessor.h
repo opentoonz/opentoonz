@@ -6,20 +6,19 @@
 #include "processor.h"
 
 //! A dummy Processor
-class DummyProcessor : public Processor
-{
-	std::vector<int> m_dummyData;
+class DummyProcessor : public Processor {
+  std::vector<int> m_dummyData;
 
 public:
-	//! Constructor
-	DummyProcessor();
-	//! Destructor
-	~DummyProcessor();
+  //! Constructor
+  DummyProcessor();
+  //! Destructor
+  ~DummyProcessor();
 
-	//! process the raster
-	void process(TRaster32P raster);
-	//! draw after the processing phase
-	void draw();
+  //! process the raster
+  void process(TRaster32P raster);
+  //! draw after the processing phase
+  void draw();
 };
 
-#endif // DUMMYPROCESSOR_H
+#endif  // DUMMYPROCESSOR_H

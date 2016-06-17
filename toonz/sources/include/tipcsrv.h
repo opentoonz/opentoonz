@@ -3,13 +3,13 @@
 #ifndef TIPC_SERVER_H
 #define TIPC_SERVER_H
 
-//Toonz includes
+// Toonz includes
 #include "tcommon.h"
 
-//STL includes
+// STL includes
 #include <map>
 
-//Qt includes
+// Qt includes
 #include <QString>
 #include <QHash>
 #include <QSharedMemory>
@@ -26,8 +26,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-namespace tipc
-{
+namespace tipc {
 
 class MessageParser;
 
@@ -36,42 +35,45 @@ class MessageParser;
 //*******************************************************************************
 
 /*!
-  The tipc::Server class is the base server class for inter-process communication
+  The tipc::Server class is the base server class for inter-process
+  communication
   in Toonz-related applications.
 
-  A tipc::Server is a specialized QLocalServer which stores header/message-callback
+  A tipc::Server is a specialized QLocalServer which stores
+  header/message-callback
   associations to perform message parsing.
 */
 
-class DVAPI Server : public QLocalServer
-{
-	Q_OBJECT
+class DVAPI Server : public QLocalServer {
+  Q_OBJECT
 
-	QHash<QString, MessageParser *> m_parsers;
-	bool m_lock;
+  QHash<QString, MessageParser *> m_parsers;
+  bool m_lock;
 
 public:
-	Server();
-	~Server();
+  Server();
+  ~Server();
 
-	void addParser(MessageParser *parser);
-	void removeParser(QString header);
+  void addParser(MessageParser *parser);
+  void removeParser(QString header);
 
-	//!Generic dispatcher function for socket messages.
-	//!Acceptable socket messages are composed of a header and a body part.
-	//!The header part, containing an explanation of the message's body, is
-	//!the first line of the message, and is expected to be at max 1024 chars long.
-	//!Depending on the header content, the rest of the message is read in
-	//!specialized message handler functions.
-	void dispatchSocket(QLocalSocket *socket);
+  //! Generic dispatcher function for socket messages.
+  //! Acceptable socket messages are composed of a header and a body part.
+  //! The header part, containing an explanation of the message's body, is
+  //! the first line of the message, and is expected to be at max 1024 chars
+  //! long.
+  //! Depending on the header content, the rest of the message is read in
+  //! specialized message handler functions.
+  void dispatchSocket(QLocalSocket *socket);
 
 public Q_SLOTS:
 
-	//! Receives a client connection to the server and prepares a socket for the connection.
-	void onNewConnection();
-	void onError(QLocalSocket::LocalSocketError);
+  //! Receives a client connection to the server and prepares a socket for the
+  //! connection.
+  void onNewConnection();
+  void onError(QLocalSocket::LocalSocketError);
 };
 
-} //namespace tipc
+}  // namespace tipc
 
-#endif //TIPC_SERVER_H
+#endif  // TIPC_SERVER_H

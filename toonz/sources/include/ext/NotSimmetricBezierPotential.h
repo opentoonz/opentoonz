@@ -22,43 +22,35 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-namespace ToonzExt
-{
-class DVAPI
-	NotSimmetricBezierPotential
-	: public Potential
-{
+namespace ToonzExt {
+class DVAPI NotSimmetricBezierPotential : public Potential {
 public:
-	virtual ~NotSimmetricBezierPotential();
+  virtual ~NotSimmetricBezierPotential();
 
-	// chiama compute_value ma effettua un controllo del parametro
-	virtual double
-	value_(double radiusToTest) const;
+  // chiama compute_value ma effettua un controllo del parametro
+  virtual double value_(double radiusToTest) const;
 
-	virtual void
-	setParameters_(const TStroke *ref,
-				   double w,
-				   double actionLength);
+  virtual void setParameters_(const TStroke *ref, double w,
+                              double actionLength);
 
-	Potential *
-	clone();
+  Potential *clone();
 
 private:
-	double compute_shape(double) const; // funzione ausiliaria per
-	// il calcolo del parametro
-	// da usare
+  double compute_shape(double) const;  // funzione ausiliaria per
+  // il calcolo del parametro
+  // da usare
 
-	double compute_value(double) const; // funzione ausiliaria per
-	// il calcolo del potenziale senza
-	// controllo del parametro
-	const TStroke *ref_;
-	double range_; // range of mapping
-	double par_;
-	double actionLength_;  // lunghezza dell'azione
-	double strokeLength_;  // lunghezza stroke
-	double lenghtAtParam_; // lunghezza nel pto di movimento
-	double leftFactor_;	// fattore di shape x la curva a sinistra
-	double rightFactor_;   // fattore di shape x la curva a dx
+  double compute_value(double) const;  // funzione ausiliaria per
+  // il calcolo del potenziale senza
+  // controllo del parametro
+  const TStroke *ref_;
+  double range_;  // range of mapping
+  double par_;
+  double actionLength_;   // lunghezza dell'azione
+  double strokeLength_;   // lunghezza stroke
+  double lenghtAtParam_;  // lunghezza nel pto di movimento
+  double leftFactor_;     // fattore di shape x la curva a sinistra
+  double rightFactor_;    // fattore di shape x la curva a dx
 };
 }
 #endif /* NOT_SIMMETRIC_BEZIER_POTENTIAL_H */

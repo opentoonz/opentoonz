@@ -20,58 +20,55 @@
 class ColorChip;
 class TValueField;
 
-class DVAPI TColorField : public TWidget
-{
+class DVAPI TColorField : public TWidget {
 public:
-	class Listener
-	{
-	public:
-		virtual void onChange(TColorField *cfd, TPixel32 color, bool dragging) {}
-		virtual ~Listener() {}
-	};
+  class Listener {
+  public:
+    virtual void onChange(TColorField *cfd, TPixel32 color, bool dragging) {}
+    virtual ~Listener() {}
+  };
 
-	class ColorEditor
-	{
-	public:
-		virtual void connectTo(TColorField *fld, bool openPopup = false) = 0;
-		virtual bool isConnectedTo(TColorField *fld) const = 0;
-		virtual void updateColor(const TPixel32 &color, bool dragging) = 0;
-	};
+  class ColorEditor {
+  public:
+    virtual void connectTo(TColorField *fld, bool openPopup = false) = 0;
+    virtual bool isConnectedTo(TColorField *fld) const = 0;
+    virtual void updateColor(const TPixel32 &color, bool dragging) = 0;
+  };
 
 private:
-	Listener *m_listener;
-	TPixel32 m_color;
-	ColorChip *m_colorChip;
-	TValueField *m_redFld, *m_greenFld, *m_blueFld, *m_matteFld;
-	typedef TColorField This;
-	int m_labelWidth;
-	bool m_matteEnabled;
-	ColorEditor *m_colorEditor;
+  Listener *m_listener;
+  TPixel32 m_color;
+  ColorChip *m_colorChip;
+  TValueField *m_redFld, *m_greenFld, *m_blueFld, *m_matteFld;
+  typedef TColorField This;
+  int m_labelWidth;
+  bool m_matteEnabled;
+  ColorEditor *m_colorEditor;
 
 protected:
-	virtual void onChange(TPixel32 color, bool dragging) {}
+  virtual void onChange(TPixel32 color, bool dragging) {}
 
 public:
-	TColorField(TWidget *parent, string name, int labelWidth, bool matteEnabled);
+  TColorField(TWidget *parent, string name, int labelWidth, bool matteEnabled);
 
-	void configureNotify(const TDimension &size);
+  void configureNotify(const TDimension &size);
 
-	void setListener(Listener *listener);
+  void setListener(Listener *listener);
 
-	void setColor(TPixel32 color);
+  void setColor(TPixel32 color);
 
-	TPixel32 getColor() const;
+  TPixel32 getColor() const;
 
-	void onChange(TValueField *vf, double value, bool dragging);
+  void onChange(TValueField *vf, double value, bool dragging);
 
-	void draw();
-	void setColorEditor(ColorEditor *colorEditor) { m_colorEditor = colorEditor; }
-	ColorEditor *getColorEditor() const { return m_colorEditor; }
+  void draw();
+  void setColorEditor(ColorEditor *colorEditor) { m_colorEditor = colorEditor; }
+  ColorEditor *getColorEditor() const { return m_colorEditor; }
 
-	void notifyListener(bool dragging);
-	bool isMatteEnabled() const { return m_matteEnabled; }
+  void notifyListener(bool dragging);
+  bool isMatteEnabled() const { return m_matteEnabled; }
 
-	void onEditedColorChange();
+  void onEditedColorChange();
 };
 
 //-------------------------------------------------------------------
@@ -136,24 +133,28 @@ class DVAPI TColorFieldActionInterface {
 public:
   TColorFieldActionInterface() {}
   virtual ~TColorFieldActionInterface() {}
-  virtual void triggerAction(TColorField*vf, const TPixel32 &value, bool dragging) = 0;
+  virtual void triggerAction(TColorField*vf, const TPixel32 &value, bool
+dragging) = 0;
 };
 
 
 template <class T>
 class TColorFieldAction : public TColorFieldActionInterface {
-  typedef void (T::*Method)(TColorField *vf, const TPixel32 &value, bool dragging);
+  typedef void (T::*Method)(TColorField *vf, const TPixel32 &value, bool
+dragging);
   T *m_target;
   Method m_method;
 public:
-  TColorFieldAction(T*target, Method method) : m_target(target), m_method(method) {}
-  void triggerAction(TColorField*vf, const TPixel32 &value, bool dragging) 
+  TColorFieldAction(T*target, Method method) : m_target(target),
+m_method(method) {}
+  void triggerAction(TColorField*vf, const TPixel32 &value, bool dragging)
     {(m_target->*m_method)(vf, value, dragging); }
 };
 
 
 template <class T>
-inline void tconnect(TColorField&src, T *target, void (T::*method)(TColorField *vf, const TPixel32 &value, bool dragging))
+inline void tconnect(TColorField&src, T *target, void (T::*method)(TColorField
+*vf, const TPixel32 &value, bool dragging))
 {
   src.addAction(new TColorFieldAction<T>(target, method));
 }
@@ -165,24 +166,28 @@ class DVAPI TColorField2ActionInterface {
 public:
   TColorField2ActionInterface() {}
   virtual ~TColorField2ActionInterface() {}
-  virtual void triggerAction(TColorField2*vf, const TPixel32 &value, bool dragging) = 0;
+  virtual void triggerAction(TColorField2*vf, const TPixel32 &value, bool
+dragging) = 0;
 };
 
 
 template <class T>
 class TColorField2Action : public TColorField2ActionInterface {
-  typedef void (T::*Method)(TColorField2 *vf, const TPixel32 &value, bool dragging);
+  typedef void (T::*Method)(TColorField2 *vf, const TPixel32 &value, bool
+dragging);
   T *m_target;
   Method m_method;
 public:
-  TColorField2Action(T*target, Method method) : m_target(target), m_method(method) {}
-  void triggerAction(TColorField2*vf, const TPixel32 &value, bool dragging) 
+  TColorField2Action(T*target, Method method) : m_target(target),
+m_method(method) {}
+  void triggerAction(TColorField2*vf, const TPixel32 &value, bool dragging)
     {(m_target->*m_method)(vf, value, dragging); }
 };
 
 
 template <class T>
-inline void tconnect(TColorField2&src, T *target, void (T::*method)(TColorField2 *vf, const TPixel32 &value, bool dragging))
+inline void tconnect(TColorField2&src, T *target, void (T::*method)(TColorField2
+*vf, const TPixel32 &value, bool dragging))
 {
   src.addAction(new TColorField2Action<T>(target, method));
 }
@@ -217,24 +222,28 @@ class DVAPI TColorField3ActionInterface {
 public:
   TColorField3ActionInterface() {}
   virtual ~TColorField3ActionInterface() {}
-  virtual void triggerAction(TColorField3*vf, const TPixel32 &value, bool dragging) = 0;
+  virtual void triggerAction(TColorField3*vf, const TPixel32 &value, bool
+dragging) = 0;
 };
 
 
 template <class T>
 class TColorField3Action : public TColorField3ActionInterface {
-  typedef void (T::*Method)(TColorField3 *vf, const TPixel32 &value, bool dragging);
+  typedef void (T::*Method)(TColorField3 *vf, const TPixel32 &value, bool
+dragging);
   T *m_target;
   Method m_method;
 public:
-  TColorField3Action(T*target, Method method) : m_target(target), m_method(method) {}
-  void triggerAction(TColorField3*vf, const TPixel32 &value, bool dragging) 
+  TColorField3Action(T*target, Method method) : m_target(target),
+m_method(method) {}
+  void triggerAction(TColorField3*vf, const TPixel32 &value, bool dragging)
     {(m_target->*m_method)(vf, value, dragging); }
 };
 
 
 template <class T>
-inline void tconnect(TColorField3&src, T *target, void (T::*method)(TColorField3 *vf, const TPixel32 &value, bool dragging))
+inline void tconnect(TColorField3&src, T *target, void (T::*method)(TColorField3
+*vf, const TPixel32 &value, bool dragging))
 {
   src.addAction(new TColorField3Action<T>(target, method));
 }

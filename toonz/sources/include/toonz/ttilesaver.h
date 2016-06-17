@@ -18,40 +18,38 @@ class TTileSetFullColor;
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TTileSaverCM32
-{
-	TRasterCM32P m_raster;
-	TTileSetCM32 *m_tileSet;
-	int m_rowSize;
-	std::vector<int> m_savedTiles;
-	void saveTile(int row, int col);
+class DVAPI TTileSaverCM32 {
+  TRasterCM32P m_raster;
+  TTileSetCM32 *m_tileSet;
+  int m_rowSize;
+  std::vector<int> m_savedTiles;
+  void saveTile(int row, int col);
 
 public:
-	TTileSaverCM32(const TRasterCM32P &raster, TTileSetCM32 *tileSet);
+  TTileSaverCM32(const TRasterCM32P &raster, TTileSetCM32 *tileSet);
 
-	void save(TRect rect);
-	void save(TPoint point);
+  void save(TRect rect);
+  void save(TPoint point);
 
-	TTileSetCM32 *getTileSet() const;
+  TTileSetCM32 *getTileSet() const;
 };
 
 //********************************************************************************
 
-class DVAPI TTileSaverFullColor
-{
-	TRasterP m_raster;
-	TTileSetFullColor *m_tileSet;
-	int m_rowSize;
-	std::vector<int> m_savedTiles;
-	void saveTile(int row, int col);
+class DVAPI TTileSaverFullColor {
+  TRasterP m_raster;
+  TTileSetFullColor *m_tileSet;
+  int m_rowSize;
+  std::vector<int> m_savedTiles;
+  void saveTile(int row, int col);
 
 public:
-	TTileSaverFullColor(const TRasterP &raster, TTileSetFullColor *tileSet);
+  TTileSaverFullColor(const TRasterP &raster, TTileSetFullColor *tileSet);
 
-	void save(TRect rect);
-	void save(TPoint point);
+  void save(TRect rect);
+  void save(TPoint point);
 
-	TTileSetFullColor *getTileSet() const;
+  TTileSetFullColor *getTileSet() const;
 };
 
 #endif

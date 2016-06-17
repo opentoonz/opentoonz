@@ -35,64 +35,62 @@ template class DVAPI TPersistDeclarationT<TSpectrumParam>;
 
 //---------------------------------------------------------
 
-class DVAPI TSpectrumParam : public TParam
-{
-	PERSIST_DECLARATION(TSpectrumParam)
+class DVAPI TSpectrumParam : public TParam {
+  PERSIST_DECLARATION(TSpectrumParam)
 
-	std::unique_ptr<TSpectrumParamImp> m_imp;
+  std::unique_ptr<TSpectrumParamImp> m_imp;
 
 public:
-	TSpectrumParam();
-	TSpectrumParam(int keyCount, TSpectrum::ColorKey keys[]);
-	TSpectrumParam(const TSpectrumParam &);
-	~TSpectrumParam();
+  TSpectrumParam();
+  TSpectrumParam(int keyCount, TSpectrum::ColorKey keys[]);
+  TSpectrumParam(const TSpectrumParam &);
+  ~TSpectrumParam();
 
-	TParam *clone() const { return new TSpectrumParam(*this); }
-	void copy(TParam *src);
+  TParam *clone() const { return new TSpectrumParam(*this); }
+  void copy(TParam *src);
 
-	void addObserver(TParamObserver *);
-	void removeObserver(TParamObserver *);
+  void addObserver(TParamObserver *);
+  void removeObserver(TParamObserver *);
 
-	TSpectrum getValue(double frame) const;
-	TSpectrum64 getValue64(double frame) const;
-	void setValue(double frame, const TSpectrum &value, bool undoing = false);
-	void setDefaultValue(const TSpectrum &value);
+  TSpectrum getValue(double frame) const;
+  TSpectrum64 getValue64(double frame) const;
+  void setValue(double frame, const TSpectrum &value, bool undoing = false);
+  void setDefaultValue(const TSpectrum &value);
 
-	int getKeyCount() const;
+  int getKeyCount() const;
 
-	TDoubleParamP getPosition(int index) const;
-	TPixelParamP getColor(int index) const;
+  TDoubleParamP getPosition(int index) const;
+  TPixelParamP getColor(int index) const;
 
-	void setValue(double frame, int index, double s, const TPixel32 &color, bool undoing = false);
+  void setValue(double frame, int index, double s, const TPixel32 &color,
+                bool undoing = false);
 
-	void insertKey(int index, double s, const TPixel32 &color);
-	void addKey(double s, const TPixel32 &color);
-	void removeKey(int index);
+  void insertKey(int index, double s, const TPixel32 &color);
+  void addKey(double s, const TPixel32 &color);
+  void removeKey(int index);
 
-	bool isAnimatable() const { return true; }
-	bool isKeyframe(double frame) const;
-	void deleteKeyframe(double frame);
-	void clearKeyframes();
-	void assignKeyframe(
-		double frame,
-		const TSmartPointerT<TParam> &src, double srcFrame,
-		bool changedOnly = false);
+  bool isAnimatable() const { return true; }
+  bool isKeyframe(double frame) const;
+  void deleteKeyframe(double frame);
+  void clearKeyframes();
+  void assignKeyframe(double frame, const TSmartPointerT<TParam> &src,
+                      double srcFrame, bool changedOnly = false);
 
-	void loadData(TIStream &is);
-	void saveData(TOStream &os);
+  void loadData(TIStream &is);
+  void saveData(TOStream &os);
 
-	void enableDragging(bool on);
-	void enableNotification(bool on);
-	bool isNotificationEnabled() const;
-	void enableMatte(bool on);
+  void enableDragging(bool on);
+  void enableNotification(bool on);
+  bool isNotificationEnabled() const;
+  void enableMatte(bool on);
 
-	bool isMatteEnabled() const;
-	std::string getValueAlias(double frame, int precision);
-	bool hasKeyframes() const;
-	void getKeyframes(std::set<double> &frames) const;
-	int getNextKeyframe(double frame) const;
-	int getPrevKeyframe(double frame) const;
-	double keyframeIndexToFrame(int index) const;
+  bool isMatteEnabled() const;
+  std::string getValueAlias(double frame, int precision);
+  bool hasKeyframes() const;
+  void getKeyframes(std::set<double> &frames) const;
+  int getNextKeyframe(double frame) const;
+  int getPrevKeyframe(double frame) const;
+  double keyframeIndexToFrame(int index) const;
 };
 
 #ifdef _WIN32
@@ -100,15 +98,18 @@ template class DVAPI TSmartPointerT<TSpectrumParam>;
 template class DVAPI TDerivedSmartPointerT<TSpectrumParam, TParam>;
 #endif
 
-class DVAPI TSpectrumParamP : public TDerivedSmartPointerT<TSpectrumParam, TParam>
-{
+class DVAPI TSpectrumParamP
+    : public TDerivedSmartPointerT<TSpectrumParam, TParam> {
 public:
-	TSpectrumParamP() {}
-	TSpectrumParamP(int keyCount, TSpectrum::ColorKey keys[])
-		: TDerivedSmartPointerT<TSpectrumParam, TParam>(new TSpectrumParam(keyCount, keys)) {}
-	TSpectrumParamP(TSpectrumParam *p) : TDerivedSmartPointerT<TSpectrumParam, TParam>(p) {}
-	TSpectrumParamP(const TParamP &p) : TDerivedSmartPointerT<TSpectrumParam, TParam>(p) {}
-	operator TParamP() const { return TParamP(m_pointer); }
+  TSpectrumParamP() {}
+  TSpectrumParamP(int keyCount, TSpectrum::ColorKey keys[])
+      : TDerivedSmartPointerT<TSpectrumParam, TParam>(
+            new TSpectrumParam(keyCount, keys)) {}
+  TSpectrumParamP(TSpectrumParam *p)
+      : TDerivedSmartPointerT<TSpectrumParam, TParam>(p) {}
+  TSpectrumParamP(const TParamP &p)
+      : TDerivedSmartPointerT<TSpectrumParam, TParam>(p) {}
+  operator TParamP() const { return TParamP(m_pointer); }
 };
 
 //---------------------------------------------------------

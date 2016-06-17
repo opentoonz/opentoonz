@@ -16,14 +16,20 @@
 #include "application_imp.h"
 
 TImageLocation::TImageLocation()
-	: m_row(0), m_col(0), m_fid(), m_spline(0), m_levelName(L""), m_type(None)
-{
-}
+    : m_row(0)
+    , m_col(0)
+    , m_fid()
+    , m_spline(0)
+    , m_levelName(L"")
+    , m_type(None) {}
 
 TImageLocation::TImageLocation(int row, int col)
-	: m_row(row), m_col(col), m_fid(), m_spline(0), m_levelName(L""), m_type(XsheetImage)
-{
-}
+    : m_row(row)
+    , m_col(col)
+    , m_fid()
+    , m_spline(0)
+    , m_levelName(L"")
+    , m_type(XsheetImage) {}
 
 /*
 TImageLocation::TImageLocation(const TStageObjectId &pid)
@@ -37,13 +43,19 @@ TImageLocation::TImageLocation(const TStageObjectId &pid)
 }
 */
 TImageLocation::TImageLocation(TStageObjectSpline *spline)
-	: m_row(0), m_col(0), m_fid(), m_spline(spline), m_levelName(L""), m_type(PathImage)
-{
-}
+    : m_row(0)
+    , m_col(0)
+    , m_fid()
+    , m_spline(spline)
+    , m_levelName(L"")
+    , m_type(PathImage) {}
 
 TImageLocation::TImageLocation(std::wstring levelName, const TFrameId &fid)
-	: m_row(0), m_col(0), m_fid(fid), m_spline(0), m_levelName(levelName), m_type(LevelStripImage)
-{
-}
+    : m_row(0)
+    , m_col(0)
+    , m_fid(fid)
+    , m_spline(0)
+    , m_levelName(levelName)
+    , m_type(LevelStripImage) {}
 
 #endif

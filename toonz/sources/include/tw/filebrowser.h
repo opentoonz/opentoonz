@@ -15,10 +15,9 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TFileBrowser : public TTreeView
-{
+class DVAPI TFileBrowser : public TTreeView {
 public:
-	TFileBrowser(TWidget *parent, string name = "fileBrowser");
+  TFileBrowser(TWidget *parent, string name = "fileBrowser");
 };
 
 #endif

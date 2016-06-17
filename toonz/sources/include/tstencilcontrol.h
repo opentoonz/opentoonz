@@ -19,36 +19,32 @@
 
 //------------------------------------------------------
 
-//singleton
-class DVAPI TStencilControl
-{
+// singleton
+class DVAPI TStencilControl {
 public:
-	enum MaskType {
-		SHOW_INSIDE = 0,
-		SHOW_OUTSIDE
-	};
+  enum MaskType { SHOW_INSIDE = 0, SHOW_OUTSIDE };
 
-	enum DrawMode {
-		DRAW_ONLY_MASK = 0,
-		DRAW_ALSO_ON_SCREEN,
-		DRAW_ON_SCREEN_ONLY_ONCE
-	};
+  enum DrawMode {
+    DRAW_ONLY_MASK = 0,
+    DRAW_ALSO_ON_SCREEN,
+    DRAW_ON_SCREEN_ONLY_ONCE
+  };
 
 private:
-	class Imp;
-	std::unique_ptr<Imp> m_imp;
+  class Imp;
+  std::unique_ptr<Imp> m_imp;
 
 public:
-	static TStencilControl *instance();
+  static TStencilControl *instance();
 
-	TStencilControl();
-	~TStencilControl();
+  TStencilControl();
+  ~TStencilControl();
 
-	void beginMask(DrawMode drawMode = DRAW_ONLY_MASK);
-	void endMask();
+  void beginMask(DrawMode drawMode = DRAW_ONLY_MASK);
+  void endMask();
 
-	void enableMask(MaskType maskType);
-	void disableMask();
+  void enableMask(MaskType maskType);
+  void disableMask();
 };
 
 //------------------------------------------------------

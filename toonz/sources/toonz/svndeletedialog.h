@@ -15,69 +15,68 @@ class QFile;
 
 //-----------------------------------------------------------------------------
 
-class SVNDeleteDialog : public DVGui::Dialog
-{
-	Q_OBJECT
+class SVNDeleteDialog : public DVGui::Dialog {
+  Q_OBJECT
 
-	QLabel *m_waitingLabel;
-	QLabel *m_textLabel;
+  QLabel *m_waitingLabel;
+  QLabel *m_textLabel;
 
-	QPushButton *m_deleteLocalButton;
-	QPushButton *m_deleteServerButton;
-	QPushButton *m_cancelButton;
+  QPushButton *m_deleteLocalButton;
+  QPushButton *m_deleteServerButton;
+  QPushButton *m_cancelButton;
 
-	QTreeWidget *m_treeWidget;
+  QTreeWidget *m_treeWidget;
 
-	QLabel *m_commentLabel;
-	QPlainTextEdit *m_commentTextEdit;
+  QLabel *m_commentLabel;
+  QPlainTextEdit *m_commentTextEdit;
 
-	QCheckBox *m_keepLocalCopyCheckBox;
+  QCheckBox *m_keepLocalCopyCheckBox;
 
-	QCheckBox *m_deleteSceneContentsCheckBox;
+  QCheckBox *m_deleteSceneContentsCheckBox;
 
-	QStringList m_sceneResources;
+  QStringList m_sceneResources;
 
-	QString m_workingDir;
-	QStringList m_files;
+  QString m_workingDir;
+  QStringList m_files;
 
-	VersionControlThread m_thread;
+  VersionControlThread m_thread;
 
-	QFile *m_targetTempFile;
+  QFile *m_targetTempFile;
 
-	bool m_isFolder;
+  bool m_isFolder;
 
-	int m_sceneIconAdded;
+  int m_sceneIconAdded;
 
 public:
-	SVNDeleteDialog(QWidget *parent, const QString &workingDir,
-					const QStringList &filesToDelete, bool isFolder,
-					int sceneIconAdded);
+  SVNDeleteDialog(QWidget *parent, const QString &workingDir,
+                  const QStringList &filesToDelete, bool isFolder,
+                  int sceneIconAdded);
 
 protected:
-	void showEvent(QShowEvent *);
+  void showEvent(QShowEvent *);
 
 private:
-	void switchToCloseButton();
+  void switchToCloseButton();
 
-	void updateFileBrowser();
+  void updateFileBrowser();
 
-	void initTreeWidget();
+  void initTreeWidget();
 
 protected slots:
 
-	void onError(const QString &);
-	void onDeleteLocalButtonClicked();
-	void onDeleteServerButtonClicked();
+  void onError(const QString &);
+  void onDeleteLocalButtonClicked();
+  void onDeleteServerButtonClicked();
 
-	void deleteFiles();
-	void commitDeletedFiles();
+  void deleteFiles();
+  void commitDeletedFiles();
 
-	void onCommitDone();
+  void onCommitDone();
 
-	void onDeleteSceneContentsToggled(bool);
+  void onDeleteSceneContentsToggled(bool);
 
 signals:
-	void done(const QStringList &);
+  void done(const QStringList &);
 };
 
-#endif // SVN_DELETE_DIALOG_H
+#endif  // SVN_DELETE_DIALOG_H

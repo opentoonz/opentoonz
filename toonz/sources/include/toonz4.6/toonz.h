@@ -35,27 +35,27 @@ TNZAPI void init_check_memory(void);
 /*---------------------------------------------------------------------------*/
 
 typedef enum {
-	TOONZ_ROOT,
-	TOONZ_BIN,
-	TOONZ_CONFIG,
-	TOONZ_XRESOURCES,
-	TOONZ_MISC,
-	TOONZ_SCRIPTS,
-	TOONZ_PIXMAP,
-	TOONZ_SHELL_BUTTON,
-	TOONZ_FLIP_BUTTON,
-	TOONZ_WORK,
-	TOONZ_ADM,
-	TOONZ_TUTORIAL,
-	TOONZ_SETUP_FILE,
-	TOONZ_TMP,
-	TOONZ_VARTMP,
-	TOONZ_LINETEST_DATABASE,
+  TOONZ_ROOT,
+  TOONZ_BIN,
+  TOONZ_CONFIG,
+  TOONZ_XRESOURCES,
+  TOONZ_MISC,
+  TOONZ_SCRIPTS,
+  TOONZ_PIXMAP,
+  TOONZ_SHELL_BUTTON,
+  TOONZ_FLIP_BUTTON,
+  TOONZ_WORK,
+  TOONZ_ADM,
+  TOONZ_TUTORIAL,
+  TOONZ_SETUP_FILE,
+  TOONZ_TMP,
+  TOONZ_VARTMP,
+  TOONZ_LINETEST_DATABASE,
 
-	TOONZ_DIR_HOW_MANY
+  TOONZ_DIR_HOW_MANY
 } TOONZ_DIRECTORY;
-/* 
-  NON FARE 'free' del puntatore ritornato 
+/*
+  NON FARE 'free' del puntatore ritornato
   CONTROLLARE sempre la validita' del puntatore ritornato (!=NIL)
 
   TOONZ_TMP e TOONZ_VARTMP possono coincidere
@@ -78,17 +78,17 @@ typedef enum {
 
 /* Per chmod */
 #define TNZ_S_IRWXU _S_IWRITE | _S_IREAD /* read, write, execute: owner */
-#define TNZ_S_IRUSR _S_IREAD			 /* read permission: owner */
-#define TNZ_S_IWUSR _S_IWRITE			 /* write permission: owner */
-#define TNZ_S_IXUSR 0					 /* execute permission: owner */
-#define TNZ_S_IRWXG TNZ_S_IRWXU			 /* read, write, execute: group */
-#define TNZ_S_IRGRP TNZ_S_IRUSR			 /* read permission: group */
-#define TNZ_S_IWGRP TNZ_S_IWUSR			 /* write permission: group */
-#define TNZ_S_IXGRP TNZ_S_IXUSR			 /* execute permission: group */
-#define TNZ_S_IRWXO TNZ_S_IRWXU			 /* read, write, execute: other */
-#define TNZ_S_IROTH TNZ_S_IRUSR			 /* read permission: other */
-#define TNZ_S_IWOTH TNZ_S_IWUSR			 /* write permission: other */
-#define TNZ_S_IXOTH TNZ_S_IXUSR			 /* execute permission: other */
+#define TNZ_S_IRUSR _S_IREAD             /* read permission: owner */
+#define TNZ_S_IWUSR _S_IWRITE            /* write permission: owner */
+#define TNZ_S_IXUSR 0                    /* execute permission: owner */
+#define TNZ_S_IRWXG TNZ_S_IRWXU          /* read, write, execute: group */
+#define TNZ_S_IRGRP TNZ_S_IRUSR          /* read permission: group */
+#define TNZ_S_IWGRP TNZ_S_IWUSR          /* write permission: group */
+#define TNZ_S_IXGRP TNZ_S_IXUSR          /* execute permission: group */
+#define TNZ_S_IRWXO TNZ_S_IRWXU          /* read, write, execute: other */
+#define TNZ_S_IROTH TNZ_S_IRUSR          /* read permission: other */
+#define TNZ_S_IWOTH TNZ_S_IWUSR          /* write permission: other */
+#define TNZ_S_IXOTH TNZ_S_IXUSR          /* execute permission: other */
 
 #else
 
@@ -118,7 +118,7 @@ typedef enum {
 /*---------------------------------------------------------------------------*/
 /* Prototipi delle funzioni contenute nella libreria common */
 
-//TNZAPI char  *strsave (const char *str);
+// TNZAPI char  *strsave (const char *str);
 TNZAPI char *strnsave(const char *str, int n);
 
 TNZAPI int tnz_filestrcmp(const char *str1, const char *str2);
@@ -146,7 +146,7 @@ TNZAPI double tnz_sec_time(void);
 
 TNZAPI void tnz_random_seed(UINT seed);
 TNZAPI UCHAR tnz_random_byte(void);  /* in [0, 255] */
-TNZAPI int tnz_random_int(void);	 /* in [MININT, MAXINT] */
+TNZAPI int tnz_random_int(void);     /* in [MININT, MAXINT] */
 TNZAPI UINT tnz_random_uint(void);   /* in [0, (UINT)MAXINT*2+1] */
 TNZAPI float tnz_random_float(void); /* in [0.0, 1.0) */
 
@@ -156,7 +156,7 @@ TNZAPI TRANDOM trandom_create(void); /* seed: 0 */
 TNZAPI void trandom_destroy(TRANDOM trandom);
 TNZAPI void trandom_seed(TRANDOM trandom, UINT seed);
 TNZAPI UCHAR trandom_byte(TRANDOM trandom);  /* in [0, 255] */
-TNZAPI int trandom_int(TRANDOM trandom);	 /* in [MININT, MAXINT] */
+TNZAPI int trandom_int(TRANDOM trandom);     /* in [MININT, MAXINT] */
 TNZAPI UINT trandom_uint(TRANDOM trandom);   /* in [0, (UINT)MAXINT*2+1] */
 TNZAPI float trandom_float(TRANDOM trandom); /* in [0.0, 1.0) */
 

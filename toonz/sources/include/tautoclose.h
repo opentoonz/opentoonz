@@ -16,34 +16,33 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class TAutocloser
-{
+class TAutocloser {
 public:
-	typedef std::pair<TPoint, TPoint> Segment;
+  typedef std::pair<TPoint, TPoint> Segment;
 
-	TAutocloser(const TRasterP &r);
-	~TAutocloser();
+  TAutocloser(const TRasterP &r);
+  ~TAutocloser();
 
-	//if this function is never used, use default values
-	void setClosingDistance(int d);
-	int getClosingDistance() const;
+  // if this function is never used, use default values
+  void setClosingDistance(int d);
+  int getClosingDistance() const;
 
-	void setSpotAngle(double degrees);
-	double getSpotAngle() const;
+  void setSpotAngle(double degrees);
+  double getSpotAngle() const;
 
-	void setInkIndex(int inkIndex);
-	int getInkIndex() const;
+  void setInkIndex(int inkIndex);
+  int getInkIndex() const;
 
-	void compute(vector<Segment> &closingSegmentArray);
+  void compute(vector<Segment> &closingSegmentArray);
 
 private:
-	class Imp;
-	Imp *m_imp;
+  class Imp;
+  Imp *m_imp;
 
-	//not implemented
-	TAutocloser();
-	TAutocloser(const TAutocloser &a);
-	TAutocloser &operator=(const TAutocloser &a);
+  // not implemented
+  TAutocloser();
+  TAutocloser(const TAutocloser &a);
+  TAutocloser &operator=(const TAutocloser &a);
 };
 
 #endif

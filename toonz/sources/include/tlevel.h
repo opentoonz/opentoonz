@@ -18,56 +18,54 @@
 
 //-------------------------------------------------------------------
 
-class DVAPI TLevel : public TSmartObject
-{
-
-	DECLARE_CLASS_CODE
+class DVAPI TLevel : public TSmartObject {
+  DECLARE_CLASS_CODE
 
 public:
-	typedef std::map<const TFrameId, TImageP> Table;
-	typedef Table::iterator Iterator;
+  typedef std::map<const TFrameId, TImageP> Table;
+  typedef Table::iterator Iterator;
 
 private:
-	std::string m_name;
-	Table *m_table;
-	TPalette *m_palette;
+  std::string m_name;
+  Table *m_table;
+  TPalette *m_palette;
 
 public:
-	TLevel();
-	~TLevel();
+  TLevel();
+  ~TLevel();
 
 private:
-	// not implemented
-	TLevel(const TLevel &);
-	TLevel &operator=(const TLevel &);
+  // not implemented
+  TLevel(const TLevel &);
+  TLevel &operator=(const TLevel &);
 
 public:
-	// nome
-	std::string getName() const;
-	void setName(std::string name);
+  // nome
+  std::string getName() const;
+  void setName(std::string name);
 
-	// frames
-	int getFrameCount() const { return (int)m_table->size(); };
+  // frames
+  int getFrameCount() const { return (int)m_table->size(); };
 
-	const TImageP &frame(const TFrameId fid);
-	const TImageP &frame(int f) { return frame(TFrameId(f)); };
+  const TImageP &frame(const TFrameId fid);
+  const TImageP &frame(int f) { return frame(TFrameId(f)); };
 
-	void setFrame(const TFrameId &fid, const TImageP &img);
+  void setFrame(const TFrameId &fid, const TImageP &img);
 
-	// ritorna la posizione (0..getNFrames()-1) del frame f
-	// se il frame f non c'e' ritorna -1
-	//int getIndex(const TFrameId fid);
-	//int getIndex(int f) {return getIndex(TFrameId(f));};
+  // ritorna la posizione (0..getNFrames()-1) del frame f
+  // se il frame f non c'e' ritorna -1
+  // int getIndex(const TFrameId fid);
+  // int getIndex(int f) {return getIndex(TFrameId(f));};
 
-	Iterator begin() { return m_table->begin(); };
-	Iterator end() { return m_table->end(); };
+  Iterator begin() { return m_table->begin(); };
+  Iterator end() { return m_table->end(); };
 
-	// uh - oh; serve a tinytoonz/filmstrip.
-	// PROVVISORIO !!
-	Table *getTable() { return m_table; }
+  // uh - oh; serve a tinytoonz/filmstrip.
+  // PROVVISORIO !!
+  Table *getTable() { return m_table; }
 
-	TPalette *getPalette();
-	void setPalette(TPalette *);
+  TPalette *getPalette();
+  void setPalette(TPalette *);
 };
 
 //-------------------------------------------------------------------
@@ -76,11 +74,10 @@ public:
 template class DVAPI TSmartPointerT<TLevel>;
 #endif
 
-class DVAPI TLevelP : public TSmartPointerT<TLevel>
-{
+class DVAPI TLevelP : public TSmartPointerT<TLevel> {
 public:
-	TLevelP() : TSmartPointerT<TLevel>(new TLevel) {}
-	TLevelP(TLevel *level) : TSmartPointerT<TLevel>(level) {}
+  TLevelP() : TSmartPointerT<TLevel>(new TLevel) {}
+  TLevelP(TLevel *level) : TSmartPointerT<TLevel>(level) {}
 };
 
 //-------------------------------------------------------------------

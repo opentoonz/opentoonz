@@ -28,8 +28,7 @@ class QCheckBox;
 class QLabel;
 class QComboBox;
 
-namespace DVGui
-{
+namespace DVGui {
 class IntLineEdit;
 class FileField;
 class LineEdit;
@@ -38,8 +37,7 @@ class ProgressDialog;
 class CheckBox;
 }
 
-namespace ImageUtils
-{
+namespace ImageUtils {
 class FrameTaskNotifier;
 }
 
@@ -54,104 +52,88 @@ class FrameTaskNotifier;
             file formats.
 */
 
-class ConvertPopup : public DVGui::Dialog
-{
-	Q_OBJECT
+class ConvertPopup : public DVGui::Dialog {
+  Q_OBJECT
 
 public:
-	ConvertPopup(bool specifyInput = false);
-	~ConvertPopup();
+  ConvertPopup(bool specifyInput = false);
+  ~ConvertPopup();
 
-	void setFiles(const std::vector<TFilePath> &fps);
-	bool isConverting() const { return m_isConverting; }
+  void setFiles(const std::vector<TFilePath> &fps);
+  bool isConverting() const { return m_isConverting; }
 
-	void convertToTlv(bool toPainted);
+  void convertToTlv(bool toPainted);
 
-	QString getDestinationType() const;
-	QString getTlvMode() const;
-	QString TlvMode_Unpainted;
-	/*- 塗られていないカラー二値画像からTLVへの変換 -*/
-	QString TlvMode_UnpaintedFromNonAA;
-	QString TlvMode_PaintedFromTwoImages;
-	QString TlvMode_PaintedFromNonAA;
-	QString SameAsPainted;
-	QString CreateNewPalette;
+  QString getDestinationType() const;
+  QString getTlvMode() const;
+  QString TlvMode_Unpainted;
+  /*- 塗られていないカラー二値画像からTLVへの変換 -*/
+  QString TlvMode_UnpaintedFromNonAA;
+  QString TlvMode_PaintedFromTwoImages;
+  QString TlvMode_PaintedFromNonAA;
+  QString SameAsPainted;
+  QString CreateNewPalette;
 
 public slots:
 
-	void apply(); //!< Starts the convertion.
-	void onOptionsClicked();
-	void onConvertFinished();
-	void onTlvModeSelected(const QString &tlvMode);
-	void onFormatSelected(const QString &format);
-	void onAntialiasSelected(int index);
-	void onFileInChanged();
-	void onRangeChanged();
-	void onLevelConverted(const TFilePath &fullPath);
+  void apply();  //!< Starts the convertion.
+  void onOptionsClicked();
+  void onConvertFinished();
+  void onTlvModeSelected(const QString &tlvMode);
+  void onFormatSelected(const QString &format);
+  void onAntialiasSelected(int index);
+  void onFileInChanged();
+  void onRangeChanged();
+  void onLevelConverted(const TFilePath &fullPath);
 
-	void onFormatChanged(const QString &);
+  void onFormatChanged(const QString &);
 
 protected:
-	Convert2Tlv *makeTlvConverter(const TFilePath &sourceFilePath);
-	bool checkParameters() const;
-	TPalette *readUserProvidedPalette() const;
-	TFilePath getDestinationFilePath(const TFilePath &sourceFilePath);
-	void getFrameRange(const TFilePath &sourceFilePath, TFrameId &from, TFrameId &to);
+  Convert2Tlv *makeTlvConverter(const TFilePath &sourceFilePath);
+  bool checkParameters() const;
+  TPalette *readUserProvidedPalette() const;
+  TFilePath getDestinationFilePath(const TFilePath &sourceFilePath);
+  void getFrameRange(const TFilePath &sourceFilePath, TFrameId &from,
+                     TFrameId &to);
 
 private:
-	DVGui::FileField *m_saveInFileFld,
-		*m_convertFileFld,
-		*m_unpaintedFolder,
-		*m_palettePath;
-	DVGui::IntLineEdit *m_fromFld,
-		*m_toFld,
-		*m_antialiasIntensity,
-		*m_tolerance;
-	DVGui::LineEdit *m_fileNameFld,
-		*m_unpaintedSuffix;
-	DVGui::ColorField *m_bgColorField;
-	QFrame *m_tlvFrame;
-	QCheckBox *m_applyAutoclose,
-		*m_removeDotBeforeFrameNumber,
-		*m_saveBackupToNopaint,
-		*m_appendDefaultPalette;
-	DVGui::CheckBox *m_skip;
-	QComboBox *m_antialias,
-		*m_tlvMode,
-		*m_fileFormat;
-	QLabel *m_bgColorLabel,
-		*m_suffixLabel,
-		*m_unpaintedFolderLabel,
-		*m_antialiasLabel;
+  DVGui::FileField *m_saveInFileFld, *m_convertFileFld, *m_unpaintedFolder,
+      *m_palettePath;
+  DVGui::IntLineEdit *m_fromFld, *m_toFld, *m_antialiasIntensity, *m_tolerance;
+  DVGui::LineEdit *m_fileNameFld, *m_unpaintedSuffix;
+  DVGui::ColorField *m_bgColorField;
+  QFrame *m_tlvFrame;
+  QCheckBox *m_applyAutoclose, *m_removeDotBeforeFrameNumber,
+      *m_saveBackupToNopaint, *m_appendDefaultPalette;
+  DVGui::CheckBox *m_skip;
+  QComboBox *m_antialias, *m_tlvMode, *m_fileFormat;
+  QLabel *m_bgColorLabel, *m_suffixLabel, *m_unpaintedFolderLabel,
+      *m_antialiasLabel;
 
-	QPushButton *m_okBtn,
-		*m_cancelBtn,
-		*m_formatOptions;
+  QPushButton *m_okBtn, *m_cancelBtn, *m_formatOptions;
 
-	class Converter;
-	Converter *m_converter;
+  class Converter;
+  Converter *m_converter;
 
-	ImageUtils::FrameTaskNotifier *m_notifier;
-	DVGui::ProgressDialog *m_progressDialog;
+  ImageUtils::FrameTaskNotifier *m_notifier;
+  DVGui::ProgressDialog *m_progressDialog;
 
-	std::vector<TFilePath> m_srcFilePaths;
-	static QMap<std::string,
-				TPropertyGroup *> m_formatProperties;
+  std::vector<TFilePath> m_srcFilePaths;
+  static QMap<std::string, TPropertyGroup *> m_formatProperties;
 
-	bool m_isConverting;
+  bool m_isConverting;
 
 private:
-	TPropertyGroup *getFormatProperties(const std::string &ext);
-	QFrame *createTlvSettings();
-	QFrame *createSvgSettings();
+  TPropertyGroup *getFormatProperties(const std::string &ext);
+  QFrame *createTlvSettings();
+  QFrame *createSvgSettings();
 
-	bool isSaveTlvBackupToNopaintActive();
+  bool isSaveTlvBackupToNopaintActive();
 };
 
-class ConvertPopupWithInput : public ConvertPopup
-{
+class ConvertPopupWithInput : public ConvertPopup {
 public:
-	ConvertPopupWithInput() : ConvertPopup(true) {}
+  ConvertPopupWithInput() : ConvertPopup(true) {}
 };
 
-#endif // CONVERTPOPUP_H
+#endif  // CONVERTPOPUP_H

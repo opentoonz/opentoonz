@@ -9,18 +9,16 @@
 
 //===========================================================================
 
-namespace Tiio
-{
+namespace Tiio {
 
 //===========================================================================
 
-class TgaWriterProperties : public TPropertyGroup
-{
+class TgaWriterProperties : public TPropertyGroup {
 public:
-	TEnumProperty m_pixelSize; // 16,24,32
-	TBoolProperty m_compressed;
+  TEnumProperty m_pixelSize;  // 16,24,32
+  TBoolProperty m_compressed;
 
-	TgaWriterProperties();
+  TgaWriterProperties();
 };
 
 //===========================================================================
@@ -30,6 +28,6 @@ Tiio::Writer *makeTgaWriter();
 
 //===========================================================================
 
-} // namespace
+}  // namespace
 
 #endif

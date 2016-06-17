@@ -37,21 +37,19 @@
 #define TNZ_INFO_ORIENT_NONE L""
 //===========================================================================
 
-namespace Tiio
-{
+namespace Tiio {
 
 //===========================================================================
 
-class TifWriterProperties : public TPropertyGroup
-{
+class TifWriterProperties : public TPropertyGroup {
 public:
-	TEnumProperty m_byteOrdering;
-	TEnumProperty m_compressionType;
-	TEnumProperty m_bitsPerPixel;
-	TEnumProperty m_orientation;
+  TEnumProperty m_byteOrdering;
+  TEnumProperty m_compressionType;
+  TEnumProperty m_bitsPerPixel;
+  TEnumProperty m_orientation;
 
-	//TBoolProperty m_matte;
-	TifWriterProperties();
+  // TBoolProperty m_matte;
+  TifWriterProperties();
 };
 
 //===========================================================================
@@ -61,6 +59,6 @@ Tiio::Writer *makeTifWriter();
 
 Tiio::Reader *makeTziReader();
 
-} // namespace
+}  // namespace
 
-#endif //TTIO_TIF_INCLUDED
+#endif  // TTIO_TIF_INCLUDED

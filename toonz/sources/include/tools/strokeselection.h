@@ -38,61 +38,59 @@ class TSceneHandle;
 //    StrokeSelection  declaration
 //****************************************************************************
 
-class DVAPI StrokeSelection : public TSelection
-{
+class DVAPI StrokeSelection : public TSelection {
 public:
-	typedef std::set<int> IndexesContainer;
-
-public:
-	StrokeSelection();
-	~StrokeSelection();
-
-	StrokeSelection(const StrokeSelection &other);
-	StrokeSelection &operator=(const StrokeSelection &other);
-
-	TGroupCommand *getGroupCommand() { return m_groupCommand.get(); }
-
-	void setImage(const TVectorImageP &image) { m_vi = image; }
-	const TVectorImageP &getImage() const { return m_vi; }
-
-	const IndexesContainer &getSelection() const { return m_indexes; }
-	IndexesContainer &getSelection() { return m_indexes; }
-
-	bool isEmpty() const { return m_indexes.empty(); }
-	bool updateSelectionBBox() const { return m_updateSelectionBBox; }
-	bool isSelected(int index) const { return (m_indexes.count(index) > 0); }
-	void select(int index, bool on);
-	void toggle(int index);
-	void selectNone() { m_indexes.clear(); }
-
-	void setSceneHandle(TSceneHandle *tsh)
-	{
-		m_sceneHandle = tsh;
-	}
+  typedef std::set<int> IndexesContainer;
 
 public:
-	// Commands
+  StrokeSelection();
+  ~StrokeSelection();
 
-	void changeColorStyle(int styleIndex);
-	void deleteStrokes();
-	void copy();
-	void cut();
-	void paste();
+  StrokeSelection(const StrokeSelection &other);
+  StrokeSelection &operator=(const StrokeSelection &other);
 
-	void removeEndpoints();
+  TGroupCommand *getGroupCommand() { return m_groupCommand.get(); }
 
-	void enableCommands();
+  void setImage(const TVectorImageP &image) { m_vi = image; }
+  const TVectorImageP &getImage() const { return m_vi; }
+
+  const IndexesContainer &getSelection() const { return m_indexes; }
+  IndexesContainer &getSelection() { return m_indexes; }
+
+  bool isEmpty() const { return m_indexes.empty(); }
+  bool updateSelectionBBox() const { return m_updateSelectionBBox; }
+  bool isSelected(int index) const { return (m_indexes.count(index) > 0); }
+  void select(int index, bool on);
+  void toggle(int index);
+  void selectNone() { m_indexes.clear(); }
+
+  void setSceneHandle(TSceneHandle *tsh) { m_sceneHandle = tsh; }
+
+public:
+  // Commands
+
+  void changeColorStyle(int styleIndex);
+  void deleteStrokes();
+  void copy();
+  void cut();
+  void paste();
+
+  void removeEndpoints();
+
+  void enableCommands();
 
 private:
-	TVectorImageP m_vi;			//!< Selected vector image.
-	IndexesContainer m_indexes; //!< Selected stroke indexes in m_vi.
+  TVectorImageP m_vi;          //!< Selected vector image.
+  IndexesContainer m_indexes;  //!< Selected stroke indexes in m_vi.
 
-	std::unique_ptr<TGroupCommand> m_groupCommand; //!< Groups commands wrapper.
-	TSceneHandle *m_sceneHandle;					 //!< Global scene handle. \deprecated  Use TApplication instead.
+  std::unique_ptr<TGroupCommand> m_groupCommand;  //!< Groups commands wrapper.
+  TSceneHandle *m_sceneHandle;  //!< Global scene handle. \deprecated  Use
+                                //!TApplication instead.
 
-	/*!Set this boolean to true before call tool->notifyImageChanged() when you want to reset strokes bbox.
-     N.B. after call tool->notifyImageChanged() set m_updateSelectionBBox to false.*/
-	bool m_updateSelectionBBox;
+  /*!Set this boolean to true before call tool->notifyImageChanged() when you
+want to reset strokes bbox.
+N.B. after call tool->notifyImageChanged() set m_updateSelectionBBox to false.*/
+  bool m_updateSelectionBBox;
 };
 
-#endif // STROKE_SELECTION_H
+#endif  // STROKE_SELECTION_H

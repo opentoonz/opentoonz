@@ -58,38 +58,37 @@ class QAction;
 //
 //==================================================================
 
-class DVAPI SchematicScene : public QGraphicsScene
-{
-	Q_OBJECT
+class DVAPI SchematicScene : public QGraphicsScene {
+  Q_OBJECT
 
 public:
-	SchematicScene(QWidget *parent);
-	~SchematicScene();
+  SchematicScene(QWidget *parent);
+  ~SchematicScene();
 
-	void clearAllItems();
+  void clearAllItems();
 
-	virtual QGraphicsItem *getCurrentNode() { return 0; }
-	virtual void reorderScene() = 0;
-	virtual void updateScene() = 0;
-
-protected:
-	QList<SchematicLink *> m_highlightedLinks;
-	enum GridDimension { eLarge,
-						 eSmall };
+  virtual QGraphicsItem *getCurrentNode() { return 0; }
+  virtual void reorderScene() = 0;
+  virtual void updateScene()  = 0;
 
 protected:
-	//! Returns \b true if no nodes intersects \b rect.
-	bool isAnEmptyZone(const QRectF &rect);
-	//! Returns a vector containing all nodes which had their bounding rects conatined in \b node bounding
-	//! rect enlarged of 10.
-	QVector<SchematicNode *> getPlacedNode(SchematicNode *node);
+  QList<SchematicLink *> m_highlightedLinks;
+  enum GridDimension { eLarge, eSmall };
 
-	void showEvent(QShowEvent *se);
-	void hideEvent(QHideEvent *se);
+protected:
+  //! Returns \b true if no nodes intersects \b rect.
+  bool isAnEmptyZone(const QRectF &rect);
+  //! Returns a vector containing all nodes which had their bounding rects
+  //! conatined in \b node bounding
+  //! rect enlarged of 10.
+  QVector<SchematicNode *> getPlacedNode(SchematicNode *node);
+
+  void showEvent(QShowEvent *se);
+  void hideEvent(QHideEvent *se);
 
 protected slots:
 
-	virtual void onSelectionSwitched(TSelection *, TSelection *) {}
+  virtual void onSelectionSwitched(TSelection *, TSelection *) {}
 };
 
 //==================================================================
@@ -98,44 +97,40 @@ protected slots:
 //
 //==================================================================
 
-class DVAPI SchematicSceneViewer : public QGraphicsView
-{
-	Q_OBJECT
+class DVAPI SchematicSceneViewer : public QGraphicsView {
+  Q_OBJECT
 
 public:
-	SchematicSceneViewer(QWidget *parent);
-	~SchematicSceneViewer();
+  SchematicSceneViewer(QWidget *parent);
+  ~SchematicSceneViewer();
 
-	void zoomQt(bool zoomin, bool resetZoom);
+  void zoomQt(bool zoomin, bool resetZoom);
 
-	QPointF getOldScenePos()
-	{
-		return m_oldScenePos;
-	}
+  QPointF getOldScenePos() { return m_oldScenePos; }
 
 protected:
-	void mousePressEvent(QMouseEvent *me);
-	void mouseMoveEvent(QMouseEvent *me);
-	void mouseReleaseEvent(QMouseEvent *me);
-	void keyPressEvent(QKeyEvent *ke);
-	void wheelEvent(QWheelEvent *me);
-	void showEvent(QShowEvent *se);
+  void mousePressEvent(QMouseEvent *me);
+  void mouseMoveEvent(QMouseEvent *me);
+  void mouseReleaseEvent(QMouseEvent *me);
+  void keyPressEvent(QKeyEvent *ke);
+  void wheelEvent(QWheelEvent *me);
+  void showEvent(QShowEvent *se);
 
 protected slots:
 
-	void fitScene();
-	void centerOnCurrent();
-	void reorderScene();
-	void normalizeScene();
+  void fitScene();
+  void centerOnCurrent();
+  void reorderScene();
+  void normalizeScene();
 
 private:
-	Qt::MouseButton m_buttonState;
-	QPoint m_oldWinPos;
-	QPointF m_oldScenePos;
-	bool m_firstShowing;
+  Qt::MouseButton m_buttonState;
+  QPoint m_oldWinPos;
+  QPointF m_oldScenePos;
+  bool m_firstShowing;
 
 private:
-	void changeScale(const QPoint &winPos, qreal scaleFactor);
+  void changeScale(const QPoint &winPos, qreal scaleFactor);
 };
 
 //==================================================================
@@ -144,67 +139,58 @@ private:
 //
 //==================================================================
 
-class DVAPI SchematicViewer : public QWidget
-{
-	Q_OBJECT
+class DVAPI SchematicViewer : public QWidget {
+  Q_OBJECT
 
 public:
-	SchematicViewer(QWidget *parent);
-	~SchematicViewer();
+  SchematicViewer(QWidget *parent);
+  ~SchematicViewer();
 
-	void setSchematicScene(SchematicScene *scene);
-	void setApplication(TApplication *app);
-	bool isStageSchematicViewed();
-	void setStageSchematicViewed(bool isStageSchematic);
+  void setSchematicScene(SchematicScene *scene);
+  void setApplication(TApplication *app);
+  bool isStageSchematicViewed();
+  void setStageSchematicViewed(bool isStageSchematic);
 
 public slots:
 
-	void updateSchematic();
+  void updateSchematic();
 
 signals:
 
-	void showPreview(TFxP);
-	void doCollapse(const QList<TFxP> &);
-	void doCollapse(QList<TStageObjectId>);
-	void doExplodeChild(const QList<TFxP> &);
-	void doExplodeChild(QList<TStageObjectId>);
-	void editObject();
+  void showPreview(TFxP);
+  void doCollapse(const QList<TFxP> &);
+  void doCollapse(QList<TStageObjectId>);
+  void doExplodeChild(const QList<TFxP> &);
+  void doExplodeChild(QList<TStageObjectId>);
+  void editObject();
 
 protected slots:
 
-	void onSceneChanged();
-	void onSceneSwitched();
-	void updateScenes();
-	void changeNodeSize();
+  void onSceneChanged();
+  void onSceneSwitched();
+  void updateScenes();
+  void changeNodeSize();
 
 private:
-	SchematicSceneViewer *m_viewer;
-	StageSchematicScene *m_stageScene;
-	FxSchematicScene *m_fxScene;
+  SchematicSceneViewer *m_viewer;
+  StageSchematicScene *m_stageScene;
+  FxSchematicScene *m_fxScene;
 
-	TSceneHandle *m_sceneHandle;
+  TSceneHandle *m_sceneHandle;
 
-	QToolBar *m_stageToolbar,
-		*m_commonToolbar,
-		*m_fxToolbar,
-		*m_swapToolbar;
+  QToolBar *m_stageToolbar, *m_commonToolbar, *m_fxToolbar, *m_swapToolbar;
 
-	QAction *m_fitSchematic,
-		*m_centerOn,
-		*m_reorder,
-		*m_normalize,
-		*m_nodeSize,
-		*m_changeScene;
+  QAction *m_fitSchematic, *m_centerOn, *m_reorder, *m_normalize, *m_nodeSize,
+      *m_changeScene;
 
-	bool m_fullSchematic,
-		m_maximizedNode;
+  bool m_fullSchematic, m_maximizedNode;
 
 private:
-	void createToolbars();
-	void createActions();
+  void createToolbars();
+  void createActions();
 
-	void setStageSchematic();
-	void setFxSchematic();
+  void setStageSchematic();
+  void setFxSchematic();
 };
 
-#endif //SCHEMATICVIEWER_H
+#endif  // SCHEMATICVIEWER_H

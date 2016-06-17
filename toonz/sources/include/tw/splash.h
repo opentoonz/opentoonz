@@ -19,33 +19,34 @@
 
 class TFilePath;
 
-class DVAPI TSplashWindow
-{
+class DVAPI TSplashWindow {
 protected:
-	class TSplashWindowImp;
-	TSplashWindowImp *m_imp;
-	//TThread::Executor  m_thrExecutor;
-	//TRasterP					 m_raster;
+  class TSplashWindowImp;
+  TSplashWindowImp *m_imp;
+  // TThread::Executor  m_thrExecutor;
+  // TRasterP					 m_raster;
 
 protected:
-	TSplashWindow(TRaster32P splash_image, unsigned int timeout_msec);
-	TSplashWindow(const TFilePath &splash_image, unsigned int timeout_msec);
+  TSplashWindow(TRaster32P splash_image, unsigned int timeout_msec);
+  TSplashWindow(const TFilePath &splash_image, unsigned int timeout_msec);
 
 public:
-	virtual ~TSplashWindow();
-	void close();
+  virtual ~TSplashWindow();
+  void close();
 
-	static TSplashWindow *create(TRaster32P splash_image, unsigned int timeout_msec);
-	static TSplashWindow *create(const TFilePath &splash_image, unsigned int timeout_msec);
+  static TSplashWindow *create(TRaster32P splash_image,
+                               unsigned int timeout_msec);
+  static TSplashWindow *create(const TFilePath &splash_image,
+                               unsigned int timeout_msec);
 
 protected:
-	void createWindow(TRaster32P splash_image, unsigned int timeout_msec);
-	void createWindow(const TFilePath &splash_image, unsigned int timeout_msec);
+  void createWindow(TRaster32P splash_image, unsigned int timeout_msec);
+  void createWindow(const TFilePath &splash_image, unsigned int timeout_msec);
 
 private:
-	// cloning is forbidden
-	TSplashWindow(const TSplashWindow &);
-	TSplashWindow &operator=(const TSplashWindow &);
+  // cloning is forbidden
+  TSplashWindow(const TSplashWindow &);
+  TSplashWindow &operator=(const TSplashWindow &);
 };
 
 #endif

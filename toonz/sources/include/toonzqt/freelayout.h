@@ -26,38 +26,44 @@
 //************************************************************************************
 
 /*!
-  \brief    The DummyLayout class implements a layout whose items' geometry is not
+  \brief    The DummyLayout class implements a layout whose items' geometry is
+  not
             enforced at all, ignoring parent size bounds or geometry.
 
   \details  A DummyLayout serves as a simple, inert container of layout items.
             It does not enforce geometry to items added to it, allowing objects
             using this layout to appear as a 'viewport' for free-geometry items.
 
-  \note     As this layout does not effectively manage its objects' geometry, these
+  \note     As this layout does not effectively manage its objects' geometry,
+  these
             must be managed outside.
 */
 
-class DVAPI DummyLayout : public QLayout
-{
+class DVAPI DummyLayout : public QLayout {
 public:
-	DummyLayout();
-	virtual ~DummyLayout();
+  DummyLayout();
+  virtual ~DummyLayout();
 
-	QSize sizeHint() const;
+  QSize sizeHint() const;
 
-	QSize minimumSize() const { return QSize(0, 0); }
-	QSize maximumSize() const { return QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX); }
+  QSize minimumSize() const { return QSize(0, 0); }
+  QSize maximumSize() const { return QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX); }
 
-	int count() const { return m_items.count(); }
-	void addItem(QLayoutItem *item) { m_items.push_back(item); }
-	QLayoutItem *itemAt(int index) const { return (index < count()) ? m_items.at(index) : 0; }
-	QLayoutItem *takeAt(int index) { return (index < count()) ? m_items.takeAt(index) : 0; }
+  int count() const { return m_items.count(); }
+  void addItem(QLayoutItem *item) { m_items.push_back(item); }
+  QLayoutItem *itemAt(int index) const {
+    return (index < count()) ? m_items.at(index) : 0;
+  }
+  QLayoutItem *takeAt(int index) {
+    return (index < count()) ? m_items.takeAt(index) : 0;
+  }
 
-	void setGeometry(const QRect &r) {}
-	//Qt::Orientations	expandingDirections () const { return Qt::Orientations(); }
+  void setGeometry(const QRect &r) {}
+  // Qt::Orientations	expandingDirections () const { return
+  // Qt::Orientations(); }
 
 protected:
-	QList<QLayoutItem *> m_items;
+  QList<QLayoutItem *> m_items;
 };
 
 //************************************************************************************
@@ -69,22 +75,27 @@ protected:
             positioned, ignoring parent size bounds or geometry.
 
   \details  A FreeLayout instance can be used to achieve results similar to that
-            of a QScrollArea, with a more straightforward API and without restriction
-            to just one item at a time. Please observe that layouts can be inserted too.
+            of a QScrollArea, with a more straightforward API and without
+  restriction
+            to just one item at a time. Please observe that layouts can be
+  inserted too.
 
-            Specifically, FreeLayout is a convenience subclass of DummyLayout whose items'
-            sizes are enforced to their sizeHint() - in order to spare users from having to deal
-            with it externally. This complies with the idea that its items are comfortly
-            free to adapt to their preferred size, as it would be in a scrollable environment.
+            Specifically, FreeLayout is a convenience subclass of DummyLayout
+  whose items'
+            sizes are enforced to their sizeHint() - in order to spare users
+  from having to deal
+            with it externally. This complies with the idea that its items are
+  comfortly
+            free to adapt to their preferred size, as it would be in a
+  scrollable environment.
 */
 
-class FreeLayout : public DummyLayout
-{
+class FreeLayout : public DummyLayout {
 public:
-	FreeLayout() : DummyLayout() {}
-	~FreeLayout() {}
+  FreeLayout() : DummyLayout() {}
+  ~FreeLayout() {}
 
-	void setGeometry(const QRect &r);
+  void setGeometry(const QRect &r);
 };
 
-#endif // FREE_LAYOUT_H
+#endif  // FREE_LAYOUT_H

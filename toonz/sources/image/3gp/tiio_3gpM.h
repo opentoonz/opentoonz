@@ -23,76 +23,73 @@ class TImageReader3gp;
 
 bool IsQuickTimeInstalled();
 
-class TLevelWriter3gp : public TLevelWriter
-{
+class TLevelWriter3gp : public TLevelWriter {
 public:
-	TLevelWriter3gp(const TFilePath &path, TPropertyGroup *winfo);
-	~TLevelWriter3gp();
-	TImageWriterP getFrameWriter(TFrameId fid);
+  TLevelWriter3gp(const TFilePath &path, TPropertyGroup *winfo);
+  ~TLevelWriter3gp();
+  TImageWriterP getFrameWriter(TFrameId fid);
 
-	bool m_initDone;
-	int m_IOError;
-	Handle m_dataRef;
-	Handle m_hMovieData;
-	Handle m_soundDataRef;
-	Handle m_hSoundMovieData;
-	MovieExportComponent m_myExporter;
+  bool m_initDone;
+  int m_IOError;
+  Handle m_dataRef;
+  Handle m_hMovieData;
+  Handle m_soundDataRef;
+  Handle m_hSoundMovieData;
+  MovieExportComponent m_myExporter;
 
-	void save(const TImageP &img, int frameIndex);
+  void save(const TImageP &img, int frameIndex);
 
 private:
-	Movie m_movie;
-	Track m_videoTrack;
-	Media m_videoMedia;
-	GWorldPtr m_gworld;
-	PixMapHandle m_pixmap;
-	Handle m_compressedData;
-	short m_refNum;
-	UCHAR m_cancelled;
+  Movie m_movie;
+  Track m_videoTrack;
+  Media m_videoMedia;
+  GWorldPtr m_gworld;
+  PixMapHandle m_pixmap;
+  Handle m_compressedData;
+  short m_refNum;
+  UCHAR m_cancelled;
 
-	PixelXRGB *buf;
-	int buf_lx;
-	int buf_ly;
-	TThread::Mutex m_mutex;
+  PixelXRGB *buf;
+  int buf_lx;
+  int buf_ly;
+  TThread::Mutex m_mutex;
 
 public:
-	static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo)
-	{
-		return new TLevelWriter3gp(f, winfo);
-	};
-	void saveSoundTrack(TSoundTrack *st);
+  static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo) {
+    return new TLevelWriter3gp(f, winfo);
+  };
+  void saveSoundTrack(TSoundTrack *st);
 };
 
-class TLevelReader3gp : public TLevelReader
-{
+class TLevelReader3gp : public TLevelReader {
 public:
-	TLevelReader3gp(const TFilePath &path);
-	~TLevelReader3gp();
-	TImageReaderP getFrameReader(TFrameId fid);
-	//friend class TImageReader3gp;
-	TLevelP loadInfo();
+  TLevelReader3gp(const TFilePath &path);
+  ~TLevelReader3gp();
+  TImageReaderP getFrameReader(TFrameId fid);
+  // friend class TImageReader3gp;
+  TLevelP loadInfo();
 
-	void load(const TRasterP &rasP, int frameIndex, const TPoint &pos, int shrinkX = 1, int shrinkY = 1);
-	TDimension getSize() const { return TDimension(m_lx, m_ly); }
-	TRect getBBox() const { return TRect(0, 0, m_lx - 1, m_ly - 1); }
+  void load(const TRasterP &rasP, int frameIndex, const TPoint &pos,
+            int shrinkX = 1, int shrinkY = 1);
+  TDimension getSize() const { return TDimension(m_lx, m_ly); }
+  TRect getBBox() const { return TRect(0, 0, m_lx - 1, m_ly - 1); }
 
-	int m_IOError;
+  int m_IOError;
 
 private:
-	short m_refNum;
-	Movie m_movie;
-	short m_resId;
-	Track m_track;
-	long m_depth;
-	vector<TimeValue> currentTimes;
-	int m_lx, m_ly;
+  short m_refNum;
+  Movie m_movie;
+  short m_resId;
+  Track m_track;
+  long m_depth;
+  vector<TimeValue> currentTimes;
+  int m_lx, m_ly;
 
 public:
-	static TLevelReader *create(const TFilePath &f)
-	{
-		return new TLevelReader3gp(f);
-	};
-	TThread::Mutex m_mutex;
+  static TLevelReader *create(const TFilePath &f) {
+    return new TLevelReader3gp(f);
+  };
+  TThread::Mutex m_mutex;
 };
 
 //------------------------------------------------------------------------------
@@ -106,7 +103,7 @@ public:
   TWriterInfo *clone() const;
 private:
   TWriterInfo3gp();
-  
+
 
   TWriterInfo3gp(const TWriterInfo3gp&);
 
@@ -119,6 +116,6 @@ private:
 };
 */
 
-#endif //!__LP64__
+#endif  //!__LP64__
 
-#endif //TIIO_3gp_H
+#endif  // TIIO_3gp_H

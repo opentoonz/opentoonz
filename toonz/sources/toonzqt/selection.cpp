@@ -12,63 +12,49 @@
 // TSelection
 //-----------------------------------------------------------------------------
 
-TSelection::TSelection()
-	: m_view(0)
-{
+TSelection::TSelection() : m_view(0) {}
+
+//-----------------------------------------------------------------------------
+
+TSelection::~TSelection() {}
+
+//-----------------------------------------------------------------------------
+
+void TSelection::makeCurrent() {
+  TSelectionHandle::getCurrent()->setSelection(this);
 }
 
 //-----------------------------------------------------------------------------
 
-TSelection::~TSelection()
-{
+void TSelection::makeNotCurrent() {
+  TSelectionHandle *sh = TSelectionHandle::getCurrent();
+  if (sh->getSelection() == this) sh->setSelection(0);
 }
 
 //-----------------------------------------------------------------------------
 
-void TSelection::makeCurrent()
-{
-	TSelectionHandle::getCurrent()->setSelection(this);
+TSelection *TSelection::getCurrent() {
+  return TSelectionHandle::getCurrent()->getSelection();
 }
 
 //-----------------------------------------------------------------------------
 
-void TSelection::makeNotCurrent()
-{
-	TSelectionHandle *sh = TSelectionHandle::getCurrent();
-	if (sh->getSelection() == this)
-		sh->setSelection(0);
+void TSelection::setCurrent(TSelection *selection) {
+  // assert(0);
+  TSelectionHandle::getCurrent()->setSelection(selection);
 }
 
 //-----------------------------------------------------------------------------
 
-TSelection *TSelection::getCurrent()
-{
-	return TSelectionHandle::getCurrent()->getSelection();
+void TSelection::enableCommand(CommandId cmdId,
+                               CommandHandlerInterface *handler) {
+  TSelectionHandle::getCurrent()->enableCommand(cmdId, handler);
 }
 
-//-----------------------------------------------------------------------------
-
-void TSelection::setCurrent(TSelection *selection)
-{
-	//assert(0);
-	TSelectionHandle::getCurrent()->setSelection(selection);
+void TSelection::addMenuAction(QMenu *menu, CommandId cmdId) {
+  menu->addAction(CommandManager::instance()->getAction(cmdId));
 }
 
-//-----------------------------------------------------------------------------
-
-void TSelection::enableCommand(CommandId cmdId, CommandHandlerInterface *handler)
-{
-
-	TSelectionHandle::getCurrent()->enableCommand(cmdId, handler);
-}
-
-void TSelection::addMenuAction(QMenu *menu, CommandId cmdId)
-{
-	menu->addAction(CommandManager::instance()->getAction(cmdId));
-}
-
-void TSelection::notifyView()
-{
-	if (m_view)
-		m_view->onSelectionChanged();
+void TSelection::notifyView() {
+  if (m_view) m_view->onSelectionChanged();
 }

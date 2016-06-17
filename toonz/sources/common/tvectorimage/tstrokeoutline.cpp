@@ -8,31 +8,26 @@ using namespace std;
 //-----------------------------------------------------------------------------
 
 TStrokeOutline::TStrokeOutline(const TStrokeOutline &stroke)
-	: m_outline(stroke.m_outline)
-{
+    : m_outline(stroke.m_outline) {}
+
+//-----------------------------------------------------------------------------
+
+TStrokeOutline &TStrokeOutline::operator=(const TStrokeOutline &stroke) {
+  TStrokeOutline tmp(stroke);
+  tmp.m_outline.swap(m_outline);
+  return *this;
 }
 
 //-----------------------------------------------------------------------------
 
-TStrokeOutline &TStrokeOutline::operator=(const TStrokeOutline &stroke)
-{
-	TStrokeOutline tmp(stroke);
-	tmp.m_outline.swap(m_outline);
-	return *this;
+void TStrokeOutline::addOutlinePoint(const TOutlinePoint &p) {
+  m_outline.push_back(p);
 }
 
 //-----------------------------------------------------------------------------
 
-void TStrokeOutline::addOutlinePoint(const TOutlinePoint &p)
-{
-	m_outline.push_back(p);
-}
-
-//-----------------------------------------------------------------------------
-
-std::vector<TQuadratic> getOutlineWithQuadratic(const TStroke &s)
-{
-	return vector<TQuadratic>();
+std::vector<TQuadratic> getOutlineWithQuadratic(const TStroke &s) {
+  return vector<TQuadratic>();
 }
 
 //-----------------------------------------------------------------------------

@@ -6,8 +6,7 @@
 #include <QObject>
 #include <QLocalSocket>
 
-namespace tipc
-{
+namespace tipc {
 
 //------------------------------------------------------------------
 
@@ -17,20 +16,19 @@ class Server;
 
 //------------------------------------------------------------------
 
-class SocketController : public QObject
-{
-	Q_OBJECT
+class SocketController : public QObject {
+  Q_OBJECT
 
 public:
-	Server *m_server;
-	QLocalSocket *m_socket;
+  Server *m_server;
+  QLocalSocket *m_socket;
 
 public Q_SLOTS:
 
-	void onReadyRead();
-	void onDisconnected();
+  void onReadyRead();
+  void onDisconnected();
 };
 
-} //namespace tipc
+}  // namespace tipc
 
-#endif //TIPC_SERVER_PRIVATE_H
+#endif  // TIPC_SERVER_PRIVATE_H

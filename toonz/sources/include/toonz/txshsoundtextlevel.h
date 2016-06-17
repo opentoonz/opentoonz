@@ -20,39 +20,38 @@
 #endif
 
 //=============================================================================
-//!The TXshSoundTextLevel
+//! The TXshSoundTextLevel
 //=============================================================================
 
-class DVAPI TXshSoundTextLevel : public TXshLevel
-{
-	PERSIST_DECLARATION(TXshSoundTextLevel)
+class DVAPI TXshSoundTextLevel : public TXshLevel {
+  PERSIST_DECLARATION(TXshSoundTextLevel)
 
-	DECLARE_CLASS_CODE
+  DECLARE_CLASS_CODE
 
-	QList<QString> m_framesText;
+  QList<QString> m_framesText;
 
 public:
-	TXshSoundTextLevel(std::wstring name = L"");
-	~TXshSoundTextLevel();
+  TXshSoundTextLevel(std::wstring name = L"");
+  ~TXshSoundTextLevel();
 
-	TXshSoundTextLevel *clone() const;
+  TXshSoundTextLevel *clone() const;
 
-	//! Overridden from TXshLevel
-	TXshSoundTextLevel *getSoundTextLevel() { return this; }
+  //! Overridden from TXshLevel
+  TXshSoundTextLevel *getSoundTextLevel() { return this; }
 
-	void setFrameText(int frameIndex, QString);
-	QString getFrameText(int frameIndex) const;
+  void setFrameText(int frameIndex, QString);
+  QString getFrameText(int frameIndex) const;
 
-	void loadData(TIStream &is);
-	void saveData(TOStream &os);
+  void loadData(TIStream &is);
+  void saveData(TOStream &os);
 
-	void load(){};
-	void save(){};
+  void load(){};
+  void save(){};
 
 private:
-	// not implemented
-	TXshSoundTextLevel(const TXshSoundTextLevel &);
-	TXshSoundTextLevel &operator=(const TXshSoundTextLevel &);
+  // not implemented
+  TXshSoundTextLevel(const TXshSoundTextLevel &);
+  TXshSoundTextLevel &operator=(const TXshSoundTextLevel &);
 };
 
 #ifdef _WIN32
@@ -60,4 +59,4 @@ template class DV_EXPORT_API TSmartPointerT<TXshSoundTextLevel>;
 #endif
 typedef TSmartPointerT<TXshSoundTextLevel> TXshSoundTextLevelP;
 
-#endif //TXSHSOUNDTEXTLEVEL_INCLUDED
+#endif  // TXSHSOUNDTEXTLEVEL_INCLUDED

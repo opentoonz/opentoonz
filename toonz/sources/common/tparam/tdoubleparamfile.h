@@ -15,24 +15,23 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TDoubleParamFileData
-{
-	TDoubleKeyframe::FileParams m_params;
-	std::vector<double> m_values;
-	bool m_dirtyFlag;
+class DVAPI TDoubleParamFileData {
+  TDoubleKeyframe::FileParams m_params;
+  std::vector<double> m_values;
+  bool m_dirtyFlag;
 
-	void read();
+  void read();
 
 public:
-	TDoubleParamFileData();
-	~TDoubleParamFileData();
+  TDoubleParamFileData();
+  ~TDoubleParamFileData();
 
-	void setParams(const TDoubleKeyframe::FileParams &params);
-	const TDoubleKeyframe::FileParams &getParams() { return m_params; }
+  void setParams(const TDoubleKeyframe::FileParams &params);
+  const TDoubleKeyframe::FileParams &getParams() { return m_params; }
 
-	void invalidate();
+  void invalidate();
 
-	double getValue(double frame, double defaultValue = 0);
+  double getValue(double frame, double defaultValue = 0);
 };
 
 #endif

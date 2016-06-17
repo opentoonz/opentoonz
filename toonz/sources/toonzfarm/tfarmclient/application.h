@@ -10,38 +10,36 @@ class TFarmController;
 
 //------------------------------------------------------------------------------
 
-class RenderFarmTasksObserver
-{
+class RenderFarmTasksObserver {
 public:
-	virtual void onChange() = 0;
+  virtual void onChange() = 0;
 };
 
 //------------------------------------------------------------------------------
 
-class Application
-{ // singleton
+class Application {  // singleton
 public:
-	~Application();
-	static Application *instance();
+  ~Application();
+  static Application *instance();
 
-	void init();
+  void init();
 
-	TFarmController *getController();
-	bool testControllerConnection() const;
-	void getControllerData(string &hostName, string &ipAddr, int &port) const;
+  TFarmController *getController();
+  bool testControllerConnection() const;
+  void getControllerData(string &hostName, string &ipAddr, int &port) const;
 
-	void setCurrentFolder(const TFilePath &fp);
-	TFilePath getCurrentFolder();
+  void setCurrentFolder(const TFilePath &fp);
+  TFilePath getCurrentFolder();
 
 private:
-	class Imp;
-	Imp *m_imp;
+  class Imp;
+  Imp *m_imp;
 
-	Application();
+  Application();
 
-	// not implemented
-	Application(const Application &);
-	Application &operator=(const Application &);
+  // not implemented
+  Application(const Application &);
+  Application &operator=(const Application &);
 };
 
 #endif
