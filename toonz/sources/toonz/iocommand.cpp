@@ -1178,15 +1178,18 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
                    "%1: the current scene has been modified.\n"
                    "Do you want to save your changes?")
                    .arg(msg);
-    int ret = DVGui::MsgBox(question, QObject::tr("Save"),
+	int ret = DVGui::MsgBox(question, QObject::tr("Save All"), QObject::tr("Save Scene"),
                             QObject::tr("Discard"), QObject::tr("Cancel"), 0);
-    if (ret == 0 || ret == 3) {
+    if (ret == 0 || ret == 4) {
       // cancel (or closed message box window)
       return false;
-    } else if (ret == 1) {
+	} else if (ret == 1) {
+		// save all
+		if (!IoCmd::saveAll()) return false;
+	} else if (ret == 2) {
       // save
       if (!IoCmd::saveScene()) return false;
-    } else if (ret == 2) {
+    } else if (ret == 3) {
     }
 
     isLevelOrSceneIsDirty = true;
@@ -1204,20 +1207,23 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
       QString question;
 
       question =
-          msg + ":" + QObject::tr(" Following file(s) are modified.\n\n");
+          msg + ":" + QObject::tr(" The following file(s) have been modified.\n\n");
       for (int i = 0; i < dirtyResources.size(); i++) {
         question += "   " + dirtyResources[i] + "\n";
       }
       question +=
-          QObject::tr("\nAre you sure to ") + msg + QObject::tr(" anyway ?");
+          QObject::tr("\nAre you sure you want to ") + msg + QObject::tr(" anyway ?");
 
       int ret =
-          DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);
-      if (ret == 0 || ret == 2) {
+		  DVGui::MsgBox(question, QObject::tr("Save All Changes"), QObject::tr("Quit"), QObject::tr("Cancel"), 0);
+      if (ret == 0 || ret == 3) {
         // cancel (or closed message box window)
         return false;
-      } else if (ret == 1) {
-        // ok
+	  } else if (ret == 1) {
+		  // save all
+		  if (!IoCmd::saveAll()) return false;
+	  } else if (ret == 2) {
+        // quit
       }
 
       isLevelOrSceneIsDirty = true;

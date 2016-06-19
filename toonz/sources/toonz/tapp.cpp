@@ -682,7 +682,8 @@ void TApp::autosave() {
   DVGui::ProgressDialog pb(
       "Autosaving scene..." + toQString(scene->getScenePath()), 0, 0, 1);
   pb.show();
-  IoCmd::saveScene();
+  IoCmd::saveAll();
+  //IoCmd::saveScene();
   pb.setValue(1);
 }
 
