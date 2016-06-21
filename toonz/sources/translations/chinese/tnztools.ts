@@ -880,7 +880,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>V:</source>
-        <translation>重置:</translation>
+        <translation>垂直:</translation>
     </message>
     <message>
         <source>Rotation</source>
@@ -911,7 +911,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Show Only Active Skeleton</source>
-        <translation>仅显示可用的骨架</translation>
+        <translation>仅显示活动的骨架</translation>
     </message>
     <message>
         <source>Mode:</source>
