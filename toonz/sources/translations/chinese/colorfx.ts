@@ -434,7 +434,7 @@
     </message>
     <message>
         <source>Distortion</source>
-        <translation>歪曲</translation>
+        <translation>扭曲</translation>
     </message>
     <message>
         <source>Min Thick</source>
@@ -510,7 +510,7 @@
     </message>
     <message>
         <source>Distortion</source>
-        <translation>歪曲</translation>
+        <translation>扭曲</translation>
     </message>
     <message>
         <source>Thickness</source>
