@@ -292,7 +292,7 @@ Possibly the preset file has been corrupted</source>
     <name>DVGui::LineEdit</name>
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation>文件名不能包含如下的任一字符: /\:*?&quot;&lt;&gt;|</translation>
+        <translation>文件名不能包含如下的任一字符: /\:*?&quot;&lt;&gt;|.</translation>
     </message>
 </context>
 <context>
@@ -1155,7 +1155,7 @@ Select FX nodes and related links before copying or cutting the selection you wa
     <name>LineEdit</name>
     <message>
         <source>A file name cannot contains any of the following chracters: /\:*?&quot;&lt;&gt;|.</source>
-        <translation type="vanished">文件名能包含如下的任一字符: /\:*?&quot;&lt;&gt;|。</translation>
+        <translation type="vanished">文件名能包含如下的任一字符: /\:*?&quot;&lt;&gt;|.</translation>
     </message>
 </context>
 <context>
@@ -2139,7 +2139,7 @@ Apply</source>
     </message>
     <message>
         <source>Matte</source>
-        <translation>半透明</translation>
+        <translation>不透明度</translation>
     </message>
     <message>
         <source>RGB</source>
