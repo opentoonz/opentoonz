@@ -5,9 +5,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-//#include <ft2build.h>
-//#include FT_FREETYPE_H
-
 #include <QStringList>
 #include <QFont>
 #include <QFontDatabase>
@@ -25,12 +22,7 @@
 #include "tstroke.h"
 #include "tcurves.h"
 #include "traster.h"
-#include <vector>
-#include <iostream>
-#include <string>
-//#include <tstring.h>
-#include <tmathutil.h>
-//#include <tdebugmessage.h>
+#include "tmathutil.h"
 #include "tvectorimage.h"
 using namespace std;
 
@@ -45,14 +37,14 @@ struct TFont::Impl {
 
   //  KerningPairs m_kerningPairs;
 
-  /*
-          ATSUStyle m_style;
-          ATSUFontID m_fontId;
-          ATSUTextLayout m_layout;
-          Fixed m_size;
-          int m_ascender;
-          int m_descender;
-  */
+#if 0
+  ATSUStyle m_style;
+  ATSUFontID m_fontId;
+  ATSUTextLayout m_layout;
+  Fixed m_size;
+  int m_ascender;
+  int m_descender;
+#endif
 
   Impl(const QString &family, const QString &style, int size);
   ~Impl();
@@ -102,9 +94,9 @@ TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode,
   if (path.elementCount() < 1) return getDistance(charcode, nextCharCode);
 
   // force closing the last path
-  if (path.elementAt(path.elementCount() - 1).type !=
-      QPainterPath::MoveToElement)
+  if (path.elementAt(path.elementCount() - 1).type != QPainterPath::MoveToElement) {
     path.moveTo(0.0, 0.0);
+  }
 
   int i, n = path.elementCount();
   int strokes = 0;
@@ -177,8 +169,9 @@ TPoint TFont::drawChar(TRasterGR8P &outImage, TPoint &unused, wchar_t charcode,
   quint32 indices[2];
   int count = 2;
 
-  if (!raw.glyphIndexesForChars(chars, 2, indices, &count) || count < 1)
+  if (!raw.glyphIndexesForChars(chars, 2, indices, &count) || count < 1) {
     return TPoint(0, 0);
+  }
 
   QImage image(raw.alphaMapForGlyph(indices[0], QRawFont::PixelAntialiasing));
 
@@ -190,11 +183,11 @@ TPoint TFont::drawChar(TRasterGR8P &outImage, TPoint &unused, wchar_t charcode,
 
   outImage = TRasterGR8P(width, height);
 
-  /*
-          TPixelGR8 bgp;
-          bgp.value = 255;
-          outImage->fill(bgp);
-  */
+#if 0
+  TPixelGR8 bgp;
+  bgp.value = 255;
+  outImage->fill(bgp);
+#endif
   void *data = outImage->getRawData();
 
   memcpy(data, image.bits(), image.byteCount());
@@ -249,12 +242,13 @@ TPoint TFont::getDistance(wchar_t firstChar, wchar_t secondChar) const {
   QPointF advances[2];
   int count = 2;
 
-  if (!raw.glyphIndexesForChars(chars, 2, indices, &count) || count != 2)
+  if (!raw.glyphIndexesForChars(chars, 2, indices, &count) || count != 2) {
     return TPoint(0, 0);
+  }
 
-  if (!raw.advancesForGlyphIndexes(indices, advances, 2,
-                                   QRawFont::KernedAdvances))
+  if (!raw.advancesForGlyphIndexes(indices, advances, 2, QRawFont::KernedAdvances)) {
     return TPoint(0, 0);
+  }
 
   int advance = (int)(advances[0].x());
 
@@ -370,12 +364,12 @@ void TFontManager::setFamily(const wstring family) {
 
   // XXX: if current style is not valid for family, reset it?
   // doing so asserts when chosing a font in the GUI
-  /*
-          QStringList styles = m_pimpl->m_qfontdb->styles(qFamily);
-          if
-     (styles.contains(QString::fromStdWString(m_pimpl->m_currentTypeface)))
-                  m_pimpl->m_currentTypeface = L"";
-  */
+#if 0
+  QStringList styles = m_pimpl->m_qfontdb->styles(qFamily);
+  if (styles.contains(QString::fromStdWString(m_pimpl->m_currentTypeface))) {
+    m_pimpl->m_currentTypeface = L"";
+  }
+#endif
   delete m_pimpl->m_currentFont;
   m_pimpl->m_currentFont = new TFont(
       m_pimpl->m_currentFamily, m_pimpl->m_currentTypeface, m_pimpl->m_size);
@@ -389,7 +383,9 @@ void TFontManager::setTypeface(const wstring typeface) {
   QString qTypeface  = QString::fromStdWString(typeface);
   QStringList styles = m_pimpl->m_qfontdb->styles(
       QString::fromStdWString(m_pimpl->m_currentFamily));
-  if (!styles.contains(qTypeface)) throw TFontCreationError();
+  if (!styles.contains(qTypeface)) {
+    throw TFontCreationError();
+  }
 
   m_pimpl->m_currentTypeface = typeface;
 
@@ -423,9 +419,13 @@ wstring TFontManager::getCurrentTypeface() const {
 //---------------------------------------------------------
 
 TFont *TFontManager::getCurrentFont() {
-  if (m_pimpl->m_currentFont) return m_pimpl->m_currentFont;
+  if (m_pimpl->m_currentFont) {
+    return m_pimpl->m_currentFont;
+  }
 
-  if (!m_pimpl->m_currentFont) loadFontNames();
+  if (!m_pimpl->m_currentFont) {
+    loadFontNames();
+  }
 
   assert(!m_pimpl->m_qfontdb->families().empty());
   setFamily(m_pimpl->m_qfontdb->families().first().toStdWString());
