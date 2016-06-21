@@ -73,7 +73,7 @@
     <command>MI_SendBack</command>
     <command>MI_SendBackward</command>
   </menu>
-  <menu title="Scan &amp; Cleanup">
+  <menu title="Scan &amp;&amp; Cleanup">
     <command>MI_DefineScanner</command>
     <command>MI_ScanSettings</command>
     <command>MI_Scan</command>

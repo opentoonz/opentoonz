@@ -373,6 +373,7 @@ void FileBrowserPopup::showEvent(QShowEvent *) {
     m_currentProjectPath = projectPath;
     initFolder();
     m_nameField->update();
+    m_nameField->setFocus();
   }
   resize(m_dialogSize);
 }

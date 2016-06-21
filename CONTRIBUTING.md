@@ -42,3 +42,17 @@ so we cannot reproduce them. We believe you can fix the bug and send us the fix.
 If you had an idea about a new feature, please implement it and send a pull-request to us.
 Even if you cannot implement the feature, you can open a topic in [issues](https://github.com/opentoonz/opentoonz/issues).
 It enables us to discuss about implementaions of the feature there.
+
+## Translations
+
+Translation source (`.ts`) files for OpenToonz GUI are located in `toonz/sources/translations`.
+If you create new `.ts` files for your language or polish existing ones,
+please send us those modifications as pull-requests. 
+[Qt Linguist](http://doc.qt.io/qt-5.6/linguist-translators.html) is usefull for translating them.
+
+Please send us Qt message (`.qm`) files with `.ts` files if you can make the following modifications.
+
+OpenToonz uses `.qm` files generated from `.ts` files.
+You can generate `.qm` files by using [Qt Linguist](http://doc.qt.io/qt-5.6/linguist-translators.html).
+Please locate generated `.qm` files in `stuff/config/loc`.
+It enables OpenToonz installer to install them into the `stuff` directory.
