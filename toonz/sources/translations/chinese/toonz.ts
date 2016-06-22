@@ -1087,7 +1087,7 @@ order to save the effort of creating styles
 before color designing.</source>
         <translation>启用该选项时，会在转换完成后附加默认调色板
 ($TOONZSTUDIOPALETTE\cleanup_default.tpl)的样式到调色板中。
-可以在创建色板的时候，省略新建样式的功夫。</translation>
+这样可以在创建色板的时候，省去新建样式的功夫。</translation>
     </message>
 </context>
 <context>
@@ -5761,7 +5761,9 @@ What do you want to do? </source>
     </message>
     <message numerus="yes">
         <source>Deleting %n files. Are you sure?</source>
-        <translation>确定要删除 %n 个文件吗？</translation>
+        <translation>
+            <numerusform>确定要删除 %n 个文件吗？</numerusform>
+        </translation>
     </message>
     <message>
         <source>Delete</source>
