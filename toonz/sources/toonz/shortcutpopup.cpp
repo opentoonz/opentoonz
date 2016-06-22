@@ -191,7 +191,7 @@ ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
   addFolder(tr("Fill"), FillCommandType);
   addFolder(tr("File"), MenuFileCommandType, menuCommandFolder);
   addFolder(tr("Edit"), MenuEditCommandType, menuCommandFolder);
-  addFolder(tr("Scan & Cleanup"), MenuScanCleanupCommandType,
+  addFolder(tr("Scan && Cleanup"), MenuScanCleanupCommandType,
             menuCommandFolder);
   addFolder(tr("Level"), MenuLevelCommandType, menuCommandFolder);
   addFolder(tr("Xsheet"), MenuXsheetCommandType, menuCommandFolder);
