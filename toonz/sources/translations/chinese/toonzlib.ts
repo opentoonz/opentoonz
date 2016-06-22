@@ -282,7 +282,7 @@
     </message>
     <message>
         <source>Move Z</source>
-        <translation>移动纵深</translation>
+        <translation>移动 Z 轴</translation>
     </message>
     <message>
         <source>Edit Stack Order</source>
