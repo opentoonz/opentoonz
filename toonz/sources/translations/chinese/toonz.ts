@@ -1085,9 +1085,9 @@ What do you want to do?</source>
 be appended to the palette after conversion in 
 order to save the effort of creating styles 
 before color designing.</source>
-        <translation>このオプションがONのとき、デフォルトパレット ($TOONZSTUDIOPALETTE\cleanup_default.tpl)
-のスタイルが変換後のパレットに追加されます。色見本を作成する際に、スタイルを新規作成する
-手間を省くことができます。</translation>
+        <translation>启用该选项时，会在转换完成后附加默认调色板
+($TOONZSTUDIOPALETTE\cleanup_default.tpl)的样式到调色板中。
+可以在创建色板的时候，省略新建样式的功夫。</translation>
     </message>
 </context>
 <context>
