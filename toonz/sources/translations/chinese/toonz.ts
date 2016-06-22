@@ -32,6 +32,7 @@
     <name>AdjustLevelsPopup</name>
     <message>
         <source>Adjust Levels</source>
+        <translatorcomment>level 多数是专有名词，但此处为颜色阶调，非Toonz的专有名词</translatorcomment>
         <translation>调整色阶</translation>
     </message>
     <message>
@@ -323,7 +324,7 @@ Stop it or wait for its completion before removing it.</source>
     </message>
     <message>
         <source>New Size</source>
-        <translation>新建尺寸</translation>
+        <translation>新尺寸</translation>
     </message>
     <message>
         <source>Unit:</source>
@@ -460,7 +461,7 @@ Do you want to crop the canvas?</source>
     <name>CleanupPopup</name>
     <message>
         <source>Do you want to cleanup this frame?</source>
-        <translation>是否要清稿这个帧？</translation>
+        <translation>是否要对这个帧进行清稿？</translation>
     </message>
     <message>
         <source>Cleanup</source>
@@ -468,7 +469,7 @@ Do you want to crop the canvas?</source>
     </message>
     <message>
         <source>Cleanup in progress</source>
-        <translation>正在处理清稿</translation>
+        <translation>正在进行清稿</translation>
     </message>
     <message>
         <source>Skip</source>
@@ -476,7 +477,7 @@ Do you want to crop the canvas?</source>
     </message>
     <message>
         <source>Cleanup All</source>
-        <translation>清稿全部</translation>
+        <translation>全部进行清稿</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -484,7 +485,7 @@ Do you want to crop the canvas?</source>
     </message>
     <message>
         <source>Cleanup in progress: </source>
-        <translation>正在处理清稿:</translation>
+        <translation>正在进行清稿: </translation>
     </message>
     <message>
         <source>It is not possible to cleanup: the cleanup list is empty.</source>
@@ -538,7 +539,7 @@ when running the cleanup process.</source>
     </message>
     <message>
         <source> : Cleanup in progress</source>
-        <translation> : 正在处理清稿</translation>
+        <translation> : 正在进行清稿</translation>
     </message>
 </context>
 <context>
@@ -819,19 +820,19 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Scene: </source>
-        <translation>场景:</translation>
+        <translation>场景: </translation>
     </message>
     <message>
         <source>   ::   Frame: </source>
-        <translation>    ::    帧:</translation>
+        <translation>    ::    帧: </translation>
     </message>
     <message>
         <source>   ::   Level: </source>
-        <translation>    ::   层级:</translation>
+        <translation>    ::   层级: </translation>
     </message>
     <message>
         <source>Level: </source>
-        <translation>层级:</translation>
+        <translation>层级: </translation>
     </message>
 </context>
 <context>
@@ -1154,11 +1155,11 @@ before color designing.</source>
     </message>
     <message>
         <source>Style Index: </source>
-        <translation type="vanished">样式索引:</translation>
+        <translation type="vanished">样式索引: </translation>
     </message>
     <message>
         <source>Apply to Frames: </source>
-        <translation type="vanished">应用给这些帧:</translation>
+        <translation type="vanished">应用给这些帧: </translation>
     </message>
     <message>
         <source>Style Index:</source>
@@ -1318,8 +1319,8 @@ before color designing.</source>
         <translation type="vanished">编辑</translation>
     </message>
     <message>
-        <source>Scan &amp;&amp; Cleanup</source>
-        <translation type="vanished">扫描/清稿</translation>
+        <source>Scan &amp; Cleanup</source>
+        <translation type="vanished">扫描&amp;&amp;清稿</translation>
     </message>
     <message>
         <source>Level</source>
@@ -1425,7 +1426,7 @@ before color designing.</source>
     </message>
     <message>
         <source>DPI: </source>
-        <translation>DPI:</translation>
+        <translation>DPI: </translation>
     </message>
     <message>
         <source>Vectors Thickness</source>
@@ -1773,7 +1774,7 @@ before color designing.</source>
     <name>Filmstrip</name>
     <message>
         <source>Level:  </source>
-        <translation>层级:</translation>
+        <translation>层级: </translation>
     </message>
     <message>
         <source>Level Strip</source>
@@ -1897,7 +1898,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Unfreeze Preview</source>
-        <translation>解冻预览</translation>
+        <translation>取消冻结预览</translation>
     </message>
     <message>
         <source>Freeze Preview</source>
@@ -1949,7 +1950,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>  ::  Zoom : </source>
-        <translation>    ::    缩放:</translation>
+        <translation>    ::    缩放: </translation>
     </message>
     <message>
         <source>Load / Append Images</source>
@@ -2328,19 +2329,19 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Scene: </source>
-        <translation>场景:</translation>
+        <translation>场景: </translation>
     </message>
     <message>
         <source>   ::   Frame: </source>
-        <translation>    ::    帧:</translation>
+        <translation>    ::    帧: </translation>
     </message>
     <message>
         <source>   ::   Level: </source>
-        <translation>    ::   层级:</translation>
+        <translation>    ::   层级: </translation>
     </message>
     <message>
         <source>Level: </source>
-        <translation>层级:</translation>
+        <translation>层级: </translation>
     </message>
     <message>
         <source>Preview</source>
@@ -2771,7 +2772,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Freeze//Unfreeze Preview</source>
-        <translation>冻结/解冻预览(&amp;F)</translation>
+        <translation>冻结/取消冻结预览(&amp;F)</translation>
     </message>
     <message>
         <source>Freeze Preview</source>
@@ -2779,7 +2780,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Unfreeze Preview</source>
-        <translation>解冻预览</translation>
+        <translation>取消冻结预览</translation>
     </message>
     <message>
         <source>&amp;Save As Preset</source>
@@ -3111,11 +3112,11 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Roll Up</source>
-        <translation>提前(&amp;R)</translation>
+        <translation>上卷(&amp;R)</translation>
     </message>
     <message>
         <source>&amp;Roll Down</source>
-        <translation>推延(&amp;R)</translation>
+        <translation>下卷(&amp;R)</translation>
     </message>
     <message>
         <source>&amp;Time Stretch...</source>
@@ -3727,7 +3728,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Show Only Active Skeleton</source>
-        <translation>仅显示可用的骨架</translation>
+        <translation>仅显示活动的骨架</translation>
     </message>
     <message>
         <source>Brush Preset</source>
@@ -3955,7 +3956,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Adjust Levels...</source>
-        <translation>调整层级...</translation>
+        <translation>调整色阶...</translation>
     </message>
     <message>
         <source>&amp;Raster Bounding Box</source>
@@ -4270,7 +4271,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Use Style: </source>
-        <translation type="vanished">使用样式:</translation>
+        <translation type="vanished">使用样式: </translation>
     </message>
     <message>
         <source>Line Prevalence</source>
@@ -4294,7 +4295,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Use Ink: </source>
-        <translation>使用墨迹:</translation>
+        <translation>使用墨迹: </translation>
     </message>
     <message>
         <source>Ink Usage</source>
@@ -4483,7 +4484,7 @@ What do you want to do?</source>
     <name>MyScannerListener</name>
     <message>
         <source>Scanning in progress: </source>
-        <translation>正在扫描:</translation>
+        <translation>正在扫描: </translation>
     </message>
     <message>
         <source>The scanning process is completed.</source>
@@ -4554,7 +4555,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Multiple Rendering: </source>
-        <translation type="vanished">多重渲染:</translation>
+        <translation type="vanished">多重渲染: </translation>
     </message>
     <message>
         <source>Standard</source>
@@ -4630,7 +4631,7 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Render Tile:</source>
-        <translation>渲染平铺:</translation>
+        <translation>渲染区块:</translation>
     </message>
     <message>
         <source>Options</source>
@@ -5045,7 +5046,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Default Interpolation: </source>
-        <translation type="vanished">默认插值法:</translation>
+        <translation type="vanished">默认插值法: </translation>
     </message>
     <message>
         <source>Linear</source>
@@ -5093,11 +5094,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>   Following Frames Correction: </source>
-        <translation type="vanished">   后面帧的颜色:</translation>
+        <translation type="vanished">   后面帧的颜色: </translation>
     </message>
     <message>
         <source>   Previous  Frames Correction: </source>
-        <translation type="vanished">   前面帧的颜色:</translation>
+        <translation type="vanished">   前面帧的颜色: </translation>
     </message>
     <message>
         <source>Display Lines Only </source>
@@ -5161,7 +5162,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Level Strip Frames Width*:</source>
-        <translation type="vanished">层级条的帧宽度*:</translation>
+        <translation type="vanished">层级条的帧数宽*:</translation>
     </message>
     <message>
         <source>Capture</source>
@@ -5217,15 +5218,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>   Ink Color on White Bg: </source>
-        <translation type="vanished">   白色背景上的描线颜色:</translation>
+        <translation type="vanished">   白色背景上的描线颜色: </translation>
     </message>
     <message>
         <source>   Ink Color on Black Bg: </source>
-        <translation type="vanished">   黑色背景上的描线颜色:</translation>
+        <translation type="vanished">   黑色背景上的描线颜色: </translation>
     </message>
     <message>
         <source> Paint Color: </source>
-        <translation type="vanished"> 上色颜色:</translation>
+        <translation type="vanished"> 上色颜色: </translation>
     </message>
     <message>
         <source>Fit to Flipbook</source>
@@ -5261,7 +5262,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Show Lines with Thickness 0</source>
-        <translation>以 0 的粗细显示线条</translation>
+        <translation>显示粗细为 0 的线条</translation>
     </message>
     <message>
         <source>Antialiased region boundaries</source>
@@ -6014,7 +6015,7 @@ undefined error.</source>
     </message>
     <message>
         <source>Level: </source>
-        <translation>层级:</translation>
+        <translation>层级: </translation>
     </message>
     <message>
         <source>Tasks</source>
@@ -6852,11 +6853,11 @@ Are you sure to </source>
     </message>
     <message>
         <source>Roll Up</source>
-        <translation>提前</translation>
+        <translation>上卷</translation>
     </message>
     <message>
         <source>Roll Down</source>
-        <translation>推延</translation>
+        <translation>下卷</translation>
     </message>
     <message>
         <source>Clone  Level : %1 &gt; %2</source>
@@ -8183,15 +8184,15 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Dpi: </source>
-        <translation>DPI:</translation>
+        <translation>DPI: </translation>
     </message>
     <message>
         <source>Brightness: </source>
-        <translation>亮度:</translation>
+        <translation>亮度: </translation>
     </message>
     <message>
         <source>Threshold: </source>
-        <translation>阈值:</translation>
+        <translation>阈值: </translation>
     </message>
 </context>
 <context>
@@ -8328,19 +8329,19 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Scene: </source>
-        <translation>场景:</translation>
+        <translation>场景: </translation>
     </message>
     <message>
         <source>   ::   Frame: </source>
-        <translation>    ::    帧:</translation>
+        <translation>    ::    帧: </translation>
     </message>
     <message>
         <source>   ::   Level: </source>
-        <translation>    ::   层级:</translation>
+        <translation>    ::   层级: </translation>
     </message>
     <message>
         <source>Level: </source>
-        <translation>层级:</translation>
+        <translation>层级: </translation>
     </message>
     <message>
         <source>Freeze</source>
@@ -8360,7 +8361,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>  ::  Zoom : </source>
-        <translation>    ::    缩放:</translation>
+        <translation>    ::    缩放: </translation>
     </message>
 </context>
 <context>
@@ -8554,7 +8555,7 @@ Assign to &apos;%3&apos;?</source>
     </message>
     <message>
         <source>Scan &amp;&amp; Cleanup</source>
-        <translation>扫描/清稿</translation>
+        <translation>扫描&amp;&amp;清稿</translation>
     </message>
     <message>
         <source>Level</source>
@@ -8745,7 +8746,7 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Render Tile:</source>
-        <translation>渲染平铺:</translation>
+        <translation>渲染区块:</translation>
     </message>
     <message>
         <source>Large</source>
@@ -9040,7 +9041,7 @@ Click the arrow button to create a new sub-xsheet</source>
     </message>
     <message>
         <source>Conversion in progress: </source>
-        <translation>处理中的转换:</translation>
+        <translation>正在进行转换: </translation>
     </message>
     <message>
         <source>Raster Levels</source>
@@ -9420,7 +9421,7 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>Scene: </source>
-        <translation>场景:</translation>
+        <translation>场景: </translation>
     </message>
     <message>
         <source> Frames</source>
@@ -9432,15 +9433,15 @@ Please refer to the user guide for details.</source>
     </message>
     <message>
         <source>  Level: </source>
-        <translation>层级:</translation>
+        <translation>层级: </translation>
     </message>
     <message>
         <source>   Selected: </source>
-        <translation>      选中:</translation>
+        <translation>      选中: </translation>
     </message>
     <message>
         <source> frame : </source>
-        <translation> 帧:</translation>
+        <translation> 帧: </translation>
     </message>
     <message>
         <source> frames * </source>
