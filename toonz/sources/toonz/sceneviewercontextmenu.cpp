@@ -243,7 +243,7 @@ void SceneViewerContextMenu::addShowHideCommand(QMenu *menu,
   TXsheet *xsh  = TApp::instance()->getCurrentXsheet()->getXsheet();
   TStageObject *stageObject =
       xsh->getStageObject(TStageObjectId::ColumnId(column->getIndex()));
-  QString text    = (isHidden ? "Show " : "Hide ") + getName(stageObject);
+  QString text    = (isHidden ? tr("Show ") : tr("Hide ")) + getName(stageObject);
   QAction *action = new QAction(text, this);
   action->setData(column->getIndex());
   connect(action, SIGNAL(triggered()), this, SLOT(onShowHide()));
@@ -256,7 +256,7 @@ void SceneViewerContextMenu::addSelectCommand(QMenu *menu,
   TStageObject *stageObject = xsh->getStageObject(id);
   if (!stageObject) return;
   QString text           = getName(stageObject);
-  if (menu == this) text = "Select " + text;
+  if (menu == this) text = tr("Select ") + text;
   QAction *action        = new QAction(text, this);
   action->setData(id.getCode());
   connect(action, SIGNAL(triggered()), this, SLOT(onSetCurrent()));
@@ -282,7 +282,7 @@ void SceneViewerContextMenu::addLevelCommands(std::vector<int> &indices) {
   if (!columns.empty()) {
     // show/hide
     if (columns.size() > 1) {
-      QMenu *subMenu = addMenu("Show / Hide");
+      QMenu *subMenu = addMenu(tr("Show / Hide"));
       for (int i = 0; i < (int)columns.size(); i++)
         addShowHideCommand(subMenu, columns[i]);
     } else
