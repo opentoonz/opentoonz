@@ -35,7 +35,7 @@ struct BrushData : public TPersist {
   PERSIST_DECLARATION(BrushData)
 
   std::wstring m_name;
-  double m_min, m_max, m_acc, m_hardness, m_opacityMin, m_opacityMax;
+  double m_min, m_max, m_acc, m_smooth, m_hardness, m_opacityMin, m_opacityMax;
   bool m_selective, m_pencil, m_breakAngles, m_pressure;
   int m_cap, m_join, m_miter;
 
@@ -69,6 +69,37 @@ public:
   void removePreset(const std::wstring &name);
 };
 
+//************************************************************************
+//    Smooth Stroke declaration
+//    Brush stroke smoothing buffer.
+//************************************************************************
+class SmoothStroke {
+public:
+  SmoothStroke() {}
+  ~SmoothStroke() {}
+
+  // begin stroke
+  // smooth is smooth strength, from 0 to 100
+  void beginStroke(int smooth);
+  // add stroke point
+  void addPoint(const TThickPoint &point);
+  // end stroke
+  void endStroke();
+  // Get generated stroke points which has been smoothed.
+  // Both addPoint() and endStroke() generate new smoothed points.
+  // This method will removed generated points
+  void getSmoothPoints(std::vector<TThickPoint> &smoothPoints);
+
+private:
+  void generatePoints();
+
+private:
+  int m_smooth;
+  int m_outputIndex;
+  int m_readIndex;
+  std::vector<TThickPoint> m_rawPoints;
+  std::vector<TThickPoint> m_outputPoints;
+};
 //************************************************************************
 //    Brush Tool declaration
 //************************************************************************
@@ -118,12 +149,16 @@ public:
   // Tools.
   bool isPencilModeActive();
 
+  void addTrackPoint(const TThickPoint &point, double pixelSize2);
+  void flushTrackPoint();
+
 protected:
   TPropertyGroup m_prop[2];
 
   TDoublePairProperty m_thickness;
   TDoublePairProperty m_rasThickness;
   TDoubleProperty m_accuracy;
+  TDoubleProperty m_smooth;
   TDoubleProperty m_hardness;
   TEnumProperty m_preset;
   TBoolProperty m_selective;
@@ -158,12 +193,14 @@ protected:
   std::vector<TThickPoint> m_points;
   TRect m_strokeRect, m_lastRect;
 
+  SmoothStroke m_smoothStroke;
+
   BrushPresetManager
       m_presetsManager;  //!< Manager for presets of this tool instance
 
   bool m_active, m_enabled,
       m_isPrompting,  //!< Whether the tool is prompting for spline
-                      //!substitution.
+                      //! substitution.
       m_firstTime, m_isPath, m_presetsLoaded;
 
   /*---

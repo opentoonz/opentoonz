@@ -138,6 +138,10 @@
         <source>Pressure</source>
         <translation>压感</translation>
     </message>
+    <message>
+        <source>Smooth:</source>
+        <translation>平滑：</translation>
+    </message>
 </context>
 <context>
     <name>BrushToolOptionsBox</name>

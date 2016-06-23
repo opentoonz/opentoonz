@@ -51,6 +51,7 @@ TEnv::IntVar VectorMiterValue("InknpaintVectorMiterValue", 4);
 TEnv::DoubleVar RasterBrushMinSize("InknpaintRasterBrushMinSize", 1);
 TEnv::DoubleVar RasterBrushMaxSize("InknpaintRasterBrushMaxSize", 5);
 TEnv::DoubleVar BrushAccuracy("InknpaintBrushAccuracy", 20);
+TEnv::DoubleVar BrushSmooth("InknpaintBrushSmooth", 0);
 TEnv::IntVar BrushSelective("InknpaintBrushSelective", 0);
 TEnv::IntVar BrushBreakSharpAngles("InknpaintBrushBreakSharpAngles", 0);
 TEnv::IntVar RasterBrushPencilMode("InknpaintRasterBrushPencilMode", 0);
@@ -539,6 +540,179 @@ int computeThickness(int pressure, const TIntPairProperty &property,
 
 }  // namespace
 
+//--------------------------------------------------------------------------------------------------
+
+static void CatmullRomInterpolate(const TThickPoint &P0, const TThickPoint &P1,
+                                  const TThickPoint &P2, const TThickPoint &P3,
+                                  int samples,
+                                  std::vector<TThickPoint> &points) {
+  double x0 = P1.x;
+  double x1 = (-P0.x + P2.x) * 0.5f;
+  double x2 = P0.x - 2.5f * P1.x + 2.0f * P2.x - 0.5f * P3.x;
+  double x3 = -0.5f * P0.x + 1.5f * P1.x - 1.5f * P2.x + 0.5f * P3.x;
+
+  double y0 = P1.y;
+  double y1 = (-P0.y + P2.y) * 0.5f;
+  double y2 = P0.y - 2.5f * P1.y + 2.0f * P2.y - 0.5f * P3.y;
+  double y3 = -0.5f * P0.y + 1.5f * P1.y - 1.5f * P2.y + 0.5f * P3.y;
+
+  double z0 = P1.thick;
+  double z1 = (-P0.thick + P2.thick) * 0.5f;
+  double z2 = P0.thick - 2.5f * P1.thick + 2.0f * P2.thick - 0.5f * P3.thick;
+  double z3 =
+      -0.5f * P0.thick + 1.5f * P1.thick - 1.5f * P2.thick + 0.5f * P3.thick;
+
+  for (int i = 1; i <= samples; ++i) {
+    double t  = i / (double)(samples + 1);
+    double t2 = t * t;
+    double t3 = t2 * t;
+    TThickPoint p;
+    p.x     = x0 + x1 * t + x2 * t2 + x3 * t3;
+    p.y     = y0 + y1 * t + y2 * t2 + y3 * t3;
+    p.thick = z0 + z1 * t + z2 * t2 + z3 * t3;
+    points.push_back(p);
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+
+static void Smooth(std::vector<TThickPoint> &points, int radius) {
+  int n = (int)points.size();
+  if (radius < 1 || n < 3) {
+    return;
+  }
+
+  std::vector<TThickPoint> result;
+
+  float d = 1.0f / (radius * 2 + 1);
+
+  for (int i = 1; i < n - 1; ++i) {
+    int lower = i - radius;
+    int upper = i + radius;
+
+    TThickPoint total;
+    total.x     = 0;
+    total.y     = 0;
+    total.thick = 0;
+
+    for (int j = lower; j <= upper; ++j) {
+      int idx = j;
+      if (idx < 0) {
+        idx = 0;
+      } else if (idx >= n) {
+        idx = n - 1;
+      }
+      total.x += points[idx].x;
+      total.y += points[idx].y;
+      total.thick += points[idx].thick;
+    }
+
+    total.x *= d;
+    total.y *= d;
+    total.thick *= d;
+    result.push_back(total);
+  }
+
+  for (int i = 1; i < n - 1; ++i) {
+    points[i].x     = result[i - 1].x;
+    points[i].y     = result[i - 1].y;
+    points[i].thick = result[i - 1].thick;
+  }
+
+  if (points.size() >= 3) {
+    std::vector<TThickPoint> pts;
+    CatmullRomInterpolate(points[0], points[0], points[1], points[2], 10, pts);
+    std::vector<TThickPoint>::iterator it = points.begin();
+    points.insert(it, pts.begin(), pts.end());
+
+    pts.clear();
+    CatmullRomInterpolate(points[n - 3], points[n - 2], points[n - 1],
+                          points[n - 1], 10, pts);
+    it = points.begin();
+    it += n - 1;
+    points.insert(it, pts.begin(), pts.end());
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+
+void SmoothStroke::beginStroke(int smooth) {
+  m_smooth      = smooth;
+  m_outputIndex = 0;
+  m_readIndex   = -1;
+  m_rawPoints.clear();
+  m_outputPoints.clear();
+}
+
+//--------------------------------------------------------------------------------------------------
+
+void SmoothStroke::addPoint(const TThickPoint &point) {
+  if (m_rawPoints.size() > 0 && m_rawPoints.back().x == point.x &&
+      m_rawPoints.back().y == point.y) {
+    return;
+  }
+  m_rawPoints.push_back(point);
+  generatePoints();
+}
+
+//--------------------------------------------------------------------------------------------------
+
+void SmoothStroke::endStroke() {
+  generatePoints();
+  // force enable the output all segments
+  m_outputIndex = m_outputPoints.size() - 1;
+}
+
+//--------------------------------------------------------------------------------------------------
+
+void SmoothStroke::getSmoothPoints(std::vector<TThickPoint> &smoothPoints) {
+  int n = m_outputPoints.size();
+  for (int i = m_readIndex + 1; i <= m_outputIndex && i < n; ++i) {
+    smoothPoints.push_back(m_outputPoints[i]);
+  }
+  m_readIndex = m_outputIndex;
+}
+
+//--------------------------------------------------------------------------------------------------
+
+void SmoothStroke::generatePoints() {
+  int n = (int)m_rawPoints.size();
+  if (n == 0) {
+    return;
+  }
+  std::vector<TThickPoint> smoothedPoints;
+  // Add more stroke samples before applying the smoothing
+  // This is because the raw inputs points are too few to support smooth result,
+  // especially on stroke ends
+  smoothedPoints.push_back(m_rawPoints.front());
+  for (int i = 1; i < n; ++i) {
+    const TThickPoint &p1 = m_rawPoints[i - 1];
+    const TThickPoint &p2 = m_rawPoints[i];
+    const TThickPoint &p0 = i - 2 >= 0 ? m_rawPoints[i - 2] : p1;
+    const TThickPoint &p3 = i + 1 < n ? m_rawPoints[i + 1] : p2;
+
+    int samples = 8;
+    CatmullRomInterpolate(p0, p1, p2, p3, samples, smoothedPoints);
+    smoothedPoints.push_back(p2);
+  }
+  // Apply the 1D box filter
+  // Multiple passes result in better quality and fix the stroke ends break
+  // issue
+  for (int i = 0; i < 3; ++i) {
+    Smooth(smoothedPoints, m_smooth);
+  }
+  // Compare the new smoothed stroke with old one
+  // Enable the output for unchanged parts
+  int outputNum = (int)m_outputPoints.size();
+  for (int i = m_outputIndex; i < outputNum; ++i) {
+    if (m_outputPoints[i] != smoothedPoints[i]) {
+      break;
+    }
+    ++m_outputIndex;
+  }
+  m_outputPoints = smoothedPoints;
+}
+
 //===================================================================
 //
 // BrushTool
@@ -550,6 +724,7 @@ BrushTool::BrushTool(std::string name, int targetType)
     , m_thickness("Size", 0, 100, 0, 5)
     , m_rasThickness("Size", 1, 100, 1, 5)
     , m_accuracy("Accuracy:", 1, 100, 20)
+    , m_smooth("Smooth:", 0, 50, 0)
     , m_hardness("Hardness:", 0, 100, 100)
     , m_preset("Preset:")
     , m_selective("Selective", false)
@@ -574,6 +749,7 @@ BrushTool::BrushTool(std::string name, int targetType)
   if (targetType & TTool::Vectors) {
     m_prop[0].bind(m_thickness);
     m_prop[0].bind(m_accuracy);
+    m_prop[0].bind(m_smooth);
     m_prop[0].bind(m_breakAngles);
     m_breakAngles.setId("BreakSharpAngles");
   }
@@ -581,6 +757,7 @@ BrushTool::BrushTool(std::string name, int targetType)
   if (targetType & TTool::ToonzImage) {
     m_prop[0].bind(m_rasThickness);
     m_prop[0].bind(m_hardness);
+    m_prop[0].bind(m_smooth);
     m_prop[0].bind(m_selective);
     m_prop[0].bind(m_pencil);
     m_pencil.setId("PencilMode");
@@ -771,6 +948,7 @@ void BrushTool::updateTranslation() {
   m_rasThickness.setQStringName(tr("Size"));
   m_hardness.setQStringName(tr("Hardness:"));
   m_accuracy.setQStringName(tr("Accuracy:"));
+  m_smooth.setQStringName(tr("Smooth:"));
   m_selective.setQStringName(tr("Selective"));
   // m_filled.setQStringName(tr("Filled"));
   m_preset.setQStringName(tr("Preset:"));
@@ -825,6 +1003,7 @@ void BrushTool::onActivate() {
     m_pressure.setValue(BrushPressureSensibility ? 1 : 0);
     m_firstTime = false;
     m_accuracy.setValue(BrushAccuracy);
+    m_smooth.setValue(BrushSmooth);
     m_hardness.setValue(RasterBrushHardness);
   }
   if (m_targetType & TTool::ToonzImage) {
@@ -929,12 +1108,18 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
          * --*/
         if (!m_pencil.getValue()) thickness -= 1.0;
 
+        TThickPoint thickPoint(pos + convert(ras->getCenter()), thickness);
         m_rasterTrack = new RasterStrokeGenerator(
-            ras, BRUSH, NONE, m_styleId,
-            TThickPoint(pos + convert(ras->getCenter()), thickness),
-            m_selective.getValue(), 0, !m_pencil.getValue());
+            ras, BRUSH, NONE, m_styleId, thickPoint, m_selective.getValue(), 0,
+            !m_pencil.getValue());
         m_tileSaver->save(m_rasterTrack->getLastRect());
         m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue());
+
+        m_smoothStroke.beginStroke(m_smooth.getValue());
+        m_smoothStroke.addPoint(thickPoint);
+        std::vector<TThickPoint> pts;
+        m_smoothStroke.getSmoothPoints(
+            pts);  // skip first point because it has been outputted
       } else {
         m_points.clear();
         TThickPoint point(pos + rasCenter, thickness);
@@ -948,6 +1133,12 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
         m_bluredBrush->updateDrawing(ri->getRaster(), m_backupRas, m_strokeRect,
                                      m_styleId, m_selective.getValue());
         m_lastRect = m_strokeRect;
+
+        m_smoothStroke.beginStroke(m_smooth.getValue());
+        m_smoothStroke.addPoint(point);
+        std::vector<TThickPoint> pts;
+        m_smoothStroke.getSmoothPoints(
+            pts);  // skip first point because it has been outputted
       }
       /*-- 作業中のFidを登録 --*/
       m_workingFrameId = getFrameId();
@@ -965,7 +1156,8 @@ void BrushTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
     if (m_pressure.getValue() && e.m_pressure == 255)
       thickness = m_rasThickness.getValue().first;
 
-    m_track.add(TThickPoint(pos, thickness), getPixelSize() * getPixelSize());
+    m_smoothStroke.beginStroke(m_smooth.getValue());
+    addTrackPoint(TThickPoint(pos, thickness), getPixelSize() * getPixelSize());
   }
 }
 
@@ -992,63 +1184,90 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
        * --*/
       if (!m_pencil.getValue()) thickness -= 1.0;
 
-      isAdded = m_rasterTrack->add(TThickPoint(pos + rasCenter, thickness));
-      if (isAdded) {
-        m_tileSaver->save(m_rasterTrack->getLastRect());
-        m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue());
-        std::vector<TThickPoint> brushPoints =
-            m_rasterTrack->getPointsSequence();
-        int m = (int)brushPoints.size();
-        std::vector<TThickPoint> points;
-        if (m == 3) {
-          points.push_back(brushPoints[0]);
-          points.push_back(brushPoints[1]);
-        } else {
-          points.push_back(brushPoints[m - 4]);
-          points.push_back(brushPoints[m - 3]);
-          points.push_back(brushPoints[m - 2]);
+      TThickPoint thickPoint(pos + rasCenter, thickness);
+      m_smoothStroke.addPoint(thickPoint);
+      std::vector<TThickPoint> pts;
+      m_smoothStroke.getSmoothPoints(pts);
+      for (size_t i = 0; i < pts.size(); ++i) {
+        const TThickPoint &thickPoint = pts[i];
+        isAdded                       = m_rasterTrack->add(thickPoint);
+        if (isAdded) {
+          m_tileSaver->save(m_rasterTrack->getLastRect());
+          m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue());
+          std::vector<TThickPoint> brushPoints =
+              m_rasterTrack->getPointsSequence();
+          int m = (int)brushPoints.size();
+          std::vector<TThickPoint> points;
+          if (m == 3) {
+            points.push_back(brushPoints[0]);
+            points.push_back(brushPoints[1]);
+          } else {
+            points.push_back(brushPoints[m - 4]);
+            points.push_back(brushPoints[m - 3]);
+            points.push_back(brushPoints[m - 2]);
+          }
+          if (i == 0) {
+            invalidateRect =
+                ToolUtils::getBounds(points, maxThickness) - rasCenter;
+          } else {
+            invalidateRect +=
+                ToolUtils::getBounds(points, maxThickness) - rasCenter;
+          }
         }
-        invalidateRect = ToolUtils::getBounds(points, maxThickness) - rasCenter;
       }
     } else {
       // antialiased brush
       assert(m_workRas.getPointer() && m_backupRas.getPointer());
+      TThickPoint thickPoint(pos + rasCenter, thickness);
+      m_smoothStroke.addPoint(thickPoint);
+      std::vector<TThickPoint> pts;
+      m_smoothStroke.getSmoothPoints(pts);
+      bool rectUpdated = false;
+      for (size_t i = 0; i < pts.size(); ++i) {
+        TThickPoint old = m_points.back();
+        if (norm2(pos - old) < 4) continue;
 
-      TThickPoint old = m_points.back();
-      if (norm2(pos - old) < 4) return;
+        const TThickPoint &point = pts[i];
+        TThickPoint mid((old + point) * 0.5, (point.thick + old.thick) * 0.5);
+        m_points.push_back(mid);
+        m_points.push_back(point);
 
-      TThickPoint point(pos + rasCenter, thickness);
-      TThickPoint mid((old + point) * 0.5, (point.thick + old.thick) * 0.5);
-      m_points.push_back(mid);
-      m_points.push_back(point);
+        TRect bbox;
+        int m = (int)m_points.size();
+        std::vector<TThickPoint> points;
+        if (m == 3) {
+          // ho appena cominciato. devo disegnare un segmento
+          TThickPoint pa = m_points.front();
+          points.push_back(pa);
+          points.push_back(mid);
+          bbox = m_bluredBrush->getBoundFromPoints(points);
+          updateWorkAndBackupRasters(bbox + m_lastRect);
+          m_tileSaver->save(bbox);
+          m_bluredBrush->addArc(pa, (mid + pa) * 0.5, mid, 1, 1);
+          m_lastRect += bbox;
+        } else {
+          points.push_back(m_points[m - 4]);
+          points.push_back(old);
+          points.push_back(mid);
+          bbox = m_bluredBrush->getBoundFromPoints(points);
+          updateWorkAndBackupRasters(bbox + m_lastRect);
+          m_tileSaver->save(bbox);
+          m_bluredBrush->addArc(m_points[m - 4], old, mid, 1, 1);
+          m_lastRect += bbox;
+        }
+        if (!rectUpdated) {
+          invalidateRect =
+              ToolUtils::getBounds(points, maxThickness) - rasCenter;
+          rectUpdated = true;
+        } else {
+          invalidateRect +=
+              ToolUtils::getBounds(points, maxThickness) - rasCenter;
+        }
 
-      TRect bbox;
-      int m = (int)m_points.size();
-      std::vector<TThickPoint> points;
-      if (m == 3) {
-        // ho appena cominciato. devo disegnare un segmento
-        TThickPoint pa = m_points.front();
-        points.push_back(pa);
-        points.push_back(mid);
-        bbox = m_bluredBrush->getBoundFromPoints(points);
-        updateWorkAndBackupRasters(bbox + m_lastRect);
-        m_tileSaver->save(bbox);
-        m_bluredBrush->addArc(pa, (mid + pa) * 0.5, mid, 1, 1);
-        m_lastRect += bbox;
-      } else {
-        points.push_back(m_points[m - 4]);
-        points.push_back(old);
-        points.push_back(mid);
-        bbox = m_bluredBrush->getBoundFromPoints(points);
-        updateWorkAndBackupRasters(bbox + m_lastRect);
-        m_tileSaver->save(bbox);
-        m_bluredBrush->addArc(m_points[m - 4], old, mid, 1, 1);
-        m_lastRect += bbox;
+        m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox,
+                                     m_styleId, m_selective.getValue());
+        m_strokeRect += bbox;
       }
-      invalidateRect = ToolUtils::getBounds(points, maxThickness) - rasCenter;
-      m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox,
-                                   m_styleId, m_selective.getValue());
-      m_strokeRect += bbox;
     }
     invalidate(invalidateRect.enlarge(2));
   } else {
@@ -1056,8 +1275,7 @@ void BrushTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
         (m_pressure.getValue() || m_isPath)
             ? computeThickness(e.m_pressure, m_thickness, m_isPath)
             : m_thickness.getValue().second * 0.5;
-    m_track.add(TThickPoint(pos, thickness), getPixelSize() * getPixelSize());
-
+    addTrackPoint(TThickPoint(pos, thickness), getPixelSize() * getPixelSize());
     invalidate();
   }
 }
@@ -1072,7 +1290,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
 
   if (m_isPath) {
     double error = 20.0 * getPixelSize();
-
+    flushTrackPoint();
     TStroke *stroke = m_track.makeStroke(error);
     int points      = stroke->getControlPointCount();
 
@@ -1120,6 +1338,7 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     double error = 30.0 / (1 + 0.5 * m_accuracy.getValue());
     error *= getPixelSize();
 
+    flushTrackPoint();
     TStroke *stroke = m_track.makeStroke(error);
     stroke->setStyle(m_styleId);
     {
@@ -1148,6 +1367,29 @@ void BrushTool::leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
     m_track.clear();
   } else if (TToonzImageP ti = image) {
     finishRasterBrush(pos, e.m_pressure);
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+
+void BrushTool::addTrackPoint(const TThickPoint &point, double pixelSize2) {
+  m_smoothStroke.addPoint(point);
+  std::vector<TThickPoint> pts;
+  m_smoothStroke.getSmoothPoints(pts);
+  for (size_t i = 0; i < pts.size(); ++i) {
+    m_track.add(pts[i], pixelSize2);
+  }
+}
+
+//--------------------------------------------------------------------------------------------------
+
+void BrushTool::flushTrackPoint() {
+  m_smoothStroke.endStroke();
+  std::vector<TThickPoint> pts;
+  m_smoothStroke.getSmoothPoints(pts);
+  double pixelSize2 = getPixelSize() * getPixelSize();
+  for (size_t i = 0; i < pts.size(); ++i) {
+    m_track.add(pts[i], pixelSize2);
   }
 }
 
@@ -1184,27 +1426,42 @@ void BrushTool::finishRasterBrush(const TPointD &pos, int pressureVal) {
     /*-- Pencilモードでなく、Hardness=100 の場合のブラシサイズを1段階下げる --*/
     if (!m_pencil.getValue()) thickness -= 1.0;
 
-    bool isAdded = m_rasterTrack->add(
-        TThickPoint(pos + convert(ti->getRaster()->getCenter()), thickness));
-    if (isAdded) {
-      m_tileSaver->save(m_rasterTrack->getLastRect());
-      m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue(), true);
+    TRectD invalidateRect;
+    TThickPoint thickPoint(pos + rasCenter, thickness);
+    m_smoothStroke.addPoint(thickPoint);
+    m_smoothStroke.endStroke();
+    std::vector<TThickPoint> pts;
+    m_smoothStroke.getSmoothPoints(pts);
+    for (size_t i = 0; i < pts.size(); ++i) {
+      const TThickPoint &thickPoint = pts[i];
+      bool isAdded                  = m_rasterTrack->add(thickPoint);
+      if (isAdded) {
+        m_tileSaver->save(m_rasterTrack->getLastRect());
+        m_rasterTrack->generateLastPieceOfStroke(m_pencil.getValue(), true);
 
-      std::vector<TThickPoint> brushPoints = m_rasterTrack->getPointsSequence();
-      int m                                = (int)brushPoints.size();
-      std::vector<TThickPoint> points;
-      if (m == 3) {
-        points.push_back(brushPoints[0]);
-        points.push_back(brushPoints[1]);
-      } else {
-        points.push_back(brushPoints[m - 4]);
-        points.push_back(brushPoints[m - 3]);
-        points.push_back(brushPoints[m - 2]);
+        std::vector<TThickPoint> brushPoints =
+            m_rasterTrack->getPointsSequence();
+        int m = (int)brushPoints.size();
+        std::vector<TThickPoint> points;
+        if (m == 3) {
+          points.push_back(brushPoints[0]);
+          points.push_back(brushPoints[1]);
+        } else {
+          points.push_back(brushPoints[m - 4]);
+          points.push_back(brushPoints[m - 3]);
+          points.push_back(brushPoints[m - 2]);
+        }
+        int maxThickness = m_rasThickness.getValue().second;
+        if (i == 0) {
+          invalidateRect =
+              ToolUtils::getBounds(points, maxThickness) - rasCenter;
+        } else {
+          invalidateRect +=
+              ToolUtils::getBounds(points, maxThickness) - rasCenter;
+        }
       }
-      int maxThickness = m_rasThickness.getValue().second;
-      invalidate(ToolUtils::getBounds(points, maxThickness).enlarge(2) -
-                 rasCenter);
     }
+    invalidate(invalidateRect.enlarge(2));
 
     if (m_tileSet->getTileCount() > 0) {
       TUndoManager::manager()->add(new RasterBrushUndo(
@@ -1223,22 +1480,84 @@ void BrushTool::finishRasterBrush(const TPointD &pos, int pressureVal) {
               ? computeThickness(pressureVal, m_rasThickness, m_isPath)
               : maxThickness;
       TPointD rasCenter = ti->getRaster()->getCenterD();
-      TThickPoint point(pos + rasCenter, thickness);
-      m_points.push_back(point);
-      int m = m_points.size();
-      std::vector<TThickPoint> points;
-      points.push_back(m_points[m - 3]);
-      points.push_back(m_points[m - 2]);
-      points.push_back(m_points[m - 1]);
-      TRect bbox = m_bluredBrush->getBoundFromPoints(points);
-      updateWorkAndBackupRasters(bbox);
-      m_tileSaver->save(bbox);
-      m_bluredBrush->addArc(points[0], points[1], points[2], 1, 1);
-      m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox,
-                                   m_styleId, m_selective.getValue());
-      TRectD invalidateRect = ToolUtils::getBounds(points, maxThickness);
-      invalidate(invalidateRect.enlarge(2) - rasCenter);
-      m_strokeRect += bbox;
+      TRectD invalidateRect;
+      bool rectUpdated = false;
+      TThickPoint thickPoint(pos + rasCenter, thickness);
+      m_smoothStroke.addPoint(thickPoint);
+      m_smoothStroke.endStroke();
+      std::vector<TThickPoint> pts;
+      m_smoothStroke.getSmoothPoints(pts);
+      for (size_t i = 0; i < pts.size() - 1; ++i) {
+        TThickPoint old = m_points.back();
+        if (norm2(pos - old) < 4) continue;
+
+        const TThickPoint &point = pts[i];
+        TThickPoint mid((old + point) * 0.5, (point.thick + old.thick) * 0.5);
+        m_points.push_back(mid);
+        m_points.push_back(point);
+
+        TRect bbox;
+        int m = (int)m_points.size();
+        std::vector<TThickPoint> points;
+        if (m == 3) {
+          // ho appena cominciato. devo disegnare un segmento
+          TThickPoint pa = m_points.front();
+          points.push_back(pa);
+          points.push_back(mid);
+          bbox = m_bluredBrush->getBoundFromPoints(points);
+          updateWorkAndBackupRasters(bbox + m_lastRect);
+          m_tileSaver->save(bbox);
+          m_bluredBrush->addArc(pa, (mid + pa) * 0.5, mid, 1, 1);
+          m_lastRect += bbox;
+        } else {
+          points.push_back(m_points[m - 4]);
+          points.push_back(old);
+          points.push_back(mid);
+          bbox = m_bluredBrush->getBoundFromPoints(points);
+          updateWorkAndBackupRasters(bbox + m_lastRect);
+          m_tileSaver->save(bbox);
+          m_bluredBrush->addArc(m_points[m - 4], old, mid, 1, 1);
+          m_lastRect += bbox;
+        }
+        if (!rectUpdated) {
+          invalidateRect =
+              ToolUtils::getBounds(points, maxThickness) - rasCenter;
+          rectUpdated = true;
+        } else {
+          invalidateRect +=
+              ToolUtils::getBounds(points, maxThickness) - rasCenter;
+        }
+
+        m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox,
+                                     m_styleId, m_selective.getValue());
+        m_strokeRect += bbox;
+      }
+      if (pts.size() > 0) {
+        TThickPoint point = pts.back();
+        m_points.push_back(point);
+        int m = m_points.size();
+        std::vector<TThickPoint> points;
+        points.push_back(m_points[m - 3]);
+        points.push_back(m_points[m - 2]);
+        points.push_back(m_points[m - 1]);
+        TRect bbox = m_bluredBrush->getBoundFromPoints(points);
+        updateWorkAndBackupRasters(bbox);
+        m_tileSaver->save(bbox);
+        m_bluredBrush->addArc(points[0], points[1], points[2], 1, 1);
+        m_bluredBrush->updateDrawing(ti->getRaster(), m_backupRas, bbox,
+                                     m_styleId, m_selective.getValue());
+
+        if (!rectUpdated) {
+          invalidateRect =
+              ToolUtils::getBounds(points, maxThickness) - rasCenter;
+        } else {
+          invalidateRect +=
+              ToolUtils::getBounds(points, maxThickness) - rasCenter;
+        }
+        m_lastRect += bbox;
+        m_strokeRect += bbox;
+      }
+      invalidate(invalidateRect.enlarge(2));
       m_lastRect.empty();
     }
     delete m_bluredBrush;
@@ -1476,6 +1795,8 @@ bool BrushTool::onPropertyChanged(std::string propertyName) {
     }
   } else if (propertyName == m_accuracy.getName()) {
     BrushAccuracy = m_accuracy.getValue();
+  } else if (propertyName == m_smooth.getName()) {
+    BrushSmooth = m_smooth.getValue();
   } else if (propertyName == m_preset.getName()) {
     loadPreset();
     notifyTool = true;
@@ -1560,6 +1881,7 @@ void BrushTool::loadPreset() {
       m_thickness.setValue(
           TDoublePairProperty::Value(preset.m_min, preset.m_max));
       m_accuracy.setValue(preset.m_acc, true);
+      m_smooth.setValue(preset.m_smooth, true);
       m_breakAngles.setValue(preset.m_breakAngles);
       m_pressure.setValue(preset.m_pressure);
       m_capStyle.setIndex(preset.m_cap);
@@ -1570,6 +1892,7 @@ void BrushTool::loadPreset() {
           std::max(preset.m_min, 1.0), preset.m_max));
       m_brushPad =
           ToolUtils::getBrushPad(preset.m_max, preset.m_hardness * 0.01);
+      m_smooth.setValue(preset.m_smooth, true);
       m_hardness.setValue(preset.m_hardness, true);
       m_selective.setValue(preset.m_selective);
       m_pencil.setValue(preset.m_pencil);
@@ -1594,6 +1917,7 @@ void BrushTool::addPreset(QString name) {
   }
 
   preset.m_acc         = m_accuracy.getValue();
+  preset.m_smooth      = m_smooth.getValue();
   preset.m_hardness    = m_hardness.getValue();
   preset.m_selective   = m_selective.getValue();
   preset.m_pencil      = m_pencil.getValue();
@@ -1649,6 +1973,7 @@ BrushData::BrushData()
     , m_min(0.0)
     , m_max(0.0)
     , m_acc(0.0)
+    , m_smooth(0.0)
     , m_hardness(0.0)
     , m_opacityMin(0.0)
     , m_opacityMax(0.0)
@@ -1667,6 +1992,7 @@ BrushData::BrushData(const std::wstring &name)
     , m_min(0.0)
     , m_max(0.0)
     , m_acc(0.0)
+    , m_smooth(0.0)
     , m_hardness(0.0)
     , m_opacityMin(0.0)
     , m_opacityMax(0.0)
@@ -1689,6 +2015,9 @@ void BrushData::saveData(TOStream &os) {
   os.closeChild();
   os.openChild("Accuracy");
   os << m_acc;
+  os.closeChild();
+  os.openChild("Smooth");
+  os << m_smooth;
   os.closeChild();
   os.openChild("Hardness");
   os << m_hardness;
@@ -1732,6 +2061,8 @@ void BrushData::loadData(TIStream &is) {
       is >> m_min >> m_max, is.matchEndTag();
     else if (tagName == "Accuracy")
       is >> m_acc, is.matchEndTag();
+    else if (tagName == "Smooth")
+      is >> m_smooth, is.matchEndTag();
     else if (tagName == "Hardness")
       is >> m_hardness, is.matchEndTag();
     else if (tagName == "Opacity")

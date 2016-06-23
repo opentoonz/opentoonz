@@ -195,7 +195,7 @@ void StudioPaletteTreeViewer::setStdPaletteHandle(
 
 QTreeWidgetItem *StudioPaletteTreeViewer::createRootItem(TFilePath path) {
   QString rootName = QString::fromStdWString(path.getWideName());
-  if (rootName != "Toonz Palettes") rootName = "Project Palettes";
+  if (rootName != "Global Palettes") rootName = "Project Palettes";
   QTreeWidgetItem *rootItem =
       new QTreeWidgetItem((QTreeWidget *)0, QStringList(rootName));
   rootItem->setIcon(0, m_folderIcon);
