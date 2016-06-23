@@ -695,6 +695,22 @@ What do you want to do?</source>
         <translation>Störungen entfernen:</translation>
     </message>
     <message>
+        <source>Save In</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Please fill the Save In field.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cleanup Settings (Global)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cleanup Settings: </source>
+        <translation> </translation>
+    </message>
+    <message>
         <source>Cleanup Settings</source>
         <translation>Säuberungs-Einstellungen</translation>
     </message>
@@ -796,6 +812,30 @@ What do you want to do?</source>
 </context>
 <context>
     <name>ComboViewerPanel</name>
+    <message>
+        <source>Safe Area (Right Click to Select)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Field Guide</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera Stand View</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>3D View</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera View</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Freeze</source>
+        <translation></translation>
+    </message>
     <message>
         <source>GUI Show / Hide</source>
         <translation>GUI anzeigen/verbergen</translation>
@@ -1295,6 +1335,22 @@ What do you want to do?</source>
         <source>Export File List</source>
         <translation>Dateiliste exportieren</translation>
     </message>
+    <message>
+        <source>Up</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Icon</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>List</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>DvItemViewerPanel</name>
@@ -1610,6 +1666,10 @@ What do you want to do?</source>
 <context>
     <name>FileBrowser</name>
     <message>
+        <source>Folder: </source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Can&apos;t change file extension</source>
         <translation>Die Dateiendung kann nicht geändert werden</translation>
     </message>
@@ -1799,6 +1859,10 @@ What do you want to do?</source>
     <message>
         <source>OK</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder name:</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2838,6 +2902,10 @@ Möchten Sie einen erstellen?</translation>
         <translation>Palette speichern (&amp;S)...</translation>
     </message>
     <message>
+        <source>&amp;Save Palette</source>
+        <translation>.</translation>
+    </message>
+    <message>
         <source>&amp;Load Color Model...</source>
         <translation>Farbmodell importieren (&amp;L)...</translation>
     </message>
@@ -3250,6 +3318,22 @@ Möchten Sie einen erstellen?</translation>
         <translation>Clonen (&amp;C)</translation>
     </message>
     <message>
+        <source>Drawing Substitution Forward</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Drawing Substitution Backward</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Similar Drawing Substitution Forward</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Similar Drawing Substitution Backward</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>&amp;Set Key</source>
         <translation>Key setzen (&amp;S)</translation>
     </message>
@@ -3412,6 +3496,10 @@ Möchten Sie einen erstellen?</translation>
     <message>
         <source>&amp;Schematic</source>
         <translation>Schaubild (&amp;S)</translation>
+    </message>
+    <message>
+        <source>Toggle FX/Stage schematic</source>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Scene Cast</source>
@@ -3658,6 +3746,14 @@ Möchten Sie einen erstellen?</translation>
         <translation>Füll-Tool</translation>
     </message>
     <message>
+        <source>Fill Tool - Areas</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Fill Tool - Lines</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Paint Brush Tool</source>
         <translation>Farbpinsel-Tool</translation>
     </message>
@@ -3672,6 +3768,14 @@ Möchten Sie einen erstellen?</translation>
     <message>
         <source>Style Picker Tool</source>
         <translation>Stil-Auswahl-Tool</translation>
+    </message>
+    <message>
+        <source>Style Picker Tool - Areas</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Style Picker Tool - Lines</source>
+        <translation></translation>
     </message>
     <message>
         <source>RGB Picker Tool</source>
@@ -3908,6 +4012,30 @@ Möchten Sie einen erstellen?</translation>
     <message>
         <source>TypeTool Style</source>
         <translation>Stil für Schreib-Tool</translation>
+    </message>
+    <message>
+        <source>Active Axis</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Position</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Rotation</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Scale</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Shear</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Center</source>
+        <translation></translation>
     </message>
     <message>
         <source>Build Skeleton Mode</source>
@@ -4284,6 +4412,10 @@ Möchten Sie einen erstellen?</translation>
     <message>
         <source>Swap Lock/Unlock</source>
         <translation>Sperre umschalten</translation>
+    </message>
+    <message>
+        <source>Hide Upper Columns</source>
+        <translation></translation>
     </message>
     <message>
         <source>Ruler Tool</source>
@@ -5344,6 +5476,19 @@ Do you want to overwrite it?</source>
         <source>Default Level Type:</source>
         <translation>Standard Ebenen-Format:</translation>
     </message>
+    <message>
+        <source>Toonz Vector Level</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Toonz Raster Level</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Raster Level</source>
+        <translation></translation>
+    </message>
+
     <message>
         <source>Autocreation:</source>
         <translation>Automatisches Erstellen:</translation>
@@ -8504,9 +8649,21 @@ Bitte tragen Sie die Änderungen ein oder setzen sie zurück.</translation>
         <source>Regenerate Frame Preview</source>
         <translation>Vorschau neu berechnen（nur aktueller Frame）</translation>
     </message>
+   <message>
+        <source>Select </source>
+        <translation></translation>
+    </message>
     <message>
-        <source>Select</source>
-        <translation type="vanished">Wählen</translation>
+        <source>Show </source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Hide </source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Show / Hide</source>
+        <translation></translation>
     </message>
     <message>
         <source>Reset Subcamera</source>
