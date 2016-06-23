@@ -63,6 +63,11 @@ public:
   }
 
   ToolType getToolType() const override { return TTool::LevelReadTool; }
+  
+  void StylePickerTool::updateTranslation() {
+    m_colorType.setQStringName(tr("Mode:"));
+    m_passivePick.setQStringName(tr("Passive Pick"));
+  }
 
   void draw() override {}
 
