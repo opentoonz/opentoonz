@@ -814,6 +814,24 @@ Do you want to proceed?</source>
     </message>
 </context>
 <context>
+    <name>RotateTool</name>
+    <message>
+        <source>Rotate On Camera Center</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>StylePickerTool</name>
+    <message>
+        <source>Type:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Passive Pick</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>RGBPickerTool</name>
     <message>
         <source>Type:</source>
@@ -996,6 +1014,10 @@ Do you want to proceed?</source>
     <message>
         <source>Join Vectors</source>
         <translation>Unir vectores</translation>
+    </message>
+    <message>
+        <source>Distance</source>
+        <translation></translation>
     </message>
     <message>
         <source>Mode:</source>
