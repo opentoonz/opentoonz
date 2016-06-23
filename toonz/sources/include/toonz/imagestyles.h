@@ -92,10 +92,10 @@ private:
   TPixel32 m_averageColor;
 
 protected:
-  void makeIcon(const TDimension &d);
+  void makeIcon(const TDimension &d) override;
 
-  virtual void loadData(TInputStreamInterface &);
-  virtual void saveData(TOutputStreamInterface &) const;
+  void loadData(TInputStreamInterface &) override;
+  void saveData(TOutputStreamInterface &) const override;
 
 public:
   // TTextureStyle();
@@ -105,69 +105,71 @@ public:
 
   ~TTextureStyle();
 
-  int getParamCount() const;
-  TColorStyle::ParamType getParamType(int index) const;
-  QString getParamNames(int index) const;
-  void getParamRange(int index, double &min, double &max) const;
-  double getParamValue(TColorStyle::double_tag, int index) const;
+  int getParamCount() const override;
+  TColorStyle::ParamType getParamType(int index) const override;
+  QString getParamNames(int index) const override;
+  void getParamRange(int index, double &min, double &max) const override;
+  double getParamValue(TColorStyle::double_tag, int index) const override;
 
-  void getParamRange(int index, QStringList &enumItems) const;
-  bool getParamValue(TColorStyle::bool_tag, int index) const;
-  int getParamValue(TColorStyle::int_tag, int index) const;
-  TFilePath getParamValue(TColorStyle::TFilePath_tag, int index) const;
+  void getParamRange(int index, QStringList &enumItems) const override;
+  bool getParamValue(TColorStyle::bool_tag, int index) const override;
+  int getParamValue(TColorStyle::int_tag, int index) const override;
+  TFilePath getParamValue(TColorStyle::TFilePath_tag, int index) const override;
   bool isPattern() const { return m_params.m_isPattern; }
   static void fillCustomTextureIcon(const TRaster32P &r);
 
   //-------------------------------------------------------------------
 
-  void setParamValue(int index, const TFilePath &value);
-  void setParamValue(int index, double value);
-  void setParamValue(int index, bool value);
-  void setParamValue(int index, int value);
+  void setParamValue(int index, const TFilePath &value) override;
+  void setParamValue(int index, double value) override;
+  void setParamValue(int index, bool value) override;
+  void setParamValue(int index, int value) override;
 
-  int getColorParamCount() const;
-  TPixel32 getColorParamValue(int index) const;
-  void setColorParamValue(int index, const TPixel32 &color);
+  int getColorParamCount() const override;
+  TPixel32 getColorParamValue(int index) const override;
+  void setColorParamValue(int index, const TPixel32 &color) override;
 
-  TColorStyle *clone() const;
-  QString getDescription() const;
+  TColorStyle *clone() const override;
+  QString getDescription() const override;
 
-  bool hasMainColor() const { return true; }
-  TPixel32 getMainColor() const { return m_averageColor; }
-  void setMainColor(const TPixel32 &color) { m_params.m_patternColor = color; }
+  bool hasMainColor() const override { return true; }
+  TPixel32 getMainColor() const override { return m_averageColor; }
+  void setMainColor(const TPixel32 &color) override {
+    m_params.m_patternColor = color;
+  }
 
   // void draw(const TVectorRenderData &rd,  TStrokeOutline* outline) const;
   void drawRegion(const TColorFunction *cf, const bool antiAliasing,
-                  TRegionOutline &outline) const;
+                  TRegionOutline &outline) const override;
   // void drawRegion( const TVectorRenderData &rd, TRegionOutline &boundary )
   // const;
-  void drawRegion(TFlash &flash, const TRegion *r) const;
+  void drawRegion(TFlash &flash, const TRegion *r) const override;
   void drawStroke(const TColorFunction *cf, TStrokeOutline *outline,
-                  const TStroke *stroke) const;
+                  const TStroke *stroke) const override;
   // void drawStroke(TFlash& flash, const TStroke* s) const;
 
-  TRasterStyleFx *getRasterStyleFx() { return this; }
+  TRasterStyleFx *getRasterStyleFx() override { return this; }
 
-  bool isRasterStyle() const { return true; }
+  bool isRasterStyle() const override { return true; }
 
   void computeOutline(const TStroke *stroke, TStrokeOutline &outline,
-                      TOutlineUtil::OutlineParameter param) const;
+                      TOutlineUtil::OutlineParameter param) const override;
 
   void setTexture(const TRasterP &color);
   TRasterP getTexture() const;
 
-  TPixel32 getAverageColor() const;
+  TPixel32 getAverageColor() const override;
 
-  int getTagId() const;
+  int getTagId() const override;
 
   // static TRaster32P loadTexture(const TFilePath &path);
-  void setFill(TFlash &flash) const;
+  void setFill(TFlash &flash) const override;
 
-  bool isPaintStyle() const { return true; }
-  bool isInkStyle() const { return true; }
-  bool inkFxNeedRGBMRaster() const { return true; }
+  bool isPaintStyle() const override { return true; }
+  bool isInkStyle() const override { return true; }
+  bool inkFxNeedRGBMRaster() const override { return true; }
 
-  bool compute(const Params &params) const {
+  bool compute(const Params &params) const override {
     return doCompute(params);
   }  // faccio questo per compilare su mac! le virtuali pubbliche devono essere
      // inline

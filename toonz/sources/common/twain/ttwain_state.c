@@ -709,7 +709,8 @@ static void myHackFunction(int v) {
   }
 }
 #else
-static void myHackFunction(int v) { /*it's empty...*/ }
+static void myHackFunction(int v) { /*it's empty...*/
+}
 #endif
 /*---------------------------------------------------------------------------*/
 int TTWAIN_AcquireMemory(void *hwnd) {

@@ -26,23 +26,23 @@ class CastTreeViewer : public QTreeWidget, public TSelection {
 
 public:
   CastTreeViewer(QWidget *parent = 0);
-  QSize sizeHint() const;
+  QSize sizeHint() const override;
 
   TFilePath getCurrentFolder() const;
   static TLevelSet *getLevelSet();
 
   // da TSelection
-  bool isEmpty() const { return false; }
-  void selectNone() {}
-  void enableCommands();
+  bool isEmpty() const override { return false; }
+  void selectNone() override {}
+  void enableCommands() override;
 
 protected:
-  void paintEvent(QPaintEvent *);
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dragMoveEvent(QDragMoveEvent *event);
-  void dropEvent(QDropEvent *event);
-  void dragLeaveEvent(QDragLeaveEvent *event);
-  void resizeEvent(QResizeEvent *);
+  void paintEvent(QPaintEvent *) override;
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dragMoveEvent(QDragMoveEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
+  void dragLeaveEvent(QDragLeaveEvent *event) override;
+  void resizeEvent(QResizeEvent *) override;
 
 public slots:
   void onItemChanged(QTreeWidgetItem *item, int column);
@@ -87,15 +87,16 @@ public:
 
   CastItems const &getCastItems() const { return *m_castItems; }
 
-  void sortByDataModel(DataType dataType, bool isDiscendent);
+  void sortByDataModel(DataType dataType, bool isDiscendent) override;
 
-  int getItemCount() const;
-  void refreshData();
-  QVariant getItemData(int index, DataType dataType, bool isSelected = false);
-  QMenu *getContextMenu(QWidget *parent, int index);
-  void startDragDrop();
-  bool acceptDrop(const QMimeData *data) const;
-  bool drop(const QMimeData *data);
+  int getItemCount() const override;
+  void refreshData() override;
+  QVariant getItemData(int index, DataType dataType,
+                       bool isSelected = false) override;
+  QMenu *getContextMenu(QWidget *parent, int index) override;
+  void startDragDrop() override;
+  bool acceptDrop(const QMimeData *data) const override;
+  bool drop(const QMimeData *data) override;
 
   void expose();
   void edit();

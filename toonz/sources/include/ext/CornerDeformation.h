@@ -32,13 +32,13 @@ class DVAPI CornerDeformation : public StrokeDeformationImpl {
 public:
   virtual ~CornerDeformation();
 
-  bool check_(const ContextStatus *status);
+  bool check_(const ContextStatus *status) override;
 
-  bool findExtremes_(const ContextStatus *, Interval &);
+  bool findExtremes_(const ContextStatus *, Interval &) override;
 
-  double findActionLength();
+  double findActionLength() override;
 
-  virtual void draw(Designer *);
+  void draw(Designer *) override;
 
   static CornerDeformation *instance();
 };

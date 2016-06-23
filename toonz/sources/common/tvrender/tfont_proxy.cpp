@@ -1,6 +1,6 @@
 
 
-#ifdef __LP64__
+#if defined(__LP64__) && !defined(LINUX)
 
 // Toonz includes
 #include "tvectorimage.h"

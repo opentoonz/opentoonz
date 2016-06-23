@@ -21,7 +21,7 @@ public:
 
   TKeyframeSelection() {}
 
-  void enableCommands();
+  void enableCommands() override;
 /* FIXME: clang
  * でテンポラリオブジェクトをアドレッシングしたとエラーになっていたので参照を返すようにしたが、元の意図が不明なので注意
  */
@@ -39,7 +39,7 @@ public:
 
   void clear() { m_positions.clear(); }
 
-  void selectNone() { m_positions.clear(); }
+  void selectNone() override { m_positions.clear(); }
 
   void select(int row, int col) {
     m_positions.insert(std::make_pair(row, col));
@@ -53,7 +53,7 @@ public:
     return m_positions.find(std::make_pair(row, col)) != m_positions.end();
   }
 
-  bool isEmpty() const { return m_positions.empty(); }
+  bool isEmpty() const override { return m_positions.empty(); }
 
   TSelection *clone() const { return new TKeyframeSelection(m_positions); }
 

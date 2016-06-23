@@ -425,14 +425,14 @@ public:
 
   ~TSoundTrackResample(){};
 
-  TSoundTrackP compute(const TSoundTrackMono8Signed &src) {
+  TSoundTrackP compute(const TSoundTrackMono8Signed &src) override {
     TSoundTrackMono8Signed *dst = resampleT(
         const_cast<TSoundTrackMono8Signed &>(src), m_sampleRate, m_filterType);
 
     return TSoundTrackP(dst);
   }
 
-  TSoundTrackP compute(const TSoundTrackMono8Unsigned &src) {
+  TSoundTrackP compute(const TSoundTrackMono8Unsigned &src) override {
     TSoundTrackMono8Unsigned *dst =
         resampleT(const_cast<TSoundTrackMono8Unsigned &>(src), m_sampleRate,
                   m_filterType);
@@ -440,7 +440,7 @@ public:
     return TSoundTrackP(dst);
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo8Signed &src) {
+  TSoundTrackP compute(const TSoundTrackStereo8Signed &src) override {
     TSoundTrackStereo8Signed *dst =
         resampleT(const_cast<TSoundTrackStereo8Signed &>(src), m_sampleRate,
                   m_filterType);
@@ -448,7 +448,7 @@ public:
     return TSoundTrackP(dst);
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &src) {
+  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &src) override {
     TSoundTrackStereo8Unsigned *dst =
         resampleT(const_cast<TSoundTrackStereo8Unsigned &>(src), m_sampleRate,
                   m_filterType);
@@ -456,28 +456,28 @@ public:
     return TSoundTrackP(dst);
   }
 
-  TSoundTrackP compute(const TSoundTrackMono16 &src) {
+  TSoundTrackP compute(const TSoundTrackMono16 &src) override {
     TSoundTrackMono16 *dst = resampleT(const_cast<TSoundTrackMono16 &>(src),
                                        m_sampleRate, m_filterType);
 
     return TSoundTrackP(dst);
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo16 &src) {
+  TSoundTrackP compute(const TSoundTrackStereo16 &src) override {
     TSoundTrackStereo16 *dst = resampleT(const_cast<TSoundTrackStereo16 &>(src),
                                          m_sampleRate, m_filterType);
 
     return TSoundTrackP(dst);
   }
 
-  TSoundTrackP compute(const TSoundTrackMono24 &src) {
+  TSoundTrackP compute(const TSoundTrackMono24 &src) override {
     TSoundTrackMono24 *dst = resampleT(const_cast<TSoundTrackMono24 &>(src),
                                        m_sampleRate, m_filterType);
 
     return TSoundTrackP(dst);
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo24 &src) {
+  TSoundTrackP compute(const TSoundTrackStereo24 &src) override {
     TSoundTrackStereo24 *dst = resampleT(const_cast<TSoundTrackStereo24 &>(src),
                                          m_sampleRate, m_filterType);
 
@@ -573,34 +573,34 @@ public:
 
   ~TSoundTrackConverterWithoutResampling(){};
 
-  TSoundTrackP compute(const TSoundTrackMono8Signed &src) {
+  TSoundTrackP compute(const TSoundTrackMono8Signed &src) override {
     return doConvertWithoutResamplingT(&src, m_format);
   }
 
-  TSoundTrackP compute(const TSoundTrackMono8Unsigned &src) {
+  TSoundTrackP compute(const TSoundTrackMono8Unsigned &src) override {
     return doConvertWithoutResamplingT(&src, m_format);
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo8Signed &src) {
+  TSoundTrackP compute(const TSoundTrackStereo8Signed &src) override {
     return doConvertWithoutResamplingT(&src, m_format);
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &src) {
+  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &src) override {
     return doConvertWithoutResamplingT(&src, m_format);
   }
 
-  TSoundTrackP compute(const TSoundTrackMono16 &src) {
+  TSoundTrackP compute(const TSoundTrackMono16 &src) override {
     return doConvertWithoutResamplingT(&src, m_format);
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo16 &src) {
+  TSoundTrackP compute(const TSoundTrackStereo16 &src) override {
     return doConvertWithoutResamplingT(&src, m_format);
   }
-  TSoundTrackP compute(const TSoundTrackMono24 &src) {
+  TSoundTrackP compute(const TSoundTrackMono24 &src) override {
     return doConvertWithoutResamplingT(&src, m_format);
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo24 &src) {
+  TSoundTrackP compute(const TSoundTrackStereo24 &src) override {
     return doConvertWithoutResamplingT(&src, m_format);
   }
 };
@@ -805,42 +805,42 @@ public:
 
   ~TSoundReverb() {}
 
-  virtual TSoundTrackP compute(const TSoundTrackMono8Signed &src) {
+  TSoundTrackP compute(const TSoundTrackMono8Signed &src) override {
     return doReverb(const_cast<TSoundTrackMono8Signed *>(&src), m_delayTime,
                     m_decayFactor, m_extendTime);
   }
 
-  virtual TSoundTrackP compute(const TSoundTrackMono8Unsigned &src) {
+  TSoundTrackP compute(const TSoundTrackMono8Unsigned &src) override {
     return doReverb(const_cast<TSoundTrackMono8Unsigned *>(&src), m_delayTime,
                     m_decayFactor, m_extendTime);
   }
 
-  virtual TSoundTrackP compute(const TSoundTrackStereo8Signed &src) {
+  TSoundTrackP compute(const TSoundTrackStereo8Signed &src) override {
     return doReverb(const_cast<TSoundTrackStereo8Signed *>(&src), m_delayTime,
                     m_decayFactor, m_extendTime);
   }
 
-  virtual TSoundTrackP compute(const TSoundTrackStereo8Unsigned &src) {
+  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &src) override {
     return doReverb(const_cast<TSoundTrackStereo8Unsigned *>(&src), m_delayTime,
                     m_decayFactor, m_extendTime);
   }
 
-  virtual TSoundTrackP compute(const TSoundTrackMono16 &src) {
+  TSoundTrackP compute(const TSoundTrackMono16 &src) override {
     return doReverb(const_cast<TSoundTrackMono16 *>(&src), m_delayTime,
                     m_decayFactor, m_extendTime);
   }
 
-  virtual TSoundTrackP compute(const TSoundTrackStereo16 &src) {
+  TSoundTrackP compute(const TSoundTrackStereo16 &src) override {
     return doReverb(const_cast<TSoundTrackStereo16 *>(&src), m_delayTime,
                     m_decayFactor, m_extendTime);
   }
 
-  virtual TSoundTrackP compute(const TSoundTrackMono24 &src) {
+  TSoundTrackP compute(const TSoundTrackMono24 &src) override {
     return doReverb(const_cast<TSoundTrackMono24 *>(&src), m_delayTime,
                     m_decayFactor, m_extendTime);
   }
 
-  virtual TSoundTrackP compute(const TSoundTrackStereo24 &src) {
+  TSoundTrackP compute(const TSoundTrackStereo24 &src) override {
     return doReverb(const_cast<TSoundTrackStereo24 *>(&src), m_delayTime,
                     m_decayFactor, m_extendTime);
   }
@@ -912,42 +912,42 @@ public:
 
   ~TSoundGate() {}
 
-  TSoundTrackP compute(const TSoundTrackMono8Signed &src) {
+  TSoundTrackP compute(const TSoundTrackMono8Signed &src) override {
     return doGate(const_cast<TSoundTrackMono8Signed *>(&src), m_threshold,
                   m_holdTime, m_releaseTime);
   }
 
-  TSoundTrackP compute(const TSoundTrackMono8Unsigned &src) {
+  TSoundTrackP compute(const TSoundTrackMono8Unsigned &src) override {
     return doGate(const_cast<TSoundTrackMono8Unsigned *>(&src), m_threshold,
                   m_holdTime, m_releaseTime);
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo8Signed &src) {
+  TSoundTrackP compute(const TSoundTrackStereo8Signed &src) override {
     return doGate(const_cast<TSoundTrackStereo8Signed *>(&src), m_threshold,
                   m_holdTime, m_releaseTime);
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &src) {
+  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &src) override {
     return doGate(const_cast<TSoundTrackStereo8Unsigned *>(&src), m_threshold,
                   m_holdTime, m_releaseTime);
   }
 
-  TSoundTrackP compute(const TSoundTrackMono16 &src) {
+  TSoundTrackP compute(const TSoundTrackMono16 &src) override {
     return doGate(const_cast<TSoundTrackMono16 *>(&src), m_threshold,
                   m_holdTime, m_releaseTime);
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo16 &src) {
+  TSoundTrackP compute(const TSoundTrackStereo16 &src) override {
     return doGate(const_cast<TSoundTrackStereo16 *>(&src), m_threshold,
                   m_holdTime, m_releaseTime);
   }
 
-  TSoundTrackP compute(const TSoundTrackMono24 &src) {
+  TSoundTrackP compute(const TSoundTrackMono24 &src) override {
     return doGate(const_cast<TSoundTrackMono24 *>(&src), m_threshold,
                   m_holdTime, m_releaseTime);
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo24 &src) {
+  TSoundTrackP compute(const TSoundTrackStereo24 &src) override {
     return doGate(const_cast<TSoundTrackStereo24 *>(&src), m_threshold,
                   m_holdTime, m_releaseTime);
   }
@@ -1230,7 +1230,7 @@ public:
 
   ~TSoundTrackMixer(){};
 
-  TSoundTrackP compute(const TSoundTrackMono8Signed &src) {
+  TSoundTrackP compute(const TSoundTrackMono8Signed &src) override {
     assert(src.getFormat() == m_sndtrack->getFormat());
 
     return (
@@ -1239,7 +1239,7 @@ public:
              m_alpha2));
   }
 
-  TSoundTrackP compute(const TSoundTrackMono8Unsigned &src) {
+  TSoundTrackP compute(const TSoundTrackMono8Unsigned &src) override {
     assert(src.getFormat() == m_sndtrack->getFormat());
 
     return (
@@ -1248,7 +1248,7 @@ public:
              m_alpha2));
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo8Signed &src) {
+  TSoundTrackP compute(const TSoundTrackStereo8Signed &src) override {
     assert(src.getFormat() == m_sndtrack->getFormat());
 
     return (
@@ -1257,7 +1257,7 @@ public:
              m_alpha2));
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &src) {
+  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &src) override {
     assert(src.getFormat() == m_sndtrack->getFormat());
 
     return (mixT(
@@ -1266,7 +1266,7 @@ public:
         m_alpha2));
   }
 
-  TSoundTrackP compute(const TSoundTrackMono16 &src) {
+  TSoundTrackP compute(const TSoundTrackMono16 &src) override {
     assert(src.getFormat() == m_sndtrack->getFormat());
 
     return (mixT(const_cast<TSoundTrackMono16 *>(&src), m_alpha1,
@@ -1274,7 +1274,7 @@ public:
                  m_alpha2));
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo16 &src) {
+  TSoundTrackP compute(const TSoundTrackStereo16 &src) override {
     assert(src.getFormat() == m_sndtrack->getFormat());
 
     return (mixT(const_cast<TSoundTrackStereo16 *>(&src), m_alpha1,
@@ -1282,7 +1282,7 @@ public:
                  m_alpha2));
   }
 
-  TSoundTrackP compute(const TSoundTrackMono24 &src) {
+  TSoundTrackP compute(const TSoundTrackMono24 &src) override {
     assert(src.getFormat() == m_sndtrack->getFormat());
 
     return (mixT(const_cast<TSoundTrackMono24 *>(&src), m_alpha1,
@@ -1290,7 +1290,7 @@ public:
                  m_alpha2));
   }
 
-  TSoundTrackP compute(const TSoundTrackStereo24 &src) {
+  TSoundTrackP compute(const TSoundTrackStereo24 &src) override {
     assert(src.getFormat() == m_sndtrack->getFormat());
 
     return (mixT(const_cast<TSoundTrackStereo24 *>(&src), m_alpha1,
@@ -1365,14 +1365,14 @@ public:
   TSoundTrackFaderIn(double riseFactor)
       : TSoundTransform(), m_riseFactor(riseFactor) {}
 
-  TSoundTrackP compute(const TSoundTrackMono8Signed &);
-  TSoundTrackP compute(const TSoundTrackStereo8Signed &);
-  TSoundTrackP compute(const TSoundTrackMono8Unsigned &);
-  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &);
-  TSoundTrackP compute(const TSoundTrackMono16 &);
-  TSoundTrackP compute(const TSoundTrackStereo16 &);
-  TSoundTrackP compute(const TSoundTrackMono24 &);
-  TSoundTrackP compute(const TSoundTrackStereo24 &);
+  TSoundTrackP compute(const TSoundTrackMono8Signed &) override;
+  TSoundTrackP compute(const TSoundTrackStereo8Signed &) override;
+  TSoundTrackP compute(const TSoundTrackMono8Unsigned &) override;
+  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &) override;
+  TSoundTrackP compute(const TSoundTrackMono16 &) override;
+  TSoundTrackP compute(const TSoundTrackStereo16 &) override;
+  TSoundTrackP compute(const TSoundTrackMono24 &) override;
+  TSoundTrackP compute(const TSoundTrackStereo24 &) override;
 
   double m_riseFactor;
 };
@@ -1487,14 +1487,14 @@ public:
   TSoundTrackFaderOut(double decayFactor)
       : TSoundTransform(), m_decayFactor(decayFactor) {}
 
-  TSoundTrackP compute(const TSoundTrackMono8Signed &);
-  TSoundTrackP compute(const TSoundTrackStereo8Signed &);
-  TSoundTrackP compute(const TSoundTrackMono8Unsigned &);
-  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &);
-  TSoundTrackP compute(const TSoundTrackMono16 &);
-  TSoundTrackP compute(const TSoundTrackStereo16 &);
-  TSoundTrackP compute(const TSoundTrackMono24 &);
-  TSoundTrackP compute(const TSoundTrackStereo24 &);
+  TSoundTrackP compute(const TSoundTrackMono8Signed &) override;
+  TSoundTrackP compute(const TSoundTrackStereo8Signed &) override;
+  TSoundTrackP compute(const TSoundTrackMono8Unsigned &) override;
+  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &) override;
+  TSoundTrackP compute(const TSoundTrackMono16 &) override;
+  TSoundTrackP compute(const TSoundTrackStereo16 &) override;
+  TSoundTrackP compute(const TSoundTrackMono24 &) override;
+  TSoundTrackP compute(const TSoundTrackStereo24 &) override;
 
   double m_decayFactor;
 };
@@ -1619,14 +1619,14 @@ public:
   TSoundTrackCrossFader(TSoundTrackP src, double crossFactor)
       : TSoundTransform(), m_st(src), m_crossFactor(crossFactor) {}
 
-  TSoundTrackP compute(const TSoundTrackMono8Signed &);
-  TSoundTrackP compute(const TSoundTrackStereo8Signed &);
-  TSoundTrackP compute(const TSoundTrackMono8Unsigned &);
-  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &);
-  TSoundTrackP compute(const TSoundTrackMono16 &);
-  TSoundTrackP compute(const TSoundTrackStereo16 &);
-  TSoundTrackP compute(const TSoundTrackMono24 &);
-  TSoundTrackP compute(const TSoundTrackStereo24 &);
+  TSoundTrackP compute(const TSoundTrackMono8Signed &) override;
+  TSoundTrackP compute(const TSoundTrackStereo8Signed &) override;
+  TSoundTrackP compute(const TSoundTrackMono8Unsigned &) override;
+  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &) override;
+  TSoundTrackP compute(const TSoundTrackMono16 &) override;
+  TSoundTrackP compute(const TSoundTrackStereo16 &) override;
+  TSoundTrackP compute(const TSoundTrackMono24 &) override;
+  TSoundTrackP compute(const TSoundTrackStereo24 &) override;
 
   TSoundTrackP m_st;
   double m_crossFactor;
@@ -1785,14 +1785,14 @@ public:
   TSoundTrackCrossFaderOverWrite(TSoundTrackP src, double crossFactor)
       : TSoundTransform(), m_st(src), m_crossFactor(crossFactor) {}
 
-  TSoundTrackP compute(const TSoundTrackMono8Signed &);
-  TSoundTrackP compute(const TSoundTrackStereo8Signed &);
-  TSoundTrackP compute(const TSoundTrackMono8Unsigned &);
-  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &);
-  TSoundTrackP compute(const TSoundTrackMono16 &);
-  TSoundTrackP compute(const TSoundTrackStereo16 &);
-  TSoundTrackP compute(const TSoundTrackMono24 &);
-  TSoundTrackP compute(const TSoundTrackStereo24 &);
+  TSoundTrackP compute(const TSoundTrackMono8Signed &) override;
+  TSoundTrackP compute(const TSoundTrackStereo8Signed &) override;
+  TSoundTrackP compute(const TSoundTrackMono8Unsigned &) override;
+  TSoundTrackP compute(const TSoundTrackStereo8Unsigned &) override;
+  TSoundTrackP compute(const TSoundTrackMono16 &) override;
+  TSoundTrackP compute(const TSoundTrackStereo16 &) override;
+  TSoundTrackP compute(const TSoundTrackMono24 &) override;
+  TSoundTrackP compute(const TSoundTrackStereo24 &) override;
 
   TSoundTrackP m_st;
   double m_crossFactor;

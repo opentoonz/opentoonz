@@ -64,7 +64,7 @@ private:
   void buildValueField(int index, TPropertyGroup *props);
   void buildPropertyCheckBox(int index, TPropertyGroup *props);
   void buildPropertyLineEdit(int index, TPropertyGroup *props);
-  void showEvent(QShowEvent *se);
+  void showEvent(QShowEvent *se) override;
 
 #ifdef _WIN32
 

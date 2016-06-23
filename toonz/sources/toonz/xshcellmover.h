@@ -106,11 +106,11 @@ public:
   LevelMoverTool(XsheetViewer *viewer);
   ~LevelMoverTool();
 
-  void onClick(const QMouseEvent *e);
+  void onClick(const QMouseEvent *e) override;
   void onCellChange(int row, int col);
-  void onDrag(const QMouseEvent *e);
-  void onRelease(int row, int col);
-  void drawCellsArea(QPainter &p);
+  void onDrag(const QMouseEvent *e) override;
+  void onRelease(int row, int col) override;
+  void drawCellsArea(QPainter &p) override;
 };
 
 #endif

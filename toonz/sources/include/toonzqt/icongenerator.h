@@ -156,7 +156,7 @@ private:
   TDimension m_iconSize;
 
   QEventLoop m_iconsTerminationLoop;  //!< Event loop used to wait for icons
-                                      //!termination.
+                                      //! termination.
 
   Settings m_settings;
 

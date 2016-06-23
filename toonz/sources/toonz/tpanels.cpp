@@ -92,7 +92,7 @@
 class XsheetViewerFactory : public TPanelFactory {
 public:
   XsheetViewerFactory() : TPanelFactory("Xsheet") {}
-  void initialize(TPanel *panel) {
+  void initialize(TPanel *panel) override {
     panel->setWidget(new XsheetViewer(panel));
     panel->resize(500, 300);
   }
@@ -110,7 +110,7 @@ class SchematicSceneViewerFactory : public QObject, public TPanelFactory {
 public:
   SchematicSceneViewerFactory() : TPanelFactory("Schematic") {}
 
-  TPanel *createPanel(QWidget *parent) {
+  TPanel *createPanel(QWidget *parent) override {
     SchematicScenePanel *panel = new SchematicScenePanel(parent);
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("Schematic"));
@@ -118,7 +118,7 @@ public:
     return panel;
   }
 
-  void initialize(TPanel *panel) { assert(0); }
+  void initialize(TPanel *panel) override { assert(0); }
 
 } schematicSceneViewerFactory;
 
@@ -386,7 +386,7 @@ public:
   CurrentStyleChangeCommand() {}
   ~CurrentStyleChangeCommand() {}
 
-  bool onStyleChanged() {
+  bool onStyleChanged() override {
     TApp *app = TApp::instance();
     int styleIndex =
         app->getPaletteController()->getCurrentLevelPalette()->getStyleIndex();
@@ -553,7 +553,7 @@ class PaletteViewerFactory : public TPanelFactory {
 public:
   PaletteViewerFactory() : TPanelFactory("LevelPalette") {}
 
-  TPanel *createPanel(QWidget *parent) {
+  TPanel *createPanel(QWidget *parent) override {
     PaletteViewerPanel *panel = new PaletteViewerPanel(parent);
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr(("Level Palette")));
@@ -561,7 +561,7 @@ public:
     return panel;
   }
 
-  void initialize(TPanel *panel) { assert(0); }
+  void initialize(TPanel *panel) override { assert(0); }
 
 } paletteViewerFactory;
 
@@ -615,7 +615,7 @@ class StudioPaletteViewerFactory : public TPanelFactory {
 public:
   StudioPaletteViewerFactory() : TPanelFactory("StudioPalette") {}
 
-  TPanel *createPanel(QWidget *parent) {
+  TPanel *createPanel(QWidget *parent) override {
     StudioPaletteViewerPanel *panel = new StudioPaletteViewerPanel(parent);
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("Studio Palette"));
@@ -623,7 +623,7 @@ public:
     return panel;
   }
 
-  void initialize(TPanel *panel) { assert(0); }
+  void initialize(TPanel *panel) override { assert(0); }
 
 } studioPaletteViewerFactory;
 
@@ -802,14 +802,14 @@ class StyleEditorFactory : public TPanelFactory {
 public:
   StyleEditorFactory() : TPanelFactory("StyleEditor") {}
 
-  TPanel *createPanel(QWidget *parent) {
+  TPanel *createPanel(QWidget *parent) override {
     StyleEditorPanel *panel = new StyleEditorPanel(parent);
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("Style Editor"));
     return panel;
   }
 
-  void initialize(TPanel *panel) { assert(0); }
+  void initialize(TPanel *panel) override { assert(0); }
 
 } styleEditorFactory;
 
@@ -826,7 +826,7 @@ class SceneViewerFactory : public TPanelFactory {
 public:
   SceneViewerFactory() : TPanelFactory("SceneViewer") {}
 
-  TPanel *createPanel(QWidget *parent) {
+  TPanel *createPanel(QWidget *parent) override {
     SceneViewerPanel *panel = new SceneViewerPanel(parent);
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("Viewer"));
@@ -834,7 +834,7 @@ public:
     return panel;
   }
 
-  void initialize(TPanel *panel) { assert(0); }
+  void initialize(TPanel *panel) override { assert(0); }
 
 } sceneViewerFactory;
 
@@ -848,7 +848,7 @@ OpenFloatingPanel openSceneViewerCommand(MI_OpenLevelView, "SceneViewer",
 class ToolbarFactory : public TPanelFactory {
 public:
   ToolbarFactory() : TPanelFactory("ToolBar") {}
-  void initialize(TPanel *panel) {
+  void initialize(TPanel *panel) override {
     Toolbar *toolbar = new Toolbar(panel);
     panel->setWidget(toolbar);
     panel->setIsMaximizable(false);
@@ -882,14 +882,14 @@ class ToolOptionsFactory : public TPanelFactory {
 
 public:
   ToolOptionsFactory() : TPanelFactory("ToolOptions") {}
-  TPanel *createPanel(QWidget *parent) {
+  TPanel *createPanel(QWidget *parent) override {
     TPanel *panel = new ToolOptionPanel(parent);
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(getPanelType());
     panel->resize(600, panel->height());
     return panel;
   }
-  void initialize(TPanel *panel) { assert(0); }
+  void initialize(TPanel *panel) override { assert(0); }
 } toolOptionsFactory;
 
 //=============================================================================
@@ -980,14 +980,14 @@ class FlipbookFactory : public TPanelFactory {
 public:
   FlipbookFactory() : TPanelFactory("FlipBook") {}
 
-  TPanel *createPanel(QWidget *parent) {
+  TPanel *createPanel(QWidget *parent) override {
     TPanel *panel = new FlipbookPanel(parent);
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("FlipBook"));
     return panel;
   }
 
-  void initialize(TPanel *panel) { assert(0); }
+  void initialize(TPanel *panel) override { assert(0); }
 } flipbookFactory;
 
 #ifndef LINETEST
@@ -998,7 +998,7 @@ public:
 class TasksViewerFactory : public TPanelFactory {
 public:
   TasksViewerFactory() : TPanelFactory("Tasks") {}
-  void initialize(TPanel *panel) {
+  void initialize(TPanel *panel) override {
     panel->setWindowTitle(QObject::tr("Tasks"));
     panel->setWidget(new TasksViewer(panel));
   }
@@ -1007,7 +1007,7 @@ public:
 class BatchServersViewerFactory : public TPanelFactory {
 public:
   BatchServersViewerFactory() : TPanelFactory("BatchServers") {}
-  void initialize(TPanel *panel) {
+  void initialize(TPanel *panel) override {
     panel->setWindowTitle(QObject::tr("Batch Servers"));
     panel->setWidget(new BatchServersViewer(panel));
   }
@@ -1017,7 +1017,7 @@ public:
 class BrowserFactory : public TPanelFactory {
 public:
   BrowserFactory() : TPanelFactory("Browser") {}
-  void initialize(TPanel *panel) {
+  void initialize(TPanel *panel) override {
     FileBrowser *browser = new FileBrowser(panel, 0, false, true);
     panel->setWidget(browser);
     panel->setWindowTitle(QObject::tr("File Browser"));
@@ -1034,7 +1034,7 @@ public:
 class CastViewerFactory : public TPanelFactory {
 public:
   CastViewerFactory() : TPanelFactory("SceneCast") {}
-  void initialize(TPanel *panel) {
+  void initialize(TPanel *panel) override {
     panel->setWidget(new CastBrowser(panel));
     panel->setWindowTitle(QObject::tr("Scene Cast"));
   }
@@ -1047,7 +1047,7 @@ public:
 class FilmStripFactory : public TPanelFactory {
 public:
   FilmStripFactory() : TPanelFactory("FilmStrip") {}
-  void initialize(TPanel *panel) {
+  void initialize(TPanel *panel) override {
     Filmstrip *filmstrip = new Filmstrip(panel);
     panel->setWidget(filmstrip);
     panel->setIsMaximizable(false);
@@ -1085,7 +1085,7 @@ OpenFloatingPanel openExportPanelCommand(MI_OpenExport, "Export",
 class ColorModelViewerFactory : public TPanelFactory {
 public:
   ColorModelViewerFactory() : TPanelFactory("ColorModel") {}
-  void initialize(TPanel *panel) {
+  void initialize(TPanel *panel) override {
     panel->setWidget(new ColorModelViewer(panel));
     panel->resize(400, 300);
   }
@@ -1101,14 +1101,14 @@ class FunctionViewerFactory : public TPanelFactory {
 public:
   FunctionViewerFactory() : TPanelFactory("FunctionEditor") {}
 
-  TPanel *createPanel(QWidget *parent) {
+  TPanel *createPanel(QWidget *parent) override {
     FunctionViewerPanel *panel = new FunctionViewerPanel(parent);
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("Function Editor"));
     return panel;
   }
 
-  void initialize(TPanel *panel) { assert(0); }
+  void initialize(TPanel *panel) override { assert(0); }
 
 } functionViewerFactory;
 
@@ -1123,7 +1123,7 @@ OpenFloatingPanel openFunctionViewerCommand(MI_OpenFunctionEditor,
 class TMessageViewerFactory : public TPanelFactory {
 public:
   TMessageViewerFactory() : TPanelFactory("TMessage") {}
-  void initialize(TPanel *panel) {
+  void initialize(TPanel *panel) override {
     panel->setWindowTitle(QObject::tr("Message Center"));
     panel->setWidget(new TMessageViewer(panel));
     panel->setMinimumHeight(80);
@@ -1141,7 +1141,7 @@ class ScriptConsolePanelFactory : public TPanelFactory {
 public:
   ScriptConsolePanelFactory() : TPanelFactory("ScriptConsole") {}
 
-  TPanel *createPanel(QWidget *parent) {
+  TPanel *createPanel(QWidget *parent) override {
     ScriptConsolePanel *panel = new ScriptConsolePanel(parent);
     panel->setObjectName(getPanelType());
 
@@ -1150,7 +1150,7 @@ public:
     return panel;
   }
 
-  void initialize(TPanel *panel) { assert(0); }
+  void initialize(TPanel *panel) override { assert(0); }
 } scriptConsolePanelFactory;
 
 OpenFloatingPanel openTScriptConsoleCommand("MI_OpenScriptConsole",
@@ -1219,14 +1219,14 @@ OpenFloatingPanel openLineTestCaptureCommand(MI_OpenLineTestCapture,
 class ComboViewerFactory : public TPanelFactory {
 public:
   ComboViewerFactory() : TPanelFactory("ComboViewer") {}
-  TPanel *createPanel(QWidget *parent) {
+  TPanel *createPanel(QWidget *parent) override {
     ComboViewerPanel *panel = new ComboViewerPanel(parent);
     panel->setObjectName(getPanelType());
     panel->setWindowTitle(QObject::tr("Combo Viewer"));
     panel->resize(700, 600);
     return panel;
   }
-  void initialize(TPanel *panel) {
+  void initialize(TPanel *panel) override {
     assert(0);
     panel->setWidget(new ComboViewerPanel(panel));
   }
@@ -1245,7 +1245,7 @@ class CleanupSettingsFactory : public TPanelFactory {
 public:
   CleanupSettingsFactory() : TPanelFactory("CleanupSettings") {}
 
-  void initialize(TPanel *panel) {
+  void initialize(TPanel *panel) override {
     panel->setWidget(new CleanupSettingsPane(panel));
     panel->setIsMaximizable(false);
   }
@@ -1266,7 +1266,7 @@ OpenFloatingPanel openCleanupSettingsDockCommand(
 class HistoryPanelFactory : public TPanelFactory {
 public:
   HistoryPanelFactory() : TPanelFactory("HistoryPanel") {}
-  void initialize(TPanel *panel) {
+  void initialize(TPanel *panel) override {
     HistoryPane *historyPane = new HistoryPane(panel);
     panel->setWidget(historyPane);
     panel->setIsMaximizable(false);

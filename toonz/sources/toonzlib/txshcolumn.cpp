@@ -237,7 +237,7 @@ bool TXshCellColumn::setCells(int row, int rowCount, const TXshCell cells[]) {
   if (row > c_rb)  // sono oltre l'ultima riga
   {
     if (oldCellCount == 0) m_first = row;  // row 'e la nuova firstrow
-    int newCellCount = row - m_first + rowCount;
+    int newCellCount               = row - m_first + rowCount;
     m_cells.resize(newCellCount);
   } else if (row < m_first) {
     int delta = m_first - row;

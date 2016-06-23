@@ -317,7 +317,7 @@ public:
   const typename ReplacePainter::pixel_type &color() const { return m_color; }
   typename ReplacePainter::pixel_type &color() { return m_color; }
 
-  void paintPixel(typename ReplacePainter::pixel_type *pix) const {
+  void paintPixel(typename ReplacePainter::pixel_type *pix) const override {
     *pix = m_color;
   }
 };
@@ -342,7 +342,7 @@ public:
   const TUINT32 &keepMask() const { return m_keepMask; }
   TUINT32 &keepMask() { return m_keepMask; }
 
-  void paintPixel(pixel_type *pix) const {
+  void paintPixel(pixel_type *pix) const override {
     *pix = TPixelCM32(m_value | (pix->getValue() & m_keepMask));
   }
 };
@@ -366,7 +366,7 @@ public:
 
   void openContainer(const RasterEdgeIterator<PixelSelector> &it);
   void addElement(const RasterEdgeIterator<PixelSelector> &it);
-  void closeContainer();
+  void closeContainer() override;
 };
 
 //---------------------------------------------------------------------------------------------
@@ -523,7 +523,7 @@ public:
 
   void openContainer(const RasterEdgeIterator<PixelSelector> &it);
   void addElement(const RasterEdgeIterator<PixelSelector> &it);
-  void closeContainer();
+  void closeContainer() override;
 
   RunsMapP &runsMap() { return m_painter.runsMap(); }
 };

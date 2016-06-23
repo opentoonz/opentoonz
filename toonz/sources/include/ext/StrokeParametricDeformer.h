@@ -56,7 +56,7 @@ public:
 *@return displacement to apply to obtain deformation
 *@sa increaseControlPoints
 */
-  TThickPoint getDisplacement(const TStroke &stroke, double w) const;
+  TThickPoint getDisplacement(const TStroke &stroke, double w) const override;
 
   /**
 *@brief Return displacement to use with function  modifyControlPoints
@@ -66,9 +66,9 @@ public:
 *@sa modifyControlPoints
 */
   TThickPoint getDisplacementForControlPoint(const TStroke &stroke,
-                                             UINT n) const;
+                                             UINT n) const override;
   TThickPoint getDisplacementForControlPointLen(const TStroke &stroke,
-                                                double cpLen) const;
+                                                double cpLen) const override;
 
   /**
 *@brief This method compute the delta (gradient) referred to stroke in
@@ -80,14 +80,14 @@ public:
 *@param w Stroke parameter
 *@return the @b gradient in w
 */
-  double getDelta(const TStroke &stroke, double w) const;
+  double getDelta(const TStroke &stroke, double w) const override;
 
   /**
 *@brief Max diff of delta (This value indicates when it's necessary
 *  to insert control point)
 *@return max displacement permitted
 */
-  double getMaxDiff() const;
+  double getMaxDiff() const override;
 
   // just for debug
   const Potential *getPotential() const { return pot_; }

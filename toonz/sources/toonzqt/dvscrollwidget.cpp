@@ -30,7 +30,7 @@ public:
     assert(m_scrollWidget);
   }
 
-  QSize minimumSize() const {
+  QSize minimumSize() const override {
     struct locals {
       inline static QSize expand(const QSize &size, const QLayoutItem *item) {
         return size.expandedTo(item->minimumSize());
@@ -45,7 +45,7 @@ public:
                : QSize(minSize.width(), 0);
   }
 
-  QSize maximumSize() const {
+  QSize maximumSize() const override {
     struct locals {
       inline static QSize bound(const QSize &size, const QLayoutItem *item) {
         return size.boundedTo(item->minimumSize());
@@ -61,7 +61,7 @@ public:
                : QSize(maxSize.width(), QWIDGETSIZE_MAX);
   }
 
-  void setGeometry(const QRect &r) {
+  void setGeometry(const QRect &r) override {
     const Qt::Orientation orientation = m_scrollWidget->getOrientation();
 
     QList<QLayoutItem *>::const_iterator it, iEnd = m_items.end();

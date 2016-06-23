@@ -33,7 +33,7 @@ public:
   SMemAllocError() : SError(""){};
   SMemAllocError(const char *s) : SError(s){};
   virtual ~SMemAllocError(){};
-  void debug_print() const {
+  void debug_print() const override {
     /*	if ( !m_msg.empty() )
             smsg_error("Error in Memory Allocation %s!\n",m_msg.c_str());
     else
@@ -46,7 +46,7 @@ public:
   SWriteRasterError() : SError(""){};
   SWriteRasterError(const char *s) : SError(s){};
   virtual ~SWriteRasterError(){};
-  void debug_print() const {
+  void debug_print() const override {
     /*if ( !m_msg.empty() )
             smsg_error("Error in Writing Raster %s!\n",m_msg.c_str());
     else
@@ -59,7 +59,7 @@ public:
   SBlurMatrixError() : SError(""){};
   SBlurMatrixError(const char *s) : SError(s){};
   virtual ~SBlurMatrixError(){};
-  void debug_print() const {
+  void debug_print() const override {
     /*	if ( !m_msg.empty() ) {
             smsg_error("Error in Generating BlurMatrix %s!\n",m_msg.c_str());
     } else
@@ -72,7 +72,7 @@ public:
   SFileReadError() : SError(""){};
   SFileReadError(const char *s) : SError(s){};
   virtual ~SFileReadError(){};
-  void debug_print() const {
+  void debug_print() const override {
     /*if ( !m_msg.empty() ) {
             smsg_error("Error in Reading File %s!\n",m_msg.c_str());
     } else

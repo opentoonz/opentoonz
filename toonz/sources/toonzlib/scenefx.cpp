@@ -72,7 +72,7 @@ public:
   }
   ~TimeShuffleFx() {}
 
-  TFx *clone(bool recursive = true) const {
+  TFx *clone(bool recursive = true) const override {
     TimeShuffleFx *fx = dynamic_cast<TimeShuffleFx *>(TFx::clone(recursive));
     assert(fx);
 
@@ -88,19 +88,22 @@ public:
   void setTimeRegion(const TFxTimeRegion &timeRegion) {
     m_timeRegion = timeRegion;
   }
-  TFxTimeRegion getTimeRegion() const { return m_timeRegion; }
+  TFxTimeRegion getTimeRegion() const override { return m_timeRegion; }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
-  std::string getPluginId() const { return std::string(); }
+  std::string getPluginId() const override { return std::string(); }
 
-  void compute(TFlash &flash, int frame) {
+  void compute(TFlash &flash, int frame) override {
     if (!m_port.isConnected()) return;
 
     TRasterFxP(m_port.getFx())->compute(flash, m_frame);
   }
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &ri) override {
     if (!m_port.isConnected()) {
       tile.getRaster()->clear();
       return;
@@ -110,17 +113,20 @@ public:
     TRasterFxP(m_port.getFx())->compute(tile, m_frame, ri);
   }
 
-  bool doGetBBox(double frame, TRectD &bbox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bbox,
+                 const TRenderSettings &info) override {
     if (!m_port.isConnected()) return false;
 
     return TRasterFxP(m_port.getFx())->doGetBBox(m_frame, bbox, info);
   }
 
-  std::string getAlias(double frame, const TRenderSettings &info) const {
+  std::string getAlias(double frame,
+                       const TRenderSettings &info) const override {
     return TRasterFx::getAlias(m_frame, info);
   }
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info) {
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override {
     if (m_port.isConnected())
       TRasterFxP(m_port.getFx())->dryCompute(rect, m_frame, info);
   }
@@ -165,7 +171,7 @@ public:
   }
   ~AffineFx() {}
 
-  TFx *clone(bool recursive = true) const {
+  TFx *clone(bool recursive = true) const override {
     AffineFx *fx = dynamic_cast<AffineFx *>(TFx::clone(recursive));
     assert(fx);
     fx->m_stageObject = m_stageObject;
@@ -173,9 +179,11 @@ public:
     return fx;
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
-  TAffine getPlacement(double frame) {
+  TAffine getPlacement(double frame) override {
     TAffine objAff = m_stageObject->getPlacement(frame);
 
     double objZ        = m_stageObject->getZ(frame);
@@ -197,11 +205,11 @@ public:
       return aff;
   }
 
-  TAffine getParentPlacement(double frame) {
+  TAffine getParentPlacement(double frame) override {
     return m_stageObject->getPlacement(frame);
   }
 
-  std::string getPluginId() const { return std::string(); }
+  std::string getPluginId() const override { return std::string(); }
 
 private:
   // not implemented

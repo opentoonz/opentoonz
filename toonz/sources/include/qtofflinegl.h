@@ -24,14 +24,14 @@ public:
   ~QtOfflineGL();
 
   void createContext(TDimension rasterSize,
-                     std::shared_ptr<TOfflineGL::Imp> shared);
-  void makeCurrent();
-  void doneCurrent();
+                     std::shared_ptr<TOfflineGL::Imp> shared) override;
+  void makeCurrent() override;
+  void doneCurrent() override;
 
   void saveCurrentContext();
   void restoreCurrentContext();
 
-  void getRaster(TRaster32P raster);
+  void getRaster(TRaster32P raster) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -44,10 +44,10 @@ public:
   ~QtOfflineGLPBuffer();
 
   void createContext(TDimension rasterSize);
-  void makeCurrent();
-  void doneCurrent();
+  void makeCurrent() override;
+  void doneCurrent() override;
 
-  void getRaster(TRaster32P raster);
+  void getRaster(TRaster32P raster) override;
 };
 
 #endif

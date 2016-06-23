@@ -212,19 +212,19 @@ protected:
   void drawCurrentCurve(QPainter &);
   void drawGroupKeyframes(QPainter &);
 
-  void paintEvent(QPaintEvent *e);
-  void mousePressEvent(QMouseEvent *e);
-  void mouseReleaseEvent(QMouseEvent *e);
-  void mouseMoveEvent(QMouseEvent *e);
-  void wheelEvent(QWheelEvent *e);
+  void paintEvent(QPaintEvent *e) override;
+  void mousePressEvent(QMouseEvent *e) override;
+  void mouseReleaseEvent(QMouseEvent *e) override;
+  void mouseMoveEvent(QMouseEvent *e) override;
+  void wheelEvent(QWheelEvent *e) override;
   void openContextMenu(QMouseEvent *e);
 
-  void keyPressEvent(QKeyEvent *e);
-  void enterEvent(QEvent *);
-  void leaveEvent(QEvent *);
+  void keyPressEvent(QKeyEvent *e) override;
+  void enterEvent(QEvent *) override;
+  void leaveEvent(QEvent *) override;
 
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
 
 public slots:
   void onFrameSwitched();

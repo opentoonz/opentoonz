@@ -63,7 +63,7 @@ public:
 
   ~TPasteSelectionUndo() {}
 
-  void undo() const {
+  void undo() const override {
     m_xshHandle->blockSignals(true);
     TStageObjectCmd::deleteSelection(
         m_pastedId, std::list<QPair<TStageObjectId, TStageObjectId>>(),
@@ -72,7 +72,7 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     std::set<int> indexes;
     indexes.insert(m_index);
     std::list<int> splineIds;
@@ -92,9 +92,11 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this) + sizeof(StageObjectsData); }
+  int getSize() const override {
+    return sizeof(*this) + sizeof(StageObjectsData);
+  }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str                              = QObject::tr("Paste Object  ");
     std::vector<TStageObjectId>::iterator it = m_pastedId.begin();
     for (; it != m_pastedId.end(); it++) {
@@ -103,7 +105,7 @@ public:
     }
     return str;
   }
-  int getHistoryType() { return HistoryType::Schematic; }
+  int getHistoryType() override { return HistoryType::Schematic; }
 };
 }
 

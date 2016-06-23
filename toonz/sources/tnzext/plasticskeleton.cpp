@@ -98,9 +98,9 @@ void PlasticSkeletonVertex::loadData(TIStream &is) {
 class PlasticSkeleton::Imp {
 public:
   std::set<PlasticSkeletonDeformation *> m_deformations;  //!< Registered
-                                                          //!deformations for
-                                                          //!this skeleton (not
-                                                          //!owned)
+                                                          //! deformations for
+  //! this skeleton (not
+  //! owned)
   tcg::indices_pool<int>
       m_numbersPool;  //!< Vertex numbers pool (used for naming vertices only)
 

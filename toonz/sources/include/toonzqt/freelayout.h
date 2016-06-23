@@ -44,21 +44,23 @@ public:
   DummyLayout();
   virtual ~DummyLayout();
 
-  QSize sizeHint() const;
+  QSize sizeHint() const override;
 
-  QSize minimumSize() const { return QSize(0, 0); }
-  QSize maximumSize() const { return QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX); }
+  QSize minimumSize() const override { return QSize(0, 0); }
+  QSize maximumSize() const override {
+    return QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+  }
 
-  int count() const { return m_items.count(); }
-  void addItem(QLayoutItem *item) { m_items.push_back(item); }
-  QLayoutItem *itemAt(int index) const {
+  int count() const override { return m_items.count(); }
+  void addItem(QLayoutItem *item) override { m_items.push_back(item); }
+  QLayoutItem *itemAt(int index) const override {
     return (index < count()) ? m_items.at(index) : 0;
   }
-  QLayoutItem *takeAt(int index) {
+  QLayoutItem *takeAt(int index) override {
     return (index < count()) ? m_items.takeAt(index) : 0;
   }
 
-  void setGeometry(const QRect &r) {}
+  void setGeometry(const QRect &r) override {}
   // Qt::Orientations	expandingDirections () const { return
   // Qt::Orientations(); }
 
@@ -95,7 +97,7 @@ public:
   FreeLayout() : DummyLayout() {}
   ~FreeLayout() {}
 
-  void setGeometry(const QRect &r);
+  void setGeometry(const QRect &r) override;
 };
 
 #endif  // FREE_LAYOUT_H

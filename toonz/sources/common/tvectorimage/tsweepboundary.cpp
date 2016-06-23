@@ -419,7 +419,7 @@ inline bool getOutputOutlines(LinkedQuadraticList &inputBoundaries,
     } while (current != first && !inputBoundaries.empty());
     sweepStrokes.push_back(new TStroke(v));
     //		sort(outputOutlines[count].begin(), outputOutlines[count].end(),
-    //CompareQuadratics());
+    // CompareQuadratics());
   }
   inputBoundaries.clear();
   return true;
@@ -539,7 +539,7 @@ inline void computeStrokeBoundary(const TStroke &stroke,
 
   if (!(rwdP2 == fwdP0)) {
     //		inputBoundaries.push_front(TQuadratic(rwdP2, (rwdP2+fwdP0)*0.5,
-    //fwdP0));
+    // fwdP0));
     vector<TQuadratic *> quadArray;
     splitCircularArcIntoQuadraticCurves((rwdP2 + fwdP0) * 0.5, rwdP2, fwdP0,
                                         quadArray);
@@ -777,9 +777,9 @@ inline void computeStrokeBoundary(const TStroke &stroke,
           rwdP2 = nextRwdP2;
         } else {
           //					inputBoundaries.push_back(TQuadratic(fwdP0,
-          //fwdP1, fwdP2));
+          // fwdP1, fwdP2));
           //					inputBoundaries.push_front(TQuadratic(rwdP0,
-          //rwdP1, rwdP2));
+          // rwdP1, rwdP2));
           //					fwdP0 = nextFwdP0;
           //					rwdP2 = nextRwdP2;
           ++chunkIndex;
@@ -794,7 +794,7 @@ inline void computeStrokeBoundary(const TStroke &stroke,
   normalizeTThickQuadratic(thickQuadratic, tempThickQuadratic);
 
   //	if(	stroke->getChunk(0)->getP0() ==
-  //stroke->getChunk(chunkCount-1)->getP2() )
+  // stroke->getChunk(chunkCount-1)->getP2() )
   /*	if(	norm(stroke->getChunk(0)->getP0() - stroke->getChunk(chunkCount-1)->getP2()) <
 		stroke->getChunk(0)->getThickP0().thick/2)
 	{
@@ -1413,7 +1413,7 @@ inline bool deleteUnlinkedLoops(LinkedQuadraticList &inputBoundaries) {
     int count;
     if (it->prev == 0) {
       //			if( nonSimpleCrossing.find(it->getP0()) !=
-      //nonSimpleCrossing.end() )
+      // nonSimpleCrossing.end() )
       //				isNonSimpleBranch = true;
       //			else isNonSimpleBranch = false;
       count   = inputBoundaries.size();
@@ -1422,7 +1422,8 @@ inline bool deleteUnlinkedLoops(LinkedQuadraticList &inputBoundaries) {
         assert(count > 0);
         if (count == 0) return false;
         if (nonSimpleCrossing.find(current->getP2()) != nonSimpleCrossing.end())
-        //					|| simpleCrossing.find(current->getP2())
+        //					||
+        //simpleCrossing.find(current->getP2())
         //!= simpleCrossing.end() )
         {
           if (current->next) current->next->prev = 0;
@@ -1446,7 +1447,7 @@ inline bool deleteUnlinkedLoops(LinkedQuadraticList &inputBoundaries) {
       }
     } else if (it->next == 0) {
       //			if( nonSimpleCrossing.find(it->getP2()) !=
-      //nonSimpleCrossing.end() )
+      // nonSimpleCrossing.end() )
       //				isNonSimpleBranch = true;
       //			else isNonSimpleBranch = false;
       count   = inputBoundaries.size();
@@ -1455,7 +1456,8 @@ inline bool deleteUnlinkedLoops(LinkedQuadraticList &inputBoundaries) {
         assert(count > 0);
         if (count == 0) return false;
         if (nonSimpleCrossing.find(current->getP0()) != nonSimpleCrossing.end())
-        //					|| simpleCrossing.find(current->getP0())
+        //					||
+        //simpleCrossing.find(current->getP0())
         //!= simpleCrossing.end() )
         {
           if (current->prev) current->prev->next = 0;

@@ -19,9 +19,9 @@
 
 class TDockDecoAllocator : public DockDecoAllocator {
   DockSeparator *newSeparator(DockLayout *owner, bool orientation,
-                              Region *parentRegion);
+                              Region *parentRegion) override;
   DockPlaceholder *newPlaceholder(DockWidget *owner, Region *r, int idx,
-                                  int attributes);
+                                  int attributes) override;
 };
 
 //========================================================================
@@ -331,7 +331,7 @@ public:
   TDockSeparator(DockLayout *owner, bool orientation, Region *parentRegion)
       : DockSeparator(owner, orientation, parentRegion) {}
 
-  void paintEvent(QPaintEvent *pe);
+  void paintEvent(QPaintEvent *pe) override;
 };
 
 //----------------------------------------
@@ -343,10 +343,10 @@ public:
   TDockPlaceholder(DockWidget *owner, Region *r, int idx, int attributes);
   ~TDockPlaceholder();
 
-  void buildGeometry();
+  void buildGeometry() override;
 
-  void showEvent(QShowEvent *se);
-  void hideEvent(QHideEvent *he);
+  void showEvent(QShowEvent *se) override;
+  void hideEvent(QHideEvent *he) override;
 };
 
 //----------------------------------------

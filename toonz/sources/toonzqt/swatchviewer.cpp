@@ -90,12 +90,12 @@ public:
 
   void getResource(TCacheResourceP &resource, const std::string &alias,
                    const TFxP &fx, double frame, const TRenderSettings &rs,
-                   ResourceDeclaration *resData);
+                   ResourceDeclaration *resData) override;
 
   // void onRenderInstanceStart(unsigned long renderId);
   // void onRenderInstanceEnd(unsigned long renderId);
 
-  bool renderHasOwnership() { return false; }
+  bool renderHasOwnership() override { return false; }
 };
 
 //*****************************************************************************************
@@ -103,7 +103,7 @@ public:
 //*****************************************************************************************
 
 class SwatchCacheManagerGenerator : public TRenderResourceManagerGenerator {
-  TRenderResourceManager *operator()(void) {
+  TRenderResourceManager *operator()(void) override {
     // return new TPassiveCacheManager;
     return SwatchCacheManager::instance();
   }

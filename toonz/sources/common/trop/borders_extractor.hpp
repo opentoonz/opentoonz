@@ -64,7 +64,7 @@ void _readBorder(const TRasterPT<Pixel> &rin, const PixelSelector &selector,
   RasterEdgeIterator<PixelSelector> it(rin, selector, TPoint(x, y),
                                        counter ? TPoint(1, 0) : TPoint(0, 1));
   //++it;   //As we could be in the middle of a straight edge, increment to get
-  //a corner
+  // a corner
 
   TPoint start(it.pos()), startDir(it.dir());
   reader.openContainer(it);

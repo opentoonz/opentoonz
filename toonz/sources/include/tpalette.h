@@ -123,16 +123,16 @@ public:
     }  //!< Returns the number of the styles contained in the page.
 
     int getStyleId(int indexInPage) const;  //!< Returns the \a index-th style
-                                            //!id in the page, or \p -1 if not
-                                            //!found.
+                                            //! id in the page, or \p -1 if not
+    //! found.
     TColorStyle *getStyle(int indexInPage) const;  //!< Returns the \a index-th
-                                                   //!style in the page, or \p 0
-                                                   //!if not found.
+    //! style in the page, or \p 0
+    //! if not found.
 
     //! \return The insertion index in the page, or \p -1 on failure
     int addStyle(int styleId);  //!< Adds the specified style Id to the page (at
-                                //!the \a back
-                                //!  of the page).
+                                //! the \a back
+    //!  of the page).
     /*!
 \warning  The supplied style must have been allocated with \a new.
 \warning  Style ownership is surrendered to the palette.
@@ -140,31 +140,31 @@ public:
     In case of failure, the supplied style is \a deleted.
 */
     int addStyle(TColorStyle *style);  //!< Adds the specified style to the
-                                       //!palette, and assigns it
-                                       //!  to this page.
+                                       //! palette, and assigns it
+    //!  to this page.
     //! \return The insertion index in the page, or \p -1 on failure
     int addStyle(TPixel32 color);  //!< Add a solid color style to the palette,
-                                   //!and assigns it
-                                   //!  to this page.
+                                   //! and assigns it
+    //!  to this page.
 
     void insertStyle(int indexInPage, int styleId);  //!< Inserts the supplied
-                                                     //!style id at the
-                                                     //!specified position
-                                                     //!  in the page.
+                                                     //! style id at the
+    //! specified position
+    //!  in the page.
     //! \sa The specifics of addStyle(TColorStyle*) apply here.
     void insertStyle(int indexInPage, TColorStyle *style);  //!< Inserts the
-                                                            //!supplied style in
-                                                            //!the palette, and
-                                                            //!assigns its
+    //! supplied style in
+    //! the palette, and
+    //! assigns its
     //!  id at the specified position in the page.
     void insertStyle(int indexInPage, TPixel32 color);  //!< Inserts a solid
-                                                        //!color style in the
-                                                        //!palette, and assigns
-                                                        //!its
+                                                        //! color style in the
+    //! palette, and assigns
+    //! its
     //!  id at the specified position in the page.
 
     void removeStyle(int indexInPage);  //!< Removes the style at the specified
-                                        //!position from this page.
+                                        //! position from this page.
     int search(int styleId)
         const;  //!< Returns the page position of the specified style id,
                 //!  or \p -1 if it cannot be found on the page.
@@ -193,7 +193,7 @@ private:
       m_styleAnimationTable;  //!< Table of style animations (per style).
   int m_currentFrame;         //!< Palette's current frame in style animations.
   bool m_isCleanupPalette;    //!< Whether the palette is used for cleanup
-                              //!purposes.
+                              //! purposes.
 
   TImageP m_refImg;
   TFilePath m_refImgPath;
@@ -204,7 +204,7 @@ private:
 
   bool m_isLocked;          //!< Whether the palette is locked.
   bool m_askOverwriteFlag;  //!< This variable is quite unique. This flag is to
-                            //!acheive following beghavior:
+                            //! acheive following beghavior:
   //! When saving the level with the palette being edited, ask whether the
   //! palette
   //! should be overwitten ONLY ONCE AT THE FIRST TIME.
@@ -219,8 +219,8 @@ public:
       const;  //!< Allocates a \a new copy of this palette instance.
 
   static void setRootDir(const TFilePath &fp);  //!< It must be specified to
-                                                //!save textures in \e
-                                                //!fp/textures.
+                                                //! save textures in \e
+  //! fp/textures.
   static TFilePath getRootDir();
 
   std::wstring getGlobalName() const {
@@ -231,7 +231,7 @@ public:
   }  //!< Assigns the name of the palette.
 
   void setDirtyFlag(bool dirtyFlag)  //!< Declares the palette \a changed with
-                                     //!respect to the last <I>saved state</I>.
+                                     //! respect to the last <I>saved state</I>.
   {
     m_dirtyFlag = dirtyFlag;
     // synchronize with the dirty flag
@@ -240,7 +240,7 @@ public:
   bool getDirtyFlag() {
     return m_dirtyFlag;
   }  //!< Returns whether the palette changed with respect to the last <I>saved
-     //!state</I>.
+     //! state</I>.
 
   TColorStyle *getStyle(int styleId)
       const;  //!< Returns a pointer to the color style with the specified id,
@@ -252,7 +252,7 @@ public:
       const;  //!< Returns the number of styles contained in palette pages.
 
   int getFirstUnpagedStyle() const;  //!< Returns the styleId of the first style
-                                     //!not in a page (\p -1 if none).
+                                     //! not in a page (\p -1 if none).
 
   /*!
           \remark   Style ownserhip is \a surrendered to the palette
@@ -260,9 +260,9 @@ public:
      failure.
   */
   int addStyle(TColorStyle *style);         //!< Adds the specified style to the
-                                            //!palette (but in no page).
+                                            //! palette (but in no page).
   int addStyle(const TPixelRGBM32 &color);  //!< Adds a solid color style to the
-                                            //!palette (but in no page).
+                                            //! palette (but in no page).
 
   /*!
 \remark     Style ownserhip is \a surrendered to the palette.
@@ -272,8 +272,8 @@ public:
       int styleId,
       TColorStyle *style);  //!< Replaces the style with the specified style id.
   void setStyle(int styleId, const TPixelRGBM32 &color);  //!< Replaces the
-                                                          //!style with the
-                                                          //!specified style id.
+                                                          //! style with the
+  //! specified style id.
 
   int getPageCount() const;  //!< Returns the pages count.
 
@@ -289,7 +289,7 @@ public:
   void erasePage(int index);  //!< Deletes the \a index-th page.
 
   void movePage(Page *page, int dstPageIndex);  //!< Moves the specified page to
-                                                //!a different page index.
+                                                //! a different page index.
 
   Page *getStylePage(int styleId)
       const;  //!< Returns the page containing the specified \a styleId.
@@ -303,8 +303,8 @@ between RGBA color components.
       const;  //!< Returns the index of the style whose main color
               //!  is nearest to the requested one.
 
-  void loadData(TIStream &is);  //!< I/O palette save function.
-  void saveData(TOStream &os);  //!< I/O palette load function.
+  void loadData(TIStream &is) override;  //!< I/O palette save function.
+  void saveData(TOStream &os) override;  //!< I/O palette load function.
 
   int getVersion() const {
     return m_version;
@@ -314,17 +314,17 @@ between RGBA color components.
   }  //!< Sets the palette's version number
 
   void setRefLevelFids(const std::vector<TFrameId> fids);  //!< Associates the
-                                                           //!list of frames \e
-                                                           //!fids to this
-                                                           //!palette.
+                                                           //! list of frames \e
+  //! fids to this
+  //! palette.
   std::vector<TFrameId> getRefLevelFids();  //!< Returns the list of frames
-                                            //!associated to this palette.
+                                            //! associated to this palette.
 
   //! \deprecated  Should be substituted by operator=(const TPalette&).
   void assign(const TPalette *src,
               bool isFromStudioPalette = false);  //!< Copies src's page, color
-                                                  //!styles an animation table
-                                                  //!to the
+                                                  //! styles an animation table
+  //! to the
   //!  correspondig features of the palette.
   //!  if the palette is copied from studio palette, this function will modify
   //!  the original names.
@@ -351,9 +351,9 @@ between RGBA color components.
   const TImageP &getRefImg() const {
     return m_refImg;
   }  //!< Returns an image that represents the frame image associated to this
-     //!palette.
+     //! palette.
   void setRefImg(const TImageP &img);  //!< Associates an image to this palette,
-                                       //!that is an image in the frame
+                                       //! that is an image in the frame
   //!  builded or modified using this palette.
 
   const TFilePath getRefImgPath() const {
@@ -369,21 +369,21 @@ between RGBA color components.
   void setFrame(int frame);  //!< Sets the index of the current frame.
 
   bool isKeyframe(int styleId, int frame) const;  //!< Returns whether the
-                                                  //!specified frame is a \a
-                                                  //!keyframe in styleId's
-                                                  //!animation
+                                                  //! specified frame is a \a
+  //! keyframe in styleId's
+  //! animation
   int getKeyframeCount(int styleId)
       const;  //!< Returns the keyframes count in styleId's animation.
 
   int getKeyframe(int styleId, int index)
       const;  //!< Returns the \a index-th frame in styleId's animation,
               //!  or \p -1 if it couldn't be found.
-  void setKeyframe(int styleId, int frame);    //!< Sets a keyframe at the
-                                               //!specified frame of styleId's
-                                               //!animation.
+  void setKeyframe(int styleId, int frame);  //!< Sets a keyframe at the
+                                             //! specified frame of styleId's
+  //! animation.
   void clearKeyframe(int styleId, int frame);  //!< Deletes the keyframe at the
-                                               //!specified frame of styleId's
-                                               //!animation.
+                                               //! specified frame of styleId's
+  //! animation.
 
   /*!
 \note   Key is an integer between 0 and 9 included.

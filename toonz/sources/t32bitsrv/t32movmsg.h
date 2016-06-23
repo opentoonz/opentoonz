@@ -29,8 +29,8 @@ class IsQTInstalledParser : public tipc::MessageParser {
   // Reply: yes | no
 
 public:
-  QString header() const { return "$isQTInstalled"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$isQTInstalled"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -40,8 +40,8 @@ class DefaultMovPropsParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$defaultMovProps"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$defaultMovProps"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -51,8 +51,8 @@ class OpenMovSettingsPopupParser : public tipc::MessageParser {
   // Reply: ok
 
 public:
-  QString header() const { return "$openMovSettingsPopup"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$openMovSettingsPopup"; }
+  void operator()(Message &stream) override;
 };
 
 //************************************************************************************
@@ -64,8 +64,8 @@ class InitLWMovParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$initLWMov"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$initLWMov"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -75,8 +75,8 @@ class LWSetFrameRateParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$LWMovSetFrameRate"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LWMovSetFrameRate"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -86,8 +86,8 @@ class LWImageWriteParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$LWMovImageWrite"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LWMovImageWrite"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -98,8 +98,8 @@ class LWSaveSoundTrackParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$LWMovSaveSoundTrack"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LWMovSaveSoundTrack"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -109,8 +109,8 @@ class CloseLWMovParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$closeLWMov"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$closeLWMov"; }
+  void operator()(Message &stream) override;
 };
 
 //************************************************************************************
@@ -122,8 +122,8 @@ class InitLRMovParser : public tipc::MessageParser {
   // Reply: ok <lx> <ly> <framerate> | err
 
 public:
-  QString header() const { return "$initLRMov"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$initLRMov"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -137,8 +137,8 @@ class LRLoadInfoParser : public tipc::MessageParser {
   //      If the shmem_id is empty, the level infos are not returned.
 
 public:
-  QString header() const { return "$LRMovLoadInfo"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LRMovLoadInfo"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -148,8 +148,8 @@ class LREnableRandomAccessReadParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$LRMovEnableRandomAccessRead"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LRMovEnableRandomAccessRead"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -162,8 +162,8 @@ class LRSetYMirrorParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$LRMovSetYMirror"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LRMovSetYMirror"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -173,8 +173,8 @@ class LRSetLoadTimecodeParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$LRMovSetLoadTimecode"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LRMovSetLoadTimecode"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -184,8 +184,8 @@ class LRTimecodeParser : public tipc::MessageParser {
   // Reply: ok <hh> <mm> <ss> <ff> | err
 
 public:
-  QString header() const { return "$LRMovTimecode"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LRMovTimecode"; }
+  void operator()(Message &stream) override;
 };
 
 #endif
@@ -198,8 +198,8 @@ class LRImageReadParser : public tipc::MessageParser {
   // Reply: [data reader]
 
 public:
-  QString header() const { return "$LRMovImageRead"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LRMovImageRead"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -209,8 +209,8 @@ class LRImageReadSHMParser : public tipc::MessageParser {
   // Reply: ok <hh> <mm> <ss> <ff> | err
 
 public:
-  QString header() const { return "$LRMovImageReadSHM"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LRMovImageReadSHM"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -220,8 +220,8 @@ class CloseLRMovParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$closeLRMov"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$closeLRMov"; }
+  void operator()(Message &stream) override;
 };
 
 }  // namespace tlevelwriter_mov

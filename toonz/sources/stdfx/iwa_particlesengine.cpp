@@ -507,8 +507,8 @@ void Iwa_Particles_Engine::render_particles(
     TTile *tile,                             /*- 結果を格納するTile -*/
     std::vector<TRasterFxPort *> part_ports, /*- テクスチャ素材画像のポート -*/
     const TRenderSettings &ri,
-    TDimension &
-        p_size,        /*- テクスチャ素材のバウンディングボックスの足し合わさったもの
+    TDimension
+        &p_size,       /*- テクスチャ素材のバウンディングボックスの足し合わさったもの
                           -*/
     TPointD &p_offset, /*- バウンディングボックス左下の座標 -*/
     std::map<int, TRasterFxPort *>

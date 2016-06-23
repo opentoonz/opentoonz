@@ -31,17 +31,17 @@ public:
   TXshSoundTextColumn();
   ~TXshSoundTextColumn();
 
-  TXshColumn::ColumnType getColumnType() const;
-  TXshSoundTextColumn *getSoundTextColumn() { return this; }
+  TXshColumn::ColumnType getColumnType() const override;
+  TXshSoundTextColumn *getSoundTextColumn() override { return this; }
 
   void createSoundTextLevel(int row, QList<QString> textList);
 
-  bool canSetCell(const TXshCell &cell) const;
+  bool canSetCell(const TXshCell &cell) const override;
 
-  TXshColumn *clone() const;
+  TXshColumn *clone() const override;
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 };
 
 #ifdef _WIN32

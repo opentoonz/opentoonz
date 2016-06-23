@@ -63,8 +63,8 @@ public:
     ToonzScene *m_scene;
     DecodeFileExistsFunc(ToonzScene *scene) : m_scene(scene) {}
 
-    QString conflictString(const TFilePath &fp) const;
-    bool operator()(const TFilePath &fp) const;
+    QString conflictString(const TFilePath &fp) const override;
+    bool operator()(const TFilePath &fp) const override;
   };
 
 public:

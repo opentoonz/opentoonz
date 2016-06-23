@@ -143,8 +143,8 @@ public:
   ~XsheetScrollArea() {}
 
 protected:
-  void keyPressEvent(QKeyEvent *event) { event->ignore(); }
-  void wheelEvent(QWheelEvent *event) { event->ignore(); }
+  void keyPressEvent(QKeyEvent *event) override { event->ignore(); }
+  void wheelEvent(QWheelEvent *event) override { event->ignore(); }
 };
 
 //=============================================================================
@@ -402,7 +402,7 @@ public:
   void setCurrentRow(int row);
 
   void scroll(QPoint delta);
-  void onPrepareToScroll(int dy);
+  void onPrepareToScroll(int dy) override;
 
   void setAutoPanSpeed(const QPoint &speed);
   void setAutoPanSpeed(const QRect &widgetBounds, const QPoint &mousePos);
@@ -425,7 +425,7 @@ public:
   void updateAreeSize();
 
   // provvisorio
-  QScrollArea *getFrameScrollArea() const { return m_cellScrollArea; }
+  QScrollArea *getFrameScrollArea() const override { return m_cellScrollArea; }
 
   QList<XsheetGUI::NoteWidget *> getNotesWidget() const;
   void addNoteWidget(XsheetGUI::NoteWidget *w);
@@ -640,15 +640,15 @@ protected:
   void scrollToRow(int row);
   void scrollToVerticalRange(int y0, int y1);
 
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
-  void resizeEvent(QResizeEvent *event);
-  void keyPressEvent(QKeyEvent *event);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
+  void resizeEvent(QResizeEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
   // display the upper-directional smart tab only when the ctrl key is pressed
-  void keyReleaseEvent(QKeyEvent *event);
-  void enterEvent(QEvent *);
-  void wheelEvent(QWheelEvent *event);
-  void timerEvent(QTimerEvent *);
+  void keyReleaseEvent(QKeyEvent *event) override;
+  void enterEvent(QEvent *) override;
+  void wheelEvent(QWheelEvent *event) override;
+  void timerEvent(QTimerEvent *) override;
 
 public slots:
   void onSceneSwitched();

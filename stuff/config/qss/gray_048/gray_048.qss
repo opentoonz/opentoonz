@@ -746,7 +746,7 @@ DvDirTreeView {
   alternate-background-color: #3d3d3d;
 }
 /*---------------------------------------------------------------------------*/
-/* Cleanup Settings, LoadLevel, PsdSettingsPopup, FxSettingsPopup */
+/* Cleanup Settings, LoadLevel, PsdSettingsPopup, FxSettingsPopup, RenameAsToonzPopup */
 /*---------------------------------------------------------------------------*/
 #CleanupSettingsFrame,
 #LoadLevelFrame,
@@ -757,7 +757,8 @@ DvDirTreeView {
 #LoadLevelHeadLabel,
 #PsdSettingsHeadLabel,
 #PsdSettingsGroupBox::title,
-#FxSettingsPreviewShowLabel {
+#FxSettingsPreviewShowLabel,
+#RenameAsToonzPopupLabel {
   color: #a8bee7;
 }
 #PsdSettingsGroupBox {
@@ -1207,6 +1208,13 @@ PopupButton::menu-indicator:disabled {
   min-width: 16px;
   max-width: 16px;
   padding: 0px;
+}
+/*------ Script Console ------*/
+#ScriptConsole {
+  border: 1px inset;
+  background-color: #dcdcdc;
+  color: black;
+  font-family: "Courier";
 }
 /*------ Topbar and Menubar of the MainWindow ------*/
 #TopBar {

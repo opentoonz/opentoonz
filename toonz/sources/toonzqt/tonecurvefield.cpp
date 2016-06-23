@@ -353,8 +353,9 @@ void ChennelCurveEditor::moveCentralControlPoint(int index,
   double precDistance = (p.x() + d.x()) - precP.x();
 
   // Caso particolare: Punto di controllo corrente == primo visibile,
-  //								  Punto di controllo successivo == l'ultimo
-  //visibile
+  //								  Punto di controllo successivo ==
+  //l'ultimo
+  // visibile
   if (index == 3 && index + 3 == pointCount - 4) {
     setPoint(index + 1,
              getNewFirstHandlePoint(p, nextP, m_points.at(index + 1)));
@@ -363,8 +364,9 @@ void ChennelCurveEditor::moveCentralControlPoint(int index,
     if (nextDistance < 0) d = QPointF(nextP.x() - p.x(), d.y());
   }
   // Caso particolare: Punto di controllo corrente == ultimo visibile,
-  //								  Punto di controllo precedente == primo
-  //visibile
+  //								  Punto di controllo precedente ==
+  //primo
+  // visibile
   else if (index - 3 == 3 && index == pointCount - 4) {
     setPoint(index - 2,
              getNewFirstHandlePoint(precP, p, m_points.at(index - 2)));

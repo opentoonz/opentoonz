@@ -45,7 +45,7 @@ public:
   { FRAMES_NONE,      //!< No frame is selected.
     FRAMES_CURRENT,   //!< Selects the (context-defined) current frame.
     FRAMES_SELECTED,  //!< Selects the frames specified in \p
-                      //!TTool::getSelectedFrames().
+                      //! TTool::getSelectedFrames().
     FRAMES_ALL,       //!< Selects the whole level.
   };
 
@@ -54,7 +54,7 @@ public:
     WHOLE,             //!< Selects everything - nothing is filtered out.
     SELECTED_STYLES,   //!< Acts only entities with selected palette styles.
     BOUNDARY_STROKES,  //!< Acts only on boundary strokes (applies only to
-                       //!vector images).
+                       //! vector images).
   };
 
   typedef std::set<int>
@@ -68,9 +68,10 @@ public:
           FramesMode FRAMES_NONE or Filter EMPTY. It is user's responsibility
           to check whether nontrivial selections are empty or not. */
 
-  bool isEmpty() const;  //!< Returns whether the selection is empty.
-  void selectNone();  //!< Resets the selection to empty. This is functionally
-                      //!  equivalent to <TT>operator=(LevelSelection());</TT>
+  bool isEmpty() const override;  //!< Returns whether the selection is empty.
+  void selectNone()
+      override;  //!< Resets the selection to empty. This is functionally
+                 //!  equivalent to <TT>operator=(LevelSelection());</TT>
   FramesMode framesMode() const { return m_framesMode; }
   FramesMode &framesMode()  //!  Returns current frames selection mode.
   {
@@ -93,7 +94,7 @@ private:
   Filter m_filter;          //!< Selection filter.
 
   std::set<int> m_styles;  //!< Selected palette styles used with the \p
-                           //!SELECTED_STYLES filter.
+                           //! SELECTED_STYLES filter.
 };
 
 //*******************************************************************************

@@ -18,15 +18,15 @@ public:
   TColumnSelection();
   ~TColumnSelection();
 
-  bool isEmpty() const;
+  bool isEmpty() const override;
   void selectColumn(int col, bool on = true);
-  void selectNone();
+  void selectNone() override;
 
   bool isColumnSelected(int col) const;
 
   const std::set<int> &getIndices() const { return m_indices; }
 
-  void enableCommands();
+  void enableCommands() override;
 
   void copyColumns();
   void pasteColumns();

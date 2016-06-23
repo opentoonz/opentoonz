@@ -265,7 +265,7 @@ int main(int argc, char *argv[]) {
 
 #ifdef Q_OS_WIN
   //	Since currently OpenToonz does not work with OpenGL of software or
-  //angle,
+  // angle,
   //	force Qt to use desktop OpenGL
   a.setAttribute(Qt::AA_UseDesktopOpenGL, true);
 #endif

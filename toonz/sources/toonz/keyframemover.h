@@ -90,10 +90,10 @@ public:
 
   void onCellChange(int row, int col);
 
-  void onClick(const QMouseEvent *event);
-  void onDrag(const QMouseEvent *event);
-  void onRelease(int row, int col);
-  void drawCellsArea(QPainter &p);
+  void onClick(const QMouseEvent *event) override;
+  void onDrag(const QMouseEvent *event) override;
+  void onRelease(int row, int col) override;
+  void drawCellsArea(QPainter &p) override;
 };
 
 #endif

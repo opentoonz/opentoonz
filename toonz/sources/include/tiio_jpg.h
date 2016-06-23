@@ -37,12 +37,12 @@ public:
   JpgReader();
   ~JpgReader();
 
-  Tiio::RowOrder getRowOrder() const;
+  Tiio::RowOrder getRowOrder() const override;
 
-  void open(FILE *file);
+  void open(FILE *file) override;
 
-  void readLine(char *buffer, int x0, int x1, int shrink);
-  int skipLines(int lineCount);
+  void readLine(char *buffer, int x0, int x1, int shrink) override;
+  int skipLines(int lineCount) override;
 };
 
 DVAPI Tiio::ReaderMaker makeJpgReader;

@@ -36,11 +36,11 @@ public:
   ScriptEngine *getEngine() const { return m_engine; }
 
 protected:
-  void keyPressEvent(QKeyEvent *e);
+  void keyPressEvent(QKeyEvent *e) override;
   void onReturnKeyPress();
 
-  bool canInsertFromMimeData(const QMimeData *source) const;
-  void insertFromMimeData(const QMimeData *source);
+  bool canInsertFromMimeData(const QMimeData *source) const override;
+  void insertFromMimeData(const QMimeData *source) override;
 
 public slots:
   void onEvaluationDone();

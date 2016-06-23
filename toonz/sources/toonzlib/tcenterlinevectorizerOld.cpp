@@ -1158,7 +1158,7 @@ void CenterLineVectorizer::traceLine(DataPixel *pix) {
         TPointD p1;
         if (na1->m_junction && nb1->m_junction) {
           //					assert(na1->m_junction ==
-          //nb1->m_junction);
+          // nb1->m_junction);
         } else {
           if (na1->m_junction) {
             p1              = convert(nb1->m_pixel->m_pos);
@@ -1559,8 +1559,8 @@ Junction *CenterLineVectorizer::mergeJunctions(
       }
     } else {
       //			if(
-      //isContained(it_junction->m_junction->m_center, newJunction->m_nodes) )
-      //continue;
+      // isContained(it_junction->m_junction->m_center, newJunction->m_nodes) )
+      // continue;
       /*			if(
       it_junction->m_junction->m_nodes.size() < 3)
       {
@@ -1571,7 +1571,8 @@ Junction *CenterLineVectorizer::mergeJunctions(
                       it_protoStroke!=it_junction->m_junction->m_protoStrokes.end();
                       ++it_protoStroke)
               {
-                      if(	(*it_protoStroke)->m_startJunction == newJunction
+                      if(	(*it_protoStroke)->m_startJunction ==
+      newJunction
       ||
                               (*it_protoStroke)->m_endJunction == newJunction )
                       {
@@ -1691,7 +1692,7 @@ void CenterLineVectorizer::joinJunctions() {
     joinJunctions.push_back(JunctionMerge(currJunction));
 
     //		std::sort(currJunction->m_nodes.begin(),
-    //currJunction->m_nodes.end());
+    // currJunction->m_nodes.end());
     std::deque<Node *>::iterator it;
     for (it = currJunction->m_nodes.begin(); it != currJunction->m_nodes.end();
          it++) {
@@ -1767,13 +1768,13 @@ junctionMaxDist )
       // erase duplicate junctions
       //			joinJunctions.sort();
       //			std::sort(joinJunctions.begin(),
-      //joinJunctions.end());
+      // joinJunctions.end());
       //			std::list<JunctionMerge>::iterator it_newEnd;
       //			it_newEnd = std::unique(joinJunctions.begin(),
-      //joinJunctions.end());
+      // joinJunctions.end());
       //			assert(it_newEnd == joinJunctions.end());
       //			joinJunctions.erase(it_newEnd,
-      //joinJunctions.end());
+      // joinJunctions.end());
 
       Junction *newJunction = mergeJunctions(joinJunctions);
       assert(newJunction);
@@ -1851,9 +1852,9 @@ link.m_first) ) == m_links.end() )
 void CenterLineVectorizer::createJunctionPolygon(Junction *junction) {
   // int size = junction->m_nodes.size();
   //	std::sort(junction->m_nodes.begin(), junction->m_nodes.end(),
-  //CompareJunctionNodes(junction->m_center));
+  // CompareJunctionNodes(junction->m_center));
   //	std::reverse(junction->m_nodes.begin(), junction->m_nodes.end());
-  //std::deque<Node*>::iterator it, it_temp;
+  // std::deque<Node*>::iterator it, it_temp;
   std::deque<Node *>::iterator it, it_temp;
   for (it = junction->m_nodes.begin(); it != junction->m_nodes.end(); it++) {
     int step = 0;
@@ -1920,17 +1921,19 @@ currNode);
         }
       else {
         //				assert(*(it+1) == otherNode || (it+1 ==
-        //junction->m_nodes.end() && *junction->m_nodes.begin() == otherNode) );
+        // junction->m_nodes.end() && *junction->m_nodes.begin() == otherNode)
+        // );
         if (currNode != otherNode) {
           Node tempNode = *otherNode;
           *otherNode    = *currNode;
           *currNode     = tempNode;
-          //					it_temp = std::find(junction->m_nodes.begin(),
-          //junction->m_nodes.end(), currNode);
+          //					it_temp =
+          //std::find(junction->m_nodes.begin(),
+          // junction->m_nodes.end(), currNode);
           //					assert(it_temp !=
-          //junction->m_nodes.end());
+          // junction->m_nodes.end());
           //					if(it+1 ==
-          //junction->m_nodes.end())
+          // junction->m_nodes.end())
           //						std::swap(*junction->m_nodes.begin(),
           //*it_temp);
           //					else
@@ -2630,10 +2633,10 @@ void OutlineVectorizer::createOutlineStrokes() {
       stroke->setSelfLoop();
       m_vimage->addStroke(stroke);
       //			TStroke *stroke = TStroke::interpolate(points,
-      //m_configuration.interpolationError);
+      // m_configuration.interpolationError);
       //     		stroke->setStyle(strokeStyleId);
       //			m_vimage->addStroke(stroke);//,
-      //TPalette::DefaultStrokeStyle, TPalette::DefaultFillStyle);
+      // TPalette::DefaultStrokeStyle, TPalette::DefaultFillStyle);
       // internalPoints.push_back(internalPoint);
       // m_vimage->fill(externalPoint, TPalette::DefaultFillStyle);
     }

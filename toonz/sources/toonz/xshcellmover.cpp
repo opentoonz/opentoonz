@@ -252,7 +252,7 @@ public:
 
   CellsMover *getCellsMover() { return &m_cellsMover; }
 
-  void undo() const {
+  void undo() const override {
     m_cellsMover.undoMoveCells();
 
     int ca       = m_cellsMover.getStartPos().x;
@@ -269,7 +269,7 @@ public:
     if (m_cellsMover.getColumnTypeFromCell(0) == TXshColumn::eSoundType)
       TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
-  void redo() const {
+  void redo() const override {
     int ca       = m_cellsMover.getStartPos().x;
     int cb       = m_cellsMover.getPos().x;
     int colCount = m_cellsMover.getColumnCount();
@@ -297,10 +297,10 @@ public:
       TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Move Level"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  QString getHistoryString() override { return QObject::tr("Move Level"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //=============================================================================

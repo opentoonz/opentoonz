@@ -74,11 +74,11 @@ protected:
   double posToSpectrumValue(int pos);
   int spectrumValueToPos(double spectrumValue);
 
-  void paintEvent(QPaintEvent *e);
-  void mousePressEvent(QMouseEvent *e);
-  void mouseMoveEvent(QMouseEvent *e);
+  void paintEvent(QPaintEvent *e) override;
+  void mousePressEvent(QMouseEvent *e) override;
+  void mouseMoveEvent(QMouseEvent *e) override;
 
-  void mouseReleaseEvent(QMouseEvent *e);
+  void mouseReleaseEvent(QMouseEvent *e) override;
 
   int getMaxPosKeyIndex();
   int getMinPosKeyIndex();
@@ -121,7 +121,7 @@ protected slots:
   void onColorChanged(const TPixel32 &color, bool isDragging);
 
 protected:
-  void paintEvent(QPaintEvent *e);
+  void paintEvent(QPaintEvent *e) override;
 
 signals:
   void keyColorChanged(bool);

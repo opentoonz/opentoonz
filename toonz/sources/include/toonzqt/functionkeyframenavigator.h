@@ -21,17 +21,17 @@ public:
   void setCurve(TDoubleParam *curve);
 
 protected:
-  bool hasNext() const;
-  bool hasPrev() const;
-  bool hasKeyframes() const;
-  bool isKeyframe() const;
-  bool isFullKeyframe() const { return isKeyframe(); }
-  void toggle();
-  void goNext();
-  void goPrev();
+  bool hasNext() const override;
+  bool hasPrev() const override;
+  bool hasKeyframes() const override;
+  bool isKeyframe() const override;
+  bool isFullKeyframe() const override { return isKeyframe(); }
+  void toggle() override;
+  void goNext() override;
+  void goPrev() override;
 
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
 
 public slots:
   void onFrameSwitched() { update(); }

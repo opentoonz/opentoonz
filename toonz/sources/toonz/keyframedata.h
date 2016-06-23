@@ -31,7 +31,7 @@ public:
   TKeyframeData(const TKeyframeData *src);
   ~TKeyframeData();
 
-  TKeyframeData *clone() const { return new TKeyframeData(this); }
+  TKeyframeData *clone() const override { return new TKeyframeData(this); }
 
   // data <- xsh
   void setKeyframes(std::set<Position> positions, TXsheet *xsh);

@@ -69,8 +69,8 @@ public:
 
   UCHAR *buffer() const { return m_buf; }
 
-  int read(const char *srcBuf, int len);
-  int write(char *dstBuf, int len);
+  int read(const char *srcBuf, int len) override;
+  int write(char *dstBuf, int len) override;
 };
 
 //*************************************************************************************
@@ -94,8 +94,8 @@ public:
 
   TRasterP raster() const { return m_ras; }
 
-  int read(const char *srcBuf, int len);
-  int write(char *dstBuf, int len);
+  int read(const char *srcBuf, int len) override;
+  int write(char *dstBuf, int len) override;
 };
 
 }  // namespace t32bitsrv

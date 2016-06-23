@@ -615,7 +615,7 @@ public:
                      this->pixe_starts_, this->thre_starts_, this->result_,
                      this->alpha_ref_);
   }
-  void run(void) {
+  void run(void) override {
     bool rgb_rendering_sw   = true;
     bool alpha_rendering_sw = this->alpha_rendering_sw_;
     if (this->pixe_tracks_.size() <= 1) {

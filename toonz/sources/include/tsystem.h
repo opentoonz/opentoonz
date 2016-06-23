@@ -75,7 +75,7 @@ public:
   TSystemException(const std::string &);
   TSystemException(const std::wstring &msg);
   ~TSystemException() {}
-  TString getMessage() const;
+  TString getMessage() const override;
 };
 
 // DVAPI ostream&operator<<(ostream&out, const TSystemException &e);

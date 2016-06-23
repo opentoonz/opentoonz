@@ -106,9 +106,9 @@ public:
   FxSchematicScene(QWidget *parent);
   ~FxSchematicScene();
 
-  void updateScene();
-  QGraphicsItem *getCurrentNode();
-  void reorderScene();
+  void updateScene() override;
+  QGraphicsItem *getCurrentNode() override;
+  void reorderScene() override;
   TXsheet *getXsheet();
 
   void setApplication(TApplication *app);
@@ -148,11 +148,11 @@ public:
   bool isLargeScaled() { return m_isLargeScaled; }
 
 protected:
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme);
-  void mousePressEvent(QGraphicsSceneMouseEvent *me);
-  void mouseMoveEvent(QGraphicsSceneMouseEvent *me);
-  void mouseReleaseEvent(QGraphicsSceneMouseEvent *me);
-  bool event(QEvent *e);
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
+  void mouseMoveEvent(QGraphicsSceneMouseEvent *me) override;
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent *me) override;
+  bool event(QEvent *e) override;
 
 private:
   FxSchematicNode *addFxSchematicNode(TFx *fx);
@@ -187,7 +187,7 @@ signals:
   void editObject();
 
 protected slots:
-  void onSelectionSwitched(TSelection *oldSel, TSelection *newSel);
+  void onSelectionSwitched(TSelection *oldSel, TSelection *newSel) override;
   void onSelectionChanged();
 
   // void onOutputFxAdded();

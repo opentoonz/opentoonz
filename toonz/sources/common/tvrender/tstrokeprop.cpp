@@ -111,12 +111,12 @@ TStrokeProp *TRasterImagePatternStrokeProp::clone(const TStroke *stroke) const {
 
 //-----------------------------------------------------------------------------
 
-void TRasterImagePatternStrokeProp::draw(const TVectorRenderData &
-                                             rd) /*assenza di const non e' una
-                                                    dimenticanza! Alcune
-                                                    sottoclassi devono
-                                                    ridefinire questo metodo e
-                                                    serbve che non sia const*/
+void TRasterImagePatternStrokeProp::draw(
+    const TVectorRenderData &rd) /*assenza di const non e' una
+                                    dimenticanza! Alcune
+                                    sottoclassi devono
+                                    ridefinire questo metodo e
+                                    serbve che non sia const*/
 {
   if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
       !convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))
@@ -171,12 +171,12 @@ TStrokeProp *TVectorImagePatternStrokeProp::clone(const TStroke *stroke) const {
 
 //-----------------------------------------------------------------------------
 
-void TVectorImagePatternStrokeProp::draw(const TVectorRenderData &
-                                             rd) /*assenza di const non e' una
-                                                    dimenticanza! Alcune
-                                                    sottoclassi devono
-                                                    ridefinire questo metodo e
-                                                    serbve che non sia const*/
+void TVectorImagePatternStrokeProp::draw(
+    const TVectorRenderData &rd) /*assenza di const non e' una
+                                    dimenticanza! Alcune
+                                    sottoclassi devono
+                                    ridefinire questo metodo e
+                                    serbve che non sia const*/
 {
   if (rd.m_clippingRect != TRect() && !rd.m_is3dView &&
       !convert(rd.m_aff * m_stroke->getBBox()).overlaps(rd.m_clippingRect))

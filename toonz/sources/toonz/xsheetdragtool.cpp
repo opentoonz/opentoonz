@@ -116,7 +116,7 @@ public:
   XsheetSelectionDragTool(XsheetViewer *viewer)
       : DragTool(viewer), m_firstRow(0), m_firstCol(0), m_modifier() {}
   // activate when clicked the cell
-  void onClick(const QMouseEvent *event) {
+  void onClick(const QMouseEvent *event) override {
     m_modifier = event->modifiers();
     int row    = getViewer()->yToRow(event->pos().y());
     int col    = getViewer()->xToColumn(event->pos().x());
@@ -171,7 +171,7 @@ public:
     refreshCellsArea();
     refreshRowsArea();
   }
-  void onDrag(int row, int col) {
+  void onDrag(int row, int col) override {
     if (col < 0) return;
     if (row < 0) row = 0;
     if (m_modifier & Qt::ControlModifier)
@@ -183,7 +183,7 @@ public:
     refreshCellsArea();
     refreshRowsArea();
   }
-  void onRelease(const QMouseEvent *event) {
+  void onRelease(const QMouseEvent *event) override {
     TApp::instance()->getCurrentSelection()->notifySelectionChanged();
     refreshRowsArea();
   }
@@ -212,19 +212,19 @@ public:
       , m_oldStep(oldStep)
       , m_newStep(newStep) {}
 
-  void undo() const {
+  void undo() const override {
     XsheetGUI::setPlayRange(m_oldR0, m_oldR1, m_oldStep, false);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     XsheetGUI::setPlayRange(m_newR0, m_newR1, m_newStep, false);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     if (m_oldR0 < 0 || m_oldR1 < 0)
       return QObject::tr("Modify Play Range  : %1 - %2")
           .arg(QString::number(m_newR0 + 1))
@@ -236,7 +236,7 @@ public:
         .arg(QString::number(m_newR0 + 1))
         .arg(QString::number(m_newR1 + 1));
   }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 }  // namespace
@@ -407,7 +407,7 @@ public:
     }
   }
 
-  void undo() const {
+  void undo() const override {
     // undo for shrinking operation -> revert cells
     if (m_deltaRow < 0) (m_invert) ? setCells() : insertCells();
     // undo for stretching operation -> remove cells
@@ -422,7 +422,7 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     // redo for shrinking operation -> remove cells
     if (m_deltaRow < 0) (m_invert) ? clearCells() : removeCells();
     // redo for stretching operation -> revert cells
@@ -437,12 +437,14 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) + sizeof(TXshCell) * m_cells.size();
   }
 
-  QString getHistoryString() { return QObject::tr("Use Level Extender"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  QString getHistoryString() override {
+    return QObject::tr("Use Level Extender");
+  }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -624,7 +626,7 @@ public:
       , m_invert(invert) {}
 
   // called when the smart tab is clicked
-  void onClick(int row, int col) {
+  void onClick(int row, int col) override {
     int r0, c0, r1, c1;
     getViewer()->getCellSelection()->getSelectedCells(r0, c0, r1, c1);
     if (m_invert)
@@ -645,7 +647,7 @@ public:
     m_undo->setCells(xsh, r0, c0, m_rowCount, m_colCount);
   }
 
-  void onDrag(int row, int col) {
+  void onDrag(int row, int col) override {
     if (!m_invert)
       onCellChange(row, col);
     else
@@ -742,7 +744,7 @@ public:
                                                  m_c0 + m_colCount - 1);
   }
 
-  void onRelease(int row, int col) {
+  void onRelease(int row, int col) override {
     int delta = m_r1 - (m_r0 + m_rowCount - 1);
     if (delta == 0)
       delete m_undo;
@@ -804,25 +806,27 @@ public:
     return soundColumn;
   }
 
-  void undo() const {
+  void undo() const override {
     TXshSoundColumn *soundColumn = getColumn();
     if (!soundColumn) return;
     soundColumn->assignLevels(m_oldSoundColumn.getPointer());
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     TXshSoundColumn *soundColumn = getColumn();
     if (!soundColumn) return;
     soundColumn->assignLevels(m_newSoundColumn.getPointer());
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Modify Sound Level"); }
+  QString getHistoryString() override {
+    return QObject::tr("Modify Sound Level");
+  }
 
-  int getHistoryType() { return HistoryType::Xsheet; }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 }  // namespace
@@ -879,7 +883,7 @@ public:
     return soundColumn;
   }
 
-  void onClick(int row, int col) {
+  void onClick(int row, int col) override {
     m_firstRow                   = row;
     m_col                        = col;
     TXshSoundColumn *soundColumn = getColumn();
@@ -889,7 +893,7 @@ public:
     getViewer()->update();
   }
 
-  void onDrag(int row, int col) {
+  void onDrag(int row, int col) override {
     onChange(row);
     refreshCellsArea();
   }
@@ -918,7 +922,7 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
-  void onRelease(int row, int col) {
+  void onRelease(int row, int col) override {
     if (row - m_firstRow == 0) {
       m_undo = 0;
       return;
@@ -962,7 +966,7 @@ class CellKeyframeMoverTool : public LevelMoverTool {
   KeyframeMoverTool *m_keyframeMoverTool;
 
 protected:
-  bool canMove(const TPoint &pos) {
+  bool canMove(const TPoint &pos) override {
     if (!m_keyframeMoverTool->canMove(pos)) return false;
     return LevelMoverTool::canMove(pos);
   }
@@ -972,23 +976,23 @@ public:
     m_keyframeMoverTool = new KeyframeMoverTool(viewer, true);
   }
 
-  void onClick(const QMouseEvent *e) {
+  void onClick(const QMouseEvent *e) override {
     LevelMoverTool::onClick(e);
     m_keyframeMoverTool->onClick(e);
   }
 
-  void onDrag(const QMouseEvent *e) {
+  void onDrag(const QMouseEvent *e) override {
     LevelMoverTool::onDrag(e);
     if (m_validPos) m_keyframeMoverTool->onDrag(e);
   }
-  void onRelease(int row, int col) {
+  void onRelease(int row, int col) override {
     TUndoManager::manager()->beginBlock();
     LevelMoverTool::onRelease(row, col);
     m_keyframeMoverTool->onRelease(row, col);
     TUndoManager::manager()->endBlock();
   }
 
-  void drawCellsArea(QPainter &p) {
+  void drawCellsArea(QPainter &p) override {
     LevelMoverTool::drawCellsArea(p);
     m_keyframeMoverTool->drawCellsArea(p);
   }
@@ -1026,7 +1030,7 @@ public:
     m_oldKeyframe = pegbar->getKeyframe(m_row);
   }
 
-  void onAdd() {
+  void onAdd() override {
     TStageObject *pegbar =
         TApp::instance()->getCurrentXsheet()->getXsheet()->getStageObject(
             m_objId);
@@ -1043,17 +1047,17 @@ public:
     TApp::instance()->getCurrentObject()->notifyObjectIdChanged(false);
   }
 
-  void undo() const { setKeyframe(m_oldKeyframe); }
-  void redo() const { setKeyframe(m_newKeyframe); }
-  int getSize() const { return sizeof *this; }
+  void undo() const override { setKeyframe(m_oldKeyframe); }
+  void redo() const override { setKeyframe(m_newKeyframe); }
+  int getSize() const override { return sizeof *this; }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Move keyframe handle  : %1  Handle of the keyframe %2")
         .arg(QString::fromStdString(m_objId.toString()))
         .arg(QString::number(m_row + 1));
   }
 
-  int getHistoryType() { return HistoryType::Xsheet; }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -1085,7 +1089,7 @@ public:
       , m_r1(0)
       , m_enable(true) {}
 
-  void onClick(int row, int col) {
+  void onClick(int row, int col) override {
     m_r0 = m_r1             = row;
     TXsheet *xsh            = getViewer()->getXsheet();
     TStageObjectId cameraId = xsh->getStageObjectTree()->getCurrentCameraId();
@@ -1101,7 +1105,7 @@ public:
     m_undo = new KeyFrameHandleUndo(objId, m_startRow);
   }
 
-  void onDrag(int row, int col) {
+  void onDrag(int row, int col) override {
     if (!m_enable) return;
     m_r1 = row;
     onCellChange(row, col);
@@ -1123,7 +1127,7 @@ public:
     m_stageObject->setKeyframeWithoutUndo(m_startRow, m_k);
   }
 
-  void onRelease(int row, int col) {
+  void onRelease(int row, int col) override {
     if (!m_enable) return;
     if (m_r0 == m_r1)
       delete m_undo;
@@ -1163,7 +1167,7 @@ class NoteMoveTool : public XsheetGUI::DragTool {
 public:
   NoteMoveTool(XsheetViewer *viewer) : DragTool(viewer) {}
 
-  void onClick(const QMouseEvent *e) {
+  void onClick(const QMouseEvent *e) override {
     TXshNoteSet *notes = getViewer()->getXsheet()->getNotes();
     int currentIndex   = getViewer()->getCurrentNoteIndex();
     m_startPos         = notes->getNotePos(currentIndex);
@@ -1197,13 +1201,13 @@ public:
     notes->setNotePos(currentIndex, newPos);
   }
 
-  void onDrag(const QMouseEvent *event) {
+  void onDrag(const QMouseEvent *event) override {
     QPoint p = event->pos();
     onChange(TPointD(p.x(), p.y()));
     refreshCellsArea();
   }
 
-  void onRelease(const QMouseEvent *event) {
+  void onRelease(const QMouseEvent *event) override {
     QPoint p = event->pos();
     onChange(TPointD(p.x(), p.y()));
 
@@ -1248,14 +1252,14 @@ public:
                    TApp::instance()->getCurrentFrame()->getFrame())
       , m_isFos(isFos) {}
 
-  void onClick(int row, int col) {
+  void onClick(int row, int col) override {
     OnionSkinMask mask = m_modifier.getMask();
     TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(mask);
     m_modifier.click(row, m_isFos);
     TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
   }
 
-  void onDrag(int row, int col) {
+  void onDrag(int row, int col) override {
     if (row < 0) row = 0;
     onRowChange(row);
     TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
@@ -1267,7 +1271,7 @@ public:
     TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(mask);
   }
 
-  void onRelease(int row, int col) {
+  void onRelease(int row, int col) override {
     m_modifier.release(row);
     OnionSkinMask mask = m_modifier.getMask();
     TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(mask);
@@ -1298,12 +1302,12 @@ class CurrentFrameModifier : public XsheetGUI::DragTool {
 public:
   CurrentFrameModifier(XsheetViewer *viewer) : DragTool(viewer) {}
 
-  void onClick(int row, int col) {
+  void onClick(int row, int col) override {
     TApp::instance()->getCurrentFrame()->setFrame(row);
     refreshRowsArea();
   }
 
-  void onDrag(int row, int col) {
+  void onDrag(int row, int col) override {
     if (row < 0) row = 0;
     int lastRow      = TApp::instance()->getCurrentFrame()->getFrameIndex();
     if (lastRow == row) return;
@@ -1318,7 +1322,9 @@ public:
     app->getCurrentFrame()->scrubXsheet(row, row, getViewer()->getXsheet());
   }
 
-  void onRelease(int row, int col) { getViewer()->getXsheet()->stopScrub(); }
+  void onRelease(int row, int col) override {
+    getViewer()->getXsheet()->stopScrub();
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -1348,14 +1354,14 @@ public:
   PlayRangeModifier(XsheetViewer *viewer)
       : DragTool(viewer), m_movingFirst(false) {}
 
-  void onClick(int row, int col) {
+  void onClick(int row, int col) override {
     XsheetGUI::getPlayRange(m_oldR0, m_oldR1, m_oldStep);
     assert(m_oldR0 == row || m_oldR1 == row);
     m_movingFirst = m_oldR0 == row;
     refreshRowsArea();
   }
 
-  void onDrag(int row, int col) {
+  void onDrag(int row, int col) override {
     if (row < 0) row = 0;
     onRowChange(row);
     refreshRowsArea();
@@ -1385,7 +1391,7 @@ public:
     XsheetGUI::setPlayRange(r0, r1, step, false);
   }
 
-  void onRelease(int row, int col) {
+  void onRelease(int row, int col) override {
     int newR0, newR1, newStep;
     XsheetGUI::getPlayRange(newR0, newR1, newStep);
     if (m_oldR0 != newR0 || m_oldR1 != newR1) {
@@ -1420,7 +1426,7 @@ public:
   ColumnSelectionTool(XsheetViewer *viewer)
       : DragTool(viewer), m_firstColumn(-1), m_enabled(false) {}
 
-  void onClick(const QMouseEvent *event) {
+  void onClick(const QMouseEvent *event) override {
     TColumnSelection *selection = getViewer()->getColumnSelection();
     int col                     = getViewer()->xToColumn(event->pos().x());
     m_firstColumn               = col;
@@ -1447,7 +1453,7 @@ public:
     getViewer()->update();
   }
 
-  void onDrag(int row, int col) {
+  void onDrag(int row, int col) override {
     if (!m_enabled) return;
     if (col < 0) return;
     TColumnSelection *selection = getViewer()->getColumnSelection();
@@ -1459,7 +1465,7 @@ public:
     refreshCellsArea();
     return;
   }
-  void onRelease(int row, int col) {
+  void onRelease(int row, int col) override {
     TSelectionHandle::getCurrent()->notifySelectionChanged();
   }
 };
@@ -1515,14 +1521,14 @@ public:
     assert(*indices.begin() >= 0);
     assert(delta < 0 || *indices.begin() - delta >= 0);
   }
-  void undo() const {
+  void undo() const override {
     moveColumns(m_indices, -m_delta);
     TSelection *selection =
         TApp::instance()->getCurrentSelection()->getSelection();
     if (selection) selection->selectNone();
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
-  void redo() const {
+  void redo() const override {
     std::set<int> ii;
     for (std::set<int>::const_iterator it = m_indices.begin();
          it != m_indices.end(); ++it)
@@ -1533,10 +1539,12 @@ public:
     if (selection) selection->selectNone();
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
-  int getSize() const { return sizeof(*this) + m_indices.size() * sizeof(int); }
+  int getSize() const override {
+    return sizeof(*this) + m_indices.size() * sizeof(int);
+  }
 
-  QString getHistoryString() { return QObject::tr("Move Columns"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  QString getHistoryString() override { return QObject::tr("Move Columns"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
@@ -1551,7 +1559,7 @@ public:
       , m_lastCol(-1)
       , m_offset(0) {}
 
-  void onClick(int row, int col) {
+  void onClick(int row, int col) override {
     TColumnSelection *selection = getViewer()->getColumnSelection();
     if (!selection->isColumnSelected(col)) {
       selection->selectNone();
@@ -1566,7 +1574,7 @@ public:
     assert(m_lastCol == *indices.begin());
     getViewer()->update();
   }
-  void onDrag(int row, int col) {
+  void onDrag(int row, int col) override {
     TColumnSelection *selection = getViewer()->getColumnSelection();
     std::set<int> indices       = selection->getIndices();
     if (indices.empty()) return;
@@ -1587,7 +1595,7 @@ public:
          ++it)
       selection->selectColumn(*it + dCol, true);
   }
-  void onRelease(int row, int col) {
+  void onRelease(int row, int col) override {
     int delta = m_lastCol - m_firstCol;
     if (delta == 0) return;
     TColumnSelection *selection = getViewer()->getColumnSelection();
@@ -1622,22 +1630,22 @@ public:
       , m_newParentId(newParentId)
       , m_child(child) {}
 
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     xsh->setStageObjectParent(m_child, m_oldParentId);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     xsh->setStageObjectParent(m_child, m_newParentId);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Change Pegbar"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  QString getHistoryString() override { return QObject::tr("Change Pegbar"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
@@ -1649,9 +1657,9 @@ public:
   ChangePegbarParentDragTool(XsheetViewer *viewer)
       : XsheetGUI::DragTool(viewer), m_firstCol(-1), m_lastCol(-1) {}
 
-  void onClick(int row, int col) { m_firstCol = m_lastCol = col; }
-  void onDrag(int row, int col) { m_lastCol = col; }
-  void onRelease(int row, int col) {
+  void onClick(int row, int col) override { m_firstCol = m_lastCol = col; }
+  void onDrag(int row, int col) override { m_lastCol = col; }
+  void onRelease(int row, int col) override {
     // TUndoManager::manager()->add(new ColumnMoveUndo(indices, delta));
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     TStageObjectId columnId(getViewer()->getObjectId(m_firstCol));
@@ -1720,9 +1728,9 @@ public:
     }
   }
 
-  void onClick(const QMouseEvent *) {}
+  void onClick(const QMouseEvent *) override {}
 
-  void onDrag(const QMouseEvent *event) {
+  void onDrag(const QMouseEvent *event) override {
     if (!m_enabled) return;
     double v =
         (double)(60 - (event->pos().y() - (XsheetGUI::RowHeight * 2 + 4))) /
@@ -1737,7 +1745,7 @@ public:
     getViewer()->update();
   }
 
-  void onRelease(const QMouseEvent *) {
+  void onRelease(const QMouseEvent *) override {
     TApp::instance()->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 };
@@ -1774,7 +1782,7 @@ public:
       , m_oldRow(0)
       , m_timerId(0) {}
 
-  void onClick(int row, int col) {
+  void onClick(int row, int col) override {
     TColumnSelection *selection = getViewer()->getColumnSelection();
     selection->selectNone();
     m_startRow = row;
@@ -1782,7 +1790,7 @@ public:
     getViewer()->updateCells();
   }
 
-  void onDrag(int row, int col) { onCellChange(row, col); }
+  void onDrag(int row, int col) override { onCellChange(row, col); }
 
   void onCellChange(int row, int col) {
     assert(m_startRow >= 0);
@@ -1790,7 +1798,7 @@ public:
     getViewer()->updateCells();
   }
 
-  void onRelease(int row, int col) {
+  void onRelease(int row, int col) override {
     int r0 = std::min(row, m_startRow);
     int r1 = std::max(row, m_startRow);
     assert(m_soundColumn);
@@ -1885,7 +1893,7 @@ public:
       , m_valid(false)
       , m_type(NO_MOVEMENT) {}
 
-  void onClick(const QDropEvent *e) {
+  void onClick(const QDropEvent *e) override {
     if (e->mimeData()->hasUrls()) {
       QList<QUrl> urls = e->mimeData()->urls();
       int i;
@@ -1918,7 +1926,7 @@ public:
     }
     refreshCellsArea();
   }
-  void onDrag(const QDropEvent *e) {
+  void onDrag(const QDropEvent *e) override {
     TPoint pos(e->pos().x(), e->pos().y());
     int row = getViewer()->yToRow(pos.y);
     int col = getViewer()->xToColumn(pos.x);
@@ -1933,7 +1941,7 @@ public:
     m_curPos  = pos;
     refreshCellsArea();
   }
-  void onRelease(const QDropEvent *e) {
+  void onRelease(const QDropEvent *e) override {
     TPoint pos(e->pos().x(), e->pos().y());
     int row = getViewer()->yToRow(pos.y);
     int col = getViewer()->xToColumn(pos.x);
@@ -1964,7 +1972,7 @@ public:
     }
     refreshCellsArea();
   }
-  void drawCellsArea(QPainter &p) {
+  void drawCellsArea(QPainter &p) override {
     TPoint pos(getViewer()->xToColumn(m_curPos.x),
                getViewer()->yToRow(m_curPos.y));
     TRect rect = m_data->getLevelFrameRect();

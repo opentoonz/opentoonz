@@ -49,7 +49,7 @@ public:
   SolidColorBgPainter(std::string name, TPixel32 color)
       : BgPainter(name), m_color(color) {}
 
-  void paint(const TRaster32P &ras) { ras->fill(m_color); }
+  void paint(const TRaster32P &ras) override { ras->fill(m_color); }
 };
 
 //=============================================================================
@@ -61,7 +61,7 @@ public:
   CheckboardBgPainter(std::string name, TPixel32 c0, TPixel32 c1)
       : BgPainter(name), m_c0(c0), m_c1(c1) {}
 
-  void paint(const TRaster32P &ras) {
+  void paint(const TRaster32P &ras) override {
     int n = 4, min = 4;
     TDimensionD d(std::max(min, ras->getLx() / n),
                   std::max(min, ras->getLy() / n));
@@ -146,12 +146,12 @@ public:
                   SwatchViewer *viewer);
     ~ContentRender();
 
-    void run();
-    int taskLoad();
+    void run() override;
+    int taskLoad() override;
 
-    void onStarted(TThread::RunnableP task);
-    void onFinished(TThread::RunnableP task);
-    void onCanceled(TThread::RunnableP task);
+    void onStarted(TThread::RunnableP task) override;
+    void onFinished(TThread::RunnableP task) override;
+    void onCanceled(TThread::RunnableP task) override;
   };
 
 #if QT_VERSION >= 0x050500
@@ -194,14 +194,14 @@ protected:
 
   void setAff(const TAffine &aff);
 
-  void paintEvent(QPaintEvent *event);
-  void mousePressEvent(QMouseEvent *event);
-  void mouseMoveEvent(QMouseEvent *event);
-  void mouseReleaseEvent(QMouseEvent *event);
-  void wheelEvent(QWheelEvent *);
-  void keyPressEvent(QKeyEvent *event);
-  void resizeEvent(QResizeEvent *event);
-  void hideEvent(QHideEvent *event);
+  void paintEvent(QPaintEvent *event) override;
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  void wheelEvent(QWheelEvent *) override;
+  void keyPressEvent(QKeyEvent *event) override;
+  void resizeEvent(QResizeEvent *event) override;
+  void hideEvent(QHideEvent *event) override;
 
 signals:
   void pointPositionChanged(int index, const TPointD &p);

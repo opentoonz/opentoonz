@@ -140,7 +140,7 @@ public:
   Executor(ScriptEngine *engine, const QString &cmd)
       : m_engine(engine), m_cmd(cmd) {}
 
-  void run() {
+  void run() override {
     m_engine->m_engine->collectGarbage();
     QScriptValue result = m_engine->m_engine->evaluate(m_cmd);
     if (result.isError()) {

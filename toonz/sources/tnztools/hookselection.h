@@ -23,13 +23,13 @@ public:
   HookUndo(const TXshLevelP &level);
   ~HookUndo();
 
-  void onAdd();
+  void onAdd() override;
   void assignHookSet(const HookSet &src) const;
 
-  void undo() const;
-  void redo() const;
+  void undo() const override;
+  void redo() const override;
 
-  int getSize() const;
+  int getSize() const override;
 };
 
 //=============================================================================
@@ -52,7 +52,7 @@ public:
   HooksData(const TXshLevelP &level);
   ~HooksData();
 
-  HooksData *clone() const;
+  HooksData *clone() const override;
   void storeHookPositions(const std::vector<int> &ids);
   void restoreHookPositions() const;
 };
@@ -80,11 +80,11 @@ public:
   void unselect(int id, int side);
   bool isSelected(int id, int side) const;
   void invertSelection(int id, int side);
-  bool isEmpty() const;
-  void selectNone() { m_hooks.clear(); }
+  bool isEmpty() const override;
+  void selectNone() override { m_hooks.clear(); }
   HookSet *getHookSet() const;
   bool select(const TSelection *s);
-  void enableCommands();
+  void enableCommands() override;
 
   // commands
   void deleteSelectedHooks();

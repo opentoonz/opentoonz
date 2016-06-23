@@ -272,9 +272,9 @@ public:
   UndoPaletteSetKeyFrame(int styleId, int frame, TPaletteHandle *paletteHandle)
       : m_frame(frame), m_styleId(styleId), m_paletteHandle(paletteHandle) {}
 
-  void undo() const { setKeyFrame(); }
-  void redo() const { setKeyFrame(); }
-  int getSize() const { return sizeof(*this); }
+  void undo() const override { setKeyFrame(); }
+  void redo() const override { setKeyFrame(); }
+  int getSize() const override { return sizeof(*this); }
 
 protected:
   void setKeyFrame() const {

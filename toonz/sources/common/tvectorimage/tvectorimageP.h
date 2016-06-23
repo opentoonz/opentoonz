@@ -228,7 +228,7 @@ private:
   // gruppo o il move di strokes
 
   //--------------------NUOVO CALCOLO
-  //REGIONI------------------------------------------------
+  // REGIONI------------------------------------------------
 
 public:
 #ifdef LEVO

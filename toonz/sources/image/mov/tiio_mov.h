@@ -95,10 +95,10 @@ public:
   TLevelWriterMov(const TFilePath &path, TPropertyGroup *winfo);
   ~TLevelWriterMov();
 
-  TImageWriterP getFrameWriter(TFrameId fid);
+  TImageWriterP getFrameWriter(TFrameId fid) override;
 
   void save(const TImageP &img, int frameIndex);
-  void saveSoundTrack(TSoundTrack *st);
+  void saveSoundTrack(TSoundTrack *st) override;
 
 public:
   static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo) {
@@ -130,20 +130,20 @@ public:
   TLevelReaderMov(const TFilePath &path);
   ~TLevelReaderMov();
 
-  TImageReaderP getFrameReader(TFrameId fid);
-  TLevelP loadInfo();
+  TImageReaderP getFrameReader(TFrameId fid) override;
+  TLevelP loadInfo() override;
   void load(const TRasterP &rasP, int frameIndex, const TPoint &pos,
             int shrinkX = 1, int shrinkY = 1);
 
   void timecode(int frame, UCHAR &hh, UCHAR &mm, UCHAR &ss, UCHAR &ff);
   void loadedTimecode(UCHAR &hh, UCHAR &mm, UCHAR &ss, UCHAR &ff);
 
-  const TImageInfo *getImageInfo(TFrameId fid) { return m_info; }
-  const TImageInfo *getImageInfo() { return m_info; }
+  const TImageInfo *getImageInfo(TFrameId fid) override { return m_info; }
+  const TImageInfo *getImageInfo() override { return m_info; }
 
   void setYMirror(bool enabled);
   void setLoadTimecode(bool enabled);
-  void enableRandomAccessRead(bool enable);
+  void enableRandomAccessRead(bool enable) override;
 
   TDimension getSize() const { return TDimension(m_lx, m_ly); }
   TRect getBBox() const { return TRect(0, 0, m_lx - 1, m_ly - 1); }

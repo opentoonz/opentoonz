@@ -38,7 +38,8 @@ public:
     this->m_ref_mode->addItem(4, "Luminance");
     this->m_ref_mode->addItem(-1, "Nothing");
   }
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (this->m_input.isConnected()) {
       const bool ret      = this->m_input->doGetBBox(frame, bBox, info);
       const double margin = ceil(this->m_radius->getValue(frame));
@@ -51,15 +52,16 @@ public:
       return false;
     }
   }
-  bool canHandle(const TRenderSettings &rend_sets, double frame) {
+  bool canHandle(const TRenderSettings &rend_sets, double frame) override {
     return true;
   }
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     const double radius = this->m_radius->getValue(frame);
     return TRasterFx::memorySize(rect.enlarge(ceil(radius) + 0.5), info.m_bpp);
   }
-  void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &rend_sets) override;
 };
 FX_PLUGIN_IDENTIFIER(ino_median_filter, "inoMedianFilterFx")
 //------------------------------------------------------------

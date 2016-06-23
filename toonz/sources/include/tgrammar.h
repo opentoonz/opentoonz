@@ -114,9 +114,9 @@ public:
   NumberNode(Calculator *calc, double value)
       : CalculatorNode(calc), m_value(value) {}
 
-  double compute(double vars[3]) const { return m_value; }
+  double compute(double vars[3]) const override { return m_value; }
 
-  void accept(CalculatorNodeVisitor &visitor) {}
+  void accept(CalculatorNodeVisitor &visitor) override {}
 };
 
 //-------------------------------------------------------------------
@@ -128,9 +128,9 @@ public:
   VariableNode(Calculator *calc, int varIdx)
       : CalculatorNode(calc), m_varIdx(varIdx) {}
 
-  double compute(double vars[3]) const { return vars[m_varIdx]; }
+  double compute(double vars[3]) const override { return vars[m_varIdx]; }
 
-  void accept(CalculatorNodeVisitor &visitor) {}
+  void accept(CalculatorNodeVisitor &visitor) override {}
 };
 
 //-------------------------------------------------------------------

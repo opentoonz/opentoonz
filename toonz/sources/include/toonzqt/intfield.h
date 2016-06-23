@@ -56,10 +56,10 @@ public:
   void setStep(double _step) { m_step = _step; }
 
 protected:
-  void paintEvent(QPaintEvent *e);
-  void mousePressEvent(QMouseEvent *);
-  void mouseMoveEvent(QMouseEvent *);
-  void mouseReleaseEvent(QMouseEvent *);
+  void paintEvent(QPaintEvent *e) override;
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
 
   void addValue(bool isDragging);
   void removeValue(bool isDragging);
@@ -118,7 +118,7 @@ public:
 protected:
   /*! If focus is lost and current text value is out of range emit signal
                   \b editingFinished.*/
-  void focusOutEvent(QFocusEvent *);
+  void focusOutEvent(QFocusEvent *) override;
 };
 
 //=============================================================================

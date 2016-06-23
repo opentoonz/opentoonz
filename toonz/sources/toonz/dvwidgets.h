@@ -45,7 +45,7 @@ protected slots:
   void onCurrentIndexChanged(const QString &text);
 
 private:
-  void onPropertyChanged();
+  void onPropertyChanged() override;
 };
 
 //-----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ protected slots:
   void onStateChanged(int state);
 
 private:
-  void onPropertyChanged();
+  void onPropertyChanged() override;
 };
 
 //-----------------------------------------------------------------------------
@@ -75,7 +75,7 @@ protected slots:
   void onTextChanged(const QString &text);
 
 private:
-  void onPropertyChanged();
+  void onPropertyChanged() override;
 };
 
 //-----------------------------------------------------------------------------
@@ -90,7 +90,7 @@ protected slots:
   void onValueChanged(bool isDragging);
 
 private:
-  void onPropertyChanged();
+  void onPropertyChanged() override;
 };
 
 //-----------------------------------------------------------------------------

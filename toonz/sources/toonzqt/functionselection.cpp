@@ -40,16 +40,16 @@ public:
     delete m_newData;
   }
 
-  void undo() const {
+  void undo() const override {
     QApplication::clipboard()->setMimeData(cloneData(m_oldData));
   }
-  void redo() const {
+  void redo() const override {
     QApplication::clipboard()->setMimeData(cloneData(m_newData));
   }
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) + sizeof(QMimeData) * 2;  // approx
   }
-  QString getHistoryString() { return QObject::tr("Copy Keyframe"); }
+  QString getHistoryString() override { return QObject::tr("Copy Keyframe"); }
 };
 
 //-----------------------------------------------------------------------------
@@ -97,7 +97,7 @@ public:
     delete m_data;
   }
 
-  void undo() const {
+  void undo() const override {
     int columnCount = (int)m_columns.size();
     for (int col = 0; col < columnCount; col++) {
       TDoubleParam *param = m_columns[col].m_param;
@@ -108,15 +108,15 @@ public:
       param->setKeyframes(m_columns[col].m_oldKeyframes);
     }
   }
-  void redo() const {
+  void redo() const override {
     for (int col = 0; col < (int)m_columns.size(); col++) {
       m_data->setData(col, m_columns[col].m_param, m_frame);
     }
   }
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) + 100;  // approx
   }
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Paste Keyframe  at Frame : %1")
         .arg(QString::number((int)m_frame + 1));
   }
@@ -152,22 +152,22 @@ public:
       m_columns[col].m_param->release();
   }
 
-  void undo() const {
+  void undo() const override {
     for (int col = 0; col < (int)m_columns.size(); col++)
       for (int i = 0; i < (int)m_columns[col].m_keyframes.size(); i++)
         m_columns[col].m_param->setKeyframe(m_columns[col].m_keyframes[i]);
   }
-  void redo() const {
+  void redo() const override {
     for (int col = 0; col < (int)m_columns.size(); col++)
       for (int i = 0; i < (int)m_columns[col].m_keyframes.size(); i++)
         m_columns[col].m_param->deleteKeyframe(
             m_columns[col].m_keyframes[i].m_frame);
   }
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) +
            sizeof(TDoubleKeyframe) * m_columns.size();  // sbagliato!
   }
-  QString getHistoryString() { return QObject::tr("Delete Keyframe"); }
+  QString getHistoryString() override { return QObject::tr("Delete Keyframe"); }
 
 private:
   std::vector<ColumnKeyframes> m_columns;
@@ -189,7 +189,7 @@ public:
     param->addRef();
   }
 
-  void undo() const {
+  void undo() const override {
     for (int i = (int)m_movements.size() - 1; i >= 0; i--) {
       TDoubleKeyframe kf =
           m_movements[i].m_param->getKeyframe(m_movements[i].m_kIndex);
@@ -197,7 +197,7 @@ public:
       m_movements[i].m_param->setKeyframe(m_movements[i].m_kIndex, kf);
     }
   }
-  void redo() const {
+  void redo() const override {
     for (int i = 0; i < (int)m_movements.size(); i++) {
       TDoubleKeyframe kf =
           m_movements[i].m_param->getKeyframe(m_movements[i].m_kIndex);
@@ -205,11 +205,11 @@ public:
       m_movements[i].m_param->setKeyframe(m_movements[i].m_kIndex, kf);
     }
   }
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) + sizeof(m_movements[0]) * m_movements.size();
   }
   int getCount() const { return (int)m_movements.size(); }
-  QString getHistoryString() { return QObject::tr("Move Keyframe"); }
+  QString getHistoryString() override { return QObject::tr("Move Keyframe"); }
 
 private:
   struct KeyframeMovement {

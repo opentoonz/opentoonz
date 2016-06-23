@@ -29,7 +29,7 @@ class TXshLevelHandle;
 
 //=============================================================================
 //!	The StudioPaletteTreeViewer class provides an object to view and manage
-//!palettes files.
+//! palettes files.
 /*!	Inherits \b QTreeWidget, \b StudioPalette::Listener and \b
    ProjectManager::Listener.
 
@@ -78,18 +78,19 @@ public:
   TPaletteHandle *getStdPaletteHandle() const { return m_studioPaletteHandle; }
 
   /*!	Overriden from StudioPalette::Listener. */
-  void onStudioPaletteTreeChange() { refresh(); }
+  void onStudioPaletteTreeChange() override { refresh(); }
   /*!	Overriden from StudioPalette::Listener. */
-  void onStudioPaletteMove(const TFilePath &dstPath, const TFilePath &srcPath) {
+  void onStudioPaletteMove(const TFilePath &dstPath,
+                           const TFilePath &srcPath) override {
     refresh();
   }
   /*!	Overriden from StudioPalette::Listener. */
-  void onStudioPaletteChange(const TFilePath &palette) { refresh(); }
+  void onStudioPaletteChange(const TFilePath &palette) override { refresh(); }
 
   /*!	Overriden from TProjectManager::Listener. */
-  void onProjectSwitched() { resetProjectPaletteFolder(); }
+  void onProjectSwitched() override { resetProjectPaletteFolder(); }
   /*!	Overriden from TProjectManager::Listener. */
-  void onProjectChanged() { resetProjectPaletteFolder(); }
+  void onProjectChanged() override { resetProjectPaletteFolder(); }
 
   TFilePath getCurrentItemPath() { return getItemPath(currentItem()); }
 
@@ -163,33 +164,33 @@ protected:
 
   void resetDropItem();
 
-  void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event) override;
   /*! Open a context menu considering current item data role \b Qt::UserRole. */
-  void contextMenuEvent(QContextMenuEvent *event);
+  void contextMenuEvent(QContextMenuEvent *event) override;
   /*! Add an action to menu \b menu; the action has text \b name and its
                   \b triggered() signal is connetted with \b slot. */
   void createMenuAction(QMenu &menu, const char *id, QString name,
                         const char *slot);
   /*! If button left is pressed start drag and drop. */
-  void mouseMoveEvent(QMouseEvent *event);
+  void mouseMoveEvent(QMouseEvent *event) override;
   /*! If path related to current item exist and is a palette execute drag. */
   void startDragDrop();
   /*! Verify drag enter data, if it has an url and it's path is a palette or
      data
                   is a PaletteData accept drag event. */
-  void dragEnterEvent(QDragEnterEvent *event);
+  void dragEnterEvent(QDragEnterEvent *event) override;
   /*! Find item folder nearest to current position. */
-  void dragMoveEvent(QDragMoveEvent *event);
+  void dragMoveEvent(QDragMoveEvent *event) override;
   /*! Execute drop event. If dropped palette is in studio palette folder move
                   palette, otherwise copy palette in current folder. */
-  void dropEvent(QDropEvent *event);
+  void dropEvent(QDropEvent *event) override;
   /*! Set dropItem to 0 and update the tree. */
-  void dragLeaveEvent(QDragLeaveEvent *event);
+  void dragLeaveEvent(QDragLeaveEvent *event) override;
 };
 
 //=============================================================================
 //!	The StudioPaletteViewer class provides an object to view and manage
-//!studio palettes.
+//! studio palettes.
 /*!	Inherits \b QFrame.
                 This object is composed of a splitter \b QSplitter that contain
    a vertical

@@ -713,7 +713,7 @@ int rootFinding(const std::vector<double> &in_poly, std::vector<double> &sol) {
     sol.push_back(0.0);
     p.erase(p.begin());  // se i coefficienti bassi sono zero, ci sono soluzioni
                          // pari a 0.0. le metto,
-  }  // e abbasso il grado del polinomio(piu' veloce)
+  }                      // e abbasso il grado del polinomio(piu' veloce)
 
   switch (p.size()) {
   case 0:

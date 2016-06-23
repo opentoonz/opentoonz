@@ -462,9 +462,9 @@ public:
     if (m_data) delete m_data;
   }
 
-  void onAdd() { m_newPalette = m_level->getPalette()->clone(); }
+  void onAdd() override { m_newPalette = m_level->getPalette()->clone(); }
 
-  void undo() const {
+  void undo() const override {
     if (!m_level || m_frames.empty()) return;
     std::set<TFrameId> frames = m_frames;
 
@@ -512,7 +512,7 @@ public:
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
 
-  void redo() const {
+  void redo() const override {
     if (!m_level || m_frames.empty()) return;
     if (m_isFrameInserted) {
       assert(m_frames.size() == 1);
@@ -605,11 +605,11 @@ public:
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) + sizeof(*m_data) + sizeof(*m_tiles);
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Paste  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_level->getName()));
 
@@ -621,7 +621,7 @@ public:
 
     return str;
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 //=============================================================================
@@ -654,9 +654,9 @@ public:
     if (m_data) delete m_data;
   }
 
-  void onAdd() { m_newPalette = m_level->getPalette()->clone(); }
+  void onAdd() override { m_newPalette = m_level->getPalette()->clone(); }
 
-  void undo() const {
+  void undo() const override {
     if (!m_level || m_frames.empty()) return;
 
     std::set<TFrameId> frames = m_frames;
@@ -696,7 +696,7 @@ public:
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
 
-  void redo() const {
+  void redo() const override {
     if (!m_level || m_frames.empty()) return;
 
     if (m_isFrameInserted) {
@@ -727,9 +727,9 @@ public:
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
 
-  int getSize() const { return sizeof(*this) + sizeof(*m_data); }
+  int getSize() const override { return sizeof(*this) + sizeof(*m_data); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Paste  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_level->getName()));
 
@@ -741,7 +741,7 @@ public:
 
     return str;
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 /*//=============================================================================
@@ -904,7 +904,7 @@ public:
     if (m_newData) m_newData->releaseData();
   }
 
-  void undo() const {
+  void undo() const override {
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
     std::set<TFrameId> frames = m_frames;
@@ -955,7 +955,7 @@ public:
     *m_sl->getHookSet() = *m_oldLevelHooks;
   }
 
-  void redo() const {
+  void redo() const override {
     if (!m_sl || m_frames.empty()) return;
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
@@ -966,9 +966,9 @@ public:
                            true, keepOriginalPalette, true);
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Paste  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_sl->getName()));
 
@@ -980,7 +980,7 @@ public:
 
     return str;
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 //=============================================================================
@@ -1012,16 +1012,16 @@ public:
                            true, dummy);
   }
 
-  void undo() const { pasteFramesFromData(m_oldData); }
+  void undo() const override { pasteFramesFromData(m_oldData); }
 
   // OSS.: Non posso usare il metodo "clearFramesWithoutUndo(...)" perche'
   //  genera un NUOVO frame vuoto, perdendo quello precedente e le eventuali
   //  modifiche che ad esso possono essere state fatte successivamente.
-  void redo() const { pasteFramesFromData(m_newData); }
+  void redo() const override { pasteFramesFromData(m_newData); }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Delete Frames  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_sl->getName()));
 
@@ -1033,7 +1033,7 @@ public:
 
     return str;
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 //=============================================================================
@@ -1060,7 +1060,7 @@ public:
     if (m_newData) m_newData->releaseData();
   }
 
-  void undo() const {
+  void undo() const override {
     std::set<TFrameId> frames = m_framesCutted;
     bool dummy                = true;
     pasteFramesWithoutUndo(m_newData, m_sl, frames, DrawingData::OVER_SELECTION,
@@ -1068,7 +1068,7 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     // Prendo il clipboard corrente.
     QClipboard *clipboard  = QApplication::clipboard();
     QMimeData *currentData = cloneData(clipboard->mimeData());
@@ -1080,9 +1080,9 @@ public:
     clipboard->setMimeData(currentData, QClipboard::Clipboard);
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Cut Frames  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_sl->getName()));
 
@@ -1094,7 +1094,7 @@ public:
 
     return str;
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 }  // namespace
@@ -1117,7 +1117,7 @@ public:
                 std::vector<TFrameId> oldFids)
       : m_level(level), m_insertedFids(insertedFids), m_oldFids(oldFids) {}
 
-  void undo() const {
+  void undo() const override {
     removeFramesWithoutUndo(m_level, m_insertedFids);
     m_level->renumber(m_oldFids);
     invalidateIcons(m_level.getPointer(), m_oldFids);
@@ -1128,7 +1128,7 @@ public:
     app->getCurrentLevel()->notifyLevelChange();
   }
 
-  void redo() const {
+  void redo() const override {
     makeSpaceForFids(m_level.getPointer(), m_insertedFids);
 
     for (auto const &fid : m_insertedFids) {
@@ -1142,9 +1142,9 @@ public:
     app->getCurrentLevel()->notifyLevelChange();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Add Frames  : Level %1 : Frame ")
                       .arg(QString::fromStdWString(m_level->getName()));
 
@@ -1156,7 +1156,7 @@ public:
 
     return str;
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 }  // namespace
@@ -1225,7 +1225,7 @@ public:
     invalidateIcons(m_level.getPointer(), fids);
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
-  void undo() const {
+  void undo() const override {
     std::vector<TFrameId> fids;
     m_level->getFids(fids);
     assert(fids.size() == m_fids.size());
@@ -1240,16 +1240,16 @@ public:
     }
     renumber(fids);
   }
-  void redo() const { renumber(m_fids); }
-  int getSize() const {
+  void redo() const override { renumber(m_fids); }
+  int getSize() const override {
     return sizeof(*this) + sizeof(TFrameId) * m_fids.size();
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Renumber  : Level %1")
         .arg(QString::fromStdWString(m_level->getName()));
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 }  // namespace
@@ -1639,7 +1639,7 @@ public:
                                     QString::number((uintptr_t)this));
   }
 
-  void undo() const {
+  void undo() const override {
     removeFramesWithoutUndo(m_level, m_frames);
     assert(m_oldFrames.size() == m_level->getFrameCount());
     m_level->renumber(m_oldFrames);
@@ -1647,7 +1647,7 @@ public:
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
 
-  void redo() const {
+  void redo() const override {
     if (!m_level || m_frames.empty()) return;
     if (m_level->getType() == PLI_XSHLEVEL)
       FilmstripCmd::insert(m_level.getPointer(), m_frames, false);
@@ -1668,13 +1668,13 @@ public:
     }
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Insert  : Level %1")
         .arg(QString::fromStdWString(m_level->getName()));
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 }  // namespace
@@ -1734,15 +1734,15 @@ public:
   FilmstripReverseUndo(TXshSimpleLevelP level, std::set<TFrameId> frames)
       : m_level(level), m_frames(frames) {}
 
-  void undo() const { performReverse(m_level, m_frames); }
-  void redo() const { performReverse(m_level, m_frames); }
-  int getSize() const { return sizeof *this; }
+  void undo() const override { performReverse(m_level, m_frames); }
+  void redo() const override { performReverse(m_level, m_frames); }
+  int getSize() const override { return sizeof *this; }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Reverse  : Level %1")
         .arg(QString::fromStdWString(m_level->getName()));
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 }  // namespace
@@ -1815,23 +1815,23 @@ public:
     for (i = 0; i < count; i++) m_newFrames.insert(insertPoint + i);
   }
 
-  void undo() const {
+  void undo() const override {
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
     removeFramesWithoutUndo(m_level, m_newFrames);
   }
-  void redo() const {
+  void redo() const override {
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
     performSwing(m_level, m_frames);
   }
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Swing  : Level %1")
         .arg(QString::fromStdWString(m_level->getName()));
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 }  // namespace
@@ -1911,7 +1911,7 @@ public:
       for (int j = 1; j < step; j++) m_insertedFrames.insert(*it + (++d));
   }
 
-  void undo() const {
+  void undo() const override {
     removeFramesWithoutUndo(m_level, m_insertedFrames);
     std::set<TFrameId>::const_iterator it = m_frames.begin();
     m_level->renumber(m_oldFrames);
@@ -1920,19 +1920,19 @@ public:
     invalidateIcons(m_level.getPointer(), m_oldFrames);
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
-  void redo() const {
+  void redo() const override {
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
     stepFilmstripFrames(m_level, m_frames, m_step);
   }
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Step %1  : Level %2")
         .arg(QString::number(m_step))
         .arg(QString::fromStdWString(m_level->getName()));
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 }  // namespace
@@ -2011,24 +2011,24 @@ public:
     for (; it != m_cutFrames.end(); ++it)
       TImageCache::instance()->remove(it->second);
   }
-  void undo() const {
+  void undo() const override {
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
     insertNotEmptyframes(m_level, m_cutFrames);
   }
-  void redo() const {
+  void redo() const override {
     TSelection *selection = TSelection::getCurrent();
     if (selection) selection->selectNone();
     eachFilmstripFrames(m_level, m_frames, m_each);
   }
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Each %1  : Level %2")
         .arg(QString::number(m_each))
         .arg(QString::fromStdWString(m_level->getName()));
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 }  // namespace
@@ -2070,24 +2070,24 @@ public:
       , m_frameInserted(frameInserted)
       , m_framesForRedo(framesForRedo) {}
 
-  void undo() const {
+  void undo() const override {
     assert(m_level);
     removeFramesWithoutUndo(m_level, m_frameInserted);
     m_level->renumber(m_oldFrames);
     invalidateIcons(m_level.getPointer(), m_oldFrames);
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
-  void redo() const {
+  void redo() const override {
     std::set<TFrameId> framesForRedo = m_framesForRedo;
     FilmstripCmd::duplicate(m_level.getPointer(), framesForRedo, false);
   }
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Duplicate  : Level %1")
         .arg(QString::fromStdWString(m_level->getName()));
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 }  // namespace
@@ -2160,7 +2160,7 @@ public:
   MoveLevelToSceneUndo(std::wstring levelName, int col, std::set<TFrameId> fids)
       : m_levelName(levelName), m_col(col), m_fids(fids) {}
 
-  void undo() const {
+  void undo() const override {
     TApp *app         = TApp::instance();
     TXsheet *xsh      = app->getCurrentXsheet()->getXsheet();
     ToonzScene *scene = app->getCurrentScene()->getScene();
@@ -2169,20 +2169,20 @@ public:
     xsh->clearCells(0, m_col, m_fids.size());
     app->getCurrentXsheet()->notifyXsheetChanged();
   }
-  void redo() const {
+  void redo() const override {
     TApp *app         = TApp::instance();
     ToonzScene *scene = app->getCurrentScene()->getScene();
     TXshLevel *xl     = scene->getLevelSet()->getLevel(m_levelName);
     if (!xl) return;
     moveToSceneFrames(xl, m_fids);
   }
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Move Level to Scene  : Level %1")
         .arg(QString::fromStdWString(m_levelName));
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 }  // namespace
@@ -2275,7 +2275,7 @@ public:
                          // rilascia queste immagini a causa dell'inbetweener
   }
 
-  void undo() const {
+  void undo() const override {
     UINT levelSize = m_fids.size() - 1;
     for (UINT count = 1; count != levelSize; count++) {
       TVectorImageP vImage = m_images[count];
@@ -2287,19 +2287,19 @@ public:
     TApp::instance()->getCurrentLevel()->notifyLevelChange();
   }
 
-  void redo() const {
+  void redo() const override {
     TFrameId fid0 = *m_fids.begin();
     TFrameId fid1 = *(--m_fids.end());
     FilmstripCmd::inbetweenWithoutUndo(m_level.getPointer(), fid0, fid1,
                                        m_interpolation);
   }
 
-  int getSize() const {
+  int getSize() const override {
     assert(!m_images.empty());
     return m_images.size() * m_images.front()->getStrokeCount() * 100;
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Inbetween  : Level %1,  ")
                       .arg(QString::fromStdWString(m_level->getName()));
     switch (m_interpolation) {
@@ -2318,7 +2318,7 @@ public:
     }
     return str;
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 }  // namespace

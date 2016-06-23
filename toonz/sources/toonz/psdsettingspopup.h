@@ -30,8 +30,9 @@ class PsdSettingsPopup : public DVGui::Dialog {
   // FRAMES: all psd layers are frames of a single Tlevel
   // COLUMNS: each psd layer is a TLevel with only one frame.
   // FOLDER: each psd layer is a TLevel and
-  //				 each psd folder is a TLevel where each psd layer contained
-  //into folder is a frame of TLevel
+  //				 each psd folder is a TLevel where each psd layer
+  //contained
+  // into folder is a frame of TLevel
 
   enum Mode { FLAT, FRAMES, COLUMNS, FOLDER };
 

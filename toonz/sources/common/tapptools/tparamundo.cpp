@@ -8,7 +8,7 @@ class ParamUndoManager : public TParamUndoManager {
 public:
   ParamUndoManager() {}
   ~ParamUndoManager() {}
-  void onChange(const TParamChange &change);
+  void onChange(const TParamChange &change) override;
 };
 
 //-------------------------------------------------------------------

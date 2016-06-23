@@ -56,20 +56,21 @@ public:
   void getSelectedClips(std::vector<TFilePath> &selectedClips);
 
   // da DvItemListModel
-  int getItemCount() const;
-  QVariant getItemData(int index, DataType dataType, bool isSelected = false);
-  bool isSceneItem(int index) const { return true; }
-  QMenu *getContextMenu(QWidget *parent, int index);
-  void enableSelectionCommands(TSelection *);
-  void startDragDrop();
+  int getItemCount() const override;
+  QVariant getItemData(int index, DataType dataType,
+                       bool isSelected = false) override;
+  bool isSceneItem(int index) const override { return true; }
+  QMenu *getContextMenu(QWidget *parent, int index) override;
+  void enableSelectionCommands(TSelection *) override;
+  void startDragDrop() override;
 
-  void draw(QPainter &);
+  void draw(QPainter &) override;
 
 protected:
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dragMoveEvent(QDragMoveEvent *event);
-  void dropEvent(QDropEvent *event);
-  void dragLeaveEvent(QDragLeaveEvent *event);
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dragMoveEvent(QDragMoveEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
+  void dragLeaveEvent(QDragLeaveEvent *event) override;
 
 public slots:
   void resetList();
@@ -161,7 +162,7 @@ public:
   static int computeTotalFrameCount(const std::vector<TFilePath> &clipList,
                                     bool useMarkers = false);
   bool addScene(MovieGenerator &g, ToonzScene *scene);
-  bool onFrameCompleted(int frameCount);
+  bool onFrameCompleted(int frameCount) override;
   void getMovieProperties(const TFilePath &scenePath, TDimension &resolution);
 };
 

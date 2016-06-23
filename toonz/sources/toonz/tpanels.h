@@ -39,14 +39,14 @@ class PaletteViewerPanel : public TPanel {
 public:
   PaletteViewerPanel(QWidget *parent);
 
-  void setViewType(int viewType);
-  int getViewType();
+  void setViewType(int viewType) override;
+  int getViewType() override;
 
-  void reset();
+  void reset() override;
 
 protected:
   void initializeTitleBar();
-  bool isActivatableOnEnter() { return true; }
+  bool isActivatableOnEnter() override { return true; }
 
 protected slots:
   void onColorStyleSwitched();
@@ -69,7 +69,7 @@ public:
   StudioPaletteViewerPanel(QWidget *parent);
 
 protected:
-  bool isActivatableOnEnter() { return true; }
+  bool isActivatableOnEnter() override { return true; }
 protected slots:
   void onColorStyleSwitched();
   void onPaletteSwitched();
@@ -105,8 +105,8 @@ public:
   ~ColorFieldEditorController() {}
 
   // Indice dello stile corrente == 1
-  void edit(DVGui::ColorField *colorField);
-  void hide();
+  void edit(DVGui::ColorField *colorField) override;
+  void hide() override;
 
 protected slots:
   void onColorStyleChanged();
@@ -132,8 +132,8 @@ public:
   ~CleanupColorFieldEditorController() {}
 
   // Indice dello stile corrente == 1
-  void edit(DVGui::CleanupColorField *colorField);
-  void hide();
+  void edit(DVGui::CleanupColorField *colorField) override;
+  void hide() override;
 
 protected slots:
   void onColorStyleChanged();
@@ -151,12 +151,12 @@ class SchematicScenePanel : public TPanel {
 public:
   SchematicScenePanel(QWidget *parent);
 
-  void setViewType(int viewType);
-  int getViewType();
+  void setViewType(int viewType) override;
+  int getViewType() override;
 
 protected:
-  void showEvent(QShowEvent *e);
-  void hideEvent(QHideEvent *e);
+  void showEvent(QShowEvent *e) override;
+  void hideEvent(QHideEvent *e) override;
 
 protected slots:
   void onShowPreview(TFxP fx);
@@ -179,16 +179,16 @@ class FunctionViewerPanel : public TPanel {
 public:
   FunctionViewerPanel(QWidget *parent = 0);
 
-  void reset();
+  void reset() override;
 
   void attachHandles();
   void detachHandles();
 
-  bool widgetInThisPanelIsFocused();
+  bool widgetInThisPanelIsFocused() override;
 
 protected:
-  void widgetFocusOnEnter();
-  void widgetClearFocusOnLeave();
+  void widgetFocusOnEnter() override;
+  void widgetClearFocusOnLeave() override;
 
 public slots:
 
@@ -226,9 +226,9 @@ protected:
 public:
   FlipbookPanel(QWidget *parent);
 
-  void reset();
+  void reset() override;
   // disable minimize button when docked
-  void onDock(bool docked);
+  void onDock(bool docked) override;
 
 protected slots:
   void onMinimizeButtonToggled(bool);

@@ -106,17 +106,19 @@ class Iwa_PNPerspectiveFx : public TStandardZeraryFx {
 public:
   Iwa_PNPerspectiveFx();
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
 
-  bool canHandle(const TRenderSettings &info, double frame);
+  bool canHandle(const TRenderSettings &info, double frame) override;
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &rend_sets) override;
 
   void doCompute_CPU(TTile &tile, double frame, const TRenderSettings &settings,
                      float4 *out_host, TDimensionI &dimOut,
                      PN_Params &pnParams);
 
-  void getParamUIs(TParamUIConcept *&concepts, int &length);
+  void getParamUIs(TParamUIConcept *&concepts, int &length) override;
 };
 
 #endif

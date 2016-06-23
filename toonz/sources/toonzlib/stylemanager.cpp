@@ -54,9 +54,9 @@ class CustomStyleManager::StyleLoaderTask : public TThread::Runnable {
 public:
   StyleLoaderTask(CustomStyleManager *manager, const TFilePath &fp);
 
-  void run();
+  void run() override;
 
-  void onFinished(TThread::RunnableP sender);
+  void onFinished(TThread::RunnableP sender) override;
 };
 
 //-----------------------------------------------------------------------------

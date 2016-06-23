@@ -91,7 +91,7 @@ sperando che sia il nome del file => compila ma non funziona
 
 Tifstream::~Tifstream() {
 #ifndef MACOSX
-  fclose();
+  fclose(m_file);
 #endif
 }
 

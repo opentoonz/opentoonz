@@ -5,7 +5,7 @@
     <name>ArrowToolOptionsBox</name>
     <message>
         <source>Pick:</source>
-        <translation>选取：</translation>
+        <translation>选取:</translation>
     </message>
     <message>
         <source>Position</source>
@@ -13,19 +13,19 @@
     </message>
     <message>
         <source>E/W:</source>
-        <translation>东西向：</translation>
+        <translation>左右:</translation>
     </message>
     <message>
         <source>N/S:</source>
-        <translation>南北向:</translation>
+        <translation>上下:</translation>
     </message>
     <message>
         <source>Z:</source>
-        <translation>Z:</translation>
+        <translation>纵深:</translation>
     </message>
     <message>
         <source>SO:</source>
-        <translation></translation>
+        <translation>堆栈顺序:</translation>
     </message>
     <message>
         <source>Rotation</source>
@@ -37,19 +37,19 @@
     </message>
     <message>
         <source>Global:</source>
-        <translation>全局：</translation>
+        <translation>全局:</translation>
     </message>
     <message>
         <source>H:</source>
-        <translation>水平：</translation>
+        <translation>水平:</translation>
     </message>
     <message>
         <source>V:</source>
-        <translation>垂直：</translation>
+        <translation>垂直:</translation>
     </message>
     <message>
         <source>Maintain:</source>
-        <translation>保持：</translation>
+        <translation>保持:</translation>
     </message>
     <message>
         <source>Shear</source>
@@ -57,11 +57,11 @@
     </message>
     <message>
         <source>Center</source>
-        <translation type="vanished">基準点</translation>
+        <translation type="vanished">中心点</translation>
     </message>
     <message>
         <source>Lock</source>
-        <translation type="vanished">ロック</translation>
+        <translation type="vanished">锁定</translation>
     </message>
     <message>
         <source>(</source>
@@ -84,11 +84,11 @@
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>硬度：</translation>
+        <translation>硬度:</translation>
     </message>
     <message>
         <source>Accuracy:</source>
-        <translation>精度：</translation>
+        <translation>精度:</translation>
     </message>
     <message>
         <source>Selective</source>
@@ -96,35 +96,35 @@
     </message>
     <message>
         <source>Preset:</source>
-        <translation>预设：</translation>
+        <translation>预设:</translation>
     </message>
     <message>
         <source>Break Sharp Angles</source>
-        <translation type="vanished">鋭角で線を分割</translation>
+        <translation type="vanished">断开尖角</translation>
     </message>
     <message>
         <source>Pencil Mode</source>
-        <translation type="vanished">鉛筆モード</translation>
+        <translation type="vanished">铅笔模式</translation>
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation type="vanished">圧力感度</translation>
+        <translation type="vanished">压力灵敏度</translation>
     </message>
     <message>
         <source>Cap</source>
-        <translation>线端</translation>
+        <translation>端点</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>拐角形状</translation>
+        <translation>边角</translation>
     </message>
     <message>
         <source>Miter:</source>
-        <translation>斜切比率：</translation>
+        <translation>斜接比例:</translation>
     </message>
     <message>
         <source>Size</source>
-        <translation>笔触</translation>
+        <translation>大小</translation>
     </message>
     <message>
         <source>Break</source>
@@ -138,16 +138,20 @@
         <source>Pressure</source>
         <translation>压感</translation>
     </message>
+    <message>
+        <source>Smooth:</source>
+        <translation>平滑:</translation>
+    </message>
 </context>
 <context>
     <name>BrushToolOptionsBox</name>
     <message>
         <source>Preset Name</source>
-        <translation>预设名</translation>
+        <translation>预设名称</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>好</translation>
+        <translation>确定</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -165,18 +169,18 @@
     <name>ControlPointSelection</name>
     <message>
         <source>Set Linear Control Point</source>
-        <translation>设定线性控制点</translation>
+        <translation>设置线性控制点</translation>
     </message>
     <message>
         <source>Set Nonlinear Control Point</source>
-        <translation>设定非线性控制点</translation>
+        <translation>设置非线性控制点</translation>
     </message>
 </context>
 <context>
     <name>EditTool</name>
     <message>
         <source>Scale Constraint:</source>
-        <translation>拡大・縮小設定:</translation>
+        <translation>缩放设置:</translation>
     </message>
     <message>
         <source>Auto Select Column</source>
@@ -184,59 +188,59 @@
     </message>
     <message>
         <source>Global Key</source>
-        <translation>全局键</translation>
+        <translation>全局关键帧</translation>
     </message>
     <message>
         <source>Lock Center E/W</source>
-        <translation>锁定中点（东西向）</translation>
+        <translation>锁定中心点(左右)</translation>
     </message>
     <message>
         <source>Lock Center N/S</source>
-        <translation>锁定中点（南北向）</translation>
+        <translation>锁定中心点(上下)</translation>
     </message>
     <message>
         <source>Lock Position E/W</source>
-        <translation>锁定位置（东西向）</translation>
+        <translation>锁定位置(左右)</translation>
     </message>
     <message>
         <source>Lock Position N/S</source>
-        <translation>锁定位置（南北向）</translation>
+        <translation>锁定位置(上下)</translation>
     </message>
     <message>
         <source>Lock Rotation</source>
-        <translation>旋转</translation>
+        <translation>锁定旋转</translation>
     </message>
     <message>
         <source>Lock Shear H</source>
-        <translation>切变（横）</translation>
+        <translation>锁定切变(水平)</translation>
     </message>
     <message>
         <source>Lock Shear V</source>
-        <translation>切变（纵）</translation>
+        <translation>锁定切变(垂直)</translation>
     </message>
     <message>
         <source>Lock Scale H</source>
-        <translation>缩放（横）</translation>
+        <translation>锁定缩放(水平)</translation>
     </message>
     <message>
         <source>Lock Scale V</source>
-        <translation>缩放（纵）</translation>
+        <translation>锁定缩放(垂直)</translation>
     </message>
     <message>
         <source>Lock Global Scale</source>
-        <translation>缩放［全局］</translation>
+        <translation>锁定缩放(全局)</translation>
     </message>
     <message>
         <source>E/W and N/S Positions</source>
-        <translation>东西向和南北向的位置</translation>
+        <translation>左右和上下位置</translation>
     </message>
     <message>
         <source>Z Position</source>
-        <translation>Z 位置</translation>
+        <translation>纵深位置</translation>
     </message>
     <message>
         <source>SO</source>
-        <translation></translation>
+        <translation>堆栈顺序</translation>
     </message>
     <message>
         <source>Rotation</source>
@@ -244,11 +248,11 @@
     </message>
     <message>
         <source>Global Scale</source>
-        <translation>缩放［全局］</translation>
+        <translation>全局缩放</translation>
     </message>
     <message>
         <source>Horizontal and Vertical Scale</source>
-        <translation>缩放（横向和纵向）</translation>
+        <translation>水平和垂直缩放</translation>
     </message>
     <message>
         <source>Shear</source>
@@ -260,26 +264,26 @@
     </message>
     <message>
         <source>Active Axis</source>
-        <translation>操作轴</translation>
+        <translation>当前轴</translation>
     </message>
 </context>
 <context>
     <name>EraserTool</name>
     <message>
         <source>Size:</source>
-        <translation>大小：</translation>
+        <translation>大小:</translation>
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>硬度：</translation>
+        <translation>硬度:</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation>类型：</translation>
+        <translation>类型:</translation>
     </message>
     <message>
         <source>Mode:</source>
-        <translation>模式：</translation>
+        <translation>模式:</translation>
     </message>
     <message>
         <source>Selective</source>
@@ -306,7 +310,7 @@
     </message>
     <message>
         <source>Type:</source>
-        <translation>类型：</translation>
+        <translation>类型:</translation>
     </message>
     <message>
         <source>Selective</source>
@@ -314,7 +318,7 @@
     </message>
     <message>
         <source>Mode:</source>
-        <translation>模式：</translation>
+        <translation>模式:</translation>
     </message>
     <message>
         <source>Onion Skin</source>
@@ -326,14 +330,14 @@
     </message>
     <message>
         <source>Segment</source>
-        <translation>线段自检</translation>
+        <translation>自动分段</translation>
     </message>
 </context>
 <context>
     <name>FingerTool</name>
     <message>
         <source>Size:</source>
-        <translation>大小：</translation>
+        <translation>大小:</translation>
     </message>
     <message>
         <source>Invert</source>
@@ -348,38 +352,38 @@
     </message>
     <message>
         <source>Pressure Sensitivity</source>
-        <translation>压力敏感性</translation>
+        <translation>压力灵敏度</translation>
     </message>
     <message>
         <source>Opacity:</source>
-        <translation>不透明度：</translation>
+        <translation>不透明度:</translation>
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>硬度：</translation>
+        <translation>硬度:</translation>
     </message>
     <message>
         <source>Preset:</source>
-        <translation>预设：</translation>
+        <translation>预设:</translation>
     </message>
 </context>
 <context>
     <name>FullColorEraserTool</name>
     <message>
         <source>Size:</source>
-        <translation>大小：</translation>
+        <translation>大小:</translation>
     </message>
     <message>
         <source>Opacity:</source>
-        <translation>不透明度：</translation>
+        <translation>不透明度:</translation>
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>硬度：</translation>
+        <translation>硬度:</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation>类型：</translation>
+        <translation>类型:</translation>
     </message>
     <message>
         <source>Invert</source>
@@ -394,25 +398,25 @@
     <name>HookTool</name>
     <message>
         <source>Snap</source>
-        <translation>捕捉</translation>
+        <translation>吸附</translation>
     </message>
 </context>
 <context>
     <name>MagnetTool</name>
     <message>
         <source>Size:</source>
-        <translation>大小：</translation>
+        <translation>大小:</translation>
     </message>
 </context>
 <context>
     <name>PaintBrushTool</name>
     <message>
         <source>Size:</source>
-        <translation>大小：</translation>
+        <translation>大小:</translation>
     </message>
     <message>
         <source>Mode:</source>
-        <translation>模式：</translation>
+        <translation>模式:</translation>
     </message>
     <message>
         <source>Selective</source>
@@ -427,7 +431,7 @@
     </message>
     <message>
         <source>Corner:</source>
-        <translation>拐角：</translation>
+        <translation>拐角:</translation>
     </message>
     <message>
         <source>Manual</source>
@@ -442,7 +446,7 @@
     </message>
     <message>
         <source>Paint Rigid</source>
-        <translation>涂绘刚柔</translation>
+        <translation>绘画刚性</translation>
     </message>
     <message>
         <source>Animate</source>
@@ -450,19 +454,19 @@
     </message>
     <message>
         <source>Rigid</source>
-        <translation>刚硬</translation>
+        <translation>刚性</translation>
     </message>
     <message>
         <source>Flex</source>
-        <translation>柔软</translation>
+        <translation>弹性</translation>
     </message>
     <message>
         <source>Mode:</source>
-        <translation>模式：</translation>
+        <translation>模式:</translation>
     </message>
     <message>
         <source>Vertex Name:</source>
-        <translation>顶点名：</translation>
+        <translation>顶点名:</translation>
     </message>
     <message>
         <source>Allow Stretching</source>
@@ -478,7 +482,7 @@
     </message>
     <message>
         <source>Global Key</source>
-        <translation>全局键</translation>
+        <translation>全局关键帧</translation>
     </message>
     <message>
         <source>A group of skeletons already exists for current column. Replacing it will also substitute any existing vertex animation.
@@ -490,7 +494,7 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>Ok</source>
-        <translation>好</translation>
+        <translation>确定</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -510,19 +514,19 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>Set Key</source>
-        <translation>设定键</translation>
+        <translation>设置关键帧</translation>
     </message>
     <message>
         <source>Set Rest Key</source>
-        <translation>设定休止键</translation>
+        <translation>设置休止关键帧</translation>
     </message>
     <message>
         <source>Set Global Key</source>
-        <translation>设置全局键</translation>
+        <translation>设置全局关键帧</translation>
     </message>
     <message>
         <source>Set Global Rest Key</source>
-        <translation>设置全局休止键</translation>
+        <translation>设置全局休止关键帧</translation>
     </message>
     <message>
         <source>Show Mesh</source>
@@ -530,11 +534,11 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>Show Rigidity</source>
-        <translation>显示刚硬度</translation>
+        <translation>显示刚性</translation>
     </message>
     <message>
         <source>Show SO</source>
-        <translation>显示 SO</translation>
+        <translation>显示堆栈顺序</translation>
     </message>
     <message>
         <source>Show Skeleton Onion Skin</source>
@@ -544,9 +548,9 @@ Do you want to continue?</source>
         <source>The previous vertex name will be discarded, and all associated keys will be lost.
 
 Do you want to proceed?</source>
-        <translation>之前的顶点名会被抛弃，所有的关联键也会丢失。
+        <translation>之前的顶点名称会被放弃，所有关联的关键帧也会丢失。
 
-要继续吗？</translation>
+您要继续吗？</translation>
     </message>
     <message>
         <source>Edit Mesh</source>
@@ -554,7 +558,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Snap To Mesh</source>
-        <translation>捕捉网格</translation>
+        <translation>吸附网格</translation>
     </message>
     <message>
         <source>Angle Bounds</source>
@@ -562,15 +566,15 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Swap Edge</source>
-        <translation>交换边界</translation>
+        <translation>交换边缘</translation>
     </message>
     <message>
         <source>Collapse Edge</source>
-        <translation>拆掉边界</translation>
+        <translation>折叠边缘</translation>
     </message>
     <message>
         <source>Split Edge</source>
-        <translation>分解边界</translation>
+        <translation>拆分边缘</translation>
     </message>
     <message>
         <source>Cut Mesh</source>
@@ -585,11 +589,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Skeleton:</source>
-        <translation>骨架：</translation>
+        <translation>骨架:</translation>
     </message>
     <message>
         <source>SO</source>
-        <translation></translation>
+        <translation>堆栈顺序</translation>
     </message>
     <message>
         <source>Angle</source>
@@ -604,23 +608,23 @@ Do you want to proceed?</source>
     <name>PrimitiveParam</name>
     <message>
         <source>Shape:</source>
-        <translation>形状：</translation>
+        <translation>形状:</translation>
     </message>
     <message>
         <source>Thickness:</source>
-        <translation>粗细：</translation>
+        <translation>粗细:</translation>
     </message>
     <message>
         <source>Opacity:</source>
-        <translation>不透明度：</translation>
+        <translation>不透明度:</translation>
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>硬度：</translation>
+        <translation>硬度:</translation>
     </message>
     <message>
         <source>Polygon Sides:</source>
-        <translation>边数：</translation>
+        <translation>多边形边数:</translation>
     </message>
     <message>
         <source>Auto Group</source>
@@ -640,41 +644,41 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Cap</source>
-        <translation>线端</translation>
+        <translation>端点</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>拐角</translation>
+        <translation>边角</translation>
     </message>
     <message>
         <source>Miter:</source>
-        <translation>斜切比率：</translation>
+        <translation>斜接比例:</translation>
     </message>
     <message>
         <source>Size:</source>
-        <translation>笔划粗细：</translation>
+        <translation>大小:</translation>
     </message>
 </context>
 <context>
     <name>PumpTool</name>
     <message>
         <source>Size:</source>
-        <translation>作用范围：</translation>
+        <translation>大小:</translation>
     </message>
     <message>
         <source>Accuracy:</source>
-        <translation>精度：</translation>
+        <translation>精度:</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Min:</source>
-        <translation>最小：</translation>
+        <translation>最小:</translation>
     </message>
     <message>
         <source>Max:</source>
-        <translation>最大：</translation>
+        <translation>最大:</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -686,23 +690,23 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The copied selection cannot be pasted in the current drawing.</source>
-        <translation>已拷的选择不能粘贴到当前绘图中。</translation>
+        <translation>无法将拷贝的选区粘贴到当前图像。</translation>
     </message>
     <message>
         <source>The current column is locked.</source>
-        <translation>当前列是锁定的。</translation>
+        <translation>当前列被锁定。</translation>
     </message>
     <message>
         <source>The current column is not visible in Camera Stand.</source>
-        <translation type="vanished">選択した列はテーブルに非表示で、作業できません。</translation>
+        <translation type="vanished">当前列在摄影机位中不可见。</translation>
     </message>
     <message>
         <source>It is not possible to edit the audio column.</source>
-        <translation>未能编辑该音频列。</translation>
+        <translation>无法编辑音频列。</translation>
     </message>
     <message>
         <source>It is not possible to edit the Magpie column.</source>
-        <translation>不能编辑 MAGPIE 列。</translation>
+        <translation>无法编辑 MAGPIE 列。</translation>
     </message>
     <message>
         <source>The current tool cannot be used on a Level column.</source>
@@ -746,11 +750,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>The current frame is locked: any editing is forbidden.</source>
-        <translation>当前帧已经被锁定：禁止所有编辑。</translation>
+        <translation>当前帧已经被锁定: 禁止所有编辑。</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation>好</translation>
+        <translation>确定</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -766,7 +770,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>RGB Picker (R%1, G%2, B%3)</source>
-        <translation>RGB 拾取器（R%1, G%2, B%3）</translation>
+        <translation>RGB 拾色器 (R%1, G%2, B%3)</translation>
     </message>
     <message>
         <source>Group</source>
@@ -782,7 +786,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Modify Fx Gadget  </source>
-        <translation>修改特效 Gadget</translation>
+        <translation>修改特效小工具</translation>
     </message>
     <message>
         <source>%1   Level : %2  Frame : %3</source>
@@ -798,40 +802,40 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Deform Raster</source>
-        <translation>光栅图变形</translation>
+        <translation>变形栅格图</translation>
     </message>
     <message>
         <source>Transform Raster</source>
-        <translation>光栅图变形</translation>
+        <translation>变换栅格图</translation>
     </message>
     <message>
         <source>Set Save Box : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</source>
-        <translation>设定保存框 : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</translation>
+        <translation>设置保存框 : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</translation>
     </message>
 </context>
 <context>
     <name>RGBPickerTool</name>
     <message>
         <source>Type:</source>
-        <translation>类型：</translation>
+        <translation>类型:</translation>
     </message>
     <message>
         <source>Passive Pick</source>
-        <translation>被动拾取</translation>
+        <translation>拾取光标位置颜色</translation>
     </message>
 </context>
 <context>
     <name>RGBPickerToolOptionsBox</name>
     <message>
         <source>Pick Screen</source>
-        <translation>拾取屏幕</translation>
+        <translation>屏幕拾色</translation>
     </message>
 </context>
 <context>
     <name>RasterSelectionTool</name>
     <message>
         <source>No Antialiasing</source>
-        <translation>不抗锯齿</translation>
+        <translation>不消除锯齿</translation>
     </message>
     <message>
         <source>Modify Savebox</source>
@@ -842,19 +846,19 @@ Do you want to proceed?</source>
     <name>RasterTapeTool</name>
     <message>
         <source>Type:</source>
-        <translation>类型：</translation>
+        <translation>类型:</translation>
     </message>
     <message>
         <source>Distance:</source>
-        <translation>距离：</translation>
+        <translation>距离:</translation>
     </message>
     <message>
         <source>Style Index:</source>
-        <translation>样式索引：</translation>
+        <translation>样式索引:</translation>
     </message>
     <message>
         <source>Opacity:</source>
-        <translation>不透明度：</translation>
+        <translation>不透明度:</translation>
     </message>
     <message>
         <source>Frame Range</source>
@@ -862,25 +866,25 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Angle:</source>
-        <translation>角度：</translation>
+        <translation>角度:</translation>
     </message>
 </context>
 <context>
     <name>SelectionTool</name>
     <message>
         <source>Type:</source>
-        <translation>类型：</translation>
+        <translation>类型:</translation>
     </message>
 </context>
 <context>
     <name>SelectionToolOptionsBox</name>
     <message>
         <source>H:</source>
-        <translation>横：</translation>
+        <translation>水平:</translation>
     </message>
     <message>
         <source>V:</source>
-        <translation>竖：</translation>
+        <translation>垂直:</translation>
     </message>
     <message>
         <source>Rotation</source>
@@ -888,11 +892,11 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>E/W:</source>
-        <translation>东西向：</translation>
+        <translation>左右:</translation>
     </message>
     <message>
         <source>N/S:</source>
-        <translation>南北向：</translation>
+        <translation>上下:</translation>
     </message>
     <message>
         <source>Thickness</source>
@@ -900,22 +904,22 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Link</source>
-        <translation>关联</translation>
+        <translation>保持长宽比</translation>
     </message>
 </context>
 <context>
     <name>SkeletonTool</name>
     <message>
         <source>Global Key</source>
-        <translation>全局键</translation>
+        <translation>全局关键帧</translation>
     </message>
     <message>
         <source>Show Only Active Skeleton</source>
-        <translation>仅显示激活的骨架</translation>
+        <translation>仅显示活动的骨架</translation>
     </message>
     <message>
         <source>Mode:</source>
-        <translation>模式：</translation>
+        <translation>模式:</translation>
     </message>
     <message>
         <source>Reset Pinned Center</source>
@@ -926,61 +930,61 @@ Do you want to proceed?</source>
     <name>TrackerTool</name>
     <message>
         <source>Width:</source>
-        <translation>宽：</translation>
+        <translation>宽度:</translation>
     </message>
     <message>
         <source>Height:</source>
-        <translation>高：</translation>
+        <translation>高度:</translation>
     </message>
     <message>
         <source>X:</source>
-        <translation>X：</translation>
+        <translation>X:</translation>
     </message>
     <message>
         <source>Y:</source>
-        <translation>Y：</translation>
+        <translation>Y:</translation>
     </message>
 </context>
 <context>
     <name>TypeTool</name>
     <message>
         <source>Font:</source>
-        <translation>字体：</translation>
+        <translation>字体:</translation>
     </message>
     <message>
         <source>Style:</source>
-        <translation>样式：</translation>
+        <translation>样式:</translation>
     </message>
     <message>
         <source>Vertical Orientation</source>
-        <translation>垂直方向</translation>
+        <translation>直排</translation>
     </message>
     <message>
         <source>Size:</source>
-        <translation>大小：</translation>
+        <translation>大小:</translation>
     </message>
 </context>
 <context>
     <name>VectorSelectionTool</name>
     <message>
         <source>Mode:</source>
-        <translation>模式：</translation>
+        <translation>模式:</translation>
     </message>
     <message>
         <source>Preserve Thickness</source>
-        <translation>保持线粗</translation>
+        <translation>保持粗细</translation>
     </message>
     <message>
         <source>Cap</source>
-        <translation>线端</translation>
+        <translation>端点</translation>
     </message>
     <message>
         <source>Join</source>
-        <translation>拐角形状</translation>
+        <translation>边角</translation>
     </message>
     <message>
         <source>Miter:</source>
-        <translation>斜切比率：</translation>
+        <translation>斜接比例:</translation>
     </message>
 </context>
 <context>
@@ -991,15 +995,15 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Join Vectors</source>
-        <translation>矢量相接</translation>
+        <translation>连接矢量</translation>
     </message>
     <message>
         <source>Mode:</source>
-        <translation>模式：</translation>
+        <translation>模式:</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation>类型：</translation>
+        <translation>类型:</translation>
     </message>
 </context>
 </TS>

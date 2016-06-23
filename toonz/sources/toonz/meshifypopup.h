@@ -45,8 +45,8 @@ public:
   MeshifyPopup();
 
 protected:
-  void showEvent(QShowEvent *se);
-  void hideEvent(QHideEvent *se);
+  void showEvent(QShowEvent *se) override;
+  void hideEvent(QHideEvent *se) override;
 
   void acquirePreview();
   void updateMeshPreview();

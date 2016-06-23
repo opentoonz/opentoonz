@@ -73,7 +73,7 @@
     <command>MI_SendBack</command>
     <command>MI_SendBackward</command>
   </menu>
-  <menu title="Scan &amp; Cleanup">
+  <menu title="Scan &amp;&amp; Cleanup">
     <command>MI_DefineScanner</command>
     <command>MI_ScanSettings</command>
     <command>MI_Scan</command>
@@ -156,6 +156,8 @@
     <command>MI_Rollup</command>
     <command>MI_Rolldown</command>
     <command>MI_TimeStretch</command>
+    <command>MI_DrawingSubForward</command>
+    <command>MI_DrawingSubBackward</command>
     <separator/>
     <command>MI_Autorenumber</command>
     <command>MI_Duplicate</command>

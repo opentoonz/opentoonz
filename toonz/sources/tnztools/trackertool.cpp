@@ -78,9 +78,9 @@ public:
       select(objectId, trackerRegionIndex);
   }
 
-  bool isEmpty() const { return m_objtp.empty(); }
+  bool isEmpty() const override { return m_objtp.empty(); }
 
-  void selectNone() { m_objtp.clear(); }
+  void selectNone() override { m_objtp.clear(); }
 
   HookSet *getHookSet() const {
     TXshLevel *xl = TTool::getApplication()->getCurrentLevel()->getLevel();
@@ -128,7 +128,7 @@ return TDataP(); */
       return false;
   }
 
-  void enableCommands();
+  void enableCommands() override;
   void convertToRegion();
 };
 
@@ -183,39 +183,39 @@ class TrackerTool : public TTool {
 public:
   TrackerTool();
 
-  ToolType getToolType() const { return TTool::LevelReadTool; }
+  ToolType getToolType() const override { return TTool::LevelReadTool; }
 
-  void updateTranslation();
+  void updateTranslation() override;
 
   TrackerObjectsSet *getTrackerObjectsSet() const;
   HookSet *getHookSet() const;
-  void draw();
+  void draw() override;
 
   void deleteSelectedTrackerRegion();
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
 
-  bool keyDown(int key, TUINT32 flags, const TPoint &pos);
+  bool keyDown(int key, TUINT32 flags, const TPoint &pos) override;
   // bool moveCursor(const TPointD &pos){}
-  void onEnter();
-  void onLeave();
-  void onActivate();
-  void onDeactivate();
+  void onEnter() override;
+  void onLeave() override;
+  void onActivate() override;
+  void onDeactivate() override;
 
-  void onImageChanged() {}
-  void reset();
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  void onImageChanged() override {}
+  void reset() override;
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
   void onSelectionChanged() { invalidate(); }
-  bool onPropertyChanged(std::string propertyName);
+  bool onPropertyChanged(std::string propertyName) override;
   bool select(const TSelection *) { return false; }
 
   bool pick(int &hookIndex, const TPointD &pos);
 
-  int getCursorId() const;
+  int getCursorId() const override;
 
 } trackerTool;
 

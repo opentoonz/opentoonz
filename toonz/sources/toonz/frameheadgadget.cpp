@@ -452,7 +452,7 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
     //		オニオンスキンの●エリア
     //をクリックで各フレームのON／OFF切り替え→ドラッグで伸ばせる
     //		Fixedオニオンスキンの●エリアをクリックで
-    //Fixedオニオンスキンの位置の指定
+    // Fixedオニオンスキンの位置の指定
 
     //-----
     //それぞれのパーツの位置Rectの指定。各フレームの右上座標からのオフセットも含む。
@@ -652,7 +652,7 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
 class OnionSkinToggle : public MenuItemHandler {
 public:
   OnionSkinToggle() : MenuItemHandler(MI_OnionSkin) {}
-  void execute() {
+  void execute() override {
     QAction *action = CommandManager::instance()->getAction(MI_OnionSkin);
     if (!action) return;
     bool checked = action->isChecked();

@@ -46,8 +46,8 @@ public:
 protected:
   // set m_pathFld to the default path
   void updatePath();
-
-  void showEvent(QShowEvent *);
+  void nextName();
+  void showEvent(QShowEvent *) override;
 
 public slots:
   void onLevelTypeChanged(const QString &text);

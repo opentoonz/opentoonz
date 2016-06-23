@@ -3070,12 +3070,12 @@ void do_resample(TRasterCM32P rout, const TRasterCM32P &rin,
         *out_tcm++ = tcm[0];  // If they are all equal, it's a copy-op
       else {
         // Otherwise, take the bilinear coordinates
-        fu   = u_ - u;
-        gu   = 1. - fu;
-        fv   = v_ - v;
-        gv   = 1. - fv;
-        w[0] = gu * gv;
-        w[2] = gu * fv;  // And the associated weights
+        fu          = u_ - u;
+        gu          = 1. - fu;
+        fv          = v_ - v;
+        gv          = 1. - fv;
+        w[0]        = gu * gv;
+        w[2]        = gu * fv;  // And the associated weights
         w[1]        = fu * gv;
         w[3]        = fu * fv;
         color_blobs = pencil_blobs = 0;

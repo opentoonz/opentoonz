@@ -180,7 +180,7 @@ public:
   // the method returns the processed codedPath (related to scene)
   //
   TFilePath process(ToonzScene *scene, ToonzScene *srcScene,
-                    TFilePath srcPath) {
+                    TFilePath srcPath) override {
     TFilePath actualSrcPath     = srcPath;
     if (srcScene) actualSrcPath = srcScene->decodeFilePath(srcPath);
 
@@ -386,7 +386,7 @@ public:
     m_columnInserted = columnInserted;
   }
 
-  void undo() const {
+  void undo() const override {
     TApp *app = TApp::instance();
     /*- 最初にシーンに読み込んだ操作のUndoのとき、Castから除く -*/
     if (m_level && m_isFirstTime)
@@ -420,7 +420,7 @@ public:
       app->getCurrentLevel()->setLevel(0);
     app->getCurrentScene()->notifyCastChange();
   }
-  void redo() const {
+  void redo() const override {
     TApp *app = TApp::instance();
     if (m_level)
       app->getCurrentScene()->getScene()->getLevelSet()->insertLevel(
@@ -438,11 +438,11 @@ public:
       app->getCurrentLevel()->setLevel(m_level.getPointer());
     app->getCurrentScene()->notifyCastChange();
   }
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) + sizeof(TXshCell) * m_cells.size() +
            sizeof(TXshLevel);
   }
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Load Level  %1")
         .arg(QString::fromStdWString(m_level->getName()));
   }
@@ -472,7 +472,7 @@ public:
       }
   }
 
-  void undo() const {
+  void undo() const override {
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     int c, r;
@@ -490,7 +490,7 @@ public:
     app->getCurrentScene()->notifyCastChange();
   }
 
-  void redo() const {
+  void redo() const override {
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     int c, r;
@@ -507,8 +507,8 @@ public:
     app->getCurrentScene()->notifyCastChange();
   }
 
-  int getSize() const { return sizeof(*this); }
-  QString getHistoryString() {
+  int getSize() const override { return sizeof(*this); }
+  QString getHistoryString() override {
     return QObject::tr("Load and Replace Level  %1")
         .arg(QString::fromStdWString(m_level->getName()));
   }
@@ -597,10 +597,10 @@ public:
     m_levelSetFolder = levelSetFolder;
   }
 
-  void process(TXshSimpleLevel *sl);
-  void process(TXshPaletteLevel *sl);
-  void process(TXshSoundLevel *sl);
-  bool aborted() const { return m_importStrategy.aborted(); }
+  void process(TXshSimpleLevel *sl) override;
+  void process(TXshPaletteLevel *sl) override;
+  void process(TXshSoundLevel *sl) override;
+  bool aborted() const override { return m_importStrategy.aborted(); }
 };
 
 //---------------------------------------------------------------------------
@@ -1020,7 +1020,7 @@ public:
 
   void setFids(const std::vector<TFrameId> &fids) { m_fids = fids; }
 
-  void undo() const {
+  void undo() const override {
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     if (m_insertEmptyColumn)
@@ -1037,7 +1037,7 @@ public:
     }
   }
 
-  void redo() const {
+  void redo() const override {
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     if (m_insertEmptyColumn) xsh->insertColumn(m_col);
@@ -1058,9 +1058,9 @@ public:
     app->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Expose Level  %1")
         .arg(QString::fromStdWString(m_sl->getName()));
   }
@@ -1084,7 +1084,7 @@ public:
       , m_insertEmptyColumn(insertEmptyColumn)
       , m_columnName(columnName) {}
 
-  void undo() const {
+  void undo() const override {
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     xsh->removeColumn(m_col);
@@ -1092,7 +1092,7 @@ public:
     app->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     if (m_insertEmptyColumn) xsh->insertColumn(m_col);
@@ -1106,7 +1106,7 @@ public:
     app->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 };
 
 //=============================================================================
@@ -1224,7 +1224,7 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
     }
 
     //--- If both the level and scene is clean, then open the quit confirmation
-    //dialog
+    // dialog
     if (!isLevelOrSceneIsDirty && msg == "Quit") {
       QString question("Are you sure ?");
       int ret =
@@ -2457,7 +2457,7 @@ bool IoCmd::importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
 class SaveSceneCommandHandler : public MenuItemHandler {
 public:
   SaveSceneCommandHandler() : MenuItemHandler(MI_SaveScene) {}
-  void execute() { IoCmd::saveScene(); }
+  void execute() override { IoCmd::saveScene(); }
 } saveSceneCommandHandler;
 
 //---------------------------------------------------------------------------
@@ -2465,7 +2465,7 @@ public:
 class SaveLevelCommandHandler : public MenuItemHandler {
 public:
   SaveLevelCommandHandler() : MenuItemHandler(MI_SaveLevel) {}
-  void execute() {
+  void execute() override {
     TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
     if (!sl) {
       DVGui::warning(QObject::tr("No Current Level"));
@@ -2498,7 +2498,7 @@ public:
 class SaveProjectTemplate : public MenuItemHandler {
 public:
   SaveProjectTemplate() : MenuItemHandler(MI_SaveDefaultSettings) {}
-  void execute() {
+  void execute() override {
     QString question;
     question =
         QObject::tr("Are you sure you want to save the Default Settings?");
@@ -2520,7 +2520,7 @@ public:
 class OpenRecentSceneFileCommandHandler : public MenuItemHandler {
 public:
   OpenRecentSceneFileCommandHandler() : MenuItemHandler(MI_OpenRecentScene) {}
-  void execute() {
+  void execute() override {
     QAction *act = CommandManager::instance()->getAction(MI_OpenRecentScene);
     DVMenuAction *menu = dynamic_cast<DVMenuAction *>(act->menu());
     int index          = menu->getTriggeredActionIndex();
@@ -2536,7 +2536,7 @@ public:
 class OpenRecentLevelFileCommandHandler : public MenuItemHandler {
 public:
   OpenRecentLevelFileCommandHandler() : MenuItemHandler(MI_OpenRecentLevel) {}
-  void execute() {
+  void execute() override {
     QAction *act = CommandManager::instance()->getAction(MI_OpenRecentLevel);
     DVMenuAction *menu = dynamic_cast<DVMenuAction *>(act->menu());
     int index          = menu->getTriggeredActionIndex();
@@ -2560,7 +2560,7 @@ class ClearRecentSceneFileListCommandHandler : public MenuItemHandler {
 public:
   ClearRecentSceneFileListCommandHandler()
       : MenuItemHandler(MI_ClearRecentScene) {}
-  void execute() {
+  void execute() override {
     RecentFiles::instance()->clearRecentFilesList(RecentFiles::Scene);
   }
 } clearRecentSceneFileListCommandHandler;
@@ -2571,7 +2571,7 @@ class ClearRecentLevelFileListCommandHandler : public MenuItemHandler {
 public:
   ClearRecentLevelFileListCommandHandler()
       : MenuItemHandler(MI_ClearRecentLevel) {}
-  void execute() {
+  void execute() override {
     RecentFiles::instance()->clearRecentFilesList(RecentFiles::Level);
   }
 } clearRecentLevelFileListCommandHandler;
@@ -2581,7 +2581,7 @@ public:
 class RevertScene : public MenuItemHandler {
 public:
   RevertScene() : MenuItemHandler(MI_RevertScene) {}
-  void execute() {
+  void execute() override {
     TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
     ToonzScene *scene         = sceneHandle->getScene();
     assert(scene);
@@ -2611,7 +2611,7 @@ class OverwritePaletteCommandHandler : public MenuItemHandler {
 public:
   OverwritePaletteCommandHandler() : MenuItemHandler(MI_OverwritePalette) {}
 
-  void execute() {
+  void execute() override {
     TXshLevel *level = TApp::instance()->getCurrentLevel()->getLevel();
     if (!level) {
       DVGui::warning("No current level.");
@@ -2699,5 +2699,5 @@ public:
 class SaveAllCommandHandler : public MenuItemHandler {
 public:
   SaveAllCommandHandler() : MenuItemHandler(MI_SaveAll) {}
-  void execute() { IoCmd::saveAll(); }
+  void execute() override { IoCmd::saveAll(); }
 } saveAllCommandHandler;

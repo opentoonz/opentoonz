@@ -28,7 +28,7 @@ public:
                                       const TFilePath &path)
       : DvDirModelFileFolderNode(parent, path) {}
 
-  DvDirModelNode *makeChild(std::wstring name);
+  DvDirModelNode *makeChild(std::wstring name) override;
   DvDirModelFileFolderNode *createExposeSceneNode(DvDirModelNode *parent,
                                                   const TFilePath &path);
 };
@@ -45,7 +45,7 @@ public:
                                              std::wstring name,
                                              const TFilePath &path)
       : ExportSceneDvDirModelFileFolderNode(parent, name, path) {}
-  QPixmap getPixmap(bool isOpen) const { return m_pixmap; }
+  QPixmap getPixmap(bool isOpen) const override { return m_pixmap; }
   void setPixmap(const QPixmap &pixmap) { m_pixmap = pixmap; }
 };
 
@@ -59,7 +59,7 @@ public:
                                    const TFilePath &path)
       : ExportSceneDvDirModelFileFolderNode(parent, path) {}
   void makeCurrent() {}
-  QPixmap getPixmap(bool isOpen) const;
+  QPixmap getPixmap(bool isOpen) const override;
 };
 
 //=============================================================================
@@ -73,8 +73,8 @@ class ExportSceneDvDirModelRootNode : public DvDirModelNode {
 public:
   ExportSceneDvDirModelRootNode();
 
-  void refreshChildren();
-  DvDirModelNode *getNodeByPath(const TFilePath &path);
+  void refreshChildren() override;
+  DvDirModelNode *getNodeByPath(const TFilePath &path) override;
 };
 
 //=============================================================================
@@ -88,17 +88,19 @@ public:
   ~ExportSceneDvDirModel();
 
   DvDirModelNode *getNode(const QModelIndex &index) const;
-  QModelIndex index(int row, int column, const QModelIndex &parent) const;
-  QModelIndex parent(const QModelIndex &index) const;
+  QModelIndex index(int row, int column,
+                    const QModelIndex &parent) const override;
+  QModelIndex parent(const QModelIndex &index) const override;
   QModelIndex childByName(const QModelIndex &parent,
                           const std::wstring &name) const;
-  int columnCount(const QModelIndex &parent) const { return 1; }
-  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-  Qt::ItemFlags flags(const QModelIndex &index) const;
+  int columnCount(const QModelIndex &parent) const override { return 1; }
+  QVariant data(const QModelIndex &index,
+                int role = Qt::DisplayRole) const override;
+  Qt::ItemFlags flags(const QModelIndex &index) const override;
   bool setData(const QModelIndex &index, const QVariant &value,
-               int role = Qt::EditRole);
-  int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  bool hasChildren(const QModelIndex &parent) const;
+               int role = Qt::EditRole) override;
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+  bool hasChildren(const QModelIndex &parent) const override;
   void refresh(const QModelIndex &index);
 };
 
@@ -113,9 +115,9 @@ public:
   ExportSceneTreeViewDelegate(ExportSceneTreeView *parent);
   ~ExportSceneTreeViewDelegate();
   void paint(QPainter *painter, const QStyleOptionViewItem &option,
-             const QModelIndex &index) const;
+             const QModelIndex &index) const override;
   QSize sizeHint(const QStyleOptionViewItem &option,
-                 const QModelIndex &index) const;
+                 const QModelIndex &index) const override;
 };
 
 //=============================================================================
@@ -127,13 +129,13 @@ class ExportSceneTreeView : public QTreeView {
 
 public:
   ExportSceneTreeView(QWidget *parent);
-  QSize sizeHint() const;
+  QSize sizeHint() const override;
   DvDirModelNode *getCurrentNode() const;
 
 protected:
   void refresh();
-  void showEvent(QShowEvent *);
-  void focusInEvent(QFocusEvent *event);
+  void showEvent(QShowEvent *) override;
+  void focusInEvent(QFocusEvent *event) override;
 
 public slots:
   void resizeToConts();

@@ -39,7 +39,7 @@ class PreviewToggleCommand : public MenuItemHandler {
 public:
   PreviewToggleCommand();
 
-  void execute();
+  void execute() override;
 
 protected:
   friend class CameraTestToggleCommand;
@@ -73,7 +73,7 @@ class CameraTestToggleCommand : public MenuItemHandler {
 public:
   CameraTestToggleCommand();
 
-  void execute();
+  void execute() override;
 
 protected:
   friend class PreviewToggleCommand;

@@ -107,7 +107,7 @@ private:
   std::wstring m_name;          //!< User-define style name.
   std::wstring m_globalName;    //!< User-define style \a global name.
   std::wstring m_originalName;  //!< If the style is copied from studio palette,
-                                //!its original name is stored
+                                //! its original name is stored
 
   int m_versionNumber;  //!< Style's version number.
 
@@ -115,8 +115,8 @@ private:
   bool m_enabled;        //!< Style's \a enabled status.
 
   bool m_isEditedFromOriginal;  //<! If the style is copied from studio palette,
-                                //This flag will be set when the
-                                //!  style is edited from the original one.
+                                // This flag will be set when the
+  //!  style is edited from the original one.
 
 protected:
   TRaster32P m_icon;  //!< Icon shown on TPalette viewers.
@@ -196,12 +196,12 @@ The \a global name contains information about palette id.
   void setIsEditedFlag(bool edited) {
     m_isEditedFromOriginal = edited;
   }  //<! If the style is copied from studio palette, This flag will be set when
-     //the
-     //!  style is edited from the original one.
+     // the
+  //!  style is edited from the original one.
   bool getIsEditedFlag() const {
     return m_isEditedFromOriginal;
   }  //!< Returns whether the style is edited from the original from studio
-     //!palette
+     //! palette
 
   void assignNames(
       const TColorStyle *src);  //!< Copies the style names from src.
@@ -345,13 +345,13 @@ etc...
   virtual void getObsoleteTagIds(std::vector<int> &) const {};  //!< \deprecated
 
   void save(TOutputStreamInterface &) const;  //!< Calls the local
-                                              //!implementation of saveData()
-                                              //!passing it also the name and
-                                              //!the tagId of the style.
+                                              //! implementation of saveData()
+  //! passing it also the name and
+  //! the tagId of the style.
   static TColorStyle *load(TInputStreamInterface &);  //!< Loads the style from
-                                                      //!disk. Calls the local
-                                                      //!implementation of
-                                                      //!loadData().
+                                                      //! disk. Calls the local
+  //! implementation of
+  //! loadData().
 
   static TColorStyle *create(
       int tagId);  //!< Creates a new style with identifier equal to \a tagId.

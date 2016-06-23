@@ -21,10 +21,10 @@ public:
   KaleidoDistorter(double angle, const TAffine &aff, const TPointD shift)
       : m_angle(angle), m_aff(aff), m_shift(shift) {}
 
-  TPointD map(const TPointD &p) const { return TPointD(); }
-  int maxInvCount() const { return 1; }
+  TPointD map(const TPointD &p) const override { return TPointD(); }
+  int maxInvCount() const override { return 1; }
 
-  int invMap(const TPointD &p, TPointD *results) const;
+  int invMap(const TPointD &p, TPointD *results) const override;
 };
 
 //-------------------------------------------------------------------
@@ -88,14 +88,16 @@ public:
 
   ~KaleidoFx(){};
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &ri);
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &ri) override;
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info);
+                           const TRenderSettings &info) override;
 
-  bool canHandle(const TRenderSettings &info, double frame) {
+  bool canHandle(const TRenderSettings &info, double frame) override {
     return isAlmostIsotropic(info.m_affine);
   }
 

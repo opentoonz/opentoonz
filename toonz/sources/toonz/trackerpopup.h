@@ -139,7 +139,7 @@ class MyThread : public QThread {
 
 public:
   MyThread(Tracker *tracker);
-  void run();
+  void run() override;
   // Ritorna 0 se non c'è stato alcun errore nell'esecuzione del thread
   // altrimenti ritorna il codice di errore del tracker
   int getLastError() { return m_trackerError; };

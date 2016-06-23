@@ -265,7 +265,7 @@ public:
   static std::vector<TFxCommand::Link> inputLinks(TXsheet *xsh, TFx *fx);
   static std::vector<TFxCommand::Link> outputLinks(TXsheet *xsh, TFx *fx);
 
-  int getHistoryType() { return HistoryType::Schematic; }
+  int getHistoryType() override { return HistoryType::Schematic; }
 
 protected:
   static TXshZeraryFxColumn *createZeraryFxColumn(TXsheet *xsh, TFx *zfx,
@@ -716,14 +716,14 @@ public:
     initialize(fx, row, col);
   }
 
-  bool isConsistent() const { return !m_insertedFxs.isEmpty(); }
+  bool isConsistent() const override { return !m_insertedFxs.isEmpty(); }
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString();
+  QString getHistoryString() override;
 
 private:
   void initialize(const TFxP &newFx, int row, int col);
@@ -967,14 +967,14 @@ public:
     initialize();
   }
 
-  bool isConsistent() const { return bool(m_dupFx); }
+  bool isConsistent() const override { return bool(m_dupFx); }
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString();
+  QString getHistoryString() override;
 
 private:
   void initialize();
@@ -1102,14 +1102,14 @@ public:
     initialize();
   }
 
-  bool isConsistent() const { return bool(m_repFx); }
+  bool isConsistent() const override { return bool(m_repFx); }
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString();
+  QString getHistoryString() override;
 
 private:
   void initialize();
@@ -1323,21 +1323,21 @@ public:
   UnlinkFxUndo(const TFxP &fx, TXsheetHandle *xshHandle)
       : m_fx(fx), m_linkedFx(fx->getLinkedFx()), m_xshHandle(xshHandle) {}
 
-  bool isConsistent() const { return bool(m_linkedFx); }
+  bool isConsistent() const override { return bool(m_linkedFx); }
 
-  void undo() const {
+  void undo() const override {
     FxCommandUndo::linkParams(m_fx.getPointer(), m_linkedFx.getPointer());
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     FxCommandUndo::unlinkParams(m_fx.getPointer());
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Unlink Fx  : %1 - - %2")
         .arg(QString::fromStdWString(m_fx->getFxId()))
         .arg(QString::fromStdWString(m_linkedFx->getFxId()));
@@ -1371,14 +1371,14 @@ public:
     initialize(fxs);
   }
 
-  bool isConsistent() const { return bool(m_macroFx); }
+  bool isConsistent() const override { return bool(m_macroFx); }
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  virtual QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Make Macro Fx  : %1")
         .arg(QString::fromStdWString(m_macroFx->getFxId()));
   }
@@ -1516,12 +1516,12 @@ public:
     initialize();
   }
 
-  void redo() const { MakeMacroUndo::undo(); }
-  void undo() const { MakeMacroUndo::redo(); }
+  void redo() const override { MakeMacroUndo::undo(); }
+  void undo() const override { MakeMacroUndo::redo(); }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Explode Macro Fx  : %1")
         .arg(QString::fromStdWString(m_macroFx->getFxId()));
   }
@@ -1563,9 +1563,9 @@ public:
     initialize(fx);
   }
 
-  bool isConsistent() const { return true; }
+  bool isConsistent() const override { return true; }
 
-  void redo() const {
+  void redo() const override {
     FxDag *fxDag        = m_xshHandle->getXsheet()->getFxDag();
     TOutputFx *outputFx = static_cast<TOutputFx *>(m_outputFx.getPointer());
 
@@ -1575,16 +1575,18 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void undo() const {
+  void undo() const override {
     TOutputFx *outputFx = static_cast<TOutputFx *>(m_outputFx.getPointer());
 
     m_xshHandle->getXsheet()->getFxDag()->removeOutputFx(outputFx);
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Create Output Fx"); }
+  QString getHistoryString() override {
+    return QObject::tr("Create Output Fx");
+  }
 
 private:
   void initialize(TFx *fx) {
@@ -1640,9 +1642,9 @@ public:
     initialize();
   }
 
-  bool isConsistent() const { return !m_fxs.empty(); }
+  bool isConsistent() const override { return !m_fxs.empty(); }
 
-  void redo() const {
+  void redo() const override {
     /*
 Due to compatibility issues from *schematicnode.cpp files, the "do" operation
 must be
@@ -1660,7 +1662,7 @@ accessible without scene change notifications (see TFxCommand::setParent())
     for (f = 0; f != fCount; ++f) fxDag->addToXsheet(m_fxs[f].getPointer());
   }
 
-  void undo() const {
+  void undo() const override {
     FxDag *fxDag = m_xshHandle->getXsheet()->getFxDag();
 
     size_t f, fCount = m_fxs.size();
@@ -1670,9 +1672,9 @@ accessible without scene change notifications (see TFxCommand::setParent())
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  virtual QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Connect to Xsheet  : ");
     std::vector<TFxP>::iterator it;
     for (it = m_fxs.begin(); it != m_fxs.end(); it++) {
@@ -1729,10 +1731,10 @@ public:
     initialize();
   }
 
-  void redo() const { ConnectNodesToXsheetUndo::undo(); }
-  void undo() const { ConnectNodesToXsheetUndo::redo(); }
+  void redo() const override { ConnectNodesToXsheetUndo::undo(); }
+  void undo() const override { ConnectNodesToXsheetUndo::redo(); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Disconnect from Xsheet  : ");
     std::vector<TFxP>::iterator it;
     for (it = m_fxs.begin(); it != m_fxs.end(); it++) {
@@ -1792,7 +1794,7 @@ private:
   std::list<TFxCommand::Link>
       m_normalLinks;               //!< Actual *common* links from m_links
   std::list<TFx *> m_terminalFxs;  //!< Fxs connected to the xsheet (represents
-                                   //!xsheet input links)
+                                   //! xsheet input links)
   //   Why SMART pointers? No fx is deleted with this command... hmm...
   std::map<TFx *, DynamicLinksVector>
       m_dynamicLinks;  //!< Complete dynamic links configuration, per fx.
@@ -1806,14 +1808,14 @@ public:
     initialize();
   }
 
-  bool isConsistent() const { return !m_links.empty(); }
+  bool isConsistent() const override { return !m_links.empty(); }
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const { return 10 << 10; }  // Say, around 10 kB
+  int getSize() const override { return 10 << 10; }  // Say, around 10 kB
 
-  virtual QString getHistoryString();
+  QString getHistoryString() override;
 
 protected:
   DeleteLinksUndo(TXsheetHandle *xshHandle) : m_xshHandle(xshHandle) {}
@@ -2069,14 +2071,14 @@ public:
   DeleteFxOrColumnUndo(int colIdx, TXsheetHandle *xshHandle,
                        TFxHandle *fxHandle);
 
-  bool isConsistent() const;
+  bool isConsistent() const override;
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString();
+  QString getHistoryString() override;
 
 private:
   void initialize();
@@ -2438,14 +2440,16 @@ public:
     initialize(zeraryFxColumnSize, pos, addOffset);
   }
 
-  bool isConsistent() const { return !(m_fxs.empty() && m_columns.empty()); }
+  bool isConsistent() const override {
+    return !(m_fxs.empty() && m_columns.empty());
+  }
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString();
+  QString getHistoryString() override;
 
 protected:
   template <typename Func>
@@ -2748,9 +2752,9 @@ public:
     initialize(inFx);
   }
 
-  void redo() const;
+  void redo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
 private:
   void initialize(TFx *inFx);
@@ -2838,10 +2842,10 @@ public:
     initialize(link);
   }
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
 private:
   void initialize(const TFxCommand::Link &link);
@@ -2933,13 +2937,13 @@ public:
     initialize();
   }
 
-  bool isConsistent() const {
+  bool isConsistent() const override {
     return UndoAddPasteFxs::isConsistent() && m_deleteFxUndo->isConsistent();
   }
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
 private:
   static TFx *inFx(const TFx *fx) {
@@ -3065,14 +3069,14 @@ public:
     initialize();
   }
 
-  bool isConsistent() const { return !m_fxs.empty(); }
+  bool isConsistent() const override { return !m_fxs.empty(); }
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Disconnect Fx"); }
+  QString getHistoryString() override { return QObject::tr("Disconnect Fx"); }
 
 private:
   void initialize();
@@ -3222,14 +3226,14 @@ public:
     initialize();
   }
 
-  bool isConsistent() const { return !m_fxs.empty(); }
+  bool isConsistent() const override { return !m_fxs.empty(); }
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString();
+  QString getHistoryString() override;
 
 private:
   void initialize();
@@ -3369,13 +3373,13 @@ public:
     initialize();
   }
 
-  bool isConsistent() const { return m_parentFx; }
+  bool isConsistent() const override { return m_parentFx; }
 
-  void redo() const;
+  void redo() const override;
   void redo_() const;
-  void undo() const;
+  void undo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
 private:
   void initialize();
@@ -3494,23 +3498,23 @@ public:
     assert(fx);
   }
 
-  bool isConsistent() const { return true; }
+  bool isConsistent() const override { return true; }
 
-  void redo() const {
+  void redo() const override {
     redo_();
     m_xshHandle->notifyXsheetChanged();
   }
 
   void redo_() const { ::getActualIn(m_fx.getPointer())->setName(m_newName); }
 
-  void undo() const {
+  void undo() const override {
     ::getActualIn(m_fx.getPointer())->setName(m_oldName);
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Rename Fx : %1 > %2")
         .arg(QString::fromStdWString(m_oldName))
         .arg(QString::fromStdWString(m_newName));
@@ -3556,14 +3560,14 @@ public:
     initialize();
   }
 
-  bool isConsistent() const { return !m_groupData.empty(); }
+  bool isConsistent() const override { return !m_groupData.empty(); }
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  virtual QString getHistoryString() { return QObject::tr("Group Fx"); }
+  QString getHistoryString() override { return QObject::tr("Group Fx"); }
 
 protected:
   UndoGroupFxs(int groupId, TXsheetHandle *xshHandle)
@@ -3664,10 +3668,10 @@ public:
     initialize();
   }
 
-  void redo() const { UndoGroupFxs::undo(); }
-  void undo() const { UndoGroupFxs::redo(); }
+  void redo() const override { UndoGroupFxs::undo(); }
+  void undo() const override { UndoGroupFxs::redo(); }
 
-  QString getHistoryString() { return QObject::tr("Ungroup Fx"); }
+  QString getHistoryString() override { return QObject::tr("Ungroup Fx"); }
 
 private:
   void initialize();
@@ -3759,16 +3763,16 @@ public:
     initialize(fromEditor);
   }
 
-  bool isConsistent() const { return !m_groupData.empty(); }
+  bool isConsistent() const override { return !m_groupData.empty(); }
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
   void redo_() const;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Rename Group  : %1 > %2")
         .arg(QString::fromStdWString(m_oldGroupName))
         .arg(QString::fromStdWString(m_newGroupName));

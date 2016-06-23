@@ -114,17 +114,17 @@ public:
   // Ghibli3DLutUtil* get3DLutUtil(){ return m_ghibli3DLutUtil; }
 
 protected:
-  void contextMenuEvent(QContextMenuEvent *event);
-  void initializeGL();
-  void resizeGL(int width, int height);
-  void paintGL();
+  void contextMenuEvent(QContextMenuEvent *event) override;
+  void initializeGL() override;
+  void resizeGL(int width, int height) override;
+  void paintGL() override;
 
-  void mouseMoveEvent(QMouseEvent *event);
-  void mousePressEvent(QMouseEvent *event);
-  void mouseReleaseEvent(QMouseEvent *event);
-  void keyPressEvent(QKeyEvent *event);
-  void mouseDoubleClickEvent(QMouseEvent *event);
-  void wheelEvent(QWheelEvent *);
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void wheelEvent(QWheelEvent *) override;
 
   void panQt(const QPoint &delta);
   void zoomQt(const QPoint &center, double factor);

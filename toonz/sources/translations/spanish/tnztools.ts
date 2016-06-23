@@ -138,6 +138,10 @@
         <source>Pressure</source>
         <translation>Presión</translation>
     </message>
+    <message>
+        <source>Smooth:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BrushToolOptionsBox</name>
@@ -782,7 +786,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Modify Fx Gadget  </source>
-        <translation>Modificar aparato de efectos</translation>
+        <translation>Control de modificación de efectos</translation>
     </message>
     <message>
         <source>%1   Level : %2  Frame : %3</source>
@@ -806,7 +810,7 @@ Do you want to proceed?</source>
     </message>
     <message>
         <source>Set Save Box : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</source>
-        <translation type="unfinished"></translation>
+        <translation>Definir marco de seguridad : (X%1,Y%2,An%3,Al%4)-&gt;(X%5,Y%6,An%7,Al%8)</translation>
     </message>
 </context>
 <context>

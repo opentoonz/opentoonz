@@ -59,7 +59,7 @@ public:
   DockLayout *dockLayout() const { return m_layout; }
 
 protected:
-  virtual void resizeEvent(QResizeEvent *event);
+  void resizeEvent(QResizeEvent *event) override;
 };
 
 //========================================================================
@@ -105,17 +105,17 @@ public:
   bool getOrientation() const;
 
 private:
-  QSize getDockedMinimumSize();
-  QSize getDockedMaximumSize();
-  void setFloatingAppearance();
-  void setDockedAppearance();
+  QSize getDockedMinimumSize() override;
+  QSize getDockedMaximumSize() override;
+  void setFloatingAppearance() override;
+  void setDockedAppearance() override;
 
-  void selectDockPlaceholder(QMouseEvent *me);
+  void selectDockPlaceholder(QMouseEvent *me) override;
 
-  bool isDragGrip(QPoint p);
-  int isResizeGrip(QPoint p);
+  bool isDragGrip(QPoint p) override;
+  int isResizeGrip(QPoint p) override;
 
-  void windowTitleEvent(QEvent *e);
+  void windowTitleEvent(QEvent *e) override;
 };
 
 #endif  // TDOCKWINDOWS_H

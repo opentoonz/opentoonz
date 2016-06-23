@@ -30,11 +30,11 @@ public:
   ~ShortcutViewer();
 
 protected:
-  void paintEvent(QPaintEvent *);
-  bool event(QEvent *event);
-  void keyPressEvent(QKeyEvent *event);
-  void enterEvent(QEvent *event);
-  void leaveEvent(QEvent *event);
+  void paintEvent(QPaintEvent *) override;
+  bool event(QEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
+  void enterEvent(QEvent *event) override;
+  void leaveEvent(QEvent *event) override;
 
 public slots:
   void setAction(QAction *action);

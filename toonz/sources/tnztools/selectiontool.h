@@ -179,7 +179,8 @@ public:
 
   virtual void applyTransform(FourPoints bbox) = 0;
   virtual void applyTransform(TAffine aff){};
-  virtual void addTransformUndo() = 0;
+
+  void addTransformUndo() override = 0;
 
   int getSimmetricPointIndex(int index) const;
   /*! Return before point \b index between possible point index
@@ -202,10 +203,10 @@ public:
   bool isDragging() const { return m_isDragging; }
   TPointD getStartScaleValue() const { return m_startScaleValue; }
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) = 0;
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
-  virtual void draw() = 0;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override = 0;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
+  void draw() override = 0;
 };
 
 //=============================================================================
@@ -388,7 +389,7 @@ protected:
   void addPointPolyline(const TPointD &pos);
   void closePolyline(const TPointD &pos);
 
-  void updateTranslation();
+  void updateTranslation() override;
 
   void drawPolylineSelection();
   void drawRectSelection(const TImage *image);
@@ -400,7 +401,7 @@ public:
   SelectionTool(int targetType);
   ~SelectionTool();
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
   TPointD getCenter(int index = 0) const;
   void setCenter(const TPointD &center, int index = 0);
@@ -427,30 +428,31 @@ public:
 
   virtual QSet<int> getSelectedStyles() const { return QSet<int>(); }
 
-  virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-  virtual void leftButtonDrag(const TPointD &pos, const TMouseEvent &) = 0;
-  virtual void leftButtonUp(const TPointD &pos, const TMouseEvent &)   = 0;
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
-  virtual void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) = 0;
-  bool keyDown(int key, TUINT32 flags, const TPoint &pos);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override = 0;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override   = 0;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDoubleClick(const TPointD &,
+                             const TMouseEvent &e) override = 0;
+  bool keyDown(int key, TUINT32 flags, const TPoint &pos) override;
 
-  int getCursorId() const;
+  int getCursorId() const override;
 
-  virtual void draw() = 0;
+  void draw() override = 0;
 
-  virtual TSelection *getSelection() = 0;
-  virtual bool isSelectionEmpty()    = 0;
+  TSelection *getSelection() override = 0;
+  virtual bool isSelectionEmpty()     = 0;
 
   virtual void computeBBox() = 0;
 
-  void onActivate();
-  void onDeactivate();
-  virtual void onImageChanged() = 0;
-  void onSelectionChanged();
+  void onActivate() override;
+  void onDeactivate() override;
+  void onImageChanged() override = 0;
+  void onSelectionChanged() override;
 
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  bool onPropertyChanged(std::string propertyName);
+  bool onPropertyChanged(std::string propertyName) override;
 };
 
 #endif  // SELECTIONTOOL_INCLUDED

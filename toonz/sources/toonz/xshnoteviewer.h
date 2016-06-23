@@ -59,8 +59,8 @@ protected:
   DVGui::ColorField *createColorField(int index);
   void updateColorField();
 
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
 
 protected slots:
   void onColor1Switched(const TPixel32 &, bool isDragging);
@@ -104,7 +104,7 @@ public:
   void openNotePopup();
 
 protected:
-  void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event) override;
 };
 
 //=============================================================================

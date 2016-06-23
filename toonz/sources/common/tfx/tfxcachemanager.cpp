@@ -121,7 +121,7 @@ class TFxCacheManagerGenerator : public TRenderResourceManagerGenerator {
 public:
   TFxCacheManagerGenerator() : TRenderResourceManagerGenerator(true) {}
 
-  TRenderResourceManager *operator()() { return new TFxCacheManager; }
+  TRenderResourceManager *operator()() override { return new TFxCacheManager; }
 };
 
 MANAGER_FILESCOPE_DECLARATION(TFxCacheManager, TFxCacheManagerGenerator);

@@ -48,16 +48,16 @@ public:
 
   void setPastePosition(const TPointD &pos) { m_pastePosition = pos; }
 
-  void enableCommands();
+  void enableCommands() override;
 
   //! Return true if the selection is empty
-  bool isEmpty() const {
+  bool isEmpty() const override {
     return m_selectedFxs.empty() && m_selectedLinks.empty() &&
            m_selectedColIndexes.isEmpty();
   }
 
   //! Empty the selection
-  void selectNone() {
+  void selectNone() override {
     m_selectedFxs.clear();
     m_selectedLinks.clear();
     m_selectedColIndexes.clear();

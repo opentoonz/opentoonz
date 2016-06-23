@@ -201,7 +201,7 @@ public:
   //--------------------------------------------------------------------------
 
   //!\warning Assignment of the kind hash_map[i1] = hash_map[i2] are DANGEROUS!
-  //!The
+  //! The
   //! reference returned on the right may be INVALIDATED if the first key is
   //! inserted!
   T &operator[](const K &key) { return m_items[touchKey(key)].m_val; }

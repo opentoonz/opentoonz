@@ -157,7 +157,7 @@ public:
 
   void setInfo(const TRasterImageP &ri);
 
-  ImageInfo *clone();
+  ImageInfo *clone() override;
 
   double m_dpix, m_dpiy;
   std::string m_name;
@@ -202,7 +202,7 @@ public:
     if (m_palette) m_palette->release();
   }
 
-  ImageInfo *clone() {
+  ImageInfo *clone() override {
     ToonzImageInfo *ret = new ToonzImageInfo(*this);
     if (ret->m_palette) ret->m_palette->addRef();
     return ret;
@@ -243,9 +243,9 @@ void ToonzImageInfo::setInfo(const TToonzImageP &ti) {
 
 class RasterImageBuilder : public ImageBuilder {
 public:
-  ImageBuilder *clone() { return new RasterImageBuilder(*this); }
+  ImageBuilder *clone() override { return new RasterImageBuilder(*this); }
 
-  TImageP build(ImageInfo *info, const TRasterP &ras);
+  TImageP build(ImageInfo *info, const TRasterP &ras) override;
 };
 
 TImageP RasterImageBuilder::build(ImageInfo *info, const TRasterP &ras) {
@@ -269,9 +269,9 @@ TImageP RasterImageBuilder::build(ImageInfo *info, const TRasterP &ras) {
 
 class ToonzImageBuilder : public ImageBuilder {
 public:
-  ImageBuilder *clone() { return new ToonzImageBuilder(*this); }
+  ImageBuilder *clone() override { return new ToonzImageBuilder(*this); }
 
-  TImageP build(ImageInfo *info, const TRasterP &ras);
+  TImageP build(ImageInfo *info, const TRasterP &ras) override;
 };
 
 TImageP ToonzImageBuilder::build(ImageInfo *info, const TRasterP &ras) {
@@ -330,8 +330,8 @@ public:
     if (m_imageInfo) delete m_imageInfo;
   }
 
-  TUINT32 getSize() const;
-  TImageP getImage() const { return m_image; }
+  TUINT32 getSize() const override;
+  TImageP getImage() const override { return m_image; }
 
   TImageP m_image;
 };
@@ -378,8 +378,8 @@ public:
 
   ~CompressedOnMemoryCacheItem();
 
-  TUINT32 getSize() const;
-  TImageP getImage() const;
+  TUINT32 getSize() const override;
+  TImageP getImage() const override;
 
   TRasterP m_compressedRas;
 };
@@ -474,8 +474,8 @@ public:
 
   ~CompressedOnDiskCacheItem();
 
-  TUINT32 getSize() const { return 0; }
-  TImageP getImage() const;
+  TUINT32 getSize() const override { return 0; }
+  TImageP getImage() const override;
   TFilePath m_fp;
 };
 
@@ -539,8 +539,8 @@ public:
 
   ~UncompressedOnDiskCacheItem();
 
-  TUINT32 getSize() const { return 0; }
-  TImageP getImage() const;
+  TUINT32 getSize() const override { return 0; }
+  TImageP getImage() const override;
   // TRaster32P getRaster32() const;
 
   TFilePath m_fp;
@@ -773,7 +773,7 @@ inline TINT32 hasExternalReferences(const TImageP &img) {
     if (timg)
       refCount = timg->getRaster()->getRefCount() -
                  1;  //!!! the TToonzImage::getRaster method increments raster
-                     //!refCount!(the TRasterImage::getRaster don't)
+                     //! refCount!(the TRasterImage::getRaster don't)
   }
 #endif
 

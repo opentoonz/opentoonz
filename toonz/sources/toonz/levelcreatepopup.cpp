@@ -33,6 +33,7 @@
 #include "toonz/preferences.h"
 #include "toonz/palettecontroller.h"
 #include "toonz/tproject.h"
+#include "toonz/namebuilder.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -92,7 +93,7 @@ public:
 
   void onAdd(TXshSimpleLevelP sl) { m_sl = sl; }
 
-  void undo() const {
+  void undo() const override {
     TApp *app         = TApp::instance();
     ToonzScene *scene = app->getCurrentScene()->getScene();
     TXsheet *xsh      = scene->getXsheet();
@@ -115,7 +116,7 @@ public:
     app->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     if (!m_sl.getPointer()) return;
     TApp *app         = TApp::instance();
     ToonzScene *scene = app->getCurrentScene()->getScene();
@@ -139,8 +140,8 @@ public:
     app->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof *this; }
-  QString getHistoryString() {
+  int getSize() const override { return sizeof *this; }
+  QString getHistoryString() override {
     return QObject::tr("Create Level %1  at Column %2")
         .arg(QString::fromStdWString(m_sl->getName()))
         .arg(QString::number(m_columnIndex + 1));
@@ -287,28 +288,48 @@ LevelCreatePopup::LevelCreatePopup()
 
 void LevelCreatePopup::updatePath() {
   ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
-
-  /*--- 初期Pathを入れる。Xsheet Roomのときのみ、分岐 ---*/
-  QString roomName = TApp::instance()->getCurrentRoomName();
   TFilePath defaultPath;
-  if (roomName == "Xsheet") {
-    /*--- 名称未設定シーンのとき、+satsuei直下に ---*/
-    if (scene->isUntitled()) defaultPath = TFilePath("+" + TProject::Scenes);
-    /*---
-     * 保存済みシーンのとき、そのシーンファイルの入っているフォルダの1階層上のフォルダにする
-     * ---*/
-    else
-      defaultPath = scene->codeFilePath(
-          scene->getScenePath().getParentDir().getParentDir());
-  } else
-    defaultPath = scene->getDefaultLevelPath(getLevelType()).getParentDir();
-
+  defaultPath = scene->getDefaultLevelPath(getLevelType()).getParentDir();
   m_pathFld->setPath(toQString(defaultPath));
 }
 
 //-----------------------------------------------------------------------------
 
-void LevelCreatePopup::showEvent(QShowEvent *) { update(); }
+void LevelCreatePopup::nextName() {
+  const std::auto_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
+
+  TLevelSet *levelSet =
+      TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
+  ToonzScene *scene      = TApp::instance()->getCurrentScene()->getScene();
+  std::wstring levelName = L"";
+
+  // Select a different unique level name in case it already exists (either in
+  // scene or on disk)
+  TFilePath fp;
+  TFilePath actualFp;
+  for (;;) {
+    levelName = nameBuilder->getNext();
+
+    if (levelSet->getLevel(levelName) != 0) continue;
+
+    fp       = scene->getDefaultLevelPath(getLevelType(), levelName);
+    actualFp = scene->decodeFilePath(fp);
+
+    if (TSystem::doesExistFileOrLevel(actualFp)) {
+      continue;
+    }
+
+    break;
+  }
+
+  m_nameFld->setText(QString::fromStdWString(levelName));
+}
+
+void LevelCreatePopup::showEvent(QShowEvent *) {
+  nextName();
+  update();
+  m_nameFld->setFocus();
+}
 
 //-----------------------------------------------------------------------------
 
@@ -344,20 +365,27 @@ void LevelCreatePopup::onLevelTypeChanged(const QString &text) {
   else
     setSizeWidgetEnable(false);
   updatePath();
+  nextName();
+  m_nameFld->setFocus();
 }
 
 //-----------------------------------------------------------------------------
 
 void LevelCreatePopup::onOkBtn() {
-  apply();
-  close();
-  /*if(apply())
-this->accept();*/
+  if (apply())
+    close();
+  else
+    m_nameFld->setFocus();
 }
 
 //-----------------------------------------------------------------------------
 
-void LevelCreatePopup::onApplyButton() { apply(); }
+void LevelCreatePopup::onApplyButton() {
+  if (apply()) {
+    nextName();
+  }
+  m_nameFld->setFocus();
+}
 
 //-----------------------------------------------------------------------------
 

@@ -95,8 +95,8 @@ public:
   // Note - fields are sorted by decreasing size. This ensures minimal padding.
 
   TAffine m_affine;  //!< Affine that \a should be applied \a after the fx has
-                     //!been rendered.
-                     //!  \sa TRasterFx::compute().
+                     //! been rendered.
+  //!  \sa TRasterFx::compute().
   std::vector<TRasterFxRenderDataP>
       m_data;  //!< Fx-specific data inserted by upstream fxs.
 
@@ -104,25 +104,25 @@ public:
                     //!  demo versions of Toonz
 
   double m_gamma;  //!< Gamma modifier for the output frame. \note Should be
-                   //!moved to TOutputProperties.
+                   //! moved to TOutputProperties.
   double m_timeStretchFrom,  //!< Fps source stretch variable. \note Should be
-                             //!moved to TOutputProperties.
+                             //! moved to TOutputProperties.
       m_timeStretchTo;  //!< Fps destination stretch variable. \note Should be
-                        //!moved to TOutputProperties.
+                        //! moved to TOutputProperties.
   double m_stereoscopicShift;  //!< X-axis camera shift for stereoscopy, in
-                               //!inches. \sa m_stereoscopic. \note Should be
-                               //!moved to TOutputProperties.
+                               //! inches. \sa m_stereoscopic. \note Should be
+  //! moved to TOutputProperties.
 
   int m_bpp;  //!< Bits-per-pixel required in the output frame. \remark This
-              //!data
-              //!  must be accompanied by a tile of the suitable type. \sa
-              //!  TRasterFx::compute().
+              //! data
+  //!  must be accompanied by a tile of the suitable type. \sa
+  //!  TRasterFx::compute().
   int m_maxTileSize;  //!< Maximum size (in MegaBytes) of a tile cachable during
-                      //!a render process.
+                      //! a render process.
   //!  Used by the predictive cache manager to subdivide an fx calculation into
   //!  tiles. \sa TRasterFx::compute().
   int m_shrinkX,  //!< Required horizontal shrink. \warning Obsolete, do not
-                  //!use. \todo Must be removed.
+                  //! use. \todo Must be removed.
       m_shrinkY;  //!< Required vertical shrink. \warning Obsolete, do not use.
                   //!\todo Must be removed.
 
@@ -137,14 +137,14 @@ public:
   //!  This info could be used by computationally intensive fxs to
   //!  implement a simplified render during user interactions.
   bool m_userCachable;  //!< Whether the user can manually cache this render
-                        //!request. \sa TRasterFx::compute()
+                        //! request. \sa TRasterFx::compute()
 
   // Toonz-relevant data (used by Toonz, fx writers should *IGNORE* them while
   // rendering a single fx)
   // NOTE: The signed options should to be moved in TOutputProperties class.
 
   bool m_applyShrinkToViewer;  //!< Whether shrink must be considered.   \note
-                               //!Should be moved to TOutputProperties.
+                               //! Should be moved to TOutputProperties.
 
   /*-- カメラサイズ --*/
   TRectD m_cameraBox;
@@ -266,7 +266,8 @@ public:
 
   // resituisce una stringa che identifica univocamente il sottoalbero
   // avente come radice l'effetto
-  virtual std::string getAlias(double frame, const TRenderSettings &info) const;
+  std::string getAlias(double frame,
+                       const TRenderSettings &info) const override;
 
   virtual void dryCompute(TRectD &rect, double frame,
                           const TRenderSettings &info);
@@ -331,18 +332,21 @@ public:
   virtual TAffine getPlacement(double frame)       = 0;
   virtual TAffine getParentPlacement(double frame) = 0;
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &info);
-  virtual void compute(TFlash &flash, int frame);
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &info) override;
+  void compute(TFlash &flash, int frame) override;
 
-  bool doGetBBox(double frame, TRectD &bbox, const TRenderSettings &info);
+  bool doGetBBox(double frame, TRectD &bbox,
+                 const TRenderSettings &info) override;
 
   virtual bool checkTimeRegion() const { return false; }
 
-  std::string getAlias(double frame, const TRenderSettings &info) const;
+  std::string getAlias(double frame,
+                       const TRenderSettings &info) const override;
 
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput);
+                 TRenderSettings &infoOnInput) override;
 };
 
 //-------------------------------------------------------------------
@@ -388,21 +392,23 @@ public:
   ~NaAffineFx() {}
   NaAffineFx(bool isDpiAffine = false);
 
-  TFx *clone(bool recursive) const;
+  TFx *clone(bool recursive) const override;
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
-  void compute(TFlash &flash, int frame);
+  void compute(TFlash &flash, int frame) override;
 
-  TAffine getPlacement(double frame) { return m_aff; }
-  TAffine getParentPlacement(double frame) { return TAffine(); }
+  TAffine getPlacement(double frame) override { return m_aff; }
+  TAffine getParentPlacement(double frame) override { return TAffine(); }
 
   void setAffine(const TAffine &aff) {
     assert(aff != TAffine());
     m_aff = aff;
   }
   bool isDpiAffine() const { return m_isDpiAffine; }
-  std::string getPluginId() const { return std::string(); }
+  std::string getPluginId() const override { return std::string(); }
 
 protected:
   TRasterFxPort m_port;

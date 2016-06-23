@@ -59,10 +59,10 @@ Returns the \b TVectorImageP converted image.*/
   bool isCanceled() { return m_isCanceled; }
 
   //!\b (\b Internal \b use \b only) Sets the maximum number of partial
-  //!notifications.
+  //! notifications.
   void setOverallPartials(int total) { m_totalPartials = total; }
   //!\b (\b Internal \b use \b only) Emits partial progress signal and updates
-  //!partial progresses internal count.
+  //! partial progresses internal count.
   void emitPartialDone(void);
 
 private:

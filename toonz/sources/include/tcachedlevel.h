@@ -191,20 +191,20 @@ public:
   TRamCachePersist(TRasterCodec *codec);
   ~TRamCachePersist();
 
-  void setFrameSize(int lx, int ly, int bpp) {}
+  void setFrameSize(int lx, int ly, int bpp) override {}
 
-  void onInvalidate();
-  void onInvalidate(int startFrame, int endFrame);
+  void onInvalidate() override;
+  void onInvalidate(int startFrame, int endFrame) override;
 
-  UCHAR *getRawData(int frame, TINT32 &size, int &lx, int &ly);
+  UCHAR *getRawData(int frame, TINT32 &size, int &lx, int &ly) override;
 
-  TUINT64 getUsedSpace();
+  TUINT64 getUsedSpace() override;
 
 private:
-  TRasterP doGetRaster(int frame);
-  bool doGetRaster(int frame, TRaster32P &ras) const;
+  TRasterP doGetRaster(int frame) override;
+  bool doGetRaster(int frame, TRaster32P &ras) const override;
 
-  bool doPutRaster(int frame, const TRasterP &ras);
+  bool doPutRaster(int frame, const TRasterP &ras) override;
 
 private:
   class Imp;
@@ -218,20 +218,20 @@ public:
   TDiskCachePersist(TRasterCodec *codec, const TFilePath &fullpath);
   ~TDiskCachePersist();
 
-  void setFrameSize(int lx, int ly, int bpp);
+  void setFrameSize(int lx, int ly, int bpp) override;
 
-  void onInvalidate();
-  void onInvalidate(int startFrame, int endFrame);
+  void onInvalidate() override;
+  void onInvalidate(int startFrame, int endFrame) override;
 
-  UCHAR *getRawData(int frame, TINT32 &size, int &lx, int &ly);
+  UCHAR *getRawData(int frame, TINT32 &size, int &lx, int &ly) override;
 
-  TUINT64 getUsedSpace();
+  TUINT64 getUsedSpace() override;
 
 private:
-  TRasterP doGetRaster(int frame);
-  bool doGetRaster(int frame, TRaster32P &ras) const;
+  TRasterP doGetRaster(int frame) override;
+  bool doGetRaster(int frame, TRaster32P &ras) const override;
 
-  bool doPutRaster(int frame, const TRasterP &ras);
+  bool doPutRaster(int frame, const TRasterP &ras) override;
 
 private:
   class Imp;
@@ -246,20 +246,20 @@ public:
   TDiskCachePersist2(TRasterCodec *codec, const TFilePath &fullpath);
   ~TDiskCachePersist2();
 
-  void setFrameSize(int lx, int ly, int bpp);
+  void setFrameSize(int lx, int ly, int bpp) override;
 
-  void onInvalidate();
-  void onInvalidate(int startFrame, int endFrame);
+  void onInvalidate() override;
+  void onInvalidate(int startFrame, int endFrame) override;
 
-  UCHAR *getRawData(int frame, TINT32 &size, int &lx, int &ly);
+  UCHAR *getRawData(int frame, TINT32 &size, int &lx, int &ly) override;
 
-  TUINT64 getUsedSpace();
+  TUINT64 getUsedSpace() override;
 
 private:
-  TRasterP doGetRaster(int frame);
-  bool doGetRaster(int frame, TRaster32P &ras) const;
+  TRasterP doGetRaster(int frame) override;
+  bool doGetRaster(int frame, TRaster32P &ras) const override;
 
-  bool doPutRaster(int frame, const TRasterP &ras);
+  bool doPutRaster(int frame, const TRasterP &ras) override;
 
 private:
   class Imp;

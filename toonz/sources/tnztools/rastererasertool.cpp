@@ -107,7 +107,7 @@ public:
     m_stroke = new TStroke(stroke);
   }
 
-  void redo() const {
+  void redo() const override {
     TToonzImageP ti = getImage();
     if (!ti) return;
     bool eraseInk   = m_colorType == LINES || m_colorType == ALL;
@@ -132,7 +132,7 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return TRasterUndo::getSize() + sizeof(this) +
            m_stroke->getControlPointCount() * sizeof(TThickPoint) + 100;
   }
@@ -141,8 +141,8 @@ public:
     if (m_stroke) delete m_stroke;
   }
 
-  QString getToolName() { return QString("Eraser Tool (Rect)"); }
-  int getHistoryType() { return HistoryType::EraserTool; }
+  QString getToolName() override { return QString("Eraser Tool (Rect)"); }
+  int getHistoryType() override { return HistoryType::EraserTool; }
 };
 
 //=====================================================================
@@ -172,7 +172,7 @@ public:
       , m_colorSelected(colorSelected)
       , m_isPencil(isPencil) {}
 
-  void redo() const {
+  void redo() const override {
     TToonzImageP image = m_level->getFrame(m_frameId, true);
     TRasterCM32P ras   = image->getRaster();
     RasterStrokeGenerator m_rasterTrack(ras, ERASE, m_colorType, 0, m_points[0],
@@ -187,10 +187,12 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const { return sizeof(*this) + TRasterUndo::getSize(); }
+  int getSize() const override {
+    return sizeof(*this) + TRasterUndo::getSize();
+  }
 
-  QString getToolName() { return QString("Eraser Tool"); }
-  int getHistoryType() { return HistoryType::EraserTool; }
+  QString getToolName() override { return QString("Eraser Tool"); }
+  int getHistoryType() override { return HistoryType::EraserTool; }
 };
 
 //=====================================================================
@@ -217,7 +219,7 @@ public:
       , m_hardness(hardness)
       , m_mode(mode) {}
 
-  void redo() const {
+  void redo() const override {
     if (m_points.size() == 0) return;
     TToonzImageP image     = getImage();
     TRasterCM32P ras       = image->getRaster();
@@ -256,10 +258,12 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const { return sizeof(*this) + TRasterUndo::getSize(); }
+  int getSize() const override {
+    return sizeof(*this) + TRasterUndo::getSize();
+  }
 
-  QString getToolName() { return QString("Eraser Tool"); }
-  int getHistoryType() { return HistoryType::EraserTool; }
+  QString getToolName() override { return QString("Eraser Tool"); }
+  int getHistoryType() override { return HistoryType::EraserTool; }
 };
 
 void eraseStroke(const TToonzImageP &ti, TStroke *stroke,
@@ -447,11 +451,11 @@ public:
     if (m_firstStroke) delete m_firstStroke;
   }
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
-  void updateTranslation();
+  void updateTranslation() override;
 
-  void draw();
+  void draw() override;
 
   void update(const TToonzImageP &ti, const TPointD &pos);
   void saveUndo();
@@ -459,10 +463,10 @@ public:
               const TXshSimpleLevelP &level, bool multi = false,
               const TFrameId &frameId = -1);
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-  void leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e) override;
 
   void multiAreaEraser(const TXshSimpleLevelP &sl, TFrameId &firstFid,
                        TFrameId &lastFid, TStroke *firstStroke,
@@ -471,25 +475,25 @@ public:
                      const TFrameId &fid, const TVectorImageP &firstImage,
                      const TVectorImageP &lastImage);
 
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
-  void onEnter();
-  void onLeave();
-  void onActivate();
-  bool onPropertyChanged(std::string propertyName);
-  void onImageChanged();
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  void onEnter() override;
+  void onLeave() override;
+  void onActivate() override;
+  bool onPropertyChanged(std::string propertyName) override;
+  void onImageChanged() override;
 
   void multiUpdate(const TXshSimpleLevelP &level, TFrameId firstFrameId,
                    TFrameId lastFrameId, TRectD firstRect, TRectD lastRect);
 
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  int getCursorId() const;
+  int getCursorId() const override;
   void resetMulti();
 
   /*-- ドラッグ中にツールが切り替わった場合、処理を終了させる--*/
-  void onDeactivate();
+  void onDeactivate() override;
   /*-- Brush、PaintBrush、EraserToolがPencilModeのときにTrueを返す --*/
-  bool isPencilModeActive();
+  bool isPencilModeActive() override;
 
 private:
   /*-- 終了処理 --*/
@@ -1073,7 +1077,7 @@ void EraserTool::onImageChanged() {
     m_firstFrameSelected = false;  // nel caso sono passato allo stato 1 e torno
                                    // all'immagine iniziale, torno allo stato
                                    // iniziale
-  else {  // cambio stato.
+  else {                           // cambio stato.
     m_firstFrameSelected = true;
     if (m_eraseType.getValue() != FREEHANDERASE &&
         m_eraseType.getValue() != POLYLINEERASE) {

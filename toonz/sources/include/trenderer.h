@@ -92,11 +92,11 @@ struct TRenderPort::RenderData {
   std::vector<double> m_frames;  //!< Frames this output represents
   TRenderSettings m_info;        //!< Output settings description
   TRasterP m_rasA, m_rasB;  //!< The output images; m_rasB is not empty only for
-                            //!interlacacing and stereoscopic.
+                            //! interlacacing and stereoscopic.
   unsigned long m_renderId;  //!< Identifier of the rendering session this
-                             //!output belongs to
+                             //! output belongs to
   unsigned long m_taskId;  //!< Task identifier in the rendering session. Starts
-                           //!at 0, preserves
+                           //! at 0, preserves
   //!< the original submission order except for cluster equivalence.
 
   RenderData() : m_renderId((unsigned long)-1), m_taskId((unsigned long)-1) {}

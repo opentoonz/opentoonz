@@ -50,7 +50,7 @@ class SchematicZoomer : public ImageUtils::ShortcutZoomer {
 public:
   SchematicZoomer(QWidget *parent) : ShortcutZoomer(parent) {}
 
-  bool zoom(bool zoomin, bool resetZoom) {
+  bool zoom(bool zoomin, bool resetZoom) override {
     static_cast<SchematicSceneViewer *>(getWidget())->zoomQt(zoomin, resetZoom);
     return true;
   }

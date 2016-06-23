@@ -195,7 +195,7 @@ void StudioPaletteTreeViewer::setStdPaletteHandle(
 
 QTreeWidgetItem *StudioPaletteTreeViewer::createRootItem(TFilePath path) {
   QString rootName = QString::fromStdWString(path.getWideName());
-  if (rootName != "Toonz Palettes") rootName = "Project Palettes";
+  if (rootName != "Global Palettes") rootName = "Project Palettes";
   QTreeWidgetItem *rootItem =
       new QTreeWidgetItem((QTreeWidget *)0, QStringList(rootName));
   rootItem->setIcon(0, m_folderIcon);
@@ -653,7 +653,7 @@ public:
   InvalidateIconsUndo(TXshLevelHandle *levelHandle)
       : m_levelHandle(levelHandle) {}
 
-  void undo() const {
+  void undo() const override {
     TXshLevel *level = m_levelHandle->getLevel();
     if (level) {
       std::vector<TFrameId> fids;
@@ -661,9 +661,9 @@ public:
       invalidateIcons(level, fids);
     }
   }
-  void redo() const { undo(); }
+  void redo() const override { undo(); }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 };
 
 //----------------------------------------------------------------------

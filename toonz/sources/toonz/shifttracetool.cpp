@@ -83,7 +83,7 @@ private:
 public:
   ShiftTraceTool();
 
-  ToolType getToolType() const { return GenericTool; }
+  ToolType getToolType() const override { return GenericTool; }
 
   void clearData();
   void updateData();
@@ -91,16 +91,16 @@ public:
   void updateCurveAffs();
   void updateGhost();
 
-  void reset() {
+  void reset() override {
     onActivate();
     invalidate();
   }
 
-  void mouseMove(const TPointD &, const TMouseEvent &e);
-  void leftButtonDown(const TPointD &, const TMouseEvent &);
-  void leftButtonDrag(const TPointD &, const TMouseEvent &);
-  void leftButtonUp(const TPointD &, const TMouseEvent &);
-  void draw();
+  void mouseMove(const TPointD &, const TMouseEvent &e) override;
+  void leftButtonDown(const TPointD &, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &, const TMouseEvent &) override;
+  void leftButtonUp(const TPointD &, const TMouseEvent &) override;
+  void draw() override;
 
   TAffine getGhostAff();
   GadgetId getGadget(const TPointD &);
@@ -109,7 +109,7 @@ public:
   void drawControlRect();
   void drawCurve();
 
-  void onActivate() {
+  void onActivate() override {
     m_ghostIndex  = 0;
     m_curveStatus = NoCurve;
     clearData();
@@ -120,12 +120,12 @@ public:
     m_center[0] = osm.getShiftTraceGhostCenter(0);
     m_center[1] = osm.getShiftTraceGhostCenter(1);
   }
-  void onDeactivate() {
+  void onDeactivate() override {
     QAction *action = CommandManager::instance()->getAction("MI_EditShift");
     action->setChecked(false);
   }
 
-  int getCursorId() const;
+  int getCursorId() const override;
 };
 
 ShiftTraceTool::ShiftTraceTool()

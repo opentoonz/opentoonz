@@ -35,8 +35,8 @@ public:
   FxSettingsUndo(QString name, TFxHandle *fxHandle)
       : m_name(name), m_fxHandle(fxHandle) {}
 
-  int getSize() const { return sizeof(*this); }
-  int getHistoryType() { return HistoryType::Fx; }
+  int getSize() const override { return sizeof(*this); }
+  int getHistoryType() override { return HistoryType::Fx; }
 };
 
 class AnimatableFxSettingsUndo : public FxSettingsUndo {
@@ -48,7 +48,7 @@ public:
   AnimatableFxSettingsUndo(QString name, int frame, TFxHandle *fxHandle)
       : FxSettingsUndo(name, fxHandle), m_frame(frame) {}
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Modify Fx Param : %1").arg(m_name);
     if (m_wasKeyframe)
       str += QString("  Frame : %1").arg(QString::number(m_frame + 1));
@@ -74,9 +74,9 @@ public:
     m_wasKeyframe = m_param->isKeyframe(frame);
   }
 
-  void onAdd() { m_newValue = m_param->getValue(m_frame); }
+  void onAdd() override { m_newValue = m_param->getValue(m_frame); }
 
-  void undo() const {
+  void undo() const override {
     if (!m_wasKeyframe)
       m_param->setDefaultValue(m_oldValue);
     else
@@ -87,7 +87,7 @@ public:
     }
   }
 
-  void redo() const {
+  void redo() const override {
     if (!m_wasKeyframe)
       m_param->setDefaultValue(m_newValue);
     else
@@ -112,9 +112,9 @@ public:
     m_wasKeyframe = m_param->isKeyframe(frame);
   }
 
-  void onAdd() { m_newValue = m_param->getValue(m_frame); }
+  void onAdd() override { m_newValue = m_param->getValue(m_frame); }
 
-  void undo() const {
+  void undo() const override {
     if (!m_wasKeyframe)
       m_param->setDefaultValue(m_oldValue);
     else
@@ -125,7 +125,7 @@ public:
     }
   }
 
-  void redo() const {
+  void redo() const override {
     if (!m_wasKeyframe)
       m_param->setDefaultValue(m_newValue);
     else
@@ -150,9 +150,9 @@ public:
     m_wasKeyframe = m_param->isKeyframe(frame);
   }
 
-  void onAdd() { m_newValue = m_param->getValue(m_frame); }
+  void onAdd() override { m_newValue = m_param->getValue(m_frame); }
 
-  void undo() const {
+  void undo() const override {
     if (!m_wasKeyframe)
       m_param->setDefaultValue(m_oldValue);
     else
@@ -163,7 +163,7 @@ public:
     }
   }
 
-  void redo() const {
+  void redo() const override {
     if (!m_wasKeyframe)
       m_param->setDefaultValue(m_newValue);
     else
@@ -188,9 +188,9 @@ public:
     m_wasKeyframe = m_param->isKeyframe(frame);
   }
 
-  void onAdd() { m_newValue = m_param->getValue(m_frame); }
+  void onAdd() override { m_newValue = m_param->getValue(m_frame); }
 
-  void undo() const {
+  void undo() const override {
     if (!m_wasKeyframe)
       m_param->setDefaultValue(m_oldValue);
     else
@@ -199,7 +199,7 @@ public:
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     if (!m_wasKeyframe)
       m_param->setDefaultValue(m_newValue);
     else
@@ -223,17 +223,17 @@ public:
       , m_oldString(oldString)
       , m_newString(newString) {}
 
-  void undo() const {
+  void undo() const override {
     m_param->setValue(m_oldString);
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     m_param->setValue(m_newString);
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Modify Fx Param : %1 : %2 -> %3")
                       .arg(m_name)
                       .arg(QString::fromStdString(m_oldString))
@@ -256,19 +256,19 @@ public:
     m_newValue = m_oldValue;
   }
 
-  void onAdd() { m_newValue = m_param->getValue(); }
+  void onAdd() override { m_newValue = m_param->getValue(); }
 
-  void undo() const {
+  void undo() const override {
     m_param->setValue(m_oldValue);
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     m_param->setValue(m_newValue);
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Modify Fx Param : %1 : %2 -> %3")
                       .arg(m_name)
                       .arg(QString::number(m_oldValue))
@@ -290,17 +290,17 @@ public:
     m_newState = param->getValue();
   }
 
-  void undo() const {
+  void undo() const override {
     m_param->setValue(!m_newState);
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     m_param->setValue(m_newState);
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Modify Fx Param : ");
     if (m_newState)
       str += QObject::tr("ON : %1").arg(m_name);
@@ -326,9 +326,9 @@ public:
     m_wasKeyframe = m_param->isKeyframe(frame);
   }
 
-  void onAdd() { m_newSpectrum = m_param->getValue(m_frame); }
+  void onAdd() override { m_newSpectrum = m_param->getValue(m_frame); }
 
-  void undo() const {
+  void undo() const override {
     if (!m_wasKeyframe)
       m_param->setDefaultValue(m_oldSpectrum);
     else
@@ -339,7 +339,7 @@ public:
     }
   }
 
-  void redo() const {
+  void redo() const override {
     if (!m_wasKeyframe)
       m_param->setDefaultValue(m_newSpectrum);
     else
@@ -385,7 +385,7 @@ public:
     m_currentParam->insertKey(m_index, m_key.first, m_key.second);
   }
 
-  void undo() const {
+  void undo() const override {
     if (m_isAddUndo)
       removeKeys();
     else
@@ -394,7 +394,7 @@ public:
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     if (m_isAddUndo)
       addKeys();
     else
@@ -402,7 +402,7 @@ public:
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str =
         QObject::tr("Modify Fx Param : %1 : %2 Key")
             .arg(m_name)
@@ -426,19 +426,19 @@ public:
     m_newValue = m_oldValue;
   }
 
-  void onAdd() { m_newValue = m_param->getValue(); }
+  void onAdd() override { m_newValue = m_param->getValue(); }
 
-  void undo() const {
+  void undo() const override {
     m_param->setValue(m_oldValue);
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     m_param->setValue(m_newValue);
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Modify Fx Param : %1 : %2 -> %3")
                       .arg(m_name)
                       .arg(QString::fromStdWString(m_oldValue))
@@ -463,9 +463,9 @@ public:
     m_wasKeyframe = m_param->isKeyframe(frame);
   }
 
-  void onAdd() { m_newPoints = m_param->getValue(m_frame); }
+  void onAdd() override { m_newPoints = m_param->getValue(m_frame); }
 
-  void undo() const {
+  void undo() const override {
     if (!m_wasKeyframe)
       m_param->setDefaultValue(m_oldPoints);
     else
@@ -474,7 +474,7 @@ public:
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     if (!m_wasKeyframe)
       m_param->setDefaultValue(m_newPoints);
     else
@@ -521,7 +521,7 @@ public:
     m_currentParam->addValue(0, m_value, m_index);
   }
 
-  void undo() const {
+  void undo() const override {
     if (m_isAddUndo)
       removePoints();
     else
@@ -530,7 +530,7 @@ public:
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     if (m_isAddUndo)
       addPoints();
     else
@@ -538,7 +538,7 @@ public:
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str =
         QObject::tr("Modify Fx Param : %1 : %2 Point")
             .arg(m_name)
@@ -565,19 +565,19 @@ public:
     m_newState = actualParam->isLinear();
   }
 
-  void undo() const {
+  void undo() const override {
     m_actualParam->setIsLinear(!m_newState);
     m_currentParam->setIsLinear(!m_newState);
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     m_actualParam->setIsLinear(m_newState);
     m_currentParam->setIsLinear(m_newState);
     if (m_fxHandle) m_fxHandle->notifyFxChanged();
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Modify Fx Param : ");
     if (m_newState)
       str += QObject::tr("%1 : Linear ON").arg(m_name);

@@ -1248,7 +1248,7 @@ TDebugMessage::flush();
         }
 
         ///////////////////////////////////////// compute centre of Rotation and
-        ///Scaling
+        /// Scaling
 
         std::vector<TPointD> vpOld(cornerSize), vpNew(cornerSize);
         TPointD pOld, pNew;

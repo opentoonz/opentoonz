@@ -286,7 +286,7 @@ Destroys the TXshCellColumn object.
   /*!
 Return \b TXshCellColumn.
 */
-  TXshCellColumn *getCellColumn() { return this; }
+  TXshCellColumn *getCellColumn() override { return this; }
 
   virtual bool canSetCell(const TXshCell &cell) const = 0;
 
@@ -295,7 +295,7 @@ Return not empty cell range. Set \b r0 and \b r1 to first
 and last row with not empty cell.
 \sa isEmpty() and getRowCount()
 */
-  virtual int getRange(int &r0, int &r1) const;
+  int getRange(int &r0, int &r1) const override;
   /*!
 Return row count.
 \sa isEmpty() and getRange()
@@ -305,13 +305,13 @@ Return row count.
 Return true if row count is null.
 \sa isCellEmpty(), getRowCount(), getRange()
 */
-  virtual bool isEmpty() const { return getRowCount() == 0; }
+  bool isEmpty() const override { return getRowCount() == 0; }
 
   /*!
 Return true if cell in \b row is empty.
 \sa isEmpty()
 */
-  virtual bool isCellEmpty(int row) const;
+  bool isCellEmpty(int row) const override;
 
   /*!
 Return cell in \b row.
@@ -351,7 +351,7 @@ Clear \b rowCount cells from line \b row, without shift.
   /*!
 Return last row with not empty cell.
 */
-  virtual int getMaxFrame() const;
+  int getMaxFrame() const override;
 
   /*!
 Return first not empty row.
@@ -364,7 +364,7 @@ Return first not empty row.
 Return true if cell in row is not empty. Set \b r0 and \b r1 to first and
 last row with not empty cell of same level.
 */
-  virtual bool getLevelRange(int row, int &r0, int &r1) const;
+  bool getLevelRange(int row, int &r0, int &r1) const override;
 
   // virtual void updateIcon() = 0;
 };

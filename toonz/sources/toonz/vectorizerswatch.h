@@ -44,8 +44,8 @@ protected:
   void connectUpdates();
   void disconnectUpdates();
 
-  void showEvent(QShowEvent *se);  // { connectUpdates(); }
-  void hideEvent(QHideEvent *he);  // { disconnectUpdates(); }
+  void showEvent(QShowEvent *se) override;  // { connectUpdates(); }
+  void hideEvent(QHideEvent *he) override;  // { disconnectUpdates(); }
 
 public slots:
 
@@ -98,9 +98,9 @@ class VectorizationSwatchTask : public TThread::Runnable {
 public:
   VectorizationSwatchTask(int row, int col);
 
-  void run();
-  void onStarted(TThread::RunnableP task);
-  void onFinished(TThread::RunnableP task);
+  void run() override;
+  void onStarted(TThread::RunnableP task) override;
+  void onFinished(TThread::RunnableP task) override;
 
 signals:
 

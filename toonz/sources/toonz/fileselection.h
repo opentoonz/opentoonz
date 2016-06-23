@@ -24,7 +24,7 @@ public:
   void getSelectedFiles(std::vector<TFilePath> &files);
 
   // commands
-  void enableCommands();
+  void enableCommands() override;
 
   void duplicateFiles();
   void deleteFiles();

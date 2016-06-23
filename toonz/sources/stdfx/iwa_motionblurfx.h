@@ -112,7 +112,8 @@ protected:
 public:
   Iwa_MotionBlurCompFx();
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &settings);
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &settings) override;
 
   void doCompute_CPU(TTile &tile, double frame, const TRenderSettings &settings,
                      float4 *pointsTable, int pointAmount, double hardness,
@@ -124,12 +125,14 @@ public:
                      TDimensionI &dimOut, TDimensionI &filterDim,
                      TTile &back_tile);
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
 
-  bool canHandle(const TRenderSettings &info, double frame);
+  bool canHandle(const TRenderSettings &info, double frame) override;
   /*- 参考にしているオブジェクトが動いている可能性があるので、
           エイリアスは毎フレーム変える -*/
-  std::string getAlias(double frame, const TRenderSettings &info) const;
+  std::string getAlias(double frame,
+                       const TRenderSettings &info) const override;
 };
 
 #endif

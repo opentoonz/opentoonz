@@ -61,7 +61,8 @@ public:
     this->m_ref_mode->setDefaultValue(0);
     this->m_ref_mode->setValue(0);
   }
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (this->m_input.isConnected()) {
       const bool ret = this->m_input->doGetBBox(frame, bBox, info);
       const double margin =
@@ -76,16 +77,19 @@ public:
       return false;
     }
   }
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     const double radius = (this->m_radius->getValue(frame) + smoothing_edge_) *
                           ino::pixel_per_mm() *
                           sqrt(fabs(info.m_affine.det())) /
                           ((info.m_shrinkX + info.m_shrinkY) / 2.0);
     return TRasterFx::memorySize(rect.enlarge(ceil(radius) + 0.5), info.m_bpp);
   }
-  void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &rend_sets) override;
 };
 FX_PLUGIN_IDENTIFIER(ino_maxmin, "inoMaxMinFx");
 //------------------------------------------------------------

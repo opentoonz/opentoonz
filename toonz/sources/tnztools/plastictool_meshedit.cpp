@@ -659,12 +659,12 @@ public:
     assert(m_vIdxs.size() == m_origVxsPos.size());
   }
 
-  int getSize() const {
+  int getSize() const override {
     return int(sizeof(*this) +
                m_vIdxs.size() * (sizeof(int) + 2 * sizeof(TPointD)));
   }
 
-  void redo() const {
+  void redo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     l_plasticTool.setMeshVertexesSelection(m_vIdxs);
@@ -675,7 +675,7 @@ public:
         .notifyImageChanged();  // IMPORTANT: In particular, sets the level's
   }                             //            dirty flag, so Toonz knows it has
                                 //            to be saved!
-  void undo() const {
+  void undo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     l_plasticTool.setMeshVertexesSelection(m_vIdxs);
@@ -696,9 +696,9 @@ public:
   SwapEdgeUndo(const MeshIndex &edgeIdx)
       : m_row(::row()), m_col(::column()), m_edgeIdx(edgeIdx) {}
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  void redo() const {
+  void redo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     const TMeshImageP &mi = TMeshImageP(TTool::getImage(true));
@@ -720,8 +720,8 @@ public:
     l_plasticTool.notifyImageChanged();
   }
 
-  void undo() const { redo(); }  // Operation is idempotent (indices
-                                 // are perfectly restored, too)
+  void undo() const override { redo(); }  // Operation is idempotent (indices
+                                          // are perfectly restored, too)
 };
 
 //==============================================================================
@@ -738,7 +738,7 @@ public:
       : m_row(::row()), m_col(::column()), m_meshIdx(meshIdx) {}
 
   // Let's say 1MB each - storing the mesh is costly
-  int getSize() const { return 1 << 20; }
+  int getSize() const override { return 1 << 20; }
 
   TMeshImageP getMeshImage() const {
     const TMeshImageP &mi = TMeshImageP(TTool::getImage(true));
@@ -757,7 +757,7 @@ public:
   CollapseEdgeUndo(const MeshIndex &edgeIdx)
       : TTextureMeshUndo(edgeIdx.m_meshIdx), m_eIdx(edgeIdx.m_idx) {}
 
-  void redo() const {
+  void redo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     const TMeshImageP &mi = getMeshImage();
@@ -780,7 +780,7 @@ public:
     l_plasticTool.notifyImageChanged();
   }
 
-  void undo() const {
+  void undo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     const TMeshImageP &mi = getMeshImage();
@@ -808,7 +808,7 @@ public:
   SplitEdgeUndo(const MeshIndex &edgeIdx)
       : TTextureMeshUndo(edgeIdx.m_meshIdx), m_eIdx(edgeIdx.m_idx) {}
 
-  void redo() const {
+  void redo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     const TMeshImageP &mi = getMeshImage();
@@ -834,7 +834,7 @@ public:
     l_plasticTool.notifyImageChanged();
   }
 
-  void undo() const {
+  void undo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     const TMeshImageP &mi = getMeshImage();
@@ -868,7 +868,7 @@ public:
       , m_origImage(TTool::getImage(false)->cloneImage())
       , m_edgesSelection(edgesSelection) {}
 
-  int getSize() const { return 1 << 20; }
+  int getSize() const override { return 1 << 20; }
 
   bool do_() const {
     TMeshImageP mi = TTool::getImage(true);
@@ -887,7 +887,7 @@ public:
     return false;
   }
 
-  void redo() const {
+  void redo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     bool ret = do_();
@@ -895,7 +895,7 @@ public:
     assert(ret);
   }
 
-  void undo() const {
+  void undo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     TMeshImageP mi = TTool::getImage(true);

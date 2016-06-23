@@ -57,7 +57,7 @@ Destroys the TXshChildLevel object.
   /*!
 Return the \b TXshChildLevel child level.
 */
-  TXshChildLevel *getChildLevel() { return this; }
+  TXshChildLevel *getChildLevel() override { return this; }
   /*!
 Return the level \b TXsheet.
 \sa setXsheet()
@@ -69,24 +69,24 @@ Set the level \b TXsheet to \b xsheet.
 */
   void setXsheet(TXsheet *xsheet);
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 
-  void load() {}
-  void save() {}
+  void load() override {}
+  void save() override {}
 
   /*!
 Override. Set level scene to \b scene.
 */
-  void setScene(ToonzScene *scene);
+  void setScene(ToonzScene *scene) override;
   /*!
 Return the frame count.
 */
-  int getFrameCount() const;
+  int getFrameCount() const override;
   /*!
 Set the vector \b fids to the frameId of level.
 */
-  void getFids(std::vector<TFrameId> &fids) const;
+  void getFids(std::vector<TFrameId> &fids) const override;
 
 private:
   // not implemented

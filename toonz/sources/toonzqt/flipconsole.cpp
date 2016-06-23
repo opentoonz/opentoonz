@@ -603,7 +603,7 @@ public:
   }
 
 protected:
-  void paintEvent(QPaintEvent *e) {
+  void paintEvent(QPaintEvent *e) override {
     QPainter p(this);
 
     p.drawPixmap(0, 0,
@@ -623,7 +623,7 @@ protected:
                  m_secondAction->icon().pixmap(QSize(LX, LY / 2), mode, state));
   }
 
-  void mousePressEvent(QMouseEvent *e) {
+  void mousePressEvent(QMouseEvent *e) override {
     QRect firstActionRect(0, 0, LX, LY / 2);
     QRect secondActionRect(0, LY / 2 + 1, LX, LY / 2);
 
@@ -636,7 +636,7 @@ protected:
     update();
   }
 
-  void mouseMoveEvent(QMouseEvent *e) {
+  void mouseMoveEvent(QMouseEvent *e) override {
     QPoint pos = e->pos();
     QRect firstActionRect(0, 0, LX, LY / 2);
     QRect secondActionRect(0, LY / 2 + 1, LX, LY / 2);
@@ -656,7 +656,7 @@ protected:
     update();
   }
 
-  void leaveEvent(QEvent *e) {
+  void leaveEvent(QEvent *e) override {
     m_firstMode   = QIcon::Normal;
     m_firstState  = QIcon::Off;
     m_secondMode  = QIcon::Normal;
@@ -1879,28 +1879,28 @@ void FlipConsole::onPreferenceChanged() {
 
       m_enableBlankFrameButton->setStyleSheet(
           QString("#enableBlankFrameButton{ \
-							background-color: transparent; \
-							padding: 2px;\
-							font-weight: bold; \
-							font-size: 12px; \
-							color: %11;\
-							border-style: inset; \
-							border-left-color: rgb(%5,%6,%7); \
-							border-top-color: rgb(%5,%6,%7); \
-							border-right-color: rgb(%8,%9,%10); \
-							border-bottom-color: rgb(%8,%9,%10); \
-							border-width: 2px; \
-							border-radius: 3px; \
-						} \
-						#enableBlankFrameButton:checked { \
-							background-color: rgb(%1,%2,%3); \
-							color: %4; \
-							border-style: outset; \
-							border-left-color: rgb(%8,%9,%10); \
-							border-top-color: rgb(%8,%9,%10); \
-							border-right-color: rgb(%5,%6,%7); \
-							border-bottom-color: rgb(%5,%6,%7); \
-						} ")
+              background-color: transparent; \
+              padding: 2px;\
+              font-weight: bold; \
+              font-size: 12px; \
+              color: %11;\
+              border-style: inset; \
+              border-left-color: rgb(%5,%6,%7); \
+              border-top-color: rgb(%5,%6,%7); \
+              border-right-color: rgb(%8,%9,%10); \
+              border-bottom-color: rgb(%8,%9,%10); \
+              border-width: 2px; \
+              border-radius: 3px; \
+            } \
+            #enableBlankFrameButton:checked { \
+              background-color: rgb(%1,%2,%3); \
+              color: %4; \
+              border-style: outset; \
+              border-left-color: rgb(%8,%9,%10); \
+              border-top-color: rgb(%8,%9,%10); \
+              border-right-color: rgb(%5,%6,%7); \
+              border-bottom-color: rgb(%5,%6,%7); \
+            } ")
               .arg(m_blankColor.r)
               .arg(m_blankColor.g)
               .arg(m_blankColor.b)
@@ -1928,7 +1928,7 @@ class FlipConsoleActionsCreator : AuxActionsCreator {
   }
 
 public:
-  void createActions(QObject *parent) {
+  void createActions(QObject *parent) override {
     /*createToggleAction(parent, "A_Flip_Play",  "Play",  FlipConsole::ePlay);
 createToggleAction(parent, "A_Flip_Pause", "Pause", FlipConsole::ePause);
 createToggleAction(parent, "A_Flip_Loop",  "Loop",  FlipConsole::eLoop);*/

@@ -45,19 +45,19 @@ public:
 
   TXshSoundLevel *clone() const;
 
-  void setScene(ToonzScene *scene);
+  void setScene(ToonzScene *scene) override;
 
   //! Overridden from TXshLevel
-  TXshSoundLevel *getSoundLevel() { return this; }
+  TXshSoundLevel *getSoundLevel() override { return this; }
 
   void loadSoundTrack();
   void loadSoundTrack(const TFilePath &fileName);
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 
-  void load();
-  void save();
+  void load() override;
+  void save() override;
   void save(const TFilePath &path);
 
   void computeValues(int frameHeight = 20);
@@ -69,7 +69,7 @@ public:
   double getFrameRate() const { return m_fps; }
 
   void setPath(const TFilePath &path) { m_path = path; }
-  TFilePath getPath() const { return m_path; }
+  TFilePath getPath() const override { return m_path; }
 
   void setSoundTrack(TSoundTrackP st) {
     m_soundTrack = st;
@@ -82,9 +82,9 @@ public:
 
   int getSamplePerFrame() const { return m_samplePerFrame; }
 
-  int getFrameCount() const;
+  int getFrameCount() const override;
 
-  void getFids(std::vector<TFrameId> &fids) const;
+  void getFids(std::vector<TFrameId> &fids) const override;
 
 private:
   // not implemented

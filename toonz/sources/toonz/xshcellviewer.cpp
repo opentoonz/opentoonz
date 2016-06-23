@@ -466,18 +466,18 @@ public:
     app->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void undo() const { setcell(m_oldCell); }
+  void undo() const override { setcell(m_oldCell); }
 
-  void redo() const { setcell(m_newCell); }
+  void redo() const override { setcell(m_newCell); }
 
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Rename Cell  at Column %1  Frame %2")
         .arg(QString::number(m_col + 1))
         .arg(QString::number(m_row + 1));
   }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 // display upper-directional smart tab only when pressing ctrl key
@@ -1580,18 +1580,18 @@ public:
   // indices sono le colonne inserite
   CycleUndo(TStageObject *pegbar, CellArea *area)
       : m_pegbar(pegbar), m_area(area) {}
-  void undo() const {
+  void undo() const override {
     m_pegbar->enableCycle(!m_pegbar->isCycleEnabled());
     m_area->update();
   }
-  void redo() const { undo(); }
-  int getSize() const { return sizeof *this; }
+  void redo() const override { undo(); }
+  int getSize() const override { return sizeof *this; }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Toggle cycle of  %1")
         .arg(QString::fromStdString(m_pegbar->getName()));
   }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 //----------------------------------------------------------
 

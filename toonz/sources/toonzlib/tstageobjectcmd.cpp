@@ -66,26 +66,26 @@ public:
     m_oldCurrentId = m_objHandle->getObjectId();
   }
   ~NewCameraUndo() { m_stageObject->release(); }
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh = m_xshHandle->getXsheet();
     if (m_cameraId == m_objHandle->getObjectId())
       m_objHandle->setObjectId(m_oldCurrentId);
     xsh->getStageObjectTree()->removeStageObject(m_cameraId);
     m_xshHandle->notifyXsheetChanged();
   }
-  void redo() const {
+  void redo() const override {
     TXsheet *xsh = m_xshHandle->getXsheet();
     xsh->getStageObjectTree()->insertStageObject(m_stageObject);
     m_objHandle->setObjectId(m_cameraId);
     m_xshHandle->notifyXsheetChanged();
   }
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("New Camera  %1")
         .arg(QString::fromStdString(m_cameraId.toString()));
   }
-  int getHistoryType() { return HistoryType::Schematic; }
+  int getHistoryType() override { return HistoryType::Schematic; }
 
 private:
   // not implemented
@@ -121,27 +121,27 @@ public:
 
   ~NewPegbarUndo() { m_stageObject->release(); }
 
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh = m_xshHandle->getXsheet();
     if (m_id == m_objHandle->getObjectId())
       m_objHandle->setObjectId(m_oldCurrentId);
     xsh->getStageObjectTree()->removeStageObject(m_id);
     m_xshHandle->notifyXsheetChanged();
   }
-  void redo() const {
+  void redo() const override {
     TXsheet *xsh = m_xshHandle->getXsheet();
     xsh->getStageObjectTree()->insertStageObject(m_stageObject);
     m_objHandle->setObjectId(m_id);
     m_xshHandle->notifyXsheetChanged();
   }
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("New Pegbar  %1")
         .arg(QString::fromStdString(m_id.toString()));
   }
 
-  int getHistoryType() { return HistoryType::Schematic; }
+  int getHistoryType() override { return HistoryType::Schematic; }
 
 private:
   // not implemented
@@ -167,29 +167,29 @@ public:
       , m_newCameraId(newCameraId)
       , m_xshHandle(xshHandle) {}
 
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh = m_xshHandle->getXsheet();
     xsh->getStageObjectTree()->setCurrentCameraId(m_oldCameraId);
     // make the preview camera same as the final camera
     xsh->getStageObjectTree()->setCurrentPreviewCameraId(m_oldCameraId);
     m_xshHandle->notifyXsheetChanged();
   }
-  void redo() const {
+  void redo() const override {
     TXsheet *xsh = m_xshHandle->getXsheet();
     xsh->getStageObjectTree()->setCurrentCameraId(m_newCameraId);
     // make the preview camera same as the final camera
     xsh->getStageObjectTree()->setCurrentPreviewCameraId(m_newCameraId);
     m_xshHandle->notifyXsheetChanged();
   }
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Set Active Camera  %1 > %2")
         .arg(QString::fromStdString(m_oldCameraId.toString()))
         .arg(QString::fromStdString(m_newCameraId.toString()));
   }
 
-  int getHistoryType() { return HistoryType::Schematic; }
+  int getHistoryType() override { return HistoryType::Schematic; }
 };
 
 //===================================================================
@@ -216,7 +216,7 @@ public:
     }
   }
   ~RemoveSplineUndo() { m_spline->release(); }
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh = m_xshHandle->getXsheet();
     xsh->getStageObjectTree()->insertSpline(m_spline);
     for (int i = 0; i < (int)m_ids.size(); i++) {
@@ -226,7 +226,7 @@ public:
     }
     m_xshHandle->notifyXsheetChanged();
   }
-  void redo() const {
+  void redo() const override {
     TXsheet *xsh = m_xshHandle->getXsheet();
     for (int i = 0; i < (int)m_ids.size(); i++) {
       TStageObject *pegbar = xsh->getStageObject(m_ids[i]);
@@ -236,17 +236,17 @@ public:
     xsh->getStageObjectTree()->removeSpline(m_spline);
     m_xshHandle->notifyXsheetChanged();
   }
-  int getSize() const {
+  int getSize() const override {
     return sizeof *this + sizeof(TStageObjectSpline) +
            sizeof(TStageObjectId) * m_ids.size();
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Remove Spline  %1")
         .arg(QString::fromStdString(m_id.toString()));
   }
 
-  int getHistoryType() { return HistoryType::Schematic; }
+  int getHistoryType() override { return HistoryType::Schematic; }
 };
 
 //===================================================================
@@ -267,7 +267,7 @@ public:
     m_spline->addRef();
   }
   ~NewSplineUndo() { m_spline->release(); }
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh         = m_xshHandle->getXsheet();
     TStageObject *pegbar = xsh->getStageObject(m_id);
     assert(pegbar);
@@ -275,7 +275,7 @@ public:
     xsh->getStageObjectTree()->removeSpline(m_spline);
     m_xshHandle->notifyXsheetChanged();
   }
-  void redo() const {
+  void redo() const override {
     TXsheet *xsh = m_xshHandle->getXsheet();
     xsh->getStageObjectTree()->insertSpline(m_spline);
     TStageObject *pegbar = xsh->getStageObject(m_id);
@@ -283,13 +283,15 @@ public:
     pegbar->setSpline(m_spline);
     m_xshHandle->notifyXsheetChanged();
   }
-  int getSize() const { return sizeof *this + sizeof(TStageObjectSpline); }
+  int getSize() const override {
+    return sizeof *this + sizeof(TStageObjectSpline);
+  }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("New Motion Path  %1")
         .arg(QString::fromStdString(m_spline->getName()));
   }
-  int getHistoryType() { return HistoryType::Schematic; }
+  int getHistoryType() override { return HistoryType::Schematic; }
 };
 
 //===================================================================
@@ -312,26 +314,28 @@ public:
 
   ~SplineLinkUndo() { m_spline->release(); }
 
-  void undo() const {
+  void undo() const override {
     TStageObject *object = m_xshHandle->getXsheet()->getStageObject(m_id);
     object->setSpline(0);
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     TStageObject *object = m_xshHandle->getXsheet()->getStageObject(m_id);
     object->setSpline(m_spline);
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof *this + sizeof(TStageObjectSpline); }
+  int getSize() const override {
+    return sizeof *this + sizeof(TStageObjectSpline);
+  }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Link Motion Path  %1 > %2")
         .arg(QString::fromStdString(m_spline->getName()))
         .arg(QString::fromStdString(m_id.toString()));
   }
-  int getHistoryType() { return HistoryType::Schematic; }
+  int getHistoryType() override { return HistoryType::Schematic; }
 };
 
 //===================================================================
@@ -358,7 +362,7 @@ public:
 
   ~RemoveSplineLinkUndo() { m_spline->release(); }
 
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh              = m_xshHandle->getXsheet();
     TStageObjectTree *objTree = xsh->getStageObjectTree();
     TStageObject *object      = objTree->getStageObject(m_id, false);
@@ -368,7 +372,7 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     TXsheet *xsh              = m_xshHandle->getXsheet();
     TStageObjectTree *objTree = xsh->getStageObjectTree();
     TStageObject *object      = objTree->getStageObject(m_id, false);
@@ -378,7 +382,9 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof *this + sizeof(TStageObjectSpline); }
+  int getSize() const override {
+    return sizeof *this + sizeof(TStageObjectSpline);
+  }
 };
 
 //===================================================================
@@ -410,7 +416,7 @@ public:
     m_linkedObj = linkedObj;
   }
 
-  void undo() const {
+  void undo() const override {
     // reinsert Object
     TXsheet *xsh = m_xshHandle->getXsheet();
     if (m_objId.isColumn() && m_column)
@@ -428,7 +434,7 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     TXsheet *xsh     = m_xshHandle->getXsheet();
     int pegbarsCount = xsh->getStageObjectTree()->getStageObjectCount();
     int i;
@@ -445,15 +451,15 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof *this + sizeof(TStageObjectParams) + sizeof(m_xshHandle);
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Remove Object  %1")
         .arg(QString::fromStdString(m_objId.toString()));
   }
-  int getHistoryType() { return HistoryType::Schematic; }
+  int getHistoryType() override { return HistoryType::Schematic; }
 };
 
 //===================================================================
@@ -489,7 +495,7 @@ public:
     for (i = 0; i < (int)m_deletedFx.size(); i++) m_deletedFx[i]->release();
   }
 
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh        = m_xshHandle->getXsheet();
     TFxSet *terminalFxs = xsh->getFxDag()->getTerminalFxs();
     TFxSet *internalFxs = xsh->getFxDag()->getInternalFxs();
@@ -514,7 +520,7 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     TXsheet *xsh        = m_xshHandle->getXsheet();
     TFxSet *terminalFxs = xsh->getFxDag()->getTerminalFxs();
     TFxSet *internalFxs = xsh->getFxDag()->getInternalFxs();
@@ -526,7 +532,7 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof *this + m_deletedFx.size() * sizeof(TFx) +
            m_terminalFx.size() * sizeof(TFx) +
            m_columnFxConnections.size() *
@@ -534,7 +540,7 @@ public:
            m_notTerminalColumns.size() * sizeof(TFx) + sizeof(TXsheetHandle);
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str = QObject::tr("Remove Column  ");
     QMap<TStageObjectId, QList<TFxPort *>>::const_iterator it;
     for (it = m_columnFxConnections.begin(); it != m_columnFxConnections.end();
@@ -546,7 +552,7 @@ public:
     }
     return str;
   }
-  int getHistoryType() { return HistoryType::Schematic; }
+  int getHistoryType() override { return HistoryType::Schematic; }
 };
 
 //===================================================================
@@ -571,7 +577,7 @@ public:
 
   ~UndoGroup() {}
 
-  void undo() const {
+  void undo() const override {
     assert(m_ids.size() == m_positions.size());
     TStageObjectTree *pegTree = m_xshHandle->getXsheet()->getStageObjectTree();
     int i;
@@ -585,7 +591,7 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     assert(m_ids.size() == m_positions.size());
     TStageObjectTree *pegTree = m_xshHandle->getXsheet()->getStageObjectTree();
     int i;
@@ -600,7 +606,7 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 };
 
 //===================================================================
@@ -636,7 +642,7 @@ public:
     m_positions = positions;
   }
 
-  void undo() const {
+  void undo() const override {
     assert(m_objsId.size() == m_positions.size());
     TStageObjectTree *objTree = m_xshHandle->getXsheet()->getStageObjectTree();
     if (!objTree) return;
@@ -650,7 +656,7 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     assert(m_objsId.size() == m_positions.size());
     TStageObjectTree *objTree = m_xshHandle->getXsheet()->getStageObjectTree();
     if (!objTree) return;
@@ -664,7 +670,7 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 };
 
 //===================================================================
@@ -699,7 +705,7 @@ public:
     for (i = 0; i < m_objs.size(); i++) m_objs[i]->release();
   }
 
-  void undo() const {
+  void undo() const override {
     assert(m_objs.size() == m_positions.size());
     int i;
     for (i = 0; i < m_objs.size(); i++) {
@@ -709,7 +715,7 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     assert(m_objs.size() == m_positions.size());
     int i;
     for (i = 0; i < m_objs.size(); i++) {
@@ -719,7 +725,7 @@ public:
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 };
 
 //===================================================================
@@ -754,19 +760,19 @@ public:
     if (spline) spline->release();
   }
 
-  void onAdd() { m_newStatus = m_obj->getStatus(); }
+  void onAdd() override { m_newStatus = m_obj->getStatus(); }
 
-  void undo() const {
+  void undo() const override {
     m_obj->setStatus(m_oldStatus);
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     m_obj->setStatus(m_newStatus);
     m_xshHandle->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 };
 
 //===================================================================
@@ -975,19 +981,19 @@ public:
     TStageObject *pegbar = getStageObject();
     if (pegbar) setAttribute(pegbar, value);
   }
-  void undo() const {
+  void undo() const override {
     setAttribute(m_oldValue);
     m_xshHandle->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     setAttribute(m_newValue);
     m_xshHandle->notifyXsheetChanged();
   }
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  int getHistoryType() { return HistoryType::Unidentified; }
-  QString getHistoryString() {
+  int getHistoryType() override { return HistoryType::Unidentified; }
+  QString getHistoryString() override {
     return QString("%1 %2 : %3 -> %4")
         .arg(getActionName())
         .arg(QString::fromStdString(getId().toString()))
@@ -1005,11 +1011,11 @@ public:
   StageObjectRenameUndo(const TStageObjectId &id, TXsheetHandle *xshHandle,
                         std::string oldName, std::string newName)
       : SetAttributeUndo<std::string>(id, xshHandle, oldName, newName) {}
-  void setAttribute(TStageObject *pegbar, std::string name) const {
+  void setAttribute(TStageObject *pegbar, std::string name) const override {
     pegbar->setName(name);
   }
-  QString getActionName() { return QString("Rename Object"); }
-  QString getStringFromValue(std::string value) {
+  QString getActionName() override { return QString("Rename Object"); }
+  QString getStringFromValue(std::string value) override {
     return QString::fromStdString(value);
   }
 };
@@ -1021,11 +1027,11 @@ public:
   ResetOffsetUndo(const TStageObjectId &id, TXsheetHandle *xshHandle,
                   const TPointD &oldOffset)
       : SetAttributeUndo<TPointD>(id, xshHandle, oldOffset, TPointD()) {}
-  void setAttribute(TStageObject *pegbar, TPointD offset) const {
+  void setAttribute(TStageObject *pegbar, TPointD offset) const override {
     pegbar->setOffset(offset);
   }
-  QString getActionName() { return QString("Reset Center"); }
-  QString getStringFromValue(TPointD value) {
+  QString getActionName() override { return QString("Reset Center"); }
+  QString getStringFromValue(TPointD value) override {
     return QString("(%1,%2)")
         .arg(QString::number(value.x))
         .arg(QString::number(value.y));
@@ -1039,11 +1045,11 @@ public:
   ResetCenterAndOffsetUndo(const TStageObjectId &id, TXsheetHandle *xshHandle,
                            const TPointD &oldOffset)
       : SetAttributeUndo<TPointD>(id, xshHandle, oldOffset, TPointD()) {}
-  void setAttribute(TStageObject *pegbar, TPointD offset) const {
+  void setAttribute(TStageObject *pegbar, TPointD offset) const override {
     pegbar->setCenterAndOffset(offset, offset);
   }
-  QString getActionName() { return QString("Reset Center"); }
-  QString getStringFromValue(TPointD value) {
+  QString getActionName() override { return QString("Reset Center"); }
+  QString getStringFromValue(TPointD value) override {
     return QString("(%1,%2)")
         .arg(QString::number(value.x))
         .arg(QString::number(value.y));
@@ -1064,17 +1070,17 @@ public:
     TStageObject *pegbar = getStageObject();
     if (pegbar) pegbar->getCenterAndOffset(m_center, m_offset);
   }
-  void setAttribute(TStageObject *pegbar, std::string handle) const {
+  void setAttribute(TStageObject *pegbar, std::string handle) const override {
     pegbar->setHandle(handle);
   }
-  void undo() const {
+  void undo() const override {
     SetAttributeUndo<std::string>::undo();
     TStageObject *pegbar = getStageObject();
     if (pegbar) pegbar->setCenterAndOffset(m_center, m_offset);
     m_xshHandle->notifyXsheetChanged();
   }
-  QString getActionName() { return QString("Set Handle"); }
-  QString getStringFromValue(std::string value) {
+  QString getActionName() override { return QString("Set Handle"); }
+  QString getStringFromValue(std::string value) override {
     return QString::fromStdString(value);
   }
 };
@@ -1086,11 +1092,11 @@ public:
   SetParentHandleUndo(const TStageObjectId &id, TXsheetHandle *xshHandle,
                       std::string oldHandle, std::string newHandle)
       : SetAttributeUndo<std::string>(id, xshHandle, oldHandle, newHandle) {}
-  void setAttribute(TStageObject *pegbar, std::string handle) const {
+  void setAttribute(TStageObject *pegbar, std::string handle) const override {
     pegbar->setParentHandle(handle);
   }
-  QString getActionName() { return QString("Set Parent Handle"); }
-  QString getStringFromValue(std::string value) {
+  QString getActionName() override { return QString("Set Parent Handle"); }
+  QString getStringFromValue(std::string value) override {
     return QString::fromStdString(value);
   }
 };
@@ -1107,12 +1113,13 @@ public:
       : SetAttributeUndo<ParentIdAndHandle>(
             id, xshHandle, ParentIdAndHandle(oldParentId, oldParentHandle),
             ParentIdAndHandle(newParentId, newParentHandle)) {}
-  void setAttribute(TStageObject *pegbar, ParentIdAndHandle parent) const {
+  void setAttribute(TStageObject *pegbar,
+                    ParentIdAndHandle parent) const override {
     pegbar->setParent(parent.first);
     pegbar->setParentHandle(parent.second);
   }
-  QString getActionName() { return QString("Set Parent Handle"); }
-  QString getStringFromValue(ParentIdAndHandle value) {
+  QString getActionName() override { return QString("Set Parent Handle"); }
+  QString getStringFromValue(ParentIdAndHandle value) override {
     return QString("(%1,%2)")
         .arg(QString::fromStdString(value.first.toString()))
         .arg(QString::fromStdString(value.second));
@@ -1164,7 +1171,7 @@ public:
     }
   }
 
-  void undo() const {
+  void undo() const override {
     TStageObject *stageObject = getStageObject();
     if (!stageObject) return;
     stageObject->setCenterAndOffset(m_center, m_offset);
@@ -1172,7 +1179,7 @@ public:
     restoreKeyframes(stageObject->getParam(TStageObject::T_Y), m_yKeyframes);
     m_xshHandle->notifyXsheetChanged();
   }
-  void redo() const {
+  void redo() const override {
     TStageObject *stageObject = getStageObject();
     if (!stageObject) return;
     stageObject->setCenterAndOffset(TPointD(0, 0), TPointD(0, 0));
@@ -1180,7 +1187,7 @@ public:
     deleteAllKeyframes(stageObject->getParam(TStageObject::T_Y));
     m_xshHandle->notifyXsheetChanged();
   }
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) +
            sizeof(TDoubleKeyframe) *
                (m_xKeyframes.size() + m_yKeyframes.size());

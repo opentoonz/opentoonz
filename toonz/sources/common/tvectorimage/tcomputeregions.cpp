@@ -2258,12 +2258,10 @@ void TVectorImage::Imp::findIntersections() {
   for (i = 0; i < strokeSize; i++) {
     TStroke *s1 = strokeArray[i]->m_s;
     if (strokeArray[i]->m_isPoint) continue;
-    for (
-        j = i;
-        j <
-        strokeSize /*&& (strokeArray[i]->getBBox().x1>= strokeArray[j]->getBBox().x0)*/
-        ;
-        j++) {
+    for (j = i; j < strokeSize /*&& (strokeArray[i]->getBBox().x1>=
+                                  strokeArray[j]->getBBox().x0)*/
+         ;
+         j++) {
       TStroke *s2 = strokeArray[j]->m_s;
 
       if (strokeArray[j]->m_isPoint ||
@@ -2572,11 +2570,11 @@ private:
 public:
   TRegionClockWiseFormula() : m_quasiArea(0) {}
 
-  void inline update(const TPointD &p1, const TPointD &p2) {
+  void update(const TPointD &p1, const TPointD &p2) override {
     m_quasiArea += (p2.y + p1.y) * (p1.x - p2.x);
   }
 
-  bool inline isClockwise() { return m_quasiArea > 0.5; }
+  bool isClockwise() { return m_quasiArea > 0.5; }
 };
 
 //----------------------------------------------------------------------------------------------

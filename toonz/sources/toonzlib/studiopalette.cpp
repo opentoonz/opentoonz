@@ -202,8 +202,9 @@ StudioPalette *StudioPalette::instance() {
 
 //-------------------------------------------------------------------
 
+
 TFilePath StudioPalette::getLevelPalettesRoot() {
-  return m_root + "Toonz Palettes";
+  return m_root + "Global Palettes";
 }
 
 //-------------------------------------------------------------------

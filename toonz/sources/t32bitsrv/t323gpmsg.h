@@ -29,8 +29,8 @@ class InitLW3gpParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$initLW3gp"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$initLW3gp"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -40,8 +40,8 @@ class LWSetFrameRateParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$LW3gpSetFrameRate"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LW3gpSetFrameRate"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -51,8 +51,8 @@ class LWImageWriteParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$LW3gpImageWrite"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LW3gpImageWrite"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -63,8 +63,8 @@ class LWSaveSoundTrackParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$LW3gpSaveSoundTrack"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LW3gpSaveSoundTrack"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -74,8 +74,8 @@ class CloseLW3gpParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$closeLW3gp"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$closeLW3gp"; }
+  void operator()(Message &stream) override;
 };
 
 //************************************************************************************
@@ -87,8 +87,8 @@ class InitLR3gpParser : public tipc::MessageParser {
   // Reply: ok <lx> <ly> <framerate> | err
 
 public:
-  QString header() const { return "$initLR3gp"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$initLR3gp"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -101,8 +101,8 @@ class LRLoadInfoParser : public tipc::MessageParser {
   // dealt with.
 
 public:
-  QString header() const { return "$LR3gpLoadInfo"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LR3gpLoadInfo"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -112,8 +112,8 @@ class LREnableRandomAccessReadParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$LR3gpEnableRandomAccessRead"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LR3gpEnableRandomAccessRead"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -124,8 +124,8 @@ class LRImageReadParser : public tipc::MessageParser {
   // Reply: [data reader]
 
 public:
-  QString header() const { return "$LR3gpImageRead"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$LR3gpImageRead"; }
+  void operator()(Message &stream) override;
 };
 
 //------------------------------------------------------------------------------
@@ -135,8 +135,8 @@ class CloseLR3gpParser : public tipc::MessageParser {
   // Reply: ok | err
 
 public:
-  QString header() const { return "$closeLR3gp"; }
-  void operator()(Message &stream);
+  QString header() const override { return "$closeLR3gp"; }
+  void operator()(Message &stream) override;
 };
 
 }  // namespace _3gp_io

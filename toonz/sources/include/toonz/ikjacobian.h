@@ -255,7 +255,7 @@ public:
   // The entries are in column order!!!
   // Use this with care.  You may call GetRowStride and GetColStride to navigate
   //			within the matrix.  I do not expect these values to ever
-  //change.
+  // change.
   const double *GetPtr() const;
   double *GetPtr();
   const double *GetPtr(long i, long j) const;

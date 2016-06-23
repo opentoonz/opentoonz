@@ -42,7 +42,7 @@ public:
   template <typename T>
   void notify(const T &change);
 
-  void onChange(const TParamChange &change) {}
+  void onChange(const TParamChange &change) override {}
 };
 
 //---------------------------------------------------------

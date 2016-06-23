@@ -60,7 +60,8 @@ public:
   void enlarge(const TRectD &bbox, TRectD &requestedGeom,
                const TRenderSettings &ri, double frame);
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (m_input.isConnected()) {
       m_input->doGetBBox(frame, bBox, info);
       bBox = bBox.enlarge(getMaxBraid(bBox, frame));
@@ -73,20 +74,20 @@ public:
 
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput);
+                 TRenderSettings &infoOnInput) override;
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &) override;
 
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info);
-  bool canHandle(const TRenderSettings &info, double frame) {
+                           const TRenderSettings &info) override;
+  bool canHandle(const TRenderSettings &info, double frame) override {
     if (info.m_isSwatch) return true;
 
     return m_blur->getValue(frame) == 0 ? true
                                         : isAlmostIsotropic(info.m_affine);
   }
 
-  void getParamUIs(TParamUIConcept *&concepts, int &length) {
+  void getParamUIs(TParamUIConcept *&concepts, int &length) override {
     concepts = new TParamUIConcept[length = 2];
 
     concepts[0].m_type  = TParamUIConcept::POINT;

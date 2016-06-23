@@ -4207,15 +4207,14 @@ void TRop::quickPut(const TRasterP &dn, const TRasterCM32P &upCM32,
 //
 //=============================================================================
 
-void TRop::quickPut(
-    const TRasterP &dn, const TRasterCM32P &upCM32, const TPaletteP &plt,
-    const TAffine &aff,
-    const CmappedQuickputSettings &settings)  // const TPixel32&
-                                              // globalColorScale, bool
-                                              // inksOnly, bool
-                                              // transparencyCheck, bool
-                                              // blackBgCheck, int inkIndex, int
-                                              // paintIndex)
+void TRop::quickPut(const TRasterP &dn, const TRasterCM32P &upCM32,
+                    const TPaletteP &plt, const TAffine &aff,
+                    const CmappedQuickputSettings &settings)  // const TPixel32&
+// globalColorScale, bool
+// inksOnly, bool
+// transparencyCheck, bool
+// blackBgCheck, int inkIndex, int
+// paintIndex)
 {
   TRaster32P dn32 = dn;
   if (dn32 && upCM32)

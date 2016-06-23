@@ -460,7 +460,7 @@ inline std::ostream &operator<<(std::ostream &out, const TThickPoint &p) {
 
 //=============================================================================
 //!	This is a template class representing a generic vector in a plane, i.e.
-//!a point.
+//! a point.
 /*!
                 It is a data structure with two objects in it representing
    coordinate of the point and

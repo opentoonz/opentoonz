@@ -37,15 +37,17 @@ class RGBPickerTool : public TTool {
   std::vector<TPointD> m_workingPolyline;
   bool m_makePick;
 
+  TPoint m_mousePixelPosition;
+
 public:
   RGBPickerTool();
 
   /*-- ToolOptionBox上にPassiveに拾った色を表示するため --*/
   void setToolOptionsBox(RGBPickerToolOptionsBox *toolOptionsBox);
 
-  ToolType getToolType() const { return TTool::LevelReadTool; }
+  ToolType getToolType() const override { return TTool::LevelReadTool; }
 
-  void updateTranslation();
+  void updateTranslation() override;
 
   // Used to notify and set the currentColor outside the draw() methods:
   // using special style there was a conflict between the draw() methods of the
@@ -54,35 +56,37 @@ public:
   // use
   // another glContext
 
-  void onImageChanged();
+  void onImageChanged() override;
 
-  void draw();
+  void draw() override;
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
 
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
 
-  void leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e) override;
 
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
 
-  void pick(TPoint pos);
+  void pick();
 
   void pickRect();
 
   void pickStroke();
 
-  bool onPropertyChanged(std::string propertyName);
+  bool onPropertyChanged(std::string propertyName) override;
 
-  void onActivate();
+  void onActivate() override;
 
-  TPropertyGroup *getProperties(int targetType);
+  TPropertyGroup *getProperties(int targetType) override;
 
-  int getCursorId() const;
+  int getCursorId() const override;
 
-  void doPolylinePick();
+  void doPolylineFreehandPick();
+
+  void passivePick();
 
   //! Viene aggiunto \b pos a \b m_track e disegnato il primo pezzetto del
   //! lazzo. Viene inizializzato \b m_firstPos

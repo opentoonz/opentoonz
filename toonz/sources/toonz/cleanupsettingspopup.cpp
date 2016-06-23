@@ -833,7 +833,7 @@ class ToggleOpacityCheckCommand : public MenuItemHandler {
 public:
   ToggleOpacityCheckCommand() : MenuItemHandler(MI_OpacityCheck) {}
 
-  void execute() {
+  void execute() override {
     CleanupSettingsModel *model = CleanupSettingsModel::instance();
     CleanupParameters *params   = model->getCurrentParameters();
 

@@ -31,7 +31,7 @@ public:
       , m_modifiedSavebox(modifiedSavebox)
       , m_originalSavebox(originalSavebox) {}
 
-  void redo() const {
+  void redo() const override {
     TToonzImageP ti = getImage();
     if (!ti) return;
     TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
@@ -40,18 +40,20 @@ public:
     notifyImageChanged();
   }
 
-  void undo() const {
+  void undo() const override {
     TRasterUndo::undo();
     TToonzImageP ti = getImage();
     if (!ti) return;
     ti->setSavebox(m_originalSavebox);
   }
 
-  int getSize() const { return TRasterUndo::getSize() + sizeof(this) + 100; }
+  int getSize() const override {
+    return TRasterUndo::getSize() + sizeof(this) + 100;
+  }
 
   ~SetSaveboxUndo() {}
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Set Save Box : (X%1,Y%2,W%3,H%4)->(X%5,Y%6,W%7,H%8)")
         .arg(QString::number(m_originalSavebox.x0))
         .arg(QString::number(m_originalSavebox.y0))

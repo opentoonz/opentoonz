@@ -49,7 +49,7 @@ protected slots:
 
 protected:
   void setLabel(const TFilePath &fp);
-  void timerEvent(QTimerEvent *event);
+  void timerEvent(QTimerEvent *event) override;
   void push(const TFilePath &fp);
   void push(const TFilePathSet &fs);
   void pop();

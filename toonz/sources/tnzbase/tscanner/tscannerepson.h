@@ -25,11 +25,11 @@ public:
   TScannerEpson();
   ~TScannerEpson();
 
-  void selectDevice();
-  bool isDeviceAvailable();
-  bool isDeviceSelected();
-  void updateParameters(TScannerParameters &param);  // vedi TScanner
-  void acquire(const TScannerParameters &params, int paperCount);
+  void selectDevice() override;
+  bool isDeviceAvailable() override;
+  bool isDeviceSelected() override;
+  void updateParameters(TScannerParameters &param) override;  // vedi TScanner
+  void acquire(const TScannerParameters &params, int paperCount) override;
   bool isAreaSupported();
   void closeIO();
 

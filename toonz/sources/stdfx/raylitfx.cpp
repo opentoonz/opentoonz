@@ -43,15 +43,19 @@ public:
 
   ~BaseRaylitFx() {}
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
 
-  bool canHandle(const TRenderSettings &info, double frame) { return false; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return false;
+  }
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info);
+                           const TRenderSettings &info) override;
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info);
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override;
 
-  void getParamUIs(TParamUIConcept *&concepts, int &length) {
+  void getParamUIs(TParamUIConcept *&concepts, int &length) override {
     concepts = new TParamUIConcept[length = 1];
 
     concepts[0].m_type  = TParamUIConcept::POINT;
@@ -118,7 +122,7 @@ public:
     bindParam(this, "invert", m_invert);
   }
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &) override;
 };
 
 FX_PLUGIN_IDENTIFIER(RaylitFx, "raylitFx")
@@ -180,7 +184,7 @@ class ColorRaylitFx : public BaseRaylitFx {
 public:
   ColorRaylitFx() : BaseRaylitFx() {}
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &) override;
 };
 
 //-------------------------------------------------------------------

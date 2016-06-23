@@ -39,7 +39,8 @@ public:
     this->m_gamma->setValueRange(0.1 * ino::param_range(),
                                  10.0 * ino::param_range()); /* gamma値 */
   }
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (this->m_input.isConnected()) {
       return this->m_input->doGetBBox(frame, bBox, info);
     } else {
@@ -47,8 +48,11 @@ public:
       return false;
     }
   }
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
-  void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &rend_sets) override;
 };
 FX_PLUGIN_IDENTIFIER(ino_level_auto, "inoLevelAutoFx");
 //------------------------------------------------------------

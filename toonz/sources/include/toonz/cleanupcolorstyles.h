@@ -30,17 +30,17 @@ public:
   TCleanupStyle(const TCleanupStyle &);
   ~TCleanupStyle();
 
-  void setMainColor(const TPixel32 &color);
+  void setMainColor(const TPixel32 &color) override;
 
-  int getColorParamCount() const;
-  TPixel32 getColorParamValue(int index) const;
-  void setColorParamValue(int index, const TPixel32 &color);
+  int getColorParamCount() const override;
+  TPixel32 getColorParamValue(int index) const override;
+  void setColorParamValue(int index, const TPixel32 &color) override;
 
-  int getParamCount() const { return 2; }
-  QString getParamNames(int index) const;
-  void getParamRange(int index, double &min, double &max) const;
-  double getParamValue(TColorStyle::double_tag, int index) const;
-  void setParamValue(int index, double value);
+  int getParamCount() const override { return 2; }
+  QString getParamNames(int index) const override;
+  void getParamRange(int index, double &min, double &max) const override;
+  double getParamValue(TColorStyle::double_tag, int index) const override;
+  void setParamValue(int index, double value) override;
 
   double getBrightness() const { return m_brightness; }
   double getContrast() const { return m_contrastEnable ? m_contrast : 100; }
@@ -52,11 +52,11 @@ public:
   bool canUpdate() const { return m_canUpdate; }
   void setCanUpdate(bool state);
 
-  void makeIcon(const TDimension &size);
+  void makeIcon(const TDimension &size) override;
 
 protected:
-  void loadData(TInputStreamInterface &);
-  void saveData(TOutputStreamInterface &) const;
+  void loadData(TInputStreamInterface &) override;
+  void saveData(TOutputStreamInterface &) const override;
 
 private:
   // not implemented
@@ -74,15 +74,15 @@ class DVAPI TColorCleanupStyle : public TCleanupStyle {
 public:
   TColorCleanupStyle(const TPixel32 &color = TPixel32::Black);
 
-  TColorStyle *clone() const;
-  QString getDescription() const;
-  int getTagId() const;
+  TColorStyle *clone() const override;
+  QString getDescription() const override;
+  int getTagId() const override;
 
-  int getParamCount() const { return 4; }
-  QString getParamNames(int index) const;
-  void getParamRange(int index, double &min, double &max) const;
-  double getParamValue(TColorStyle::double_tag, int index) const;
-  void setParamValue(int index, double value);
+  int getParamCount() const override { return 4; }
+  QString getParamNames(int index) const override;
+  void getParamRange(int index, double &min, double &max) const override;
+  double getParamValue(TColorStyle::double_tag, int index) const override;
+  void setParamValue(int index, double value) override;
 
   double getHRange() const { return m_hRange; }
   void setHRange(double hRange);
@@ -91,8 +91,8 @@ public:
   void setLineWidth(double lineWidth);
 
 protected:
-  void loadData(TInputStreamInterface &);
-  void saveData(TOutputStreamInterface &) const;
+  void loadData(TInputStreamInterface &) override;
+  void saveData(TOutputStreamInterface &) const override;
 
 private:
   // not implemented
@@ -107,15 +107,15 @@ class DVAPI TBlackCleanupStyle : public TCleanupStyle {
 public:
   TBlackCleanupStyle(const TPixel32 &color = TPixel32::Black);
 
-  TColorStyle *clone() const;
-  QString getDescription() const;
-  int getTagId() const;
+  TColorStyle *clone() const override;
+  QString getDescription() const override;
+  int getTagId() const override;
 
-  int getParamCount() const { return 4; }
-  QString getParamNames(int index) const;
-  void getParamRange(int index, double &min, double &max) const;
-  double getParamValue(TColorStyle::double_tag, int index) const;
-  void setParamValue(int index, double value);
+  int getParamCount() const override { return 4; }
+  QString getParamNames(int index) const override;
+  void getParamRange(int index, double &min, double &max) const override;
+  double getParamValue(TColorStyle::double_tag, int index) const override;
+  void setParamValue(int index, double value) override;
 
   double getColorThreshold() const { return m_colorThreshold; }
   void setColorThreshold(double t);
@@ -123,8 +123,8 @@ public:
   void setWhiteThreshold(double t);
 
 protected:
-  void loadData(TInputStreamInterface &);
-  void saveData(TOutputStreamInterface &) const;
+  void loadData(TInputStreamInterface &) override;
+  void saveData(TOutputStreamInterface &) const override;
 
 private:
   // not implemented

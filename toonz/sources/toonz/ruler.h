@@ -55,13 +55,13 @@ public:
 
   void drawVertical(QPainter &);
   void drawHorizontal(QPainter &);
-  void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
   double posToValue(const QPoint &p) const;
 
-  void mousePressEvent(QMouseEvent *e);
-  void mouseMoveEvent(QMouseEvent *e);
-  void mouseReleaseEvent(QMouseEvent *e);
+  void mousePressEvent(QMouseEvent *e) override;
+  void mouseMoveEvent(QMouseEvent *e) override;
+  void mouseReleaseEvent(QMouseEvent *e) override;
 };
 
 #endif

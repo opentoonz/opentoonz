@@ -28,14 +28,14 @@ public:
   virtual ~SquarePotential();
 
   // chiama compute_value ma effettua un controllo del parametro
-  virtual double value_(double radiusToTest) const;
+  double value_(double radiusToTest) const override;
 
   // chiama compute_value ma effettua un controllo del parametro
-  virtual void setParameters_(const TStroke *ref, double w,
-                              double actionLength);
+  void setParameters_(const TStroke *ref, double w,
+                      double actionLength) override;
 
 private:
-  Potential *clone();
+  Potential *clone() override;
 
   double compute_shape(double) const;  // funzione ausiliaria per
   // il calcolo del parametro

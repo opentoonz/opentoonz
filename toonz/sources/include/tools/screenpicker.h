@@ -21,15 +21,15 @@ public:
   ScreenPicker(QWidget *parent = 0);
 
 protected:
-  void event(QWidget *widget, QEvent *e);
+  void event(QWidget *widget, QEvent *e) override;
 
   void mousePressEvent(QWidget *widget, QMouseEvent *me);
   void mouseMoveEvent(QWidget *widget, QMouseEvent *me);
   void mouseReleaseEvent(QWidget *widget, QMouseEvent *me);
 
-  void paintEvent(QWidget *widget, QPaintEvent *pe);
+  void paintEvent(QWidget *widget, QPaintEvent *pe) override;
 
-  bool acceptScreenEvents(const QRect &screenRect) const;
+  bool acceptScreenEvents(const QRect &screenRect) const override;
 
 public slots:
 

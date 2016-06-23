@@ -221,8 +221,8 @@ public:
   void add(const std::string &cacheId, TImageP img);
   void remove(const std::string &cacheId);
 
-  void onRenderStatusStart(int renderStatus);
-  void onRenderStatusEnd(int renderStatus);
+  void onRenderStatusStart(int renderStatus) override;
+  void onRenderStatusEnd(int renderStatus) override;
 
   // void install(TFxCacheManagerListener* listener);
   // void uninstall(TFxCacheManagerListener* listener);
@@ -278,7 +278,7 @@ public:
                            const TRenderSettings &rs,
                            ResourceDeclaration *resData) = 0;
 
-  virtual void onRenderInstanceStart(unsigned long renderId) {
+  void onRenderInstanceStart(unsigned long renderId) override {
     assert(TFxCacheManager::instance());
     TFxCacheManager::instance()->install(this);
   }

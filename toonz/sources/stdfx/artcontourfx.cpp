@@ -91,7 +91,8 @@ public:
 
   //----------------------------------------------------------------------------
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &ri) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &ri) override {
     if (m_input.isConnected() && m_controller.isConnected()) {
       TRectD controlBox, inputBox;
 
@@ -119,19 +120,22 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
   //-----------------------------------------------------------------------------
 
-  bool allowUserCacheOnPort(int port) { return port != 0; }
+  bool allowUserCacheOnPort(int port) override { return port != 0; }
 
   //-----------------------------------------------------------------------------
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &ri);
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &ri) override;
 
   //-----------------------------------------------------------------------------
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
 
   //-----------------------------------------------------------------------------
 

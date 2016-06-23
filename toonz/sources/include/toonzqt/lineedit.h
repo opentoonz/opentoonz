@@ -44,8 +44,8 @@ public:
   ~LineEdit() {}
 
 protected:
-  void focusInEvent(QFocusEvent *event);
-  void keyPressEvent(QKeyEvent *event);
+  void focusInEvent(QFocusEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
 
 signals:
   void focusIn();

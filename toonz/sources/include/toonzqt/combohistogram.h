@@ -53,7 +53,7 @@ public:
   void setColorAndUpdate(QColor color);
 
 protected:
-  void paintEvent(QPaintEvent *pe);
+  void paintEvent(QPaintEvent *pe) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ public:
   void showCurrentChannelValue(int val);
 
 protected:
-  virtual void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -92,10 +92,10 @@ public:
   RGBHistoGraph(QWidget *parent = 0, int *channelValue = 0);
   ~RGBHistoGraph();
 
-  void setValues();
+  void setValues() override;
 
 protected:
-  void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event) override;
 };
 //-----------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@ public:
   ~ChannelColorBar() {}
 
 protected:
-  void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event) override;
 };
 
 //-----------------------------------------------------------------------------

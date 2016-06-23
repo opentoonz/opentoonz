@@ -107,9 +107,11 @@ public:
   OnRenderCompleted(const TFilePath &fp, bool error)
       : m_fp(fp), m_error(error) {}
 
-  TThread::Message *clone() const { return new OnRenderCompleted(*this); }
+  TThread::Message *clone() const override {
+    return new OnRenderCompleted(*this);
+  }
 
-  void onDeliver() {
+  void onDeliver() override {
     if (m_error) {
       m_error = false;
       DVGui::error(
@@ -188,6 +190,7 @@ class RenderCommand {
   TFilePath m_fp;
   int m_numFrames;
   TPixel32 m_oldBgColor;
+  static TPixel32 m_priorBgColor;
   TDimension m_oldCameraRes;
   double m_r, m_stepd;
   double m_timeStretchFactor;
@@ -215,6 +218,7 @@ public:
   void multimediaRender();
   void onRender();
   void onPreview();
+  static void resetBgColor();
   void doRender(bool isPreview);
 };
 
@@ -392,8 +396,8 @@ class RenderListener : public DVGui::ProgressDialog,
         , m_pb(pb)
         , m_frame(frame)
         , m_labelText(labelText) {}
-    TThread::Message *clone() const { return new Message(*this); }
-    void onDeliver() {
+    TThread::Message *clone() const override { return new Message(*this); }
+    void onDeliver() override {
       if (m_frame == -1)
         m_pb->hide();
       else {
@@ -428,26 +432,28 @@ public:
   }
 
   /*-- 以下３つの関数はMovieRenderer::Listenerの純粋仮想関数の実装 --*/
-  bool onFrameCompleted(int frame) {
+  bool onFrameCompleted(int frame) override {
     bool ret = wasCanceled();
     Message(this, ret ? -1 : ++m_frameCounter, m_progressBarString).send();
     return !ret;
   }
-  bool onFrameFailed(int frame, TException &) {
+  bool onFrameFailed(int frame, TException &) override {
     m_error = true;
     return onFrameCompleted(frame);
   }
-  void onSequenceCompleted(const TFilePath &fp) {
+  void onSequenceCompleted(const TFilePath &fp) override {
     Message(this, -1, "").send();
     OnRenderCompleted(fp, m_error).send();
     m_error = false;
+    RenderCommand::resetBgColor();
   }
 
-  void onCancel() {
+  void onCancel() override {
     m_isCanceled = true;
     setLabelText("Aborting render...");
     reset();
     hide();
+    RenderCommand::resetBgColor();
   }
 };
 
@@ -482,6 +488,13 @@ void RenderCommand::rasterRender(bool isPreview) {
     }
   }
 #endif
+
+  TPixel32 currBgColor = scene->getProperties()->getBgColor();
+  m_priorBgColor       = currBgColor;
+  if (ext == "jpg" || ext == "avi" || ext == "bmp") {
+    currBgColor.m = 255;
+    scene->getProperties()->setBgColor(currBgColor);
+  }
 
   // Extract output properties
   TOutputProperties *prop = isPreview
@@ -573,6 +586,13 @@ void RenderCommand::rasterRender(bool isPreview) {
   movieRenderer.start();
 }
 
+TPixel32 RenderCommand::m_priorBgColor;
+
+void RenderCommand::resetBgColor() {
+  ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+  scene->getProperties()->setBgColor(m_priorBgColor);
+}
+
 //===================================================================
 
 class MultimediaProgressBar : public DVGui::ProgressDialog,
@@ -602,9 +622,9 @@ class MultimediaProgressBar : public DVGui::ProgressDialog,
         , m_pbValue(pbValue)
         , m_labelText(labelText) {}
 
-    TThread::Message *clone() const { return new Message(*this); }
+    TThread::Message *clone() const override { return new Message(*this); }
 
-    void onDeliver() {
+    void onDeliver() override {
       if (m_pbValue == -1)
         m_pb->hide();
       else {
@@ -647,7 +667,7 @@ public:
 
   MultimediaRenderer *getRenderer() { return m_renderer; }
 
-  bool onFrameCompleted(int frame, int column) {
+  bool onFrameCompleted(int frame, int column) override {
     bool ret = wasCanceled();
     Message(this, ++m_frameCounter, m_columnCounter, ret ? -1 : ++m_pbCounter,
             m_progressBarString)
@@ -655,11 +675,11 @@ public:
     return !ret;
   }
 
-  bool onFrameFailed(int frame, int column, TException &) {
+  bool onFrameFailed(int frame, int column, TException &) override {
     return onFrameCompleted(frame, column);
   }
 
-  void onSequenceCompleted(int column) {
+  void onSequenceCompleted(int column) override {
     m_frameCounter = 0;
     Message(this, m_frameCounter, ++m_columnCounter, m_pbCounter,
             m_progressBarString)
@@ -668,12 +688,12 @@ public:
     // - and no viewfile to be called...
   }
 
-  virtual void onRenderCompleted() {
+  void onRenderCompleted() override {
     Message(this, -1, -1, -1, "").send();
     // OnRenderCompleted(fp).send();
   }
 
-  void onCancel() {
+  void onCancel() override {
     m_isCanceled = true;
     setLabelText("Aborting render...");
     TRenderer *trenderer(m_renderer->getTRenderer());

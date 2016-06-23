@@ -200,7 +200,7 @@ class TImageWriter3gp : public TImageWriter {
 public:
   TImageWriter3gp(const TFilePath &, int frameIndex, TLevelWriter3gp *);
   ~TImageWriter3gp() { m_lwm->release(); }
-  bool is64bitOutputSupported() { return false; }
+  bool is64bitOutputSupported() override { return false; }
 
 private:
   // not implemented
@@ -208,7 +208,7 @@ private:
   TImageWriter3gp &operator=(const TImageWriter3gp &src);
 
 public:
-  void save(const TImageP &);
+  void save(const TImageP &) override;
   int m_frameIndex;
 
 private:
@@ -229,7 +229,7 @@ private:
   TImageReader3gp &operator=(const TImageReader3gp &src);
 
 public:
-  TImageP load();
+  TImageP load() override;
   void load(const TRasterP &rasP, const TPoint &pos = TPoint(0, 0),
             int shrinkX = 1, int shrinkY = 1);
   int m_frameIndex;
@@ -891,11 +891,11 @@ void TImageReader3gp::load(const TRasterP &rasP, const TPoint &pos, int shrinkX,
 //------------------------------------------------
 inline void setMatteAndYMirror(const TRaster32P &ras) {
   ras->lock();
-  TPixel32 *upRow   = ras->pixels();
-  TPixel32 *dwRow   = ras->pixels(ras->getLy() - 1);
-  int hLy           = (int)(ras->getLy() / 2. + 0.5);  // piccola pessimizzazione...
-  int wrap          = ras->getWrap();
-  int lx            = ras->getLx();
+  TPixel32 *upRow = ras->pixels();
+  TPixel32 *dwRow = ras->pixels(ras->getLy() - 1);
+  int hLy  = (int)(ras->getLy() / 2. + 0.5);  // piccola pessimizzazione...
+  int wrap = ras->getWrap();
+  int lx   = ras->getLx();
   TPixel32 *upPix   = 0;
   TPixel32 *lastPix = ras->pixels(hLy);
   while (upPix < lastPix) {

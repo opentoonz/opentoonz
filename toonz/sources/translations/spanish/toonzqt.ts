@@ -70,19 +70,19 @@
     </message>
     <message>
         <source>XPx:</source>
-        <translation type="vanished">Píx X:</translation>
+        <translation type="vanished">X píx:</translation>
     </message>
     <message>
         <source>YPx:</source>
-        <translation type="vanished">Píx Y:</translation>
+        <translation type="vanished">Y píx:</translation>
     </message>
     <message>
         <source>XDpi:</source>
-        <translation type="vanished">PPP X:</translation>
+        <translation type="vanished">X ppp:</translation>
     </message>
     <message>
         <source>YDpi:</source>
-        <translation type="vanished">PPP Y:</translation>
+        <translation type="vanished">Y ppp:</translation>
     </message>
     <message>
         <source>Use Current Level Settings</source>
@@ -108,7 +108,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>AR:</source>
-        <translation type="vanished">Prop.:</translation>
+        <translation type="vanished">Prop:</translation>
     </message>
     <message>
         <source>Add</source>
@@ -116,19 +116,19 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>Remover</translation>
+        <translation>Eliminar</translation>
     </message>
     <message>
         <source>Force Squared Pixel</source>
-        <translation>Forzar píxeles cuadrados</translation>
+        <translation>Forzar píxel cuadrado</translation>
     </message>
     <message>
         <source>Error : Preset Name is Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Error: El nombre del ajuste no es válido</translation>
     </message>
     <message>
         <source>The preset name must not use &apos;,&apos;(comma).</source>
-        <translation type="unfinished"></translation>
+        <translation>El nombre del ajuste no puede utilizar &apos;,&apos;(coma).</translation>
     </message>
 </context>
 <context>
@@ -186,11 +186,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>XPx:</source>
-        <translation type="vanished">PíxX:</translation>
+        <translation type="vanished">Xpíx:</translation>
     </message>
     <message>
         <source>YPx:</source>
-        <translation type="vanished">PíxY:</translation>
+        <translation type="vanished">Ypíx:</translation>
     </message>
     <message>
         <source>Resulting Level Info</source>
@@ -299,14 +299,14 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>DVGui::ProgressDialog</name>
     <message>
         <source>Toonz</source>
-        <translation>Toonz</translation>
+        <translation>OpenToonz</translation>
     </message>
 </context>
 <context>
     <name>DVGui::RadioButtonDialog</name>
     <message>
         <source>Toonz</source>
-        <translation>Toonz</translation>
+        <translation>OpenToonz</translation>
     </message>
 </context>
 <context>
@@ -362,11 +362,11 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     <name>EaseInOutSegmentPage</name>
     <message>
         <source>Ease In:</source>
-        <translation>Desaceleración:</translation>
+        <translation>Desaceleración suave:</translation>
     </message>
     <message>
         <source>Ease Out:</source>
-        <translation>Aceleración:</translation>
+        <translation>Aceleración suave:</translation>
     </message>
 </context>
 <context>
@@ -523,7 +523,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Soundtrack </source>
-        <translation>Banda de &amp;sonido</translation>
+        <translation>Pista de &amp;sonido</translation>
     </message>
     <message>
         <source>&amp;Histogram</source>
@@ -672,19 +672,19 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Step 1</source>
-        <translation>Intervalo 1</translation>
+        <translation>En 1</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>Intervalo 2</translation>
+        <translation>En 2</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>Intervalo 3</translation>
+        <translation>En 3</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>Intervalo 4</translation>
+        <translation>En 4</translation>
     </message>
     <message>
         <source>Function Curves</source>
@@ -849,19 +849,19 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>Step 1</source>
-        <translation>Intervalo 1</translation>
+        <translation>En 1</translation>
     </message>
     <message>
         <source>Step 2</source>
-        <translation>Intervalo 2</translation>
+        <translation>En 2</translation>
     </message>
     <message>
         <source>Step 3</source>
-        <translation>Intervalo 3</translation>
+        <translation>En 3</translation>
     </message>
     <message>
         <source>Step 4</source>
-        <translation>Intervalo 4</translation>
+        <translation>En 4</translation>
     </message>
 </context>
 <context>
@@ -948,7 +948,7 @@ Es posible que el archivo de dicho ajuste se encuentre corrupto.</translation>
     </message>
     <message>
         <source>&amp;Paste Replace</source>
-        <translation>&amp;Pegar (remplazar)</translation>
+        <translation>&amp;Pegar (reemplazar)</translation>
     </message>
     <message>
         <source>&amp;Paste Add</source>
@@ -1150,7 +1150,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Remove Reference to Studio Palette</source>
-        <translation type="vanished">Remover referencia a paleta de estudio</translation>
+        <translation type="vanished">Eliminar referencia a paleta de estudio</translation>
     </message>
     <message>
         <source>New Style</source>
@@ -1292,7 +1292,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Remove Links</source>
-        <translation>Remover vínculos</translation>
+        <translation>Eliminar vínculos</translation>
     </message>
     <message>
         <source>New Style</source>
@@ -1358,7 +1358,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     <name>ProgressDialog</name>
     <message>
         <source>Toonz</source>
-        <translation type="vanished">Toonz</translation>
+        <translation type="vanished">OpenToonz</translation>
     </message>
 </context>
 <context>
@@ -1438,7 +1438,7 @@ Seleccionar los nodos de efecto y sus vínculos relacionados antes de copiar o c
     </message>
     <message>
         <source>Stage Schematic</source>
-        <translation>Diagrama de escena</translation>
+        <translation>Diagrama de escenario</translation>
     </message>
     <message>
         <source>FX Schematic</source>
@@ -1532,7 +1532,7 @@ Para más información visitar el sitio %1:</translation>
     </message>
     <message>
         <source>SaveBox:      </source>
-        <translation>Marco de guardado: </translation>
+        <translation>Marco de seguridad: </translation>
     </message>
     <message>
         <source>Bits/Sample:  </source>
@@ -1740,7 +1740,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Remove Link  in Palette : %1</source>
-        <translation>Remover vínculo en paleta: %1</translation>
+        <translation>Eliminar vínculo en paleta: %1</translation>
     </message>
     <message>
         <source>Get Color from Studio Palette</source>
@@ -1804,7 +1804,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Remove</source>
-        <translation>Remover</translation>
+        <translation>Eliminar</translation>
     </message>
     <message>
         <source>Modify Fx Param : %1 : %2 Point</source>
@@ -1836,7 +1836,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>OpenToonz 1.0</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenToonz 1.0</translation>
     </message>
 </context>
 <context>
@@ -1850,7 +1850,7 @@ Are you sure?</source>
     <name>RadioButtonDialog</name>
     <message>
         <source>Toonz</source>
-        <translation type="vanished">Toonz</translation>
+        <translation type="vanished">OpenToonz</translation>
     </message>
 </context>
 <context>
@@ -1897,7 +1897,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>&amp;Swtich output port display mode</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Cambiar modo de visualización del puerto de salida</translation>
     </message>
 </context>
 <context>
@@ -2117,8 +2117,8 @@ Are you sure?</source>
     <message>
         <source>Auto  
 Apply</source>
-        <translation type="unfinished">Aplicar  
-Autom.</translation>
+        <translation>Aplicar
+Autom</translation>
     </message>
 </context>
 <context>

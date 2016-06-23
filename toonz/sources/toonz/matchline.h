@@ -34,7 +34,7 @@ class MergeCmappedDialog : public DVGui::Dialog {
 public:
   MergeCmappedDialog(TFilePath &);
 
-  void accept();
+  void accept() override;
 
 protected slots:
 
@@ -63,10 +63,10 @@ protected slots:
   void onChooseInkClicked(bool value);
   void onLineStackButtonPressed(int id);
   void onInkPrevalenceChanged(bool isDragging);
-  void accept();
+  void accept() override;
 
 protected:
-  void showEvent(QShowEvent *e);
+  void showEvent(QShowEvent *e) override;
 
 public:
   MatchlinesDialog();

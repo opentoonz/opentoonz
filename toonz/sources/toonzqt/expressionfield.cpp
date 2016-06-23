@@ -33,7 +33,7 @@ public:
 
   void setGrammar(const Grammar *grammar) { m_grammar = grammar; }
 
-  void highlightBlock(const QString &text) {
+  void highlightBlock(const QString &text) override {
     Parser parser(m_grammar);
     std::vector<SyntaxToken> tokens;
     Parser::SyntaxStatus status =
@@ -114,9 +114,10 @@ public:
     m_tooltip->setIndent(1);
     m_tooltip->setWordWrap(false);
   }
-  void showEvent(QShowEvent *) { showToolTip(currentIndex()); }
-  void hideEvent(QHideEvent *) { m_tooltip->hide(); }
-  void currentChanged(const QModelIndex &current, const QModelIndex &previous) {
+  void showEvent(QShowEvent *) override { showToolTip(currentIndex()); }
+  void hideEvent(QHideEvent *) override { m_tooltip->hide(); }
+  void currentChanged(const QModelIndex &current,
+                      const QModelIndex &previous) override {
     showToolTip(current);
     QListView::currentChanged(current, previous);
   }
@@ -139,7 +140,7 @@ public:
   }
 
 protected:
-  void resizeEvent(QResizeEvent *e) {
+  void resizeEvent(QResizeEvent *e) override {
     QListView::resizeEvent(e);
     if (m_tooltip->isVisible()) showToolTip(currentIndex());
   }

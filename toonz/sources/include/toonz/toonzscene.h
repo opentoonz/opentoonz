@@ -78,7 +78,7 @@ public:
   TXsheet *getXsheet()
       const;  //!< Returns a pointer to the scene's \a current xsheet.
   TXsheet *getTopXsheet() const;  //!< Returns the \a topmost xsheet in the
-                                  //!scene's xsheet hierarchy.
+                                  //! scene's xsheet hierarchy.
 
   ChildStack *getChildStack() const {
     return m_childStack;
@@ -104,7 +104,7 @@ public:
       const TFilePath &path);  //!< Loads scene data from file, \a excluding the
                                //!  associated project and the scene resources.
   void loadNoResources(const TFilePath &path);  //!< Loads a scene \a without
-                                                //!loading its resources.
+                                                //! loading its resources.
   void loadResources(
       bool withProgressDialog = false);  //!< Loads the scene resources.
   void load(const TFilePath &path,
@@ -123,8 +123,8 @@ public:
           the convertion succeeded.                                           */
 
   bool convertLevelIfNeeded(TFilePath &levelPath);  //!< Checks if the given
-                                                    //!levelPath is a file path
-                                                    //!of an
+                                                    //! levelPath is a file path
+  //! of an
   //!  old Toonz level, and converts it if needed.
 
   /*! \details  The loadLevel() function accepts an optional pointer to the

@@ -35,7 +35,7 @@ struct BrushData : public TPersist {
   PERSIST_DECLARATION(BrushData)
 
   std::wstring m_name;
-  double m_min, m_max, m_acc, m_hardness, m_opacityMin, m_opacityMax;
+  double m_min, m_max, m_acc, m_smooth, m_hardness, m_opacityMin, m_opacityMax;
   bool m_selective, m_pencil, m_breakAngles, m_pressure;
   int m_cap, m_join, m_miter;
 
@@ -44,8 +44,8 @@ struct BrushData : public TPersist {
 
   bool operator<(const BrushData &other) const { return m_name < other.m_name; }
 
-  void saveData(TOStream &os);
-  void loadData(TIStream &is);
+  void saveData(TOStream &os) override;
+  void loadData(TIStream &is) override;
 };
 
 //************************************************************************
@@ -70,6 +70,37 @@ public:
 };
 
 //************************************************************************
+//    Smooth Stroke declaration
+//    Brush stroke smoothing buffer.
+//************************************************************************
+class SmoothStroke {
+public:
+  SmoothStroke() {}
+  ~SmoothStroke() {}
+
+  // begin stroke
+  // smooth is smooth strength, from 0 to 100
+  void beginStroke(int smooth);
+  // add stroke point
+  void addPoint(const TThickPoint &point);
+  // end stroke
+  void endStroke();
+  // Get generated stroke points which has been smoothed.
+  // Both addPoint() and endStroke() generate new smoothed points.
+  // This method will removed generated points
+  void getSmoothPoints(std::vector<TThickPoint> &smoothPoints);
+
+private:
+  void generatePoints();
+
+private:
+  int m_smooth;
+  int m_outputIndex;
+  int m_readIndex;
+  std::vector<TThickPoint> m_rawPoints;
+  std::vector<TThickPoint> m_outputPoints;
+};
+//************************************************************************
 //    Brush Tool declaration
 //************************************************************************
 
@@ -79,32 +110,32 @@ class BrushTool : public TTool {
 public:
   BrushTool(std::string name, int targetType);
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
-  ToolOptionsBox *createOptionsBox();
+  ToolOptionsBox *createOptionsBox() override;
 
-  void updateTranslation();
+  void updateTranslation() override;
 
-  void onActivate();
-  void onDeactivate();
+  void onActivate() override;
+  void onDeactivate() override;
 
-  bool preLeftButtonDown();
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
+  bool preLeftButtonDown() override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
 
-  void draw();
+  void draw() override;
 
-  void onEnter();
-  void onLeave();
+  void onEnter() override;
+  void onLeave() override;
 
-  int getCursorId() const { return ToolCursor::PenCursor; }
+  int getCursorId() const override { return ToolCursor::PenCursor; }
 
-  TPropertyGroup *getProperties(int targetType);
-  bool onPropertyChanged(std::string propertyName);
+  TPropertyGroup *getProperties(int targetType) override;
+  bool onPropertyChanged(std::string propertyName) override;
 
-  void onImageChanged();
+  void onImageChanged() override;
   void setWorkAndBackupImages();
   void updateWorkAndBackupRasters(const TRect &rect);
 
@@ -116,7 +147,10 @@ public:
   void finishRasterBrush(const TPointD &pos, int pressureVal);
   // return true if the pencil mode is active in the Brush / PaintBrush / Eraser
   // Tools.
-  bool isPencilModeActive();
+  bool isPencilModeActive() override;
+
+  void addTrackPoint(const TThickPoint &point, double pixelSize2);
+  void flushTrackPoint();
 
 protected:
   TPropertyGroup m_prop[2];
@@ -124,6 +158,7 @@ protected:
   TDoublePairProperty m_thickness;
   TDoublePairProperty m_rasThickness;
   TDoubleProperty m_accuracy;
+  TDoubleProperty m_smooth;
   TDoubleProperty m_hardness;
   TEnumProperty m_preset;
   TBoolProperty m_selective;
@@ -158,12 +193,14 @@ protected:
   std::vector<TThickPoint> m_points;
   TRect m_strokeRect, m_lastRect;
 
+  SmoothStroke m_smoothStroke;
+
   BrushPresetManager
       m_presetsManager;  //!< Manager for presets of this tool instance
 
   bool m_active, m_enabled,
       m_isPrompting,  //!< Whether the tool is prompting for spline
-                      //!substitution.
+                      //! substitution.
       m_firstTime, m_isPath, m_presetsLoaded;
 
   /*---

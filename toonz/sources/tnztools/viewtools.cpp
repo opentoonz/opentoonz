@@ -27,11 +27,11 @@ public:
     bind(TTool::AllTargets);
   }
 
-  ToolType getToolType() const { return TTool::GenericTool; }
+  ToolType getToolType() const override { return TTool::GenericTool; }
 
-  void updateMatrix() { return setMatrix(TAffine()); }
+  void updateMatrix() override { return setMatrix(TAffine()); }
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
     if (!m_viewer) return;
     m_dragging              = true;
     int v                   = 1;
@@ -42,24 +42,24 @@ public:
     m_factor = 1;
     invalidate();
   }
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     int d    = m_oldY - e.m_pos.y;
     m_oldY   = e.m_pos.y;
     double f = exp(-d * 0.01);
     m_factor = f;
     m_viewer->zoom(m_center, f);
   }
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override {
     m_dragging = false;
     invalidate();
   }
 
-  void rightButtonDown(const TPointD &, const TMouseEvent &e) {
+  void rightButtonDown(const TPointD &, const TMouseEvent &e) override {
     if (!m_viewer) return;
     invalidate();
   }
 
-  void draw() {
+  void draw() override {
     if (!m_dragging) return;
 
     TPointD center   = m_viewer->winToWorld(TPoint(m_center.x, m_center.y));
@@ -81,7 +81,7 @@ public:
     glPopMatrix();
   }
 
-  int getCursorId() const { return ToolCursor::ZoomCursor; }
+  int getCursorId() const override { return ToolCursor::ZoomCursor; }
 
 } zoomTool;
 
@@ -96,17 +96,17 @@ class HandTool : public TTool {
 public:
   HandTool() : TTool("T_Hand") { bind(TTool::AllTargets); }
 
-  ToolType getToolType() const { return TTool::GenericTool; }
+  ToolType getToolType() const override { return TTool::GenericTool; }
 
-  void updateMatrix() { return setMatrix(TAffine()); }
+  void updateMatrix() override { return setMatrix(TAffine()); }
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
     if (!m_viewer) return;
     m_oldPos = e.m_pos;
     m_sw.start(true);
   }
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     if (!m_viewer) return;
     if (m_sw.getTotalTime() < 10) return;
     m_sw.stop();
@@ -117,12 +117,12 @@ public:
     m_oldPos = e.m_pos;
   }
 
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override {
     if (!m_viewer) return;
     m_sw.stop();
   }
 
-  int getCursorId() const { return ToolCursor::PanCursor; }
+  int getCursorId() const override { return ToolCursor::PanCursor; }
 
 } handTool;
 
@@ -150,13 +150,13 @@ public:
     m_prop.bind(m_cameraCentered);
   }
 
-  ToolType getToolType() const { return TTool::GenericTool; }
+  ToolType getToolType() const override { return TTool::GenericTool; }
 
-  void updateMatrix() { return setMatrix(TAffine()); }
+  void updateMatrix() override { return setMatrix(TAffine()); }
 
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
     if (!m_viewer) return;
 
     m_angle       = 0.0;
@@ -172,7 +172,7 @@ public:
     // virtual TPointD winToWorld(const TPoint &winPos) const = 0;
   }
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     if (!m_viewer) return;
     if (m_sw.getTotalTime() < 50) return;
     m_sw.stop();
@@ -195,13 +195,13 @@ public:
     m_oldPos = p;
   }
 
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override {
     m_dragging = false;
     invalidate();
     m_sw.stop();
   }
 
-  void draw() {
+  void draw() override {
     glColor3f(1, 0, 0);
     double u = 50;
     if (m_cameraCentered.getValue())
@@ -217,7 +217,7 @@ public:
                    TPointD(m_center.x, u + m_center.y));
   }
 
-  int getCursorId() const { return ToolCursor::RotateCursor; }
+  int getCursorId() const override { return ToolCursor::RotateCursor; }
 
 } rotateTool;
 

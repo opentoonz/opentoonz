@@ -92,7 +92,8 @@ public:
     }
   }
   //------------------------------------------------------------
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (!this->m_input.isConnected()) {
       bBox = TRectD();
       return false;
@@ -102,19 +103,19 @@ public:
     return ret;
   }
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     TRectD bBox(rect);
     this->get_render_enlarge(frame, info.m_affine, bBox);
     return TRasterFx::memorySize(bBox, info.m_bpp);
   }
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput) {
+                 TRenderSettings &infoOnInput) override {
     rectOnInput = rectOnOutput;
     infoOnInput = infoOnOutput;
     this->get_render_enlarge(frame, infoOnOutput.m_affine, rectOnInput);
   }
-  bool canHandle(const TRenderSettings &info, double frame) {
+  bool canHandle(const TRenderSettings &info, double frame) override {
     // return false; // toonz has geometry control
     // return true;
     /* 2012-11-14:
@@ -122,10 +123,10 @@ public:
     return m_blur->getValue(frame) == 0 ? true
                                         : isAlmostIsotropic(info.m_affine);
   }
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
 
   // add 20140130
-  void getParamUIs(TParamUIConcept *&concepts, int &length) {
+  void getParamUIs(TParamUIConcept *&concepts, int &length) override {
     concepts = new TParamUIConcept[length = 2];
 
     concepts[0].m_type  = TParamUIConcept::POINT;

@@ -274,7 +274,7 @@ include_directories(BEFORE ${TIFF_INCLUDE_DIR} ${PNG_INCLUDE_DIRS})
 
 if(WIN32 OR APPLE)
     find_path(BOOST_ROOT include/boost boost HINTS ${THIRDPARTY_LIBS_HINTS}
-        PATH_SUFFIXES boost/boost_1_60_0/ boost/boost_1_59_0/
+        PATH_SUFFIXES boost/boost_1_61_0/ boost/boost_1_60_0/ boost/boost_1_59_0/
         boost/boost_1_58_0/ boost/boost_1_57_0/ boost/boost_1_56_0/ boost155/1.55.0_1/ boost/boost_1_55_0/ )
 endif()
 find_package(Boost 1.55 REQUIRED)

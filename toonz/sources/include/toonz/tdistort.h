@@ -121,9 +121,9 @@ public:
                         const TPointD &p00d, const TPointD &p10d,
                         const TPointD &p01d, const TPointD &p11d);
 
-  TPointD map(const TPointD &p) const;
-  int invMap(const TPointD &p, TPointD *results) const;
-  int maxInvCount() const { return 2; }
+  TPointD map(const TPointD &p) const override;
+  int invMap(const TPointD &p, TPointD *results) const override;
+  int maxInvCount() const override { return 2; }
 };
 
 //------------------------------------------------------------------------------------------------
@@ -154,10 +154,10 @@ public:
                     const TPointD &p01d, const TPointD &p11d);
   ~BilinearDistorter();
 
-  TPointD map(const TPointD &p) const;
-  int invMap(const TPointD &p, TPointD *results) const;
-  int maxInvCount() const { return 2; }
-  TRectD invMap(const TRectD &rect) const;
+  TPointD map(const TPointD &p) const override;
+  int invMap(const TPointD &p, TPointD *results) const override;
+  int maxInvCount() const override { return 2; }
+  TRectD invMap(const TRectD &rect) const override;
 };
 
 //================================================================================================
@@ -214,10 +214,10 @@ public:
 
   const TPerspect &getMatrix() const { return m_matrix; }
 
-  TPointD map(const TPointD &p) const;
-  int invMap(const TPointD &p, TPointD *results) const;
-  int maxInvCount() const { return 1; }
-  TRectD invMap(const TRectD &rect) const;
+  TPointD map(const TPointD &p) const override;
+  int invMap(const TPointD &p, TPointD *results) const override;
+  int maxInvCount() const override { return 1; }
+  TRectD invMap(const TRectD &rect) const override;
 
 private:
   //! Compute the matrix used to distort image.

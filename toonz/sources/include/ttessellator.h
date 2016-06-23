@@ -73,9 +73,9 @@ private:
 public:
   // void tessellate(const TVectorRenderData &rd, TRegionOutline &outline );
   void tessellate(const TColorFunction *cf, const bool antiAliasing,
-                  TRegionOutline &outline, TPixel32 color);
+                  TRegionOutline &outline, TPixel32 color) override;
   void tessellate(const TColorFunction *cf, const bool antiAliasing,
-                  TRegionOutline &outline, TRaster32P texture);
+                  TRegionOutline &outline, TRaster32P texture) override;
 };
 
 //=============================================================================

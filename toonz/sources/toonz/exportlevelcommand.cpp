@@ -62,7 +62,7 @@ struct BusyCursorOverride {
 //---------------------------------------------------------------------------
 
 struct ExportOverwriteCB : public IoCmd::OverwriteCallbacks {
-  bool overwriteRequest(const TFilePath &fp) {
+  bool overwriteRequest(const TFilePath &fp) override {
     int ret = DVGui::MsgBox(
         QObject::tr("Warning: file %1 already exists.").arg(toQString(fp)),
         QObject::tr("Continue Exporting"), QObject::tr("Stop Exporting"), 1);
@@ -82,13 +82,15 @@ public:
     return QObject::tr("Exporting level of %1 frames in %2");
   }
 
-  void setProcessedName(const QString &name) { m_processedName = name; }
-  void setRange(int min, int max) {
+  void setProcessedName(const QString &name) override {
+    m_processedName = name;
+  }
+  void setRange(int min, int max) override {
     m_pb.setMaximum(max);
     buildString();
   }
-  void setValue(int val) { m_pb.setValue(val); }
-  bool canceled() const { return m_pb.wasCanceled(); }
+  void setValue(int val) override { m_pb.setValue(val); }
+  bool canceled() const override { return m_pb.wasCanceled(); }
   void buildString() {
     m_pb.setLabelText(
         msg().arg(QString::number(m_pb.maximum())).arg(m_processedName));
@@ -405,7 +407,7 @@ TImageP IoCmd::exportedImage(const std::string &ext, const TXshSimpleLevel &sl,
 // in modo adatto ad essere usato in Retas, e cioe':
 //- messo il bianco al posto del transparente
 //- se c'e' bianco nell'immagine, viene "sporcato"(altrimenti poi viene letto
-//come trasparente da retas)
+// come trasparente da retas)
 //- l'output e' solo tga a 24bit compressed nel formato pippo0001.tga
 
 bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl,

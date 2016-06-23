@@ -54,26 +54,26 @@ Destroys the TXshLevelColumn object.
 */
   ~TXshLevelColumn();
 
-  TXshColumn::ColumnType getColumnType() const;
+  TXshColumn::ColumnType getColumnType() const override;
 
   /*!
 Return true if \b cell is empty or level of \b cell isn't a \b
 TXshZeraryFxLevel.
 */
-  bool canSetCell(const TXshCell &cell) const;
+  bool canSetCell(const TXshCell &cell) const override;
 
   /*!
 Return \b TXshLevelColumn.
 */
-  TXshLevelColumn *getLevelColumn() { return this; }
+  TXshLevelColumn *getLevelColumn() override { return this; }
 
   /*!
 Clone column and return a pointer to the new \b TXshColumn cloned.
 */
-  TXshColumn *clone() const;
+  TXshColumn *clone() const override;
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 
   /*!
 Return a pointer to \b TLevelColumnFx \b m_fx.
@@ -83,7 +83,7 @@ Return a pointer to \b TLevelColumnFx \b m_fx.
   /*!
 Return \b TFx.
 */
-  TFx *getFx() const;
+  TFx *getFx() const override;
 
 private:
   // not implemented

@@ -42,7 +42,7 @@ public:
 
   //----------------------------------------------------------------------------
 
-  bool isSampleSigned() const { return T::isSampleSigned(); }
+  bool isSampleSigned() const override { return T::isSampleSigned(); }
 
   //----------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ public:
   //----------------------------------------------------------------------------
 
   //! Returns a soundtrack whom is a clone of the object
-  TSoundTrackP clone() const {
+  TSoundTrackP clone() const override {
     TSoundTrackP dst = TSoundTrack::create(getFormat(), m_sampleCount);
     TSoundTrackP src(const_cast<TSoundTrack *>((const TSoundTrack *)this));
     dst->copy(src, (TINT32)0);
@@ -67,7 +67,7 @@ public:
   //----------------------------------------------------------------------------
 
   //! Extract the subtrack in the samples range [s0,s1] given in samples
-  TSoundTrackP extract(TINT32 s0, TINT32 s1) {
+  TSoundTrackP extract(TINT32 s0, TINT32 s1) override {
     if (!m_buffer || s0 > s1) return TSoundTrackP();
 
     // addRef();
@@ -89,7 +89,7 @@ Returns a soundtrack whom is a clone of the object for the spicified channel
 A clone means that it's an object who lives indipendently from the other
 from which it's created.It hasn't reference to the object.
 */
-  TSoundTrackP clone(TSound::Channel chan) const {
+  TSoundTrackP clone(TSound::Channel chan) const override {
     if (getChannelCount() == 1)
       return clone();
     else {
@@ -114,7 +114,7 @@ from which it's created.It hasn't reference to the object.
   //----------------------------------------------------------------------------
 
   //! Copies from sample dst_s0 of object the samples of the soundtrack src
-  void copy(const TSoundTrackP &src, TINT32 dst_s0) {
+  void copy(const TSoundTrackP &src, TINT32 dst_s0) override {
     TSoundTrackT<T> *srcT = dynamic_cast<TSoundTrackT<T> *>(src.getPointer());
 
     if (!srcT)
@@ -140,7 +140,7 @@ from which it's created.It hasn't reference to the object.
 #if defined(MACOSX) || defined(LINUX)
   TSoundTrackP apply(TSoundTransform *transform);
 #else  // _WIN32
-  TSoundTrackP apply(TSoundTransform *transform) {
+  TSoundTrackP apply(TSoundTransform *transform) override {
     assert(transform);
     return transform->compute(*this);
   }
@@ -148,7 +148,7 @@ from which it's created.It hasn't reference to the object.
   //----------------------------------------------------------------------------
 
   //! Returns the pressure of the sample s about the channel chan
-  double getPressure(TINT32 s, TSound::Channel chan) const {
+  double getPressure(TINT32 s, TSound::Channel chan) const override {
     assert(s >= 0 && s < getSampleCount());
     assert(m_buffer);
     const T *sample = samples() + s;
@@ -161,7 +161,7 @@ from which it's created.It hasn't reference to the object.
   //! Returns the soundtrack pressure max and min values in the given sample
   //! range and channel
   void getMinMaxPressure(TINT32 s0, TINT32 s1, TSound::Channel chan,
-                         double &min, double &max) const {
+                         double &min, double &max) const override {
     TINT32 sampleCount = getSampleCount();
     if (sampleCount <= 0) {
       min = 0;
@@ -203,7 +203,8 @@ from which it's created.It hasn't reference to the object.
 
   //! Returns the soundtrack pressure max value in the given sample range and
   //! channel
-  double getMaxPressure(TINT32 s0, TINT32 s1, TSound::Channel chan) const {
+  double getMaxPressure(TINT32 s0, TINT32 s1,
+                        TSound::Channel chan) const override {
     TINT32 sampleCount = getSampleCount();
     if (sampleCount <= 0) {
       return -1;
@@ -237,7 +238,8 @@ from which it's created.It hasn't reference to the object.
 
   //! Returns the soundtrack pressure min value in the given sample range and
   //! channel
-  double getMinPressure(TINT32 s0, TINT32 s1, TSound::Channel chan) const {
+  double getMinPressure(TINT32 s0, TINT32 s1,
+                        TSound::Channel chan) const override {
     TINT32 sampleCount = getSampleCount();
     if (sampleCount <= 0) {
       return 0;
@@ -309,7 +311,7 @@ inside the dstChan channel from sample dst_s0
   //----------------------------------------------------------------------------
 
   //! Makes blank the samples in the given sample range
-  void blank(TINT32 s0, TINT32 s1) {
+  void blank(TINT32 s0, TINT32 s1) override {
     TINT32 ss0, ss1;
     // se i valori sono nel range ed uguali => voglio pulire
     // un solo campione

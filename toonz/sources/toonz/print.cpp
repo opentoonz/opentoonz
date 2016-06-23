@@ -69,7 +69,7 @@ void printCurrentFrame() {
 class PrintCommand : public MenuItemHandler {
 public:
   PrintCommand() : MenuItemHandler(MI_Print) {}
-  void execute() {
+  void execute() override {
     qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
     qApp->processEvents();
     printCurrentFrame();

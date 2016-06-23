@@ -47,9 +47,9 @@ class DragCenterTool : public DragTool {
 public:
   DragCenterTool(SkeletonTool *tool);
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
 };
 
 //---------------------------------------------------------
@@ -79,7 +79,7 @@ public:
     m_after.applyValues();
   }
 
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
 };
 
 //---------------------------------------------------------
@@ -90,8 +90,8 @@ class DragPositionTool : public DragChannelTool {
 public:
   DragPositionTool(SkeletonTool *tool);
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
 };
 
 //---------------------------------------------------------
@@ -104,8 +104,8 @@ class DragRotationTool : public DragChannelTool {
 public:
   DragRotationTool(SkeletonTool *tool, bool snapped);
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override;
 };
 
 //---------------------------------------------------------
@@ -143,11 +143,11 @@ class ParentChangeTool : public DragTool {
 public:
   ParentChangeTool(SkeletonTool *tool, TTool::Viewer *viewer);
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
 
-  void draw();
+  void draw() override;
 };
 
 //---------------------------------------------------------
@@ -200,11 +200,11 @@ public:
   void setAngleOffsets();
   void apply();
 
-  void leftButtonDown(const TPointD &, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &, const TMouseEvent &e) override;
 
-  void draw();
+  void draw() override;
 };
 
 //---------------------------------------------------------
@@ -217,9 +217,9 @@ class ChangeDrawingTool : public DragTool {
 public:
   ChangeDrawingTool(SkeletonTool *tool, int d);
 
-  void leftButtonDown(const TPointD &, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &, const TMouseEvent &e) override;
 
   bool changeDrawing(int delta);
 };

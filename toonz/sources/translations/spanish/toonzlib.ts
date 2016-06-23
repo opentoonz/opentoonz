@@ -264,7 +264,7 @@
     </message>
     <message>
         <source>Remove Spline  %1</source>
-        <translation>Remover curva  %1</translation>
+        <translation>Eliminar curva  %1</translation>
     </message>
     <message>
         <source>New Motion Path  %1</source>
@@ -276,11 +276,11 @@
     </message>
     <message>
         <source>Remove Object  %1</source>
-        <translation>Remover objeto  %1</translation>
+        <translation>Eliminar objeto  %1</translation>
     </message>
     <message>
         <source>Remove Column  </source>
-        <translation>Remover columna</translation>
+        <translation>Eliminar columna</translation>
     </message>
     <message>
         <source>Load into Current Palette  &gt; %1</source>
@@ -428,7 +428,7 @@
     </message>
     <message>
         <source>Remove Keyframe</source>
-        <translation>Remover fotograma clave</translation>
+        <translation>Eliminar fotograma clave</translation>
     </message>
     <message>
         <source>Cycle</source>
@@ -492,11 +492,15 @@
     </message>
     <message>
         <source>Remove Keyframe   %1 at frame %2</source>
-        <translation>Remover fotograma clave   %1 en fotograma %2</translation>
+        <translation>Eliminar fotograma clave   %1 en fotograma %2</translation>
     </message>
     <message>
         <source>Move Center   %1  Frame %2</source>
         <translation>Mover centro   %1  fotograma %2</translation>
+    </message>
+    <message>
+        <source>color model</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -546,7 +550,7 @@
     </message>
     <message>
         <source>Could not load level %1</source>
-        <translation type="obsolete">No fue posible cargar el nivel %1</translation>
+        <translation type="vanished">No fue posible cargar el nivel %1</translation>
     </message>
     <message>
         <source>Level is not included in the scene : %1</source>

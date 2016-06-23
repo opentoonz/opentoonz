@@ -24,9 +24,9 @@ class TLevelWriterAvi : public TLevelWriter {
 public:
   TLevelWriterAvi(const TFilePath &path, TPropertyGroup *winfo);
   ~TLevelWriterAvi();
-  TImageWriterP getFrameWriter(TFrameId fid);
+  TImageWriterP getFrameWriter(TFrameId fid) override;
 
-  void saveSoundTrack(TSoundTrack *st);
+  void saveSoundTrack(TSoundTrack *st) override;
   void save(const TImageP &image, int frameIndex);
   static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo) {
     return new TLevelWriterAvi(f, winfo);
@@ -71,12 +71,12 @@ class TLevelReaderAvi : public TLevelReader {
 public:
   TLevelReaderAvi(const TFilePath &path);
   ~TLevelReaderAvi();
-  TImageReaderP getFrameReader(TFrameId fid);
+  TImageReaderP getFrameReader(TFrameId fid) override;
 
   static TLevelReader *create(const TFilePath &f) {
     return new TLevelReaderAvi(f);
   }
-  TLevelP loadInfo();
+  TLevelP loadInfo() override;
   TImageP load(int frameIndex);
   TDimension getSize();
   TThread::Mutex m_mutex;

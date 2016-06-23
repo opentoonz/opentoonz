@@ -51,9 +51,10 @@ public:
       : TParamVar(name, hidden), m_var(var) {}
   TParamVarT(std::string name, T *var, bool hidden = false)
       : TParamVar(name, hidden), m_var(var) {}
-  void setParam(TParam *param) { m_var = TParamP(param); }
-  virtual TParam *getParam() const { return m_var.getPointer(); }
-  TParamVar *clone() const {
+  void setParam(TParam *param) override { m_var = TParamP(param); }
+
+  TParam *getParam() const override { return m_var.getPointer(); }
+  TParamVar *clone() const override {
     return new TParamVarT<T>(getName(), m_var, isHidden());
   }
 };

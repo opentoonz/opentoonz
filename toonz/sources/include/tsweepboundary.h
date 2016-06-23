@@ -10,7 +10,7 @@
 
 // bool computeSweepBoundary(	const std::vector<TStroke*> &strokes,
 //							std::vector<
-//std::vector<TQuadratic*> > &outlines );
+// std::vector<TQuadratic*> > &outlines );
 
 #undef DVAPI
 #undef DVVAR

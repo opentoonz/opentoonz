@@ -16,7 +16,7 @@ class TPredictiveCacheManagerGenerator
 public:
   TPredictiveCacheManagerGenerator() : TRenderResourceManagerGenerator(true) {}
 
-  TRenderResourceManager *operator()(void) {
+  TRenderResourceManager *operator()(void) override {
     return new TPredictiveCacheManager;
   }
 };

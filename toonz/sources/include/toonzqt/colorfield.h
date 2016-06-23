@@ -74,9 +74,9 @@ public:
   bool isEnable() const { return m_drawEnable; }
 
 protected:
-  void paintEvent(QPaintEvent *event);
-  void mousePressEvent(QMouseEvent *);
-  void mouseDoubleClickEvent(QMouseEvent *event);
+  void paintEvent(QPaintEvent *event) override;
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 signals:
   void clicked(const TColorStyle &style);
@@ -177,9 +177,9 @@ public:
 
 protected:
   void updateChannels();
-  void mousePressEvent(QMouseEvent *event);
-  void mouseDoubleClickEvent(QMouseEvent *event);
-  void hideEvent(QHideEvent *);
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void hideEvent(QHideEvent *) override;
 
 protected slots:
   void onRedChannelChanged(int value, bool isDragging);
@@ -263,9 +263,9 @@ public:
   void setContrastEnabled(bool enable);
 
 protected:
-  void mousePressEvent(QMouseEvent *event);
-  void mouseDoubleClickEvent(QMouseEvent *event);
-  void hideEvent(QHideEvent *);
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void hideEvent(QHideEvent *) override;
 
 protected slots:
 

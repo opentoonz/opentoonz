@@ -159,10 +159,10 @@ public:
 
 //-------------------------------------------------------------------
 
-const int c_soundRate       = 5512;  //  5512; //11025
-const int c_soundBps        = 16;
-const bool c_soundIsSigned  = false;
-const int c_soundChannelNum = 1;
+const int c_soundRate        = 5512;  //  5512; //11025
+const int c_soundBps         = 16;
+const bool c_soundIsSigned   = false;
+const int c_soundChannelNum  = 1;
 const int c_soundCompression = 3;  // per compatibilita' con MAC!!!
 
 //-------------------------------------------------------------------

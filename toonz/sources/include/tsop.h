@@ -24,7 +24,7 @@ public:
   TSopException(const TString &s) : m_message(s) {}
   ~TSopException() {}
 
-  TString getMessage() const { return m_message; };
+  TString getMessage() const override { return m_message; };
 };
 
 //===================================================================

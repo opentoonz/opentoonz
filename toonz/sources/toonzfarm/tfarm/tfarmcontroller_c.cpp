@@ -21,48 +21,51 @@ public:
 
   // TFarmController interface implementation
 
-  QString addTask(const TFarmTask &task, bool suspended);
+  QString addTask(const TFarmTask &task, bool suspended) override;
 
-  void removeTask(const QString &id);
-  void suspendTask(const QString &id);
-  void activateTask(const QString &id);
-  void restartTask(const QString &id);
+  void removeTask(const QString &id) override;
+  void suspendTask(const QString &id) override;
+  void activateTask(const QString &id) override;
+  void restartTask(const QString &id) override;
 
-  void getTasks(vector<QString> &tasks);
-  void getTasks(const QString &parentId, vector<QString> &tasks);
-  void getTasks(const QString &parentId, vector<TaskShortInfo> &tasks);
+  void getTasks(vector<QString> &tasks) override;
+  void getTasks(const QString &parentId, vector<QString> &tasks) override;
+  void getTasks(const QString &parentId, vector<TaskShortInfo> &tasks) override;
 
-  void queryTaskInfo(const QString &id, TFarmTask &task);
+  void queryTaskInfo(const QString &id, TFarmTask &task) override;
 
   void queryTaskShortInfo(const QString &id, QString &parentId, QString &name,
-                          TaskState &status);
+                          TaskState &status) override;
 
-  void attachServer(const QString &name, const QString &addr, int port);
+  void attachServer(const QString &name, const QString &addr,
+                    int port) override;
 
-  void detachServer(const QString &name, const QString &addr, int port);
+  void detachServer(const QString &name, const QString &addr,
+                    int port) override;
 
-  void taskSubmissionError(const QString &taskId, int errCode);
+  void taskSubmissionError(const QString &taskId, int errCode) override;
 
   void taskProgress(const QString &taskId, int step, int stepCount,
-                    int frameNumber, FrameState state);
+                    int frameNumber, FrameState state) override;
 
-  void taskCompleted(const QString &taskId, int exitCode);
+  void taskCompleted(const QString &taskId, int exitCode) override;
 
   // fills the servers vector with the names of the servers
-  void getServers(vector<ServerIdentity> &servers);
+  void getServers(vector<ServerIdentity> &servers) override;
 
   // returns the state of the server whose id has been specified
-  ServerState queryServerState2(const QString &id);
+  ServerState queryServerState2(const QString &id) override;
 
   // fills info with the infoes about the server whose id has been specified
-  void queryServerInfo(const QString &id, ServerInfo &info);
+  void queryServerInfo(const QString &id, ServerInfo &info) override;
 
   // activates the server whose id has been specified
-  void activateServer(const QString &id);
+  void activateServer(const QString &id) override;
 
   // deactivates the server whose id has been specified
   // once deactivated, a server is not available for task rendering
-  void deactivateServer(const QString &id, bool completeRunningTasks = true);
+  void deactivateServer(const QString &id,
+                        bool completeRunningTasks = true) override;
 };
 
 //------------------------------------------------------------------------------

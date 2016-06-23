@@ -272,7 +272,7 @@ public:
   DataReader(int clientSocket, std::shared_ptr<TTcpIpServerImp> serverImp)
       : m_clientSocket(clientSocket), m_serverImp(std::move(serverImp)) {}
 
-  void run();
+  void run() override;
 
   int m_clientSocket;
   std::shared_ptr<TTcpIpServerImp> m_serverImp;
@@ -304,7 +304,7 @@ public:
       , m_data(data)
       , m_serverImp(std::move(serverImp)) {}
 
-  void run();
+  void run() override;
 
   int m_clientSocket;
   QString m_data;

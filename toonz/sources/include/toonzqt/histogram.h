@@ -65,7 +65,7 @@ public:
   void draw(QPainter *painter, QPoint translation = QPoint(0, 0));
 
 protected:
-  void paintEvent(QPaintEvent *pe);
+  void paintEvent(QPaintEvent *pe) override;
 };
 
 //=============================================================================
@@ -94,7 +94,7 @@ public:
   void draw(QPainter *painter, QPoint translation = QPoint(0, 0));
 
 protected:
-  void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event) override;
 };
 
 //=============================================================================

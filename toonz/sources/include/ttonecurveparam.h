@@ -52,11 +52,11 @@ public:
   void setCurrentChannel(ToneChannel channel);
   ToneChannel getCurrentChannel() const { return m_toneChannel; }
 
-  TParam *clone() const { return new TToneCurveParam(*this); }
-  void copy(TParam *src);
+  TParam *clone() const override { return new TToneCurveParam(*this); }
+  void copy(TParam *src) override;
 
-  void addObserver(TParamObserver *);
-  void removeObserver(TParamObserver *);
+  void addObserver(TParamObserver *) override;
+  void removeObserver(TParamObserver *) override;
 
   QList<TPointD> getValue(double frame) const;
   void setValue(double frame, const QList<TPointD> &value,
@@ -72,23 +72,23 @@ public:
   //  virtual void enableNotification(bool on) {}
   //  virtual bool isNotificationEnabled() const { return true;}
 
-  std::string getValueAlias(double frame, int precision);
+  std::string getValueAlias(double frame, int precision) override;
 
-  bool isAnimatable() const { return true; };
-  bool isKeyframe(double frame) const;
-  void deleteKeyframe(double frame);
-  void clearKeyframes();
+  bool isAnimatable() const override { return true; };
+  bool isKeyframe(double frame) const override;
+  void deleteKeyframe(double frame) override;
+  void clearKeyframes() override;
   void assignKeyframe(double frame, const TSmartPointerT<TParam> &src,
-                      double srcFrame, bool changedOnly = false);
+                      double srcFrame, bool changedOnly = false) override;
 
-  void getKeyframes(std::set<double> &frames) const;
-  bool hasKeyframes() const;
-  int getNextKeyframe(double frame) const;
-  int getPrevKeyframe(double frame) const;
-  double keyframeIndexToFrame(int index) const;
+  void getKeyframes(std::set<double> &frames) const override;
+  bool hasKeyframes() const override;
+  int getNextKeyframe(double frame) const override;
+  int getPrevKeyframe(double frame) const override;
+  double keyframeIndexToFrame(int index) const override;
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 };
 
 #ifdef _WIN32

@@ -29,7 +29,9 @@ public:
   void setKeyframeData(TKeyframeData *data) { m_keyframeData = data; }
   TKeyframeData *getKeyframeData() const { return m_keyframeData; }
 
-  TCellKeyframeData *clone() const { return new TCellKeyframeData(this); }
+  TCellKeyframeData *clone() const override {
+    return new TCellKeyframeData(this);
+  }
 };
 
 #endif

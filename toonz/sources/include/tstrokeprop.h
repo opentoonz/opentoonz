@@ -39,11 +39,11 @@ public:
   TSimpleStrokeProp(const TStroke *stroke, TSimpleStrokeStyle *style);
   ~TSimpleStrokeProp();
 
-  const TColorStyle *getColorStyle() const;
+  const TColorStyle *getColorStyle() const override;
 
-  TStrokeProp *clone(const TStroke *stroke) const;
-  void draw(const TVectorRenderData &rd);
-  void draw(TFlash &flash);
+  TStrokeProp *clone(const TStroke *stroke) const override;
+  void draw(const TVectorRenderData &rd) override;
+  void draw(TFlash &flash) override;
 };
 
 //=============================================================================
@@ -58,11 +58,11 @@ public:
                                 TRasterImagePatternStrokeStyle *style);
   ~TRasterImagePatternStrokeProp();
 
-  const TColorStyle *getColorStyle() const;
+  const TColorStyle *getColorStyle() const override;
 
-  TStrokeProp *clone(const TStroke *stroke) const;
-  void draw(const TVectorRenderData &rd);
-  void draw(TFlash &flash);
+  TStrokeProp *clone(const TStroke *stroke) const override;
+  void draw(const TVectorRenderData &rd) override;
+  void draw(TFlash &flash) override;
 };
 
 //=============================================================================
@@ -77,11 +77,11 @@ public:
                                 TVectorImagePatternStrokeStyle *style);
   ~TVectorImagePatternStrokeProp();
 
-  const TColorStyle *getColorStyle() const;
+  const TColorStyle *getColorStyle() const override;
 
-  TStrokeProp *clone(const TStroke *stroke) const;
-  void draw(const TVectorRenderData &rd);
-  void draw(TFlash &flash);
+  TStrokeProp *clone(const TStroke *stroke) const override;
+  void draw(const TVectorRenderData &rd) override;
+  void draw(TFlash &flash) override;
 };
 
 //=============================================================================
@@ -95,11 +95,11 @@ protected:
 public:
   OutlineStrokeProp(const TStroke *stroke, TOutlineStyleP style);
 
-  const TColorStyle *getColorStyle() const;
+  const TColorStyle *getColorStyle() const override;
 
-  TStrokeProp *clone(const TStroke *stroke) const;
-  void draw(const TVectorRenderData &rd);
-  void draw(TFlash &flash);
+  TStrokeProp *clone(const TStroke *stroke) const override;
+  void draw(const TVectorRenderData &rd) override;
+  void draw(TFlash &flash) override;
 };
 
 //=============================================================================

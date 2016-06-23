@@ -201,10 +201,11 @@ public:
   PlasticSkeletonPMime(const PlasticSkeletonP &skeleton)
       : m_skeleton(skeleton) {}
 
-  virtual DvMimeData *clone() const {
+  DvMimeData *clone() const override {
     return new PlasticSkeletonPMime(m_skeleton);
   }
-  virtual void releaseData() { m_skeleton = PlasticSkeletonP(); }
+
+  void releaseData() override { m_skeleton = PlasticSkeletonP(); }
 };
 
 struct SkDPMime : public DvMimeData {
@@ -213,8 +214,9 @@ struct SkDPMime : public DvMimeData {
 public:
   SkDPMime(const SkDP &sd) : m_sd(sd) {}
 
-  virtual DvMimeData *clone() const { return new SkDPMime(m_sd); }
-  virtual void releaseData() { m_sd = SkDP(); }
+  DvMimeData *clone() const override { return new SkDPMime(m_sd); }
+
+  void releaseData() override { m_sd = SkDP(); }
 };
 
 //****************************************************************************************
@@ -249,9 +251,11 @@ public:
     m_oldName = vx.name();
   }
 
-  int getSize() const { return sizeof(*this); }  // sizeof this is roughly ok
+  int getSize() const override {
+    return sizeof(*this);
+  }  // sizeof this is roughly ok
 
-  void redo() const {
+  void redo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     // Store the vertex deformation before it's released (possibly destroyed)
@@ -272,7 +276,7 @@ public:
     ::invalidateXsheet();
   }
 
-  void undo() const {
+  void undo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     const SkDP &sd = l_plasticTool.deformation();
@@ -304,15 +308,15 @@ public:
       , m_oldSd(stageObject()->getPlasticSkeletonDeformation())
       , m_newSd(newSd) {}
 
-  int getSize() const { return 1 << 20; }
+  int getSize() const override { return 1 << 20; }
 
-  void redo() const {
+  void redo() const override {
     TTool::getApplication()->getCurrentColumn()->setColumnIndex(m_col);
     stageObject()->setPlasticSkeletonDeformation(m_newSd);
     ::invalidateXsheet();
   }
 
-  void undo() const {
+  void undo() const override {
     TTool::getApplication()->getCurrentColumn()->setColumnIndex(m_col);
     stageObject()->setPlasticSkeletonDeformation(m_oldSd);
     ::invalidateXsheet();
@@ -876,7 +880,7 @@ void PlasticTool::onChange() {
 
   struct locals {
     struct RefreshFunctor : public TFunctorInvoker::BaseFunctor {
-      void operator()() {
+      void operator()() override {
         refresh = false;
         l_plasticTool.storeSkeletonId();  // Calls ::sdFrame()
 

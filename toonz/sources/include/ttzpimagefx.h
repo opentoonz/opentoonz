@@ -40,10 +40,10 @@ public:
 public:
   ExternalPaletteFxRenderData(TPaletteP palette, const std::string &name);
 
-  float typeIndex() const { return 0.0f; }
+  float typeIndex() const override { return 0.0f; }
 
-  bool operator==(const TRasterFxRenderData &data) const;
-  std::string toString() const;
+  bool operator==(const TRasterFxRenderData &data) const override;
+  std::string toString() const override;
 };
 
 //**********************************************************************************************
@@ -70,12 +70,12 @@ public:
 public:
   PaletteFilterFxRenderData();
 
-  float typeIndex() const {
+  float typeIndex() const override {
     return (m_type == eApplyToInksAndPaints) ? 0.5f : 1.0f;
   }
 
-  bool operator==(const TRasterFxRenderData &data) const;
-  std::string toString() const;
+  bool operator==(const TRasterFxRenderData &data) const override;
+  std::string toString() const override;
 };
 
 //------------------------------------------------------------------------------
@@ -189,12 +189,12 @@ public:
                      int shrink, const TRectD &controllerBBox = TRectD(),
                      const TRasterP &controller = TRasterP());
 
-  float typeIndex() const { return (m_type == BlendTz) ? 2.0f : 3.0f; }
+  float typeIndex() const override { return (m_type == BlendTz) ? 2.0f : 3.0f; }
 
-  bool operator==(const TRasterFxRenderData &data) const;
-  std::string toString() const;
+  bool operator==(const TRasterFxRenderData &data) const override;
+  std::string toString() const override;
 
-  TRectD getBBoxEnlargement(const TRectD &bbox);
+  TRectD getBBoxEnlargement(const TRectD &bbox) override;
 };
 
 #endif

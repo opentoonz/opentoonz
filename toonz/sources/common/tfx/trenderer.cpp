@@ -413,11 +413,11 @@ public:
   void onFrameFailed(TException &e);
 
   void preRun();
-  void run();
+  void run() override;
 
-  int taskLoad() { return 100; }
+  int taskLoad() override { return 100; }
 
-  void onFinished(TThread::RunnableP);
+  void onFinished(TThread::RunnableP) override;
 };
 
 //================================================================================

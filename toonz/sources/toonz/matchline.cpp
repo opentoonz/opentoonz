@@ -507,7 +507,7 @@ public:
     }
   }
 
-  void undo() const {
+  void undo() const override {
     int i;
 
     for (i = 0; i < m_fids.size(); i++) {
@@ -524,7 +524,7 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     int i;
 
     applyDeleteMatchline(m_sl, m_fids, m_indexes);
@@ -536,7 +536,7 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
   ~DeleteMatchlineUndo() {
     int i;
@@ -546,11 +546,11 @@ public:
                                       QString::number(i));
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Delete Matchline  : Level %1")
         .arg(QString::fromStdWString(m_sl->getName()));
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 //-----------------------------------------------------------------------------
@@ -580,7 +580,7 @@ public:
       , m_prevalence(prevalence)
       , m_images(images) {}
 
-  void undo() const {
+  void undo() const override {
     std::map<TFrameId, QString>::const_iterator it = m_images.begin();
 
     m_level->getPalette()->assign(m_palette);
@@ -609,12 +609,12 @@ public:
           ->notifyPaletteChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     doMatchlines(m_column, m_mColumn, m_index, m_prevalence,
                  m_mergeCmappedSessionId);
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
   ~MatchlineUndo() {
     std::map<TFrameId, QString>::const_iterator it = m_images.begin();
@@ -627,12 +627,12 @@ public:
     delete m_palette;
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Apply Matchline  : Column%1 < Column%2")
         .arg(QString::number(m_column + 1))
         .arg(QString::number(m_mColumn + 1));
   }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 //-----------------------------------------------------------------------------

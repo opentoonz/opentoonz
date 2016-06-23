@@ -45,12 +45,13 @@ public:
 #endif
   ~SceneViewerPanel();
 
-  void onDrawFrame(int frame, const ImagePainter::VisualSettings &settings);
+  void onDrawFrame(int frame,
+                   const ImagePainter::VisualSettings &settings) override;
 
 protected:
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
-  void resizeEvent(QResizeEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
+  void resizeEvent(QResizeEvent *) override;
   void initializeTitleBar(TPanelTitleBar *titleBar);
   void createFrameToolBar();
   void createPlayToolBar();

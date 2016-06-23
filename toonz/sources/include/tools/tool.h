@@ -87,9 +87,9 @@ public:
 public:
   TPoint m_pos;  //!< Mouse position in window coordinates, bottom-left origin.
   int m_pressure;  //!< Pressure of the tablet pen, or 255 for pure mouse
-                   //!events.
+                   //! events.
   ModifierMask m_modifiersMask;  //!< Bitmask specifying key modifiers applying
-                                 //!on the event.
+                                 //! on the event.
 
   bool m_leftButtonPressed;
 
@@ -316,7 +316,7 @@ least
 \deprecated   This so much stinks of a bug turned into design choice... */
 
   static void updateToolsPropertiesTranslation();  //!< Updates translation of
-                                                   //!the bound properties of
+                                                   //! the bound properties of
   //!  every tool (invoking updateTranslation() for each).
 
 public:
@@ -436,11 +436,11 @@ return true if the method execution can have changed the current tool
   getObjectId();  //!< Returns a pointer to the actual stage object.
 
   void notifyImageChanged();  //!< Notifies changes on the actual image; used to
-                              //!update
-                              //!  images on the level view.
+                              //! update
+  //!  images on the level view.
   void notifyImageChanged(const TFrameId &fid);  //!< Notifies changes on the
-                                                 //!frame \p fid; used to update
-                                                 //!  images on the level view.
+  //! frame \p fid; used to update
+  //!  images on the level view.
 
   /*! \details   It can depend on the actual frame and the actual cell or
             on the current fid (editing level). In editing scene if
@@ -504,13 +504,13 @@ transformation.
 
 public:
   static std::vector<int> m_cellsData;  //!< \deprecated  brutto brutto. fix
-                                        //!quick & dirty del baco #6213 (undo
-                                        //!con animation sheet) spiegazioni in
-                                        //!tool.cpp
+                                        //! quick & dirty del baco #6213 (undo
+  //! con animation sheet) spiegazioni in
+  //! tool.cpp
   static bool m_isLevelCreated;  //!< \deprecated  Shouldn't expose global
-                                 //!static variables.
+                                 //! static variables.
   static bool m_isFrameCreated;  //!< \deprecated  Shouldn't expose global
-                                 //!static variables.
+                                 //! static variables.
 
 protected:
   std::string m_name;  //!< The tool's name.
@@ -567,19 +567,19 @@ public:
       const = 0;  //!< Returns the length of a pixel in current OpenGL
                   //!< coordinates
   virtual void startForegroundDrawing() = 0;  //!< Marks the beginning of an
-                                              //!OpenGL drawing block
+                                              //! OpenGL drawing block
   virtual void endForegroundDrawing() = 0;  //!< Closes an OpenGL drawing block
 
   virtual void invalidateAll() = 0;    //!< Redraws the entire viewer, passing
-                                       //!through Qt's event system
+                                       //! through Qt's event system
   virtual void GLInvalidateAll() = 0;  //!< Redraws the entire viewer, bypassing
-                                       //!Qt's event system
+                                       //! Qt's event system
   virtual void GLInvalidateRect(const TRectD &rect) = 0;  //!< Same as
-                                                          //!GLInvalidateAll(),
-                                                          //!for a specific
-                                                          //!clipping rect
+                                                          //! GLInvalidateAll(),
+  //! for a specific
+  //! clipping rect
   virtual void invalidateToolStatus() = 0;  //!< Forces the viewer to update the
-                                            //!perceived status of tools
+                                            //! perceived status of tools
   virtual TAffine getViewMatrix() const {
     return TAffine();
   }  //!< Gets the viewer's current view affine (ie the transform from

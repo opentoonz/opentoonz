@@ -114,15 +114,15 @@ Can be different from getSelectionBound() after a free deform transformation. */
   TRectD getSelectionBbox() const;
   void setSelectionBbox(const TRectD &rect);
 
-  void selectNone();
+  void selectNone() override;
 
   //! Take a rect in world coordinates and put it in the selection.
   void select(const TRectD &rect);
   void select(TStroke &stroke);
   void selectAll();
-  bool isEmpty() const;
+  bool isEmpty() const override;
 
-  void enableCommands();
+  void enableCommands() override;
 
   bool isFloating() const;
   void transform(const TAffine &affine);

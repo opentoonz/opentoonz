@@ -86,7 +86,7 @@ public:
       : CellBuilder<PIXEL>(cellLx, cellLy, radius, wrap) {}
 
   void doCell(PIXEL *cellBuffer, const PIXEL &cellColor, const PIXEL &bgColor,
-              int x0, int y0, int x1, int y1) {
+              int x0, int y0, int x1, int y1) override {
     // Apply the mask to the cell. 0 pixels are bgColored, GRAY::maxChannelValue
     // ones are cellColored.
     PIXEL *pix, *line    = cellBuffer, *lineEnd;
@@ -201,21 +201,23 @@ public:
 
   ~MosaicFx(){};
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &ri);
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &ri) override;
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info);
+                           const TRenderSettings &info) override;
 
-  bool canHandle(const TRenderSettings &info, double frame) {
+  bool canHandle(const TRenderSettings &info, double frame) override {
     // We'll return the handled affine only through handledAffine().
     if ((m_size->getValue(frame) + m_distance->getValue(frame)) == 0.0)
       return true;
     return false;
   }
 
-  TAffine handledAffine(const TRenderSettings &info, double frame) {
+  TAffine handledAffine(const TRenderSettings &info, double frame) override {
     // Return the default implementation: only the scale part of the affine
     // can be handled. Rotations and other distortions would need us have to
     // implement diagonal grid lines - and we don't want to!

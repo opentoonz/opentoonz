@@ -231,7 +231,7 @@ void Convert2Tlv::buildInks(TRasterCM32P &rout, const TRaster32P &rin) {
           if (m_colorTolerance > 0) it = findNearestColor(curColor);
           // if (it==colorMap.end() && (int)colorMap.size()>origColorCount)
           //	it  = findNearestColor(curColor, colorMap, colorTolerance,
-          //origColorCount, colorMap.size()-1);
+          // origColorCount, colorMap.size()-1);
           if (it == m_colorMap.end() && m_lastIndex < 4095) {
             m_colorMap[curColor] = ++m_lastIndex;
             curIndex             = m_lastIndex;
@@ -369,7 +369,7 @@ void Convert2Tlv::doFill(TRasterCM32P &rout, const TRaster32P &rin) {
         // non l'ho trovato tra i colori origari, lo cerco in quelli nuovi, ma
         // in questo caso deve essere esattamente uguale(tolerance = 0)
         //	 it  = findNearestColor(*pixin, colorMap, colorTolerance,
-        //origColorCount, colorMap.size()-1);
+        // origColorCount, colorMap.size()-1);
 
         if (it == m_colorMap.end() && m_lastIndex < 4096) {
           m_colorMap[*pixin] = ++m_lastIndex;
@@ -670,7 +670,8 @@ Convert2Tlv::Convert2Tlv(const TFilePath &filepath1, const TFilePath &filepath2,
 
 int Convert2Tlv::getFramesToConvertCount() {
   if (m_level1 && m_level1->getFrameCount() > 0)
-    return getFramesCount(m_level1, m_from, m_to);  // m_level1->getFrameCount();
+    return getFramesCount(m_level1, m_from,
+                          m_to);  // m_level1->getFrameCount();
   else {
     try {
       TLevelReaderP lr = TLevelReaderP(m_levelIn1);
