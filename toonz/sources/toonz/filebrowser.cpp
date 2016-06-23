@@ -170,7 +170,7 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu,
   m_mainSplitter      = new QSplitter(this);
   m_folderTreeView    = new DvDirTreeView(this);
   QFrame *box         = new QFrame(this);
-  QLabel *folderLabel = new QLabel("Folder: ", this);
+  QLabel *folderLabel = new QLabel(tr("Folder: "), this);
   m_folderName        = new QLineEdit();
   m_itemViewer = new DvItemViewer(box, noContextMenu, multiSelectionEnabled,
                                   DvItemViewer::Browser);
