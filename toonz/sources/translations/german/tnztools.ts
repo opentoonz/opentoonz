@@ -810,6 +810,24 @@ Möchten Sie fortfahren?</translation>
     </message>
 </context>
 <context>
+    <name>RotateTool</name>
+    <message>
+        <source>Rotate On Camera Center</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>StylePickerTool</name>
+    <message>
+        <source>Type:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Passive Pick</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>RGBPickerTool</name>
     <message>
         <source>Type:</source>
@@ -992,6 +1010,10 @@ Möchten Sie fortfahren?</translation>
     <message>
         <source>Join Vectors</source>
         <translation>Vektoren verbinden</translation>
+    </message>
+    <message>
+        <source>Distance</source>
+        <translation></translation>
     </message>
     <message>
         <source>Mode:</source>
