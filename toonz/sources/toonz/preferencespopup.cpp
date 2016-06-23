@@ -448,7 +448,35 @@ void PreferencesPopup::onDefaultViewerChanged(int index) {
 
 void PreferencesPopup::onAutoSaveChanged(int index) {
   m_minuteFld->setEnabled(index == Qt::Checked);
+  m_autoSaveSceneCB->setEnabled(index == Qt::Checked);
+  m_autoSaveOtherFilesCB->setEnabled(index == Qt::Checked);
   m_pref->enableAutosave(index == Qt::Checked);
+  if (index == Qt::Checked && !m_autoSaveSceneCB->isChecked() && !m_autoSaveOtherFilesCB->isChecked())
+  {
+	  m_autoSaveSceneCB->setChecked(true);
+	  m_autoSaveOtherFilesCB->setChecked(true);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSaveSceneChanged(int index) {
+	m_pref->enableAutosaveScene(index == Qt::Checked);
+	if (!m_autoSaveOtherFilesCB->isChecked() && index == Qt::Unchecked)
+	{
+		m_autoSaveCB->setChecked(false);
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onAutoSaveOtherFilesChanged(int index) {
+
+	m_pref->enableAutosaveOtherFiles(index == Qt::Checked);
+	if (!m_autoSaveSceneCB->isChecked() && index == Qt::Unchecked)
+	{
+		m_autoSaveCB->setChecked(false);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -799,7 +827,9 @@ PreferencesPopup::PreferencesPopup()
       new CheckBox(tr("Use Default Viewer for Movie Formats"), this);
   CheckBox *minimizeRasterMemoryCB =
       new CheckBox(tr("Minimize Raster Memory Fragmentation *"), this);
-  CheckBox *autoSaveCB = new CheckBox(tr("Save Automatically Every Minutes"));
+  m_autoSaveCB = new CheckBox(tr("Save Automatically Every Minutes"));
+  m_autoSaveSceneCB = new CheckBox(tr("Automatically Save the Scene File"));
+  m_autoSaveOtherFilesCB = new CheckBox(tr("Automatically Save Non-Scene Files"));
   m_minuteFld          = new DVGui::IntLineEdit(this, 15, 1, 60);
   CheckBox *replaceAfterSaveLevelAsCB =
       new CheckBox(tr("Replace Toonz Level after SaveLevelAs command"), this);
@@ -991,7 +1021,11 @@ PreferencesPopup::PreferencesPopup()
   //--- General ------------------------------
   useDefaultViewerCB->setChecked(m_pref->isDefaultViewerEnabled());
   minimizeRasterMemoryCB->setChecked(m_pref->isRasterOptimizedMemory());
-  autoSaveCB->setChecked(m_pref->isAutosaveEnabled());
+  m_autoSaveCB->setChecked(m_pref->isAutosaveEnabled());
+  m_autoSaveSceneCB->setChecked(m_pref->isAutosaveSceneEnabled());
+  m_autoSaveSceneCB->setEnabled(m_pref->isAutosaveEnabled());
+  m_autoSaveOtherFilesCB->setChecked(m_pref->isAutosaveOtherFilesEnabled());
+  m_autoSaveOtherFilesCB->setEnabled(m_pref->isAutosaveEnabled());
   m_minuteFld->setValue(m_pref->getAutosavePeriod());
   m_minuteFld->setEnabled(m_pref->isAutosaveEnabled());
   replaceAfterSaveLevelAsCB->setChecked(
@@ -1207,13 +1241,22 @@ PreferencesPopup::PreferencesPopup()
       saveAutoLay->setMargin(0);
       saveAutoLay->setSpacing(15);
       {
-        saveAutoLay->addWidget(autoSaveCB, 0);
-        saveAutoLay->addWidget(m_minuteFld, 0);
+        saveAutoLay->addWidget(m_autoSaveCB, 0);
+		saveAutoLay->addWidget(m_minuteFld, 0);
         saveAutoLay->addStretch(1);
       }
-      generalFrameLay->addLayout(saveAutoLay, 0);
-
-      // Unit, CameraUnit
+	  generalFrameLay->addLayout(saveAutoLay, 0);
+	  QVBoxLayout *autoSaveOptionsLay = new QVBoxLayout();
+	  autoSaveOptionsLay->setContentsMargins(30, 0, 0, 20);
+	  {
+		  
+		  autoSaveOptionsLay->addWidget(m_autoSaveSceneCB, 0,
+			  Qt::AlignLeft | Qt::AlignVCenter);
+		  autoSaveOptionsLay->addWidget(m_autoSaveOtherFilesCB, 0,
+			  Qt::AlignLeft | Qt::AlignVCenter);
+	  }
+	  generalFrameLay->addLayout(autoSaveOptionsLay);
+	  // Unit, CameraUnit
       QGridLayout *unitLay = new QGridLayout();
       unitLay->setMargin(0);
       unitLay->setHorizontalSpacing(5);
@@ -1644,8 +1687,12 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onDefaultViewerChanged(int)));
   ret = ret && connect(minimizeRasterMemoryCB, SIGNAL(stateChanged(int)), this,
                        SLOT(onRasterOptimizedMemoryChanged(int)));
-  ret = ret && connect(autoSaveCB, SIGNAL(stateChanged(int)),
+  ret = ret && connect(m_autoSaveCB, SIGNAL(stateChanged(int)),
                        SLOT(onAutoSaveChanged(int)));
+  ret = ret && connect(m_autoSaveSceneCB, SIGNAL(stateChanged(int)),
+					   SLOT(onAutoSaveSceneChanged(int)));
+  ret = ret && connect(m_autoSaveOtherFilesCB, SIGNAL(stateChanged(int)),
+					   SLOT(onAutoSaveOtherFilesChanged(int)));
   ret = ret && connect(m_minuteFld, SIGNAL(editingFinished()),
                        SLOT(onMinuteChanged()));
   ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)),

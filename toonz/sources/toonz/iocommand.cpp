@@ -1176,10 +1176,10 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
     QString question;
     question = QObject::tr(
                    "%1: the current scene has been modified.\n"
-                   "Do you want to save your changes?")
+                   "What would you like to do?")
                    .arg(msg);
-	int ret = DVGui::MsgBox(question, QObject::tr("Save All"), QObject::tr("Save Scene"),
-                            QObject::tr("Discard"), QObject::tr("Cancel"), 0);
+	int ret = DVGui::MsgBox(question, QObject::tr("Save All"), QObject::tr("Save Scene Only"),
+                            QObject::tr("Discard Changes"), QObject::tr("Cancel"), 0);
     if (ret == 0 || ret == 4) {
       // cancel (or closed message box window)
       return false;
@@ -1212,16 +1212,16 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
         question += "   " + dirtyResources[i] + "\n";
       }
       question +=
-          QObject::tr("\nAre you sure you want to ") + msg + QObject::tr(" anyway ?");
+          QObject::tr("\nWhat would you like to do? ");
 
       int ret =
-		  DVGui::MsgBox(question, QObject::tr("Save All Changes"), QObject::tr("Quit"), QObject::tr("Cancel"), 0);
+		  DVGui::MsgBox(question, QObject::tr("Save Changes"), msg + QObject::tr(" Anyway"), QObject::tr("Cancel"), 0);
       if (ret == 0 || ret == 3) {
         // cancel (or closed message box window)
         return false;
 	  } else if (ret == 1) {
-		  // save all
-		  if (!IoCmd::saveAll()) return false;
+		  // save non scene files
+		  if (!IoCmd::saveNonSceneFiles()) return false;
 	  } else if (ret == 2) {
         // quit
       }
@@ -1603,7 +1603,7 @@ bool IoCmd::saveLevel(TXshSimpleLevel *sl) {
 }
 
 //===========================================================================
-// IoCmd::saveSound(soundPath, soundColumn, overwrite)
+// IoCmd::saveAll()
 //---------------------------------------------------------------------------
 
 bool IoCmd::saveAll() {
@@ -1623,6 +1623,36 @@ bool IoCmd::saveAll() {
   app->getCurrentPalette()->notifyPaletteTitleChanged();
 
   return result;
+}
+
+//===========================================================================
+// IoCmd::saveNonSceneFiles()
+//---------------------------------------------------------------------------
+
+bool IoCmd::saveNonSceneFiles() {
+	// try to save non scene files
+	// if anything is wrong, return false
+	bool result = true;
+
+	TApp *app = TApp::instance();
+	ToonzScene *scene = app->getCurrentScene()->getScene();
+	if (scene->isUntitled()) {
+		DVGui::warning(
+			QObject::tr("It is not possible to save the levels of an untitled scene."));
+		    result = saveScene();
+			if (!result)
+				return false;	
+	}
+
+	SceneResources resources(scene, 0);
+	resources.save(scene->getScenePath());
+	resources.updatePaths();
+
+	// for update title bar
+	app->getCurrentLevel()->notifyLevelTitleChange();
+	app->getCurrentPalette()->notifyPaletteTitleChanged();
+
+	return result;
 }
 
 //===========================================================================
@@ -2707,3 +2737,12 @@ public:
   SaveAllCommandHandler() : MenuItemHandler(MI_SaveAll) {}
   void execute() { IoCmd::saveAll(); }
 } saveAllCommandHandler;
+
+//=============================================================================
+// Save all levels
+//-----------------------------------------------------------------------------
+class SaveAllLevelsCommandHandler : public MenuItemHandler {
+public:
+	SaveAllLevelsCommandHandler() : MenuItemHandler(MI_SaveAllLevels) {}
+	void execute() { IoCmd::saveNonSceneFiles(); }
+} saveAllLevelsCommandHandler;

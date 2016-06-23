@@ -675,15 +675,25 @@ void TApp::autosave() {
 
   if (scene->isUntitled()) {
     DVGui::warning(
-        tr("It is not possible to save automatically an untitled scene."));
+        tr("It is not possible to automatically save an untitled scene."));
     return;
   }
 
   DVGui::ProgressDialog pb(
       "Autosaving scene..." + toQString(scene->getScenePath()), 0, 0, 1);
   pb.show();
-  IoCmd::saveAll();
-  //IoCmd::saveScene();
+  Preferences *pref = Preferences::instance();
+  if (pref->isAutosaveSceneEnabled() && pref->isAutosaveOtherFilesEnabled()) {
+	  IoCmd::saveAll();
+  }
+  else if (pref->isAutosaveSceneEnabled()) {
+	  IoCmd::saveScene();
+  }
+  else if (pref->isAutosaveOtherFilesEnabled())
+  {
+	  IoCmd::saveNonSceneFiles();
+  }
+
   pb.setValue(1);
 }
 

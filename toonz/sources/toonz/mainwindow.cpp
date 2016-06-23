@@ -1548,6 +1548,7 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_NewLevel, tr("&New Level..."), "");
   createMenuFileAction(MI_LoadLevel, tr("&Load Level..."), "");
   createMenuFileAction(MI_SaveLevel, tr("&Save Level"), "");
+  createMenuFileAction(MI_SaveAllLevels, tr("&Save All Levels"), "");
   createMenuFileAction(MI_SaveLevelAs, tr("&Save Level As..."), "");
   createMenuFileAction(MI_ExportLevel, tr("&Export Level..."), "");
   createMenuFileAction(MI_ConvertFileWithInput, tr("&Convert File..."), "");
@@ -2029,7 +2030,7 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_PreserveThickness",
                           tr("Preserve Thickness"), "");
   createToolOptionsAction("A_ToolOption_PressureSensibility",
-                          tr("Pressure sensibility"), "");
+                          tr("Pressure Sensitivity"), "");
   createToolOptionsAction("A_ToolOption_SegmentInk", tr("Segment Ink"), "F8");
   createToolOptionsAction("A_ToolOption_Selective", tr("Selective"), "F7");
   createToolOptionsAction("A_ToolOption_Smooth", tr("Smooth"), "");

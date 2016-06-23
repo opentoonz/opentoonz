@@ -65,7 +65,7 @@ private:
   QPushButton *m_addLevelFormat, *m_removeLevelFormat, *m_editLevelFormat;
 
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
-      *m_onionSkinVisibility;
+      *m_onionSkinVisibility, *m_autoSaveCB, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB;
 
 private:
   // QWidget* create(const QString& lbl, bool def, const char* slot);
@@ -92,6 +92,8 @@ private slots:
   void onSaveUnpaintedInCleanupChanged(int index);
   void onMinimizeSaveboxAfterEditing(int index);
   void onAutoSaveChanged(int index);
+  void onAutoSaveSceneChanged(int index);
+  void onAutoSaveOtherFilesChanged(int index);
   void onDefaultViewerChanged(int index);
   void onBlankCountChanged();
   void onBlankColorChanged(const TPixel32 &, bool isDragging);

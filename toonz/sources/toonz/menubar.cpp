@@ -1066,8 +1066,8 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   QMenu *fileMenu = addMenu(tr("File"), fullMenuBar);
   addMenuItem(fileMenu, MI_NewScene);
   addMenuItem(fileMenu, MI_LoadScene);
-  addMenuItem(fileMenu, MI_SaveScene);
   addMenuItem(fileMenu, MI_SaveAll);
+  addMenuItem(fileMenu, MI_SaveScene);
   addMenuItem(fileMenu, MI_SaveSceneAs);
   addMenuItem(fileMenu, MI_OpenRecentScene);
   addMenuItem(fileMenu, MI_RevertScene);
@@ -1077,6 +1077,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   fileMenu->addSeparator();
   addMenuItem(fileMenu, MI_NewLevel);
   addMenuItem(fileMenu, MI_LoadLevel);
+  addMenuItem(fileMenu, MI_SaveAllLevels);
   addMenuItem(fileMenu, MI_SaveLevel);
   addMenuItem(fileMenu, MI_SaveLevelAs);
   addMenuItem(fileMenu, MI_ExportLevel);
