@@ -150,7 +150,7 @@ public:
 public:
   OverwriteDialog(QWidget *parent);
 
-  virtual QString acceptResolution(void *obj, int resolution, bool applyToAll);
+  QString acceptResolution(void *obj, int resolution, bool applyToAll) override;
 };
 
 //************************************************************************

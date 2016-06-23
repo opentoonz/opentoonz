@@ -1727,11 +1727,14 @@ void MainWindow::defineActions() {
   createMenuCellsAction(MI_Duplicate, tr("&Duplicate Drawing  "), "D");
   createMenuCellsAction(MI_Autorenumber, tr("&Autorenumber"), "");
   createMenuCellsAction(MI_CloneLevel, tr("&Clone"), "");
-  createMenuCellsAction(MI_DrawingSubForward, tr("Drawing Substitution Forward"), ".");
-	createMenuCellsAction(MI_DrawingSubBackward, tr("Drawing Substitution Backward"), ",");
-	createMenuCellsAction(MI_DrawingSubGroupForward, tr("Similar Drawing Substitution Forward"), "Ctrl+.");
-	createMenuCellsAction(MI_DrawingSubGroupBackward, tr("Similar Drawing Substitution Backward"), "Ctrl+,");
-
+  createMenuCellsAction(MI_DrawingSubForward,
+                        tr("Drawing Substitution Forward"), ".");
+  createMenuCellsAction(MI_DrawingSubBackward,
+                        tr("Drawing Substitution Backward"), ",");
+  createMenuCellsAction(MI_DrawingSubGroupForward,
+                        tr("Similar Drawing Substitution Forward"), "Ctrl+.");
+  createMenuCellsAction(MI_DrawingSubGroupBackward,
+                        tr("Similar Drawing Substitution Backward"), "Ctrl+,");
 
   createMenuCellsAction(MI_Reframe1, tr("1's"), "");
   createMenuCellsAction(MI_Reframe2, tr("2's"), "");
@@ -2151,7 +2154,7 @@ void MainWindow::togglePickStyleLines() {
 class ReloadStyle : public MenuItemHandler {
 public:
   ReloadStyle() : MenuItemHandler("MI_ReloadStyle") {}
-  void execute() {
+  void execute() override {
     QString currentStyle = Preferences::instance()->getCurrentStyleSheet();
     QFile file(currentStyle);
     file.open(QFile::ReadOnly);

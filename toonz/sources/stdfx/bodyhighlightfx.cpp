@@ -373,7 +373,8 @@ public:
 
   ~BodyHighLightFx(){};
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (m_input.isConnected())
       return m_input->doGetBBox(frame, bBox, info);
     else {
@@ -382,11 +383,14 @@ public:
     }
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info);
-  void doCompute(TTile &tile, double frame, const TRenderSettings &);
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override;
+  void doCompute(TTile &tile, double frame, const TRenderSettings &) override;
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info);
+                           const TRenderSettings &info) override;
 };
 
 //------------------------------------------------------------------------------

@@ -30,24 +30,26 @@ public:
   FreeDistortBaseFx(bool isCastShadow);
   ~FreeDistortBaseFx();
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &ri);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &ri) override;
   void onPortConnected(TFxPort *port);
-  bool canHandle(const TRenderSettings &info, double frame);
+  bool canHandle(const TRenderSettings &info, double frame) override;
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info);
+                           const TRenderSettings &info) override;
 
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput);
+                 TRenderSettings &infoOnInput) override;
 
   void safeTransform(double frame, int port, const TRectD &rectOnOutput,
                      const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
                      TRenderSettings &infoOnInput, TRectD &inBBox);
 
-  void getParamUIs(TParamUIConcept *&concepts, int &length);
+  void getParamUIs(TParamUIConcept *&concepts, int &length) override;
 
 private:
   bool m_isCastShadow;

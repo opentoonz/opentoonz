@@ -64,7 +64,7 @@ struct MultiExportOverwriteCB : public IoCmd::OverwriteCallbacks {
   bool m_stopped;
 
   MultiExportOverwriteCB() : m_yesToAll(false), m_stopped(false) {}
-  bool overwriteRequest(const TFilePath &fp) {
+  bool overwriteRequest(const TFilePath &fp) override {
     if (m_yesToAll) return true;
     if (m_stopped) return false;
 
@@ -93,13 +93,15 @@ public:
     return QObject::tr("Exporting level of %1 frames in %2");
   }
 
-  void setProcessedName(const QString &name) { m_processedName = name; }
-  void setRange(int min, int max) {
+  void setProcessedName(const QString &name) override {
+    m_processedName = name;
+  }
+  void setRange(int min, int max) override {
     m_pb.setMaximum(max);
     buildString();
   }
-  void setValue(int val) { m_pb.setValue(val); }
-  bool canceled() const { return m_pb.wasCanceled(); }
+  void setValue(int val) override { m_pb.setValue(val); }
+  bool canceled() const override { return m_pb.wasCanceled(); }
   void buildString() {
     m_pb.setLabelText(
         msg().arg(QString::number(m_pb.maximum())).arg(m_processedName));
@@ -132,10 +134,10 @@ private:
     ShortcutZoomer(Swatch *swatch) : ImageUtils::ShortcutZoomer(swatch) {}
 
   private:
-    bool zoom(bool zoomin, bool resetZoom) {
+    bool zoom(bool zoomin, bool resetZoom) override {
       return false;
     }  // Already covered by PlaneViewer
-    bool setActualPixelSize() {
+    bool setActualPixelSize() override {
       static_cast<Swatch *>(getWidget())->setActualPixelSize();
       return true;
     }

@@ -32,7 +32,7 @@ class ImageLoader : public ImageBuilder {
 public:
   struct BuildExtData {
     const TXshSimpleLevel *m_sl;  //!< TXshSimpleLevel instance associated to an
-                                  //!image loading request
+                                  //! image loading request
     TFrameId m_fid;  //!< m_sl's fid at which the image will be loaded
 
     int m_subs;  //!< The subsampling factor for image loading (0 meaning either
@@ -49,7 +49,7 @@ public:
 public:
   ImageLoader(const TFilePath &path, const TFrameId &fid);
 
-  bool isImageCompatible(int imFlags, void *extData);
+  bool isImageCompatible(int imFlags, void *extData) override;
 
   /*--
    * ImageBuilder仮想関数の実装。アイコン、画像をLoad時に全てキャッシュに格納する
@@ -57,13 +57,13 @@ public:
   void buildAllIconsAndPutInCache(TXshSimpleLevel *level,
                                   std::vector<TFrameId> fids,
                                   std::vector<std::string> iconIds,
-                                  bool cacheImagesAsWell);
+                                  bool cacheImagesAsWell) override;
 
 protected:
-  bool getInfo(TImageInfo &info, int imFlags, void *extData);
-  TImageP build(int imFlags, void *extData);
+  bool getInfo(TImageInfo &info, int imFlags, void *extData) override;
+  TImageP build(int imFlags, void *extData) override;
 
-  void invalidate();
+  void invalidate() override;
 
   inline int buildSubsampling(int imFlags, BuildExtData *data);
 
@@ -83,11 +83,11 @@ public:
   ImageRasterizer() {}
   ~ImageRasterizer() {}
 
-  bool isImageCompatible(int imFlags, void *extData) { return true; }
+  bool isImageCompatible(int imFlags, void *extData) override { return true; }
 
 protected:
-  bool getInfo(TImageInfo &info, int imFlags, void *extData);
-  TImageP build(int imFlags, void *extData);
+  bool getInfo(TImageInfo &info, int imFlags, void *extData) override;
+  TImageP build(int imFlags, void *extData) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -97,11 +97,11 @@ public:
   ImageFiller() {}
   ~ImageFiller() {}
 
-  bool isImageCompatible(int imFlags, void *extData) { return true; }
+  bool isImageCompatible(int imFlags, void *extData) override { return true; }
 
 protected:
-  bool getInfo(TImageInfo &info, int imFlags, void *extData);
-  TImageP build(int imFlags, void *extData);
+  bool getInfo(TImageInfo &info, int imFlags, void *extData) override;
+  TImageP build(int imFlags, void *extData) override;
 };
 
 #endif  // IMAGE_BUILDERS_H

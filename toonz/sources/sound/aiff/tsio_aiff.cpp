@@ -79,7 +79,7 @@ public:
 
   TCOMMChunk(string name, TINT32 length) : TAIFFChunk(name, length) {}
 
-  virtual bool read(ifstream &is) {
+  bool read(ifstream &is) override {
     is.read((char *)&m_chans, sizeof(m_chans));
     is.read((char *)&m_frames, sizeof(m_frames));
     is.read((char *)&m_bitPerSample, sizeof(m_bitPerSample));
@@ -153,7 +153,7 @@ public:
 
   TSSNDChunk(string name, TINT32 length) : TAIFFChunk(name, length) {}
 
-  bool read(ifstream &is) {
+  bool read(ifstream &is) override {
     is.read((char *)&m_offset, sizeof(m_offset));
     is.read((char *)&m_blockSize, sizeof(m_blockSize));
 

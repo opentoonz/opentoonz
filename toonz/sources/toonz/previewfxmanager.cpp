@@ -149,10 +149,11 @@ public:
   PreviewFxRenderPort(PreviewFxInstance *owner);
   ~PreviewFxRenderPort();
 
-  void onRenderRasterStarted(const TRenderPort::RenderData &renderData);
-  void onRenderRasterCompleted(const RenderData &renderData);
-  void onRenderFailure(const RenderData &renderData, TException &e);
-  void onRenderFinished(bool inCanceled = false);
+  void onRenderRasterStarted(
+      const TRenderPort::RenderData &renderData) override;
+  void onRenderRasterCompleted(const RenderData &renderData) override;
+  void onRenderFailure(const RenderData &renderData, TException &e) override;
+  void onRenderFinished(bool inCanceled = false) override;
 };
 
 //----------------------------------------------------------------------------------------

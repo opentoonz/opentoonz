@@ -188,7 +188,7 @@ class CommandHandlerHelper : public CommandHandlerInterface {
 public:
   CommandHandlerHelper(T *target, void (T::*method)())
       : m_target(target), m_method(method) {}
-  void execute() { (m_target->*m_method)(); }
+  void execute() override { (m_target->*m_method)(); }
 };
 
 template <class T, typename R>
@@ -200,7 +200,7 @@ class CommandHandlerHelper2 : public CommandHandlerInterface {
 public:
   CommandHandlerHelper2(T *target, void (T::*method)(R), R value)
       : m_target(target), m_method(method), m_value(value) {}
-  void execute() { (m_target->*m_method)(m_value); }
+  void execute() override { (m_target->*m_method)(m_value); }
 };
 
 //-----------------------------------------------------------------------------
@@ -230,7 +230,7 @@ public:
   OpenPopupCommandHandler(CommandId cmdId)
       : MenuItemHandler(cmdId), m_popup(0) {}
 
-  void execute() {
+  void execute() override {
     if (!m_popup) m_popup = new T();
     m_popup->show();
     m_popup->raise();

@@ -18,7 +18,7 @@ public:
   FileData(const FileData *src);
   ~FileData();
 
-  FileData *clone() const { return new FileData(this); }
+  FileData *clone() const override { return new FileData(this); }
 
   // data <- files.
   void setFiles(std::vector<TFilePath> &files);

@@ -21,14 +21,14 @@ class TXshColumn;
 
 struct PlasticVisualSettings {
   bool m_applyPlasticDeformation;  //!< Whether the deformation must be applied.
-                                   //!If false,
+                                   //! If false,
   //!< the original image should be displayed instead.
   TXshColumn *m_showOriginalColumn;  //!< As an exception to the above control,
-                                     //!one specific
+                                     //! one specific
   //!< mesh column can be dispensed from deforming.
   //!< This is typically used in PlasticTool's 'build mode'.
   bool m_drawMeshesWireframe;  //!< Whether any mesh wireframe should be
-                               //!displayed
+                               //! displayed
   bool m_drawRigidity;         //!< Whether mesh rigidities should be displayed
   bool m_drawSO;               //!< Whether mesh vertices' stacking order should
                                //!< be displayed

@@ -52,10 +52,10 @@ public:
 
   void getResource(TCacheResourceP &resource, const std::string &alias,
                    const TFxP &fx, double frame, const TRenderSettings &rs,
-                   ResourceDeclaration *resData);
+                   ResourceDeclaration *resData) override;
 
-  void onRenderStatusStart(int renderStatus);
-  void onRenderStatusEnd(int renderStatus);
+  void onRenderStatusStart(int renderStatus) override;
+  void onRenderStatusEnd(int renderStatus) override;
 };
 
 #endif  // TPREDICTIVECACHEMANAGER_H

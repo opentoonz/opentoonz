@@ -65,7 +65,8 @@ public:
 
   ~CalligraphicFx(){};
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (m_input.isConnected()) {
       TRenderSettings info2(info);
 
@@ -94,9 +95,11 @@ public:
     }
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
-  bool allowUserCacheOnPort(int port) { return false; }
+  bool allowUserCacheOnPort(int port) override { return false; }
 
 private:
   void getValues(const char *argv[], int argc, double frame) {
@@ -129,7 +132,8 @@ private:
     }
   }
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &ri) override {
     if (!m_input.isConnected()) return;
 
     int shrink = tround((ri.m_shrinkX + ri.m_shrinkY) / 2.0);
@@ -156,7 +160,7 @@ private:
 
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput) {
+                 TRenderSettings &infoOnInput) override {
     rectOnInput = rectOnOutput;
     infoOnInput = infoOnOutput;
 
@@ -225,7 +229,8 @@ public:
 
   ~OutBorderFx(){};
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (m_input.isConnected()) {
       TRenderSettings info2(info);
 
@@ -254,7 +259,9 @@ public:
     }
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
 private:
   void getValues(const char *argv[], int argc, double frame) {
@@ -287,7 +294,8 @@ private:
     }
   }
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &ri) override {
     if (!m_input.isConnected()) return;
 
     int shrink = tround((ri.m_shrinkX + ri.m_shrinkY) / 2.0);
@@ -313,7 +321,7 @@ private:
 
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput) {
+                 TRenderSettings &infoOnInput) override {
     rectOnInput = rectOnOutput;
     infoOnInput = infoOnOutput;
 

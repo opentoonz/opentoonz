@@ -24,15 +24,15 @@ public:
   SchematicName(QGraphicsItem *parent, double width, double height);
   ~SchematicName();
 
-  bool eventFilter(QObject *object, QEvent *event);
+  bool eventFilter(QObject *object, QEvent *event) override;
 
   void setName(const QString &name);
 
 protected:
-  void focusInEvent(QFocusEvent *fe);
-  void focusOutEvent(QFocusEvent *fe);
+  void focusInEvent(QFocusEvent *fe) override;
+  void focusOutEvent(QFocusEvent *fe) override;
 
-  void keyPressEvent(QKeyEvent *ke);
+  void keyPressEvent(QKeyEvent *ke) override;
 
 signals:
   void focusOut();
@@ -59,13 +59,13 @@ public:
   SchematicThumbnailToggle(SchematicNode *parent, bool isOpened);
   ~SchematicThumbnailToggle();
 
-  QRectF boundingRect() const;
+  QRectF boundingRect() const override;
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-             QWidget *widget = 0);
+             QWidget *widget = 0) override;
   void setIsDown(bool value);
 
 protected:
-  void mousePressEvent(QGraphicsSceneMouseEvent *me);
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 
 signals:
   void toggled(bool isOpened);
@@ -100,10 +100,10 @@ public:
 
   ~SchematicToggle();
 
-  QRectF boundingRect() const;
+  QRectF boundingRect() const override;
   // reimplemeted in SchematicToggle_SplineOptions
-  virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                     QWidget *widget = 0);
+  void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+             QWidget *widget = 0) override;
 
   //! this is used for a 2-state toggle;
   void setIsActive(bool value) { m_state = value ? 1 : 0; }
@@ -119,8 +119,8 @@ public:
 
 protected:
   // reimplemeted in SchematicToggle_SplineOptions
-  virtual void mousePressEvent(QGraphicsSceneMouseEvent *me);
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme);
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) override;
 signals:
   //! this is triggered for a 2-state toggle;
   void toggled(bool isChecked);
@@ -142,10 +142,10 @@ public:
       : SchematicToggle(parent, pixmap1, pixmap2, flags) {}
 
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-             QWidget *widget = 0);
+             QWidget *widget = 0) override;
 
 protected:
-  void mousePressEvent(QGraphicsSceneMouseEvent *me);
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 };
 
 //========================================================
@@ -169,9 +169,9 @@ public:
   SchematicHandleSpinBox(QGraphicsItem *parent);
   ~SchematicHandleSpinBox();
 
-  QRectF boundingRect() const;
+  QRectF boundingRect() const override;
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-             QWidget *widget = 0);
+             QWidget *widget = 0) override;
 
 signals:
   void modifyHandle(int);
@@ -180,9 +180,9 @@ signals:
   void handleReleased();
 
 protected:
-  void mouseMoveEvent(QGraphicsSceneMouseEvent *me);
-  void mousePressEvent(QGraphicsSceneMouseEvent *me);
-  void mouseReleaseEvent(QGraphicsSceneMouseEvent *me);
+  void mouseMoveEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent *me) override;
 };
 
 //========================================================
@@ -214,12 +214,12 @@ public:
   ~SchematicLink();
 
   //! Reimplements the pure virtual QGraphicsItem::boundingRect() method.
-  QRectF boundingRect() const;
+  QRectF boundingRect() const override;
   //! Reimplements the virtual QGraphicsItem::shape() method.
-  QPainterPath shape() const;
+  QPainterPath shape() const override;
   //! Reimplements the pure virtual QGraphicsItem::paint() method.
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-             QWidget *widget = 0);
+             QWidget *widget = 0) override;
 
   /*! Update the link path.\n
     The link is has a cubic shape starting from \b startPos and ending to \b
@@ -261,8 +261,8 @@ public:
   void setHighlighted(bool value) { m_highlighted = value; }
 
 protected:
-  void mousePressEvent(QGraphicsSceneMouseEvent *me);
-  void mouseReleaseEvent(QGraphicsSceneMouseEvent *me);
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent *me) override;
 };
 
 //========================================================
@@ -309,9 +309,10 @@ public:
 
   SchematicNode *getNode() const { return m_node; }
 
-  virtual QRectF boundingRect() const { return QRectF(0, 0, 1, 1); };
-  virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                     QWidget *widget = 0){};
+  QRectF boundingRect() const override { return QRectF(0, 0, 1, 1); };
+
+  void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+             QWidget *widget = 0) override{};
 
   //! Add the \b link to the links container.
   void addLink(SchematicLink *link) { m_links.push_back(link); }
@@ -330,7 +331,7 @@ public:
 
   //! Returns the link indexed with \b index.\n
   //!\note A link is indexed with a progressive number when is inserted in the
-  //!container.
+  //! container.
   SchematicLink *getLink(int index) const {
     return (index < m_links.size() && index >= 0) ? m_links[index] : 0;
   }
@@ -372,9 +373,9 @@ public:
   void setType(int type) { m_type = type; }
 
 protected:
-  void mouseMoveEvent(QGraphicsSceneMouseEvent *me);
-  void mousePressEvent(QGraphicsSceneMouseEvent *me);
-  void mouseReleaseEvent(QGraphicsSceneMouseEvent *me);
+  void mouseMoveEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent *me) override;
 
 private:
   virtual SchematicPort *searchPort(const QPointF &scenePos) = 0;
@@ -410,9 +411,9 @@ public:
   SchematicNode(SchematicScene *scene);
   ~SchematicNode();
 
-  QRectF boundingRect() const;
+  QRectF boundingRect() const override;
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-             QWidget *widget = 0);
+             QWidget *widget = 0) override;
 
   SchematicPort *addPort(int portId, SchematicPort *port);
   void erasePort(int portId);
@@ -427,9 +428,9 @@ public:
   virtual void onClicked(){};
 
 protected:
-  virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *me);
-  virtual void mousePressEvent(QGraphicsSceneMouseEvent *me);
-  virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *me);
+  void mouseMoveEvent(QGraphicsSceneMouseEvent *me) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent *me) override;
 
 signals:
   void sceneChanged();

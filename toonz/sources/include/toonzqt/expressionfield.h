@@ -65,13 +65,13 @@ private:
   int computeSuggestions();
 
 protected:
-  bool event(QEvent *e);
-  void keyPressEvent(QKeyEvent *e);
-  void focusInEvent(QFocusEvent *e);
-  void focusOutEvent(QFocusEvent *e);
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
-  bool eventFilter(QObject *obj, QEvent *e);
+  bool event(QEvent *e) override;
+  void keyPressEvent(QKeyEvent *e) override;
+  void focusInEvent(QFocusEvent *e) override;
+  void focusOutEvent(QFocusEvent *e) override;
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
+  bool eventFilter(QObject *obj, QEvent *e) override;
 
 private slots:
   void onTextChanged();

@@ -145,7 +145,8 @@ public:
 
   //---------------------------------------------------------------------------
 
-  bool doGetBBox(double frame, TRectD &bbox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bbox,
+                 const TRenderSettings &info) override {
     if (getActiveTimeRegion().contains(frame))
       if (m_light.isConnected()) {
         TRectD b0, b1;
@@ -184,7 +185,8 @@ public:
 
   //---------------------------------------------------------------------------
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &ri) override {
     Status status = getFxStatus(m_light, m_lighted);
 
     if (status & NoPortsConnected)
@@ -293,8 +295,8 @@ public:
 
   //---------------------------------------------------------------------------
 
-  virtual void doDryCompute(TRectD &rect, double frame,
-                            const TRenderSettings &info) {
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override {
     Status status = getFxStatus(m_light, m_lighted);
     if (status & NoPortsConnected) return;
 
@@ -319,7 +321,7 @@ public:
   //---------------------------------------------------------------------------
 
   // Just like the blur
-  bool canHandle(const TRenderSettings &info, double frame) {
+  bool canHandle(const TRenderSettings &info, double frame) override {
     if (m_light.isConnected())
       return (m_value->getValue(frame) == 0) ? true
                                              : isAlmostIsotropic(info.m_affine);
@@ -330,7 +332,7 @@ public:
   //---------------------------------------------------------------------------
 
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     double scale = sqrt(fabs(info.m_affine.det()));
     double blur  = m_value->getValue(frame) * scale;
 
@@ -339,7 +341,7 @@ public:
 
   //---------------------------------------------------------------------------
 
-  TFxPort *getXsheetPort() const { return getInputPort(1); }
+  TFxPort *getXsheetPort() const override { return getInputPort(1); }
 };
 
 //==================================================================

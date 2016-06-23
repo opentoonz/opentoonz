@@ -34,7 +34,7 @@ class FxsData : public DvMimeData {
 public:
   FxsData();
 
-  FxsData *clone() const;
+  FxsData *clone() const override;
 
   //! Set the FxsData. FxsData<-QList<TFxP>
   void setFxs(const QList<TFxP> &selectedFxs, const QList<Link> &selectedLinks,

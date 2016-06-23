@@ -538,7 +538,7 @@ class TFarmTaskDeclaration : public TPersistDeclaration {
 public:
   TFarmTaskDeclaration(const std::string &id) : TPersistDeclaration(id) {}
 
-  TPersist *create() const { return new TFarmTask; }
+  TPersist *create() const override { return new TFarmTask; }
 
 } FarmTaskDeclaration("ttask");
 
@@ -752,7 +752,7 @@ class TFarmTaskGroupDeclaration : public TPersistDeclaration {
 public:
   TFarmTaskGroupDeclaration(const std::string &id) : TPersistDeclaration(id) {}
 
-  TPersist *create() const { return new TFarmTaskGroup; }
+  TPersist *create() const override { return new TFarmTaskGroup; }
 
 } FarmTaskGroupDeclaration("ttaskgroup");
 

@@ -23,9 +23,9 @@ public:
   void setPaletteHandle(TPaletteHandle *ph);
 
 protected:
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
-  void enterEvent(QEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
+  void enterEvent(QEvent *) override;
 
 protected slots:
   void onStyleSwitched();

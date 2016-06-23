@@ -23,15 +23,16 @@ public:
   TileFx();
   ~TileFx();
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
-  bool canHandle(const TRenderSettings &info, double frame);
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
+  bool canHandle(const TRenderSettings &info, double frame) override;
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info);
+                           const TRenderSettings &info) override;
 
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput);
+                 TRenderSettings &infoOnInput) override;
 
 private:
   void makeTile(const TTile &inputTile, const TTile &tile) const;

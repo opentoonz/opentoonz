@@ -50,7 +50,7 @@ class TLevelWriter3gp : public TLevelWriter {
 public:
   TLevelWriter3gp(const TFilePath &path, TPropertyGroup *winfo);
   ~TLevelWriter3gp();
-  TImageWriterP getFrameWriter(TFrameId fid);
+  TImageWriterP getFrameWriter(TFrameId fid) override;
 
   bool m_initDone;
   int m_IOError;
@@ -80,16 +80,16 @@ public:
   static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo) {
     return new TLevelWriter3gp(f, winfo);
   };
-  void saveSoundTrack(TSoundTrack *st);
+  void saveSoundTrack(TSoundTrack *st) override;
 };
 
 class TLevelReader3gp : public TLevelReader {
 public:
   TLevelReader3gp(const TFilePath &path);
   ~TLevelReader3gp();
-  TImageReaderP getFrameReader(TFrameId fid);
+  TImageReaderP getFrameReader(TFrameId fid) override;
   // friend class TImageReaderMov;
-  TLevelP loadInfo();
+  TLevelP loadInfo() override;
 
   void load(const TRasterP &rasP, int frameIndex, const TPoint &pos,
             int shrinkX = 1, int shrinkY = 1);

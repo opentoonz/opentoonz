@@ -56,12 +56,15 @@ public:
 
   void initialize(std::string name);
 
-  virtual TFx *clone(bool recursive = true) const;
+  TFx *clone(bool recursive = true) const override;
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
 
-  bool canHandle(const TRenderSettings &info, double frame) { return false; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return false;
+  }
 
   void setExecutable(TFilePath fp, std::string args) {
     m_executablePath = fp;
@@ -71,8 +74,8 @@ public:
   void addPort(std::string portName, std::string ext, bool isInput);
   // void addParam(string paramName, const TParamP &param);
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 
   void setExternFxName(std::string name) { m_externFxName = name; }
   std::string getExternFxName() const { return m_externFxName; };

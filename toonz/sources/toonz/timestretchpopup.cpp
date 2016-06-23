@@ -78,7 +78,7 @@ public:
     m_c1Old = c1;
   }
 
-  void undo() const {
+  void undo() const override {
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     int oldNr    = m_newRange;
@@ -119,7 +119,7 @@ public:
     app->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     if (m_r1 - m_r0 < 0 || m_c1 - m_c0 < 0) return;
     TApp *app = TApp::instance();
     app->getCurrentXsheet()->getXsheet()->timeStretch(m_r0, m_c0, m_r1, m_c1,
@@ -137,10 +137,10 @@ public:
     app->getCurrentXsheet()->notifyXsheetSoundChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Time Stretch"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  QString getHistoryString() override { return QObject::tr("Time Stretch"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------

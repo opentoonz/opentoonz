@@ -155,23 +155,23 @@ public:
   // NOTE: These should be moved to TCleanupper as soon as I get the chance
 
   static TFilePath getInputPath(TXshSimpleLevel *sl);  //!< Returns the \b
-                                                       //!encoded input cleanup
-                                                       //!path for the specified
-                                                       //!level.
+                                                       //! encoded input cleanup
+  //! path for the specified
+  //! level.
   static TFilePath getOutputPath(TXshSimpleLevel *sl,
                                  const CleanupParameters *params);  //!< Returns
-                                                                    //!the \b
-                                                                    //!encoded
-                                                                    //!output
-                                                                    //!cleanup
-                                                                    //!path for
-                                                                    //!the
-                                                                    //!specified
-                                                                    //!level.
+                                                                    //! the \b
+  //! encoded
+  //! output
+  //! cleanup
+  //! path for
+  //! the
+  //! specified
+  //! level.
 
   static TFilePath getClnPath(TXshSimpleLevel *sl);  //!< Returns the \b decoded
-                                                     //!path for the level's \a
-                                                     //!cln file.
+                                                     //! path for the level's \a
+  //! cln file.
   static void saveSettings(CleanupParameters *params, const TFilePath &clnPath);
   static bool loadSettings(CleanupParameters *params, const TFilePath &clnPath);
 
@@ -186,7 +186,7 @@ public slots:
   void promptLoad();  //!< Prompts to load settings
 
   void restoreGlobalSettings();  //!< Reloads the project's cleanup settings (no
-                                 //!prompts)
+                                 //! prompts)
 
 signals:
 

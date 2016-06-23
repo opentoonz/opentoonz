@@ -199,7 +199,7 @@ public:
       , m_images(images)
       , m_palette(palette->clone()) {}
 
-  void undo() const {
+  void undo() const override {
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     std::map<TFrameId, QString>::const_iterator it = m_images.begin();
@@ -222,7 +222,7 @@ public:
     QApplication::restoreOverrideCursor();
   }
 
-  void redo() const {
+  void redo() const override {
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     mergeColumns(m_column, m_mColumn, true);
@@ -230,7 +230,7 @@ public:
     QApplication::restoreOverrideCursor();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
   ~MergeColumnsUndo() {
     std::map<TFrameId, QString>::const_iterator it = m_images.begin();
@@ -242,8 +242,10 @@ public:
     }
   }
 
-  QString getHistoryString() { return QObject::tr("Merge Raster Levels"); }
-  int getHistoryType() { return HistoryType::FilmStrip; }
+  QString getHistoryString() override {
+    return QObject::tr("Merge Raster Levels");
+  }
+  int getHistoryType() override { return HistoryType::FilmStrip; }
 };
 
 //-----------------------------------------------------------------------------

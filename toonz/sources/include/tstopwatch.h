@@ -54,15 +54,15 @@
 class DVAPI TStopWatch {
   std::string m_name;  // stopwatch name
 
-  TM_TOTAL m_tm;     // elapsed total time (in milliseconds)
-  TM_USER m_tmUser;  // elapsed user time (time associated to the process
-                     // calling stop watch)(unit=100-nanosecond)
+  TM_TOTAL m_tm;         // elapsed total time (in milliseconds)
+  TM_USER m_tmUser;      // elapsed user time (time associated to the process
+                         // calling stop watch)(unit=100-nanosecond)
   TM_SYSTEM m_tmSystem;  // elapsed system time (unit=100-nanosecond)
   START m_start;         // total starting reference time in milliseconds
   START_USER
-      m_startUser;  // process starting reference time (unit=100-nanosecond)
+  m_startUser;  // process starting reference time (unit=100-nanosecond)
   START_SYSTEM
-      m_startSystem;  // system starting reference time  (unit=100-nanosecond)
+  m_startSystem;  // system starting reference time  (unit=100-nanosecond)
 
 #ifdef _WIN32
   LARGE_INTEGER m_hrStart;  // high resolution starting reference (total) time

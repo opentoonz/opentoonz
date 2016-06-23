@@ -136,8 +136,8 @@ public:
   }
   ~TImageWriterAvi() { m_lwa->release(); }
 
-  bool is64bitOutputSupported() { return false; }
-  void save(const TImageP &img) { m_lwa->save(img, m_frameIndex); }
+  bool is64bitOutputSupported() override { return false; }
+  void save(const TImageP &img) override { m_lwa->save(img, m_frameIndex); }
 
 private:
   TLevelWriterAvi *m_lwa;
@@ -573,11 +573,11 @@ void TLevelWriterAvi::doSaveSoundTrack() {
   audioStreamInfo.dwFormatChangeCount   = 0;
   audioStreamInfo.szName[0]             = 0;
 
-  waveinfo.wFormatTag     = WAVE_FORMAT_PCM;  // WAVE_FORMAT_DRM
-  waveinfo.nChannels      = m_st->getChannelCount();
-  waveinfo.nSamplesPerSec = m_st->getSampleRate();
-  waveinfo.wBitsPerSample = m_st->getBitPerSample();
-  waveinfo.nBlockAlign    = waveinfo.nChannels * waveinfo.wBitsPerSample >> 3;
+  waveinfo.wFormatTag      = WAVE_FORMAT_PCM;  // WAVE_FORMAT_DRM
+  waveinfo.nChannels       = m_st->getChannelCount();
+  waveinfo.nSamplesPerSec  = m_st->getSampleRate();
+  waveinfo.wBitsPerSample  = m_st->getBitPerSample();
+  waveinfo.nBlockAlign     = waveinfo.nChannels * waveinfo.wBitsPerSample >> 3;
   waveinfo.nAvgBytesPerSec = waveinfo.nSamplesPerSec * waveinfo.nBlockAlign;
   waveinfo.cbSize          = sizeof(WAVEFORMATEX);
 
@@ -613,7 +613,7 @@ public:
   }
   ~TImageReaderAvi() { m_lra->release(); }
 
-  TImageP load() { return m_lra->load(m_frameIndex); }
+  TImageP load() override { return m_lra->load(m_frameIndex); }
   TDimension getSize() const { return m_lra->getSize(); }
   TRect getBBox() const { return TRect(); }
 

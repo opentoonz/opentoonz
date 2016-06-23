@@ -37,9 +37,9 @@ public:
   ~CheckBox() {}
 
 protected:
-  void mousePressEvent(QMouseEvent *e);
-  void mouseReleaseEvent(QMouseEvent *e);
-  void mouseMoveEvent(QMouseEvent *);
+  void mousePressEvent(QMouseEvent *e) override;
+  void mouseReleaseEvent(QMouseEvent *e) override;
+  void mouseMoveEvent(QMouseEvent *) override;
 };
 
 //-----------------------------------------------------------------------------

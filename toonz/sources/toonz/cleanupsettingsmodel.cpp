@@ -85,7 +85,7 @@ public:
     setOkText(tr("Save"));
   }
 
-  bool execute() {
+  bool execute() override {
     if (m_selectedPaths.empty()) return false;
 
     TFilePath savePath(*m_selectedPaths.begin());
@@ -117,7 +117,7 @@ public:
     setOkText(tr("Load"));
   }
 
-  bool execute() {
+  bool execute() override {
     if (m_selectedPaths.empty()) return false;
 
     const TFilePath &loadPath = *m_selectedPaths.begin();

@@ -238,7 +238,7 @@ void StrokeOutlinizationData::buildPoint(const CenterlinePoint &p, bool pNextD,
 int StrokeOutlinizationData::buildPoints(const CenterlinePoint &p,
                                          CenterlinePoint &ref,
                                          CenterlinePoint *out) {
-  out[0] = out[1] = p;
+  out[0] = out[1]  = p;
   out[0].m_covered = out[1].m_covered = true;  // Coverage is rebuilt
 
   bool refSymmetric =
@@ -380,8 +380,9 @@ public:
                               const StrokeOutlinizationData &data)
       : ReferenceLinearizator(stroke, path, data) {}
 
-  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk);
-  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk, double t1);
+  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk) override;
+  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk,
+                 double t1) override;
 
   void addCenterlinePoints(std::vector<CenterlinePoint> &cPoints,
                            int brushChunk, double x0, double x1);
@@ -515,8 +516,9 @@ public:
   SubdivisorFuncPtr m_subdivisor;
 
 public:
-  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk);
-  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk, double t1);
+  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk) override;
+  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk,
+                 double t1) override;
 
   void subdivide(std::vector<CenterlinePoint> &cPoints, CenterlinePoint &cp0,
                  CenterlinePoint &cp1);

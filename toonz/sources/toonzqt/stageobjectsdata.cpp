@@ -203,7 +203,7 @@ public:
 
   //! Clones the stord data.
   //! \warning Clones the stored TXshColumnP, too.
-  TColumnDataElement *clone() const;
+  TColumnDataElement *clone() const override;
 
   //! Stores the stage object and column data of the specified column index in
   //! the supplied xsheet.
@@ -348,7 +348,7 @@ public:
   TCameraDataElement();
   ~TCameraDataElement();
 
-  TCameraDataElement *clone() const;
+  TCameraDataElement *clone() const override;
 
   //! Stores the specified camera object.
   void storeCamera(const TStageObjectId &selectedObj, TXsheet *xsh);

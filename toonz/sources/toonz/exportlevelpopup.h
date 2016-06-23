@@ -62,14 +62,14 @@ public:
   ExportLevelPopup();
   ~ExportLevelPopup();
 
-  bool execute();
+  bool execute() override;
 
   TPropertyGroup *getFormatProperties(const std::string &ext);
   IoCmd::ExportLevelOptions getOptions(const std::string &ext);
 
 protected:
-  void showEvent(QShowEvent *se);
-  void hideEvent(QHideEvent *he);
+  void showEvent(QShowEvent *se) override;
+  void hideEvent(QHideEvent *he) override;
 
 private:
   class ExportOptions;
@@ -96,7 +96,7 @@ private slots:
 
   void onOptionsClicked();
   void onRetas(int);
-  void initFolder();
+  void initFolder() override;
   void updateOnSelection();
   void onformatChanged(const QString &);
   void checkAlpha();
@@ -120,7 +120,7 @@ signals:
   void optionsChanged();
 
 protected:
-  void showEvent(QShowEvent *se);
+  void showEvent(QShowEvent *se) override;
 
   void updateCameraDefault();
   void updateDpi();

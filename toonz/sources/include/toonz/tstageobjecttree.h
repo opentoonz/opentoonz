@@ -141,7 +141,7 @@ TStageObjectId \b \e id.
           Retrieves  object's data from a tagged data stream \b \e is.
   \sa saveData()
   */
-  void loadData(TIStream &is);
+  void loadData(TIStream &is) override;
   /*!
           Saves object's data (name, center coords, etc ) to a tagged data
      stream \b \e os saved on a file.
@@ -149,7 +149,7 @@ TStageObjectId \b \e id.
      their data.
   */
   void saveData(TOStream &os, int occupiedColumnCount);
-  void saveData(TOStream &os){};  // not used
+  void saveData(TOStream &os) override{};  // not used
   /*!
 Returns the numbers of the objects in the tree.
 */
@@ -230,7 +230,8 @@ Removes from stage object tree the spline \b spline.
 */
   void removeSpline(TStageObjectSpline *spline);
   /*!
-          Returns	\e true if \b \e spline is present in the tree, otherwise
+          Returns	\e true if \b \e spline is present in the tree,
+     otherwise
      returns \e false.
   */
   bool containsSpline(TStageObjectSpline *) const;

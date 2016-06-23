@@ -20,7 +20,7 @@ public:
 Loads the .aiff audio file whose path has been specified in the constructor.
 It returns a TSoundTrackP created from the audio file
 */
-  TSoundTrackP load();
+  TSoundTrackP load() override;
 
   /*!
 Returns a soundtrack reader able to read .aiff audio files
@@ -44,7 +44,7 @@ public:
 Saves the informations of the soundtrack in .aiff audio file
 whose path has been specified in the constructor.
 */
-  bool save(const TSoundTrackP &);
+  bool save(const TSoundTrackP &) override;
 
   /*!
 Returns a soundtrack writer able to write .aiff audio files

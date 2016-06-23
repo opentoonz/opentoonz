@@ -142,20 +142,22 @@ Constructs SceneLevel with \b ToonzScene \b scene and \b TXshPaletteLevel \b pl.
   /*!
 Save simple level in right path.
 */
-  void save();
+  void save() override;
   /*!
 Update simple level path.
 */
-  void updatePath();
+  void updatePath() override;
   /*!
 Set simple level path to old path.
 */
-  void rollbackPath();
+  void rollbackPath() override;
 
-  void accept(ResourceProcessor *processor) { processor->process(m_pl); }
+  void accept(ResourceProcessor *processor) override {
+    processor->process(m_pl);
+  }
 
-  bool isDirty();
-  QString getResourceName();
+  bool isDirty() override;
+  QString getResourceName() override;
 };
 
 //=============================================================================
@@ -186,20 +188,22 @@ Constructs SceneLevel with \b ToonzScene \b scene and \b TXshSimpleLevel \b sl.
   /*!
 Save simple level in right path.
 */
-  void save();
+  void save() override;
   /*!
 Update simple level path.
 */
-  void updatePath();
+  void updatePath() override;
   /*!
 Set simple level path to old path.
 */
-  void rollbackPath();
+  void rollbackPath() override;
 
-  void accept(ResourceProcessor *processor) { processor->process(m_sl); }
+  void accept(ResourceProcessor *processor) override {
+    processor->process(m_sl);
+  }
 
-  bool isDirty();
-  QString getResourceName();
+  bool isDirty() override;
+  QString getResourceName() override;
 };
 
 //=============================================================================
@@ -228,20 +232,22 @@ sl.
   /*!
 Save sound column in right path.
 */
-  void save();
+  void save() override;
   /*!
 Update sound track path.
 */
-  void updatePath();
+  void updatePath() override;
   /*!
 Set sound track path to old path.
 */
-  void rollbackPath();
+  void rollbackPath() override;
 
-  void accept(ResourceProcessor *processor) { processor->process(m_sl); }
+  void accept(ResourceProcessor *processor) override {
+    processor->process(m_sl);
+  }
 
-  bool isDirty() { return false; }
-  QString getResourceName() { return QString(); }
+  bool isDirty() override { return false; }
+  QString getResourceName() override { return QString(); }
 };
 
 //=============================================================================
@@ -336,11 +342,11 @@ public:
   TFilePath codePath(const TFilePath &oldCodedPath,
                      const TFilePath &newActualPath);
 
-  void process(TXshSimpleLevel *sl);
-  void process(TXshPaletteLevel *sl);
-  void process(TXshSoundLevel *sl);
+  void process(TXshSimpleLevel *sl) override;
+  void process(TXshPaletteLevel *sl) override;
+  void process(TXshSoundLevel *sl) override;
 
-  bool aborted() const { return m_importStrategy.aborted(); }
+  bool aborted() const override { return m_importStrategy.aborted(); }
 
   static std::string extractPsdSuffix(TFilePath &path);
   static TFilePath buildPsd(const TFilePath &path, const std::string &suffix);
@@ -373,9 +379,9 @@ public:
 
   int getCollectedResourceCount() const { return m_count; }
 
-  void process(TXshSimpleLevel *sl);
-  void process(TXshSoundLevel *sl);
-  void process(TXshPaletteLevel *pl);
+  void process(TXshSimpleLevel *sl) override;
+  void process(TXshSoundLevel *sl) override;
+  void process(TXshPaletteLevel *pl) override;
 };
 
 #endif

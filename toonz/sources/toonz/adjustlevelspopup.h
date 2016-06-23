@@ -80,8 +80,8 @@ public:
   AdjustLevelsPopup();
 
 protected:
-  void showEvent(QShowEvent *se);
-  void hideEvent(QHideEvent *se);
+  void showEvent(QShowEvent *se) override;
+  void hideEvent(QHideEvent *se) override;
 
   void acquireRaster();
   void updateProcessedImage();

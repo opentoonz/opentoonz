@@ -40,14 +40,16 @@ public:
 
   ~CloudsFx(){};
 
-  bool doGetBBox(double, TRectD &bbox, const TRenderSettings &info) {
+  bool doGetBBox(double, TRectD &bbox, const TRenderSettings &info) override {
     bbox = TConsts::infiniteRectD;
     return true;
   };
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
 
-  bool canHandle(const TRenderSettings &info, double frame) { return false; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return false;
+  }
   // TAffine handledAffine(const TRenderSettings& info, double frame) {return
   // TAffine();}
 };

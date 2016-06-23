@@ -27,7 +27,7 @@ namespace poly_ops {
 */
 template <typename Scalar>
 Scalar evaluate(const Scalar poly[],  //!< Coefficients of the input polynomial,
-                                      //!indexed by degree
+                                      //! indexed by degree
                 int deg,              //!< Degree of the polynomial function
                 Scalar x)  //!< Parameter the polynomial will be evaluated on
 {
@@ -222,7 +222,7 @@ template <typename Scalar>
 unsigned int solve_3(Scalar c[4],     //!< Polynomial coefficients array
                      Scalar s[3],     //!< Solutions array
                      Scalar tol = 0)  //!< Leading coefficient tolerance, the
-                                      //!equation is reduced to 2nd degree
+                                      //! equation is reduced to 2nd degree
 //!  if the leading coefficient is below this threshold
 {
   if (std::abs(c[3]) <= tol)

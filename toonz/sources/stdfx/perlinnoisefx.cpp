@@ -52,7 +52,8 @@ public:
   }
   ~PerlinNoiseFx(){};
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (m_input.isConnected()) {
       m_input->doGetBBox(frame, bBox, info);
       bBox = bBox.enlarge(m_intensity->getValue(frame));
@@ -65,14 +66,16 @@ public:
 
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput);
+                 TRenderSettings &infoOnInput) override;
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info);
-  bool canHandle(const TRenderSettings &info, double frame) { return false; }
+                           const TRenderSettings &info) override;
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return false;
+  }
 
-  void getParamUIs(TParamUIConcept *&concepts, int &length) {
+  void getParamUIs(TParamUIConcept *&concepts, int &length) override {
     concepts = new TParamUIConcept[length = 1];
 
     concepts[0].m_type  = TParamUIConcept::POINT_2;

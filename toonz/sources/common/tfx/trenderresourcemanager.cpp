@@ -30,10 +30,10 @@ public:
   TRenderResourceManager *getManager(unsigned long renderId,
                                      unsigned int idx) const;
 
-  void onRenderInstanceStart(unsigned long id);
-  void onRenderInstanceEnd(unsigned long id);
+  void onRenderInstanceStart(unsigned long id) override;
+  void onRenderInstanceEnd(unsigned long id) override;
 
-  bool renderHasOwnership() { return false; }
+  bool renderHasOwnership() override { return false; }
 };
 
 //===============================================================================================
@@ -41,7 +41,7 @@ public:
 class RenderInstanceManagersBuilderGenerator
     : public TRenderResourceManagerGenerator {
 public:
-  TRenderResourceManager *operator()(void) {
+  TRenderResourceManager *operator()(void) override {
     return RenderInstanceManagersBuilder::instance();
   }
 };
@@ -68,14 +68,14 @@ public:
   InstanceResourceManagerStub(TRenderResourceManagerGenerator *generator)
       : m_generator(generator) {}
 
-  void onRenderInstanceStart(unsigned long id);
-  void onRenderInstanceEnd(unsigned long id);
+  void onRenderInstanceStart(unsigned long id) override;
+  void onRenderInstanceEnd(unsigned long id) override;
 
-  void onRenderFrameStart(double f);
-  void onRenderFrameEnd(double f);
+  void onRenderFrameStart(double f) override;
+  void onRenderFrameEnd(double f) override;
 
-  virtual void onRenderStatusStart(int renderStatus);
-  virtual void onRenderStatusEnd(int renderStatus);
+  void onRenderStatusStart(int renderStatus) override;
+  void onRenderStatusEnd(int renderStatus) override;
 };
 
 //===============================================================================================
@@ -87,7 +87,7 @@ public:
   StubGenerator(TRenderResourceManagerGenerator *generator)
       : m_generator(generator) {}
 
-  TRenderResourceManager *operator()() {
+  TRenderResourceManager *operator()() override {
     return new InstanceResourceManagerStub(m_generator);
   }
 };

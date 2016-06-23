@@ -36,7 +36,8 @@ public:
 
   ~PaletteFilterFx(){};
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (m_input.isConnected()) {
       bool ret = m_input->doGetBBox(frame, bBox, info);
       return ret;
@@ -46,12 +47,15 @@ public:
     }
   }
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info);
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override;
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
-  bool allowUserCacheOnPort(int port) { return false; }
+  bool allowUserCacheOnPort(int port) override { return false; }
 };
 
 //-------------------------------------------------------------------

@@ -20,7 +20,7 @@
 class RunScriptCommand : public MenuItemHandler {
 public:
   RunScriptCommand() : MenuItemHandler("MI_RunScript") {}
-  void execute();
+  void execute() override;
 } runScriptCommand;
 
 void RunScriptCommand::execute() {

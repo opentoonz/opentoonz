@@ -30,12 +30,16 @@ public:
     m_size->setValueRange(1, 1000);
   }
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &);
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &) override;
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override;
 
-  bool canHandle(const TRenderSettings &info, double frame) { return false; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return false;
+  }
 };
 
 //-------------------------------------------------------------------

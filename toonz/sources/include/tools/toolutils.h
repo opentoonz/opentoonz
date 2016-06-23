@@ -172,7 +172,8 @@ public:
   ~TToolUndo();
 
   virtual QString getToolName() { return QString("Tool"); }
-  virtual QString getHistoryString() {
+
+  QString getHistoryString() override {
     return QObject::tr("%1   Level : %2  Frame : %3")
         .arg(getToolName())
         .arg(QString::fromStdWString(m_level->getName()))
@@ -194,10 +195,10 @@ public:
               const TPaletteP &oldPalette);  // get tiles ownership
   ~TRasterUndo();
 
-  int getSize() const;
-  void undo() const;
+  int getSize() const override;
+  void undo() const override;
 
-  virtual QString getToolName() { return QString("Raster Tool"); }
+  QString getToolName() override { return QString("Raster Tool"); }
 };
 
 //================================================================================================
@@ -215,8 +216,8 @@ public:
                        const TPaletteP &oldPalette);  // get tiles ownership
   ~TFullColorRasterUndo();
 
-  int getSize() const;
-  void undo() const;
+  int getSize() const override;
+  void undo() const override;
 
 private:
   std::vector<TRect> paste(const TRasterImageP &ti,
@@ -240,10 +241,10 @@ public:
 
   ~UndoModifyStroke();
 
-  void onAdd();
-  void undo() const;
-  void redo() const;
-  int getSize() const;
+  void onAdd() override;
+  void undo() const override;
+  void redo() const override;
+  int getSize() const override;
 };
 
 //-----------------------------------------------------------------------------
@@ -258,11 +259,11 @@ public:
 
   ~UndoModifyStrokeAndPaint();
 
-  void onAdd();
-  void undo() const;
-  int getSize() const;
+  void onAdd() override;
+  void undo() const override;
+  int getSize() const override;
 
-  QString getToolName() { return QObject::tr("Modify Stroke Tool"); }
+  QString getToolName() override { return QObject::tr("Modify Stroke Tool"); }
 };
 
 //-----------------------------------------------------------------------------
@@ -280,12 +281,12 @@ public:
 
   ~UndoModifyListStroke();
 
-  void onAdd();
-  void undo() const;
-  void redo() const;
-  int getSize() const;
+  void onAdd() override;
+  void undo() const override;
+  void redo() const override;
+  int getSize() const override;
 
-  QString getToolName() { return QObject::tr("Modify Stroke Tool"); }
+  QString getToolName() override { return QObject::tr("Modify Stroke Tool"); }
 };
 
 //-----------------------------------------------------------------------------
@@ -304,12 +305,12 @@ public:
              bool m_createdFrame, bool m_createdLevel, bool autogroup = false,
              bool autofill = false);
   ~UndoPencil();
-  void undo() const;
-  void redo() const;
-  int getSize() const;
+  void undo() const override;
+  void redo() const override;
+  int getSize() const override;
 
-  QString getToolName() { return QString("Vector Brush Tool"); }
-  int getHistoryType() { return HistoryType::BrushTool; }
+  QString getToolName() override { return QString("Vector Brush Tool"); }
+  int getHistoryType() override { return HistoryType::BrushTool; }
 };
 
 //-----------------------------------------------------------------------------
@@ -328,14 +329,14 @@ public:
                    bool doAntialias, bool createdFrame, bool createdLevel,
                    std::string primitiveName);
   ~UndoRasterPencil();
-  virtual void redo() const;
-  int getSize() const;
+  void redo() const override;
+  int getSize() const override;
 
-  QString getToolName() {
+  QString getToolName() override {
     return QString("Geometric Tool : %1")
         .arg(QString::fromStdString(m_primitiveName));
   }
-  int getHistoryType() { return HistoryType::GeometricTool; }
+  int getHistoryType() override { return HistoryType::GeometricTool; }
 };
 
 //-----------------------------------------------------------------------------
@@ -351,10 +352,10 @@ public:
                       TStroke *stroke, double opacity, bool doAntialias,
                       bool createdFrame, bool createdLevel);
   ~UndoFullColorPencil();
-  virtual void redo() const;
-  int getSize() const;
-  QString getToolName() { return QString("Geometric Tool"); }
-  int getHistoryType() { return HistoryType::GeometricTool; }
+  void redo() const override;
+  int getSize() const override;
+  QString getToolName() override { return QString("Geometric Tool"); }
+  int getHistoryType() override { return HistoryType::GeometricTool; }
 };
 
 //-----------------------------------------------------------------------------
@@ -371,12 +372,12 @@ class UndoPath : public TUndo {
 public:
   UndoPath(TStageObjectSpline *spline);
   ~UndoPath();
-  void onAdd();
-  void undo() const;
-  void redo() const;
-  int getSize() const;
-  QString getHistoryString() { return QObject::tr("Modify Spline"); }
-  int getHistoryType() { return HistoryType::ControlPointEditorTool; }
+  void onAdd() override;
+  void undo() const override;
+  void redo() const override;
+  int getSize() const override;
+  QString getHistoryString() override { return QObject::tr("Modify Spline"); }
+  int getHistoryType() override { return HistoryType::ControlPointEditorTool; }
 };
 
 //-----------------------------------------------------------------------------
@@ -395,23 +396,25 @@ public:
   UndoControlPointEditor(TXshSimpleLevel *level, const TFrameId &frameId);
   ~UndoControlPointEditor();
 
-  void onAdd();
+  void onAdd() override;
   void addOldStroke(int index, VIStroke *vs);
   void addNewStroke(int index, VIStroke *vs);
   void isStrokeDelete(bool isStrokeDelete) {
     m_isStrokeDelete = isStrokeDelete;
   }
 
-  void undo() const;
-  void redo() const;
+  void undo() const override;
+  void redo() const override;
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) +
-           /*(m_oldFillInformation.capacity()+m_newFillInformation.capacity())*sizeof(TFilledRegionInf) +*/
+           /*(m_oldFillInformation.capacity()+m_newFillInformation.capacity())*sizeof(TFilledRegionInf)
+              +*/
            500;
   }
-  virtual QString getToolName() { return QString("Control Point Editor"); }
-  int getHistoryType() { return HistoryType::ControlPointEditorTool; }
+
+  QString getToolName() override { return QString("Control Point Editor"); }
+  int getHistoryType() override { return HistoryType::ControlPointEditorTool; }
 };
 
 //-----------------------------------------------------------------------------
@@ -425,7 +428,7 @@ public:
   QAction *exec(const QPoint &p, QAction *action = 0);
 
 protected:
-  void mouseReleaseEvent(QMouseEvent *e);
+  void mouseReleaseEvent(QMouseEvent *e) override;
 };
 
 //-----------------------------------------------------------------------------

@@ -102,8 +102,8 @@ to
     ChannelGroup(const QString &name = "");
     ~ChannelGroup();
 
-    bool isActive() const;
-    bool isAnimated() const;
+    bool isActive() const override;
+    bool isAnimated() const override;
 
     virtual QString getShortName() const { return m_name; }
     virtual QString getLongName() const { return m_name; }
@@ -115,7 +115,7 @@ to
 
     void applyShowFilter();  // call this method when a channel changes
                              // its animation status
-    QVariant data(int role) const;
+    QVariant data(int role) const override;
 
     // used in FunctionTreeView::onActivated
     void setChildrenAllActive(bool active);
@@ -170,7 +170,7 @@ color, which
     TDoubleParam *getParam() const {
       return (TDoubleParam *)m_param.getPointer();
     }
-    void setParam(const TParamP &param);
+    void setParam(const TParamP &param) override;
 
     QString getShortName() const;
     QString getLongName() const;
@@ -181,21 +181,21 @@ color, which
     ChannelGroup *getChannelGroup() const { return m_group; }
     void setChannelGroup(ChannelGroup *group) { m_group = group; }
 
-    QVariant data(int role) const;
+    QVariant data(int role) const override;
 
-    bool isActive() const { return m_isActive; }
+    bool isActive() const override { return m_isActive; }
     void setIsActive(bool active);
 
-    bool isAnimated() const;
+    bool isAnimated() const override;
 
     bool isCurrent() const;
     void setIsCurrent(bool current);
 
     bool isHidden() const;  // the channel is hidden if it is filtered out
                             // by its channelgroup
-    void onChange(const TParamChange &);
+    void onChange(const TParamChange &) override;
 
-    void *getInternalPointer() const;
+    void *getInternalPointer() const override;
   };
 
 private:
@@ -290,7 +290,8 @@ private:
 
   // Observers notification functions
 
-  void onChange(const TParamChange &);  // Multiple param notifications ...
+  void onChange(
+      const TParamChange &) override;   // Multiple param notifications ...
   void onParamChange(bool isDragging);  // ... that get compressed into one
 
   // Update functions
@@ -319,16 +320,18 @@ public:
   FxChannelGroup(TFx *fx);
   ~FxChannelGroup();
 
-  QString getShortName() const;
-  QString getLongName() const;
+  QString getShortName() const override;
+  QString getLongName() const override;
 
-  QString getIdName() const;
+  QString getIdName() const override;
 
-  void *getInternalPointer() const { return static_cast<void *>(m_fx); }
+  void *getInternalPointer() const override {
+    return static_cast<void *>(m_fx);
+  }
   TFx *getFx() const { return m_fx; }
-  QVariant data(int role) const;
+  QVariant data(int role) const override;
 
-  void refresh();
+  void refresh() override;
 };
 
 //*****************************************************************************************
@@ -359,7 +362,7 @@ public:
 
   void setCurrentScenePath(TFilePath scenePath) { m_scenePath = scenePath; }
 
-  void openContextMenu(TreeModel::Item *item, const QPoint &globalPos);
+  void openContextMenu(TreeModel::Item *item, const QPoint &globalPos) override;
 
   void setTextColor(const QColor &color) { m_textColor = color; }
   QColor getTextColor() const { return m_textColor; }
@@ -367,12 +370,15 @@ public:
   QColor getCurrentTextColor() const { return m_currentTextColor; }
 
 protected:
-  void onClick(TreeModel::Item *item, const QPoint &itemPos, QMouseEvent *e);
+  void onClick(TreeModel::Item *item, const QPoint &itemPos,
+               QMouseEvent *e) override;
 
-  void onMidClick(TreeModel::Item *item, const QPoint &itemPos, QMouseEvent *e);
+  void onMidClick(TreeModel::Item *item, const QPoint &itemPos,
+                  QMouseEvent *e) override;
 
-  void onDrag(TreeModel::Item *item, const QPoint &itemPos, QMouseEvent *e);
-  void onRelease();
+  void onDrag(TreeModel::Item *item, const QPoint &itemPos,
+              QMouseEvent *e) override;
+  void onRelease() override;
 
   void openContextMenu(FunctionTreeModel::Channel *channel,
                        const QPoint &globalPos);

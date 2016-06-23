@@ -28,9 +28,9 @@ public:
 
   // Again, not accurate. We should get in the details of SkDF... So, let's say
   // around 10 kB - max 10k instances in the standard undos pool.
-  int getSize() const { return 10 << 10; }
+  int getSize() const override { return 10 << 10; }
 
-  void redo() const {
+  void redo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     if (m_v >= 0) l_plasticTool.setSkeletonSelection(m_v);
@@ -45,7 +45,7 @@ public:
     l_plasticTool.onChange();
   }
 
-  void undo() const {
+  void undo() const override {
     PlasticTool::TemporaryActivation tempActivate(m_row, m_col);
 
     if (m_v >= 0) l_plasticTool.setSkeletonSelection(m_v);

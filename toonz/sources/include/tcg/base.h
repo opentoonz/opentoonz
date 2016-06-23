@@ -84,9 +84,8 @@ public:
 */
 
 template <typename T, typename B = empty_type>  // B is used for base class
-                                                // chaining, to deal with
-                                                class safe_bool
-    : public B  // the empty class optimization
+// chaining, to deal with
+class safe_bool : public B  // the empty class optimization
 {
   class dummy {};
   struct detail {

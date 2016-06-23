@@ -18,7 +18,7 @@ class OpenFloatingPanel : public MenuItemHandler {
 
 public:
   OpenFloatingPanel(CommandId id, const std::string &panelType, QString title);
-  void execute();
+  void execute() override;
 
   static TPanel *getOrOpenFloatingPanel(const std::string &panelType);
 };

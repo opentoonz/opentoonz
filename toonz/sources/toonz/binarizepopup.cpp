@@ -93,7 +93,7 @@ public:
     }
   }
 
-  void undo() const {
+  void undo() const override {
     TXshSimpleLevel *sl = getLevel();
     if (!sl) return;
     TRasterImageP ri = sl->getFrame(m_fid, true);
@@ -104,7 +104,7 @@ public:
     notify(sl);
   }
 
-  void redo() const {
+  void redo() const override {
     TXshSimpleLevel *sl = getLevel();
     if (!sl) return;
     TRasterImageP ri = sl->getFrame(m_fid, true);
@@ -117,7 +117,7 @@ public:
     notify(sl);
   }
 
-  int getSize() const { return sizeof(*this) + m_rasSize; }
+  int getSize() const override { return sizeof(*this) + m_rasSize; }
 };
 
 //**************************************************************************

@@ -903,7 +903,7 @@ void LoadLevelPopup::updatePosTo() {
     } else {
       std::vector<TFrameId> fIds = getCurrentFIds();
       //--- If loading the level with sequencial files, reuse the list of
-      //TFrameId
+      // TFrameId
       if (fIds.size() != 0) {
         if (m_stepCombo->currentIndex() == 0)  // Step = Auto
         {

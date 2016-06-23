@@ -48,8 +48,8 @@ public:
   ~DvMiniToolBar();
 
 protected:
-  void mousePressEvent(QMouseEvent *);
-  void mouseMoveEvent(QMouseEvent *);
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -62,8 +62,8 @@ public:
   ~DvTextEditButton();
 
 protected:
-  void paintEvent(QPaintEvent *);
-  void mousePressEvent(QMouseEvent *);
+  void paintEvent(QPaintEvent *) override;
+  void mousePressEvent(QMouseEvent *) override;
 
 signals:
   void clicked();
@@ -107,15 +107,15 @@ protected:
   void showMiniToolBar(const QPoint &pos);
   void hideMiniToolBar();
 
-  void mousePressEvent(QMouseEvent *);
-  void mouseMoveEvent(QMouseEvent *);
-  void mouseReleaseEvent(QMouseEvent *);
-  void wheelEvent(QWheelEvent *);
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
+  void wheelEvent(QWheelEvent *) override;
 
-  void focusInEvent(QFocusEvent *);
-  void focusOutEvent(QFocusEvent *);
+  void focusInEvent(QFocusEvent *) override;
+  void focusOutEvent(QFocusEvent *) override;
 
-  void dragMoveEvent(QDragMoveEvent *);
+  void dragMoveEvent(QDragMoveEvent *) override;
 
 private:
   void fontChanged(const QFont &f);

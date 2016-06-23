@@ -72,11 +72,11 @@ public:
   ~TObserverListT() {}
   typedef TChangeObserverT<T> Observer;
 
-  void attach(TChangeObserver *observer) {
+  void attach(TChangeObserver *observer) override {
     if (Observer *o = dynamic_cast<Observer *>(observer))
       m_observers.push_back(o);
   }
-  void detach(TChangeObserver *observer) {
+  void detach(TChangeObserver *observer) override {
     if (Observer *o = dynamic_cast<Observer *>(observer))
       m_observers.erase(std::remove(m_observers.begin(), m_observers.end(), o),
                         m_observers.end());

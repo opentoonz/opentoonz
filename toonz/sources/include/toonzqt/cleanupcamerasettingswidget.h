@@ -55,7 +55,7 @@ public:
   CleanupCameraSettingsWidget();
   ~CleanupCameraSettingsWidget();
 
-  QSize sizeHint() const { return minimumSize(); }
+  QSize sizeHint() const override { return minimumSize(); }
 
   void setCameraPresetListFile(const TFilePath &fp);
 

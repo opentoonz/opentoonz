@@ -69,7 +69,7 @@ public:
 
   const std::string &propertyName() const { return m_propertyName; }
 
-  void onPropertyChanged() { updateStatus(); }
+  void onPropertyChanged() override { updateStatus(); }
   void notifyTool();
   // return true if the control is belonging to the visible viewer
   bool isInVisibleViewer(QWidget *widget);
@@ -90,12 +90,12 @@ protected:
 public:
   ToolOptionCheckbox(TTool *tool, TBoolProperty *property,
                      ToolHandle *toolHandle = 0, QWidget *parent = 0);
-  void updateStatus();
+  void updateStatus() override;
 public slots:
   void doClick();
 
 protected:
-  void nextCheckState();
+  void nextCheckState() override;
 };
 
 //-----------------------------------------------------------------------------
@@ -109,7 +109,7 @@ protected:
 public:
   ToolOptionSlider(TTool *tool, TDoubleProperty *property,
                    ToolHandle *toolHandle = 0);
-  void updateStatus();
+  void updateStatus() override;
 
 protected slots:
 
@@ -131,7 +131,7 @@ public:
   ToolOptionPairSlider(TTool *tool, TDoublePairProperty *property,
                        const QString &leftName, const QString &rightName,
                        ToolHandle *toolHandle = 0);
-  void updateStatus();
+  void updateStatus() override;
 
 protected slots:
 
@@ -155,7 +155,7 @@ public:
   ToolOptionIntPairSlider(TTool *tool, TIntPairProperty *property,
                           const QString &leftName, const QString &rightName,
                           ToolHandle *toolHandle = 0);
-  void updateStatus();
+  void updateStatus() override;
 
 protected slots:
 
@@ -177,7 +177,7 @@ protected:
 public:
   ToolOptionIntSlider(TTool *tool, TIntProperty *property,
                       ToolHandle *toolHandle = 0);
-  void updateStatus();
+  void updateStatus() override;
 
 protected slots:
 
@@ -198,7 +198,7 @@ public:
   ToolOptionCombo(TTool *tool, TEnumProperty *property,
                   ToolHandle *toolHandle = 0);
   void loadEntries();
-  void updateStatus();
+  void updateStatus() override;
 
 public slots:
 
@@ -217,7 +217,7 @@ protected:
 
 public:
   ToolOptionPopupButton(TTool *tool, TEnumProperty *property);
-  void updateStatus();
+  void updateStatus() override;
   TEnumProperty *getProperty() { return m_property; }
 
 public slots:
@@ -238,7 +238,7 @@ protected:
 
 public:
   ToolOptionTextField(TTool *tool, TStringProperty *property);
-  void updateStatus();
+  void updateStatus() override;
 
 public slots:
 
@@ -258,7 +258,7 @@ protected:
 public:
   StyleIndexFieldAndChip(TTool *tool, TStyleIndexProperty *property,
                          TPaletteHandle *pltHandle, ToolHandle *toolHandle = 0);
-  void updateStatus();
+  void updateStatus() override;
 
 public slots:
 
@@ -300,7 +300,7 @@ public:
 
   void setGlobalKey(TBoolProperty *globalKey, TPropertyGroup *globalGroup);
 
-  void updateStatus();
+  void updateStatus() override;
 
 protected slots:
 
@@ -373,7 +373,7 @@ public:
 
   ~PegbarChannelField() {}
 
-  void updateStatus();
+  void updateStatus() override;
 
 public slots:
 
@@ -401,7 +401,7 @@ public:
 
   ~PegbarCenterField() {}
 
-  void updateStatus();
+  void updateStatus() override;
 
 protected slots:
 
@@ -417,7 +417,7 @@ public:
   NoScaleField(TTool *tool, QString name);
   ~NoScaleField() {}
 
-  void updateStatus();
+  void updateStatus() override;
 
 protected slots:
 
@@ -438,7 +438,7 @@ public:
       QIcon icon = QIcon(), QString tooltip = QString());
   ~PropertyMenuButton() {}
 
-  void updateStatus();
+  void updateStatus() override;
 
 protected slots:
 

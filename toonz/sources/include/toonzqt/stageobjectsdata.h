@@ -62,10 +62,10 @@ class DVAPI StageObjectsData : public DvMimeData {
 
   std::set<TFx *> m_fxs;  //!< Supplied Fx objects (cloned, shared ownership)
   std::set<TFx *> m_originalColumnFxs;  //!< Column Fxs of the supplied column
-                                        //!objects (originals, 'owned' due to
-                                        //!m_elements)
+                                        //! objects (originals, 'owned' due to
+  //! m_elements)
   std::set<TFx *> m_terminalFxs;  //!< Selection-terminal fxs (from both the
-                                  //!above) (cloned, shared ownership)
+                                  //! above) (cloned, shared ownership)
 
   std::map<TFx *, TFx *> m_fxTable;  //!< Original fxs/Cloned fxs pairings
 
@@ -82,7 +82,7 @@ public:
 
   //! Clones this object.
   //! \note Clones stored fxs, columns, etc. too.
-  StageObjectsData *clone() const;
+  StageObjectsData *clone() const override;
 
   bool isEmpty() const { return m_elements.isEmpty() && m_splines.isEmpty(); }
 

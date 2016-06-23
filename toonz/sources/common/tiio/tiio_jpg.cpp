@@ -152,7 +152,7 @@ class JpgWriter : public Tiio::Writer {
 public:
   JpgWriter() : m_chan(0), m_headerWritten(false) {}
 
-  void open(FILE *file, const TImageInfo &info) {
+  void open(FILE *file, const TImageInfo &info) override {
     m_cinfo.err = jpeg_std_error(&m_jerr);
     jpeg_create_compress(&m_cinfo);
 
@@ -185,11 +185,11 @@ public:
     delete m_properties;
   }
 
-  void flush() { fflush(m_chan); }
+  void flush() override { fflush(m_chan); }
 
-  Tiio::RowOrder getRowOrder() const { return Tiio::TOP2BOTTOM; }
+  Tiio::RowOrder getRowOrder() const override { return Tiio::TOP2BOTTOM; }
 
-  void writeLine(char *buffer) {
+  void writeLine(char *buffer) override {
     if (!m_headerWritten) {
       m_headerWritten = true;
       jpeg_start_compress(&m_cinfo, TRUE);

@@ -37,16 +37,16 @@ public:
   TXshSoundTextLevel *clone() const;
 
   //! Overridden from TXshLevel
-  TXshSoundTextLevel *getSoundTextLevel() { return this; }
+  TXshSoundTextLevel *getSoundTextLevel() override { return this; }
 
   void setFrameText(int frameIndex, QString);
   QString getFrameText(int frameIndex) const;
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 
-  void load(){};
-  void save(){};
+  void load() override{};
+  void save() override{};
 
 private:
   // not implemented

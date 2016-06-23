@@ -35,8 +35,8 @@ public:
     std::sort(m_objects.begin(), m_objects.end());
   }
 
-  bool isEmpty() const { return m_objects.empty(); }
-  void selectNone() {
+  bool isEmpty() const override { return m_objects.empty(); }
+  void selectNone() override {
     m_objects.clear();
     notifyView();
   }

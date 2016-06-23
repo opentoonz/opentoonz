@@ -49,7 +49,7 @@ public:
   bool getStatus() const { return m_status; }
   // For reproducing the UI toggle when launch
   void setStatus(bool status) { m_status = status; }
-  void execute();
+  void execute() override;
 };
 
 //=============================================================================
@@ -78,7 +78,8 @@ class SceneViewer : public QGLWidget,
   /*!  FreezedStatus:
 *  \li NO_FREEZED freezed is not active;
 *  \li NORMAL_FREEZED freezed is active: show grab image;
-*  \li UPDATE_FREEZED freezed is active: draw last unfreezed image and grab view;
+*  \li UPDATE_FREEZED freezed is active: draw last unfreezed image and grab
+* view;
 */
   enum FreezedStatus {
     NO_FREEZED     = 0,
@@ -154,16 +155,16 @@ public:
   SceneViewer(ImageUtils::FullScreenWidget *parent);
   ~SceneViewer();
 
-  double getPixelSize() const { return m_pixelSize; }
+  double getPixelSize() const override { return m_pixelSize; }
 
   // Previewer::Listener
-  TRectD getPreviewRect() const;
-  void onRenderStarted(int frame);
-  void onRenderCompleted(int frame);
-  void onPreviewUpdate();
+  TRectD getPreviewRect() const override;
+  void onRenderStarted(int frame) override;
+  void onRenderCompleted(int frame) override;
+  void onPreviewUpdate() override;
 
-  void startForegroundDrawing();
-  void endForegroundDrawing();
+  void startForegroundDrawing() override;
+  void endForegroundDrawing() override;
   bool isPreviewEnabled() const { return m_previewMode != NO_PREVIEW; }
   int getPreviewMode() const { return m_previewMode; }
 
@@ -177,7 +178,7 @@ public:
   //! in Camera view Mode (m_referenceMode = CAMERA_REFERENCE) the returned
   //! affine is composed with camera
   //! transformation.
-  TAffine getViewMatrix() const;
+  TAffine getViewMatrix() const override;
   //! Return the view matrix.
   //! The view matrix is a matrix contained in \b m_viewAff
   TAffine getSceneMatrix() const;
@@ -191,20 +192,20 @@ public:
     m_hRuler = h;
   }
 
-  bool is3DView() const;
+  bool is3DView() const override;
   TDimension getViewportSize() const { return TDimension(width(), height()); }
 
-  void invalidateAll();
-  void GLInvalidateAll();
-  void GLInvalidateRect(const TRectD &rect);
-  void invalidateToolStatus();
+  void invalidateAll() override;
+  void GLInvalidateAll() override;
+  void GLInvalidateRect(const TRectD &rect) override;
+  void invalidateToolStatus() override;
 
   TPointD getPan3D() const { return m_pan3D; }
   double getZoomScale3D() const { return m_zoomScale3D; }
 
-  double projectToZ(const TPoint &delta);
+  double projectToZ(const TPoint &delta) override;
 
-  TPointD getDpiScale() const { return m_dpiScale; }
+  TPointD getDpiScale() const override { return m_dpiScale; }
   void zoomQt(bool forward, bool reset);
   TAffine getNormalZoomScale();
 
@@ -225,16 +226,16 @@ public:
   // return the viewer geometry in order to avoid picking the style outside of
   // the viewer
   // when using the stylepicker and the finger tools
-  virtual TRectD getGeometry() const;
+  TRectD getGeometry() const override;
 
   void setFocus(Qt::FocusReason reason) { QWidget::setFocus(reason); };
 
 public:
   // SceneViewer's gadget public functions
   TPointD winToWorld(const QPoint &pos) const;
-  TPointD winToWorld(const TPoint &winPos) const;
+  TPointD winToWorld(const TPoint &winPos) const override;
 
-  TPoint worldToPos(const TPointD &worldPos) const;
+  TPoint worldToPos(const TPointD &worldPos) const override;
 
 protected:
   // Paint vars
@@ -261,28 +262,28 @@ protected:
 protected:
   void mult3DMatrix();
 
-  void initializeGL();
-  void resizeGL(int width, int height);
+  void initializeGL() override;
+  void resizeGL(int width, int height) override;
 
-  void paintGL();
+  void paintGL() override;
 
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
 
-  void tabletEvent(QTabletEvent *);
-  void leaveEvent(QEvent *);
-  void enterEvent(QEvent *);
-  void mouseMoveEvent(QMouseEvent *event);
-  void mousePressEvent(QMouseEvent *event);
-  void mouseReleaseEvent(QMouseEvent *event);
-  void mouseDoubleClickEvent(QMouseEvent *event);
-  void wheelEvent(QWheelEvent *);
-  void keyPressEvent(QKeyEvent *event);
-  void keyReleaseEvent(QKeyEvent *event);
-  void contextMenuEvent(QContextMenuEvent *event);
-  void inputMethodEvent(QInputMethodEvent *);
+  void tabletEvent(QTabletEvent *) override;
+  void leaveEvent(QEvent *) override;
+  void enterEvent(QEvent *) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void wheelEvent(QWheelEvent *) override;
+  void keyPressEvent(QKeyEvent *event) override;
+  void keyReleaseEvent(QKeyEvent *event) override;
+  void contextMenuEvent(QContextMenuEvent *event) override;
+  void inputMethodEvent(QInputMethodEvent *) override;
   void drawCompared();
-  bool event(QEvent *event);
+  bool event(QEvent *event) override;
 
   // delta.x: right panning, pixel; delta.y: down panning, pixel
   void panQt(const QPoint &delta);
@@ -291,43 +292,44 @@ protected:
   void zoomQt(const QPoint &center, double scaleFactor);
 
   // overriden from TTool::Viewer
-  void pan(const TPoint &delta) { panQt(QPoint(delta.x, delta.y)); }
+  void pan(const TPoint &delta) override { panQt(QPoint(delta.x, delta.y)); }
 
   // overriden from TTool::Viewer
-  void zoom(const TPointD &center, double factor);
+  void zoom(const TPointD &center, double factor) override;
 
-  void rotate(const TPointD &center, double angle);
-  void rotate3D(double dPhi, double dTheta);
+  void rotate(const TPointD &center, double angle) override;
+  void rotate3D(double dPhi, double dTheta) override;
 
   TAffine getToolMatrix() const;
 
   //! return the column index of the drawing intersecting point \b p
   //! (window coordinate, pixels, bottom-left origin)
-  int pick(const TPoint &point);
+  int pick(const TPoint &point) override;
 
   //! return the column indexes of the drawings intersecting point \b p
   //! (window coordinate, pixels, bottom-left origin)
   int posToColumnIndex(const TPoint &p, double distance,
-                       bool includeInvisible = true) const;
+                       bool includeInvisible = true) const override;
   void posToColumnIndexes(const TPoint &p, std::vector<int> &indexes,
-                          double distance, bool includeInvisible = true) const;
+                          double distance,
+                          bool includeInvisible = true) const override;
 
   //! return the row of the drawings intersecting point \b p (used with onion
   //! skins)
   //! (window coordinate, pixels, bottom-left origin)
   int posToRow(const TPoint &p, double distance,
-               bool includeInvisible = true) const;
+               bool includeInvisible = true) const override;
 
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dropEvent(QDropEvent *event);
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
 
-  void resetInputMethod();
+  void resetInputMethod() override;
 
   void set3DLeftSideView();
   void set3DRightSideView();
   void set3DTopView();
 
-  void setFocus() { QWidget::setFocus(); };
+  void setFocus() override { QWidget::setFocus(); };
 
 public slots:
 

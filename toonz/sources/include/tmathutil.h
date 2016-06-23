@@ -34,7 +34,8 @@ class DVAPI TMathException : public TException {
 public:
   TMathException(std::string msg);
   virtual ~TMathException() {}
-  virtual TString getMessage() const { return m_msg; }
+
+  TString getMessage() const override { return m_msg; }
 };
 
 //-----------------------------------------------------------------------------

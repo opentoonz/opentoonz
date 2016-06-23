@@ -64,8 +64,8 @@ public:
 
   TDoubleParam &operator=(const TDoubleParam &);
 
-  TParam *clone() const { return new TDoubleParam(*this); }
-  void copy(TParam *src);
+  TParam *clone() const override { return new TDoubleParam(*this); }
+  void copy(TParam *src) override;
 
   std::string getMeasureName() const;
   void setMeasureName(std::string name);
@@ -110,8 +110,8 @@ public:
   bool isCycleEnabled() const;
 
   int getKeyframeCount() const;
-  void getKeyframes(std::set<double> &frames) const;
-  double keyframeIndexToFrame(int index) const;
+  void getKeyframes(std::set<double> &frames) const override;
+  double keyframeIndexToFrame(int index) const override;
 
   const TDoubleKeyframe &getKeyframe(int index) const;
   const TDoubleKeyframe &getKeyframeAt(double frame) const;
@@ -127,33 +127,33 @@ public:
   //! create a keyframe in k.m_frame (if is needed) and assign k to it
   void setKeyframe(const TDoubleKeyframe &k);
 
-  bool isKeyframe(double frame) const;
-  bool hasKeyframes() const;
-  void deleteKeyframe(double frame);
-  void clearKeyframes();
+  bool isKeyframe(double frame) const override;
+  bool hasKeyframes() const override;
+  void deleteKeyframe(double frame) override;
+  void clearKeyframes() override;
 
   int getClosestKeyframe(double frame) const;
-  int getNextKeyframe(double frame) const;
-  int getPrevKeyframe(double frame) const;
+  int getNextKeyframe(double frame) const override;
+  int getPrevKeyframe(double frame) const override;
 
   void assignKeyframe(double frame, const TParamP &src, double srcFrame,
-                      bool changedOnly);
+                      bool changedOnly) override;
 
-  bool isAnimatable() const { return true; }
+  bool isAnimatable() const override { return true; }
 
-  void addObserver(TParamObserver *observer);
-  void removeObserver(TParamObserver *observer);
+  void addObserver(TParamObserver *observer) override;
+  void removeObserver(TParamObserver *observer) override;
 
   const std::set<TParamObserver *> &observers() const;
 
   //! no keyframes, default value not changed
   bool isDefault() const;
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
   std::string getStreamTag() const;
 
-  std::string getValueAlias(double frame, int precision);
+  std::string getValueAlias(double frame, int precision) override;
 };
 
 //---------------------------------------------------------

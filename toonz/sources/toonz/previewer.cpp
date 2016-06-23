@@ -199,9 +199,9 @@ public:
   void refreshFrame(int frame);
 
   // TRenderPort methods
-  void onRenderRasterStarted(const RenderData &renderData);
-  void onRenderRasterCompleted(const RenderData &renderData);
-  void onRenderFailure(const RenderData &renderData, TException &e);
+  void onRenderRasterStarted(const RenderData &renderData) override;
+  void onRenderRasterCompleted(const RenderData &renderData) override;
+  void onRenderFailure(const RenderData &renderData, TException &e) override;
 
   // Main-thread executed code related to TRenderPort. Used to update
   // thread-vulnerable infos.
@@ -775,7 +775,7 @@ public:
   QString m_str;
   ProgressBarMessager(int choice, int val, const QString &str = "")
       : m_choice(choice), m_val(val), m_str(str) {}
-  void onDeliver() {
+  void onDeliver() override {
     switch (m_choice) {
     case eBegin:
       if (!Pd)
@@ -805,7 +805,9 @@ public:
     }
   }
 
-  TThread::Message *clone() const { return new ProgressBarMessager(*this); }
+  TThread::Message *clone() const override {
+    return new ProgressBarMessager(*this);
+  }
 };
 
 }  // namespace
@@ -822,7 +824,7 @@ public:
 
   void setPreview(Previewer *p) { m_p = p; }
 
-  bool execute() {
+  bool execute() override {
     if (m_selectedPaths.empty()) return false;
 
     return m_p->doSaveRenderedFrames(*m_selectedPaths.begin());

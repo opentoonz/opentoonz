@@ -28,7 +28,7 @@ class LoadFolderPopup : public DVGui::Dialog {
 
 public:
   LoadFolderPopup(QWidget *parent = 0);  //!< Constructs the popup as child of
-                                         //!an optional parent widget.
+                                         //! an optional parent widget.
 
   /*! \details  The path returned by getFolder() could be empty in case
           there is no selected folder, or the selection is not a

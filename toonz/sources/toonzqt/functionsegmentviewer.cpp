@@ -65,9 +65,9 @@ public:
   FunctionEmptySegmentPage(FunctionSegmentViewer *parent = 0)
       : FunctionSegmentPage(parent) {}
 
-  void refresh() {}
-  void apply() {}
-  void init(int segmentLength) {}
+  void refresh() override {}
+  void apply() override {}
+  void init(int segmentLength) override {}
 };
 
 //=============================================================================
@@ -704,7 +704,7 @@ public:
     }
     setLayout(mainLayout);
   }
-  void refresh() {
+  void refresh() override {
     TDoubleKeyframe kf;
     TDoubleParam *curve = getCurve();
     if (curve) kf       = curve->getKeyframeAt(getR0());
@@ -731,7 +731,7 @@ public:
     }
   }
 
-  void init(int segmentLength) {
+  void init(int segmentLength) override {
     TDoubleParam *curve = getCurve();
     if (!curve) return;
 
@@ -747,7 +747,7 @@ public:
     m_fieldIndexFld->setText("");
   }
 
-  void apply() {
+  void apply() override {
     TDoubleParam *curve = getCurve();
     if (!curve) return;
     int kIndex = getViewer()->getSegmentIndex();

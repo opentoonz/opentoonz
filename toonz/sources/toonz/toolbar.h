@@ -15,15 +15,16 @@ class Toolbar : public QToolBar {
   bool m_isExpanded;
 
   void updateToolbar();
+
 public:
   Toolbar(QWidget *parent, bool isVertical = true);
   ~Toolbar();
-  
+
 protected:
   bool addAction(QAction *act);
 
-  void showEvent(QShowEvent *e);
-  void hideEvent(QHideEvent *e);
+  void showEvent(QShowEvent *e) override;
+  void hideEvent(QHideEvent *e) override;
 
 protected slots:
   void onToolChanged();

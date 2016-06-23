@@ -25,8 +25,7 @@ TEnv::IntVar ShowAllToolsToggle("ShowAllToolsToggle", 0);
 //-----------------------------------------------------------------------------
 
 Toolbar::Toolbar(QWidget *parent, bool isVertical)
-    : QToolBar(parent)
-    , m_isExpanded(ShowAllToolsToggle !=0) {
+    : QToolBar(parent), m_isExpanded(ShowAllToolsToggle != 0) {
   // Fondamentale per lo style sheet
   setObjectName("toolBar");
 
@@ -117,7 +116,7 @@ Toolbar::Toolbar(QWidget *parent, bool isVertical)
 
   // toolbar is expanded or shrinked according to env at the beginning
   updateToolbar();
-  
+
   connect(m_expandButton, SIGNAL(toggled(bool)), this,
           SLOT(setIsExpanded(bool)));
 }
@@ -177,7 +176,7 @@ void Toolbar::updateToolbar() {
 //----------------------------------------------------------------------------
 
 void Toolbar::setIsExpanded(bool expand) {
-  m_isExpanded = expand;
+  m_isExpanded       = expand;
   ShowAllToolsToggle = (expand) ? 1 : 0;
   updateToolbar();
 }

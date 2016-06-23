@@ -44,10 +44,10 @@ public:
   bool apply();
 
 protected:
-	// set m_pathFld to the default path
-	void updatePath();
-	void nextName();
-	void showEvent(QShowEvent *);
+  // set m_pathFld to the default path
+  void updatePath();
+  void nextName();
+  void showEvent(QShowEvent *) override;
 
 public slots:
   void onLevelTypeChanged(const QString &text);

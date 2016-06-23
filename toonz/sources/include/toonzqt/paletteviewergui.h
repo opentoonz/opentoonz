@@ -89,7 +89,7 @@ public:
     LargeChips,         //!< Large icons with style names.
     List,               //!< Top-down list of all icons.
     SmallChipsWithName  //!< Small icons with overlayed style names (if
-                        //!user-defined).
+                        //! user-defined).
   };
 
   // for displaying the linked style name from studio palette
@@ -141,7 +141,7 @@ public:
 
   void drop(int indexInPage, const QMimeData *mimeData);
   void createDropPage();
-  void onSelectionChanged() { update(); }
+  void onSelectionChanged() override { update(); }
 
   TStyleSelection *getSelection() const { return m_styleSelection; }
   void clearSelection();
@@ -170,29 +170,29 @@ protected:
   void drawToggleLink(QPainter &p, QRect &chipRect, TColorStyle *style);
 
   // event handlers
-  void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
-  void resizeEvent(QResizeEvent *);
+  void resizeEvent(QResizeEvent *) override;
 
-  void mousePressEvent(QMouseEvent *event);
-  void mouseMoveEvent(QMouseEvent *event);
-  void mouseReleaseEvent(QMouseEvent *event);
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
 
-  void mouseDoubleClickEvent(QMouseEvent *event);
-  void contextMenuEvent(QContextMenuEvent *event);
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
-  void keyPressEvent(QKeyEvent *event);
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dragMoveEvent(QDragMoveEvent *event);
-  void dropEvent(QDropEvent *event);
-  void dragLeaveEvent(QDragLeaveEvent *event);
+  void keyPressEvent(QKeyEvent *event) override;
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dragMoveEvent(QDragMoveEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
+  void dragLeaveEvent(QDragLeaveEvent *event) override;
   void startDragDrop();
   void createMenuAction(QMenu &menu, const char *id, QString name,
                         const char *slot);
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
 
-  bool event(QEvent *e);
+  bool event(QEvent *e) override;
 
   void select(int indexInPage, QMouseEvent *event);
 
@@ -255,12 +255,12 @@ signals:
   void movePage(int srcIndex, int dstIndex);
 
 protected:
-  void mousePressEvent(QMouseEvent *event);
-  void mouseMoveEvent(QMouseEvent *event);
-  void mouseDoubleClickEvent(QMouseEvent *event);
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dragMoveEvent(QDragMoveEvent *event);
-  void dropEvent(QDropEvent *event);
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dragMoveEvent(QDragMoveEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
 
 private:
   DVGui::LineEdit *m_renameTextField;
@@ -300,13 +300,13 @@ signals:
   void startDrag();  //!< Emitted \a once whenever the icon is sensibly dragged
                      //!  by the user.
 protected:
-  void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
-  void enterEvent(QEvent *event);
-  void leaveEvent(QEvent *event);
+  void enterEvent(QEvent *event) override;
+  void leaveEvent(QEvent *event) override;
 
-  void mousePressEvent(QMouseEvent *event);
-  void mouseMoveEvent(QMouseEvent *event);
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
   QPoint m_mousePressPos;  //!< Mouse position at mouse press.

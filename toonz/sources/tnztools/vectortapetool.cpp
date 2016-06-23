@@ -92,7 +92,7 @@ public:
     if (m_isLastInBlock) delete m_fillInformation;
   }
 
-  void undo() const {
+  void undo() const override {
     TTool::Application *app = TTool::getApplication();
     if (!app) return;
     if (app->getCurrentFrame()->isEditingScene()) {
@@ -125,7 +125,7 @@ public:
     notifyImageChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     TTool::Application *app = TTool::getApplication();
     if (!app) return;
 
@@ -158,13 +158,13 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) +
            m_fillInformation->capacity() * sizeof(TFilledRegionInf) + 500;
   }
 
-  virtual QString getToolName() { return QString("Autoclose Tool"); }
-  int getHistoryType() { return HistoryType::AutocloseTool; }
+  QString getToolName() override { return QString("Autoclose Tool"); }
+  int getHistoryType() override { return HistoryType::AutocloseTool; }
 };
 
 }  // namespace
@@ -234,11 +234,11 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
   //-----------------------------------------------------------------------------
 
-  bool onPropertyChanged(std::string propertyName) {
+  bool onPropertyChanged(std::string propertyName) override {
     TapeMode                 = ::to_string(m_mode.getValue());
     TapeSmooth               = (int)(m_smooth.getValue());
     std::wstring s           = m_type.getValue();
@@ -255,7 +255,7 @@ public:
   }
 
   //-----------------------------------------------------------------------------
-  void updateTranslation() {
+  void updateTranslation() override {
     m_smooth.setQStringName(tr("Smooth"));
     m_joinStrokes.setQStringName(tr("Join Vectors"));
     m_mode.setQStringName(tr("Mode:"));
@@ -264,9 +264,9 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  void draw() {
+  void draw() override {
     TVectorImageP vi(getImage(false));
     if (!m_draw) return;
     if (!vi) return;
@@ -313,7 +313,7 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  void mouseMove(const TPointD &pos, const TMouseEvent &) {
+  void mouseMove(const TPointD &pos, const TMouseEvent &) override {
     TVectorImageP vi(getImage(false));
     if (!vi) return;
 
@@ -373,7 +373,7 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
     if (!(TVectorImageP)getImage(false)) return;
 
     if (m_type.getValue() == RECT) {
@@ -384,7 +384,7 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override {
     TVectorImageP vi(getImage(false));
     if (!vi) return;
 
@@ -684,7 +684,7 @@ public:
   }
   //-------------------------------------------------------------------------------
 
-  void leftButtonUp(const TPointD &, const TMouseEvent &) {
+  void leftButtonUp(const TPointD &, const TMouseEvent &) override {
     TVectorImageP vi(getImage(true));
 
     if (vi && m_type.getValue() == RECT) {
@@ -723,19 +723,19 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  void onEnter() {
+  void onEnter() override {
     //      getApplication()->editImage();
     m_draw          = true;
     m_selectionRect = TRectD();
     m_startRect     = TPointD();
   }
 
-  void onLeave() {
+  void onLeave() override {
     m_draw = false;
     // m_strokeIndex1=-1;
   }
 
-  void onActivate() {
+  void onActivate() override {
     if (!m_firstTime) return;
 
     std::wstring s = ::to_wstring(TapeMode.getValue());
@@ -750,7 +750,7 @@ public:
     m_startRect     = TPointD();
   }
 
-  int getCursorId() const {
+  int getCursorId() const override {
     if (ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg)
       return ToolCursor::TapeCursorWhite;
     else

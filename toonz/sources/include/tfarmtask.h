@@ -69,7 +69,7 @@ public:
   Id m_parentId;  //!< Task id of the parent task (if any)
 
   bool m_isComposerTask;  //!< Whether this is a tcomposer task (opposed to
-                          //!tcleanupper task)
+                          //! tcleanupper task)
 
   QString m_name;               //!< User-readable name
   TFilePath m_taskFilePath;     //!< Path of the input file affected by the task
@@ -137,9 +137,9 @@ public:
   void parseCommandLine(QString commandLine);
 
   // TPersist
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
-  const TPersistDeclaration *getDeclaration() const;
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
+  const TPersistDeclaration *getDeclaration() const override;
 };
 
 //------------------------------------------------------------------------------
@@ -170,14 +170,14 @@ public:
   void addTask(TFarmTask *task);
   void removeTask(TFarmTask *task);
 
-  int getTaskCount() const;
-  TFarmTask *getTask(int index);
+  int getTaskCount() const override;
+  TFarmTask *getTask(int index) override;
   bool changeChunkSize(int chunksize);
 
   // TPersist
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
-  const TPersistDeclaration *getDeclaration() const;
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
+  const TPersistDeclaration *getDeclaration() const override;
 
 private:
   class Imp;

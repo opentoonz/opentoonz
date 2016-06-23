@@ -620,7 +620,7 @@ public:
     m_nodes.back().m_wasKeyframe = param->isKeyframe(frame);
   }
 
-  void onAdd() {
+  void onAdd() override {
     TXsheet *xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
     m_frame      = TTool::getApplication()->getCurrentFrame()->getFrame();
     for (int i = 0; i < (int)m_nodes.size(); i++) {
@@ -641,7 +641,7 @@ public:
     obj->invalidate();
   }
 
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
     for (int i = 0; i < (int)m_nodes.size(); i++) {
       TDoubleParam *param =
@@ -656,7 +656,7 @@ public:
     TTool::getApplication()->getCurrentXsheet()->notifyXsheetChanged();
     TTool::getApplication()->getCurrentObject()->notifyObjectIdChanged(false);
   }
-  void redo() const {
+  void redo() const override {
     TXsheet *xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
     for (int i = 0; i < (int)m_nodes.size(); i++) {
       TDoubleParam *param =
@@ -669,7 +669,7 @@ public:
     TTool::getApplication()->getCurrentObject()->notifyObjectIdChanged(false);
   }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) + (int)m_nodes.size() * sizeof(Node);
   }
 };
@@ -1083,10 +1083,10 @@ public:
     app->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void onAdd() { m_newFid = getDrawing(); }
-  void undo() const { setDrawing(m_oldFid); }
-  void redo() const { setDrawing(m_newFid); }
-  int getSize() const { return sizeof(*this); }
+  void onAdd() override { m_newFid = getDrawing(); }
+  void undo() const override { setDrawing(m_oldFid); }
+  void redo() const override { setDrawing(m_newFid); }
+  int getSize() const override { return sizeof(*this); }
   TFrameId getOldDrawing() const { return m_oldFid; }
 };
 

@@ -80,8 +80,9 @@ public:
     }
   }
 
-  virtual bool read16BitIsEnabled() const { return m_is16bitEnabled; }
-  virtual void enable16BitRead(bool enabled) { m_is16bitEnabled = enabled; }
+  bool read16BitIsEnabled() const override { return m_is16bitEnabled; }
+
+  void enable16BitRead(bool enabled) override { m_is16bitEnabled = enabled; }
 
   void readLineInterlace(char *buffer) {
     readLineInterlace(buffer, 0, m_info.m_lx - 1, 1);
@@ -90,7 +91,7 @@ public:
     readLineInterlace(buffer, 0, m_info.m_lx - 1, 1);
   }
 
-  void open(FILE *file) {
+  void open(FILE *file) override {
     try {
       m_chan = file;
     } catch (...) {
@@ -206,7 +207,7 @@ public:
     }
   }
 
-  void readLine(char *buffer, int x0, int x1, int shrink) {
+  void readLine(char *buffer, int x0, int x1, int shrink) override {
     int ly = m_info.m_ly;
     if (!m_tempBuffer) {
       int lx       = m_info.m_lx;
@@ -248,7 +249,7 @@ public:
     }
   }
 
-  void readLine(short *buffer, int x0, int x1, int shrink) {
+  void readLine(short *buffer, int x0, int x1, int shrink) override {
     int ly = m_info.m_ly;
     if (!m_tempBuffer) {
       int lx       = m_info.m_lx;
@@ -290,7 +291,7 @@ public:
     }
   }
 
-  int skipLines(int lineCount) {
+  int skipLines(int lineCount) override {
     for (int i = 0; i < lineCount; i++) {
       if (m_interlace_type == 1 &&
           m_info.m_lx > 4)  // pezza. Studiare il codice
@@ -308,7 +309,7 @@ public:
     return lineCount;
   }
 
-  Tiio::RowOrder getRowOrder() const { return Tiio::TOP2BOTTOM; }
+  Tiio::RowOrder getRowOrder() const override { return Tiio::TOP2BOTTOM; }
 
   void writeRow(char *buffer) {
     if (m_color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
@@ -717,14 +718,15 @@ public:
   PngWriter();
   ~PngWriter();
 
-  void open(FILE *file, const TImageInfo &info);
-  void writeLine(char *buffer);
-  virtual void writeLine(short *buffer);
+  void open(FILE *file, const TImageInfo &info) override;
+  void writeLine(char *buffer) override;
+  void writeLine(short *buffer) override;
 
-  Tiio::RowOrder getRowOrder() const { return Tiio::TOP2BOTTOM; }
+  Tiio::RowOrder getRowOrder() const override { return Tiio::TOP2BOTTOM; }
 
-  void flush();
-  virtual bool write64bitSupported() const { return true; }
+  void flush() override;
+
+  bool write64bitSupported() const override { return true; }
 };
 
 //---------------------------------------------------------

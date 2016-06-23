@@ -21,7 +21,7 @@ public:
   ~TImageWriterMesh() {}
 
 public:
-  void save(const TImageP &);
+  void save(const TImageP &) override;
 
 private:
   TImageWriterMesh(const TImageWriterMesh &);
@@ -84,8 +84,8 @@ public:
   TImageReaderMesh(const TFilePath &fp, const TFrameId &frameId);
   ~TImageReaderMesh() {}
 
-  const TImageInfo *getImageInfo() const;
-  TImageP load();
+  const TImageInfo *getImageInfo() const override;
+  TImageP load() override;
 
 private:
   //! Reference to level reader

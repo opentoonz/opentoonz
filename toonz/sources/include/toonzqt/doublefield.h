@@ -47,7 +47,7 @@ public:
 protected:
   /*! If focus is lost and current value is out of range emit signal \b
    * lostFocus. */
-  void focusOutEvent(QFocusEvent *);
+  void focusOutEvent(QFocusEvent *) override;
 
 signals:
   /*! To emit when value change. */
@@ -173,21 +173,21 @@ public:
   ~DoubleLineEdit() {}
 
   /*! Set text field value to double value \b value. */
-  void setValue(double value);
+  void setValue(double value) override;
   /*! Return a double with field value. */
-  double getValue();
+  double getValue() override;
 
   /*! Set the range of field from \b minValue to \b maxValue;
                   set validator value. */
-  void setRange(double minValue, double maxValue);
+  void setRange(double minValue, double maxValue) override;
   /*! Set \b minValue an \b maxValue to current range; to current
                   validator minimum and maximum value. */
-  void getRange(double &minValue, double &maxValue);
+  void getRange(double &minValue, double &maxValue) override;
 
   /*! Set lenght of field value decimal part to \b decimals. */
   void setDecimals(int decimals);
   /*! Return lenght of field value decimal part. */
-  int getDecimals();
+  int getDecimals() override;
 };
 
 //=============================================================================
@@ -222,16 +222,16 @@ public:
   MeasuredDoubleLineEdit(QWidget *parent = 0);
   ~MeasuredDoubleLineEdit();
 
-  void setValue(double value);
-  double getValue();
+  void setValue(double value) override;
+  double getValue() override;
 
-  void setRange(double minValue, double maxValue);
-  void getRange(double &minValue, double &maxValue);
+  void setRange(double minValue, double maxValue) override;
+  void getRange(double &minValue, double &maxValue) override;
 
   void setMeasure(std::string measureName);
 
   void setDecimals(int decimals);
-  int getDecimals();
+  int getDecimals() override;
 
   // called after setText()
   void postSetText() { onEditingFinished(); }
@@ -240,7 +240,7 @@ private:
   void valueToText();
 
 protected:
-  void timerEvent(QTimerEvent *e);
+  void timerEvent(QTimerEvent *e) override;
 
 protected slots:
 

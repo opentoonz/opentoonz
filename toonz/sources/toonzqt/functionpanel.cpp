@@ -59,7 +59,7 @@ public:
   FunctionPanelZoomer(FunctionPanel *panel)
       : ShortcutZoomer(panel), m_panel(panel) {}
 
-  bool zoom(bool zoomin, bool resetZoom) {
+  bool zoom(bool zoomin, bool resetZoom) override {
     if (resetZoom)
       m_panel->fitGraphToWindow();
     else {

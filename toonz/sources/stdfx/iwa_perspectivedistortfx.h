@@ -39,11 +39,13 @@ protected:
 public:
   Iwa_PerspectiveDistortFx();
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
 
-  bool canHandle(const TRenderSettings &info, double frame);
+  bool canHandle(const TRenderSettings &info, double frame) override;
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &rend_sets) override;
 
   void doCompute_CPU(TTile &tile, const double frame,
                      const TRenderSettings &settings, TPointD &vanishingPoint,
@@ -52,7 +54,7 @@ public:
                      TDimensionI &resultDim, const double precision,
                      const double offs);
 
-  void getParamUIs(TParamUIConcept *&concepts, int &length);
+  void getParamUIs(TParamUIConcept *&concepts, int &length) override;
 };
 
 #endif

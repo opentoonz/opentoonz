@@ -34,8 +34,8 @@ private:
   // These methods are used to remember special panel infos
   // when a MessagePanel substitutes a panel due to license
   // limitations.
-  void setViewType(int viewType);
-  int getViewType();
+  void setViewType(int viewType) override;
+  int getViewType() override;
 
   void setPoolIndex(int poolIndex);
   int getPoolIndex() const;
@@ -61,7 +61,7 @@ public:
 #endif
   ~LogPanel();
 
-  void onLogChanged();
+  void onLogChanged() override;
 
 public slots:
   void clear();

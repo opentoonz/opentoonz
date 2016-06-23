@@ -76,9 +76,9 @@ the context's output buffer is destroyed.
       const QString &shaderName) const;
 
   GLuint loadTexture(const TRasterP &src, GLuint texUnit);  //!< Loads a texture
-                                                            //!and binds it to
-                                                            //!the specified
-                                                            //!texture unit.
+                                                            //! and binds it to
+  //! the specified
+  //! texture unit.
   //!  \return  The OpenGL texture id of the loaded texture.      \param src
   //!  Loaded texture.  \param texUnit  Unit the texture will be bound to.
   void unloadTexture(GLuint texId);  //!< Releases the specified texture id.

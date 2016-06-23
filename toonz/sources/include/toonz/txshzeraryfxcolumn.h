@@ -53,31 +53,31 @@ Destroys the TXshZeraryFxColumn object.
 */
   ~TXshZeraryFxColumn();
 
-  TXshColumn::ColumnType getColumnType() const;
+  TXshColumn::ColumnType getColumnType() const override;
 
   /*! Return true if level which cell \b cell belongs is equal to \b
    * m_zeraryFxLevel. */
-  bool canSetCell(const TXshCell &cell) const;
+  bool canSetCell(const TXshCell &cell) const override;
 
   /*! Clone column and return a pointer to the new \b TXshColumn cloned. */
-  TXshColumn *clone() const;
+  TXshColumn *clone() const override;
 
   /*!
 Return \b TZeraryColumnFx.
 */
   TZeraryColumnFx *getZeraryColumnFx() const { return m_zeraryColumnFx; }
 
-  TXshZeraryFxColumn *getZeraryFxColumn() { return this; }
+  TXshZeraryFxColumn *getZeraryFxColumn() override { return this; }
 
-  bool setCell(int row, const TXshCell &cell);
+  bool setCell(int row, const TXshCell &cell) override;
   /*! Return false if cannot set cells.*/
-  bool setCells(int row, int rowCount, const TXshCell cells[]);
+  bool setCells(int row, int rowCount, const TXshCell cells[]) override;
 
   /*! Return a pointer to \b TFx \b m_zeraryColumnFx. */
-  TFx *getFx() const;
+  TFx *getFx() const override;
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 
   /*! Implement method isn't necessary because TXshZeraryFxColumn doesn't have
    * icon. */

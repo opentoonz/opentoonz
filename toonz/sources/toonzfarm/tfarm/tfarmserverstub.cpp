@@ -18,7 +18,7 @@ public:
   }
 
   // TFarmExecutor overrides
-  QString execute(const std::vector<QString> &argv);
+  QString execute(const std::vector<QString> &argv) override;
 
   TFarmServer *m_server;
 };

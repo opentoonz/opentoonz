@@ -28,14 +28,17 @@ public:
     setName(L"ColorCardFx");
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     bBox = TConsts::infiniteRectD;
     return true;
   }
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &) {
+  void doCompute(TTile &tile, double frame, const TRenderSettings &) override {
     TRaster32P raster32 = tile.getRaster();
     if (raster32)
       raster32->fill(m_color->getPremultipliedValue(frame));
@@ -71,14 +74,17 @@ public:
     setName(L"CheckBoardFx");
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return false; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return false;
+  }
 
-  bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info) override {
     bBox = TConsts::infiniteRectD;
     return true;
   }
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &info) {
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &info) override {
     const TPixel32 &c1 = m_color1->getValue(frame);
     const TPixel32 &c2 = m_color2->getValue(frame);
 
@@ -91,7 +97,7 @@ public:
     TRop::checkBoard(tile.getRaster(), c1, c2, dim, tile.m_pos);
   }
 
-  void getParamUIs(TParamUIConcept *&concepts, int &length) {
+  void getParamUIs(TParamUIConcept *&concepts, int &length) override {
     concepts = new TParamUIConcept[length = 1];
 
     concepts[0].m_type  = TParamUIConcept::SIZE;

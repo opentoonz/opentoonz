@@ -167,7 +167,7 @@ CYOMBInputParam::CYOMBInputParam(const int argc, const char *argv[],
       //				m_nbSample=
       //(int)((double)m_nbSample*sqrt(m_scale)+0.5);
       //				m_nbSample= m_nbSample<3 ? 3 :
-      //m_nbSample;
+      // m_nbSample;
       //			}
     } else
       m_nbSample = m_nbSample < 1 ? 1 : m_nbSample;

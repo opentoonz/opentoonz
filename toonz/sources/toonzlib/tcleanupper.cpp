@@ -174,9 +174,9 @@ struct TargetColorData {
   int m_idx;                 //!< Palette color index
   HSVColor m_hsv;            //!< HSV coordinates of the color
   double m_saturationLower;  //!< Pixel colors associated with this color must
-                             //!be above this
+                             //! be above this
   double m_hueLower, m_hueUpper;  //!< Pixel colors associated with this color
-                                  //!must in this range
+                                  //! must in this range
 
 public:
   TargetColorData(const TargetColor &color)
@@ -1122,7 +1122,7 @@ void TCleanupper::preprocessColors(const TRasterCM32P &outRas,
               255)  // sometimes the resampling produces semitransparent pixels
         // on the  border of the raster; I discards those pixels.
         //(which otherwise creates a black border in the final cleanupped image)
-        //vinz
+        // vinz
         *outPix = TPixelCM32();
       else
         preprocessColor(*pix, blackData, pencilsHSV, pencilsHSV.size(),

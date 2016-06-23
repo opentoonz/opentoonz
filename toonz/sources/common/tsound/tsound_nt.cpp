@@ -53,9 +53,9 @@ class EndPlayMsg : public TThread::Message {
 public:
   EndPlayMsg(TSoundOutputDeviceListener *notifier) { m_listener = notifier; }
 
-  TThread::Message *clone() const { return new EndPlayMsg(*this); }
+  TThread::Message *clone() const override { return new EndPlayMsg(*this); }
 
-  void onDeliver() { m_listener->onPlayCompleted(); }
+  void onDeliver() override { m_listener->onPlayCompleted(); }
 
 private:
   TSoundOutputDeviceListener *m_listener;
@@ -1019,7 +1019,7 @@ public:
 
   ~RecordTask() {}
 
-  void run();
+  void run() override;
 
   std::shared_ptr<TSoundInputDeviceImp> m_dev;
 };

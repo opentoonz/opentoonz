@@ -230,7 +230,7 @@ private:
 
   struct VisualizationOptions {
     bool m_singleColumnEnabled;  //!< Whether only current column should be
-                                 //!rendered
+                                 //! rendered
     bool m_checkFlags;           //   ... o.o? ....
   };
 
@@ -251,15 +251,15 @@ public:
                 const TRect &rect, const ImagePainter::VisualSettings &vs,
                 bool checkFlags);
 
-  void onImage(const Stage::Player &data);
+  void onImage(const Stage::Player &data) override;
   void onVectorImage(TVectorImage *vi, const Stage::Player &data);
   void onRasterImage(TRasterImage *ri, const Stage::Player &data);
   void onToonzImage(TToonzImage *ri, const Stage::Player &data);
 
-  void beginMask();
-  void endMask();
-  void enableMask();
-  void disableMask();
+  void beginMask() override;
+  void endMask() override;
+  void enableMask() override;
+  void disableMask() override;
 
   int getNodesCount();
   void clearNodes();
@@ -289,11 +289,11 @@ public:
 
   void setDistance(double d);
 
-  void onImage(const Stage::Player &data);
-  void beginMask();
-  void endMask();
-  void enableMask();
-  void disableMask();
+  void onImage(const Stage::Player &data) override;
+  void beginMask() override;
+  void endMask() override;
+  void enableMask() override;
+  void disableMask() override;
 
   int getColumnIndex() const;
   void getColumnIndexes(std::vector<int> &indexes) const;
@@ -324,15 +324,15 @@ public:
   void setPhi(double phi) { m_phi = phi; }
   void setPaletteHasChanged(bool on) { m_paletteHasChanged = on; }
 
-  void onImage(const Stage::Player &data);
+  void onImage(const Stage::Player &data) override;
   void onVectorImage(TVectorImage *vi, const Stage::Player &data);
   void onRasterImage(TRasterImage *ri, const Stage::Player &data);
   void onToonzImage(TToonzImage *ti, const Stage::Player &data);
 
-  void beginMask();
-  void endMask();
-  void enableMask();
-  void disableMask();
+  void beginMask() override;
+  void endMask() override;
+  void enableMask() override;
+  void disableMask() override;
 
   double getMinZ() const { return m_minZ; }
 };

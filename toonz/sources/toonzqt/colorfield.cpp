@@ -293,7 +293,7 @@ void ChannelField::onSliderReleased() {
 
 ColorField::ColorFieldEditorController *ColorField::m_editorController = 0;
 //																							new
-//ColorField::ColorFieldEditorController();
+// ColorField::ColorFieldEditorController();
 
 //=============================================================================
 /*! \class DVGui::ColorField

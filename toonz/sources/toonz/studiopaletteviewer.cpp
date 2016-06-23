@@ -60,12 +60,12 @@ bool isInStudioPalette(TFilePath path) {
     return true;
   if (isInStudioPaletteFolder(path, studioPlt->getCleanupPalettesRoot()))
     return true;
-  if (isInStudioPaletteFolder(path,
-                              TFilePath(
-                                  "C:\\Toonz 6.0 stuff\\projects\\Project "
-                                  "Palettes")))  // DAFARE
-                                                 // studioPlt->getProjectPalettesRoot();
-                                                 // Per ora lo fisso))
+  if (isInStudioPaletteFolder(
+          path,
+          TFilePath("C:\\Toonz 6.0 stuff\\projects\\Project "
+                    "Palettes")))  // DAFARE
+                                   // studioPlt->getProjectPalettesRoot();
+                                   // Per ora lo fisso))
     return true;
   return false;
 }

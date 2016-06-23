@@ -72,28 +72,31 @@ public:
   }
   bool getShowHideFlag(CV_Parts parts) { return m_visibleFlag[parts]; }
   // reimplementation of TPanel::widgetInThisPanelIsFocused
-  bool widgetInThisPanelIsFocused() { return m_sceneViewer->hasFocus(); }
+  bool widgetInThisPanelIsFocused() override {
+    return m_sceneViewer->hasFocus();
+  }
 
-  void onDrawFrame(int frame, const ImagePainter::VisualSettings &settings);
+  void onDrawFrame(int frame,
+                   const ImagePainter::VisualSettings &settings) override;
 
   // reimplementation of FlipConsoleOwner::isFrameAlreadyCached
-  bool isFrameAlreadyCached(int frame);
+  bool isFrameAlreadyCached(int frame) override;
 
 protected:
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
   void initializeTitleBar(TPanelTitleBar *titleBar);
   void createFrameToolBar();
   void createPlayToolBar();
   void addColorMaskButton(QWidget *parent, const char *iconSVGName, int id);
-  void contextMenuEvent(QContextMenuEvent *event);
+  void contextMenuEvent(QContextMenuEvent *event) override;
   // reimplementation of TPanel::widgetFocusOnEnter
-  void widgetFocusOnEnter() {
+  void widgetFocusOnEnter() override {
     m_sceneViewer->setFocus(Qt::OtherFocusReason);
     // activate shortcut key for this flipconsole
     m_flipConsole->makeCurrent();
   };
-  void widgetClearFocusOnLeave() { m_sceneViewer->clearFocus(); };
+  void widgetClearFocusOnLeave() override { m_sceneViewer->clearFocus(); };
 
 public slots:
   void onSceneChanged();

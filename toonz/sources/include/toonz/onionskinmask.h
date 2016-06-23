@@ -69,7 +69,7 @@ public:
   }
 
   void setMos(int drow, bool on);  //!< Sets a Mobile OS frame shifted by drow
-                                   //!around current xsheet frame
+                                   //! around current xsheet frame
   void setFos(int row,
               bool on);  //!< Sets a Fixed OS frame to the specified xsheet row
 

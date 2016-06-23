@@ -120,9 +120,9 @@ old one.  */
           &geometry,  //!< Rebinds the image bound to the specified texture
       PremultMode premultiplyMode = NONPREMULTIPLIED);  //!  id to a new image.
   void unbindTexture(int textureId);  //!< Deletes the texture associated to the
-                                      //!passed id.           \param textureId
-                                      //!Identifier of the texture to be
-                                      //!unbound.
+                                      //! passed id.           \param textureId
+  //! Identifier of the texture to be
+  //! unbound.
 
 private:
   class Imp;

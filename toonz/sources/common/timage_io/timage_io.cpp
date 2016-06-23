@@ -106,7 +106,7 @@ void TImageReader::open() {
   assert(m_file == NULL);
 
   std::string type = toLower(m_path.getType());
-  m_file           = fopen(m_path, "rb");  // Opens for reading. If the file does not
+  m_file = fopen(m_path, "rb");  // Opens for reading. If the file does not
                                  // exist or cannot be found, the fopen_s call
                                  // fails
 

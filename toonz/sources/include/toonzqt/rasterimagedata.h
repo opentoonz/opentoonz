@@ -60,7 +60,8 @@ public:
   virtual StrokesData *toStrokesData(ToonzScene *scene) const = 0;
   virtual TPointD getDpi() const                              = 0;
   TDimension getDim() const { return m_dim; }
-  virtual RasterImageData *clone() const = 0;
+
+  RasterImageData *clone() const override = 0;
 
   // Necessary for undo purpose!!!!
   virtual int getMemorySize() const = 0;
@@ -86,19 +87,19 @@ public:
                const std::vector<TRectD> &rects,
                const std::vector<TStroke> &strokes,
                const std::vector<TStroke> &originalStrokes,
-               const TAffine &transformation);
+               const TAffine &transformation) override;
 
   // floating ti <- data;
   void getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
                std::vector<TRectD> &rects, std::vector<TStroke> &strokes,
                std::vector<TStroke> &originalStrokes, TAffine &transformation,
-               TPalette *targetPalette) const;
+               TPalette *targetPalette) const override;
 
-  StrokesData *toStrokesData(ToonzScene *scene) const;
-  TPointD getDpi() const { return TPointD(m_dpiX, m_dpiY); }
+  StrokesData *toStrokesData(ToonzScene *scene) const override;
+  TPointD getDpi() const override { return TPointD(m_dpiX, m_dpiY); }
 
-  ToonzImageData *clone() const { return new ToonzImageData(*this); }
-  int getMemorySize() const;
+  ToonzImageData *clone() const override { return new ToonzImageData(*this); }
+  int getMemorySize() const override;
 };
 
 //===================================================================
@@ -120,19 +121,21 @@ public:
                const std::vector<TRectD> &rects,
                const std::vector<TStroke> &strokes,
                const std::vector<TStroke> &originalStrokes,
-               const TAffine &transformation);
+               const TAffine &transformation) override;
 
   // floating ti <- data;
   void getData(TRasterP &copiedRaster, double &dpiX, double &dpiY,
                std::vector<TRectD> &rects, std::vector<TStroke> &strokes,
                std::vector<TStroke> &originalStrokes, TAffine &transformation,
-               TPalette *targetPalette) const;
+               TPalette *targetPalette) const override;
 
-  StrokesData *toStrokesData(ToonzScene *scene) const;
-  TPointD getDpi() const { return TPointD(m_dpiX, m_dpiY); }
+  StrokesData *toStrokesData(ToonzScene *scene) const override;
+  TPointD getDpi() const override { return TPointD(m_dpiX, m_dpiY); }
 
-  FullColorImageData *clone() const { return new FullColorImageData(*this); }
-  int getMemorySize() const;
+  FullColorImageData *clone() const override {
+    return new FullColorImageData(*this);
+  }
+  int getMemorySize() const override;
 };
 
 #endif

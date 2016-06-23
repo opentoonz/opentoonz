@@ -80,9 +80,9 @@ public:
   int m_ancestorColumnIndex;  //!< Index of this object's hierarchycal root
                               //!(top-most column)
   bool m_isCurrentColumn;  //!< Whether this player emanates from (a descendant
-                           //!of) the current column
+                           //! of) the current column
   bool m_isCurrentXsheetLevel;  //!< Whether the player's xsheet is the \a
-                                //!current one
+                                //! current one
 
   TXshSimpleLevel *m_sl;  //!< (not owned) The player's simple level
   TFrameId m_fid;         //!< The player's frame in m_sl
@@ -90,7 +90,7 @@ public:
   TXsheet *m_xsh;  //!< (not owned) The player's xsheet
   int m_column;    //!< The player's xsheet column
   int m_frame;  //!< The player's xhseet row (could be not the current, due to
-                //!onion skin?)
+                //! onion skin?)
 
   bool m_isPlaying;  //!< Whether this player is in a 'play >' status or rather
                      //!'paused'

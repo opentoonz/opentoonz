@@ -36,16 +36,16 @@ class DVAPI PaletteController : public QObject {
   Q_OBJECT
 
   TPaletteHandle *m_currentLevelPalette;  //!< (\p owned) Handle to the palette
-                                          //!of current level.
+                                          //! of current level.
   TPaletteHandle *m_currentCleanupPalette;  //!< (\p owned) Handle to the
-                                            //!palette of current cleanup
-                                            //!settings.
+                                            //! palette of current cleanup
+  //! settings.
   TPaletteHandle *m_currentPalette;  //!< (\p owned) Handle to the palette of
-                                     //!currently selected object.
+                                     //! currently selected object.
 
   TPaletteHandle *m_originalCurrentPalette;  //!< Pointer to the \a original
-                                             //!current palette handle specified
-                                             //!on
+  //! current palette handle specified
+  //! on
   //!  the last setCurrentPalette() invocation.
   TPixel32 m_colorSample;
   bool m_colorAutoApplyEnabled;

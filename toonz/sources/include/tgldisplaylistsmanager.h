@@ -64,8 +64,8 @@ public:
   TGLDisplayListsProxyT(Context *proxy) : m_proxy(proxy) {}
   ~TGLDisplayListsProxyT() { delete m_proxy; }
 
-  void makeCurrent() { m_proxy->makeCurrent(); }
-  void doneCurrent() { m_proxy->doneCurrent(); }
+  void makeCurrent() override { m_proxy->makeCurrent(); }
+  void doneCurrent() override { m_proxy->doneCurrent(); }
 };
 
 //**************************************************************************************************
@@ -123,23 +123,23 @@ public:
   static TGLDisplayListsManager *instance();
 
   int storeProxy(TGLDisplayListsProxy *proxy);  //!< Stores the specified proxy,
-                                                //!returning its associated
-                                                //!display
+                                                //! returning its associated
+  //! display
   //!< lists id. Context attaches should follow.
   void attachContext(int dlSpaceId, TGlContext context);  //!< Attaches the
-                                                          //!specified context
-                                                          //!to a display lists
-                                                          //!space
+                                                          //! specified context
+  //! to a display lists
+  //! space
   void releaseContext(TGlContext context);  //!< Releases a context reference to
-                                            //!its display lists space
+                                            //! its display lists space
   int displayListsSpaceId(TGlContext context);  //!< Returns the display lists
-                                                //!space id of a known context,
-                                                //!or
+                                                //! space id of a known context,
+  //! or
   //!< -1 if it did not attach to any known space.
   TGLDisplayListsProxy *dlProxy(int dlSpaceId);  //!< Returns the display lists
-                                                 //!space proxy associated to
-                                                 //!the
-                                                 //!< specified id.
+                                                 //! space proxy associated to
+  //! the
+  //!< specified id.
 };
 
 #endif  // TGLDISPLAYLISTSMANAGER_H

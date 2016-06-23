@@ -27,8 +27,8 @@ struct MeshBuilderOptions {
   int m_targetMaxVerticesCount;  //!< The desired maximum vertices count
                                  //!< (the returned mesh could still be larger)
   TPixel64 m_transparentColor;   //!< Color to be used as transparent for
-                                 //!boundaries recognition
-                                 //!< (for fullcolor images only).
+                                 //! boundaries recognition
+  //!< (for fullcolor images only).
   //!< \note Transparent colors will be recognized as transparent
   //!< anyway
 };

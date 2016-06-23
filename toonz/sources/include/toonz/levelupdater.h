@@ -118,7 +118,7 @@ class DVAPI LevelUpdater {
   TXshSimpleLevelP m_sl;  //!< XSheet image level the updater may be attached to
 
   bool m_usingTemporaryFile;  //!< Whether a temporary file is being used to
-                              //!hold additional frames
+                              //! hold additional frames
   bool m_opened;  //!< Wheter the updater is already attached to a level
 
 public:

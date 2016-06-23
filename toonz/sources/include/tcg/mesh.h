@@ -81,10 +81,10 @@ public:
   int addFace(const F &f);
 
   void removeVertex(int v);  //!< Removes the <TT>v</TT>-th vertex from the
-                             //!mesh.  \warning  Any adjacent edge or face will
-                             //!be removed, too.  \param v  Index of the vertex
-                             //!to be removed.
-  void removeEdge(int e);    //!< Removes the <TT>e</TT>-th edge from the mesh.
+                             //! mesh.  \warning  Any adjacent edge or face will
+  //! be removed, too.  \param v  Index of the vertex
+  //! to be removed.
+  void removeEdge(int e);  //!< Removes the <TT>e</TT>-th edge from the mesh.
                            //!\warning  Any adjacent face will be removed, too.
                            //!\param e  Index of the edge to be removed.
   void removeFace(int f);  //!< Removes the <TT>f</TT>-th face from the mesh.
@@ -94,19 +94,19 @@ public:
   V &vertex(int v) {
     return m_vertices[v];
   }  //!< Returns the <TT>v</TT>-th mesh vertex.   \param v  Index of the vertex
-     //!to be returned.  \return  See description.
+     //! to be returned.  \return  See description.
 
   const E &edge(int e) const { return m_edges[e]; }
   E &edge(int e) {
     return m_edges[e];
   }  //!< Returns the <TT>e</TT>-th mesh edge.   \param e  Index of the edge to
-     //!be returned.  \return  See description.
+     //! be returned.  \return  See description.
 
   const F &face(int f) const { return m_faces[f]; }
   F &face(int f) {
     return m_faces[f];
   }  //!< Returns the <TT>f</TT>-th mesh face.   \param f  Index of the face to
-     //!be returned.  \return  See description.
+     //! be returned.  \return  See description.
 
   const V &edgeVertex(int e, int i) const { return vertex(edge(e).vertex(i)); }
   V &edgeVertex(int e, int i)  //!  \param e  Host edge index.  \param i  Vertex
@@ -150,9 +150,9 @@ and \p v2:
           \code for(int n=0; mesh.edgeInciding(v1, v2, n) > 0; ++n) ... \endcode
 */
   int edgeInciding(int v1, int v2, int n = 0) const;  //!< \brief Returns the
-                                                      //!edge index of the
-                                                      //!<TT>n</TT>-th edge
-                                                      //!inciding
+                                                      //! edge index of the
+  //!<TT>n</TT>-th edge
+  //! inciding
   //!  \p v1 and \p v2, or \p -1 if the required edge could not be found.
   //!  \param v1  First edge endpoint.  \param v2  Second edge endpoint.  \param
   //!  n  Index in the sequence of all edges inciding \p v1 and \p v2.  \return

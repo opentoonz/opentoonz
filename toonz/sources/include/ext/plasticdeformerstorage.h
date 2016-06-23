@@ -67,9 +67,9 @@ struct DVAPI PlasticDeformerDataGroup {
       m_dstHandles;  //!< Corresponding destination handle positions
 
   int m_compiled;  //!< Whether compiled data is present about a certain
-                   //!datatype.
+                   //! datatype.
   int m_upToDate;  //!< Whether updated  data is present about a certain
-                   //!datatype.
+                   //! datatype.
 
   double m_outputFrame;  //!< The frame of current output values.
   //!< Value numeric_limits::max can be used to invalidate

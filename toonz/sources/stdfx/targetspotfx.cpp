@@ -42,14 +42,16 @@ public:
   }
   ~TargetSpotFx(){};
 
-  bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info) override {
     bBox = TConsts::infiniteRectD;
     return true;  // si potrebbe/dovrebbe fare meglio
   };
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
 
-  bool canHandle(const TRenderSettings &info, double frame) { return false; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return false;
+  }
 };
 
 template <typename PIXEL>

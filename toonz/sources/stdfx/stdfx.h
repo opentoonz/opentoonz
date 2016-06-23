@@ -47,14 +47,14 @@ public:                                                                        \
 
 class TStandardRasterFx : public TRasterFx {
 public:
-  std::string getPluginId() const { return PLUGIN_PREFIX; }
+  std::string getPluginId() const override { return PLUGIN_PREFIX; }
 };
 
 //-------------------------------------------------------------------
 
 class TStandardZeraryFx : public TZeraryFx {
 public:
-  std::string getPluginId() const { return PLUGIN_PREFIX; }
+  std::string getPluginId() const override { return PLUGIN_PREFIX; }
 };
 
 //-------------------------------------------------------------------

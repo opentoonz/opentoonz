@@ -50,9 +50,9 @@ public:
                     double paintValue)
       : m_cell(cell), m_vertices(vertices), m_paintValue(paintValue) {}
 
-  int getSize() const { return 1 << 20; }
+  int getSize() const override { return 1 << 20; }
 
-  void redo() const {
+  void redo() const override {
     TXshSimpleLevel *sl =
         static_cast<TXshSimpleLevel *>(m_cell.m_level.getPointer());
     sl->setDirtyFlag(true);
@@ -73,7 +73,7 @@ public:
         mi.getPointer(), PlasticDeformerStorage::MESH);
   }
 
-  void undo() const {
+  void undo() const override {
     TXshSimpleLevel *sl =
         static_cast<TXshSimpleLevel *>(m_cell.m_level.getPointer());
     sl->setDirtyFlag(true);

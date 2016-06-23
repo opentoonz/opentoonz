@@ -48,10 +48,10 @@ public:
   bool m_showBBox;        //!< Show the bounding box of current level
 
   TSceneProperties *m_sceneProperties;  //!< Scene properties reference - which
-                                        //!contains further options
+                                        //! contains further options
 
   PlasticVisualSettings m_plasticVisualSettings;  //!< Settings for mesh images
-                                                  //!and plastic deformations
+                                                  //! and plastic deformations
 
   // Other (misplaced) misc options
 
@@ -62,7 +62,7 @@ public:
   TPixel32 m_blankColor;  //!< The color of blank frames during playback
 
   bool m_useTexture;  //!< Whether should we use OpenGL textures instead of
-                      //!drawPixels()
+                      //! drawPixels()
   bool m_recomputeIfNeeded;
   bool m_drawBlankFrame;
   bool m_useChecks;  //!< whether to consider  paint check and ink check

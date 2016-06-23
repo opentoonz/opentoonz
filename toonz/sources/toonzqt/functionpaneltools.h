@@ -28,7 +28,7 @@ class MoveFrameDragTool : public FunctionPanel::DragTool {
 
 public:
   MoveFrameDragTool(FunctionPanel *panel, TFrameHandle *frameHandle);
-  void drag(QMouseEvent *e);
+  void drag(QMouseEvent *e) override;
 };
 
 class PanDragTool : public FunctionPanel::DragTool {
@@ -38,8 +38,8 @@ class PanDragTool : public FunctionPanel::DragTool {
 
 public:
   PanDragTool(FunctionPanel *panel, bool xLocked, bool yLocked);
-  void click(QMouseEvent *e);
-  void drag(QMouseEvent *e);
+  void click(QMouseEvent *e) override;
+  void drag(QMouseEvent *e) override;
 };
 
 class ZoomDragTool : public FunctionPanel::DragTool {
@@ -52,9 +52,9 @@ public:
   ZoomDragTool(FunctionPanel *panel, ZoomType zoomType)
       : m_panel(panel), m_zoomType((int)zoomType) {}
 
-  void click(QMouseEvent *e);
-  void drag(QMouseEvent *e);
-  void release(QMouseEvent *e);
+  void click(QMouseEvent *e) override;
+  void drag(QMouseEvent *e) override;
+  void release(QMouseEvent *e) override;
 };
 
 class RectSelectTool : public FunctionPanel::DragTool {
@@ -67,11 +67,11 @@ public:
   RectSelectTool(FunctionPanel *panel, TDoubleParam *curve)
       : m_panel(panel), m_curve(curve) {}
 
-  void click(QMouseEvent *e);
-  void drag(QMouseEvent *e);
-  void release(QMouseEvent *e);
+  void click(QMouseEvent *e) override;
+  void drag(QMouseEvent *e) override;
+  void release(QMouseEvent *e) override;
 
-  void draw(QPainter &painter);
+  void draw(QPainter &painter) override;
 };
 
 class MovePointDragTool : public FunctionPanel::DragTool {
@@ -99,9 +99,9 @@ public:
 
   void setSelection(FunctionSelection *selection);
 
-  void click(QMouseEvent *e);
-  void drag(QMouseEvent *e);
-  void release(QMouseEvent *e);
+  void click(QMouseEvent *e) override;
+  void drag(QMouseEvent *e) override;
+  void release(QMouseEvent *e) override;
 };
 
 class MoveHandleDragTool : public FunctionPanel::DragTool {
@@ -126,9 +126,9 @@ public:
   MoveHandleDragTool(FunctionPanel *panel, TDoubleParam *curve, int kIndex,
                      Handle handle);
 
-  void click(QMouseEvent *e);
-  void drag(QMouseEvent *e);
-  void release(QMouseEvent *e);
+  void click(QMouseEvent *e) override;
+  void drag(QMouseEvent *e) override;
+  void release(QMouseEvent *e) override;
 };
 
 class MoveGroupHandleDragTool : public FunctionPanel::DragTool {
@@ -146,9 +146,9 @@ public:
                           Handle handle);
   ~MoveGroupHandleDragTool();
 
-  void click(QMouseEvent *e);
-  void drag(QMouseEvent *e);
-  void release(QMouseEvent *e);
+  void click(QMouseEvent *e) override;
+  void drag(QMouseEvent *e) override;
+  void release(QMouseEvent *e) override;
 };
 
 #endif

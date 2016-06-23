@@ -204,22 +204,22 @@ class UndoMoveKeyFrame : public TUndo {
 public:
   UndoMoveKeyFrame(int dr, KeyframeMover *mover) : m_dr(dr), m_mover(mover) {}
 
-  void undo() const {
+  void undo() const override {
     m_mover->undoMoveKeyframe();
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     std::set<TKeyframeSelection::Position> newPositions;
     m_mover->moveKeyframes(m_dr, newPositions);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Move Keyframe"); }
+  QString getHistoryString() override { return QObject::tr("Move Keyframe"); }
 
-  int getHistoryType() { return HistoryType::Xsheet; }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------

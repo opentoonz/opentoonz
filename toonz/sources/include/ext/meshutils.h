@@ -78,9 +78,9 @@ DVAPI void tglDrawFaces(
 DVAPI void tglDrawSO(
     const TMeshImage &image,  //!< Input mesh image whose SO will be drawn.
     double minColor[4],  //!< RGBM color quadruple (in [0, 1]) corresponding to
-                         //!the lowest SO value.
+                         //! the lowest SO value.
     double maxColor[4],  //!< RGBM color quadruple corresponding to the highest
-                         //!SO value.
+                         //! SO value.
     const PlasticDeformerDataGroup *deformerDatas =
         0,  //!< Deformation data structure containing SO data.
     bool deformedDomain =
@@ -99,9 +99,9 @@ DVAPI void tglDrawRigidity(
     const TMeshImage
         &image,          //!< Input mesh image whose rigidity will be drawn.
     double minColor[4],  //!< RGBM color quadruple (in [0, 1]) corresponding to
-                         //!the lowest rigidity value.
+                         //! the lowest rigidity value.
     double maxColor[4],  //!< RGBM color quadruple corresponding to the highest
-                         //!rigidity value.
+                         //! rigidity value.
     const PlasticDeformerDataGroup *deformerDatas =
         0,  //!< Data structure of an optional deformation of the input image.
     bool deformedDomain =

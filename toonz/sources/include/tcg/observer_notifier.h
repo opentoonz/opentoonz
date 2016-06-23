@@ -44,12 +44,12 @@ public:
   virtual ~observer_base() {}
 
   virtual void attach(notifier_base *notifier) = 0;  //!< Adds the specified
-                                                     //!notifier to the internal
-                                                     //!set of notifiers.
+  //! notifier to the internal
+  //! set of notifiers.
   virtual void detach(notifier_base *notifier) = 0;  //!< Removes the specified
-                                                     //!notifier from the
-                                                     //!internal set of
-                                                     //!notifiers.
+                                                     //! notifier from the
+  //! internal set of
+  //! notifiers.
 };
 
 //------------------------------------------------------------
@@ -59,12 +59,12 @@ public:
   virtual ~notifier_base() {}
 
   virtual void attach(observer_base *observer) = 0;  //!< Adds the specified
-                                                     //!observer to the internal
-                                                     //!set of observers.
+  //! observer to the internal
+  //! set of observers.
   virtual void detach(observer_base *observer) = 0;  //!< Removes the specified
-                                                     //!observer from the
-                                                     //!internal set of
-                                                     //!observers.
+                                                     //! observer from the
+  //! internal set of
+  //! observers.
 };
 
 //************************************************************************

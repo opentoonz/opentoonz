@@ -88,10 +88,12 @@ public:
       return "TileCM" + QString::number((unsigned long)this);
     }
 #else
-    QString id() const { return "TileCM" + QString::number((UINT)this); }
+    QString id() const override {
+      return "TileCM" + QString::number((UINT)this);
+    }
 #endif
 
-    Tile *clone() const;
+    Tile *clone() const override;
 
     void getRaster(TRasterCM32P &ras) const;
 
@@ -107,12 +109,12 @@ public:
   // crea un tile estraendo rect*ras->getBounds() da ras.
   // Nota: se rect e' completamente fuori non fa nulla
   // Nota: clona il raster!
-  void add(const TRasterP &ras, TRect rect);
+  void add(const TRasterP &ras, TRect rect) override;
 
   const Tile *getTile(int index) const;
   Tile *editTile(int index) const;
 
-  TTileSetCM32 *clone() const;
+  TTileSetCM32 *clone() const override;
 };
 
 //********************************************************************************
@@ -132,12 +134,12 @@ public:
       return "TTileSet32::Tile" + QString::number((unsigned long)this);
     }
 #else
-    QString id() const {
+    QString id() const override {
       return "TTileSet32::Tile" + QString::number((UINT)this);
     }
 #endif
 
-    Tile *clone() const;
+    Tile *clone() const override;
 
     void getRaster(TRasterP &ras) const;
 
@@ -153,11 +155,11 @@ public:
   // crea un tile estraendo rect*ras->getBounds() da ras.
   // Nota: se rect e' completamente fuori non fa nulla
   // Nota: clona il raster!
-  void add(const TRasterP &ras, TRect rect);
+  void add(const TRasterP &ras, TRect rect) override;
 
   const Tile *getTile(int index) const;
 
-  TTileSetFullColor *clone() const;
+  TTileSetFullColor *clone() const override;
 };
 
 #endif

@@ -210,9 +210,9 @@ public:
   bool isSubsceneFolderEnabled() const { return m_subsceneFolderEnabled; }
 
   int addLevelFormat(const LevelFormat &format);  //!< Inserts a new level
-                                                  //!format.  \return  The
-                                                  //!associated format index.
-  void removeLevelFormat(int formatIdx);          //!< Removes a level format.
+                                                  //! format.  \return  The
+  //! associated format index.
+  void removeLevelFormat(int formatIdx);  //!< Removes a level format.
 
   const LevelFormat &levelFormat(
       int formatIdx) const;  //!< Retrieves a level format.
@@ -285,7 +285,7 @@ public:
   // Xsheet  tab
 
   void setXsheetStep(int step);  //!< Sets the step used for the <I>next/prev
-                                 //!step</I> commands.
+                                 //! step</I> commands.
   int getXsheetStep() const {
     return m_xsheetStep;
   }  //!< Returns the step used for the <I>next/prev step</I> commands.

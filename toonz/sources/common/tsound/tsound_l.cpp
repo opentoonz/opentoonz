@@ -134,7 +134,7 @@ bool TSoundOutputDeviceImp::doOpenDevice() {
 
   // le chiamate a questa ioctl sono state commentate perche' pag 36 doc OSS
   //"this ioctl stop the device immadiately	and returns it to a state where
-  //it
+  // it
   // can accept new parameters. It Should not be called after opening the device
   // as it may cause unwanted side effect in his situation. require to abort
   // play
@@ -2058,8 +2058,9 @@ TSoundTrackFormat TSoundInputDevice::getPreferredFormat(
 
 //******************************************************************************
 //******************************************************************************
-//						funzioni per l'interazione con la libreria
-//OSS
+//						funzioni per l'interazione con la
+//libreria
+// OSS
 //******************************************************************************
 //******************************************************************************
 namespace {

@@ -87,7 +87,7 @@ public:
     TImageCache::instance()->remove(m_newImageId);
   }
 
-  void undo() const {
+  void undo() const override {
     TImageP img = TImageCache::instance()->get(m_oldImageId, true);
     m_level->setFrame(m_fid, img);
     IconGenerator::instance()->invalidate(m_level.getPointer(), m_fid);
@@ -99,7 +99,7 @@ public:
     }
   }
 
-  void redo() const {
+  void redo() const override {
     TImageP img = TImageCache::instance()->get(m_newImageId, true);
     m_level->setFrame(m_fid, img);
     IconGenerator::instance()->invalidate(m_level.getPointer(), m_fid);
@@ -113,7 +113,7 @@ public:
     }
   }
 
-  int getSize() const { return m_undoSize; }
+  int getSize() const override { return m_undoSize; }
 };
 
 int ResizeCanvasUndo::m_idCount = 0;

@@ -14,7 +14,7 @@ public:
   TLevelWriterMesh(const TFilePath &path, TPropertyGroup *winfo);
   ~TLevelWriterMesh();
 
-  TImageWriterP getFrameWriter(TFrameId fid);
+  TImageWriterP getFrameWriter(TFrameId fid) override;
 
 public:
   static TLevelWriter *create(const TFilePath &f, TPropertyGroup *winfo) {
@@ -36,7 +36,7 @@ public:
   TLevelReaderMesh(const TFilePath &path);
   ~TLevelReaderMesh();
 
-  TImageReaderP getFrameReader(TFrameId fid);
+  TImageReaderP getFrameReader(TFrameId fid) override;
 
 public:
   static TLevelReader *create(const TFilePath &f) {

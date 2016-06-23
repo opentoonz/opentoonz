@@ -1253,7 +1253,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(cellsMenu, MI_Rolldown);
   addMenuItem(cellsMenu, MI_TimeStretch);
   addMenuItem(xsheetMenu, MI_DrawingSubForward);
-	addMenuItem(xsheetMenu, MI_DrawingSubBackward);
+  addMenuItem(xsheetMenu, MI_DrawingSubBackward);
   cellsMenu->addSeparator();
   addMenuItem(cellsMenu, MI_Autorenumber);
   addMenuItem(cellsMenu, MI_Duplicate);

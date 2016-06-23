@@ -23,7 +23,7 @@ public:
   MyQListView(QWidget *parent) : QListView(parent) {}
 
 protected:
-  void rowsInserted(const QModelIndex &parent, int start, int end) {
+  void rowsInserted(const QModelIndex &parent, int start, int end) override {
     QListView::rowsInserted(parent, start, end);
     scrollToBottom();
   }
@@ -37,7 +37,8 @@ class MySortFilterProxyModel : public QSortFilterProxyModel {
 public:
   MySortFilterProxyModel(QObject *parent) : QSortFilterProxyModel(parent) {}
 
-  bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {
+  bool filterAcceptsRow(int sourceRow,
+                        const QModelIndex &sourceParent) const override {
     TMessageViewer *v = dynamic_cast<TMessageViewer *>(parent());
     assert(v);
 

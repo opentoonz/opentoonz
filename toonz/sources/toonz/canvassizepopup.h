@@ -48,7 +48,7 @@ private:
   void createButton(QPushButton **button, PeggingPositions position);
 
 protected:
-  void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
 public slots:
   void on00();
@@ -85,7 +85,7 @@ public:
   CanvasSizePopup();
 
 protected:
-  void showEvent(QShowEvent *e);
+  void showEvent(QShowEvent *e) override;
 
 public slots:
   void onOkBtn();

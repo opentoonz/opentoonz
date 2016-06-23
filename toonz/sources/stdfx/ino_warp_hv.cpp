@@ -77,7 +77,8 @@ public:
       bBox = bBox.enlarge(static_cast<double>(margin));
     }
   }
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (false == this->m_input.isConnected()) {
       bBox = TRectD();
       return false;
@@ -87,23 +88,24 @@ public:
     return ret;
   }
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     TRectD bBox(rect);
     this->get_render_enlarge(frame, info.m_affine, bBox);
     return TRasterFx::memorySize(bBox, info.m_bpp);
   }
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput) {
+                 TRenderSettings &infoOnInput) override {
     rectOnInput = rectOnOutput;
     infoOnInput = infoOnOutput;
     this->get_render_enlarge(frame, infoOnOutput.m_affine, rectOnInput);
   }
-  bool canHandle(const TRenderSettings &info, double frame) {
+  bool canHandle(const TRenderSettings &info, double frame) override {
     // return true;
     return false;
   }
-  void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &rend_sets) override;
 };
 FX_PLUGIN_IDENTIFIER(ino_warp_hv, "inoWarphvFx");
 //--------------------------------------------------------------------

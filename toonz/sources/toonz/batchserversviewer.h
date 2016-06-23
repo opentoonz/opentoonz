@@ -36,7 +36,7 @@ protected slots:
 
 private:
   void openContextMenu(const QPoint &p);
-  void mousePressEvent(QMouseEvent *event);
+  void mousePressEvent(QMouseEvent *event) override;
   std::unique_ptr<QMenu> m_menu;
 };
 

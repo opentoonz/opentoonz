@@ -32,8 +32,8 @@ public:
   ~InfoViewer();
 
 protected:
-  void hideEvent(QHideEvent *);
-  void showEvent(QShowEvent *);
+  void hideEvent(QHideEvent *) override;
+  void showEvent(QShowEvent *) override;
 protected slots:
   void onSliderChanged(bool);
 public slots:

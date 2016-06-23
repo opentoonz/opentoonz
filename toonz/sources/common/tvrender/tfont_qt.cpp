@@ -37,15 +37,6 @@ struct TFont::Impl {
 
   //  KerningPairs m_kerningPairs;
 
-#if 0
-  ATSUStyle m_style;
-  ATSUFontID m_fontId;
-  ATSUTextLayout m_layout;
-  Fixed m_size;
-  int m_ascender;
-  int m_descender;
-#endif
-
   Impl(const QString &family, const QString &style, int size);
   ~Impl();
 

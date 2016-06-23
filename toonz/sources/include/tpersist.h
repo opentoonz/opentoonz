@@ -128,7 +128,7 @@ public:
           This template class is called by the macro PERSIST_DECLARATION(T).
           A class that calls PERSIST_DECLARATION(T) must inherits TPersist.
   */
-  TPersist *create() const { return new T; };
+  TPersist *create() const override { return new T; };
 };
 
 //-------------------------------------------------------------------

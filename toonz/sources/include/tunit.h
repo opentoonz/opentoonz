@@ -38,9 +38,13 @@ class DVAPI TSimpleUnitConverter : public TUnitConverter {
 public:
   TSimpleUnitConverter(double factor = 1, double offset = 0)
       : m_factor(factor), m_offset(offset) {}
-  TUnitConverter *clone() const { return new TSimpleUnitConverter(*this); }
-  double convertTo(double v) const { return v * m_factor + m_offset; }
-  double convertFrom(double v) const { return (v - m_offset) / m_factor; }
+  TUnitConverter *clone() const override {
+    return new TSimpleUnitConverter(*this);
+  }
+  double convertTo(double v) const override { return v * m_factor + m_offset; }
+  double convertFrom(double v) const override {
+    return (v - m_offset) / m_factor;
+  }
 };
 
 //---------------------------

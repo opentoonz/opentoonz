@@ -44,8 +44,8 @@ public:
   TDoubleParamRelayProperty(const TDoubleParamRelayProperty &other);
   TDoubleParamRelayProperty &operator=(const TDoubleParamRelayProperty &other);
 
-  TProperty *clone() const;
-  std::string getValueAsString();
+  TProperty *clone() const override;
+  std::string getValueAsString() override;
 
   void setParam(const TDoubleParamP &param);
   const TDoubleParamP &getParam() const { return m_param; }
@@ -56,9 +56,9 @@ public:
   double frame() const { return m_frame; }
   double &frame() { return m_frame; }
 
-  void accept(TProperty::Visitor &v);
+  void accept(TProperty::Visitor &v) override;
 
-  void onChange(const TParamChange &);
+  void onChange(const TParamChange &) override;
 };
 
 #endif  // TDOUBLEPARAMRELAYPROPERTY_H

@@ -30,8 +30,8 @@ public:
   void showInRowCol(int row, int col);
 
 protected:
-  void focusOutEvent(QFocusEvent *);
-  void keyPressEvent(QKeyEvent *event);
+  void focusOutEvent(QFocusEvent *) override;
+  void keyPressEvent(QKeyEvent *event) override;
 
   void renameCell();
 
@@ -84,7 +84,7 @@ public:
 #endif
   ~CellArea();
 
-  void mouseMoveEvent(QMouseEvent *event);
+  void mouseMoveEvent(QMouseEvent *event) override;
 
   // display upper-directional smart tab only when pressing ctrl key
   void onControlPressed(bool pressed);
@@ -92,17 +92,17 @@ public:
   //	void keyUpDownPressed(int newRow);
 
 protected:
-  void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
-  void mousePressEvent(QMouseEvent *event);
-  void mouseReleaseEvent(QMouseEvent *event);
-  void mouseDoubleClickEvent(QMouseEvent *event);
-  void contextMenuEvent(QContextMenuEvent *event);
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dragLeaveEvent(QDragLeaveEvent *event);
-  void dragMoveEvent(QDragMoveEvent *event);
-  void dropEvent(QDropEvent *event);
-  bool event(QEvent *event);
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void contextMenuEvent(QContextMenuEvent *event) override;
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dragLeaveEvent(QDragLeaveEvent *event) override;
+  void dragMoveEvent(QDragMoveEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
+  bool event(QEvent *event) override;
 
   /*!Crea il menu' del tasto destro che si visualizza quando si clicca sulla
 cella,

@@ -117,7 +117,7 @@ private:
   TTexturesStorage();
   ~TTexturesStorage();
 
-  void onDisplayListDestroyed(int dlSpaceId);
+  void onDisplayListDestroyed(int dlSpaceId) override;
 };
 
 #endif  // DRAWABLEMESHIMAGE_H

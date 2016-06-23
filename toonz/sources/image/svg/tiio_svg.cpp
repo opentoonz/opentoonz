@@ -1771,7 +1771,7 @@ private:
   TImageWriterSvg &operator=(const TImageWriterSvg &src);
 
 public:
-  void save(const TImageP &);
+  void save(const TImageP &) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -1781,7 +1781,8 @@ class TImageReaderSvg : public TImageReader {
 public:
   TImageReaderSvg(const TFilePath &path, TLevelP &level)
       : TImageReader(path), m_level(level) {}
-  virtual TImageP load();
+
+  TImageP load() override;
 };
 
 TImageWriterP TLevelWriterSvg::getFrameWriter(TFrameId fid) {

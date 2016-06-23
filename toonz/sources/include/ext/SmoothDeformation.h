@@ -31,12 +31,12 @@ class DVAPI SmoothDeformation : public StrokeDeformationImpl {
 public:
   virtual ~SmoothDeformation();
 
-  bool check_(const ContextStatus *status);
+  bool check_(const ContextStatus *status) override;
 
-  bool findExtremes_(const ContextStatus *, Interval &);
-  double findActionLength();
+  bool findExtremes_(const ContextStatus *, Interval &) override;
+  double findActionLength() override;
 
-  virtual void draw(Designer *);
+  void draw(Designer *) override;
 
   static SmoothDeformation *instance();
 };

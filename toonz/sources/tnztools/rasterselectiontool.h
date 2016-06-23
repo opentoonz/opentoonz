@@ -25,12 +25,12 @@ public:
   ~RasterFreeDeformer();
 
   /*! Set \b index point to \b p, with index from 0 to 3. */
-  void setPoint(int index, const TPointD &p);
+  void setPoint(int index, const TPointD &p) override;
   /*! Helper function. */
   void setPoints(const TPointD &p0, const TPointD &p1, const TPointD &p2,
-                 const TPointD &p3);
+                 const TPointD &p3) override;
   TRasterP getImage() const { return m_newRas; }
-  void deformImage();
+  void deformImage() override;
   void setNoAntialiasing(bool value) { m_noAntialiasing = value; }
 };
 
@@ -63,12 +63,12 @@ public:
 
   void registerRasterDeformation();
 
-  void undo() const;
-  void redo() const;
+  void undo() const override;
+  void redo() const override;
 
-  int getSize() const;
+  int getSize() const override;
 
-  QString getHistoryString() { return QObject::tr("Deform Raster"); }
+  QString getHistoryString() override { return QObject::tr("Deform Raster"); }
 };
 
 //=============================================================================
@@ -85,12 +85,14 @@ class UndoRasterTransform : public TUndo {
 public:
   UndoRasterTransform(RasterSelectionTool *tool);
   void setChangedValues();
-  void undo() const;
-  void redo() const;
+  void undo() const override;
+  void redo() const override;
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Transform Raster"); }
+  QString getHistoryString() override {
+    return QObject::tr("Transform Raster");
+  }
 };
 
 //=============================================================================
@@ -106,12 +108,12 @@ protected:
   //! It's true when use RasterFreeDeformer
   bool m_isFreeDeformer;
 
-  void applyTransform(FourPoints bbox);
+  void applyTransform(FourPoints bbox) override;
   void applyTransform(TAffine aff, bool modifyCenter);
-  void addTransformUndo();
+  void addTransformUndo() override;
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e){};
-  void draw(){};
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override{};
+  void draw() override{};
 
 public:
   RasterDeformTool(RasterSelectionTool *tool, bool freeDeformer);
@@ -126,9 +128,9 @@ class RasterRotationTool : public RasterDeformTool {
 
 public:
   RasterRotationTool(RasterSelectionTool *tool);
-  void transform(TAffine aff, double angle);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void draw();
+  void transform(TAffine aff, double angle) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void draw() override;
 };
 
 //=============================================================================
@@ -140,7 +142,7 @@ class RasterFreeDeformTool : public RasterDeformTool {
 
 public:
   RasterFreeDeformTool(RasterSelectionTool *tool);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
 };
 
 //=============================================================================
@@ -152,9 +154,9 @@ class RasterMoveSelectionTool : public RasterDeformTool {
 
 public:
   RasterMoveSelectionTool(RasterSelectionTool *tool);
-  void transform(TAffine aff);
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  void transform(TAffine aff) override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
 };
 
 //=============================================================================
@@ -167,9 +169,9 @@ class RasterScaleTool : public RasterDeformTool {
 public:
   RasterScaleTool(RasterSelectionTool *tool, int type);
   /*! Return scale value. */
-  TPointD transform(int index, TPointD newPos);
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
+  TPointD transform(int index, TPointD newPos) override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
 };
 
 }  // namespace DragSelectionTool
@@ -194,53 +196,54 @@ class RasterSelectionTool : public SelectionTool {
   VectorFreeDeformer *m_selectionFreeDeformer;
 
   void modifySelectionOnClick(TImageP image, const TPointD &pos,
-                              const TMouseEvent &e);
+                              const TMouseEvent &e) override;
 
   void drawFloatingSelection();
 
 public:
   RasterSelectionTool(int targetType);
 
-  void setBBox(const DragSelectionTool::FourPoints &points, int index = 0);
+  void setBBox(const DragSelectionTool::FourPoints &points,
+               int index = 0) override;
 
-  void setNewFreeDeformer();
+  void setNewFreeDeformer() override;
   VectorFreeDeformer *getSelectionFreeDeformer() const;
 
-  bool isFloating() const;
+  bool isFloating() const override;
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-  void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) override;
 
-  void draw();
+  void draw() override;
 
-  TSelection *getSelection();
-  bool isSelectionEmpty();
+  TSelection *getSelection() override;
+  bool isSelectionEmpty() override;
 
-  void computeBBox();
+  void computeBBox() override;
 
-  void doOnActivate();
-  void doOnDeactivate();
+  void doOnActivate() override;
+  void doOnDeactivate() override;
 
-  void onImageChanged();
+  void onImageChanged() override;
 
   void transformFloatingSelection(const TAffine &affine, const TPointD &center,
                                   const DragSelectionTool::FourPoints &points);
   void increaseTransformationCount();
   void decreaseTransformationCount();
 
-  void onActivate();
+  void onActivate() override;
   TBoolProperty *getModifySaveboxProperty() {
     if (m_targetType & ToonzImage) return &m_modifySavebox;
     return 0;
   }
-  bool onPropertyChanged(std::string propertyName);
+  bool onPropertyChanged(std::string propertyName) override;
   bool getNoAntialiasingValue() { return m_noAntialiasing.getValue(); }
 
 protected:
-  void updateTranslation();
+  void updateTranslation() override;
 };
 
 #endif  // RASTERSELECTIONTOOL_INCLUDED

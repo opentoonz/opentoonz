@@ -29,7 +29,7 @@ class ServerThread : public QThread {
 public:
   ServerThread(const QString &srvName) : m_srvName(srvName) {}
 
-  void run() {
+  void run() override {
     // Start a local server receiving connections on the specified key
     tipc::Server server;
     mov_io::addParsers(&server);

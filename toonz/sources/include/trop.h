@@ -37,7 +37,7 @@ public:
   TRopException(const std::string &s) : message(s) {}
   ~TRopException() {}
 
-  TString getMessage() const;
+  TString getMessage() const override;
 };
 
 //********************************************************************************

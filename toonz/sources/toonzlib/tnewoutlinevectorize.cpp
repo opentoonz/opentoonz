@@ -343,10 +343,10 @@ public:
 
   void openContainer(const TPoint &pos, const TPoint &dir,
                      const pixel_type &innerColor,
-                     const pixel_type &outerColor);
+                     const pixel_type &outerColor) override;
   void addElement(const TPoint &pos, const TPoint &dir,
-                  const pixel_type &outerColor);
-  void closeContainer();
+                  const pixel_type &outerColor) override;
+  void closeContainer() override;
 
   int surroundingEdges();
 

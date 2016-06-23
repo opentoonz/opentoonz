@@ -118,13 +118,13 @@ public slots:
 
   // const QList<Item*> &getItemsToDelete() const {return m_itemsToDelete;}
 
-  Qt::ItemFlags flags(const QModelIndex &index) const;
+  Qt::ItemFlags flags(const QModelIndex &index) const override;
   QModelIndex index(int row, int column,
-                    const QModelIndex &parent = QModelIndex()) const;
-  QModelIndex parent(const QModelIndex &index) const;
-  int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  int columnCount(const QModelIndex &parent = QModelIndex()) const;
-  QVariant data(const QModelIndex &index, int role) const;
+                    const QModelIndex &parent = QModelIndex()) const override;
+  QModelIndex parent(const QModelIndex &index) const override;
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+  QVariant data(const QModelIndex &index, int role) const override;
 
   void setRowHidden(int row, const QModelIndex &parent, bool hide);
 
@@ -166,11 +166,11 @@ friend Delegate;
 
   // virtual void onClick(TreeModel::Item *item, const QPoint &pos, const
   // QStyleOptionViewItem &option) {}
-  void mouseDoubleClickEvent(QMouseEvent *);
-  void mousePressEvent(QMouseEvent *);
-  void mouseReleaseEvent(QMouseEvent *);
-  void mouseMoveEvent(QMouseEvent *);
-  void resizeEvent(QResizeEvent *);
+  void mouseDoubleClickEvent(QMouseEvent *) override;
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void resizeEvent(QResizeEvent *) override;
 
   void setModel(TreeModel *model);
 

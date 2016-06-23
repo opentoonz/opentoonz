@@ -85,8 +85,8 @@ reimplementation of the TPersist::loadData() function.
   TIStream &operator>>(
       TPersist &v);  //!< Reads a TPersist derived object data from the stream.
   TIStream &operator>>(TPersist *&v);  //!< \a Allocates and reads a TPersist
-                                       //!derived object data from the stream.
-                                       //!  \sa operator>>(TPersist&)
+                                       //! derived object data from the stream.
+  //!  \sa operator>>(TPersist&)
 
   //!  \deprecated
   std::string
@@ -94,8 +94,8 @@ reimplementation of the TPersist::loadData() function.
 
   //!  \deprecated
   bool eos();  //!< \brief Returns \e true in case of end of string (a
-               //!StreamTag::EndTag
-               //!  is encountered or the string is empty).
+               //! StreamTag::EndTag
+  //!  is encountered or the string is empty).
 
   /*!
 \param      tagName Output name of a matched tag.
@@ -120,7 +120,7 @@ reimplementation of the TPersist::loadData() function.
                    int &value);  //!< \sa getTagParam(string, string&)
 
   bool isBeginEndTag();  //!< Returns whether current tag is of type
-                         //!StreamTag::BeginEndTag.
+                         //! StreamTag::BeginEndTag.
 
   bool openChild(
       std::string &tagName);  //!< \deprecated Use matchTag(string&) instead.
@@ -133,7 +133,7 @@ reimplementation of the TPersist::loadData() function.
   //!  TOStream::openChild(string, const map<std::string, string>&).
 
   TFilePath getFilePath();  //!< Returns the stream's path (i.e. the opened
-                            //!filename associated to the input stream).
+                            //! filename associated to the input stream).
   TFilePath getRepositoryPath();  //!< \deprecated
 
   int getLine()
@@ -145,15 +145,15 @@ reimplementation of the TPersist::loadData() function.
               //!  \sa setVersion()
 
   void setVersion(const VersionNumber &version);  //!< Returns the currently
-                                                  //!stored version of the
-                                                  //!opened document.
-                                                  //!  \sa setVersion()
+                                                  //! stored version of the
+  //! opened document.
+  //!  \sa setVersion()
   /*!
 \note After skipping the tag content, the stream is positioned immediately
     after the end tag.
 */
   void skipCurrentTag();  //!< Silently ignores the content of currently opened
-                          //!tag up to its end.
+                          //! tag up to its end.
 
 private:
   // Not copyable
@@ -234,7 +234,7 @@ public:
   TOStream child(std::string tagName);
 
   void openChild(std::string tagName);  //!< Writes a <tagName> to the stream,
-                                        //!opening a tag.
+                                        //! opening a tag.
   void openChild(
       std::string tagName,
       const std::map<std::string, std::string>
@@ -243,19 +243,19 @@ public:
   void openCloseChild(std::string tagName,
                       const std::map<std::string, std::string>
                           &attributes);  //!< \brief Writes a tag <tagName
-                                         //!attribute1="value1" ../>
+                                         //! attribute1="value1" ../>
   //!  to the stream, opening a tag with embedded attributes
   //!  which is immediately closed.
 
   void closeChild();  //!< Closes current tag, writing </currentTagName> to the
-                      //!stream.
+                      //! stream.
 
   void cr();  //!< Writes carriage return to the stream. \deprecated
 
   void tab(int dt);  //!< \deprecated
 
   TFilePath getFilePath();  //!< Returns the file path of the file associated to
-                            //!this output stream.
+                            //! this output stream.
   TFilePath getRepositoryPath();  //!< \deprecated
 
   /*! \detail

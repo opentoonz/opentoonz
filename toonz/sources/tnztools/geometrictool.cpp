@@ -189,16 +189,16 @@ public:
 
   ~MultilinePrimitiveUndo() {}
 
-  void undo() const;
-  void redo() const;
+  void undo() const override;
+  void redo() const override;
   void setNewVertex(const std::vector<TPointD> &vertex) {
     m_newVertex = vertex;
   }
 
-  int getSize() const { return sizeof(this); }
+  int getSize() const override { return sizeof(this); }
 
   QString getToolName();
-  int getHistoryType() { return HistoryType::GeometricTool; }
+  int getHistoryType() override { return HistoryType::GeometricTool; }
 };
 
 //-----------------------------------------------------------------------------
@@ -227,7 +227,7 @@ public:
 
   ~FullColorBluredPrimitiveUndo() {}
 
-  void redo() const {
+  void redo() const override {
     insertLevelAndFrameIfNeeded();
     TRasterImageP ri = getImage();
     if (!ri) return;
@@ -236,7 +236,9 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const { return UndoFullColorPencil::getSize() + sizeof(this); }
+  int getSize() const override {
+    return UndoFullColorPencil::getSize() + sizeof(this);
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -267,7 +269,7 @@ public:
 
   ~CMBluredPrimitiveUndo() {}
 
-  void redo() const {
+  void redo() const override {
     insertLevelAndFrameIfNeeded();
     TToonzImageP ti = getImage();
     if (!ti) return;
@@ -276,7 +278,9 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const { return UndoRasterPencil::getSize() + sizeof(this); }
+  int getSize() const override {
+    return UndoRasterPencil::getSize() + sizeof(this);
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -441,17 +445,17 @@ public:
                      bool reasterTool)
       : Primitive(param, tool, reasterTool) {}
 
-  virtual std::string getName() const {
+  std::string getName() const override {
     return "Rectangle";
   }  // W_ToolOptions_ShapeRect"; }
 
-  TStroke *makeStroke() const;
-  void draw();
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-  void leftButtonDrag(const TPointD &realPos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
-  void onEnter();
+  TStroke *makeStroke() const override;
+  void draw() override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &realPos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  void onEnter() override;
 };
 
 //=============================================================================
@@ -468,17 +472,17 @@ public:
   CirclePrimitive(PrimitiveParam *param, GeometricTool *tool, bool reasterTool)
       : Primitive(param, tool, reasterTool) {}
 
-  virtual std::string getName() const {
+  std::string getName() const override {
     return "Circle";
   }  // W_ToolOptions_ShapeCircle";}
 
-  void draw();
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  TStroke *makeStroke() const;
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
-  void onEnter();
+  void draw() override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  TStroke *makeStroke() const override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  void onEnter() override;
 };
 
 //=============================================================================
@@ -508,29 +512,29 @@ public:
       , m_beforeSpeedMoved(false)
       , m_ctrlDown(false) {}
 
-  virtual std::string getName() const {
+  std::string getName() const override {
     return "Polyline";
   }  // W_ToolOptions_ShapePolyline";}
 
   void addVertex(const TPointD &pos);
   void moveSpeed(const TPointD &delta);
-  virtual void draw();
-  virtual void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  virtual void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
-  bool keyDown(int key, const TPoint &point);
-  TStroke *makeStroke() const;
+  void draw() override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  bool keyDown(int key, const TPoint &point) override;
+  TStroke *makeStroke() const override;
   void endLine();
-  void onActivate();
-  void onDeactivate() {
+  void onActivate() override;
+  void onDeactivate() override {
     m_vertex.clear();
     m_speedMoved       = false;
     m_beforeSpeedMoved = false;
   }
-  void onEnter();
-  void onImageChanged();
+  void onEnter() override;
+  void onImageChanged() override;
   void setVertexes(const std::vector<TPointD> &vertex) { m_vertex = vertex; };
   void setSpeedMoved(bool speedMoved) { m_speedMoved = speedMoved; };
 };
@@ -573,15 +577,15 @@ public:
     m_isSingleLine = true;
   }
 
-  std::string getName() const {
+  std::string getName() const override {
     return "Line";
   }  // W_ToolOptions_ShapePolyline";}
 
-  void draw();
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) {}
+  void draw() override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDoubleClick(const TPointD &, const TMouseEvent &e) override {}
 };
 
 //=============================================================================
@@ -598,17 +602,17 @@ public:
   EllipsePrimitive(PrimitiveParam *param, GeometricTool *tool, bool reasterTool)
       : Primitive(param, tool, reasterTool) {}
 
-  virtual std::string getName() const {
+  std::string getName() const override {
     return "Ellipse";
   }  // W_ToolOptions_ShapeEllipse";}
 
-  void draw();
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-  void leftButtonDrag(const TPointD &realPos, const TMouseEvent &e);
-  TStroke *makeStroke() const;
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
-  void onEnter();
+  void draw() override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &realPos, const TMouseEvent &e) override;
+  TStroke *makeStroke() const override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  void onEnter() override;
 };
 
 //=============================================================================
@@ -629,15 +633,15 @@ public:
     if (m_stroke) delete m_stroke;
   }
 
-  virtual std::string getName() const {
+  std::string getName() const override {
     return "Arc";
   }  // _ToolOptions_ShapeArc";}
 
-  TStroke *makeStroke() const;
-  void draw();
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
-  void onEnter();
+  TStroke *makeStroke() const override;
+  void draw() override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  void onEnter() override;
 };
 
 //=============================================================================
@@ -653,15 +657,15 @@ public:
   PolygonPrimitive(PrimitiveParam *param, GeometricTool *tool, bool reasterTool)
       : Primitive(param, tool, reasterTool) {}
 
-  virtual std::string getName() const {
+  std::string getName() const override {
     return "Polygon";
   }  // W_ToolOptions_ShapePolygon";}
 
-  TStroke *makeStroke() const;
-  void draw();
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
+  TStroke *makeStroke() const override;
+  void draw() override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
 };
 
 //=============================================================================
@@ -712,9 +716,9 @@ public:
       delete it->second;
   }
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
-  void updateTranslation() { m_param.updateTranslation(); }
+  void updateTranslation() override { m_param.updateTranslation(); }
 
   void addPrimitive(Primitive *p) {
     // TODO: aggiungere il controllo per evitare nomi ripetuti
@@ -731,7 +735,7 @@ public:
     if (it != m_primitiveTable.end()) m_primitive = it->second;
   }
 
-  void leftButtonDown(const TPointD &p, const TMouseEvent &e) {
+  void leftButtonDown(const TPointD &p, const TMouseEvent &e) override {
     /* m_active = getApplication()->getCurrentObject()->isSpline() ||
    (bool) getImage(true);*/
 
@@ -742,41 +746,41 @@ public:
     if (m_primitive) m_primitive->leftButtonDown(p, e);
     invalidate();
   }
-  void leftButtonDrag(const TPointD &p, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &p, const TMouseEvent &e) override {
     if (!m_active) return;
     if (m_primitive) m_primitive->leftButtonDrag(p, e);
     invalidate();
   }
-  void leftButtonUp(const TPointD &p, const TMouseEvent &e) {
+  void leftButtonUp(const TPointD &p, const TMouseEvent &e) override {
     if (!m_active) return;
     if (m_primitive) m_primitive->leftButtonUp(p, e);
     invalidate();
   }
-  void leftButtonDoubleClick(const TPointD &p, const TMouseEvent &e) {
+  void leftButtonDoubleClick(const TPointD &p, const TMouseEvent &e) override {
     if (!m_active) return;
     if (m_primitive) m_primitive->leftButtonDoubleClick(p, e);
     invalidate();
   }
 
-  bool keyDown(int key, TUINT32 b, const TPoint &point) {
+  bool keyDown(int key, TUINT32 b, const TPoint &point) override {
     return m_primitive->keyDown(key, point);
   }
 
-  void onImageChanged() {
+  void onImageChanged() override {
     if (m_primitive) m_primitive->onImageChanged();
     invalidate();
   }
 
-  void rightButtonDown(const TPointD &p, const TMouseEvent &e) {
+  void rightButtonDown(const TPointD &p, const TMouseEvent &e) override {
     if (m_primitive) m_primitive->rightButtonDown(p, e);
     invalidate();
   }
 
-  void mouseMove(const TPointD &p, const TMouseEvent &e) {
+  void mouseMove(const TPointD &p, const TMouseEvent &e) override {
     if (m_primitive) m_primitive->mouseMove(p, e);
   }
 
-  void onActivate() {
+  void onActivate() override {
     if (m_firstTime) {
       m_param.m_toolSize.setValue(GeometricSize);
       m_param.m_rasterToolSize.setValue(GeometricRasterSize);
@@ -806,26 +810,28 @@ public:
     if (m_primitive) m_primitive->onActivate();
   }
 
-  void onDeactivate() {
+  void onDeactivate() override {
     if (m_primitive) m_primitive->onDeactivate();
   }
 
-  void onEnter() {
+  void onEnter() override {
     m_active = getImage(false) != 0;
     if (m_active && m_primitive) m_primitive->onEnter();
   }
 
-  void draw() {
+  void draw() override {
     if (m_primitive) m_primitive->draw();
   }
 
-  int getCursorId() const { return ToolCursor::PenCursor; }
+  int getCursorId() const override { return ToolCursor::PenCursor; }
 
   int getColorClass() const { return 1; }
 
-  TPropertyGroup *getProperties(int idx) { return &m_param.m_prop[idx]; }
+  TPropertyGroup *getProperties(int idx) override {
+    return &m_param.m_prop[idx];
+  }
 
-  bool onPropertyChanged(std::string propertyName) {
+  bool onPropertyChanged(std::string propertyName) override {
     /*---	変更されたPropertyごとに処理を分ける。
             注意：m_toolSizeとm_rasterToolSizeは同じName(="Size:")なので、
             扱っている画像がラスタかどうかで区別する ---*/

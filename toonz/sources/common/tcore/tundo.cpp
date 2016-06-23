@@ -30,7 +30,7 @@ public:
     m_undos.clear();
   }
 
-  int getSize() const {
+  int getSize() const override {
     int size = sizeof(*this);
     for (Iterator cit = m_undos.begin(); cit != m_undos.end(); ++cit)
       size += (*cit)->getSize();
@@ -44,7 +44,7 @@ public:
     m_undos[0]->m_isLastInBlock   = true;
   }
 
-  void undo() const {
+  void undo() const override {
     assert(!m_deleted);
     assert(!m_undoing);
     m_undoing = true;
@@ -54,7 +54,7 @@ public:
     // for_each(m_undos.begin(), m_undos.end(), callUndo);
     m_undoing = false;
   }
-  void redo() const {
+  void redo() const override {
     assert(!m_deleted);
     // VERSIONE CORRETTA
     for_each(m_undos.begin(), m_undos.end(), callRedo);
@@ -65,7 +65,7 @@ public:
   // void repeat() const {
   //  for_each(m_undos.begin(), m_undos.end(), callRepeat);
   //}
-  void onAdd() {}
+  void onAdd() override {}
   void add(TUndo *undo) {
     undo->m_isLastInBlock = true;
     m_undos.push_back(undo);
@@ -82,7 +82,7 @@ public:
     }
   }
 
-  virtual QString getHistoryString() {
+  QString getHistoryString() override {
     if (m_undos.empty())
       return TUndo::getHistoryString();
     else if ((int)m_undos.size() == 1)
@@ -92,7 +92,7 @@ public:
     }
   }
 
-  virtual int getHistoryType() {
+  int getHistoryType() override {
     if (m_undos.empty())
       return TUndo::getHistoryType();
     else

@@ -99,9 +99,9 @@ public:
 
   TRectD getEditingCameraInterestStageRect() const;
 
-  bool mousePressEvent(SceneViewer *viewer, QMouseEvent *event);
-  bool mouseMoveEvent(SceneViewer *viewer, QMouseEvent *event);
-  bool mouseReleaseEvent(SceneViewer *viewer, QMouseEvent *event);
+  bool mousePressEvent(SceneViewer *viewer, QMouseEvent *event) override;
+  bool mouseMoveEvent(SceneViewer *viewer, QMouseEvent *event) override;
+  bool mouseReleaseEvent(SceneViewer *viewer, QMouseEvent *event) override;
 
   void deleteSubCamera(SceneViewer *viewer);
 

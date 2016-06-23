@@ -169,7 +169,7 @@ void MatrixRmn::SetSequence(const VectorRn &d, long startRow, long startCol,
 // The matrix A is loaded, in into "this" matrix, based at (0,0).
 //  The size of "this" matrix must be large enough to accomodate A.
 //	The rest of "this" matrix is left unchanged.  It is not filled with
-//zeroes!
+// zeroes!
 
 void MatrixRmn::LoadAsSubmatrix(const MatrixRmn &A) {
   assert(A.NumRows <= NumRows && A.NumCols <= NumCols);
@@ -190,7 +190,7 @@ void MatrixRmn::LoadAsSubmatrix(const MatrixRmn &A) {
 // (0,0).
 //  The size of "this" matrix must be large enough to accomodate A.
 //	The rest of "this" matrix is left unchanged.  It is not filled with
-//zeroes!
+// zeroes!
 void MatrixRmn::LoadAsSubmatrixTranspose(const MatrixRmn &A) {
   assert(A.NumRows <= NumCols && A.NumCols <= NumRows);
   double *rowPtr = x;
@@ -532,8 +532,9 @@ void MatrixRmn::PostApplyGivens(double c, double s, long idx1, long idx2) {
 //     (this) = U * Diag(w) * V^T     (V^T is V-transpose.)
 // Diagonal entries have all non-zero entries before all zero entries, but are
 // not
-//		necessarily sorted.  (Someday, I will write ComputedSortedSVD that
-//handles
+//		necessarily sorted.  (Someday, I will write ComputedSortedSVD
+//that
+// handles
 //		sorting the eigenvalues by magnitude.)
 // ********************************************************************************************
 void MatrixRmn::ComputeSVD(MatrixRmn &U, VectorRn &w, MatrixRmn &V) const {
@@ -710,13 +711,14 @@ void MatrixRmn::SvdHouseholder(double *basePt, long colLength, long numCols,
 //   numXforms = number of Householder transformations to concatenate
 //		Each Householder transformation is represented by a unit vector
 //		Each successive Householder transformation starts one position
-//later
+// later
 //			and has one more implied leading zero
 //	 basePt = beginning of the first Householder transform
 //	 colStride, rowStride: Householder xforms are stored in "columns"
 //   numZerosSkipped is the number of implicit zeros on the front each
-//			Householder transformation vector (only values supported are
-//0 and 1).
+//			Householder transformation vector (only values supported
+//are
+// 0 and 1).
 void MatrixRmn::ExpandHouseholders(long numXforms, int numZerosSkipped,
                                    const double *basePt, long colStride,
                                    long rowStride) {

@@ -573,7 +573,7 @@ TFilePath TSystem::getHomeDirectory() {
 TFilePath TSystem::getTempDir() {
 #ifdef WIN32
   // gestire eccezioni se dw==0
-  DWORD dw = GetTempPath(0, 0);  // non include il terminatore
+  DWORD dw   = GetTempPath(0, 0);  // non include il terminatore
   char *path = new char[dw + 1];
   GetTempPath(dw, path);
   TFilePath tempDir(path);

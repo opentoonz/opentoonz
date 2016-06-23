@@ -193,7 +193,7 @@ public:
   Worker();
   ~Worker();
 
-  void run();
+  void run() override;
 
   inline void takeTask();
   inline bool canAdopt(const RunnableP &task);

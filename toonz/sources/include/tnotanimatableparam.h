@@ -62,9 +62,9 @@ public:
   TNotAnimatableParamChangeUndo(TParam *param, const T &oldValue,
                                 const T &newValue);
   ~TNotAnimatableParamChangeUndo();
-  void undo() const;
-  void redo() const;
-  int getSize() const;
+  void undo() const override;
+  void redo() const override;
+  int getSize() const override;
 
 private:
   TParam *m_param;
@@ -80,7 +80,8 @@ template <class T>
 class TNotAnimatableParamObserver : public TParamObserver {
 public:
   TNotAnimatableParamObserver() {}
-  virtual void onChange(const TParamChange &) = 0;
+
+  void onChange(const TParamChange &) override = 0;
   void onChange(const TNotAnimatableParamChange<T> &change) {
     onChange(static_cast<const TParamChange &>(change));
   }
@@ -130,7 +131,7 @@ public:
   }
 
   void setDefaultValue(T value) { m_defaultValue = value; }
-  void copy(TParam *src) {
+  void copy(TParam *src) override {
     TNotAnimatableParam<T> *p = dynamic_cast<TNotAnimatableParam<T> *>(src);
     if (!p) throw TException("invalid source for copy");
     setName(src->getName());
@@ -140,7 +141,7 @@ public:
 
   void reset(bool undoing = false) { setValue(m_defaultValue, undoing); }
 
-  void addObserver(TParamObserver *observer) {
+  void addObserver(TParamObserver *observer) override {
     TNotAnimatableParamObserver<T> *obs =
         dynamic_cast<TNotAnimatableParamObserver<T> *>(observer);
     if (obs)
@@ -148,7 +149,7 @@ public:
     else
       m_paramObservers.insert(observer);
   }
-  void removeObserver(TParamObserver *observer) {
+  void removeObserver(TParamObserver *observer) override {
     TNotAnimatableParamObserver<T> *obs =
         dynamic_cast<TNotAnimatableParamObserver<T> *>(observer);
     if (obs)
@@ -157,20 +158,21 @@ public:
       m_paramObservers.erase(observer);
   }
 
-  bool isAnimatable() const { return false; }
-  bool isKeyframe(double) const { return false; }
-  void deleteKeyframe(double) {}
-  void clearKeyframes() {}
-  void assignKeyframe(double, const TSmartPointerT<TParam> &, double, bool) {}
+  bool isAnimatable() const override { return false; }
+  bool isKeyframe(double) const override { return false; }
+  void deleteKeyframe(double) override {}
+  void clearKeyframes() override {}
+  void assignKeyframe(double, const TSmartPointerT<TParam> &, double,
+                      bool) override {}
 
-  std::string getValueAlias(double, int) {
+  std::string getValueAlias(double, int) override {
     using namespace std;
     return to_string(getValue());
   }
-  bool hasKeyframes() const { return 0; };
-  void getKeyframes(std::set<double> &) const {};
-  int getNextKeyframe(double) const { return -1; };
-  int getPrevKeyframe(double) const { return -1; };
+  bool hasKeyframes() const override { return 0; };
+  void getKeyframes(std::set<double> &) const override{};
+  int getNextKeyframe(double) const override { return -1; };
+  int getPrevKeyframe(double) const override { return -1; };
 };
 
 //=========================================================
@@ -197,9 +199,9 @@ public:
       , maxValue((std::numeric_limits<int>::max)())
       , m_isWheelEnabled(false) {}
   TIntParam(const TIntParam &src) : TNotAnimatableParam<int>(src) {}
-  TParam *clone() const { return new TIntParam(*this); }
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  TParam *clone() const override { return new TIntParam(*this); }
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
   void enableWheel(bool on);
 
   bool isWheelEnabled() const;
@@ -228,10 +230,10 @@ public:
   TBoolParam(bool v = bool()) : TNotAnimatableParam<bool>(v) {}
   TBoolParam(const TBoolParam &src) : TNotAnimatableParam<bool>(src) {}
 
-  TParam *clone() const { return new TBoolParam(*this); }
+  TParam *clone() const override { return new TBoolParam(*this); }
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 };
 
 DEFINE_PARAM_SMARTPOINTER(TBoolParam, bool)
@@ -256,9 +258,9 @@ public:
       : TNotAnimatableParam<TFilePath>(v) {}
   TFilePathParam(const TFilePathParam &src)
       : TNotAnimatableParam<TFilePath>(src) {}
-  TParam *clone() const { return new TFilePathParam(*this); }
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  TParam *clone() const override { return new TFilePathParam(*this); }
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 };
 
 DEFINE_PARAM_SMARTPOINTER(TFilePathParam, TFilePath)
@@ -282,9 +284,9 @@ public:
   TStringParam(std::wstring v = L"") : TNotAnimatableParam<std::wstring>(v) {}
   TStringParam(const TStringParam &src)
       : TNotAnimatableParam<std::wstring>(src) {}
-  TParam *clone() const { return new TStringParam(*this); }
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  TParam *clone() const override { return new TStringParam(*this); }
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 };
 
 DEFINE_PARAM_SMARTPOINTER(TStringParam, std::wstring)
@@ -308,8 +310,8 @@ public:
   TEnumParam(const TEnumParam &src);
   ~TEnumParam();
 
-  TParam *clone() const { return new TEnumParam(*this); }
-  void copy(TParam *src);
+  TParam *clone() const override { return new TEnumParam(*this); }
+  void copy(TParam *src) override;
 
   void setValue(int v, bool undoing = false);
   void setValue(const std::string &caption, bool undoing = false);
@@ -320,8 +322,8 @@ public:
   void getItem(int i, int &item, std::string &caption) const;
 
   // TPersist methods
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 
 private:
   std::unique_ptr<TEnumParamImp> m_imp;
@@ -366,7 +368,7 @@ public:
       : TNotAnimatableParam<double>(v), m_min(0.), m_max(100.) {}
   TNADoubleParam(const TNADoubleParam &src)
       : TNotAnimatableParam<double>(src) {}
-  TParam *clone() const { return new TNADoubleParam(*this); }
+  TParam *clone() const override { return new TNADoubleParam(*this); }
   void setValueRange(double min, double max) {
     m_min = min;
     m_max = max;
@@ -382,8 +384,8 @@ public:
     return min < max;
   }
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 
 private:
   double m_min, m_max;

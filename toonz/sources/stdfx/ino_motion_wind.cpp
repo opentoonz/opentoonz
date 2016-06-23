@@ -126,7 +126,8 @@ public:
     this->m_ref_mode->addItem(4, "Luminance");
     this->m_ref_mode->addItem(-1, "Nothing");
   }
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (this->m_input.isConnected()) {
       const bool ret = this->m_input->doGetBBox(frame, bBox, info);
       // if ( this->m_spread->getValue() ) {
@@ -144,12 +145,12 @@ public:
       return false;
     }
   }
-  bool canHandle(const TRenderSettings &info, double frame) {
+  bool canHandle(const TRenderSettings &info, double frame) override {
     // return true;
     return false;
   }
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     const double mm2scale_shrink_pixel =
         ino::pixel_per_mm() * sqrt(fabs(info.m_affine.det())) /
         ((info.m_shrinkX + info.m_shrinkY) / 2.0);
@@ -161,7 +162,8 @@ public:
         (int)(ceil((length_min < length_max) ? length_max : length_min) + 0.5);
     return TRasterFx::memorySize(rect.enlarge(enlarge_pixel), info.m_bpp);
   }
-  void doCompute(TTile &tile, double frame, const TRenderSettings &rend_sets);
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &rend_sets) override;
 };
 FX_PLUGIN_IDENTIFIER(ino_motion_wind, "inoMotionWindFx");
 //------------------------------------------------------------

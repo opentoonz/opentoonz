@@ -46,11 +46,11 @@ public:
   TSpectrumParam(const TSpectrumParam &);
   ~TSpectrumParam();
 
-  TParam *clone() const { return new TSpectrumParam(*this); }
-  void copy(TParam *src);
+  TParam *clone() const override { return new TSpectrumParam(*this); }
+  void copy(TParam *src) override;
 
-  void addObserver(TParamObserver *);
-  void removeObserver(TParamObserver *);
+  void addObserver(TParamObserver *) override;
+  void removeObserver(TParamObserver *) override;
 
   TSpectrum getValue(double frame) const;
   TSpectrum64 getValue64(double frame) const;
@@ -69,28 +69,28 @@ public:
   void addKey(double s, const TPixel32 &color);
   void removeKey(int index);
 
-  bool isAnimatable() const { return true; }
-  bool isKeyframe(double frame) const;
-  void deleteKeyframe(double frame);
-  void clearKeyframes();
+  bool isAnimatable() const override { return true; }
+  bool isKeyframe(double frame) const override;
+  void deleteKeyframe(double frame) override;
+  void clearKeyframes() override;
   void assignKeyframe(double frame, const TSmartPointerT<TParam> &src,
-                      double srcFrame, bool changedOnly = false);
+                      double srcFrame, bool changedOnly = false) override;
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 
   void enableDragging(bool on);
-  void enableNotification(bool on);
-  bool isNotificationEnabled() const;
+  void enableNotification(bool on) override;
+  bool isNotificationEnabled() const override;
   void enableMatte(bool on);
 
   bool isMatteEnabled() const;
-  std::string getValueAlias(double frame, int precision);
-  bool hasKeyframes() const;
-  void getKeyframes(std::set<double> &frames) const;
-  int getNextKeyframe(double frame) const;
-  int getPrevKeyframe(double frame) const;
-  double keyframeIndexToFrame(int index) const;
+  std::string getValueAlias(double frame, int precision) override;
+  bool hasKeyframes() const override;
+  void getKeyframes(std::set<double> &frames) const override;
+  int getNextKeyframe(double frame) const override;
+  int getPrevKeyframe(double frame) const override;
+  double keyframeIndexToFrame(int index) const override;
 };
 
 #ifdef _WIN32

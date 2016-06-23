@@ -10,11 +10,11 @@ class TLevelReaderPsd : public TLevelReader {
 public:
   TLevelReaderPsd(const TFilePath &path);
   ~TLevelReaderPsd();
-  TImageReaderP getFrameReader(TFrameId fid);
-  TLevelP loadInfo();
+  TImageReaderP getFrameReader(TFrameId fid) override;
+  TLevelP loadInfo() override;
 
-  const TImageInfo *getImageInfo(TFrameId fid) { return m_info; }
-  const TImageInfo *getImageInfo() { return m_info; }
+  const TImageInfo *getImageInfo(TFrameId fid) override { return m_info; }
+  const TImageInfo *getImageInfo() override { return m_info; }
 
   void load(TRasterImageP &rasP, int shrinkX = 1, int shrinkY = 1,
             TRect region = TRect());
@@ -40,7 +40,7 @@ class TLevelWriterPsd : public TLevelWriter {
 public:
   TLevelWriterPsd(const TFilePath &path, TPropertyGroup *winfo);
   ~TLevelWriterPsd();
-  TImageWriterP getFrameWriter(TFrameId fid);
+  TImageWriterP getFrameWriter(TFrameId fid) override;
 
   void save(const TImageP &img, int layerId);
 

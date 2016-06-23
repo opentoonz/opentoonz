@@ -108,7 +108,7 @@ class PluginSetupMessage : public TThread::Message {
 public:
   PluginSetupMessage(PluginInformation *pi) : pi_(pi) {}
 
-  void onDeliver() {
+  void onDeliver() override {
     RasterFxPluginHost *fx = new RasterFxPluginHost(pi_);
     if (pi_ && pi_->handler_) {
       pi_->handler_->setup(fx);
@@ -121,7 +121,9 @@ public:
     delete fx;
   }
 
-  TThread::Message *clone() const { return new PluginSetupMessage(*this); }
+  TThread::Message *clone() const override {
+    return new PluginSetupMessage(*this);
+  }
 };
 
 PluginInformation::~PluginInformation() {
@@ -419,11 +421,11 @@ TFx *RasterFxPluginHost::clone(bool recursive) const {
   for (auto &ip : pi_->port_mapper_) {
     if (ip.second.input_) {
 #if 0
-			/* addInputPort() 内で行われる port owner の更新は後勝ちだが,
-			   clone された新しいインスタンスのほうが先に消えてしまう場合に, 無効なポインタを示す owner が port に残ってしまう. この問題が解決したら共有できるようにしたい.
-			   (このため、 plugin 空間に通知される全ての handle には一貫性がない. ただし、後から一貫性がなくなるよりは遥かにいいだろう)
-			*/
-			plugin->addInputPort(getInputPortName(i), ip);
+      /* addInputPort() 内で行われる port owner の更新は後勝ちだが,
+         clone された新しいインスタンスのほうが先に消えてしまう場合に, 無効なポインタを示す owner が port に残ってしまう. この問題が解決したら共有できるようにしたい.
+         (このため、 plugin 空間に通知される全ての handle には一貫性がない. ただし、後から一貫性がなくなるよりは遥かにいいだろう)
+      */
+      plugin->addInputPort(getInputPortName(i), ip);
 #else
       plugin->addInputPort(ip.first,
                            std::shared_ptr<TFxPort>(new TRasterFxPort));

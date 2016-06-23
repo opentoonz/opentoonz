@@ -54,30 +54,35 @@ public:
 public:
   // Low-level TRasterFx-related functions
 
-  int dynamicPortGroupsCount() const { return 1; }
-  const TFxPortDG *dynamicPortGroup(int g) const {
+  int dynamicPortGroupsCount() const override { return 1; }
+  const TFxPortDG *dynamicPortGroup(int g) const override {
     return (g == 0) ? &m_group : 0;
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     // At max the memory of another tile with the same infos may be allocated
     // apart from
     // the externally supplied one.
     return TRasterFx::memorySize(rect, info.m_bpp);
   }
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info);
-  void doCompute(TTile &tile, double frame, const TRenderSettings &info);
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override;
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &info) override;
 
   void compatibilityTranslatePort(int majorVersion, int minorVersion,
-                                  std::string &portName);
+                                  std::string &portName) override;
 
-  int getPreferredInputPort() { return 1; }
+  int getPreferredInputPort() override { return 1; }
 };
 
 //******************************************************************************************
@@ -253,7 +258,8 @@ class OverFx : public TImageCombinationFx {
 public:
   OverFx() { setName(L"OverFx"); }
 
-  void process(const TRasterP &up, const TRasterP &down, double frame) {
+  void process(const TRasterP &up, const TRasterP &down,
+               double frame) override {
     TRop::over(down, up);
   }
 };
@@ -268,7 +274,8 @@ class AddFx : public TImageCombinationFx {
 public:
   AddFx() : m_value(100.0) { bindParam(this, "value", m_value); }
 
-  void process(const TRasterP &up, const TRasterP &down, double frame) {
+  void process(const TRasterP &up, const TRasterP &down,
+               double frame) override {
     double value = m_value->getValue(frame) / 100.0;
 
     if (value != 1.0)
@@ -277,7 +284,7 @@ public:
       TRop::add(up, down, down);
   }
 
-  TFxPort *getXsheetPort() const { return getInputPort(1); }
+  TFxPort *getXsheetPort() const override { return getInputPort(1); }
 };
 
 //==================================================================
@@ -286,11 +293,12 @@ class ColorDodgeFx : public TImageCombinationFx {
   FX_DECLARATION(AddFx)
 
 public:
-  void process(const TRasterP &up, const TRasterP &down, double frame) {
+  void process(const TRasterP &up, const TRasterP &down,
+               double frame) override {
     TRop::colordodge(up, down, down);
   }
 
-  TFxPort *getXsheetPort() const { return getInputPort(1); }
+  TFxPort *getXsheetPort() const override { return getInputPort(1); }
 };
 
 //==================================================================
@@ -299,11 +307,12 @@ class ColorBurnFx : public TImageCombinationFx {
   FX_DECLARATION(AddFx)
 
 public:
-  void process(const TRasterP &up, const TRasterP &down, double frame) {
+  void process(const TRasterP &up, const TRasterP &down,
+               double frame) override {
     TRop::colorburn(up, down, down);
   }
 
-  TFxPort *getXsheetPort() const { return getInputPort(1); }
+  TFxPort *getXsheetPort() const override { return getInputPort(1); }
 };
 
 //==================================================================
@@ -312,13 +321,14 @@ class ScreenFx : public TImageCombinationFx {
   FX_DECLARATION(AddFx)
 
 public:
-  bool requiresFullRect() { return true; }
+  bool requiresFullRect() override { return true; }
 
-  void process(const TRasterP &up, const TRasterP &down, double frame) {
+  void process(const TRasterP &up, const TRasterP &down,
+               double frame) override {
     TRop::screen(up, down, down);
   }
 
-  TFxPort *getXsheetPort() const { return getInputPort(1); }
+  TFxPort *getXsheetPort() const override { return getInputPort(1); }
 };
 
 //==================================================================
@@ -331,11 +341,12 @@ class SubFx : public TImageCombinationFx {
 public:
   SubFx() : m_matte(false) { bindParam(this, "matte", m_matte); }
 
-  void process(const TRasterP &up, const TRasterP &down, double frame) {
+  void process(const TRasterP &up, const TRasterP &down,
+               double frame) override {
     TRop::sub(up, down, down, m_matte->getValue());
   }
 
-  TFxPort *getXsheetPort() const { return getInputPort(1); }
+  TFxPort *getXsheetPort() const override { return getInputPort(1); }
 };
 
 //==================================================================
@@ -352,13 +363,14 @@ public:
     bindParam(this, "matte", m_matte);
   }
 
-  bool requiresFullRect() { return m_matte->getValue(); }
+  bool requiresFullRect() override { return m_matte->getValue(); }
 
-  void process(const TRasterP &up, const TRasterP &down, double frame) {
+  void process(const TRasterP &up, const TRasterP &down,
+               double frame) override {
     TRop::mult(up, down, down, m_value->getValue(frame), m_matte->getValue());
   }
 
-  TFxPort *getXsheetPort() const { return getInputPort(1); }
+  TFxPort *getXsheetPort() const override { return getInputPort(1); }
 };
 
 //==================================================================
@@ -371,13 +383,14 @@ class MinFx : public TImageCombinationFx {
 public:
   MinFx() : m_matte(true) { bindParam(this, "matte", m_matte); }
 
-  bool requiresFullRect() { return true; }
+  bool requiresFullRect() override { return true; }
 
-  void process(const TRasterP &up, const TRasterP &down, double frame) {
+  void process(const TRasterP &up, const TRasterP &down,
+               double frame) override {
     TRop::ropmin(up, down, down, m_matte->getValue());
   }
 
-  TFxPort *getXsheetPort() const { return getInputPort(1); }
+  TFxPort *getXsheetPort() const override { return getInputPort(1); }
 };
 
 //==================================================================
@@ -386,11 +399,12 @@ class MaxFx : public TImageCombinationFx {
   FX_DECLARATION(MaxFx)
 
 public:
-  void process(const TRasterP &up, const TRasterP &down, double frame) {
+  void process(const TRasterP &up, const TRasterP &down,
+               double frame) override {
     TRop::ropmax(up, down, down);
   }
 
-  TFxPort *getXsheetPort() const { return getInputPort(1); }
+  TFxPort *getXsheetPort() const override { return getInputPort(1); }
 };
 
 //==================================================================
@@ -399,11 +413,12 @@ class LinearBurnFx : public TImageCombinationFx {
   FX_DECLARATION(LinearBurnFx)
 
 public:
-  void process(const TRasterP &up, const TRasterP &down, double frame) {
+  void process(const TRasterP &up, const TRasterP &down,
+               double frame) override {
     TRop::linearburn(up, down, down);
   }
 
-  TFxPort *getXsheetPort() const { return getInputPort(1); }
+  TFxPort *getXsheetPort() const override { return getInputPort(1); }
 };
 
 //==================================================================
@@ -416,7 +431,8 @@ public:
   OverlayFx() {}
   ~OverlayFx() {}
 
-  void process(const TRasterP &up, const TRasterP &down, double frame) {
+  void process(const TRasterP &up, const TRasterP &down,
+               double frame) override {
     TRop::overlay(up, down, down);
   }
 };
@@ -434,16 +450,17 @@ public:
     m_value->setValueRange(0.0, 100.0);
   }
 
-  bool requiresFullRect() { return true; }
+  bool requiresFullRect() override { return true; }
 
-  void process(const TRasterP &up, const TRasterP &down, double frame) {
+  void process(const TRasterP &up, const TRasterP &down,
+               double frame) override {
     double value     = 0.01 * m_value->getValue(frame);
     UCHAR matteValue = (UCHAR)(value * 255.0 + 0.5);
 
     TRop::crossDissolve(up, down, down, matteValue);
   }
 
-  TFxPort *getXsheetPort() const { return getInputPort(1); }
+  TFxPort *getXsheetPort() const override { return getInputPort(1); }
 };
 
 //******************************************************************************************
@@ -464,7 +481,8 @@ public:
 
   ~InFx() {}
 
-  bool doGetBBox(double frame, TRectD &bbox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bbox,
+                 const TRenderSettings &info) override {
     if (m_matte.isConnected() && m_source.isConnected()) {
       bool ret = m_matte->doGetBBox(frame, bbox, info);
 
@@ -477,9 +495,12 @@ public:
     return false;
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &ri) override {
     // This fx is not visible if either the source or the matte tiles are empty.
     // It's because only source is visible, and only where matte is opaque.
     if (!(m_source.isConnected() && m_matte.isConnected())) return;
@@ -494,7 +515,8 @@ public:
     TRop::ropin(srcTile.getRaster(), tile.getRaster(), tile.getRaster());
   }
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info) {
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override {
     if (!(m_source.isConnected() && m_matte.isConnected())) return;
 
     m_source->dryCompute(rect, frame, info);
@@ -502,11 +524,11 @@ public:
   }
 
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     return TRasterFx::memorySize(rect, info.m_bpp);
   }
 
-  void compute(TFlash &flash, int frame) {
+  void compute(TFlash &flash, int frame) override {
     if (m_matte.isConnected()) {
       flash.pushMatrix();
       flash.beginMask();
@@ -541,15 +563,19 @@ public:
 
   ~OutFx() {}
 
-  bool doGetBBox(double frame, TRectD &bbox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bbox,
+                 const TRenderSettings &info) override {
     if (m_source.isConnected()) return m_source->doGetBBox(frame, bbox, info);
 
     return false;
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &ri) override {
     // If there is no source, do nothing
     if (!m_source.isConnected()) return;
 
@@ -570,7 +596,8 @@ public:
     TRop::ropout(srcTile.getRaster(), tile.getRaster(), tile.getRaster());
   }
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info) {
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override {
     if (!m_source.isConnected()) return;
 
     if (!m_matte.isConnected()) {
@@ -583,7 +610,7 @@ public:
   }
 
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     return TRasterFx::memorySize(rect, info.m_bpp);
   }
 };
@@ -601,9 +628,12 @@ public:
     addInputPort("Down", m_dn);
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     bBox = TRectD();
 
     {
@@ -625,7 +655,8 @@ public:
     return (bBox.getLx() >= 0) && (bBox.getLy() >= 0);
   }
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &ri) override {
     // Here it's just like matte in, but the matte is visible under up.
 
     if (!m_dn.isConnected()) return;
@@ -644,7 +675,8 @@ public:
     TRop::atop(upTile.getRaster(), tile.getRaster(), tile.getRaster());
   }
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info) {
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override {
     if (!m_dn.isConnected()) return;
 
     if (!m_up.isConnected()) {
@@ -657,7 +689,7 @@ public:
   }
 
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     return TRasterFx::memorySize(rect, info.m_bpp);
   }
 };

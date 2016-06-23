@@ -150,11 +150,11 @@ public:
     m_prop.bind(m_toolSize);
   }
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
-  void updateTranslation() { m_toolSize.setQStringName(tr("Size:")); }
+  void updateTranslation() override { m_toolSize.setQStringName(tr("Size:")); }
 
-  void onEnter() {
+  void onEnter() override {
     if ((TVectorImageP)getImage(false))
       m_cursorId = ToolCursor::MagnetCursor;
     else
@@ -172,9 +172,9 @@ public:
         (x - minRange) / (maxRange - minRange) * (maxSize - minSize) + minSize;
   }
 
-  void onLeave() { m_pointSize = -1; }
+  void onLeave() override { m_pointSize = -1; }
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
     TPointD p(pos);
 
     m_oldPos = pos;
@@ -274,7 +274,7 @@ public:
     // vi->validateRegionEdges(ref, true);
   };
 
-  void leftButtonDrag(const TPointD &p, const TMouseEvent &) {
+  void leftButtonDrag(const TPointD &p, const TMouseEvent &) override {
     if (!m_active) return;
 
     //      double dx = p.x - m_pointAtMouseDown.x;
@@ -317,7 +317,7 @@ lefrightButtonDown(p);
     invalidate();
   };
 
-  void mouseMove(const TPointD &p, const TMouseEvent &e) {
+  void mouseMove(const TPointD &p, const TMouseEvent &e) override {
     m_pointAtMove    = p;
     double pixelSize = getPixelSize();
     if (tdistance2(p, m_oldPos) < 9.0 * pixelSize * pixelSize) return;
@@ -326,7 +326,7 @@ lefrightButtonDown(p);
     invalidate();
   }
 
-  void leftButtonUp(const TPointD &, const TMouseEvent &) {
+  void leftButtonUp(const TPointD &, const TMouseEvent &) override {
     if (!m_active) return;
 
     m_active           = false;
@@ -400,7 +400,7 @@ lefrightButtonDown(p);
     invalidate();
   };
 
-  void draw() {
+  void draw() override {
     TVectorImageP vi = TImageP(getImage(true));
     if (!vi) return;
 
@@ -440,13 +440,13 @@ lefrightButtonDown(p);
     // glPopMatrix();
   }
 
-  void onActivate() {
+  void onActivate() override {
     //        getApplication()->editImageOrSpline();
   }
 
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  int getCursorId() const { return m_cursorId; }
+  int getCursorId() const override { return m_cursorId; }
 
 } magnetTool;
 

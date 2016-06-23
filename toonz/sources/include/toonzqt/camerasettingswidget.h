@@ -46,7 +46,7 @@ class CheckBox;
 class SimpleExpValidator : public QValidator {
 public:
   SimpleExpValidator(QObject *parent) : QValidator(parent){};
-  State validate(QString &input, int &pos) const;
+  State validate(QString &input, int &pos) const override;
 };
 
 //---------------------------------------------------------------
@@ -63,8 +63,8 @@ public:
   double getValue();
 
 protected:
-  void focusInEvent(QFocusEvent *event);
-  void focusOutEvent(QFocusEvent *event);
+  void focusInEvent(QFocusEvent *event) override;
+  void focusOutEvent(QFocusEvent *event) override;
 };
 
 //---------------------------------------------------------------
@@ -121,7 +121,7 @@ public:
   // widget fields => camera
   void getFields(TCamera *camera);
 
-  QSize sizeHint() const { return minimumSize(); }
+  QSize sizeHint() const override { return minimumSize(); }
 
   // The aspect ratio can be expressed as a fraction (e.g. "4/3")
   // The following methods convert code/decode the value
@@ -146,7 +146,7 @@ public:
   }
 
 protected:
-  bool eventFilter(QObject *obj, QEvent *e);
+  bool eventFilter(QObject *obj, QEvent *e) override;
 
   void hComputeLx();
   void hComputeLy();

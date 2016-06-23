@@ -53,7 +53,7 @@ void fillRow(const TRasterCM32P &r, const TPoint &p, int &xa, int &xb,
     oldtone = tone;
   }
   if (tone == 0) {
-    tmp_limit                    = pix + 10;  // edge stop fill == 10 per default
+    tmp_limit = pix + 10;  // edge stop fill == 10 per default
     if (limit > tmp_limit) limit = tmp_limit;
     for (; pix <= limit; pix++) {
       if (pix->getPaint() == paint) break;
@@ -130,7 +130,7 @@ void findSegment(const TRaster32P &r, const TPoint &p, int &xa, int &xb,
     oldmatte = matte;
   }
   if (matte == 0) {
-    tmp_limit                    = pix + 10;  // edge stop fill == 10 per default
+    tmp_limit = pix + 10;  // edge stop fill == 10 per default
     if (limit > tmp_limit) limit = tmp_limit;
     for (; pix <= limit; pix++) {
       if (*pix == color) break;

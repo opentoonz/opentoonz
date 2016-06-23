@@ -148,11 +148,11 @@ class ControlPointEditorTool : public TTool {
 public:
   ControlPointEditorTool();
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
-  void updateTranslation();
+  void updateTranslation() override;
 
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
   // da TSelectionOwner: chiamato quando la selezione corrente viene cambiata
   void onSelectionChanged() { invalidate(); }
@@ -171,31 +171,31 @@ public:
 
   void drawMovingSegment();
   void drawControlPoint();
-  void draw();
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void rightButtonDown(const TPointD &pos, const TMouseEvent &);
+  void draw() override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void rightButtonDown(const TPointD &pos, const TMouseEvent &) override;
 
   void moveControlPoints(const TPointD &delta);
   void moveSpeed(const TPointD &delta, bool isIn);
   void moveSegment(const TPointD &delta, bool dragging, bool isShiftPressed);
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
-  void addContextMenuItems(QMenu *menu);
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
+  void addContextMenuItems(QMenu *menu) override;
 
   void linkSpeedInOut(int index);
   void unlinkSpeedInOut(int pointIndex);
 
-  bool keyDown(int key, TUINT32 flags, const TPoint &pos);
-  void onEnter();
-  void onLeave();
-  bool onPropertyChanged(std::string propertyName);
+  bool keyDown(int key, TUINT32 flags, const TPoint &pos) override;
+  void onEnter() override;
+  void onLeave() override;
+  bool onPropertyChanged(std::string propertyName) override;
 
-  void onActivate();
-  void onDeactivate();
-  void onImageChanged();
-  int getCursorId() const;
+  void onActivate() override;
+  void onDeactivate() override;
+  void onImageChanged() override;
+  int getCursorId() const override;
 
 } controlPointEditorTool;
 

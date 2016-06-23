@@ -172,7 +172,7 @@ bool MagicWandFx::pixelProcessor(TPixel32 *testPix, TPixelGR8 *maskPix) {
       }  // gia' trattato
 
       //* DECIDERE SE VOGLIO CHE LA SELEZIONE INTERESSI AREE GIA' SELEZIONATE IN
-      //PRECEDENZA
+      // PRECEDENZA
       //      if (maskPix->value == EmptyPixel) { //pixel c-compatibile, non
       //      gia' mascherato
       testPix->m     = maskValue;  // set(mV)m

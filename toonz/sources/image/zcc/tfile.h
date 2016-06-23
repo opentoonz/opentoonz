@@ -58,7 +58,8 @@ public:
                            TFileConsts::kOpenExisting);  // false if failed due
                                                          // to not found or
                                                          // already exists
-  // bool	open(const wchar_t *pwszFileName, uint32 flags = TFileConsts::kRead
+  // bool	open(const wchar_t *pwszFileName, uint32 flags =
+  // TFileConsts::kRead
   // | TFileConsts::kDenyWrite | TFileConsts::kOpenExisting);	// false if
   // failed due to not found or already exists
   bool close();

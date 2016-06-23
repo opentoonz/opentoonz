@@ -370,7 +370,7 @@ typedef struct {
   TW_STR255 OutputName; /* The result of an operation or the name of a
                            destination file */
   TW_MEMREF
-      Context; /* Source specific data used to remember state information */
+  Context; /* Source specific data used to remember state information */
   /* DG_CONTROL / DAT_FILESYSTEM / MSG_DELETE field    */
   int Recursive; /* recursively delete all sub-directories */
   /* DG_CONTROL / DAT_FILESYSTEM / MSG_GETINFO fields  */
@@ -407,9 +407,9 @@ typedef struct {
   TW_UINT32 Id;       /* Unique number.  In Windows, application hWnd      */
   TW_VERSION Version; /* Identifies the piece of code              */
   TW_UINT16
-      ProtocolMajor; /* Application and DS must set to TWON_PROTOCOLMAJOR */
+  ProtocolMajor; /* Application and DS must set to TWON_PROTOCOLMAJOR */
   TW_UINT16
-      ProtocolMinor; /* Application and DS must set to TWON_PROTOCOLMINOR */
+  ProtocolMinor; /* Application and DS must set to TWON_PROTOCOLMINOR */
   TW_UINT32 SupportedGroups; /* Bit field OR combination of DG_ constants */
   TW_STR32 Manufacturer;     /* Manufacturer name, e.g. "Hewlett-Packard" */
   TW_STR32 ProductFamily;    /* Product family name, e.g. "ScanJet"       */
@@ -555,9 +555,9 @@ typedef struct {
                        terminating NUL byte.  This is not the same as the total
                        number of characters in the string. */
   TW_HANDLE
-      UTF8string; /* output TW_HANDLE to a UTF-8 encoded localized string (based
-                     on TW_IDENTITY.Language or CAP_LANGUAGE).  The Source
-                     allocates it, the Application frees it. */
+  UTF8string; /* output TW_HANDLE to a UTF-8 encoded localized string (based
+                 on TW_IDENTITY.Language or CAP_LANGUAGE).  The Source
+                 allocates it, the Application frees it. */
 } TW_STATUSUTF8, FAR *pTW_STATUSUTF8;
 
 /* DAT_USERINTERFACE. Coordinates UI between application and data source. */
@@ -1434,13 +1434,14 @@ typedef struct {
  */
 #define DF_DSM2 0x10000000L /* added to the identity by the DSM  */
 #define DF_APP2                                                                \
-  0x20000000L /* Set by the App to indicate it would \                         \
+  0x20000000L /* Set by the App to indicate it would \ \                                                                             \
                                              prefer to use DSM2 */
 #define DF_DS2                                                                 \
-  0x40000000L           /* Set by the DS to indicate it would \                \
-                                                       prefer to use DSM2 */
-#define DG_MASK 0xFFFFL /* all Data Groups limited to 16 bit.  Added for 2.1   \
-                           */
+  0x40000000L /* Set by the DS to indicate it would \                \         \
+                                             prefer to use DSM2 */
+#define DG_MASK                                                                \
+  0xFFFFL /* all Data Groups limited to 16 bit.  Added for 2.1   \             \
+             */
 
 /****************************************************************************
  *                                                        *
@@ -1487,13 +1488,13 @@ typedef struct {
 
 /* misplaced */
 #define DAT_ICCPROFILE                                                         \
-  0x0401 /* TW_MEMORY        Added 1.91  This Data Argument is misplaced but   \
+  0x0401 /* TW_MEMORY        Added 1.91  This Data Argument is misplaced but \                                                                             \
             belongs to the DG_IMAGE Data Group */
 #define DAT_IMAGEMEMFILEXFER                                                   \
-  0x0402 /* TW_IMAGEMEMXFER  Added 1.91  This Data Argument is misplaced but   \
+  0x0402 /* TW_IMAGEMEMXFER  Added 1.91  This Data Argument is misplaced but \                                                                             \
             belongs to the DG_IMAGE Data Group */
 #define DAT_ENTRYPOINT                                                         \
-  0x0403 /* TW_ENTRYPOINT    Added 2.0   This Data Argument is misplaced but   \
+  0x0403 /* TW_ENTRYPOINT    Added 2.0   This Data Argument is misplaced but \                                                                             \
             belongs to the DG_CONTROL Data Group */
 
 /****************************************************************************
@@ -1859,9 +1860,10 @@ typedef struct {
 #define TWCC_CAPUNSUPPORTED                                                    \
   13 /* Capability not supported by source            */
 #define TWCC_CAPBADOPERATION                                                   \
-  14                        /* Operation not supported by capability         */
-#define TWCC_CAPSEQERROR 15 /* Capability has dependancy on other capability   \
-                               */
+  14 /* Operation not supported by capability         */
+#define TWCC_CAPSEQERROR                                                       \
+  15 /* Capability has dependancy on other capability   \                      \
+        */
 #define TWCC_DENIED                                                            \
   16 /* File System operation is denied (file is protected) Added 1.8 */
 #define TWCC_FILEEXISTS                                                        \
@@ -1875,7 +1877,7 @@ typedef struct {
 #define TWCC_PAPERDOUBLEFEED                                                   \
   21 /* The feeder detected multiple pages                  Added 1.8 */
 #define TWCC_FILEWRITEERROR                                                    \
-  22 /* Error writing the file (meant for things like disk full                \
+  22 /* Error writing the file (meant for things like disk full \                                                                             \
         conditions)Added 1.8 */
 #define TWCC_CHECKDEVICEONLINE                                                 \
   23 /* The device went offline prior to or during this operation Added 1.8 */
@@ -1922,10 +1924,10 @@ typedef wchar_t TW_UNI512[512], FAR *pTW_UNI512;
 #define TWFF_JPN 12 /* 1.91 */
 
 #define DAT_TWUNKIDENTITY                                                      \
-  0x000b /* Additional message required for thunker to request the special     \
+  0x000b /* Additional message required for thunker to request the special \                                                                             \
             identity information. */
 #define DAT_SETUPFILEXFER2                                                     \
-  0x0301 /* Data transfer via a file. deprecated - use DAT_SETUPFILEXFER       \
+  0x0301 /* Data transfer via a file. deprecated - use DAT_SETUPFILEXFER \                                                                             \
             instead*/
 
 #define CAP_SUPPORTEDCAPSEXT 0x100c

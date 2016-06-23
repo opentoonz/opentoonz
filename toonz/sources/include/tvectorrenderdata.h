@@ -50,24 +50,24 @@ public:
   const TColorFunction
       *m_cf;  //!< [\p not-owned] Transform to be used for drawing RGBM colors.
   const TPalette *m_palette;  //!< [\p not-owned] Palette to be used for
-                              //!translating color indexes to
-                              //!                 RGBM colors.
+                              //! translating color indexes to
+  //!                 RGBM colors.
   TAffine m_aff;  //!< Geometric transform to be applied on image rendering.
 
   TRect m_clippingRect;  //!< Integral rect where the image drawing will be
-                         //!restricted on;
-                         //!  if empty, clipping is assumed to be disabled.
-                         //!  \internal  Coordinates reference?
+                         //! restricted on;
+  //!  if empty, clipping is assumed to be disabled.
+  //!  \internal  Coordinates reference?
   TPixel m_tCheckInk;    //!< Color to be used for <I>ink check</I> mode.
   TPixel m_tCheckPaint;  //!< Color to be used for <I>paint check</I> mode.
 
   int m_colorCheckIndex;  //!< Color index to be highlighted in <I>color
-                          //!check</I> mode.
+                          //! check</I> mode.
 
   bool m_alphaChannel,      //!< Whether alpha channel is enabled.
       m_antiAliasing,       //!< Whether antialiasing must be applied.
       m_isImagePattern,     //!< \internal  Seems like a bad bug-patch - inquire
-                            //!further...
+                            //! further...
       m_drawRegions,        //!< Inks only mode.
       m_tcheckEnabled,      //!< Transparency check mode.
       m_inkCheckEnabled,    //!< Ink check mode.
@@ -76,11 +76,11 @@ public:
       m_isIcon,             //!< Whether image rendering is for an icon.
       m_is3dView,           //!< Whether image rendering is in 3D mode.
       m_show0ThickStrokes,  //!< Whether strokes with 0 thickness should be
-                            //!rendered anyway.
+                            //! rendered anyway.
       m_regionAntialias,    //!< Whether regions should be rendered with
-                            //!antialiasing at boundaries.
+                            //! antialiasing at boundaries.
       m_isOfflineRender;    //!< Whether image rendering is in render or
-                            //!camera-stand (preview) mode.
+                            //! camera-stand (preview) mode.
   //!  \deprecated  Use the above individual options instead.
   //!  \todo  Remove it ASAP.
 public:

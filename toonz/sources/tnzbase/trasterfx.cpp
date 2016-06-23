@@ -227,17 +227,20 @@ public:
 
   //-----------------------------------------------------------
 
-  bool isCachable() const {
+  bool isCachable() const override {
     return true;
   }  // Currently cachable as a test. Observe that it was NOT in Toonz 6.1
 
   //-----------------------------------------------------------
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
   //-----------------------------------------------------------
 
-  std::string getAlias(double frame, const TRenderSettings &info) const {
+  std::string getAlias(double frame,
+                       const TRenderSettings &info) const override {
     // NOTE: TrFx are not present at this recursive level. Affines dealing is
     // currently handled by inserting the
     // rendering affine AFTER a getAlias call. Ever.
@@ -247,7 +250,8 @@ public:
 
   //-----------------------------------------------------------
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     // NOTE: TrFx are not present at this recursive level. Affines dealing is
     // still handled by TGeometryFxs here....
     return m_fx->doGetBBox(frame, bBox, info);
@@ -255,7 +259,8 @@ public:
 
   //-----------------------------------------------------------
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &info) {
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &info) override {
     const TRectD &rectOut =
         myConvert(tile.getRaster()->getBounds()) + tile.m_pos;
 
@@ -280,7 +285,8 @@ public:
 
   //-----------------------------------------------------------
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info) {
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override {
     TRectD rectIn;
     TRenderSettings infoIn(info);
     TAffine appliedAff;
@@ -293,7 +299,7 @@ public:
   //-----------------------------------------------------------
 
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     TRectD rectIn;
     TRenderSettings infoIn(info);
     TAffine appliedAff;
@@ -377,17 +383,17 @@ public:
   inline void build(TTile &tile);
 
 protected:
-  void simCompute(const TRectD &rect) {
+  void simCompute(const TRectD &rect) override {
     TRectD rectCpy(
         rect);  // Why the hell dryCompute(..) has non-const TRectD& input ????
     m_rfx->doDryCompute(rectCpy, m_frame, *m_rs);
   }
 
   void buildTileToCalculate(const TRectD &tileRect);
-  void compute(const TRectD &tileRect);
+  void compute(const TRectD &tileRect) override;
 
-  void upload(TCacheResourceP &resource);
-  bool download(TCacheResourceP &resource);
+  void upload(TCacheResourceP &resource) override;
+  bool download(TCacheResourceP &resource) override;
 };
 
 //------------------------------------------------------------------------------
