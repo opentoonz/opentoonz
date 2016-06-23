@@ -258,6 +258,7 @@ public:
   void updateTranslation() override {
     m_smooth.setQStringName(tr("Smooth"));
     m_joinStrokes.setQStringName(tr("Join Vectors"));
+    m_autocloseFactor.setQStringName(tr("Distance"));
     m_mode.setQStringName(tr("Mode:"));
     m_type.setQStringName(tr("Type:"));
   }
