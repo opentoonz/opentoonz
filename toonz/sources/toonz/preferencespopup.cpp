@@ -1108,9 +1108,9 @@ PreferencesPopup::PreferencesPopup()
   m_defScanLevelType->setCurrentIndex(
       m_defScanLevelType->findText(m_pref->getScanLevelType()));
   QStringList levelTypes;
-  m_defLevelType->addItem(("Toonz Vector Level"), PLI_XSHLEVEL);
-  m_defLevelType->addItem(("Toonz Raster Level"), TZP_XSHLEVEL);
-  m_defLevelType->addItem(("Raster Level"), OVL_XSHLEVEL);
+  m_defLevelType->addItem((tr("Toonz Vector Level")), PLI_XSHLEVEL);
+  m_defLevelType->addItem((tr("Toonz Raster Level")), TZP_XSHLEVEL);
+  m_defLevelType->addItem((tr("Raster Level")), OVL_XSHLEVEL);
   m_defLevelType->setCurrentIndex(0);
 
   for (int i = 0; i < m_defLevelType->count(); i++) {
