@@ -153,7 +153,7 @@ public:
 
   ToolType getToolType() const override { return TTool::GenericTool; }
   
-  void RotateTool::updateTranslation() {
+  void updateTranslation() {
     m_cameraCentered.setQStringName(tr("Rotate On Camera Center"));
   }
 
