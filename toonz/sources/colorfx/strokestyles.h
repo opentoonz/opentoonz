@@ -193,8 +193,8 @@ public:
 
 //-------------------------------------------------------------------
 
-class TGraphicPenStrokeStyle
-    final : public TOptimizedStrokeStyleT<DrawmodePointsMatrix> {
+class TGraphicPenStrokeStyle final
+    : public TOptimizedStrokeStyleT<DrawmodePointsMatrix> {
   TPixel32 m_color;
   double m_intensity;
 
@@ -717,7 +717,8 @@ public:
 
 //-------------------------------------------------------------------
 
-class TBlendStrokeStyle2 final : public TOptimizedStrokeStyleT<PointsAndDoubles> {
+class TBlendStrokeStyle2 final
+    : public TOptimizedStrokeStyleT<PointsAndDoubles> {
   TPixel32 m_color;
   double m_blend, m_in, m_out;
 
@@ -865,7 +866,8 @@ public:
 
 //-------------------------------------------------------------------
 
-class TMultiLineStrokeStyle2 final : public TOptimizedStrokeStyleT<BlendAndPoints> {
+class TMultiLineStrokeStyle2 final
+    : public TOptimizedStrokeStyleT<BlendAndPoints> {
   TPixel32 m_color0, m_color1;
   double m_intensity, m_length, m_thick, m_noise;
 

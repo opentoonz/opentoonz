@@ -60,7 +60,7 @@ application and to
                 notify through event handling to the rest of the code.
         */
 class TApp final : public QObject,
-             public TTool::Application  // Singleton
+                   public TTool::Application  // Singleton
 {
   Q_OBJECT
 

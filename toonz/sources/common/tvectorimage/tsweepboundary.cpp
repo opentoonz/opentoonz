@@ -1423,7 +1423,7 @@ inline bool deleteUnlinkedLoops(LinkedQuadraticList &inputBoundaries) {
         if (count == 0) return false;
         if (nonSimpleCrossing.find(current->getP2()) != nonSimpleCrossing.end())
         //					||
-        //simpleCrossing.find(current->getP2())
+        // simpleCrossing.find(current->getP2())
         //!= simpleCrossing.end() )
         {
           if (current->next) current->next->prev = 0;
@@ -1457,7 +1457,7 @@ inline bool deleteUnlinkedLoops(LinkedQuadraticList &inputBoundaries) {
         if (count == 0) return false;
         if (nonSimpleCrossing.find(current->getP0()) != nonSimpleCrossing.end())
         //					||
-        //simpleCrossing.find(current->getP0())
+        // simpleCrossing.find(current->getP0())
         //!= simpleCrossing.end() )
         {
           if (current->prev) current->prev->next = 0;

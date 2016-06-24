@@ -40,8 +40,8 @@ class TXshLevelHandle;
    of \b StudioPalette.
 */
 class DVAPI StudioPaletteTreeViewer final : public QTreeWidget,
-                                      public StudioPalette::Listener,
-                                      public TProjectManager::Listener {
+                                            public StudioPalette::Listener,
+                                            public TProjectManager::Listener {
   Q_OBJECT
 
   TPaletteP m_currentPalette;

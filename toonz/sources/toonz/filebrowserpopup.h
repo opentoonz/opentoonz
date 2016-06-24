@@ -417,8 +417,9 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class BrowserPopupController final : public QObject,
-                               public DVGui::FileField::BrowserPopupController {
+class BrowserPopupController final
+    : public QObject,
+      public DVGui::FileField::BrowserPopupController {
   Q_OBJECT
 
   BrowserPopup *m_browserPopup;

@@ -153,7 +153,9 @@ color, which
   //----------------------------------------------------------------------------------
 
   //! The model item representing a channel (i.e. a real-valued function).
-  class Channel final : public ParamWrapper, public Item, public TParamObserver {
+  class Channel final : public ParamWrapper,
+                        public Item,
+                        public TParamObserver {
     FunctionTreeModel *m_model;  //!< (\p not \p owned) Reference to the model
     ChannelGroup
         *m_group;  //!< (\p not \p owned) Reference to the enclosing group

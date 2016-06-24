@@ -335,8 +335,8 @@ typedef TNotAnimatableParamObserver<TIntEnumParam> TIntEnumParamObserver;
 
 DVAPI_PARAM_SMARTPOINTER(TIntEnumParam)
 
-class DVAPI TIntEnumParamP
-    final : public TDerivedSmartPointerT<TIntEnumParam, TParam> {
+class DVAPI TIntEnumParamP final
+    : public TDerivedSmartPointerT<TIntEnumParam, TParam> {
 public:
   TIntEnumParamP(TIntEnumParam *p = 0) : DerivedSmartPointer(p) {}
   TIntEnumParamP(int v, const std::string &caption)

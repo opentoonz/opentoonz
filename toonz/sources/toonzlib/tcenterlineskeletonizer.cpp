@@ -194,8 +194,8 @@ struct EventGreater {
   }
 };
 
-class Timeline
-    final : public std::priority_queue<Event, std::vector<Event>, EventGreater> {
+class Timeline final
+    : public std::priority_queue<Event, std::vector<Event>, EventGreater> {
 public:
   Timeline() {}
 

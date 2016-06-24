@@ -53,7 +53,7 @@
 namespace {
 
 class ParamChannelGroup final : public FunctionTreeModel::ParamWrapper,
-                          public FunctionTreeModel::ChannelGroup {
+                                public FunctionTreeModel::ChannelGroup {
 public:
   ParamChannelGroup(TParam *param, const std::wstring &fxId,
                     std::string &paramName);

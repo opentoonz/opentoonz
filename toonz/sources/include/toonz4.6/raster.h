@@ -31,9 +31,7 @@ typedef enum {
 } RAS_TYPE;
 
 #ifdef VECCHIO
-' typedef enum { RAS_NONE, RAS_BW, /* 1 bit, B=0, W=1, first pixel in bit 7 */ RAS_WB, /* "    , W=0, B=1, "                    */
-    RAS_GR8,     /* grey tones, 8 bits */
-    RAS_CM8,     /* color-mapped,  8 bits */
+' typedef enum { RAS_NONE, RAS_BW, /* 1 bit, B=0, W=1, first pixel in bit 7 */ RAS_WB, /* "    , W=0, B=1, "                    */ RAS_GR8, /* grey tones, 8 bits */ RAS_CM8, /* color-mapped,  8 bits */
     RAS_GR16,    /* grey tones, 16 bits */
     RAS_RGB16,   /* RGB 5+6+5 bits, red most significant */
     RAS_RLEBW,   /* 1 bit compressed(quick casm format) */

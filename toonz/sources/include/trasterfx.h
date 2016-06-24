@@ -358,7 +358,8 @@ template class DVAPI TDerivedSmartPointerT<TGeometryFx, TFx>;
 
 //-------------------------------------------------------------------
 
-class DVAPI TGeometryFxP final : public TDerivedSmartPointerT<TGeometryFx, TFx> {
+class DVAPI TGeometryFxP final
+    : public TDerivedSmartPointerT<TGeometryFx, TFx> {
 public:
   TGeometryFxP() {}
   TGeometryFxP(TGeometryFx *fx) : DerivedSmartPointer(fx) {}

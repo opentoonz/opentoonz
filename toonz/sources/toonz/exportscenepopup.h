@@ -36,8 +36,8 @@ public:
 //=============================================================================
 // ExportSceneDvDirModelSpecialFileFolderNode
 
-class ExportSceneDvDirModelSpecialFileFolderNode
-    final : public ExportSceneDvDirModelFileFolderNode {
+class ExportSceneDvDirModelSpecialFileFolderNode final
+    : public ExportSceneDvDirModelFileFolderNode {
   QPixmap m_pixmap;
 
 public:
@@ -52,8 +52,8 @@ public:
 //=============================================================================
 // ExportSceneDvDirModelProjectNode
 
-class ExportSceneDvDirModelProjectNode
-    final : public ExportSceneDvDirModelFileFolderNode {
+class ExportSceneDvDirModelProjectNode final
+    : public ExportSceneDvDirModelFileFolderNode {
 public:
   ExportSceneDvDirModelProjectNode(DvDirModelNode *parent,
                                    const TFilePath &path)

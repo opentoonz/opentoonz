@@ -413,7 +413,8 @@ template class DVAPI TSmartPointerT<TVectorImage>;
 template class DVAPI TDerivedSmartPointerT<TVectorImage, TImage>;
 #endif
 
-class DVAPI TVectorImageP final : public TDerivedSmartPointerT<TVectorImage, TImage> {
+class DVAPI TVectorImageP final
+    : public TDerivedSmartPointerT<TVectorImage, TImage> {
 public:
   TVectorImageP() {}
   TVectorImageP(TVectorImage *image) : DerivedSmartPointer(image) {}

@@ -379,7 +379,7 @@ void RenderCommand::flashRender() {
 //===================================================================
 
 class RenderListener final : public DVGui::ProgressDialog,
-                       public MovieRenderer::Listener {
+                             public MovieRenderer::Listener {
   QString m_progressBarString;
   int m_frameCounter;
   TRenderer *m_renderer;
@@ -596,7 +596,7 @@ void RenderCommand::resetBgColor() {
 //===================================================================
 
 class MultimediaProgressBar final : public DVGui::ProgressDialog,
-                              public MultimediaRenderer::Listener {
+                                    public MultimediaRenderer::Listener {
   QString m_progressBarString;
   int m_frameCounter;
   int m_columnCounter;

@@ -154,7 +154,8 @@ of the
   skeletons it is attached to. It is therefore intended to be a \a container of
 said skeletons.
 */
-class DVAPI PlasticSkeletonDeformation final : public TSmartObject, public TPersist {
+class DVAPI PlasticSkeletonDeformation final : public TSmartObject,
+                                               public TPersist {
   DECLARE_CLASS_CODE
   PERSIST_DECLARATION(PlasticSkeletonDeformation)
 

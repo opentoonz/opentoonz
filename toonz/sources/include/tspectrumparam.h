@@ -98,8 +98,8 @@ template class DVAPI TSmartPointerT<TSpectrumParam>;
 template class DVAPI TDerivedSmartPointerT<TSpectrumParam, TParam>;
 #endif
 
-class DVAPI TSpectrumParamP
-    final : public TDerivedSmartPointerT<TSpectrumParam, TParam> {
+class DVAPI TSpectrumParamP final
+    : public TDerivedSmartPointerT<TSpectrumParam, TParam> {
 public:
   TSpectrumParamP() {}
   TSpectrumParamP(int keyCount, TSpectrum::ColorKey keys[])

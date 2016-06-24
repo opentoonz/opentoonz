@@ -332,7 +332,7 @@ public:
 
 // singleton
 class DvDirModel final : public QAbstractItemModel,
-                   public FolderListenerManager::Listener {
+                         public FolderListenerManager::Listener {
   DvDirModelNode *m_root;
 
 public:

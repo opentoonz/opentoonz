@@ -153,7 +153,8 @@ public:
 
 //--------------------------------------------------------------------------------
 
-class ImageMesh final : public TSmartObject, public tcg::Mesh<Vertex, Edge, Face> {};
+class ImageMesh final : public TSmartObject,
+                        public tcg::Mesh<Vertex, Edge, Face> {};
 
 //--------------------------------------------------------------------------------
 

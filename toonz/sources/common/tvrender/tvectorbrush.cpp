@@ -118,7 +118,8 @@ void getHRange(const TStroke &stroke, double &x0, double &x1) {
 //    Outlinization Data
 //********************************************************************************
 
-struct StrokeOutlinizationData final : public tellipticbrush::OutlinizationData {
+struct StrokeOutlinizationData final
+    : public tellipticbrush::OutlinizationData {
   double m_x0, m_x1, m_xRange;
   double m_y0, m_yScale;
 

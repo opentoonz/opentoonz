@@ -45,8 +45,8 @@ public:
 //=============================================================================
 // ProjectDvDirModelSpecialFileFolderNode
 
-class ProjectDvDirModelSpecialFileFolderNode
-    final : public ProjectDvDirModelFileFolderNode {
+class ProjectDvDirModelSpecialFileFolderNode final
+    : public ProjectDvDirModelFileFolderNode {
   QPixmap m_pixmap;
 
 public:
@@ -61,7 +61,8 @@ public:
 //=============================================================================
 // ProjectDvDirModelProjectNode
 
-class ProjectDvDirModelProjectNode final : public ProjectDvDirModelFileFolderNode {
+class ProjectDvDirModelProjectNode final
+    : public ProjectDvDirModelFileFolderNode {
 public:
   ProjectDvDirModelProjectNode(DvDirModelNode *parent, const TFilePath &path)
       : ProjectDvDirModelFileFolderNode(parent, path) {}

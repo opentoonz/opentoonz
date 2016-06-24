@@ -42,7 +42,7 @@ std::wstring removeSpaces(const std::wstring &str) {
 //---------------------------------------------------------
 
 class MultimediaRenderer::Imp final : public MovieRenderer::Listener,
-                                public TSmartObject {
+                                      public TSmartObject {
 public:
   ToonzScene *m_scene;
   TFilePath m_fp;

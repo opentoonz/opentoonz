@@ -38,8 +38,8 @@ public:
 
 //===============================================================================================
 
-class RenderInstanceManagersBuilderGenerator
-    final : public TRenderResourceManagerGenerator {
+class RenderInstanceManagersBuilderGenerator final
+    : public TRenderResourceManagerGenerator {
 public:
   TRenderResourceManager *operator()(void) override {
     return RenderInstanceManagersBuilder::instance();

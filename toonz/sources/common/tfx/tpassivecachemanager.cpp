@@ -423,7 +423,8 @@ TPassiveCacheManager::FxData::~FxData() {}
 //    TPassiveCacheManagerGenerator
 //---------------------------------------
 
-class TPassiveCacheManagerGenerator final : public TRenderResourceManagerGenerator {
+class TPassiveCacheManagerGenerator final
+    : public TRenderResourceManagerGenerator {
   TRenderResourceManager *operator()(void) override {
     // return new TPassiveCacheManager;
     return TPassiveCacheManager::instance();

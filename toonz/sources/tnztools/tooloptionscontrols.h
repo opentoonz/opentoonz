@@ -81,7 +81,8 @@ public:
 //    ToolOptionControl derivative  declarations
 //***********************************************************************************
 
-class ToolOptionCheckbox final : public DVGui::CheckBox, public ToolOptionControl {
+class ToolOptionCheckbox final : public DVGui::CheckBox,
+                                 public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -100,7 +101,8 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionSlider final : public DVGui::DoubleField, public ToolOptionControl {
+class ToolOptionSlider final : public DVGui::DoubleField,
+                               public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -121,7 +123,7 @@ protected slots:
 //-----------------------------------------------------------------------------
 
 class ToolOptionPairSlider final : public DVGui::DoublePairField,
-                             public ToolOptionControl {
+                                   public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -145,7 +147,7 @@ protected slots:
 //-----------------------------------------------------------------------------
 
 class ToolOptionIntPairSlider final : public DVGui::IntPairField,
-                                public ToolOptionControl {
+                                      public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -168,7 +170,8 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionIntSlider final : public DVGui::IntField, public ToolOptionControl {
+class ToolOptionIntSlider final : public DVGui::IntField,
+                                  public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -209,7 +212,8 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionPopupButton final : public PopupButton, public ToolOptionControl {
+class ToolOptionPopupButton final : public PopupButton,
+                                    public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -230,7 +234,8 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionTextField final : public DVGui::LineEdit, public ToolOptionControl {
+class ToolOptionTextField final : public DVGui::LineEdit,
+                                  public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -248,7 +253,7 @@ public slots:
 //-----------------------------------------------------------------------------
 
 class StyleIndexFieldAndChip final : public DVGui::StyleIndexLineEdit,
-                               public ToolOptionControl {
+                                     public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -281,7 +286,7 @@ public slots:
   \li Undo/Redo of user interactions.
 */
 class ToolOptionParamRelayField final : public DVGui::MeasuredDoubleLineEdit,
-                                  public ToolOptionControl {
+                                        public ToolOptionControl {
   Q_OBJECT
 
   TDoubleParamP m_param;  //!< Cached property param
@@ -356,7 +361,8 @@ signals:
 };
 //-----------------------------------------------------------------------------
 
-class PegbarChannelField final : public MeasuredValueField, public ToolOptionControl {
+class PegbarChannelField final : public MeasuredValueField,
+                                 public ToolOptionControl {
   Q_OBJECT
 
   const enum TStageObject::Channel m_actionId;
@@ -387,7 +393,7 @@ protected slots:
 //-----------------------------------------------------------------------------
 
 class DVAPI PegbarCenterField final : public MeasuredValueField,
-                                public ToolOptionControl {
+                                      public ToolOptionControl {
   Q_OBJECT
 
   int m_index;  // 0 = x, 1 = y

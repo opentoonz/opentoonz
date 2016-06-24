@@ -351,7 +351,7 @@ dare seri problemi!!!!
   // 		ras->lock();
   //		memcpy( ptr, ras->getRawData(), dataSize);
   //		glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB); // release pointer
-  //to
+  // to
   // mapping buffer
   //		ras->unlock();
   //   }

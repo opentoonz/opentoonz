@@ -57,8 +57,8 @@ public:
 //-----------------------------------------------------------------------------
 
 class SceneViewer final : public QGLWidget,
-                    public TTool::Viewer,
-                    public Previewer::Listener {
+                          public TTool::Viewer,
+                          public Previewer::Listener {
   Q_OBJECT
 
   qreal m_pressure;

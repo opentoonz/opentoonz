@@ -63,8 +63,8 @@ public:
 //-------------------------------------------------------------------
 
 class ParamCalculatorNode final : public CalculatorNode,
-                            public TParamObserver,
-                            public boost::noncopyable {
+                                  public TParamObserver,
+                                  public boost::noncopyable {
   TDoubleParamP m_param;
   std::auto_ptr<CalculatorNode> m_frame;
 
@@ -118,7 +118,7 @@ public:
 //-------------------------------------------------------------------
 
 class XsheetDrawingCalculatorNode final : public CalculatorNode,
-                                    public boost::noncopyable {
+                                          public boost::noncopyable {
   TXsheet *m_xsh;
   int m_columnIndex;
 

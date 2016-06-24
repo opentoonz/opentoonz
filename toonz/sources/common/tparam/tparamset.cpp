@@ -62,7 +62,8 @@ TParamSet::~TParamSet() { delete m_imp; }
 //---------------------------------------------------------
 /*
 template <class Container >
-class MyBackInsertIterator final : public std::iterator<std::output_iterator_tag,
+class MyBackInsertIterator final : public
+std::iterator<std::output_iterator_tag,
 void, void, void, void>
 {
 protected:

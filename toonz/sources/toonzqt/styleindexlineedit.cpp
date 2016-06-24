@@ -13,8 +13,8 @@ using namespace DVGui;
 //--------------------------------------------------------------------
 
 StyleIndexLineEdit::StyleIndexLineEdit() : m_pltHandle(0) {
-  // style index will not be more than 4096, but a longer text 
-  // "current" may be input instead of style id + chip width + margin 
+  // style index will not be more than 4096, but a longer text
+  // "current" may be input instead of style id + chip width + margin
   setMaximumWidth(fontMetrics().width("current") + 30);
   setFixedHeight(20);
 }

@@ -107,7 +107,7 @@ public slots:
 };
 
 class RenderController final : public QObject,
-                         public MovieGenerator::Listener {  // singleton
+                               public MovieGenerator::Listener {  // singleton
   Q_OBJECT
   DVGui::ProgressDialog *m_progressDialog;
   int m_frame;

@@ -57,9 +57,9 @@
 //****************************************************************************************
 
 class PlasticTool final : public QObject,
-                    public TTool,
-                    public TParamObserver,
-                    public TSelection::View {
+                          public TTool,
+                          public TParamObserver,
+                          public TSelection::View {
   Q_OBJECT
 
   friend class PlasticToolOptionsBox;
@@ -398,7 +398,7 @@ private slots:
 //****************************************************************************************
 
 class PlasticToolOptionsBox final : public GenericToolOptionsBox,
-                              public TProperty::Listener {
+                                    public TProperty::Listener {
   Q_OBJECT
 
 public:

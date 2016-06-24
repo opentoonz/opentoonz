@@ -59,7 +59,7 @@ static QString srvCmdline() {
 //*************************************************************************************
 
 class DVAPI BufferExchanger final : public tipc::ShMemReader,
-                              public tipc::ShMemWriter {
+                                    public tipc::ShMemWriter {
   UCHAR *m_buf;
   UCHAR *m_data;
 
@@ -79,7 +79,7 @@ public:
 
 template <typename PIXEL>
 class DVAPI RasterExchanger final : public tipc::ShMemReader,
-                              public tipc::ShMemWriter {
+                                    public tipc::ShMemWriter {
   typedef PIXEL pix_type;
 
   TRasterPT<PIXEL> m_ras;

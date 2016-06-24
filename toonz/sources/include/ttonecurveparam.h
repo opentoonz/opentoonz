@@ -96,8 +96,8 @@ template class DVAPI TSmartPointerT<TToneCurveParam>;
 template class DVAPI TDerivedSmartPointerT<TToneCurveParam, TParam>;
 #endif
 
-class DVAPI TToneCurveParamP
-    final : public TDerivedSmartPointerT<TToneCurveParam, TParam> {
+class DVAPI TToneCurveParamP final
+    : public TDerivedSmartPointerT<TToneCurveParam, TParam> {
 public:
   TToneCurveParamP() {}
   TToneCurveParamP(TToneCurveParam *p)

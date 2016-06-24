@@ -91,8 +91,8 @@ public:
 // ColorFieldEditorController
 //---------------------------------------------------------
 
-class ColorFieldEditorController
-    final : public QObject,
+class ColorFieldEditorController final
+    : public QObject,
       public DVGui::ColorField::ColorFieldEditorController {
   Q_OBJECT
 
@@ -117,8 +117,8 @@ protected slots:
 // CleanupColorFieldEditorController
 //---------------------------------------------------------
 
-class CleanupColorFieldEditorController
-    final : public QObject,
+class CleanupColorFieldEditorController final
+    : public QObject,
       public DVGui::CleanupColorField::CleanupColorFieldEditorController {
   Q_OBJECT
 

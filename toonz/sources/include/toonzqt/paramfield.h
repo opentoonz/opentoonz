@@ -283,8 +283,8 @@ public:
 // MeasuredDoubleParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI MeasuredDoubleParamField
-    final : public AnimatedParamField<double, TDoubleParamP> {
+class DVAPI MeasuredDoubleParamField final
+    : public AnimatedParamField<double, TDoubleParamP> {
   Q_OBJECT
 
   DVGui::MeasuredDoubleField *m_measuredDoubleField;
@@ -306,8 +306,8 @@ protected slots:
 // RangeParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI MeasuredRangeParamField
-    final : public AnimatedParamField<DoublePair, TRangeParamP> {
+class DVAPI MeasuredRangeParamField final
+    : public AnimatedParamField<DoublePair, TRangeParamP> {
   Q_OBJECT
 
   DVGui::MeasuredDoublePairField *m_valueField;
@@ -330,7 +330,8 @@ protected slots:
 // PointParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI PointParamField final : public AnimatedParamField<TPointD, TPointParamP> {
+class DVAPI PointParamField final
+    : public AnimatedParamField<TPointD, TPointParamP> {
   Q_OBJECT
 
   DVGui::MeasuredDoubleField *m_xFld, *m_yFld;
@@ -353,8 +354,8 @@ protected slots:
 // PixelParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI PixelParamField
-    final : public AnimatedParamField<TPixel32, TPixelParamP> {
+class DVAPI PixelParamField final
+    : public AnimatedParamField<TPixel32, TPixelParamP> {
   Q_OBJECT
 
   DVGui::ColorField *m_colorField;
@@ -398,8 +399,8 @@ protected slots:
 // SpectrumParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI SpectrumParamField
-    final : public AnimatedParamField<TSpectrum, TSpectrumParamP> {
+class DVAPI SpectrumParamField final
+    : public AnimatedParamField<TSpectrum, TSpectrumParamP> {
   Q_OBJECT
 
   DVGui::SpectrumField *m_spectrumField;
@@ -522,8 +523,8 @@ protected slots:
 // ToneCurveParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI ToneCurveParamField
-    final : public AnimatedParamField<const QList<TPointD>, TToneCurveParamP> {
+class DVAPI ToneCurveParamField final
+    : public AnimatedParamField<const QList<TPointD>, TToneCurveParamP> {
   Q_OBJECT
 
   DVGui::ToneCurveField *m_toneCurveField;

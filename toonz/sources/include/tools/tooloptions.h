@@ -271,34 +271,47 @@ class IconViewField final : public QWidget {
   Q_OBJECT
 
 public:
-  enum IconType{
+  enum IconType {
     Icon_ScalePeg = 0,
     Icon_Rotation,
     Icon_Position,
     Icon_Thickness,
     Icon_Amount
   };
+
 private:
   IconType m_iconType;
 
 protected:
   QPixmap m_pm[Icon_Amount];
-  Q_PROPERTY(QPixmap ScalePegPixmap READ getScalePegPixmap WRITE setScalePegPixmap);
-  Q_PROPERTY(QPixmap RotationPixmap READ getRotationPixmap WRITE setRotationPixmap);
-  Q_PROPERTY(QPixmap PositionPixmap READ getPositionPixmap WRITE setPositionPixmap);
-  Q_PROPERTY(QPixmap ThicknessPixmap READ getThicknessPixmap WRITE setThicknessPixmap);
+  Q_PROPERTY(
+      QPixmap ScalePegPixmap READ getScalePegPixmap WRITE setScalePegPixmap);
+  Q_PROPERTY(
+      QPixmap RotationPixmap READ getRotationPixmap WRITE setRotationPixmap);
+  Q_PROPERTY(
+      QPixmap PositionPixmap READ getPositionPixmap WRITE setPositionPixmap);
+  Q_PROPERTY(
+      QPixmap ThicknessPixmap READ getThicknessPixmap WRITE setThicknessPixmap);
 
 public:
   IconViewField(QWidget *parent = 0, IconType iconType = Icon_ScalePeg);
 
   QPixmap getScalePegPixmap() const { return m_pm[Icon_ScalePeg]; }
-  void setScalePegPixmap(const QPixmap &pixmap) { m_pm[Icon_ScalePeg] = pixmap; }
+  void setScalePegPixmap(const QPixmap &pixmap) {
+    m_pm[Icon_ScalePeg] = pixmap;
+  }
   QPixmap getRotationPixmap() const { return m_pm[Icon_Rotation]; }
-  void setRotationPixmap(const QPixmap &pixmap) { m_pm[Icon_Rotation] = pixmap; }
+  void setRotationPixmap(const QPixmap &pixmap) {
+    m_pm[Icon_Rotation] = pixmap;
+  }
   QPixmap getPositionPixmap() const { return m_pm[Icon_Position]; }
-  void setPositionPixmap(const QPixmap &pixmap) { m_pm[Icon_Position] = pixmap; }
+  void setPositionPixmap(const QPixmap &pixmap) {
+    m_pm[Icon_Position] = pixmap;
+  }
   QPixmap getThicknessPixmap() const { return m_pm[Icon_Thickness]; }
-  void setThicknessPixmap(const QPixmap &pixmap) { m_pm[Icon_Thickness] = pixmap; }
+  void setThicknessPixmap(const QPixmap &pixmap) {
+    m_pm[Icon_Thickness] = pixmap;
+  }
 
 protected:
   void paintEvent(QPaintEvent *e);

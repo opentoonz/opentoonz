@@ -115,8 +115,8 @@ struct point_traits<RigidPoint> {
 //    TTextureMesh (Textured Mesh Type)  declaration
 //***********************************************************************************
 
-class DVAPI TTextureMesh
-    final : public tcg::TriMesh<TTextureVertex, tcg::Edge, tcg::FaceN<3>>,
+class DVAPI TTextureMesh final
+    : public tcg::TriMesh<TTextureVertex, tcg::Edge, tcg::FaceN<3>>,
       public TSmartObject,
       public TPersist {
   PERSIST_DECLARATION(TTextureMesh)
@@ -150,8 +150,8 @@ typedef TSmartPointerT<TTextureMesh> TTextureMeshP;
 namespace boost {
 
 template <>
-struct graph_traits<TTextureMesh>
-    final : public graph_traits<
+struct graph_traits<TTextureMesh> final
+    : public graph_traits<
           tcg::Mesh<TTextureMesh::vertex_type, TTextureMesh::edge_type,
                     TTextureMesh::face_type>> {};
 
@@ -199,7 +199,8 @@ template class DVAPI TSmartPointerT<TMeshImage>;
 template class DVAPI TDerivedSmartPointerT<TMeshImage, TImage>;
 #endif
 
-class DVAPI TMeshImageP final : public TDerivedSmartPointerT<TMeshImage, TImage> {
+class DVAPI TMeshImageP final
+    : public TDerivedSmartPointerT<TMeshImage, TImage> {
 public:
   TMeshImageP() {}
   TMeshImageP(TMeshImage *image) : DerivedSmartPointer(image) {}

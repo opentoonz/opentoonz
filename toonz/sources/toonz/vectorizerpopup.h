@@ -314,7 +314,7 @@ protected:
           be called before invoking run().                                    */
 
   void run() override;  //!< Starts the vectorization thread (see QThread
-                        //!documentation).
+                        //! documentation).
 
 private:
   TXshSimpleLevelP m_level;  //!< Input level to vectorize (only one level at a

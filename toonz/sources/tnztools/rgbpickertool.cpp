@@ -198,7 +198,7 @@ RGBPickerTool::RGBPickerTool()
     , m_firstTime(true)
     , m_passivePick("Passive Pick", false)
     , m_toolOptionsBox(0)
-    , m_mousePixelPosition(){
+    , m_mousePixelPosition() {
   bind(TTool::CommonLevels);
   m_prop.bind(m_pickType);
   m_pickType.addValue(NORMAL_PICK);
@@ -284,8 +284,8 @@ void RGBPickerTool::draw() {
                        ? TPixel32::White
                        : TPixel32::Red;
     ToolUtils::drawRect(m_drawingRect, color, 0x3F33, true);
-  }
-  else if (m_pickType.getValue() == POLYLINE_PICK && !m_drawingPolyline.empty()) {
+  } else if (m_pickType.getValue() == POLYLINE_PICK &&
+             !m_drawingPolyline.empty()) {
     TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
                        ? TPixel32::White
                        : TPixel32::Black;
@@ -296,12 +296,11 @@ void RGBPickerTool::draw() {
       tglVertex(m_drawingPolyline[i]);
     tglVertex(m_mousePosition);
     glEnd();
-  }
-  else if (m_pickType.getValue() == FREEHAND_PICK && !m_drawingTrack.isEmpty())
-  {
+  } else if (m_pickType.getValue() == FREEHAND_PICK &&
+             !m_drawingTrack.isEmpty()) {
     TPixel color = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg
-      ? TPixel32::White
-      : TPixel32::Black;
+                       ? TPixel32::White
+                       : TPixel32::Black;
     tglColor(color);
     m_drawingTrack.drawAllFragments();
   }
@@ -336,9 +335,9 @@ void RGBPickerTool::leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
   } else if (m_pickType.getValue() == POLYLINE_PICK) {
     addPointPolyline(pos, convert(e.m_pos));
     return;
-  } else {//NORMAL_PICK
+  } else {  // NORMAL_PICK
     m_mousePixelPosition = e.m_pos;
-    m_makePick = true;
+    m_makePick           = true;
     invalidate();
   }
 }
@@ -354,9 +353,7 @@ void RGBPickerTool::leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
     m_drawingRect.y1   = pos.y;
     invalidate();
     return;
-  }
-  else if (m_pickType.getValue() == FREEHAND_PICK)
-  {
+  } else if (m_pickType.getValue() == FREEHAND_PICK) {
     freehandDrag(pos, convert(e.m_pos));
     invalidate();
   }
@@ -372,8 +369,7 @@ void RGBPickerTool::leftButtonUp(const TPointD &pos, const TMouseEvent &) {
   }
   if (m_pickType.getValue() == FREEHAND_PICK) {
     closeFreehand();
-    if (m_currentStyleId != 0)
-      m_makePick = true;
+    if (m_currentStyleId != 0) m_makePick = true;
   }
   invalidate();
 }
@@ -416,12 +412,11 @@ void RGBPickerTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
 //---------------------------------------------------------
 
-void RGBPickerTool::passivePick()
-{
+void RGBPickerTool::passivePick() {
   TImageP image = TImageP(getImage(false));
   if (!image) return;
-  TRectD area = TRectD(m_mousePixelPosition.x, m_mousePixelPosition.y, 
-    m_mousePixelPosition.x, m_mousePixelPosition.y);
+  TRectD area = TRectD(m_mousePixelPosition.x, m_mousePixelPosition.y,
+                       m_mousePixelPosition.x, m_mousePixelPosition.y);
 
   StylePicker picker(image);
 
@@ -430,7 +425,7 @@ void RGBPickerTool::passivePick()
   QColor col((int)pix.r, (int)pix.g, (int)pix.b);
 
   PaletteController *controller =
-    TTool::getApplication()->getPaletteController();
+      TTool::getApplication()->getPaletteController();
   controller->notifyColorPassivePicked(col);
 }
 
@@ -445,8 +440,8 @@ void RGBPickerTool::pick() {
   TPalette *palette       = ph->getPalette();
   if (!palette) return;
 
-  TRectD area = TRectD(m_mousePixelPosition.x - 1, m_mousePixelPosition.y - 1, 
-    m_mousePixelPosition.x + 1, m_mousePixelPosition.y + 1);
+  TRectD area = TRectD(m_mousePixelPosition.x - 1, m_mousePixelPosition.y - 1,
+                       m_mousePixelPosition.x + 1, m_mousePixelPosition.y + 1);
   StylePicker picker(image, palette);
 
   m_currentValue = picker.pickColor(area);
@@ -489,9 +484,8 @@ void RGBPickerTool::pickRect() {
   m_selectingRect.empty();
   if (area.getLx() <= 1 || area.getLy() <= 1) return;
   StylePicker picker(image, palette);
-  
-  m_currentValue = picker.pickColor(area);
 
+  m_currentValue = picker.pickColor(area);
 }
 
 //---------------------------------------------------------
@@ -507,9 +501,9 @@ void RGBPickerTool::pickStroke() {
 
   StylePicker picker(image, palette);
   TStroke *stroke = new TStroke(*m_stroke);
-  
+
   m_currentValue = picker.pickColor(stroke);
-  
+
   if (!(m_pickType.getValue() == POLYLINE_PICK)) {
     TXshSimpleLevel *level = app->getCurrentLevel()->getSimpleLevel();
     TUndoManager::manager()->add(
@@ -564,7 +558,8 @@ int RGBPickerTool::getCursorId() const {
 //---------------------------------------------------------
 
 void RGBPickerTool::doPolylineFreehandPick() {
-  if (m_stroke && (m_pickType.getValue() == POLYLINE_PICK || m_pickType.getValue() == FREEHAND_PICK)) {
+  if (m_stroke && (m_pickType.getValue() == POLYLINE_PICK ||
+                   m_pickType.getValue() == FREEHAND_PICK)) {
     pickStroke();
     delete m_stroke;
     m_stroke = 0;

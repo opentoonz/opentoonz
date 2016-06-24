@@ -245,7 +245,7 @@ public:
 //-------------------------------------------------------------------------------
 
 struct LinearVertexColorFunction final : public LinearColorFunction,
-                                   public NoColorFunction {
+                                         public NoColorFunction {
   LinearVertexColorFunction(const TMeshImage &meshImg,
                             const PlasticDeformerDataGroup *group, double min,
                             double max, double *cMin, double *cMax,
@@ -258,7 +258,7 @@ struct LinearVertexColorFunction final : public LinearColorFunction,
 //-------------------------------------------------------------------------------
 
 struct LinearFaceColorFunction final : public LinearColorFunction,
-                                 public NoColorFunction {
+                                       public NoColorFunction {
   LinearFaceColorFunction(const TMeshImage &meshImg,
                           const PlasticDeformerDataGroup *group, double min,
                           double max, double *cMin, double *cMax,

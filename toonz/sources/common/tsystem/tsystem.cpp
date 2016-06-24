@@ -408,8 +408,8 @@ void TSystem::hideFile(const TFilePath &fp) {
 
 //------------------------------------------------------------
 
-class CaselessFilepathLess
-    final : public std::binary_function<TFilePath, TFilePath, bool> {
+class CaselessFilepathLess final
+    : public std::binary_function<TFilePath, TFilePath, bool> {
 public:
   bool operator()(const TFilePath &a, const TFilePath &b) const {
     wstring aa = toLower(a.getWideString());

@@ -102,7 +102,8 @@ public:
 //    Manager generator
 //*****************************************************************************************
 
-class SwatchCacheManagerGenerator final : public TRenderResourceManagerGenerator {
+class SwatchCacheManagerGenerator final
+    : public TRenderResourceManagerGenerator {
   TRenderResourceManager *operator()(void) override {
     // return new TPassiveCacheManager;
     return SwatchCacheManager::instance();

@@ -141,7 +141,8 @@ private slots:
 //    CleanupPopup::OverwriteDialog declaration (private)
 //*****************************************************************************
 
-class CleanupPopup::OverwriteDialog final : public DVGui::ValidatedChoiceDialog {
+class CleanupPopup::OverwriteDialog final
+    : public DVGui::ValidatedChoiceDialog {
   Q_OBJECT
 
 public:

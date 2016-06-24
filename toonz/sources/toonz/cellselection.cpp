@@ -817,7 +817,8 @@ public:
 //  PasteFullColorImageInCellsUndo
 //-----------------------------------------------------------------------------
 
-class PasteFullColorImageInCellsUndo final : public ToolUtils::TFullColorRasterUndo {
+class PasteFullColorImageInCellsUndo final
+    : public ToolUtils::TFullColorRasterUndo {
   RasterImageData *m_rasterImageData;
 
 public:
