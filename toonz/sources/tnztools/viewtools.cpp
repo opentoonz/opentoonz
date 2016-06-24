@@ -9,7 +9,6 @@
 #include <math.h>
 
 #include "tgl.h"
-#include <QCoreApplication>  // For Qt translation support
 
 namespace {
 
@@ -152,10 +151,6 @@ public:
   }
 
   ToolType getToolType() const override { return TTool::GenericTool; }
-  
-  void updateTranslation() {
-    m_cameraCentered.setQStringName(tr("Rotate On Camera Center"));
-  }
 
   void updateMatrix() override { return setMatrix(TAffine()); }
 
