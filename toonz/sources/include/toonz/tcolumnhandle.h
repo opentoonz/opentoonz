@@ -23,7 +23,7 @@ class TXshColumn;
 // TColumnHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TColumnHandle : public QObject {
+class DVAPI TColumnHandle final : public QObject {
   Q_OBJECT
 
   TXshColumn *m_column;

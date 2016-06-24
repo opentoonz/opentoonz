@@ -26,7 +26,7 @@
 #endif
 
 namespace ToonzExt {
-class DVAPI CornerDeformation : public StrokeDeformationImpl {
+class DVAPI CornerDeformation final : public StrokeDeformationImpl {
   CornerDeformation();
 
 public:

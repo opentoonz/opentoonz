@@ -9,7 +9,7 @@
 // FxParamEditorPopup
 //-----------------------------------------------------------------------------
 
-class FxParamEditorPopup : public QDialog {
+class FxParamEditorPopup final : public QDialog {
   Q_OBJECT
 
 public:

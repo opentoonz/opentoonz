@@ -6,7 +6,7 @@
 
 #include "tparamset.h"
 
-class RGBMCutFx : public TStandardRasterFx {
+class RGBMCutFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(RGBMCutFx)
 
   TRasterFxPort m_input;

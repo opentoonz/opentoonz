@@ -4,7 +4,7 @@
 //#include "tparam.h"
 #include "tundo.h"
 
-class ParamUndoManager : public TParamUndoManager {
+class ParamUndoManager final : public TParamUndoManager {
 public:
   ParamUndoManager() {}
   ~ParamUndoManager() {}

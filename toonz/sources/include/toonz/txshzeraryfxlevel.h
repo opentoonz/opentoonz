@@ -27,7 +27,7 @@ class TXshZeraryFxColumn;
  */
 //=============================================================================
 
-class DVAPI TXshZeraryFxLevel : public TXshLevel {
+class DVAPI TXshZeraryFxLevel final : public TXshLevel {
   PERSIST_DECLARATION(TXshZeraryFxLevel)
 
   TXshZeraryFxColumn *m_zeraryFxColumn;

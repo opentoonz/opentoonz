@@ -237,7 +237,7 @@ class TRasterT;
 //! \include rasterpt_ex1.cpp
 // class TRasterPT<T>
 template <class T>
-class TRasterPT : public TSmartPointerT<TRasterT<T>> {
+class TRasterPT final : public TSmartPointerT<TRasterT<T>> {
 public:
   typedef T Pixel;
   typedef TRasterT<T> Raster;
@@ -269,7 +269,7 @@ public:
 // e' la classe concreta che discende da TRaster
 
 template <class T>
-class TRasterT : public TRaster {
+class TRasterT final : public TRaster {
 protected:
   // Constructors are protected to prevent direct allocation of TRasterT
   // instances.

@@ -25,7 +25,7 @@ class FlipBook;
 
 //=============================================================================
 
-class SaveImagesPopup : public FileBrowserPopup {
+class SaveImagesPopup final : public FileBrowserPopup {
   Q_OBJECT
 
   FlipBook *m_flip;
@@ -36,7 +36,7 @@ public:
   bool execute() override;
 };
 
-class LoadImagesPopup : public FileBrowserPopup {
+class LoadImagesPopup final : public FileBrowserPopup {
   Q_OBJECT
 
   DVGui::LineEdit *m_fromField;

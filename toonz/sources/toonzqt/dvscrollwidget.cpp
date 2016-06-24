@@ -22,7 +22,7 @@
 
 namespace {
 
-class ScrollLayout : public DummyLayout {
+class ScrollLayout final : public DummyLayout {
   DvScrollWidget *m_scrollWidget;
 
 public:

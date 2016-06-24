@@ -534,7 +534,7 @@ QString TFarmTask::getCommandLine(bool isFarmTask) const {
 
 namespace {
 
-class TFarmTaskDeclaration : public TPersistDeclaration {
+class TFarmTaskDeclaration final : public TPersistDeclaration {
 public:
   TFarmTaskDeclaration(const std::string &id) : TPersistDeclaration(id) {}
 
@@ -748,7 +748,7 @@ void TFarmTaskGroup::saveData(TOStream &os) {
 
 namespace {
 
-class TFarmTaskGroupDeclaration : public TPersistDeclaration {
+class TFarmTaskGroupDeclaration final : public TPersistDeclaration {
 public:
   TFarmTaskGroupDeclaration(const std::string &id) : TPersistDeclaration(id) {}
 

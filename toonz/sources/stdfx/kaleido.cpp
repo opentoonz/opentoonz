@@ -12,7 +12,7 @@
 
 namespace {
 
-class KaleidoDistorter : public TDistorter {
+class KaleidoDistorter final : public TDistorter {
   double m_angle;
   TAffine m_aff;
   TPointD m_shift;
@@ -63,7 +63,7 @@ int KaleidoDistorter::invMap(const TPointD &p, TPointD *results) const {
 //    Kaleido Fx
 //****************************************************************************
 
-class KaleidoFx : public TStandardRasterFx {
+class KaleidoFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(KaleidoFx)
 
   TRasterFxPort m_input;

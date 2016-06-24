@@ -645,7 +645,7 @@ void StudioPaletteTreeViewer::searchForPalette() {
 
 //-----------------------------------------------------------------------------
 
-class InvalidateIconsUndo : public TUndo {
+class InvalidateIconsUndo final : public TUndo {
   TPaletteP m_targetPalette, m_oldPalette, m_newPalette;
   TXshLevelHandle *m_levelHandle;
 
@@ -670,7 +670,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class AdjustPaletteDialog : public DVGui::Dialog {
+class AdjustPaletteDialog final : public DVGui::Dialog {
 private:
   IntField *m_tolerance;
 

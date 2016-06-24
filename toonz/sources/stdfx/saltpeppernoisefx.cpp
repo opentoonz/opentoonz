@@ -8,7 +8,7 @@
 
 //===================================================================
 
-class SaltPepperNoiseFx : public TStandardRasterFx {
+class SaltPepperNoiseFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(SaltPepperNoiseFx)
 
   TRasterFxPort m_input;

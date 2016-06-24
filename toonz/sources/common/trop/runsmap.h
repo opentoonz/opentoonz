@@ -37,7 +37,7 @@
   to traverse runs both forward and backwards. This means that 2 headers are
   provided for each run, at the opposite ends (unless the run is 1 pixel-width).
 */
-class RunsMap : public TRasterT<TPixelGR8> {
+class RunsMap final : public TRasterT<TPixelGR8> {
 public:
   RunsMap(int lx, int ly) : TRasterT<TPixelGR8>(lx, ly) { clear(); }
 
@@ -62,7 +62,7 @@ public:
 template class DV_EXPORT_API TSmartPointerT<RunsMap>;
 #endif
 
-class RunsMapP : public TSmartPointerT<RunsMap> {
+class RunsMapP final : public TSmartPointerT<RunsMap> {
 public:
   RunsMapP() {}
   RunsMapP(int lx, int ly) : TSmartPointerT<RunsMap>(new RunsMap(lx, ly)) {}

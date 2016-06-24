@@ -245,7 +245,7 @@ type is a string that indicate the filename extension(ex:. bmp or .bmp)*/
 
 //-----------------------------------------------------------------------------
 
-class TMalformedFrameException : public TException {
+class TMalformedFrameException final : public TException {
 public:
   TMalformedFrameException(const TFilePath &fp,
                            const std::wstring &msg = std::wstring())

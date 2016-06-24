@@ -67,7 +67,7 @@ const QString ScanLevel("Scan Level");
 // CreateLevelUndo
 //-----------------------------------------------------------------------------
 
-class CreateLevelUndo : public TUndo {
+class CreateLevelUndo final : public TUndo {
   int m_rowIndex;
   int m_columnIndex;
   int m_frameCount;

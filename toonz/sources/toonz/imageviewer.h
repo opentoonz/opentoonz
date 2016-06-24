@@ -22,7 +22,7 @@ class HistogramPopup;
 //    ImageViewer
 //--------------------
 
-class ImageViewer : public QOpenGLWidget {
+class ImageViewer final : public QOpenGLWidget {
   Q_OBJECT
   enum DragType {
     eNone,

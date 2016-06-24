@@ -110,7 +110,7 @@ public:
 //! The BilinearDistorterBase is just a convenience class implementing a
 //! lightweight version of
 //! \b BilinearDistorter class when the source quad is a rect.
-class DVAPI BilinearDistorterBase : public TQuadDistorter {
+class DVAPI BilinearDistorterBase final : public TQuadDistorter {
   // Used to make things a little bit faster.
   TPointD m_A, m_B, m_C, m_D;
   double m_a, m_b0;
@@ -133,7 +133,7 @@ public:
 //! of the source corners into the same combinations of destination ones. The
 //! resulting image deformation
 //! is similar to bending a paper foil.
-class DVAPI BilinearDistorter : public TQuadDistorter {
+class DVAPI BilinearDistorter final : public TQuadDistorter {
   struct Base {
     TPointD m_p00, m_p10, m_p01, m_p11;
     // Used to make things a little bit faster.
@@ -169,7 +169,7 @@ public:
 //! The PerspectiveDistorter class implements a quadrilateral distorter that
 //! makes the source quad
 //! bend into the destination one while keeping a perspectical resemblance.
-class DVAPI PerspectiveDistorter : public TQuadDistorter {
+class DVAPI PerspectiveDistorter final : public TQuadDistorter {
   //================================================================================================
   // TPerspect
   //================================================================================================

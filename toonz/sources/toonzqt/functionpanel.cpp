@@ -52,7 +52,7 @@ void drawRoundedSquare(QPainter &painter, const QPointF &p, double r) {
 
 double norm2(const QPointF &p) { return p.x() * p.x() + p.y() * p.y(); }
 
-class FunctionPanelZoomer : public ImageUtils::ShortcutZoomer {
+class FunctionPanelZoomer final : public ImageUtils::ShortcutZoomer {
   FunctionPanel *m_panel;
 
 public:

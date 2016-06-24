@@ -857,7 +857,7 @@ void ToolOptionParamRelayField::onValueChanged() {
 
     //-----------------------------------------------------------------------------
 
-    struct SetValueUndo : public TUndo {
+    struct SetValueUndo final : public TUndo {
       TDoubleParamP m_param;      //!< The referenced param
       double m_oldVal, m_newVal;  //!< Values before and after the set action...
       double m_frame;             //!< ... at this frame

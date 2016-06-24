@@ -99,7 +99,7 @@ using namespace DVGui;
 //    FrameCountTask class
 //----------------------------
 
-class FrameCountTask : public TThread::Runnable {
+class FrameCountTask final : public TThread::Runnable {
   bool m_started;
 
   TFilePath m_path;

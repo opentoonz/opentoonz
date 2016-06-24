@@ -165,7 +165,7 @@ public:
   };
   //----------------------------------------------
 
-  struct KeyLess : public std::binary_function<Key, Key, bool> {
+  struct KeyLess final : public std::binary_function<Key, Key, bool> {
     bool operator()(const Key &d1, const Key &d2) const {
       return d1.m_glContext < d2.m_glContext ||
              (d1.m_glContext == d2.m_glContext &&

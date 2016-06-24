@@ -70,7 +70,7 @@ public:
 
 //  COMM Chunk: Chunk contenente le informazioni sulla traccia
 
-class TCOMMChunk : public TAIFFChunk {
+class TCOMMChunk final : public TAIFFChunk {
 public:
   USHORT m_chans;    // numero di canali
   TUINT32 m_frames;  // numero di campioni
@@ -145,7 +145,7 @@ ostream &operator<<(ostream &os, const TCOMMChunk &commChunk) {
 
 //  SSND Chunk: Chunk contenente i campioni della traccia
 
-class TSSNDChunk : public TAIFFChunk {
+class TSSNDChunk final : public TAIFFChunk {
 public:
   TUINT32 m_offset;  // dall'inizio dei sample frames tra i wavedata
   TUINT32 m_blockSize;

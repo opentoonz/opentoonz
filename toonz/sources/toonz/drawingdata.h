@@ -16,7 +16,7 @@
 // Sono i fotogrammi della filmstrip
 //-----------------------------------------------------------------------------
 
-class DrawingData : public DvMimeData {
+class DrawingData final : public DvMimeData {
 public:
   std::map<TFrameId, QString>
       m_imageSet;  // images are in the cache, the QString is the cache id

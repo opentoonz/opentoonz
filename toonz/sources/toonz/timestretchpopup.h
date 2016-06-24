@@ -18,7 +18,7 @@ class TSelection;
 // TimeStretchPopup
 //-----------------------------------------------------------------------------
 
-class TimeStretchPopup : public DVGui::Dialog {
+class TimeStretchPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   QPushButton *m_okBtn;

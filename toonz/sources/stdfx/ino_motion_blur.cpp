@@ -5,7 +5,7 @@
 
 #include "ino_common.h"
 //------------------------------------------------------------
-class ino_motion_blur : public TStandardRasterFx {
+class ino_motion_blur final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_motion_blur)
   TRasterFxPort m_input;
 

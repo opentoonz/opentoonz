@@ -93,7 +93,7 @@ pix->m=(UCHAR)(pix->m+intensity*(col.m-pix->m));*/
 //    BrightnessAndContrastPopup Swatch
 //**************************************************************************
 
-class LinesFadePopup::Swatch : public PlaneViewer {
+class LinesFadePopup::Swatch final : public PlaneViewer {
   TRasterP m_ras;
 
 public:
@@ -295,7 +295,7 @@ void LinesFadePopup::hideEvent(QHideEvent *he) {
 
 //-----------------------------------------------------------------------------
 
-class TLineFadeUndo : public TUndo {
+class TLineFadeUndo final : public TUndo {
   int m_r, m_c;
   TPixel32 m_color;
   int m_intensity;

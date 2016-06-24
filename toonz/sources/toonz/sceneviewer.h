@@ -40,7 +40,7 @@ class FullScreenWidget;
 
 //=====================================================================
 
-class ToggleCommandHandler : public MenuItemHandler {
+class ToggleCommandHandler final : public MenuItemHandler {
   int m_status;
 
 public:
@@ -56,7 +56,7 @@ public:
 // SceneViewer
 //-----------------------------------------------------------------------------
 
-class SceneViewer : public QGLWidget,
+class SceneViewer final : public QGLWidget,
                     public TTool::Viewer,
                     public Previewer::Listener {
   Q_OBJECT

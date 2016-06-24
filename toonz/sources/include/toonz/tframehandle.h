@@ -27,7 +27,7 @@ class TXsheet;
 // TFrameHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TFrameHandle : public QObject {
+class DVAPI TFrameHandle final : public QObject {
   Q_OBJECT
 
 public:

@@ -102,7 +102,7 @@ TLevelReader *TLevelReaderPsd::create(const TFilePath &f) {
 //  TImageReaderLayerPsd
 //-----------------------------------------------------------
 
-class TImageReaderLayerPsd : public TImageReader {
+class TImageReaderLayerPsd final : public TImageReader {
 public:
   TImageReaderLayerPsd(const TFilePath &, int layerId, TLevelReaderPsd *lr,
                        TImageInfo *info);
@@ -150,7 +150,7 @@ TImageReaderP TLevelReaderPsd::getFrameReader(TFrameId fid) {
 //  TImageWriterPsd
 //------------------------------------------------------------------------------
 
-class TImageWriterPsd : public TImageWriter {
+class TImageWriterPsd final : public TImageWriter {
   int m_layerId;
 
 public:

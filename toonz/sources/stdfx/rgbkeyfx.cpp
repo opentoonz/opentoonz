@@ -7,7 +7,7 @@
 
 #include "tparamset.h"
 
-class RGBKeyFx : public TStandardRasterFx {
+class RGBKeyFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(RGBKeyFx)
 
   TRasterFxPort m_input;

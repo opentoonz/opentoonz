@@ -24,7 +24,7 @@ TFilePath TVectorBrushStyle::m_rootDir = TFilePath();
 //    Vector Brush Prop  declaration
 //**********************************************************************
 
-class VectorBrushProp : public TStrokeProp {
+class VectorBrushProp final : public TStrokeProp {
   TVectorBrushStyle *m_style;
   TVectorImageP m_brush;
   TRectD m_brushBox;

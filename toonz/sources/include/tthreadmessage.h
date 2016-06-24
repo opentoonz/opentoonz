@@ -82,7 +82,7 @@ public:
 
 #else
 
-class DVAPI Mutex : public QMutex {
+class DVAPI Mutex final : public QMutex {
 public:
   Mutex() : QMutex(QMutex::Recursive) {}
 

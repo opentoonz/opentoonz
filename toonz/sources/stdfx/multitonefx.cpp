@@ -4,7 +4,7 @@
 #include "tfxparam.h"
 #include "tspectrumparam.h"
 
-class MultiToneFx : public TStandardRasterFx {
+class MultiToneFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(MultiToneFx)
 
   TRasterFxPort m_input;

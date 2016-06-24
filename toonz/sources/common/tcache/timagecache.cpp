@@ -68,7 +68,7 @@ class ImageInfo;
 TUINT32 HistoryCount = 0;
 //------------------------------------------------------------------------------
 
-class TheCodec : public TRasterCodecLz4 {
+class TheCodec final : public TRasterCodecLz4 {
 public:
   static TheCodec *instance() {
     if (!_instance) _instance = new TheCodec();
@@ -151,7 +151,7 @@ public:
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-class RasterImageInfo : public ImageInfo {
+class RasterImageInfo final : public ImageInfo {
 public:
   RasterImageInfo(const TRasterImageP &ri);
 
@@ -195,7 +195,7 @@ ImageInfo *RasterImageInfo::clone() { return new RasterImageInfo(*this); }
 #include "tpalette.h"
 #include "ttoonzimage.h"
 
-class ToonzImageInfo : public ImageInfo {
+class ToonzImageInfo final : public ImageInfo {
 public:
   ToonzImageInfo(const TToonzImageP &ti);
   ~ToonzImageInfo() {
@@ -241,7 +241,7 @@ void ToonzImageInfo::setInfo(const TToonzImageP &ti) {
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-class RasterImageBuilder : public ImageBuilder {
+class RasterImageBuilder final : public ImageBuilder {
 public:
   ImageBuilder *clone() override { return new RasterImageBuilder(*this); }
 
@@ -267,7 +267,7 @@ TImageP RasterImageBuilder::build(ImageInfo *info, const TRasterP &ras) {
 //------------------------------------------------------------------------------
 #ifndef TNZCORE_LIGHT
 
-class ToonzImageBuilder : public ImageBuilder {
+class ToonzImageBuilder final : public ImageBuilder {
 public:
   ImageBuilder *clone() override { return new ToonzImageBuilder(*this); }
 
@@ -306,7 +306,7 @@ TImageP ToonzImageBuilder::build(ImageInfo *info, const TRasterP &ras) {
 
 //------------------------------------------------------------------------------
 
-class UncompressedOnMemoryCacheItem : public CacheItem {
+class UncompressedOnMemoryCacheItem final : public CacheItem {
 public:
   UncompressedOnMemoryCacheItem(const TImageP &image) : m_image(image) {
     TRasterImageP ri = m_image;
@@ -369,7 +369,7 @@ TUINT32 UncompressedOnMemoryCacheItem::getSize() const {
 
 //------------------------------------------------------------------------------
 
-class CompressedOnMemoryCacheItem : public CacheItem {
+class CompressedOnMemoryCacheItem final : public CacheItem {
 public:
   CompressedOnMemoryCacheItem(const TImageP &img);
 
@@ -467,7 +467,7 @@ TImageP CompressedOnMemoryCacheItem::getImage() const {
 
 //------------------------------------------------------------------------------
 
-class CompressedOnDiskCacheItem : public CacheItem {
+class CompressedOnDiskCacheItem final : public CacheItem {
 public:
   CompressedOnDiskCacheItem(const TFilePath &fp, const TRasterP &compressedRas,
                             ImageBuilder *builder, ImageInfo *info);
@@ -531,7 +531,7 @@ TImageP CompressedOnDiskCacheItem::getImage() const {
 
 //------------------------------------------------------------------------------
 
-class UncompressedOnDiskCacheItem : public CacheItem {
+class UncompressedOnDiskCacheItem final : public CacheItem {
   int m_pixelsize;
 
 public:

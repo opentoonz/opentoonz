@@ -6,7 +6,7 @@
 
 #include "ino_common.h"
 //------------------------------------------------------------
-class ino_channel_selector : public TStandardRasterFx {
+class ino_channel_selector final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_channel_selector)
 
   TRasterFxPort m_source1;

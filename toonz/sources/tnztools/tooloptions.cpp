@@ -582,7 +582,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
 
   const int ITEM_SPACING = 10;
   const int LABEL_SPACING = 3;
-
+  /* --- Layout --- */
   /* --- Layout --- */
   QHBoxLayout *mainLay = m_layout;
   {
@@ -593,8 +593,8 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
 
     mainLay->addWidget(m_mainStackedWidget, 1);
     {
-      //Position
-      QFrame *posFrame = new QFrame(this);
+      // Position
+      QFrame *posFrame    = new QFrame(this);
       QHBoxLayout *posLay = new QHBoxLayout();
       posLay->setMargin(0);
       posLay->setSpacing(0);
@@ -636,8 +636,8 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         posLay->addStretch(1);
       }
 
-      //Rotation
-      QFrame *rotFrame = new QFrame(this);
+      // Rotation
+      QFrame *rotFrame    = new QFrame(this);
       QHBoxLayout *rotLay = new QHBoxLayout();
       rotLay->setMargin(0);
       rotLay->setSpacing(0);
@@ -652,8 +652,8 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         rotLay->addStretch(1);
       }
 
-      //Scale
-      QFrame *scaleFrame = new QFrame(this);
+      // Scale
+      QFrame *scaleFrame    = new QFrame(this);
       QHBoxLayout *scaleLay = new QHBoxLayout();
       scaleLay->setMargin(0);
       scaleLay->setSpacing(0);
@@ -690,8 +690,8 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         scaleLay->addStretch(1);
       }
 
-      //Shear
-      QFrame *shearFrame = new QFrame(this);
+      // Shear
+      QFrame *shearFrame    = new QFrame(this);
       QHBoxLayout *shearLay = new QHBoxLayout();
       shearLay->setMargin(0);
       shearLay->setSpacing(0);
@@ -718,8 +718,8 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         shearLay->addStretch(1);
       }
 
-      //Center Position
-      QFrame *centerPosFrame = new QFrame(this);
+      // Center Position
+      QFrame *centerPosFrame    = new QFrame(this);
       QHBoxLayout *centerPosLay = new QHBoxLayout();
       centerPosLay->setMargin(0);
       centerPosLay->setSpacing(0);
@@ -1012,7 +1012,7 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   if (tool && tool->getProperties(0))
     tool->getProperties(0)->accept(builder);
 
-  //Scale
+
   IconViewField *iconView = new IconViewField(this, IconViewField::Icon_ScalePeg);
   m_scaleXLabel = new QLabel(tr("H:"), this);
   m_scaleXField = new SelectionScaleField(selectionTool, 0, "Scale X");
@@ -1020,11 +1020,11 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   m_scaleYField = new SelectionScaleField(selectionTool, 1, "Scale Y");
   m_scaleLink = new DVGui::CheckBox(tr("Link"), this);
 
-  //Rotation
+
   IconViewField *rotIconView = new IconViewField(this, IconViewField::Icon_Rotation);
   m_rotationField = new SelectionRotationField(selectionTool, tr("Rotation"));
 
-  //Move
+
   IconViewField *moveIconView = new IconViewField(this, IconViewField::Icon_Position);
   m_moveXLabel = new QLabel(tr("E/W:"), this);
   m_moveXField = new SelectionMoveField(selectionTool, 0, "Move X");
@@ -1045,7 +1045,7 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
 
   //--- layout ---- 
 
-  addSeparator();
+      addSeparator();
 
   hLayout()->addWidget(iconView, 0);
   hLayout()->addWidget(m_scaleXLabel, 0);
@@ -1071,20 +1071,20 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   {
     addSeparator();
     hLayout()->addWidget(m_setSaveboxCheckbox, 0);
-  }
+    }
 
   VectorSelectionTool *vectorSelectionTool = dynamic_cast<VectorSelectionTool *>(tool);
   if (vectorSelectionTool) {
     m_isVectorSelction = true;
 
-    //change Thick
+    // change Thick
     IconViewField *thicknessIconView = new IconViewField(this, IconViewField::Icon_Thickness);
     m_thickChangeField = new ThickChangeField(selectionTool, tr("Thickness"));
 
     addSeparator();
     hLayout()->addWidget(thicknessIconView, 0);
     hLayout()->addWidget(m_thickChangeField, 10);
-    
+    // Outline options
     // Outline options
     ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
     builder.setEnumWidgetType(ToolOptionControlBuilder::POPUPBUTTON);
@@ -1106,7 +1106,7 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   }
 
 	hLayout()->addStretch(1);
-
+  // assert(ret);
 	bool ret = connect(m_scaleXField, SIGNAL(valueChange()), SLOT(onScaleXValueChanged()));
 	ret = ret && connect(m_scaleYField, SIGNAL(valueChange()), SLOT(onScaleYValueChanged()));
 	if (m_setSaveboxCheckbox)
@@ -1114,7 +1114,7 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
 
 	//assert(ret);
 
-	updateStatus();
+  updateStatus();
 }
 
 //-----------------------------------------------------------------------------
@@ -1528,7 +1528,7 @@ void FillToolOptionsBox::onMultiFrameModeToggled(bool value) {
 //
 //=============================================================================
 
-class BrushToolOptionsBox::PresetNamePopup : public DVGui::Dialog {
+class BrushToolOptionsBox::PresetNamePopup final : public DVGui::Dialog {
   DVGui::LineEdit *m_nameFld;
 
 public:
@@ -1791,7 +1791,7 @@ void EraserToolOptionsBox::onColorModeChanged() {
 // RulerToolOptionsBox
 //
 //=============================================================================
-class ToolOptionsBarSeparator : public QWidget {
+class ToolOptionsBarSeparator final : public QWidget {
 public:
   ToolOptionsBarSeparator(QWidget *parent) : QWidget(parent) {
     setFixedSize(2, 26);
@@ -1954,7 +1954,7 @@ TapeToolOptionsBox::TapeToolOptionsBox(QWidget *parent, TTool *tool,
 
   ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
   if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
-  
+
   hLayout()->addStretch(1);
   if (!(tool->getTargetType() & TTool::Vectors)) return;
 
@@ -2029,7 +2029,7 @@ void TapeToolOptionsBox::onJoinStrokesModeChanged() {
 //-----------------------------------------------------------------------------
 /*! Label with background color
 */
-class RGBLabel : public QWidget {
+class RGBLabel final : public QWidget {
   QColor m_color;
 
 public:

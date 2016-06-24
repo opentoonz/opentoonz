@@ -74,7 +74,7 @@ TThickPoint operator*(const TAffine &aff, const TThickPoint &p) {
 
 /*=====================================================================*/
 
-class MyOfstream : public Tofstream {
+class MyOfstream final : public Tofstream {
 public:
   MyOfstream(const TFilePath &path) : Tofstream(path) {}
 

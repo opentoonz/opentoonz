@@ -35,7 +35,7 @@ namespace {
 // Pick Style Tool
 //------------------------------------------------------------------------
 
-class StylePickerTool : public TTool {
+class StylePickerTool final : public TTool {
   int m_oldStyleId, m_currentStyleId;
 
   TEnumProperty m_colorType;

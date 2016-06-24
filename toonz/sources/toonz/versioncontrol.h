@@ -19,7 +19,7 @@ class TLevelSet;
 
 //-----------------------------------------------------------------------------
 
-class VersionControlThread : public QThread {
+class VersionControlThread final : public QThread {
   Q_OBJECT
 
   bool m_abort;
@@ -66,7 +66,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class VersionControlManager : public QObject {
+class VersionControlManager final : public QObject {
   Q_OBJECT
 
   VersionControlThread m_thread;
@@ -91,7 +91,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class VersionControl : public QObject {
+class VersionControl final : public QObject {
   Q_OBJECT
 
   QString m_userName;

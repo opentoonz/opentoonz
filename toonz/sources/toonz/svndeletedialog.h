@@ -15,7 +15,7 @@ class QFile;
 
 //-----------------------------------------------------------------------------
 
-class SVNDeleteDialog : public DVGui::Dialog {
+class SVNDeleteDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QLabel *m_waitingLabel;

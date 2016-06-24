@@ -10,7 +10,7 @@ class TXshSimpleLevel;
 
 namespace TScriptBinding {
 
-class DVAPI ToonzRasterConverter : public Wrapper {
+class DVAPI ToonzRasterConverter final : public Wrapper {
   Q_OBJECT
   bool m_flatSource;
 

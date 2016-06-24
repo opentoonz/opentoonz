@@ -30,7 +30,7 @@ class TContentHistory;
  */
 //=============================================================================
 
-class DVAPI TXshPaletteLevel : public TXshLevel {
+class DVAPI TXshPaletteLevel final : public TXshLevel {
 private:
   PERSIST_DECLARATION(TXshPaletteLevel)
 

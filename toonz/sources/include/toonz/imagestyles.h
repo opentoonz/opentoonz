@@ -81,7 +81,7 @@ public:
 
 //--------------------------------------------------------------------------------------------------------
 
-class DVAPI TTextureStyle : public TOutlineStyle, TRasterStyleFx, TImageStyle {
+class DVAPI TTextureStyle final : public TOutlineStyle, TRasterStyleFx, TImageStyle {
 public:
 private:
   TTextureParams m_params;

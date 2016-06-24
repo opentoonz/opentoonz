@@ -11,7 +11,7 @@ class FunctionPanel;
 class TFrameHandle;
 class FrameNavigator;
 
-class DVAPI FunctionKeyframeNavigator : public KeyframeNavigator {
+class DVAPI FunctionKeyframeNavigator final : public KeyframeNavigator {
   Q_OBJECT
   TDoubleParamP m_curve;
 

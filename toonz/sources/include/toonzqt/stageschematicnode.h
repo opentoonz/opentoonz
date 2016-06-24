@@ -39,7 +39,7 @@ enum eStageSchematicPortType {
 //
 //========================================================
 
-class ColumnPainter : public QObject, public QGraphicsItem {
+class ColumnPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 
@@ -72,7 +72,7 @@ public slots:
 //
 //========================================================
 
-class GroupPainter : public QObject, public QGraphicsItem {
+class GroupPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 
@@ -99,7 +99,7 @@ protected:
 //
 //========================================================
 
-class PegbarPainter : public QObject, public QGraphicsItem {
+class PegbarPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 
@@ -126,7 +126,7 @@ protected:
 //
 //========================================================
 
-class CameraPainter : public QObject, public QGraphicsItem {
+class CameraPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 
@@ -154,7 +154,7 @@ protected:
 //
 //========================================================
 
-class TablePainter : public QObject, public QGraphicsItem {
+class TablePainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 
@@ -178,7 +178,7 @@ protected:
 //
 //========================================================
 
-class SplinePainter : public QObject, public QGraphicsItem {
+class SplinePainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 
@@ -205,7 +205,7 @@ protected:
 //
 //========================================================
 
-class StageSchematicNodePort : public SchematicPort {
+class StageSchematicNodePort final : public SchematicPort {
   QString m_handle;
 
 public:
@@ -232,7 +232,7 @@ private:
 //
 //========================================================
 
-class StageSchematicSplinePort : public SchematicPort {
+class StageSchematicSplinePort final : public SchematicPort {
   StageSchematicSplineDock *m_parent;
   QPixmap m_squarePixmap, m_rhombPixmap;
 
@@ -257,7 +257,7 @@ private:
 //
 //========================================================
 
-class SplineAimChanger : public SchematicHandleSpinBox {
+class SplineAimChanger final : public SchematicHandleSpinBox {
   bool m_aim;
 
 public:
@@ -278,7 +278,7 @@ protected:
 //
 //========================================================
 
-class StageSchematicNodeDock : public QObject, public QGraphicsItem {
+class StageSchematicNodeDock final : public QObject, public QGraphicsItem {
   Q_OBJECT
 #ifndef MACOSX
   Q_INTERFACES(QGraphicsItem)
@@ -329,7 +329,7 @@ protected slots:
 //
 //========================================================
 
-class StageSchematicSplineDock : public QObject, public QGraphicsItem {
+class StageSchematicSplineDock final : public QObject, public QGraphicsItem {
   Q_OBJECT
 #ifndef MACOSX
   Q_INTERFACES(QGraphicsItem)
@@ -412,7 +412,7 @@ protected slots:
 //
 //========================================================
 
-class StageSchematicPegbarNode : public StageSchematicNode {
+class StageSchematicPegbarNode final : public StageSchematicNode {
   Q_OBJECT
 
   PegbarPainter *m_pegbarPainter;
@@ -438,7 +438,7 @@ protected slots:
 //
 //========================================================
 
-class StageSchematicTableNode : public StageSchematicNode {
+class StageSchematicTableNode final : public StageSchematicNode {
   TablePainter *m_tablePainter;
 
 public:
@@ -456,7 +456,7 @@ public:
 //
 //========================================================
 
-class StageSchematicColumnNode : public StageSchematicNode {
+class StageSchematicColumnNode final : public StageSchematicNode {
   Q_OBJECT
 
   SchematicThumbnailToggle *m_resizeItem;
@@ -496,7 +496,7 @@ protected slots:
 //
 //========================================================
 
-class StageSchematicCameraNode : public StageSchematicNode {
+class StageSchematicCameraNode final : public StageSchematicNode {
   Q_OBJECT
 
   CameraPainter *m_cameraPainter;
@@ -522,7 +522,7 @@ protected slots:
 //
 //========================================================
 
-class StageSchematicSplineNode : public SchematicNode {
+class StageSchematicSplineNode final : public SchematicNode {
   Q_OBJECT
 
   TStageObjectSpline *m_spline;
@@ -569,7 +569,7 @@ protected slots:
 //
 //========================================================
 
-class StageSchematicGroupNode : public StageSchematicNode {
+class StageSchematicGroupNode final : public StageSchematicNode {
   Q_OBJECT
 
   GroupPainter *m_painter;

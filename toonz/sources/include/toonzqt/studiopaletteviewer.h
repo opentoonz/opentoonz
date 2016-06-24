@@ -39,7 +39,7 @@ class TXshLevelHandle;
                 folder and current project palette folder, the three root folder
    of \b StudioPalette.
 */
-class DVAPI StudioPaletteTreeViewer : public QTreeWidget,
+class DVAPI StudioPaletteTreeViewer final : public QTreeWidget,
                                       public StudioPalette::Listener,
                                       public TProjectManager::Listener {
   Q_OBJECT
@@ -203,7 +203,7 @@ protected:
                 allows to show and modify current studio palette selected in
    tree.
 */
-class DVAPI StudioPaletteViewer : public QSplitter {
+class DVAPI StudioPaletteViewer final : public QSplitter {
   Q_OBJECT
 
   StudioPaletteTreeViewer *m_studioPaletteTreeViewer;

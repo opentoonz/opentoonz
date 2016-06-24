@@ -16,7 +16,7 @@
 //    Centered Text Widget class
 //----------------------------------
 
-class CenteredTextWidget : public QWidget {
+class CenteredTextWidget final : public QWidget {
   QString m_text;
 
 public:
@@ -158,7 +158,7 @@ void LogPanel::clear() {
 //=============================================================================
 // OpenFloatingLogPanel
 
-class OpenFloatingLogPanel : public MenuItemHandler {
+class OpenFloatingLogPanel final : public MenuItemHandler {
 public:
   OpenFloatingLogPanel() : MenuItemHandler(MI_OpenMessage) {}
   void execute() override {

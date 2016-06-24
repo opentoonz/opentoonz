@@ -20,7 +20,7 @@ class QListWidgetItem;
 //=============================================================================
 // BatchServersViewer
 
-class FarmServerListView : public QListWidget {
+class FarmServerListView final : public QListWidget {
   Q_OBJECT
 public:
   FarmServerListView(QWidget *parent);
@@ -40,7 +40,7 @@ private:
   std::unique_ptr<QMenu> m_menu;
 };
 
-class BatchServersViewer : public QFrame {
+class BatchServersViewer final : public QFrame {
   Q_OBJECT
 
 public:

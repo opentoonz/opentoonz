@@ -85,7 +85,7 @@ void fill_lut(QList<TPointD> points, std::vector<T> &lut, bool isLinear) {
 
 //===================================================================
 
-class ToneCurveFx : public TStandardRasterFx {
+class ToneCurveFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ToneCurveFx)
 
   TRasterFxPort m_input;

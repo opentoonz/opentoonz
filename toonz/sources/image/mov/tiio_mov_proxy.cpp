@@ -104,7 +104,7 @@ err:
 //    TImageWriterMov Proxy implementation
 //******************************************************************************
 
-class TImageWriterMovProxy : public TImageWriter {
+class TImageWriterMovProxy final : public TImageWriter {
   TLevelWriterMov *m_lw;
 
 public:
@@ -305,7 +305,7 @@ void TLevelWriterMov::saveSoundTrack(TSoundTrack *st) {
 //    TImageReaderMov Proxy implementation
 //******************************************************************************
 
-class TImageReaderMovProxy : public TImageReader {
+class TImageReaderMovProxy final : public TImageReader {
   TLevelReaderMov *m_lr;
   TImageInfo *m_info;
 

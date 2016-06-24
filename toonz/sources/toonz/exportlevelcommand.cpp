@@ -61,7 +61,7 @@ struct BusyCursorOverride {
 
 //---------------------------------------------------------------------------
 
-struct ExportOverwriteCB : public IoCmd::OverwriteCallbacks {
+struct ExportOverwriteCB final : public IoCmd::OverwriteCallbacks {
   bool overwriteRequest(const TFilePath &fp) override {
     int ret = DVGui::MsgBox(
         QObject::tr("Warning: file %1 already exists.").arg(toQString(fp)),
@@ -72,7 +72,7 @@ struct ExportOverwriteCB : public IoCmd::OverwriteCallbacks {
 
 //---------------------------------------------------------------------------
 
-struct ExportProgressCB : public IoCmd::ProgressCallbacks {
+struct ExportProgressCB final : public IoCmd::ProgressCallbacks {
   QString m_processedName;
   ProgressDialog m_pb;
 

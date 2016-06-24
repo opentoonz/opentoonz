@@ -408,7 +408,7 @@ void addStrokeToImage(TTool::Application *application, const TVectorImageP &vi,
 
 //=========================================================================================================
 
-class RasterBrushUndo : public TRasterUndo {
+class RasterBrushUndo final : public TRasterUndo {
   std::vector<TThickPoint> m_points;
   int m_styleId;
   bool m_selective;
@@ -449,7 +449,7 @@ public:
 
 //=========================================================================================================
 
-class RasterBluredBrushUndo : public TRasterUndo {
+class RasterBluredBrushUndo final : public TRasterUndo {
   std::vector<TThickPoint> m_points;
   int m_styleId;
   bool m_selective;

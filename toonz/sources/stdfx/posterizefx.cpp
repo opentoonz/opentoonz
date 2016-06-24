@@ -16,7 +16,7 @@ void prepare_lut(int levels, std::vector<T> &lut) {
 
 //===================================================================
 
-class PosterizeFx : public TStandardRasterFx {
+class PosterizeFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(PosterizeFx)
 
   TRasterFxPort m_input;

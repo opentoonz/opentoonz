@@ -23,7 +23,7 @@ class CheckBox;
 // PsdSettingsPopup
 //-----------------------------------------------------------------------------
 
-class PsdSettingsPopup : public DVGui::Dialog {
+class PsdSettingsPopup final : public DVGui::Dialog {
   Q_OBJECT
   // Loading Mode
   // FLAT: psd flat image

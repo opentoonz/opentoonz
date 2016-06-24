@@ -674,7 +674,7 @@ bool TProject::isAProjectPath(const TFilePath &fp) {
 namespace {
 
 /*
-class SimpleProject : public TProject {
+class SimpleProject final : public TProject {
 public:
   SimpleProject() : TProject(TFilePath("___simpleProject")) {
   }

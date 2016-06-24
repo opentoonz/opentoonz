@@ -10,7 +10,7 @@ class TXshSimpleLevel;
 
 namespace TScriptBinding {
 
-class DVAPI Transform : public Wrapper {
+class DVAPI Transform final : public Wrapper {
   Q_OBJECT
   TAffine m_affine;
 
@@ -31,7 +31,7 @@ public:
   const TAffine &getAffine() const { return m_affine; }
 };
 
-class DVAPI ImageBuilder : public Wrapper {
+class DVAPI ImageBuilder final : public Wrapper {
   Q_OBJECT
   TImageP m_img;
   int m_width, m_height;

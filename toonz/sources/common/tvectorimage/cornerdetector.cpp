@@ -5,7 +5,7 @@
 //======================================================================
 
 //! Classe che definisce dei punti che consentono di trovare gli angoli
-class AlgorithmPointI : public TPointI {
+class AlgorithmPointI final : public TPointI {
 public:
   //! Indice originale del punto
   int m_originalIndex;

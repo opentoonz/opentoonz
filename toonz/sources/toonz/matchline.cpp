@@ -481,7 +481,7 @@ void MatchlinesDialog::onInkPrevalenceChanged(bool isDragging) {
 
 //-----------------------------------------------------------------------------
 
-class DeleteMatchlineUndo : public TUndo {
+class DeleteMatchlineUndo final : public TUndo {
 public:
   TXshLevel *m_xl;
   TXshSimpleLevel *m_sl;
@@ -555,7 +555,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class MatchlineUndo : public TUndo {
+class MatchlineUndo final : public TUndo {
   TXshLevelP m_xl;
   int m_mergeCmappedSessionId;
   std::map<TFrameId, QString> m_images;

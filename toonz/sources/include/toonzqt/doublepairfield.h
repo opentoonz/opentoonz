@@ -234,7 +234,7 @@ public:
                         \image html DoublePairField.jpg
 */
 
-class DVAPI MeasuredDoublePairField : public DoubleValuePairField {
+class DVAPI MeasuredDoublePairField final : public DoubleValuePairField {
 public:
   MeasuredDoublePairField(QWidget *parent = 0, bool isMaxRangeLimited = true);
   ~MeasuredDoublePairField() {}

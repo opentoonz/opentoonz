@@ -38,7 +38,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class DVAPI TTextData : public TData {
+class DVAPI TTextData final : public TData {
   TString m_text;
 
 public:
@@ -57,7 +57,7 @@ public:
 #pragma warning(disable : 4251)
 #endif
 
-class DVAPI TFilePathListData : public TData {
+class DVAPI TFilePathListData final : public TData {
   std::vector<TFilePath> m_filePaths;
 
 public:

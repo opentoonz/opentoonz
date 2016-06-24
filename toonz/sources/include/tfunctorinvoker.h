@@ -47,7 +47,7 @@ instance on the heap,
               The following code exemplifies a correct usage for this class:
 \n
               \code
-              class MyFunctor : public TFunctorInvoker::BaseFunctor
+              class MyFunctor final : public TFunctorInvoker::BaseFunctor
               {
                 MyParams m_params;                                // Function
 parameters
@@ -74,7 +74,7 @@ Qt::QueuedConnection,
               \endcode
 */
 
-class DVAPI TFunctorInvoker : public QObject {
+class DVAPI TFunctorInvoker final : public QObject {
   Q_OBJECT
 
 public:

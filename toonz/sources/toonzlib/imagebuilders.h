@@ -28,7 +28,7 @@ class TXshSimpleLevel;
   for
   image loading.
 */
-class ImageLoader : public ImageBuilder {
+class ImageLoader final : public ImageBuilder {
 public:
   struct BuildExtData {
     const TXshSimpleLevel *m_sl;  //!< TXshSimpleLevel instance associated to an
@@ -78,7 +78,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-class ImageRasterizer : public ImageBuilder {
+class ImageRasterizer final : public ImageBuilder {
 public:
   ImageRasterizer() {}
   ~ImageRasterizer() {}
@@ -92,7 +92,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class ImageFiller : public ImageBuilder {
+class ImageFiller final : public ImageBuilder {
 public:
   ImageFiller() {}
   ~ImageFiller() {}

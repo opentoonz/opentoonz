@@ -196,7 +196,7 @@ const std::string CodecQualityId = "PU_CodecQuality";
 //  TImageWriterMov
 //------------------------------------------------------------------------------
 
-class TImageWriter3gp : public TImageWriter {
+class TImageWriter3gp final : public TImageWriter {
 public:
   TImageWriter3gp(const TFilePath &, int frameIndex, TLevelWriter3gp *);
   ~TImageWriter3gp() { m_lwm->release(); }
@@ -218,7 +218,7 @@ private:
 //-----------------------------------------------------------
 //  TImageReaderv
 //-----------------------------------------------------------
-class TImageReader3gp : public TImageReader {
+class TImageReader3gp final : public TImageReader {
 public:
   TImageReader3gp(const TFilePath &, int frameIndex, TLevelReader3gp *);
   ~TImageReader3gp() { m_lrm->release(); }

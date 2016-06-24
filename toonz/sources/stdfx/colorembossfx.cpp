@@ -6,7 +6,7 @@
 
 //===================================================================
 
-class ColorEmbossFx : public TStandardRasterFx {
+class ColorEmbossFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ColorEmbossFx)
 
   TRasterFxPort m_input;

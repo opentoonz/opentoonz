@@ -61,7 +61,7 @@ to the
       "current cleanup palette handle" accessible through the
 TPaletteController.
 */
-class CleanupSettingsModel : public QObject {
+class CleanupSettingsModel final : public QObject {
   Q_OBJECT
 
   int m_listenersCount;    //!< Number of attached clients

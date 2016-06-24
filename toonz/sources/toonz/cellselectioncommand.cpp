@@ -53,7 +53,7 @@
 
 namespace {
 
-class ReverseUndo : public TUndo {
+class ReverseUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
 
 public:
@@ -101,7 +101,7 @@ void TCellSelection::reverseCells() {
 
 namespace {
 
-class SwingUndo : public TUndo {
+class SwingUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
 
 public:
@@ -160,7 +160,7 @@ void TCellSelection::swingCells() {
 
 namespace {
 
-class IncrementUndo : public TUndo {
+class IncrementUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
   mutable std::vector<std::pair<TRect, TXshCell>> m_undoCells;
 
@@ -245,7 +245,7 @@ void TCellSelection::incrementCells() {
 
 namespace {
 
-class RandomUndo : public TUndo {
+class RandomUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
 
   std::vector<int> m_shuffle;  //!< Shuffled indices
@@ -344,7 +344,7 @@ void TCellSelection::randomCells() {
 
 namespace {
 
-class StepUndo : public TUndo {
+class StepUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
   int m_rowsCount, m_colsCount;
 
@@ -445,7 +445,7 @@ void TCellSelection::stepCells(int step) {
 
 namespace {
 
-class EachUndo : public TUndo {
+class EachUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
   int m_rowsCount, m_colsCount;
 
@@ -549,7 +549,7 @@ void TCellSelection::eachCells(int each) {
 
 namespace {
 
-class ReframeUndo : public TUndo {
+class ReframeUndo final : public TUndo {
   int m_r0, m_r1;
   int m_type;
   int m_nr;
@@ -705,7 +705,7 @@ void TColumnSelection::reframeCells(int count) {
 
 namespace {
 
-class ResetStepUndo : public TUndo {
+class ResetStepUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
   int m_rowsCount, m_colsCount;
 
@@ -804,7 +804,7 @@ void TCellSelection::resetStepCells() {
 
 namespace {
 
-class IncreaseStepUndo : public TUndo {
+class IncreaseStepUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
   int m_rowsCount, m_colsCount;
 
@@ -908,7 +908,7 @@ void TCellSelection::increaseStepCells() {
 
 namespace {
 
-class DecreaseStepUndo : public TUndo {
+class DecreaseStepUndo final : public TUndo {
   int m_r0, m_c0, m_r1, m_c1;
   int m_rowsCount, m_colsCount;
 
@@ -1070,7 +1070,7 @@ void TCellSelection::rollupCells() {
 
 namespace {
 
-class RolldownUndo : public RollupUndo {
+class RolldownUndo final : public RollupUndo {
 public:
   RolldownUndo(int r0, int c0, int r1, int c1) : RollupUndo(r0, c0, r1, c1) {}
 
@@ -1142,7 +1142,7 @@ void TCellSelection::setKeyframes() {
 
 namespace {
 
-class CloneLevelUndo : public TUndo {
+class CloneLevelUndo final : public TUndo {
   typedef std::map<TXshSimpleLevel *, TXshLevelP> InsertedLevelsMap;
   typedef std::set<int> InsertedColumnsSet;
 
@@ -1211,7 +1211,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-struct CloneLevelUndo::ExistsFunc : public OverwriteDialog::ExistsFunc {
+struct CloneLevelUndo::ExistsFunc final : public OverwriteDialog::ExistsFunc {
   ToonzScene *m_scene;
 
 public:
@@ -1231,7 +1231,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class CloneLevelUndo::LevelNamePopup : public DVGui::Dialog {
+class CloneLevelUndo::LevelNamePopup final : public DVGui::Dialog {
   DVGui::LineEdit *m_name;
   QPushButton *m_ok, *m_cancel;
 

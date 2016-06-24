@@ -182,7 +182,7 @@ inline void delete_(T t) {
 }
 
 template <typename T>
-struct Vector : public std::vector<T> {
+struct Vector final : public std::vector<T> {
   Vector() : std::vector<T>() {}
   ~Vector() { std::for_each(this->begin(), this->end(), delete_<T>); }
 };
@@ -219,7 +219,7 @@ public:
 
 //--------------------------------------------------------------------------
 
-class BordersReader : public ImageMeshesReaderT<TPixelGR8> {
+class BordersReader final : public ImageMeshesReaderT<TPixelGR8> {
 public:
   Vector<RasterBorder *> m_borders;
   RasterBorder *m_current;

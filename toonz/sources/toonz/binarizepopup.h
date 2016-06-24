@@ -21,7 +21,7 @@ class CheckBox;
 // BinarizePopup
 //-----------------------------------------------------------------------------
 
-class BinarizePopup : public DVGui::Dialog {
+class BinarizePopup final : public DVGui::Dialog {
   Q_OBJECT
 
 protected:

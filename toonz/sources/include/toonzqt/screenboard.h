@@ -70,7 +70,7 @@ list
     be refreshed to keep it to a minimum.
 */
 
-class DVAPI ScreenBoard : public QObject {
+class DVAPI ScreenBoard final : public QObject {
   Q_OBJECT
 
 public:

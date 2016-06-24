@@ -55,7 +55,7 @@ class QHideEvent;
 /*!
   \brief    The popup dealing with level exports in Toonz.
 */
-class ExportLevelPopup : public FileBrowserPopup {
+class ExportLevelPopup final : public FileBrowserPopup {
   Q_OBJECT
 
 public:
@@ -105,7 +105,7 @@ private slots:
 
 //-----------------------------------------------------------------------------
 
-class ExportLevelPopup::ExportOptions : public QFrame {
+class ExportLevelPopup::ExportOptions final : public QFrame {
   Q_OBJECT
 
 public:

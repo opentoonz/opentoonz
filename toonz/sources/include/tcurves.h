@@ -326,7 +326,7 @@ inline std::ostream &operator<<(std::ostream &out, const TCubic *curve) {
   TSegment Class to manage a segment with thickness
   \!relates TSegment
  */
-class DVAPI TThickSegment : public TSegment {
+class DVAPI TThickSegment final : public TSegment {
 protected:
   double m_thickP0;
   double m_thickP1;
@@ -413,7 +413,7 @@ inline std::ostream &operator<<(std::ostream &out,
   Class TThickQuadratic: manage a curve with thick
   \!relates TQuadratic
  */
-class DVAPI TThickQuadratic : public TQuadratic {
+class DVAPI TThickQuadratic final : public TQuadratic {
 protected:
   double m_thickP0;
   double m_thickP1;
@@ -501,7 +501,7 @@ inline std::ostream &operator<<(std::ostream &out, const TThickQuadratic *tq) {
   Class TThickCubic: manage a cubic with thick
   \!relates TCubic
  */
-class DVAPI TThickCubic : public TCubic {
+class DVAPI TThickCubic final : public TCubic {
 protected:
   double m_thickP0;
   double m_thickP1;

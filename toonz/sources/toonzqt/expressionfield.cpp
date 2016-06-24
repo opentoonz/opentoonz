@@ -22,7 +22,7 @@ using namespace TSyntax;
 
 //=============================================================================
 
-class ExpressionField::SyntaxHighlighter : public QSyntaxHighlighter {
+class ExpressionField::SyntaxHighlighter final : public QSyntaxHighlighter {
   const Grammar *m_grammar;
 
 public:
@@ -95,7 +95,7 @@ public:
 
 //=============================================================================
 
-class MyListView : public QListView {
+class MyListView final : public QListView {
   QLabel *m_tooltip;
 
 public:

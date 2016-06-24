@@ -73,12 +73,12 @@ public:
 
 //********************************************************************************
 
-class DVAPI TTileSetCM32 : public TTileSet {
+class DVAPI TTileSetCM32 final : public TTileSet {
 public:
   // per adesso, facciamo che comprime sempre,
   // appena costruisce l'oggetto. Poi potremmo dare la scelta,
   // anche per decidere se farlo subito o meno.
-  class DVAPI Tile : public TTileSet::Tile {
+  class DVAPI Tile final : public TTileSet::Tile {
   public:
     Tile();
     Tile(const TRasterCM32P &ras, const TPoint &p);
@@ -113,12 +113,12 @@ public:
 
 //********************************************************************************
 
-class DVAPI TTileSetFullColor : public TTileSet {
+class DVAPI TTileSetFullColor final : public TTileSet {
 public:
   // per adesso, facciamo che comprime sempre,
   // appena costruisce l'oggetto. Poi potremmo dare la scelta,
   // anche per decidere se farlo subito o meno.
-  class DVAPI Tile : public TTileSet::Tile {
+  class DVAPI Tile final : public TTileSet::Tile {
   public:
     Tile();
     Tile(const TRasterP &ras, const TPoint &p);

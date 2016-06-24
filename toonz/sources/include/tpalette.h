@@ -82,7 +82,7 @@ ASAP.
 \sa The TColorStyle class.
 */
 
-class DVAPI TPalette : public TPersist, public TSmartObject {
+class DVAPI TPalette final : public TPersist, public TSmartObject {
   DECLARE_CLASS_CODE
   PERSIST_DECLARATION(TPalette);
 

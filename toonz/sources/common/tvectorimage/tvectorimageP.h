@@ -101,7 +101,7 @@ class Intersection;
 
 #ifdef LEVO
 
-class TAutocloseEdge : public TGeneralEdge {
+class TAutocloseEdge final : public TGeneralEdge {
 public:
   TSegment m_segment;
   int m_nextStrokeIndex;

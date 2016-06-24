@@ -49,7 +49,7 @@ const int labelSize = 110;
 //-----------------------------------------------------------------------------
 
 /*
-class CheckBoardRect : public QWidget
+class CheckBoardRect final : public QWidget
 {
 TRaster32P m_ras;
 

@@ -116,7 +116,7 @@ typedef tcg::Vertex<TPoint> Vertex;
 
 //--------------------------------------------------------------------------------
 
-class Edge : public tcg::Edge {
+class Edge final : public tcg::Edge {
   TPoint m_directions[2];
   int m_imageIndex;
 
@@ -133,7 +133,7 @@ public:
 
 //--------------------------------------------------------------------------------
 
-class Face : public tcg::Face {
+class Face final : public tcg::Face {
   tcg::list<int> m_meshes;
   int m_imageIndex;
 
@@ -153,7 +153,7 @@ public:
 
 //--------------------------------------------------------------------------------
 
-class ImageMesh : public TSmartObject, public tcg::Mesh<Vertex, Edge, Face> {};
+class ImageMesh final : public TSmartObject, public tcg::Mesh<Vertex, Edge, Face> {};
 
 //--------------------------------------------------------------------------------
 
@@ -205,7 +205,7 @@ private:
 //--------------------------------------------------------------------------------
 
 template <typename Pixel>
-class ImageMeshesReaderT : public ImageMeshesReader {
+class ImageMeshesReaderT final : public ImageMeshesReader {
 public:
   typedef PixelSelector<Pixel> pixel_selector_type;
   typedef typename pixel_selector_type::value_type value_type;

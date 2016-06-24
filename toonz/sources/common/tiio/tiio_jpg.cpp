@@ -142,7 +142,7 @@ int JpgReader::skipLines(int lineCount) {
   return lineCount;
 }
 
-class JpgWriter : public Tiio::Writer {
+class JpgWriter final : public Tiio::Writer {
   struct jpeg_compress_struct m_cinfo;
   struct jpeg_error_mgr m_jerr;
   FILE *m_chan;

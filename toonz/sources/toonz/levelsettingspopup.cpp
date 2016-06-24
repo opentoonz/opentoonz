@@ -1048,7 +1048,7 @@ OpenPopupCommandHandler<LevelSettingsPopup> openLevelSettingsPopup(
 
 //-----------------------------------------------------------------------------
 
-class ViewLevelFileInfoHandler : public MenuItemHandler {
+class ViewLevelFileInfoHandler final : public MenuItemHandler {
 public:
   ViewLevelFileInfoHandler(CommandId cmdId) : MenuItemHandler(cmdId) {}
 
@@ -1106,7 +1106,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class ViewLevelHandler : public MenuItemHandler {
+class ViewLevelHandler final : public MenuItemHandler {
 public:
   ViewLevelHandler(CommandId cmdId) : MenuItemHandler(cmdId) {}
 

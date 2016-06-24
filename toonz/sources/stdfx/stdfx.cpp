@@ -23,7 +23,7 @@ bool isAlmostIsotropic(const TAffine &aff) { return aff.isIsotropic(0.001); }
 
 //==================================================================
 
-class FadeFx : public TStandardRasterFx {
+class FadeFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(FadeFx)
   TRasterFxPort m_input;
   TDoubleParamP m_value;
@@ -67,7 +67,7 @@ public:
 
 //==================================================================
 
-class SpiralFx : public TStandardZeraryFx {
+class SpiralFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(SpiralFx)
   TDoubleParamP m_freq;
   TDoubleParamP m_phase;
@@ -164,7 +164,7 @@ void SpiralFx::doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
 
 //------------------------------------------------------------------
 
-class MultiLinearGradientFx : public TStandardZeraryFx {
+class MultiLinearGradientFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(MultiLinearGradientFx)
   TDoubleParamP m_period;
   TDoubleParamP m_count;
@@ -227,7 +227,7 @@ public:
   }
 };
 
-class LinearGradientFx : public TStandardZeraryFx {
+class LinearGradientFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(LinearGradientFx)
   TDoubleParamP m_period;
 
@@ -398,7 +398,7 @@ throw TException("MultiLinearGradientFx: unsupported Pixel Type");
 
 //==================================================================
 
-class RadialGradientFx : public TStandardZeraryFx {
+class RadialGradientFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(RadialGradientFx)
   TDoubleParamP m_period;
   TDoubleParamP m_innerperiod;
@@ -450,7 +450,7 @@ public:
 
 //==================================================================
 
-class MultiRadialGradientFx : public TStandardZeraryFx {
+class MultiRadialGradientFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(MultiRadialGradientFx)
   TDoubleParamP m_period;
   TDoubleParamP m_count;
@@ -546,7 +546,7 @@ void RadialGradientFx::doCompute(TTile &tile, double frame,
 
 //------------------------------------------------------------------
 
-class LightSpotFx : public TStandardZeraryFx {
+class LightSpotFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(LightSpotFx)
   TDoubleParamP m_softness;
   TDoubleParamP m_a;

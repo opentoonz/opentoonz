@@ -30,7 +30,7 @@ struct _RASTER;
 //    TRopException  definition
 //********************************************************************************
 
-class DVAPI TRopException : public TException {
+class DVAPI TRopException final : public TException {
   std::string message;
 
 public:

@@ -65,7 +65,7 @@ public:
 // KeyframeMoverTool
 //-----------------------------------------------------------------------------
 
-class KeyframeMoverTool : public XsheetGUI::DragTool {
+class KeyframeMoverTool final : public XsheetGUI::DragTool {
   TKeyframeSelection m_startSelection;
   int m_offset;
   int m_firstRow, m_firstCol;

@@ -278,7 +278,7 @@ TSystem::outputDebug("~RasterPool: itemCount = " + toString
 //    TRendererImp
 //---------------------
 
-class TRendererImp : public TSmartObject {
+class TRendererImp final : public TSmartObject {
 public:
   struct RenderInstanceInfos {
     int m_canceled;
@@ -374,7 +374,7 @@ unsigned long TRendererImp::m_renderIdCounter   = 0;
 //    RenderTask
 //-------------------
 
-class RenderTask : public TThread::Runnable {
+class RenderTask final : public TThread::Runnable {
   std::vector<double> m_frames;
 
   unsigned long m_taskId;

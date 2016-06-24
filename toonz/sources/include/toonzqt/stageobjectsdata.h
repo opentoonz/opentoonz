@@ -50,7 +50,7 @@ class TFxSet;
 
 //! StageObjectsData is the class used to store multiple schematic stage
 //! object's relational data.
-class DVAPI StageObjectsData : public DvMimeData {
+class DVAPI StageObjectsData final : public DvMimeData {
   QList<TStageObjectDataElement *>
       m_elements;  //!< The collection of single stage object
                    //!< relational data (owned)

@@ -35,7 +35,7 @@ class Potential;
    *
    * New stroke deformer doesn't change last point of stroke.
    */
-class DVAPI StrokeParametricDeformer : public TStrokeDeformation {
+class DVAPI StrokeParametricDeformer final : public TStrokeDeformation {
 public:
   StrokeParametricDeformer(double actionLenght, double startParameter,
                            TStroke *s, Potential *);

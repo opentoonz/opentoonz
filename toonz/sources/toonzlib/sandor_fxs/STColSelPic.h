@@ -27,7 +27,7 @@
 #include "SError.h"
 
 template <class P>
-class CSTColSelPic : public CSTPic<P> {
+class CSTColSelPic final : public CSTPic<P> {
 public:
   std::shared_ptr<UCHAR> m_sel;
 

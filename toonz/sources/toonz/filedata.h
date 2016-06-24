@@ -10,7 +10,7 @@
 // FileData
 //-----------------------------------------------------------------------------
 
-class FileData : public DvMimeData {
+class FileData final : public DvMimeData {
 public:
   std::vector<TFilePath> m_files;
 

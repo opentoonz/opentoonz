@@ -21,7 +21,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI UpdateChecker : public QObject {
+class DVAPI UpdateChecker final : public QObject {
   Q_OBJECT
 
   QSharedPointer<QNetworkAccessManager> manager_;

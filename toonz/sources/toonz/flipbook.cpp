@@ -303,7 +303,7 @@ enum { eBegin, eIncrement, eEnd };
 
 static DVGui::ProgressDialog *Pd = 0;
 
-class ProgressBarMessager : public TThread::Message {
+class ProgressBarMessager final : public TThread::Message {
 public:
   int m_choice;
   int m_val;

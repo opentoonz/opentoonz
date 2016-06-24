@@ -135,7 +135,7 @@ public:
 
 enum CurrentWheel { none, leftWheel, rightTriangle };
 
-class DVAPI HexagonalColorWheel : public QOpenGLWidget {
+class DVAPI HexagonalColorWheel final : public QOpenGLWidget {
   Q_OBJECT
 
   // backgoround color (R160, G160, B160)
@@ -192,7 +192,7 @@ signals:
                 It's possible to choose viewed shade using \b setChannel().
                 Click in square change current SquaredColorWheel.
 */
-class DVAPI SquaredColorWheel : public QWidget {
+class DVAPI SquaredColorWheel final : public QWidget {
   Q_OBJECT
   ColorChannel m_channel;
   ColorModel m_color;
@@ -235,7 +235,7 @@ signals:
    maximum channel color
                 value.
 */
-class DVAPI ColorSlider : public QSlider {
+class DVAPI ColorSlider final : public QSlider {
   Q_OBJECT
 public:
   ColorSlider(Qt::Orientation orientation, QWidget *parent = 0);
@@ -264,7 +264,7 @@ private:
 //=============================================================================
 // ArrowButton
 
-class ArrowButton : public QToolButton {
+class ArrowButton final : public QToolButton {
   Q_OBJECT
 
   Qt::Orientation m_orientaion;
@@ -297,7 +297,7 @@ signals:
 
                 Inherits \b QToolBar.
 */
-class DVAPI ColorSliderBar : public QWidget {
+class DVAPI ColorSliderBar final : public QWidget {
   Q_OBJECT
 
   ColorSlider *m_colorSlider;
@@ -334,7 +334,7 @@ signals:
    value.
     It calls selectAll() at the moment of the first click.
 */
-class ChannelLineEdit : public DVGui::IntLineEdit {
+class ChannelLineEdit final : public DVGui::IntLineEdit {
   Q_OBJECT
 
   bool m_isEditing;
@@ -360,7 +360,7 @@ protected:
    ColorSlider to show/edit the
                 channel value.
 */
-class DVAPI ColorChannelControl : public QWidget {
+class DVAPI ColorChannelControl final : public QWidget {
   Q_OBJECT
   QLabel *m_label;
   ChannelLineEdit *m_field;
@@ -405,7 +405,7 @@ public:
 
                 Inherits \b QWidget.
 */
-class ColorParameterSelector : public QWidget {
+class ColorParameterSelector final : public QWidget {
   Q_OBJECT
 
   std::vector<QColor> m_colors;
@@ -438,7 +438,7 @@ protected:
    button (to control
                 the ColorWheel behaviour).
 */
-class PlainColorPage : public StyleEditorPage {
+class PlainColorPage final : public StyleEditorPage {
   Q_OBJECT
 
   // ColorSliderBar *m_verticalSlider;
@@ -534,7 +534,7 @@ signals:
             style are \a not performed directly by this class.
 */
 
-class SettingsPage : public QScrollArea {
+class SettingsPage final : public QScrollArea {
   Q_OBJECT
 
   QGridLayout *m_paramsLayout;
@@ -577,7 +577,7 @@ using namespace StyleEditorGUI;
 // StyleEditor
 //-----------------------------------------------------------------------------
 
-class DVAPI StyleEditor : public QWidget {
+class DVAPI StyleEditor final : public QWidget {
   Q_OBJECT
 
   PaletteController *m_paletteController;

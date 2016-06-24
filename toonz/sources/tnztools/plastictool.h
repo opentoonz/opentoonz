@@ -56,7 +56,7 @@
 //    PlasticTool  declaration
 //****************************************************************************************
 
-class PlasticTool : public QObject,
+class PlasticTool final : public QObject,
                     public TTool,
                     public TParamObserver,
                     public TSelection::View {
@@ -73,7 +73,7 @@ public:
     ~TemporaryActivation();
   };
 
-  struct MeshIndex : public tcg::safe_bool<MeshIndex> {
+  struct MeshIndex final : public tcg::safe_bool<MeshIndex> {
     int m_meshIdx,  //!< Mesh index in a TMeshImage
         m_idx;      //!< Index in the referenced mesh
 
@@ -397,7 +397,7 @@ private slots:
 //    PlasticToolOptionsBox  declaration
 //****************************************************************************************
 
-class PlasticToolOptionsBox : public GenericToolOptionsBox,
+class PlasticToolOptionsBox final : public GenericToolOptionsBox,
                               public TProperty::Listener {
   Q_OBJECT
 

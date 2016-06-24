@@ -49,7 +49,7 @@ bool isSmallStroke                     = false;
 set<TPointD> simpleCrossing;
 set<TPointD> nonSimpleCrossing;
 
-class LinkedQuadratic : public TQuadratic {
+class LinkedQuadratic final : public TQuadratic {
 public:
   LinkedQuadratic *prev, *next;
   LinkedQuadratic() : TQuadratic(), prev(0), next(0){};

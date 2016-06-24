@@ -28,7 +28,7 @@ class TXshLevelHandle;
 // TStyleSelection
 //-----------------------------------------------------------------------------
 
-class DVAPI TStyleSelection : public TSelection {
+class DVAPI TStyleSelection final : public TSelection {
   TPaletteHandle *m_paletteHandle;
 
   // Used to change level palette; in other palette (cleanup, ...) xsheetHandle

@@ -26,7 +26,7 @@ extern "C" {
 
 namespace Tiio {
 
-class DVAPI JpgReader : public Tiio::Reader {
+class DVAPI JpgReader final : public Tiio::Reader {
   struct jpeg_decompress_struct m_cinfo;
   struct jpeg_error_mgr m_jerr;
   FILE *m_chan;
@@ -48,7 +48,7 @@ public:
 DVAPI Tiio::ReaderMaker makeJpgReader;
 DVAPI Tiio::WriterMaker makeJpgWriter;
 
-class DVAPI JpgWriterProperties : public TPropertyGroup {
+class DVAPI JpgWriterProperties final : public TPropertyGroup {
 public:
   TIntProperty m_quality;
   TIntProperty m_smoothing;

@@ -55,7 +55,7 @@ class ToonzScene;
 
                 Inherits \b QWidget.
 */
-class DVAPI ParamsPage : public QFrame {
+class DVAPI ParamsPage final : public QFrame {
   Q_OBJECT
 
   QColor m_textColor; /*-- 文字の色 デフォルト黒 --*/
@@ -126,7 +126,7 @@ public:
 
                 Inherits \b QWidget.
 */
-class DVAPI ParamsPageSet : public QWidget {
+class DVAPI ParamsPageSet final : public QWidget {
   Q_OBJECT
 
   TabBarContainter *m_tabBarContainer;
@@ -186,7 +186,7 @@ protected slots:
 
                 Inherits \b QWidget.
 */
-class DVAPI ParamViewer : public QFrame {
+class DVAPI ParamViewer final : public QFrame {
   Q_OBJECT
 
   TFxP m_fx;
@@ -230,7 +230,7 @@ signals:
 */
 
 class QActionGroup;
-class DVAPI FxSettings : public QSplitter {
+class DVAPI FxSettings final : public QSplitter {
   Q_OBJECT
 
   QToolBar *m_toolBar;

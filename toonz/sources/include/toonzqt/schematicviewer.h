@@ -97,7 +97,7 @@ protected slots:
 //
 //==================================================================
 
-class DVAPI SchematicSceneViewer : public QGraphicsView {
+class DVAPI SchematicSceneViewer final : public QGraphicsView {
   Q_OBJECT
 
 public:
@@ -139,7 +139,7 @@ private:
 //
 //==================================================================
 
-class DVAPI SchematicViewer : public QWidget {
+class DVAPI SchematicViewer final : public QWidget {
   Q_OBJECT
 
 public:

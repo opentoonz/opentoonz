@@ -119,7 +119,7 @@ bool deleteKeyframesWithoutUndo(
 //  PasteKeyframesUndo
 //-----------------------------------------------------------------------------
 
-class PasteKeyframesUndo : public TUndo {
+class PasteKeyframesUndo final : public TUndo {
   TKeyframeSelection *m_selection;
   QMimeData *m_newData;
   QMimeData *m_oldData;
@@ -173,7 +173,7 @@ public:
 //  DeleteKeyframesUndo
 //-----------------------------------------------------------------------------
 
-class DeleteKeyframesUndo : public TUndo {
+class DeleteKeyframesUndo final : public TUndo {
   TKeyframeSelection *m_selection;
   QMimeData *m_data;
   int m_r0, m_r1, m_c0, m_c1;

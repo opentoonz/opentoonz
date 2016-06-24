@@ -15,7 +15,7 @@ class TXsheet;
 // TKeyframeData
 //-----------------------------------------------------------------------------
 
-class TKeyframeData : public DvMimeData {
+class TKeyframeData final : public DvMimeData {
 public:
   typedef TKeyframeSelection::Position Position;
   typedef std::map<Position, TStageObject::Keyframe> KeyData;

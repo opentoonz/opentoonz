@@ -8,7 +8,7 @@
 
 //===================================================================
 
-class TextureFx : public TStandardRasterFx {
+class TextureFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(TextureFx)
 
   TRasterFxPort m_input;

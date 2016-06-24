@@ -40,7 +40,7 @@ private:
 
 //------------------------------------------------------------------------------
 
-class DVAPI TRasterCodecDummy : public TRasterCodec {
+class DVAPI TRasterCodecDummy final : public TRasterCodec {
 public:
   TRasterCodecDummy(const std::string &name) : TRasterCodec(name) {}
   ~TRasterCodecDummy() {}
@@ -60,7 +60,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-class DVAPI TRasterCodecQTL : public TRasterCodec {
+class DVAPI TRasterCodecQTL final : public TRasterCodec {
 public:
   TRasterCodecQTL(const std::string &name) : TRasterCodec(name) {}
   ~TRasterCodecQTL() {}
@@ -80,7 +80,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-/*class DVAPI TRasterCodecSnappy : public TRasterCodec
+/*class DVAPI TRasterCodecSnappy final : public TRasterCodec
 {
 public:
 
@@ -133,7 +133,7 @@ private:
 
 //------------------------------------------------------------------------------
 
-class DVAPI TRasterCodecLZO : public TRasterCodec {
+class DVAPI TRasterCodecLZO final : public TRasterCodec {
 public:
   TRasterCodecLZO(const std::string &name, bool useCache);
   ~TRasterCodecLZO();

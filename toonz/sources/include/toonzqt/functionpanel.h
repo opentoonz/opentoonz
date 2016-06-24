@@ -29,7 +29,7 @@ class FunctionSelection;
 //-----------------------------------------------------------------------------
 
 //! Channel edit panel (numcols + graph popup)
-class FunctionPanel : public QDialog {
+class FunctionPanel final : public QDialog {
   Q_OBJECT
 
   QColor m_bgColor;

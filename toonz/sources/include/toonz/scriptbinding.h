@@ -48,7 +48,7 @@ class TFilePath;
 
 namespace TScriptBinding {
 
-class DVAPI Void : public QObject {
+class DVAPI Void final : public QObject {
   Q_OBJECT
 public:
   WRAPPER_STD_METHODS(Void)

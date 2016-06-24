@@ -19,7 +19,7 @@ using namespace DVGui;
 
 namespace {
 
-class MouseTrackerDrawing : public ScreenBoard::Drawing {
+class MouseTrackerDrawing final : public ScreenBoard::Drawing {
 public:
   bool acceptScreenEvents(const QRect &rect) const override {
     return rect.contains(QCursor::pos());
@@ -54,7 +54,7 @@ public:
 //    ScreenWidget implementation
 //***********************************************************************************
 
-class ScreenBoard::ScreenWidget : public QWidget {
+class ScreenBoard::ScreenWidget final : public QWidget {
   QList<ScreenBoard::Drawing *>
       m_drawings;        //!< Drawings intersecting the screen
   bool m_mouseOnScreen;  //!< Whether the mouse is inside this screen

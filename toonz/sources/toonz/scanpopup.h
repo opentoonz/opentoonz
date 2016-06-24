@@ -21,7 +21,7 @@ class ProgressDialog;
 // MyScannerListener
 //-----------------------------------------------------------------------------
 
-class MyScannerListener : public QObject, public TScannerListener {
+class MyScannerListener final : public QObject, public TScannerListener {
   Q_OBJECT
 
   int m_current;
@@ -46,7 +46,7 @@ protected slots:
 // DefineScannerPopup
 //-----------------------------------------------------------------------------
 
-class DefineScannerPopup : public DVGui::Dialog {
+class DefineScannerPopup final : public DVGui::Dialog {
   Q_OBJECT
   QComboBox *m_scanDriverOm;
 
@@ -61,7 +61,7 @@ public slots:
 // ScanSettingsPopup
 //-----------------------------------------------------------------------------
 
-class ScanSettingsPopup : public DVGui::Dialog {
+class ScanSettingsPopup final : public DVGui::Dialog {
   Q_OBJECT
   QLabel *m_scannerNameLbl;
   DVGui::CheckBox *m_reverseOrderCB;
@@ -99,7 +99,7 @@ public slots:
 // AutocenterPopup
 //-----------------------------------------------------------------------------
 
-class AutocenterPopup : public DVGui::Dialog {
+class AutocenterPopup final : public DVGui::Dialog {
   Q_OBJECT
   DVGui::CheckBox *m_autocenter;
   QComboBox *m_pegbarHoles;

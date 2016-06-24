@@ -102,7 +102,7 @@ std::map<std::string, QTreeWidgetItem *> PluginLoader::create_menu_items(
 static bool copy_rendering_setting(toonz_rendering_setting_t *dst,
                                    const TRenderSettings &src);
 
-class PluginSetupMessage : public TThread::Message {
+class PluginSetupMessage final : public TThread::Message {
   PluginInformation *pi_;
 
 public:

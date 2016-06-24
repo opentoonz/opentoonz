@@ -19,7 +19,7 @@ class QMenu;
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TGroupCommand : public QObject {
+class DVAPI TGroupCommand final : public QObject {
   Q_OBJECT
 public:
   enum {

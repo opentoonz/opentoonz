@@ -60,7 +60,7 @@ namespace {
 // dipendere dallo sceneHandle)
 // questo undo puo' essere spostato in un nuovo file levelsetcommand in
 // toonzlib.
-class MoveLevelToFolderUndo : public TUndo {
+class MoveLevelToFolderUndo final : public TUndo {
   TLevelSet *m_levelSet;
   std::wstring m_levelName;
   TFilePath m_oldFolder;

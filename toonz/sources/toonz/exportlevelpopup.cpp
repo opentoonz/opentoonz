@@ -59,7 +59,7 @@
 
 namespace {
 
-struct MultiExportOverwriteCB : public IoCmd::OverwriteCallbacks {
+struct MultiExportOverwriteCB final : public IoCmd::OverwriteCallbacks {
   bool m_yesToAll;
   bool m_stopped;
 
@@ -81,7 +81,7 @@ struct MultiExportOverwriteCB : public IoCmd::OverwriteCallbacks {
 
 //=============================================================================
 
-struct MultiExportProgressCB : public IoCmd::ProgressCallbacks {
+struct MultiExportProgressCB final : public IoCmd::ProgressCallbacks {
   QString m_processedName;
   DVGui::ProgressDialog m_pb;
 
@@ -114,7 +114,7 @@ public:
 //    Swatch  definition
 //********************************************************************************
 
-class ExportLevelPopup::Swatch : public PlaneViewer {
+class ExportLevelPopup::Swatch final : public PlaneViewer {
 public:
   Swatch(QWidget *parent = 0) : PlaneViewer(parent) {}
 
@@ -130,7 +130,7 @@ protected:
   void setActualPixelSize();
 
 private:
-  struct ShortcutZoomer : public ImageUtils::ShortcutZoomer {
+  struct ShortcutZoomer final : public ImageUtils::ShortcutZoomer {
     ShortcutZoomer(Swatch *swatch) : ImageUtils::ShortcutZoomer(swatch) {}
 
   private:

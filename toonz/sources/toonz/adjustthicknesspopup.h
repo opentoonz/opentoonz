@@ -35,7 +35,7 @@ class QComboBox;
 //    Adjust Thickness Popup  declaration
 //*****************************************************************************
 
-class AdjustThicknessPopup : public DVGui::Dialog {
+class AdjustThicknessPopup final : public DVGui::Dialog {
   Q_OBJECT
 
 public:

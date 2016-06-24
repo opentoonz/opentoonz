@@ -131,7 +131,7 @@ private:
   bool isSaveTlvBackupToNopaintActive();
 };
 
-class ConvertPopupWithInput : public ConvertPopup {
+class ConvertPopupWithInput final : public ConvertPopup {
 public:
   ConvertPopupWithInput() : ConvertPopup(true) {}
 };

@@ -415,7 +415,7 @@ dstSample += tmp;
 
 //=============================================================================
 
-class TSoundTrackResample : public TSoundTransform {
+class TSoundTrackResample final : public TSoundTransform {
   TINT32 m_sampleRate;
   FLT_TYPE m_filterType;
 
@@ -564,7 +564,7 @@ TSoundTrackP doConvertWithoutResamplingT(SRC *src,
 
 //------------------------------------------------------------------------------
 
-class TSoundTrackConverterWithoutResampling : public TSoundTransform {
+class TSoundTrackConverterWithoutResampling final : public TSoundTransform {
   TSoundTrackFormat m_format;
 
 public:
@@ -792,7 +792,7 @@ TSoundTrackP doReverb(TSoundTrackT<T> *src, double delayTime,
 
 //==============================================================================
 
-class TSoundReverb : public TSoundTransform {
+class TSoundReverb final : public TSoundTransform {
   double m_delayTime;
   double m_decayFactor;
   double m_extendTime;
@@ -899,7 +899,7 @@ TSoundTrackP doGate(TSoundTrackT<T> *src, double threshold, double holdTime,
 
 //==============================================================================
 
-class TSoundGate : public TSoundTransform {
+class TSoundGate final : public TSoundTransform {
   double m_threshold;
   double m_holdTime;
   double m_releaseTime;
@@ -1220,7 +1220,7 @@ TSoundTrackP mixT(TSoundTrackT<T> *st1, double a1, TSoundTrackT<T> *st2,
 
 //=============================================================================
 
-class TSoundTrackMixer : public TSoundTransform {
+class TSoundTrackMixer final : public TSoundTransform {
   double m_alpha1, m_alpha2;
   TSoundTrackP m_sndtrack;
 
@@ -1360,7 +1360,7 @@ TSoundTrackP doFadeIn(const TSoundTrackT<T> &track, double riseFactor) {
 
 //------------------------------------------------------------------------------
 
-class TSoundTrackFaderIn : public TSoundTransform {
+class TSoundTrackFaderIn final : public TSoundTransform {
 public:
   TSoundTrackFaderIn(double riseFactor)
       : TSoundTransform(), m_riseFactor(riseFactor) {}
@@ -1482,7 +1482,7 @@ TSoundTrackP doFadeOut(const TSoundTrackT<T> &track, double decayFactor) {
 
 //------------------------------------------------------------------------------
 
-class TSoundTrackFaderOut : public TSoundTransform {
+class TSoundTrackFaderOut final : public TSoundTransform {
 public:
   TSoundTrackFaderOut(double decayFactor)
       : TSoundTransform(), m_decayFactor(decayFactor) {}
@@ -1614,7 +1614,7 @@ TSoundTrackP doCrossFade(const TSoundTrackT<T> &track1, TSoundTrackT<T> *track2,
 
 //------------------------------------------------------------------------------
 
-class TSoundTrackCrossFader : public TSoundTransform {
+class TSoundTrackCrossFader final : public TSoundTransform {
 public:
   TSoundTrackCrossFader(TSoundTrackP src, double crossFactor)
       : TSoundTransform(), m_st(src), m_crossFactor(crossFactor) {}
@@ -1780,7 +1780,7 @@ TSoundTrackP doCrossFadeOverWrite(const TSoundTrackT<T> &track1,
 
 //------------------------------------------------------------------------------
 
-class TSoundTrackCrossFaderOverWrite : public TSoundTransform {
+class TSoundTrackCrossFaderOverWrite final : public TSoundTransform {
 public:
   TSoundTrackCrossFaderOverWrite(TSoundTrackP src, double crossFactor)
       : TSoundTransform(), m_st(src), m_crossFactor(crossFactor) {}

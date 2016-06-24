@@ -86,7 +86,7 @@ void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
 
 //-----------------------------------------------------------------------------
 
-class ViewerZoomer : public ImageUtils::ShortcutZoomer {
+class ViewerZoomer final : public ImageUtils::ShortcutZoomer {
 public:
   ViewerZoomer(QWidget *parent) : ShortcutZoomer(parent) {}
   void zoom(bool zoomin, bool resetZoom) {

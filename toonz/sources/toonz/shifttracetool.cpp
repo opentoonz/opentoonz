@@ -44,7 +44,7 @@ bool circumCenter(TPointD &out, const TPointD &a, const TPointD &b,
 
 //=============================================================================
 
-class ShiftTraceTool : public TTool {
+class ShiftTraceTool final : public TTool {
 public:
   enum CurveStatus {
     NoCurve,

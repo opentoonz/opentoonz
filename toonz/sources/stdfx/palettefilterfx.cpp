@@ -6,7 +6,7 @@
 
 //===================================================================
 
-class PaletteFilterFx : public TStandardRasterFx {
+class PaletteFilterFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(PaletteFilterFx)
 
   TRasterFxPort m_input;

@@ -11,7 +11,7 @@ namespace igs {
 namespace maxmin {
 template <class IT, class RT>
 class thread
-    : public igs::resource::thread_execute_interface { /* thread単位の実行設定
+    final : public igs::resource::thread_execute_interface { /* thread単位の実行設定
                                                           */
 public:
   thread() {}

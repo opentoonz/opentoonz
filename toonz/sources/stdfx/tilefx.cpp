@@ -8,7 +8,7 @@
 
 //=============================================================================
 
-class TileFx : public TStandardRasterFx {
+class TileFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(TileFx)
 
   enum tilingMode { eTile = 1, eTileHorizontally = 2, eTileVertically = 3 };

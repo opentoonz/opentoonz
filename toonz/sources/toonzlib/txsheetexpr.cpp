@@ -41,7 +41,7 @@ namespace {
 
 //===================================================================
 
-class ParamDependencyFinder : public TSyntax::CalculatorNodeVisitor {
+class ParamDependencyFinder final : public TSyntax::CalculatorNodeVisitor {
   TDoubleParam *m_possiblyDependentParam;
   bool m_found;
 
@@ -62,7 +62,7 @@ public:
 //
 //-------------------------------------------------------------------
 
-class ParamCalculatorNode : public CalculatorNode,
+class ParamCalculatorNode final : public CalculatorNode,
                             public TParamObserver,
                             public boost::noncopyable {
   TDoubleParamP m_param;
@@ -117,7 +117,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class XsheetDrawingCalculatorNode : public CalculatorNode,
+class XsheetDrawingCalculatorNode final : public CalculatorNode,
                                     public boost::noncopyable {
   TXsheet *m_xsh;
   int m_columnIndex;
@@ -154,7 +154,7 @@ public:
 //
 //-------------------------------------------------------------------
 
-class XsheetReferencePattern : public Pattern {
+class XsheetReferencePattern final : public Pattern {
   TXsheet *m_xsh;
 
 public:
@@ -288,7 +288,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class FxReferencePattern : public Pattern {
+class FxReferencePattern final : public Pattern {
   TXsheet *m_xsh;
 
 public:
@@ -415,7 +415,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class PlasticVertexPattern : public Pattern {
+class PlasticVertexPattern final : public Pattern {
   TXsheet *m_xsh;
 
   /*

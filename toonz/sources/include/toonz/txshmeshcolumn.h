@@ -19,7 +19,7 @@
 //    TXshMeshColumn  declaration
 //*******************************************************************************
 
-class DVAPI TXshMeshColumn : public TXshCellColumn {
+class DVAPI TXshMeshColumn final : public TXshCellColumn {
   PERSIST_DECLARATION(TXshMeshColumn)
 
 public:

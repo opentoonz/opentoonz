@@ -32,7 +32,7 @@
 //    ExternalPaletteFxRenderData  declaration
 //**********************************************************************************************
 
-class DVAPI ExternalPaletteFxRenderData : public TRasterFxRenderData {
+class DVAPI ExternalPaletteFxRenderData final : public TRasterFxRenderData {
 public:
   TPaletteP m_palette;
   std::string m_name;
@@ -61,7 +61,7 @@ enum FilterType {
 
 //------------------------------------------------------------------------------
 
-class DVAPI PaletteFilterFxRenderData : public TRasterFxRenderData {
+class DVAPI PaletteFilterFxRenderData final : public TRasterFxRenderData {
 public:
   bool m_keep;
   FilterType m_type;
@@ -171,7 +171,7 @@ public:
 //    SandorFxRenderData  declaration
 //**********************************************************************************************
 
-class DVAPI SandorFxRenderData : public TRasterFxRenderData {
+class DVAPI SandorFxRenderData final : public TRasterFxRenderData {
 public:
   Type m_type;
   BlendTzParams m_blendParams;

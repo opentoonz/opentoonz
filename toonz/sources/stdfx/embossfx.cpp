@@ -5,7 +5,7 @@
 #include "tpixelutils.h"
 //===================================================================
 
-class EmbossFx : public TStandardRasterFx {
+class EmbossFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(EmbossFx)
 
   TRasterFxPort m_input;

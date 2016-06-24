@@ -109,7 +109,7 @@ int BaseRaylitFx::getMemoryRequirement(const TRectD &rect, double frame,
 
 //========================================================================================
 
-class RaylitFx : public BaseRaylitFx {
+class RaylitFx final : public BaseRaylitFx {
   FX_PLUGIN_DECLARATION(RaylitFx)
 
 protected:
@@ -178,7 +178,7 @@ void RaylitFx::doCompute(TTile &tileOut, double frame,
 
 //========================================================================================
 
-class ColorRaylitFx : public BaseRaylitFx {
+class ColorRaylitFx final : public BaseRaylitFx {
   FX_PLUGIN_DECLARATION(ColorRaylitFx)
 
 public:

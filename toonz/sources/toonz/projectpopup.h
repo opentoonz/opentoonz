@@ -21,7 +21,7 @@ class QComboBox;
 //=============================================================================
 // ProjectDvDirModelRootNode
 
-class ProjectDvDirModelRootNode : public DvDirModelNode {
+class ProjectDvDirModelRootNode final : public DvDirModelNode {
 public:
   ProjectDvDirModelRootNode();
   void refreshChildren() override;
@@ -46,7 +46,7 @@ public:
 // ProjectDvDirModelSpecialFileFolderNode
 
 class ProjectDvDirModelSpecialFileFolderNode
-    : public ProjectDvDirModelFileFolderNode {
+    final : public ProjectDvDirModelFileFolderNode {
   QPixmap m_pixmap;
 
 public:
@@ -61,7 +61,7 @@ public:
 //=============================================================================
 // ProjectDvDirModelProjectNode
 
-class ProjectDvDirModelProjectNode : public ProjectDvDirModelFileFolderNode {
+class ProjectDvDirModelProjectNode final : public ProjectDvDirModelFileFolderNode {
 public:
   ProjectDvDirModelProjectNode(DvDirModelNode *parent, const TFilePath &path)
       : ProjectDvDirModelFileFolderNode(parent, path) {}
@@ -72,7 +72,7 @@ public:
 //=============================================================================
 // ProjectDirModel
 
-class ProjectDirModel : public QAbstractItemModel {
+class ProjectDirModel final : public QAbstractItemModel {
   DvDirModelNode *m_root;
 
 public:
@@ -137,7 +137,7 @@ protected:
 // ProjectSettingsPopup
 //-----------------------------------------------------------------------------
 
-class ProjectSettingsPopup : public ProjectPopup {
+class ProjectSettingsPopup final : public ProjectPopup {
   Q_OBJECT
 
 public:
@@ -154,7 +154,7 @@ public slots:
 // ProjectCreatePopup
 //-----------------------------------------------------------------------------
 
-class ProjectCreatePopup : public ProjectPopup {
+class ProjectCreatePopup final : public ProjectPopup {
   Q_OBJECT
 
 public:

@@ -842,7 +842,7 @@ static int iflush(IMAGERGB *image) {
 
 /*----------------------------------------------------------------------------*/
 
-class SgiReader : public Tiio::Reader {
+class SgiReader final : public Tiio::Reader {
   IMAGERGB *m_header;
   int m_currentY;
 
@@ -1047,7 +1047,7 @@ int SgiReader::skipLines(int lineCount) {
                                                 WRITER
 */
 
-class SgiWriter : public Tiio::Writer {
+class SgiWriter final : public Tiio::Writer {
   int m_currentY;
   IMAGERGB *m_header;
 

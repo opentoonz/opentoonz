@@ -9,7 +9,7 @@
 //=============================================================================
 // TestPanel
 
-class TestPanel : public TPanel {
+class TestPanel final : public TPanel {
   Q_OBJECT
 
 public:

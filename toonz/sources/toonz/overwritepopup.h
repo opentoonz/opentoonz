@@ -40,7 +40,7 @@ class QPushButton;
   Additionally, the dialog could be \t CANCELED, either by closing it
   or pressing the "Cancel" button.
 */
-class OverwriteDialog : public DVGui::Dialog {
+class OverwriteDialog final : public DVGui::Dialog {
   Q_OBJECT
 
 public:
@@ -59,7 +59,7 @@ public:
     virtual bool operator()(const TFilePath &fp) const        = 0;
   };
 
-  struct DecodeFileExistsFunc : public ExistsFunc {
+  struct DecodeFileExistsFunc final : public ExistsFunc {
     ToonzScene *m_scene;
     DecodeFileExistsFunc(ToonzScene *scene) : m_scene(scene) {}
 

@@ -17,7 +17,7 @@ class QComboBox;
 // SceneSettingsPopup
 //-----------------------------------------------------------------------------
 
-class SceneSettingsPopup : public QDialog {
+class SceneSettingsPopup final : public QDialog {
   Q_OBJECT
 
   DVGui::DoubleLineEdit *m_frameRateFld;

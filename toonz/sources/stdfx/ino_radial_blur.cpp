@@ -11,7 +11,7 @@
 namespace {
 const double ino_param_range = 100.0;
 }
-class ino_radial_blur : public TStandardRasterFx {
+class ino_radial_blur final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_radial_blur)
   TRasterFxPort m_input;
   TRasterFxPort m_refer;

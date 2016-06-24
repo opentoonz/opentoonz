@@ -263,7 +263,7 @@ void ViewerKeyframeNavigator::hideEvent(QHideEvent *e) {
 namespace {
 //-----------------------------------------------------------------------------
 
-class UndoPaletteSetKeyFrame : public TUndo {
+class UndoPaletteSetKeyFrame final : public TUndo {
   int m_frame;
   int m_styleId;
   TPaletteHandle *m_paletteHandle;

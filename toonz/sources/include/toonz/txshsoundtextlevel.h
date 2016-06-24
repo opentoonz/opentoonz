@@ -23,7 +23,7 @@
 //! The TXshSoundTextLevel
 //=============================================================================
 
-class DVAPI TXshSoundTextLevel : public TXshLevel {
+class DVAPI TXshSoundTextLevel final : public TXshLevel {
   PERSIST_DECLARATION(TXshSoundTextLevel)
 
   DECLARE_CLASS_CODE

@@ -41,7 +41,7 @@ public:
 //===========================================
 //=============================================================================
 
-class DVAPI TglTessellator : public TTessellator {
+class DVAPI TglTessellator final : public TTessellator {
 public:
   // TThread::Mutex m_mutex;
 

@@ -34,7 +34,7 @@ extern "C" {
 //    TifReader  implementation
 //**************************************************************************
 
-class TifReader : public Tiio::Reader {
+class TifReader final : public Tiio::Reader {
   TIFF *m_tiff;
   int m_row;
   bool m_tiled, m_stripped;
@@ -722,7 +722,7 @@ Tiio::TifWriterProperties::TifWriterProperties()
 
 //============================================================
 
-class TifWriter : public Tiio::Writer {
+class TifWriter final : public Tiio::Writer {
   TIFF *m_tiff;
   int m_row;
   // Tiio::TifWriterProperties m_properties;

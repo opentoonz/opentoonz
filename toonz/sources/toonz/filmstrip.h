@@ -36,7 +36,7 @@ const int fs_iconMarginBottom = 15;
 // (inserita dentro Filmstrip : QScrollArea)
 //-----------------------------------------------------------------------------
 
-class FilmstripFrames : public QFrame, public TSelection::View {
+class FilmstripFrames final : public QFrame, public TSelection::View {
   Q_OBJECT
 
 public:
@@ -191,7 +191,7 @@ private:
 // Filmstrip
 //-----------------------------------------------------------------------------
 
-class Filmstrip : public QWidget {
+class Filmstrip final : public QWidget {
   Q_OBJECT
 
   FilmstripFrames *m_frames;
@@ -243,7 +243,7 @@ private:
 // inbetweenDialog
 //-----------------------------------------------------------------------------
 
-class InbetweenDialog : public DVGui::Dialog {
+class InbetweenDialog final : public DVGui::Dialog {
   Q_OBJECT
   QComboBox *m_comboBox;
 

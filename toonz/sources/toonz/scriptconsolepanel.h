@@ -7,7 +7,7 @@
 
 class ScriptConsole;
 
-class ScriptConsolePanel : public TPanel {
+class ScriptConsolePanel final : public TPanel {
   Q_OBJECT
   ScriptConsole *m_scriptConsole;
 

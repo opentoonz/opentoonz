@@ -34,7 +34,7 @@ class QColor;
 // HistogramGraph
 //-----------------------------------------------------------------------------
 
-class DVAPI HistogramGraph : public QWidget {
+class DVAPI HistogramGraph final : public QWidget {
   Q_OBJECT
 
   QColor m_color;
@@ -72,7 +72,7 @@ protected:
 // ChannelBar
 //-----------------------------------------------------------------------------
 
-class DVAPI ChannelBar : public QWidget {
+class DVAPI ChannelBar final : public QWidget {
   Q_OBJECT
 
   QColor m_color;
@@ -101,7 +101,7 @@ protected:
 // HistogramView
 //-----------------------------------------------------------------------------
 
-class DVAPI HistogramView : public QWidget {
+class DVAPI HistogramView final : public QWidget {
   Q_OBJECT
 
   HistogramGraph *m_histogramGraph;
@@ -136,7 +136,7 @@ public:
 // Histograms
 //-----------------------------------------------------------------------------
 
-class DVAPI Histograms : public QStackedWidget {
+class DVAPI Histograms final : public QStackedWidget {
   Q_OBJECT
 
   TRasterP m_raster;
@@ -163,7 +163,7 @@ protected:
 // Histogram
 //-----------------------------------------------------------------------------
 
-class DVAPI Histogram : public QWidget {
+class DVAPI Histogram final : public QWidget {
   Q_OBJECT
 
   QComboBox *m_channelsListBox;

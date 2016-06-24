@@ -45,7 +45,7 @@ namespace RGBPicker {
 // Pick RGB Tool
 //------------------------------------------------------------
 
-class UndoPickRGBM : public TUndo {
+class UndoPickRGBM final : public TUndo {
   TPaletteP m_palette;
   int m_styleId;
   int m_styleParamIndex;

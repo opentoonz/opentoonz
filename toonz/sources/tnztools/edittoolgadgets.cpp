@@ -27,7 +27,7 @@ GLdouble FxGadget::m_selectedColor[3] = {0.2, 0.8, 0.1};
 //    FxGadgetUndo  definition
 //*************************************************************************************
 
-class FxGadgetUndo : public TUndo {
+class FxGadgetUndo final : public TUndo {
   struct ParamData {
     TDoubleParamP m_param;
     double m_oldValue, m_newValue;
@@ -93,7 +93,7 @@ public:
 //    GadgetDragTool  definition
 //*************************************************************************************
 
-class GadgetDragTool : public DragTool {
+class GadgetDragTool final : public DragTool {
   FxGadgetController *m_controller;
   FxGadget *m_gadget;
 
@@ -219,7 +219,7 @@ void FxGadget::commitUndo() {
 //    Specific Gadget Concepts  definition
 //*************************************************************************************
 
-class PointFxGadget : public FxGadget {
+class PointFxGadget final : public FxGadget {
   TPointD m_pos;
   TDoubleParamP m_xParam, m_yParam;
 
@@ -299,7 +299,7 @@ void PointFxGadget::leftButtonUp(const TPointD &pos, const TMouseEvent &) {}
 
 //=============================================================================
 
-class RadiusFxGadget : public FxGadget {
+class RadiusFxGadget final : public FxGadget {
   TDoubleParamP m_radius;
   TPointParamP m_center;
 
@@ -367,7 +367,7 @@ void RadiusFxGadget::leftButtonUp(const TPointD &pos, const TMouseEvent &) {}
 
 //=============================================================================
 
-class DistanceFxGadget : public FxGadget {
+class DistanceFxGadget final : public FxGadget {
   TDoubleParamP m_distance, m_angle;
   int m_grabPos;
 
@@ -451,7 +451,7 @@ void DistanceFxGadget::leftButtonUp(const TPointD &pos, const TMouseEvent &) {}
 
 //=============================================================================
 
-class AngleFxGadget : public FxGadget {
+class AngleFxGadget final : public FxGadget {
   TDoubleParamP m_param;
   TPointD m_pos;
 
@@ -524,7 +524,7 @@ void AngleFxGadget::leftButtonUp(const TPointD &pos, const TMouseEvent &) {}
 
 //=============================================================================
 
-class DiamondFxGadget : public FxGadget {
+class DiamondFxGadget final : public FxGadget {
   TDoubleParamP m_param;
 
 public:
@@ -588,7 +588,7 @@ void DiamondFxGadget::leftButtonDrag(const TPointD &pos, const TMouseEvent &) {
 
 //=============================================================================
 
-class SizeFxGadget : public FxGadget {
+class SizeFxGadget final : public FxGadget {
   TDoubleParamP m_lx, m_ly;
 
 public:
@@ -652,7 +652,7 @@ void SizeFxGadget::leftButtonDrag(const TPointD &pos, const TMouseEvent &) {
 
 //=============================================================================
 
-class RectFxGadget : public FxGadget {
+class RectFxGadget final : public FxGadget {
   TDoubleParamP m_width, m_height;
   TPointParamP m_center;
 
@@ -756,7 +756,7 @@ void RectFxGadget::leftButtonDrag(const TPointD &ppos, const TMouseEvent &) {
 
 //=============================================================================
 
-class PolarFxGadget : public FxGadget {
+class PolarFxGadget final : public FxGadget {
   TPointD m_pos;
   TDoubleParamP m_phiParam, m_lengthParam;
 
@@ -828,7 +828,7 @@ public:
 
 //=============================================================================
 
-class VectorFxGadget : public FxGadget {
+class VectorFxGadget final : public FxGadget {
   TPointParamP m_pa, m_pb;
   int m_selected;
 
@@ -885,7 +885,7 @@ public:
 
 //=============================================================================
 
-class QuadFxGadget : public FxGadget {
+class QuadFxGadget final : public FxGadget {
   TPointParamP m_pa, m_pb, m_pc, m_pd;
 
 public:

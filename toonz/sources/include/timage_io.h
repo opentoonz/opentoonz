@@ -34,7 +34,7 @@ class TImageInfo;
 
 //===========================================================
 
-class DVAPI TImageException : public TException {
+class DVAPI TImageException final : public TException {
   TFilePath m_fp;
 
 public:
@@ -48,7 +48,7 @@ public:
 
 //===========================================================
 
-class DVAPI TImageVersionException : public TException {
+class DVAPI TImageVersionException final : public TException {
   TFilePath m_fp;
   int m_major, m_minor;
 
@@ -182,7 +182,7 @@ Region dimension doesn't consider shrink
 template class DVAPI TSmartPointerT<TImageReader>;
 #endif
 
-class DVAPI TImageReaderP : public TSmartPointerT<TImageReader> {
+class DVAPI TImageReaderP final : public TSmartPointerT<TImageReader> {
 public:
   TImageReaderP(TImageReader *ir) : TSmartPointerT<TImageReader>(ir){};
   // il costruttore "non banale"
@@ -245,7 +245,7 @@ public:
 template class DVAPI TSmartPointerT<TImageWriter>;
 #endif
 
-class DVAPI TImageWriterP : public TSmartPointerT<TImageWriter> {
+class DVAPI TImageWriterP final : public TSmartPointerT<TImageWriter> {
 public:
   TImageWriterP(TImageWriter *iw) : TSmartPointerT<TImageWriter>(iw){};
   // il costruttore "non banale"

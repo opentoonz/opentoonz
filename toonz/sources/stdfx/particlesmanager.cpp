@@ -31,7 +31,7 @@ typedef std::map<double, ParticlesManager::FrameData> FramesMap;
 //    Preliminaries
 //************************************************************************************************
 
-class ParticlesManagerGenerator : public TRenderResourceManagerGenerator {
+class ParticlesManagerGenerator final : public TRenderResourceManagerGenerator {
 public:
   ParticlesManagerGenerator() : TRenderResourceManagerGenerator(true) {}
 

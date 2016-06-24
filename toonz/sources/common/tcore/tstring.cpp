@@ -15,7 +15,7 @@
 
 #include <sstream>
 
-class TStringConvertException : public TException {
+class TStringConvertException final : public TException {
   std::string m_string;
 
 public:

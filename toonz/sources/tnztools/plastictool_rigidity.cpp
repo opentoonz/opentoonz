@@ -38,7 +38,7 @@ enum { RIGID_IDX = 0, FLEX_IDX };
 
 namespace {
 
-class PaintRigidityUndo : public TUndo {
+class PaintRigidityUndo final : public TUndo {
   TXshCell m_cell;  //!< Affected image (cell == level + frame)
   std::vector<std::map<int, double>> m_vertices;  //!< Affected vertices
 
@@ -103,7 +103,7 @@ public:
 
 namespace {
 
-class RigidityPainter : public tcg::polymorphic {
+class RigidityPainter final : public tcg::polymorphic {
   std::vector<std::map<int, double>>
       m_oldRigidities;         //!< The original values of painted vertices
   double m_sqRadius, m_value;  //!< Drawing parameters

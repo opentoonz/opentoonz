@@ -22,7 +22,7 @@ class QStackedWidget;
 // MixAudioThread
 //-----------------------------------------------------------------------------
 
-class MixAudioThread : public QThread {
+class MixAudioThread final : public QThread {
   Q_OBJECT
 
   bool m_abort;
@@ -57,7 +57,7 @@ signals:
 // LineTestPanel
 //-----------------------------------------------------------------------------
 // Andrebbe messo a fattor comune del codice con ViewerPane
-class LineTestPane : public TPanel {
+class LineTestPane final : public TPanel {
   Q_OBJECT
 
   QStackedWidget *m_stackedWidget;

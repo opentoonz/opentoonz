@@ -12,7 +12,7 @@ class QLabel;
 
 //-----------------------------------------------------------------------------
 
-class SVNPurgeDialog : public DVGui::Dialog {
+class SVNPurgeDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QString m_workingDir;

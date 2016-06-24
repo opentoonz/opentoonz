@@ -41,7 +41,7 @@ std::wstring removeSpaces(const std::wstring &str) {
 //
 //---------------------------------------------------------
 
-class MultimediaRenderer::Imp : public MovieRenderer::Listener,
+class MultimediaRenderer::Imp final : public MovieRenderer::Listener,
                                 public TSmartObject {
 public:
   ToonzScene *m_scene;

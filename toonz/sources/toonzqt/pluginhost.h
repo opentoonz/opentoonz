@@ -45,7 +45,7 @@ public:
 class PluginInformation;
 
 /* エフェクトのインスタンスを構築するためのクラス */
-struct PluginDeclaration : public TFxDeclaration {
+struct PluginDeclaration final : public TFxDeclaration {
   PluginDeclaration(PluginInformation *pi);
   TPersist *create() const final override;
 
@@ -117,7 +117,7 @@ public:
   void release();
 };
 
-class Loader : public QObject {
+class Loader final : public QObject {
   Q_OBJECT;
 
 public:
@@ -134,7 +134,7 @@ signals:
   void fixup();
 };
 
-class PluginLoadController : public QObject {
+class PluginLoadController final : public QObject {
   Q_OBJECT;
   QThread work_entity;
 
@@ -149,7 +149,7 @@ signals:
   void start(const QString &filepath);
 };
 
-class RasterFxPluginHost : public TZeraryFx, public TPluginInterface {
+class RasterFxPluginHost final : public TZeraryFx, public TPluginInterface {
   PluginInformation *pi_;
 
   std::vector<std::shared_ptr<TFxPort>> inputs_;

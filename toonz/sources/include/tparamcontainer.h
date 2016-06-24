@@ -43,7 +43,7 @@ public:
 };
 
 template <class T>
-class TParamVarT : public TParamVar {
+class TParamVarT final : public TParamVar {
   TParamP m_var;
 
 public:

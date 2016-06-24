@@ -170,7 +170,7 @@ bool isAScript(TFarmTask *task) {
 
 //==============================================================================
 
-class CtrlFarmTask : public TFarmTask {
+class CtrlFarmTask final : public TFarmTask {
 public:
   CtrlFarmTask() : m_toBeDeleted(false), m_failureCount(0) {}
 
@@ -206,7 +206,7 @@ public:
 
 namespace {
 
-class TFarmTaskDeclaration : public TPersistDeclaration {
+class TFarmTaskDeclaration final : public TPersistDeclaration {
 public:
   TFarmTaskDeclaration(const std::string &id) : TPersistDeclaration(id) {}
 
@@ -442,7 +442,7 @@ bool doTestConnection(const QString &hostName, const QString &addr, int port) {
 
 //------------------------------------------------------------------------------
 #ifdef _WIN32
-class ConnectionTest : public TThread::Runnable {
+class ConnectionTest final : public TThread::Runnable {
 public:
   ConnectionTest(const FarmServerProxy *server, HANDLE hEvent)
       : m_server(server), m_hEvent(hEvent) {}
@@ -553,7 +553,7 @@ public:
 
 //==============================================================================
 
-class FarmController : public TFarmExecutor, public TFarmController {
+class FarmController final : public TFarmExecutor, public TFarmController {
 public:
   FarmController(const QString &hostName, const QString &addr, int port,
                  TUserLog *log);
@@ -1326,7 +1326,7 @@ ServerState FarmController::getServerState(FarmServerProxy *server,
 
 //------------------------------------------------------------------------------
 
-class ServerInitializer : public TThread::Runnable {
+class ServerInitializer final : public TThread::Runnable {
 public:
   ServerInitializer(FarmServerProxy *server) : m_server(server) {}
 
@@ -1381,7 +1381,7 @@ QString FarmController::addTask(const QString &name, const QString &cmdline,
 
 //------------------------------------------------------------------------------
 
-class TaskStarter : public TThread::Runnable {
+class TaskStarter final : public TThread::Runnable {
 public:
   TaskStarter(FarmController *controller, CtrlFarmTask *task,
               FarmServerProxy *server = 0)
@@ -2176,7 +2176,7 @@ void FarmController::activateReadyServers() {
 
 //==============================================================================
 
-class ControllerService : public TService {
+class ControllerService final : public TService {
 public:
   ControllerService()
       : TService("ToonzFarmController", "ToonzFarm Controller")

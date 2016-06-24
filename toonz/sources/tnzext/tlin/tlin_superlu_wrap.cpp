@@ -15,8 +15,8 @@ extern "C" {
 //    Preliminaries
 //*************************************************************************
 
-struct tlin::SuperMatrix : public ::SuperMatrix {};
-struct tlin::superlu_options_t : public ::superlu_options_t {};
+struct tlin::SuperMatrix final : public ::SuperMatrix {};
+struct tlin::superlu_options_t final : public ::superlu_options_t {};
 
 //=======================================================================
 

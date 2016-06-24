@@ -111,7 +111,7 @@ inline TRectD getImageBoundsD(const TImageP &img) {
 
 //-----------------------------------------------------------------------------
 
-class FlipZoomer : public ImageUtils::ShortcutZoomer {
+class FlipZoomer final : public ImageUtils::ShortcutZoomer {
 public:
   FlipZoomer(ImageViewer *parent) : ShortcutZoomer(parent) {}
 
@@ -1160,7 +1160,7 @@ void ImageViewer::keyPressEvent(QKeyEvent *event) {
 //-----------------------------------------------------------------------------
 /*! load image from history
 */
-class LoadRecentFlipbookImagesCommandHandler : public MenuItemHandler {
+class LoadRecentFlipbookImagesCommandHandler final : public MenuItemHandler {
 public:
   LoadRecentFlipbookImagesCommandHandler()
       : MenuItemHandler(MI_LoadRecentImage) {}
@@ -1188,7 +1188,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! clear the history
 */
-class ClearRecentFlipbookImagesCommandHandler : public MenuItemHandler {
+class ClearRecentFlipbookImagesCommandHandler final : public MenuItemHandler {
 public:
   ClearRecentFlipbookImagesCommandHandler()
       : MenuItemHandler(MI_ClearRecentImage) {}

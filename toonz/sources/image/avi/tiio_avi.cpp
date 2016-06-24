@@ -126,7 +126,7 @@ bool isAKeyFrame(PAVISTREAM videoStream, int index) {
 //
 //===========================================================
 
-class TImageWriterAvi : public TImageWriter {
+class TImageWriterAvi final : public TImageWriter {
 public:
   int m_frameIndex;
 
@@ -603,7 +603,7 @@ void TLevelWriterAvi::doSaveSoundTrack() {
 //
 //===========================================================
 
-class TImageReaderAvi : public TImageReader {
+class TImageReaderAvi final : public TImageReader {
 public:
   int m_frameIndex;
 

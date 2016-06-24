@@ -85,7 +85,7 @@ const QString TlvExtension("tlv");
 //
 //-----------------------------------------------------------------------------
 
-class ConvertPopup::Converter : public QThread {
+class ConvertPopup::Converter final : public QThread {
   int m_skippedCount;
   ConvertPopup *m_parent;
 

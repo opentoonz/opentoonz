@@ -10,7 +10,7 @@
 
 namespace TScriptBinding {
 
-class DVAPI FilePath : public Wrapper {
+class DVAPI FilePath final : public Wrapper {
   Q_OBJECT
   QString m_filePath;
 
