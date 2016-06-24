@@ -1,6 +1,7 @@
 
 
 #include "toonz/preferences.h"
+#include "tnzffmpeg.h"
 
 // TnzLib includes
 #include "toonz/tscenehandle.h"
@@ -19,6 +20,8 @@
 #include "tundo.h"
 #include "tbigmemorymanager.h"
 #include "tfilepath.h"
+
+#include <qmessagebox.h>
 
 // Qt includes
 #include <QSettings>
@@ -605,6 +608,24 @@ void Preferences::enablePreviewAlwaysOpenNewFlip(bool on) {
 //-----------------------------------------------------------------
 
 void Preferences::enableAutosave(bool on) {
+	TnzFfmpeg* ffmpeg = new TnzFfmpeg();
+	if (ffmpeg->TestFfmpeg() < 1)
+	{
+		QMessageBox msgBox;
+		msgBox.setWindowTitle("title");
+		msgBox.setText("Question");
+		msgBox.setStandardButtons(QMessageBox::Yes);
+		msgBox.addButton(QMessageBox::No);
+		msgBox.setDefaultButton(QMessageBox::No);
+		if (msgBox.exec() == QMessageBox::Yes){
+			// do something
+		}
+		else {
+			// do something else
+		}
+		msgBox.show();
+
+	}
   m_autosaveEnabled = on;
   m_settings->setValue("autosaveEnabled", on ? "1" : "0");
 

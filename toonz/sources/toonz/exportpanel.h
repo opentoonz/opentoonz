@@ -11,6 +11,10 @@
  ** - ClipListViewer che controlla l'elenco delle scene di cui fare il
  **   rendering
  ** - OutputIconViewer che visualizza l'icona del file generato
+
+
+ ** ClipListViewer that controls the list of scenes that make the rendering
+ ** - OutputIconViewer displaying the generated files icon
  **
  ******************************************************************************/
 #include "pane.h"
