@@ -25,15 +25,15 @@ class DVAPI TXshMeshColumn : public TXshCellColumn {
 public:
   TXshMeshColumn();
 
-  TXshColumn::ColumnType getColumnType() const { return eMeshType; }
-  TXshMeshColumn *getMeshColumn() { return this; }
+  TXshColumn::ColumnType getColumnType() const override { return eMeshType; }
+  TXshMeshColumn *getMeshColumn() override { return this; }
 
-  TXshColumn *clone() const;
+  TXshColumn *clone() const override;
 
-  bool canSetCell(const TXshCell &cell) const;
+  bool canSetCell(const TXshCell &cell) const override;
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &is);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &is) override;
 
 private:
   // Not copiable

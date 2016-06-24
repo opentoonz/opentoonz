@@ -541,7 +541,7 @@ inline std::string TFx::getFxType() const { return getDeclaration()->getId(); }
 #define FX_DECLARATION(T)                                                      \
   \
 public:                                                                        \
-  const TPersistDeclaration *getDeclaration() const;
+  const TPersistDeclaration *getDeclaration() const override;
 
 #define FX_IDENTIFIER(T, I)                                                    \
   namespace {                                                                  \

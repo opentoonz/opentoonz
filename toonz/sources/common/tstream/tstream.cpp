@@ -880,7 +880,7 @@ TIStream::TIStream(const TFilePath &fp) : m_imp(new Imp) {
 
     if (check_len != out_len) throw TException("corrupted file");
 
-    m_imp->m_is = new istringstream((char *)out, out_len);
+    m_imp->m_is = new istringstream(std::string(out, out_len));
   }
 
   m_imp->m_chanOwner = true;
@@ -1191,7 +1191,7 @@ bool TIStream::getTagParam(string paramName, string &value) {
 bool TIStream::getTagParam(string paramName, int &value) {
   string svalue;
   if (!getTagParam(paramName, svalue)) return false;
-  istringstream is(svalue.c_str(), svalue.length());
+  istringstream is(svalue);
   value = 0;
   is >> value;
   return true;

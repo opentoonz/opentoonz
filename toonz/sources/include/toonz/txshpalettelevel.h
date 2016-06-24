@@ -54,7 +54,7 @@ Destroys the TXshPaletteLevel object.
   /*!
 Return the \b TXshPaletteLevel level (overridden from TXshLevel)
 */
-  TXshPaletteLevel *getPaletteLevel() { return this; }
+  TXshPaletteLevel *getPaletteLevel() override { return this; }
 
   /*!
 Return the \b TPalette
@@ -72,7 +72,7 @@ Set the level palette to \b palette.
 Return level path.
 \sa setPath()
 */
-  TFilePath getPath() const { return m_path; }
+  TFilePath getPath() const override { return m_path; }
 
   /*!
 Set level path.
@@ -82,13 +82,13 @@ Set level path.
 
   //! Returns the frame count. It depends on the palette animation:
   //! for a not-animated palette getFrameCount() == 1
-  int getFrameCount() const;
+  int getFrameCount() const override;
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 
-  void load();
-  void save();
+  void load() override;
+  void save() override;
   void save(const TFilePath &fp);
 
   //! note gets the contentHistory. can be 0
