@@ -9,6 +9,7 @@
 #include <math.h>
 
 #include "tgl.h"
+#include <QCoreApplication>  // For Qt translation support
 
 namespace {
 
