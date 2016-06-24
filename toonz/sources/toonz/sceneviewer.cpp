@@ -1,4 +1,7 @@
 
+#ifdef LINUX
+#define GL_GLEXT_PROTOTYPES
+#endif
 
 // Toonz includes
 #include "tapp.h"
@@ -1011,10 +1014,8 @@ void SceneViewer::drawBackground() {
     if (proc != nullptr)
       status = reinterpret_cast<PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC>(proc)(
           GL_FRAMEBUFFER);
-#elif MACOSX
-    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 #else
-    status = 0;                       /* XXX, stub */
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 #endif
     printf("GL_INVALID_FRAMEBUFFER_OPERATION: framebuffer:%d\n", status);
   }
@@ -1026,10 +1027,8 @@ bool check_framebuffer_status() {
   if (proc == nullptr) return true;
   GLenum s = reinterpret_cast<PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC>(proc)(
       GL_FRAMEBUFFER);
-#elif MACOSX
-  GLenum s = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 #else
-  GLenum s = GL_FRAMEBUFFER_COMPLETE; /* XXX, stub */
+  GLenum s = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 #endif
   if (s == GL_FRAMEBUFFER_UNDEFINED)
     printf("Warning: FB undefined: %d\n", s);
