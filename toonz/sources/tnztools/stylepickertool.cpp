@@ -24,6 +24,7 @@
 #include "toonz/tcolumnhandle.h"
 #include "toonz/dpiscale.h"
 #include "toonz/palettecontroller.h"
+#include <QCoreApplication>  // For Qt translation support
 
 #define LINES L"Lines"
 #define AREAS L"Areas"
