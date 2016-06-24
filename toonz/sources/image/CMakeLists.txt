@@ -84,8 +84,7 @@ message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
 include_directories(
     ${TIFF_INCLUDE_DIR}
-    ${SDKROOT}/LibJPEG/jpeg-9
-    ${SDKROOT}/libpng-1.6.21)
+    ${SDKROOT}/LibJPEG/jpeg-9)
 if(WIN32)
     include_directories(${SDKROOT}/libpng-1.6.21)
     if(PLATFORM EQUAL 32)
