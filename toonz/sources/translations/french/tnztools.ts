@@ -670,18 +670,6 @@ Voulez-vous continuer?</translation>
 <context>
     <name>QObject</name>
     <message>
-        <source>Rotate On Camera Center</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Mode:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Passive Pick</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Min:</source>
         <translation>Min:</translation>
     </message>

@@ -25,8 +25,6 @@
 #include "toonz/dpiscale.h"
 #include "toonz/palettecontroller.h"
 
-#include <QCoreApplication> // For Qt translation support
-
 #define LINES L"Lines"
 #define AREAS L"Areas"
 #define ALL L"Lines & Areas"
@@ -65,11 +63,6 @@ public:
   }
 
   ToolType getToolType() const override { return TTool::LevelReadTool; }
-  
-  void StylePickerTool::updateTranslation() {
-    m_colorType.setQStringName(QObject::tr("Mode:"));
-    m_passivePick.setQStringName(QObject::tr("Passive Pick"));
-  }
 
   void draw() override {}
 

@@ -701,18 +701,6 @@ Do you want to proceed?</source>
 <context>
     <name>QObject</name>
     <message>
-        <source>Rotate On Camera Center</source>
-        <translation>在摄影机中心旋转</translation>
-    </message>
-    <message>
-        <source>Mode:</source>
-        <translation>类型:</translation>
-    </message>
-    <message>
-        <source>Passive Pick</source>
-        <translation>拾取光标位置颜色</translation>
-    </message>
-    <message>
         <source>Min:</source>
         <translation>最小:</translation>
     </message>
