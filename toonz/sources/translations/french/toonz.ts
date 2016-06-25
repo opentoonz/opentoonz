@@ -276,6 +276,10 @@ Arrête ou attendre son achèvement avant de le retirer.</translation>
         <source>Contrast:</source>
         <translation> Contraste:</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>BrowserPopup</name>
@@ -2412,6 +2416,10 @@ Voulez-vous le créer?</translation>
         <source>Intensity:</source>
         <translation>Intensité:</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>LoadColorModelPopup</name>
@@ -2491,6 +2499,18 @@ Voulez-vous le créer?</translation>
 </context>
 <context>
     <name>LoadLevelPopup</name>
+    <message>
+        <source>On Demand</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>All Icons</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>All Icons &amp; Images</source>
+        <translation></translation>
+    </message>
     <message>
         <source>Load Level</source>
         <translation>Charger un Niveau</translation>
@@ -4674,7 +4694,11 @@ Que voulez-vous faire?</translation>
     </message>
     <message>
         <source>Multiple Rendering: </source>
-        <translation type="vanished">Rendu Multiple:</translation>
+        <translation>Rendu Multiple:</translation>
+    </message>
+    <message>
+        <source>Do stereoscopy</source>
+        <translation>: </translation>
     </message>
     <message>
         <source>Apply Shrink to Main Viewer</source>

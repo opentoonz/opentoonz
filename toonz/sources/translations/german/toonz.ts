@@ -273,6 +273,10 @@ Halten Sie sie an oder warten Sie auf ihre Beendung bevor Sie sie entwenden.</tr
         <source>Contrast:</source>
         <translation>Kontrast:</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>BrowserPopup</name>
@@ -2545,6 +2549,10 @@ Möchten Sie einen erstellen?</translation>
         <source>Intensity:</source>
         <translation>Intensität:</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>LoadColorModelPopup</name>
@@ -2624,6 +2632,18 @@ Möchten Sie einen erstellen?</translation>
 </context>
 <context>
     <name>LoadLevelPopup</name>
+    <message>
+        <source>On Demand</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>All Icons</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>All Icons &amp; Images</source>
+        <translation></translation>
+    </message>
     <message>
         <source>Load Level</source>
         <translation>Ebene importieren</translation>
@@ -4822,7 +4842,11 @@ Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Multiple Rendering: </source>
-        <translation type="vanished">Multiples Rendern:</translation>
+        <translation>Multiples Rendern:</translation>
+    </message>
+    <message>
+        <source>Do stereoscopy</source>
+        <translation>: </translation>
     </message>
     <message>
         <source>Standard</source>

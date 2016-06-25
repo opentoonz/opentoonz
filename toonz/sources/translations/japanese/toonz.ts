@@ -277,6 +277,10 @@ Stop it or wait for its completion before removing it.</source>
         <source>Contrast:</source>
         <translation>コントラスト：</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>BrowserPopup</name>
@@ -2421,6 +2425,10 @@ Do you want to create it?</source>
         <source>Intensity:</source>
         <translation>強度:</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>LoadColorModelPopup</name>
@@ -2500,6 +2508,18 @@ Do you want to create it?</source>
 </context>
 <context>
     <name>LoadLevelPopup</name>
+    <message>
+        <source>On Demand</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>All Icons</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>All Icons &amp; Images</source>
+        <translation></translation>
+    </message>
     <message>
         <source>Load Level</source>
         <translation>レベルを読み込み</translation>
@@ -4683,7 +4703,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Multiple Rendering: </source>
-        <translation type="vanished">複数レンダリング：</translation>
+        <translation>複数レンダリング：</translation>
+    </message>
+    <message>
+        <source>Do stereoscopy</source>
+        <translation>: </translation>
     </message>
     <message>
         <source>Standard</source>

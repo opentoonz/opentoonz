@@ -701,6 +701,18 @@ Do you want to proceed?</source>
 <context>
     <name>QObject</name>
     <message>
+        <source>Rotate On Camera Center</source>
+        <translation>在摄影机中心旋转</translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation>类型:</translation>
+    </message>
+    <message>
+        <source>Passive Pick</source>
+        <translation>拾取光标位置颜色</translation>
+    </message>
+    <message>
         <source>Min:</source>
         <translation>最小:</translation>
     </message>
@@ -839,24 +851,6 @@ Do you want to proceed?</source>
     <message>
         <source>Set Save Box : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</source>
         <translation>设置保存框 : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</translation>
-    </message>
-</context>
-<context>
-    <name>RotateTool</name>
-    <message>
-        <source>Rotate On Camera Center</source>
-        <translation>在摄影机中心旋转</translation>
-    </message>
-</context>
-<context>
-    <name>StylePickerTool</name>
-    <message>
-        <source>Type:</source>
-        <translation>类型:</translation>
-    </message>
-    <message>
-        <source>Passive Pick</source>
-        <translation>拾取光标位置颜色</translation>
     </message>
 </context>
 <context>

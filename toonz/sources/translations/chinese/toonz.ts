@@ -277,6 +277,10 @@ Stop it or wait for its completion before removing it.</source>
         <source>Contrast:</source>
         <translation>对比度:</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation>应用</translation>
+    </message>
 </context>
 <context>
     <name>BrowserPopup</name>
@@ -1376,7 +1380,7 @@ before color designing.</source>
     </message>
     <message>
         <source>Scan &amp; Cleanup</source>
-        <translation type="vanished">扫描&amp;&amp;清稿</translation>
+        <translation>扫描&amp;清稿</translation>
     </message>
     <message>
         <source>Level</source>
@@ -2426,6 +2430,10 @@ Do you want to create it?</source>
         <source>Intensity:</source>
         <translation>强度:</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation>应用</translation>
+    </message>
 </context>
 <context>
     <name>LoadColorModelPopup</name>
@@ -2505,6 +2513,18 @@ Do you want to create it?</source>
 </context>
 <context>
     <name>LoadLevelPopup</name>
+    <message>
+        <source>On Demand</source>
+        <translation>按需</translation>
+    </message>
+    <message>
+        <source>All Icons</source>
+        <translation>所有图标</translation>
+    </message>
+    <message>
+        <source>All Icons &amp; Images</source>
+        <translation>所有图标和图像</translation>
+    </message>
     <message>
         <source>Load Level</source>
         <translation>加载层级</translation>
@@ -4687,7 +4707,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Multiple Rendering: </source>
-        <translation type="vanished">多重渲染: </translation>
+        <translation>多重渲染: </translation>
+    </message>
+    <message>
+        <source>Do stereoscopy</source>
+        <translation>制作 3D 效果</translation>
     </message>
     <message>
         <source>Standard</source>
@@ -8548,7 +8572,7 @@ Please commit or revert changes first.</source>
     </message>
     <message>
         <source>Scan &amp; Cleanup</source>
-        <translation>清稿</translation>
+        <translation>扫描&amp;清稿</translation>
     </message>
     <message>
         <source>Level</source>

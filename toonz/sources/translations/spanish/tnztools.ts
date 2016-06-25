@@ -673,6 +673,18 @@ Do you want to proceed?</source>
 <context>
     <name>QObject</name>
     <message>
+        <source>Rotate On Camera Center</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Mode:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Passive Pick</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Min:</source>
         <translation>Mín:</translation>
     </message>
@@ -811,24 +823,6 @@ Do you want to proceed?</source>
     <message>
         <source>Set Save Box : (X%1,Y%2,W%3,H%4)-&gt;(X%5,Y%6,W%7,H%8)</source>
         <translation>Definir marco de seguridad : (X%1,Y%2,An%3,Al%4)-&gt;(X%5,Y%6,An%7,Al%8)</translation>
-    </message>
-</context>
-<context>
-    <name>RotateTool</name>
-    <message>
-        <source>Rotate On Camera Center</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>StylePickerTool</name>
-    <message>
-        <source>Type:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Passive Pick</source>
-        <translation></translation>
     </message>
 </context>
 <context>
