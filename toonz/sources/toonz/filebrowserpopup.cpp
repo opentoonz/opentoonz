@@ -631,8 +631,8 @@ LoadLevelPopup::LoadLevelPopup()
 
   //----
   QStringList behaviorList;
-  behaviorList << QString("On Demand") << QString("All Icons")
-               << QString("All Icons & Images");
+  behaviorList << QString(tr("On Demand")) << QString(tr("All Icons"))
+               << QString(tr("All Icons & Images"));
   m_loadTlvBehaviorComboBox->addItems(behaviorList);
   // use the default value set in the preference
   m_loadTlvBehaviorComboBox->setCurrentIndex(

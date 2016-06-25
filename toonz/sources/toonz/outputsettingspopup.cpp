@@ -187,7 +187,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
     removePresetButton       = new QPushButton(tr("Remove"), this);
     m_presetCombo            = new QComboBox(this);
 
-    m_doStereoscopy = new DVGui::CheckBox("Do stereoscopy", this);
+    m_doStereoscopy = new DVGui::CheckBox(tr("Do stereoscopy"), this);
     m_stereoShift   = new DVGui::DoubleLineEdit(this, 0.05);
   }
   // Threads
