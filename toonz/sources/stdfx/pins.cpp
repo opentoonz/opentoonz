@@ -6,11 +6,12 @@
 #include "tmathutil.h"
 #include "tofflinegl.h"
 
+#include <cmath>
+
 //------------------------------------------------------------------------------
 #ifdef _WIN32
 #define ISNAN _isnan
 #else
-extern "C" int isnan(double);
 #define ISNAN isnan
 #endif
 

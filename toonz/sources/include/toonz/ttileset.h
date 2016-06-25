@@ -83,15 +83,9 @@ public:
     Tile();
     Tile(const TRasterCM32P &ras, const TPoint &p);
     ~Tile();
-#ifdef __LP64__
-    QString id() const {
-      return "TileCM" + QString::number((unsigned long)this);
-    }
-#else
     QString id() const override {
-      return "TileCM" + QString::number((UINT)this);
+      return "TileCM" + QString::number((uintptr_t)this);
     }
-#endif
 
     Tile *clone() const override;
 
@@ -129,15 +123,9 @@ public:
     Tile();
     Tile(const TRasterP &ras, const TPoint &p);
     ~Tile();
-#ifdef __LP64__
-    QString id() const {
-      return "TTileSet32::Tile" + QString::number((unsigned long)this);
-    }
-#else
     QString id() const override {
-      return "TTileSet32::Tile" + QString::number((UINT)this);
+      return "TTileSet32::Tile" + QString::number((uintptr_t)this);
     }
-#endif
 
     Tile *clone() const override;
 

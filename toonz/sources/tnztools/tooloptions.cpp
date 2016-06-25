@@ -215,7 +215,7 @@ void ToolOptionControlBuilder::visit(TDoublePairProperty *p) {
   hLayout()->addWidget(control, 200);
   m_panel->addControl(control);
 
-  if (p->getName() == "Size:") {
+  if (p->getName() == "Size:" || p->getName() == "Size") {
     CommandManager *cm = CommandManager::instance();
     QAction *a;
     a = cm->getAction("A_IncreaseMaxBrushThickness");

@@ -147,7 +147,7 @@ private:                                                                       \
   static TPersistDeclarationT<T> m_declaration;                                \
   \
 public:                                                                        \
-  const TPersistDeclaration *getDeclaration() const { return &m_declaration; }
+  const TPersistDeclaration *getDeclaration() const override { return &m_declaration; }
 
 #define PERSIST_IDENTIFIER(T, I) TPersistDeclarationT<T> T::m_declaration(I);
 
