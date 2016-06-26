@@ -337,7 +337,7 @@ include_directories(
 if(WIN32)
     target_link_libraries(toonzlib
         Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script
-        ${GLUT_LIB} ${GL_LIB} vfw32.lib
+        ${GLUT_LIB} ${GL_LIB} vfw32.lib 
         tnzcore tnzbase tnzext)
 elseif(APPLE)
     set(EXTRA_LIBS

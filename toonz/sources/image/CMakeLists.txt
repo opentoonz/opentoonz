@@ -20,6 +20,9 @@ set(HEADERS
     ../include/tnzimage.h
     mov/tiio_mov_proxy.h
     3gp/tiio_3gp_proxy.h
+    gif/tiio_gif.h
+    webm/tiio_webm.h
+    mp4/tiio_mp4.h
     mesh/tiio_mesh.h)
 
 set(SOURCES
@@ -46,6 +49,9 @@ set(SOURCES
     tzl/tiio_tzl.cpp
     mov/tiio_mov_proxy.cpp
     3gp/tiio_3gp_proxy.cpp
+    gif/tiio_gif.cpp
+    webm/tiio_webm.cpp
+    mp4/tiio_mp4.cpp
     mesh/tiio_mesh.cpp)
 
 if(WIN32)
@@ -84,7 +90,8 @@ message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
 include_directories(
     ${TIFF_INCLUDE_DIR}
-    ${SDKROOT}/LibJPEG/jpeg-9)
+    ${SDKROOT}/LibJPEG/jpeg-9
+    ${SDKROOT}/ffmpeg)
 if(WIN32)
     include_directories(${SDKROOT}/libpng-1.6.21)
     if(PLATFORM EQUAL 32)
@@ -126,4 +133,11 @@ else()
         ${TNZLIBS})
 endif()
 
-target_link_libraries(image Qt5::Core Qt5::Network ${Z_LIB} ${GLUT_LIB} ${GL_LIB} ${JPEG_LIB} ${TIFF_LIB} ${PNG_LIB} ${EXTRA_LIBS})
+target_link_libraries(image Qt5::Core Qt5::Network ${Z_LIB} ${GLUT_LIB} ${GL_LIB} ${JPEG_LIB} ${TIFF_LIB} ${PNG_LIB} ${EXTRA_LIBS} 
+        ${AVCODEC_LIB}
+        ${AVFORMAT_LIB}
+        ${AVUTIL_LIB}
+        ${SWSCALE_LIB}
+        ${SWRESAMPLE_LIB}
+        ${AVDEVICE_LIB}
+        ${AVFILTER_LIB})
