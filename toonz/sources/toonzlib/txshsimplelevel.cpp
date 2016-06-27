@@ -1549,9 +1549,8 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
           m_properties->setSubsampling(oldSubs);
           m_path = oldPath;
           throw TSystemException(decodedFp,
-                                 "Can't open file.\nAccess may be denied or \n"
-                                 "someone else may be saving the same file.\n"
-								 "Please wait and try again.");
+			  "can't fopen.\nSomeone may be saving the same "
+			  - "file. Please wait a while and retry.");
         }
 
         lw->setOverwritePaletteFlag(overwritePalette);
