@@ -269,7 +269,7 @@ public:
 // e' la classe concreta che discende da TRaster
 
 template <class T>
-class TRasterT final : public TRaster {
+class TRasterT : public TRaster {
 protected:
   // Constructors are protected to prevent direct allocation of TRasterT
   // instances.

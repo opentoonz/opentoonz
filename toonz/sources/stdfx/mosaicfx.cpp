@@ -77,7 +77,7 @@ public:
 namespace mosaic {
 
 template <typename PIXEL, typename GRAY>
-class MaskCellBuilder final : public CellBuilder<PIXEL> {
+class MaskCellBuilder : public CellBuilder<PIXEL> {
 protected:
   TRasterPT<GRAY> m_mask;
 

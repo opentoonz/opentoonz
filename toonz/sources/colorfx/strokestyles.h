@@ -49,7 +49,7 @@ typedef std::vector<BlendAndPoint> BlendAndPoints;
 //=============================================================================
 
 template <class T>
-class TOptimizedStrokeStyleT final : public TColorStyle {
+class TOptimizedStrokeStyleT : public TColorStyle {
 public:
   TOptimizedStrokeStyleT() {}
 

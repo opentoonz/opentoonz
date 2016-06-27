@@ -956,7 +956,7 @@ namespace {
 //-------------------------------------------------------------------
 
 template <class T>
-class SetAttributeUndo final : public TUndo {
+class SetAttributeUndo : public TUndo {
   TStageObjectId m_id;
   T m_oldValue, m_newValue;
   TXsheetHandle *m_xshHandle;

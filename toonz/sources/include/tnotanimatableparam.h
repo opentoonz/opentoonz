@@ -77,7 +77,7 @@ private:
 //-----------------------------------------------------------------------------
 
 template <class T>
-class TNotAnimatableParamObserver final : public TParamObserver {
+class TNotAnimatableParamObserver : public TParamObserver {
 public:
   TNotAnimatableParamObserver() {}
 

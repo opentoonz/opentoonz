@@ -206,7 +206,7 @@ private:
 //--------------------------------------------------------------------------------
 
 template <typename Pixel>
-class ImageMeshesReaderT final : public ImageMeshesReader {
+class ImageMeshesReaderT : public ImageMeshesReader {
 public:
   typedef PixelSelector<Pixel> pixel_selector_type;
   typedef typename pixel_selector_type::value_type value_type;
