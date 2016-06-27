@@ -1548,7 +1548,6 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_NewLevel, tr("&New Level..."), "");
   createMenuFileAction(MI_LoadLevel, tr("&Load Level..."), "");
   createMenuFileAction(MI_SaveLevel, tr("&Save Level"), "");
-  createMenuFileAction(MI_SaveAllLevels, tr("&Save All Levels"), "");
   createMenuFileAction(MI_SaveLevelAs, tr("&Save Level As..."), "");
   createMenuFileAction(MI_ExportLevel, tr("&Export Level..."), "");
   createMenuFileAction(MI_ConvertFileWithInput, tr("&Convert File..."), "");
