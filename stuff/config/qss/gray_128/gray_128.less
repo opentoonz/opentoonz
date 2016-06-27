@@ -996,6 +996,37 @@ SpreadsheetViewer {
 	}
 }
 
+IconViewField {
+	qproperty-ScalePegPixmap: url("@{image_url}/selectiontool_scalepeg.png");
+	qproperty-RotationPixmap: url("@{image_url}/selectiontool_rotation.png");
+	qproperty-PositionPixmap: url("@{image_url}/selectiontool_position.png");
+	qproperty-ThicknessPixmap: url("@{image_url}/selectiontool_thickness.png");
+}
+
+PopupButton {
+    &::menu-indicator {
+        image: url("@{image_url}/down_arrow.png");
+        width: 10px;
+        height: 17px;
+        border-left: 1px solid gray;
+    }
+    &::menu-indicator:disabled {
+        image: url("@{image_url}/down_arrow_disabled.png");
+    }
+}
+
+#Cap,#Join {
+	padding-left: -8px;
+	padding-right: 4px;
+ 	min-width: 32px; max-width: 32px;
+	& QMenu {
+	    min-width: 18px; max-width: 18px;
+	    &::item {
+	        min-width: 16px; max-width: 16px;
+	        padding: 0px;
+	    }
+	}
+}
 
 /*------ Script Console ------*/
 
