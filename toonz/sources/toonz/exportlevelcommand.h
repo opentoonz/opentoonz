@@ -68,7 +68,7 @@ struct ExportLevelOptions {
   //! \remark   In single frame exports, the transform applied to the frame is
   //! <I>the first</I>.
   double m_thicknessTransform[2][2];  //!< Vector images' thickness
-                                      //!transformation at the start and
+                                      //! transformation at the start and
   //!  end of the level export. Each transform is represented as
   //!  first order polynomial through its coefficients.
 

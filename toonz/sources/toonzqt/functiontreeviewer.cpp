@@ -58,8 +58,8 @@ public:
   ParamChannelGroup(TParam *param, const std::wstring &fxId,
                     std::string &paramName);
 
-  void refresh();
-  void *getInternalPointer() const;
+  void refresh() override;
+  void *getInternalPointer() const override;
 };
 
 //=============================================================================
@@ -74,17 +74,17 @@ public:
   StageObjectChannelGroup(TStageObject *pegbar);
   ~StageObjectChannelGroup();
 
-  QString getShortName() const;
-  QString getLongName() const;
+  QString getShortName() const override;
+  QString getLongName() const override;
 
-  QString getIdName() const;
+  QString getIdName() const override;
 
-  void *getInternalPointer() const {
+  void *getInternalPointer() const override {
     return static_cast<void *>(m_stageObject);
   }
 
   TStageObject *getStageObject() const { return m_stageObject; }
-  QVariant data(int role) const;
+  QVariant data(int role) const override;
 };
 
 //=============================================================================
@@ -100,10 +100,12 @@ public:
       , m_stageObjectGroup(stageGroup)
       , m_vxName(vxName) {}
 
-  QString getShortName() const { return m_stageObjectGroup->getShortName(); }
-  QString getLongName() const { return *m_vxName; }
+  QString getShortName() const override {
+    return m_stageObjectGroup->getShortName();
+  }
+  QString getLongName() const override { return *m_vxName; }
 
-  void *getInternalPointer() const { return (void *)m_vxName; }
+  void *getInternalPointer() const override { return (void *)m_vxName; }
 
   static inline bool compareStr(const TreeModel::Item *item,
                                 const QString &str) {
@@ -112,7 +114,7 @@ public:
     return (QString::localeAwareCompare(thisStr, str) < 0);
   }
 
-  QVariant data(int role) const;
+  QVariant data(int role) const override;
 };
 
 }  // namespace
@@ -1186,7 +1188,7 @@ void FunctionTreeModel::onChange(const TParamChange &tpc) {
 
       Func(FunctionTreeModel *obj, const TParamChange *tpc)
           : m_obj(obj), m_tpc(tpc) {}
-      void operator()() { m_obj->onParamChange(m_tpc->m_dragging); }
+      void operator()() override { m_obj->onParamChange(m_tpc->m_dragging); }
     };
 
     QMetaObject::invokeMethod(TFunctorInvoker::instance(), "invoke",

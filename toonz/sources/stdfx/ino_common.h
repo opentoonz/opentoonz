@@ -42,9 +42,9 @@ inline double pixel_per_mm(void) { return 1.; }
 class TBlendForeBackRasterFx : public TRasterFx {
 public:
   /* FX nodeが無効のときの、表示port番号 */
-  int getPreferredInputPort() { return 1; }
+  int getPreferredInputPort() override { return 1; }
 
-  std::string getPluginId() const { return PLUGIN_PREFIX; }
+  std::string getPluginId() const override { return PLUGIN_PREFIX; }
 };
 
 #endif /* !ino_common_h */

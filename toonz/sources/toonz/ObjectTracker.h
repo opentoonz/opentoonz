@@ -38,7 +38,7 @@ private:
 
     short dim_temp;  // dimension searce template area (real area =
                      // (2*dim_temp+1)*(2*dim_temp+1))
-    short var_dim;  // variation dimension window (dimension in pixel)
+    short var_dim;   // variation dimension window (dimension in pixel)
     float threshold_distance;    // threshold of lose object
     float threshold_distance_B;  // threshold of lose object
 

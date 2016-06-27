@@ -27,21 +27,25 @@ public:
   CornerPinFx();
   ~CornerPinFx();
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override;
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info);
+                           const TRenderSettings &info) override;
 
   void onPortConnected(TFxPort *port);
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
-  bool allowUserCacheOnPort(int port) { return port != 0; }
+  bool allowUserCacheOnPort(int port) override { return port != 0; }
 
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput);
+                 TRenderSettings &infoOnInput) override;
 
   void safeTransform(double frame, int port, const TRectD &rectOnOutput,
                      const TRenderSettings &infoOnOutput, TRectD &rectOnInput,

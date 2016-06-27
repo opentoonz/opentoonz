@@ -25,7 +25,7 @@ class DVAPI RasterStrokeGenerator {
       m_raster;  // L'immagine raster sulla quale dobbiamo disegnare lo stroke
   std::vector<TThickPoint> m_points;  // Il vettore di punti che rappresentano
                                       // la spina dorsale dello stroke
-  int m_styleId;  // L'ink-style dello stroke
+  int m_styleId;                      // L'ink-style dello stroke
   bool m_selective;
   TRect m_boxOfRaster;  // Un rettangolo della stessa dimensione di "m_raster"
   ColorType m_colorType;

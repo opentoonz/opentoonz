@@ -425,31 +425,31 @@ public:
   StyleWriter(TOStream &os, int index) : m_os(os), m_index(index) {}
   static void setRootDir(const TFilePath &fp) { m_rootDir = fp; }
 
-  TOutputStreamInterface &operator<<(double x) {
+  TOutputStreamInterface &operator<<(double x) override {
     m_os << x;
     return *this;
   };
-  TOutputStreamInterface &operator<<(int x) {
+  TOutputStreamInterface &operator<<(int x) override {
     m_os << x;
     return *this;
   };
-  TOutputStreamInterface &operator<<(std::string x) {
+  TOutputStreamInterface &operator<<(std::string x) override {
     m_os << x;
     return *this;
   };
-  TOutputStreamInterface &operator<<(UCHAR x) {
+  TOutputStreamInterface &operator<<(UCHAR x) override {
     m_os << (int)x;
     return *this;
   };
-  TOutputStreamInterface &operator<<(USHORT x) {
+  TOutputStreamInterface &operator<<(USHORT x) override {
     m_os << (int)x;
     return *this;
   };
-  TOutputStreamInterface &operator<<(const TPixel32 &x) {
+  TOutputStreamInterface &operator<<(const TPixel32 &x) override {
     m_os << x;
     return *this;
   };
-  TOutputStreamInterface &operator<<(const TRaster32P &ras) {
+  TOutputStreamInterface &operator<<(const TRaster32P &ras) override {
     assert(m_rootDir != TFilePath());
 
     std::string name = "texture_" + std::to_string(m_index);
@@ -482,31 +482,36 @@ public:
 
   static void setRootDir(const TFilePath &fp) { m_rootDir = fp; }
 
-  virtual TInputStreamInterface &operator>>(double &x) {
+  TInputStreamInterface &operator>>(double &x) override {
     m_is >> x;
     return *this;
   }
-  virtual TInputStreamInterface &operator>>(int &x) {
+
+  TInputStreamInterface &operator>>(int &x) override {
     m_is >> x;
     return *this;
   }
-  virtual TInputStreamInterface &operator>>(std::string &x) {
+
+  TInputStreamInterface &operator>>(std::string &x) override {
     m_is >> x;
     return *this;
   }
-  virtual TInputStreamInterface &operator>>(UCHAR &x) {
+
+  TInputStreamInterface &operator>>(UCHAR &x) override {
     int v;
     m_is >> v;
     x = v;
     return *this;
   }
-  virtual TInputStreamInterface &operator>>(USHORT &x) {
+
+  TInputStreamInterface &operator>>(USHORT &x) override {
     int v;
     m_is >> v;
     x = v;
     return *this;
   }
-  virtual TInputStreamInterface &operator>>(TRaster32P &x) {
+
+  TInputStreamInterface &operator>>(TRaster32P &x) override {
     assert(m_rootDir != TFilePath());
     std::string name;
     m_is >> name;
@@ -517,7 +522,8 @@ public:
     }
     return *this;
   }
-  virtual TInputStreamInterface &operator>>(TPixel32 &x) {
+
+  TInputStreamInterface &operator>>(TPixel32 &x) override {
     m_is >> x;
     return *this;
   }
@@ -527,7 +533,7 @@ public:
         This is necessary since palettes have their \a own version number,
         which is \a not the TIStream's file one.
 */
-  virtual VersionNumber versionNumber() const {
+  VersionNumber versionNumber() const override {
     return m_version;
   }  //!< Returns the palette's version number.
 };

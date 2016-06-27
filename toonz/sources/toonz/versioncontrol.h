@@ -52,7 +52,7 @@ public:
                     bool depthInfinity = false);
 
 protected:
-  void run();
+  void run() override;
 
 protected slots:
   void onStandardOutputReady();

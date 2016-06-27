@@ -32,11 +32,11 @@ class MyScannerListener : public QObject, public TScannerListener {
 
 public:
   MyScannerListener(const ScanList &scanList);
-  void onImage(const TRasterImageP &);
-  void onError();
-  void onNextPaper();
-  void onAutomaticallyNextPaper();
-  bool isCanceled();
+  void onImage(const TRasterImageP &) override;
+  void onError() override;
+  void onNextPaper() override;
+  void onAutomaticallyNextPaper() override;
+  bool isCanceled() override;
 
 protected slots:
   void cancelButtonPressed();
@@ -54,7 +54,7 @@ public:
   DefineScannerPopup();
 
 public slots:
-  void accept();
+  void accept() override;
 };
 
 //=============================================================================
@@ -81,8 +81,8 @@ public:
   ScanSettingsPopup();
 
 protected:
-  void showEvent(QShowEvent *event);
-  void hideEvent(QHideEvent *event);
+  void showEvent(QShowEvent *event) override;
+  void hideEvent(QHideEvent *event) override;
   void connectAll();
   void disconnectAll();
 

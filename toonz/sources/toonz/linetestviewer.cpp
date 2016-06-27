@@ -350,8 +350,9 @@ dare seri problemi!!!!
   //	{
   // 		ras->lock();
   //		memcpy( ptr, ras->getRawData(), dataSize);
-  //		glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB); // release pointer to
-  //mapping buffer
+  //		glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB); // release pointer
+  //to
+  // mapping buffer
   //		ras->unlock();
   //   }
 
@@ -492,7 +493,7 @@ void LineTestViewer::paintGL() {
   //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   //	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, cameraWidth, cameraHeight, 0,
-  //GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)0);
+  // GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)0);
 
   //	glBindTexture(GL_TEXTURE_2D, m_textureId);
   //  glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, m_pboId);
@@ -513,9 +514,9 @@ void LineTestViewer::paintGL() {
   //	// glMapBufferARB() returns a new allocated pointer immediately
   //	// even if GPU is still working with the previous data.
   //	glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, cameraWidth * cameraHeight *
-  //4, 0, GL_STREAM_DRAW_ARB);
+  // 4, 0, GL_STREAM_DRAW_ARB);
   //	pbo = (GLubyte*)glMapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB,
-  //GL_WRITE_ONLY_ARB);
+  // GL_WRITE_ONLY_ARB);
 
   //	pboRaster = TRaster32P(cameraWidth, cameraHeight,cameraWidth,
   //(TPixelRGBM32*) pbo, false);

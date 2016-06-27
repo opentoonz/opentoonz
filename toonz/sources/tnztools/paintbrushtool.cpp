@@ -77,7 +77,7 @@ public:
       , m_selective(selective)
       , m_colorType(colorType) {}
 
-  void redo() const {
+  void redo() const override {
     TToonzImageP image = m_level->getFrame(m_frameId, true);
     TRasterCM32P ras   = image->getRaster();
     RasterStrokeGenerator m_rasterTrack(ras, PAINTBRUSH, m_colorType, m_styleId,
@@ -91,9 +91,12 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const { return sizeof(*this) + TRasterUndo::getSize(); }
-  virtual QString getToolName() { return QString("Paint Brush Tool"); }
-  int getHistoryType() { return HistoryType::PaintBrushTool; }
+  int getSize() const override {
+    return sizeof(*this) + TRasterUndo::getSize();
+  }
+
+  QString getToolName() override { return QString("Paint Brush Tool"); }
+  int getHistoryType() override { return HistoryType::PaintBrushTool; }
 };
 
 //-------------------------------------------------------------------------------------------
@@ -271,26 +274,26 @@ class PaintBrushTool : public TTool {
 public:
   PaintBrushTool();
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
-  void draw();
+  void draw() override;
   void update(TToonzImageP ti, TRectD area);
 
-  void updateTranslation();
+  void updateTranslation() override;
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
-  void onEnter();
-  void onLeave();
-  void onActivate();
-  void onDeactivate();
-  bool onPropertyChanged(std::string propertyName);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  void onEnter() override;
+  void onLeave() override;
+  void onActivate() override;
+  void onDeactivate() override;
+  bool onPropertyChanged(std::string propertyName) override;
 
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  int getCursorId() const { return m_cursor; }
+  int getCursorId() const override { return m_cursor; }
 
   int getColorClass() const { return 2; }
 
@@ -301,7 +304,7 @@ public:
   /*--- Brush、PaintBrush、EraserToolがPencilModeのときにTrueを返す。
   　　　PaintBrushはピクセルのStyleIndexを入れ替えるツールのため、
      　 アンチエイリアスは存在しない、いわば常にPencilMode ---*/
-  bool isPencilModeActive() { return true; }
+  bool isPencilModeActive() override { return true; }
 };
 
 PaintBrushTool paintBrushTool;

@@ -76,9 +76,9 @@ public:
     bind(TTool::Vectors);
   }
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
-  void draw() {
+  void draw() override {
     if (m_draw && (TVectorImageP)getImage(false)) {
       glColor3d(1, 0, 1);
       if (m_cursor.thick > 0) tglDrawCircle(m_cursor, m_cursor.thick);
@@ -86,7 +86,7 @@ public:
     }
   }
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
     if (m_active) return;
     assert(m_undo == 0);
     m_active = false;
@@ -130,7 +130,7 @@ public:
     invalidate();
   }
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     TVectorImageP vi(getImage(true));
     if (!m_active || !vi || !m_strokeRef) {
       delete m_undo;
@@ -330,7 +330,7 @@ public:
     notifyImageChanged();
   }
 
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override {
     if (!m_active) return;
 
     m_active = false;
@@ -475,7 +475,7 @@ Altrimenti non si fa altro che aumentarli i punti di controllo
     invalidate(TRectD(m_cursor - d, m_cursor + d));
   }
 
-  void mouseMove(const TPointD &pos, const TMouseEvent &e) {
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override {
     TVectorImageP vi = TImageP(getImage(true));
     if (!vi) {
       m_draw = false;
@@ -499,14 +499,14 @@ Altrimenti non si fa altro che aumentarli i punti di controllo
 
   bool moveCursor(const TPointD &pos) { return false; }
 
-  void onActivate() {
+  void onActivate() override {
     //      getApplication()->editImageOrSpline();
   }
 
-  void onLeave() { m_draw = false; }
+  void onLeave() override { m_draw = false; }
 
-  int getCursorId() const { return m_cursorId; }
-  void onEnter() {
+  int getCursorId() const override { return m_cursorId; }
+  void onEnter() override {
     m_draw = true;
     if ((TVectorImageP)getImage(false))
       m_cursorId = ToolCursor::IronCursor;

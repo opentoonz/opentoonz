@@ -79,7 +79,7 @@ public:
 
   TFMTChunk(TINT32 length) : TWAVChunk("fmt ", length) {}
 
-  virtual bool read(Tifstream &is) {
+  bool read(Tifstream &is) override {
     is.read((char *)&m_encodingType, sizeof(m_encodingType));
     is.read((char *)&m_chans, sizeof(m_chans));
     is.read((char *)&m_sampleRate, sizeof(m_sampleRate));
@@ -145,7 +145,7 @@ public:
 
   TDATAChunk(TINT32 length) : TWAVChunk("data", length) {}
 
-  bool read(Tifstream &is) {
+  bool read(Tifstream &is) override {
     // alloca il buffer dei campioni
     m_samples.reset(new UCHAR[m_length]);
     if (!m_samples) return false;

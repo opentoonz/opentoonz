@@ -15,7 +15,7 @@
 
 struct TStageObject::Keyframe {
   TDoubleKeyframe m_channels[T_ChannelCount];  //!< Keyframe per standard stage
-                                               //!object channel
+                                               //! object channel
   SkDKey m_skeletonKeyframe;  //!< Keyframes for the eventual plastic
                               //!< deformation
 

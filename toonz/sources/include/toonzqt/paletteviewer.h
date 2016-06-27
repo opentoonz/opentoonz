@@ -126,14 +126,14 @@ protected:
   void updatePaletteToolBar();
   void updateSavePaletteToolBar();
 
-  void resizeEvent(QResizeEvent *event);
-  void contextMenuEvent(QContextMenuEvent *event);
+  void resizeEvent(QResizeEvent *event) override;
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
 
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dropEvent(QDropEvent *event);
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
 
   void clearStyleSelection();
 

@@ -292,7 +292,7 @@ string TFilePath::getUndottedType() const  // ritorna l'estensione senza PUNTO
 
 string TFilePath::getName() const  // noDot! noSlash!
 {
-  int i = getLastSlash(m_path);  // cerco l'ultimo slash
+  int i      = getLastSlash(m_path);  // cerco l'ultimo slash
   string str = m_path.substr(i + 1);
   i          = str.rfind(".");
   if (i == string::npos) return str;
@@ -304,7 +304,7 @@ string TFilePath::getName() const  // noDot! noSlash!
 //-----------------------------------------------------------------------------
 // es. TFilePath("/pippo/pluto.0001.gif").getLevelName() == "pluto..gif"
 string TFilePath::getLevelName() const {
-  int i = getLastSlash(m_path);       // cerco l'ultimo slash
+  int i      = getLastSlash(m_path);  // cerco l'ultimo slash
   string str = m_path.substr(i + 1);  // str e' m_path senza directory
   i          = str.find(".");         // posizione del primo punto di str
   if (i == string::npos) return str;  // no frame; no type
@@ -336,7 +336,7 @@ TFilePath TFilePath::getParentDir() const  // noSlash!
 //-----------------------------------------------------------------------------
 
 TFrameId TFilePath::getFrame() const {
-  int i = getLastSlash(m_path);       // cerco l'ultimo slash
+  int i      = getLastSlash(m_path);  // cerco l'ultimo slash
   string str = m_path.substr(i + 1);  // str e' il path senza parentdir
   i          = str.rfind('.');
   if (i == string::npos || str == "." || str == "..")
@@ -359,7 +359,7 @@ TFrameId TFilePath::getFrame() const {
 TFilePath TFilePath::withType(const string &type) const {
   const string dotDot = "..";
   assert(type.length() < 2 || type.substr(0, 2) != dotDot);
-  int i = getLastSlash(m_path);       // cerco l'ultimo slash
+  int i      = getLastSlash(m_path);  // cerco l'ultimo slash
   string str = m_path.substr(i + 1);  // str e' il path senza parentdir
   int j      = str.rfind('.');
   if (j == string::npos || str == dotDot)
@@ -386,7 +386,7 @@ TFilePath TFilePath::withType(const string &type) const {
 //-----------------------------------------------------------------------------
 
 TFilePath TFilePath::withName(const string &name) const {
-  int i = getLastSlash(m_path);       // cerco l'ultimo slash
+  int i      = getLastSlash(m_path);  // cerco l'ultimo slash
   string str = m_path.substr(i + 1);  // str e' il path senza parentdir
   int j      = str.rfind('.');
   if (j == string::npos) return TFilePath(m_path.substr(0, i + 1) + name);
@@ -407,7 +407,7 @@ TFilePath TFilePath::withParentDir(const TFilePath &dir) const {
 TFilePath TFilePath::withFrame(const TFrameId &frame,
                                TFrameId::FrameFormat format) const {
   const string dot = ".", dotDot = "..";
-  int i = getLastSlash(m_path);       // cerco l'ultimo slash
+  int i      = getLastSlash(m_path);  // cerco l'ultimo slash
   string str = m_path.substr(i + 1);  // str e' il path senza parentdir
   assert(str != dot && str != dotDot);
   int j = str.rfind('.');

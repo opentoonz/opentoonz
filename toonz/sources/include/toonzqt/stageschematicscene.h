@@ -106,13 +106,13 @@ public:
   ~StageSchematicScene();
 
   //! Clear all item an regenerate the Stage Schematic graph.
-  void updateScene();
+  void updateScene() override;
 
   //! Reurns the current node.
-  QGraphicsItem *getCurrentNode();
+  QGraphicsItem *getCurrentNode() override;
 
   //! Replace all nodes in the scene.
-  void reorderScene();
+  void reorderScene() override;
   TXsheet *getXsheet();
   TXsheetHandle *getXsheetHandle() { return m_xshHandle; }
 
@@ -181,8 +181,8 @@ private:
                                     bool maximizedNode);
 
 protected:
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme);
-  void mousePressEvent(QGraphicsSceneMouseEvent *me);
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *me) override;
 
 signals:
   void editObject();
@@ -190,7 +190,7 @@ signals:
   void doExplodeChild(QList<TStageObjectId>);
 
 protected slots:
-  void onSelectionSwitched(TSelection *oldSel, TSelection *newSel);
+  void onSelectionSwitched(TSelection *oldSel, TSelection *newSel) override;
 
   void onPegbarAdded();
   void onSplineAdded();

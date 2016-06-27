@@ -1567,8 +1567,8 @@ int write_bmp_header(FILE *fp, BMP_HEADER *hd)
   putshort(fp, (int)hd->biPlanes);   /* must be '1'                    */
   putshort(fp, (int)hd->biBitCount); /* 1,4,8, or 24                   */
   putint(fp,
-         (int)hd->biCompression); /* BMP_BI_RGB, BMP_BI_RLE8 or BMP_BI_RLE4 */
-  putint(fp, (int)hd->biSizeImage);     /* size of raw image data         */
+         (int)hd->biCompression);   /* BMP_BI_RGB, BMP_BI_RLE8 or BMP_BI_RLE4 */
+  putint(fp, (int)hd->biSizeImage); /* size of raw image data         */
   putint(fp, (int)hd->biXPelsPerMeter); /* dpi * 39" per meter            */
   putint(fp, (int)hd->biYPelsPerMeter); /* dpi * 39" per meter            */
   putint(fp, (int)hd->biClrUsed);       /* colors used in cmap            */

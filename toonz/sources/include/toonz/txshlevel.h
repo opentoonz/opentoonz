@@ -125,9 +125,9 @@ Set scene to which level belongs to \b scene.
   virtual void getFids(std::vector<TFrameId> &fids) const {}
 
   //! Load the level data (i.e. name, path, etc. e.g. from the .tnz file)
-  virtual void loadData(TIStream &is) = 0;
+  void loadData(TIStream &is) override = 0;
   //! Save the level data (i.e. name, path, etc. e.g. to the .tnz file)
-  virtual void saveData(TOStream &os) = 0;
+  void saveData(TOStream &os) override = 0;
 
   //! Load the level content from the associated path
   virtual void load() = 0;

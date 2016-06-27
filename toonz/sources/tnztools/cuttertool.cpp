@@ -69,7 +69,7 @@ public:
     delete m_fillInformation;
   }
 
-  void undo() const {
+  void undo() const override {
     TTool::Application *app = TTool::getApplication();
     if (!app) return;
     if (dynamic_cast<StrokeSelection *>(
@@ -115,7 +115,7 @@ public:
     notifyImageChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     TTool::Application *app = TTool::getApplication();
     if (!app) return;
     if (app->getCurrentFrame()->isEditingScene()) {
@@ -139,12 +139,12 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) +
            m_fillInformation->capacity() * sizeof(TFilledRegionInf) + 500;
   }
 
-  QString getToolName() { return QString("Cutter Tool"); }
+  QString getToolName() override { return QString("Cutter Tool"); }
 };
 
 //=============================================================================
@@ -169,9 +169,9 @@ public:
     bind(TTool::VectorImage);
   }
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
-  void draw() {
+  void draw() override {
     // TAffine viewMatrix = getViewer()->getViewMatrix();
     // glPushMatrix();
     // tglMultMatrix(viewMatrix);
@@ -195,7 +195,7 @@ public:
     // glPopMatrix();
   }
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
     TVectorImageP vi = TImageP(getImage(true));
     if (!vi) return;
     QMutexLocker sl(vi->getMutex());
@@ -283,7 +283,7 @@ public:
     invalidate();
   }
 
-  void mouseMove(const TPointD &pos, const TMouseEvent &e) {
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override {
     TVectorImageP vi = TImageP(getImage(true));
     if (!vi) {
       m_speed = TPointD(0, 0);
@@ -305,17 +305,17 @@ public:
     invalidate();
   }
 
-  void onLeave() { m_speed = TPointD(0, 0); }
+  void onLeave() override { m_speed = TPointD(0, 0); }
 
-  void onActivate() {}
-  void onEnter() {
+  void onActivate() override {}
+  void onEnter() override {
     if ((TVectorImageP)getImage(false))
       m_cursorId = ToolCursor::CutterCursor;
     else
       m_cursorId = ToolCursor::CURSOR_NO;
   }
 
-  int getCursorId() const { return m_cursorId; }
+  int getCursorId() const override { return m_cursorId; }
 
 } cutterTool;
 

@@ -49,7 +49,7 @@ public:
     return kIndex;
   }
 
-  void onAdd() {
+  void onAdd() override {
     Keyframes::iterator it;
     for (it = m_oldKeyframes.begin(); it != m_oldKeyframes.end(); ++it) {
       int kIndex = it->first;
@@ -57,23 +57,23 @@ public:
       m_newKeyframes[kIndex] = m_param->getKeyframe(kIndex);
     }
   }
-  void undo() const {
+  void undo() const override {
     m_param->setKeyframes(m_oldKeyframes);
     Keyframes::const_iterator it;
     for (it = m_oldKeyframes.begin(); it != m_oldKeyframes.end(); ++it)
       if (!it->second.m_isKeyframe) m_param->deleteKeyframe(it->second.m_frame);
   }
-  void redo() const {
+  void redo() const override {
     Keyframes::const_iterator it;
     for (it = m_oldKeyframes.begin(); it != m_oldKeyframes.end(); ++it)
       if (!it->second.m_isKeyframe) m_param->setKeyframe(it->second);
     m_param->setKeyframes(m_newKeyframes);
   }
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) +
            sizeof(*m_oldKeyframes.begin()) * 2 * m_oldKeyframes.size();
   }
-  QString getHistoryString() { return QObject::tr("Set Keyframe"); }
+  QString getHistoryString() override { return QObject::tr("Set Keyframe"); }
 };
 
 //=============================================================================
@@ -161,7 +161,7 @@ int KeyframeSetter::createKeyframe(double frame) {
       TDoubleKeyframe kb                = m_param->getKeyframe(m_kIndex + 1);
       TDoubleKeyframe::Type segmentType = ka.m_type;
       m_keyframe.m_type                 = ka.m_type;
-      m_keyframe.m_step                 = ka.m_step;  // An existing segment step should prevail
+      m_keyframe.m_step = ka.m_step;  // An existing segment step should prevail
                                       // over the preference
 
       /*---Segment内にKeyを打った場合は、Step値も元のSegmentの値を引き継ぐようにする---*/
@@ -812,11 +812,11 @@ public:
     m_keyframe = m_param->getKeyframe(kIndex);
   }
   ~RemoveKeyframeUndo() { m_param->release(); }
-  void undo() const { m_param->setKeyframe(m_keyframe); }
-  void redo() const { m_param->deleteKeyframe(m_keyframe.m_frame); }
-  int getSize() const { return sizeof(*this); }
+  void undo() const override { m_param->setKeyframe(m_keyframe); }
+  void redo() const override { m_param->deleteKeyframe(m_keyframe.m_frame); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Remove Keyframe"); }
+  QString getHistoryString() override { return QObject::tr("Remove Keyframe"); }
 };
 
 //=============================================================================
@@ -842,11 +842,11 @@ public:
     bool isEnabled = m_param->isCycleEnabled();
     m_param->enableCycle(!isEnabled);
   }
-  void undo() const { invertCycleEnabled(); }
-  void redo() const { invertCycleEnabled(); }
-  int getSize() const { return sizeof(*this); }
+  void undo() const override { invertCycleEnabled(); }
+  void redo() const override { invertCycleEnabled(); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Cycle"); }
+  QString getHistoryString() override { return QObject::tr("Cycle"); }
 };
 
 //=============================================================================

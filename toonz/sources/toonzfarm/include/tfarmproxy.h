@@ -72,7 +72,7 @@ public:
   CantConnectToStub(const QString &hostname, const QString &addr, int port)
       : TFarmProxyException(hostname, addr, port, "") {}
 
-  TString getMessage() const;
+  TString getMessage() const override;
 };
 
 #endif

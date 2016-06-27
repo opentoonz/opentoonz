@@ -40,11 +40,13 @@ public:
                         TOptimizedStrokeStyleT<T> *style);
   ~TOptimizedStrokePropT() { m_colorStyle->release(); }
 
-  const TColorStyle *getColorStyle() const;
+  const TColorStyle *getColorStyle() const override;
 
-  TStrokeProp *clone(const TStroke *stroke) const;
-  void draw(const TVectorRenderData &rd);
-  void draw(TFlash &flash) { getColorStyle()->drawStroke(flash, getStroke()); }
+  TStrokeProp *clone(const TStroke *stroke) const override;
+  void draw(const TVectorRenderData &rd) override;
+  void draw(TFlash &flash) override {
+    getColorStyle()->drawStroke(flash, getStroke());
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -671,8 +673,8 @@ void TSprayStrokeStyle::drawStroke(const TColorFunction *cf,
   double length = stroke->getLength();
   double step   = 4;
 
-  double blend = m_blend;  // distanza che controlla da dove il gessetto
-                           // comincia il fade out  (0, 1)
+  double blend = m_blend;          // distanza che controlla da dove il gessetto
+                                   // comincia il fade out  (0, 1)
   double intensity = m_intensity;  // quanti punti vengono disegnati ad ogni
                                    // step
   double radius = m_radius;
@@ -735,8 +737,8 @@ void TSprayStrokeStyle::drawStroke(TFlash &flash, const TStroke *stroke) const {
   double length = stroke->getLength();
   double step   = 4;
 
-  double blend = m_blend;  // distanza che controlla da dove il gessetto
-                           // comincia il fade out  (0, 1)
+  double blend = m_blend;          // distanza che controlla da dove il gessetto
+                                   // comincia il fade out  (0, 1)
   double intensity = m_intensity;  // quanti punti vengono disegnati ad ogni
                                    // step
   double radius = m_radius;
@@ -3507,9 +3509,9 @@ void TBlendStrokeStyle2::computeData(PointsAndDoubles &data,
   else
     color = m_color;
   TPixelD dcolor;
-  dcolor         = toPixelD(color);
-  bool firstRing = true;
-  double s       = 0;
+  dcolor           = toPixelD(color);
+  bool firstRing   = true;
+  double s         = 0;
   double maxfactor = 2 * m_blend / step;  // max definisce il numero di
                                           // intervalli in cui la regione viene
                                           // divisa

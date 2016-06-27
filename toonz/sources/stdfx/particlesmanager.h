@@ -63,7 +63,7 @@ private:
 
   int m_renderStatus;
 
-  void onRenderStatusStart(int renderStatus);
+  void onRenderStatusStart(int renderStatus) override;
 };
 
 #endif

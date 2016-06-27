@@ -406,7 +406,7 @@ public:
     TApp::instance()->getCurrentTool()->getTool()->invalidate();
   }
 
-  void undo() const {
+  void undo() const override {
     /*--- 既にCleanupSettingsを移動していたらreturn ---*/
     CleanupParameters *cp =
         CleanupSettingsModel::instance()->getCurrentParameters();
@@ -416,7 +416,7 @@ public:
 
     onChange();
   }
-  void redo() const {
+  void redo() const override {
     /*--- 既にCleanupSettingsを移動していたらreturn ---*/
     CleanupParameters *cp =
         CleanupSettingsModel::instance()->getCurrentParameters();
@@ -426,10 +426,12 @@ public:
 
     onChange();
   }
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Move Cleanup Camera"); }
-  int getHistoryType() { return HistoryType::EditTool_Move; }
+  QString getHistoryString() override {
+    return QObject::tr("Move Cleanup Camera");
+  }
+  int getHistoryType() override { return HistoryType::EditTool_Move; }
 };
 
 //=============================================================================
@@ -455,7 +457,7 @@ public:
     TApp::instance()->getCurrentTool()->getTool()->invalidate();
   }
 
-  void undo() const {
+  void undo() const override {
     /*--- 既にCleanupSettingsを移動していたらreturn ---*/
     CleanupParameters *cp =
         CleanupSettingsModel::instance()->getCurrentParameters();
@@ -467,7 +469,7 @@ public:
     onChange();
   }
 
-  void redo() const {
+  void redo() const override {
     /*--- 既にCleanupSettingsを移動していたらreturn ---*/
     CleanupParameters *cp =
         CleanupSettingsModel::instance()->getCurrentParameters();
@@ -478,10 +480,12 @@ public:
 
     onChange();
   }
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Scale Cleanup Camera"); }
-  int getHistoryType() { return HistoryType::EditTool_Move; }
+  QString getHistoryString() override {
+    return QObject::tr("Scale Cleanup Camera");
+  }
+  int getHistoryType() override { return HistoryType::EditTool_Move; }
 };
 
 //**********************************************************************************
@@ -505,16 +509,16 @@ class CameraTestTool : public TTool {
 public:
   CameraTestTool();
 
-  void draw();
+  void draw() override;
 
-  void mouseMove(const TPointD &p, const TMouseEvent &e);
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
+  void mouseMove(const TPointD &p, const TMouseEvent &e) override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
 
-  ToolType getToolType() const { return TTool::GenericTool; }
+  ToolType getToolType() const override { return TTool::GenericTool; }
 
-  int getCursorId() const;
+  int getCursorId() const override;
 
 private:
   void drawCleanupCamera(double pixelSize);
@@ -868,7 +872,7 @@ int CameraTestTool::getCursorId() const {
 class OpacityCheckToggleCommand : public MenuItemHandler {
 public:
   OpacityCheckToggleCommand() : MenuItemHandler("MI_OpacityCheck") {}
-  void execute() {
+  void execute() override {
     CleanupSettingsModel *model = CleanupSettingsModel::instance();
     CleanupParameters *params   = model->getCurrentParameters();
 

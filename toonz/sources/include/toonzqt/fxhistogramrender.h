@@ -42,8 +42,8 @@ public:
   FxHistogramRenderPort();
   ~FxHistogramRenderPort();
 
-  void onRenderRasterCompleted(const RenderData &renderData);
-  void onRenderFailure(const RenderData &renderData, TException &e){};
+  void onRenderRasterCompleted(const RenderData &renderData) override;
+  void onRenderFailure(const RenderData &renderData, TException &e) override{};
   void onRenderFinished(){};
 
 signals:

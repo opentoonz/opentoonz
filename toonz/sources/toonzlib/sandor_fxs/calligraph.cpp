@@ -57,7 +57,7 @@ void calligraphUC(const RASTER *inr, RASTER *outr, CCallParam &par,
       double fSize = par.m_accuracy / 5.0;
       fSize        = D_CUT(fSize, 1.0, 20.0);
       //			CSDirection
-      //dir(ipUC.m_lX,ipUC.m_lY,ipUC.m_sel,I_ROUND(fSize));
+      // dir(ipUC.m_lX,ipUC.m_lY,ipUC.m_sel,I_ROUND(fSize));
       // Only on border (thickness of border is 3 )
       CSDirection dir(ipUC.m_lX, ipUC.m_lY, ipUC.m_sel.get(), I_ROUND(fSize),
                       3);
@@ -108,7 +108,7 @@ void calligraphUS(const RASTER *inr, RASTER *outr, CCallParam &par,
       double fSize = par.m_accuracy / 5.0;
       fSize        = D_CUT(fSize, 1.0, 20.0);
       //			CSDirection
-      //dir(ipUS.m_lX,ipUS.m_lY,ipUS.m_sel,I_ROUND(fSize));
+      // dir(ipUS.m_lX,ipUS.m_lY,ipUS.m_sel,I_ROUND(fSize));
       // Only on border (thickness of border is 3 )
       CSDirection dir(ipUS.m_lX, ipUS.m_lY, ipUS.m_sel.get(), I_ROUND(fSize),
                       3);

@@ -52,9 +52,9 @@ public slots:
   void onAdd();
 
 protected:
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
-  void contextMenuEvent(QContextMenuEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
+  void contextMenuEvent(QContextMenuEvent *) override;
 
 protected slots:
   void updatePresets();

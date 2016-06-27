@@ -120,27 +120,27 @@ protected:
 public:
   InsertSceneFrameUndo(int frame) : m_frame(frame) {}
 
-  void undo() const {
+  void undo() const override {
     doRemoveSceneFrame(m_frame);
 
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     doInsertSceneFrame(m_frame);
 
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Insert Frame  at Frame %1")
         .arg(QString::number(m_frame + 1));
   }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 
 protected:
   static void doInsertSceneFrame(int frame);
@@ -215,7 +215,7 @@ void insertSceneFrame(int frame) {
 class InsertSceneFrameCommand : public MenuItemHandler {
 public:
   InsertSceneFrameCommand() : MenuItemHandler(MI_InsertSceneFrame) {}
-  void execute() {
+  void execute() override {
     int frame = TApp::instance()->getCurrentFrame()->getFrame();
     XshCmd::insertSceneFrame(frame);
   }
@@ -254,9 +254,9 @@ public:
     }
   }
 
-  void redo() const { InsertSceneFrameUndo::undo(); }
+  void redo() const override { InsertSceneFrameUndo::undo(); }
 
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
     // Insert an empty frame, need space for our stored stuff
@@ -285,15 +285,15 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return 10 << 10;
   }  // Gave up exact calculation. Say ~ 10 kB?
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Remove Frame  at Frame %1")
         .arg(QString::number(m_frame + 1));
   }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
@@ -310,7 +310,7 @@ void removeSceneFrame(int frame) {
 class RemoveSceneFrameCommand : public MenuItemHandler {
 public:
   RemoveSceneFrameCommand() : MenuItemHandler(MI_RemoveSceneFrame) {}
-  void execute() {
+  void execute() override {
     int frame = TApp::instance()->getCurrentFrame()->getFrame();
     XshCmd::removeSceneFrame(frame);
   }
@@ -324,9 +324,11 @@ class GlobalKeyframeUndo : public TUndo {
 public:
   GlobalKeyframeUndo(int frame) : m_frame(frame) {}
 
-  int getSize() const { return sizeof(*this) + m_columns.size() * sizeof(int); }
+  int getSize() const override {
+    return sizeof(*this) + m_columns.size() * sizeof(int);
+  }
 
-  int getHistoryType() { return HistoryType::Xsheet; }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 
 protected:
   std::vector<int> m_columns;
@@ -419,21 +421,21 @@ public:
                       boost::bind(isKeyframe, frame, _1)))));
   }
 
-  void redo() const {
+  void redo() const override {
     doInsertGlobalKeyframes(m_frame, m_columns);
 
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void undo() const {
+  void undo() const override {
     doRemoveGlobalKeyframes(m_frame, m_columns);
 
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Insert Multiple Keys  at Frame %1")
         .arg(QString::number(m_frame + 1));
   }
@@ -458,7 +460,7 @@ void insertGlobalKeyframe(int frame) {
 class InsertGlobalKeyframeCommand : public MenuItemHandler {
 public:
   InsertGlobalKeyframeCommand() : MenuItemHandler(MI_InsertGlobalKeyframe) {}
-  void execute() {
+  void execute() override {
     int frame = TApp::instance()->getCurrentFrame()->getFrame();
     XshCmd::insertGlobalKeyframe(frame);
   }
@@ -496,14 +498,14 @@ public:
                                                             frame, _1)));
   }
 
-  void redo() const {
+  void redo() const override {
     doRemoveGlobalKeyframes(m_frame, m_columns);
 
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
     int c, cCount = int(m_columns.size());
@@ -521,12 +523,12 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return GlobalKeyframeUndo::getSize() +
            m_keyframes.size() * sizeof(TStageObject::Keyframe);
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Remove Multiple Keys  at Frame %1")
         .arg(QString::number(m_frame + 1));
   }
@@ -551,7 +553,7 @@ void removeGlobalKeyframe(int frame) {
 class RemoveGlobalKeyframeCommand : public MenuItemHandler {
 public:
   RemoveGlobalKeyframeCommand() : MenuItemHandler(MI_RemoveGlobalKeyframe) {}
-  void execute() {
+  void execute() override {
     int frame = TApp::instance()->getCurrentFrame()->getFrame();
     XshCmd::removeGlobalKeyframe(frame);
   }
@@ -561,255 +563,257 @@ public:
 //	Drawing Substitution
 //============================================================
 class DrawingSubtitutionUndo : public TUndo {
-
 private:
-	int m_direction, m_row, m_col;
-	TCellSelection::Range m_range;
-	bool m_selected;
+  int m_direction, m_row, m_col;
+  TCellSelection::Range m_range;
+  bool m_selected;
 
 public:
-	DrawingSubtitutionUndo(int dir, TCellSelection::Range range, int row, int col, bool selected) 
-    : m_direction(dir), m_range(range), m_row(row), m_col(col), m_selected(selected){}
-	
-	void undo() const	{
-		if (!m_selected) {
-			changeDrawing(-m_direction, m_row, m_col);
-			return;
-		}
-		int col, row;
-		int c = m_range.m_c0;
-		int r = m_range.m_r0;
-		while (c <= m_range.m_c1)	{
-			col = c;
-			while (r <= m_range.m_r1)	{
-				row = r;
-				changeDrawing(-m_direction, row, col);
-				r++;
-			}
-			r = m_range.m_r0;
-			c++;
-		}
-		
-	}
+  DrawingSubtitutionUndo(int dir, TCellSelection::Range range, int row, int col,
+                         bool selected)
+      : m_direction(dir)
+      , m_range(range)
+      , m_row(row)
+      , m_col(col)
+      , m_selected(selected) {}
 
-	void redo() const	{
-		if (!m_selected) {
-			changeDrawing(m_direction, m_row, m_col);
-			return;
-		}
-		
-		int col, row;
-		int c = m_range.m_c0;
-		int r = m_range.m_r0;
-		while (c <= m_range.m_c1)	{
-			col = c;
-			while (r <= m_range.m_r1)	{
-				row = r;
-				changeDrawing(m_direction, row, col);
-				r++;
-			}
-			r = m_range.m_r0;
-			c++;
-		}
-	}
+  void undo() const override {
+    if (!m_selected) {
+      changeDrawing(-m_direction, m_row, m_col);
+      return;
+    }
+    int col, row;
+    int c = m_range.m_c0;
+    int r = m_range.m_r0;
+    while (c <= m_range.m_c1) {
+      col = c;
+      while (r <= m_range.m_r1) {
+        row = r;
+        changeDrawing(-m_direction, row, col);
+        r++;
+      }
+      r = m_range.m_r0;
+      c++;
+    }
+  }
 
-	int getSize() const	{
-		return sizeof(*this);
-	}
+  void redo() const override {
+    if (!m_selected) {
+      changeDrawing(m_direction, m_row, m_col);
+      return;
+    }
 
-	QString getHistoryString() {
-		return QObject::tr("Change current drawing %1").arg(QString::number(m_direction));
-	}
+    int col, row;
+    int c = m_range.m_c0;
+    int r = m_range.m_r0;
+    while (c <= m_range.m_c1) {
+      col = c;
+      while (r <= m_range.m_r1) {
+        row = r;
+        changeDrawing(m_direction, row, col);
+        r++;
+      }
+      r = m_range.m_r0;
+      c++;
+    }
+  }
 
-	int getHistoryType() {
-		return HistoryType::Xsheet;
-	}
+  int getSize() const override { return sizeof(*this); }
+
+  QString getHistoryString() override {
+    return QObject::tr("Change current drawing %1")
+        .arg(QString::number(m_direction));
+  }
+
+  int getHistoryType() override { return HistoryType::Xsheet; }
+
 protected:
-
-	static bool changeDrawing(int delta, int row, int col);
-	static void setDrawing(const TFrameId &fid, int row, int col, TXshCell cell);
-	friend class DrawingSubtitutionGroupUndo;
+  static bool changeDrawing(int delta, int row, int col);
+  static void setDrawing(const TFrameId &fid, int row, int col, TXshCell cell);
+  friend class DrawingSubtitutionGroupUndo;
 };
 
 //============================================================
 
 class DrawingSubtitutionGroupUndo : public TUndo {
-
 private:
-	int m_direction;
-	int m_row;
-	int m_col;
-	int m_count;
+  int m_direction;
+  int m_row;
+  int m_col;
+  int m_count;
 
 public:
-	DrawingSubtitutionGroupUndo(int dir, int row, int col) : m_direction(dir), m_col(col), m_row(row)
-	{
-		m_count = 1;
-		TXshCell cell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row, m_col);
-		if (!cell.m_level || !cell.m_level->getSimpleLevel())	return;
+  DrawingSubtitutionGroupUndo(int dir, int row, int col)
+      : m_direction(dir), m_col(col), m_row(row) {
+    m_count       = 1;
+    TXshCell cell = TTool::getApplication()
+                        ->getCurrentScene()
+                        ->getScene()
+                        ->getXsheet()
+                        ->getCell(m_row, m_col);
+    if (!cell.m_level || !cell.m_level->getSimpleLevel()) return;
 
-		TFrameId id = cell.m_frameId;
+    TFrameId id = cell.m_frameId;
 
-		TXshCell nextCell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row + m_count, m_col);
-		if (!nextCell.m_level || !nextCell.m_level->getSimpleLevel())	return;
+    TXshCell nextCell = TTool::getApplication()
+                            ->getCurrentScene()
+                            ->getScene()
+                            ->getXsheet()
+                            ->getCell(m_row + m_count, m_col);
+    if (!nextCell.m_level || !nextCell.m_level->getSimpleLevel()) return;
 
-		TFrameId nextId = nextCell.m_frameId;
+    TFrameId nextId = nextCell.m_frameId;
 
-		while (id == nextId) {
-			m_count++;
-			nextCell = TTool::getApplication()->getCurrentScene()->getScene()->getXsheet()->getCell(m_row + m_count, m_col);
-			nextId = nextCell.m_frameId;
-		}
-	}
+    while (id == nextId) {
+      m_count++;
+      nextCell = TTool::getApplication()
+                     ->getCurrentScene()
+                     ->getScene()
+                     ->getXsheet()
+                     ->getCell(m_row + m_count, m_col);
+      nextId = nextCell.m_frameId;
+    }
+  }
 
-	void undo() const	{
-		int n = 1;
-		DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row, m_col);
-		while (n < m_count)	{
-			DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row + n, m_col);
-			n++; 
-		}
-	}
+  void undo() const override {
+    int n = 1;
+    DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row, m_col);
+    while (n < m_count) {
+      DrawingSubtitutionUndo::changeDrawing(-m_direction, m_row + n, m_col);
+      n++;
+    }
+  }
 
-	void redo() const	{
-		int n = 1;
-		DrawingSubtitutionUndo::changeDrawing(m_direction, m_row, m_col);
-		while (n < m_count)	{
-			DrawingSubtitutionUndo::changeDrawing(m_direction, m_row + n, m_col);
-			n++;
-		}
-	}
+  void redo() const override {
+    int n = 1;
+    DrawingSubtitutionUndo::changeDrawing(m_direction, m_row, m_col);
+    while (n < m_count) {
+      DrawingSubtitutionUndo::changeDrawing(m_direction, m_row + n, m_col);
+      n++;
+    }
+  }
 
-	int getSize() const	{
-		return sizeof(*this);
-	}
+  int getSize() const override { return sizeof(*this); }
 
-	QString getHistoryString() {
-		return QObject::tr("Change current drawing %1").arg(QString::number(m_direction));
-	}
+  QString getHistoryString() override {
+    return QObject::tr("Change current drawing %1")
+        .arg(QString::number(m_direction));
+  }
 
-	int getHistoryType() {
-		return HistoryType::Xsheet;
-	}
-
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //============================================================
 
 bool DrawingSubtitutionUndo::changeDrawing(int delta, int row, int col) {
-		TTool::Application *app = TTool::getApplication();
-		TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
-		TXshCell cell = xsh->getCell(row, col);
-		
-		if (!cell.m_level || !cell.m_level->getSimpleLevel())	return false;
-		
-		std::vector<TFrameId> fids;
-		cell.m_level->getSimpleLevel()->getFids(fids);
-		int n = fids.size();
-		
-		if (n < 2) return false;
-		
-		std::vector<TFrameId>::iterator it;
-		it = std::find(fids.begin(), fids.end(), cell.m_frameId);
-		
-		if (it == fids.end())	return false;
-		
-		int index = std::distance(fids.begin(), it);
-		while (delta < 0)	delta += n;
-		index = (index + delta) % n;
-		
-		setDrawing(fids[index], row, col, cell);
+  TTool::Application *app = TTool::getApplication();
+  TXsheet *xsh            = app->getCurrentScene()->getScene()->getXsheet();
+  TXshCell cell           = xsh->getCell(row, col);
 
+  if (!cell.m_level || !cell.m_level->getSimpleLevel()) return false;
+
+  std::vector<TFrameId> fids;
+  cell.m_level->getSimpleLevel()->getFids(fids);
+  int n = fids.size();
+
+  if (n < 2) return false;
+
+  std::vector<TFrameId>::iterator it;
+  it = std::find(fids.begin(), fids.end(), cell.m_frameId);
+
+  if (it == fids.end()) return false;
+
+  int index = std::distance(fids.begin(), it);
+  while (delta < 0) delta += n;
+  index = (index + delta) % n;
+
+  setDrawing(fids[index], row, col, cell);
 }
 
-void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col, TXshCell cell) {
-		TTool::Application *app = TTool::getApplication();
-		TXsheet *xsh = app->getCurrentScene()->getScene()->getXsheet();
-		cell.m_frameId = fid;
-		xsh->setCell(row, col, cell);
-		TStageObject *pegbar = xsh->getStageObject(TStageObjectId::ColumnId(col));
-		pegbar->setOffset(pegbar->getOffset());
+void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col,
+                                        TXshCell cell) {
+  TTool::Application *app = TTool::getApplication();
+  TXsheet *xsh            = app->getCurrentScene()->getScene()->getXsheet();
+  cell.m_frameId          = fid;
+  xsh->setCell(row, col, cell);
+  TStageObject *pegbar = xsh->getStageObject(TStageObjectId::ColumnId(col));
+  pegbar->setOffset(pegbar->getOffset());
 
-		app->getCurrentXsheet()->notifyXsheetChanged();
-		TApp::instance()->getCurrentScene()->setDirtyFlag(true);
+  app->getCurrentXsheet()->notifyXsheetChanged();
+  TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 }
 
 //-----------------------------------------------------------------------------
 
 void drawingSubstituion(int dir) {
-	//TTool::Application *app = TTool::getApplication();
-	//TCellSelection *selection = dynamic_cast<TCellSelection *>(app->getCurrentSelection()->getSelection());
-	TCellSelection *selection = dynamic_cast<TCellSelection *>(TTool::getApplication()->getCurrentSelection()->getSelection());
-	TCellSelection::Range range;
-	bool selected = false;
-	if (selection) {
-		range = selection->getSelectedCells();
-		if (!(range.isEmpty()))
-			selected = true;
-	}
-	int row = TTool::getApplication()->getCurrentFrame()->getFrame();
-	int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
-	
-	DrawingSubtitutionUndo *undo = new DrawingSubtitutionUndo(dir, range, row, col, selected);
-	TUndoManager::manager()->add(undo);
+  // TTool::Application *app = TTool::getApplication();
+  // TCellSelection *selection = dynamic_cast<TCellSelection
+  // *>(app->getCurrentSelection()->getSelection());
+  TCellSelection *selection = dynamic_cast<TCellSelection *>(
+      TTool::getApplication()->getCurrentSelection()->getSelection());
+  TCellSelection::Range range;
+  bool selected = false;
+  if (selection) {
+    range                            = selection->getSelectedCells();
+    if (!(range.isEmpty())) selected = true;
+  }
+  int row = TTool::getApplication()->getCurrentFrame()->getFrame();
+  int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
 
-	undo->redo();
+  DrawingSubtitutionUndo *undo =
+      new DrawingSubtitutionUndo(dir, range, row, col, selected);
+  TUndoManager::manager()->add(undo);
+
+  undo->redo();
 }
 
 void drawingSubstituionGroup(int dir) {
-	int row = TTool::getApplication()->getCurrentFrame()->getFrame();
-	int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
-	DrawingSubtitutionGroupUndo *undo = new DrawingSubtitutionGroupUndo(dir, row, col);
-	TUndoManager::manager()->add(undo);
-	undo->redo();
+  int row = TTool::getApplication()->getCurrentFrame()->getFrame();
+  int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
+  DrawingSubtitutionGroupUndo *undo =
+      new DrawingSubtitutionGroupUndo(dir, row, col);
+  TUndoManager::manager()->add(undo);
+  undo->redo();
 }
 
 //=============================================================================
 
 class DrawingSubstitutionForwardCommand : public MenuItemHandler {
 public:
-	DrawingSubstitutionForwardCommand() : MenuItemHandler(MI_DrawingSubForward) {}
-	void execute() {
-		XshCmd::drawingSubstituion(1);
-	}
+  DrawingSubstitutionForwardCommand() : MenuItemHandler(MI_DrawingSubForward) {}
+  void execute() override { XshCmd::drawingSubstituion(1); }
 } DrawingSubstitutionForwardCommand;
-
 
 //============================================================
 
 class DrawingSubstitutionBackwardCommand : public MenuItemHandler {
 public:
-	DrawingSubstitutionBackwardCommand() : MenuItemHandler(MI_DrawingSubBackward) {}
-	void execute() {
-		XshCmd::drawingSubstituion(-1);
-	}
+  DrawingSubstitutionBackwardCommand()
+      : MenuItemHandler(MI_DrawingSubBackward) {}
+  void execute() override { XshCmd::drawingSubstituion(-1); }
 } DrawingSubstitutionBackwardCommand;
 
 //=============================================================================
 
 class DrawingSubstitutionGroupForwardCommand : public MenuItemHandler {
 public:
-	DrawingSubstitutionGroupForwardCommand() : MenuItemHandler(MI_DrawingSubGroupForward) {}
-	void execute() {
-		XshCmd::drawingSubstituionGroup(1);
-	}
+  DrawingSubstitutionGroupForwardCommand()
+      : MenuItemHandler(MI_DrawingSubGroupForward) {}
+  void execute() override { XshCmd::drawingSubstituionGroup(1); }
 } DrawingSubstitutionGroupForwardCommand;
-
 
 //============================================================
 
 class DrawingSubstitutionGroupBackwardCommand : public MenuItemHandler {
 public:
-	DrawingSubstitutionGroupBackwardCommand() : MenuItemHandler(MI_DrawingSubGroupBackward) {}
-	void execute() {
-		XshCmd::drawingSubstituionGroup(-1);
-	}
+  DrawingSubstitutionGroupBackwardCommand()
+      : MenuItemHandler(MI_DrawingSubGroupBackward) {}
+  void execute() override { XshCmd::drawingSubstituionGroup(-1); }
 } DrawingSubstitutionGroupBackwardCommand;
-
 
 //============================================================
 
-} // namespace XshCmd
+}  // namespace XshCmd
 
 //*****************************************************************************
 //    Selection  commands
@@ -819,7 +823,7 @@ class SelectRowKeyframesCommand : public MenuItemHandler {
 public:
   SelectRowKeyframesCommand() : MenuItemHandler(MI_SelectRowKeyframes) {}
 
-  void execute() {
+  void execute() override {
     TApp *app                     = TApp::instance();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
@@ -852,7 +856,7 @@ class SelectColumnKeyframesCommand : public MenuItemHandler {
 public:
   SelectColumnKeyframesCommand() : MenuItemHandler(MI_SelectColumnKeyframes) {}
 
-  void execute() {
+  void execute() override {
     TApp *app                     = TApp::instance();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
@@ -883,7 +887,7 @@ class SelectAllKeyframesCommand : public MenuItemHandler {
 public:
   SelectAllKeyframesCommand() : MenuItemHandler(MI_SelectAllKeyframes) {}
 
-  void execute() {
+  void execute() override {
     TApp *app                     = TApp::instance();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
@@ -923,7 +927,7 @@ public:
   SelectAllKeyframesBeforeCommand()
       : MenuItemHandler(MI_SelectAllKeyframesNotBefore) {}
 
-  void execute() {
+  void execute() override {
     TApp *app                     = TApp::instance();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
@@ -964,7 +968,7 @@ public:
   SelectAllKeyframesAfterCommand()
       : MenuItemHandler(MI_SelectAllKeyframesNotAfter) {}
 
-  void execute() {
+  void execute() override {
     TApp *app                     = TApp::instance();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
@@ -1006,7 +1010,7 @@ public:
   SelectPreviousKeysInColumnCommand()
       : MenuItemHandler(MI_SelectPreviousKeysInColumn) {}
 
-  void execute() {
+  void execute() override {
     TApp *app                     = TApp::instance();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
@@ -1044,7 +1048,7 @@ public:
   SelectFollowingKeysInColumnCommand()
       : MenuItemHandler(MI_SelectFollowingKeysInColumn) {}
 
-  void execute() {
+  void execute() override {
     TApp *app                     = TApp::instance();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
@@ -1081,7 +1085,7 @@ public:
   SelectPreviousKeysInRowCommand()
       : MenuItemHandler(MI_SelectPreviousKeysInRow) {}
 
-  void execute() {
+  void execute() override {
     TApp *app                     = TApp::instance();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
@@ -1125,7 +1129,7 @@ public:
   SelectFollowingKeysInRowCommand()
       : MenuItemHandler(MI_SelectFollowingKeysInRow) {}
 
-  void execute() {
+  void execute() override {
     TApp *app                     = TApp::instance();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
@@ -1171,7 +1175,7 @@ public:
   InvertKeyframeSelectionCommand()
       : MenuItemHandler(MI_InvertKeyframeSelection) {}
 
-  void execute() {
+  void execute() override {
     TApp *app                     = TApp::instance();
     TKeyframeSelection *selection = dynamic_cast<TKeyframeSelection *>(
         app->getCurrentSelection()->getSelection());
@@ -1230,7 +1234,7 @@ public:
     m_oldKeyframeSecond = pegbar->getKeyframe(m_rowSecond);
   }
 
-  void onAdd() {
+  void onAdd() override {
     TStageObject *pegbar =
         TApp::instance()->getCurrentXsheet()->getXsheet()->getStageObject(
             m_objId);
@@ -1254,16 +1258,20 @@ public:
     TApp::instance()->getCurrentObject()->notifyObjectIdChanged(false);
   }
 
-  void redo() const { setKeyframes(m_newKeyframeFirst, m_newKeyframeSecond); }
-  void undo() const { setKeyframes(m_oldKeyframeFirst, m_oldKeyframeSecond); }
+  void redo() const override {
+    setKeyframes(m_newKeyframeFirst, m_newKeyframeSecond);
+  }
+  void undo() const override {
+    setKeyframes(m_oldKeyframeFirst, m_oldKeyframeSecond);
+  }
 
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Set Keyframe : %1")
         .arg(QString::fromStdString(m_objId.toString()));
   }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 }  // namespace
@@ -1274,7 +1282,7 @@ class SetAccelerationCommand : public MenuItemHandler {
 public:
   SetAccelerationCommand() : MenuItemHandler(MI_SetAcceleration) {}
 
-  void execute() {
+  void execute() override {
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     int row      = app->getCurrentFrame()->getFrame();
@@ -1321,7 +1329,7 @@ class SetDecelerationCommand : public MenuItemHandler {
 public:
   SetDecelerationCommand() : MenuItemHandler(MI_SetDeceleration) {}
 
-  void execute() {
+  void execute() override {
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     int row      = app->getCurrentFrame()->getFrame();
@@ -1364,7 +1372,7 @@ class SetConstantSpeedCommand : public MenuItemHandler {
 public:
   SetConstantSpeedCommand() : MenuItemHandler(MI_SetConstantSpeed) {}
 
-  void execute() {
+  void execute() override {
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     int row      = app->getCurrentFrame()->getFrame();
@@ -1405,7 +1413,7 @@ class ResetArrowCommand : public MenuItemHandler {
 public:
   ResetArrowCommand() : MenuItemHandler(MI_ResetInterpolation) {}
 
-  void execute() {
+  void execute() override {
     TApp *app    = TApp::instance();
     TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
     int row      = app->getCurrentFrame()->getFrame();
@@ -1449,7 +1457,7 @@ class NewOutputFx : public MenuItemHandler {
 public:
   NewOutputFx() : MenuItemHandler(MI_NewOutputFx) {}
 
-  void execute() {
+  void execute() override {
     TApp *app = TApp::instance();
     TFxCommand::createOutputFx(app->getCurrentXsheet(),
                                app->getCurrentFx()->getFx());
@@ -1801,7 +1809,7 @@ void makeHtml(TFilePath fp) {
 class PrintXsheetCommand : public MenuItemHandler {
 public:
   PrintXsheetCommand() : MenuItemHandler(MI_PrintXsheet) {}
-  void execute();
+  void execute() override;
 } printXsheetCommand;
 
 void PrintXsheetCommand::execute() {

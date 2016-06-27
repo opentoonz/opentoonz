@@ -9,7 +9,7 @@
 #include "timage.h"
 
 // Qt includes
-#include <QOpenGLWidget>
+#include <QGLWidget>
 
 #undef DVAPI
 #undef DVVAR
@@ -51,7 +51,13 @@ class TVectorImageP;
             efficient image-drawing functions for all Toonz image types.
 */
 
-class DVAPI PlaneViewer : public QOpenGLWidget {
+/*
+CAUTION : Changing PlaneViewer to inherit QOpenGLWidget causes crash bug with 
+shader fx for some unknown reasons. So I will reluctantly keep using the 
+obsolete class until the shader fx being overhauled. 2016/6/22 Shun
+*/
+
+class DVAPI PlaneViewer : public QGLWidget {
 public:
   PlaneViewer(QWidget *parent);
 
@@ -122,7 +128,7 @@ protected:
   double m_chessSize;   //!< Size of the chessboard squares (default is 40).
 
   TRaster32P m_rasterBuffer;  //!< Auxiliary buffer used to draw on the widget
-                              //!directly.
+                              //! directly.
 
   double m_zoomRange[2];  //!< Viewport zoom range (default: [-1024, 1024]).
 

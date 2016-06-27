@@ -35,8 +35,8 @@ public:
   BrightnessAndContrastPopup();
 
 protected:
-  void showEvent(QShowEvent *e);
-  void hideEvent(QHideEvent *e);
+  void showEvent(QShowEvent *e) override;
+  void hideEvent(QHideEvent *e) override;
 
 protected slots:
 

@@ -34,9 +34,9 @@ class NotifyMessage : public TThread::Message {
 public:
   NotifyMessage() {}
 
-  void onDeliver() { BatchesController::instance()->update(); }
+  void onDeliver() override { BatchesController::instance()->update(); }
 
-  TThread::Message *clone() const { return new NotifyMessage(*this); }
+  TThread::Message *clone() const override { return new NotifyMessage(*this); }
 };
 
 }  // namespace
@@ -142,9 +142,9 @@ public:
   TaskRunner(TFarmTask *task, int localControllerPort)
       : m_task(task), m_localControllerPort(localControllerPort) {}
 
-  void run();
+  void run() override;
 
-  int taskLoad();
+  int taskLoad() override;
 
   void doRun(TFarmTask *task);
 
@@ -957,11 +957,13 @@ class ControllerFailureMsg : public TThread::Message {
 public:
   ControllerFailureMsg(const TException &e) : m_e(e) {}
 
-  void onDeliver() {
+  void onDeliver() override {
     // throw m_e;
   }
 
-  TThread::Message *clone() const { return new ControllerFailureMsg(m_e); }
+  TThread::Message *clone() const override {
+    return new ControllerFailureMsg(m_e);
+  }
 
   TException m_e;
 };
@@ -1029,52 +1031,57 @@ class MyLocalController : public TFarmController, public TFarmExecutor {
 public:
   MyLocalController(int port) : TFarmExecutor(port) {}
 
-  QString execute(const std::vector<QString> &argv);
+  QString execute(const std::vector<QString> &argv) override;
 
-  QString addTask(const TFarmTask &task, bool suspended);
-  void removeTask(const QString &id);
-  void suspendTask(const QString &id);
-  void activateTask(const QString &id);
-  void restartTask(const QString &id);
+  QString addTask(const TFarmTask &task, bool suspended) override;
+  void removeTask(const QString &id) override;
+  void suspendTask(const QString &id) override;
+  void activateTask(const QString &id) override;
+  void restartTask(const QString &id) override;
 
-  void getTasks(vector<QString> &tasks);
-  void getTasks(const QString &parentId, std::vector<QString> &tasks);
-  void getTasks(const QString &parentId, std::vector<TaskShortInfo> &tasks);
+  void getTasks(vector<QString> &tasks) override;
+  void getTasks(const QString &parentId, std::vector<QString> &tasks) override;
+  void getTasks(const QString &parentId,
+                std::vector<TaskShortInfo> &tasks) override;
 
-  void queryTaskInfo(const QString &id, TFarmTask &task);
+  void queryTaskInfo(const QString &id, TFarmTask &task) override;
 
   void queryTaskShortInfo(const QString &id, QString &parentId, QString &name,
-                          TaskState &status);
+                          TaskState &status) override;
 
-  void attachServer(const QString &name, const QString &addr, int port) {
+  void attachServer(const QString &name, const QString &addr,
+                    int port) override {
     assert(false);
   }
 
-  void detachServer(const QString &name, const QString &addr, int port) {
+  void detachServer(const QString &name, const QString &addr,
+                    int port) override {
     assert(false);
   }
 
-  void taskSubmissionError(const QString &taskId, int errCode) {
+  void taskSubmissionError(const QString &taskId, int errCode) override {
     assert(false);
   }
 
   void taskProgress(const QString &taskId, int step, int stepCount,
-                    int frameNumber, FrameState state);
+                    int frameNumber, FrameState state) override;
 
-  void taskCompleted(const QString &taskId, int exitCode);
+  void taskCompleted(const QString &taskId, int exitCode) override;
 
-  void getServers(vector<ServerIdentity> &servers) { assert(false); }
+  void getServers(vector<ServerIdentity> &servers) override { assert(false); }
 
-  ServerState queryServerState2(const QString &id) {
+  ServerState queryServerState2(const QString &id) override {
     assert(false);
     return ServerUnknown;
   }
 
-  void queryServerInfo(const QString &id, ServerInfo &info) { assert(false); }
+  void queryServerInfo(const QString &id, ServerInfo &info) override {
+    assert(false);
+  }
 
-  void activateServer(const QString &id) { assert(false); }
+  void activateServer(const QString &id) override { assert(false); }
 
-  void deactivateServer(const QString &id, bool completeRunningTasks) {
+  void deactivateServer(const QString &id, bool completeRunningTasks) override {
     assert(false);
   }
 
@@ -1180,11 +1187,11 @@ public:
             SLOT(onFinished(TThread::RunnableP)));
   }
 
-  void run() { m_controller->run(); }
+  void run() override { m_controller->run(); }
 
 public slots:
 
-  void onFinished(TThread::RunnableP thisTask) {
+  void onFinished(TThread::RunnableP thisTask) override {
     BatchesController::instance()->notify();
   }
 };

@@ -32,7 +32,7 @@ public:
   virtual ~TFarmExecutor() {}
 
   // TTcpIpServer overrides
-  void onReceive(int socket, const QString &data);
+  void onReceive(int socket, const QString &data) override;
 
 protected:
   virtual QString execute(const std::vector<QString> &argv) = 0;

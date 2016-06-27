@@ -93,23 +93,23 @@ class HookTool : public TTool {
 public:
   HookTool();
 
-  ToolType getToolType() const { return TTool::LevelReadTool; }
+  ToolType getToolType() const override { return TTool::LevelReadTool; }
 
   HookSet *getHookSet() const;
 
-  void updateTranslation();
+  void updateTranslation() override;
 
-  void draw();
+  void draw() override;
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
 
-  void onActivate();
-  void onDeactivate();
-  void onEnter();
-  void onImageChanged() {
+  void onActivate() override;
+  void onDeactivate() override;
+  void onEnter() override;
+  void onImageChanged() override {
     m_selection.selectNone();
     m_hookId = -1;
     m_otherHooks.clear();
@@ -117,9 +117,9 @@ public:
     invalidate();
   }
 
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  int getCursorId() const { return ToolCursor::MoveCursor; }
+  int getCursorId() const override { return ToolCursor::MoveCursor; }
 
   void onSelectionChanged() { invalidate(); }
   bool select(const TSelection *) { return false; }
@@ -149,7 +149,7 @@ public:
   // when the current matrix changes (e.g. because of a parent change or a
   // handle change)
   // we must recompute the hooks positions
-  void updateMatrix() {
+  void updateMatrix() override {
     TTool::updateMatrix();
     m_otherHooks.clear();
     getOtherHooks(m_otherHooks);

@@ -39,7 +39,7 @@ public:
   double m_dpix,    //!< Horizontal image dpi.
       m_dpiy,       //!< Vertical image dpi.
       m_frameRate;  //!< Movie frame rate. \deprecated Should not be here. An
-                    //!image has \a no frame rate!
+                    //! image has \a no frame rate!
 
   TPropertyGroup *m_properties;  //!< Format-specific image data.
 
@@ -52,7 +52,7 @@ public:
       m_samplePerPixel,  //!< Number of samples (channels) per pixel.
       m_bitsPerSample,   //!< Number of bits per sample (channel).
       m_fileSize;  //!< Total size (in bytes) of the image file. \deprecated
-                   //!Possibly useless.
+                   //! Possibly useless.
 
   bool m_valid;  //!< \a Deprecated. \deprecated Just... wrong.
 

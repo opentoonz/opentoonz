@@ -94,7 +94,7 @@ public:
   void scroll(int dy);
 
   // overriden from TSelection::View
-  void onSelectionChanged() { update(); }
+  void onSelectionChanged() override { update(); }
 
   enum SelectionMode {
     SIMPLE_SELECT,
@@ -109,9 +109,9 @@ public:
   int getOneFrameHeight();
 
 protected:
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
-  void paintEvent(QPaintEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
+  void paintEvent(QPaintEvent *) override;
 
   enum {
     F_NORMAL          = 0,
@@ -121,24 +121,24 @@ protected:
   void drawFrameIcon(QPainter &p, const QRect &r, int index,
                      const TFrameId &fid, int flags);
 
-  void mousePressEvent(QMouseEvent *event);
-  void mouseReleaseEvent(QMouseEvent *event);
-  void mouseMoveEvent(QMouseEvent *);
-  void keyPressEvent(QKeyEvent *event);
-  void wheelEvent(QWheelEvent *event);
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void keyPressEvent(QKeyEvent *event) override;
+  void wheelEvent(QWheelEvent *event) override;
 
   void startAutoPanning();
   void stopAutoPanning();
-  void timerEvent(QTimerEvent *);
+  void timerEvent(QTimerEvent *) override;
 
-  void contextMenuEvent(QContextMenuEvent *event);
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
   void startDragDrop();
 
   void inbetween();
 
   void execNavigatorPan(const QPoint &point);
-  void mouseDoubleClickEvent(QMouseEvent *event);
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 protected slots:
   void onLevelChanged();
@@ -176,7 +176,7 @@ private:
 
   int m_scrollSpeed,
       m_dragSelectionStartIndex,  //!< Starting level index during drag
-                                  //!selections.
+                                  //! selections.
       m_dragSelectionEndIndex,  //!< Ending level index during drag selections.
       m_timerId;                // per l'autoscroll
 
@@ -211,9 +211,9 @@ public:
   ~Filmstrip();
 
 protected:
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
-  void resizeEvent(QResizeEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
+  void resizeEvent(QResizeEvent *) override;
   // void keyPressEvent(QKeyEvent* event){
   //  event->ignore();
   //}

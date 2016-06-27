@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Unidentified Action</source>
-        <translation>Acción no definida</translation>
+        <translation>Acción no identificada</translation>
     </message>
 </context>
 <context>

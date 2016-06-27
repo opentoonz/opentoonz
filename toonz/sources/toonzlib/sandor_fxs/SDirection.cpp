@@ -5,6 +5,7 @@
 //////////////////////////////////////////////////////////////////////
 #include <stdlib.h>
 #include <memory.h>
+#include <algorithm>
 #include "SDirection.h"
 #include "SError.h"
 
@@ -158,7 +159,7 @@ UCHAR CSDirection::getDir(const int xx, const int yy, UCHAR *sel) {
     }
   }
   if (w == 0) return 0;
-  short ma     = std::max({sum[0], sum[1], sum[2], sum[3]});
+  short ma     = *std::max_element(sum, sum + 4);
   double angle = getAngle(sum, ma);
   // tmsg_info(" - dir - %d, %d, %d, %d angle=%f", sum[0],sum[1],sum[2],sum[3],
   //		                                          angle-50.0);

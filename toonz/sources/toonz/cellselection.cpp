@@ -181,7 +181,7 @@ public:
     delete m_data;
   }
 
-  void undo() const {
+  void undo() const override {
     int r0, c0, r1, c1;
     m_newSelection->getSelectedCells(r0, c0, r1, c1);
 
@@ -205,7 +205,7 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     int r0, c0, r1, c1;
     m_newSelection->getSelectedCells(r0, c0, c1, r1);
     // Cut delle celle che sono in newSelection
@@ -213,10 +213,10 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Paste Cells"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  QString getHistoryString() override { return QObject::tr("Paste Cells"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -266,7 +266,7 @@ public:
       it.value()->release();
   }
 
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
     // devo rimettere le colonne che ho rimosso dall'xsheet
@@ -295,16 +295,16 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     int r0, c0, r1, c1;
     m_selection->getSelectedCells(r0, c0, r1, c1);
     deleteCellsWithoutUndo(r0, c0, r1, c1);
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Delete Cells"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  QString getHistoryString() override { return QObject::tr("Delete Cells"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -350,7 +350,7 @@ public:
     delete m_data;
   }
 
-  void undo() const {
+  void undo() const override {
     int r0, c0, r1, c1;
     m_selection->getSelectedCells(r0, c0, r1, c1);
 
@@ -368,7 +368,7 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     QClipboard *clipboard  = QApplication::clipboard();
     QMimeData *currentData = cloneData(clipboard->mimeData());
 
@@ -379,10 +379,10 @@ public:
     clipboard->setMimeData(currentData, QClipboard::Clipboard);
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Cut Cells"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  QString getHistoryString() override { return QObject::tr("Cut Cells"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -395,7 +395,7 @@ class InsertUndo : public TUndo {
 public:
   InsertUndo(const TCellSelection::Range &range) : m_range(range) {}
 
-  void undo() const {
+  void undo() const override {
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     int rowCount = m_range.getRowCount();
     int c;
@@ -403,7 +403,7 @@ public:
       xsh->removeCells(m_range.m_r0, c, rowCount);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
-  void redo() const {
+  void redo() const override {
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
     int rowCount = m_range.getRowCount();
     int c;
@@ -411,9 +411,9 @@ public:
       xsh->insertCells(m_range.m_r0, c, rowCount);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
-  int getSize() const { return sizeof(*this); }
-  QString getHistoryString() { return QObject::tr("Insert Cells"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  int getSize() const override { return sizeof(*this); }
+  QString getHistoryString() override { return QObject::tr("Insert Cells"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -456,30 +456,32 @@ public:
     }
   }
 
-  void undo() const { renumber(m_undoTable); }
-  void redo() const { renumber(m_redoTable); }
+  void undo() const override { renumber(m_undoTable); }
+  void redo() const override { renumber(m_redoTable); }
 
-  int getSize() const { return (m_redoTable.size() << 2) * sizeof(TXshCell); }
+  int getSize() const override {
+    return (m_redoTable.size() << 2) * sizeof(TXshCell);
+  }
 };
 
 class RenumberUndo::RedoNotifier : public TUndo {
-  void undo() const {}
-  void redo() const {
+  void undo() const override {}
+  void redo() const override {
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 };
 
 class RenumberUndo::UndoNotifier : public TUndo {
-  void redo() const {}
-  void undo() const {
+  void redo() const override {}
+  void undo() const override {
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     TApp::instance()->getCurrentScene()->setDirtyFlag(true);
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 };
 
 //=============================================================================
@@ -585,7 +587,7 @@ public:
 
   void setIndices(const std::vector<int> &indices) { m_indices = indices; }
 
-  void onAdd() {
+  void onAdd() override {
     TXsheet *xsh  = TApp::instance()->getCurrentXsheet()->getXsheet();
     TXshCell cell = xsh->getCell(m_row, m_col);
     m_sl          = cell.getSimpleLevel();
@@ -593,7 +595,7 @@ public:
     m_image       = cell.getImage(false);
   }
 
-  void undo() const {
+  void undo() const override {
     m_image->removeStrokes(m_indices, true, true);
     if (m_createdFrame) {
       TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
@@ -619,7 +621,7 @@ public:
     IconGenerator::instance()->invalidate(m_sl.getPointer(), m_fid);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
-  void redo() const {
+  void redo() const override {
     if (m_isLevelCreated) {
       TLevelSet *levelSet =
           TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
@@ -639,9 +641,9 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof *this; }
-  QString getHistoryString() { return QObject::tr("Paste (Strokes)"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  int getSize() const override { return sizeof *this; }
+  QString getHistoryString() override { return QObject::tr("Paste (Strokes)"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -794,7 +796,7 @@ public:
 
   ~PasteToonzImageInCellsUndo() { delete m_rasterImageData; }
 
-  void redo() const {
+  void redo() const override {
     insertLevelAndFrameIfNeeded();
     TTileSet *tiles;
     bool isLevelCreated;
@@ -804,11 +806,11 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return m_rasterImageData->getMemorySize() + TRasterUndo::getSize();
   }
-  QString getHistoryString() { return QObject::tr("Paste"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  QString getHistoryString() override { return QObject::tr("Paste"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -830,7 +832,7 @@ public:
 
   ~PasteFullColorImageInCellsUndo() { delete m_rasterImageData; }
 
-  void redo() const {
+  void redo() const override {
     insertLevelAndFrameIfNeeded();
     TTileSet *tiles = 0;
     bool isLevelCreated;
@@ -840,11 +842,11 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return m_rasterImageData->getMemorySize() + TFullColorRasterUndo::getSize();
   }
-  QString getHistoryString() { return QObject::tr("Paste (Raster)"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  QString getHistoryString() override { return QObject::tr("Paste (Raster)"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -884,22 +886,22 @@ public:
 
   ~PasteDrawingsInCellUndo() { m_xsheet->release(); }
 
-  void undo() const {
+  void undo() const override {
     int cellsToRemove = m_frameIds.size();
     m_xsheet->removeCells(m_r0, m_c0, cellsToRemove);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     pasteDrawingsInCellWithoutUndo(m_xsheet, m_level.getPointer(), m_frameIds,
                                    m_r0, m_c0);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof *this; }
+  int getSize() const override { return sizeof *this; }
 
-  QString getHistoryString() { return QObject::tr("Paste"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  QString getHistoryString() override { return QObject::tr("Paste"); }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //=============================================================================
@@ -964,7 +966,7 @@ public:
     delete m_beforeData;
   }
 
-  void undo() const {
+  void undo() const override {
     int r0, c0, r1, c1;
     m_newSelection->getSelectedCells(r0, c0, r1, c1);
 
@@ -1008,7 +1010,7 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     int r0, c0, r1, c1;
     m_newSelection->getSelectedCells(r0, c0, c1, r1);
     QClipboard *clipboard = QApplication::clipboard();
@@ -1018,10 +1020,12 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Overwrite Paste Cells"); }
-  int getHistoryType() { return HistoryType::Xsheet; }
+  QString getHistoryString() override {
+    return QObject::tr("Overwrite Paste Cells");
+  }
+  int getHistoryType() override { return HistoryType::Xsheet; }
 };
 
 //-----------------------------------------------------------------------------
@@ -1653,7 +1657,7 @@ public:
       : m_row(row), m_col(col), m_levelCreated(levelCreated) {
     m_oldCell = getXsheet()->getCell(m_row, m_col);
   }
-  void onAdd() {
+  void onAdd() override {
     m_newCell      = getXsheet()->getCell(m_row, m_col);
     TImageP img    = m_newCell.getImage(false);
     if (img) m_img = img->cloneImage();
@@ -1665,7 +1669,7 @@ public:
     return TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
   }
 
-  void undo() const {
+  void undo() const override {
     getXsheet()->setCell(m_row, m_col, m_oldCell);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     TXshSimpleLevel *sl = m_newCell.getSimpleLevel();
@@ -1679,7 +1683,7 @@ public:
       }
     }
   }
-  void redo() const {
+  void redo() const override {
     getXsheet()->setCell(m_row, m_col, m_newCell);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
     TXshSimpleLevel *sl = m_newCell.getSimpleLevel();
@@ -1695,7 +1699,7 @@ public:
       }
     }
   }
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) + sizeof(TXshLevel);  // impreciso.
   }
 };

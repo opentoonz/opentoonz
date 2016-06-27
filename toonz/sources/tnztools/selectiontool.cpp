@@ -307,17 +307,17 @@ public:
   UndoMoveCenter(SelectionTool *tool, const TAffine &aff)
       : m_tool(tool), m_aff(aff) {}
   ~UndoMoveCenter() {}
-  void undo() const {
+  void undo() const override {
     m_tool->setCenter(m_aff.inv() * m_tool->getCenter());
     m_tool->invalidate();
   }
-  void redo() const {
+  void redo() const override {
     m_tool->setCenter(m_aff * m_tool->getCenter());
     m_tool->invalidate();
   }
-  int getSize() const { return sizeof(*this) + sizeof(*m_tool); }
+  int getSize() const override { return sizeof(*this) + sizeof(*m_tool); }
 
-  QString getHistoryString() { return QObject::tr("Move Center"); }
+  QString getHistoryString() override { return QObject::tr("Move Center"); }
 };
 
 //=============================================================================
@@ -336,10 +336,10 @@ public:
     m_transform *= aff;
     getTool()->invalidate();
   }
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
     m_startPos = pos;
   }
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     TPointD delta      = pos - m_startPos;
     FourPoints bbox    = getTool()->getBBox();
     TPointD bboxCenter = 0.5 * (bbox.getP11() + bbox.getP00());
@@ -352,11 +352,11 @@ public:
     else
       translateCenter(aff);
   }
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override {
     UndoMoveCenter *undo = new UndoMoveCenter(getTool(), m_transform);
     TUndoManager::manager()->add(undo);
   }
-  void draw() {}
+  void draw() override {}
 };
 
 //=============================================================================

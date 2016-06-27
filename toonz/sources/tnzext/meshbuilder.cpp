@@ -229,7 +229,7 @@ public:
       : ImageMeshesReaderT<TPixelGR8>(PixelSelector<TPixelGR8>(false))
       , m_current(0) {}
 
-  void openFace(ImageMesh *mesh, int faceIdx, const TPixelGR8 &color) {
+  void openFace(ImageMesh *mesh, int faceIdx, const TPixelGR8 &color) override {
     ImageMeshesReader::openFace(mesh, faceIdx);  // defines imageIndex
 
     if (mesh) {
@@ -240,20 +240,20 @@ public:
 
   //--------------------------------------------------------------------------
 
-  void openEdge(const raster_edge_iterator &it) {
+  void openEdge(const raster_edge_iterator &it) override {
     m_current = new RasterBorder;
     m_current->push_back(it.pos());
   }
 
   //--------------------------------------------------------------------------
 
-  void addVertex(const raster_edge_iterator &it) {
+  void addVertex(const raster_edge_iterator &it) override {
     m_current->push_back(it.pos());
   }
 
   //--------------------------------------------------------------------------
 
-  void closeEdge(ImageMesh *mesh, int edgeIdx) {
+  void closeEdge(ImageMesh *mesh, int edgeIdx) override {
     ImageMesh::edge_type &ed = mesh->edge(edgeIdx);
     ed.imageIndex()          = m_borders.size();
 

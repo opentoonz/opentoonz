@@ -149,9 +149,9 @@ public:
     m_controlPointEditorStroke = controlPointEditorStroke;
   }
 
-  bool isEmpty() const { return m_selectedPoints.empty(); }
+  bool isEmpty() const override { return m_selectedPoints.empty(); }
 
-  void selectNone() { m_selectedPoints.clear(); }
+  void selectNone() override { m_selectedPoints.clear(); }
   bool isSelected(int index) const;
   void select(int index);
   void unselect(int index);
@@ -160,7 +160,7 @@ public:
 
   void addMenuItems(QMenu *menu);
 
-  void enableCommands();
+  void enableCommands() override;
 
 protected slots:
   void setLinear();

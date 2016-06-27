@@ -83,12 +83,12 @@ public:
 
   ~GizmoUndo() {}
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof *this +
            (m_oldColors.size() + m_newColors.size()) * sizeof(TPixel32);
   }
 
-  void onAdd() { getColors(m_newColors, m_newEditedFlags); }
+  void onAdd() override { getColors(m_newColors, m_newEditedFlags); }
 
   void getColors(std::vector<TPixel32> &colors,
                  std::vector<bool> &flags) const {
@@ -122,10 +122,10 @@ public:
         ->notifyColorStyleChanged(false, false);
   }
 
-  void undo() const { setColors(m_oldColors, m_oldEditedFlags); }
-  void redo() const { setColors(m_newColors, m_newEditedFlags); }
+  void undo() const override { setColors(m_oldColors, m_oldEditedFlags); }
+  void redo() const override { setColors(m_newColors, m_newEditedFlags); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString str =
         QObject::tr("Palette Gizmo  %1")
             .arg(QString::fromStdWString(m_palette->getPaletteName()));
@@ -142,7 +142,7 @@ public:
     str.append(")");
     return str;
   }
-  int getHistoryType() { return HistoryType::Palette; }
+  int getHistoryType() override { return HistoryType::Palette; }
 };
 
 //=============================================================================
@@ -504,7 +504,7 @@ ValueShifter::ValueShifter(bool isHue, QWidget *parent, Qt::WFlags flags)
   QPushButton *plusBut  = new QPushButton(QString("+"), this);
   QPushButton *minusBut = new QPushButton(QString("-"), this);
   int maxValue          = (isHue) ? 360 : 100;
-  m_valueLineEdit = new DoubleLineEdit(this, 10.00);  // parent - value
+  m_valueLineEdit       = new DoubleLineEdit(this, 10.00);  // parent - value
   plusBut->setFixedSize(21, 21);
   minusBut->setFixedSize(21, 21);
   plusBut->setObjectName("GizmoButton");

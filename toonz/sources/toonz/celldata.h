@@ -33,7 +33,7 @@ public:
   const TXshCell getCell(int index) const { return m_cells[index]; }
   const TXshCell getCell(int row, int col) const;
 
-  TCellData *clone() const { return new TCellData(this); }
+  TCellData *clone() const override { return new TCellData(this); }
 
   // data <- xsh
   void setCells(TXsheet *xsh, int r0, int c0, int r1, int c1);

@@ -285,10 +285,10 @@ UINT TStyleParam::getSize() {
 #else
 #define CHECK_FOR_READ_ERROR(filePath)                                         \
   {                                                                            \
-    /*if (m_iChan.flags()&(ios::failbit|ios::eofbit))          \               \
-    {                                                          \               \
-    m_lastError = PREMATURE_EOF;                               \               \
-    throw TImageException( filePath, "Error on reading file"); \               \
+    /*if (m_iChan.flags()&(ios::failbit|ios::eofbit))          \ \                                                                             \
+    {                                                          \ \                                                                             \
+    m_lastError = PREMATURE_EOF;                               \ \                                                                             \
+    throw TImageException( filePath, "Error on reading file"); \ \                                                                             \
     }*/                                                                        \
   }
 #endif

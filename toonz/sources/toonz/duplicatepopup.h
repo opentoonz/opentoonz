@@ -37,7 +37,7 @@ public slots:
   void onSelectionChanged();
 
 protected:
-  void showEvent(QShowEvent *);
+  void showEvent(QShowEvent *) override;
 };
 
 #endif  // DUPLICATEPOPUP_H

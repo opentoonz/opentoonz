@@ -93,7 +93,7 @@ class ConvertPopup::Converter : public QThread {
 
 public:
   Converter(ConvertPopup *parent) : m_parent(parent), m_skippedCount(0) {}
-  void run();
+  void run() override;
   void convertLevel(const TFilePath &fp);
   void convertLevelWithConvert2Tlv(const TFilePath &fp);
   int getSkippedCount() const { return m_skippedCount; }

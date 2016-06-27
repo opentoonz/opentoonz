@@ -28,14 +28,16 @@ public:
   }
   ~SquareGradientFx(){};
 
-  bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double, TRectD &bBox, const TRenderSettings &info) override {
     bBox = TConsts::infiniteRectD;
     return true;
   };
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
-  void getParamUIs(TParamUIConcept *&concepts, int &length) {
+  void getParamUIs(TParamUIConcept *&concepts, int &length) override {
     concepts = new TParamUIConcept[length = 1];
 
     concepts[0].m_type  = TParamUIConcept::DIAMOND;

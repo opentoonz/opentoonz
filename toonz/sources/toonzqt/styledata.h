@@ -21,7 +21,7 @@ public:
   StyleData();
   ~StyleData();
 
-  StyleData *clone() const;
+  StyleData *clone() const override;
 
   void addStyle(int styleIndex, TColorStyle *style);  // gets ownership
 

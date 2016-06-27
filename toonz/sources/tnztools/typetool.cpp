@@ -119,7 +119,7 @@ public:
     m_strokes.push_back(s);
   }
 
-  void undo() const {
+  void undo() const override {
     TTool::Application *application = TTool::getApplication();
 
     TVectorImageP image = m_level->getFrame(m_frameId, true);
@@ -147,7 +147,7 @@ public:
     notifyImageChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     insertLevelAndFrameIfNeeded();
     TVectorImageP image = m_level->getFrame(m_frameId, true);
     assert(!!image);
@@ -178,7 +178,7 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     if (m_fillInformationAfter && m_fillInformationBefore)
       return sizeof(*this) +
              m_fillInformationBefore->capacity() * sizeof(TFilledRegionInf) +
@@ -188,7 +188,7 @@ public:
       return sizeof(*this) + m_strokes.capacity() * sizeof(TStroke) + 500;
   }
 
-  QString getToolName() { return QString("Type Tool"); }
+  QString getToolName() override { return QString("Type Tool"); }
 };
 
 //---------------------------------------------------------
@@ -205,7 +205,7 @@ public:
 
   ~RasterUndoTypeTool() { delete m_afterTiles; }
 
-  void redo() const {
+  void redo() const override {
     insertLevelAndFrameIfNeeded();
     TToonzImageP image = getImage();
     if (!image) return;
@@ -218,14 +218,14 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     if (m_afterTiles)
       return TRasterUndo::getSize() + m_afterTiles->getMemorySize();
     else
       return TRasterUndo::getSize();
   }
 
-  QString getToolName() { return QString("Type Tool"); }
+  QString getToolName() override { return QString("Type Tool"); }
 };
 
 //---------------------------------------------------------
@@ -333,9 +333,9 @@ public:
   TypeTool();
   ~TypeTool();
 
-  void updateTranslation();
+  void updateTranslation() override;
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
   void init();
   void initTypeFaces();
@@ -345,7 +345,7 @@ public:
   void setTypeface(std::wstring typeface);
   void setSize(std::wstring size);
   void setVertical(bool vertical);
-  void draw();
+  void draw() override;
 
   void updateMouseCursor(const TPointD &pos);
   void updateStrokeChar();
@@ -355,13 +355,13 @@ public:
 
   void setCursorIndexFromPoint(TPointD point);
 
-  void mouseMove(const TPointD &pos, const TMouseEvent &);
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-  void rightButtonDown(const TPointD &pos, const TMouseEvent &);
+  void mouseMove(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void rightButtonDown(const TPointD &pos, const TMouseEvent &) override;
   bool keyDown(int key, std::wstring unicodeChar, TUINT32 flags,
-               const TPoint &pos);
+               const TPoint &pos) override;
   void onInputText(std::wstring preedit, std::wstring commit,
-                   int replacementStart, int replacementLen);
+                   int replacementStart, int replacementLen) override;
 
   // cancella gli StrokeChar fra from e to-1 e inserisce nuovi StrokeChar
   // corrispondenti a text a partire da from
@@ -380,17 +380,17 @@ public:
   void addTextToToonzImage(const TToonzImageP &currentImage);
   void stopEditing();
 
-  void reset();
+  void reset() override;
 
-  void onActivate();
-  void onDeactivate();
-  void onImageChanged();
+  void onActivate() override;
+  void onDeactivate() override;
+  void onImageChanged() override;
 
-  int getCursorId() const { return m_cursorId; }
+  int getCursorId() const override { return m_cursorId; }
 
-  bool onPropertyChanged(std::string propertyName);
+  bool onPropertyChanged(std::string propertyName) override;
 
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
   int getColorClass() const { return 1; }
 

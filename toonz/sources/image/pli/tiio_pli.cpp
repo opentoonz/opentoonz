@@ -30,27 +30,27 @@ class PliOuputStream : public TOutputStreamInterface {
 
 public:
   PliOuputStream(std::vector<TStyleParam> *stream) : m_stream(stream) {}
-  TOutputStreamInterface &operator<<(double x) {
+  TOutputStreamInterface &operator<<(double x) override {
     m_stream->push_back(TStyleParam(x));
     return *this;
   }
-  TOutputStreamInterface &operator<<(int x) {
+  TOutputStreamInterface &operator<<(int x) override {
     m_stream->push_back(TStyleParam(x));
     return *this;
   }
-  TOutputStreamInterface &operator<<(std::string x) {
+  TOutputStreamInterface &operator<<(std::string x) override {
     m_stream->push_back(TStyleParam(x));
     return *this;
   }
-  TOutputStreamInterface &operator<<(USHORT x) {
+  TOutputStreamInterface &operator<<(USHORT x) override {
     m_stream->push_back(TStyleParam(x));
     return *this;
   }
-  TOutputStreamInterface &operator<<(BYTE x) {
+  TOutputStreamInterface &operator<<(BYTE x) override {
     m_stream->push_back(TStyleParam(x));
     return *this;
   }
-  TOutputStreamInterface &operator<<(const TRaster32P &x) {
+  TOutputStreamInterface &operator<<(const TRaster32P &x) override {
     m_stream->push_back(TStyleParam(x));
     return *this;
   }
@@ -68,17 +68,17 @@ public:
                  int minorVersion)
       : m_stream(stream), m_version(majorVersion, minorVersion), m_count(0) {}
 
-  TInputStreamInterface &operator>>(double &x) {
+  TInputStreamInterface &operator>>(double &x) override {
     assert((*m_stream)[m_count].m_type == TStyleParam::SP_DOUBLE);
     x = (*m_stream)[m_count++].m_numericVal;
     return *this;
   }
-  TInputStreamInterface &operator>>(int &x) {
+  TInputStreamInterface &operator>>(int &x) override {
     assert((*m_stream)[m_count].m_type == TStyleParam::SP_INT);
     x = (int)(*m_stream)[m_count++].m_numericVal;
     return *this;
   }
-  TInputStreamInterface &operator>>(std::string &x) {
+  TInputStreamInterface &operator>>(std::string &x) override {
     if ((*m_stream)[m_count].m_type == TStyleParam::SP_INT)
       x = std::to_string(static_cast<int>((*m_stream)[m_count++].m_numericVal));
     else {
@@ -87,23 +87,23 @@ public:
     }
     return *this;
   }
-  TInputStreamInterface &operator>>(BYTE &x) {
+  TInputStreamInterface &operator>>(BYTE &x) override {
     assert((*m_stream)[m_count].m_type == TStyleParam::SP_BYTE);
     x = (BYTE)(*m_stream)[m_count++].m_numericVal;
     return *this;
   }
-  TInputStreamInterface &operator>>(USHORT &x) {
+  TInputStreamInterface &operator>>(USHORT &x) override {
     assert((*m_stream)[m_count].m_type == TStyleParam::SP_USHORT);
     x = (USHORT)(*m_stream)[m_count++].m_numericVal;
     return *this;
   }
-  TInputStreamInterface &operator>>(TRaster32P &x) {
+  TInputStreamInterface &operator>>(TRaster32P &x) override {
     assert((*m_stream)[m_count].m_type == TStyleParam::SP_RASTER);
     x = (*m_stream)[m_count++].m_r;
     return *this;
   }
 
-  VersionNumber versionNumber() const { return m_version; }
+  VersionNumber versionNumber() const override { return m_version; }
 };
 
 //---------------------------------------------------------------------------
@@ -254,7 +254,7 @@ private:
   TImageWriterPli &operator=(const TImageWriterPli &src);
 
 public:
-  void save(const TImageP &);
+  void save(const TImageP &) override;
   TFrameId m_frameId;
 
 private:

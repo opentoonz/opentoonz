@@ -9,7 +9,7 @@
 #include <limits>
 
 //#define UNIT_TEST                                             // Enables unit
-//testing at program startup
+// testing at program startup
 
 //************************************************************************
 //    Rationale

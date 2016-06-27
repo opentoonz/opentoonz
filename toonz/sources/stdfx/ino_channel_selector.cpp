@@ -66,7 +66,8 @@ public:
     this->m_alp_channel->addItem(1, "Green");
     this->m_alp_channel->addItem(2, "Blue");
   }
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     for (int ii = 0; ii < this->getInputPortCount(); ++ii) {
       std::string nm          = this->getInputPortName(ii);
       TRasterFxPort *tmp_port = (TRasterFxPort *)this->getInputPort(nm);
@@ -77,8 +78,10 @@ public:
     bBox = TRectD();
     return false;
   }
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
 };
 FX_PLUGIN_IDENTIFIER(ino_channel_selector, "inoChannelSelectorFx");
 //--------------------------------------------------------------------

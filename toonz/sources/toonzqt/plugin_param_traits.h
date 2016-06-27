@@ -652,9 +652,8 @@ inline bool param_read_value_<tpbind_str_t>(TParam *p,
   std::size_t len       = str.length() + 1;
   /* get_type() の返す大きさも文字列長+1 を含んでいる */
   if (isize < len)
-    len =
-        isize; /* 要求サイズが実際の長さより短くても良いが切り詰める(ただし 1
-                  以上であること) */
+    len = isize; /* 要求サイズが実際の長さより短くても良いが切り詰める(ただし 1
+                    以上であること) */
 
   if (len > 0) {
     auto dst = reinterpret_cast<char *>(ptr);

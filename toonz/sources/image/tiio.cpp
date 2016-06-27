@@ -42,7 +42,9 @@
 #include "./3gp/tiio_3gpM.h"
 
 #elif LINUX  // No more supported by the way...
-#include "./mov/tiio_movL.h"
+// #include "./mov/tiio_movL.h"
+#include "./mov/tiio_mov_proxy.h"
+#include "./3gp/tiio_3gp_proxy.h"
 #endif
 
 // Common includes

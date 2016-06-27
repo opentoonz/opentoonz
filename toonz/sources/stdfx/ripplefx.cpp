@@ -65,13 +65,14 @@ public:
 
   //-------------------------------------------------------------------
 
-  bool canHandle(const TRenderSettings &info, double frame) {
+  bool canHandle(const TRenderSettings &info, double frame) override {
     return isAlmostIsotropic(info.m_affine);
   }
 
   //-------------------------------------------------------------------
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (m_warped.isConnected()) {
       int ret = m_warped->doGetBBox(frame, bBox, info);
 
@@ -92,7 +93,8 @@ public:
 
   //-------------------------------------------------------------------
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info) {
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override {
     bool isWarped = m_warped.isConnected();
     if (!isWarped) return;
     if (fabs(m_intensity->getValue(frame)) < 0.01) {
@@ -123,7 +125,8 @@ public:
 
   //-------------------------------------------------------------------
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &info) {
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &info) override {
     bool isWarped = m_warped.isConnected();
 
     if (!isWarped) return;
@@ -225,7 +228,7 @@ public:
 
   //-------------------------------------------------------------------
 
-  void getParamUIs(TParamUIConcept *&concepts, int &length) {
+  void getParamUIs(TParamUIConcept *&concepts, int &length) override {
     concepts = new TParamUIConcept[length = 2];
 
     concepts[0].m_type  = TParamUIConcept::POINT;
@@ -241,7 +244,7 @@ public:
   //-------------------------------------------------------------------
 
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     // return -1;   //Deactivated. This fx is currently very inefficient if
     // subdivided!
 

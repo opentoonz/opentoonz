@@ -86,7 +86,7 @@ void DVAPI convert(
     const TFilePath &source,  //!< Level path to convert from.
     const TFilePath &dest,    //!< Level path to convert to.
     const TFrameId &from,     //!< First source frame to convert. Supports
-                              //!TFrameId::EMPTY_FRAME
+                              //! TFrameId::EMPTY_FRAME
     //!  to specify conversion from the beginning of level.
     const TFrameId
         &to,  //!< Last source frame to convert. Supports TFrameId::EMPTY_FRAME

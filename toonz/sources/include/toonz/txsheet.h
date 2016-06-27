@@ -222,9 +222,9 @@ Return false if cannot set cells.
   void removeCells(int row, int col, int rowCount = 1);
 
   /*! If column identified by index \b \e col is not empty, is a \b TXshCellColumn and is not
-		locked, clear \b \e rowCount cells starting from \b \e row and it recalls TXshCellColumn::clearCells().
-		Clears cells and it shifts remaining cells. Xsheet's frame count is updated.
-		\sa removeCells(), insertCells()
+    locked, clear \b \e rowCount cells starting from \b \e row and it recalls TXshCellColumn::clearCells().
+    Clears cells and it shifts remaining cells. Xsheet's frame count is updated.
+    \sa removeCells(), insertCells()
 */ void
   clearCells(int row, int col, int rowCount = 1);
   /*! Clears xsheet. It sets to default values all xsheet elements contained in
@@ -433,12 +433,12 @@ frame duplication.
           in \b TXsheetImp, to information contained in \b TIStream \b \e is.
           \sa saveData()
   */
-  void loadData(TIStream &is);
+  void loadData(TIStream &is) override;
   /*! Save all xsheet elements information, contained in \b TXsheetImp, in \b
      TOStream \b \e os.
           \sa loadData()
   */
-  void saveData(TOStream &os);
+  void saveData(TOStream &os) override;
   /*! Inserts an empty column in \b \e index calling \b insertColumn().
   */
   void insertColumn(int index,

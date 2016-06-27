@@ -45,7 +45,8 @@ public:
 
   ~HSVKeyFx(){};
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (m_input.isConnected()) {
       m_input->doGetBBox(frame, bBox, info);
       return true;
@@ -54,9 +55,11 @@ public:
     return false;
   };
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &) override;
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 };
 
 //------------------------------------------------------------------------------

@@ -67,7 +67,7 @@ public:
         (ref != 0 || 4 <= channels) ? true : false, this->pixe_tracks_,
         this->alpha_ref_, this->result_);
   }
-  void run(void) { /* threadで実行する部分 */
+  void run(void) override { /* threadで実行する部分 */
     bool rgb_ren_sw = true;
     bool alp_ren_sw = this->alpha_rendering_sw_;
     bool add_ble_sw = this->add_blend_sw_;

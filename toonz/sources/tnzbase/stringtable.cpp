@@ -32,11 +32,11 @@ public:
   void loadCoded(const TFilePath &);
   void saveCoded(const TFilePath &);
 
-  const Item *getItem(std::string name) const;
-  std::pair<std::string, int> getDefaultFontNameAndSize() const {
+  const Item *getItem(std::string name) const override;
+  std::pair<std::string, int> getDefaultFontNameAndSize() const override {
     return m_defaultFontNameAndSize;
   }
-  std::string getDefaultMacFontName() const;
+  std::string getDefaultMacFontName() const override;
 };
 
 //-------------------------------------------------------------------

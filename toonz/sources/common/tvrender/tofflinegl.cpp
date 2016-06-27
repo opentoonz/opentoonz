@@ -114,7 +114,7 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  void makeCurrent() {
+  void makeCurrent() override {
     QMutexLocker locker(&win32ImpMutex);
 
     int ret = wglMakeCurrent(m_offDC, m_hglRC);
@@ -123,7 +123,7 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  void doneCurrent() {
+  void doneCurrent() override {
     QMutexLocker locker(&win32ImpMutex);
 
     glFlush();
@@ -153,7 +153,7 @@ public:
   //-----------------------------------------------------------------------------
 
   void createContext(TDimension rasterSize,
-                     std::shared_ptr<TOfflineGL::Imp> shared) {
+                     std::shared_ptr<TOfflineGL::Imp> shared) override {
     QMutexLocker locker(&win32ImpMutex);
 
     BITMAPINFO info;
@@ -281,7 +281,7 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  void getRaster(TRaster32P raster) {
+  void getRaster(TRaster32P raster) override {
     makeCurrent();
     glFlush();
 
@@ -346,7 +346,7 @@ public:
     if (((it != m_glxContext.end()) && (it->second != m_context)) ||
         (it == m_glxContext.end())) {
       //	cout << "calling GLXMakeCurrent " << self << " " << m_context <<
-      //endl;
+      // endl;
       Bool ret;
       if (!isDtor) ret   = glXMakeCurrent(m_dpy, m_pixmap, m_context);
       m_glxContext[self] = m_context;
@@ -519,9 +519,13 @@ public:
                        std::shared_ptr<TOfflineGL::Imp> shared)
       : m_ogl(ogl), m_size(size), m_shared(std::move(shared)) {}
 
-  void onDeliver() { m_ogl->m_imp = currentImpGenerator(m_size, m_shared); }
+  void onDeliver() override {
+    m_ogl->m_imp = currentImpGenerator(m_size, m_shared);
+  }
 
-  TThread::Message *clone() const { return new MessageCreateContext(*this); }
+  TThread::Message *clone() const override {
+    return new MessageCreateContext(*this);
+  }
 };
 
 //} // namespace

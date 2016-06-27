@@ -284,8 +284,8 @@ protected:
   void setFx(const TFxP &currentFx, const TFxP &actualFx);
 
   void createToolBar();
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
   void setCheckboardColors(const TPixel32 &col1, const TPixel32 &col2);
 
   void changeTitleBar(TFx *fx);

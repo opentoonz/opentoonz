@@ -22,9 +22,12 @@ public:
 
   ~Bright_ContFx(){};
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (!m_input.isConnected()) {
       bBox = TRectD();
       return false;
@@ -32,7 +35,7 @@ public:
     return m_input->doGetBBox(frame, bBox, info);
   };
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &) override;
 };
 
 //===================================================================

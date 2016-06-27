@@ -76,7 +76,7 @@ CompatibilityStruct compatibility = {
     //                 Note: this mask is currently not used.
     0x000E  // forbidden mask: loaded levels MUST NOT have a mask with these
             // bits set
-    //
+            //
 };
 
 //-----------------------------------------------------------------------------

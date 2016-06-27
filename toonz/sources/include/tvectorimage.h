@@ -74,7 +74,7 @@ public:
   TVectorImage(bool loaded = false);
   virtual ~TVectorImage();
 
-  TImage::Type getType() const { return VECTOR; }
+  TImage::Type getType() const override { return VECTOR; }
 
   /*!Set valid regions flags
       call validateRegions() after region/stroke changes
@@ -89,7 +89,7 @@ public:
   TVectorImageP clone() const;
 
   //! Create a new \b TImage
-  TImage *cloneImage() const;
+  TImage *cloneImage() const override;
 
   //! Transform a stroke using an affine \b TAffine
   void transform(const TAffine &aff, bool doChangeThickness = false);
@@ -278,7 +278,7 @@ get the stroke nearest at point
   bool isComputedRegionAlmostOnce() const;
 
   //! Return the image bounding box in the image coordinate system
-  TRectD getBBox() const;
+  TRectD getBBox() const override;
 
   //! Call the following method after stroke modification
   //! \note you must specify, using the second argument, whether the

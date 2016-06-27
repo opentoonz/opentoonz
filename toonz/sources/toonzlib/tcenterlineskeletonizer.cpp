@@ -3,9 +3,9 @@
 #include "tcenterlinevectP.h"
 
 //#define _SSDEBUG                                              // Uncomment to
-//enable the debug viewer
+// enable the debug viewer
 //#define _UPDATE                                               // Shows borders
-//updated to current time
+// updated to current time
 
 //====================================================
 
@@ -144,7 +144,7 @@ public:
     edge,              //!< An edge shrinks to 0 length.
     vertex,            //!< Two contour nodes clash.
     split_regenerate,  //!< Placeholder type for split events that must be
-                       //!regenerated.
+                       //! regenerated.
     split,             //!< An edge is split by a clashing contour node.
     failure };
 
@@ -365,7 +365,7 @@ inline void VectorizationContext::prepareGlobals() {
   // On the n+k-3(k-m+2) nodes remaining for pure edge events, as many
   // non-original nodes are inserted.
   //=> This yields 2k + n-2k+3m-6= n+3m-6 non-original nodes. Contemporaneous
-  //events such as
+  // events such as
   // vertex and special events can only decrease the number of non-original
   // nodes requested.
 

@@ -47,7 +47,7 @@
     </message>
     <message>
         <source>Center Line</source>
-        <translation>Centrar línea</translation>
+        <translation>Línea central</translation>
     </message>
     <message>
         <source>Outline Mode</source>

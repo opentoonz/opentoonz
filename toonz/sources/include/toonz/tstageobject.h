@@ -104,14 +104,14 @@ The default value is XY.
     XY,            //!< The object can move freely on a plane
     PATH     = 1,  //!< The movement take place on a spline
     PATH_AIM = 2,  //!< The movement take place on a spline with the orientation
-                   //!of the object
+                   //! of the object
     //!< defined by the user through \b TStageObject::T_Angle and the total
-    //!angle is
+    //! angle is
     //!< the sum of the user angle plus the angle formed by
     //!< the tangent at the curve in the actual point
     IK = 3,  //!< The object is translated according to inverse kinematics
     PATH_UPPK = 5,  //!< PATH + UPPK (Update Pos Path Keyframe, when the spline
-                    //!is changed; see TStageObjectSpline)
+                    //! is changed; see TStageObjectSpline)
     PATH_AIM_UPPK = 6,  //!< PATH_AIM + UPPK
     UPPK_MASK     = 4,  //!< (status&UPPK_MASK)!=0 <==> UPPK enabled
     STATUS_MASK   = 3   //!< (status&STATUS_MASK) => old status
@@ -128,7 +128,7 @@ The default value is XY.
     T_ScaleY,  //!< Y-axis scale factor
     T_Scale,
     T_Path,  //!< point position along the spline, as a percentage of the length
-             //!of the spline
+             //! of the spline
     T_ShearX,  //!< Shear along x-axis
     T_ShearY,  //!< Shear along y-axis
     T_ChannelCount
@@ -570,7 +570,7 @@ private:
   void invalidate(LazyData &ld) const;
   void updateKeyframes(LazyData &ld) const;
 
-  void onChange(const class TParamChange &c);
+  void onChange(const class TParamChange &c) override;
 };
 
 //-----------------------------------------------------------------------------

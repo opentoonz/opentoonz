@@ -63,10 +63,10 @@ protected:
   int valToPos(int val);
   int posToVal(int pos);
 
-  void paintEvent(QPaintEvent *pe);
-  void mousePressEvent(QMouseEvent *me);
-  void mouseMoveEvent(QMouseEvent *me);
-  void mouseReleaseEvent(QMouseEvent *me);
+  void paintEvent(QPaintEvent *pe) override;
+  void mousePressEvent(QMouseEvent *me) override;
+  void mouseMoveEvent(QMouseEvent *me) override;
+  void mouseReleaseEvent(QMouseEvent *me) override;
 
 signals:
 

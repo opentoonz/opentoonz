@@ -102,47 +102,49 @@ public:
   /*!
           Returns a pointer to the current scene.
   */
-  TSceneHandle *getCurrentScene() const { return m_currentScene; }
+  TSceneHandle *getCurrentScene() const override { return m_currentScene; }
   /*!
           Returns a pointer to the current Xsheet.
   */
-  TXsheetHandle *getCurrentXsheet() const { return m_currentXsheet; }
+  TXsheetHandle *getCurrentXsheet() const override { return m_currentXsheet; }
   /*!
           Returns a pointer to the current frame.
   */
-  TFrameHandle *getCurrentFrame() const { return m_currentFrame; }
+  TFrameHandle *getCurrentFrame() const override { return m_currentFrame; }
   /*!
           Returns a pointer to the current column.
   */
-  TColumnHandle *getCurrentColumn() const { return m_currentColumn; }
+  TColumnHandle *getCurrentColumn() const override { return m_currentColumn; }
   /*!
           Returns a pointer to the current level.
   */
-  TXshLevelHandle *getCurrentLevel() const { return m_currentLevel; }
+  TXshLevelHandle *getCurrentLevel() const override { return m_currentLevel; }
   /*!
           Returns a pointer to the current tool used.
   */
-  ToolHandle *getCurrentTool() const { return m_currentTool; }
+  ToolHandle *getCurrentTool() const override { return m_currentTool; }
   /*!
           Returns a pointer to the current object in use.
   */
-  TObjectHandle *getCurrentObject() const { return m_currentObject; }
+  TObjectHandle *getCurrentObject() const override { return m_currentObject; }
   /*!
           Returns a pointer to the current selection.
   */
-  TSelectionHandle *getCurrentSelection() const { return m_currentSelection; }
+  TSelectionHandle *getCurrentSelection() const override {
+    return m_currentSelection;
+  }
   /*!
           Returns a pointer to the current layer's mask.
   */
-  TOnionSkinMaskHandle *getCurrentOnionSkin() const {
+  TOnionSkinMaskHandle *getCurrentOnionSkin() const override {
     return m_currentOnionSkinMask;
   }
   /*!
           Returns a pointer to the current effect.
   */
-  TFxHandle *getCurrentFx() const { return m_currentFx; }
+  TFxHandle *getCurrentFx() const override { return m_currentFx; }
 
-  PaletteController *getPaletteController() const {
+  PaletteController *getPaletteController() const override {
     return m_paletteController;
   }
   /*!
@@ -151,13 +153,13 @@ public:
 
   // Current Palette (PaletteController) methods
 
-  TPaletteHandle *getCurrentPalette() const;
+  TPaletteHandle *getCurrentPalette() const override;
 
-  TColorStyle *getCurrentLevelStyle() const;
+  TColorStyle *getCurrentLevelStyle() const override;
 
-  int getCurrentLevelStyleIndex() const;
+  int getCurrentLevelStyleIndex() const override;
 
-  void setCurrentLevelStyleIndex(int index);
+  void setCurrentLevelStyleIndex(int index) override;
 
   void setMainWindow(QMainWindow *mainWindow) { m_mainWindow = mainWindow; }
   /*!
@@ -200,7 +202,7 @@ public:
   void writeSettings();
 
 protected:
-  bool eventFilter(QObject *obj, QEvent *event);
+  bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
   void updateXshLevel();

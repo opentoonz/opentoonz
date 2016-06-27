@@ -44,8 +44,8 @@ struct BrushData : public TPersist {
 
   bool operator<(const BrushData &other) const { return m_name < other.m_name; }
 
-  void saveData(TOStream &os);
-  void loadData(TIStream &is);
+  void saveData(TOStream &os) override;
+  void loadData(TIStream &is) override;
 };
 
 //************************************************************************
@@ -110,32 +110,32 @@ class BrushTool : public TTool {
 public:
   BrushTool(std::string name, int targetType);
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
-  ToolOptionsBox *createOptionsBox();
+  ToolOptionsBox *createOptionsBox() override;
 
-  void updateTranslation();
+  void updateTranslation() override;
 
-  void onActivate();
-  void onDeactivate();
+  void onActivate() override;
+  void onDeactivate() override;
 
-  bool preLeftButtonDown();
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
+  bool preLeftButtonDown() override;
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
 
-  void draw();
+  void draw() override;
 
-  void onEnter();
-  void onLeave();
+  void onEnter() override;
+  void onLeave() override;
 
-  int getCursorId() const { return ToolCursor::PenCursor; }
+  int getCursorId() const override { return ToolCursor::PenCursor; }
 
-  TPropertyGroup *getProperties(int targetType);
-  bool onPropertyChanged(std::string propertyName);
+  TPropertyGroup *getProperties(int targetType) override;
+  bool onPropertyChanged(std::string propertyName) override;
 
-  void onImageChanged();
+  void onImageChanged() override;
   void setWorkAndBackupImages();
   void updateWorkAndBackupRasters(const TRect &rect);
 
@@ -147,7 +147,7 @@ public:
   void finishRasterBrush(const TPointD &pos, int pressureVal);
   // return true if the pencil mode is active in the Brush / PaintBrush / Eraser
   // Tools.
-  bool isPencilModeActive();
+  bool isPencilModeActive() override;
 
   void addTrackPoint(const TThickPoint &point, double pixelSize2);
   void flushTrackPoint();

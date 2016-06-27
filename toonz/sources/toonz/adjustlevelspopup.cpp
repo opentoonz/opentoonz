@@ -566,10 +566,10 @@ public:
                    TRasterP ras);
   ~AdjustLevelsUndo();
 
-  void undo() const;
-  void redo() const;
+  void undo() const override;
+  void redo() const override;
 
-  int getSize() const { return sizeof(*this) + m_rasSize; }
+  int getSize() const override { return sizeof(*this) + m_rasSize; }
 };
 
 //--------------------------------------------------------------

@@ -217,7 +217,7 @@ class TImageWriterMov : public TImageWriter {
 public:
   TImageWriterMov(const TFilePath &, int frameIndex, TLevelWriterMov *);
   ~TImageWriterMov() { m_lwm->release(); }
-  bool is64bitOutputSupported() { return false; }
+  bool is64bitOutputSupported() override { return false; }
 
 private:
   // not implemented
@@ -225,7 +225,7 @@ private:
   TImageWriterMov &operator=(const TImageWriterMov &src);
 
 public:
-  void save(const TImageP &);
+  void save(const TImageP &) override;
   int m_frameIndex;
 
 private:
@@ -1012,14 +1012,14 @@ public:
                   TImageInfo *);
   ~TImageReaderMov() { m_lrm->release(); }
 
-  TImageP load();
+  TImageP load() override;
   void load(const TRasterP &rasP, const TPoint &pos = TPoint(0, 0),
             int shrinkX = 1, int shrinkY = 1);
 
   TDimension getSize() const { return m_lrm->getSize(); }
   TRect getBBox() const { return m_lrm->getBBox(); }
 
-  const TImageInfo *getImageInfo() const { return m_info; }
+  const TImageInfo *getImageInfo() const override { return m_info; }
 
 private:
   // Not copyable
@@ -1191,9 +1191,9 @@ inline void setMatteAndYMirror(const TRaster32P &ras) {
   ras->lock();
   TPixel32 *upRow = ras->pixels();
   TPixel32 *dwRow = ras->pixels(ras->getLy() - 1);
-  int hLy         = (int)(ras->getLy() / 2. + 0.5);  // piccola pessimizzazione...
-  int wrap        = ras->getWrap();
-  int lx          = ras->getLx();
+  int hLy  = (int)(ras->getLy() / 2. + 0.5);  // piccola pessimizzazione...
+  int wrap = ras->getWrap();
+  int lx   = ras->getLx();
   TPixel32 *upPix = 0;
 
   TPixel32 *lastPix = ras->pixels(hLy);

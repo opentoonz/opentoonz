@@ -129,8 +129,8 @@ public:  // Sub-classes
     }
 
   protected:
-    void saveData(TOStream &os);
-    void loadData(TIStream &is);
+    void saveData(TOStream &os) override;
+    void loadData(TIStream &is) override;
   };
 
   union ParameterValue {
@@ -165,8 +165,8 @@ public:  // Sub-classes
         : m_type(type), m_name(name) {}
 
   protected:
-    void saveData(TOStream &os);
-    void loadData(TIStream &is);
+    void saveData(TOStream &os) override;
+    void loadData(TIStream &is) override;
   };
 
   class ShaderData : public TPersist {
@@ -181,8 +181,8 @@ public:  // Sub-classes
     bool isValid() const { return !m_path.isEmpty(); }
 
   protected:
-    void saveData(TOStream &os);
-    void loadData(TIStream &is);
+    void saveData(TOStream &os) override;
+    void loadData(TIStream &is) override;
   };
 
 public:  // Public methods
@@ -210,8 +210,8 @@ last modified date of the associated shader file.
 protected:
   void clear();
 
-  void saveData(TOStream &os);
-  void loadData(TIStream &is);
+  void saveData(TOStream &os) override;
+  void loadData(TIStream &is) override;
 
 private:
   PERSIST_DECLARATION(ShaderInterface)

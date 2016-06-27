@@ -125,7 +125,7 @@ class DVAPI Runnable : public QObject, public TSmartObject {
   friend class Executor;     // Needed to confront Executor's and Runnable's ids
   friend class ExecutorImp;  // The internal task manager needs full control
                              // over the task
-  friend class Worker;  // Workers force tasks to emit state signals
+  friend class Worker;       // Workers force tasks to emit state signals
 
 public:
   Runnable();

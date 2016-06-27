@@ -133,8 +133,8 @@ public:
 
   TRectD getBBox() const;
 
-  void saveData(TOStream &os);
-  void loadData(TIStream &is);
+  void saveData(TOStream &os) override;
+  void loadData(TIStream &is) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -176,10 +176,10 @@ public:
   TMeshImage(const TMeshImage &other);
   TMeshImage &operator=(TMeshImage other);
 
-  TImage::Type getType() const { return TImage::MESH; }
+  TImage::Type getType() const override { return TImage::MESH; }
 
-  TRectD getBBox() const;
-  TImage *cloneImage() const;
+  TRectD getBBox() const override;
+  TImage *cloneImage() const override;
 
   void getDpi(double &dpix, double &dpiy) const;
   void setDpi(double dpix, double dpiy);

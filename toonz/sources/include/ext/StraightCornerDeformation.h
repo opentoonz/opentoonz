@@ -32,13 +32,13 @@ class DVAPI StraightCornerDeformation : public StrokeDeformationImpl {
 public:
   virtual ~StraightCornerDeformation();
 
-  bool check_(const ContextStatus *status);
+  bool check_(const ContextStatus *status) override;
 
-  bool findExtremes_(const ContextStatus *, Interval &);
+  bool findExtremes_(const ContextStatus *, Interval &) override;
 
-  virtual void draw(Designer *);
+  void draw(Designer *) override;
 
-  double findActionLength();
+  double findActionLength() override;
 
   static StraightCornerDeformation *instance();
 };

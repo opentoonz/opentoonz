@@ -125,7 +125,7 @@ public:
 
   ~TgaReader();
 
-  void open(FILE *file);
+  void open(FILE *file) override;
 
   int skipLines0(int count) {
     int lineSize = m_info.m_lx;
@@ -179,15 +179,15 @@ public:
     return pix;
   }
 
-  Tiio::RowOrder getRowOrder() const {
+  Tiio::RowOrder getRowOrder() const override {
     return ((m_header.ImageDescriptor >> 5) & 1) == 0 ? Tiio::BOTTOM2TOP
                                                       : Tiio::TOP2BOTTOM;
   }
 
-  void readLine(char *buffer, int x0, int x1, int shrink) {
+  void readLine(char *buffer, int x0, int x1, int shrink) override {
     (this->*m_readLineProc)(buffer, x0, x1, shrink);
   }
-  int skipLines(int count) { return (this->*m_skipLineProc)(count); }
+  int skipLines(int count) override { return (this->*m_skipLineProc)(count); }
   void readPalette();
 
   void readNoLine(char *buffer, int x0, int x1, int shrink) {}
@@ -531,7 +531,7 @@ class TgaWriter : public Tiio::Writer {
 public:
   TgaWriter() : m_chan(0), m_writeLineProc(&TgaWriter::writeNoLine) {}
 
-  void open(FILE *file, const TImageInfo &info) {
+  void open(FILE *file, const TImageInfo &info) override {
     m_info = info;
     try {
       m_chan = file;
@@ -569,7 +569,7 @@ public:
     writeTgaHeader(m_header, m_chan);
   }
 
-  void flush() { fflush(m_chan); }
+  void flush() override { fflush(m_chan); }
 
   ~TgaWriter() { delete m_properties; }
 
@@ -600,7 +600,7 @@ public:
   void writeLine24rle(char *buffer);
   void writeLine32rle(char *buffer);
 
-  void writeLine(char *buffer) { (this->*m_writeLineProc)(buffer); }
+  void writeLine(char *buffer) override { (this->*m_writeLineProc)(buffer); }
 };
 
 //------------------------------------------------------------

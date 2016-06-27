@@ -75,7 +75,7 @@ public:
   void refresh();
 
   // overriden from TDoubleParamObserver
-  void onChange(const TParamChange &) { refresh(); }
+  void onChange(const TParamChange &) override { refresh(); }
 
   void setXsheetHandle(TXsheetHandle *xshHandle) { m_xshHandle = xshHandle; }
 
@@ -147,11 +147,11 @@ class SpeedInOutSegmentPage : public FunctionSegmentPage {
 
 public:
   SpeedInOutSegmentPage(FunctionSegmentViewer *parent = 0);
-  void refresh();
-  void apply(){};
+  void refresh() override;
+  void apply() override{};
 
   void getGuiValues(TPointD &speedIn, TPointD &speedOut);
-  void init(int segmentLength);
+  void init(int segmentLength) override;
 
 public slots:
   void onFirstHandleXChanged();
@@ -173,11 +173,11 @@ class EaseInOutSegmentPage : public FunctionSegmentPage {
 
 public:
   EaseInOutSegmentPage(bool percentage, FunctionSegmentViewer *parent = 0);
-  void refresh();
-  void apply() {}
+  void refresh() override;
+  void apply() override {}
 
   void getGuiValues(TPointD &easeIn, TPointD &easeOut);
-  void init(int segmentLength);
+  void init(int segmentLength) override;
 
 public slots:
   void onEase0Changed();
@@ -194,13 +194,13 @@ class FunctionExpressionSegmentPage : public FunctionSegmentPage {
 
 public:
   FunctionExpressionSegmentPage(FunctionSegmentViewer *parent = 0);
-  void refresh();
-  void apply();
+  void refresh() override;
+  void apply() override;
 
   // return false if a circular reference is occured
   bool getGuiValues(std::string &expressionText, std::string &unitName);
 
-  void init(int segmentLength);
+  void init(int segmentLength) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -214,10 +214,10 @@ class SimilarShapeSegmentPage : public FunctionSegmentPage {
 public:
   SimilarShapeSegmentPage(FunctionSegmentViewer *parent = 0);
 
-  void refresh();
-  void apply();
+  void refresh() override;
+  void apply() override;
 
-  void init(int segmentLength);
+  void init(int segmentLength) override;
 
   void getGuiValues(std::string &expressionText, double &similarShapeOffset);
 };

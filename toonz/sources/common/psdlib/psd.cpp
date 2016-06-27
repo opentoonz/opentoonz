@@ -1050,7 +1050,7 @@ void readChannel(FILE *f, TPSDLayerInfo *li,
         count   = fread(zipdata, 1, chan->length - 2, f);
         // if(count < chan->length - 2)
         //	alwayswarn("ZIP data short: wanted %d bytes, got %d",
-        //chan->length, count);
+        // chan->length, count);
 
         chan->unzipdata =
             (unsigned char *)mymalloc(chan->rows * chan->rowbytes);

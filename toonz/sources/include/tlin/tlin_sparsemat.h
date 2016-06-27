@@ -73,7 +73,7 @@ public:
   }
 
   //!\warning Assignments of kind: A.at(1,1) = A.at(0,0) are potentially
-  //!harmful.
+  //! harmful.
   //! Use A.get(x,y) on the right side instead.
   T &at(int row, int col) { return m_hash.touch(std::make_pair(row, col), 0); }
   const T get(int row, int col) const {

@@ -12,8 +12,8 @@ public:
   TLevelReaderSvg(const TFilePath &path);
   ~TLevelReaderSvg() {}
 
-  TLevelP loadInfo();
-  TImageReaderP getFrameReader(TFrameId fid);
+  TLevelP loadInfo() override;
+  TImageReaderP getFrameReader(TFrameId fid) override;
 
   // QString getCreator();
   // friend class TImageReaderPli;
@@ -55,7 +55,7 @@ class TLevelWriterSvg : public TLevelWriter {
 public:
   TLevelWriterSvg(const TFilePath &path, TPropertyGroup *winfo);
 
-  TImageWriterP getFrameWriter(TFrameId fid);
+  TImageWriterP getFrameWriter(TFrameId fid) override;
 
   friend class TImageWriterSvg;
 

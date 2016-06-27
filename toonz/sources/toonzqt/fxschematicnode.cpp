@@ -2890,7 +2890,7 @@ FxSchematicColumnNode::FxSchematicColumnNode(FxSchematicScene *scene,
   m_resizeItem = new SchematicThumbnailToggle(
       this, fx->getAttributes()->isOpened());    //サムネイル矢印
   m_nameItem = new SchematicName(this, 54, 20);  //リネーム部分
-  m_outDock = new FxSchematicDock(this, "", 0, eFxOutputPort);  // Outポート
+  m_outDock  = new FxSchematicDock(this, "", 0, eFxOutputPort);  // Outポート
   m_renderToggle =
       new SchematicToggle(this, QPixmap(":Resources/schematic_prev_eye.png"),
                           SchematicToggle::eIsParentColumn, m_isLargeScaled);

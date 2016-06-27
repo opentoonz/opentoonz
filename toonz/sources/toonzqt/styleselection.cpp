@@ -280,7 +280,7 @@ public:
 
   ~PasteStylesUndo() { delete m_data; }
 
-  void undo() const {
+  void undo() const override {
     TPaletteHandle *paletteHandle    = m_selection->getPaletteHandle();
     std::set<int> styleIndicesInPage = m_styleIndicesInPage;
     cutStylesWithoutUndo(m_palette.getPointer(), paletteHandle, m_pageIndex,
@@ -294,7 +294,7 @@ public:
       paletteHandle->setStyleIndex(m_oldStyleIndex);
   }
 
-  void redo() const {
+  void redo() const override {
     // Se e' la paletta corrente setto l'indice corrente.
     TPaletteHandle *paletteHandle = m_selection->getPaletteHandle();
     if (m_palette.getPointer() == paletteHandle->getPalette())
@@ -321,12 +321,12 @@ public:
     }
   }
 
-  int getSize() const { return sizeof(*this); }
-  QString getHistoryString() {
+  int getSize() const override { return sizeof(*this); }
+  QString getHistoryString() override {
     return QObject::tr("Paste Style  in Palette : %1")
         .arg(QString::fromStdWString(m_palette->getPaletteName()));
   }
-  int getHistoryType() { return HistoryType::Palette; }
+  int getHistoryType() override { return HistoryType::Palette; }
 };
 
 //=============================================================================
@@ -356,7 +356,7 @@ public:
 
   ~DeleteStylesUndo() { delete m_data; }
 
-  void undo() const {
+  void undo() const override {
     TPaletteHandle *paletteHandle = m_selection->getPaletteHandle();
     // Prendo il data corrente
     QClipboard *clipboard  = QApplication::clipboard();
@@ -385,7 +385,7 @@ public:
     paletteHandle->notifyColorStyleChanged(false, false);
   }
 
-  void redo() const {
+  void redo() const override {
     std::set<int> styleIndicesInPage = m_styleIndicesInPage;
     deleteStylesWithoutUndo(m_palette.getPointer(),
                             m_selection->getPaletteHandle(), m_pageIndex,
@@ -396,13 +396,13 @@ public:
     }
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Delete Style  from Palette : %1")
         .arg(QString::fromStdWString(m_palette->getPaletteName()));
   }
-  int getHistoryType() { return HistoryType::Palette; }
+  int getHistoryType() override { return HistoryType::Palette; }
 };
 
 //=============================================================================
@@ -430,7 +430,7 @@ public:
     delete m_data;
   }
 
-  void undo() const {
+  void undo() const override {
     TPaletteHandle *paletteHandle = m_selection->getPaletteHandle();
 
     // Setto il data del cut
@@ -455,7 +455,7 @@ public:
     clipboard->setMimeData(cloneData(m_oldData), QClipboard::Clipboard);
   }
 
-  void redo() const {
+  void redo() const override {
     std::set<int> styleIndicesInPage = m_styleIndicesInPage;
     cutStylesWithoutUndo(m_palette.getPointer(),
                          m_selection->getPaletteHandle(), m_pageIndex,
@@ -465,13 +465,13 @@ public:
     m_selection->makeCurrent();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Cut Style  from Palette : %1")
         .arg(QString::fromStdWString(m_palette->getPaletteName()));
   }
-  int getHistoryType() { return HistoryType::Palette; }
+  int getHistoryType() override { return HistoryType::Palette; }
 };
 
 //-----------------------------------------------------------------------------
@@ -840,7 +840,7 @@ public:
       getPalette()->getStyle(styleId)->setName(newStyle->getName());
   }
 
-  void undo() const {
+  void undo() const override {
     m_selection->selectNone();
     TPalette::Page *page = getPalette()->getPage(m_pageIndex);
 
@@ -871,7 +871,7 @@ public:
     m_paletteHandle->notifyColorStyleSwitched();
   }
 
-  void redo() const {
+  void redo() const override {
     m_selection->selectNone();
 
     TPalette::Page *page = getPalette()->getPage(m_pageIndex);
@@ -948,7 +948,8 @@ public:
           pastedStyle->setGlobalName(dstGlobalName);
           pastedStyle->setOriginalName(L"");
           pastedStyle->setIsEditedFlag(false);
-        } else  // dstStyle == LINKEDSTYLE		//9. From linked to linked.
+        } else  // dstStyle == LINKEDSTYLE		//9. From linked to
+                // linked.
                 // Do nothing (bring all information from the original).
         {
         }
@@ -986,11 +987,11 @@ public:
     m_paletteHandle->notifyColorStyleSwitched();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) + (int)m_items.size() * 100;  // forfait
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     QString palNameStr =
         QObject::tr("  to Palette : %1")
             .arg(QString::fromStdWString(m_palette->getPaletteName()));
@@ -1003,7 +1004,7 @@ public:
     else
       return QObject::tr("Paste%1").arg(palNameStr);
   }
-  int getHistoryType() { return HistoryType::Palette; }
+  int getHistoryType() override { return HistoryType::Palette; }
 };
 
 //-----------------------------------------------------------------------------
@@ -1122,7 +1123,8 @@ void TStyleSelection::pasteStylesValues(bool pasteName, bool pasteColor) {
           pastedStyle->setGlobalName(dstGlobalName);
           pastedStyle->setOriginalName(L"");
           pastedStyle->setIsEditedFlag(false);
-        } else  // dstStyle == LINKEDSTYLE		//9. From linked to linked.
+        } else  // dstStyle == LINKEDSTYLE		//9. From linked to
+                // linked.
                 // Do nothing (bring all information from the original).
         {
         }
@@ -1217,7 +1219,7 @@ public:
 
   ~UndoBlendColor() {}
 
-  void undo() const {
+  void undo() const override {
     if (!m_palette) return;
     TPalette::Page *page = m_palette->getPage(m_pageIndex);
     if (!page) return;
@@ -1237,7 +1239,7 @@ public:
     m_paletteHandle->notifyColorStyleSwitched();
   }
 
-  void redo() const {
+  void redo() const override {
     if (!m_palette) return;
     TPalette::Page *page = m_palette->getPage(m_pageIndex);
     if (!page) return;
@@ -1257,16 +1259,16 @@ public:
     m_paletteHandle->notifyColorStyleSwitched();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof(
         *this);  //+500*m_oldStyles.size(); //dipende da che stile ha salvato
   }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Blend Colors  in Palette : %1")
         .arg(QString::fromStdWString(m_palette->getPaletteName()));
   }
-  int getHistoryType() { return HistoryType::Palette; }
+  int getHistoryType() override { return HistoryType::Palette; }
 };
 
 //-----------------------------------------------------------------------------
@@ -1360,7 +1362,7 @@ public:
     m_styles.push_back(data);
   }
 
-  void undo() const {
+  void undo() const override {
     TPalette::Page *page = m_palette->getPage(m_pageIndex);
     assert(page);
     int i;
@@ -1375,7 +1377,7 @@ public:
     m_paletteHandle->notifyColorStyleSwitched();
   }
 
-  void redo() const {
+  void redo() const override {
     TPalette::Page *page = m_palette->getPage(m_pageIndex);
     assert(page);
     int i;
@@ -1390,13 +1392,13 @@ public:
       StudioPalette::instance()->updateLinkedColors(m_palette.getPointer());
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Toggle Link  in Palette : %1")
         .arg(QString::fromStdWString(m_palette->getPaletteName()));
   }
-  int getHistoryType() { return HistoryType::Palette; }
+  int getHistoryType() override { return HistoryType::Palette; }
 };
 
 //-----------------------------------------------------------------------------
@@ -1542,7 +1544,7 @@ public:
     m_styles.push_back(data);
   }
 
-  void undo() const {
+  void undo() const override {
     TPalette::Page *page = m_palette->getPage(m_pageIndex);
     assert(page);
     int i;
@@ -1556,7 +1558,7 @@ public:
     m_paletteHandle->notifyColorStyleChanged(false, false);
   }
 
-  void redo() const {
+  void redo() const override {
     TPalette::Page *page = m_palette->getPage(m_pageIndex);
     assert(page);
     int i;
@@ -1570,13 +1572,13 @@ public:
     m_paletteHandle->notifyColorStyleChanged(false, false);
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Remove Link  in Palette : %1")
         .arg(QString::fromStdWString(m_palette->getPaletteName()));
   }
-  int getHistoryType() { return HistoryType::Palette; }
+  int getHistoryType() override { return HistoryType::Palette; }
 };
 
 //-----------------------------------------------------------------------------
@@ -1652,12 +1654,12 @@ public:
       styles.push_back(page->getStyle(*it));
   }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof *this +
            (m_oldColors.size() + m_newColors.size()) * sizeof(TPixel32);
   }
 
-  void onAdd() { getColors(m_newColors, m_newEditedFlags); }
+  void onAdd() override { getColors(m_newColors, m_newEditedFlags); }
 
   void getColors(std::vector<TPixel32> &colors,
                  std::vector<bool> &flags) const {
@@ -1687,14 +1689,14 @@ public:
     m_selection.getPaletteHandle()->notifyColorStyleChanged(false, false);
   }
 
-  void undo() const { setColors(m_oldColors, m_oldEditedFlags); }
+  void undo() const override { setColors(m_oldColors, m_oldEditedFlags); }
 
-  void redo() const { setColors(m_newColors, m_newEditedFlags); }
+  void redo() const override { setColors(m_newColors, m_newEditedFlags); }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr("Get Color from Studio Palette");
   }
-  int getHistoryType() { return HistoryType::Palette; }
+  int getHistoryType() override { return HistoryType::Palette; }
 };
 
 //-----------------------------------------------------------------------------

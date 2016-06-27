@@ -71,7 +71,7 @@ public:
       , m_styleId(styleId)
       , m_invert(invert) {}
 
-  void redo() const {
+  void redo() const override {
     TToonzImageP image = m_level->getFrame(m_frameId, true);
     TRasterCM32P ras   = image->getRaster();
     RasterStrokeGenerator m_rasterTrack(ras, FINGER, INK, m_styleId,
@@ -87,10 +87,12 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const { return sizeof(*this) + TRasterUndo::getSize(); }
+  int getSize() const override {
+    return sizeof(*this) + TRasterUndo::getSize();
+  }
 
-  virtual QString getToolName() { return QString("Finger Tool"); }
-  int getHistoryType() { return HistoryType::FingerTool; }
+  QString getToolName() override { return QString("Finger Tool"); }
+  int getHistoryType() override { return HistoryType::FingerTool; }
 };
 
 //-------------------------------------------------------------------------------------------
@@ -269,24 +271,24 @@ class FingerTool : public TTool {
 public:
   FingerTool();
 
-  void draw();
+  void draw() override;
   void update(TToonzImageP ti, TRectD area);
 
-  void updateTranslation();
+  void updateTranslation() override;
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
-  void onEnter();
-  void onLeave();
-  void onActivate();
-  void onDeactivate();
-  bool onPropertyChanged(std::string propertyName);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  void onEnter() override;
+  void onLeave() override;
+  void onActivate() override;
+  void onDeactivate() override;
+  bool onPropertyChanged(std::string propertyName) override;
 
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
-  int getCursorId() const { return m_cursor; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
+  int getCursorId() const override { return m_cursor; }
 
   int getColorClass() const { return 2; }
 

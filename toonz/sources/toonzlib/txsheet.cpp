@@ -808,7 +808,7 @@ void TXsheet::eachCells(int r0, int c0, int r1, int c1, int type) {
   for (i = r0, k = 0; i < r0 + newRows && k < size; i++)
     for (j = c0; j <= c1; j++) {
       //----110523 iwasawa
-      //Eachでできた空きセルに、操作前のセルの中身が残ってしまう不具合を修正
+      // Eachでできた空きセルに、操作前のセルの中身が残ってしまう不具合を修正
       if (cells[k].isEmpty())
         clearCells(i, j);
       else

@@ -45,12 +45,12 @@ public:
       m_antialias;    //!< <TT>[default: 0]</TT> Antialias amount (\p 0 meaning
                       //!  no antialias).
   DpiPolicy m_dpiPolicy;  //!< <TT>[default: DP_ImageDpi]</TT> Dpi policy to be
-                          //!adpoted.
+                          //! adpoted.
 
   bool m_whiteTransp,  //!< <TT>[default: false]</TT> Whether white should be
       //!  visualized as transparent.
       m_premultiply;  //!< <TT>[default: false]</TT> Whether level images should
-                      //!be
+                      //! be
   //!  premultiplied by Toonz for alpha compositing (because they
   //!  are not).
 public:

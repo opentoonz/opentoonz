@@ -140,30 +140,35 @@ public:
   Iwa_TiledParticlesFx();
   ~Iwa_TiledParticlesFx();
 
-  bool isZerary() const { return true; }
+  bool isZerary() const override { return true; }
 
-  int dynamicPortGroupsCount() const { return 2; }
-  const TFxPortDG *dynamicPortGroup(int g) const {
+  int dynamicPortGroupsCount() const override { return 2; }
+  const TFxPortDG *dynamicPortGroup(int g) const override {
     return (g == 0) ? &m_source : (g == 1) ? &m_control : 0;
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
-  bool allowUserCacheOnPort(int port);
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
+  bool allowUserCacheOnPort(int port) override;
 
-  std::string getAlias(double frame, const TRenderSettings &info) const;
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
-  TFxTimeRegion getTimeRegion() const {
+  std::string getAlias(double frame,
+                       const TRenderSettings &info) const override;
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
+  TFxTimeRegion getTimeRegion() const override {
     return TFxTimeRegion::createUnlimited();
   }
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info);
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
-  void compute(TFlash &flash, int frame);
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override;
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
+  void compute(TFlash &flash, int frame) override;
 
-  void getParamUIs(TParamUIConcept *&concepts, int &length);
+  void getParamUIs(TParamUIConcept *&concepts, int &length) override;
 
   void compatibilityTranslatePort(int majorVersion, int minorVersion,
-                                  std::string &portName);
+                                  std::string &portName) override;
 };
 
 #endif  // IWA_TILEDPARTICLESFX_H

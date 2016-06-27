@@ -87,7 +87,7 @@ public:
       m_scannerMsg += L"\n" + ::to_wstring(notFatal[i - 1]);
     log("Exception created: " + ::to_string(m_scannerMsg));
   }
-  TString getMessage() const { return m_scannerMsg; }
+  TString getMessage() const override { return m_scannerMsg; }
 };
 
 //-----------------------------------------------------------------------------

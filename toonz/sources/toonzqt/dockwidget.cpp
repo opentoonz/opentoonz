@@ -43,7 +43,7 @@ class DockingToggleCommand : public MenuItemHandler {
 public:
   DockingToggleCommand() : MenuItemHandler("MI_DockingCheck") {}
 
-  void execute() {
+  void execute() override {
     DockingCheck *dc = DockingCheck::instance();
     dc->setIsEnabled(!dc->isEnabled());
   }
@@ -259,7 +259,7 @@ void DockWidget::mousePressEvent(QMouseEvent *me) {
     // this ensures
     // that mouse cursor changes are always consistent with resize events.
 
-    m_resizing = true;
+    m_resizing            = true;
     m_dragMouseInitialPos = me->globalPos();  // Re-used as old position
   } else if (isDragGrip(me->pos())) {
     // Dragging begins
@@ -411,7 +411,7 @@ void DockWidget::wheelEvent(QWheelEvent *we) {
 //! Convenience function combining parentLayout() and containerOf(\b point).
 
 //!\b NOTE: Observe that, in any case, the use of QEnterEvents is discouraged
-//!for this purpose:
+//! for this purpose:
 //! remember that we forcedly remain within its boundaries when dragging a dock
 //! widget;
 //! instead, we are rather interested about entering the dock widgets *below*.
@@ -525,7 +525,7 @@ inline void DockPlaceholder::buildGeometry() {
     DockLayout *layout = m_owner->parentLayout();
     QRect mainRect     = layout->contentsRect();
     int sepWidth       = layout->spacing();
-    int margin         = 6;  // layout->margin();   //Purtroppo questa info e' assegnata
+    int margin = 6;  // layout->margin();   //Purtroppo questa info e' assegnata
                      // prima delle Room...
 
     if (isRoot()) {

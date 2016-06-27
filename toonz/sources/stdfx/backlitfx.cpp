@@ -197,7 +197,8 @@ public:
     addInputPort("Source", m_lighted);
   }
   ~BacklitFx() {}
-  bool doGetBBox(double frame, TRectD &bbox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bbox,
+                 const TRenderSettings &info) override {
     if (getActiveTimeRegion().contains(frame))
       if (m_light.isConnected()) {
         if (m_lighted.isConnected()) {
@@ -213,7 +214,8 @@ public:
     return false;
   }
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info) {
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override {
     if (!m_light.isConnected()) return;
     if (!m_lighted.isConnected()) {
       m_light->dryCompute(rect, frame, info);
@@ -232,7 +234,8 @@ public:
     m_light->dryCompute(inRect, frame, info);
   }
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &ri) override {
     if (!m_light.isConnected()) return;
 
     if (!m_lighted.isConnected()) {
@@ -272,10 +275,12 @@ public:
     tile.getRaster()->copy(ctrTile.getRaster(), TPoint(-brad, -brad));
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     double value = m_value->getValue(frame);
     double scale = sqrt(fabs(info.m_affine.det()));
     int brad     = tceil(value * scale);

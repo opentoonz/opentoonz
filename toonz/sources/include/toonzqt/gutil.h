@@ -159,7 +159,7 @@ public:
   TabBarContainter(QWidget *parent = 0);
 
 protected:
-  void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -171,7 +171,7 @@ public:
   ToolBarContainer(QWidget *parent = 0);
 
 protected:
-  void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event) override;
 };
 
 QString DVAPI operator+(const QString &a, const TFilePath &fp);

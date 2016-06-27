@@ -91,7 +91,7 @@ public:
       , m_lockCenterX(lockCenterX)
       , m_lockCenterY(lockCenterY) {}
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
     if (m_lockCenterX && m_lockCenterY) return;
     TXsheet *xsh =
         TTool::getApplication()->getCurrentTool()->getTool()->getXsheet();
@@ -102,7 +102,7 @@ public:
     m_affine.a13 = m_affine.a23 = 0;
   }
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override {
     if (m_lockCenterX && m_lockCenterY) return;
     double factor = 1.0 / Stage::inch;
     TPointD delta = pos - m_firstPos;
@@ -117,7 +117,7 @@ public:
         ->getXsheet()
         ->setCenter(m_objId, m_frame, m_center);
   }
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override {
     if ((m_lockCenterX && m_lockCenterY) || m_firstPos == pos) return;
     UndoStageObjectCenterMove *undo =
         new UndoStageObjectCenterMove(m_objId, m_frame, m_oldCenter, m_center);
@@ -192,7 +192,7 @@ public:
     m_after = m_before;
   }
 
-  void enableGlobalKeyframes(bool enabled) {
+  void enableGlobalKeyframes(bool enabled) override {
     m_globalKeyframesEnabled = enabled;
   }
 
@@ -223,7 +223,7 @@ public:
     m_after.applyValues();
   }
 
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override {
     if (!m_isStarted || m_firstPos == pos)
       return;
     else
@@ -253,12 +253,12 @@ public:
       , m_lockPositionX(lockPositionX)
       , m_lockPositionY(lockPositionY) {}
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
     if (m_lockPositionX && m_lockPositionY) return;
     start();
     m_firstPos = pos;
   }
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     if (m_lockPositionX && m_lockPositionY) return;
     TPointD delta = pos - m_firstPos;
     if (m_lockPositionX)
@@ -318,7 +318,7 @@ else return 0.0;
       return 0.0;
   }
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
     m_firstPos = pos;
     start();
     assert(m_spline);
@@ -358,7 +358,7 @@ else return 0.0;
       return false;
   }
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override {
     double len = tcrop(getLengthAtPos(pos) + m_offset, 0.0, m_splineLength);
     snapLengthToControlPoint(len);
     setValue(lengthToParamValue(len));
@@ -379,14 +379,14 @@ public:
       : DragChannelTool(TStageObject::T_Angle, globalKeyframesEnabled)
       , m_lockRotation(lockRotation) {}
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
     if (m_lockRotation) return;
     m_firstPos = pos;
     m_lastPos  = pos;
     m_center   = getCenter();
     start();
   }
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override {
     if (m_lockRotation) return;
     TPointD a = m_lastPos - m_center;
     TPointD b = pos - m_center;
@@ -424,14 +424,14 @@ public:
       , m_lockGlobalScale(lockGlobalScale)
       , m_r0(0) {}
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
     if (m_lockGlobalScale) return;
     m_firstPos = pos;
     m_center   = getCenter();
     start();
     m_r0 = norm(m_firstPos - m_center);
   }
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     if (m_lockGlobalScale) return;
     if (m_r0 < 0.001) return;
 
@@ -462,13 +462,13 @@ public:
       , m_lockScaleH(lockScaleH)
       , m_lockScaleV(lockScaleV) {}
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
     if (m_lockScaleH && m_lockScaleV) return;
     m_firstPos = pos;
     m_center   = getCenter();
     start();
   }
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     if (m_lockScaleH && m_lockScaleV) return;
     TPointD center = m_center + TPointD(40, 40);
     TPointD a      = m_firstPos - center;
@@ -533,13 +533,13 @@ public:
       , m_lockShearH(lockShearH)
       , m_lockShearV(lockShearV) {}
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override {
     if (m_lockShearH && m_lockShearV) return;
     m_firstPos = pos;
     m_center   = getCenter();
     start();
   }
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     if (m_lockShearH && m_lockShearV) return;
     TPointD a = m_firstPos - m_center;
     TPointD b = pos - m_center;
@@ -575,13 +575,13 @@ public:
       : DragChannelTool(TStageObject::T_Z, globalKeyframesEnabled)
       , m_viewer(viewer) {}
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
     m_lastPos  = e.m_pos;
     m_firstPos = pos;
     m_dz       = 0;
     start();
   }
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     double dz = m_viewer->projectToZ(e.m_pos - m_lastPos);
     m_lastPos = e.m_pos;
     if (dz != 0.0) {
@@ -668,7 +668,7 @@ public:
   EditTool();
   ~EditTool();
 
-  ToolType getToolType() const { return TTool::ColumnTool; }
+  ToolType getToolType() const override { return TTool::ColumnTool; }
 
   bool doesApply() const;  // ritorna vero se posso deformare l'oggetto corrente
   void saveOldValues();
@@ -683,29 +683,29 @@ public:
   void squeeze();
   void shear(const TPointD &pos, bool single);
 
-  void updateTranslation();
+  void updateTranslation() override;
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &) override;
 
-  void mouseMove(const TPointD &, const TMouseEvent &e);
+  void mouseMove(const TPointD &, const TMouseEvent &e) override;
 
-  void draw();
+  void draw() override;
 
   void transform(const TAffine &aff);
 
-  void onActivate();
-  void onDeactivate();
-  bool onPropertyChanged(std::string propertyName);
+  void onActivate() override;
+  void onDeactivate() override;
+  bool onPropertyChanged(std::string propertyName) override;
 
   void computeBBox();
 
-  int getCursorId() const;
+  int getCursorId() const override;
 
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
-  void updateMatrix() {
+  void updateMatrix() override {
     setMatrix(
         getCurrentObjectParentMatrix2());  // getCurrentObjectParentMatrix());
   }

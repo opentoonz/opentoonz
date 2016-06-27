@@ -111,7 +111,7 @@ public:
     }
   }
 
-  void undo() const {
+  void undo() const override {
     TTool::Application *app = TTool::getApplication();
     if (!app) return;
 
@@ -132,7 +132,7 @@ public:
     notifyImageChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     TTool::Application *app = TTool::getApplication();
     if (!app) return;
 
@@ -153,14 +153,14 @@ public:
     notifyImageChanged();
   }
 
-  void onAdd() {}
+  void onAdd() override {}
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  virtual QString getToolName() {
+  QString getToolName() override {
     return QString("Fill Tool : %1").arg(QString::fromStdWString(m_type));
   }
-  int getHistoryType() { return HistoryType::FillTool; }
+  int getHistoryType() override { return HistoryType::FillTool; }
 };
 
 //=============================================================================
@@ -197,7 +197,7 @@ public:
     if (stroke) m_stroke = new TStroke(*stroke);
   }
 
-  void undo() const {
+  void undo() const override {
     TTool::Application *app = TTool::getApplication();
     if (!app) return;
 
@@ -221,7 +221,7 @@ public:
     notifyImageChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     TTool::Application *app = TTool::getApplication();
     if (!app) return;
 
@@ -235,9 +235,9 @@ public:
     notifyImageChanged();
   }
 
-  void onAdd() {}
+  void onAdd() override {}
 
-  int getSize() const {
+  int getSize() const override {
     int size1 = m_regionFillInformation
                     ? m_regionFillInformation->capacity() *
                           sizeof(m_regionFillInformation)
@@ -249,8 +249,8 @@ public:
     return sizeof(*this) + size1 + size2 + 500;
   }
 
-  virtual QString getToolName() { return QString("Fill Tool : "); }
-  int getHistoryType() { return HistoryType::FillTool; }
+  QString getToolName() override { return QString("Fill Tool : "); }
+  int getHistoryType() override { return HistoryType::FillTool; }
 };
 
 //=============================================================================
@@ -277,7 +277,7 @@ public:
       , m_params(params)
       , m_saveboxOnly(saveboxOnly) {}
 
-  void redo() const {
+  void redo() const override {
     TToonzImageP image = getImage();
     if (!image) return;
     bool recomputeSavebox = false;
@@ -312,13 +312,15 @@ public:
     }
   }
 
-  int getSize() const { return sizeof(*this) + TRasterUndo::getSize(); }
+  int getSize() const override {
+    return sizeof(*this) + TRasterUndo::getSize();
+  }
 
-  virtual QString getToolName() {
+  QString getToolName() override {
     return QString("Fill Tool : %1")
         .arg(QString::fromStdWString(m_params.m_fillType));
   }
-  int getHistoryType() { return HistoryType::FillTool; }
+  int getHistoryType() override { return HistoryType::FillTool; }
 };
 
 //=============================================================================
@@ -351,7 +353,7 @@ public:
     m_s = s ? new TStroke(*s) : 0;
   }
 
-  void redo() const {
+  void redo() const override {
     TToonzImageP image = getImage();
     if (!image) return;
     TRasterCM32P ras = image->getRaster();
@@ -382,16 +384,16 @@ public:
     }
   }
 
-  int getSize() const {
+  int getSize() const override {
     int size =
         m_s ? m_s->getControlPointCount() * sizeof(TThickPoint) + 100 : 0;
     return sizeof(*this) + TRasterUndo::getSize() + size;
   }
 
-  virtual QString getToolName() {
+  QString getToolName() override {
     return QString("Fill Tool : %1").arg(QString::fromStdWString(m_colorType));
   }
-  int getHistoryType() { return HistoryType::FillTool; }
+  int getHistoryType() override { return HistoryType::FillTool; }
 };
 
 //=============================================================================
@@ -414,7 +416,7 @@ public:
       , m_onlyUnfilled(onlyUnfilled)
       , m_fidToLearn(fidToLearn) {}
 
-  void redo() const {
+  void redo() const override {
     TToonzImageP image        = getImage();
     TToonzImageP imageToLearn = m_level->getFrame(m_fidToLearn, false);
     if (!image || !imageToLearn) return;
@@ -433,7 +435,9 @@ public:
     }
   }
 
-  int getSize() const { return sizeof(*this) + TRasterUndo::getSize(); }
+  int getSize() const override {
+    return sizeof(*this) + TRasterUndo::getSize();
+  }
 };
 
 //=============================================================================
@@ -455,7 +459,7 @@ public:
 
   void setTileSet(TTileSetCM32 *tileSet) { m_tileSet = tileSet; }
 
-  void redo() const {
+  void redo() const override {
     TToonzImageP image = getImage();
     if (!image) return;
 
@@ -469,7 +473,7 @@ public:
     }
   }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) + TRasterUndo::getSize() + m_tileSet->getMemorySize();
   }
 };
@@ -505,7 +509,7 @@ public:
     m_selectingStroke = selectingStroke ? new TStroke(*selectingStroke) : 0;
   }
 
-  void undo() const {
+  void undo() const override {
     TTool::Application *app = TTool::getApplication();
     if (!app) return;
     TVectorImageP img = m_level->getFrame(m_frameId, true);
@@ -523,7 +527,7 @@ public:
     notifyImageChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     TTool::Application *app = TTool::getApplication();
     if (!app) return;
 
@@ -546,7 +550,7 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     int size =
         m_selectingStroke
             ? m_selectingStroke->getControlPointCount() * sizeof(TThickPoint) +
@@ -1007,7 +1011,7 @@ public:
   }
 
   void process(TImageP img, double t, TXshSimpleLevel *sl,
-               const TFrameId &fid) {
+               const TFrameId &fid) override {
     if (!m_firstImage) {
       TPointD p0 = m_firstRect.getP00() * (1 - t) + m_lastRect.getP00() * t;
       TPointD p1 = m_firstRect.getP11() * (1 - t) + m_lastRect.getP11() * t;
@@ -1052,7 +1056,7 @@ public:
               const FillParameters &params)
       : m_firstPoint(firstPoint), m_lastPoint(lastPoint), m_params(params) {}
   void process(TImageP img, double t, TXshSimpleLevel *sl,
-               const TFrameId &fid) {
+               const TFrameId &fid) override {
     TPointD p = m_firstPoint * (1 - t) + m_lastPoint * t;
     doFill(img, p, m_params, false, sl, fid);
   }
@@ -1491,7 +1495,7 @@ public:
       m_firstFrameSelected = false;  // nel caso sono passato allo stato 1 e
                                      // torno all'immagine iniziale, torno allo
                                      // stato iniziale
-    else {  // cambio stato.
+    else {                           // cambio stato.
       m_firstFrameSelected = true;
       if (m_type != FREEHAND && m_type != POLYLINE) {
         assert(!m_selectingRect.isEmpty());
@@ -1691,35 +1695,35 @@ class FillTool : public TTool {
 public:
   FillTool(int targetType);
 
-  ToolType getToolType() const { return TTool::LevelWriteTool; }
+  ToolType getToolType() const override { return TTool::LevelWriteTool; }
 
-  void updateTranslation();
+  void updateTranslation() override;
 
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
   FillParameters getFillParameters() const;
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonUp(const TPointD &pos, const TMouseEvent &e);
-  void mouseMove(const TPointD &pos, const TMouseEvent &e);
-  void leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e);
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonUp(const TPointD &pos, const TMouseEvent &e) override;
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override;
+  void leftButtonDoubleClick(const TPointD &pos, const TMouseEvent &e) override;
   void resetMulti();
 
-  bool onPropertyChanged(std::string propertyName);
-  void onImageChanged();
+  bool onPropertyChanged(std::string propertyName) override;
+  void onImageChanged() override;
 
-  void draw();
+  void draw() override;
 
   int pick(const TImageP &image, const TPointD &pos);
   int pickOnionColor(const TPointD &pos);
 
-  void onEnter();
+  void onEnter() override;
 
-  void onActivate();
-  void onDeactivate();
+  void onActivate() override;
+  void onDeactivate() override;
 
-  int getCursorId() const;
+  int getCursorId() const override;
 
   int getColorClass() const { return 2; }
 };

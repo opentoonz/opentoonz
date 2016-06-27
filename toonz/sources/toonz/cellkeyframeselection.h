@@ -33,9 +33,9 @@ public:
     m_xsheetHandle = xsheetHandle;
   }
 
-  void enableCommands();
+  void enableCommands() override;
 
-  bool isEmpty() const;
+  bool isEmpty() const override;
 
   void copyCellsKeyframes();
   void pasteCellsKeyframes();
@@ -45,7 +45,7 @@ public:
   //! \note: puo' anche essere r0>r1 o c0>c1
   void selectCellsKeyframes(int r0, int c0, int r1, int c1);
   void selectCellKeyframe(int row, int col);
-  void selectNone();
+  void selectNone() override;
 
   /*
   void getSelectedCells(int &r0, int &c0, int &r1, int &c1) const;

@@ -114,9 +114,9 @@ private:
   TImageReaderLayerPsd &operator=(const TImageReaderLayerPsd &src);
 
 public:
-  TImageP load();
+  TImageP load() override;
 
-  const TImageInfo *getImageInfo() const { return m_info; }
+  const TImageInfo *getImageInfo() const override { return m_info; }
 
 private:
   TPSDReader *m_psdreader;
@@ -164,7 +164,7 @@ private:
 
 public:
   // not implemented
-  void save(const TImageP &);
+  void save(const TImageP &) override;
 
 private:
   TLevelWriterPsd *m_lwm;

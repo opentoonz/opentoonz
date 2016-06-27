@@ -305,24 +305,26 @@ public:
 
   // Derived rasters creation
 
-  TRasterP clone() const {
+  TRasterP clone() const override {
     TRasterP dst = TRasterPT<T>(m_lx, m_ly);
     TRasterP src(const_cast<TRaster *>((const TRaster *)this));
     dst->copy(src);
     return dst;
   }
 
-  TRasterP create() const { return TRasterPT<T>(m_lx, m_ly); }
+  TRasterP create() const override { return TRasterPT<T>(m_lx, m_ly); }
 
-  virtual TRasterP create(int lx, int ly) const { return TRasterPT<T>(lx, ly); }
+  TRasterP create(int lx, int ly) const override {
+    return TRasterPT<T>(lx, ly);
+  }
 
   //!\include raster_ex2.cpp
-  TRasterP extract(int x0, int y0, int x1, int y1) {
+  TRasterP extract(int x0, int y0, int x1, int y1) override {
     TRect rect(x0, y0, x1, y1);
     return extract(rect);
   };
 
-  TRasterP extract(TRect &rect) {
+  TRasterP extract(TRect &rect) override {
     if (isEmpty() || getBounds().overlaps(rect) == false) return TRasterP();
     rect = getBounds() * rect;
     // addRef();

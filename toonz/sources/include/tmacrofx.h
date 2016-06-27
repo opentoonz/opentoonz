@@ -41,15 +41,17 @@ public:
   TMacroFx();
   ~TMacroFx();
 
-  TFx *clone(bool recursive = true) const;
+  TFx *clone(bool recursive = true) const override;
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &info);
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &info) override;
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
 
-  TFxTimeRegion getTimeRegion() const;
+  TFxTimeRegion getTimeRegion() const override;
 
-  std::string getPluginId() const;
+  std::string getPluginId() const override;
 
   void setRoot(TFx *root);
   TFx *getRoot() const;
@@ -63,17 +65,18 @@ public:
 
   std::string getMacroFxType() const;
 
-  bool canHandle(const TRenderSettings &info, double frame);
+  bool canHandle(const TRenderSettings &info, double frame) override;
 
-  std::string getAlias(double frame, const TRenderSettings &info) const;
+  std::string getAlias(double frame,
+                       const TRenderSettings &info) const override;
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
   bool isEditing() { return m_isEditing; }
   void editMacro(bool edit) { m_isEditing = edit; }
 
   void compatibilityTranslatePort(int majorVersion, int minorVersion,
-                                  std::string &portName);
+                                  std::string &portName) override;
 
 private:
   // non implementati

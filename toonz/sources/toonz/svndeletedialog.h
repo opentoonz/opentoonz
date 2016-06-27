@@ -53,7 +53,7 @@ public:
                   int sceneIconAdded);
 
 protected:
-  void showEvent(QShowEvent *);
+  void showEvent(QShowEvent *) override;
 
 private:
   void switchToCloseButton();

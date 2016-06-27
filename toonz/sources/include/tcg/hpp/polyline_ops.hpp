@@ -27,7 +27,7 @@ StandardDeviationEvaluator<RanIt>::StandardDeviationEvaluator(
     : m_begin(begin), m_end(end) {
   // Let m_sum[i] and m_sum2[i] be respectively the sums of vertex coordinates
   //(relative to begin is sufficient) from 0 to i, and the sums of their
-  //squares;
+  // squares;
   // m_sumsMix contain sums of xy terms.
 
   diff_type i, n = m_end - m_begin;

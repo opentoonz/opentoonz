@@ -41,11 +41,11 @@ public:
   ~MotionPathMenu();
 
 protected:
-  void paintEvent(QPaintEvent *);
-  void mousePressEvent(QMouseEvent *event);
-  void mouseMoveEvent(QMouseEvent *event);
-  void mouseReleaseEvent(QMouseEvent *event);
-  void leaveEvent(QEvent *event);
+  void paintEvent(QPaintEvent *) override;
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  void leaveEvent(QEvent *event) override;
 };
 
 //=============================================================================
@@ -71,9 +71,9 @@ public:
   virtual void refresh(){};
 
 protected:
-  void mouseMoveEvent(QMouseEvent *event);
-  void focusOutEvent(QFocusEvent *e);
-  void focusInEvent(QFocusEvent *e) {}
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void focusOutEvent(QFocusEvent *e) override;
+  void focusInEvent(QFocusEvent *e) override {}
   void selectCurrent(const QString &text);
 
 protected slots:
@@ -91,10 +91,10 @@ public:
   ChangeObjectParent(QWidget *parent = 0);
   ~ChangeObjectParent();
 
-  void refresh();
+  void refresh() override;
 
 protected slots:
-  void onTextChanged(const QString &);
+  void onTextChanged(const QString &) override;
 };
 
 //=============================================================================
@@ -108,10 +108,10 @@ public:
   ChangeObjectHandle(QWidget *parent = 0);
   ~ChangeObjectHandle();
 
-  void refresh();
+  void refresh() override;
 
 protected slots:
-  void onTextChanged(const QString &);
+  void onTextChanged(const QString &) override;
 };
 
 //=============================================================================
@@ -136,7 +136,7 @@ public:
   void show(QPoint pos, int col);
 
 protected:
-  void focusOutEvent(QFocusEvent *);
+  void focusOutEvent(QFocusEvent *) override;
 
 protected slots:
   void renameColumn();
@@ -159,7 +159,7 @@ public:
 
 protected:
   // void mouseMoveEvent ( QMouseEvent * e );
-  void mouseReleaseEvent(QMouseEvent *e);
+  void mouseReleaseEvent(QMouseEvent *e) override;
 
 protected slots:
   void onSliderReleased();
@@ -227,14 +227,14 @@ public:
 protected:
   void select(int columnIndex, QMouseEvent *event);
 
-  void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
-  void mousePressEvent(QMouseEvent *event);
-  void mouseMoveEvent(QMouseEvent *event);
-  void mouseReleaseEvent(QMouseEvent *event);
-  void mouseDoubleClickEvent(QMouseEvent *event);
-  void contextMenuEvent(QContextMenuEvent *event);
-  bool event(QEvent *event);
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void contextMenuEvent(QContextMenuEvent *event) override;
+  bool event(QEvent *event) override;
 
 protected slots:
   void onSubSampling(QAction *);

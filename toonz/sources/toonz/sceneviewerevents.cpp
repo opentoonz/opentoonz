@@ -562,12 +562,12 @@ void SceneViewer::wheelEvent(QWheelEvent *event) {
 
   default:  // Qt::MouseEventSynthesizedByQt,
             // Qt::MouseEventSynthesizedByApplication
-  {
-    std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
-                 "Qt::MouseEventSynthesizedByApplication"
-              << std::endl;
-    break;
-  }
+    {
+      std::cout << "not supported event: Qt::MouseEventSynthesizedByQt, "
+                   "Qt::MouseEventSynthesizedByApplication"
+                << std::endl;
+      break;
+    }
 
   }  // end switch
 
@@ -660,7 +660,7 @@ class ViewerZoomer : public ImageUtils::ShortcutZoomer {
 public:
   ViewerZoomer(SceneViewer *parent) : ShortcutZoomer(parent) {}
 
-  bool zoom(bool zoomin, bool resetZoom) {
+  bool zoom(bool zoomin, bool resetZoom) override {
     SceneViewer *sceneViewer = static_cast<SceneViewer *>(getWidget());
 
     resetZoom ? sceneViewer->resetSceneViewer()
@@ -669,17 +669,17 @@ public:
     return true;
   }
 
-  bool fit() {
+  bool fit() override {
     static_cast<SceneViewer *>(getWidget())->fitToCamera();
     return true;
   }
 
-  bool setActualPixelSize() {
+  bool setActualPixelSize() override {
     static_cast<SceneViewer *>(getWidget())->setActualPixelSize();
     return true;
   }
 
-  bool toggleFullScreen(bool quit) {
+  bool toggleFullScreen(bool quit) override {
     if (ImageUtils::FullScreenWidget *fsWidget =
             dynamic_cast<ImageUtils::FullScreenWidget *>(
                 getWidget()->parentWidget()))

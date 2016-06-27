@@ -25,7 +25,8 @@ public:
 
   ~BlurFx(){};
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (m_input.isConnected()) {
       bool ret = m_input->doGetBBox(frame, bBox, info);
 
@@ -44,14 +45,14 @@ public:
 
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput);
+                 TRenderSettings &infoOnInput) override;
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &) override;
 
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info);
+                           const TRenderSettings &info) override;
 
-  bool canHandle(const TRenderSettings &info, double frame) {
+  bool canHandle(const TRenderSettings &info, double frame) override {
     if (m_value->getValue(frame) == 0) return true;
     return (isAlmostIsotropic(info.m_affine));
   }

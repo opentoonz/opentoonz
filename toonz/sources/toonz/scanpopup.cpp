@@ -879,7 +879,7 @@ OpenPopupCommandHandler<AutocenterPopup> openAutocenterPopup(MI_Autocenter);
 class ScanCommand : public MenuItemHandler {
 public:
   ScanCommand() : MenuItemHandler("MI_Scan") {}
-  void execute() { doScan(); }
+  void execute() override { doScan(); }
 } ScanCommand;
 
 //=========================================================================================
@@ -895,7 +895,7 @@ public:
   SetCropboxCommand()
       : MenuItemHandler("MI_SetScanCropbox"), m_currentTool(0) {}
 
-  void execute() {
+  void execute() override {
     TApp *app                         = TApp::instance();
     SetScanCropboxCheck *cropboxCheck = SetScanCropboxCheck::instance();
     cropboxCheck->setIsEnabled(!cropboxCheck->isEnabled());
@@ -961,7 +961,7 @@ class ResetCropboxCommand : public MenuItemHandler {
 public:
   ResetCropboxCommand() : MenuItemHandler("MI_ResetScanCropbox") {}
 
-  void execute() {
+  void execute() override {
     TScannerParameters *sp = TApp::instance()
                                  ->getCurrentScene()
                                  ->getScene()
@@ -995,11 +995,11 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  ToolType getToolType() const { return TTool::GenericTool; }
+  ToolType getToolType() const override { return TTool::GenericTool; }
 
   //-----------------------------------------------------------------------------
 
-  void draw() {
+  void draw() override {
     TRasterImageP ri = TImageCache::instance()->get(m_imgId, false);
     if (ri) {
       TPointD center = ri->getRaster()->getCenterD();
@@ -1039,7 +1039,7 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  void mouseMove(const TPointD &p, const TMouseEvent &e) {
+  void mouseMove(const TPointD &p, const TMouseEvent &e) override {
     double pixelSize = getPixelSize();
     TPointD size(10 * pixelSize, 10 * pixelSize);
     TRectD cropBox = rect2pix(m_parameters->getCropBox());
@@ -1077,13 +1077,13 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
     m_lastPos = pos;
   }
 
   //-----------------------------------------------------------------------------
 
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     TPointD dp         = pos - m_lastPos;
     double scaleFactor = Stage::inch / previewDPI;
     dp.x               = ((dp.x / scaleFactor) * 25.4) / previewDPI;
@@ -1146,7 +1146,7 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  int getCursorId() const {
+  int getCursorId() const override {
     switch (m_scaling) {
     case eNone:
       return ToolCursor::StrokeSelectCursor;
@@ -1172,7 +1172,7 @@ public:
 
   //-----------------------------------------------------------------------------
 
-  void onActivate() {
+  void onActivate() override {
     m_parameters = TTool::getApplication()
                        ->getCurrentScene()
                        ->getScene()
@@ -1180,7 +1180,7 @@ public:
                        ->getScanParameters();
   }
 
-  void onEnter() {
+  void onEnter() override {
     m_parameters = TTool::getApplication()
                        ->getCurrentScene()
                        ->getScene()

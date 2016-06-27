@@ -246,7 +246,7 @@ public:
     }
   }
 
-  void undo() const {
+  void undo() const override {
     int i;
     // TPalette *palette = m_matchlinePalette->clone();
     // m_sl->setPalette(palette);
@@ -265,7 +265,7 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     int i;
 
     // for (i=0; i<m_fids.size(); i++)
@@ -280,7 +280,7 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
   ~DeleteMatchlineUndo() {
     int i;
@@ -365,7 +365,7 @@ public:
     m_fullpath = m_xl->getPath().getWideString();
   }
 
-  void undo() const {
+  void undo() const override {
     std::map<TFrameId, QString>::const_iterator it = m_images.begin();
     TPalette *palette = m_palette->clone();
     m_level->setPalette(palette);
@@ -391,12 +391,12 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     mergeCmapped(m_column, m_mColumn, QString::fromStdWString(m_fullpath),
                  true);
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
   ~MergeCmappedUndo() {
     std::map<TFrameId, QString>::const_iterator it = m_images.begin();

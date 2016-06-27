@@ -88,7 +88,7 @@ public:
       , m_oldEditedFlag(oldColor.getIsEditedFlag())
       , m_newEditedFlag(newColor.getIsEditedFlag()) {}
 
-  void undo() const {
+  void undo() const override {
     m_palette->setStyle(m_styleId, m_oldColor->clone());
     m_palette->getStyle(m_styleId)->setIsEditedFlag(m_oldEditedFlag);
     m_palette->getStyle(m_styleId)->setName(m_oldName);
@@ -101,7 +101,7 @@ public:
     m_paletteHandle->notifyColorStyleChanged(false, false);
   }
 
-  void redo() const {
+  void redo() const override {
     m_palette->setStyle(m_styleId, m_newColor->clone());
     m_palette->getStyle(m_styleId)->setIsEditedFlag(m_newEditedFlag);
     m_palette->getStyle(m_styleId)->setName(m_newName);
@@ -115,9 +115,11 @@ public:
   }
 
   // imprecise - depends on the style
-  int getSize() const { return sizeof(*this) + 2 * sizeof(TColorStyle *); }
+  int getSize() const override {
+    return sizeof(*this) + 2 * sizeof(TColorStyle *);
+  }
 
-  QString getHistoryString() {
+  QString getHistoryString() override {
     return QObject::tr(
                "Change Style   Palette : %1  Style#%2  [R%3 G%4 B%5] -> [R%6 "
                "G%7 B%8]")
@@ -131,7 +133,7 @@ public:
         .arg(m_newColor->getMainColor().b);
   }
 
-  int getHistoryType() { return HistoryType::Palette; }
+  int getHistoryType() override { return HistoryType::Palette; }
 };
 
 }  // namespace
@@ -1860,31 +1862,33 @@ public:
 
   static CustomStyleManager *styleManager();
 
-  bool event(QEvent *e);
+  bool event(QEvent *e) override;
 
-  void showEvent(QShowEvent *) {
+  void showEvent(QShowEvent *) override {
     connect(styleManager(), SIGNAL(patternAdded()), this, SLOT(computeSize()));
     styleManager()->loadItems();
   }
-  void hideEvent(QHideEvent *) {
+  void hideEvent(QHideEvent *) override {
     disconnect(styleManager(), SIGNAL(patternAdded()), this,
                SLOT(computeSize()));
   }
-  bool loadIfNeeded() { return false; }  // serve?
+  bool loadIfNeeded() override { return false; }  // serve?
   /*
 if(!m_loaded) {loadItems(); m_loaded=true;return true;}
 else return false;
 }
   */
 
-  int getChipCount() const { return styleManager()->getPatternCount(); }
+  int getChipCount() const override {
+    return styleManager()->getPatternCount();
+  }
 
-  void drawChip(QPainter &p, QRect rect, int index) {
+  void drawChip(QPainter &p, QRect rect, int index) override {
     assert(0 <= index && index < getChipCount());
     CustomStyleManager::PatternData pattern = styleManager()->getPattern(index);
     p.drawImage(rect, *pattern.m_image);
   }
-  void onSelect(int index);
+  void onSelect(int index) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -1947,22 +1951,24 @@ public:
 
   static CustomStyleManager *styleManager();
 
-  bool event(QEvent *e);
+  bool event(QEvent *e) override;
 
-  void showEvent(QShowEvent *) {
+  void showEvent(QShowEvent *) override {
     connect(styleManager(), SIGNAL(patternAdded()), this, SLOT(computeSize()));
     styleManager()->loadItems();
   }
-  void hideEvent(QHideEvent *) {
+  void hideEvent(QHideEvent *) override {
     disconnect(styleManager(), SIGNAL(patternAdded()), this,
                SLOT(computeSize()));
   }
-  bool loadIfNeeded() { return false; }
+  bool loadIfNeeded() override { return false; }
 
-  int getChipCount() const { return styleManager()->getPatternCount() + 1; }
+  int getChipCount() const override {
+    return styleManager()->getPatternCount() + 1;
+  }
 
-  void drawChip(QPainter &p, QRect rect, int index);
-  void onSelect(int index);
+  void drawChip(QPainter &p, QRect rect, int index) override;
+  void onSelect(int index) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -2052,7 +2058,7 @@ class TextureStyleChooserPage : public StyleChooserPage {
 public:
   TextureStyleChooserPage(QWidget *parent = 0) : StyleChooserPage(parent) {}
 
-  bool loadIfNeeded() {
+  bool loadIfNeeded() override {
     if (!m_loaded) {
       loadItems();
       m_loaded = true;
@@ -2061,19 +2067,19 @@ public:
       return false;
   }
 
-  int getChipCount() const { return m_textures.size(); }
+  int getChipCount() const override { return m_textures.size(); }
 
   static void loadTexture(const TFilePath &fp);
   static void loadItems();
 
-  void drawChip(QPainter &p, QRect rect, int index) {
+  void drawChip(QPainter &p, QRect rect, int index) override {
     assert(0 <= index && index < getChipCount());
     p.drawImage(rect, rasterToQImage(m_textures[index].m_raster));
   }
 
-  void onSelect(int index);
+  void onSelect(int index) override;
 
-  bool event(QEvent *e);
+  bool event(QEvent *e) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -2186,7 +2192,7 @@ public:
                           const TFilePath &rootDir = TFilePath())
       : StyleChooserPage(parent) {}
 
-  bool loadIfNeeded() {
+  bool loadIfNeeded() override {
     if (!m_loaded) {
       loadItems();
       m_loaded = true;
@@ -2194,13 +2200,13 @@ public:
     } else
       return false;
   }
-  int getChipCount() const { return m_customStyles.size(); }
+  int getChipCount() const override { return m_customStyles.size(); }
 
   void loadItems();
 
-  void drawChip(QPainter &p, QRect rect, int index);
-  void onSelect(int index);
-  bool event(QEvent *e);
+  void drawChip(QPainter &p, QRect rect, int index) override;
+  void onSelect(int index) override;
+  bool event(QEvent *e) override;
 };
 
 //-----------------------------------------------------------------------------

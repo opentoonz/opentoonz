@@ -104,7 +104,7 @@ class MergeColumnsCommand : public MenuItemHandler {
 public:
   MergeColumnsCommand() : MenuItemHandler(MI_MergeColumns) {}
 
-  void execute() {
+  void execute() override {
     TColumnSelection *selection =
         dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
 
@@ -139,7 +139,7 @@ class ApplyMatchlinesCommand : public MenuItemHandler {
 public:
   ApplyMatchlinesCommand() : MenuItemHandler(MI_ApplyMatchLines) {}
 
-  void execute() {
+  void execute() override {
     TColumnSelection *selection =
         dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
     if (!selection) {
@@ -237,7 +237,7 @@ public:
       , m_insertedColumnIndices(insertedColumnIndices)
       , m_levelname(levelname) {}
 
-  void undo() const {
+  void undo() const override {
     TApp *app         = TApp::instance();
     ToonzScene *scene = app->getCurrentScene()->getScene();
     TXsheet *xsh      = scene->getXsheet();
@@ -258,9 +258,11 @@ public:
     }
     app->getCurrentXsheet()->notifyXsheetChanged();
   }
-  void redo() const { doCloneLevelNoSave(m_range, m_levelname, false); }
+  void redo() const override {
+    doCloneLevelNoSave(m_range, m_levelname, false);
+  }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof *this +
            (sizeof(TXshLevelP) + sizeof(TXshSimpleLevel *)) *
                m_createdLevels.size();
@@ -414,7 +416,7 @@ void cloneColumn(const TCellSelection::Range &cells,
 class MergeCmappedCommand : public MenuItemHandler {
 public:
   MergeCmappedCommand() : MenuItemHandler(MI_MergeCmapped) {}
-  void execute() {
+  void execute() override {
     TColumnSelection *selection =
         dynamic_cast<TColumnSelection *>(TSelection::getCurrent());
     if (!selection) {
@@ -583,7 +585,7 @@ void doDeleteCommand(bool isMatchline) {
 class DeleteInkCommand : public MenuItemHandler {
 public:
   DeleteInkCommand() : MenuItemHandler(MI_DeleteInk) {}
-  void execute() { doDeleteCommand(false); }
+  void execute() override { doDeleteCommand(false); }
 
 } DeleteInkCommand;
 
@@ -592,6 +594,6 @@ public:
 class DeleteMatchlinesCommand : public MenuItemHandler {
 public:
   DeleteMatchlinesCommand() : MenuItemHandler(MI_DeleteMatchLines) {}
-  void execute() { doDeleteCommand(true); }
+  void execute() override { doDeleteCommand(true); }
 
 } DeleteMatchlinesCommand;

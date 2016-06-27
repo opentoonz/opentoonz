@@ -82,7 +82,7 @@ public:
   void setSelection(FunctionSelection *);
   void setFrameHandle(TFrameHandle *frameHandle);
 
-  void onChange(const TParamChange &);
+  void onChange(const TParamChange &) override;
 
   bool anyWidgetHasFocus();
 

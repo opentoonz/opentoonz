@@ -15,14 +15,16 @@ public:
       : TFarmProxy(hostName, addr, port) {}
 
   // TFarmServer interface implementation
-  int addTask(const QString &taskid, const QString &cmdline);
-  int terminateTask(const QString &taskid);
-  int getTasks(vector<QString> &tasks);
+  int addTask(const QString &taskid, const QString &cmdline) override;
+  int terminateTask(const QString &taskid) override;
+  int getTasks(vector<QString> &tasks) override;
 
-  void queryHwInfo(HwInfo &hwInfo);
+  void queryHwInfo(HwInfo &hwInfo) override;
 
-  void attachController(const QString &name, const QString &addr, int port);
-  void detachController(const QString &name, const QString &addr, int port);
+  void attachController(const QString &name, const QString &addr,
+                        int port) override;
+  void detachController(const QString &name, const QString &addr,
+                        int port) override;
 };
 
 //------------------------------------------------------------------------------

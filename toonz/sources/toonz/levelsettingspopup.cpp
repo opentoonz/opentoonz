@@ -1052,7 +1052,7 @@ class ViewLevelFileInfoHandler : public MenuItemHandler {
 public:
   ViewLevelFileInfoHandler(CommandId cmdId) : MenuItemHandler(cmdId) {}
 
-  void execute() {
+  void execute() override {
     TSelection *selection =
         TApp::instance()->getCurrentSelection()->getSelection();
 
@@ -1110,7 +1110,7 @@ class ViewLevelHandler : public MenuItemHandler {
 public:
   ViewLevelHandler(CommandId cmdId) : MenuItemHandler(cmdId) {}
 
-  void execute() {
+  void execute() override {
     TSelection *selection =
         TApp::instance()->getCurrentSelection()->getSelection();
     if (FileSelection *fileSelection =

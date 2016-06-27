@@ -110,14 +110,14 @@ public:
 
   ~FrameCountTask();
 
-  void run();
+  void run() override;
 
-  QThread::Priority runningPriority();
+  QThread::Priority runningPriority() override;
 
 public slots:
 
-  void onStarted(TThread::RunnableP thisTask);
-  void onCanceled(TThread::RunnableP thisTask);
+  void onStarted(TThread::RunnableP thisTask) override;
+  void onCanceled(TThread::RunnableP thisTask) override;
 };
 
 //============================

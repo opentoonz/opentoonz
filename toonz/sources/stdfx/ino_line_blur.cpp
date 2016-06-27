@@ -67,28 +67,24 @@ IGS_LINE_BLUR_EXPORT void convert(
 
 //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 
-#include <windows.h>
-#include <stdio.h>
-#include <math.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdarg.h>
-#include <time.h>
+#include <cstdio>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <cstdarg>
+#include <ctime>
 #include <assert.h>
-#include <stdlib.h>
+#include <cstdlib>
+
 #include <iostream>
 #include <stdexcept>
+
+#include <windows.h>
+
 namespace {
 
 #ifndef _pri_h_
 #define _pri_h_
-
-/* Windowsではstdint.hが見付からない */
-#if defined _WIN32
-typedef int int32_t;
-#else
-#include <stdint.h> /* for int32_t */
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -5238,15 +5234,15 @@ int thinnest_ui16_image::exec05_thin(void) {
 /* メモリ開放 */
 void thinnest_ui16_image::mem_free(void) {
 #if 0
-	if (NULL !=	this->_ui16p_channel[0]) {
-		if (ON == this->_i_mv_sw) {
-			pri_funct_msg_ttvr( "thinnest_ui16_image::mem_free()" );
-		}
+  if (NULL !=	this->_ui16p_channel[0]) {
+    if (ON == this->_i_mv_sw) {
+      pri_funct_msg_ttvr( "thinnest_ui16_image::mem_free()" );
+    }
 
-		free(	this->_ui16p_channel[0]);/* ここで落ちる2014-5-16 */
-			this->_ui16p_channel[0] = NULL;
-			this->_ui16p_channel[1] = NULL;
-	}
+    free(	this->_ui16p_channel[0]);/* ここで落ちる2014-5-16 */
+      this->_ui16p_channel[0] = NULL;
+      this->_ui16p_channel[1] = NULL;
+  }
 #endif
   if (NULL != this->memory_free_this_) {
     if (ON == this->_i_mv_sw) {

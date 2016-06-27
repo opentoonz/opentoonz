@@ -100,13 +100,14 @@ Use this constructor with modifyControlPoints.
 
   virtual ~TStrokePointDeformation();
 
-  TThickPoint getDisplacement(const TStroke &stroke, double s) const;
-  TThickPoint getDisplacementForControlPoint(const TStroke &s, UINT n) const;
+  TThickPoint getDisplacement(const TStroke &stroke, double s) const override;
+  TThickPoint getDisplacementForControlPoint(const TStroke &s,
+                                             UINT n) const override;
   TThickPoint getDisplacementForControlPointLen(const TStroke &stroke,
-                                                double cpLen) const;
+                                                double cpLen) const override;
 
-  double getDelta(const TStroke &stroke, double w) const;
-  double getMaxDiff() const;
+  double getDelta(const TStroke &stroke, double w) const override;
+  double getMaxDiff() const override;
 };
 
 //=============================================================================
@@ -143,15 +144,15 @@ Use this constructor with movePoints.
 
   virtual ~TStrokeParamDeformation();
 
-  TThickPoint getDisplacement(const TStroke &, double) const;
+  TThickPoint getDisplacement(const TStroke &, double) const override;
   TThickPoint getDisplacementForControlPoint(const TStroke &stroke,
-                                             UINT n) const;
+                                             UINT n) const override;
   TThickPoint getDisplacementForControlPointLen(const TStroke &stroke,
-                                                double cpLen) const;
+                                                double cpLen) const override;
 
-  double getDelta(const TStroke &, double) const;
+  double getDelta(const TStroke &, double) const override;
 
-  double getMaxDiff() const;
+  double getMaxDiff() const override;
 };
 
 //=============================================================================
@@ -188,15 +189,15 @@ Use this constructor with movePoints.
 
   virtual ~TStrokeThicknessDeformation();
 
-  TThickPoint getDisplacement(const TStroke &, double) const;
+  TThickPoint getDisplacement(const TStroke &, double) const override;
   TThickPoint getDisplacementForControlPoint(const TStroke &stroke,
-                                             UINT n) const;
+                                             UINT n) const override;
   TThickPoint getDisplacementForControlPointLen(const TStroke &stroke,
-                                                double cpLen) const;
+                                                double cpLen) const override;
 
-  double getDelta(const TStroke &, double) const;
+  double getDelta(const TStroke &, double) const override;
 
-  double getMaxDiff() const;
+  double getMaxDiff() const override;
 };
 //=============================================================================
 /*!
@@ -234,13 +235,14 @@ Use this constructor with movePoints.
 
   virtual ~TStrokeBenderDeformation();
 
-  TThickPoint getDisplacement(const TStroke &, double s) const;
-  TThickPoint getDisplacementForControlPoint(const TStroke &, UINT n) const;
+  TThickPoint getDisplacement(const TStroke &, double s) const override;
+  TThickPoint getDisplacementForControlPoint(const TStroke &,
+                                             UINT n) const override;
   TThickPoint getDisplacementForControlPointLen(const TStroke &stroke,
-                                                double cpLen) const;
+                                                double cpLen) const override;
 
-  double getDelta(const TStroke &, double) const;
-  double getMaxDiff() const;
+  double getDelta(const TStroke &, double) const override;
+  double getMaxDiff() const override;
 };
 
 //=============================================================================
@@ -267,9 +269,9 @@ Use this constructor with increasePoints.
 
   virtual ~TStrokeTwirlDeformation();
 
-  TThickPoint getDisplacement(const TStroke &, double s) const;
-  double getDelta(const TStroke &, double) const;
-  double getMaxDiff() const;
+  TThickPoint getDisplacement(const TStroke &, double s) const override;
+  double getDelta(const TStroke &, double) const override;
+  double getMaxDiff() const override;
 };
 
 //=============================================================================

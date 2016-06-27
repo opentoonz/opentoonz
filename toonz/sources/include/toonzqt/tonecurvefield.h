@@ -65,7 +65,7 @@ public:
     m_currentControlPointIndex = index;
   };
 
-  bool eventFilter(QObject *object, QEvent *event);
+  bool eventFilter(QObject *object, QEvent *event) override;
 
   void setFirstLastXPosition(std::pair<int, int> values, bool isDragging);
 
@@ -95,16 +95,16 @@ protected:
 
   QPainterPath getPainterPath();
 
-  void paintEvent(QPaintEvent *);
-  void mouseMoveEvent(QMouseEvent *);
-  void mousePressEvent(QMouseEvent *);
-  void mouseReleaseEvent(QMouseEvent *);
-  void keyPressEvent(QKeyEvent *e);
-  void enterEvent(QEvent *);
-  void leaveEvent(QEvent *);
+  void paintEvent(QPaintEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
+  void keyPressEvent(QKeyEvent *e) override;
+  void enterEvent(QEvent *) override;
+  void leaveEvent(QEvent *) override;
 
-  void focusInEvent(QFocusEvent *fe);
-  void focusOutEvent(QFocusEvent *fe);
+  void focusInEvent(QFocusEvent *fe) override;
+  void focusOutEvent(QFocusEvent *fe) override;
 
 signals:
   void focusOut();

@@ -38,7 +38,7 @@ typedef struct {
 } MyGlyphRecord;
 
 //-----------------------------------------
-//callback---------------------------------------------------------------------
+// callback---------------------------------------------------------------------
 
 OSStatus MyQuadraticLineProc(const Float32Point *pt1, const Float32Point *pt2,
                              void *callBackDataPtr) {

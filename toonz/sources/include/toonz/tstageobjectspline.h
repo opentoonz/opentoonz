@@ -73,8 +73,8 @@ Set spline stroke to \b stroke.
   bool isOpened() const { return m_isOpened; }
   void setIsOpened(bool value) { m_isOpened = value; }
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &os);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &os) override;
 
   std::string getIconId();
 

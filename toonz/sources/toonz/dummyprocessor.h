@@ -16,9 +16,9 @@ public:
   ~DummyProcessor();
 
   //! process the raster
-  void process(TRaster32P raster);
+  void process(TRaster32P raster) override;
   //! draw after the processing phase
-  void draw();
+  void draw() override;
 };
 
 #endif  // DUMMYPROCESSOR_H

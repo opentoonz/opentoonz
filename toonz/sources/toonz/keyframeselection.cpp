@@ -147,7 +147,7 @@ public:
     if (keyframeData)
       pasteKeyframesWithoutUndo(keyframeData, &m_selection->getSelection());
   }
-  void undo() const {
+  void undo() const override {
     // Delete merged data
     deleteKeyframesWithoutUndo(&m_selection->getSelection());
     if (-(m_r1 - m_r0 + 1) != 0)
@@ -155,16 +155,18 @@ public:
     if (m_oldData) setXshFromData(m_oldData);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
-  void redo() const {
+  void redo() const override {
     if (m_r1 - m_r0 + 1 != 0)
       shiftKeyframesWithoutUndo(m_r0, m_r1, m_c0, m_c1, false);
     // Delete merged data
     setXshFromData(m_newData);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Paste Key Frames"); }
+  QString getHistoryString() override {
+    return QObject::tr("Paste Key Frames");
+  }
 };
 
 //=============================================================================
@@ -191,7 +193,7 @@ public:
     delete m_data;
   }
 
-  void undo() const {
+  void undo() const override {
     const TKeyframeData *keyframeData = dynamic_cast<TKeyframeData *>(m_data);
     if (m_r1 - m_r0 + 1 != 0)
       shiftKeyframesWithoutUndo(m_r0, m_r1, m_c0, m_c1, false);
@@ -200,16 +202,18 @@ public:
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  void redo() const {
+  void redo() const override {
     deleteKeyframesWithoutUndo(&m_selection->getSelection());
     if (m_r1 - m_r0 + 1 != 0)
       shiftKeyframesWithoutUndo(m_r0, m_r1, m_c0, m_c1, true);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Delete Key Frames"); }
+  QString getHistoryString() override {
+    return QObject::tr("Delete Key Frames");
+  }
 };
 
 //-----------------------------------------------------------------------------

@@ -78,18 +78,18 @@ public:
   ~FunctionViewer();
 
   void setXsheetHandle(TXsheetHandle *xshHandle);  //!< Associates an xsheet to
-                                                   //!the function editor.
+                                                   //! the function editor.
   void setFrameHandle(TFrameHandle *frameHandle);  //!< Synchronizes an external
-                                                   //!timeline with the function
-                                                   //!editor.
+  //! timeline with the function
+  //! editor.
   void setObjectHandle(TObjectHandle *objectHandle);  //!< Associates a stage
-                                                      //!objects selector to the
-                                                      //!function editor.
+  //! objects selector to the
+  //! function editor.
   void setFxHandle(TFxHandle *fxHandle);  //!< Associates an fx selector to the
-                                          //!function editor.
+                                          //! function editor.
   void setColumnHandle(TColumnHandle *columnHandle);  //!< Associates a column
-                                                      //!selector to the
-                                                      //!function editor.
+                                                      //! selector to the
+  //! function editor.
 
   FunctionSelection *getSelection() const { return m_selection; }
 
@@ -97,20 +97,20 @@ public:
 
   void addParameter(TParam *parameter,
                     const TFilePath &folder = TFilePath());  //!< Adds the
-                                                             //!specified
-                                                             //!parameter to the
-                                                             //!function editor.
-                                                             //!\param parameter
-                                                             //!Parameter to be
-                                                             //!added. Ownership
-                                                             //!remains \a
-                                                             //!external. \param
-                                                             //!folder Host
-                                                             //!folder (created
-                                                             //!if necessary)
-                                                             //!the parameter
-                                                             //!will be added
-                                                             //!to.
+                                                             //! specified
+  //! parameter to the
+  //! function editor.
+  //!\param parameter
+  //! Parameter to be
+  //! added. Ownership
+  //! remains \a
+  //! external. \param
+  //! folder Host
+  //! folder (created
+  //! if necessary)
+  //! the parameter
+  //! will be added
+  //! to.
 
   void setFocusColumnsOrGraph();
   void clearFocusColumnsAndGraph();
@@ -172,8 +172,8 @@ private:
   FunctionSelection *m_selection;
 
 private:
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
 
 public:  //  :(
   void emitCurveChanged() {
@@ -186,7 +186,7 @@ public:  //  :(
 private slots:
 
   void propagateExternalSetFrame();  //!< Forwards m_frameHandle's setFrame()
-                                     //!invocations to m_localFrame.
+                                     //! invocations to m_localFrame.
 };
 
 #endif  // FUNCTIONEDITORVIEWER_H

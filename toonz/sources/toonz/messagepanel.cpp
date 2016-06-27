@@ -25,7 +25,7 @@ public:
   void setText(const QString &text) { m_text = text; }
 
 protected:
-  void paintEvent(QPaintEvent *) {
+  void paintEvent(QPaintEvent *) override {
     QPainter p(this);
 
     QFontMetrics fm    = p.fontMetrics();
@@ -161,7 +161,7 @@ void LogPanel::clear() {
 class OpenFloatingLogPanel : public MenuItemHandler {
 public:
   OpenFloatingLogPanel() : MenuItemHandler(MI_OpenMessage) {}
-  void execute() {
+  void execute() override {
     TMainWindow *currentRoom = TApp::instance()->getCurrentRoom();
     if (currentRoom) {
       QList<TPanel *> list = currentRoom->findChildren<TPanel *>();

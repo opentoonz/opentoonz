@@ -25,8 +25,8 @@ public:
   void exposeCurrent();
 
 protected:
-  void paintEvent(QPaintEvent *);
-  void mousePressEvent(QMouseEvent *event);
+  void paintEvent(QPaintEvent *) override;
+  void mousePressEvent(QMouseEvent *event) override;
 };
 
 class HistoryPane : public QWidget {
@@ -44,9 +44,9 @@ public:
   ~HistoryPane(){};
 
 protected:
-  void resizeEvent(QResizeEvent *);
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
+  void resizeEvent(QResizeEvent *) override;
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
 
 public slots:
   void onHistoryChanged();

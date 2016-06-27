@@ -23,8 +23,8 @@ public:
   ~ColorModelViewer();
 
 protected:
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dropEvent(QDropEvent *event);
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
   void loadImage(const TFilePath &fp);
   void resetImageViewer() {
     clearCache();
@@ -35,14 +35,14 @@ protected:
     m_palette           = 0;
   }
 
-  void contextMenuEvent(QContextMenuEvent *event);
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
-  void mousePressEvent(QMouseEvent *);
-  void mouseMoveEvent(QMouseEvent *);
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
   void pick(const QPoint &p);
-  void hideEvent(
-      QHideEvent *e);  // to avoid calling the hideEvent of class Flipbook!
-  void showEvent(QShowEvent *e);
+  void hideEvent(QHideEvent *e)
+      override;  // to avoid calling the hideEvent of class Flipbook!
+  void showEvent(QShowEvent *e) override;
 
   /*-
    * UseCurrentFrameのLevelに移動してきたときに、改めてCurrentFrameを格納しなおす

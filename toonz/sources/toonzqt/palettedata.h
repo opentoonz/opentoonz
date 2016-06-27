@@ -25,7 +25,7 @@ public:
 
   ~PaletteData() {}
 
-  PaletteData *clone() const;
+  PaletteData *clone() const override;
 
   void setPaletteData(TPalette *palette, int pageIndex,
                       std::set<int> styleIndicesInPage);

@@ -46,7 +46,7 @@ class TLevelWriterPli : public TLevelWriter {
 public:
   TLevelWriterPli(const TFilePath &path, TPropertyGroup *winfo);
   ~TLevelWriterPli();
-  TImageWriterP getFrameWriter(TFrameId fid);
+  TImageWriterP getFrameWriter(TFrameId fid) override;
 
   friend class TImageWriterPli;
 
@@ -76,15 +76,15 @@ public:
   /*!
 Return info about current pli
 */
-  TLevelP loadInfo();
-  void doReadPalette(bool doReadIt);
+  TLevelP loadInfo() override;
+  void doReadPalette(bool doReadIt) override;
 
   /*!
 Return an image with Reader information
 */
-  TImageReaderP getFrameReader(TFrameId fid);
+  TImageReaderP getFrameReader(TFrameId fid) override;
 
-  QString getCreator();
+  QString getCreator() override;
   friend class TImageReaderPli;
 
 private:
@@ -134,7 +134,7 @@ public:
                   TLevelReaderPli *);
   ~TImageReaderPli() {}
 
-  TImageP load();
+  TImageP load() override;
   TImageP doLoad();
 
   TDimension getSize() const;

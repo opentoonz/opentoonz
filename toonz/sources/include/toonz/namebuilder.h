@@ -38,7 +38,7 @@ class DVAPI NameCreator : public NameBuilder {
 
 public:
   NameCreator() {}
-  std::wstring getNext();
+  std::wstring getNext() override;
 };
 
 //-------------------------------------------------------------------
@@ -49,7 +49,7 @@ class DVAPI NameModifier : public NameBuilder {
 
 public:
   NameModifier(std::wstring name);
-  std::wstring getNext();
+  std::wstring getNext() override;
 };
 
 //-------------------------------------------------------------------

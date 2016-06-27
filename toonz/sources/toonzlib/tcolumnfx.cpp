@@ -736,7 +736,7 @@ public:
 
   void setRasBounds(const TRect &rasBounds) { m_rasBounds = rasBounds; }
 
-  void compute(const TRectD &tileRect) {
+  void compute(const TRectD &tileRect) override {
     // Load the image
     TImageP img(m_sl->getFullsampledFrame(
         m_fid, (m_64bit ? ImageManager::is64bitEnabled : 0) |
@@ -757,15 +757,15 @@ public:
            TRectD(0, 0, m_loadedRas->getLx(), m_loadedRas->getLy()));
   }
 
-  void simCompute(const TRectD &rect) {}
+  void simCompute(const TRectD &rect) override {}
 
-  void upload(TCacheResourceP &resource) {
+  void upload(TCacheResourceP &resource) override {
     assert(m_loadedRas);
     resource->upload(TPoint(), m_loadedRas);
     if (m_palette) resource->uploadPalette(m_palette);
   }
 
-  bool download(TCacheResourceP &resource) {
+  bool download(TCacheResourceP &resource) override {
     // If the image has been loaded in this builder, just use it
     if (m_loadedRas) return true;
 

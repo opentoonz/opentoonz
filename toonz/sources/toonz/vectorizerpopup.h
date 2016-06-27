@@ -97,8 +97,8 @@ public:
   bool apply();  //!< The main vectorization method - prepares input
                  //!  configuration and runs the vectorization thread.
   bool isLevelToConvert(TXshSimpleLevel *level);  //!< Verifies if specified
-                                                  //!level supports
-                                                  //!vectorization.
+                                                  //! level supports
+  //! vectorization.
 
 signals:
 
@@ -203,20 +203,20 @@ private:
 
   void updateVisibility();
 
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
 
 private slots:
 
   void onTypeChange(int type);  //!< Stores the active vectorization \p type
-                                //!name, and calls \p setType().
+                                //! name, and calls \p setType().
 
   void onFrameName(QString frameName);
   void onFrameDone(int frameCount);
 
   void onPartialDone(int partial, int total);  //!< Partial progress \p partial
-                                               //!of \p total was done for
-                                               //!current frame.
+                                               //! of \p total was done for
+  //! current frame.
   void onFinished();
 
   void updateSceneSettings();
@@ -272,7 +272,7 @@ public:
   TXshSimpleLevel *getVectorizedLevel() const { return m_vLevel.getPointer(); }
 
   void setLevel(const TXshSimpleLevelP &level);  //!< Stores current level and
-                                                 //!creates a new vector level.
+                                                 //! creates a new vector level.
 
   void setParameters(
       const VectorizerParameters &params)  //!  Stores vectorizer parameters.
@@ -313,11 +313,12 @@ protected:
   /*! \details  Remember that \b each of the above \a set methods \b must
           be called before invoking run().                                    */
 
-  void run();  //!< Starts the vectorization thread (see QThread documentation).
+  void run() override;  //!< Starts the vectorization thread (see QThread
+                        //!documentation).
 
 private:
   TXshSimpleLevelP m_level;  //!< Input level to vectorize (only one level at a
-                             //!time is dealt here).
+                             //! time is dealt here).
   VectorizerParameters m_params;  //!< Vectorizer options to be applied
 
   TXshSimpleLevelP m_vLevel;     //!< Output vectorized level
@@ -328,7 +329,7 @@ private:
 
   bool m_isCanceled,  //!< User cancels set this flag to true
       m_dialogShown;  //!< Whether \p m_dialog was shown for current
-                      //!vectorization.
+                      //! vectorization.
 
 private:
   int doVectorize();  //!< Start vectorization of input frames.

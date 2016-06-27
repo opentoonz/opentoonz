@@ -181,12 +181,14 @@ public:
   // void setShaderInterface(const ShaderInterface& shaderInterface);
   void initialize();
 
-  void getParamUIs(TParamUIConcept *&params, int &length);
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
-  bool canHandle(const TRenderSettings &info, double frame);
+  void getParamUIs(TParamUIConcept *&params, int &length) override;
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
+  bool canHandle(const TRenderSettings &info, double frame) override;
 
-  void doDryCompute(TRectD &rect, double frame, const TRenderSettings &ri);
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  void doDryCompute(TRectD &rect, double frame,
+                    const TRenderSettings &ri) override;
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
 
 private:
   QGLShaderProgram *touchShaderProgram(const ShaderInterface::ShaderData &sd,
@@ -218,7 +220,7 @@ public:
             TFxInfo(shaderInterface.mainShader().m_name.toStdString(), false))
       , m_shaderInterface(shaderInterface) {}
 
-  TPersist *create() const { return new ShaderFx(&m_shaderInterface); }
+  TPersist *create() const override { return new ShaderFx(&m_shaderInterface); }
 };
 
 //****************************************************************************
@@ -327,19 +329,21 @@ class MessageCreateContext : public TThread::Message {
 public:
   MessageCreateContext(ShadingContextManager *ctx) : man(ctx) {}
 
-  void onDeliver() { man->onRenderInstanceEnd(); }
+  void onDeliver() override { man->onRenderInstanceEnd(); }
 
-  TThread::Message *clone() const { return new MessageCreateContext(*this); }
+  TThread::Message *clone() const override {
+    return new MessageCreateContext(*this);
+  }
 };
 
 class SCMDelegate : public TRenderResourceManager {
   T_RENDER_RESOURCE_MANAGER
 
-  void onRenderInstanceStart(unsigned long id) {
+  void onRenderInstanceStart(unsigned long id) override {
     ShadingContextManager::instance()->onRenderInstanceStart();
   }
 
-  void onRenderInstanceEnd(unsigned long id) {
+  void onRenderInstanceEnd(unsigned long id) override {
     if (!TThread::isMainThread()) {
       /* tofflinegl のときとは逆で main thread に dispatch する */
       MessageCreateContext(ShadingContextManager::instance()).sendBlocking();
@@ -362,13 +366,13 @@ is scheduling a slot to be executed as soon as event processing starts.
 */
 
     struct InstanceSCM : public TFunctorInvoker::BaseFunctor {
-      void operator()() { ShadingContextManager::instance(); }
+      void operator()() override { ShadingContextManager::instance(); }
     };
 
     TFunctorInvoker::instance()->invokeQueued(new InstanceSCM);
   }
 
-  TRenderResourceManager *operator()() { return new SCMDelegate; }
+  TRenderResourceManager *operator()() override { return new SCMDelegate; }
 };
 
 MANAGER_FILESCOPE_DECLARATION(SCMDelegate, SCMDelegateGenerator)

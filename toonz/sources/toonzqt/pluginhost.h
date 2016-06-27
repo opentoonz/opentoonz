@@ -167,18 +167,20 @@ public:
 
   void notify();
 
-  const TPersistDeclaration *getDeclaration() const;
-  std::string getPluginId() const;
+  const TPersistDeclaration *getDeclaration() const override;
+  std::string getPluginId() const override;
 
-  bool doGetBBox(double frame, TRectD &bbox, const TRenderSettings &info);
-  void doCompute(TTile &tile, double frame, const TRenderSettings &info);
+  bool doGetBBox(double frame, TRectD &bbox,
+                 const TRenderSettings &info) override;
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &info) override;
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info);
-  bool canHandle(const TRenderSettings &info, double frame);
+                           const TRenderSettings &info) override;
+  bool canHandle(const TRenderSettings &info, double frame) override;
   bool addInputPort(const std::string &nm, std::shared_ptr<TFxPort> port);
   bool addOutputPort(const std::string &nm, TRasterFxPort *port);
 
-  TFx *clone(bool recursive) const;
+  TFx *clone(bool recursive) const override;
 
   // UIPage
   UIPage *createUIPage(const char *name);
@@ -195,14 +197,16 @@ public:
   Param *getParam(const char *name) const;
   ParamView *createParamView();
 
-  bool isPlugin() const { return true; }
-  bool isPluginZerary() const { return pi_->desc_->is_geometric(); }
+  bool isPlugin() const override { return true; }
+  bool isPluginZerary() const override { return pi_->desc_->is_geometric(); }
 
-  bool isZerary() const { return isPluginZerary(); };
-  void callStartRenderHandler();
-  void callEndRenderHandler();
-  void callStartRenderFrameHandler(const TRenderSettings *rs, double frame);
-  void callEndRenderFrameHandler(const TRenderSettings *rs, double frame);
+  bool isZerary() const override { return isPluginZerary(); };
+  void callStartRenderHandler() override;
+  void callEndRenderHandler() override;
+  void callStartRenderFrameHandler(const TRenderSettings *rs,
+                                   double frame) override;
+  void callEndRenderFrameHandler(const TRenderSettings *rs,
+                                 double frame) override;
   void *getUserData();
   void setUserData(void *user_data);
 

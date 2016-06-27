@@ -38,12 +38,12 @@ public:
   TzpReader();
   ~TzpReader();
 
-  void open(FILE *file);
+  void open(FILE *file) override;
 
-  Tiio::RowOrder getRowOrder() const { return Tiio::BOTTOM2TOP; }
+  Tiio::RowOrder getRowOrder() const override { return Tiio::BOTTOM2TOP; }
 
-  int skipLines(int lineCount);
-  void readLine(char *buffer, int x0, int x1, int shrink);
+  int skipLines(int lineCount) override;
+  void readLine(char *buffer, int x0, int x1, int shrink) override;
 };
 
 //------------------------------------------------------------

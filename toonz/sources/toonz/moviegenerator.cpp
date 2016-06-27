@@ -112,13 +112,13 @@ public:
   AlphaChecker() : m_alphaEnabled(false) {}
   bool isAlphaEnabled() const { return m_alphaEnabled; }
 
-  void visit(TDoubleProperty *p) {}
-  void visit(TIntProperty *p) {}
-  void visit(TBoolProperty *p) {
+  void visit(TDoubleProperty *p) override {}
+  void visit(TIntProperty *p) override {}
+  void visit(TBoolProperty *p) override {
     if (p->getName() == "Alpha Channel") m_alphaEnabled = p->getValue();
   }
-  void visit(TStringProperty *p) {}
-  void visit(TEnumProperty *p) {
+  void visit(TStringProperty *p) override {}
+  void visit(TEnumProperty *p) override {
     if (p->getName() == "Resolution")
       m_alphaEnabled = p->getValue() == L"32 bits";
   }
@@ -181,7 +181,7 @@ public:
     if (m_st) m_lw->saveSoundTrack(m_st.getPointer());
   }
 
-  bool addFrame(ToonzScene &scene, int row, bool isLast) {
+  bool addFrame(ToonzScene &scene, int row, bool isLast) override {
     assert(m_status == 3);
     if (!m_started) start(scene);
 
@@ -264,7 +264,7 @@ false,0);
   }
 
   void addSoundtrack(const ToonzScene &scene, int frameOffset,
-                     int sceneFrameCount) {
+                     int sceneFrameCount) override {
     assert(m_status <= 2);
     m_status                       = 2;
     TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
@@ -290,11 +290,11 @@ false,0);
     m_whiteSample = 0;
   }
 
-  void startScene(const ToonzScene &scene, int r) {
+  void startScene(const ToonzScene &scene, int r) override {
     if (!m_started) start(scene);
   }
 
-  void close() {
+  void close() override {
     m_lw = TLevelWriterP();
     m_st = TSoundTrackP();
   }
@@ -318,7 +318,7 @@ public:
       , m_cameraAff(cameraAff)
       , m_bgColor(bgColor) {}
 
-  void onImage(const Stage::Player &player) {
+  void onImage(const Stage::Player &player) override {
     const TImageP &img = player.image();
     m_flash.pushMatrix();
     m_flash.multMatrix(m_cameraAff * player.m_placement * player.m_dpiAff);
@@ -336,10 +336,10 @@ public:
 
     m_flash.popMatrix();
   }
-  void beginMask() { m_flash.beginMask(); }
-  void endMask() { m_flash.endMask(); }
-  void enableMask() { m_flash.enableMask(); }
-  void disableMask() { m_flash.disableMask(); }
+  void beginMask() override { m_flash.beginMask(); }
+  void endMask() override { m_flash.endMask(); }
+  void enableMask() override { m_flash.enableMask(); }
+  void disableMask() override { m_flash.disableMask(); }
 };
 
 //=============================================================================
@@ -370,9 +370,9 @@ public:
   }
 
   void addSoundtrack(const ToonzScene &scene, int frameOffset,
-                     int sceneFrameCount) {}
+                     int sceneFrameCount) override {}
 
-  void startScene(const ToonzScene &scene, int r) {
+  void startScene(const ToonzScene &scene, int r) override {
     m_flash.cleanCachedImages();
     m_flash.setBackgroundColor(m_bgColor);
     TXsheet::SoundProperties *prop = new TXsheet::SoundProperties();
@@ -396,7 +396,7 @@ public:
     m_sceneIndex++;
   }
 
-  bool addFrame(ToonzScene &scene, int row, bool isLast) {
+  bool addFrame(ToonzScene &scene, int row, bool isLast) override {
     TAffine cameraView =
         scene.getXsheet()->getPlacement(TStageObjectId::CameraId(0), row).inv();
     TPixel32 bgColor = scene.getProperties()->getBgColor();
@@ -436,7 +436,7 @@ public:
     return true;
   }
 
-  void close() {
+  void close() override {
     TFilePath flashFn = m_filepath.withType("swf");
     FILE *fp          = fopen(flashFn, "wb");
     if (!fp) throw TException("Can't open file");

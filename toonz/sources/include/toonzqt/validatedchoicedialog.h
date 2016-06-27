@@ -74,12 +74,12 @@ reserves
 
   ValidatedChoiceDialog(QWidget *parent,
                         Options opts = NO_OPTIONS);  //!< Constructs the dialog
-                                                     //!with no default
-                                                     //!resolutions.
-                                                     //!\param parent  Parent
-                                                     //!top-level widget.
-                                                     //!\param Opts
-                                                     //!Construction options.
+                                                     //! with no default
+  //! resolutions.
+  //!\param parent  Parent
+  //! top-level widget.
+  //!\param Opts
+  //! Construction options.
 
   /*! \param    obj  The object to resolve.
 \return        The accepted resolution. */
@@ -104,9 +104,9 @@ other
   virtual QString acceptResolution(
       void *obj,  //!< The type-erased object to be resolved. May be modified.
       int resolution,  //!< The <I>button id</I> associated to the selected
-                       //!resolution.
+                       //! resolution.
       bool applyToAll  //!< Whether user selected the resolution for all
-                       //!successive prompts.
+                       //! successive prompts.
       ) = 0;           //!< Attempts enforcement of the selected resolution.
 
   /*! \details  This function can be used to initialize the widget as soon as
@@ -128,10 +128,10 @@ private:
 
   int m_appliedToAllRes;  //!< Resolution applied in the \p APPLY_TO_ALL case.
   bool m_appliedToAll,    //!< Whether the \p APPLY_TO_ALL option has previously
-                          //!been selected.
+                          //! been selected.
       m_applyToAll;  //!< Whether the \p APPLY_TO_ALL option has been selected
-                     //!in
-                     //!  \a current user interaction.
+                     //! in
+  //!  \a current user interaction.
 private slots:
 
   void onApplyToAll();

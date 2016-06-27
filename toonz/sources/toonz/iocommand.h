@@ -67,8 +67,8 @@ struct LoadResourceArguments {
   public:
     ScopedBlock();
     ~ScopedBlock();  //!< Invokes all necessary Toonz updates before control is
-                     //!returned,
-                     //!  included posting of the embedded undo block.
+                     //! returned,
+    //!  included posting of the embedded undo block.
     DVGui::ProgressDialog &progressDialog()
         const;  //!< Progress dialog shown on multiple resource loads.
 
@@ -107,25 +107,25 @@ public:
   std::vector<std::vector<TFrameId>> frameIdsSet;
 
   TFilePath castFolder;  //!< [\p In]      Cast panel folder where the resources
-                         //!will be inserted.
+                         //! will be inserted.
 
   int row0,  //!< [\p In/Out]  Starting xsheet row where resources have been
-             //!inserted.
+             //! inserted.
       col0,  //!< [\p In/Out]  Starting xsheet column where resources have been
-             //!inserted.
+             //! inserted.
       row1,  //!< [\p Out]     Ending xsheet row where resources have been
-             //!inserted (included).
+             //! inserted (included).
       col1;  //!< [\p Out]     Ending xsheet column where resources have been
-             //!inserted (included).
+             //! inserted (included).
 
   ImportPolicy importPolicy;  //!< [\p In]      Policy adopted for resources
-                              //!external to current scene.
+                              //! external to current scene.
   bool expose;  //!< [\p In]      Whether resources must be exposed in the
-                //!xsheet.
+                //! xsheet.
 
   std::vector<TXshLevel *> loadedLevels;  //!< [\p Out]     Levels loaded by
-                                          //!resource loading procedures.
-                                          //!Multiple
+                                          //! resource loading procedures.
+  //! Multiple
   //!               levels \a may be loaded for a single resource data.
 public:
   /*-

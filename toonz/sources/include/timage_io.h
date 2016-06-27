@@ -41,7 +41,7 @@ public:
   TImageException(const TFilePath &fp, const std::string &msg);
   ~TImageException() {}
 
-  TString getMessage() const;
+  TString getMessage() const override;
   TString getRawMessage() const { return TException::getMessage(); }
   const TFilePath &getFilePath() const { return m_fp; }
 };

@@ -33,16 +33,17 @@ public:
   Iwa_TileFx();
   ~Iwa_TileFx();
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info);
-  bool canHandle(const TRenderSettings &info, double frame);
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override;
+  bool canHandle(const TRenderSettings &info, double frame) override;
   TRect getInvalidRect(const TRect &max) { return max; }
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri);
+  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info);
+                           const TRenderSettings &info) override;
 
   void transform(double frame, int port, const TRectD &rectOnOutput,
                  const TRenderSettings &infoOnOutput, TRectD &rectOnInput,
-                 TRenderSettings &infoOnInput);
+                 TRenderSettings &infoOnInput) override;
 
   bool checkIfThisTileShouldBeComptedOrNot(int horizIndex, int vertIndex);
   bool isInRange(int quantityMode, int index);

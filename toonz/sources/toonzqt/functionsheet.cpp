@@ -36,7 +36,7 @@ const int cGroupShortNameY =
     0;  //!< Column header's y pos for channel groups' short name tabs
 const int cGroupLongNameY = 27;  //!< Same for its long name tabs
 const int cChannelNameY = 50;  //!< Column header's y pos of channel name tabs,
-                               //!up to the widget's height
+                               //! up to the widget's height
 const int cColHeadersEndY = 87;  //!< End of column headers y pos
 
 }  // namespace
@@ -57,7 +57,7 @@ public:
   MoveChannelsDragTool(FunctionSheet *sheet)
       : m_sheet(sheet), m_firstKeyframeRow(-1) {}
 
-  void click(int row, int col, QMouseEvent *e) {
+  void click(int row, int col, QMouseEvent *e) override {
     m_firstKeyframeRow                  = -1;
     FunctionTreeModel::Channel *channel = m_sheet->getChannel(col);
     if (!channel) return;
@@ -106,7 +106,7 @@ public:
     m_oldRow = row;
   }
 
-  void drag(int row, int col, QMouseEvent *e) {
+  void drag(int row, int col, QMouseEvent *e) override {
     int d                             = row - m_oldRow;
     m_oldRow                          = row;
     if (d + m_firstKeyframeRow < 0) d = -m_firstKeyframeRow;
@@ -117,7 +117,7 @@ public:
     m_sheet->selectCells(m_selectedCells);
   }
 
-  void release(int row, int col, QMouseEvent *e) {
+  void release(int row, int col, QMouseEvent *e) override {
     for (int i = 0; i < (int)m_setters.size(); i++) delete m_setters[i];
     m_setters.clear();
   }
@@ -133,7 +133,7 @@ public:
   FunctionSheetSelectionTool(FunctionSheet *sheet)
       : m_sheet(sheet), m_firstRow(-1), m_firstCol(-1) {}
 
-  void click(int row, int col, QMouseEvent *e) {
+  void click(int row, int col, QMouseEvent *e) override {
     if (0 != (e->modifiers() & Qt::ShiftModifier) &&
         !m_sheet->getSelectedCells().isEmpty()) {
       QRect selectedCells = m_sheet->getSelectedCells();
@@ -161,7 +161,7 @@ public:
     }
   }
 
-  void drag(int row, int col, QMouseEvent *e) {
+  void drag(int row, int col, QMouseEvent *e) override {
     if (row < 0) row = 0;
     if (col < 0) col = 0;
     int r0           = qMin(row, m_firstRow);
@@ -172,7 +172,7 @@ public:
     m_sheet->selectCells(selectedCells);
   }
 
-  void release(int row, int col, QMouseEvent *e) {
+  void release(int row, int col, QMouseEvent *e) override {
     if (row == m_firstRow && col == m_firstCol) {
       if (Preferences::instance()->isMoveCurrentEnabled())
         m_sheet->setCurrentFrame(row);
@@ -902,7 +902,7 @@ class FunctionSheetColumnToCurveMapper : public ColumnToCurveMapper {
 
 public:
   FunctionSheetColumnToCurveMapper(FunctionSheet *sheet) : m_sheet(sheet) {}
-  TDoubleParam *getCurve(int columnIndex) const {
+  TDoubleParam *getCurve(int columnIndex) const override {
     FunctionTreeModel::Channel *channel = m_sheet->getChannel(columnIndex);
     if (channel)
       return channel->getParam();

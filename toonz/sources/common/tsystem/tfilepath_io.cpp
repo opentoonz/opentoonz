@@ -90,8 +90,8 @@ sperando che sia il nome del file => compila ma non funziona
 {}
 
 Tifstream::~Tifstream() {
-#ifndef MACOSX
-  fclose();
+#ifdef _WIN32
+  fclose(m_file);
 #endif
 }
 

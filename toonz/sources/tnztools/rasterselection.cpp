@@ -341,7 +341,7 @@ public:
       TImageCache::instance()->remove(m_erasedImageId);
   }
 
-  void undo() const {
+  void undo() const override {
     TImageP image = m_level->getFrame(m_frameId, true);
     if (!image) return;
     TRasterP ras = getRaster(image);
@@ -358,7 +358,7 @@ public:
     m_tool->invalidate();
   }
 
-  void redo() const {
+  void redo() const override {
     TImageP image       = m_level->getFrame(m_frameId, true);
     TImageP erasedImage = TImageCache::instance()->get(m_erasedImageId, false);
     if (!erasedImage) return;
@@ -370,7 +370,7 @@ public:
     m_tool->invalidate();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 };
 
 int UndoDeleteSelection::m_id = 0;
@@ -390,20 +390,20 @@ public:
 
   ~UndoPasteSelection() {}
 
-  void undo() const {
+  void undo() const override {
     m_currentSelection->setFloatingSeletion(TRasterP());
     m_currentSelection->selectNone();
     m_currentSelection->notify();
   }
 
-  void redo() const {
+  void redo() const override {
     *m_currentSelection = m_newSelection;
     m_currentSelection->notify();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Paste"); }
+  QString getHistoryString() override { return QObject::tr("Paste"); }
 };
 
 //=============================================================================
@@ -502,7 +502,7 @@ public:
       TImageCache::instance()->remove(m_undoImageId);
   }
 
-  void undo() const {
+  void undo() const override {
     TImageP image = TImageCache::instance()->get(m_imageId, false);
     if (!image) return;
     TRasterP rasImage = getRaster(image);
@@ -538,7 +538,7 @@ public:
     m_tool->invalidate();
   }
 
-  void redo() const {
+  void redo() const override {
     TImageP image = TImageCache::instance()->get(m_imageId, false);
     TImageP floatingImage =
         TImageCache::instance()->get(m_floatingImageId, false);
@@ -566,9 +566,9 @@ public:
     m_tool->invalidate();
   }
 
-  int getSize() const { return sizeof(*this); }
+  int getSize() const override { return sizeof(*this); }
 
-  QString getHistoryString() { return QObject::tr("Paste"); }
+  QString getHistoryString() override { return QObject::tr("Paste"); }
 };
 
 int UndoPasteFloatingSelection::m_id = 0;

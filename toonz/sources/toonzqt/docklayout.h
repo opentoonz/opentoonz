@@ -85,15 +85,15 @@ public:
   virtual ~DockLayout();
 
   // QLayout item handling (see Qt reference)
-  int count(void) const;
-  void addItem(QLayoutItem *item);
-  QSize sizeHint() const;
-  QSize minimumSize() const;
-  QSize maximumSize() const;
-  QLayoutItem *itemAt(int) const;
+  int count(void) const override;
+  void addItem(QLayoutItem *item) override;
+  QSize sizeHint() const override;
+  QSize minimumSize() const override;
+  QSize maximumSize() const override;
+  QLayoutItem *itemAt(int) const override;
   QWidget *widgetAt(int) const;
-  QLayoutItem *takeAt(int);
-  void setGeometry(const QRect &rect);
+  QLayoutItem *takeAt(int) override;
+  void setGeometry(const QRect &rect) override;
 
   void update();        // Re-applies partition found
   void redistribute();  // Calculates partition
@@ -270,16 +270,16 @@ public:
 private:
   // Event handling
   // Basic events
-  bool event(QEvent *e);
-  void mousePressEvent(QMouseEvent *me);
-  void mouseReleaseEvent(QMouseEvent *me);
-  void mouseMoveEvent(QMouseEvent *me);
+  bool event(QEvent *e) override;
+  void mousePressEvent(QMouseEvent *me) override;
+  void mouseReleaseEvent(QMouseEvent *me) override;
+  void mouseMoveEvent(QMouseEvent *me) override;
   void hoverMoveEvent(QHoverEvent *he);
 
 protected:
   // Customizable events
-  virtual void wheelEvent(QWheelEvent *we);
-  virtual void mouseDoubleClickEvent(QMouseEvent *me);
+  void wheelEvent(QWheelEvent *we) override;
+  void mouseDoubleClickEvent(QMouseEvent *me) override;
   virtual void windowTitleEvent(QEvent *) {}
 };
 
@@ -323,8 +323,8 @@ protected:
 class DockSeparator : public QWidget {
   friend class DockLayout;  // Layout updates each DockSeparator during
                             // DockLayout::applyGeometry()
-  friend class Region;  // Region may update a DockSeparator's parent during
-                        // removeItem()
+  friend class Region;      // Region may update a DockSeparator's parent during
+                            // removeItem()
 
   DockLayout *m_owner;
 
@@ -357,9 +357,9 @@ public:
 private:
   void calculateBounds();
 
-  void mousePressEvent(QMouseEvent *me);
-  void mouseReleaseEvent(QMouseEvent *me);
-  void mouseMoveEvent(QMouseEvent *me);
+  void mousePressEvent(QMouseEvent *me) override;
+  void mouseReleaseEvent(QMouseEvent *me) override;
+  void mouseMoveEvent(QMouseEvent *me) override;
 };
 
 //========================================================================
@@ -444,7 +444,7 @@ public:
 
 private:
   //! Let wheel events also be propagated to owner dock widget
-  void wheelEvent(QWheelEvent *we) { m_owner->wheelEvent(we); }
+  void wheelEvent(QWheelEvent *we) override { m_owner->wheelEvent(we); }
 };
 
 //===========================================
@@ -471,8 +471,8 @@ private:
 */
 
 class Region {
-  friend class DockLayout;  // Layout is the main operating class over
-                            // rectangular regions - need full access
+  friend class DockLayout;     // Layout is the main operating class over
+                               // rectangular regions - need full access
   friend class DockSeparator;  // Separators need access to extremal sizes
                                // methods when moving themselves
 

@@ -33,7 +33,7 @@ class SaveImagesPopup : public FileBrowserPopup {
 public:
   SaveImagesPopup(FlipBook *flip);
 
-  bool execute();
+  bool execute() override;
 };
 
 class LoadImagesPopup : public FileBrowserPopup {
@@ -55,8 +55,8 @@ class LoadImagesPopup : public FileBrowserPopup {
 public:
   LoadImagesPopup(FlipBook *flip);
 
-  bool execute();
-  bool executeApply();
+  bool execute() override;
+  bool executeApply() override;
   bool doLoad(bool append);
 
 public slots:
@@ -189,7 +189,7 @@ public:
                 TPalette *palette = 0, int from = -1, int to = -1, int step = 1,
                 int currentFrame = 1, TSoundTrack *snd = 0);
   void setLevel(TXshSimpleLevel *xl);
-  void onPlayCompleted() {}
+  void onPlayCompleted() override {}
   bool doSaveImages(TFilePath fp);
   int getCurrentFrame() { return m_flipConsole->getCurrentFrame(); }
   QString getLevelZoomTitle() const { return m_title1 + m_title; }
@@ -227,7 +227,7 @@ public:
 
   void reset();
 
-  void onDrawFrame(int frame, const ImagePainter::VisualSettings &vs);
+  void onDrawFrame(int frame, const ImagePainter::VisualSettings &vs) override;
 
   void minimize(bool doMinimize);
 
@@ -236,8 +236,8 @@ public:
   void setLoadbox(const TRect &box);
   TDimension getImageSize() const { return m_dim; }
 
-  void swapBuffers();
-  void changeSwapBehavior(bool enable);
+  void swapBuffers() override;
+  void changeSwapBehavior(bool enable) override;
 
 private:
   // When viewing the tlv, try to cache all frames at the beginning.
@@ -251,18 +251,18 @@ protected:
   void adaptWidGeometry(const TRect &interestWidRect, const TRect &imgWidRect,
                         bool keepPosition);
 
-  void dragEnterEvent(QDragEnterEvent *e);
-  void dropEvent(QDropEvent *e);
+  void dragEnterEvent(QDragEnterEvent *e) override;
+  void dropEvent(QDropEvent *e) override;
 
   void playAudioFrame(int frame);
   TImageP getCurrentImage(int frame);
 
-  void showEvent(QShowEvent *e);
-  void hideEvent(QHideEvent *e);
-  void focusInEvent(QFocusEvent *e);
-  void resizeEvent(QResizeEvent *e);
+  void showEvent(QShowEvent *e) override;
+  void hideEvent(QHideEvent *e) override;
+  void focusInEvent(QFocusEvent *e) override;
+  void resizeEvent(QResizeEvent *e) override;
 
-  void enterEvent(QEvent *e) { m_flipConsole->makeCurrent(); }
+  void enterEvent(QEvent *e) override { m_flipConsole->makeCurrent(); }
 
 signals:
 

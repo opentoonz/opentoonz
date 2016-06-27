@@ -128,7 +128,8 @@ public:
   }
   virtual ~LocalTransparencyFx() {}
 
-  bool doGetBBox(double frame, TRectD &bBox, const TRenderSettings &info) {
+  bool doGetBBox(double frame, TRectD &bBox,
+                 const TRenderSettings &info) override {
     if (m_src.isConnected())
       return m_src->doGetBBox(frame, bBox, info);
     else {
@@ -137,7 +138,8 @@ public:
     }
   }
 
-  void doCompute(TTile &tile, double frame, const TRenderSettings &ri) {
+  void doCompute(TTile &tile, double frame,
+                 const TRenderSettings &ri) override {
     if (!checkBeforeCompute(tile, frame, ri)) return;
     TTile srcTile;
     m_src->allocateAndCompute(srcTile, tile.m_pos, tile.getRaster()->getSize(),
@@ -177,10 +179,12 @@ public:
     return true;
   }
 
-  bool canHandle(const TRenderSettings &info, double frame) { return true; }
+  bool canHandle(const TRenderSettings &info, double frame) override {
+    return true;
+  }
 
   int getMemoryRequirement(const TRectD &rect, double frame,
-                           const TRenderSettings &info) {
+                           const TRenderSettings &info) override {
     return TRasterFx::memorySize(rect, info.m_bpp);
   }
 };

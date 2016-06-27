@@ -977,10 +977,10 @@ public:
   AdjustThicknessUndo(const SelectionData &selData, double (&fromTransform)[2],
                       double (&toTransform)[2]);
 
-  void redo() const;
-  void undo() const;
+  void redo() const override;
+  void undo() const override;
 
-  int getSize() const {
+  int getSize() const override {
     return (10 << 20);
   }  // 10 MB, flat - ie, at max 10 of these for a standard 100MB
      // undo cache size.

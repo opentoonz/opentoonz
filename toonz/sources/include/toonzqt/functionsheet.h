@@ -34,12 +34,12 @@ public:
   FunctionSheetRowViewer(FunctionSheet *parent);
 
 protected:
-  void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
-  void mousePressEvent(QMouseEvent *);
-  void mouseReleaseEvent(QMouseEvent *);
-  void mouseMoveEvent(QMouseEvent *);
-  void contextMenuEvent(QContextMenuEvent *);
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void contextMenuEvent(QContextMenuEvent *) override;
 };
 
 class FunctionSheetColumnHeadViewer : public Spreadsheet::ColumnPanel {
@@ -52,12 +52,12 @@ public:
   FunctionSheetColumnHeadViewer(FunctionSheet *parent);
 
 protected:
-  void paintEvent(QPaintEvent *);
-  void mousePressEvent(QMouseEvent *);
+  void paintEvent(QPaintEvent *) override;
+  void mousePressEvent(QMouseEvent *) override;
   // update the tooltip
-  void mouseMoveEvent(QMouseEvent *);
+  void mouseMoveEvent(QMouseEvent *) override;
 
-  void contextMenuEvent(QContextMenuEvent *);
+  void contextMenuEvent(QContextMenuEvent *) override;
 };
 
 class FunctionSheetCellViewer : public Spreadsheet::CellPanel {
@@ -69,16 +69,16 @@ class FunctionSheetCellViewer : public Spreadsheet::CellPanel {
 public:
   FunctionSheetCellViewer(FunctionSheet *parent);
 
-  Spreadsheet::DragTool *createDragTool(QMouseEvent *);
+  Spreadsheet::DragTool *createDragTool(QMouseEvent *) override;
 
 protected:
-  void drawCells(QPainter &p, int r0, int c0, int r1, int c1);
+  void drawCells(QPainter &p, int r0, int c0, int r1, int c1) override;
 
-  void mouseDoubleClickEvent(QMouseEvent *);
+  void mouseDoubleClickEvent(QMouseEvent *) override;
 
-  void mousePressEvent(QMouseEvent *);
-  void mouseReleaseEvent(QMouseEvent *);
-  void mouseMoveEvent(QMouseEvent *);
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
   void openContextMenu(QMouseEvent *);
 
 private slots:
@@ -105,8 +105,8 @@ public:
   TDoubleParam *getCurve(int column);
   FunctionTreeModel::Channel *getChannel(int column);
 
-  QRect getSelectedCells() const;
-  void selectCells(const QRect &selectedCells);
+  QRect getSelectedCells() const override;
+  void selectCells(const QRect &selectedCells) override;
 
   FunctionSelection *getSelection() const { return m_selection; }
   void setSelection(FunctionSelection *selection);  // does NOT get ownership
@@ -116,8 +116,8 @@ public:
   bool anyWidgetHasFocus();
 
 protected:
-  void showEvent(QShowEvent *e);
-  void hideEvent(QHideEvent *e);
+  void showEvent(QShowEvent *e) override;
+  void hideEvent(QHideEvent *e) override;
 
 private:
   FunctionSheetRowViewer *m_rowViewer;

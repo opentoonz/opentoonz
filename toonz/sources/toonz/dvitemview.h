@@ -154,7 +154,7 @@ public:
   void paint(QPainter *painter, QRect rect);
 
 protected:
-  void timerEvent(QTimerEvent *event);
+  void timerEvent(QTimerEvent *event) override;
 };
 
 //=============================================================================
@@ -194,20 +194,20 @@ public:
 
   void select(int index, bool on = true);
   void select(int *indices, int indicesCount);
-  void selectNone();
+  void selectNone() override;
   void selectAll();
 
   bool isSelected(int index) const {
     return m_selectedIndices.count(index) > 0;
   }
-  bool isEmpty() const { return m_selectedIndices.empty(); }
+  bool isEmpty() const override { return m_selectedIndices.empty(); }
 
   const std::set<int> &getSelectedIndices() const { return m_selectedIndices; }
 
   void setModel(DvItemListModel *model);
   DvItemListModel *getModel() const { return m_model; }
 
-  void enableCommands();
+  void enableCommands() override;
 
 signals:
 
@@ -219,8 +219,8 @@ signals:
 class DvItemViewerPanel : public QFrame, public TSelection::View {
   Q_OBJECT
 
-  QColor m_alternateBackground;  // alaternate bg color for teble view
-                                 // (170,170,170)
+  QColor m_alternateBackground;     // alaternate bg color for teble view
+                                    // (170,170,170)
   QColor m_textColor;               // text color (black)
   QColor m_selectedTextColor;       // selected item text color (white)
   QColor m_folderTextColor;         // folder item text color (blue)
@@ -339,7 +339,7 @@ public:
   void paintTableItem(QPainter &p, int index);
 
   // da TSelection::View
-  void onSelectionChanged() { update(); }
+  void onSelectionChanged() override { update(); }
 
   const std::set<int> &getSelectedIndices() const;
 
@@ -353,13 +353,13 @@ public:
   void setMissingTextColor(const QColor &color);
 
 protected:
-  void paintEvent(QPaintEvent *);
-  void mousePressEvent(QMouseEvent *);
-  void mouseMoveEvent(QMouseEvent *);
-  void mouseReleaseEvent(QMouseEvent *);
-  void mouseDoubleClickEvent(QMouseEvent *);
-  void contextMenuEvent(QContextMenuEvent *);
-  bool event(QEvent *event);
+  void paintEvent(QPaintEvent *) override;
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
+  void mouseDoubleClickEvent(QMouseEvent *) override;
+  void contextMenuEvent(QContextMenuEvent *) override;
+  bool event(QEvent *event) override;
 
 signals:
   void viewTypeChange(DvItemViewerPanel::ViewType viewType);
@@ -387,7 +387,7 @@ private:
   DvItemViewerPanel *m_panel;
 
 protected:
-  void resizeEvent(QResizeEvent *);
+  void resizeEvent(QResizeEvent *) override;
 
 public:
   DvItemViewer(QWidget *parent, bool noContextMenu = false,
@@ -416,11 +416,11 @@ public:
     m_panel->enableGlobalSelection(enabled);
   }
   void selectNone();
-  void keyPressEvent(QKeyEvent *event);
+  void keyPressEvent(QKeyEvent *event) override;
 
 protected:
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dropEvent(QDropEvent *event);
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
 
 signals:
   void clickedItem(int index);
@@ -445,10 +445,10 @@ protected slots:
   void onViewTypeChanged(DvItemViewerPanel::ViewType viewType);
 
 protected:
-  void mouseMoveEvent(QMouseEvent *);
+  void mouseMoveEvent(QMouseEvent *) override;
   void openContextMenu(QMouseEvent *);
-  void mousePressEvent(QMouseEvent *);
-  void paintEvent(QPaintEvent *);
+  void mousePressEvent(QMouseEvent *) override;
+  void paintEvent(QPaintEvent *) override;
 };
 
 //=============================================================================

@@ -51,7 +51,7 @@
 */
 
 //#define GL_DEBUG                                    // Debug using OpenGL.
-//Must deform while drawing.
+// Must deform while drawing.
 #ifdef GL_DEBUG   // NOTE: You should force deformations,
 #include "tgl.h"  // see plasticdeformersstorage.cpp
 #endif
@@ -297,7 +297,7 @@ public:
       m_invF;  //!< Each of step 2's systems factorizations
 
   TPointDPtr m_relativeCoords;  //!< Faces' p2 coordinates in (p0, p1)'s
-                                //!orthogonal reference
+                                //! orthogonal reference
   double m_v[4], m_c[4];        //!< Known term and output coordinates
 
   TPointDPtr m_fitTriangles;  //!< Output face coordinates

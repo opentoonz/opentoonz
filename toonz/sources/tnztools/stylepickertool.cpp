@@ -44,7 +44,7 @@ class StylePickerTool : public TTool {
   TBoolProperty m_passivePick;
 
 public:
-  TPropertyGroup *getProperties(int targetType) { return &m_prop; }
+  TPropertyGroup *getProperties(int targetType) override { return &m_prop; }
 
   StylePickerTool()
       : TTool("T_StylePicker")
@@ -62,16 +62,16 @@ public:
     m_passivePick.setId("PassivePick");
   }
 
-  ToolType getToolType() const { return TTool::LevelReadTool; }
+  ToolType getToolType() const override { return TTool::LevelReadTool; }
 
-  void draw() {}
+  void draw() override {}
 
-  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDown(const TPointD &pos, const TMouseEvent &e) override {
     m_oldStyleId = m_currentStyleId =
         getApplication()->getCurrentLevelStyleIndex();
     pick(pos, e);
   }
-  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) {
+  void leftButtonDrag(const TPointD &pos, const TMouseEvent &e) override {
     pick(pos, e);
   }
 
@@ -191,7 +191,7 @@ public:
     getApplication()->setCurrentLevelStyleIndex(styleId);
   }
 
-  void mouseMove(const TPointD &pos, const TMouseEvent &e) {
+  void mouseMove(const TPointD &pos, const TMouseEvent &e) override {
     if (!m_passivePick.getValue()) return;
     /*--- PassiveにStyleを拾う機能 ---*/
     PaletteController *controller =
@@ -218,9 +218,9 @@ public:
     controller->notifyStylePassivePicked(inkStyleId, paintStyleId, tone);
   }
 
-  void onActivate() {}
+  void onActivate() override {}
 
-  int getCursorId() const {
+  int getCursorId() const override {
     bool isBlackBG = ToonzCheck::instance()->getChecks() & ToonzCheck::eBlackBg;
 
     if (m_colorType.getValue() == LINES)

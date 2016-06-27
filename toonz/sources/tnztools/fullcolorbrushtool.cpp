@@ -100,7 +100,7 @@ public:
 
   ~FullColorBrushUndo() { TImageCache::instance()->remove(m_id); }
 
-  void redo() const {
+  void redo() const override {
     insertLevelAndFrameIfNeeded();
 
     TRasterImageP image = getImage();
@@ -114,12 +114,12 @@ public:
     notifyImageChanged();
   }
 
-  int getSize() const {
+  int getSize() const override {
     return sizeof(*this) + ToolUtils::TFullColorRasterUndo::getSize();
   }
 
-  virtual QString getToolName() { return QString("Raster Brush Tool"); }
-  int getHistoryType() { return HistoryType::BrushTool; }
+  QString getToolName() override { return QString("Raster Brush Tool"); }
+  int getHistoryType() override { return HistoryType::BrushTool; }
 };
 
 }  // namespace

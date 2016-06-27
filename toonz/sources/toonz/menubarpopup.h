@@ -33,9 +33,9 @@ public:
 
 protected:
   bool dropMimeData(QTreeWidgetItem* parent, int index, const QMimeData* data,
-                    Qt::DropAction action);
-  QStringList mimeTypes() const;
-  void contextMenuEvent(QContextMenuEvent* event);
+                    Qt::DropAction action) override;
+  QStringList mimeTypes() const override;
+  void contextMenuEvent(QContextMenuEvent* event) override;
 protected slots:
   void insertMenu();
   void removeItem();
@@ -55,7 +55,7 @@ public:
   CommandListTree(QWidget* parent = 0);
 
 protected:
-  void mousePressEvent(QMouseEvent*);
+  void mousePressEvent(QMouseEvent*) override;
 };
 
 //=============================================================================

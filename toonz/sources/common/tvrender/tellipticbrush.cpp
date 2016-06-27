@@ -303,7 +303,7 @@ public:
   LengthLinearizator(const TStroke *stroke, double lengthStep)
       : StrokeLinearizator(stroke), m_lengthStep(lengthStep), m_countIdx(0) {}
 
-  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk);
+  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk) override;
 };
 
 //--------------------------------------------------------------------------------------------
@@ -359,7 +359,7 @@ public:
   RecursiveLinearizator(const TStroke *stroke, double pixSize)
       : StrokeLinearizator(stroke), m_pixSize(pixSize) {}
 
-  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk);
+  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk) override;
   void subdivide(std::vector<CenterlinePoint> &cPoints, CenterlinePoint &cp0,
                  CenterlinePoint &cp1);
 };
@@ -455,7 +455,7 @@ class CoverageLinearizator : public tellipticbrush::StrokeLinearizator {
 public:
   CoverageLinearizator(const TStroke *stroke) : StrokeLinearizator(stroke) {}
 
-  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk);
+  void linearize(std::vector<CenterlinePoint> &cPoints, int chunk) override;
 };
 
 //--------------------------------------------------------------------------------------------

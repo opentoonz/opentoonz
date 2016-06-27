@@ -106,12 +106,13 @@ public:
       : UsageElement(name, help), m_switcher(false){};
   ~Qualifier(){};
 
-  virtual bool isSwitcher() const { return m_switcher; };
-  virtual bool isHidden() const { return m_help == ""; };
+  bool isSwitcher() const override { return m_switcher; };
+
+  bool isHidden() const override { return m_help == ""; };
 
   operator bool() const { return isSelected(); };
   virtual void fetch(int index, int &argc, char *argv[]) = 0;
-  virtual void print(std::ostream &out) const;
+  void print(std::ostream &out) const override;
 };
 
 //---------------------------------------------------------
@@ -120,9 +121,9 @@ class DVAPI SimpleQualifier : public Qualifier {
 public:
   SimpleQualifier(std::string name, std::string help) : Qualifier(name, help){};
   ~SimpleQualifier(){};
-  void fetch(int index, int &argc, char *argv[]);
-  void dumpValue(std::ostream &out) const;
-  void resetValue();
+  void fetch(int index, int &argc, char *argv[]) override;
+  void dumpValue(std::ostream &out) const override;
+  void resetValue() override;
 };
 
 //---------------------------------------------------------
@@ -148,7 +149,7 @@ public:
 
   T getValue() const { return m_value; };
 
-  virtual void fetch(int index, int &argc, char *argv[]) {
+  void fetch(int index, int &argc, char *argv[]) override {
     if (index + 1 >= argc) throw UsageError("missing argument");
     if (!fromStr(m_value, argv[index + 1]))
       throw UsageError(m_name + ": bad argument type /" +
@@ -157,12 +158,12 @@ public:
     argc -= 2;
   };
 
-  void dumpValue(std::ostream &out) const {
+  void dumpValue(std::ostream &out) const override {
     out << m_name << " = " << (isSelected() ? "on" : "off") << " : " << m_value
         << "\n";
   };
 
-  void resetValue() {
+  void resetValue() override {
     m_value    = T();
     m_selected = false;
   };
@@ -176,7 +177,7 @@ public:
   ~Argument(){};
   virtual void fetch(int index, int &argc, char *argv[]);
   virtual bool assign(char *) = 0;
-  bool isArgument() const { return true; };
+  bool isArgument() const override { return true; };
 };
 
 //---------------------------------------------------------
@@ -191,11 +192,11 @@ public:
   operator T() const { return m_value; };
   T getValue() const { return m_value; };
 
-  bool assign(char *src) { return fromStr(m_value, src); };
-  void dumpValue(std::ostream &out) const {
+  bool assign(char *src) override { return fromStr(m_value, src); };
+  void dumpValue(std::ostream &out) const override {
     out << m_name << " = " << m_value << "\n";
   };
-  void resetValue() {
+  void resetValue() override {
     m_value    = T();
     m_selected = false;
   };
@@ -212,8 +213,9 @@ public:
       : Argument(name, help), m_count(0), m_index(0){};
   ~MultiArgument(){};
   int getCount() const { return m_count; };
-  virtual void fetch(int index, int &argc, char *argv[]);
-  bool isMultiArgument() const { return true; };
+
+  void fetch(int index, int &argc, char *argv[]) override;
+  bool isMultiArgument() const override { return true; };
   virtual void allocate(int count) = 0;
 };
 
@@ -230,23 +232,24 @@ public:
     assert(0 <= index && index < m_count);
     return m_values[index];
   };
-  virtual bool assign(char *src) {
+
+  bool assign(char *src) override {
     assert(0 <= m_index && m_index < m_count);
     return fromStr(m_values[m_index], src);
   };
 
-  void dumpValue(std::ostream &out) const {
+  void dumpValue(std::ostream &out) const override {
     out << m_name << " = {";
     for (int i = 0; i < m_count; i++) out << " " << m_values[i];
     out << "}" << std::endl;
   };
 
-  void resetValue() {
+  void resetValue() override {
     m_values.reset();
     m_count = m_index = 0;
   };
 
-  void allocate(int count) {
+  void allocate(int count) override {
     m_values.reset((count > 0) ? new T[count] : nullptr);
     m_count = count;
     m_index = 0;
@@ -353,9 +356,9 @@ public:
   int getFrom() const { return m_from; };
   int getTo() const { return m_to; };
   bool contains(int frame) const { return m_from <= frame && frame <= m_to; };
-  void fetch(int index, int &argc, char *argv[]);
-  void dumpValue(std::ostream &out) const;
-  void resetValue();
+  void fetch(int index, int &argc, char *argv[]) override;
+  void dumpValue(std::ostream &out) const override;
+  void resetValue() override;
 };
 
 //=========================================================

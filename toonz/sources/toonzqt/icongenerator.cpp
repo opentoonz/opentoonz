@@ -442,7 +442,7 @@ public:
   IconRenderer(const std::string &id, const TDimension &iconSize);
   virtual ~IconRenderer();
 
-  virtual void run() = 0;
+  void run() override = 0;
 
   void setIcon(const TRaster32P &icon) { m_icon = icon; }
   TRaster32P getIcon() const { return m_icon; }
@@ -517,7 +517,7 @@ public:
       , m_settings(settings) {}
 
   TRaster32P generateRaster(const TDimension &iconSize) const;
-  void run();
+  void run() override;
 };
 
 //-----------------------------------------------------------------------------
@@ -570,7 +570,7 @@ public:
       : IconRenderer(id, iconSize), m_spline(spline) {}
 
   TRaster32P generateRaster(const TDimension &iconSize) const;
-  void run();
+  void run() override;
 };
 
 //-----------------------------------------------------------------------------
@@ -631,7 +631,7 @@ public:
                           TXshSimpleLevelP sl, const TFrameId &fid)
       : IconRenderer(id, iconSize), m_sl(sl), m_fid(fid) {}
 
-  void run();
+  void run() override;
 };
 
 //-----------------------------------------------------------------------------
@@ -673,7 +673,7 @@ public:
       , m_settings(settings)
       , m_tnzImgIcon(0) {}
 
-  void run();
+  void run() override;
 
   void setIcon_TnzImg(const TRasterCM32P &timgp) { m_tnzImgIcon = timgp; }
   TRasterCM32P getIcon_TnzImg() const { return m_tnzImgIcon; }
@@ -787,7 +787,7 @@ public:
       , m_settings(settings) {}
 
   TRaster32P generateRaster(const TDimension &iconSize) const;
-  void run();
+  void run() override;
 };
 
 //-----------------------------------------------------------------------------
@@ -856,7 +856,7 @@ public:
   }
 
   TRaster32P generateRaster(const TDimension &iconSize) const;
-  void run();
+  void run() override;
 };
 
 //-----------------------------------------------------------------------------
@@ -905,7 +905,7 @@ public:
 
   static std::string getId(const TFilePath &path, const TFrameId &fid);
 
-  void run();
+  void run() override;
 };
 
 //-----------------------------------------------------------------------------
@@ -1236,7 +1236,7 @@ public:
 
   static std::string getId() { return "currentScene"; }
 
-  void run();
+  void run() override;
   TRaster32P generateIcon(const TDimension &iconSize) const;
 };
 

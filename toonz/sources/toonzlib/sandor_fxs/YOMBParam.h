@@ -84,11 +84,12 @@ public:
   static void adjustToMatte(I_PIXEL &p);
 
   //	void blurPixel(CSTColSelPic<UC_PIXEL>& pic, const int xx, const int yy,
-  //				   const CBlurMatrix& bm, UC_PIXEL& col,const UCHAR
-  //osel);
+  //				   const CBlurMatrix& bm, UC_PIXEL& col,const
+  //UCHAR
+  // osel);
   //	bool isContourOnPath(const int xx, const int yy,
   //						 std::vector<BLURSECTION>::const_iterator
-  //pBS,
+  // pBS,
   //						 CSTColSelPic<UC_PIXEL>& pic);
   //	void addPixel(I_PIXEL& p, const UC_PIXEL* pic);
   //	void addPixel(I_PIXEL& p, const CSTColSelPic<UC_PIXEL>& pic,

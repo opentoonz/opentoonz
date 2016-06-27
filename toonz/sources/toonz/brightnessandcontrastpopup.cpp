@@ -423,7 +423,7 @@ public:
 
   ~TRasterBrightnessUndo() { TImageCache::instance()->remove(m_rasId); }
 
-  void undo() const {
+  void undo() const override {
     TXsheet *xsheet        = TApp::instance()->getCurrentXsheet()->getXsheet();
     TXshCell cell          = xsheet->getCell(m_r, m_c);
     TRasterImageP rasImage = (TRasterImageP)cell.getImage(true);
@@ -443,7 +443,7 @@ public:
     }
   }
 
-  void redo() const {
+  void redo() const override {
     TXsheet *xsheet        = TApp::instance()->getCurrentXsheet()->getXsheet();
     TXshCell cell          = xsheet->getCell(m_r, m_c);
     TRasterImageP rasImage = (TRasterImageP)cell.getImage(true);
@@ -462,7 +462,7 @@ public:
     }
   }
 
-  int getSize() const { return sizeof(*this) + m_rasSize; }
+  int getSize() const override { return sizeof(*this) + m_rasSize; }
 };
 
 //-----------------------------------------------------------------------------

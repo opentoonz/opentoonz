@@ -35,7 +35,7 @@ public:
   TPaletteHandle *getPaletteHandle() { return m_pltHandle; }
 
 protected:
-  void paintEvent(QPaintEvent *pe);
+  void paintEvent(QPaintEvent *pe) override;
 };
 }  // namspace
 

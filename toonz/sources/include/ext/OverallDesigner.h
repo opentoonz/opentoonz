@@ -32,11 +32,11 @@ class DVAPI OverallDesigner : public Designer {
 public:
   OverallDesigner(int x, int y);
   virtual ~OverallDesigner();
-  void draw(SmoothDeformation *);
-  void draw(CornerDeformation *);
-  void draw(StraightCornerDeformation *);
-  void draw(StrokeDeformation *);
-  void draw(Selector *);
+  void draw(SmoothDeformation *) override;
+  void draw(CornerDeformation *) override;
+  void draw(StraightCornerDeformation *) override;
+  void draw(StrokeDeformation *) override;
+  void draw(Selector *) override;
 };
 }
 #endif /* OVERALLDESIGNER_H */

@@ -35,20 +35,20 @@ public:
   TXshPaletteColumn();
   ~TXshPaletteColumn();
 
-  TXshColumn::ColumnType getColumnType() const;
+  TXshColumn::ColumnType getColumnType() const override;
 
-  TXshPaletteColumn *getPaletteColumn() { return this; }
+  TXshPaletteColumn *getPaletteColumn() override { return this; }
 
-  TXshColumn *clone() const;
+  TXshColumn *clone() const override;
 
   TPaletteColumnFx *getPaletteColumnFx() const { return m_fx; }
-  TFx *getFx() const;
+  TFx *getFx() const override;
   void setFx(TFx *fx);
 
-  bool canSetCell(const TXshCell &cell) const;
+  bool canSetCell(const TXshCell &cell) const override;
 
-  void loadData(TIStream &is);
-  void saveData(TOStream &is);
+  void loadData(TIStream &is) override;
+  void saveData(TOStream &is) override;
 
 private:
   // not implemented

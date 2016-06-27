@@ -120,8 +120,8 @@ public:
   QString getLayoutName() { return m_layoutName; }
 
 protected:
-  void showEvent(QShowEvent *);
-  void closeEvent(QCloseEvent *);
+  void showEvent(QShowEvent *) override;
+  void closeEvent(QCloseEvent *) override;
   void readSettings(const QString &layoutFileName);
   void writeSettings();
 

@@ -35,8 +35,8 @@ public:
                     TVectorImageP vi = TVectorImageP());
   ~TVectorBrushStyle();
 
-  TColorStyle *clone() const;
-  QString getDescription() const;
+  TColorStyle *clone() const override;
+  QString getDescription() const override;
 
   static TFilePath getRootDir() { return m_rootDir; }
   static void setRootDir(const TFilePath &path) {
@@ -45,30 +45,30 @@ public:
 
   void loadBrush(const std::string &brushName);
 
-  int getTagId() const { return 3000; }
+  int getTagId() const override { return 3000; }
 
   TVectorImageP getImage() const { return m_brush; }
 
-  bool isRegionStyle() const { return false; }
-  bool isStrokeStyle() const { return true; }
+  bool isRegionStyle() const override { return false; }
+  bool isStrokeStyle() const override { return true; }
 
-  TStrokeProp *makeStrokeProp(const TStroke *stroke);
-  TRegionProp *makeRegionProp(const TRegion *region) {
+  TStrokeProp *makeStrokeProp(const TStroke *stroke) override;
+  TRegionProp *makeRegionProp(const TRegion *region) override {
     assert(false);
     return 0;
   }
 
-  bool hasMainColor() const { return true; }
-  TPixel32 getMainColor() const;
-  void setMainColor(const TPixel32 &color);
+  bool hasMainColor() const override { return true; }
+  TPixel32 getMainColor() const override;
+  void setMainColor(const TPixel32 &color) override;
 
-  int getColorParamCount() const;
-  TPixel32 getColorParamValue(int index) const;
-  void setColorParamValue(int index, const TPixel32 &color);
+  int getColorParamCount() const override;
+  TPixel32 getColorParamValue(int index) const override;
+  void setColorParamValue(int index, const TPixel32 &color) override;
 
 protected:
-  void loadData(TInputStreamInterface &);
-  void saveData(TOutputStreamInterface &) const;
+  void loadData(TInputStreamInterface &) override;
+  void saveData(TOutputStreamInterface &) const override;
 
 private:
   int getColorStyleId(int index) const;
