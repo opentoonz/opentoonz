@@ -1527,9 +1527,9 @@ QAction *MainWindow::createToolAction(const char *id, const char *iconName,
 void MainWindow::defineActions() {
   createMenuFileAction(MI_NewScene, tr("&New Scene"), "Ctrl+N");
   createMenuFileAction(MI_LoadScene, tr("&Load Scene..."), "Ctrl+L");
-  createMenuFileAction(MI_SaveScene, tr("&Save Scene"), "Ctrl+S");
+  createMenuFileAction(MI_SaveScene, tr("&Save Scene"), "");
   createMenuFileAction(MI_SaveSceneAs, tr("&Save Scene As..."), "Ctrl+Shift+S");
-  createMenuFileAction(MI_SaveAll, tr("&Save All"), "");
+  createMenuFileAction(MI_SaveAll, tr("&Save All"), "Ctrl+S");
   createMenuFileAction(MI_RevertScene, tr("&Revert Scene"), "");
 
   QAction *act = CommandManager::instance()->getAction(MI_RevertScene);
@@ -1548,6 +1548,7 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_NewLevel, tr("&New Level..."), "");
   createMenuFileAction(MI_LoadLevel, tr("&Load Level..."), "");
   createMenuFileAction(MI_SaveLevel, tr("&Save Level"), "");
+  createMenuFileAction(MI_SaveAllLevels, tr("&Save All Levels"), "");
   createMenuFileAction(MI_SaveLevelAs, tr("&Save Level As..."), "");
   createMenuFileAction(MI_ExportLevel, tr("&Export Level..."), "");
   createMenuFileAction(MI_ConvertFileWithInput, tr("&Convert File..."), "");
@@ -2032,7 +2033,7 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_PreserveThickness",
                           tr("Preserve Thickness"), "");
   createToolOptionsAction("A_ToolOption_PressureSensibility",
-                          tr("Pressure sensibility"), "");
+                          tr("Pressure Sensitivity"), "");
   createToolOptionsAction("A_ToolOption_SegmentInk", tr("Segment Ink"), "F8");
   createToolOptionsAction("A_ToolOption_Selective", tr("Selective"), "F7");
   createToolOptionsAction("A_ToolOption_Smooth", tr("Smooth"), "");
