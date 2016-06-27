@@ -7,6 +7,18 @@
 //#include "timage_io.h"
 #include "tproperty.h"
 
+class TLevelReaderGif : public TLevelReader {
+public:
+	TLevelReaderGif(const TFilePath &path);
+	~TLevelReaderGif();
+	TLevelP loadInfo() override;
+	TImageReaderP getFrameReader(TFrameId fid) override;
+};
+
+class TLevelWriterGif : public TLevelWriter {
+
+};
+
 //===========================================================================
 
 namespace Tiio {

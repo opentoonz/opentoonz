@@ -149,6 +149,16 @@ void initImageIo(bool lightVersion) {
   Tiio::defineWriterProperties("rgb", new Tiio::SgiWriterProperties());
 
   //ffmpeg will go here
+  Tiio::defineReaderMaker("gif", Tiio::makePngReader);
+  Tiio::defineWriterMaker("gif", Tiio::makePngWriter, true);
+  TFileType::declare("gif", TFileType::RASTER_IMAGE);
+  Tiio::defineWriterProperties("gif", new Tiio::PngWriterProperties());
+
+  TLevelWriter::define("webm", TLevelWriterAvi::create, true);
+  TLevelReader::define("webm", TLevelReaderAvi::create);
+  TFileType::declare("webm", TFileType::RASTER_LEVEL);
+  Tiio::defineWriterProperties("webm", new Tiio::AviWriterProperties());
+
   TLevelWriter::define("mp4", TLevelWriterAvi::create, true);
   TLevelReader::define("mp4", TLevelReaderAvi::create);
   TFileType::declare("mp4", TFileType::RASTER_LEVEL);
