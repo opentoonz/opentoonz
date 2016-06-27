@@ -1527,9 +1527,9 @@ QAction *MainWindow::createToolAction(const char *id, const char *iconName,
 void MainWindow::defineActions() {
   createMenuFileAction(MI_NewScene, tr("&New Scene"), "Ctrl+N");
   createMenuFileAction(MI_LoadScene, tr("&Load Scene..."), "Ctrl+L");
-  createMenuFileAction(MI_SaveScene, tr("&Save Scene"), "");
+  createMenuFileAction(MI_SaveScene, tr("&Save Scene"), "Ctrl+S");
   createMenuFileAction(MI_SaveSceneAs, tr("&Save Scene As..."), "Ctrl+Shift+S");
-  createMenuFileAction(MI_SaveAll, tr("&Save All"), "Ctrl+S");
+  createMenuFileAction(MI_SaveAll, tr("&Save All"), "");
   createMenuFileAction(MI_RevertScene, tr("&Revert Scene"), "");
 
   QAction *act = CommandManager::instance()->getAction(MI_RevertScene);
