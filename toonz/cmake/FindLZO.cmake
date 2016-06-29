@@ -1,5 +1,5 @@
-find_path(LZO_INCLUDE_DIR NAMES lzoconf.h HINTS ${THIRDPARTY_LIBS_HINTS} PATH_SUFFIXES lzo/2.09/include/lzo lzo/2.03/include/lzo)
-find_library(LZO_LIBRARY NAMES liblzo2.a lzo2_64.lib HINTS ${THIRDPARTY_LIBS_HINTS} PATH_SUFFIXES lzo/2.09/lib lzo/2.03/lib/LZO_lib)
+find_path(LZO_INCLUDE_DIR NAMES lzoconf.h HINTS ${THIRDPARTY_LIBS_HINTS} /usr/include/lzo/ PATH_SUFFIXES lzo/2.09/include/lzo lzo/2.03/include/lzo)
+find_library(LZO_LIBRARY NAMES liblzo2.a lzo2_64.lib HINTS ${THIRDPARTY_LIBS_HINTS} /usr/lib/i386-linux-gnu/ /usr/lib/x86_64-linux-gnu/ PATH_SUFFIXES lzo/2.09/lib lzo/2.03/lib/LZO_lib)
 
 message("***** LZO Header path:" ${LZO_INCLUDE_DIR})
 message("***** LZO Library path:" ${LZO_LIBRARY})
