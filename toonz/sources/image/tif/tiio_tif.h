@@ -41,7 +41,7 @@ namespace Tiio {
 
 //===========================================================================
 
-class TifWriterProperties : public TPropertyGroup {
+class TifWriterProperties final : public TPropertyGroup {
 public:
   TEnumProperty m_byteOrdering;
   TEnumProperty m_compressionType;

@@ -960,7 +960,7 @@ ParamViewer::ParamViewer(QWidget *parent, Qt::WFlags flags)
   QPushButton *showSwatchButton = new QPushButton("", this);
   QLabel *swatchLabel           = new QLabel(tr("Swatch Viewer"), this);
 
-  swatchLabel->setObjectName("FxSettingsPreviewShowLabel");
+  swatchLabel->setObjectName("TitleTxtLabel");
   showSwatchButton->setObjectName("FxSettingsPreviewShowButton");
   showSwatchButton->setFixedSize(15, 15);
   showSwatchButton->setCheckable(true);

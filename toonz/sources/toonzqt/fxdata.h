@@ -24,7 +24,7 @@ using namespace TFxCommand;
 //    FxsData  declaration
 //**********************************************************************
 
-class FxsData : public DvMimeData {
+class FxsData final : public DvMimeData {
   QList<TFxP> m_fxs;
   QMap<TFx *, bool> m_visitedFxs;
   QMap<TFx *, int> m_zeraryFxColumnSize;

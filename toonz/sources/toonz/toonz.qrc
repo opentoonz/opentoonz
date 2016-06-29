@@ -206,7 +206,6 @@
         <file>Resources/play.png</file>
         <file>Resources/play_click.png</file>
         <file>Resources/play_over.png</file>
-        <file>Resources/position.png</file>
         <file>Resources/preview_toggle.png</file>
         <file>Resources/previuos_folder.png</file>
         <file>Resources/prevkey.png</file>
@@ -232,13 +231,11 @@
         <file>Resources/rotate.png</file>
         <file>Resources/rotate.svg</file>
         <file>Resources/rotate_rollover.svg</file>
-        <file>Resources/rotation.png</file>
         <file>Resources/savescreen.png</file>
         <file>Resources/scale.png</file>
         <file>Resources/scale_h.png</file>
         <file>Resources/scale_inv.png</file>
         <file>Resources/scale_v.png</file>
-        <file>Resources/scalepeg.png</file>
         <file>Resources/schematic_spin_arrows.svg</file>
         <file>Resources/schematic_spline_aim_rhomb.svg</file>
         <file>Resources/schematic_spline_aim_square.svg</file>
@@ -394,7 +391,6 @@
         <file>Resources/round_join.png</file>
         <file>Resources/bevel_join.png</file>
         <file>Resources/miter_join.png</file>
-        <file>Resources/thickness.png</file>
         <file>Resources/init.js</file>
         <file>Resources/scripticon.png</file>
         <file>Resources/safearea.png</file>

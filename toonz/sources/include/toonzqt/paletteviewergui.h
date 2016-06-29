@@ -76,7 +76,7 @@ enum PaletteViewType  //! Possible palette contents of a Palette Viewer.
 //    PageViewer  declaration
 //****************************************************************************
 
-class DVAPI PageViewer : public QFrame, public TSelection::View {
+class DVAPI PageViewer final : public QFrame, public TSelection::View {
   Q_OBJECT
 
   QColor m_textColor;  // text color used for list view
@@ -237,7 +237,7 @@ signals:
 //    PaletteTabBar  declaration
 //****************************************************************************
 
-class DVAPI PaletteTabBar : public QTabBar {
+class DVAPI PaletteTabBar final : public QTabBar {
   Q_OBJECT
 
 public:
@@ -284,7 +284,7 @@ private:
         in the widgets hierarchy.
         */
 
-class DVAPI PaletteIconWidget : public QWidget {
+class DVAPI PaletteIconWidget final : public QWidget {
   Q_OBJECT
 
 public:

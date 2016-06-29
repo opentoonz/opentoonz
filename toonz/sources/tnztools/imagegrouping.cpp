@@ -75,7 +75,7 @@ void ungroupWithoutUndo(TVectorImage *vimg, StrokeSelection *selection) {
 // GroupUndo
 //-----------------------------------------------------------------------------
 
-class GroupUndo : public ToolUtils::TToolUndo {
+class GroupUndo final : public ToolUtils::TToolUndo {
   std::auto_ptr<StrokeSelection> m_selection;
 
 public:
@@ -102,7 +102,7 @@ public:
 // UngroupUndo
 //-----------------------------------------------------------------------------
 
-class UngroupUndo : public ToolUtils::TToolUndo {
+class UngroupUndo final : public ToolUtils::TToolUndo {
   std::auto_ptr<StrokeSelection> m_selection;
 
 public:
@@ -129,7 +129,7 @@ public:
 // MoveGroupUndo
 //-----------------------------------------------------------------------------
 
-class MoveGroupUndo : public ToolUtils::TToolUndo {
+class MoveGroupUndo final : public ToolUtils::TToolUndo {
   UCHAR m_moveType;
   int m_refStroke, m_count, m_moveBefore;
   std::vector<std::pair<TStroke *, int>> m_selectedGroups;

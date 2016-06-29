@@ -252,7 +252,7 @@ void TImageCombinationFx::compatibilityTranslatePort(int major, int minor,
 //    TImageCombinationFx  heir classes
 //******************************************************************************************
 
-class OverFx : public TImageCombinationFx {
+class OverFx final : public TImageCombinationFx {
   FX_DECLARATION(OverFx)
 
 public:
@@ -266,7 +266,7 @@ public:
 
 //==================================================================
 
-class AddFx : public TImageCombinationFx {
+class AddFx final : public TImageCombinationFx {
   FX_DECLARATION(AddFx)
 
   TDoubleParamP m_value;
@@ -289,7 +289,7 @@ public:
 
 //==================================================================
 
-class ColorDodgeFx : public TImageCombinationFx {
+class ColorDodgeFx final : public TImageCombinationFx {
   FX_DECLARATION(AddFx)
 
 public:
@@ -303,7 +303,7 @@ public:
 
 //==================================================================
 
-class ColorBurnFx : public TImageCombinationFx {
+class ColorBurnFx final : public TImageCombinationFx {
   FX_DECLARATION(AddFx)
 
 public:
@@ -317,7 +317,7 @@ public:
 
 //==================================================================
 
-class ScreenFx : public TImageCombinationFx {
+class ScreenFx final : public TImageCombinationFx {
   FX_DECLARATION(AddFx)
 
 public:
@@ -333,7 +333,7 @@ public:
 
 //==================================================================
 
-class SubFx : public TImageCombinationFx {
+class SubFx final : public TImageCombinationFx {
   FX_DECLARATION(SubFx)
 
   TBoolParamP m_matte;
@@ -351,7 +351,7 @@ public:
 
 //==================================================================
 
-class MultFx : public TImageCombinationFx {
+class MultFx final : public TImageCombinationFx {
   FX_DECLARATION(MultFx)
 
   TDoubleParamP m_value;
@@ -375,7 +375,7 @@ public:
 
 //==================================================================
 
-class MinFx : public TImageCombinationFx {
+class MinFx final : public TImageCombinationFx {
   FX_DECLARATION(MinFx)
 
   TBoolParamP m_matte;
@@ -395,7 +395,7 @@ public:
 
 //==================================================================
 
-class MaxFx : public TImageCombinationFx {
+class MaxFx final : public TImageCombinationFx {
   FX_DECLARATION(MaxFx)
 
 public:
@@ -409,7 +409,7 @@ public:
 
 //==================================================================
 
-class LinearBurnFx : public TImageCombinationFx {
+class LinearBurnFx final : public TImageCombinationFx {
   FX_DECLARATION(LinearBurnFx)
 
 public:
@@ -424,7 +424,7 @@ public:
 //==================================================================
 
 // This Fx is probably unused...!
-class OverlayFx : public TImageCombinationFx {
+class OverlayFx final : public TImageCombinationFx {
   FX_DECLARATION(OverlayFx)
 
 public:
@@ -439,7 +439,7 @@ public:
 
 //==================================================================
 
-class BlendFx : public TImageCombinationFx {
+class BlendFx final : public TImageCombinationFx {
   FX_DECLARATION(BlendFx)
 
   TDoubleParamP m_value;
@@ -467,7 +467,7 @@ public:
 //    Matte Fxs  definition
 //******************************************************************************************
 
-class InFx : public TBaseRasterFx {
+class InFx final : public TBaseRasterFx {
   FX_DECLARATION(InFx)
 
   TRasterFxPort m_source, m_matte;
@@ -549,7 +549,7 @@ public:
 
 //==================================================================
 
-class OutFx : public TBaseRasterFx {
+class OutFx final : public TBaseRasterFx {
   FX_DECLARATION(OutFx)
 
   TRasterFxPort m_source, m_matte;
@@ -617,7 +617,7 @@ public:
 
 //==================================================================
 
-class AtopFx : public TBaseRasterFx {
+class AtopFx final : public TBaseRasterFx {
   FX_DECLARATION(AtopFx)
 
   TRasterFxPort m_up, m_dn;

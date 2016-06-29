@@ -34,7 +34,7 @@ It can also deal notifications about its progress status, and is receptive to
 user cancels.
 
 \sa VectorizerPopup, Vectorizer, VectorizerConfiguration classes.*/
-class DVAPI VectorizerCore : public QObject {
+class DVAPI VectorizerCore final : public QObject {
   Q_OBJECT
 
   int m_currPartial;

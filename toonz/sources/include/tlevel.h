@@ -18,7 +18,7 @@
 
 //-------------------------------------------------------------------
 
-class DVAPI TLevel : public TSmartObject {
+class DVAPI TLevel final : public TSmartObject {
   DECLARE_CLASS_CODE
 
 public:
@@ -74,7 +74,7 @@ public:
 template class DVAPI TSmartPointerT<TLevel>;
 #endif
 
-class DVAPI TLevelP : public TSmartPointerT<TLevel> {
+class DVAPI TLevelP final : public TSmartPointerT<TLevel> {
 public:
   TLevelP() : TSmartPointerT<TLevel>(new TLevel) {}
   TLevelP(TLevel *level) : TSmartPointerT<TLevel>(level) {}

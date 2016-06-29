@@ -62,7 +62,7 @@ public:
 
 #endif
 
-class DVAPI TSystemException : public TException {
+class DVAPI TSystemException final : public TException {
   TFilePath m_fname;
   int m_err;
   TString m_msg;

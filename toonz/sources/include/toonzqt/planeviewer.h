@@ -52,8 +52,8 @@ class TVectorImageP;
 */
 
 /*
-CAUTION : Changing PlaneViewer to inherit QOpenGLWidget causes crash bug with 
-shader fx for some unknown reasons. So I will reluctantly keep using the 
+CAUTION : Changing PlaneViewer to inherit QOpenGLWidget causes crash bug with
+shader fx for some unknown reasons. So I will reluctantly keep using the
 obsolete class until the shader fx being overhauled. 2016/6/22 Shun
 */
 

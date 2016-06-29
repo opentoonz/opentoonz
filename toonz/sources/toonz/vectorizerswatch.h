@@ -19,7 +19,7 @@
 //    VectorizerSwatchArea declaration
 //*****************************************************************************
 
-class VectorizerSwatchArea : public QFrame {
+class VectorizerSwatchArea final : public QFrame {
   Q_OBJECT
 
 public:
@@ -60,7 +60,7 @@ public slots:
 //    VectorizerSwatchArea::Swatch declaration
 //*****************************************************************************
 
-class VectorizerSwatchArea::Swatch : public PlaneViewer {
+class VectorizerSwatchArea::Swatch final : public PlaneViewer {
   TImageP m_img;
   VectorizerSwatchArea *m_area;
 
@@ -87,7 +87,7 @@ protected:
 //    VectorizationSwatchTask declaration   -   Private class
 //*****************************************************************************
 
-class VectorizationSwatchTask : public TThread::Runnable {
+class VectorizationSwatchTask final : public TThread::Runnable {
   Q_OBJECT
 
   int m_row, m_col;

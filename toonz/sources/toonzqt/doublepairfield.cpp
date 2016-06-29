@@ -5,6 +5,8 @@
 
 #include "tcommon.h"
 
+#include <cmath>
+
 #include <QLabel>
 #include <QPainter>
 #include <QMouseEvent>
@@ -171,8 +173,9 @@ void DoubleValuePairField::setLabelsEnabled(bool enable) {
 //-----------------------------------------------------------------------------
 
 void DoubleValuePairField::setValue(double value) {
+  int decimals = std::min(m_leftLineEdit->getDecimals(), 4);
+  value = tround(value * std::pow(10, decimals)) * std::pow(0.1, decimals);
   value = tcrop(value, m_minValue, m_maxValue);
-  value = tround(value * 10000) * 0.0001;
   if (m_grabIndex == 0)  // Left grab
   {
     m_values.first = value;

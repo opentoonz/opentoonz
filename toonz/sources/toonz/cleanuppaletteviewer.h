@@ -27,7 +27,7 @@ class CleanupColorField;
 //    CleanupPaletteViewer declaration
 //********************************************************************************
 
-class CleanupPaletteViewer : public QWidget {
+class CleanupPaletteViewer final : public QWidget {
   Q_OBJECT
 
   TPaletteHandle *m_ph;

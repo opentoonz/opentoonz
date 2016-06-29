@@ -12,7 +12,7 @@ class TPanel;
 // Widget"));
 // the "paneName" create the right widget and set it to the pane
 
-class OpenFloatingPanel : public MenuItemHandler {
+class OpenFloatingPanel final : public MenuItemHandler {
   QString m_title;
   std::string m_panelType;
 

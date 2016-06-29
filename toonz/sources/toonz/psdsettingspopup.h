@@ -23,15 +23,16 @@ class CheckBox;
 // PsdSettingsPopup
 //-----------------------------------------------------------------------------
 
-class PsdSettingsPopup : public DVGui::Dialog {
+class PsdSettingsPopup final : public DVGui::Dialog {
   Q_OBJECT
   // Loading Mode
   // FLAT: psd flat image
   // FRAMES: all psd layers are frames of a single Tlevel
   // COLUMNS: each psd layer is a TLevel with only one frame.
   // FOLDER: each psd layer is a TLevel and
-  //				 each psd folder is a TLevel where each psd layer
-  //contained
+  //				 each psd folder is a TLevel where each psd
+  // layer
+  // contained
   // into folder is a frame of TLevel
 
   enum Mode { FLAT, FRAMES, COLUMNS, FOLDER };

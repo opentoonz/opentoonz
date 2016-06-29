@@ -151,7 +151,7 @@ public:
 
 protected:
   /*
-class Delegate : public QItemDelegate
+class Delegate final : public QItemDelegate
 {
 public:
 Delegate(TreeView *parent) : QItemDelegate(parent), m_treeView(parent) {}

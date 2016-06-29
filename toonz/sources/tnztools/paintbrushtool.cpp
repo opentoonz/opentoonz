@@ -61,7 +61,7 @@ const int BackgroundStyle = 0;
 
 namespace {
 
-class BrushUndo : public TRasterUndo {
+class BrushUndo final : public TRasterUndo {
   std::vector<TThickPoint> m_points;
   int m_styleId;
   bool m_selective;
@@ -246,7 +246,7 @@ void drawEmptyCircle(int thick, const TPointD &mousePos, bool isPencil,
 
 //-----------------------------------------------------------------------------
 
-class PaintBrushTool : public TTool {
+class PaintBrushTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(PaintBrushTool)
 
   RasterStrokeGenerator *m_rasterTrack;

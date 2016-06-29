@@ -16,7 +16,7 @@
 
 //==================================================================
 
-class ColorCardFx : public TBaseZeraryFx {
+class ColorCardFx final : public TBaseZeraryFx {
   FX_DECLARATION(ColorCardFx)
 
   TPixelParamP m_color;
@@ -54,7 +54,7 @@ public:
 
 //==================================================================
 
-class CheckBoardFx : public TBaseZeraryFx {
+class CheckBoardFx final : public TBaseZeraryFx {
   FX_DECLARATION(CheckBoardFx)
 
   TPixelParamP m_color1, m_color2;

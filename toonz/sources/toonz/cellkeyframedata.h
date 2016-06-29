@@ -15,7 +15,7 @@ class TXshColumn;
 // TCellKeyframeData
 //-----------------------------------------------------------------------------
 
-class TCellKeyframeData : public DvMimeData {
+class TCellKeyframeData final : public DvMimeData {
   TCellData *m_cellData;
   TKeyframeData *m_keyframeData;
 

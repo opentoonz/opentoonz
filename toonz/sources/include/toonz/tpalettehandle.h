@@ -24,7 +24,7 @@
 // TPaletteHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TPaletteHandle : public QObject {
+class DVAPI TPaletteHandle final : public QObject {
   Q_OBJECT
 
   TPalette *m_palette;

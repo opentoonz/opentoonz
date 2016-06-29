@@ -16,7 +16,7 @@ class MainWindow;
 // MessagePanel
 //-----------------------------------------------------------------------------
 
-class MessagePanel : public TPanel {
+class MessagePanel final : public TPanel {
   friend class MainWindow;
 
   CenteredTextWidget *m_messageBox;
@@ -45,7 +45,7 @@ private:
 // MessagePanel
 //-----------------------------------------------------------------------------
 
-class LogPanel : public TPanel, public TLogger::Listener {
+class LogPanel final : public TPanel, public TLogger::Listener {
   Q_OBJECT
 
   QTextEdit *m_messageBox;

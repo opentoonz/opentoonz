@@ -25,7 +25,7 @@ class Ruler;
 
 class FlipConsole;
 class TXshLevel;
-class SceneViewerPanel : public TPanel, public FlipConsoleOwner {
+class SceneViewerPanel final : public TPanel, public FlipConsoleOwner {
   Q_OBJECT
 
   friend class SceneViewer;

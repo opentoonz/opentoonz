@@ -267,7 +267,7 @@ static void shutdown_cb(int) { Sthutdown = true; }
 
 //---------------------------------------------------------------------
 
-class DataReader : public TThread::Runnable {
+class DataReader final : public TThread::Runnable {
 public:
   DataReader(int clientSocket, std::shared_ptr<TTcpIpServerImp> serverImp)
       : m_clientSocket(clientSocket), m_serverImp(std::move(serverImp)) {}
@@ -296,7 +296,7 @@ void DataReader::run() {
 
 //---------------------------------------------------------------------
 
-class DataReceiver : public TThread::Runnable {
+class DataReceiver final : public TThread::Runnable {
 public:
   DataReceiver(int clientSocket, const QString &data,
                std::shared_ptr<TTcpIpServerImp> serverImp)

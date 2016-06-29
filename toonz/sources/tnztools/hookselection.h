@@ -15,7 +15,7 @@
 // HookUndo
 //-----------------------------------------------------------------------------
 
-class HookUndo : public TUndo {
+class HookUndo final : public TUndo {
   HookSet m_oldHooks, m_newHooks;
   TXshLevelP m_level;
 
@@ -36,7 +36,7 @@ public:
 // HooksData
 //-----------------------------------------------------------------------------
 
-class HooksData : public DvMimeData {
+class HooksData final : public DvMimeData {
   struct HookPosition {
     int m_id;
     TPointD m_aPos, m_bPos;
@@ -66,7 +66,7 @@ public:
 // (1=A,2=B)
 //-----------------------------------------------------------------------------
 
-class HookSelection : public TSelection {
+class HookSelection final : public TSelection {
   TXshLevelP m_level;
   std::set<std::pair<int, int>> m_hooks;  // hookId, side : 1=A 2=B
 

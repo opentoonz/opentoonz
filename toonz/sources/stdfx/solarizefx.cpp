@@ -21,7 +21,7 @@ void prepare_lut(double max, int edge, std::vector<T> &lut) {
 
 //===================================================================
 
-class SolarizeFx : public TStandardRasterFx {
+class SolarizeFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(SolarizeFx)
 
   TRasterFxPort m_input;

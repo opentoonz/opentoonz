@@ -127,7 +127,7 @@ const QColor CurrentFrameBGColor(210, 210, 210);
 // XsheetScrollArea
 //-----------------------------------------------------------------------------
 
-class XsheetScrollArea : public QScrollArea {
+class XsheetScrollArea final : public QScrollArea {
   Q_OBJECT
 
 public:
@@ -154,7 +154,7 @@ protected:
 //! Note: some refactoring is needed. XsheetViewer is going to derive from
 //! SpreadsheetViewer.
 
-class XsheetViewer : public QFrame, public Spreadsheet::FrameScroller {
+class XsheetViewer final : public QFrame, public Spreadsheet::FrameScroller {
   Q_OBJECT
 
   QColor m_lightLightBgColor;

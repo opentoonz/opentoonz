@@ -36,7 +36,7 @@ public:
 
 //--------------------------------------------------------------------------
 
-class RawBorder : public std::vector<RawBorderPoint> {
+class RawBorder final : public std::vector<RawBorderPoint> {
   int m_xExternal;  // x coordinate of a specific vertex in the outer
   // RawBorder which contains this inner one.
   TPointD *m_coordinateSums;

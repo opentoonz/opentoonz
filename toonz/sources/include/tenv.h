@@ -40,7 +40,7 @@ public:
   void assignValue(std::string str);
 };
 
-class DVAPI IntVar : public Variable {
+class DVAPI IntVar final : public Variable {
 public:
   IntVar(std::string name, int defValue);
   IntVar(std::string name);
@@ -48,7 +48,7 @@ public:
   void operator=(int v);
 };
 
-class DVAPI DoubleVar : public Variable {
+class DVAPI DoubleVar final : public Variable {
 public:
   DoubleVar(std::string name, double defValue);
   DoubleVar(std::string name);
@@ -56,7 +56,7 @@ public:
   void operator=(double v);
 };
 
-class DVAPI StringVar : public Variable {
+class DVAPI StringVar final : public Variable {
 public:
   StringVar(std::string name, const std::string &defValue);
   StringVar(std::string name);
@@ -64,7 +64,7 @@ public:
   void operator=(const std::string &v);
 };
 
-class DVAPI FilePathVar : public Variable {
+class DVAPI FilePathVar final : public Variable {
 public:
   FilePathVar(std::string name, const TFilePath &defValue);
   FilePathVar(std::string name);
@@ -72,7 +72,7 @@ public:
   void operator=(const TFilePath &v);
 };
 
-class DVAPI RectVar : public Variable {
+class DVAPI RectVar final : public Variable {
 public:
   RectVar(std::string name, const TRect &defValue);
   RectVar(std::string name);

@@ -38,7 +38,7 @@ class RasterImageData;
 //! Selection of TToonzImage and TRasterImage.
 //-----------------------------------------------------------------------------
 
-class DVAPI RasterSelection : public TSelection {
+class DVAPI RasterSelection final : public TSelection {
   TImageP m_currentImage;
   TXshCell m_currentImageCell;
 

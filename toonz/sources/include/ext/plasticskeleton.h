@@ -56,8 +56,8 @@ class PlasticSkeletonDeformation;
 //************************************************************************************
 
 //! PlasticSkeletonVertex is the vertex of a plastic skeleton object.
-struct DVAPI PlasticSkeletonVertex : public tcg::Vertex<TPointD>,
-                                     public TPersist {
+struct DVAPI PlasticSkeletonVertex final : public tcg::Vertex<TPointD>,
+                                           public TPersist {
   PERSIST_DECLARATION(PlasticSkeletonVertex)
 
 private:
@@ -100,7 +100,7 @@ public:
 //    PlasticSkeleton  declaration
 //************************************************************************************
 
-class DVAPI PlasticSkeleton
+class DVAPI PlasticSkeleton final
     : public TSmartObject,
       public tcg::Mesh<PlasticSkeletonVertex, tcg::Edge, tcg::FaceN<3>>,
       public TPersist {

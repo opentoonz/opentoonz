@@ -13,7 +13,7 @@
 
 #include "tofflinegl.h"
 
-class QtOfflineGL : public TOfflineGL::Imp {
+class QtOfflineGL final : public TOfflineGL::Imp {
 public:
   std::shared_ptr<QOpenGLContext> m_context;
   std::shared_ptr<QOpenGLContext> m_oldContext;
@@ -36,7 +36,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class QtOfflineGLPBuffer : public TOfflineGL::Imp {
+class QtOfflineGLPBuffer final : public TOfflineGL::Imp {
 public:
   std::shared_ptr<QGLPixelBuffer> m_context;
 

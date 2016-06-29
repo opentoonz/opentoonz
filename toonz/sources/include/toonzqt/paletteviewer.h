@@ -40,7 +40,7 @@ class TXsheetHandle;
 // PaletteViewer
 //-----------------------------------------------------------------------------
 
-class DVAPI PaletteViewer : public QFrame {
+class DVAPI PaletteViewer final : public QFrame {
   Q_OBJECT
 
 public:

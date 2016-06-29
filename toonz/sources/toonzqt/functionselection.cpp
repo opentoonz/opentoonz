@@ -29,7 +29,7 @@
 //
 //-----------------------------------------------------------------------------
 
-class KeyframesCopyUndo : public TUndo {
+class KeyframesCopyUndo final : public TUndo {
   QMimeData *m_oldData, *m_newData;
 
 public:
@@ -54,7 +54,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class KeyframesPasteUndo : public TUndo {
+class KeyframesPasteUndo final : public TUndo {
   struct Column {
     TDoubleParam *m_param;
     std::map<int, TDoubleKeyframe> m_oldKeyframes;
@@ -124,7 +124,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class KeyframesDeleteUndo : public TUndo {
+class KeyframesDeleteUndo final : public TUndo {
 public:
   struct ColumnKeyframes {
     TDoubleParam *m_param;
@@ -175,7 +175,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-class KeyframesMoveUndo : public TUndo {
+class KeyframesMoveUndo final : public TUndo {
 public:
   KeyframesMoveUndo() {}
   ~KeyframesMoveUndo() {

@@ -15,7 +15,7 @@ class TXsheetHandle;
 // TCellKeyframeSelection
 //-----------------------------------------------------------------------------
 
-class TCellKeyframeSelection : public TSelection {
+class TCellKeyframeSelection final : public TSelection {
   TCellSelection *m_cellSelection;
   TKeyframeSelection *m_keyframeSelection;
 

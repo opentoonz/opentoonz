@@ -32,7 +32,7 @@ using namespace ToolUtils;
 //    PumpTool declaration
 //*****************************************************************************
 
-class PumpTool : public TTool {
+class PumpTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(PumpTool)
 
   int m_strokeStyleId, m_strokeIndex;  //!< Edited stroke indices

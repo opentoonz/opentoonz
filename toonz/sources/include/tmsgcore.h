@@ -38,7 +38,7 @@ void DVAPI warning(const QString &msg);
 void DVAPI info(const QString &msg);
 };
 
-class DVAPI TMsgCore : public QObject {
+class DVAPI TMsgCore final : public QObject {
   Q_OBJECT
 
   QTcpServer *m_tcpServer;

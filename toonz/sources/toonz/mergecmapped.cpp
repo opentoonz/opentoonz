@@ -217,7 +217,7 @@ void applyDeleteMatchline(TXshSimpleLevel *sl,
 }  // namespace
 //-----------------------------------------------------------------------------
 
-class DeleteMatchlineUndo : public TUndo {
+class DeleteMatchlineUndo final : public TUndo {
 public:
   TXshLevel *m_xl;
   TXshSimpleLevel *m_sl;
@@ -295,7 +295,7 @@ public:
 /*
 namespace {
 
-class DeleteLevelUndo : public TUndo {
+class DeleteLevelUndo final : public TUndo {
   TXshLevelP m_xl;
 public:
   DeleteLevelUndo(TXshLevel *xl) : m_xl(xl) {}
@@ -338,7 +338,7 @@ bool removeLevel(TXshLevel *level) {
   return true;
 }
 
-class MergeCmappedUndo : public TUndo {
+class MergeCmappedUndo final : public TUndo {
   TXshLevel *m_xl;
   int m_mergeCmappedSessionId;
   std::map<TFrameId, QString> m_images;

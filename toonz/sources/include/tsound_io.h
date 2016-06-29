@@ -54,7 +54,8 @@ public:
 template class DVAPI TSmartPointerT<TSoundTrackReader>;
 #endif
 
-class DVAPI TSoundTrackReaderP : public TSmartPointerT<TSoundTrackReader> {
+class DVAPI TSoundTrackReaderP final
+    : public TSmartPointerT<TSoundTrackReader> {
 public:
   TSoundTrackReaderP(const TFilePath &fp);
 };
@@ -93,7 +94,8 @@ public:
 template class DVAPI TSmartPointerT<TSoundTrackWriter>;
 #endif
 
-class DVAPI TSoundTrackWriterP : public TSmartPointerT<TSoundTrackWriter> {
+class DVAPI TSoundTrackWriterP final
+    : public TSmartPointerT<TSoundTrackWriter> {
 public:
   TSoundTrackWriterP(const TFilePath &fp);
 };

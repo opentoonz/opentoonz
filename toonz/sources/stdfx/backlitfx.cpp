@@ -176,7 +176,7 @@ void backlit(TRaster64P lighted, TRaster64P light, TRaster64P out, double blur,
 
 //---------------------------------------------------------------------
 
-class BacklitFx : public TBaseRasterFx {
+class BacklitFx final : public TBaseRasterFx {
   FX_DECLARATION(BacklitFx)
   TRasterFxPort m_lighted, m_light;
   TDoubleParamP m_value;

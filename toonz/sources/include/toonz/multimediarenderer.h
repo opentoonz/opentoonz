@@ -46,7 +46,7 @@ class ToonzScene;
 
 class ToonzScene;
 
-class DVAPI MultimediaRenderer : public QObject {
+class DVAPI MultimediaRenderer final : public QObject {
   Q_OBJECT
 
   class Imp;

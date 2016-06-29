@@ -83,7 +83,7 @@ namespace {
    RECTERASE
 */
 
-class RectRasterUndo : public TRasterUndo {
+class RectRasterUndo final : public TRasterUndo {
   TRectD m_modifyArea;
   TStroke *m_stroke;
   int m_styleId;
@@ -150,7 +150,7 @@ public:
         Viene realizzata la funzione di "UNDO" per il cancellino nell'opzione
    NORMALERAS
 */
-class RasterEraserUndo : public TRasterUndo {
+class RasterEraserUndo final : public TRasterUndo {
   std::vector<TThickPoint> m_points;
   int m_styleId;
   bool m_selective;
@@ -197,7 +197,7 @@ public:
 
 //=====================================================================
 
-class RasterBluredEraserUndo : public TRasterUndo {
+class RasterBluredEraserUndo final : public TRasterUndo {
   std::vector<TThickPoint> m_points;
   int m_styleId;
   bool m_selective;
@@ -442,7 +442,7 @@ void drawEmptyCircle(int thick, const TPointD &mousePos, bool isPencil,
 //
 //------------------------------------------------------------------------
 
-class EraserTool : public TTool {
+class EraserTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(EraserTool)
 
 public:

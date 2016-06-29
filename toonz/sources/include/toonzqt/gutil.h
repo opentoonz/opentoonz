@@ -154,7 +154,7 @@ QPainterPath DVAPI strokeToPainterPath(TStroke *stroke);
 // using the styleSheet.
 // It is also used to take 6px on the left before the tabBar
 
-class DVAPI TabBarContainter : public QFrame {
+class DVAPI TabBarContainter final : public QFrame {
 public:
   TabBarContainter(QWidget *parent = 0);
 
@@ -166,7 +166,7 @@ protected:
 // This widget is only used to set the background color of the playToolBar
 // using the styleSheet. And to put a line in the upper zone
 
-class DVAPI ToolBarContainer : public QFrame {
+class DVAPI ToolBarContainer final : public QFrame {
 public:
   ToolBarContainer(QWidget *parent = 0);
 

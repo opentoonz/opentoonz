@@ -213,7 +213,7 @@ bool IsQuickTimeInstalled() {
 //  TImageWriterMov
 //------------------------------------------------------------------------------
 
-class TImageWriterMov : public TImageWriter {
+class TImageWriterMov final : public TImageWriter {
 public:
   TImageWriterMov(const TFilePath &, int frameIndex, TLevelWriterMov *);
   ~TImageWriterMov() { m_lwm->release(); }
@@ -294,7 +294,7 @@ return new TWriterInfoMov(*this);
 */
 //-----------------------------------------------------------
 /*
-class MovWriterProperties : public TPropertyGroup {
+class MovWriterProperties final : public TPropertyGroup {
 public:
   TEnumProperty m_codec;
   TEnumProperty m_quality;
@@ -1000,7 +1000,7 @@ void TLevelReaderMov::enableRandomAccessRead(bool enable) {
 //  TImageReaderMov
 //-----------------------------------------------------------
 
-class TImageReaderMov : public TImageReader {
+class TImageReaderMov final : public TImageReader {
   TLevelReaderMov *m_lrm;
   TImageInfo *m_info;
 

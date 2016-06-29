@@ -18,7 +18,7 @@ class DragTool;
 //-----------------------------------------------------------------------------
 
 //! La classe si occupa della visualizzazione dell'area che gestisce le righe.
-class RowArea : public QWidget {
+class RowArea final : public QWidget {
   Q_OBJECT
   XsheetViewer *m_viewer;
   int m_xa;

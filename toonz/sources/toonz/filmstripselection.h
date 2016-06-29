@@ -13,7 +13,7 @@ class TXshSimpleLevel;
 // TFilmStripSelection
 //-----------------------------------------------------------------------------
 
-class TFilmstripSelection : public TSelection {
+class TFilmstripSelection final : public TSelection {
 public:
   typedef std::pair<TFrameId, TFrameId> InbetweenRange;
 

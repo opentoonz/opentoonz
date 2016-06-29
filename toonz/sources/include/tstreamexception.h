@@ -22,7 +22,7 @@ class TOStream;
 
 //===================================================================
 
-class DVAPI TIStreamException : public TException {
+class DVAPI TIStreamException final : public TException {
 public:
   TIStreamException(TIStream &is);
   TIStreamException(TIStream &is, const TException &e);

@@ -46,7 +46,7 @@ void convertRaster32ToImage(TRaster32P ras, QImage *image) {
 //    StyleLoaderTask definition
 //********************************************************************************
 
-class CustomStyleManager::StyleLoaderTask : public TThread::Runnable {
+class CustomStyleManager::StyleLoaderTask final : public TThread::Runnable {
   CustomStyleManager *m_manager;
   TFilePath m_fp;
   PatternData m_data;

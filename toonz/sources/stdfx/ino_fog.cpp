@@ -5,7 +5,7 @@
 #include "ino_common.h"
 #include "igs_fog.h"
 //------------------------------------------------------------
-class ino_fog : public TStandardRasterFx {
+class ino_fog final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_fog)
   TRasterFxPort m_input;
   TDoubleParamP m_radius;

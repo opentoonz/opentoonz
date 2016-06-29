@@ -14,7 +14,7 @@ namespace {
 
 //------------------------------------------------------------------------------
 
-class Controller : public TFarmController, public TFarmProxy {
+class Controller final : public TFarmController, public TFarmProxy {
 public:
   Controller(const QString &hostName, const QString &addr, int port)
       : TFarmProxy(hostName, addr, port) {}

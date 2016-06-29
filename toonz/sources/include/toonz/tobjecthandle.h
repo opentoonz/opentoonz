@@ -32,7 +32,7 @@ class TStageObjectSpline;
   Puo' anche essere la spline associata all'oggetto
 */
 
-class DVAPI TObjectHandle : public QObject {
+class DVAPI TObjectHandle final : public QObject {
   Q_OBJECT
 
   TStageObjectId m_objectId;

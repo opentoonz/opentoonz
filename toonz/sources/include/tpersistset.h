@@ -25,7 +25,7 @@
   configuration options, without discarding the other objects.
 */
 
-class DVAPI TPersistSet : public TPersist {
+class DVAPI TPersistSet final : public TPersist {
   PERSIST_DECLARATION(TPersistSet)
 
   std::vector<TPersist *> m_objects;  //!< #owned# Stored objects.

@@ -11,7 +11,7 @@ class TXshSimpleLevel;
 
 namespace TScriptBinding {
 
-class DVAPI Level : public Wrapper {
+class DVAPI Level final : public Wrapper {
   Q_OBJECT
   TXshSimpleLevel *m_sl;
   ToonzScene *m_scene;

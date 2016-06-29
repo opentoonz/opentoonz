@@ -14,7 +14,7 @@ class QCheckBox;
 
 //-----------------------------------------------------------------------------
 
-class SVNRevertDialog : public DVGui::Dialog {
+class SVNRevertDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QLabel *m_waitingLabel;
@@ -72,7 +72,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNRevertFrameRangeDialog : public DVGui::Dialog {
+class SVNRevertFrameRangeDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QLabel *m_waitingLabel;

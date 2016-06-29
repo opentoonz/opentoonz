@@ -60,7 +60,7 @@ FunctionSegmentPage::~FunctionSegmentPage() {}
 
 //=============================================================================
 
-class FunctionEmptySegmentPage : public FunctionSegmentPage {
+class FunctionEmptySegmentPage final : public FunctionSegmentPage {
 public:
   FunctionEmptySegmentPage(FunctionSegmentViewer *parent = 0)
       : FunctionSegmentPage(parent) {}
@@ -657,7 +657,7 @@ bool FunctionExpressionSegmentPage::getGuiValues(std::string &expressionText,
 
 //=============================================================================
 
-class FileSegmentPage : public FunctionSegmentPage {
+class FileSegmentPage final : public FunctionSegmentPage {
   DVGui::FileField *m_fileFld;
   LineEdit *m_fieldIndexFld;
   LineEdit *m_measureFld;

@@ -92,7 +92,7 @@ responsibility of the
   TStageObjectTree class.
 */
 
-class DVAPI TStageObject : public TSmartObject, public TParamObserver {
+class DVAPI TStageObject final : public TSmartObject, public TParamObserver {
   DECLARE_CLASS_CODE
 
 public:

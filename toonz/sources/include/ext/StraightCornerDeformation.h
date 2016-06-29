@@ -26,7 +26,7 @@
 #include "StrokeDeformationImpl.h"
 
 namespace ToonzExt {
-class DVAPI StraightCornerDeformation : public StrokeDeformationImpl {
+class DVAPI StraightCornerDeformation final : public StrokeDeformationImpl {
   StraightCornerDeformation();
 
 public:

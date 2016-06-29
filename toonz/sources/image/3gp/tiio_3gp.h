@@ -46,7 +46,7 @@ class TImageReader3gp;
 
 bool IsQuickTimeInstalled();
 
-class TLevelWriter3gp : public TLevelWriter {
+class TLevelWriter3gp final : public TLevelWriter {
 public:
   TLevelWriter3gp(const TFilePath &path, TPropertyGroup *winfo);
   ~TLevelWriter3gp();
@@ -83,7 +83,7 @@ public:
   void saveSoundTrack(TSoundTrack *st) override;
 };
 
-class TLevelReader3gp : public TLevelReader {
+class TLevelReader3gp final : public TLevelReader {
 public:
   TLevelReader3gp(const TFilePath &path);
   ~TLevelReader3gp();

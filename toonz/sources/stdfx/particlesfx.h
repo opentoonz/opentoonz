@@ -11,7 +11,7 @@
 //    Particles Fx  class
 //******************************************************************
 
-class ParticlesFx : public TStandardZeraryFx {
+class ParticlesFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(ParticlesFx)
 
   TFxPortDG m_source, m_control;

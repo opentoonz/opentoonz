@@ -86,7 +86,7 @@ void initToonzEvent(TMouseEvent &toonzEvent, QMouseEvent *event,
 
 //-----------------------------------------------------------------------------
 
-class ViewerZoomer : public ImageUtils::ShortcutZoomer {
+class ViewerZoomer final : public ImageUtils::ShortcutZoomer {
 public:
   ViewerZoomer(QWidget *parent) : ShortcutZoomer(parent) {}
   void zoom(bool zoomin, bool resetZoom) {
@@ -351,7 +351,7 @@ dare seri problemi!!!!
   // 		ras->lock();
   //		memcpy( ptr, ras->getRawData(), dataSize);
   //		glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB); // release pointer
-  //to
+  // to
   // mapping buffer
   //		ras->unlock();
   //   }

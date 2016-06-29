@@ -36,7 +36,7 @@ public:
 //=============================================================================
 // ExportSceneDvDirModelSpecialFileFolderNode
 
-class ExportSceneDvDirModelSpecialFileFolderNode
+class ExportSceneDvDirModelSpecialFileFolderNode final
     : public ExportSceneDvDirModelFileFolderNode {
   QPixmap m_pixmap;
 
@@ -52,7 +52,7 @@ public:
 //=============================================================================
 // ExportSceneDvDirModelProjectNode
 
-class ExportSceneDvDirModelProjectNode
+class ExportSceneDvDirModelProjectNode final
     : public ExportSceneDvDirModelFileFolderNode {
 public:
   ExportSceneDvDirModelProjectNode(DvDirModelNode *parent,
@@ -65,7 +65,7 @@ public:
 //=============================================================================
 // ExportSceneDvDirModelRootNode
 
-class ExportSceneDvDirModelRootNode : public DvDirModelNode {
+class ExportSceneDvDirModelRootNode final : public DvDirModelNode {
   std::vector<ExportSceneDvDirModelFileFolderNode *> m_projectRootNodes;
   ExportSceneDvDirModelFileFolderNode *m_sandboxProjectNode;
   void add(std::wstring name, const TFilePath &path);
@@ -80,7 +80,7 @@ public:
 //=============================================================================
 // ExportSceneDvDirModel
 
-class ExportSceneDvDirModel : public QAbstractItemModel {
+class ExportSceneDvDirModel final : public QAbstractItemModel {
   DvDirModelNode *m_root;
 
 public:
@@ -107,7 +107,7 @@ public:
 //=============================================================================
 // ExportSceneTreeViewDelegate
 
-class ExportSceneTreeViewDelegate : public QItemDelegate {
+class ExportSceneTreeViewDelegate final : public QItemDelegate {
   Q_OBJECT
   ExportSceneTreeView *m_treeView;
 
@@ -123,7 +123,7 @@ public:
 //=============================================================================
 // ExportSceneTreeView
 
-class ExportSceneTreeView : public QTreeView {
+class ExportSceneTreeView final : public QTreeView {
   Q_OBJECT
   ExportSceneDvDirModel *m_model;
 
@@ -147,7 +147,7 @@ signals:
 //=============================================================================
 // ExportScenePopup
 
-class ExportScenePopup : public DVGui::Dialog {
+class ExportScenePopup final : public DVGui::Dialog {
   Q_OBJECT
 
   std::vector<TFilePath> m_scenes;

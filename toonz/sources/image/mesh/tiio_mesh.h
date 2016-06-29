@@ -9,7 +9,7 @@
 //    TLevelWriterMesh  declaration
 //*****************************************************************************************
 
-class TLevelWriterMesh : public TLevelWriter {
+class TLevelWriterMesh final : public TLevelWriter {
 public:
   TLevelWriterMesh(const TFilePath &path, TPropertyGroup *winfo);
   ~TLevelWriterMesh();
@@ -31,7 +31,7 @@ private:
 //    TLevelReaderMesh  declaration
 //*****************************************************************************************
 
-class TLevelReaderMesh : public TLevelReader {
+class TLevelReaderMesh final : public TLevelReader {
 public:
   TLevelReaderMesh(const TFilePath &path);
   ~TLevelReaderMesh();

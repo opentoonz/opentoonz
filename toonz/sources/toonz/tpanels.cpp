@@ -89,7 +89,7 @@
 // XsheetViewer
 //-----------------------------------------------------------------------------
 
-class XsheetViewerFactory : public TPanelFactory {
+class XsheetViewerFactory final : public TPanelFactory {
 public:
   XsheetViewerFactory() : TPanelFactory("Xsheet") {}
   void initialize(TPanel *panel) override {
@@ -106,7 +106,7 @@ public:
 // SchematicSceneViewerFactory
 //---------------------------------------------------------
 
-class SchematicSceneViewerFactory : public QObject, public TPanelFactory {
+class SchematicSceneViewerFactory final : public QObject, public TPanelFactory {
 public:
   SchematicSceneViewerFactory() : TPanelFactory("Schematic") {}
 
@@ -381,7 +381,7 @@ void FunctionViewerPanel::onIoCurve(int type, TDoubleParam *curve,
 // CurrentStyleChangeCommand
 //-----------------------------------------------------------------------------
 
-class CurrentStyleChangeCommand : public ChangeStyleCommand {
+class CurrentStyleChangeCommand final : public ChangeStyleCommand {
 public:
   CurrentStyleChangeCommand() {}
   ~CurrentStyleChangeCommand() {}
@@ -549,7 +549,7 @@ void PaletteViewerPanel::onSceneSwitched() {
 
 //=============================================================================
 
-class PaletteViewerFactory : public TPanelFactory {
+class PaletteViewerFactory final : public TPanelFactory {
 public:
   PaletteViewerFactory() : TPanelFactory("LevelPalette") {}
 
@@ -611,7 +611,7 @@ void StudioPaletteViewerPanel::onPaletteSwitched() {
 // StudioPaletteViewerFactory
 //-----------------------------------------------------------------------------
 
-class StudioPaletteViewerFactory : public TPanelFactory {
+class StudioPaletteViewerFactory final : public TPanelFactory {
 public:
   StudioPaletteViewerFactory() : TPanelFactory("StudioPalette") {}
 
@@ -798,7 +798,7 @@ StyleEditorPanel::StyleEditorPanel(QWidget *parent) : TPanel(parent) {
 
 //-----------------------------------------------------------------------------
 
-class StyleEditorFactory : public TPanelFactory {
+class StyleEditorFactory final : public TPanelFactory {
 public:
   StyleEditorFactory() : TPanelFactory("StyleEditor") {}
 
@@ -822,7 +822,7 @@ OpenFloatingPanel openStyleEditorCommand(MI_OpenStyleControl, "StyleEditor",
 // SceneViewer
 //-----------------------------------------------------------------------------
 
-class SceneViewerFactory : public TPanelFactory {
+class SceneViewerFactory final : public TPanelFactory {
 public:
   SceneViewerFactory() : TPanelFactory("SceneViewer") {}
 
@@ -845,7 +845,7 @@ OpenFloatingPanel openSceneViewerCommand(MI_OpenLevelView, "SceneViewer",
 
 //-----------------------------------------------------------------------------
 
-class ToolbarFactory : public TPanelFactory {
+class ToolbarFactory final : public TPanelFactory {
 public:
   ToolbarFactory() : TPanelFactory("ToolBar") {}
   void initialize(TPanel *panel) override {
@@ -877,7 +877,7 @@ ToolOptionPanel::ToolOptionPanel(QWidget *parent)
 // ToolOptionsFactory
 //-----------------------------------------------------------------------------
 
-class ToolOptionsFactory : public TPanelFactory {
+class ToolOptionsFactory final : public TPanelFactory {
   TPanel *m_panel;
 
 public:
@@ -976,7 +976,7 @@ void FlipbookPanel::onDock(bool docked) { m_button->setVisible(!docked); }
 
 //-----------------------------------------------------------------------------
 
-class FlipbookFactory : public TPanelFactory {
+class FlipbookFactory final : public TPanelFactory {
 public:
   FlipbookFactory() : TPanelFactory("FlipBook") {}
 
@@ -995,7 +995,7 @@ public:
 // TasksViewerFactory
 //-----------------------------------------------------------------------------
 
-class TasksViewerFactory : public TPanelFactory {
+class TasksViewerFactory final : public TPanelFactory {
 public:
   TasksViewerFactory() : TPanelFactory("Tasks") {}
   void initialize(TPanel *panel) override {
@@ -1004,7 +1004,7 @@ public:
   }
 } tasksViewerFactory;
 
-class BatchServersViewerFactory : public TPanelFactory {
+class BatchServersViewerFactory final : public TPanelFactory {
 public:
   BatchServersViewerFactory() : TPanelFactory("BatchServers") {}
   void initialize(TPanel *panel) override {
@@ -1014,7 +1014,7 @@ public:
 } batchServersViewerFactory;
 #endif
 
-class BrowserFactory : public TPanelFactory {
+class BrowserFactory final : public TPanelFactory {
 public:
   BrowserFactory() : TPanelFactory("Browser") {}
   void initialize(TPanel *panel) override {
@@ -1031,7 +1031,7 @@ public:
 // CastViewerFactory
 //-----------------------------------------------------------------------------
 
-class CastViewerFactory : public TPanelFactory {
+class CastViewerFactory final : public TPanelFactory {
 public:
   CastViewerFactory() : TPanelFactory("SceneCast") {}
   void initialize(TPanel *panel) override {
@@ -1044,7 +1044,7 @@ public:
 // FilmStripFactory
 //-----------------------------------------------------------------------------
 
-class FilmStripFactory : public TPanelFactory {
+class FilmStripFactory final : public TPanelFactory {
 public:
   FilmStripFactory() : TPanelFactory("FilmStrip") {}
   void initialize(TPanel *panel) override {
@@ -1058,7 +1058,7 @@ public:
 //-----------------------------------------------------------------------------
 
 #ifdef LINETEST
-class ExportFactory : public TPanelFactory {
+class ExportFactory final : public TPanelFactory {
 public:
   ExportFactory() : TPanelFactory("Export") {}
 
@@ -1082,7 +1082,7 @@ OpenFloatingPanel openExportPanelCommand(MI_OpenExport, "Export",
 #endif
 
 #ifndef LINETEST
-class ColorModelViewerFactory : public TPanelFactory {
+class ColorModelViewerFactory final : public TPanelFactory {
 public:
   ColorModelViewerFactory() : TPanelFactory("ColorModel") {}
   void initialize(TPanel *panel) override {
@@ -1097,7 +1097,7 @@ public:
 // FunctionViewerFactory
 //-----------------------------------------------------------------------------
 
-class FunctionViewerFactory : public TPanelFactory {
+class FunctionViewerFactory final : public TPanelFactory {
 public:
   FunctionViewerFactory() : TPanelFactory("FunctionEditor") {}
 
@@ -1120,7 +1120,7 @@ OpenFloatingPanel openFunctionViewerCommand(MI_OpenFunctionEditor,
 // TMessageViewerFactory
 //-----------------------------------------------------------------------------
 
-class TMessageViewerFactory : public TPanelFactory {
+class TMessageViewerFactory final : public TPanelFactory {
 public:
   TMessageViewerFactory() : TPanelFactory("TMessage") {}
   void initialize(TPanel *panel) override {
@@ -1137,7 +1137,7 @@ OpenFloatingPanel openTMessageCommand(MI_OpenTMessage, "TMessage",
 // ScriptConsolePanelFactory
 //-----------------------------------------------------------------------------
 
-class ScriptConsolePanelFactory : public TPanelFactory {
+class ScriptConsolePanelFactory final : public TPanelFactory {
 public:
   ScriptConsolePanelFactory() : TPanelFactory("ScriptConsole") {}
 
@@ -1164,7 +1164,7 @@ OpenFloatingPanel openTScriptConsoleCommand("MI_OpenScriptConsole",
 // LineTestViewer
 //-----------------------------------------------------------------------------
 
-class LineTestFactory : public TPanelFactory {
+class LineTestFactory final : public TPanelFactory {
 public:
   LineTestFactory() : TPanelFactory("LineTestViewer") {}
 
@@ -1189,7 +1189,7 @@ OpenFloatingPanel openLineTestViewerCommand(MI_OpenLineTestView,
 // LineTestCapturePane
 //-----------------------------------------------------------------------------
 
-class LineTestCaptureFactory : public TPanelFactory {
+class LineTestCaptureFactory final : public TPanelFactory {
 public:
   LineTestCaptureFactory() : TPanelFactory("LineTestCapture") {}
 
@@ -1216,7 +1216,7 @@ OpenFloatingPanel openLineTestCaptureCommand(MI_OpenLineTestCapture,
 // ComboViewer : Viewer + Toolbar + Tool Options
 //-----------------------------------------------------------------------------
 
-class ComboViewerFactory : public TPanelFactory {
+class ComboViewerFactory final : public TPanelFactory {
 public:
   ComboViewerFactory() : TPanelFactory("ComboViewer") {}
   TPanel *createPanel(QWidget *parent) override {
@@ -1241,7 +1241,7 @@ OpenFloatingPanel openComboViewerCommand(MI_OpenComboViewer, "ComboViewer",
 // CleanupSettings DockWindow
 //-----------------------------------------------------------------------------
 
-class CleanupSettingsFactory : public TPanelFactory {
+class CleanupSettingsFactory final : public TPanelFactory {
 public:
   CleanupSettingsFactory() : TPanelFactory("CleanupSettings") {}
 
@@ -1263,7 +1263,7 @@ OpenFloatingPanel openCleanupSettingsDockCommand(
 
 //-----------------------------------------------------------------------------
 
-class HistoryPanelFactory : public TPanelFactory {
+class HistoryPanelFactory final : public TPanelFactory {
 public:
   HistoryPanelFactory() : TPanelFactory("HistoryPanel") {}
   void initialize(TPanel *panel) override {

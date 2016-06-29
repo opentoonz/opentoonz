@@ -14,7 +14,7 @@ void callUndo(const TUndo *undo) { undo->undo(); }
 void callRedo(const TUndo *undo) { undo->redo(); }
 // void callRepeat(const TUndo* undo) {undo->repeat(); }
 
-class TUndoBlock : public TUndo {
+class TUndoBlock final : public TUndo {
   std::vector<TUndo *> m_undos;
   typedef std::vector<TUndo *>::const_iterator Iterator;
   typedef std::vector<TUndo *>::const_reverse_iterator ReverseIterator;

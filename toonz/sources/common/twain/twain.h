@@ -1434,13 +1434,13 @@ typedef struct {
  */
 #define DF_DSM2 0x10000000L /* added to the identity by the DSM  */
 #define DF_APP2                                                                \
-  0x20000000L /* Set by the App to indicate it would \ \                                                                             \
+  0x20000000L /* Set by the App to indicate it would \ \ \ \                                                                             \
                                              prefer to use DSM2 */
 #define DF_DS2                                                                 \
-  0x40000000L /* Set by the DS to indicate it would \                \         \
+  0x40000000L /* Set by the DS to indicate it would \                \ \ \                                                                             \
                                              prefer to use DSM2 */
 #define DG_MASK                                                                \
-  0xFFFFL /* all Data Groups limited to 16 bit.  Added for 2.1   \             \
+  0xFFFFL /* all Data Groups limited to 16 bit.  Added for 2.1   \ \ \                                                                             \
              */
 
 /****************************************************************************
@@ -1488,13 +1488,19 @@ typedef struct {
 
 /* misplaced */
 #define DAT_ICCPROFILE                                                         \
-  0x0401 /* TW_MEMORY        Added 1.91  This Data Argument is misplaced but \                                                                             \
+  0x0401 /* TW_MEMORY        Added 1.91  This Data Argument is misplaced but \ \
+            \                                                                  \
+            \ \                                                                             \
             belongs to the DG_IMAGE Data Group */
 #define DAT_IMAGEMEMFILEXFER                                                   \
-  0x0402 /* TW_IMAGEMEMXFER  Added 1.91  This Data Argument is misplaced but \                                                                             \
+  0x0402 /* TW_IMAGEMEMXFER  Added 1.91  This Data Argument is misplaced but \ \
+            \                                                                  \
+            \ \                                                                             \
             belongs to the DG_IMAGE Data Group */
 #define DAT_ENTRYPOINT                                                         \
-  0x0403 /* TW_ENTRYPOINT    Added 2.0   This Data Argument is misplaced but \                                                                             \
+  0x0403 /* TW_ENTRYPOINT    Added 2.0   This Data Argument is misplaced but \ \
+            \                                                                  \
+            \ \                                                                             \
             belongs to the DG_CONTROL Data Group */
 
 /****************************************************************************
@@ -1862,7 +1868,7 @@ typedef struct {
 #define TWCC_CAPBADOPERATION                                                   \
   14 /* Operation not supported by capability         */
 #define TWCC_CAPSEQERROR                                                       \
-  15 /* Capability has dependancy on other capability   \                      \
+  15 /* Capability has dependancy on other capability   \ \ \                                                                             \
         */
 #define TWCC_DENIED                                                            \
   16 /* File System operation is denied (file is protected) Added 1.8 */
@@ -1877,7 +1883,7 @@ typedef struct {
 #define TWCC_PAPERDOUBLEFEED                                                   \
   21 /* The feeder detected multiple pages                  Added 1.8 */
 #define TWCC_FILEWRITEERROR                                                    \
-  22 /* Error writing the file (meant for things like disk full \                                                                             \
+  22 /* Error writing the file (meant for things like disk full \ \ \                                                                             \
         conditions)Added 1.8 */
 #define TWCC_CHECKDEVICEONLINE                                                 \
   23 /* The device went offline prior to or during this operation Added 1.8 */
@@ -1924,10 +1930,11 @@ typedef wchar_t TW_UNI512[512], FAR *pTW_UNI512;
 #define TWFF_JPN 12 /* 1.91 */
 
 #define DAT_TWUNKIDENTITY                                                      \
-  0x000b /* Additional message required for thunker to request the special \                                                                             \
+  0x000b /* Additional message required for thunker to request the special \ \ \
+            \                                                                  \
             identity information. */
 #define DAT_SETUPFILEXFER2                                                     \
-  0x0301 /* Data transfer via a file. deprecated - use DAT_SETUPFILEXFER \                                                                             \
+  0x0301 /* Data transfer via a file. deprecated - use DAT_SETUPFILEXFER \ \ \                                                                             \
             instead*/
 
 #define CAP_SUPPORTEDCAPSEXT 0x100c

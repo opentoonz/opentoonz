@@ -54,7 +54,7 @@ public:
 //    FunctionToolbar  declaration
 //*************************************************************************
 
-class FunctionToolbar : public DVGui::ToolBar, public TParamObserver {
+class FunctionToolbar final : public DVGui::ToolBar, public TParamObserver {
   Q_OBJECT
 
   QToolBar *m_valueToolbar, *m_keyframeToolbar;

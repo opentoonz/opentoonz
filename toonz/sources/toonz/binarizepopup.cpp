@@ -53,7 +53,7 @@
 //    TBinarizeUndo
 //**************************************************************************
 
-class TBinarizeUndo : public TUndo {
+class TBinarizeUndo final : public TUndo {
   std::wstring m_levelName;
   TFrameId m_fid;
   bool m_alphaEnabled;
@@ -124,7 +124,7 @@ public:
 //    BinarizePopup Swatch
 //**************************************************************************
 
-class BinarizePopup::Swatch : public PlaneViewer {
+class BinarizePopup::Swatch final : public PlaneViewer {
   TRasterP m_ras;
 
 public:

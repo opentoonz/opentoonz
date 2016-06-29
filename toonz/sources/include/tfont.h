@@ -93,14 +93,14 @@ private:
 
 //-----------------------------------------------------------------------------
 
-class TFontCreationError : public TException {
+class TFontCreationError final : public TException {
 public:
   TFontCreationError() : TException("E_CanNotUseSelectedFont") {}
 };
 
 //-----------------------------------------------------------------------------
 
-class TFontLibraryLoadingError : public TException {
+class TFontLibraryLoadingError final : public TException {
 public:
   TFontLibraryLoadingError() : TException("E_CanNotLoadFonts") {}
 };

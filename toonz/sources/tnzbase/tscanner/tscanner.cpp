@@ -329,7 +329,7 @@ Cleaner MyCleaner;
 
 // #define DUMMYSCAN
 #ifdef DUMMYSCAN
-class TScannerDummy : public TScanner {
+class TScannerDummy final : public TScanner {
 public:
   TScannerDummy() {}
   ~TScannerDummy() {}

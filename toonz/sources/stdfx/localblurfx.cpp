@@ -233,7 +233,7 @@ void doLocalBlur(TRasterPT<Pix> rin, TRasterPT<Pix> rcontrol,
 //    LocalBlurFx implementation
 //********************************************************************************
 
-class LocalBlurFx : public TStandardRasterFx {
+class LocalBlurFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(LocalBlurFx)
 
 protected:

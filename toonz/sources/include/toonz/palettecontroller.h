@@ -32,7 +32,7 @@ class TPaletteHandle;
 //    PaletteController  declaration
 //************************************************************************
 
-class DVAPI PaletteController : public QObject {
+class DVAPI PaletteController final : public QObject {
   Q_OBJECT
 
   TPaletteHandle *m_currentLevelPalette;  //!< (\p owned) Handle to the palette

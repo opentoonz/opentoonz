@@ -40,7 +40,7 @@ class FullScreenWidget;
 
 //=====================================================================
 
-class ToggleCommandHandler : public MenuItemHandler {
+class ToggleCommandHandler final : public MenuItemHandler {
   int m_status;
 
 public:
@@ -56,9 +56,9 @@ public:
 // SceneViewer
 //-----------------------------------------------------------------------------
 
-class SceneViewer : public QGLWidget,
-                    public TTool::Viewer,
-                    public Previewer::Listener {
+class SceneViewer final : public QGLWidget,
+                          public TTool::Viewer,
+                          public Previewer::Listener {
   Q_OBJECT
 
   qreal m_pressure;

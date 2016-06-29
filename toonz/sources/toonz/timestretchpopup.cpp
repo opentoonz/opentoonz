@@ -37,7 +37,7 @@
 namespace {
 //-----------------------------------------------------------------------------
 
-class TimeStretchUndo : public TUndo {
+class TimeStretchUndo final : public TUndo {
   int m_r0, m_r1;
   int m_c0, m_c1;
   int m_newRange;

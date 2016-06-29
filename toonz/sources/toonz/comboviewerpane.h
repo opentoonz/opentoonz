@@ -37,7 +37,7 @@ enum CV_Parts {
 };
 //-----------------------------------------------------------------------------
 
-class ComboViewerPanel : public TPanel, public FlipConsoleOwner {
+class ComboViewerPanel final : public TPanel, public FlipConsoleOwner {
   Q_OBJECT
 
   SceneViewer *m_sceneViewer;

@@ -15,7 +15,7 @@ struct float4 {
   float x, y, z, w;
 };
 
-class Iwa_AdjustExposureFx : public TStandardRasterFx {
+class Iwa_AdjustExposureFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(Iwa_AdjustExposureFx)
 
 protected:

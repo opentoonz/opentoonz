@@ -39,7 +39,7 @@ In a more generic view, the term 'movie' represents here a generic sequence
 of images, which may even be kept in memory rather than written to file.
 */
 
-class DVAPI MovieRenderer : public QObject {
+class DVAPI MovieRenderer final : public QObject {
   Q_OBJECT
 
   class Imp;

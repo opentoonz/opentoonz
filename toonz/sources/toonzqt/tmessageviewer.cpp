@@ -18,7 +18,7 @@ QIcon gYellowIcon;
 
 //-------------------------------------------------------------------------
 
-class MyQListView : public QListView {
+class MyQListView final : public QListView {
 public:
   MyQListView(QWidget *parent) : QListView(parent) {}
 
@@ -33,7 +33,7 @@ protected:
 
 }  // namespace
 
-class MySortFilterProxyModel : public QSortFilterProxyModel {
+class MySortFilterProxyModel final : public QSortFilterProxyModel {
 public:
   MySortFilterProxyModel(QObject *parent) : QSortFilterProxyModel(parent) {}
 

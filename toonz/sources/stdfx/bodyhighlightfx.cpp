@@ -331,7 +331,7 @@ void doBodyHighlight(const TRasterPT<PIXEL> rout, const TRasterPT<PIXEL> rin,
 //    BodyHighLightFx implementation
 //************************************************************************
 
-class BodyHighLightFx : public TStandardRasterFx {
+class BodyHighLightFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(BodyHighLightFx)
 
   TRasterFxPort m_input;

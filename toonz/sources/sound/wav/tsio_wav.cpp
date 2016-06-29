@@ -66,7 +66,7 @@ TINT32 TWAVChunk::HDR_LENGTH = 8;
 
 //  FMT Chunk: Chunk contenente le informazioni sulla traccia
 
-class TFMTChunk : public TWAVChunk {
+class TFMTChunk final : public TWAVChunk {
 public:
   static TINT32 LENGTH;
 
@@ -139,7 +139,7 @@ TINT32 TFMTChunk::LENGTH = TWAVChunk::HDR_LENGTH + 16;
 
 //  DATA Chunk: Chunk contenente i campioni
 
-class TDATAChunk : public TWAVChunk {
+class TDATAChunk final : public TWAVChunk {
 public:
   std::unique_ptr<UCHAR[]> m_samples;
 

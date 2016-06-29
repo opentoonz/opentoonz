@@ -107,7 +107,7 @@ private:
 
 //-------------------------------------------------------------------
 
-class DVAPI NumberNode : public CalculatorNode {
+class DVAPI NumberNode final : public CalculatorNode {
   double m_value;
 
 public:
@@ -121,7 +121,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class DVAPI VariableNode : public CalculatorNode {
+class DVAPI VariableNode final : public CalculatorNode {
   int m_varIdx;
 
 public:

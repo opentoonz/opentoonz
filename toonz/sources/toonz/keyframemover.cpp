@@ -197,7 +197,7 @@ namespace {
 // UndoMoveKeyFrame
 //-----------------------------------------------------------------------------
 
-class UndoMoveKeyFrame : public TUndo {
+class UndoMoveKeyFrame final : public TUndo {
   int m_dr;
   KeyframeMover *m_mover;
 

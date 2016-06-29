@@ -43,7 +43,7 @@ struct VectorizationContext;
 #include <QMouseEvent>
 #include <QWheelEvent>
 
-class SSDebugger : public QWidget {
+class SSDebugger final : public QWidget {
 public:
   VectorizationContext &m_context;
 
@@ -194,7 +194,7 @@ struct EventGreater {
   }
 };
 
-class Timeline
+class Timeline final
     : public std::priority_queue<Event, std::vector<Event>, EventGreater> {
 public:
   Timeline() {}

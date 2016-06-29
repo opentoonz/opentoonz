@@ -303,7 +303,7 @@ void pasteFloatingSelectionWithoutUndo(const TImageP &image,
 // UndoDeleteSelection
 //-----------------------------------------------------------------------------
 
-class UndoDeleteSelection : public TUndo {
+class UndoDeleteSelection final : public TUndo {
   static int m_id;
   TXshSimpleLevelP m_level;
   TFrameId m_frameId;
@@ -379,7 +379,7 @@ int UndoDeleteSelection::m_id = 0;
 // UndoPasteSelection
 //-----------------------------------------------------------------------------
 
-class UndoPasteSelection : public TUndo {
+class UndoPasteSelection final : public TUndo {
   RasterSelection *m_currentSelection, m_newSelection;
 
 public:
@@ -410,7 +410,7 @@ public:
 // UndoPasteFloatingSelection
 //-----------------------------------------------------------------------------
 
-class UndoPasteFloatingSelection : public TUndo {
+class UndoPasteFloatingSelection final : public TUndo {
   static int m_id;
 
   TXshCell m_imageCell;  //!< Level/frame pair to the pasted-to image

@@ -8,7 +8,7 @@
 #include "igs_rotate_blur.h"
 
 //------------------------------------------------------------
-class ino_spin_blur : public TStandardRasterFx {
+class ino_spin_blur final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_spin_blur)
   TRasterFxPort m_input;
   TRasterFxPort m_refer;

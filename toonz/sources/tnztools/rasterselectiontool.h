@@ -15,7 +15,7 @@ class VectorFreeDeformer;
 // RasterFreeDeformer
 //-----------------------------------------------------------------------------
 
-class RasterFreeDeformer : public FreeDeformer {
+class RasterFreeDeformer final : public FreeDeformer {
   TRasterP m_ras;
   TRasterP m_newRas;
   bool m_noAntialiasing;
@@ -44,7 +44,7 @@ namespace DragSelectionTool {
 // UndoRasterDeform
 //-----------------------------------------------------------------------------
 
-class UndoRasterDeform : public TUndo {
+class UndoRasterDeform final : public TUndo {
   static int m_id;
   RasterSelectionTool *m_tool;
   std::string m_oldFloatingImageId, m_newFloatingImageId;
@@ -75,7 +75,7 @@ public:
 // UndoRasterTransform
 //-----------------------------------------------------------------------------
 
-class UndoRasterTransform : public TUndo {
+class UndoRasterTransform final : public TUndo {
   RasterSelectionTool *m_tool;
   TAffine m_oldTransform, m_newTransform;
   TPointD m_oldCenter, m_newCenter;
@@ -123,7 +123,7 @@ public:
 // RasterRotationTool
 //-----------------------------------------------------------------------------
 
-class RasterRotationTool : public RasterDeformTool {
+class RasterRotationTool final : public RasterDeformTool {
   Rotation *m_rotation;
 
 public:
@@ -137,7 +137,7 @@ public:
 // RasterFreeDeformTool
 //-----------------------------------------------------------------------------
 
-class RasterFreeDeformTool : public RasterDeformTool {
+class RasterFreeDeformTool final : public RasterDeformTool {
   FreeDeform *m_freeDeform;
 
 public:
@@ -149,7 +149,7 @@ public:
 // RasterMoveSelectionTool
 //-----------------------------------------------------------------------------
 
-class RasterMoveSelectionTool : public RasterDeformTool {
+class RasterMoveSelectionTool final : public RasterDeformTool {
   MoveSelection *m_moveSelection;
 
 public:
@@ -163,7 +163,7 @@ public:
 // RasterScaleTool
 //-----------------------------------------------------------------------------
 
-class RasterScaleTool : public RasterDeformTool {
+class RasterScaleTool final : public RasterDeformTool {
   Scale *m_scale;
 
 public:
@@ -180,7 +180,7 @@ public:
 // RasterSelectionTool
 //-----------------------------------------------------------------------------
 
-class RasterSelectionTool : public SelectionTool {
+class RasterSelectionTool final : public SelectionTool {
   Q_DECLARE_TR_FUNCTIONS(RasterSelectionTool)
 
   RasterSelection m_rasterSelection;

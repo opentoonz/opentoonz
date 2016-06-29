@@ -28,7 +28,7 @@ public:
 
 //---------------------------------------------------------
 
-class DVAPI TExternalProgramFx : public TExternFx {
+class DVAPI TExternalProgramFx final : public TExternFx {
   FX_DECLARATION(TExternalProgramFx)
 
   class Port {

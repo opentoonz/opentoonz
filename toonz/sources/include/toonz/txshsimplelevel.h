@@ -57,7 +57,7 @@ class TContentHistory;
             a boost flat_set.
 */
 
-class DVAPI TXshSimpleLevel : public TXshLevel {
+class DVAPI TXshSimpleLevel final : public TXshLevel {
   Q_OBJECT
 
   PERSIST_DECLARATION(TXshSimpleLevel)

@@ -46,7 +46,7 @@
 #endif
 
 namespace ToonzExt {
-class DVAPI NotSimmetricExpPotential : public Potential {
+class DVAPI NotSimmetricExpPotential final : public Potential {
 public:
   virtual ~NotSimmetricExpPotential();
 

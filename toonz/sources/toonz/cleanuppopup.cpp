@@ -1580,7 +1580,7 @@ void CleanupPopup::updateTitleString() {
 //    CleanupCommand  definition
 //*****************************************************************************
 
-class CleanupCommand : public MenuItemHandler {
+class CleanupCommand final : public MenuItemHandler {
 public:
   CleanupCommand() : MenuItemHandler("MI_Cleanup") {}
 

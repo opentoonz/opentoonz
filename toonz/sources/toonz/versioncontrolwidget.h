@@ -18,7 +18,7 @@ class DoubleRadioWidget;
 
 //-----------------------------------------------------------------------------
 
-class DateChooserWidget : public QWidget {
+class DateChooserWidget final : public QWidget {
   Q_OBJECT
 
   int m_selectedRadioIndex;
@@ -45,7 +45,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ConflictWidget : public QWidget {
+class ConflictWidget final : public QWidget {
   Q_OBJECT
 
   QVBoxLayout *m_mainLayout;
@@ -72,7 +72,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class DoubleRadioWidget : public QWidget {
+class DoubleRadioWidget final : public QWidget {
   Q_OBJECT
 
   QLabel *m_label;

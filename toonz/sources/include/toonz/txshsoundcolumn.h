@@ -31,7 +31,7 @@ class ColumnLevel;
 /*!Inherits \b TXshCellColumn. */
 //=============================================================================
 
-class DVAPI TXshSoundColumn : public QObject, public TXshCellColumn {
+class DVAPI TXshSoundColumn final : public QObject, public TXshCellColumn {
   Q_OBJECT
 
   PERSIST_DECLARATION(TXshSoundColumn)

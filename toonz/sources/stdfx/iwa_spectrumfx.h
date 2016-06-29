@@ -19,7 +19,7 @@ struct float4 {
   float x, y, z, w;
 };
 
-class Iwa_SpectrumFx : public TStandardRasterFx {
+class Iwa_SpectrumFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(Iwa_SpectrumFx)
 
 protected:

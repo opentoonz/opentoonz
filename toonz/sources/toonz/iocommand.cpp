@@ -102,7 +102,7 @@ class RenderingSuspender;
 // class ResourceImportDialog
 //---------------------------------------------------------------------------
 
-class ResourceImportDialog : public ResourceImportStrategy {
+class ResourceImportDialog final : public ResourceImportStrategy {
   OverwriteDialog *m_dialog;
   bool m_isLastResource;
   bool m_importQuestionAsked;
@@ -350,7 +350,7 @@ int getLevelType(const TFilePath &actualPath) {
 // class LoadLevelUndo
 //---------------------------------------------------------------------------
 
-class LoadLevelUndo : public TUndo {
+class LoadLevelUndo final : public TUndo {
   TXshLevelP m_level;
   TFilePath m_levelSetFolder;
   int m_row, m_col, m_rowCount;
@@ -452,7 +452,7 @@ public:
 // class LoadLevelAndReplaceUndo
 //---------------------------------------------------------------------------
 
-class LoadAndReplaceLevelUndo : public TUndo {
+class LoadAndReplaceLevelUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   QMap<QPair<int, int>, QPair<TXshSimpleLevelP, TFrameId>> m_oldLevels;
   int m_row0, m_col0, m_row1, m_col1;
@@ -582,7 +582,7 @@ void substituteLevel(TXsheet *xsh, TXshLevel *srcLevel, TXshLevel *dstLevel) {
 // class ChildLevelResourceImporter
 //---------------------------------------------------------------------------
 
-class ChildLevelResourceImporter : public ResourceProcessor {
+class ChildLevelResourceImporter final : public ResourceProcessor {
   ToonzScene *m_parentScene;
   ToonzScene *m_childScene;
 
@@ -990,7 +990,7 @@ enum ExposeType { eOverWrite, eShiftCells, eNone };
 // class ExposeLevelUndo
 //---------------------------------------------------------------------------
 
-class ExposeLevelUndo : public TUndo {
+class ExposeLevelUndo final : public TUndo {
   TXshSimpleLevelP m_sl;
   std::vector<TXshCell> m_oldCells;
   std::vector<TFrameId> m_fids;
@@ -1070,7 +1070,7 @@ public:
 // class ExposeCommentUndo
 //---------------------------------------------------------------------------
 
-class ExposeCommentUndo : public TUndo {
+class ExposeCommentUndo final : public TUndo {
   TXshSoundTextColumnP m_soundtextColumn;
   int m_col;
   bool m_insertEmptyColumn;
@@ -2454,7 +2454,7 @@ bool IoCmd::importLipSync(TFilePath levelPath, QList<TFrameId> frameList,
 // Commands
 //---------------------------------------------------------------------------
 
-class SaveSceneCommandHandler : public MenuItemHandler {
+class SaveSceneCommandHandler final : public MenuItemHandler {
 public:
   SaveSceneCommandHandler() : MenuItemHandler(MI_SaveScene) {}
   void execute() override { IoCmd::saveScene(); }
@@ -2462,7 +2462,7 @@ public:
 
 //---------------------------------------------------------------------------
 
-class SaveLevelCommandHandler : public MenuItemHandler {
+class SaveLevelCommandHandler final : public MenuItemHandler {
 public:
   SaveLevelCommandHandler() : MenuItemHandler(MI_SaveLevel) {}
   void execute() override {
@@ -2495,7 +2495,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SaveProjectTemplate : public MenuItemHandler {
+class SaveProjectTemplate final : public MenuItemHandler {
 public:
   SaveProjectTemplate() : MenuItemHandler(MI_SaveDefaultSettings) {}
   void execute() override {
@@ -2517,7 +2517,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class OpenRecentSceneFileCommandHandler : public MenuItemHandler {
+class OpenRecentSceneFileCommandHandler final : public MenuItemHandler {
 public:
   OpenRecentSceneFileCommandHandler() : MenuItemHandler(MI_OpenRecentScene) {}
   void execute() override {
@@ -2533,7 +2533,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class OpenRecentLevelFileCommandHandler : public MenuItemHandler {
+class OpenRecentLevelFileCommandHandler final : public MenuItemHandler {
 public:
   OpenRecentLevelFileCommandHandler() : MenuItemHandler(MI_OpenRecentLevel) {}
   void execute() override {
@@ -2556,7 +2556,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class ClearRecentSceneFileListCommandHandler : public MenuItemHandler {
+class ClearRecentSceneFileListCommandHandler final : public MenuItemHandler {
 public:
   ClearRecentSceneFileListCommandHandler()
       : MenuItemHandler(MI_ClearRecentScene) {}
@@ -2567,7 +2567,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class ClearRecentLevelFileListCommandHandler : public MenuItemHandler {
+class ClearRecentLevelFileListCommandHandler final : public MenuItemHandler {
 public:
   ClearRecentLevelFileListCommandHandler()
       : MenuItemHandler(MI_ClearRecentLevel) {}
@@ -2578,7 +2578,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class RevertScene : public MenuItemHandler {
+class RevertScene final : public MenuItemHandler {
 public:
   RevertScene() : MenuItemHandler(MI_RevertScene) {}
   void execute() override {
@@ -2607,7 +2607,7 @@ public:
 //=============================================================================
 // Overwrite palette
 //-----------------------------------------------------------------------------
-class OverwritePaletteCommandHandler : public MenuItemHandler {
+class OverwritePaletteCommandHandler final : public MenuItemHandler {
 public:
   OverwritePaletteCommandHandler() : MenuItemHandler(MI_OverwritePalette) {}
 
@@ -2696,7 +2696,7 @@ public:
 //=============================================================================
 // Save scene and levels
 //-----------------------------------------------------------------------------
-class SaveAllCommandHandler : public MenuItemHandler {
+class SaveAllCommandHandler final : public MenuItemHandler {
 public:
   SaveAllCommandHandler() : MenuItemHandler(MI_SaveAll) {}
   void execute() override { IoCmd::saveAll(); }

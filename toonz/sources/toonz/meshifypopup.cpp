@@ -493,7 +493,7 @@ void getRaster(const TXsheet *xsh, int row, TRasterP &ras, TPointD &rasDpi,
 //    MeshifyPopup::Swatch  definition
 //********************************************************************************************
 
-class MeshifyPopup::Swatch : public PlaneViewer {
+class MeshifyPopup::Swatch final : public PlaneViewer {
 public:
   TImageP m_img;  //!< The eventual image to be meshified
 
@@ -1306,7 +1306,7 @@ bool meshifySelection(const MeshifyOptions &options) {
 //    Meshify Command  definition
 //********************************************************************************************
 
-class MeshifyCommand : public MenuItemHandler {
+class MeshifyCommand final : public MenuItemHandler {
 public:
   MeshifyCommand() : MenuItemHandler("A_ToolOption_Meshify") {}
 

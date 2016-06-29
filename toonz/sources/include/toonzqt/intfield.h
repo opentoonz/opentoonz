@@ -31,7 +31,7 @@ namespace DVGui {
 
                 Inherits \b QWidget.
 */
-class DVAPI RollerField : public QWidget {
+class DVAPI RollerField final : public QWidget {
   Q_OBJECT
 
   double m_value;

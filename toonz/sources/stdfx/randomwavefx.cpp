@@ -13,7 +13,7 @@
 
 //-------------------------------------------------------------------
 
-class RandomWaveFx : public TStandardRasterFx {
+class RandomWaveFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(RandomWaveFx)
 protected:
   TRasterFxPort m_warped;

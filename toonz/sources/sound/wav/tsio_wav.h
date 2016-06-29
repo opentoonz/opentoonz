@@ -10,7 +10,7 @@
 The class TSoundTrackReaderWav reads audio files having
 .wav extension
 */
-class TSoundTrackReaderWav : public TSoundTrackReader {
+class TSoundTrackReaderWav final : public TSoundTrackReader {
 public:
   TSoundTrackReaderWav(const TFilePath &fp);
   ~TSoundTrackReaderWav() {}
@@ -35,7 +35,7 @@ The class TSoundTrackWriterWav writes audio file having
 .wav extension
 */
 
-class TSoundTrackWriterWav : public TSoundTrackWriter {
+class TSoundTrackWriterWav final : public TSoundTrackWriter {
 public:
   TSoundTrackWriterWav(const TFilePath &fp);
   ~TSoundTrackWriterWav() {}

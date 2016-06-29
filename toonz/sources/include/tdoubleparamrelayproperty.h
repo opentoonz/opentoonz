@@ -25,8 +25,8 @@
 
 //! The TDoubleParamRelayProperty is a TProperty heir which can be used as
 //! intermediary between a TDoubleParam instance and its GUI viewers.
-class DVAPI TDoubleParamRelayProperty : public TProperty,
-                                        public TParamObserver {
+class DVAPI TDoubleParamRelayProperty final : public TProperty,
+                                              public TParamObserver {
   TDoubleParamP m_param;  //!< The referenced param
   double m_frame;         //!< Frame at which m_param returns values
 

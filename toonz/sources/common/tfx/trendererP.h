@@ -25,7 +25,7 @@
 //! the mousePressEvent may cause the mouseReleaseEvent to be processed before
 //! the
 //! former's end.
-class TRendererStartInvoker : public QObject {
+class TRendererStartInvoker final : public QObject {
   Q_OBJECT
 
 public:

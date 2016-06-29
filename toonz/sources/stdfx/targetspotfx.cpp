@@ -9,7 +9,7 @@
 
 //==================================================================
 
-class TargetSpotFx : public TStandardZeraryFx {
+class TargetSpotFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(TargetSpotFx)
 
   TDoubleParamP m_z;

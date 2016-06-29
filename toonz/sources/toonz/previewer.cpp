@@ -126,7 +126,7 @@ inline bool contains(const QRegion &region, const TRect &rect) {
 //    Previewer::Imp
 //-----------------------
 
-class Previewer::Imp : public TRenderPort {
+class Previewer::Imp final : public TRenderPort {
 public:
   // All useful infos about a frame under Previewer's management
   struct FrameInfo {
@@ -768,7 +768,7 @@ static DVGui::ProgressDialog *Pd = 0;
 
 //-----------------------------------------------------------------------------
 
-class ProgressBarMessager : public TThread::Message {
+class ProgressBarMessager final : public TThread::Message {
 public:
   int m_choice;
   int m_val;
@@ -814,7 +814,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SavePreviewedPopup : public FileBrowserPopup {
+class SavePreviewedPopup final : public FileBrowserPopup {
   Previewer *m_p;
 
 public:

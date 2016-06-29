@@ -12,7 +12,7 @@
 
 //-------------------------------------------------------------------
 
-class RippleFx : public TStandardRasterFx {
+class RippleFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(RippleFx)
 protected:
   TRasterFxPort m_warped;

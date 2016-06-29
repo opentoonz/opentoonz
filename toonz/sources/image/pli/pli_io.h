@@ -159,7 +159,7 @@ real tags; their structures resembles the structure in the PLI file and
 the description in the PLI specific document
 =====================================================================*/
 
-class TextTag : public PliObjectTag {
+class TextTag final : public PliObjectTag {
 public:
   std::string m_text;
 
@@ -171,7 +171,7 @@ public:
 //=====================================================================
 /*!
  */
-class PaletteTag : public PliTag {
+class PaletteTag final : public PliTag {
 public:
   TUINT32 m_numColors;
   TPixelRGBM32 *m_color;
@@ -187,7 +187,7 @@ public:
 //=====================================================================
 /*!
  */
-class PaletteWithAlphaTag : public PliTag {
+class PaletteWithAlphaTag final : public PliTag {
 public:
   TUINT32 m_numColors;
   TPixelRGBM32 *m_color;
@@ -207,7 +207,7 @@ All the geometric tags that contains curve informations are
 instantiations of this template class
  */
 
-class ThickQuadraticChainTag : public PliGeometricTag {
+class ThickQuadraticChainTag final : public PliGeometricTag {
 public:
   TUINT32 m_numCurves;
   std::unique_ptr<TThickQuadratic[]> m_curve;
@@ -257,7 +257,7 @@ private:
 /*!
 Not yet implemented
 */
-class BitmapTag : public PliGeometricTag {
+class BitmapTag final : public PliGeometricTag {
 public:
   enum compressionType { NONE = 0, RLE, HOW_MANY_COMPRESSION };
 
@@ -274,7 +274,7 @@ public:
 Not yet implemented
 */
 
-class ColorTag : public PliObjectTag {
+class ColorTag final : public PliObjectTag {
 public:
   enum styleType {
     STYLE_NONE = 0,
@@ -308,7 +308,7 @@ public:
 
 //=====================================================================
 
-class StyleTag : public PliObjectTag {
+class StyleTag final : public PliObjectTag {
 public:
   USHORT m_id;
   USHORT m_pageIndex;
@@ -324,7 +324,7 @@ public:
 
 //=====================================================================
 
-class GeometricTransformationTag : public PliGeometricTag {
+class GeometricTransformationTag final : public PliGeometricTag {
 public:
   TAffine m_affine;
   PliGeometricTag *m_object;
@@ -338,7 +338,7 @@ public:
 
 //=====================================================================
 
-class GroupTag : public PliObjectTag {
+class GroupTag final : public PliObjectTag {
 public:
   enum {
     NONE = 0,
@@ -364,7 +364,7 @@ public:
 
 //=====================================================================
 
-class ImageTag : public PliObjectTag {
+class ImageTag final : public PliObjectTag {
 public:
   TFrameId m_numFrame;
 
@@ -381,7 +381,7 @@ public:
 
 //=====================================================================
 
-class DoublePairTag : public PliObjectTag {
+class DoublePairTag final : public PliObjectTag {
 public:
   double m_first, m_second;
 
@@ -393,7 +393,7 @@ public:
 
 //=====================================================================
 
-class IntersectionDataTag : public PliObjectTag {
+class IntersectionDataTag final : public PliObjectTag {
 public:
   UINT m_branchCount;
   std::unique_ptr<TVectorImage::IntersectionBranch[]> m_branchArray;
@@ -409,7 +409,7 @@ public:
 
 //=====================================================================
 
-class StrokeOutlineOptionsTag : public PliObjectTag {
+class StrokeOutlineOptionsTag final : public PliObjectTag {
 public:
   TStroke::OutlineOptions m_options;
 
@@ -419,7 +419,7 @@ public:
 
 //=====================================================================
 
-class PrecisionScaleTag : public PliObjectTag {
+class PrecisionScaleTag final : public PliObjectTag {
 public:
   int m_precisionScale;
 

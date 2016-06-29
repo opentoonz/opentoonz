@@ -10,7 +10,7 @@ class TXshSimpleLevel;
 
 namespace TScriptBinding {
 
-class DVAPI OutlineVectorizer : public Wrapper {
+class DVAPI OutlineVectorizer final : public Wrapper {
   Q_OBJECT
   NewOutlineConfiguration *m_parameters;
 

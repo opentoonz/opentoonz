@@ -170,7 +170,7 @@ private:
 
 //! The TCachedImage class implements a shared reference to an image that is
 //! stored under TImageCache.
-class DVAPI TCachedImage : public TSmartObject {
+class DVAPI TCachedImage final : public TSmartObject {
   DECLARE_CLASS_CODE
 
   std::string m_ref;

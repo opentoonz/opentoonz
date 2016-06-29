@@ -26,7 +26,7 @@
 
 //---------------------------------------------------------
 
-class DVAPI TToneCurveParam : public TParam {
+class DVAPI TToneCurveParam final : public TParam {
   PERSIST_DECLARATION(TToneCurveParam)
 
   TParamSetP m_rgbaParamSet;
@@ -96,7 +96,7 @@ template class DVAPI TSmartPointerT<TToneCurveParam>;
 template class DVAPI TDerivedSmartPointerT<TToneCurveParam, TParam>;
 #endif
 
-class DVAPI TToneCurveParamP
+class DVAPI TToneCurveParamP final
     : public TDerivedSmartPointerT<TToneCurveParam, TParam> {
 public:
   TToneCurveParamP() {}

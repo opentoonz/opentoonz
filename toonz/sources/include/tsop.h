@@ -17,7 +17,7 @@
 
 //===================================================================
 
-class DVAPI TSopException : public TException {
+class DVAPI TSopException final : public TException {
   TString m_message;
 
 public:

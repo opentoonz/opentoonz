@@ -7,7 +7,7 @@
 
 namespace TScriptBinding {
 
-class DVAPI Renderer : public Wrapper {
+class DVAPI Renderer final : public Wrapper {
   Q_OBJECT
   class Imp;
   Imp *m_imp;

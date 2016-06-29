@@ -4,7 +4,7 @@
 
 #include "ino_common.h"
 //------------------------------------------------------------
-class ino_median_filter : public TStandardRasterFx {
+class ino_median_filter final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_median_filter)
   TRasterFxPort m_input;
   TRasterFxPort m_refer;

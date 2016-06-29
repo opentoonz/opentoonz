@@ -27,7 +27,7 @@
   files as well.
 */
 
-class ResListManager : public QObject {
+class ResListManager final : public QObject {
   Q_OBJECT
 
 public:

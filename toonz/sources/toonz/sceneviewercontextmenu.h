@@ -10,7 +10,7 @@ class TStageObjectId;
 class SceneViewer;
 class TXshColumn;
 
-class SceneViewerContextMenu : public QMenu {
+class SceneViewerContextMenu final : public QMenu {
   Q_OBJECT
   SceneViewer *m_viewer;
   int m_groupIndexToBeEntered;

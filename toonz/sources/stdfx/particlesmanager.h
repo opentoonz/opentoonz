@@ -19,7 +19,7 @@ class TRandom;
 
 //-----------------------------------------------------------------------
 
-class ParticlesManager : public TRenderResourceManager {
+class ParticlesManager final : public TRenderResourceManager {
   T_RENDER_RESOURCE_MANAGER
 
 public:
@@ -41,7 +41,7 @@ public:
     void clear();
   };
 
-  struct FxData : public TSmartObject {
+  struct FxData final : public TSmartObject {
     DECLARE_CLASS_CODE
 
     QThreadStorage<FrameData *> m_frames;

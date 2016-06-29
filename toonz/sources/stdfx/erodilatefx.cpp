@@ -14,7 +14,7 @@
 //    ErodeDilate Fx
 //****************************************************************************
 
-class ErodeDilateFx : public TStandardRasterFx {
+class ErodeDilateFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ErodeDilateFx)
 
   TRasterFxPort m_input;

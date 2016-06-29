@@ -71,7 +71,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TFurStrokeStyle : public TOptimizedStrokeStyleT<Points> {
+class TFurStrokeStyle final : public TOptimizedStrokeStyleT<Points> {
   double m_cs, m_sn, m_angle, m_length;
   TPixel32 m_color;
 
@@ -119,7 +119,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TChainStrokeStyle : public TOptimizedStrokeStyleT<Points> {
+class TChainStrokeStyle final : public TOptimizedStrokeStyleT<Points> {
   TPixel32 m_color;
 
 public:
@@ -151,7 +151,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TSprayStrokeStyle : public TSimpleStrokeStyle {
+class TSprayStrokeStyle final : public TSimpleStrokeStyle {
   TPixel32 m_color;
   double m_blend, m_intensity, m_radius;
 
@@ -193,7 +193,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TGraphicPenStrokeStyle
+class TGraphicPenStrokeStyle final
     : public TOptimizedStrokeStyleT<DrawmodePointsMatrix> {
   TPixel32 m_color;
   double m_intensity;
@@ -238,7 +238,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TDottedLineStrokeStyle : public TOptimizedStrokeStyleT<Points> {
+class TDottedLineStrokeStyle final : public TOptimizedStrokeStyleT<Points> {
   TPixel32 m_color;
   double m_in, m_line, m_out, m_blank;
 
@@ -284,7 +284,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TRopeStrokeStyle : public TOptimizedStrokeStyleT<Points> {
+class TRopeStrokeStyle final : public TOptimizedStrokeStyleT<Points> {
   TPixel32 m_color;
   double m_bend;
 
@@ -328,7 +328,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TCrystallizeStrokeStyle : public TOptimizedStrokeStyleT<Points> {
+class TCrystallizeStrokeStyle final : public TOptimizedStrokeStyleT<Points> {
   TPixel32 m_color;
   double m_period, m_opacity;
 
@@ -374,7 +374,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TBraidStrokeStyle : public TSimpleStrokeStyle {
+class TBraidStrokeStyle final : public TSimpleStrokeStyle {
   TPixel32 m_colors[3];
   double m_period;
 
@@ -426,7 +426,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TSketchStrokeStyle : public TSimpleStrokeStyle {
+class TSketchStrokeStyle final : public TSimpleStrokeStyle {
   TPixel32 m_color;
   double m_density;
 
@@ -470,7 +470,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TBubbleStrokeStyle : public TSimpleStrokeStyle {
+class TBubbleStrokeStyle final : public TSimpleStrokeStyle {
   TPixel32 m_color0, m_color1;
 
 public:
@@ -520,7 +520,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TTissueStrokeStyle : public TOptimizedStrokeStyleT<PointMatrix> {
+class TTissueStrokeStyle final : public TOptimizedStrokeStyleT<PointMatrix> {
   TPixel32 m_color;
   double m_density, m_border;
 
@@ -565,7 +565,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TBiColorStrokeStyle : public TOutlineStyle {
+class TBiColorStrokeStyle final : public TOutlineStyle {
   TPixel32 m_color0, m_color1;
   double m_parameter;
 
@@ -618,7 +618,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TNormal2StrokeStyle : public TOutlineStyle {
+class TNormal2StrokeStyle final : public TOutlineStyle {
   TPixel32 m_color;
   double m_lightx, m_lighty, m_shininess, m_metal, m_bend;
 
@@ -670,7 +670,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TChalkStrokeStyle2 : public TOptimizedStrokeStyleT<Doubles> {
+class TChalkStrokeStyle2 final : public TOptimizedStrokeStyleT<Doubles> {
   TPixel32 m_color;
   double m_blend, m_intensity, m_in, m_out, m_noise;
 
@@ -717,7 +717,8 @@ public:
 
 //-------------------------------------------------------------------
 
-class TBlendStrokeStyle2 : public TOptimizedStrokeStyleT<PointsAndDoubles> {
+class TBlendStrokeStyle2 final
+    : public TOptimizedStrokeStyleT<PointsAndDoubles> {
   TPixel32 m_color;
   double m_blend, m_in, m_out;
 
@@ -767,7 +768,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TTwirlStrokeStyle : public TOptimizedStrokeStyleT<Doubles> {
+class TTwirlStrokeStyle final : public TOptimizedStrokeStyleT<Doubles> {
   TPixel32 m_color;
   double m_period, m_blend;
 
@@ -814,7 +815,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TSawToothStrokeStyle : public TOutlineStyle {
+class TSawToothStrokeStyle final : public TOutlineStyle {
   TPixel32 m_color;
   double m_parameter;
 
@@ -865,7 +866,8 @@ public:
 
 //-------------------------------------------------------------------
 
-class TMultiLineStrokeStyle2 : public TOptimizedStrokeStyleT<BlendAndPoints> {
+class TMultiLineStrokeStyle2 final
+    : public TOptimizedStrokeStyleT<BlendAndPoints> {
   TPixel32 m_color0, m_color1;
   double m_intensity, m_length, m_thick, m_noise;
 
@@ -928,7 +930,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TZigzagStrokeStyle : public TOptimizedStrokeStyleT<Points> {
+class TZigzagStrokeStyle final : public TOptimizedStrokeStyleT<Points> {
   TPixel32 m_color;
   double m_minDist, m_maxDist;
   double m_minAngle, m_maxAngle;
@@ -985,7 +987,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TSinStrokeStyle : public TOptimizedStrokeStyleT<Points> {
+class TSinStrokeStyle final : public TOptimizedStrokeStyleT<Points> {
   TPixel32 m_color;
   double m_frequency, m_thick;
 
@@ -1031,7 +1033,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TFriezeStrokeStyle2 : public TOptimizedStrokeStyleT<Points> {
+class TFriezeStrokeStyle2 final : public TOptimizedStrokeStyleT<Points> {
   TPixel32 m_color;
   double m_parameter, m_thick;
 
@@ -1080,7 +1082,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TDualColorStrokeStyle2 : public TOutlineStyle {
+class TDualColorStrokeStyle2 final : public TOutlineStyle {
   TPixel32 m_color0, m_color1;
   double m_parameter;
 
@@ -1143,7 +1145,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class TLongBlendStrokeStyle2 : public TOutlineStyle {
+class TLongBlendStrokeStyle2 final : public TOutlineStyle {
   TPixel32 m_color0, m_color1;
   double m_parameter;
 
@@ -1208,7 +1210,7 @@ public:
 
 #ifdef _DEBUG
 
-class OutlineViewerStyle : public TSolidColorStyle {
+class OutlineViewerStyle final : public TSolidColorStyle {
   double m_parameter[4];
 
   bool m_boolPar;
@@ -1269,7 +1271,7 @@ public:
 
 class TMatrioskaStrokeStyle;
 
-class TMatrioskaStrokeProp : public TStrokeProp {
+class TMatrioskaStrokeProp final : public TStrokeProp {
 protected:
   double m_outlinePixelSize;
   TMatrioskaStrokeStyle *m_colorStyle;
@@ -1289,7 +1291,7 @@ public:
   void draw(TFlash &flash) override;
 };
 
-class TMatrioskaStrokeStyle : public TSolidColorStyle {
+class TMatrioskaStrokeStyle final : public TSolidColorStyle {
   double m_parameter;
   TPixel32 m_color2;
 

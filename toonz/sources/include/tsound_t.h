@@ -18,7 +18,7 @@
 //=========================================================
 
 template <class T>
-class DVAPI TSoundTrackT : public TSoundTrack {
+class DVAPI TSoundTrackT final : public TSoundTrack {
 public:
   typedef T SampleType;
 
@@ -138,7 +138,7 @@ from which it's created.It hasn't reference to the object.
 //! Applies a trasformation (echo, reverb, ect) to the object and returns the
 //! transformed soundtrack
 #if defined(MACOSX) || defined(LINUX)
-  TSoundTrackP apply(TSoundTransform *transform);
+  TSoundTrackP apply(TSoundTransform *transform) override;
 #else  // _WIN32
   TSoundTrackP apply(TSoundTransform *transform) override {
     assert(transform);

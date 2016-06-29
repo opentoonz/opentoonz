@@ -105,7 +105,7 @@ public:
 // il canale di trasparenza (se la proprieta' booleana Alpha Channel esiste
 // e vale true, oppure la "Resolution" vale L"32 bits"
 //
-class AlphaChecker : public TProperty::Visitor {
+class AlphaChecker final : public TProperty::Visitor {
   bool m_alphaEnabled;
 
 public:
@@ -128,7 +128,7 @@ public:
 // RasterMovieGenerator ( animazioni raster)
 //-----------------------------------------------------------------------------
 
-class RasterMovieGenerator : public MovieGenerator::Imp {
+class RasterMovieGenerator final : public MovieGenerator::Imp {
 public:
   bool m_isFrames;
   TLevelWriterP m_lw;
@@ -304,7 +304,7 @@ false,0);
 // FlashStagePainter
 //-----------------------------------------------------------------------------
 
-class FlashStagePainter : public Stage::Visitor {
+class FlashStagePainter final : public Stage::Visitor {
   TFlash &m_flash;
   TAffine m_cameraAff;
   TPixel32 m_bgColor;
@@ -346,7 +346,7 @@ public:
 // FlashMovieGenerator
 //-----------------------------------------------------------------------------
 
-class FlashMovieGenerator : public MovieGenerator::Imp {
+class FlashMovieGenerator final : public MovieGenerator::Imp {
 public:
   TFlash m_flash;
   TAffine m_viewAff;

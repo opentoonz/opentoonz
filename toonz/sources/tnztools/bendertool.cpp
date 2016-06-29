@@ -108,7 +108,7 @@ void clearPointerMap(std::map<TStroke *, std::vector<int> *> &corners) {
 // Bender Tool
 //-----------------------------------------------------------------------------
 
-class BenderTool : public TTool {
+class BenderTool final : public TTool {
 private:
   TUndo *m_undo;
   bool m_atLeastOneIsChanged;

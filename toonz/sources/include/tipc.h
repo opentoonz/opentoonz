@@ -122,7 +122,7 @@ public:
   A tipc::Stream is a specialized QDataStream designed to work with a tipc-based
   QLocalSocket instance.
 */
-class DVAPI Stream : public QDataStream {
+class DVAPI Stream final : public QDataStream {
   QLocalSocket *m_socket;
 
 public:

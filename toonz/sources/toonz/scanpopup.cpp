@@ -876,7 +876,7 @@ OpenPopupCommandHandler<ScanSettingsPopup> openScanSettingsPopup(
 OpenPopupCommandHandler<AutocenterPopup> openAutocenterPopup(MI_Autocenter);
 #endif
 
-class ScanCommand : public MenuItemHandler {
+class ScanCommand final : public MenuItemHandler {
 public:
   ScanCommand() : MenuItemHandler("MI_Scan") {}
   void execute() override { doScan(); }
@@ -888,7 +888,7 @@ public:
 //
 //=========================================================================================
 
-class SetCropboxCommand : public MenuItemHandler {
+class SetCropboxCommand final : public MenuItemHandler {
   TTool *m_currentTool;
 
 public:
@@ -957,7 +957,7 @@ public:
 //
 //=========================================================================================
 
-class ResetCropboxCommand : public MenuItemHandler {
+class ResetCropboxCommand final : public MenuItemHandler {
 public:
   ResetCropboxCommand() : MenuItemHandler("MI_ResetScanCropbox") {}
 
@@ -977,7 +977,7 @@ public:
 //
 //=========================================================================================
 
-class SetScanCropboxTool : public TTool {
+class SetScanCropboxTool final : public TTool {
   const std::string m_imgId;
   TScannerParameters *m_parameters;
   int m_scaling;

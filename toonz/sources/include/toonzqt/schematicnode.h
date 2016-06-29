@@ -15,7 +15,7 @@ class SchematicPort;
 //
 //========================================================
 
-class SchematicName : public QGraphicsTextItem {
+class SchematicName final : public QGraphicsTextItem {
   Q_OBJECT
   double m_width;
   double m_height;
@@ -47,7 +47,7 @@ protected slots:
 //
 //========================================================
 
-class SchematicThumbnailToggle : public QObject, public QGraphicsItem {
+class SchematicThumbnailToggle final : public QObject, public QGraphicsItem {
   Q_OBJECT
 #ifndef MACOSX
   Q_INTERFACES(QGraphicsItem)
@@ -131,7 +131,7 @@ signals:
 
 //========================================================
 
-class SchematicToggle_SplineOptions : public SchematicToggle {
+class SchematicToggle_SplineOptions final : public SchematicToggle {
   Q_OBJECT
 public:
   SchematicToggle_SplineOptions(SchematicNode *parent, const QPixmap &pixmap,

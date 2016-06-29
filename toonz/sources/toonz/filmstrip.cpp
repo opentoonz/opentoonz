@@ -1063,7 +1063,6 @@ Filmstrip::Filmstrip(QWidget *parent, Qt::WFlags flags)
   setLayout(mainLayout);
 
   setFocusProxy(m_frames);
-  setMinimumWidth(m_frames->width() + 16);  // 16 is the scroll bar's width
 
   onLevelSwitched(0);
 

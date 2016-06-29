@@ -55,7 +55,7 @@ class CameraSettingsPopup;
 
 //=============================================================================
 
-class OpenCameraStageCommandHandler : public MenuItemHandler {
+class OpenCameraStageCommandHandler final : public MenuItemHandler {
   CommandId m_id;
 
 public:
