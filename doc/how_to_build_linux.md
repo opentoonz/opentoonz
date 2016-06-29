@@ -113,13 +113,6 @@ $ ./configure && make
 $ cd -
 ```
 
-### Building the libpng library from thirdparty
-
-```
-$ cd opentoonz/thirdparty/libpng-1.6.21
-$ ./configure && make
-```
-
 ### compiling the actual application
 
 ```
