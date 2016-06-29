@@ -41,10 +41,10 @@ private:
 	int IOError;
 	int m_bpp;
 	int m_frameCount;
+	double m_fps;
 	AVCodecContext* m_codecContext;
 	AVFormatContext	* m_formatCtx;
-	void *m_buffer;
-	bool m_initFinished;
+	uint8_t * m_buffer;
 	void mp4Init();
 	std::string m_status;
 	TThread::Mutex m_mutex;
