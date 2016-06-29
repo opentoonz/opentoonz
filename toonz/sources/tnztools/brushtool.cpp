@@ -55,7 +55,7 @@ TEnv::DoubleVar BrushSmooth("InknpaintBrushSmooth", 0);
 TEnv::IntVar BrushSelective("InknpaintBrushSelective", 0);
 TEnv::IntVar BrushBreakSharpAngles("InknpaintBrushBreakSharpAngles", 0);
 TEnv::IntVar RasterBrushPencilMode("InknpaintRasterBrushPencilMode", 0);
-TEnv::IntVar BrushPressureSensibility("InknpaintBrushPressureSensibility", 1);
+TEnv::IntVar BrushPressureSensitivity("InknpaintBrushPressureSensitivity", 1);
 TEnv::DoubleVar RasterBrushHardness("RasterBrushHardness", 100);
 
 //-------------------------------------------------------------------
@@ -772,7 +772,7 @@ BrushTool::BrushTool(std::string name, int targetType)
   m_prop[0].bind(m_preset);
   m_preset.setId("BrushPreset");
   m_preset.addValue(CUSTOM_WSTR);
-  m_pressure.setId("PressureSensibility");
+  m_pressure.setId("PressureSensitivity");
 
   m_capStyle.addValue(BUTT_WSTR);
   m_capStyle.addValue(ROUNDC_WSTR);
@@ -1004,7 +1004,7 @@ void BrushTool::onActivate() {
     m_selective.setValue(BrushSelective ? 1 : 0);
     m_breakAngles.setValue(BrushBreakSharpAngles ? 1 : 0);
     m_pencil.setValue(RasterBrushPencilMode ? 1 : 0);
-    m_pressure.setValue(BrushPressureSensibility ? 1 : 0);
+    m_pressure.setValue(BrushPressureSensitivity ? 1 : 0);
     m_firstTime = false;
     m_accuracy.setValue(BrushAccuracy);
     m_smooth.setValue(BrushSmooth);
@@ -1811,7 +1811,7 @@ bool BrushTool::onPropertyChanged(std::string propertyName) {
   } else if (propertyName == m_pencil.getName()) {
     RasterBrushPencilMode = m_pencil.getValue();
   } else if (propertyName == m_pressure.getName()) {
-    BrushPressureSensibility = m_pressure.getValue();
+    BrushPressureSensitivity = m_pressure.getValue();
   } else if (propertyName == m_capStyle.getName()) {
     VectorCapStyle = m_capStyle.getIndex();
   } else if (propertyName == m_joinStyle.getName()) {

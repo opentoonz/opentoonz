@@ -93,7 +93,7 @@ public:
   const Potential *getPotential() const { return pot_; }
 
   /**
-*@brief Change sensibility of deformer (just for debug).
+*@brief Change sensitivity of deformer (just for debug).
 */
   void setDiff(double diff) { diff_ = diff; }
 
@@ -121,7 +121,7 @@ private:
   // deformation shape
   Potential *pot_;
 
-  // sensibility of deformer
+  // sensitivity of deformer
   // Indica il valore minimo a partire dal quale
   //  l'inseritore comincia a mettere punti di controllo
   double diff_;

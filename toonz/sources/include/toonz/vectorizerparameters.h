@@ -37,7 +37,7 @@ class TOStream;
             (like \p VectorizerPopup) to lower layers (\p VectorizerCore) of
             the vectorization process inside a \p VectorizerConfiguration
   variable.
-            This typically includes vectorization modes, various sensibility and
+            This typically includes vectorization modes, various sensitivity and
             accuracy parameters, and post-processing informations. This class
             merely acts as a base parameters container (although no pure virtual
             method is present) - meaning that every vectorization method

@@ -45,7 +45,7 @@ struct DVAPI ContextStatus {
   double lengthOfAction_;
 
   //  how much curve to move
-  double deformerSensibility_;
+  double deformerSensitivity_;
 
   // pixel size
   double pixelSize_;

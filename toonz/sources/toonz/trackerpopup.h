@@ -46,7 +46,7 @@ class TrackerPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::DoubleField *m_threshold;
-  DVGui::DoubleField *m_sensibility;
+  DVGui::DoubleField *m_sensitivity;
   DVGui::CheckBox *m_activeBackground;
   DVGui::CheckBox *m_variationWindow;
   /*DVGui::LineEdit*    m_frameStart;
@@ -85,7 +85,7 @@ public slots:
 
 class Tracker {
   float m_threshold;
-  float m_sensibility;
+  float m_sensitivity;
   int m_activeBackground;
   int m_manageOcclusion;
   int m_variationWindow;
@@ -114,7 +114,7 @@ class Tracker {
   TAffine m_affine;
 
 public:
-  Tracker(double threshold, double sensibility, int activeBackground,
+  Tracker(double threshold, double sensitivity, int activeBackground,
           int manageOcclusion, int variationWindow, int frameStart,
           int framesNumber);
   ~Tracker();

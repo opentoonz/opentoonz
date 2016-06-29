@@ -43,7 +43,7 @@
 
 TEnv::IntVar FullcolorBrushMinSize("FullcolorBrushMinSize", 1);
 TEnv::IntVar FullcolorBrushMaxSize("FullcolorBrushMaxSize", 5);
-TEnv::IntVar FullcolorPressureSensibility("FullcolorPressureSensibility", 1);
+TEnv::IntVar FullcolorPressureSensitivity("FullcolorPressureSensitivity", 1);
 TEnv::DoubleVar FullcolorBrushHardness("FullcolorBrushHardness", 100);
 TEnv::DoubleVar FullcolorMinOpacity("FullcolorMinOpacity", 100);
 TEnv::DoubleVar FullcolorMaxOpacity("FullcolorMaxOpacity", 100);
@@ -203,7 +203,7 @@ void FullColorBrushTool::onActivate() {
     m_firstTime = false;
     m_thickness.setValue(
         TIntPairProperty::Value(FullcolorBrushMinSize, FullcolorBrushMaxSize));
-    m_pressure.setValue(FullcolorPressureSensibility ? 1 : 0);
+    m_pressure.setValue(FullcolorPressureSensitivity ? 1 : 0);
     m_opacity.setValue(
         TDoublePairProperty::Value(FullcolorMinOpacity, FullcolorMaxOpacity));
     m_hardness.setValue(FullcolorBrushHardness);
@@ -582,7 +582,7 @@ bool FullColorBrushTool::onPropertyChanged(std::string propertyName) {
 setWorkAndBackupImages();*/
   FullcolorBrushMinSize        = m_minThick;
   FullcolorBrushMaxSize        = m_maxThick;
-  FullcolorPressureSensibility = m_pressure.getValue();
+  FullcolorPressureSensitivity = m_pressure.getValue();
   FullcolorBrushHardness       = m_hardness.getValue();
   FullcolorMinOpacity          = m_opacity.getValue().first;
   FullcolorMaxOpacity          = m_opacity.getValue().second;
