@@ -847,29 +847,26 @@ public:
 //**********************************************************************
 //    Open Popup Command
 //**********************************************************************
-
-/*
-class CleanupSettingsFactory final : public TPanelFactory
-{
+#if 0
+class CleanupSettingsFactory final : public TPanelFactory {
 public:
-/*
   CleanupSettingsFactory() : TPanelFactory("CleanupSettings") {}
 
-  void initialize(TPanel* panel)
-  {
-    CleanupSettings* cleanupSettings = new CleanupSettings(panel);
+  void initialize(TPanel *panel) {
+    CleanupSettings *cleanupSettings = new CleanupSettings(panel);
     panel->setWidget(cleanupSettings);
-{
-    bool ret = QObject::connect(
-      cleanupSettings, SIGNAL(windowTitleChanged(const QString&)),
-      panel,           SLOT(setWindowTitle(const QString&)));
+
+    bool ret = QObject::connect(cleanupSettings,
+                                SIGNAL(windowTitleChanged(const QString &)),
+                                panel, SLOT(setWindowTitle(const QString &)));
     assert(ret);
-public:
+
     panel->setMinimumSize(320, 150);
     panel->resize(600, 500);
   }
 
 } cleanupSettingsFactory;
-  CleanupSettingsFactory() : TPanelFactory("CleanupSettings") {}
+#endif
+
 OpenFloatingPanel cleanupSettingsCommand(MI_CleanupSettings, "CleanupSettings",
                                          QObject::tr("Cleanup Settings"));

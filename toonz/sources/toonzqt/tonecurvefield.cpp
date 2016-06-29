@@ -354,7 +354,7 @@ void ChennelCurveEditor::moveCentralControlPoint(int index,
 
   // Caso particolare: Punto di controllo corrente == primo visibile,
   //								  Punto di
-  //controllo
+  // controllo
   // successivo
   //==
   // l'ultimo
@@ -368,7 +368,7 @@ void ChennelCurveEditor::moveCentralControlPoint(int index,
   }
   // Caso particolare: Punto di controllo corrente == ultimo visibile,
   //								  Punto di
-  //controllo
+  // controllo
   // precedente
   //==
   // primo

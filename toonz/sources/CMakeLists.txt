@@ -14,10 +14,18 @@ message("Thirdpary Library Search path:" ${THIRDPARTY_LIBS_HINTS})
 
 if(WIN32)
     message("Windows System")
-    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-        set(QT_PATH "C:/Qt/Qt5.6.0_32/5.6/msvc2013" CACHE PATH "Qt instlattion directory")
+    if(MSVC_VERSION GREATER 1800)
+        if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+            set(QT_PATH "C:/Qt/5.6/msvc2015" CACHE PATH "Qt instlattion directory")
+        else()
+            set(QT_PATH "C:/Qt/5.6/msvc2015_64" CACHE PATH "Qt instlattion directory")
+        endif()
     else()
-        set(QT_PATH "C:/Qt/Qt5.6.0/5.6/msvc2013_64" CACHE PATH "Qt instlattion directory")
+        if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+            set(QT_PATH "C:/Qt/Qt5.6.0_32/5.6/msvc2013" CACHE PATH "Qt instlattion directory")
+        else()
+            set(QT_PATH "C:/Qt/Qt5.6.0/5.6/msvc2013_64" CACHE PATH "Qt instlattion directory")
+        endif()
     endif()
     if(NOT EXISTS ${QT_PATH})
         message("Specify QT_PATH properly")
@@ -152,22 +160,28 @@ if(WIN32)
         set(PLATFORM2 _64)
     endif()
 
+    if(MSVC_VERSION GREATER 1800)
+        set(MSVC_LIB_VERSION 2015)
+    else()
+        set(MSVC_LIB_VERSION 2013)
+    endif()
+
     set(GLUT_LIB ${SDKROOT}/glut/3.7.6/lib/glut${PLATFORM}.lib)
     set(GL_LIB opengl32.lib)
     set(Z_LIB
-        optimized ${SDKROOT}/zlib-1.2.8/lib/zlib-1.2.8${PLATFORM2}.lib
-        debug ${SDKROOT}/zlib-1.2.8/lib/zlib-1.2.8${PLATFORM2}d.lib)
-    set(JPEG_LIB ${SDKROOT}/LibJPEG/jpeg-9/lib/LibJPEG-9${PLATFORM2}.lib)
+        optimized ${SDKROOT}/zlib-1.2.8/lib/zlib-1.2.8_${MSVC_LIB_VERSION}${PLATFORM2}.lib
+        debug ${SDKROOT}/zlib-1.2.8/lib/zlib-1.2.8_${MSVC_LIB_VERSION}${PLATFORM2}d.lib)
+    set(JPEG_LIB ${SDKROOT}/LibJPEG/jpeg-9/lib/LibJPEG-9_${MSVC_LIB_VERSION}${PLATFORM2}.lib)
     set(TIFF_INCLUDE_DIR ${SDKROOT}/tiff-4.0.3/libtiff)
     set(TIFF_LIB
-        optimized ${SDKROOT}/tiff-4.0.3/lib/LibTIFF-4.0.3${PLATFORM2}.lib
-        debug  ${SDKROOT}/tiff-4.0.3/lib/LibTIFF-4.0.3${PLATFORM2}d.lib)
+        optimized ${SDKROOT}/tiff-4.0.3/lib/LibTIFF-4.0.3_${MSVC_LIB_VERSION}${PLATFORM2}.lib
+        debug  ${SDKROOT}/tiff-4.0.3/lib/LibTIFF-4.0.3_${MSVC_LIB_VERSION}${PLATFORM2}d.lib)
     set(PNG_LIB
-        optimized ${SDKROOT}/libpng-1.6.21/lib/libpng16${PLATFORM2}.lib
-        debug  ${SDKROOT}/libpng-1.6.21/lib/libpng16${PLATFORM2}d.lib)
+        optimized ${SDKROOT}/libpng-1.6.21/lib/libpng16_${MSVC_LIB_VERSION}${PLATFORM2}.lib
+        debug  ${SDKROOT}/libpng-1.6.21/lib/libpng16_${MSVC_LIB_VERSION}${PLATFORM2}d.lib)
     set(GLEW_LIB ${SDKROOT}/glew/glew-1.9.0/lib/glew${PLATFORM}.lib)
     set(LZ4_LIB ${SDKROOT}/Lz4/Lz4_131/lz4_${PLATFORM}.lib)
-    set(SUPERLU_LIB ${SDKROOT}/superlu/SuperLU_${PLATFORM}.lib)
+    set(SUPERLU_LIB ${SDKROOT}/superlu/SuperLU_${MSVC_LIB_VERSION}_${PLATFORM}.lib)
     set(OPENBLAS_LIB ${SDKROOT}/openblas/libopenblas_${PLATFORM}.lib)
     set(USB_LIB)  # unused
     if(PLATFORM EQUAL 32)

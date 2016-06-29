@@ -56,6 +56,13 @@ Visual Studio 2013とQt 5.6でビルドできることを確認しています�
   - `$opentoonz/thirdparty/tiff-4.0.3/libtiff/tiffconf.vc.h` → `$opentoonz/thirdparty/tiff-4.0.3/libtiff/tiffconf.h`
   - `$opentoonz/thirdparty/libpng-1.6.21/scripts/pnglibconf.h.prebuilt` → `$opentoonz/thirdparty/libpng-1.6.21/pnglibconf.h`
 
+`tif_config.h` の 50 行目あたりに下記の修正を加えます:
+```
++#if _MSC_VER < 1900
+#define snprintf _snprintf
++#endif
+```
+
 ## ビルド
 1. `$opentoonz/toonz/build/OpenToonz.sln`を開いてRelease構成を選択してビルドします
 2. `$opentoonz/toonz/build/Release`にファイルが生成されます

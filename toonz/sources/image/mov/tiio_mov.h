@@ -12,13 +12,14 @@
 
 // QuickTime includes
 namespace QuickTime {
-#define list List
-#define map Map
-#define iterator Iterator
-#define float_t Float_t
-#define int_fast8_t QT_int_fast8_t
-#define int_fast16_t QT_int_fast16_t
-#define uint_fast16_t QT_uint_fast16_t
+#define list QuickTime_list
+#define map QuickTime_map
+#define iterator QuickTime_iterator
+#define float_t QuickTime_float_t
+#define GetProcessInformation QuickTime_GetProcessInformation
+#define int_fast8_t QuickTime_int_fast8_t
+#define int_fast16_t QuickTime_int_fast16_t
+#define uint_fast16_t QuickTime_uint_fast16_t
 
 #include "QTML.h"
 #include "Movies.h"
@@ -27,15 +28,16 @@ namespace QuickTime {
 #include "Sound.h"
 #include "QuickTimeComponents.h"
 
-#include "tquicktime.h"
-
 #undef list
 #undef map
 #undef iterator
 #undef float_t
-#undef QT_int_fast8_t
-#undef QT_int_fast16_t
-#undef QT_uint_fast16_t
+#undef GetProcessInformation
+#undef int_fast8_t
+#undef int_fast16_t
+#undef uint_fast16_t
+
+#include "tquicktime.h"
 }  // namespace QuickTime
 
 // Toonz includes
