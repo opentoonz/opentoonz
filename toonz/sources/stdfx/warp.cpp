@@ -27,7 +27,7 @@ inline double convert<TPixel64>(const TPixel64 &pixel) {
 /*-----------------------------------------------------------------*/
 
 template <typename T>
-class Warper : public TDistorter {
+class Warper final : public TDistorter {
 public:
   TRasterPT<T> m_rin;
   TRasterPT<T> m_warper;

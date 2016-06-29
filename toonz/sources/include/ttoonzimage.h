@@ -20,7 +20,7 @@ class TToonzImageP;
 
 //! An image containing a Toonz raster.
 
-class DVAPI TToonzImage : public TImage {
+class DVAPI TToonzImage final : public TImage {
   //! dpi value for x axis
   double m_dpix,
       //! dpi value for y axis
@@ -122,7 +122,8 @@ template class DVAPI TSmartPointerT<TToonzImage>;
 template class DVAPI TDerivedSmartPointerT<TToonzImage, TImage>;
 #endif
 
-class DVAPI TToonzImageP : public TDerivedSmartPointerT<TToonzImage, TImage> {
+class DVAPI TToonzImageP final
+    : public TDerivedSmartPointerT<TToonzImage, TImage> {
 public:
   TToonzImageP() {}
   TToonzImageP(TToonzImage *image) : DerivedSmartPointer(image) {}

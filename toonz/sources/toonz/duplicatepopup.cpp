@@ -30,7 +30,7 @@
 namespace {
 //-----------------------------------------------------------------------------
 
-class DuplicateUndo : public TUndo {
+class DuplicateUndo final : public TUndo {
   int m_r0, m_c0;
   int m_r1, m_c1;
   int m_upTo;

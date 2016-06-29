@@ -39,7 +39,7 @@
 //    TTextureVertex (Textured Mesh Vertex Type)  declaration
 //***********************************************************************************
 
-struct RigidPoint : public TPointD {
+struct RigidPoint final : public TPointD {
   double rigidity;
 
 public:
@@ -115,7 +115,7 @@ struct point_traits<RigidPoint> {
 //    TTextureMesh (Textured Mesh Type)  declaration
 //***********************************************************************************
 
-class DVAPI TTextureMesh
+class DVAPI TTextureMesh final
     : public tcg::TriMesh<TTextureVertex, tcg::Edge, tcg::FaceN<3>>,
       public TSmartObject,
       public TPersist {
@@ -150,7 +150,7 @@ typedef TSmartPointerT<TTextureMesh> TTextureMeshP;
 namespace boost {
 
 template <>
-struct graph_traits<TTextureMesh>
+struct graph_traits<TTextureMesh> final
     : public graph_traits<
           tcg::Mesh<TTextureMesh::vertex_type, TTextureMesh::edge_type,
                     TTextureMesh::face_type>> {};
@@ -161,7 +161,7 @@ struct graph_traits<TTextureMesh>
 //    TMeshImage (Textured Mesh Image)  declaration
 //***********************************************************************************
 
-class DVAPI TMeshImage : public TImage {
+class DVAPI TMeshImage final : public TImage {
   class Imp;
   std::shared_ptr<Imp> m_imp;
 
@@ -199,7 +199,8 @@ template class DVAPI TSmartPointerT<TMeshImage>;
 template class DVAPI TDerivedSmartPointerT<TMeshImage, TImage>;
 #endif
 
-class DVAPI TMeshImageP : public TDerivedSmartPointerT<TMeshImage, TImage> {
+class DVAPI TMeshImageP final
+    : public TDerivedSmartPointerT<TMeshImage, TImage> {
 public:
   TMeshImageP() {}
   TMeshImageP(TMeshImage *image) : DerivedSmartPointer(image) {}

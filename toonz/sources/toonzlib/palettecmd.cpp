@@ -162,7 +162,7 @@ bool areStylesUsed(const set<TXshSimpleLevel *> levels,
 
 namespace {
 
-class ArrangeStylesUndo : public TUndo {
+class ArrangeStylesUndo final : public TUndo {
   TPaletteHandle *m_paletteHandle;
   TPaletteP m_palette;
   int m_dstPageIndex;
@@ -276,7 +276,7 @@ void PaletteCmd::arrangeStyles(TPaletteHandle *paletteHandle, int dstPageIndex,
 namespace {
 //-----------------------------------------------------------------------------
 
-class CreateStyleUndo : public TUndo {
+class CreateStyleUndo final : public TUndo {
   TPaletteHandle *m_paletteHandle;
   TPaletteP m_palette;
   int m_pageIndex;
@@ -394,7 +394,7 @@ namespace {
 // AddStylesUndo
 //-----------------------------------------------------------------------------
 
-class AddStylesUndo : public TUndo {
+class AddStylesUndo final : public TUndo {
   TPaletteP m_palette;
   int m_pageIndex;
   int m_indexInPage;
@@ -523,7 +523,7 @@ void PaletteCmd::eraseStyles(const std::set<TXshSimpleLevel *> &levels,
   typedef std::pair<const TXshSimpleLevelP, std::vector<TVectorImageP>>
       LevelImages;
 
-  struct Undo : public TUndo {
+  struct Undo final : public TUndo {
     std::set<TXshSimpleLevel *> m_levels;
     std::vector<int> m_styleIds;
 
@@ -616,7 +616,7 @@ void PaletteCmd::eraseStyles(const std::set<TXshSimpleLevel *> &levels,
 
 namespace {
 
-class AddPageUndo : public TUndo {
+class AddPageUndo final : public TUndo {
   TPaletteHandle *m_paletteHandle;
   TPaletteP m_palette;
   int m_pageIndex;
@@ -699,7 +699,7 @@ void PaletteCmd::addPage(TPaletteHandle *paletteHandle, std::wstring name,
 
 namespace {
 
-class DestroyPageUndo : public TUndo {
+class DestroyPageUndo final : public TUndo {
   TPaletteHandle *m_paletteHandle;
   TPaletteP m_palette;
   int m_pageIndex;
@@ -765,7 +765,7 @@ namespace {
 // SetReferenceImageUndo
 //-------------------------------------------------------------------
 
-class SetReferenceImageUndo : public TUndo {
+class SetReferenceImageUndo final : public TUndo {
   TPaletteP m_palette;
   TPaletteP m_oldPalette, m_newPalette;
 
@@ -1004,7 +1004,7 @@ void PaletteCmd::removeReferenceImage(TPaletteHandle *paletteHandle) {
 
 namespace {
 
-class MovePageUndo : public TUndo {
+class MovePageUndo final : public TUndo {
   TPaletteHandle *m_paletteHandle;
   TPaletteP m_palette;
   int m_srcIndex;
@@ -1047,7 +1047,7 @@ void PaletteCmd::movePalettePage(TPaletteHandle *paletteHandle, int srcIndex,
 
 namespace {
 
-class RenamePageUndo : public TUndo {
+class RenamePageUndo final : public TUndo {
   TPaletteHandle *m_paletteHandle;
   TPaletteP m_palette;
   int m_pageIndex;
@@ -1108,7 +1108,7 @@ void PaletteCmd::renamePalettePage(TPaletteHandle *paletteHandle, int pageIndex,
 
 namespace {
 
-class RenamePaletteStyleUndo : public TUndo {
+class RenamePaletteStyleUndo final : public TUndo {
   TPaletteHandle *m_paletteHandle;  // Usato nell'undo e nel redo per lanciare
                                     // la notifica di cambiamento
   int m_styleId;

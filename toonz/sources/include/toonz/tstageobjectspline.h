@@ -33,7 +33,7 @@ class TDoubleParam;
 */
 //=============================================================================
 
-class DVAPI TStageObjectSpline : public TSmartObject, public TPersist {
+class DVAPI TStageObjectSpline final : public TSmartObject, public TPersist {
   PERSIST_DECLARATION(TStageObjectSpline)
   TStroke *m_stroke;
   DECLARE_CLASS_CODE

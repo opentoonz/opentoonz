@@ -6,7 +6,7 @@
 #include "tspectrumparam.h"
 #include "tparamuiconcept.h"
 
-class DiamondGradientFx : public TStandardZeraryFx {
+class DiamondGradientFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(DiamondGradientFx)
   TSpectrumParamP m_colors;
   TDoubleParamP m_size;

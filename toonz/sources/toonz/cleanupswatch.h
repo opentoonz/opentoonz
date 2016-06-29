@@ -5,10 +5,10 @@
 
 // class QPushButton;
 class QAction;
-class CleanupSwatch : public QWidget {
+class CleanupSwatch final : public QWidget {
   Q_OBJECT
 
-  class CleanupSwatchArea : public QWidget {
+  class CleanupSwatchArea final : public QWidget {
     QPoint m_pos;
     bool m_isLeft, m_panning;
     CleanupSwatch *m_sw;

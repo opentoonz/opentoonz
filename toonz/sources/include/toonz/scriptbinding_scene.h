@@ -7,7 +7,7 @@
 
 namespace TScriptBinding {
 
-class DVAPI Scene : public Wrapper {
+class DVAPI Scene final : public Wrapper {
   Q_OBJECT
   ToonzScene *m_scene;
 

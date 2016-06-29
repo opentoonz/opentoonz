@@ -17,7 +17,7 @@ class TXshLevel;
 //
 //-----------------------------------------------------------------------------
 
-class CastSelection : public DvItemSelection {
+class CastSelection final : public DvItemSelection {
   CastBrowser *m_browser;
 
 public:
@@ -58,7 +58,7 @@ public:
 };
 //-----------------------------------------------------------------------------
 
-class LevelCastItem : public CastItem {
+class LevelCastItem final : public CastItem {
   TXshLevel *m_level;
   QSize m_itemPixmapSize;
 
@@ -78,7 +78,7 @@ public:
 };
 //-----------------------------------------------------------------------------
 
-class SoundCastItem : public CastItem {
+class SoundCastItem final : public CastItem {
   TXshSoundLevel *m_soundLevel;
   QSize m_itemPixmapSize;
 
@@ -98,7 +98,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class PaletteCastItem : public CastItem {
+class PaletteCastItem final : public CastItem {
   TXshPaletteLevel *m_paletteLevel;
   QSize m_itemPixmapSize;
 
@@ -117,7 +117,7 @@ public:
 };
 //-----------------------------------------------------------------------------
 
-class CastItems : public QMimeData {
+class CastItems final : public QMimeData {
   std::vector<CastItem *> m_items;
 
 public:

@@ -14,7 +14,7 @@
 //--------------------------------------
 
 // NOTE: This class should eventually be moved to tthreadmessagep.h...
-class TThreadMessageDispatcher : public QObject  // singleton
+class TThreadMessageDispatcher final : public QObject  // singleton
 {
   Q_OBJECT
 
@@ -47,7 +47,7 @@ class ExecutorImpSlots;
 //    ExecutorImpSlots class
 //------------------------------
 
-class TThread::ExecutorImpSlots : public QObject {
+class TThread::ExecutorImpSlots final : public QObject {
   Q_OBJECT
 
 public:

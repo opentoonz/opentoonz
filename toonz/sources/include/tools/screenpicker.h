@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------
 
-class ScreenPicker : public QObject, public DVGui::ScreenBoard::Drawing {
+class ScreenPicker final : public QObject, public DVGui::ScreenBoard::Drawing {
   Q_OBJECT
 
   QPoint m_start;

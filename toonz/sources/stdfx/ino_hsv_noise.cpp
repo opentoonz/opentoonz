@@ -4,7 +4,7 @@
 
 #include "ino_common.h"
 //------------------------------------------------------------
-class ino_hsv_noise : public TStandardRasterFx {
+class ino_hsv_noise final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_hsv_noise)
   TRasterFxPort m_input;
   TRasterFxPort m_refer;

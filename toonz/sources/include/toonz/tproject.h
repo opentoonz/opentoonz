@@ -20,7 +20,7 @@ class TSceneProperties;
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TProject : public TSmartObject {
+class DVAPI TProject final : public TSmartObject {
   TFilePath m_name, m_path;
   std::vector<std::string> m_folderNames;
   std::map<std::string, TFilePath> m_folders;

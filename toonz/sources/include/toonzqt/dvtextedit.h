@@ -40,7 +40,7 @@ namespace DVGui {
 class ColorField;
 //-----------------------------------------------------------------------------
 
-class DvMiniToolBar : public QFrame {
+class DvMiniToolBar final : public QFrame {
   QPoint m_dragPos;
 
 public:
@@ -54,7 +54,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class DvTextEditButton : public QWidget {
+class DvTextEditButton final : public QWidget {
   Q_OBJECT
 
 public:
@@ -71,7 +71,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI DvTextEdit : public QTextEdit {
+class DVAPI DvTextEdit final : public QTextEdit {
   Q_OBJECT
 
   bool m_paintMode;

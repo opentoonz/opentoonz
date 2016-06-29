@@ -24,7 +24,7 @@ using namespace std;
 
 //===============================
 
-class TActualDoubleKeyframe : public TDoubleKeyframe {
+class TActualDoubleKeyframe final : public TDoubleKeyframe {
 public:
   mutable TExpression m_expression;
   mutable TDoubleParamFileData m_fileData;

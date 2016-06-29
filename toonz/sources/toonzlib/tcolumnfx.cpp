@@ -713,7 +713,7 @@ void applyCmappedFx(TVectorImageP &vi,
 //    LevelFxResourceBuilder  definition
 //****************************************************************************************
 
-class LevelFxBuilder : public ResourceBuilder {
+class LevelFxBuilder final : public ResourceBuilder {
   TRasterP m_loadedRas;
   TPaletteP m_palette;
 

@@ -34,7 +34,7 @@ public:
 // ViewerHistogramPopup
 //-----------------------------------------------------------------------------
 
-class ViewerHistogramPopup : public HistogramPopup {
+class ViewerHistogramPopup final : public HistogramPopup {
   Q_OBJECT
 
 public:

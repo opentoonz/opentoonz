@@ -193,7 +193,7 @@ public:
 
 //------------------------------------------------------------------------
 
-class AddVertexUndo : public VertexUndo {
+class AddVertexUndo final : public VertexUndo {
 public:
   AddVertexUndo(int vParent, const PlasticSkeletonVertex &vx) {
     m_vParent = vParent, m_vx = vx;
@@ -210,7 +210,7 @@ public:
 
 //------------------------------------------------------------------------
 
-class RemoveVertexUndo : public VertexUndo {
+class RemoveVertexUndo final : public VertexUndo {
 public:
   RemoveVertexUndo(int v) {
     assert(v >= 0);
@@ -227,7 +227,7 @@ public:
 
 //========================================================================
 
-class InsertVertexUndo : public VertexUndo {
+class InsertVertexUndo final : public VertexUndo {
 public:
   InsertVertexUndo(int e, const PlasticSkeletonVertex &vx) {
     const PlasticSkeleton &skeleton      = *l_plasticTool.skeleton();
@@ -298,7 +298,7 @@ public:
 
 //------------------------------------------------------------------------
 
-class RemoveSkeletonUndo_WithKeyframes : public RemoveSkeletonUndo {
+class RemoveSkeletonUndo_WithKeyframes final : public RemoveSkeletonUndo {
   mutable std::vector<TDoubleKeyframe>
       m_skelIdsKeyframes;  //!< Skeleton Ids param curve keyframes
                            //!< for m_skelId
@@ -351,7 +351,7 @@ public:
 
 //========================================================================
 
-class SetSkeletonIdUndo : public TUndo {
+class SetSkeletonIdUndo final : public TUndo {
   int m_row, m_col;  //!< Xsheet coordinates
 
   int m_skelId;  //!< The new skeleton id value
@@ -423,7 +423,7 @@ public:
 
 //========================================================================
 
-class MoveVertexUndo_Build : public TUndo {
+class MoveVertexUndo_Build final : public TUndo {
   int m_row, m_col;  //!< Xsheet coordinates
 
   std::vector<int> m_vIdxs;           //!< Moved vertices

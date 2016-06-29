@@ -753,12 +753,7 @@ DvDirTreeView {
 #SolidLineFrame {
   border: 1px solid #e6e6e6;
 }
-#CleanupSettingsHeadLabel,
-#LoadLevelHeadLabel,
-#PsdSettingsHeadLabel,
-#PsdSettingsGroupBox::title,
-#FxSettingsPreviewShowLabel,
-#RenameAsToonzPopupLabel {
+#TitleTxtLabel {
   color: #a8bee7;
 }
 #PsdSettingsGroupBox {
@@ -1351,4 +1346,4 @@ QDialog #dialogButtonFrame {
   background-color: #7d7d7d;
 }
 
-//# sourceMappingURL=gray_048.qss.map
+//# sourceMappingURL=gray_048_mac.qss.map

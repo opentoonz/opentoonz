@@ -11,7 +11,7 @@
 The class TSoundTrackReaderRaw reads audio files having
 .raw extension (this kind of file contains only the sample)
 */
-class TSoundTrackReaderRaw : public TSoundTrackReader {
+class TSoundTrackReaderRaw final : public TSoundTrackReader {
 public:
   TSoundTrackReaderRaw(const TFilePath &fp);
   ~TSoundTrackReaderRaw() {}
@@ -36,7 +36,7 @@ Returns a soundtrack reader able to read .raw audio files
 The class TSoundTrackWriterRaw writes audio file having
 .raw extension (this kind of file contains only the sample)
 */
-class TSoundTrackWriterRaw : public TSoundTrackWriter {
+class TSoundTrackWriterRaw final : public TSoundTrackWriter {
 public:
   TSoundTrackWriterRaw(const TFilePath &fp);
   ~TSoundTrackWriterRaw() {}

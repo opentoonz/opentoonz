@@ -57,7 +57,7 @@ private:
 //    TUndoManager  class
 //************************************************************************
 
-class DVAPI TUndoManager : public QObject {
+class DVAPI TUndoManager final : public QObject {
   Q_OBJECT
 
 public:

@@ -24,7 +24,7 @@ class TXsheet;
 // TXsheetHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TXsheetHandle : public QObject {
+class DVAPI TXsheetHandle final : public QObject {
   Q_OBJECT
 
   TXsheet *m_xsheet;

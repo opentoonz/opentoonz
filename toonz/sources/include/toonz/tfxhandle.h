@@ -24,7 +24,7 @@ class TFx;
 // TFxHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TFxHandle : public QObject {
+class DVAPI TFxHandle final : public QObject {
   Q_OBJECT
 
 private:

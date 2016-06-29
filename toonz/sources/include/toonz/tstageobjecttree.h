@@ -82,7 +82,7 @@ public:
         */
 //=============================================================================
 
-class DVAPI TStageObjectTree : public TPersist {
+class DVAPI TStageObjectTree final : public TPersist {
   PERSIST_DECLARATION(TStageObjectTree)
   struct TStageObjectTreeImp;
   std::unique_ptr<TStageObjectTreeImp> m_imp;

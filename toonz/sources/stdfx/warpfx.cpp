@@ -9,7 +9,7 @@
 
 //-------------------------------------------------------------------
 
-class WarpFx : public TStandardRasterFx {
+class WarpFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(WarpFx)
 
 protected:

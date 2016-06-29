@@ -21,7 +21,7 @@ struct int2 {
   int x, y;
 };
 
-class Iwa_GradientWarpFx : public TStandardRasterFx {
+class Iwa_GradientWarpFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(Iwa_GradientWarpFx)
 
 protected:

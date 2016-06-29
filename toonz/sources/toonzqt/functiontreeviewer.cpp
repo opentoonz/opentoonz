@@ -52,8 +52,8 @@
 
 namespace {
 
-class ParamChannelGroup : public FunctionTreeModel::ParamWrapper,
-                          public FunctionTreeModel::ChannelGroup {
+class ParamChannelGroup final : public FunctionTreeModel::ParamWrapper,
+                                public FunctionTreeModel::ChannelGroup {
 public:
   ParamChannelGroup(TParam *param, const std::wstring &fxId,
                     std::string &paramName);
@@ -64,7 +64,7 @@ public:
 
 //=============================================================================
 
-class StageObjectChannelGroup : public FunctionTreeModel::ChannelGroup {
+class StageObjectChannelGroup final : public FunctionTreeModel::ChannelGroup {
 public:
   TStageObject *m_stageObject;  //!< (not owned) Referenced stage object
   FunctionTreeModel::ChannelGroup
@@ -89,7 +89,7 @@ public:
 
 //=============================================================================
 
-class SkVDChannelGroup : public FunctionTreeModel::ChannelGroup {
+class SkVDChannelGroup final : public FunctionTreeModel::ChannelGroup {
 public:
   StageObjectChannelGroup *m_stageObjectGroup;  //!< Parent stage object group
   const QString *m_vxName;                      //!< The associated vertex name
@@ -1182,7 +1182,7 @@ void FunctionTreeModel::onChange(const TParamChange &tpc) {
   if (!m_paramsChanged) {
     m_paramsChanged = true;
 
-    struct Func : public TFunctorInvoker::BaseFunctor {
+    struct Func final : public TFunctorInvoker::BaseFunctor {
       FunctionTreeModel *m_obj;
       const TParamChange *m_tpc;
 

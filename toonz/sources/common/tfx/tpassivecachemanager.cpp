@@ -234,7 +234,7 @@ public:
     bool operator!=(const Iterator &it) { return !operator==(it); }
   };
 
-  class ColIterator : public Iterator {
+  class ColIterator final : public Iterator {
     ColKey m_colKey;
 
     friend class Table;
@@ -256,7 +256,7 @@ public:
     }
   };
 
-  class RowIterator : public Iterator {
+  class RowIterator final : public Iterator {
     friend class Table;
     RowIterator(Table *table) : Iterator(table) {}
 
@@ -423,7 +423,8 @@ TPassiveCacheManager::FxData::~FxData() {}
 //    TPassiveCacheManagerGenerator
 //---------------------------------------
 
-class TPassiveCacheManagerGenerator : public TRenderResourceManagerGenerator {
+class TPassiveCacheManagerGenerator final
+    : public TRenderResourceManagerGenerator {
   TRenderResourceManager *operator()(void) override {
     // return new TPassiveCacheManager;
     return TPassiveCacheManager::instance();

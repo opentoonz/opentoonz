@@ -13,7 +13,7 @@ class ExportScenePopup;
 // FileSelection
 //-----------------------------------------------------------------------------
 
-class FileSelection : public DvItemSelection {
+class FileSelection final : public DvItemSelection {
   QList<InfoViewer *> m_infoViewers;
   ExportScenePopup *m_exportScenePopup;
 

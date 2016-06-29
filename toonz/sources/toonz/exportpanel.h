@@ -35,7 +35,7 @@ class LineEdit;
 
 //-----------------------------------------------------------------------------
 
-class ClipListViewer : public DvItemViewer, public DvItemListModel {
+class ClipListViewer final : public DvItemViewer, public DvItemListModel {
   Q_OBJECT
 
   static const char *m_mimeFormat;
@@ -79,7 +79,7 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class ExportPanel : public TPanel {
+class ExportPanel final : public TPanel {
   Q_OBJECT
 
   ClipListViewer *m_clipListViewer;
@@ -106,8 +106,8 @@ public slots:
   void openSettingsPopup();
 };
 
-class RenderController : public QObject,
-                         public MovieGenerator::Listener {  // singleton
+class RenderController final : public QObject,
+                               public MovieGenerator::Listener {  // singleton
   Q_OBJECT
   DVGui::ProgressDialog *m_progressDialog;
   int m_frame;

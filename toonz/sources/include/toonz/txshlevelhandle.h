@@ -21,7 +21,7 @@ class TXshSimpleLevel;
 // TXshLevelHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TXshLevelHandle : public QObject {
+class DVAPI TXshLevelHandle final : public QObject {
   Q_OBJECT
 
   TXshLevel *m_level;

@@ -62,7 +62,7 @@ inline TPixelGR16 transparent<TPixelGR16>() {
 //    Mesh stuff
 //===========================================================
 
-class Edge : public tcg::Edge {
+class Edge final : public tcg::Edge {
   TPoint m_dirs[2];
   TStroke *m_s;
 
@@ -282,7 +282,7 @@ public:
 //************************************************************************
 
 template <typename Pix>
-class BordersReader : public TRop::borders::BordersReader {
+class BordersReader final : public TRop::borders::BordersReader {
 public:
   typedef Pix pixel_type;
 

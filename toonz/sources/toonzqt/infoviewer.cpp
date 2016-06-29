@@ -172,8 +172,7 @@ void InfoViewerImp::onSliderChanged() {
 
 namespace {
 void setLabelStyle(QLabel *l) {
-  l->setFrameStyle(QFrame::StyledPanel);
-  l->setStyleSheet("color: rgb(0, 0, 200);");
+  l->setObjectName("TitleTxtLabel");
 }
 }
 

@@ -57,7 +57,7 @@ const int BackgroundStyle = 0;
 
 namespace {
 
-class FingerUndo : public TRasterUndo {
+class FingerUndo final : public TRasterUndo {
   std::vector<TThickPoint> m_points;
   int m_styleId;
   bool m_invert;
@@ -242,7 +242,7 @@ void drawEmptyCircle(int thick, const TPointD &mousePos, bool isPencil,
 
 //-----------------------------------------------------------------------------
 
-class FingerTool : public TTool {
+class FingerTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(FingerTool)
 
   RasterStrokeGenerator *m_rasterTrack;

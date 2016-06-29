@@ -30,7 +30,7 @@
 
 namespace {
 
-class NotifyMessage : public TThread::Message {
+class NotifyMessage final : public TThread::Message {
 public:
   NotifyMessage() {}
 
@@ -137,7 +137,7 @@ bool SaveTaskListPopup::execute() {
 QMutex TasksMutex;
 map<QString, QProcess *> RunningTasks;
 
-class TaskRunner : public TThread::Runnable {
+class TaskRunner final : public TThread::Runnable {
 public:
   TaskRunner(TFarmTask *task, int localControllerPort)
       : m_task(task), m_localControllerPort(localControllerPort) {}
@@ -953,7 +953,7 @@ TFarmController *BatchesController::getController() const {
 
 namespace {
 
-class ControllerFailureMsg : public TThread::Message {
+class ControllerFailureMsg final : public TThread::Message {
 public:
   ControllerFailureMsg(const TException &e) : m_e(e) {}
 
@@ -1027,7 +1027,7 @@ BatchesController::Observer::~Observer() {}
 
 namespace {
 
-class MyLocalController : public TFarmController, public TFarmExecutor {
+class MyLocalController final : public TFarmController, public TFarmExecutor {
 public:
   MyLocalController(int port) : TFarmExecutor(port) {}
 
@@ -1173,7 +1173,7 @@ void MyLocalController::taskProgress(const QString &taskId, int step,
 
 void MyLocalController::taskCompleted(const QString &taskId, int exitCode) {}
 
-class MyLocalControllerController : public TThread::Runnable {
+class MyLocalControllerController final : public TThread::Runnable {
   MyLocalController *m_controller;
 
 public:

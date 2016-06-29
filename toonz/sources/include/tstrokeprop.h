@@ -31,7 +31,7 @@ class TCenterLineStrokeStyle;
 
 //=============================================================================
 
-class DVAPI TSimpleStrokeProp : public TStrokeProp {
+class DVAPI TSimpleStrokeProp final : public TStrokeProp {
 protected:
   TSimpleStrokeStyle *m_colorStyle;
 
@@ -48,7 +48,7 @@ public:
 
 //=============================================================================
 
-class DVAPI TRasterImagePatternStrokeProp : public TStrokeProp {
+class DVAPI TRasterImagePatternStrokeProp final : public TStrokeProp {
 protected:
   TRasterImagePatternStrokeStyle *m_colorStyle;
   std::vector<TAffine> m_transformations;
@@ -67,7 +67,7 @@ public:
 
 //=============================================================================
 
-class DVAPI TVectorImagePatternStrokeProp : public TStrokeProp {
+class DVAPI TVectorImagePatternStrokeProp final : public TStrokeProp {
 protected:
   TVectorImagePatternStrokeStyle *m_colorStyle;
   std::vector<TAffine> m_transformations;
@@ -86,7 +86,7 @@ public:
 
 //=============================================================================
 
-class DVAPI OutlineStrokeProp : public TStrokeProp {
+class DVAPI OutlineStrokeProp final : public TStrokeProp {
 protected:
   TOutlineStyleP m_colorStyle;
   TStrokeOutline m_outline;

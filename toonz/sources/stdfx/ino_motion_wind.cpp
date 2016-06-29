@@ -4,7 +4,7 @@
 
 #include "ino_common.h"
 //------------------------------------------------------------
-class ino_motion_wind : public TStandardRasterFx {
+class ino_motion_wind final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_motion_wind)
 
   TRasterFxPort m_input;

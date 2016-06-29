@@ -288,7 +288,7 @@ void findRoads(const JointSequenceGraph &JSGraph) {
 //----------------------------------
 
 // Entering point of a Sequence inside a Junction Area
-class EnteringSequence : public Sequence {
+class EnteringSequence final : public Sequence {
 public:
   TPointD m_direction;  // In this case, we keep
   double m_height;      // separated (x,y) and z coords.

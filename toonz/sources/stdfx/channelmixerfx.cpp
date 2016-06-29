@@ -8,7 +8,7 @@
 
 //==================================================================
 
-class ChannelMixerFx : public TStandardRasterFx {
+class ChannelMixerFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ChannelMixerFx)
 
   TRasterFxPort m_input;

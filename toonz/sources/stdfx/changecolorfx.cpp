@@ -99,7 +99,7 @@ static void OLDHSV2RGB(double hue, double sat, double value, double *red,
   }
 }
 
-class ChangeColorFx : public TStandardRasterFx {
+class ChangeColorFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ChangeColorFx)
   TRasterFxPort m_input;
   TPixelParamP m_from_color;

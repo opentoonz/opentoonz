@@ -186,7 +186,7 @@ private:
   Constant thickness stroke style.
 */
 
-class DVAPI TCenterLineStrokeStyle : public TSimpleStrokeStyle {
+class DVAPI TCenterLineStrokeStyle final : public TSimpleStrokeStyle {
   TPixel32 m_color;
   USHORT m_stipple;
   double m_width;
@@ -236,7 +236,7 @@ private:
 //    TRasterImagePatternStrokeStyle  declaration
 //**********************************************************************************
 
-class DVAPI TRasterImagePatternStrokeStyle : public TColorStyle {
+class DVAPI TRasterImagePatternStrokeStyle final : public TColorStyle {
   static TFilePath m_rootDir;
 
 protected:
@@ -313,7 +313,7 @@ private:
 //    TVectorImagePatternStrokeStyle  declaration
 //**********************************************************************************
 
-class DVAPI TVectorImagePatternStrokeStyle : public TColorStyle {
+class DVAPI TVectorImagePatternStrokeStyle final : public TColorStyle {
   static TFilePath m_rootDir;
 
 protected:

@@ -42,7 +42,7 @@ class QLabel;
 // 120405
 //-----------------------------------------------------------------------------
 
-class DVAPI ComboHistoRGBLabel : public QWidget {
+class DVAPI ComboHistoRGBLabel final : public QWidget {
   QColor m_color;
 
 public:
@@ -81,7 +81,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI RGBHistoGraph : public ChannelHistoGraph {
+class DVAPI RGBHistoGraph final : public ChannelHistoGraph {
   Q_OBJECT
 
   QVector<int> m_rgbValues[3];
@@ -99,7 +99,7 @@ protected:
 };
 //-----------------------------------------------------------------------------
 
-class DVAPI ChannelColorBar : public QWidget {
+class DVAPI ChannelColorBar final : public QWidget {
   Q_OBJECT
   QColor m_color;
 
@@ -113,7 +113,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI ChannelHisto : public QWidget {
+class DVAPI ChannelHisto final : public QWidget {
   Q_OBJECT
 
   ChannelHistoGraph *m_histogramGraph;
@@ -133,7 +133,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI ComboHistogram : public QWidget {
+class DVAPI ComboHistogram final : public QWidget {
   Q_OBJECT
 
   TRasterP m_raster;

@@ -128,7 +128,9 @@ PsdSettingsPopup::PsdSettingsPopup()
   m_parentDir->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
   m_parentDir->setFixedHeight(WidgetHeight);
   QLabel *nmLbl     = new QLabel(tr("Name:"));
+  nmLbl->setObjectName("TitleTxtLabel");
   QLabel *ptLbl     = new QLabel(tr("Path:"));
+  ptLbl->setObjectName("TitleTxtLabel");
   QGridLayout *grid = new QGridLayout();
   grid->setColumnMinimumWidth(0, 65);
   grid->addWidget(nmLbl, 0, 0, Qt::AlignRight);
@@ -168,6 +170,7 @@ PsdSettingsPopup::PsdSettingsPopup()
   m_createSubXSheet->setEnabled(false);
 
   QLabel *modeLbl = new QLabel(tr("Load As:"));
+  modeLbl->setObjectName("TitleTxtLabel");
 
   QGridLayout *gridMode = new QGridLayout();
   gridMode->setColumnMinimumWidth(0, 65);

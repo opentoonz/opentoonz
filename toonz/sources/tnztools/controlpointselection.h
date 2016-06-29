@@ -133,7 +133,7 @@ If updatePoints is true update dependent point after.*/
 // ControlPointSelection
 //-----------------------------------------------------------------------------
 
-class ControlPointSelection : public QObject, public TSelection {
+class ControlPointSelection final : public QObject, public TSelection {
   Q_OBJECT
 
 private:

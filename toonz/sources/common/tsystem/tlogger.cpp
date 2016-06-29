@@ -18,7 +18,7 @@ public:
   std::set<TLogger::Listener *> m_listeners;
   TThread::Mutex m_mutex;
 
-  class ListenerNotifier : public TThread::Message {
+  class ListenerNotifier final : public TThread::Message {
     Imp *m_imp;
 
   public:

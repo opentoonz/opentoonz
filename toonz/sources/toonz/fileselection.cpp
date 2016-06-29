@@ -53,7 +53,7 @@ namespace {
 //  CopyFilesUndo
 //-----------------------------------------------------------------------------
 
-class CopyFilesUndo : public TUndo {
+class CopyFilesUndo final : public TUndo {
   QMimeData *m_oldData;
   QMimeData *m_newData;
 
@@ -80,7 +80,7 @@ public:
 //  PasteFilesUndo
 //-----------------------------------------------------------------------------
 
-class PasteFilesUndo : public TUndo {
+class PasteFilesUndo final : public TUndo {
   std::vector<TFilePath> m_newFiles;
   TFilePath m_folder;
 
@@ -130,7 +130,7 @@ public:
 //  DuplicateUndo
 //-----------------------------------------------------------------------------
 
-class DuplicateUndo : public TUndo {
+class DuplicateUndo final : public TUndo {
   std::vector<TFilePath> m_newFiles;
   std::vector<TFilePath> m_files;
 

@@ -7,7 +7,7 @@
 
 //===================================================================
 
-class RGBMScaleFx : public TStandardRasterFx {
+class RGBMScaleFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(RGBMScaleFx)
   TRasterFxPort m_input;
   TDoubleParamP m_red;

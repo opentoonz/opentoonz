@@ -17,7 +17,7 @@
 //    Decorations
 //-------------------
 
-class TDockDecoAllocator : public DockDecoAllocator {
+class TDockDecoAllocator final : public DockDecoAllocator {
   DockSeparator *newSeparator(DockLayout *owner, bool orientation,
                               Region *parentRegion) override;
   DockPlaceholder *newPlaceholder(DockWidget *owner, Region *r, int idx,
@@ -326,7 +326,7 @@ QSize TDockWidget::getDockedMaximumSize() {
 //    Custom Decorations
 //--------------------------
 
-class TDockSeparator : public DockSeparator {
+class TDockSeparator final : public DockSeparator {
 public:
   TDockSeparator(DockLayout *owner, bool orientation, Region *parentRegion)
       : DockSeparator(owner, orientation, parentRegion) {}
@@ -336,7 +336,7 @@ public:
 
 //----------------------------------------
 
-class TDockPlaceholder : public DockPlaceholder {
+class TDockPlaceholder final : public DockPlaceholder {
   QWidget *m_associated[3];
 
 public:

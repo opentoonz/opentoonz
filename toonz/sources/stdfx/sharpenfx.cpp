@@ -234,7 +234,7 @@ void ropSharpen(const TRasterPT<T> &rin, TRasterPT<T> &rout,
 
 /*---------------------------------------------------------------------------*/
 
-class SharpenFx : public TStandardRasterFx {
+class SharpenFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(SharpenFx)
 
   TRasterFxPort m_input;

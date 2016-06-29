@@ -214,7 +214,7 @@ void SkVD::loadData(TIStream &is) {
 //    PlasticSkeletonDeformation::Imp  definition
 //**************************************************************************************
 
-class PlasticSkeletonDeformation::Imp : public TParamObserver {
+class PlasticSkeletonDeformation::Imp final : public TParamObserver {
 public:
   PlasticSkeletonDeformation *m_back;  //!< Back-pointer to the interface class
 

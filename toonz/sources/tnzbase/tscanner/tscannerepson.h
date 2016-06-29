@@ -13,7 +13,7 @@ PLEASE DO NOT REMOVE unreferenced methods... they are useful for debugging  :)
 max
 */
 
-class TScannerEpson : public TScanner {
+class TScannerEpson final : public TScanner {
   enum SettingsMode { OLD_STYLE, NEW_STYLE };
 
   TScannerIO *m_scannerIO;

@@ -212,7 +212,7 @@ void removeRenderCache(const std::string &alias) {
 //! Internal fx node which applies the implicit affine stored in the
 //! TRenderSettings structure,
 //! replacing the old TRasterFx::doCompute.
-class TrFx : public TBaseRasterFx {
+class TrFx final : public TBaseRasterFx {
   FX_DECLARATION(TrFx)
 
   TRasterFx *m_fx;
@@ -360,7 +360,7 @@ FX_IDENTIFIER_IS_HIDDEN(TrFx, "trFx")
 // render
 // results. Please refer to the ResourceBuilder documentation in
 // tfxcachemanager.cpp
-class FxResourceBuilder : public ResourceBuilder {
+class FxResourceBuilder final : public ResourceBuilder {
   TRasterFxP m_rfx;
   double m_frame;
   const TRenderSettings *m_rs;

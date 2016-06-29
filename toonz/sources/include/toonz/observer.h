@@ -64,7 +64,7 @@ public:
 //-------------------------------------------------------------------
 
 template <class T>
-class TObserverListT : public TObserverList {
+class TObserverListT final : public TObserverList {
   friend class TNotifier;
 
 public:

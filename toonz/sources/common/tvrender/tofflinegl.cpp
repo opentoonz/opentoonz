@@ -69,7 +69,7 @@ static QMutex win32ImpMutex;
 
 //-------------------------------
 
-class WIN32Implementation : public TOfflineGL::Imp {
+class WIN32Implementation final : public TOfflineGL::Imp {
 public:
   HDC m_offDC;
   HGDIOBJ m_oldobj;
@@ -314,7 +314,7 @@ namespace {
 static QMutex linuxImpMutex;
 }
 
-class XImplementation : public TOfflineGL::Imp {
+class XImplementation final : public TOfflineGL::Imp {
 public:
   Display *m_dpy;
   GLXContext m_context;
@@ -514,7 +514,7 @@ TOfflineGL::ImpGenerator *currentImpGenerator = defaultOfflineGLGenerator;
 
 // namespace {
 
-class MessageCreateContext : public TThread::Message {
+class MessageCreateContext final : public TThread::Message {
   friend class TOfflineGL;
 
   TOfflineGL *m_ogl;
@@ -845,7 +845,7 @@ int TOfflineGL::getLy() const { return m_imp->getLy(); }
 
 namespace {
 
-struct DimensionLess
+struct DimensionLess final
     : public std::binary_function<TDimension, TDimension, bool> {
   bool operator()(const TDimension &d1, const TDimension &d2) const {
     return d1.lx < d2.lx || (d1.lx == d2.lx && d1.ly < d2.ly);

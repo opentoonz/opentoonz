@@ -9,7 +9,7 @@
 #undef max
 //===================================================================
 
-class SquareGradientFx : public TStandardZeraryFx {
+class SquareGradientFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(SquareGradientFx)
   TSpectrumParamP m_colors;
   TDoubleParamP m_size;

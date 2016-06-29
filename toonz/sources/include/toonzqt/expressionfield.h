@@ -36,7 +36,7 @@ namespace DVGui {
 
 */
 
-class DVAPI ExpressionField : public QTextEdit {
+class DVAPI ExpressionField final : public QTextEdit {
   Q_OBJECT
   bool m_editing;
   const TSyntax::Grammar *m_grammar;

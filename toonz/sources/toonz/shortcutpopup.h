@@ -21,7 +21,7 @@ class ShortcutItem;
 // Per cancellarlo bisogna chiamare removeShortcut()
 //-----------------------------------------------------------------------------
 
-class ShortcutViewer : public QWidget {
+class ShortcutViewer final : public QWidget {
   Q_OBJECT
   QAction *m_action;
 
@@ -51,7 +51,7 @@ signals:
 // Serve per selezionare la QAction corrente
 //-----------------------------------------------------------------------------
 
-class ShortcutTree : public QTreeWidget {
+class ShortcutTree final : public QTreeWidget {
   Q_OBJECT
   std::vector<ShortcutItem *> m_items;
 
@@ -80,7 +80,7 @@ signals:
 // Questo e' il popup che l'utente utilizza per modificare gli shortcut
 //-----------------------------------------------------------------------------
 
-class ShortcutPopup : public DVGui::Dialog {
+class ShortcutPopup final : public DVGui::Dialog {
   Q_OBJECT
   QPushButton *m_removeBtn;
   ShortcutViewer *m_sViewer;

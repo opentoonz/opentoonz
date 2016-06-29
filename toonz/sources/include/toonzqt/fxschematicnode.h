@@ -58,7 +58,7 @@ enum eFxType {
 //    FxColumnPainter
 //*****************************************************
 
-class FxColumnPainter : public QObject, public QGraphicsItem {
+class FxColumnPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 
@@ -91,7 +91,7 @@ protected:
 //    FxPalettePainter
 //*****************************************************
 
-class FxPalettePainter : public QGraphicsItem, public QObject {
+class FxPalettePainter final : public QGraphicsItem, public QObject {
   FxSchematicPaletteNode *m_parent;
   double m_width, m_height;
   QString m_name;
@@ -114,7 +114,7 @@ protected:
 //    FxPainter
 //*****************************************************
 
-class FxPainter : public QObject, public QGraphicsItem {
+class FxPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 
@@ -147,7 +147,7 @@ protected:
 //    FxXSheetPainter
 //*****************************************************
 
-class FxXSheetPainter : public QObject, public QGraphicsItem {
+class FxXSheetPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 
@@ -171,7 +171,7 @@ protected:
 //    FxOutputPainter
 //*****************************************************
 
-class FxOutputPainter : public QObject, public QGraphicsItem {
+class FxOutputPainter final : public QObject, public QGraphicsItem {
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 
@@ -195,7 +195,7 @@ protected:
 //    FxSchematicLink
 //*****************************************************
 
-class FxSchematicLink : public SchematicLink {
+class FxSchematicLink final : public SchematicLink {
   Q_OBJECT
 
 public:
@@ -210,7 +210,7 @@ protected:
 //    FxSchematicPort
 //*****************************************************
 
-class FxSchematicPort : public SchematicPort {
+class FxSchematicPort final : public SchematicPort {
   TFx *m_ownerFx;
   FxSchematicPort *m_currentTargetPort;
   QList<SchematicLink *> m_hiddenLinks;
@@ -256,7 +256,7 @@ private:
 //    FxSchematicDock
 //*****************************************************
 
-class FxSchematicDock : public QGraphicsItem, public QObject {
+class FxSchematicDock final : public QGraphicsItem, public QObject {
   QString m_name;
   double m_width;
   FxSchematicPort *m_port;
@@ -373,7 +373,7 @@ signals:
 //    FxSchematicOutputNode
 //*****************************************************
 
-class FxSchematicOutputNode : public FxSchematicNode {
+class FxSchematicOutputNode final : public FxSchematicNode {
   FxOutputPainter *m_outputPainter;
 
 public:
@@ -392,7 +392,7 @@ protected:
 //    FxSchematicXSheetNode
 //*****************************************************
 
-class FxSchematicXSheetNode : public FxSchematicNode {
+class FxSchematicXSheetNode final : public FxSchematicNode {
   FxXSheetPainter *m_xsheetPainter;
 
 public:
@@ -411,7 +411,7 @@ protected:
 //    FxSchematicNormalFxNode
 //*****************************************************
 
-class FxSchematicNormalFxNode : public FxSchematicNode {
+class FxSchematicNormalFxNode final : public FxSchematicNode {
   Q_OBJECT
 
   FxPainter *m_painter;
@@ -440,7 +440,7 @@ protected slots:
 //    FxSchematicZeraryNode
 //*****************************************************
 
-class FxSchematicZeraryNode : public FxSchematicNode {
+class FxSchematicZeraryNode final : public FxSchematicNode {
   Q_OBJECT
 
   FxPainter *m_painter;
@@ -473,7 +473,7 @@ protected slots:
 //    FxSchematicColumnNode
 //*****************************************************
 
-class FxSchematicColumnNode : public FxSchematicNode {
+class FxSchematicColumnNode final : public FxSchematicNode {
   Q_OBJECT
 
   SchematicThumbnailToggle *m_resizeItem;
@@ -515,7 +515,7 @@ protected slots:
 //    FxSchematicPaletteNode
 //*****************************************************
 
-class FxSchematicPaletteNode : public FxSchematicNode {
+class FxSchematicPaletteNode final : public FxSchematicNode {
   Q_OBJECT
 
   SchematicToggle *m_renderToggle;
@@ -551,7 +551,7 @@ private:
 //    FxGroupNode
 //*****************************************************
 
-class FxGroupNode : public FxSchematicNode {
+class FxGroupNode final : public FxSchematicNode {
   Q_OBJECT
 
   QList<TFxP> m_groupedFxs;

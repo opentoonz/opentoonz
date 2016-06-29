@@ -6,7 +6,7 @@
 #include "ino_common.h"
 #include "igs_gaussian_blur.h"
 //------------------------------------------------------------
-class ino_blur : public TStandardRasterFx {
+class ino_blur final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_blur)
   TRasterFxPort m_input;
   TRasterFxPort m_refer;

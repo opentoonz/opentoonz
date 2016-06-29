@@ -59,7 +59,7 @@ static TPointD workB(0, 0);
 
 //==============================================================================================
 
-class AreasAndPerimeterFormula : public TRegionFeatureFormula {
+class AreasAndPerimeterFormula final : public TRegionFeatureFormula {
   double m_signedArea, m_perimeter;
 
 public:
@@ -79,7 +79,7 @@ public:
 
 //---------------------------------------------------------------------------------------------
 
-class CentroidFormula : public TRegionFeatureFormula {
+class CentroidFormula final : public TRegionFeatureFormula {
   TPointD m_centroid;
   double m_signedArea;
 

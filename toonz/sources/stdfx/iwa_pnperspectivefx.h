@@ -46,7 +46,7 @@ struct PN_Params {
   float p_evolution;
 };
 
-class Iwa_PNPerspectiveFx : public TStandardZeraryFx {
+class Iwa_PNPerspectiveFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(Iwa_PNPerspectiveFx)
 
   TIntEnumParamP

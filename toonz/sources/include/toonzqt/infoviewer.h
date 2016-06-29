@@ -22,7 +22,7 @@ class TFilePath;
 class TPalette;
 class InfoViewerImp;
 
-class DVAPI InfoViewer : public DVGui::Dialog {
+class DVAPI InfoViewer final : public DVGui::Dialog {
   Q_OBJECT
   std::unique_ptr<InfoViewerImp> m_imp;
   QWidget *m_parent;

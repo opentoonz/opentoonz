@@ -14,7 +14,7 @@ class TImageReaderPli;
 
 //===========================================================================
 /*
-class TWriterInfoPli : public TWriterInfo {
+class TWriterInfoPli final : public TWriterInfo {
 
 public:
  ~TWriterInfoPli() {}
@@ -33,7 +33,7 @@ private:
 /*!
   TLevelWriterPli:
  */
-class TLevelWriterPli : public TLevelWriter {
+class TLevelWriterPli final : public TLevelWriter {
   //! object to manage a pli
   std::unique_ptr<ParsedPli> m_pli;
 
@@ -68,7 +68,7 @@ typedef std::pair<ImageTag *, bool> pliFrameInfo;
 /*!
   TLevelReaderPli:
  */
-class TLevelReaderPli : public TLevelReader {
+class TLevelReaderPli final : public TLevelReader {
 public:
   TLevelReaderPli(const TFilePath &path);
   ~TLevelReaderPli();
@@ -120,7 +120,7 @@ private:
 /*
 Classe locale per la lettura di un frame del livello.
 */
-class TImageReaderPli : public TImageReader {
+class TImageReaderPli final : public TImageReader {
 public:
   TFrameId m_frameId;  //<! Current frame id
 

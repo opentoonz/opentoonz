@@ -305,7 +305,7 @@ template class DVAPI TDerivedSmartPointerT<TRasterFx, TFx>;
 
 //-------------------------------------------------------------------
 
-class DVAPI TRasterFxP : public TDerivedSmartPointerT<TRasterFx, TFx> {
+class DVAPI TRasterFxP final : public TDerivedSmartPointerT<TRasterFx, TFx> {
 public:
   TRasterFxP() {}
   TRasterFxP(TRasterFx *fx) : DerivedSmartPointer(fx) {}
@@ -358,7 +358,8 @@ template class DVAPI TDerivedSmartPointerT<TGeometryFx, TFx>;
 
 //-------------------------------------------------------------------
 
-class DVAPI TGeometryFxP : public TDerivedSmartPointerT<TGeometryFx, TFx> {
+class DVAPI TGeometryFxP final
+    : public TDerivedSmartPointerT<TGeometryFx, TFx> {
 public:
   TGeometryFxP() {}
   TGeometryFxP(TGeometryFx *fx) : DerivedSmartPointer(fx) {}
@@ -376,7 +377,7 @@ public:
 template class DVAPI TFxPortT<TGeometryFx>;
 #endif
 
-class DVAPI TGeometryPort : public TFxPortT<TGeometryFx> {
+class DVAPI TGeometryPort final : public TFxPortT<TGeometryFx> {
 public:
   TGeometryPort() : TFxPortT<TGeometryFx>(true) {}
   TAffine getPlacement(double frame) { return m_fx->getPlacement(frame); }
@@ -386,7 +387,7 @@ public:
 //    NaAffineFx  declaration
 //******************************************************************************
 
-class DVAPI NaAffineFx : public TGeometryFx {
+class DVAPI NaAffineFx final : public TGeometryFx {
   FX_DECLARATION(NaAffineFx)
 public:
   ~NaAffineFx() {}

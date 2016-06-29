@@ -152,7 +152,7 @@ protected slots:
 
 //! The GenericLoadFilePopup is a simple, standard Toonz popup that
 //! asks the user for \a single file to be loaded from disk.
-class GenericLoadFilePopup : public FileBrowserPopup {
+class GenericLoadFilePopup final : public FileBrowserPopup {
 public:
   GenericLoadFilePopup(const QString &title);
 
@@ -171,7 +171,7 @@ protected:
 
 //! The GenericSaveFilePopup is a simple, standard Toonz popup that
 //! asks the user for a \a single file path to save something to.
-class GenericSaveFilePopup : public FileBrowserPopup {
+class GenericSaveFilePopup final : public FileBrowserPopup {
 public:
   GenericSaveFilePopup(const QString &title);
 
@@ -191,7 +191,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class LoadScenePopup : public FileBrowserPopup {
+class LoadScenePopup final : public FileBrowserPopup {
   Q_OBJECT
 
 public:
@@ -209,7 +209,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class LoadSubScenePopup : public FileBrowserPopup {
+class LoadSubScenePopup final : public FileBrowserPopup {
   Q_OBJECT
 
 public:
@@ -224,7 +224,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class SaveSceneAsPopup : public FileBrowserPopup {
+class SaveSceneAsPopup final : public FileBrowserPopup {
   Q_OBJECT
 
 public:
@@ -236,7 +236,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SaveSubSceneAsPopup : public FileBrowserPopup {
+class SaveSubSceneAsPopup final : public FileBrowserPopup {
   Q_OBJECT
 
 public:
@@ -248,7 +248,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class LoadLevelPopup : public FileBrowserPopup {
+class LoadLevelPopup final : public FileBrowserPopup {
   Q_OBJECT
 
   QFrame *m_subsequenceFrame;
@@ -305,7 +305,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-class SaveLevelAsPopup : public FileBrowserPopup {
+class SaveLevelAsPopup final : public FileBrowserPopup {
   Q_OBJECT
 
 public:
@@ -317,7 +317,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class ReplaceLevelPopup : public FileBrowserPopup {
+class ReplaceLevelPopup final : public FileBrowserPopup {
   Q_OBJECT
 
   TCellSelection::Range m_range;
@@ -338,7 +338,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class SavePaletteAsPopup : public FileBrowserPopup {
+class SavePaletteAsPopup final : public FileBrowserPopup {
   Q_OBJECT
 
 public:
@@ -350,7 +350,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class LoadColorModelPopup : public FileBrowserPopup {
+class LoadColorModelPopup final : public FileBrowserPopup {
   Q_OBJECT
 
   DVGui::LineEdit *m_paletteFrame;
@@ -370,7 +370,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ImportMagpieFilePopup : public FileBrowserPopup {
+class ImportMagpieFilePopup final : public FileBrowserPopup {
   Q_OBJECT
 
 public:
@@ -387,7 +387,7 @@ protected:
 /*! replace the parent folder path of the levels in the selected cells
 */
 
-class ReplaceParentDirectoryPopup : public FileBrowserPopup {
+class ReplaceParentDirectoryPopup final : public FileBrowserPopup {
   TCellSelection::Range m_range;
   bool m_replaceCells;  // true : cell selection, false : column selection
   std::set<int> m_columnRange;
@@ -401,7 +401,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class BrowserPopup : public FileBrowserPopup {
+class BrowserPopup final : public FileBrowserPopup {
   Q_OBJECT
 
   TFilePath m_path;
@@ -417,8 +417,9 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class BrowserPopupController : public QObject,
-                               public DVGui::FileField::BrowserPopupController {
+class BrowserPopupController final
+    : public QObject,
+      public DVGui::FileField::BrowserPopupController {
   Q_OBJECT
 
   BrowserPopup *m_browserPopup;

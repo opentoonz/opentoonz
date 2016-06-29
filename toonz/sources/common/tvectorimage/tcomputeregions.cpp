@@ -108,7 +108,7 @@ public:
   inline bool empty() { return size() == 0; }
 };
 
-class Intersection : public VIListElem {
+class Intersection final : public VIListElem {
 public:
   // Intersection* m_prev, *m_next;
   TPointD m_intersection;
@@ -149,7 +149,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class IntersectedStroke : public VIListElem {
+class IntersectedStroke final : public VIListElem {
   /*double m_w;
 TStroke *m_s;
 UINT m_index;*/
@@ -2563,7 +2563,7 @@ return false;
 //-----------------------------------------------------------------------------
 */
 
-class TRegionClockWiseFormula : public TRegionFeatureFormula {
+class TRegionClockWiseFormula final : public TRegionFeatureFormula {
 private:
   double m_quasiArea;
 

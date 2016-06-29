@@ -58,7 +58,7 @@ is developed from
   is fixed, a sub-xsheet can be seen as a <I> frame setter <\I> fx.
 */
 
-class TimeShuffleFx : public TRasterFx {
+class TimeShuffleFx final : public TRasterFx {
   FX_DECLARATION(TimeShuffleFx)
 
 private:
@@ -151,7 +151,7 @@ FX_IDENTIFIER_IS_HIDDEN(TimeShuffleFx, "timeShuffleFx")
   \b not resolved during the rendering-tree expansion procedure.
 */
 
-class AffineFx : public TGeometryFx {
+class AffineFx final : public TGeometryFx {
   FX_DECLARATION(AffineFx)
 
 private:

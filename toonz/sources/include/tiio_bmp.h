@@ -20,7 +20,7 @@ DVAPI Tiio::WriterMaker makeBmpWriter;
 
 // DVAPI TPropertyGroup *makeBmpWriterProperties();
 
-class BmpWriterProperties : public TPropertyGroup {
+class BmpWriterProperties final : public TPropertyGroup {
 public:
   TEnumProperty m_pixelSize;
   // TBoolProperty m_compressed;

@@ -32,7 +32,7 @@
 
 namespace {
 
-struct PlaneViewerZoomer : public ImageUtils::ShortcutZoomer {
+struct PlaneViewerZoomer final : public ImageUtils::ShortcutZoomer {
   PlaneViewerZoomer(PlaneViewer *planeViewer) : ShortcutZoomer(planeViewer) {}
 
 private:

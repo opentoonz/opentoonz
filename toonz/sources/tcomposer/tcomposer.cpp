@@ -227,7 +227,7 @@ void tcomposerRunOutOfContMemHandler(unsigned long size) {
 
 //==============================================================================================
 
-class MyMovieRenderListener : public MovieRenderer::Listener {
+class MyMovieRenderListener final : public MovieRenderer::Listener {
 public:
   MyMovieRenderListener(const TFilePath &fp, int frameCount,
                         QWaitCondition &renderCompleted, bool stereo)
@@ -319,7 +319,7 @@ void MyMovieRenderListener::onSequenceCompleted(const TFilePath &fp) {
 
 //==============================================================================================
 
-class MyMultimediaRenderListener : public MultimediaRenderer::Listener {
+class MyMultimediaRenderListener final : public MultimediaRenderer::Listener {
 public:
   TFilePath m_fp;
   int m_frameCount;

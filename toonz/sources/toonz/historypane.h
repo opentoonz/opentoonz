@@ -5,7 +5,7 @@
 
 #include <QScrollArea>
 
-class HistoryField : public QFrame {
+class HistoryField final : public QFrame {
   Q_OBJECT
 
   QScrollArea *m_scrollArea;
@@ -29,7 +29,7 @@ protected:
   void mousePressEvent(QMouseEvent *event) override;
 };
 
-class HistoryPane : public QWidget {
+class HistoryPane final : public QWidget {
   Q_OBJECT
 
   HistoryField *m_field;

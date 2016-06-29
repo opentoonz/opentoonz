@@ -68,7 +68,7 @@ void getStyleIds(std::vector<int> &styleIds, const TStyleSelection &selection) {
 // GizmoUndo
 //-----------------------------------------------------------------------------
 
-class GizmoUndo : public TUndo {
+class GizmoUndo final : public TUndo {
   TStyleSelection m_selection;
   std::vector<TPixel32> m_oldColors, m_newColors;
 

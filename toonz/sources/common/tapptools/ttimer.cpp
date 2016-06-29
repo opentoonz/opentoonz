@@ -166,7 +166,7 @@ public:
   TGenericTimerAction *m_action;
 };
 
-class SendCommandMSG : public TThread::Message {
+class SendCommandMSG final : public TThread::Message {
   TTimer::Imp *m_ztimp;
 
 public:

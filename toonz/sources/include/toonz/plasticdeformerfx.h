@@ -25,7 +25,7 @@ class TXsheet;
 //! PlasticDeformerFx is a hidden fx used to inject data about a plastic
 //! deformation just above a
 //! TLevelColumnFx instance.
-class PlasticDeformerFx : public TRasterFx {
+class PlasticDeformerFx final : public TRasterFx {
   FX_DECLARATION(PlasticDeformerFx)
 
 public:

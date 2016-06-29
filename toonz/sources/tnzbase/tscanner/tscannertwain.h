@@ -5,7 +5,7 @@
 
 #include "tscanner.h"
 
-class TScannerTwain : public TScanner {
+class TScannerTwain final : public TScanner {
 public:
   TScannerTwain();
   ~TScannerTwain();

@@ -363,7 +363,7 @@ inline T3DPointT<T> cross(const T3DPointT<T> &a, const T3DPointT<T> &b) {
 TThickPoint describe a thick point.
 \relates TThickQuadratic, TThickCubic
 */
-class DVAPI TThickPoint : public TPointD {
+class DVAPI TThickPoint final : public TPointD {
 public:
   double thick;
 
@@ -1071,7 +1071,7 @@ const TAffine AffI = TAffine();
 
 //-----------------------------------------------------------------------------
 
-class DVAPI TTranslation : public TAffine {
+class DVAPI TTranslation final : public TAffine {
 public:
   TTranslation(){};
   TTranslation(double x, double y) : TAffine(1, 0, x, 0, 1, y){};
@@ -1080,7 +1080,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI TRotation : public TAffine {
+class DVAPI TRotation final : public TAffine {
 public:
   TRotation(){};
 
@@ -1130,7 +1130,7 @@ a21 = a.a21; a22 = a.a22; a23 = a.a23;
 
 //-----------------------------------------------------------------------------
 
-class DVAPI TScale : public TAffine {
+class DVAPI TScale final : public TAffine {
 public:
   TScale(){};
   TScale(double sx, double sy) : TAffine(sx, 0, 0, 0, sy, 0){};
@@ -1157,7 +1157,7 @@ a21 = a.a21; a22 = a.a22; a23 = a.a23;
 
 //-----------------------------------------------------------------------------
 
-class DVAPI TShear : public TAffine {
+class DVAPI TShear final : public TAffine {
 public:
   TShear(){};
   TShear(double sx, double sy) : TAffine(1, sx, 0, sy, 1, 0){};

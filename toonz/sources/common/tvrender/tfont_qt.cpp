@@ -85,7 +85,8 @@ TPoint TFont::drawChar(TVectorImageP &image, wchar_t charcode,
   if (path.elementCount() < 1) return getDistance(charcode, nextCharCode);
 
   // force closing the last path
-  if (path.elementAt(path.elementCount() - 1).type != QPainterPath::MoveToElement) {
+  if (path.elementAt(path.elementCount() - 1).type !=
+      QPainterPath::MoveToElement) {
     path.moveTo(0.0, 0.0);
   }
 
@@ -237,7 +238,8 @@ TPoint TFont::getDistance(wchar_t firstChar, wchar_t secondChar) const {
     return TPoint(0, 0);
   }
 
-  if (!raw.advancesForGlyphIndexes(indices, advances, 2, QRawFont::KernedAdvances)) {
+  if (!raw.advancesForGlyphIndexes(indices, advances, 2,
+                                   QRawFont::KernedAdvances)) {
     return TPoint(0, 0);
   }
 
@@ -353,8 +355,8 @@ void TFontManager::setFamily(const wstring family) {
 
   m_pimpl->m_currentFamily = family;
 
-  // XXX: if current style is not valid for family, reset it?
-  // doing so asserts when chosing a font in the GUI
+// XXX: if current style is not valid for family, reset it?
+// doing so asserts when chosing a font in the GUI
 #if 0
   QStringList styles = m_pimpl->m_qfontdb->styles(qFamily);
   if (styles.contains(QString::fromStdWString(m_pimpl->m_currentTypeface))) {

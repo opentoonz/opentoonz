@@ -31,7 +31,7 @@ namespace {
 // UndoCutter
 //-----------------------------------------------------------------------------
 
-class UndoCutter : public ToolUtils::TToolUndo {
+class UndoCutter final : public ToolUtils::TToolUndo {
   int m_newStrokeId1;
   int m_newStrokeId2;
   int m_pos;
@@ -151,7 +151,7 @@ public:
 // CutterTool
 //-----------------------------------------------------------------------------
 
-class CutterTool : public TTool {
+class CutterTool final : public TTool {
 public:
   bool m_mouseDown;
 

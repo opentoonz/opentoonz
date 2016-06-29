@@ -8,7 +8,7 @@
 
 //===================================================================
 
-class DissolveFx : public TStandardRasterFx {
+class DissolveFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(DissolveFx)
 
   TRasterFxPort m_input;

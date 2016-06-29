@@ -10,7 +10,7 @@ class TXshSimpleLevel;
 
 namespace TScriptBinding {
 
-class DVAPI Rasterizer : public Wrapper {
+class DVAPI Rasterizer final : public Wrapper {
   Q_OBJECT
   bool m_colorMapped;
   int m_xres, m_yres;

@@ -30,7 +30,7 @@ private:
 typedef std::map<TFrameId, TzlChunk> TzlOffsetMap;
 class TRasterCodecLZO;
 
-class TLevelWriterTzl : public TLevelWriter {
+class TLevelWriterTzl final : public TLevelWriter {
   // bool m_paletteWritten;
   bool m_headerWritten;
   bool m_creatorWritten;
@@ -134,7 +134,7 @@ private:
 /*!
   TLevelReaderTzl:
  */
-class TLevelReaderTzl : public TLevelReader {
+class TLevelReaderTzl final : public TLevelReader {
 public:
   TLevelReaderTzl(const TFilePath &path);
   ~TLevelReaderTzl();

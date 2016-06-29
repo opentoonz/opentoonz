@@ -70,7 +70,7 @@ class FunctionViewer;
   TnzExt library).
 */
 
-class FunctionTreeModel : public TreeModel, public TParamObserver {
+class FunctionTreeModel final : public TreeModel, public TParamObserver {
   Q_OBJECT
 
 public:
@@ -153,7 +153,9 @@ color, which
   //----------------------------------------------------------------------------------
 
   //! The model item representing a channel (i.e. a real-valued function).
-  class Channel : public ParamWrapper, public Item, public TParamObserver {
+  class Channel final : public ParamWrapper,
+                        public Item,
+                        public TParamObserver {
     FunctionTreeModel *m_model;  //!< (\p not \p owned) Reference to the model
     ChannelGroup
         *m_group;  //!< (\p not \p owned) Reference to the enclosing group
@@ -312,7 +314,7 @@ public:
 
 //=============================================================================
 
-class FxChannelGroup : public FunctionTreeModel::ChannelGroup {
+class FxChannelGroup final : public FunctionTreeModel::ChannelGroup {
 public:
   TFx *m_fx;
 
@@ -340,7 +342,7 @@ public:
 
 //! TreeView with stage object and fx channels. controls channel visibility and
 //! current channel
-class FunctionTreeView : public TreeView {
+class FunctionTreeView final : public TreeView {
   Q_OBJECT
 
   TFilePath m_scenePath;

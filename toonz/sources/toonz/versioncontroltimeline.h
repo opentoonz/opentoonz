@@ -17,7 +17,7 @@ class QTimer;
 
 //-----------------------------------------------------------------------------
 
-class TimelineWidget : public QWidget {
+class TimelineWidget final : public QWidget {
   Q_OBJECT
   QListWidget *m_listWidget;
 
@@ -31,7 +31,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SVNTimeline : public DVGui::Dialog {
+class SVNTimeline final : public DVGui::Dialog {
   Q_OBJECT
 
   TimelineWidget *m_timelineWidget;

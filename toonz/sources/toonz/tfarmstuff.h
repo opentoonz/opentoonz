@@ -33,7 +33,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-class TaskInfoPage : public TFarmPage {
+class TaskInfoPage final : public TFarmPage {
 public:
   TaskInfoPage(TWidget *parent);
   ~TaskInfoPage();
@@ -90,7 +90,7 @@ protected:
 
 //------------------------------------------------------------------------------
 
-class SubmitPage : public TFarmPage {
+class SubmitPage final : public TFarmPage {
 public:
   SubmitPage(TWidget *parent);
   ~SubmitPage();
@@ -110,7 +110,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-class TaskConfigPanel : public TWidget {
+class TaskConfigPanel final : public TWidget {
 public:
   TaskConfigPanel(TWidget *parent) : TWidget(parent) {}
 
@@ -120,7 +120,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-class SubmitRenderPopup : public TModalPopup {
+class SubmitRenderPopup final : public TModalPopup {
 public:
   SubmitRenderPopup(TWidget *parent, std::string name);
   ~SubmitRenderPopup();
@@ -144,7 +144,7 @@ private:
 
 //------------------------------------------------------------------------------
 
-class SubmitCleanupPopup : public TModalPopup {
+class SubmitCleanupPopup final : public TModalPopup {
 public:
   SubmitCleanupPopup(TWidget *parent, std::string name);
   ~SubmitCleanupPopup();
@@ -168,7 +168,7 @@ private:
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-class GRootEnvVarPopup : public TModalPopup {
+class GRootEnvVarPopup final : public TModalPopup {
 public:
   GRootEnvVarPopup(TWidget *parent, std::string name);
   ~GRootEnvVarPopup();
@@ -210,14 +210,14 @@ void getControllerData(QString &hostName, QString &ipAddr, int &port);
 
 //------------------------------------------------------------------------------
 
-class TMissingGRootFolder : public TException {
+class TMissingGRootFolder final : public TException {
 public:
   TMissingGRootFolder() : TException() {}
 };
 
 //------------------------------------------------------------------------------
 
-class TMissingGRootEnvironmentVariable : public TException {
+class TMissingGRootEnvironmentVariable final : public TException {
 public:
   TMissingGRootEnvironmentVariable() : TException() {}
 };

@@ -15,7 +15,7 @@ TPixel32 unmultiply(const TPixel32 &pix) {
 
 //===================================================================
 
-class UnmultiplyFx : public TStandardRasterFx {
+class UnmultiplyFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(UnmultiplyFx)
   TRasterFxPort m_input;
 

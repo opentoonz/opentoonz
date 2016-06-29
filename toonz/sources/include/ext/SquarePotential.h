@@ -23,7 +23,7 @@
 #endif
 
 namespace ToonzExt {
-class DVAPI SquarePotential : public Potential {
+class DVAPI SquarePotential final : public Potential {
 public:
   virtual ~SquarePotential();
 

@@ -32,7 +32,7 @@ intermediate
 render results due to predictive analysis of the scene schematic.
 */
 
-class DVAPI TPredictiveCacheManager : public TFxCacheManagerDelegate {
+class DVAPI TPredictiveCacheManager final : public TFxCacheManagerDelegate {
   T_RENDER_RESOURCE_MANAGER
 
   class Imp;

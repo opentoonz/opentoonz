@@ -11,7 +11,7 @@
 
 //--------------------------------------------------------------------------
 
-class DespeckleFx : public TStandardRasterFx {
+class DespeckleFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(DespeckleFx)
 
   TRasterFxPort m_input;

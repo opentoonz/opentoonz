@@ -408,7 +408,7 @@ void TSystem::hideFile(const TFilePath &fp) {
 
 //------------------------------------------------------------
 
-class CaselessFilepathLess
+class CaselessFilepathLess final
     : public std::binary_function<TFilePath, TFilePath, bool> {
 public:
   bool operator()(const TFilePath &a, const TFilePath &b) const {
@@ -632,7 +632,7 @@ TFilePathSet TSystem::getDisks() {
 
 //------------------------------------------------------------
 
-class LocalThread : public QThread {
+class LocalThread final : public QThread {
 public:
   static LocalThread *currentThread() {
     return (LocalThread *)QThread::currentThread();

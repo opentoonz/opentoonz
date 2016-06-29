@@ -57,7 +57,7 @@ public:
 //**************************************************************************************************
 
 template <typename Context>
-class TGLDisplayListsProxyT : public TGLDisplayListsProxy {
+class TGLDisplayListsProxyT final : public TGLDisplayListsProxy {
   Context *m_proxy;
 
 public:
@@ -113,7 +113,7 @@ handled by
            display lists id.
 */
 
-class DVAPI TGLDisplayListsManager : public tcg::notifier<> {
+class DVAPI TGLDisplayListsManager final : public tcg::notifier<> {
 public:
   struct Observer : public tcg::observer<TGLDisplayListsManager> {
     virtual void onDisplayListDestroyed(int dlSpaceId) = 0;

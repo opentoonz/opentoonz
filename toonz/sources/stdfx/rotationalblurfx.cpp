@@ -6,7 +6,7 @@
 #include "tparamset.h"
 #include "tparamuiconcept.h"
 
-class SpinBlurFx : public TStandardRasterFx {
+class SpinBlurFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(SpinBlurFx)
 
   TRasterFxPort m_input;

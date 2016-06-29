@@ -23,7 +23,7 @@ class DvDirTreeView;
   \brief    Popup widget used to invoke the <I>Load Folder</I> command.
 */
 
-class LoadFolderPopup : public DVGui::Dialog {
+class LoadFolderPopup final : public DVGui::Dialog {
   Q_OBJECT
 
 public:

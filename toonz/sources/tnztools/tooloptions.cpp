@@ -580,9 +580,9 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   if (splined != m_splined) m_splined = splined;
   setSplined(m_splined);
 
-  const int ITEM_SPACING = 10;
+  const int ITEM_SPACING  = 10;
   const int LABEL_SPACING = 3;
-
+  /* --- Layout --- */
   /* --- Layout --- */
   QHBoxLayout *mainLay = m_layout;
   {
@@ -593,8 +593,8 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
 
     mainLay->addWidget(m_mainStackedWidget, 1);
     {
-      //Position
-      QFrame *posFrame = new QFrame(this);
+      // Position
+      QFrame *posFrame    = new QFrame(this);
       QHBoxLayout *posLay = new QHBoxLayout();
       posLay->setMargin(0);
       posLay->setSpacing(0);
@@ -636,8 +636,8 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         posLay->addStretch(1);
       }
 
-      //Rotation
-      QFrame *rotFrame = new QFrame(this);
+      // Rotation
+      QFrame *rotFrame    = new QFrame(this);
       QHBoxLayout *rotLay = new QHBoxLayout();
       rotLay->setMargin(0);
       rotLay->setSpacing(0);
@@ -652,8 +652,8 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         rotLay->addStretch(1);
       }
 
-      //Scale
-      QFrame *scaleFrame = new QFrame(this);
+      // Scale
+      QFrame *scaleFrame    = new QFrame(this);
       QHBoxLayout *scaleLay = new QHBoxLayout();
       scaleLay->setMargin(0);
       scaleLay->setSpacing(0);
@@ -690,8 +690,8 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         scaleLay->addStretch(1);
       }
 
-      //Shear
-      QFrame *shearFrame = new QFrame(this);
+      // Shear
+      QFrame *shearFrame    = new QFrame(this);
       QHBoxLayout *shearLay = new QHBoxLayout();
       shearLay->setMargin(0);
       shearLay->setSpacing(0);
@@ -718,8 +718,8 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
         shearLay->addStretch(1);
       }
 
-      //Center Position
-      QFrame *centerPosFrame = new QFrame(this);
+      // Center Position
+      QFrame *centerPosFrame    = new QFrame(this);
       QHBoxLayout *centerPosLay = new QHBoxLayout();
       centerPosLay->setMargin(0);
       centerPosLay->setSpacing(0);
@@ -981,12 +981,11 @@ void ArrowToolOptionsBox::onCurrentStageObjectComboActivated(int index) {
 //=============================================================================
 
 IconViewField::IconViewField(QWidget *parent, IconType iconType)
-    : QWidget(parent)
-    , m_iconType(iconType){
+    : QWidget(parent), m_iconType(iconType) {
   setMinimumSize(21, 25);
 }
 
-void IconViewField::paintEvent(QPaintEvent *e){
+void IconViewField::paintEvent(QPaintEvent *e) {
   QPainter p(this);
   // La pixmap e' alta 17 px, il widget 23. Per centrarla faccio il draw a 3 px.
   p.drawPixmap(QRect(0, 3, 21, 17), m_pm[m_iconType]);
@@ -1004,46 +1003,47 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   TPropertyGroup *props = tool->getProperties(0);
   assert(props->getPropertyCount() > 0);
 
-  RasterSelectionTool *rasterSelectionTool = dynamic_cast<RasterSelectionTool *>(tool);
+  RasterSelectionTool *rasterSelectionTool =
+      dynamic_cast<RasterSelectionTool *>(tool);
 
   SelectionTool *selectionTool = dynamic_cast<SelectionTool *>(tool);
 
   ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
-  if (tool && tool->getProperties(0))
-    tool->getProperties(0)->accept(builder);
+  if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
 
-  //Scale
-  IconViewField *iconView = new IconViewField(this, IconViewField::Icon_ScalePeg);
+  IconViewField *iconView =
+      new IconViewField(this, IconViewField::Icon_ScalePeg);
   m_scaleXLabel = new QLabel(tr("H:"), this);
   m_scaleXField = new SelectionScaleField(selectionTool, 0, "Scale X");
   m_scaleYLabel = new QLabel(tr("V:"), this);
   m_scaleYField = new SelectionScaleField(selectionTool, 1, "Scale Y");
-  m_scaleLink = new DVGui::CheckBox(tr("Link"), this);
+  m_scaleLink   = new DVGui::CheckBox(tr("Link"), this);
 
-  //Rotation
-  IconViewField *rotIconView = new IconViewField(this, IconViewField::Icon_Rotation);
+  IconViewField *rotIconView =
+      new IconViewField(this, IconViewField::Icon_Rotation);
   m_rotationField = new SelectionRotationField(selectionTool, tr("Rotation"));
 
-  //Move
-  IconViewField *moveIconView = new IconViewField(this, IconViewField::Icon_Position);
+  IconViewField *moveIconView =
+      new IconViewField(this, IconViewField::Icon_Position);
   m_moveXLabel = new QLabel(tr("E/W:"), this);
   m_moveXField = new SelectionMoveField(selectionTool, 0, "Move X");
   m_moveYLabel = addLabel(tr("N/S:"));
   m_moveYField = new SelectionMoveField(selectionTool, 1, "Move Y");
 
   if (rasterSelectionTool) {
-    TBoolProperty *modifySetSaveboxProp = rasterSelectionTool->getModifySaveboxProperty();
+    TBoolProperty *modifySetSaveboxProp =
+        rasterSelectionTool->getModifySaveboxProperty();
     if (modifySetSaveboxProp)
-      m_setSaveboxCheckbox = new ToolOptionCheckbox(rasterSelectionTool, modifySetSaveboxProp);
+      m_setSaveboxCheckbox =
+          new ToolOptionCheckbox(rasterSelectionTool, modifySetSaveboxProp);
   }
-
 
   m_scaleXLabel->setEnabled(false);
   m_scaleYLabel->setEnabled(false);
   m_moveXLabel->setEnabled(false);
   m_moveYLabel->setEnabled(false);
 
-  //--- layout ---- 
+  //--- layout ----
 
   addSeparator();
 
@@ -1067,24 +1067,25 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
   hLayout()->addWidget(m_moveXField, 10);
   hLayout()->addWidget(m_moveYLabel, 0);
   hLayout()->addWidget(m_moveYField, 10);
-  if (m_setSaveboxCheckbox)
-  {
+  if (m_setSaveboxCheckbox) {
     addSeparator();
     hLayout()->addWidget(m_setSaveboxCheckbox, 0);
   }
 
-  VectorSelectionTool *vectorSelectionTool = dynamic_cast<VectorSelectionTool *>(tool);
+  VectorSelectionTool *vectorSelectionTool =
+      dynamic_cast<VectorSelectionTool *>(tool);
   if (vectorSelectionTool) {
     m_isVectorSelction = true;
 
-    //change Thick
-    IconViewField *thicknessIconView = new IconViewField(this, IconViewField::Icon_Thickness);
+    // change Thick
+    IconViewField *thicknessIconView =
+        new IconViewField(this, IconViewField::Icon_Thickness);
     m_thickChangeField = new ThickChangeField(selectionTool, tr("Thickness"));
 
     addSeparator();
     hLayout()->addWidget(thicknessIconView, 0);
     hLayout()->addWidget(m_thickChangeField, 10);
-    
+    // Outline options
     // Outline options
     ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
     builder.setEnumWidgetType(ToolOptionControlBuilder::POPUPBUTTON);
@@ -1105,16 +1106,19 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
     onPropertyChanged();
   }
 
-	hLayout()->addStretch(1);
+  hLayout()->addStretch(1);
+  // assert(ret);
+  bool ret = connect(m_scaleXField, SIGNAL(valueChange()),
+                     SLOT(onScaleXValueChanged()));
+  ret = ret && connect(m_scaleYField, SIGNAL(valueChange()),
+                       SLOT(onScaleYValueChanged()));
+  if (m_setSaveboxCheckbox)
+    ret = ret && connect(m_setSaveboxCheckbox, SIGNAL(toggled(bool)),
+                         SLOT(onSetSaveboxCheckboxChanged(bool)));
 
-	bool ret = connect(m_scaleXField, SIGNAL(valueChange()), SLOT(onScaleXValueChanged()));
-	ret = ret && connect(m_scaleYField, SIGNAL(valueChange()), SLOT(onScaleYValueChanged()));
-	if (m_setSaveboxCheckbox)
-		ret = ret && connect(m_setSaveboxCheckbox, SIGNAL(toggled(bool)), SLOT(onSetSaveboxCheckboxChanged(bool)));
+  // assert(ret);
 
-	//assert(ret);
-
-	updateStatus();
+  updateStatus();
 }
 
 //-----------------------------------------------------------------------------
@@ -1528,7 +1532,7 @@ void FillToolOptionsBox::onMultiFrameModeToggled(bool value) {
 //
 //=============================================================================
 
-class BrushToolOptionsBox::PresetNamePopup : public DVGui::Dialog {
+class BrushToolOptionsBox::PresetNamePopup final : public DVGui::Dialog {
   DVGui::LineEdit *m_nameFld;
 
 public:
@@ -1791,7 +1795,7 @@ void EraserToolOptionsBox::onColorModeChanged() {
 // RulerToolOptionsBox
 //
 //=============================================================================
-class ToolOptionsBarSeparator : public QWidget {
+class ToolOptionsBarSeparator final : public QWidget {
 public:
   ToolOptionsBarSeparator(QWidget *parent) : QWidget(parent) {
     setFixedSize(2, 26);
@@ -1954,7 +1958,7 @@ TapeToolOptionsBox::TapeToolOptionsBox(QWidget *parent, TTool *tool,
 
   ToolOptionControlBuilder builder(this, tool, pltHandle, toolHandle);
   if (tool && tool->getProperties(0)) tool->getProperties(0)->accept(builder);
-  
+
   hLayout()->addStretch(1);
   if (!(tool->getTargetType() & TTool::Vectors)) return;
 
@@ -2029,7 +2033,7 @@ void TapeToolOptionsBox::onJoinStrokesModeChanged() {
 //-----------------------------------------------------------------------------
 /*! Label with background color
 */
-class RGBLabel : public QWidget {
+class RGBLabel final : public QWidget {
   QColor m_color;
 
 public:

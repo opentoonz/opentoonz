@@ -128,7 +128,7 @@ public:
 
 //---------------------------------------------------------
 
-class DVAPI Switcher : public SimpleQualifier {
+class DVAPI Switcher final : public SimpleQualifier {
 public:
   Switcher(std::string name, std::string help) : SimpleQualifier(name, help) {
     m_switcher = true;
@@ -139,7 +139,7 @@ public:
 //---------------------------------------------------------
 
 template <class T>
-class QualifierT : public Qualifier {
+class QualifierT final : public Qualifier {
   T m_value;
 
 public:
@@ -183,7 +183,7 @@ public:
 //---------------------------------------------------------
 
 template <class T>
-class ArgumentT : public Argument {
+class ArgumentT final : public Argument {
   T m_value;
 
 public:
@@ -222,7 +222,7 @@ public:
 //---------------------------------------------------------
 
 template <class T>
-class MultiArgumentT : public MultiArgument {
+class MultiArgumentT final : public MultiArgument {
   std::unique_ptr<T[]> m_values;
 
 public:
@@ -293,7 +293,7 @@ DVAPI UsageLine operator+(UsageElement &a, UsageElement &b);
 
 //---------------------------------------------------------
 
-class DVAPI Optional : public UsageLine {
+class DVAPI Optional final : public UsageLine {
 public:
   Optional(const UsageLine &ul);
   ~Optional(){};
@@ -346,7 +346,7 @@ typedef MultiArgumentT<TFilePath> FilePathMultiArgument;
 
 //=========================================================
 
-class DVAPI RangeQualifier : public Qualifier {
+class DVAPI RangeQualifier final : public Qualifier {
   int m_from, m_to;
 
 public:

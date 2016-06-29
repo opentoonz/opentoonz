@@ -15,7 +15,7 @@ container
 structure of the active renderIds against resource managers.
 */
 
-class RenderInstanceManagersBuilder : public TRenderResourceManager {
+class RenderInstanceManagersBuilder final : public TRenderResourceManager {
   T_RENDER_RESOURCE_MANAGER
 
   typedef std::vector<TRenderResourceManager *> ManagersVector;
@@ -38,7 +38,7 @@ public:
 
 //===============================================================================================
 
-class RenderInstanceManagersBuilderGenerator
+class RenderInstanceManagersBuilderGenerator final
     : public TRenderResourceManagerGenerator {
 public:
   TRenderResourceManager *operator()(void) override {
@@ -61,7 +61,7 @@ passed to the
 dedicated instanceScope handler.
 */
 
-class InstanceResourceManagerStub : public TRenderResourceManager {
+class InstanceResourceManagerStub final : public TRenderResourceManager {
   TRenderResourceManagerGenerator *m_generator;
 
 public:
@@ -80,7 +80,7 @@ public:
 
 //===============================================================================================
 
-class StubGenerator : public TRenderResourceManagerGenerator {
+class StubGenerator final : public TRenderResourceManagerGenerator {
   TRenderResourceManagerGenerator *m_generator;
 
 public:

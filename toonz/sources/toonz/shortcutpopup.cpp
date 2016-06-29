@@ -33,7 +33,7 @@
 // ogni ShortcutItem rappresenta una QAction (e relativo Shortcut)
 //-----------------------------------------------------------------------------
 
-class ShortcutItem : public QTreeWidgetItem {
+class ShortcutItem final : public QTreeWidgetItem {
   QAction *m_action;
 
 public:

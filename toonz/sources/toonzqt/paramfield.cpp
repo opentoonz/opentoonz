@@ -61,7 +61,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! MeasuredDoubleParamField Undo
 */
-class MeasuredDoubleParamFieldUndo : public AnimatableFxSettingsUndo {
+class MeasuredDoubleParamFieldUndo final : public AnimatableFxSettingsUndo {
   TDoubleParamP m_param;
   double m_oldValue, m_newValue;
 
@@ -99,7 +99,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! RangeParamField Undo
 */
-class RangeParamFieldUndo : public AnimatableFxSettingsUndo {
+class RangeParamFieldUndo final : public AnimatableFxSettingsUndo {
   TRangeParamP m_param;
   DoublePair m_oldValue, m_newValue;
 
@@ -137,7 +137,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! PixelParamField Undo
 */
-class PixelParamFieldUndo : public AnimatableFxSettingsUndo {
+class PixelParamFieldUndo final : public AnimatableFxSettingsUndo {
   TPixelParamP m_param;
   TPixel32 m_oldValue, m_newValue;
 
@@ -175,7 +175,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! PointParamField Undo
 */
-class PointParamFieldUndo : public AnimatableFxSettingsUndo {
+class PointParamFieldUndo final : public AnimatableFxSettingsUndo {
   TPointParamP m_param;
   TPointD m_oldValue, m_newValue;
 
@@ -211,7 +211,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! EnumParamField Undo
 */
-class EnumParamFieldUndo : public FxSettingsUndo {
+class EnumParamFieldUndo final : public FxSettingsUndo {
   TIntEnumParamP m_param;
   std::string m_oldString, m_newString;
 
@@ -245,7 +245,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! IntParamFieldのUndo
 */
-class IntParamFieldUndo : public FxSettingsUndo {
+class IntParamFieldUndo final : public FxSettingsUndo {
   TIntParamP m_param;
   int m_oldValue, m_newValue;
 
@@ -280,7 +280,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! BoolParamFieldのUndo
 */
-class BoolParamFieldUndo : public FxSettingsUndo {
+class BoolParamFieldUndo final : public FxSettingsUndo {
   TBoolParamP m_param;
   bool m_newState;
 
@@ -313,7 +313,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! SpectrumParamFieldのUndo
 */
-class SpectrumParamFieldUndo : public AnimatableFxSettingsUndo {
+class SpectrumParamFieldUndo final : public AnimatableFxSettingsUndo {
   TSpectrumParamP m_param;
   TSpectrum m_oldSpectrum, m_newSpectrum;
 
@@ -354,7 +354,7 @@ public:
    SpectrumParamFieldは、表示更新時にactualParamとcurrentParamのKeyの数が
         一致していなくてはならないので、２つ同時に変更する必要が有る。
 */
-class SpectrumParamFieldAddRemoveKeyUndo : public FxSettingsUndo {
+class SpectrumParamFieldAddRemoveKeyUndo final : public FxSettingsUndo {
   TSpectrumParamP m_actualParam;
   TSpectrumParamP m_currentParam;
   TSpectrum::ColorKey m_key;
@@ -414,7 +414,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! StringParamField Undo
 */
-class StringParamFieldUndo : public FxSettingsUndo {
+class StringParamFieldUndo final : public FxSettingsUndo {
   TStringParamP m_param;
   std::wstring m_oldValue, m_newValue;
 
@@ -450,7 +450,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! ToneCurveParamField Undo
 */
-class ToneCurveParamFieldUndo : public AnimatableFxSettingsUndo {
+class ToneCurveParamFieldUndo final : public AnimatableFxSettingsUndo {
   TToneCurveParamP m_param;
   QList<TPointD> m_oldPoints, m_newPoints;
 
@@ -490,7 +490,7 @@ public:
         一致していなくてはならないので、２つ同時に変更する必要が有る。
 */
 
-class ToneCurveParamFieldAddRemovePointUndo : public FxSettingsUndo {
+class ToneCurveParamFieldAddRemovePointUndo final : public FxSettingsUndo {
   TToneCurveParamP m_actualParam;
   TToneCurveParamP m_currentParam;
   QList<TPointD> m_value;
@@ -550,7 +550,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! ToneCurveParamField Undo (Linearのトグル)
 */
-class ToneCurveParamFieldToggleLinearUndo : public FxSettingsUndo {
+class ToneCurveParamFieldToggleLinearUndo final : public FxSettingsUndo {
   TToneCurveParamP m_actualParam;
   TToneCurveParamP m_currentParam;
   bool m_newState;

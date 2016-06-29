@@ -6,7 +6,7 @@
 
 //-------------------------------------------------------------------
 
-class BlurFx : public TStandardRasterFx {
+class BlurFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(BlurFx)
 
   TRasterFxPort m_input;

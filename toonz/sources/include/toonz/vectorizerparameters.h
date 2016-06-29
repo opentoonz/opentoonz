@@ -79,7 +79,7 @@ public:
             specialization for the centerline vectorization method.
 */
 
-class DVAPI CenterlineConfiguration : public VectorizerConfiguration {
+class DVAPI CenterlineConfiguration final : public VectorizerConfiguration {
 public:
   /*!After threshold is done, raster zones of uniform ink or paint color whose
 area is under this parameter
@@ -142,7 +142,7 @@ with activated region computing and painting.*/
             specialization for the (new) outline vectorization method.
 */
 
-class DVAPI NewOutlineConfiguration : public VectorizerConfiguration {
+class DVAPI NewOutlineConfiguration final : public VectorizerConfiguration {
 public:
   double m_adherenceTol;  //!< Adherence to contour corners
   double m_angleTol;      //!< Angle-based corners tolerance
@@ -182,7 +182,7 @@ public:
                 with a different outline vectorization algorithm.
 */
 
-class DVAPI OutlineConfiguration : public VectorizerConfiguration {
+class DVAPI OutlineConfiguration final : public VectorizerConfiguration {
 public:
   int m_smoothness;  // Outline
 
@@ -215,7 +215,7 @@ public:
   \brief    Container class for scene-bound vectorizer options.
 */
 
-class DVAPI VectorizerParameters : public TPersist {
+class DVAPI VectorizerParameters final : public TPersist {
   PERSIST_DECLARATION(VectorizerParameters)
 
 public:

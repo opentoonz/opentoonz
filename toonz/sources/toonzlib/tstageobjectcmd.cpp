@@ -46,7 +46,7 @@ bool canRemoveFx(const std::set<TFx *> &leaves, TFx *fx) {
 //
 //---------------------------------------------------------
 
-class NewCameraUndo : public TUndo {
+class NewCameraUndo final : public TUndo {
   TStageObjectId m_cameraId, m_oldCurrentId;
   TStageObject *m_stageObject;
   TXsheetHandle *m_xshHandle;
@@ -99,7 +99,7 @@ private:
 //
 //---------------------------------------------------------
 
-class NewPegbarUndo : public TUndo {
+class NewPegbarUndo final : public TUndo {
   TStageObjectId m_id, m_oldCurrentId;
   TStageObject *m_stageObject;
   TXsheetHandle *m_xshHandle;
@@ -155,7 +155,7 @@ private:
 //
 //-------------------------------------------------------------------
 
-class SetActiveCameraUndo : public TUndo {
+class SetActiveCameraUndo final : public TUndo {
   TStageObjectId m_oldCameraId, m_newCameraId;
   TXsheetHandle *m_xshHandle;
 
@@ -198,7 +198,7 @@ public:
 //
 //-------------------------------------------------------------------
 
-class RemoveSplineUndo : public TUndo {
+class RemoveSplineUndo final : public TUndo {
   TStageObjectId m_id;
   TStageObjectSpline *m_spline;
   std::vector<TStageObjectId> m_ids;
@@ -255,7 +255,7 @@ public:
 //
 //-------------------------------------------------------------------
 
-class NewSplineUndo : public TUndo {
+class NewSplineUndo final : public TUndo {
   TStageObjectId m_id;
   TStageObjectSpline *m_spline;
   TXsheetHandle *m_xshHandle;
@@ -300,7 +300,7 @@ public:
 //
 //-------------------------------------------------------------------
 
-class SplineLinkUndo : public TUndo {
+class SplineLinkUndo final : public TUndo {
   TStageObjectId m_id;
   TStageObjectSpline *m_spline;
   TXsheetHandle *m_xshHandle;
@@ -344,7 +344,7 @@ public:
 //
 //-------------------------------------------------------------------
 
-class RemoveSplineLinkUndo : public TUndo {
+class RemoveSplineLinkUndo final : public TUndo {
   TStageObjectId m_id;
   TStageObjectSpline *m_spline;
   TXsheetHandle *m_xshHandle;
@@ -393,7 +393,7 @@ public:
 //
 //-------------------------------------------------------------------
 
-class RemovePegbarNodeUndo : public TUndo {
+class RemovePegbarNodeUndo final : public TUndo {
   TStageObjectId m_objId;
   TXshColumnP m_column;
   TStageObjectParams *m_params;
@@ -468,7 +468,7 @@ public:
 //
 //-------------------------------------------------------------------
 
-class RemoveColumnsUndo : public TUndo {
+class RemoveColumnsUndo final : public TUndo {
   std::vector<TFx *> m_deletedFx;
   std::vector<TFx *> m_terminalFx;
   QMap<TStageObjectId, QList<TFxPort *>> m_columnFxConnections;
@@ -561,7 +561,7 @@ public:
 //
 //-------------------------------------------------------------------
 
-class UndoGroup : public TUndo {
+class UndoGroup final : public TUndo {
   QList<TStageObjectId> m_ids;
   int m_groupId;
   QList<int> m_positions;
@@ -615,7 +615,7 @@ public:
 //
 //-------------------------------------------------------------------
 
-class UndoUngroup : public TUndo {
+class UndoUngroup final : public TUndo {
   QList<TStageObjectId> m_objsId;
   QList<int> m_positions;
   int m_groupId;
@@ -679,7 +679,7 @@ public:
 //
 //-------------------------------------------------------------------
 
-class UndoRenameGroup : public TUndo {
+class UndoRenameGroup final : public TUndo {
   QList<TStageObject *> m_objs;
   QList<int> m_positions;
   std::wstring m_oldGroupName;
@@ -734,7 +734,7 @@ public:
 //
 //-------------------------------------------------------------------
 
-class UndoStatusChange : public TUndo {
+class UndoStatusChange final : public TUndo {
   TStageObject *m_obj;
   TStageObject::Status m_oldStatus, m_newStatus;
   TXsheetHandle *m_xshHandle;
@@ -1006,7 +1006,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class StageObjectRenameUndo : public SetAttributeUndo<std::string> {
+class StageObjectRenameUndo final : public SetAttributeUndo<std::string> {
 public:
   StageObjectRenameUndo(const TStageObjectId &id, TXsheetHandle *xshHandle,
                         std::string oldName, std::string newName)
@@ -1022,7 +1022,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class ResetOffsetUndo : public SetAttributeUndo<TPointD> {
+class ResetOffsetUndo final : public SetAttributeUndo<TPointD> {
 public:
   ResetOffsetUndo(const TStageObjectId &id, TXsheetHandle *xshHandle,
                   const TPointD &oldOffset)
@@ -1040,7 +1040,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class ResetCenterAndOffsetUndo : public SetAttributeUndo<TPointD> {
+class ResetCenterAndOffsetUndo final : public SetAttributeUndo<TPointD> {
 public:
   ResetCenterAndOffsetUndo(const TStageObjectId &id, TXsheetHandle *xshHandle,
                            const TPointD &oldOffset)
@@ -1058,7 +1058,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class SetHandleUndo : public SetAttributeUndo<std::string> {
+class SetHandleUndo final : public SetAttributeUndo<std::string> {
   TPointD m_center, m_offset;
   TXsheetHandle *m_xshHandle;
 
@@ -1087,7 +1087,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class SetParentHandleUndo : public SetAttributeUndo<std::string> {
+class SetParentHandleUndo final : public SetAttributeUndo<std::string> {
 public:
   SetParentHandleUndo(const TStageObjectId &id, TXsheetHandle *xshHandle,
                       std::string oldHandle, std::string newHandle)
@@ -1105,7 +1105,7 @@ public:
 
 typedef std::pair<TStageObjectId, std::string> ParentIdAndHandle;
 
-class SetParentUndo : public SetAttributeUndo<ParentIdAndHandle> {
+class SetParentUndo final : public SetAttributeUndo<ParentIdAndHandle> {
 public:
   SetParentUndo(const TStageObjectId &id, TXsheetHandle *xshHandle,
                 TStageObjectId oldParentId, std::string oldParentHandle,
@@ -1128,7 +1128,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class ResetPositionUndo : public TUndo {
+class ResetPositionUndo final : public TUndo {
   TXsheetHandle *m_xshHandle;
   TStageObjectId m_id;
   TPointD m_center, m_offset;

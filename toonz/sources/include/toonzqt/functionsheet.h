@@ -27,7 +27,7 @@ class TDoubleParam;
 class TFrameHandle;
 class FunctionSelection;
 
-class FunctionSheetRowViewer : public Spreadsheet::RowPanel {
+class FunctionSheetRowViewer final : public Spreadsheet::RowPanel {
   FunctionSheet *m_sheet;
 
 public:
@@ -42,7 +42,7 @@ protected:
   void contextMenuEvent(QContextMenuEvent *) override;
 };
 
-class FunctionSheetColumnHeadViewer : public Spreadsheet::ColumnPanel {
+class FunctionSheetColumnHeadViewer final : public Spreadsheet::ColumnPanel {
   FunctionSheet *m_sheet;
   // enable drag and drop the expression arguments
   QPoint m_dragStartPosition;
@@ -60,7 +60,7 @@ protected:
   void contextMenuEvent(QContextMenuEvent *) override;
 };
 
-class FunctionSheetCellViewer : public Spreadsheet::CellPanel {
+class FunctionSheetCellViewer final : public Spreadsheet::CellPanel {
   Q_OBJECT
   FunctionSheet *m_sheet;
   DVGui::LineEdit *m_lineEdit;
@@ -85,7 +85,7 @@ private slots:
   void onCellEditorEditingFinished();
 };
 
-class FunctionSheet : public SpreadsheetViewer {
+class FunctionSheet final : public SpreadsheetViewer {
   Q_OBJECT
 
 public:

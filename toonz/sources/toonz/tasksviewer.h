@@ -17,14 +17,14 @@ class TaskTreeView;
 class QListWidgetItem;
 class QComboBox;
 
-class TaskTreeModel : public TreeModel {
+class TaskTreeModel final : public TreeModel {
   Q_OBJECT
 
   // QModelIndex m_selectedIndex;
   TaskTreeView *m_view;
 
 public:
-  class Item : public TreeModel::Item {
+  class Item final : public TreeModel::Item {
     friend class TaskTreeModel;
 
   public:
@@ -69,7 +69,7 @@ private:
 //------------------------------------------------------------------------------------------
 class TasksViewer;
 
-class TaskTreeView : public TreeView {
+class TaskTreeView final : public TreeView {
   Q_OBJECT
 
 public:
@@ -93,7 +93,7 @@ class TFarmTask;
 class QTextEdit;
 class QListWidget;
 
-class TaskSheet : public QScrollArea {
+class TaskSheet final : public QScrollArea {
   Q_OBJECT
 
   TasksViewer *m_viewer;
@@ -161,7 +161,7 @@ public:
 
 //=============================================================================
 class QToolBar;
-class TasksViewer : public QSplitter, public BatchesController::Observer {
+class TasksViewer final : public QSplitter, public BatchesController::Observer {
   Q_OBJECT
 
 public:

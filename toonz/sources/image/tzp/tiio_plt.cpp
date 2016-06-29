@@ -19,7 +19,7 @@ extern "C" {
 
 //============================================================
 
-class PltReader : public Tiio::Reader {
+class PltReader final : public Tiio::Reader {
   TIFF *m_tiff;
   int m_row;
   bool m_tiled, m_stripped;

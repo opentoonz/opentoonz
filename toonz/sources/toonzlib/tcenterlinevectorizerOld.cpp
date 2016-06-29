@@ -1928,7 +1928,7 @@ currNode);
           *otherNode    = *currNode;
           *currNode     = tempNode;
           //					it_temp =
-          //std::find(junction->m_nodes.begin(),
+          // std::find(junction->m_nodes.begin(),
           // junction->m_nodes.end(), currNode);
           //					assert(it_temp !=
           // junction->m_nodes.end());

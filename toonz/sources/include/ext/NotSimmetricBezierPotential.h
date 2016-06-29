@@ -23,7 +23,7 @@
 #endif
 
 namespace ToonzExt {
-class DVAPI NotSimmetricBezierPotential : public Potential {
+class DVAPI NotSimmetricBezierPotential final : public Potential {
 public:
   virtual ~NotSimmetricBezierPotential();
 

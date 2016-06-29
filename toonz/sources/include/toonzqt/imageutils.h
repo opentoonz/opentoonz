@@ -41,7 +41,7 @@ namespace ImageUtils {
 /*!
   \brief    Notify that a task on a single frame is completed.
 */
-class DVAPI FrameTaskNotifier : public QObject {
+class DVAPI FrameTaskNotifier final : public QObject {
   Q_OBJECT
 
   int m_errorCount, m_warningCount;
@@ -144,7 +144,7 @@ void DVAPI getStrokeStyleInformationInArea(
             widgets (specifically, context menus).
 */
 
-class DVAPI FullScreenWidget : public QWidget {
+class DVAPI FullScreenWidget final : public QWidget {
   Q_OBJECT
 
   QWidget *m_widget;  //!< (Owned) The content widget.

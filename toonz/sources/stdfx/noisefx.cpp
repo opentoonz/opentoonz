@@ -4,7 +4,7 @@
 #include "tfxparam.h"
 #include "stdfx.h"
 
-class NoiseFx : public TStandardRasterFx {
+class NoiseFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(NoiseFx)
 
   TRasterFxPort m_input;

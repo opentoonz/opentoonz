@@ -25,7 +25,7 @@
 #include "StrokeDeformationImpl.h"
 
 namespace ToonzExt {
-class DVAPI SmoothDeformation : public StrokeDeformationImpl {
+class DVAPI SmoothDeformation final : public StrokeDeformationImpl {
   SmoothDeformation();
 
 public:

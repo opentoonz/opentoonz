@@ -200,7 +200,7 @@ predictive purposes.
 classes
 */
 
-class DVAPI TFxCacheManager : public TRenderResourceManager {
+class DVAPI TFxCacheManager final : public TRenderResourceManager {
   T_RENDER_RESOURCE_MANAGER
 
 private:

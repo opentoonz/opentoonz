@@ -43,7 +43,7 @@ inline bool isIncluded(int index, int left, int rigth) {
 // IronTool
 //-----------------------------------------------------------------------------
 
-class IronTool : public TTool {
+class IronTool final : public TTool {
   TStroke *m_strokeRef, *m_oldStroke;
   TUndo *m_undo;
 

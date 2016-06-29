@@ -27,7 +27,7 @@ class TPaletteColumnFx;
 */
 //=============================================================================
 
-class DVAPI TXshPaletteColumn : public TXshCellColumn {
+class DVAPI TXshPaletteColumn final : public TXshCellColumn {
   PERSIST_DECLARATION(TXshPaletteColumn)
   TPaletteColumnFx *m_fx;
 

@@ -92,7 +92,7 @@ const double cBorderSize = 15;
 //
 //---------------------------------------------------------
 
-class UndoTypeTool : public ToolUtils::TToolUndo {
+class UndoTypeTool final : public ToolUtils::TToolUndo {
   std::vector<TStroke *> m_strokes;
   std::vector<TFilledRegionInf> *m_fillInformationBefore,
       *m_fillInformationAfter;
@@ -193,7 +193,7 @@ public:
 
 //---------------------------------------------------------
 
-class RasterUndoTypeTool : public TRasterUndo {
+class RasterUndoTypeTool final : public TRasterUndo {
   TTileSetCM32 *m_afterTiles;
 
 public:
@@ -288,7 +288,7 @@ public:
 //
 //---------------------------------------------------------
 
-class TypeTool : public TTool {
+class TypeTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(TypeTool)
 
   // Properties

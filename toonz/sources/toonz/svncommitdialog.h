@@ -22,7 +22,7 @@ class TXshLevel;
 
 //-----------------------------------------------------------------------------
 
-class SVNCommitDialog : public DVGui::Dialog {
+class SVNCommitDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QLabel *m_waitingLabel;
@@ -116,7 +116,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNCommitFrameRangeDialog : public DVGui::Dialog {
+class SVNCommitFrameRangeDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QLabel *m_waitingLabel;

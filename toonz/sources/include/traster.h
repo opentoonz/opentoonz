@@ -237,7 +237,7 @@ class TRasterT;
 //! \include rasterpt_ex1.cpp
 // class TRasterPT<T>
 template <class T>
-class TRasterPT : public TSmartPointerT<TRasterT<T>> {
+class TRasterPT final : public TSmartPointerT<TRasterT<T>> {
 public:
   typedef T Pixel;
   typedef TRasterT<T> Raster;

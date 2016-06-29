@@ -46,7 +46,7 @@
 
 namespace {
 
-class SchematicZoomer : public ImageUtils::ShortcutZoomer {
+class SchematicZoomer final : public ImageUtils::ShortcutZoomer {
 public:
   SchematicZoomer(QWidget *parent) : ShortcutZoomer(parent) {}
 

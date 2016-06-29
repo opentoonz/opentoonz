@@ -6,7 +6,7 @@
 #include "processor.h"
 
 //! A dummy Processor
-class DummyProcessor : public Processor {
+class DummyProcessor final : public Processor {
   std::vector<int> m_dummyData;
 
 public:

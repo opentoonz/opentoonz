@@ -42,7 +42,7 @@ class CheckBox;
 /*!Consente di cambiare modalita' di vettorizzazione e quindi in funzione
    di questa di cambiare i parametri da settare.*/
 
-class TrackerPopup : public DVGui::Dialog {
+class TrackerPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::DoubleField *m_threshold;
@@ -134,7 +134,7 @@ private:
   QString getErrorMessage(int errorCode);
 };
 
-class MyThread : public QThread {
+class MyThread final : public QThread {
   Tracker *m_tracker;
 
 public:

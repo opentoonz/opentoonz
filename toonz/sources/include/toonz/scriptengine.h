@@ -31,7 +31,7 @@ public:
   virtual void execute() = 0;
 };
 
-class DVAPI ScriptEngine : public QObject {
+class DVAPI ScriptEngine final : public QObject {
   Q_OBJECT
   QScriptEngine *m_engine;
   class Executor;

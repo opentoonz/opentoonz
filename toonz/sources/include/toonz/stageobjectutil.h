@@ -104,7 +104,7 @@ public:
 //
 //-----------------------------------------------------------------------------
 
-class DVAPI UndoSetKeyFrame : public TUndo {
+class DVAPI UndoSetKeyFrame final : public TUndo {
   TStageObjectId m_objId;
   int m_frame;
 
@@ -146,7 +146,7 @@ public:
 //
 //-----------------------------------------------------------------------------
 
-class DVAPI UndoRemoveKeyFrame : public TUndo {
+class DVAPI UndoRemoveKeyFrame final : public TUndo {
   TStageObjectId m_objId;
   int m_frame;
 
@@ -184,7 +184,7 @@ public:
 // UndoStageObjectCenterMove
 //-----------------------------------------------------------------------------
 
-class DVAPI UndoStageObjectCenterMove : public TUndo {
+class DVAPI UndoStageObjectCenterMove final : public TUndo {
   TStageObjectId m_pid;
   int m_frame;
   TPointD m_before, m_after;
@@ -220,7 +220,7 @@ public:
 // UndoStageObjectMove
 //-----------------------------------------------------------------------------
 
-class DVAPI UndoStageObjectMove : public TUndo {
+class DVAPI UndoStageObjectMove final : public TUndo {
   TStageObjectValues m_before, m_after;
   TObjectHandle
       *m_objectHandle;  // OK: viene usato per notificare i cambiamenti!
@@ -245,7 +245,7 @@ public:
 // UndoStageObjectPinned
 //-----------------------------------------------------------------------------
 
-class DVAPI UndoStageObjectPinned : public TUndo {
+class DVAPI UndoStageObjectPinned final : public TUndo {
   TStageObjectId m_pid;
   int m_frame;
   bool m_before, m_after;

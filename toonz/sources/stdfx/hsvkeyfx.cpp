@@ -6,7 +6,7 @@
 #include "stdfx.h"
 #include "hsvutil.h"
 
-class HSVKeyFx : public TStandardRasterFx {
+class HSVKeyFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(HSVKeyFx)
 
   TRasterFxPort m_input;

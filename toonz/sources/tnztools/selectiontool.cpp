@@ -299,7 +299,7 @@ namespace {
 // UndoMoveCenter
 //-----------------------------------------------------------------------------
 
-class UndoMoveCenter : public TUndo {
+class UndoMoveCenter final : public TUndo {
   SelectionTool *m_tool;
   TAffine m_aff;
 
@@ -324,7 +324,7 @@ public:
 // MoveCenterTool
 //-----------------------------------------------------------------------------
 
-class MoveCenterTool : public DragTool {
+class MoveCenterTool final : public DragTool {
   TPointD m_startPos;
   TAffine m_transform;
 

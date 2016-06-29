@@ -19,7 +19,7 @@ DV_IMPORT_API void splitSpeedInOutSegment(TDoubleKeyframe &k,
 //
 //-----------------------------------------------------------------------------
 
-class KeyframesUndo : public TUndo {
+class KeyframesUndo final : public TUndo {
   TDoubleParamP m_param;
   typedef std::map<int, TDoubleKeyframe> Keyframes;
   Keyframes m_oldKeyframes;
@@ -802,7 +802,7 @@ void KeyframeSetter::setAllParams(
 
 //=============================================================================
 
-class RemoveKeyframeUndo : public TUndo {
+class RemoveKeyframeUndo final : public TUndo {
   TDoubleParam *m_param;
   TDoubleKeyframe m_keyframe;
 
@@ -832,7 +832,7 @@ void KeyframeSetter::removeKeyframeAt(TDoubleParam *curve, double frame) {
 
 //=============================================================================
 
-class EnableCycleUndo : public TUndo {
+class EnableCycleUndo final : public TUndo {
   TDoubleParam *m_param;
 
 public:

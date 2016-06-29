@@ -99,7 +99,7 @@ std::set<TGlContext>
 //-------------------------------------------------------------------------------
 
 QGLWidget *touchProxy() {
-  struct GLWidgetProxy : public TGLDisplayListsProxy {
+  struct GLWidgetProxy final : public TGLDisplayListsProxy {
     ~GLWidgetProxy() {
       delete l_proxy;
       l_proxy = 0;
@@ -321,7 +321,7 @@ void executeCheck(int checkType) {
 
 //-----------------------------------------------------------------------------
 
-class TCheckToggleCommand : public MenuItemHandler {
+class TCheckToggleCommand final : public MenuItemHandler {
 public:
   TCheckToggleCommand() : MenuItemHandler("MI_TCheck") {}
   void execute() override { executeCheck(ToonzCheck::eTransparency); }
@@ -329,7 +329,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class ICheckToggleCommand : public MenuItemHandler {
+class ICheckToggleCommand final : public MenuItemHandler {
 public:
   ICheckToggleCommand() : MenuItemHandler("MI_ICheck") {}
   void execute() override { executeCheck(ToonzCheck::eInk); }
@@ -337,7 +337,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class PCheckToggleCommand : public MenuItemHandler {
+class PCheckToggleCommand final : public MenuItemHandler {
 public:
   PCheckToggleCommand() : MenuItemHandler("MI_PCheck") {}
   void execute() override { executeCheck(ToonzCheck::ePaint); }
@@ -345,7 +345,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class BCheckToggleCommand : public MenuItemHandler {
+class BCheckToggleCommand final : public MenuItemHandler {
 public:
   BCheckToggleCommand() : MenuItemHandler("MI_BCheck") {}
   void execute() override { executeCheck(ToonzCheck::eBlackBg); }
@@ -353,7 +353,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class TAutocloseToggleCommand : public MenuItemHandler {
+class TAutocloseToggleCommand final : public MenuItemHandler {
 public:
   TAutocloseToggleCommand() : MenuItemHandler("MI_ACheck") {}
   void execute() override { executeCheck(ToonzCheck::eAutoclose); }
@@ -361,7 +361,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class TGapToggleCommand : public MenuItemHandler {
+class TGapToggleCommand final : public MenuItemHandler {
 public:
   TGapToggleCommand() : MenuItemHandler("MI_GCheck") {}
   void execute() override { executeCheck(ToonzCheck::eGap); }
@@ -369,7 +369,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class TInksOnlyToggleCommand : public MenuItemHandler {
+class TInksOnlyToggleCommand final : public MenuItemHandler {
 public:
   TInksOnlyToggleCommand() : MenuItemHandler("MI_IOnly") {}
   void execute() override { executeCheck(ToonzCheck::eInksOnly); }
@@ -378,7 +378,7 @@ public:
 //-----------------------------------------------------------------------------
 /*! emphasize lines with style#1 regardless of the current style
 */
-class Ink1CheckToggleCommand : public MenuItemHandler {
+class Ink1CheckToggleCommand final : public MenuItemHandler {
 public:
   Ink1CheckToggleCommand() : MenuItemHandler("MI_Ink1Check") {}
   void execute() override { executeCheck(ToonzCheck::eInk1); }
@@ -386,7 +386,7 @@ public:
 
 //=============================================================================
 
-class TShiftTraceToggleCommand : public MenuItemHandler {
+class TShiftTraceToggleCommand final : public MenuItemHandler {
   CommandId m_cmdId;
 
 public:
@@ -443,7 +443,7 @@ public:
 TShiftTraceToggleCommand shiftTraceToggleCommand(MI_ShiftTrace),
     editShiftToggleCommand(MI_EditShift), noShiftToggleCommand(MI_NoShift);
 
-class TResetShiftTraceCommand : public MenuItemHandler {
+class TResetShiftTraceCommand final : public MenuItemHandler {
 public:
   TResetShiftTraceCommand() : MenuItemHandler(MI_ResetShift) {}
   void execute() override {
@@ -1404,7 +1404,7 @@ void drawFpsGraph(int t0, int t1) {
 
 //-----------------------------------------------------------------------------
 
-class Qt_GLContextManager : public TGLContextManager {
+class Qt_GLContextManager final : public TGLContextManager {
   QGLContext *m_context;
 
 public:

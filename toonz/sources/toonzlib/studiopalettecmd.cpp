@@ -35,7 +35,7 @@ namespace {
 //=============================================================================
 // PaletteAssignUndo : Undo for the "Load into Current Palette" command.
 
-class PaletteAssignUndo : public TUndo {
+class PaletteAssignUndo final : public TUndo {
   TPaletteP m_targetPalette, m_oldPalette, m_newPalette;
   TPaletteHandle *m_paletteHandle;
 
@@ -74,7 +74,7 @@ public:
 // StudioPaletteAssignUndo : Undo for the "Replace with Current Palette"
 // command.
 
-class StudioPaletteAssignUndo : public TUndo {
+class StudioPaletteAssignUndo final : public TUndo {
   TPaletteP m_oldPalette, m_newPalette;
   TFilePath m_fp;
   TPaletteHandle *m_paletteHandle;
@@ -116,7 +116,7 @@ public:
 //=============================================================================
 // DeletePaletteUndo
 
-class DeletePaletteUndo : public TUndo {
+class DeletePaletteUndo final : public TUndo {
   TFilePath m_palettePath;
   TPaletteP m_palette;
 
@@ -143,7 +143,7 @@ public:
 //=============================================================================
 // CreatePaletteUndo
 
-class CreatePaletteUndo : public TUndo {
+class CreatePaletteUndo final : public TUndo {
   TFilePath m_palettePath;
   TPaletteP m_palette;
 
@@ -170,7 +170,7 @@ public:
 //=============================================================================
 // DeleteFolderUndo
 
-class DeleteFolderUndo : public TUndo {
+class DeleteFolderUndo final : public TUndo {
   TFilePath m_path;
   TFilePathSet m_pathSet;
   QList<TPaletteP> m_paletteList;
@@ -215,7 +215,7 @@ public:
 //=============================================================================
 // CreateFolderUndo
 
-class CreateFolderUndo : public TUndo {
+class CreateFolderUndo final : public TUndo {
   TFilePath m_folderPath;
 
 public:
@@ -239,7 +239,7 @@ public:
 //=============================================================================
 // MovePaletteUndo
 
-class MovePaletteUndo : public TUndo {
+class MovePaletteUndo final : public TUndo {
   TFilePath m_dstPath, m_srcPath;
 
 public:
@@ -267,7 +267,7 @@ void adaptLevelToPalette(TXshLevelHandle *currentLevelHandle,
                          TPaletteHandle *paletteHandle, TPalette *plt,
                          int tolerance, bool noUndo);
 
-class AdjustIntoCurrentPaletteUndo : public TUndo {
+class AdjustIntoCurrentPaletteUndo final : public TUndo {
   TXshLevelHandle *m_currentLevelHandle;
   TPaletteHandle *m_paletteHandle;
   TPaletteP m_oldPalette, m_newPalette;

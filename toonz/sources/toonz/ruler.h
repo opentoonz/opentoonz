@@ -16,7 +16,7 @@ class SceneViewer;
 /*! La classe si occupa della visualizzazione e della gestione
     di una linea guida (puo' essere orizzontale o verticale)
 */
-class Ruler : public QWidget {
+class Ruler final : public QWidget {
   Q_OBJECT
 
   QColor m_parentBgColor;

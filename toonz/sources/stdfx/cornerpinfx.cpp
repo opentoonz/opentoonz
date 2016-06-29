@@ -18,7 +18,7 @@ inline bool myIsEmpty(const TRectD &r) { return r.x0 >= r.x1 || r.y0 >= r.y1; }
 
 //==============================================================================
 
-class CornerPinFx : public TStandardRasterFx {
+class CornerPinFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(CornerPinFx)
 
   enum { PERSPECTIVE, BILINEAR };

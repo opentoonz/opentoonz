@@ -74,7 +74,7 @@ private:
 
 //-------------------------------------------------------------------
 
-class OutlineRegionProp : public TRegionProp {
+class OutlineRegionProp final : public TRegionProp {
   double m_pixelSize;
   TOutlineStyleP m_colorStyle;
 

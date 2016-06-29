@@ -6,7 +6,7 @@
 #include "stdfx.h"
 #include "tspectrumparam.h"
 
-class CloudsFx : public TStandardZeraryFx {
+class CloudsFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(CloudsFx)
   TIntEnumParamP m_type;
   TDoubleParamP m_size;

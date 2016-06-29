@@ -18,7 +18,7 @@ class ScriptEngine;
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI ScriptConsole : public QTextEdit {
+class DVAPI ScriptConsole final : public QTextEdit {
   Q_OBJECT
   ScriptEngine *m_engine;
 

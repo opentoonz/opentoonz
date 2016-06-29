@@ -12,7 +12,7 @@
 // ValueAdjuster
 //-----------------------------------------------------------------------------
 
-class ValueAdjuster : public QWidget {
+class ValueAdjuster final : public QWidget {
   Q_OBJECT
 
   DVGui::DoubleLineEdit *m_valueLineEdit;
@@ -37,7 +37,7 @@ signals:
 // ValueShifter
 //-----------------------------------------------------------------------------
 
-class ValueShifter : public QWidget {
+class ValueShifter final : public QWidget {
   Q_OBJECT
 
   DVGui::DoubleLineEdit *m_valueLineEdit;
@@ -64,7 +64,7 @@ signals:
 
 // TODO: spostare il colorfield qui dentro
 
-class ColorFader : public QWidget {
+class ColorFader final : public QWidget {
   Q_OBJECT
 
   DVGui::DoubleLineEdit *m_valueLineEdit;
@@ -88,7 +88,7 @@ signals:
 // PltGizmoPopup
 //-----------------------------------------------------------------------------
 
-class PltGizmoPopup : public DVGui::Dialog {
+class PltGizmoPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::ColorField *m_colorFld;

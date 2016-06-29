@@ -25,7 +25,7 @@ struct SVNPartialLock {
 
 //-----------------------------------------------------------------------------
 
-class SVNPartialLockReader : public QXmlStreamReader {
+class SVNPartialLockReader final : public QXmlStreamReader {
   QList<SVNPartialLock> m_partialLock;
   QString m_data;
 
@@ -56,7 +56,7 @@ struct SVNRepository {
 
 //-----------------------------------------------------------------------------
 
-class SVNConfigReader : public QXmlStreamReader {
+class SVNConfigReader final : public QXmlStreamReader {
   QList<SVNRepository> m_repositories;
 
   QString m_data;
@@ -98,7 +98,7 @@ struct SVNStatus {
 
 //-----------------------------------------------------------------------------
 
-class SVNStatusReader : public QXmlStreamReader {
+class SVNStatusReader final : public QXmlStreamReader {
   QList<SVNStatus> m_status;
 
   QString m_data;
@@ -141,7 +141,7 @@ struct SVNLog {
 
 //-----------------------------------------------------------------------------
 
-class SVNLogReader : public QXmlStreamReader {
+class SVNLogReader final : public QXmlStreamReader {
   QList<SVNLog> m_log;
 
   QString m_data;
@@ -163,7 +163,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class SVNInfoReader : public QXmlStreamReader {
+class SVNInfoReader final : public QXmlStreamReader {
   QString m_data;
 
   QString m_revision;
@@ -189,7 +189,7 @@ struct SVNListInfo {
 
 //-----------------------------------------------------------------------------
 
-class SVNListReader : public QXmlStreamReader {
+class SVNListReader final : public QXmlStreamReader {
   QString m_data;
   QList<SVNListInfo> m_listInfo;
 

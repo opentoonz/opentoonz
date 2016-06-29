@@ -126,7 +126,7 @@ QString DVAPI getText(const QString &title, const QString &label,
                 \b Result
                         \image html DialogSeparator.jpg
 */
-class DVAPI Separator : public QFrame {
+class DVAPI Separator final : public QFrame {
   Q_OBJECT
 
   QString m_name;
@@ -243,7 +243,7 @@ signals:
     0 -> Cancel or Close Popup,
     1,2,3,... -> checkbox clicked.
 */
-class DVAPI RadioButtonDialog : public DVGui::Dialog {
+class DVAPI RadioButtonDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   int m_result;

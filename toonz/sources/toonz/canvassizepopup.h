@@ -23,7 +23,7 @@ enum PeggingPositions { e00, e01, e02, e10, e11, e12, e20, e21, e22 };
 
 //=============================================================================
 
-class PeggingWidget : public QWidget {
+class PeggingWidget final : public QWidget {
   Q_OBJECT
 
   QButtonGroup *m_buttonGroup;
@@ -66,7 +66,7 @@ public slots:
 // CanvasSizePopup
 //-----------------------------------------------------------------------------
 
-class CanvasSizePopup : public DVGui::Dialog {
+class CanvasSizePopup final : public DVGui::Dialog {
   Q_OBJECT
 
   TXshSimpleLevelP m_sl;

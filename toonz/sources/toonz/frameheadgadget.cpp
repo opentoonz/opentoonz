@@ -649,7 +649,7 @@ bool FilmstripFrameHeadGadget::eventFilter(QObject *obj, QEvent *e) {
 
 //-----------------------------------------------------------------------------
 
-class OnionSkinToggle : public MenuItemHandler {
+class OnionSkinToggle final : public MenuItemHandler {
 public:
   OnionSkinToggle() : MenuItemHandler(MI_OnionSkin) {}
   void execute() override {

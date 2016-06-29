@@ -46,7 +46,7 @@ const int cColHeadersEndY = 87;  //!< End of column headers y pos
 //********************************************************************************
 
 /*--- NumericalColumnsのセグメントの左側のバーをクリックしたとき ---*/
-class MoveChannelsDragTool : public Spreadsheet::DragTool {
+class MoveChannelsDragTool final : public Spreadsheet::DragTool {
   FunctionSheet *m_sheet;
   std::vector<KeyframeSetter *> m_setters;
   int m_oldRow;
@@ -125,7 +125,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*--- NumericalColumnsのセル部分をクリックしたとき ---*/
-class FunctionSheetSelectionTool : public Spreadsheet::DragTool {
+class FunctionSheetSelectionTool final : public Spreadsheet::DragTool {
   int m_firstRow, m_firstCol;
   FunctionSheet *m_sheet;
 
@@ -897,7 +897,7 @@ void FunctionSheetCellViewer::openContextMenu(QMouseEvent *e) {
 //    FunctionSheetColumnToCurveMapper  implementation
 //********************************************************************************
 
-class FunctionSheetColumnToCurveMapper : public ColumnToCurveMapper {
+class FunctionSheetColumnToCurveMapper final : public ColumnToCurveMapper {
   FunctionSheet *m_sheet;
 
 public:

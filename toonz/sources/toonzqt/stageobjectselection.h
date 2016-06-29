@@ -23,7 +23,7 @@ class SchematicPort;
 //
 //---------------------------------------------------------
 
-class StageObjectSelection : public QObject, public TSelection {
+class StageObjectSelection final : public QObject, public TSelection {
   Q_OBJECT
 
   QList<QPair<TStageObjectId, TStageObjectId>> m_selectedLinks;

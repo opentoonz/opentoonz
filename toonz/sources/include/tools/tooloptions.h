@@ -84,7 +84,7 @@ class QStackedWidget;
 //    ToolOptionToolBar  declaration
 //***********************************************************************************************
 
-class ToolOptionToolBar : public QToolBar {
+class ToolOptionToolBar final : public QToolBar {
 public:
   ToolOptionToolBar(QWidget *parent = 0);
 
@@ -127,7 +127,7 @@ public:
 //    ToolOptionControlBuilder  declaration
 //***********************************************************************************************
 
-class ToolOptionControlBuilder : public TProperty::Visitor {
+class ToolOptionControlBuilder final : public TProperty::Visitor {
   ToolOptionsBox *m_panel;
   TTool *m_tool;
   TPaletteHandle *m_pltHandle;
@@ -178,7 +178,7 @@ public:
 //
 //=============================================================================
 
-class ArrowToolOptionsBox : public ToolOptionsBox {
+class ArrowToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
   TPropertyGroup *m_pg;
@@ -267,38 +267,51 @@ protected slots:
 //
 //=============================================================================
 
-class IconViewField : public QWidget {
+class IconViewField final : public QWidget {
   Q_OBJECT
 
 public:
-  enum IconType{
+  enum IconType {
     Icon_ScalePeg = 0,
     Icon_Rotation,
     Icon_Position,
     Icon_Thickness,
     Icon_Amount
   };
+
 private:
   IconType m_iconType;
 
 protected:
   QPixmap m_pm[Icon_Amount];
-  Q_PROPERTY(QPixmap ScalePegPixmap READ getScalePegPixmap WRITE setScalePegPixmap);
-  Q_PROPERTY(QPixmap RotationPixmap READ getRotationPixmap WRITE setRotationPixmap);
-  Q_PROPERTY(QPixmap PositionPixmap READ getPositionPixmap WRITE setPositionPixmap);
-  Q_PROPERTY(QPixmap ThicknessPixmap READ getThicknessPixmap WRITE setThicknessPixmap);
+  Q_PROPERTY(
+      QPixmap ScalePegPixmap READ getScalePegPixmap WRITE setScalePegPixmap);
+  Q_PROPERTY(
+      QPixmap RotationPixmap READ getRotationPixmap WRITE setRotationPixmap);
+  Q_PROPERTY(
+      QPixmap PositionPixmap READ getPositionPixmap WRITE setPositionPixmap);
+  Q_PROPERTY(
+      QPixmap ThicknessPixmap READ getThicknessPixmap WRITE setThicknessPixmap);
 
 public:
   IconViewField(QWidget *parent = 0, IconType iconType = Icon_ScalePeg);
 
   QPixmap getScalePegPixmap() const { return m_pm[Icon_ScalePeg]; }
-  void setScalePegPixmap(const QPixmap &pixmap) { m_pm[Icon_ScalePeg] = pixmap; }
+  void setScalePegPixmap(const QPixmap &pixmap) {
+    m_pm[Icon_ScalePeg] = pixmap;
+  }
   QPixmap getRotationPixmap() const { return m_pm[Icon_Rotation]; }
-  void setRotationPixmap(const QPixmap &pixmap) { m_pm[Icon_Rotation] = pixmap; }
+  void setRotationPixmap(const QPixmap &pixmap) {
+    m_pm[Icon_Rotation] = pixmap;
+  }
   QPixmap getPositionPixmap() const { return m_pm[Icon_Position]; }
-  void setPositionPixmap(const QPixmap &pixmap) { m_pm[Icon_Position] = pixmap; }
+  void setPositionPixmap(const QPixmap &pixmap) {
+    m_pm[Icon_Position] = pixmap;
+  }
   QPixmap getThicknessPixmap() const { return m_pm[Icon_Thickness]; }
-  void setThicknessPixmap(const QPixmap &pixmap) { m_pm[Icon_Thickness] = pixmap; }
+  void setThicknessPixmap(const QPixmap &pixmap) {
+    m_pm[Icon_Thickness] = pixmap;
+  }
 
 protected:
   void paintEvent(QPaintEvent *e);
@@ -306,8 +319,8 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class SelectionToolOptionsBox : public ToolOptionsBox,
-                                public TProperty::Listener {
+class SelectionToolOptionsBox final : public ToolOptionsBox,
+                                      public TProperty::Listener {
   Q_OBJECT
 
   TTool *m_tool;
@@ -337,7 +350,7 @@ public:
   void updateStatus();
   void onPropertyChanged();
 
- protected slots:
+protected slots:
   void onScaleXValueChanged();
   void onScaleYValueChanged();
   void onSetSaveboxCheckboxChanged(bool);
@@ -349,7 +362,7 @@ public:
 //
 //=============================================================================
 
-class GeometricToolOptionsBox : public ToolOptionsBox {
+class GeometricToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
   int m_targetType;
@@ -379,7 +392,7 @@ protected slots:
 //
 //=============================================================================
 
-class TypeToolOptionsBox : public ToolOptionsBox {
+class TypeToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
   TTool *m_tool;
@@ -400,7 +413,7 @@ protected slots:
 //
 //=============================================================================
 
-class PaintbrushToolOptionsBox : public ToolOptionsBox {
+class PaintbrushToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
   ToolOptionCombo *m_colorMode;
@@ -422,7 +435,7 @@ protected slots:
 //
 //=============================================================================
 
-class FillToolOptionsBox : public ToolOptionsBox {
+class FillToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
   int m_targetType;
@@ -451,7 +464,7 @@ protected slots:
 //
 //=============================================================================
 
-class BrushToolOptionsBox : public ToolOptionsBox {
+class BrushToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
   TTool *m_tool;
@@ -488,7 +501,7 @@ protected slots:
 //
 //=============================================================================
 
-class EraserToolOptionsBox : public ToolOptionsBox {
+class EraserToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
   ToolOptionCheckbox *m_pencilMode, *m_invertMode, *m_multiFrameMode;
@@ -514,7 +527,7 @@ protected slots:
 //
 //=============================================================================
 
-class RulerToolOptionsBox : public ToolOptionsBox {
+class RulerToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
   MeasuredValueField *m_Xfld;
@@ -547,7 +560,7 @@ public:
 //
 //=============================================================================
 
-class TapeToolOptionsBox : public ToolOptionsBox {
+class TapeToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
 
   ToolOptionCheckbox *m_smoothMode, *m_joinStrokesMode;
@@ -573,7 +586,7 @@ protected slots:
 //
 //=============================================================================
 
-class RGBPickerToolOptionsBox : public ToolOptionsBox {
+class RGBPickerToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
   ToolOptionCheckbox *m_realTimePickMode;
   // label with background color
@@ -594,7 +607,7 @@ protected slots:
 //
 //=============================================================================
 
-class StylePickerToolOptionsBox : public ToolOptionsBox {
+class StylePickerToolOptionsBox final : public ToolOptionsBox {
   Q_OBJECT
   ToolOptionCheckbox *m_realTimePickMode;
 
@@ -611,7 +624,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI ToolOptions : public QFrame {
+class DVAPI ToolOptions final : public QFrame {
   Q_OBJECT
 
   int m_width, m_height;

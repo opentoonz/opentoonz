@@ -55,7 +55,7 @@ class VIStroke;
     A vector image is a set of strokes and regions.
   \relates  TImage
 */
-class DVAPI TVectorImage : public TImage {
+class DVAPI TVectorImage final : public TImage {
   class Imp;
   int pickGroup(const TPointD &pos, bool onEnteredGroup) const;
 
@@ -413,7 +413,8 @@ template class DVAPI TSmartPointerT<TVectorImage>;
 template class DVAPI TDerivedSmartPointerT<TVectorImage, TImage>;
 #endif
 
-class DVAPI TVectorImageP : public TDerivedSmartPointerT<TVectorImage, TImage> {
+class DVAPI TVectorImageP final
+    : public TDerivedSmartPointerT<TVectorImage, TImage> {
 public:
   TVectorImageP() {}
   TVectorImageP(TVectorImage *image) : DerivedSmartPointer(image) {}

@@ -829,7 +829,7 @@ void CleanupSettings::onRestoreSceneSettings() {
 //    Toggle Opacity Check Command
 //**********************************************************************
 
-class ToggleOpacityCheckCommand : public MenuItemHandler {
+class ToggleOpacityCheckCommand final : public MenuItemHandler {
 public:
   ToggleOpacityCheckCommand() : MenuItemHandler(MI_OpacityCheck) {}
 
@@ -849,7 +849,7 @@ public:
 //**********************************************************************
 
 /*
-class CleanupSettingsFactory : public TPanelFactory
+class CleanupSettingsFactory final : public TPanelFactory
 {
 public:
 

@@ -4,7 +4,7 @@
 #include "tfxparam.h"
 #include "tpixelutils.h"
 
-class Bright_ContFx : public TStandardRasterFx {
+class Bright_ContFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(Bright_ContFx)
 
   TRasterFxPort m_input;

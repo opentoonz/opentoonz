@@ -156,7 +156,7 @@ void cutCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1) {
 //  PasteCellsUndo
 //-----------------------------------------------------------------------------
 
-class PasteCellsUndo : public TUndo {
+class PasteCellsUndo final : public TUndo {
   TCellSelection *m_oldSelection;
   TCellSelection *m_newSelection;
   TCellData *m_data;
@@ -223,7 +223,7 @@ public:
 //  DeleteCellsUndo
 //-----------------------------------------------------------------------------
 
-class DeleteCellsUndo : public TUndo {
+class DeleteCellsUndo final : public TUndo {
   TCellSelection *m_selection;
   QMimeData *m_data;
   QMap<int, QList<TFxPort *>> m_outputConnections;
@@ -311,7 +311,7 @@ public:
 //  CutCellsUndo
 //-----------------------------------------------------------------------------
 
-class CutCellsUndo : public TUndo {
+class CutCellsUndo final : public TUndo {
   TCellSelection *m_selection;
   TCellData *m_data;
   QMap<int, QList<TFxPort *>> m_outputConnections;
@@ -389,7 +389,7 @@ public:
 //  InsertUndo
 //-----------------------------------------------------------------------------
 
-class InsertUndo : public TUndo {
+class InsertUndo final : public TUndo {
   TCellSelection::Range m_range;
 
 public:
@@ -420,7 +420,7 @@ public:
 //  RenumberUndo
 //-----------------------------------------------------------------------------
 
-class RenumberUndo : public TUndo {
+class RenumberUndo final : public TUndo {
   std::map<TXshCell, TXshCell> m_undoTable, m_redoTable;
 
 public:
@@ -464,7 +464,7 @@ public:
   }
 };
 
-class RenumberUndo::RedoNotifier : public TUndo {
+class RenumberUndo::RedoNotifier final : public TUndo {
   void undo() const override {}
   void redo() const override {
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
@@ -474,7 +474,7 @@ class RenumberUndo::RedoNotifier : public TUndo {
   int getSize() const override { return sizeof(*this); }
 };
 
-class RenumberUndo::UndoNotifier : public TUndo {
+class RenumberUndo::UndoNotifier final : public TUndo {
   void redo() const override {}
   void undo() const override {
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
@@ -548,7 +548,7 @@ bool pasteStrokesInCellWithoutUndo(
 //  PasteStrokesInCellsUndo
 //-----------------------------------------------------------------------------
 
-class PasteStrokesInCellUndo : public TUndo {
+class PasteStrokesInCellUndo final : public TUndo {
   int m_row, m_col;
   StrokesData *m_strokesData;
   TFrameId m_fid;
@@ -782,7 +782,7 @@ bool pasteRasterImageInCellWithoutUndo(int row, int col,
 //  PasteToonzImageInCellsUndo
 //-----------------------------------------------------------------------------
 
-class PasteToonzImageInCellsUndo : public ToolUtils::TRasterUndo {
+class PasteToonzImageInCellsUndo final : public ToolUtils::TRasterUndo {
   RasterImageData *m_rasterImageData;
 
 public:
@@ -817,7 +817,8 @@ public:
 //  PasteFullColorImageInCellsUndo
 //-----------------------------------------------------------------------------
 
-class PasteFullColorImageInCellsUndo : public ToolUtils::TFullColorRasterUndo {
+class PasteFullColorImageInCellsUndo final
+    : public ToolUtils::TFullColorRasterUndo {
   RasterImageData *m_rasterImageData;
 
 public:
@@ -868,7 +869,7 @@ void pasteDrawingsInCellWithoutUndo(TXsheet *xsh, TXshSimpleLevel *level,
 //  PasteDrawingsInCellUndo
 //-----------------------------------------------------------------------------
 
-class PasteDrawingsInCellUndo : public TUndo {
+class PasteDrawingsInCellUndo final : public TUndo {
   TXsheet *m_xsheet;
   int m_r0, m_c0;
   set<TFrameId> m_frameIds;
@@ -930,7 +931,7 @@ bool pasteCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1,
 
 //=============================================================================
 
-class OverwritePasteCellsUndo : public TUndo {
+class OverwritePasteCellsUndo final : public TUndo {
   TCellSelection *m_oldSelection;
   TCellSelection *m_newSelection;
   QMimeData *m_data;
@@ -1646,7 +1647,7 @@ void TCellSelection::dRenumberCells() {
 
 //-----------------------------------------------------------------------------
 
-class PasteNewCellUndo : public TUndo {
+class PasteNewCellUndo final : public TUndo {
   TXshCell m_oldCell, m_newCell;
   TImageP m_img;
   int m_row, m_col;

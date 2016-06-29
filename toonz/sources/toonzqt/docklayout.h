@@ -70,7 +70,7 @@ public:
 
   \sa DockWidget and DockSeparator classes.
 */
-class DVAPI DockLayout : public QLayout {
+class DVAPI DockLayout final : public QLayout {
   std::vector<QLayoutItem *> m_items;
   std::deque<Region *> m_regions;
 

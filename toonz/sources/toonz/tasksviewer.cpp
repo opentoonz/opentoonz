@@ -230,7 +230,7 @@ bool containsTask(const TFarmTask::Dependencies &dependencies,
 
 //-----------------------------------------------------------------------------
 
-class DependencyItem : public QListWidgetItem {
+class DependencyItem final : public QListWidgetItem {
 public:
   TFarmTask *m_task;
 

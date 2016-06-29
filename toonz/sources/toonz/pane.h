@@ -53,7 +53,7 @@ signals:
  * context menu
 */
 
-class TPanelTitleBarButtonForSafeArea : public TPanelTitleBarButton {
+class TPanelTitleBarButtonForSafeArea final : public TPanelTitleBarButton {
   Q_OBJECT
 public:
   TPanelTitleBarButtonForSafeArea(QWidget *parent,
@@ -74,7 +74,7 @@ protected slots:
 //-----------------------------------------------------------------------------
 
 //! a buttonset can group different TPanelTitleBarButton
-class TPanelTitleBarButtonSet : public QObject {
+class TPanelTitleBarButtonSet final : public QObject {
   Q_OBJECT
   std::vector<TPanelTitleBarButton *> m_buttons;
 
@@ -92,7 +92,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class TPanelTitleBar : public QFrame {
+class TPanelTitleBar final : public QFrame {
   Q_OBJECT
 
   bool m_isActive;

@@ -5,7 +5,7 @@
 #include "ino_common.h"
 #include "igs_warp.h"
 //------------------------------------------------------------
-class ino_warp_hv : public TStandardRasterFx {
+class ino_warp_hv final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_warp_hv)
 
   TRasterFxPort m_input;

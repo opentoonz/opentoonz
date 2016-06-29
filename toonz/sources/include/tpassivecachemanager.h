@@ -33,7 +33,7 @@ under control of another manager class - namely, the TFxCacheManager - for
 single render instances.
 */
 
-class DVAPI TPassiveCacheManager : public TFxCacheManagerDelegate {
+class DVAPI TPassiveCacheManager final : public TFxCacheManagerDelegate {
   T_RENDER_RESOURCE_MANAGER
 
 private:

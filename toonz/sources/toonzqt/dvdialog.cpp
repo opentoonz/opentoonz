@@ -115,7 +115,7 @@ void Separator::paintEvent(QPaintEvent *) {
   QPainter p(this);
   ParamsPage *page = dynamic_cast<ParamsPage *>(parentWidget());
   if (!page)
-    p.setPen(Qt::black);
+    p.setPen(palette().alternateBase().color());
   else
     p.setPen(page->getTextColor());
 
@@ -125,7 +125,7 @@ void Separator::paintEvent(QPaintEvent *) {
 
   p.drawText(contents.left(), 10, m_name);
 
-  //make the line semi-transparent
+  // make the line semi-transparent
   QColor lineColor = palette().alternateBase().color();
   lineColor.setAlpha(128);
 

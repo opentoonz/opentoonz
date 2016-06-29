@@ -63,7 +63,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class DVAPI SetFrameDragTool : public DragTool {
+class DVAPI SetFrameDragTool final : public DragTool {
   TFrameHandle *m_frameHandle;
 
 public:
@@ -76,7 +76,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class DVAPI SelectionDragTool : public DragTool {
+class DVAPI SelectionDragTool final : public DragTool {
   SpreadsheetViewer *m_viewer;
   int m_firstRow, m_firstCol;
 
@@ -90,7 +90,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class DVAPI PanTool : public DragTool {
+class DVAPI PanTool final : public DragTool {
   SpreadsheetViewer *m_viewer;
   GenericPanel *m_panel;
   QPoint m_lastPos;
@@ -105,7 +105,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class DVAPI ScrollArea : public QScrollArea {
+class DVAPI ScrollArea final : public QScrollArea {
   Q_OBJECT
 
 public:

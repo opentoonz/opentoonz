@@ -45,7 +45,7 @@ class TFlash;
   It's possible to use style to set brush, texture, pattern,
   TStroke now are smart pointer.
  */
-class DVAPI TStroke : public TSmartObject {
+class DVAPI TStroke final : public TSmartObject {
   DECLARE_CLASS_CODE
 
 private:

@@ -25,7 +25,7 @@ namespace {
 
 //---------------------------------------------------------------------------
 
-class PliOuputStream : public TOutputStreamInterface {
+class PliOuputStream final : public TOutputStreamInterface {
   std::vector<TStyleParam> *m_stream;
 
 public:
@@ -58,7 +58,7 @@ public:
 
 //---------------------------------------------------------------------------
 
-class PliInputStream : public TInputStreamInterface {
+class PliInputStream final : public TInputStreamInterface {
   std::vector<TStyleParam> *m_stream;
   VersionNumber m_version;
   int m_count;
@@ -240,7 +240,7 @@ pli->m_idWrittenColorsArray[0]=true;
 /*
 Classe locale per la scrittura di un frame del livello.
 */
-class TImageWriterPli : public TImageWriter {
+class TImageWriterPli final : public TImageWriter {
 public:
   TImageWriterPli(const TFilePath &, const TFrameId &frameId,
                   TLevelWriterPli *);

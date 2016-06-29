@@ -59,7 +59,7 @@ std::set<std::string> *toolNames = 0;
 
 // Local classes
 
-struct DummyTool : public TTool {
+struct DummyTool final : public TTool {
   ToolType getToolType() const override {
     return TTool::LevelReadTool;
   }  // Test level type

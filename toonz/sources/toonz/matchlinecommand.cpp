@@ -100,7 +100,7 @@ MergeCmappedDialog::MergeCmappedDialog(TFilePath &levelPath)
 //    MergeColumns  command
 //*****************************************************************************
 
-class MergeColumnsCommand : public MenuItemHandler {
+class MergeColumnsCommand final : public MenuItemHandler {
 public:
   MergeColumnsCommand() : MenuItemHandler(MI_MergeColumns) {}
 
@@ -135,7 +135,7 @@ public:
 //    ApplyMatchlines  command
 //*****************************************************************************
 
-class ApplyMatchlinesCommand : public MenuItemHandler {
+class ApplyMatchlinesCommand final : public MenuItemHandler {
 public:
   ApplyMatchlinesCommand() : MenuItemHandler(MI_ApplyMatchLines) {}
 
@@ -220,7 +220,7 @@ void doCloneLevelNoSave(const TCellSelection::Range &range,
 namespace {
 //-----------------------------------------------------------------------------
 
-class CloneLevelNoSaveUndo : public TUndo {
+class CloneLevelNoSaveUndo final : public TUndo {
   std::map<TXshSimpleLevel *, TXshLevelP> m_createdLevels;
   std::set<int> m_insertedColumnIndices;
 
@@ -413,7 +413,7 @@ void cloneColumn(const TCellSelection::Range &cells,
 
 }  // namespace
 
-class MergeCmappedCommand : public MenuItemHandler {
+class MergeCmappedCommand final : public MenuItemHandler {
 public:
   MergeCmappedCommand() : MenuItemHandler(MI_MergeCmapped) {}
   void execute() override {
@@ -582,7 +582,7 @@ void doDeleteCommand(bool isMatchline) {
 
 //-----------------------------------------------------------------------------
 
-class DeleteInkCommand : public MenuItemHandler {
+class DeleteInkCommand final : public MenuItemHandler {
 public:
   DeleteInkCommand() : MenuItemHandler(MI_DeleteInk) {}
   void execute() override { doDeleteCommand(false); }
@@ -591,7 +591,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DeleteMatchlinesCommand : public MenuItemHandler {
+class DeleteMatchlinesCommand final : public MenuItemHandler {
 public:
   DeleteMatchlinesCommand() : MenuItemHandler(MI_DeleteMatchLines) {}
   void execute() override { doDeleteCommand(true); }

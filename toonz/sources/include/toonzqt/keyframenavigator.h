@@ -95,7 +95,7 @@ protected:
 // ViewerKeyframeNavigator
 //-----------------------------------------------------------------------------
 
-class DVAPI ViewerKeyframeNavigator : public KeyframeNavigator {
+class DVAPI ViewerKeyframeNavigator final : public KeyframeNavigator {
   Q_OBJECT
 
   TObjectHandle *m_objectHandle;
@@ -141,7 +141,7 @@ protected:
 // PaletteKeyframeNavigator
 //-----------------------------------------------------------------------------
 
-class DVAPI PaletteKeyframeNavigator : public KeyframeNavigator {
+class DVAPI PaletteKeyframeNavigator final : public KeyframeNavigator {
   Q_OBJECT
 
   TPaletteHandle *m_paletteHandle;
@@ -192,7 +192,7 @@ protected:
 // FxKeyframeNavigator
 //-----------------------------------------------------------------------------
 
-class DVAPI FxKeyframeNavigator : public KeyframeNavigator {
+class DVAPI FxKeyframeNavigator final : public KeyframeNavigator {
   Q_OBJECT
 
   TFxHandle *m_fxHandle;

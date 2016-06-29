@@ -81,7 +81,7 @@ double computeThickness(int pressure, const TDoublePairProperty &property,
 
 //----------------------------------------------------------------------------------
 
-class FullColorBrushUndo : public ToolUtils::TFullColorRasterUndo {
+class FullColorBrushUndo final : public ToolUtils::TFullColorRasterUndo {
   TPoint m_offset;
   QString m_id;
 

@@ -36,7 +36,7 @@ class QFileSystemWatcher;
 //    DvDirTreeView  declaration
 //**********************************************************************************
 
-class DvDirTreeView : public QTreeView, public TSelection {
+class DvDirTreeView final : public QTreeView, public TSelection {
   Q_OBJECT
 
   QColor m_textColor;                // text color (black)
@@ -200,7 +200,7 @@ private:
 //    DvDirTreeViewDelegate  declaration
 //**********************************************************************************
 
-class DvDirTreeViewDelegate : public QItemDelegate {
+class DvDirTreeViewDelegate final : public QItemDelegate {
   Q_OBJECT
 
 public:
@@ -237,7 +237,7 @@ private slots:
 //    NodeEditor  declaration
 //**********************************************************************************
 
-class NodeEditor : public QWidget {
+class NodeEditor final : public QWidget {
   Q_OBJECT
 
 public:

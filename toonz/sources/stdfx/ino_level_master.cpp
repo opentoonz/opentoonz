@@ -5,7 +5,7 @@
 
 #include "ino_common.h"
 //------------------------------------------------------------
-class ino_level_master : public TStandardRasterFx {
+class ino_level_master final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_level_master)
   TRasterFxPort m_input;
   TRasterFxPort m_refer;

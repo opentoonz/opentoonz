@@ -58,7 +58,7 @@ public:
 
 //============================================================
 
-class RasterAutocloseUndo : public TRasterUndo {
+class RasterAutocloseUndo final : public TRasterUndo {
   AutocloseParameters m_params;
   std::vector<TAutocloser::Segment> m_segments;
 
@@ -100,7 +100,7 @@ public:
 
 //============================================================
 
-class RasterTapeTool : public TTool {
+class RasterTapeTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(RasterTapeTool)
 
   bool m_selecting;

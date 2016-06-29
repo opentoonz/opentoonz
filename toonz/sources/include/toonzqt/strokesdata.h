@@ -26,7 +26,7 @@ class FullColorImageData;
 // StrokesData
 //-----------------------------------------------------------------------------
 
-class DVAPI StrokesData : public DvMimeData {
+class DVAPI StrokesData final : public DvMimeData {
 public:
   TVectorImageP m_image;
 

@@ -22,7 +22,7 @@
 
 //===================================================================
 
-class CalligraphicFx : public TStandardRasterFx {
+class CalligraphicFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(CalligraphicFx)
   TRasterFxPort m_input;
   TStringParamP m_colorIndex;
@@ -189,7 +189,7 @@ private:
 //------------------------------------------------------------------
 
 //===================================================================
-class OutBorderFx : public TStandardRasterFx {
+class OutBorderFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(OutBorderFx)
   TRasterFxPort m_input;
   TDoubleParamP m_thickness;

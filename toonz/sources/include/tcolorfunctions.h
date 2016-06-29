@@ -45,7 +45,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI TGenericColorFunction : public TColorFunction {
+class DVAPI TGenericColorFunction final : public TColorFunction {
   double m_m[4], m_c[4];
 
 public:
@@ -61,7 +61,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI TColorFader : public TColorFunction {
+class DVAPI TColorFader final : public TColorFunction {
   TPixel32 m_color;
   double m_fade;
 
@@ -80,7 +80,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI TOnionFader : public TColorFunction {
+class DVAPI TOnionFader final : public TColorFunction {
   TPixel32 m_color;
   double m_fade;
 
@@ -97,7 +97,7 @@ public:
   bool getParameters(Parameters &p) const override;
 };
 
-class DVAPI TTranspFader : public TColorFunction {
+class DVAPI TTranspFader final : public TColorFunction {
   double m_transp;
 
 public:

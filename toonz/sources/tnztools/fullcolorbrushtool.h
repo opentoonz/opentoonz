@@ -20,7 +20,7 @@ class FullColorBrushToolNotifier;
 //    FullColor Brush Tool declaration
 //************************************************************************
 
-class FullColorBrushTool : public TTool {
+class FullColorBrushTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(FullColorBrushTool)
 
 public:
@@ -103,7 +103,7 @@ protected:
 
 //------------------------------------------------------------
 
-class FullColorBrushToolNotifier : public QObject {
+class FullColorBrushToolNotifier final : public QObject {
   Q_OBJECT
 
   FullColorBrushTool *m_tool;

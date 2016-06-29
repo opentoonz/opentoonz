@@ -7,7 +7,7 @@
 
 class TUSBScannerIOPD;
 
-class TUSBScannerIO : public TScannerIO {
+class TUSBScannerIO final : public TScannerIO {
   TUSBScannerIOPD *m_data;
 
 public:
