@@ -1431,236 +1431,238 @@ int get_image_rotation_and_center(const TRasterP &img, int strip_width,
   }
   for (i = 0; i < ref_dot; i++) {
     if (ref[i].area > max_area) {
-      max_area = ref[i].area;
-    }
-    if (ref[i].area < min_area) {
-      min_area = ref[i].area;
-    }
-  }
-
-  ndot = find_dots(img, strip_width, pegs_side, dotarray, MAX_DOT, max_area);
-  if (Debug_flag) printf(">>>> %d dots found\n", ndot);
-
-  i = 0;
-  while (i < ndot)  // elimino i dots troppo piccoli
-  {
-    if (dotarray[i].area < min_area * PERCENT) {
-      for (int j = i; j < ndot - 1; j++) dotarray[j] = dotarray[j + 1];
-      ndot--;
-    } else
-      i++;
-  }
-
-  /* controllo il pattern delle perforazioni  */
-  if (ndot <= 1) {
-    return FALSE;
-  }
-
-  int indexArray[3] = {0, 1, 2};
-  found             = compare_dots(dotarray, ndot, ref, ref_dot, indexArray[0],
-                       indexArray[1], indexArray[2]);
-
-  if (Debug_flag)
-    for (i = 0; i < ndot; i++) {
-      printf("**** Dot[%d]\n", i);
-      stampa_dot(dotarray + i);
+      { max_area = ref[i].area; }
+      if (ref[i].area < min_area) {
+        min_area = ref[i].area;
+      }
     }
 
-  if (!found) return FALSE;
+    ndot = find_dots(img, strip_width, pegs_side, dotarray, MAX_DOT, max_area);
+    if (Debug_flag) printf(">>>> %d dots found\n", ndot);
 
-  angle = 0;
-  for (i = 0; i < 2; i++) {
-    dx = dotarray[indexArray[i + 1]].x - dotarray[indexArray[i]].x;
-    dy = dotarray[indexArray[i + 1]].y - dotarray[indexArray[i]].y;
-    switch (pegs_side) {
-    case PEGS_LEFT:
-    case PEGS_RIGHT:
-      angle += dy == 0.0 ? M_PI_2 : atan(dx / dy);
-      break;
-    default:
-      angle -= dx == 0.0 ? M_PI_2 : atan(dy / dx);
-      break;
+    i = 0;
+    while (i < ndot)  // elimino i dots troppo piccoli
+    {
+      if (dotarray[i].area < min_area * PERCENT) {
+        for (int j = i; j < ndot - 1; j++) dotarray[j] = dotarray[j + 1];
+        ndot--;
+      } else
+        i++;
     }
+
+    /* controllo il pattern delle perforazioni  */
+    if (ndot <= 1) {
+      return FALSE;
+    }
+
+    int indexArray[3] = {0, 1, 2};
+    found = compare_dots(dotarray, ndot, ref, ref_dot, indexArray[0],
+                         indexArray[1], indexArray[2]);
+
+    if (Debug_flag)
+      for (i = 0; i < ndot; i++) {
+        printf("**** Dot[%d]\n", i);
+        stampa_dot(dotarray + i);
+      }
+
+    if (!found) return FALSE;
+
+    angle = 0;
+    for (i = 0; i < 2; i++) {
+      dx = dotarray[indexArray[i + 1]].x - dotarray[indexArray[i]].x;
+      dy = dotarray[indexArray[i + 1]].y - dotarray[indexArray[i]].y;
+      switch (pegs_side) {
+      case PEGS_LEFT:
+      case PEGS_RIGHT:
+        angle += dy == 0.0 ? M_PI_2 : atan(dx / dy);
+        break;
+      default:
+        angle -= dx == 0.0 ? M_PI_2 : atan(dy / dx);
+        break;
+      }
+    }
+
+    *p_ang = angle / 2;
+
+    // Now calculate the center, we have to get the offset of the center for the
+    // dot at point indexArray[1]
+    // from the reference and then use the angle to calculate the offsets for
+    // the
+    // center.
+    //
+    // It is assumed, that the holes are all on one line.
+    float pegWidth =
+        sqrt((ref[ref_dot - 1].x - ref[0].x) * (ref[ref_dot - 1].x - ref[0].x) +
+             (ref[ref_dot - 1].y - ref[0].y) * (ref[ref_dot - 1].y - ref[0].y));
+    float refPegOffset = sqrt(
+        (ref[indexArray[1]].x - ref[0].x) * (ref[indexArray[1]].x - ref[0].x) +
+        (ref[indexArray[1]].y - ref[0].y) * (ref[indexArray[1]].y - ref[0].y));
+    *cx = dotarray[indexArray[1]].x +
+          cos(*p_ang) * (pegWidth / 2.0f - refPegOffset);
+    *cy = dotarray[indexArray[1]].y +
+          sin(*p_ang) * (pegWidth / 2.0f - refPegOffset);
+
+    if (Debug_flag) {
+      printf("\nang: %g\ncx : %g\ncy : %g\n\n", *p_ang, *cx, *cy);
+    }
+
+    return TRUE;
   }
-
-  *p_ang = angle / 2;
-
-  // Now calculate the center, we have to get the offset of the center for the
-  // dot at point indexArray[1]
-  // from the reference and then use the angle to calculate the offsets for the
-  // center.
-  //
-  // It is assumed, that the holes are all on one line.
-  float pegWidth =
-      sqrt((ref[ref_dot - 1].x - ref[0].x) * (ref[ref_dot - 1].x - ref[0].x) +
-           (ref[ref_dot - 1].y - ref[0].y) * (ref[ref_dot - 1].y - ref[0].y));
-  float refPegOffset = sqrt(
-      (ref[indexArray[1]].x - ref[0].x) * (ref[indexArray[1]].x - ref[0].x) +
-      (ref[indexArray[1]].y - ref[0].y) * (ref[indexArray[1]].y - ref[0].y));
-  *cx = dotarray[indexArray[1]].x +
-        cos(*p_ang) * (pegWidth / 2.0f - refPegOffset);
-  *cy = dotarray[indexArray[1]].y +
-        sin(*p_ang) * (pegWidth / 2.0f - refPegOffset);
-
-  if (Debug_flag) {
-    printf("\nang: %g\ncx : %g\ncy : %g\n\n", *p_ang, *cx, *cy);
-  }
-
-  return TRUE;
-}
 
 /*---------------------------------------------------------------------------*/
 #define MIN_V 100.0
 
-static int compare_dots(DOT const dots[], int ndots, DOT reference[],
-                        int ref_dot, int &i_ok, int &j_ok, int &k_ok) {
-  int found;
-  int toll;
-  float tolld;
-  int i, j, k;
-  bool *dot_ok   = 0;
-  float *ref_dis = 0, dx, dy;
-  float vmin, v, dist_i_j, dist_i_k, dist_j_k, del1, del2;
-  float ref_dis_0_1, ref_dis_1_2;
+  static int compare_dots(DOT const dots[], int ndots, DOT reference[],
+                          int ref_dot, int &i_ok, int &j_ok, int &k_ok) {
+    int found;
+    int toll;
+    float tolld;
+    int i, j, k;
+    bool *dot_ok   = 0;
+    float *ref_dis = 0, dx, dy;
+    float vmin, v, dist_i_j, dist_i_k, dist_j_k, del1, del2;
+    float ref_dis_0_1, ref_dis_1_2;
 
-  i_ok = 0;
-  j_ok = 0;
-  k_ok = 0;
+    i_ok = 0;
+    j_ok = 0;
+    k_ok = 0;
 
-  /* questa funz e' indipendente da posizione e orientamento dei dots */
+    /* questa funz e' indipendente da posizione e orientamento dei dots */
 
-  if (ndots < 1 || ref_dot < 1) {
-    goto error;
-  }
-
-  /* controllo quanti dots sono realmente buoni per il confronto */
-  dot_ok = (bool *)calloc(ndots, sizeof(bool));
-  found  = 0;
-
-  for (i = 0; i < ndots; i++) {
-    dot_ok[i] = false;
-    for (j = 0; j < ref_dot; j++) {
-      toll = (int)((float)reference[j].area * PERCENT);
-      if (abs(dots[i].area - reference[j].area) < toll) {
-        dot_ok[i] = true;
-        found++;
-        break;
-      }
+    if (ndots < 1 || ref_dot < 1) {
+      goto error;
     }
-  }
 
-  if (!found) {
-    goto error;
-  }
+    /* controllo quanti dots sono realmente buoni per il confronto */
+    dot_ok = (bool *)calloc(ndots, sizeof(bool));
+    found  = 0;
 
-  ref_dis = (float *)calloc(ref_dot, sizeof(float));
-
-  /* calcolo le distanze di riferimento e la tolleranza stessa */
-
-  tolld                              = (float)reference[0].lx;
-  if (tolld < reference[0].ly) tolld = (float)reference[0].ly;
-  for (i = 1; i < ref_dot; i++) {
-    dx                                 = reference[0].x - reference[i].x;
-    dy                                 = reference[0].y - reference[i].y;
-    ref_dis[i - 1]                     = sqrtf((dx * dx) + (dy * dy));
-    if (tolld < reference[i].lx) tolld = (float)reference[i].lx;
-    if (tolld < reference[i].ly) tolld = (float)reference[i].ly;
-  }
-
-  // I suspect that the following expects symmetry in the holes layout...
-  // Besides, if the layout is not symmetric, the peg is supposed to be rotated
-  // OR translated
-  // switching from, say, top to bottom? (Daniele)
-
-  i_ok = -1;
-  v = vmin = 10000000.0;
-  for (i = 0; i < ndots - 2; i++) {
-    if (!dot_ok[i]) continue;
-
-    for (j = i + 1; j < ndots - 1; j++) {
-      if (!dot_ok[j]) continue;
-      for (k = j + 1; k < ndots; k++) {
-        if (!dot_ok[k]) continue;
-
-        // Build square discrepancies from the reference relative hole distances
-        dx       = dots[i].x - dots[j].x;
-        dy       = dots[i].y - dots[j].y;
-        dist_i_j = sqrtf((dx * dx) + (dy * dy));
-        dx       = dots[i].x - dots[k].x;
-        dy       = dots[i].y - dots[k].y;
-        dist_i_k = sqrtf((dx * dx) + (dy * dy));
-        del1     = (dist_i_j - ref_dis[0]);
-        del2     = (dist_i_k - ref_dis[1]);
-        v        = ((del1 * del1) + (del2 * del2));
-
-        // Furthermore, add discrepancies from the reference hole areas
-        v += abs(dots[i].area -
-                 reference[0].area);  // fabs since areas are already squared
-        v += abs(dots[j].area - reference[1].area);
-        v += abs(dots[k].area - reference[2].area);
-
-        if (v < vmin) {
-          i_ok = i;
-          j_ok = j;
-          k_ok = k;
-          vmin = v;
+    for (i = 0; i < ndots; i++) {
+      dot_ok[i] = false;
+      for (j = 0; j < ref_dot; j++) {
+        toll = (int)((float)reference[j].area * PERCENT);
+        if (abs(dots[i].area - reference[j].area) < toll) {
+          dot_ok[i] = true;
+          found++;
+          break;
         }
       }
     }
-  }
 
-  if (Debug_flag) {
-    printf("Ho trovato v = %f su %f per %d %d %d \n", v, vmin, i_ok, j_ok,
-           k_ok);
-    printf("----  Dot <%d>  ----\n", i_ok);
-    stampa_dot(dots + i_ok);
-    printf("----  Dot <%d>  ----\n", j_ok);
-    stampa_dot(dots + j_ok);
-    printf("----  Dot <%d>  ----\n", k_ok);
-    stampa_dot(dots + k_ok);
-  }
-
-  if (i_ok < 0)
-    goto error;
-  else {
-    dx       = dots[i_ok].x - dots[j_ok].x;
-    dy       = dots[i_ok].y - dots[j_ok].y;
-    dist_i_j = sqrtf((dx * dx) + (dy * dy));
-
-    dx       = dots[k_ok].x - dots[j_ok].x;
-    dy       = dots[k_ok].y - dots[j_ok].y;
-    dist_j_k = sqrtf((dx * dx) + (dy * dy));
-
-    ref_dis_0_1 = ref_dis[0];
-
-    dx          = reference[1].x - reference[2].x;
-    dy          = reference[1].y - reference[2].y;
-    ref_dis_1_2 = sqrtf((dx * dx) + (dy * dy));
-
-    if (fabsf(dist_i_j - ref_dis_0_1) >= tolld ||
-        fabsf(dist_j_k - ref_dis_1_2) >= tolld) {
-      i_ok = 0;
-      j_ok = 1;
-      k_ok = 2;
+    if (!found) {
+      goto error;
     }
+
+    ref_dis = (float *)calloc(ref_dot, sizeof(float));
+
+    /* calcolo le distanze di riferimento e la tolleranza stessa */
+
+    tolld                              = (float)reference[0].lx;
+    if (tolld < reference[0].ly) tolld = (float)reference[0].ly;
+    for (i = 1; i < ref_dot; i++) {
+      dx                                 = reference[0].x - reference[i].x;
+      dy                                 = reference[0].y - reference[i].y;
+      ref_dis[i - 1]                     = sqrtf((dx * dx) + (dy * dy));
+      if (tolld < reference[i].lx) tolld = (float)reference[i].lx;
+      if (tolld < reference[i].ly) tolld = (float)reference[i].ly;
+    }
+
+    // I suspect that the following expects symmetry in the holes layout...
+    // Besides, if the layout is not symmetric, the peg is supposed to be
+    // rotated
+    // OR translated
+    // switching from, say, top to bottom? (Daniele)
+
+    i_ok = -1;
+    v = vmin = 10000000.0;
+    for (i = 0; i < ndots - 2; i++) {
+      if (!dot_ok[i]) continue;
+
+      for (j = i + 1; j < ndots - 1; j++) {
+        if (!dot_ok[j]) continue;
+        for (k = j + 1; k < ndots; k++) {
+          if (!dot_ok[k]) continue;
+
+          // Build square discrepancies from the reference relative hole
+          // distances
+          dx       = dots[i].x - dots[j].x;
+          dy       = dots[i].y - dots[j].y;
+          dist_i_j = sqrtf((dx * dx) + (dy * dy));
+          dx       = dots[i].x - dots[k].x;
+          dy       = dots[i].y - dots[k].y;
+          dist_i_k = sqrtf((dx * dx) + (dy * dy));
+          del1     = (dist_i_j - ref_dis[0]);
+          del2     = (dist_i_k - ref_dis[1]);
+          v        = ((del1 * del1) + (del2 * del2));
+
+          // Furthermore, add discrepancies from the reference hole areas
+          v += abs(dots[i].area -
+                   reference[0].area);  // fabs since areas are already squared
+          v += abs(dots[j].area - reference[1].area);
+          v += abs(dots[k].area - reference[2].area);
+
+          if (v < vmin) {
+            i_ok = i;
+            j_ok = j;
+            k_ok = k;
+            vmin = v;
+          }
+        }
+      }
+    }
+
+    if (Debug_flag) {
+      printf("Ho trovato v = %f su %f per %d %d %d \n", v, vmin, i_ok, j_ok,
+             k_ok);
+      printf("----  Dot <%d>  ----\n", i_ok);
+      stampa_dot(dots + i_ok);
+      printf("----  Dot <%d>  ----\n", j_ok);
+      stampa_dot(dots + j_ok);
+      printf("----  Dot <%d>  ----\n", k_ok);
+      stampa_dot(dots + k_ok);
+    }
+
+    if (i_ok < 0)
+      goto error;
+    else {
+      dx       = dots[i_ok].x - dots[j_ok].x;
+      dy       = dots[i_ok].y - dots[j_ok].y;
+      dist_i_j = sqrtf((dx * dx) + (dy * dy));
+
+      dx       = dots[k_ok].x - dots[j_ok].x;
+      dy       = dots[k_ok].y - dots[j_ok].y;
+      dist_j_k = sqrtf((dx * dx) + (dy * dy));
+
+      ref_dis_0_1 = ref_dis[0];
+
+      dx          = reference[1].x - reference[2].x;
+      dy          = reference[1].y - reference[2].y;
+      ref_dis_1_2 = sqrtf((dx * dx) + (dy * dy));
+
+      if (fabsf(dist_i_j - ref_dis_0_1) >= tolld ||
+          fabsf(dist_j_k - ref_dis_1_2) >= tolld) {
+        i_ok = 0;
+        j_ok = 1;
+        k_ok = 2;
+      }
+    }
+
+    if (ref_dis) free(ref_dis);
+    if (dot_ok) free(dot_ok);
+
+    return TRUE;
+
+  error:
+    if (ref_dis) free(ref_dis);
+    if (dot_ok) free(dot_ok);
+    return FALSE;
   }
+  /*---------------------------------------------------------------------------*/
 
-  if (ref_dis) free(ref_dis);
-  if (dot_ok) free(dot_ok);
-
-  return TRUE;
-
-error:
-  if (ref_dis) free(ref_dis);
-  if (dot_ok) free(dot_ok);
-  return FALSE;
-}
-/*---------------------------------------------------------------------------*/
-
-static void stampa_dot(DOT const *dot) {
-  printf("Dimensioni: %d,\t%d\n", dot->lx, dot->ly);
-  printf("Start     : %d,\t%d\n", dot->x1, dot->y1);
-  printf("End       : %d,\t%d\n", dot->x2, dot->y2);
-  printf("Baricentro: %5.3f,\t%5.3f\n", dot->x, dot->y);
-  printf("Area      : %d\n", dot->area);
-}
+  static void stampa_dot(DOT const *dot) {
+    printf("Dimensioni: %d,\t%d\n", dot->lx, dot->ly);
+    printf("Start     : %d,\t%d\n", dot->x1, dot->y1);
+    printf("End       : %d,\t%d\n", dot->x2, dot->y2);
+    printf("Baricentro: %5.3f,\t%5.3f\n", dot->x, dot->y);
+    printf("Area      : %d\n", dot->area);
+  }

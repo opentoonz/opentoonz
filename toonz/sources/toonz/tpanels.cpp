@@ -1251,6 +1251,7 @@ public:
   }
 
 } cleanupSettingsFactory;
+#endif
 
 //=============================================================================
 OpenFloatingPanel openCleanupSettingsDockCommand(

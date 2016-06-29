@@ -682,8 +682,7 @@ Region *DockLayout::dockItem(DockWidget *item, Region *r, int idx) {
 // which may slow down a bit - should be done only after a redistribute() and a
 // repaint() on
 // real-time docking.
-Region *DockLayout::dockItemPrivate(DockWidget *item, Region *r,
-                                           int idx) {
+Region *DockLayout::dockItemPrivate(DockWidget *item, Region *r, int idx) {
   // hide minimize button in FlipboolPanel
   item->onDock(true);
 
@@ -864,10 +863,8 @@ bool DockLayout::undockItem(DockWidget *item) {
 //! Search for the \b nearest n-ple from a \b target one, under conditions:
 //!\b 1) nearest elements belong to \b fixed \b intervals; \b 2) their \b sum is
 //!\b fixed too.
-void calculateNearest(std::vector<double> target,
-                      std::vector<double> &nearest,
-                      std::vector<std::pair<int, int>> intervals,
-                      double sum) {
+void calculateNearest(std::vector<double> target, std::vector<double> &nearest,
+                      std::vector<std::pair<int, int>> intervals, double sum) {
   // Solving a small Lagrange multipliers problem to find solution on constraint
   // (2)
   assert(target.size() == intervals.size());
@@ -1208,8 +1205,7 @@ bool Region::subItemSize(DockWidget *item) {
 
 //! Checks insertion validity of \b item inside \b parentRegion at position \b
 //! insertionIdx.
-bool DockLayout::isPossibleInsertion(DockWidget *item,
-                                     Region *parentRegion,
+bool DockLayout::isPossibleInsertion(DockWidget *item, Region *parentRegion,
                                      int insertionIdx) {
   const int inf = 1000000;
 
@@ -1266,8 +1262,7 @@ bool DockLayout::isPossibleInsertion(DockWidget *item,
 
 //! Checks insertion validity of \b item inside \b parentRegion at position \b
 //! insertionIdx.
-bool DockLayout::isPossibleRemoval(DockWidget *item,
-                                   Region *parentRegion,
+bool DockLayout::isPossibleRemoval(DockWidget *item, Region *parentRegion,
                                    int removalIdx) {
   // NOTE: parentRegion is necessarily !=0 or there's no need to check anything
   if (!parentRegion) return true;
@@ -1597,9 +1592,8 @@ DockSeparator *DockDecoAllocator::newSeparator(DockLayout *owner,
 
 //! When inheriting a DockLayout class, new custom placeholders gets allocated
 //! by this method.
-DockPlaceholder *DockDecoAllocator::newPlaceholder(DockWidget *owner,
-                                                   Region *r, int idx,
-                                                   int attributes) {
+DockPlaceholder *DockDecoAllocator::newPlaceholder(DockWidget *owner, Region *r,
+                                                   int idx, int attributes) {
   return new DockPlaceholder(owner, r, idx, attributes);
 }
 
@@ -1608,9 +1602,8 @@ DockPlaceholder *DockDecoAllocator::newPlaceholder(DockWidget *owner,
 // BuildGeometry() method should not be called inside the base contructor -
 // because it's a virtual method.
 // So we provide this little inline...
-DockPlaceholder *DockDecoAllocator::newPlaceBuilt(DockWidget *owner,
-                                                  Region *r, int idx,
-                                                  int attributes) {
+DockPlaceholder *DockDecoAllocator::newPlaceBuilt(DockWidget *owner, Region *r,
+                                                  int idx, int attributes) {
   DockPlaceholder *res = newPlaceholder(owner, r, idx, attributes);
   res->buildGeometry();
   return res;

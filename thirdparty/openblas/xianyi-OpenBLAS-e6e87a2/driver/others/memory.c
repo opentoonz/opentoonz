@@ -109,8 +109,8 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if defined(OS_WINDOWS) && (defined(__MINGW32__) || defined(__MINGW64__))
 #include <conio.h>
-#undef  printf
-#define printf	_cprintf
+//#undef  printf
+//#define printf	_cprintf
 #endif
 
 #ifdef OS_LINUX

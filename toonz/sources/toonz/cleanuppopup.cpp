@@ -676,7 +676,9 @@ bool CleanupPopup::analyzeCleanupList() {
 
         clt->m_frames.erase(
             std::remove_if(clt->m_frames.begin(), clt->m_frames.end(),
-                           boost::bind(&TLevel::Table::count, table, _1)),
+                           [table](TLevel::Table::key_type const &key) {
+                             return table->count(key);
+                           }),
             clt->m_frames.end());
       }
     }
