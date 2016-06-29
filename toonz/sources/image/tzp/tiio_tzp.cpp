@@ -7,7 +7,7 @@
 #include "texception.h"
 
 #include "tiffio.h"
-#if defined(WIN32) || defined(MACOSX)
+#if defined(_WIN32) || defined(MACOSX)
 #include "tiffiop.h"
 #endif
 #ifdef LINUX
