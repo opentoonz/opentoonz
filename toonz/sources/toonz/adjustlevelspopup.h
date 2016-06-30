@@ -24,7 +24,7 @@ class QPushButton;
 //    EditableMarksBar  declaration
 //**************************************************************
 
-class EditableMarksBar : public QFrame {
+class EditableMarksBar final : public QFrame {
   Q_OBJECT
 
   MarksBar *m_marksBar;
@@ -59,7 +59,7 @@ public slots:
 //    Adjust-Levels Popup  declaration
 //**************************************************************
 
-class AdjustLevelsPopup : public DVGui::Dialog {
+class AdjustLevelsPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   Histogram *m_histogram;

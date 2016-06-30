@@ -13,7 +13,7 @@
 //    TImageWriterMesh  definition
 //********************************************************************************
 
-class TImageWriterMesh : public TImageWriter {
+class TImageWriterMesh final : public TImageWriter {
   TFrameId m_fid;  //!< The frame id
 
 public:
@@ -76,7 +76,7 @@ void TImageWriterMesh::save(const TImageP &img) {
 //    TImageReaderMesh  definition
 //********************************************************************************
 
-class TImageReaderMesh : public TImageReader {
+class TImageReaderMesh final : public TImageReader {
   TFrameId m_fid;             //<! Current frame id
   mutable TImageInfo m_info;  //!< The image's infos
 

@@ -83,7 +83,7 @@ private:
 //
 //=====================================================
 
-class DVAPI FxSchematicGroupEditor : public SchematicWindowEditor {
+class DVAPI FxSchematicGroupEditor final : public SchematicWindowEditor {
   Q_OBJECT
 
   int m_groupId;
@@ -111,7 +111,7 @@ private:
 //
 //=====================================================
 
-class DVAPI FxSchematicMacroEditor : public SchematicWindowEditor {
+class DVAPI FxSchematicMacroEditor final : public SchematicWindowEditor {
   Q_OBJECT
 
   TMacroFx *m_macro;
@@ -143,7 +143,7 @@ private:
 //
 //=====================================================
 
-class DVAPI StageSchematicGroupEditor : public SchematicWindowEditor {
+class DVAPI StageSchematicGroupEditor final : public SchematicWindowEditor {
   Q_OBJECT
 
   int m_groupId;

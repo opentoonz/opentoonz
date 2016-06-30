@@ -14,7 +14,7 @@ class QLineEdit;
 // AddFilmstripFramesPopup
 //-----------------------------------------------------------------------------
 
-class AddFilmstripFramesPopup : public DVGui::Dialog {
+class AddFilmstripFramesPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   QPushButton *m_okBtn;

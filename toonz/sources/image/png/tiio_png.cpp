@@ -45,7 +45,7 @@ TNZ_LITTLE_ENDIAN undefined !!
 
 //=========================================================
 
-class PngReader : public Tiio::Reader {
+class PngReader final : public Tiio::Reader {
   FILE *m_chan;
   png_structp m_png_ptr;
   png_infop m_info_ptr, m_end_info_ptr;
@@ -707,7 +707,7 @@ Tiio::PngWriterProperties::PngWriterProperties()
 
 //=========================================================
 
-class PngWriter : public Tiio::Writer {
+class PngWriter final : public Tiio::Writer {
   png_structp m_png_ptr;
   png_infop m_info_ptr;
   FILE *m_chan;

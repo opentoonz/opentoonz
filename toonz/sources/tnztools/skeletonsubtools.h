@@ -35,7 +35,7 @@ public:
 
 //---------------------------------------------------------
 
-class DragCenterTool : public DragTool {
+class DragCenterTool final : public DragTool {
   TStageObjectId m_objId;
   int m_frame;
 
@@ -84,7 +84,7 @@ public:
 
 //---------------------------------------------------------
 
-class DragPositionTool : public DragChannelTool {
+class DragPositionTool final : public DragChannelTool {
   TPointD m_firstPos;
 
 public:
@@ -96,7 +96,7 @@ public:
 
 //---------------------------------------------------------
 
-class DragRotationTool : public DragChannelTool {
+class DragRotationTool final : public DragChannelTool {
   TPointD m_lastPos;
   TPointD m_center;
   bool m_snapped;
@@ -110,7 +110,7 @@ public:
 
 //---------------------------------------------------------
 
-class ParentChangeTool : public DragTool {
+class ParentChangeTool final : public DragTool {
   TTool::Viewer *m_viewer;
   TPoint m_firstWinPos;
   TPointD m_lastPos, m_lastPos2;
@@ -154,7 +154,7 @@ public:
 
 class IKToolUndo;
 
-class IKTool : public DragTool {
+class IKTool final : public DragTool {
   TTool::Viewer *m_viewer;
   TPointD m_pos;
   Skeleton *m_skeleton;
@@ -209,7 +209,7 @@ public:
 
 //---------------------------------------------------------
 
-class ChangeDrawingTool : public DragTool {
+class ChangeDrawingTool final : public DragTool {
   int m_oldY;
   int m_dir;
   TUndo *m_undo;
@@ -226,7 +226,7 @@ public:
 
 //---------------------------------------------------------
 
-class CommandHandler : public QObject {
+class CommandHandler final : public QObject {
   Q_OBJECT
   Skeleton *m_skeleton;
   std::set<int> *m_tempPinnedSet;

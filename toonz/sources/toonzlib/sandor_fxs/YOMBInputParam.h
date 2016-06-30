@@ -18,7 +18,7 @@ typedef struct color_index_list {
   unsigned short ci[MAXNBCIL];
 } COLOR_INDEX_LIST;
 
-class CYOMBInputParam : public CInputParam {
+class CYOMBInputParam final : public CInputParam {
 public:
   bool m_isRandomSampling;
   bool m_isShowSelection;

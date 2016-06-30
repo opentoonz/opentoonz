@@ -11,7 +11,7 @@
 //    CacheFxCommand
 //-----------------------------------------------------------------------------
 
-class CacheFxCommand : public QObject {
+class CacheFxCommand final : public QObject {
   Q_OBJECT
 
 public:

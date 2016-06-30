@@ -142,7 +142,7 @@ inline void adaptView(FlipBook *flipbook, TDimension cameraSize) {
 //! This class receives and handles notifications from a TRenderer executing the
 //! preview fx
 //! rendering job.
-class PreviewFxRenderPort : public QObject, public TRenderPort {
+class PreviewFxRenderPort final : public QObject, public TRenderPort {
   PreviewFxInstance *m_owner;
 
 public:

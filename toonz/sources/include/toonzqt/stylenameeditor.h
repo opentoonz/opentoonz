@@ -9,7 +9,7 @@ class QLineEdit;
 class QPushButton;
 class TPaletteHandle;
 
-class StyleNameEditor : public QDialog  // singleton
+class StyleNameEditor final : public QDialog  // singleton
 {
   Q_OBJECT
 

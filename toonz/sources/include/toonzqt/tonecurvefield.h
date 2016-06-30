@@ -35,7 +35,7 @@ class CheckBox;
 // ChennelCurveEditor
 //-----------------------------------------------------------------------------
 
-class DVAPI ChennelCurveEditor : public QWidget {
+class DVAPI ChennelCurveEditor final : public QWidget {
   Q_OBJECT
 
   HistogramView *m_histogramView;
@@ -119,7 +119,7 @@ signals:
 // ToneCurveField
 //-----------------------------------------------------------------------------
 
-class DVAPI ToneCurveField : public QWidget {
+class DVAPI ToneCurveField final : public QWidget {
   Q_OBJECT
 
   QStackedWidget *m_toneCurveStackedWidget;

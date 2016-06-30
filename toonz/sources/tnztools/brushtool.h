@@ -31,7 +31,7 @@ class BluredBrush;
 //    Brush Data declaration
 //************************************************************************
 
-struct BrushData : public TPersist {
+struct BrushData final : public TPersist {
   PERSIST_DECLARATION(BrushData)
 
   std::wstring m_name;
@@ -104,7 +104,7 @@ private:
 //    Brush Tool declaration
 //************************************************************************
 
-class BrushTool : public TTool {
+class BrushTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(BrushTool)
 
 public:

@@ -23,7 +23,7 @@
 
 class TParamSetImp;
 
-class TParamSetChange : public TParamChange {
+class TParamSetChange final : public TParamChange {
 public:
   std::vector<TParamChange *> m_paramChanges;
 
@@ -137,7 +137,7 @@ template class DVAPI TPersistDeclarationT<TPointParam>;
 class TPointParamImp;
 class TDoubleParamP;
 
-class DVAPI TPointParam : public TParamSet {
+class DVAPI TPointParam final : public TParamSet {
   PERSIST_DECLARATION(TPointParam)
   TPointParamImp *m_data;
   bool m_from_plugin;
@@ -184,7 +184,7 @@ public:
 
 class TPixelParamImp;
 
-class DVAPI TPixelParam : public TParamSet {
+class DVAPI TPixelParam final : public TParamSet {
   PERSIST_DECLARATION(TPixelParam)
   TPixelParamImp *m_data;
 
@@ -242,7 +242,7 @@ template class DVAPI TPersistDeclarationT<TRangeParam>;
 class TRangeParamImp;
 class TDoubleParamP;
 
-class DVAPI TRangeParam : public TParamSet {
+class DVAPI TRangeParam final : public TParamSet {
   PERSIST_DECLARATION(TRangeParam)
   TRangeParamImp *m_data;
 

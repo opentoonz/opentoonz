@@ -181,7 +181,7 @@ namespace TThread {
 
 //! A Worker is a specialized QThread that continuously polls Runnable
 //! tasks from a global execution queue to make them work.
-class Worker : public QThread {
+class Worker final : public QThread {
 public:
   RunnableP m_task;
 
@@ -220,7 +220,7 @@ public:
 //! tasks added through it - by copying the smart pointer to the id into each
 //! added task.
 //! \sa Executor and Runnable class.
-class ExecutorId : public TSmartObject {
+class ExecutorId final : public TSmartObject {
 public:
   size_t m_id;
 

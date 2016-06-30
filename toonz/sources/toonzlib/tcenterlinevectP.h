@@ -430,7 +430,7 @@ public:
 
 //--------------------------------------------------------------------------
 
-class JointSequenceGraph : public Graph<UINT, Sequence> {
+class JointSequenceGraph final : public Graph<UINT, Sequence> {
 public:
   JointSequenceGraph() {}
   ~JointSequenceGraph() {}

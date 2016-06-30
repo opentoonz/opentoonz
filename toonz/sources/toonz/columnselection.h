@@ -11,7 +11,7 @@
 // TColumnSelection
 //-----------------------------------------------------------------------------
 
-class TColumnSelection : public TSelection {
+class TColumnSelection final : public TSelection {
   std::set<int> m_indices;
 
 public:

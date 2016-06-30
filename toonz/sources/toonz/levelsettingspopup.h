@@ -31,7 +31,7 @@ class CheckBox;
 // LevelSettingsPopup
 //-----------------------------------------------------------------------------
 
-class LevelSettingsPopup : public DVGui::Dialog {
+class LevelSettingsPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   TXshSimpleLevelP m_sl;

@@ -47,7 +47,7 @@ namespace {
 //-----------------------------------------------------------------------------
 // Ancora da definire.
 // under construction
-class TrackerRegionSelection : public TSelection {
+class TrackerRegionSelection final : public TSelection {
   TXshLevelP m_level;
   std::set<std::pair<int, int>>
       m_objtp;  // objtp: 1=ObjectId 2=Tracker Region Index
@@ -138,7 +138,7 @@ return TDataP(); */
 //  TrackerTool class declaration
 //-----------------------------------------------------------------------------
 
-class TrackerTool : public TTool {
+class TrackerTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(TrackerTool)
 
   TrackerRegionSelection m_selection;

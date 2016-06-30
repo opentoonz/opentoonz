@@ -62,11 +62,11 @@ public:
   bool eventFilter(QObject *obj, QEvent *event) override;
 };
 
-class XsheetFrameHeadGadget : public FrameHeadGadget {
+class XsheetFrameHeadGadget final : public FrameHeadGadget {
 public:
 };
 
-class FilmstripFrameHeadGadget : public FrameHeadGadget {
+class FilmstripFrameHeadGadget final : public FrameHeadGadget {
   FilmstripFrames *m_filmstrip;
   int m_dy;
 

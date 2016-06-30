@@ -11,7 +11,7 @@
 
 //===================================================================
 
-class ExternalPaletteFx : public TStandardRasterFx {
+class ExternalPaletteFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ExternalPaletteFx)
 
   TRasterFxPort m_input;

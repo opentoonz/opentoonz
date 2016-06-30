@@ -37,7 +37,7 @@ class QFileSystemWatcher;
 //! generator does. Calculated frame counts are also stored for quick lookup
 //! once they
 //! have been calculated the first time.
-class FrameCountReader : public QObject {
+class FrameCountReader final : public QObject {
   Q_OBJECT
 
   TThread::Executor m_executor;
@@ -56,7 +56,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class FileBrowser : public QFrame, public DvItemListModel {
+class FileBrowser final : public QFrame, public DvItemListModel {
   Q_OBJECT
 
 public:
@@ -267,7 +267,7 @@ private:
 };
 
 //--------------------------------------------------------------------
-class RenameAsToonzPopup : public DVGui::Dialog {
+class RenameAsToonzPopup final : public DVGui::Dialog {
   Q_OBJECT
   QPushButton *m_okBtn, *m_cancelBtn;
   DVGui::LineEdit *m_name;

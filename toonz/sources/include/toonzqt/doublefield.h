@@ -163,7 +163,7 @@ signals:
    can set this
                 value using setValue(), setRange() and setDecimals().
 */
-class DVAPI DoubleLineEdit : public DoubleValueLineEdit {
+class DVAPI DoubleLineEdit final : public DoubleValueLineEdit {
   Q_OBJECT
 
   QDoubleValidator *m_validator;
@@ -255,7 +255,7 @@ protected slots:
                 Inherits \b PrimaryDoubleField.
 */
 
-class DVAPI MeasuredDoubleField : public DoubleValueField {
+class DVAPI MeasuredDoubleField final : public DoubleValueField {
   Q_OBJECT
 
 public:

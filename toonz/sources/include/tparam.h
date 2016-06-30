@@ -186,7 +186,7 @@ typedef TSmartPointerT<TParam> TParamP;
 #define DEFINE_PARAM_SMARTPOINTER(PARAM, TYPE)                                 \
   DVAPI_PARAM_SMARTPOINTER(PARAM)                                              \
                                                                                \
-  class DVAPI PARAM##P : public TDerivedSmartPointerT<PARAM, TParam> {         \
+  class DVAPI PARAM##P final : public TDerivedSmartPointerT<PARAM, TParam> {   \
   public:                                                                      \
     PARAM##P(PARAM *p = 0) : DerivedSmartPointer(p) {}                         \
     PARAM##P(TYPE v) : DerivedSmartPointer(new PARAM(v)) {}                    \

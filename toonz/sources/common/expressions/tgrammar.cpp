@@ -110,7 +110,7 @@ void Calculator::setRootNode(CalculatorNode *node) {
 //-------------------------------------------------------------------
 
 template <class Op>
-class Op0Node : public CalculatorNode {
+class Op0Node final : public CalculatorNode {
 public:
   Op0Node(Calculator *calc) : CalculatorNode(calc) {}
 
@@ -123,7 +123,7 @@ public:
 //-------------------------------------------------------------------
 
 template <class Op>
-class Op1Node : public CalculatorNode {
+class Op1Node final : public CalculatorNode {
 protected:
   std::auto_ptr<CalculatorNode> m_a;
 
@@ -141,7 +141,7 @@ public:
 //-------------------------------------------------------------------
 
 template <class Op>
-class Op2Node : public CalculatorNode {
+class Op2Node final : public CalculatorNode {
 protected:
   std::auto_ptr<CalculatorNode> m_a, m_b;
 
@@ -162,7 +162,7 @@ public:
 //-------------------------------------------------------------------
 
 template <class Op>
-class Op3Node : public CalculatorNode {
+class Op3Node final : public CalculatorNode {
 protected:
   std::auto_ptr<CalculatorNode> m_a, m_b, m_c;
 
@@ -183,7 +183,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class ChsNode : public CalculatorNode {
+class ChsNode final : public CalculatorNode {
   std::auto_ptr<CalculatorNode> m_a;
 
 public:
@@ -195,7 +195,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class QuestionNode : public CalculatorNode {
+class QuestionNode final : public CalculatorNode {
   std::auto_ptr<CalculatorNode> m_a, m_b, m_c;
 
 public:
@@ -214,7 +214,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class NotNode : public CalculatorNode {
+class NotNode final : public CalculatorNode {
   std::auto_ptr<CalculatorNode> m_a;
 
 public:
@@ -227,7 +227,7 @@ public:
 };
 //-------------------------------------------------------------------
 
-class CycleNode : public CalculatorNode {
+class CycleNode final : public CalculatorNode {
   std::auto_ptr<CalculatorNode> m_a;
 
 public:
@@ -267,7 +267,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class RandomNode : public CalculatorNode {
+class RandomNode final : public CalculatorNode {
   std::auto_ptr<CalculatorNode> m_seed, m_min, m_max, m_arg;
 
 public:
@@ -322,7 +322,7 @@ CalculatorNode *Pattern::popNode(std::vector<CalculatorNode *> &stack) const {
 
 //===================================================================
 
-class NumberPattern : public Pattern {
+class NumberPattern final : public Pattern {
 public:
   bool matchToken(const std::vector<Token> &previousTokens,
                   const Token &token) const override {
@@ -346,7 +346,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class ConstantPattern : public Pattern {
+class ConstantPattern final : public Pattern {
   std::string m_constantName;
   double m_value;
 
@@ -380,7 +380,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class VariablePattern : public Pattern {
+class VariablePattern final : public Pattern {
   std::string m_variableName;
   int m_varIdx;
 
@@ -416,7 +416,7 @@ public:
 //-------------------------------------------------------------------
 
 template <class Op>
-class Op2Pattern : public Pattern {
+class Op2Pattern final : public Pattern {
   std::string m_opName;
   int m_priority;
 
@@ -453,7 +453,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class UnaryMinusPattern : public Pattern {
+class UnaryMinusPattern final : public Pattern {
 public:
   UnaryMinusPattern() {}
   int getPriority() const override { return 50; }
@@ -486,7 +486,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class NotPattern : public Pattern {
+class NotPattern final : public Pattern {
   std::string m_prefix;
 
 public:
@@ -522,7 +522,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class QuestionTernaryPattern : public Pattern {
+class QuestionTernaryPattern final : public Pattern {
 public:
   QuestionTernaryPattern() {}
   int getPriority() const override { return 5; }
@@ -557,7 +557,7 @@ public:
 };
 //-------------------------------------------------------------------
 
-class BraketPattern : public Pattern {
+class BraketPattern final : public Pattern {
 public:
   BraketPattern() {}
   int getPriority() const override { return 5; }
@@ -702,7 +702,7 @@ public:
 //-------------------------------------------------------------------
 
 template <class Function>
-class F0Pattern : public FunctionPattern {
+class F0Pattern final : public FunctionPattern {
 public:
   F0Pattern(std::string functionName) : FunctionPattern(functionName, 0) {}
   void createNode(Calculator *calc, std::vector<CalculatorNode *> &stack,
@@ -714,7 +714,7 @@ public:
 //-------------------------------------------------------------------
 
 template <class Function>
-class F1Pattern : public FunctionPattern {
+class F1Pattern final : public FunctionPattern {
 public:
   F1Pattern(std::string functionName, std::string descr = "")
       : FunctionPattern(functionName, 1) {
@@ -729,7 +729,7 @@ public:
 //-------------------------------------------------------------------
 
 template <class Function>
-class F2Pattern : public FunctionPattern {
+class F2Pattern final : public FunctionPattern {
 public:
   F2Pattern(std::string functionName, std::string descr = "")
       : FunctionPattern(functionName, 2) {
@@ -746,7 +746,7 @@ public:
 //-------------------------------------------------------------------
 
 template <class Function>
-class F3Pattern : public FunctionPattern {
+class F3Pattern final : public FunctionPattern {
 public:
   F3Pattern(std::string functionName, std::string descr = "")
       : FunctionPattern(functionName, 3) {
@@ -764,7 +764,7 @@ public:
 //-------------------------------------------------------------------
 
 template <class Function>
-class Fs2Pattern : public FunctionPattern {
+class Fs2Pattern final : public FunctionPattern {
 public:
   Fs2Pattern(std::string functionName, std::string description)
       : FunctionPattern(functionName, 1) {
@@ -782,7 +782,7 @@ public:
 //-------------------------------------------------------------------
 
 template <class Function>
-class Fs3Pattern : public FunctionPattern {
+class Fs3Pattern final : public FunctionPattern {
 public:
   Fs3Pattern(std::string functionName, double defVal, std::string descr)
       : FunctionPattern(functionName, 1) {
@@ -800,7 +800,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class CyclePattern : public FunctionPattern {
+class CyclePattern final : public FunctionPattern {
 public:
   CyclePattern(std::string functionName) : FunctionPattern(functionName, 1) {
     setDescription(
@@ -816,7 +816,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class RandomPattern : public FunctionPattern {
+class RandomPattern final : public FunctionPattern {
   bool m_seed;
 
 public:

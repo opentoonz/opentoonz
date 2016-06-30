@@ -21,7 +21,7 @@ struct int2 {
   int x, y;
 };
 
-class Iwa_DirectionalBlurFx : public TStandardRasterFx {
+class Iwa_DirectionalBlurFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(Iwa_DirectionalBlurFx)
 
   TRasterFxPort m_input;

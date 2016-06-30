@@ -5,7 +5,7 @@
 
 #include "ino_common.h"
 //------------------------------------------------------------
-class ino_level_rgba : public TStandardRasterFx {
+class ino_level_rgba final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_level_rgba)
   TRasterFxPort m_input;
   TRasterFxPort m_refer;

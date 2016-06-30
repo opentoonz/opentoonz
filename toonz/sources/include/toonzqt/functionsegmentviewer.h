@@ -33,7 +33,7 @@ class ExpressionField;
 
 //-----------------------------------------------------------------------------
 
-class FunctionSegmentViewer : public QFrame, public TParamObserver {
+class FunctionSegmentViewer final : public QFrame, public TParamObserver {
   Q_OBJECT
 
   TDoubleParam *m_curve;
@@ -134,7 +134,7 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class SpeedInOutSegmentPage : public FunctionSegmentPage {
+class SpeedInOutSegmentPage final : public FunctionSegmentPage {
   Q_OBJECT
 
   DVGui::LineEdit *m_speed0xFld;
@@ -164,7 +164,7 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class EaseInOutSegmentPage : public FunctionSegmentPage {
+class EaseInOutSegmentPage final : public FunctionSegmentPage {
   Q_OBJECT
   DVGui::MeasuredDoubleLineEdit *m_ease0Fld, *m_ease1Fld;
   double m_fieldScale;
@@ -186,7 +186,7 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class FunctionExpressionSegmentPage : public FunctionSegmentPage {
+class FunctionExpressionSegmentPage final : public FunctionSegmentPage {
   Q_OBJECT
 
   DVGui::ExpressionField *m_expressionFld;
@@ -205,7 +205,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SimilarShapeSegmentPage : public FunctionSegmentPage {
+class SimilarShapeSegmentPage final : public FunctionSegmentPage {
   Q_OBJECT
 
   DVGui::ExpressionField *m_expressionFld;

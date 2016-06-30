@@ -171,7 +171,7 @@ void cutStrokesWithoutUndo(TVectorImageP image, std::set<int> &indexes) {
 // CopyStrokesUndo
 //-----------------------------------------------------------------------------
 
-class CopyStrokesUndo : public TUndo {
+class CopyStrokesUndo final : public TUndo {
   QMimeData *m_oldData;
   QMimeData *m_newData;
 
@@ -196,7 +196,7 @@ public:
 // PasteStrokesUndo
 //-----------------------------------------------------------------------------
 
-class PasteStrokesUndo : public TUndo {
+class PasteStrokesUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   TFrameId m_frameId;
   std::set<int> m_indexes;
@@ -252,7 +252,7 @@ public:
 
 //--------------------------------------------------------------------
 
-class RemoveEndpointsUndo : public TUndo {
+class RemoveEndpointsUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   TFrameId m_frameId;
   std::vector<std::pair<int, TStroke *>> m_strokes;
@@ -349,7 +349,7 @@ public:
 // CutStrokesUndo
 //-----------------------------------------------------------------------------
 
-class CutStrokesUndo : public DeleteStrokesUndo {
+class CutStrokesUndo final : public DeleteStrokesUndo {
 public:
   CutStrokesUndo(TXshSimpleLevel *level, const TFrameId &frameId,
                  std::set<int> indexes, QMimeData *data,
@@ -619,7 +619,7 @@ void StrokeSelection::enableCommands() {
 namespace {
 //===================================================================
 
-class UndoSetStrokeStyle : public TUndo {
+class UndoSetStrokeStyle final : public TUndo {
   TVectorImageP m_image;
   std::vector<int> m_strokeIndexes;
   std::vector<int> m_oldStyles;

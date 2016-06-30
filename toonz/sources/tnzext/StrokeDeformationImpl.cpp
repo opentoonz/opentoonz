@@ -413,7 +413,7 @@ bool StrokeDeformationImpl::activate_impl(const ContextStatus *status) {
   }
   // change the threshold value of increser,
   //  if value is greater than diff add control points
-  deformer_->setDiff(getImplStatus()->deformerSensibility_);
+  deformer_->setDiff(getImplStatus()->deformerSensitivity_);
 
   // just to be sure to have a control point where
   // stroke is selected

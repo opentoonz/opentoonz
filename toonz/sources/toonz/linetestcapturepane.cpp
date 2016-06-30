@@ -51,7 +51,7 @@
 //-----------------------------------------------------------------------------
 namespace {
 
-class ViewerZoomer : public ImageUtils::ShortcutZoomer {
+class ViewerZoomer final : public ImageUtils::ShortcutZoomer {
 public:
   ViewerZoomer(QWidget *parent) : ShortcutZoomer(parent) {}
   void zoom(bool zoomin, bool resetZoom) {
@@ -78,7 +78,7 @@ ToggleCommandHandler capturePanelFieldGuideToggle(MI_CapturePanelFieldGuide,
 // CaptureCommand
 //-----------------------------------------------------------------------------
 
-class CaptureCommand : public MenuItemHandler {
+class CaptureCommand final : public MenuItemHandler {
 public:
   CaptureCommand() : MenuItemHandler(MI_Capture) {}
   void execute() {}

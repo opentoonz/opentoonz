@@ -171,7 +171,7 @@ inline bool isBlank(char c) { return c == ' ' || c == '\t' || c == '\n'; }
 //==============================================================================
 //==============================================================================
 
-class FarmServerService : public TService {
+class FarmServerService final : public TService {
 public:
   FarmServerService(std::ostream &os)
       : TService("ToonzFarm Server", "ToonzFarm Server")
@@ -208,7 +208,7 @@ FarmServerService service(std::cout);
 //==============================================================================
 //==============================================================================
 
-class FarmControllerProxy : public TSmartObject {
+class FarmControllerProxy final : public TSmartObject {
   TFarmController *m_controller;
 
 public:
@@ -259,7 +259,7 @@ public:
 //==============================================================================
 //==============================================================================
 
-class FarmServer : public TFarmExecutor, public TFarmServer {
+class FarmServer final : public TFarmExecutor, public TFarmServer {
 public:
   FarmServer(int port, TUserLog *log);
   ~FarmServer();
@@ -326,7 +326,7 @@ private:
 //===================================================================
 //===================================================================
 
-class Task : public TThread::Runnable {
+class Task final : public TThread::Runnable {
 public:
   Task(const QString &id, const QString &cmdline, TUserLog *log,
        FarmServer *server, const FarmControllerProxyP &controller)

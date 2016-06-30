@@ -9,7 +9,7 @@
 #include "trasterfx.h"
 
 //-----------------------------------------------------------------------------------------
-class BlendTzFx : public TStandardRasterFx {
+class BlendTzFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(BlendTzFx)
 
   TRasterFxPort m_input;

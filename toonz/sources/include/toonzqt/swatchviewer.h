@@ -42,7 +42,7 @@ public:
 
 //=============================================================================
 
-class DVAPI SolidColorBgPainter : public BgPainter {
+class DVAPI SolidColorBgPainter final : public BgPainter {
   TPixel32 m_color;
 
 public:
@@ -54,7 +54,7 @@ public:
 
 //=============================================================================
 
-class DVAPI CheckboardBgPainter : public BgPainter {
+class DVAPI CheckboardBgPainter final : public BgPainter {
   TPixel32 m_c0, m_c1;
 
 public:
@@ -75,7 +75,7 @@ public:
 
                 Inherits \b QWidget.
 */
-class DVAPI SwatchViewer : public QWidget {
+class DVAPI SwatchViewer final : public QWidget {
   Q_OBJECT
 
   //! La classe \b Point gestisce un punto che e' collegato a parametri \b
@@ -132,7 +132,7 @@ class DVAPI SwatchViewer : public QWidget {
   friend class ContentRender;
 
 public:
-  class ContentRender : public TThread::Runnable {
+  class ContentRender final : public TThread::Runnable {
   public:
     TRasterFxP m_fx;
     TRasterP m_raster;

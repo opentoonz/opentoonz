@@ -21,7 +21,7 @@
 class TPalette;
 class ToonzScene;
 
-class DVAPI FullColorPalette : public QObject {
+class DVAPI FullColorPalette final : public QObject {
   Q_OBJECT
 
   TPalette *m_palette;

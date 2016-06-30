@@ -110,7 +110,7 @@ public:
 
 }  // EditToolGadgets namespace
 
-class FxGadgetController : public QObject {
+class FxGadgetController final : public QObject {
   Q_OBJECT
 
   TTool *m_tool;

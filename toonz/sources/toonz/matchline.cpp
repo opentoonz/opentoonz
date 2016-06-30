@@ -372,7 +372,7 @@ MatchlinesDialog::MatchlinesDialog()
     {
       inkUsageLay->addWidget(m_button1, 0, 0, 1, 2);
       inkUsageLay->addWidget(m_button2, 1, 0);
-      inkUsageLay->addWidget(m_inkIndex, 1, 1);
+      inkUsageLay->addWidget(m_inkIndex, 1, 1, Qt::AlignLeft);
     }
     inkUsageLay->setColumnStretch(0, 0);
     inkUsageLay->setColumnStretch(1, 1);
@@ -481,7 +481,7 @@ void MatchlinesDialog::onInkPrevalenceChanged(bool isDragging) {
 
 //-----------------------------------------------------------------------------
 
-class DeleteMatchlineUndo : public TUndo {
+class DeleteMatchlineUndo final : public TUndo {
 public:
   TXshLevel *m_xl;
   TXshSimpleLevel *m_sl;
@@ -555,7 +555,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class MatchlineUndo : public TUndo {
+class MatchlineUndo final : public TUndo {
   TXshLevelP m_xl;
   int m_mergeCmappedSessionId;
   std::map<TFrameId, QString> m_images;

@@ -25,7 +25,7 @@ class TFilePath;
 // TSceneHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TSceneHandle : public QObject {
+class DVAPI TSceneHandle final : public QObject {
   Q_OBJECT
 
   ToonzScene *m_scene;

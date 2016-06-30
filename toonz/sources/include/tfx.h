@@ -250,7 +250,7 @@ private:
 
 //------------------------------------------------------------------------------
 
-class TFxParamChange : public TFxChange {
+class TFxParamChange final : public TFxChange {
 public:
   TFxParamChange(TFx *fx, double firstAffectedFrame, double lastAffectedFrame,
                  bool dragging);
@@ -259,7 +259,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-class TFxPortAdded : public TFxChange {
+class TFxPortAdded final : public TFxChange {
 public:
   TFxPortAdded(TFx *fx) : TFxChange(fx, m_minFrame, m_maxFrame, false) {}
   ~TFxPortAdded() {}
@@ -267,7 +267,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-class TFxPortRemoved : public TFxChange {
+class TFxPortRemoved final : public TFxChange {
 public:
   TFxPortRemoved(TFx *fx) : TFxChange(fx, m_minFrame, m_maxFrame, false) {}
   ~TFxPortRemoved() {}
@@ -275,7 +275,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-class TFxParamAdded : public TFxChange {
+class TFxParamAdded final : public TFxChange {
 public:
   TFxParamAdded(TFx *fx) : TFxChange(fx, m_minFrame, m_maxFrame, false) {}
   ~TFxParamAdded() {}
@@ -283,7 +283,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-class TFxParamRemoved : public TFxChange {
+class TFxParamRemoved final : public TFxChange {
 public:
   TFxParamRemoved(TFx *fx) : TFxChange(fx, m_minFrame, m_maxFrame, false) {}
   ~TFxParamRemoved() {}
@@ -291,7 +291,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-class TFxParamsUnlinked : public TFxChange {
+class TFxParamsUnlinked final : public TFxChange {
 public:
   TFxParamsUnlinked(TFx *fx) : TFxChange(fx, m_minFrame, m_maxFrame, false) {}
   ~TFxParamsUnlinked() {}
@@ -526,7 +526,7 @@ public:
 };
 
 template <class T>
-class TFxDeclarationT : public TFxDeclaration {
+class TFxDeclarationT final : public TFxDeclaration {
 public:
   TFxDeclarationT(const TFxInfo &info) : TFxDeclaration(info) {}
   TPersist *create() const override { return new T; }

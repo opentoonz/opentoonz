@@ -177,7 +177,7 @@ TRect drawBluredBrush(const TToonzImageP &ti, TStroke *stroke, int thick,
 
 //-----------------------------------------------------------------------------
 
-class MultilinePrimitiveUndo : public TUndo {
+class MultilinePrimitiveUndo final : public TUndo {
   std::vector<TPointD> m_oldVertex;
   std::vector<TPointD> m_newVertex;
   MultiLinePrimitive *m_tool;
@@ -203,7 +203,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class FullColorBluredPrimitiveUndo : public UndoFullColorPencil {
+class FullColorBluredPrimitiveUndo final : public UndoFullColorPencil {
   int m_thickness;
   double m_hardness;
 
@@ -243,7 +243,7 @@ public:
 
 //-----------------------------------------------------------------------------
 /*-- Hardness<100 のときの GeometricToolのUndo --*/
-class CMBluredPrimitiveUndo : public UndoRasterPencil {
+class CMBluredPrimitiveUndo final : public UndoRasterPencil {
   int m_thickness;
   double m_hardness;
   bool m_selective;
@@ -434,7 +434,7 @@ public:
 // Rectangle Primitive Class Declaration
 //-----------------------------------------------------------------------------
 
-class RectanglePrimitive : public Primitive {
+class RectanglePrimitive final : public Primitive {
   TRectD m_selectingRect;
   TPointD m_pos;
   TPointD m_startPoint;
@@ -462,7 +462,7 @@ public:
 // Circle Primitive Class Declaration
 //-----------------------------------------------------------------------------
 
-class CirclePrimitive : public Primitive {
+class CirclePrimitive final : public Primitive {
   TPointD m_centre;
   TPointD m_pos;
   double m_radius;
@@ -570,7 +570,7 @@ QString MultilinePrimitiveUndo::getToolName() {
 // Line Primitive Class Declaration
 //-----------------------------------------------------------------------------
 
-class LinePrimitive : public MultiLinePrimitive {
+class LinePrimitive final : public MultiLinePrimitive {
 public:
   LinePrimitive(PrimitiveParam *param, GeometricTool *tool, bool reasterTool)
       : MultiLinePrimitive(param, tool, reasterTool) {
@@ -592,7 +592,7 @@ public:
 // Ellipse Primitive Class Declaration
 //-----------------------------------------------------------------------------
 
-class EllipsePrimitive : public Primitive {
+class EllipsePrimitive final : public Primitive {
   TPointD m_pos;
   TRectD m_selectingRect;
   TPointD m_startPoint;
@@ -619,7 +619,7 @@ public:
 // Arc Primitive Class Declaration
 //-----------------------------------------------------------------------------
 
-class ArcPrimitive : public Primitive {
+class ArcPrimitive final : public Primitive {
   TStroke *m_stroke;
   TPointD m_startPoint, m_endPoint, m_centralPoint;
   int m_clickNumber;
@@ -648,7 +648,7 @@ public:
 // Polygon Primitive Class Declaration
 //-----------------------------------------------------------------------------
 
-class PolygonPrimitive : public Primitive {
+class PolygonPrimitive final : public Primitive {
   TPointD m_startPoint, m_centre;
   double m_radius;
   TPixel32 m_color;
@@ -672,7 +672,7 @@ public:
 // Geometric Tool
 //-----------------------------------------------------------------------------
 
-class GeometricTool : public TTool {
+class GeometricTool final : public TTool {
 protected:
   Primitive *m_primitive;
   std::map<std::wstring, Primitive *> m_primitiveTable;

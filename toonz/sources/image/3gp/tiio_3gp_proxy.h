@@ -22,7 +22,7 @@ bool IsQuickTimeInstalled();
 //    TLevelWriter3gp Proxy - delegates to a background 32-bit process
 //******************************************************************************
 
-class TLevelWriter3gp : public TLevelWriter {
+class TLevelWriter3gp final : public TLevelWriter {
   unsigned int m_id;
 
 public:
@@ -48,7 +48,7 @@ public:
 //    TLevelReader3gp Proxy
 //******************************************************************************
 
-class TLevelReader3gp : public TLevelReader {
+class TLevelReader3gp final : public TLevelReader {
   unsigned int m_id;
   int m_lx, m_ly;
 

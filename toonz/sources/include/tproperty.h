@@ -102,7 +102,7 @@ private:
 //---------------------------------------------------------
 
 template <class T>
-class TRangeProperty : public TProperty {
+class TRangeProperty final : public TProperty {
 public:
   typedef std::pair<T, T> Range;
 
@@ -150,7 +150,7 @@ template class DVAPI TRangeProperty<double>;
 #endif
 //---------------------------------------------------------
 
-class TDoublePairProperty : public TProperty {
+class TDoublePairProperty final : public TProperty {
 public:
   typedef std::pair<double, double> Range;
   typedef std::pair<double, double> Value;
@@ -191,7 +191,7 @@ private:
 
 //---------------------------------------------------------
 
-class TIntPairProperty : public TProperty {
+class TIntPairProperty final : public TProperty {
 public:
   typedef std::pair<int, int> Range;
   typedef std::pair<int, int> Value;
@@ -232,7 +232,7 @@ private:
 
 //---------------------------------------------------------
 
-class DVAPI TBoolProperty : public TProperty {
+class DVAPI TBoolProperty final : public TProperty {
 public:
   TBoolProperty(std::string name, bool value)
       : TProperty(name), m_value(value) {}
@@ -250,7 +250,7 @@ private:
 
 //---------------------------------------------------------
 
-class DVAPI TStringProperty : public TProperty {
+class DVAPI TStringProperty final : public TProperty {
 public:
   TStringProperty(std::string name, std::wstring value)
       : TProperty(name), m_value(value) {}
@@ -268,7 +268,7 @@ private:
 
 //---------------------------------------------------------
 
-class DVAPI TStyleIndexProperty : public TProperty {
+class DVAPI TStyleIndexProperty final : public TProperty {
 public:
   TStyleIndexProperty(std::string name, std::wstring value)
       : TProperty(name), m_value(value) {}
@@ -288,7 +288,7 @@ private:
 
 //------------------------------------------------------------------
 
-class DVAPI TPointerProperty : public TProperty {
+class DVAPI TPointerProperty final : public TProperty {
 public:
   TPointerProperty(std::string name, void *value)
       : TProperty(name), m_value(value) {}
@@ -308,7 +308,7 @@ private:
 
 //---------------------------------------------------------
 
-class DVAPI TEnumProperty : public TProperty {
+class DVAPI TEnumProperty final : public TProperty {
 public:
   typedef std::vector<std::wstring> Range;
 

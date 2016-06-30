@@ -48,7 +48,7 @@ class TFrameHandle;
             (e.g. when \p m_frame is 0 then 1 is visualized).
 */
 
-class DVAPI FrameNavigator : public QToolBar {
+class DVAPI FrameNavigator final : public QToolBar {
   Q_OBJECT
 
   TFrameHandle *m_frameHandle;

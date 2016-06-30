@@ -25,7 +25,7 @@ class OnionSkinMask;
 // TOnionSkinMaskHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TOnionSkinMaskHandle : public QObject {
+class DVAPI TOnionSkinMaskHandle final : public QObject {
   Q_OBJECT
 
   OnionSkinMask m_onionSkinMask;

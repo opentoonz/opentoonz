@@ -166,11 +166,11 @@ TrackerPopup::TrackerPopup(QWidget *parent, Qt::WFlags flags)
   m_threshold->setValue(0.2);
   addWidget(tr("Threshold:"), m_threshold);
 
-  m_sensibility = new DoubleField();  // W_Accuracy
-  m_sensibility->setFixedHeight(WidgetHeight);
-  m_sensibility->setRange(0, 1000);
-  m_sensibility->setValue(10);
-  addWidget(tr("Sensitivity:"), m_sensibility);
+  m_sensitivity = new DoubleField();  // W_Accuracy
+  m_sensitivity->setFixedHeight(WidgetHeight);
+  m_sensitivity->setRange(0, 1000);
+  m_sensitivity->setValue(10);
+  addWidget(tr("Sensitivity:"), m_sensitivity);
 
   m_variationWindow = new CheckBox(tr("Variable Region Size"));
   m_variationWindow->setFixedHeight(WidgetHeight);
@@ -193,7 +193,7 @@ TrackerPopup::TrackerPopup(QWidget *parent, Qt::WFlags flags)
 
 bool TrackerPopup::apply() {
   float threshold      = m_threshold->getValue();
-  float sensibility    = m_sensibility->getValue() / 1000;
+  float sensitivity    = m_sensitivity->getValue() / 1000;
   int activeBackground = m_activeBackground->isChecked();
   int manageOcclusion  = 0;
   int variationWindow  = m_variationWindow->isChecked();
@@ -225,7 +225,7 @@ bool TrackerPopup::apply() {
   if (framesNumber <= 0) return false;
 
   m_tracker =
-      new Tracker(threshold, sensibility, activeBackground, manageOcclusion,
+      new Tracker(threshold, sensitivity, activeBackground, manageOcclusion,
                   variationWindow, frameStart, framesNumber);
   if (m_tracker->getLastError() != 0) {
     DVGui::warning(m_tracker->getLastError());
@@ -282,12 +282,12 @@ void TrackerPopup::onTrack() { apply(); }
 // TrackerPopup
 //-----------------------------------------------------------------------------
 
-Tracker::Tracker(double threshold, double sensibility, int activeBackground,
+Tracker::Tracker(double threshold, double sensitivity, int activeBackground,
                  int manageOcclusion, int variationWindow, int frameStart,
                  int framesNumber)
     : m_affine() {
   m_threshold        = threshold;
-  m_sensibility      = sensibility;
+  m_sensitivity      = sensitivity;
   m_activeBackground = activeBackground;
   m_manageOcclusion  = manageOcclusion;
   m_variationWindow  = variationWindow;
@@ -569,7 +569,7 @@ bool Tracker::setup() {
   }
   float threshold_distB = 0.6 * threshold_dist;
 
-  if ((m_sensibility < 0) || (m_sensibility > 1)) {
+  if ((m_sensitivity < 0) || (m_sensitivity > 1)) {
     m_lastErrorCode = 10;
     return false;
   }
@@ -662,7 +662,7 @@ bool Tracker::trackCurrentFrame() {
       m_pObjectTracker[i]->ObjeckTrackerHandlerByUser(&m_raster);
     float dist_temp;
     dist_temp = m_pObjectTracker[i]->Matching(&m_raster, &m_raster_template[i]);
-    if ((dist_temp < m_sensibility) && (m_pObjectTracker[i]->track)) {
+    if ((dist_temp < m_sensitivity) && (m_pObjectTracker[i]->track)) {
       m_raster_template[i] = m_raster;
       m_pObjectTracker[i]->updateTemp();
     }

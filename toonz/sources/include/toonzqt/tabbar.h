@@ -33,7 +33,7 @@ namespace DVGui {
    using \b addIconTab(),
                 it's anyhow possible add text tab using \b addSimpleTab().
 */
-class DVAPI TabBar : public QTabBar {
+class DVAPI TabBar final : public QTabBar {
   Q_OBJECT
 
   std::vector<QPixmap> m_pixmaps;

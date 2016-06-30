@@ -99,7 +99,7 @@ TRaster32P loadLight() {
 
 //=========================================================
 
-class OnRenderCompleted : public TThread::Message {
+class OnRenderCompleted final : public TThread::Message {
   TFilePath m_fp;
   bool m_error;
 
@@ -378,14 +378,14 @@ void RenderCommand::flashRender() {
 
 //===================================================================
 
-class RenderListener : public DVGui::ProgressDialog,
-                       public MovieRenderer::Listener {
+class RenderListener final : public DVGui::ProgressDialog,
+                             public MovieRenderer::Listener {
   QString m_progressBarString;
   int m_frameCounter;
   TRenderer *m_renderer;
   bool m_error;
 
-  class Message : public TThread::Message {
+  class Message final : public TThread::Message {
     RenderListener *m_pb;
     int m_frame;
     QString m_labelText;
@@ -595,8 +595,8 @@ void RenderCommand::resetBgColor() {
 
 //===================================================================
 
-class MultimediaProgressBar : public DVGui::ProgressDialog,
-                              public MultimediaRenderer::Listener {
+class MultimediaProgressBar final : public DVGui::ProgressDialog,
+                                    public MultimediaRenderer::Listener {
   QString m_progressBarString;
   int m_frameCounter;
   int m_columnCounter;
@@ -605,7 +605,7 @@ class MultimediaProgressBar : public DVGui::ProgressDialog,
 
   //----------------------------------------------------------
 
-  class Message : public TThread::Message {
+  class Message final : public TThread::Message {
     MultimediaProgressBar *m_pb;
     int m_frame;
     int m_column;

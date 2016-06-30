@@ -104,7 +104,7 @@ void writeTgaHeader(TgaHeader &header, FILE *chan) {
 
 //============================================================
 
-class TgaReader : public Tiio::Reader {
+class TgaReader final : public Tiio::Reader {
   FILE *m_chan;
   TgaHeader m_header;
   TPixel32 *m_palette;
@@ -521,7 +521,7 @@ Tiio::TgaWriterProperties::TgaWriterProperties()
 
 //============================================================
 
-class TgaWriter : public Tiio::Writer {
+class TgaWriter final : public Tiio::Writer {
   FILE *m_chan;
   TgaHeader m_header;
 

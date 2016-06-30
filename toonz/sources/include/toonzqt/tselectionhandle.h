@@ -28,7 +28,7 @@ class CommandHandlerInterface;
 // TSelectionHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI TSelectionHandle : public QObject {
+class DVAPI TSelectionHandle final : public QObject {
   Q_OBJECT
 
   std::vector<TSelection *> m_selectionStack;

@@ -16,7 +16,7 @@ ToonzExt::ContextStatus::~ContextStatus() {}
 void ToonzExt::ContextStatus::init() {
   key_event_           = NONE;
   w_                   = -1;
-  deformerSensibility_ = -1;
+  deformerSensitivity_ = -1;
   stroke2change_       = 0;
   lengthOfAction_      = 50;
   deformer_            = 0;
@@ -43,7 +43,7 @@ ToonzExt::ContextStatus &ToonzExt::ContextStatus::operator=(
   cornerSize_          = ob.cornerSize_;
   stroke2change_       = ob.stroke2change_;
   lengthOfAction_      = ob.lengthOfAction_;
-  deformerSensibility_ = ob.deformerSensibility_;
+  deformerSensitivity_ = ob.deformerSensitivity_;
   // spireCorners_ = ob.spireCorners_;
   // straightCorners_ =ob.straightCorners_;
   return *this;

@@ -75,7 +75,7 @@ void assign(Property *dst, TProperty *src) {
   dst->setValue(s->getValue());
 }
 
-class Setter : public TProperty::Visitor {
+class Setter final : public TProperty::Visitor {
   TProperty *m_src;
 
 public:
@@ -111,7 +111,7 @@ void TPropertyGroup::accept(TProperty::Visitor &v) {
     i->first->accept(v);
 }
 
-class PropertyWriter : public TProperty::Visitor {
+class PropertyWriter final : public TProperty::Visitor {
   TOStream &m_os;
 
 public:

@@ -2151,7 +2151,7 @@ void MainWindow::togglePickStyleLines() {
 
 //-----------------------------------------------------------------------------
 
-class ReloadStyle : public MenuItemHandler {
+class ReloadStyle final : public MenuItemHandler {
 public:
   ReloadStyle() : MenuItemHandler("MI_ReloadStyle") {}
   void execute() override {

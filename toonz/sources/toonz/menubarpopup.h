@@ -18,7 +18,7 @@ class QXmlStreamWriter;
 // MenuBarTree
 //-----------------------------------------------------------------------------
 
-class MenuBarTree : public QTreeWidget {
+class MenuBarTree final : public QTreeWidget {
   Q_OBJECT
 
   TFilePath m_path;
@@ -45,7 +45,7 @@ protected slots:
 // CommandListTree
 //-----------------------------------------------------------------------------
 
-class CommandListTree : public QTreeWidget {
+class CommandListTree final : public QTreeWidget {
   Q_OBJECT
 
   void addFolder(const QString& title, int commandType,
@@ -62,7 +62,7 @@ protected:
 // MenuBarPopup
 //-----------------------------------------------------------------------------
 
-class MenuBarPopup : public DVGui::Dialog {
+class MenuBarPopup final : public DVGui::Dialog {
   Q_OBJECT
   CommandListTree* m_commandListTree;
   MenuBarTree* m_menuBarTree;

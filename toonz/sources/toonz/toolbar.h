@@ -7,7 +7,7 @@
 
 class QToolButton;
 
-class Toolbar : public QToolBar {
+class Toolbar final : public QToolBar {
   Q_OBJECT
 
   QToolButton *m_expandButton;

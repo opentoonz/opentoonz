@@ -29,7 +29,7 @@ class TRandom;
 
 //============================================================
 
-class MovingModifier : public TOutlineStyle::RegionOutlineModifier {
+class MovingModifier final : public TOutlineStyle::RegionOutlineModifier {
   TPointD m_move;
 
 public:
@@ -51,7 +51,7 @@ public:
 
 //============================================================
 
-class MovingSolidColor : public TSolidColorStyle {
+class MovingSolidColor final : public TSolidColorStyle {
 public:
   MovingSolidColor(const TPixel32 &color, const TPointD &move);
 
@@ -84,7 +84,7 @@ protected:
 
 //============================================================
 
-class DVAPI ShadowStyle : public TSolidColorStyle {
+class DVAPI ShadowStyle final : public TSolidColorStyle {
   TPointD m_shadowDirection;
   TPixel32 m_shadowColor;
   double m_density;
@@ -140,7 +140,7 @@ private:
 
 //============================================================
 
-class DVAPI ShadowStyle2 : public TSolidColorStyle {
+class DVAPI ShadowStyle2 final : public TSolidColorStyle {
   TPointD m_shadowDirection;
   TPixel32 m_shadowColor;
   double m_shadowLength;
@@ -193,7 +193,7 @@ private:
 
 //============================================================
 
-class RubberModifier : public TOutlineStyle::RegionOutlineModifier {
+class RubberModifier final : public TOutlineStyle::RegionOutlineModifier {
   double m_deform;
 
 public:
@@ -212,7 +212,7 @@ public:
 
 //============================================================
 
-class DVAPI TRubberFillStyle : public TSolidColorStyle {
+class DVAPI TRubberFillStyle final : public TSolidColorStyle {
   typedef std::vector<TQuadratic> QuadraticVector;
   typedef std::vector<TQuadratic *> QuadraticPVector;
 
@@ -253,7 +253,7 @@ private:
 
 //============================================================
 
-class DVAPI TPointShadowFillStyle : public TSolidColorStyle {
+class DVAPI TPointShadowFillStyle final : public TSolidColorStyle {
   TPointD m_shadowDirection;
   TPixel32 m_shadowColor;
   double m_shadowSize;
@@ -317,7 +317,7 @@ private:
 
 //============================================================
 
-class DVAPI TDottedFillStyle : public TSolidColorStyle {
+class DVAPI TDottedFillStyle final : public TSolidColorStyle {
   TPixel32 m_pointColor;
   double m_dotSize;
   double m_dotDist;
@@ -372,7 +372,7 @@ private:
 
 //============================================================
 
-class DVAPI TCheckedFillStyle : public TSolidColorStyle {
+class DVAPI TCheckedFillStyle final : public TSolidColorStyle {
   TPixel32 m_pointColor;
   double m_HDist, m_HAngle;
   double m_VDist, m_VAngle, m_Thickness;
@@ -429,7 +429,7 @@ protected:
 
 //============================================================
 
-class ArtisticModifier : public TOutlineStyle::RegionOutlineModifier {
+class ArtisticModifier final : public TOutlineStyle::RegionOutlineModifier {
   TPointD m_move;
   double m_period;
 
@@ -454,7 +454,7 @@ public:
 
 //============================================================
 
-class ArtisticSolidColor : public TSolidColorStyle {
+class ArtisticSolidColor final : public TSolidColorStyle {
 public:
   ArtisticSolidColor(const TPixel32 &color, const TPointD &move, double period);
 
@@ -487,7 +487,7 @@ protected:
 
 //============================================================
 
-class DVAPI TChalkFillStyle : public TSolidColorStyle {
+class DVAPI TChalkFillStyle final : public TSolidColorStyle {
   TPixel32 m_color0;
   double m_density, m_size;
 
@@ -538,7 +538,7 @@ protected:
 
 //============================================================
 
-class DVAPI TChessFillStyle : public TSolidColorStyle {
+class DVAPI TChessFillStyle final : public TSolidColorStyle {
   TPixel32 m_pointColor;
   double m_HDist, m_VDist, m_Angle;
 
@@ -589,7 +589,7 @@ private:
 
 //============================================================
 
-class DVAPI TStripeFillStyle : public TSolidColorStyle {
+class DVAPI TStripeFillStyle final : public TSolidColorStyle {
   TPixel32 m_pointColor;
   double m_Dist, m_Angle, m_Thickness;
 
@@ -644,7 +644,7 @@ private:
 
 //============================================================
 
-class DVAPI TLinGradFillStyle : public TSolidColorStyle {
+class DVAPI TLinGradFillStyle final : public TSolidColorStyle {
   TPixel32 m_pointColor;
   double m_Angle;
   double m_XPos, m_YPos, m_Size;
@@ -699,7 +699,7 @@ private:
 
 //============================================================
 
-class DVAPI TRadGradFillStyle : public TSolidColorStyle {
+class DVAPI TRadGradFillStyle final : public TSolidColorStyle {
   TPixel32 m_pointColor;
   double m_Radius;
   double m_XPos, m_YPos;
@@ -747,7 +747,7 @@ protected:
 
 //============================================================
 
-class DVAPI TCircleStripeFillStyle : public TSolidColorStyle {
+class DVAPI TCircleStripeFillStyle final : public TSolidColorStyle {
   TPixel32 m_pointColor;
   double m_XPos, m_YPos;
   double m_Dist, m_Thickness;
@@ -802,7 +802,7 @@ private:
 
 //============================================================
 
-class DVAPI TMosaicFillStyle : public TSolidColorStyle {
+class DVAPI TMosaicFillStyle final : public TSolidColorStyle {
   TPixel32 m_pointColor[4];
   double m_size;
   double m_deform;
@@ -859,7 +859,7 @@ private:
 
 //============================================================
 
-class DVAPI TPatchFillStyle : public TSolidColorStyle {
+class DVAPI TPatchFillStyle final : public TSolidColorStyle {
   TPixel32 m_pointColor[6];
   double m_size;
   double m_deform;

@@ -4,7 +4,7 @@
 
 #include "ino_common.h"
 //------------------------------------------------------------
-class ino_density : public TStandardRasterFx {
+class ino_density final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_density)
   TRasterFxPort m_input;
   TRasterFxPort m_refer;

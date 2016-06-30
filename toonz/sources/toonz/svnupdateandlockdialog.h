@@ -15,7 +15,7 @@ class QCheckBox;
 
 //-----------------------------------------------------------------------------
 
-class SVNUpdateAndLockDialog : public DVGui::Dialog {
+class SVNUpdateAndLockDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QLabel *m_waitingLabel;

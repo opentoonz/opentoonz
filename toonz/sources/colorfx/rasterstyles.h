@@ -110,7 +110,7 @@ protected:
 
 //=============================================================================
 
-class TBlendRasterStyle : public TAirbrushRasterStyle {
+class TBlendRasterStyle final : public TAirbrushRasterStyle {
 public:
   TBlendRasterStyle(const TPixel32 &color, double blur)
       : TAirbrushRasterStyle(color, blur) {}
@@ -132,7 +132,7 @@ private:
 
 //=============================================================================
 
-class TNoColorRasterStyle : public TColorStyle, TRasterStyleFx {
+class TNoColorRasterStyle final : public TColorStyle, TRasterStyleFx {
 public:
   TNoColorRasterStyle() {}
   TColorStyle *clone() const override { return new TNoColorRasterStyle(*this); }

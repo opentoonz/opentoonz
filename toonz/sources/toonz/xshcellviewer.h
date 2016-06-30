@@ -16,7 +16,7 @@ namespace XsheetGUI {
 class NoteWidget;
 class DragTool;
 
-class RenameCellField : public QLineEdit {
+class RenameCellField final : public QLineEdit {
   Q_OBJECT
 
   int m_row;
@@ -44,7 +44,7 @@ protected slots:
 //-----------------------------------------------------------------------------
 
 //! La classe si occupa della visualizzazione delle celle nel viewer.
-class CellArea : public QWidget {
+class CellArea final : public QWidget {
   Q_OBJECT
 
   XsheetViewer *m_viewer;

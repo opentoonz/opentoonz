@@ -84,7 +84,7 @@ class CheckBox;
   classes.
 */
 
-class VectorizerPopup : public DVGui::Dialog {
+class VectorizerPopup final : public DVGui::Dialog {
   Q_OBJECT
 
 public:
@@ -262,7 +262,7 @@ private slots:
             classes.
 */
 
-class Vectorizer : public QThread {
+class Vectorizer final : public QThread {
   Q_OBJECT
 
 public:
@@ -314,7 +314,7 @@ protected:
           be called before invoking run().                                    */
 
   void run() override;  //!< Starts the vectorization thread (see QThread
-                        //!documentation).
+                        //! documentation).
 
 private:
   TXshSimpleLevelP m_level;  //!< Input level to vectorize (only one level at a

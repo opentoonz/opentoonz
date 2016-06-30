@@ -142,7 +142,7 @@ void CYOMBInputParam::makeColorIndexList(const char *s, COLOR_INDEX_LIST &cil,
 //		10,11,12,13,14		isColor2, color2 (RGBM)
 //		15,16,17,18,19		isColor1, color1 (RGBM)
 //		20,21,22,23,24		isColor0, color0 (RGBM)
-//		25. sensibility of selection (dAB)
+//		25. sensitivity of selection (dAB)
 //		26. nbSamples (Quality). The number of sampling pixels.
 //		27. dSamples (Amount). The distance of sampling.
 //		28. isStopAtContour (Y/N) Stops the sampling at contour line.
@@ -174,10 +174,10 @@ CYOMBInputParam::CYOMBInputParam(const int argc, const char *argv[],
     if ((int)(m_dSample * m_dSample * 2.5) < m_nbSample)
       m_nbSample = (int)(m_dSample * m_dSample * 2.5);
 
-    // Sensibility - dist A
+    // Sensitivity - dist A
     m_dA = 3.0 * atof(argv[25]) / 50.0;
     m_dA = m_dA <= 0.001 ? 0.001 : m_dA;
-    // Sensibility - dist AB
+    // Sensitivity - dist AB
     m_dAB = atof(argv[25]) / 50.0;
     m_dAB = m_dAB <= 0.001 ? 0.001 : m_dAB;
 

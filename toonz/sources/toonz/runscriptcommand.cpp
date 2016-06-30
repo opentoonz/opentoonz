@@ -17,7 +17,7 @@
 
 #include <QFileDialog>
 
-class RunScriptCommand : public MenuItemHandler {
+class RunScriptCommand final : public MenuItemHandler {
 public:
   RunScriptCommand() : MenuItemHandler("MI_RunScript") {}
   void execute() override;

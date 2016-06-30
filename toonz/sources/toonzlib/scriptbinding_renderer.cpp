@@ -43,7 +43,7 @@ void valueToIntList(const QScriptValue &arr, QList<int> &list) {
 
 //=======================================================
 
-class Renderer::Imp : public TRenderPort {
+class Renderer::Imp final : public TRenderPort {
 public:
   TScriptBinding::Image *m_outputImage;
   TScriptBinding::Level *m_outputLevel;

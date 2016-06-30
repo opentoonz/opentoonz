@@ -106,7 +106,7 @@ void drawQuadratic(const TQuadratic &quad, double pixelSize) {
 // MagnetTool
 //-----------------------------------------------------------------------------
 
-class MagnetTool : public TTool {
+class MagnetTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(MagnetTool)
 
   bool m_active;

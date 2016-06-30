@@ -656,7 +656,7 @@ break;
 
 //-----------------------------------------------------------------------------
 
-class ViewerZoomer : public ImageUtils::ShortcutZoomer {
+class ViewerZoomer final : public ImageUtils::ShortcutZoomer {
 public:
   ViewerZoomer(SceneViewer *parent) : ShortcutZoomer(parent) {}
 

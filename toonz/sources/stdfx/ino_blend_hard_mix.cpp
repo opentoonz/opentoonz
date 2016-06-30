@@ -4,7 +4,7 @@
 
 #include "ino_common.h"
 /* tnzbase --> Source Files --> tfx --> binaryFx.cppを参照 */
-class ino_blend_hard_mix : public TBlendForeBackRasterFx {
+class ino_blend_hard_mix final : public TBlendForeBackRasterFx {
   FX_PLUGIN_DECLARATION(ino_blend_hard_mix)
   TRasterFxPort m_up;
   TRasterFxPort m_down;

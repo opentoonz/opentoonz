@@ -242,7 +242,7 @@ TXshColumn::ColumnType CellsMover::getColumnTypeFromCell(int index) const {
 
 //=============================================================================
 
-class LevelMoverUndo : public TUndo {
+class LevelMoverUndo final : public TUndo {
   CellsMover m_cellsMover;
 
 public:

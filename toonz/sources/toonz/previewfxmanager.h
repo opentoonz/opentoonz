@@ -55,7 +55,7 @@ or the whole scene's fxs.
 
 \sa FlipBook, TXshLevelHandle, TFxHandle, TXsheetHandle classes.
 */
-class PreviewFxManager : public QObject {
+class PreviewFxManager final : public QObject {
   Q_OBJECT
 
   TThread::Mutex m_mutex;

@@ -63,7 +63,7 @@ class ValueField;
 //************************************************************************
 
 // Function editor widget
-class DVAPI FunctionViewer : public QSplitter {
+class DVAPI FunctionViewer final : public QSplitter {
   Q_OBJECT
 
 public:

@@ -416,7 +416,7 @@ bool TPalette::getFxRects(const TRect &rect, TRect &rectIn, TRect &rectOut) {
 
 namespace {
 
-class StyleWriter : public TOutputStreamInterface {
+class StyleWriter final : public TOutputStreamInterface {
   TOStream &m_os;
   int m_index;
 
@@ -469,7 +469,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class StyleReader : public TInputStreamInterface {
+class StyleReader final : public TInputStreamInterface {
   TIStream &m_is;           //!< Wrapped input stream.
   VersionNumber m_version;  //!< Palette version number (overrides m_is's one).
 

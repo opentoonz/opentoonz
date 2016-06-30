@@ -28,7 +28,7 @@ public:
   }
 };
 
-class SMemAllocError : public SError {
+class SMemAllocError final : public SError {
 public:
   SMemAllocError() : SError(""){};
   SMemAllocError(const char *s) : SError(s){};
@@ -41,7 +41,7 @@ public:
   }
 };
 
-class SWriteRasterError : public SError {
+class SWriteRasterError final : public SError {
 public:
   SWriteRasterError() : SError(""){};
   SWriteRasterError(const char *s) : SError(s){};
@@ -54,7 +54,7 @@ public:
   }
 };
 
-class SBlurMatrixError : public SError {
+class SBlurMatrixError final : public SError {
 public:
   SBlurMatrixError() : SError(""){};
   SBlurMatrixError(const char *s) : SError(s){};
@@ -67,7 +67,7 @@ public:
   }
 };
 
-class SFileReadError : public SError {
+class SFileReadError final : public SError {
 public:
   SFileReadError() : SError(""){};
   SFileReadError(const char *s) : SError(s){};

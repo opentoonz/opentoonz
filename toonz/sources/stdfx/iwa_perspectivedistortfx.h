@@ -17,7 +17,7 @@ struct float4 {
   float x, y, z, w;
 };
 
-class Iwa_PerspectiveDistortFx : public TStandardRasterFx {
+class Iwa_PerspectiveDistortFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(Iwa_PerspectiveDistortFx)
 protected:
   TRasterFxPort m_source; /*- 入力画像 -*/

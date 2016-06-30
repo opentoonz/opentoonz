@@ -16,7 +16,7 @@ class IntField;
 // AntialiasPopup
 //-----------------------------------------------------------------------------
 
-class AntialiasPopup : public DVGui::Dialog {
+class AntialiasPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::IntField *m_thresholdField;

@@ -585,7 +585,7 @@ bool addToActiveChain(Graph &tree, const Skeleton::Bone *bone,
 
 namespace SkeletonSubtools {
 
-class IKToolUndo : public TUndo {
+class IKToolUndo final : public TUndo {
   struct Node {
     TStageObjectId m_id;
     double m_oldAngle, m_newAngle;
@@ -1053,7 +1053,7 @@ void IKTool::draw() {
 //
 //------------------------------------------------------------
 
-class ChangeDrawingUndo : public TUndo {
+class ChangeDrawingUndo final : public TUndo {
   int m_row, m_col;
   TFrameId m_oldFid, m_newFid;
 

@@ -81,7 +81,8 @@ public:
 //    ToolOptionControl derivative  declarations
 //***********************************************************************************
 
-class ToolOptionCheckbox : public DVGui::CheckBox, public ToolOptionControl {
+class ToolOptionCheckbox final : public DVGui::CheckBox,
+                                 public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -100,7 +101,8 @@ protected:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionSlider : public DVGui::DoubleField, public ToolOptionControl {
+class ToolOptionSlider final : public DVGui::DoubleField,
+                               public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -120,8 +122,8 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionPairSlider : public DVGui::DoublePairField,
-                             public ToolOptionControl {
+class ToolOptionPairSlider final : public DVGui::DoublePairField,
+                                   public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -144,8 +146,8 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionIntPairSlider : public DVGui::IntPairField,
-                                public ToolOptionControl {
+class ToolOptionIntPairSlider final : public DVGui::IntPairField,
+                                      public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -168,7 +170,8 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionIntSlider : public DVGui::IntField, public ToolOptionControl {
+class ToolOptionIntSlider final : public DVGui::IntField,
+                                  public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -188,7 +191,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionCombo : public QComboBox, public ToolOptionControl {
+class ToolOptionCombo final : public QComboBox, public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -209,7 +212,8 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionPopupButton : public PopupButton, public ToolOptionControl {
+class ToolOptionPopupButton final : public PopupButton,
+                                    public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -230,7 +234,8 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class ToolOptionTextField : public DVGui::LineEdit, public ToolOptionControl {
+class ToolOptionTextField final : public DVGui::LineEdit,
+                                  public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -247,8 +252,8 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class StyleIndexFieldAndChip : public DVGui::StyleIndexLineEdit,
-                               public ToolOptionControl {
+class StyleIndexFieldAndChip final : public DVGui::StyleIndexLineEdit,
+                                     public ToolOptionControl {
   Q_OBJECT
 
 protected:
@@ -280,8 +285,8 @@ public slots:
   the edited one)
   \li Undo/Redo of user interactions.
 */
-class ToolOptionParamRelayField : public DVGui::MeasuredDoubleLineEdit,
-                                  public ToolOptionControl {
+class ToolOptionParamRelayField final : public DVGui::MeasuredDoubleLineEdit,
+                                        public ToolOptionControl {
   Q_OBJECT
 
   TDoubleParamP m_param;  //!< Cached property param
@@ -356,7 +361,8 @@ signals:
 };
 //-----------------------------------------------------------------------------
 
-class PegbarChannelField : public MeasuredValueField, public ToolOptionControl {
+class PegbarChannelField final : public MeasuredValueField,
+                                 public ToolOptionControl {
   Q_OBJECT
 
   const enum TStageObject::Channel m_actionId;
@@ -386,8 +392,8 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI PegbarCenterField : public MeasuredValueField,
-                                public ToolOptionControl {
+class DVAPI PegbarCenterField final : public MeasuredValueField,
+                                      public ToolOptionControl {
   Q_OBJECT
 
   int m_index;  // 0 = x, 1 = y
@@ -410,7 +416,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class NoScaleField : public MeasuredValueField, public ToolOptionControl {
+class NoScaleField final : public MeasuredValueField, public ToolOptionControl {
   Q_OBJECT
 
 public:
@@ -426,7 +432,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class PropertyMenuButton : public QToolButton, public ToolOptionControl {
+class PropertyMenuButton final : public QToolButton, public ToolOptionControl {
   Q_OBJECT
 
   QList<TBoolProperty *> m_properties;
@@ -451,7 +457,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SelectionScaleField : public MeasuredValueField {
+class SelectionScaleField final : public MeasuredValueField {
   Q_OBJECT
 
   int m_id;
@@ -474,7 +480,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SelectionRotationField : public MeasuredValueField {
+class SelectionRotationField final : public MeasuredValueField {
   Q_OBJECT
 
   SelectionTool *m_tool;
@@ -492,7 +498,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class SelectionMoveField : public MeasuredValueField {
+class SelectionMoveField final : public MeasuredValueField {
   Q_OBJECT
 
   int m_id;
@@ -511,7 +517,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class ThickChangeField : public MeasuredValueField {
+class ThickChangeField final : public MeasuredValueField {
   Q_OBJECT
 
   SelectionTool *m_tool;

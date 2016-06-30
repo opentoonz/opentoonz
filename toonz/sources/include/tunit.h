@@ -32,7 +32,7 @@ public:
 
 //---------------------------
 
-class DVAPI TSimpleUnitConverter : public TUnitConverter {
+class DVAPI TSimpleUnitConverter final : public TUnitConverter {
   const double m_factor, m_offset;
 
 public:

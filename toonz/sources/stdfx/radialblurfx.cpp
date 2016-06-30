@@ -5,7 +5,7 @@
 #include "tparamset.h"
 #include "tparamuiconcept.h"
 
-class RadialBlurFx : public TStandardRasterFx {
+class RadialBlurFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(RadialBlurFx)
 
   TRasterFxPort m_input;

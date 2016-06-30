@@ -24,7 +24,7 @@ class ComboViewerPanel;
 class TopBar;
 //-----------------------------------------------------------------------------
 
-class Room : public TMainWindow {
+class Room final : public TMainWindow {
   Q_OBJECT
 
   TFilePath m_path;
@@ -63,7 +63,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class MainWindow : public QMainWindow {
+class MainWindow final : public QMainWindow {
   Q_OBJECT
 
   bool m_saveSettingsOnQuit;

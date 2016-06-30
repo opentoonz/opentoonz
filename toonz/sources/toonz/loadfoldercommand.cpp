@@ -133,7 +133,7 @@ public:
 //    OverwriteDialog  definition
 //************************************************************************
 
-class OverwriteDialog : public DVGui::ValidatedChoiceDialog {
+class OverwriteDialog final : public DVGui::ValidatedChoiceDialog {
 public:
   enum Resolution {
     NO_RESOLUTION,

@@ -34,7 +34,7 @@ class TColorFunction;
 
 namespace Tiio {
 
-class SwfWriterProperties : public TPropertyGroup {
+class SwfWriterProperties final : public TPropertyGroup {
 public:
   TEnumProperty m_lineQuality;
   TBoolProperty m_isCompressed;

@@ -65,7 +65,7 @@ public:
   TGeneralEdge(Type type) : m_type(type) {}
 };
 
-class TEdge : public TGeneralEdge {
+class TEdge final : public TGeneralEdge {
 public:
   TStroke *m_s;
   double m_w0, m_w1;

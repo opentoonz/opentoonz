@@ -72,7 +72,7 @@ bool IsQuickTimeInstalled();
 //    Mov TLevelWriter class
 //***********************************************************************************
 
-class TLevelWriterMov : public TLevelWriter {
+class TLevelWriterMov final : public TLevelWriter {
   std::vector<std::pair<int, TimeValue>> m_savedFrames;
   int m_IOError;
 
@@ -110,7 +110,7 @@ public:
 //    Mov TLevelReader class
 //***********************************************************************************
 
-class DVAPI TLevelReaderMov : public TLevelReader {
+class DVAPI TLevelReaderMov final : public TLevelReader {
   bool m_readAsToonzOutput;  // default: false
   bool m_yMirror;            // default: true
   bool m_loadTimecode;       // default: false
@@ -161,7 +161,7 @@ private:
 
 namespace Tiio {
 
-class MovWriterProperties : public TPropertyGroup {
+class MovWriterProperties final : public TPropertyGroup {
 public:
   MovWriterProperties();
 };

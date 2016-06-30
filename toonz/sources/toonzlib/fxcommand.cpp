@@ -690,7 +690,7 @@ std::vector<TFxCommand::Link> FxCommandUndo::outputLinks(TXsheet *xsh,
 //    Insert Fx  command
 //**********************************************************************
 
-class InsertFxUndo : public FxCommandUndo {
+class InsertFxUndo final : public FxCommandUndo {
   QList<TFxP> m_selectedFxs;
   QList<TFxCommand::Link> m_selectedLinks;
 
@@ -949,7 +949,7 @@ void TFxCommand::addFx(TFx *newFx, const QList<TFxP> &fxs, TApplication *app,
 //    Duplicate Fx  command
 //**********************************************************************
 
-class DuplicateFxUndo : public FxCommandUndo {
+class DuplicateFxUndo final : public FxCommandUndo {
   TFxP m_fx, m_dupFx;
   TXshColumnP m_column;
   int m_colIdx;
@@ -1080,7 +1080,7 @@ void TFxCommand::duplicateFx(TFx *src, TXsheetHandle *xshHandle,
 //    Replace Fx  command
 //**********************************************************************
 
-class ReplaceFxUndo : public FxCommandUndo {
+class ReplaceFxUndo final : public FxCommandUndo {
   TFxP m_fx, m_repFx, m_linkedFx;
   TXshColumnP m_column, m_repColumn;
   int m_colIdx, m_repColIdx;
@@ -1314,7 +1314,7 @@ void TFxCommand::replaceFx(TFx *newFx, const QList<TFxP> &fxs,
 //    Unlink Fx  command
 //**********************************************************************
 
-class UnlinkFxUndo : public FxCommandUndo {
+class UnlinkFxUndo final : public FxCommandUndo {
   TFxP m_fx, m_linkedFx;
 
   TXsheetHandle *m_xshHandle;
@@ -1509,7 +1509,7 @@ void TFxCommand::makeMacroFx(const std::vector<TFxP> &fxs, TApplication *app) {
 //    Explode Macro Fx  command
 //**********************************************************************
 
-class ExplodeMacroUndo : public MakeMacroUndo {
+class ExplodeMacroUndo final : public MakeMacroUndo {
 public:
   ExplodeMacroUndo(TMacroFx *macro, TApplication *app)
       : MakeMacroUndo(macro, app) {
@@ -1553,7 +1553,7 @@ void TFxCommand::explodeMacroFx(TMacroFx *macroFx, TApplication *app) {
 //    Create Output Fx  command
 //**********************************************************************
 
-class CreateOutputFxUndo : public FxCommandUndo {
+class CreateOutputFxUndo final : public FxCommandUndo {
   TFxP m_outputFx;
   TXsheetHandle *m_xshHandle;
 
@@ -1723,7 +1723,7 @@ void TFxCommand::connectNodesToXsheet(const std::list<TFxP> &fxs,
 //    Disconnect Nodes From Xsheet  command
 //**********************************************************************
 
-class DisconnectNodesFromXsheetUndo : public ConnectNodesToXsheetUndo {
+class DisconnectNodesFromXsheetUndo final : public ConnectNodesToXsheetUndo {
 public:
   DisconnectNodesFromXsheetUndo(const std::list<TFxP> &fxs,
                                 TXsheetHandle *xshHandle)
@@ -2049,7 +2049,7 @@ void deleteLinks(const std::list<TFxCommand::Link> &links,
 //    Delete Fx  command
 //******************************************************
 
-class DeleteFxOrColumnUndo : public DeleteLinksUndo {
+class DeleteFxOrColumnUndo final : public DeleteLinksUndo {
 protected:
   TFxP m_fx;
   TXshColumnP m_column;
@@ -2829,7 +2829,7 @@ void TFxCommand::addPasteFxs(TFx *inFx, const std::list<TFxP> &fxs,
 //    Insert Paste Fxs  command
 //**********************************************************************
 
-class UndoInsertPasteFxs : public UndoAddPasteFxs {
+class UndoInsertPasteFxs final : public UndoAddPasteFxs {
   TFxCommand::Link m_linkOut;  //!< Output link to be re-established
                                //!< on redo
 public:
@@ -2919,7 +2919,7 @@ void TFxCommand::insertPasteFxs(const Link &link, const std::list<TFxP> &fxs,
 //    Replace Paste Fxs  command
 //**********************************************************************
 
-class UndoReplacePasteFxs : public UndoAddPasteFxs {
+class UndoReplacePasteFxs final : public UndoAddPasteFxs {
   std::auto_ptr<DeleteFxOrColumnUndo> m_deleteFxUndo;
 
   TFx *m_fx, *m_rightmostFx;
@@ -3211,7 +3211,7 @@ void TFxCommand::disconnectFxs(const std::list<TFxP> &fxs,
 //    Connect Fxs  command
 //**********************************************************************
 
-class UndoConnectFxs : public UndoDisconnectFxs {
+class UndoConnectFxs final : public UndoDisconnectFxs {
   struct GroupData;
 
 private:
@@ -3355,7 +3355,7 @@ void TFxCommand::connectFxs(const Link &link, const std::list<TFxP> &fxs,
 //    Set Parent  command
 //**********************************************************************
 
-class SetParentUndo : public FxCommandUndo {
+class SetParentUndo final : public FxCommandUndo {
   TFxP m_oldFx, m_newFx, m_parentFx;
   int m_parentPort;
 
@@ -3483,7 +3483,7 @@ void TFxCommand::setParent(TFx *fx, TFx *parentFx, int parentFxPort,
 //    Rename Fx  command
 //**********************************************************************
 
-class UndoRenameFx : public FxCommandUndo {
+class UndoRenameFx final : public FxCommandUndo {
   TFxP m_fx;
   std::wstring m_newName, m_oldName;
 
@@ -3661,7 +3661,7 @@ void TFxCommand::groupFxs(const std::list<TFxP> &fxs,
 //    Ungroup Fxs  command
 //**********************************************************************
 
-class UndoUngroupFxs : public UndoGroupFxs {
+class UndoUngroupFxs final : public UndoGroupFxs {
 public:
   UndoUngroupFxs(int groupId, TXsheetHandle *xshHandle)
       : UndoGroupFxs(groupId, xshHandle) {
@@ -3748,7 +3748,7 @@ void TFxCommand::ungroupFxs(int groupId, TXsheetHandle *xshHandle) {
 //    Rename Group  command
 //**********************************************************************
 
-class UndoRenameGroup : public FxCommandUndo {
+class UndoRenameGroup final : public FxCommandUndo {
   std::vector<UndoGroupFxs::GroupData> m_groupData;
   std::wstring m_oldGroupName, m_newGroupName;
 

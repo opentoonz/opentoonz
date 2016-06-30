@@ -28,7 +28,7 @@ class TFilePath;
 // Previewer
 //-----------------------------------------------------------------------------
 
-class Previewer : public QObject, public TFxObserver {
+class Previewer final : public QObject, public TFxObserver {
   Q_OBJECT
 
   class Imp;

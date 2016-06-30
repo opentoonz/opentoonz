@@ -125,7 +125,7 @@ void eraseImage(const TRasterImageP &ri, const TRaster32P &image,
 
 //----------------------------------------------------------------------------------
 
-class RectFullColorUndo : public TFullColorRasterUndo {
+class RectFullColorUndo final : public TFullColorRasterUndo {
   TRectD m_modifyArea;
   TStroke *m_stroke;
   std::wstring m_eraseType;
@@ -180,7 +180,7 @@ public:
 
 //----------------------------------------------------------------------------------
 
-class FullColorEraserUndo : public TFullColorRasterUndo {
+class FullColorEraserUndo final : public TFullColorRasterUndo {
   std::vector<TThickPoint> m_points;
   int m_size;
   double m_hardness;
@@ -279,7 +279,7 @@ void eraseStroke(const TRasterImageP &ri, TStroke *stroke,
 //    FullColorEraserTool  definition
 //**********************************************************************************
 
-class FullColorEraserTool : public TTool {
+class FullColorEraserTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(FullColorEraserTool)
 
 public:

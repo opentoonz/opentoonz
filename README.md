@@ -24,6 +24,7 @@ Older versions and unstable nightly build are also available at <https://github.
 
 - [Windows](./doc/how_to_build_win.md)
 - [OS X](./doc/how_to_build_macosx.md)
+- [Linux](./doc/how_to_build_linux.md)
 
 ## Community
 

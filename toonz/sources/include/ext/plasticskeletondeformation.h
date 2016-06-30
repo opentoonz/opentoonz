@@ -44,7 +44,7 @@ class ParamChange;
 //**************************************************************************************
 
 //! The deformation of a plastic skeleton vertex.
-typedef struct DVAPI PlasticSkeletonVertexDeformation : public TPersist {
+typedef struct DVAPI PlasticSkeletonVertexDeformation final : public TPersist {
   PERSIST_DECLARATION(PlasticSkeletonVertexDeformation)
 
 public:
@@ -154,7 +154,8 @@ of the
   skeletons it is attached to. It is therefore intended to be a \a container of
 said skeletons.
 */
-class DVAPI PlasticSkeletonDeformation : public TSmartObject, public TPersist {
+class DVAPI PlasticSkeletonDeformation final : public TSmartObject,
+                                               public TPersist {
   DECLARE_CLASS_CODE
   PERSIST_DECLARATION(PlasticSkeletonDeformation)
 

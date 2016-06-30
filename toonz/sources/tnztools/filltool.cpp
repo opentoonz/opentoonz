@@ -88,7 +88,7 @@ inline int vectorFill(const TVectorImageP &img, const std::wstring &type,
 // VectorFillUndo
 //-----------------------------------------------------------------------------
 
-class VectorFillUndo : public TToolUndo {
+class VectorFillUndo final : public TToolUndo {
   int m_oldColorStyle;
   int m_newColorStyle;
   TPointD m_point;
@@ -167,7 +167,7 @@ public:
 // VectorRectFillUndo
 //-----------------------------------------------------------------------------
 
-class VectorRectFillUndo : public TToolUndo {
+class VectorRectFillUndo final : public TToolUndo {
   std::vector<TFilledRegionInf> *m_regionFillInformation;
   std::vector<std::pair<int, int>> *m_strokeFillInformation;
   TRectD m_selectionArea;
@@ -257,7 +257,7 @@ public:
 // RasterFillUndo
 //-----------------------------------------------------------------------------
 
-class RasterFillUndo : public TRasterUndo {
+class RasterFillUndo final : public TRasterUndo {
   FillParameters m_params;
   bool m_saveboxOnly;
 
@@ -327,7 +327,7 @@ public:
 // RasterRectFillUndo
 //-----------------------------------------------------------------------------
 
-class RasterRectFillUndo : public TRasterUndo {
+class RasterRectFillUndo final : public TRasterUndo {
   TRect m_fillArea;
   int m_paintId;
   std::wstring m_colorType;
@@ -400,7 +400,7 @@ public:
 // RasterRectAutoFillUndo
 //-----------------------------------------------------------------------------
 
-class RasterRectAutoFillUndo : public TRasterUndo {
+class RasterRectAutoFillUndo final : public TRasterUndo {
   TRect m_rectToFill;
   TFrameId m_fidToLearn;
   bool m_onlyUnfilled;
@@ -444,7 +444,7 @@ public:
 // RasterStrokeAutoFillUndo
 //-----------------------------------------------------------------------------
 
-class RasterStrokeAutoFillUndo : public TRasterUndo {
+class RasterStrokeAutoFillUndo final : public TRasterUndo {
   TTileSetCM32 *m_tileSet;
 
 public:
@@ -482,7 +482,7 @@ public:
 // RasterRectAutoFillUndo
 //-----------------------------------------------------------------------------
 
-class VectorAutoFillUndo : public TToolUndo {
+class VectorAutoFillUndo final : public TToolUndo {
   std::vector<TFilledRegionInf> *m_regionFillInformation;
   TRectD m_selectionArea;
   TStroke *m_selectingStroke;
@@ -972,7 +972,7 @@ void SequencePainter::processSequence(TXshSimpleLevel *sl, TFrameId firstFid,
 // MultiAreaFiller : SequencePainter
 //-----------------------------------------------------------------------------
 
-class MultiAreaFiller : public SequencePainter {
+class MultiAreaFiller final : public SequencePainter {
   TRectD m_firstRect, m_lastRect;
   bool m_unfilledOnly;
   std::wstring m_colorType;
@@ -1047,7 +1047,7 @@ public:
 // MultiFiller : SequencePainter
 //-----------------------------------------------------------------------------
 
-class MultiFiller : public SequencePainter {
+class MultiFiller final : public SequencePainter {
   TPointD m_firstPoint, m_lastPoint;
   FillParameters m_params;
 
@@ -1666,7 +1666,7 @@ public:
 // Fill Tool
 //-----------------------------------------------------------------------------
 
-class FillTool : public TTool {
+class FillTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(FillTool)
 
   bool m_firstTime;

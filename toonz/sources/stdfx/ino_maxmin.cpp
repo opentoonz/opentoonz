@@ -7,7 +7,7 @@ namespace {
 const double smoothing_edge_ = 1.0;
 }
 //------------------------------------------------------------
-class ino_maxmin : public TStandardRasterFx {
+class ino_maxmin final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_maxmin)
   TRasterFxPort m_input;
   TRasterFxPort m_refer;

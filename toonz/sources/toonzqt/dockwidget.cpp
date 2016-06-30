@@ -39,7 +39,7 @@ void DockingCheck::setIsEnabled(bool on) {
 
 //========================================================
 
-class DockingToggleCommand : public MenuItemHandler {
+class DockingToggleCommand final : public MenuItemHandler {
 public:
   DockingToggleCommand() : MenuItemHandler("MI_DockingCheck") {}
 

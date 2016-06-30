@@ -16,7 +16,7 @@ class Server;
 
 //------------------------------------------------------------------
 
-class SocketController : public QObject {
+class SocketController final : public QObject {
   Q_OBJECT
 
 public:

@@ -23,7 +23,7 @@ class DragTool;
 // MotionPathMenu
 //-----------------------------------------------------------------------------
 
-class MotionPathMenu : public QWidget {
+class MotionPathMenu final : public QWidget {
   Q_OBJECT
 
   QRect m_mDeleteRect;
@@ -84,7 +84,7 @@ protected slots:
 // ChangeObjectParent
 //-----------------------------------------------------------------------------
 
-class ChangeObjectParent : public ChangeObjectWidget {
+class ChangeObjectParent final : public ChangeObjectWidget {
   Q_OBJECT
 
 public:
@@ -101,7 +101,7 @@ protected slots:
 // ChangeObjectHandle
 //-----------------------------------------------------------------------------
 
-class ChangeObjectHandle : public ChangeObjectWidget {
+class ChangeObjectHandle final : public ChangeObjectWidget {
   Q_OBJECT
 
 public:
@@ -118,7 +118,7 @@ protected slots:
 // RenameColumnField
 //-----------------------------------------------------------------------------
 
-class RenameColumnField : public QLineEdit {
+class RenameColumnField final : public QLineEdit {
   Q_OBJECT
 
   int m_col;
@@ -146,7 +146,7 @@ protected slots:
 // ColumnArea
 //-----------------------------------------------------------------------------
 
-class ColumnTransparencyPopup : public QWidget {
+class ColumnTransparencyPopup final : public QWidget {
   Q_OBJECT
 
   QSlider *m_slider;
@@ -169,7 +169,7 @@ protected slots:
 };
 
 //! La classe si occupa della visualizzazione dell'area che gestisce le colonne.
-class ColumnArea : public QWidget {
+class ColumnArea final : public QWidget {
   Q_OBJECT
 
   enum { ToggleTransparency = 1, TogglePreviewVisible, ToggleLock };

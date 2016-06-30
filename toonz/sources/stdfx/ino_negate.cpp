@@ -4,7 +4,7 @@
 
 #include "ino_common.h"
 //------------------------------------------------------------
-class ino_negate : public TStandardRasterFx {
+class ino_negate final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_negate)
   TRasterFxPort m_input;
   TBoolParamP m_red;

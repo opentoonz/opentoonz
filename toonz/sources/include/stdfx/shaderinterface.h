@@ -68,7 +68,7 @@ class QGLShaderProgram;
   A loaded ShaderInterface allows access to shader parameters and
   acts as a factory object to compiled QGLShaderProgram instances.
 */
-class DVAPI ShaderInterface : public TPersist {
+class DVAPI ShaderInterface final : public TPersist {
 public:  // Enums
   enum ParameterConceptType {
     CONCEPT_NONE,
@@ -110,7 +110,7 @@ public:  // Enums
   enum HandledWorldTransformsType { HWT_UNKNOWN, ANY, ISOTROPIC, HWTCOUNT };
 
 public:  // Sub-classes
-  class ParameterConcept : public TPersist {
+  class ParameterConcept final : public TPersist {
     PERSIST_DECLARATION(ParameterConcept)
 
   public:
@@ -147,7 +147,7 @@ public:  // Sub-classes
     GLubyte m_rgb[3];
   };
 
-  class Parameter : public TPersist {
+  class Parameter final : public TPersist {
     PERSIST_DECLARATION(Parameter)
 
   public:
@@ -169,7 +169,7 @@ public:  // Sub-classes
     void loadData(TIStream &is) override;
   };
 
-  class ShaderData : public TPersist {
+  class ShaderData final : public TPersist {
     PERSIST_DECLARATION(ShaderData)
 
   public:

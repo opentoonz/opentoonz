@@ -18,7 +18,7 @@
 //=========================================================
 
 template <class T>
-class DVAPI TSoundTrackT : public TSoundTrack {
+class DVAPI TSoundTrackT final : public TSoundTrack {
 public:
   typedef T SampleType;
 

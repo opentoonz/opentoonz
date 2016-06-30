@@ -10,7 +10,7 @@
 // TKeyframeSelection
 //-----------------------------------------------------------------------------
 
-class TKeyframeSelection : public TSelection {
+class TKeyframeSelection final : public TSelection {
 public:
   typedef std::pair<int, int> Position;  // row, col
 

@@ -117,7 +117,7 @@ bool getTilesToBuild(
 //    TFxCacheManager Generator
 //****************************************************************************************************
 
-class TFxCacheManagerGenerator : public TRenderResourceManagerGenerator {
+class TFxCacheManagerGenerator final : public TRenderResourceManagerGenerator {
 public:
   TFxCacheManagerGenerator() : TRenderResourceManagerGenerator(true) {}
 

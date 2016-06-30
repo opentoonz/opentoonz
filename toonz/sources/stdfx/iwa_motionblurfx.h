@@ -36,7 +36,7 @@ enum PremultiTypes {
   SOURCE_IS_NOT_PREMUTIPLIED
 };
 
-class Iwa_MotionBlurCompFx : public MotionAwareBaseFx {
+class Iwa_MotionBlurCompFx final : public MotionAwareBaseFx {
   FX_PLUGIN_DECLARATION(Iwa_MotionBlurCompFx)
 
 protected:

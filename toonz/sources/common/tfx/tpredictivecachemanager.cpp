@@ -11,7 +11,7 @@
 //    Preliminaries
 //************************************************************************************************
 
-class TPredictiveCacheManagerGenerator
+class TPredictiveCacheManagerGenerator final
     : public TRenderResourceManagerGenerator {
 public:
   TPredictiveCacheManagerGenerator() : TRenderResourceManagerGenerator(true) {}

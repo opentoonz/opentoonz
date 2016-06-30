@@ -44,7 +44,7 @@ class MessageParser;
   associations to perform message parsing.
 */
 
-class DVAPI Server : public QLocalServer {
+class DVAPI Server final : public QLocalServer {
   Q_OBJECT
 
   QHash<QString, MessageParser *> m_parsers;

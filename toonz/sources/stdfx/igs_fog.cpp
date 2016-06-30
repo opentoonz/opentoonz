@@ -566,9 +566,9 @@ void put_sl_ch_(std::vector<double> &result, const int hh, const int ww,
 }
 namespace {  //--------------------------------------------------------
 template <class T>
-class one_thread_
+class one_thread_ final
     : public igs::resource::thread_execute_interface { /* thread単位の実行設定
-                                                          */
+                                                    */
 public:
   one_thread_() {}
   void setup(T in_image, T out_image, double *ref_thresh

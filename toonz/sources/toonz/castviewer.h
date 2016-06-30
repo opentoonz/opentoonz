@@ -17,7 +17,7 @@ class CastItems;
 
 //-----------------------------------------------------------------------------
 
-class CastTreeViewer : public QTreeWidget, public TSelection {
+class CastTreeViewer final : public QTreeWidget, public TSelection {
   Q_OBJECT
   QTreeWidgetItem *m_dropTargetItem;
   TFilePath m_dropFilePath;
@@ -68,7 +68,7 @@ signals:
    m_treeView
    e un widget che consente di visualizzare i file \b m_sceneCastView.
    I suoi widget sono settati tramite un modello del tipo \b SceneCastModel.*/
-class CastBrowser : public QSplitter, public DvItemListModel {
+class CastBrowser final : public QSplitter, public DvItemListModel {
   Q_OBJECT
 
   CastTreeViewer *m_treeViewer;

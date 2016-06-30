@@ -577,7 +577,7 @@ void FlipConsole::setActive(bool active) {
 
 #define LX 21
 #define LY 17
-class DoubleButton : public QToolButton {
+class DoubleButton final : public QToolButton {
   QAction *m_firstAction, *m_secondAction;
   QIcon::Mode m_firstMode, m_secondMode;
   QIcon::State m_firstState, m_secondState;

@@ -17,7 +17,7 @@ class TXshColumn;
 // TCellData
 //-----------------------------------------------------------------------------
 
-class TCellData : public DvMimeData {
+class TCellData final : public DvMimeData {
   std::vector<TXshCell> m_cells;
   int m_rowCount, m_colCount;
 

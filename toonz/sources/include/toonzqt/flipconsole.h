@@ -47,7 +47,7 @@ class FlipConsoleOwner;
 class TFrameHandle;
 //-----------------------------------------------------------------------------
 
-class PlaybackExecutor : public QThread {
+class PlaybackExecutor final : public QThread {
   Q_OBJECT
 
   int m_fps;
@@ -71,7 +71,7 @@ signals:
 //-----------------------------------------------------------------------------
 
 // Implements a flipbook slider with a progress bar in background.
-class FlipSlider : public QAbstractSlider {
+class FlipSlider final : public QAbstractSlider {
   Q_OBJECT
 
   Q_PROPERTY(int PBHeight READ getPBHeight WRITE setPBHeight)
@@ -179,7 +179,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI FlipConsole : public QWidget {
+class DVAPI FlipConsole final : public QWidget {
   Q_OBJECT
 
 public:

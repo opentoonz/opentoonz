@@ -34,7 +34,7 @@ getIcon()
 */
 //=============================================================================
 
-class DVAPI TXshLevelColumn : public TXshCellColumn {
+class DVAPI TXshLevelColumn final : public TXshCellColumn {
   PERSIST_DECLARATION(TXshLevelColumn)
   TLevelColumnFx *m_fx;
   std::string m_iconId;

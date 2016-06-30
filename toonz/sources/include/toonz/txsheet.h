@@ -116,7 +116,7 @@ the xsheet refers using
                 getScene() and setScene().
 */
 
-class DVAPI TXsheet : public TSmartObject, public TPersist {
+class DVAPI TXsheet final : public TSmartObject, public TPersist {
   PERSIST_DECLARATION(TXsheet)
 
 public:

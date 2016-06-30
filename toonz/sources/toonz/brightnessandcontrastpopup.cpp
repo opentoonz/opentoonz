@@ -197,7 +197,7 @@ inline void onChange(const RAS &ras, int contrast, int brightness) {
 //    BrightnessAndContrastPopup Swatch
 //**************************************************************************
 
-class BrightnessAndContrastPopup::Swatch : public PlaneViewer {
+class BrightnessAndContrastPopup::Swatch final : public PlaneViewer {
   TRasterP m_ras;
 
 public:
@@ -402,7 +402,7 @@ void BrightnessAndContrastPopup::hideEvent(QHideEvent *he) {
 
 //-----------------------------------------------------------------------------
 
-class TRasterBrightnessUndo : public TUndo {
+class TRasterBrightnessUndo final : public TUndo {
   int m_r, m_c, m_brightness, m_contrast;
 
   QString m_rasId;

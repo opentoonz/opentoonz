@@ -3116,8 +3116,8 @@ double *reparameterize3D(const TThickCubic &cubic,
   for (int i = 0; i < size; i++) {
     uPrime[i] = NewtonRaphsonRootFind3D(cubic, *(pointsArrayBegin + i), u[i]);
     if (!_finite(uPrime[i])) {
-      delete uPrime;
-      return 0;
+      delete[] uPrime;
+      return NULL;
     }
   }
 
@@ -3125,8 +3125,8 @@ double *reparameterize3D(const TThickCubic &cubic,
   // std::sort( uPrime, uPrime+size );
 
   if (uPrime[0] < 0.0 || uPrime[size - 1] > 1.0) {
-    delete uPrime;
-    return 0;
+    delete[] uPrime;
+    return NULL;
   }
 
   assert(uPrime[0] >= 0.0);

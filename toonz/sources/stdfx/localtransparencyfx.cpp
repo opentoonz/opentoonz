@@ -113,7 +113,7 @@ void drawCheckboard(TRaster32P &raster) {
 
 //-------------------------------------------------------------------
 
-class LocalTransparencyFx : public TStandardRasterFx {
+class LocalTransparencyFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(LocalTransparencyFx)
 protected:
   TRasterFxPort m_src, m_ref;

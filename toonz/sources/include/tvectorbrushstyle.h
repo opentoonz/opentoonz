@@ -22,7 +22,7 @@
 //    Vector Brush Style  declaration
 //**********************************************************************
 
-class DVAPI TVectorBrushStyle : public TColorStyle {
+class DVAPI TVectorBrushStyle final : public TColorStyle {
   static TFilePath m_rootDir;
 
   std::string m_brushName;

@@ -19,7 +19,7 @@ using namespace ToolUtils;
 namespace {
 //-----------------------------------------------------------------------------
 
-class SetSaveboxUndo : public TRasterUndo {
+class SetSaveboxUndo final : public TRasterUndo {
   TRect m_modifiedSavebox;
   TRect m_originalSavebox;
 

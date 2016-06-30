@@ -9,7 +9,7 @@
 //-------------------------------------------------------------------
 
 /*
-class VerticalCameraFldUnitConverter : public TUnitConverter {
+class VerticalCameraFldUnitConverter final : public TUnitConverter {
 public:
   static double m_factor;
   VerticalCameraFldUnitConverter() {}
@@ -35,7 +35,7 @@ void setCurrentDpiGetter(CurrentDpiGetter f) { currentDpiGetter = f; }
 
 //-------------------------------------------------------------------
 
-class VerticalFldUnitConverter : public TUnitConverter {
+class VerticalFldUnitConverter final : public TUnitConverter {
   double m_factor;
 
 public:
@@ -70,7 +70,7 @@ double getFieldGuideAspectRatio() {
 
 //===================================================================
 
-class TangentConverter : public TUnitConverter {
+class TangentConverter final : public TUnitConverter {
 public:
   TangentConverter() {}
   TUnitConverter *clone() const override { return new TangentConverter(*this); }
@@ -82,7 +82,7 @@ public:
 
 //===================================================================
 
-class TPixelUnitXConverter : public TUnitConverter {
+class TPixelUnitXConverter final : public TUnitConverter {
 public:
   TPixelUnitXConverter() {}
   TUnitConverter *clone() const override {
@@ -96,7 +96,7 @@ public:
   }
 };
 
-class TPixelUnitYConverter : public TUnitConverter {
+class TPixelUnitYConverter final : public TUnitConverter {
 public:
   TPixelUnitYConverter() {}
   TUnitConverter *clone() const override {
@@ -530,7 +530,7 @@ std::wstring TMeasuredValue::toWideString(int decimals) const {
 
 namespace {
 
-class ZDepthUnitConverter : public TUnitConverter {
+class ZDepthUnitConverter final : public TUnitConverter {
   TMeasureManager::CameraSizeProvider *m_cameraSizeProvider;
 
 public:
@@ -550,7 +550,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class CameraZDepthUnitConverter : public TUnitConverter {
+class CameraZDepthUnitConverter final : public TUnitConverter {
   TMeasureManager::CameraSizeProvider *m_cameraSizeProvider;
 
 public:
@@ -571,7 +571,7 @@ public:
 
 //===================================================================
 /*-- Zのカーブのハンドルの長さは0=0となるようにしなければならない --*/
-class ZDepthHandleUnitConverter : public TUnitConverter {
+class ZDepthHandleUnitConverter final : public TUnitConverter {
   TMeasureManager::CameraSizeProvider *m_cameraSizeProvider;
 
 public:
@@ -591,7 +591,7 @@ public:
   }
 };
 
-class CameraZDepthHandleUnitConverter : public TUnitConverter {
+class CameraZDepthHandleUnitConverter final : public TUnitConverter {
   TMeasureManager::CameraSizeProvider *m_cameraSizeProvider;
 
 public:

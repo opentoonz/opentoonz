@@ -39,7 +39,7 @@ TEnv::StringVar TapeType("InknpaintTapeType1", "Normal");
 TEnv::DoubleVar AutocloseFactor("InknpaintAutocloseFactor", 4.0);
 namespace {
 
-class UndoAutoclose : public ToolUtils::TToolUndo {
+class UndoAutoclose final : public ToolUtils::TToolUndo {
   int m_oldStrokeId1;
   int m_oldStrokeId2;
   int m_pos1, m_pos2;
@@ -173,7 +173,7 @@ public:
 // Autoclose Tool
 //-----------------------------------------------------------------------------
 
-class VectorTapeTool : public TTool {
+class VectorTapeTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(VectorTapeTool)
 
   bool m_draw;

@@ -28,7 +28,7 @@ class QString;
 // ToolHandle
 //-----------------------------------------------------------------------------
 
-class DVAPI ToolHandle : public QObject {
+class DVAPI ToolHandle final : public QObject {
   Q_OBJECT
 
   TTool *m_tool;

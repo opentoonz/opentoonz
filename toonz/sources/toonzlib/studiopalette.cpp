@@ -202,7 +202,6 @@ StudioPalette *StudioPalette::instance() {
 
 //-------------------------------------------------------------------
 
-
 TFilePath StudioPalette::getLevelPalettesRoot() {
   return m_root + "Global Palettes";
 }

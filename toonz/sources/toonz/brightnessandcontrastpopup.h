@@ -19,7 +19,7 @@ class IntField;
 // BrightnessAndContrastPopup
 //-----------------------------------------------------------------------------
 
-class BrightnessAndContrastPopup : public DVGui::Dialog {
+class BrightnessAndContrastPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::IntField *m_brightnessField;

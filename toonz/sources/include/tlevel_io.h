@@ -106,7 +106,7 @@ private:
 template class DVAPI TSmartPointerT<TLevelReader>;
 #endif
 
-class DVAPI TLevelReaderP : public TSmartPointerT<TLevelReader> {
+class DVAPI TLevelReaderP final : public TSmartPointerT<TLevelReader> {
 public:
   // il costruttore "non banale"
   TLevelReaderP(const TFilePath &filepath, int reader = 0);
@@ -211,7 +211,7 @@ public:
 template class DVAPI TSmartPointerT<TLevelWriter>;
 #endif
 
-class DVAPI TLevelWriterP : public TSmartPointerT<TLevelWriter> {
+class DVAPI TLevelWriterP final : public TSmartPointerT<TLevelWriter> {
 public:
   // il costruttore "non banale"
   TLevelWriterP(const TFilePath &filepath,

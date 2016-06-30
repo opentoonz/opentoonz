@@ -444,7 +444,7 @@ void setParamStep(int indexKeyframe, int step, TDoubleParam *param) {
 // RenameCellUndo
 //-----------------------------------------------------------------------------
 
-class RenameCellUndo : public TUndo {
+class RenameCellUndo final : public TUndo {
   int m_row;
   int m_col;
   const TXshCell m_oldCell;
@@ -1572,7 +1572,7 @@ void CellArea::paintEvent(QPaintEvent *event) {
 
 //-----------------------------------------------------------------------------
 
-class CycleUndo : public TUndo {
+class CycleUndo final : public TUndo {
   TStageObject *m_pegbar;
   CellArea *m_area;
 

@@ -181,7 +181,7 @@ public:
 //
 
 template <class T>
-class CommandHandlerHelper : public CommandHandlerInterface {
+class CommandHandlerHelper final : public CommandHandlerInterface {
   T *m_target;
   void (T::*m_method)();
 
@@ -192,7 +192,7 @@ public:
 };
 
 template <class T, typename R>
-class CommandHandlerHelper2 : public CommandHandlerInterface {
+class CommandHandlerHelper2 final : public CommandHandlerInterface {
   T *m_target;
   void (T::*m_method)(R value);
   R m_value;
@@ -222,7 +222,7 @@ public:
 };
 
 template <class T>
-class OpenPopupCommandHandler : public MenuItemHandler {
+class OpenPopupCommandHandler final : public MenuItemHandler {
   T *m_popup;
   CommandId m_id;
 
@@ -240,7 +240,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI DVAction : public QAction {
+class DVAPI DVAction final : public QAction {
   Q_OBJECT
 public:
   DVAction(const QString &text, QObject *parent);
@@ -252,7 +252,7 @@ public slots:
 
 //-----------------------------------------------------------------------------
 
-class DVAPI DVMenuAction : public QMenu {
+class DVAPI DVMenuAction final : public QMenu {
   Q_OBJECT
 
   int m_triggeredActionIndex;

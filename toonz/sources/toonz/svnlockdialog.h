@@ -17,7 +17,7 @@ class QFile;
 
 //-----------------------------------------------------------------------------
 
-class SVNLockDialog : public DVGui::Dialog {
+class SVNLockDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QLabel *m_waitingLabel;
@@ -76,7 +76,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNLockInfoDialog : public DVGui::Dialog {
+class SVNLockInfoDialog final : public DVGui::Dialog {
   Q_OBJECT
   SVNStatus m_status;
 

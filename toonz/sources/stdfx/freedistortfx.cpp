@@ -75,14 +75,14 @@ private:
   TDoubleParamP m_downBlur;
 };
 
-class FreeDistortFx : public FreeDistortBaseFx {
+class FreeDistortFx final : public FreeDistortBaseFx {
   FX_PLUGIN_DECLARATION(FreeDistortFx)
 
 public:
   FreeDistortFx() : FreeDistortBaseFx(false) {}
 };
 
-class CastShadowFx : public FreeDistortBaseFx {
+class CastShadowFx final : public FreeDistortBaseFx {
   FX_PLUGIN_DECLARATION(CastShadowFx)
 public:
   CastShadowFx() : FreeDistortBaseFx(true) {}

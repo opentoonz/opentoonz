@@ -85,7 +85,7 @@ public:
 
   //	void blurPixel(CSTColSelPic<UC_PIXEL>& pic, const int xx, const int yy,
   //				   const CBlurMatrix& bm, UC_PIXEL& col,const
-  //UCHAR
+  // UCHAR
   // osel);
   //	bool isContourOnPath(const int xx, const int yy,
   //						 std::vector<BLURSECTION>::const_iterator

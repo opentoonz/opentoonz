@@ -34,7 +34,7 @@
 #endif
 
 template <class T>
-class TNotAnimatableParamChange : public TParamChange {
+class TNotAnimatableParamChange final : public TParamChange {
   T m_oldValue;
   T m_newValue;
 
@@ -57,7 +57,7 @@ public:
 //-----------------------------------------------------------------------------
 
 template <class T>
-class TNotAnimatableParamChangeUndo : public TUndo {
+class TNotAnimatableParamChangeUndo final : public TUndo {
 public:
   TNotAnimatableParamChangeUndo(TParam *param, const T &oldValue,
                                 const T &newValue);
@@ -187,7 +187,7 @@ class TIntParam;
 template class DVAPI TPersistDeclarationT<TIntParam>;
 #endif
 
-class DVAPI TIntParam : public TNotAnimatableParam<int> {
+class DVAPI TIntParam final : public TNotAnimatableParam<int> {
   PERSIST_DECLARATION(TIntParam);
   int minValue, maxValue;
   bool m_isWheelEnabled;
@@ -223,7 +223,7 @@ class TBoolParam;
 template class DVAPI TPersistDeclarationT<TBoolParam>;
 #endif
 
-class DVAPI TBoolParam : public TNotAnimatableParam<bool> {
+class DVAPI TBoolParam final : public TNotAnimatableParam<bool> {
   PERSIST_DECLARATION(TBoolParam);
 
 public:
@@ -250,7 +250,7 @@ class TFilePathParam;
 template class DVAPI TPersistDeclarationT<TFilePathParam>;
 #endif
 
-class DVAPI TFilePathParam : public TNotAnimatableParam<TFilePath> {
+class DVAPI TFilePathParam final : public TNotAnimatableParam<TFilePath> {
   PERSIST_DECLARATION(TFilePathParam);
 
 public:
@@ -277,7 +277,7 @@ class TStringParam;
 template class DVAPI TPersistDeclarationT<TStringParam>;
 #endif
 
-class DVAPI TStringParam : public TNotAnimatableParam<std::wstring> {
+class DVAPI TStringParam final : public TNotAnimatableParam<std::wstring> {
   PERSIST_DECLARATION(TStringParam);
 
 public:
@@ -299,7 +299,7 @@ DEFINE_PARAM_SMARTPOINTER(TStringParam, std::wstring)
 
 class TEnumParamImp;
 
-class DVAPI TEnumParam : public TNotAnimatableParam<int> {
+class DVAPI TEnumParam final : public TNotAnimatableParam<int> {
   PERSIST_DECLARATION(TEnumParam)
 
 public:
@@ -335,7 +335,7 @@ typedef TNotAnimatableParamObserver<TIntEnumParam> TIntEnumParamObserver;
 
 DVAPI_PARAM_SMARTPOINTER(TIntEnumParam)
 
-class DVAPI TIntEnumParamP
+class DVAPI TIntEnumParamP final
     : public TDerivedSmartPointerT<TIntEnumParam, TParam> {
 public:
   TIntEnumParamP(TIntEnumParam *p = 0) : DerivedSmartPointer(p) {}
@@ -360,7 +360,7 @@ class TNADoubleParam;
 template class DVAPI TPersistDeclarationT<TNADoubleParam>;
 #endif
 
-class DVAPI TNADoubleParam : public TNotAnimatableParam<double> {
+class DVAPI TNADoubleParam final : public TNotAnimatableParam<double> {
   PERSIST_DECLARATION(TNADoubleParam);
 
 public:

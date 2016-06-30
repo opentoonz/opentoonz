@@ -70,7 +70,7 @@ using EditToolGadgets::DragTool;
 // DragCenterTool
 //-----------------------------------------------------------------------------
 
-class DragCenterTool : public DragTool {
+class DragCenterTool final : public DragTool {
   TStageObjectId m_objId;
   int m_frame;
 
@@ -241,7 +241,7 @@ public:
 // DragPositionTool
 //-----------------------------------------------------------------------------
 
-class DragPositionTool : public DragChannelTool {
+class DragPositionTool final : public DragChannelTool {
   bool m_lockPositionX;
   bool m_lockPositionY;
 
@@ -282,7 +282,7 @@ public:
 // DragSplinePositionTool
 //-----------------------------------------------------------------------------
 
-class DragSplinePositionTool : public DragChannelTool {
+class DragSplinePositionTool final : public DragChannelTool {
   const TStroke *m_spline;
   std::vector<double> m_lengthAtCPs;
   double m_offset;
@@ -369,7 +369,7 @@ else return 0.0;
 // DragRotationTool
 //-----------------------------------------------------------------------------
 
-class DragRotationTool : public DragChannelTool {
+class DragRotationTool final : public DragChannelTool {
   TPointD m_lastPos;
   TPointD m_center;
   bool m_lockRotation;
@@ -413,7 +413,7 @@ a = m_viewer->mouseToTool(gc) - m_curCenter;
 // DragIsotropicScaleTool
 //-----------------------------------------------------------------------------
 
-class DragIsotropicScaleTool : public DragChannelTool {
+class DragIsotropicScaleTool final : public DragChannelTool {
   TPointD m_center;
   double m_r0;
   bool m_lockGlobalScale;
@@ -446,7 +446,7 @@ public:
 // DragScaleTool
 //-----------------------------------------------------------------------------
 
-class DragScaleTool : public DragChannelTool {
+class DragScaleTool final : public DragChannelTool {
   TPointD m_center;
   int m_constraint;
 
@@ -521,7 +521,7 @@ public:
 // DragShearTool
 //-----------------------------------------------------------------------------
 
-class DragShearTool : public DragChannelTool {
+class DragShearTool final : public DragChannelTool {
   TPointD m_center;
   bool m_lockShearH;
   bool m_lockShearV;
@@ -565,7 +565,7 @@ public:
 // DragZTool
 //-----------------------------------------------------------------------------
 
-class DragZTool : public DragChannelTool {
+class DragZTool final : public DragChannelTool {
   TPoint m_lastPos;
   TTool::Viewer *m_viewer;
   double m_dz;
@@ -599,7 +599,7 @@ public:
 // EditTool
 //-----------------------------------------------------------------------------
 
-class EditTool : public TTool {
+class EditTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(EditTool)
 
   DragTool *m_dragTool;

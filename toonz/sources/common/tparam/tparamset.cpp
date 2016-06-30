@@ -18,7 +18,7 @@ void doRelease(const std::pair<TParam *, std::string> &param) {
 
 //------------------------------------------------------------------------------
 
-class TParamSetImp : public TParamObserver {
+class TParamSetImp final : public TParamObserver {
   friend class TParamSet;
   TParamSet *m_param;
   std::vector<std::pair<TParam *, std::string>> m_params;
@@ -62,7 +62,8 @@ TParamSet::~TParamSet() { delete m_imp; }
 //---------------------------------------------------------
 /*
 template <class Container >
-class MyBackInsertIterator : public std::iterator<std::output_iterator_tag,
+class MyBackInsertIterator final : public
+std::iterator<std::output_iterator_tag,
 void, void, void, void>
 {
 protected:
@@ -323,7 +324,7 @@ void TParamSet::enableDragging(bool on) {
 /*
 namespace {
 
-class DoEnableNotification : public std::binary_function {
+class DoEnableNotification final : public std::binary_function {
 public:
   DoEnableNotification() {}
 

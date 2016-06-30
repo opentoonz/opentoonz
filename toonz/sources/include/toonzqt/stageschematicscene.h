@@ -81,7 +81,7 @@ public:
 //! To regenearte the scene use the updateScene().\n
 //! To oreder nodes in the scene use the reorderScene().
 
-class StageSchematicScene : public SchematicScene {
+class StageSchematicScene final : public SchematicScene {
   Q_OBJECT
   TXsheetHandle *m_xshHandle;
   TObjectHandle *m_objHandle;

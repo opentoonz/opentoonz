@@ -895,7 +895,7 @@ set<int> explode(TXsheet *xsh, TXsheet *subXsh, int index,
 // OpenChildUndo
 //-----------------------------------------------------------------------------
 
-class OpenChildUndo : public TUndo {
+class OpenChildUndo final : public TUndo {
   int m_row, m_col;
 
 public:
@@ -931,7 +931,7 @@ public:
 // CloseChildUndo
 //-----------------------------------------------------------------------------
 
-class CloseChildUndo : public TUndo {
+class CloseChildUndo final : public TUndo {
   std::vector<std::pair<int, int>> m_cells;
 
 public:
@@ -1532,7 +1532,7 @@ public:
 // CollapseFxUndo
 //-----------------------------------------------------------------------------
 
-class CollapseFxUndo : public CollapseUndo {
+class CollapseFxUndo final : public CollapseUndo {
   set<TFx *> m_fxs;
   QMap<TFx *, FxConnections> m_fxConnections;
 
@@ -1624,7 +1624,7 @@ public:
 // ExplodeChildUndoRemovingColumn
 //-----------------------------------------------------------------------------
 
-class ExplodeChildUndoRemovingColumn : public TUndo {
+class ExplodeChildUndoRemovingColumn final : public TUndo {
   std::set<int> m_newIndexs;
   int m_index;
   StageObjectsData *m_oldData;
@@ -1914,7 +1914,7 @@ public:
 // ExplodeChildUndo
 //-----------------------------------------------------------------------------
 
-class ExplodeChildUndoWithoutRemovingColumn : public TUndo {
+class ExplodeChildUndoWithoutRemovingColumn final : public TUndo {
   std::set<int> m_newIndexs;
   int m_index, m_from, m_to;
 
@@ -2098,7 +2098,7 @@ public:
 // OpenChildCommand
 //-----------------------------------------------------------------------------
 
-class OpenChildCommand : public MenuItemHandler {
+class OpenChildCommand final : public MenuItemHandler {
 public:
   OpenChildCommand() : MenuItemHandler(MI_OpenChild) {}
   void execute() override { openSubXsheet(); }
@@ -2108,7 +2108,7 @@ public:
 // CloseChildCommand
 //-----------------------------------------------------------------------------
 
-class CloseChildCommand : public MenuItemHandler {
+class CloseChildCommand final : public MenuItemHandler {
 public:
   CloseChildCommand() : MenuItemHandler(MI_CloseChild) {}
   void execute() override { closeSubXsheet(1); }
@@ -2118,7 +2118,7 @@ public:
 // ToggleEditInPlaceCommand
 //-----------------------------------------------------------------------------
 
-class ToggleEditInPlaceCommand : public MenuItemHandler {
+class ToggleEditInPlaceCommand final : public MenuItemHandler {
 public:
   ToggleEditInPlaceCommand() : MenuItemHandler(MI_ToggleEditInPlace) {}
   void execute() override { toggleEditInPlace(); }

@@ -392,7 +392,7 @@ void CameraTestToggleCommand::clean() {
 //=============================================================================
 /*! CameraTestのドラッグ移動のUndo
 */
-class UndoCameraTestMove : public TUndo {
+class UndoCameraTestMove final : public TUndo {
   TPointD m_before, m_after;
   CleanupParameters *m_cp;
 
@@ -437,7 +437,7 @@ public:
 //=============================================================================
 /*! CameraTestのサイズ変更のUndo
 */
-class UndoCameraTestScale : public TUndo {
+class UndoCameraTestScale final : public TUndo {
   TDimension m_resBefore, m_resAfter;
   TDimensionD m_sizeBefore, m_sizeAfter;
   CleanupParameters *m_cp;
@@ -492,7 +492,7 @@ public:
 //    CameraTestTool definition
 //**********************************************************************************
 
-class CameraTestTool : public TTool {
+class CameraTestTool final : public TTool {
   TPointD m_lastPos;
   bool m_dragged;
   int m_scaling;
@@ -869,7 +869,7 @@ int CameraTestTool::getCursorId() const {
 //
 //==============================================================================
 
-class OpacityCheckToggleCommand : public MenuItemHandler {
+class OpacityCheckToggleCommand final : public MenuItemHandler {
 public:
   OpacityCheckToggleCommand() : MenuItemHandler("MI_OpacityCheck") {}
   void execute() override {

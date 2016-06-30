@@ -103,7 +103,7 @@ signals:
 // ParamFieldKeyToggle
 //-----------------------------------------------------------------------------
 
-class DVAPI ParamFieldKeyToggle : public QWidget {
+class DVAPI ParamFieldKeyToggle final : public QWidget {
   Q_OBJECT
 
 public:
@@ -136,7 +136,7 @@ signals:
 // FxSettingsKeyToggleUndo
 //=============================================================================
 template <class T, class ParamP>
-class FxSettingsKeyToggleUndo : public TUndo {
+class FxSettingsKeyToggleUndo final : public TUndo {
   TFxHandle *m_fxHandle;
   QString m_name;
   bool m_wasKeyframe;
@@ -283,7 +283,7 @@ public:
 // MeasuredDoubleParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI MeasuredDoubleParamField
+class DVAPI MeasuredDoubleParamField final
     : public AnimatedParamField<double, TDoubleParamP> {
   Q_OBJECT
 
@@ -306,7 +306,7 @@ protected slots:
 // RangeParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI MeasuredRangeParamField
+class DVAPI MeasuredRangeParamField final
     : public AnimatedParamField<DoublePair, TRangeParamP> {
   Q_OBJECT
 
@@ -330,7 +330,8 @@ protected slots:
 // PointParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI PointParamField : public AnimatedParamField<TPointD, TPointParamP> {
+class DVAPI PointParamField final
+    : public AnimatedParamField<TPointD, TPointParamP> {
   Q_OBJECT
 
   DVGui::MeasuredDoubleField *m_xFld, *m_yFld;
@@ -353,7 +354,7 @@ protected slots:
 // PixelParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI PixelParamField
+class DVAPI PixelParamField final
     : public AnimatedParamField<TPixel32, TPixelParamP> {
   Q_OBJECT
 
@@ -382,7 +383,7 @@ protected slots:
 // RGB Link Button
 //-----------------------------------------------------------------------------
 
-class DVAPI RgbLinkButton : public QPushButton {
+class DVAPI RgbLinkButton final : public QPushButton {
   Q_OBJECT
   PixelParamField *m_field1, *m_field2;
 
@@ -398,7 +399,7 @@ protected slots:
 // SpectrumParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI SpectrumParamField
+class DVAPI SpectrumParamField final
     : public AnimatedParamField<TSpectrum, TSpectrumParamP> {
   Q_OBJECT
 
@@ -425,7 +426,7 @@ protected slots:
 // EnumParamField
 //-----------------------------------------------------------------------------
 
-class EnumParamField : public ParamField {
+class EnumParamField final : public ParamField {
   Q_OBJECT
 
   TIntEnumParamP m_currentParam, m_actualParam;
@@ -448,7 +449,7 @@ protected slots:
 // BoolParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI BoolParamField : public ParamField {
+class DVAPI BoolParamField final : public ParamField {
   Q_OBJECT
 
   TBoolParamP m_currentParam, m_actualParam;
@@ -475,7 +476,7 @@ signals:
 // IntParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI IntParamField : public ParamField {
+class DVAPI IntParamField final : public ParamField {
   Q_OBJECT
 
   TIntParamP m_currentParam, m_actualParam;
@@ -500,7 +501,7 @@ protected slots:
 // StringParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI StringParamField : public ParamField {
+class DVAPI StringParamField final : public ParamField {
   Q_OBJECT
 
   TStringParamP m_currentParam, m_actualParam;
@@ -522,7 +523,7 @@ protected slots:
 // ToneCurveParamField
 //-----------------------------------------------------------------------------
 
-class DVAPI ToneCurveParamField
+class DVAPI ToneCurveParamField final
     : public AnimatedParamField<const QList<TPointD>, TToneCurveParamP> {
   Q_OBJECT
 
@@ -550,7 +551,7 @@ protected slots:
 };
 
 namespace component {
-class DVAPI LineEdit_double : public ParamField {
+class DVAPI LineEdit_double final : public ParamField {
   Q_OBJECT;  // could not use templates for Q_OBJECT
 
   int frame_;
@@ -569,7 +570,7 @@ protected slots:
   void update_value(QString const &text);  // could not use MACROs for slots
 };
 
-class DVAPI Slider_double : public ParamField {
+class DVAPI Slider_double final : public ParamField {
   Q_OBJECT;
 
   int frame_;
@@ -588,7 +589,7 @@ protected slots:
   void update_value(int);
 };
 
-class DVAPI SpinBox_double : public ParamField {
+class DVAPI SpinBox_double final : public ParamField {
   Q_OBJECT;
 
   int frame_;
@@ -609,7 +610,7 @@ protected slots:
 }
 
 namespace component {
-class DVAPI LineEdit_int : public ParamField {
+class DVAPI LineEdit_int final : public ParamField {
   Q_OBJECT;
 
   int frame_;
@@ -628,7 +629,7 @@ protected slots:
   void update_value(QString const &text);
 };
 
-class DVAPI Slider_int : public ParamField {
+class DVAPI Slider_int final : public ParamField {
   Q_OBJECT;
 
   int frame_;
@@ -647,7 +648,7 @@ protected slots:
   void update_value(int);
 };
 
-class DVAPI SpinBox_int : public ParamField {
+class DVAPI SpinBox_int final : public ParamField {
   Q_OBJECT;
 
   int frame_;
@@ -669,7 +670,7 @@ protected slots:
 }  // end of namespace component
 
 namespace component {
-class DVAPI CheckBox_bool : public ParamField {
+class DVAPI CheckBox_bool final : public ParamField {
   Q_OBJECT;
 
   int frame_;
@@ -691,7 +692,7 @@ protected slots:
 }  // end of namespace component
 
 namespace component {
-class DVAPI RadioButton_enum : public ParamField {
+class DVAPI RadioButton_enum final : public ParamField {
   Q_OBJECT;
 
   int frame_;
@@ -710,7 +711,7 @@ protected slots:
   void update_value(int);
 };
 
-class DVAPI ComboBox_enum : public ParamField {
+class DVAPI ComboBox_enum final : public ParamField {
   Q_OBJECT;
 
   int frame_;
@@ -731,7 +732,7 @@ protected slots:
 }  // end of namespace component
 
 namespace component {
-class DVAPI LineEdit_string : public ParamField {
+class DVAPI LineEdit_string final : public ParamField {
   Q_OBJECT;
 
   int frame_;

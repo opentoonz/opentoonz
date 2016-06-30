@@ -19,7 +19,7 @@ void addOnionSkinCommand(QMenu *, bool isFilmStrip = false);
 // OnionSkinSwitcher
 //-----------------------------------------------------------------------------
 
-class OnionSkinSwitcher : public QObject {
+class OnionSkinSwitcher final : public QObject {
   Q_OBJECT
 
 public:

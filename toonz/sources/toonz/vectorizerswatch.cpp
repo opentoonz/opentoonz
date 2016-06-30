@@ -100,7 +100,7 @@ namespace {
   VectorizationSwatchData is the 'server' singleton data class used to
   vectorize within swatch areas.
 */
-struct VectorizationBuilder : public TThread::Executor {
+struct VectorizationBuilder final : public TThread::Executor {
   int m_row, m_col;
   bool m_done, m_submitted;
 

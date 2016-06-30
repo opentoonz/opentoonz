@@ -8,7 +8,7 @@
 
 //===================================================================
 
-class RGBMFadeFx : public TStandardRasterFx {
+class RGBMFadeFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(RGBMFadeFx)
   TRasterFxPort m_input;
   TPixelParamP m_color;

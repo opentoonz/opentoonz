@@ -113,7 +113,7 @@ void TestPanel::onColorValueChanged(const TPixel32 &, bool isDragging) {
 //=============================================================================
 // OpenFloatingTestPanel
 
-class OpenFloatingTestPanel : public MenuItemHandler {
+class OpenFloatingTestPanel final : public MenuItemHandler {
 public:
   OpenFloatingTestPanel() : MenuItemHandler(MI_OpenTest) {}
   void execute() override {

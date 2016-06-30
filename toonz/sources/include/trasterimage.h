@@ -25,7 +25,7 @@
  \include rasterImage_ex.cpp
 */
 
-class DVAPI TRasterImage : public TImage {
+class DVAPI TRasterImage final : public TImage {
   TRasterP m_mainRaster, m_patchRaster, m_iconRaster;
 
   //! dpi value for x axis
@@ -144,7 +144,8 @@ template class DVAPI TSmartPointerT<TRasterImage>;
 template class DVAPI TDerivedSmartPointerT<TRasterImage, TImage>;
 #endif
 
-class DVAPI TRasterImageP : public TDerivedSmartPointerT<TRasterImage, TImage> {
+class DVAPI TRasterImageP final
+    : public TDerivedSmartPointerT<TRasterImage, TImage> {
 public:
   TRasterImageP() {}
   TRasterImageP(TRasterImage *image) : DerivedSmartPointer(image) {}

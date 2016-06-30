@@ -24,7 +24,7 @@ class TXsheet;
 
 //==================================================
 
-class MergeCmappedDialog : public DVGui::Dialog {
+class MergeCmappedDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::FileField *m_saveInFileFld;
@@ -44,7 +44,7 @@ protected slots:
 
 //----------------------------------------------------------------
 
-class MatchlinesDialog : public DVGui::Dialog {
+class MatchlinesDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QRadioButton *m_button1, *m_button2;
@@ -78,7 +78,7 @@ public:
 
 //----------------------------------------------------------------
 
-class DeleteInkDialog : public DVGui::Dialog {
+class DeleteInkDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::LineEdit *m_inkIndex;

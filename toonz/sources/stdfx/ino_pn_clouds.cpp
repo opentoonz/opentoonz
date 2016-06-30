@@ -8,7 +8,7 @@
 toonz6.4sg ではTStandardRasterFx
 toonz7.0   ではTStandardZeraryFx
 */
-class ino_pn_clouds : public TStandardZeraryFx {
+class ino_pn_clouds final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(ino_pn_clouds)
 
   TDoubleParamP m_size;

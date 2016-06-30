@@ -175,7 +175,7 @@ private:
 //    TZeraryColumnFx  declaration
 //*******************************************************************************************
 
-class DVAPI TZeraryColumnFx : public TColumnFx {
+class DVAPI TZeraryColumnFx final : public TColumnFx {
   TXshZeraryFxColumn *m_zeraryFxColumn;
   TZeraryFx *m_fx;
 
@@ -222,7 +222,7 @@ private:
 //    TXsheetFx  declaration
 //*******************************************************************************************
 
-class TXsheetFx : public TRasterFx {
+class TXsheetFx final : public TRasterFx {
   FxDag *m_fxDag;
 
 public:
@@ -257,7 +257,7 @@ private:
 //    TOutputFx  declaration
 //*******************************************************************************************
 
-class TOutputFx : public TRasterFx {
+class TOutputFx final : public TRasterFx {
   TRasterFxPort m_input;
 
 public:

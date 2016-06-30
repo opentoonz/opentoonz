@@ -61,7 +61,7 @@ using namespace StyleEditorGUI;
 
 namespace {
 
-class UndoPaletteChange : public TUndo {
+class UndoPaletteChange final : public TUndo {
   TPaletteHandle *m_paletteHandle;
   TPaletteP m_palette;
 
@@ -1856,7 +1856,7 @@ void StyleChooserPage::setRootPath(const TFilePath &rootPath) {
 //    CustomStyleChooser  definition
 //*****************************************************************************
 
-class CustomStyleChooserPage : public StyleChooserPage {
+class CustomStyleChooserPage final : public StyleChooserPage {
 public:
   CustomStyleChooserPage(QWidget *parent = 0) : StyleChooserPage(parent) {}
 
@@ -1943,7 +1943,7 @@ void CustomStyleChooserPage::onSelect(int index) {
 //    VectorBrushStyleChooser  definition
 //*****************************************************************************
 
-class VectorBrushStyleChooserPage : public StyleChooserPage {
+class VectorBrushStyleChooserPage final : public StyleChooserPage {
 public:
   VectorBrushStyleChooserPage(QWidget *parent = 0) : StyleChooserPage(parent) {
     m_chipSize = QSize(60, 25);
@@ -2051,7 +2051,7 @@ struct Texture {
 
 //-----------------------------------------------------------------------------
 
-class TextureStyleChooserPage : public StyleChooserPage {
+class TextureStyleChooserPage final : public StyleChooserPage {
   static std::vector<Texture> m_textures;
   static bool m_loaded;
 
@@ -2183,7 +2183,7 @@ bool TextureStyleChooserPage::event(QEvent *e) {
 //    SpecialStyleChooser  definition
 //*****************************************************************************
 
-class SpecialStyleChooserPage : public StyleChooserPage {
+class SpecialStyleChooserPage final : public StyleChooserPage {
   static std::vector<std::pair<int, QImage *>> m_customStyles;
   static bool m_loaded;
 
