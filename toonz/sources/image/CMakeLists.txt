@@ -20,8 +20,6 @@ set(HEADERS
     ../include/tnzimage.h
     mov/tiio_mov_proxy.h
     3gp/tiio_3gp_proxy.h
-    gif/tiio_gif.h
-    webm/tiio_webm.h
     mp4/tiio_mp4.h
     mesh/tiio_mesh.h)
 
@@ -49,8 +47,6 @@ set(SOURCES
     tzl/tiio_tzl.cpp
     mov/tiio_mov_proxy.cpp
     3gp/tiio_3gp_proxy.cpp
-    gif/tiio_gif.cpp
-    webm/tiio_webm.cpp
     mp4/tiio_mp4.cpp
     mesh/tiio_mesh.cpp)
 
