@@ -13,6 +13,7 @@ find_library(
     TIFF_LIBRARY
     NAMES
         libtiff.a
+        libtiff.so
     HINTS
         ${SDKROOT}
     PATH_SUFFIXES

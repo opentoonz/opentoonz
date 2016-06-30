@@ -7,6 +7,7 @@ find_path(
     PATH_SUFFIXES
         lzo/2.09/include/lzo
         lzo/2.03/include/lzo
+        lzo
 )
 
 find_library(

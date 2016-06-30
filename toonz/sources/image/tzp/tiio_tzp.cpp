@@ -7,7 +7,13 @@
 #include "texception.h"
 
 #include "tiffio.h"
+#if defined(_WIN32) || defined(MACOSX)
 #include "tiffiop.h"
+#endif
+#ifdef LINUX
+#include "tiff.h"
+#endif
+
 //#include "tspecialstyleid.h"
 #include <set>
 
@@ -217,9 +223,13 @@ void TzpReader::readLine(char *buffer, int x0, int x1, int shrink) {
       pix += m_x;
       static std::set<int> table;
 
-      /// per le tzp che vengono da Irix
+/// per le tzp che vengono da Irix
+#ifndef LINUX
       bool bigEndian =
           (m_tiff->tif_header.classic.tiff_magic == TIFF_BIGENDIAN);
+#else
+      bool bigEndian = false;  // XXX, stub!
+#endif
 
       for (int i = 0; i < m_lx; i++) {
         unsigned short inPix = line[i];

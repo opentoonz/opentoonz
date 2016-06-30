@@ -8,6 +8,7 @@ find_path(
     PATH_SUFFIXES
         superlu43/4.3_1/include/superlu
         superlu/SuperLU_4.1/include
+        superlu
 )
 
 find_library(
@@ -15,6 +16,7 @@ find_library(
     NAMES
         libsuperlu.a
         libsuperlu_4.1.a
+        libsuperlu.so
     HINTS
         ${THIRDPARTY_LIBS_HINTS}
     PATH_SUFFIXES
