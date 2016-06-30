@@ -17,12 +17,11 @@ TODO: list them all?
 ### Installing required packages on Debian / Ubuntu
 
 ```
-$ sudo apt-get install build-essential cmake pkg-config libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev-tools libqt5opengl5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libjpeg-dev libtiff5-dev libglew-dev freeglut3-dev libsdl2-dev libfreetype6-dev
+$ sudo apt-get install build-essential cmake pkg-config libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev-tools libqt5opengl5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libjpeg-dev libglew-dev freeglut3-dev libsdl2-dev libfreetype6-dev
 ```
 
 Notes:
 * Debian doesn't seem to be a package yet for libpng 1.6, but try libpng16-dev
-* libtiff5-dev should work but we need to fix FindTIFF.cmake to use pkg-config
 * It's possible we also need libgsl2 (or maybe libopenbias-dev)
 
 ### Installing required packages on RedHat / Mageia
@@ -36,13 +35,13 @@ $ rpm ...
 (it may include some useless packages)
 
 ```
-dnf install gcc gcc-c++ automake cmake boost boost-devel SuperLU SuperLU-devel lz4-devel libusb-devel lzo-devel libjpeg-turbo-devel libtiff-devel GLEW libGLEW freeglut-devel freeglut SDL2 SDL2-devel freetype-devel libpng-devel qt5-base qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel blas blas-devel
+dnf install gcc gcc-c++ automake cmake boost boost-devel SuperLU SuperLU-devel lz4-devel libusb-devel lzo-devel libjpeg-turbo-devel GLEW libGLEW freeglut-devel freeglut SDL2 SDL2-devel freetype-devel libpng-devel qt5-base qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel blas blas-devel
 ```
 
 ### Installing required packages on ArchLinux
 
 ```
-$ sudo pacman -S base-devel cmake boost boost-libs qt5-base qt5-svg qt5-script qt5-tools lz4 libusb lzo libjpeg-turbo libtiff glew freeglut sdl2 freetype2
+$ sudo pacman -S base-devel cmake boost boost-libs qt5-base qt5-svg qt5-script qt5-tools lz4 libusb lzo libjpeg-turbo glew freeglut sdl2 freetype2
 $ sudo pacman -S blas cblas
 ```
 From AUR, using eg. yaourt:
@@ -56,7 +55,7 @@ Notes:
 ### Installing required packages on openSUSE
 
 ```
-zypper in boost-devel cmake gcc-c++ freeglut-devel freetype2-devel glew-devel libjpeg-devel liblz4-devel libqt5-linguist-devel libQt5OpenGL5 libqt5-qtbase-devel libqt5-qtscript-devel libqt5-qtsvg-devel lzo-devel libtiff-devel libusb-devel openblas-devel SDL2-devel superlu-devel zlib-devel
+zypper in boost-devel cmake gcc-c++ freeglut-devel freetype2-devel glew-devel libjpeg-devel liblz4-devel libqt5-linguist-devel libQt5OpenGL5 libqt5-qtbase-devel libqt5-qtscript-devel libqt5-qtsvg-devel lzo-devel libusb-devel openblas-devel SDL2-devel superlu-devel zlib-devel
 ```
 
 ## Build instructions
@@ -106,14 +105,15 @@ Note the generated file must not actually contain "$HOME", this shell command re
 ### Building the tiff library from thirdparty
 
 TODO: make sure we can use the system libtiff instead and remove this section.
+Features from the modified libtiff and needed currently, so this isn't a simple switch.
 
 ```
 $ cd opentoonz/thirdparty/tiff-4.0.3
-$ ./configure && make
+$ CFLAGS="-fPIC" ./configure && make
 $ cd -
 ```
 
-### compiling the actual application
+### Compiling the actual application
 
 ```
 $ cd ../../toonz
