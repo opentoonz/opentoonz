@@ -141,6 +141,7 @@ If you need to debug the application, you should be able to use `cmake -DCMAKE_B
 You can now run the application:
 
 ```
+$ cd bin
 $ LD_LIBRARY_PATH=image:toonzlib:toonzfarm/tfarm:tnzbase:tnztools:stdfx:sound:tnzcore:tnzext:colorfx:toonzqt toonz/OpenToonz_1.0
 ```
 
