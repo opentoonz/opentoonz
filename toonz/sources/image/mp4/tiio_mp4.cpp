@@ -72,12 +72,11 @@ TLevelWriterMp4::TLevelWriterMp4(const TFilePath &path, TPropertyGroup *winfo)
 TLevelWriterMp4::~TLevelWriterMp4()
 {
 	int status = 0;
-	//delete ffmpeg;
 	int numBytes = avpicture_get_size(m_codecContext->pix_fmt, m_codecContext->width, m_codecContext->height);
 	int got_packet_ptr = 1;
 
 	int ret;
-	//        for(; got_packet_ptr != 0; i++)
+	
 	while (got_packet_ptr)
 	{
 		uint8_t *outbuf = (uint8_t *)malloc(numBytes);
@@ -178,15 +177,15 @@ void TLevelWriterMp4::mp4Init() {
 	avcodec_open2(m_codecContext, codec, NULL);
 	avio_open(&m_formatCtx->pb, m_path.getQString().toLatin1().data(), AVIO_FLAG_READ_WRITE);
 	if (m_formatCtx->pb == NULL) {
-		//cerr << "Could not open for writing" << endl;
+		
 		status = "Could not open for writing";
-		//return;
+		
 	}
 	//avio_open(&m_formatCtx->pb, m_path.getQString().toLatin1().data(), AVIO_FLAG_WRITE);
 	//avformat_write_header(m_formatCtx, NULL);
 	if (avformat_write_header(m_formatCtx, NULL) != 0) {
 		status = "Could not write header";
-		//return -1;
+		
 	}
 }
 //-----------------------------------------------------------
@@ -199,8 +198,10 @@ void TLevelWriterMp4::save(const TImageP &img, int frameIndex) {
 	int linesize = image->getRaster()->getRowSize();
 	int pixelSize = image->getRaster()->getPixelSize();
 
+	//what does this do?
 	QMutexLocker sl(&m_mutex);
 
+	//lock raster to get data
 	image->getRaster()->lock();
 	uint8_t *buffin = image->getRaster()->getRawData();
 	assert(buffin);
@@ -234,9 +235,9 @@ void TLevelWriterMp4::save(const TImageP &img, int frameIndex) {
 	int ret2 = av_image_fill_arrays(outFrame->data, outFrame->linesize, outPicture_buf, m_codecContext->pix_fmt, m_codecContext->width, m_codecContext->height, 1);
 
 	//YUV data has one for each y, u, v
-	//outFrame->data[0] = outPicture_buf;
-	//outFrame->data[1] = outFrame->data[0] + outSize;
-	//outFrame->data[2] = outFrame->data[1] + outSize / 4;
+	outFrame->data[0] = outPicture_buf;
+	outFrame->data[1] = outFrame->data[0] + outSize;
+	outFrame->data[2] = outFrame->data[1] + outSize / 4;
 	outFrame->linesize[0] = m_codecContext->width;
 	outFrame->linesize[1] = m_codecContext->width / 2;
 	outFrame->linesize[2] = m_codecContext->width / 2;
@@ -248,14 +249,15 @@ void TLevelWriterMp4::save(const TImageP &img, int frameIndex) {
 
 	
 
-	int pts = frameIndex;//(1.0 / 30.0) * 90.0 * frameIndex;
+	int pts = frameIndex;
 
-	inFrame->pts = pts;//av_rescale_q(m_codecContext->coded_frame->pts, m_codecContext->time_base, formatCtx->streams[0]->time_base); //(1.0 / 30.0) * 90.0 * frameIndex;
+	inFrame->pts = pts;
 	
 	//set up scaling context
 	struct SwsContext *sws_ctx = NULL;
 	int frameFinished;
-	//AVPacket packet;
+
+	
 	// initialize SWS context for software scaling
 	sws_ctx = sws_getContext(lx,
 		ly,
@@ -274,34 +276,13 @@ void TLevelWriterMp4::save(const TImageP &img, int frameIndex) {
 			inFrame->linesize, 0, ly,
 			(uint8_t* const *)outFrame->data, outFrame->linesize);
 	
-	//dummy data
-	for (int y = 0; y < m_codecContext->height; y++)
-	{
-		for (int x = 0; x < m_codecContext->width; x++)
-		{
-			unsigned char b = buffin[(y * m_codecContext->width + x) * 4 + 0];
-			unsigned char g = buffin[(y * m_codecContext->width + x) * 4 + 1];
-			unsigned char r = buffin[(y * m_codecContext->width + x) * 4 + 2];
-
-			unsigned char Y = (0.257 * r) + (0.504 * g) + (0.098 * b) + 16;
-			outFrame->data[0][y * outFrame->linesize[0] + x] = Y;
-
-			if (y % 2 == 0 && x % 2 == 0)
-			{
-				unsigned char V = (0.439 * r) - (0.368 * g) - (0.071 * b) + 128;
-				unsigned char U = -(0.148 * r) - (0.291 * g) + (0.439 * b) + 128;
-
-				outFrame->data[1][y / 2 * outFrame->linesize[1] + x / 2] = U;
-				outFrame->data[2][y / 2 * outFrame->linesize[2] + x / 2] = V;
-			}
-		}
-	}
+	
 
 	int got_packet_ptr;
 	AVPacket packet;
-	av_init_packet(&packet);
-	packet.data = outbuf;
-	packet.size = outNumBytes;
+	av_init_packet(&packet);	
+	packet.data = outbuf;		//if I comment these out
+	packet.size = outNumBytes;	//the packet is empty
 	//packet.stream_index = m_formatCtx->streams[0]->index;
 	packet.flags |= AV_PKT_FLAG_KEY;
 	packet.pts = packet.dts = pts;
@@ -323,7 +304,7 @@ void TLevelWriterMp4::save(const TImageP &img, int frameIndex) {
 			packet.flags |= AV_PKT_FLAG_KEY;
 		}
 
-
+		//nothing to write
 		av_interleaved_write_frame(m_formatCtx, &packet);
 		av_free_packet(&packet);
 	}
