@@ -445,10 +445,10 @@ void ParsedPli::setMaxThickness(double maxThickness) {
 /* indirect inclusion of <math.h> causes 'abs' to return double on Linux */
 #ifdef LINUX
 template <typename T>
-T ABS(T a) {
+T abs_workaround(T a) {
   return (a > 0) ? a : -a;
 }
-#define abs ABS
+#define abs abs_workaround
 #endif
 
 /*=====================================================================*/
