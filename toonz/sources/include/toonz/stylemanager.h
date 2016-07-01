@@ -31,7 +31,7 @@ class QImage;
 //    CustomStyleManager declaration
 //********************************************************************************
 
-class DVAPI CustomStyleManager : public QObject {
+class DVAPI CustomStyleManager final : public QObject {
   Q_OBJECT
 
 public:

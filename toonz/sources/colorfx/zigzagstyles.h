@@ -7,7 +7,7 @@
 
 #ifdef POICIPENSO
 
-class TZigzagStrokeStyle : public TStrokeStyle {
+class TZigzagStrokeStyle final : public TStrokeStyle {
   TPixel32 m_color;
   double m_density;
 
@@ -36,7 +36,7 @@ public:
   }
 };
 
-class TImageBasedZigzagStrokeStyle : public TStrokeStyle {
+class TImageBasedZigzagStrokeStyle final : public TStrokeStyle {
   TPixel32 m_color;
   double m_textScale;
   TRaster32P m_texture;

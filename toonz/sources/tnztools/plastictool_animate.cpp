@@ -16,7 +16,7 @@ using namespace PlasticToolLocals;
 
 namespace {
 
-class AnimateValuesUndo : public TUndo {
+class AnimateValuesUndo final : public TUndo {
   int m_row, m_col;  //!< Xsheet coordinates
   int m_v;           //!< Moved vertex
 

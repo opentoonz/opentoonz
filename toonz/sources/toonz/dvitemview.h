@@ -100,7 +100,7 @@ protected:
 
 //=============================================================================
 
-class ItemViewPlayWidget : public QWidget {
+class ItemViewPlayWidget final : public QWidget {
   Q_OBJECT
 
   int m_currentItemIndex;  //-1 -> pause
@@ -159,7 +159,7 @@ protected:
 
 //=============================================================================
 
-class DVItemViewPlayDelegate : public QObject {
+class DVItemViewPlayDelegate final : public QObject {
   Q_OBJECT
 
   ItemViewPlayWidget *m_itemViewPlay;
@@ -216,7 +216,7 @@ signals:
 
 //=============================================================================
 
-class DvItemViewerPanel : public QFrame, public TSelection::View {
+class DvItemViewerPanel final : public QFrame, public TSelection::View {
   Q_OBJECT
 
   QColor m_alternateBackground;     // alaternate bg color for teble view
@@ -429,7 +429,7 @@ signals:
 
 //=============================================================================
 
-class DvItemViewerTitleBar : public QWidget {
+class DvItemViewerTitleBar final : public QWidget {
   Q_OBJECT
 
   DvItemViewer *m_itemViewer;
@@ -453,7 +453,7 @@ protected:
 
 //=============================================================================
 
-class DvItemViewerButtonBar : public QToolBar {
+class DvItemViewerButtonBar final : public QToolBar {
   Q_OBJECT
   QAction *m_folderBack;
   QAction *m_folderFwd;

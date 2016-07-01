@@ -28,7 +28,7 @@ namespace DVGui {
 // SpectrumBar
 //-----------------------------------------------------------------------------
 
-class DVAPI SpectrumBar : public QWidget {
+class DVAPI SpectrumBar final : public QWidget {
   Q_OBJECT
 
   int m_x0;
@@ -89,7 +89,7 @@ protected:
 // SpectrumField
 //-----------------------------------------------------------------------------
 
-class DVAPI SpectrumField : public QWidget {
+class DVAPI SpectrumField final : public QWidget {
   Q_OBJECT
 
   int m_margin;

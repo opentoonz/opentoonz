@@ -14,7 +14,7 @@ class QPushButton;
 // RenumberPopup
 //-----------------------------------------------------------------------------
 
-class RenumberPopup : public DVGui::Dialog {
+class RenumberPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   QPushButton *m_okBtn;

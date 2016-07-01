@@ -62,7 +62,7 @@ class QTimer;
 
   \sa       The FreeLayout class.
 */
-class DVAPI DvScrollWidget : public QFrame {
+class DVAPI DvScrollWidget final : public QFrame {
   Q_OBJECT
 
   QWidget *m_content;

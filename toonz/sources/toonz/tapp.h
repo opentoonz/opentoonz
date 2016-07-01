@@ -59,8 +59,8 @@ TApp::instance()->getCurrentObject()->getObjectId();
 application and to
                 notify through event handling to the rest of the code.
         */
-class TApp : public QObject,
-             public TTool::Application  // Singleton
+class TApp final : public QObject,
+                   public TTool::Application  // Singleton
 {
   Q_OBJECT
 

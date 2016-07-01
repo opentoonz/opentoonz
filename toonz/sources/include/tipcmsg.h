@@ -55,7 +55,7 @@ enum DefMsgEnum {
 };
 
 template <DefMsgEnum msgType>
-class DVAPI DefaultMessageParser : public MessageParser {
+class DVAPI DefaultMessageParser final : public MessageParser {
 public:
   QString header() const override;
   void operator()(Message &msg) override;

@@ -72,7 +72,7 @@ void mapToVector(const std::map<int, VIStroke *> &theMap,
 
 //-----------------------------------------------------------------------------
 
-class UndoEraser : public ToolUtils::TToolUndo {
+class UndoEraser final : public ToolUtils::TToolUndo {
   std::vector<TFilledRegionInf> m_oldFillInformation, m_newFillInformation;
 
   int m_row;
@@ -247,7 +247,7 @@ public:
 //  EraserTool class declaration
 //-----------------------------------------------------------------------------
 
-class EraserTool : public TTool {
+class EraserTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(EraserTool)
 
 public:

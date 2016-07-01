@@ -9,7 +9,7 @@ namespace {
 
 //------------------------------------------------------------------------------
 
-class FarmServerProxy : public TFarmServer, public TFarmProxy {
+class FarmServerProxy final : public TFarmServer, public TFarmProxy {
 public:
   FarmServerProxy(const QString &hostName, const QString &addr, int port)
       : TFarmProxy(hostName, addr, port) {}

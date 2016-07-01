@@ -12,7 +12,7 @@ namespace Tiio {
 Tiio::ReaderMaker makeSgiReader;
 Tiio::WriterMaker makeSgiWriter;
 
-class SgiWriterProperties : public TPropertyGroup {
+class SgiWriterProperties final : public TPropertyGroup {
 public:
   TEnumProperty m_pixelSize;
   TBoolProperty m_compressed;

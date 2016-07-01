@@ -10,7 +10,7 @@
 
 #include <QCoreApplication>
 
-class RGBPickerTool : public TTool {
+class RGBPickerTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(RGBPickerTool)
 
   bool m_firstTime;

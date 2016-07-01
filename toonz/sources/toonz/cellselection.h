@@ -13,7 +13,7 @@ class TimeStretchPopup;
 // TCellSelection
 //-----------------------------------------------------------------------------
 
-class TCellSelection : public TSelection {
+class TCellSelection final : public TSelection {
   TimeStretchPopup *m_timeStretchPopup;
 
 public:

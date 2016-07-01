@@ -144,7 +144,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-class TFARMAPI TFarmTaskGroup : public TFarmTask {
+class TFARMAPI TFarmTaskGroup final : public TFarmTask {
 public:
   TFarmTaskGroup();
 

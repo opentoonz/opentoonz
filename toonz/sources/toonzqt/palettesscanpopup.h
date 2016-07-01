@@ -22,7 +22,7 @@
 // PalettesScanPopup
 //-----------------------------------------------------------------------------
 
-class DVAPI PalettesScanPopup : public DVGui::Dialog {
+class DVAPI PalettesScanPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::FileField *m_field;

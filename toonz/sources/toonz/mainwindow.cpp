@@ -2032,8 +2032,8 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_PencilMode", tr("Pencil Mode"), "");
   createToolOptionsAction("A_ToolOption_PreserveThickness",
                           tr("Preserve Thickness"), "");
-  createToolOptionsAction("A_ToolOption_PressureSensibility",
-                          tr("Pressure Sensibility"), "");
+  createToolOptionsAction("A_ToolOption_PressureSensitivity",
+                          tr("Pressure sensitivity"), "");
   createToolOptionsAction("A_ToolOption_SegmentInk", tr("Segment Ink"), "F8");
   createToolOptionsAction("A_ToolOption_Selective", tr("Selective"), "F7");
   createToolOptionsAction("A_ToolOption_Smooth", tr("Smooth"), "");
@@ -2152,7 +2152,7 @@ void MainWindow::togglePickStyleLines() {
 
 //-----------------------------------------------------------------------------
 
-class ReloadStyle : public MenuItemHandler {
+class ReloadStyle final : public MenuItemHandler {
 public:
   ReloadStyle() : MenuItemHandler("MI_ReloadStyle") {}
   void execute() override {

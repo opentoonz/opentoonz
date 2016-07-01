@@ -182,7 +182,7 @@ DVAPI void visit(Visitor &visitor, TXshLevel *level, const TFrameId &fid,
   \warning The RasterPainter visitor expects an active OpenGL context.
 */
 
-class DVAPI RasterPainter : public Visitor {
+class DVAPI RasterPainter final : public Visitor {
 private:
   //! Class used to deal with composition of raster images. A Node instance
   //! represents a
@@ -277,7 +277,7 @@ public:
 
 //=============================================================================
 
-class DVAPI Picker : public Visitor {
+class DVAPI Picker final : public Visitor {
   std::vector<int> m_columnIndexes, m_rows;
   TPointD m_point;
   TAffine m_viewAff;
@@ -304,7 +304,7 @@ public:
 
 //! The derived Stage::Visitor responsible for camera-stand rendering in 3D mode
 
-class DVAPI OpenGlPainter : public Visitor  // Yep, the name sucks...
+class DVAPI OpenGlPainter final : public Visitor  // Yep, the name sucks...
 {
   TAffine m_viewAff;
   TRect m_clipRect;

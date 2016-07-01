@@ -9,7 +9,7 @@
 
 //==================================================================
 
-class PerlinNoiseFx : public TStandardRasterFx {
+class PerlinNoiseFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(PerlinNoiseFx)
   TRasterFxPort m_input;
   TIntEnumParamP m_type;

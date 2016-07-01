@@ -17,7 +17,7 @@ class QCheckBox;
 
 //-----------------------------------------------------------------------------
 
-class SVNUpdateDialog : public DVGui::Dialog {
+class SVNUpdateDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QPushButton *m_closeButton;

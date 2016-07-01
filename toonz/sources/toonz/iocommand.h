@@ -156,7 +156,7 @@ public:
 
 //------------------------------------------------------------------------
 
-class ConvertingPopup : public QDialog {
+class ConvertingPopup final : public QDialog {
 public:
   ConvertingPopup(QWidget *parent, QString fileName);
   ~ConvertingPopup();

@@ -22,6 +22,8 @@
 #include <QAction>
 #include <QKeyEvent>
 #include <QMainWindow>
+#include <QLabel>
+#include <QLineEdit>
 
 // STD includes
 #include <vector>
@@ -33,7 +35,7 @@
 // ogni ShortcutItem rappresenta una QAction (e relativo Shortcut)
 //-----------------------------------------------------------------------------
 
-class ShortcutItem : public QTreeWidgetItem {
+class ShortcutItem final : public QTreeWidgetItem {
   QAction *m_action;
 
 public:
@@ -45,9 +47,10 @@ public:
   void updateText() {
     QString text = m_action->text();
     text.remove("&");
-    QString shortcut = m_action->shortcut().toString();
-    if (shortcut != "") text += " (" + shortcut + ")";
     setText(0, text);
+    QString shortcut = m_action->shortcut().toString();
+    if (shortcut != "")
+      setText(1, shortcut);
   }
   QAction *getAction() const { return m_action; }
 };
@@ -181,18 +184,20 @@ ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
   setIndentation(14);
   setAlternatingRowColors(true);
 
-  setColumnCount(1);
+  setColumnCount(2);
   header()->close();
   // setStyleSheet("border-bottom:1px solid rgb(120,120,120); border-left:1px
   // solid rgb(120,120,120); border-top:1px solid rgb(120,120,120)");
 
   QTreeWidgetItem *menuCommandFolder = new QTreeWidgetItem(this);
   menuCommandFolder->setText(0, tr("Menu Commands"));
+  m_folders.push_back(menuCommandFolder);
+
   addFolder(tr("Fill"), FillCommandType);
   addFolder(tr("File"), MenuFileCommandType, menuCommandFolder);
   addFolder(tr("Edit"), MenuEditCommandType, menuCommandFolder);
   addFolder(tr("Scan & Cleanup"), MenuScanCleanupCommandType,
-            menuCommandFolder);
+    menuCommandFolder);
   addFolder(tr("Level"), MenuLevelCommandType, menuCommandFolder);
   addFolder(tr("Xsheet"), MenuXsheetCommandType, menuCommandFolder);
   addFolder(tr("Cells"), MenuCellsCommandType, menuCommandFolder);
@@ -221,13 +226,17 @@ ShortcutTree::~ShortcutTree() {}
 
 //-----------------------------------------------------------------------------
 
-void ShortcutTree::addFolder(const QString &title, int commandType,
-                             QTreeWidgetItem *parentFolder) {
+void ShortcutTree::addFolder(const QString &title, int commandType, 
+                              QTreeWidgetItem *parentFolder) {
   QTreeWidgetItem *folder;
-  if (!parentFolder)
+  if (!parentFolder){
     folder = new QTreeWidgetItem(this);
-  else
+    m_folders.push_back(folder);
+  }
+  else{
     folder = new QTreeWidgetItem(parentFolder);
+    m_subFolders.push_back(folder);
+  }
   assert(folder);
   folder->setText(0, title);
 
@@ -237,6 +246,80 @@ void ShortcutTree::addFolder(const QString &title, int commandType,
     ShortcutItem *item = new ShortcutItem(folder, actions[i]);
     m_items.push_back(item);
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutTree::searchItems(const QString& searchWord) {
+
+  if (searchWord.isEmpty()) {
+    for (int i = 0; i < (int)m_items.size(); i++) m_items[i]->setHidden(false);
+    for (int f = 0; f < m_subFolders.size(); f++){
+      m_subFolders[f]->setHidden(false);
+      m_subFolders[f]->setExpanded(false);
+    }
+    for (int f = 0; f < m_folders.size(); f++){
+      m_folders[f]->setHidden(false);
+      m_folders[f]->setExpanded(f==0);
+    }
+    show();
+    emit searched(true);
+    update();
+    return;
+  }
+  
+  QList<QTreeWidgetItem *> foundItems = findItems(searchWord, Qt::MatchContains | Qt::MatchRecursive, 0);
+  if (foundItems.isEmpty()){
+    hide();
+    emit searched(false);
+    update();
+    return;
+  }
+ 
+  // show all matched items, hide all unmatched items
+  for (int i = 0; i < (int)m_items.size(); i++)
+    m_items[i]->setHidden(!foundItems.contains(m_items[i]));
+    
+  // hide folders which does not contain matched items
+  // show and expand folders containing matched items
+  bool found;
+  for (int f = 0; f < m_subFolders.size(); f++){
+    QTreeWidgetItem* sf = m_subFolders.at(f);
+    found = false;
+    for (int i = 0; i < sf->childCount(); i++){
+      if (!sf->child(i)->isHidden()){
+        found = true;
+        break;
+      }
+    }
+    sf->setHidden(!found);
+    sf->setExpanded(found);
+  }
+  for (int f = 0; f < m_folders.size(); f++){
+    QTreeWidgetItem* fol = m_folders.at(f);
+    found = false;
+    for (int i = 0; i < fol->childCount(); i++){
+      if (!fol->child(i)->isHidden()){
+        found = true;
+        break;
+      }
+    }
+    fol->setHidden(!found);
+    fol->setExpanded(found);
+  }
+
+  show();
+  emit searched(true);
+  update();
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutTree::resizeEvent(QResizeEvent *event)
+{
+  header()->resizeSection(0, width() - 120);
+  header()->resizeSection(1, 120);
+  QTreeView::resizeEvent(event);
 }
 
 //-----------------------------------------------------------------------------
@@ -269,11 +352,31 @@ ShortcutPopup::ShortcutPopup()
 
   m_sViewer   = new ShortcutViewer(this);
   m_removeBtn = new QPushButton(tr("Remove"), this);
+  QLabel* noSearchResultLabel = new QLabel(tr("Couldn't find any matching command."), this);
+  noSearchResultLabel->setHidden(true);
+
+  QLineEdit* searchEdit = new QLineEdit(this);
 
   m_topLayout->setMargin(5);
   m_topLayout->setSpacing(8);
   {
-    m_topLayout->addWidget(m_list, 1);
+    QHBoxLayout* searchLay = new QHBoxLayout();
+    searchLay->setMargin(0);
+    searchLay->setSpacing(5);
+    {
+      searchLay->addWidget(new QLabel("Search:",this),0);
+      searchLay->addWidget(searchEdit);
+    }
+    m_topLayout->addLayout(searchLay, 0);
+
+    QVBoxLayout* listLay = new QVBoxLayout();
+    listLay->setMargin(0);
+    listLay->setSpacing(0);
+    {
+      listLay->addWidget(noSearchResultLabel, 0, Qt::AlignTop|Qt::AlignHCenter);
+      listLay->addWidget(m_list, 1);
+    }
+    m_topLayout->addLayout(listLay,1);
 
     QHBoxLayout *bottomLayout = new QHBoxLayout();
     bottomLayout->setMargin(0);
@@ -292,11 +395,24 @@ ShortcutPopup::ShortcutPopup()
 
   connect(m_sViewer, SIGNAL(shortcutChanged()), m_list,
           SLOT(onShortcutChanged()));
+
+  connect(m_list, SIGNAL(searched(bool)), noSearchResultLabel, SLOT(setHidden(bool)));
+  connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(onSearchTextChanged(const QString &)));
 }
 
 //-----------------------------------------------------------------------------
 
 ShortcutPopup::~ShortcutPopup() {}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::onSearchTextChanged(const QString &text) {
+  static bool busy = false;
+  if (busy) return;
+  busy = true;
+  m_list->searchItems(text);
+  busy = false;
+}
 
 //-----------------------------------------------------------------------------
 

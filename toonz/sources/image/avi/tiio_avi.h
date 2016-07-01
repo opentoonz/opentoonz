@@ -20,7 +20,7 @@ class VDVideoDecompressor;
 //
 //===========================================================
 
-class TLevelWriterAvi : public TLevelWriter {
+class TLevelWriterAvi final : public TLevelWriter {
 public:
   TLevelWriterAvi(const TFilePath &path, TPropertyGroup *winfo);
   ~TLevelWriterAvi();
@@ -67,7 +67,7 @@ private:
 //
 //===========================================================
 
-class TLevelReaderAvi : public TLevelReader {
+class TLevelReaderAvi final : public TLevelReader {
 public:
   TLevelReaderAvi(const TFilePath &path);
   ~TLevelReaderAvi();
@@ -104,7 +104,7 @@ private:
 //===========================================================
 
 namespace Tiio {
-class AviWriterProperties : public TPropertyGroup {
+class AviWriterProperties final : public TPropertyGroup {
 public:
   AviWriterProperties();
   TEnumProperty m_codec;

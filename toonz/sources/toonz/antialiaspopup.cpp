@@ -69,7 +69,7 @@ inline void onChange(const TRasterP &ras, int threshold, int softness) {
 //    AntialiasPopup Swatch
 //**************************************************************************
 
-class AntialiasPopup::Swatch : public PlaneViewer {
+class AntialiasPopup::Swatch final : public PlaneViewer {
   TImageP m_img;
 
 public:
@@ -274,7 +274,7 @@ void AntialiasPopup::hideEvent(QHideEvent *he) {
 
 //-----------------------------------------------------------------------------
 
-class TRasterAntialiasUndo : public TUndo {
+class TRasterAntialiasUndo final : public TUndo {
   int m_r, m_c, m_threshold, m_softness;
 
   QString m_rasId;

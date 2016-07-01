@@ -295,7 +295,7 @@ void tellipticbrush::CenterlinePoint::buildDirs(const TStroke &stroke) {
 
 namespace {
 
-class LengthLinearizator : public tellipticbrush::StrokeLinearizator {
+class LengthLinearizator final : public tellipticbrush::StrokeLinearizator {
   double m_lengthStep;
   int m_countIdx;
 
@@ -352,7 +352,7 @@ void LengthLinearizator::linearize(std::vector<CenterlinePoint> &cPoints,
 
 //============================================================================================
 
-class RecursiveLinearizator : public tellipticbrush::StrokeLinearizator {
+class RecursiveLinearizator final : public tellipticbrush::StrokeLinearizator {
   double m_pixSize;
 
 public:
@@ -451,7 +451,7 @@ void RecursiveLinearizator::subdivide(std::vector<CenterlinePoint> &cPoints,
 
 //============================================================================================
 
-class CoverageLinearizator : public tellipticbrush::StrokeLinearizator {
+class CoverageLinearizator final : public tellipticbrush::StrokeLinearizator {
 public:
   CoverageLinearizator(const TStroke *stroke) : StrokeLinearizator(stroke) {}
 

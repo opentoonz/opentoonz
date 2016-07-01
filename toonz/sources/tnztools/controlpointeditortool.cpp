@@ -108,7 +108,7 @@ void getSegmentParameter(ControlPointEditorStroke *cpEditor, int beforeIndex,
 // ControlPointEditorTool
 //-----------------------------------------------------------------------------
 
-class ControlPointEditorTool : public TTool {
+class ControlPointEditorTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(ControlPointEditorTool)
 
   bool m_draw;

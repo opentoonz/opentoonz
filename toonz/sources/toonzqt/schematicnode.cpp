@@ -497,13 +497,13 @@ void SchematicLink::mousePressEvent(QGraphicsSceneMouseEvent *me) {
   QPointF p0((endPos.x() - startPos.x()) * 0.5, 0);
   QPointF p1(p0.x(), endPos.y() - startPos.y());
   QPointF p2(endPos - startPos);
-  double sensibility = 5 / scaleFactor;
-  QPointF h(0, sensibility);
+  double sensitivity = 5 / scaleFactor;
+  QPointF h(0, sensitivity);
   QPointF p = h;
   if (p2.y() > 0)
-    p.setX(p2.x() > 0 ? -sensibility : sensibility);
+    p.setX(p2.x() > 0 ? -sensitivity : sensitivity);
   else
-    p.setX(p2.x() > 0 ? sensibility : -sensibility);
+    p.setX(p2.x() > 0 ? sensitivity : -sensitivity);
   QPainterPath path(QPointF(0, 0));
   path.lineTo(h);
   path.cubicTo(p0 + p, p1 + p, p2 + h);

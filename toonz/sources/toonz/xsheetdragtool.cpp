@@ -108,7 +108,7 @@ void XsheetGUI::DragTool::onRelease(const QMouseEvent *event) {
 // XsheetSelection DragTool
 //-----------------------------------------------------------------------------
 
-class XsheetSelectionDragTool : public XsheetGUI::DragTool {
+class XsheetSelectionDragTool final : public XsheetGUI::DragTool {
   int m_firstRow, m_firstCol;
   Qt::KeyboardModifiers m_modifier;
 
@@ -199,7 +199,7 @@ XsheetGUI::DragTool *XsheetGUI::DragTool::makeSelectionTool(
 //-----------------------------------------------------------------------------
 namespace {
 
-class UndoPlayRangeModifier : public TUndo {
+class UndoPlayRangeModifier final : public TUndo {
   int m_oldR0, m_oldR1, m_newR0, m_newR1, m_newStep, m_oldStep;
 
 public:
@@ -310,7 +310,7 @@ namespace {
 // LevelExtenderUndo
 //-----------------------------------------------------------------------------
 
-class LevelExtenderUndo : public TUndo {
+class LevelExtenderUndo final : public TUndo {
   int m_colCount;
   int m_rowCount;
   int m_col, m_row, m_deltaRow;
@@ -609,7 +609,7 @@ public:
 // LevelExtenderTool
 //-----------------------------------------------------------------------------
 
-class LevelExtenderTool : public XsheetGUI::DragTool {
+class LevelExtenderTool final : public XsheetGUI::DragTool {
   int m_colCount;
   int m_rowCount;
   int m_c0, m_r0, m_r1;
@@ -779,7 +779,7 @@ namespace {
 // SoundLevelModifierUndo
 //-----------------------------------------------------------------------------
 
-class SoundLevelModifierUndo : public TUndo {
+class SoundLevelModifierUndo final : public TUndo {
   int m_col;
   TXshSoundColumnP m_newSoundColumn;
   TXshSoundColumnP m_oldSoundColumn;
@@ -835,7 +835,7 @@ public:
 // SoundLevelModifierTool
 //-----------------------------------------------------------------------------
 
-class SoundLevelModifierTool : public XsheetGUI::DragTool {
+class SoundLevelModifierTool final : public XsheetGUI::DragTool {
   int m_col;
   int m_firstRow;
   TXshSoundColumnP m_oldColumn;
@@ -962,7 +962,7 @@ XsheetGUI::DragTool *XsheetGUI::DragTool::makeKeyframeMoverTool(
 // Cell KeyFrame Mover DragTool
 //-----------------------------------------------------------------------------
 
-class CellKeyframeMoverTool : public LevelMoverTool {
+class CellKeyframeMoverTool final : public LevelMoverTool {
   KeyframeMoverTool *m_keyframeMoverTool;
 
 protected:
@@ -1016,7 +1016,7 @@ namespace {
 // KeyFrameHandleUndo
 //-----------------------------------------------------------------------------
 
-class KeyFrameHandleUndo : public TUndo {
+class KeyFrameHandleUndo final : public TUndo {
   TStageObjectId m_objId;
   int m_row;
   TStageObject::Keyframe m_oldKeyframe, m_newKeyframe;
@@ -1064,7 +1064,7 @@ public:
 // KeyFrameHandleMoverTool
 //-----------------------------------------------------------------------------
 
-class KeyFrameHandleMoverTool : public XsheetGUI::DragTool {
+class KeyFrameHandleMoverTool final : public XsheetGUI::DragTool {
 public:
   enum HandleType { EaseOut = 0, EaseIn = 1 };
 
@@ -1160,7 +1160,7 @@ namespace {
 // OnionSkinMaskModifierTool
 //-----------------------------------------------------------------------------
 
-class NoteMoveTool : public XsheetGUI::DragTool {
+class NoteMoveTool final : public XsheetGUI::DragTool {
   TPointD m_startPos, m_delta;
   int m_startRow, m_startCol;
 
@@ -1241,7 +1241,7 @@ namespace {
 // OnionSkinMaskModifierTool
 //-----------------------------------------------------------------------------
 
-class OnionSkinMaskModifierTool : public XsheetGUI::DragTool {
+class OnionSkinMaskModifierTool final : public XsheetGUI::DragTool {
   OnionSkinMaskModifier m_modifier;
   bool m_isFos;
 
@@ -1298,7 +1298,7 @@ namespace {
 // CurrentFrameModifier
 //-----------------------------------------------------------------------------
 
-class CurrentFrameModifier : public XsheetGUI::DragTool {
+class CurrentFrameModifier final : public XsheetGUI::DragTool {
 public:
   CurrentFrameModifier(XsheetViewer *viewer) : DragTool(viewer) {}
 
@@ -1346,7 +1346,7 @@ namespace {
 // PlayRangeModifier
 //-----------------------------------------------------------------------------
 
-class PlayRangeModifier : public XsheetGUI::DragTool {
+class PlayRangeModifier final : public XsheetGUI::DragTool {
   bool m_movingFirst;
   int m_oldR0, m_oldR1, m_oldStep;
 
@@ -1418,7 +1418,7 @@ XsheetGUI::DragTool *XsheetGUI::DragTool::makePlayRangeModifierTool(
 
 namespace {
 
-class ColumnSelectionTool : public XsheetGUI::DragTool {
+class ColumnSelectionTool final : public XsheetGUI::DragTool {
   int m_firstColumn;
   bool m_enabled;
 
@@ -1508,7 +1508,7 @@ void moveColumns(const std::set<int> &indices, int delta) {
 
 //-----------------------------------------------------------------------------
 
-class ColumnMoveUndo : public TUndo {
+class ColumnMoveUndo final : public TUndo {
   std::set<int> m_indices;
   int m_delta;
 
@@ -1549,7 +1549,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class ColumnMoveDragTool : public XsheetGUI::DragTool {
+class ColumnMoveDragTool final : public XsheetGUI::DragTool {
   int m_offset, m_firstCol, m_lastCol;
 
 public:
@@ -1617,7 +1617,7 @@ XsheetGUI::DragTool *XsheetGUI::DragTool::makeColumnMoveTool(
 //  Parent Change
 //-----------------------------------------------------------------------------
 
-class ChangePegbarParentUndo : public TUndo {
+class ChangePegbarParentUndo final : public TUndo {
   TStageObjectId m_oldParentId;
   TStageObjectId m_newParentId;
   TStageObjectId m_child;
@@ -1650,7 +1650,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class ChangePegbarParentDragTool : public XsheetGUI::DragTool {
+class ChangePegbarParentDragTool final : public XsheetGUI::DragTool {
   int m_firstCol, m_lastCol;
 
 public:
@@ -1709,7 +1709,7 @@ XsheetGUI::DragTool *XsheetGUI::DragTool::makeColumnLinkTool(
 
 namespace {
 
-class VolumeDragTool : public XsheetGUI::DragTool {
+class VolumeDragTool final : public XsheetGUI::DragTool {
   int m_index;
   bool m_enabled;
 
@@ -1765,7 +1765,7 @@ XsheetGUI::DragTool *XsheetGUI::DragTool::makeVolumeDragTool(
 
 namespace {
 
-class SoundScrubTool : public XsheetGUI::DragTool {
+class SoundScrubTool final : public XsheetGUI::DragTool {
   TXshSoundColumn *m_soundColumn;
   int m_startRow;
   std::pair<int, int> m_playRange;
@@ -1867,7 +1867,7 @@ public:
 
 enum CellMovementType { NO_MOVEMENT, INSERT_CELLS, OVERWRITE_CELLS };
 
-class DataDragTool : public XsheetGUI::DragTool {
+class DataDragTool final : public XsheetGUI::DragTool {
   DragAndDropData *m_data;
   bool m_valid;
   TPoint m_curPos;

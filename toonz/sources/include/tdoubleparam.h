@@ -51,7 +51,7 @@ template class DVAPI TPersistDeclarationT<TDoubleParam>;
 //    TDoubleParam  declaration
 //**************************************************************************
 
-class DVAPI TDoubleParam : public TParam {
+class DVAPI TDoubleParam final : public TParam {
   PERSIST_DECLARATION(TDoubleParam)
 
   class Imp;

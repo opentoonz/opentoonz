@@ -30,7 +30,7 @@ class TFilePath;
 
 //============================================================================
 
-class DVAPI TCacheResourcePool : public QObject {
+class DVAPI TCacheResourcePool final : public QObject {
   Q_OBJECT
 
   THDCacheResourcePool *m_hdPool;

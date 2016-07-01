@@ -33,7 +33,7 @@ public:
 //-------------------------------------------------------------------
 
 // NameCreator genera la sequenza 'A', 'B', ...
-class DVAPI NameCreator : public NameBuilder {
+class DVAPI NameCreator final : public NameBuilder {
   std::vector<int> m_s;
 
 public:
@@ -43,7 +43,7 @@ public:
 
 //-------------------------------------------------------------------
 
-class DVAPI NameModifier : public NameBuilder {
+class DVAPI NameModifier final : public NameBuilder {
   std::wstring m_nameBase;
   int m_index;
 

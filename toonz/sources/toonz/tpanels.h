@@ -27,7 +27,7 @@ class ToolOptions;
 // PaletteViewerPanel
 //---------------------------------------------------------
 
-class PaletteViewerPanel : public TPanel {
+class PaletteViewerPanel final : public TPanel {
   Q_OBJECT
 
   TPaletteHandle *m_paletteHandle;
@@ -59,7 +59,7 @@ protected slots:
 // StudioPaletteViewerPanel
 //---------------------------------------------------------
 
-class StudioPaletteViewerPanel : public TPanel {
+class StudioPaletteViewerPanel final : public TPanel {
   Q_OBJECT
 
   TPaletteHandle *m_studioPaletteHandle;
@@ -79,7 +79,7 @@ protected slots:
 // StyleEditorPanel
 //---------------------------------------------------------
 
-class StyleEditorPanel : public TPanel {
+class StyleEditorPanel final : public TPanel {
   Q_OBJECT
   StyleEditor *m_styleEditor;
 
@@ -91,7 +91,7 @@ public:
 // ColorFieldEditorController
 //---------------------------------------------------------
 
-class ColorFieldEditorController
+class ColorFieldEditorController final
     : public QObject,
       public DVGui::ColorField::ColorFieldEditorController {
   Q_OBJECT
@@ -117,7 +117,7 @@ protected slots:
 // CleanupColorFieldEditorController
 //---------------------------------------------------------
 
-class CleanupColorFieldEditorController
+class CleanupColorFieldEditorController final
     : public QObject,
       public DVGui::CleanupColorField::CleanupColorFieldEditorController {
   Q_OBJECT
@@ -143,7 +143,7 @@ protected slots:
 // SchematicScenePanel
 //---------------------------------------------------------
 
-class SchematicScenePanel : public TPanel {
+class SchematicScenePanel final : public TPanel {
   Q_OBJECT
 
   SchematicViewer *m_schematicViewer;
@@ -171,7 +171,7 @@ protected slots:
 // FunctionViewerPanel
 //---------------------------------------------------------
 
-class FunctionViewerPanel : public TPanel {
+class FunctionViewerPanel final : public TPanel {
   Q_OBJECT
 
   FunctionViewer *m_functionViewer;
@@ -200,7 +200,7 @@ public slots:
 // ToolOptionPanel
 //---------------------------------------------------------
 
-class ToolOptionPanel : public TPanel {
+class ToolOptionPanel final : public TPanel {
   Q_OBJECT
 
   ToolOptions *m_toolOption;
@@ -213,7 +213,7 @@ public:
 // FlipbookPanel
 //---------------------------------------------------------
 
-class FlipbookPanel : public TPanel {
+class FlipbookPanel final : public TPanel {
   Q_OBJECT
   FlipBook *m_flipbook;
 

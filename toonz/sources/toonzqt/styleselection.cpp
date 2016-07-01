@@ -261,7 +261,7 @@ void insertStylesWithoutUndo(TPalette *palette, TPaletteHandle *pltHandle,
 // PasteStylesUndo
 //-----------------------------------------------------------------------------
 
-class PasteStylesUndo : public TUndo {
+class PasteStylesUndo final : public TUndo {
   TStyleSelection *m_selection;
   int m_oldStyleIndex;
   int m_pageIndex;
@@ -333,7 +333,7 @@ public:
 // DeleteStylesUndo
 //-----------------------------------------------------------------------------
 
-class DeleteStylesUndo : public TUndo {
+class DeleteStylesUndo final : public TUndo {
   TStyleSelection *m_selection;
   int m_pageIndex;
   std::set<int> m_styleIndicesInPage;
@@ -409,7 +409,7 @@ public:
 // CutStylesUndo
 //-----------------------------------------------------------------------------
 
-class CutStylesUndo : public TUndo {
+class CutStylesUndo final : public TUndo {
   TStyleSelection *m_selection;
   int m_pageIndex;
   std::set<int> m_styleIndicesInPage;
@@ -771,7 +771,7 @@ namespace {
 // UndoPasteValues
 //-----------------------------------------------------------------------------
 
-class UndoPasteValues : public TUndo {
+class UndoPasteValues final : public TUndo {
   TStyleSelection *m_selection;
   TPaletteHandle *m_paletteHandle;
   int m_pageIndex;
@@ -1198,7 +1198,7 @@ namespace {
 // UndoBlendColor
 //-----------------------------------------------------------------------------
 
-class UndoBlendColor : public TUndo {
+class UndoBlendColor final : public TUndo {
   TPaletteHandle *m_paletteHandle;
   TPaletteP m_palette;
   int m_pageIndex;
@@ -1327,7 +1327,7 @@ namespace {
 // UndoLinkToStudioPalette
 //-----------------------------------------------------------------------------
 
-class UndoLinkToStudioPalette : public TUndo {
+class UndoLinkToStudioPalette final : public TUndo {
   TPaletteHandle *m_paletteHandle;
   TPaletteP m_palette;
   int m_pageIndex;
@@ -1515,7 +1515,7 @@ void TStyleSelection::toggleKeyframe(int frame) {
 
 //-----------------------------------------------------------------------------
 
-class UndoRemoveLink : public TUndo {
+class UndoRemoveLink final : public TUndo {
   TPaletteHandle *m_paletteHandle;
   TPaletteP m_palette;
   int m_pageIndex;
@@ -1623,7 +1623,7 @@ bool TStyleSelection::removeLink() {
 }
 
 //=============================================================================
-class getBackOriginalStyleUndo : public TUndo {
+class getBackOriginalStyleUndo final : public TUndo {
   TStyleSelection m_selection;
   std::vector<TPixel32> m_oldColors, m_newColors;
 

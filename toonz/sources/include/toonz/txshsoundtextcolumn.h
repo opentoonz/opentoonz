@@ -24,7 +24,7 @@
 /*!Inherits \b TXshCellColumn. */
 //=============================================================================
 
-class DVAPI TXshSoundTextColumn : public TXshCellColumn {
+class DVAPI TXshSoundTextColumn final : public TXshCellColumn {
   PERSIST_DECLARATION(TXshSoundTextColumn)
 
 public:

@@ -471,7 +471,7 @@ void cloneSubXsheets(TXsheet *xsh) {
 //  PasteColumnsUndo
 //-----------------------------------------------------------------------------
 
-class PasteColumnsUndo : public TUndo {
+class PasteColumnsUndo final : public TUndo {
   std::set<int> m_indices;
   StageObjectsData *m_data;
   QMap<TFxPort *, TFx *> m_columnLinks;
@@ -532,7 +532,7 @@ public:
 //  DeleteColumnsUndo
 //-----------------------------------------------------------------------------
 
-class DeleteColumnsUndo : public TUndo {
+class DeleteColumnsUndo final : public TUndo {
   std::set<int> m_indices;
 
   QMap<TFxPort *, TFx *> m_columnFxLinks;
@@ -643,7 +643,7 @@ protected:
 //    Insert Empty Columns  Command
 //*************************************************************************
 
-class InsertEmptyColumnsUndo : public ColumnCommandUndo {
+class InsertEmptyColumnsUndo final : public ColumnCommandUndo {
   std::vector<std::pair<int, int>> m_columnBlocks;
 
 public:
@@ -839,7 +839,7 @@ void ColumnCmd::cutColumns(std::set<int> &indices) {
 // Undo Resequence
 //=============================================================================
 
-class ResequenceUndo : public TUndo {
+class ResequenceUndo final : public TUndo {
   int m_index;
   int m_r0;
   std::vector<TFrameId> m_oldFrames;
@@ -972,7 +972,7 @@ void ColumnCmd::resequence(int index) {
 // Undo cloneChild
 //=============================================================================
 
-class CloneChildUndo : public TUndo {
+class CloneChildUndo final : public TUndo {
   TXshChildLevelP m_childLevel;
   int m_columnIndex;
 
@@ -1126,7 +1126,7 @@ void ColumnCmd::copyColumn(int dstIndex, int srcIndex) {
 // Undo Clear Cells
 //=============================================================================
 
-class ClearColumnCellsUndo : public TUndo {
+class ClearColumnCellsUndo final : public TUndo {
   int m_col;
   int m_r0;
   std::vector<TXshCell> m_oldFrames;
@@ -1213,7 +1213,7 @@ enum {
 
 }  // namespace
 
-class ColumnsStatusCommand : public MenuItemHandler {
+class ColumnsStatusCommand final : public MenuItemHandler {
   int m_cmd, m_target;
 
 public:

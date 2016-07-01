@@ -15,7 +15,7 @@ class QPlainTextEdit;
 
 //-----------------------------------------------------------------------------
 
-class SVNLockFrameRangeDialog : public DVGui::Dialog {
+class SVNLockFrameRangeDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QLabel *m_waitingLabel;
@@ -74,7 +74,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNLockMultiFrameRangeDialog : public DVGui::Dialog {
+class SVNLockMultiFrameRangeDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QLabel *m_waitingLabel;
@@ -130,7 +130,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNUnlockFrameRangeDialog : public DVGui::Dialog {
+class SVNUnlockFrameRangeDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QLabel *m_waitingLabel;
@@ -175,7 +175,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNUnlockMultiFrameRangeDialog : public DVGui::Dialog {
+class SVNUnlockMultiFrameRangeDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QLabel *m_waitingLabel;
@@ -216,7 +216,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class SVNFrameRangeLockInfoDialog : public DVGui::Dialog {
+class SVNFrameRangeLockInfoDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QString m_workingDir;
@@ -238,7 +238,7 @@ protected slots:
 
 //-----------------------------------------------------------------------------
 
-class SVNMultiFrameRangeLockInfoDialog : public DVGui::Dialog {
+class SVNMultiFrameRangeLockInfoDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QString m_workingDir;

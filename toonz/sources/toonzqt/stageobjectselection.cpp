@@ -21,7 +21,7 @@
 #include <QClipboard>
 
 namespace {
-class TPasteSelectionUndo : public TUndo {
+class TPasteSelectionUndo final : public TUndo {
   StageObjectsData *m_objData;
   int m_index;
   std::vector<TStageObjectId> m_pastedId;

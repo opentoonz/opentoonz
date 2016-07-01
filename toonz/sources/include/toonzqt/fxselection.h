@@ -27,7 +27,7 @@ using namespace TFxCommand;
 //
 //---------------------------------------------------------
 
-class FxSelection : public QObject, public TSelection {
+class FxSelection final : public QObject, public TSelection {
   Q_OBJECT
 
   QList<Link> m_selectedLinks;

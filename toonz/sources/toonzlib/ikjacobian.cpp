@@ -533,7 +533,7 @@ void MatrixRmn::PostApplyGivens(double c, double s, long idx1, long idx2) {
 // Diagonal entries have all non-zero entries before all zero entries, but are
 // not
 //		necessarily sorted.  (Someday, I will write ComputedSortedSVD
-//that
+// that
 // handles
 //		sorting the eigenvalues by magnitude.)
 // ********************************************************************************************
@@ -717,7 +717,7 @@ void MatrixRmn::SvdHouseholder(double *basePt, long colLength, long numCols,
 //	 colStride, rowStride: Householder xforms are stored in "columns"
 //   numZerosSkipped is the number of implicit zeros on the front each
 //			Householder transformation vector (only values supported
-//are
+// are
 // 0 and 1).
 void MatrixRmn::ExpandHouseholders(long numXforms, int numZerosSkipped,
                                    const double *basePt, long colStride,

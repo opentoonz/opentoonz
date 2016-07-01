@@ -35,7 +35,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-class PropertyComboBox : public QComboBox, public PropertyWidget {
+class PropertyComboBox final : public QComboBox, public PropertyWidget {
   Q_OBJECT
 
 public:
@@ -50,7 +50,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-class PropertyCheckBox : public CheckBox, public PropertyWidget {
+class PropertyCheckBox final : public CheckBox, public PropertyWidget {
   Q_OBJECT
 
 public:
@@ -65,7 +65,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-class PropertyLineEdit : public LineEdit, public PropertyWidget {
+class PropertyLineEdit final : public LineEdit, public PropertyWidget {
   Q_OBJECT
 
 public:
@@ -80,7 +80,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-class PropertyIntField : public IntField, public PropertyWidget {
+class PropertyIntField final : public IntField, public PropertyWidget {
   Q_OBJECT
 
 public:

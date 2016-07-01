@@ -20,7 +20,7 @@ class IntField;
 // LinesFadePopup
 //-----------------------------------------------------------------------------
 
-class LinesFadePopup : public DVGui::Dialog {
+class LinesFadePopup final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::ColorField *m_linesColorField;

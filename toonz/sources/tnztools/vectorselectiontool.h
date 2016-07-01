@@ -65,7 +65,7 @@ enum SelectionTarget         //! Possible selection targets in a SelectionTool.
 // VectorFreeDeformer
 //-----------------------------------------------------------------------------
 
-class VectorFreeDeformer : public FreeDeformer {
+class VectorFreeDeformer final : public FreeDeformer {
   TVectorImageP m_vi;
   std::set<int> m_strokeIndexes;
   std::vector<TStroke *> m_originalStrokes;
@@ -106,7 +106,7 @@ namespace DragSelectionTool {
 // UndoChangeStrokes
 //-----------------------------------------------------------------------------
 
-class UndoChangeStrokes : public ToolUtils::TToolUndo {
+class UndoChangeStrokes final : public ToolUtils::TToolUndo {
 public:
   UndoChangeStrokes(TXshSimpleLevel *level, const TFrameId &frameId,
                     VectorSelectionTool *tool,
@@ -178,7 +178,7 @@ private:
 // VectorRotationTool
 //-----------------------------------------------------------------------------
 
-class VectorRotationTool : public VectorDeformTool {
+class VectorRotationTool final : public VectorDeformTool {
   tcg::unique_ptr<Rotation> m_rotation;
 
 public:
@@ -193,7 +193,7 @@ public:
 // VectorFreeDeformTool
 //-----------------------------------------------------------------------------
 
-class VectorFreeDeformTool : public VectorDeformTool {
+class VectorFreeDeformTool final : public VectorDeformTool {
   tcg::unique_ptr<FreeDeform> m_freeDeform;
 
 public:
@@ -206,7 +206,7 @@ public:
 // VectorMoveSelectionTool
 //-----------------------------------------------------------------------------
 
-class VectorMoveSelectionTool : public VectorDeformTool {
+class VectorMoveSelectionTool final : public VectorDeformTool {
   tcg::unique_ptr<MoveSelection> m_moveSelection;
 
 public:
@@ -221,7 +221,7 @@ public:
 // VectorScaleTool
 //-----------------------------------------------------------------------------
 
-class VectorScaleTool : public VectorDeformTool {
+class VectorScaleTool final : public VectorDeformTool {
   tcg::unique_ptr<Scale> m_scale;
 
 public:
@@ -238,7 +238,7 @@ public:
 // VectorChangeThicknessTool
 //-----------------------------------------------------------------------------
 
-class VectorChangeThicknessTool : public DragTool {
+class VectorChangeThicknessTool final : public DragTool {
   TPointD m_curPos, m_firstPos;
   std::map<int, std::vector<double>> m_strokesThickness;
   double m_thicknessChange;
@@ -271,7 +271,7 @@ public:
   \brief    Selection tool for Toonz's vector images.
 */
 
-class VectorSelectionTool : public SelectionTool {
+class VectorSelectionTool final : public SelectionTool {
   Q_DECLARE_TR_FUNCTIONS(VectorSelectionTool)
 
 public:
@@ -327,7 +327,7 @@ protected:
   void onImageChanged() override;
 
 private:
-  class AttachedLevelSelection : public LevelSelection {
+  class AttachedLevelSelection final : public LevelSelection {
     StrokeSelection &m_strokeSelection;  //!< Selection of strokes to be seen at
                                          //! current frame.
 

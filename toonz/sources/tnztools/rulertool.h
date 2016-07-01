@@ -11,7 +11,7 @@
 
 //----------------------------------------------------------------------------------------------
 
-class RulerTool : public TTool {
+class RulerTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(RulerTool)
 
   enum DragMode { MakeNewRuler = 0, MoveFirstPos, MoveSecondPos, MoveRuler };

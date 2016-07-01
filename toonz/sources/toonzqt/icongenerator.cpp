@@ -491,7 +491,7 @@ IconRenderer::~IconRenderer() {}
 //    VectorImageIconRenderer class
 //--------------------------------------
 
-class VectorImageIconRenderer : public IconRenderer {
+class VectorImageIconRenderer final : public IconRenderer {
   TVectorImageP m_vimage;
   TXshSimpleLevelP m_sl;
   TFrameId m_fid;
@@ -561,7 +561,7 @@ void VectorImageIconRenderer::run() {
 //    SplineImageIconRenderer class
 //--------------------------------------
 
-class SplineIconRenderer : public IconRenderer {
+class SplineIconRenderer final : public IconRenderer {
   TStageObjectSpline *m_spline;
 
 public:
@@ -622,7 +622,7 @@ void SplineIconRenderer::run() {
 //    RasterImageIconRenderer class
 //--------------------------------------
 
-class RasterImageIconRenderer : public IconRenderer {
+class RasterImageIconRenderer final : public IconRenderer {
   TXshSimpleLevelP m_sl;
   TFrameId m_fid;
 
@@ -656,7 +656,7 @@ void RasterImageIconRenderer::run() {
 //    ToonzImageIconRenderer class
 //--------------------------------------
 
-class ToonzImageIconRenderer : public IconRenderer {
+class ToonzImageIconRenderer final : public IconRenderer {
   TXshSimpleLevelP m_sl;
   TFrameId m_fid;
   IconGenerator::Settings m_settings;
@@ -761,7 +761,7 @@ void ToonzImageIconRenderer::run() {
 //    MeshImageIconRenderer class
 //--------------------------------------
 
-class MeshImageIconRenderer : public IconRenderer {
+class MeshImageIconRenderer final : public IconRenderer {
   TMeshImageP m_image;
   TXshSimpleLevelP m_sl;
   TFrameId m_fid;
@@ -833,7 +833,7 @@ void MeshImageIconRenderer::run() {
 //    XsheetIconRenderer class
 //----------------------------------
 
-class XsheetIconRenderer : public IconRenderer {
+class XsheetIconRenderer final : public IconRenderer {
   TXsheet *m_xsheet;
   int m_row;
 
@@ -894,7 +894,7 @@ void XsheetIconRenderer::run() {
 //    FileIconRenderer class
 //--------------------------------
 
-class FileIconRenderer : public IconRenderer {
+class FileIconRenderer final : public IconRenderer {
   TFilePath m_path;
   TFrameId m_fid;
 
@@ -1227,7 +1227,7 @@ void FileIconRenderer::run() {
 //    SceneIconRenderer class
 //--------------------------------
 
-class SceneIconRenderer : public IconRenderer {
+class SceneIconRenderer final : public IconRenderer {
   ToonzScene *m_toonzScene;
 
 public:

@@ -61,14 +61,14 @@ protected:
 };
 
 
-class TRamCache : public TCache {
+class TRamCache final : public TCache {
 public:
   TRamCache();
 
 };
 
 
-class TDiskCache : public TCache {
+class TDiskCache final : public TCache {
 public:
   TDiskCache();
 };
@@ -83,18 +83,18 @@ void TDiskCache::getRaster(
 
 
 
-class TRAMUncompressedCache : public TRamCache {
+class TRAMUncompressedCache final : public TRamCache {
 };
 
-class TRAMLzoCache : public TRamCache {
-};
-
-
-class TDiskUncompressedCache : public TDiskCache {
+class TRAMLzoCache final : public TRamCache {
 };
 
 
-class TDiskYUV422Cache : public TDiskCache {
+class TDiskUncompressedCache final : public TDiskCache {
+};
+
+
+class TDiskYUV422Cache final : public TDiskCache {
 public:
   TDiskYUV422Cache();
   ~TDiskYUV422Cache();
@@ -186,7 +186,7 @@ public:
   TRasterCodec *m_codec;
 };
 
-class DVAPI TRamCachePersist : public TCachePersist {
+class DVAPI TRamCachePersist final : public TCachePersist {
 public:
   TRamCachePersist(TRasterCodec *codec);
   ~TRamCachePersist();
@@ -213,7 +213,7 @@ private:
 
 //------------------------------------------------------------------------------
 
-class DVAPI TDiskCachePersist : public TCachePersist {
+class DVAPI TDiskCachePersist final : public TCachePersist {
 public:
   TDiskCachePersist(TRasterCodec *codec, const TFilePath &fullpath);
   ~TDiskCachePersist();
@@ -241,7 +241,7 @@ private:
 //------------------------------------------------------------------------------
 // TDiskCachePersist2 usa il Direct File I/O (acceso al disco non bufferizzato)
 
-class DVAPI TDiskCachePersist2 : public TCachePersist {
+class DVAPI TDiskCachePersist2 final : public TCachePersist {
 public:
   TDiskCachePersist2(TRasterCodec *codec, const TFilePath &fullpath);
   ~TDiskCachePersist2();

@@ -96,7 +96,7 @@ QString getPreviewName(unsigned long renderSessionId) {
 //    MovieRenderer::Imp  definition
 //**************************************************************************
 
-class MovieRenderer::Imp : public TRenderPort, public TSmartObject {
+class MovieRenderer::Imp final : public TRenderPort, public TSmartObject {
 public:
   ToonzScene *m_scene;
   TRenderer m_renderer;

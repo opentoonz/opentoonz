@@ -23,7 +23,7 @@
 #endif
 
 namespace ToonzExt {
-class DVAPI OverallDesigner : public Designer {
+class DVAPI OverallDesigner final : public Designer {
   int x_, y_;
   double scale_, pixelSize_;
 

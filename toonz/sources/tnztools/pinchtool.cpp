@@ -134,7 +134,7 @@ void PinchTool::updateInterfaceStatus(const TMouseEvent &event) {
   m_status.pixelSize_           = getPixelSize();
   m_status.cornerSize_          = (int)m_toolCornerSize.getValue();
   m_status.lengthOfAction_      = m_toolRange.getValue();
-  m_status.deformerSensibility_ = 0.01 * getPixelSize();
+  m_status.deformerSensitivity_ = 0.01 * getPixelSize();
 
   m_status.key_event_ = ContextStatus::NONE;
 

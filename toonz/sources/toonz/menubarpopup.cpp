@@ -37,7 +37,7 @@
 // MenuBarCommandItem
 //-----------------------------------------------------------------------------
 
-class MenuBarCommandItem : public QTreeWidgetItem {
+class MenuBarCommandItem final : public QTreeWidgetItem {
   QAction* m_action;
 
 public:
@@ -55,7 +55,7 @@ public:
 // MenuBarSeparatorItem
 //-----------------------------------------------------------------------------
 
-class MenuBarSeparatorItem : public QTreeWidgetItem {
+class MenuBarSeparatorItem final : public QTreeWidgetItem {
 public:
   MenuBarSeparatorItem(QTreeWidgetItem* parent)
       : QTreeWidgetItem(parent, UserType) {
@@ -70,7 +70,7 @@ public:
 // MenuBarSubmenuItem
 //-----------------------------------------------------------------------------
 
-class MenuBarSubmenuItem : public QTreeWidgetItem {
+class MenuBarSubmenuItem final : public QTreeWidgetItem {
 public:
   MenuBarSubmenuItem(QTreeWidgetItem* parent, QString& title)
       : QTreeWidgetItem(parent, UserType) {

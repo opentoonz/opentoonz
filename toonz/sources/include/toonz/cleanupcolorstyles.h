@@ -67,7 +67,7 @@ private:
 
 //-------------------------------------------------------------------
 
-class DVAPI TColorCleanupStyle : public TCleanupStyle {
+class DVAPI TColorCleanupStyle final : public TCleanupStyle {
   double m_hRange;
   double m_lineWidth;
 
@@ -101,7 +101,7 @@ private:
 
 //-------------------------------------------------------------------
 
-class DVAPI TBlackCleanupStyle : public TCleanupStyle {
+class DVAPI TBlackCleanupStyle final : public TCleanupStyle {
   double m_colorThreshold, m_whiteThreshold;
 
 public:

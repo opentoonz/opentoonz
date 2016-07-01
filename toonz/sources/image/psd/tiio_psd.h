@@ -6,7 +6,7 @@
 #include "../../common/psdlib/psd.h"
 #include "tlevel_io.h"
 
-class TLevelReaderPsd : public TLevelReader {
+class TLevelReaderPsd final : public TLevelReader {
 public:
   TLevelReaderPsd(const TFilePath &path);
   ~TLevelReaderPsd();
@@ -36,7 +36,7 @@ public:
   TThread::Mutex m_mutex;
 };
 
-class TLevelWriterPsd : public TLevelWriter {
+class TLevelWriterPsd final : public TLevelWriter {
 public:
   TLevelWriterPsd(const TFilePath &path, TPropertyGroup *winfo);
   ~TLevelWriterPsd();

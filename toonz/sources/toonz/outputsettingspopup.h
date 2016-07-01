@@ -97,7 +97,7 @@ protected slots:
   void onFrameRateEditingFinished();
 };
 
-class PreviewSettingsPopup : public OutputSettingsPopup {
+class PreviewSettingsPopup final : public OutputSettingsPopup {
 public:
   PreviewSettingsPopup() : OutputSettingsPopup(true) {}
 };

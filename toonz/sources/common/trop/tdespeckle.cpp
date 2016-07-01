@@ -304,7 +304,7 @@ void DespecklingReader::closeContainer() {
 //========================================================================
 
 template <typename Pix>
-class ReplacePainter : public BordersPainter<Pix> {
+class ReplacePainter final : public BordersPainter<Pix> {
   typename ReplacePainter::pixel_type m_color;
 
 public:
@@ -325,7 +325,7 @@ public:
 //---------------------------------------------------------------------------------------------
 
 template <>
-class ReplacePainter<TPixelCM32> : public BordersPainter<TPixelCM32> {
+class ReplacePainter<TPixelCM32> final : public BordersPainter<TPixelCM32> {
   TUINT32 m_value;
   TUINT32 m_keepMask;
 
@@ -352,7 +352,7 @@ public:
 //========================================================================
 
 template <typename PixelSelector>
-class IsolatedReader : public DespecklingReader {
+class IsolatedReader final : public DespecklingReader {
 public:
   typedef typename PixelSelector::pixel_type pixel_type;
   typedef typename PixelSelector::value_type value_type;
@@ -509,7 +509,7 @@ void TRop::despeckle(const TRasterP &rout, const TRasterP &rin,
 namespace {
 
 template <typename PixelSelector>
-class FillingReader : public DespecklingReader {
+class FillingReader final : public DespecklingReader {
 public:
   typedef typename PixelSelector::pixel_type pixel_type;
   typedef typename PixelSelector::value_type value_type;

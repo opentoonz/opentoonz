@@ -4,7 +4,7 @@
 #include "tfxparam.h"
 #include "trop.h"
 
-class GammaFx : public TStandardRasterFx {
+class GammaFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(GammaFx)
 
   TRasterFxPort m_input;

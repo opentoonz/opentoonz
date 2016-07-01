@@ -24,7 +24,7 @@ class PluginInformation;
 //! FxSchematicScene and its items!
 //! This method is used to create and keep updated the three menus.
 //! Each menus contains all toonz special effect and effect presets.
-class AddFxContextMenu : public QObject {
+class AddFxContextMenu final : public QObject {
   Q_OBJECT
 
   QMenu *m_insertMenu, *m_addMenu, *m_replaceMenu;

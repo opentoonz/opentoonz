@@ -79,14 +79,14 @@ private:
 
 template <typename T>
 union aligned_buffer {
-  typedef aligner_type<sizeof(_Aligner<T>) - sizeof(T)> aligner_type;
+  typedef aligner_type<sizeof(_Aligner<T>) - sizeof(T)> aligner_type_t;
 
-  aligner_type m_aligner;
+  aligner_type_t m_aligner;
   char m_buf[sizeof(T)];
 
 private:
   TCG_STATIC_ASSERT(sizeof(_Aligner<T>) - sizeof(T) ==
-                    sizeof(_Aligner<aligner_type>) - sizeof(aligner_type));
+                    sizeof(_Aligner<aligner_type_t>) - sizeof(aligner_type_t));
 };
 
 //**************************************************************************
@@ -97,7 +97,7 @@ template <typename T>
 struct alignment_traits {
   static const int alignment = sizeof(_Aligner<T>) - sizeof(T);
 
-  typedef aligner_type<alignment> aligner_type;
+  typedef aligner_type<alignment> aligner_type_traits;
   typedef aligned_buffer<T> buffer_type;
 };
 

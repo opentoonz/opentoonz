@@ -63,7 +63,7 @@ class TOfflineGL;
             once an icon has been generated.
 */
 
-class DVAPI IconGenerator : public QObject {
+class DVAPI IconGenerator final : public QObject {
   Q_OBJECT
 
 public:

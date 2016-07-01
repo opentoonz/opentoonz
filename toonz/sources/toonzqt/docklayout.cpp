@@ -113,11 +113,11 @@ DockLayout::~DockLayout() {
 
 //-------------------------------------
 
-inline int DockLayout::count() const { return m_items.size(); }
+int DockLayout::count() const { return m_items.size(); }
 
 //-------------------------------------
 
-inline void DockLayout::addItem(QLayoutItem *item) {
+void DockLayout::addItem(QLayoutItem *item) {
   DockWidget *addedItem = dynamic_cast<DockWidget *>(item->widget());
 
   // Ensure that added item is effectively a DockWidget type;
@@ -145,7 +145,7 @@ inline void DockLayout::addItem(QLayoutItem *item) {
 
 //-------------------------------------
 
-inline QLayoutItem *DockLayout::takeAt(int idx) {
+QLayoutItem *DockLayout::takeAt(int idx) {
   if (idx < 0 || idx >= (int)m_items.size()) return 0;
 
   QLayoutItem *item = m_items[idx];
@@ -164,7 +164,7 @@ inline QLayoutItem *DockLayout::takeAt(int idx) {
 
 //-------------------------------------
 
-inline QLayoutItem *DockLayout::itemAt(int idx) const {
+QLayoutItem *DockLayout::itemAt(int idx) const {
   if (idx >= (int)m_items.size()) return 0;
   return m_items[idx];
 }
@@ -175,7 +175,7 @@ QWidget *DockLayout::widgetAt(int idx) const { return itemAt(idx)->widget(); }
 
 //-------------------------------------
 
-inline QSize DockLayout::minimumSize() const {
+QSize DockLayout::minimumSize() const {
   if (!m_regions.empty()) {
     Region *r = m_regions.front();
     r->calculateExtremalSizes();
@@ -187,7 +187,7 @@ inline QSize DockLayout::minimumSize() const {
 
 //-------------------------------------
 
-inline QSize DockLayout::maximumSize() const {
+QSize DockLayout::maximumSize() const {
   if (!m_regions.empty()) {
     Region *r = m_regions.front();
     r->calculateExtremalSizes();
@@ -199,7 +199,7 @@ inline QSize DockLayout::maximumSize() const {
 
 //-------------------------------------
 
-inline QSize DockLayout::sizeHint() const {
+QSize DockLayout::sizeHint() const {
   QSize s(0, 0);
   int n        = m_items.size();
   if (n > 0) s = QSize(100, 70);  // start with a nice default size
@@ -242,7 +242,7 @@ QWidget *DockLayout::containerOf(QPoint point) const {
 
 //-------------------------------------
 
-inline void DockLayout::setMaximized(DockWidget *item, bool state) {
+void DockLayout::setMaximized(DockWidget *item, bool state) {
   if (item && state != item->m_maximized) {
     if (state) {
       // Maximize
@@ -311,7 +311,7 @@ void DockLayout::setGeometry(const QRect &rect) {
 
 //! Defines cursors for separators of the layout: if it is not possible to
 //! move a separator, its cursor must be an arrow.
-inline void DockLayout::updateSeparatorCursors() {
+void DockLayout::updateSeparatorCursors() {
   Region *r, *child;
 
   unsigned int i, j;
@@ -464,21 +464,21 @@ Region::~Region() {
 //------------------------------------------------------
 
 //! Inserts DockSeparator \b sep in \b this Region
-inline void Region::insertSeparator(DockSeparator *sep) {
+void Region::insertSeparator(DockSeparator *sep) {
   m_separators.push_back(sep);
 }
 
 //------------------------------------------------------
 
 //! Removes a DockSeparator from \b this Region
-inline void Region::removeSeparator() {
+void Region::removeSeparator() {
   delete m_separators.back();
   m_separators.pop_back();
 }
 
 //------------------------------------------------------
 
-inline void Region::insertSubRegion(Region *subRegion, int idx) {
+void Region::insertSubRegion(Region *subRegion, int idx) {
   m_childList.insert(m_childList.begin() + idx, subRegion);
   subRegion->m_parent      = this;
   subRegion->m_orientation = !m_orientation;
@@ -487,7 +487,7 @@ inline void Region::insertSubRegion(Region *subRegion, int idx) {
 //------------------------------------------------------
 
 //! Inserts input \b item before position \b idx. Returns associated new region.
-inline Region *Region::insertItem(DockWidget *item, int idx) {
+Region *Region::insertItem(DockWidget *item, int idx) {
   Region *newRegion = new Region(m_owner, item);
 
   if (this) insertSubRegion(newRegion, idx);
@@ -682,7 +682,7 @@ Region *DockLayout::dockItem(DockWidget *item, Region *r, int idx) {
 // which may slow down a bit - should be done only after a redistribute() and a
 // repaint() on
 // real-time docking.
-inline Region *DockLayout::dockItemPrivate(DockWidget *item, Region *r,
+Region *DockLayout::dockItemPrivate(DockWidget *item, Region *r,
                                            int idx) {
   // hide minimize button in FlipboolPanel
   item->onDock(true);
@@ -731,7 +731,7 @@ inline Region *DockLayout::dockItemPrivate(DockWidget *item, Region *r,
 //------------------------------------------------------
 
 //! A region is empty, if contains no item and no children.
-inline bool isEmptyRegion(Region *r) {
+bool isEmptyRegion(Region *r) {
   if ((!r->getItem()) && (r->getChildList().size() == 0)) {
     delete r;  // Be', e' un po' improprio, ma funziona...
     return true;
@@ -742,7 +742,7 @@ inline bool isEmptyRegion(Region *r) {
 //------------------------------------------------------
 
 //! Removes input item from region
-inline void Region::removeItem(DockWidget *item) {
+void Region::removeItem(DockWidget *item) {
   if (item == 0) return;
 
   unsigned int i;
@@ -864,10 +864,10 @@ bool DockLayout::undockItem(DockWidget *item) {
 //! Search for the \b nearest n-ple from a \b target one, under conditions:
 //!\b 1) nearest elements belong to \b fixed \b intervals; \b 2) their \b sum is
 //!\b fixed too.
-inline void calculateNearest(std::vector<double> target,
-                             std::vector<double> &nearest,
-                             std::vector<std::pair<int, int>> intervals,
-                             double sum) {
+void calculateNearest(std::vector<double> target,
+                      std::vector<double> &nearest,
+                      std::vector<std::pair<int, int>> intervals,
+                      double sum) {
   // Solving a small Lagrange multipliers problem to find solution on constraint
   // (2)
   assert(target.size() == intervals.size());
@@ -1095,7 +1095,7 @@ int Region::calculateMaximumSize(bool direction, bool recalcChildren) {
 
 //------------------------------------------------------
 
-inline bool Region::addItemSize(DockWidget *item) {
+bool Region::addItemSize(DockWidget *item) {
   int sepWidth = m_owner->spacing();
 
   if (m_orientation == horizontal) {
@@ -1146,7 +1146,7 @@ inline bool Region::addItemSize(DockWidget *item) {
 
 //------------------------------------------------------
 
-inline bool Region::subItemSize(DockWidget *item) {
+bool Region::subItemSize(DockWidget *item) {
   int sepWidth = m_owner->spacing();
 
   if (m_orientation == horizontal) {
@@ -1208,9 +1208,9 @@ inline bool Region::subItemSize(DockWidget *item) {
 
 //! Checks insertion validity of \b item inside \b parentRegion at position \b
 //! insertionIdx.
-inline bool DockLayout::isPossibleInsertion(DockWidget *item,
-                                            Region *parentRegion,
-                                            int insertionIdx) {
+bool DockLayout::isPossibleInsertion(DockWidget *item,
+                                     Region *parentRegion,
+                                     int insertionIdx) {
   const int inf = 1000000;
 
   int mainWindowWidth  = contentsRect().width();
@@ -1266,9 +1266,9 @@ inline bool DockLayout::isPossibleInsertion(DockWidget *item,
 
 //! Checks insertion validity of \b item inside \b parentRegion at position \b
 //! insertionIdx.
-inline bool DockLayout::isPossibleRemoval(DockWidget *item,
-                                          Region *parentRegion,
-                                          int removalIdx) {
+bool DockLayout::isPossibleRemoval(DockWidget *item,
+                                   Region *parentRegion,
+                                   int removalIdx) {
   // NOTE: parentRegion is necessarily !=0 or there's no need to check anything
   if (!parentRegion) return true;
 
@@ -1587,9 +1587,9 @@ void Region::restoreGeometry() {
 //! Allocates a new DockSeparator with input parameters. This function can be
 //! re-implemented
 //! to allocate derived DockSeparator classes.
-inline DockSeparator *DockDecoAllocator::newSeparator(DockLayout *owner,
-                                                      bool orientation,
-                                                      Region *parentRegion) {
+DockSeparator *DockDecoAllocator::newSeparator(DockLayout *owner,
+                                               bool orientation,
+                                               Region *parentRegion) {
   return new DockSeparator(owner, orientation, parentRegion);
 }
 
@@ -1597,9 +1597,9 @@ inline DockSeparator *DockDecoAllocator::newSeparator(DockLayout *owner,
 
 //! When inheriting a DockLayout class, new custom placeholders gets allocated
 //! by this method.
-inline DockPlaceholder *DockDecoAllocator::newPlaceholder(DockWidget *owner,
-                                                          Region *r, int idx,
-                                                          int attributes) {
+DockPlaceholder *DockDecoAllocator::newPlaceholder(DockWidget *owner,
+                                                   Region *r, int idx,
+                                                   int attributes) {
   return new DockPlaceholder(owner, r, idx, attributes);
 }
 
@@ -1608,9 +1608,9 @@ inline DockPlaceholder *DockDecoAllocator::newPlaceholder(DockWidget *owner,
 // BuildGeometry() method should not be called inside the base contructor -
 // because it's a virtual method.
 // So we provide this little inline...
-inline DockPlaceholder *DockDecoAllocator::newPlaceBuilt(DockWidget *owner,
-                                                         Region *r, int idx,
-                                                         int attributes) {
+DockPlaceholder *DockDecoAllocator::newPlaceBuilt(DockWidget *owner,
+                                                  Region *r, int idx,
+                                                  int attributes) {
   DockPlaceholder *res = newPlaceholder(owner, r, idx, attributes);
   res->buildGeometry();
   return res;

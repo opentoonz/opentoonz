@@ -75,7 +75,7 @@ public:
 //    SaveSettingsPopup
 //==================================================================
 
-class SaveSettingsPopup : public IOSettingsPopup {
+class SaveSettingsPopup final : public IOSettingsPopup {
 public:
   SaveSettingsPopup() : IOSettingsPopup(tr("Save Cleanup Settings")) {
     // addFilterType("tif");
@@ -111,7 +111,7 @@ public:
 //    LoadSettingsPopup
 //==================================================================
 
-class LoadSettingsPopup : public IOSettingsPopup {
+class LoadSettingsPopup final : public IOSettingsPopup {
 public:
   LoadSettingsPopup() : IOSettingsPopup(tr("Load Cleanup Settings")) {
     setOkText(tr("Load"));

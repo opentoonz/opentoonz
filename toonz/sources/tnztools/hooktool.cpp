@@ -66,7 +66,7 @@ public:
 // HookTool
 //-----------------------------------------------------------------------------
 
-class HookTool : public TTool {
+class HookTool final : public TTool {
   Q_DECLARE_TR_FUNCTIONS(HookTool)
 
   HookSelection m_selection;

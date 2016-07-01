@@ -321,7 +321,7 @@ void getThumbnail(TRasterP ras, int shrink, TRasterP &thumbnail) {
 
 //-------------------------------------------------------------------
 
-class TImageReaderTzl : public TImageReader {
+class TImageReaderTzl final : public TImageReader {
 public:
   TImageReaderTzl(const TFilePath &f, const TFrameId &fid, TLevelReaderTzl *);
   ~TImageReaderTzl() {}
@@ -366,7 +366,7 @@ private:
 //
 //-------------------------------------------------------------------
 
-class TImageWriterTzl : public TImageWriter {
+class TImageWriterTzl final : public TImageWriter {
   //! Reference to level writer
   TLevelWriterTzl *m_lwp;
   TFrameId m_fid;

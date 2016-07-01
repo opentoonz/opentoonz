@@ -44,7 +44,7 @@ class QGroupBox;
 //    CleanupPopup declaration
 //*****************************************************************************
 
-class CleanupPopup : public QDialog {
+class CleanupPopup final : public QDialog {
   Q_OBJECT
 
 public:
@@ -141,7 +141,8 @@ private slots:
 //    CleanupPopup::OverwriteDialog declaration (private)
 //*****************************************************************************
 
-class CleanupPopup::OverwriteDialog : public DVGui::ValidatedChoiceDialog {
+class CleanupPopup::OverwriteDialog final
+    : public DVGui::ValidatedChoiceDialog {
   Q_OBJECT
 
 public:

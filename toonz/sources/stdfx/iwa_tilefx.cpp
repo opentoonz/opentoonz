@@ -11,7 +11,7 @@
 
 //=============================================================================
 
-class Iwa_TileFx : public TStandardRasterFx {
+class Iwa_TileFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(Iwa_TileFx)
 
   enum tileQuantity { eNoTile = 1, eOneTile = 2, eMultipleTiles = 3 };

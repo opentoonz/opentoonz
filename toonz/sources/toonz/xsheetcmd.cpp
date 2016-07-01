@@ -212,7 +212,7 @@ void insertSceneFrame(int frame) {
 
 //=============================================================================
 
-class InsertSceneFrameCommand : public MenuItemHandler {
+class InsertSceneFrameCommand final : public MenuItemHandler {
 public:
   InsertSceneFrameCommand() : MenuItemHandler(MI_InsertSceneFrame) {}
   void execute() override {
@@ -225,7 +225,7 @@ public:
 //    RemoveSceneFrame  command
 //*****************************************************************************
 
-class RemoveSceneFrameUndo : public InsertSceneFrameUndo {
+class RemoveSceneFrameUndo final : public InsertSceneFrameUndo {
   std::vector<TXshCell> m_cells;
   std::vector<TStageObject::Keyframe> m_keyframes;
 
@@ -307,7 +307,7 @@ void removeSceneFrame(int frame) {
 
 //=============================================================================
 
-class RemoveSceneFrameCommand : public MenuItemHandler {
+class RemoveSceneFrameCommand final : public MenuItemHandler {
 public:
   RemoveSceneFrameCommand() : MenuItemHandler(MI_RemoveSceneFrame) {}
   void execute() override {
@@ -411,7 +411,7 @@ void GlobalKeyframeUndo::doRemoveGlobalKeyframes(
 //    InsertGlobalKeyframe  command
 //*****************************************************************************
 
-class InsertGlobalKeyframeUndo : public GlobalKeyframeUndo {
+class InsertGlobalKeyframeUndo final : public GlobalKeyframeUndo {
 public:
   InsertGlobalKeyframeUndo(int frame, const std::vector<int> &columns)
       : GlobalKeyframeUndo(frame) {
@@ -457,7 +457,7 @@ void insertGlobalKeyframe(int frame) {
 
 //=============================================================================
 
-class InsertGlobalKeyframeCommand : public MenuItemHandler {
+class InsertGlobalKeyframeCommand final : public MenuItemHandler {
 public:
   InsertGlobalKeyframeCommand() : MenuItemHandler(MI_InsertGlobalKeyframe) {}
   void execute() override {
@@ -470,7 +470,7 @@ public:
 //    RemoveGlobalKeyframe  command
 //*****************************************************************************
 
-class RemoveGlobalKeyframeUndo : public GlobalKeyframeUndo {
+class RemoveGlobalKeyframeUndo final : public GlobalKeyframeUndo {
   std::vector<TStageObject::Keyframe> m_keyframes;
 
 public:
@@ -550,7 +550,7 @@ void removeGlobalKeyframe(int frame) {
 
 //=============================================================================
 
-class RemoveGlobalKeyframeCommand : public MenuItemHandler {
+class RemoveGlobalKeyframeCommand final : public MenuItemHandler {
 public:
   RemoveGlobalKeyframeCommand() : MenuItemHandler(MI_RemoveGlobalKeyframe) {}
   void execute() override {
@@ -562,7 +562,7 @@ public:
 //============================================================
 //	Drawing Substitution
 //============================================================
-class DrawingSubtitutionUndo : public TUndo {
+class DrawingSubtitutionUndo final : public TUndo {
 private:
   int m_direction, m_row, m_col;
   TCellSelection::Range m_range;
@@ -635,7 +635,7 @@ protected:
 
 //============================================================
 
-class DrawingSubtitutionGroupUndo : public TUndo {
+class DrawingSubtitutionGroupUndo final : public TUndo {
 private:
   int m_direction;
   int m_row;
@@ -728,6 +728,8 @@ bool DrawingSubtitutionUndo::changeDrawing(int delta, int row, int col) {
   index = (index + delta) % n;
 
   setDrawing(fids[index], row, col, cell);
+
+  return true;
 }
 
 void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col,
@@ -778,7 +780,7 @@ void drawingSubstituionGroup(int dir) {
 
 //=============================================================================
 
-class DrawingSubstitutionForwardCommand : public MenuItemHandler {
+class DrawingSubstitutionForwardCommand final : public MenuItemHandler {
 public:
   DrawingSubstitutionForwardCommand() : MenuItemHandler(MI_DrawingSubForward) {}
   void execute() override { XshCmd::drawingSubstituion(1); }
@@ -786,7 +788,7 @@ public:
 
 //============================================================
 
-class DrawingSubstitutionBackwardCommand : public MenuItemHandler {
+class DrawingSubstitutionBackwardCommand final : public MenuItemHandler {
 public:
   DrawingSubstitutionBackwardCommand()
       : MenuItemHandler(MI_DrawingSubBackward) {}
@@ -795,7 +797,7 @@ public:
 
 //=============================================================================
 
-class DrawingSubstitutionGroupForwardCommand : public MenuItemHandler {
+class DrawingSubstitutionGroupForwardCommand final : public MenuItemHandler {
 public:
   DrawingSubstitutionGroupForwardCommand()
       : MenuItemHandler(MI_DrawingSubGroupForward) {}
@@ -804,7 +806,7 @@ public:
 
 //============================================================
 
-class DrawingSubstitutionGroupBackwardCommand : public MenuItemHandler {
+class DrawingSubstitutionGroupBackwardCommand final : public MenuItemHandler {
 public:
   DrawingSubstitutionGroupBackwardCommand()
       : MenuItemHandler(MI_DrawingSubGroupBackward) {}
@@ -819,7 +821,7 @@ public:
 //    Selection  commands
 //*****************************************************************************
 
-class SelectRowKeyframesCommand : public MenuItemHandler {
+class SelectRowKeyframesCommand final : public MenuItemHandler {
 public:
   SelectRowKeyframesCommand() : MenuItemHandler(MI_SelectRowKeyframes) {}
 
@@ -852,7 +854,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SelectColumnKeyframesCommand : public MenuItemHandler {
+class SelectColumnKeyframesCommand final : public MenuItemHandler {
 public:
   SelectColumnKeyframesCommand() : MenuItemHandler(MI_SelectColumnKeyframes) {}
 
@@ -883,7 +885,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SelectAllKeyframesCommand : public MenuItemHandler {
+class SelectAllKeyframesCommand final : public MenuItemHandler {
 public:
   SelectAllKeyframesCommand() : MenuItemHandler(MI_SelectAllKeyframes) {}
 
@@ -922,7 +924,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SelectAllKeyframesBeforeCommand : public MenuItemHandler {
+class SelectAllKeyframesBeforeCommand final : public MenuItemHandler {
 public:
   SelectAllKeyframesBeforeCommand()
       : MenuItemHandler(MI_SelectAllKeyframesNotBefore) {}
@@ -963,7 +965,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SelectAllKeyframesAfterCommand : public MenuItemHandler {
+class SelectAllKeyframesAfterCommand final : public MenuItemHandler {
 public:
   SelectAllKeyframesAfterCommand()
       : MenuItemHandler(MI_SelectAllKeyframesNotAfter) {}
@@ -1005,7 +1007,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SelectPreviousKeysInColumnCommand : public MenuItemHandler {
+class SelectPreviousKeysInColumnCommand final : public MenuItemHandler {
 public:
   SelectPreviousKeysInColumnCommand()
       : MenuItemHandler(MI_SelectPreviousKeysInColumn) {}
@@ -1043,7 +1045,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SelectFollowingKeysInColumnCommand : public MenuItemHandler {
+class SelectFollowingKeysInColumnCommand final : public MenuItemHandler {
 public:
   SelectFollowingKeysInColumnCommand()
       : MenuItemHandler(MI_SelectFollowingKeysInColumn) {}
@@ -1080,7 +1082,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SelectPreviousKeysInRowCommand : public MenuItemHandler {
+class SelectPreviousKeysInRowCommand final : public MenuItemHandler {
 public:
   SelectPreviousKeysInRowCommand()
       : MenuItemHandler(MI_SelectPreviousKeysInRow) {}
@@ -1124,7 +1126,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SelectFollowingKeysInRowCommand : public MenuItemHandler {
+class SelectFollowingKeysInRowCommand final : public MenuItemHandler {
 public:
   SelectFollowingKeysInRowCommand()
       : MenuItemHandler(MI_SelectFollowingKeysInRow) {}
@@ -1170,7 +1172,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class InvertKeyframeSelectionCommand : public MenuItemHandler {
+class InvertKeyframeSelectionCommand final : public MenuItemHandler {
 public:
   InvertKeyframeSelectionCommand()
       : MenuItemHandler(MI_InvertKeyframeSelection) {}
@@ -1215,7 +1217,7 @@ public:
 
 namespace {
 
-class KeyFrameHandleCommandUndo : public TUndo {
+class KeyFrameHandleCommandUndo final : public TUndo {
   TStageObjectId m_objId;
   int m_rowFirst, m_rowSecond;
 
@@ -1278,7 +1280,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SetAccelerationCommand : public MenuItemHandler {
+class SetAccelerationCommand final : public MenuItemHandler {
 public:
   SetAccelerationCommand() : MenuItemHandler(MI_SetAcceleration) {}
 
@@ -1325,7 +1327,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SetDecelerationCommand : public MenuItemHandler {
+class SetDecelerationCommand final : public MenuItemHandler {
 public:
   SetDecelerationCommand() : MenuItemHandler(MI_SetDeceleration) {}
 
@@ -1368,7 +1370,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class SetConstantSpeedCommand : public MenuItemHandler {
+class SetConstantSpeedCommand final : public MenuItemHandler {
 public:
   SetConstantSpeedCommand() : MenuItemHandler(MI_SetConstantSpeed) {}
 
@@ -1409,7 +1411,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class ResetArrowCommand : public MenuItemHandler {
+class ResetArrowCommand final : public MenuItemHandler {
 public:
   ResetArrowCommand() : MenuItemHandler(MI_ResetInterpolation) {}
 
@@ -1453,7 +1455,7 @@ public:
 //    To Be Reworked
 //===========================================================
 
-class NewOutputFx : public MenuItemHandler {
+class NewOutputFx final : public MenuItemHandler {
 public:
   NewOutputFx() : MenuItemHandler(MI_NewOutputFx) {}
 
@@ -1806,7 +1808,7 @@ void makeHtml(TFilePath fp) {
   os << "</body></html>" << endl;
 }
 
-class PrintXsheetCommand : public MenuItemHandler {
+class PrintXsheetCommand final : public MenuItemHandler {
 public:
   PrintXsheetCommand() : MenuItemHandler(MI_PrintXsheet) {}
   void execute() override;

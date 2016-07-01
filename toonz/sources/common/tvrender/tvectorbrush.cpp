@@ -118,7 +118,8 @@ void getHRange(const TStroke &stroke, double &x0, double &x1) {
 //    Outlinization Data
 //********************************************************************************
 
-struct StrokeOutlinizationData : public tellipticbrush::OutlinizationData {
+struct StrokeOutlinizationData final
+    : public tellipticbrush::OutlinizationData {
   double m_x0, m_x1, m_xRange;
   double m_y0, m_yScale;
 
@@ -372,7 +373,7 @@ ReferenceLinearizator::ReferenceLinearizator(
 //    Brush Linearizator on Path inter-chunk points
 //********************************************************************************
 
-class ReferenceChunksLinearizator : public ReferenceLinearizator {
+class ReferenceChunksLinearizator final : public ReferenceLinearizator {
   double m_w0, m_w1;
 
 public:
@@ -507,7 +508,7 @@ void ReferenceChunksLinearizator::addCenterlinePoints(
 //    Recursive (regular) Reference Stroke Linearizator
 //********************************************************************************
 
-class RecursiveReferenceLinearizator : public ReferenceLinearizator {
+class RecursiveReferenceLinearizator final : public ReferenceLinearizator {
 public:
   typedef void (RecursiveReferenceLinearizator::*SubdivisorFuncPtr)(
       std::vector<CenterlinePoint> &cPoints, CenterlinePoint &cp0,

@@ -434,7 +434,7 @@ void insertNotEmptyframes(const TXshSimpleLevelP &sl,
 // PasteRasterAreasUndo
 //-----------------------------------------------------------------------------
 
-class PasteRasterAreasUndo : public TUndo {
+class PasteRasterAreasUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   std::set<TFrameId> m_frames;
   TTileSet *m_tiles;
@@ -628,7 +628,7 @@ public:
 // PasteVectorAreasUndo
 //-----------------------------------------------------------------------------
 
-class PasteVectorAreasUndo : public TUndo {
+class PasteVectorAreasUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   std::set<TFrameId> m_frames;
   std::map<TFrameId, std::set<int>> m_indices;
@@ -748,7 +748,7 @@ public:
 // PasteAreasUndo
 //-----------------------------------------------------------------------------
 
-class PasteAreasUndo : public TUndo
+class PasteAreasUndo final : public TUndo
 {
   TXshSimpleLevelP m_level;
   std::set<TFrameId> m_frames;
@@ -867,7 +867,7 @@ TImageCache::instance()->get("PasteAreasUndoNew"+QString::number((UINT)this)+QSt
 // PasteFramesUndo
 //-----------------------------------------------------------------------------
 
-class PasteFramesUndo : public TUndo {
+class PasteFramesUndo final : public TUndo {
   TXshSimpleLevelP m_sl;
   std::set<TFrameId> m_frames;
   std::vector<TFrameId> m_oldLevelFrameId;
@@ -987,7 +987,7 @@ public:
 // DeleteFramesUndo
 //-----------------------------------------------------------------------------
 
-class DeleteFramesUndo : public TUndo {
+class DeleteFramesUndo final : public TUndo {
   TXshSimpleLevel *m_sl;
   std::set<TFrameId> m_frames;
   DrawingData *m_oldData;
@@ -1040,7 +1040,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class CutFramesUndo : public TUndo {
+class CutFramesUndo final : public TUndo {
   TXshSimpleLevel *m_sl;
   std::set<TFrameId> m_framesCutted;
   std::vector<TFrameId> m_oldFrames;
@@ -1106,7 +1106,7 @@ public:
 namespace {
 //-----------------------------------------------------------------------------
 
-class AddFramesUndo : public TUndo {
+class AddFramesUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   std::set<TFrameId> m_insertedFids;
   std::vector<TFrameId> m_oldFids;
@@ -1201,7 +1201,7 @@ void FilmstripCmd::addFrames(TXshSimpleLevel *sl, int start, int end,
 
 namespace {
 
-class RenumberUndo : public TUndo {
+class RenumberUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   std::vector<TFrameId> m_fids;
   std::map<TFrameId, TFrameId> m_mapOldFrameId;
@@ -1611,7 +1611,7 @@ void insertEmptyFilmstripFrames(const TXshSimpleLevelP &sl,
 
 //-----------------------------------------------------------------------------
 
-class UndoInsertEmptyFrames : public TUndo {
+class UndoInsertEmptyFrames final : public TUndo {
   TXshSimpleLevelP m_level;
   std::vector<TFrameId> m_oldFrames;
   std::set<TFrameId> m_frames;
@@ -1726,7 +1726,7 @@ void performReverse(const TXshSimpleLevelP &sl,
 
 //-----------------------------------------------------------------------------
 
-class FilmstripReverseUndo : public TUndo {
+class FilmstripReverseUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   std::set<TFrameId> m_frames;
 
@@ -1797,7 +1797,7 @@ void performSwing(const TXshSimpleLevelP &sl,
 
 //-----------------------------------------------------------------------------
 
-class FilmstripSwingUndo : public TUndo {
+class FilmstripSwingUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   std::set<TFrameId> m_frames;
   std::set<TFrameId> m_newFrames;
@@ -1892,7 +1892,7 @@ void stepFilmstripFrames(const TXshSimpleLevelP &sl,
 
 //-----------------------------------------------------------------------------
 
-class StepFilmstripUndo : public TUndo {
+class StepFilmstripUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   std::set<TFrameId> m_insertedFrames;
   std::set<TFrameId> m_frames;
@@ -1992,7 +1992,7 @@ std::map<TFrameId, QString> eachFilmstripFrames(
 
 //-----------------------------------------------------------------------------
 
-class EachFilmstripUndo : public TUndo {
+class EachFilmstripUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   std::set<TFrameId> m_frames;
   std::map<TFrameId, QString> m_cutFrames;
@@ -2054,7 +2054,7 @@ void FilmstripCmd::each(TXshSimpleLevel *sl, std::set<TFrameId> &frames,
 namespace {
 //-----------------------------------------------------------------------------
 
-class UndoDuplicateDrawing : public TUndo {
+class UndoDuplicateDrawing final : public TUndo {
   TXshSimpleLevelP m_level;
   std::set<TFrameId> m_frameInserted;
   std::vector<TFrameId> m_oldFrames;
@@ -2151,7 +2151,7 @@ void moveToSceneFrames(TXshLevel *level, const std::set<TFrameId> &frames) {
 
 //-----------------------------------------------------------------------------
 
-class MoveLevelToSceneUndo : public TUndo {
+class MoveLevelToSceneUndo final : public TUndo {
   std::wstring m_levelName;
   int m_col;
   std::set<TFrameId> m_fids;
@@ -2257,7 +2257,7 @@ void FilmstripCmd::moveToScene(TXshSoundLevel *sl) {
 
 namespace {
 
-class UndoInbetween : public TUndo {
+class UndoInbetween final : public TUndo {
   TXshSimpleLevelP m_level;
   std::vector<TFrameId> m_fids;
   std::vector<TVectorImageP> m_images;

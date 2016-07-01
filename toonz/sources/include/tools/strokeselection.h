@@ -38,7 +38,7 @@ class TSceneHandle;
 //    StrokeSelection  declaration
 //****************************************************************************
 
-class DVAPI StrokeSelection : public TSelection {
+class DVAPI StrokeSelection final : public TSelection {
 public:
   typedef std::set<int> IndexesContainer;
 

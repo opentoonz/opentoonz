@@ -16,7 +16,7 @@ namespace {
 // Zoom Tool
 //-----------------------------------------------------------------------------
 
-class ZoomTool : public TTool {
+class ZoomTool final : public TTool {
   int m_oldY;
   TPointD m_center;
   bool m_dragging;
@@ -89,7 +89,7 @@ public:
 // Hand Tool
 //-----------------------------------------------------------------------------
 
-class HandTool : public TTool {
+class HandTool final : public TTool {
   TStopWatch m_sw;
   TPoint m_oldPos;
 
@@ -130,7 +130,7 @@ public:
 // Rotate Tool
 //-----------------------------------------------------------------------------
 
-class RotateTool : public TTool {
+class RotateTool final : public TTool {
   TStopWatch m_sw;
   TPointD m_oldPos;
   TPointD m_center;

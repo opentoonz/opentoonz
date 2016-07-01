@@ -46,7 +46,7 @@ class QSettings;
   \brief    Stores application-wide preferences used throughout Toonz.
 */
 
-class DVAPI Preferences : public QObject  // singleton
+class DVAPI Preferences final : public QObject  // singleton
 {
   Q_OBJECT
 

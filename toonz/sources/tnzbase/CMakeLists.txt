@@ -190,6 +190,7 @@ elseif(UNIX)
     set(EXTRA_LIBS ${EXTRA_LIBS}
         ${SDL_LIB_LIBRARIES})
 
+	include_directories(${SDL_LIB_INCLUDE_DIRS})
     target_link_libraries(tnzbase Qt5::Core Qt5::Gui)
 endif()
 

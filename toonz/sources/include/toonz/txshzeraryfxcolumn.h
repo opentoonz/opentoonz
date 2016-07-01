@@ -32,7 +32,7 @@ to
 */
 //=============================================================================
 
-class DVAPI TXshZeraryFxColumn : public TXshCellColumn {
+class DVAPI TXshZeraryFxColumn final : public TXshCellColumn {
   PERSIST_DECLARATION(TXshZeraryFxColumn)
   TZeraryColumnFx *m_zeraryColumnFx;
   TXshZeraryFxLevel *m_zeraryFxLevel;

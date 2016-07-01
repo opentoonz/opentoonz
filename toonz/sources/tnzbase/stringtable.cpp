@@ -14,7 +14,7 @@ namespace {
 
 //-------------------------------------------------------------------
 
-class TStringTableImp : public TStringTable {
+class TStringTableImp final : public TStringTable {
 public:
   bool m_initialized;
 

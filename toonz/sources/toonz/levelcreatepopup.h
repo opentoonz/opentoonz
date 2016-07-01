@@ -17,7 +17,7 @@ class QComboBox;
 // LevelCreatePopup
 //-----------------------------------------------------------------------------
 
-class LevelCreatePopup : public DVGui::Dialog {
+class LevelCreatePopup final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::LineEdit *m_nameFld;

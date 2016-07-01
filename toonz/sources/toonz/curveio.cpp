@@ -12,7 +12,7 @@
 
 //=============================================================================
 
-class LoadCurveUndo : public TUndo {
+class LoadCurveUndo final : public TUndo {
   TDoubleParamP m_curve;
   TDoubleParamP m_oldCurve, m_newCurve;
 
@@ -70,7 +70,7 @@ public:
 
 //=============================================================================
 
-class SaveCurvePopup : public CurvePopup {
+class SaveCurvePopup final : public CurvePopup {
 public:
   SaveCurvePopup(const TFilePath folderPath, TDoubleParam *curve)
       : CurvePopup(tr("Save Curve"), folderPath, curve) {
@@ -105,7 +105,7 @@ bool SaveCurvePopup::execute() {
 
 //=============================================================================
 
-class LoadCurvePopup : public CurvePopup {
+class LoadCurvePopup final : public CurvePopup {
 public:
   LoadCurvePopup(const TFilePath folderPath, TDoubleParam *curve)
       : CurvePopup(tr("Load Curve"), folderPath, curve) {
@@ -146,7 +146,7 @@ bool LoadCurvePopup::execute() {
 
 //=============================================================================
 
-class ExportCurvePopup : public CurvePopup {
+class ExportCurvePopup final : public CurvePopup {
   std::string m_name;
 
 public:

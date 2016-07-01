@@ -88,7 +88,7 @@ void putint(FILE *fp, int i) {
 
 //=========================================================
 
-class BmpReader : public Tiio::Reader {
+class BmpReader final : public Tiio::Reader {
   FILE *m_chan;
   BMP_HEADER m_header;
   char *m_line;
@@ -584,7 +584,7 @@ int BmpReader::read32Line(char *buffer, int x0, int x1, int shrink) {
 
 //=========================================================
 
-class BmpWriter : public Tiio::Writer {
+class BmpWriter final : public Tiio::Writer {
   FILE *m_chan;
   int m_bitPerPixel;
   int m_compression;

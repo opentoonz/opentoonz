@@ -495,7 +495,7 @@ bool SkeletonTool::keyDown(int key, TUINT32 flags, const TPoint &pos) {
 
 //-------------------------------------------------------------------
 
-class TogglePinnedStatusUndo : public TUndo {
+class TogglePinnedStatusUndo final : public TUndo {
   SkeletonTool *m_tool;
   std::set<int> m_oldTemp, m_newTemp;
   int m_columnIndex, m_oldColumnIndex;

@@ -11,7 +11,7 @@ class QLabel;
 
 //-----------------------------------------------------------------------------
 
-class SVNCleanupDialog : public DVGui::Dialog {
+class SVNCleanupDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   QPushButton *m_closeButton;

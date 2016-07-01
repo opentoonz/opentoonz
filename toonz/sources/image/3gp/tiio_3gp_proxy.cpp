@@ -36,7 +36,7 @@
 //    TImageWriter3gp Proxy implementation
 //******************************************************************************
 
-class TImageWriter3gpProxy : public TImageWriter {
+class TImageWriter3gpProxy final : public TImageWriter {
   TLevelWriter3gp *m_lw;
 
 public:
@@ -237,7 +237,7 @@ void TLevelWriter3gp::saveSoundTrack(TSoundTrack *st) {
 //    TImageReaderMov Proxy implementation
 //******************************************************************************
 
-class TImageReader3gpProxy : public TImageReader {
+class TImageReader3gpProxy final : public TImageReader {
   TLevelReader3gp *m_lr;
   TImageInfo *m_info;
 

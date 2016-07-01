@@ -10,7 +10,7 @@
 
 //-------------------------------------------------------------------
 
-class LinearWaveFx : public TStandardRasterFx {
+class LinearWaveFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(LinearWaveFx)
 protected:
   TRasterFxPort m_warped;

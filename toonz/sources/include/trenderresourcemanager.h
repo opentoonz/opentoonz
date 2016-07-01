@@ -116,7 +116,7 @@ Declares a TRenderResourceManager class, it must be used inside the manager
 definition.
 For example:
 \code
-class MyManager : public TRenderResourceManager
+class MyManager final : public TRenderResourceManager
 {
   T_RENDER_RESOURCE_MANAGER
 

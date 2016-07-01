@@ -176,7 +176,7 @@ void mergeVectorColumns(const std::vector<MatchlinePair> &matchingLevels) {
 }  // namespace
 //-----------------------------------------------------------------------------
 
-class MergeColumnsUndo : public TUndo {
+class MergeColumnsUndo final : public TUndo {
   TXshLevelP m_xl;
   int m_matchlineSessionId;
   std::map<TFrameId, QString> m_images;

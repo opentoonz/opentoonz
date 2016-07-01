@@ -9,7 +9,7 @@
 #include "trasterfx.h"
 #include "tspectrumparam.h"
 
-class ArtContourFx : public TStandardRasterFx {
+class ArtContourFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ArtContourFx)
 
   TRasterFxPort m_input;

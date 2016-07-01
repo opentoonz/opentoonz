@@ -20,7 +20,7 @@
 #define DVVAR DV_IMPORT_VAR
 #endif
 
-class DVAPI TXshSoundLevel : public TXshLevel {
+class DVAPI TXshSoundLevel final : public TXshLevel {
   PERSIST_DECLARATION(TXshSoundLevel)
 
   TSoundTrackP m_soundTrack;

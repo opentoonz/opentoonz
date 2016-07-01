@@ -28,7 +28,7 @@ using namespace std;
 namespace {
 
 template <class T>
-class TOptimizedStrokePropT : public TStrokeProp {
+class TOptimizedStrokePropT final : public TStrokeProp {
 protected:
   double m_pixelSize;
 

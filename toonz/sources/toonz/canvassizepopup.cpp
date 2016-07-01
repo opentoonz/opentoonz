@@ -39,7 +39,7 @@
 
 namespace {
 
-class ResizeCanvasUndo : public TUndo {
+class ResizeCanvasUndo final : public TUndo {
   TXshSimpleLevelP m_level;
   TFrameId m_fid;
   std::string m_oldImageId, m_newImageId;

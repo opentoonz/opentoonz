@@ -424,7 +424,7 @@ int DragSelectionTool::UndoChangeStrokes::getSize() const {
 // UndoChangeOutlineStyle
 //-----------------------------------------------------------------------------
 
-class UndoChangeOutlineStyle : public ToolUtils::TToolUndo {
+class UndoChangeOutlineStyle final : public ToolUtils::TToolUndo {
   std::vector<TStroke::OutlineOptions> m_oldOptions, m_newOptions;
   FourPoints m_oldBBox, m_newBBox;
   VectorSelectionTool *m_tool;
@@ -1123,7 +1123,7 @@ bool getGroupBBox(const TVectorImage &vi, int strokeIndex, TRectD &gBox) {
 // UndoEnterGroup
 //-----------------------------------------------------------------------------
 
-class UndoEnterGroup : public TUndo {
+class UndoEnterGroup final : public TUndo {
   int m_strokeIndex;
   TVectorImageP m_vi;
 
@@ -1145,7 +1145,7 @@ public:
 // UndoExitGroup
 //-----------------------------------------------------------------------------
 
-class UndoExitGroup : public TUndo {
+class UndoExitGroup final : public TUndo {
   int m_strokeIndex;
   TVectorImageP m_vi;
 

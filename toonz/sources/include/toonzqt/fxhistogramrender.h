@@ -35,7 +35,7 @@ class ToonzScene;
 //! Implements the TRenderPort virtual class
 //! This class receives and handles signals from the TThread::Runnable class
 //! that make the render of frame.
-class FxHistogramRenderPort : public QObject, public TRenderPort {
+class FxHistogramRenderPort final : public QObject, public TRenderPort {
   Q_OBJECT
 
 public:
@@ -56,7 +56,7 @@ signals:
 // FxHistogramRender
 //---------------------------------------------------------
 
-class DVAPI FxHistogramRender : public QObject {
+class DVAPI FxHistogramRender final : public QObject {
   Q_OBJECT
 
 private:

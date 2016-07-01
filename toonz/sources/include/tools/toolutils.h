@@ -249,7 +249,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class UndoModifyStrokeAndPaint : public UndoModifyStroke {
+class UndoModifyStrokeAndPaint final : public UndoModifyStroke {
   std::vector<TFilledRegionInf> *m_fillInformation;
   TRectD m_oldBBox;
 
@@ -268,7 +268,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class UndoModifyListStroke : public TToolUndo {
+class UndoModifyListStroke final : public TToolUndo {
   std::list<UndoModifyStroke *> m_strokeList;
   std::list<UndoModifyStroke *>::iterator m_beginIt, m_endIt;
 
@@ -291,7 +291,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class UndoPencil : public TToolUndo {
+class UndoPencil final : public TToolUndo {
   int m_strokeId;
   TStroke *m_stroke;
   std::vector<TFilledRegionInf> *m_fillInformation;
@@ -362,7 +362,7 @@ public:
 //
 // undo class (path strokes). call it BEFORE and register it AFTER path change
 //
-class UndoPath : public TUndo {
+class UndoPath final : public TUndo {
   TStageObjectSpline *m_spline;
   std::vector<TThickPoint> m_before, m_after;
   bool m_selfLoopBefore;
@@ -384,7 +384,7 @@ public:
 //
 // UndoControlPointEditor
 //
-class UndoControlPointEditor : public TToolUndo {
+class UndoControlPointEditor final : public TToolUndo {
   std::pair<int, VIStroke *> m_oldStroke;
   std::pair<int, VIStroke *> m_newStroke;
   bool m_isStrokeDelete;
@@ -436,7 +436,7 @@ protected:
 // ChooseColumnMenu
 //
 
-class ColumChooserMenu : public DragMenu {
+class ColumChooserMenu final : public DragMenu {
 public:
   ColumChooserMenu(TXsheet *xsh, const std::vector<int> &columnIndexes);
   int execute();

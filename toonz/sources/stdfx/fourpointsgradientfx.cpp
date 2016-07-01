@@ -13,7 +13,7 @@ inline void pixelConvert(TPixel64 &dst, const TPixel32 &src) {
 }
 }  // namespace
 
-class FourPointsGradientFx : public TStandardZeraryFx {
+class FourPointsGradientFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(FourPointsGradientFx)
   TSpectrumParamP m_colors;
   TPointParamP m_point1;

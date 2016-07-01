@@ -66,7 +66,7 @@ void printCurrentFrame() {
 
 //=============================================================================
 
-class PrintCommand : public MenuItemHandler {
+class PrintCommand final : public MenuItemHandler {
 public:
   PrintCommand() : MenuItemHandler(MI_Print) {}
   void execute() override {

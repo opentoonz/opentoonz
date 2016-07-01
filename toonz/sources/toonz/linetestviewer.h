@@ -23,9 +23,9 @@
 // Andrebbe messo a fattor comune del codice con SceneViewer
 
 #ifdef USE_QPAINTER
-class LineTestViewer : public QWidget
+class LineTestViewer final : public QWidget
 #else
-class LineTestViewer : public QOpenGLWidget
+class LineTestViewer final : public QOpenGLWidget
 #endif
 {
   Q_OBJECT

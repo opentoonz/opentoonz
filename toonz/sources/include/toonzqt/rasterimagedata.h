@@ -71,7 +71,7 @@ public:
 // ToonzImageData
 //-------------------------------------------------------------------
 /*-- SelectionToolで選択した画像のデータ --*/
-class DVAPI ToonzImageData : public RasterImageData {
+class DVAPI ToonzImageData final : public RasterImageData {
   TRasterCM32P m_copiedRaster;
   TPaletteP m_palette;
 
@@ -106,7 +106,7 @@ public:
 // FullColorImageData
 //-------------------------------------------------------------------
 
-class DVAPI FullColorImageData : public RasterImageData {
+class DVAPI FullColorImageData final : public RasterImageData {
   TRasterP m_copiedRaster;
   TPaletteP m_palette;
 

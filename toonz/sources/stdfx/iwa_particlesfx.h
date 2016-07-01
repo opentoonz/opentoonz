@@ -15,7 +15,7 @@
 //	Iwa_Particles Fx  class
 //******************************************************************
 
-class Iwa_TiledParticlesFx : public TStandardZeraryFx {
+class Iwa_TiledParticlesFx final : public TStandardZeraryFx {
   FX_PLUGIN_DECLARATION(Iwa_TiledParticlesFx)
 
   TFxPortDG m_source, m_control;

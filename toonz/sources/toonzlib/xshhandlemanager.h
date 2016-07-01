@@ -18,7 +18,7 @@ class ToonzScene;
 //    XshHandleManager  declaration
 //*********************************************************************************
 
-class XshHandleManager : public HandleManager {
+class XshHandleManager final : public HandleManager {
   TXsheet *m_xsh;
 
 public:

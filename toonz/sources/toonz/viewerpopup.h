@@ -15,7 +15,7 @@
 // \/
 //-----------------------------------------------------------------------------
 /*
-class ViewerPopup : public FlipBook
+class ViewerPopup final : public FlipBook
 {
   Q_OBJECT
 public:

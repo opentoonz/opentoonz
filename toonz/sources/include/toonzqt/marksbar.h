@@ -26,7 +26,7 @@
 /*!
   A MarksBar is a generalized slider with multiple values.
 */
-class DVAPI MarksBar : public QFrame {
+class DVAPI MarksBar final : public QFrame {
   Q_OBJECT
 
 protected:

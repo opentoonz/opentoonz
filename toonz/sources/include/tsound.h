@@ -245,7 +245,7 @@ Range in seconds
 
 //==============================================================================
 
-class TSoundDeviceException : public TException {
+class TSoundDeviceException final : public TException {
 public:
   enum Type {
     FailedInit,  // fallimento del costruttore

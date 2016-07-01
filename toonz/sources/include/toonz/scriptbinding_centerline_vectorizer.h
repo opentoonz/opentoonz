@@ -10,7 +10,7 @@ class TXshSimpleLevel;
 
 namespace TScriptBinding {
 
-class DVAPI CenterlineVectorizer : public Wrapper {
+class DVAPI CenterlineVectorizer final : public Wrapper {
   Q_OBJECT
   CenterlineConfiguration *m_parameters;
 

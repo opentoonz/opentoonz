@@ -640,7 +640,7 @@ bool cutMesh(TMeshImage &mi, const PlasticTool::MeshSelection &edgesSelection) {
 
 namespace {
 
-class MoveVertexUndo_Mesh : public TUndo {
+class MoveVertexUndo_Mesh final : public TUndo {
   int m_row, m_col;  //!< Xsheet coordinates
 
   std::vector<MeshIndex> m_vIdxs;     //!< Moved vertices
@@ -688,7 +688,7 @@ public:
 
 //==============================================================================
 
-class SwapEdgeUndo : public TUndo {
+class SwapEdgeUndo final : public TUndo {
   int m_row, m_col;             //!< Xsheet coordinates
   mutable MeshIndex m_edgeIdx;  //!< Edge index
 
@@ -750,7 +750,7 @@ public:
 
 //==============================================================================
 
-class CollapseEdgeUndo : public TTextureMeshUndo {
+class CollapseEdgeUndo final : public TTextureMeshUndo {
   int m_eIdx;  //!< Collapsed edge index
 
 public:
@@ -801,7 +801,7 @@ public:
 
 //==============================================================================
 
-class SplitEdgeUndo : public TTextureMeshUndo {
+class SplitEdgeUndo final : public TTextureMeshUndo {
   int m_eIdx;  //!< Split edge index
 
 public:
@@ -855,7 +855,7 @@ public:
 
 //==============================================================================
 
-class CutEdgesUndo : public TUndo {
+class CutEdgesUndo final : public TUndo {
   int m_row, m_col;         //!< Xsheet coordinates
   TMeshImageP m_origImage;  //!< Clone of the original image
 

@@ -132,7 +132,7 @@ QScriptValue runFunction(QScriptContext *context, QScriptEngine *engine) {
 
 //=========================================================
 
-class ScriptEngine::Executor : public QThread {
+class ScriptEngine::Executor final : public QThread {
   ScriptEngine *m_engine;
   QString m_cmd;
 

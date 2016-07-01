@@ -35,7 +35,7 @@ template class DVAPI TPersistDeclarationT<TSpectrumParam>;
 
 //---------------------------------------------------------
 
-class DVAPI TSpectrumParam : public TParam {
+class DVAPI TSpectrumParam final : public TParam {
   PERSIST_DECLARATION(TSpectrumParam)
 
   std::unique_ptr<TSpectrumParamImp> m_imp;
@@ -98,7 +98,7 @@ template class DVAPI TSmartPointerT<TSpectrumParam>;
 template class DVAPI TDerivedSmartPointerT<TSpectrumParam, TParam>;
 #endif
 
-class DVAPI TSpectrumParamP
+class DVAPI TSpectrumParamP final
     : public TDerivedSmartPointerT<TSpectrumParam, TParam> {
 public:
   TSpectrumParamP() {}

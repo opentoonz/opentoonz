@@ -21,7 +21,7 @@
 
 //===================================================================
 
-class DVAPI TMacroFx : public TRasterFx {
+class DVAPI TMacroFx final : public TRasterFx {
   FX_DECLARATION(TMacroFx)
 
   TRasterFxP m_root;

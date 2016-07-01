@@ -58,8 +58,8 @@ static QString srvCmdline() {
 //  Buffer data exchanger
 //*************************************************************************************
 
-class DVAPI BufferExchanger : public tipc::ShMemReader,
-                              public tipc::ShMemWriter {
+class DVAPI BufferExchanger final : public tipc::ShMemReader,
+                                    public tipc::ShMemWriter {
   UCHAR *m_buf;
   UCHAR *m_data;
 
@@ -78,8 +78,8 @@ public:
 //*************************************************************************************
 
 template <typename PIXEL>
-class DVAPI RasterExchanger : public tipc::ShMemReader,
-                              public tipc::ShMemWriter {
+class DVAPI RasterExchanger final : public tipc::ShMemReader,
+                                    public tipc::ShMemWriter {
   typedef PIXEL pix_type;
 
   TRasterPT<PIXEL> m_ras;

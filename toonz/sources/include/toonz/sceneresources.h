@@ -130,7 +130,7 @@ updatePath()
 */
 //=============================================================================
 
-class DVAPI ScenePalette : public SceneResource {
+class DVAPI ScenePalette final : public SceneResource {
   TXshPaletteLevel *m_pl;
   TFilePath m_oldPath, m_oldActualPath;
 
@@ -174,7 +174,7 @@ updatePath()
 */
 //=============================================================================
 
-class DVAPI SceneLevel : public SceneResource {
+class DVAPI SceneLevel final : public SceneResource {
   TXshSimpleLevel *m_sl;
   TFilePath m_oldPath, m_oldActualPath;
   TFilePath m_oldScannedPath, m_oldActualScannedPath;
@@ -218,7 +218,7 @@ path
 */
 //=============================================================================
 
-class DVAPI SceneSound : public SceneResource {
+class DVAPI SceneSound final : public SceneResource {
   TXshSoundLevel *m_sl;
   TFilePath m_oldPath, m_oldActualPath;
 
@@ -326,7 +326,7 @@ private:
 
 //=============================================================================
 
-class DVAPI ResourceImporter : public ResourceProcessor {
+class DVAPI ResourceImporter final : public ResourceProcessor {
 public:
   ResourceImporter(ToonzScene *scene, TProject *dstProject,
                    ResourceImportStrategy &strategy);
@@ -363,7 +363,7 @@ private:
 // Rende tutte le risorse locali: tutte quelle con path assoluto
 // vengono copiate dentro il progetto
 
-class DVAPI ResourceCollector : public ResourceProcessor {
+class DVAPI ResourceCollector final : public ResourceProcessor {
   ToonzScene *m_scene;
   int m_count;
   std::map<TFilePath, TFilePath> m_collectedFiles;

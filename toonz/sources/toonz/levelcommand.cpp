@@ -35,7 +35,7 @@
 
 namespace {
 
-class DeleteLevelUndo : public TUndo {
+class DeleteLevelUndo final : public TUndo {
   TXshLevelP m_xl;
 
 public:
@@ -66,7 +66,7 @@ public:
 // RemoveUnusedLevelCommand
 //-----------------------------------------------------------------------------
 
-class RemoveUnusedLevelsCommand : public MenuItemHandler {
+class RemoveUnusedLevelsCommand final : public MenuItemHandler {
 public:
   RemoveUnusedLevelsCommand() : MenuItemHandler(MI_RemoveUnused) {}
 
@@ -108,7 +108,7 @@ public:
 // RemoveLevelCommand
 //-----------------------------------------------------------------------------
 
-class RemoveLevelCommand : public MenuItemHandler {
+class RemoveLevelCommand final : public MenuItemHandler {
 public:
   RemoveLevelCommand() : MenuItemHandler(MI_RemoveLevel) {}
 
@@ -242,7 +242,7 @@ bool loadLastSaveFids(TXshSimpleLevel *sl,
 // Undo RevertToCommandUndo
 //-----------------------------------------------------------------------------
 
-class RevertToCommandUndo : public TUndo {
+class RevertToCommandUndo final : public TUndo {
   TXshSimpleLevel *m_sl;
   std::vector<QString> m_replacedImgsId;
   std::set<TFrameId> m_selectedFids;
@@ -409,7 +409,7 @@ void revertTo(bool isCleanedUp) {
 // RevertToCleanedUpCommand
 //-----------------------------------------------------------------------------
 
-class RevertToCleanedUpCommand : public MenuItemHandler {
+class RevertToCleanedUpCommand final : public MenuItemHandler {
 public:
   RevertToCleanedUpCommand() : MenuItemHandler(MI_RevertToCleanedUp) {}
 
@@ -421,7 +421,7 @@ public:
 // RevertToLastSaveCommand
 //-----------------------------------------------------------------------------
 
-class RevertToLastSaveCommand : public MenuItemHandler {
+class RevertToLastSaveCommand final : public MenuItemHandler {
 public:
   RevertToLastSaveCommand() : MenuItemHandler(MI_RevertToLastSaved) {}
 

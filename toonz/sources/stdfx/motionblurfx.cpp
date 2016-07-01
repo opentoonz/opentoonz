@@ -415,7 +415,7 @@ public:
                            const TRenderSettings &info) override;
 };
 
-class DirectionalBlurFx : public DirectionalBlurBaseFx
+class DirectionalBlurFx final : public DirectionalBlurBaseFx
 
 {
   FX_PLUGIN_DECLARATION(DirectionalBlurFx)
@@ -437,7 +437,7 @@ public:
   }
 };
 
-class MotionBlurFx : public DirectionalBlurBaseFx
+class MotionBlurFx final : public DirectionalBlurBaseFx
 
 {
   FX_PLUGIN_DECLARATION(MotionBlurFx)

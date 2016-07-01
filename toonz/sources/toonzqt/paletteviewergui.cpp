@@ -770,9 +770,9 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       p.drawRect(indexRect);
       p.drawText(indexRect, Qt::AlignCenter, QString().setNum(styleIndex));
 
-      //draw "Autopaint for lines" indicator
+      // draw "Autopaint for lines" indicator
       if (style->getFlags() != 0) {
-        QRect aflRect(chipRect.bottomLeft() + QPoint(0,-14), QSize(12,15));
+        QRect aflRect(chipRect.bottomLeft() + QPoint(0, -14), QSize(12, 15));
         p.drawRect(aflRect);
         p.drawText(aflRect, Qt::AlignCenter, "A");
       }

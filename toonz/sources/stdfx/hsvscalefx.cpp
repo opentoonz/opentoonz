@@ -6,7 +6,7 @@
 #include "stdfx.h"
 #include "hsvutil.h"
 
-class HSVScaleFx : public TStandardRasterFx {
+class HSVScaleFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(HSVScaleFx)
 
   TRasterFxPort m_input;

@@ -1225,7 +1225,7 @@ typedef unsigned short uint16_t;
 #endif
 
 /* x,yポイント座標のリストノード、画素連結、及び、線分連結、機能付き */
-class pixel_point_node : public list_node {
+class pixel_point_node final : public list_node {
 public:
   pixel_point_node() {
     int32_t ii;
@@ -1351,7 +1351,7 @@ void pixel_point_node::print_xy_around(void) {
 #define OFF (0)
 #endif
 
-class pixel_point_root : public list_root {
+class pixel_point_root final : public list_root {
 public:
   pixel_point_root(void) {
     this->_i_mv_sw = OFF;
@@ -1522,7 +1522,7 @@ int pixel_point_root::save(const char *cp_fname) {
 #define NG (-1)
 #endif
 
-class pixel_line_node : public list_node {
+class pixel_line_node final : public list_node {
 public:
   pixel_line_node() {
     this->_i32_point_count           = 0;
@@ -2463,7 +2463,7 @@ void pixel_line_node::smooth_expand(int32_t i32_smooth_retry) {
 
 #include "igs_line_blur.h"  // "list_root.h" "calculator_geometry.h" "pixel_point_root.h" "pixel_line_root.h"
 
-class pixel_select_same_way_node : public list_node {
+class pixel_select_same_way_node final : public list_node {
 public:
   pixel_select_same_way_node(void) {
     this->clp_point_middle = NULL;
@@ -2485,7 +2485,7 @@ public:
 private:
 };
 
-class pixel_select_same_way_root : public list_root {
+class pixel_select_same_way_root final : public list_root {
 public:
   pixel_select_same_way_root(void) {
     this->_i_mv_sw = OFF;
@@ -2781,7 +2781,7 @@ void pixel_select_same_way_root::get_vector(double *dp_xv, double *dp_yv) {
 
 #include "igs_line_blur.h"  // "list_root.h" "calculator_geometry.h" "pixel_point_root.h" "pixel_line_node.h" "pixel_select_same_way.h"
 
-class pixel_line_root : public list_root {
+class pixel_line_root final : public list_root {
 public:
   pixel_line_root(void) {
     this->_i_mv_sw = OFF;
@@ -3991,7 +3991,7 @@ int pixel_line_root::save_expand_vector(const char *cp_fname) {
 
 #include "igs_line_blur.h"  // "list_root.h" "calculator_geometry.h" "pixel_point_root.h" "pixel_line_root.h"
 
-class pixel_select_curve_blur_node : public list_node {
+class pixel_select_curve_blur_node final : public list_node {
 public:
   pixel_select_curve_blur_node(void) {
     this->clp_line           = NULL;
@@ -4019,7 +4019,7 @@ public:
 private:
 };
 
-class pixel_select_curve_blur_root : public list_root {
+class pixel_select_curve_blur_root final : public list_root {
 public:
   pixel_select_curve_blur_root(void) {
     this->_i_mv_sw = OFF;
@@ -6494,7 +6494,7 @@ void igs::line_blur::convert(
 #include "ino_common.h"
 #include "igs_line_blur.h"
 //------------------------------------------------------------
-class ino_line_blur : public TStandardRasterFx {
+class ino_line_blur final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_line_blur)
   TRasterFxPort m_input;
 

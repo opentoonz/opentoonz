@@ -40,7 +40,7 @@ namespace DVGui {
 // StyleSample
 //-----------------------------------------------------------------------------
 
-class DVAPI StyleSample : public QWidget {
+class DVAPI StyleSample final : public QWidget {
   Q_OBJECT
   QImage m_samplePixmap;
   TRaster32P m_bgRas;
@@ -86,7 +86,7 @@ signals:
 // ChannelField
 //-----------------------------------------------------------------------------
 
-class DVAPI ChannelField : public QWidget {
+class DVAPI ChannelField final : public QWidget {
   Q_OBJECT
 
   DVGui::IntLineEdit *m_channelEdit;
@@ -116,7 +116,7 @@ protected slots:
 // ColorField
 //-----------------------------------------------------------------------------
 
-class DVAPI ColorField : public QWidget {
+class DVAPI ColorField final : public QWidget {
   Q_OBJECT
 
   StyleSample *m_colorSample;
@@ -196,7 +196,7 @@ signals:
 // CleanupColorField
 //-----------------------------------------------------------------------------
 
-class DVAPI CleanupColorField : public QWidget {
+class DVAPI CleanupColorField final : public QWidget {
   Q_OBJECT
 
   TPaletteHandle *m_ph;

@@ -134,6 +134,21 @@ ToolOptionSlider::ToolOptionSlider(TTool *tool, TDoubleProperty *property,
   m_property->addListener(this);
   TDoubleProperty::Range range = property->getRange();
   setRange(range.first, range.second);
+
+  // calculate maximum text length which includes length for decimals (for now
+  // it's fixed to 2) and period
+  int textMaxLength = std::max(QString::number((int)range.first).length(),
+                               QString::number((int)range.second).length()) +
+                      m_lineEdit->getDecimals() + 1;
+  QString txt;
+  // set the maximum width of the widget according to the text length (with 5
+  // pixels margin)
+  txt.fill('0', textMaxLength);
+  int widgetWidth = fontMetrics().width(txt) + 5;
+  m_lineEdit->parentWidget()->setMaximumWidth(widgetWidth);
+  // set the maximum width of the slider to 250 pixels
+  setMaximumWidth(250 + widgetWidth);
+
   updateStatus();
   connect(this, SIGNAL(valueChanged(bool)), SLOT(onValueChanged(bool)));
   // synchronize the state with the same widgets in other tool option bars
@@ -210,12 +225,31 @@ ToolOptionPairSlider::ToolOptionPairSlider(TTool *tool,
     : DoublePairField(0, property->isMaxRangeLimited())
     , ToolOptionControl(tool, property->getName(), toolHandle)
     , m_property(property) {
-  setLeftText(leftName);
-  setRightText(rightName);
   m_property->addListener(this);
   TDoublePairProperty::Value value = property->getValue();
   TDoublePairProperty::Range range = property->getRange();
   setRange(range.first, range.second);
+
+  // calculate maximum text length which includes length for decimals (for now
+  // it's fixed to 2) and period
+  int textMaxLength = std::max(QString::number((int)range.first).length(),
+                               QString::number((int)range.second).length()) +
+                      m_leftLineEdit->getDecimals() + 1;
+  QString txt;
+  // set the maximum width of the widget according to the text length (with 5
+  // pixels margin)
+  txt.fill('0', textMaxLength);
+  int widgetWidth = fontMetrics().width(txt) + 5;
+  m_leftLineEdit->setFixedWidth(widgetWidth);
+  m_rightLineEdit->setFixedWidth(widgetWidth);
+  m_leftMargin  = widgetWidth + 12;
+  m_rightMargin = widgetWidth + 12;
+  // set the maximum width of the slider to 300 pixels
+  setMaximumWidth(300 + m_leftMargin + m_rightMargin);
+
+  setLeftText(leftName);
+  setRightText(rightName);
+
   updateStatus();
   connect(this, SIGNAL(valuesChanged(bool)), SLOT(onValuesChanged(bool)));
 }
@@ -324,6 +358,7 @@ ToolOptionIntPairSlider::ToolOptionIntPairSlider(TTool *tool,
   TIntPairProperty::Value value = property->getValue();
   TIntPairProperty::Range range = property->getRange();
   setRange(range.first, range.second);
+  setMaximumWidth(300);
   updateStatus();
   connect(this, SIGNAL(valuesChanged(bool)), SLOT(onValuesChanged(bool)));
 }
@@ -434,6 +469,7 @@ ToolOptionIntSlider::ToolOptionIntSlider(TTool *tool, TIntProperty *property,
   m_property->addListener(this);
   TIntProperty::Range range = property->getRange();
   setRange(range.first, range.second);
+  setMaximumWidth(300);
   updateStatus();
   connect(this, SIGNAL(valueChanged(bool)), SLOT(onValueChanged(bool)));
   // synchronize the state with the same widgets in other tool option bars
@@ -528,9 +564,19 @@ void ToolOptionCombo::loadEntries() {
   TEnumProperty::Range range = m_property->getRange();
   TEnumProperty::Range::iterator it;
 
+  int maxWidth = 0;
+
   clear();
-  for (it = range.begin(); it != range.end(); ++it)
-    addItem(QString::fromStdWString(*it));
+  for (it = range.begin(); it != range.end(); ++it) {
+    QString itemStr = QString::fromStdWString(*it);
+    addItem(itemStr);
+    int tmpWidth                      = fontMetrics().width(itemStr);
+    if (tmpWidth > maxWidth) maxWidth = tmpWidth;
+  }
+
+  // set the maximum width according to the longest item with 25 pixels for
+  // arrow button and margin
+  setMaximumWidth(maxWidth + 25);
 
   updateStatus();
 }
@@ -818,7 +864,7 @@ void ToolOptionParamRelayField::onValueChanged() {
 
     //-----------------------------------------------------------------------------
 
-    struct SetValueUndo : public TUndo {
+    struct SetValueUndo final : public TUndo {
       TDoubleParamP m_param;      //!< The referenced param
       double m_oldVal, m_newVal;  //!< Values before and after the set action...
       double m_frame;             //!< ... at this frame
@@ -986,6 +1032,14 @@ void MeasuredValueField::setPrecision(int precision) {
 
 //=============================================================================
 
+namespace {
+// calculate maximum field size (once) with 10 pixels margin
+int getMaximumWidthForEditToolField(QWidget *widget) {
+  static int fieldMaxWidth = widget->fontMetrics().width("-0000.00 field") + 10;
+  return fieldMaxWidth;
+}
+}  // namespace
+
 PegbarChannelField::PegbarChannelField(TTool *tool,
                                        enum TStageObject::Channel actionId,
                                        QString name, TFrameHandle *frameHandle,
@@ -1032,6 +1086,9 @@ PegbarChannelField::PegbarChannelField(TTool *tool,
     setMeasure("dummy");
     break;
   }
+
+  setMaximumWidth(getMaximumWidthForEditToolField(this));
+
   updateStatus();
 }
 
@@ -1133,6 +1190,7 @@ PegbarCenterField::PegbarCenterField(TTool *tool, int index, QString name,
   connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
           SLOT(onChange(TMeasuredValue *)));
   updateStatus();
+  setMaximumWidth(getMaximumWidthForEditToolField(this));
 }
 
 //-----------------------------------------------------------------------------
@@ -1187,6 +1245,7 @@ NoScaleField::NoScaleField(TTool *tool, QString name)
   connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
           SLOT(onChange(TMeasuredValue *)));
   updateStatus();
+  setMaximumWidth(getMaximumWidthForEditToolField(this));
 }
 
 //-----------------------------------------------------------------------------
@@ -1288,6 +1347,14 @@ void PropertyMenuButton::onActionTriggered(QAction *action) {
 }
 
 //=============================================================================
+namespace {
+// calculate maximum field size (once) with 10 pixels margin
+int getMaximumWidthForSelectionToolField(QWidget *widget) {
+  static int fieldMaxWidth = widget->fontMetrics().width("-000.00 %") + 10;
+  return fieldMaxWidth;
+}
+}  // namespace
+
 // id == 0 Scale X
 // id == 0 Scale Y
 SelectionScaleField::SelectionScaleField(SelectionTool *tool, int id,
@@ -1298,6 +1365,8 @@ SelectionScaleField::SelectionScaleField(SelectionTool *tool, int id,
   assert(ret);
   setMeasure("scale");
   updateStatus();
+
+  setMaximumWidth(getMaximumWidthForSelectionToolField(this));
 }
 
 //-----------------------------------------------------------------------------
@@ -1382,6 +1451,8 @@ SelectionRotationField::SelectionRotationField(SelectionTool *tool,
   assert(ret);
   setMeasure("angle");
   updateStatus();
+
+  setMaximumWidth(getMaximumWidthForSelectionToolField(this));
 }
 
 //-----------------------------------------------------------------------------
@@ -1434,6 +1505,10 @@ SelectionMoveField::SelectionMoveField(SelectionTool *tool, int id,
   else
     setMeasure("length.y");
   updateStatus();
+
+  // for translation value field, use size for the Edit Tool as it needs more
+  // estate
+  setMaximumWidth(getMaximumWidthForEditToolField(this));
 }
 
 //-----------------------------------------------------------------------------
@@ -1491,6 +1566,8 @@ ThickChangeField::ThickChangeField(SelectionTool *tool, QString name)
   assert(ret);
   setMeasure("");
   updateStatus();
+
+  setMaximumWidth(getMaximumWidthForSelectionToolField(this));
 }
 
 //-----------------------------------------------------------------------------

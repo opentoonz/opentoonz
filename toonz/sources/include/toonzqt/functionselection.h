@@ -37,7 +37,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class FunctionSelection : public QObject, public TSelection {
+class FunctionSelection final : public QObject, public TSelection {
   Q_OBJECT
   QRect m_selectedCells;  // yrange = rowrange of the selected keyframes;
                           // xrange = columnrange (functionsheet only)
@@ -115,7 +115,7 @@ signals:
 
 //-----------------------------------------------------------------------------
 
-class FunctionKeyframesData : public DvMimeData {
+class FunctionKeyframesData final : public DvMimeData {
 public:
   FunctionKeyframesData();
   ~FunctionKeyframesData();

@@ -4,7 +4,7 @@
 
 #include "ino_common.h"
 //------------------------------------------------------------
-class ino_level_auto : public TStandardRasterFx {
+class ino_level_auto final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(ino_level_auto)
   TRasterFxPort m_input;
   TDoubleParamP m_in_min_shift;

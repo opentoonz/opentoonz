@@ -7,7 +7,7 @@
 
 namespace TScriptBinding {
 
-class DVAPI Image : public Wrapper {
+class DVAPI Image final : public Wrapper {
   Q_OBJECT
   TImageP m_img;
 

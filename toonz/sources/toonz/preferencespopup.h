@@ -30,7 +30,7 @@ class QLabel;
 //    PreferencesPopup  definition
 //**********************************************************************************
 
-class PreferencesPopup : public QDialog {
+class PreferencesPopup final : public QDialog {
   Q_OBJECT
 
 public:
@@ -153,7 +153,7 @@ private slots:
 //    PreferencesPopup::FormatProperties  definition
 //**********************************************************************************
 
-class PreferencesPopup::FormatProperties : public DVGui::Dialog {
+class PreferencesPopup::FormatProperties final : public DVGui::Dialog {
   Q_OBJECT
 
 public:

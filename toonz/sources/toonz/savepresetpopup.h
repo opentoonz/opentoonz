@@ -10,7 +10,7 @@
 // SavePresetPopup
 //-----------------------------------------------------------------------------
 
-class SavePresetPopup : public DVGui::Dialog {
+class SavePresetPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::LineEdit *m_nameFld;

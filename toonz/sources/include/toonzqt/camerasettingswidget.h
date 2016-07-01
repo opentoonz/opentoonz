@@ -43,7 +43,7 @@ class CheckBox;
 
 //---------------------------------------------------------------
 
-class SimpleExpValidator : public QValidator {
+class SimpleExpValidator final : public QValidator {
 public:
   SimpleExpValidator(QObject *parent) : QValidator(parent){};
   State validate(QString &input, int &pos) const override;
@@ -51,7 +51,7 @@ public:
 
 //---------------------------------------------------------------
 // for A/R input field
-class SimpleExpField : public QLineEdit {
+class SimpleExpField final : public QLineEdit {
   SimpleExpValidator *m_validator;
   QString m_previousValue;
 
@@ -69,7 +69,7 @@ protected:
 
 //---------------------------------------------------------------
 
-class DVAPI CameraSettingsWidget : public QFrame {
+class DVAPI CameraSettingsWidget final : public QFrame {
   Q_OBJECT
 
   bool m_forCleanup;

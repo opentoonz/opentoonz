@@ -103,7 +103,7 @@ public:
 };
 
 template <typename PIXEL, typename GRAY>
-class SquareBuilder : public MaskCellBuilder<PIXEL, GRAY> {
+class SquareBuilder final : public MaskCellBuilder<PIXEL, GRAY> {
 public:
   SquareBuilder(int cellLx, int cellLy, double radius, int wrap)
       : MaskCellBuilder<PIXEL, GRAY>(cellLx, cellLy, radius, wrap) {
@@ -135,7 +135,7 @@ public:
 };
 
 template <typename PIXEL, typename GRAY>
-class CircleBuilder : public MaskCellBuilder<PIXEL, GRAY> {
+class CircleBuilder final : public MaskCellBuilder<PIXEL, GRAY> {
 public:
   CircleBuilder(int cellLx, int cellLy, double radius, int wrap)
       : MaskCellBuilder<PIXEL, GRAY>(cellLx, cellLy, radius, wrap) {
@@ -172,7 +172,7 @@ public:
 //    Mosaic Fx
 //****************************************************************************
 
-class MosaicFx : public TStandardRasterFx {
+class MosaicFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(MosaicFx)
 
   TRasterFxPort m_input;

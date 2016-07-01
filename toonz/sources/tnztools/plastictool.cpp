@@ -194,7 +194,7 @@ void invalidateXsheet() {
 //    Mime  definitions
 //****************************************************************************************
 
-struct PlasticSkeletonPMime : public DvMimeData {
+struct PlasticSkeletonPMime final : public DvMimeData {
   PlasticSkeletonP m_skeleton;
 
 public:
@@ -208,7 +208,7 @@ public:
   void releaseData() override { m_skeleton = PlasticSkeletonP(); }
 };
 
-struct SkDPMime : public DvMimeData {
+struct SkDPMime final : public DvMimeData {
   SkDP m_sd;
 
 public:
@@ -233,7 +233,7 @@ public:
 
 namespace {
 
-class SetVertexNameUndo : public TUndo {
+class SetVertexNameUndo final : public TUndo {
   int m_row, m_col;  //!< Xsheet coordinates
   int m_v;           //!< Changed vertex
 
@@ -298,7 +298,7 @@ public:
 
 //========================================================================
 
-class PasteDeformationUndo : public TUndo {
+class PasteDeformationUndo final : public TUndo {
   int m_col;              //!< Affected column
   SkDP m_oldSd, m_newSd;  //!< The skeleton deformations
 
@@ -346,7 +346,7 @@ PlasticTool::TemporaryActivation::~TemporaryActivation() {
 //    PlasticToolOptionsBox::SkelIdComboBox  definition
 //****************************************************************************************
 
-class PlasticToolOptionsBox::SkelIdsComboBox : public QComboBox {
+class PlasticToolOptionsBox::SkelIdsComboBox final : public QComboBox {
 public:
   SkelIdsComboBox(QWidget *parent = 0) : QComboBox(parent) {
     updateSkeletonsList();
@@ -879,7 +879,7 @@ void PlasticTool::onChange() {
   static bool refresh = false;  // Accessible from locals since static
 
   struct locals {
-    struct RefreshFunctor : public TFunctorInvoker::BaseFunctor {
+    struct RefreshFunctor final : public TFunctorInvoker::BaseFunctor {
       void operator()() override {
         refresh = false;
         l_plasticTool.storeSkeletonId();  // Calls ::sdFrame()

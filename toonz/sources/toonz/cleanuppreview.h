@@ -28,7 +28,7 @@ class TTool;
 //    PreviewToggleCommand declaration
 //**********************************************************************************
 
-class PreviewToggleCommand : public MenuItemHandler {
+class PreviewToggleCommand final : public MenuItemHandler {
   Q_OBJECT
 
   TXshSimpleLevelP m_sl;         //!< Level under cleanup focus
@@ -60,7 +60,7 @@ protected slots:
 //    CameraTestToggleCommand declaration
 //**********************************************************************************
 
-class CameraTestToggleCommand : public MenuItemHandler {
+class CameraTestToggleCommand final : public MenuItemHandler {
   Q_OBJECT
 
   TTool *m_oldTool;

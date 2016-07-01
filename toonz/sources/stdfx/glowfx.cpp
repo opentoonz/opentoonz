@@ -110,7 +110,7 @@ void fade(TRasterPT<T> ras, double fade, T color)  // Why it is not in TRop..??
 //    Glow Fx
 //-----------------
 
-class GlowFx : public TBaseRasterFx {
+class GlowFx final : public TBaseRasterFx {
   FX_DECLARATION(GlowFx)
 
   TRasterFxPort m_lighted, m_light;

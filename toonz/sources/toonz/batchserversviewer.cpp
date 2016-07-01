@@ -21,7 +21,7 @@ using namespace TFarmStuff;
 
 //------------------------------------------------------------------------------
 
-class MyListItem : public QListWidgetItem {
+class MyListItem final : public QListWidgetItem {
 public:
   QString m_id;
 

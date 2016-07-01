@@ -9,7 +9,7 @@
 // ColorModelViewer
 //-----------------------------------------------------------------------------
 
-class ColorModelViewer : public FlipBook {
+class ColorModelViewer final : public FlipBook {
   Q_OBJECT
 
   /*-- ツールのタイプを手元に持っておき、取得の手間を省く --*/

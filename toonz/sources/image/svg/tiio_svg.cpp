@@ -1759,7 +1759,7 @@ error:
 //=------------------------------------------------------------------------------------------------------------------------------
 //=------------------------------------------------------------------------------------------------------------------------------
 
-class TImageWriterSvg : public TImageWriter {
+class TImageWriterSvg final : public TImageWriter {
 public:
   TImageWriterSvg(const TFilePath &, TPropertyGroup *);
   ~TImageWriterSvg() {}
@@ -1775,7 +1775,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class TImageReaderSvg : public TImageReader {
+class TImageReaderSvg final : public TImageReader {
   TLevelP m_level;
 
 public:

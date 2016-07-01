@@ -32,7 +32,7 @@ class CaptureParameters;
 //=============================================================================
 // LineTestImageViewer
 
-class LineTestImageViewer : public QWidget, public CameraImageViewer {
+class LineTestImageViewer final : public QWidget, public CameraImageViewer {
   Q_OBJECT
 
   QPoint m_pos;
@@ -88,7 +88,7 @@ protected:
 //===================================================================
 // ChooseCameraDialog
 
-class ChooseCameraDialog : public DVGui::Dialog {
+class ChooseCameraDialog final : public DVGui::Dialog {
   Q_OBJECT
 
   int m_cameraIndex;
@@ -107,7 +107,7 @@ protected slots:
 //===================================================================
 // CaptureSettingsPopup
 
-class CaptureSettingsPopup : public DVGui::Dialog {
+class CaptureSettingsPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   QPushButton *m_defineDeviceButton;
@@ -149,7 +149,7 @@ signals:
 //===================================================================
 // FileSettingsPopup
 
-class FileSettingsPopup : public DVGui::Dialog {
+class FileSettingsPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   DVGui::FileField *m_pathField;
@@ -173,7 +173,7 @@ protected slots:
 //=============================================================================
 // LineTestCapturePane
 
-class LineTestCapturePane : public TPanel {
+class LineTestCapturePane final : public TPanel {
   Q_OBJECT
 
   LineTestImageViewer *m_imageView;

@@ -67,7 +67,7 @@ object.
           This method is overridden with the macro PERSIST_DECLARATION(T).
   \n	For example:
           \code
-class DVAPI TStageObjectTree : public TPersist {
+class DVAPI TStageObjectTree final : public TPersist {
 PERSIST_DECLARATION(TStageObjectTree)
 public:
 
@@ -116,7 +116,7 @@ inline std::string TPersist::getStreamTag() const {
    T.
         */
 template <class T>
-class TPersistDeclarationT : public TPersistDeclaration {
+class TPersistDeclarationT final : public TPersistDeclaration {
 public:
   /*!
           This is the constructor. Its argument is the id of the object.
@@ -147,7 +147,9 @@ private:                                                                       \
   static TPersistDeclarationT<T> m_declaration;                                \
   \
 public:                                                                        \
-  const TPersistDeclaration *getDeclaration() const override { return &m_declaration; }
+  const TPersistDeclaration *getDeclaration() const override {                 \
+    return &m_declaration;                                                     \
+  }
 
 #define PERSIST_IDENTIFIER(T, I) TPersistDeclarationT<T> T::m_declaration(I);
 

@@ -55,7 +55,7 @@ public:
 //    PreviewSubCameraManager
 //--------------------------------
 
-class PreviewSubCameraManager : public SceneViewerInteractiveGadget {
+class PreviewSubCameraManager final : public SceneViewerInteractiveGadget {
   TRect m_editingInterestRect;
   UCHAR m_dragType;
   bool m_clickAndDrag;

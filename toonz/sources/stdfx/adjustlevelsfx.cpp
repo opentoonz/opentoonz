@@ -9,7 +9,7 @@
 
 //===================================================================
 
-class AdjustLevelsFx : public TStandardRasterFx {
+class AdjustLevelsFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(AdjustLevelsFx)
 
   TRasterFxPort m_input;

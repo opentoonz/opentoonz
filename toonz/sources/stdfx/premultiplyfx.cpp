@@ -5,7 +5,7 @@
 #include "trop.h"
 //===================================================================
 
-class PremultiplyFx : public TStandardRasterFx {
+class PremultiplyFx final : public TStandardRasterFx {
   FX_PLUGIN_DECLARATION(PremultiplyFx)
   TRasterFxPort m_input;
 

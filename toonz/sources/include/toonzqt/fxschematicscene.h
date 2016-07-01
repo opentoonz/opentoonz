@@ -30,7 +30,7 @@ class TMacroFx;
 //
 //==================================================================
 
-class FxSchematicScene : public SchematicScene {
+class FxSchematicScene final : public SchematicScene {
   Q_OBJECT
 
   //----------------------------------------------------

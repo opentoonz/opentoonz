@@ -170,7 +170,7 @@ FX_IDENTIFIER_IS_HIDDEN(NaAffineFx, "naAffineFx")
 
 //------------------------------------------------------------------------------
 
-class InvertFx : public TBaseRasterFx {
+class InvertFx final : public TBaseRasterFx {
   FX_DECLARATION(InvertFx)
   TRasterFxPort m_input;
   TBoolParamP m_redChan, m_greenChan, m_blueChan, m_alphaChan;

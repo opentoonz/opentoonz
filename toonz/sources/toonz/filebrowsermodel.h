@@ -125,7 +125,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DvDirModelSceneFolderNode : public DvDirModelFileFolderNode {
+class DvDirModelSceneFolderNode final : public DvDirModelFileFolderNode {
   std::map<std::wstring, TFilePath> m_folders;
 
 public:
@@ -145,7 +145,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DvDirModelSpecialFileFolderNode : public DvDirModelFileFolderNode {
+class DvDirModelSpecialFileFolderNode final : public DvDirModelFileFolderNode {
   QPixmap m_pixmap;
 
 public:
@@ -206,7 +206,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DvDirVersionControlRootNode : public DvDirVersionControlNode {
+class DvDirVersionControlRootNode final : public DvDirVersionControlNode {
   QPixmap m_pixmap;
   std::wstring m_repositoryPath;
   std::wstring m_localPath;
@@ -241,7 +241,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DvDirVersionControlProjectNode : public DvDirVersionControlNode {
+class DvDirVersionControlProjectNode final : public DvDirVersionControlNode {
 public:
   DvDirVersionControlProjectNode(DvDirModelNode *parent, std::wstring name,
                                  const TFilePath &path);
@@ -256,7 +256,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DvDirModelProjectNode : public DvDirModelFileFolderNode {
+class DvDirModelProjectNode final : public DvDirModelFileFolderNode {
 public:
   DvDirModelProjectNode(DvDirModelNode *parent, const TFilePath &path);
   TFilePath getProjectPath() const;
@@ -270,7 +270,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DvDirModelDayNode : public DvDirModelNode {
+class DvDirModelDayNode final : public DvDirModelNode {
   std::string m_dayDateString;
 
 public:
@@ -282,7 +282,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DvDirModelHistoryNode : public DvDirModelNode {
+class DvDirModelHistoryNode final : public DvDirModelNode {
 public:
   DvDirModelHistoryNode(DvDirModelNode *parent);
   void refreshChildren() override;
@@ -291,7 +291,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DvDirModelMyComputerNode : public DvDirModelNode {
+class DvDirModelMyComputerNode final : public DvDirModelNode {
 public:
   DvDirModelMyComputerNode(DvDirModelNode *parent);
   void refreshChildren() override;
@@ -301,7 +301,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DvDirModelNetworkNode : public DvDirModelNode {
+class DvDirModelNetworkNode final : public DvDirModelNode {
 public:
   DvDirModelNetworkNode(DvDirModelNode *parent);
   void refreshChildren() override;
@@ -311,7 +311,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-class DvDirModelRootNode : public DvDirModelNode {
+class DvDirModelRootNode final : public DvDirModelNode {
   std::vector<DvDirModelFileFolderNode *> m_projectRootNodes;
   std::vector<DvDirModelFileFolderNode *> m_versionControlNodes;
   DvDirModelMyComputerNode *m_myComputerNode;
@@ -331,8 +331,8 @@ public:
 //=============================================================================
 
 // singleton
-class DvDirModel : public QAbstractItemModel,
-                   public FolderListenerManager::Listener {
+class DvDirModel final : public QAbstractItemModel,
+                         public FolderListenerManager::Listener {
   DvDirModelNode *m_root;
 
 public:

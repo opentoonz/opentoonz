@@ -36,7 +36,7 @@ level
  */
 //=============================================================================
 
-class DVAPI TXshChildLevel : public TXshLevel {
+class DVAPI TXshChildLevel final : public TXshLevel {
   PERSIST_DECLARATION(TXshChildLevel)
 
   TXsheet *m_xsheet;

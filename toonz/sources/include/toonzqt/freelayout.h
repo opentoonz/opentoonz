@@ -92,7 +92,7 @@ protected:
   scrollable environment.
 */
 
-class FreeLayout : public DummyLayout {
+class FreeLayout final : public DummyLayout {
 public:
   FreeLayout() : DummyLayout() {}
   ~FreeLayout() {}

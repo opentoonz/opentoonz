@@ -15,7 +15,7 @@ class TFilePath;
 // FileInfoPopup
 //-----------------------------------------------------------------------------
 
-class FileInfoPopup : public DVGui::Dialog {
+class FileInfoPopup final : public DVGui::Dialog {
   Q_OBJECT
 
   typedef std::pair<std::string, std::string> StringPair;

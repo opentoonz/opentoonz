@@ -21,7 +21,7 @@ class MySortFilterProxyModel;
 class QCheckBox;
 class QStandardItemModel;
 
-class DVAPI TMessageRepository : public QObject {
+class DVAPI TMessageRepository final : public QObject {
   QStandardItemModel *m_sim;
 
   Q_OBJECT
@@ -41,7 +41,7 @@ signals:
 
 //---------------------------------------------------------------------------------------
 
-class DVAPI TMessageViewer : public QFrame {
+class DVAPI TMessageViewer final : public QFrame {
   Q_OBJECT
 
 protected:
