@@ -124,8 +124,8 @@ void CALLBACK ElapsedTimeCB(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1,
 };
 #elif LINUX
 
-#include <SDL/SDL_timer.h>
-#include <SDL/SDL.h>
+#include <SDL_timer.h>
+#include <SDL.h>
 #include "tthread.h"
 namespace {
 Uint32 ElapsedTimeCB(Uint32 interval, void *param);

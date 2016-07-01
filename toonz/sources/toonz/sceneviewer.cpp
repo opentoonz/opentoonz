@@ -1,4 +1,7 @@
 
+#ifdef LINUX
+#define GL_GLEXT_PROTOTYPES
+#endif
 
 // Toonz includes
 #include "tapp.h"

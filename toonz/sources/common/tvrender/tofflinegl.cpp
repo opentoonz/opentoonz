@@ -13,10 +13,10 @@
 // Platform-specific includes
 #if defined(LINUX)
 
+#include "qtofflinegl.h"
 #include <X11/Xlib.h>
 #include <GL/glx.h>
 
-#include "xscopedlock.h"
 #include "tthread.h"
 
 #elif MACOSX
@@ -308,6 +308,11 @@ std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(
 //-----------------------------------------------------------------------------
 
 #elif defined(LINUX)
+namespace {
+// The XScopedLock stuff doesn't seem finished,
+// why not just do the same as with win32 and use a Qt lock??
+static QMutex linuxImpMutex;
+}
 
 class XImplementation final : public TOfflineGL::Imp {
 public:
@@ -315,10 +320,12 @@ public:
   GLXContext m_context;
   GLXPixmap m_pixmap;
   Pixmap m_xpixmap;
+  TRaster32P m_raster;
 
   //-----------------------------------------------------------------------------
 
-  XImplementation(TDimension rasterSize) {
+  XImplementation(TDimension rasterSize)
+      : TOfflineGL::Imp(rasterSize.lx, rasterSize.ly) {
     createContext(rasterSize);
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -359,7 +366,7 @@ public:
   //-----------------------------------------------------------------------------
 
   void makeCurrent() {
-    XScopedLock xsl;
+    QMutexLocker locker(&linuxImpMutex);
 
     // Bool ret = glXMakeCurrent(m_dpy,m_pixmap,m_context);
 
@@ -480,7 +487,7 @@ Bool ret = glXMakeCurrent(m_dpy,
 
 std::shared_ptr<TOfflineGL::Imp> defaultOfflineGLGenerator(
     const TDimension &dim, std::shared_ptr<TOfflineGL::Imp> shared) {
-  return std::make_shared<XImplementation>(dim);
+  return std::make_shared<QtOfflineGL>(dim, shared);
 }
 
 #elif MACOSX
@@ -516,8 +523,8 @@ class MessageCreateContext final : public TThread::Message {
 
 public:
   MessageCreateContext(TOfflineGL *ogl, const TDimension &size,
-                       std::shared_ptr<TOfflineGL::Imp> shared)
-      : m_ogl(ogl), m_size(size), m_shared(std::move(shared)) {}
+                       TOfflineGL::Imp *shared)
+      : m_ogl(ogl), m_size(size), m_shared(shared) {}
 
   void onDeliver() override {
     m_ogl->m_imp = currentImpGenerator(m_size, m_shared);
@@ -532,12 +539,10 @@ public:
 
 //--------------------------------------------------
 
-TOfflineGL::TOfflineGL(TDimension dim, const TOfflineGL *shared) {
+TOfflineGL::TOfflineGL(TDimension dim, const TOfflineGL *shared) : m_imp(0) {
 #if defined(LINUX)
-  XScopedLock xsl;
+  QMutexLocker locker(&linuxImpMutex);
 #endif
-
-  std::shared_ptr<Imp> sharedImp = shared ? shared->m_imp : 0;
 
   /*
   元のコードは(別スレッドから呼び出すための) offline renderer を作って main
@@ -545,7 +550,7 @@ TOfflineGL::TOfflineGL(TDimension dim, const TOfflineGL *shared) {
   thread context を超えられないので直接生成してこのコンテキストで閉じる.
   別スレッドには dispatch しない.
 */
-  m_imp = currentImpGenerator(dim, std::move(sharedImp));
+  m_imp = currentImpGenerator(dim, shared ? shared->m_imp : 0);
 
   initMatrix();
 }
@@ -554,8 +559,10 @@ TOfflineGL::TOfflineGL(TDimension dim, const TOfflineGL *shared) {
 
 TOfflineGL::TOfflineGL(const TRaster32P &raster, const TOfflineGL *shared) {
 #if defined(LINUX)
-  XScopedLock xsl;
+  QMutexLocker locker(&linuxImpMutex);
 #endif
+
+  // m_imp = new Imp(raster->getSize());
 
   m_imp = currentImpGenerator(raster->getSize(), shared->m_imp);
 
@@ -570,7 +577,9 @@ TOfflineGL::TOfflineGL(const TRaster32P &raster, const TOfflineGL *shared) {
 
 //-----------------------------------------------------------------------------
 
-TOfflineGL::~TOfflineGL() {}
+TOfflineGL::~TOfflineGL() {
+  // delete m_imp;
+}
 
 //-----------------------------------------------------------------------------
 
