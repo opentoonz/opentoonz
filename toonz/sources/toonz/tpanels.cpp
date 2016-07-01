@@ -1240,6 +1240,7 @@ OpenFloatingPanel openComboViewerCommand(MI_OpenComboViewer, "ComboViewer",
 //=============================================================================
 // CleanupSettings DockWindow
 //-----------------------------------------------------------------------------
+
 class CleanupSettingsFactory final : public TPanelFactory {
 public:
   CleanupSettingsFactory() : TPanelFactory("CleanupSettings") {}

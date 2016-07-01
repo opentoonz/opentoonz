@@ -9,9 +9,7 @@
 // dummy definition for linker
 #include <conio.h>
 extern "C" {
-void __imp__cprintf(char const* const _Format) {
-  _cprintf(_Format);
-}
+void __imp__cprintf(char const *const _Format) { _cprintf(_Format); }
 }
 #endif
 
@@ -56,7 +54,6 @@ extern "C" {
 */
 
 //========================================================================================
-
 
 void sum(int n, const double *x, double *&y) {
   /*
