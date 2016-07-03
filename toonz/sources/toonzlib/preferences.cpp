@@ -20,6 +20,8 @@
 #include "tbigmemorymanager.h"
 #include "tfilepath.h"
 
+#include <qmessagebox.h>
+
 // Qt includes
 #include <QSettings>
 #include <QStringList>
