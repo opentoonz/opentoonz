@@ -432,7 +432,9 @@ centralWidget->setLayout(centralWidgetLayout);*/
   setCommandHandler(MI_PickStyleAreas, this, &MainWindow::togglePickStyleAreas);
   setCommandHandler(MI_PickStyleLines, this, &MainWindow::togglePickStyleLines);
 
-  setCommandHandler(MI_About, this, &MainWindow::onAbout);
+	setCommandHandler(MI_About, this, &MainWindow::onAbout);
+	setCommandHandler(MI_MaximizePanel, this, &MainWindow::maximizePanel);
+	setCommandHandler(MI_FullScreenWindow, this, &MainWindow::fullScreenWindow);
 }
 
 //-----------------------------------------------------------------------------
@@ -1092,6 +1094,36 @@ void MainWindow::resetRoomsLayout() {
 
   DVGui::info(
       QObject::tr("The rooms will be reset the next time you run Toonz."));
+}
+
+void MainWindow::maximizePanel()
+{
+	DockLayout *currDockLayout = getCurrentRoom()->dockLayout();
+	QPoint p;
+	if (!panelMaximized)
+	{
+		p = mapFromGlobal(QCursor::pos());
+		panelMaximized = true;
+	}
+	else {
+		panelMaximized = false;
+	}
+	QWidget* currWidget = currDockLayout->containerOf(p);
+	DockWidget* currW = static_cast<DockWidget*>(currWidget);
+	if (currW)
+	currW->maximizeDock();
+}
+
+void MainWindow::fullScreenWindow()
+{
+	QMainWindow *currWindow = TApp::instance()->getMainWindow();
+	if (currWindow->isFullScreen()) {
+		currWindow->setWindowState(Qt::WindowMaximized);
+	}
+	else {
+		currWindow->setWindowState(Qt::WindowFullScreen);
+	}
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1878,12 +1910,13 @@ void MainWindow::defineActions() {
 
   createMenuWindowsAction(MI_ResetRoomLayout, tr("&Reset to Default Rooms"),
                           "");
-
+  createMenuWindowsAction(MI_MaximizePanel, tr("Toggle Maximize Panel"), "`");
+	createMenuWindowsAction(MI_FullScreenWindow, tr("Toggle Full Screen"), "Ctrl+`");
   createMenuWindowsAction(MI_About, tr("&About OpenToonz..."), "");
 
   createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 
-  createToggle(MI_OnionSkin, tr("Onion Skin"), "", false,
+  createToggle(MI_OnionSkin, tr("Onion Skin Toggle"), "//", false,
                RightClickMenuCommandType);
 
   // createRightClickMenuAction(MI_LoadSubSceneFile,     tr("Load As
