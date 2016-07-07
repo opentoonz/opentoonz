@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(OpenToonz)
 
+include(${CMAKE_SOURCE_DIR}/../cmake/util_compiler.cmake)
+
 get_filename_component(SDKROOT ../../thirdparty/ ABSOLUTE)
 message("SDK Root:" ${SDKROOT})
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake")
@@ -309,6 +311,19 @@ elseif(UNIX)
     pkg_check_modules(SDL_LIB REQUIRED sdl2)
 endif()
 
+
+set(C_WARNINGS)
+set(CXX_WARNINGS)
+
+if(CMAKE_COMPILER_IS_GNUCC)
+    ADD_CHECK_C_COMPILER_FLAG(C_WARNINGS C_WARN_WRITE_STRINGS -Wwrite-strings)
+    ADD_CHECK_C_COMPILER_FLAG(C_WARNINGS C_WARN_UNDEF -Wundef)
+
+    ADD_CHECK_CXX_COMPILER_FLAG(CXX_WARNINGS CXX_WARN_WRITE_STRINGS -Wwrite-strings)
+    ADD_CHECK_CXX_COMPILER_FLAG(CXX_WARNINGS CXX_WARN_UNDEF -Wundef)
+endif()
+
+
 include_directories(
     BEFORE
     ${TIFF_INCLUDE_DIR}
@@ -393,6 +408,9 @@ function(add_translation module)
     set_target_properties("translation_${module}" PROPERTIES
         EXCLUDE_FROM_DEFAULT_BUILD TRUE)
 endfunction()
+
+set(CMAKE_C_FLAGS "${C_WARNINGS} ${CMAKE_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CXX_WARNINGS} ${CMAKE_CXX_FLAGS}")
 
 add_subdirectory(tnzcore)
 add_subdirectory(tnzbase)
