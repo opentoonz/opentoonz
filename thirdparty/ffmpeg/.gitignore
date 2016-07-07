@@ -1,2 +1,10 @@
 *.lib
 bin/
+libavcodec/
+libavdevice/
+libavfilter/
+libavformat/
+libavutil/
+libswresample/
+libswscale/
+
