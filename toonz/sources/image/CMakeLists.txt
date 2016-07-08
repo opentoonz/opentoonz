@@ -88,12 +88,21 @@ message("subdir: image")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
 include_directories(
+    SYSTEM
     ${TIFF_INCLUDE_DIR}
-    ${SDKROOT}/LibJPEG/jpeg-9)
+    ${SDKROOT}/LibJPEG/jpeg-9
+)
+
 if(WIN32)
-    include_directories(${SDKROOT}/libpng-1.6.21)
+    include_directories(
+        SYSTEM
+        ${SDKROOT}/libpng-1.6.21
+    )
     if(PLATFORM EQUAL 32)
-        include_directories(${SDKROOT}/quicktime/QT73SDK/CIncludes)
+        include_directories(
+            SYSTEM
+            ${SDKROOT}/quicktime/QT73SDK/CIncludes
+        )
     endif()
 endif()
 

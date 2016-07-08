@@ -32,7 +32,9 @@ endif()
 message("subdir: tfarm")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
-include_directories(../include)
+include_directories(
+    ../include
+)
 
 if(WIN32)
     set(EXTRA_LIBS

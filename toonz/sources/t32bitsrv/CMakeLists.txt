@@ -8,7 +8,10 @@ add_executable(t32bitsrv
     t32movmsg.h)
 
 if(WIN32)
-    include_directories(${SDKROOT}/quicktime/QT73SDK/CIncludes)
+    include_directories(
+        SYSTEM
+        ${SDKROOT}/quicktime/QT73SDK/CIncludes
+    )
 endif()
 
 target_link_libraries(t32bitsrv

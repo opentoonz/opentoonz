@@ -142,6 +142,7 @@ find_package(Qt5 REQUIRED
 
 if(WIN32)
     include_directories(
+        SYSTEM
         ${SDKROOT}/glut/3.7.6/include
         ${SDKROOT}/zlib-1.2.8
         ${SDKROOT}/LibJPEG/jpeg-9
@@ -335,6 +336,7 @@ endif()
 
 
 include_directories(
+    SYSTEM
     BEFORE
     ${TIFF_INCLUDE_DIR}
     ${PNG_INCLUDE_DIRS}
@@ -363,6 +365,7 @@ else()
 endif()
 
 include_directories(
+    SYSTEM
     ${Boost_INCLUDE_DIR}
     ${LZ4_LIB_INCLUDE_DIRS}
     ${USB_LIB_INCLUDE_DIRS}

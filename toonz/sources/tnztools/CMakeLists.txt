@@ -110,7 +110,13 @@ endif()
 message("subdir: tnztools")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
-include_directories(../include/tools ${SDKROOT}/superlu/SupperLU_4.1/SRC)
+include_directories(
+    SYSTEM
+    ${SDKROOT}/superlu/SupperLU_4.1/SRC
+)
+include_directories(
+    ../include/tools
+)
 
 _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;tnzext;toonzlib;toonzqt")
 

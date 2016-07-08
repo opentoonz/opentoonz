@@ -92,7 +92,10 @@ if(APPLE)
     find_library(ACCE_LIB Accelerate)
 endif()
 
-include_directories(${SDKROOT}/superlu/SuperLU_4.1/SRC)
+include_directories(
+    SYSTEM
+    ${SDKROOT}/superlu/SuperLU_4.1/SRC
+)
 
 if(WIN32)
     target_link_libraries(tnzext

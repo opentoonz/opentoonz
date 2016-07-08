@@ -291,12 +291,19 @@ add_definitions(
 )
 
 message("subdir: tnzcore")
-message("Sources:" ${SOURCES})
+#message("Sources:" ${SOURCES})
 
-include_directories(../common/flash ${SDKROOT}/Lz4/Lz4_131/lib/)
+include_directories(
+    SYSTEM
+    ../common/flash
+    ${SDKROOT}/Lz4/Lz4_131/lib/
+)
 if(WIN32)
     if(PLATFORM EQUAL 32)
-        include_directories(${SDKROOT}/quicktime/QT73SDK/CIncludes)
+        include_directories(
+            SYSTEM
+            ${SDKROOT}/quicktime/QT73SDK/CIncludes
+        )
     endif()
 endif()
 
@@ -318,7 +325,10 @@ elseif(APPLE)
         ${CARBON_LIB})
 elseif(UNIX)
     set(QT_LIB)  # avoid warning
-    include_directories(${FREETYPE_INCLUDE_DIRS})
+    include_directories(
+        SYSTEM
+        ${FREETYPE_INCLUDE_DIRS}
+    )
     set(EXTRA_LIBS
         ${GLU_LIB})
 endif()

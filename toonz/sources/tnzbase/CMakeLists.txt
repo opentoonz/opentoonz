@@ -174,7 +174,11 @@ message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 #message("Exe: " ${EXECUTABLE_OUTPUT_PATH})
 #message("Sources:" ${SOURCES})
 
-include_directories(../common/flash ${SDKROOT}/libusb/libusb-1.0.9/include)
+include_directories(
+    SYSTEM
+    ../common/flash
+    ${SDKROOT}/libusb/libusb-1.0.9/include
+)
 
 if(WIN32)
     set(EXTRA_LIBS
@@ -197,7 +201,10 @@ elseif(UNIX)
     set(EXTRA_LIBS ${EXTRA_LIBS}
         ${SDL_LIB_LIBRARIES})
 
-	include_directories(${SDL_LIB_INCLUDE_DIRS})
+    include_directories(
+        SYSTEM
+        ${SDL_LIB_INCLUDE_DIRS}
+    )
     target_link_libraries(tnzbase Qt5::Core Qt5::Gui)
 endif()
 

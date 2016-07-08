@@ -349,11 +349,17 @@ message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 #message("Exe: " ${EXECUTABLE_OUTPUT_PATH})
 #message("Sources:" ${SOURCES})
 
-include_directories(../../sources/toonzfarm/include)
-include_directories(../../sources/toonzqt)
+include_directories(
+    ../../sources/toonzfarm/include
+    ../../sources/toonzqt
+)
+
 if(WIN32)
     if(PLATFORM EQUAL 32)
-        include_directories(${SDKROOT}/quicktime/QT73SDK/CIncludes)
+        include_directories(
+            SYSTEM
+            ${SDKROOT}/quicktime/QT73SDK/CIncludes
+        )
     endif()
 endif()
 
