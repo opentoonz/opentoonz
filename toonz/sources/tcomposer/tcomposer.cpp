@@ -565,7 +565,7 @@ int main(int argc, char *argv[]) {
 
   // Create a QObject destroyed just before app - see Tnz6's main.cpp for
   // rationale
-  std::auto_ptr<QObject> mainScope(new QObject(&app));
+  std::unique_ptr<QObject> mainScope(new QObject(&app));
   mainScope->setObjectName("mainScope");
 
 #ifdef _WIN32

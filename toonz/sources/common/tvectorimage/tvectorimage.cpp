@@ -629,7 +629,7 @@ TRaster32P TVectorImage::render(bool onlyStrokes) {
   TRect bBox = convert(getBBox());
   if (bBox.isEmpty()) return (TRaster32P)0;
 
-  std::auto_ptr<TOfflineGL> offlineGlContext(new TOfflineGL(bBox.getSize()));
+  std::unique_ptr<TOfflineGL> offlineGlContext(new TOfflineGL(bBox.getSize()));
   offlineGlContext->clear(TPixel32(0, 0, 0, 0));
   offlineGlContext->makeCurrent();
   TVectorRenderData rd(TTranslation(-convert(bBox.getP00())),

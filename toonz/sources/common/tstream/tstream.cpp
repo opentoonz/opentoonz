@@ -225,7 +225,7 @@ TOStream::TOStream(const TFilePath &fp, bool compressed) : m_imp(new Imp) {
     m_imp->m_compressed = true;
     m_imp->m_chanOwner  = false;
   } else {
-    std::auto_ptr<Tofstream> os(new Tofstream(fp));
+    std::unique_ptr<Tofstream> os(new Tofstream(fp));
     m_imp->m_os        = os->isOpen() ? os.release() : 0;
     m_imp->m_chanOwner = true;
   }
@@ -818,7 +818,7 @@ TIStream::TIStream(const TFilePath &fp) : m_imp(new Imp) {
   {
     bool swapForEndianess = false;
 
-    auto_ptr<std::istream> is(m_imp->m_is);
+    unique_ptr<std::istream> is(m_imp->m_is);
     m_imp->m_is = 0;
 
     char magicBuffer[4];

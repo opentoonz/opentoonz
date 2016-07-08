@@ -226,7 +226,7 @@ void TCellSelection::incrementCells() {
 
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
 
-  std::auto_ptr<IncrementUndo> undo(new IncrementUndo(
+  std::unique_ptr<IncrementUndo> undo(new IncrementUndo(
       m_range.m_r0, m_range.m_c0, m_range.m_r1, m_range.m_c1));
 
   if (undo->redo(), !undo->m_ok) {
@@ -1312,7 +1312,7 @@ TXshSimpleLevel *CloneLevelUndo::cloneLevel(
 //-----------------------------------------------------------------------------
 
 bool CloneLevelUndo::chooseLevelName(TFilePath &fp) const {
-  std::auto_ptr<LevelNamePopup> levelNamePopup(
+  std::unique_ptr<LevelNamePopup> levelNamePopup(
       new LevelNamePopup(fp.getWideName()));
   if (levelNamePopup->exec() == QDialog::Accepted) {
     const QString &levelName = levelNamePopup->getName();
@@ -1385,7 +1385,7 @@ void CloneLevelUndo::cloneLevels() const {
     bool askCloneName = (levels.size() == 1);
 
     // Now, try to clone every found level in the associated range
-    std::auto_ptr<OverwriteDialog> dialog;
+    std::unique_ptr<OverwriteDialog> dialog;
     ExistsFunc exists(scene);
 
     LevelsMap::iterator lt, lEnd(levels.end());
@@ -1533,7 +1533,7 @@ void CloneLevelUndo::undo() const {
 //-----------------------------------------------------------------------------
 
 void TCellSelection::cloneLevel() {
-  std::auto_ptr<CloneLevelUndo> undo(new CloneLevelUndo(m_range));
+  std::unique_ptr<CloneLevelUndo> undo(new CloneLevelUndo(m_range));
 
   if (undo->redo(), undo->m_ok) TUndoManager::manager()->add(undo.release());
 }

@@ -1484,16 +1484,18 @@ typedef struct {
 
 /* misplaced */
 #define DAT_ICCPROFILE                                                         \
-  0x0401 /* TW_MEMORY   Added 1.91   This Data Argument is misplaced but \ \                                                                             \
+  0x0401 /* TW_MEMORY   Added 1.91   This Data Argument is misplaced but \ \ \                                                                             \
             belongs to the DG_IMAGE Data Group */
 #define DAT_IMAGEMEMFILEXFER                                                   \
   0x0402 /* TW_IMAGEMEMXFER   Added 1.91  This Data Argument is misplaced but  \
             \                                                                  \
             \ \                                                                             \
+            \ \ \                                                                             \
             belongs to the DG_IMAGE Data Group */
 #define DAT_ENTRYPOINT                                                         \
   0x0403 /* TW_ENTRYPOINT    Added 2.0   This Data Argument is misplaced but \ \
             \                                                                  \
+            \ \                                                                             \
             belongs to the DG_CONTROL Data Group */
 
 /****************************************************************************

@@ -160,8 +160,8 @@ private:
 
   // Editing-related vars
 
-  std::auto_ptr<tcg::polymorphic> m_rigidityPainter;  //!< Delegate class to
-                                                      //! deal with (undoable)
+  std::unique_ptr<tcg::polymorphic> m_rigidityPainter;  //!< Delegate class to
+                                                        //! deal with (undoable)
   //! rigidity painting
   bool m_showSkeletonOS;  //!< Whether onion-skinned skeletons must be shown
 
@@ -352,7 +352,7 @@ private:
   void setGlobalRestKey();
 
   // Rigidity methods
-  static std::auto_ptr<tcg::polymorphic> createRigidityPainter();
+  static std::unique_ptr<tcg::polymorphic> createRigidityPainter();
 
   // Drawing methods
 

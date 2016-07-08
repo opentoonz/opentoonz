@@ -603,7 +603,7 @@ void PaletteCmd::eraseStyles(const std::set<TXshSimpleLevel *> &levels,
 
   if (levels.empty() || styleIds.empty()) return;
 
-  std::auto_ptr<TUndo> undo(new Undo(levels, styleIds));
+  std::unique_ptr<TUndo> undo(new Undo(levels, styleIds));
   if (static_cast<Undo &>(*undo).isValid()) {
     undo->redo();
     TUndoManager::manager()->add(undo.release());

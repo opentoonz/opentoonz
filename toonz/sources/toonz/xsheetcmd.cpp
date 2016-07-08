@@ -1299,7 +1299,8 @@ public:
 
     pegbar->getKeyframeSpan(row, r0, ease0, r1, ease1);
 
-    std::auto_ptr<TUndo> undo(new KeyFrameHandleCommandUndo(objectId, r0, r1));
+    std::unique_ptr<TUndo> undo(
+        new KeyFrameHandleCommandUndo(objectId, r0, r1));
 
     TStageObject::Keyframe keyframe0 = pegbar->getKeyframe(r0);
     TStageObject::Keyframe keyframe1 = pegbar->getKeyframe(r1);
@@ -1346,7 +1347,8 @@ public:
 
     pegbar->getKeyframeSpan(row, r0, ease0, r1, ease1);
 
-    std::auto_ptr<TUndo> undo(new KeyFrameHandleCommandUndo(objectId, r0, r1));
+    std::unique_ptr<TUndo> undo(
+        new KeyFrameHandleCommandUndo(objectId, r0, r1));
 
     TStageObject::Keyframe keyframe0 = pegbar->getKeyframe(r0);
     TStageObject::Keyframe keyframe1 = pegbar->getKeyframe(r1);

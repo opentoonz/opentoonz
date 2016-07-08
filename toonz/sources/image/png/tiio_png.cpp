@@ -37,22 +37,18 @@ void tnz_error_fun(png_structp pngPtr, png_const_charp error_message) {
 #if defined(PNG_LIBPNG_VER)
 #if (PNG_LIBPNG_VER < 10527)
 extern "C" {
-static png_uint_32 png_get_current_row_number(const png_structp png_ptr)
-{
-       /* See the comments in png.h - this is the sub-image row when reading and
-        * interlaced image.
-        */
-       if (png_ptr != NULL)
-               return png_ptr->row_number;
+static png_uint_32 png_get_current_row_number(const png_structp png_ptr) {
+  /* See the comments in png.h - this is the sub-image row when reading and
+   * interlaced image.
+   */
+  if (png_ptr != NULL) return png_ptr->row_number;
 
-       return PNG_UINT_32_MAX; /* help the app not to fail silently */
+  return PNG_UINT_32_MAX; /* help the app not to fail silently */
 }
 
-static png_byte png_get_current_pass_number(const png_structp png_ptr)
-{
-       if (png_ptr != NULL)
-               return png_ptr->pass;
-       return 8; /* invalid */
+static png_byte png_get_current_pass_number(const png_structp png_ptr) {
+  if (png_ptr != NULL) return png_ptr->pass;
+  return 8; /* invalid */
 }
 }
 #endif
@@ -60,10 +56,9 @@ static png_byte png_get_current_pass_number(const png_structp png_ptr)
 #error "PNG_LIBPNG_VER undefined, libpng too old?"
 #endif
 
-    //=========================================================
+//=========================================================
 
-    inline USHORT
-    mySwap(USHORT val) {
+inline USHORT mySwap(USHORT val) {
 #if TNZ_LITTLE_ENDIAN
   return ((val) |
           ((val & 0xff) << 8));  //((val>>8)|((val&0xff)<<8)); (vecchio codice)
@@ -141,8 +136,8 @@ public:
 #if (PNG_LIBPNG_VER >= 10527)
     png_set_longjmp_fn(m_png_ptr, tnz_abort,
                        sizeof(jmp_buf)); /* ignore all fatal errors */
-#endif // (PNG_LIBPNG_VER >= 10527)
-#endif // defined(PNG_LIBPNG_VER)
+#endif                                   // (PNG_LIBPNG_VER >= 10527)
+#endif                                   // defined(PNG_LIBPNG_VER)
 
     m_canDelete = 1;
     m_info_ptr  = png_create_info_struct(m_png_ptr);

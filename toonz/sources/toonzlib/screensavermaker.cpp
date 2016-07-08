@@ -1,9 +1,9 @@
-
-
 #include "toonz/screensavermaker.h"
-#include "texception.h"
 
+#include "texception.h"
 #include "tsystem.h"
+
+#include <memory>
 
 #ifdef _WIN32
 #pragma warning(disable : 4996)
@@ -24,7 +24,7 @@ void makeScreenSaver(TFilePath scrFn, TFilePath swfFn,
     throw TException(L"Can't stat file " + swfFn.getWideString());
 
   int swfSize = results.st_size;
-  std::auto_ptr<char> swf(new char[swfSize]);
+  std::unique_ptr<char> swf(new char[swfSize]);
   FILE *chan = _wfopen(swfFn.getWideString().c_str(), L"rb");
   if (!chan) throw TException(L"fopen failed on " + swfFn.getWideString());
   fread(swf.get(), swfSize, 1, chan);

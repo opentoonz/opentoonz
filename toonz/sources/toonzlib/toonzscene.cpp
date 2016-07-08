@@ -824,7 +824,7 @@ TXshLevel *ToonzScene::createNewLevel(int type, std::wstring levelName,
   // Select a different unique level name in case it already exists (either in
   // scene or on disk)
   {
-    const std::auto_ptr<NameBuilder> nameBuilder(
+    const std::unique_ptr<NameBuilder> nameBuilder(
         NameBuilder::getBuilder(levelName));
 
     for (;;) {

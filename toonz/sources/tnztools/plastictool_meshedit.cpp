@@ -1188,7 +1188,7 @@ void PlasticTool::swapEdge_mesh_undo() {
   }
 
   // Perform operation
-  std::auto_ptr<TUndo> undo(new SwapEdgeUndo(m_meSel.objects().front()));
+  std::unique_ptr<TUndo> undo(new SwapEdgeUndo(m_meSel.objects().front()));
   undo->redo();
 
   TUndoManager::manager()->add(undo.release());
@@ -1208,7 +1208,7 @@ void PlasticTool::collapseEdge_mesh_undo() {
   }
 
   // Perform operation
-  std::auto_ptr<TUndo> undo(new CollapseEdgeUndo(m_meSel.objects().front()));
+  std::unique_ptr<TUndo> undo(new CollapseEdgeUndo(m_meSel.objects().front()));
   undo->redo();
 
   TUndoManager::manager()->add(undo.release());
@@ -1219,7 +1219,7 @@ void PlasticTool::collapseEdge_mesh_undo() {
 void PlasticTool::splitEdge_mesh_undo() {
   if (!(m_mi && m_meSel.hasSingleObject())) return;
 
-  std::auto_ptr<TUndo> undo(new SplitEdgeUndo(m_meSel.objects().front()));
+  std::unique_ptr<TUndo> undo(new SplitEdgeUndo(m_meSel.objects().front()));
   undo->redo();
 
   TUndoManager::manager()->add(undo.release());
@@ -1230,7 +1230,7 @@ void PlasticTool::splitEdge_mesh_undo() {
 void PlasticTool::cutEdges_mesh_undo() {
   if (!m_mi) return;
 
-  std::auto_ptr<CutEdgesUndo> undo(new CutEdgesUndo(m_meSel.objects()));
+  std::unique_ptr<CutEdgesUndo> undo(new CutEdgesUndo(m_meSel.objects()));
 
   if (undo->do_()) TUndoManager::manager()->add(undo.release());
 }

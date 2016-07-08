@@ -125,7 +125,7 @@ public:
 template <class Op>
 class Op1Node final : public CalculatorNode {
 protected:
-  std::auto_ptr<CalculatorNode> m_a;
+  std::unique_ptr<CalculatorNode> m_a;
 
 public:
   Op1Node(Calculator *calc, CalculatorNode *a) : CalculatorNode(calc), m_a(a) {}
@@ -143,7 +143,7 @@ public:
 template <class Op>
 class Op2Node final : public CalculatorNode {
 protected:
-  std::auto_ptr<CalculatorNode> m_a, m_b;
+  std::unique_ptr<CalculatorNode> m_a, m_b;
 
 public:
   Op2Node(Calculator *calc, CalculatorNode *a, CalculatorNode *b)
@@ -164,7 +164,7 @@ public:
 template <class Op>
 class Op3Node final : public CalculatorNode {
 protected:
-  std::auto_ptr<CalculatorNode> m_a, m_b, m_c;
+  std::unique_ptr<CalculatorNode> m_a, m_b, m_c;
 
 public:
   Op3Node(Calculator *calc, CalculatorNode *a, CalculatorNode *b,
@@ -184,7 +184,7 @@ public:
 //-------------------------------------------------------------------
 
 class ChsNode final : public CalculatorNode {
-  std::auto_ptr<CalculatorNode> m_a;
+  std::unique_ptr<CalculatorNode> m_a;
 
 public:
   ChsNode(Calculator *calc, CalculatorNode *a) : CalculatorNode(calc), m_a(a) {}
@@ -196,7 +196,7 @@ public:
 //-------------------------------------------------------------------
 
 class QuestionNode final : public CalculatorNode {
-  std::auto_ptr<CalculatorNode> m_a, m_b, m_c;
+  std::unique_ptr<CalculatorNode> m_a, m_b, m_c;
 
 public:
   QuestionNode(Calculator *calc, CalculatorNode *a, CalculatorNode *b,
@@ -215,7 +215,7 @@ public:
 //-------------------------------------------------------------------
 
 class NotNode final : public CalculatorNode {
-  std::auto_ptr<CalculatorNode> m_a;
+  std::unique_ptr<CalculatorNode> m_a;
 
 public:
   NotNode(Calculator *calc, CalculatorNode *a) : CalculatorNode(calc), m_a(a) {}
@@ -228,7 +228,7 @@ public:
 //-------------------------------------------------------------------
 
 class CycleNode final : public CalculatorNode {
-  std::auto_ptr<CalculatorNode> m_a;
+  std::unique_ptr<CalculatorNode> m_a;
 
 public:
   CycleNode(Calculator *calc, CalculatorNode *a)
@@ -268,13 +268,15 @@ public:
 //-------------------------------------------------------------------
 
 class RandomNode final : public CalculatorNode {
-  std::auto_ptr<CalculatorNode> m_seed, m_min, m_max, m_arg;
+  std::unique_ptr<CalculatorNode> m_seed, m_min, m_max, m_arg;
 
 public:
   RandomNode(Calculator *calc)
-      : CalculatorNode(calc), m_seed(0), m_min(0), m_max(0) {
-    m_arg.reset(new VariableNode(calc, CalculatorNode::FRAME));
-  }
+      : CalculatorNode(calc)
+      , m_seed()
+      , m_min()
+      , m_max()
+      , m_arg(new VariableNode(calc, CalculatorNode::FRAME)) {}
 
   void setSeed(CalculatorNode *arg) {
     assert(m_seed.get() == 0);

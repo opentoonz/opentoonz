@@ -539,7 +539,7 @@ class DeleteColumnsUndo final : public TUndo {
   QMap<TStageObjectId, QList<TStageObjectId>> m_columnObjChildren;
   QMap<TStageObjectId, TStageObjectId> m_columnObjParents;
 
-  mutable std::auto_ptr<StageObjectsData> m_data;
+  mutable std::unique_ptr<StageObjectsData> m_data;
 
 public:
   DeleteColumnsUndo(const std::set<int> &indices)
@@ -736,7 +736,7 @@ void ColumnCmd::insertEmptyColumns(const std::set<int> &indices) {
   std::vector<int> positiveIndices(indices.lower_bound(0), indices.end());
   if (positiveIndices.empty()) return;
 
-  std::auto_ptr<ColumnCommandUndo> undo(
+  std::unique_ptr<ColumnCommandUndo> undo(
       new InsertEmptyColumnsUndo(positiveIndices));
   if (undo->isConsistent()) {
     undo->redo();

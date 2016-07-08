@@ -76,7 +76,7 @@ void ungroupWithoutUndo(TVectorImage *vimg, StrokeSelection *selection) {
 //-----------------------------------------------------------------------------
 
 class GroupUndo final : public ToolUtils::TToolUndo {
-  std::auto_ptr<StrokeSelection> m_selection;
+  std::unique_ptr<StrokeSelection> m_selection;
 
 public:
   GroupUndo(TXshSimpleLevel *level, const TFrameId &frameId,
@@ -103,7 +103,7 @@ public:
 //-----------------------------------------------------------------------------
 
 class UngroupUndo final : public ToolUtils::TToolUndo {
-  std::auto_ptr<StrokeSelection> m_selection;
+  std::unique_ptr<StrokeSelection> m_selection;
 
 public:
   UngroupUndo(TXshSimpleLevel *level, const TFrameId &frameId,

@@ -1908,7 +1908,7 @@ void MainWindow::defineActions() {
 
   createToggle(MI_OnionSkin, tr("Onion Skin Toggle"), "//", false,
                RightClickMenuCommandType);
-  createToggle(MI_ZeroThick, tr("Zero Thick Lines"), "Shift+/", false, 
+  createToggle(MI_ZeroThick, tr("Zero Thick Lines"), "Shift+/", false,
                RightClickMenuCommandType);
 
   // createRightClickMenuAction(MI_LoadSubSceneFile,     tr("Load As

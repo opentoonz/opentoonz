@@ -245,9 +245,9 @@ void AddFxContextMenu::loadFxs() {
 void AddFxContextMenu::loadFxPluginGroup() {
   QString groupName = QString::fromStdString("Plugins");
 
-  std::auto_ptr<QMenu> insertFxGroup(new QMenu(groupName, m_insertMenu));
-  std::auto_ptr<QMenu> addFxGroup(new QMenu(groupName, m_addMenu));
-  std::auto_ptr<QMenu> replaceFxGroup(new QMenu(groupName, m_replaceMenu));
+  std::unique_ptr<QMenu> insertFxGroup(new QMenu(groupName, m_insertMenu));
+  std::unique_ptr<QMenu> addFxGroup(new QMenu(groupName, m_addMenu));
+  std::unique_ptr<QMenu> replaceFxGroup(new QMenu(groupName, m_replaceMenu));
 
   loadFxPlugins(insertFxGroup.get(), addFxGroup.get(), replaceFxGroup.get());
 
@@ -263,9 +263,10 @@ void AddFxContextMenu::loadFxGroup(TIStream *is) {
     if (is->matchTag(tagName)) {
       QString groupName = QString::fromStdString(tagName);
 
-      std::auto_ptr<QMenu> insertFxGroup(new QMenu(groupName, m_insertMenu));
-      std::auto_ptr<QMenu> addFxGroup(new QMenu(groupName, m_addMenu));
-      std::auto_ptr<QMenu> replaceFxGroup(new QMenu(groupName, m_replaceMenu));
+      std::unique_ptr<QMenu> insertFxGroup(new QMenu(groupName, m_insertMenu));
+      std::unique_ptr<QMenu> addFxGroup(new QMenu(groupName, m_addMenu));
+      std::unique_ptr<QMenu> replaceFxGroup(
+          new QMenu(groupName, m_replaceMenu));
 
       loadFx(is, insertFxGroup.get(), addFxGroup.get(), replaceFxGroup.get());
 
