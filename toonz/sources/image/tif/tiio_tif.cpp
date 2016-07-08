@@ -758,7 +758,7 @@ TifWriter::TifWriter()
 TifWriter::~TifWriter() {
   if (m_tiff) TIFFClose(m_tiff);
 
-  delete m_lineBuffer;
+  delete[] m_lineBuffer;
   delete m_properties;
 }
 
