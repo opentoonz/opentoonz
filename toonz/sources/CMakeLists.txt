@@ -312,6 +312,16 @@ elseif(UNIX)
 endif()
 
 
+include(TestBigEndian)
+test_big_endian(_SYSTEM_BIG_ENDIAN)
+if(_SYSTEM_BIG_ENDIAN)
+    add_definitions(-DTNZ_LITTLE_ENDIAN=0)
+else()
+    add_definitions(-DTNZ_LITTLE_ENDIAN=1)
+endif()
+unset(_SYSTEM_BIG_ENDIAN)
+
+
 set(C_WARNINGS)
 set(CXX_WARNINGS)
 
