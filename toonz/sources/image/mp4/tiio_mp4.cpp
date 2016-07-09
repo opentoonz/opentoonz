@@ -437,5 +437,5 @@ TImageP TLevelReaderMp4::load(int frameIndex) {
 
 Tiio::Mp4WriterProperties::Mp4WriterProperties(){}
 
-Tiio::Reader* Tiio::makeMp4Reader(){ return nullptr; }
-Tiio::Writer* Tiio::makeMp4Writer(){ return nullptr; }
+//Tiio::Reader* Tiio::makeMp4Reader(){ return nullptr; }
+//Tiio::Writer* Tiio::makeMp4Writer(){ return nullptr; }
