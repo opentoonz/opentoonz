@@ -1246,7 +1246,7 @@ void LoadLevelPopup::updateBottomGUI() {
       TLevelReaderP lr(fp);
       TLevelP level;
       if (lr) level = lr->loadInfo();
-      if (!level.getPointer()) return;
+      if (!level.getPointer() || level->getTable()->size() == 0) return;
 
       firstFrame = level->begin()->first;
       lastFrame  = (--level->end())->first;
