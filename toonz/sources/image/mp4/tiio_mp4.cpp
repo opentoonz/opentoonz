@@ -387,7 +387,8 @@ TImageP TLevelReaderMp4::load(int frameIndex) {
 	
 	//for debugging	
 	std::string strPath = tempName.toStdString();
-	//
+	
+	//This loads one image from the file, but it is slow.
 	//QString ffmpegPath = QDir::currentPath();
 	//std::string ffmpegstrpath = ffmpegPath.toStdString();
 	//QProcess ffmpeg;

@@ -279,7 +279,7 @@ SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1
 
   QGLFormat fmt;
 
-#ifdef defined(_WIN32)
+#if defined(_WIN32)
   fmt.setAlphaBufferSize(8);
   fmt.setAlpha(false);
   fmt.setRgba(true);

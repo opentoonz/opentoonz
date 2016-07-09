@@ -4253,6 +4253,26 @@ Do you want to create it?</source>
         <source>Refresh Folder Tree</source>
         <translation>フォルダ構成の再読み込み</translation>
     </message>
+    <message>
+        <source>&amp;Pencil Test...</source>
+        <translation>ラインテスト (&amp;P)...</translation>
+    </message>
+    <message>
+        <source>Drawing Substitution Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drawing Substitution Backward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Similar Drawing Substitution Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Similar Drawing Substitution Backward</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MatchlinesDialog</name>
@@ -4501,6 +4521,13 @@ What do you want to do?</source>
     <message>
         <source>The pixel type is not supported.</source>
         <translation>ピクセル形式が対応されていません。</translation>
+    </message>
+</context>
+<context>
+    <name>MyViewFinder</name>
+    <message>
+        <source>Camera is not available</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4878,6 +4905,145 @@ What do you want to do?</source>
 Do you want to overwrite it?</source>
         <translation>ファイル&quot;%1&quot;は既に存在します。
 上書きしますか？ </translation>
+    </message>
+</context>
+<context>
+    <name>PencilTestPopup</name>
+    <message>
+        <source>Pencil Test</source>
+        <translation>ラインテスト</translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation>リスト更新</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation>ファイル</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation>ファイル設定</translation>
+    </message>
+    <message>
+        <source>Image adjust</source>
+        <translation>画像調整</translation>
+    </message>
+    <message>
+        <source>Upside down</source>
+        <translation>180度回転</translation>
+    </message>
+    <message>
+        <source>Capture white BG</source>
+        <translation>基準背景取り込み</translation>
+    </message>
+    <message>
+        <source>Display</source>
+        <translation>表示</translation>
+    </message>
+    <message>
+        <source>Show onion skin</source>
+        <translation>前の画像と比べる</translation>
+    </message>
+    <message>
+        <source>Capture</source>
+        <translation>取り込み</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>閉じる</translation>
+    </message>
+    <message>
+        <source>Next Level</source>
+        <translation>次のレベル</translation>
+    </message>
+    <message>
+        <source>Camera:</source>
+        <translation>カメラ：</translation>
+    </message>
+    <message>
+        <source>Resolution:</source>
+        <translation>サイズ：</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>レベル名：</translation>
+    </message>
+    <message>
+        <source>Frame:</source>
+        <translation>フレーム：</translation>
+    </message>
+    <message>
+        <source>File Type:</source>
+        <translation>ファイルタイプ：</translation>
+    </message>
+    <message>
+        <source>Save In:</source>
+        <translation>保存先：</translation>
+    </message>
+    <message>
+        <source>Color type:</source>
+        <translation>タイプ：</translation>
+    </message>
+    <message>
+        <source>Threshold:</source>
+        <translation>しきい値：</translation>
+    </message>
+    <message>
+        <source>Contrast:</source>
+        <translation>コントラスト：</translation>
+    </message>
+    <message>
+        <source>Brightness:</source>
+        <translation>明るさ：</translation>
+    </message>
+    <message>
+        <source>BG reduction:</source>
+        <translation>背景の除去：</translation>
+    </message>
+    <message>
+        <source>Opacity(%):</source>
+        <translation>不透明度（％）：</translation>
+    </message>
+    <message>
+        <source>No camera found</source>
+        <translation>カメラが見つかりません</translation>
+    </message>
+    <message>
+        <source>No level name specified: please choose a valid level name</source>
+        <translation>レベル名は指定されていません。有効なレベル名を指定して下さい。</translation>
+    </message>
+    <message>
+        <source>Folder %1 doesn&apos;t exist.
+Do you want to create it?</source>
+        <translation>フォルダー %1 は存在しません。
+作成しますか？</translation>
+    </message>
+    <message>
+        <source>Unable to create</source>
+        <translation>作成できません。</translation>
+    </message>
+    <message>
+        <source>The level name specified is already used: please choose a different level name.</source>
+        <translation>指定されたレベル名はすでに使用中です：別の名前を指定してください</translation>
+    </message>
+    <message>
+        <source>The save in path specified does not match with the existing level.</source>
+        <translation>指定された保存先パスが既存のレベルと異なります。</translation>
+    </message>
+    <message>
+        <source>The captured image size does not match with the existing level.</source>
+        <translation>取り込まれた画像サイズが既存のレベルと異なります。</translation>
+    </message>
+    <message>
+        <source>File %1 does exist.
+Do you want to overwrite it?</source>
+        <translation>ファイル %1 は、既に存在します。
+上書きしてもよろしいですか？</translation>
+    </message>
+    <message>
+        <source>Failed to load %1.</source>
+        <translation>ファイル %1 の読み込みに失敗しました</translation>
     </message>
 </context>
 <context>
@@ -7069,6 +7235,10 @@ Are you sure to </source>
     <message>
         <source>Add color model&apos;s palette to the destination palette.</source>
         <translation>カラーモデルのパレットを、対象のパレットに追加する。</translation>
+    </message>
+    <message>
+        <source>Change current drawing %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9407,6 +9577,10 @@ Please refer to the user guide for details.</source>
     <message>
         <source>Double Click to Toggle Onion Skin</source>
         <translation>[ダブルクリック] オニオンスキン表示/非表示</translation>
+    </message>
+    <message>
+        <source>Pinned Center : Col%1%2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

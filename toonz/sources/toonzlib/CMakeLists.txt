@@ -332,9 +332,12 @@ message("subdir: toonzlib")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
 include_directories(
+    SYSTEM
+    ${SDKROOT}/libusb/libusb-1.0.9/include
+)
+include_directories(
     ../toonzfarm/include
-    ${SDKROOT}/libusb/libusb-1.0.9/include)
-
+)
 
 if(WIN32)
     target_link_libraries(toonzlib

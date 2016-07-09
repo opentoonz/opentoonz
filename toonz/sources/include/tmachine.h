@@ -4,19 +4,19 @@
 #define T_MACHINE_INCLUDED
 
 #if defined(_WIN32) || defined(i386)
-#define TNZ_LITTLE_ENDIAN 1
 #define TNZ_MACHINE_CHANNEL_ORDER_BGRM 1
 #elif defined(__sgi)
-#define TNZ_LITTLE_ENDIAN 0
 #define TNZ_MACHINE_CHANNEL_ORDER_MBGR 1
 #elif defined(LINUX)
-#define TNZ_LITTLE_ENDIAN 1
 #define TNZ_MACHINE_CHANNEL_ORDER_BGRM 1
 #elif defined(MACOSX)
-#define TNZ_LITTLE_ENDIAN 0
 #define TNZ_MACHINE_CHANNEL_ORDER_MRGB 1
 #else
 @UNKNOW PLATFORM @
+#endif
+
+#if !defined(TNZ_LITTLE_ENDIAN)
+#error "TNZ_LITTLE_ENDIAN not defined!"
 #endif
 
 #ifndef WIN32

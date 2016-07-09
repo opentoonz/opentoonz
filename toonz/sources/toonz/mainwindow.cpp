@@ -1650,6 +1650,9 @@ void MainWindow::defineActions() {
                MenuScanCleanupCommandType);
 
   createMenuScanCleanupAction(MI_Cleanup, tr("&Cleanup"), "");
+  
+  createMenuScanCleanupAction(MI_PencilTest, tr("&Pencil Test..."), "");
+  
   createMenuLevelAction(MI_AddFrames, tr("&Add Frames..."), "");
   createMenuLevelAction(MI_Renumber, tr("&Renumber..."), "");
   createMenuLevelAction(MI_ReplaceLevel, tr("&Replace Level..."), "");

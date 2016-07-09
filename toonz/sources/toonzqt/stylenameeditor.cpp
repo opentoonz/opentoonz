@@ -27,7 +27,7 @@ StyleNameEditor::StyleNameEditor(QWidget *parent)
   m_applyButton->setEnabled(false);
   m_cancelButton->setFocusPolicy(Qt::NoFocus);
 
-  m_styleName->setObjectName("RenameColorTextField");
+  m_styleName->setObjectName("LargeSizedText");
 
   QVBoxLayout *mainLayout = new QVBoxLayout();
   mainLayout->setMargin(10);
