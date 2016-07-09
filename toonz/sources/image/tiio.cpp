@@ -162,7 +162,7 @@ void initImageIo(bool lightVersion) {
 
   //ffmpeg 
   TLevelWriter::define("mp4", TLevelWriterMp4::create, true);
-  //TLevelReader::define("mp4", TLevelReaderMp4::create);
+  TLevelReader::define("mp4", TLevelReaderMp4::create);
   TFileType::declare("mp4", TFileType::RASTER_LEVEL);
   Tiio::defineWriterProperties("mp4", new Tiio::Mp4WriterProperties());
   //end ffmpeg

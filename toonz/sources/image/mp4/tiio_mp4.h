@@ -3,25 +3,9 @@
 #ifndef TTIO_MP4_INCLUDED
 #define TTIO_MP4_INCLUDED
 
-extern "C" {
-//#include "libavcodec\avcodec.h"
-#include "libswscale\swscale.h"
-//#include "libavformat\avformat.h"
-//#include "libavutil\imgutils.h"
-#include <math.h>
-
-#include <libavutil/opt.h>
-#include <libavcodec/avcodec.h>
-//#include <libavutil/channel_layout.h>
-//#include <libavutil/common.h>
-#include <libavutil/imgutils.h>
-//#include <libavutil/mathematics.h>
-//#include <libavutil/samplefmt.h>
-}
-
 #include "tproperty.h"
 #include "tlevel_io.h"
-#include "tthreadmessage.h"
+//#include "tthreadmessage.h"
 
 //===========================================================
 //
@@ -47,9 +31,35 @@ public:
 	}
 
 private:
-	int m_frameCount;
+	int m_frameCount, m_lx, m_ly;
 	double m_fps;
+};
 
+//===========================================================
+//
+//  TLevelReaderMp4
+//
+//===========================================================
+
+class TLevelReaderMp4 final : public TLevelReader {
+public:
+	TLevelReaderMp4(const TFilePath &path);
+	~TLevelReaderMp4();
+	TImageReaderP getFrameReader(TFrameId fid) override;
+
+	static TLevelReader *create(const TFilePath &f) {
+		return new TLevelReaderMp4(f);
+	}
+
+	
+	TLevelP loadInfo() override;
+	TImageP load(int frameIndex);
+	TDimension getSize();
+	TThread::Mutex m_mutex;
+	void *m_decompressedBuffer;
+private:
+	TDimension m_size;
+	int m_numFrames, m_lx, m_ly;
 };
 
 //===========================================================================
