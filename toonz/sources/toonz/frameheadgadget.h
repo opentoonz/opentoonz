@@ -11,6 +11,7 @@ class FilmstripFrames;
 class QEvent;
 class QColor;
 class QWidget;
+class QMenu;
 
 class FrameHeadGadget : public QObject {
   Q_OBJECT

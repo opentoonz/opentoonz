@@ -18,7 +18,7 @@
 #include <math.h>
 
 // Platform-specific includes
-#ifdef _WIN32
+#if defined(_WIN32)
 
 #ifndef x64
 
@@ -49,11 +49,11 @@
 #include "./3gp/tiio_3gp.h"
 #include "./zcc/tiio_zcc.h"
 
-#elif MACOSX
+#elif defined(MACOSX)
 #include "./mov/tiio_movM.h"
 #include "./3gp/tiio_3gpM.h"
 
-#elif LINUX  // No more supported by the way...
+#elif defined(LINUX)  // No more supported by the way...
 // #include "./mov/tiio_movL.h"
 #include "./mov/tiio_mov_proxy.h"
 #include "./3gp/tiio_3gp_proxy.h"

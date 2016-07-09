@@ -469,7 +469,7 @@ int sp_dgemv (char *, double, SuperMatrix *, double *,
   SuperMatrix *_A = const_cast<SuperMatrix *>(A);
   double *_x      = const_cast<double *>(x);
 
-  sp_dgemv("N", 1.0, _A, _x, 1, 1.0, y, 1);
+  sp_dgemv((char *)"N", 1.0, _A, _x, 1, 1.0, y, 1);
 }
 
 //---------------------------------------------------------------

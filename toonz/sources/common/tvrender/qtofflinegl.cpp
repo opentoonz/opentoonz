@@ -127,7 +127,7 @@ void QtOfflineGL::createContext(TDimension rasterSize,
 
   QGLFormat fmt;
 
-#ifdef _WIN32
+#if defined(_WIN32)
   fmt.setAlphaBufferSize(8);
   fmt.setAlpha(true);
   fmt.setRgba(true);
@@ -137,7 +137,7 @@ void QtOfflineGL::createContext(TDimension rasterSize,
   fmt.setStencil(true);
   fmt.setAccum(false);
   fmt.setPlane(0);
-#elif MACOSX
+#elif defined(MACOSX)
   fmt = QGLFormat::defaultFormat();
   // printf("GL Version: %s\n",glGetString(GL_VERSION));
   fmt.setVersion(2, 1); /* OSX10.8 では 3.2 だめかも */
@@ -153,7 +153,7 @@ void QtOfflineGL::createContext(TDimension rasterSize,
   fmt.setPlane(0);
   fmt.setDirectRendering(false);
 #endif
-#elif LINUX
+#elif defined(LINUX)
   fmt = QGLFormat::defaultFormat();
   // printf("GL Version: %s\n",glGetString(GL_VERSION));
   fmt.setVersion(2, 1); /* XXX? */
@@ -279,7 +279,7 @@ SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1
 
   QGLFormat fmt;
 
-#ifdef _WIN32
+#if defined(_WIN32)
   fmt.setAlphaBufferSize(8);
   fmt.setAlpha(false);
   fmt.setRgba(true);
@@ -289,7 +289,7 @@ SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1
   fmt.setStencil(true);
   fmt.setAccum(false);
   fmt.setPlane(0);
-#elif MACOSX
+#elif defined(MACOSX)
   fmt.setAlphaBufferSize(1);
   fmt.setAlpha(false);
   fmt.setRgba(true);
@@ -299,7 +299,7 @@ SPECIFICHE  MAC = depth_size 24, stencil_size 8, alpha_size 1
   fmt.setStencil(true);
   fmt.setAccum(false);
   fmt.setPlane(0);
-#elif LINUX
+#elif defined(LINUX)
   fmt.setAlphaBufferSize(1);
   fmt.setAlpha(false);
   fmt.setRgba(true);

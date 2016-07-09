@@ -1650,6 +1650,9 @@ void MainWindow::defineActions() {
                MenuScanCleanupCommandType);
 
   createMenuScanCleanupAction(MI_Cleanup, tr("&Cleanup"), "");
+  
+  createMenuScanCleanupAction(MI_PencilTest, tr("&Pencil Test..."), "");
+  
   createMenuLevelAction(MI_AddFrames, tr("&Add Frames..."), "");
   createMenuLevelAction(MI_Renumber, tr("&Renumber..."), "");
   createMenuLevelAction(MI_ReplaceLevel, tr("&Replace Level..."), "");
@@ -1884,6 +1887,8 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 
   createToggle(MI_OnionSkin, tr("Onion Skin"), "", false,
+               RightClickMenuCommandType);
+  createToggle(MI_ZeroThick, tr("Zero Thick Lines"), "Shift+/", false, 
                RightClickMenuCommandType);
 
   // createRightClickMenuAction(MI_LoadSubSceneFile,     tr("Load As

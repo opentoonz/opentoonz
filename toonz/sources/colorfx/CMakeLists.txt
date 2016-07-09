@@ -17,7 +17,12 @@ set(SOURCES
 add_translation(colorfx ${HEADERS} ${SOURCES})
 
 add_library(colorfx SHARED ${HEADERS} ${SOURCES})
-add_definitions(-D _USRDLL -DCOLORFX_EXPORTS -DUSE_MESA)
+add_definitions(
+    -D_USRDLL
+    -DCOLORFX_EXPORTS
+    -DUSE_MESA
+)
+
 if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libcolorfx.dylib")
 endif()

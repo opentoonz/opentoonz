@@ -1,17 +1,14 @@
-os: osx
 language: cpp
-compiler: clang
-before_install:
-    - brew update
+sudo: required
+dist: trusty
 install:
-    - brew install qt55 glew lz4 lzo libusb
+    - if [[ $TRAVIS_OS_NAME == "osx" ]];   then bash ci-scripts/osx/travis-install.sh; fi
+    - if [[ $TRAVIS_OS_NAME == "linux" ]]; then bash ci-scripts/linux/travis-install.sh; fi
 script:
-    - pushd thirdparty/tiff-4.0.3
-    - ./configure && make
-    - popd
-    - cd toonz && mkdir build && cd build
-    - cmake ../sources
-          -DQT_PATH=/usr/local/Cellar/qt55/5.5.1/lib/
-          -DTIFF_INCLUDE_DIR=../../thirdparty/tiff-4.0.3/libtiff/
-          -DSUPERLU_INCLUDE_DIR=../../thirdparty/superlu/SuperLU_4.1/include/
-    - make
+    - if [[ $TRAVIS_OS_NAME == "osx" ]];   then bash ci-scripts/osx/travis-build.sh; fi
+    - if [[ $TRAVIS_OS_NAME == "linux" ]]; then bash ci-scripts/linux/travis-build.sh; fi
+
+matrix:
+    include:
+        - os: linux
+        - os: osx

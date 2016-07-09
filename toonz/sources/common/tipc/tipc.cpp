@@ -13,12 +13,12 @@
 #include <QTimer>
 
 // System-specific includes
-#ifdef _WIN32
+#if defined(_WIN32)
 #include <windows.h>
-#elif MACOSX
+#elif defined(MACOSX)
 #include <sys/sysctl.h>
 #include <unistd.h>
-#elif LINUX
+#elif defined(LINUX)
 #include <sys/time.h>
 #include <unistd.h>
 #endif

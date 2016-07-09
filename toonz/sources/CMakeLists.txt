@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(OpenToonz)
 
+include(${CMAKE_SOURCE_DIR}/../cmake/util_compiler.cmake)
+
 get_filename_component(SDKROOT ../../thirdparty/ ABSOLUTE)
-message("SDK Root:" ${SDKROOT})
+message(STATUS "SDK Root:" ${SDKROOT})
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake")
 if(APPLE)
     set(THIRDPARTY_LIBS_HINTS "/usr/local/Cellar/" "/opt/include" ${SDKROOT})
@@ -10,10 +12,11 @@ elseif(WIN32 OR UNIX)
     set(THIRDPARTY_LIBS_HINTS ${SDKROOT})
 endif()
 
-message("Thirdpary Library Search path:" ${THIRDPARTY_LIBS_HINTS})
+message(STATUS "Thirdpary Library Search path:" ${THIRDPARTY_LIBS_HINTS})
 
 if(WIN32)
-    message("Windows System")
+    message(STATUS "Windows System")
+
     if(MSVC_VERSION GREATER 1800)
         if(CMAKE_SIZEOF_VOID_P EQUAL 4)
             set(QT_PATH "C:/Qt/5.6/msvc2015" CACHE PATH "Qt instlattion directory")
@@ -35,9 +38,14 @@ if(WIN32)
     set(CMAKE_PREFIX_PATH "${QT_PATH}/lib/cmake/")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4251")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4251")
-    add_definitions(-DVC_EXTRALEAN -DNOMINMAX -D_USE_MATH_DEFINES)
+    add_definitions(
+        -DVC_EXTRALEAN
+        -DNOMINMAX
+        -D_USE_MATH_DEFINES
+    )
 elseif(APPLE)
-    message("Apple System")
+    message(STATUS "Apple System")
+
     if(NOT PLATFORM)
         set(PLATFORM 64)
     endif()
@@ -48,7 +56,10 @@ elseif(APPLE)
         set(CMAKE_PREFIX_PATH "${QT_LIB_PATH}cmake/")
 
         message("CMAKE_PREFIX_PATH:" ${CMAKE_PREFIX_PATH})
-        add_definitions(-DMACOSX -Di386)
+        add_definitions(
+            -DMACOSX
+            -Di386
+        )
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -std=c++11 -stdlib=libc++ -fno-implicit-templates")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
     elseif(PLATFORM EQUAL 32)
@@ -57,7 +68,10 @@ elseif(APPLE)
         set(CMAKE_PREFIX_PATH "${QT_LIB_PATH}cmake/")
 
         message("CMAKE_PREFIX_PATH:" ${CMAKE_PREFIX_PATH})
-        add_definitions(-DMACOSX -Di386)
+        add_definitions(
+            -DMACOSX
+            -Di386
+        )
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32 -std=c++11 -stdlib=libc++ -fno-implicit-templates -D HAS_QUICKDRAW")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
         set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -m32")
@@ -65,10 +79,11 @@ elseif(APPLE)
         message(FATAL_ERROR "Invalid PLATFORM:" ${PLATFORM} ". 'PLATFORM' must be 32 or 64.")
     endif()
 elseif(UNIX)
+    message(STATUS "Unix System")
+
     # Needed for correct Qt detection
     cmake_minimum_required(VERSION 2.8.12)
 
-    message("Unix System")
     if(CMAKE_SIZEOF_VOID_P MATCHES "8")
         set(PLATFORM 64)
     else()
@@ -89,7 +104,12 @@ else()
     message(ERROR "Unknown System")
 endif()
 
-add_definitions(-DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED)
+add_definitions(
+    -DQT_GUI_LIB
+    -DQT_NETWORK_LIB
+    -DQT_CORE_LIB
+    -DQT_SHARED
+)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -121,20 +141,24 @@ find_package(Qt5 REQUIRED
     Script
     Widgets
     PrintSupport
-    LinguistTools)
+    LinguistTools
+    Multimedia)
 
 if(WIN32)
     include_directories(
+        SYSTEM
         ${SDKROOT}/glut/3.7.6/include
         ${SDKROOT}/zlib-1.2.8
         ${SDKROOT}/LibJPEG/jpeg-9
     )
-    add_definitions(-DGLUT_NO_LIB_PRAGMA)
+    add_definitions(
+        -DGLUT_NO_LIB_PRAGMA
+    )
 endif()
 
 get_target_property(QtCore_location Qt5::Core LOCATION)
 get_target_property(QtWidget_location Qt5::Widgets LOCATION)
-message("Qt Core Location:" ${QtCore_location})
+message(STATUS "Qt Core Location:" ${QtCore_location})
 
 macro(_find_toonz_library OUT_LIB_LIST IN_LIB_LIST)
     set(OUTLIST "")
@@ -244,7 +268,6 @@ elseif(UNIX)
     find_library(Z_LIB z)
 
     find_package(TIFF REQUIRED)
-    set(TIFF_LIB ${TIFF_LIBRARY})
     find_package(PNG REQUIRED)
     set(PNG_LIB ${PNG_LIBRARY})
     message("******* libpng:" ${PNG_LIB})
@@ -258,6 +281,12 @@ elseif(UNIX)
 
     # the libraries have .pc
     find_package(PkgConfig)
+
+    # This is not required for OpenToonz itself, but libtiff will pick it up if
+    # present and libimage won't be aware causing linker to fail
+    pkg_check_modules(LZMA liblzma)
+    set(TIFF_LIB ${TIFF_LIBRARY} ${LZMA_LIBRARIES})
+
     if(GLEW-NOTFOUND)
         pkg_check_modules(GLEW REQUIRED glew)
     endif()
@@ -287,7 +316,31 @@ elseif(UNIX)
     pkg_check_modules(SDL_LIB REQUIRED sdl2)
 endif()
 
+
+include(TestBigEndian)
+test_big_endian(_SYSTEM_BIG_ENDIAN)
+if(_SYSTEM_BIG_ENDIAN)
+    add_definitions(-DTNZ_LITTLE_ENDIAN=0)
+else()
+    add_definitions(-DTNZ_LITTLE_ENDIAN=1)
+endif()
+unset(_SYSTEM_BIG_ENDIAN)
+
+
+set(C_WARNINGS)
+set(CXX_WARNINGS)
+
+if(CMAKE_COMPILER_IS_GNUCC)
+    ADD_CHECK_C_COMPILER_FLAG(C_WARNINGS C_WARN_WRITE_STRINGS -Wwrite-strings)
+    ADD_CHECK_C_COMPILER_FLAG(C_WARNINGS C_WARN_UNDEF -Wundef)
+
+    ADD_CHECK_CXX_COMPILER_FLAG(CXX_WARNINGS CXX_WARN_WRITE_STRINGS -Wwrite-strings)
+    ADD_CHECK_CXX_COMPILER_FLAG(CXX_WARNINGS CXX_WARN_UNDEF -Wundef)
+endif()
+
+
 include_directories(
+    SYSTEM
     BEFORE
     ${TIFF_INCLUDE_DIR}
     ${PNG_INCLUDE_DIRS}
@@ -316,6 +369,7 @@ else()
 endif()
 
 include_directories(
+    SYSTEM
     ${Boost_INCLUDE_DIR}
     ${LZ4_LIB_INCLUDE_DIRS}
     ${USB_LIB_INCLUDE_DIRS}
@@ -371,6 +425,9 @@ function(add_translation module)
     set_target_properties("translation_${module}" PROPERTIES
         EXCLUDE_FROM_DEFAULT_BUILD TRUE)
 endfunction()
+
+set(CMAKE_C_FLAGS "${C_WARNINGS} ${CMAKE_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CXX_WARNINGS} ${CMAKE_CXX_FLAGS}")
 
 add_subdirectory(tnzcore)
 add_subdirectory(tnzbase)

@@ -474,13 +474,13 @@ void tglDraw(const TRectD &rect, const TRaster32P &tex, bool blending) {
   } else
     texture = tex;
   GLenum fmt =
-#ifdef TNZ_MACHINE_CHANNEL_ORDER_BGRM
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
       GL_BGRA_EXT;
-#elif TNZ_MACHINE_CHANNEL_ORDER_MBGR
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
       GL_ABGR_EXT;
-#elif TNZ_MACHINE_CHANNEL_ORDER_RGBM
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
       GL_RGBA;
-#elif TNZ_MACHINE_CHANNEL_ORDER_MRGB
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
       GL_BGRA;
 #else
 //   Error  PLATFORM NOT SUPPORTED

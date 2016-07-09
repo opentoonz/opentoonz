@@ -13,9 +13,9 @@
 #include "tproperty.h"
 #include "tsound.h"
 
-#ifdef WIN32
+#if defined(_WIN32)
 #include "../image/mov/tiio_mov.h"
-#elif MACOSX
+#elif defined(MACOSX)
 #include "../image/mov/tiio_movM.h"
 #include <ApplicationServices/ApplicationServices.h>
 #endif

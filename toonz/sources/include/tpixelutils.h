@@ -125,10 +125,11 @@ DVAPI inline T quickOverPixPremultT(const T &bot, const T &top) {
            (bot.m == max) ? max : max - (max - bot.m) * (max - top.m) / max);
 }
 //------------------------------------------------------------------------------------
-/*-- Viewer上でラスタ素材を「比較暗」合成表示する --*/
+/*-- Show raster images darken-blended on the viewer --*/
 template <class T, class Q>
 DVAPI inline T quickOverPixDarkenBlendedT(const T &bot, const T &top) {
-  UINT max  = T::maxChannelValue;
+  UINT max = T::maxChannelValue;
+  if (bot.m == 0) return top;
   TUINT32 r = (top.r < bot.r) ? top.r : bot.r;
   TUINT32 g = (top.g < bot.g) ? top.g : bot.g;
   TUINT32 b = (top.b < bot.b) ? top.b : bot.b;

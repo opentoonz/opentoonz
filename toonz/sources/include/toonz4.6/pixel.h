@@ -37,7 +37,7 @@ typedef struct _SPIXEL { unsigned short b, g, r, m; } SPIXEL;
 #define LPIXEL_B_SHIFT 24
 #endif
 
-#elif TNZ_MACHINE_CHANNEL_ORDER_MBGR
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
 
 typedef struct { unsigned char m, b, g, r; } LPIXEL;
 typedef struct { unsigned short m, b, g, r; } SPIXEL;

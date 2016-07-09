@@ -36,4 +36,18 @@ public slots:
   void onSetCurrent();
 };
 
+namespace ZeroThickToggleGui {
+	void addZeroThickCommand(QMenu* menu);
+
+	class ZeroThickToggleHandler : public QObject {
+		Q_OBJECT
+
+			public slots:
+		void activate();
+		void deactivate();
+	};
+
+
+} //Namespace ZeroThickToggleGui
+
 #endif
