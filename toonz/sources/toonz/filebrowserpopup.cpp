@@ -1456,6 +1456,38 @@ void SaveLevelAsPopup::initFolder() {
   if (scene) fp = scene->decodeFilePath(project->getFolder(TProject::Drawings));
   setFolder(fp);
 }
+
+//---------------------------------------------------------------------------
+/*
+  For Save Level As command, it is needed to check if the current level is
+  selected (just like Save Level command) BEFORE opening the popup. So I decided
+  to use an original MenuItemHandler rather than OpenPopupCommandHandler.
+  06/07/2016 Shun
+*/
+
+class SaveLevelAsCommandHandler final : public MenuItemHandler {
+  SaveLevelAsPopup *m_popup;
+
+public:
+  SaveLevelAsCommandHandler() : MenuItemHandler(MI_SaveLevelAs), m_popup(0) {}
+  void execute() override {
+    TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
+    if (!sl) {
+      DVGui::warning(QObject::tr("No Current Level"));
+      return;
+    }
+    ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+    if (!scene) {
+      DVGui::warning(QObject::tr("No Current Scene"));
+      return;
+    }
+    if (!m_popup) m_popup = new SaveLevelAsPopup();
+    m_popup->show();
+    m_popup->raise();
+    m_popup->activateWindow();
+  }
+} saveLevelAsCommandHandler;
+
 //=============================================================================
 // ReplaceLevelPopup
 
@@ -2040,8 +2072,6 @@ OpenPopupCommandHandler<SaveSceneAsPopup> saveSceneAsPopupCommand(
 OpenPopupCommandHandler<SaveSubSceneAsPopup> saveSubSceneAsPopupCommand(
     MI_SaveSubxsheetAs);
 OpenPopupCommandHandler<LoadLevelPopup> loadLevelPopupCommand(MI_LoadLevel);
-OpenPopupCommandHandler<SaveLevelAsPopup> saveLevelAsPopupCommand(
-    MI_SaveLevelAs);
 OpenPopupCommandHandler<ConvertPopupWithInput> convertWithInputPopupCommand(
     MI_ConvertFileWithInput);
 OpenPopupCommandHandler<ReplaceLevelPopup> replaceLevelPopupCommand(
