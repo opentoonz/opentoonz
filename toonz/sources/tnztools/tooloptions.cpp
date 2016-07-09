@@ -427,6 +427,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
     TObjectHandle *objHandle, TXsheetHandle *xshHandle, ToolHandle *toolHandle)
     : ToolOptionsBox(parent)
     , m_pg(pg)
+    , m_splined(false)
     , m_tool(tool)
     , m_frameHandle(frameHandle)
     , m_objHandle(objHandle)
