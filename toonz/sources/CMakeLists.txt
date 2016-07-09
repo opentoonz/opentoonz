@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 2.8.11)
+
+set(CMAKE_BUILD_TYPE_INIT Release)
+
 project(OpenToonz)
 
 include(${CMAKE_SOURCE_DIR}/../cmake/util_compiler.cmake)
