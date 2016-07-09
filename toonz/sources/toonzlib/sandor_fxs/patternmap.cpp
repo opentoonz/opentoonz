@@ -31,7 +31,6 @@
 using namespace std;
 
 #ifdef __cplusplus
-
 extern "C" {
 #endif
 
@@ -44,10 +43,9 @@ extern "C" {
 
 // ----- PatternMapping for UCHAR pixels (range 0-255)
 // --------------------------
-void patternmapUC(
+static void patternmapUC(
     const RASTER *iras, RASTER *oras, CPatternMapParam &pmP, const int border,
-    RASTER
-        *imgContour)  // throw (SMemAllocError,SWriteRasterError,SFileReadError)
+    RASTER *imgContour)  // throw (SMemAllocError,SWriteRasterError,SFileReadError)
 {
   try {
     SRECT rect = {border, border, iras->lx - border - 1, iras->ly - border - 1};
@@ -125,10 +123,9 @@ void patternmapUC(
 
 // ----- PatternMapping for USHORT pixels (range 0-255)
 // --------------------------
-void patternmapUS(
+static void patternmapUS(
     const RASTER *iras, RASTER *oras, CPatternMapParam &pmP, const int border,
-    RASTER
-        *imgContour)  // throw (SMemAllocError,SWriteRasterError,SFileReadError)
+    RASTER *imgContour)  // throw (SMemAllocError,SWriteRasterError,SFileReadError)
 {
   try {
     SRECT rect = {border, border, iras->lx - border - 1, iras->ly - border - 1};

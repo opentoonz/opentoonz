@@ -31,6 +31,7 @@
 #include "toonz/stageplayer.h"
 #include "toonz/stage.h"
 #include "toonz/stage2.h"
+#include "toonz/tcolumnfx.h"
 #include "toonz/txsheet.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshchildlevel.h"
@@ -681,9 +682,9 @@ void RasterPainter::drawRasterImages(QPainter &p, QPolygon cameraPol) {
   m_nodes.clear();
 }
 
-void buildAutocloseImage(TVectorImage *vaux, TVectorImage *vi,
-                         const std::vector<std::pair<int, double>> &startPoints,
-                         const std::vector<std::pair<int, double>> &endPoints) {
+static void buildAutocloseImage(TVectorImage *vaux, TVectorImage *vi,
+                                const std::vector<std::pair<int, double>> &startPoints,
+                                const std::vector<std::pair<int, double>> &endPoints) {
   for (UINT i = 0; i < startPoints.size(); i++) {
     TThickPoint p1 = vi->getStroke(startPoints[i].first)
                          ->getThickPoint(startPoints[i].second);
@@ -702,7 +703,7 @@ void buildAutocloseImage(TVectorImage *vaux, TVectorImage *vi,
 
 TEnv::DoubleVar AutocloseFactor("InknpaintAutocloseFactor", 4.0);
 
-void drawAutocloses(TVectorImage *vi, TVectorRenderData &rd) {
+static void drawAutocloses(TVectorImage *vi, TVectorRenderData &rd) {
   static TPalette *plt = 0;
   if (!plt) {
     plt = new TPalette();
@@ -861,9 +862,6 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
   delete cf;
 }
 
-//-----------------------------------------------------------------------------
-
-bool isSubsheetChainOnColumn0(TXsheet *topXsheet, TXsheet *subsheet, int frame);
 
 //-----------------------------------------------------
 

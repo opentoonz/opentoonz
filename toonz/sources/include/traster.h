@@ -452,6 +452,13 @@ typedef TRasterPT<TPixelCY> TRasterYUV422P;
 
 //=========================================================
 
+// functions
+
+// trastercentroid.cpp
+TPoint computeCentroid(const TRaster32P &r);
+
+//=========================================================
+
 //=========================================================
 
 #endif  //__T_RASTER_INCLUDED

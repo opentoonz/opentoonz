@@ -113,7 +113,7 @@ void TFxSet::loadData(TIStream &is) {
   }
 }
 
-TFx *getActualFx(TFx *fx) {
+static TFx *getActualFx(TFx *fx) {
   // Zerary fxs and zerary COLUMN fxs are separate, and fx port connections
   // are stored in the actual zerary fx.
   // It's sad - couldn't we do something about it?

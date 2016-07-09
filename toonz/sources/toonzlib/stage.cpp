@@ -453,8 +453,8 @@ void StageBuilder::addCell(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
 
 //-----------------------------------------------------------------------------
 
-bool alreadyAdded(TXsheet *xsh, int row, int index,
-                  const std::vector<int> &rows, int col) {
+static bool alreadyAdded(TXsheet *xsh, int row, int index,
+                         const std::vector<int> &rows, int col) {
   int i;
   for (i = 0; i < index; i++)
     if (xsh->getCell(rows[i], col) == xsh->getCell(rows[index], col))

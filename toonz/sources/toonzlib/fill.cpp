@@ -456,11 +456,11 @@ void fill(const TRaster32P &ras, const TRaster32P &ref,
 
 //-----------------------------------------------------------------------------
 
-void rectFill(const TRaster32P &ras, const TRect &r, const TPixel32 &color) {}
+static void rectFill(const TRaster32P &ras, const TRect &r, const TPixel32 &color) {}
 
 //-----------------------------------------------------------------------------
 
-TPoint nearestInk(const TRasterCM32P &r, const TPoint &p, int ray) {
+static TPoint nearestInk(const TRasterCM32P &r, const TPoint &p, int ray) {
   int i, j;
   TPixelCM32 *buf = (TPixelCM32 *)r->getRawData();
 

@@ -303,9 +303,9 @@ inline void getFactors(int tone, double &inkFactor, double &paintFactor) {
 //---------------------------------------------------------------------------------
 
 // Copies the cmIn paint and ink colors to the output rasters.
-void buildLayers(const TRasterCM32P &cmIn,
-                 const std::vector<TPixel32> &palColors, TRaster32P &inkRaster,
-                 TRaster32P &paintRaster) {
+static void buildLayers(const TRasterCM32P &cmIn,
+                        const std::vector<TPixel32> &palColors, TRaster32P &inkRaster,
+                        TRaster32P &paintRaster) {
   // Separate cmIn by copying the ink & paint colors directly to the layer
   // rasters.
   TPixelCM32 *cmPix, *cmBegin = (TPixelCM32 *)cmIn->getRawData();

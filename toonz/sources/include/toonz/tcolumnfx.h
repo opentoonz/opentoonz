@@ -281,4 +281,11 @@ private:
   TOutputFx &operator=(const TOutputFx &);
 };
 
+//*******************************************************************************************
+//    TColumnFx functions
+//*******************************************************************************************
+
+bool isSubsheetChainOnColumn0(TXsheet *topXsheet, TXsheet *subsheet,
+                              int frame);
+
 #endif  // TCOLUMNFX_H

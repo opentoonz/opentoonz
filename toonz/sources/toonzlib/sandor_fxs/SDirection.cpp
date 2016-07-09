@@ -255,7 +255,7 @@ void CSDirection::equalizeDir(UCHAR *sel, const int d) {
     }
 }
 
-UCHAR getRadius(const double angle, const double r[4]) {
+static UCHAR getRadius(const double angle, const double r[4]) {
   double p, q;
   if (angle >= 0.0 && angle < 45.0) {
     q = angle / 45.0;

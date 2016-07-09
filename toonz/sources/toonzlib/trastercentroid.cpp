@@ -271,7 +271,7 @@ static int find_next_seed(const TRasterGR8P &r, int first_seed, UCHAR *&seed,
 
 /*------------------------------------------------------------------------*/
 
-void doComputeCentroid(const TRasterGR8P &r, TPoint &cp) {
+static void doComputeCentroid(const TRasterGR8P &r, TPoint &cp) {
   int preseed, displ, prewalker, code;
   UCHAR *seed, *walker;
   int x_num = 0, y_num = 0, den = 0;

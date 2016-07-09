@@ -1653,9 +1653,9 @@ inline void Event::processSpecialEvent() {
 //    Straight Skeleton mains
 //-------------------------------
 
-SkeletonGraph *skeletonize(ContourFamily &regionContours,
-                           VectorizationContext &context,
-                           VectorizerCore *thisVectorizer) {
+static SkeletonGraph *skeletonize(ContourFamily &regionContours,
+                                  VectorizationContext &context,
+                                  VectorizerCore *thisVectorizer) {
   SkeletonGraph *output = context.m_output = new SkeletonGraph;
 
   context.prepareContours(regionContours);

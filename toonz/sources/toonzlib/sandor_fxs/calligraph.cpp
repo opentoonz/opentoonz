@@ -39,9 +39,9 @@ extern "C" {
                  inr->ly - border - 1, 0, 0)
 
 // ----- CALLIGRAPH for UCHAR pixels (range 0-255) --------------------------
-void calligraphUC(const RASTER *inr, RASTER *outr, CCallParam &par,
-                  const int border,
-                  bool isOutBorder)  // throw(SMemAllocError,SWriteRasterError)
+static void calligraphUC(const RASTER *inr, RASTER *outr, CCallParam &par,
+                         const int border,
+                         bool isOutBorder)  // throw(SMemAllocError,SWriteRasterError)
 {
   try {
     SRECT rect = {border, border, inr->lx - border - 1, inr->ly - border - 1};
@@ -90,9 +90,9 @@ void calligraphUC(const RASTER *inr, RASTER *outr, CCallParam &par,
 }
 
 // ----- CALLIGRAPH for USHORT pixels (range 0-65535) ------------------------
-void calligraphUS(const RASTER *inr, RASTER *outr, CCallParam &par,
-                  const int border,
-                  bool isOutBorder)  // throw(SMemAllocError,SWriteRasterError)
+static void calligraphUS(const RASTER *inr, RASTER *outr, CCallParam &par,
+                         const int border,
+                         bool isOutBorder)  // throw(SMemAllocError,SWriteRasterError)
 {
   try {
     SRECT rect = {border, border, inr->lx - border - 1, inr->ly - border - 1};

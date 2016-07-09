@@ -549,7 +549,7 @@ void TAutocloser::Imp::findMeetingPoints(
 
 /*------------------------------------------------------------------------*/
 
-bool allMarked(const std::vector<bool> &marks, int index) {
+static bool allMarked(const std::vector<bool> &marks, int index) {
   int i;
 
   for (i = index + 1; i < (int)marks.size(); i++)

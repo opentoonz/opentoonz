@@ -919,7 +919,7 @@ void Preferences::setViewValues(int shrink, int step) {
 
 //-----------------------------------------------------------------
 
-void setCurrentUnits(std::string measureName, std::string units) {
+static void setCurrentUnits(std::string measureName, std::string units) {
   TMeasure *m = TMeasureManager::instance()->get(measureName);
   if (!m) return;
   TUnit *u = m->getUnit(::to_wstring(units));
