@@ -93,12 +93,8 @@ include_directories(
     SYSTEM
     ${TIFF_INCLUDE_DIR}
     ${SDKROOT}/LibJPEG/jpeg-9
-<<<<<<< HEAD
-    ${SDKROOT}/ffmpeg)
-=======
 )
 
->>>>>>> master
 if(WIN32)
     include_directories(
         SYSTEM
@@ -146,11 +142,4 @@ else()
         ${TNZLIBS})
 endif()
 
-target_link_libraries(image Qt5::Core Qt5::Network ${Z_LIB} ${GLUT_LIB} ${GL_LIB} ${JPEG_LIB} ${TIFF_LIB} ${PNG_LIB} ${EXTRA_LIBS} 
-        ${AVCODEC_LIB}
-        ${AVFORMAT_LIB}
-        ${AVUTIL_LIB}
-        ${SWSCALE_LIB}
-        ${SWRESAMPLE_LIB}
-        ${AVDEVICE_LIB}
-        ${AVFILTER_LIB})
+target_link_libraries(image Qt5::Core Qt5::Network ${Z_LIB} ${GLUT_LIB} ${GL_LIB} ${JPEG_LIB} ${TIFF_LIB} ${PNG_LIB} ${EXTRA_LIBS})

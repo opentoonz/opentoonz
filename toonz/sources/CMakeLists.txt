@@ -150,7 +150,6 @@ if(WIN32)
         ${SDKROOT}/glut/3.7.6/include
         ${SDKROOT}/zlib-1.2.8
         ${SDKROOT}/LibJPEG/jpeg-9
-        ${SDKROOT}/ffmpeg
     )
     add_definitions(
         -DGLUT_NO_LIB_PRAGMA
@@ -211,17 +210,6 @@ if(WIN32)
     set(LZ4_LIB ${SDKROOT}/Lz4/Lz4_131/lz4_${PLATFORM}.lib)
     set(SUPERLU_LIB ${SDKROOT}/superlu/SuperLU_${MSVC_LIB_VERSION}_${PLATFORM}.lib)
     set(OPENBLAS_LIB ${SDKROOT}/openblas/libopenblas_${PLATFORM}.lib)
-    
-    #start ffmpeg
-    set(AVCODEC_LIB ${SDKROOT}/ffmpeg/avcodec.lib)
-    set(AVFORMAT_LIB ${SDKROOT}/ffmpeg/avformat.lib)
-    set(AVUTIL_LIB ${SDKROOT}/ffmpeg/avutil.lib)
-    set(SWSCALE_LIB ${SDKROOT}/ffmpeg/swscale.lib)
-    set(SWRESAMPLE_LIB ${SDKROOT}/ffmpeg/swresample.lib)
-    set(AVDEVICE_LIB ${SDKROOT}/ffmpeg/avdevice.lib)
-    set(AVFILTER_LIB ${SDKROOT}/ffmpeg/avfilter.lib)
-    #end ffmpeg
-    
     set(USB_LIB)  # unused
     if(PLATFORM EQUAL 32)
         set(QT_LIB ${SDKROOT}/quicktime/QT73SDK/Libraries/QTMLClient.lib)
