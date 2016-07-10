@@ -2,6 +2,7 @@
 #include "tsystem.h"
 //#include "texception.h"
 #include "tfilepath.h"
+#include "tproperty.h"
 #include "tiio_mp4.h"
 #include "tenv.h"
 #include "trasterimage.h"
@@ -45,6 +46,11 @@ private:
 
 TLevelWriterMp4::TLevelWriterMp4(const TFilePath &path, TPropertyGroup *winfo)
 	: TLevelWriter(path, winfo) {
+	if (!m_properties) m_properties = new Tiio::Mp4WriterProperties();
+	std::string scale = m_properties->getProperty("Scale")->getValueAsString();
+	sscanf(scale.c_str(), "%d", &m_scale);
+	std::string quality = m_properties->getProperty("Qual")->getValueAsString();
+	sscanf(quality.c_str(), "%d", &m_vidQuality);
 	m_frameCount = 0;
 	if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);
 }
@@ -56,16 +62,30 @@ TLevelWriterMp4::~TLevelWriterMp4()
 	QProcess createMp4;
 	QStringList args;
 
-	TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
-	QString tempName = "frame%d.ppm";
-	tempName = tempPath.getQString() + tempName;
+	
+	QString tempName = "tempOut%d.ppm";
+	tempName = m_path.getQString() + tempName;
 	//for debugging	
 	std::string strPath = tempName.toStdString();
+	int outLx = m_lx;
+	int outLy = m_ly;
+
+	//set scaling
+	if (m_scale != 0) {
+		outLx = m_lx * m_scale / 100;
+		outLy = m_ly * m_scale / 100;
+	}
+
+	//calculate quality (bitrate)
+	int pixelCount = m_lx * m_ly;
+	int bitRate = pixelCount / 150; //crude but gets decent values
+	double quality = m_vidQuality / 100.0;
+	double tempRate = (double)bitRate * quality;
+	int finalBitrate = (int)tempRate;
 
 	args << "-framerate";
 	args << QString::number(m_frameRate);
 	args << "-s";
-	//args << "1920x1080";
 	args << QString::number(m_lx) + "x" + QString::number(m_ly);
 	args << "-pix_fmt";
 	args << "rgb32";
@@ -73,6 +93,10 @@ TLevelWriterMp4::~TLevelWriterMp4()
 	args << "rawvideo";
 	args << "-i";
 	args << tempName;
+	args << "-s";
+	args << QString::number(outLx) + "x" + QString::number(outLy);
+	args << "-b";
+	args << QString::number(finalBitrate) + "k";
 	args << "-c:v";
 	args << "libopenh264";
 	args << m_path.getQString();
@@ -90,7 +114,7 @@ TLevelWriterMp4::~TLevelWriterMp4()
 	createMp4.waitForFinished(-1);
 	createMp4.close();
 
-	QString deletePath = tempPath.getQString() + "frame";
+	QString deletePath = m_path.getQString() + "tempOut";
 	QString deleteFile;
 	bool startedDelete = false;
 	for (int i = 0; ; i++)
@@ -148,9 +172,9 @@ void TLevelWriterMp4::save(const TImageP &img, int frameIndex) {
 	uint8_t *buffin = image->getRaster()->getRawData();
 	assert(buffin);
 	
-	TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
-	QString tempName = "frame" + QString::number(frameIndex) + ".ppm";
-	tempName = tempPath.getQString() + tempName;
+	//TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
+	QString tempName = "tempOut" + QString::number(frameIndex) + ".ppm";
+	tempName = m_path.getQString() + tempName;
 
 	
 	QByteArray ba = tempName.toLatin1();
@@ -298,9 +322,9 @@ TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path)
 
 	//convert frames
 	TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
-	QString tempName = "frame%03d.rgb";
+	QString tempName = "In%03d.rgb";
 	tempName = tempPath.getQString() + tempName;
-	QString tempStart = "frame001.rgb";
+	QString tempStart = "In001.rgb";
 	tempStart = tempPath.getQString() + tempStart;
 	if (!TSystem::doesExistFileOrLevel(TFilePath(tempStart))) {
 		//for debugging	
@@ -382,7 +406,7 @@ TImageP TLevelReaderMp4::load(int frameIndex) {
 	
 	TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
 	QString number = QString("%1").arg(frameIndex, 3, 10, QChar('0'));
-	QString tempName = "frame" + number + ".rgb";
+	QString tempName = "In" + number + ".rgb";
 	tempName = tempPath.getQString() + tempName;
 	
 	//for debugging	
@@ -435,7 +459,12 @@ TImageP TLevelReaderMp4::load(int frameIndex) {
 
 
 
-Tiio::Mp4WriterProperties::Mp4WriterProperties(){}
+Tiio::Mp4WriterProperties::Mp4WriterProperties()
+	: m_vidQuality("Qual", 1, 100, 90), m_scale("Scale", 1, 100, 100) {
+		bind(m_vidQuality);
+		bind(m_scale);
+	
+}
 
 //Tiio::Reader* Tiio::makeMp4Reader(){ return nullptr; }
 //Tiio::Writer* Tiio::makeMp4Writer(){ return nullptr; }

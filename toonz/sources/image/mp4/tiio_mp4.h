@@ -33,6 +33,8 @@ public:
 private:
 	int m_frameCount, m_lx, m_ly;
 	double m_fps;
+	int m_scale;
+	int m_vidQuality;
 };
 
 //===========================================================
@@ -72,16 +74,17 @@ class Mp4WriterProperties : public TPropertyGroup {
 public:
   // TEnumProperty m_pixelSize;
   //TBoolProperty m_matte;
-
-  Mp4WriterProperties();
+	TIntProperty m_vidQuality;
+	TIntProperty m_scale;
+    Mp4WriterProperties();
 };
 
 
 
 //===========================================================================
 
-Tiio::Reader *makeMp4Reader();
-Tiio::Writer *makeMp4Writer();
+//Tiio::Reader *makeMp4Reader();
+//Tiio::Writer *makeMp4Writer();
 
 }  // namespace
 
