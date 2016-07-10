@@ -49,7 +49,7 @@ TLevelWriterMp4::TLevelWriterMp4(const TFilePath &path, TPropertyGroup *winfo)
 	if (!m_properties) m_properties = new Tiio::Mp4WriterProperties();
 	std::string scale = m_properties->getProperty("Scale")->getValueAsString();
 	sscanf(scale.c_str(), "%d", &m_scale);
-	std::string quality = m_properties->getProperty("Qual")->getValueAsString();
+	std::string quality = m_properties->getProperty("Quality")->getValueAsString();
 	sscanf(quality.c_str(), "%d", &m_vidQuality);
 	m_frameCount = 0;
 	if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);
@@ -460,7 +460,7 @@ TImageP TLevelReaderMp4::load(int frameIndex) {
 
 
 Tiio::Mp4WriterProperties::Mp4WriterProperties()
-	: m_vidQuality("Qual", 1, 100, 90), m_scale("Scale", 1, 100, 100) {
+	: m_vidQuality("Quality", 1, 100, 90), m_scale("Scale", 1, 100, 100) {
 		bind(m_vidQuality);
 		bind(m_scale);
 	
