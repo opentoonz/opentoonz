@@ -20,6 +20,8 @@ set(HEADERS
     ../include/tnzimage.h
     mov/tiio_mov_proxy.h
     3gp/tiio_3gp_proxy.h
+    gif/tiio_gif.h
+    webm/tiio_webm.h
     mesh/tiio_mesh.h)
 
 set(SOURCES
@@ -46,6 +48,8 @@ set(SOURCES
     tzl/tiio_tzl.cpp
     mov/tiio_mov_proxy.cpp
     3gp/tiio_3gp_proxy.cpp
+    gif/tiio_gif.cpp
+    webm/tiio_webm.cpp
     mesh/tiio_mesh.cpp)
 
 if(WIN32)

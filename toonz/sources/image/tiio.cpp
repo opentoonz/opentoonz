@@ -72,6 +72,8 @@
 #include "./pli/tiio_pli.h"
 #include "./tzl/tiio_tzl.h"
 #include "./svg/tiio_svg.h"
+#include "./gif/tiio_gif.h"
+#include "./webm/tiio_webm.h"
 #include "./mesh/tiio_mesh.h"
 
 //-------------------------------------------------------------------
@@ -158,6 +160,20 @@ void initImageIo(bool lightVersion) {
   Tiio::defineWriterMaker("rgb", Tiio::makeSgiWriter, true);
   TFileType::declare("rgb", TFileType::RASTER_IMAGE);
   Tiio::defineWriterProperties("rgb", new Tiio::SgiWriterProperties());
+
+  //ffmpeg 
+  TLevelWriter::define("webm", TLevelWriterWebm::create, true);
+  //TLevelReader::define("webm", TLevelReaderWebm::create);
+  TFileType::declare("webm", TFileType::RASTER_LEVEL);
+  Tiio::defineWriterProperties("webm", new Tiio::WebmWriterProperties());
+
+  TLevelWriter::define("gif", TLevelWriterGif::create, true);
+  //TLevelReader::define("gif", TLevelReaderGif::create);
+  TFileType::declare("gif", TFileType::RASTER_LEVEL);
+  Tiio::defineWriterProperties("gif", new Tiio::GifWriterProperties());
+
+
+  //end ffmpeg
 
   if (!lightVersion) {
 #ifdef _WIN32
