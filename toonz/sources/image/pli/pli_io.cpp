@@ -1099,7 +1099,7 @@ PliTag *ParsedPliImp::readPaletteTag() {
 
   PaletteTag *tag = new PaletteTag(numColors, plt);
 
-  delete plt;
+  delete[] plt;
 
   return tag;
 }
@@ -1121,7 +1121,7 @@ PliTag *ParsedPliImp::readPaletteWithAlphaTag() {
 
   PaletteWithAlphaTag *tag = new PaletteWithAlphaTag(numColors, plt);
 
-  delete plt;
+  delete[] plt;
 
   return tag;
 }
@@ -2143,7 +2143,7 @@ TUINT32 ParsedPliImp::writeImageTag(ImageTag *tag) {
 
   for (i = 0; i < tag->m_numObjects; i++) writeDinamicData(objectOffset[i]);
 
-  delete objectOffset;
+  delete[] objectOffset;
 
   return offset;
 }
