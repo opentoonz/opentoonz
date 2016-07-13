@@ -683,7 +683,7 @@ int inline STRICMP(const char *a, const char *b) {
   return str.compare(QString(b), Qt::CaseSensitive);
 }
 
-bool loadServerData(const QString &hostname, QString &addr, int &port) {
+static bool loadServerData(const QString &hostname, QString &addr, int &port) {
   TFilePath rootDir = getGlobalRoot();
 
   TFilePath fp = rootDir + "config" + "servers.txt";

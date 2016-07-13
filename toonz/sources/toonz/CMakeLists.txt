@@ -95,6 +95,7 @@ set(MOC_HEADERS
     scenesettingspopup.h
     sceneviewer.h
     sceneviewercontextmenu.h
+    sceneviewerevents.h
     scriptconsolepanel.h
     selectionutils.h
     shifttracetool.h

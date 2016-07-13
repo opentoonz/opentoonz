@@ -1951,9 +1951,9 @@ std::vector<int>
                           // Trovare un metodo alternativo.
 
 //! Returns the number of actually loaded levels
-int createSubXSheetFromPSDFolder(IoCmd::LoadResourceArguments &args,
-                                 TXsheet *xsh, int &col0, int psdLevelIndex,
-                                 PsdSettingsPopup *popup) {
+static int createSubXSheetFromPSDFolder(IoCmd::LoadResourceArguments &args,
+                                        TXsheet *xsh, int &col0, int psdLevelIndex,
+                                        PsdSettingsPopup *popup) {
   assert(popup->isFolder(psdLevelIndex));
 
   int row0  = 0;
@@ -2008,8 +2008,8 @@ int createSubXSheetFromPSDFolder(IoCmd::LoadResourceArguments &args,
 
 //  Load a psd file
 //! Returns the number of actually loaded levels
-int loadPSDResource(IoCmd::LoadResourceArguments &args, bool updateRecentFile,
-                    PsdSettingsPopup *popup) {
+static int loadPSDResource(IoCmd::LoadResourceArguments &args, bool updateRecentFile,
+                           PsdSettingsPopup *popup) {
   int &row0 = args.row0;
   int &col0 = args.col0;
   int &row1 = args.row1;

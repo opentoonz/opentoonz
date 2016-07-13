@@ -39,8 +39,8 @@
 #include <QContextMenuEvent>
 #include <QSignalMapper>
 
-void addShowHideStageObjectCmd(QMenu *menu, const TStageObjectId &id,
-                               bool isShow) {
+static void addShowHideStageObjectCmd(QMenu *menu, const TStageObjectId &id,
+                                      bool isShow) {
   TXsheet *xsh         = TApp::instance()->getCurrentXsheet()->getXsheet();
   TStageObject *pegbar = xsh->getStageObject(id);
   QString cmdStr;
@@ -55,7 +55,7 @@ void addShowHideStageObjectCmd(QMenu *menu, const TStageObjectId &id,
   menu->addAction(showHideAction);
 }
 
-void onShowHideSelectObject(QAction *action) {
+static void onShowHideSelectObject(QAction *action) {
   TApp *app = TApp::instance();
   TStageObjectId id;
   id.setCode(action->data().toInt());
@@ -80,7 +80,7 @@ void onShowHideSelectObject(QAction *action) {
   }
 }
 
-int addShowHideStageObjectCmds(const std::vector<int> &columnIndexes,
+static int addShowHideStageObjectCmds(const std::vector<int> &columnIndexes,
                                QMenu *menu, bool isShow) {
   int ii, columnIndex = -1;
   bool flag = true;
@@ -238,7 +238,7 @@ void SceneViewerContextMenu::addEnterGroupCommands(const TPointD &pos) {
   assert(ret);
 }
 
-QString getName(TStageObject *obj) {
+static QString getName(TStageObject *obj) {
   return QString::fromStdString(obj->getFullName());
 }
 

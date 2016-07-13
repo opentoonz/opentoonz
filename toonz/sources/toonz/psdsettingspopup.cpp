@@ -39,7 +39,7 @@ QStringList modesDescription =
 // Costruisce la stringa delle info della psd da caricare che comparirà nel
 // popup:
 // Path, Dimensioni, numero di livelli, ecc..
-void doPSDInfo(TFilePath psdpath, QTreeWidget *psdTree) {
+static void doPSDInfo(TFilePath psdpath, QTreeWidget *psdTree) {
   psdTree->clear();
   try {
     TPSDReader *psdreader = new TPSDReader(psdpath);

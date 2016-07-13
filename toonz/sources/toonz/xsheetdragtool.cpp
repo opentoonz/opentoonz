@@ -1483,7 +1483,7 @@ XsheetGUI::DragTool *XsheetGUI::DragTool::makeColumnSelectionTool(
 // Column Movement
 //-----------------------------------------------------------------------------
 
-void moveColumns(const std::set<int> &indices, int delta) {
+static void moveColumns(const std::set<int> &indices, int delta) {
   if (indices.empty()) return;
   if (delta < 0 && *indices.begin() + delta < 0) delta = -*indices.begin();
   if (delta == 0) return;

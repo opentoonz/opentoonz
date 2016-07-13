@@ -203,7 +203,7 @@ void InsertSceneFrameUndo::doRemoveSceneFrame(int frame) {
 
 //-----------------------------------------------------------------------------
 
-void insertSceneFrame(int frame) {
+static void insertSceneFrame(int frame) {
   InsertSceneFrameUndo *undo = new InsertSceneFrameUndo(frame);
   TUndoManager::manager()->add(undo);
 
@@ -298,7 +298,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-void removeSceneFrame(int frame) {
+static void removeSceneFrame(int frame) {
   RemoveSceneFrameUndo *undo = new RemoveSceneFrameUndo(frame);
   TUndoManager::manager()->add(undo);
 
@@ -443,7 +443,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-void insertGlobalKeyframe(int frame) {
+static void insertGlobalKeyframe(int frame) {
   std::vector<int> columns;
   ::getColumns(columns);
 
@@ -536,7 +536,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-void removeGlobalKeyframe(int frame) {
+static void removeGlobalKeyframe(int frame) {
   std::vector<int> columns;
   ::getColumns(columns);
 
@@ -747,7 +747,7 @@ void DrawingSubtitutionUndo::setDrawing(const TFrameId &fid, int row, int col,
 
 //-----------------------------------------------------------------------------
 
-void drawingSubstituion(int dir) {
+static void drawingSubstituion(int dir) {
   // TTool::Application *app = TTool::getApplication();
   // TCellSelection *selection = dynamic_cast<TCellSelection
   // *>(app->getCurrentSelection()->getSelection());
@@ -769,7 +769,7 @@ void drawingSubstituion(int dir) {
   undo->redo();
 }
 
-void drawingSubstituionGroup(int dir) {
+static void drawingSubstituionGroup(int dir) {
   int row = TTool::getApplication()->getCurrentFrame()->getFrame();
   int col = TTool::getApplication()->getCurrentColumn()->getColumnIndex();
   DrawingSubtitutionGroupUndo *undo =
@@ -1744,7 +1744,7 @@ void XsheetWriter::write(ostream &os) {
   }
 }
 
-void makeHtml(TFilePath fp) {
+static void makeHtml(TFilePath fp) {
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
 

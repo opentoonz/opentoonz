@@ -41,7 +41,7 @@ using namespace DVGui;
 
 //-----------------------------------------------------------------------------
 
-LineEdit *createField() {
+static LineEdit *createField() {
   LineEdit *field = new LineEdit();
   /*
 field->setMaximumWidth(100);

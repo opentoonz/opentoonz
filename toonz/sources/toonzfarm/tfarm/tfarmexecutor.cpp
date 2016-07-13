@@ -8,7 +8,7 @@ TFarmExecutor::TFarmExecutor(int port) : TTcpIpServer(port) {}
 
 //------------------------------------------------------------------------------
 
-int extractArgs(const QString &s, std::vector<QString> &argv) {
+static int extractArgs(const QString &s, std::vector<QString> &argv) {
   argv.clear();
   if (s == "") return 0;
 

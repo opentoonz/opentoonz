@@ -110,13 +110,13 @@ namespace ImageUtils {
 // todo: spostare da qualche altra parte. rendere accessibile a tutti.
 // utilizzare
 // anche nella libreria dovunque si usi direttamente "_files"
-TFilePath getResourceFolder(const TFilePath &scenePath) {
+static TFilePath getResourceFolder(const TFilePath &scenePath) {
   return scenePath.getParentDir() + (scenePath.getName() + "_files");
 }
 
 //-----------------------------------------------------------------------------
 
-void copyScene(const TFilePath &dst, const TFilePath &src) {
+static void copyScene(const TFilePath &dst, const TFilePath &src) {
   TSystem::copyFile(dst, src);
   if (TProjectManager::instance()->isTabModeEnabled())
     TSystem::copyDir(getResourceFolder(dst), getResourceFolder(src));
@@ -337,11 +337,11 @@ void getStrokeStyleInformationInArea(
 }
 
 //--------------------------------------------------------------------
-void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt,
-                   const TLevelWriterP &lw, const std::vector<TFrameId> &frames,
-                   const TAffine &aff, const TRop::ResampleFilterType &resType,
-                   FrameTaskNotifier *frameNotifier, const TPixel &bgColor,
-                   bool removeDotBeforeFrameNumber = false) {
+static void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt,
+                          const TLevelWriterP &lw, const std::vector<TFrameId> &frames,
+                          const TAffine &aff, const TRop::ResampleFilterType &resType,
+                          FrameTaskNotifier *frameNotifier, const TPixel &bgColor,
+                          bool removeDotBeforeFrameNumber = false) {
   for (int i = 0; i < (int)frames.size(); i++) {
     if (frameNotifier->abortTask()) break;
     try {
@@ -402,10 +402,10 @@ void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt,
 
 //--------------------------------------------------------------------
 
-void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt,
-                   const TLevelWriterP &lw, const std::vector<TFrameId> &frames,
-                   const TRop::ResampleFilterType &resType, int width,
-                   FrameTaskNotifier *frameNotifier) {
+static void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt,
+                          const TLevelWriterP &lw, const std::vector<TFrameId> &frames,
+                          const TRop::ResampleFilterType &resType, int width,
+                          FrameTaskNotifier *frameNotifier) {
   QString msg;
   int i;
   std::vector<TVectorImageP> images;
@@ -457,13 +457,13 @@ void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt,
 
 //-----------------------------------------------------------------------
 
-void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw,
-                           const std::vector<TFrameId> &_frames,
-                           const TAffine &aff,
-                           const TRop::ResampleFilterType &resType,
-                           FrameTaskNotifier *frameNotifier,
-                           const TPixel &bgColor,
-                           bool removeDotBeforeFrameNumber = false) {
+static void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw,
+                                  const std::vector<TFrameId> &_frames,
+                                  const TAffine &aff,
+                                  const TRop::ResampleFilterType &resType,
+                                  FrameTaskNotifier *frameNotifier,
+                                  const TPixel &bgColor,
+                                  bool removeDotBeforeFrameNumber = false) {
   std::vector<TFrameId> frames = _frames;
   if (frames.empty() &&
       lr->loadInfo()->getFrameCount() ==
@@ -540,9 +540,9 @@ ConvertPopup での指定に合わせて、[レベル名].[フレーム番号].[
 
 //-----------------------------------------------------------------------
 
-void convertFromVector(const TLevelReaderP &lr, const TLevelWriterP &lw,
-                       const std::vector<TFrameId> &_frames,
-                       FrameTaskNotifier *frameNotifier) {
+static void convertFromVector(const TLevelReaderP &lr, const TLevelWriterP &lw,
+                              const std::vector<TFrameId> &_frames,
+                              FrameTaskNotifier *frameNotifier) {
   std::vector<TFrameId> frames = _frames;
   TLevelP lv                   = lr->loadInfo();
   if (frames.empty() &&

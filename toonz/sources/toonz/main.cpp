@@ -117,7 +117,7 @@ void qt_mac_set_menubar_merge(bool enable);
 #define NO_LICENSE
 //-----------------------------------------------------------------------------
 
-void fatalError(QString msg) {
+static void fatalError(QString msg) {
   DVGui::MsgBoxInPopup(
       CRITICAL, msg + "\n" +
                     QObject::tr("Installing %1 again could fix the problem.")
@@ -126,13 +126,13 @@ void fatalError(QString msg) {
 }
 //-----------------------------------------------------------------------------
 
-void lastWarningError(QString msg) {
+static void lastWarningError(QString msg) {
   DVGui::error(msg);
   // exit(0);
 }
 //-----------------------------------------------------------------------------
 
-void toonzRunOutOfContMemHandler(unsigned long size) {
+static void toonzRunOutOfContMemHandler(unsigned long size) {
 #ifdef _WIN32
   static bool firstTime = true;
   if (firstTime) {
@@ -156,7 +156,7 @@ DV_IMPORT_API void initColorFx();
     la stuffDir, controlla se la directory di outputs esiste (e provvede a
     crearla in caso contrario) verifica inoltre che stuffDir esista.
 */
-void initToonzEnv() {
+static void initToonzEnv() {
   StudioPalette::enable(true);
 
   TEnv::setApplication(applicationName, applicationVersion,
