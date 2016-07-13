@@ -63,7 +63,7 @@ TLevelWriterWebm::~TLevelWriterWebm()
 	QStringList args;
 
 	
-	QString tempName = "tempOut%d.jpg";
+	QString tempName = "tempOut%d.png";
 	tempName = m_path.getQString() + tempName;
 	//for debugging	
 	std::string strPath = tempName.toStdString();
@@ -123,7 +123,7 @@ TLevelWriterWebm::~TLevelWriterWebm()
 	bool startedDelete = false;
 	for (int i = 0; ; i++)
 	{
-		deleteFile = deletePath + QString::number(i) + ".jpg";
+		deleteFile = deletePath + QString::number(i) + ".png";
 		TFilePath deleteCurrent(deleteFile);
 		if (TSystem::doesExistFileOrLevel(deleteCurrent)) {
 			TSystem::deleteFile(deleteCurrent);
@@ -178,7 +178,7 @@ void TLevelWriterWebm::save(const TImageP &img, int frameIndex) {
 	
 	//TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
 	QString tempName = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".ppm";
-	QString tempJpg = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".jpg";
+	QString tempPng = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".png";
 
 	
 	QByteArray ba = tempName.toLatin1();
@@ -214,7 +214,7 @@ void TLevelWriterWebm::save(const TImageP &img, int frameIndex) {
 	args << "-q";
 	args << "1";
 	args << "-y";
-	args << tempJpg;
+	args << tempPng;
 
 
 	//get directory for ffmpeg (ffmpeg binaries also need to be in the folder)

@@ -980,6 +980,10 @@ PreferencesPopup::PreferencesPopup()
   CheckBox *autoRefreshFolderContentsCB =
       new CheckBox(tr("Automatically Refresh Folder Contents"), this);
 
+  //--- Extras ------------------------------
+  categoryList->addItem(tr("Extras"));
+  DVGui::FileField *ffmpegPath = new DVGui::FileField(this, QString(""));
+
   QLabel *note_version =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_version->setStyleSheet("font-size: 10px; font: italic;");
@@ -1628,6 +1632,22 @@ PreferencesPopup::PreferencesPopup()
     }
     versionControlBox->setLayout(vcLay);
     stackedWidget->addWidget(versionControlBox);
+
+	//--- Extras --------------------------
+	QWidget *extrasBox = new QWidget(this);
+	QVBoxLayout *extrasLay = new QVBoxLayout();
+	extrasLay->setMargin(15);
+	extrasLay->setSpacing(10);
+	{
+		extrasLay->addWidget(ffmpegPath, 0,
+			Qt::AlignLeft | Qt::AlignVCenter);
+		
+		extrasLay->addStretch(1);
+
+		extrasLay->addWidget(note_version, 0);
+	}
+	extrasBox->setLayout(extrasLay);
+	stackedWidget->addWidget(extrasBox);
 
     mainLayout->addWidget(stackedWidget, 1);
   }

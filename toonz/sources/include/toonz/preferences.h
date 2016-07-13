@@ -372,6 +372,10 @@ public:
   bool isAutomaticSVNFolderRefreshEnabled() const {
     return m_automaticSVNFolderRefreshEnabled;
   }
+  // Extras Tab
+
+  void setFfmpegPath(std::string path);
+  QString getFfmpegPath() const { return m_ffmpegPath; }
 
   // Uncategorized - internals
 
@@ -410,7 +414,7 @@ private:
 
   std::vector<LevelFormat> m_levelFormats;
 
-  QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice;
+  QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice, m_ffmpegPath;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
 
