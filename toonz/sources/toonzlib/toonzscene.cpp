@@ -283,7 +283,7 @@ void fixBiancoProblem(ToonzScene *scene, TXsheet *xsh) {
 
 //=============================================================================
 
-void deleteAllUntitledScenes() {
+static void deleteAllUntitledScenes() {
   TFilePath tempDir = getUntitledScenesDir();
   try {
     if (TFileStatus(tempDir).isDirectory()) {
@@ -948,7 +948,7 @@ struct LevelType {
 
 //-----------------------------------------------------------------------------
 
-LevelType getLevelType(const TFilePath &fp) {
+static LevelType getLevelType(const TFilePath &fp) {
   LevelType ret;
   ret.m_ltype        = UNKNOWN_XSHLEVEL;
   ret.m_oldLevelFlag = false;

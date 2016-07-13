@@ -94,7 +94,7 @@ void CYOMBInputParam::strToColorIndex(const char *s, COLOR_INDEX_LIST &cil,
   }
 }
 
-int ushortCompare(const void *a, const void *b) {
+static int ushortCompare(const void *a, const void *b) {
   unsigned short *aa;
   unsigned short *bb;
   aa = (unsigned short *)a;

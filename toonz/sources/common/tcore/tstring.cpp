@@ -157,10 +157,11 @@ std::wstring toLower(std::wstring a) {
 #ifdef _WIN32
   return _wcslwr(const_cast<wchar_t *>(a.c_str()));
 #else
+  const int length = (int)a.length();
   std::wstring ret;
-  for (int i = 0; i < (int)a.length(); i++) {
-    wchar_t c = towlower(a[i]);
-    ret += c;
+  ret.resize(length);
+  for (int i = 0; i < length; i++) {
+    ret[i] = towlower(a[i]);
   }
   return ret;
 #endif

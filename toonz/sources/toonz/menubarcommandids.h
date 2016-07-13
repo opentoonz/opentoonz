@@ -220,7 +220,8 @@
 #define MI_OpenXshView "MI_OpenXshView"
 #define MI_OpenCleanupSettings "MI_OpenCleanupSettings"
 #define MI_ResetRoomLayout "MI_ResetRoomLayout"
-
+#define MI_MaximizePanel "MI_MaximizePanel"
+#define MI_FullScreenWindow "MI_FullScreenWindow"
 #define MI_OnionSkin "MI_OnionSkin"
 #define MI_ZeroThick "MI_ZeroThick"
 

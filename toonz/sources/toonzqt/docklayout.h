@@ -168,6 +168,8 @@ class DVAPI DockWidget : public QWidget {
                             // privates
   friend class DockPlaceholder;  // As above.
   // friend Region;          //Regions need access to m_saveIndex field.
+public:
+  void maximizeDock();
 
 protected:
   // Private attributes for dragging purposes

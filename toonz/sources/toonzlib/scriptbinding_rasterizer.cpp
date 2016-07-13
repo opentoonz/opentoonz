@@ -27,9 +27,9 @@ QScriptValue Rasterizer::ctor(QScriptContext *context, QScriptEngine *engine) {
   return create(engine, new Rasterizer());
 }
 
-TToonzImageP vectorToToonzRaster(const TVectorImageP &vi,
-                                 const TDimension &size, const TAffine &aff,
-                                 const TPointD &dpi) {
+static TToonzImageP vectorToToonzRaster(const TVectorImageP &vi,
+                                        const TDimension &size, const TAffine &aff,
+                                        const TPointD &dpi) {
   /*
 TScale sc(dpi.x/Stage::inch, dpi.y/Stage::inch);
 TRectD bbox = sc*vi->getBBox();
@@ -47,9 +47,9 @@ TDimension size(bbox.getLx(), bbox.getLy());
   return ti;
 }
 
-TImageP renderVectorImage(TOfflineGL *glContext, const TVectorRenderData &rd,
-                          const TPointD &dpi, const TImageP &img,
-                          const TPixel32 &color) {
+static TImageP renderVectorImage(TOfflineGL *glContext, const TVectorRenderData &rd,
+                                 const TPointD &dpi, const TImageP &img,
+                                 const TPixel32 &color) {
   glContext->clear(color);
   glContext->draw(img, rd);
   TRasterImageP rimg(glContext->getRaster());
@@ -57,8 +57,8 @@ TImageP renderVectorImage(TOfflineGL *glContext, const TVectorRenderData &rd,
   return rimg;
 }
 
-void setFrame(QScriptEngine *engine, QScriptValue &level, const TFrameId &fid,
-              const TImageP &drawing) {
+static void setFrame(QScriptEngine *engine, QScriptValue &level, const TFrameId &fid,
+                     const TImageP &drawing) {
   QScriptValueList args;
   args << QString::fromStdString(fid.expand())
        << Wrapper::create(engine, new Image(drawing.getPointer()));
