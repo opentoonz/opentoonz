@@ -98,7 +98,7 @@ void TColumnSelection::explodeChild() {
 
 //-----------------------------------------------------------------------------
 
-bool canMergeColumns(int column, int mColumn, bool forMatchlines) {
+static bool canMergeColumns(int column, int mColumn, bool forMatchlines) {
   TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
   int start, end;
   xsh->getCellRange(column, start, end);

@@ -1972,8 +1972,8 @@ TCALLOC (colval,    lu);*/
       yhi_ += aff.a21;
     }
   }
-  delete colval;
-  delete colheight;
+  delete[] colval;
+  delete[] colheight;
 
   topy = 0;
   /*TCALLOC (nocheight, lx);*/
@@ -2181,8 +2181,8 @@ TCALLOC (colval,    lu);*/
       yhi_ += aff.a21;
     }
   }
-  delete colval;
-  delete colheight;
+  delete[] colval;
+  delete[] colheight;
 
   topy = 0;
   /*TCALLOC (nocheight, lx);*/
@@ -2589,7 +2589,7 @@ void rop_resample_rgbm(TRasterPT<T> rout, const TRasterPT<T> &rin,
 static void free_filter(FILTER *filter, int lx) {
   for (--lx; lx >= 0; lx--)
     if (filter[lx].w_base) delete (filter[lx].w_base);
-  delete (filter);
+  delete[] filter;
 }
 
 //-----------------------------------------------------------------------------
@@ -2772,9 +2772,9 @@ void do_resample(TRasterGR8P rout, const TRaster32P &rin, const TAffine &aff,
                           rown, nocdiamx, coln, nocdiamy);
 
   // free_nocalc (coln);
-  if (coln) delete (coln);
+  if (coln) delete[] coln;
   // free_nocalc (rown);
-  if (rown) delete (rown);
+  if (rown) delete[] rown;
   free_filter(colf, rout->getLy());
   free_filter(rowf, rout->getLx());
   //----NON GESTIAMO ANCORA EXTRA BUFFER

@@ -995,6 +995,10 @@ Voulez-vous continuer?</translation>
         <translation>Réunir les Vecteurs</translation>
     </message>
     <message>
+        <source>Distance</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Mode:</source>
         <translation>Mode:</translation>
     </message>

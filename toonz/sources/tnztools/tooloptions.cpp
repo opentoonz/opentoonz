@@ -1830,6 +1830,14 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
 
   m_Afld->setMeasure("angle");
 
+  if (Preferences::instance()->getUnits() == "pixel") {
+    m_Xfld->setMeasure("length.x");
+    m_Yfld->setMeasure("length.y");
+    m_Wfld->setMeasure("length.x");
+    m_Hfld->setMeasure("length.y");
+    m_Lfld->setMeasure("length.x");
+  }
+
   m_Xfld->setObjectName("RulerToolOptionValues");
   m_Yfld->setObjectName("RulerToolOptionValues");
   m_Wfld->setObjectName("RulerToolOptionValues");

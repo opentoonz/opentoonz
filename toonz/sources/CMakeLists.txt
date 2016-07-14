@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 2.8.11)
+
+set(CMAKE_BUILD_TYPE_INIT Release)
+
 project(OpenToonz)
 
 include(${CMAKE_SOURCE_DIR}/../cmake/util_compiler.cmake)
@@ -117,7 +120,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 if(APPLE)
     set(CMAKE_MACOSX_RPATH ON)
     set(CMAKE_SKIP_BUILD_RPATH FALSE)
-    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
     set(CMAKE_INSTALL_RPATH ${QT_LIB_PATH})
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${QT_LIB_PATH}" isSystemDir)
@@ -448,6 +451,11 @@ add_subdirectory(tcleanupper)
 add_subdirectory(tcomposer)
 add_subdirectory(tconverter)
 add_subdirectory(toonzfarm)
+
+if(APPLE)
+    add_subdirectory(mousedragfilter)
+endif()
+
 if((PLATFORM EQUAL 32) AND (WIN32 OR APPLE))
     add_subdirectory(t32bitsrv)
 endif()

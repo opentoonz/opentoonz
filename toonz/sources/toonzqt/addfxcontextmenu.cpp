@@ -207,7 +207,7 @@ void AddFxContextMenu::fillMenus() {
 
 //---------------------------------------------------
 
-void scan_all_plugins(const std::string &basedir, QObject *listener) {
+static void scan_all_plugins(const std::string &basedir, QObject *listener) {
   // clear_all_plugins();
   new PluginLoadController(basedir, listener);
 }

@@ -69,7 +69,8 @@ typedef std::vector<Player> PlayerSet;
    thickness of
                 images .pli.
 */
-const double Stage::inch = 53.33333;
+const double Stage::inch      = 53.33333;  // consider changing to 120 or 160
+const double Stage::vectorDpi = 53.3333;
 
 namespace {
 void updateOnionSkinSize(const PlayerSet &players) {

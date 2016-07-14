@@ -277,6 +277,10 @@ Stop it or wait for its completion before removing it.</source>
         <source>Contrast:</source>
         <translation>コントラスト：</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>BrowserPopup</name>
@@ -699,6 +703,22 @@ What do you want to do?</source>
         <translation>ドットノイズを自動除去：</translation>
     </message>
     <message>
+        <source>Save In</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Please fill the Save In field.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cleanup Settings (Global)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cleanup Settings: </source>
+        <translation> </translation>
+    </message>
+    <message>
         <source>Cleanup Settings</source>
         <translation>トレース設定</translation>
     </message>
@@ -789,6 +809,30 @@ What do you want to do?</source>
 </context>
 <context>
     <name>ComboViewerPanel</name>
+    <message>
+        <source>Safe Area (Right Click to Select)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Field Guide</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera Stand View</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>3D View</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera View</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Freeze</source>
+        <translation></translation>
+    </message>
     <message>
         <source>GUI Show / Hide</source>
         <translation>GUI 表示/非表示</translation>
@@ -1294,6 +1338,22 @@ before color designing.</source>
         <source>Export File List</source>
         <translation>ファイルリストをエクスポート</translation>
     </message>
+    <message>
+        <source>Up</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Icon</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>List</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>DvItemViewerPanel</name>
@@ -1542,6 +1602,10 @@ before color designing.</source>
 <context>
     <name>FileBrowser</name>
     <message>
+        <source>Folder: </source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Can&apos;t change file extension</source>
         <translation>ファイル拡張子を変更できません</translation>
     </message>
@@ -1727,6 +1791,10 @@ before color designing.</source>
     <message>
         <source>Apply</source>
         <translation>適用</translation>
+    </message>
+    <message>
+        <source>Folder name:</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2357,6 +2425,10 @@ Do you want to create it?</source>
         <source>Intensity:</source>
         <translation>強度:</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>LoadColorModelPopup</name>
@@ -2436,6 +2508,18 @@ Do you want to create it?</source>
 </context>
 <context>
     <name>LoadLevelPopup</name>
+    <message>
+        <source>On Demand</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>All Icons</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>All Icons &amp; Images</source>
+        <translation></translation>
+    </message>
     <message>
         <source>Load Level</source>
         <translation>レベルを読み込み</translation>
@@ -2712,6 +2796,10 @@ Do you want to create it?</source>
     <message>
         <source>&amp;Save Palette As...</source>
         <translation>パレットを保存 (&amp;S)...</translation>
+    </message>
+    <message>
+        <source>&amp;Save Palette</source>
+        <translation>.</translation>
     </message>
     <message>
         <source>&amp;Load Color Model...</source>
@@ -3126,6 +3214,22 @@ Do you want to create it?</source>
         <translation>クローン (&amp;C)</translation>
     </message>
     <message>
+        <source>Drawing Substitution Forward</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Drawing Substitution Backward</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Similar Drawing Substitution Forward</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Similar Drawing Substitution Backward</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>&amp;Set Key</source>
         <translation>キーを設定 (&amp;S)</translation>
     </message>
@@ -3288,6 +3392,10 @@ Do you want to create it?</source>
     <message>
         <source>&amp;Schematic</source>
         <translation>スキマティック (&amp;S)</translation>
+    </message>
+    <message>
+        <source>Toggle FX/Stage schematic</source>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Scene Cast</source>
@@ -3534,6 +3642,14 @@ Do you want to create it?</source>
         <translation>塗りつぶしツール</translation>
     </message>
     <message>
+        <source>Fill Tool - Areas</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Fill Tool - Lines</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Paint Brush Tool</source>
         <translation>ペイントブラシツール</translation>
     </message>
@@ -3548,6 +3664,14 @@ Do you want to create it?</source>
     <message>
         <source>Style Picker Tool</source>
         <translation>スポイトツール</translation>
+    </message>
+    <message>
+        <source>Style Picker Tool - Areas</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Style Picker Tool - Lines</source>
+        <translation></translation>
     </message>
     <message>
         <source>RGB Picker Tool</source>
@@ -3784,6 +3908,30 @@ Do you want to create it?</source>
     <message>
         <source>TypeTool Style</source>
         <translation>文字ツールのスタイル</translation>
+    </message>
+    <message>
+        <source>Active Axis</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Position</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Rotation</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Scale</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Shear</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Center</source>
+        <translation></translation>
     </message>
     <message>
         <source>Build Skeleton Mode</source>
@@ -4160,6 +4308,10 @@ Do you want to create it?</source>
     <message>
         <source>Swap Lock/Unlock</source>
         <translation>ロック切り替え</translation>
+    </message>
+    <message>
+        <source>Hide Upper Columns</source>
+        <translation></translation>
     </message>
     <message>
         <source>Ruler Tool</source>
@@ -4578,7 +4730,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Multiple Rendering: </source>
-        <translation type="vanished">複数レンダリング：</translation>
+        <translation>複数レンダリング：</translation>
+    </message>
+    <message>
+        <source>Do stereoscopy</source>
+        <translation>: </translation>
     </message>
     <message>
         <source>Standard</source>
@@ -5371,6 +5527,19 @@ Do you want to overwrite it?</source>
         <source>Default Level Type:</source>
         <translation>既定のレベル形式：</translation>
     </message>
+    <message>
+        <source>Toonz Vector Level</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Toonz Raster Level</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Raster Level</source>
+        <translation></translation>
+    </message>
+
     <message>
         <source>Autocreation:</source>
         <translation>自動作成:</translation>
@@ -8459,9 +8628,21 @@ Please commit or revert changes first.</source>
         <source>Regenerate Frame Preview</source>
         <translation>プレビューを再計算（現在のフレームのみ）</translation>
     </message>
+   <message>
+        <source>Select </source>
+        <translation></translation>
+    </message>
     <message>
-        <source>Select</source>
-        <translation type="vanished">選択</translation>
+        <source>Show </source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Hide </source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Show / Hide</source>
+        <translation></translation>
     </message>
     <message>
         <source>Reset Subcamera</source>

@@ -200,7 +200,7 @@ int TTcpIpClient::send(int sock, const QString &data) {
 
 //------------------------------------------------------------------------------
 
-int readData(int sock, QString &data) {
+static int readData(int sock, QString &data) {
   int cnt = 0;
   char buff[1024];
   memset(buff, 0, sizeof(buff));

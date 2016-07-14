@@ -28,6 +28,7 @@
 class TCamera;
 class QRadioButton;
 class QComboBox;
+class QLabel;
 class ResListManager;
 class TFilePath;
 class TXshSimpleLevel;
@@ -82,6 +83,9 @@ class DVAPI CameraSettingsWidget final : public QFrame {
   double m_arValue;
   DVGui::IntLineEdit *m_xResFld, *m_yResFld;
   DVGui::DoubleLineEdit *m_xDpiFld, *m_yDpiFld;
+  QLabel *m_dpiLabel;
+  QLabel *m_resLabel;
+  QLabel *m_xLabel;
 
   QPushButton *m_fspChk;  // Force Squared Pixel => dpix == dpiy
 
@@ -147,6 +151,7 @@ public:
 
 protected:
   bool eventFilter(QObject *obj, QEvent *e) override;
+  void showEvent(QShowEvent *e) override;
 
   void hComputeLx();
   void hComputeLy();

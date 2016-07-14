@@ -998,6 +998,10 @@ Do you want to proceed?</source>
         <translation>Unir vectores</translation>
     </message>
     <message>
+        <source>Distance</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Mode:</source>
         <translation>Modo:</translation>
     </message>

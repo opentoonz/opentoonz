@@ -24,8 +24,8 @@
 
 //=============================================================================
 
-bool circumCenter(TPointD &out, const TPointD &a, const TPointD &b,
-                  const TPointD &c) {
+static bool circumCenter(TPointD &out, const TPointD &a, const TPointD &b,
+                         const TPointD &c) {
   double d = 2 * (a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y));
   if (fabs(d) < 0.0001) {
     out = TPointD();

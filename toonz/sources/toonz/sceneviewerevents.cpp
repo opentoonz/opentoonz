@@ -6,6 +6,7 @@
 
 // Tnz6 includes
 #include "sceneviewer.h"
+#include "sceneviewerevents.h"
 #include "viewerpane.h"
 #include "tapp.h"
 #include "iocommand.h"

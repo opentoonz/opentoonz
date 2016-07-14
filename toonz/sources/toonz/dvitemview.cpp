@@ -1820,13 +1820,13 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
 
   QIcon folderUpIcon = createQIconPNG("folderup");
   QAction *folderUp  = new QAction(folderUpIcon, tr("Up One Level"), this);
-  folderUp->setIconText("Up");
+  folderUp->setIconText(tr("Up"));
   addAction(folderUp);
   addSeparator();
 
   QIcon newFolderIcon = createQIconPNG("newfolder");
   QAction *newFolder  = new QAction(newFolderIcon, tr("New Folder"), this);
-  newFolder->setIconText("New");
+  newFolder->setIconText(tr("New"));
   addAction(newFolder);
   addSeparator();
 
@@ -1837,7 +1837,7 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   QIcon thumbViewIcon = createQIconOnOffPNG("viewicon");
   QAction *thumbView  = new QAction(thumbViewIcon, tr("Icons View"), this);
   thumbView->setCheckable(true);
-  thumbView->setIconText("Icon");
+  thumbView->setIconText(tr("Icon"));
   thumbView->setChecked((itemViewer->m_windowType == DvItemViewer::Browser &&
                          DvItemViewerPanel::ThumbnailView == BrowserView) ||
                         (itemViewer->m_windowType == DvItemViewer::Cast &&
@@ -1848,7 +1848,7 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   QIcon listViewIcon = createQIconOnOffPNG("viewlist");
   QAction *listView  = new QAction(listViewIcon, tr("List View"), this);
   listView->setCheckable(true);
-  listView->setIconText("List");
+  listView->setIconText(tr("List"));
   listView->setChecked((itemViewer->m_windowType == DvItemViewer::Browser &&
                         DvItemViewerPanel::TableView == BrowserView) ||
                        (itemViewer->m_windowType == DvItemViewer::Cast &&
@@ -1878,9 +1878,9 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   connect(listView, SIGNAL(triggered()), itemViewer->getPanel(),
           SLOT(setTableView()));
   //	connect(listView      , SIGNAL(triggered()), itemViewer->getPanel(),
-  // SLOT(setListView()));
+  //SLOT(setListView()));
   //	connect(tableView     , SIGNAL(triggered()), itemViewer->getPanel(),
-  // SLOT(setTableView()));
+  //SLOT(setTableView()));
 
   connect(m_folderBack, SIGNAL(triggered()), SIGNAL(folderBack()));
   connect(m_folderFwd, SIGNAL(triggered()), SIGNAL(folderFwd()));

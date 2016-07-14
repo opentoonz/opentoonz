@@ -995,8 +995,8 @@ void DeleteInkDialog::setRange(const QString &str) { m_frames->setText(str); }
          DeleteLinesコマンドから呼ばれる場合：chooseInkがtrue
 --*/
 
-void doDeleteMatchlines(TXshSimpleLevel *sl, const std::set<TFrameId> &fids,
-                        bool chooseInk) {
+static void doDeleteMatchlines(TXshSimpleLevel *sl, const std::set<TFrameId> &fids,
+                               bool chooseInk) {
   std::vector<int> indexes;
   // vector<TToonzImageP> images;
   std::vector<TFrameId> frames;

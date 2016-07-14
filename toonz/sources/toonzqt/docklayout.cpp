@@ -730,7 +730,7 @@ Region *DockLayout::dockItemPrivate(DockWidget *item, Region *r, int idx) {
 //------------------------------------------------------
 
 //! A region is empty, if contains no item and no children.
-bool isEmptyRegion(Region *r) {
+static bool isEmptyRegion(Region *r) {
   if ((!r->getItem()) && (r->getChildList().size() == 0)) {
     delete r;  // Be', e' un po' improprio, ma funziona...
     return true;
@@ -863,8 +863,8 @@ bool DockLayout::undockItem(DockWidget *item) {
 //! Search for the \b nearest n-ple from a \b target one, under conditions:
 //!\b 1) nearest elements belong to \b fixed \b intervals; \b 2) their \b sum is
 //!\b fixed too.
-void calculateNearest(std::vector<double> target, std::vector<double> &nearest,
-                      std::vector<std::pair<int, int>> intervals, double sum) {
+static void calculateNearest(std::vector<double> target, std::vector<double> &nearest,
+                             std::vector<std::pair<int, int>> intervals, double sum) {
   // Solving a small Lagrange multipliers problem to find solution on constraint
   // (2)
   assert(target.size() == intervals.size());

@@ -95,6 +95,7 @@ set(MOC_HEADERS
     scenesettingspopup.h
     sceneviewer.h
     sceneviewercontextmenu.h
+    sceneviewerevents.h
     scriptconsolepanel.h
     selectionutils.h
     shifttracetool.h
@@ -356,6 +357,12 @@ include_directories(
     ../../sources/toonzqt
 )
 
+if(APPLE)
+    include_directories(../../sources/mousedragfilter)
+endif()
+
+
+
 if(WIN32)
     if(PLATFORM EQUAL 32)
         include_directories(
@@ -378,7 +385,9 @@ elseif(APPLE)
     # 変なところにライブラリ生成するカスども
     set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
 
-    target_link_libraries(OpenToonz_${VERSION} Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia ${GL_LIB} ${GLUT_LIB} ${COCOA_LIB} ${EXTRA_LIBS})
+
+    target_link_libraries(OpenToonz_${VERSION} Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia ${GL_LIB} ${GLUT_LIB} ${COCOA_LIB} ${EXTRA_LIBS} mousedragfilter)
+
 elseif(UNIX)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;colorfx;tnzext;image;sound;toonzqt;tnztools")
 
@@ -508,4 +517,3 @@ exec \$OPENTOONZ_BASE/bin/OpenToonz_${VERSION} \"\$@\"
     )
 
 endif()
-

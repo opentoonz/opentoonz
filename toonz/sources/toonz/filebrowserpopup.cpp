@@ -189,11 +189,11 @@ void FileBrowserPopup::addFilterType(const QString &type) {
 
 void FileBrowserPopup::setFileMode(bool isDirectoryOnly) {
   if (m_isDirectoryOnly = isDirectoryOnly) {
-    m_nameFieldLabel->setText("Folder name:");
+    m_nameFieldLabel->setText(tr("Folder name:"));
     connect(m_browser, SIGNAL(treeFolderChanged(const TFilePath &)), this,
             SLOT(onFilePathClicked(const TFilePath &)));
   } else {
-    m_nameFieldLabel->setText("File name:");
+    m_nameFieldLabel->setText(tr("File name:"));
     disconnect(m_browser, SIGNAL(treeFolderChanged(const TFilePath &)), this,
                SLOT(onFilePathClicked(const TFilePath &)));
   }
@@ -631,8 +631,8 @@ LoadLevelPopup::LoadLevelPopup()
 
   //----
   QStringList behaviorList;
-  behaviorList << QString("On Demand") << QString("All Icons")
-               << QString("All Icons & Images");
+  behaviorList << QString(tr("On Demand")) << QString(tr("All Icons"))
+               << QString(tr("All Icons & Images"));
   m_loadTlvBehaviorComboBox->addItems(behaviorList);
   // use the default value set in the preference
   m_loadTlvBehaviorComboBox->setCurrentIndex(

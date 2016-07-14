@@ -122,6 +122,14 @@ public:
   QString getStyleSheet(int index) const;
   int getStyleSheetCount() const;
 
+  void setPixelsOnly(bool state);
+  bool getPixelsOnly() const { return m_pixelsOnly; }
+
+  void storeOldUnits();
+  void resetOldUnits();
+  QString getOldUnits() const { return m_oldUnits; }
+  QString getOldCameraUnits() const { return m_oldCameraUnits; }
+
   void setUnits(std::string s);
   QString getUnits() const { return m_units; }
 
@@ -414,7 +422,8 @@ private:
 
   std::vector<LevelFormat> m_levelFormats;
 
-  QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice, m_ffmpegPath;
+  QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
+      m_oldUnits, m_oldCameraUnits, m_ffmpegPath;;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
 
@@ -436,7 +445,7 @@ private:
       m_generatedMovieViewEnabled, m_xsheetAutopanEnabled,
       m_ignoreAlphaonColumn1Enabled, m_previewAlwaysOpenNewFlipEnabled,
       m_rewindAfterPlaybackEnabled, m_fitToFlipbookEnabled, m_autosaveEnabled,
-      m_defaultViewerEnabled;
+      m_defaultViewerEnabled, m_pixelsOnly;
   bool m_rasterOptimizedMemory, m_saveUnpaintedInCleanup,
       m_askForOverrideRender, m_automaticSVNFolderRefreshEnabled, m_SVNEnabled,
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,

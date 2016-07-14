@@ -347,22 +347,27 @@ TMeasureManager::TMeasureManager() {
   m->add(cameraYFld.clone());
   add(m);
 
+  const double stage_inch = 53.33333;  // Consider changing to 120 or 160
+
   TUnit fxLength(L"fxLength"),
-      fxInch(L"in", new TSimpleUnitConverter(1 / 53.33333)),
-      fxCm(L"cm", new TSimpleUnitConverter(2.54 / 53.33333)),
-      fxMm(L"mm", new TSimpleUnitConverter(25.4 / 53.33333)),
-      fxXfld(L"fld", new TSimpleUnitConverter(2 / 53.33333));
+      fxInch(L"in", new TSimpleUnitConverter(1 / stage_inch)),
+      fxCm(L"cm", new TSimpleUnitConverter(2.54 / stage_inch)),
+      fxMm(L"mm", new TSimpleUnitConverter(25.4 / stage_inch)),
+      fxXfld(L"fld", new TSimpleUnitConverter(2 / stage_inch)),
+      fxPx(L"px", new TSimpleUnitConverter(1));
   fxInch.addExtension(L"inch");
   fxInch.addExtension(L"\"");
   fxInch.addExtension(L"''");
   fxInch.setDefaultExtension(L"\"");
   fxXfld.addExtension(L"field");
   fxXfld.addExtension(L"F");
+  fxPx.addExtension(L"pixel");
   m = new TMeasure("fxLength", fxLength.clone());
   m->add(fxInch.clone());
   m->add(fxCm.clone());
   m->add(fxMm.clone());
   m->add(fxXfld.clone());
+  m->add(fxPx.clone());
   add(m);
 
   m = new TMeasure("angle", degree.clone());

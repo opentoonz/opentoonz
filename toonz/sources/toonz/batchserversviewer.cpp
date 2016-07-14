@@ -246,8 +246,8 @@ void BatchServersViewer::onCurrentItemChanged(QListWidgetItem *_item) {
                 Inherits \b QFrame.
 */
 
-LineEdit *create(QGridLayout *layout, const QString &name, int &row,
-                 bool readOnly = true) {
+static LineEdit *create(QGridLayout *layout, const QString &name, int &row,
+                        bool readOnly = true) {
   layout->addWidget(new QLabel(name), row, 0, Qt::AlignRight);
   LineEdit *ret = new LineEdit();
   ret->setReadOnly(readOnly);

@@ -1,6 +1,7 @@
 
 
 #include "xsheetviewer.h"
+#include "sceneviewerevents.h"
 #include "tapp.h"
 #include "floatingpanelcommand.h"
 #include "menubarcommandids.h"
@@ -398,7 +399,7 @@ void XsheetViewer::setAutoPanSpeed(const QPoint &speed) {
 
 //-----------------------------------------------------------------------------
 
-int getAutoPanSpeed(int pixels) {
+static int getAutoPanSpeed(int pixels) {
   int f = 40;
   return std::min(100, (f - 1 + pixels * f) / 100);
 }
@@ -771,7 +772,6 @@ void XsheetViewer::keyPressEvent(QKeyEvent *event) {
 
   } locals = {this};
 
-  extern bool changeFrameSkippingHolds(QKeyEvent * e);
   if (changeFrameSkippingHolds(event)) return;
 
   int frameCount = getXsheet()->getFrameCount();

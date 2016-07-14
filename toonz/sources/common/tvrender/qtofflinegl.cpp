@@ -190,14 +190,13 @@ void QtOfflineGL::makeCurrent() {
     m_context->moveToThread(QThread::currentThread());
     m_context->makeCurrent(m_surface.get());
   }
-  // else
-  //  m_oldContext = 0;
 }
 
 //-----------------------------------------------------------------------------
 
 void QtOfflineGL::doneCurrent() {
   if (m_context) {
+    m_context->moveToThread(0);
     m_context->doneCurrent();
   }
 }

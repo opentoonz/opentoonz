@@ -756,7 +756,7 @@ void ColumnCmd::insertEmptyColumn(int index) {
 //    Copy Columns  Command
 //*************************************************************************
 
-void copyColumns_internal(const std::set<int> &indices) {
+static void copyColumns_internal(const std::set<int> &indices) {
   assert(!indices.empty());
 
   StageObjectsData *data = new StageObjectsData;
@@ -821,7 +821,7 @@ void ColumnCmd::deleteColumn(int index) {
 // cutColumns
 //-----------------------------------------------------------------------------
 
-void cutColumnsWithoutUndo(std::set<int> *indices) {
+static void cutColumnsWithoutUndo(std::set<int> *indices) {
   copyColumns_internal(*indices);
   deleteColumnsWithoutUndo(indices);
 }
