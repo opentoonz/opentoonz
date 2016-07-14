@@ -180,17 +180,17 @@ void TLevelWriterWebm::save(const TImageP &img, int frameIndex) {
 	image->getRaster()->lock();
 	void *buffin = image->getRaster()->getRawData();
 	assert(buffin);
-	m_buffer = malloc(totalBytes);
-	memcpy(m_buffer, buffin, totalBytes);
+	void *buffer = malloc(totalBytes);
+	memcpy(buffer, buffin, totalBytes);
 	
 	image->getRaster()->unlock();
 	
 	//TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
 	
-	QImage qi((uint8_t*)m_buffer, m_lx, m_ly, QImage::Format_ARGB32);
-	qi.save(tempPng, "PNG", -1);
-
-	
+	QImage* qi= new QImage((uint8_t*)buffer, m_lx, m_ly, QImage::Format_ARGB32);
+	qi->save(tempPng, "PNG", -1);
+	free(buffer);
+	delete qi;
 	QByteArray ba = tempName.toLatin1();
 	const char *charPath = ba.data();
 	
