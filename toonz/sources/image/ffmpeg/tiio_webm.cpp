@@ -10,6 +10,7 @@
 #include "qprocess.h"
 #include "qstringlist.h"
 #include "qdir.h"
+#include "qimage.h"
 
 
 //===========================================================
@@ -163,22 +164,31 @@ void TLevelWriterWebm::saveSoundTrack(TSoundTrack *st)
 //-----------------------------------------------------------
 
 void TLevelWriterWebm::save(const TImageP &img, int frameIndex) {
+	QString tempName = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".ppm";
+	QString tempPng = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".png";
+	QString tempWebp = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".webp";
 	std::string saveStatus = "";
 	TRasterImageP image(img);
 	m_lx = image->getRaster()->getLx();
 	m_ly = image->getRaster()->getLy();
-	int linesize = image->getRaster()->getRowSize();
-	int pixelSize = image->getRaster()->getPixelSize();
+	m_bpp = image->getRaster()->getPixelSize();
+	int totalBytes = m_lx * m_ly * m_bpp;
+	//int linesize = image->getRaster()->getRowSize();
+	//int pixelSize = image->getRaster()->getPixelSize();
 	image->getRaster()->yMirror();
 	//lock raster to get data
 	image->getRaster()->lock();
-
-	uint8_t *buffin = image->getRaster()->getRawData();
+	void *buffin = image->getRaster()->getRawData();
 	assert(buffin);
+	m_buffer = malloc(totalBytes);
+	memcpy(m_buffer, buffin, totalBytes);
+	
+	image->getRaster()->unlock();
 	
 	//TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
-	QString tempName = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".ppm";
-	QString tempPng = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".png";
+	
+	QImage qi((uint8_t*)m_buffer, m_lx, m_ly, QImage::Format_ARGB32);
+	qi.save(tempPng, "PNG", -1);
 
 	
 	QByteArray ba = tempName.toLatin1();
@@ -188,49 +198,54 @@ void TLevelWriterWebm::save(const TImageP &img, int frameIndex) {
 
 	
 	
-	FILE* pFile = fopen(charPath, "wb");
-	if (!pFile)
-		return;
+	//FILE* pFile = fopen(charPath, "wb");
+	//if (!pFile)
+	//	return;
 
-	// Write pixel data
-	for (int y = 0; y<m_ly; y++)
-		fwrite(buffin + y*linesize, 1, m_lx * pixelSize, pFile);
+	//// Write pixel data
+	//for (int y = 0; y<m_ly; y++)
+	//	fwrite(m_buffer + y*linesize, 1, m_lx * pixelSize, pFile);
 
-	m_frameCount++; 
-	// Close file
-	fclose(pFile);
-	image->getRaster()->unlock();
+	//
+	//// Close file
+	//fclose(pFile);
 
-	QStringList args;
+	
+	
+	m_frameCount++;
 
-	args << "-s";
-	args << QString::number(m_lx) + "x" + QString::number(m_ly);
-	args << "-pix_fmt";
-	args << "rgb32";
-	args << "-vcodec";
-	args << "rawvideo";
-	args << "-i";
-	args << tempName;
-	args << "-q";
-	args << "1";
-	args << "-y";
-	args << tempPng;
+	//image->getRaster()->unlock();
+
+	//QStringList args;
+
+	//args << "-s";
+	//args << QString::number(m_lx) + "x" + QString::number(m_ly);
+	//args << "-pix_fmt";
+	//args << "rgb32";
+	//args << "-vcodec";
+	//args << "rawvideo";
+	//args << "-i";
+	//args << tempName;
+	//args << "-q";
+	//args << "1";
+	//args << "-y";
+	//args << tempPng;
 
 
-	//get directory for ffmpeg (ffmpeg binaries also need to be in the folder)
-	QString ffmpegPath = QDir::currentPath();
-	QProcess jpegConvert;
-	//write the file
-	jpegConvert.start(ffmpegPath + "/ffmpeg", args);
-	jpegConvert.waitForFinished(-1);
-	QString results = jpegConvert.readAllStandardError();
-	results += jpegConvert.readAllStandardOutput();
-	jpegConvert.close();
-	std::string strResults = results.toStdString();
+	////get directory for ffmpeg (ffmpeg binaries also need to be in the folder)
+	//QString ffmpegPath = QDir::currentPath();
+	//QProcess jpegConvert;
+	////write the file
+	//jpegConvert.start(ffmpegPath + "/ffmpeg", args);
+	//jpegConvert.waitForFinished(-1);
+	//QString results = jpegConvert.readAllStandardError();
+	//results += jpegConvert.readAllStandardOutput();
+	//jpegConvert.close();
+	//std::string strResults = results.toStdString();
 
-	TFilePath deleteCurrent(tempName);
-	if (TSystem::doesExistFileOrLevel(deleteCurrent))
-		TSystem::deleteFile(deleteCurrent);	
+	//TFilePath deleteCurrent(tempName);
+	//if (TSystem::doesExistFileOrLevel(deleteCurrent))
+	//	TSystem::deleteFile(deleteCurrent);	
 }
 
 

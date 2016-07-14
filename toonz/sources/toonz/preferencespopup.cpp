@@ -772,6 +772,13 @@ void PreferencesPopup::onRegionAntialiasChanged(int on) {
   m_pref->setRegionAntialias(on);
 }
 
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onFfmpegPathChanged() {
+	QString text = m_ffmpegPathFileFld->getPath();
+	m_pref->setFfmpegPath(text.toStdString());
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -901,6 +908,10 @@ PreferencesPopup::PreferencesPopup()
 
   QComboBox *paletteTypeForRasterColorModelComboBox = new QComboBox(this);
 
+  //--- Import/Export ------------------------------
+  categoryList->addItem(tr("Import/Export"));
+  m_ffmpegPathFileFld = new DVGui::FileField(this, QString(""));
+
   //--- Drawing ------------------------------
   categoryList->addItem(tr("Drawing"));
 
@@ -979,10 +990,6 @@ PreferencesPopup::PreferencesPopup()
   m_enableVersionControl = new DVGui::CheckBox(tr("Enable Version Control*"));
   CheckBox *autoRefreshFolderContentsCB =
       new CheckBox(tr("Automatically Refresh Folder Contents"), this);
-
-  //--- Extras ------------------------------
-  categoryList->addItem(tr("Extras"));
-  DVGui::FileField *ffmpegPath = new DVGui::FileField(this, QString(""));
 
   QLabel *note_version =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
@@ -1097,6 +1104,10 @@ PreferencesPopup::PreferencesPopup()
   paletteTypeForRasterColorModelComboBox->addItems(paletteTypes);
   paletteTypeForRasterColorModelComboBox->setCurrentIndex(
       m_pref->getPaletteTypeOnLoadRasterImageAsColorModel());
+  
+  //--- Import/Export ------------------------------
+  QString path = m_pref->getFfmpegPath();
+  m_ffmpegPathFileFld->setPath(path);
 
   //--- Drawing ------------------------------
   keepOriginalCleanedUpCB->setChecked(m_pref->isSaveUnpaintedInCleanupEnable());
@@ -1420,6 +1431,34 @@ PreferencesPopup::PreferencesPopup()
     loadingBox->setLayout(loadingFrameLay);
     stackedWidget->addWidget(loadingBox);
 
+	//--- Import/Export --------------------------
+	QWidget *ioBox = new QWidget(this);
+	QVBoxLayout *ioLay = new QVBoxLayout();
+	ioLay->setMargin(15);
+	ioLay->setSpacing(10);
+	{
+		ioLay->addWidget(new QLabel(tr("OpenToonz can use FFmpeg for additional file formats.")), 0,
+			Qt::AlignCenter | Qt::AlignVCenter);
+		ioLay->addWidget(new QLabel(tr("FFmpeg is not bundled with OpenToonz")), 0,
+			Qt::AlignCenter | Qt::AlignVCenter);
+		ioLay->addWidget(new QLabel(tr("Please provide the path where FFmpeg is located on your computer.")), 0,
+			Qt::AlignLeft | Qt::AlignVCenter);
+		QGridLayout *ioGridLay = new QGridLayout();
+		ioGridLay->setVerticalSpacing(10);
+		ioGridLay->setHorizontalSpacing(15);
+		ioGridLay->setMargin(0);
+		{
+			ioGridLay->addWidget(new QLabel(tr("FFmpeg Path: ")), 0, 0, Qt::AlignRight);
+			ioGridLay->addWidget(m_ffmpegPathFileFld, 0, 1, 1, 3);
+		}
+		ioLay->addLayout(ioGridLay);
+		ioLay->addStretch(1);
+
+		ioLay->addWidget(note_version, 0);
+	}
+	ioBox->setLayout(ioLay);
+	stackedWidget->addWidget(ioBox);
+
     //--- Drawing --------------------------
     QWidget *drawingBox          = new QWidget(this);
     QVBoxLayout *drawingFrameLay = new QVBoxLayout();
@@ -1633,23 +1672,7 @@ PreferencesPopup::PreferencesPopup()
     versionControlBox->setLayout(vcLay);
     stackedWidget->addWidget(versionControlBox);
 
-	//--- Extras --------------------------
-	QWidget *extrasBox = new QWidget(this);
-	QVBoxLayout *extrasLay = new QVBoxLayout();
-	extrasLay->setMargin(15);
-	extrasLay->setSpacing(10);
-	{
-		extrasLay->addWidget(ffmpegPath, 0,
-			Qt::AlignLeft | Qt::AlignVCenter);
-		
-		extrasLay->addStretch(1);
-
-		extrasLay->addWidget(note_version, 0);
-	}
-	extrasBox->setLayout(extrasLay);
-	stackedWidget->addWidget(extrasBox);
-
-    mainLayout->addWidget(stackedWidget, 1);
+	mainLayout->addWidget(stackedWidget, 1);
   }
   setLayout(mainLayout);
 
@@ -1766,6 +1789,10 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(paletteTypeForRasterColorModelComboBox,
                        SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onPaletteTypeForRasterColorModelChanged(int)));
+
+  //--- Import/Export ----------------------
+  ret = ret && connect(m_ffmpegPathFileFld, SIGNAL(pathChanged()), this,
+	  SLOT(onFfmpegPathChanged()));
 
   //--- Drawing ----------------------
   ret = ret && connect(keepOriginalCleanedUpCB, SIGNAL(stateChanged(int)), this,

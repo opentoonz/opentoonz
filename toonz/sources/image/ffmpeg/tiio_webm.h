@@ -31,10 +31,11 @@ public:
 	}
 
 private:
-	int m_frameCount, m_lx, m_ly;
+	int m_frameCount, m_lx, m_ly, m_bpp;
 	double m_fps;
 	int m_scale;
 	int m_vidQuality;
+	void *m_buffer;
 };
 
 //===========================================================

@@ -72,8 +72,9 @@
 #include "./pli/tiio_pli.h"
 #include "./tzl/tiio_tzl.h"
 #include "./svg/tiio_svg.h"
-#include "./gif/tiio_gif.h"
-#include "./webm/tiio_webm.h"
+#include "./ffmpeg/tiio_gif.h"
+#include "./ffmpeg/tiio_webm.h"
+#include "./ffmpeg/tiio_mp4.h"
 #include "./mesh/tiio_mesh.h"
 
 //-------------------------------------------------------------------
@@ -172,6 +173,10 @@ void initImageIo(bool lightVersion) {
   TFileType::declare("gif", TFileType::RASTER_LEVEL);
   Tiio::defineWriterProperties("gif", new Tiio::GifWriterProperties());
 
+  TLevelWriter::define("mp4", TLevelWriterMp4::create, true);
+  //TLevelReader::define("mp4", TLevelReaderMp4::create);
+  TFileType::declare("mp4", TFileType::RASTER_LEVEL);
+  Tiio::defineWriterProperties("mp4", new Tiio::Mp4WriterProperties());
 
   //end ffmpeg
 

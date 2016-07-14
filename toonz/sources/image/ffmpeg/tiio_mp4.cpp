@@ -3,7 +3,7 @@
 //#include "texception.h"
 #include "tfilepath.h"
 #include "tproperty.h"
-#include "tiio_webm.h"
+#include "tiio_mp4.h"
 #include "tenv.h"
 #include "trasterimage.h"
 #include "timageinfo.h"
@@ -14,39 +14,39 @@
 
 //===========================================================
 //
-//  TImageWriterWebm
+//  TImageWriterMp4
 //
 //===========================================================
 
-class TImageWriterWebm : public TImageWriter {
+class TImageWriterMp4 : public TImageWriter {
 public:
 	int m_frameIndex;
 
-	TImageWriterWebm(const TFilePath &path, int frameIndex, TLevelWriterWebm *lwg)
+	TImageWriterMp4(const TFilePath &path, int frameIndex, TLevelWriterMp4 *lwg)
 		: TImageWriter(path), m_frameIndex(frameIndex), m_lwg(lwg) {
 		m_lwg->addRef();
 		
 	}
-	~TImageWriterWebm() { m_lwg->release(); }
+	~TImageWriterMp4() { m_lwg->release(); }
 
 	bool is64bitOutputSupported() override { return false; }
 	void save(const TImageP &img) override { m_lwg->save(img, m_frameIndex); }
 
 private:
-	TLevelWriterWebm *m_lwg;
+	TLevelWriterMp4 *m_lwg;
 
 };
 
 
 //===========================================================
 //
-//  TLevelWriterWebm;
+//  TLevelWriterMp4;
 //
 //===========================================================
 
-TLevelWriterWebm::TLevelWriterWebm(const TFilePath &path, TPropertyGroup *winfo)
+TLevelWriterMp4::TLevelWriterMp4(const TFilePath &path, TPropertyGroup *winfo)
 	: TLevelWriter(path, winfo) {
-	if (!m_properties) m_properties = new Tiio::WebmWriterProperties();
+	if (!m_properties) m_properties = new Tiio::Mp4WriterProperties();
 	std::string scale = m_properties->getProperty("Scale")->getValueAsString();
 	sscanf(scale.c_str(), "%d", &m_scale);
 	std::string quality = m_properties->getProperty("Quality")->getValueAsString();
@@ -57,9 +57,9 @@ TLevelWriterWebm::TLevelWriterWebm(const TFilePath &path, TPropertyGroup *winfo)
 
 //-----------------------------------------------------------
 
-TLevelWriterWebm::~TLevelWriterWebm()
+TLevelWriterMp4::~TLevelWriterMp4()
 {
-	QProcess createWebm;
+	QProcess createMp4;
 	QStringList args;
 
 	
@@ -111,11 +111,11 @@ TLevelWriterWebm::~TLevelWriterWebm()
 	std::string ffmpegstrpath = ffmpegPath.toStdString();
 
 	//write the file
-	createWebm.start(ffmpegPath + "/ffmpeg", args);
-	createWebm.waitForFinished(-1);
-	QString results = createWebm.readAllStandardError();
-	results += createWebm.readAllStandardOutput();
-	createWebm.close();
+	createMp4.start(ffmpegPath + "/ffmpeg", args);
+	createMp4.waitForFinished(-1);
+	QString results = createMp4.readAllStandardError();
+	results += createMp4.readAllStandardOutput();
+	createMp4.close();
 	std::string strResults = results.toStdString();
 
 	QString deletePath = m_path.getQString() + "tempOut";
@@ -138,23 +138,23 @@ TLevelWriterWebm::~TLevelWriterWebm()
 
 //-----------------------------------------------------------
 
-TImageWriterP TLevelWriterWebm::getFrameWriter(TFrameId fid) {
+TImageWriterP TLevelWriterMp4::getFrameWriter(TFrameId fid) {
 	//if (IOError != 0)
 	//	throw TImageException(m_path, buildGifExceptionString(IOError));
 	if (fid.getLetter() != 0) return TImageWriterP(0);
 	int index = fid.getNumber();
-	TImageWriterWebm *iwg = new TImageWriterWebm(m_path, index, this);
+	TImageWriterMp4 *iwg = new TImageWriterMp4(m_path, index, this);
 	return TImageWriterP(iwg);
 }
 
 //-----------------------------------------------------------
-void TLevelWriterWebm::setFrameRate(double fps)
+void TLevelWriterMp4::setFrameRate(double fps)
 {
 	m_fps = fps;
 	m_frameRate = fps;
 }
 
-void TLevelWriterWebm::saveSoundTrack(TSoundTrack *st)
+void TLevelWriterMp4::saveSoundTrack(TSoundTrack *st)
 {
 	return;
 }
@@ -162,7 +162,7 @@ void TLevelWriterWebm::saveSoundTrack(TSoundTrack *st)
 
 //-----------------------------------------------------------
 
-void TLevelWriterWebm::save(const TImageP &img, int frameIndex) {
+void TLevelWriterMp4::save(const TImageP &img, int frameIndex) {
 	std::string saveStatus = "";
 	TRasterImageP image(img);
 	m_lx = image->getRaster()->getLx();
@@ -236,30 +236,30 @@ void TLevelWriterWebm::save(const TImageP &img, int frameIndex) {
 
 //===========================================================
 //
-//  TImageReaderWebm
+//  TImageReaderMp4
 //
 //===========================================================
 
-class TImageReaderWebm final : public TImageReader {
+class TImageReaderMp4 final : public TImageReader {
 public:
 	int m_frameIndex;
 
-	TImageReaderWebm(const TFilePath &path, int index, TLevelReaderWebm *lra)
+	TImageReaderMp4(const TFilePath &path, int index, TLevelReaderMp4 *lra)
 		: TImageReader(path), m_lra(lra), m_frameIndex(index) {
 		m_lra->addRef();
 	}
-	~TImageReaderWebm() { m_lra->release(); }
+	~TImageReaderMp4() { m_lra->release(); }
 
 	TImageP load() override { return m_lra->load(m_frameIndex); }
 	TDimension getSize() const { return m_lra->getSize(); }
 	TRect getBBox() const { return TRect(); }
 
 private:
-	TLevelReaderWebm *m_lra;
+	TLevelReaderMp4 *m_lra;
 
 	// not implemented
-	TImageReaderWebm(const TImageReaderWebm &);
-	TImageReaderWebm &operator=(const TImageReaderWebm &src);
+	TImageReaderMp4(const TImageReaderMp4 &);
+	TImageReaderMp4 &operator=(const TImageReaderMp4 &src);
 };
 
 //===========================================================
@@ -269,7 +269,7 @@ private:
 //===========================================================
 
 
-TLevelReaderWebm::TLevelReaderWebm(const TFilePath &path)
+TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path)
 	: TLevelReader(path)
 
 
@@ -403,11 +403,11 @@ TLevelReaderWebm::TLevelReaderWebm(const TFilePath &path)
 }
 //-----------------------------------------------------------
 
-TLevelReaderWebm::~TLevelReaderWebm() {}
+TLevelReaderMp4::~TLevelReaderMp4() {}
 
 //-----------------------------------------------------------
 
-TLevelP TLevelReaderWebm::loadInfo() {
+TLevelP TLevelReaderMp4::loadInfo() {
 	
 	if (m_numFrames == -1) return TLevelP();
 	TLevelP level;
@@ -417,25 +417,25 @@ TLevelP TLevelReaderWebm::loadInfo() {
 
 //-----------------------------------------------------------
 
-TImageReaderP TLevelReaderWebm::getFrameReader(TFrameId fid) {
+TImageReaderP TLevelReaderMp4::getFrameReader(TFrameId fid) {
 	//if (IOError != 0)
 	//	throw TImageException(m_path, buildAVIExceptionString(IOError));
 	if (fid.getLetter() != 0) return TImageReaderP(0);
 	int index = fid.getNumber();
 
-	TImageReaderWebm *irm = new TImageReaderWebm(m_path, index, this);
+	TImageReaderMp4 *irm = new TImageReaderMp4(m_path, index, this);
 	return TImageReaderP(irm);
 }
 
 //------------------------------------------------------------------------------
 
-TDimension TLevelReaderWebm::getSize() {
+TDimension TLevelReaderMp4::getSize() {
 	return m_size;
 }
 
 //------------------------------------------------
 
-TImageP TLevelReaderWebm::load(int frameIndex) {
+TImageP TLevelReaderMp4::load(int frameIndex) {
 	
 	TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
 	QString number = QString("%1").arg(frameIndex, 3, 10, QChar('0'));
@@ -470,7 +470,7 @@ TImageP TLevelReaderWebm::load(int frameIndex) {
 	////sizeResults += probe.readAllStandardOutput();
 	//ffmpeg.close();
 	//std::string framesStr = frameResults.toStdString();
-	//time for i in{ 0..39 }; do ffmpeg - accurate_seek - ss `echo $i*60.0 | bc` - i input.webm - frames:v 1 period_down_$i.bmp; done;
+	//time for i in{ 0..39 }; do ffmpeg - accurate_seek - ss `echo $i*60.0 | bc` - i input.mp4 - frames:v 1 period_down_$i.bmp; done;
 	
 	QFile file(tempName);
 	file.open(QIODevice::ReadOnly);
@@ -492,12 +492,12 @@ TImageP TLevelReaderWebm::load(int frameIndex) {
 
 
 
-Tiio::WebmWriterProperties::WebmWriterProperties()
+Tiio::Mp4WriterProperties::Mp4WriterProperties()
 	: m_vidQuality("Quality", 1, 100, 65), m_scale("Scale", 1, 100, 100) {
 		bind(m_vidQuality);
 		bind(m_scale);
 	
 }
 
-//Tiio::Reader* Tiio::makeWebmReader(){ return nullptr; }
-//Tiio::Writer* Tiio::makeWebmWriter(){ return nullptr; }
+//Tiio::Reader* Tiio::makeMp4Reader(){ return nullptr; }
+//Tiio::Writer* Tiio::makeMp4Writer(){ return nullptr; }

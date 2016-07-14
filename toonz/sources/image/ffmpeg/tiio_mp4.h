@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef TTIO_WEBM_INCLUDED
-#define TTIO_WEBM_INCLUDED
+#ifndef TTIO_MP4_INCLUDED
+#define TTIO_MP4_INCLUDED
 
 #include "tproperty.h"
 #include "tlevel_io.h"
@@ -9,15 +9,15 @@
 
 //===========================================================
 //
-//  TLevelWriterWebm
+//  TLevelWriterMp4
 //
 //===========================================================
 
-class TLevelWriterWebm : public TLevelWriter {
+class TLevelWriterMp4 : public TLevelWriter {
 
 public:
-	TLevelWriterWebm(const TFilePath &path, TPropertyGroup *winfo);
-	~TLevelWriterWebm();
+	TLevelWriterMp4(const TFilePath &path, TPropertyGroup *winfo);
+	~TLevelWriterMp4();
 	//FfmpegBridge* ffmpeg;
 	void setFrameRate(double fps);
 
@@ -27,33 +27,34 @@ public:
 	void saveSoundTrack(TSoundTrack *st);
 
 	static TLevelWriter *create(const TFilePath &path, TPropertyGroup *winfo) {
-		return new TLevelWriterWebm(path, winfo);
+		return new TLevelWriterMp4(path, winfo);
 	}
 
 private:
-	int m_frameCount, m_lx, m_ly;
+	int m_frameCount, m_lx, m_ly, m_bpp;
 	double m_fps;
 	int m_scale;
 	int m_vidQuality;
+	void *m_buffer;
 };
 
 //===========================================================
 //
-//  TLevelReaderWebm
+//  TLevelReaderMp4
 //
 //===========================================================
 
-class TLevelReaderWebm final : public TLevelReader {
+class TLevelReaderMp4 final : public TLevelReader {
 public:
-	TLevelReaderWebm(const TFilePath &path);
-	~TLevelReaderWebm();
+	TLevelReaderMp4(const TFilePath &path);
+	~TLevelReaderMp4();
 	TImageReaderP getFrameReader(TFrameId fid) override;
 
 	static TLevelReader *create(const TFilePath &f) {
-		return new TLevelReaderWebm(f);
+		return new TLevelReaderMp4(f);
 	}
 
-	
+
 	TLevelP loadInfo() override;
 	TImageP load(int frameIndex);
 	TDimension getSize();
@@ -68,23 +69,23 @@ private:
 
 namespace Tiio {
 
-//===========================================================================
+	//===========================================================================
 
-class WebmWriterProperties : public TPropertyGroup {
-public:
-  // TEnumProperty m_pixelSize;
-  //TBoolProperty m_matte;
-	TIntProperty m_vidQuality;
-	TIntProperty m_scale;
-    WebmWriterProperties();
-};
+	class Mp4WriterProperties : public TPropertyGroup {
+	public:
+		// TEnumProperty m_pixelSize;
+		//TBoolProperty m_matte;
+		TIntProperty m_vidQuality;
+		TIntProperty m_scale;
+		Mp4WriterProperties();
+	};
 
 
 
-//===========================================================================
+	//===========================================================================
 
-//Tiio::Reader *makeWebmReader();
-//Tiio::Writer *makeWebmWriter();
+	//Tiio::Reader *makeMp4Reader();
+	//Tiio::Writer *makeMp4Writer();
 
 }  // namespace
 
