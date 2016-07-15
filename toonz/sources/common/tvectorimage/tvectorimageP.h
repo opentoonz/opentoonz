@@ -264,7 +264,14 @@ private:
   Imp &operator=(const Imp &);
 };
 
+// Functions
+
 void addRegion(std::vector<TRegion *> &regionArray, TRegion *region);
+
+void transferColors(const std::list<TEdge *> &oldList,
+                    const std::list<TEdge *> &newList, bool isStrokeChanged,
+                    bool isFlipped, bool overwriteColor);
+
 //=============================================================================
 
 #endif

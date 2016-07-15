@@ -537,8 +537,8 @@ void drawQuadratic(const TQuadratic &quad, double pixelSize) {
 
 //-----------------------------------------------------------------------------
 
-void makeOutline(const TStroke *stroke, int startQuad, int endQuad,
-                 outlineBoundary &ob, double error2) {
+static void makeOutline(const TStroke *stroke, int startQuad, int endQuad,
+                        outlineBoundary &ob, double error2) {
   // std::ofstream cout("c:\\temp\\outline.txt");
 
   assert(stroke);
@@ -628,7 +628,7 @@ void makeOutline(const TStroke *stroke, int startQuad, int endQuad,
 
 //-----------------------------------------------------------------------------
 
-void drawOutline(const outlineBoundary &ob, double pixelSize) {
+static void drawOutline(const outlineBoundary &ob, double pixelSize) {
   for (UINT i = 0; i < ob.size(); ++i) {
     drawQuadratic(*ob[i].first, pixelSize);
     drawQuadratic(*ob[i].second, pixelSize);

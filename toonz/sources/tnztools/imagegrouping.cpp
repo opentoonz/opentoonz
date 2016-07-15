@@ -616,9 +616,9 @@ refStroke, count, refStroke+count)>commonDepth(vimg, refStroke, count, prev))
   if(count==0) return;
   */
 
-int doMoveGroup(UCHAR moveType, TVectorImage *vimg,
-                const std::vector<std::pair<TStroke *, int>> &selectedGroups,
-                int index) {
+static int doMoveGroup(UCHAR moveType, TVectorImage *vimg,
+                       const std::vector<std::pair<TStroke *, int>> &selectedGroups,
+                       int index) {
   int refStroke = vimg->getStrokeIndex(selectedGroups[index].first);
   int count     = selectedGroups[index].second;
 

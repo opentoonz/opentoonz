@@ -195,7 +195,7 @@ TFilePath setToonzFolder(const TFilePath &filename, std::string toonzVar) {
 
 //==============================================================================================
 
-void prepareToCleanup(TXshSimpleLevel *xl, TPalette *cleanupPalette) {
+static void prepareToCleanup(TXshSimpleLevel *xl, TPalette *cleanupPalette) {
   assert(xl->getScene());
   if (xl->getProperties()->getSubsampling() != 1) {
     xl->getProperties()->setSubsampling(1);
@@ -241,7 +241,7 @@ string TaskId;
 //
 //------------------------------------------------------------------------
 
-void searchLevelsToCleanup(
+static void searchLevelsToCleanup(
     std::vector<std::pair<TXshSimpleLevel *, std::set<TFrameId>>> &levels,
     TXsheet *xsh, bool selectedOnly) {
   std::map<wstring, TXshSimpleLevel *> levelTable;
@@ -308,7 +308,7 @@ void searchLevelsToCleanup(
 
 //------------------------------------------------------------------------------
 /*- CleanupDefaultパレットを追加する -*/
-void addCleanupDefaultPalette(TXshSimpleLevel *sl) {
+static void addCleanupDefaultPalette(TXshSimpleLevel *sl) {
   /*- 元となるパレットはStudioPaletteフォルダに置く -*/
   TFilePath palettePath =
       ToonzFolder::getStudioPaletteFolder() + "cleanup_default.tpl";
@@ -384,9 +384,9 @@ void addCleanupDefaultPalette(TXshSimpleLevel *sl) {
 //
 //------------------------------------------------------------------------
 
-void cleanupLevel(TXshSimpleLevel *xl, std::set<TFrameId> fidsInXsheet,
-                  ToonzScene *scene, bool overwrite,
-                  TUserLogAppend &m_userLog) {
+static void cleanupLevel(TXshSimpleLevel *xl, std::set<TFrameId> fidsInXsheet,
+                         ToonzScene *scene, bool overwrite,
+                         TUserLogAppend &m_userLog) {
   prepareToCleanup(xl, scene->getProperties()
                            ->getCleanupParameters()
                            ->m_cleanupPalette.getPointer());
@@ -847,4 +847,4 @@ namespace {
 const char *toonzVersion = "Toonz 7.1";
 }  // namespace
 
-string getToonzVersion() { return toonzVersion; }
+static string getToonzVersion() { return toonzVersion; }

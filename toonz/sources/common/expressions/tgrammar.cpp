@@ -23,9 +23,9 @@
 
 #include "tgrammar.h"
 
-const double PI = 4 * atan(1.0);
-const double toDeg(double rad) { return rad * 180.0 / PI; }
-const double toRad(double deg) { return deg / 180.0 * PI; }
+static const double PI = 4 * atan(1.0);
+static const double toDeg(double rad) { return rad * 180.0 / PI; }
+static const double toRad(double deg) { return deg / 180.0 * PI; }
 
 namespace TSyntax {
 

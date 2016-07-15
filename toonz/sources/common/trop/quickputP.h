@@ -11,6 +11,11 @@ void quickPut(const TRasterP &dn, const TRasterP &up, const TAffine &aff,
               bool doPremultiply = false, bool whiteTransp = false,
               bool firstColumn = false, bool doRasterDarkenBlendedView = false);
 
+void quickPut(const TRasterP &dn, const TRasterP &up, const TAffine &aff,
+              TRop::ResampleFilterType filterType, const TPixel32 &colorScale,
+              bool doPremultiply, bool whiteTransp, bool firstColumn,
+              bool doRasterDarkenBlendedView);
+
 void quickResample(const TRasterP &dn, const TRasterP &up, const TAffine &aff,
                    TRop::ResampleFilterType filterType);
 

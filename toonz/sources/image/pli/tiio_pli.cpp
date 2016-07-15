@@ -277,7 +277,7 @@ TImageP TImageReaderPli::load() {
 
 //===========================================================================
 
-void readRegionVersion4x(IntersectionDataTag *tag, TVectorImage *img) {
+static void readRegionVersion4x(IntersectionDataTag *tag, TVectorImage *img) {
 #ifndef NEW_REGION_FILL
   img->setFillData(tag->m_branchArray, tag->m_branchCount);
 #endif
@@ -316,7 +316,7 @@ void createStroke(ThickQuadraticChainTag *quadTag, TVectorImage *outVectImage,
 
 //-----------------------------------------------------------------------------
 
-void createGroup(GroupTag *groupTag, TVectorImage *vi, CreateStrokeData &data) {
+static void createGroup(GroupTag *groupTag, TVectorImage *vi, CreateStrokeData &data) {
   int count = vi->getStrokeCount();
   for (int j = 0; j < groupTag->m_numObjects; j++) {
     if (groupTag->m_object[j]->m_type == PliTag::COLOR_NGOBJ)
@@ -443,8 +443,8 @@ TImageWriterPli::TImageWriterPli(const TFilePath &f, const TFrameId &frameId,
 
 //-----------------------------------------------------------------------------
 
-void putStroke(TStroke *stroke, int &currStyleId,
-               std::vector<PliObjectTag *> &tags) {
+static void putStroke(TStroke *stroke, int &currStyleId,
+                      std::vector<PliObjectTag *> &tags) {
   double maxThickness = 0;
   assert(stroke);
 

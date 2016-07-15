@@ -527,7 +527,7 @@ void TImageWriter::setProperties(const TPropertyGroup *g) {
 
 //-----------------------------------------------------------
 
-void convertForWriting(TRasterP &ras, const TRasterP &rin, int bpp) {
+static void convertForWriting(TRasterP &ras, const TRasterP &rin, int bpp) {
   switch (bpp) {
   case 1:
   case 8:

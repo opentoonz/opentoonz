@@ -38,6 +38,7 @@
 #include "toonz/levelset.h"
 #include "toonz/txshchildlevel.h"
 #include "toonz/fxdag.h"
+#include "toonz/tcolumnfx.h"
 #include "toonz/tcolumnfxset.h"
 #include "toonz/stage.h"
 #include "toonz/fill.h"

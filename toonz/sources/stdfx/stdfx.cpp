@@ -687,4 +687,7 @@ return &info;
 
 */
 
+/* TODO, move to header */
+DV_EXPORT_API void initStdFx();
+
 DV_EXPORT_API void initStdFx() {}

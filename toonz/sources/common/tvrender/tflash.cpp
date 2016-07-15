@@ -32,13 +32,13 @@ TNZ_LITTLE_ENDIAN undefined !!
 
     int Tw = 0;
 
-bool areTwEqual(double x, double y) {
+static bool areTwEqual(double x, double y) {
   assert(Tw != 0);
 
   return (int)(Tw * x) == (int)(Tw * y);
 }
 
-bool areTwEqual(TPointD p0, TPointD p1) {
+static bool areTwEqual(TPointD p0, TPointD p1) {
   assert(Tw != 0);
 
   return areTwEqual(p0.x, p1.x) && areTwEqual(p0.y, p1.y);
@@ -184,7 +184,7 @@ public:
   TImageP m_img;
 };
 
-double computeAverageThickness(const TStroke *s) {
+static double computeAverageThickness(const TStroke *s) {
   int count       = s->getControlPointCount();
   double resThick = 0;
   int i;
@@ -198,8 +198,8 @@ double computeAverageThickness(const TStroke *s) {
   return resThick / (s->getControlPointCount() - 4);
 }
 
-void putquads(const TStroke *s, double w0, double w1,
-              std::vector<TQuadratic *> &quads) {
+static void putquads(const TStroke *s, double w0, double w1,
+                     std::vector<TQuadratic *> &quads) {
   int chunkIndex0, chunkIndex1, i;
   double dummy;
   bool ret;
@@ -216,9 +216,9 @@ void putquads(const TStroke *s, double w0, double w1,
 
 //-------------------------------------------------------------------
 
-void computeOutlineBoundary(std::vector<TStroke *> &outlines,
-                            std::list<FlashPolyline> &polylinesArray,
-                            const TPixel &color) {
+static void computeOutlineBoundary(std::vector<TStroke *> &outlines,
+                                   std::list<FlashPolyline> &polylinesArray,
+                                   const TPixel &color) {
   UINT size = polylinesArray.size();
 
   std::vector<std::vector<TQuadratic *>> quads;
@@ -273,7 +273,7 @@ bool PolyStyle::operator==(const PolyStyle &p) const {
 
 //-------------------------------------------------------------------
 
-bool affineMinorThen(const TAffine &m0, const TAffine &m1) {
+static bool affineMinorThen(const TAffine &m0, const TAffine &m1) {
   if (m0.a11 == m1.a11) {
     if (m0.a12 == m1.a12) {
       if (m0.a13 == m1.a13) {
@@ -323,8 +323,8 @@ bool PolyStyle::operator<(const PolyStyle &p) const {
 
 //-------------------------------------------------------------------
 
-void computeQuadChain(const TEdge &e, std::vector<TQuadratic *> &quadArray,
-                      std::vector<TQuadratic *> &toBeDeleted) {
+static void computeQuadChain(const TEdge &e, std::vector<TQuadratic *> &quadArray,
+                             std::vector<TQuadratic *> &toBeDeleted) {
   int chunk_b, chunk_e, chunk = -1;
   double t_b, t_e, w0, w1;
   TThickQuadratic *q_b = 0, *q_e = 0;

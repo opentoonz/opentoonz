@@ -849,7 +849,7 @@ void TrackerTool::onDeactivate() {
 
 //=============================================================================
 
-TTool *getTrackerToolTool() { return &trackerTool; }
+static TTool *getTrackerToolTool() { return &trackerTool; }
 
 //=============================================================================
 

@@ -107,7 +107,7 @@ public:
 
 extern "C" {
 
-void sdl_fill_audio(void *udata, Uint8 *stream, int len) {
+static void sdl_fill_audio(void *udata, Uint8 *stream, int len) {
   TSoundOutputDeviceImp *_this = (TSoundOutputDeviceImp *)udata;
   MyData *myData               = _this->m_data;
 

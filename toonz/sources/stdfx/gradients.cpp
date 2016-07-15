@@ -4,6 +4,9 @@
 #include "traster.h"
 
 #include "tspectrumparam.h"
+
+#include "gradients.h"
+
 //------------------------------------------------------------------
 
 namespace {

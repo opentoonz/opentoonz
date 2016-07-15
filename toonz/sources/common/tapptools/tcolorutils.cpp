@@ -456,7 +456,7 @@ assert(areAlmostEqual(a*v*v*v+b*v*v+c*v+d, 0.0));
 
 //------------------------------------------------------------------------------
 
-void clusterize(ClusterContainer &clusters, int clustersCount) {
+static void clusterize(ClusterContainer &clusters, int clustersCount) {
   unsigned int clustersSize = clusters.size();
   assert(clustersSize >= 1);
 
@@ -737,8 +737,8 @@ void Cluster::getMeanAxis(KEYER_FLOAT axis[3]) {
 
 //#define METODO_USATO_SU_TOONZ46
 
-void buildPaletteForBlendedImages(std::set<TPixel32> &palette,
-                                  const TRaster32P &raster, int maxColorCount) {
+static void buildPaletteForBlendedImages(std::set<TPixel32> &palette,
+                                         const TRaster32P &raster, int maxColorCount) {
   int lx = raster->getLx();
   int ly = raster->getLy();
 

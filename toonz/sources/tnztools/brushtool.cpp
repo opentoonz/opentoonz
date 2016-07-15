@@ -89,8 +89,8 @@ TEnv::DoubleVar RasterBrushHardness("RasterBrushHardness", 100);
 // note: stroke is unchanged
 //
 
-void split(TStroke *stroke, const std::vector<double> &parameterValues,
-           std::vector<TStroke *> &strokes) {
+static void split(TStroke *stroke, const std::vector<double> &parameterValues,
+                  std::vector<TStroke *> &strokes) {
   TThickPoint p2;
   std::vector<TThickPoint> points;
   TThickPoint lastPoint = stroke->getControlPoint(0);
@@ -199,7 +199,7 @@ void split(TStroke *stroke, const std::vector<double> &parameterValues,
 //      Note: if the curve is a single point (that's dp=0) or it is a straight
 //      line (that's ddp=0) return 0
 
-double curvature(TPointD dp, TPointD ddp) {
+static double curvature(TPointD dp, TPointD ddp) {
   if (dp == TPointD(0, 0))
     return 0;
   else
@@ -217,9 +217,9 @@ double curvature(TPointD dp, TPointD ddp) {
 // Output:
 //      parameterValues = vector of max curvature parameter points
 
-void findMaxCurvPoints(TStroke *stroke, const float &angoloLim,
-                       const float &curvMaxLim,
-                       std::vector<double> &parameterValues) {
+static void findMaxCurvPoints(TStroke *stroke, const float &angoloLim,
+                              const float &curvMaxLim,
+                              std::vector<double> &parameterValues) {
   TPointD tg1, tg2;  // Tangent vectors
 
   TPointD dp, ddp;  // First and Second derivate.
@@ -320,9 +320,9 @@ void findMaxCurvPoints(TStroke *stroke, const float &angoloLim,
   }
 }
 
-void addStroke(TTool::Application *application, const TVectorImageP &vi,
-               TStroke *stroke, bool breakAngles, bool frameCreated,
-               bool levelCreated) {
+static void addStroke(TTool::Application *application, const TVectorImageP &vi,
+                      TStroke *stroke, bool breakAngles, bool frameCreated,
+                      bool levelCreated) {
   QMutexLocker lock(vi->getMutex());
 
   if (application->getCurrentObject()->isSpline()) {
