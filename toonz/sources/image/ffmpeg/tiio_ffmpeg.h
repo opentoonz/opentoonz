@@ -6,10 +6,11 @@
 //#include "tproperty.h"
 #include "tlevel_io.h"
 #include <QVector>
-#include <QStringlist>
+#include <QStringList>
 //#include "tthreadmessage.h"
 
 class Ffmpeg {
+
 public:
 	Ffmpeg();
 	~Ffmpeg();
