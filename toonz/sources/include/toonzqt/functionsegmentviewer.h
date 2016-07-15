@@ -91,9 +91,11 @@ private:
   // for displaying the types of neighbor segments
   QString typeToString(int type) const;
 
+public slots:
+  void onCurveChanged();
+
 private slots:
   void onSegmentTypeChanged(int type);
-  void onCurveChanged();
   void onStepFieldChanged(const QString &);
 
   void onApplyButtonPressed();

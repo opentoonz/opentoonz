@@ -227,34 +227,43 @@ IntField::IntField(QWidget *parent, bool isMaxRangeLimited, bool isRollerHide)
   vLayout->setSpacing(0);
 
   m_lineEdit = new DVGui::IntLineEdit(field);
-  bool ret   = connect(m_lineEdit, SIGNAL(editingFinished()), this,
-                     SLOT(onEditingFinished()));
-  vLayout->addWidget(m_lineEdit);
+  m_roller   = new RollerField(field);
 
-  m_roller = new RollerField(field);
-  ret      = ret && connect(m_roller, SIGNAL(valueChanged(bool)), this,
-                       SLOT(onRollerValueChanged(bool)));
+  bool ret = true;
+
+  ret = ret && QObject::connect(m_lineEdit, &IntLineEdit::editingFinished,  //
+                                this, &IntField::onEditingFinished);
+  ret = ret && QObject::connect(m_roller, &RollerField::valueChanged,  //
+                                this, &IntField::onRollerValueChanged);
+
+  vLayout->addWidget(m_lineEdit);
   vLayout->addWidget(m_roller);
 
-  if (isRollerHide) enableRoller(false);
+  if (isRollerHide) {
+    enableRoller(false);
+  }
 
   layout->addWidget(field);
 
   m_slider = new QSlider(Qt::Horizontal, this);
-  ret      = ret && connect(m_slider, SIGNAL(valueChanged(int)), this,
-                       SLOT(onSliderChanged(int)));
-  ret = ret && connect(m_slider, SIGNAL(sliderReleased()), this,
-                       SLOT(onSliderReleased()));
 
-  ret = ret && connect(m_lineEdit, SIGNAL(editingFinished()), this,
-                       SIGNAL(valueEditedByHand()));
-  ret = ret && connect(m_slider, SIGNAL(sliderReleased()), this,
-                       SIGNAL(valueEditedByHand()));
+  ret = ret && QObject::connect(m_slider, &QSlider::valueChanged,  //
+                                this, &IntField::onSliderChanged);
+  ret = ret && QObject::connect(m_slider, &QSlider::sliderReleased,  //
+                                this, &IntField::onSliderReleased);
+
+  ret = ret &&
+        QObject::connect(m_lineEdit, &DVGui::IntLineEdit::editingFinished,  //
+                         this, &IntField::valueEditedByHand);
+  ret = ret && QObject::connect(m_slider, &QSlider::sliderReleased,  //
+                                this, &IntField::valueEditedByHand);
+
   layout->addWidget(m_slider);
 
   setValues(0, 0, 100);
 
   setLayout(layout);
+
   assert(ret);
 }
 

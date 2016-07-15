@@ -104,10 +104,9 @@ after
   \code
   ..
   MyTask* myTask = new MyTask;
-  connect(myTask, SIGNAL(myStarted(TThread::RunnableP)), myTask,
-SLOT(onStarted(TThread::RunnableP)),
-    Qt::BlockingQueuedConnection)   //theRunCode() waits for onStarted() to
-complete
+  connect(myTask, &MyTask::myStarted, myTask, &MyTask::onStarted),
+          // theRunCode() waits for onStarted() to complete
+          Qt::BlockingQueuedConnection)
   ..
   \endcode
 

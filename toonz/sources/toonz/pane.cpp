@@ -45,16 +45,12 @@ TPanel::TPanel(QWidget *parent, Qt::WindowFlags flags,
     , m_isActive(true)
     , m_panelTitleBar(0)
     , m_multipleInstancesAllowed(true) {
-  // setFeatures(QDockWidget::DockWidgetMovable |
-  // QDockWidget::DockWidgetFloatable);
-  // setFloating(false);
   m_panelTitleBar = new TPanelTitleBar(this, orientation);
   setTitleBarWidget(m_panelTitleBar);
-  // connect(m_panelTitleBar,SIGNAL(doubleClick()),this,SLOT(onDoubleClick()));
-  connect(m_panelTitleBar, SIGNAL(doubleClick(QMouseEvent *)), this,
-          SIGNAL(doubleClick(QMouseEvent *)));
-  connect(m_panelTitleBar, SIGNAL(closeButtonPressed()), this,
-          SLOT(onCloseButtonPressed()));
+  QObject::connect(m_panelTitleBar, SIGNAL(doubleClick(QMouseEvent *)), this,
+                   SIGNAL(doubleClick(QMouseEvent *)));
+  QObject::connect(m_panelTitleBar, SIGNAL(closeButtonPressed()), this,
+                   SLOT(onCloseButtonPressed()));
   setOrientation(orientation);
 }
 
@@ -269,7 +265,7 @@ void TPanelTitleBarButtonForSafeArea::contextMenuEvent(QContextMenuEvent *e) {
   for (int i = 0; i < safeAreaNameList.size(); i++) {
     QAction *action = new QAction(safeAreaNameList.at(i), this);
     action->setData(safeAreaNameList.at(i));
-    connect(action, SIGNAL(triggered()), this, SLOT(onSetSafeArea()));
+    QObject::connect(action, SIGNAL(triggered()), this, SLOT(onSetSafeArea()));
     if (safeAreaNameList.at(i) == QString::fromStdString(EnvSafeAreaName)) {
       action->setCheckable(true);
       action->setChecked(true);

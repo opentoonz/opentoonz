@@ -1259,8 +1259,8 @@ public:
 
     m_ok->setDefault(true);
 
-    connect(m_ok, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(m_cancel, SIGNAL(clicked()), this, SLOT(reject()));
+    QObject::connect(m_ok, SIGNAL(clicked()), this, SLOT(accept()));
+    QObject::connect(m_cancel, SIGNAL(clicked()), this, SLOT(reject()));
   }
 
   QString getName() const { return m_name->text(); }

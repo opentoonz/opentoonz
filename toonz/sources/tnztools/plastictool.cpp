@@ -439,9 +439,8 @@ PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool,
   for (int m = 0; m != PlasticTool::MODES_COUNT; ++m)
     m_layout->insertWidget(m_layout->count() - 1, m_subToolbars[m], 1);
 
-  bool ret = true;
-  ret      = ret && connect(meshifyButton, SIGNAL(clicked()), meshifyAction,
-                       SLOT(trigger()));
+  bool ret = QObject::connect(meshifyButton, SIGNAL(clicked()), meshifyAction,
+                              SLOT(trigger()));
   assert(ret);
 
   // Add Animation mode fields corresponding to vertex properties
@@ -506,16 +505,16 @@ PlasticToolOptionsBox::PlasticToolOptionsBox(QWidget *parent, TTool *tool,
 void PlasticToolOptionsBox::showEvent(QShowEvent *se) {
   bool ret = true;
 
-  ret = ret && connect(&l_plasticTool, SIGNAL(skelIdsListChanged()),
-                       SLOT(onSkelIdsListChanged()));
-  ret = ret && connect(&l_plasticTool, SIGNAL(skelIdChanged()),
-                       SLOT(onSkelIdChanged()));
-  ret = ret && connect(m_skelIdComboBox, SIGNAL(activated(int)),
-                       SLOT(onSkelIdEdited()));
-  ret = ret &&
-        connect(m_addSkelButton, SIGNAL(released()), SLOT(onAddSkeleton()));
-  ret = ret && connect(m_removeSkelButton, SIGNAL(released()),
-                       SLOT(onRemoveSkeleton()));
+  ret = ret && QObject::connect(&l_plasticTool, SIGNAL(skelIdsListChanged()),
+                                SLOT(onSkelIdsListChanged()));
+  ret = ret && QObject::connect(&l_plasticTool, SIGNAL(skelIdChanged()),
+                                SLOT(onSkelIdChanged()));
+  ret = ret && QObject::connect(m_skelIdComboBox, SIGNAL(activated(int)),
+                                SLOT(onSkelIdEdited()));
+  ret = ret && QObject::connect(m_addSkelButton, SIGNAL(released()),
+                                SLOT(onAddSkeleton()));
+  ret = ret && QObject::connect(m_removeSkelButton, SIGNAL(released()),
+                                SLOT(onRemoveSkeleton()));
 
   assert(ret);
 
@@ -525,10 +524,10 @@ void PlasticToolOptionsBox::showEvent(QShowEvent *se) {
 //------------------------------------------------------------------------
 
 void PlasticToolOptionsBox::hideEvent(QHideEvent *he) {
-  disconnect(&l_plasticTool, 0, this, 0);
-  disconnect(m_skelIdComboBox, 0, this, 0);
-  disconnect(m_addSkelButton, 0, this, 0);
-  disconnect(m_removeSkelButton, 0, this, 0);
+  QObject::disconnect(&l_plasticTool, 0, this, 0);
+  QObject::disconnect(m_skelIdComboBox, 0, this, 0);
+  QObject::disconnect(m_addSkelButton, 0, this, 0);
+  QObject::disconnect(m_removeSkelButton, 0, this, 0);
 }
 
 //------------------------------------------------------------------------
@@ -934,17 +933,21 @@ void PlasticTool::onSetViewer() {
 
 void PlasticTool::onActivate() {
   bool ret;
-  ret = connect(TTool::m_application->getCurrentFrame(),
-                SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched())),
+  ret =
+      QObject::connect(TTool::m_application->getCurrentFrame(),
+                       SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched())),
   assert(ret);
-  ret = connect(TTool::m_application->getCurrentColumn(),
-                SIGNAL(columnIndexSwitched()), this, SLOT(onColumnSwitched())),
+  ret = QObject::connect(TTool::m_application->getCurrentColumn(),
+                         SIGNAL(columnIndexSwitched()), this,
+                         SLOT(onColumnSwitched())),
   assert(ret);
-  ret = connect(TTool::m_application->getCurrentXsheet(),
-                SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged())),
+  ret =
+      QObject::connect(TTool::m_application->getCurrentXsheet(),
+                       SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged())),
   assert(ret);
-  ret = connect(TTool::m_application->getCurrentXsheet(),
-                SIGNAL(xsheetSwitched()), this, SLOT(onXsheetChanged())),
+  ret =
+      QObject::connect(TTool::m_application->getCurrentXsheet(),
+                       SIGNAL(xsheetSwitched()), this, SLOT(onXsheetChanged())),
   assert(ret);
 
   onSetViewer();
@@ -960,18 +963,21 @@ void PlasticTool::onDeactivate() {
   setActive(false);
 
   bool ret;
-  ret = disconnect(TTool::m_application->getCurrentFrame(),
-                   SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched())),
+  ret = QObject::disconnect(TTool::m_application->getCurrentFrame(),
+                            SIGNAL(frameSwitched()), this,
+                            SLOT(onFrameSwitched())),
   assert(ret);
-  ret =
-      disconnect(TTool::m_application->getCurrentColumn(),
-                 SIGNAL(columnIndexSwitched()), this, SLOT(onColumnSwitched())),
+  ret = QObject::disconnect(TTool::m_application->getCurrentColumn(),
+                            SIGNAL(columnIndexSwitched()), this,
+                            SLOT(onColumnSwitched())),
   assert(ret);
-  ret = disconnect(TTool::m_application->getCurrentXsheet(),
-                   SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged())),
+  ret = QObject::disconnect(TTool::m_application->getCurrentXsheet(),
+                            SIGNAL(xsheetChanged()), this,
+                            SLOT(onXsheetChanged())),
   assert(ret);
-  ret = disconnect(TTool::m_application->getCurrentXsheet(),
-                   SIGNAL(xsheetSwitched()), this, SLOT(onXsheetChanged())),
+  ret = QObject::disconnect(TTool::m_application->getCurrentXsheet(),
+                            SIGNAL(xsheetSwitched()), this,
+                            SLOT(onXsheetChanged())),
   assert(ret);
 
   Viewer *viewer = getViewer();
@@ -1428,15 +1434,15 @@ void PlasticTool::addContextMenuItems(QMenu *menu) {
   // Add global actions
   if (m_sd && m_sd->skeleton(::skeletonId())) {
     QAction *copySkeleton = menu->addAction(tr("Copy Skeleton"));
-    ret = ret && connect(copySkeleton, SIGNAL(triggered()), &l_plasticTool,
-                         SLOT(copySkeleton()));
+    ret = ret && QObject::connect(copySkeleton, SIGNAL(triggered()),
+                                  &l_plasticTool, SLOT(copySkeleton()));
   }
 
   if (dynamic_cast<const PlasticSkeletonPMime *>(
           QApplication::clipboard()->mimeData())) {
     QAction *pasteSkeleton = menu->addAction(tr("Paste Skeleton"));
-    ret = ret && connect(pasteSkeleton, SIGNAL(triggered()), &l_plasticTool,
-                         SLOT(pasteSkeleton_undo()));
+    ret = ret && QObject::connect(pasteSkeleton, SIGNAL(triggered()),
+                                  &l_plasticTool, SLOT(pasteSkeleton_undo()));
   }
 
   menu->addSeparator();  // Separate actions type
@@ -1462,29 +1468,31 @@ void PlasticTool::addContextMenuItems(QMenu *menu) {
   showMesh->setCheckable(true);
   showMesh->setChecked(m_pvs.m_drawMeshesWireframe);
 
-  ret = ret && connect(showMesh, SIGNAL(triggered(bool)), &l_plasticTool,
-                       SLOT(onShowMeshToggled(bool)));
+  ret = ret && QObject::connect(showMesh, SIGNAL(triggered(bool)),
+                                &l_plasticTool, SLOT(onShowMeshToggled(bool)));
 
   QAction *showRigidity = menu->addAction(tr("Show Rigidity"));
   showRigidity->setCheckable(true);
   showRigidity->setChecked(m_pvs.m_drawRigidity);
 
-  ret = ret && connect(showRigidity, SIGNAL(triggered(bool)), &l_plasticTool,
-                       SLOT(onShowRigidityToggled(bool)));
+  ret = ret &&
+        QObject::connect(showRigidity, SIGNAL(triggered(bool)), &l_plasticTool,
+                         SLOT(onShowRigidityToggled(bool)));
 
   QAction *showSO = menu->addAction(tr("Show SO"));
   showSO->setCheckable(true);
   showSO->setChecked(m_pvs.m_drawSO);
 
-  ret = ret && connect(showSO, SIGNAL(triggered(bool)), &l_plasticTool,
-                       SLOT(onShowSOToggled(bool)));
+  ret = ret && QObject::connect(showSO, SIGNAL(triggered(bool)), &l_plasticTool,
+                                SLOT(onShowSOToggled(bool)));
 
   QAction *showSkeletonOS = menu->addAction(tr("Show Skeleton Onion Skin"));
   showSkeletonOS->setCheckable(true);
   showSkeletonOS->setChecked(m_showSkeletonOS);
 
-  ret = ret && connect(showSkeletonOS, SIGNAL(triggered(bool)), &l_plasticTool,
-                       SLOT(onShowSkelOSToggled(bool)));
+  ret =
+      ret && QObject::connect(showSkeletonOS, SIGNAL(triggered(bool)),
+                              &l_plasticTool, SLOT(onShowSkelOSToggled(bool)));
 
   assert(ret);
 

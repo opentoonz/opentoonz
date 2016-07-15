@@ -58,8 +58,8 @@ void TasksViewer::add(const QString &iconName, QString text, QToolBar *toolBar,
       createQIconOnOffPNG(iconName.toAscii().constData(), false), text, this);
 #endif
   action->setIconText(iconText);
-  bool ret = connect(action, SIGNAL(triggered(bool)),
-                     (TaskTreeModel *)m_treeView->model(), slot);
+  bool ret = QObject::connect(action, SIGNAL(triggered(bool)),
+                              (TaskTreeModel *)m_treeView->model(), slot);
   assert(ret);
   toolBar->addAction(action);
   m_actions.push_back(action);
@@ -162,8 +162,9 @@ TasksViewer::TasksViewer(QWidget *parent, Qt::WFlags flags)
 
   setStretchFactor(1, 2);
 
-  m_timer  = new QTimer(this);
-  bool ret = connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
+  m_timer = new QTimer(this);
+  bool ret =
+      QObject::connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
   assert(ret);
   m_timer->start(3000);
 }
@@ -941,57 +942,66 @@ TaskSheet::TaskSheet(TasksViewer *owner) : QScrollArea(owner) {
 
   bool ret = true;
 
-  ret =
-      ret && connect(m_name, SIGNAL(editingFinished()), this, SLOT(setName()));
-  ret =
-      ret && connect(m_from, SIGNAL(editingFinished()), this, SLOT(setFrom()));
-  ret = ret && connect(m_to, SIGNAL(editingFinished()), this, SLOT(setTo()));
-  ret =
-      ret && connect(m_step, SIGNAL(editingFinished()), this, SLOT(setStep()));
+  ret = ret && QObject::connect(m_name, SIGNAL(editingFinished()), this,
+                                SLOT(setName()));
+  ret = ret && QObject::connect(m_from, SIGNAL(editingFinished()), this,
+                                SLOT(setFrom()));
   ret = ret &&
-        connect(m_shrink, SIGNAL(editingFinished()), this, SLOT(setShrink()));
-  ret = ret && connect(m_outputPath, SIGNAL(editingFinished()), this,
-                       SLOT(setOutput()));
-  ret = ret && connect(m_chunkSize, SIGNAL(editingFinished()), this,
-                       SLOT(setChunkSize()));
-  ret = ret && connect(m_priority, SIGNAL(editingFinished()), this,
-                       SLOT(setPriority()));
-
-  ret = ret && connect(m_name, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
-  ret = ret && connect(m_from, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
-  ret = ret && connect(m_to, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
-  ret = ret && connect(m_step, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
-  ret = ret && connect(m_shrink, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
-  ret =
-      ret && connect(m_outputPath, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
-  ret = ret && connect(m_chunkSize, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
-  ret = ret && connect(m_priority, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
-
-  ret = ret && connect(m_multimedia, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(setMultimedia(int)));
-  ret = ret && connect(m_visible, SIGNAL(stateChanged(int)), this,
-                       SLOT(setVisible(int)));
-
-  ret = ret && connect(m_overwrite, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(setOverwrite(int)));
-
-  ret =
-      ret && connect(m_addedBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-                     this, SLOT(onRemovedItemDoubleClicked(QListWidgetItem *)));
-  ret = ret &&
-        connect(m_notAddedBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-                this, SLOT(onAddedItemDoubleClicked(QListWidgetItem *)));
+        QObject::connect(m_to, SIGNAL(editingFinished()), this, SLOT(setTo()));
+  ret = ret && QObject::connect(m_step, SIGNAL(editingFinished()), this,
+                                SLOT(setStep()));
+  ret = ret && QObject::connect(m_shrink, SIGNAL(editingFinished()), this,
+                                SLOT(setShrink()));
+  ret = ret && QObject::connect(m_outputPath, SIGNAL(editingFinished()), this,
+                                SLOT(setOutput()));
+  ret = ret && QObject::connect(m_chunkSize, SIGNAL(editingFinished()), this,
+                                SLOT(setChunkSize()));
+  ret = ret && QObject::connect(m_priority, SIGNAL(editingFinished()), this,
+                                SLOT(setPriority()));
 
   ret = ret &&
-        connect(removeBtn, SIGNAL(clicked(bool)), this, SLOT(onRemoved(bool)));
+        QObject::connect(m_name, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
+  ret = ret &&
+        QObject::connect(m_from, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
   ret =
-      ret && connect(addBtn, SIGNAL(clicked(bool)), this, SLOT(onAdded(bool)));
+      ret && QObject::connect(m_to, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
+  ret = ret &&
+        QObject::connect(m_step, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
+  ret = ret &&
+        QObject::connect(m_shrink, SIGNAL(focusIn()), this, SLOT(onFocusIn()));
+  ret = ret && QObject::connect(m_outputPath, SIGNAL(focusIn()), this,
+                                SLOT(onFocusIn()));
+  ret = ret && QObject::connect(m_chunkSize, SIGNAL(focusIn()), this,
+                                SLOT(onFocusIn()));
+  ret = ret && QObject::connect(m_priority, SIGNAL(focusIn()), this,
+                                SLOT(onFocusIn()));
 
-  ret = ret && connect(m_threadsCombo, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(setThreadsCombo(int)));
+  ret = ret && QObject::connect(m_multimedia, SIGNAL(currentIndexChanged(int)),
+                                this, SLOT(setMultimedia(int)));
+  ret = ret && QObject::connect(m_visible, SIGNAL(stateChanged(int)), this,
+                                SLOT(setVisible(int)));
+
+  ret = ret && QObject::connect(m_overwrite, SIGNAL(currentIndexChanged(int)),
+                                this, SLOT(setOverwrite(int)));
+
+  ret = ret && QObject::connect(
+                   m_addedBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+                   this, SLOT(onRemovedItemDoubleClicked(QListWidgetItem *)));
+  ret = ret && QObject::connect(
+                   m_notAddedBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+                   this, SLOT(onAddedItemDoubleClicked(QListWidgetItem *)));
+
+  ret = ret && QObject::connect(removeBtn, SIGNAL(clicked(bool)), this,
+                                SLOT(onRemoved(bool)));
+  ret = ret && QObject::connect(addBtn, SIGNAL(clicked(bool)), this,
+                                SLOT(onAdded(bool)));
+
   ret =
-      ret && connect(m_rasterGranularityCombo, SIGNAL(currentIndexChanged(int)),
-                     this, SLOT(setGranularityCombo(int)));
+      ret && QObject::connect(m_threadsCombo, SIGNAL(currentIndexChanged(int)),
+                              this, SLOT(setThreadsCombo(int)));
+  ret = ret && QObject::connect(m_rasterGranularityCombo,
+                                SIGNAL(currentIndexChanged(int)), this,
+                                SLOT(setGranularityCombo(int)));
 
   assert(ret);
 
@@ -1020,29 +1030,9 @@ TaskTreeView::TaskTreeView(TasksViewer *parent, TaskTreeModel *treeModel)
   if (!treeModel) treeModel = new TaskTreeModel(this);
   setModel(treeModel);
   setObjectName("taskeditortree");
-
-  // connect(this, SIGNAL(pressed      (const QModelIndex &) ), this,
-  // SLOT(onActivated(const QModelIndex &)));
 }
 
 //----------------------------------------------------------------------------------------------------------------
-/*
-void TaskTreeView::mousePressEvent ( QMouseEvent * event )
-{
-QTreeView::mousePressEvent(event);
-if (selectedIndexes().empty()) return;
-QModelIndex index = selectedIndexes().at(0);
-if (!index.isValid()) return;
-
-((TaskTreeModel*)model())->setSelected(index);
-
-m_mainViewer->setSelected(((TaskTreeModel::Item*)index.internalPointer())->getTask());
-
-if (event->button()==Qt::RightButton)
-  ((TaskTreeModel*)model())->openContextMenu(event->globalPos());
-
-}
-*/
 
 void TaskTreeView::onClick(TreeModel::Item *gItem, const QPoint &pos,
                            QMouseEvent *e) {
@@ -1074,17 +1064,17 @@ void TaskTreeView::openContextMenu(TreeModel::Item *gItem,
       bool ret = true;
       QAction *action;
       action = new QAction(tr("Start"), this);
-      ret =
-          ret && connect(action, SIGNAL(triggered(bool)), m, SLOT(start(bool)));
+      ret    = ret && QObject::connect(action, SIGNAL(triggered(bool)), m,
+                                    SLOT(start(bool)));
       menu.addAction(action);
       action = new QAction(tr("Stop"), this);
-      ret =
-          ret && connect(action, SIGNAL(triggered(bool)), m, SLOT(stop(bool)));
+      ret    = ret && QObject::connect(action, SIGNAL(triggered(bool)), m,
+                                    SLOT(stop(bool)));
       menu.addAction(action);
       action = new QAction(tr("Remove"), this);
       menu.addAction(action);
-      ret = ret &&
-            connect(action, SIGNAL(triggered(bool)), m, SLOT(remove(bool)));
+      ret = ret && QObject::connect(action, SIGNAL(triggered(bool)), m,
+                                    SLOT(remove(bool)));
       assert(ret);
     }
     menu.exec(globalPos);

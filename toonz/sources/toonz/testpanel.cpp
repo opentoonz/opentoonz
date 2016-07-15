@@ -52,26 +52,27 @@ TestPanel::TestPanel(QWidget *parent, Qt::WFlags flags)
   doublePairFld->setValues(std::make_pair(2.5, 6.5));
   doublePairFld->setLeftText(tr("Left:"));
   doublePairFld->setRightText(tr("Right:"));
-  connect(doublePairFld, SIGNAL(valuesChanged(bool)),
-          SLOT(onDoubleValuesChanged(bool)));
+  QObject::connect(doublePairFld, SIGNAL(valuesChanged(bool)),
+                   SLOT(onDoubleValuesChanged(bool)));
   layout->addWidget(doublePairFld, 1);
 
   DoubleField *doubleFld = new DoubleField();
   doubleFld->setRange(-100, 100);
   doubleFld->setValue(50.55);
-  connect(doubleFld, SIGNAL(valueChanged(bool)),
-          SLOT(onDoubleValueChanged(bool)));
+  QObject::connect(doubleFld, SIGNAL(valueChanged(bool)),
+                   SLOT(onDoubleValueChanged(bool)));
   layout->addWidget(doubleFld, 1);
 
   IntField *intFld = new IntField();
   intFld->setRange(0, 100);
   intFld->setValue(50);
-  connect(intFld, SIGNAL(valueChanged(bool)), SLOT(onIntValueChanged(bool)));
+  QObject::connect(intFld, SIGNAL(valueChanged(bool)),
+                   SLOT(onIntValueChanged(bool)));
   layout->addWidget(intFld, 1);
 
   ColorField *colorFld = new ColorField(0, true, TPixel32(0, 0, 255, 255), 50);
-  connect(colorFld, SIGNAL(colorChanged(const TPixel32 &, bool)),
-          SLOT(onColorValueChanged(const TPixel32 &, bool)));
+  QObject::connect(colorFld, SIGNAL(colorChanged(const TPixel32 &, bool)),
+                   SLOT(onColorValueChanged(const TPixel32 &, bool)));
   layout->addWidget(colorFld, 1, Qt::AlignCenter);
 
   SpectrumField *spectrumFld = new SpectrumField(0, TPixel32(0, 0, 255));

@@ -80,8 +80,8 @@ SVNRevertDialog::SVNRevertDialog(QWidget *parent, const QString &workingDir,
     QHBoxLayout *checkBoxLayout = new QHBoxLayout;
     checkBoxLayout->setMargin(0);
     m_revertSceneContentsCheckBox = new QCheckBox(this);
-    connect(m_revertSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
-            SLOT(onRevertSceneContentsToggled(bool)));
+    QObject::connect(m_revertSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+                     SLOT(onRevertSceneContentsToggled(bool)));
     m_revertSceneContentsCheckBox->setChecked(false);
     m_revertSceneContentsCheckBox->hide();
     m_revertSceneContentsCheckBox->setText(tr("Revert Scene Contents"));
@@ -99,21 +99,21 @@ SVNRevertDialog::SVNRevertDialog(QWidget *parent, const QString &workingDir,
 
   m_revertButton = new QPushButton(tr("Revert"));
   m_revertButton->setEnabled(false);
-  connect(m_revertButton, SIGNAL(clicked()), this,
-          SLOT(onRevertButtonClicked()));
+  QObject::connect(m_revertButton, SIGNAL(clicked()), this,
+                   SLOT(onRevertButtonClicked()));
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(m_revertButton, m_cancelButton);
 
   // 0. Connect for svn errors (that may occurs everythings)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // 1. Getting status
-  connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-          SLOT(onStatusRetrieved(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                   SLOT(onStatusRetrieved(const QString &)));
   m_thread.getSVNStatus(m_workingDir);
 }
 
@@ -218,7 +218,7 @@ void SVNRevertDialog::switchToCloseButton() {
   m_revertButton->setText("Close");
   m_revertButton->setEnabled(true);
   m_cancelButton->hide();
-  connect(m_revertButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_revertButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 //-----------------------------------------------------------------------------
@@ -252,7 +252,8 @@ void SVNRevertDialog::revertFiles() {
     for (int i = 0; i < sceneResourceToRevertSize; i++)
       args << m_sceneResources.at(i);
 
-    connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onRevertDone()));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                     SLOT(onRevertDone()));
     m_thread.executeCommand(m_workingDir, "svn", args);
   } else
     onRevertDone();
@@ -338,11 +339,11 @@ SVNRevertFrameRangeDialog::SVNRevertFrameRangeDialog(
   endVLayout();
 
   m_revertButton = new QPushButton(tr("Revert"));
-  connect(m_revertButton, SIGNAL(clicked()), this,
-          SLOT(onRevertButtonClicked()));
+  QObject::connect(m_revertButton, SIGNAL(clicked()), this,
+                   SLOT(onRevertButtonClicked()));
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(m_revertButton, m_cancelButton);
 }
@@ -355,7 +356,7 @@ void SVNRevertFrameRangeDialog::switchToCloseButton() {
   m_revertButton->setText("Close");
   m_revertButton->setEnabled(true);
   m_cancelButton->hide();
-  connect(m_revertButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_revertButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 //-----------------------------------------------------------------------------
@@ -407,12 +408,12 @@ void SVNRevertFrameRangeDialog::revertFiles() {
     m_files          = list.filter(regExp);
 
     // 0. Connect for svn errors (that may occurs everythings)
-    connect(&m_thread, SIGNAL(error(const QString &)), this,
-            SLOT(onError(const QString &)));
+    QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                     SLOT(onError(const QString &)));
 
     // 1. Getting status
-    connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-            SLOT(onStatusRetrieved(const QString &)));
+    QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                     SLOT(onStatusRetrieved(const QString &)));
     m_thread.getSVNStatus(m_workingDir, m_files);
   } else {
     m_textLabel->setText(tr("Revert done successfully."));
@@ -447,7 +448,8 @@ void SVNRevertFrameRangeDialog::onStatusRetrieved(const QString &xmlResponse) {
     args << "revert";
     for (int i = 0; i < fileToRevertCount; i++) args << m_filesToRevert.at(i);
 
-    connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onRevertDone()));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                     SLOT(onRevertDone()));
     m_thread.executeCommand(m_workingDir, "svn", args);
   }
 }

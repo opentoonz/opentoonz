@@ -22,20 +22,21 @@ FrameNavigator::FrameNavigator(QWidget *parent)
   setMaximumWidth(130);
   QAction *prevButton =
       new QAction(createQIconPNG("frameprev"), tr("Previous Frame"), this);
-  connect(prevButton, SIGNAL(triggered()), this, SLOT(prevFrame()));
+  QObject::connect(prevButton, &QAction::triggered,  //
+                   this, &FrameNavigator::prevFrame);
   addAction(prevButton);
 
   m_lineEdit = new DVGui::IntLineEdit(this);
 
   m_lineEdit->setFixedHeight(16);
-  bool ret = connect(m_lineEdit, SIGNAL(editingFinished()), this,
-                     SLOT(onEditingFinished()));
+  bool ret = QObject::connect(m_lineEdit, &IntLineEdit::editingFinished,  //
+                              this, &FrameNavigator::onEditingFinished);
   addWidget(m_lineEdit);
 
   QAction *nextButton =
       new QAction(createQIconPNG("framenext"), tr("Next Frame"), this);
-  ret =
-      ret && connect(nextButton, SIGNAL(triggered()), this, SLOT(nextFrame()));
+  ret = ret && QObject::connect(nextButton, &QAction::triggered,  //
+                                this, &FrameNavigator::nextFrame);
   addAction(nextButton);
   assert(ret);
 }
@@ -51,13 +52,13 @@ bool FrameNavigator::anyWidgetHasFocus() {
 void FrameNavigator::setFrameHandle(TFrameHandle *fh) {
   if (fh == m_frameHandle) return;
   if (isVisible() && m_frameHandle)
-    disconnect(m_frameHandle, SIGNAL(frameSwitched()), this,
-               SLOT(onFrameSwitched()));
+    QObject::disconnect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                        this, &FrameNavigator::onFrameSwitched);
   m_frameHandle = fh;
   if (m_frameHandle) {
     if (isVisible())
-      connect(m_frameHandle, SIGNAL(frameSwitched()), this,
-              SLOT(onFrameSwitched()));
+      QObject::connect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                       this, &FrameNavigator::onFrameSwitched);
     updateFrame(m_frameHandle->getFrame());
   }
 }
@@ -98,14 +99,15 @@ void FrameNavigator::onFrameSwitched() {
 void FrameNavigator::showEvent(QShowEvent *) {
   onFrameSwitched();
   if (m_frameHandle)
-    connect(m_frameHandle, SIGNAL(frameSwitched()), this,
-            SLOT(onFrameSwitched()));
+    QObject::connect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                     this, &FrameNavigator::onFrameSwitched);
 }
 
 //-----------------------------------------------------------------------------
 
 void FrameNavigator::hideEvent(QHideEvent *) {
-  if (m_frameHandle)
-    disconnect(m_frameHandle, SIGNAL(frameSwitched()), this,
-               SLOT(onFrameSwitched()));
+  if (m_frameHandle) {
+    QObject::disconnect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                        this, &FrameNavigator::onFrameSwitched);
+  }
 }

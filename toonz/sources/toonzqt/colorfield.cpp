@@ -222,12 +222,12 @@ ChannelField::ChannelField(QWidget *parent, const QString &string, int value,
 
   //----singnal-slot connections
 
-  bool ret = connect(m_channelEdit, SIGNAL(textChanged(const QString &)),
-                     SLOT(onEditChanged(const QString &)));
-  ret = ret && connect(m_channelSlider, SIGNAL(valueChanged(int)),
-                       SLOT(onSliderChanged(int)));
-  ret = ret && connect(m_channelSlider, SIGNAL(sliderReleased()),
-                       SLOT(onSliderReleased()));
+  bool ret = QObject::connect(m_channelEdit, &IntLineEdit::textChanged,     //
+                              this, &ChannelField::onEditChanged);          //
+  ret = ret && QObject::connect(m_channelSlider, &QSlider::valueChanged,    //
+                                this, &ChannelField::onSliderChanged);      //
+  ret = ret && QObject::connect(m_channelSlider, &QSlider::sliderReleased,  //
+                                this, &ChannelField::onSliderReleased);     //
   assert(ret);
 }
 
@@ -355,18 +355,19 @@ ColorField::ColorField(QWidget *parent, bool isAlphaActive, TPixel32 color,
 
   m_colorSample = new StyleSample(this, squareSize, squareSize);
   m_colorSample->setColor(m_color);
-  m_redChannel = new ChannelField(this, QString("R:"), m_color.r);
-  connect(m_redChannel, SIGNAL(valueChanged(int, bool)),
-          SLOT(onRedChannelChanged(int, bool)));
+  m_redChannel   = new ChannelField(this, QString("R:"), m_color.r);
   m_greenChannel = new ChannelField(this, QString("G:"), m_color.g);
-  connect(m_greenChannel, SIGNAL(valueChanged(int, bool)),
-          SLOT(onGreenChannelChanged(int, bool)));
-  m_blueChannel = new ChannelField(this, QString("B:"), m_color.b);
-  connect(m_blueChannel, SIGNAL(valueChanged(int, bool)),
-          SLOT(onBlueChannelChanged(int, bool)));
+  m_blueChannel  = new ChannelField(this, QString("B:"), m_color.b);
   m_alphaChannel = new ChannelField(this, QString("M:"), m_color.m);
-  connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)),
-          SLOT(onAlphaChannelChanged(int, bool)));
+
+  QObject::connect(m_redChannel, &ChannelField::valueChanged,    //
+                   this, &ColorField::onRedChannelChanged);      //
+  QObject::connect(m_greenChannel, &ChannelField::valueChanged,  //
+                   this, &ColorField::onGreenChannelChanged);    //
+  QObject::connect(m_blueChannel, &ChannelField::valueChanged,   //
+                   this, &ColorField::onBlueChannelChanged);     //
+  QObject::connect(m_alphaChannel, &ChannelField::valueChanged,  //
+                   this, &ColorField::onAlphaChannelChanged);    //
 
   layout->addWidget(m_colorSample);
   layout->addWidget(m_redChannel);
@@ -386,15 +387,13 @@ ColorField::ColorField(QWidget *parent, bool isAlphaActive, TPixel32 color,
 void ColorField::setAlphaActive(bool active) {
   if (active && !m_alphaChannel->isVisible()) {
     m_alphaChannel->show();
-    connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)),
-            SLOT(onAlphaChannelChanged(int, bool)));
+    QObject::connect(m_alphaChannel, &ChannelField::valueChanged,  //
+                     this, &ColorField::onAlphaChannelChanged);    //
     assert(m_color.m == 255);
-    // m_color.m = m_alphaChannel->getChannel();
-    // m_colorSample->setColor(m_color);
   } else if (!active && m_alphaChannel->isVisible()) {
     m_alphaChannel->hide();
-    disconnect(m_alphaChannel, SIGNAL(valueChanged(int, bool)), this,
-               SLOT(onAlphaChannelChanged(int, bool)));
+    QObject::disconnect(m_alphaChannel, &ChannelField::valueChanged,  //
+                        this, &ColorField::onAlphaChannelChanged);    //
     if (m_color.m != 255) {
       m_alphaChannel->setChannel(255);
       m_color.m = 255;
@@ -422,28 +421,28 @@ void ColorField::hideChannelsFields(bool hide) {
     m_greenChannel->hide();
     m_blueChannel->hide();
     m_alphaChannel->hide();
-    disconnect(m_redChannel, SIGNAL(valueChanged(int, bool)), this,
-               SLOT(onRedChannelChanged(int, bool)));
-    disconnect(m_greenChannel, SIGNAL(valueChanged(int, bool)), this,
-               SLOT(onGreenChannelChanged(int, bool)));
-    disconnect(m_blueChannel, SIGNAL(valueChanged(int, bool)), this,
-               SLOT(onBlueChannelChanged(int, bool)));
-    disconnect(m_alphaChannel, SIGNAL(valueChanged(int, bool)), this,
-               SLOT(onAlphaChannelChanged(int, bool)));
+    QObject::disconnect(m_redChannel, &ChannelField::valueChanged,    //
+                        this, &ColorField::onRedChannelChanged);      //
+    QObject::disconnect(m_greenChannel, &ChannelField::valueChanged,  //
+                        this, &ColorField::onGreenChannelChanged);    //
+    QObject::disconnect(m_blueChannel, &ChannelField::valueChanged,   //
+                        this, &ColorField::onBlueChannelChanged);     //
+    QObject::disconnect(m_alphaChannel, &ChannelField::valueChanged,  //
+                        this, &ColorField::onAlphaChannelChanged);    //
   } else {
     m_redChannel->show();
     m_greenChannel->show();
     m_blueChannel->show();
     m_alphaChannel->show();
-    ;
-    connect(m_redChannel, SIGNAL(valueChanged(int, bool)),
-            SLOT(onRedChannelChanged(int, bool)));
-    connect(m_greenChannel, SIGNAL(valueChanged(int, bool)),
-            SLOT(onGreenChannelChanged(int, bool)));
-    connect(m_blueChannel, SIGNAL(valueChanged(int, bool)),
-            SLOT(onBlueChannelChanged(int, bool)));
-    connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)),
-            SLOT(onAlphaChannelChanged(int, bool)));
+
+    QObject::connect(m_redChannel, &ChannelField::valueChanged,    //
+                     this, &ColorField::onRedChannelChanged);      //
+    QObject::connect(m_greenChannel, &ChannelField::valueChanged,  //
+                     this, &ColorField::onGreenChannelChanged);    //
+    QObject::connect(m_blueChannel, &ChannelField::valueChanged,   //
+                     this, &ColorField::onBlueChannelChanged);     //
+    QObject::connect(m_alphaChannel, &ChannelField::valueChanged,  //
+                     this, &ColorField::onAlphaChannelChanged);    //
   }
 }
 
@@ -691,23 +690,23 @@ CleanupColorField::CleanupColorField(QWidget *parent,
   setLayout(mainLay);
 
   //---- signal-slot connections
-
-  bool ret = true;
-  ret = ret && connect(m_brightnessChannel, SIGNAL(valueChanged(int, bool)),
-                       SLOT(onBrightnessChannelChanged(int, bool)));
-  ret = ret && connect(m_contrastChannel, SIGNAL(valueChanged(int, bool)),
-                       SLOT(onContrastChannelChanged(int, bool)));
+  QObject::connect(m_brightnessChannel, &ChannelField::valueChanged,       //
+                   this, &CleanupColorField::onBrightnessChannelChanged);  //
+  QObject::connect(m_contrastChannel, &ChannelField::valueChanged,         //
+                   this, &CleanupColorField::onContrastChannelChanged);    //
   if (!greyMode) {
     if (bs) {
-      ret = ret && connect(m_cThresholdChannel, SIGNAL(valueChanged(int, bool)),
-                           SLOT(onCThresholdChannelChanged(int, bool)));
-      ret = ret && connect(m_wThresholdChannel, SIGNAL(valueChanged(int, bool)),
-                           SLOT(onWThresholdChannelChanged(int, bool)));
+      QObject::connect(m_cThresholdChannel, &ChannelField::valueChanged,  //
+                       this,
+                       &CleanupColorField::onCThresholdChannelChanged);   //
+      QObject::connect(m_wThresholdChannel, &ChannelField::valueChanged,  //
+                       this,
+                       &CleanupColorField::onWThresholdChannelChanged);  //
     } else {
-      ret = ret && connect(m_hRangeChannel, SIGNAL(valueChanged(int, bool)),
-                           SLOT(onHRangeChannelChanged(int, bool)));
-      ret = ret && connect(m_lineWidthChannel, SIGNAL(valueChanged(int, bool)),
-                           SLOT(onLineWidthChannelChanged(int, bool)));
+      QObject::connect(m_hRangeChannel, &ChannelField::valueChanged,          //
+                       this, &CleanupColorField::onHRangeChannelChanged);     //
+      QObject::connect(m_lineWidthChannel, &ChannelField::valueChanged,       //
+                       this, &CleanupColorField::onLineWidthChannelChanged);  //
     }
   }
 }

@@ -115,8 +115,8 @@ SVNDeleteDialog::SVNDeleteDialog(QWidget *parent, const QString &workingDir,
 
   if (!m_isFolder) {
     m_deleteSceneContentsCheckBox = new QCheckBox(this);
-    connect(m_deleteSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
-            SLOT(onDeleteSceneContentsToggled(bool)));
+    QObject::connect(m_deleteSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+                     SLOT(onDeleteSceneContentsToggled(bool)));
     m_deleteSceneContentsCheckBox->setChecked(false);
     m_deleteSceneContentsCheckBox->hide();
     m_deleteSceneContentsCheckBox->setText(tr("Delete Scene Contents"));
@@ -148,22 +148,22 @@ SVNDeleteDialog::SVNDeleteDialog(QWidget *parent, const QString &workingDir,
 
   m_deleteLocalButton = new QPushButton();
   m_deleteLocalButton->setText(tr("Delete Local Copy "));
-  connect(m_deleteLocalButton, SIGNAL(clicked()), this,
-          SLOT(onDeleteLocalButtonClicked()));
+  QObject::connect(m_deleteLocalButton, SIGNAL(clicked()), this,
+                   SLOT(onDeleteLocalButtonClicked()));
 
   m_deleteServerButton = new QPushButton();
   m_deleteServerButton->setText(tr("Delete on Server "));
-  connect(m_deleteServerButton, SIGNAL(clicked()), this,
-          SLOT(onDeleteServerButtonClicked()));
+  QObject::connect(m_deleteServerButton, SIGNAL(clicked()), this,
+                   SLOT(onDeleteServerButtonClicked()));
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(m_deleteLocalButton, m_deleteServerButton, m_cancelButton);
 
   // 0. Connect for svn errors (that may occurs)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 }
 
 //-----------------------------------------------------------------------------
@@ -201,7 +201,7 @@ void SVNDeleteDialog::switchToCloseButton() {
   m_deleteLocalButton->show();
   m_cancelButton->hide();
   m_deleteServerButton->hide();
-  connect(m_deleteLocalButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_deleteLocalButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 //-----------------------------------------------------------------------------
@@ -256,10 +256,11 @@ void SVNDeleteDialog::updateFileBrowser() {
 void SVNDeleteDialog::onDeleteServerButtonClicked() {
   m_deleteLocalButton->hide();
 
-  disconnect(m_deleteServerButton, SIGNAL(clicked()), this,
-             SLOT(onDeleteServerButtonClicked()));
+  QObject::disconnect(m_deleteServerButton, SIGNAL(clicked()), this,
+                      SLOT(onDeleteServerButtonClicked()));
   m_deleteServerButton->setText(tr("Delete"));
-  connect(m_deleteServerButton, SIGNAL(clicked()), this, SLOT(deleteFiles()));
+  QObject::connect(m_deleteServerButton, SIGNAL(clicked()), this,
+                   SLOT(deleteFiles()));
 
   m_textLabel->setText(
       tr("You are deleting items also on repository. Are you sure ?"));
@@ -307,7 +308,8 @@ void SVNDeleteDialog::deleteFiles() {
   args << "tempDeleteFile";
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), SLOT(commitDeletedFiles()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(commitDeletedFiles()));
   m_thread.executeCommand(m_workingDir, "svn", args, false);
 }
 
@@ -326,7 +328,8 @@ void SVNDeleteDialog::commitDeletedFiles() {
     args << QString("-m").append(VersionControl::instance()->getUserName() +
                                  " delete files.");
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onCommitDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(onCommitDone()));
   m_thread.executeCommand(m_workingDir, "svn", args);
 }
 

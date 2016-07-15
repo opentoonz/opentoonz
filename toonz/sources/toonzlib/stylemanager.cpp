@@ -64,8 +64,8 @@ public:
 CustomStyleManager::StyleLoaderTask::StyleLoaderTask(
     CustomStyleManager *manager, const TFilePath &fp)
     : m_manager(manager), m_fp(fp) {
-  connect(this, SIGNAL(finished(TThread::RunnableP)), this,
-          SLOT(onFinished(TThread::RunnableP)));
+  QObject::connect(this, &StyleLoaderTask::finished,     //
+                   this, &StyleLoaderTask::onFinished);  //
 }
 
 //-----------------------------------------------------------------------------

@@ -125,15 +125,16 @@ SVNTimeline::SVNTimeline(QWidget *parent, const QString &workingDir,
       "QListWidget { background-color: white; } QListWidget:item { margin: "
       "5px; }");
   m_timelineWidget->hide();
-  connect(m_timelineWidget->getListWidget(), SIGNAL(itemSelectionChanged()),
-          this, SLOT(onSelectionChanged()));
+  QObject::connect(m_timelineWidget->getListWidget(),
+                   SIGNAL(itemSelectionChanged()), this,
+                   SLOT(onSelectionChanged()));
 
   QHBoxLayout *checkBoxLayout = new QHBoxLayout;
   checkBoxLayout->setMargin(0);
   m_sceneContentsCheckBox = new QCheckBox(this);
   m_sceneContentsCheckBox->setVisible(m_fileName.endsWith(".tnz"));
-  connect(m_sceneContentsCheckBox, SIGNAL(toggled(bool)), this,
-          SLOT(onSceneContentsToggled(bool)));
+  QObject::connect(m_sceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+                   SLOT(onSceneContentsToggled(bool)));
   m_sceneContentsCheckBox->setChecked(false);
   m_sceneContentsCheckBox->setText(tr("Get Scene Contents"));
   checkBoxLayout->addStretch();
@@ -155,28 +156,28 @@ SVNTimeline::SVNTimeline(QWidget *parent, const QString &workingDir,
   endHLayout();
 
   m_updateButton = new QPushButton(tr("Get Last Revision"));
-  connect(m_updateButton, SIGNAL(clicked()), this,
-          SLOT(onUpdateButtonClicked()));
+  QObject::connect(m_updateButton, SIGNAL(clicked()), this,
+                   SLOT(onUpdateButtonClicked()));
 
   m_updateToRevisionButton = new QPushButton(tr("Get Selected Revision"));
-  connect(m_updateToRevisionButton, SIGNAL(clicked()), this,
-          SLOT(onUpdateToRevisionButtonClicked()));
+  QObject::connect(m_updateToRevisionButton, SIGNAL(clicked()), this,
+                   SLOT(onUpdateToRevisionButtonClicked()));
   m_updateToRevisionButton->setEnabled(false);
 
   m_closeButton = new QPushButton(tr("Close"));
-  connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
 
   addButtonBarWidget(m_updateButton, m_updateToRevisionButton, m_closeButton);
 
   // 0. Connect for svn errors (that may occurs everythings)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // 1. get the log (history) of fileName
   QStringList args;
   args << "log" << m_fileName << "--xml";
-  connect(&m_thread, SIGNAL(done(const QString &)),
-          SLOT(onLogDone(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(onLogDone(const QString &)));
   m_thread.executeCommand(m_workingDir, "svn", args, true);
 }
 
@@ -312,7 +313,8 @@ void SVNTimeline::onLogDone(const QString &xmlResponse) {
 
   // Export to temporary files
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onExportDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(onExportDone()));
   exportToTemporaryFile(m_currentExportIndex);
 }
 
@@ -343,8 +345,8 @@ void SVNTimeline::onExportDone() {
   } else {
     if (!m_auxTempFiles.isEmpty()) {
       m_thread.disconnect(SIGNAL(done(const QString &)));
-      connect(&m_thread, SIGNAL(done(const QString &)),
-              SLOT(onExportAuxDone()));
+      QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                       SLOT(onExportAuxDone()));
       exportToTemporaryFile(m_currentAuxExportIndex, true);
     }
   }
@@ -512,8 +514,8 @@ void SVNTimeline::onUpdateButtonClicked() {
   files.append(m_auxFiles);
 
   // Getting status to control if an update is needed
-  connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-          SLOT(onStatusRetrieved(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                   SLOT(onStatusRetrieved(const QString &)));
   m_thread.getSVNStatus(m_workingDir, files, true);
 }
 
@@ -551,7 +553,8 @@ void SVNTimeline::onUpdateToRevisionButtonClicked() {
   args << QString("-r").append(log.m_revision);
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onUpdateDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(onUpdateDone()));
   m_thread.executeCommand(m_workingDir, "svn", args, true);
 }
 
@@ -585,7 +588,8 @@ void SVNTimeline::onStatusRetrieved(const QString &xmlResponse) {
       }
 
       m_thread.disconnect(SIGNAL(done(const QString &)));
-      connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onUpdateDone()));
+      QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                       SLOT(onUpdateDone()));
       m_thread.executeCommand(m_workingDir, "svn", args, true);
       return;
     }
@@ -625,17 +629,17 @@ void SVNTimeline::onUpdateDone() {
   QStringList args;
   args << "log" << m_fileName << "--xml";
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)),
-          SLOT(onLogDone(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(onLogDone(const QString &)));
   m_thread.executeCommand(m_workingDir, "svn", args, true);
 }
 
 //-----------------------------------------------------------------------------
 
 void SVNTimeline::onSceneContentsToggled(bool checked) {
-  if (!checked)
+  if (!checked) {
     m_sceneResources.clear();
-  else {
+  } else {
     VersionControl *vc = VersionControl::instance();
     m_sceneResources.append(vc->getSceneContents(m_workingDir, m_fileName));
   }

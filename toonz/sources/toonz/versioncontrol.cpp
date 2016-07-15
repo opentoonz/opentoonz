@@ -122,8 +122,8 @@ void VersionControlThread::run() {
     if (m_abort) {
       if (m_process) {
         m_process->close();
-        disconnect(m_process, SIGNAL(readyReadStandardOutput()), this,
-                   SLOT(onStandardOutputReady()));
+        QObject::disconnect(m_process, SIGNAL(readyReadStandardOutput()), this,
+                            SLOT(onStandardOutputReady()));
         delete m_process;
         m_process = 0;
       }
@@ -132,8 +132,8 @@ void VersionControlThread::run() {
 
     if (m_process) {
       m_process->close();
-      disconnect(m_process, SIGNAL(readyReadStandardOutput()), this,
-                 SLOT(onStandardOutputReady()));
+      QObject::disconnect(m_process, SIGNAL(readyReadStandardOutput()), this,
+                          SLOT(onStandardOutputReady()));
       delete m_process;
       m_process = 0;
     }
@@ -147,9 +147,10 @@ void VersionControlThread::run() {
                                  // language to English
     m_process->setEnvironment(env);
 
-    if (!m_readOutputOnDone)
-      connect(m_process, SIGNAL(readyReadStandardOutput()), this,
-              SLOT(onStandardOutputReady()));
+    if (!m_readOutputOnDone) {
+      QObject::connect(m_process, SIGNAL(readyReadStandardOutput()), this,
+                       SLOT(onStandardOutputReady()));
+    }
 
     m_process->start(binary, args);
     if (!m_process->waitForStarted()) {
@@ -305,8 +306,8 @@ void VersionControlThread::getSVNStatus(const QString &path,
 
 VersionControlManager::VersionControlManager()
     : m_scene(0), m_levelSet(0), m_isRunning(false), m_deleteLater(false) {
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 }
 
 //-----------------------------------------------------------------------------
@@ -386,8 +387,8 @@ void VersionControlManager::setFrameRange(TLevelSet *levelSet,
     QString workingDir = toQString(path.getParentDir());
 
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(done(const QString &)), this,
-            SLOT(onFrameRangeDone(const QString)));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                     SLOT(onFrameRangeDone(const QString)));
     m_thread.executeCommand(workingDir, "svn", args, true);
     m_isRunning = true;
   }
@@ -623,8 +624,8 @@ void VersionControl::commit(QWidget *parent, const QString &workingDir,
                             int sceneIconAdded) {
   SVNCommitDialog *dialog = new SVNCommitDialog(
       parent, workingDir, filesToCommit, folderOnly, sceneIconAdded);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -636,8 +637,8 @@ void VersionControl::revert(QWidget *parent, const QString &workingDir,
                             int sceneIconAdded) {
   SVNRevertDialog *dialog = new SVNRevertDialog(parent, workingDir, files,
                                                 folderOnly, sceneIconAdded);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -651,8 +652,8 @@ void VersionControl::update(QWidget *parent, const QString &workingDir,
   SVNUpdateDialog *dialog =
       new SVNUpdateDialog(parent, workingDir, filesToUpdate, sceneIconsCounts,
                           folderOnly, updateToRevision, nonRecursive);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -664,8 +665,8 @@ void VersionControl::updateAndLock(QWidget *parent, const QString &workingDir,
                                    int workingRevision, int sceneIconAdded) {
   SVNUpdateAndLockDialog *dialog = new SVNUpdateAndLockDialog(
       parent, workingDir, files, workingRevision, sceneIconAdded);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -676,8 +677,8 @@ void VersionControl::lock(QWidget *parent, const QString &workingDir,
                           const QStringList &filesToLock, int sceneIconAdded) {
   SVNLockDialog *dialog =
       new SVNLockDialog(parent, workingDir, filesToLock, true, sceneIconAdded);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -689,8 +690,8 @@ void VersionControl::unlock(QWidget *parent, const QString &workingDir,
                             int sceneIconAdded) {
   SVNLockDialog *dialog = new SVNLockDialog(parent, workingDir, filesToUnlock,
                                             false, sceneIconAdded);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -701,8 +702,8 @@ void VersionControl::lockFrameRange(QWidget *parent, const QString &workingDir,
                                     const QString &file, int frameCount) {
   SVNLockFrameRangeDialog *dialog =
       new SVNLockFrameRangeDialog(parent, workingDir, file, frameCount);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -713,8 +714,8 @@ void VersionControl::lockFrameRange(QWidget *parent, const QString &workingDir,
                                     const QStringList &files) {
   SVNLockMultiFrameRangeDialog *dialog =
       new SVNLockMultiFrameRangeDialog(parent, workingDir, files);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -726,8 +727,8 @@ void VersionControl::unlockFrameRange(QWidget *parent,
                                       const QString &file) {
   SVNUnlockFrameRangeDialog *dialog =
       new SVNUnlockFrameRangeDialog(parent, workingDir, file);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -739,8 +740,8 @@ void VersionControl::unlockFrameRange(QWidget *parent,
                                       const QStringList &files) {
   SVNUnlockMultiFrameRangeDialog *dialog =
       new SVNUnlockMultiFrameRangeDialog(parent, workingDir, files);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -774,8 +775,8 @@ void VersionControl::commitFrameRange(QWidget *parent,
                                       const QString &file) {
   SVNCommitFrameRangeDialog *dialog =
       new SVNCommitFrameRangeDialog(parent, workingDir, file);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -788,8 +789,8 @@ void VersionControl::revertFrameRange(QWidget *parent,
                                       const QString &tempFileName) {
   SVNRevertFrameRangeDialog *dialog =
       new SVNRevertFrameRangeDialog(parent, workingDir, file, tempFileName);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -801,8 +802,8 @@ void VersionControl::deleteFiles(QWidget *parent, const QString &workingDir,
                                  int sceneIconAdded) {
   SVNDeleteDialog *dialog = new SVNDeleteDialog(
       parent, workingDir, filesToDelete, false, sceneIconAdded);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }
@@ -813,8 +814,8 @@ void VersionControl::deleteFolder(QWidget *parent, const QString &workingDir,
                                   const QString &folderName) {
   SVNDeleteDialog *dialog =
       new SVNDeleteDialog(parent, workingDir, QStringList(folderName), true, 0);
-  connect(dialog, SIGNAL(done(const QStringList &)), this,
-          SIGNAL(commandDone(const QStringList &)));
+  QObject::connect(dialog, SIGNAL(done(const QStringList &)), this,
+                   SIGNAL(commandDone(const QStringList &)));
   dialog->show();
   dialog->raise();
 }

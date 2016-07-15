@@ -27,20 +27,18 @@ PaletteController::PaletteController()
   m_currentCleanupPalette = new TPaletteHandle;
   m_currentPalette        = new TPaletteHandle;
 
-  QObject::connect(m_currentCleanupPalette, SIGNAL(paletteSwitched()), this,
-                   SLOT(editCleanupPalette()));
-  QObject::connect(m_currentCleanupPalette, SIGNAL(colorStyleSwitched()), this,
-                   SLOT(editCleanupPalette()));
+  QObject::connect(m_currentCleanupPalette, &TPaletteHandle::paletteSwitched,
+                   this, &PaletteController::editCleanupPalette);
+  QObject::connect(m_currentCleanupPalette, &TPaletteHandle::colorStyleSwitched,
+                   this, &PaletteController::editCleanupPalette);
 
-  QObject::connect(m_currentLevelPalette, SIGNAL(paletteSwitched()), this,
-                   SLOT(editLevelPalette()));
-  QObject::connect(m_currentLevelPalette, SIGNAL(colorStyleSwitched()), this,
-                   SLOT(editLevelPalette()));
-  // QObject::connect(m_currentLevelPalette, SIGNAL(colorStyleSwitched()), this,
-  // SLOT(setColorCheckIndex()));
+  QObject::connect(m_currentLevelPalette, &TPaletteHandle::paletteSwitched,
+                   this, &PaletteController::editLevelPalette);
+  QObject::connect(m_currentLevelPalette, &TPaletteHandle::colorStyleSwitched,
+                   this, &PaletteController::editLevelPalette);
 
-  QObject::connect(m_currentLevelPalette, SIGNAL(paletteLockChanged()), this,
-                   SLOT(editLevelPalette()));
+  QObject::connect(m_currentLevelPalette, &TPaletteHandle::paletteLockChanged,
+                   this, &PaletteController::editLevelPalette);
 }
 
 //-----------------------------------------------------------------------------

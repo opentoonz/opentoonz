@@ -73,18 +73,22 @@ DoubleValueField::DoubleValueField(QWidget *parent,
 
   //----signal/slot connections
   bool ret = true;
-  ret      = ret && connect(m_lineEdit, SIGNAL(valueChanged()),
-                       SLOT(onLineEditValueChanged()));
-  ret = ret && connect(m_roller, SIGNAL(valueChanged(bool)),
-                       SLOT(onRollerValueChanged(bool)));
-  ret = ret && connect(m_slider, SIGNAL(valueChanged(int)),
-                       SLOT(onSliderChanged(int)));
+
   ret = ret &&
-        connect(m_slider, SIGNAL(sliderReleased()), SLOT(onSliderReleased()));
-  ret = ret && connect(m_lineEdit, SIGNAL(editingFinished()), this,
-                       SIGNAL(valueEditedByHand()));
-  ret = ret && connect(m_slider, SIGNAL(sliderReleased()), this,
-                       SIGNAL(valueEditedByHand()));
+        QObject::connect(m_lineEdit, &DoubleValueLineEdit::valueChanged,    //
+                         this, &DoubleValueField::onLineEditValueChanged);  //
+  ret = ret &&
+        QObject::connect(m_roller, &RollerField::valueChanged,               //
+                         this, &DoubleValueField::onRollerValueChanged);     //
+  ret = ret && QObject::connect(m_slider, &QSlider::valueChanged,            //
+                                this, &DoubleValueField::onSliderChanged);   //
+  ret = ret && QObject::connect(m_slider, &QSlider::sliderReleased,          //
+                                this, &DoubleValueField::onSliderReleased);  //
+  ret = ret &&
+        QObject::connect(m_lineEdit, &DoubleValueLineEdit::editingFinished,   //
+                         this, &DoubleValueField::valueEditedByHand);         //
+  ret = ret && QObject::connect(m_slider, &QSlider::sliderReleased,           //
+                                this, &DoubleValueField::valueEditedByHand);  //
   assert(ret);
 
   m_spaceWidget = new QWidget();
@@ -253,7 +257,8 @@ DoubleLineEdit::DoubleLineEdit(QWidget *parent, double value)
 
   setValue(value);
 
-  bool ret = connect(this, SIGNAL(editingFinished()), SIGNAL(valueChanged()));
+  bool ret =
+      QObject::connect(this, SIGNAL(editingFinished()), SIGNAL(valueChanged()));
   assert(ret);
 }
 
@@ -332,9 +337,11 @@ MeasuredDoubleLineEdit::MeasuredDoubleLineEdit(QWidget *parent)
   m_value = new TMeasuredValue("length");
   valueToText();
   bool ret =
-      connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
-  ret = ret && connect(this, SIGNAL(textChanged(const QString &)), this,
-                       SLOT(onTextChanged(const QString &)));
+      QObject::connect(this, &MeasuredDoubleLineEdit::editingFinished,     //
+                       this, &MeasuredDoubleLineEdit::onEditingFinished);  //
+  ret =
+      ret && QObject::connect(this, &MeasuredDoubleLineEdit::textChanged,     //
+                              this, &MeasuredDoubleLineEdit::onTextChanged);  //
   assert(ret);
 }
 

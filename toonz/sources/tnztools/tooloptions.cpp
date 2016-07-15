@@ -764,12 +764,12 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
 
   /* --- signal-slot connections --- */
   // swap page when the active axis is changed
-  connect(m_chooseActiveAxisCombo, SIGNAL(currentIndexChanged(int)),
-          m_mainStackedWidget, SLOT(setCurrentIndex(int)));
+  QObject::connect(m_chooseActiveAxisCombo, SIGNAL(currentIndexChanged(int)),
+                   m_mainStackedWidget, SLOT(setCurrentIndex(int)));
   // when the current stage object is changed via combo box, then switch the
   // current stage object in the scene
-  connect(m_currentStageObjectCombo, SIGNAL(activated(int)), this,
-          SLOT(onCurrentStageObjectComboActivated(int)));
+  QObject::connect(m_currentStageObjectCombo, SIGNAL(activated(int)), this,
+                   SLOT(onCurrentStageObjectComboActivated(int)));
 
   /* --- Assigning shortcut keys --- */
   if (activeAxisProp->getId() != "") {
@@ -806,26 +806,27 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
   if (scaleConstraintProp) {
     m_scaleHField->onScaleTypeChanged(m_maintainCombo->currentIndex());
     m_scaleVField->onScaleTypeChanged(m_maintainCombo->currentIndex());
-    connect(m_maintainCombo, SIGNAL(currentIndexChanged(int)), m_scaleHField,
-            SLOT(onScaleTypeChanged(int)));
-    connect(m_maintainCombo, SIGNAL(currentIndexChanged(int)), m_scaleVField,
-            SLOT(onScaleTypeChanged(int)));
+    QObject::connect(m_maintainCombo, SIGNAL(currentIndexChanged(int)),
+                     m_scaleHField, SLOT(onScaleTypeChanged(int)));
+    QObject::connect(m_maintainCombo, SIGNAL(currentIndexChanged(int)),
+                     m_scaleVField, SLOT(onScaleTypeChanged(int)));
   }
 }
 
 //-----------------------------------------------------------------------------
 
 void ArrowToolOptionsBox::showEvent(QShowEvent *) {
-  connect(m_frameHandle, SIGNAL(frameSwitched()), SLOT(onFrameSwitched()));
+  QObject::connect(m_frameHandle, SIGNAL(frameSwitched()),
+                   SLOT(onFrameSwitched()));
   // if some stage object is added/removed, then reflect it to the combobox
-  connect(m_xshHandle, SIGNAL(xsheetSwitched()), this,
-          SLOT(updateStageObjectComboItems()));
-  connect(m_xshHandle, SIGNAL(xsheetChanged()), this,
-          SLOT(updateStageObjectComboItems()));
+  QObject::connect(m_xshHandle, SIGNAL(xsheetSwitched()), this,
+                   SLOT(updateStageObjectComboItems()));
+  QObject::connect(m_xshHandle, SIGNAL(xsheetChanged()), this,
+                   SLOT(updateStageObjectComboItems()));
   // If the current stage object is switched, then synchronize it to the
   // combobox
-  connect(m_objHandle, SIGNAL(objectSwitched()), this,
-          SLOT(syncCurrentStageObjectComboItem()));
+  QObject::connect(m_objHandle, SIGNAL(objectSwitched()), this,
+                   SLOT(syncCurrentStageObjectComboItem()));
 
   // update the item list in m_currentStageObjectCombo
   updateStageObjectComboItems();
@@ -834,15 +835,15 @@ void ArrowToolOptionsBox::showEvent(QShowEvent *) {
 //-----------------------------------------------------------------------------
 
 void ArrowToolOptionsBox::hideEvent(QShowEvent *) {
-  disconnect(m_frameHandle, SIGNAL(frameSwitched()), this,
-             SLOT(onFrameSwitched()));
+  QObject::disconnect(m_frameHandle, SIGNAL(frameSwitched()), this,
+                      SLOT(onFrameSwitched()));
 
-  disconnect(m_xshHandle, SIGNAL(xsheetSwitched()), this,
-             SLOT(updateStageObjectComboItems()));
-  disconnect(m_xshHandle, SIGNAL(xsheetChanged()), this,
-             SLOT(updateStageObjectComboItems()));
-  disconnect(m_objHandle, SIGNAL(objectSwitched()), this,
-             SLOT(syncCurrentStageObjectComboItem()));
+  QObject::disconnect(m_xshHandle, SIGNAL(xsheetSwitched()), this,
+                      SLOT(updateStageObjectComboItems()));
+  QObject::disconnect(m_xshHandle, SIGNAL(xsheetChanged()), this,
+                      SLOT(updateStageObjectComboItems()));
+  QObject::disconnect(m_objHandle, SIGNAL(objectSwitched()), this,
+                      SLOT(syncCurrentStageObjectComboItem()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1109,13 +1110,13 @@ SelectionToolOptionsBox::SelectionToolOptionsBox(QWidget *parent, TTool *tool,
 
   hLayout()->addStretch(1);
   // assert(ret);
-  bool ret = connect(m_scaleXField, SIGNAL(valueChange()),
-                     SLOT(onScaleXValueChanged()));
-  ret = ret && connect(m_scaleYField, SIGNAL(valueChange()),
-                       SLOT(onScaleYValueChanged()));
+  bool ret = QObject::connect(m_scaleXField, SIGNAL(valueChange()),
+                              SLOT(onScaleXValueChanged()));
+  ret = ret && QObject::connect(m_scaleYField, SIGNAL(valueChange()),
+                                SLOT(onScaleYValueChanged()));
   if (m_setSaveboxCheckbox)
-    ret = ret && connect(m_setSaveboxCheckbox, SIGNAL(toggled(bool)),
-                         SLOT(onSetSaveboxCheckboxChanged(bool)));
+    ret = ret && QObject::connect(m_setSaveboxCheckbox, SIGNAL(toggled(bool)),
+                                  SLOT(onSetSaveboxCheckboxChanged(bool)));
 
   // assert(ret);
 
@@ -1253,16 +1254,16 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
     m_poligonSideLabel->setEnabled(false);
     m_poligonSideField->setEnabled(false);
   }
-  bool ret = connect(m_shapeField, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(onShapeValueChanged()));
+  bool ret = QObject::connect(m_shapeField, SIGNAL(currentIndexChanged(int)),
+                              this, SLOT(onShapeValueChanged()));
 
   if (m_pencilMode) {
     if (m_pencilMode->isChecked()) {
       m_hardnessLabel->setEnabled(false);
       m_hardnessField->setEnabled(false);
     }
-    ret = ret && connect(m_pencilMode, SIGNAL(toggled(bool)), this,
-                         SLOT(onPencilModeToggled(bool)));
+    ret = ret && QObject::connect(m_pencilMode, SIGNAL(toggled(bool)), this,
+                                  SLOT(onPencilModeToggled(bool)));
   }
 
   ToolOptionPopupButton *m_joinStyle =
@@ -1273,8 +1274,8 @@ GeometricToolOptionsBox::GeometricToolOptionsBox(QWidget *parent, TTool *tool,
                            TStroke::OutlineOptions::MITER_JOIN);
 
   assert(m_joinStyle && m_miterField);
-  connect(m_joinStyle, SIGNAL(activated(int)), this,
-          SLOT(onJoinStyleChanged(int)));
+  QObject::connect(m_joinStyle, SIGNAL(activated(int)), this,
+                   SLOT(onJoinStyleChanged(int)));
 
   assert(ret);
 }
@@ -1346,8 +1347,8 @@ TypeToolOptionsBox::TypeToolOptionsBox(QWidget *parent, TTool *tool,
 
   ToolOptionCheckbox *orientationField = dynamic_cast<ToolOptionCheckbox *>(
       m_controls.value("Vertical Orientation"));
-  ret = ret && connect(orientationField, SIGNAL(stateChanged(int)), this,
-                       SLOT(onFieldChanged()));
+  ret = ret && QObject::connect(orientationField, SIGNAL(stateChanged(int)),
+                                this, SLOT(onFieldChanged()));
 
   assert(ret);
 }
@@ -1391,8 +1392,8 @@ PaintbrushToolOptionsBox::PaintbrushToolOptionsBox(QWidget *parent, TTool *tool,
   if (m_colorMode->currentText().toStdWString() == L"Lines")
     m_selectiveMode->setEnabled(false);
 
-  bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(onColorModeChanged()));
+  bool ret = QObject::connect(m_colorMode, SIGNAL(currentIndexChanged(int)),
+                              this, SLOT(onColorModeChanged()));
   assert(ret);
 }
 
@@ -1448,14 +1449,14 @@ FillToolOptionsBox::FillToolOptionsBox(QWidget *parent, TTool *tool,
   m_multiFrameMode =
       dynamic_cast<ToolOptionCheckbox *>(m_controls.value("Frame Range"));
 
-  bool ret = connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(onColorModeChanged()));
-  ret = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onToolTypeChanged()));
-  ret = ret && connect(m_onionMode, SIGNAL(toggled(bool)), this,
-                       SLOT(onOnionModeToggled(bool)));
-  ret = ret && connect(m_multiFrameMode, SIGNAL(toggled(bool)), this,
-                       SLOT(onMultiFrameModeToggled(bool)));
+  bool ret = QObject::connect(m_colorMode, SIGNAL(currentIndexChanged(int)),
+                              this, SLOT(onColorModeChanged()));
+  ret = ret && QObject::connect(m_toolType, SIGNAL(currentIndexChanged(int)),
+                                this, SLOT(onToolTypeChanged()));
+  ret = ret && QObject::connect(m_onionMode, SIGNAL(toggled(bool)), this,
+                                SLOT(onOnionModeToggled(bool)));
+  ret = ret && QObject::connect(m_multiFrameMode, SIGNAL(toggled(bool)), this,
+                                SLOT(onMultiFrameModeToggled(bool)));
   assert(ret);
   if (m_colorMode->currentText().toStdWString() == L"Lines") {
     m_selectiveMode->setEnabled(false);
@@ -1545,8 +1546,8 @@ public:
     QPushButton *okBtn = new QPushButton(tr("OK"), this);
     okBtn->setDefault(true);
     QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-    connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+    QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
+    QObject::connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
 
     addButtonBarWidget(okBtn, cancelBtn);
   }
@@ -1594,14 +1595,15 @@ BrushToolOptionsBox::BrushToolOptionsBox(QWidget *parent, TTool *tool,
   hLayout()->addWidget(m_addPresetButton);
   hLayout()->addWidget(m_removePresetButton);
 
-  connect(m_addPresetButton, SIGNAL(clicked()), this, SLOT(onAddPreset()));
-  connect(m_removePresetButton, SIGNAL(clicked()), this,
-          SLOT(onRemovePreset()));
+  QObject::connect(m_addPresetButton, SIGNAL(clicked()), this,
+                   SLOT(onAddPreset()));
+  QObject::connect(m_removePresetButton, SIGNAL(clicked()), this,
+                   SLOT(onRemovePreset()));
 
   if (tool->getTargetType() & TTool::ToonzImage) {
     assert(m_pencilMode);
-    bool ret = connect(m_pencilMode, SIGNAL(toggled(bool)), this,
-                       SLOT(onPencilModeToggled(bool)));
+    bool ret = QObject::connect(m_pencilMode, SIGNAL(toggled(bool)), this,
+                                SLOT(onPencilModeToggled(bool)));
     assert(ret);
 
     if (m_pencilMode->isChecked()) {
@@ -1727,14 +1729,14 @@ EraserToolOptionsBox::EraserToolOptionsBox(QWidget *parent, TTool *tool,
 
   bool ret = true;
   if (m_pencilMode) {
-    ret = ret && connect(m_pencilMode, SIGNAL(toggled(bool)), this,
-                         SLOT(onPencilModeToggled(bool)));
-    ret = ret && connect(m_colorMode, SIGNAL(currentIndexChanged(int)), this,
-                         SLOT(onColorModeChanged()));
+    ret = ret && QObject::connect(m_pencilMode, SIGNAL(toggled(bool)), this,
+                                  SLOT(onPencilModeToggled(bool)));
+    ret = ret && QObject::connect(m_colorMode, SIGNAL(currentIndexChanged(int)),
+                                  this, SLOT(onColorModeChanged()));
   }
 
-  ret = ret && connect(m_toolType, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onToolTypeChanged()));
+  ret = ret && QObject::connect(m_toolType, SIGNAL(currentIndexChanged(int)),
+                                this, SLOT(onToolTypeChanged()));
 
   if (m_pencilMode && m_pencilMode->isChecked()) {
     assert(m_hardnessField && m_hardnessLabel);
@@ -1992,12 +1994,12 @@ TapeToolOptionsBox::TapeToolOptionsBox(QWidget *parent, TTool *tool,
   bool isJoinStrokes = m_joinStrokesMode->isChecked();
   m_smoothMode->setEnabled(!isLineToLineMode && isJoinStrokes);
 
-  bool ret = connect(m_typeMode, SIGNAL(currentIndexChanged(int)), this,
-                     SLOT(onToolTypeChanged()));
-  ret = ret && connect(m_toolMode, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onToolModeChanged()));
-  ret = ret && connect(m_joinStrokesMode, SIGNAL(toggled(bool)), this,
-                       SLOT(onJoinStrokesModeChanged()));
+  bool ret = QObject::connect(m_typeMode, SIGNAL(currentIndexChanged(int)),
+                              this, SLOT(onToolTypeChanged()));
+  ret = ret && QObject::connect(m_toolMode, SIGNAL(currentIndexChanged(int)),
+                                this, SLOT(onToolModeChanged()));
+  ret = ret && QObject::connect(m_joinStrokesMode, SIGNAL(toggled(bool)), this,
+                                SLOT(onJoinStrokesModeChanged()));
   assert(ret);
 }
 
@@ -2110,7 +2112,8 @@ RGBPickerToolOptionsBox::RGBPickerToolOptionsBox(
   QPushButton *button = new QPushButton(tr("Pick Screen"));
   button->setFixedHeight(20);
   button->addAction(pickScreenAction);
-  connect(button, SIGNAL(clicked()), pickScreenAction, SLOT(trigger()));
+  QObject::connect(button, SIGNAL(clicked()), pickScreenAction,
+                   SLOT(trigger()));
 
   TPropertyGroup *props = tool->getProperties(0);
   assert(props->getPropertyCount() > 0);
@@ -2126,14 +2129,15 @@ RGBPickerToolOptionsBox::RGBPickerToolOptionsBox(
   m_layout->addWidget(button, 0);  // new in 6.4
 
   if (m_realTimePickMode) {
-    connect(m_realTimePickMode, SIGNAL(toggled(bool)), m_currentRGBLabel,
-            SLOT(setVisible(bool)));
+    QObject::connect(m_realTimePickMode, SIGNAL(toggled(bool)),
+                     m_currentRGBLabel, SLOT(setVisible(bool)));
     m_currentRGBLabel->setVisible(m_realTimePickMode->isChecked());
   }
 
   // for passive pick
-  connect(paletteController, SIGNAL(colorPassivePicked(const QColor &)), this,
-          SLOT(updateRealTimePickLabel(const QColor &)));
+  QObject::connect(paletteController,
+                   SIGNAL(colorPassivePicked(const QColor &)), this,
+                   SLOT(updateRealTimePickLabel(const QColor &)));
 }
 
 //-----------------------------------------------------------------------------
@@ -2183,15 +2187,16 @@ StylePickerToolOptionsBox::StylePickerToolOptionsBox(
   m_layout->addStretch(1);
 
   if (m_realTimePickMode) {
-    connect(m_realTimePickMode, SIGNAL(toggled(bool)), m_currentStyleLabel,
-            SLOT(setVisible(bool)));
+    QObject::connect(m_realTimePickMode, SIGNAL(toggled(bool)),
+                     m_currentStyleLabel, SLOT(setVisible(bool)));
     m_currentStyleLabel->setVisible(m_realTimePickMode->isChecked());
   }
 
   // for passive pick
-  connect(paletteController,
-          SIGNAL(stylePassivePicked(const int, const int, const int)), this,
-          SLOT(updateRealTimePickLabel(const int, const int, const int)));
+  QObject::connect(
+      paletteController,
+      SIGNAL(stylePassivePicked(const int, const int, const int)), this,
+      SLOT(updateRealTimePickLabel(const int, const int, const int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -2240,23 +2245,25 @@ void ToolOptions::showEvent(QShowEvent *) {
   ToolHandle *currTool    = app->getCurrentTool();
   if (currTool) {
     onToolSwitched();
-    connect(currTool, SIGNAL(toolSwitched()), SLOT(onToolSwitched()));
-    connect(currTool, SIGNAL(toolChanged()), SLOT(onToolChanged()));
+    QObject::connect(currTool, SIGNAL(toolSwitched()), SLOT(onToolSwitched()));
+    QObject::connect(currTool, SIGNAL(toolChanged()), SLOT(onToolChanged()));
   }
 
   TObjectHandle *currObject = app->getCurrentObject();
   if (currObject) {
     onStageObjectChange();
-    connect(currObject, SIGNAL(objectSwitched()), SLOT(onStageObjectChange()));
-    connect(currObject, SIGNAL(objectChanged(bool)),
-            SLOT(onStageObjectChange()));
+    QObject::connect(currObject, SIGNAL(objectSwitched()),
+                     SLOT(onStageObjectChange()));
+    QObject::connect(currObject, SIGNAL(objectChanged(bool)),
+                     SLOT(onStageObjectChange()));
   }
 
   TXshLevelHandle *currLevel = app->getCurrentLevel();
 
-  if (currLevel)
-    connect(currLevel, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-            SLOT(onStageObjectChange()));
+  if (currLevel) {
+    QObject::connect(currLevel, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+                     SLOT(onStageObjectChange()));
+  }
 }
 
 //-----------------------------------------------------------------------------

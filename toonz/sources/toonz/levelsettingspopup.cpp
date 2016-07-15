@@ -268,30 +268,34 @@ LevelSettingsPopup::LevelSettingsPopup()
   }
 
   //----signal/slot connections
-  connect(m_nameFld, SIGNAL(editingFinished()), SLOT(onNameChanged()));
-  connect(m_pathFld, SIGNAL(pathChanged()), SLOT(onPathChanged()));
-  connect(m_dpiTypeOm, SIGNAL(currentIndexChanged(const QString &)),
-          SLOT(onDpiTypeChanged(const QString &)));
-  connect(m_dpiFld, SIGNAL(editingFinished()), SLOT(onDpiFieldChanged()));
-  connect(m_squarePixCB, SIGNAL(stateChanged(int)),
-          SLOT(onSquarePixelChanged(int)));
-  connect(m_widthFld, SIGNAL(editingFinished()), SLOT(onWidthFieldChanged()));
-  connect(m_heightFld, SIGNAL(editingFinished()), SLOT(onHeightFieldChanged()));
-  connect(m_useCameraDpiBtn, SIGNAL(clicked()), SLOT(useCameraDpi()));
-  connect(m_subsamplingFld, SIGNAL(editingFinished()),
-          SLOT(onSubsamplingChanged()));
+  QObject::connect(m_nameFld, SIGNAL(editingFinished()), SLOT(onNameChanged()));
+  QObject::connect(m_pathFld, SIGNAL(pathChanged()), SLOT(onPathChanged()));
+  QObject::connect(m_dpiTypeOm, SIGNAL(currentIndexChanged(const QString &)),
+                   SLOT(onDpiTypeChanged(const QString &)));
+  QObject::connect(m_dpiFld, SIGNAL(editingFinished()),
+                   SLOT(onDpiFieldChanged()));
+  QObject::connect(m_squarePixCB, SIGNAL(stateChanged(int)),
+                   SLOT(onSquarePixelChanged(int)));
+  QObject::connect(m_widthFld, SIGNAL(editingFinished()),
+                   SLOT(onWidthFieldChanged()));
+  QObject::connect(m_heightFld, SIGNAL(editingFinished()),
+                   SLOT(onHeightFieldChanged()));
+  QObject::connect(m_useCameraDpiBtn, SIGNAL(clicked()), SLOT(useCameraDpi()));
+  QObject::connect(m_subsamplingFld, SIGNAL(editingFinished()),
+                   SLOT(onSubsamplingChanged()));
 
   /*--- ScanPathの入力に対応 ---*/
-  connect(m_scanPathFld, SIGNAL(pathChanged()), SLOT(onScanPathChanged()));
-  connect(m_doPremultiply, SIGNAL(stateChanged(int)),
-          SLOT(onDoPremultiplyChanged(int)));
-  connect(m_doAntialias, SIGNAL(stateChanged(int)),
-          SLOT(onDoAntialiasChanged(int)));
-  connect(m_antialiasSoftness, SIGNAL(editingFinished()),
-          SLOT(onAntialiasSoftnessChanged()));
+  QObject::connect(m_scanPathFld, SIGNAL(pathChanged()),
+                   SLOT(onScanPathChanged()));
+  QObject::connect(m_doPremultiply, SIGNAL(stateChanged(int)),
+                   SLOT(onDoPremultiplyChanged(int)));
+  QObject::connect(m_doAntialias, SIGNAL(stateChanged(int)),
+                   SLOT(onDoAntialiasChanged(int)));
+  QObject::connect(m_antialiasSoftness, SIGNAL(editingFinished()),
+                   SLOT(onAntialiasSoftnessChanged()));
 
-  connect(m_whiteTransp, SIGNAL(stateChanged(int)),
-          SLOT(onWhiteTranspChanged(int)));
+  QObject::connect(m_whiteTransp, SIGNAL(stateChanged(int)),
+                   SLOT(onWhiteTranspChanged(int)));
 
   updateLevelSettings();
 }
@@ -299,23 +303,23 @@ LevelSettingsPopup::LevelSettingsPopup()
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::showEvent(QShowEvent *e) {
-  bool ret =
-      connect(TApp::instance()->getCurrentSelection(),
-              SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
-              SLOT(onSelectionSwitched(TSelection *, TSelection *)));
-  ret = ret && connect(TApp::instance()->getCurrentSelection(),
-                       SIGNAL(selectionChanged(TSelection *)),
-                       SLOT(updateLevelSettings()));
+  bool ret = QObject::connect(
+      TApp::instance()->getCurrentSelection(),
+      SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
+      SLOT(onSelectionSwitched(TSelection *, TSelection *)));
+  ret = ret && QObject::connect(TApp::instance()->getCurrentSelection(),
+                                SIGNAL(selectionChanged(TSelection *)),
+                                SLOT(updateLevelSettings()));
 
   CastSelection *castSelection = dynamic_cast<CastSelection *>(
       TApp::instance()->getCurrentSelection()->getSelection());
   if (castSelection)
-    ret = ret && connect(castSelection, SIGNAL(itemSelectionChanged()), this,
-                         SLOT(onCastSelectionChanged()));
+    ret = ret && QObject::connect(castSelection, SIGNAL(itemSelectionChanged()),
+                                  this, SLOT(onCastSelectionChanged()));
 
   /*--- Cleanupが行われたときに表示を更新するため ---*/
-  ret = ret && connect(TApp::instance()->getCurrentScene(),
-                       SIGNAL(sceneChanged()), SLOT(onSceneChanged()));
+  ret = ret && QObject::connect(TApp::instance()->getCurrentScene(),
+                                SIGNAL(sceneChanged()), SLOT(onSceneChanged()));
 
   assert(ret);
   updateLevelSettings();
@@ -349,22 +353,24 @@ void LevelSettingsPopup::showEvent(QShowEvent *e) {
 //-----------------------------------------------------------------------------
 
 void LevelSettingsPopup::hideEvent(QHideEvent *e) {
-  bool ret =
-      disconnect(TApp::instance()->getCurrentSelection(),
-                 SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
-                 SLOT(onSelectionSwitched(TSelection *, TSelection *)));
-  ret = ret && disconnect(TApp::instance()->getCurrentSelection(),
-                          SIGNAL(selectionChanged(TSelection *)), this,
-                          SLOT(updateLevelSettings()));
+  bool ret = QObject::disconnect(
+      TApp::instance()->getCurrentSelection(),
+      SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
+      SLOT(onSelectionSwitched(TSelection *, TSelection *)));
+  ret = ret && QObject::disconnect(TApp::instance()->getCurrentSelection(),
+                                   SIGNAL(selectionChanged(TSelection *)), this,
+                                   SLOT(updateLevelSettings()));
 
   CastSelection *castSelection = dynamic_cast<CastSelection *>(
       TApp::instance()->getCurrentSelection()->getSelection());
   if (castSelection)
-    ret = ret && disconnect(castSelection, SIGNAL(itemSelectionChanged()), this,
-                            SLOT(onCastSelectionChanged()));
+    ret = ret &&
+          QObject::disconnect(castSelection, SIGNAL(itemSelectionChanged()),
+                              this, SLOT(onCastSelectionChanged()));
 
-  ret = ret && disconnect(TApp::instance()->getCurrentScene(),
-                          SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
+  ret = ret && QObject::disconnect(TApp::instance()->getCurrentScene(),
+                                   SIGNAL(sceneChanged()), this,
+                                   SLOT(onSceneChanged()));
 
   assert(ret);
   Dialog::hideEvent(e);
@@ -387,12 +393,12 @@ void LevelSettingsPopup::onSelectionSwitched(TSelection *oldSelection,
     CastSelection *oldCastSelection =
         dynamic_cast<CastSelection *>(oldSelection);
     if (oldCastSelection)
-      disconnect(oldCastSelection, SIGNAL(itemSelectionChanged()), this,
-                 SLOT(onCastSelectionChanged()));
+      QObject::disconnect(oldCastSelection, SIGNAL(itemSelectionChanged()),
+                          this, SLOT(onCastSelectionChanged()));
     return;
   }
-  connect(castSelection, SIGNAL(itemSelectionChanged()), this,
-          SLOT(onCastSelectionChanged()));
+  QObject::connect(castSelection, SIGNAL(itemSelectionChanged()), this,
+                   SLOT(onCastSelectionChanged()));
 }
 
 //-----------------------------------------------------------------------------

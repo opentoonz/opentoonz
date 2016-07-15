@@ -40,18 +40,18 @@ SVNCleanupDialog::SVNCleanupDialog(QWidget *parent, const QString &workingDir)
   endVLayout();
 
   m_closeButton = new QPushButton(tr("Close"));
-  connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
   m_closeButton->setEnabled(false);
 
   addButtonBarWidget(m_closeButton);
 
   // 0. Connect for svn errors (that may occurs everythings)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // 1. Cleanup
-  connect(&m_thread, SIGNAL(done(const QString &)), this,
-          SLOT(onCleanupDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onCleanupDone()));
   QStringList args;
   args << "cleanup";
   m_thread.executeCommand(workingDir, "svn", args);

@@ -33,9 +33,9 @@ LoadFolderPopup::LoadFolderPopup(QWidget *parent)
   // Connect signals/slots
   bool ret = true;
 
-  ret = ret && connect(okBtn, SIGNAL(clicked()), SLOT(onOk()));
-  ret = ret && connect(okBtn, SIGNAL(clicked()), SLOT(close()));
-  ret = ret && connect(cancelBtn, SIGNAL(clicked()), SLOT(close()));
+  ret = ret && QObject::connect(okBtn, SIGNAL(clicked()), SLOT(onOk()));
+  ret = ret && QObject::connect(okBtn, SIGNAL(clicked()), SLOT(close()));
+  ret = ret && QObject::connect(cancelBtn, SIGNAL(clicked()), SLOT(close()));
 
   assert(ret);
 }

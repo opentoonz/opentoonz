@@ -4,8 +4,8 @@
 UpdateChecker::UpdateChecker(QUrl const& updateUrl)
     : manager_(new QNetworkAccessManager(this),
                &QNetworkAccessManager::deleteLater) {
-  connect(manager_.data(), SIGNAL(finished(QNetworkReply*)), this,
-          SLOT(httpRequestFinished(QNetworkReply*)));
+  QObject::connect(manager_.data(), &QNetworkAccessManager::finished,  //
+                   this, &UpdateChecker::httpRequestFinished);         //
 
   manager_->get(QNetworkRequest(updateUrl));
 }

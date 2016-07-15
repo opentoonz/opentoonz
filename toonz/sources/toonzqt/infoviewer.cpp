@@ -115,7 +115,6 @@ public slots:
 InfoViewer::InfoViewer(QWidget *parent) : Dialog(), m_imp(new InfoViewerImp()) {
   setWindowTitle(tr("File Info"));
   setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-  // setAttribute(Qt::WA_DeleteOnClose);
 
   m_parent = parent;
 
@@ -131,8 +130,8 @@ InfoViewer::InfoViewer(QWidget *parent) : Dialog(), m_imp(new InfoViewerImp()) {
 
   addWidgets(&m_imp->m_framesLabel, &m_imp->m_framesSlider);
 
-  connect(&m_imp->m_framesSlider, SIGNAL(valueChanged(bool)), this,
-          SLOT(onSliderChanged(bool)));
+  QObject::connect(&m_imp->m_framesSlider, &IntField::valueChanged,  //
+                   this, &InfoViewer::onSliderChanged);
   hide();
 }
 
@@ -145,14 +144,12 @@ void InfoViewer::hideEvent(QHideEvent *) {
 
   if (m_parent) {
     m_parent->setWindowModality(Qt::ApplicationModal);
-    // setWindowModality(Qt::NonModal);
   }
 }
 
 void InfoViewer::showEvent(QShowEvent *) {
   if (m_parent) {
     m_parent->setWindowModality(Qt::NonModal);
-    // setWindowModality(Qt::WindowModal);
   }
 }
 

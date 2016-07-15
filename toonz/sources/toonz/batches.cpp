@@ -556,8 +556,8 @@ void BatchesController::setDirtyFlag(bool state) {
 
   if (FirstTime) {
     FirstTime = false;
-    bool ret  = connect(TApp::instance()->getMainWindow(), SIGNAL(exit(bool &)),
-                       SLOT(onExit(bool &)));
+    bool ret  = QObject::connect(TApp::instance()->getMainWindow(),
+                                SIGNAL(exit(bool &)), SLOT(onExit(bool &)));
     assert(ret);
   }
 
@@ -1181,10 +1181,10 @@ public:
       : m_controller(new MyLocalController(port)) {
     TThread::Executor executor;
     executor.addTask(this);
-    connect(this, SIGNAL(finished(TThread::RunnableP)), this,
-            SLOT(onFinished(TThread::RunnableP)));
-    connect(this, SIGNAL(exception(TThread::RunnableP)), this,
-            SLOT(onFinished(TThread::RunnableP)));
+    QObject::connect(this, SIGNAL(finished(TThread::RunnableP)), this,
+                     SLOT(onFinished(TThread::RunnableP)));
+    QObject::connect(this, SIGNAL(exception(TThread::RunnableP)), this,
+                     SLOT(onFinished(TThread::RunnableP)));
   }
 
   void run() override { m_controller->run(); }

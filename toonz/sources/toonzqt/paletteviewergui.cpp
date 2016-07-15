@@ -130,8 +130,8 @@ PageViewer::PageViewer(QWidget *parent, PaletteViewType viewType,
 
   m_renameTextField->hide();
   m_renameTextField->setObjectName("RenameColorTextField");
-  connect(m_renameTextField, SIGNAL(editingFinished()), this,
-          SLOT(onStyleRenamed()));
+  QObject::connect(m_renameTextField, &LineEdit::editingFinished,  //
+                   this, &PageViewer::onStyleRenamed);
   m_styleSelection->setView(this);
   setAcceptDrops(true);
 
@@ -164,12 +164,16 @@ void PageViewer::setPaletteHandle(TPaletteHandle *paletteHandle) {
   TPaletteHandle *previousPalette = getPaletteHandle();
   if (previousPalette == paletteHandle) return;
 
-  if (previousPalette)
-    disconnect(previousPalette, SIGNAL(colorStyleChanged()), this,
-               SLOT(update()));
+  if (previousPalette) {
+    QObject::disconnect<void (TPaletteHandle::*)(), void (PageViewer::*)()>(
+        previousPalette, &TPaletteHandle::colorStyleChanged,  //
+        this, &PageViewer::update);
+  }
 
   m_styleSelection->setPaletteHandle(paletteHandle);
-  connect(paletteHandle, SIGNAL(colorStyleChanged()), SLOT(update()));
+  QObject::connect<void (TPaletteHandle::*)(), void (PageViewer::*)()>(
+      paletteHandle, &TPaletteHandle::colorStyleChanged,  //
+      this, &PageViewer::update);
 
   m_styleNameEditor->setPaletteHandle(paletteHandle);
 }
@@ -958,7 +962,7 @@ void PageViewer::createMenuAction(QMenu &menu, const char *id, QString name,
   QAction *act = menu.addAction(name);
   std::string slotName(slot);
   slotName = std::string("1") + slotName;
-  ret      = connect(act, SIGNAL(triggered()), slotName.c_str());
+  ret      = QObject::connect(act, SIGNAL(triggered()), slotName.c_str());
   assert(ret);
 }
 
@@ -1008,7 +1012,7 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
   QAction *openStyleControlAct = cmd->getAction("MI_OpenStyleControl");
   menu.addAction(openStyleControlAct);
   QAction *openStyleNameEditorAct = menu.addAction(tr("Name Editor"));
-  connect(openStyleNameEditorAct, &QAction::triggered, [&]() {
+  QObject::connect(openStyleNameEditorAct, &QAction::triggered, [&]() {
     m_styleNameEditor->show();
     m_styleNameEditor->raise();
     m_styleNameEditor->activateWindow();
@@ -1026,7 +1030,8 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
       !m_styleSelection->isEmpty() && !isLocked) {
     menu.addSeparator();
     QAction *removeLinkAct = menu.addAction(tr("Remove Links"));
-    connect(removeLinkAct, SIGNAL(triggered()), this, SLOT(removeLink()));
+    QObject::connect(removeLinkAct, &QAction::triggered,  //
+                     this, &PageViewer::removeLink);
   }
 
   if (((indexPage == 0 && index > 0) || (indexPage > 0 && index >= 0)) &&
@@ -1080,9 +1085,11 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
   */
   if (m_page) {
     QAction *newStyle = menu.addAction(tr("New Style"));
-    connect(newStyle, SIGNAL(triggered()), SLOT(addNewColor()));
+    QObject::connect(newStyle, &QAction::triggered,  //
+                     this, &PageViewer::addNewColor);
     QAction *newPage = menu.addAction(tr("New Page"));
-    connect(newPage, SIGNAL(triggered()), SLOT(addNewPage()));
+    QObject::connect(newPage, &QAction::triggered,  //
+                     this, &PageViewer::addNewPage);
   }
   menu.exec(event->globalPos());
 }
@@ -1220,8 +1227,9 @@ void PageViewer::keyPressEvent(QKeyEvent *e) {
 void PageViewer::showEvent(QShowEvent *) {
   TPaletteHandle *paletteHandle = getPaletteHandle();
   if (!paletteHandle) return;
-  connect(paletteHandle, SIGNAL(colorStyleChanged()), SLOT(update()),
-          Qt::UniqueConnection);
+  QObject::connect<void (TPaletteHandle::*)(), void (PageViewer::*)()>(
+      paletteHandle, &TPaletteHandle::colorStyleChanged,  //
+      this, &PageViewer::update, Qt::UniqueConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -1229,7 +1237,9 @@ void PageViewer::showEvent(QShowEvent *) {
 void PageViewer::hideEvent(QHideEvent *) {
   TPaletteHandle *paletteHandle = getPaletteHandle();
   if (!paletteHandle) return;
-  disconnect(paletteHandle, SIGNAL(colorStyleChanged()), this, SLOT(update()));
+  QObject::disconnect<void (TPaletteHandle::*)(), void (PageViewer::*)()>(
+      paletteHandle, &TPaletteHandle::colorStyleChanged,  //
+      this, &PageViewer::update);
 }
 
 //-----------------------------------------------------------------------------
@@ -1418,8 +1428,8 @@ PaletteTabBar::PaletteTabBar(QWidget *parent, bool hasPageCommand)
   setObjectName("PaletteTabBar");
   setDrawBase(false);
   m_renameTextField->hide();
-  connect(m_renameTextField, SIGNAL(editingFinished()), this,
-          SLOT(updateTabName()));
+  QObject::connect(m_renameTextField, &LineEdit::editingFinished,  //
+                   this, &PaletteTabBar::updateTabName);
   if (m_hasPageCommand) setAcceptDrops(true);
 }
 

@@ -139,41 +139,52 @@ FunctionViewer::FunctionViewer(QWidget *parent, Qt::WFlags flags)
 
   //---- signal-slot connections
   bool ret = true;
-  ret      = ret && connect(m_toolbar, SIGNAL(numericalColumnToggled()), this,
-                       SLOT(toggleMode()));
-  ret = ret && connect(ftModel, SIGNAL(activeChannelsChanged()),
-                       m_functionGraph, SLOT(update()));
-  ret = ret && connect(ftModel, SIGNAL(activeChannelsChanged()),
-                       m_numericalColumns, SLOT(updateAll()));
-  ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_treeView,
-                       SLOT(update()));
-  ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_functionGraph,
-                       SLOT(update()));
-  ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_numericalColumns,
-                       SLOT(updateAll()));
-  ret = ret && connect(ftModel, SIGNAL(curveSelected(TDoubleParam *)), this,
-                       SLOT(onCurveSelected(TDoubleParam *)));
-  ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), m_segmentViewer,
-                       SLOT(onCurveChanged()));
-  ret = ret && connect(ftModel, SIGNAL(curveChanged(bool)), this,
-                       SLOT(onCurveChanged(bool)));
-  ret = ret && connect(&m_localFrame, SIGNAL(frameSwitched()), this,
-                       SLOT(onFrameSwitched()));
-  ret = ret && connect(getSelection(), SIGNAL(selectionChanged()), this,
-                       SLOT(onSelectionChanged()));
-  ret = ret && connect(m_functionGraph, SIGNAL(keyframeSelected(double)),
-                       m_toolbar, SLOT(setFrame(double)));
 
-  ret = ret && connect(m_treeView, SIGNAL(switchCurrentObject(TStageObject *)),
-                       this, SLOT(doSwitchCurrentObject(TStageObject *)));
-  ret = ret && connect(m_treeView, SIGNAL(switchCurrentFx(TFx *)), this,
-                       SLOT(doSwitchCurrentFx(TFx *)));
+  ret = ret && QObject::connect(m_toolbar,
+                                &FunctionToolbar::numericalColumnToggled,  //
+                                this, &FunctionViewer::toggleMode);
+  ret = ret && QObject::connect<void (FunctionTreeModel::*)(),
+                                void (FunctionPanel::*)()>(
+                   ftModel, &FunctionTreeModel::activeChannelsChanged,  //
+                   m_functionGraph, &FunctionPanel::update);
+  ret = ret &&
+        QObject::connect(ftModel, &FunctionTreeModel::activeChannelsChanged,
+                         m_numericalColumns, &FunctionSheet::updateAll);
+
+  // FIXME: arg type missmatch
+  ret = ret && QObject::connect(ftModel, SIGNAL(curveChanged(bool)),  //
+                                m_treeView, SLOT(update()));
+  ret = ret && QObject::connect(ftModel, SIGNAL(curveChanged(bool)),  //
+                                m_functionGraph, SLOT(update()));
+  ret = ret && QObject::connect(ftModel, SIGNAL(curveChanged(bool)),  //
+                                m_numericalColumns, SLOT(updateAll()));
+
+  ret = ret && QObject::connect(ftModel, &FunctionTreeModel::curveSelected,
+                                this, &FunctionViewer::onCurveSelected);
+
+  ret = ret && QObject::connect(ftModel, &FunctionTreeModel::curveChanged,  //
+                                m_segmentViewer,
+                                &FunctionSegmentViewer::onCurveChanged);
+  ret = ret && QObject::connect(ftModel, &FunctionTreeModel::curveChanged,  //
+                                this, &FunctionViewer::onCurveChanged);
+  ret = ret && QObject::connect(&m_localFrame, &TFrameHandle::frameSwitched,  //
+                                this, &FunctionViewer::onFrameSwitched);
+  ret = ret && QObject::connect(getSelection(),
+                                &FunctionSelection::selectionChanged,  //
+                                this, &FunctionViewer::onSelectionChanged);
+  ret =
+      ret && QObject::connect(m_functionGraph, &FunctionPanel::keyframeSelected,
+                              m_toolbar, &FunctionToolbar::setFrame);
 
   ret = ret &&
-        connect(ftModel,
-                SIGNAL(currentChannelChanged(FunctionTreeModel::Channel *)),
-                m_numericalColumns,
-                SLOT(onCurrentChannelChanged(FunctionTreeModel::Channel *)));
+        QObject::connect(m_treeView, &FunctionTreeView::switchCurrentObject,  //
+                         this, &FunctionViewer::doSwitchCurrentObject);
+  ret = ret && QObject::connect(m_treeView, &FunctionTreeView::switchCurrentFx,
+                                this, &FunctionViewer::doSwitchCurrentFx);
+
+  ret = ret && QObject::connect(
+                   ftModel, &FunctionTreeModel::currentChannelChanged,  //
+                   m_numericalColumns, &FunctionSheet::onCurrentChannelChanged);
 
   assert(ret);
 
@@ -196,37 +207,38 @@ void FunctionViewer::showEvent(QShowEvent *) {
   bool ret = true;
 
   if (m_xshHandle) {
-    ret = connect(m_xshHandle, SIGNAL(xsheetChanged()), this,
-                  SLOT(refreshModel())) &&
+    ret = QObject::connect(m_xshHandle, &TXsheetHandle::xsheetChanged,  //
+                           this, &FunctionViewer::refreshModel) &&
           ret;
-    ret = connect(m_xshHandle, SIGNAL(xsheetSwitched()), this,
-                  SLOT(rebuildModel())) &&
+    ret = QObject::connect(m_xshHandle, &TXsheetHandle::xsheetSwitched,  //
+                           this, &FunctionViewer::rebuildModel) &&
           ret;
   }
 
   if (m_frameHandle)
-    ret = connect(m_frameHandle, SIGNAL(frameSwitched()), this,
-                  SLOT(propagateExternalSetFrame())) &&
+    ret = QObject::connect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                           this, &FunctionViewer::propagateExternalSetFrame) &&
           ret;
 
   if (m_objectHandle) {
-    ret = connect(m_objectHandle, SIGNAL(objectSwitched()), this,
-                  SLOT(onStageObjectSwitched())) &&
+    ret = QObject::connect(m_objectHandle, &TObjectHandle::objectSwitched,  //
+                           this, &FunctionViewer::onStageObjectSwitched) &&
           ret;
-    ret = connect(m_objectHandle, SIGNAL(objectChanged(bool)), this,
-                  SLOT(onStageObjectChanged(bool))) &&
+    ret = QObject::connect(m_objectHandle, &TObjectHandle::objectChanged,  //
+                           this, &FunctionViewer::onStageObjectChanged) &&
           ret;
   }
 
   if (m_fxHandle)
-    ret =
-        connect(m_fxHandle, SIGNAL(fxSwitched()), this, SLOT(onFxSwitched())) &&
-        ret;
+    ret = QObject::connect(m_fxHandle, &TFxHandle::fxSwitched,  //
+                           this, &FunctionViewer::onFxSwitched) &&
+          ret;
 
   // display animated channels when the scene is switched
   if (m_sceneHandle)
-    ret = connect(m_sceneHandle, SIGNAL(sceneSwitched()), m_treeView,
-                  SLOT(displayAnimatedChannels())) &&
+    ret = QObject::connect(m_sceneHandle, &TSceneHandle::sceneSwitched,  //
+                           m_treeView,
+                           &FunctionTreeView::displayAnimatedChannels) &&
           ret;
 
   assert(ret);
@@ -325,8 +337,8 @@ void FunctionViewer::setXsheetHandle(TXsheetHandle *xshHandle) {
     TXsheet *xsh = m_xshHandle->getXsheet();
     m_functionGraph->getModel()->refreshData(xsh);
 
-    bool ret =
-        connect(m_xshHandle, SIGNAL(xsheetChanged), this, SLOT(refreshModel()));
+    bool ret = QObject::connect(m_xshHandle, &TXsheetHandle::xsheetChanged,  //
+                                this, &FunctionViewer::refreshModel);
     assert(ret);
   }
 }
@@ -341,8 +353,9 @@ void FunctionViewer::setFrameHandle(TFrameHandle *frameHandle) {
   m_frameHandle = frameHandle;
 
   if (m_frameHandle && isVisible()) {
-    bool ret = connect(m_frameHandle, SIGNAL(frameSwitched()), this,
-                       SLOT(propagateExternalSetFrame()));
+    bool ret =
+        QObject::connect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                         this, &FunctionViewer::propagateExternalSetFrame);
     assert(ret);
   }
 }
@@ -360,11 +373,11 @@ void FunctionViewer::setObjectHandle(TObjectHandle *objectHandle) {
     m_treeView->updateAll();
 
     bool ret = true;
-    ret      = connect(m_objectHandle, SIGNAL(objectSwitched()), this,
-                  SLOT(onStageObjectSwitched())) &&
+    ret = QObject::connect(m_objectHandle, &TObjectHandle::objectSwitched,  //
+                           this, &FunctionViewer::onStageObjectSwitched) &&
           ret;
-    ret = connect(m_objectHandle, SIGNAL(objectChanged(bool)), this,
-                  SLOT(onStageObjectChanged(bool))) &&
+    ret = QObject::connect(m_objectHandle, &TObjectHandle::objectChanged,  //
+                           this, &FunctionViewer::onStageObjectChanged) &&
           ret;
 
     assert(ret);
@@ -386,8 +399,8 @@ void FunctionViewer::setFxHandle(TFxHandle *fxHandle) {
   if (isVisible()) {
     m_treeView->updateAll();
 
-    bool ret =
-        connect(m_fxHandle, SIGNAL(fxSwitched()), this, SLOT(onFxSwitched()));
+    bool ret = QObject::connect(m_fxHandle, &TFxHandle::fxSwitched,  //
+                                this, &FunctionViewer::onFxSwitched);
     assert(ret);
   }
 

@@ -118,8 +118,8 @@ SVNLockDialog::SVNLockDialog(QWidget *parent, const QString &workingDir,
 
   m_editSceneContentsCheckBox->hide();
 
-  connect(m_editSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
-          SLOT(onEditSceneContentsToggled(bool)));
+  QObject::connect(m_editSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+                   SLOT(onEditSceneContentsToggled(bool)));
 
   int fileSize = m_files.size();
   for (int i = 0; i < fileSize; i++) {
@@ -147,20 +147,21 @@ SVNLockDialog::SVNLockDialog(QWidget *parent, const QString &workingDir,
 
   m_lockButton->hide();
 
-  connect(m_lockButton, SIGNAL(clicked()), this, SLOT(onLockButtonClicked()));
+  QObject::connect(m_lockButton, SIGNAL(clicked()), this,
+                   SLOT(onLockButtonClicked()));
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(m_lockButton, m_cancelButton);
 
   // 0. Connect for svn errors (that may occurs everythings)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // 1. Getting status
-  connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-          SLOT(onStatusRetrieved(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                   SLOT(onStatusRetrieved(const QString &)));
   m_thread.getSVNStatus(m_workingDir);
 }
 
@@ -254,8 +255,8 @@ void SVNLockDialog::onLockButtonClicked() {
   // Check the status of sceneResources
   if (!m_sceneResources.empty()) {
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-            SLOT(onSceneResourcesStatusRetrieved(const QString &)));
+    QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                     SLOT(onSceneResourcesStatusRetrieved(const QString &)));
     m_thread.getSVNStatus(m_workingDir, m_sceneResources);
     return;
   } else
@@ -312,7 +313,8 @@ void SVNLockDialog::executeCommand() {
   }
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onLockDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(onLockDone()));
   m_thread.executeCommand(m_workingDir, "svn", args);
 }
 
@@ -404,7 +406,7 @@ void SVNLockDialog::switchToCloseButton() {
   m_lockButton->setEnabled(true);
   m_lockButton->show();
   m_cancelButton->hide();
-  connect(m_lockButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_lockButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 //-----------------------------------------------------------------------------
@@ -487,7 +489,7 @@ SVNLockInfoDialog::SVNLockInfoDialog(QWidget *parent, const SVNStatus &status)
   endHLayout();
 
   QPushButton *closeButton = new QPushButton(tr("Close"));
-  connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
 
   addButtonBarWidget(closeButton);
 }

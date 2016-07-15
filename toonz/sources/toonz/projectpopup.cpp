@@ -454,16 +454,16 @@ ProjectSettingsPopup::ProjectSettingsPopup() : ProjectPopup(false) {
   int i;
   for (i = 0; i < m_folderFlds.size(); i++) {
     FileField *ff = m_folderFlds[i].second;
-    connect(ff, SIGNAL(pathChanged()), this, SLOT(onFolderChanged()));
+    QObject::connect(ff, SIGNAL(pathChanged()), this, SLOT(onFolderChanged()));
   }
   for (i = 0; i < m_useScenePathCbs.size(); i++) {
     CheckBox *cb = m_useScenePathCbs[i].second;
-    connect(cb, SIGNAL(stateChanged(int)), this,
-            SLOT(onUseSceneChekboxChanged(int)));
+    QObject::connect(cb, SIGNAL(stateChanged(int)), this,
+                     SLOT(onUseSceneChekboxChanged(int)));
   }
 
-  connect(m_chooseProjectCombo, SIGNAL(activated(int)), this,
-          SLOT(onChooseProjectChanged(int)));
+  QObject::connect(m_chooseProjectCombo, SIGNAL(activated(int)), this,
+                   SLOT(onChooseProjectChanged(int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -527,8 +527,8 @@ ProjectCreatePopup::ProjectCreatePopup() : ProjectPopup(true) {
   QPushButton *okBtn = new QPushButton(tr("OK"), this);
   okBtn->setDefault(true);
   QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-  connect(okBtn, SIGNAL(clicked()), this, SLOT(createProject()));
-  connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(createProject()));
+  QObject::connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
 
   m_buttonLayout->setMargin(0);
   m_buttonLayout->setSpacing(20);

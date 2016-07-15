@@ -94,8 +94,10 @@ ToolOptionCheckbox::ToolOptionCheckbox(TTool *tool, TBoolProperty *property,
   m_property->addListener(this);
   updateStatus();
   // synchronize the state with the same widgets in other tool option bars
-  if (toolHandle)
-    connect(this, SIGNAL(clicked(bool)), toolHandle, SIGNAL(toolChanged()));
+  if (toolHandle) {
+    QObject::connect(this, SIGNAL(clicked(bool)), toolHandle,
+                     SIGNAL(toolChanged()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -150,11 +152,13 @@ ToolOptionSlider::ToolOptionSlider(TTool *tool, TDoubleProperty *property,
   setMaximumWidth(250 + widgetWidth);
 
   updateStatus();
-  connect(this, SIGNAL(valueChanged(bool)), SLOT(onValueChanged(bool)));
+  QObject::connect(this, SIGNAL(valueChanged(bool)),
+                   SLOT(onValueChanged(bool)));
   // synchronize the state with the same widgets in other tool option bars
-  if (toolHandle)
-    connect(this, SIGNAL(valueEditedByHand()), toolHandle,
-            SIGNAL(toolChanged()));
+  if (toolHandle) {
+    QObject::connect(this, SIGNAL(valueEditedByHand()), toolHandle,
+                     SIGNAL(toolChanged()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -251,7 +255,8 @@ ToolOptionPairSlider::ToolOptionPairSlider(TTool *tool,
   setRightText(rightName);
 
   updateStatus();
-  connect(this, SIGNAL(valuesChanged(bool)), SLOT(onValuesChanged(bool)));
+  QObject::connect(this, SIGNAL(valuesChanged(bool)),
+                   SLOT(onValuesChanged(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -360,7 +365,8 @@ ToolOptionIntPairSlider::ToolOptionIntPairSlider(TTool *tool,
   setRange(range.first, range.second);
   setMaximumWidth(300);
   updateStatus();
-  connect(this, SIGNAL(valuesChanged(bool)), SLOT(onValuesChanged(bool)));
+  QObject::connect(this, SIGNAL(valuesChanged(bool)),
+                   SLOT(onValuesChanged(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -471,11 +477,13 @@ ToolOptionIntSlider::ToolOptionIntSlider(TTool *tool, TIntProperty *property,
   setRange(range.first, range.second);
   setMaximumWidth(300);
   updateStatus();
-  connect(this, SIGNAL(valueChanged(bool)), SLOT(onValueChanged(bool)));
+  QObject::connect(this, SIGNAL(valueChanged(bool)),
+                   SLOT(onValueChanged(bool)));
   // synchronize the state with the same widgets in other tool option bars
-  if (toolHandle)
-    connect(this, SIGNAL(valueEditedByHand()), toolHandle,
-            SIGNAL(toolChanged()));
+  if (toolHandle) {
+    QObject::connect(this, SIGNAL(valueEditedByHand()), toolHandle,
+                     SIGNAL(toolChanged()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -552,10 +560,12 @@ ToolOptionCombo::ToolOptionCombo(TTool *tool, TEnumProperty *property,
   m_property->addListener(this);
   loadEntries();
   setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
+  QObject::connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
   // synchronize the state with the same widgets in other tool option bars
-  if (toolHandle)
-    connect(this, SIGNAL(activated(int)), toolHandle, SIGNAL(toolChanged()));
+  if (toolHandle) {
+    QObject::connect(this, SIGNAL(activated(int)), toolHandle,
+                     SIGNAL(toolChanged()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -655,7 +665,7 @@ ToolOptionPopupButton::ToolOptionPopupButton(TTool *tool,
 
   setCurrentIndex(0);
   updateStatus();
-  connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
+  QObject::connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -704,7 +714,7 @@ ToolOptionTextField::ToolOptionTextField(TTool *tool, TStringProperty *property)
   m_property->addListener(this);
 
   updateStatus();
-  connect(this, SIGNAL(editingFinished()), SLOT(onValueChanged()));
+  QObject::connect(this, SIGNAL(editingFinished()), SLOT(onValueChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -738,12 +748,13 @@ StyleIndexFieldAndChip::StyleIndexFieldAndChip(TTool *tool,
   m_property->addListener(this);
 
   updateStatus();
-  connect(this, SIGNAL(textChanged(const QString &)),
-          SLOT(onValueChanged(const QString &)));
+  QObject::connect(this, SIGNAL(textChanged(const QString &)),
+                   SLOT(onValueChanged(const QString &)));
 
   setPaletteHandle(pltHandle);
-  connect(pltHandle, SIGNAL(colorStyleSwitched()), SLOT(updateColor()));
-  connect(pltHandle, SIGNAL(colorStyleChanged()), SLOT(updateColor()));
+  QObject::connect(pltHandle, SIGNAL(colorStyleSwitched()),
+                   SLOT(updateColor()));
+  QObject::connect(pltHandle, SIGNAL(colorStyleChanged()), SLOT(updateColor()));
 }
 
 //-----------------------------------------------------------------------------
@@ -795,7 +806,7 @@ ToolOptionParamRelayField::ToolOptionParamRelayField(
 
   setDecimals(decimals);
   updateStatus();
-  connect(this, SIGNAL(valueChanged()), SLOT(onValueChanged()));
+  QObject::connect(this, SIGNAL(valueChanged()), SLOT(onValueChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -941,11 +952,11 @@ MeasuredValueField::MeasuredValueField(QWidget *parent, QString name)
 
   m_value = new TMeasuredValue("length");
   setText(QString::fromStdWString(m_value->toWideString(m_precision)));
-  connect(this, SIGNAL(textChanged(const QString &)), this,
-          SLOT(onTextChanged(const QString &)));
-  connect(this, SIGNAL(editingFinished()), SLOT(commit()));
-  connect(&m_errorHighlightingTimer, SIGNAL(timeout()), this,
-          SLOT(errorHighlightingTick()));
+  QObject::connect(this, SIGNAL(textChanged(const QString &)), this,
+                   SLOT(onTextChanged(const QString &)));
+  QObject::connect(this, SIGNAL(editingFinished()), SLOT(commit()));
+  QObject::connect(&m_errorHighlightingTimer, SIGNAL(timeout()), this,
+                   SLOT(errorHighlightingTick()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1053,8 +1064,9 @@ PegbarChannelField::PegbarChannelField(TTool *tool,
     , m_objHandle(objHandle)
     , m_xshHandle(xshHandle)
     , m_scaleType(eNone) {
-  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-                     SLOT(onChange(TMeasuredValue *)));
+  bool ret =
+      QObject::connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
+                       SLOT(onChange(TMeasuredValue *)));
   assert(ret);
   // NOTA: per le unita' di misura controlla anche tpegbar.cpp
   switch (actionId) {
@@ -1187,8 +1199,8 @@ PegbarCenterField::PegbarCenterField(TTool *tool, int index, QString name,
     , m_xshHandle(xshHandle) {
   TStageObjectId objId = m_tool->getObjectId();
   setMeasure(m_index == 0 ? "length.x" : "length.y");
-  connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-          SLOT(onChange(TMeasuredValue *)));
+  QObject::connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
+                   SLOT(onChange(TMeasuredValue *)));
   updateStatus();
   setMaximumWidth(getMaximumWidthForEditToolField(this));
 }
@@ -1242,8 +1254,8 @@ NoScaleField::NoScaleField(TTool *tool, QString name)
     : MeasuredValueField(0, name), ToolOptionControl(tool, "") {
   TStageObjectId objId = m_tool->getObjectId();
   setMeasure("zdepth");
-  connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-          SLOT(onChange(TMeasuredValue *)));
+  QObject::connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
+                   SLOT(onChange(TMeasuredValue *)));
   updateStatus();
   setMaximumWidth(getMaximumWidthForEditToolField(this));
 }
@@ -1308,8 +1320,8 @@ PropertyMenuButton::PropertyMenuButton(QWidget *parent, TTool *tool,
     action->setData(QVariant(i));
     actiongroup->addAction(action);
   }
-  bool ret = connect(actiongroup, SIGNAL(triggered(QAction *)),
-                     SLOT(onActionTriggered(QAction *)));
+  bool ret = QObject::connect(actiongroup, SIGNAL(triggered(QAction *)),
+                              SLOT(onActionTriggered(QAction *)));
   assert(ret);
 
   setMenu(menu);
@@ -1360,8 +1372,9 @@ int getMaximumWidthForSelectionToolField(QWidget *widget) {
 SelectionScaleField::SelectionScaleField(SelectionTool *tool, int id,
                                          QString name)
     : MeasuredValueField(0, name), m_tool(tool), m_id(id) {
-  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-                     SLOT(onChange(TMeasuredValue *)));
+  bool ret =
+      QObject::connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
+                       SLOT(onChange(TMeasuredValue *)));
   assert(ret);
   setMeasure("scale");
   updateStatus();
@@ -1446,8 +1459,9 @@ void SelectionScaleField::updateStatus() {
 SelectionRotationField::SelectionRotationField(SelectionTool *tool,
                                                QString name)
     : MeasuredValueField(0, name), m_tool(tool) {
-  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-                     SLOT(onChange(TMeasuredValue *)));
+  bool ret =
+      QObject::connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
+                       SLOT(onChange(TMeasuredValue *)));
   assert(ret);
   setMeasure("angle");
   updateStatus();
@@ -1497,8 +1511,9 @@ void SelectionRotationField::updateStatus() {
 SelectionMoveField::SelectionMoveField(SelectionTool *tool, int id,
                                        QString name)
     : MeasuredValueField(0, name), m_tool(tool), m_id(id) {
-  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-                     SLOT(onChange(TMeasuredValue *)));
+  bool ret =
+      QObject::connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
+                       SLOT(onChange(TMeasuredValue *)));
   assert(ret);
   if (m_id == 0)
     setMeasure("length.x");
@@ -1561,8 +1576,9 @@ void SelectionMoveField::updateStatus() {
 
 ThickChangeField::ThickChangeField(SelectionTool *tool, QString name)
     : MeasuredValueField(0, name), m_tool(tool) {
-  bool ret = connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
-                     SLOT(onChange(TMeasuredValue *)));
+  bool ret =
+      QObject::connect(this, SIGNAL(measuredValueChanged(TMeasuredValue *)),
+                       SLOT(onChange(TMeasuredValue *)));
   assert(ret);
   setMeasure("");
   updateStatus();

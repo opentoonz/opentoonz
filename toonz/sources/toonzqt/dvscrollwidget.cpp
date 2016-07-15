@@ -123,16 +123,15 @@ DvScrollWidget::DvScrollWidget(QWidget *parent, Qt::Orientation orientation)
   setLayout(scrollLayout);
 
   // At the toolbar sides, add scroll buttons
-  m_scrollBackward =
-      new QPushButton(this);  // NOTE: Not being managed by the scroll layout.
-  m_scrollBackward->setFixedSize(
-      24, 24);  //       It's not necessary. They are not part
-  m_scrollBackward->setFocusPolicy(Qt::NoFocus);  //       of the content.
+  // NOTE: Not being managed by the scroll layout.
+  //       It's not necessary. They are not part of the content.
+  m_scrollBackward = new QPushButton(this);
+  m_scrollBackward->setFixedSize(24, 24);
+  m_scrollBackward->setFocusPolicy(Qt::NoFocus);
 
-  m_scrollForward =
-      new QPushButton(this);  //       Observe that the parent widget must
-  m_scrollForward->setFixedSize(24,
-                                24);  //       therefore be explicitly supplied.
+  // Observe that the parent widget must therefore be explicitly supplied.
+  m_scrollForward = new QPushButton(this);
+  m_scrollForward->setFixedSize(24, 24);
   m_scrollForward->setFocusPolicy(Qt::NoFocus);
 
   setOrientation(orientation);
@@ -144,16 +143,25 @@ DvScrollWidget::DvScrollWidget(QWidget *parent, Qt::Orientation orientation)
   m_backwardTimer->setSingleShot(true);
   m_forwardTimer->setSingleShot(true);
 
-  connect(m_scrollBackward, SIGNAL(clicked(bool)), this,
-          SLOT(scrollBackward()));
-  connect(m_scrollForward, SIGNAL(clicked(bool)), this, SLOT(scrollForward()));
-  connect(m_backwardTimer, SIGNAL(timeout()), this, SLOT(holdBackward()));
-  connect(m_forwardTimer, SIGNAL(timeout()), this, SLOT(holdForward()));
+  QObject::connect(m_scrollBackward, &QPushButton::clicked,  //
+                   this, &DvScrollWidget::scrollBackward);
+  QObject::connect(m_scrollForward, &QPushButton::clicked,  //
+                   this, &DvScrollWidget::scrollForward);
+  QObject::connect(m_backwardTimer, &QTimer::timeout,  //
+                   this, &DvScrollWidget::holdBackward);
+  QObject::connect(m_forwardTimer, &QTimer::timeout,  //
+                   this, &DvScrollWidget::holdForward);
 
-  connect(m_scrollBackward, SIGNAL(pressed()), m_backwardTimer, SLOT(start()));
-  connect(m_scrollForward, SIGNAL(pressed()), m_forwardTimer, SLOT(start()));
-  connect(m_scrollBackward, SIGNAL(released()), this, SLOT(releaseBackward()));
-  connect(m_scrollForward, SIGNAL(released()), this, SLOT(releaseForward()));
+  QObject::connect<void (QPushButton::*)(), void (QTimer::*)()>(
+      m_scrollBackward, &QPushButton::pressed,  //
+      m_backwardTimer, &QTimer::start);
+  QObject::connect<void (QPushButton::*)(), void (QTimer::*)()>(
+      m_scrollForward, &QPushButton::pressed,  //
+      m_forwardTimer, &QTimer::start);
+  QObject::connect(m_scrollBackward, &QPushButton::released,  //
+                   this, &DvScrollWidget::releaseBackward);
+  QObject::connect(m_scrollForward, &QPushButton::released,  //
+                   this, &DvScrollWidget::releaseForward);
 }
 
 //------------------------------------------------------------------------------
@@ -162,9 +170,8 @@ void DvScrollWidget::setWidget(QWidget *widget) {
   // Delete currently set widget, if any
   QLayout *lay = layout();
 
-  while (QLayoutItem *item = lay->takeAt(
-             0))  // Should be 1 item only - while is just to be pedant
-  {
+  // Should be 1 item only - while is just to be pedant
+  while (QLayoutItem *item = lay->takeAt(0)) {
     assert(item->widget());
 
     delete item->widget();  // The item DOES NOT own the widget.
@@ -182,9 +189,8 @@ void DvScrollWidget::setWidget(QWidget *widget) {
   // Use animations to make scrolling 'smooth'
   delete m_animation;
   m_animation = new QPropertyAnimation(m_content, "pos");
-  connect(m_animation, SIGNAL(stateChanged(QAbstractAnimation::State,
-                                           QAbstractAnimation::State)),
-          this, SLOT(updateButtonsVisibility()));
+  QObject::connect(m_animation, &QPropertyAnimation::stateChanged, this,
+                   &DvScrollWidget::updateButtonsVisibility);
 }
 
 //------------------------------------------------------------------------------

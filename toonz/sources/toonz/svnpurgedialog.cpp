@@ -53,20 +53,21 @@ SVNPurgeDialog::SVNPurgeDialog(QWidget *parent, const QString &workingDir)
 
   m_purgeButton = new QPushButton(tr("Purge"));
   m_purgeButton->setEnabled(false);
-  connect(m_purgeButton, SIGNAL(clicked()), this, SLOT(onPurgeClicked()));
+  QObject::connect(m_purgeButton, SIGNAL(clicked()), this,
+                   SLOT(onPurgeClicked()));
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(m_purgeButton, m_cancelButton);
 
   // 0. Connect for svn errors (that may occurs everythings)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // 1. Getting status (with show-updates enabled...)
-  connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-          SLOT(onStatusRetrieved(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                   SLOT(onStatusRetrieved(const QString &)));
   m_thread.getSVNStatus(m_workingDir);
 }
 
@@ -116,7 +117,7 @@ void SVNPurgeDialog::switchToCloseButton() {
   m_purgeButton->setText("Close");
   m_purgeButton->setEnabled(true);
   m_cancelButton->hide();
-  connect(m_purgeButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_purgeButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 //-----------------------------------------------------------------------------

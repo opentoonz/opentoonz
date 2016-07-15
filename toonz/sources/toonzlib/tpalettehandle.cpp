@@ -39,21 +39,22 @@ TColorStyle *TPaletteHandle::getStyle() const {
 bool TPaletteHandle::connectBroadcasts(const QObject *receiver) {
   bool ret = true;
 
-  ret = connect(this, SIGNAL(broadcastPaletteChanged()), receiver,
-                SIGNAL(paletteChanged())) &&
+  ret = QObject::connect(this, SIGNAL(broadcastPaletteChanged()), receiver,
+                         SIGNAL(paletteChanged())) &&
         ret;
-  ret = connect(this, SIGNAL(broadcastPaletteTitleChanged()), receiver,
-                SIGNAL(paletteTitleChanged())) &&
+  ret = QObject::connect(this, SIGNAL(broadcastPaletteTitleChanged()), receiver,
+                         SIGNAL(paletteTitleChanged())) &&
         ret;
-  ret = connect(this, SIGNAL(broadcastColorStyleSwitched()), receiver,
-                SIGNAL(colorStyleSwitched())) &&
+  ret = QObject::connect(this, SIGNAL(broadcastColorStyleSwitched()), receiver,
+                         SIGNAL(colorStyleSwitched())) &&
         ret;
-  ret = connect(this, SIGNAL(broadcastColorStyleChanged()), receiver,
-                SIGNAL(colorStyleChanged())) &&
+  ret = QObject::connect(this, SIGNAL(broadcastColorStyleChanged()), receiver,
+                         SIGNAL(colorStyleChanged())) &&
         ret;
-  ret = connect(this, SIGNAL(broadcastColorStyleChangedOnMouseRelease()),
-                receiver, SIGNAL(colorStyleChangedOnMouseRelease())) &&
-        ret;
+  ret =
+      QObject::connect(this, SIGNAL(broadcastColorStyleChangedOnMouseRelease()),
+                       receiver, SIGNAL(colorStyleChangedOnMouseRelease())) &&
+      ret;
 
   return ret;
 }
@@ -63,20 +64,21 @@ bool TPaletteHandle::connectBroadcasts(const QObject *receiver) {
 bool TPaletteHandle::disconnectBroadcasts(const QObject *receiver) {
   bool ret = true;
 
-  ret = disconnect(this, SIGNAL(broadcastPaletteChanged()), receiver,
-                   SIGNAL(paletteChanged())) &&
+  ret = QObject::disconnect(this, SIGNAL(broadcastPaletteChanged()), receiver,
+                            SIGNAL(paletteChanged())) &&
         ret;
-  ret = disconnect(this, SIGNAL(broadcastPaletteTitleChanged()), receiver,
-                   SIGNAL(paletteTitleChanged())) &&
+  ret = QObject::disconnect(this, SIGNAL(broadcastPaletteTitleChanged()),
+                            receiver, SIGNAL(paletteTitleChanged())) &&
         ret;
-  ret = disconnect(this, SIGNAL(broadcastColorStyleSwitched()), receiver,
-                   SIGNAL(colorStyleSwitched())) &&
+  ret = QObject::disconnect(this, SIGNAL(broadcastColorStyleSwitched()),
+                            receiver, SIGNAL(colorStyleSwitched())) &&
         ret;
-  ret = disconnect(this, SIGNAL(broadcastColorStyleChanged()), receiver,
-                   SIGNAL(colorStyleChanged())) &&
+  ret = QObject::disconnect(this, SIGNAL(broadcastColorStyleChanged()),
+                            receiver, SIGNAL(colorStyleChanged())) &&
         ret;
-  ret = disconnect(this, SIGNAL(broadcastColorStyleChangedOnMouseRelease()),
-                   receiver, SIGNAL(colorStyleChangedOnMouseRelease())) &&
+  ret = QObject::disconnect(
+            this, SIGNAL(broadcastColorStyleChangedOnMouseRelease()), receiver,
+            SIGNAL(colorStyleChangedOnMouseRelease())) &&
         ret;
 
   return ret;

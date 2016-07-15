@@ -927,10 +927,8 @@ RenderTask::RenderTask(unsigned long renderId, unsigned long taskId,
   m_frames.push_back(frame);
 
   // Connect the onFinished slot
-  connect(this, SIGNAL(finished(TThread::RunnableP)), this,
-          SLOT(onFinished(TThread::RunnableP)));
-  connect(this, SIGNAL(exception(TThread::RunnableP)), this,
-          SLOT(onFinished(TThread::RunnableP)));
+  QObject::connect(this, &RenderTask::finished, this, &RenderTask::onFinished);
+  QObject::connect(this, &RenderTask::exception, this, &RenderTask::onFinished);
 
   // The shrink info is currently reversed to the settings'affine. Shrink info
   // in the TRenderSettings
@@ -1107,7 +1105,7 @@ void RenderTask::onFinished(TThread::RunnableP) {
 
   // Update the render instance status
   bool instanceExpires = false;
-  bool isCanceled = false;
+  bool isCanceled      = false;
   {
     QMutexLocker sl(&rendererImp->m_renderInstancesMutex);
     std::map<unsigned long, TRendererImp::RenderInstanceInfos>::iterator it =
@@ -1116,7 +1114,7 @@ void RenderTask::onFinished(TThread::RunnableP) {
     if (it != rendererImp->m_activeInstances.end() &&
         (--it->second.m_activeTasks) <= 0) {
       instanceExpires = true;
-      isCanceled = (m_info.m_isCanceled && *m_info.m_isCanceled);
+      isCanceled      = (m_info.m_isCanceled && *m_info.m_isCanceled);
       rendererImp->m_activeInstances.erase(m_renderId);
       // m_info is freed, don't access further!
     }
@@ -1160,11 +1158,25 @@ void RenderTask::onFinished(TThread::RunnableP) {
 //================================================================================
 //    Tough Stuff
 //================================================================================
+TRendererStartInvoker::TRendererStartInvoker() {
+  qRegisterMetaType<StartInvokerRenderData>("StartInvokerRenderData");
+
+  QObject::connect(this, &TRendererStartInvoker::startRender,    //
+                   this, &TRendererStartInvoker::doStartRender,  //
+                   Qt::QueuedConnection);
+}
+
+TRendererStartInvoker::~TRendererStartInvoker() {}
 
 void TRendererStartInvoker::emitStartRender(TRendererImp *renderer,
                                             StartInvokerRenderData rd) {
   renderer->addRef();
-  Q_EMIT startRender(renderer, rd);
+  emit startRender(renderer, rd);
+}
+
+TRendererStartInvoker *TRendererStartInvoker::instance() {
+  static TRendererStartInvoker theInstance;
+  return &theInstance;
 }
 
 //---------------------------------------------------------

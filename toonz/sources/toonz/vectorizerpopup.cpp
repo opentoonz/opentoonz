@@ -217,11 +217,11 @@ TVectorImageP Vectorizer::doVectorize(TImageP img, TPalette *palette,
   if (!ti && !ri) return TVectorImageP();
 
   VectorizerCore vCore;
-  connect(&vCore, SIGNAL(partialDone(int, int)), this,
-          SIGNAL(partialDone(int, int)));
-  connect(this, SIGNAL(transmitCancel()), &vCore, SLOT(onCancel()),
-          Qt::DirectConnection);  // Direct connection *must* be
-                                  // established for child cancels
+  QObject::connect(&vCore, SIGNAL(partialDone(int, int)), this,
+                   SIGNAL(partialDone(int, int)));
+  QObject::connect(this, SIGNAL(transmitCancel()), &vCore, SLOT(onCancel()),
+                   Qt::DirectConnection);  // Direct connection *must* be
+                                           // established for child cancels
   return vCore.vectorize(img, conf, palette);
 }
 
@@ -504,8 +504,8 @@ VectorizerPopup::VectorizerPopup(QWidget *parent, Qt::WFlags flags)
                        ->getVectorizerParameters()
                        ->m_isOutline;
   m_typeMenu->setCurrentIndex(isOutline ? 1 : 0);
-  connect(m_typeMenu, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onTypeChange(int)));
+  QObject::connect(m_typeMenu, SIGNAL(currentIndexChanged(int)), this,
+                   SLOT(onTypeChange(int)));
 
   m_paramsLayout->addWidget(new QLabel(tr("Mode")), row, 0, Qt::AlignRight);
   m_paramsLayout->addWidget(m_typeMenu, row++, 1);
@@ -727,8 +727,8 @@ paramsLayout->addWidget(m_cThicknessRatio, row++, 1);*/
   splitter->addWidget(m_swatchArea);
   m_swatchArea->setEnabled(false);  // Initally not enabled
 
-  connect(this, SIGNAL(valuesChanged()), m_swatchArea,
-          SLOT(invalidateContents()));
+  QObject::connect(this, SIGNAL(valuesChanged()), m_swatchArea,
+                   SLOT(invalidateContents()));
 
   //---------------------- Toolbar --------------------------
 
@@ -765,76 +765,75 @@ paramsLayout->addWidget(m_cThicknessRatio, row++, 1);*/
                                   tr("Reset Settings"), this);
   rightToolBar->addAction(resetAct);
 
-  connect(swatchAct, SIGNAL(triggered(bool)), m_swatchArea,
-          SLOT(enablePreview(bool)));
-  connect(centerlineAct, SIGNAL(triggered(bool)), m_swatchArea,
-          SLOT(enableDrawCenterlines(bool)));
-  connect(visibilityMenu, SIGNAL(aboutToShow()), this,
-          SLOT(populateVisibilityMenu()));
-  connect(saveAct, SIGNAL(triggered()), this, SLOT(saveParameters()));
-  connect(loadAct, SIGNAL(triggered()), this, SLOT(loadParameters()));
-  connect(resetAct, SIGNAL(triggered()), this, SLOT(resetParameters()));
+  QObject::connect(swatchAct, SIGNAL(triggered(bool)), m_swatchArea,
+                   SLOT(enablePreview(bool)));
+  QObject::connect(centerlineAct, SIGNAL(triggered(bool)), m_swatchArea,
+                   SLOT(enableDrawCenterlines(bool)));
+  QObject::connect(visibilityMenu, SIGNAL(aboutToShow()), this,
+                   SLOT(populateVisibilityMenu()));
+  QObject::connect(saveAct, SIGNAL(triggered()), this, SLOT(saveParameters()));
+  QObject::connect(loadAct, SIGNAL(triggered()), this, SLOT(loadParameters()));
+  QObject::connect(resetAct, SIGNAL(triggered()), this,
+                   SLOT(resetParameters()));
 
   //------------------- Convert Button ----------------------
 
   // Convert Button
   m_okBtn = new QPushButton(QString(tr("Convert")), this);
-  connect(m_okBtn, SIGNAL(clicked()), this, SLOT(onOk()));
+  QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(onOk()));
 
   addButtonBarWidget(m_okBtn);
 
-  // All detailed signals convey to the unique valuesChanged() signal. That
-  // makes it easier
-  // to disconnect update notifications whenever we loadConfiguration(..).
-  connect(this, SIGNAL(valuesChanged()), this, SLOT(updateSceneSettings()));
+  // All detailed signals convey to the unique valuesChanged() signal.
+  // That makes it easier to disconnect update notifications whenever
+  // we loadConfiguration(..).
+  QObject::connect(this, SIGNAL(valuesChanged()), this,
+                   SLOT(updateSceneSettings()));
 
   // Connect value changes to update the global
   // VectorizerPopUpSettingsContainer.
-  // connect(m_typeMenu,SIGNAL(currentIndexChanged(const QString
-  // &)),this,SLOT(updateSceneSettings()));
-  connect(m_cThreshold, SIGNAL(valueChanged(bool)), this,
-          SLOT(onValueEdited(bool)));
-  connect(m_cAccuracy, SIGNAL(valueChanged(bool)), this,
-          SLOT(onValueEdited(bool)));
-  connect(m_cDespeckling, SIGNAL(valueChanged(bool)), this,
-          SLOT(onValueEdited(bool)));
-  connect(m_cMaxThickness, SIGNAL(valueChanged(bool)), this,
-          SLOT(onValueEdited(bool)));
-  // connect(m_cThicknessRatio,SIGNAL(valueChanged(bool)),this,SLOT(onValueEdited(bool)));
-  connect(m_cThicknessRatioFirst, SIGNAL(valueChanged()), this,
-          SLOT(onValueEdited()));
-  connect(m_cThicknessRatioLast, SIGNAL(valueChanged()), this,
-          SLOT(onValueEdited()));
-  connect(m_cMakeFrame, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
-  connect(m_cPaintFill, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
-  connect(m_cNaaSource, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
+  QObject::connect(m_cThreshold, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onValueEdited(bool)));
+  QObject::connect(m_cAccuracy, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onValueEdited(bool)));
+  QObject::connect(m_cDespeckling, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onValueEdited(bool)));
+  QObject::connect(m_cMaxThickness, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onValueEdited(bool)));
+  QObject::connect(m_cThicknessRatioFirst, SIGNAL(valueChanged()), this,
+                   SLOT(onValueEdited()));
+  QObject::connect(m_cThicknessRatioLast, SIGNAL(valueChanged()), this,
+                   SLOT(onValueEdited()));
+  QObject::connect(m_cMakeFrame, SIGNAL(stateChanged(int)), this,
+                   SLOT(onValueEdited()));
+  QObject::connect(m_cPaintFill, SIGNAL(stateChanged(int)), this,
+                   SLOT(onValueEdited()));
+  QObject::connect(m_cNaaSource, SIGNAL(stateChanged(int)), this,
+                   SLOT(onValueEdited()));
 
-  connect(m_oAccuracy, SIGNAL(valueChanged(bool)), this,
-          SLOT(onValueEdited(bool)));
-  connect(m_oDespeckling, SIGNAL(valueChanged(bool)), this,
-          SLOT(onValueEdited(bool)));
-  connect(m_oPaintFill, SIGNAL(stateChanged(int)), this, SLOT(onValueEdited()));
-  connect(m_oAdherence, SIGNAL(valueChanged(bool)), this,
-          SLOT(onValueEdited(bool)));
-  connect(m_oAngle, SIGNAL(valueChanged(bool)), this,
-          SLOT(onValueEdited(bool)));
-  connect(m_oRelative, SIGNAL(valueChanged(bool)), this,
-          SLOT(onValueEdited(bool)));
-  connect(m_oDespeckling, SIGNAL(valueChanged(bool)), this,
-          SLOT(onValueEdited(bool)));
-  connect(m_oMaxColors, SIGNAL(valueChanged(bool)), this,
-          SLOT(onValueEdited(bool)));
-  connect(m_oTransparentColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
-          this, SLOT(onValueEdited(const TPixel32 &, bool)));
-  connect(m_oToneThreshold, SIGNAL(valueChanged(bool)), this,
-          SLOT(onValueEdited(bool)));
+  QObject::connect(m_oAccuracy, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onValueEdited(bool)));
+  QObject::connect(m_oDespeckling, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onValueEdited(bool)));
+  QObject::connect(m_oPaintFill, SIGNAL(stateChanged(int)), this,
+                   SLOT(onValueEdited()));
+  QObject::connect(m_oAdherence, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onValueEdited(bool)));
+  QObject::connect(m_oAngle, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onValueEdited(bool)));
+  QObject::connect(m_oRelative, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onValueEdited(bool)));
+  QObject::connect(m_oDespeckling, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onValueEdited(bool)));
+  QObject::connect(m_oMaxColors, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onValueEdited(bool)));
+  QObject::connect(m_oTransparentColor,
+                   SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+                   SLOT(onValueEdited(const TPixel32 &, bool)));
+  QObject::connect(m_oToneThreshold, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onValueEdited(bool)));
 
   refreshPopup();
-
-  // Non e' corretto: manca la possibilita' di aggiornare la selezione del
-  // livello corrente
-  //  connect(TApp::instance()->getCurrentLevel(), SIGNAL(xshLevelChanged()),
-  //                                         this, SLOT(updateValues()));
 }
 
 //-----------------------------------------------------------------------------
@@ -907,30 +906,29 @@ bool VectorizerPopup::apply() {
 
   m_vectorizer->setParameters(*vectorizerParameters);
 
-  connect(m_vectorizer, SIGNAL(frameName(QString)), this,
-          SLOT(onFrameName(QString)), Qt::QueuedConnection);
-  connect(m_vectorizer, SIGNAL(frameDone(int)), this, SLOT(onFrameDone(int)),
-          Qt::QueuedConnection);
-  connect(m_vectorizer, SIGNAL(partialDone(int, int)), this,
-          SLOT(onPartialDone(int, int)), Qt::QueuedConnection);
+  QObject::connect(m_vectorizer, SIGNAL(frameName(QString)), this,
+                   SLOT(onFrameName(QString)), Qt::QueuedConnection);
+  QObject::connect(m_vectorizer, SIGNAL(frameDone(int)), this,
+                   SLOT(onFrameDone(int)), Qt::QueuedConnection);
+  QObject::connect(m_vectorizer, SIGNAL(partialDone(int, int)), this,
+                   SLOT(onPartialDone(int, int)), Qt::QueuedConnection);
   // We DON'T want the progress bar to be hidden at cancel press - since its
-  // modal
-  // behavior prevents the user to interfere with a possibly still active
-  // vectorization.
-  disconnect(m_progressDialog, SIGNAL(canceled()), m_progressDialog,
-             SLOT(onCancel()));
+  // modal behavior prevents the user to interfere with a possibly still
+  // active vectorization.
+  QObject::disconnect(m_progressDialog, SIGNAL(canceled()), m_progressDialog,
+                      SLOT(onCancel()));
   // We first inform the vectorizer of a cancel press;
-  bool ret = connect(m_progressDialog, SIGNAL(canceled()), m_vectorizer,
-                     SLOT(cancel()));
+  bool ret = QObject::connect(m_progressDialog, SIGNAL(canceled()),
+                              m_vectorizer, SLOT(cancel()));
   // which eventually transmits the command to vectorization core, allowing
   // full-time cancels
-  ret = ret && connect(m_progressDialog, SIGNAL(canceled()), m_vectorizer,
-                       SIGNAL(transmitCancel()));
+  ret = ret && QObject::connect(m_progressDialog, SIGNAL(canceled()),
+                                m_vectorizer, SIGNAL(transmitCancel()));
   // Only after the vectorizer has terminated its process - or got cancelled, we
   // are allowed
   // to proceed here.
-  ret = ret && connect(m_vectorizer, SIGNAL(finished()), this,
-                       SLOT(onFinished()), Qt::QueuedConnection);
+  ret = ret && QObject::connect(m_vectorizer, SIGNAL(finished()), this,
+                                SLOT(onFinished()), Qt::QueuedConnection);
   assert(ret);
 
   int newIndexColumn = c1 + 1;
@@ -1182,8 +1180,8 @@ void VectorizerPopup::onTypeChange(int indexType) {
 //-----------------------------------------------------------------------------
 
 void VectorizerPopup::setType(bool outline) {
-  disconnect(m_typeMenu, SIGNAL(currentIndexChanged(int)), this,
-             SLOT(onTypeChange(int)));
+  QObject::disconnect(m_typeMenu, SIGNAL(currentIndexChanged(int)), this,
+                      SLOT(onTypeChange(int)));
 
   // Setting child visibility alot invokes several layout updates - causing
   // extensive flickering
@@ -1237,8 +1235,8 @@ void VectorizerPopup::setType(bool outline) {
 
   loadConfiguration(outline);
 
-  connect(m_typeMenu, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onTypeChange(int)));
+  QObject::connect(m_typeMenu, SIGNAL(currentIndexChanged(int)), this,
+                   SLOT(onTypeChange(int)));
 
   updateVisibility();
 }
@@ -1247,7 +1245,8 @@ void VectorizerPopup::setType(bool outline) {
 
 // This is essentially the inverse of the previous one.
 void VectorizerPopup::loadConfiguration(bool isOutline) {
-  disconnect(SIGNAL(valuesChanged()));  // Avoid notifications for value changes
+  QObject::disconnect(
+      SIGNAL(valuesChanged()));  // Avoid notifications for value changes
 
   ToonzScene *scene = m_sceneHandle->getScene();
   assert(scene);
@@ -1284,9 +1283,10 @@ void VectorizerPopup::loadConfiguration(bool isOutline) {
   }
 
   // Reconnect changes update
-  connect(this, SIGNAL(valuesChanged()), this, SLOT(updateSceneSettings()));
-  connect(this, SIGNAL(valuesChanged()), m_swatchArea,
-          SLOT(invalidateContents()));
+  QObject::connect(this, SIGNAL(valuesChanged()), this,
+                   SLOT(updateSceneSettings()));
+  QObject::connect(this, SIGNAL(valuesChanged()), m_swatchArea,
+                   SLOT(invalidateContents()));
 
   m_swatchArea->updateContents();
 }
@@ -1317,15 +1317,16 @@ void VectorizerPopup::loadRanges(int outline) {
 
 void VectorizerPopup::showEvent(QShowEvent *se) {
   refreshPopup();
-  connect(m_sceneHandle, SIGNAL(sceneSwitched()), SLOT(refreshPopup()));
+  QObject::connect(m_sceneHandle, SIGNAL(sceneSwitched()),
+                   SLOT(refreshPopup()));
 }
 
 //-----------------------------------------------------------------------------
 
 void VectorizerPopup::hideEvent(QHideEvent *he) {
   refreshPopup();
-  disconnect(m_sceneHandle, SIGNAL(sceneSwitched()), this,
-             SLOT(refreshPopup()));
+  QObject::disconnect(m_sceneHandle, SIGNAL(sceneSwitched()), this,
+                      SLOT(refreshPopup()));
   Dialog::hideEvent(he);
 }
 
@@ -1349,8 +1350,8 @@ void VectorizerPopup::populateVisibilityMenu() {
           visibleParam->setChecked(visibilityBits & (1 << pt->m_bit));
           visibleParam->setData(pt->m_bit);
 
-          bool ret = connect(visibleParam, SIGNAL(toggled(bool)), m_this,
-                             SLOT(visibilityToggled()));
+          bool ret = QObject::connect(visibleParam, SIGNAL(toggled(bool)),
+                                      m_this, SLOT(visibilityToggled()));
           assert(ret);
         }
       }

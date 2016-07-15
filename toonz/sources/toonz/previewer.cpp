@@ -987,15 +987,13 @@ Previewer::Previewer(bool subcamera) : m_imp(new Imp(this)) {
 
   bool ret = true;
 
-  // ret = ret && connect(app->getPaletteController()->getCurrentPalette(),
-  // SIGNAL(colorStyleChangedOnMouseRelease()),SLOT(onLevelChanged()));
-  // ret = ret && connect(app->getPaletteController()->getCurrentPalette(),
-  // SIGNAL(paletteChanged()),   SLOT(onLevelChanged()));
-  ret = ret && connect(app->getPaletteController()->getCurrentLevelPalette(),
-                       SIGNAL(colorStyleChangedOnMouseRelease()),
-                       SLOT(onLevelChanged()));
-  ret = ret && connect(app->getPaletteController()->getCurrentLevelPalette(),
-                       SIGNAL(paletteChanged()), SLOT(onLevelChanged()));
+  ret = ret &&
+        QObject::connect(app->getPaletteController()->getCurrentLevelPalette(),
+                         SIGNAL(colorStyleChangedOnMouseRelease()),
+                         SLOT(onLevelChanged()));
+  ret = ret &&
+        QObject::connect(app->getPaletteController()->getCurrentLevelPalette(),
+                         SIGNAL(paletteChanged()), SLOT(onLevelChanged()));
 
   levelChangedTimer.setInterval(notificationDelay);
   fxChangedTimer.setInterval(notificationDelay);
@@ -1006,44 +1004,50 @@ Previewer::Previewer(bool subcamera) : m_imp(new Imp(this)) {
   xsheetChangedTimer.setSingleShot(true);
   objectChangedTimer.setSingleShot(true);
 
-  ret = ret && connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()),
-                       &levelChangedTimer, SLOT(start()));
-  ret = ret && connect(app->getCurrentFx(), SIGNAL(fxChanged()),
-                       &fxChangedTimer, SLOT(start()));
-  ret = ret && connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()),
-                       &xsheetChangedTimer, SLOT(start()));
-  ret = ret && connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)),
-                       &objectChangedTimer, SLOT(start()));
-
-  ret = ret && connect(&levelChangedTimer, SIGNAL(timeout()), this,
-                       SLOT(onLevelChanged()));
+  ret =
+      ret && QObject::connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()),
+                              &levelChangedTimer, SLOT(start()));
+  ret = ret && QObject::connect(app->getCurrentFx(), SIGNAL(fxChanged()),
+                                &fxChangedTimer, SLOT(start()));
+  ret =
+      ret && QObject::connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()),
+                              &xsheetChangedTimer, SLOT(start()));
   ret = ret &&
-        connect(&fxChangedTimer, SIGNAL(timeout()), this, SLOT(onFxChanged()));
-  ret = ret && connect(&xsheetChangedTimer, SIGNAL(timeout()), this,
-                       SLOT(onXsheetChanged()));
-  ret = ret && connect(&objectChangedTimer, SIGNAL(timeout()), this,
-                       SLOT(onObjectChanged()));
+        QObject::connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)),
+                         &objectChangedTimer, SLOT(start()));
+
+  ret = ret && QObject::connect(&levelChangedTimer, SIGNAL(timeout()), this,
+                                SLOT(onLevelChanged()));
+  ret = ret && QObject::connect(&fxChangedTimer, SIGNAL(timeout()), this,
+                                SLOT(onFxChanged()));
+  ret = ret && QObject::connect(&xsheetChangedTimer, SIGNAL(timeout()), this,
+                                SLOT(onXsheetChanged()));
+  ret = ret && QObject::connect(&objectChangedTimer, SIGNAL(timeout()), this,
+                                SLOT(onObjectChanged()));
 
   qRegisterMetaType<TRenderPort::RenderData>("TRenderPort::RenderData");
 
-  ret = ret && connect(this, SIGNAL(startedFrame(TRenderPort::RenderData)),
-                       this, SLOT(onStartedFrame(TRenderPort::RenderData)));
+  ret = ret &&
+        QObject::connect(this, SIGNAL(startedFrame(TRenderPort::RenderData)),
+                         this, SLOT(onStartedFrame(TRenderPort::RenderData)));
 
-  ret = ret && connect(this, SIGNAL(renderedFrame(TRenderPort::RenderData)),
-                       this, SLOT(onRenderedFrame(TRenderPort::RenderData)));
+  ret = ret &&
+        QObject::connect(this, SIGNAL(renderedFrame(TRenderPort::RenderData)),
+                         this, SLOT(onRenderedFrame(TRenderPort::RenderData)));
 
-  ret = ret && connect(this, SIGNAL(failedFrame(TRenderPort::RenderData)), this,
-                       SLOT(onFailedFrame(TRenderPort::RenderData)));
+  ret = ret &&
+        QObject::connect(this, SIGNAL(failedFrame(TRenderPort::RenderData)),
+                         this, SLOT(onFailedFrame(TRenderPort::RenderData)));
 
   // As a result of performing the connections above in the Previewer
-  // constructor, no instance()
-  // of it can be requested before a first scene has been completely
-  // initialized.
+  // constructor, no instance() of it can be requested before a first
+  // scene has been completely initialized.
   // Inform a global variable of the fact that a first instantiation was made.
-  if (subcamera)
+  if (subcamera) {
     previewerInstanceSC = this;
-  else
+  } else {
     previewerInstance = this;
+  }
 
   assert(ret);
 }
@@ -1072,16 +1076,16 @@ std::vector<UCHAR> &Previewer::getProgressBarStatus() const {
 
 void Previewer::addListener(Listener *listener) {
   m_imp->m_listeners.insert(listener);
-  connect(&listener->m_refreshTimer, SIGNAL(timeout()), this,
-          SLOT(updateView()));
+  QObject::connect(&listener->m_refreshTimer, SIGNAL(timeout()), this,
+                   SLOT(updateView()));
 }
 
 //-----------------------------------------------------------------------------
 
 void Previewer::removeListener(Listener *listener) {
   m_imp->m_listeners.erase(listener);
-  disconnect(&listener->m_refreshTimer, SIGNAL(timeout()), this,
-             SLOT(updateView()));
+  QObject::disconnect(&listener->m_refreshTimer, SIGNAL(timeout()), this,
+                      SLOT(updateView()));
 
   if (m_imp->m_listeners.empty()) {
     m_imp->m_renderer.stopRendering(false);

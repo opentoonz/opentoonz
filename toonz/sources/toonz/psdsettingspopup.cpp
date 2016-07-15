@@ -212,16 +212,17 @@ PsdSettingsPopup::PsdSettingsPopup()
   folderOptLayout->addStretch();
   addLayout(folderOptLayout, false);
 
-  ret = ret && connect(m_loadMode, SIGNAL(currentIndexChanged(const QString &)),
-                       SLOT(onModeChanged(const QString &)));
+  ret = ret && QObject::connect(m_loadMode,
+                                SIGNAL(currentIndexChanged(const QString &)),
+                                SLOT(onModeChanged(const QString &)));
   assert(ret);
-  ret = ret && connect(m_psdFolderOptions, SIGNAL(buttonClicked(int)), this,
-                       SLOT(onFolderOptionChange(int)));
+  ret = ret && QObject::connect(m_psdFolderOptions, SIGNAL(buttonClicked(int)),
+                                this, SLOT(onFolderOptionChange(int)));
   assert(ret);
   m_okBtn     = new QPushButton("OK", this);
   m_cancelBtn = new QPushButton("Cancel", this);
-  connect(m_okBtn, SIGNAL(clicked()), this, SLOT(onOk()));
-  connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(onOk()));
+  QObject::connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(close()));
   addButtonBarWidget(m_okBtn, m_cancelBtn);
 }
 

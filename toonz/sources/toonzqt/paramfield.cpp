@@ -724,9 +724,12 @@ MeasuredDoubleParamField::MeasuredDoubleParamField(QWidget *parent,
   setLayout(m_layout);
 
   //----signal-slot connection
-  bool ret = connect(m_measuredDoubleField, SIGNAL(valueChanged(bool)),
-                     SLOT(onChange(bool)));
-  ret = ret && connect(m_keyToggle, SIGNAL(keyToggled()), SLOT(onKeyToggled()));
+  bool ret = QObject::connect(m_measuredDoubleField,
+                              &MeasuredDoubleField::valueChanged,  //
+                              this, &MeasuredDoubleParamField::onChange);
+  ret =
+      ret && QObject::connect(m_keyToggle, &ParamFieldKeyToggle::keyToggled,  //
+                              this, &MeasuredDoubleParamField::onKeyToggled);
 
   assert(ret);
 }
@@ -792,9 +795,12 @@ MeasuredRangeParamField::MeasuredRangeParamField(QWidget *parent, QString name,
   m_layout->addWidget(m_valueField);
   setLayout(m_layout);
 
-  bool ret =
-      connect(m_valueField, SIGNAL(valuesChanged(bool)), SLOT(onChange(bool)));
-  ret = ret && connect(m_keyToggle, SIGNAL(keyToggled()), SLOT(onKeyToggled()));
+  bool ret = QObject::connect(m_valueField,
+                              &MeasuredDoublePairField::valuesChanged,  //
+                              this, &MeasuredRangeParamField::onChange);
+  ret =
+      ret && QObject::connect(m_keyToggle, &ParamFieldKeyToggle::keyToggled,  //
+                              this, &MeasuredRangeParamField::onKeyToggled);
   assert(ret);
 }
 
@@ -901,11 +907,13 @@ PointParamField::PointParamField(QWidget *parent, QString name,
   setLayout(m_layout);
 
   //----signal-slot connections
-  bool ret =
-      connect(m_xFld, SIGNAL(valueChanged(bool)), this, SLOT(onChange(bool)));
-  ret = ret &&
-        connect(m_yFld, SIGNAL(valueChanged(bool)), this, SLOT(onChange(bool)));
-  ret = ret && connect(m_keyToggle, SIGNAL(keyToggled()), SLOT(onKeyToggled()));
+  bool ret = QObject::connect(m_xFld, &MeasuredDoubleField::valueChanged,  //
+                              this, &PointParamField::onChange);
+  ret = ret && QObject::connect(m_yFld, &MeasuredDoubleField::valueChanged,  //
+                                this, &PointParamField::onChange);
+  ret =
+      ret && QObject::connect(m_keyToggle, &ParamFieldKeyToggle::keyToggled,  //
+                              this, &PointParamField::onKeyToggled);
   assert(ret);
 }
 
@@ -972,9 +980,11 @@ PixelParamField::PixelParamField(QWidget *parent, QString name,
   setLayout(m_layout);
 
   //----signal-slot connections
-  bool ret = connect(m_colorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
-                     this, SLOT(onChange(const TPixel32 &, bool)));
-  ret = ret && connect(m_keyToggle, SIGNAL(keyToggled()), SLOT(onKeyToggled()));
+  bool ret = QObject::connect(m_colorField, &ColorField::colorChanged,  //
+                              this, &PixelParamField::onChange);
+  ret =
+      ret && QObject::connect(m_keyToggle, &ParamFieldKeyToggle::keyToggled,  //
+                              this, &PixelParamField::onKeyToggled);
   assert(ret);
 }
 
@@ -1067,15 +1077,19 @@ SpectrumParamField::SpectrumParamField(QWidget *parent, QString name,
 
   //--- signal-slot connections
   bool ret = true;
-  ret = ret && connect(m_spectrumField, SIGNAL(keyColorChanged(bool)), this,
-                       SLOT(onChange(bool)));
-  ret = ret && connect(m_spectrumField, SIGNAL(keyPositionChanged(bool)), this,
-                       SLOT(onChange(bool)));
-  ret = ret && connect(m_spectrumField, SIGNAL(keyAdded(int)), this,
-                       SLOT(onKeyAdded(int)));
-  ret = ret && connect(m_spectrumField, SIGNAL(keyRemoved(int)), this,
-                       SLOT(onKeyRemoved(int)));
-  ret = ret && connect(m_keyToggle, SIGNAL(keyToggled()), SLOT(onKeyToggled()));
+  ret      = ret &&
+        QObject::connect(m_spectrumField, &SpectrumField::keyColorChanged,  //
+                         this, &SpectrumParamField::onChange);
+  ret = ret && QObject::connect(m_spectrumField,
+                                &SpectrumField::keyPositionChanged,  //
+                                this, &SpectrumParamField::onChange);
+  ret = ret && QObject::connect(m_spectrumField, &SpectrumField::keyAdded,  //
+                                this, &SpectrumParamField::onKeyAdded);
+  ret = ret && QObject::connect(m_spectrumField, &SpectrumField::keyRemoved,  //
+                                this, &SpectrumParamField::onKeyRemoved);
+  ret =
+      ret && QObject::connect(m_keyToggle, &ParamFieldKeyToggle::keyToggled,  //
+                              this, &SpectrumParamField::onKeyToggled);
   assert(ret);
 }
 
@@ -1188,10 +1202,10 @@ EnumParamField::EnumParamField(QWidget *parent, QString name,
     QString str;
     m_om->addItem(str.fromStdString(caption));
   }
-  connect(m_om, SIGNAL(activated(const QString &)), this,
-          SLOT(onChange(const QString &)));
+  QObject::connect<void (QComboBox::*)(QString const &),
+                   void (EnumParamField::*)(QString const &)>(
+      m_om, &QComboBox::activated, this, &EnumParamField::onChange);
   m_layout->addWidget(m_om);
-
   m_layout->addStretch();
 
   setLayout(m_layout);
@@ -1271,13 +1285,15 @@ BoolParamField::BoolParamField(QWidget *parent, QString name,
   m_checkBox = new CheckBox("", this);
 
   /*-- Undo時には反応しないように、toggledでなくclickedにする --*/
-  connect(m_checkBox, SIGNAL(clicked(bool)), this, SLOT(onToggled(bool)));
+  QObject::connect(m_checkBox, &CheckBox::clicked,  //
+                   this, &BoolParamField::onToggled);
   m_layout->addWidget(m_checkBox);
   m_layout->addStretch();
   setLayout(m_layout);
 
   /*-- visibleToggleインタフェースのため --*/
-  connect(m_checkBox, SIGNAL(toggled(bool)), this, SIGNAL(toggled(bool)));
+  QObject::connect(m_checkBox, &CheckBox::toggled,  //
+                   this, &BoolParamField::toggled);
 }
 
 //-----------------------------------------------------------------------------
@@ -1332,7 +1348,8 @@ IntParamField::IntParamField(QWidget *parent, QString name,
   param->getValueRange(min, max);
   assert(min < max);
   m_intField->setRange(min, max);
-  connect(m_intField, SIGNAL(valueChanged(bool)), SLOT(onChange(bool)));
+  QObject::connect(m_intField, &IntField::valueChanged,  //
+                   this, &IntParamField::onChange);
 
   m_layout->addWidget(m_intField);
   m_layout->addStretch();
@@ -1399,8 +1416,8 @@ StringParamField::StringParamField(QWidget *parent, QString name,
   m_paramName = str.fromStdString(param->getName());
   m_textFld   = new LineEdit(name, this);
   m_textFld->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-  bool ret =
-      connect(m_textFld, SIGNAL(editingFinished()), this, SLOT(onChange()));
+  bool ret = QObject::connect(m_textFld, &LineEdit::editingFinished,  //
+                              this, &StringParamField::onChange);
   m_layout->addWidget(m_textFld);
 
   setLayout(m_layout);
@@ -1476,21 +1493,25 @@ ToneCurveParamField::ToneCurveParamField(QWidget *parent, QString name,
   m_layout->addStretch();
   setLayout(m_layout);
 
-  connect(m_keyToggle, SIGNAL(keyToggled()), SLOT(onKeyToggled()));
-  connect(m_toneCurveField, SIGNAL(currentChannelIndexChanged(int)),
-          SLOT(onChannelChanged(int)));
+  QObject::connect(m_keyToggle, &ParamFieldKeyToggle::keyToggled,  //
+                   this, &ToneCurveParamField::onKeyToggled);
+  QObject::connect(m_toneCurveField,
+                   &ToneCurveField::currentChannelIndexChanged,  //
+                   this, &ToneCurveParamField::onChannelChanged);
 
   int i;
   for (i = 0; i < m_toneCurveField->getChannelCount(); i++) {
     ChennelCurveEditor *c = m_toneCurveField->getChannelEditor(i);
 
-    connect(c, SIGNAL(controlPointChanged(bool)), this, SLOT(onChange(bool)));
-    connect(c, SIGNAL(controlPointAdded(int)), this, SLOT(onPointAdded(int)));
-    connect(c, SIGNAL(controlPointRemoved(int)), this,
-            SLOT(onPointRemoved(int)));
+    QObject::connect(c, &ChennelCurveEditor::controlPointChanged,  //
+                     this, &ToneCurveParamField::onChange);
+    QObject::connect(c, &ChennelCurveEditor::controlPointAdded,  //
+                     this, &ToneCurveParamField::onPointAdded);
+    QObject::connect(c, &ChennelCurveEditor::controlPointRemoved,  //
+                     this, &ToneCurveParamField::onPointRemoved);
   }
-  connect(m_toneCurveField, SIGNAL(isLinearChanged(bool)), this,
-          SLOT(onIsLinearChanged(bool)));
+  QObject::connect(m_toneCurveField, &ToneCurveField::isLinearChanged,  //
+                   this, &ToneCurveParamField::onIsLinearChanged);
   updateField(param->getValue(0));
 }
 
@@ -1679,8 +1700,8 @@ LineEdit_double::LineEdit_double(QWidget *parent, QString name,
   value_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
   value_->setText(QString::number(param->getValue(0)));
 
-  connect(value_, SIGNAL(textChanged(QString const &)), this,
-          SLOT(update_value(QString const &)));
+  QObject::connect(value_, &QLineEdit::textChanged,  //
+                   this, &LineEdit_double::update_value);
 
   m_layout->addWidget(value_);
 
@@ -1738,7 +1759,8 @@ Slider_double::Slider_double(QWidget *parent, QString name,
     value_->setRange(minvalue * 100, maxvalue * 100);
   }
 
-  connect(value_, SIGNAL(valueChanged(int)), this, SLOT(update_value(int)));
+  QObject::connect(value_, &QSlider::valueChanged,  //
+                   this, &Slider_double::update_value);
 
   m_layout->addWidget(value_);
 
@@ -1796,8 +1818,10 @@ SpinBox_double::SpinBox_double(QWidget *parent, QString name,
     value_->setSingleStep(valuestep / 100.0);
   }
 
-  connect(value_, SIGNAL(valueChanged(double)), this,
-          SLOT(update_value(double)));
+  QObject::connect<void (QDoubleSpinBox::*)(double),
+                   void (SpinBox_double::*)(double)>(
+      value_, &QDoubleSpinBox::valueChanged,  //
+      this, &SpinBox_double::update_value);
 
   m_layout->addWidget(value_);
 
@@ -1848,8 +1872,8 @@ LineEdit_int::LineEdit_int(QWidget *parent, QString name,
   value_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
   value_->setText(QString::number(param->getValue()));
 
-  connect(value_, SIGNAL(textChanged(QString const &)), this,
-          SLOT(update_value(QString const &)));
+  QObject::connect(value_, &QLineEdit::textChanged,  //
+                   this, &LineEdit_int::update_value);
 
   m_layout->addWidget(value_);
 
@@ -1907,7 +1931,8 @@ Slider_int::Slider_int(QWidget *parent, QString name, TIntParamP const &param)
     value_->setRange(0, 100);
   }
 
-  connect(value_, SIGNAL(valueChanged(int)), this, SLOT(update_value(int)));
+  QObject::connect(value_, &QSlider::valueChanged,  //
+                   this, &Slider_int::update_value);
 
   m_layout->addWidget(value_);
 
@@ -1962,7 +1987,8 @@ SpinBox_int::SpinBox_int(QWidget *parent, QString name, TIntParamP const &param)
     value_->setRange(0, 100);
   }
 
-  connect(value_, SIGNAL(valueChanged(int)), this, SLOT(update_value(int)));
+  QObject::connect<void (QSpinBox::*)(int), void (SpinBox_int::*)(int)>(
+      value_, &QSpinBox::valueChanged, this, &SpinBox_int::update_value);
 
   m_layout->addWidget(value_);
 
@@ -2012,7 +2038,8 @@ CheckBox_bool::CheckBox_bool(QWidget *parent, QString name,
   value_ = new QCheckBox(this);
   value_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-  connect(value_, SIGNAL(stateChanged(int)), this, SLOT(update_value(int)));
+  QObject::connect(value_, &QCheckBox::stateChanged,  //
+                   this, &CheckBox_bool::update_value);
 
   m_layout->addWidget(value_);
 
@@ -2074,7 +2101,10 @@ RadioButton_enum::RadioButton_enum(QWidget *parent, QString name,
     m_layout->addWidget(button);
   }
 
-  connect(value_, SIGNAL(buttonClicked(int)), this, SLOT(update_value(int)));
+  QObject::connect<void (QButtonGroup::*)(int),
+                   void (RadioButton_enum::*)(int)>(
+      value_, &QButtonGroup::buttonClicked,  //
+      this, &RadioButton_enum::update_value);
 
   setLayout(m_layout);
 }
@@ -2129,8 +2159,9 @@ ComboBox_enum::ComboBox_enum(QWidget *parent, QString name,
     value_->addItem(QString::fromStdString(caption));
   }
 
-  connect(value_, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(update_value(int)));
+  QObject::connect<void (QComboBox::*)(int), void (ComboBox_enum::*)(int)>(
+      value_, &QComboBox::currentIndexChanged,  //
+      this, &ComboBox_enum::update_value);
 
   setLayout(m_layout);
 }
@@ -2179,8 +2210,8 @@ LineEdit_string::LineEdit_string(QWidget *parent, QString name,
   value_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
   value_->setText(QString::fromStdWString(param->getValue()));
 
-  connect(value_, SIGNAL(textChanged(QString const &)), this,
-          SLOT(update_value(QString const &)));
+  QObject::connect(value_, &QLineEdit::textChanged,  //
+                   this, &LineEdit_string::update_value);
 
   m_layout->addWidget(value_);
 

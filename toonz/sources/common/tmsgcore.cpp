@@ -27,8 +27,10 @@ void TMsgCore::OnNewConnection()  // server side
   if (m_tcpServer) socket = m_tcpServer->nextPendingConnection();
   assert(socket);
 
-  bool ret = connect(socket, SIGNAL(readyRead()), SLOT(OnReadyRead()));
-  ret = ret && connect(socket, SIGNAL(disconnected()), SLOT(OnDisconnected()));
+  bool ret = QObject::connect(socket, &QTcpSocket::readyRead, this,
+                              &TMsgCore::OnReadyRead);
+  ret = ret && QObject::connect(socket, &QTcpSocket::disconnected, this,
+                                &TMsgCore::OnDisconnected);
   assert(ret);
   m_sockets.insert(socket);
 }
@@ -47,8 +49,8 @@ bool TMsgCore::openConnection()  // server side
   if (m_tcpServer != 0) delete m_tcpServer;
 
   m_tcpServer = new QTcpServer();
-  bool ret =
-      connect(m_tcpServer, SIGNAL(newConnection()), SLOT(OnNewConnection()));
+  bool ret    = QObject::connect(m_tcpServer, &QTcpServer::newConnection, this,
+                              &TMsgCore::OnNewConnection);
   // bool listen =
   // m_tcpServer->listen(QString("tmsg")+QString::number(QCoreApplication::applicationPid()));
   bool listen = m_tcpServer->listen(
@@ -202,9 +204,6 @@ void TMsgCore::connectTo(const QString &address)  // client side
   // QIODevice::Text);
   bool ret = m_clientSocket->waitForConnected(1000);
   if (!ret) {
-    // std::cout << "cannot connect to "<< address.toStdString() << std::endl;
-    // std::cout << "error "<< m_clientSocket->errorString().toStdString() <<
-    // std::endl;
     int err = m_clientSocket->error();
   }
 }

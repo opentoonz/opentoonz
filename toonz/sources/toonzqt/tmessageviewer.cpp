@@ -85,10 +85,9 @@ TMessageRepository *TMessageRepository::instance() {
   if (theObject == 0) {
     theObject = new TMessageRepository();
     bool ret =
-        connect(TMsgCore::instance(), SIGNAL(sendMessage(int, const QString &)),
-                theObject, SLOT(messageReceived(int, const QString &)));
+        QObject::connect(TMsgCore::instance(), &TMsgCore::sendMessage,      //
+                         theObject, &TMessageRepository::messageReceived);  //
     assert(ret);
-    // TMsgCore::instance()->getConnectionName();
   }
   return theObject;
 }
@@ -152,26 +151,28 @@ TMessageViewer::TMessageViewer(QWidget *parent) : QFrame(parent) {
 
   m_redCheck = new QCheckBox(tr("Errors"));
   m_redCheck->setChecked(true);
-  ret = ret && connect(m_redCheck, SIGNAL(stateChanged(int)),
-                       SLOT(refreshFilter(int)));
+  ret = ret && QObject::connect(m_redCheck, &QCheckBox::stateChanged,   //
+                                this, &TMessageViewer::refreshFilter);  //
   hLayout->addWidget(m_redCheck);
 
   m_yellowCheck = new QCheckBox(tr("Warnings"));
   m_yellowCheck->setChecked(true);
-  ret = ret && connect(m_yellowCheck, SIGNAL(stateChanged(int)),
-                       SLOT(refreshFilter(int)));
+  ret = ret && QObject::connect(m_yellowCheck, &QCheckBox::stateChanged,  //
+                                this, &TMessageViewer::refreshFilter);    //
   hLayout->addWidget(m_yellowCheck);
 
   m_greenCheck = new QCheckBox(tr("Infos"));
   m_greenCheck->setChecked(true);
-  ret = ret && connect(m_greenCheck, SIGNAL(stateChanged(int)),
-                       SLOT(refreshFilter(int)));
+  ret = ret && QObject::connect(m_greenCheck, &QCheckBox::stateChanged,  //
+                                this, &TMessageViewer::refreshFilter);   //
   hLayout->addWidget(m_greenCheck);
 
   hLayout->addStretch();
 
   QPushButton *pb = new QPushButton(tr(" Clear "));
-  ret = ret && connect(pb, SIGNAL(clicked(bool)), SLOT(onClicked(bool)));
+
+  ret = ret && QObject::connect(pb, &QPushButton::clicked,          //
+                                this, &TMessageViewer::onClicked);  //
   hLayout->addWidget(pb);
 
   hLayout->addSpacing(4);

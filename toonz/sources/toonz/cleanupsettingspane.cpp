@@ -226,36 +226,39 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
 
   //-----signal-slot connections
   bool ret = true;
-  ret      = ret && connect(m_rotateOm, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_flipX, SIGNAL(stateChanged(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_flipY, SIGNAL(stateChanged(int)),
-                       SLOT(onGenericSettingsChange()));
+
+  ret = ret && QObject::connect(m_rotateOm, SIGNAL(activated(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_flipX, SIGNAL(stateChanged(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_flipY, SIGNAL(stateChanged(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_pathField, SIGNAL(pathChanged()),
+                                SLOT(onPathChange()));
+  ret = ret && QObject::connect(m_sharpness, SIGNAL(valueChanged(bool)),
+                                SLOT(onSharpnessChange(bool)));
+  ret = ret && QObject::connect(m_antialias, SIGNAL(activated(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_lineProcessing, SIGNAL(activated(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_despeckling, SIGNAL(valueChanged(bool)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_aaValue, SIGNAL(valueChanged(bool)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(TApp::instance()->getCurrentLevel(),
+                                SIGNAL(xshLevelSwitched(TXshLevel *)),
+                                SLOT(onLevelSwitched()));
   ret =
-      ret && connect(m_pathField, SIGNAL(pathChanged()), SLOT(onPathChange()));
-  ret = ret && connect(m_sharpness, SIGNAL(valueChanged(bool)),
-                       SLOT(onSharpnessChange(bool)));
-  ret = ret && connect(m_antialias, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_lineProcessing, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_despeckling, SIGNAL(valueChanged(bool)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_aaValue, SIGNAL(valueChanged(bool)),
-                       SLOT(onGenericSettingsChange()));
+      ret && QObject::connect(m_cameraWidget, SIGNAL(cleanupSettingsChanged()),
+                              SLOT(onGenericSettingsChange()));
+
+  ret = ret && QObject::connect(saveBtn, SIGNAL(pressed()), this,
+                                SLOT(onSaveSettings()));
+
   ret = ret &&
-        connect(TApp::instance()->getCurrentLevel(),
-                SIGNAL(xshLevelSwitched(TXshLevel *)), SLOT(onLevelSwitched()));
-  ret = ret && connect(m_cameraWidget, SIGNAL(cleanupSettingsChanged()),
-                       SLOT(onGenericSettingsChange()));
-
-  ret =
-      ret && connect(saveBtn, SIGNAL(pressed()), this, SLOT(onSaveSettings()));
-
-  ret = ret && connect(loadBtn, SIGNAL(pressed()), model, SLOT(promptLoad()));
-  ret = ret && connect(resetBtn, SIGNAL(pressed()), this,
-                       SLOT(onRestoreSceneSettings()));
+        QObject::connect(loadBtn, SIGNAL(pressed()), model, SLOT(promptLoad()));
+  ret = ret && QObject::connect(resetBtn, SIGNAL(pressed()), this,
+                                SLOT(onRestoreSceneSettings()));
 
   assert(ret);
 }
@@ -273,11 +276,12 @@ void CleanupSettingsPane::showEvent(QShowEvent *se) {
     model->attach(CleanupSettingsModel::LISTENER);
 
     bool ret = true;
-    ret      = ret && connect(model, SIGNAL(imageSwitched()), this,
-                         SLOT(onImageSwitched()));
-    ret = ret && connect(model, SIGNAL(modelChanged(bool)), this,
-                         SLOT(updateGui(bool)));
-    ret = ret && connect(model, SIGNAL(clnLoaded()), this, SLOT(onClnLoaded()));
+    ret      = ret && QObject::connect(model, SIGNAL(imageSwitched()), this,
+                                  SLOT(onImageSwitched()));
+    ret = ret && QObject::connect(model, SIGNAL(modelChanged(bool)), this,
+                                  SLOT(updateGui(bool)));
+    ret = ret && QObject::connect(model, SIGNAL(clnLoaded()), this,
+                                  SLOT(onClnLoaded()));
     assert(ret);
 
     m_cameraWidget->setCurrentLevel(
@@ -306,13 +310,12 @@ void CleanupSettingsPane::hideEvent(QHideEvent *he) {
 
     model->detach(CleanupSettingsModel::LISTENER);
 
-    bool ret = true;
-    ret      = ret && disconnect(model, SIGNAL(imageSwitched()), this,
-                            SLOT(onImageSwitched()));
-    ret = ret && disconnect(model, SIGNAL(modelChanged(bool)), this,
-                            SLOT(updateGui(bool)));
-    ret = ret &&
-          disconnect(model, SIGNAL(clnLoaded()), this, SLOT(onClnLoaded()));
+    bool ret = QObject::disconnect(model, SIGNAL(imageSwitched()), this,
+                                   SLOT(onImageSwitched()));
+    ret = ret && QObject::disconnect(model, SIGNAL(modelChanged(bool)), this,
+                                     SLOT(updateGui(bool)));
+    ret = ret && QObject::disconnect(model, SIGNAL(clnLoaded()), this,
+                                     SLOT(onClnLoaded()));
     assert(ret);
   }
 
@@ -394,7 +397,8 @@ void CleanupSettingsPane::updateImageInfo() {
     parentWidget()->setWindowTitle(tr("Cleanup Settings (Global)"));
   else
     parentWidget()->setWindowTitle(
-        tr("Cleanup Settings: ") + toQString(model->clnPath().withoutParentDir()));
+        tr("Cleanup Settings: ") +
+        toQString(model->clnPath().withoutParentDir()));
 }
 
 //-----------------------------------------------------------------------------

@@ -105,8 +105,8 @@ LogPanel::LogPanel(QWidget *parent, Qt::WFlags flags)
 
   setWidget(m_messageBox);
 
-  connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()), this,
-          SLOT(clear()));
+  QObject::connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()),
+                   this, SLOT(clear()));
 }
 
 //-----------------------------------------------------------------------------

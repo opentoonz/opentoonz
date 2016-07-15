@@ -90,8 +90,8 @@ SVNUpdateAndLockDialog::SVNUpdateAndLockDialog(QWidget *parent,
 
   m_editSceneContentsCheckBox->hide();
 
-  connect(m_editSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
-          SLOT(onEditSceneContentsToggled(bool)));
+  QObject::connect(m_editSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+                   SLOT(onEditSceneContentsToggled(bool)));
 
   int fileSize = m_files.size();
   for (int i = 0; i < fileSize; i++) {
@@ -115,28 +115,29 @@ SVNUpdateAndLockDialog::SVNUpdateAndLockDialog(QWidget *parent,
   endHLayout();
 
   m_updateAndLockButton = new QPushButton(tr("Get And Edit "));
-  connect(m_updateAndLockButton, SIGNAL(clicked()), this,
-          SLOT(onUpdateAndLockButtonClicked()));
+  QObject::connect(m_updateAndLockButton, SIGNAL(clicked()), this,
+                   SLOT(onUpdateAndLockButtonClicked()));
 
   m_updateAndLockButton->hide();
 
   m_lockButton = new QPushButton(tr("Edit"));
-  connect(m_lockButton, SIGNAL(clicked()), this, SLOT(onLockButtonClicked()));
+  QObject::connect(m_lockButton, SIGNAL(clicked()), this,
+                   SLOT(onLockButtonClicked()));
 
   m_lockButton->hide();
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(m_updateAndLockButton, m_lockButton, m_cancelButton);
 
   // 0. Connect for svn errors (that may occurs)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // 1. Getting status
-  connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-          SLOT(onStatusRetrieved(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                   SLOT(onStatusRetrieved(const QString &)));
   m_thread.getSVNStatus(m_workingDir);
 }
 
@@ -192,7 +193,8 @@ void SVNUpdateAndLockDialog::switchToCloseButton() {
   m_updateAndLockButton->setEnabled(true);
   m_lockButton->hide();
   m_cancelButton->hide();
-  connect(m_updateAndLockButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_updateAndLockButton, SIGNAL(clicked()), this,
+                   SLOT(close()));
 }
 
 //-----------------------------------------------------------------------------
@@ -258,7 +260,8 @@ void SVNUpdateAndLockDialog::updateCommand() {
   for (int i = 0; i < resourceCount; i++) args << m_sceneResources.at(i);
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onUpdateDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(onUpdateDone()));
   m_thread.executeCommand(m_workingDir, "svn", args, false);
 }
 
@@ -268,8 +271,8 @@ void SVNUpdateAndLockDialog::onUpdateDone() {
   // Check the status of sceneResources
   if (!m_sceneResources.empty()) {
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-            SLOT(onSceneResourcesStatusRetrieved(const QString &)));
+    QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                     SLOT(onSceneResourcesStatusRetrieved(const QString &)));
     m_thread.getSVNStatus(m_workingDir, m_sceneResources);
     return;
   } else
@@ -298,7 +301,8 @@ void SVNUpdateAndLockDialog::lockCommand() {
                                  " edit files.");
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onLockDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(onLockDone()));
   m_thread.executeCommand(m_workingDir, "svn", args);
 }
 
@@ -325,7 +329,8 @@ void SVNUpdateAndLockDialog::reverseMerge() {
     args << file;
 
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(done(const QString &)), SLOT(reverseMerge()));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                     SLOT(reverseMerge()));
     m_thread.executeCommand(m_workingDir, "svn", args, false);
   } else
     finish();

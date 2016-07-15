@@ -329,40 +329,49 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
   TCamera camera;
   setFields(&camera);
 
-  // connect events
+  // QObject::connect events
   bool ret = true;
-  ret = ret && connect(m_lxFld, SIGNAL(editingFinished()), SLOT(onLxChanged()));
-  ret = ret && connect(m_lyFld, SIGNAL(editingFinished()), SLOT(onLyChanged()));
-  ret = ret && connect(m_arFld, SIGNAL(editingFinished()), SLOT(onArChanged()));
+
   ret = ret &&
-        connect(m_xResFld, SIGNAL(editingFinished()), SLOT(onXResChanged()));
+        QObject::connect(m_lxFld, &MeasuredDoubleLineEdit::editingFinished,  //
+                         this, &CameraSettingsWidget::onLxChanged);
   ret = ret &&
-        connect(m_yResFld, SIGNAL(editingFinished()), SLOT(onYResChanged()));
-  ret = ret &&
-        connect(m_xDpiFld, SIGNAL(editingFinished()), SLOT(onXDpiChanged()));
-  ret = ret &&
-        connect(m_yDpiFld, SIGNAL(editingFinished()), SLOT(onYDpiChanged()));
+        QObject::connect(m_lyFld, &MeasuredDoubleLineEdit::editingFinished,  //
+                         this, &CameraSettingsWidget::onLyChanged);
+  ret = ret && QObject::connect(m_arFld, &SimpleExpField::editingFinished,  //
+                                this, &CameraSettingsWidget::onArChanged);
+  ret = ret && QObject::connect(m_xResFld, &IntLineEdit::editingFinished,  //
+                                this, &CameraSettingsWidget::onXResChanged);
+  ret = ret && QObject::connect(m_yResFld, &IntLineEdit::editingFinished,  //
+                                this, &CameraSettingsWidget::onYResChanged);
+  ret = ret && QObject::connect(m_xDpiFld, &DoubleLineEdit::editingFinished,  //
+                                this, &CameraSettingsWidget::onXDpiChanged);
+  ret = ret && QObject::connect(m_yDpiFld, &DoubleLineEdit::editingFinished,  //
+                                this, &CameraSettingsWidget::onYDpiChanged);
+
+  ret = ret && QObject::connect(m_fspChk, &QPushButton::clicked,  //
+                                this, &CameraSettingsWidget::onFspChanged);
+
+  ret = ret && QObject::connect(m_xPrev, &QRadioButton::toggled,  //
+                                this, &CameraSettingsWidget::onPrevToggled);
+  ret = ret && QObject::connect(m_yPrev, &QRadioButton::toggled,  //
+                                this, &CameraSettingsWidget::onPrevToggled);
+  ret = ret && QObject::connect(m_dotPrev, &QRadioButton::toggled,  //
+                                this, &CameraSettingsWidget::onPrevToggled);
+  ret = ret && QObject::connect(m_inchPrev, &QRadioButton::toggled,  //
+                                this, &CameraSettingsWidget::onPrevToggled);
 
   ret =
-      ret && connect(m_fspChk, SIGNAL(clicked(bool)), SLOT(onFspChanged(bool)));
+      ret && QObject::connect(m_useLevelSettingsBtn, &QPushButton::clicked,  //
+                              this, &CameraSettingsWidget::useLevelSettings);
 
-  ret =
-      ret && connect(m_xPrev, SIGNAL(toggled(bool)), SLOT(onPrevToggled(bool)));
-  ret =
-      ret && connect(m_yPrev, SIGNAL(toggled(bool)), SLOT(onPrevToggled(bool)));
-  ret = ret &&
-        connect(m_dotPrev, SIGNAL(toggled(bool)), SLOT(onPrevToggled(bool)));
-  ret = ret &&
-        connect(m_inchPrev, SIGNAL(toggled(bool)), SLOT(onPrevToggled(bool)));
-
-  ret = ret && connect(m_useLevelSettingsBtn, SIGNAL(clicked()), this,
-                       SLOT(useLevelSettings()));
-
-  ret = ret && connect(m_presetListOm, SIGNAL(activated(const QString &)),
-                       SLOT(onPresetSelected(const QString &)));
-  ret = ret && connect(m_addPresetBtn, SIGNAL(clicked()), SLOT(addPreset()));
-  ret = ret &&
-        connect(m_removePresetBtn, SIGNAL(clicked()), SLOT(removePreset()));
+  ret = ret && QObject::connect<void (QComboBox::*)(QString const &)>(
+                   m_presetListOm, &QComboBox::activated,  //
+                   this, &CameraSettingsWidget::onPresetSelected);
+  ret = ret && QObject::connect(m_addPresetBtn, &QPushButton::clicked,  //
+                                this, &CameraSettingsWidget::addPreset);
+  ret = ret && QObject::connect(m_removePresetBtn, &QPushButton::clicked,  //
+                                this, &CameraSettingsWidget::removePreset);
 
   assert(ret);
 }

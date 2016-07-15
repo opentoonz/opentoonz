@@ -1341,8 +1341,8 @@ FunctionTreeView::FunctionTreeView(FunctionViewer *parent)
   setObjectName("FunctionEditorTree");
   setSelectionMode(QAbstractItemView::NoSelection);
 
-  connect(this, SIGNAL(pressed(const QModelIndex &)), this,
-          SLOT(onActivated(const QModelIndex &)));
+  QObject::connect(this, &FunctionTreeView::pressed,       //
+                   this, &FunctionTreeView::onActivated);  //
 
   setFocusPolicy(Qt::NoFocus);
   setIndentation(14);

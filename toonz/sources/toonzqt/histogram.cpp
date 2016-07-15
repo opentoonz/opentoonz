@@ -531,9 +531,11 @@ Histogram::Histogram(QWidget *parent) : QWidget(parent) {
   m_histograms->setCurrentIndex(0);
   mainLayout->addWidget(m_histograms);
 
-  connect(m_channelsListBox, SIGNAL(currentIndexChanged(int)), m_histograms,
-          SLOT(setCurrentIndex(int)));
-  connect(logScaleButton, SIGNAL(toggled(bool)), this, SLOT(setLogScale(bool)));
+  QObject::connect<void (QComboBox::*)(int), void (Histograms::*)(int)>(
+      m_channelsListBox, &QComboBox::currentIndexChanged,  //
+      m_histograms, &Histograms::setCurrentIndex);
+  QObject::connect(logScaleButton, &QPushButton::toggled,  //
+                   this, &Histogram::setLogScale);
 
   updateChannelsList();
 }
@@ -545,14 +547,15 @@ void Histogram::updateChannelsList() {
     QStringList channels;
     m_channelsListBox->clear();
 
-    if (m_histograms->channelsCount() == 1)
+    if (m_histograms->channelsCount() == 1) {
       channels << "Value";
-    else
+    } else {
       channels << "RGB"
                << "Red"
                << "Green"
                << "Blue"
                << "Alpha";
+    }
 
     m_channelsListBox->addItems(channels);
   }

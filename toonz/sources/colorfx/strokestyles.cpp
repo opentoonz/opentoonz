@@ -5486,7 +5486,8 @@ TColorStyle::ParamType TLongBlendStrokeStyle2::getParamType(int index) const {
 QString TLongBlendStrokeStyle2::getParamNames(int index) const {
   assert(0 <= index && index < 1);
 
-  return QCoreApplication::translate("TLongBlendStrokeStyle2", "Distance");  // W_Watercolor_Distance
+  return QCoreApplication::translate("TLongBlendStrokeStyle2",
+                                     "Distance");  // W_Watercolor_Distance
 }
 
 //-----------------------------------------------------------------------------

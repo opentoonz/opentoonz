@@ -163,12 +163,12 @@ PaletteViewer::PaletteViewer(QWidget *parent, PaletteViewType viewType,
   }
   setLayout(mainLayout);
 
-  connect(m_pagesBar, SIGNAL(currentChanged(int)), this,
-          SLOT(setPageView(int)));
-  connect(m_pagesBar, SIGNAL(movePage(int, int)), this,
-          SLOT(movePage(int, int)));
-  connect(m_pageViewer, SIGNAL(changeWindowTitleSignal()), this,
-          SLOT(changeWindowTitle()));
+  QObject::connect(m_pagesBar, &PaletteTabBar::currentChanged,  //
+                   this, &PaletteViewer::setPageView);
+  QObject::connect(m_pagesBar, &PaletteTabBar::movePage,  //
+                   this, &PaletteViewer::movePage);
+  QObject::connect(m_pageViewer, &PageViewer::changeWindowTitleSignal,  //
+                   this, &PaletteViewer::changeWindowTitle);
 
   changeWindowTitle();
 
@@ -184,26 +184,34 @@ PaletteViewer::~PaletteViewer() { delete m_changeStyleCommand; }
 void PaletteViewer::setPaletteHandle(TPaletteHandle *paletteHandle) {
   if (m_paletteHandle == paletteHandle) return;
 
-  bool ret                 = true;
-  if (m_paletteHandle) ret = ret && disconnect(m_paletteHandle, 0, this, 0);
+  bool ret = true;
+  if (m_paletteHandle)
+    ret = ret && QObject::disconnect(m_paletteHandle, 0, this, 0);
 
   m_paletteHandle = paletteHandle;
 
   if (m_paletteHandle && isVisible()) {
-    ret = ret && connect(m_paletteHandle, SIGNAL(paletteSwitched()), this,
-                         SLOT(onPaletteSwitched()));
-    ret = ret && connect(m_paletteHandle, SIGNAL(paletteChanged()), this,
-                         SLOT(onPaletteChanged()));
-    ret = ret && connect(m_paletteHandle, SIGNAL(paletteChanged()), this,
-                         SLOT(changeWindowTitle()));
-    ret = ret && connect(m_paletteHandle, SIGNAL(paletteTitleChanged()), this,
-                         SLOT(changeWindowTitle()));
-    ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
-                         SLOT(onColorStyleSwitched()));
-    ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleChanged()), this,
-                         SLOT(changeWindowTitle()));
-    ret = ret && connect(m_paletteHandle, SIGNAL(paletteDirtyFlagChanged()),
-                         this, SLOT(changeWindowTitle()));
+    ret = ret && QObject::connect(m_paletteHandle,
+                                  &TPaletteHandle::paletteSwitched,  //
+                                  this, &PaletteViewer::onPaletteSwitched);
+    ret = ret &&
+          QObject::connect(m_paletteHandle, &TPaletteHandle::paletteChanged,  //
+                           this, &PaletteViewer::onPaletteChanged);
+    ret = ret &&
+          QObject::connect(m_paletteHandle, &TPaletteHandle::paletteChanged,  //
+                           this, &PaletteViewer::changeWindowTitle);
+    ret = ret && QObject::connect(m_paletteHandle,
+                                  &TPaletteHandle::paletteTitleChanged,  //
+                                  this, &PaletteViewer::changeWindowTitle);
+    ret = ret && QObject::connect(m_paletteHandle,
+                                  &TPaletteHandle::colorStyleSwitched,  //
+                                  this, &PaletteViewer::onColorStyleSwitched);
+    ret = ret && QObject::connect(m_paletteHandle,
+                                  &TPaletteHandle::colorStyleChanged,  //
+                                  this, &PaletteViewer::changeWindowTitle);
+    ret = ret && QObject::connect(m_paletteHandle,
+                                  &TPaletteHandle::paletteDirtyFlagChanged,  //
+                                  this, &PaletteViewer::changeWindowTitle);
   }
 
   assert(ret);
@@ -282,8 +290,8 @@ void PaletteViewer::enableSaveAction(bool enable) {
 void PaletteViewer::createTabBar() {
   m_pagesBar = new PaletteTabBar(this, m_hasPageCommand);
 
-  connect(m_pagesBar, SIGNAL(tabTextChanged(int)), this,
-          SLOT(onTabTextChanged(int)));
+  QObject::connect(m_pagesBar, &PaletteTabBar::tabTextChanged,  //
+                   this, &PaletteViewer::onTabTextChanged);
 
   if (!getPalette()) return;
 
@@ -312,8 +320,8 @@ void PaletteViewer::createPaletteToolBar() {
       m_lockPaletteToolButton->setChecked(getPalette()->isLocked());
     }
 
-    connect(m_lockPaletteToolButton, SIGNAL(clicked(bool)), this,
-            SLOT(setIsLocked(bool)));
+    QObject::connect(m_lockPaletteToolButton, &QToolButton::clicked,  //
+                     this, &PaletteViewer::setIsLocked);
 
     m_paletteToolBar->addWidget(m_lockPaletteToolButton);
 
@@ -337,10 +345,10 @@ void PaletteViewer::createPaletteToolBar() {
       m_lockPaletteAction->setChecked(getPalette()->isLocked());
     }
 
-    connect(m_lockPaletteAction, SIGNAL(triggered(bool)), this,
-            SLOT(setIsLocked(bool)));
-    connect(m_lockPaletteAction, SIGNAL(toggled(bool)), toolButton,
-            SLOT(setChecked(bool)));
+    QObject::connect(m_lockPaletteAction, &QAction::triggered,  //
+                     this, &PaletteViewer::setIsLocked);
+    QObject::connect(m_lockPaletteAction, &QAction::toggled,  //
+                     toolButton, &QToolButton::setChecked);
 
     m_paletteToolBar->addWidget(toolButton);
   }
@@ -355,8 +363,8 @@ void PaletteViewer::createPaletteToolBar() {
   viewMode->setToolTip(tr("Options"));
 
   QActionGroup *viewModeGroup = new QActionGroup(viewMode);
-  connect(viewModeGroup, SIGNAL(triggered(QAction *)), this,
-          SLOT(onViewMode(QAction *)));
+  QObject::connect(viewModeGroup, &QActionGroup::triggered,  //
+                   this, &PaletteViewer::onViewMode);
 
   QAction *smallThumbAct =
       new QAction(tr("&Small Thumbnails View"), viewModeButton);
@@ -385,8 +393,8 @@ void PaletteViewer::createPaletteToolBar() {
   bothDisplayAct->setData(PageViewer::StyleAndOriginal);
 
   QActionGroup *nameDisplayModeGroup = new QActionGroup(viewMode);
-  connect(nameDisplayModeGroup, SIGNAL(triggered(QAction *)), this,
-          SLOT(onNameDisplayMode(QAction *)));
+  QObject::connect(nameDisplayModeGroup, &QActionGroup::triggered,  //
+                   this, &PaletteViewer::onNameDisplayMode);
   nameDisplayModeGroup->addAction(styleDisplayAct);
   nameDisplayModeGroup->addAction(originalDisplayAct);
   nameDisplayModeGroup->addAction(bothDisplayAct);
@@ -412,7 +420,8 @@ void PaletteViewer::createPaletteToolBar() {
     QAction *addPage;
     QIcon addPageIcon = createQIconPNG("newpage");
     addPage = new QAction(addPageIcon, tr("&New Page"), m_paletteToolBar);
-    connect(addPage, SIGNAL(triggered()), this, SLOT(addNewPage()));
+    QObject::connect(addPage, &QAction::triggered,  //
+                     this, &PaletteViewer::addNewPage);
 
     m_paletteToolBar->addAction(addPage);
   }
@@ -420,7 +429,8 @@ void PaletteViewer::createPaletteToolBar() {
   QIcon newColorIcon = createQIconPNG("newstyle");
   QAction *addColor =
       new QAction(newColorIcon, tr("&New Style"), m_paletteToolBar);
-  connect(addColor, SIGNAL(triggered()), this, SLOT(addNewColor()));
+  QObject::connect(addColor, &QAction::triggered,  //
+                   this, &PaletteViewer::addNewColor);
 
   m_paletteToolBar->addAction(addColor);
   m_paletteToolBar->addSeparator();
@@ -459,28 +469,31 @@ void PaletteViewer::createSavePaletteToolBar() {
       new QAction(savePaletteIcon, tr("&Save Palette"), m_savePaletteToolBar);
 
   if (m_viewType == STUDIO_PALETTE) {
-    connect(savePalette, SIGNAL(triggered()), this, SLOT(saveStudioPalette()));
+    QObject::connect(savePalette, &QAction::triggered,  //
+                     this, &PaletteViewer::saveStudioPalette);
     m_savePaletteToolBar->addAction(savePalette);
   } else if (m_viewType == LEVEL_PALETTE) {
     // save load palette
     PaletteIconWidget *movePalette =
         new PaletteIconWidget(m_savePaletteToolBar);
-    connect(movePalette, SIGNAL(startDrag()), this, SLOT(startDragDrop()));
+    QObject::connect(movePalette, &PaletteIconWidget::startDrag,  //
+                     this, &PaletteViewer::startDragDrop);
 
     QAction *act = m_savePaletteToolBar->addWidget(movePalette);
     act->setText(tr("&Move Palette"));
     m_savePaletteToolBar->addSeparator();
 
     // save palette as
-    connect(saveAsPalette, SIGNAL(triggered()),
-            CommandManager::instance()->getAction("MI_SavePaletteAs"),
-            SIGNAL(triggered()));
+    QObject::connect(saveAsPalette, &QAction::triggered,  //
+                     CommandManager::instance()->getAction("MI_SavePaletteAs"),
+                     &QAction::triggered);
     m_savePaletteToolBar->addAction(saveAsPalette);
 
     // overwrite palette
-    connect(savePalette, SIGNAL(triggered()),
-            CommandManager::instance()->getAction("MI_OverwritePalette"),
-            SIGNAL(triggered()));
+    QObject::connect(
+        savePalette, &QAction::triggered,  //
+        CommandManager::instance()->getAction("MI_OverwritePalette"),
+        &QAction::triggered);
     m_savePaletteToolBar->addAction(savePalette);
   }
 
@@ -591,7 +604,8 @@ void PaletteViewer::contextMenuEvent(QContextMenuEvent *event) {
   QMenu *menu = new QMenu(this);
   if (m_hasPageCommand) {
     QAction *newPage = menu->addAction(tr("New Page"));
-    connect(newPage, SIGNAL(triggered()), SLOT(addNewPage()));
+    QObject::connect(newPage, &QAction::triggered,  //
+                     this, &PaletteViewer::addNewPage);
 
     if (m_pagesBar->geometry().contains(pos)) {
       int tabIndex         = m_pagesBar->tabAt(pos);
@@ -603,7 +617,8 @@ void PaletteViewer::contextMenuEvent(QContextMenuEvent *event) {
         if (canRemovePage) {
           m_indexPageToDelete = tabIndex;
           QAction *deletePage = menu->addAction(tr("Delete Page"));
-          connect(deletePage, SIGNAL(triggered()), SLOT(deletePage()));
+          QObject::connect(deletePage, &QAction::triggered,  //
+                           this, &PaletteViewer::deletePage);
         }
       }
     }
@@ -627,44 +642,46 @@ void PaletteViewer::showEvent(QShowEvent *) {
 
   if (!m_paletteHandle) return;
 
-  connect(m_paletteHandle, SIGNAL(paletteSwitched()), this,
-          SLOT(onPaletteSwitched()));
-  connect(m_paletteHandle, SIGNAL(paletteChanged()), this,
-          SLOT(onPaletteChanged()));
-  connect(m_paletteHandle, SIGNAL(paletteTitleChanged()), this,
-          SLOT(changeWindowTitle()));
-  connect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
-          SLOT(onColorStyleSwitched()));
-  connect(m_paletteHandle, SIGNAL(colorStyleChanged()), this,
-          SLOT(changeWindowTitle()));
-  connect(m_paletteHandle, SIGNAL(paletteDirtyFlagChanged()), this,
-          SLOT(changeWindowTitle()));
+  QObject::connect(m_paletteHandle, &TPaletteHandle::paletteSwitched,  //
+                   this, &PaletteViewer::onPaletteSwitched);
+  QObject::connect(m_paletteHandle, &TPaletteHandle::paletteChanged, this,
+                   &PaletteViewer::onPaletteChanged);                      //
+  QObject::connect(m_paletteHandle, &TPaletteHandle::paletteTitleChanged,  //
+                   this, &PaletteViewer::changeWindowTitle);
+  QObject::connect(m_paletteHandle, &TPaletteHandle::colorStyleSwitched,  //
+                   this, &PaletteViewer::onColorStyleSwitched);           //
+  QObject::connect(m_paletteHandle, &TPaletteHandle::colorStyleChanged, this,
+                   &PaletteViewer::changeWindowTitle);
+  QObject::connect(m_paletteHandle,
+                   &TPaletteHandle::paletteDirtyFlagChanged,  //
+                   this, &PaletteViewer::changeWindowTitle);
 
   if (!m_frameHandle) return;
   // Connessione necessaria per aggiornare lo stile in caso di palette animate.
-  connect(m_frameHandle, SIGNAL(frameSwitched()), this,
-          SLOT(onFrameSwitched()));
+  QObject::connect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                   this, &PaletteViewer::onFrameSwitched);
 }
 
 //-----------------------------------------------------------------------------
 
 void PaletteViewer::hideEvent(QHideEvent *) {
-  disconnect(m_paletteHandle, SIGNAL(paletteSwitched()), this,
-             SLOT(onPaletteSwitched()));
-  disconnect(m_paletteHandle, SIGNAL(paletteChanged()), this,
-             SLOT(onPaletteChanged()));
-  disconnect(m_paletteHandle, SIGNAL(paletteTitleChanged()), this,
-             SLOT(changeWindowTitle()));
-  disconnect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
-             SLOT(onColorStyleSwitched()));
-  disconnect(m_paletteHandle, SIGNAL(colorStyleChanged()), this,
-             SLOT(changeWindowTitle()));
-  disconnect(m_paletteHandle, SIGNAL(paletteDirtyFlagChanged()), this,
-             SLOT(changeWindowTitle()));
+  QObject::disconnect(m_paletteHandle, &TPaletteHandle::paletteSwitched,  //
+                      this, &PaletteViewer::onPaletteSwitched);
+  QObject::disconnect(m_paletteHandle, &TPaletteHandle::paletteChanged, this,
+                      &PaletteViewer::onPaletteChanged);                      //
+  QObject::disconnect(m_paletteHandle, &TPaletteHandle::paletteTitleChanged,  //
+                      this, &PaletteViewer::changeWindowTitle);
+  QObject::disconnect(m_paletteHandle, &TPaletteHandle::colorStyleSwitched,  //
+                      this, &PaletteViewer::onColorStyleSwitched);           //
+  QObject::disconnect(m_paletteHandle, &TPaletteHandle::colorStyleChanged, this,
+                      &PaletteViewer::changeWindowTitle);
+  QObject::disconnect(m_paletteHandle,
+                      &TPaletteHandle::paletteDirtyFlagChanged,  //
+                      this, &PaletteViewer::changeWindowTitle);
 
   if (!m_frameHandle) return;
-  disconnect(m_frameHandle, SIGNAL(frameSwitched()), this,
-             SLOT(onFrameSwitched()));
+  QObject::disconnect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                      this, &PaletteViewer::onFrameSwitched);
 }
 
 //-----------------------------------------------------------------------------

@@ -147,12 +147,12 @@ PreferencesPopup::FormatProperties::FormatProperties(PreferencesPopup *parent)
   // Establish connections
   bool ret = true;
 
-  ret = connect(m_dpiPolicy, SIGNAL(currentIndexChanged(int)),
-                SLOT(updateEnabledStatus())) &&
+  ret = QObject::connect(m_dpiPolicy, SIGNAL(currentIndexChanged(int)),
+                         SLOT(updateEnabledStatus())) &&
         ret;
-  ret =
-      connect(m_doAntialias, SIGNAL(clicked()), SLOT(updateEnabledStatus())) &&
-      ret;
+  ret = QObject::connect(m_doAntialias, SIGNAL(clicked()),
+                         SLOT(updateEnabledStatus())) &&
+        ret;
 
   assert(ret);
 }
@@ -227,12 +227,15 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
     camSize.lx = camRes.lx / 53.33333;
     camSize.ly = camRes.ly / 53.33333;
     camera->setSize(camSize);
-    TDimension cleanupRes = CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.getRes();
+    TDimension cleanupRes = CleanupSettingsModel::instance()
+                                ->getCurrentParameters()
+                                ->m_camera.getRes();
     TDimensionD cleanupSize;
     cleanupSize.lx = cleanupRes.lx / 53.33333;
     cleanupSize.ly = cleanupRes.ly / 53.33333;
-    CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.setSize(cleanupSize);
-	m_pref->storeOldUnits();
+    CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.setSize(
+        cleanupSize);
+    m_pref->storeOldUnits();
     if (m_unitOm->currentIndex() != 4) m_unitOm->setCurrentIndex(4);
     if (m_cameraUnitOm->currentIndex() != 4) m_cameraUnitOm->setCurrentIndex(4);
     m_unitOm->setDisabled(true);
@@ -683,18 +686,6 @@ void PreferencesPopup::onStyleSheetTypeChanged(int index) {
 }
 
 //-----------------------------------------------------------------------------
-/*
-QWidget* PreferencesPopup::create(const QString &lbl, bool def, const char*slot)
-{
-  DVGui::CheckBox* cb = new DVGui::CheckBox(lbl);
-  cb->setMaximumHeight(WidgetHeight);
-  cb->setChecked(def);
-  bool ret = connect(cb, SIGNAL(stateChanged (int)), slot);
-  assert(ret);
-  return cb;
-}
-*/
-//-----------------------------------------------------------------------------
 
 void PreferencesPopup::onUndoMemorySizeChanged() {
   int value = m_undoMemorySize->getValue();
@@ -799,8 +790,8 @@ void PreferencesPopup::onEditLevelFormat() {
   if (!m_formatProperties) {
     m_formatProperties = new FormatProperties(this);
 
-    bool ret = connect(m_formatProperties, SIGNAL(dialogClosed()),
-                       SLOT(onLevelFormatEdited()));
+    bool ret = QObject::connect(m_formatProperties, SIGNAL(dialogClosed()),
+                                SLOT(onLevelFormatEdited()));
     assert(ret);
   }
 
@@ -1728,203 +1719,240 @@ PreferencesPopup::PreferencesPopup()
   /*---- signal-slot connections -----*/
 
   bool ret = true;
-  ret      = ret && connect(categoryList, SIGNAL(currentRowChanged(int)),
-                       stackedWidget, SLOT(setCurrentIndex(int)));
+
+  ret = ret && QObject::connect(categoryList, SIGNAL(currentRowChanged(int)),
+                                stackedWidget, SLOT(setCurrentIndex(int)));
 
   //--- General ----------------------
-  ret = ret && connect(useDefaultViewerCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onDefaultViewerChanged(int)));
-  ret = ret && connect(minimizeRasterMemoryCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onRasterOptimizedMemoryChanged(int)));
-  ret = ret && connect(autoSaveCB, SIGNAL(stateChanged(int)),
-                       SLOT(onAutoSaveChanged(int)));
-  ret = ret && connect(m_minuteFld, SIGNAL(editingFinished()),
-                       SLOT(onMinuteChanged()));
-  ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onDragCellsBehaviourChanged(int)));
-  ret = ret && connect(m_undoMemorySize, SIGNAL(editingFinished()),
-                       SLOT(onUndoMemorySizeChanged()));
-  ret = ret && connect(m_levelsBackup, SIGNAL(stateChanged(int)),
-                       SLOT(onLevelsBackupChanged(int)));
-  ret = ret && connect(sceneNumberingCB, SIGNAL(stateChanged(int)),
-                       SLOT(onSceneNumberingChanged(int)));
-  ret = ret && connect(m_chunkSizeFld, SIGNAL(editingFinished()), this,
-                       SLOT(onChunkSizeChanged()));
+  ret = ret && QObject::connect(useDefaultViewerCB, SIGNAL(stateChanged(int)),
+                                this, SLOT(onDefaultViewerChanged(int)));
+  ret =
+      ret && QObject::connect(minimizeRasterMemoryCB, SIGNAL(stateChanged(int)),
+                              this, SLOT(onRasterOptimizedMemoryChanged(int)));
+  ret = ret && QObject::connect(autoSaveCB, SIGNAL(stateChanged(int)),
+                                SLOT(onAutoSaveChanged(int)));
+  ret = ret && QObject::connect(m_minuteFld, SIGNAL(editingFinished()),
+                                SLOT(onMinuteChanged()));
+  ret = ret &&
+        QObject::connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)),
+                         SLOT(onDragCellsBehaviourChanged(int)));
+  ret = ret && QObject::connect(m_undoMemorySize, SIGNAL(editingFinished()),
+                                SLOT(onUndoMemorySizeChanged()));
+  ret = ret && QObject::connect(m_levelsBackup, SIGNAL(stateChanged(int)),
+                                SLOT(onLevelsBackupChanged(int)));
+  ret = ret && QObject::connect(sceneNumberingCB, SIGNAL(stateChanged(int)),
+                                SLOT(onSceneNumberingChanged(int)));
+  ret = ret && QObject::connect(m_chunkSizeFld, SIGNAL(editingFinished()), this,
+                                SLOT(onChunkSizeChanged()));
 
   //--- Interface ----------------------
-  ret = ret && connect(styleSheetType, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onStyleSheetTypeChanged(int)));
-  ret = ret && connect(m_pixelsOnlyCB, SIGNAL(stateChanged(int)),
-                       SLOT(onPixelsOnlyChanged(int)));
-  ret = ret && connect(m_unitOm, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onUnitChanged(int)));
-  ret = ret && connect(m_cameraUnitOm, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onCameraUnitChanged(int)));
-  ret = ret && connect(roomChoice, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onRoomChoiceChanged(int)));
-  ret = ret && connect(openFlipbookAfterCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onViewGeneratedMovieChanged(int)));
-  ret = ret && connect(m_iconSizeLx, SIGNAL(editingFinished()),
-                       SLOT(onIconSizeChanged()));
-  ret = ret && connect(m_iconSizeLy, SIGNAL(editingFinished()),
-                       SLOT(onIconSizeChanged()));
-  ret = ret && connect(m_viewShrink, SIGNAL(editingFinished()),
-                       SLOT(onViewValuesChanged()));
-  ret = ret && connect(m_viewStep, SIGNAL(editingFinished()),
-                       SLOT(onViewValuesChanged()));
+  ret =
+      ret && QObject::connect(styleSheetType, SIGNAL(currentIndexChanged(int)),
+                              SLOT(onStyleSheetTypeChanged(int)));
+  ret = ret && QObject::connect(m_pixelsOnlyCB, SIGNAL(stateChanged(int)),
+                                SLOT(onPixelsOnlyChanged(int)));
+  ret = ret && QObject::connect(m_unitOm, SIGNAL(currentIndexChanged(int)),
+                                SLOT(onUnitChanged(int)));
+  ret =
+      ret && QObject::connect(m_cameraUnitOm, SIGNAL(currentIndexChanged(int)),
+                              SLOT(onCameraUnitChanged(int)));
+  ret = ret && QObject::connect(roomChoice, SIGNAL(currentIndexChanged(int)),
+                                SLOT(onRoomChoiceChanged(int)));
+  ret = ret && QObject::connect(openFlipbookAfterCB, SIGNAL(stateChanged(int)),
+                                this, SLOT(onViewGeneratedMovieChanged(int)));
+  ret = ret && QObject::connect(m_iconSizeLx, SIGNAL(editingFinished()),
+                                SLOT(onIconSizeChanged()));
+  ret = ret && QObject::connect(m_iconSizeLy, SIGNAL(editingFinished()),
+                                SLOT(onIconSizeChanged()));
+  ret = ret && QObject::connect(m_viewShrink, SIGNAL(editingFinished()),
+                                SLOT(onViewValuesChanged()));
+  ret = ret && QObject::connect(m_viewStep, SIGNAL(editingFinished()),
+                                SLOT(onViewValuesChanged()));
   if (languageList.size() > 1)
-    ret = ret && connect(languageType, SIGNAL(currentIndexChanged(int)),
-                         SLOT(onLanguageTypeChanged(int)));
-  ret = ret && connect(moveCurrentFrameCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onMoveCurrentFrameChanged(int)));
-  ret =
-      ret && connect(viewerZoomCenterComboBox, SIGNAL(currentIndexChanged(int)),
-                     this, SLOT(onViewerZoomCenterChanged(int)));
-  ret = ret && connect(replaceAfterSaveLevelAsCB, SIGNAL(stateChanged(int)),
-                       this, SLOT(onReplaceAfterSaveLevelAsChanged(int)));
-  ret =
-      ret &&
-      connect(showRasterImageDarkenBlendedInViewerCB, SIGNAL(stateChanged(int)),
-              this, SLOT(onShowRasterImageDarkenBlendedInViewerChanged(int)));
+    ret =
+        ret && QObject::connect(languageType, SIGNAL(currentIndexChanged(int)),
+                                SLOT(onLanguageTypeChanged(int)));
+  ret = ret && QObject::connect(moveCurrentFrameCB, SIGNAL(stateChanged(int)),
+                                this, SLOT(onMoveCurrentFrameChanged(int)));
+  ret = ret && QObject::connect(viewerZoomCenterComboBox,
+                                SIGNAL(currentIndexChanged(int)), this,
+                                SLOT(onViewerZoomCenterChanged(int)));
   ret = ret &&
-        connect(showShowFrameNumberWithLettersCB, SIGNAL(stateChanged(int)),
-                this, SLOT(onShowFrameNumberWithLettersChanged(int)));
+        QObject::connect(replaceAfterSaveLevelAsCB, SIGNAL(stateChanged(int)),
+                         this, SLOT(onReplaceAfterSaveLevelAsChanged(int)));
+  ret = ret &&
+        QObject::connect(
+            showRasterImageDarkenBlendedInViewerCB, SIGNAL(stateChanged(int)),
+            this, SLOT(onShowRasterImageDarkenBlendedInViewerChanged(int)));
+  ret = ret && QObject::connect(showShowFrameNumberWithLettersCB,
+                                SIGNAL(stateChanged(int)), this,
+                                SLOT(onShowFrameNumberWithLettersChanged(int)));
   // Viewer BG color
-  ret = ret && connect(m_viewerBgColorFld,
-                       SIGNAL(colorChanged(const TPixel32 &, bool)), this,
-                       SLOT(setViewerBgColor(const TPixel32 &, bool)));
-  // Preview BG color
-  ret = ret && connect(m_previewBgColorFld,
-                       SIGNAL(colorChanged(const TPixel32 &, bool)), this,
-                       SLOT(setPreviewBgColor(const TPixel32 &, bool)));
-  // bg chessboard colors
-  ret = ret && connect(m_chessboardColor1Fld,
-                       SIGNAL(colorChanged(const TPixel32 &, bool)), this,
-                       SLOT(setChessboardColor1(const TPixel32 &, bool)));
-  ret = ret && connect(m_chessboardColor2Fld,
-                       SIGNAL(colorChanged(const TPixel32 &, bool)), this,
-                       SLOT(setChessboardColor2(const TPixel32 &, bool)));
-  // Column Icon
   ret = ret &&
-        connect(m_columnIconOm, SIGNAL(currentIndexChanged(const QString &)),
-                this, SLOT(onColumnIconChange(const QString &)));
-  ret = ret && connect(actualPixelOnSceneModeCB, SIGNAL(stateChanged(int)),
-                       SLOT(onActualPixelOnSceneModeChanged(int)));
-  ret = ret && connect(levelNameOnEachMarkerCB, SIGNAL(stateChanged(int)),
-                       SLOT(onLevelNameOnEachMarkerChanged(int)));
+        QObject::connect(m_viewerBgColorFld,
+                         SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+                         SLOT(setViewerBgColor(const TPixel32 &, bool)));
+  // Preview BG color
+  ret = ret &&
+        QObject::connect(m_previewBgColorFld,
+                         SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+                         SLOT(setPreviewBgColor(const TPixel32 &, bool)));
+  // bg chessboard colors
+  ret = ret &&
+        QObject::connect(m_chessboardColor1Fld,
+                         SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+                         SLOT(setChessboardColor1(const TPixel32 &, bool)));
+  ret = ret &&
+        QObject::connect(m_chessboardColor2Fld,
+                         SIGNAL(colorChanged(const TPixel32 &, bool)), this,
+                         SLOT(setChessboardColor2(const TPixel32 &, bool)));
+  // Column Icon
+  ret = ret && QObject::connect(
+                   m_columnIconOm, SIGNAL(currentIndexChanged(const QString &)),
+                   this, SLOT(onColumnIconChange(const QString &)));
+  ret = ret &&
+        QObject::connect(actualPixelOnSceneModeCB, SIGNAL(stateChanged(int)),
+                         SLOT(onActualPixelOnSceneModeChanged(int)));
+  ret = ret &&
+        QObject::connect(levelNameOnEachMarkerCB, SIGNAL(stateChanged(int)),
+                         SLOT(onLevelNameOnEachMarkerChanged(int)));
 
   //--- Visualization ---------------------
-  ret = ret && connect(show0ThickLinesCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onShow0ThickLinesChanged(int)));
-  ret = ret && connect(regionAntialiasCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onRegionAntialiasChanged(int)));
+  ret = ret && QObject::connect(show0ThickLinesCB, SIGNAL(stateChanged(int)),
+                                this, SLOT(onShow0ThickLinesChanged(int)));
+  ret = ret && QObject::connect(regionAntialiasCB, SIGNAL(stateChanged(int)),
+                                this, SLOT(onRegionAntialiasChanged(int)));
 
   //--- Loading ----------------------
-  ret = ret && connect(exposeLoadedLevelsCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onAutoExposeChanged(int)));
-  ret = ret && connect(initialLoadTlvCachingBehaviorComboBox,
-                       SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onInitialLoadTlvCachingBehaviorChanged(int)));
-  ret = ret && connect(createSubfolderCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onSubsceneFolderChanged(int)));
-  ret =
-      ret &&
-      connect(removeSceneNumberFromLoadedLevelNameCB, SIGNAL(stateChanged(int)),
-              this, SLOT(onRemoveSceneNumberFromLoadedLevelNameChanged(int)));
+  ret = ret && QObject::connect(exposeLoadedLevelsCB, SIGNAL(stateChanged(int)),
+                                this, SLOT(onAutoExposeChanged(int)));
   ret = ret &&
-        connect(m_addLevelFormat, SIGNAL(clicked()), SLOT(onAddLevelFormat()));
-  ret = ret && connect(m_removeLevelFormat, SIGNAL(clicked()),
-                       SLOT(onRemoveLevelFormat()));
-  ret = ret && connect(m_editLevelFormat, SIGNAL(clicked()),
-                       SLOT(onEditLevelFormat()));
-  ret = ret && connect(paletteTypeForRasterColorModelComboBox,
-                       SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onPaletteTypeForRasterColorModelChanged(int)));
+        QObject::connect(initialLoadTlvCachingBehaviorComboBox,
+                         SIGNAL(currentIndexChanged(int)), this,
+                         SLOT(onInitialLoadTlvCachingBehaviorChanged(int)));
+  ret = ret && QObject::connect(createSubfolderCB, SIGNAL(stateChanged(int)),
+                                this, SLOT(onSubsceneFolderChanged(int)));
+  ret = ret &&
+        QObject::connect(
+            removeSceneNumberFromLoadedLevelNameCB, SIGNAL(stateChanged(int)),
+            this, SLOT(onRemoveSceneNumberFromLoadedLevelNameChanged(int)));
+  ret = ret && QObject::connect(m_addLevelFormat, SIGNAL(clicked()),
+                                SLOT(onAddLevelFormat()));
+  ret = ret && QObject::connect(m_removeLevelFormat, SIGNAL(clicked()),
+                                SLOT(onRemoveLevelFormat()));
+  ret = ret && QObject::connect(m_editLevelFormat, SIGNAL(clicked()),
+                                SLOT(onEditLevelFormat()));
+  ret = ret &&
+        QObject::connect(paletteTypeForRasterColorModelComboBox,
+                         SIGNAL(currentIndexChanged(int)), this,
+                         SLOT(onPaletteTypeForRasterColorModelChanged(int)));
 
   //--- Drawing ----------------------
-  ret = ret && connect(keepOriginalCleanedUpCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onSaveUnpaintedInCleanupChanged(int)));
-  ret = ret && connect(multiLayerStylePickerCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onMultiLayerStylePickerChanged(int)));
-  ret = ret && connect(useSaveboxToLimitFillingOpCB, SIGNAL(stateChanged(int)),
-                       this, SLOT(onGetFillOnlySavebox(int)));
-  ret = ret && connect(m_defScanLevelType,
-                       SIGNAL(currentIndexChanged(const QString &)),
-                       SLOT(onScanLevelTypeChanged(const QString &)));
-  ret = ret && connect(minimizeSaveboxAfterEditingCB, SIGNAL(stateChanged(int)),
-                       this, SLOT(onMinimizeSaveboxAfterEditing(int)));
-  ret = ret && connect(m_defLevelType, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onDefLevelTypeChanged(int)));
-  ret = ret && connect(m_autocreationType, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onAutocreationTypeChanged(int)));
-  ret = ret && connect(m_defLevelWidth, SIGNAL(valueChanged()),
-                       SLOT(onDefLevelParameterChanged()));
-  ret = ret && connect(m_defLevelHeight, SIGNAL(valueChanged()),
-                       SLOT(onDefLevelParameterChanged()));
-  ret = ret && connect(m_defLevelDpi, SIGNAL(valueChanged()),
-                       SLOT(onDefLevelParameterChanged()));
+  ret = ret &&
+        QObject::connect(keepOriginalCleanedUpCB, SIGNAL(stateChanged(int)),
+                         this, SLOT(onSaveUnpaintedInCleanupChanged(int)));
+  ret = ret &&
+        QObject::connect(multiLayerStylePickerCB, SIGNAL(stateChanged(int)),
+                         this, SLOT(onMultiLayerStylePickerChanged(int)));
+  ret = ret && QObject::connect(useSaveboxToLimitFillingOpCB,
+                                SIGNAL(stateChanged(int)), this,
+                                SLOT(onGetFillOnlySavebox(int)));
+  ret = ret && QObject::connect(m_defScanLevelType,
+                                SIGNAL(currentIndexChanged(const QString &)),
+                                SLOT(onScanLevelTypeChanged(const QString &)));
+  ret = ret && QObject::connect(minimizeSaveboxAfterEditingCB,
+                                SIGNAL(stateChanged(int)), this,
+                                SLOT(onMinimizeSaveboxAfterEditing(int)));
+  ret =
+      ret && QObject::connect(m_defLevelType, SIGNAL(currentIndexChanged(int)),
+                              SLOT(onDefLevelTypeChanged(int)));
+  ret = ret &&
+        QObject::connect(m_autocreationType, SIGNAL(currentIndexChanged(int)),
+                         SLOT(onAutocreationTypeChanged(int)));
+  ret = ret && QObject::connect(m_defLevelWidth, SIGNAL(valueChanged()),
+                                SLOT(onDefLevelParameterChanged()));
+  ret = ret && QObject::connect(m_defLevelHeight, SIGNAL(valueChanged()),
+                                SLOT(onDefLevelParameterChanged()));
+  ret = ret && QObject::connect(m_defLevelDpi, SIGNAL(valueChanged()),
+                                SLOT(onDefLevelParameterChanged()));
 
   //--- Xsheet ----------------------
-  ret = ret && connect(xsheetAutopanDuringPlaybackCB, SIGNAL(stateChanged(int)),
-                       this, SLOT(onXsheetAutopanChanged(int)));
-  ret = ret && connect(ignoreAlphaonColumn1CB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onIgnoreAlphaonColumn1Changed(int)));
-  ret = ret && connect(m_xsheetStep, SIGNAL(editingFinished()),
-                       SLOT(onXsheetStepChanged()));
-  ret = ret && connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onDragCellsBehaviourChanged(int)));
-  ret = ret && connect(showKeyframesOnCellAreaCB, SIGNAL(stateChanged(int)),
-                       this, SLOT(onShowKeyframesOnCellAreaChanged(int)));
+  ret = ret && QObject::connect(xsheetAutopanDuringPlaybackCB,
+                                SIGNAL(stateChanged(int)), this,
+                                SLOT(onXsheetAutopanChanged(int)));
+  ret =
+      ret && QObject::connect(ignoreAlphaonColumn1CB, SIGNAL(stateChanged(int)),
+                              this, SLOT(onIgnoreAlphaonColumn1Changed(int)));
+  ret = ret && QObject::connect(m_xsheetStep, SIGNAL(editingFinished()),
+                                SLOT(onXsheetStepChanged()));
+  ret = ret &&
+        QObject::connect(m_cellsDragBehaviour, SIGNAL(currentIndexChanged(int)),
+                         SLOT(onDragCellsBehaviourChanged(int)));
+  ret = ret &&
+        QObject::connect(showKeyframesOnCellAreaCB, SIGNAL(stateChanged(int)),
+                         this, SLOT(onShowKeyframesOnCellAreaChanged(int)));
 
   //--- Animation ----------------------
-  ret = ret && connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onKeyframeTypeChanged(int)));
-  ret = ret && connect(m_animationStepField, SIGNAL(editingFinished()),
-                       SLOT(onAnimationStepChanged()));
+  ret =
+      ret && QObject::connect(m_keyframeType, SIGNAL(currentIndexChanged(int)),
+                              SLOT(onKeyframeTypeChanged(int)));
+  ret = ret && QObject::connect(m_animationStepField, SIGNAL(editingFinished()),
+                                SLOT(onAnimationStepChanged()));
 
   //--- Preview ----------------------
-  ret = ret && connect(m_blanksCount, SIGNAL(editingFinished()),
-                       SLOT(onBlankCountChanged()));
+  ret = ret && QObject::connect(m_blanksCount, SIGNAL(editingFinished()),
+                                SLOT(onBlankCountChanged()));
+  ret = ret && QObject::connect(
+                   m_blankColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
+                   SLOT(onBlankColorChanged(const TPixel32 &, bool)));
   ret =
-      ret && connect(m_blankColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
-                     SLOT(onBlankColorChanged(const TPixel32 &, bool)));
-  ret = ret && connect(rewindAfterPlaybackCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onRewindAfterPlayback(int)));
-  ret = ret && connect(displayInNewFlipBookCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onPreviewAlwaysOpenNewFlip(int)));
-  ret = ret && connect(fitToFlipbookCB, SIGNAL(stateChanged(int)), this,
-                       SLOT(onFitToFlipbook(int)));
+      ret && QObject::connect(rewindAfterPlaybackCB, SIGNAL(stateChanged(int)),
+                              this, SLOT(onRewindAfterPlayback(int)));
+  ret =
+      ret && QObject::connect(displayInNewFlipBookCB, SIGNAL(stateChanged(int)),
+                              this, SLOT(onPreviewAlwaysOpenNewFlip(int)));
+  ret = ret && QObject::connect(fitToFlipbookCB, SIGNAL(stateChanged(int)),
+                                this, SLOT(onFitToFlipbook(int)));
 
   //--- Onion Skin ----------------------
-  ret = ret &&
-        connect(m_frontOnionColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
-                SLOT(onOnionDataChanged(const TPixel32 &, bool)));
-  ret = ret &&
-        connect(m_backOnionColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
-                SLOT(onOnionDataChanged(const TPixel32 &, bool)));
-  ret = ret && connect(m_inksOnly, SIGNAL(stateChanged(int)),
-                       SLOT(onOnionDataChanged(int)));
-  ret = ret && connect(m_onionSkinVisibility, SIGNAL(stateChanged(int)),
-                       SLOT(onOnionSkinVisibilityChanged(int)));
-  ret = ret && connect(m_onionPaperThickness, SIGNAL(editingFinished()),
-                       SLOT(onOnionPaperThicknessChanged()));
+  ret =
+      ret && QObject::connect(m_frontOnionColor,
+                              SIGNAL(colorChanged(const TPixel32 &, bool)),
+                              SLOT(onOnionDataChanged(const TPixel32 &, bool)));
+  ret =
+      ret && QObject::connect(m_backOnionColor,
+                              SIGNAL(colorChanged(const TPixel32 &, bool)),
+                              SLOT(onOnionDataChanged(const TPixel32 &, bool)));
+  ret = ret && QObject::connect(m_inksOnly, SIGNAL(stateChanged(int)),
+                                SLOT(onOnionDataChanged(int)));
+  ret =
+      ret && QObject::connect(m_onionSkinVisibility, SIGNAL(stateChanged(int)),
+                              SLOT(onOnionSkinVisibilityChanged(int)));
+  ret =
+      ret && QObject::connect(m_onionPaperThickness, SIGNAL(editingFinished()),
+                              SLOT(onOnionPaperThicknessChanged()));
 
   //--- Transparency Check ----------------------
-  ret = ret && connect(m_transpCheckBgColor,
-                       SIGNAL(colorChanged(const TPixel32 &, bool)),
-                       SLOT(onTranspCheckDataChanged(const TPixel32 &, bool)));
-  ret = ret && connect(m_transpCheckInkColor,
-                       SIGNAL(colorChanged(const TPixel32 &, bool)),
-                       SLOT(onTranspCheckDataChanged(const TPixel32 &, bool)));
-  ret = ret && connect(m_transpCheckPaintColor,
-                       SIGNAL(colorChanged(const TPixel32 &, bool)),
-                       SLOT(onTranspCheckDataChanged(const TPixel32 &, bool)));
+  ret = ret &&
+        QObject::connect(
+            m_transpCheckBgColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
+            SLOT(onTranspCheckDataChanged(const TPixel32 &, bool)));
+  ret = ret &&
+        QObject::connect(
+            m_transpCheckInkColor, SIGNAL(colorChanged(const TPixel32 &, bool)),
+            SLOT(onTranspCheckDataChanged(const TPixel32 &, bool)));
+  ret = ret && QObject::connect(
+                   m_transpCheckPaintColor,
+                   SIGNAL(colorChanged(const TPixel32 &, bool)),
+                   SLOT(onTranspCheckDataChanged(const TPixel32 &, bool)));
 
   //--- Version Control ----------------------
-  ret = ret && connect(m_enableVersionControl, SIGNAL(stateChanged(int)),
-                       SLOT(onSVNEnabledChanged(int)));
-  ret = ret && connect(autoRefreshFolderContentsCB, SIGNAL(stateChanged(int)),
-                       SLOT(onAutomaticSVNRefreshChanged(int)));
+  ret =
+      ret && QObject::connect(m_enableVersionControl, SIGNAL(stateChanged(int)),
+                              SLOT(onSVNEnabledChanged(int)));
+  ret = ret &&
+        QObject::connect(autoRefreshFolderContentsCB, SIGNAL(stateChanged(int)),
+                         SLOT(onAutomaticSVNRefreshChanged(int)));
 
   assert(ret);
 }

@@ -640,8 +640,9 @@ void PlasticTool::addContextMenuActions_build(QMenu *menu) {
 
   if (!m_svSel.isEmpty()) {
     QAction *deleteVertex = menu->addAction(tr("Delete Vertex"));
-    ret = ret && connect(deleteVertex, SIGNAL(triggered()), &l_plasticTool,
-                         SLOT(deleteSelectedVertex_undo()));
+    ret                   = ret &&
+          QObject::connect(deleteVertex, SIGNAL(triggered()), &l_plasticTool,
+                           SLOT(deleteSelectedVertex_undo()));
 
     menu->addSeparator();
   }

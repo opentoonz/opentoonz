@@ -527,12 +527,11 @@ FlipConsole::FlipConsole(QVBoxLayout *mainLayout, UINT gadgetsMask,
 
   applyCustomizeMask();
 
-  bool ret = connect(&m_playbackExecutor, SIGNAL(nextFrame(int)), this,
-                     SLOT(onNextFrame(int)), Qt::BlockingQueuedConnection);
+  bool ret = QObject::connect(
+      &m_playbackExecutor, &PlaybackExecutor::nextFrame,  //
+      this, &FlipConsole::onNextFrame, Qt::BlockingQueuedConnection);
 
   assert(ret);
-
-  // parent->setLayout(mainLayout);
 }
 
 //-----------------------------------------------------------------------------
@@ -910,9 +909,11 @@ QAction *FlipConsole::createCheckedButtonWithBorderImage(
 
   action->setDefaultWidget(button);
   button->setObjectName("chackableButtonWithImageBorder");
-  connect(button, SIGNAL(triggered(QAction *)), this,
-          SLOT(onButtonPressed(QAction *)));
-  // connect(action, SIGNAL(toggled(bool)), button, SLOT(setChecked(bool)));
+
+  QObject::connect<void (QToolButton::*)(QAction *),
+                   void (FlipConsole::*)(QAction *)>(
+      button, &QToolButton::triggered, this, &FlipConsole::onButtonPressed);
+
   m_playToolBar->addAction(action);
   return action;
 }
@@ -940,9 +941,6 @@ QAction *FlipConsole::createDoubleButton(
 
   widget = new DoubleButton(action1, action2, this);
   return m_playToolBar->addWidget(widget);
-
-  // m_playToolBar->addAction(action1);
-  // m_playToolBar->addAction(action2);
 }
 
 //-----------------------------------------------------------------------------
@@ -1106,8 +1104,8 @@ void FlipConsole::createCustomizeMenu(bool withCustomWidget) {
     if (m_gadgetsMask & eFilledRaster)
       addMenuItem(eFilledRaster, tr("Display Areas as Filled"), menu);
 
-    bool ret = connect(menu, SIGNAL(triggered(QAction *)), this,
-                       SLOT(onCustomizeButtonPressed(QAction *)));
+    bool ret = QObject::connect(menu, &QMenu::triggered,  //
+                                this, &FlipConsole::onCustomizeButtonPressed);
     assert(ret);
   }
 }
@@ -1120,16 +1118,12 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
   m_playToolBar = new QToolBar(this);
   m_playToolBar->setMovable(false);
   m_playToolBar->setObjectName("FlipConsolePlayToolBar");
-  //	m_playToolBar->setObjectName("chackableButtonToolBar");
-
-  // m_playToolBar->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 
   createCustomizeMenu(withCustomWidget);
 
   if (m_gadgetsMask & eSave) {
     // just reuse the icon file named "savepalette"
     createButton(eSave, "savepalette", tr("&Save Images"), false);
-    // m_saveSep = m_playToolBar->addSeparator();
   }
 
   // snapshot
@@ -1224,8 +1218,10 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
         eBlue, eGBlue, "half_B", "half_bw", tr("Blue Channel"),
         tr("Blue Channel in Grayscale"), m_colorFilterGroup, m_doubleBlue);
 
-  ret = ret && connect(m_colorFilterGroup, SIGNAL(triggered(QAction *)), this,
-                       SLOT(onButtonPressed(QAction *)));
+  ret = ret && QObject::connect<void (QActionGroup::*)(QAction *),
+                                void (FlipConsole::*)(QAction *)>(
+                   m_colorFilterGroup, &QActionGroup::triggered,  //
+                   this, &FlipConsole::onButtonPressed);
 
   if (m_gadgetsMask & eMatte)
     createButton(eMatte, "channelmatte", tr("Alpha Channel"), true);
@@ -1253,8 +1249,10 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
   }
 
   // for all actions in this toolbar
-  ret = ret && connect(m_playToolBar, SIGNAL(actionTriggered(QAction *)), this,
-                       SLOT(onButtonPressed(QAction *)));
+  ret = ret && QObject::connect<void (QToolBar::*)(QAction *),
+                                void (FlipConsole::*)(QAction *)>(
+                   m_playToolBar, &QToolBar::actionTriggered,  //
+                   this, &FlipConsole::onButtonPressed);
 
   setChecked(ePause, true);
   setChecked(eWhiteBg, FlipBookWhiteBgToggle);
@@ -1268,9 +1266,9 @@ void FlipConsole::createPlayToolBar(bool withCustomWidget) {
 void FlipConsole::enableBlanks(bool state) {
   m_drawBlanksEnabled = state;
   m_blankColor        = TPixel::Transparent;
-  if (m_drawBlanksEnabled)
+  if (m_drawBlanksEnabled) {
     Preferences::instance()->getBlankValues(m_blanksCount, m_blankColor);
-  else {
+  } else {
     m_blanksCount = 0;
     m_blankColor  = TPixel::Transparent;
   }
@@ -1495,18 +1493,20 @@ void FlipConsole::doButtonPressed(UINT button) {
     }
     if (m_fpsLabel) m_fpsLabel->setText(tr(" FPS "));
     if (m_fpsField) m_fpsField->setLineEditBackgroundColor(Qt::transparent);
-    // setChecked(ePlay,   false);
-    // setChecked(eLoop,   false);
-    connect(m_editCurrFrame, SIGNAL(editingFinished()), this,
-            SLOT(OnSetCurrentFrame()));
-    connect(m_currFrameSlider, SIGNAL(flipSliderReleased()), this,
-            SLOT(OnFrameSliderRelease()));
-    connect(m_currFrameSlider, SIGNAL(flipSliderPressed()), this,
-            SLOT(OnFrameSliderPress()));
-    connect(m_currFrameSlider, SIGNAL(valueChanged(int)), this,
-            SLOT(OnSetCurrentFrame(int)));
-    connect(m_currFrameSlider, SIGNAL(flipSliderReleased()), this,
-            SLOT(onSliderRelease()));
+
+    QObject::connect<void (IntLineEdit::*)(), void (FlipConsole::*)()>(
+        m_editCurrFrame, &IntLineEdit::editingFinished,  //
+        this, &FlipConsole::OnSetCurrentFrame);
+    QObject::connect(m_currFrameSlider, &FlipSlider::flipSliderReleased,  //
+                     this, &FlipConsole::OnFrameSliderRelease);
+    QObject::connect(m_currFrameSlider, &FlipSlider::flipSliderPressed,  //
+                     this, &FlipConsole::OnFrameSliderPress);
+    QObject::connect<void (FlipSlider::*)(int), void (FlipConsole::*)(int)>(
+        m_currFrameSlider, &FlipSlider::valueChanged,  //
+        this, &FlipConsole::OnSetCurrentFrame);
+    QObject::connect(m_currFrameSlider, &FlipSlider::flipSliderReleased,  //
+                     this, &FlipConsole::onSliderRelease);
+
     emit playStateChanged(false);
     return;
 
@@ -1638,12 +1638,14 @@ QFrame *FlipConsole::createFrameSlider() {
   }
   frameSliderFrame->setLayout(frameSliderLayout);
 
-  connect(m_editCurrFrame, SIGNAL(editingFinished()), this,
-          SLOT(OnSetCurrentFrame()));
-  connect(m_currFrameSlider, SIGNAL(valueChanged(int)), this,
-          SLOT(OnSetCurrentFrame(int)));
-  connect(m_currFrameSlider, SIGNAL(flipSliderReleased()), this,
-          SLOT(OnFrameSliderRelease()));
+  QObject::connect<void (IntLineEdit::*)(), void (FlipConsole::*)()>(
+      m_editCurrFrame, &IntLineEdit::editingFinished,  //
+      this, &FlipConsole::OnSetCurrentFrame);
+  QObject::connect<void (FlipSlider::*)(int), void (FlipConsole::*)(int)>(
+      m_currFrameSlider, &FlipSlider::valueChanged,  //
+      this, &FlipConsole::OnSetCurrentFrame);
+  QObject::connect(m_currFrameSlider, &FlipSlider::flipSliderReleased,  //
+                   this, &FlipConsole::OnFrameSliderRelease);
 
   return frameSliderFrame;
 }
@@ -1676,9 +1678,12 @@ QFrame *FlipConsole::createFpsSlider() {
   }
   fpsSliderFrame->setLayout(hLay);
 
-  connect(m_fpsSlider, SIGNAL(valueChanged(int)), this,
-          SLOT(setCurrentFPS(int)));
-  connect(m_fpsField, SIGNAL(editingFinished()), this, SLOT(onFPSEdited()));
+  QObject::connect<void (QScrollBar::*)(int), void (FlipConsole::*)(int)>(
+      m_fpsSlider, &QScrollBar::valueChanged,  //
+      this, &FlipConsole::setCurrentFPS);
+
+  QObject::connect(m_fpsField, &IntLineEdit::editingFinished,  //
+                   this, &FlipConsole::onFPSEdited);
 
   return fpsSliderFrame;
 }
@@ -1700,7 +1705,6 @@ void FlipConsole::setFrameRange(int from, int to, int step, int current) {
     m_to -= (m_to - m_from) % m_step;
     m_framesCount = (m_to - m_from) / m_step + 1;
     m_currFrameSlider->blockSignals(true);
-    // m_currFrameSlider->setRange(0, m_framesCount-1);
     m_currFrameSlider->setRange(m_from, m_to);
     m_currFrameSlider->setSingleStep(m_step);
     m_currFrameSlider->blockSignals(false);
@@ -1929,9 +1933,9 @@ class FlipConsoleActionsCreator : AuxActionsCreator {
 
 public:
   void createActions(QObject *parent) override {
-    /*createToggleAction(parent, "A_Flip_Play",  "Play",  FlipConsole::ePlay);
-createToggleAction(parent, "A_Flip_Pause", "Pause", FlipConsole::ePause);
-createToggleAction(parent, "A_Flip_Loop",  "Loop",  FlipConsole::eLoop);*/
+    // createToggleAction(parent, "A_Flip_Play",  "Play",  FlipConsole::ePlay);
+    // createToggleAction(parent, "A_Flip_Pause", "Pause", FlipConsole::ePause);
+    // createToggleAction(parent, "A_Flip_Loop",  "Loop",  FlipConsole::eLoop);
   }
 } flipConsoleActionsCreator;
 

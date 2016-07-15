@@ -57,8 +57,8 @@ FxHistogramRender::FxHistogramRender()
 
   qRegisterMetaType<TRasterP>("TRasterP");
   qRegisterMetaType<UINT>("UINT");
-  connect(m_renderPort, SIGNAL(renderCompleted(const TRasterP &, UINT)), this,
-          SLOT(onRenderCompleted(const TRasterP &, UINT)));
+  QObject::connect(m_renderPort, &FxHistogramRenderPort::renderCompleted,  //
+                   this, &FxHistogramRender::onRenderCompleted);           //
 }
 
 //-----------------------------------------------------------------------------

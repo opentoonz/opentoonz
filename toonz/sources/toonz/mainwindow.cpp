@@ -398,23 +398,25 @@ centralWidget->setLayout(centralWidgetLayout);*/
 
   // Setto le stanze
   QTabBar *roomTabWidget = m_topBar->getRoomTabWidget();
-  connect(m_stackedWidget, SIGNAL(currentChanged(int)),
-          SLOT(onCurrentRoomChanged(int)));
-  connect(roomTabWidget, SIGNAL(currentChanged(int)), m_stackedWidget,
-          SLOT(setCurrentIndex(int)));
+  QObject::connect(m_stackedWidget, SIGNAL(currentChanged(int)),
+                   SLOT(onCurrentRoomChanged(int)));
+  QObject::connect(roomTabWidget, SIGNAL(currentChanged(int)), m_stackedWidget,
+                   SLOT(setCurrentIndex(int)));
 
   /*-- タイトルバーにScene名を表示する --*/
-  connect(TApp::instance()->getCurrentScene(), SIGNAL(nameSceneChanged()), this,
-          SLOT(changeWindowTitle()));
+  QObject::connect(TApp::instance()->getCurrentScene(),
+                   SIGNAL(nameSceneChanged()), this, SLOT(changeWindowTitle()));
   changeWindowTitle();
 
   // Connetto i comandi che sono in RoomTabWidget
-  connect(roomTabWidget, SIGNAL(indexSwapped(int, int)),
-          SLOT(onIndexSwapped(int, int)));
-  connect(roomTabWidget, SIGNAL(insertNewTabRoom()), SLOT(insertNewRoom()));
-  connect(roomTabWidget, SIGNAL(deleteTabRoom(int)), SLOT(deleteRoom(int)));
-  connect(roomTabWidget, SIGNAL(renameTabRoom(int, const QString)),
-          SLOT(renameRoom(int, const QString)));
+  QObject::connect(roomTabWidget, SIGNAL(indexSwapped(int, int)),
+                   SLOT(onIndexSwapped(int, int)));
+  QObject::connect(roomTabWidget, SIGNAL(insertNewTabRoom()),
+                   SLOT(insertNewRoom()));
+  QObject::connect(roomTabWidget, SIGNAL(deleteTabRoom(int)),
+                   SLOT(deleteRoom(int)));
+  QObject::connect(roomTabWidget, SIGNAL(renameTabRoom(int, const QString)),
+                   SLOT(renameRoom(int, const QString)));
 
   setCommandHandler("MI_Quit", this, &MainWindow::onQuit);
   setCommandHandler("MI_Undo", this, &MainWindow::onUndo);
@@ -1050,7 +1052,7 @@ void MainWindow::onAbout() {
   QPushButton *button = new QPushButton(tr("Close"), dialog);
   button->setDefault(true);
   dialog->addButtonBarWidget(button);
-  connect(button, SIGNAL(clicked()), dialog, SLOT(accept()));
+  QObject::connect(button, SIGNAL(clicked()), dialog, SLOT(accept()));
 
   dialog->exec();
 }
@@ -1271,8 +1273,8 @@ void MainWindow::checkForUpdates() {
   QString updateUrl("http://opentoonz.github.io/opentoonz-version.txt");
 
   m_updateChecker = new UpdateChecker(updateUrl);
-  connect(m_updateChecker, SIGNAL(done(bool)), this,
-          SLOT(onUpdateCheckerDone(bool)));
+  QObject::connect(m_updateChecker, SIGNAL(done(bool)), this,
+                   SLOT(onUpdateCheckerDone(bool)));
 }
 //-----------------------------------------------------------------------------
 
@@ -1301,7 +1303,7 @@ void MainWindow::onUpdateCheckerDone(bool error) {
     }
   }
 
-  disconnect(m_updateChecker);
+  QObject::disconnect(m_updateChecker);
   m_updateChecker->deleteLater();
 }
 //-----------------------------------------------------------------------------
@@ -1507,8 +1509,8 @@ QAction *MainWindow::createToggle(const char *id, const QString &name,
   QAction *action = createAction(id, name, defaultShortcut, type);
   action->setCheckable(true);
   if (startStatus == true) action->trigger();
-  bool ret =
-      connect(action, SIGNAL(changed()), this, SLOT(onMenuCheckboxChanged()));
+  bool ret = QObject::connect(action, SIGNAL(changed()), this,
+                              SLOT(onMenuCheckboxChanged()));
   assert(ret);
   return action;
 }
@@ -1667,9 +1669,9 @@ void MainWindow::defineActions() {
                MenuScanCleanupCommandType);
 
   createMenuScanCleanupAction(MI_Cleanup, tr("&Cleanup"), "");
-  
+
   createMenuScanCleanupAction(MI_PencilTest, tr("&Camera Capture..."), "");
-  
+
   createMenuLevelAction(MI_AddFrames, tr("&Add Frames..."), "");
   createMenuLevelAction(MI_Renumber, tr("&Renumber..."), "");
   createMenuLevelAction(MI_ReplaceLevel, tr("&Replace Level..."), "");
@@ -1793,10 +1795,10 @@ void MainWindow::defineActions() {
       createToggle(MI_Ink1Check, tr("&Ink#1 Check"), "",
                    Ink1CheckToggleAction ? 1 : 0, MenuViewCommandType);
   /*-- Ink Check と Ink1Checkを排他的にする --*/
-  connect(inkCheckAction, SIGNAL(triggered(bool)), this,
-          SLOT(onInkCheckTriggered(bool)));
-  connect(ink1CheckAction, SIGNAL(triggered(bool)), this,
-          SLOT(onInk1CheckTriggered(bool)));
+  QObject::connect(inkCheckAction, SIGNAL(triggered(bool)), this,
+                   SLOT(onInkCheckTriggered(bool)));
+  QObject::connect(ink1CheckAction, SIGNAL(triggered(bool)), this,
+                   SLOT(onInk1CheckTriggered(bool)));
 
   createToggle(MI_PCheck, tr("&Paint Check"), "", PCheckToggleAction ? 1 : 0,
                MenuViewCommandType);
@@ -1985,8 +1987,8 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_UnlockAllColumns, tr("Unlock All"), "");
   createRightClickMenuAction(MI_ToggleColumnLocks, tr("Swap Lock/Unlock"), "");
   /*-- カレントカラムの右側のカラムを全て非表示にするコマンド --*/
-  createRightClickMenuAction(MI_DeactivateUpperColumns, tr("Hide Upper Columns"),
-                             "");
+  createRightClickMenuAction(MI_DeactivateUpperColumns,
+                             tr("Hide Upper Columns"), "");
 
   createToolAction(T_Edit, "edit", tr("Edit Tool"), "E");
   createToolAction(T_Selection, "selection", tr("Selection Tool"), "S");
@@ -2092,7 +2094,8 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_TypeSize", tr("TypeTool Size"), "");
   createToolOptionsAction("A_ToolOption_TypeStyle", tr("TypeTool Style"), "");
 
-  createToolOptionsAction("A_ToolOption_EditToolActiveAxis", tr("Active Axis"), "");
+  createToolOptionsAction("A_ToolOption_EditToolActiveAxis", tr("Active Axis"),
+                          "");
   createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Position",
                           tr("Active Axis - Position"), "");
   createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Rotation",

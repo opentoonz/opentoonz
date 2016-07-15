@@ -78,8 +78,8 @@ QWidget *DvDirTreeViewDelegate::createEditor(QWidget *parent,
 #endif
     NodeEditor *editor = new NodeEditor(parent, rect, px.width());
     editor->setText(index.data().toString());
-    connect(editor, SIGNAL(editingFinished()), this,
-            SLOT(commitAndCloseEditor()));
+    QObject::connect(editor, SIGNAL(editingFinished()), this,
+                     SLOT(commitAndCloseEditor()));
     return editor;
   } else {
     return QAbstractItemDelegate::createEditor(parent, option, index);
@@ -293,22 +293,24 @@ DvDirTreeView::DvDirTreeView(QWidget *parent)
 
   // Connect all possible changes that can alter the
   // bottom horizontal scrollbar to resize contents...
-  connect(this, SIGNAL(expanded(const QModelIndex &)), this,
-          SLOT(resizeToConts()));
+  QObject::connect(this, SIGNAL(expanded(const QModelIndex &)), this,
+                   SLOT(resizeToConts()));
 
-  connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
-          SLOT(resizeToConts()));
+  QObject::connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
+                   SLOT(resizeToConts()));
 
-  connect(this->model(), SIGNAL(layoutChanged()), this, SLOT(resizeToConts()));
+  QObject::connect(this->model(), SIGNAL(layoutChanged()), this,
+                   SLOT(resizeToConts()));
 
-  connect(this, SIGNAL(expanded(const QModelIndex &)), this,
-          SLOT(onExpanded(const QModelIndex &)));
+  QObject::connect(this, SIGNAL(expanded(const QModelIndex &)), this,
+                   SLOT(onExpanded(const QModelIndex &)));
 
-  connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
-          SLOT(onCollapsed(const QModelIndex &)));
+  QObject::connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
+                   SLOT(onCollapsed(const QModelIndex &)));
 
-  connect(m_dirFileSystemWatcher, SIGNAL(directoryChanged(const QString &)),
-          this, SLOT(onMonitoredDirectoryChanged(const QString &)));
+  QObject::connect(m_dirFileSystemWatcher,
+                   SIGNAL(directoryChanged(const QString &)), this,
+                   SLOT(onMonitoredDirectoryChanged(const QString &)));
 
   setAcceptDrops(true);
 
@@ -430,54 +432,54 @@ void DvDirTreeView::contextMenuEvent(QContextMenuEvent *e) {
 
         if (status == DvItemListModel::VC_ReadOnly) {
           action = menu.addAction(tr("Edit"));
-          connect(action, SIGNAL(triggered()), this,
-                  SLOT(editCurrentVersionControlNode()));
+          QObject::connect(action, SIGNAL(triggered()), this,
+                           SLOT(editCurrentVersionControlNode()));
         } else if (status == DvItemListModel::VC_Edited) {
           action = menu.addAction("Unlock");
-          connect(action, SIGNAL(triggered()), this,
-                  SLOT(unlockCurrentVersionControlNode()));
+          QObject::connect(action, SIGNAL(triggered()), this,
+                           SLOT(unlockCurrentVersionControlNode()));
         } else if (status == DvItemListModel::VC_Modified) {
           action = menu.addAction("Revert");
-          connect(action, SIGNAL(triggered()), this,
-                  SLOT(revertCurrentVersionControlNode()));
+          QObject::connect(action, SIGNAL(triggered()), this,
+                           SLOT(revertCurrentVersionControlNode()));
         }
       }
 
       action = menu.addAction(tr("Get"));
-      connect(action, SIGNAL(triggered()), this,
-              SLOT(updateCurrentVersionControlNode()));
+      QObject::connect(action, SIGNAL(triggered()), this,
+                       SLOT(updateCurrentVersionControlNode()));
     }
     if (fileExists) {
       action = menu.addAction(tr("Put..."));
-      connect(action, SIGNAL(triggered()), this,
-              SLOT(putCurrentVersionControlNode()));
+      QObject::connect(action, SIGNAL(triggered()), this,
+                       SLOT(putCurrentVersionControlNode()));
     }
     if (vcNode->isUnderVersionControl() && fileExists) {
       DvDirVersionControlRootNode *rootNode =
           dynamic_cast<DvDirVersionControlRootNode *>(vcNode);
       if (!rootNode) {
         action = menu.addAction(tr("Delete"));
-        connect(action, SIGNAL(triggered()), this,
-                SLOT(deleteCurrentVersionControlNode()));
+        QObject::connect(action, SIGNAL(triggered()), this,
+                         SLOT(deleteCurrentVersionControlNode()));
       }
     }
     if (pathType != "tnz" && vcNode->isUnderVersionControl()) {
       menu.addSeparator();
 
       action = menu.addAction(tr("Refresh"));
-      connect(action, SIGNAL(triggered()), this,
-              SLOT(refreshCurrentVersionControlNode()));
+      QObject::connect(action, SIGNAL(triggered()), this,
+                       SLOT(refreshCurrentVersionControlNode()));
 
       if (fileExists) {
         menu.addSeparator();
 
         action = menu.addAction(tr("Cleanup"));
-        connect(action, SIGNAL(triggered()), this,
-                SLOT(cleanupCurrentVersionControlNode()));
+        QObject::connect(action, SIGNAL(triggered()), this,
+                         SLOT(cleanupCurrentVersionControlNode()));
 
         action = menu.addAction(tr("Purge"));
-        connect(action, SIGNAL(triggered()), this,
-                SLOT(purgeCurrentVersionControlNode()));
+        QObject::connect(action, SIGNAL(triggered()), this,
+                         SLOT(purgeCurrentVersionControlNode()));
       }
     }
 
@@ -493,7 +495,7 @@ void DvDirTreeView::createMenuAction(QMenu &menu, QString name,
   act->setEnabled(enable);
   std::string slotName(slot);
   slotName = std::string("1") + slotName;
-  connect(act, SIGNAL(triggered()), slotName.c_str());
+  QObject::connect(act, SIGNAL(triggered()), slotName.c_str());
 }
 
 //-----------------------------------------------------------------------------
@@ -632,10 +634,10 @@ void DvDirTreeView::updateVersionControl(DvDirVersionControlNode *node) {
       args << "checkout"
            << QString::fromStdWString(rootNode->getRepositoryPath()) << "."
            << "--depth=empty";
-      connect(&m_thread, SIGNAL(error(const QString &)), this,
-              SLOT(onCheckOutError(const QString &)));
-      connect(&m_thread, SIGNAL(done(const QString &)), this,
-              SLOT(onCheckOutDone(const QString &)));
+      QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                       SLOT(onCheckOutError(const QString &)));
+      QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                       SLOT(onCheckOutDone(const QString &)));
       m_thread.executeCommand(localPath, "svn", args, true);
     }
     // Full checkout on the root node
@@ -808,10 +810,10 @@ void DvDirTreeView::listVersionControl(
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
   m_thread.disconnect(SIGNAL(error(const QString &)));
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onRefreshStatusError(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), this,
-          SLOT(onInfoDone(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onRefreshStatusError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onInfoDone(const QString &)));
   m_thread.executeCommand(toQString(lastExistingNode->getPath()), "svn", args);
 }
 
@@ -842,10 +844,10 @@ void DvDirTreeView::refreshVersionControl(DvDirVersionControlNode *node,
       }
       m_thread.disconnect(SIGNAL(statusRetrieved(const QString &)));
       m_thread.disconnect(SIGNAL(error(const QString &)));
-      connect(&m_thread, SIGNAL(error(const QString &)), this,
-              SLOT(onRefreshStatusError(const QString &)));
-      connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-              SLOT(onRefreshStatusDone(const QString &)));
+      QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                       SLOT(onRefreshStatusError(const QString &)));
+      QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)),
+                       this, SLOT(onRefreshStatusDone(const QString &)));
       setRefreshVersionControlEnabled(false);
       m_thread.getSVNStatus(path, true, true);
     }
@@ -875,10 +877,10 @@ void DvDirTreeView::refreshVersionControl(DvDirVersionControlNode *node,
       }
       m_thread.disconnect(SIGNAL(statusRetrieved(const QString &)));
       m_thread.disconnect(SIGNAL(error(const QString &)));
-      connect(&m_thread, SIGNAL(error(const QString &)), this,
-              SLOT(onRefreshStatusError(const QString &)));
-      connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-              SLOT(onRefreshStatusDone(const QString &)));
+      QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                       SLOT(onRefreshStatusError(const QString &)));
+      QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)),
+                       this, SLOT(onRefreshStatusDone(const QString &)));
       if (files.isEmpty()) {
         if (isVisible() && node->isUnderVersionControl())
           node->setTemporaryName(tempName.toStdWString());
@@ -1159,10 +1161,10 @@ void DvDirTreeView::purgeCurrentVersionControlNode() {
 //-----------------------------------------------------------------------------
 
 void DvDirTreeView::onCheckOutError(const QString &text) {
-  disconnect(&m_thread, SIGNAL(error(const QString &)), this,
-             SLOT(onCheckOutError(const QString &)));
-  disconnect(&m_thread, SIGNAL(done(const QString &)), this,
-             SLOT(onCheckOutDone(const QString &)));
+  QObject::disconnect(&m_thread, SIGNAL(error(const QString &)), this,
+                      SLOT(onCheckOutError(const QString &)));
+  QObject::disconnect(&m_thread, SIGNAL(done(const QString &)), this,
+                      SLOT(onCheckOutDone(const QString &)));
 
   if (isVisible()) {
     if (m_currentRefreshedNode) m_currentRefreshedNode->restoreName();
@@ -1176,10 +1178,10 @@ void DvDirTreeView::onCheckOutError(const QString &text) {
 //-----------------------------------------------------------------------------
 
 void DvDirTreeView::onCheckOutDone(const QString &text) {
-  disconnect(&m_thread, SIGNAL(error(const QString &)), this,
-             SLOT(onCheckOutError(const QString &)));
-  disconnect(&m_thread, SIGNAL(done(const QString &)), this,
-             SLOT(onCheckOutDone(const QString &)));
+  QObject::disconnect(&m_thread, SIGNAL(error(const QString &)), this,
+                      SLOT(onCheckOutError(const QString &)));
+  QObject::disconnect(&m_thread, SIGNAL(done(const QString &)), this,
+                      SLOT(onCheckOutDone(const QString &)));
 
   if (isVisible()) {
     if (!m_currentRefreshedNode) return;
@@ -1206,12 +1208,12 @@ void DvDirTreeView::onInfoDone(const QString &xmlResponse) {
   args << repositoryURL;
   args << "--xml";
 
-  disconnect(&m_thread, SIGNAL(done(const QString &)), this,
-             SLOT(onInfoDone(const QString &)));
+  QObject::disconnect(&m_thread, SIGNAL(done(const QString &)), this,
+                      SLOT(onInfoDone(const QString &)));
   if (!m_currentRefreshedNode) return;
 
-  connect(&m_thread, SIGNAL(done(const QString &)), this,
-          SLOT(onListDone(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onListDone(const QString &)));
   m_thread.executeCommand(toQString(m_currentRefreshedNode->getPath()), "svn",
                           args);
 }
@@ -1321,10 +1323,10 @@ void DvDirTreeView::checkPartialLock(const QString &workingDir,
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
   m_thread.disconnect(SIGNAL(error(const QString &)));
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onCheckPartialLockError(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), this,
-          SLOT(onCheckPartialLockDone(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onCheckPartialLockError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onCheckPartialLockDone(const QString &)));
 
   m_thread.executeCommand(workingDir, "svn", args, true);
 }
@@ -1622,7 +1624,8 @@ NodeEditor::NodeEditor(QWidget *parent, QRect rect, int leftMargin)
   layout->addSpacing(leftMargin);
   layout->addWidget(m_lineEdit);
   setLayout(layout);
-  connect(m_lineEdit, SIGNAL(editingFinished()), this, SLOT(emitFinished()));
+  QObject::connect(m_lineEdit, SIGNAL(editingFinished()), this,
+                   SLOT(emitFinished()));
 }
 
 //-----------------------------------------------------------------------------

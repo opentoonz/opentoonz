@@ -184,7 +184,7 @@ TrackerPopup::TrackerPopup(QWidget *parent, Qt::WFlags flags)
 
   // Bottone Convert
   m_trackBtn = new QPushButton(QString(tr("Track")), this);  // W_Vectorize
-  connect(m_trackBtn, SIGNAL(clicked()), this, SLOT(onTrack()));
+  QObject::connect(m_trackBtn, SIGNAL(clicked()), this, SLOT(onTrack()));
 
   addButtonBarWidget(m_trackBtn);
 }
@@ -233,7 +233,8 @@ bool TrackerPopup::apply() {
   }
 
   m_myThread = new MyThread(m_tracker);
-  connect(m_myThread, SIGNAL(finished()), this, SLOT(startNewThread()));
+  QObject::connect(m_myThread, SIGNAL(finished()), this,
+                   SLOT(startNewThread()));
   m_progressBarIndex = 0;
   m_stoppedProcess   = false;
   m_progress =
@@ -241,8 +242,8 @@ bool TrackerPopup::apply() {
                          m_tracker->getFramesNumber() - 1);
   //	QPushButton* cancelButton = new QPushButton(QString("Cancel"),this);
   //  m_progress->setCancelButton(cancelButton);
-  bool ret =
-      connect(m_progress, SIGNAL(canceled()), this, SLOT(stopProcessing()));
+  bool ret = QObject::connect(m_progress, SIGNAL(canceled()), this,
+                              SLOT(stopProcessing()));
   assert(ret);
   //	m_progress->setWindowModality(Qt::WindowModal);
   m_progress->show();

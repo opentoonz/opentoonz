@@ -129,19 +129,22 @@ DuplicatePopup::DuplicatePopup()
 
   //----signal-slot connections
   bool ret = true;
-  ret      = ret && connect(m_countFld, SIGNAL(editingFinished()), this,
-                       SLOT(updateValues()));
-  ret = ret && connect(m_upToFld, SIGNAL(editingFinished()), this,
-                       SLOT(updateValues()));
 
-  ret = ret && connect(m_okBtn, SIGNAL(clicked()), this, SLOT(onOKPressed()));
-  ret = ret && connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(close()));
+  ret = ret && QObject::connect(m_countFld, SIGNAL(editingFinished()), this,
+                                SLOT(updateValues()));
+  ret = ret && QObject::connect(m_upToFld, SIGNAL(editingFinished()), this,
+                                SLOT(updateValues()));
+
   ret = ret &&
-        connect(m_applyBtn, SIGNAL(clicked()), this, SLOT(onApplyPressed()));
+        QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(onOKPressed()));
+  ret = ret &&
+        QObject::connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(close()));
+  ret = ret && QObject::connect(m_applyBtn, SIGNAL(clicked()), this,
+                                SLOT(onApplyPressed()));
 
-  ret = ret && connect(TApp::instance()->getCurrentSelection(),
-                       SIGNAL(selectionChanged(TSelection *)), this,
-                       SLOT(onSelectionChanged()));
+  ret = ret && QObject::connect(TApp::instance()->getCurrentSelection(),
+                                SIGNAL(selectionChanged(TSelection *)), this,
+                                SLOT(onSelectionChanged()));
   assert(ret);
 }
 

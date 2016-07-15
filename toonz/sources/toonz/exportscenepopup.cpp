@@ -420,12 +420,12 @@ ExportSceneTreeView::ExportSceneTreeView(QWidget *parent) : QTreeView(parent) {
 
   // Connect all possible changes that can alter the
   // bottom horizontal scrollbar to resize contents...
-  bool ret = connect(this, SIGNAL(expanded(const QModelIndex &)), this,
-                     SLOT(resizeToConts()));
-  ret = ret && connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
-                       SLOT(resizeToConts()));
-  ret = ret && connect(this->model(), SIGNAL(layoutChanged()), this,
-                       SLOT(resizeToConts()));
+  bool ret = QObject::connect(this, SIGNAL(expanded(const QModelIndex &)), this,
+                              SLOT(resizeToConts()));
+  ret = ret && QObject::connect(this, SIGNAL(collapsed(const QModelIndex &)),
+                                this, SLOT(resizeToConts()));
+  ret = ret && QObject::connect(this->model(), SIGNAL(layoutChanged()), this,
+                                SLOT(resizeToConts()));
 
   assert(ret);
   setAcceptDrops(true);
@@ -493,8 +493,8 @@ ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
 
   m_projectTreeView = new ExportSceneTreeView(chooseProjectWidget);
   m_projectTreeView->setMinimumWidth(200);
-  ret = ret && connect(m_projectTreeView, SIGNAL(focusIn()), this,
-                       SLOT(onProjectTreeViweFocusIn()));
+  ret = ret && QObject::connect(m_projectTreeView, SIGNAL(focusIn()), this,
+                                SLOT(onProjectTreeViweFocusIn()));
   chooseProjectLayout->addWidget(m_projectTreeView);
 
   chooseProjectWidget->setLayout(chooseProjectLayout);
@@ -514,24 +514,25 @@ ExportScenePopup::ExportScenePopup(std::vector<TFilePath> scenes)
                               Qt::AlignRight);
 
   m_newProjectName = new LineEdit(newProjectWidget);
-  ret              = ret && connect(m_newProjectName, SIGNAL(focusIn()), this,
-                       SLOT(onProjectNameFocusIn()));
+
+  ret = ret && QObject::connect(m_newProjectName, SIGNAL(focusIn()), this,
+                                SLOT(onProjectNameFocusIn()));
   newProjectLayout->setColumnStretch(1, 5);
   newProjectLayout->addWidget(m_newProjectName, 1, 1, 1, 1, Qt::AlignLeft);
 
   newProjectWidget->setLayout(chooseProjectLayout);
   layout->addWidget(newProjectWidget);
 
-  ret = ret &&
-        connect(group, SIGNAL(buttonClicked(int)), this, SLOT(switchMode(int)));
+  ret = ret && QObject::connect(group, SIGNAL(buttonClicked(int)), this,
+                                SLOT(switchMode(int)));
 
   addLayout(layout, false);
 
   QPushButton *okBtn = new QPushButton(tr("Export"), this);
   okBtn->setDefault(true);
   QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-  connect(okBtn, SIGNAL(clicked()), this, SLOT(onExport()));
-  connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(onExport()));
+  QObject::connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(okBtn, cancelBtn);
 

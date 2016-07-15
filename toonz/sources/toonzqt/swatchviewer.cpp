@@ -736,16 +736,16 @@ SwatchViewer::ContentRender::ContentRender(TRasterFx *fx, int frame,
     , m_viewer(viewer)
     , m_started(false) {
   // Is there a less complicated way...?
-  connect(this, SIGNAL(started(TThread::RunnableP)), this,
-          SLOT(onStarted(TThread::RunnableP)));
-  connect(this, SIGNAL(finished(TThread::RunnableP)), this,
-          SLOT(onFinished(TThread::RunnableP)));
-  connect(this, SIGNAL(exception(TThread::RunnableP)), this,
-          SLOT(onFinished(TThread::RunnableP)));
-  connect(this, SIGNAL(canceled(TThread::RunnableP)), this,
-          SLOT(onCanceled(TThread::RunnableP)),
-          Qt::QueuedConnection);  // Starts will need to come *strictly before*
-                                  // cancels
+  QObject::connect(this, &ContentRender::started,      //
+                   this, &ContentRender::onStarted);   //
+  QObject::connect(this, &ContentRender::finished,     //
+                   this, &ContentRender::onFinished);  //
+  QObject::connect(this, &ContentRender::exception,    //
+                   this, &ContentRender::onFinished);  //
+
+  // Starts will need to come *strictly before* cancels
+  QObject::connect(this, &ContentRender::canceled,  //
+                   this, &ContentRender::onCanceled, Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------

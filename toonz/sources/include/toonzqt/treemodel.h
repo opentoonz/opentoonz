@@ -150,20 +150,6 @@ public:
   TreeView(QWidget *parent);
 
 protected:
-  /*
-class Delegate final : public QItemDelegate
-{
-public:
-Delegate(TreeView *parent) : QItemDelegate(parent), m_treeView(parent) {}
-bool editorEvent(QEvent *e, QAbstractItemModel *model, const
-QStyleOptionViewItem &option, const QModelIndex &index);
-private:
-TreeView *m_treeView;
-
-};
-friend Delegate;
-*/
-
   // virtual void onClick(TreeModel::Item *item, const QPoint &pos, const
   // QStyleOptionViewItem &option) {}
   void mouseDoubleClickEvent(QMouseEvent *) override;

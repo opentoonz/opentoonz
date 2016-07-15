@@ -110,7 +110,8 @@ namespace XsheetGUI {
 
 //-----------------------------------------------------------------------------
 
-static void getVolumeCursorRect(QRect &out, double volume, const QPoint &origin) {
+static void getVolumeCursorRect(QRect &out, double volume,
+                                const QPoint &origin) {
   int ly = 60;
   int v  = tcrop(0, ly, (int)(volume * ly));
   out.setX(origin.x() + 11);
@@ -279,8 +280,8 @@ void ChangeObjectWidget::selectCurrent(const QString &text) {
 
 ChangeObjectParent::ChangeObjectParent(QWidget *parent)
     : ChangeObjectWidget(parent) {
-  bool ret = connect(this, SIGNAL(currentTextChanged(const QString &)), this,
-                     SLOT(onTextChanged(const QString &)));
+  bool ret = QObject::connect(this, SIGNAL(currentTextChanged(const QString &)),
+                              this, SLOT(onTextChanged(const QString &)));
   assert(ret);
 }
 
@@ -376,8 +377,8 @@ void ChangeObjectParent::onTextChanged(const QString &text) {
 
 ChangeObjectHandle::ChangeObjectHandle(QWidget *parent)
     : ChangeObjectWidget(parent) {
-  bool ret = connect(this, SIGNAL(currentTextChanged(const QString &)), this,
-                     SLOT(onTextChanged(const QString &)));
+  bool ret = QObject::connect(this, SIGNAL(currentTextChanged(const QString &)),
+                              this, SLOT(onTextChanged(const QString &)));
   assert(ret);
 }
 
@@ -434,7 +435,7 @@ void ChangeObjectHandle::onTextChanged(const QString &text) {
 RenameColumnField::RenameColumnField(QWidget *parent, XsheetViewer *viewer)
     : QLineEdit(parent), m_col(-1) {
   setFixedSize(XsheetGUI::ColumnWidth + 3, XsheetGUI::RowHeight + 4);
-  connect(this, SIGNAL(returnPressed()), SLOT(renameColumn()));
+  QObject::connect(this, SIGNAL(returnPressed()), SLOT(renameColumn()));
 }
 
 //-----------------------------------------------------------------------------
@@ -544,8 +545,8 @@ ColumnArea::ColumnArea(XsheetViewer *parent, Qt::WFlags flags)
   actionGroup->addAction(m_subsampling3);
   actionGroup->addAction(m_subsampling4);
 
-  connect(actionGroup, SIGNAL(triggered(QAction *)), this,
-          SLOT(onSubSampling(QAction *)));
+  QObject::connect(actionGroup, SIGNAL(triggered(QAction *)), this,
+                   SLOT(onSubSampling(QAction *)));
 
   setMouseTracking(true);
 }
@@ -1318,14 +1319,14 @@ m_value->setFont(font);*/
   hlayout->addWidget(new QLabel("%"));
   setLayout(hlayout);
 
-  bool ret = connect(m_slider, SIGNAL(sliderReleased()), this,
-                     SLOT(onSliderReleased()));
-  ret = ret && connect(m_slider, SIGNAL(sliderMoved(int)), this,
-                       SLOT(onSliderChange(int)));
-  ret = ret && connect(m_slider, SIGNAL(valueChanged(int)), this,
-                       SLOT(onSliderValueChanged(int)));
-  ret = ret && connect(m_value, SIGNAL(textChanged(const QString &)), this,
-                       SLOT(onValueChanged(const QString &)));
+  bool ret = QObject::connect(m_slider, SIGNAL(sliderReleased()), this,
+                              SLOT(onSliderReleased()));
+  ret = ret && QObject::connect(m_slider, SIGNAL(sliderMoved(int)), this,
+                                SLOT(onSliderChange(int)));
+  ret = ret && QObject::connect(m_slider, SIGNAL(valueChanged(int)), this,
+                                SLOT(onSliderValueChanged(int)));
+  ret = ret && QObject::connect(m_value, SIGNAL(textChanged(const QString &)),
+                                this, SLOT(onValueChanged(const QString &)));
   assert(ret);
 }
 
@@ -1347,10 +1348,10 @@ void ColumnTransparencyPopup::onSliderReleased() {
 //-----------------------------------------------------------------------
 
 void ColumnTransparencyPopup::onSliderChange(int val) {
-  disconnect(m_value, SIGNAL(textChanged(const QString &)), 0, 0);
+  QObject::disconnect(m_value, SIGNAL(textChanged(const QString &)), 0, 0);
   m_value->setText(QString::number(val));
-  connect(m_value, SIGNAL(textChanged(const QString &)), this,
-          SLOT(onValueChanged(const QString &)));
+  QObject::connect(m_value, SIGNAL(textChanged(const QString &)), this,
+                   SLOT(onValueChanged(const QString &)));
 }
 
 //----------------------------------------------------------------
@@ -1372,18 +1373,11 @@ void ColumnTransparencyPopup::setColumn(TXshColumn *column) {
   assert(m_column);
   int val = (int)troundp(100.0 * m_column->getOpacity() / 255.0);
   m_slider->setValue(val);
-  disconnect(m_value, SIGNAL(textChanged(const QString &)), 0, 0);
+  QObject::disconnect(m_value, SIGNAL(textChanged(const QString &)), 0, 0);
   m_value->setText(QString::number(val));
-  connect(m_value, SIGNAL(textChanged(const QString &)), this,
-          SLOT(onValueChanged(const QString &)));
+  QObject::connect(m_value, SIGNAL(textChanged(const QString &)), this,
+                   SLOT(onValueChanged(const QString &)));
 }
-
-/*void ColumnTransparencyPopup::mouseMoveEvent ( QMouseEvent * e )
-{
-        int val = tcrop((e->pos().x()+10)/(this->width()/(99-1+1)), 1, 99);
-        m_value->setText(QString::number(val));
-        m_slider->setValue(val);
-}*/
 
 void ColumnTransparencyPopup::mouseReleaseEvent(QMouseEvent *e) {
   // hide();
@@ -1422,8 +1416,8 @@ void ColumnArea::startTransparencyPopupTimer(QMouseEvent *e) {
 
   if (!m_transparencyPopupTimer) {
     m_transparencyPopupTimer = new QTimer(this);
-    bool ret = connect(m_transparencyPopupTimer, SIGNAL(timeout()), this,
-                       SLOT(openTransparencyPopup()));
+    bool ret = QObject::connect(m_transparencyPopupTimer, SIGNAL(timeout()),
+                                this, SLOT(openTransparencyPopup()));
     assert(ret);
     m_transparencyPopupTimer->setSingleShot(true);
   }

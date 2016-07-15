@@ -87,50 +87,57 @@ NotePopup::NotePopup(XsheetViewer *viewer, int noteIndex)
       QColor(color.r, color.g, color.b, color.m)));
   layout->addWidget(m_textEditor, row, col, 1, 9);
   layout->setRowStretch(row, 10);
-  ret = ret && connect(m_textEditor, SIGNAL(focusIn()), this,
-                       SLOT(onTextEditFocusIn()));
+  ret = ret && QObject::connect(m_textEditor, SIGNAL(focusIn()), this,
+                                SLOT(onTextEditFocusIn()));
   row++;
 
   int index                 = 0;
   DVGui::ColorField *color1 = createColorField(index);
-  ret = ret && connect(color1, SIGNAL(editingChanged(const TPixel32 &, bool)),
-                       SLOT(onColor1Switched(const TPixel32 &, bool)));
+  ret                       = ret &&
+        QObject::connect(color1, SIGNAL(editingChanged(const TPixel32 &, bool)),
+                         SLOT(onColor1Switched(const TPixel32 &, bool)));
   layout->addWidget(color1, row, index, 1, 1);
   m_colorFields.push_back(color1);
   index++;
   DVGui::ColorField *color2 = createColorField(index);
-  ret = ret && connect(color2, SIGNAL(editingChanged(const TPixel32 &, bool)),
-                       SLOT(onColor2Switched(const TPixel32 &, bool)));
+  ret                       = ret &&
+        QObject::connect(color2, SIGNAL(editingChanged(const TPixel32 &, bool)),
+                         SLOT(onColor2Switched(const TPixel32 &, bool)));
   layout->addWidget(color2, row, index, 1, 1);
   m_colorFields.push_back(color2);
   index++;
   DVGui::ColorField *color3 = createColorField(index);
-  ret = ret && connect(color3, SIGNAL(editingChanged(const TPixel32 &, bool)),
-                       SLOT(onColor3Switched(const TPixel32 &, bool)));
+  ret                       = ret &&
+        QObject::connect(color3, SIGNAL(editingChanged(const TPixel32 &, bool)),
+                         SLOT(onColor3Switched(const TPixel32 &, bool)));
   layout->addWidget(color3, row, index, 1, 1);
   m_colorFields.push_back(color3);
   index++;
   DVGui::ColorField *color4 = createColorField(index);
-  ret = ret && connect(color4, SIGNAL(editingChanged(const TPixel32 &, bool)),
-                       SLOT(onColor4Switched(const TPixel32 &, bool)));
+  ret                       = ret &&
+        QObject::connect(color4, SIGNAL(editingChanged(const TPixel32 &, bool)),
+                         SLOT(onColor4Switched(const TPixel32 &, bool)));
   layout->addWidget(color4, row, index, 1, 1);
   m_colorFields.push_back(color4);
   index++;
   DVGui::ColorField *color5 = createColorField(index);
-  ret = ret && connect(color5, SIGNAL(editingChanged(const TPixel32 &, bool)),
-                       SLOT(onColor5Switched(const TPixel32 &, bool)));
+  ret                       = ret &&
+        QObject::connect(color5, SIGNAL(editingChanged(const TPixel32 &, bool)),
+                         SLOT(onColor5Switched(const TPixel32 &, bool)));
   layout->addWidget(color5, row, index, 1, 1);
   m_colorFields.push_back(color5);
   index++;
   DVGui::ColorField *color6 = createColorField(index);
-  ret = ret && connect(color6, SIGNAL(editingChanged(const TPixel32 &, bool)),
-                       SLOT(onColor6Switched(const TPixel32 &, bool)));
+  ret                       = ret &&
+        QObject::connect(color6, SIGNAL(editingChanged(const TPixel32 &, bool)),
+                         SLOT(onColor6Switched(const TPixel32 &, bool)));
   layout->addWidget(color6, row, index, 1, 1);
   m_colorFields.push_back(color6);
   index++;
   DVGui::ColorField *color7 = createColorField(index);
-  ret = ret && connect(color7, SIGNAL(editingChanged(const TPixel32 &, bool)),
-                       SLOT(onColor7Switched(const TPixel32 &, bool)));
+  ret                       = ret &&
+        QObject::connect(color7, SIGNAL(editingChanged(const TPixel32 &, bool)),
+                         SLOT(onColor7Switched(const TPixel32 &, bool)));
   layout->addWidget(color7, row, index, 1, 1);
   m_colorFields.push_back(color7);
 
@@ -139,14 +146,14 @@ NotePopup::NotePopup(XsheetViewer *viewer, int noteIndex)
 
   QPushButton *addNoteButton = new QPushButton(tr("Post"));
   addNoteButton->setMinimumSize(50, 20);
-  ret = ret &&
-        connect(addNoteButton, SIGNAL(pressed()), this, SLOT(onNoteAdded()));
+  ret = ret && QObject::connect(addNoteButton, SIGNAL(pressed()), this,
+                                SLOT(onNoteAdded()));
   layout->addWidget(addNoteButton, row, col, 1, 1);
   col++;
   QPushButton *discardNoteButton = new QPushButton(tr("Discard"));
   discardNoteButton->setMinimumSize(50, 20);
-  ret = ret && connect(discardNoteButton, SIGNAL(pressed()), this,
-                       SLOT(onNoteDiscarded()));
+  ret = ret && QObject::connect(discardNoteButton, SIGNAL(pressed()), this,
+                                SLOT(onNoteDiscarded()));
   layout->addWidget(discardNoteButton, row, col, 1, 1);
   addLayout(layout, false);
 
@@ -180,8 +187,9 @@ DVGui::ColorField *NotePopup::createColorField(int index) {
   TPixel32 color                = getColors().at(index);
   DVGui::ColorField *colorField = new DVGui::ColorField(this, true, color, 20);
   colorField->hideChannelsFields(true);
-  bool ret = connect(colorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
-                     SLOT(onColorChanged(const TPixel32 &, bool)));
+  bool ret =
+      QObject::connect(colorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
+                       SLOT(onColorChanged(const TPixel32 &, bool)));
   assert(ret);
   return colorField;
 }
@@ -209,8 +217,8 @@ void NotePopup::showEvent(QShowEvent *) {
   updateColorField();
   onXsheetSwitched();
   TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
-  bool ret = connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
-                     SLOT(onXsheetSwitched()));
+  bool ret = QObject::connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
+                              SLOT(onXsheetSwitched()));
   assert(ret);
 }
 
@@ -218,8 +226,8 @@ void NotePopup::showEvent(QShowEvent *) {
 
 void NotePopup::hideEvent(QHideEvent *) {
   TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
-  disconnect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
-             SLOT(onXsheetSwitched()));
+  QObject::disconnect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
+                      SLOT(onXsheetSwitched()));
 }
 
 //-----------------------------------------------------------------------------
@@ -520,15 +528,16 @@ NoteArea::NoteArea(XsheetViewer *parent, Qt::WFlags flags)
   // signal-slot connections
   bool ret = true;
 
-  ret = ret && connect(toolButton, SIGNAL(clicked()), SLOT(toggleNewNote()));
   ret = ret &&
-        connect(m_precNoteButton, SIGNAL(clicked()), this, SLOT(precNote()));
-  ret = ret &&
-        connect(m_nextNoteButton, SIGNAL(clicked()), this, SLOT(nextNote()));
+        QObject::connect(toolButton, SIGNAL(clicked()), SLOT(toggleNewNote()));
+  ret = ret && QObject::connect(m_precNoteButton, SIGNAL(clicked()), this,
+                                SLOT(precNote()));
+  ret = ret && QObject::connect(m_nextNoteButton, SIGNAL(clicked()), this,
+                                SLOT(nextNote()));
 
-  ret =
-      ret && connect(m_frameDisplayStyleCombo, SIGNAL(currentIndexChanged(int)),
-                     this, SLOT(onFrameDisplayStyleChanged(int)));
+  ret = ret && QObject::connect(m_frameDisplayStyleCombo,
+                                SIGNAL(currentIndexChanged(int)), this,
+                                SLOT(onFrameDisplayStyleChanged(int)));
 
   updateButtons();
 

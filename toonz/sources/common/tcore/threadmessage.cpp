@@ -16,10 +16,11 @@ bool TThread::isMainThread() { return MainThread == QThread::currentThread(); }
 //------------------------------------------------------------------------------
 
 TThreadMessageDispatcher::TThreadMessageDispatcher() {
-  connect(this, SIGNAL(signaled(TThread::Message *)), this,
-          SLOT(onSignal(TThread::Message *)));
-  connect(this, SIGNAL(blockingSignaled(TThread::Message *)), this,
-          SLOT(onSignal(TThread::Message *)), Qt::BlockingQueuedConnection);
+  QObject::connect(this, &TThreadMessageDispatcher::signaled, this,
+                   &TThreadMessageDispatcher::onSignal);
+  QObject::connect(this, &TThreadMessageDispatcher::blockingSignaled, this,
+                   &TThreadMessageDispatcher::onSignal,
+                   Qt::BlockingQueuedConnection);
 }
 
 //------------------------------------------------------------------------------

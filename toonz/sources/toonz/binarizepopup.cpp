@@ -235,7 +235,7 @@ m_contrastField->setValue(0);
   //--------------------------- Button ----------------------------
 
   m_okBtn = new QPushButton(tr("Apply"), this);
-  connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
+  QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
 
   addButtonBarWidget(m_okBtn);
 
@@ -243,15 +243,11 @@ m_contrastField->setValue(0);
 
   bool ret = true;
 
-  // ret = ret && connect(m_brightnessField, SIGNAL(valueChanged(bool)), this,
-  // SLOT(onValuesChanged(bool)));
-  // ret = ret && connect(m_contrastField,   SIGNAL(valueChanged(bool)), this,
-  // SLOT(onValuesChanged(bool)));
-  ret = ret && connect(m_previewChk, SIGNAL(stateChanged(int)), this,
-                       SLOT(onPreviewCheckboxChanged(int)));
+  ret = ret && QObject::connect(m_previewChk, SIGNAL(stateChanged(int)), this,
+                                SLOT(onPreviewCheckboxChanged(int)));
 
-  ret = ret && connect(m_alphaChk, SIGNAL(stateChanged(int)), this,
-                       SLOT(onAlphaCheckboxChanged(int)));
+  ret = ret && QObject::connect(m_alphaChk, SIGNAL(stateChanged(int)), this,
+                                SLOT(onAlphaCheckboxChanged(int)));
 
   assert(ret);
 
@@ -280,17 +276,20 @@ void BinarizePopup::showEvent(QShowEvent *e) {
   m_viewer->setBgColor(col1, col2);
 
   bool ret = true;
-  ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
-                       SLOT(fetchSample()));
-  ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-                       SLOT(fetchSample()));
-  ret = ret && connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()),
-                       this, SLOT(fetchSample()));
+  ret      = ret &&
+        QObject::connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()),
+                         this, SLOT(fetchSample()));
+  ret = ret && QObject::connect(app->getCurrentFrame(), SIGNAL(frameSwitched()),
+                                this, SLOT(fetchSample()));
   ret = ret &&
-        connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)),
-                this, SLOT(onLevelSwitched(TXshLevel *)));
-  ret = ret && connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), this,
-                       SLOT(fetchSample()));
+        QObject::connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()),
+                         this, SLOT(fetchSample()));
+  ret = ret && QObject::connect(app->getCurrentLevel(),
+                                SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+                                SLOT(onLevelSwitched(TXshLevel *)));
+  ret =
+      ret && QObject::connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()),
+                              this, SLOT(fetchSample()));
   assert(ret);
   m_previewChk->setChecked(false);
   fetchSample();
@@ -299,9 +298,10 @@ void BinarizePopup::showEvent(QShowEvent *e) {
 void BinarizePopup::hideEvent(QHideEvent *e) {
   TApp *app = TApp::instance();
   bool ret  = true;
-  ret       = ret && disconnect(app->getCurrentFrame(), 0, this, 0);
-  ret       = ret && disconnect(app->getCurrentColumn(), 0, this, 0);
-  ret       = ret && disconnect(app->getCurrentLevel(), 0, this, 0);
+
+  ret = ret && QObject::disconnect(app->getCurrentFrame(), 0, this, 0);
+  ret = ret && QObject::disconnect(app->getCurrentColumn(), 0, this, 0);
+  ret = ret && QObject::disconnect(app->getCurrentLevel(), 0, this, 0);
   assert(ret);
 }
 

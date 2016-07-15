@@ -139,23 +139,25 @@ FileBrowserPopup::FileBrowserPopup(const QString &title, Options options,
 
   // Establish connections
   bool ret = true;
-  ret =
-      ret && connect(m_okButton, SIGNAL(clicked()), this, SLOT(onOkPressed()));
-  ret = ret && connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(close()));
+  ret      = ret && QObject::connect(m_okButton, SIGNAL(clicked()), this,
+                                SLOT(onOkPressed()));
+  ret = ret && QObject::connect(m_cancelButton, SIGNAL(clicked()), this,
+                                SLOT(close()));
   ret =
       ret &&
-      connect(
+      QObject::connect(
           m_browser,
           SIGNAL(filePathsSelected(const std::set<TFilePath> &,
                                    const std::list<std::vector<TFrameId>> &)),
           this,
           SLOT(onFilePathsSelected(const std::set<TFilePath> &,
                                    const std::list<std::vector<TFrameId>> &)));
-  ret = ret && connect(m_browser, SIGNAL(filePathClicked(const TFilePath &)),
-                       this, SIGNAL(filePathClicked(const TFilePath &)));
+  ret = ret &&
+        QObject::connect(m_browser, SIGNAL(filePathClicked(const TFilePath &)),
+                         this, SIGNAL(filePathClicked(const TFilePath &)));
   if (applyButton) {
-    ret = ret &&
-          connect(applyButton, SIGNAL(clicked()), this, SLOT(onApplyPressed()));
+    ret = ret && QObject::connect(applyButton, SIGNAL(clicked()), this,
+                                  SLOT(onApplyPressed()));
   }
   assert(ret);
 
@@ -190,12 +192,12 @@ void FileBrowserPopup::addFilterType(const QString &type) {
 void FileBrowserPopup::setFileMode(bool isDirectoryOnly) {
   if (m_isDirectoryOnly = isDirectoryOnly) {
     m_nameFieldLabel->setText(tr("Folder name:"));
-    connect(m_browser, SIGNAL(treeFolderChanged(const TFilePath &)), this,
-            SLOT(onFilePathClicked(const TFilePath &)));
+    QObject::connect(m_browser, SIGNAL(treeFolderChanged(const TFilePath &)),
+                     this, SLOT(onFilePathClicked(const TFilePath &)));
   } else {
     m_nameFieldLabel->setText(tr("File name:"));
-    disconnect(m_browser, SIGNAL(treeFolderChanged(const TFilePath &)), this,
-               SLOT(onFilePathClicked(const TFilePath &)));
+    QObject::disconnect(m_browser, SIGNAL(treeFolderChanged(const TFilePath &)),
+                        this, SLOT(onFilePathClicked(const TFilePath &)));
   }
 }
 
@@ -788,26 +790,28 @@ LoadLevelPopup::LoadLevelPopup()
 
   //----signal-slot connections
   //----Load Subsequence Level
-  connect(showSubsequenceButton, SIGNAL(toggled(bool)), m_subsequenceFrame,
-          SLOT(setVisible(bool)));
-  connect(m_fromFrame, SIGNAL(editingFinished()),
-          SLOT(onSubsequentFrameChanged()));
-  connect(m_toFrame, SIGNAL(editingFinished()),
-          SLOT(onSubsequentFrameChanged()));
+  QObject::connect(showSubsequenceButton, SIGNAL(toggled(bool)),
+                   m_subsequenceFrame, SLOT(setVisible(bool)));
+  QObject::connect(m_fromFrame, SIGNAL(editingFinished()),
+                   SLOT(onSubsequentFrameChanged()));
+  QObject::connect(m_toFrame, SIGNAL(editingFinished()),
+                   SLOT(onSubsequentFrameChanged()));
 
   //----Arrangement in Xsheet
-  connect(showArrangementButton, SIGNAL(toggled(bool)), m_arrangementFrame,
-          SLOT(setVisible(bool)));
-  connect(m_xFrom, SIGNAL(editingFinished()), SLOT(updatePosTo()));
-  connect(m_xTo, SIGNAL(editingFinished()), SLOT(updatePosTo()));
-  connect(m_posFrom, SIGNAL(editingFinished()), SLOT(updatePosTo()));
-  connect(m_stepCombo, SIGNAL(currentIndexChanged(int)), SLOT(updatePosTo()));
-  connect(m_incCombo, SIGNAL(currentIndexChanged(int)), SLOT(updatePosTo()));
+  QObject::connect(showArrangementButton, SIGNAL(toggled(bool)),
+                   m_arrangementFrame, SLOT(setVisible(bool)));
+  QObject::connect(m_xFrom, SIGNAL(editingFinished()), SLOT(updatePosTo()));
+  QObject::connect(m_xTo, SIGNAL(editingFinished()), SLOT(updatePosTo()));
+  QObject::connect(m_posFrom, SIGNAL(editingFinished()), SLOT(updatePosTo()));
+  QObject::connect(m_stepCombo, SIGNAL(currentIndexChanged(int)),
+                   SLOT(updatePosTo()));
+  QObject::connect(m_incCombo, SIGNAL(currentIndexChanged(int)),
+                   SLOT(updatePosTo()));
 
-  connect(m_nameField, SIGNAL(editingFinished()), this,
-          SLOT(onNameSetEditted()));
-  connect(m_browser, SIGNAL(treeFolderChanged(const TFilePath &)), this,
-          SLOT(onNameSetEditted()));
+  QObject::connect(m_nameField, SIGNAL(editingFinished()), this,
+                   SLOT(onNameSetEditted()));
+  QObject::connect(m_browser, SIGNAL(treeFolderChanged(const TFilePath &)),
+                   this, SLOT(onNameSetEditted()));
 }
 
 //-----------------------------------------------------------------------
@@ -1003,12 +1007,13 @@ void LoadLevelPopup::showEvent(QShowEvent *e) {
   FileBrowserPopup::showEvent(e);
 
   TFrameHandle *fh = TApp::instance()->getCurrentFrame();
-  connect(fh, SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
-  connect(fh, SIGNAL(frameTypeChanged()), this, SLOT(onFrameSwitched()));
+  QObject::connect(fh, SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
+  QObject::connect(fh, SIGNAL(frameTypeChanged()), this,
+                   SLOT(onFrameSwitched()));
 
   TSelectionHandle *sh = TApp::instance()->getCurrentSelection();
-  connect(sh, SIGNAL(selectionChanged(TSelection *)), this,
-          SLOT(onSelectionChanged(TSelection *)));
+  QObject::connect(sh, SIGNAL(selectionChanged(TSelection *)), this,
+                   SLOT(onSelectionChanged(TSelection *)));
 
   onFrameSwitched();
 
@@ -1021,12 +1026,14 @@ void LoadLevelPopup::hideEvent(QHideEvent *e) {
   FileBrowserPopup::hideEvent(e);
 
   TFrameHandle *fh = TApp::instance()->getCurrentFrame();
-  disconnect(fh, SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
-  disconnect(fh, SIGNAL(frameTypeChanged()), this, SLOT(onFrameSwitched()));
+  QObject::disconnect(fh, SIGNAL(frameSwitched()), this,
+                      SLOT(onFrameSwitched()));
+  QObject::disconnect(fh, SIGNAL(frameTypeChanged()), this,
+                      SLOT(onFrameSwitched()));
 
   TSelectionHandle *sh = TApp::instance()->getCurrentSelection();
-  disconnect(sh, SIGNAL(selectionChanged(TSelection *)), this,
-             SLOT(onSelectionChanged(TSelection *)));
+  QObject::disconnect(sh, SIGNAL(selectionChanged(TSelection *)), this,
+                      SLOT(onSelectionChanged(TSelection *)));
 }
 
 //-----------------------------------------------------------------------
@@ -1494,9 +1501,9 @@ public:
 ReplaceLevelPopup::ReplaceLevelPopup()
     : FileBrowserPopup(tr("Replace Level"), Options(WITH_APPLY_BUTTON)) {
   setOkText(tr("Replace"));
-  connect(TApp::instance()->getCurrentSelection(),
-          SIGNAL(selectionChanged(TSelection *)), this,
-          SLOT(onSelectionChanged(TSelection *)));
+  QObject::connect(TApp::instance()->getCurrentSelection(),
+                   SIGNAL(selectionChanged(TSelection *)), this,
+                   SLOT(onSelectionChanged(TSelection *)));
 }
 
 void ReplaceLevelPopup::show() {

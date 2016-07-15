@@ -157,20 +157,21 @@ CleanupTab::CleanupTab() {
 
   //  Connections
   bool ret = true;
-  ret      = ret && connect(m_autoCenter, SIGNAL(stateChanged(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_pegHolesOm, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_fieldGuideOm, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_rotateOm, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_flipX, SIGNAL(stateChanged(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_flipY, SIGNAL(stateChanged(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret =
-      ret && connect(m_pathField, SIGNAL(pathChanged()), SLOT(onPathChange()));
+
+  ret = ret && QObject::connect(m_autoCenter, SIGNAL(stateChanged(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_pegHolesOm, SIGNAL(activated(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_fieldGuideOm, SIGNAL(activated(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_rotateOm, SIGNAL(activated(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_flipX, SIGNAL(stateChanged(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_flipY, SIGNAL(stateChanged(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_pathField, SIGNAL(pathChanged()),
+                                SLOT(onPathChange()));
 
   assert(ret);
 }
@@ -344,18 +345,19 @@ ProcessingTab::ProcessingTab() {
   //-------------------- Connections --------------------------
 
   bool ret = true;
-  ret      = ret && connect(m_sharpness, SIGNAL(valueChanged(bool)),
-                       SLOT(onSharpnessChange(bool)));
-  ret = ret && connect(m_lineProcessing, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_antialias, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_autoadjustOm, SIGNAL(activated(int)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_despeckling, SIGNAL(valueChanged(bool)),
-                       SLOT(onGenericSettingsChange()));
-  ret = ret && connect(m_aaValue, SIGNAL(valueChanged(bool)),
-                       SLOT(onGenericSettingsChange()));
+
+  ret = ret && QObject::connect(m_sharpness, SIGNAL(valueChanged(bool)),
+                                SLOT(onSharpnessChange(bool)));
+  ret = ret && QObject::connect(m_lineProcessing, SIGNAL(activated(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_antialias, SIGNAL(activated(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_autoadjustOm, SIGNAL(activated(int)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_despeckling, SIGNAL(valueChanged(bool)),
+                                SLOT(onGenericSettingsChange()));
+  ret = ret && QObject::connect(m_aaValue, SIGNAL(valueChanged(bool)),
+                                SLOT(onGenericSettingsChange()));
   assert(ret);
 }
 
@@ -441,11 +443,12 @@ void ProcessingTab::onSharpnessChange(bool dragging = false) {
 
 CameraTab::CameraTab() {
   bool ret = true;
-  ret      = ret &&
-        connect(TApp::instance()->getCurrentLevel(),
-                SIGNAL(xshLevelSwitched(TXshLevel *)), SLOT(onLevelSwitched()));
-  ret = ret && connect(this, SIGNAL(cleanupSettingsChanged()),
-                       SLOT(onGenericSettingsChange()));
+
+  ret = ret && QObject::connect(TApp::instance()->getCurrentLevel(),
+                                SIGNAL(xshLevelSwitched(TXshLevel *)),
+                                SLOT(onLevelSwitched()));
+  ret = ret && QObject::connect(this, SIGNAL(cleanupSettingsChanged()),
+                                SLOT(onGenericSettingsChange()));
   assert(ret);
 }
 
@@ -653,16 +656,19 @@ CleanupSettings::CleanupSettings(QWidget *parent)
   assert(opacityCheckCmd);
 
   bool ret = true;
-  ret      = ret && connect(tabBar, SIGNAL(currentChanged(int)), stackedWidget,
-                       SLOT(setCurrentIndex(int)));
-  ret = ret &&
-        connect(m_swatchAct, SIGNAL(toggled(bool)), SLOT(enableSwatch(bool)));
-  ret = ret && connect(m_opacityAct, SIGNAL(triggered(bool)), opacityCheckCmd,
-                       SLOT(trigger()));
-  ret = ret && connect(saveAct, SIGNAL(triggered()), model, SLOT(promptSave()));
-  ret = ret && connect(loadAct, SIGNAL(triggered()), model, SLOT(promptLoad()));
-  ret = ret && connect(resetAct, SIGNAL(triggered()), this,
-                       SLOT(onRestoreSceneSettings()));
+
+  ret = ret && QObject::connect(tabBar, SIGNAL(currentChanged(int)),
+                                stackedWidget, SLOT(setCurrentIndex(int)));
+  ret = ret && QObject::connect(m_swatchAct, SIGNAL(toggled(bool)),
+                                SLOT(enableSwatch(bool)));
+  ret = ret && QObject::connect(m_opacityAct, SIGNAL(triggered(bool)),
+                                opacityCheckCmd, SLOT(trigger()));
+  ret = ret && QObject::connect(saveAct, SIGNAL(triggered()), model,
+                                SLOT(promptSave()));
+  ret = ret && QObject::connect(loadAct, SIGNAL(triggered()), model,
+                                SLOT(promptLoad()));
+  ret = ret && QObject::connect(resetAct, SIGNAL(triggered()), this,
+                                SLOT(onRestoreSceneSettings()));
 
   assert(ret);
 }
@@ -681,11 +687,13 @@ void CleanupSettings::showEvent(QShowEvent *se) {
     model->attach(CleanupSettingsModel::LISTENER);
 
     bool ret = true;
-    ret      = ret && connect(model, SIGNAL(imageSwitched()), this,
-                         SLOT(onImageSwitched()));
-    ret = ret && connect(model, SIGNAL(modelChanged(bool)), this,
-                         SLOT(updateGui(bool)));
-    ret = ret && connect(model, SIGNAL(clnLoaded()), this, SLOT(onClnLoaded()));
+
+    ret = ret && QObject::connect(model, SIGNAL(imageSwitched()), this,
+                                  SLOT(onImageSwitched()));
+    ret = ret && QObject::connect(model, SIGNAL(modelChanged(bool)), this,
+                                  SLOT(updateGui(bool)));
+    ret = ret && QObject::connect(model, SIGNAL(clnLoaded()), this,
+                                  SLOT(onClnLoaded()));
     assert(ret);
 
     m_cameraTab->setCurrentLevel(
@@ -717,13 +725,12 @@ void CleanupSettings::hideEvent(QHideEvent *he) {
 
     model->detach(CleanupSettingsModel::LISTENER);
 
-    bool ret = true;
-    ret      = ret && disconnect(model, SIGNAL(imageSwitched()), this,
-                            SLOT(onImageSwitched()));
-    ret = ret && disconnect(model, SIGNAL(modelChanged(bool)), this,
-                            SLOT(updateGui(bool)));
-    ret = ret &&
-          disconnect(model, SIGNAL(clnLoaded()), this, SLOT(onClnLoaded()));
+    bool ret = QObject::disconnect(model, SIGNAL(imageSwitched()), this,
+                                   SLOT(onImageSwitched()));
+    ret = ret && QObject::disconnect(model, SIGNAL(modelChanged(bool)), this,
+                                     SLOT(updateGui(bool)));
+    ret = ret && QObject::disconnect(model, SIGNAL(clnLoaded()), this,
+                                     SLOT(onClnLoaded()));
     assert(ret);
 
     if (m_swatchAct->isChecked()) enableSwatch(false);  // detach swatch
@@ -758,13 +765,13 @@ void CleanupSettings::enableSwatch(bool enable) {
   CleanupSettingsModel *model = CleanupSettingsModel::instance();
   if (enable) {
     model->attach(CleanupSettingsModel::PREVIEWER);
-    connect(model, SIGNAL(previewDataChanged()), this,
-            SLOT(onPreviewDataChanged()));
+    QObject::connect(model, SIGNAL(previewDataChanged()), this,
+                     SLOT(onPreviewDataChanged()));
     onPreviewDataChanged();
   } else {
     model->detach(CleanupSettingsModel::PREVIEWER);
-    disconnect(model, SIGNAL(previewDataChanged()), this,
-               SLOT(onPreviewDataChanged()));
+    QObject::disconnect(model, SIGNAL(previewDataChanged()), this,
+                        SLOT(onPreviewDataChanged()));
     m_swatch->setRaster(TRasterP(), TAffine(), TRasterP());
   }
 }

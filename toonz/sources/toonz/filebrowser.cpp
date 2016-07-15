@@ -233,54 +233,58 @@ FileBrowser::FileBrowser(QWidget *parent, Qt::WFlags flags, bool noContextMenu,
   m_mainSplitter->setSizes(QList<int>() << 270 << 500);
 
   // signal-slot connections
-  bool ret = connect(m_folderTreeView, SIGNAL(currentNodeChanged()),
-                     itemViewPlayDelegate, SLOT(resetPlayWidget()));
+  bool ret = QObject::connect(m_folderTreeView, SIGNAL(currentNodeChanged()),
+                              itemViewPlayDelegate, SLOT(resetPlayWidget()));
   // if the current forder is changed in the folder tree, then update in the
   // item view
-  ret = ret && connect(m_folderTreeView, SIGNAL(currentNodeChanged()), this,
-                       SLOT(onTreeFolderChanged()));
+  ret = ret && QObject::connect(m_folderTreeView, SIGNAL(currentNodeChanged()),
+                                this, SLOT(onTreeFolderChanged()));
 
-  ret = ret && connect(m_itemViewer, SIGNAL(clickedItem(int)), this,
-                       SLOT(onClickedItem(int)));
-  ret =
-      ret && connect(m_itemViewer, SIGNAL(selectedItems(const std::set<int> &)),
-                     this, SLOT(onSelectedItems(const std::set<int> &)));
-  ret = ret && connect(buttonBar, SIGNAL(folderUp()), this, SLOT(folderUp()));
-  ret = ret && connect(buttonBar, SIGNAL(newFolder()), this, SLOT(newFolder()));
+  ret = ret && QObject::connect(m_itemViewer, SIGNAL(clickedItem(int)), this,
+                                SLOT(onClickedItem(int)));
+  ret = ret && QObject::connect(
+                   m_itemViewer, SIGNAL(selectedItems(const std::set<int> &)),
+                   this, SLOT(onSelectedItems(const std::set<int> &)));
+  ret = ret &&
+        QObject::connect(buttonBar, SIGNAL(folderUp()), this, SLOT(folderUp()));
+  ret = ret && QObject::connect(buttonBar, SIGNAL(newFolder()), this,
+                                SLOT(newFolder()));
 
-  ret = ret && connect(&m_frameCountReader, SIGNAL(calculatedFrameCount()),
-                       m_itemViewer->getPanel(), SLOT(update()));
+  ret = ret &&
+        QObject::connect(&m_frameCountReader, SIGNAL(calculatedFrameCount()),
+                         m_itemViewer->getPanel(), SLOT(update()));
 
   QAction *refresh = CommandManager::instance()->getAction("MI_RefreshTree");
-  ret = ret && connect(refresh, SIGNAL(triggered()), this, SLOT(refresh()));
+  ret              = ret &&
+        QObject::connect(refresh, SIGNAL(triggered()), this, SLOT(refresh()));
   addAction(refresh);
 
   // Version Control instance connection
   if (Preferences::instance()->isSVNEnabled())
-    ret =
-        ret && connect(VersionControl::instance(),
-                       SIGNAL(commandDone(const QStringList &)), this,
-                       SLOT(onVersionControlCommandDone(const QStringList &)));
+    ret = ret && QObject::connect(
+                     VersionControl::instance(),
+                     SIGNAL(commandDone(const QStringList &)), this,
+                     SLOT(onVersionControlCommandDone(const QStringList &)));
 
   // if the folderName is edited, move the current folder accordingly
-  ret = ret && connect(m_folderName, SIGNAL(editingFinished()), this,
-                       SLOT(onFolderEdited()));
+  ret = ret && QObject::connect(m_folderName, SIGNAL(editingFinished()), this,
+                                SLOT(onFolderEdited()));
 
   // folder history
-  ret = ret && connect(m_folderTreeView, SIGNAL(currentNodeChanged()), this,
-                       SLOT(storeFolderHistory()));
-  ret = ret && connect(buttonBar, SIGNAL(folderBack()), this,
-                       SLOT(onBackButtonPushed()));
-  ret = ret && connect(buttonBar, SIGNAL(folderFwd()), this,
-                       SLOT(onFwdButtonPushed()));
+  ret = ret && QObject::connect(m_folderTreeView, SIGNAL(currentNodeChanged()),
+                                this, SLOT(storeFolderHistory()));
+  ret = ret && QObject::connect(buttonBar, SIGNAL(folderBack()), this,
+                                SLOT(onBackButtonPushed()));
+  ret = ret && QObject::connect(buttonBar, SIGNAL(folderFwd()), this,
+                                SLOT(onFwdButtonPushed()));
   // when the history changes, enable/disable the history buttons accordingly
-  ret = ret && connect(this, SIGNAL(historyChanged(bool, bool)), buttonBar,
-                       SLOT(onHistoryChanged(bool, bool)));
+  ret = ret && QObject::connect(this, SIGNAL(historyChanged(bool, bool)),
+                                buttonBar, SLOT(onHistoryChanged(bool, bool)));
 
   // check out the update of the current folder
-  ret = ret &&
-        connect(m_fileSystemWatcher, SIGNAL(directoryChanged(const QString &)),
-                this, SLOT(onFileSystemChanged(const QString &)));
+  ret = ret && QObject::connect(m_fileSystemWatcher,
+                                SIGNAL(directoryChanged(const QString &)), this,
+                                SLOT(onFileSystemChanged(const QString &)));
 
   // store the first item("Root") in the history
   m_indexHistoryList.append(m_folderTreeView->currentIndex());
@@ -1100,12 +1104,12 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
   else if (files.size() == 1 && files[0].getType() == "scr") {
     QAction *action;
     action = new QAction(tr("Preview Screensaver"), menu);
-    ret    = ret && connect(action, SIGNAL(triggered()), this,
-                         SLOT(previewScreenSaver()));
+    ret    = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                  SLOT(previewScreenSaver()));
     menu->addAction(action);
     action = new QAction(tr("Install Screensaver"), menu);
-    ret    = ret && connect(action, SIGNAL(triggered()), this,
-                         SLOT(installScreenSaver()));
+    ret    = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                  SLOT(installScreenSaver()));
     menu->addAction(action);
   }
 #endif
@@ -1134,13 +1138,16 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
 
   if (areResources) {
     QString title;
-    if (clickedFile != TFilePath() && clickedFile.getType() == "tnz")
+    if (clickedFile != TFilePath() && clickedFile.getType() == "tnz") {
       title = tr("Load As Sub-xsheet");
-    else
-      title         = tr("Load");
+    } else {
+      title = tr("Load");
+    }
     QAction *action = new QAction(title, menu);
-    ret             = ret &&
-          connect(action, SIGNAL(triggered()), this, SLOT(loadResources()));
+
+    ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                  SLOT(loadResources()));
+
     menu->addAction(action);
     menu->addSeparator();
   }
@@ -1181,8 +1188,9 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
   }
   if (files.size() == 1 && files[0].getType() != "tnz") {
     QAction *action = new QAction(tr("Rename"), menu);
-    ret             = ret && connect(action, SIGNAL(triggered()), this,
-                         SLOT(renameAsToonzLevel()));
+
+    ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                  SLOT(renameAsToonzLevel()));
     menu->addAction(action);
   }
 #ifdef LEVO
@@ -1195,14 +1203,16 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
        files[1].getType() == "png" || files[1].getType() == "TIF" ||
        files[1].getType() == "TIFF" || files[1].getType() == "PNG")) {
     QAction *action = new QAction(tr("Convert to Painted TLV"), menu);
-    ret             = ret && connect(action, SIGNAL(triggered()), this,
-                         SLOT(convertToPaintedTlv()));
+
+    ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                  SLOT(convertToPaintedTlv()));
     menu->addAction(action);
   }
   if (areFullcolor) {
     QAction *action = new QAction(tr("Convert to Unpainted TLV"), menu);
-    ret             = ret && connect(action, SIGNAL(triggered()), this,
-                         SLOT(convertToUnpaintedTlv()));
+
+    ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                  SLOT(convertToUnpaintedTlv()));
     menu->addAction(action);
     menu->addSeparator();
   }
@@ -1234,43 +1244,48 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
         (status == DvItemListModel::VC_ToUpdate && files.size() == 1)) {
       if (status == DvItemListModel::VC_ReadOnly) {
         action = vcMenu->addAction(tr("Edit"));
-        ret    = ret && connect(action, SIGNAL(triggered()), this,
-                             SLOT(editVersionControl()));
+
+        ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                      SLOT(editVersionControl()));
 
         TFilePath path       = files.at(0);
         std::string fileType = path.getType();
         if (fileType == "tlv" || fileType == "pli" || path.getDots() == "..") {
           action = vcMenu->addAction(tr("Edit Frame Range..."));
-          ret    = ret && connect(action, SIGNAL(triggered()), this,
-                               SLOT(editFrameRangeVersionControl()));
+          ret    = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                        SLOT(editFrameRangeVersionControl()));
         }
       } else {
         action = vcMenu->addAction(tr("Edit"));
-        ret    = ret && connect(action, SIGNAL(triggered()), this,
-                             SLOT(updateAndEditVersionControl()));
+        ret    = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                      SLOT(updateAndEditVersionControl()));
       }
     }
 
     if (status == DvItemListModel::VC_Modified) {
       action = vcMenu->addAction(tr("Put..."));
-      ret    = ret && connect(action, SIGNAL(triggered()), this,
-                           SLOT(putVersionControl()));
+
+      ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                    SLOT(putVersionControl()));
 
       action = vcMenu->addAction(tr("Revert"));
-      ret    = ret && connect(action, SIGNAL(triggered()), this,
-                           SLOT(revertVersionControl()));
+
+      ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                    SLOT(revertVersionControl()));
     }
 
     if (status == DvItemListModel::VC_ReadOnly ||
         status == DvItemListModel::VC_ToUpdate) {
       action = vcMenu->addAction(tr("Get"));
-      ret    = ret && connect(action, SIGNAL(triggered()), this,
-                           SLOT(getVersionControl()));
+
+      ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                    SLOT(getVersionControl()));
 
       if (status == DvItemListModel::VC_ReadOnly) {
         action = vcMenu->addAction(tr("Delete"));
-        ret    = ret && connect(action, SIGNAL(triggered()), this,
-                             SLOT(deleteVersionControl()));
+
+        ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                      SLOT(deleteVersionControl()));
       }
 
       vcMenu->addSeparator();
@@ -1278,96 +1293,106 @@ QMenu *FileBrowser::getContextMenu(QWidget *parent, int index) {
       if (files.size() == 1) {
         action         = vcMenu->addAction(tr("Get Revision..."));
         TFilePath path = files.at(0);
-        if (path.getDots() == "..")
-          ret = ret && connect(action, SIGNAL(triggered()), this,
-                               SLOT(getRevisionVersionControl()));
-        else
-          ret = ret && connect(action, SIGNAL(triggered()), this,
-                               SLOT(getRevisionHistory()));
+        if (path.getDots() == "..") {
+          ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                        SLOT(getRevisionVersionControl()));
+        } else {
+          ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                        SLOT(getRevisionHistory()));
+        }
       } else if (files.size() > 1) {
         action = vcMenu->addAction("Get Revision...");
-        ret    = ret && connect(action, SIGNAL(triggered()), this,
-                             SLOT(getRevisionVersionControl()));
+        ret    = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                      SLOT(getRevisionVersionControl()));
       }
     }
 
     if (status == DvItemListModel::VC_Edited) {
       action = vcMenu->addAction(tr("Unlock"));
-      ret    = ret && connect(action, SIGNAL(triggered()), this,
-                           SLOT(unlockVersionControl()));
+
+      ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                    SLOT(unlockVersionControl()));
     }
 
     if (status == DvItemListModel::VC_Unversioned) {
       action = vcMenu->addAction(tr("Put..."));
-      ret    = ret && connect(action, SIGNAL(triggered()), this,
-                           SLOT(putVersionControl()));
+
+      ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                    SLOT(putVersionControl()));
     }
 
     if (status == DvItemListModel::VC_Locked && files.size() == 1) {
       action = vcMenu->addAction(tr("Edit Info"));
-      ret    = ret && connect(action, SIGNAL(triggered()), this,
-                           SLOT(showLockInformation()));
+
+      ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                    SLOT(showLockInformation()));
     }
 
     if (status == DvItemListModel::VC_Missing) {
       action = vcMenu->addAction(tr("Get"));
-      ret    = ret && connect(action, SIGNAL(triggered()), this,
-                           SLOT(getVersionControl()));
+
+      ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                    SLOT(getVersionControl()));
 
       if (files.size() == 1) {
         vcMenu->addSeparator();
         action         = vcMenu->addAction(tr("Revision History..."));
         TFilePath path = files.at(0);
-        if (path.getDots() == "..")
-          ret = ret && connect(action, SIGNAL(triggered()), this,
-                               SLOT(getRevisionVersionControl()));
-        else
-          ret = ret && connect(action, SIGNAL(triggered()), this,
-                               SLOT(getRevisionHistory()));
+        if (path.getDots() == "..") {
+          ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                        SLOT(getRevisionVersionControl()));
+        } else {
+          ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                        SLOT(getRevisionHistory()));
+        }
       }
     }
 
     if (status == DvItemListModel::VC_PartialLocked) {
       action = vcMenu->addAction(tr("Get"));
-      ret    = ret && connect(action, SIGNAL(triggered()), this,
-                           SLOT(getVersionControl()));
+
+      ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                    SLOT(getVersionControl()));
       if (files.size() == 1) {
         action = vcMenu->addAction(tr("Edit Frame Range..."));
-        ret    = ret && connect(action, SIGNAL(triggered()), this,
-                             SLOT(editFrameRangeVersionControl()));
+
+        ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                      SLOT(editFrameRangeVersionControl()));
 
         action = vcMenu->addAction(tr("Edit Info"));
-        ret    = ret && connect(action, SIGNAL(triggered()), this,
-                             SLOT(showFrameRangeLockInfo()));
+
+        ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                      SLOT(showFrameRangeLockInfo()));
       }
 
     } else if (status == DvItemListModel::VC_PartialEdited) {
       action = vcMenu->addAction(tr("Get"));
-      ret    = ret && connect(action, SIGNAL(triggered()), this,
-                           SLOT(getVersionControl()));
+      ret    = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                    SLOT(getVersionControl()));
 
       if (files.size() == 1) {
         action = vcMenu->addAction(tr("Unlock Frame Range"));
-        ret    = ret && connect(action, SIGNAL(triggered()), this,
-                             SLOT(unlockFrameRangeVersionControl()));
+        ret    = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                      SLOT(unlockFrameRangeVersionControl()));
 
         action = vcMenu->addAction(tr("Edit Info"));
-        ret    = ret && connect(action, SIGNAL(triggered()), this,
-                             SLOT(showFrameRangeLockInfo()));
+        ret    = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                      SLOT(showFrameRangeLockInfo()));
       }
     } else if (status == DvItemListModel::VC_PartialModified) {
       action = vcMenu->addAction(tr("Get"));
-      ret    = ret && connect(action, SIGNAL(triggered()), this,
-                           SLOT(getVersionControl()));
+      ret    = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                    SLOT(getVersionControl()));
 
       if (files.size() == 1) {
         action = vcMenu->addAction(tr("Put..."));
-        ret    = ret && connect(action, SIGNAL(triggered()), this,
-                             SLOT(putFrameRangeVersionControl()));
+        ret    = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                      SLOT(putFrameRangeVersionControl()));
 
         action = vcMenu->addAction(tr("Revert"));
-        ret    = ret && connect(action, SIGNAL(triggered()), this,
-                             SLOT(revertFrameRangeVersionControl()));
+
+        ret = ret && QObject::connect(action, SIGNAL(triggered()), this,
+                                      SLOT(revertFrameRangeVersionControl()));
       }
     }
 
@@ -1611,12 +1636,9 @@ RenameAsToonzPopup::RenameAsToonzPopup(const QString name, int frames)
 
   m_name = new LineEdit(frames == -1 ? "" : name);
   m_name->setFixedHeight(20);
-  // connect(m_name, SIGNAL(editingFinished()), SLOT(onNameChanged()));
-  // addWidget(tr("Level Name:"),m_name);
 
   m_overwrite = new QCheckBox(tr("Delete Original Files"));
   m_overwrite->setFixedHeight(20);
-  // addWidget(m_overwrite, false);
 
   QFormLayout *formLayout = new QFormLayout;
 
@@ -1636,8 +1658,8 @@ RenameAsToonzPopup::RenameAsToonzPopup(const QString name, int frames)
   m_okBtn = new QPushButton(tr("Rename"), this);
   m_okBtn->setDefault(true);
   m_cancelBtn = new QPushButton(tr("Cancel"), this);
-  connect(m_okBtn, SIGNAL(clicked()), this, SLOT(onOk()));
-  connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(onOk()));
+  QObject::connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
   addButtonBarWidget(m_okBtn, m_cancelBtn);
 }
 
@@ -2268,10 +2290,10 @@ calculateTask:
   // Now, we have to calculate the frame count; first, create a frame count
   // calculation task and submit it.
   FrameCountTask *task = new FrameCountTask(fp, modifiedDate);
-  connect(task, SIGNAL(finished(TThread::RunnableP)), this,
-          SIGNAL(calculatedFrameCount()));
-  connect(task, SIGNAL(exception(TThread::RunnableP)), this,
-          SIGNAL(calculatedFrameCount()));
+  QObject::connect(task, SIGNAL(finished(TThread::RunnableP)), this,
+                   SIGNAL(calculatedFrameCount()));
+  QObject::connect(task, SIGNAL(exception(TThread::RunnableP)), this,
+                   SIGNAL(calculatedFrameCount()));
 
   m_executor.addTask(task);
 
@@ -2289,10 +2311,10 @@ inline void FrameCountReader::stopReading() { m_executor.cancelAll(); }
 FrameCountTask::FrameCountTask(const TFilePath &path,
                                const QDateTime &modifiedDate)
     : m_path(path), m_modifiedDate(modifiedDate), m_started(false) {
-  connect(this, SIGNAL(started(TThread::RunnableP)), this,
-          SLOT(onStarted(TThread::RunnableP)));
-  connect(this, SIGNAL(canceled(TThread::RunnableP)), this,
-          SLOT(onCanceled(TThread::RunnableP)));
+  QObject::connect(this, SIGNAL(started(TThread::RunnableP)), this,
+                   SLOT(onStarted(TThread::RunnableP)));
+  QObject::connect(this, SIGNAL(canceled(TThread::RunnableP)), this,
+                   SLOT(onCanceled(TThread::RunnableP)));
 }
 
 //-----------------------------------------------------------------------------

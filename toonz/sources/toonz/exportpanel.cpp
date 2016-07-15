@@ -250,7 +250,7 @@ you want to do?";*/
   progress.setWindowTitle(tr("Exporting"));
   progress.setValue(0);
   progress.show();
-  connect(&progress, SIGNAL(canceled()), this, SLOT(myCancel()));
+  QObject::connect(&progress, SIGNAL(canceled()), this, SLOT(myCancel()));
   qApp->processEvents();
   m_progressDialog = &progress;
   m_frame          = 0;
@@ -550,7 +550,7 @@ QMenu *ClipListViewer::getContextMenu(QWidget *parent, int index) {
     int index = *selectedIndices.begin();
     if (0 <= index && index < getController()->getClipCount()) {
       QAction *action = new QAction(tr("Load Scene"), menu);
-      connect(action, SIGNAL(triggered()), this, SLOT(loadScene()));
+      QObject::connect(action, SIGNAL(triggered()), this, SLOT(loadScene()));
       menu->addAction(action);
     }
   }
@@ -721,7 +721,8 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 
   TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
 
-  connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(onSceneSwitched()));
+  QObject::connect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                   SLOT(onSceneSwitched()));
 
   // Settings Box
   QFrame *settingsBox = new QFrame(box);
@@ -772,13 +773,14 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
 
   m_fileFormat->addItems(formats);
   m_fileFormat->setMaximumHeight(DVGui::WidgetHeight);
-  connect(m_fileFormat, SIGNAL(currentIndexChanged(const QString &)),
-          SLOT(onFormatChanged(const QString &)));
+  QObject::connect(m_fileFormat, SIGNAL(currentIndexChanged(const QString &)),
+                   SLOT(onFormatChanged(const QString &)));
   m_fileFormat->setCurrentIndex(formats.indexOf("mov"));
 
   QPushButton *fileFormatButton = new QPushButton(QString(tr("Options")));
   fileFormatButton->setFixedSize(60, DVGui::WidgetHeight);
-  connect(fileFormatButton, SIGNAL(pressed()), this, SLOT(openSettingsPopup()));
+  QObject::connect(fileFormatButton, SIGNAL(pressed()), this,
+                   SLOT(openSettingsPopup()));
   QLabel *fileFormat = new QLabel(tr("File Format:"));
   fileFormat->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
   fileFormat->setFixedSize(55, fileFormatButton->height());
@@ -791,8 +793,8 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
   m_useMarker = new QCheckBox(tr("Use Markers"), settingsBox);
   m_useMarker->setMinimumHeight(30);
   m_useMarker->setChecked(false);
-  connect(m_useMarker, SIGNAL(toggled(bool)), this,
-          SLOT(onUseMarkerToggled(bool)));
+  QObject::connect(m_useMarker, SIGNAL(toggled(bool)), this,
+                   SLOT(onUseMarkerToggled(bool)));
 
   // Export button
   QFrame *exportBox = new QFrame(box);
@@ -802,7 +804,8 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
   QVBoxLayout *exportLayout = new QVBoxLayout();
   QPushButton *exportButton = new QPushButton(tr("Export"), exportBox);
   exportButton->setFixedSize(65, DVGui::WidgetHeight);
-  connect(exportButton, SIGNAL(pressed()), this, SLOT(generateMovie()));
+  QObject::connect(exportButton, SIGNAL(pressed()), this,
+                   SLOT(generateMovie()));
   exportLayout->addWidget(exportButton, 0, Qt::AlignCenter);
   exportBox->setLayout(exportLayout);
 
@@ -818,8 +821,8 @@ ExportPanel::ExportPanel(QWidget *parent, Qt::WFlags flags)
   mainLayout->addWidget(new DVGui::Separator("", this));
   mainLayout->addWidget(exportBox, 0);
 
-  connect(RenderController::instance(), SIGNAL(movieGenerated()), this,
-          SLOT(onMovieGenerated()));
+  QObject::connect(RenderController::instance(), SIGNAL(movieGenerated()), this,
+                   SLOT(onMovieGenerated()));
 
   box->setLayout(mainLayout);
   setWidget(box);

@@ -94,15 +94,17 @@ CacheFxCommand::CacheFxCommand() {
   // rendering instaces receive the update signal.
 
   // ret = ret &&
-  // connect(app->getCurrentLevel(),SIGNAL(xshLevelChanged()),this,SLOT(onLevelChanged()));
-  ret = ret && connect(app->getCurrentFx(), SIGNAL(fxChanged()), this,
-                       SLOT(onFxChanged()));
-  ret = ret && connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
-                       SLOT(onXsheetChanged()));
+  // QObject::connect(app->getCurrentLevel(),SIGNAL(xshLevelChanged()),this,SLOT(onLevelChanged()));
+  ret = ret && QObject::connect(app->getCurrentFx(), SIGNAL(fxChanged()), this,
+                                SLOT(onFxChanged()));
+  ret =
+      ret && QObject::connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()),
+                              this, SLOT(onXsheetChanged()));
   // ret = ret &&
-  // connect(app->getCurrentXsheet(),SIGNAL(xsheetSwitched()),this,SLOT(onXsheetChanged()));
-  ret = ret && connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)),
-                       this, SLOT(onObjectChanged()));
+  // QObject::connect(app->getCurrentXsheet(),SIGNAL(xsheetSwitched()),this,SLOT(onXsheetChanged()));
+  ret = ret &&
+        QObject::connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)),
+                         this, SLOT(onObjectChanged()));
 
   TCacheResourcePool::instance();  // The resources pool must be instanced
                                    // before the passive delegate

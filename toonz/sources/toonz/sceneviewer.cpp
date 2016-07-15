@@ -793,43 +793,48 @@ void SceneViewer::showEvent(QShowEvent *) {
   TApp *app = TApp::instance();
 
   TSceneHandle *sceneHandle = app->getCurrentScene();
-  connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(resetSceneViewer()));
-  connect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
+  QObject::connect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                   SLOT(resetSceneViewer()));
+  QObject::connect(sceneHandle, SIGNAL(sceneChanged()), this,
+                   SLOT(onSceneChanged()));
 
   TFrameHandle *frameHandle = app->getCurrentFrame();
-  connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
+  QObject::connect(frameHandle, SIGNAL(frameSwitched()), this,
+                   SLOT(onFrameSwitched()));
 
   TPaletteHandle *paletteHandle =
       app->getPaletteController()->getCurrentLevelPalette();
-  connect(paletteHandle, SIGNAL(colorStyleChanged()), this, SLOT(update()));
+  QObject::connect(paletteHandle, SIGNAL(colorStyleChanged()), this,
+                   SLOT(update()));
 
-  connect(app->getCurrentObject(), SIGNAL(objectSwitched()), this,
-          SLOT(onObjectSwitched()));
-  connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)), this,
-          SLOT(update()));
+  QObject::connect(app->getCurrentObject(), SIGNAL(objectSwitched()), this,
+                   SLOT(onObjectSwitched()));
+  QObject::connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)), this,
+                   SLOT(update()));
 
-  connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
-          SLOT(update()));
+  QObject::connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()),
+                   this, SLOT(update()));
 
-  connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), this,
-          SLOT(update()));
-  connect(app->getCurrentLevel(), SIGNAL(xshCanvasSizeChanged()), this,
-          SLOT(update()));
+  QObject::connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), this,
+                   SLOT(update()));
+  QObject::connect(app->getCurrentLevel(), SIGNAL(xshCanvasSizeChanged()), this,
+                   SLOT(update()));
   // when level is switched, update m_dpiScale in order to show white background
   // for Ink&Paint work properly
-  connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-          SLOT(onLevelSwitched()));
+  QObject::connect(app->getCurrentLevel(),
+                   SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+                   SLOT(onLevelSwitched()));
 
-  connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
-          SLOT(onXsheetChanged()));
-  connect(app->getCurrentXsheet(), SIGNAL(xsheetSwitched()), this,
-          SLOT(update()));
+  QObject::connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
+                   SLOT(onXsheetChanged()));
+  QObject::connect(app->getCurrentXsheet(), SIGNAL(xsheetSwitched()), this,
+                   SLOT(update()));
 
   // update tooltip when tool options are changed
-  connect(app->getCurrentTool(), SIGNAL(toolChanged()), this,
-          SLOT(onToolChanged()));
-  connect(app->getCurrentTool(), SIGNAL(toolCursorTypeChanged()), this,
-          SLOT(onToolChanged()));
+  QObject::connect(app->getCurrentTool(), SIGNAL(toolChanged()), this,
+                   SLOT(onToolChanged()));
+  QObject::connect(app->getCurrentTool(), SIGNAL(toolCursorTypeChanged()), this,
+                   SLOT(onToolChanged()));
 
   if (m_hRuler && m_vRuler) {
     if (!viewRulerToggle.getStatus()) {

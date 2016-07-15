@@ -101,10 +101,10 @@ ViewerHistogramPopup::ViewerHistogramPopup()
 //-----------------------------------------------------------------------------
 
 void ViewerHistogramPopup::showEvent(QShowEvent *e) {
-  connect(TApp::instance()->getCurrentFrame(), SIGNAL(frameSwitched()),
-          SLOT(setCurrentRaster()));
-  connect(Previewer::instance(), SIGNAL(activedChanged()),
-          SLOT(setCurrentRaster()));
+  QObject::connect(TApp::instance()->getCurrentFrame(), SIGNAL(frameSwitched()),
+                   SLOT(setCurrentRaster()));
+  QObject::connect(Previewer::instance(), SIGNAL(activedChanged()),
+                   SLOT(setCurrentRaster()));
 
   setCurrentRaster();
 }
@@ -112,10 +112,10 @@ void ViewerHistogramPopup::showEvent(QShowEvent *e) {
 //-----------------------------------------------------------------------------
 
 void ViewerHistogramPopup::hideEvent(QHideEvent *e) {
-  disconnect(TApp::instance()->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-             SLOT(setCurrentRaster()));
-  disconnect(Previewer::instance(), SIGNAL(activedChanged()), this,
-             SLOT(setCurrentRaster()));
+  QObject::disconnect(TApp::instance()->getCurrentFrame(),
+                      SIGNAL(frameSwitched()), this, SLOT(setCurrentRaster()));
+  QObject::disconnect(Previewer::instance(), SIGNAL(activedChanged()), this,
+                      SLOT(setCurrentRaster()));
 }
 
 //-----------------------------------------------------------------------------

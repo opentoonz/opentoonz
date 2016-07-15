@@ -219,8 +219,9 @@ engine.globalObject().setProperty("run", run);
   engine.globalObject().setProperty("void", *m_voidValue);
 
   TScriptBinding::bindAll(engine);
-  bool ret = connect(this, SIGNAL(mainThreadEvaluationPosted()), this,
-                     SLOT(onMainThreadEvaluationPosted()));
+  bool ret =
+      QObject::connect(this, &ScriptEngine::mainThreadEvaluationPosted,     //
+                       this, &ScriptEngine::onMainThreadEvaluationPosted);  //
   assert(ret);
 }
 
@@ -252,7 +253,8 @@ void ScriptEngine::onMainThreadEvaluationPosted() {
 void ScriptEngine::evaluate(const QString &cmd) {
   if (m_executor) return;
   m_executor = new Executor(this, cmd);
-  connect(m_executor, SIGNAL(finished()), this, SLOT(onTerminated()));
+  QObject::connect(m_executor, &Executor::finished, this,
+                   &ScriptEngine::onTerminated);
   m_executor->start();
 }
 

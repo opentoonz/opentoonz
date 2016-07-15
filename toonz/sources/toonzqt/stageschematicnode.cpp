@@ -90,8 +90,8 @@ ColumnPainter::ColumnPainter(StageSchematicColumnNode *parent, double width,
   setFlag(QGraphicsItem::ItemIsSelectable, false);
   setFlag(QGraphicsItem::ItemIsFocusable, false);
   assert(parent->getStageObject()->getId().isColumn());
-  connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
-          SLOT(onIconGenerated()));
+  QObject::connect(IconGenerator::instance(), &IconGenerator::iconGenerated,  //
+                   this, &ColumnPainter::onIconGenerated);
 
   StageSchematicScene *stageScene =
       dynamic_cast<StageSchematicScene *>(scene());
@@ -102,10 +102,11 @@ ColumnPainter::ColumnPainter(StageSchematicColumnNode *parent, double width,
   xsh->getCellRange(index, r0, r1);
   if (r0 > r1) return;
   TXshCell firstCell = xsh->getCell(r0, index);
-  if (!firstCell.isEmpty())
+  if (!firstCell.isEmpty()) {
     m_type = firstCell.m_level->getType();
-  else
+  } else {
     m_type = NO_XSHLEVEL;
+  }
 }
 
 //--------------------------------------------------------
@@ -274,12 +275,14 @@ void ColumnPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   QMenu menu(stageScene->views()[0]);
 
   QAction *resetCenter = new QAction(tr("&Reset Center"), &menu);
-  connect(resetCenter, SIGNAL(triggered()), stageScene, SLOT(onResetCenter()));
+  QObject::connect(resetCenter, &QAction::triggered,  //
+                   stageScene, &StageSchematicScene::onResetCenter);
   QAction *collapse   = CommandManager::instance()->getAction("MI_Collapse");
   QAction *openSubxsh = new QAction(tr("&Open Subxsheet"), &menu);
   QAction *explodeChild =
       CommandManager::instance()->getAction("MI_ExplodeChild");
-  connect(openSubxsh, SIGNAL(triggered()), stageScene, SLOT(onOpenSubxsheet()));
+  QObject::connect(openSubxsh, &QAction::triggered,  //
+                   stageScene, &StageSchematicScene::onOpenSubxsheet);
   QAction *group = CommandManager::instance()->getAction("MI_Group");
 
   QAction *clear = CommandManager::instance()->getAction("MI_Clear");
@@ -421,7 +424,8 @@ void GroupPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   QAction *ungroup = CommandManager::instance()->getAction("MI_Ungroup");
 
   QAction *editGroup = new QAction(tr("&Open Group"), &menu);
-  connect(editGroup, SIGNAL(triggered()), stageScene, SLOT(onEditGroup()));
+  QObject::connect(editGroup, &QAction::triggered,  //
+                   stageScene, &StageSchematicScene::onEditGroup);
 
   menu.addAction(group);
   menu.addAction(ungroup);
@@ -493,7 +497,8 @@ void PegbarPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   QMenu menu(stageScene->views()[0]);
 
   QAction *resetCenter = new QAction(tr("&Reset Center"), &menu);
-  connect(resetCenter, SIGNAL(triggered()), stageScene, SLOT(onResetCenter()));
+  QObject::connect(resetCenter, &QAction::triggered,  //
+                   stageScene, &StageSchematicScene::onResetCenter);
 
   QAction *group = CommandManager::instance()->getAction("MI_Group");
 
@@ -595,10 +600,12 @@ void CameraPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
       CommandManager::instance()->getAction("MI_CameraStage");
 
   QAction *resetCenter = new QAction(tr("&Reset Center"), &menu);
-  connect(resetCenter, SIGNAL(triggered()), stageScene, SLOT(onResetCenter()));
+  QObject::connect(resetCenter, &QAction::triggered,  //
+                   stageScene, &StageSchematicScene::onResetCenter);
 
   QAction *activate = new QAction(tr("&Activate"), &menu);
-  connect(activate, SIGNAL(triggered()), stageScene, SLOT(onCameraActivate()));
+  QObject::connect(activate, &QAction::triggered,  //
+                   stageScene, &StageSchematicScene::onCameraActivate);
 
   QAction *clear = CommandManager::instance()->getAction("MI_Clear");
   QAction *copy  = CommandManager::instance()->getAction("MI_Copy");
@@ -609,10 +616,11 @@ void CameraPainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
       m_parent->getStageObject()->getId() !=
       stageScene->getXsheet()->getStageObjectTree()->getCurrentCameraId();
 
-  if (isDeactivated)
+  if (isDeactivated) {
     menu.addAction(activate);
-  else
+  } else {
     menu.addAction(cameraSettings);
+  }
   menu.addAction(resetCenter);
   menu.addSeparator();
   if (isDeactivated) menu.addAction(clear);
@@ -689,7 +697,8 @@ void TablePainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   QMenu menu(stageScene->views()[0]);
 
   QAction *resetCenter = new QAction(tr("&Reset Center"), &menu);
-  connect(resetCenter, SIGNAL(triggered()), stageScene, SLOT(onResetCenter()));
+  QObject::connect(resetCenter, &QAction::triggered,  //
+                   stageScene, &StageSchematicScene::onResetCenter);
 
   menu.addAction(resetCenter);
   menu.exec(cme->screenPos());
@@ -772,12 +781,14 @@ void SplinePainter::contextMenuEvent(QGraphicsSceneContextMenuEvent *cme) {
   QMenu menu(stageScene->views()[0]);
 
   QAction *removeSpline = new QAction(tr("&Delete"), &menu);
-  connect(removeSpline, SIGNAL(triggered()), stageScene,
-          SLOT(onRemoveSpline()));
+  QObject::connect(removeSpline, &QAction::triggered,  //
+                   stageScene, &StageSchematicScene::onRemoveSpline);
   QAction *saveSpline = new QAction(tr("&Save Motion Path..."), &menu);
-  connect(saveSpline, SIGNAL(triggered()), stageScene, SLOT(onSaveSpline()));
+  QObject::connect(saveSpline, &QAction::triggered,  //
+                   stageScene, &StageSchematicScene::onSaveSpline);
   QAction *loadSpline = new QAction(tr("&Load Motion Path..."), &menu);
-  connect(loadSpline, SIGNAL(triggered()), stageScene, SLOT(onLoadSpline()));
+  QObject::connect(loadSpline, &QAction::triggered,  //
+                   stageScene, &StageSchematicScene::onLoadSpline);
 
   QAction *copy  = CommandManager::instance()->getAction("MI_Copy");
   QAction *cut   = CommandManager::instance()->getAction("MI_Cut");
@@ -1146,26 +1157,31 @@ StageSchematicNodeDock::StageSchematicNodeDock(StageSchematicNode *parent,
     m_handleSpinBox->setPos(m_port->boundingRect().width(), 1);
 
   m_handleSpinBox->hide();
-  connect(m_handleSpinBox, SIGNAL(modifyHandle(int)), this,
-          SLOT(onModifyHandle(int)));
-  connect(m_handleSpinBox, SIGNAL(sceneChanged()), parent,
-          SIGNAL(sceneChanged()));
-  connect(m_handleSpinBox, SIGNAL(handleReleased()), parent,
-          SLOT(onHandleReleased()));
+  QObject::connect(m_handleSpinBox, &SchematicHandleSpinBox::modifyHandle,  //
+                   this, &StageSchematicNodeDock::onModifyHandle);
+  QObject::connect(m_handleSpinBox, &SchematicHandleSpinBox::sceneChanged,  //
+                   parent, &StageSchematicNode::sceneChanged);
+  QObject::connect(m_handleSpinBox, &SchematicHandleSpinBox::handleReleased,  //
+                   parent, &StageSchematicNode::onHandleReleased);
 
-  connect(this, SIGNAL(sceneChanged()), parent, SIGNAL(sceneChanged()));
+  QObject::connect(this, &StageSchematicNodeDock::sceneChanged,  //
+                   parent, &StageSchematicNode::sceneChanged);
 
-  connect(m_port, SIGNAL(isClicked()), this, SLOT(onPortClicked()));
-  connect(m_port, SIGNAL(isReleased(const QPointF &)), this,
-          SLOT(onPortReleased(const QPointF &)));
+  QObject::connect(m_port, &StageSchematicNodePort::isClicked,  //
+                   this, &StageSchematicNodeDock::onPortClicked);
+  QObject::connect(m_port, &StageSchematicNodePort::isReleased,  //
+                   this, &StageSchematicNodeDock::onPortReleased);
 
   m_timer = new QTimer(this);
   m_timer->setInterval(200);
   m_timer->setSingleShot(true);
-  connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
+  QObject::connect(m_timer, &QTimer::timeout,  //
+                   this, &StageSchematicNodeDock::onTimeOut);
 
-  connect(m_port, SIGNAL(sceneChanged()), parent, SIGNAL(sceneChanged()));
-  connect(m_port, SIGNAL(xsheetChanged()), parent, SIGNAL(xsheetChanged()));
+  QObject::connect(m_port, &StageSchematicNodePort::sceneChanged,  //
+                   parent, &StageSchematicNode::sceneChanged);
+  QObject::connect(m_port, &StageSchematicNodePort::xsheetChanged,  //
+                   parent, &StageSchematicNode::xsheetChanged);
 
   setZValue(1.5);
 #if QT_VERSION >= 0x050000
@@ -1353,9 +1369,12 @@ StageSchematicSplineDock::StageSchematicSplineDock(SchematicNode *parent,
   setAcceptsHoverEvents(true);
 #endif
 
-  connect(m_port, SIGNAL(sceneChanged()), parent, SIGNAL(sceneChanged()));
-  connect(m_port, SIGNAL(xsheetChanged()), parent, SIGNAL(xsheetChanged()));
-  connect(this, SIGNAL(sceneChanged()), parent, SIGNAL(sceneChanged()));
+  QObject::connect(m_port, SIGNAL(sceneChanged()), parent,
+                   SIGNAL(sceneChanged()));
+  QObject::connect(m_port, SIGNAL(xsheetChanged()), parent,
+                   SIGNAL(xsheetChanged()));
+  QObject::connect(this, SIGNAL(sceneChanged()), parent,
+                   SIGNAL(sceneChanged()));
 }
 
 //--------------------------------------------------------
@@ -1420,9 +1439,11 @@ StageSchematicNode::StageSchematicNode(StageSchematicScene *scene,
   }
   m_cpToggle->setIsActive(m_stageObject->isUppkEnabled());
 
-  connect(m_pathToggle, SIGNAL(stateChanged(int)), scene,
-          SLOT(onPathToggled(int)));
-  connect(m_cpToggle, SIGNAL(toggled(bool)), scene, SLOT(onCpToggled(bool)));
+  QObject::connect(m_pathToggle,
+                   &SchematicToggle_SplineOptions::stateChanged,  //
+                   scene, &StageSchematicScene::onPathToggled);
+  QObject::connect(m_cpToggle, &SchematicToggle_SplineOptions::toggled,  //
+                   scene, &StageSchematicScene::onCpToggled);
 
   if (!m_stageObject->getSpline()) {
     m_pathToggle->hide();
@@ -1646,7 +1667,8 @@ StageSchematicPegbarNode::StageSchematicPegbarNode(StageSchematicScene *scene,
   m_nameItem->setName(m_name);
   m_nameItem->setPos(16, -1);
   m_nameItem->setZValue(2);
-  connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
+  QObject::connect(m_nameItem, &SchematicName::focusOut,  //
+                   this, &StageSchematicPegbarNode::onNameChanged);
   m_nameItem->hide();
 
   m_pegbarPainter = new PegbarPainter(this, m_width, m_height, m_name);
@@ -1766,22 +1788,24 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene,
   m_resizeItem = new SchematicThumbnailToggle(this, m_stageObject->isOpened());
   m_resizeItem->setPos(2, 0);
   m_resizeItem->setZValue(2);
-  ret = ret && connect(m_resizeItem, SIGNAL(toggled(bool)), this,
-                       SLOT(onChangedSize(bool)));
+  ret = ret &&
+        QObject::connect(m_resizeItem, &SchematicThumbnailToggle::toggled,  //
+                         this, &StageSchematicColumnNode::onChangedSize);
 
   m_nameItem = new SchematicName(this, 54, 20);
   m_nameItem->setName(m_name);
   m_nameItem->setPos(16, -1);
   m_nameItem->setZValue(2);
-  ret = ret &&
-        connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
+  ret = ret && QObject::connect(m_nameItem, &SchematicName::focusOut,  //
+                                this, &StageSchematicColumnNode::onNameChanged);
   m_nameItem->hide();
 
   m_renderToggle =
       new SchematicToggle(this, QPixmap(":Resources/schematic_prev_eye.png"),
                           SchematicToggle::eIsParentColumn);
-  ret = ret && connect(m_renderToggle, SIGNAL(toggled(bool)), this,
-                       SLOT(onRenderToggleClicked(bool)));
+  ret = ret && QObject::connect(
+                   m_renderToggle, &SchematicToggle::toggled,  //
+                   this, &StageSchematicColumnNode::onRenderToggleClicked);
   if (scene) {
     TXshColumn *column =
         scene->getXsheet()->getColumn(pegbar->getId().getIndex());
@@ -1794,8 +1818,9 @@ StageSchematicColumnNode::StageSchematicColumnNode(StageSchematicScene *scene,
         this, QPixmap(":Resources/schematic_table_view.png"),
         QPixmap(":Resources/schematic_table_view_transp.png"),
         SchematicToggle::eIsParentColumn | SchematicToggle::eEnableNullState);
-    ret = ret && connect(m_cameraStandToggle, SIGNAL(stateChanged(int)), this,
-                         SLOT(onCameraStandToggleClicked(int)));
+    ret = ret && QObject::connect(
+                     m_cameraStandToggle, &SchematicToggle::stateChanged, this,
+                     &StageSchematicColumnNode::onCameraStandToggleClicked);
     if (column)
       m_cameraStandToggle->setState(column->isCamstandVisible()
                                         ? (column->getOpacity() < 255 ? 2 : 1)
@@ -2061,7 +2086,8 @@ StageSchematicCameraNode::StageSchematicCameraNode(StageSchematicScene *scene,
   m_nameItem->setName(m_name);
 
   m_nameItem->setPos(16, -2);
-  connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
+  QObject::connect(m_nameItem, &SchematicName::focusOut,  //
+                   this, &StageSchematicCameraNode::onNameChanged);
   m_nameItem->hide();
   m_nameItem->setZValue(2);
 
@@ -2145,7 +2171,8 @@ StageSchematicSplineNode::StageSchematicSplineNode(StageSchematicScene *scene,
   m_resizeItem = new SchematicThumbnailToggle(this, m_spline->isOpened());
   m_resizeItem->setPos(2, 2);
   m_resizeItem->setZValue(2);
-  connect(m_resizeItem, SIGNAL(toggled(bool)), this, SLOT(onChangedSize(bool)));
+  QObject::connect(m_resizeItem, &SchematicThumbnailToggle::toggled,  //
+                   this, &StageSchematicSplineNode::onChangedSize);
 
   std::string name = m_spline->getName();
   m_splineName     = QString::fromStdString(name);
@@ -2153,7 +2180,8 @@ StageSchematicSplineNode::StageSchematicSplineNode(StageSchematicScene *scene,
   m_nameItem->setName(m_splineName);
   m_nameItem->setPos(16, -1);
   m_nameItem->setZValue(2);
-  connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
+  QObject::connect(m_nameItem, &SchematicName::focusOut,  //
+                   this, &StageSchematicSplineNode::onNameChanged);
   m_nameItem->hide();
 
   m_splinePainter = new SplinePainter(this, m_width, m_height, m_splineName);
@@ -2273,8 +2301,8 @@ StageSchematicGroupNode::StageSchematicGroupNode(
   m_nameItem->setName(m_name);
   m_nameItem->setPos(16, -1);
   m_nameItem->setZValue(2);
-  ret = ret &&
-        connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
+  ret = ret && QObject::connect(m_nameItem, &SchematicName::focusOut,  //
+                                this, &StageSchematicGroupNode::onNameChanged);
   m_nameItem->hide();
 
   // m_childDocks[0]->setPos(m_width - 18, 0);

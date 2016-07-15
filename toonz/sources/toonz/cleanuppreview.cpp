@@ -90,17 +90,20 @@ void PreviewToggleCommand::enable() {
 
   // Connect signals
   bool ret = true;
-  ret      = ret && connect(model, SIGNAL(previewDataChanged()), this,
-                       SLOT(onPreviewDataChanged()));
-  ret = ret && connect(model, SIGNAL(modelChanged(bool)), this,
-                       SLOT(onModelChanged(bool)));
-  ret = ret && connect(&m_timer, SIGNAL(timeout()), this, SLOT(postProcess()));
+
+  ret = ret && QObject::connect(model, SIGNAL(previewDataChanged()), this,
+                                SLOT(onPreviewDataChanged()));
+  ret = ret && QObject::connect(model, SIGNAL(modelChanged(bool)), this,
+                                SLOT(onModelChanged(bool)));
+  ret = ret && QObject::connect(&m_timer, SIGNAL(timeout()), this,
+                                SLOT(postProcess()));
 
   TPaletteHandle *ph =
       TApp::instance()->getPaletteController()->getCurrentCleanupPalette();
-  ret =
-      ret && connect(ph, SIGNAL(colorStyleChanged()), &m_timer, SLOT(start()));
-  ret = ret && connect(ph, SIGNAL(paletteChanged()), &m_timer, SLOT(start()));
+  ret = ret && QObject::connect(ph, SIGNAL(colorStyleChanged()), &m_timer,
+                                SLOT(start()));
+  ret = ret &&
+        QObject::connect(ph, SIGNAL(paletteChanged()), &m_timer, SLOT(start()));
   assert(ret);
 
   onPreviewDataChanged();
@@ -118,21 +121,21 @@ void PreviewToggleCommand::disable() {
                 CleanupSettingsModel::PREVIEWER);
 
   bool ret = true;
-  ret      = ret && disconnect(model, SIGNAL(previewDataChanged()), this,
-                          SLOT(onPreviewDataChanged()));
-  ret = ret && disconnect(model, SIGNAL(modelChanged(bool)), this,
-                          SLOT(onModelChanged(bool)));
-  ret =
-      ret && disconnect(&m_timer, SIGNAL(timeout()), this, SLOT(postProcess()));
+  ret = ret && QObject::disconnect(model, SIGNAL(previewDataChanged()), this,
+                                   SLOT(onPreviewDataChanged()));
+  ret = ret && QObject::disconnect(model, SIGNAL(modelChanged(bool)), this,
+                                   SLOT(onModelChanged(bool)));
+  ret = ret && QObject::disconnect(&m_timer, SIGNAL(timeout()), this,
+                                   SLOT(postProcess()));
 
   // Cleanup palette changes all falls under post-processing stuff. And do not
   // involve the model.
   TPaletteHandle *ph =
       TApp::instance()->getPaletteController()->getCurrentCleanupPalette();
-  ret = ret &&
-        disconnect(ph, SIGNAL(colorStyleChanged()), &m_timer, SLOT(start()));
-  ret =
-      ret && disconnect(ph, SIGNAL(paletteChanged()), &m_timer, SLOT(start()));
+  ret = ret && QObject::disconnect(ph, SIGNAL(colorStyleChanged()), &m_timer,
+                                   SLOT(start()));
+  ret = ret && QObject::disconnect(ph, SIGNAL(paletteChanged()), &m_timer,
+                                   SLOT(start()));
   assert(ret);
 
   clean();
@@ -283,8 +286,9 @@ void CameraTestToggleCommand::enable() {
 
   // Connect signals
   bool ret = true;
-  ret      = ret && connect(model, SIGNAL(previewDataChanged()), this,
-                       SLOT(onPreviewDataChanged()));
+
+  ret = ret && QObject::connect(model, SIGNAL(previewDataChanged()), this,
+                                SLOT(onPreviewDataChanged()));
   assert(ret);
 
   onPreviewDataChanged();
@@ -299,9 +303,8 @@ void CameraTestToggleCommand::disable() {
   model->detach(CleanupSettingsModel::LISTENER |
                 CleanupSettingsModel::CAMERATEST);
 
-  bool ret = true;
-  ret      = ret && disconnect(model, SIGNAL(previewDataChanged()), this,
-                          SLOT(onPreviewDataChanged()));
+  bool ret = QObject::disconnect(model, SIGNAL(previewDataChanged()), this,
+                                 SLOT(onPreviewDataChanged()));
   assert(ret);
 
   clean();

@@ -704,12 +704,12 @@ DvItemViewerPanel::DvItemViewerPanel(DvItemViewer *viewer, bool noContextMenu,
   m_selection = new DvItemSelection();
   m_selection->setView(this);
   m_selection->setModel(m_viewer->getModel());
-  connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
-          SLOT(update()));
+  QObject::connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
+                   SLOT(update()));
 
   m_editFld = new DVGui::LineEdit(this);
   m_editFld->hide();
-  connect(m_editFld, SIGNAL(editingFinished()), this, SLOT(rename()));
+  QObject::connect(m_editFld, SIGNAL(editingFinished()), this, SLOT(rename()));
 
   m_columns.push_back(
       std::make_pair(DvItemListModel::Name, std::make_pair(200, 1)));
@@ -1550,9 +1550,10 @@ DvItemViewerTitleBar::DvItemViewerTitleBar(DvItemViewer *itemViewer,
     , m_dragColumnIndex(-1) {
   setMinimumHeight(22);
 
-  bool ret = connect(m_itemViewer->getPanel(),
-                     SIGNAL(viewTypeChange(DvItemViewerPanel::ViewType)), this,
-                     SLOT(onViewTypeChanged(DvItemViewerPanel::ViewType)));
+  bool ret = QObject::connect(
+      m_itemViewer->getPanel(),
+      SIGNAL(viewTypeChange(DvItemViewerPanel::ViewType)), this,
+      SLOT(onViewTypeChanged(DvItemViewerPanel::ViewType)));
 
   assert(ret);
 
@@ -1868,22 +1869,18 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   addAction(exportFileListAction);
   addSeparator();
 
-  connect(exportFileListAction, SIGNAL(triggered()), itemViewer->getPanel(),
-          SLOT(exportFileList()));
+  QObject::connect(exportFileListAction, SIGNAL(triggered()),
+                   itemViewer->getPanel(), SLOT(exportFileList()));
 
-  connect(folderUp, SIGNAL(triggered()), SIGNAL(folderUp()));
-  connect(newFolder, SIGNAL(triggered()), SIGNAL(newFolder()));
-  connect(thumbView, SIGNAL(triggered()), itemViewer->getPanel(),
-          SLOT(setThumbnailsView()));
-  connect(listView, SIGNAL(triggered()), itemViewer->getPanel(),
-          SLOT(setTableView()));
-  //	connect(listView      , SIGNAL(triggered()), itemViewer->getPanel(),
-  //SLOT(setListView()));
-  //	connect(tableView     , SIGNAL(triggered()), itemViewer->getPanel(),
-  //SLOT(setTableView()));
+  QObject::connect(folderUp, SIGNAL(triggered()), SIGNAL(folderUp()));
+  QObject::connect(newFolder, SIGNAL(triggered()), SIGNAL(newFolder()));
+  QObject::connect(thumbView, SIGNAL(triggered()), itemViewer->getPanel(),
+                   SLOT(setThumbnailsView()));
+  QObject::connect(listView, SIGNAL(triggered()), itemViewer->getPanel(),
+                   SLOT(setTableView()));
 
-  connect(m_folderBack, SIGNAL(triggered()), SIGNAL(folderBack()));
-  connect(m_folderFwd, SIGNAL(triggered()), SIGNAL(folderFwd()));
+  QObject::connect(m_folderBack, SIGNAL(triggered()), SIGNAL(folderBack()));
+  QObject::connect(m_folderFwd, SIGNAL(triggered()), SIGNAL(folderFwd()));
 }
 
 //-----------------------------------------------------------------------------

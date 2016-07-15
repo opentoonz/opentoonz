@@ -306,11 +306,12 @@ FxSchematicScene::FxSchematicScene(QWidget *parent)
   m_selection = new FxSelection();
   m_selection->setFxSchematicScene(this);
 
-  connect(m_selection, SIGNAL(doCollapse(const QList<TFxP> &)), this,
-          SLOT(onCollapse(const QList<TFxP> &)));
-  connect(m_selection, SIGNAL(doExplodeChild(const QList<TFxP> &)), this,
-          SIGNAL(doExplodeChild(const QList<TFxP> &)));
-  connect(this, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+  QObject::connect(m_selection, &FxSelection::doCollapse,  //
+                   this, &FxSchematicScene::onCollapse);
+  QObject::connect(m_selection, &FxSelection::doExplodeChild,  //
+                   this, &FxSchematicScene::doExplodeChild);
+  QObject::connect(this, &FxSchematicScene::selectionChanged,  //
+                   this, &FxSchematicScene::onSelectionChanged);
 
   m_addFxContextMenu.setSelection(m_selection);
   m_highlightedLinks.clear();
@@ -332,9 +333,10 @@ void FxSchematicScene::setApplication(TApplication *app) {
   m_frameHandle  = app->getCurrentFrame();
   m_columnHandle = app->getCurrentColumn();
 
-  if (m_fxHandle)
-    connect(m_fxHandle, SIGNAL(fxSwitched()), this,
-            SLOT(onCurrentFxSwitched()));
+  if (m_fxHandle) {
+    QObject::connect(m_fxHandle, &TFxHandle::fxSwitched,  //
+                     this, &FxSchematicScene::onCurrentFxSwitched);
+  }
 
   m_addFxContextMenu.setApplication(app);
 
@@ -517,20 +519,22 @@ void FxSchematicScene::updateEditedMacros(
 FxSchematicNode *FxSchematicScene::addFxSchematicNode(TFx *fx) {
   FxSchematicNode *node = createFxSchematicNode(fx);
   if (!node) return 0;
-  connect(node, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
-  connect(node, SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
-  connect(node, SIGNAL(switchCurrentFx(TFx *)), this,
-          SLOT(onSwitchCurrentFx(TFx *)));
-  connect(node, SIGNAL(currentColumnChanged(int)), this,
-          SLOT(onCurrentColumnChanged(int)));
-
-  connect(node, SIGNAL(fxNodeDoubleClicked()), this,
-          SLOT(onFxNodeDoubleClicked()));
+  QObject::connect(node, &FxSchematicNode::sceneChanged,  //
+                   this, &FxSchematicScene::onSceneChanged);
+  QObject::connect(node, &FxSchematicNode::xsheetChanged,  //
+                   this, &FxSchematicScene::onXsheetChanged);
+  QObject::connect(node, &FxSchematicNode::switchCurrentFx,  //
+                   this, &FxSchematicScene::onSwitchCurrentFx);
+  QObject::connect(node, &FxSchematicNode::currentColumnChanged,  //
+                   this, &FxSchematicScene::onCurrentColumnChanged);
+  QObject::connect(node, &FxSchematicNode::fxNodeDoubleClicked,  //
+                   this, &FxSchematicScene::onFxNodeDoubleClicked);
   if (fx->getAttributes()->getDagNodePos() == TConst::nowhere) {
     node->resize(m_gridDimension == 0);
     placeNode(node);
-  } else
+  } else {
     updatePosition(node, fx->getAttributes()->getDagNodePos());
+  }
   m_table[fx] = node;
   return node;
 }
@@ -545,12 +549,14 @@ FxSchematicNode *FxSchematicScene::addGroupedFxSchematicNode(
   std::wstring name = roots[0]->getAttributes()->getGroupName(false);
   FxGroupNode *node = new FxGroupNode(this, groupedFxs, roots, groupId, name);
   if (!node) return 0;
-  connect(node, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
-  connect(node, SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
-  connect(node, SIGNAL(switchCurrentFx(TFx *)), this,
-          SLOT(onSwitchCurrentFx(TFx *)));
-  connect(node, SIGNAL(currentColumnChanged(int)), this,
-          SLOT(onCurrentColumnChanged(int)));
+  QObject::connect(node, &FxGroupNode::sceneChanged,  //
+                   this, &FxSchematicScene::onSceneChanged);
+  QObject::connect(node, &FxGroupNode::xsheetChanged,  //
+                   this, &FxSchematicScene::onXsheetChanged);
+  QObject::connect(node, &FxGroupNode::switchCurrentFx,  //
+                   this, &FxSchematicScene::onSwitchCurrentFx);
+  QObject::connect(node, &FxGroupNode::currentColumnChanged,  //
+                   this, &FxSchematicScene::onCurrentColumnChanged);
   m_groupedTable[groupId] = node;
   return node;
 }

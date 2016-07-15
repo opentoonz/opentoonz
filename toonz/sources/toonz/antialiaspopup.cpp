@@ -174,7 +174,7 @@ AntialiasPopup::AntialiasPopup()
   //--------------------------- Button ----------------------------
 
   m_okBtn = new QPushButton(QString(tr("Apply")), this);
-  connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
+  QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
 
   addButtonBarWidget(m_okBtn);
 
@@ -184,10 +184,10 @@ AntialiasPopup::AntialiasPopup()
 
   bool ret = true;
 
-  ret = ret && connect(m_thresholdField, SIGNAL(valueChanged(bool)), this,
-                       SLOT(onValuesChanged(bool)));
-  ret = ret && connect(m_softnessField, SIGNAL(valueChanged(bool)), this,
-                       SLOT(onValuesChanged(bool)));
+  ret = ret && QObject::connect(m_thresholdField, SIGNAL(valueChanged(bool)),
+                                this, SLOT(onValuesChanged(bool)));
+  ret = ret && QObject::connect(m_softnessField, SIGNAL(valueChanged(bool)),
+                                this, SLOT(onValuesChanged(bool)));
 
   assert(ret);
 
@@ -245,12 +245,14 @@ void AntialiasPopup::setCurrentSampleRaster() {
 void AntialiasPopup::showEvent(QShowEvent *se) {
   TApp *app = TApp::instance();
   bool ret  = true;
-  ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
-                       SLOT(setCurrentSampleRaster()));
-  ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-                       SLOT(setCurrentSampleRaster()));
-  ret = ret && connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()),
-                       this, SLOT(setCurrentSampleRaster()));
+  ret       = ret &&
+        QObject::connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()),
+                         this, SLOT(setCurrentSampleRaster()));
+  ret = ret && QObject::connect(app->getCurrentFrame(), SIGNAL(frameSwitched()),
+                                this, SLOT(setCurrentSampleRaster()));
+  ret = ret &&
+        QObject::connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()),
+                         this, SLOT(setCurrentSampleRaster()));
   assert(ret);
   setCurrentSampleRaster();
 }
@@ -259,12 +261,12 @@ void AntialiasPopup::showEvent(QShowEvent *se) {
 
 void AntialiasPopup::hideEvent(QHideEvent *he) {
   TApp *app = TApp::instance();
-  disconnect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
-             SLOT(setCurrentSampleRaster()));
-  disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-             SLOT(setCurrentSampleRaster()));
-  disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
-             SLOT(setCurrentSampleRaster()));
+  QObject::disconnect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
+                      SLOT(setCurrentSampleRaster()));
+  QObject::disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+                      SLOT(setCurrentSampleRaster()));
+  QObject::disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()),
+                      this, SLOT(setCurrentSampleRaster()));
 
   Dialog::hideEvent(he);
 

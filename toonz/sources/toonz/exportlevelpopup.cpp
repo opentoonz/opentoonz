@@ -358,19 +358,23 @@ ExportLevelPopup::ExportLevelPopup()
 
   // Establish connections
   bool ret = true;
-  ret      = connect(tabBar, SIGNAL(currentChanged(int)), stackedWidget,
-                SLOT(setCurrentIndex(int)));
-  ret = connect(m_format, SIGNAL(currentIndexChanged(const QString &)),
-                SLOT(onformatChanged(const QString &))) &&
+
+  ret = QObject::connect(tabBar, SIGNAL(currentChanged(int)), stackedWidget,
+                         SLOT(setCurrentIndex(int)));
+  ret = QObject::connect(m_format, SIGNAL(currentIndexChanged(const QString &)),
+                         SLOT(onformatChanged(const QString &))) &&
         ret;
-  ret = connect(m_retas, SIGNAL(stateChanged(int)), SLOT(onRetas(int))) && ret;
-  ret = connect(m_formatOptions, SIGNAL(clicked()), SLOT(onOptionsClicked())) &&
+  ret = QObject::connect(m_retas, SIGNAL(stateChanged(int)),
+                         SLOT(onRetas(int))) &&
         ret;
-  ret = connect(&m_levelFrameIndexHandle, SIGNAL(frameSwitched()),
-                SLOT(updatePreview())) &&
+  ret = QObject::connect(m_formatOptions, SIGNAL(clicked()),
+                         SLOT(onOptionsClicked())) &&
         ret;
-  ret = connect(m_exportOptions, SIGNAL(optionsChanged()),
-                SLOT(updatePreview())) &&
+  ret = QObject::connect(&m_levelFrameIndexHandle, SIGNAL(frameSwitched()),
+                         SLOT(updatePreview())) &&
+        ret;
+  ret = QObject::connect(m_exportOptions, SIGNAL(optionsChanged()),
+                         SLOT(updatePreview())) &&
         ret;
   assert(ret);
 }
@@ -393,19 +397,19 @@ void ExportLevelPopup::showEvent(QShowEvent *se) {
   {
     TSelectionHandle *selectionHandle = TApp::instance()->getCurrentSelection();
     TSelection *selection             = selectionHandle->getSelection();
-	if (Preferences::instance()->getPixelsOnly()) {
-		m_exportOptions->m_widthFld->hide();
-		m_exportOptions->m_heightFld->hide();
-		m_exportOptions->m_widthLabel->hide();
-		m_exportOptions->m_heightLabel->hide();
-		m_exportOptions->m_dpiLabel->hide();
-	} else {
-		m_exportOptions->m_widthFld->show();
-		m_exportOptions->m_heightFld->show();
-		m_exportOptions->m_widthLabel->show();
-		m_exportOptions->m_heightLabel->show();
-		m_exportOptions->m_dpiLabel->show();
-	}
+    if (Preferences::instance()->getPixelsOnly()) {
+      m_exportOptions->m_widthFld->hide();
+      m_exportOptions->m_heightFld->hide();
+      m_exportOptions->m_widthLabel->hide();
+      m_exportOptions->m_heightLabel->hide();
+      m_exportOptions->m_dpiLabel->hide();
+    } else {
+      m_exportOptions->m_widthFld->show();
+      m_exportOptions->m_heightFld->show();
+      m_exportOptions->m_widthLabel->show();
+      m_exportOptions->m_heightLabel->show();
+      m_exportOptions->m_dpiLabel->show();
+    }
     selectionHandle->pushSelection();
     selectionHandle->setSelection(selection);
   }
@@ -424,16 +428,17 @@ void ExportLevelPopup::showEvent(QShowEvent *se) {
 
   bool ret = true;
   {
-    ret = connect(app->getCurrentSelection(),
-                  SIGNAL(selectionChanged(TSelection *)),
-                  SLOT(updateOnSelection())) &&
+    ret = QObject::connect(app->getCurrentSelection(),
+                           SIGNAL(selectionChanged(TSelection *)),
+                           SLOT(updateOnSelection())) &&
           ret;
 
-    ret = connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)),
-                  this, SLOT(updatePreview())) &&
+    ret = QObject::connect(app->getCurrentLevel(),
+                           SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+                           SLOT(updatePreview())) &&
           ret;
-    ret = connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), this,
-                  SLOT(updatePreview())) &&
+    ret = QObject::connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()),
+                           this, SLOT(updatePreview())) &&
           ret;
   }
   assert(ret);
@@ -526,7 +531,7 @@ void ExportLevelPopup::onOptionsClicked() {
   if (DVGui::Dialog *dialog =
           openFormatSettingsPopup(this, ext, props, m_browser->getFolder())) {
     bool ret;
-    ret = connect(dialog, SIGNAL(dialogClosed()), SLOT(checkAlpha())),
+    ret = QObject::connect(dialog, SIGNAL(dialogClosed()), SLOT(checkAlpha())),
     assert(ret);
   }
 }
@@ -737,16 +742,16 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
       layout->addLayout(exportBoxLayout, row++, 1, 1, 2, Qt::AlignLeft);
 
       {
-        m_widthFld  = new DVGui::MeasuredDoubleLineEdit;
-        m_heightFld = new DVGui::MeasuredDoubleLineEdit;
-        m_hResFld   = new DVGui::IntLineEdit;
-        m_vResFld   = new DVGui::IntLineEdit;
-        m_dpiLabel  = new QLabel;
-		m_widthLabel = new QLabel;
-		m_heightLabel = new QLabel;
-		m_widthLabel->setText("Width: ");
-		m_heightLabel->setText("Height: ");
-        m_resScale  = new DVGui::MeasuredDoubleLineEdit;
+        m_widthFld    = new DVGui::MeasuredDoubleLineEdit;
+        m_heightFld   = new DVGui::MeasuredDoubleLineEdit;
+        m_hResFld     = new DVGui::IntLineEdit;
+        m_vResFld     = new DVGui::IntLineEdit;
+        m_dpiLabel    = new QLabel;
+        m_widthLabel  = new QLabel;
+        m_heightLabel = new QLabel;
+        m_widthLabel->setText("Width: ");
+        m_heightLabel->setText("Height: ");
+        m_resScale = new DVGui::MeasuredDoubleLineEdit;
 
         m_widthFld->setRange(0, dmax);
         m_heightFld->setRange(0, dmax);
@@ -847,60 +852,68 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
   // Install connections
   bool ret = true;
   {
-    ret = connect(m_widthFld, SIGNAL(editingFinished()), SLOT(updateXRes())) &&
+    ret = QObject::connect(m_widthFld, SIGNAL(editingFinished()),
+                           SLOT(updateXRes())) &&
           ret;
-    ret = connect(m_heightFld, SIGNAL(editingFinished()), SLOT(updateYRes())) &&
+    ret = QObject::connect(m_heightFld, SIGNAL(editingFinished()),
+                           SLOT(updateYRes())) &&
           ret;
-    ret = connect(m_hResFld, SIGNAL(editingFinished()), SLOT(updateYRes())) &&
+    ret = QObject::connect(m_hResFld, SIGNAL(editingFinished()),
+                           SLOT(updateYRes())) &&
           ret;  // Note that x and y here
-    ret = connect(m_vResFld, SIGNAL(editingFinished()), SLOT(updateXRes())) &&
+    ret = QObject::connect(m_vResFld, SIGNAL(editingFinished()),
+                           SLOT(updateXRes())) &&
           ret;  // are exchanged
-    ret =
-        connect(m_resScale, SIGNAL(editingFinished()), SLOT(scaleRes())) && ret;
+    ret = QObject::connect(m_resScale, SIGNAL(editingFinished()),
+                           SLOT(scaleRes())) &&
+          ret;
 
-    ret = connect(m_thicknessTransformMode, SIGNAL(currentIndexChanged(int)),
-                  SLOT(onThicknessTransformModeChanged())) &&
+    ret = QObject::connect(m_thicknessTransformMode,
+                           SIGNAL(currentIndexChanged(int)),
+                           SLOT(onThicknessTransformModeChanged())) &&
           ret;
 
     // Option changes
-    ret = connect(m_bgColorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
-                  SIGNAL(optionsChanged())) &&
+    ret = QObject::connect(m_bgColorField,
+                           SIGNAL(colorChanged(const TPixel32 &, bool)),
+                           SIGNAL(optionsChanged())) &&
           ret;
-    ret = connect(m_noAntialias, SIGNAL(clicked(bool)),
-                  SIGNAL(optionsChanged())) &&
+    ret = QObject::connect(m_noAntialias, SIGNAL(clicked(bool)),
+                           SIGNAL(optionsChanged())) &&
           ret;
 
     // Queued connections for camera fields, to guarantee that whenever signals
     // editingFinished()
     // and valueChanged() are emitted at the same time, the former takes
     // precedence (applies value corrections)
-    ret = connect(m_widthFld, SIGNAL(valueChanged()), SIGNAL(optionsChanged()),
-                  Qt::QueuedConnection) &&
+    ret = QObject::connect(m_widthFld, SIGNAL(valueChanged()),
+                           SIGNAL(optionsChanged()), Qt::QueuedConnection) &&
           ret;
-    ret = connect(m_heightFld, SIGNAL(valueChanged()), SIGNAL(optionsChanged()),
-                  Qt::QueuedConnection) &&
+    ret = QObject::connect(m_heightFld, SIGNAL(valueChanged()),
+                           SIGNAL(optionsChanged()), Qt::QueuedConnection) &&
           ret;
-    ret = connect(m_hResFld, SIGNAL(textChanged(const QString &)),
-                  SIGNAL(optionsChanged()), Qt::QueuedConnection) &&
+    ret = QObject::connect(m_hResFld, SIGNAL(textChanged(const QString &)),
+                           SIGNAL(optionsChanged()), Qt::QueuedConnection) &&
           ret;
-    ret = connect(m_vResFld, SIGNAL(textChanged(const QString &)),
-                  SIGNAL(optionsChanged()), Qt::QueuedConnection) &&
+    ret = QObject::connect(m_vResFld, SIGNAL(textChanged(const QString &)),
+                           SIGNAL(optionsChanged()), Qt::QueuedConnection) &&
           ret;
 
-    ret = connect(m_thicknessTransformMode, SIGNAL(currentIndexChanged(int)),
-                  SIGNAL(optionsChanged())) &&
+    ret = QObject::connect(m_thicknessTransformMode,
+                           SIGNAL(currentIndexChanged(int)),
+                           SIGNAL(optionsChanged())) &&
           ret;
-    ret = connect(m_fromThicknessScale, SIGNAL(valueChanged()),
-                  SIGNAL(optionsChanged())) &&
+    ret = QObject::connect(m_fromThicknessScale, SIGNAL(valueChanged()),
+                           SIGNAL(optionsChanged())) &&
           ret;
-    ret = connect(m_fromThicknessDisplacement, SIGNAL(valueChanged()),
-                  SIGNAL(optionsChanged())) &&
+    ret = QObject::connect(m_fromThicknessDisplacement, SIGNAL(valueChanged()),
+                           SIGNAL(optionsChanged())) &&
           ret;
-    ret = connect(m_toThicknessScale, SIGNAL(valueChanged()),
-                  SIGNAL(optionsChanged())) &&
+    ret = QObject::connect(m_toThicknessScale, SIGNAL(valueChanged()),
+                           SIGNAL(optionsChanged())) &&
           ret;
-    ret = connect(m_toThicknessDisplacement, SIGNAL(valueChanged()),
-                  SIGNAL(optionsChanged())) &&
+    ret = QObject::connect(m_toThicknessDisplacement, SIGNAL(valueChanged()),
+                           SIGNAL(optionsChanged())) &&
           ret;
   }
   assert(ret);

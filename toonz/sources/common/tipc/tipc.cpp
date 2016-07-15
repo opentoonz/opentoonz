@@ -131,11 +131,12 @@ bool tipc::Stream::readDataNB(char *data, qint64 dataSize, int msecs,
   char *currData = data;
 
   QEventLoop loop;
-  QObject::connect(m_socket, SIGNAL(readyRead()), &loop, SLOT(quit()));
-  QObject::connect(m_socket, SIGNAL(error(QLocalSocket::LocalSocketError)),
-                   &loop, SLOT(quit()));
+  QObject::connect(m_socket, &QLocalSocket::readyRead, &loop,
+                   &QEventLoop::quit);
+  QObject::connect(m_socket, &QLocalSocket::disconnected, &loop,
+                   &QEventLoop::quit);
 
-  if (msecs >= 0) QTimer::singleShot(msecs, &loop, SLOT(quit()));
+  if (msecs >= 0) QTimer::singleShot(msecs, &loop, &QEventLoop::quit);
 
   while (dataRead < dataSize) {
     if (m_socket->bytesAvailable() == 0) {
@@ -269,9 +270,8 @@ bool tipc::startBackgroundProcess(QString cmdline) {
     return false;
   }
 
+  // NOTE: arg type mismatch
   QObject::connect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), proc,
-                   SLOT(deleteLater()));
-  QObject::connect(proc, SIGNAL(error(QProcess::ProcessError)), proc,
                    SLOT(deleteLater()));
   return true;
 #else
@@ -344,8 +344,8 @@ bool tipc::startSlaveServer(QString srvName, QString cmdline) {
   // If a connection error takes place, release the dummy socket.
   // Please, observe that this QObject::connect is invoked *AFTER* the
   // connection trials above...
-  QObject::connect(dummySock, SIGNAL(error(QLocalSocket::LocalSocketError)),
-                   dummySock, SLOT(deleteLater()));
+  QObject::connect(dummySock, &QLocalSocket::disconnected, dummySock,
+                   &QLocalSocket::deleteLater);
 
   return true;
 }

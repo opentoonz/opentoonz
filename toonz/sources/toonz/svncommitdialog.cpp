@@ -82,8 +82,8 @@ SVNCommitDialog::SVNCommitDialog(QWidget *parent, const QString &workingDir,
     belowTreeLayout->setMargin(0);
 
     m_selectionCheckBox = new QCheckBox(tr("Select / Deselect All"), 0);
-    connect(m_selectionCheckBox, SIGNAL(clicked(bool)), this,
-            SLOT(onSelectionCheckBoxClicked(bool)));
+    QObject::connect(m_selectionCheckBox, SIGNAL(clicked(bool)), this,
+                     SLOT(onSelectionCheckBoxClicked(bool)));
 
     m_selectionLabel = new QLabel;
     m_selectionLabel->setText(tr("0 Selected / 0 Total"));
@@ -141,8 +141,8 @@ SVNCommitDialog::SVNCommitDialog(QWidget *parent, const QString &workingDir,
 
   if (!m_folderOnly) {
     m_commitSceneContentsCheckBox = new QCheckBox(this);
-    connect(m_commitSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
-            SLOT(onCommiSceneContentsToggled(bool)));
+    QObject::connect(m_commitSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+                     SLOT(onCommiSceneContentsToggled(bool)));
     m_commitSceneContentsCheckBox->setChecked(false);
     m_commitSceneContentsCheckBox->hide();
     m_commitSceneContentsCheckBox->setText(tr("Put Scene Contents"));
@@ -159,21 +159,21 @@ SVNCommitDialog::SVNCommitDialog(QWidget *parent, const QString &workingDir,
 
   m_commitButton = new QPushButton(tr("Put"));
   m_commitButton->setEnabled(false);
-  connect(m_commitButton, SIGNAL(clicked()), this,
-          SLOT(onCommitButtonClicked()));
+  QObject::connect(m_commitButton, SIGNAL(clicked()), this,
+                   SLOT(onCommitButtonClicked()));
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(m_commitButton, m_cancelButton);
 
   // 0. Connect for svn errors (that may occurs everythings)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // 1. Getting status (with show-updates enabled...)
-  connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-          SLOT(onStatusRetrieved(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                   SLOT(onStatusRetrieved(const QString &)));
   m_thread.getSVNStatus(m_workingDir, m_files, true);
 }
 
@@ -201,8 +201,8 @@ void SVNCommitDialog::onCommitButtonClicked() {
   // to be added or can be directly committed
   if (!m_folderOnly && !m_sceneResourcesToCommit.empty()) {
     m_thread.disconnect(SIGNAL(statusRetrieved(const QString &)));
-    connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-            SLOT(onResourcesStatusRetrieved(const QString &)));
+    QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                     SLOT(onResourcesStatusRetrieved(const QString &)));
     m_thread.getSVNStatus(m_workingDir, m_sceneResourcesToCommit, true);
     return;
   }
@@ -254,7 +254,8 @@ void SVNCommitDialog::addFiles() {
     args << "tempAddFile";
 
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onAddDone()));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                     SLOT(onAddDone()));
     m_thread.executeCommand(m_workingDir, "svn", args);
   } else
     onAddDone();
@@ -296,7 +297,8 @@ void SVNCommitDialog::commitFiles() {
                                    " commit changes.");
     m_thread.disconnect(SIGNAL(statusRetrieved(const QString &)));
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onCommitDone()));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                     SLOT(onCommitDone()));
     m_thread.executeCommand(m_workingDir, "svn", args);
   } else
     onCommitDone();
@@ -327,8 +329,8 @@ void SVNCommitDialog::setPropertyFiles() {
 
     m_thread.disconnect(SIGNAL(statusRetrieved(const QString &)));
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(done(const QString &)),
-            SLOT(onSetPropertyDone()));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                     SLOT(onSetPropertyDone()));
     m_thread.executeCommand(m_workingDir, "svn", args);
   } else
     onSetPropertyDone();
@@ -342,7 +344,7 @@ void SVNCommitDialog::switchToCloseButton() {
   m_commitButton->setText(tr("Close"));
   m_commitButton->setEnabled(true);
   m_cancelButton->hide();
-  connect(m_commitButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_commitButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 //-----------------------------------------------------------------------------
@@ -359,8 +361,8 @@ void SVNCommitDialog::onAddDone() {
     m_textLabel->setText(tr("Getting repository status..."));
 
     m_thread.disconnect(SIGNAL(statusRetrieved(const QString &)));
-    connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-            SLOT(onStatusRetrievedAfterAdd(const QString &)));
+    QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                     SLOT(onStatusRetrievedAfterAdd(const QString &)));
 
     QStringList oldFilesAndResources;
     oldFilesAndResources.append(m_files);
@@ -524,8 +526,9 @@ void SVNCommitDialog::onStatusRetrieved(const QString &xmlResponse) {
   } else {
     if (m_folderOnly) {
       updateTreeSelectionLabel();
-      connect(m_treeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this,
-              SLOT(onItemChanged(QTreeWidgetItem *)));
+      QObject::connect(m_treeWidget,
+                       SIGNAL(itemChanged(QTreeWidgetItem *, int)), this,
+                       SLOT(onItemChanged(QTreeWidgetItem *)));
       m_treeWidget->show();
       m_selectionCheckBox->show();
       m_selectionLabel->show();
@@ -754,8 +757,8 @@ void SVNCommitDialog::addModifiedItem(const QString &relativePath) {
 //-----------------------------------------------------------------------------
 
 void SVNCommitDialog::onItemChanged(QTreeWidgetItem *item) {
-  disconnect(m_treeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this,
-             SLOT(onItemChanged(QTreeWidgetItem *)));
+  QObject::disconnect(m_treeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+                      this, SLOT(onItemChanged(QTreeWidgetItem *)));
 
   Qt::CheckState state = item->checkState(0);
 
@@ -766,8 +769,8 @@ void SVNCommitDialog::onItemChanged(QTreeWidgetItem *item) {
       selItem->setCheckState(0, state);
   }
 
-  connect(m_treeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this,
-          SLOT(onItemChanged(QTreeWidgetItem *)));
+  QObject::connect(m_treeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+                   this, SLOT(onItemChanged(QTreeWidgetItem *)));
 
   updateTreeSelectionLabel();
 }
@@ -978,16 +981,17 @@ SVNCommitFrameRangeDialog::SVNCommitFrameRangeDialog(QWidget *parent,
   m_isOVLLevel = path.getDots() == "..";
 
   m_commitButton = new QPushButton(tr("Put"));
-  connect(m_commitButton, SIGNAL(clicked()), this, SLOT(onPutButtonClicked()));
+  QObject::connect(m_commitButton, SIGNAL(clicked()), this,
+                   SLOT(onPutButtonClicked()));
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(m_commitButton, m_cancelButton);
 
   // 0. Connect for svn errors (that may occurs)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 }
 
 //-----------------------------------------------------------------------------
@@ -1025,7 +1029,8 @@ void SVNCommitFrameRangeDialog::onUpdateDone() {
   if (!m_hookFileName.isEmpty()) args << m_hookFileName;
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(onLockDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onLockDone()));
   m_thread.executeCommand(m_workingDir, "svn", args, false);
 }
 
@@ -1047,8 +1052,8 @@ void SVNCommitFrameRangeDialog::onLockDone() {
   args << "--xml";
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), this,
-          SLOT(onPropGetDone(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onPropGetDone(const QString &)));
   m_thread.executeCommand(m_workingDir, "svn", args, true);
 }
 
@@ -1112,8 +1117,8 @@ void SVNCommitFrameRangeDialog::onPropGetDone(const QString &xmlResponse) {
     args << m_file;
 
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(done(const QString &)), this,
-            SLOT(onPropSetDone()));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                     SLOT(onPropSetDone()));
     m_thread.executeCommand(m_workingDir, "svn", args, true);
   }
   // Set the partial-lock property
@@ -1126,8 +1131,8 @@ void SVNCommitFrameRangeDialog::onPropGetDone(const QString &xmlResponse) {
     args << m_file;
 
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(done(const QString &)), this,
-            SLOT(onPropSetDone()));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                     SLOT(onPropSetDone()));
     m_thread.executeCommand(m_workingDir, "svn", args, true);
   }
 }
@@ -1246,8 +1251,8 @@ void SVNCommitFrameRangeDialog::onPropSetDone() {
       args << m_newHookFileName;
 
       m_thread.disconnect(SIGNAL(done(const QString &)));
-      connect(&m_thread, SIGNAL(done(const QString &)), this,
-              SLOT(onHookFileAdded()));
+      QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                       SLOT(onHookFileAdded()));
       m_thread.executeCommand(m_workingDir, "svn", args, true);
     } else
       commit();
@@ -1267,7 +1272,7 @@ void SVNCommitFrameRangeDialog::onHookFileAdded() {
   args << m_newHookFileName;
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), SLOT(commit()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), SLOT(commit()));
   m_thread.executeCommand(m_workingDir, "svn", args);
 }
 
@@ -1312,7 +1317,8 @@ void SVNCommitFrameRangeDialog::commit() {
                                  " commit changes.");
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(onCommitDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onCommitDone()));
   m_thread.executeCommand(m_workingDir, "svn", args, true);
 }
 
@@ -1336,7 +1342,8 @@ void SVNCommitFrameRangeDialog::onPutButtonClicked() {
   if (!m_isOVLLevel) args << m_file;
   if (!m_hookFileName.isEmpty()) args << m_hookFileName;
 
-  connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(onUpdateDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onUpdateDone()));
   m_thread.executeCommand(m_workingDir, "svn", args, false);
 }
 
@@ -1349,7 +1356,7 @@ void SVNCommitFrameRangeDialog::switchToCloseButton() {
   m_commitButton->setEnabled(true);
   m_commitButton->show();
   m_cancelButton->hide();
-  connect(m_commitButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_commitButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 //-----------------------------------------------------------------------------

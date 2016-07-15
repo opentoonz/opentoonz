@@ -183,8 +183,9 @@ TApp::TApp()
   TMeasureManager::instance()->addCameraMeasures(getCurrentCameraSize);
 
   m_autosaveTimer = new QTimer(this);
-  ret             = ret &&
-        connect(m_autosaveTimer, SIGNAL(timeout()), this, SLOT(autosave()));
+
+  ret = ret && QObject::connect(m_autosaveTimer, SIGNAL(timeout()), this,
+                                SLOT(autosave()));
 
   Preferences *preferences = Preferences::instance();
 
@@ -193,12 +194,12 @@ TApp::TApp()
             (int)(/*15*1024*/ TSystem::getFreeMemorySize(true) * .8)))
       DVGui::warning(tr("Error allocating memory: not enough memory."));
   }
-  ret = ret &&
-        connect(preferences, SIGNAL(stopAutoSave()), SLOT(onStopAutoSave()));
-  ret = ret &&
-        connect(preferences, SIGNAL(startAutoSave()), SLOT(onStartAutoSave()));
-  ret = ret && connect(m_currentTool, SIGNAL(toolEditingFinished()),
-                       SLOT(onToolEditingFinished()));
+  ret = ret && QObject::connect(preferences, SIGNAL(stopAutoSave()),
+                                SLOT(onStopAutoSave()));
+  ret = ret && QObject::connect(preferences, SIGNAL(startAutoSave()),
+                                SLOT(onStartAutoSave()));
+  ret = ret && QObject::connect(m_currentTool, SIGNAL(toolEditingFinished()),
+                                SLOT(onToolEditingFinished()));
 
   if (preferences->isAutosaveEnabled())
     m_autosaveTimer->start(preferences->getAutosavePeriod() * 1000 * 60);

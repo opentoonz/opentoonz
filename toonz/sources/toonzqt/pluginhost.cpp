@@ -1559,7 +1559,7 @@ PluginLoadController::PluginLoadController(const std::string &basedir,
   Loader *ld = new Loader;
 
   ld->moveToThread(&work_entity);
-  connect(&work_entity, &QThread::finished, ld, &QObject::deleteLater);
+  QObject::connect(&work_entity, &QThread::finished, ld, &QObject::deleteLater);
   /* AddFxContextMenu から呼ばれていたが、プラグインの検索が load_entries()
      を通じて起動時に呼ばれるようにした関係で,
      (あまりよくはないが)listner の有無によって receiver を分けるようにしている.
@@ -1570,11 +1570,14 @@ PluginLoadController::PluginLoadController(const std::string &basedir,
   */
   if (listener) {
     AddFxContextMenu *a = qobject_cast<AddFxContextMenu *>(listener);
-    connect(ld, &Loader::fixup, a, &AddFxContextMenu::fixup);
-    connect(this, &PluginLoadController::start, ld, &Loader::walkDictionary);
+    QObject::connect(ld, &Loader::fixup, a, &AddFxContextMenu::fixup);
+    QObject::connect(this, &PluginLoadController::start, ld,
+                     &Loader::walkDictionary);
   } else {
-    connect(this, &PluginLoadController::start, ld, &Loader::walkDirectory);
-    connect(ld, &Loader::load_finished, this, &PluginLoadController::result);
+    QObject::connect(this, &PluginLoadController::start, ld,
+                     &Loader::walkDirectory);
+    QObject::connect(ld, &Loader::load_finished, this,
+                     &PluginLoadController::result);
     if (!connect(ld, &Loader::fixup, this, &PluginLoadController::finished))
       assert(false);
   }

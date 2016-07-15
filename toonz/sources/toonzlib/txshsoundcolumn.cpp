@@ -222,7 +222,8 @@ TXshSoundColumn::TXshSoundColumn()
   m_timer.setSingleShot(true);
   m_timer.stop();
 
-  connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimerOut()));
+  QObject::connect(&m_timer, &QTimer::timeout,  //
+                   this, &TXshSoundColumn::onTimerOut);
 }
 
 //-----------------------------------------------------------------------------

@@ -205,25 +205,25 @@ InsertFxPopup::InsertFxPopup()
           });
 
   m_fxTree->insertTopLevelItems(0, fxItems);
-  connect(m_fxTree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
-          SLOT(onItemDoubleClicked(QTreeWidgetItem *, int)));
+  QObject::connect(m_fxTree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
+                   SLOT(onItemDoubleClicked(QTreeWidgetItem *, int)));
 
   addWidget(m_fxTree);
 
   QPushButton *insertBtn = new QPushButton(tr("Insert"), this);
   insertBtn->setFixedSize(65, 25);
-  connect(insertBtn, SIGNAL(clicked()), this, SLOT(onInsert()));
+  QObject::connect(insertBtn, SIGNAL(clicked()), this, SLOT(onInsert()));
   insertBtn->setDefault(true);
   m_buttonLayout->addWidget(insertBtn);
 
   QPushButton *addBtn = new QPushButton(tr("Add"), this);
   addBtn->setFixedSize(65, 25);
-  connect(addBtn, SIGNAL(clicked()), this, SLOT(onAdd()));
+  QObject::connect(addBtn, SIGNAL(clicked()), this, SLOT(onAdd()));
   m_buttonLayout->addWidget(addBtn);
 
   QPushButton *replaceBtn = new QPushButton(tr("Replace"), this);
   replaceBtn->setFixedSize(65, 25);
-  connect(replaceBtn, SIGNAL(clicked()), this, SLOT(onReplace()));
+  QObject::connect(replaceBtn, SIGNAL(clicked()), this, SLOT(onReplace()));
   m_buttonLayout->addWidget(replaceBtn);
 }
 
@@ -454,15 +454,15 @@ TFx *InsertFxPopup::createFx() {
 
 void InsertFxPopup::showEvent(QShowEvent *) {
   updatePresets();
-  connect(TApp::instance()->getCurrentFx(), SIGNAL(fxPresetSaved()),
-          SLOT(updatePresets()));
+  QObject::connect(TApp::instance()->getCurrentFx(), SIGNAL(fxPresetSaved()),
+                   SLOT(updatePresets()));
 }
 
 //-----------------------------------------------------------------------------
 
 void InsertFxPopup::hideEvent(QHideEvent *e) {
-  disconnect(TApp::instance()->getCurrentFx(), SIGNAL(fxPresetSaved()), this,
-             SLOT(updatePresets()));
+  QObject::disconnect(TApp::instance()->getCurrentFx(), SIGNAL(fxPresetSaved()),
+                      this, SLOT(updatePresets()));
   Dialog::hideEvent(e);
 }
 
@@ -480,7 +480,7 @@ void InsertFxPopup::contextMenuEvent(QContextMenuEvent *event) {
     if (folder == "macroFx")  // Menu' macro
     {
       QAction *remove = new QAction(tr("Remove Macro FX"), menu);
-      connect(remove, SIGNAL(triggered()), this, SLOT(removePreset()));
+      QObject::connect(remove, SIGNAL(triggered()), this, SLOT(removePreset()));
       menu->addAction(remove);
     } else  // Verifico se devo caricare un preset
     {
@@ -488,7 +488,8 @@ void InsertFxPopup::contextMenuEvent(QContextMenuEvent *event) {
       if (folder == "presets")  // Menu' preset
       {
         QAction *remove = new QAction(tr("Remove Preset"), menu);
-        connect(remove, SIGNAL(triggered()), this, SLOT(removePreset()));
+        QObject::connect(remove, SIGNAL(triggered()), this,
+                         SLOT(removePreset()));
         menu->addAction(remove);
       }
     }

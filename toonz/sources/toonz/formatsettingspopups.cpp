@@ -83,8 +83,8 @@ FormatSettingsPopup::FormatSettingsPopup(QWidget *parent,
     m_configureCodec->setFixedSize(100, DVGui::WidgetHeight);
     m_mainLayout->addWidget(m_configureCodec, m_mainLayout->rowCount(), 0, 1,
                             2);
-    connect(m_configureCodec, SIGNAL(released()), this,
-            SLOT(onAviCodecConfigure()));
+    QObject::connect(m_configureCodec, SIGNAL(released()), this,
+                     SLOT(onAviCodecConfigure()));
   }
 #endif
 
@@ -113,8 +113,8 @@ void FormatSettingsPopup::buildPropertyComboBox(int index,
 
   DVGui::PropertyComboBox *comboBox = new DVGui::PropertyComboBox(this, prop);
   m_widgets[prop->getName()]        = comboBox;
-  connect(comboBox, SIGNAL(currentIndexChanged(const QString)), this,
-          SLOT(onComboBoxIndexChanged(const QString)));
+  QObject::connect(comboBox, SIGNAL(currentIndexChanged(const QString)), this,
+                   SLOT(onComboBoxIndexChanged(const QString)));
   TEnumProperty::Range range = prop->getRange();
   int currIndex              = -1;
   std::wstring defaultVal    = prop->getValue();

@@ -131,22 +131,24 @@ StudioPaletteTreeViewer::StudioPaletteTreeViewer(
 
   insertTopLevelItems(0, paletteItems);
 
-  bool ret = connect(this, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-                     SLOT(onItemChanged(QTreeWidgetItem *, int)));
-  ret = ret && connect(this, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-                       SLOT(onItemClicked(QTreeWidgetItem *, int)));
-  ret =
-      ret &&
-      connect(this,
-              SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-              SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
-  ret = ret && connect(this, SIGNAL(itemClicked(QTreeWidgetItem *, int)), this,
-                       SLOT(onTreeItemExpanded(QTreeWidgetItem *)));
+  bool ret = QObject::connect(this, &StudioPaletteTreeViewer::itemChanged,  //
+                              this, &StudioPaletteTreeViewer::onItemChanged);
+  ret = ret && QObject::connect(this, &StudioPaletteTreeViewer::itemClicked,  //
+                                this, &StudioPaletteTreeViewer::onItemClicked);
+  ret = ret &&
+        QObject::connect(this, &StudioPaletteTreeViewer::currentItemChanged,  //
+                         this, &StudioPaletteTreeViewer::onCurrentItemChanged);
+  ret = ret &&
+        QObject::connect(this, &StudioPaletteTreeViewer::itemClicked,  //
+                         this, &StudioPaletteTreeViewer::onTreeItemExpanded);
 
   // refresh tree with shortcut key
   QAction *refreshAct = CommandManager::instance()->getAction(MI_RefreshTree);
-  ret                 = ret && connect(refreshAct, SIGNAL(triggered()), this,
-                       SLOT(onRefreshTreeShortcutTriggered()));
+
+  ret = ret &&
+        QObject::connect(
+            refreshAct, &QAction::triggered,  //
+            this, &StudioPaletteTreeViewer::onRefreshTreeShortcutTriggered);
   addAction(refreshAct);
 
   m_palettesScanPopup = new PalettesScanPopup();
@@ -691,8 +693,10 @@ public:
     QPushButton *okBtn = new QPushButton(tr("Apply"), this);
     okBtn->setDefault(true);
     QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-    bool ret = connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
-    ret = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+    bool ret               = QObject::connect(okBtn, &QPushButton::clicked,  //
+                                this, &AdjustPaletteDialog::accept);
+    ret = ret && QObject::connect(cancelBtn, &QPushButton::clicked, this,  //
+                                  &AdjustPaletteDialog::reject);
     assert(ret);
 
     addButtonBarWidget(okBtn, cancelBtn);
@@ -953,7 +957,7 @@ void StudioPaletteTreeViewer::createMenuAction(QMenu &menu, const char *id,
   QAction *act = menu.addAction(name);
   string slotName(slot);
   slotName = string("1") + slotName;
-  connect(act, SIGNAL(triggered()), slotName.c_str());
+  QObject::connect(act, SIGNAL(triggered()), slotName.c_str());
 }
 
 //-----------------------------------------------------------------------------

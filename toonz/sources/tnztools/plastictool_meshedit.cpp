@@ -1122,25 +1122,28 @@ void PlasticTool::addContextMenuActions_mesh(QMenu *menu) {
 
       if (::testSwapEdge(mesh, mIdx.m_idx)) {
         QAction *swapEdge = menu->addAction(tr("Swap Edge"));
-        ret = ret && connect(swapEdge, SIGNAL(triggered()), &l_plasticTool,
-                             SLOT(swapEdge_mesh_undo()));
+        ret =
+            ret && QObject::connect(swapEdge, SIGNAL(triggered()),
+                                    &l_plasticTool, SLOT(swapEdge_mesh_undo()));
       }
 
       if (::testCollapseEdge(mesh, mIdx.m_idx)) {
         QAction *collapseEdge = menu->addAction(tr("Collapse Edge"));
-        ret = ret && connect(collapseEdge, SIGNAL(triggered()), &l_plasticTool,
-                             SLOT(collapseEdge_mesh_undo()));
+        ret                   = ret &&
+              QObject::connect(collapseEdge, SIGNAL(triggered()),
+                               &l_plasticTool, SLOT(collapseEdge_mesh_undo()));
       }
 
       QAction *splitEdge = menu->addAction(tr("Split Edge"));
-      ret = ret && connect(splitEdge, SIGNAL(triggered()), &l_plasticTool,
-                           SLOT(splitEdge_mesh_undo()));
+      ret =
+          ret && QObject::connect(splitEdge, SIGNAL(triggered()),
+                                  &l_plasticTool, SLOT(splitEdge_mesh_undo()));
     }
 
     if (::testCutMesh(*m_mi, m_meSel)) {
       QAction *cutEdges = menu->addAction(tr("Cut Mesh"));
-      ret = ret && connect(cutEdges, SIGNAL(triggered()), &l_plasticTool,
-                           SLOT(cutEdges_mesh_undo()));
+      ret               = ret && QObject::connect(cutEdges, SIGNAL(triggered()),
+                                    &l_plasticTool, SLOT(cutEdges_mesh_undo()));
     }
 
     menu->addSeparator();

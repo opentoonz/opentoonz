@@ -25,8 +25,8 @@ SchematicName::SchematicName(QGraphicsItem *parent, double width, double height)
   setFlag(QGraphicsItem::ItemIsFocusable, true);
   setTextInteractionFlags(Qt::TextEditorInteraction);
 
-  connect(document(), SIGNAL(contentsChanged()), this,
-          SLOT(onContentsChanged()));
+  QObject::connect(document(), &QTextDocument::contentsChanged,  //
+                   this, &SchematicName::onContentsChanged);
 }
 
 //--------------------------------------------------------

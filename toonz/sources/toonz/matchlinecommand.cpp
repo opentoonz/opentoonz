@@ -77,21 +77,22 @@ MergeCmappedDialog::MergeCmappedDialog(TFilePath &levelPath)
 
   setWindowTitle(tr(" Merge Tlv Levels"));
   m_saveInFileFld = new DVGui::FileField(0, path);
-  ret             = ret && connect(m_saveInFileFld, SIGNAL(pathChanged()), this,
-                       SLOT(onPathChanged()));
+
+  ret = ret && QObject::connect(m_saveInFileFld, SIGNAL(pathChanged()), this,
+                                SLOT(onPathChanged()));
   addWidget(tr("Save in:"), m_saveInFileFld);
 
   m_fileNameFld = new DVGui::LineEdit(name + "_merged");
   m_fileNameFld->setMaximumHeight(DVGui::WidgetHeight);
-  ret = ret && connect(m_fileNameFld, SIGNAL(editingFinished()),
-                       SLOT(onNameChanged()));
+  ret = ret && QObject::connect(m_fileNameFld, SIGNAL(editingFinished()),
+                                SLOT(onNameChanged()));
   addWidget(tr("File Name:"), m_fileNameFld);
 
   QPushButton *okBtn = new QPushButton(tr("Apply"), this);
   okBtn->setDefault(true);
   QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-  connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
+  QObject::connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(okBtn, cancelBtn);
 }

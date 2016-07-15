@@ -252,36 +252,41 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
       action = menu->addAction(tr("Clone Preview"));
       action->setShortcut(QKeySequence(
           CommandManager::instance()->getKeyFromId(MI_ClonePreview)));
-      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(clonePreview()));
+      QObject::connect(action, SIGNAL(triggered()), m_flipbook,
+                       SLOT(clonePreview()));
     }
 
     if (m_flipbook->isFreezed()) {
       action = menu->addAction(tr("Unfreeze Preview"));
       action->setShortcut(QKeySequence(
           CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
-      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(unfreezePreview()));
+      QObject::connect(action, SIGNAL(triggered()), m_flipbook,
+                       SLOT(unfreezePreview()));
     } else {
       action = menu->addAction(tr("Freeze Preview"));
       action->setShortcut(QKeySequence(
           CommandManager::instance()->getKeyFromId(MI_FreezePreview)));
-      connect(action, SIGNAL(triggered()), m_flipbook, SLOT(freezePreview()));
+      QObject::connect(action, SIGNAL(triggered()), m_flipbook,
+                       SLOT(freezePreview()));
     }
 
     action = menu->addAction(tr("Regenerate Preview"));
     action->setShortcut(QKeySequence(
         CommandManager::instance()->getKeyFromId(MI_RegeneratePreview)));
-    connect(action, SIGNAL(triggered()), m_flipbook, SLOT(regenerate()));
+    QObject::connect(action, SIGNAL(triggered()), m_flipbook,
+                     SLOT(regenerate()));
 
     action = menu->addAction(tr("Regenerate Frame Preview"));
     action->setShortcut(QKeySequence(
         CommandManager::instance()->getKeyFromId(MI_RegenerateFramePr)));
-    connect(action, SIGNAL(triggered()), m_flipbook, SLOT(regenerateFrame()));
+    QObject::connect(action, SIGNAL(triggered()), m_flipbook,
+                     SLOT(regenerateFrame()));
 
     menu->addSeparator();
   }
 
   action = menu->addAction(tr("Load / Append Images"));
-  connect(action, SIGNAL(triggered()), m_flipbook, SLOT(loadImages()));
+  QObject::connect(action, SIGNAL(triggered()), m_flipbook, SLOT(loadImages()));
 
   // history of the loaded paths of flipbook
   action = CommandManager::instance()->getAction(MI_LoadRecentImage);
@@ -290,19 +295,20 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
 
   if (m_flipbook->isSavable()) {
     action = menu->addAction(tr("Save Images"));
-    connect(action, SIGNAL(triggered()), m_flipbook, SLOT(saveImages()));
+    QObject::connect(action, SIGNAL(triggered()), m_flipbook,
+                     SLOT(saveImages()));
   }
   menu->addSeparator();
 
   QAction *reset = menu->addAction(tr("Reset View"));
   reset->setShortcut(
       QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomReset)));
-  connect(reset, SIGNAL(triggered()), SLOT(resetView()));
+  QObject::connect(reset, SIGNAL(triggered()), SLOT(resetView()));
 
   QAction *fit = menu->addAction(tr("Fit To Window"));
   fit->setShortcut(
       QKeySequence(CommandManager::instance()->getKeyFromId(V_ZoomFit)));
-  connect(fit, SIGNAL(triggered()), SLOT(fitView()));
+  QObject::connect(fit, SIGNAL(triggered()), SLOT(fitView()));
 
 #ifdef _WIN32
 
@@ -315,7 +321,8 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
 
     action->setShortcut(QKeySequence(
         CommandManager::instance()->getKeyFromId(V_ShowHideFullScreen)));
-    connect(action, SIGNAL(triggered()), fsWidget, SLOT(toggleFullScreen()));
+    QObject::connect(action, SIGNAL(triggered()), fsWidget,
+                     SLOT(toggleFullScreen()));
   }
 
 #endif
@@ -326,13 +333,13 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
     menu->addSeparator();
     addedSep = true;
     action   = menu->addAction(tr("Show Histogram"));
-    connect(action, SIGNAL(triggered()), SLOT(showHistogram()));
+    QObject::connect(action, SIGNAL(triggered()), SLOT(showHistogram()));
   }
 
   if (m_visualSettings.m_doCompare) {
     if (!addedSep) menu->addSeparator();
     action = menu->addAction(tr("Swap Compared Images"));
-    connect(action, SIGNAL(triggered()), SLOT(swapCompared()));
+    QObject::connect(action, SIGNAL(triggered()), SLOT(swapCompared()));
   }
 
   menu->exec(event->globalPos());

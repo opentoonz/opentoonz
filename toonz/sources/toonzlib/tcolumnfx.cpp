@@ -183,7 +183,8 @@ std::string getAlias(TXsheet *xsh, double frame, const TRenderSettings &info) {
 //    Local namespace  -  Colormap (Sandor) Fxs stuff
 //****************************************************************************************
 
-static bool vectorMustApplyCmappedFx(const std::vector<TRasterFxRenderDataP> &fxs) {
+static bool vectorMustApplyCmappedFx(
+    const std::vector<TRasterFxRenderDataP> &fxs) {
   std::vector<TRasterFxRenderDataP>::const_iterator ft, fEnd(fxs.end());
   for (ft = fxs.begin(); ft != fEnd; ++ft) {
     PaletteFilterFxRenderData *paletteFilterData =
@@ -233,7 +234,8 @@ static bool mustApplySandorFx(const std::vector<TRasterFxRenderDataP> &fxs) {
 
 //-------------------------------------------------------------------
 
-static int getEnlargement(const std::vector<TRasterFxRenderDataP> &fxs, double scale) {
+static int getEnlargement(const std::vector<TRasterFxRenderDataP> &fxs,
+                          double scale) {
   int enlargement = 1;
 
   std::vector<TRasterFxRenderDataP>::const_iterator ft, fEnd(fxs.end());
@@ -287,8 +289,8 @@ static int getEnlargement(const std::vector<TRasterFxRenderDataP> &fxs, double s
 
 //-------------------------------------------------------------------
 
-static void applyPaletteFilter(TPalette *&plt, bool keep, const set<int> &colors,
-                               const TPalette *srcPlt) {
+static void applyPaletteFilter(TPalette *&plt, bool keep,
+                               const set<int> &colors, const TPalette *srcPlt) {
   if (colors.empty()) return;
 
   if (!plt) plt = srcPlt->clone();
@@ -379,8 +381,8 @@ static std::vector<int> getAllBut(std::vector<int> &colorIds) {
 //! optimizing memory usage, please avoid copying the entire image buffer...
 
 static TImageP applyCmappedFx(TToonzImageP &ti,
-                              const std::vector<TRasterFxRenderDataP> &fxs, int frame,
-                              double scale) {
+                              const std::vector<TRasterFxRenderDataP> &fxs,
+                              int frame, double scale) {
   TImageP result = ti;
   TTile resultTile;  // Just a quick wrapper to the ImageCache
   TPalette *inPalette, *tempPlt;
@@ -672,7 +674,8 @@ static TImageP applyCmappedFx(TToonzImageP &ti,
 //-------------------------------------------------------------------
 
 static void applyCmappedFx(TVectorImageP &vi,
-                           const std::vector<TRasterFxRenderDataP> &fxs, int frame) {
+                           const std::vector<TRasterFxRenderDataP> &fxs,
+                           int frame) {
   TRasterP ras;
   bool keep = false;
   TPaletteP modPalette;
