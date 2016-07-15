@@ -3,9 +3,9 @@
 #ifndef TTIO_MP4_INCLUDED
 #define TTIO_MP4_INCLUDED
 
-#include "tproperty.h"
-#include "tlevel_io.h"
-//#include "tthreadmessage.h"
+//#include "tproperty.h"
+//#include "tlevel_io.h"
+#include "tiio_ffmpeg.h"
 
 //===========================================================
 //
@@ -18,7 +18,6 @@ class TLevelWriterMp4 : public TLevelWriter {
 public:
 	TLevelWriterMp4(const TFilePath &path, TPropertyGroup *winfo);
 	~TLevelWriterMp4();
-	//FfmpegBridge* ffmpeg;
 	void setFrameRate(double fps);
 
 	TImageWriterP getFrameWriter(TFrameId fid) override;
@@ -31,8 +30,8 @@ public:
 	}
 
 private:
-	int m_frameCount, m_lx, m_ly, m_bpp;
-	double m_fps;
+	Ffmpeg *ffmpegWriter;
+	int m_lx, m_ly;
 	int m_scale;
 	int m_vidQuality;
 	void *m_buffer;

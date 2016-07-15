@@ -1,15 +1,14 @@
 
 #include "tsystem.h"
-//#include "texception.h"
-#include "tfilepath.h"
-#include "tproperty.h"
 #include "tiio_mp4.h"
 #include "tenv.h"
 #include "trasterimage.h"
 #include "timageinfo.h"
+#include "tsound.h"
 #include "qprocess.h"
 #include "qstringlist.h"
 #include "qdir.h"
+
 
 
 //===========================================================
@@ -25,7 +24,7 @@ public:
 	TImageWriterMp4(const TFilePath &path, int frameIndex, TLevelWriterMp4 *lwg)
 		: TImageWriter(path), m_frameIndex(frameIndex), m_lwg(lwg) {
 		m_lwg->addRef();
-		
+
 	}
 	~TImageWriterMp4() { m_lwg->release(); }
 
@@ -51,7 +50,8 @@ TLevelWriterMp4::TLevelWriterMp4(const TFilePath &path, TPropertyGroup *winfo)
 	sscanf(scale.c_str(), "%d", &m_scale);
 	std::string quality = m_properties->getProperty("Quality")->getValueAsString();
 	sscanf(quality.c_str(), "%d", &m_vidQuality);
-	m_frameCount = 0;
+	ffmpegWriter = new Ffmpeg();
+	ffmpegWriter->setPath(m_path);
 	if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);
 }
 
@@ -59,14 +59,10 @@ TLevelWriterMp4::TLevelWriterMp4(const TFilePath &path, TPropertyGroup *winfo)
 
 TLevelWriterMp4::~TLevelWriterMp4()
 {
-	QProcess createMp4;
-	QStringList args;
+	//QProcess createMp4;
+	QStringList preIArgs;
+	QStringList postIArgs;
 
-	
-	QString tempName = "tempOut%d.png";
-	tempName = m_path.getQString() + tempName;
-	//for debugging	
-	std::string strPath = tempName.toStdString();
 	int outLx = m_lx;
 	int outLy = m_ly;
 
@@ -84,56 +80,19 @@ TLevelWriterMp4::~TLevelWriterMp4()
 	int finalBitrate = (int)tempRate;
 	int crf = 51 - (m_vidQuality * 51 / 100);
 
-	args << "-framerate";
-	args << QString::number(m_frameRate);
-	args << "-i";
-	args << tempName;
-	args << "-c:v";
-	args << "libvpx";
-	args << "-s";
-	args << QString::number(outLx) + "x" + QString::number(outLy);
-	args << "-b";
-	args << QString::number(finalBitrate) + "k";
-	args << "-speed";
-	args << "3";
-	args << "-quality";
-	args << "good";
-	//args << "-crf";
-	//args << QString::number(crf);
-	args << m_path.getQString();
+	preIArgs << "-framerate";
+	preIArgs << QString::number(m_frameRate);
 
-	std::string outPath = m_path.getQString().toStdString();
+	postIArgs << "-pix_fmt";
+	postIArgs << "yuv420p";
+	postIArgs << "-s";
+	postIArgs << QString::number(outLx) + "x" + QString::number(outLy);
+	postIArgs << "-b";
+	postIArgs << QString::number(finalBitrate) + "k";
+	postIArgs << "-y";
 
-	//get directory for ffmpeg (ffmpeg binaries also need to be in the folder)
-	QString ffmpegPath = QDir::currentPath();
-	//for debugging directory
-	
-	std::string ffmpegstrpath = ffmpegPath.toStdString();
-
-	//write the file
-	createMp4.start(ffmpegPath + "/ffmpeg", args);
-	createMp4.waitForFinished(-1);
-	QString results = createMp4.readAllStandardError();
-	results += createMp4.readAllStandardOutput();
-	createMp4.close();
-	std::string strResults = results.toStdString();
-
-	QString deletePath = m_path.getQString() + "tempOut";
-	QString deleteFile;
-	bool startedDelete = false;
-	for (int i = 0; ; i++)
-	{
-		deleteFile = deletePath + QString::number(i) + ".png";
-		TFilePath deleteCurrent(deleteFile);
-		if (TSystem::doesExistFileOrLevel(deleteCurrent)) {
-			TSystem::deleteFile(deleteCurrent);
-			startedDelete = true;
-		}
-		else {
-			if (startedDelete == true)
-				break;
-		}
-	}
+	ffmpegWriter->runFfmpeg(preIArgs, postIArgs);
+	ffmpegWriter->cleanUpFiles();
 }
 
 //-----------------------------------------------------------
@@ -150,87 +109,23 @@ TImageWriterP TLevelWriterMp4::getFrameWriter(TFrameId fid) {
 //-----------------------------------------------------------
 void TLevelWriterMp4::setFrameRate(double fps)
 {
-	m_fps = fps;
 	m_frameRate = fps;
+	ffmpegWriter->setFrameRate(fps);
 }
 
 void TLevelWriterMp4::saveSoundTrack(TSoundTrack *st)
 {
-	return;
+	ffmpegWriter->saveSoundTrack(st);
 }
 
 
 //-----------------------------------------------------------
 
 void TLevelWriterMp4::save(const TImageP &img, int frameIndex) {
-	std::string saveStatus = "";
 	TRasterImageP image(img);
 	m_lx = image->getRaster()->getLx();
 	m_ly = image->getRaster()->getLy();
-	int linesize = image->getRaster()->getRowSize();
-	int pixelSize = image->getRaster()->getPixelSize();
-	image->getRaster()->yMirror();
-	//lock raster to get data
-	image->getRaster()->lock();
-
-	uint8_t *buffin = image->getRaster()->getRawData();
-	assert(buffin);
-	
-	//TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
-	QString tempName = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".ppm";
-	QString tempPng = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".png";
-
-	
-	QByteArray ba = tempName.toLatin1();
-	const char *charPath = ba.data();
-	
-	std::string strPath = tempName.toStdString();
-
-	
-	
-	FILE* pFile = fopen(charPath, "wb");
-	if (!pFile)
-		return;
-
-	// Write pixel data
-	for (int y = 0; y<m_ly; y++)
-		fwrite(buffin + y*linesize, 1, m_lx * pixelSize, pFile);
-
-	m_frameCount++; 
-	// Close file
-	fclose(pFile);
-	image->getRaster()->unlock();
-
-	QStringList args;
-
-	args << "-s";
-	args << QString::number(m_lx) + "x" + QString::number(m_ly);
-	args << "-pix_fmt";
-	args << "rgb32";
-	args << "-vcodec";
-	args << "rawvideo";
-	args << "-i";
-	args << tempName;
-	args << "-q";
-	args << "1";
-	args << "-y";
-	args << tempPng;
-
-
-	//get directory for ffmpeg (ffmpeg binaries also need to be in the folder)
-	QString ffmpegPath = QDir::currentPath();
-	QProcess jpegConvert;
-	//write the file
-	jpegConvert.start(ffmpegPath + "/ffmpeg", args);
-	jpegConvert.waitForFinished(-1);
-	QString results = jpegConvert.readAllStandardError();
-	results += jpegConvert.readAllStandardOutput();
-	jpegConvert.close();
-	std::string strResults = results.toStdString();
-
-	TFilePath deleteCurrent(tempName);
-	if (TSystem::doesExistFileOrLevel(deleteCurrent))
-		TSystem::deleteFile(deleteCurrent);	
+	ffmpegWriter->createIntermediateImage(img, frameIndex);
 }
 
 
@@ -282,7 +177,7 @@ TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path)
 
 	QString ffmpegPath = QDir::currentPath();
 	std::string ffmpegstrpath = ffmpegPath.toStdString();
-	
+
 
 	//get fps
 	fpsArgs << "-v";
@@ -295,7 +190,7 @@ TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path)
 	fpsArgs << "default=noprint_wrappers=1:nokey=1";
 	fpsArgs << m_path.getQString();
 
-	
+
 	probe.start(ffmpegPath + "/ffprobe", fpsArgs);
 	probe.waitForFinished(-1);
 	QString fpsResults = probe.readAllStandardError();
@@ -328,8 +223,8 @@ TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path)
 	QStringList split = sizeResults.split("\r");
 	int lx = split[0].split("=")[1].toInt();
 	int ly = split[1].split("=")[1].toInt();
-	
-	
+
+
 	//get total frames
 	frameNumArgs << "-v";
 	frameNumArgs << "error";
@@ -341,7 +236,7 @@ TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path)
 	frameNumArgs << "-of";
 	frameNumArgs << "default=nokey=1:noprint_wrappers=1";
 	frameNumArgs << m_path.getQString();
-	
+
 
 	probe.start(ffmpegPath + "/ffprobe", frameNumArgs);
 	probe.waitForFinished(-1);
@@ -349,7 +244,7 @@ TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path)
 	//sizeResults += probe.readAllStandardOutput();
 	probe.close();
 	std::string framesStr = frameResults.toStdString();
-	
+
 	m_numFrames = frameResults.toInt();
 	m_size = TDimension(lx, ly);
 
@@ -397,7 +292,7 @@ TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path)
 	m_info->m_bitsPerSample = 8;
 	m_info->m_samplePerPixel = 4;
 
-	
+
 
 
 }
@@ -408,7 +303,7 @@ TLevelReaderMp4::~TLevelReaderMp4() {}
 //-----------------------------------------------------------
 
 TLevelP TLevelReaderMp4::loadInfo() {
-	
+
 	if (m_numFrames == -1) return TLevelP();
 	TLevelP level;
 	for (int i = 1; i <= m_numFrames; i++) level->setFrame(i, TImageP());
@@ -436,15 +331,15 @@ TDimension TLevelReaderMp4::getSize() {
 //------------------------------------------------
 
 TImageP TLevelReaderMp4::load(int frameIndex) {
-	
+
 	TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
 	QString number = QString("%1").arg(frameIndex, 3, 10, QChar('0'));
 	QString tempName = "In" + number + ".rgb";
 	tempName = tempPath.getQString() + tempName;
-	
+
 	//for debugging	
 	std::string strPath = tempName.toStdString();
-	
+
 	//This loads one image from the file, but it is slow.
 	//QString ffmpegPath = QDir::currentPath();
 	//std::string ffmpegstrpath = ffmpegPath.toStdString();
@@ -471,7 +366,7 @@ TImageP TLevelReaderMp4::load(int frameIndex) {
 	//ffmpeg.close();
 	//std::string framesStr = frameResults.toStdString();
 	//time for i in{ 0..39 }; do ffmpeg - accurate_seek - ss `echo $i*60.0 | bc` - i input.mp4 - frames:v 1 period_down_$i.bmp; done;
-	
+
 	QFile file(tempName);
 	file.open(QIODevice::ReadOnly);
 	QByteArray blob = file.readAll();
@@ -484,7 +379,7 @@ TImageP TLevelReaderMp4::load(int frameIndex) {
 	ret->unlock();
 	ret->yMirror();
 	return TRasterImageP(ret);
-	
+
 	//return TRasterImageP();
 }
 
@@ -494,9 +389,9 @@ TImageP TLevelReaderMp4::load(int frameIndex) {
 
 Tiio::Mp4WriterProperties::Mp4WriterProperties()
 	: m_vidQuality("Quality", 1, 100, 65), m_scale("Scale", 1, 100, 100) {
-		bind(m_vidQuality);
-		bind(m_scale);
-	
+	bind(m_vidQuality);
+	bind(m_scale);
+
 }
 
 //Tiio::Reader* Tiio::makeMp4Reader(){ return nullptr; }
