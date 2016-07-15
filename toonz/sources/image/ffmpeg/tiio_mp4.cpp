@@ -5,9 +5,9 @@
 #include "trasterimage.h"
 #include "timageinfo.h"
 #include "tsound.h"
-#include "qprocess.h"
-#include "qstringlist.h"
-#include "qdir.h"
+#include <QStringList>
+#include <QDir>
+#include <QImage>
 
 
 

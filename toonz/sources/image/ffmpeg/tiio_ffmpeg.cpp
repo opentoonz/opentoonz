@@ -8,11 +8,11 @@
 #include "tenv.h"
 #include "trasterimage.h"
 #include "timageinfo.h"
-#include "qprocess.h"
-#include "qstringlist.h"
-#include "qdir.h"
+#include <QProcess>
+#include <QStringList>
+#include <QDir>
+#include <QImage>
 #include "tiio_ffmpeg.h"
-#include "qimage.h"
 #include "toonz/preferences.h"
 
 Ffmpeg::Ffmpeg() {

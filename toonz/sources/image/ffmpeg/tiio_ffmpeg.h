@@ -5,8 +5,8 @@
 
 //#include "tproperty.h"
 #include "tlevel_io.h"
-#include "qvector.h"
-#include "qstringlist.h"
+#include <QVector>
+#include <QStringlist>
 //#include "tthreadmessage.h"
 
 class Ffmpeg {
