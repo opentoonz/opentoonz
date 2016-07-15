@@ -381,7 +381,7 @@ void RenderCommand::flashRender() {
 class RenderListener final : public DVGui::ProgressDialog,
                              public MovieRenderer::Listener {
   QString m_progressBarString;
-  int m_frameCounter;
+  int m_frameCounter, m_totalFrames;
   TRenderer *m_renderer;
   bool m_error;
 
@@ -428,13 +428,17 @@ public:
     m_progressBarString =
         QString::number(steps) + ((isPreview) ? "" : " of " + toQString(path));
     // setMinimumDuration (0);
+	m_totalFrames = steps;
     show();
   }
 
   /*-- 以下３つの関数はMovieRenderer::Listenerの純粋仮想関数の実装 --*/
   bool onFrameCompleted(int frame) override {
     bool ret = wasCanceled();
-    Message(this, ret ? -1 : ++m_frameCounter, m_progressBarString).send();
+	if (m_frameCounter + 1 < m_totalFrames)
+		Message(this, ret ? -1 : ++m_frameCounter, m_progressBarString).send();
+	else
+		setLabelText(tr("Finalizing render, please wait."));
     return !ret;
   }
   bool onFrameFailed(int frame, TException &) override {

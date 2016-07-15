@@ -1184,6 +1184,7 @@ void Preferences::setPaletteTypeOnLoadRasterImageAsColorModel(int type) {
 
 void Preferences::setFfmpegPath(std::string path) {
 	m_ffmpegPath = QString::fromStdString(path);
+	std::string strPath = m_ffmpegPath.toStdString();
 	m_settings->setValue("ffmpegPath", m_ffmpegPath);
 }
 

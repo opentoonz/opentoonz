@@ -1,16 +1,14 @@
 
 #include "tsystem.h"
-//#include "texception.h"
-#include "tfilepath.h"
-#include "tproperty.h"
 #include "tiio_webm.h"
 #include "tenv.h"
 #include "trasterimage.h"
 #include "timageinfo.h"
+#include "tsound.h"
 #include "qprocess.h"
 #include "qstringlist.h"
 #include "qdir.h"
-#include "qimage.h"
+
 
 
 //===========================================================
@@ -52,7 +50,8 @@ TLevelWriterWebm::TLevelWriterWebm(const TFilePath &path, TPropertyGroup *winfo)
 	sscanf(scale.c_str(), "%d", &m_scale);
 	std::string quality = m_properties->getProperty("Quality")->getValueAsString();
 	sscanf(quality.c_str(), "%d", &m_vidQuality);
-	m_frameCount = 0;
+	ffmpegWriter = new Ffmpeg();
+	ffmpegWriter->setPath(m_path);
 	if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);
 }
 
@@ -60,14 +59,10 @@ TLevelWriterWebm::TLevelWriterWebm(const TFilePath &path, TPropertyGroup *winfo)
 
 TLevelWriterWebm::~TLevelWriterWebm()
 {
-	QProcess createWebm;
-	QStringList args;
+	//QProcess createWebm;
+	QStringList preIArgs;
+	QStringList postIArgs;
 
-	
-	QString tempName = "tempOut%d.png";
-	tempName = m_path.getQString() + tempName;
-	//for debugging	
-	std::string strPath = tempName.toStdString();
 	int outLx = m_lx;
 	int outLy = m_ly;
 
@@ -85,56 +80,23 @@ TLevelWriterWebm::~TLevelWriterWebm()
 	int finalBitrate = (int)tempRate;
 	int crf = 51 - (m_vidQuality * 51 / 100);
 
-	args << "-framerate";
-	args << QString::number(m_frameRate);
-	args << "-i";
-	args << tempName;
-	args << "-c:v";
-	args << "libvpx";
-	args << "-s";
-	args << QString::number(outLx) + "x" + QString::number(outLy);
-	args << "-b";
-	args << QString::number(finalBitrate) + "k";
-	args << "-speed";
-	args << "3";
-	args << "-quality";
-	args << "good";
-	//args << "-crf";
-	//args << QString::number(crf);
-	args << m_path.getQString();
+	preIArgs << "-framerate";
+	preIArgs << QString::number(m_frameRate);
 
-	std::string outPath = m_path.getQString().toStdString();
+	postIArgs << "-c:v";
+	postIArgs << "libvpx";
+	postIArgs << "-s";
+	postIArgs << QString::number(outLx) + "x" + QString::number(outLy);
+	postIArgs << "-b";
+	postIArgs << QString::number(finalBitrate) + "k";
+	postIArgs << "-speed";
+	postIArgs << "3";
+	postIArgs << "-quality";
+	postIArgs << "good";
+	postIArgs << "-y";
 
-	//get directory for ffmpeg (ffmpeg binaries also need to be in the folder)
-	QString ffmpegPath = QDir::currentPath();
-	//for debugging directory
-	
-	std::string ffmpegstrpath = ffmpegPath.toStdString();
-
-	//write the file
-	createWebm.start(ffmpegPath + "/ffmpeg", args);
-	createWebm.waitForFinished(-1);
-	QString results = createWebm.readAllStandardError();
-	results += createWebm.readAllStandardOutput();
-	createWebm.close();
-	std::string strResults = results.toStdString();
-
-	QString deletePath = m_path.getQString() + "tempOut";
-	QString deleteFile;
-	bool startedDelete = false;
-	for (int i = 0; ; i++)
-	{
-		deleteFile = deletePath + QString::number(i) + ".png";
-		TFilePath deleteCurrent(deleteFile);
-		if (TSystem::doesExistFileOrLevel(deleteCurrent)) {
-			TSystem::deleteFile(deleteCurrent);
-			startedDelete = true;
-		}
-		else {
-			if (startedDelete == true)
-				break;
-		}
-	}
+	ffmpegWriter->runFfmpeg(preIArgs, postIArgs);
+	ffmpegWriter->cleanUpFiles();
 }
 
 //-----------------------------------------------------------
@@ -151,101 +113,23 @@ TImageWriterP TLevelWriterWebm::getFrameWriter(TFrameId fid) {
 //-----------------------------------------------------------
 void TLevelWriterWebm::setFrameRate(double fps)
 {
-	m_fps = fps;
 	m_frameRate = fps;
+	ffmpegWriter->setFrameRate(fps);
 }
 
 void TLevelWriterWebm::saveSoundTrack(TSoundTrack *st)
 {
-	return;
+	ffmpegWriter->saveSoundTrack(st);
 }
 
 
 //-----------------------------------------------------------
 
 void TLevelWriterWebm::save(const TImageP &img, int frameIndex) {
-	QString tempName = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".ppm";
-	QString tempPng = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".png";
-	QString tempWebp = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".webp";
-	std::string saveStatus = "";
 	TRasterImageP image(img);
 	m_lx = image->getRaster()->getLx();
 	m_ly = image->getRaster()->getLy();
-	m_bpp = image->getRaster()->getPixelSize();
-	int totalBytes = m_lx * m_ly * m_bpp;
-	//int linesize = image->getRaster()->getRowSize();
-	//int pixelSize = image->getRaster()->getPixelSize();
-	image->getRaster()->yMirror();
-	//lock raster to get data
-	image->getRaster()->lock();
-	void *buffin = image->getRaster()->getRawData();
-	assert(buffin);
-	void *buffer = malloc(totalBytes);
-	memcpy(buffer, buffin, totalBytes);
-	
-	image->getRaster()->unlock();
-	
-	//TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
-	
-	QImage* qi= new QImage((uint8_t*)buffer, m_lx, m_ly, QImage::Format_ARGB32);
-	qi->save(tempPng, "PNG", -1);
-	free(buffer);
-	delete qi;
-	QByteArray ba = tempName.toLatin1();
-	const char *charPath = ba.data();
-	
-	std::string strPath = tempName.toStdString();
-
-	
-	
-	//FILE* pFile = fopen(charPath, "wb");
-	//if (!pFile)
-	//	return;
-
-	//// Write pixel data
-	//for (int y = 0; y<m_ly; y++)
-	//	fwrite(m_buffer + y*linesize, 1, m_lx * pixelSize, pFile);
-
-	//
-	//// Close file
-	//fclose(pFile);
-
-	
-	
-	m_frameCount++;
-
-	//image->getRaster()->unlock();
-
-	//QStringList args;
-
-	//args << "-s";
-	//args << QString::number(m_lx) + "x" + QString::number(m_ly);
-	//args << "-pix_fmt";
-	//args << "rgb32";
-	//args << "-vcodec";
-	//args << "rawvideo";
-	//args << "-i";
-	//args << tempName;
-	//args << "-q";
-	//args << "1";
-	//args << "-y";
-	//args << tempPng;
-
-
-	////get directory for ffmpeg (ffmpeg binaries also need to be in the folder)
-	//QString ffmpegPath = QDir::currentPath();
-	//QProcess jpegConvert;
-	////write the file
-	//jpegConvert.start(ffmpegPath + "/ffmpeg", args);
-	//jpegConvert.waitForFinished(-1);
-	//QString results = jpegConvert.readAllStandardError();
-	//results += jpegConvert.readAllStandardOutput();
-	//jpegConvert.close();
-	//std::string strResults = results.toStdString();
-
-	//TFilePath deleteCurrent(tempName);
-	//if (TSystem::doesExistFileOrLevel(deleteCurrent))
-	//	TSystem::deleteFile(deleteCurrent);	
+	ffmpegWriter->createIntermediateImage(img, frameIndex);
 }
 
 
