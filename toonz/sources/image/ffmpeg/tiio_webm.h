@@ -3,8 +3,8 @@
 #ifndef TTIO_WEBM_INCLUDED
 #define TTIO_WEBM_INCLUDED
 
-//#include "tproperty.h"
-//#include "tlevel_io.h"
+#include "tproperty.h"
+#include "tlevel_io.h"
 #include "tiio_ffmpeg.h"
 
 //===========================================================
@@ -34,7 +34,7 @@ private:
 	int m_lx, m_ly;
 	int m_scale;
 	int m_vidQuality;
-	void *m_buffer;
+	//void *m_buffer;
 };
 
 //===========================================================

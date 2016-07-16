@@ -5,6 +5,7 @@
 
 #include "tproperty.h"
 #include "tlevel_io.h"
+#include "tiio_ffmpeg.h"
 //#include "tthreadmessage.h"
 
 //===========================================================
@@ -31,8 +32,9 @@ public:
 	}
 
 private:
+	Ffmpeg *ffmpegWriter;
 	int m_frameCount, m_lx, m_ly;
-	double m_fps;
+	//double m_fps;
 	int m_scale;
 	bool m_looping=false;
 	bool m_palette=false;

@@ -1,14 +1,9 @@
 
 #include "tsystem.h"
 #include "tiio_mp4.h"
-#include "tenv.h"
 #include "trasterimage.h"
-#include "timageinfo.h"
 #include "tsound.h"
 #include <QStringList>
-#include <QDir>
-//#include <QProcess>
-
 
 
 //===========================================================
@@ -89,9 +84,8 @@ TLevelWriterMp4::~TLevelWriterMp4()
 	postIArgs << QString::number(outLx) + "x" + QString::number(outLy);
 	postIArgs << "-b";
 	postIArgs << QString::number(finalBitrate) + "k";
-	postIArgs << "-y";
 
-	ffmpegWriter->runFfmpeg(preIArgs, postIArgs);
+	ffmpegWriter->runFfmpeg(preIArgs, postIArgs, false, false, true);
 	ffmpegWriter->cleanUpFiles();
 }
 

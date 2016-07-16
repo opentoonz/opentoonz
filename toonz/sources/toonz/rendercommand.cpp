@@ -495,7 +495,7 @@ void RenderCommand::rasterRender(bool isPreview) {
 
   TPixel32 currBgColor = scene->getProperties()->getBgColor();
   m_priorBgColor       = currBgColor;
-  if (ext == "jpg" || ext == "avi" || ext == "bmp" || ext == "mp4" || ext == "webm") {
+  if (ext == "jpg" || ext == "avi" || ext == "bmp" || ext == "mp4" || ext == "webm" || ext == "gif") {
     currBgColor.m = 255;
     scene->getProperties()->setBgColor(currBgColor);
   }

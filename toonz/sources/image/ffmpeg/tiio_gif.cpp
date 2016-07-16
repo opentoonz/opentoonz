@@ -1,14 +1,7 @@
 
 #include "tsystem.h"
-//#include "texception.h"
-#include "tfilepath.h"
-#include "tproperty.h"
 #include "tiio_gif.h"
-#include "tenv.h"
 #include "trasterimage.h"
-#include "timageinfo.h"
-#include <QProcess>
-#include <QDir>
 #include <QStringList>
 
 
@@ -53,7 +46,9 @@ TLevelWriterGif::TLevelWriterGif(const TFilePath &path, TPropertyGroup *winfo)
 	m_looping = looping->getValue();
 	TBoolProperty* palette = (TBoolProperty *)m_properties->getProperty("Generate Palette");
 	m_palette = palette->getValue();
-	m_frameCount = 0;
+	ffmpegWriter = new Ffmpeg();
+	ffmpegWriter->setPath(m_path);
+	//m_frameCount = 0;
 	if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);
 }
 
@@ -61,22 +56,11 @@ TLevelWriterGif::TLevelWriterGif(const TFilePath &path, TPropertyGroup *winfo)
 
 TLevelWriterGif::~TLevelWriterGif()
 {
-	QProcess createGif;
-	QStringList args;
-	QStringList paletteArgs;
+	QStringList preIArgs;
+	QStringList postIArgs;
+	QStringList palettePreIArgs;
+	QStringList palettePostIArgs;
 
-	//get directory for ffmpeg (ffmpeg binaries also need to be in the folder)
-	QString ffmpegPath = QDir::currentPath();
-	
-	//for debugging directory
-	std::string ffmpegstrpath = ffmpegPath.toStdString();
-
-	
-	QString tempName = "tempOut%d.jpg";
-	tempName = m_path.getQString() + tempName;
-	//for debugging	
-	std::string strPath = tempName.toStdString();
-	
 	int outLx = m_lx;
 	int outLy = m_ly;
 
@@ -90,75 +74,38 @@ TLevelWriterGif::~TLevelWriterGif()
 	if (m_palette)
 	{
 		palette = m_path.getQString() + "palette.png";
-		paletteArgs << "-v";
-		paletteArgs << "warning";
-		paletteArgs << "-i";
-		paletteArgs << tempName;
-		paletteArgs << "-vf";
-		paletteArgs << filters + ",palettegen";
-		paletteArgs << "-y";
-		paletteArgs << palette;
+		palettePreIArgs << "-v";
+		palettePreIArgs << "warning";
+	
+		palettePostIArgs << "-vf";
+		palettePostIArgs << filters + ",palettegen";
+		palettePostIArgs << palette;
 
 
 		//write the palette
-	
-		createGif.start(ffmpegPath + "/ffmpeg", paletteArgs);
-		createGif.waitForFinished(-1);
-		QString paletteResults = createGif.readAllStandardError();
-		paletteResults += createGif.readAllStandardOutput();
-		createGif.close();
-		std::string strPaletteResults = paletteResults.toStdString();
+		ffmpegWriter->runFfmpeg(palettePreIArgs, palettePostIArgs, false, true, true);
+		ffmpegWriter->addToCleanUp(palette);
 	}
 
-	//ffmpeg - v warning - i $1 - i $palette - lavfi "$filters [x]; [x][1:v] paletteuse" - y $2
-	args << "-v";
-	args << "warning";
-	args << "-i";
-	args << tempName;
+	preIArgs << "-v";
+	preIArgs << "warning";
+	
 	if (m_palette) {
-		args << "-i";
-		args << palette;
-		args << "-lavfi";
-		args << filters + " [x]; [x][1:v] paletteuse";
+		postIArgs << "-i";
+		postIArgs << palette;
+		postIArgs << "-lavfi";
+		postIArgs << filters + " [x]; [x][1:v] paletteuse";
 	}
-	if (!m_looping)
-	{
-		args << "-loop";
-		args << "-1";
+	
+	if (!m_looping)	{
+		postIArgs << "-loop";
+		postIArgs << "-1";
 	}
-	args << "-y";
-	args << m_path.getQString();
 
 	std::string outPath = m_path.getQString().toStdString();
 
-	
-
-	//write the file
-	createGif.start(ffmpegPath + "/ffmpeg", args);
-	createGif.waitForFinished(-1);
-	QString results = createGif.readAllStandardError();
-	results += createGif.readAllStandardOutput();
-	createGif.close();
-	std::string strResults = results.toStdString();
-
-	QString deletePath = m_path.getQString() + "tempOut";
-	QString deleteFile;
-	bool startedDelete = false;
-	for (int i = 0; ; i++)
-	{
-		deleteFile = deletePath + QString::number(i) + ".jpg";
-		TFilePath deleteCurrent(deleteFile);
-		if (TSystem::doesExistFileOrLevel(deleteCurrent)) {
-			TSystem::deleteFile(deleteCurrent);
-			startedDelete = true;
-		}
-		else {
-			if (startedDelete == true)
-				break;
-		}
-	}
-	if (m_palette && TSystem::doesExistFileOrLevel(TFilePath(palette)))
-		TSystem::deleteFile(TFilePath(palette));
+	ffmpegWriter->runFfmpeg(preIArgs, postIArgs, false, false, true);
+	ffmpegWriter->cleanUpFiles();
 }
 
 //-----------------------------------------------------------
@@ -175,8 +122,9 @@ TImageWriterP TLevelWriterGif::getFrameWriter(TFrameId fid) {
 //-----------------------------------------------------------
 void TLevelWriterGif::setFrameRate(double fps)
 {
-	m_fps = fps;
+	//m_fps = fps;
 	m_frameRate = fps;
+	ffmpegWriter->setFrameRate(fps);
 }
 
 void TLevelWriterGif::saveSoundTrack(TSoundTrack *st)
@@ -188,76 +136,10 @@ void TLevelWriterGif::saveSoundTrack(TSoundTrack *st)
 //-----------------------------------------------------------
 
 void TLevelWriterGif::save(const TImageP &img, int frameIndex) {
-	std::string saveStatus = "";
 	TRasterImageP image(img);
 	m_lx = image->getRaster()->getLx();
 	m_ly = image->getRaster()->getLy();
-	int linesize = image->getRaster()->getRowSize();
-	int pixelSize = image->getRaster()->getPixelSize();
-	image->getRaster()->yMirror();
-	//lock raster to get data
-	image->getRaster()->lock();
-
-	uint8_t *buffin = image->getRaster()->getRawData();
-	assert(buffin);
-	
-	//TFilePath tempPath(TEnv::getStuffDir() + "projects/temp/");
-	QString tempName = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".ppm";
-	QString tempJpg = m_path.getQString() + "tempOut" + QString::number(frameIndex) + ".jpg";
-
-	
-	QByteArray ba = tempName.toLatin1();
-	const char *charPath = ba.data();
-	
-	std::string strPath = tempName.toStdString();
-
-	
-	
-	FILE* pFile = fopen(charPath, "wb");
-	if (!pFile)
-		return;
-
-	// Write pixel data
-	for (int y = 0; y<m_ly; y++)
-		fwrite(buffin + y*linesize, 1, m_lx * pixelSize, pFile);
-
-	m_frameCount++; 
-	// Close file
-	fclose(pFile);
-	image->getRaster()->unlock();
-
-	QStringList args;
-
-	args << "-s";
-	args << QString::number(m_lx) + "x" + QString::number(m_ly);
-	args << "-pix_fmt";
-	args << "rgb32";
-	args << "-vcodec";
-	args << "rawvideo";
-	args << "-i";
-	args << tempName;
-	args << "-q";
-	args << "1";
-	args << "-y";
-	args << tempJpg;
-
-
-	//get directory for ffmpeg (ffmpeg binaries also need to be in the folder)
-	QString ffmpegPath = QDir::currentPath();
-	QProcess jpegConvert;
-	//write the file
-	jpegConvert.start(ffmpegPath + "/ffmpeg", args);
-	jpegConvert.waitForFinished(-1);
-	QString results = jpegConvert.readAllStandardError();
-	results += jpegConvert.readAllStandardOutput();
-	jpegConvert.close();
-	std::string strResults = results.toStdString();
-
-	TFilePath deleteCurrent(tempName);
-	if (TSystem::doesExistFileOrLevel(deleteCurrent)) 
-		TSystem::deleteFile(deleteCurrent);
-
-	
+	ffmpegWriter->createIntermediateImage(img, frameIndex);
 }
 
 

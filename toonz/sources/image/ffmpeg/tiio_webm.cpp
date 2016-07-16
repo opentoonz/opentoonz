@@ -1,15 +1,9 @@
 
-#include "tsystem.h"
 #include "tiio_webm.h"
-#include "tenv.h"
+#include "tsystem.h"
 #include "trasterimage.h"
-#include "timageinfo.h"
 #include "tsound.h"
 #include <QStringList>
-//#include <QDir>
-//#include <QImage>
-
-
 
 //===========================================================
 //
@@ -94,9 +88,8 @@ TLevelWriterWebm::~TLevelWriterWebm()
 	postIArgs << "3";
 	postIArgs << "-quality";
 	postIArgs << "good";
-	postIArgs << "-y";
 
-	ffmpegWriter->runFfmpeg(preIArgs, postIArgs);
+	ffmpegWriter->runFfmpeg(preIArgs, postIArgs, false, false, true);
 	ffmpegWriter->cleanUpFiles();
 }
 

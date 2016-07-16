@@ -1,18 +1,10 @@
-
-#include "tsystem.h"
-//#include "texception.h"
-#include "tfilepath.h"
-#include "tproperty.h"
-#include "tsound.h"
-//#include "tiio_webm.h"
-#include "tenv.h"
-#include "trasterimage.h"
-#include "timageinfo.h"
-#include <QProcess>
-#include <QStringList>
-#include <QDir>
-#include <QImage>
 #include "tiio_ffmpeg.h"
+#include "tsystem.h"
+#include "tsound.h"
+#include "trasterimage.h"
+#include <QProcess>
+#include <QDir>
+#include <QtGui/QImage>
 #include "toonz/preferences.h"
 
 Ffmpeg::Ffmpeg() {
@@ -108,22 +100,29 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
 	qi->save(tempPath, format, -1);
 	free(buffer);
 	delete qi;
-
+	m_cleanUpList.push_back(tempPath);
 	m_frameCount++;
 }
 
-void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs) {
+void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs, bool includesInPath, bool includesOutPath, bool overWriteFiles) {
 	QString tempName = "tempOut%d." + m_intermediateFormat;
 	tempName = m_path.getQString() + tempName;
 
 	QStringList args;
 	args = args + preIArgs;
-	args << "-i";
-	args << tempName;
+	if (!includesInPath) {  //NOTE:  if including the in path, it needs to be in the preIArgs argument.
+		args << "-i";
+		args << tempName;
+	}
 	if (m_hasSoundTrack)
 		args = args + m_audioArgs;
 	args = args + postIArgs;
-	args << m_path.getQString();
+	if (overWriteFiles && !includesOutPath) { //if includesOutPath is true, you need to include the overwrite in your postIArgs.
+		args << "-y";
+	}
+	if (!includesOutPath) {
+		args << m_path.getQString();
+	}
 
 	//write the file
 	QProcess ffmpeg;
@@ -178,23 +177,20 @@ void Ffmpeg::saveSoundTrack(TSoundTrack *st)
 	m_audioArgs << "-i";
 	m_audioArgs << m_audioPath;
 
+	//add file to framesWritten for cleanup
+	m_cleanUpList.push_back(m_audioPath);
+}
+
+void Ffmpeg::addToCleanUp(QString path) {
+	if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
+		m_cleanUpList.push_back(path);
+	}
 }
 
 void Ffmpeg::cleanUpFiles() {
-	QString deletePath = m_path.getQString() + "tempOut";
-	QString deleteFile;
-	bool startedDelete = false;
-	for (int i = 0;; i++)
-	{
-		deleteFile = deletePath + QString::number(i) + "." + m_intermediateFormat;
-		TFilePath deleteCurrent(deleteFile);
-		if (TSystem::doesExistFileOrLevel(deleteCurrent)) {
-			TSystem::deleteFile(deleteCurrent);
-			startedDelete = true;
-		}
-		else {
-			if (startedDelete == true)
-				break;
+	for (QString path : m_cleanUpList) {
+		if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
+			TSystem::deleteFile(TFilePath(path));
 		}
 	}
 }
