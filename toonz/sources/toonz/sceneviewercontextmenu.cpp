@@ -25,6 +25,7 @@
 #include "toonz/tframehandle.h"
 #include "toonz/tobjecthandle.h"
 #include "toonz/tstageobjecttree.h"
+#include "toonz/tscenehandle.h"
 #include "toonz/txshcolumn.h"
 #include "toonz/tstageobjectspline.h"
 #include "toonz/tstageobjectid.h"
@@ -38,8 +39,8 @@
 #include <QContextMenuEvent>
 #include <QSignalMapper>
 
-void addShowHideStageObjectCmd(QMenu *menu, const TStageObjectId &id,
-                               bool isShow) {
+static void addShowHideStageObjectCmd(QMenu *menu, const TStageObjectId &id,
+                                      bool isShow) {
   TXsheet *xsh         = TApp::instance()->getCurrentXsheet()->getXsheet();
   TStageObject *pegbar = xsh->getStageObject(id);
   QString cmdStr;
@@ -54,7 +55,7 @@ void addShowHideStageObjectCmd(QMenu *menu, const TStageObjectId &id,
   menu->addAction(showHideAction);
 }
 
-void onShowHideSelectObject(QAction *action) {
+static void onShowHideSelectObject(QAction *action) {
   TApp *app = TApp::instance();
   TStageObjectId id;
   id.setCode(action->data().toInt());
@@ -79,7 +80,7 @@ void onShowHideSelectObject(QAction *action) {
   }
 }
 
-int addShowHideStageObjectCmds(const std::vector<int> &columnIndexes,
+static int addShowHideStageObjectCmds(const std::vector<int> &columnIndexes,
                                QMenu *menu, bool isShow) {
   int ii, columnIndex = -1;
   bool flag = true;
@@ -176,6 +177,10 @@ SceneViewerContextMenu::SceneViewerContextMenu(SceneViewer *parent)
       !parent->isPreviewEnabled())
     OnioniSkinMaskGUI::addOnionSkinCommand(this);
 
+  // Zero Thick
+	if (!parent->isPreviewEnabled())
+		ZeroThickToggleGui::addZeroThickCommand(this);
+
   // preview
   if (parent->isPreviewEnabled()) {
     addSeparator();
@@ -233,7 +238,7 @@ void SceneViewerContextMenu::addEnterGroupCommands(const TPointD &pos) {
   assert(ret);
 }
 
-QString getName(TStageObject *obj) {
+static QString getName(TStageObject *obj) {
   return QString::fromStdString(obj->getFullName());
 }
 
@@ -243,7 +248,7 @@ void SceneViewerContextMenu::addShowHideCommand(QMenu *menu,
   TXsheet *xsh  = TApp::instance()->getCurrentXsheet()->getXsheet();
   TStageObject *stageObject =
       xsh->getStageObject(TStageObjectId::ColumnId(column->getIndex()));
-  QString text    = (isHidden ? "Show " : "Hide ") + getName(stageObject);
+  QString text    = (isHidden ? tr("Show ") : tr("Hide ")) + getName(stageObject);
   QAction *action = new QAction(text, this);
   action->setData(column->getIndex());
   connect(action, SIGNAL(triggered()), this, SLOT(onShowHide()));
@@ -256,7 +261,7 @@ void SceneViewerContextMenu::addSelectCommand(QMenu *menu,
   TStageObject *stageObject = xsh->getStageObject(id);
   if (!stageObject) return;
   QString text           = getName(stageObject);
-  if (menu == this) text = "Select " + text;
+  if (menu == this) text = tr("Select ") + text;
   QAction *action        = new QAction(text, this);
   action->setData(id.getCode());
   connect(action, SIGNAL(triggered()), this, SLOT(onSetCurrent()));
@@ -282,7 +287,7 @@ void SceneViewerContextMenu::addLevelCommands(std::vector<int> &indices) {
   if (!columns.empty()) {
     // show/hide
     if (columns.size() > 1) {
-      QMenu *subMenu = addMenu("Show / Hide");
+      QMenu *subMenu = addMenu(tr("Show / Hide"));
       for (int i = 0; i < (int)columns.size(); i++)
         addShowHideCommand(subMenu, columns[i]);
     } else
@@ -386,4 +391,46 @@ void SceneViewerContextMenu::savePreviewedFrames() {
   Previewer::instance(m_viewer->getPreviewMode() ==
                       SceneViewer::SUBCAMERA_PREVIEW)
       ->saveRenderedFrames();
+}
+
+
+
+class ZeroThickToggle : public MenuItemHandler {
+public:
+	ZeroThickToggle() : MenuItemHandler(MI_ZeroThick) {}
+	void execute() {
+		QAction *action = CommandManager::instance()->getAction(MI_ZeroThick);
+		if (!action)
+			return;
+		bool checked = action->isChecked();
+		enableZeroThick(checked);
+	}
+
+	static void enableZeroThick(bool enable = true)	{
+		Preferences::instance()->setShow0ThickLines(enable);
+		TApp::instance()->getCurrentScene()->notifySceneChanged();
+	}
+} ZeroThickToggle;
+
+
+void ZeroThickToggleGui::addZeroThickCommand(QMenu *menu) {
+	static ZeroThickToggleHandler switcher;
+	if (Preferences::instance()->getShow0ThickLines()) {
+		QAction *hideZeroThick = menu->addAction(QString(QObject::tr("Hide Zero Thickness Lines")));
+		menu->connect(hideZeroThick, SIGNAL(triggered()),
+			&switcher, SLOT(deactivate()));
+	}
+	else {
+		QAction *showZeroThick = menu->addAction(QString(QObject::tr("Show Zero Thickness Lines")));
+		menu->connect(showZeroThick, SIGNAL(triggered()),
+			&switcher, SLOT(activate()));
+	}
+}
+
+void ZeroThickToggleGui::ZeroThickToggleHandler::activate() {
+	ZeroThickToggle::enableZeroThick(true);
+}
+
+void ZeroThickToggleGui::ZeroThickToggleHandler::deactivate() {
+	ZeroThickToggle::enableZeroThick(false);
 }

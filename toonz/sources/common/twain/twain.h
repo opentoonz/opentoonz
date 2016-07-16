@@ -1434,14 +1434,10 @@ typedef struct {
  */
 #define DF_DSM2 0x10000000L /* added to the identity by the DSM  */
 #define DF_APP2                                                                \
-  0x20000000L /* Set by the App to indicate it would \ \ \ \                                                                             \
-                                             prefer to use DSM2 */
+  0x20000000L /* Set by the App to indicate it would  prefer to use DSM2 */
 #define DF_DS2                                                                 \
-  0x40000000L /* Set by the DS to indicate it would \                \ \ \                                                                             \
-                                             prefer to use DSM2 */
-#define DG_MASK                                                                \
-  0xFFFFL /* all Data Groups limited to 16 bit.  Added for 2.1   \ \ \                                                                             \
-             */
+  0x40000000L /* Set by the DS to indicate it would prefer to use DSM2 */
+#define DG_MASK 0xFFFFL /* all Data Groups limited to 16 bit. Added for 2.1 */
 
 /****************************************************************************
  *                                                        *
@@ -1488,19 +1484,16 @@ typedef struct {
 
 /* misplaced */
 #define DAT_ICCPROFILE                                                         \
-  0x0401 /* TW_MEMORY        Added 1.91  This Data Argument is misplaced but \ \
-            \                                                                  \
-            \ \                                                                             \
+  0x0401 /* TW_MEMORY   Added 1.91   This Data Argument is misplaced but \ \                                                                             \
             belongs to the DG_IMAGE Data Group */
 #define DAT_IMAGEMEMFILEXFER                                                   \
-  0x0402 /* TW_IMAGEMEMXFER  Added 1.91  This Data Argument is misplaced but \ \
+  0x0402 /* TW_IMAGEMEMXFER   Added 1.91  This Data Argument is misplaced but  \
             \                                                                  \
             \ \                                                                             \
             belongs to the DG_IMAGE Data Group */
 #define DAT_ENTRYPOINT                                                         \
   0x0403 /* TW_ENTRYPOINT    Added 2.0   This Data Argument is misplaced but \ \
             \                                                                  \
-            \ \                                                                             \
             belongs to the DG_CONTROL Data Group */
 
 /****************************************************************************
@@ -1845,54 +1838,60 @@ typedef struct {
 #define TWRC_INFONOTSUPPORTED 8
 #define TWRC_DATANOTAVAILABLE 9
 
-/* Condition Codes: Application gets these by doing DG_CONTROL DAT_STATUS
- * MSG_GET.  */
+// Condition Codes: Application gets these
+// by doing DG_CONTROL DAT_STATUS MSG_GET.
 #define TWCC_CUSTOMBASE 0x8000
 
-#define TWCC_SUCCESS 0   /* It worked!                                */
-#define TWCC_BUMMER 1    /* Failure due to unknown causes             */
-#define TWCC_LOWMEMORY 2 /* Not enough memory to perform operation    */
-#define TWCC_NODS 3      /* No Data Source                            */
-#define TWCC_MAXCONNECTIONS                                                    \
-  4 /* DS is connected to max possible applications      */
-#define TWCC_OPERATIONERROR                                                    \
-  5                   /* DS or DSM reported error, application shouldn't   */
-#define TWCC_BADCAP 6 /* Unknown capability                        */
-#define TWCC_BADPROTOCOL 9 /* Unrecognized MSG DG DAT combination       */
-#define TWCC_BADVALUE 10   /* Data parameter out of range              */
-#define TWCC_SEQERROR 11   /* DG DAT MSG out of expected sequence      */
-#define TWCC_BADDEST                                                           \
-  12 /* Unknown destination Application/Source in DSM_Entry */
-#define TWCC_CAPUNSUPPORTED                                                    \
-  13 /* Capability not supported by source            */
-#define TWCC_CAPBADOPERATION                                                   \
-  14 /* Operation not supported by capability         */
-#define TWCC_CAPSEQERROR                                                       \
-  15 /* Capability has dependancy on other capability   \ \ \                                                                             \
-        */
-#define TWCC_DENIED                                                            \
-  16 /* File System operation is denied (file is protected) Added 1.8 */
-#define TWCC_FILEEXISTS                                                        \
-  17 /* Operation failed because file already exists.       Added 1.8 */
-#define TWCC_FILENOTFOUND                                                      \
-  18 /* File not found                                      Added 1.8 */
-#define TWCC_NOTEMPTY                                                          \
-  19 /* Operation failed because directory is not empty     Added 1.8 */
-#define TWCC_PAPERJAM                                                          \
-  20 /* The feeder is jammed                                Added 1.8 */
-#define TWCC_PAPERDOUBLEFEED                                                   \
-  21 /* The feeder detected multiple pages                  Added 1.8 */
-#define TWCC_FILEWRITEERROR                                                    \
-  22 /* Error writing the file (meant for things like disk full \ \ \                                                                             \
-        conditions)Added 1.8 */
-#define TWCC_CHECKDEVICEONLINE                                                 \
-  23 /* The device went offline prior to or during this operation Added 1.8 */
-#define TWCC_INTERLOCK 24     /* Added 2.0 */
-#define TWCC_DAMAGEDCORNER 25 /* Added 2.0 */
-#define TWCC_FOCUSERROR 26    /* Added 2.0 */
-#define TWCC_DOCTOOLIGHT 27   /* Added 2.0 */
-#define TWCC_DOCTOODARK 28    /* Added 2.0 */
-#define TWCC_NOMEDIA 29       /* Added 2.1 */
+// It worked!
+#define TWCC_SUCCESS 0
+// Failure due to unknown causes
+#define TWCC_BUMMER 1
+// Not enough memory to perform operation
+#define TWCC_LOWMEMORY 2
+// No Data Source
+#define TWCC_NODS 3
+// DS is connected to max possible applications
+#define TWCC_MAXCONNECTIONS 4
+// DS or DSM reported error, application shouldn't
+#define TWCC_OPERATIONERROR 5
+// Unknown capability
+#define TWCC_BADCAP 6
+// Unrecognized MSG DG DAT combination
+#define TWCC_BADPROTOCOL 9
+// Data parameter out of range
+#define TWCC_BADVALUE 10
+// DG DAT MSG out of expected sequence
+#define TWCC_SEQERROR 11
+// Unknown destination Application/Source in DSM_Entry
+#define TWCC_BADDEST 12
+// Capability not supported by source
+#define TWCC_CAPUNSUPPORTED 13
+// Operation not supported by capability
+#define TWCC_CAPBADOPERATION 14
+// Capability has dependancy on other capability
+#define TWCC_CAPSEQERROR 15
+// File System operation is denied (file is protected)
+#define TWCC_DENIED 16 /* Added 1.8 */
+// Operation failed because file already exists.
+#define TWCC_FILEEXISTS 17 /* Added 1.8 */
+// File not found
+#define TWCC_FILENOTFOUND 18 /* Added 1.8 */
+// Operation failed because directory is not empty
+#define TWCC_NOTEMPTY 19 /* Added 1.8 */
+// The feeder is jammed
+#define TWCC_PAPERJAM 20 /* Added 1.8 */
+// The feeder detected multiple pages
+#define TWCC_PAPERDOUBLEFEED 21 /* Added 1.8 */
+// Error writing the file (meant for things like disk full conditions)
+#define TWCC_FILEWRITEERROR 22 /*  Added 1.8 */
+// The device went offline prior to or during this operation
+#define TWCC_CHECKDEVICEONLINE 23 /* Added 1.8 */
+#define TWCC_INTERLOCK 24         /* Added 2.0 */
+#define TWCC_DAMAGEDCORNER 25     /* Added 2.0 */
+#define TWCC_FOCUSERROR 26        /* Added 2.0 */
+#define TWCC_DOCTOOLIGHT 27       /* Added 2.0 */
+#define TWCC_DOCTOODARK 28        /* Added 2.0 */
+#define TWCC_NOMEDIA 29           /* Added 2.1 */
 
 /* bit patterns: for query the operation that are supported by the data source
  * on a capability */
@@ -1929,28 +1928,26 @@ typedef wchar_t TW_UNI512[512], FAR *pTW_UNI512;
 
 #define TWFF_JPN 12 /* 1.91 */
 
-#define DAT_TWUNKIDENTITY                                                      \
-  0x000b /* Additional message required for thunker to request the special \ \ \
-            \                                                                  \
-            identity information. */
-#define DAT_SETUPFILEXFER2                                                     \
-  0x0301 /* Data transfer via a file. deprecated - use DAT_SETUPFILEXFER \ \ \                                                                             \
-            instead*/
+// Additional message required for thunker to request the special identity
+// information.
+#define DAT_TWUNKIDENTITY 0x000b
+// Data transfer via a file. deprecated - use DAT_SETUPFILEXFER instead
+#define DAT_SETUPFILEXFER2 0x0301
 
 #define CAP_SUPPORTEDCAPSEXT 0x100c
 #define CAP_FILESYSTEM                 // 0x????
 #define CAP_PAGEMULTIPLEACQUIRE 0x1023 /* Added 1.8 */
 #define CAP_PAPERBINDING 0x102f        /* Added 1.8 */
 #define CAP_PASSTHRU 0x1031            /* Added 1.8 */
-#define CAP_POWERDOWNTIME                                                      \
-  0x1034 /* Added 1.8 */            // 0x1034 is reused by CAP_CAMERASIDE
+// 0x1034 is reused by CAP_CAMERASIDE
+#define CAP_POWERDOWNTIME 0x1034    /* Added 1.8 */
 #define ACAP_AUDIOFILEFORMAT 0x1201 /* Added 1.8 */
 
-#define MSG_CHECKSTATUS                                                        \
-  0x0201 /* Get status information - use MSG_GET instead */
+// Get status information - use MSG_GET instead
+#define MSG_CHECKSTATUS 0x0201
 
-#define MSG_INVOKE_CALLBACK                                                    \
-  0x0903 /* Mac Only, deprecated - use DAT_NULL and MSG_xxx instead */
+// Mac Only, deprecated - use DAT_NULL and MSG_xxx instead
+#define MSG_INVOKE_CALLBACK 0x0903
 
 #define TWSX_FILE2 3
 

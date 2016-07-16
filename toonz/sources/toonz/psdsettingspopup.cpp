@@ -39,7 +39,7 @@ QStringList modesDescription =
 // Costruisce la stringa delle info della psd da caricare che comparirà nel
 // popup:
 // Path, Dimensioni, numero di livelli, ecc..
-void doPSDInfo(TFilePath psdpath, QTreeWidget *psdTree) {
+static void doPSDInfo(TFilePath psdpath, QTreeWidget *psdTree) {
   psdTree->clear();
   try {
     TPSDReader *psdreader = new TPSDReader(psdpath);
@@ -127,9 +127,9 @@ PsdSettingsPopup::PsdSettingsPopup()
   m_parentDir = new QLabel(tr(""));
   m_parentDir->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
   m_parentDir->setFixedHeight(WidgetHeight);
-  QLabel *nmLbl     = new QLabel(tr("Name:"));
+  QLabel *nmLbl = new QLabel(tr("Name:"));
   nmLbl->setObjectName("TitleTxtLabel");
-  QLabel *ptLbl     = new QLabel(tr("Path:"));
+  QLabel *ptLbl = new QLabel(tr("Path:"));
   ptLbl->setObjectName("TitleTxtLabel");
   QGridLayout *grid = new QGridLayout();
   grid->setColumnMinimumWidth(0, 65);

@@ -1797,7 +1797,7 @@ void TStroke::reduceControlPoints(double error, vector<int> corners) {
   }
   controlPoints.push_back(m_imp->m_centerLineArray.back()->getThickP2());
 
-#if _DEBUG
+#ifdef _DEBUG
   cpSize = controlPoints.size();
   for (cp = 1; cp < cpSize; cp++)
     assert(!(controlPoints[cp - 1] == controlPoints[cp]));
@@ -2341,7 +2341,7 @@ void TStroke::draw(const TVectorRenderData &rd) const
 //-----------------------------------------------------------------------------
 
 TStrokeProp *TStroke::getProp() const {
-#if DISEGNO_OUTLINE == 0
+#if !defined(DISEGNO_OUTLINE)
   if (!m_imp->m_styleId) return 0;
 #endif
 
@@ -3559,7 +3559,7 @@ void TCubicStroke::fitCubic3D(const T3DPointD pointsArrayBegin[], int size,
 
   // if (maxError<error)
   {
-    double *uPrime = 0;
+    double *uPrime = NULL;
     for (int i = 0; i < maxIterations; i++) {
       // delete uPrime;
       uPrime = reparameterize3D(*cubic, pointsArrayBegin, size, u);
@@ -3571,7 +3571,7 @@ void TCubicStroke::fitCubic3D(const T3DPointD pointsArrayBegin[], int size,
       maxError =
           computeMaxError3D(*cubic, pointsArrayBegin, size, uPrime, splitPoint);
       if (maxError < error) {
-        delete uPrime;
+        delete[] uPrime;
         delete[] u;
         m_cubicChunkArray->push_back(cubic);
         return;

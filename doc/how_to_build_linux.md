@@ -16,11 +16,10 @@ You will need to install some dependencies before you can build. Depending on yo
 ### Installing required packages on Debian / Ubuntu
 
 ```
-$ sudo apt-get install build-essential cmake pkg-config libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev-tools libqt5opengl5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libjpeg-dev libglew-dev freeglut3-dev libsdl2-dev libfreetype6-dev
+$ sudo apt-get install build-essential git cmake pkg-config libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev-tools libqt5opengl5-dev qtmultimedia5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libsdl2-dev libfreetype6-dev
 ```
 
 Notes:
-* Debian doesn't seem to be a package yet for libpng 1.6, but try libpng16-dev
 * It's possible we also need libgsl2 (or maybe libopenbias-dev)
 
 ### Installing required packages on RedHat / Mageia
@@ -34,13 +33,13 @@ $ rpm ...
 (it may include some useless packages)
 
 ```
-dnf install gcc gcc-c++ automake cmake boost boost-devel SuperLU SuperLU-devel lz4-devel libusb-devel lzo-devel libjpeg-turbo-devel GLEW libGLEW freeglut-devel freeglut SDL2 SDL2-devel freetype-devel libpng-devel qt5-base qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel blas blas-devel
+dnf install gcc gcc-c++ automake git cmake boost boost-devel SuperLU SuperLU-devel lz4-devel libusb-devel lzo-devel libjpeg-turbo-devel GLEW libGLEW freeglut-devel freeglut SDL2 SDL2-devel freetype-devel libpng-devel qt5-base qt5-qtbase-devel qt5-qtsvg qt5-qtsvg-devel qt5-qtscript qt5-qtscript-devel qt5-qttools qt5-qttools-devel blas blas-devel
 ```
 
 ### Installing required packages on ArchLinux
 
 ```
-$ sudo pacman -S base-devel cmake boost boost-libs qt5-base qt5-svg qt5-script qt5-tools lz4 libusb lzo libjpeg-turbo glew freeglut sdl2 freetype2
+$ sudo pacman -S base-devel git cmake boost boost-libs qt5-base qt5-svg qt5-script qt5-tools qt5-multimedia lz4 libusb lzo libjpeg-turbo glew freeglut sdl2 freetype2
 $ sudo pacman -S blas cblas
 ```
 From AUR, using eg. yaourt:
@@ -54,7 +53,7 @@ Notes:
 ### Installing required packages on openSUSE
 
 ```
-zypper in boost-devel cmake gcc-c++ freeglut-devel freetype2-devel glew-devel libjpeg-devel liblz4-devel libqt5-linguist-devel libQt5OpenGL5 libqt5-qtbase-devel libqt5-qtscript-devel libqt5-qtsvg-devel lzo-devel libusb-devel openblas-devel SDL2-devel superlu-devel zlib-devel
+zypper in boost-devel git cmake gcc-c++ freeglut-devel freetype2-devel glew-devel libjpeg-devel liblz4-devel libqt5-linguist-devel libQt5OpenGL5 libqt5-qtbase-devel libqt5-qtscript-devel libqt5-qtsvg-devel lzo-devel libusb-devel openblas-devel SDL2-devel superlu-devel zlib-devel
 ```
 
 ## Build instructions
@@ -65,7 +64,7 @@ zypper in boost-devel cmake gcc-c++ freeglut-devel freetype2-devel glew-devel li
 $ git clone https://github.com/opentoonz/opentoonz
 ```
 
-### Installation of the stuff directory
+### Copying the stuff directory
 
 TODO: some parts should really be installed in $prefix/ instead... and some other in various cache or user-local places.
 cf. https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -141,6 +140,21 @@ You can now run the application:
 
 ```
 $ cd bin
-$ LD_LIBRARY_PATH=image:toonzlib:toonzfarm/tfarm:tnzbase:tnztools:stdfx:sound:tnzcore:tnzext:colorfx:toonzqt toonz/OpenToonz_1.0
+$ LD_LIBRARY_PATH=./lib/opentoonz:$LD_LIBRARY_PATH ./bin/OpenToonz_1.0
 ```
+
+### Performing a system installation
+
+The steps above show how to run OpenToonz from the build directory,
+however you may wish to install OpenToonz onto your system.
+
+OpenToonz will install to `/opt/opentoonz` by default, to do this run:
+
+```
+$ sudo make install
+```
+
+Then you can launch OpenToonz by running `/opt/opentoonz/bin/opentoonz`.
+
+You can change the installation path by modifying the `CMAKE_INSTALL_PREFIX` CMake variable.
 

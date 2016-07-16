@@ -5,6 +5,14 @@
 #include <memory>
 #include <cstring>
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1900)
+// dummy definition for linker
+#include <conio.h>
+extern "C" {
+void __imp__cprintf(char const *const _Format) { _cprintf(_Format); }
+}
+#endif
+
 // blasint may either be common 4 bytes or extended 8 (long)...
 // Replace this and REBUILD the CBLAS with extended int if needed.
 typedef int blasint;
@@ -60,7 +68,6 @@ incx and incy are the increments in array access - ie x[incx * i] and y[incy *
 j] values only are
 considered (=> we'll use 1).
 */
-
   double *_x = const_cast<double *>(x);
 
   cblas_daxpy(n, 1.0, _x, 1, y, 1);

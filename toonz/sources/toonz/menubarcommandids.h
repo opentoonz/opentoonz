@@ -221,8 +221,10 @@
 #define MI_OpenXshView "MI_OpenXshView"
 #define MI_OpenCleanupSettings "MI_OpenCleanupSettings"
 #define MI_ResetRoomLayout "MI_ResetRoomLayout"
-
+#define MI_MaximizePanel "MI_MaximizePanel"
+#define MI_FullScreenWindow "MI_FullScreenWindow"
 #define MI_OnionSkin "MI_OnionSkin"
+#define MI_ZeroThick "MI_ZeroThick"
 
 //#define MI_LoadResourceFile       "MI_LoadResourceFile"
 #define MI_DuplicateFile "MI_DuplicateFile"
@@ -309,4 +311,5 @@
 #define MI_PreviewFx "MI_PreviewFx"
 
 #define MI_About "MI_About"
+#define MI_PencilTest "MI_PencilTest"
 #endif

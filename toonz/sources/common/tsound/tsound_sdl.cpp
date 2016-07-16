@@ -284,7 +284,7 @@ void TSoundOutputDeviceImp::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1,
 #endif
 
   //	myData->maxPacketSize = fileASBD.mFramesPerPacket *
-  //fileASBD.mBytesPerFrame;
+  // fileASBD.mBytesPerFrame;
   {
     // TThread::ScopedLock sl(MutexOut);
     m_isPlaying = true;

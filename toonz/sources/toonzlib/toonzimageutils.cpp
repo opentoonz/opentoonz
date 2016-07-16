@@ -202,10 +202,10 @@ TRectD ToonzImageUtils::convertRasterToWorld(const TRect area,
 
 // overlaying inks, blend inks always "lose" on normal inks
 
-TRect fastAddInkStroke(const TToonzImageP &ti, TStroke *stroke, int inkId,
-                       bool selective, bool filled, TRectD clip,
-                       bool doAntialiasing       = true,
-                       const set<int> &blendInks = set<int>()) {
+static TRect fastAddInkStroke(const TToonzImageP &ti, TStroke *stroke, int inkId,
+                              bool selective, bool filled, TRectD clip,
+                              bool doAntialiasing       = true,
+                              const set<int> &blendInks = set<int>()) {
   TRasterCM32P ras = ti->getRaster();
   TOfflineGL *gl   = 0;
 

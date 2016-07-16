@@ -2880,7 +2880,6 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   assert(ret);
 
   /* ------- initial conditions ------- */
-  autoCheckChanged(false);
   enable(false, false, false);
   // set to the empty page
   m_styleChooser->setCurrentIndex(6);
@@ -2912,12 +2911,12 @@ QFrame *StyleEditor::createBottomWidget() {
   bottomWidget->setObjectName("bottomWidget");
   bottomWidget->setContentsMargins(0, 0, 0, 0);
   m_applyButton->setToolTip(tr("Apply changes to current style"));
-  m_applyButton->setDisabled(true);
+  m_applyButton->setDisabled(m_paletteController->isColorAutoApplyEnabled());
   m_applyButton->setFocusPolicy(Qt::NoFocus);
 
   m_autoButton->setCheckable(true);
   m_autoButton->setToolTip(tr("Automatically update style changes"));
-  m_autoButton->setChecked(false);
+  m_autoButton->setChecked(m_paletteController->isColorAutoApplyEnabled());
   m_autoButton->setFocusPolicy(Qt::NoFocus);
 
   m_oldColor->setToolTip(tr("Return To Previous Style"));
@@ -3225,7 +3224,7 @@ void StyleEditor::enable(bool enabled, bool enabledOnlyFirstTab,
       m_autoButton->setEnabled(false);
     } else  // when the palette is unlocked
     {
-      m_applyButton->setEnabled(true);
+      m_applyButton->setDisabled(m_autoButton->isChecked());
       m_autoButton->setEnabled(true);
     }
   }
@@ -3268,14 +3267,11 @@ void StyleEditor::applyButtonClicked() {
 //-----------------------------------------------------------------------------
 
 void StyleEditor::autoCheckChanged(bool value) {
-  m_paletteController->enableColorAutoApply(!!value);
+  m_paletteController->enableColorAutoApply(value);
 
   if (!m_enabled) return;
 
-  if (value != 0)
-    m_applyButton->setDisabled(true);
-  else
-    m_applyButton->setDisabled(false);
+  m_applyButton->setDisabled(value);
 }
 
 //-----------------------------------------------------------------------------

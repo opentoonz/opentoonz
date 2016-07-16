@@ -433,6 +433,8 @@ centralWidget->setLayout(centralWidgetLayout);*/
   setCommandHandler(MI_PickStyleLines, this, &MainWindow::togglePickStyleLines);
 
   setCommandHandler(MI_About, this, &MainWindow::onAbout);
+  setCommandHandler(MI_MaximizePanel, this, &MainWindow::maximizePanel);
+  setCommandHandler(MI_FullScreenWindow, this, &MainWindow::fullScreenWindow);
 }
 
 //-----------------------------------------------------------------------------
@@ -1094,6 +1096,21 @@ void MainWindow::resetRoomsLayout() {
       QObject::tr("The rooms will be reset the next time you run Toonz."));
 }
 
+void MainWindow::maximizePanel() {
+  DockLayout *currDockLayout = getCurrentRoom()->dockLayout();
+  QPoint p                   = mapFromGlobal(QCursor::pos());
+  QWidget *currWidget        = currDockLayout->containerOf(p);
+  DockWidget *currW          = dynamic_cast<DockWidget *>(currWidget);
+  if (currW) currW->maximizeDock();
+}
+
+void MainWindow::fullScreenWindow() {
+  if (isFullScreen())
+    setWindowState(Qt::WindowMaximized);
+  else
+    setWindowState(Qt::WindowFullScreen);
+}
+
 //-----------------------------------------------------------------------------
 
 void MainWindow::onCurrentRoomChanged(int newRoomIndex) {
@@ -1553,7 +1570,7 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_ExportLevel, tr("&Export Level..."), "");
   createMenuFileAction(MI_ConvertFileWithInput, tr("&Convert File..."), "");
   createRightClickMenuAction(MI_SavePaletteAs, tr("&Save Palette As..."), "");
-  createRightClickMenuAction(MI_OverwritePalette, "&Save Palette", "");
+  createRightClickMenuAction(MI_OverwritePalette, tr("&Save Palette"), "");
   createMenuFileAction(MI_LoadColorModel, tr("&Load Color Model..."), "");
   createMenuFileAction(MI_ImportMagpieFile, tr("&Import Magpie File..."), "");
   createMenuFileAction(MI_NewProject, tr("&New Project..."), "");
@@ -1651,6 +1668,9 @@ void MainWindow::defineActions() {
                MenuScanCleanupCommandType);
 
   createMenuScanCleanupAction(MI_Cleanup, tr("&Cleanup"), "");
+  
+  createMenuScanCleanupAction(MI_PencilTest, tr("&Pencil Test..."), "");
+  
   createMenuLevelAction(MI_AddFrames, tr("&Add Frames..."), "");
   createMenuLevelAction(MI_Renumber, tr("&Renumber..."), "");
   createMenuLevelAction(MI_ReplaceLevel, tr("&Replace Level..."), "");
@@ -1879,12 +1899,17 @@ void MainWindow::defineActions() {
 
   createMenuWindowsAction(MI_ResetRoomLayout, tr("&Reset to Default Rooms"),
                           "");
-
+  createMenuWindowsAction(MI_MaximizePanel, tr("Toggle Maximize Panel"), "`");
+  createMenuWindowsAction(MI_FullScreenWindow,
+                          tr("Toggle Main Window's Full Screen Mode"),
+                          "Ctrl+`");
   createMenuWindowsAction(MI_About, tr("&About OpenToonz..."), "");
 
   createRightClickMenuAction(MI_BlendColors, tr("&Blend colors"), "");
 
-  createToggle(MI_OnionSkin, tr("Onion Skin"), "", false,
+  createToggle(MI_OnionSkin, tr("Onion Skin Toggle"), "//", false,
+               RightClickMenuCommandType);
+  createToggle(MI_ZeroThick, tr("Zero Thick Lines"), "Shift+/", false, 
                RightClickMenuCommandType);
 
   // createRightClickMenuAction(MI_LoadSubSceneFile,     tr("Load As
@@ -1961,7 +1986,7 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_UnlockAllColumns, tr("Unlock All"), "");
   createRightClickMenuAction(MI_ToggleColumnLocks, tr("Swap Lock/Unlock"), "");
   /*-- カレントカラムの右側のカラムを全て非表示にするコマンド --*/
-  createRightClickMenuAction(MI_DeactivateUpperColumns, "Hide Upper Columns",
+  createRightClickMenuAction(MI_DeactivateUpperColumns, tr("Hide Upper Columns"),
                              "");
 
   createToolAction(T_Edit, "edit", tr("Edit Tool"), "E");
@@ -2068,17 +2093,17 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_TypeSize", tr("TypeTool Size"), "");
   createToolOptionsAction("A_ToolOption_TypeStyle", tr("TypeTool Style"), "");
 
-  createToolOptionsAction("A_ToolOption_EditToolActiveAxis", "Active Axis", "");
+  createToolOptionsAction("A_ToolOption_EditToolActiveAxis", tr("Active Axis"), "");
   createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Position",
-                          "Active Axis - Position", "");
+                          tr("Active Axis - Position"), "");
   createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Rotation",
-                          "Active Axis - Rotation", "");
+                          tr("Active Axis - Rotation"), "");
   createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Scale",
-                          "Active Axis - Scale", "");
+                          tr("Active Axis - Scale"), "");
   createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Shear",
-                          "Active Axis - Shear", "");
+                          tr("Active Axis - Shear"), "");
   createToolOptionsAction("A_ToolOption_EditToolActiveAxis:Center",
-                          "Active Axis - Center", "");
+                          tr("Active Axis - Center"), "");
 
   createToolOptionsAction("A_ToolOption_SkeletonMode:Build Skeleton",
                           tr("Build Skeleton Mode"), "");
@@ -2096,16 +2121,16 @@ void MainWindow::defineActions() {
   createToolOptionsAction("A_ToolOption_Meshify", tr("Create Mesh"), "");
 
   /*-- FillAreas, FillLinesにキー1つで切り替えるためのコマンド --*/
-  createAction(MI_FillAreas, "Fill Tool - Areas", "", ToolCommandType);
-  createAction(MI_FillLines, "Fill Tool - Lines", "", ToolCommandType);
+  createAction(MI_FillAreas, tr("Fill Tool - Areas"), "", ToolCommandType);
+  createAction(MI_FillLines, tr("Fill Tool - Lines"), "", ToolCommandType);
   /*-- Style picker Area, Style picker Lineににキー1つで切り替えるためのコマンド
    * --*/
-  createAction(MI_PickStyleAreas, "Style Picker Tool - Areas", "",
+  createAction(MI_PickStyleAreas, tr("Style Picker Tool - Areas"), "",
                ToolCommandType);
-  createAction(MI_PickStyleLines, "Style Picker Tool - Lines", "",
+  createAction(MI_PickStyleLines, tr("Style Picker Tool - Lines"), "",
                ToolCommandType);
 
-  createMiscAction("A_FxSchematicToggle", "Toggle FX/Stage schematic", "");
+  createMiscAction("A_FxSchematicToggle", tr("Toggle FX/Stage schematic"), "");
 }
 
 //-----------------------------------------------------------------------------

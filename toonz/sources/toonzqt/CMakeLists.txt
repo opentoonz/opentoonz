@@ -213,7 +213,10 @@ if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtoonzqt.dylib")
 endif()
 
-add_definitions(-DQT_WIDGETS_LIB -DTOONZQT_EXPORTS)
+add_definitions(
+    -DQT_WIDGETS_LIB
+    -DTOONZQT_EXPORTS
+)
 
 message("subdir: toonzqt")
 message("type:" ${CMAKE_SHARED_LIBRARY_SUFFIX})

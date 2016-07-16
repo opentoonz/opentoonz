@@ -580,6 +580,7 @@ void PageViewer::paintEvent(QPaintEvent *e) {
       if (getCurrentStyleIndex() == styleIndex) currentStyleIndexInPage = i;
 
       QRect chipRect = getColorChipRect(i);
+      p.setPen(Qt::black);
       drawColorChip(p, chipRect, style);
 
       // name, index and shortcut
@@ -942,14 +943,13 @@ void PageViewer::mouseDoubleClickEvent(QMouseEvent *e) {
       fld->show();
       fld->selectAll();
       fld->setFocus(Qt::OtherFocusReason);
-      fld->setAlignment(Qt::AlignCenter);
+      fld->setAlignment((m_viewMode == List) ? Qt::AlignLeft : Qt::AlignCenter);
       return;
     }
   }
 
-  m_styleNameEditor->show();
-  m_styleNameEditor->raise();
-  m_styleNameEditor->activateWindow();
+  CommandManager::instance()->execute("MI_OpenStyleControl");
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1008,6 +1008,12 @@ void PageViewer::contextMenuEvent(QContextMenuEvent *event) {
   menu.addAction(openPltGizmoAct);
   QAction *openStyleControlAct = cmd->getAction("MI_OpenStyleControl");
   menu.addAction(openStyleControlAct);
+  QAction *openStyleNameEditorAct = menu.addAction(tr("Name Editor"));
+  connect(openStyleNameEditorAct, &QAction::triggered, [&]() {
+    m_styleNameEditor->show();
+    m_styleNameEditor->raise();
+    m_styleNameEditor->activateWindow();
+  });
 
   // Verifica se lo stile e' link.
   // Abilita e disabilita le voci di menu' in base a dove si e' cliccato.

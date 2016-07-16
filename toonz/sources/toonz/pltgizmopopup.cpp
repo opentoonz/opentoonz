@@ -34,8 +34,8 @@ using namespace DVGui;
 
 //-----------------------------------------------------------------------------
 
-void getStyles(std::vector<TColorStyle *> &styles,
-               const TStyleSelection &selection, TPaletteP palette) {
+static void getStyles(std::vector<TColorStyle *> &styles,
+                      const TStyleSelection &selection, TPaletteP palette) {
   styles.clear();
   int pageIndex        = selection.getPageIndex();
   TPalette::Page *page = palette->getPage(pageIndex);
@@ -50,7 +50,7 @@ void getStyles(std::vector<TColorStyle *> &styles,
 
 //-----------------------------------------------------------------------------
 
-void getStyleIds(std::vector<int> &styleIds, const TStyleSelection &selection) {
+static void getStyleIds(std::vector<int> &styleIds, const TStyleSelection &selection) {
   styleIds.clear();
   int pageIndex        = selection.getPageIndex();
   TPaletteP palette    = selection.getPalette();

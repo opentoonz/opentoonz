@@ -1500,8 +1500,8 @@ void FunctionPanel::fitRegion(double f0, double v0, double f1, double v1) {}
 
 //-----------------------------------------------------------------------------
 
-void setSegmentType(FunctionSelection *selection, TDoubleParam *curve,
-                    int segmentIndex, TDoubleKeyframe::Type type) {
+static void setSegmentType(FunctionSelection *selection, TDoubleParam *curve,
+                           int segmentIndex, TDoubleKeyframe::Type type) {
   selection->selectSegment(curve, segmentIndex);
   KeyframeSetter setter(curve, segmentIndex);
   setter.setType(type);

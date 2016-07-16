@@ -51,7 +51,7 @@ protected:
 
 public:
   TTileSet(const TDimension &dim) : m_srcImageSize(dim) {}
-  ~TTileSet();
+  virtual ~TTileSet();
 
   int getMemorySize() const;
 

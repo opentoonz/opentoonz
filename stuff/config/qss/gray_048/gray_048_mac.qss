@@ -1345,5 +1345,8 @@ QDialog #dialogButtonFrame {
 #MatchLineButton::pressed {
   background-color: #7d7d7d;
 }
+#LargeSizedText {
+  font-size: 17px;
+}
 
 //# sourceMappingURL=gray_048_mac.qss.map

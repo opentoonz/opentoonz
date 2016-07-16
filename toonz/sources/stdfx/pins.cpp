@@ -12,7 +12,7 @@
 #ifdef _WIN32
 #define ISNAN _isnan
 #else
-#define ISNAN isnan
+#define ISNAN std::isnan
 #endif
 
 namespace {
@@ -138,7 +138,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
   TRectD clippingRect =
       TRectD(tile.m_pos,
              TDimensionD(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
-#if CREATE_GL_CONTEXT_ONE_TIME
+#ifdef CREATE_GL_CONTEXT_ONE_TIME
   int ret = wglMakeCurrent(m_offScreenGL.m_offDC, m_offScreenGL.m_hglRC);
   assert(ret == TRUE);
 #else
@@ -168,7 +168,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
   checkErrorsByGL
-#if !CREATE_GL_CONTEXT_ONE_TIME
+#ifndef CREATE_GL_CONTEXT_ONE_TIME
       TRaster32P rasaux;
   if (!wireframe) {
     TRaster32P texture(texWidth, texHeight);
@@ -482,7 +482,7 @@ int splitMatrix(double **a, int n, int *index) {
       for (i = j + 1; i < n; i++) a[i][j] *= dum;
     }
   }
-  delete vv;
+  delete[] vv;
   return 0;
 }
 

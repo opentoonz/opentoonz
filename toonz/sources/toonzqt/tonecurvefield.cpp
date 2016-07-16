@@ -353,8 +353,7 @@ void ChennelCurveEditor::moveCentralControlPoint(int index,
   double precDistance = (p.x() + d.x()) - precP.x();
 
   // Caso particolare: Punto di controllo corrente == primo visibile,
-  //								  Punto di controllo
-  //successivo
+  //                   Punto di controllo successivo
   //==
   // l'ultimo
   // visibile
@@ -366,8 +365,7 @@ void ChennelCurveEditor::moveCentralControlPoint(int index,
     if (nextDistance < 0) d = QPointF(nextP.x() - p.x(), d.y());
   }
   // Caso particolare: Punto di controllo corrente == ultimo visibile,
-  //								  Punto di controllo
-  //precedente
+  //                   Punto di controllo precedente
   //==
   // primo
   // visibile
@@ -403,107 +401,6 @@ void ChennelCurveEditor::moveCentralControlPoint(int index,
   movePoint(index, d);
   emit controlPointChanged(true);
 }
-
-//-----------------------------------------------------------------------------
-
-/* Se due punti di controllo sono troppo vicini uno dei due viene eliminato.
-         Ritorna vero se un punto viene eliminato.
-
-Prima di richiamare il metodo nel move andava fatto questo controllo!!!
-//Se il punto di controllo successivo, o precente, e' l'utlimo, o il primo,
-blocco il
-// movimento altrimenti elimino il punto di controllo successivo e richiamo il
-move.
-int nextPX = m_points.at(index+3).x();
-if(nextPX>m_margin && nextPX<=w && newX>nextPX)
-{
-        if(index+3 == pointCount-4) d = QPointF(0, d.y());
-        else
-        {
-                moveCentralControlPoint(index, d);
-                return;
-        }
-}
-int precPX = m_points.at(index-3).x();
-if(precPX>=m_margin && precPX<=w && newX<precPX)
-{
-        if(index-3 == 3) d = QPointF(0, d.y());
-        else
-        {
-                moveCentralControlPoint(index, d);
-                return;
-        }
-}
-
-bool ChennelCurveEditor::eraseControlPointWhileMove(int index, const QPointF
-delta)
-{
-        int pointCount = m_points.size();
-        QPointF p = m_points.at(index);
-        QPointF nextP = m_points.at(index+3);
-        QPointF precP = m_points.at(index-3);
-        double nextDistance = abs((p.x()+delta.x())-nextP.x());
-        double precDistance = abs((p.x()+delta.x())-precP.x());
-
-        if(nextDistance>16 && precDistance>16) return false;
-
-        //Se vado troppo vicino al punto di controllo precedente, o successivo,
-lo elimino.
-        if(nextDistance<=16)
-        {
-                //Caso particolare: il successivo e' l'ultimo visibile; non
-posso eliminare l'ultimo punto di controllo visibile.
-                if(index+3 == pointCount-4)
-                {
-                        //Se il punto di controllo in index e' il primo visibile
-sto gestendo il
-                        // primo e l'ultimo punto, entrambi non possono essere
-eliminati.
-                        if(index == 3)
-                        {
-                                setPoint(index+1,nextP);
-                                setPoint(index+2,p+delta);
-                                return false;
-                        }
-                        else	//Altrimenti elimino il penultimo.
-                        {
-                                removeControlPoint(index);
-                                m_currentControlPointIndex += 3;
-                                return true;
-                        }
-                }
-                removeControlPoint(index+3);
-                return true;
-        }
-        if(precDistance<=16)
-        {
-                //Caso particolare: il precedente e' il primo visibile; non
-posso eliminare il primo punto di controllo visibile.
-                if(index-3 == 3)
-                {
-                        //Se il punto di controllo in index e' l'ultimo visibile
-sto gestendo il
-                        // primo e l'ultimo punto, entrambi non possono essere
-eliminati.
-                        if(index == pointCount-4)
-                        {
-                                setPoint(index-1,precP);
-                                setPoint(index-2,p+delta);
-                                return false;
-                        }
-                        else	//Altrimenti elimino il secondo.
-                        {
-                                removeControlPoint(index);
-                                return true;
-                        }
-                }
-                removeControlPoint(index-3);
-                m_currentControlPointIndex += 3;
-                return true;
-        }
-        return false;
-}
-*/
 
 //-----------------------------------------------------------------------------
 

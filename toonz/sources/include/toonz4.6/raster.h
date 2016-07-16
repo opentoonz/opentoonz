@@ -31,28 +31,31 @@ typedef enum {
 } RAS_TYPE;
 
 #ifdef VECCHIO
-' typedef enum { RAS_NONE, RAS_BW, /* 1 bit, B=0, W=1, first pixel in bit 7 */ RAS_WB, /* "    , W=0, B=1, "                    */ RAS_GR8, /* grey tones, 8 bits */ RAS_CM8, /* color-mapped,  8 bits */
-    RAS_GR16,    /* grey tones, 16 bits */
-    RAS_RGB16,   /* RGB 5+6+5 bits, red most significant */
-    RAS_RLEBW,   /* 1 bit compressed(quick casm format) */
-    RAS_RGB,     /* 1 byte per color channel */
-    RAS_RGB_,    /* LPIXEL, matte channel ignored, for display */
-    RAS_RGBM,    /* LPIXEL, matte channel considered */
-    RAS_RGBM64,  /* SPIXEL, matte channel considered */
-    RAS_RGB_64,  /* SPIXEL, matte channel ignored */
-    RAS_MBW16,   /* 16 images of 1 bit per pixel, B=0, W=1 */
-    RAS_CM8S4,   /* cmapped,  8 bits, standard SGI  16-color colormap */
-    RAS_CM8S8,   /* cmapped,  8 bits, standard SGI 256-color colormap */
-    RAS_CM16S4,  /* cmapped, 16 bits, standard SGI  16-color colormap */
-    RAS_CM16S8,  /* cmapped, 16 bits, standard SGI 256-color colormap */
-    RAS_CM16S12, /* cmapped, 16 bits, standard SGI+Toonz 4096-color colormap */
-    // RAS_CM24,   /* cmapped, 8+8+8 bits (ink, paint, ramp), +8 bits extra
-    // (MSB) */
-    RAS_CM16, /* color-mapped, 16 bits */
-    RAS_CM32, /* cmapped, 12+12+8 bits (ink, paint, ramp) */
-    RAS_HOW_MANY
-}
-RAS_TYPE;
+typedef enum {
+  RAS_NONE,
+  RAS_BW,       // 1 bit, B=0, W=1, first pixel in bit 7
+  RAS_WB,       // "    , W=0, B=1, "
+  RAS_GR8,      // grey tones, 8 bits
+  RAS_CM8,      // color-mapped,  8 bits
+  RAS_GR16,     // grey tones, 16 bits
+  RAS_RGB16,    // RGB 5+6+5 bits, red most significant
+  RAS_RLEBW,    // 1 bit compressed(quick casm format)
+  RAS_RGB,      // 1 byte per color channel/
+  RAS_RGB_,     // LPIXEL, matte channel ignored, for display
+  RAS_RGBM,     // LPIXEL, matte channel considered
+  RAS_RGBM64,   // SPIXEL, matte channel considered
+  RAS_RGB_64,   // SPIXEL, matte channel ignored
+  RAS_MBW16,    // 16 images of 1 bit per pixel, B=0, W=1
+  RAS_CM8S4,    // cmapped,  8 bits, standard SGI  16-color colormap
+  RAS_CM8S8,    // cmapped,  8 bits, standard SGI 256-color colormap
+  RAS_CM16S4,   // cmapped, 16 bits, standard SGI  16-color colormap
+  RAS_CM16S8,   // cmapped, 16 bits, standard SGI 256-color colormap
+  RAS_CM16S12,  // cmapped, 16 bits, standard SGI+Toonz 4096-color colormap
+  // RAS_CM24, // cmapped, 8+8+8 bits (ink, paint, ramp), +8 bits extra (MSB)
+  RAS_CM16,  // color-mapped, 16 bits
+  RAS_CM32,  // cmapped, 12+12+8 bits (ink, paint, ramp)
+  RAS_HOW_MANY
+} RAS_TYPE;
 #endif
 
 typedef struct {

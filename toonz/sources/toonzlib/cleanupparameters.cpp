@@ -122,8 +122,6 @@ void FdgManager::loadFieldGuideInfo() {
         else if (STR_EQ(label, "HOLE")) {
           sscanf(arg, "%d", &cnt);
           if (cnt >= (int)fdg_info.dots.size()) {
-            // tmsg_error("load field guide info error: bad hole number");
-            //        return FALSE;
             fdg_info.dots.push_back(CleanupTypes::DOT());
           }
         } else if (STR_EQ(label, "X0"))

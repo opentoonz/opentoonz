@@ -1013,7 +1013,7 @@ void getLoadingLevelRange(TFrameId &fromFid, TFrameId &toFid) {
   toFid   = loadingLevelRange.m_toFid;
 }
 
-TFilePath getLevelPathAndSetNameWithPsdLevelName(TXshSimpleLevel *xshLevel) {
+static TFilePath getLevelPathAndSetNameWithPsdLevelName(TXshSimpleLevel *xshLevel) {
   TFilePath retfp = xshLevel->getPath();
 
   QString name     = QString::fromStdWString(retfp.getWideName());
@@ -1358,7 +1358,7 @@ void TXshSimpleLevel::save() {
 
 //-----------------------------------------------------------------------------
 
-void saveBackup(TFilePath path) {
+static void saveBackup(TFilePath path) {
   try {
     TFilePath backup = path.withName(path.getName() + "_backup");
     if (TSystem::doesExistFileOrLevel(backup))
@@ -2169,9 +2169,8 @@ TFilePath TXshSimpleLevel::getExistingHookFile(
   }
 
   assert(h >= 0);
-  return (h < 0) ? TFilePath()
-                 : decodedLevelPath.getParentDir() +
-                       TFilePath(hookFiles[h].toStdWString());
+  return (h < 0) ? TFilePath() : decodedLevelPath.getParentDir() +
+                                     TFilePath(hookFiles[h].toStdWString());
 }
 
 //-----------------------------------------------------------------------------

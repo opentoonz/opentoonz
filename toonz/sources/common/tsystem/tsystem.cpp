@@ -412,12 +412,27 @@ class CaselessFilepathLess final
     : public std::binary_function<TFilePath, TFilePath, bool> {
 public:
   bool operator()(const TFilePath &a, const TFilePath &b) const {
-    wstring aa = toLower(a.getWideString());
-    wstring bb = toLower(b.getWideString());
-    if (aa == bb)
-      return a < b;
-    else
-      return aa < bb;
+    // Perform case sensitive compare, fallback to case insensitive.
+    const wstring a_str = a.getWideString();
+    const wstring b_str = b.getWideString();
+
+    unsigned int i = 0;
+    int case_compare = -1;
+    while (a_str[i] || b_str[i]) {
+      if (a_str[i] != b_str[i]) {
+        const wchar_t a_wchar = towlower(a_str[i]);
+        const wchar_t b_wchar = towlower(b_str[i]);
+        if (a_wchar < b_wchar) {
+          return true;
+        } else if (a_wchar > b_wchar) {
+          return false;
+        } else if (case_compare == -1) {
+          case_compare = a_str[i] < b_str[i];
+        }
+      }
+      i++;
+    }
+    return (case_compare == 1);
   }
 };
 

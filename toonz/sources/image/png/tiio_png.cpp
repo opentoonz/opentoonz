@@ -1,4 +1,4 @@
-#if _MSC_VER >= 1400
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
@@ -28,7 +28,36 @@ void tnz_error_fun(png_structp pngPtr, png_const_charp error_message) {
 }
 
 #if !defined(TNZ_LITTLE_ENDIAN)
-TNZ_LITTLE_ENDIAN undefined !!
+#error "TNZ_LITTLE_ENDIAN undefined !!"
+#endif
+
+//=========================================================
+/* Check for the older version of libpng */
+
+#if defined(PNG_LIBPNG_VER)
+#if (PNG_LIBPNG_VER < 10527)
+extern "C" {
+static png_uint_32 png_get_current_row_number(const png_structp png_ptr)
+{
+       /* See the comments in png.h - this is the sub-image row when reading and
+        * interlaced image.
+        */
+       if (png_ptr != NULL)
+               return png_ptr->row_number;
+
+       return PNG_UINT_32_MAX; /* help the app not to fail silently */
+}
+
+static png_byte png_get_current_pass_number(const png_structp png_ptr)
+{
+       if (png_ptr != NULL)
+               return png_ptr->pass;
+       return 8; /* invalid */
+}
+}
+#endif
+#else
+#error "PNG_LIBPNG_VER undefined, libpng too old?"
 #endif
 
     //=========================================================
@@ -108,8 +137,12 @@ public:
                                        tnz_error_fun, 0);
     if (!m_png_ptr) return;
 
+#if defined(PNG_LIBPNG_VER)
+#if (PNG_LIBPNG_VER >= 10527)
     png_set_longjmp_fn(m_png_ptr, tnz_abort,
                        sizeof(jmp_buf)); /* ignore all fatal errors */
+#endif // (PNG_LIBPNG_VER >= 10527)
+#endif // defined(PNG_LIBPNG_VER)
 
     m_canDelete = 1;
     m_info_ptr  = png_create_info_struct(m_png_ptr);
@@ -149,7 +182,7 @@ public:
 
     int rowBytes = png_get_rowbytes(m_png_ptr, m_info_ptr);
 
-    TUINT32 lx = 0, ly = 0;
+    png_uint_32 lx = 0, ly = 0;
     png_get_IHDR(m_png_ptr, m_info_ptr, &lx, &ly, &m_bit_depth, &m_color_type,
                  &m_interlace_type, &m_compression_type, &m_filter_type);
     m_info.m_lx = lx;

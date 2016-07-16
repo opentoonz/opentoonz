@@ -21,8 +21,8 @@ namespace TScriptBinding {
 
 //=======================================================
 
-QScriptValue getScene(QScriptContext *context, const QScriptValue &sceneArg,
-                      Scene *&scene) {
+static QScriptValue getScene(QScriptContext *context, const QScriptValue &sceneArg,
+                             Scene *&scene) {
   scene = qscriptvalue_cast<Scene *>(sceneArg);
   if (!scene)
     return context->throwError(
@@ -33,7 +33,7 @@ QScriptValue getScene(QScriptContext *context, const QScriptValue &sceneArg,
   return QScriptValue();
 }
 
-void valueToIntList(const QScriptValue &arr, QList<int> &list) {
+static void valueToIntList(const QScriptValue &arr, QList<int> &list) {
   list.clear();
   if (arr.isArray()) {
     int length = arr.property("length").toInteger();

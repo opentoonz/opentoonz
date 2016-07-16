@@ -25,7 +25,7 @@
 #include <QPainter>
 #include <QApplication>
 
-void printCurrentFrame() {
+static void printCurrentFrame() {
   QPrinter printer;
   QPrintDialog dialog(&printer, 0);
   if (!dialog.exec()) return;

@@ -1198,7 +1198,7 @@ void TCellSelection::copyCells() {
 
 //-----------------------------------------------------------------------------
 
-void pasteStrokesInCell(int row, int col, const StrokesData *strokesData) {
+static void pasteStrokesInCell(int row, int col, const StrokesData *strokesData) {
   PasteStrokesInCellUndo *undo =
       new PasteStrokesInCellUndo(row, col, strokesData);
   std::vector<int> indices;
@@ -1213,8 +1213,8 @@ void pasteStrokesInCell(int row, int col, const StrokesData *strokesData) {
 
 //-----------------------------------------------------------------------------
 
-void pasteRasterImageInCell(int row, int col,
-                            const RasterImageData *rasterImageData) {
+static void pasteRasterImageInCell(int row, int col,
+                                   const RasterImageData *rasterImageData) {
   TXsheet *xsh         = TApp::instance()->getCurrentXsheet()->getXsheet();
   TXshCell cell        = xsh->getCell(row, col);
   bool createdFrame    = false;
@@ -1557,7 +1557,7 @@ void TCellSelection::openTimeStretchPopup() {
 
 //-----------------------------------------------------------------------------
 
-bool operator<(const TXshCell &a, const TXshCell &b) {
+static bool operator<(const TXshCell &a, const TXshCell &b) {
   if (a.getSimpleLevel() < b.getSimpleLevel())
     return true;
   else if (a.getSimpleLevel() > b.getSimpleLevel())
@@ -1567,7 +1567,7 @@ bool operator<(const TXshCell &a, const TXshCell &b) {
 
 //-----------------------------------------------------------------------------
 
-void dRenumberCells(int col, int r0, int r1) {
+static void dRenumberCells(int col, int r0, int r1) {
   typedef std::vector<std::pair<TFrameId, TFrameId>> FramesMap;
   typedef std::map<TXshCell, TXshCell> CellsMap;
   typedef std::map<TXshSimpleLevel *, FramesMap> LevelsTable;
@@ -1709,7 +1709,7 @@ public:
 
 // TODO: spostare queste funzioni in un posto piu' generale e riutilizzabile
 
-int getLevelType(const TImageP &img) {
+static int getLevelType(const TImageP &img) {
   if (img->getType() == TImage::RASTER)
     return OVL_XSHLEVEL;
   else if (img->getType() == TImage::VECTOR)
@@ -1775,7 +1775,7 @@ void setNewDrawing(TXsheet *xsh, int row, int col, const TImageP &img)
 
 //-----------------------------------------------------------------------------
 
-void createNewDrawing(TXsheet *xsh, int row, int col, int preferredLevelType) {
+static void createNewDrawing(TXsheet *xsh, int row, int col, int preferredLevelType) {
   // search for the level
   TXshCell old = xsh->getCell(row, col);
   if (old.isEmpty()) {

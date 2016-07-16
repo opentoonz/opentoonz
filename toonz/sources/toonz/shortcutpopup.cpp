@@ -49,8 +49,7 @@ public:
     text.remove("&");
     setText(0, text);
     QString shortcut = m_action->shortcut().toString();
-    if (shortcut != "")
-      setText(1, shortcut);
+	setText(1, shortcut);
   }
   QAction *getAction() const { return m_action; }
 };
@@ -90,6 +89,7 @@ void ShortcutViewer::paintEvent(QPaintEvent *) {
 void ShortcutViewer::setAction(QAction *action) {
   m_action = action;
   update();
+  setFocus();
 }
 
 //-----------------------------------------------------------------------------
@@ -171,7 +171,6 @@ void ShortcutViewer::enterEvent(QEvent *event) {
 //-----------------------------------------------------------------------------
 
 void ShortcutViewer::leaveEvent(QEvent *event) {
-  clearFocus();
   update();
 }
 

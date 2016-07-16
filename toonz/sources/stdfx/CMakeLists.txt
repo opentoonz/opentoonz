@@ -244,8 +244,15 @@ set(SOURCES
     iwa_noise1234.cpp
     iwa_pnperspectivefx.cpp)
 
+set(OBJCSOURCES
+)
+
 add_library(tnzstdfx SHARED ${HEADERS} ${SOURCES} ${OBJCSOURCES})
-add_definitions(-D_USRDLL -DTNZSTDFX_EXPORTS)
+add_definitions(
+    -D_USRDLL
+    -DTNZSTDFX_EXPORTS
+)
+
 if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzstdfx.dylib")
 endif()
@@ -254,9 +261,15 @@ message("subdir: tnzstdfx")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
 if(GLEW_FOUND)
-    include_directories(${GLEW_INCLUDE_DIRS})
+    include_directories(
+        SYSTEM
+        ${GLEW_INCLUDE_DIRS}
+    )
 else()
-    include_directories(${SDKROOT}/glew/glew-1.9.0/include)
+    include_directories(
+        SYSTEM
+        ${SDKROOT}/glew/glew-1.9.0/include
+    )
 endif()
 
 _find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")

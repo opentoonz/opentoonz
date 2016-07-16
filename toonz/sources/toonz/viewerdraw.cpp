@@ -37,6 +37,9 @@
 
 TEnv::StringVar EnvSafeAreaName("SafeAreaName", "PR_safe");
 
+/* TODO, move to include */
+void getSafeAreaSizeList(QList<QList<double>> &_sizeList);
+
 //=============================================================================
 //=============================================================================
 // SafeAreaData

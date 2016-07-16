@@ -47,16 +47,16 @@ public:
   static const int maxChannelValue;
   typedef unsigned char Channel;
 
-#ifdef TNZ_MACHINE_CHANNEL_ORDER_BGRM
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
   Channel b, g, r, m;
-#elif TNZ_MACHINE_CHANNEL_ORDER_MBGR
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
   Channel m, b, g, r;
-#elif TNZ_MACHINE_CHANNEL_ORDER_RGBM
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
   unsigned char r, g, b, m;
-#elif TNZ_MACHINE_CHANNEL_ORDER_MRGB
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
   Channel m, r, g, b;
 #else
-  Undefined machine order !!!!
+#error "Undefined machine order !!!!"
 #endif
 
 #ifdef MACOSX
@@ -164,9 +164,9 @@ public:
 
 #ifdef TNZ_MACHINE_CHANNEL_ORDER_BGRM
   Channel b, g, r, m;
-#elif TNZ_MACHINE_CHANNEL_ORDER_MRGB
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
   Channel m, r, g, b;
-#elif TNZ_MACHINE_CHANNEL_ORDER_RGBM
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
 Channel r, g, b, m;
 #else
 undefined machine order !!!!

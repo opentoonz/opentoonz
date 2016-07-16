@@ -410,6 +410,10 @@
         <source>Watercolor</source>
         <translation>水彩画</translation>
     </message>
+    <message>
+        <source>Distance</source>
+        <translation>距离</translation>
+    </message>
 </context>
 <context>
     <name>TMatrioskaStrokeStyle</name>
@@ -582,7 +586,7 @@
     </message>
     <message>
         <source>Intensity</source>
-        <translation>強度</translation>
+        <translation>强度</translation>
     </message>
 </context>
 <context>

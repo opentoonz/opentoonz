@@ -64,7 +64,7 @@ inline void deleteSkeletonList(SkeletonList *skeleton) {
 
 //========================================================================
 
-TVectorImageP copyStrokes(std::vector<TStroke *> &strokes) {
+static TVectorImageP copyStrokes(std::vector<TStroke *> &strokes) {
   unsigned int i;
   TVectorImageP result = new TVectorImage;
 
@@ -88,7 +88,7 @@ inline TThickPoint randomized(const TThickPoint &P) {
 //------------------------------------------------------------------------
 
 // Give stroke extremities a random shake. May help for region computing.
-void randomizeExtremities(TVectorImageP vi) {
+static void randomizeExtremities(TVectorImageP vi) {
   unsigned int i;
   for (i = 0; i < vi->getStrokeCount(); ++i) {
     TThickPoint P = vi->getStroke(i)->getControlPoint(0);

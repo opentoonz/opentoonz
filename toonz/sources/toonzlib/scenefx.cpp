@@ -318,8 +318,8 @@ bool getColumnPlacement(TAffine &aff, TXsheet *xsh, double row, int col,
 
 //-------------------------------------------------------------------
 
-bool getColumnPlacement(PlacedFx &pf, TXsheet *xsh, double row, int col,
-                        bool isPreview) {
+static bool getColumnPlacement(PlacedFx &pf, TXsheet *xsh, double row, int col,
+                               bool isPreview) {
   if (col < 0) return false;
   TStageObject *pegbar = xsh->getStageObject(TStageObjectId::ColumnId(col));
   TAffine objAff       = pegbar->getPlacement(row);
@@ -344,8 +344,8 @@ bool getColumnPlacement(PlacedFx &pf, TXsheet *xsh, double row, int col,
 
 //-------------------------------------------------------------------
 /*-- Objectの位置を得る --*/
-bool getStageObjectPlacement(TAffine &aff, TXsheet *xsh, double row,
-                             TStageObjectId &id, bool isPreview) {
+static bool getStageObjectPlacement(TAffine &aff, TXsheet *xsh, double row,
+                                    TStageObjectId &id, bool isPreview) {
   TStageObject *pegbar = xsh->getStageObjectTree()->getStageObject(id, false);
   if (!pegbar) return false;
 
@@ -398,7 +398,7 @@ TStageObjectId getMotionObjectId(MotionObjectType type, int index) {
 
 //-------------------------------------------------------------------
 
-TPointD getColumnSpeed(TXsheet *xsh, double row, int col, bool isPreview) {
+static TPointD getColumnSpeed(TXsheet *xsh, double row, int col, bool isPreview) {
   TAffine aff;
   TPointD a, b;
   const double h = 0.001;
@@ -427,10 +427,10 @@ TPointD getColumnSpeed(TXsheet *xsh, double row, int col, bool isPreview) {
 /*-- オブジェクトの軌跡を、基準点との差分で得る
         objectId: 移動の参考にするオブジェクト。自分自身の場合はNoneId
 --*/
-QList<TPointD> getColumnMotionPoints(TXsheet *xsh, double row, int col,
-                                     TStageObjectId &objectId, bool isPreview,
-                                     double shutterStart, double shutterEnd,
-                                     int traceResolution) {
+static QList<TPointD> getColumnMotionPoints(TXsheet *xsh, double row, int col,
+                                            TStageObjectId &objectId, bool isPreview,
+                                            double shutterStart, double shutterEnd,
+                                            int traceResolution) {
   /*-- 前後フレームが共に０なら空のリストを返す --*/
   if (shutterStart == 0.0 && shutterEnd == 0.0) return QList<TPointD>();
 

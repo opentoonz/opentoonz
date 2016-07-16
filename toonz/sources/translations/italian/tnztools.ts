@@ -993,6 +993,10 @@ Procedere?</translation>
         <translation>Unisci i Vettori</translation>
     </message>
     <message>
+        <source>Distance</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Mode:</source>
         <translation>Modalità:</translation>
     </message>

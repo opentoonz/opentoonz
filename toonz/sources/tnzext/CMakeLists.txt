@@ -67,6 +67,9 @@ set(SOURCES
     tlin/tlin_cblas_wrap.cpp
     tlin/tlin_superlu_wrap.cpp)
 
+set(OBJCSOURCES
+)
+
 if(WIN32 AND PLATFORM EQUAL 32)
     # can not link libopenblas_32.lib with SAFESEH
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
@@ -78,7 +81,9 @@ if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzext.dylib")
 endif()
 
-add_definitions(-DTNZEXT_EXPORTS)
+add_definitions(
+    -DTNZEXT_EXPORTS
+)
 
 message("subdir: tnzext")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
@@ -87,7 +92,10 @@ if(APPLE)
     find_library(ACCE_LIB Accelerate)
 endif()
 
-include_directories(${SDKROOT}/superlu/SuperLU_4.1/SRC)
+include_directories(
+    SYSTEM
+    ${SDKROOT}/superlu/SuperLU_4.1/SRC
+)
 
 if(WIN32)
     target_link_libraries(tnzext

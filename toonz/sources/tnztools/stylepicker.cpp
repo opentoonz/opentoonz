@@ -151,13 +151,13 @@ namespace {
 
 TPixel32 getAverageColor(const TRect &rect) {
   GLenum fmt =
-#ifdef TNZ_MACHINE_CHANNEL_ORDER_BGRM
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
       GL_RGBA;
-#elif TNZ_MACHINE_CHANNEL_ORDER_MBGR
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
       GL_ABGR_EXT;
-#elif TNZ_MACHINE_CHANNEL_ORDER_RGBM
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
       GL_RGBA;
-#elif TNZ_MACHINE_CHANNEL_ORDER_MRGB
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
       GL_BGRA;
 #else
 //   Error  PLATFORM NOT SUPPORTED
@@ -181,13 +181,13 @@ TPixel32 getAverageColor(const TRect &rect) {
 
 TPixel32 getAverageColor(TStroke *stroke) {
   GLenum fmt =
-#ifdef TNZ_MACHINE_CHANNEL_ORDER_BGRM
+#if defined(TNZ_MACHINE_CHANNEL_ORDER_BGRM)
       GL_RGBA;
-#elif TNZ_MACHINE_CHANNEL_ORDER_MBGR
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MBGR)
       GL_ABGR_EXT;
-#elif TNZ_MACHINE_CHANNEL_ORDER_RGBM
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_RGBM)
       GL_RGBA;
-#elif TNZ_MACHINE_CHANNEL_ORDER_MRGB
+#elif defined(TNZ_MACHINE_CHANNEL_ORDER_MRGB)
       GL_BGRA;
 #else
 //   Error  PLATFORM NOT SUPPORTED

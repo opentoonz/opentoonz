@@ -22,9 +22,9 @@ QScriptValue OutlineVectorizer::ctor(QScriptContext *context,
   return create(engine, new OutlineVectorizer());
 }
 
-QScriptValue vectorizeImage(QScriptContext *context, QScriptEngine *engine,
-                            const TImageP &src, TPalette *palette,
-                            NewOutlineConfiguration *parameters) {
+static QScriptValue vectorizeImage(QScriptContext *context, QScriptEngine *engine,
+                                   const TImageP &src, TPalette *palette,
+                                   NewOutlineConfiguration *parameters) {
   VectorizerCore vc;
   TAffine dpiAff;
   double factor = Stage::inch;

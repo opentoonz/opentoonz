@@ -375,7 +375,7 @@ QString toString(int value, int w, char c = ' ') {
 
 //------------------------------------------------------------------------------
 
-TFilePath getFilePath(const QStringList &l, int &i) {
+static TFilePath getFilePath(const QStringList &l, int &i) {
   QString outStr = l.at(i++);
   if (outStr.startsWith('"')) {
     outStr = outStr.remove(0, 1);

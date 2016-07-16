@@ -99,7 +99,9 @@ add_translation(tnztools ${HEADERS} ${SOURCES})
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 add_library(tnztools SHARED ${HEADERS} ${SOURCES} ${RESOURCES})
-add_definitions(-DTNZTOOLS_EXPORTS)
+add_definitions(
+    -DTNZTOOLS_EXPORTS
+)
 
 if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnztools.dylib")
@@ -108,7 +110,13 @@ endif()
 message("subdir: tnztools")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
-include_directories(../include/tools ${SDKROOT}/superlu/SupperLU_4.1/SRC)
+include_directories(
+    SYSTEM
+    ${SDKROOT}/superlu/SupperLU_4.1/SRC
+)
+include_directories(
+    ../include/tools
+)
 
 _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;tnzext;toonzlib;toonzqt")
 

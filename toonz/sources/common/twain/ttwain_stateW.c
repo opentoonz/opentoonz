@@ -26,7 +26,8 @@ int TTWAIN_LoadSourceManagerPD(void) {
   GetWindowsDirectory(winDir, _MAX_PATH);
   if (!winDir[0]) return FALSE;
 
-  strcat(winDir, "\\");
+  strcat(winDir, "\\system32\\");
+  // strcat(winDir, "\\");
   strcat(winDir, DSM_FILENAME);
 
   hDSMLib = LoadLibrary(winDir);
@@ -51,8 +52,10 @@ return FALSE;
       FreeLibrary(hDSMLib);
       hDSMLib = NULL;
     }
-  } else
+  } else {
+    DWORD err            = GetLastError();
     TTwainData.DSM_Entry = 0;
+  }
   return (TTWAIN_GetState() >= TWAIN_SM_LOADED);
 }
 /*---------------------------------------------------------------------------*/

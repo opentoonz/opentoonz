@@ -15,7 +15,7 @@
 //#include "tmacroW.h"
 #endif
 
-#if defined(DBMALLOC) && !defined(WIN32)
+#if defined(DBMALLOC) && !defined(_WIN32)
 #include "dbmalloc.h"
 #endif
 
@@ -126,7 +126,7 @@ static const char *const TALLOC_MSG_ =
 static const char *const TREALLOC_MSG_ =
     "Out of memory reallocating %d bytes (%s line %d)";
 
-#if defined(WIN32) && defined(_DEBUG)
+#if defined(_WIN32) && defined(_DEBUG)
 #define WIN32_DBG_NBFL_ , _NORMAL_BLOCK, __FILE__, __LINE__
 #define WIN32_DBG_NB_ , _NORMAL_BLOCK
 #define TMALLOC_FUN_ _malloc_dbg

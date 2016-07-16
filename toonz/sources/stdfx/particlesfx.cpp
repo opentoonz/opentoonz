@@ -448,6 +448,7 @@ void ParticlesFx::doCompute(TTile &tile, double frame,
     partLevel[0]->setName("particles");
     TDimension vecsize(10, 10);
     TOfflineGL *offlineGlContext = new TOfflineGL(vecsize);
+    offlineGlContext->makeCurrent();
     offlineGlContext->clear(TPixel32(0, 0, 0, 0));
 
     TStroke *stroke;
@@ -459,7 +460,7 @@ void ParticlesFx::doCompute(TTile &tile, double frame,
     vectmp->setPalette(plt);
     vectmp->addStroke(stroke);
     TVectorRenderData rd(AffI, TRect(vecsize), plt, 0, true, true);
-    offlineGlContext->makeCurrent();
+
     offlineGlContext->draw(vectmp, rd);
 
     partLevel[0]->setFrame(

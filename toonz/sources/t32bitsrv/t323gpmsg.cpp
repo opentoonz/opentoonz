@@ -13,9 +13,9 @@
 #include "tproperty.h"
 #include "tsound.h"
 
-#ifdef WIN32
+#if defined(_WIN32)
 #include "../image/3gp/tiio_3gp.h"
-#elif MACOSX
+#elif defined(MACOSX)
 #include "../image/3gp/tiio_3gpM.h"
 #endif
 

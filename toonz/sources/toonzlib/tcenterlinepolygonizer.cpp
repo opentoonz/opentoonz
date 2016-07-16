@@ -304,8 +304,8 @@ inline void setSignature(Signaturemap &ras, const RawBorder &border, int val) {
 // Keeping B on the right of our path-seeking direction, we may either turn
 // left or right at these points.
 
-RawBorder *extractPath(Signaturemap &ras, int x0, int y0, int pathType,
-                       int xOuterPixel, int despeckling) {
+static RawBorder *extractPath(Signaturemap &ras, int x0, int y0, int pathType,
+                              int xOuterPixel, int despeckling) {
   RawBorder *path = new RawBorder;
   int x, y;
   short dirX, dirY;
@@ -389,8 +389,8 @@ RawBorder *extractPath(Signaturemap &ras, int x0, int y0, int pathType,
 
 //--------------------------------------------------------------------------
 
-BorderList *extractBorders(const TRasterP &ras, int threshold,
-                           int despeckling) {
+static BorderList *extractBorders(const TRasterP &ras, int threshold,
+                                  int despeckling) {
   Signaturemap byteImage(ras, threshold);
 
   BorderList *borderHierarchy = new BorderList;

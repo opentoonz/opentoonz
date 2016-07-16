@@ -13,7 +13,10 @@ set(SOURCES
     raw/tsio_raw.cpp)
     
 add_library(sound SHARED ${HEADERS} ${SOURCES})
-add_definitions(-DSOUND_EXPORTS)
+add_definitions(
+    -DSOUND_EXPORTS
+)
+
 if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libsound.dylib")
 endif()

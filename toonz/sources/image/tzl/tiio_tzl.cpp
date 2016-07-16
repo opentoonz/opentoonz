@@ -128,19 +128,22 @@ bool readVersion(FILE *chan, int &version) {
   char magic[8];
   memset(magic, 0, sizeof(magic));
   fread(&magic, sizeof(char), 8, chan);
-  if (std::string(magic).substr(0, 5) == "TLV10")
+  if (memcmp(magic, "TLV10", 5) == 0) {
     version = 10;
-  else if (std::string(magic, 5) == "TLV11")
+  }
+  else if (memcmp(magic, "TLV11", 5) == 0) {
     version = 11;
-  else if (std::string(magic, 5) == "TLV12")
+  }
+  else if (memcmp(magic, "TLV12", 5) == 0) {
     version = 12;
-  else if (std::string(magic, 5) == "TLV13")
+  }
+  else if (memcmp(magic, "TLV13", 5) == 0) {
     version = 13;
-  else if (std::string(magic, 5) == "TLV14")
+  }
+  else if (memcmp(magic, "TLV14", 5) == 0) {
     version = 14;
+  }
   else {
-    fclose(chan);
-    chan = 0;
     return false;
   }
   return true;

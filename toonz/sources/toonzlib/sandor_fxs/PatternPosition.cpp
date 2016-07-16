@@ -32,7 +32,7 @@ bool CPatternPosition::isInSet(const int nbSet, const int *set, const int val) {
   return false;
 }
 
-int pp_intCompare(const void *a, const void *b) {
+static int pp_intCompare(const void *a, const void *b) {
   int *aa = (int *)a;
   int *bb = (int *)b;
 

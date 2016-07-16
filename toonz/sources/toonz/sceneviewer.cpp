@@ -314,7 +314,7 @@ void invalidateIcons() {
 
 //--------------------------------------------------------------
 
-void executeCheck(int checkType) {
+static void executeCheck(int checkType) {
   ToonzCheck::instance()->toggleCheck(checkType);
   invalidateIcons();
 }
@@ -1021,7 +1021,7 @@ void SceneViewer::drawBackground() {
   }
 }
 
-bool check_framebuffer_status() {
+static bool check_framebuffer_status() {
 #ifdef _WIN32
   PROC proc = wglGetProcAddress("glCheckFramebufferStatusEXT");
   if (proc == nullptr) return true;
@@ -1363,7 +1363,7 @@ void SceneViewer::drawOverlay() {
 
 //-----------------------------------------------------------------------------
 
-void drawFpsGraph(int t0, int t1) {
+static void drawFpsGraph(int t0, int t1) {
   glDisable(GL_BLEND);
   static std::deque<std::pair<int, int>> times;
   times.push_back(std::make_pair(t0, t1));

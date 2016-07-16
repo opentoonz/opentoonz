@@ -69,7 +69,8 @@ typedef std::vector<Player> PlayerSet;
    thickness of
                 images .pli.
 */
-const double Stage::inch = 53.33333;
+const double Stage::inch      = 53.33333;  // consider changing to 120 or 160
+const double Stage::vectorDpi = 53.3333;
 
 namespace {
 void updateOnionSkinSize(const PlayerSet &players) {
@@ -453,8 +454,8 @@ void StageBuilder::addCell(PlayerSet &players, ToonzScene *scene, TXsheet *xsh,
 
 //-----------------------------------------------------------------------------
 
-bool alreadyAdded(TXsheet *xsh, int row, int index,
-                  const std::vector<int> &rows, int col) {
+static bool alreadyAdded(TXsheet *xsh, int row, int index,
+                         const std::vector<int> &rows, int col) {
   int i;
   for (i = 0; i < index; i++)
     if (xsh->getCell(rows[i], col) == xsh->getCell(rows[index], col))
