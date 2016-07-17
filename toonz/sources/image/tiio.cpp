@@ -170,7 +170,7 @@ void initImageIo(bool lightVersion) {
 	  Tiio::defineWriterProperties("webm", new Tiio::WebmWriterProperties());
 
 	  TLevelWriter::define("gif", TLevelWriterGif::create, true);
-	  //TLevelReader::define("gif", TLevelReaderGif::create);
+	  TLevelReader::define("gif", TLevelReaderGif::create);
 	  TFileType::declare("gif", TFileType::RASTER_LEVEL);
 	  Tiio::defineWriterProperties("gif", new Tiio::GifWriterProperties());
 

@@ -1,7 +1,7 @@
 #include "tiio_ffmpeg.h"
 #include "tsystem.h"
 #include "tsound.h"
-#include "trasterimage.h"
+
 #include <QProcess>
 #include <QDir>
 #include <QtGui/QImage>
@@ -127,21 +127,22 @@ void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs, bool include
 	//write the file
 	QProcess ffmpeg;
 	ffmpeg.start(m_ffmpegPath + "/ffmpeg", args);
-	ffmpeg.waitForFinished(-1);
+	ffmpeg.waitForFinished();
 	QString results = ffmpeg.readAllStandardError();
 	results += ffmpeg.readAllStandardOutput();
 	ffmpeg.close();
 	std::string strResults = results.toStdString();
 }
 
-void Ffmpeg::runFfprobe(QStringList args) {
+QString Ffmpeg::runFfprobe(QStringList args) {
 	QProcess ffmpeg;
-	ffmpeg.start(m_ffmpegPath + "/ffmpeg", args);
+	ffmpeg.start(m_ffmpegPath + "/ffprobe", args);
 	ffmpeg.waitForFinished(-1);
 	QString results = ffmpeg.readAllStandardError();
 	results += ffmpeg.readAllStandardOutput();
 	ffmpeg.close();
 	std::string strResults = results.toStdString();
+	return results;
 }
 
 void Ffmpeg::saveSoundTrack(TSoundTrack *st)
@@ -179,6 +180,27 @@ void Ffmpeg::saveSoundTrack(TSoundTrack *st)
 
 	//add file to framesWritten for cleanup
 	m_cleanUpList.push_back(m_audioPath);
+}
+
+TRasterImageP Ffmpeg::getImage(QString path, int lx, int ly) {
+	if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
+		QImage *temp = new QImage(path, "PNG");
+		if (temp){
+			QImage tempToo = temp->convertToFormat(QImage::Format_ARGB32);
+			delete temp;
+			const UCHAR *bits = tempToo.bits();
+
+			TRasterPT<TPixelRGBM32> ret;
+			ret.create(lx, ly);
+			ret->lock();
+			memcpy(ret->getRawData(), bits, lx * ly * 4);
+			ret->unlock();
+			ret->yMirror();
+			return TRasterImageP(ret);
+		}
+	}
+	else return TRasterImageP();
+
 }
 
 void Ffmpeg::addToCleanUp(QString path) {
