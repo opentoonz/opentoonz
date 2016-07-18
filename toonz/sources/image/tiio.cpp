@@ -165,7 +165,7 @@ void initImageIo(bool lightVersion) {
   //ffmpeg 
   if (Ffmpeg::checkFfmpeg()) {
 	  TLevelWriter::define("webm", TLevelWriterWebm::create, true);
-	  //TLevelReader::define("webm", TLevelReaderWebm::create);
+	  TLevelReader::define("webm", TLevelReaderWebm::create);
 	  TFileType::declare("webm", TFileType::RASTER_LEVEL);
 	  Tiio::defineWriterProperties("webm", new Tiio::WebmWriterProperties());
 
@@ -175,7 +175,7 @@ void initImageIo(bool lightVersion) {
 	  Tiio::defineWriterProperties("gif", new Tiio::GifWriterProperties());
 
 	  TLevelWriter::define("mp4", TLevelWriterMp4::create, true);
-	  //TLevelReader::define("mp4", TLevelReaderMp4::create);
+	  TLevelReader::define("mp4", TLevelReaderMp4::create);
 	  TFileType::declare("mp4", TFileType::RASTER_LEVEL);
 	  Tiio::defineWriterProperties("mp4", new Tiio::Mp4WriterProperties());
   }

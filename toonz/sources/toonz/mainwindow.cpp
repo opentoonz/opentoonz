@@ -435,11 +435,23 @@ centralWidget->setLayout(centralWidgetLayout);*/
   setCommandHandler(MI_About, this, &MainWindow::onAbout);
   setCommandHandler(MI_MaximizePanel, this, &MainWindow::maximizePanel);
   setCommandHandler(MI_FullScreenWindow, this, &MainWindow::fullScreenWindow);
+  //remove ffmpegCache if still exists from crashed exit
+  QString ffmpegCachePath = ToonzFolder::getCacheRootFolder().getQString() + "//ffmpeg";
+  if (TSystem::doesExistFileOrLevel(TFilePath(ffmpegCachePath))) {
+	  TSystem::rmDirTree(TFilePath(ffmpegCachePath));
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-MainWindow::~MainWindow() { TEnv::saveAllEnvVariables(); }
+MainWindow::~MainWindow() { 
+	TEnv::saveAllEnvVariables();
+	//cleanup ffmpeg cache
+	QString ffmpegCachePath = ToonzFolder::getCacheRootFolder().getQString() + "//ffmpeg";
+	if (TSystem::doesExistFileOrLevel(TFilePath(ffmpegCachePath))) {
+		TSystem::rmDirTree(TFilePath(ffmpegCachePath));
+	}
+}
 
 //-----------------------------------------------------------------------------
 

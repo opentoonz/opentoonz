@@ -57,11 +57,12 @@ public:
 	TLevelP loadInfo() override;
 	TImageP load(int frameIndex);
 	TDimension getSize();
-	TThread::Mutex m_mutex;
-	void *m_decompressedBuffer;
+	//TThread::Mutex m_mutex;
+	//void *m_decompressedBuffer;
 private:
+	Ffmpeg *ffmpegReader;
 	TDimension m_size;
-	int m_numFrames, m_lx, m_ly;
+	int m_frameCount, m_lx, m_ly;
 };
 
 //===========================================================================

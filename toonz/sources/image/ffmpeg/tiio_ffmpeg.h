@@ -26,12 +26,17 @@ public:
 	void saveSoundTrack(TSoundTrack *st);
 	static bool checkFfmpeg();
 	static bool checkFfprobe();
-	TRasterImageP getImage(QString path, int lx, int ly);
+	double getFrameRate();
+	TDimension getSize();
+	int getFrameCount();
+	void getFramesFromMovie();
+	TRasterImageP getImage(int frameIndex);
+	TFilePath getFfmpegCache();
 
 private:
 	QString m_intermediateFormat, m_ffmpegPath, m_audioPath, m_audioFormat;
-	int m_frameCount, m_lx, m_ly, m_bpp, m_bitsPerSample, m_channelCount;
-	double m_frameRate;
+	int m_frameCount= 0, m_lx, m_ly, m_bpp, m_bitsPerSample, m_channelCount;
+	double m_frameRate = 24.0;
 	bool m_ffmpegExists = false, m_ffprobeExists = false, m_hasSoundTrack = false;
 	TFilePath m_path;
 	QVector<QString> m_cleanUpList;

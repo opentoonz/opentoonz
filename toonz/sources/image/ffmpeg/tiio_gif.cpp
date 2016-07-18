@@ -174,7 +174,7 @@ private:
 
 //===========================================================
 //
-//  TLevelReaderAvi
+//  TLevelReaderGif
 //
 //===========================================================
 
@@ -183,139 +183,19 @@ TLevelReaderGif::TLevelReaderGif(const TFilePath &path)
 	: TLevelReader(path)
 
 
-{
-
-	
+{	
 	ffmpegReader = new Ffmpeg();
-	//QProcess probe;
-	QStringList fpsArgs;
-	QStringList sizeArgs;
-	QStringList frameNumArgs;
-
-	//QString ffmpegPath = QDir::currentPath();
-	//std::string ffmpegstrpath = ffmpegPath.toStdString();
+	ffmpegReader->setPath(m_path);
 	
+	double fps = ffmpegReader->getFrameRate();
 
-	//get fps
-	fpsArgs << "-v";
-	fpsArgs << "error";
-	fpsArgs << "-select_streams";
-	fpsArgs << "v:0";
-	fpsArgs << "-show_entries";
-	fpsArgs << "stream=avg_frame_rate";
-	fpsArgs << "-of";
-	fpsArgs << "default=noprint_wrappers=1:nokey=1";
-	fpsArgs << m_path.getQString();
+	m_size = ffmpegReader->getSize();
+	m_lx = m_size.lx;
+	m_ly = m_size.ly;
 
-	QString fpsResults = ffmpegReader->runFfprobe(fpsArgs);
-	//probe.start(ffmpegPath + "/ffprobe", fpsArgs);
-	//probe.waitForFinished(-1);
-	//QString fpsResults = probe.readAllStandardError();
-	//fpsResults += probe.readAllStandardOutput();
-	//probe.close();
+	m_frameCount = ffmpegReader->getFrameCount();
 
-	int fpsNum = fpsResults.split("/")[0].toInt();
-	int fpsDen = fpsResults.split("/")[1].toInt();
-	double fps = fpsNum / fpsDen;
-
-
-	//get size
-	sizeArgs << "-v";
-	sizeArgs << "error";
-	sizeArgs << "-of";
-	sizeArgs << "flat=s=_";
-	sizeArgs << "-select_streams";
-	sizeArgs << "v:0";
-	sizeArgs << "-show_entries";
-	sizeArgs << "stream=height,width";
-	sizeArgs << m_path.getQString();
-
-	//probe.start(ffmpegPath + "/ffprobe", sizeArgs);
-	//probe.waitForFinished(-1);
-	//QString sizeResults = probe.readAllStandardError();
-	//sizeResults += probe.readAllStandardOutput();
-	//probe.close();
-	//std::string szStr = sizeResults.toStdString();
-
-	QString sizeResults = ffmpegReader->runFfprobe(sizeArgs);
-
-	QStringList split = sizeResults.split("\r");
-	m_lx = split[0].split("=")[1].toInt();
-	m_ly = split[1].split("=")[1].toInt();
-	
-	
-	//get total frames
-	frameNumArgs << "-v";
-	frameNumArgs << "error";
-	frameNumArgs << "-count_frames";
-	frameNumArgs << "-select_streams";
-	frameNumArgs << "v:0";
-	frameNumArgs << "-show_entries";
-	frameNumArgs << "stream=nb_read_frames";
-	frameNumArgs << "-of";
-	frameNumArgs << "default=nokey=1:noprint_wrappers=1";
-	frameNumArgs << m_path.getQString();
-	
-
-	//probe.start(ffmpegPath + "/ffprobe", frameNumArgs);
-	//probe.waitForFinished(-1);
-	//QString frameResults = probe.readAll();
-	//sizeResults += probe.readAllStandardOutput();
-	//probe.close();
-	//std::string framesStr = frameResults.toStdString();
-
-	QString frameResults = ffmpegReader->runFfprobe(frameNumArgs);
-	
-	m_numFrames = frameResults.toInt();
-	m_size = TDimension(m_lx, m_ly);
-
-	////convert frames
-	//TFilePath tempPath(m_path.getQString());
-	//QString tempName = "In%04d.png";
-	//tempName = tempPath.getQString() + tempName;
-	//QString tempStart = "In0001.png";
-	//tempStart = tempPath.getQString() + tempStart;
-	//QString tempBase = tempPath.getQString() + "In";
-	//QString addToDelete;
-	//if (!TSystem::doesExistFileOrLevel(TFilePath(tempStart))) {
-	//	//for debugging	
-	//	//std::string strPath = tempName.toStdString();
-
-	//	//QString ffmpegPath = QDir::currentPath();
-	//	//std::string ffmpegstrpath = ffmpegPath.toStdString();
-	//	//QProcess ffmpeg;
-	//	QStringList preIFrameArgs;
-	//	QStringList postIFrameArgs;
-	//	//frameArgs << "-accurate_seek";
-	//	//frameArgs << "-ss";
-	//	//frameArgs << "0" + QString::number(frameIndex / m_info->m_frameRate);
-	//	preIFrameArgs << "-i";
-	//	preIFrameArgs << m_path.getQString();
-	//	//frameArgs << "-y";
-	//	postIFrameArgs << "-f";
-	//	postIFrameArgs << "image2";
-	//	//postIFrameArgs << "-vcodec";
-	//	//postIFrameArgs << "rawvideo";
-	//	//postIFrameArgs << "-pix_fmt";
-	//	//postIFrameArgs << "rgb32";
-	//	postIFrameArgs << tempName;
-
-	//	//ffmpeg.start(ffmpegPath + "/ffmpeg", frameArgs);
-	//	//ffmpeg.waitForFinished(15000);
-	//	//QString frameConvertResults = ffmpeg.readAllStandardError();
-	//	//sizeResults += probe.readAllStandardOutput();
-	//	//ffmpeg.close();
-	//	//std::string framesConvertStr = frameResults.toStdString();
-	//	ffmpegReader->runFfmpeg(preIFrameArgs, postIFrameArgs, true, true, true);
-
-	//	for (int i = 1; i <= m_numFrames; i++)
-	//	{
-	//		QString number = QString("%1").arg(i, 4, 10, QChar('0'));
-	//		addToDelete = tempBase + number + ".png";
-	//		std::string delPath = addToDelete.toStdString();
-	//		ffmpegReader->addToCleanUp(addToDelete);
-	//	}
-	//}
+	ffmpegReader->getFramesFromMovie();
 
 	//set values
 	m_info = new TImageInfo();
@@ -324,24 +204,20 @@ TLevelReaderGif::TLevelReaderGif(const TFilePath &path)
 	m_info->m_ly = m_ly;
 	m_info->m_bitsPerSample = 8;
 	m_info->m_samplePerPixel = 4;
-
-	
-
-
 }
 //-----------------------------------------------------------
 
 TLevelReaderGif::~TLevelReaderGif() {
-	ffmpegReader->cleanUpFiles();
+	//ffmpegReader->cleanUpFiles();
 }
 
 //-----------------------------------------------------------
 
 TLevelP TLevelReaderGif::loadInfo() {
 	
-	if (m_numFrames == -1) return TLevelP();
+	if (m_frameCount == -1) return TLevelP();
 	TLevelP level;
-	for (int i = 1; i <= m_numFrames; i++) level->setFrame(i, TImageP());
+	for (int i = 1; i <= m_frameCount; i++) level->setFrame(i, TImageP());
 	return level;
 }
 
@@ -366,65 +242,7 @@ TDimension TLevelReaderGif::getSize() {
 //------------------------------------------------
 
 TImageP TLevelReaderGif::load(int frameIndex) {
-	
-	TFilePath tempPath(m_path.getQString());
-	QString number = QString("%1").arg(frameIndex, 4, 10, QChar('0'));
-	QString tempName = "In" + number + ".png";
-	tempName = tempPath.getQString() + tempName;
-	
-	//for debugging	
-	std::string strPath = tempName.toStdString();
-	
-	//This loads one image from the file, but it is slow.
-	//QString ffmpegPath = QDir::currentPath();
-	//std::string ffmpegstrpath = ffmpegPath.toStdString();
-	//QProcess ffmpeg;
-	QStringList preIFrameArgs;
-	QStringList postIFrameArgs;
-	preIFrameArgs << "-accurate_seek";
-	preIFrameArgs << "-ss";
-	preIFrameArgs << "0" + QString::number(frameIndex / m_info->m_frameRate);
-	preIFrameArgs << "-i";
-	preIFrameArgs << m_path.getQString();
-	postIFrameArgs << "-y";
-	postIFrameArgs << "-frames:v";
-	postIFrameArgs << "1";
-	//postIFrameArgs << "-vcodec";
-	//postIFrameArgs << "rawvideo";
-	//postIFrameArgs << "-pix_fmt";
-	//postIFrameArgs << "rgb32";
-	postIFrameArgs << tempName;
-
-	ffmpegReader->runFfmpeg(preIFrameArgs, postIFrameArgs, true, true, true);
-	
-
-	//ffmpeg.start(ffmpegPath + "/ffmpeg", frameArgs);
-	//ffmpeg.waitForFinished(5000);
-	//QString frameResults = ffmpeg.readAllStandardError();
-	//sizeResults += probe.readAllStandardOutput();
-	//ffmpeg.close();
-	//std::string framesStr = frameResults.toStdString();
-	//time for i in{ 0..39 }; do ffmpeg - accurate_seek - ss `echo $i*60.0 | bc` - i input.gif - frames:v 1 period_down_$i.bmp; done;
-	ffmpegReader->addToCleanUp(tempName);
-	return ffmpegReader->getImage(tempName, m_lx, m_ly);
-	
-
-	/*QFile file(tempName);
-	file.open(QIODevice::ReadOnly);
-	QByteArray blob = file.readAll();
-	file.close();
-
-	TRasterPT<TPixelRGBM32> ret;
-	ret.create(m_info->m_lx, m_info->m_ly);
-	ret->lock();
-	memcpy(ret->getRawData(), blob.data(), m_info->m_lx * m_info->m_ly * 4);
-	ret->unlock();
-	ret->yMirror();
-	return TRasterImageP(ret);*/
-
-	//return ffmpegReader->getImage(tempName, m_lx, m_ly);
-	
-	//return TRasterImageP();
+	return ffmpegReader->getImage(frameIndex);
 }
 
 
