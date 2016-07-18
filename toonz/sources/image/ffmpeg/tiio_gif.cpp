@@ -41,8 +41,9 @@ private:
 TLevelWriterGif::TLevelWriterGif(const TFilePath &path, TPropertyGroup *winfo)
 	: TLevelWriter(path, winfo) {
 	if (!m_properties) m_properties = new Tiio::GifWriterProperties();
-	std::string scale = m_properties->getProperty("Scale")->getValueAsString();
-	sscanf(scale.c_str(), "%d", &m_scale);
+	std::string scale = ((TEnumProperty *)(m_properties->getProperty("Scale")))
+		->getValueAsString();
+	m_scale = QString::fromStdString(scale).toInt();
 	TBoolProperty* looping = (TBoolProperty *)m_properties->getProperty("Looping");
 	m_looping = looping->getValue();
 	TBoolProperty* palette = (TBoolProperty *)m_properties->getProperty("Generate Palette");
@@ -186,14 +187,12 @@ TLevelReaderGif::TLevelReaderGif(const TFilePath &path)
 {	
 	ffmpegReader = new Ffmpeg();
 	ffmpegReader->setPath(m_path);
-	
-	double fps = ffmpegReader->getFrameRate();
-
-	m_size = ffmpegReader->getSize();
+	ffmpegFileInfo tempInfo = ffmpegReader->getInfo();
+	double fps = tempInfo.m_frameRate;
+	m_frameCount = tempInfo.m_frameCount;
+	m_size = TDimension(tempInfo.m_lx, tempInfo.m_ly);
 	m_lx = m_size.lx;
 	m_ly = m_size.ly;
-
-	m_frameCount = ffmpegReader->getFrameCount();
 
 	ffmpegReader->getFramesFromMovie();
 
@@ -250,11 +249,18 @@ TImageP TLevelReaderGif::load(int frameIndex) {
 
 
 Tiio::GifWriterProperties::GifWriterProperties()
-	: m_scale("Scale", 1, 100, 100), m_looping("Looping", false), m_palette("Generate Palette", true) {
-		bind(m_scale);
-		bind(m_looping);
-		bind(m_palette);
-	
+	: m_scale("Scale"), m_looping("Looping", false), m_palette("Generate Palette", true) {
+	m_scale.addValue(L"100");
+	m_scale.addValue(L"90");
+	m_scale.addValue(L"75");
+	m_scale.addValue(L"50");
+	m_scale.addValue(L"25");
+	m_scale.addValue(L"10");
+	m_scale.setValue(L"100");
+	bind(m_scale); 
+	bind(m_looping);
+	bind(m_palette);
+		
 }
 
 //Tiio::Reader* Tiio::makeGifReader(){ return nullptr; }

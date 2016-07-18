@@ -75,8 +75,8 @@ namespace Tiio {
 	public:
 		// TEnumProperty m_pixelSize;
 		//TBoolProperty m_matte;
-		TIntProperty m_vidQuality;
-		TIntProperty m_scale;
+		TEnumProperty m_vidQuality;
+		TEnumProperty m_scale;
 		Mp4WriterProperties();
 	};
 

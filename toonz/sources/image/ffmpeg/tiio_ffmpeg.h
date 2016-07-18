@@ -10,6 +10,11 @@
 #include <QStringList>
 
 
+struct ffmpegFileInfo {
+	int m_lx, m_ly, m_frameCount;
+	double m_frameRate;
+};
+
 class Ffmpeg {
 
 public:
@@ -24,14 +29,16 @@ public:
 	void setFrameRate(double fps);
 	void setPath(TFilePath path);
 	void saveSoundTrack(TSoundTrack *st);
+	bool checkFilesExist();
 	static bool checkFfmpeg();
 	static bool checkFfprobe();
 	double getFrameRate();
 	TDimension getSize();
 	int getFrameCount();
-	void getFramesFromMovie();
+	void getFramesFromMovie(int frame = -1);
 	TRasterImageP getImage(int frameIndex);
 	TFilePath getFfmpegCache();
+	ffmpegFileInfo getInfo();
 
 private:
 	QString m_intermediateFormat, m_ffmpegPath, m_audioPath, m_audioFormat;

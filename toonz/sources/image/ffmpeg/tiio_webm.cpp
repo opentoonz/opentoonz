@@ -42,10 +42,14 @@ private:
 TLevelWriterWebm::TLevelWriterWebm(const TFilePath &path, TPropertyGroup *winfo)
 	: TLevelWriter(path, winfo) {
 	if (!m_properties) m_properties = new Tiio::WebmWriterProperties();
-	std::string scale = m_properties->getProperty("Scale")->getValueAsString();
-	sscanf(scale.c_str(), "%d", &m_scale);
-	std::string quality = m_properties->getProperty("Quality")->getValueAsString();
-	sscanf(quality.c_str(), "%d", &m_vidQuality);
+	std::string quality = ((TEnumProperty *)(m_properties->getProperty("Quality")))
+		->getValueAsString();
+	if (quality == "Excellent") m_vidQuality = 100;
+	if (quality == "Standard") m_vidQuality = 90;
+	if (quality == "Low") m_vidQuality = 50;
+	std::string scale = ((TEnumProperty *)(m_properties->getProperty("Scale")))
+		->getValueAsString();
+	m_scale = QString::fromStdString(scale).toInt();
 	ffmpegWriter = new Ffmpeg();
 	ffmpegWriter->setPath(m_path);
 	if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);
@@ -169,14 +173,12 @@ TLevelReaderWebm::TLevelReaderWebm(const TFilePath &path)
 {
 	ffmpegReader = new Ffmpeg();
 	ffmpegReader->setPath(m_path);
-
-	double fps = ffmpegReader->getFrameRate();
-
-	m_size = ffmpegReader->getSize();
+	ffmpegFileInfo tempInfo = ffmpegReader->getInfo();
+	double fps = tempInfo.m_frameRate;
+	m_frameCount = tempInfo.m_frameCount;
+	m_size = TDimension(tempInfo.m_lx, tempInfo.m_ly);
 	m_lx = m_size.lx;
 	m_ly = m_size.ly;
-
-	m_frameCount = ffmpegReader->getFrameCount();
 
 	ffmpegReader->getFramesFromMovie();
 
@@ -231,10 +233,20 @@ TImageP TLevelReaderWebm::load(int frameIndex) {
 
 
 Tiio::WebmWriterProperties::WebmWriterProperties()
-	: m_vidQuality("Quality", 1, 100, 65), m_scale("Scale", 1, 100, 100) {
-		bind(m_vidQuality);
-		bind(m_scale);
-	
+	: m_vidQuality("Quality"), m_scale("Scale") {
+	m_vidQuality.addValue(L"Excellent");
+	m_vidQuality.addValue(L"Standard");
+	m_vidQuality.addValue(L"Low");
+	m_vidQuality.setValue(L"Standard");
+	m_scale.addValue(L"100");
+	m_scale.addValue(L"90");
+	m_scale.addValue(L"75");
+	m_scale.addValue(L"50");
+	m_scale.addValue(L"25");
+	m_scale.addValue(L"10");
+	m_scale.setValue(L"100");
+	bind(m_vidQuality);
+	bind(m_scale);	
 }
 
 //Tiio::Reader* Tiio::makeWebmReader(){ return nullptr; }

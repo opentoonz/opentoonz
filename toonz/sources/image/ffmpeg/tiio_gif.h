@@ -76,12 +76,10 @@ namespace Tiio {
 
 class GifWriterProperties : public TPropertyGroup {
 public:
-  // TEnumProperty m_pixelSize;
-  //TBoolProperty m_matte;
+	TEnumProperty m_scale; 
 	TBoolProperty m_looping;
 	TBoolProperty m_palette;
-	TIntProperty m_scale;
-    GifWriterProperties();
+	GifWriterProperties();
 };
 
 

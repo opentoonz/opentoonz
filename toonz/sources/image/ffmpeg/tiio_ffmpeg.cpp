@@ -9,11 +9,6 @@
 #include "toonz/toonzfolders.h"
 
 Ffmpeg::Ffmpeg() {
-	if (checkFfmpeg()) {
-		m_ffmpegExists = true;
-	}
-	if (checkFfprobe())
-		m_ffprobeExists = true;
 	m_ffmpegPath = Preferences::instance()->getFfmpegPath();
 	std::string strPath = m_ffmpegPath.toStdString();
 	m_intermediateFormat = "png";
@@ -192,6 +187,47 @@ void Ffmpeg::saveSoundTrack(TSoundTrack *st)
 	m_cleanUpList.push_back(m_audioPath);
 }
 
+bool Ffmpeg::checkFilesExist() { 
+	QString ffmpegCachePath = getFfmpegCache().getQString();
+	QString tempPath = ffmpegCachePath + "//" + QString::fromStdString(m_path.getName()) + QString::fromStdString(m_path.getType()) + "In0001." + m_intermediateFormat;
+	if (TSystem::doesExistFileOrLevel(TFilePath(tempPath))) {
+		return true;
+	}
+	else return false;
+}
+
+ffmpegFileInfo Ffmpeg::getInfo() {
+	QString ffmpegCachePath = getFfmpegCache().getQString();
+	QString tempPath = ffmpegCachePath + "//" + QString::fromStdString(m_path.getName()) + QString::fromStdString(m_path.getType()) + ".txt";
+	if (QFile::exists(tempPath)) {
+		QFile infoText(tempPath);
+		infoText.open(QIODevice::ReadOnly);
+		QByteArray ba = infoText.readAll();
+		infoText.close();
+		QString text = QString::fromStdString(ba.toStdString());
+		m_lx = text.split(" ")[0].toInt();
+		m_ly = text.split(" ")[1].toInt();
+		m_frameRate = text.split(" ")[2].toDouble();
+		m_frameCount = text.split(" ")[3].toInt();
+	}
+	else {
+		QFile infoText(tempPath);
+		getSize();
+		getFrameRate();
+		getFrameCount();
+		infoText.open(QIODevice::WriteOnly);
+		std::string infoToWrite = std::to_string(m_lx) + " " + std::to_string(m_ly) + " " + std::to_string(m_frameRate) + " " + std::to_string(m_frameCount);
+		int infoLength = infoToWrite.length();
+		infoText.write(infoToWrite.c_str(), infoLength);
+		infoText.close();
+	}
+	ffmpegFileInfo info;
+	info.m_lx = m_lx;
+	info.m_ly = m_ly;
+	info.m_frameRate = m_frameRate;
+	info.m_frameCount = m_frameCount; 
+	return info;
+}
 TRasterImageP Ffmpeg::getImage(int frameIndex) {
 	QString ffmpegCachePath = getFfmpegCache().getQString();
 	QString tempPath = ffmpegCachePath + "//" + QString::fromStdString(m_path.getName()) + QString::fromStdString(m_path.getType());
@@ -284,14 +320,21 @@ int Ffmpeg::getFrameCount() {
 	return m_frameCount;
 }
 
-void Ffmpeg::getFramesFromMovie() {
+void Ffmpeg::getFramesFromMovie(int frame) {
 	QString ffmpegCachePath = getFfmpegCache().getQString();
 	QString tempPath = ffmpegCachePath + "//" + QString::fromStdString(m_path.getName()) + QString::fromStdString(m_path.getType());
 	std::string tmpPath = tempPath.toStdString();
-	QString tempName = "In%04d.png";
+	QString tempName = "In%04d." + m_intermediateFormat;
 	tempName = tempPath + tempName;
-	QString tempStart = "In0001.png";
-	tempStart = tempPath + tempStart;
+	QString tempStart;
+	if (frame == -1) {
+		tempStart = "In0001." + m_intermediateFormat;
+		tempStart = tempPath + tempStart;
+	}
+	else {
+		QString number = QString("%1").arg(frame, 4, 10, QChar('0'));
+		tempStart = tempPath + "In" + number + "." + m_intermediateFormat;
+	}
 	QString tempBase = tempPath + "In";
 	QString addToDelete;
 	if (!TSystem::doesExistFileOrLevel(TFilePath(tempStart))) {
@@ -316,7 +359,7 @@ void Ffmpeg::getFramesFromMovie() {
 		for (int i = 1; i <= m_frameCount; i++)
 		{
 			QString number = QString("%1").arg(i, 4, 10, QChar('0'));
-			addToDelete = tempBase + number + ".png";
+			addToDelete = tempBase + number + "." + m_intermediateFormat;
 			std::string delPath = addToDelete.toStdString();
 			addToCleanUp(addToDelete);
 		}
