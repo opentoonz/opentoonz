@@ -128,8 +128,8 @@ public:
     if (Preferences::instance()->isGeneratedMovieViewEnabled()) {
       if (!isPreview && (Preferences::instance()->isDefaultViewerEnabled()) &&
           (m_fp.getType() == "mov" || m_fp.getType() == "avi" ||
-		  m_fp.getType() == "3gp" || m_fp.getType() == "mp4" || 
-		  m_fp.getType() == "gif" || m_fp.getType() == "webm")) {
+           m_fp.getType() == "3gp" || m_fp.getType() == "mp4" ||
+           m_fp.getType() == "gif" || m_fp.getType() == "webm")) {
         QString name = QString::fromStdString(m_fp.getName());
         int index;
         if ((index = name.indexOf("#RENDERID")) != -1)  //! quite ugly I
@@ -170,19 +170,19 @@ public:
         prop->m_frameRate              = outputSettings.getFrameRate();
         TSoundTrack *snd =
             app->getCurrentXsheet()->getXsheet()->makeSound(prop);
-		//keeps ffmpeg files from being previewed until import is fixed
-		if (m_fp.getType() != "mp4" && m_fp.getType() != "webm" && m_fp.getType() != "gif") {
-			if (outputSettings.getRenderSettings().m_stereoscopic) {
-				assert(!isPreview);
-				::viewFile(m_fp.withName(m_fp.getName() + "_l"), r0 + 1, r1 + 1, step,
-					isPreview ? rs.m_shrinkX : 1, snd, 0, false, true);
-				::viewFile(m_fp.withName(m_fp.getName() + "_r"), r0 + 1, r1 + 1, step,
-					isPreview ? rs.m_shrinkX : 1, snd, 0, false, true);
-			}
-			else
-				::viewFile(m_fp, r0 + 1, r1 + 1, step, isPreview ? rs.m_shrinkX : 1,
-				snd, 0, false, true);
-		}
+        // keeps ffmpeg files from being previewed until import is fixed
+        if (m_fp.getType() != "mp4" && m_fp.getType() != "webm" &&
+            m_fp.getType() != "gif") {
+          if (outputSettings.getRenderSettings().m_stereoscopic) {
+            assert(!isPreview);
+            ::viewFile(m_fp.withName(m_fp.getName() + "_l"), r0 + 1, r1 + 1,
+                       step, isPreview ? rs.m_shrinkX : 1, snd, 0, false, true);
+            ::viewFile(m_fp.withName(m_fp.getName() + "_r"), r0 + 1, r1 + 1,
+                       step, isPreview ? rs.m_shrinkX : 1, snd, 0, false, true);
+          } else
+            ::viewFile(m_fp, r0 + 1, r1 + 1, step, isPreview ? rs.m_shrinkX : 1,
+                       snd, 0, false, true);
+        }
       }
     }
   }
@@ -433,17 +433,17 @@ public:
     m_progressBarString =
         QString::number(steps) + ((isPreview) ? "" : " of " + toQString(path));
     // setMinimumDuration (0);
-	m_totalFrames = steps;
+    m_totalFrames = steps;
     show();
   }
 
   /*-- 以下３つの関数はMovieRenderer::Listenerの純粋仮想関数の実装 --*/
   bool onFrameCompleted(int frame) override {
     bool ret = wasCanceled();
-	if (m_frameCounter + 1 < m_totalFrames)
-		Message(this, ret ? -1 : ++m_frameCounter, m_progressBarString).send();
-	else
-		setLabelText(tr("Finalizing render, please wait."));
+    if (m_frameCounter + 1 < m_totalFrames)
+      Message(this, ret ? -1 : ++m_frameCounter, m_progressBarString).send();
+    else
+      setLabelText(tr("Finalizing render, please wait."));
     return !ret;
   }
   bool onFrameFailed(int frame, TException &) override {
@@ -500,8 +500,10 @@ void RenderCommand::rasterRender(bool isPreview) {
 
   TPixel32 currBgColor = scene->getProperties()->getBgColor();
   m_priorBgColor       = currBgColor;
-  //fixes background colors for non alpha-enabled export types (eventually transparent gif would be good)
-  if (ext == "jpg" || ext == "avi" || ext == "bmp" || ext == "mp4" || ext == "webm" || ext == "gif") {
+  // fixes background colors for non alpha-enabled export types (eventually
+  // transparent gif would be good)
+  if (ext == "jpg" || ext == "avi" || ext == "bmp" || ext == "mp4" ||
+      ext == "webm" || ext == "gif") {
     currBgColor.m = 255;
     scene->getProperties()->setBgColor(currBgColor);
   }
@@ -542,11 +544,11 @@ void RenderCommand::rasterRender(bool isPreview) {
   TPointD cameraDpi = isPreview ? scene->getCurrentPreviewCamera()->getDpi()
                                 : scene->getCurrentCamera()->getDpi();
   movieRenderer.setDpi(cameraDpi.x, cameraDpi.y);
-  //Precomputing causes a long delay for ffmpeg imported types
+  // Precomputing causes a long delay for ffmpeg imported types
   if (!isPreview && !Preferences::instance()->getPrecompute())
-	movieRenderer.enablePrecomputing(false);
-  else 
-	  movieRenderer.enablePrecomputing(true);
+    movieRenderer.enablePrecomputing(false);
+  else
+    movieRenderer.enablePrecomputing(true);
 
   /*-- プログレス ダイアログの作成 --*/
   RenderListener *listener =

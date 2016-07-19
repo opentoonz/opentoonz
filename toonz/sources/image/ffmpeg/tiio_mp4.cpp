@@ -6,7 +6,6 @@
 #include "tsound.h"
 #include <QStringList>
 
-
 //===========================================================
 //
 //  TImageWriterMp4
@@ -15,23 +14,20 @@
 
 class TImageWriterMp4 : public TImageWriter {
 public:
-	int m_frameIndex;
+  int m_frameIndex;
 
-	TImageWriterMp4(const TFilePath &path, int frameIndex, TLevelWriterMp4 *lwg)
-		: TImageWriter(path), m_frameIndex(frameIndex), m_lwg(lwg) {
-		m_lwg->addRef();
+  TImageWriterMp4(const TFilePath &path, int frameIndex, TLevelWriterMp4 *lwg)
+      : TImageWriter(path), m_frameIndex(frameIndex), m_lwg(lwg) {
+    m_lwg->addRef();
+  }
+  ~TImageWriterMp4() { m_lwg->release(); }
 
-	}
-	~TImageWriterMp4() { m_lwg->release(); }
-
-	bool is64bitOutputSupported() override { return false; }
-	void save(const TImageP &img) override { m_lwg->save(img, m_frameIndex); }
+  bool is64bitOutputSupported() override { return false; }
+  void save(const TImageP &img) override { m_lwg->save(img, m_frameIndex); }
 
 private:
-	TLevelWriterMp4 *m_lwg;
-
+  TLevelWriterMp4 *m_lwg;
 };
-
 
 //===========================================================
 //
@@ -40,95 +36,90 @@ private:
 //===========================================================
 
 TLevelWriterMp4::TLevelWriterMp4(const TFilePath &path, TPropertyGroup *winfo)
-	: TLevelWriter(path, winfo) {
-	if (!m_properties) m_properties = new Tiio::Mp4WriterProperties();
-	std::string quality = ((TEnumProperty *)(m_properties->getProperty("Quality")))
-		->getValueAsString();
-	if (quality == "Excellent") m_vidQuality = 100;
-	if (quality == "Standard") m_vidQuality = 90;
-	if (quality == "Low") m_vidQuality = 50;
-	std::string scale = ((TEnumProperty *)(m_properties->getProperty("Scale")))
-		->getValueAsString();
-	m_scale = QString::fromStdString(scale).toInt();
-	
-	ffmpegWriter = new Ffmpeg();
-	ffmpegWriter->setPath(m_path);
-	if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);
+    : TLevelWriter(path, winfo) {
+  if (!m_properties) m_properties = new Tiio::Mp4WriterProperties();
+  std::string quality =
+      ((TEnumProperty *)(m_properties->getProperty("Quality")))
+          ->getValueAsString();
+  if (quality == "Excellent") m_vidQuality = 100;
+  if (quality == "Standard") m_vidQuality  = 90;
+  if (quality == "Low") m_vidQuality       = 50;
+  std::string scale = ((TEnumProperty *)(m_properties->getProperty("Scale")))
+                          ->getValueAsString();
+  m_scale = QString::fromStdString(scale).toInt();
+
+  ffmpegWriter = new Ffmpeg();
+  ffmpegWriter->setPath(m_path);
+  if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);
 }
 
 //-----------------------------------------------------------
 
-TLevelWriterMp4::~TLevelWriterMp4()
-{
-	//QProcess createMp4;
-	QStringList preIArgs;
-	QStringList postIArgs;
+TLevelWriterMp4::~TLevelWriterMp4() {
+  // QProcess createMp4;
+  QStringList preIArgs;
+  QStringList postIArgs;
 
-	int outLx = m_lx;
-	int outLy = m_ly;
+  int outLx = m_lx;
+  int outLy = m_ly;
 
-	//set scaling
-	if (m_scale != 0) {
-		outLx = m_lx * m_scale / 100;
-		outLy = m_ly * m_scale / 100;
-	}
+  // set scaling
+  if (m_scale != 0) {
+    outLx = m_lx * m_scale / 100;
+    outLy = m_ly * m_scale / 100;
+  }
 
-	//calculate quality (bitrate)
-	int pixelCount = m_lx * m_ly;
-	int bitRate = pixelCount / 150; //crude but gets decent values
-	double quality = m_vidQuality / 100.0;
-	double tempRate = (double)bitRate * quality;
-	int finalBitrate = (int)tempRate;
-	int crf = 51 - (m_vidQuality * 51 / 100);
+  // calculate quality (bitrate)
+  int pixelCount   = m_lx * m_ly;
+  int bitRate      = pixelCount / 150;  // crude but gets decent values
+  double quality   = m_vidQuality / 100.0;
+  double tempRate  = (double)bitRate * quality;
+  int finalBitrate = (int)tempRate;
+  int crf          = 51 - (m_vidQuality * 51 / 100);
 
-	preIArgs << "-framerate";
-	preIArgs << QString::number(m_frameRate);
+  preIArgs << "-framerate";
+  preIArgs << QString::number(m_frameRate);
 
-	postIArgs << "-pix_fmt";
-	postIArgs << "yuv420p";
-	postIArgs << "-s";
-	postIArgs << QString::number(outLx) + "x" + QString::number(outLy);
-	postIArgs << "-b";
-	postIArgs << QString::number(finalBitrate) + "k";
+  postIArgs << "-pix_fmt";
+  postIArgs << "yuv420p";
+  postIArgs << "-s";
+  postIArgs << QString::number(outLx) + "x" + QString::number(outLy);
+  postIArgs << "-b";
+  postIArgs << QString::number(finalBitrate) + "k";
 
-	ffmpegWriter->runFfmpeg(preIArgs, postIArgs, false, false, true);
-	ffmpegWriter->cleanUpFiles();
+  ffmpegWriter->runFfmpeg(preIArgs, postIArgs, false, false, true);
+  ffmpegWriter->cleanUpFiles();
 }
 
 //-----------------------------------------------------------
 
 TImageWriterP TLevelWriterMp4::getFrameWriter(TFrameId fid) {
-	//if (IOError != 0)
-	//	throw TImageException(m_path, buildMp4ExceptionString(IOError));
-	if (fid.getLetter() != 0) return TImageWriterP(0);
-	int index = fid.getNumber();
-	TImageWriterMp4 *iwg = new TImageWriterMp4(m_path, index, this);
-	return TImageWriterP(iwg);
+  // if (IOError != 0)
+  //	throw TImageException(m_path, buildMp4ExceptionString(IOError));
+  if (fid.getLetter() != 0) return TImageWriterP(0);
+  int index            = fid.getNumber();
+  TImageWriterMp4 *iwg = new TImageWriterMp4(m_path, index, this);
+  return TImageWriterP(iwg);
 }
 
 //-----------------------------------------------------------
-void TLevelWriterMp4::setFrameRate(double fps)
-{
-	m_frameRate = fps;
-	ffmpegWriter->setFrameRate(fps);
+void TLevelWriterMp4::setFrameRate(double fps) {
+  m_frameRate = fps;
+  ffmpegWriter->setFrameRate(fps);
 }
 
-void TLevelWriterMp4::saveSoundTrack(TSoundTrack *st)
-{
-	ffmpegWriter->saveSoundTrack(st);
+void TLevelWriterMp4::saveSoundTrack(TSoundTrack *st) {
+  ffmpegWriter->saveSoundTrack(st);
 }
-
 
 //-----------------------------------------------------------
 
 void TLevelWriterMp4::save(const TImageP &img, int frameIndex) {
-	TRasterImageP image(img);
-	m_lx = image->getRaster()->getLx();
-	m_ly = image->getRaster()->getLy();
-	ffmpegWriter->createIntermediateImage(img, frameIndex);
+  TRasterImageP image(img);
+  m_lx = image->getRaster()->getLx();
+  m_ly = image->getRaster()->getLy();
+  ffmpegWriter->createIntermediateImage(img, frameIndex);
 }
-
-
 
 //===========================================================
 //
@@ -138,24 +129,24 @@ void TLevelWriterMp4::save(const TImageP &img, int frameIndex) {
 
 class TImageReaderMp4 final : public TImageReader {
 public:
-	int m_frameIndex;
+  int m_frameIndex;
 
-	TImageReaderMp4(const TFilePath &path, int index, TLevelReaderMp4 *lra)
-		: TImageReader(path), m_lra(lra), m_frameIndex(index) {
-		m_lra->addRef();
-	}
-	~TImageReaderMp4() { m_lra->release(); }
+  TImageReaderMp4(const TFilePath &path, int index, TLevelReaderMp4 *lra)
+      : TImageReader(path), m_lra(lra), m_frameIndex(index) {
+    m_lra->addRef();
+  }
+  ~TImageReaderMp4() { m_lra->release(); }
 
-	TImageP load() override { return m_lra->load(m_frameIndex); }
-	TDimension getSize() const { return m_lra->getSize(); }
-	TRect getBBox() const { return TRect(); }
+  TImageP load() override { return m_lra->load(m_frameIndex); }
+  TDimension getSize() const { return m_lra->getSize(); }
+  TRect getBBox() const { return TRect(); }
 
 private:
-	TLevelReaderMp4 *m_lra;
+  TLevelReaderMp4 *m_lra;
 
-	// not implemented
-	TImageReaderMp4(const TImageReaderMp4 &);
-	TImageReaderMp4 &operator=(const TImageReaderMp4 &src);
+  // not implemented
+  TImageReaderMp4(const TImageReaderMp4 &);
+  TImageReaderMp4 &operator=(const TImageReaderMp4 &src);
 };
 
 //===========================================================
@@ -164,86 +155,80 @@ private:
 //
 //===========================================================
 
+TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path) : TLevelReader(path) {
+  ffmpegReader = new Ffmpeg();
+  ffmpegReader->setPath(m_path);
+  ffmpegReader->disablePrecompute();
+  ffmpegFileInfo tempInfo = ffmpegReader->getInfo();
+  double fps              = tempInfo.m_frameRate;
+  m_frameCount            = tempInfo.m_frameCount;
+  m_size                  = TDimension(tempInfo.m_lx, tempInfo.m_ly);
+  m_lx                    = m_size.lx;
+  m_ly                    = m_size.ly;
 
-TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path)
-	: TLevelReader(path) {
-	ffmpegReader = new Ffmpeg();
-	ffmpegReader->setPath(m_path);
-	ffmpegReader->disablePrecompute();
-	ffmpegFileInfo tempInfo = ffmpegReader->getInfo();
-	double fps = tempInfo.m_frameRate;
-	m_frameCount = tempInfo.m_frameCount;
-	m_size = TDimension(tempInfo.m_lx, tempInfo.m_ly);
-	m_lx = m_size.lx;
-	m_ly = m_size.ly;
+  ffmpegReader->getFramesFromMovie();
 
-	ffmpegReader->getFramesFromMovie();
-
-	//set values
-	m_info = new TImageInfo();
-	m_info->m_frameRate = fps;
-	m_info->m_lx = m_lx;
-	m_info->m_ly = m_ly;
-	m_info->m_bitsPerSample = 8;
-	m_info->m_samplePerPixel = 4;
+  // set values
+  m_info                   = new TImageInfo();
+  m_info->m_frameRate      = fps;
+  m_info->m_lx             = m_lx;
+  m_info->m_ly             = m_ly;
+  m_info->m_bitsPerSample  = 8;
+  m_info->m_samplePerPixel = 4;
 }
 //-----------------------------------------------------------
 
 TLevelReaderMp4::~TLevelReaderMp4() {
-	//ffmpegReader->cleanUpFiles();
+  // ffmpegReader->cleanUpFiles();
 }
 
 //-----------------------------------------------------------
 
 TLevelP TLevelReaderMp4::loadInfo() {
-
-	if (m_frameCount == -1) return TLevelP();
-	TLevelP level;
-	for (int i = 1; i <= m_frameCount; i++) level->setFrame(i, TImageP());
-	return level;
+  if (m_frameCount == -1) return TLevelP();
+  TLevelP level;
+  for (int i = 1; i <= m_frameCount; i++) level->setFrame(i, TImageP());
+  return level;
 }
 
 //-----------------------------------------------------------
 
 TImageReaderP TLevelReaderMp4::getFrameReader(TFrameId fid) {
-	//if (IOError != 0)
-	//	throw TImageException(m_path, buildAVIExceptionString(IOError));
-	if (fid.getLetter() != 0) return TImageReaderP(0);
-	int index = fid.getNumber();
+  // if (IOError != 0)
+  //	throw TImageException(m_path, buildAVIExceptionString(IOError));
+  if (fid.getLetter() != 0) return TImageReaderP(0);
+  int index = fid.getNumber();
 
-	TImageReaderMp4 *irm = new TImageReaderMp4(m_path, index, this);
-	return TImageReaderP(irm);
+  TImageReaderMp4 *irm = new TImageReaderMp4(m_path, index, this);
+  return TImageReaderP(irm);
 }
 
 //------------------------------------------------------------------------------
 
-TDimension TLevelReaderMp4::getSize() {
-	return m_size;
-}
+TDimension TLevelReaderMp4::getSize() { return m_size; }
 
 //------------------------------------------------
 
 TImageP TLevelReaderMp4::load(int frameIndex) {
-	return ffmpegReader->getImage(frameIndex);
+  return ffmpegReader->getImage(frameIndex);
 }
 
 Tiio::Mp4WriterProperties::Mp4WriterProperties()
-	: m_vidQuality("Quality"), m_scale("Scale") {
-	m_vidQuality.addValue(L"Excellent");
-	m_vidQuality.addValue(L"Standard");
-	m_vidQuality.addValue(L"Low");
-	m_vidQuality.setValue(L"Standard");
-	m_scale.addValue(L"100");
-	m_scale.addValue(L"90");
-	m_scale.addValue(L"75");
-	m_scale.addValue(L"50");
-	m_scale.addValue(L"25");
-	m_scale.addValue(L"10");
-	m_scale.setValue(L"100");
-	bind(m_vidQuality);
-	bind(m_scale);
-
+    : m_vidQuality("Quality"), m_scale("Scale") {
+  m_vidQuality.addValue(L"Excellent");
+  m_vidQuality.addValue(L"Standard");
+  m_vidQuality.addValue(L"Low");
+  m_vidQuality.setValue(L"Standard");
+  m_scale.addValue(L"100");
+  m_scale.addValue(L"90");
+  m_scale.addValue(L"75");
+  m_scale.addValue(L"50");
+  m_scale.addValue(L"25");
+  m_scale.addValue(L"10");
+  m_scale.setValue(L"100");
+  bind(m_vidQuality);
+  bind(m_scale);
 }
 
-//Tiio::Reader* Tiio::makeMp4Reader(){ return nullptr; }
-//Tiio::Writer* Tiio::makeMp4Writer(){ return nullptr; }
+// Tiio::Reader* Tiio::makeMp4Reader(){ return nullptr; }
+// Tiio::Writer* Tiio::makeMp4Writer(){ return nullptr; }

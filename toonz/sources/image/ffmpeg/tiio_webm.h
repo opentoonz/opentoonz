@@ -14,27 +14,26 @@
 //===========================================================
 
 class TLevelWriterWebm : public TLevelWriter {
-
 public:
-	TLevelWriterWebm(const TFilePath &path, TPropertyGroup *winfo);
-	~TLevelWriterWebm();
-	void setFrameRate(double fps);
+  TLevelWriterWebm(const TFilePath &path, TPropertyGroup *winfo);
+  ~TLevelWriterWebm();
+  void setFrameRate(double fps);
 
-	TImageWriterP getFrameWriter(TFrameId fid) override;
-	void save(const TImageP &image, int frameIndex);
+  TImageWriterP getFrameWriter(TFrameId fid) override;
+  void save(const TImageP &image, int frameIndex);
 
-	void saveSoundTrack(TSoundTrack *st);
+  void saveSoundTrack(TSoundTrack *st);
 
-	static TLevelWriter *create(const TFilePath &path, TPropertyGroup *winfo) {
-		return new TLevelWriterWebm(path, winfo);
-	}
+  static TLevelWriter *create(const TFilePath &path, TPropertyGroup *winfo) {
+    return new TLevelWriterWebm(path, winfo);
+  }
 
 private:
-	Ffmpeg *ffmpegWriter;
-	int m_lx, m_ly;
-	int m_scale;
-	int m_vidQuality;
-	//void *m_buffer;
+  Ffmpeg *ffmpegWriter;
+  int m_lx, m_ly;
+  int m_scale;
+  int m_vidQuality;
+  // void *m_buffer;
 };
 
 //===========================================================
@@ -45,24 +44,23 @@ private:
 
 class TLevelReaderWebm final : public TLevelReader {
 public:
-	TLevelReaderWebm(const TFilePath &path);
-	~TLevelReaderWebm();
-	TImageReaderP getFrameReader(TFrameId fid) override;
+  TLevelReaderWebm(const TFilePath &path);
+  ~TLevelReaderWebm();
+  TImageReaderP getFrameReader(TFrameId fid) override;
 
-	static TLevelReader *create(const TFilePath &f) {
-		return new TLevelReaderWebm(f);
-	}
+  static TLevelReader *create(const TFilePath &f) {
+    return new TLevelReaderWebm(f);
+  }
 
-	
-	TLevelP loadInfo() override;
-	TImageP load(int frameIndex);
-	TDimension getSize();
-	//TThread::Mutex m_mutex;
-	//void *m_decompressedBuffer;
+  TLevelP loadInfo() override;
+  TImageP load(int frameIndex);
+  TDimension getSize();
+  // TThread::Mutex m_mutex;
+  // void *m_decompressedBuffer;
 private:
-	Ffmpeg *ffmpegReader;
-	TDimension m_size;
-	int m_frameCount, m_lx, m_ly;
+  Ffmpeg *ffmpegReader;
+  TDimension m_size;
+  int m_frameCount, m_lx, m_ly;
 };
 
 //===========================================================================
@@ -74,18 +72,16 @@ namespace Tiio {
 class WebmWriterProperties : public TPropertyGroup {
 public:
   // TEnumProperty m_pixelSize;
-  //TBoolProperty m_matte;
-	TEnumProperty m_vidQuality;
-	TEnumProperty m_scale;
-    WebmWriterProperties();
+  // TBoolProperty m_matte;
+  TEnumProperty m_vidQuality;
+  TEnumProperty m_scale;
+  WebmWriterProperties();
 };
-
-
 
 //===========================================================================
 
-//Tiio::Reader *makeWebmReader();
-//Tiio::Writer *makeWebmWriter();
+// Tiio::Reader *makeWebmReader();
+// Tiio::Writer *makeWebmWriter();
 
 }  // namespace
 

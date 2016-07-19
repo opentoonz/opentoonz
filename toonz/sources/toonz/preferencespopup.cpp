@@ -227,12 +227,15 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
     camSize.lx = camRes.lx / 53.33333;
     camSize.ly = camRes.ly / 53.33333;
     camera->setSize(camSize);
-    TDimension cleanupRes = CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.getRes();
+    TDimension cleanupRes = CleanupSettingsModel::instance()
+                                ->getCurrentParameters()
+                                ->m_camera.getRes();
     TDimensionD cleanupSize;
     cleanupSize.lx = cleanupRes.lx / 53.33333;
     cleanupSize.ly = cleanupRes.ly / 53.33333;
-    CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.setSize(cleanupSize);
-	m_pref->storeOldUnits();
+    CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.setSize(
+        cleanupSize);
+    m_pref->storeOldUnits();
     if (m_unitOm->currentIndex() != 4) m_unitOm->setCurrentIndex(4);
     if (m_cameraUnitOm->currentIndex() != 4) m_cameraUnitOm->setCurrentIndex(4);
     m_unitOm->setDisabled(true);
@@ -842,8 +845,8 @@ void PreferencesPopup::onRegionAntialiasChanged(int on) {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onFfmpegPathChanged() {
-	QString text = m_ffmpegPathFileFld->getPath();
-	m_pref->setFfmpegPath(text.toStdString());
+  QString text = m_ffmpegPathFileFld->getPath();
+  m_pref->setFfmpegPath(text.toStdString());
 }
 
 //**********************************************************************************
@@ -1180,7 +1183,7 @@ PreferencesPopup::PreferencesPopup()
   paletteTypeForRasterColorModelComboBox->addItems(paletteTypes);
   paletteTypeForRasterColorModelComboBox->setCurrentIndex(
       m_pref->getPaletteTypeOnLoadRasterImageAsColorModel());
-  
+
   //--- Import/Export ------------------------------
   QString path = m_pref->getFfmpegPath();
   m_ffmpegPathFileFld->setPath(path);
@@ -1520,33 +1523,37 @@ PreferencesPopup::PreferencesPopup()
     loadingBox->setLayout(loadingFrameLay);
     stackedWidget->addWidget(loadingBox);
 
-	//--- Import/Export --------------------------
-	QWidget *ioBox = new QWidget(this);
-	QVBoxLayout *ioLay = new QVBoxLayout();
-	ioLay->setMargin(15);
-	ioLay->setSpacing(10);
-	{
-		ioLay->addWidget(new QLabel(tr("OpenToonz can use FFmpeg for additional file formats.")), 0,
-			Qt::AlignCenter | Qt::AlignVCenter);
-		ioLay->addWidget(new QLabel(tr("FFmpeg is not bundled with OpenToonz")), 0,
-			Qt::AlignCenter | Qt::AlignVCenter);
-		ioLay->addWidget(new QLabel(tr("Please provide the path where FFmpeg is located on your computer.")), 0,
-			Qt::AlignLeft | Qt::AlignVCenter);
-		QGridLayout *ioGridLay = new QGridLayout();
-		ioGridLay->setVerticalSpacing(10);
-		ioGridLay->setHorizontalSpacing(15);
-		ioGridLay->setMargin(0);
-		{
-			ioGridLay->addWidget(new QLabel(tr("FFmpeg Path: ")), 0, 0, Qt::AlignRight);
-			ioGridLay->addWidget(m_ffmpegPathFileFld, 0, 1, 1, 3);
-		}
-		ioLay->addLayout(ioGridLay);
-		ioLay->addStretch(1);
+    //--- Import/Export --------------------------
+    QWidget *ioBox     = new QWidget(this);
+    QVBoxLayout *ioLay = new QVBoxLayout();
+    ioLay->setMargin(15);
+    ioLay->setSpacing(10);
+    {
+      ioLay->addWidget(
+          new QLabel(
+              tr("OpenToonz can use FFmpeg for additional file formats.")),
+          0, Qt::AlignCenter | Qt::AlignVCenter);
+      ioLay->addWidget(new QLabel(tr("FFmpeg is not bundled with OpenToonz")),
+                       0, Qt::AlignCenter | Qt::AlignVCenter);
+      ioLay->addWidget(new QLabel(tr("Please provide the path where FFmpeg is "
+                                     "located on your computer.")),
+                       0, Qt::AlignLeft | Qt::AlignVCenter);
+      QGridLayout *ioGridLay = new QGridLayout();
+      ioGridLay->setVerticalSpacing(10);
+      ioGridLay->setHorizontalSpacing(15);
+      ioGridLay->setMargin(0);
+      {
+        ioGridLay->addWidget(new QLabel(tr("FFmpeg Path: ")), 0, 0,
+                             Qt::AlignRight);
+        ioGridLay->addWidget(m_ffmpegPathFileFld, 0, 1, 1, 3);
+      }
+      ioLay->addLayout(ioGridLay);
+      ioLay->addStretch(1);
 
-		ioLay->addWidget(note_version, 0);
-	}
-	ioBox->setLayout(ioLay);
-	stackedWidget->addWidget(ioBox);
+      ioLay->addWidget(note_version, 0);
+    }
+    ioBox->setLayout(ioLay);
+    stackedWidget->addWidget(ioBox);
 
     //--- Drawing --------------------------
     QWidget *drawingBox          = new QWidget(this);
@@ -1764,7 +1771,7 @@ PreferencesPopup::PreferencesPopup()
     versionControlBox->setLayout(vcLay);
     stackedWidget->addWidget(versionControlBox);
 
-	mainLayout->addWidget(stackedWidget, 1);
+    mainLayout->addWidget(stackedWidget, 1);
   }
   setLayout(mainLayout);
 
@@ -1886,7 +1893,7 @@ PreferencesPopup::PreferencesPopup()
 
   //--- Import/Export ----------------------
   ret = ret && connect(m_ffmpegPathFileFld, SIGNAL(pathChanged()), this,
-	  SLOT(onFfmpegPathChanged()));
+                       SLOT(onFfmpegPathChanged()));
 
   //--- Drawing ----------------------
   ret = ret && connect(keepOriginalCleanedUpCB, SIGNAL(stateChanged(int)), this,
