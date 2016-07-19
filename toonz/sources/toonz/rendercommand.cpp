@@ -500,6 +500,7 @@ void RenderCommand::rasterRender(bool isPreview) {
 
   TPixel32 currBgColor = scene->getProperties()->getBgColor();
   m_priorBgColor       = currBgColor;
+  //fixes background colors for non alpha-enabled export types (eventually transparent gif would be good)
   if (ext == "jpg" || ext == "avi" || ext == "bmp" || ext == "mp4" || ext == "webm" || ext == "gif") {
     currBgColor.m = 255;
     scene->getProperties()->setBgColor(currBgColor);
@@ -541,7 +542,11 @@ void RenderCommand::rasterRender(bool isPreview) {
   TPointD cameraDpi = isPreview ? scene->getCurrentPreviewCamera()->getDpi()
                                 : scene->getCurrentCamera()->getDpi();
   movieRenderer.setDpi(cameraDpi.x, cameraDpi.y);
-  movieRenderer.enablePrecomputing(true);
+  //Precomputing causes a long delay for ffmpeg imported types
+  if (!isPreview && !Preferences::instance()->getPrecompute())
+	movieRenderer.enablePrecomputing(false);
+  else 
+	  movieRenderer.enablePrecomputing(true);
 
   /*-- プログレス ダイアログの作成 --*/
   RenderListener *listener =

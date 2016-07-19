@@ -285,7 +285,8 @@ Preferences::Preferences()
     , m_onionSkinEnabled(true)
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
-    , m_showKeyframesOnXsheetCellArea(true) {
+    , m_showKeyframesOnXsheetCellArea(true)
+	, m_precompute(true) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -1186,6 +1187,12 @@ void Preferences::setFfmpegPath(std::string path) {
 	m_ffmpegPath = QString::fromStdString(path);
 	std::string strPath = m_ffmpegPath.toStdString();
 	m_settings->setValue("ffmpegPath", m_ffmpegPath);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setPrecompute(bool enabled) {
+	m_precompute = enabled;
 }
 
 //-----------------------------------------------------------------

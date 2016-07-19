@@ -380,10 +380,12 @@ public:
   bool isAutomaticSVNFolderRefreshEnabled() const {
     return m_automaticSVNFolderRefreshEnabled;
   }
-  // Extras Tab
+  // Import Export Tab
 
   void setFfmpegPath(std::string path);
   QString getFfmpegPath() const { return m_ffmpegPath; }
+  void setPrecompute(bool enabled);
+  bool getPrecompute() { return m_precompute; }
 
   // Uncategorized - internals
 
@@ -475,6 +477,7 @@ private:
   bool m_moveCurrentFrameByClickCellArea;
   bool m_onionSkinEnabled;
   bool m_multiLayerStylePickerEnabled;
+  bool m_precompute;
   /*--
   Color Modelにラスタ画像を読み込んだとき、パレットをどのように作るか
   0 : 全ての異なるピクセルの色を別のStyleにする, 1 :

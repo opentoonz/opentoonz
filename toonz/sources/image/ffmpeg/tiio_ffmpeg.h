@@ -39,6 +39,7 @@ public:
 	TRasterImageP getImage(int frameIndex);
 	TFilePath getFfmpegCache();
 	ffmpegFileInfo getInfo();
+	void disablePrecompute();
 
 private:
 	QString m_intermediateFormat, m_ffmpegPath, m_audioPath, m_audioFormat;

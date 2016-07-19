@@ -166,12 +166,10 @@ private:
 
 
 TLevelReaderMp4::TLevelReaderMp4(const TFilePath &path)
-	: TLevelReader(path)
-
-
-{
+	: TLevelReader(path) {
 	ffmpegReader = new Ffmpeg();
 	ffmpegReader->setPath(m_path);
+	ffmpegReader->disablePrecompute();
 	ffmpegFileInfo tempInfo = ffmpegReader->getInfo();
 	double fps = tempInfo.m_frameRate;
 	m_frameCount = tempInfo.m_frameCount;

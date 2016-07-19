@@ -1,4 +1,5 @@
 #include "tiio_ffmpeg.h"
+#include "../toonz/tapp.h"
 #include "tsystem.h"
 #include "tsound.h"
 
@@ -361,7 +362,7 @@ void Ffmpeg::getFramesFromMovie(int frame) {
 			QString number = QString("%1").arg(i, 4, 10, QChar('0'));
 			addToDelete = tempBase + number + "." + m_intermediateFormat;
 			std::string delPath = addToDelete.toStdString();
-			addToCleanUp(addToDelete);
+			//addToCleanUp(addToDelete);
 		}
 	}
 }
@@ -378,4 +379,8 @@ void Ffmpeg::cleanUpFiles() {
 			TSystem::deleteFile(TFilePath(path));
 		}
 	}
+}
+
+void Ffmpeg::disablePrecompute() {
+	Preferences::instance()->setPrecompute(false);
 }
