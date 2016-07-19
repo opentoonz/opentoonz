@@ -1535,6 +1535,15 @@ PreferencesPopup::PreferencesPopup()
           0, Qt::AlignCenter | Qt::AlignVCenter);
       ioLay->addWidget(new QLabel(tr("FFmpeg is not bundled with OpenToonz")),
                        0, Qt::AlignCenter | Qt::AlignVCenter);
+	  ioLay->addWidget(new QLabel(" "),
+		  0, Qt::AlignCenter | Qt::AlignVCenter);
+	  ioLay->addWidget(new QLabel(tr("NOTE: This is an experimental feature.")),
+		  0, Qt::AlignCenter | Qt::AlignVCenter);
+	  ioLay->addWidget(new QLabel(tr("Please SAVE YOUR WORK before exporting "
+		                             "in MP4, WEBM, or GIF format.")),
+		  0, Qt::AlignCenter | Qt::AlignVCenter);
+	  ioLay->addWidget(new QLabel(" "),
+		  0, Qt::AlignCenter | Qt::AlignVCenter);
       ioLay->addWidget(new QLabel(tr("Please provide the path where FFmpeg is "
                                      "located on your computer.")),
                        0, Qt::AlignLeft | Qt::AlignVCenter);
