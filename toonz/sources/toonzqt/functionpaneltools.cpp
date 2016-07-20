@@ -208,7 +208,7 @@ void MovePointDragTool::click(QMouseEvent *e) {
 
 void MovePointDragTool::drag(QMouseEvent *e) {
   // need ctrl modifier
-  if (0 == (e->modifiers() & Qt::ControlModifier)) return;
+  //if (0 == (e->modifiers() & Qt::ControlModifier)) return;
 
   QPoint pos = e->pos();
 
@@ -332,7 +332,7 @@ void MoveHandleDragTool::click(QMouseEvent *e) {
 
 void MoveHandleDragTool::drag(QMouseEvent *e) {
   // need ctrl modifier
-  if (0 == (e->modifiers() & Qt::ControlModifier)) return;
+  //if (0 == (e->modifiers() & Qt::ControlModifier)) return;
 
   if (!m_curve) return;
   QPoint pos = e->pos();
