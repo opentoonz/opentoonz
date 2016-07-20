@@ -200,9 +200,6 @@ protected:
   void zoomOutChip();
 
 protected slots:
-
-  void toggleLink();
-  void eraseToggleLink();
   void removeLink();
 
 private:

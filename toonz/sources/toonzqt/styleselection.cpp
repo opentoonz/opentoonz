@@ -505,9 +505,15 @@ void TStyleSelection::enableCommands() {
     enableCommand(this, MI_PasteNames, &TStyleSelection::pasteStylesName);
 
     // available only for level palette
-    if (m_paletteHandle->getPalette()->getGlobalName() == L"")
-      enableCommand(this, MI_GetColorFromStudioPalette,
-                    &TStyleSelection::getBackOriginalStyle);
+	if (m_paletteHandle->getPalette()->getGlobalName() == L"") {
+		enableCommand(this, MI_GetColorFromStudioPalette,
+			&TStyleSelection::getBackOriginalStyle);
+		enableCommand(this, MI_ToggleLinkToStudioPalette,
+			&TStyleSelection::toggleLink);
+		enableCommand(this, MI_RemoveReferenceToStudioPalette,
+			&TStyleSelection::eraseToggleLink);
+		
+	}
   }
   enableCommand(this, MI_Clear, &TStyleSelection::deleteStyles);
   enableCommand(this, MI_EraseUnusedStyles, &TStyleSelection::eraseUnsedStyle);
@@ -1408,6 +1414,7 @@ public:
 void TStyleSelection::toggleLink() {
   TPalette *palette = getPalette();
   if (!palette || m_pageIndex < 0) return;
+  if (isEmpty() || palette->isLocked()) return;
   int n = m_styleIndicesInPage.size();
   if (n <= 0) return;
 
@@ -1460,6 +1467,7 @@ void TStyleSelection::toggleLink() {
 void TStyleSelection::eraseToggleLink() {
   TPalette *palette = getPalette();
   if (!palette || m_pageIndex < 0) return;
+  if (isEmpty() || palette->isLocked()) return;
   int n = m_styleIndicesInPage.size();
   if (n <= 0) return;
 

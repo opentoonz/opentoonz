@@ -1625,6 +1625,10 @@ void MainWindow::defineActions() {
   createRightClickMenuAction(MI_PasteNames, tr("Paste Name"), "");
   createRightClickMenuAction(MI_GetColorFromStudioPalette,
                              tr("Get Color from Studio Palette"), "");
+  createRightClickMenuAction(MI_ToggleLinkToStudioPalette,
+                             tr("Toggle Link to Studio Palette"), "\\");
+  createRightClickMenuAction(MI_RemoveReferenceToStudioPalette,
+                             tr("Remove Reference to Studio Palette"), "");
   createMenuEditAction(MI_Clear, tr("&Delete"), "Delete");
   createMenuEditAction(MI_Insert, tr("&Insert"), "Ins");
   createMenuEditAction(MI_Group, tr("&Group"), "Ctrl+G");
