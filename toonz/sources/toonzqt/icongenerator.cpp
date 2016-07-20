@@ -584,7 +584,10 @@ TRaster32P SplineIconRenderer::generateRaster(
 
   const TStroke *stroke = m_spline->getStroke();
   assert(stroke);
-  if (!stroke) return TRaster32P();
+  if (!stroke) {
+    glContext->doneCurrent();
+    return TRaster32P();
+  }
   TRectD sbbox = stroke->getBBox();
 
   glColor3d(0, 0, 0);

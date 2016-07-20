@@ -128,7 +128,7 @@ public:
 
 //---------------------------------------------------------
 
-double computeDistance2(Node *na, Node *nb) {
+static double computeDistance2(Node *na, Node *nb) {
   assert(na->m_pixel);
   assert(nb->m_pixel);
   TPointD d = convert(na->m_pixel->m_pos - nb->m_pixel->m_pos);
@@ -137,7 +137,7 @@ double computeDistance2(Node *na, Node *nb) {
 
 //---------------------------------------------------------
 
-void renormalizeImage(TVectorImage *vi) {
+static void renormalizeImage(TVectorImage *vi) {
   int i, j;
   int n = vi->getStrokeCount();
   std::vector<ControlPoint> points;
@@ -832,7 +832,7 @@ TVectorImageP VectorizerCore::outlineVectorize(
 
 //=========================================================
 
-bool isPointInRegion(TPointD p, TRegion *r) {
+static bool isPointInRegion(TPointD p, TRegion *r) {
   int i;
   for (i = 0; i < 5; i++) {
     double stepX = i * 0.2;
@@ -856,9 +856,9 @@ bool isPointInRegion(TPointD p, TRegion *r) {
 
 //(Daniele) Aggiunti controlli per evitare uscite dai bounds
 
-bool isNearestInkOrPaintInRegion(bool findInk, const TRasterCM32P &ras,
-                                 TRegion *r, const TAffine &aff,
-                                 const TPoint &p) {
+static bool isNearestInkOrPaintInRegion(bool findInk, const TRasterCM32P &ras,
+                                        TRegion *r, const TAffine &aff,
+                                        const TPoint &p) {
   bool isTheLastSquare = false;
   int mx, my, Mx, My;
   int i;

@@ -432,7 +432,7 @@ void FileSelection::duplicateFiles() {
 
 //------------------------------------------------------------------------
 
-int collectAssets(TFilePath scenePath) {
+static int collectAssets(TFilePath scenePath) {
   // bool dirtyFlag = TNotifier::instance()->getDirtyFlag();
   ToonzScene scene;
   scene.load(scenePath);
@@ -485,7 +485,7 @@ void FileSelection::collectAssets() {
 
 //------------------------------------------------------------------------
 
-int importScene(TFilePath scenePath) {
+static int importScene(TFilePath scenePath) {
   // bool dirtyFlag = TNotifier::instance()->getDirtyFlag();
   ToonzScene scene;
   try {

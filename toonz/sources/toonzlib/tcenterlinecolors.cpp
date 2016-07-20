@@ -38,7 +38,7 @@ namespace boost_c = boost::container;
 
 //--------------------------------------------------------------------------
 
-TPixelCM32 pixel(const TRasterCM32 &ras, int x, int y) {
+static TPixelCM32 pixel(const TRasterCM32 &ras, int x, int y) {
   // Seems that raster access was not very much double-checked at the time
   // I wrote this. Too bad. Enforcing it now.
 
@@ -47,9 +47,9 @@ TPixelCM32 pixel(const TRasterCM32 &ras, int x, int y) {
 
 //--------------------------------------------------------------------------
 
-T3DPointD firstInkChangePosition(const TRasterCM32P &ras,
-                                 const T3DPointD &start, const T3DPointD &end,
-                                 int threshold) {
+static T3DPointD firstInkChangePosition(const TRasterCM32P &ras,
+                                        const T3DPointD &start, const T3DPointD &end,
+                                        int threshold) {
   double dist = norm(end - start);
 
   int sampleMax = tceil(dist), sampleCount = sampleMax + 1;
@@ -114,8 +114,8 @@ T3DPointD firstInkChangePosition(const TRasterCM32P &ras,
 // NOTA: La struttura a grafo J-S 'superiore' non viene alterata qui dentro.
 // Eventualm. da fare fuori.
 
-void sampleColor(const TRasterCM32P &ras, int threshold, Sequence &seq,
-                 Sequence &seqOpposite, SequenceList &singleSequences) {
+static void sampleColor(const TRasterCM32P &ras, int threshold, Sequence &seq,
+                        Sequence &seqOpposite, SequenceList &singleSequences) {
   SkeletonGraph *currGraph = seq.m_graphHolder;
 
   // Calculate sequence parametrization
@@ -469,8 +469,8 @@ inline void applyStrokeIndices(VectorizerCoreGlobals *globals) {
 //--------------------------------------------------------------------------
 
 // Find predominant ink color in a circle of given radius and center
-int getInkPredominance(const TRasterCM32P &ras, TPalette *palette, int x, int y,
-                       int radius, int threshold) {
+static int getInkPredominance(const TRasterCM32P &ras, TPalette *palette, int x, int y,
+                              int radius, int threshold) {
   int i, j;
   int mx, my, Mx, My;
   std::vector<int> inksFound(palette->getStyleCount());
@@ -511,8 +511,8 @@ int getInkPredominance(const TRasterCM32P &ras, TPalette *palette, int x, int y,
             input graph node.
   \return   The predominant branch color if found, \p -1 otherwise.
 */
-int getBranchPredominance(const TRasterCM32P &ras, TPalette *palette,
-                          JointSequenceGraph::Node &node) {
+static int getBranchPredominance(const TRasterCM32P &ras, TPalette *palette,
+                                 JointSequenceGraph::Node &node) {
   struct locals {
     static inline bool valueLess(const std::pair<int, int> &a,
                                  const std::pair<int, int> &b) {
@@ -548,9 +548,9 @@ int getBranchPredominance(const TRasterCM32P &ras, TPalette *palette,
 
 // NOTA: Da implementare una versione in grado di ordinare *pienamente* la
 // vector image.
-void sortJS(JointSequenceGraph *js,
-            std::vector<std::pair<int, TStroke *>> &toOrder,
-            const TRasterCM32P &ras, TPalette *palette) {
+static void sortJS(JointSequenceGraph *js,
+                   std::vector<std::pair<int, TStroke *>> &toOrder,
+                   const TRasterCM32P &ras, TPalette *palette) {
   enum { SORTED = 0x10 };
 
   std::vector<std::pair<unsigned int, int>> nodesToDo;

@@ -20,6 +20,7 @@
 #include "toonz/txshlevel.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshleveltypes.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
 #include "tconvert.h"
@@ -193,6 +194,10 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
   m_xDpiFld = new DoubleLineEdit();
   m_yDpiFld = new DoubleLineEdit();
 
+  m_dpiLabel = new QLabel(tr("DPI"));
+  m_resLabel = new QLabel(tr("Pixels"));
+  m_xLabel   = new QLabel(tr("x"));
+
   m_fspChk = new QPushButton("");
 
   m_useLevelSettingsBtn = new QPushButton(tr("Use Current Level Settings"));
@@ -277,7 +282,8 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
       gridLay->addWidget(m_yPrev, 0, 4, Qt::AlignCenter);
 
       gridLay->addWidget(m_inchPrev, 1, 0, Qt::AlignRight | Qt::AlignVCenter);
-      gridLay->addWidget(new QLabel("Inch"), 1, 1,
+      QString units = Preferences::instance()->getCameraUnits();
+      gridLay->addWidget(new QLabel(units), 1, 1,
                          Qt::AlignRight | Qt::AlignVCenter);
       gridLay->addWidget(m_lxFld, 1, 2);
       gridLay->addWidget(new QLabel("x"), 1, 3, Qt::AlignCenter);
@@ -288,14 +294,12 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
       gridLay->addWidget(m_arFld, 2, 4);
 
       gridLay->addWidget(m_dotPrev, 3, 0, Qt::AlignRight | Qt::AlignVCenter);
-      gridLay->addWidget(new QLabel("Pixel"), 3, 1,
-                         Qt::AlignRight | Qt::AlignVCenter);
+      gridLay->addWidget(m_resLabel, 3, 1, Qt::AlignRight | Qt::AlignVCenter);
       gridLay->addWidget(m_xResFld, 3, 2);
-      gridLay->addWidget(new QLabel("x"), 3, 3, Qt::AlignCenter);
+      gridLay->addWidget(m_xLabel, 3, 3, Qt::AlignCenter);
       gridLay->addWidget(m_yResFld, 3, 4);
 
-      gridLay->addWidget(new QLabel("DPI"), 4, 1,
-                         Qt::AlignRight | Qt::AlignVCenter);
+      gridLay->addWidget(m_dpiLabel, 4, 1, Qt::AlignRight | Qt::AlignVCenter);
       gridLay->addWidget(m_xDpiFld, 4, 2);
       gridLay->addWidget(m_fspChk, 4, 3, Qt::AlignCenter);
       gridLay->addWidget(m_yDpiFld, 4, 4);
@@ -364,6 +368,30 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
 }
 
 CameraSettingsWidget::~CameraSettingsWidget() { setCurrentLevel(0); }
+
+void CameraSettingsWidget::showEvent(QShowEvent *e) {
+  if (Preferences::instance()->getCameraUnits() == "pixel") {
+    m_resLabel->hide();
+    m_dpiLabel->hide();
+    m_xLabel->hide();
+    m_xResFld->hide();
+    m_yResFld->hide();
+    m_xDpiFld->hide();
+    m_yDpiFld->hide();
+    m_fspChk->hide();
+    m_dotPrev->hide();
+  } else {
+    m_resLabel->show();
+    m_dpiLabel->show();
+    m_xLabel->show();
+    m_xResFld->show();
+    m_yResFld->show();
+    m_xDpiFld->show();
+    m_yDpiFld->show();
+    m_fspChk->show();
+    m_dotPrev->show();
+  }
+}
 
 void CameraSettingsWidget::loadPresetList() {
   if (m_presetListFile == "") return;

@@ -87,6 +87,7 @@ void rasterizeWholeStroke(TOfflineGL *&gl, TStroke *stroke, TPalette *palette,
   }
   glDisable(GL_ALPHA_TEST);
   glFinish();
+  gl->doneCurrent();
 }
 
 //--------------------------------------------------------------------------
@@ -142,6 +143,7 @@ TRect rasterizeRegion(TOfflineGL *&gl, TRect rasBounds, TRegion *region,
     glPopAttrib();
 
     glFinish();
+    gl->doneCurrent();
   }
   return rect;
 }

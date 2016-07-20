@@ -669,7 +669,7 @@ static inline bool is_compatible(const toonz_if_version_t &v) {
   return v.major == compat_maj && v.minor == compat_min;
 }
 
-int check_base_sanity(const toonz_param_page_t *p) {
+static int check_base_sanity(const toonz_param_page_t *p) {
   int err = 0;
   if (!is_compatible<toonz_param_base_t_, 1, 0>(p->base))
     err |= TOONZ_PARAM_ERROR_VERSION;
@@ -678,7 +678,7 @@ int check_base_sanity(const toonz_param_page_t *p) {
   return err;
 }
 
-int check_base_sanity(const toonz_param_group_t *p) {
+static int check_base_sanity(const toonz_param_group_t *p) {
   int err = 0;
   if (!is_compatible<toonz_param_base_t_, 1, 0>(p->base))
     err |= TOONZ_PARAM_ERROR_VERSION;
@@ -688,7 +688,7 @@ int check_base_sanity(const toonz_param_group_t *p) {
   return err;
 }
 
-int check_base_sanity(const toonz_param_desc_t *p) {
+static int check_base_sanity(const toonz_param_desc_t *p) {
   int err = 0;
   if (!is_compatible<toonz_param_base_t_, 1, 0>(p->base))
     err |= TOONZ_PARAM_ERROR_VERSION;
@@ -1266,7 +1266,7 @@ T *interface_factory() {
   return interface_t<T, major, minor>::factory();
 }
 
-int query_interface(const UUID *uuid, void **interf) {
+static int query_interface(const UUID *uuid, void **interf) {
   typedef std::pair<const UUID *, int> uuid_dict_t;
   static const uuid_dict_t dict[] = {
       uuid_dict_t(&uuid_nodal_, 1), uuid_dict_t(&uuid_port_, 2),
@@ -1325,7 +1325,7 @@ int query_interface(const UUID *uuid, void **interf) {
   return TOONZ_OK;
 }
 
-void release_interface(void *interf) {
+static void release_interface(void *interf) {
   if (interf) delete interf;
 }
 
@@ -1357,9 +1357,9 @@ void Loader::walkDirectory_(const QString &path) {
 }
 
 #if defined(_WIN32) || defined(_CYGWIN_)
-void end_library(HMODULE mod) { FreeLibrary(mod); }
+static void end_library(HMODULE mod) { FreeLibrary(mod); }
 #else
-void end_library(void *mod) { dlclose(mod); }
+static void end_library(void *mod) { dlclose(mod); }
 #endif
 
 void Loader::doLoad(const QString &file) {

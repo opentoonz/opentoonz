@@ -629,7 +629,7 @@ void TApp::onLevelColorStyleSwitched() {
 
 //-----------------------------------------------------------------------------
 
-void notifyPaletteChanged(TXshSimpleLevel *simpleLevel) {
+static void notifyPaletteChanged(TXshSimpleLevel *simpleLevel) {
   simpleLevel->onPaletteChanged();
   std::vector<TFrameId> fids;
   simpleLevel->getFids(fids);

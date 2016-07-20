@@ -17,6 +17,7 @@ class QSlider;
 class QCheckBox;
 class QPushButton;
 class QVideoFrame;
+class QTimer;
 
 namespace DVGui {
 class FileField;
@@ -36,6 +37,8 @@ class MyViewFinder : public QFrame {
   QCamera* m_camera;
   QRect m_imageRect;
 
+  int m_countDownTime;
+
   bool m_showOnionSkin;
   int m_onionOpacity;
   bool m_upsideDown;
@@ -50,6 +53,11 @@ public:
   void setShowOnionSkin(bool on) { m_showOnionSkin = on; }
   void setOnionOpacity(int value) { m_onionOpacity = value; }
   void setPreviousImage(QImage& prevImage) { m_previousImage = prevImage; }
+
+  void showCountDownTime(int time) {
+    m_countDownTime = time;
+    repaint();
+  }
 
 protected:
   void paintEvent(QPaintEvent* event);
@@ -73,12 +81,15 @@ class PencilTestPopup : public DVGui::Dialog {
   QComboBox *m_cameraListCombo, *m_resolutionCombo, *m_fileTypeCombo,
       *m_colorTypeCombo;
   QLineEdit* m_levelNameEdit;
-  QCheckBox *m_upsideDownCB, *m_onionSkinCB;
-  QPushButton *m_fileFormatOptionButton, *m_captureWhiteBGButton;
+  QCheckBox *m_upsideDownCB, *m_onionSkinCB, *m_saveOnCaptureCB, *m_timerCB;
+  QPushButton *m_fileFormatOptionButton, *m_captureWhiteBGButton,
+      *m_captureButton;
   DVGui::FileField* m_saveInFileFld;
   DVGui::IntLineEdit* m_frameNumberEdit;
   DVGui::IntField *m_thresholdFld, *m_contrastFld, *m_brightnessFld,
-      *m_bgReductionFld, *m_onionOpacityFld;
+      *m_bgReductionFld, *m_onionOpacityFld, *m_timerIntervalFld;
+
+  QTimer *m_captureTimer, *m_countdownTimer;
 
   QImage m_whiteBGImg;
 
@@ -99,6 +110,8 @@ protected:
   void showEvent(QShowEvent* event);
   void hideEvent(QHideEvent* event);
 
+  void keyPressEvent(QKeyEvent* event);
+
 protected slots:
   void refreshCameraList();
   void onCameraListComboActivated(int index);
@@ -110,8 +123,11 @@ protected slots:
   void onCaptureWhiteBGButtonPressed();
   void onOnionCBToggled(bool);
   void onOnionOpacityFldEdited();
+  void onTimerCBToggled(bool);
+  void onCaptureTimerTimeout();
+  void onCountDown();
 
-  void onCapture();
+  void onCaptureButtonClicked(bool);
 };
 
 #endif

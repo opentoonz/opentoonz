@@ -46,7 +46,7 @@ using namespace std;
 #ifdef _WIN32
 #pragma optimize("", off)
 #endif
-TAffine makeRotation(double ang) { return TRotation(ang); }
+static TAffine makeRotation(double ang) { return TRotation(ang); }
 #ifdef _WIN32
 #pragma optimize("", on)
 #endif

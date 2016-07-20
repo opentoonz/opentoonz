@@ -18,7 +18,7 @@
 
 // mette il widget al centro dello schermo e lo fa diventare la finestra
 // corrente
-void activateWidget(QWidget *w) {
+static void activateWidget(QWidget *w) {
   QDesktopWidget *desktop = qApp->desktop();
   QRect screenRect        = desktop->screenGeometry(w);
 

@@ -16,7 +16,7 @@ You will need to install some dependencies before you can build. Depending on yo
 ### Installing required packages on Debian / Ubuntu
 
 ```
-$ sudo apt-get install build-essential git cmake pkg-config libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev-tools libqt5opengl5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libsdl2-dev libfreetype6-dev
+$ sudo apt-get install build-essential git cmake pkg-config libboost-all-dev qt5-default qtbase5-dev libqt5svg5-dev qtscript5-dev qttools5-dev-tools libqt5opengl5-dev qtmultimedia5-dev libsuperlu-dev liblz4-dev libusb-1.0-0-dev liblzo2-dev libpng-dev libjpeg-dev libglew-dev freeglut3-dev libsdl2-dev libfreetype6-dev
 ```
 
 Notes:
@@ -39,7 +39,7 @@ dnf install gcc gcc-c++ automake git cmake boost boost-devel SuperLU SuperLU-dev
 ### Installing required packages on ArchLinux
 
 ```
-$ sudo pacman -S base-devel git cmake boost boost-libs qt5-base qt5-svg qt5-script qt5-tools lz4 libusb lzo libjpeg-turbo glew freeglut sdl2 freetype2
+$ sudo pacman -S base-devel git cmake boost boost-libs qt5-base qt5-svg qt5-script qt5-tools qt5-multimedia lz4 libusb lzo libjpeg-turbo glew freeglut sdl2 freetype2
 $ sudo pacman -S blas cblas
 ```
 From AUR, using eg. yaourt:

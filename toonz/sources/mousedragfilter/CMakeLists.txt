@@ -1,0 +1,10 @@
+if(APPLE)
+    cmake_minimum_required(VERSION 2.8.11)
+    project(MouseDragFilter)
+
+    include_directories(.)
+    find_library(FOUNDATION_LIBRARY NAMES foundation)
+    find_library(CG_LIBRARY NAMES CoreGraphics)
+    add_library(mousedragfilter mousedragfilter.mm mousedragfilter.h)
+    target_link_libraries(mousedragfilter ${CG_LIBRARY} ${FOUNDATION_LIBRARY})
+endif()

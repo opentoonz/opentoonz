@@ -132,7 +132,7 @@ void CEraseContour::eraseInkColors() {
       }
 }
 
-int erasecontour_xydwCompare(const void *a, const void *b) {
+static int erasecontour_xydwCompare(const void *a, const void *b) {
   SXYDW *aa = (SXYDW *)a;
   SXYDW *bb = (SXYDW *)b;
 

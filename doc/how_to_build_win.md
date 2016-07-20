@@ -89,6 +89,7 @@ Add a guard for snprintf at tif_config.h(50):
     - `Qt5Script.dll`
     - `Qt5Svg.dll`
     - `Qt5Widgets.dll`
+    - `Qt5Multimedia.dll`
   - These files should be in the corresponding folders in the same folder `OpenToonz_1.0.exe`
     - `/bearer/qgenericbearer.dll`
     - `/bearer/qnativewifibearer.dll`

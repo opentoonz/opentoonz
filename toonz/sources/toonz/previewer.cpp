@@ -241,6 +241,7 @@ Previewer::Imp::Imp(Previewer *owner)
     , m_renderer(TSystem::getProcessorCount())
     , m_computingFrameCount(0)
     , m_currentFrameToSave(0)
+    , m_subcamera(false)
     , m_lw() {
   // Precomputing (ie predictive cache) is disabled in this case. This is due to
   // current TFxCacheManager's

@@ -998,6 +998,10 @@ Do you want to proceed?</source>
         <translation>ベクターの結合</translation>
     </message>
     <message>
+        <source>Distance</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Mode:</source>
         <translation>モード：</translation>
     </message>

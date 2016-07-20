@@ -482,7 +482,7 @@ int splitMatrix(double **a, int n, int *index) {
       for (i = j + 1; i < n; i++) a[i][j] *= dum;
     }
   }
-  delete vv;
+  delete[] vv;
   return 0;
 }
 

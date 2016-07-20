@@ -372,4 +372,8 @@ signals:
   void previewToggled();
 };
 
+// Functions
+
+void invalidateIcons();
+
 #endif  // SCENEVIEWER_H

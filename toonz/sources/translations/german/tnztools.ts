@@ -994,6 +994,10 @@ Möchten Sie fortfahren?</translation>
         <translation>Vektoren verbinden</translation>
     </message>
     <message>
+        <source>Distance</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Mode:</source>
         <translation>Modus:</translation>
     </message>

@@ -76,7 +76,7 @@ void CCIL::strToColorIndex(const char *s, CCIL &cil, const int maxIndex) {
   }
 }
 
-int cilCompare(const void *a, const void *b) {
+static int cilCompare(const void *a, const void *b) {
   int *aa;
   int *bb;
   aa = (int *)a;

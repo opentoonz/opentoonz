@@ -194,8 +194,14 @@ LevelCreatePopup::LevelCreatePopup()
   m_levelTypeOm->addItem(RasterLevel);
   m_levelTypeOm->addItem(ScanLevel);
 
-  m_widthFld->setMeasure("level.lx");
-  m_heightFld->setMeasure("level.ly");
+  if (Preferences::instance()->getUnits() == "pixel") {
+    m_widthFld->setMeasure("camera.lx");
+    m_heightFld->setMeasure("camera.ly");
+  } else {
+    m_widthFld->setMeasure("level.lx");
+    m_heightFld->setMeasure("level.ly");
+  }
+
   m_widthFld->setRange(0.1, (std::numeric_limits<double>::max)());
   m_heightFld->setRange(0.1, (std::numeric_limits<double>::max)());
   m_dpiFld->setRange(0.1, (std::numeric_limits<double>::max)());
@@ -329,6 +335,13 @@ void LevelCreatePopup::showEvent(QShowEvent *) {
   nextName();
   update();
   m_nameFld->setFocus();
+  if (Preferences::instance()->getUnits() == "pixel") {
+    m_dpiFld->hide();
+    m_dpiLabel->hide();
+  } else {
+    m_dpiFld->show();
+    m_dpiLabel->show();
+  }
 }
 
 //-----------------------------------------------------------------------------

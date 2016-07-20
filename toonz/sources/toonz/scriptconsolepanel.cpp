@@ -24,7 +24,7 @@
 #include <QFile>
 #include <QTextStream>
 
-QScriptValue loadSceneFun(QScriptContext *context, QScriptEngine *engine) {
+static QScriptValue loadSceneFun(QScriptContext *context, QScriptEngine *engine) {
   if (context->argumentCount() > 0) {
     QString fpArg = context->argument(0).toString();
     TFilePath fp(fpArg.toStdWString());
@@ -33,7 +33,7 @@ QScriptValue loadSceneFun(QScriptContext *context, QScriptEngine *engine) {
   return QScriptValue();
 }
 
-QScriptValue saveSceneFun(QScriptContext *context, QScriptEngine *engine) {
+static QScriptValue saveSceneFun(QScriptContext *context, QScriptEngine *engine) {
   if (context->argumentCount() > 0) {
     QString fpArg = context->argument(0).toString();
     TFilePath fp(fpArg.toStdWString());
@@ -42,7 +42,7 @@ QScriptValue saveSceneFun(QScriptContext *context, QScriptEngine *engine) {
   return QScriptValue();
 }
 
-QScriptValue loadLevelFun(QScriptContext *context, QScriptEngine *engine) {
+static QScriptValue loadLevelFun(QScriptContext *context, QScriptEngine *engine) {
   if (context->argumentCount() > 0) {
     QString fpArg = context->argument(0).toString();
     TFilePath fp(fpArg.toStdWString());
@@ -68,11 +68,11 @@ QScriptValue loadLevelFun(QScriptContext *context, QScriptEngine *engine) {
   return QScriptValue();
 }
 
-QScriptValue dummyFun(QScriptContext *context, QScriptEngine *engine) {
+static QScriptValue dummyFun(QScriptContext *context, QScriptEngine *engine) {
   return QScriptValue(engine, 0);
 }
 
-QScriptValue viewFun(QScriptContext *context, QScriptEngine *engine) {
+static QScriptValue viewFun(QScriptContext *context, QScriptEngine *engine) {
   TScriptBinding::Image *image = 0;
   TScriptBinding::Level *level = 0;
 
@@ -101,8 +101,8 @@ QScriptValue viewFun(QScriptContext *context, QScriptEngine *engine) {
   return engine->globalObject().property("void");
 }
 
-QScriptValue evaluateOnMainThread(QScriptContext *context,
-                                  QScriptEngine *engine) {
+static QScriptValue evaluateOnMainThread(QScriptContext *context,
+                                         QScriptEngine *engine) {
   QScriptValue fun = context->callee().data();
   QObject *obj     = fun.data().toQObject();
   QString s        = fun.toString();
@@ -110,8 +110,8 @@ QScriptValue evaluateOnMainThread(QScriptContext *context,
   return se->evaluateOnMainThread(fun, context->argumentsObject());
 }
 
-void def(ScriptEngine *teng, const QString &name,
-         QScriptEngine::FunctionSignature fun) {
+static void def(ScriptEngine *teng, const QString &name,
+                QScriptEngine::FunctionSignature fun) {
   QScriptEngine *eng  = teng->getQScriptEngine();
   QScriptValue funVal = eng->newFunction(fun);
   funVal.setData(eng->newQObject(teng));

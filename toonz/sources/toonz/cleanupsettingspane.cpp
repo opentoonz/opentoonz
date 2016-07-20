@@ -205,7 +205,7 @@ CleanupSettingsPane::CleanupSettingsPane(QWidget *parent)
     pathLay->setMargin(0);
     pathLay->setSpacing(3);
     {
-      pathLay->addWidget(new QLabel("Save In"), 0);
+      pathLay->addWidget(new QLabel(tr("Save In")), 0);
       pathLay->addWidget(m_pathField);
     }
     mainLay->addLayout(pathLay, 0);
@@ -391,10 +391,10 @@ void CleanupSettingsPane::updateImageInfo() {
   if (!parentWidget()) return;
 
   if (model->clnPath().isEmpty())
-    parentWidget()->setWindowTitle("Cleanup Settings (Global)");
+    parentWidget()->setWindowTitle(tr("Cleanup Settings (Global)"));
   else
     parentWidget()->setWindowTitle(
-        "Cleanup Settings: " + toQString(model->clnPath().withoutParentDir()));
+        tr("Cleanup Settings: ") + toQString(model->clnPath().withoutParentDir()));
 }
 
 //-----------------------------------------------------------------------------
@@ -515,7 +515,7 @@ void CleanupSettingsPane::onLevelSwitched() {
 void CleanupSettingsPane::onSaveSettings() {
   /*--- Clueaup保存先を指定していないとエラーを返す ---*/
   if (m_pathField->getPath().isEmpty()) {
-    DVGui::warning("Please fill the Save In field.");
+    DVGui::warning(tr("Please fill the Save In field."));
     return;
   }
   CleanupSettingsModel::instance()->promptSave();

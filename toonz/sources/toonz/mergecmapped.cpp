@@ -321,7 +321,7 @@ TApp::instance()->getCurrentScene()->getScene();
 } //namespace
 */
 
-bool removeLevel(TXshLevel *level) {
+static bool removeLevel(TXshLevel *level) {
   TApp *app         = TApp::instance();
   ToonzScene *scene = app->getCurrentScene()->getScene();
   // if(scene->getChildStack()->getTopXsheet()->isLevelUsed(level))

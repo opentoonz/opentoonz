@@ -208,7 +208,8 @@ bool Preferences::LevelFormat::matches(const TFilePath &fp) const {
 //**********************************************************************************
 
 Preferences::Preferences()
-    : m_units("mm")
+    : m_pixelsOnly(false)
+    , m_units("mm")
     , m_cameraUnits("inch")
     , m_currentRoomChoice("Default")
     , m_scanLevelType("tif")
@@ -373,7 +374,21 @@ Preferences::Preferences()
   setUndoMemorySize(m_undoMemorySize);
   m_blankColor = TPixel32(r, g, b);
 
+  // for Pixels only
+
+  getValue(*m_settings, "pixelsOnly",
+           m_pixelsOnly);  // doesn't work for some reason.
+  QString pos                     = m_settings->value("pixelsOnly").toString();
+  if (pos == "true") m_pixelsOnly = true;
+
   QString units;
+  units      = m_settings->value("oldUnits", m_units).toString();
+  m_oldUnits = units;
+
+  units = m_settings->value("oldCameraUnits", m_cameraUnits).toString();
+  m_oldCameraUnits = units;
+  // end for pixels only
+
   units                    = m_settings->value("linearUnits").toString();
   if (units != "") m_units = units;
   setUnits(m_units.toStdString());
@@ -919,12 +934,24 @@ void Preferences::setViewValues(int shrink, int step) {
 
 //-----------------------------------------------------------------
 
-void setCurrentUnits(std::string measureName, std::string units) {
+static void setCurrentUnits(std::string measureName, std::string units) {
   TMeasure *m = TMeasureManager::instance()->get(measureName);
   if (!m) return;
   TUnit *u = m->getUnit(::to_wstring(units));
   if (!u) return;
   m->setCurrentUnit(u);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setPixelsOnly(bool state) {
+  m_pixelsOnly = state;
+  m_settings->setValue("pixelsOnly", m_pixelsOnly);
+  if (state) {
+    storeOldUnits();
+  } else {
+    resetOldUnits();
+  }
 }
 
 //-----------------------------------------------------------------
@@ -948,6 +975,24 @@ void Preferences::setCameraUnits(std::string units) {
   m_settings->setValue("cameraUnits", m_cameraUnits);
   setCurrentUnits("camera.lx", units);
   setCurrentUnits("camera.ly", units);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::storeOldUnits() {
+  m_oldUnits       = getUnits();
+  m_oldCameraUnits = getCameraUnits();
+  m_settings->setValue("oldUnits", m_oldUnits);
+  m_settings->setValue("oldCameraUnits", m_oldCameraUnits);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::resetOldUnits() {
+  if (m_oldUnits != "" && m_oldCameraUnits != "") {
+    setUnits(m_oldUnits.toStdString());
+    setCameraUnits(m_oldCameraUnits.toStdString());
+  }
 }
 
 //-----------------------------------------------------------------
