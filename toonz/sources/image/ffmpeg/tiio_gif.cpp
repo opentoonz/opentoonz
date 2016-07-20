@@ -232,7 +232,7 @@ TImageP TLevelReaderGif::load(int frameIndex) {
 
 Tiio::GifWriterProperties::GifWriterProperties()
     : m_scale("Scale")
-    , m_looping("Looping", false)
+    , m_looping("Looping", true)
     , m_palette("Generate Palette", true) {
   m_scale.addValue(L"100");
   m_scale.addValue(L"90");

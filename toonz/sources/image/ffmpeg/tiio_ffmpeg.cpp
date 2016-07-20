@@ -78,7 +78,9 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   QString tempPath = m_path.getQString() + "tempOut" +
                      QString::number(frameIndex) + "." + m_intermediateFormat;
   std::string saveStatus = "";
-  TRasterImageP image(img);
+  TRasterImageP tempImage(img);
+  TRasterImage *image = (TRasterImage *)tempImage->cloneImage();
+
   m_lx           = image->getRaster()->getLx();
   m_ly           = image->getRaster()->getLy();
   m_bpp          = image->getRaster()->getPixelSize();
@@ -101,9 +103,10 @@ void Ffmpeg::createIntermediateImage(const TImageP &img, int frameIndex) {
   QImage *qi = new QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
   qi->save(tempPath, format, -1);
   free(buffer);
-  delete qi;
   m_cleanUpList.push_back(tempPath);
   m_frameCount++;
+  delete qi;
+  delete image;
 }
 
 void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs,
