@@ -275,6 +275,14 @@ TImageP ImageRasterizer::build(int imFlags, void *extData) {
         QSurfaceFormat format;
         format.setProfile(QSurfaceFormat::CompatibilityProfile);
 
+        std::unique_ptr<QOffscreenSurface> surface(new QOffscreenSurface());
+        surface->setFormat(format);
+        surface->create();
+
+        std::unique_ptr<QOpenGLContext> context(new QOpenGLContext());
+        context->create();
+        context->makeCurrent(surface.get());
+
         TRaster32P ras(d);
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -326,6 +334,7 @@ TImageP ImageRasterizer::build(int imFlags, void *extData) {
 
         glPopAttrib();
 
+        context->doneCurrent();
         tglMakeCurrent(oldContext);
 
         TRasterImageP ri = TRasterImageP(ras);
