@@ -220,20 +220,34 @@ QMap<std::wstring, bool> AviCodecRestrictions::getUsableCodecs(
     // find the codec.
     inFmt.bmiHeader.biBitCount = bpp;
     for (int i = 0; ICInfo(fccType, i, &icinfo); i++) {
-      hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_COMPRESS);
-
-      ICGetInfo(hic, &icinfo, sizeof(ICINFO));  // Find out the compressor name
-      WideCharToMultiByte(CP_ACP, 0, icinfo.szDescription, -1, descr,
-                          sizeof(descr), 0, 0);
-      WideCharToMultiByte(CP_ACP, 0, icinfo.szName, -1, name, sizeof(name), 0,
-                          0);
-
-      std::wstring compressorName;
-      compressorName =
-          ::to_wstring(std::string(name) + " '" + std::to_string(bpp) + "' " +
-                       std::string(descr));
-
+// hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_COMPRESS);
+#ifdef _MSC_VER
+      [&]() {
+        __try {
+          hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_COMPRESS);
+        } __except (EXCEPTION_EXECUTE_HANDLER) {
+        }
+      }();
+#else
+      try {
+        hic = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_QUERY);
+        ICMODE_COMPRESS
+        catch (...) {
+        }
+#endif
       if (hic) {
+        ICGetInfo(hic, &icinfo,
+                  sizeof(ICINFO));  // Find out the compressor name
+        WideCharToMultiByte(CP_ACP, 0, icinfo.szDescription, -1, descr,
+                            sizeof(descr), 0, 0);
+        WideCharToMultiByte(CP_ACP, 0, icinfo.szName, -1, name, sizeof(name), 0,
+                            0);
+
+        std::wstring compressorName;
+        compressorName =
+            ::to_wstring(std::string(name) + " '" + std::to_string(bpp) + "' " +
+                         std::string(descr));
+
         if (ICCompressQuery(hic, &inFmt, NULL) != ICERR_OK) {
           ICClose(hic);
           continue;  // Skip this compressor if it can't handle the format.
