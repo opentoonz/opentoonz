@@ -110,6 +110,9 @@ public:
     return m_replaceAfterSaveLevelAs;
   }
 
+  void setProjectRoot(std::wstring path);
+  QString getProjectRoot() { return m_projectRoot; }
+
   // Interface  tab
 
   void setCurrentLanguage(int currentLanguage);
@@ -419,7 +422,7 @@ private:
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
-      m_oldUnits, m_oldCameraUnits;
+      m_oldUnits, m_oldCameraUnits, m_projectRoot;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
 

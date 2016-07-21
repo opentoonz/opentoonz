@@ -7,16 +7,77 @@
 #include "tconvert.h"
 #include "toonz/preferences.h"
 
+
+#ifdef _WIN32
+#include <shlobj.h>
+#include <Winnetwk.h>
+#endif
+#ifdef MACOSX
+#include <Cocoa/Cocoa.h>
+#endif
+
 using namespace TEnv;
+
+//-------------------------------------------------------------------
+
+
+TFilePath getMyDocumentsPath() {
+#ifdef _WIN32
+	WCHAR szPath[MAX_PATH];
+	if (SHGetSpecialFolderPathW(NULL, szPath, CSIDL_PERSONAL, 0)) {
+		return TFilePath(szPath);
+	}
+	return TFilePath();
+#elif defined MACOSX
+	NSArray *foundref = NSSearchPathForDirectoriesInDomains(
+		NSDocumentDirectory, NSUserDomainMask, YES);
+	if (!foundref) return TFilePath();
+	int c = [foundref count];
+	assert(c == 1);
+	NSString *documentsDirectory = [foundref objectAtIndex : 0];
+	return TFilePath((const char *)[documentsDirectory
+	cStringUsingEncoding : NSASCIIStringEncoding]);
+#else
+	return TFilePath();
+#endif
+}
+
+// Desktop Path
+TFilePath getDesktopPath() {
+#ifdef _WIN32
+	WCHAR szPath[MAX_PATH];
+	if (SHGetSpecialFolderPathW(NULL, szPath, CSIDL_DESKTOP, 0)) {
+		return TFilePath(szPath);
+	}
+	return TFilePath();
+#elif defined MACOSX
+	NSArray *foundref = NSSearchPathForDirectoriesInDomains(
+		NSDesktopDirectory, NSUserDomainMask, YES);
+	if (!foundref) return TFilePath();
+	int c = [foundref count];
+	assert(c == 1);
+	NSString *desktopDirectory = [foundref objectAtIndex : 0];
+	return TFilePath((const char *)[desktopDirectory
+	cStringUsingEncoding : NSASCIIStringEncoding]);
+#else
+	return TFilePath();
+#endif
+}
+
+//-------------------------------------------------------------------
 
 TFilePath ToonzFolder::getModulesDir() {
   return getProfileFolder() + "layouts";
 }
 
 TFilePathSet ToonzFolder::getProjectsFolders() {
-  TFilePathSet fps =
-      getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
-  if (fps.empty()) fps.push_back(TEnv::getStuffDir() + "Projects");
+	TFilePathSet fps;
+	  //=
+      //getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
+	if (fps.empty()) fps.push_back(getDesktopPath() + "Projects");
+	if (fps.empty()) fps.push_back(getMyDocumentsPath() + "Projects");
+	if (fps.empty()) fps.push_back(TEnv::getStuffDir() + "Projects");
+  
   return fps;
 }
 

@@ -285,7 +285,8 @@ Preferences::Preferences()
     , m_onionSkinEnabled(true)
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
-    , m_showKeyframesOnXsheetCellArea(true) {
+    , m_showKeyframesOnXsheetCellArea(true)
+    , m_projectRoot("Documents") {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -388,6 +389,10 @@ Preferences::Preferences()
   units = m_settings->value("oldCameraUnits", m_cameraUnits).toString();
   m_oldCameraUnits = units;
   // end for pixels only
+
+  QString projectRoot;
+  projectRoot = m_settings->value("projectRoot", m_projectRoot).toString();
+  m_projectRoot = projectRoot;
 
   units                    = m_settings->value("linearUnits").toString();
   if (units != "") m_units = units;
