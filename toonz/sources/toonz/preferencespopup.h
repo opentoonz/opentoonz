@@ -52,13 +52,13 @@ private:
 
   QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType,
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
-      *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_projectRootSelection;
+      *m_columnIconOm, *m_unitOm, *m_cameraUnitOm;
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
   DVGui::DoubleLineEdit *m_defLevelDpi;
 
-  QLabel *m_dpiLabel, *m_customProjectRootLabel;
+  QLabel *m_dpiLabel, *m_customProjectRootLabel, *m_projectRootDirections;
 
   DVGui::IntLineEdit *m_minuteFld, *m_chunkSizeFld, *m_iconSizeLx,
       *m_iconSizeLy, *m_viewShrink, *m_viewStep, *m_blanksCount,
@@ -69,7 +69,7 @@ private:
 
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
       *m_onionSkinVisibility, *m_pixelsOnlyCB, *m_projectRootDocuments,
-	  *m_projectRootDesktop, *m_projectRootStuff, *m_projectRootCustom;
+	  *m_projectRootDesktop, *m_projectRootStandard, *m_projectRootCustom;
 
   DVGui::FileField *m_customProjectRootFileField;
 

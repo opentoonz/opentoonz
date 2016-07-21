@@ -286,7 +286,7 @@ Preferences::Preferences()
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
-    , m_projectRoot(0)
+    , m_projectRoot(1010)
 	, m_customProjectRoot("") {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;

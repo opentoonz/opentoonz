@@ -1201,11 +1201,9 @@ void DvDirModelRootNode::refreshChildren() {
       addChild(projectRootNode);
     }
 
-    if (Preferences::instance()->getProjectRoot() == 2) {
-		TFilePath sandboxProjectPath = pm->getSandboxProjectFolder();
-		m_sandboxProjectNode = new DvDirModelProjectNode(this, sandboxProjectPath);
-		addChild(m_sandboxProjectNode);
-	}
+    TFilePath sandboxProjectPath = pm->getSandboxProjectFolder();
+    m_sandboxProjectNode = new DvDirModelProjectNode(this, sandboxProjectPath);
+    addChild(m_sandboxProjectNode);
 
     // SVN Repositories
     QList<SVNRepository> repositories =

@@ -275,17 +275,19 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
 void PreferencesPopup::onProjectRootChanged() {
 	int documents = m_projectRootDocuments->isChecked() ? 1 : 0;
 	int desktop = m_projectRootDesktop->isChecked() ? 1 : 0;
-	int stuff = m_projectRootStuff->isChecked() ? 1 : 0;
+	int stuff = m_projectRootStandard->isChecked() ? 1 : 0;
 	int custom = m_projectRootCustom->isChecked() ? 1 : 0;
 	QString projects = QString::number(documents) + QString::number(desktop) + QString::number(stuff) + QString::number(custom);
 	m_pref->setProjectRoot(projects.toInt());
 	if (custom) {
 		m_customProjectRootFileField->show();
 		m_customProjectRootLabel->show();
+		m_projectRootDirections->show();
 	}
 	else {
 		m_customProjectRootFileField->hide();
 		m_customProjectRootLabel->hide();
+		m_projectRootDirections->hide();
 	}
 }
 
@@ -901,13 +903,13 @@ PreferencesPopup::PreferencesPopup()
       new DVGui::IntLineEdit(this, m_pref->getDefaultTaskChunkSize(), 1, 2000);
   CheckBox *sceneNumberingCB = new CheckBox(tr("Show Info in Rendered Frames"));
 
-  m_projectRootSelection = new QComboBox();
   m_projectRootDocuments = new CheckBox(tr("My Documents"), this);
   m_projectRootDesktop = new CheckBox(tr("Desktop"), this);
-  m_projectRootStuff = new CheckBox(tr("Stuff Folder"), this);
+  m_projectRootStandard = new CheckBox(tr("Standard Folder"), this);
   m_projectRootCustom = new CheckBox(tr("Custom"), this);
   m_customProjectRootFileField = new DVGui::FileField(this, QString(""));
   m_customProjectRootLabel = new QLabel(tr("Custom Project Path: "));
+  m_projectRootDirections = new QLabel(tr("Advanced: Multiple paths can be included separated by ** (No Spaces)"));
 
   QLabel *note_general =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
@@ -1104,24 +1106,21 @@ PreferencesPopup::PreferencesPopup()
   m_levelsBackup->setChecked(m_pref->isLevelsBackupEnabled());
   sceneNumberingCB->setChecked(m_pref->isSceneNumberingEnabled());
 
-  QStringList projectRootList;
-  projectRootList << tr("My Documents") << tr("Desktop") << tr("Stuff Folder") << tr("Custom");
-  m_projectRootSelection->addItems(projectRootList);
-  m_projectRootSelection->setCurrentIndex(m_pref->getProjectRoot());
   m_customProjectRootFileField->setPath(m_pref->getCustomProjectRoot());
   
   int projectPaths = m_pref->getProjectRoot();
   int documents = (projectPaths / 1000) % 10;
   int desktop = (projectPaths / 100) % 10;
-  int stuff = (projectPaths / 10) % 10;
+  int standard = (projectPaths / 10) % 10;
   int custom = projectPaths % 10;
   m_projectRootDocuments->setChecked(documents);
   m_projectRootDesktop->setChecked(desktop);
-  m_projectRootStuff->setChecked(stuff);
+  m_projectRootStandard->setChecked(standard);
   m_projectRootCustom->setChecked(custom);
   if (!custom) {
 	  m_customProjectRootFileField->hide();
 	  m_customProjectRootLabel->hide();
+	  m_projectRootDirections->hide();
   }
   //--- Interface ------------------------------
   QStringList styleSheetList;
@@ -1378,17 +1377,17 @@ PreferencesPopup::PreferencesPopup()
 	  projectRootLay->setHorizontalSpacing(5);
 	  projectRootLay->setVerticalSpacing(10);
 	  {
-		  projectRootLay->addWidget(new QLabel(" "));
+		  projectRootLay->addWidget(new QLabel(" "), 0, 0);
 		  projectRootLay->addWidget(new QLabel(tr("Project Folder Locations:"), this), 1, 0,
 			  Qt::AlignRight | Qt::AlignVCenter);
-		  //projectRootLay->addWidget(m_projectRootSelection, 0, 1);
 		  projectRootLay->addWidget(m_projectRootDocuments, 2, 0);
 		  projectRootLay->addWidget(m_projectRootDesktop, 3, 0);
-		  projectRootLay->addWidget(m_projectRootStuff, 4, 0);
+		  projectRootLay->addWidget(m_projectRootStandard, 4, 0);
 		  projectRootLay->addWidget(m_projectRootCustom, 5, 0);
 		  projectRootLay->addWidget(m_customProjectRootLabel, 6, 0,
 			  Qt::AlignRight | Qt::AlignVCenter);
 		  projectRootLay->addWidget(m_customProjectRootFileField, 6, 1, 1, 3);
+		  projectRootLay->addWidget(m_projectRootDirections, 7, 0, 1, 4);
 	  }
 	  generalFrameLay->addLayout(projectRootLay, 0);
       generalFrameLay->addStretch(1);
@@ -1817,15 +1816,13 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onSceneNumberingChanged(int)));
   ret = ret && connect(m_chunkSizeFld, SIGNAL(editingFinished()), this,
                        SLOT(onChunkSizeChanged()));
-  //ret = ret && connect(m_projectRootSelection, SIGNAL(currentIndexChanged(int)), this,
-		//			   SLOT(onProjectRootChanged()));
   ret = ret && connect(m_customProjectRootFileField, SIGNAL(pathChanged()), this,
 					   SLOT(onCustomProjectRootChanged()));
   ret = ret && connect(m_projectRootDocuments, SIGNAL(stateChanged(int)),
 	  SLOT(onProjectRootChanged()));
   ret = ret && connect(m_projectRootDesktop, SIGNAL(stateChanged(int)),
 	  SLOT(onProjectRootChanged()));
-  ret = ret && connect(m_projectRootStuff, SIGNAL(stateChanged(int)),
+  ret = ret && connect(m_projectRootStandard, SIGNAL(stateChanged(int)),
 	  SLOT(onProjectRootChanged()));
   ret = ret && connect(m_projectRootCustom, SIGNAL(stateChanged(int)),
 	  SLOT(onProjectRootChanged()));
