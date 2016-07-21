@@ -110,8 +110,11 @@ public:
     return m_replaceAfterSaveLevelAs;
   }
 
-  void setProjectRoot(std::wstring path);
-  QString getProjectRoot() { return m_projectRoot; }
+  void setProjectRoot(int index);
+  int getProjectRoot() { return m_projectRoot; }
+
+  void setCustomProjectRoot(std::wstring path);
+  QString getCustomProjectRoot() { return m_customProjectRoot; }
 
   // Interface  tab
 
@@ -422,7 +425,7 @@ private:
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
-      m_oldUnits, m_oldCameraUnits, m_projectRoot;
+      m_oldUnits, m_oldCameraUnits, m_customProjectRoot;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
 
@@ -433,7 +436,8 @@ private:
 
   int m_autosavePeriod,  // minutes
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
-      m_textureSize, m_autocreationType, m_keyframeType, m_animationStep;
+      m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
+	  m_projectRoot;
 
   int m_currentLanguage, m_currentStyleSheet,
       m_undoMemorySize,  // in megabytes

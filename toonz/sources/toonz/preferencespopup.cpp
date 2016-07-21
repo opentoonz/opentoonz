@@ -272,6 +272,23 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
   }
 }
 
+void PreferencesPopup::onProjectRootChanged(int index) {
+	m_pref->setProjectRoot(index);
+	if (index == 3) {
+		m_customProjectRootFileField->show();
+		m_customProjectRootLabel->show();
+	}
+	else {
+		m_customProjectRootFileField->hide();
+		m_customProjectRootLabel->hide();
+	}
+}
+
+void PreferencesPopup::onCustomProjectRootChanged() {
+	QString text = m_customProjectRootFileField->getPath();
+	m_pref->setCustomProjectRoot(text.toStdWString());
+}
+
 void PreferencesPopup::onUnitChanged(int index) {
   if (index == 4 && m_pixelsOnlyCB->isChecked() == false) {
     m_pixelsOnlyCB->setCheckState(Qt::Checked);
@@ -879,6 +896,10 @@ PreferencesPopup::PreferencesPopup()
       new DVGui::IntLineEdit(this, m_pref->getDefaultTaskChunkSize(), 1, 2000);
   CheckBox *sceneNumberingCB = new CheckBox(tr("Show Info in Rendered Frames"));
 
+  m_projectRootSelection = new QComboBox();
+  m_customProjectRootFileField = new DVGui::FileField(this, QString(""));
+  m_customProjectRootLabel = new QLabel(tr("Custom Project Path: "));
+
   QLabel *note_general =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
   note_general->setStyleSheet("font-size: 10px; font: italic;");
@@ -1073,6 +1094,16 @@ PreferencesPopup::PreferencesPopup()
   m_cellsDragBehaviour->setCurrentIndex(m_pref->getDragCellsBehaviour());
   m_levelsBackup->setChecked(m_pref->isLevelsBackupEnabled());
   sceneNumberingCB->setChecked(m_pref->isSceneNumberingEnabled());
+
+  QStringList projectRootList;
+  projectRootList << tr("My Documents") << tr("Desktop") << tr("Stuff Folder") << tr("Custom");
+  m_projectRootSelection->addItems(projectRootList);
+  m_projectRootSelection->setCurrentIndex(m_pref->getProjectRoot());
+  m_customProjectRootFileField->setPath(m_pref->getCustomProjectRoot());
+  if (m_projectRootSelection->currentIndex() != 3) {
+	  m_customProjectRootFileField->hide();
+	  m_customProjectRootLabel->hide();
+  }
 
   //--- Interface ------------------------------
   QStringList styleSheetList;
@@ -1324,6 +1355,19 @@ PreferencesPopup::PreferencesPopup()
                                  Qt::AlignLeft | Qt::AlignVCenter);
       generalFrameLay->addWidget(sceneNumberingCB, 0,
                                  Qt::AlignLeft | Qt::AlignVCenter);
+	  QGridLayout *projectRootLay = new QGridLayout();
+	  projectRootLay->setMargin(0);
+	  projectRootLay->setHorizontalSpacing(5);
+	  projectRootLay->setVerticalSpacing(10);
+	  {
+		  projectRootLay->addWidget(new QLabel(tr("Project Folder Location"), this), 0, 0,
+			  Qt::AlignRight | Qt::AlignVCenter);
+		  projectRootLay->addWidget(m_projectRootSelection, 0, 1);
+		  projectRootLay->addWidget(m_customProjectRootLabel, 1, 0,
+			  Qt::AlignRight | Qt::AlignVCenter);
+		  projectRootLay->addWidget(m_customProjectRootFileField, 1, 1, 1, 3);
+	  }
+	  generalFrameLay->addLayout(projectRootLay, 0);
       generalFrameLay->addStretch(1);
 
       generalFrameLay->addWidget(note_general, 0);
@@ -1750,6 +1794,10 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onSceneNumberingChanged(int)));
   ret = ret && connect(m_chunkSizeFld, SIGNAL(editingFinished()), this,
                        SLOT(onChunkSizeChanged()));
+  ret = ret && connect(m_projectRootSelection, SIGNAL(currentIndexChanged(int)), this,
+					   SLOT(onProjectRootChanged(int)));
+  ret = ret && connect(m_customProjectRootFileField, SIGNAL(pathChanged()), this,
+					   SLOT(onCustomProjectRootChanged()));
 
   //--- Interface ----------------------
   ret = ret && connect(styleSheetType, SIGNAL(currentIndexChanged(int)),

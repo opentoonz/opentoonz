@@ -71,12 +71,37 @@ TFilePath ToonzFolder::getModulesDir() {
 }
 
 TFilePathSet ToonzFolder::getProjectsFolders() {
+	int location = Preferences::instance()->getProjectRoot();
+	QString path = Preferences::instance()->getCustomProjectRoot();
 	TFilePathSet fps;
-	  //=
-      //getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
-	if (fps.empty()) fps.push_back(getDesktopPath() + "Projects");
-	if (fps.empty()) fps.push_back(getMyDocumentsPath() + "Projects");
-	if (fps.empty()) fps.push_back(TEnv::getStuffDir() + "Projects");
+	while (fps.empty()) {
+		switch (location) {
+		case 0:
+			fps.push_back(getMyDocumentsPath() + "OpenToonz");
+			break;
+		case 1:
+			fps.push_back(getDesktopPath() + "OpenToonz");
+			break;
+		case 2:
+			fps = getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
+			if (fps.empty()) fps.push_back(TEnv::getStuffDir() + "Projects");
+			break;
+		case 3:
+			if (TSystem::doesExistFileOrLevel(TFilePath(path))) {
+				fps.push_back(TFilePath(path));
+				break;
+			}
+			else {
+				//revert the path back to My Documents if path invalid
+				location = 0;
+				break;
+			}
+		default:
+			fps = getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
+			if (fps.empty()) fps.push_back(TEnv::getStuffDir() + "Projects");
+			break;
+		}
+	}
   
   return fps;
 }

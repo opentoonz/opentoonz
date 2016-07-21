@@ -9,6 +9,7 @@
 #include "toonzqt/doublefield.h"
 #include "toonzqt/colorfield.h"
 #include "toonzqt/checkbox.h"
+#include "toonzqt/filefield.h"
 
 // TnzLib includes
 #include "toonz/preferences.h"
@@ -51,13 +52,13 @@ private:
 
   QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType,
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
-      *m_columnIconOm, *m_unitOm, *m_cameraUnitOm;
+      *m_columnIconOm, *m_unitOm, *m_cameraUnitOm, *m_projectRootSelection;
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
   DVGui::DoubleLineEdit *m_defLevelDpi;
 
-  QLabel *m_dpiLabel;
+  QLabel *m_dpiLabel, *m_customProjectRootLabel;
 
   DVGui::IntLineEdit *m_minuteFld, *m_chunkSizeFld, *m_iconSizeLx,
       *m_iconSizeLy, *m_viewShrink, *m_viewStep, *m_blanksCount,
@@ -69,6 +70,8 @@ private:
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
       *m_onionSkinVisibility, *m_pixelsOnlyCB;
 
+  DVGui::FileField *m_customProjectRootFileField;
+
 private:
   // QWidget* create(const QString& lbl, bool def, const char* slot);
   void rebuildFormatsList();
@@ -76,6 +79,8 @@ private:
 private slots:
 
   void onPixelsOnlyChanged(int index);
+  void onProjectRootChanged(int index);
+  void onCustomProjectRootChanged();
   void onUnitChanged(int index);
   void onCameraUnitChanged(int index);
   void onRoomChoiceChanged(int index);

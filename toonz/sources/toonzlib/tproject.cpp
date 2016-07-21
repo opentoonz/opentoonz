@@ -9,6 +9,7 @@
 #include "toonz/observer.h"
 #include "toonz/toonzfolders.h"
 #include "toonz/cleanupparameters.h"
+#include "toonz/preferences.h"
 
 // TnzBase includes
 #include "tenv.h"
@@ -811,8 +812,14 @@ TFilePath TProjectManager::projectNameToProjectPath(
   assert(!TProject::isAProjectPath(projectName));
   assert(!projectName.isAbsolute());
   if (m_projectsRoots.empty()) addDefaultProjectsRoot();
+  int projectRoot = Preferences::instance()->getProjectRoot();
   if (projectName == TProject::SandboxProjectName)
-    return searchProjectPath(TEnv::getStuffDir() + projectName);
+	  if (projectRoot == 2){
+		  return searchProjectPath(TEnv::getStuffDir() + projectName);
+	  }
+	  else {
+		  return searchProjectPath(ToonzFolder::getFirstProjectsFolder() + projectName);
+	  }
   return searchProjectPath(m_projectsRoots[0] + projectName);
 }
 
@@ -838,8 +845,17 @@ TFilePath TProjectManager::getProjectPathByName(const TFilePath &projectName) {
   // TFilePath relativeProjectPath = projectName + (projectName.getName() +
   // projectPathSuffix);
   if (m_projectsRoots.empty()) addDefaultProjectsRoot();
-  if (projectName == TProject::SandboxProjectName)
-    return searchProjectPath(TEnv::getStuffDir() + projectName);
+  if (projectName == TProject::SandboxProjectName) {
+	  int projectRoot = Preferences::instance()->getProjectRoot();
+	  if (projectName == TProject::SandboxProjectName)
+		  if (projectRoot == 2){
+			  return searchProjectPath(TEnv::getStuffDir() + projectName);
+		  }
+		  else {
+			  return searchProjectPath(ToonzFolder::getFirstProjectsFolder() + projectName);
+		  }
+  }
+    //return searchProjectPath(TEnv::getStuffDir() + projectName); 
   int i, n = (int)m_projectsRoots.size();
   for (i = 0; i < n; i++) {
     TFilePath projectPath = searchProjectPath(m_projectsRoots[i] + projectName);

@@ -286,7 +286,8 @@ Preferences::Preferences()
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
-    , m_projectRoot("Documents") {
+    , m_projectRoot(0)
+	, m_customProjectRoot("") {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -390,9 +391,8 @@ Preferences::Preferences()
   m_oldCameraUnits = units;
   // end for pixels only
 
-  QString projectRoot;
-  projectRoot = m_settings->value("projectRoot", m_projectRoot).toString();
-  m_projectRoot = projectRoot;
+  getValue(*m_settings, "projectRoot", m_projectRoot);
+  m_customProjectRoot = m_settings->value("customProjectRoot").toString();
 
   units                    = m_settings->value("linearUnits").toString();
   if (units != "") m_units = units;
@@ -957,6 +957,22 @@ void Preferences::setPixelsOnly(bool state) {
   } else {
     resetOldUnits();
   }
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setProjectRoot(int index) {
+	//storing the index of the selection instead of the text
+	//to make translation work
+	m_projectRoot = index;
+	m_settings->setValue("projectRoot", m_projectRoot);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setCustomProjectRoot(std::wstring customProjectRoot) {
+	m_customProjectRoot = QString::fromStdWString(customProjectRoot);
+	m_settings->setValue("customProjectRoot", m_customProjectRoot);
 }
 
 //-----------------------------------------------------------------
