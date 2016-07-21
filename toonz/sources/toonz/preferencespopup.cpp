@@ -275,9 +275,8 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
 void PreferencesPopup::onProjectRootChanged() {
 	int documents = m_projectRootDocuments->isChecked() ? 1 : 0;
 	int desktop = m_projectRootDesktop->isChecked() ? 1 : 0;
-	int stuff = m_projectRootStandard->isChecked() ? 1 : 0;
 	int custom = m_projectRootCustom->isChecked() ? 1 : 0;
-	QString projects = QString::number(documents) + QString::number(desktop) + QString::number(stuff) + QString::number(custom);
+	QString projects = QString::number(documents) + QString::number(desktop) + QString::number(custom);
 	m_pref->setProjectRoot(projects.toInt());
 	if (custom) {
 		m_customProjectRootFileField->show();
@@ -903,10 +902,9 @@ PreferencesPopup::PreferencesPopup()
       new DVGui::IntLineEdit(this, m_pref->getDefaultTaskChunkSize(), 1, 2000);
   CheckBox *sceneNumberingCB = new CheckBox(tr("Show Info in Rendered Frames"));
 
-  m_projectRootDocuments = new CheckBox(tr("My Documents"), this);
-  m_projectRootDesktop = new CheckBox(tr("Desktop"), this);
-  m_projectRootStandard = new CheckBox(tr("Standard Folder"), this);
-  m_projectRootCustom = new CheckBox(tr("Custom"), this);
+  m_projectRootDocuments = new CheckBox(tr("My Documents*"), this);
+  m_projectRootDesktop = new CheckBox(tr("Desktop*"), this);
+  m_projectRootCustom = new CheckBox(tr("Custom*"), this);
   m_customProjectRootFileField = new DVGui::FileField(this, QString(""));
   m_customProjectRootLabel = new QLabel(tr("Custom Project Path: "));
   m_projectRootDirections = new QLabel(tr("Advanced: Multiple paths can be included separated by ** (No Spaces)"));
@@ -1109,13 +1107,11 @@ PreferencesPopup::PreferencesPopup()
   m_customProjectRootFileField->setPath(m_pref->getCustomProjectRoot());
   
   int projectPaths = m_pref->getProjectRoot();
-  int documents = (projectPaths / 1000) % 10;
-  int desktop = (projectPaths / 100) % 10;
-  int standard = (projectPaths / 10) % 10;
+  int documents = (projectPaths / 100) % 10;
+  int desktop = (projectPaths / 10) % 10;
   int custom = projectPaths % 10;
   m_projectRootDocuments->setChecked(documents);
   m_projectRootDesktop->setChecked(desktop);
-  m_projectRootStandard->setChecked(standard);
   m_projectRootCustom->setChecked(custom);
   if (!custom) {
 	  m_customProjectRootFileField->hide();
@@ -1378,16 +1374,15 @@ PreferencesPopup::PreferencesPopup()
 	  projectRootLay->setVerticalSpacing(10);
 	  {
 		  projectRootLay->addWidget(new QLabel(" "), 0, 0);
-		  projectRootLay->addWidget(new QLabel(tr("Project Folder Locations:"), this), 1, 0,
+		  projectRootLay->addWidget(new QLabel(tr("Additional Project Locations:"), this), 1, 0,
 			  Qt::AlignRight | Qt::AlignVCenter);
 		  projectRootLay->addWidget(m_projectRootDocuments, 2, 0);
 		  projectRootLay->addWidget(m_projectRootDesktop, 3, 0);
-		  projectRootLay->addWidget(m_projectRootStandard, 4, 0);
-		  projectRootLay->addWidget(m_projectRootCustom, 5, 0);
-		  projectRootLay->addWidget(m_customProjectRootLabel, 6, 0,
+		  projectRootLay->addWidget(m_projectRootCustom, 4, 0);
+		  projectRootLay->addWidget(m_customProjectRootLabel, 5, 0,
 			  Qt::AlignRight | Qt::AlignVCenter);
-		  projectRootLay->addWidget(m_customProjectRootFileField, 6, 1, 1, 3);
-		  projectRootLay->addWidget(m_projectRootDirections, 7, 0, 1, 4);
+		  projectRootLay->addWidget(m_customProjectRootFileField, 5, 1, 1, 3);
+		  projectRootLay->addWidget(m_projectRootDirections, 6, 0, 1, 4);
 	  }
 	  generalFrameLay->addLayout(projectRootLay, 0);
       generalFrameLay->addStretch(1);
@@ -1821,8 +1816,6 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(m_projectRootDocuments, SIGNAL(stateChanged(int)),
 	  SLOT(onProjectRootChanged()));
   ret = ret && connect(m_projectRootDesktop, SIGNAL(stateChanged(int)),
-	  SLOT(onProjectRootChanged()));
-  ret = ret && connect(m_projectRootStandard, SIGNAL(stateChanged(int)),
 	  SLOT(onProjectRootChanged()));
   ret = ret && connect(m_projectRootCustom, SIGNAL(stateChanged(int)),
 	  SLOT(onProjectRootChanged()));

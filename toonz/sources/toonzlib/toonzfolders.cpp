@@ -75,23 +75,20 @@ TFilePathSet ToonzFolder::getProjectsFolders() {
 	QString path = Preferences::instance()->getCustomProjectRoot();
 	TFilePathSet fps;
 	int projectPaths = Preferences::instance()->getProjectRoot();
-	int documents = (projectPaths / 1000) % 10;
-	int desktop = (projectPaths / 100) % 10;
-	int standard = (projectPaths / 10) % 10;
+	int documents = (projectPaths / 100) % 10;
+	int desktop = (projectPaths / 10) % 10;
 	int custom = projectPaths % 10;
 	//fps = getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
 	if (documents) fps.push_back(getMyDocumentsPath() + "OpenToonz");
 	if (desktop) fps.push_back(getDesktopPath() + "OpenToonz");
-	if (standard) {
-		TFilePathSet tempFps = getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
-		for (TFilePath tempPath : tempFps) {
-			if (TSystem::doesExistFileOrLevel(TFilePath(tempPath))) {
-				fps.push_back(TFilePath(tempPath));
-			}
-		} 
-		if (tempFps.size() == 0) fps.push_back(TEnv::getStuffDir() + "Projects");
-		int i = tempFps.size();
-	}
+	TFilePathSet tempFps = getSystemVarPathSetValue(getSystemVarPrefix() + "PROJECTS");
+	for (TFilePath tempPath : tempFps) {
+		if (TSystem::doesExistFileOrLevel(TFilePath(tempPath))) {
+			fps.push_back(TFilePath(tempPath));
+		}
+	} 
+	if (tempFps.size() == 0) fps.push_back(TEnv::getStuffDir() + "Projects");
+
 	if (custom) {
 		QStringList paths = path.split("**");
 		for (QString tempPath : paths) {
