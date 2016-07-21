@@ -68,7 +68,8 @@ private:
   QPushButton *m_addLevelFormat, *m_removeLevelFormat, *m_editLevelFormat;
 
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
-      *m_onionSkinVisibility, *m_pixelsOnlyCB;
+      *m_onionSkinVisibility, *m_pixelsOnlyCB, *m_projectRootDocuments,
+	  *m_projectRootDesktop, *m_projectRootStuff, *m_projectRootCustom;
 
   DVGui::FileField *m_customProjectRootFileField;
 
@@ -79,7 +80,7 @@ private:
 private slots:
 
   void onPixelsOnlyChanged(int index);
-  void onProjectRootChanged(int index);
+  void onProjectRootChanged();
   void onCustomProjectRootChanged();
   void onUnitChanged(int index);
   void onCameraUnitChanged(int index);
