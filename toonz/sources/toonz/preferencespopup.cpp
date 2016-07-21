@@ -906,8 +906,8 @@ PreferencesPopup::PreferencesPopup()
   m_projectRootDesktop = new CheckBox(tr("Desktop*"), this);
   m_projectRootCustom = new CheckBox(tr("Custom*"), this);
   m_customProjectRootFileField = new DVGui::FileField(this, QString(""));
-  m_customProjectRootLabel = new QLabel(tr("Custom Project Path: "));
-  m_projectRootDirections = new QLabel(tr("Advanced: Multiple paths can be included separated by ** (No Spaces)"));
+  m_customProjectRootLabel = new QLabel(tr("Custom Project Path(s): "));
+  m_projectRootDirections = new QLabel(tr("Advanced: Multiple paths can be separated by ** (No Spaces)"));
 
   QLabel *note_general =
       new QLabel(tr("* Changes will take effect the next time you run Toonz"));
