@@ -921,7 +921,7 @@ void TFxCommand::insertFx(TFx *newFx, const QList<TFxP> &fxs,
                           int row) {
   if (!newFx) return;
 
-  std::auto_ptr<FxCommandUndo> undo(
+  std::unique_ptr<FxCommandUndo> undo(
       new InsertFxUndo(newFx, row, col, fxs, links, app));
   if (undo->isConsistent()) {
     undo->redo();
@@ -937,7 +937,7 @@ void TFxCommand::addFx(TFx *newFx, const QList<TFxP> &fxs, TApplication *app,
                        int col, int row) {
   if (!newFx) return;
 
-  std::auto_ptr<FxCommandUndo> undo(
+  std::unique_ptr<FxCommandUndo> undo(
       new InsertFxUndo(newFx, row, col, fxs, QList<Link>(), app, false));
   if (!undo->isConsistent()) return;
 
@@ -1068,7 +1068,7 @@ QString DuplicateFxUndo::getHistoryString() {
 
 void TFxCommand::duplicateFx(TFx *src, TXsheetHandle *xshHandle,
                              TFxHandle *fxHandle) {
-  std::auto_ptr<FxCommandUndo> undo(
+  std::unique_ptr<FxCommandUndo> undo(
       new DuplicateFxUndo(src, xshHandle, fxHandle));
   if (undo->isConsistent()) {
     undo->redo();
@@ -1297,7 +1297,7 @@ void TFxCommand::replaceFx(TFx *newFx, const QList<TFxP> &fxs,
   for (f = 0; f != fCount; ++f) {
     if (!clonedFx) clonedFx = cloneFx();
 
-    std::auto_ptr<FxCommandUndo> undo(
+    std::unique_ptr<FxCommandUndo> undo(
         new ReplaceFxUndo(clonedFx, fxs[f], xshHandle, fxHandle));
     if (undo->isConsistent()) {
       undo->redo();
@@ -1350,7 +1350,7 @@ void TFxCommand::unlinkFx(TFx *fx, TFxHandle *fxHandle,
                           TXsheetHandle *xshHandle) {
   if (!fx) return;
 
-  std::auto_ptr<FxCommandUndo> undo(new UnlinkFxUndo(fx, xshHandle));
+  std::unique_ptr<FxCommandUndo> undo(new UnlinkFxUndo(fx, xshHandle));
   if (undo->isConsistent()) {
     undo->redo();
     TUndoManager::manager()->add(undo.release());
@@ -1498,7 +1498,7 @@ void MakeMacroUndo::undo() const {
 void TFxCommand::makeMacroFx(const std::vector<TFxP> &fxs, TApplication *app) {
   if (fxs.empty()) return;
 
-  std::auto_ptr<FxCommandUndo> undo(new MakeMacroUndo(fxs, app));
+  std::unique_ptr<FxCommandUndo> undo(new MakeMacroUndo(fxs, app));
   if (undo->isConsistent()) {
     undo->redo();
     TUndoManager::manager()->add(undo.release());
@@ -1542,7 +1542,7 @@ void ExplodeMacroUndo::initialize() {
 void TFxCommand::explodeMacroFx(TMacroFx *macroFx, TApplication *app) {
   if (!macroFx) return;
 
-  std::auto_ptr<FxCommandUndo> undo(new ExplodeMacroUndo(macroFx, app));
+  std::unique_ptr<FxCommandUndo> undo(new ExplodeMacroUndo(macroFx, app));
   if (undo->isConsistent()) {
     undo->redo();
     TUndoManager::manager()->add(undo.release());
@@ -1711,7 +1711,7 @@ void ConnectNodesToXsheetUndo::initialize() {
 
 void TFxCommand::connectNodesToXsheet(const std::list<TFxP> &fxs,
                                       TXsheetHandle *xshHandle) {
-  std::auto_ptr<FxCommandUndo> undo(
+  std::unique_ptr<FxCommandUndo> undo(
       new ConnectNodesToXsheetUndo(fxs, xshHandle));
   if (undo->isConsistent()) {
     undo->redo();
@@ -1766,7 +1766,7 @@ void DisconnectNodesFromXsheetUndo::initialize() {
 
 void TFxCommand::disconnectNodesFromXsheet(const std::list<TFxP> &fxs,
                                            TXsheetHandle *xshHandle) {
-  std::auto_ptr<FxCommandUndo> undo(
+  std::unique_ptr<FxCommandUndo> undo(
       new DisconnectNodesFromXsheetUndo(fxs, xshHandle));
   if (undo->isConsistent()) {
     undo->redo();
@@ -2037,8 +2037,8 @@ QString DeleteLinksUndo::getHistoryString() {
 //=============================================================
 
 static void deleteLinks(const std::list<TFxCommand::Link> &links,
-                        TXsheetHandle *xshHandle) {
-  std::auto_ptr<FxCommandUndo> undo(new DeleteLinksUndo(links, xshHandle));
+                 TXsheetHandle *xshHandle) {
+  std::unique_ptr<FxCommandUndo> undo(new DeleteLinksUndo(links, xshHandle));
   if (undo->isConsistent()) {
     undo->redo();
     TUndoManager::manager()->add(undo.release());
@@ -2058,7 +2058,7 @@ protected:
   TFxP m_linkedFx;
   std::vector<TFx *> m_nonTerminalInputs;
 
-  mutable std::auto_ptr<TStageObjectParams> m_columnData;
+  mutable std::unique_ptr<TStageObjectParams> m_columnData;
 
   TXsheetHandle *m_xshHandle;
   TFxHandle *m_fxHandle;
@@ -2299,7 +2299,7 @@ QString DeleteFxOrColumnUndo::getHistoryString() {
 //=============================================================
 
 static void deleteFxs(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle,
-                      TFxHandle *fxHandle) {
+               TFxHandle *fxHandle) {
   TUndoManager *undoManager = TUndoManager::manager();
   TXsheet *xsh              = xshHandle->getXsheet();
 
@@ -2313,7 +2313,7 @@ static void deleteFxs(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle,
     // or ABOVE, if any.
     if (dynamic_cast<TLevelColumnFx *>(ft->getPointer())) continue;
 
-    std::auto_ptr<FxCommandUndo> undo(
+    std::unique_ptr<FxCommandUndo> undo(
         new DeleteFxOrColumnUndo(*ft, xshHandle, fxHandle));
     if (undo->isConsistent()) {
       undo->redo();
@@ -2333,7 +2333,7 @@ void TFxCommand::removeOutputFx(TFx *fx, TXsheetHandle *xshHandle,
   TOutputFx *outputFx = dynamic_cast<TOutputFx *>(fx);
   if (!outputFx) return;
 
-  std::auto_ptr<FxCommandUndo> undo(
+  std::unique_ptr<FxCommandUndo> undo(
       new DeleteFxOrColumnUndo(fx, xshHandle, fxHandle));
   if (undo->isConsistent()) {
     undo->redo();
@@ -2346,7 +2346,7 @@ void TFxCommand::removeOutputFx(TFx *fx, TXsheetHandle *xshHandle,
 //**********************************************************************
 
 static void deleteColumns(const std::list<int> &columns, TXsheetHandle *xshHandle,
-                          TFxHandle *fxHandle) {
+                   TFxHandle *fxHandle) {
   TUndoManager *undoManager = TUndoManager::manager();
 
   undoManager->beginBlock();
@@ -2365,7 +2365,7 @@ static void deleteColumns(const std::list<int> &columns, TXsheetHandle *xshHandl
 
   size_t c, cCount = cols.size();
   for (c = 0; c != cCount; ++c) {
-    std::auto_ptr<FxCommandUndo> undo(
+    std::unique_ptr<FxCommandUndo> undo(
         new DeleteFxOrColumnUndo(cols[c]->getIndex(), xshHandle, fxHandle));
     if (undo->isConsistent()) {
       undo->redo();
@@ -2726,7 +2726,7 @@ void TFxCommand::pasteFxs(const std::list<TFxP> &fxs,
                           const std::list<TXshColumnP> &columns,
                           const TPointD &pos, TXsheetHandle *xshHandle,
                           TFxHandle *fxHandle) {
-  std::auto_ptr<FxCommandUndo> undo(new UndoPasteFxs(
+  std::unique_ptr<FxCommandUndo> undo(new UndoPasteFxs(
       fxs, zeraryFxColumnSize, columns, pos, xshHandle, fxHandle));
   if (undo->isConsistent()) {
     undo->redo();
@@ -2815,7 +2815,7 @@ void TFxCommand::addPasteFxs(TFx *inFx, const std::list<TFxP> &fxs,
                              const std::map<TFx *, int> &zeraryFxColumnSize,
                              const std::list<TXshColumnP> &columns,
                              TXsheetHandle *xshHandle, TFxHandle *fxHandle) {
-  std::auto_ptr<FxCommandUndo> undo(new UndoAddPasteFxs(
+  std::unique_ptr<FxCommandUndo> undo(new UndoAddPasteFxs(
       inFx, fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle));
   if (undo->isConsistent()) {
     // NOTE: (inFx == 0) is considered consistent, as long as
@@ -2907,7 +2907,7 @@ void TFxCommand::insertPasteFxs(const Link &link, const std::list<TFxP> &fxs,
                                 const std::map<TFx *, int> &zeraryFxColumnSize,
                                 const std::list<TXshColumnP> &columns,
                                 TXsheetHandle *xshHandle, TFxHandle *fxHandle) {
-  std::auto_ptr<FxCommandUndo> undo(new UndoInsertPasteFxs(
+  std::unique_ptr<FxCommandUndo> undo(new UndoInsertPasteFxs(
       link, fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle));
   if (undo->isConsistent()) {
     undo->redo();
@@ -2920,7 +2920,7 @@ void TFxCommand::insertPasteFxs(const Link &link, const std::list<TFxP> &fxs,
 //**********************************************************************
 
 class UndoReplacePasteFxs final : public UndoAddPasteFxs {
-  std::auto_ptr<DeleteFxOrColumnUndo> m_deleteFxUndo;
+  std::unique_ptr<DeleteFxOrColumnUndo> m_deleteFxUndo;
 
   TFx *m_fx, *m_rightmostFx;
 
@@ -3033,7 +3033,7 @@ void TFxCommand::replacePasteFxs(TFx *inFx, const std::list<TFxP> &fxs,
                                  const std::list<TXshColumnP> &columns,
                                  TXsheetHandle *xshHandle,
                                  TFxHandle *fxHandle) {
-  std::auto_ptr<FxCommandUndo> undo(new UndoReplacePasteFxs(
+  std::unique_ptr<FxCommandUndo> undo(new UndoReplacePasteFxs(
       inFx, fxs, zeraryFxColumnSize, columns, xshHandle, fxHandle));
   if (undo->isConsistent()) {
     undo->redo();
@@ -3199,7 +3199,7 @@ void UndoDisconnectFxs::undo() const {
 void TFxCommand::disconnectFxs(const std::list<TFxP> &fxs,
                                TXsheetHandle *xshHandle,
                                const QList<QPair<TFxP, TPointD>> &fxPos) {
-  std::auto_ptr<FxCommandUndo> undo(
+  std::unique_ptr<FxCommandUndo> undo(
       new UndoDisconnectFxs(fxs, fxPos, xshHandle));
   if (undo->isConsistent()) {
     undo->redo();
@@ -3343,7 +3343,7 @@ QString UndoConnectFxs::getHistoryString() {
 void TFxCommand::connectFxs(const Link &link, const std::list<TFxP> &fxs,
                             TXsheetHandle *xshHandle,
                             const QList<QPair<TFxP, TPointD>> &fxPos) {
-  std::auto_ptr<FxCommandUndo> undo(
+  std::unique_ptr<FxCommandUndo> undo(
       new UndoConnectFxs(link, fxs, fxPos, xshHandle));
   if (undo->isConsistent()) {
     undo->redo();
@@ -3463,14 +3463,14 @@ void SetParentUndo::undo() const {
 void TFxCommand::setParent(TFx *fx, TFx *parentFx, int parentFxPort,
                            TXsheetHandle *xshHandle) {
   if (dynamic_cast<TXsheetFx *>(parentFx) || parentFxPort < 0) {
-    std::auto_ptr<ConnectNodesToXsheetUndo> undo(
+    std::unique_ptr<ConnectNodesToXsheetUndo> undo(
         new ConnectNodesToXsheetUndo(std::list<TFxP>(1, fx), xshHandle));
     if (undo->isConsistent()) {
       undo->redo_();
       TUndoManager::manager()->add(undo.release());
     }
   } else {
-    std::auto_ptr<SetParentUndo> undo(
+    std::unique_ptr<SetParentUndo> undo(
         new SetParentUndo(fx, parentFx, parentFxPort, xshHandle));
     if (undo->isConsistent()) {
       undo->redo_();
@@ -3527,7 +3527,7 @@ void TFxCommand::renameFx(TFx *fx, const std::wstring &newName,
                           TXsheetHandle *xshHandle) {
   if (!fx) return;
 
-  std::auto_ptr<UndoRenameFx> undo(new UndoRenameFx(fx, newName, xshHandle));
+  std::unique_ptr<UndoRenameFx> undo(new UndoRenameFx(fx, newName, xshHandle));
   if (undo->isConsistent()) {
     undo->redo_();
     TUndoManager::manager()->add(undo.release());
@@ -3650,7 +3650,7 @@ void UndoGroupFxs::undo() const {
 
 void TFxCommand::groupFxs(const std::list<TFxP> &fxs,
                           TXsheetHandle *xshHandle) {
-  std::auto_ptr<FxCommandUndo> undo(new UndoGroupFxs(fxs, xshHandle));
+  std::unique_ptr<FxCommandUndo> undo(new UndoGroupFxs(fxs, xshHandle));
   if (undo->isConsistent()) {
     undo->redo();
     TUndoManager::manager()->add(undo.release());
@@ -3737,7 +3737,7 @@ void UndoUngroupFxs::initialize() {
 //======================================================
 
 void TFxCommand::ungroupFxs(int groupId, TXsheetHandle *xshHandle) {
-  std::auto_ptr<FxCommandUndo> undo(new UndoUngroupFxs(groupId, xshHandle));
+  std::unique_ptr<FxCommandUndo> undo(new UndoUngroupFxs(groupId, xshHandle));
   if (undo->isConsistent()) {
     undo->redo();
     TUndoManager::manager()->add(undo.release());
@@ -3849,7 +3849,7 @@ void UndoRenameGroup::undo() const {
 void TFxCommand::renameGroup(const std::list<TFxP> &fxs,
                              const std::wstring &name, bool fromEditor,
                              TXsheetHandle *xshHandle) {
-  std::auto_ptr<UndoRenameGroup> undo(
+  std::unique_ptr<UndoRenameGroup> undo(
       new UndoRenameGroup(fxs, name, fromEditor, xshHandle));
   if (undo->isConsistent()) {
     undo->redo_();  // Same schematic nodes problem as above...   :(

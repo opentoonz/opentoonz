@@ -14,6 +14,7 @@
 #include "tdebugmessage.h"
 #include "tthreadmessage.h"
 #include "tl2lautocloser.h"
+#include "tcomputeregions.h"
 #include <vector>
 
 #include "tcurveutil.h"
@@ -46,7 +47,7 @@ inline TThickPoint myRound(const TThickPoint &p) {
   return TThickPoint(myRound(p.x), myRound(p.y), p.thick);
 }
 
-void roundStroke(TStroke *s) {
+static void roundStroke(TStroke *s) {
   int size = s->getControlPointCount();
 
   for (int j = 0; j < (int)s->getControlPointCount(); j++) {
@@ -411,13 +412,13 @@ void addIntersection(IntersectionData &intData, const vector<VIStroke *> &s,
 
 //-----------------------------------------------------------------------------
 
-bool sortBBox(const TStroke *s1, const TStroke *s2) {
+static bool sortBBox(const TStroke *s1, const TStroke *s2) {
   return s1->getBBox().x0 < s2->getBBox().x0;
 }
 
 //-----------------------------------------------------------------------------
 
-void cleanIntersectionMarks(const VIList<Intersection> &interList) {
+static void cleanIntersectionMarks(const VIList<Intersection> &interList) {
   Intersection *p;
   IntersectedStroke *q;
   for (p = interList.first(); p; p = p->next())
@@ -435,7 +436,7 @@ void cleanIntersectionMarks(const VIList<Intersection> &interList) {
 
 //-----------------------------------------------------------------------------
 
-void cleanNextIntersection(const VIList<Intersection> &interList, TStroke *s) {
+static void cleanNextIntersection(const VIList<Intersection> &interList, TStroke *s) {
   Intersection *p;
   IntersectedStroke *q;
 
@@ -903,7 +904,7 @@ void TVectorImage::Imp::eraseIntersection(int index) {
 }
 //-----------------------------------------------------------------------------
 
-void findNearestIntersection(VIList<Intersection> &interList) {
+static void findNearestIntersection(VIList<Intersection> &interList) {
   Intersection *p1;
   IntersectedStroke *p2;
 
@@ -1026,7 +1027,7 @@ void markDeadIntersections(VIList<Intersection> &intList, Intersection *p) {
 
 // se cross val era 0, cerco di spostarmi un po' su w per vedere come sono
 // orientate le tangenti agli stroke...
-double nearCrossVal(TStroke *s0, double w0, TStroke *s1, double w1) {
+static double nearCrossVal(TStroke *s0, double w0, TStroke *s1, double w1) {
   double ltot0 = s0->getLength();
   double ltot1 = s1->getLength();
   double dl    = std::min(ltot1, ltot0) / 1000;
@@ -1066,7 +1067,7 @@ inline void insertBranch(Intersection &in, IntersectedStroke &item,
 
 //-----------------------------------------------------------------------------
 
-double getAngle(const TPointD &p0, const TPointD &p1) {
+static double getAngle(const TPointD &p0, const TPointD &p1) {
   double angle1 = atan2(p0.x, p0.y) * M_180_PI;
   double angle2 = atan2(p1.x, p1.y) * M_180_PI;
 
@@ -1079,8 +1080,8 @@ double getAngle(const TPointD &p0, const TPointD &p1) {
 //-----------------------------------------------------------------------------
 // nel caso l'angolo tra due stroke in un certo w sia nullo,
 // si va un po' avanti per vedere come sono orientate....
-double getNearAngle(const TStroke *s1, double w1, bool out1, const TStroke *s2,
-                    double w2, bool out2) {
+static double getNearAngle(const TStroke *s1, double w1, bool out1, const TStroke *s2,
+                           double w2, bool out2) {
   bool verse1  = (out1 && w1 < 1) || (!out1 && w1 == 0);
   bool verse2  = (out2 && w2 < 1) || (!out2 && w2 == 0);
   double ltot1 = s1->getLength();
@@ -1105,10 +1106,10 @@ double getNearAngle(const TStroke *s1, double w1, bool out1, const TStroke *s2,
 
 //-----------------------------------------------------------------------------
 
-bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1,
-                          IntersectedStroke &item2, const TPointD &p1a,
-                          const TPointD &p1b, const TPointD &p2a,
-                          const TPointD &p2b) {
+static bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1,
+                                 IntersectedStroke &item2, const TPointD &p1a,
+                                 const TPointD &p1b, const TPointD &p2a,
+                                 const TPointD &p2b) {
   double angle1 = getAngle(p1a, p1b);
   double angle2 = getAngle(p1a, p2a);
   double angle3 = getAngle(p1a, p2b);
@@ -1215,9 +1216,9 @@ bool makeEdgeIntersection(Intersection &interList, IntersectedStroke &item1,
 
 //-----------------------------------------------------------------------------
 
-bool makeIntersection(IntersectionData &intData, const vector<VIStroke *> &s,
-                      int ii, int jj, DoublePair inter, int strokeSize,
-                      Intersection &interList) {
+static bool makeIntersection(IntersectionData &intData, const vector<VIStroke *> &s,
+                             int ii, int jj, DoublePair inter, int strokeSize,
+                             Intersection &interList) {
   IntersectedStroke item1, item2;
 
   interList.m_intersection = s[ii]->m_s->getPoint(inter.first);
@@ -1336,9 +1337,9 @@ areAlmostEqual(q->getP2(), p->getP0(), 1e-2))
 */
 //-----------------------------------------------------------------------------
 
-bool addAutocloseIntersection(IntersectionData &intData, vector<VIStroke *> &s,
-                              int ii, int jj, double w0, double w1,
-                              int strokeSize, bool isVectorized) {
+static bool addAutocloseIntersection(IntersectionData &intData, vector<VIStroke *> &s,
+                                     int ii, int jj, double w0, double w1,
+                                     int strokeSize, bool isVectorized) {
   assert(s[ii]->m_groupId == s[jj]->m_groupId);
 
   Intersection *rp = intData.m_intList.last();
@@ -1418,8 +1419,8 @@ bool addAutocloseIntersection(IntersectionData &intData, vector<VIStroke *> &s,
 
 // double g_autocloseTolerance = c_newAutocloseTolerance;
 
-bool isCloseEnoughP2P(double facMin, double facMax, TStroke *s1, double w0,
-                      TStroke *s2, double w1) {
+static bool isCloseEnoughP2P(double facMin, double facMax, TStroke *s1, double w0,
+                             TStroke *s2, double w1) {
   double autoDistMin, autoDistMax;
 
   TThickPoint p0 = s1->getThickPoint(w0);
@@ -1495,9 +1496,9 @@ return false;
 */
 //-----------------------------------------------------------------------------
 
-double getCurlW(TStroke *s, bool isBegin)  // trova il punto di split su una
-                                           // stroke, in prossimita di un
-                                           // ricciolo;
+static double getCurlW(TStroke *s, bool isBegin)  // trova il punto di split su una
+                                                  // stroke, in prossimita di un
+                                                  // ricciolo;
 // un ricciolo c'e' se la curva ha un  min o max relativo su x seguito da uno su
 // y, o viceversa.
 {
@@ -1570,8 +1571,8 @@ return -1;
 #endif
 //-----------------------------------------------------------------------------
 
-bool isCloseEnoughP2L(double facMin, double facMax, TStroke *s1, double w1,
-                      TStroke *s2, double &w) {
+static bool isCloseEnoughP2L(double facMin, double facMax, TStroke *s1, double w1,
+                             TStroke *s2, double &w) {
   if (s1->isSelfLoop()) return false;
 
   TThickPoint p0 = s1->getThickPoint(w1);
@@ -1880,10 +1881,10 @@ void getClosingPoints(const TRectD &rect, double fac, const TVectorImageP &vi,
 
 //-------------------------------------------------------------------------------------------------------
 
-void autoclose(double factor, vector<VIStroke *> &s, int ii, int jj,
-               IntersectionData &IntData, int strokeSize,
-               TL2LAutocloser &l2lautocloser, vector<DoublePair> *intersections,
-               bool isVectorized) {
+static void autoclose(double factor, vector<VIStroke *> &s, int ii, int jj,
+                      IntersectionData &IntData, int strokeSize,
+                      TL2LAutocloser &l2lautocloser, vector<DoublePair> *intersections,
+                      bool isVectorized) {
   vector<std::pair<double, double>> segments;
   getClosingSegments(l2lautocloser, 0, factor, s[ii]->m_s, s[jj]->m_s,
                      intersections, segments);
@@ -1938,9 +1939,9 @@ TPointD inline getTangent(const IntersectedStroke &item) {
 
 //-----------------------------------------------------------------------------
 
-void addBranch(IntersectionData &intData, VIList<IntersectedStroke> &strokeList,
-               const vector<VIStroke *> &s, int ii, double w, int strokeSize,
-               bool gettingOut) {
+static void addBranch(IntersectionData &intData, VIList<IntersectedStroke> &strokeList,
+                      const vector<VIStroke *> &s, int ii, double w, int strokeSize,
+                      bool gettingOut) {
   IntersectedStroke *p1, *p2;
   TPointD tanRef, lastTan;
 
@@ -2055,9 +2056,9 @@ return;
 
 //-----------------------------------------------------------------------------
 
-void addBranches(IntersectionData &intData, Intersection &intersection,
-                 const vector<VIStroke *> &s, int ii, int jj,
-                 DoublePair intersectionPair, int strokeSize) {
+static void addBranches(IntersectionData &intData, Intersection &intersection,
+                        const vector<VIStroke *> &s, int ii, int jj,
+                        DoublePair intersectionPair, int strokeSize) {
   bool foundS1 = false, foundS2 = false;
   IntersectedStroke *p;
 
@@ -2127,9 +2128,9 @@ IntersectedStroke app;
 
 //-----------------------------------------------------------------------------
 
-void addIntersections(IntersectionData &intData, const vector<VIStroke *> &s,
-                      int ii, int jj, vector<DoublePair> &intersections,
-                      int strokeSize, bool isVectorized) {
+static void addIntersections(IntersectionData &intData, const vector<VIStroke *> &s,
+                             int ii, int jj, vector<DoublePair> &intersections,
+                             int strokeSize, bool isVectorized) {
   for (int k = 0; k < (int)intersections.size(); k++) {
     if (ii >= strokeSize && (areAlmostEqual(intersections[k].first, 0.0) ||
                              areAlmostEqual(intersections[k].first, 1.0)))
@@ -2446,8 +2447,8 @@ if (tdistance2(p01, p11)< 2*0.06*0.06)
 //-----------------------------------------------------------------------------
 
 // Trova una possibile regione data una lista di punti di intersezione
-TRegion *findRegion(VIList<Intersection> &intList, Intersection *p1,
-                    IntersectedStroke *p2, bool minimizeEdges) {
+static TRegion *findRegion(VIList<Intersection> &intList, Intersection *p1,
+                           IntersectedStroke *p2, bool minimizeEdges) {
   TRegion *r    = new TRegion();
   int currStyle = 0;
 
@@ -2662,7 +2663,7 @@ void computeRegionFeature(const TRegion &r, TRegionFeatureFormula &formula) {
 
 //----------------------------------------------------------------------------------
 
-bool isValidArea(const TRegion &r) {
+static bool isValidArea(const TRegion &r) {
   TRegionClockWiseFormula formula;
   computeRegionFeature(r, formula);
   return formula.isClockwise();
@@ -2759,7 +2760,7 @@ void transferColors(const list<TEdge *> &oldList, const list<TEdge *> &newList,
                     bool isStrokeChanged, bool isFlipped, bool overwriteColor);
 
 //-----------------------------------------------------------------------------
-void printStrokes1(vector<VIStroke *> &v, int size) {
+static void printStrokes1(vector<VIStroke *> &v, int size) {
   UINT i = 0;
   ofstream of("C:\\temp\\strokes.txt");
 

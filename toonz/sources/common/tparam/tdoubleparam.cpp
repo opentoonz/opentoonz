@@ -103,8 +103,8 @@ inline double getLinearValue(const TActualDoubleKeyframe &k0,
 
 //---------------------------------------------------------
 
-void truncateSpeeds(double aFrame, double bFrame, TPointD &aSpeedTrunc,
-                    TPointD &bSpeedTrunc) {
+static void truncateSpeeds(double aFrame, double bFrame, TPointD &aSpeedTrunc,
+                           TPointD &bSpeedTrunc) {
   double deltaX                        = bFrame - aFrame;
   if (aSpeedTrunc.x < 0) aSpeedTrunc.x = 0;
   if (bSpeedTrunc.x > 0) bSpeedTrunc.x = 0;

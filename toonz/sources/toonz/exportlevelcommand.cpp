@@ -217,7 +217,7 @@ class ImageExporter {
   ExportLevelOptions m_opts;
 
   TRasterP m_rout;
-  std::auto_ptr<TOfflineGL> m_glContext;
+  std::unique_ptr<TOfflineGL> m_glContext;
 
 public:
   ImageExporter(const TXshSimpleLevel &sl, const ExportLevelOptions &opts)
@@ -536,9 +536,9 @@ bool IoCmd::exportLevel(const TFilePath &path, TXshSimpleLevel *sl,
   assert(opts.m_camera.getRes().lx > 0 && opts.m_camera.getRes().ly > 0);
 
   // Callbacks
-  std::auto_ptr<OverwriteCallbacks> overwriteDefault(
+  std::unique_ptr<OverwriteCallbacks> overwriteDefault(
       overwriteCB ? 0 : (overwriteCB = new ExportOverwriteCB()));
-  std::auto_ptr<ProgressCallbacks> progressDefault(
+  std::unique_ptr<ProgressCallbacks> progressDefault(
       progressCB ? 0 : (progressCB = new ExportProgressCB()));
 
   // Initialize variables

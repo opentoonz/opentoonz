@@ -58,6 +58,9 @@
 #include <QDateTime>
 #include <QMultimedia>
 #include <QPainter>
+#include <QKeyEvent>
+#include <QCommonStyle>
+#include <QTimer>
 
 using namespace DVGui;
 
@@ -242,7 +245,8 @@ MyViewFinder::MyViewFinder(QWidget* parent)
     , m_camera(0)
     , m_showOnionSkin(false)
     , m_onionOpacity(128)
-    , m_upsideDown(false) {}
+    , m_upsideDown(false)
+    , m_countDownTime(0) {}
 
 void MyViewFinder::paintEvent(QPaintEvent* event) {
   QPainter p(this);
@@ -274,6 +278,18 @@ void MyViewFinder::paintEvent(QPaintEvent* event) {
     p.drawRect(m_imageRect);
     p.setCompositionMode(QPainter::CompositionMode_DestinationOver);
     p.drawImage(m_imageRect, m_previousImage);
+    p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+  }
+
+  // draw countdown text
+  if (m_countDownTime > 0) {
+    QString str =
+        QTime::fromMSecsSinceStartOfDay(m_countDownTime).toString("s.zzz");
+    p.setPen(Qt::yellow);
+    QFont font = p.font();
+    font.setPixelSize(50);
+    p.setFont(font);
+    p.drawText(rect(), Qt::AlignRight | Qt::AlignBottom, str);
   }
 }
 
@@ -303,7 +319,13 @@ PencilTestPopup::PencilTestPopup()
     , m_cameraImageCapture(0)
     , m_captureWhiteBGCue(false)
     , m_captureCue(false) {
-  setWindowTitle(tr("Pencil Test"));
+  setWindowTitle(tr("Camera Capture"));
+
+  // add maximize button to the dialog
+  Qt::WindowFlags flags = windowFlags();
+  flags |= Qt::WindowMaximizeButtonHint;
+  setWindowFlags(flags);
+
   layout()->setSizeConstraint(QLayout::SetNoConstraint);
 
   std::wstring dateTime =
@@ -328,6 +350,8 @@ PencilTestPopup::PencilTestPopup()
   m_saveInFileFld          = new FileField(
       0, QString("+%1").arg(QString::fromStdString(TProject::Extras)));
   QToolButton* nextLevelButton = new QToolButton(this);
+  m_saveOnCaptureCB =
+      new QCheckBox(tr("Save images as they are captured"), this);
 
   QGroupBox* imageFrame = new QGroupBox(tr("Image adjust"), this);
   m_colorTypeCombo      = new QComboBox(this);
@@ -344,13 +368,19 @@ PencilTestPopup::PencilTestPopup()
   m_onionSkinCB           = new QCheckBox(tr("Show onion skin"), this);
   m_onionOpacityFld       = new IntField(this);
 
-  QPushButton* captureButton = new QPushButton(tr("Capture"), this);
-  QPushButton* closeButton   = new QPushButton(tr("Close"), this);
+  QGroupBox* timerFrame = new QGroupBox(tr("Interval timer"), this);
+  m_timerCB             = new QCheckBox(tr("Use interval timer"), this);
+  m_timerIntervalFld    = new IntField(this);
+  m_captureTimer        = new QTimer(this);
+  m_countdownTimer      = new QTimer(this);
+
+  m_captureButton          = new QPushButton(tr("Capture\n[Return key]"), this);
+  QPushButton* closeButton = new QPushButton(tr("Close"), this);
   //----
 
   m_resolutionCombo->setMaximumWidth(fontMetrics().width("0000 x 0000") + 25);
   m_fileTypeCombo->addItems({"jpg", "png", "tga", "tif"});
-  m_fileTypeCombo->setCurrentIndex(1);
+  m_fileTypeCombo->setCurrentIndex(0);
 
   fileFrame->setObjectName("CleanupSettingsFrame");
   // Exclude all character which cannot fit in a filepath (Win).
@@ -362,6 +392,7 @@ PencilTestPopup::PencilTestPopup()
   nextLevelButton->setFixedSize(24, 24);
   nextLevelButton->setArrowType(Qt::RightArrow);
   nextLevelButton->setToolTip(tr("Next Level"));
+  m_saveOnCaptureCB->setChecked(true);
 
   imageFrame->setObjectName("CleanupSettingsFrame");
   m_colorTypeCombo->addItems({"Color", "Grayscale", "Black & White"});
@@ -385,8 +416,21 @@ PencilTestPopup::PencilTestPopup()
   m_onionOpacityFld->setValue(50);
   m_onionOpacityFld->setDisabled(true);
 
-  captureButton->setObjectName("LargeSizedText");
-  captureButton->setFixedHeight(80);
+  timerFrame->setObjectName("CleanupSettingsFrame");
+  m_timerCB->setChecked(false);
+  m_timerIntervalFld->setRange(0, 60);
+  m_timerIntervalFld->setValue(10);
+  m_timerIntervalFld->setDisabled(true);
+  // Make the interval timer single-shot. When the capture finished, restart
+  // timer for next frame.
+  // This is because capturing and saving the image needs some time.
+  m_captureTimer->setSingleShot(true);
+
+  m_captureButton->setObjectName("LargeSizedText");
+  m_captureButton->setFixedHeight(80);
+  QCommonStyle style;
+  m_captureButton->setIcon(style.standardIcon(QStyle::SP_DialogOkButton));
+  m_captureButton->setIconSize(QSize(30, 30));
 
   //---- layout ----
   QHBoxLayout* mainLay = new QHBoxLayout();
@@ -460,6 +504,8 @@ PencilTestPopup::PencilTestPopup()
           saveInLay->addWidget(m_saveInFileFld, 1);
         }
         fileLay->addLayout(saveInLay, 0);
+
+        fileLay->addWidget(m_saveOnCaptureCB, 0);
       }
       fileFrame->setLayout(fileLay);
       rightLay->addWidget(fileFrame, 0);
@@ -504,21 +550,37 @@ PencilTestPopup::PencilTestPopup()
       displayLay->setHorizontalSpacing(3);
       displayLay->setVerticalSpacing(10);
       {
-        displayLay->addWidget(m_onionSkinCB, 0, 0, 1, 3);
+        displayLay->addWidget(m_onionSkinCB, 0, 0, 1, 2);
 
         displayLay->addWidget(new QLabel(tr("Opacity(%):"), this), 1, 0,
                               Qt::AlignRight);
-        displayLay->addWidget(m_onionOpacityFld, 1, 1, 1, 2);
+        displayLay->addWidget(m_onionOpacityFld, 1, 1);
       }
       displayLay->setColumnStretch(0, 0);
-      displayLay->setColumnStretch(1, 0);
-      displayLay->setColumnStretch(2, 1);
+      displayLay->setColumnStretch(1, 1);
+      // displayLay->setColumnStretch(2, 1);
       displayFrame->setLayout(displayLay);
       rightLay->addWidget(displayFrame);
 
+      QGridLayout* timerLay = new QGridLayout();
+      timerLay->setMargin(10);
+      timerLay->setHorizontalSpacing(3);
+      timerLay->setVerticalSpacing(10);
+      {
+        timerLay->addWidget(m_timerCB, 0, 0, 1, 2);
+
+        timerLay->addWidget(new QLabel(tr("Interval(sec):"), this), 1, 0,
+                            Qt::AlignRight);
+        timerLay->addWidget(m_timerIntervalFld, 1, 1);
+      }
+      timerLay->setColumnStretch(0, 0);
+      timerLay->setColumnStretch(1, 1);
+      timerFrame->setLayout(timerLay);
+      rightLay->addWidget(timerFrame);
+
       rightLay->addStretch(1);
 
-      rightLay->addWidget(captureButton, 0);
+      rightLay->addWidget(m_captureButton, 0);
       rightLay->addSpacing(20);
       rightLay->addWidget(closeButton, 0);
     }
@@ -548,9 +610,16 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(onOnionOpacityFldEdited()));
   ret = ret && connect(m_upsideDownCB, SIGNAL(toggled(bool)),
                        m_cameraViewfinder, SLOT(onUpsideDownChecked(bool)));
+  ret = ret && connect(m_timerCB, SIGNAL(toggled(bool)), this,
+                       SLOT(onTimerCBToggled(bool)));
+  ret = ret && connect(m_captureTimer, SIGNAL(timeout()), this,
+                       SLOT(onCaptureTimerTimeout()));
+  ret = ret &&
+        connect(m_countdownTimer, SIGNAL(timeout()), this, SLOT(onCountDown()));
+
   ret = ret && connect(closeButton, SIGNAL(clicked()), this, SLOT(reject()));
-  ret =
-      ret && connect(captureButton, SIGNAL(clicked()), this, SLOT(onCapture()));
+  ret = ret && connect(m_captureButton, SIGNAL(clicked(bool)), this,
+                       SLOT(onCaptureButtonClicked(bool)));
   assert(ret);
 
   refreshCameraList();
@@ -634,13 +703,14 @@ void PencilTestPopup::onCameraListComboActivated(int index) {
         QString("%1 x %2").arg(sizes.at(s).width()).arg(sizes.at(s).height()));
   }
   if (!sizes.isEmpty()) {
-    m_resolutionCombo->setCurrentIndex(0);
+    // select the largest available resolution
+    m_resolutionCombo->setCurrentIndex(m_resolutionCombo->count() - 1);
     QCameraViewfinderSettings settings = m_currentCamera->viewfinderSettings();
-    settings.setResolution(sizes[0]);
+    settings.setResolution(sizes.last());
     m_currentCamera->setViewfinderSettings(settings);
     QImageEncoderSettings imageEncoderSettings;
     imageEncoderSettings.setCodec("PNG");
-    imageEncoderSettings.setResolution(sizes[0]);
+    imageEncoderSettings.setResolution(sizes.last());
     m_cameraImageCapture->setEncodingSettings(imageEncoderSettings);
   }
   m_cameraViewfinder->setCamera(m_currentCamera);
@@ -756,6 +826,19 @@ void PencilTestPopup::onImageCaptured(int id, const QImage& image) {
     if (importImage(procImg)) {
       m_cameraViewfinder->setPreviousImage(procImg);
       m_frameNumberEdit->setValue(m_frameNumberEdit->getValue() + 1);
+
+      // restart interval timer for capturing next frame (it is single shot)
+      if (m_timerCB->isChecked() && m_captureButton->isChecked()) {
+        m_captureTimer->start(m_timerIntervalFld->getValue() * 1000);
+        // restart the count down as well (for aligning the timing. It is not
+        // single shot)
+        if (m_timerIntervalFld->getValue() != 0) m_countdownTimer->start(100);
+      }
+    }
+    // if capture was failed, stop interval capturing
+    else if (m_timerCB->isChecked()) {
+      m_captureButton->setChecked(false);
+      onCaptureButtonClicked(false);
     }
   }
 }
@@ -779,11 +862,42 @@ void PencilTestPopup::timerEvent(QTimerEvent* event) {
 
 void PencilTestPopup::showEvent(QShowEvent* event) {
   m_timerId = startTimer(10);
+
+  // if there is another action of which "return" key is assigned as short cut
+  // key,
+  // then release the shortcut key temporary while the popup opens
+  QAction* action = CommandManager::instance()->getActionFromShortcut("Return");
+  if (action) action->setShortcut(QKeySequence(""));
 }
 
 //-----------------------------------------------------------------------------
 
-void PencilTestPopup::hideEvent(QHideEvent* event) { killTimer(m_timerId); }
+void PencilTestPopup::hideEvent(QHideEvent* event) {
+  killTimer(m_timerId);
+
+  // set back the "return" short cut key
+  QAction* action = CommandManager::instance()->getActionFromShortcut("Return");
+  if (action) action->setShortcut(QKeySequence("Return"));
+
+  // stop interval timer if it is active
+  if (m_timerCB->isChecked() && m_captureButton->isChecked()) {
+    m_captureButton->setChecked(false);
+    onCaptureButtonClicked(false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::keyPressEvent(QKeyEvent* event) {
+  // override return (or enter) key as shortcut key for capturing
+  if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+    // show button-clicking animation followed by calling
+    // onCaptureButtonClicked()
+    m_captureButton->animateClick();
+    event->accept();
+  } else
+    event->ignore();
+}
 
 //-----------------------------------------------------------------------------
 
@@ -824,7 +938,51 @@ void PencilTestPopup::onOnionOpacityFldEdited() {
 
 //-----------------------------------------------------------------------------
 
-void PencilTestPopup::onCapture() { m_captureCue = true; }
+void PencilTestPopup::onTimerCBToggled(bool on) {
+  m_timerIntervalFld->setEnabled(on);
+  m_captureButton->setCheckable(on);
+  if (on)
+    m_captureButton->setText(tr("Start Capturing\n[Return key]"));
+  else
+    m_captureButton->setText(tr("Capture\n[Return key]"));
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onCaptureButtonClicked(bool on) {
+  if (m_timerCB->isChecked()) {
+    m_timerCB->setDisabled(on);
+    m_timerIntervalFld->setDisabled(on);
+    // start interval capturing
+    if (on) {
+      m_captureButton->setText(tr("Stop Capturing\n[Return key]"));
+      m_captureTimer->start(m_timerIntervalFld->getValue() * 1000);
+      if (m_timerIntervalFld->getValue() != 0) m_countdownTimer->start(100);
+    }
+    // stop interval capturing
+    else {
+      m_captureButton->setText(tr("Start Capturing\n[Return key]"));
+      m_captureTimer->stop();
+      m_countdownTimer->stop();
+      // hide the count down text
+      m_cameraViewfinder->showCountDownTime(0);
+    }
+  }
+  // capture immediately
+  else
+    m_captureCue = true;
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onCaptureTimerTimeout() { m_captureCue = true; }
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onCountDown() {
+  m_cameraViewfinder->showCountDownTime(
+      m_captureTimer->isActive() ? m_captureTimer->remainingTime() : 0);
+}
 
 //-----------------------------------------------------------------------------
 /*! referenced from LevelCreatePopup::apply()
@@ -951,6 +1109,8 @@ bool PencilTestPopup::importImage(QImage& image) {
 
   /* set dirty flag */
   sl->getProperties()->setDirtyFlag(true);
+
+  if (m_saveOnCaptureCB->isChecked()) sl->save();
 
   /* placement in xsheet */
   int row = app->getCurrentFrame()->getFrame();

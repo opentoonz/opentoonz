@@ -172,6 +172,8 @@ updateTable(sampleCount);
   }
 };
 
+DVAPI TSpectrumT<TPixel64> convert(const TSpectrumT<TPixel32> &s);
+
 #ifdef _WIN32
 template class DVAPI TSpectrumT<TPixel32>;
 template class DVAPI TSpectrumT<TPixel64>;

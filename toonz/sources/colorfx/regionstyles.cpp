@@ -661,7 +661,7 @@ double ShadowStyle2::getParamValue(TColorStyle::double_tag, int index) const {
 
 //-----------------------------------------------------------------------------
 
-int nbDiffVerts(const std::vector<TPointD> &pv) {
+static int nbDiffVerts(const std::vector<TPointD> &pv) {
   std::vector<TPointD> lpv;
   bool isMissing[4] = {true, true, true, true};
   if (pv.size() == 0) return 0;

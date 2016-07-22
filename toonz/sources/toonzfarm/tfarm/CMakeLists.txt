@@ -6,7 +6,8 @@ set(HEADERS
     ../include/tfarmproxy.h
     ../../include/tfarmserver.h
     ../../include/tfarmtask.h
-    ../include/tlog.h)
+    ../include/tlog.h
+)
 
 set(SOURCES
     service.cpp
@@ -18,7 +19,8 @@ set(SOURCES
     tfarmtask.cpp
     tlog.cpp
     ttcpipclient.cpp
-    ttcpipserver.cpp)
+    ttcpipserver.cpp
+)
 
 add_library(tfarm SHARED ${HEADERS} ${SOURCES})
 add_definitions(
@@ -39,16 +41,19 @@ include_directories(
 if(WIN32)
     set(EXTRA_LIBS
         tnzcore tnzbase toonzlib
-        ws2_32.lib)
+        ws2_32.lib
+    )
 elseif(APPLE)
     set(EXTRA_LIBS
         ${CMAKE_CURRENT_BINARY_DIR}/../../tnzcore/libtnzcore.dylib
         ${CMAKE_CURRENT_BINARY_DIR}/../../tnzbase/libtnzbase.dylib
-        ${CMAKE_CURRENT_BINARY_DIR}/../../toonzlib/libtoonzlib.dylib)
+        ${CMAKE_CURRENT_BINARY_DIR}/../../toonzlib/libtoonzlib.dylib
+    )
 elseif(UNIX)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;tnzext")
 endif()
 
 target_link_libraries(tfarm
     Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network
-    ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
+    ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS}
+)

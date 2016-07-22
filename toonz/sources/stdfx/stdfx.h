@@ -61,4 +61,6 @@ public:
 
 bool isAlmostIsotropic(const TAffine &aff);
 
+DV_EXPORT_API void initStdFx();
+
 #endif

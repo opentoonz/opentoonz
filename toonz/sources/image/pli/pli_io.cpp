@@ -67,7 +67,7 @@ inline double doubleFromUlong1(TUINT32 hi, TUINT32 lo) {
 
 /*=====================================================================*/
 
-TThickPoint operator*(const TAffine &aff, const TThickPoint &p) {
+static TThickPoint operator*(const TAffine &aff, const TThickPoint &p) {
   TPointD p1(p.x, p.y);
   return TThickPoint(aff * p1, p.thick);
 }

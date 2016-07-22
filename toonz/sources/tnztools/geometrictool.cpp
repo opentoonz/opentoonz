@@ -65,7 +65,7 @@ TEnv::IntVar GeometricMiterValue("InknpaintGeometricMiterValue", 4);
 // Utility Functions
 //-----------------------------------------------------------------------------
 
-TPointD rectify(const TPointD &oldPos, const TPointD &pos) {
+static TPointD rectify(const TPointD &oldPos, const TPointD &pos) {
   const double h             = sqrt(2.0) / 2.0;
   const TPointD directions[] = {TPointD(1, 0),  TPointD(h, h),  TPointD(0, 1),
                                 TPointD(-h, h), TPointD(-1, 0), TPointD(-h, -h),
@@ -85,15 +85,15 @@ TPointD rectify(const TPointD &oldPos, const TPointD &pos) {
 
 //-----------------------------------------------------------------------------
 
-TPointD computeSpeed(TPointD p0, TPointD p1, double factor) {
+static TPointD computeSpeed(TPointD p0, TPointD p1, double factor) {
   TPointD d = p1 - p0;
   return (d == TPointD()) ? TPointD() : d * (factor / norm(d));
 }
 
 //-----------------------------------------------------------------------------
 
-TRect drawBluredBrush(const TRasterImageP &ri, TStroke *stroke, int thick,
-                      double hardness, double opacity) {
+static TRect drawBluredBrush(const TRasterImageP &ri, TStroke *stroke, int thick,
+                             double hardness, double opacity) {
   TStroke *s       = new TStroke(*stroke);
   TPointD riCenter = ri->getRaster()->getCenterD();
   s->transform(TTranslation(riCenter));
@@ -135,8 +135,8 @@ TRect drawBluredBrush(const TRasterImageP &ri, TStroke *stroke, int thick,
 
 //-----------------------------------------------------------------------------
 
-TRect drawBluredBrush(const TToonzImageP &ti, TStroke *stroke, int thick,
-                      double hardness, bool selective) {
+static TRect drawBluredBrush(const TToonzImageP &ti, TStroke *stroke, int thick,
+                             double hardness, bool selective) {
   TStroke *s       = new TStroke(*stroke);
   TPointD riCenter = ti->getRaster()->getCenterD();
   s->transform(TTranslation(riCenter));

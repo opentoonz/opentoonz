@@ -18,7 +18,7 @@
 //#include "tdebugmessage.h"
 //--------------------------------------------------------------------------------------
 
-double average(std::vector<double> &values, double range = 2.5) {
+static double average(std::vector<double> &values, double range = 2.5) {
   UINT size = values.size();
   if (size == 0) return std::numeric_limits<double>::signaling_NaN();
 
@@ -56,8 +56,8 @@ double average(std::vector<double> &values, double range = 2.5) {
 
 //--------------------------------------------------------------------------------------
 
-double weightedAverage(std::vector<double> &values,
-                       std::vector<double> &weights, double range = 2.5) {
+static double weightedAverage(std::vector<double> &values,
+                              std::vector<double> &weights, double range = 2.5) {
   UINT size = values.size();
   if (size == 0) return std::numeric_limits<double>::signaling_NaN();
 
@@ -162,8 +162,8 @@ n^r <= 2^(s-1) <  (2^s)-1
 
 //--------------------------------------------------------------------------------------
 
-void eraseSmallAngles(std::vector<std::pair<int, double>> &corners,
-                      double angle) {
+static void eraseSmallAngles(std::vector<std::pair<int, double>> &corners,
+                             double angle) {
   std::vector<std::pair<int, double>>::iterator it = corners.begin();
 
   while (it != corners.end()) {
@@ -180,9 +180,9 @@ void eraseSmallAngles(std::vector<std::pair<int, double>> &corners,
 // of the corners)
 // max is tha maximum angle greater or equal to minDegree
 
-void detectCorners(const TStroke *stroke, double minDegree,
-                   std::vector<std::pair<int, double>> &corners, double &min,
-                   double &max) {
+static void detectCorners(const TStroke *stroke, double minDegree,
+                          std::vector<std::pair<int, double>> &corners, double &min,
+                          double &max) {
   const double minSin = fabs(sin(minDegree * M_PI_180));
   double angle, vectorialProduct, metaCornerLen, partialLen;
 
@@ -330,7 +330,7 @@ void detectCorners(const TStroke *stroke, double minDegree,
 
 //--------------------------------------------------------------------------------------
 
-double variance(std::vector<double> &values) {
+static double variance(std::vector<double> &values) {
   UINT size = values.size();
   if (size == 0) return std::numeric_limits<double>::signaling_NaN();
 
@@ -352,13 +352,13 @@ double variance(std::vector<double> &values) {
 
 //--------------------------------------------------------------------------------------
 
-void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
-                      std::pair<int, double> *partialAngles1,
-                      UINT partialAngles1Size,
-                      const std::vector<std::pair<int, double>> &angles2,
-                      UINT r,
-                      std::list<std::pair<int, double>> &partialSolution,
-                      double &bestValue, std::vector<int> &bestVector) {
+static void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
+                             std::pair<int, double> *partialAngles1,
+                             UINT partialAngles1Size,
+                             const std::vector<std::pair<int, double>> &angles2,
+                             UINT r,
+                             std::list<std::pair<int, double>> &partialSolution,
+                             double &bestValue, std::vector<int> &bestVector) {
   //-------------------------------------------------------------------
   if (r == partialAngles1Size) {
     UINT j;
@@ -499,10 +499,10 @@ TDebugMessage::flush();
 
 //--------------------------------------------------------------------------------------
 
-void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
-                      std::vector<std::pair<int, double>> &angles1,
-                      const std::vector<std::pair<int, double>> &angles2,
-                      double &bestValue, std::vector<int> &bestVector) {
+static void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
+                             std::vector<std::pair<int, double>> &angles1,
+                             const std::vector<std::pair<int, double>> &angles2,
+                             double &bestValue, std::vector<int> &bestVector) {
   assert(angles1.size() > angles2.size());
 
   std::list<std::pair<int, double>> partialSolution;
@@ -513,10 +513,10 @@ void findBestSolution(const TStroke *stroke1, const TStroke *stroke2,
 
 //--------------------------------------------------------------------------------------
 
-void trivialSolution(const TStroke *stroke1, const TStroke *stroke2,
-                     const std::vector<std::pair<int, double>> &angles1,
-                     const std::vector<std::pair<int, double>> &angles2,
-                     std::vector<int> &solution) {
+static void trivialSolution(const TStroke *stroke1, const TStroke *stroke2,
+                            const std::vector<std::pair<int, double>> &angles1,
+                            const std::vector<std::pair<int, double>> &angles2,
+                            std::vector<int> &solution) {
   assert(angles1.size() > angles2.size());
 
   UINT j;
@@ -578,7 +578,7 @@ void trivialSolution(const TStroke *stroke1, const TStroke *stroke2,
 
 //--------------------------------------------------------------------------------------
 
-TStroke *extract(const TStroke *source, UINT firstQuad, UINT lastQuad) {
+static TStroke *extract(const TStroke *source, UINT firstQuad, UINT lastQuad) {
   UINT quadCount = source->getChunkCount();
   if (firstQuad >= quadCount) {
     assert(!"bad quadric index");
@@ -607,8 +607,8 @@ TStroke *extract(const TStroke *source, UINT firstQuad, UINT lastQuad) {
 
 //--------------------------------------------------------------------------------------
 
-void sample(const TStroke *stroke, int samplingSize,
-            std::vector<TPointD> &sampledPoint) {
+static void sample(const TStroke *stroke, int samplingSize,
+                   std::vector<TPointD> &sampledPoint) {
   double samplingFrequency = 1.0 / (double)samplingSize;
   sampledPoint.resize(samplingSize);
 

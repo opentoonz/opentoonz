@@ -33,7 +33,7 @@
 Particles_Engine::Particles_Engine(ParticlesFx *parent, double frame)
     : m_parent(parent), m_frame(frame) {}
 
-void printTime(TStopWatch &sw, std::string name) {
+static void printTime(TStopWatch &sw, std::string name) {
   std::ostrstream ss;
   ss << name << " : ";
   sw.print(ss);

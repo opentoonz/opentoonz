@@ -121,7 +121,7 @@ TRaster32P render(const TVectorImageP &vi, double &rasDpi, int margin,
   rasDpi         = scale * Stage::inch;
 
   // Initialize a corresponding OpenGL context
-  std::auto_ptr<TOfflineGL> offlineGlContext(new TOfflineGL(bbox.getSize()));
+  std::unique_ptr<TOfflineGL> offlineGlContext(new TOfflineGL(bbox.getSize()));
   offlineGlContext->makeCurrent();
 
   // Draw the image
@@ -936,8 +936,9 @@ void createMeshifiedLevels(std::map<TXshLevel *, TXshSimpleLevel *> &meshLevels,
   }
 
   // Prepare a progress dialog
-  std::auto_ptr<DVGui::ProgressDialog> progressDialog(new DVGui::ProgressDialog(
-      MeshifyPopup::tr("Mesh Creation in progress..."), QString(), 0, 0));
+  std::unique_ptr<DVGui::ProgressDialog> progressDialog(
+      new DVGui::ProgressDialog(
+          MeshifyPopup::tr("Mesh Creation in progress..."), QString(), 0, 0));
   {
     progressDialog->setWindowTitle("Create Mesh");
     progressDialog->setModal(true);

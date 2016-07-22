@@ -76,7 +76,7 @@ void ungroupWithoutUndo(TVectorImage *vimg, StrokeSelection *selection) {
 //-----------------------------------------------------------------------------
 
 class GroupUndo final : public ToolUtils::TToolUndo {
-  std::auto_ptr<StrokeSelection> m_selection;
+  std::unique_ptr<StrokeSelection> m_selection;
 
 public:
   GroupUndo(TXshSimpleLevel *level, const TFrameId &frameId,
@@ -103,7 +103,7 @@ public:
 //-----------------------------------------------------------------------------
 
 class UngroupUndo final : public ToolUtils::TToolUndo {
-  std::auto_ptr<StrokeSelection> m_selection;
+  std::unique_ptr<StrokeSelection> m_selection;
 
 public:
   UngroupUndo(TXshSimpleLevel *level, const TFrameId &frameId,
@@ -616,9 +616,9 @@ refStroke, count, refStroke+count)>commonDepth(vimg, refStroke, count, prev))
   if(count==0) return;
   */
 
-int doMoveGroup(UCHAR moveType, TVectorImage *vimg,
-                const std::vector<std::pair<TStroke *, int>> &selectedGroups,
-                int index) {
+static int doMoveGroup(UCHAR moveType, TVectorImage *vimg,
+                       const std::vector<std::pair<TStroke *, int>> &selectedGroups,
+                       int index) {
   int refStroke = vimg->getStrokeIndex(selectedGroups[index].first);
   int count     = selectedGroups[index].second;
 

@@ -353,7 +353,7 @@ void PaletteKeyframeNavigator::toggle() {
 
   int styleId = getStyleIndex(), frame = getCurrentFrame();
 
-  std::auto_ptr<UndoPaletteSetKeyFrame> undo(
+  std::unique_ptr<UndoPaletteSetKeyFrame> undo(
       new UndoPaletteSetKeyFrame(styleId, frame, m_paletteHandle));
   undo->redo();
 

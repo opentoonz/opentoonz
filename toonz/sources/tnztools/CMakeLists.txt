@@ -10,7 +10,8 @@ set(MOC_HEADERS
     ../include/tools/tooloptions.h
     ../include/tools/screenpicker.h
     rgbpickertool.h
-    rulertool.h)
+    rulertool.h
+)
 
 set(HEADERS ${MOC_HEADERS}
     autofill.h
@@ -30,7 +31,8 @@ set(HEADERS ${MOC_HEADERS}
     ../include/tools/tool.h
     ../include/tools/toolcommandids.h
     ../include/tools/toolutils.h
-    ../include/tools/RGBpicker.h)
+    ../include/tools/RGBpicker.h
+)
 
 set(SOURCES
     autofillpli.cpp
@@ -88,7 +90,8 @@ set(SOURCES
     strokeselection.cpp
     screenpicker.cpp
     fingertool.cpp
-    rulertool.cpp)
+    rulertool.cpp
+)
 
 set(RESOURCES tnztools.qrc)
 

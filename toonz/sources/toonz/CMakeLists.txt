@@ -145,7 +145,8 @@ set(MOC_HEADERS
     metnum.h
     ObjectTracker.h
     predict3d.h
-    processor.h)
+    processor.h
+)
 
 set(HEADERS ${MOC_HEADERS})
 
@@ -301,7 +302,8 @@ set(SOURCES
     dummyprocessor.cpp
     metnum.cpp
     ObjectTracker.cpp
-    predict3d.cpp)
+    predict3d.cpp
+)
 
 add_translation(toonz ${HEADERS} ${SOURCES})
 
@@ -374,9 +376,11 @@ endif()
 
 if(WIN32)
     target_link_libraries(OpenToonz_${VERSION}
-        Qt5::WinMain Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia
+        Qt5::WinMain Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
+        Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia
         ${GL_LIB} ${GLUT_LIB}
-        tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm)
+        tnzcore tnzbase toonzlib colorfx tnzext image sound toonzqt tnztools tnzstdfx tfarm
+    )
 elseif(APPLE)
     find_library(COCOA_LIB Cocoa)
 
@@ -386,7 +390,12 @@ elseif(APPLE)
     set(EXTRA_LIBS ${EXTRA_LIBS} "$<TARGET_FILE:tnzstdfx>" "$<TARGET_FILE:tfarm>")
 
 
-    target_link_libraries(OpenToonz_${VERSION} Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia ${GL_LIB} ${GLUT_LIB} ${COCOA_LIB} ${EXTRA_LIBS} mousedragfilter)
+    target_link_libraries(OpenToonz_${VERSION}
+        Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
+        Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia
+        ${GL_LIB} ${GLUT_LIB}
+        ${COCOA_LIB} ${EXTRA_LIBS} mousedragfilter
+    )
 
 elseif(UNIX)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;toonzlib;colorfx;tnzext;image;sound;toonzqt;tnztools")
@@ -396,7 +405,12 @@ elseif(UNIX)
 
     set(EXTRA_LIBS ${EXTRA_LIBS} ${Boost_LIBRARIES} ${OPENBLAS_LIB})
 
-    target_link_libraries(OpenToonz_${VERSION} Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia ${GL_LIB} ${GLUT_LIB} ${GLU_LIB} ${EXTRA_LIBS})
+    target_link_libraries(
+        OpenToonz_${VERSION} Qt5::Core Qt5::Gui Qt5::Network Qt5::OpenGL Qt5::Svg Qt5::Xml
+        Qt5::Script Qt5::Widgets Qt5::PrintSupport Qt5::Multimedia
+        ${GL_LIB} ${GLUT_LIB} ${GLU_LIB}
+        ${EXTRA_LIBS}
+    )
 endif()
 
 if(APPLE)
@@ -423,10 +437,12 @@ if(APPLE)
 
     add_custom_command(TARGET OpenToonz_${VERSION}
         POST_BUILD COMMAND
-        ${CMAKE_INSTALL_NAME_TOOL} -add_rpath @executable_path/. ${bin})
+        ${CMAKE_INSTALL_NAME_TOOL} -add_rpath @executable_path/. ${bin}
+    )
     add_custom_command(TARGET OpenToonz_${VERSION}
         POST_BUILD COMMAND
-        ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH} ${bin})
+        ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH} ${bin}
+    )
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)
 
     add_custom_command(TARGET OpenToonz_${VERSION} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/OpenToonz_${VERSION}.app/Contents/Resources)

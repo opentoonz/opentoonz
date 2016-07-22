@@ -93,25 +93,7 @@
 /*---------------------------------------------------------------------------*/
 /*-- Prototypes -------------------------------------------------------------*/
 
-int load_bmp_header(FILE *fp, BMP_HEADER **pHd);
-int write_bmp_header(FILE *fp, BMP_HEADER *hd);
-void release_bmp_header(BMP_HEADER *hd);
-
-int write_bmp_palette(FILE *fp, int nc, UCHAR *b, UCHAR *g, UCHAR *r);
-
-int make_bmp_palette(int colors, int grey, UCHAR *r, UCHAR *g, UCHAR *b);
-
-BMP_SUBTYPE bmp_get_colorstyle(IMAGE *img);
-
-int error_checking_bmp(BMP_HEADER *hd);
-
-int read_bmp_line(FILE *fp, void *line, UINT w, UINT h, UCHAR **map,
-                  BMP_SUBTYPE type);
-
-int write_bmp_line(FILE *fp, void *line_buffer, UINT w, UINT row, UCHAR *map,
-                   BMP_SUBTYPE type);
-
-int skip_bmp_lines(FILE *fp, UINT w, UINT rows, int whence, BMP_SUBTYPE type);
+static BMP_SUBTYPE bmp_get_colorstyle(IMAGE *img);
 
 /*---------------------------------------------------------------------------*/
 /*-- Local Prototypes -------------------------------------------------------*/
@@ -1633,7 +1615,7 @@ int write_bmp_palette(FILE *fp, int nc, UCHAR *b, UCHAR *g, UCHAR *r)
 #ifndef __LIBSIMAGE__
 
 /*---------------------------------------------------------------------------*/
-int img_write_bmp(const MYSTRING fname, IMAGE *img)
+static int img_write_bmp(const MYSTRING fname, IMAGE *img)
 /*---------------------------------------------------------------------------*/
 {
   int (*write_function)(FILE * fp, UCHAR * pic, UINT w, UINT h, UCHAR * map);

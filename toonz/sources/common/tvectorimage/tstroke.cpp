@@ -8,6 +8,7 @@
 #include "tbezier.h"
 #include "tzerofinder.h"
 #include "tcurveutil.h"
+#include "cornerdetector.h"
 
 #include <limits>
 
@@ -31,10 +32,6 @@ typedef DoubleArray::iterator DoubleIt;
 typedef std::vector<TThickQuadratic *> QuadStrokeChunkArray;
 
 static int numSaved = 0;
-
-void detectCorners(const std::vector<T3DPointD> &points, int minSampleNum,
-                   int minDist, int maxDist, double maxAngle,
-                   std::vector<int> &corners);
 
 namespace {
 //---------------------------------------------------------------------------

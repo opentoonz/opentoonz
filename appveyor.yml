@@ -1,0 +1,42 @@
+version: 1.0.3.{build}
+pull_requests:
+  do_not_increment_build_number: true
+skip_tags: true
+image: Visual Studio 2013
+configuration:
+- Debug
+- Release
+platform: x64
+clone_depth: 1
+install:
+- cmd: >-
+    cd thirdparty
+
+    copy /Y LibJPEG\jpeg-9\jconfig.vc LibJPEG\jpeg-9\jconfig.h
+
+    copy /Y tiff-4.0.3\libtiff\tif_config.vc.h tiff-4.0.3\libtiff\tif_config.h
+
+    copy /Y tiff-4.0.3\libtiff\tiffconf.vc.h tiff-4.0.3\libtiff\tiffconf.h
+
+    copy /Y libpng-1.6.21\scripts\pnglibconf.h.prebuilt libpng-1.6.21\pnglibconf.h
+
+
+    cd ../toonz
+
+    mkdir %PLATFORM% && cd %PLATFORM%
+
+    cmake ..\sources -G "Visual Studio 12 Win64" -DQT_PATH="C:\Qt\5.6\msvc2013_64" -DBOOST_ROOT="C:\Libraries\boost_1_60_0"
+build:
+  project: $(APPVEYOR_BUILD_FOLDER)\toonz\$(PLATFORM)\ALL_BUILD.vcxproj
+  parallel: true
+  verbosity: minimal
+after_build:
+- cmd: >-
+    C:\Qt\5.6\msvc2013_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz_1.0.exe
+
+    copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION%
+
+    copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll %CONFIGURATION%
+artifacts:
+- path: toonz\$(PLATFORM)\$(CONFIGURATION)
+  name: OpenToonz_1.0

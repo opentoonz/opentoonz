@@ -64,7 +64,7 @@ typedef enum Direction {
   outward        = 1,
   deletedInward  = 2,
   deletedOutward = 3
-};
+} Direction;
 
 /*
         class CompareOutlines {
@@ -174,10 +174,10 @@ typedef list<TQuadratic> QuadraticList;
 
 //---------------------------------------------------------------------------
 
-void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
-                                         const TPointD &Pstart,
-                                         const TPointD &Pend,
-                                         vector<TQuadratic *> &quadArray) {
+static void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
+                                                const TPointD &Pstart,
+                                                const TPointD &Pend,
+                                                vector<TQuadratic *> &quadArray) {
   // It splits a circular anticlockwise arc into a sequence of quadratic bezier
   // curves
   // Every quadratic curve can approximate an arc no longer than 45 degrees (or
@@ -365,7 +365,7 @@ inline void drawPointCross(const TPointD &point, double R, double G, double B) {
 
 //-------------------------------------------------------------------
 
-TStroke *getOutStroke(LinkedQuadraticList &inputBoundaries) {
+static TStroke *getOutStroke(LinkedQuadraticList &inputBoundaries) {
   vector<TPointD> aux;
   LinkedQuadraticList::iterator it = inputBoundaries.begin();
 
@@ -427,8 +427,8 @@ inline bool getOutputOutlines(LinkedQuadraticList &inputBoundaries,
 
 //-------------------------------------------------------------------
 
-bool computeBoundaryStroke(const TStroke &_stroke,
-                           vector<TStroke *> &sweepStrokes) {
+static bool computeBoundaryStroke(const TStroke &_stroke,
+                                  vector<TStroke *> &sweepStrokes) {
   // if(!outlines.empty()) return false;
 
   TStroke *oriStroke = const_cast<TStroke *>(&_stroke);

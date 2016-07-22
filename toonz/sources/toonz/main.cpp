@@ -319,7 +319,7 @@ int main(int argc, char *argv[]) {
   // order ONLY within the same library. On MAC, it made the app crash on exit
   // o_o. So, nope.
 
-  std::auto_ptr<QObject> mainScope(new QObject(
+  std::unique_ptr<QObject> mainScope(new QObject(
       &a));  // A QObject destroyed before the qApp is therefore explicitly
   mainScope->setObjectName("mainScope");  // provided. It can be accessed by
                                           // looking in the qApp's children.

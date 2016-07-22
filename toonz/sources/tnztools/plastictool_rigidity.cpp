@@ -186,8 +186,8 @@ void RigidityPainter::commit() {
 //    PlasticTool  functions
 //****************************************************************************************
 
-std::auto_ptr<tcg::polymorphic> PlasticTool::createRigidityPainter() {
-  return std::auto_ptr<tcg::polymorphic>(new RigidityPainter);
+std::unique_ptr<tcg::polymorphic> PlasticTool::createRigidityPainter() {
+  return std::unique_ptr<tcg::polymorphic>(new RigidityPainter);
 }
 
 //------------------------------------------------------------------------
