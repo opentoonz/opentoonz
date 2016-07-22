@@ -444,8 +444,8 @@ void doDespeckleGR(const TRasterPT<PIXEL> &ras, int sizeThreshold) {
 
 //----------------------------------------------------
 
-void doDespeckleCM32(const TRasterPT<TPixelCM32> &ras, int sizeThreshold,
-                     bool check) {
+static void doDespeckleCM32(const TRasterPT<TPixelCM32> &ras, int sizeThreshold,
+                            bool check) {
   TRasterCM32P rasCM(ras);
   rasCM->lock();
 

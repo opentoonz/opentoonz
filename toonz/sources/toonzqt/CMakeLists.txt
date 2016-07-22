@@ -86,7 +86,8 @@ set(MOC_HEADERS
     ../include/toonzqt/flipconsoleowner.h
     ../include/toonzqt/combohistogram.h
     ../include/toonzqt/fxiconmanager.h
-    pluginhost.h)
+    pluginhost.h
+)
 
 set(HEADERS
     ${MOC_HEADERS}
@@ -95,7 +96,8 @@ set(HEADERS
     toonz_plugin.h
     plugin_tile_interface.h
     plugin_port_interface.h
-    plugin_fxnode_interface.h)
+    plugin_fxnode_interface.h
+)
 
 set(SOURCES
     checkbox.cpp
@@ -189,7 +191,8 @@ set(SOURCES
     plugin_param_interface.cpp
     plugin_param_view_interface.cpp
     plugin_ui_page_interface.cpp
-    toonz_params.cpp)
+    toonz_params.cpp
+)
 
 set(RESOURCES toonzqt.qrc)
 
@@ -226,7 +229,8 @@ _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;tnzext;toonzlib;sound")
 
 if(WIN32)
     set(EXTRA_LIBS ${EXTRA_LIBS}
-        advapi32.lib)
+        advapi32.lib
+    )
 endif()
 
 target_link_libraries(toonzqt Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::OpenGL ${EXTRA_LIBS} ${GL_LIB})

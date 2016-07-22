@@ -14,6 +14,7 @@
 #include "tpaletteutil.h"
 #include "tthreadmessage.h"
 #include "tsimplecolorstyles.h"
+#include "tcomputeregions.h"
 
 #include <memory>
 
@@ -246,7 +247,7 @@ TRectD TVectorImage::addStroke(const std::vector<TThickPoint> &points)
 
 //-----------------------------------------------------------------------------
 
-bool isRegionWithStroke(TRegion *region, TStroke *s) {
+static bool isRegionWithStroke(TRegion *region, TStroke *s) {
   for (UINT i = 0; i < region->getEdgeCount(); i++)
     if (region->getEdge(i)->m_s == s) return true;
   return false;
@@ -254,7 +255,7 @@ bool isRegionWithStroke(TRegion *region, TStroke *s) {
 
 //-----------------------------------------------------------------------------
 
-void deleteSubRegionWithStroke(TRegion *region, TStroke *s) {
+static void deleteSubRegionWithStroke(TRegion *region, TStroke *s) {
   for (int i = 0; i < (int)region->getSubregionCount(); i++) {
     deleteSubRegionWithStroke(region->getSubregion(i), s);
     if (isRegionWithStroke(region->getSubregion(i), s)) {
@@ -629,7 +630,7 @@ TRaster32P TVectorImage::render(bool onlyStrokes) {
   TRect bBox = convert(getBBox());
   if (bBox.isEmpty()) return (TRaster32P)0;
 
-  std::auto_ptr<TOfflineGL> offlineGlContext(new TOfflineGL(bBox.getSize()));
+  std::unique_ptr<TOfflineGL> offlineGlContext(new TOfflineGL(bBox.getSize()));
   offlineGlContext->clear(TPixel32(0, 0, 0, 0));
   offlineGlContext->makeCurrent();
   TVectorRenderData rd(TTranslation(-convert(bBox.getP00())),
@@ -1044,7 +1045,6 @@ bool TVectorImage::Imp::areWholeGroups(const std::vector<int> &indexes) const {
 //-----------------------------------------------------------------------------
 
 //-------------------------------------------------------------------
-void invalidateRegionPropAndBBox(TRegion *reg);
 
 void TVectorImage::Imp::notifyChangedStrokes(
     const std::vector<int> &strokeIndexArray,
@@ -1938,9 +1938,9 @@ assert(m_strokes[strokeIndex-wSize+1]->m_edgeList.empty());*/
 
 //-----------------------------------------------------------------------------
 
-void computeEdgeList(TStroke *newS, const std::list<TEdge *> &edgeList1,
-                     bool join1AtBegin, const std::list<TEdge *> &edgeList2,
-                     bool join2AtBegin, std::list<TEdge *> &edgeList) {
+static void computeEdgeList(TStroke *newS, const std::list<TEdge *> &edgeList1,
+                            bool join1AtBegin, const std::list<TEdge *> &edgeList2,
+                            bool join2AtBegin, std::list<TEdge *> &edgeList) {
   std::list<TEdge *>::const_iterator it;
 
   if (!edgeList1.empty()) {

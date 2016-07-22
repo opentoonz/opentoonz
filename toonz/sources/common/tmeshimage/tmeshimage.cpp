@@ -34,7 +34,7 @@ static TTextureMeshP cloneMesh_(const TTextureMeshP &other) {
   return TTextureMeshP(new TTextureMesh(*other));
 }
 
-void static_check() {
+static void static_check() {
   /* input iterator */
   static_assert(
       std::is_same<std::iterator_traits<

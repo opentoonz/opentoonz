@@ -37,7 +37,7 @@ public:
     return m_objects;
   }  //!< Returns the stored objects list
 
-  void insert(std::auto_ptr<TPersist>
+  void insert(std::unique_ptr<TPersist>
                   object);  //!< Overwrites an object type instance with
                             //!  the supplied one.
 public:

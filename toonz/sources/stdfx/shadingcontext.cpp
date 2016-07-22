@@ -27,9 +27,9 @@
 
 namespace {
 
-typedef std::auto_ptr<QGLPixelBuffer> QGLPixelBufferP;
-typedef std::auto_ptr<QGLFramebufferObject> QGLFramebufferObjectP;
-typedef std::auto_ptr<QGLShaderProgram> QGLShaderProgramP;
+typedef std::unique_ptr<QGLPixelBuffer> QGLPixelBufferP;
+typedef std::unique_ptr<QGLFramebufferObject> QGLFramebufferObjectP;
+typedef std::unique_ptr<QGLShaderProgram> QGLShaderProgramP;
 
 struct CompiledShader {
   QGLShaderProgramP m_program;
@@ -53,7 +53,7 @@ struct ShadingContext::Imp {
   std::map<QString,
            CompiledShader>
       m_shaderPrograms;  //!< Shader Programs stored in the context.
-                         //!  \warning   Values have \p auto_ptr members.
+                         //!  \warning   Values have \p unique_ptr members.
 public:
   Imp();
 

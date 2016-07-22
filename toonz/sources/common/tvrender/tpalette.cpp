@@ -261,7 +261,7 @@ int TPalette::addStyle(const TPixel32 &color) {
 //-------------------------------------------------------------------
 
 void TPalette::setStyle(int styleId, TColorStyle *style) {
-  std::auto_ptr<TColorStyle> styleOwner(style);
+  std::unique_ptr<TColorStyle> styleOwner(style);
 
   int styleCount = getStyleCount();
 

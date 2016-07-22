@@ -34,7 +34,7 @@ void foo()
 
 //=============================================================================
 
-bool compareEdge(const TEdge &a, const TEdge &b) { return a.m_s == b.m_s; }
+static bool compareEdge(const TEdge &a, const TEdge &b) { return a.m_s == b.m_s; }
 
 //-----------------------------------------------------------------------------
 
@@ -527,7 +527,7 @@ void TRegion::draw(const TVectorRenderData &rd)
 
 //-----------------------------------------------------------------------------
 
-void checkPolyline(const std::vector<T3DPointD> &p) {
+static void checkPolyline(const std::vector<T3DPointD> &p) {
   int ret;
 
   if (p.size() < 3) return;

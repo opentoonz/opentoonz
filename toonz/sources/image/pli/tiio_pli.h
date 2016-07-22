@@ -7,6 +7,7 @@
 
 #include "tlevel_io.h"
 
+class GroupTag;
 class ParsedPli;
 class ImageTag;
 class TImageWriterPli;
@@ -148,5 +149,10 @@ private:
   //! Reference to level reader
   TLevelReaderPli *m_lrp;
 };
+
+// Functions
+
+TPalette *readPalette(GroupTag *paletteTag, int majorVersion,
+                      int minorVersion);
 
 #endif  // TTIO_PLI_INCLUDED

@@ -326,7 +326,7 @@ void directionalBlur(TRasterPT<T> rout, TRasterPT<T> rin, const TPointD &blur,
 
 }  // namespace
 
-void enlargeDir(TRectD &r, TPointD p, bool bidirectional) {
+static void enlargeDir(TRectD &r, TPointD p, bool bidirectional) {
   if (bidirectional) {
     r.x1 += fabs(p.x);
     r.x0 -= fabs(p.x);
@@ -345,7 +345,7 @@ void enlargeDir(TRectD &r, TPointD p, bool bidirectional) {
   }
 }
 
-void reduceDir(TRectD &r, TPointD p, bool bidirectional) {
+static void reduceDir(TRectD &r, TPointD p, bool bidirectional) {
   if (bidirectional) {
     r.x1 -= fabs(p.x);
     r.x0 += fabs(p.x);

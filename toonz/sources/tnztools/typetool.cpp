@@ -1645,7 +1645,7 @@ void TypeTool::onImageChanged() { stopEditing(); }
 
 //=========================================================
 
-TTool *getTypeTool() { return &typeTool; }
+static TTool *getTypeTool() { return &typeTool; }
 
 /*void resetTypetTool(TTool*tool)
 {

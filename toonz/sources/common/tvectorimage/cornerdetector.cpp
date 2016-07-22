@@ -1,6 +1,7 @@
 
 
 #include "tgeometry.h"
+#include "cornerdetector.h"
 
 //======================================================================
 
@@ -39,8 +40,8 @@ public:
 };
 
 //! Definisce l'operatore meno tra due AlgorithmPointI
-AlgorithmPointI operator-(const AlgorithmPointI &op1,
-                          const AlgorithmPointI &op2) {
+static AlgorithmPointI operator-(const AlgorithmPointI &op1,
+                                 const AlgorithmPointI &op2) {
   return AlgorithmPointI(op1.operator-(op2), 0);
 }
 
@@ -75,7 +76,7 @@ point_container gPoints;
 
         \param points Vettore di T3DPoints
 */
-bool interpolate(const std::vector<T3DPointD> &points) {
+static bool interpolate(const std::vector<T3DPointD> &points) {
   unsigned int curr, next;
 
   TPointI currStep, xStep, yStep, guideLine;
@@ -193,7 +194,7 @@ inline bool isAdmissibleCorner(int currIndex, int precIndex, int nextIndex) {
 //----------------------------------------------------------------------
 
 //! Trova i possibili angoli tra i punti di gPoints
-void findCornerCandidates() {
+static void findCornerCandidates() {
   unsigned int curr, prec, next;
   curr = gMaxDist;
 
@@ -229,7 +230,7 @@ void findCornerCandidates() {
 //----------------------------------------------------------------------
 
 //! Trova gli angoli tra i punti di gPoints
-void findCorners(int neighborLimit, std::vector<int> &cornerIndexes) {
+static void findCorners(int neighborLimit, std::vector<int> &cornerIndexes) {
   unsigned int curr, prec, next;
   curr = gMaxDist;
 

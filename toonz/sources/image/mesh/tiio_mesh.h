@@ -49,4 +49,4 @@ private:
   TLevelReaderMesh &operator=(const TLevelReaderMesh &);
 };
 
-#endif  /* TIIO_MESH_H */
+#endif /* TIIO_MESH_H */

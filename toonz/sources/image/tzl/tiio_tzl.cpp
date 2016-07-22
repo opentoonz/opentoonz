@@ -42,15 +42,15 @@ char *reverse(char *buffer, int size) {
 }
 }
 
-int tfwrite(const char *data, const unsigned int count, FILE *f) {
+static int tfwrite(const char *data, const unsigned int count, FILE *f) {
   return fwrite(data, sizeof(char), count, f);
 }
 
-int tfwrite(UCHAR *data, const unsigned int count, FILE *f) {
+static int tfwrite(UCHAR *data, const unsigned int count, FILE *f) {
   return fwrite(data, sizeof(char), count, f);
 }
 
-int tfwrite(TINT32 *data, const unsigned int count, FILE *f) {
+static int tfwrite(TINT32 *data, const unsigned int count, FILE *f) {
   if (count == 1) {
 #if !TNZ_LITTLE_ENDIAN
     TUINT32 dataToWrite = swapTINT32(*data);
@@ -63,7 +63,7 @@ int tfwrite(TINT32 *data, const unsigned int count, FILE *f) {
   return 0;
 }
 
-int tfwrite(TUINT32 *data, const unsigned int count, FILE *f) {
+static int tfwrite(TUINT32 *data, const unsigned int count, FILE *f) {
   if (count == 1) {
 #if !TNZ_LITTLE_ENDIAN
     TUINT32 dataToWrite = swapTINT32(*data);
@@ -76,7 +76,7 @@ int tfwrite(TUINT32 *data, const unsigned int count, FILE *f) {
   return 0;
 }
 
-int tfwrite(double *data, unsigned int count, FILE *f) {
+static int tfwrite(double *data, unsigned int count, FILE *f) {
   if (count == 1) {
     double v  = *data;
     char *ptr = (char *)&v;
@@ -286,8 +286,8 @@ bool readHeaderAndOffsets(FILE *chan, TzlOffsetMap &frameOffsTable,
 }
 }
 
-bool adjustIconAspectRatio(TDimension &outDimension, TDimension inDimension,
-                           TDimension imageRes) {
+static bool adjustIconAspectRatio(TDimension &outDimension, TDimension inDimension,
+                                  TDimension imageRes) {
   TINT32 iconLx = inDimension.lx, iconLy = inDimension.ly;
   assert(iconLx > 0 && iconLy > 0);
   assert(imageRes.lx > 0 && imageRes.ly > 0);
@@ -305,7 +305,7 @@ bool adjustIconAspectRatio(TDimension &outDimension, TDimension inDimension,
   return true;
 }
 
-void getThumbnail(TRasterP ras, int shrink, TRasterP &thumbnail) {
+static void getThumbnail(TRasterP ras, int shrink, TRasterP &thumbnail) {
   int j          = 0;
   int y          = 0;
   TPixel32 *pix2 = (TPixel32 *)thumbnail->getRawData();
@@ -1995,8 +1995,8 @@ TImageP TImageReaderTzl::load13() {
 }
 
 // Restituisce la regione del raster shrinkata e la relativa savebox.
-TRect applyShrinkAndRegion(TRasterP &ras, int shrink, TRect region,
-                           TRect savebox) {
+static TRect applyShrinkAndRegion(TRasterP &ras, int shrink, TRect region,
+                                  TRect savebox) {
   // estraggo la regione solo se essa ha coordinate valide.
   if (!region.isEmpty() && region != TRect() && region.getLx() > 0 &&
       region.getLy() > 0)

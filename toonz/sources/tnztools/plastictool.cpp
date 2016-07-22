@@ -1682,7 +1682,7 @@ void drawFullSquare(const TPointD &pos, double radius) {
 
 //------------------------------------------------------------------------
 
-void drawFilledSquare(const TPointD &pos, double radius) {
+static void drawFilledSquare(const TPointD &pos, double radius) {
   glBegin(GL_QUADS);
   glVertex2d(pos.x - radius, pos.y - radius);
   glVertex2d(pos.x + radius, pos.y - radius);
@@ -1693,7 +1693,7 @@ void drawFilledSquare(const TPointD &pos, double radius) {
 
 //------------------------------------------------------------------------
 
-void drawHandle(const TPointD &pos, double radius, const TPixel32 &color) {
+static void drawHandle(const TPointD &pos, double radius, const TPixel32 &color) {
   glColor4ub(0, 0, 0, color.m);  // Black border
   glLineWidth(4.0f);
   drawSquare(pos, radius);
@@ -1705,8 +1705,8 @@ void drawHandle(const TPointD &pos, double radius, const TPixel32 &color) {
 
 //------------------------------------------------------------------------
 
-void drawFilledHandle(const TPointD &pos, double radius, double pixelSize,
-                      const TPixel32 &color) {
+static void drawFilledHandle(const TPointD &pos, double radius, double pixelSize,
+                             const TPixel32 &color) {
   glColor4ub(0, 0, 0, color.m);
   drawFilledSquare(pos, radius + pixelSize);
 
@@ -1716,7 +1716,7 @@ void drawFilledHandle(const TPointD &pos, double radius, double pixelSize,
 
 //------------------------------------------------------------------------
 
-void drawText(const TPointD &pos, const QString &text, double fontScale) {
+static void drawText(const TPointD &pos, const QString &text, double fontScale) {
   // Get the world-to-window affine
   double matrix[16];
 

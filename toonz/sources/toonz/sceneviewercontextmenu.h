@@ -37,17 +37,16 @@ public slots:
 };
 
 namespace ZeroThickToggleGui {
-	void addZeroThickCommand(QMenu* menu);
+void addZeroThickCommand(QMenu *menu);
 
-	class ZeroThickToggleHandler : public QObject {
-		Q_OBJECT
+class ZeroThickToggleHandler : public QObject {
+  Q_OBJECT
 
-			public slots:
-		void activate();
-		void deactivate();
-	};
+public slots:
+  void activate();
+  void deactivate();
+};
 
-
-} //Namespace ZeroThickToggleGui
+}  // Namespace ZeroThickToggleGui
 
 #endif

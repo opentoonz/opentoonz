@@ -3435,7 +3435,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Onion Skin</source>
-        <translation>オニオンスキン</translation>
+        <translation type="vanished">オニオンスキン</translation>
     </message>
     <message>
         <source>Duplicate</source>
@@ -3815,7 +3815,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Pressure sensibility</source>
-        <translation>圧力感度</translation>
+        <translation type="vanished">圧力感度</translation>
     </message>
     <message>
         <source>Segment Ink</source>
@@ -4407,7 +4407,7 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>&amp;Pencil Test...</source>
-        <translation>ラインテスト (&amp;P)...</translation>
+        <translation type="vanished">ラインテスト (&amp;P)...</translation>
     </message>
     <message>
         <source>Drawing Substitution Forward</source>
@@ -4423,6 +4423,30 @@ Do you want to create it?</source>
     </message>
     <message>
         <source>Similar Drawing Substitution Backward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Camera Capture...</source>
+        <translation>カメラから取り込む (&amp;C)...</translation>
+    </message>
+    <message>
+        <source>Toggle Maximize Panel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Main Window&apos;s Full Screen Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Onion Skin Toggle</source>
+        <translation type="unfinished">オニオンスキン表示/非表示</translation>
+    </message>
+    <message>
+        <source>Zero Thick Lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pressure sensitivity</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5103,7 +5127,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Capture</source>
-        <translation>取り込み</translation>
+        <translation type="vanished">取り込み</translation>
     </message>
     <message>
         <source>Close</source>
@@ -5200,6 +5224,40 @@ Do you want to overwrite it?</source>
     <message>
         <source>Failed to load %1.</source>
         <translation>ファイル %1 の読み込みに失敗しました</translation>
+    </message>
+    <message>
+        <source>Save images as they are captured</source>
+        <translation>画像を取り込むと同時に保存する</translation>
+    </message>
+    <message>
+        <source>Interval timer</source>
+        <translation>インターバルタイマー</translation>
+    </message>
+    <message>
+        <source>Use interval timer</source>
+        <translation>インターバルタイマーを使用する</translation>
+    </message>
+    <message>
+        <source>Capture
+[Return key]</source>
+        <translation>取り込み
+[Return キー]</translation>
+    </message>
+    <message>
+        <source>Interval(sec):</source>
+        <translation>間隔（秒）：</translation>
+    </message>
+    <message>
+        <source>Start Capturing
+[Return key]</source>
+        <translation>取り込み開始
+[Return キー]</translation>
+    </message>
+    <message>
+        <source>Stop Capturing
+[Return key]</source>
+        <translation>取り込み停止
+[Return キー]</translation>
     </message>
 </context>
 <context>
@@ -7409,6 +7467,14 @@ Are you sure to </source>
         <source>Change current drawing %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Hide Zero Thickness Lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Zero Thickness Lines</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RenameAsToonzPopup</name>
@@ -8721,6 +8787,10 @@ Please commit or revert changes first.</source>
     <message>
         <source>Remove</source>
         <translation>消去</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t find any matching command.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

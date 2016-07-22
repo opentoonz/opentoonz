@@ -24,7 +24,7 @@ double VerticalCameraFldUnitConverter::m_factor = 1;
 
 namespace UnitParameters {
 
-std::pair<double, double> dummyCurrentDpiGetter() {
+static std::pair<double, double> dummyCurrentDpiGetter() {
   return std::make_pair<double, double>(72, 72);
 }
 

@@ -9,15 +9,17 @@ using namespace TScannerUtil;
 
 extern "C" {
 #include "../common/twain/ttwain_util.h"
+#include "../common/twain/ttwain_global_def.h"  /* forward declare functions */
 }
 
 /* callback used to handle TTWAIN done/error status*/
 
-void throwIT(const char *msg) { throw TException(msg); }
+static void throwIT(const char *msg) { throw TException(msg); }
 
 extern "C" void TTWAIN_ErrorBox(const char *msg) { throwIT(msg); }
 
-extern "C" int onDoneCB(UCHAR *buffer, TTWAIN_PIXTYPE pixelType, int lx, int ly,
+extern "C" {
+static int onDoneCB(UCHAR *buffer, TTWAIN_PIXTYPE pixelType, int lx, int ly,
                         int wrap, float xdpi, float ydpi, void *usrData) {
   TRasterP ras;
   switch (pixelType) {
@@ -69,12 +71,15 @@ extern "C" int onDoneCB(UCHAR *buffer, TTWAIN_PIXTYPE pixelType, int lx, int ly,
   scannerDevice->decrementPaperLeftCount();
   return scannerDevice->getPaperLeftCount();
 }
+}
 
 //-----------------------------------------------------------------------------
 
-extern "C" void onErrorCB(void *usrData, void *alwaysZero) {
+extern "C" {
+static void onErrorCB(void *usrData, void *alwaysZero) {
   TScanner *scannerDevice = reinterpret_cast<TScanner *>(usrData);
   scannerDevice->notifyError();
+}
 }
 
 //-----------------------------------------------------------------------------
@@ -218,7 +223,7 @@ param.m_version = string(TTWAIN_GetVersion());
 
 //-----------------------------------------------------------------------------
 
-void setupParameters(const TScannerParameters &params, bool isAreaSupported) {
+static void setupParameters(const TScannerParameters &params, bool isAreaSupported) {
   if (isAreaSupported) {
     TRectD scanArea = params.getScanArea();
     float L         = (float)(scanArea.getP00().x / 25.4);
@@ -259,7 +264,7 @@ void setupParameters(const TScannerParameters &params, bool isAreaSupported) {
 }
 
 //-----------------------------------------------------------------------------
-void openAndSetupTwain() {
+static void openAndSetupTwain() {
   int rc = TTWAIN_OpenDefaultSource();
   if (rc) {
     TTWAIN_SetTwainUsage(TTWAIN_MODE_UNLEASHED);

@@ -76,8 +76,8 @@ PltReader::~PltReader() { delete m_stripBuffer; }
 
 //------------------------------------------------------------
 
-int decode_group_name(char group_name[], char **name, int *key,
-                      int *sister_index) {
+static int decode_group_name(char group_name[], char **name, int *key,
+                             int *sister_index) {
   char *s, *t;
   *key          = 0;
   *sister_index = -1;

@@ -302,7 +302,7 @@ void LevelCreatePopup::updatePath() {
 //-----------------------------------------------------------------------------
 
 void LevelCreatePopup::nextName() {
-  const std::auto_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
+  const std::unique_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
 
   TLevelSet *levelSet =
       TApp::instance()->getCurrentScene()->getScene()->getLevelSet();

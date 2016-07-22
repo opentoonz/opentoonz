@@ -70,7 +70,8 @@ set(HEADERS
     iwa_simplexnoise.h
     iwa_noise1234.h
     iwa_fresnel.h
-    iwa_pnperspectivefx.h)
+    iwa_pnperspectivefx.h
+)
 
 set(SOURCES
     adjustlevelsfx.cpp
@@ -242,7 +243,8 @@ set(SOURCES
     iwa_tilefx.cpp
     iwa_simplexnoise.cpp
     iwa_noise1234.cpp
-    iwa_pnperspectivefx.cpp)
+    iwa_pnperspectivefx.cpp
+)
 
 set(OBJCSOURCES
 )

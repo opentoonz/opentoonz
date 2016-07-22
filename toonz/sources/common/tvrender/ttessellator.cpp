@@ -53,20 +53,23 @@ TglTessellator::GLTess::~GLTess() { gluDeleteTess(m_tess); }
 
 namespace {
 
-extern "C" void CALLBACK tessellateTexture(const GLdouble *tex) {
+extern "C" {
+static void CALLBACK tessellateTexture(const GLdouble *tex) {
   double u = tex[0] * 0.01;
   double v = tex[1] * 0.01;
   glTexCoord2d(u, v);
   glVertex2dv(tex);
+}
 }
 
 //-------------------------------------------------------------------
 
 TThread::Mutex CombineDataGuard;
 
-std::list<GLdouble *> Combine_data;
+static std::list<GLdouble *> Combine_data;
 
-extern "C" void CALLBACK myCombine(GLdouble coords[3], GLdouble *d[4],
+extern "C" {
+static void CALLBACK myCombine(GLdouble coords[3], GLdouble *d[4],
                                    GLfloat w[4], GLdouble **dataOut) {
   GLdouble *newCoords = new GLdouble[3];
 
@@ -75,6 +78,7 @@ extern "C" void CALLBACK myCombine(GLdouble coords[3], GLdouble *d[4],
   newCoords[2] = coords[2];
   Combine_data.push_back(newCoords);
   *dataOut = newCoords;
+}
 }
 
 //===================================================================

@@ -550,7 +550,7 @@ static int TTWAIN_DoOneTransfer(void) {
   return rc;
 }
 /*---------------------------------------------------------------------------*/
-void TTWAIN_RegisterApp(
+static void TTWAIN_RegisterApp(
     int majorNum, int minorNum, /* app. revision*/
     int nLanguage,    /* (human) language (use TWLG_xxx from TWAIN.H) */
     int nCountry,     /* country (use TWCY_xxx from TWAIN.H)	     */
