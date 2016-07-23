@@ -673,7 +673,7 @@ void TApp::autosave() {
   } else
     m_autosaveSuspended = false;
 
-  if (scene->isUntitled()) {
+  if (scene->isUntitled() && Preferences::instance()->isAutosaveSceneEnabled()) {
     DVGui::warning(
         tr("It is not possible to automatically save an untitled scene."));
     return;
@@ -716,7 +716,7 @@ void TApp::onStartAutoSave() {
 //-----------------------------------------------------------------------------
 
 void TApp::onStopAutoSave() {
-  assert(!Preferences::instance()->isAutosaveEnabled());
+  //assert(!Preferences::instance()->isAutosaveEnabled());
   m_autosaveTimer->stop();
 }
 

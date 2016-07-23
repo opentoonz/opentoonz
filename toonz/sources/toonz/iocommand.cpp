@@ -1221,7 +1221,8 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
         return false;
 	  } else if (ret == 1) {
 		  // save non scene files
-		  if (!IoCmd::saveNonSceneFiles()) return false;
+		  IoCmd::saveNonSceneFiles();
+		  return false;
 	  } else if (ret == 2) {
         // quit
       }
@@ -1637,30 +1638,20 @@ bool IoCmd::saveAll() {
 // IoCmd::saveNonSceneFiles()
 //---------------------------------------------------------------------------
 
-bool IoCmd::saveNonSceneFiles() {
+void IoCmd::saveNonSceneFiles() {
 	// try to save non scene files
-	// if anything is wrong, return false
-	bool result = true;
 
 	TApp *app = TApp::instance();
 	ToonzScene *scene = app->getCurrentScene()->getScene();
-	if (scene->isUntitled()) {
-		DVGui::warning(
-			QObject::tr("It is not possible to save the levels of an untitled scene."));
-		    result = saveScene();
-			if (!result)
-				return false;	
-	}
-
+	bool untitled = scene->isUntitled();
 	SceneResources resources(scene, 0);
 	resources.save(scene->getScenePath());
+	if (untitled) scene->setUntitled();
 	resources.updatePaths();
 
 	// for update title bar
 	app->getCurrentLevel()->notifyLevelTitleChange();
 	app->getCurrentPalette()->notifyPaletteTitleChanged();
-
-	return result;
 }
 
 //===========================================================================
