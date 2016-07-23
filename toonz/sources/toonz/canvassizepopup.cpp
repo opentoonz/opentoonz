@@ -165,9 +165,9 @@ PeggingWidget::PeggingWidget(QWidget *parent)
   gridLayout->addWidget(m_01, 0, 1);
   gridLayout->addWidget(m_02, 0, 2);
 
-  bool ret = connect(m_00, SIGNAL(released()), this, SLOT(on00()));
-  ret      = ret && connect(m_01, SIGNAL(released()), this, SLOT(on01()));
-  ret      = ret && connect(m_02, SIGNAL(released()), this, SLOT(on02()));
+  bool ret = QObject::connect(m_00, SIGNAL(released()), this, SLOT(on00()));
+  ret = ret && QObject::connect(m_01, SIGNAL(released()), this, SLOT(on01()));
+  ret = ret && QObject::connect(m_02, SIGNAL(released()), this, SLOT(on02()));
 
   // second buttons line
   createButton(&m_10, e10);
@@ -176,9 +176,9 @@ PeggingWidget::PeggingWidget(QWidget *parent)
   gridLayout->addWidget(m_10, 1, 0);
   gridLayout->addWidget(m_11, 1, 1);
   gridLayout->addWidget(m_12, 1, 2);
-  ret = ret && connect(m_10, SIGNAL(released()), this, SLOT(on10()));
-  ret = ret && connect(m_11, SIGNAL(released()), this, SLOT(on11()));
-  ret = ret && connect(m_12, SIGNAL(released()), this, SLOT(on12()));
+  ret = ret && QObject::connect(m_10, SIGNAL(released()), this, SLOT(on10()));
+  ret = ret && QObject::connect(m_11, SIGNAL(released()), this, SLOT(on11()));
+  ret = ret && QObject::connect(m_12, SIGNAL(released()), this, SLOT(on12()));
 
   // third buttons line
   createButton(&m_20, e20);
@@ -187,9 +187,9 @@ PeggingWidget::PeggingWidget(QWidget *parent)
   gridLayout->addWidget(m_20, 2, 0);
   gridLayout->addWidget(m_21, 2, 1);
   gridLayout->addWidget(m_22, 2, 2);
-  ret = ret && connect(m_20, SIGNAL(released()), this, SLOT(on20()));
-  ret = ret && connect(m_21, SIGNAL(released()), this, SLOT(on21()));
-  ret = ret && connect(m_22, SIGNAL(released()), this, SLOT(on22()));
+  ret = ret && QObject::connect(m_20, SIGNAL(released()), this, SLOT(on20()));
+  ret = ret && QObject::connect(m_21, SIGNAL(released()), this, SLOT(on21()));
+  ret = ret && QObject::connect(m_22, SIGNAL(released()), this, SLOT(on22()));
 }
 
 //-----------------------------------------------------------------------------
@@ -546,28 +546,29 @@ CanvasSizePopup::CanvasSizePopup()
   m_unit->addItem("inch");
   m_unit->setFixedHeight(DVGui::WidgetHeight);
   addWidget(tr("Unit:"), m_unit);
-  connect(m_unit, SIGNAL(currentIndexChanged(const QString &)), this,
-          SLOT(onUnitChanged(const QString &)));
+  QObject::connect(m_unit, SIGNAL(currentIndexChanged(const QString &)), this,
+                   SLOT(onUnitChanged(const QString &)));
 
   // New Xsize
   m_xSizeFld = new DVGui::DoubleLineEdit(this, dim.lx);
   m_xSizeFld->setFixedSize(80, DVGui::WidgetHeight);
   addWidget(tr("Width:"), m_xSizeFld);
-  connect(m_xSizeFld, SIGNAL(textChanged(const QString &)), this,
-          SLOT(onSizeChanged()));
+  QObject::connect(m_xSizeFld, SIGNAL(textChanged(const QString &)), this,
+                   SLOT(onSizeChanged()));
 
   // New Ysize
   m_ySizeFld = new DVGui::DoubleLineEdit(this, dim.ly);
   m_ySizeFld->setFixedSize(80, DVGui::WidgetHeight);
   addWidget(tr("Height:"), m_ySizeFld);
-  connect(m_ySizeFld, SIGNAL(textChanged(const QString &)), this,
-          SLOT(onSizeChanged()));
+  QObject::connect(m_ySizeFld, SIGNAL(textChanged(const QString &)), this,
+                   SLOT(onSizeChanged()));
 
   // Relative
   m_relative = new DVGui::CheckBox(tr("Relative"), this);
   m_relative->setFixedHeight(DVGui::WidgetHeight);
   m_relative->setChecked(false);
-  connect(m_relative, SIGNAL(toggled(bool)), this, SLOT(onRelative(bool)));
+  QObject::connect(m_relative, SIGNAL(toggled(bool)), this,
+                   SLOT(onRelative(bool)));
   addWidget(m_relative);
 
   addSeparator(tr("Anchor"));
@@ -581,8 +582,8 @@ CanvasSizePopup::CanvasSizePopup()
   QPushButton *okBtn = new QPushButton(tr("Resize"), this);
   okBtn->setDefault(true);
   QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-  connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkBtn()));
-  connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkBtn()));
+  QObject::connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(okBtn, cancelBtn);
 

@@ -50,7 +50,8 @@ static void getStyles(std::vector<TColorStyle *> &styles,
 
 //-----------------------------------------------------------------------------
 
-static void getStyleIds(std::vector<int> &styleIds, const TStyleSelection &selection) {
+static void getStyleIds(std::vector<int> &styleIds,
+                        const TStyleSelection &selection) {
   styleIds.clear();
   int pageIndex        = selection.getPageIndex();
   TPaletteP palette    = selection.getPalette();
@@ -470,8 +471,8 @@ ValueAdjuster::ValueAdjuster(QWidget *parent, Qt::WFlags flags)
   }
   setLayout(layout);
 
-  connect(plusBut, SIGNAL(clicked()), this, SLOT(onClickedPlus()));
-  connect(minusBut, SIGNAL(clicked()), this, SLOT(onClickedMinus()));
+  QObject::connect(plusBut, SIGNAL(clicked()), this, SLOT(onClickedPlus()));
+  QObject::connect(minusBut, SIGNAL(clicked()), this, SLOT(onClickedMinus()));
 }
 
 //-----------------------------------------------------------------------------
@@ -522,8 +523,8 @@ ValueShifter::ValueShifter(bool isHue, QWidget *parent, Qt::WFlags flags)
   }
   setLayout(layout);
 
-  connect(plusBut, SIGNAL(clicked()), this, SLOT(onClickedPlus()));
-  connect(minusBut, SIGNAL(clicked()), this, SLOT(onClickedMinus()));
+  QObject::connect(plusBut, SIGNAL(clicked()), this, SLOT(onClickedPlus()));
+  QObject::connect(minusBut, SIGNAL(clicked()), this, SLOT(onClickedMinus()));
 }
 
 //-----------------------------------------------------------------------------
@@ -561,7 +562,7 @@ ColorFader::ColorFader(QString name, QWidget *parent, Qt::WFlags flags)
   QPushButton *button = new QPushButton(name, this);
   button->setFixedSize(50, WidgetHeight);
   button->setObjectName("PushButton_NoPadding");
-  connect(button, SIGNAL(clicked()), this, SLOT(onClicked()));
+  QObject::connect(button, SIGNAL(clicked()), this, SLOT(onClicked()));
 
   m_valueLineEdit = new DoubleLineEdit(this, 10.00);
 
@@ -675,20 +676,27 @@ PltGizmoPopup::PltGizmoPopup()
 
   //----signal-slot connections
   /*-- Scale の差が渡される。+10%なら0.1が渡される --*/
-  connect(luminanceValue, SIGNAL(adjust(double)), SLOT(adjustV(double)));
-  connect(saturationValue, SIGNAL(adjust(double)), SLOT(adjustS(double)));
-  connect(trasparancyValue, SIGNAL(adjust(double)), SLOT(adjustT(double)));
+  QObject::connect(luminanceValue, SIGNAL(adjust(double)),
+                   SLOT(adjustV(double)));
+  QObject::connect(saturationValue, SIGNAL(adjust(double)),
+                   SLOT(adjustS(double)));
+  QObject::connect(trasparancyValue, SIGNAL(adjust(double)),
+                   SLOT(adjustT(double)));
   /*-- シフト用 移動値が渡される --*/
-  connect(luminanceShift, SIGNAL(adjust(double)), SLOT(shiftV(double)));
-  connect(saturationShift, SIGNAL(adjust(double)), SLOT(shiftS(double)));
-  connect(hueShift, SIGNAL(adjust(double)), SLOT(shiftH(double)));
-  connect(trasparancyShift, SIGNAL(adjust(double)), SLOT(shiftT(double)));
+  QObject::connect(luminanceShift, SIGNAL(adjust(double)),
+                   SLOT(shiftV(double)));
+  QObject::connect(saturationShift, SIGNAL(adjust(double)),
+                   SLOT(shiftS(double)));
+  QObject::connect(hueShift, SIGNAL(adjust(double)), SLOT(shiftH(double)));
+  QObject::connect(trasparancyShift, SIGNAL(adjust(double)),
+                   SLOT(shiftT(double)));
 
-  connect(fullMatteButton, SIGNAL(pressed()), SLOT(fullMatte()));
-  connect(zeroMatteButton, SIGNAL(pressed()), SLOT(zeroMatte()));
+  QObject::connect(fullMatteButton, SIGNAL(pressed()), SLOT(fullMatte()));
+  QObject::connect(zeroMatteButton, SIGNAL(pressed()), SLOT(zeroMatte()));
 
-  connect(blendButton, SIGNAL(clicked()), this, SLOT(onBlend()));
-  connect(colorFader, SIGNAL(valueChanged(double)), SLOT(onFade(double)));
+  QObject::connect(blendButton, SIGNAL(clicked()), this, SLOT(onBlend()));
+  QObject::connect(colorFader, SIGNAL(valueChanged(double)),
+                   SLOT(onFade(double)));
 }
 
 //-----------------------------------------------------------------------------

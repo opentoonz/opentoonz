@@ -302,7 +302,7 @@ BrightnessAndContrastPopup::BrightnessAndContrastPopup()
   //--------------------------- Button ----------------------------
 
   m_okBtn = new QPushButton(QString(tr("Apply")), this);
-  connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
+  QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
 
   addButtonBarWidget(m_okBtn);
 
@@ -312,10 +312,10 @@ BrightnessAndContrastPopup::BrightnessAndContrastPopup()
 
   bool ret = true;
 
-  ret = ret && connect(m_brightnessField, SIGNAL(valueChanged(bool)), this,
-                       SLOT(onValuesChanged(bool)));
-  ret = ret && connect(m_contrastField, SIGNAL(valueChanged(bool)), this,
-                       SLOT(onValuesChanged(bool)));
+  ret = ret && QObject::connect(m_brightnessField, SIGNAL(valueChanged(bool)),
+                                this, SLOT(onValuesChanged(bool)));
+  ret = ret && QObject::connect(m_contrastField, SIGNAL(valueChanged(bool)),
+                                this, SLOT(onValuesChanged(bool)));
 
   assert(ret);
 
@@ -373,12 +373,14 @@ void BrightnessAndContrastPopup::setCurrentSampleRaster() {
 void BrightnessAndContrastPopup::showEvent(QShowEvent *se) {
   TApp *app = TApp::instance();
   bool ret  = true;
-  ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
-                       SLOT(setCurrentSampleRaster()));
-  ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-                       SLOT(setCurrentSampleRaster()));
-  ret = ret && connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()),
-                       this, SLOT(setCurrentSampleRaster()));
+  ret       = ret &&
+        QObject::connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()),
+                         this, SLOT(setCurrentSampleRaster()));
+  ret = ret && QObject::connect(app->getCurrentFrame(), SIGNAL(frameSwitched()),
+                                this, SLOT(setCurrentSampleRaster()));
+  ret = ret &&
+        QObject::connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()),
+                         this, SLOT(setCurrentSampleRaster()));
   assert(ret);
   setCurrentSampleRaster();
 }
@@ -387,12 +389,12 @@ void BrightnessAndContrastPopup::showEvent(QShowEvent *se) {
 
 void BrightnessAndContrastPopup::hideEvent(QHideEvent *he) {
   TApp *app = TApp::instance();
-  disconnect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
-             SLOT(setCurrentSampleRaster()));
-  disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-             SLOT(setCurrentSampleRaster()));
-  disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
-             SLOT(setCurrentSampleRaster()));
+  QObject::disconnect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
+                      SLOT(setCurrentSampleRaster()));
+  QObject::disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+                      SLOT(setCurrentSampleRaster()));
+  QObject::disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()),
+                      this, SLOT(setCurrentSampleRaster()));
 
   Dialog::hideEvent(he);
 

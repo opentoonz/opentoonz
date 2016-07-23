@@ -413,11 +413,6 @@ public slots:
   void updateAreas();
   void onVSliderChanged(int);
   void onHSliderChanged(int);
-  /*
-void updateAllAree();
-void updateCellColumnAree();
-void updateCellRowAree();
-*/
 };
 
 #endif

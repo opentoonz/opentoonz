@@ -618,35 +618,39 @@ void LineTestViewer::showEvent(QShowEvent *) {
 
   bool ret = true;
 
-  ret = ret && connect(TApp::instance()->getCurrentObject(),
-                       SIGNAL(objectSwitched()), this, SLOT(update()));
-  ret = ret && connect(TApp::instance()->getCurrentObject(),
-                       SIGNAL(objectChanged(bool)), this, SLOT(update()));
+  ret = ret && QObject::connect(TApp::instance()->getCurrentObject(),
+                                SIGNAL(objectSwitched()), this, SLOT(update()));
+  ret = ret &&
+        QObject::connect(TApp::instance()->getCurrentObject(),
+                         SIGNAL(objectChanged(bool)), this, SLOT(update()));
 
-  ret = ret && connect(TApp::instance()->getCurrentOnionSkin(),
-                       SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
+  ret = ret &&
+        QObject::connect(TApp::instance()->getCurrentOnionSkin(),
+                         SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
 
-  ret = ret && connect(TApp::instance()->getCurrentLevel(),
-                       SIGNAL(xshLevelChanged()), this, SLOT(update()));
+  ret =
+      ret && QObject::connect(TApp::instance()->getCurrentLevel(),
+                              SIGNAL(xshLevelChanged()), this, SLOT(update()));
 
   TFrameHandle *frameHandle = app->getCurrentFrame();
-  ret                       = ret &&
-        connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(update()));
+  ret = ret && QObject::connect(frameHandle, SIGNAL(frameSwitched()), this,
+                                SLOT(update()));
 
   TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
-  ret                         = ret &&
-        connect(xsheetHandle, SIGNAL(xsheetChanged()), this, SLOT(update()));
-  ret = ret &&
-        connect(xsheetHandle, SIGNAL(xsheetSwitched()), this, SLOT(update()));
+  ret = ret && QObject::connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                                SLOT(update()));
+  ret = ret && QObject::connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
+                                SLOT(update()));
 
   TSceneHandle *sceneHandle = app->getCurrentScene();
-  ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this,
-                       SLOT(onSceneSwitched()));
-  ret =
-      ret && connect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(update()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                                SLOT(onSceneSwitched()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(sceneChanged()), this,
+                                SLOT(update()));
 
-  ret = ret && connect(TApp::instance()->getCurrentOnionSkin(),
-                       SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
+  ret = ret &&
+        QObject::connect(TApp::instance()->getCurrentOnionSkin(),
+                         SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
 
   assert(ret);
 }
@@ -656,31 +660,35 @@ void LineTestViewer::showEvent(QShowEvent *) {
 void LineTestViewer::hideEvent(QHideEvent *e) {
   TApp *app = TApp::instance();
 
-  disconnect(TApp::instance()->getCurrentObject(), SIGNAL(objectSwitched()),
-             this, SLOT(update()));
-  disconnect(TApp::instance()->getCurrentObject(), SIGNAL(objectChanged(bool)),
-             this, SLOT(update()));
+  QObject::disconnect(TApp::instance()->getCurrentObject(),
+                      SIGNAL(objectSwitched()), this, SLOT(update()));
+  QObject::disconnect(TApp::instance()->getCurrentObject(),
+                      SIGNAL(objectChanged(bool)), this, SLOT(update()));
 
-  disconnect(TApp::instance()->getCurrentOnionSkin(),
-             SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
+  QObject::disconnect(TApp::instance()->getCurrentOnionSkin(),
+                      SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
 
-  disconnect(TApp::instance()->getCurrentLevel(), SIGNAL(xshLevelChanged()),
-             this, SLOT(update()));
+  QObject::disconnect(TApp::instance()->getCurrentLevel(),
+                      SIGNAL(xshLevelChanged()), this, SLOT(update()));
 
   TFrameHandle *frameHandle = app->getCurrentFrame();
-  disconnect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(update()));
+  QObject::disconnect(frameHandle, SIGNAL(frameSwitched()), this,
+                      SLOT(update()));
 
   TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
-  disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this, SLOT(update()));
-  disconnect(xsheetHandle, SIGNAL(xsheetSwitched()), this, SLOT(update()));
+  QObject::disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                      SLOT(update()));
+  QObject::disconnect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
+                      SLOT(update()));
 
   TSceneHandle *sceneHandle = app->getCurrentScene();
-  disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
-             SLOT(onSceneSwitched()));
-  disconnect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(update()));
+  QObject::disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                      SLOT(onSceneSwitched()));
+  QObject::disconnect(sceneHandle, SIGNAL(sceneChanged()), this,
+                      SLOT(update()));
 
-  disconnect(TApp::instance()->getCurrentOnionSkin(),
-             SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
+  QObject::disconnect(TApp::instance()->getCurrentOnionSkin(),
+                      SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
 
   QWidget::hideEvent(e);
 }
@@ -750,7 +758,7 @@ void LineTestViewer::contextMenuEvent(QContextMenuEvent *event) {
   QAction *act = menu->addAction("Reset View");
   act->setShortcut(
       QKeySequence(CommandManager::instance()->getKeyFromId(T_ZoomReset)));
-  connect(act, SIGNAL(triggered()), this, SLOT(resetView()));
+  QObject::connect(act, SIGNAL(triggered()), this, SLOT(resetView()));
   menu->exec(event->globalPos());
 }
 

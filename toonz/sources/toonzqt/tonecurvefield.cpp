@@ -769,8 +769,8 @@ ToneCurveField::ToneCurveField(QWidget *parent,
     ChennelCurveEditor *c =
         new ChennelCurveEditor(this, histograms->getHistogramView(i));
     m_toneCurveStackedWidget->addWidget(c);
-    connect(c, SIGNAL(firstLastXPostionChanged(int, int)), this,
-            SLOT(onFirstLastXPostionChanged(int, int)));
+    QObject::connect(c, &ChennelCurveEditor::firstLastXPostionChanged,    //
+                     this, &ToneCurveField::onFirstLastXPostionChanged);  //
   }
 
   QWidget *w          = new QWidget(this);
@@ -791,8 +791,8 @@ ToneCurveField::ToneCurveField(QWidget *parent,
     intPairSlider->setRange(0, 255);
     intPairSlider->setValues(std::make_pair(0, 255));
     m_sliderStackedWidget->addWidget(intPairSlider);
-    connect(intPairSlider, SIGNAL(valuesChanged(bool)), this,
-            SLOT(sliderValueChanged(bool)));
+    QObject::connect(intPairSlider, &IntPairField::valuesChanged,  //
+                     this, &ToneCurveField::sliderValueChanged);   //
   }
   mainLayout->addWidget(m_sliderStackedWidget);
   m_sliderStackedWidget->setCurrentIndex(currentChannelIndex);
@@ -800,16 +800,19 @@ ToneCurveField::ToneCurveField(QWidget *parent,
   mainLayout->addSpacing(10);
   m_isLinearCheckBox = new CheckBox(QString("Linear"), this);
   mainLayout->addWidget(m_isLinearCheckBox, 0, Qt::AlignHCenter);
-  connect(m_isLinearCheckBox, SIGNAL(clicked(bool)),
-          SLOT(setLinearManually(bool)));
-  connect(m_isLinearCheckBox, SIGNAL(toggled(bool)), SLOT(setLinear(bool)));
+  QObject::connect(m_isLinearCheckBox, &CheckBox::clicked,     //
+                   this, &ToneCurveField::setLinearManually);  //
+  QObject::connect(m_isLinearCheckBox, &CheckBox::toggled,     //
+                   this, &ToneCurveField::setLinear);          //
 
-  connect(m_channelListChooser, SIGNAL(currentIndexChanged(int)),
-          m_toneCurveStackedWidget, SLOT(setCurrentIndex(int)));
-  connect(m_channelListChooser, SIGNAL(currentIndexChanged(int)),
-          m_sliderStackedWidget, SLOT(setCurrentIndex(int)));
-  connect(m_channelListChooser, SIGNAL(currentIndexChanged(int)), this,
-          SIGNAL(currentChannelIndexChanged(int)));
+  auto const currentIndexChanged =
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged);
+  QObject::connect(m_channelListChooser, currentIndexChanged,  //
+                   m_toneCurveStackedWidget, &QStackedWidget::setCurrentIndex);
+  QObject::connect(m_channelListChooser, currentIndexChanged,                 //
+                   m_sliderStackedWidget, &QStackedWidget::setCurrentIndex);  //
+  QObject::connect(m_channelListChooser, currentIndexChanged,                 //
+                   this, &ToneCurveField::currentChannelIndexChanged);        //
 
   setLayout(mainLayout);
 }

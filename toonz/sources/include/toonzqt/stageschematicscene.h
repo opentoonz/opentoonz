@@ -189,7 +189,7 @@ signals:
   void doCollapse(QList<TStageObjectId>);
   void doExplodeChild(QList<TStageObjectId>);
 
-protected slots:
+public slots:
   void onSelectionSwitched(TSelection *oldSel, TSelection *newSel) override;
 
   void onPegbarAdded();

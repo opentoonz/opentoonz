@@ -164,12 +164,12 @@ AddFxContextMenu::AddFxContextMenu()
   m_replaceMenu        = new QMenu(tr("Replace FX"), 0);
   m_replaceActionGroup = new QActionGroup(m_replaceMenu);
 
-  connect(m_insertActionGroup, SIGNAL(triggered(QAction *)), this,
-          SLOT(onInsertFx(QAction *)));
-  connect(m_addActionGroup, SIGNAL(triggered(QAction *)), this,
-          SLOT(onAddFx(QAction *)));
-  connect(m_replaceActionGroup, SIGNAL(triggered(QAction *)), this,
-          SLOT(onReplaceFx(QAction *)));
+  QObject::connect(m_insertActionGroup, &QActionGroup::triggered,   //
+                   this, &AddFxContextMenu::onInsertFx);            //
+  QObject::connect(m_addActionGroup, &QActionGroup::triggered,      //
+                   this, &AddFxContextMenu::onAddFx);               //
+  QObject::connect(m_replaceActionGroup, &QActionGroup::triggered,  //
+                   this, &AddFxContextMenu::onReplaceFx);           //
 
   fillMenus();
 }
@@ -192,9 +192,10 @@ void AddFxContextMenu::setApplication(TApplication *app) {
   m_app = app;
 
   if (TFxHandle *fxHandle = app->getCurrentFx()) {
-    connect(fxHandle, SIGNAL(fxPresetSaved()), this, SLOT(onFxPresetHandled()));
-    connect(fxHandle, SIGNAL(fxPresetRemoved()), this,
-            SLOT(onFxPresetHandled()));
+    QObject::connect(fxHandle, &TFxHandle::fxPresetSaved,          //
+                     this, &AddFxContextMenu::onFxPresetHandled);  //
+    QObject::connect(fxHandle, &TFxHandle::fxPresetRemoved,        //
+                     this, &AddFxContextMenu::onFxPresetHandled);  //
   }
 }
 
@@ -630,7 +631,8 @@ QAction *AddFxContextMenu::getAgainCommand(int command) {
   if (!m_againCommand) {
     m_againCommand = new QAction(translatedCommandName, 0);
     m_againCommand->setData(QVariant(fxStr));
-    connect(m_againCommand, SIGNAL(triggered()), this, SLOT(onAgainCommand()));
+    QObject::connect(m_againCommand, &QAction::triggered,       //
+                     this, &AddFxContextMenu::onAgainCommand);  //
   }
   // compare the m_againCommand's name and commandName
   else if (translatedCommandName != m_againCommand->text()) {

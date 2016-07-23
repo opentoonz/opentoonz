@@ -25,8 +25,8 @@ DateChooserWidget::DateChooserWidget(QWidget *parent)
 
   m_timeRadioButton = new QRadioButton;
   m_timeRadioButton->setChecked(true);
-  connect(m_timeRadioButton, SIGNAL(clicked()), this,
-          SLOT(onRadioButtonClicked()));
+  QObject::connect(m_timeRadioButton, SIGNAL(clicked()), this,
+                   SLOT(onRadioButtonClicked()));
 
   m_timeEdit = new QTimeEdit;
   m_timeEdit->setDisplayFormat("hh:mm");
@@ -41,8 +41,8 @@ DateChooserWidget::DateChooserWidget(QWidget *parent)
   QHBoxLayout *dayLayout = new QHBoxLayout;
 
   m_dayRadioButton = new QRadioButton;
-  connect(m_dayRadioButton, SIGNAL(clicked()), this,
-          SLOT(onRadioButtonClicked()));
+  QObject::connect(m_dayRadioButton, SIGNAL(clicked()), this,
+                   SLOT(onRadioButtonClicked()));
 
   m_dayEdit = new QSpinBox;
   m_dayEdit->setRange(1, 99);
@@ -59,8 +59,8 @@ DateChooserWidget::DateChooserWidget(QWidget *parent)
   QHBoxLayout *weekLayout = new QHBoxLayout;
 
   m_weekRadioButton = new QRadioButton;
-  connect(m_weekRadioButton, SIGNAL(clicked()), this,
-          SLOT(onRadioButtonClicked()));
+  QObject::connect(m_weekRadioButton, SIGNAL(clicked()), this,
+                   SLOT(onRadioButtonClicked()));
 
   m_weekEdit = new QSpinBox;
   m_weekEdit->setRange(1, 99);
@@ -77,8 +77,8 @@ DateChooserWidget::DateChooserWidget(QWidget *parent)
   QHBoxLayout *customDateLayout = new QHBoxLayout;
 
   m_dateRadioButton = new QRadioButton;
-  connect(m_dateRadioButton, SIGNAL(clicked()), this,
-          SLOT(onRadioButtonClicked()));
+  QObject::connect(m_dateRadioButton, SIGNAL(clicked()), this,
+                   SLOT(onRadioButtonClicked()));
 
   m_dateTimeEdit = new QDateTimeEdit;
   m_dateTimeEdit->setDisplayFormat("yyyy-MM-dd hh:mm");
@@ -190,7 +190,8 @@ void ConflictWidget::setFiles(const QStringList &files) {
   int fileCount            = files.size();
   for (int i = 0; i < fileCount; i++) {
     radio = new DoubleRadioWidget(m_button1Text, m_button2Text, files.at(i));
-    connect(radio, SIGNAL(valueChanged()), this, SLOT(onRadioValueChanged()));
+    QObject::connect(radio, SIGNAL(valueChanged()), this,
+                     SLOT(onRadioValueChanged()));
     m_mainLayout->addWidget(radio);
     m_radios.insert(radio, -1);
   }
@@ -231,9 +232,11 @@ DoubleRadioWidget::DoubleRadioWidget(const QString &button1Text,
   mainLayout->setMargin(0);
 
   m_firstButton = new QRadioButton(button1Text);
-  connect(m_firstButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));
+  QObject::connect(m_firstButton, SIGNAL(clicked()), this,
+                   SIGNAL(valueChanged()));
   m_secondButton = new QRadioButton(button2Text);
-  connect(m_secondButton, SIGNAL(clicked()), this, SIGNAL(valueChanged()));
+  QObject::connect(m_secondButton, SIGNAL(clicked()), this,
+                   SIGNAL(valueChanged()));
 
   m_label = new QLabel;
   m_label->setFixedWidth(180);

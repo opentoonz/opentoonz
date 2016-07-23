@@ -117,8 +117,8 @@ Toolbar::Toolbar(QWidget *parent, bool isVertical)
   // toolbar is expanded or shrinked according to env at the beginning
   updateToolbar();
 
-  connect(m_expandButton, SIGNAL(toggled(bool)), this,
-          SLOT(setIsExpanded(bool)));
+  QObject::connect(m_expandButton, SIGNAL(toggled(bool)), this,
+                   SLOT(setIsExpanded(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -196,15 +196,15 @@ bool Toolbar::addAction(QAction *act) {
 //-----------------------------------------------------------------------------
 
 void Toolbar::showEvent(QShowEvent *e) {
-  connect(TApp::instance()->getCurrentTool(), SIGNAL(toolSwitched()),
-          SLOT(onToolChanged()));
+  QObject::connect(TApp::instance()->getCurrentTool(), SIGNAL(toolSwitched()),
+                   SLOT(onToolChanged()));
 }
 
 //-----------------------------------------------------------------------------
 
 void Toolbar::hideEvent(QHideEvent *e) {
-  disconnect(TApp::instance()->getCurrentTool(), SIGNAL(toolSwitched()), this,
-             SLOT(onToolChanged()));
+  QObject::disconnect(TApp::instance()->getCurrentTool(),
+                      SIGNAL(toolSwitched()), this, SLOT(onToolChanged()));
 }
 
 //-----------------------------------------------------------------------------

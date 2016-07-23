@@ -689,8 +689,8 @@ FullColorBrushToolNotifier::FullColorBrushToolNotifier(FullColorBrushTool *tool)
   if (app) levelHandle = app->getCurrentLevel();
   bool ret             = false;
   if (levelHandle) {
-    bool ret = connect(levelHandle, SIGNAL(xshCanvasSizeChanged()), this,
-                       SLOT(onCanvasSizeChanged()));
+    bool ret = QObject::connect(levelHandle, SIGNAL(xshCanvasSizeChanged()),
+                                this, SLOT(onCanvasSizeChanged()));
     assert(ret);
   }
 }

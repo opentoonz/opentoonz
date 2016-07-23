@@ -166,28 +166,31 @@ SceneSettingsPopup::SceneSettingsPopup()
   // signal-slot connections
   bool ret = true;
   // Frame Rate
-  ret = ret && connect(m_frameRateFld, SIGNAL(editingFinished()), this,
-                       SLOT(onFrameRateEditingFinished()));
+  ret = ret && QObject::connect(m_frameRateFld, SIGNAL(editingFinished()), this,
+                                SLOT(onFrameRateEditingFinished()));
   // Camera BG color
-  ret =
-      ret && connect(m_bgColorFld, SIGNAL(colorChanged(const TPixel32 &, bool)),
-                     this, SLOT(setBgColor(const TPixel32 &, bool)));
+  ret = ret && QObject::connect(m_bgColorFld,
+                                SIGNAL(colorChanged(const TPixel32 &, bool)),
+                                this, SLOT(setBgColor(const TPixel32 &, bool)));
   // Field Guide Size - A/R
-  ret = ret && connect(m_fieldGuideFld, SIGNAL(editingFinished()), this,
-                       SLOT(onFieldGuideSizeEditingFinished()));
-  ret = ret && connect(m_aspectRatioFld, SIGNAL(editingFinished()), this,
-                       SLOT(onFieldGuideAspectRatioEditingFinished()));
+  ret = ret && QObject::connect(m_fieldGuideFld, SIGNAL(editingFinished()),
+                                this, SLOT(onFieldGuideSizeEditingFinished()));
+  ret =
+      ret && QObject::connect(m_aspectRatioFld, SIGNAL(editingFinished()), this,
+                              SLOT(onFieldGuideAspectRatioEditingFinished()));
   // Image Subsampling  - Tlv Subsampling
-  ret = ret && connect(m_fullcolorSubsamplingFld, SIGNAL(editingFinished()),
-                       this, SLOT(onFullColorSubsampEditingFinished()));
+  ret = ret &&
+        QObject::connect(m_fullcolorSubsamplingFld, SIGNAL(editingFinished()),
+                         this, SLOT(onFullColorSubsampEditingFinished()));
   if (m_tlvSubsamplingFld)
-    ret = ret && connect(m_tlvSubsamplingFld, SIGNAL(editingFinished()), this,
-                         SLOT(onTlvSubsampEditingFinished()));
+    ret =
+        ret && QObject::connect(m_tlvSubsamplingFld, SIGNAL(editingFinished()),
+                                this, SLOT(onTlvSubsampEditingFinished()));
   // Marker Interval - Start Frame
-  ret = ret && connect(m_markerIntervalFld, SIGNAL(editingFinished()), this,
-                       SLOT(onMakerIntervalEditingFinished()));
-  ret = ret && connect(m_startFrameFld, SIGNAL(editingFinished()), this,
-                       SLOT(onStartFrameEditingFinished()));
+  ret = ret && QObject::connect(m_markerIntervalFld, SIGNAL(editingFinished()),
+                                this, SLOT(onMakerIntervalEditingFinished()));
+  ret = ret && QObject::connect(m_startFrameFld, SIGNAL(editingFinished()),
+                                this, SLOT(onStartFrameEditingFinished()));
   assert(ret);
 }
 
@@ -195,16 +198,18 @@ SceneSettingsPopup::SceneSettingsPopup()
 
 void SceneSettingsPopup::showEvent(QShowEvent *e) {
   TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
-  connect(sceneHandle, SIGNAL(sceneChanged()), SLOT(update()));
-  connect(sceneHandle, SIGNAL(sceneSwitched()), SLOT(update()));
+  QObject::connect(sceneHandle, SIGNAL(sceneChanged()), SLOT(update()));
+  QObject::connect(sceneHandle, SIGNAL(sceneSwitched()), SLOT(update()));
 
   update();
 }
 
 void SceneSettingsPopup::hideEvent(QHideEvent *e) {
   TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
-  disconnect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(update()));
-  disconnect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(update()));
+  QObject::disconnect(sceneHandle, SIGNAL(sceneChanged()), this,
+                      SLOT(update()));
+  QObject::disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                      SLOT(update()));
 }
 
 //-----------------------------------------------------------------------------

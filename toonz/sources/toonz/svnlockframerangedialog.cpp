@@ -75,15 +75,15 @@ SVNLockFrameRangeDialog::SVNLockFrameRangeDialog(QWidget *parent,
   m_fromLineEdit = new DVGui::IntLineEdit;
   m_fromLineEdit->setRange(1, frameCount);
   m_fromLineEdit->hide();
-  connect(m_fromLineEdit, SIGNAL(textChanged(const QString &)), this,
-          SLOT(onFromLineEditTextChanged()));
+  QObject::connect(m_fromLineEdit, SIGNAL(textChanged(const QString &)), this,
+                   SLOT(onFromLineEditTextChanged()));
 
   m_toLineEdit = new DVGui::IntLineEdit;
   m_toLineEdit->setRange(1, frameCount);
   m_toLineEdit->hide();
   m_toLineEdit->setValue(frameCount);
-  connect(m_toLineEdit, SIGNAL(textChanged(const QString &)), this,
-          SLOT(onToLineEditTextChanged()));
+  QObject::connect(m_toLineEdit, SIGNAL(textChanged(const QString &)), this,
+                   SLOT(onToLineEditTextChanged()));
 
   fromToLayout->addStretch();
   fromToLayout->addWidget(m_fromLabel);
@@ -116,24 +116,26 @@ SVNLockFrameRangeDialog::SVNLockFrameRangeDialog(QWidget *parent,
   endHLayout();
 
   m_lockButton = new QPushButton(tr("Edit"));
-  connect(m_lockButton, SIGNAL(clicked()), this, SLOT(onLockButtonClicked()));
+  QObject::connect(m_lockButton, SIGNAL(clicked()), this,
+                   SLOT(onLockButtonClicked()));
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this,
-          SLOT(onCancelButtonClicked()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this,
+                   SLOT(onCancelButtonClicked()));
 
   addButtonBarWidget(m_lockButton, m_cancelButton);
 
   // 0. Connect for svn errors (that may occurs)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // Step 1: Lock
   QStringList args;
   args << "lock";
   args << m_file;
 
-  connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(onLockDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onLockDone()));
   m_thread.executeCommand(m_workingDir, "svn", args, false);
 }
 
@@ -147,7 +149,7 @@ void SVNLockFrameRangeDialog::switchToCloseButton() {
   m_lockButton->setText("Close");
   m_lockButton->setEnabled(true);
   m_cancelButton->hide();
-  connect(m_lockButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_lockButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 //-----------------------------------------------------------------------------
@@ -236,8 +238,8 @@ void SVNLockFrameRangeDialog::onLockButtonClicked() {
   args << m_file;
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), this,
-          SLOT(onPropSetDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onPropSetDone()));
   m_thread.executeCommand(m_workingDir, "svn", args, true);
 }
 
@@ -249,7 +251,8 @@ void SVNLockFrameRangeDialog::onCancelButtonClicked() {
   args << m_file;
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(close()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(close()));
   m_thread.executeCommand(m_workingDir, "svn", args, true);
 }
 
@@ -310,8 +313,8 @@ void SVNLockFrameRangeDialog::onLockDone() {
     args << "--xml";
 
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(done(const QString &)), this,
-            SLOT(onPropGetDone(const QString &)));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                     SLOT(onPropGetDone(const QString &)));
     m_thread.executeCommand(m_workingDir, "svn", args, true);
   }
 }
@@ -329,7 +332,8 @@ void SVNLockFrameRangeDialog::onPropSetDone() {
     args << QString("-m").append(VersionControl::instance()->getUserName() +
                                  " edit frame range.");
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(finish()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(finish()));
   m_thread.executeCommand(m_workingDir, "svn", args, true);
 }
 
@@ -403,15 +407,15 @@ SVNLockMultiFrameRangeDialog::SVNLockMultiFrameRangeDialog(
   m_fromLineEdit = new DVGui::IntLineEdit;
   m_fromLineEdit->setRange(1, frameCount);
   m_fromLineEdit->hide();
-  connect(m_fromLineEdit, SIGNAL(textChanged(const QString &)), this,
-          SLOT(onFromLineEditTextChanged()));
+  QObject::connect(m_fromLineEdit, SIGNAL(textChanged(const QString &)), this,
+                   SLOT(onFromLineEditTextChanged()));
 
   m_toLineEdit = new DVGui::IntLineEdit;
   m_toLineEdit->setRange(1, frameCount);
   m_toLineEdit->hide();
   m_toLineEdit->setValue(frameCount);
-  connect(m_toLineEdit, SIGNAL(textChanged(const QString &)), this,
-          SLOT(onToLineEditTextChanged()));
+  QObject::connect(m_toLineEdit, SIGNAL(textChanged(const QString &)), this,
+                   SLOT(onToLineEditTextChanged()));
 
   fromToLayout->addStretch();
   fromToLayout->addWidget(m_fromLabel);
@@ -444,10 +448,11 @@ SVNLockMultiFrameRangeDialog::SVNLockMultiFrameRangeDialog(
   endHLayout();
 
   m_lockButton = new QPushButton(tr("Edit"));
-  connect(m_lockButton, SIGNAL(clicked()), this, SLOT(onLockButtonClicked()));
+  QObject::connect(m_lockButton, SIGNAL(clicked()), this,
+                   SLOT(onLockButtonClicked()));
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   m_lockButton->hide();
   m_cancelButton->hide();
@@ -455,12 +460,12 @@ SVNLockMultiFrameRangeDialog::SVNLockMultiFrameRangeDialog(
   addButtonBarWidget(m_lockButton, m_cancelButton);
 
   // 0. Connect for svn errors (that may occurs)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // 1. Getting status
-  connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-          SLOT(onStatusRetrieved(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                   SLOT(onStatusRetrieved(const QString &)));
   m_thread.getSVNStatus(m_workingDir, m_files, true);
 }
 
@@ -474,7 +479,7 @@ void SVNLockMultiFrameRangeDialog::switchToCloseButton() {
   m_lockButton->setText("Close");
   m_lockButton->setEnabled(true);
   m_cancelButton->hide();
-  connect(m_lockButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_lockButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 //-----------------------------------------------------------------------------
@@ -621,7 +626,8 @@ void SVNLockMultiFrameRangeDialog::onLockButtonClicked() {
     args << QString("-m").append(VersionControl::instance()->getUserName() +
                                  " edit frame range.");
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onLockDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(onLockDone()));
   m_thread.executeCommand(m_workingDir, "svn", args);
 }
 
@@ -690,17 +696,17 @@ SVNUnlockFrameRangeDialog::SVNUnlockFrameRangeDialog(QWidget *parent,
   endHLayout();
 
   m_unlockButton = new QPushButton(tr("Unlock"));
-  connect(m_unlockButton, SIGNAL(clicked()), this,
-          SLOT(onUnlockButtonClicked()));
+  QObject::connect(m_unlockButton, SIGNAL(clicked()), this,
+                   SLOT(onUnlockButtonClicked()));
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(m_unlockButton, m_cancelButton);
 
   // 0. Connect for svn errors (that may occurs)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 }
 
 //-----------------------------------------------------------------------------
@@ -725,7 +731,8 @@ void SVNUnlockFrameRangeDialog::onUpdateDone() {
   args << m_file;
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(onLockDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onLockDone()));
   m_thread.executeCommand(m_workingDir, "svn", args, false);
 }
 
@@ -742,8 +749,8 @@ void SVNUnlockFrameRangeDialog::onLockDone() {
   args << "--xml";
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), this,
-          SLOT(onPropGetDone(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onPropGetDone(const QString &)));
   m_thread.executeCommand(m_workingDir, "svn", args, true);
 }
 
@@ -807,8 +814,8 @@ void SVNUnlockFrameRangeDialog::onPropGetDone(const QString &xmlResponse) {
     args << m_file;
 
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(done(const QString &)), this,
-            SLOT(onPropSetDone()));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                     SLOT(onPropSetDone()));
     m_thread.executeCommand(m_workingDir, "svn", args, true);
   }
   // Set the partial-lock property
@@ -821,8 +828,8 @@ void SVNUnlockFrameRangeDialog::onPropGetDone(const QString &xmlResponse) {
     args << m_file;
 
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(done(const QString &)), this,
-            SLOT(onPropSetDone()));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                     SLOT(onPropSetDone()));
     m_thread.executeCommand(m_workingDir, "svn", args, true);
   }
 }
@@ -842,7 +849,8 @@ void SVNUnlockFrameRangeDialog::onPropSetDone() {
                                QString::number(m_myInfo.m_to) + ".");
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(onCommitDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onCommitDone()));
   m_thread.executeCommand(m_workingDir, "svn", args, true);
 }
 
@@ -857,7 +865,8 @@ void SVNUnlockFrameRangeDialog::onUnlockButtonClicked() {
   args << "update";
   args << m_file;
 
-  connect(&m_thread, SIGNAL(done(const QString &)), this, SLOT(onUpdateDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onUpdateDone()));
   m_thread.executeCommand(m_workingDir, "svn", args, false);
 }
 
@@ -870,7 +879,7 @@ void SVNUnlockFrameRangeDialog::switchToCloseButton() {
   m_unlockButton->setEnabled(true);
   m_unlockButton->show();
   m_cancelButton->hide();
-  connect(m_unlockButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_unlockButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 //=============================================================================
@@ -924,23 +933,23 @@ SVNUnlockMultiFrameRangeDialog::SVNUnlockMultiFrameRangeDialog(
   endHLayout();
 
   m_unlockButton = new QPushButton(tr("Unlock"));
-  connect(m_unlockButton, SIGNAL(clicked()), this,
-          SLOT(onUnlockButtonClicked()));
+  QObject::connect(m_unlockButton, SIGNAL(clicked()), this,
+                   SLOT(onUnlockButtonClicked()));
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   m_unlockButton->hide();
 
   addButtonBarWidget(m_unlockButton, m_cancelButton);
 
   // 0. Connect for svn errors (that may occurs)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // 1. Getting status
-  connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-          SLOT(onStatusRetrieved(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                   SLOT(onStatusRetrieved(const QString &)));
   m_thread.getSVNStatus(m_workingDir, m_files, true);
 }
 //-----------------------------------------------------------------------------
@@ -958,7 +967,8 @@ void SVNUnlockMultiFrameRangeDialog::onUnlockButtonClicked() {
   for (int i = 0; i < fileCount; i++) args << m_filesToUnlock.at(i);
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)), SLOT(onUnlockDone()));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(onUnlockDone()));
   m_thread.executeCommand(m_workingDir, "svn", args);
 }
 
@@ -1010,7 +1020,7 @@ void SVNUnlockMultiFrameRangeDialog::switchToCloseButton() {
   m_unlockButton->setEnabled(true);
   m_unlockButton->show();
   m_cancelButton->hide();
-  connect(m_unlockButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_unlockButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1064,13 +1074,13 @@ SVNFrameRangeLockInfoDialog::SVNFrameRangeLockInfoDialog(
   endHLayout();
 
   QPushButton *closeButton = new QPushButton(tr("Close"));
-  connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
 
   addButtonBarWidget(closeButton);
 
   // 0. Connect for svn errors (that may occurs)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // 1. propget
   QStringList args;
@@ -1079,8 +1089,8 @@ SVNFrameRangeLockInfoDialog::SVNFrameRangeLockInfoDialog(
   args << m_file;
   args << "--xml";
 
-  connect(&m_thread, SIGNAL(done(const QString &)), this,
-          SLOT(onPropGetDone(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)), this,
+                   SLOT(onPropGetDone(const QString &)));
   m_thread.executeCommand(m_workingDir, "svn", args, true);
 }
 
@@ -1159,17 +1169,17 @@ SVNMultiFrameRangeLockInfoDialog::SVNMultiFrameRangeLockInfoDialog(
   endHLayout();
 
   QPushButton *closeButton = new QPushButton(tr("Close"));
-  connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
 
   addButtonBarWidget(closeButton);
 
   // 0. Connect for svn errors (that may occurs)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // 1. Getting status
-  connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-          SLOT(onStatusRetrieved(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                   SLOT(onStatusRetrieved(const QString &)));
   m_thread.getSVNStatus(m_workingDir, m_files, true);
 }
 

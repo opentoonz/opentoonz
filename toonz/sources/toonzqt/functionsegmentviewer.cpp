@@ -115,19 +115,26 @@ SpeedInOutSegmentPage::SpeedInOutSegmentPage(FunctionSegmentViewer *parent)
   mainLayout->setColumnStretch(3, 1);
   setLayout(mainLayout);
 
-  bool ret = connect(m_speed0xFld, SIGNAL(editingFinished()), this,
-                     SLOT(onFirstHandleXChanged()));
-  ret = ret && connect(m_speed0yFld, SIGNAL(editingFinished()), this,
-                       SLOT(onFirstHandleYChanged()));
-  ret = ret && connect(m_firstSpeedFld, SIGNAL(editingFinished()), this,
-                       SLOT(onFirstSpeedChanged()));
+  bool ret =
+      QObject::connect(m_speed0xFld, &LineEdit::editingFinished,  //
+                       this, &SpeedInOutSegmentPage::onFirstHandleXChanged);
+  ret = ret && QObject::connect(
+                   m_speed0yFld, &MeasuredDoubleLineEdit::editingFinished,  //
+                   this, &SpeedInOutSegmentPage::onFirstHandleYChanged);
+  ret = ret &&
+        QObject::connect(m_firstSpeedFld,
+                         &MeasuredDoubleLineEdit::editingFinished,  //
+                         this, &SpeedInOutSegmentPage::onFirstSpeedChanged);
 
-  ret = ret && connect(m_speed1xFld, SIGNAL(editingFinished()), this,
-                       SLOT(onLastHandleXChanged()));
-  ret = ret && connect(m_speed1yFld, SIGNAL(editingFinished()), this,
-                       SLOT(onLastHandleYChanged()));
-  ret = ret && connect(m_lastSpeedFld, SIGNAL(editingFinished()), this,
-                       SLOT(onLastSpeedChanged()));
+  ret = ret &&
+        QObject::connect(m_speed1xFld, &LineEdit::editingFinished,  //
+                         this, &SpeedInOutSegmentPage::onLastHandleXChanged);
+  ret = ret && QObject::connect(
+                   m_speed1yFld, &MeasuredDoubleLineEdit::editingFinished,  //
+                   this, &SpeedInOutSegmentPage::onLastHandleYChanged);
+  ret = ret && QObject::connect(
+                   m_lastSpeedFld, &MeasuredDoubleLineEdit::editingFinished,  //
+                   this, &SpeedInOutSegmentPage::onLastSpeedChanged);
 
   assert(ret);
 }
@@ -1038,20 +1045,31 @@ FunctionSegmentViewer::FunctionSegmentViewer(QWidget *parent,
 
   //---- signal-slot connections
   bool ret = true;
-  ret      = ret && connect(m_typeCombo, SIGNAL(currentIndexChanged(int)),
-                       m_parametersPanel, SLOT(setCurrentIndex(int)));
-  ret = ret && connect(m_typeCombo, SIGNAL(activated(int)), this,
-                       SLOT(onSegmentTypeChanged(int)));
-  ret = ret && connect(applyButton, SIGNAL(clicked()), this,
-                       SLOT(onApplyButtonPressed()));
-  ret = ret && connect(m_prevCurveButton, SIGNAL(clicked()), this,
-                       SLOT(onPrevCurveButtonPressed()));
-  ret = ret && connect(m_nextCurveButton, SIGNAL(clicked()), this,
-                       SLOT(onNextCurveButtonPressed()));
-  ret = ret && connect(m_prevLinkButton, SIGNAL(clicked()), this,
-                       SLOT(onPrevLinkButtonPressed()));
-  ret = ret && connect(m_nextLinkButton, SIGNAL(clicked()), this,
-                       SLOT(onNextLinkButtonPressed()));
+
+  ret =
+      ret &&
+      QObject::connect<void (QComboBox::*)(int), void (QStackedWidget::*)(int)>(
+          m_typeCombo, &QComboBox::currentIndexChanged,  //
+          m_parametersPanel, &QStackedWidget::setCurrentIndex);
+  ret = ret && QObject::connect<void (QComboBox::*)(int),
+                                void (FunctionSegmentViewer::*)(int)>(
+                   m_typeCombo, &QComboBox::activated,  //
+                   this, &FunctionSegmentViewer::onSegmentTypeChanged);
+  ret = ret &&
+        QObject::connect(applyButton, &QPushButton::clicked,  //
+                         this, &FunctionSegmentViewer::onApplyButtonPressed);
+  ret = ret && QObject::connect(
+                   m_prevCurveButton, &QPushButton::clicked,  //
+                   this, &FunctionSegmentViewer::onPrevCurveButtonPressed);
+  ret = ret && QObject::connect(
+                   m_nextCurveButton, &QPushButton::clicked,  //
+                   this, &FunctionSegmentViewer::onNextCurveButtonPressed);
+  ret = ret &&
+        QObject::connect(m_prevLinkButton, &QPushButton::clicked,  //
+                         this, &FunctionSegmentViewer::onPrevLinkButtonPressed);
+  ret = ret &&
+        QObject::connect(m_nextLinkButton, &QPushButton::clicked,  //
+                         this, &FunctionSegmentViewer::onNextLinkButtonPressed);
   assert(ret);
 
   m_sheet = sheet;
@@ -1059,8 +1077,10 @@ FunctionSegmentViewer::FunctionSegmentViewer(QWidget *parent,
 }
 
 FunctionSegmentViewer::~FunctionSegmentViewer() {
-  if (m_curve) m_curve->release();
-  m_curve = 0;
+  if (m_curve) {
+    m_curve->release();
+    m_curve = 0;
+  }
 }
 
 void FunctionSegmentViewer::setSegment(TDoubleParam *curve, int segmentIndex) {

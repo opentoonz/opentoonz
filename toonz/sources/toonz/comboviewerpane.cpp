@@ -173,20 +173,20 @@ ComboViewerPanel::ComboViewerPanel(QWidget *parent, Qt::WFlags flags)
   bool ret = true;
 
   // When zoom changed, only if the viewer is active, change window title.
-  ret = connect(m_sceneViewer, SIGNAL(onZoomChanged()),
-                SLOT(changeWindowTitle()));
-  ret = ret && connect(m_sceneViewer, SIGNAL(previewToggled()),
-                       SLOT(changeWindowTitle()));
-  ret = ret &&
-        connect(m_flipConsole, SIGNAL(playStateChanged(bool)),
-                TApp::instance()->getCurrentFrame(), SLOT(setPlaying(bool)));
-  ret = ret &&
-        connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
-                m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
-  ret = ret && connect(m_sceneViewer, SIGNAL(previewStatusChanged()), this,
-                       SLOT(update()));
-  ret = ret && connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this,
-                       SLOT(onSceneSwitched()));
+  ret = QObject::connect(m_sceneViewer, SIGNAL(onZoomChanged()),
+                         SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(m_sceneViewer, SIGNAL(previewToggled()),
+                                SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(m_flipConsole, SIGNAL(playStateChanged(bool)),
+                                TApp::instance()->getCurrentFrame(),
+                                SLOT(setPlaying(bool)));
+  ret = ret && QObject::connect(
+                   m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
+                   m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
+  ret = ret && QObject::connect(m_sceneViewer, SIGNAL(previewStatusChanged()),
+                                this, SLOT(update()));
+  ret = ret && QObject::connect(app->getCurrentScene(), SIGNAL(sceneSwitched()),
+                                this, SLOT(onSceneSwitched()));
   assert(ret);
 
   // note: initializeTitleBar() refers to m_sceneViewer
@@ -250,8 +250,8 @@ void ComboViewerPanel::addShowHideContextMenu(QMenu *menu) {
   showHideActGroup->addAction(toolOptionsSHAct);
   showHideActGroup->addAction(flipConsoleSHAct);
 
-  connect(showHideActGroup, SIGNAL(triggered(QAction *)), this,
-          SLOT(onShowHideActionTriggered(QAction *)));
+  QObject::connect(showHideActGroup, SIGNAL(triggered(QAction *)), this,
+                   SLOT(onShowHideActionTriggered(QAction *)));
 
   showHideMenu->addSeparator();
   showHideMenu->addAction(CommandManager::instance()->getAction(MI_ViewCamera));
@@ -351,43 +351,44 @@ void ComboViewerPanel::showEvent(QShowEvent *) {
   - set the marker
   - update key frames
   */
-  ret =
-      connect(xshHandle, SIGNAL(xsheetChanged()), this, SLOT(onSceneChanged()));
-  ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this,
-                       SLOT(onSceneChanged()));
-  ret = ret && connect(sceneHandle, SIGNAL(sceneChanged()), this,
-                       SLOT(onSceneChanged()));
+  ret = QObject::connect(xshHandle, SIGNAL(xsheetChanged()), this,
+                         SLOT(onSceneChanged()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                                SLOT(onSceneChanged()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(sceneChanged()), this,
+                                SLOT(onSceneChanged()));
 
   /*!
   changeWindowTitle(): called when the scene / level / frame is changed
   - chenge the title text
   */
-  ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
-                       SLOT(changeWindowTitle()));
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this,
-                       SLOT(changeWindowTitle()));
-  ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this,
-                       SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
+                                SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                                SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(frameHandle, SIGNAL(frameSwitched()), this,
+                                SLOT(changeWindowTitle()));
   // onXshLevelSwitched(TXshLevel*)： changeWindowTitle() + updateFrameRange()
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-                       SLOT(onXshLevelSwitched(TXshLevel *)));
+  ret = ret &&
+        QObject::connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)),
+                         this, SLOT(onXshLevelSwitched(TXshLevel *)));
 
   // updateFrameRange(): update the frame slider's range
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this,
-                       SLOT(updateFrameRange()));
+  ret = ret && QObject::connect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                                SLOT(updateFrameRange()));
 
   // onFrameTypeChanged(): reset the marker positions in the flip console
-  ret = ret && connect(frameHandle, SIGNAL(frameTypeChanged()), this,
-                       SLOT(onFrameTypeChanged()));
+  ret = ret && QObject::connect(frameHandle, SIGNAL(frameTypeChanged()), this,
+                                SLOT(onFrameTypeChanged()));
 
   // onFrameChanged(): update the flipconsole according to the current frame
-  ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this,
-                       SLOT(onFrameChanged()));
+  ret = ret && QObject::connect(frameHandle, SIGNAL(frameSwitched()), this,
+                                SLOT(onFrameChanged()));
 
-  ret = ret && connect(app->getCurrentTool(), SIGNAL(toolSwitched()),
-                       m_sceneViewer, SLOT(onToolSwitched()));
-  ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
-                       SLOT(onPreferenceChanged()));
+  ret = ret && QObject::connect(app->getCurrentTool(), SIGNAL(toolSwitched()),
+                                m_sceneViewer, SLOT(onToolSwitched()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(preferenceChanged()),
+                                m_flipConsole, SLOT(onPreferenceChanged()));
   m_flipConsole->onPreferenceChanged();
 
   assert(ret);
@@ -403,12 +404,12 @@ void ComboViewerPanel::showEvent(QShowEvent *) {
 
 void ComboViewerPanel::hideEvent(QHideEvent *) {
   TApp *app = TApp::instance();
-  disconnect(app->getCurrentScene());
-  disconnect(app->getCurrentLevel());
-  disconnect(app->getCurrentFrame());
-  disconnect(app->getCurrentObject());
-  disconnect(app->getCurrentXsheet());
-  disconnect(app->getCurrentTool());
+  QObject::disconnect(app->getCurrentScene());
+  QObject::disconnect(app->getCurrentLevel());
+  QObject::disconnect(app->getCurrentFrame());
+  QObject::disconnect(app->getCurrentObject());
+  QObject::disconnect(app->getCurrentXsheet());
+  QObject::disconnect(app->getCurrentTool());
 
   m_flipConsole->setActive(false);
 }
@@ -431,12 +432,14 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
                                           ":Resources/safearea_on.png");
   safeAreaButton->setToolTip(tr("Safe Area (Right Click to Select)"));
   titleBar->add(QPoint(x, 1), safeAreaButton);
-  ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
-                       CommandManager::instance()->getAction(MI_SafeArea),
-                       SLOT(trigger()));
-  ret = ret && connect(CommandManager::instance()->getAction(MI_SafeArea),
-                       SIGNAL(triggered(bool)), safeAreaButton,
-                       SLOT(setPressed(bool)));
+  ret = ret &&
+        QObject::connect(safeAreaButton, SIGNAL(toggled(bool)),
+                         CommandManager::instance()->getAction(MI_SafeArea),
+                         SLOT(trigger()));
+  ret = ret &&
+        QObject::connect(CommandManager::instance()->getAction(MI_SafeArea),
+                         SIGNAL(triggered(bool)), safeAreaButton,
+                         SLOT(setPressed(bool)));
   // initialize state
   safeAreaButton->setPressed(
       CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
@@ -447,11 +450,13 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   button->setToolTip(tr("Field Guide"));
   x += 5 + iconWidth;
   titleBar->add(QPoint(x, 1), button);
-  ret = ret && connect(button, SIGNAL(toggled(bool)),
-                       CommandManager::instance()->getAction(MI_FieldGuide),
-                       SLOT(trigger()));
-  ret = ret && connect(CommandManager::instance()->getAction(MI_FieldGuide),
-                       SIGNAL(triggered(bool)), button, SLOT(setPressed(bool)));
+  ret = ret &&
+        QObject::connect(button, SIGNAL(toggled(bool)),
+                         CommandManager::instance()->getAction(MI_FieldGuide),
+                         SLOT(trigger()));
+  ret = ret && QObject::connect(
+                   CommandManager::instance()->getAction(MI_FieldGuide),
+                   SIGNAL(triggered(bool)), button, SLOT(setPressed(bool)));
   // initialize state
   button->setPressed(
       CommandManager::instance()->getAction(MI_FieldGuide)->isChecked());
@@ -481,8 +486,8 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   x += 18;  // width of 3D.png = 18pixels
   titleBar->add(QPoint(x, 1), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA_REFERENCE);
-  ret = ret && connect(viewModeButtonSet, SIGNAL(selected(int)), m_sceneViewer,
-                       SLOT(setReferenceMode(int)));
+  ret = ret && QObject::connect(viewModeButtonSet, SIGNAL(selected(int)),
+                                m_sceneViewer, SLOT(setReferenceMode(int)));
 
   // freeze button
   button = new TPanelTitleBarButton(titleBar, ":Resources/freeze.png",
@@ -492,8 +497,8 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
 
   button->setToolTip(tr("Freeze"));  // RC1
   titleBar->add(QPoint(x, 1), button);
-  ret = ret && connect(button, SIGNAL(toggled(bool)), m_sceneViewer,
-                       SLOT(freeze(bool)));
+  ret = ret && QObject::connect(button, SIGNAL(toggled(bool)), m_sceneViewer,
+                                SLOT(freeze(bool)));
 
   // preview toggles
   m_previewButton = new TPanelTitleBarButton(
@@ -502,8 +507,8 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   x += 5 + iconWidth;
   titleBar->add(QPoint(x, 1), m_previewButton);
   m_previewButton->setToolTip(tr("Preview"));
-  ret = ret && connect(m_previewButton, SIGNAL(toggled(bool)),
-                       SLOT(enableFullPreview(bool)));
+  ret = ret && QObject::connect(m_previewButton, SIGNAL(toggled(bool)),
+                                SLOT(enableFullPreview(bool)));
 
   m_subcameraPreviewButton =
       new TPanelTitleBarButton(titleBar, ":Resources/subcamera_preview.png",
@@ -513,8 +518,8 @@ void ComboViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
 
   titleBar->add(QPoint(x, 1), m_subcameraPreviewButton);
   m_subcameraPreviewButton->setToolTip(tr("Sub-camera Preview"));
-  ret = ret && connect(m_subcameraPreviewButton, SIGNAL(toggled(bool)),
-                       SLOT(enableSubCameraPreview(bool)));
+  ret = ret && QObject::connect(m_subcameraPreviewButton, SIGNAL(toggled(bool)),
+                                SLOT(enableSubCameraPreview(bool)));
 
   assert(ret);
 }

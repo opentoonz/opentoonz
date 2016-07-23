@@ -42,8 +42,10 @@ PalettesScanPopup::PalettesScanPopup()
   QPushButton *okBtn = new QPushButton(tr("Ok"), this);
   okBtn->setDefault(true);
   QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-  connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkBtnClicked()));
-  connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(okBtn, &QPushButton::clicked,  //
+                   this, &PalettesScanPopup::onOkBtnClicked);
+  QObject::connect(cancelBtn, &QPushButton::clicked,  //
+                   this, &PalettesScanPopup::reject);
   addButtonBarWidget(okBtn, cancelBtn);
 }
 

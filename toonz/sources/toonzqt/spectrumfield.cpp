@@ -333,19 +333,20 @@ SpectrumField::SpectrumField(QWidget *parent, TPixel32 color)
   layout->setSpacing(m_spacing);
 
   m_spectrumbar = new SpectrumBar(this, color);
-  connect(m_spectrumbar, SIGNAL(currentPosChanged(bool)),
-          SLOT(onCurrentPosChanged(bool)));
-  connect(m_spectrumbar, SIGNAL(currentKeyChanged()),
-          SLOT(onCurrentKeyChanged()));
-  connect(m_spectrumbar, SIGNAL(currentKeyAdded(int)), SIGNAL(keyAdded(int)));
-  connect(m_spectrumbar, SIGNAL(currentKeyRemoved(int)),
-          SIGNAL(keyRemoved(int)));
+  QObject::connect(m_spectrumbar, &SpectrumBar::currentPosChanged,  //
+                   this, &SpectrumField::onCurrentPosChanged);      //
+  QObject::connect(m_spectrumbar, &SpectrumBar::currentKeyChanged,  //
+                   this, &SpectrumField::onCurrentKeyChanged);      //
+  QObject::connect(m_spectrumbar, &SpectrumBar::currentKeyAdded,    //
+                   this, &SpectrumField::keyAdded);                 //
+  QObject::connect(m_spectrumbar, &SpectrumBar::currentKeyRemoved,  //
+                   this, &SpectrumField::keyRemoved);               //
 
   layout->addWidget(m_spectrumbar);
 
   m_colorField = new ColorField(this, true, color, 36);
-  connect(m_colorField, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
-          SLOT(onColorChanged(const TPixel32 &, bool)));
+  QObject::connect(m_colorField, &ColorField::colorChanged,  //
+                   this, &SpectrumField::onColorChanged);    //
   layout->addWidget(m_colorField, 0, Qt::AlignLeft);
 
   setLayout(layout);
@@ -378,7 +379,8 @@ void SpectrumField::onColorChanged(const TPixel32 &color, bool isDragging) {
 }
 
 //-----------------------------------------------------------------------------
-/*! Paint an arrow to connect current spectrum key and square color field.
+/*! Paint an arrow to QObject::connect current spectrum key and square color
+ * field.
 */
 void SpectrumField::paintEvent(QPaintEvent *e) {
   int curPos = m_spectrumbar->getCurrentPos();

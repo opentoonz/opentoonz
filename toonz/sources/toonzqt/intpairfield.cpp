@@ -61,10 +61,10 @@ IntPairField::IntPairField(QWidget *parent, bool isMaxRangeLimited)
   setLayout(m_mainLayout);
 
   //---signal-slot connections
-  bool ret = connect(m_leftLineEdit, SIGNAL(editingFinished()),
-                     SLOT(onLeftEditingFinished()));
-  ret = ret && connect(m_rightLineEdit, SIGNAL(editingFinished()),
-                       SLOT(onRightEditingFinished()));
+  bool ret = QObject::connect(m_leftLineEdit, &IntLineEdit::editingFinished,
+                              this, &IntPairField::onLeftEditingFinished);
+  ret = ret && QObject::connect(m_rightLineEdit, &IntLineEdit::editingFinished,
+                                this, &IntPairField::onRightEditingFinished);
 
   assert(ret);
 }

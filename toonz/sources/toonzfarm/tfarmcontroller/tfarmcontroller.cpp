@@ -424,7 +424,8 @@ void FarmServerProxy::removeTask(const QString &taskId) {
 
 //------------------------------------------------------------------------------
 
-static bool doTestConnection(const QString &hostName, const QString &addr, int port) {
+static bool doTestConnection(const QString &hostName, const QString &addr,
+                             int port) {
   TTcpIpClient client;
 
   int sock;
@@ -2296,7 +2297,8 @@ void ControllerService::onStart(int argc, char *argv[]) {
   QEventLoop eventLoop;
 
   // Connect the server's listening finished signal to main loop quit.
-  QObject::connect(m_controller, SIGNAL(finished()), &eventLoop, SLOT(quit()));
+  QObject::connect(m_controller, &FarmController::finished,  //
+                   &eventLoop, &QEventLoop::quit);           //
 
   // Start the TcpIp server's listening thread
   m_controller->start();

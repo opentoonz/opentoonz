@@ -1091,8 +1091,10 @@ ArrowButton::ArrowButton(QWidget *parent, Qt::Orientation orientation,
     else
       setIcon(createQIconPNG("arrow_right"));
   }
-  connect(this, SIGNAL(pressed()), this, SLOT(onPressed()));
-  connect(this, SIGNAL(released()), this, SLOT(onRelease()));
+  QObject::connect(this, &ArrowButton::pressed,  //
+                   this, &ArrowButton::onPressed);
+  QObject::connect(this, &ArrowButton::released,  //
+                   this, &ArrowButton::onRelease);
 }
 
 //-----------------------------------------------------------------------------
@@ -1145,20 +1147,23 @@ ColorSliderBar::ColorSliderBar(QWidget *parent, Qt::Orientation orientation)
   bool isVertical = orientation == Qt::Vertical;
 
   ArrowButton *first = new ArrowButton(this, orientation, true);
-  connect(first, SIGNAL(remove()), this, SLOT(onRemove()));
-  connect(first, SIGNAL(add()), this, SLOT(onAdd()));
+  QObject::connect(first, &ArrowButton::remove, this,
+                   &ColorSliderBar::onRemove);
+  QObject::connect(first, &ArrowButton::add, this, &ColorSliderBar::onAdd);
 
   m_colorSlider = new ColorSlider(orientation, this);
   if (isVertical) m_colorSlider->setMaximumWidth(22);
 
   ArrowButton *last = new ArrowButton(this, orientation, false);
-  connect(last, SIGNAL(add()), this, SLOT(onAdd()));
-  connect(last, SIGNAL(remove()), this, SLOT(onRemove()));
+  QObject::connect(last, &ArrowButton::add, this, &ColorSliderBar::onAdd);
+  QObject::connect(last, &ArrowButton::remove, this, &ColorSliderBar::onRemove);
 
-  connect(m_colorSlider, SIGNAL(valueChanged(int)), this,
-          SIGNAL(valueChanged(int)));
-  connect(m_colorSlider, SIGNAL(sliderReleased()), this,
-          SIGNAL(valueChanged()));
+  QObject::connect<void (ColorSlider::*)(int), void (ColorSliderBar::*)(int)>(
+      m_colorSlider, &ColorSlider::valueChanged,  //
+      this, &ColorSliderBar::valueChanged);
+  QObject::connect<void (ColorSlider::*)(), void (ColorSliderBar::*)()>(
+      m_colorSlider, &ColorSlider::sliderReleased,  //
+      this, &ColorSliderBar::valueChanged);
 
   QBoxLayout *layout;
   if (!isVertical)
@@ -1295,16 +1300,16 @@ ColorChannelControl::ColorChannelControl(ColorChannel channel, QWidget *parent)
   }
   setLayout(mainLayout);
 
-  bool ret =
-      connect(m_field, SIGNAL(editingFinished()), this, SLOT(onFieldChanged()));
-  ret = ret && connect(m_slider, SIGNAL(valueChanged(int)), this,
-                       SLOT(onSliderChanged(int)));
-  ret = ret && connect(m_slider, SIGNAL(sliderReleased()), this,
-                       SLOT(onSliderReleased()));
-  ret = ret &&
-        connect(addButton, SIGNAL(clicked()), this, SLOT(onAddButtonClicked()));
-  ret = ret &&
-        connect(subButton, SIGNAL(clicked()), this, SLOT(onSubButtonClicked()));
+  bool ret = QObject::connect(m_field, &ChannelLineEdit::editingFinished,  //
+                              this, &ColorChannelControl::onFieldChanged);
+  ret = ret && QObject::connect(m_slider, &ColorSlider::valueChanged,  //
+                                this, &ColorChannelControl::onSliderChanged);
+  ret = ret && QObject::connect(m_slider, &ColorSlider::sliderReleased,  //
+                                this, &ColorChannelControl::onSliderReleased);
+  ret = ret && QObject::connect(addButton, &QPushButton::clicked,  //
+                                this, &ColorChannelControl::onAddButtonClicked);
+  ret = ret && QObject::connect(subButton, &QPushButton::clicked,  //
+                                this, &ColorChannelControl::onSubButtonClicked);
   assert(ret);
 }
 
@@ -1468,37 +1473,12 @@ PlainColorPage::PlainColorPage(QWidget *parent)
 
   m_hexagonalColorWheel = new HexagonalColorWheel(this);
 
-  /*
-  QButtonGroup *channelButtonGroup = new QButtonGroup();
-  int i;
-  for (i = 0; i<7; i++)
-  {
-          if (i != (int)eAlpha)
-          {
-                  QRadioButton *button = new QRadioButton(this);
-                  m_modeButtons[i] = button;
-                  if (i == 0) button->setChecked(true);
-                  channelButtonGroup->addButton(button, i);
-                  //slidersLayout->addWidget(button,i,0);
-                  //とりあえず隠す
-                  m_modeButtons[i]->hide();
-          }
-          else
-                  m_modeButtons[i] = 0;
-
-          m_channelControls[i] = new ColorChannelControl((ColorChannel)i, this);
-          m_channelControls[i]->setColor(m_color);
-          bool ret = connect(m_channelControls[i], SIGNAL(colorChanged(const
-  ColorModel &, bool)),
-                  this, SLOT(onControlChanged(const ColorModel &, bool)));
-  }
-  */
   for (int i = 0; i < 7; i++) {
     m_channelControls[i] = new ColorChannelControl((ColorChannel)i, this);
     m_channelControls[i]->setColor(m_color);
-    bool ret = connect(m_channelControls[i],
-                       SIGNAL(colorChanged(const ColorModel &, bool)), this,
-                       SLOT(onControlChanged(const ColorModel &, bool)));
+    bool ret = QObject::connect(m_channelControls[i],
+                                &ColorChannelControl::colorChanged,  //
+                                this, &PlainColorPage::onControlChanged);
   }
 
   QPushButton *wheelShowButton = new QPushButton(tr("Wheel"), this);
@@ -1612,30 +1592,19 @@ PlainColorPage::PlainColorPage(QWidget *parent)
   list << rect().height() / 2 << rect().height() / 2;
   vSplitter->setSizes(list);
 
-  // connect(m_squaredColorWheel, SIGNAL(colorChanged(const ColorModel &,
-  // bool)),
-  //	this, SLOT(onWheelChanged(const ColorModel &, bool)));
-  connect(m_hexagonalColorWheel, SIGNAL(colorChanged(const ColorModel &, bool)),
-          this, SLOT(onWheelChanged(const ColorModel &, bool)));
-  // m_verticalSlider->setMaximumSize(20,150);
-  // connect(m_verticalSlider, SIGNAL(valueChanged(int)), this,
-  // SLOT(onWheelSliderChanged(int)));
-  // connect(m_verticalSlider, SIGNAL(valueChanged()), this,
-  // SLOT(onWheelSliderReleased()));
-  // connect( m_verticalSlider,		SIGNAL(sliderReleased()),	this,
-  // SLOT(onWheelSliderReleased()));
-  // connect(channelButtonGroup, SIGNAL(buttonClicked(int)), this,
-  // SLOT(setWheelChannel(int)));
+  QObject::connect(m_hexagonalColorWheel,
+                   &HexagonalColorWheel::colorChanged,  //
+                   this, &PlainColorPage::onWheelChanged);
 
   // Show/Hideトグルボタン
-  connect(wheelShowButton, SIGNAL(toggled(bool)), wheelFrame,
-          SLOT(setVisible(bool)));
-  connect(hsvShowButton, SIGNAL(toggled(bool)), hsvFrame,
-          SLOT(setVisible(bool)));
-  connect(matteShowButton, SIGNAL(toggled(bool)), matteFrame,
-          SLOT(setVisible(bool)));
-  connect(rgbShowButton, SIGNAL(toggled(bool)), rgbFrame,
-          SLOT(setVisible(bool)));
+  QObject::connect(wheelShowButton, &QPushButton::toggled,  //
+                   wheelFrame, &QFrame::setVisible);        //
+  QObject::connect(hsvShowButton, &QPushButton::toggled,    //
+                   hsvFrame, &QFrame::setVisible);          //
+  QObject::connect(matteShowButton, &QPushButton::toggled,  //
+                   matteFrame, &QFrame::setVisible);        //
+  QObject::connect(rgbShowButton, &QPushButton::toggled,    //
+                   rgbFrame, &QFrame::setVisible);          //
 }
 
 //-----------------------------------------------------------------------------
@@ -1655,22 +1624,9 @@ void PlainColorPage::updateControls() {
     m_channelControls[i]->setColor(m_color);
     m_channelControls[i]->update();
   }
-  /*
-  m_squaredColorWheel->setColor(m_color);
-  m_squaredColorWheel->update();
-  */
 
   m_hexagonalColorWheel->setColor(m_color);
   m_hexagonalColorWheel->update();
-
-  /*
-bool signalsBlocked = m_verticalSlider->blockSignals(true);
-  m_verticalSlider->setColor(m_color);
-int value = m_color.getValue(m_verticalSlider->getChannel());
-m_verticalSlider->setValue(value);
-  m_verticalSlider->update();
-m_verticalSlider->blockSignals(signalsBlocked);
-*/
 }
 
 //-----------------------------------------------------------------------------
@@ -1686,21 +1642,6 @@ void PlainColorPage::setColor(const TColorStyle &style,
   m_signalEnabled = oldSignalEnabled;
 }
 
-//-----------------------------------------------------------------------------
-/*
-void PlainColorPage::setWheelChannel(int channel)
-{
-        assert(0<=channel && channel<7);
-        m_squaredColorWheel->setChannel(channel);
-  bool signalsBlocked = m_verticalSlider->signalsBlocked();
-        m_verticalSlider->blockSignals(true);
-        m_verticalSlider->setChannel((ColorChannel)channel);
-  m_verticalSlider->setRange(0,ChannelMaxValues[channel]);
-  m_verticalSlider->setValue(m_color.getValue((ColorChannel)channel));
-  m_verticalSlider->update();
-  m_verticalSlider->blockSignals(signalsBlocked);
-}
-*/
 //-----------------------------------------------------------------------------
 
 void PlainColorPage::onControlChanged(const ColorModel &color,
@@ -1722,25 +1663,6 @@ void PlainColorPage::onWheelChanged(const ColorModel &color, bool isDragging) {
   }
   if (m_signalEnabled) emit colorChanged(m_color, isDragging);
 }
-
-//-----------------------------------------------------------------------------
-/*
-void PlainColorPage::onWheelSliderChanged(int value)
-{
-        if(m_color.getValue(m_verticalSlider->getChannel()) == value) return;
-        m_color.setValue(m_verticalSlider->getChannel(), value);
-  updateControls();
-  if(m_signalEnabled)
-    emit colorChanged(m_color, true);
-}
-*/
-//-----------------------------------------------------------------------------
-/*
-void PlainColorPage::onWheelSliderReleased()
-{
-  emit colorChanged(m_color, false);
-}
-*/
 
 //*****************************************************************************
 //    StyleChooserPage  implementation
@@ -1865,19 +1787,15 @@ public:
   bool event(QEvent *e) override;
 
   void showEvent(QShowEvent *) override {
-    connect(styleManager(), SIGNAL(patternAdded()), this, SLOT(computeSize()));
+    QObject::connect(styleManager(), &CustomStyleManager::patternAdded,  //
+                     this, &CustomStyleChooserPage::computeSize);
     styleManager()->loadItems();
   }
   void hideEvent(QHideEvent *) override {
-    disconnect(styleManager(), SIGNAL(patternAdded()), this,
-               SLOT(computeSize()));
+    QObject::disconnect(styleManager(), &CustomStyleManager::patternAdded,  //
+                        this, &CustomStyleChooserPage::computeSize);
   }
   bool loadIfNeeded() override { return false; }  // serve?
-  /*
-if(!m_loaded) {loadItems(); m_loaded=true;return true;}
-else return false;
-}
-  */
 
   int getChipCount() const override {
     return styleManager()->getPatternCount();
@@ -1954,12 +1872,13 @@ public:
   bool event(QEvent *e) override;
 
   void showEvent(QShowEvent *) override {
-    connect(styleManager(), SIGNAL(patternAdded()), this, SLOT(computeSize()));
+    QObject::connect(styleManager(), &CustomStyleManager::patternAdded,  //
+                     this, &VectorBrushStyleChooserPage::computeSize);
     styleManager()->loadItems();
   }
   void hideEvent(QHideEvent *) override {
-    disconnect(styleManager(), SIGNAL(patternAdded()), this,
-               SLOT(computeSize()));
+    QObject::disconnect(styleManager(), &CustomStyleManager::patternAdded,  //
+                        this, &VectorBrushStyleChooserPage::computeSize);
   }
   bool loadIfNeeded() override { return false; }
 
@@ -2093,7 +2012,6 @@ void TextureStyleChooserPage::loadTexture(const TFilePath &fp) {
   if (fp == TFilePath()) {
     TRaster32P ras(25, 25);
     TTextureStyle::fillCustomTextureIcon(ras);
-    // ras->fill(TPixel::Blue);
     Texture customText = {ras, QString("")};
 
     m_textures.push_back(customText);
@@ -2309,98 +2227,6 @@ bool SpecialStyleChooserPage::event(QEvent *e) {
   return StyleChooserPage::event(e);
 }
 
-//=============================================================================
-// SettingBox
-//-----------------------------------------------------------------------------
-/*
-SettingBox::SettingBox(QWidget *parent, int index)
-: QWidget(parent)
-, m_index(index)
-, m_style(0)
-{
-        QHBoxLayout* hLayout = new QHBoxLayout(this);
-        hLayout->setSpacing(5);
-        hLayout->setMargin(0);
-        hLayout->addSpacing(10);
-        m_name = new QLabel(this);
-        m_name->setFixedSize(82,20);
-        m_name->setStyleSheet("border: 0px;");
-        hLayout->addWidget(m_name,0);
-        m_doubleField = new DoubleField(this, true);
-        hLayout->addWidget(m_doubleField,1);
-        hLayout->addSpacing(10);
-        bool ret = connect(m_doubleField, SIGNAL(valueChanged(bool)), this,
-SLOT(onValueChanged(bool)));
-  assert(ret);
-        setLayout(hLayout);
-        setFixedHeight(22);
-}
-
-//-----------------------------------------------------------------------------
-
-void SettingBox::setParameters(TColorStyle* cs)
-{
-        if(!cs)
-        {
-                m_style = cs;
-                return;
-        }
-        if(cs->getParamCount() == 0 || m_index<0 ||
-cs->getParamCount()<=m_index)
-                return;
-        QString paramName = cs->getParamNames(m_index);
-        m_name->setText(paramName);
-   double newValue = cs->getParamValue(TColorStyle::double_tag(), m_index);
-        double value = m_doubleField->getValue();
-        m_style = cs;
-        if(value != newValue)
-        {
-                double min=0, max=1;
-                cs->getParamRange(m_index,min,max);
-                m_doubleField->setValues(newValue, min, max);
-        }
-        TCleanupStyle* cleanupStyle = dynamic_cast<TCleanupStyle*>(cs);
-        if(paramName == "Contrast" && cleanupStyle)
-        {
-                if(!cleanupStyle->isContrastEnabled())
-                        m_doubleField->setEnabled(false);
-                else
-                        m_doubleField->setEnabled(true);
-        }
-        update();
-}
-
-//-----------------------------------------------------------------------------
-
-void SettingBox::setColorStyleParam(double value, bool isDragging)
-{
-  TColorStyle* style = m_style;
-  assert(style && m_index < style->getParamCount());
-
-  double min = 0.0, max = 1.0;
-  style->getParamRange(m_index, min, max);
-
-  style->setParamValue(m_index, tcrop(value, min, max));
-
-  emit valueChanged(*style, isDragging);
-}
-
-//-----------------------------------------------------------------------------
-
-void SettingBox::onValueChanged(bool isDragging)
-{
-        if(!m_style || m_style->getParamCount() == 0)
-                return;
-
-        double value = m_doubleField->getValue();
-        if(isDragging && m_style->getParamValue(TColorStyle::double_tag(),
-m_index) == value)
-                return;
-
-        setColorStyleParam(value, isDragging);
-}
-*/
-
 //*****************************************************************************
 //    SettingsPage  implementation
 //*****************************************************************************
@@ -2444,8 +2270,8 @@ SettingsPage::SettingsPage(QWidget *parent)
 
     hLayout->addStretch();
 
-    ret = connect(m_autoFillCheckBox, SIGNAL(stateChanged(int)), this,
-                  SLOT(onAutofillChanged()));
+    ret = QObject::connect(m_autoFillCheckBox, &QCheckBox::stateChanged,  //
+                           this, &SettingsPage::onAutofillChanged);
     assert(ret);
   }
 
@@ -2511,8 +2337,8 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
         QCheckBox *checkBox = new QCheckBox;
         m_paramsLayout->addWidget(checkBox, p, 1);
 
-        ret = QObject::connect(checkBox, SIGNAL(toggled(bool)), this,
-                               SLOT(onValueChanged())) &&
+        ret = QObject::connect(checkBox, &QCheckBox::toggled,  //
+                               this, &SettingsPage::onValueChanged) &&
               ret;
 
         break;
@@ -2527,8 +2353,8 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
 
         intField->setRange(min, max);
 
-        ret = QObject::connect(intField, SIGNAL(valueChanged(bool)), this,
-                               SLOT(onValueChanged(bool))) &&
+        ret = QObject::connect(intField, &DVGui::IntField::valueChanged,  //
+                               this, &SettingsPage::onValueChanged) &&
               ret;
 
         break;
@@ -2543,8 +2369,10 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
 
         comboBox->addItems(items);
 
-        ret = QObject::connect(comboBox, SIGNAL(currentIndexChanged(int)), this,
-                               SLOT(onValueChanged())) &&
+        ret = QObject::connect<void (QComboBox::*)(int),
+                               void (SettingsPage::*)(bool)>(
+                  comboBox, &QComboBox::currentIndexChanged,  //
+                  this, &SettingsPage::onValueChanged) &&
               ret;
 
         break;
@@ -2559,9 +2387,10 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
 
         doubleField->setRange(min, max);
 
-        ret = QObject::connect(doubleField, SIGNAL(valueChanged(bool)), this,
-                               SLOT(onValueChanged(bool))) &&
-              ret;
+        ret =
+            QObject::connect(doubleField, &DVGui::DoubleField::valueChanged,  //
+                             this, &SettingsPage::onValueChanged) &&
+            ret;
 
         break;
       }
@@ -2580,8 +2409,9 @@ void SettingsPage::setStyle(const TColorStyleP &editedStyle) {
             editedStyle->getParamValue(TColorStyle::TFilePath_tag(), p)
                 .getWideString()));
 
-        ret = QObject::connect(fileField, SIGNAL(pathChanged()), this,
-                               SLOT(onValueChanged())) &&
+        // FIXME: arg type missmatch
+        ret = QObject::connect(fileField, SIGNAL(pathChanged()),  //
+                               this, SLOT(onValueChanged(bool))) &&
               ret;
 
         break;
@@ -2856,27 +2686,27 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
   /* ------- signal-slot connections ------- */
 
   bool ret = true;
-  ret      = ret && connect(m_styleBar, SIGNAL(currentChanged(int)), this,
-                       SLOT(setPage(int)));
-  ret = ret && connect(m_colorParameterSelector, SIGNAL(colorParamChanged()),
-                       this, SLOT(onColorParamChanged()));
+
+  ret = ret && QObject::connect(m_styleBar, &DVGui::TabBar::currentChanged,  //
+                                this, &StyleEditor::setPage);
+  ret = ret && QObject::connect(m_colorParameterSelector,
+                                &ColorParameterSelector::colorParamChanged,  //
+                                this, &StyleEditor::onColorParamChanged);
+  ret = ret && QObject::connect(m_textureStylePage,
+                                &StyleChooserPage::styleSelected,  //
+                                this, &StyleEditor::selectStyle);
+  ret = ret && QObject::connect(m_customStylePage,
+                                &StyleChooserPage::styleSelected,  //
+                                this, &StyleEditor::selectStyle);
+  ret = ret && QObject::connect(m_vectorBrushesStylePage,
+                                &StyleChooserPage::styleSelected,  //
+                                this, &StyleEditor::selectStyle);
   ret = ret &&
-        connect(m_textureStylePage, SIGNAL(styleSelected(const TColorStyle &)),
-                this, SLOT(selectStyle(const TColorStyle &)));
+        QObject::connect(m_settingsPage, &SettingsPage::paramStyleChanged,  //
+                         this, &StyleEditor::onParamStyleChanged);
   ret = ret &&
-        connect(m_specialStylePage, SIGNAL(styleSelected(const TColorStyle &)),
-                this, SLOT(selectStyle(const TColorStyle &)));
-  ret = ret &&
-        connect(m_customStylePage, SIGNAL(styleSelected(const TColorStyle &)),
-                this, SLOT(selectStyle(const TColorStyle &)));
-  ret = ret && connect(m_vectorBrushesStylePage,
-                       SIGNAL(styleSelected(const TColorStyle &)), this,
-                       SLOT(selectStyle(const TColorStyle &)));
-  ret = ret && connect(m_settingsPage, SIGNAL(paramStyleChanged(bool)), this,
-                       SLOT(onParamStyleChanged(bool)));
-  ret = ret && connect(m_plainColorPage,
-                       SIGNAL(colorChanged(const ColorModel &, bool)), this,
-                       SLOT(onColorChanged(const ColorModel &, bool)));
+        QObject::connect(m_plainColorPage, &PlainColorPage::colorChanged,  //
+                         this, &StyleEditor::onColorChanged);
   assert(ret);
 
   /* ------- initial conditions ------- */
@@ -2889,15 +2719,6 @@ StyleEditor::StyleEditor(PaletteController *paletteController, QWidget *parent)
 
 StyleEditor::~StyleEditor() {}
 
-//-----------------------------------------------------------------------------
-/*
-void StyleEditor::setPaletteHandle(TPaletteHandle* paletteHandle)
-{
-        if(m_paletteHandle != paletteHandle)
-                m_paletteHandle = paletteHandle;
-        onStyleSwitched();
-}
-*/
 //-----------------------------------------------------------------------------
 
 QFrame *StyleEditor::createBottomWidget() {
@@ -2951,12 +2772,12 @@ QFrame *StyleEditor::createBottomWidget() {
 
   /* ------ signal-slot connections ------ */
   bool ret = true;
-  ret      = ret && connect(m_applyButton, SIGNAL(clicked()), this,
-                       SLOT(applyButtonClicked()));
-  ret = ret && connect(m_autoButton, SIGNAL(toggled(bool)), this,
-                       SLOT(autoCheckChanged(bool)));
-  ret = ret && connect(m_oldColor, SIGNAL(clicked(const TColorStyle &)), this,
-                       SLOT(onOldStyleClicked(const TColorStyle &)));
+  ret      = ret && QObject::connect(m_applyButton, &QPushButton::clicked,  //
+                                this, &StyleEditor::applyButtonClicked);
+  ret = ret && QObject::connect(m_autoButton, &QPushButton::toggled,  //
+                                this, &StyleEditor::autoCheckChanged);
+  ret = ret && QObject::connect(m_oldColor, &DVGui::StyleSample::clicked,  //
+                                this, &StyleEditor::onOldStyleClicked);
   assert(ret);
 
   return bottomWidget;
@@ -2992,21 +2813,28 @@ void StyleEditor::showEvent(QShowEvent *) {
   m_autoButton->setChecked(m_paletteController->isColorAutoApplyEnabled());
   onStyleSwitched();
   bool ret = true;
-  ret      = ret && connect(m_paletteHandle, SIGNAL(colorStyleSwitched()),
-                       SLOT(onStyleSwitched()));
-  ret = ret && connect(m_paletteHandle, SIGNAL(colorStyleChanged()),
-                       SLOT(onStyleChanged()));
-  ret = ret && connect(m_paletteHandle, SIGNAL(paletteSwitched()), this,
-                       SLOT(onStyleSwitched()));
-  if (m_cleanupPaletteHandle)
-    ret = ret && connect(m_cleanupPaletteHandle, SIGNAL(colorStyleChanged()),
-                         SLOT(onCleanupStyleChanged()));
 
-  ret = ret && connect(m_paletteController, SIGNAL(colorAutoApplyEnabled(bool)),
-                       this, SLOT(enableColorAutoApply(bool)));
-  ret = ret && connect(m_paletteController,
-                       SIGNAL(colorSampleChanged(const TPixel32 &)), this,
-                       SLOT(setColorSample(const TPixel32 &)));
+  ret = ret && QObject::connect(m_paletteHandle,
+                                &TPaletteHandle::colorStyleSwitched,  //
+                                this, &StyleEditor::onStyleSwitched);
+  ret = ret && QObject::connect(m_paletteHandle,
+                                &TPaletteHandle::colorStyleChanged,  //
+                                this, &StyleEditor::onStyleChanged);
+  ret = ret &&
+        QObject::connect(m_paletteHandle, &TPaletteHandle::paletteSwitched,  //
+                         this, &StyleEditor::onStyleSwitched);
+  if (m_cleanupPaletteHandle) {
+    ret = ret && QObject::connect(m_cleanupPaletteHandle,
+                                  &TPaletteHandle::colorStyleChanged,  //
+                                  this, &StyleEditor::onCleanupStyleChanged);
+  }
+
+  ret = ret && QObject::connect(m_paletteController,
+                                &PaletteController::colorAutoApplyEnabled,  //
+                                this, &StyleEditor::enableColorAutoApply);
+  ret = ret && QObject::connect(m_paletteController,
+                                &PaletteController::colorSampleChanged,  //
+                                this, &StyleEditor::setColorSample);
 
   assert(ret);
 }
@@ -3014,9 +2842,9 @@ void StyleEditor::showEvent(QShowEvent *) {
 //-----------------------------------------------------------------------------
 
 void StyleEditor::hideEvent(QHideEvent *) {
-  disconnect(m_paletteHandle);
-  if (m_cleanupPaletteHandle) disconnect(m_cleanupPaletteHandle);
-  disconnect(m_paletteController);
+  QObject::disconnect(m_paletteHandle);
+  if (m_cleanupPaletteHandle) QObject::disconnect(m_cleanupPaletteHandle);
+  QObject::disconnect(m_paletteController);
 }
 
 //-----------------------------------------------------------------------------

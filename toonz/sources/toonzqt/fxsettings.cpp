@@ -192,12 +192,12 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
                                     Qt::AlignRight | Qt::AlignVCenter);
             m_mainLayout->addWidget(field, currentRow, 1);
           }
-          connect(field, SIGNAL(currentParamChanged()), m_paramViewer,
-                  SIGNAL(currentFxParamChanged()));
-          connect(field, SIGNAL(actualParamChanged()), m_paramViewer,
-                  SIGNAL(actualFxParamChanged()));
-          connect(field, SIGNAL(paramKeyToggle()), m_paramViewer,
-                  SIGNAL(paramKeyChanged()));
+          QObject::connect(field, SIGNAL(currentParamChanged()), m_paramViewer,
+                           SIGNAL(currentFxParamChanged()));
+          QObject::connect(field, SIGNAL(actualParamChanged()), m_paramViewer,
+                           SIGNAL(actualFxParamChanged()));
+          QObject::connect(field, SIGNAL(paramKeyToggle()), m_paramViewer,
+                           SIGNAL(paramKeyChanged()));
         }
       }
     } else if (tagName == "label") {
@@ -275,8 +275,8 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
         m_mainLayout = keepMainLay;
         m_mainLayout->addWidget(tmpWidget, currentRow + 1, 0, 1, 2);
         //--- signal-slot connection
-        connect(checkBox, SIGNAL(toggled(bool)), tmpWidget,
-                SLOT(setVisible(bool)));
+        QObject::connect(checkBox, &QCheckBox::toggled,  //
+                         tmpWidget, &QWidget::setVisible);
         checkBox->setChecked(shrink == 1);
         tmpWidget->setVisible(shrink == 1);
       } else
@@ -324,7 +324,8 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
 
       RgbLinkButton *linkBut = new RgbLinkButton(buttonStr, this, ppf1, ppf2);
       linkBut->setFixedHeight(21);
-      connect(linkBut, SIGNAL(clicked()), linkBut, SLOT(onButtonClicked()));
+      QObject::connect(linkBut, &RgbLinkButton::clicked,  //
+                       linkBut, &RgbLinkButton::onButtonClicked);
 
       int currentRow = m_mainLayout->rowCount();
       m_mainLayout->addWidget(linkBut, currentRow, 1,
@@ -401,13 +402,13 @@ void ParamsPage::setPageField(TIStream &is, const TFxP &fx, bool isVertical) {
       if (controller_bpf) {
         /*-- ラベルとWidgetを両方表示/非表示 --*/
         for (int i = 0; i < on_items.size(); i++) {
-          connect(controller_bpf, SIGNAL(toggled(bool)), on_items[i],
-                  SLOT(setVisible(bool)));
+          QObject::connect(controller_bpf, &BoolParamField::toggled,  //
+                           on_items[i], &QWidget::setVisible);
           on_items[i]->hide();
         }
         for (int i = 0; i < off_items.size(); i++) {
-          connect(controller_bpf, SIGNAL(toggled(bool)), off_items[i],
-                  SLOT(setHidden(bool)));
+          QObject::connect(controller_bpf, &BoolParamField::toggled,  //
+                           off_items[i], &QWidget::setHidden);
           off_items[i]->show();
         }
       } else
@@ -489,12 +490,12 @@ void ParamsPage::addWidget(QWidget *field, bool isVertical) {
     ParamField *field = MAKE(this, paramName, param);                          \
     if (!field) return NULL;                                                   \
     m_fields.push_back(field);                                                 \
-    connect(field, SIGNAL(currentParamChanged()), m_paramViewer,               \
-            SIGNAL(currentFxParamChanged()));                                  \
-    connect(field, SIGNAL(actualParamChanged()), m_paramViewer,                \
-            SIGNAL(actualFxParamChanged()));                                   \
-    connect(field, SIGNAL(paramKeyToggle()), m_paramViewer,                    \
-            SIGNAL(paramKeyChanged()));                                        \
+    QObject::connect(field, SIGNAL(currentParamChanged()), m_paramViewer,      \
+                     SIGNAL(currentFxParamChanged()));                         \
+    QObject::connect(field, SIGNAL(actualParamChanged()), m_paramViewer,       \
+                     SIGNAL(actualFxParamChanged()));                          \
+    QObject::connect(field, SIGNAL(paramKeyToggle()), m_paramViewer,           \
+                     SIGNAL(paramKeyChanged()));                               \
     return field;                                                              \
   }
 
@@ -720,7 +721,8 @@ ParamsPageSet::ParamsPageSet(QWidget *parent, Qt::WFlags flags)
   }
   setLayout(mainLayout);
 
-  connect(m_tabBar, SIGNAL(currentChanged(int)), this, SLOT(setPage(int)));
+  QObject::connect(m_tabBar, &TabBar::currentChanged,  //
+                   this, &ParamsPageSet::setPage);
 
   m_helpButton->hide();
 }
@@ -836,7 +838,8 @@ void ParamsPageSet::createControls(const TFxP &fx, int index) {
     plugin->build(this);
     std::string url = plugin->getUrl();
     if (!url.empty()) {
-      connect(m_helpButton, SIGNAL(pressed()), this, SLOT(openHelpUrl()));
+      QObject::connect(m_helpButton, &QPushButton::pressed,  //
+                       this, &ParamsPageSet::openHelpUrl);
       m_helpButton->show();
       m_helpUrl = url;
     }
@@ -856,7 +859,8 @@ void ParamsPageSet::createControls(const TFxP &fx, int index) {
 
       m_helpFilePath = is.getTagAttribute("help_file");
       if (m_helpFilePath != "") {
-        connect(m_helpButton, SIGNAL(pressed()), this, SLOT(openHelpFile()));
+        QObject::connect(m_helpButton, &QPushButton::pressed,  //
+                         this, &ParamsPageSet::openHelpFile);
         m_helpButton->show();
         /*-- pdfファイルのページ指定など、引数が必要な場合の追加fragmentを取得
          * --*/
@@ -985,8 +989,8 @@ ParamViewer::ParamViewer(QWidget *parent, Qt::WFlags flags)
   }
   setLayout(mainLayout);
 
-  connect(showSwatchButton, SIGNAL(toggled(bool)), this,
-          SIGNAL(showSwatchButtonToggled(bool)));
+  QObject::connect(showSwatchButton, SIGNAL(toggled(bool)), this,
+                   SIGNAL(showSwatchButtonToggled(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -1132,15 +1136,19 @@ FxSettings::FxSettings(QWidget *parent, const TPixel32 &checkCol1,
 
   //---signal-slot connections
   bool ret = true;
-  ret      = ret && connect(m_paramViewer, SIGNAL(currentFxParamChanged()),
-                       SLOT(updateViewer()));
+
   ret = ret &&
-        connect(m_viewer, SIGNAL(pointPositionChanged(int, const TPointD &)),
-                SLOT(onPointChanged(int, const TPointD &)));
-  ret = ret && connect(m_paramViewer, SIGNAL(preferedSizeChanged(QSize)), this,
-                       SLOT(onPreferedSizeChanged(QSize)));
-  ret = ret && connect(m_paramViewer, SIGNAL(showSwatchButtonToggled(bool)),
-                       this, SLOT(onShowSwatchButtonToggled(bool)));
+        QObject::connect(m_paramViewer, &ParamViewer::currentFxParamChanged,  //
+                         this, &FxSettings::updateViewer);
+  ret =
+      ret && QObject::connect(m_viewer, &SwatchViewer::pointPositionChanged,  //
+                              this, &FxSettings::onPointChanged);
+  ret = ret &&
+        QObject::connect(m_paramViewer, &ParamViewer::preferedSizeChanged,  //
+                         this, &FxSettings::onPreferedSizeChanged);
+  ret = ret && QObject::connect(m_paramViewer,
+                                &ParamViewer::showSwatchButtonToggled,  //
+                                this, &FxSettings::onShowSwatchButtonToggled);
   assert(ret);
 
   swatchContainer->hide();
@@ -1222,8 +1230,8 @@ void FxSettings::createToolBar() {
   previewAct->setCheckable(true);
   viewModeActGroup->addAction(previewAct);
   m_toolBar->addAction(previewAct);
-  connect(viewModeActGroup, SIGNAL(triggered(QAction *)),
-          SLOT(onViewModeChanged(QAction *)));
+  QObject::connect(viewModeActGroup, &QActionGroup::triggered,  //
+                   this, &FxSettings::onViewModeChanged);
 
   m_toolBar->addSeparator();
 
@@ -1235,21 +1243,24 @@ void FxSettings::createToolBar() {
   whiteBg->setCheckable(true);
   whiteBg->setChecked(true);
   viewModeGroup->addAction(whiteBg);
-  connect(whiteBg, SIGNAL(triggered()), this, SLOT(setWhiteBg()));
+  QObject::connect(whiteBg, &QAction::triggered,  //
+                   this, &FxSettings::setWhiteBg);
   m_toolBar->addAction(whiteBg);
 
   QAction *blackBg = new QAction(createQIconOnOffPNG("preview_black"),
                                  tr("&Black Background"), m_toolBar);
   blackBg->setCheckable(true);
   viewModeGroup->addAction(blackBg);
-  connect(blackBg, SIGNAL(triggered()), this, SLOT(setBlackBg()));
+  QObject::connect(blackBg, &QAction::triggered,  //
+                   this, &FxSettings::setBlackBg);
   m_toolBar->addAction(blackBg);
 
   m_checkboardBg = new QAction(createQIconOnOffPNG("preview_checkboard"),
                                tr("&Checkered Background"), m_toolBar);
   m_checkboardBg->setCheckable(true);
   viewModeGroup->addAction(m_checkboardBg);
-  connect(m_checkboardBg, SIGNAL(triggered()), this, SLOT(setCheckboardBg()));
+  QObject::connect(m_checkboardBg, &QAction::triggered,  //
+                   this, &FxSettings::setCheckboardBg);
   m_toolBar->addAction(m_checkboardBg);
 
   m_toolBar->addSeparator();
@@ -1269,9 +1280,10 @@ void FxSettings::createToolBar() {
 void FxSettings::setFx(const TFxP &currentFx, const TFxP &actualFx) {
   // disconnecting from the fxChanged() signals avoid useless and dangerous
   // updates!!!
-  if (m_fxHandle)
-    disconnect(m_fxHandle, SIGNAL(fxChanged()), this,
-               SLOT(updateParamViewer()));
+  if (m_fxHandle) {
+    QObject::disconnect(m_fxHandle, &TFxHandle::fxChanged,  //
+                        this, &FxSettings::updateParamViewer);
+  }
 
   TFxP currentFxWithoutCamera = 0;
   if (currentFx && actualFx)
@@ -1298,7 +1310,8 @@ void FxSettings::setFx(const TFxP &currentFx, const TFxP &actualFx) {
   m_viewer->setFx(currentFx, actualFx, frameIndex);
 
   if (m_fxHandle)
-    connect(m_fxHandle, SIGNAL(fxChanged()), this, SLOT(updateParamViewer()));
+    QObject::connect(m_fxHandle, &TFxHandle::fxChanged,  //
+                     this, &FxSettings::updateParamViewer);
 }
 
 //-----------------------------------------------------------------------------
@@ -1393,56 +1406,68 @@ void FxSettings::notifySceneChanged() {
 void FxSettings::showEvent(QShowEvent *event) {
   setCurrentFx();
   setCurrentFrame();
-  connect(m_frameHandle, SIGNAL(frameSwitched()), SLOT(setCurrentFrame()));
+  QObject::connect(m_frameHandle, &TFrameHandle::frameSwitched, this,
+                   &FxSettings::setCurrentFrame);
   if (m_fxHandle) {
-    connect(m_paramViewer, SIGNAL(actualFxParamChanged()), m_fxHandle,
-            SIGNAL(fxChanged()));
-    connect(m_fxHandle, SIGNAL(fxChanged()), SLOT(updateParamViewer()));
-    connect(m_fxHandle, SIGNAL(fxSettingsShouldBeSwitched()),
-            SLOT(setCurrentFx()));
+    QObject::connect(m_paramViewer, &ParamViewer::actualFxParamChanged,  //
+                     m_fxHandle, &TFxHandle::fxChanged);
+    QObject::connect(m_fxHandle, &TFxHandle::fxChanged,  //
+                     this, &FxSettings::updateParamViewer);
+    QObject::connect(m_fxHandle, &TFxHandle::fxSettingsShouldBeSwitched, this,
+                     &FxSettings::setCurrentFx);
   }
   if (m_sceneHandle) {
-    connect(m_sceneHandle, SIGNAL(sceneChanged()), this,
-            SLOT(notifySceneChanged()));
-    connect(m_sceneHandle, SIGNAL(sceneSwitched()), this,
-            SLOT(setCurrentScene()));
+    QObject::connect(m_sceneHandle, &TSceneHandle::sceneChanged,  //
+                     this, &FxSettings::notifySceneChanged);
+    QObject::connect(m_sceneHandle, &TSceneHandle::sceneSwitched,  //
+                     this, &FxSettings::setCurrentScene);
   }
-  if (m_xsheetHandle)
-    connect(m_xsheetHandle, SIGNAL(xsheetChanged()), SLOT(setCurrentFx()));
-  if (m_levelHandle)
-    connect(m_levelHandle, SIGNAL(xshLevelChanged()), SLOT(setCurrentFx()));
-  if (m_objectHandle)
-    connect(m_objectHandle, SIGNAL(objectChanged(bool)), SLOT(setCurrentFx()));
+  if (m_xsheetHandle) {
+    QObject::connect(m_xsheetHandle, &TXsheetHandle::xsheetChanged,  //
+                     this, &FxSettings::setCurrentFx);
+  }
+  if (m_levelHandle) {
+    QObject::connect(m_levelHandle, &TXshLevelHandle::xshLevelChanged,  //
+                     this, &FxSettings::setCurrentFx);
+  }
+  if (m_objectHandle) {
+    QObject::connect(m_objectHandle, &TObjectHandle::objectChanged,  //
+                     this, &FxSettings::setCurrentFx);
+  }
 }
 
 //-----------------------------------------------------------------------------
 
 void FxSettings::hideEvent(QHideEvent *) {
   setFx(0, 0);
-  disconnect(m_frameHandle, SIGNAL(frameSwitched()), this,
-             SLOT(setCurrentFrame()));
+  QObject::disconnect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                      this, &FxSettings::setCurrentFrame);
   if (m_fxHandle) {
-    disconnect(m_fxHandle, SIGNAL(fxChanged()), this, SLOT(setCurrentFx()));
-    disconnect(m_fxHandle, SIGNAL(fxChanged()), this,
-               SLOT(updateParamViewer()));
-    disconnect(m_fxHandle, SIGNAL(fxSettingsShouldBeSwitched()), this,
-               SLOT(setCurrentFx()));
+    QObject::disconnect(m_fxHandle, &TFxHandle::fxChanged,  //
+                        this, &FxSettings::setCurrentFx);
+    QObject::disconnect(m_fxHandle, &TFxHandle::fxChanged,  //
+                        this, &FxSettings::updateParamViewer);
+    QObject::disconnect(m_fxHandle, &TFxHandle::fxSettingsShouldBeSwitched,  //
+                        this, &FxSettings::setCurrentFx);
   }
   if (m_sceneHandle) {
-    disconnect(m_sceneHandle, SIGNAL(sceneChanged()), this,
-               SLOT(notifySceneChanged()));
-    disconnect(m_sceneHandle, SIGNAL(sceneSwitched()), this,
-               SLOT(setCurrentScene()));
+    QObject::disconnect(m_sceneHandle, &TSceneHandle::sceneChanged,  //
+                        this, &FxSettings::notifySceneChanged);
+    QObject::disconnect(m_sceneHandle, &TSceneHandle::sceneSwitched,  //
+                        this, &FxSettings::setCurrentScene);
   }
-  if (m_xsheetHandle)
-    disconnect(m_xsheetHandle, SIGNAL(xsheetChanged()), this,
-               SLOT(setCurrentFx()));
-  if (m_levelHandle)
-    disconnect(m_levelHandle, SIGNAL(xshLevelChanged()), this,
-               SLOT(setCurrentFx()));
-  if (m_objectHandle)
-    disconnect(m_objectHandle, SIGNAL(objectChanged(bool)), this,
-               SLOT(setCurrentFx()));
+  if (m_xsheetHandle) {
+    QObject::disconnect(m_xsheetHandle, &TXsheetHandle::xsheetChanged,  //
+                        this, &FxSettings::setCurrentFx);
+  }
+  if (m_levelHandle) {
+    QObject::disconnect(m_levelHandle, &TXshLevelHandle::xshLevelChanged,  //
+                        this, &FxSettings::setCurrentFx);
+  }
+  if (m_objectHandle) {
+    QObject::disconnect(m_objectHandle, &TObjectHandle::objectChanged,  //
+                        this, &FxSettings::setCurrentFx);
+  }
 }
 
 //-----------------------------------------------------------------------------

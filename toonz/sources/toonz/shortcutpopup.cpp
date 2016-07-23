@@ -170,9 +170,7 @@ void ShortcutViewer::enterEvent(QEvent *event) {
 
 //-----------------------------------------------------------------------------
 
-void ShortcutViewer::leaveEvent(QEvent *event) {
-  update();
-}
+void ShortcutViewer::leaveEvent(QEvent *event) { update(); }
 
 //=============================================================================
 // ShortcutTree
@@ -214,7 +212,7 @@ ShortcutTree::ShortcutTree(QWidget *parent) : QTreeWidget(parent) {
 
   sortItems(0, Qt::AscendingOrder);
 
-  connect(
+  QObject::connect(
       this, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
       this, SLOT(onCurrentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
 }
@@ -387,13 +385,14 @@ ShortcutPopup::ShortcutPopup()
     m_topLayout->addLayout(bottomLayout, 0);
   }
 
-  connect(m_list, SIGNAL(actionSelected(QAction *)), m_sViewer,
-          SLOT(setAction(QAction *)));
+  QObject::connect(m_list, SIGNAL(actionSelected(QAction *)), m_sViewer,
+                   SLOT(setAction(QAction *)));
 
-  connect(m_removeBtn, SIGNAL(clicked()), m_sViewer, SLOT(removeShortcut()));
+  QObject::connect(m_removeBtn, SIGNAL(clicked()), m_sViewer,
+                   SLOT(removeShortcut()));
 
-  connect(m_sViewer, SIGNAL(shortcutChanged()), m_list,
-          SLOT(onShortcutChanged()));
+  QObject::connect(m_sViewer, SIGNAL(shortcutChanged()), m_list,
+                   SLOT(onShortcutChanged()));
 
   connect(m_list, SIGNAL(searched(bool)), noSearchResultLabel,
           SLOT(setHidden(bool)));

@@ -1699,8 +1699,8 @@ void FunctionPanel::setFrameHandle(TFrameHandle *frameHandle) {
   if (m_frameHandle) m_frameHandle->disconnect(this);
   m_frameHandle = frameHandle;
   if (isVisible() && m_frameHandle) {
-    connect(m_frameHandle, SIGNAL(frameSwitched()), this,
-            SLOT(onFrameSwitched()));
+    QObject::connect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                     this, &FunctionPanel::onFrameSwitched);       //
     update();
   }
   assert(m_selection);
@@ -1711,8 +1711,8 @@ void FunctionPanel::setFrameHandle(TFrameHandle *frameHandle) {
 
 void FunctionPanel::showEvent(QShowEvent *) {
   if (m_frameHandle)
-    connect(m_frameHandle, SIGNAL(frameSwitched()), this,
-            SLOT(onFrameSwitched()));
+    QObject::connect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                     this, &FunctionPanel::onFrameSwitched);       //
 }
 
 //-----------------------------------------------------------------------------

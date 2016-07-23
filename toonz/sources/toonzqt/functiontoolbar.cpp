@@ -84,16 +84,20 @@ FunctionToolbar::FunctionToolbar(QWidget *parent)
   addSeparator();
   addAction(toggleAction);
 
-  bool ret = connect(m_valueFld, SIGNAL(valueChanged()), this,
-                     SLOT(onValueFieldChanged()));
-  ret = ret && connect(m_frameNavigator, SIGNAL(frameSwitched()), this,
-                       SLOT(onNavFrameSwitched()));
-  ret = ret && connect(toggleAction, SIGNAL(triggered()), this,
-                       SIGNAL(numericalColumnToggled()));
+  bool ret = true;
+
+  ret = ret && QObject::connect(
+                   m_valueFld, &DVGui::MeasuredDoubleLineEdit::valueChanged,  //
+                   this, &FunctionToolbar::onValueFieldChanged);
+  ret = ret &&
+        QObject::connect(m_frameNavigator, &FrameNavigator::frameSwitched,  //
+                         this, &FunctionToolbar::onNavFrameSwitched);
+  ret = ret && QObject::connect(toggleAction, &QAction::triggered,  //
+                                this, &FunctionToolbar::numericalColumnToggled);
+  assert(ret);
 
   m_valueFldAction->setVisible(false);
   m_keyframeNavigatorAction->setVisible(false);
-  assert(ret);
 }
 
 //-------------------------------------------------------------------
@@ -203,8 +207,8 @@ void FunctionToolbar::setFrameHandle(TFrameHandle *frameHandle) {
   m_frameHandle = frameHandle;
 
   if (m_frameHandle)
-    connect(m_frameHandle, SIGNAL(frameSwitched()), this,
-            SLOT(onFrameSwitched()));
+    QObject::connect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                     this, &FunctionToolbar::onFrameSwitched);
 
   m_keyframeNavigator->setFrameHandle(frameHandle);
 }
@@ -214,12 +218,13 @@ void FunctionToolbar::setFrameHandle(TFrameHandle *frameHandle) {
 void FunctionToolbar::setSelection(FunctionSelection *selection) {
   if (m_selection != selection) {
     if (m_selection)
-      disconnect(m_selection, SIGNAL(selectionChanged()), this,
-                 SLOT(onSelectionChanged()));
+      QObject::disconnect(m_selection, &FunctionSelection::selectionChanged,
+                          this, &FunctionToolbar::onSelectionChanged);
     m_selection = selection;
-    if (m_selection)
-      connect(m_selection, SIGNAL(selectionChanged()), this,
-              SLOT(onSelectionChanged()));
+    if (m_selection) {
+      QObject::connect(m_selection, &FunctionSelection::selectionChanged,  //
+                       this, &FunctionToolbar::onSelectionChanged);
+    }
   }
 }
 

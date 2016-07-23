@@ -69,16 +69,16 @@ CleanupCameraSettingsWidget::CleanupCameraSettingsWidget() {
   setLayout(mainLay);
 
   bool ret = true;
-  ret      = ret && connect(m_offsX, SIGNAL(editingFinished()),
-                       SIGNAL(cleanupSettingsChanged()));
-  ret = ret && connect(m_offsY, SIGNAL(editingFinished()),
-                       SIGNAL(cleanupSettingsChanged()));
-  ret = ret && connect(m_offsx_lock, SIGNAL(clicked(bool)),
-                       SIGNAL(cleanupSettingsChanged()));
-  ret = ret && connect(m_offsy_lock, SIGNAL(clicked(bool)),
-                       SIGNAL(cleanupSettingsChanged()));
-  ret = ret && connect(m_cameraWidget, SIGNAL(changed()),
-                       SIGNAL(cleanupSettingsChanged()));
+  ret      = ret && QObject::connect(m_offsX, SIGNAL(editingFinished()),
+                                SIGNAL(cleanupSettingsChanged()));
+  ret = ret && QObject::connect(m_offsY, SIGNAL(editingFinished()),
+                                SIGNAL(cleanupSettingsChanged()));
+  ret = ret && QObject::connect(m_offsx_lock, SIGNAL(clicked(bool)),
+                                SIGNAL(cleanupSettingsChanged()));
+  ret = ret && QObject::connect(m_offsy_lock, SIGNAL(clicked(bool)),
+                                SIGNAL(cleanupSettingsChanged()));
+  ret = ret && QObject::connect(m_cameraWidget, SIGNAL(changed()),
+                                SIGNAL(cleanupSettingsChanged()));
   assert(ret);
 }
 

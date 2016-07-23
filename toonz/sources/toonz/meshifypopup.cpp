@@ -668,11 +668,12 @@ MeshifyPopup::MeshifyPopup()
 
   topLayout->addWidget(m_margin, row++, 1);
 
-  connect(m_edgesLength, SIGNAL(valueChanged(bool)), this,
-          SLOT(onParamsChanged(bool)));
-  connect(m_rasterizationDpi, SIGNAL(editingFinished()), this,
-          SLOT(onParamsChanged()));
-  connect(m_margin, SIGNAL(editingFinished()), this, SLOT(onParamsChanged()));
+  QObject::connect(m_edgesLength, SIGNAL(valueChanged(bool)), this,
+                   SLOT(onParamsChanged(bool)));
+  QObject::connect(m_rasterizationDpi, SIGNAL(editingFinished()), this,
+                   SLOT(onParamsChanged()));
+  QObject::connect(m_margin, SIGNAL(editingFinished()), this,
+                   SLOT(onParamsChanged()));
 
   topLayout->setRowStretch(row, 1);
 
@@ -692,7 +693,7 @@ MeshifyPopup::MeshifyPopup()
   m_okBtn = new QPushButton(tr("Apply"));
   addButtonBarWidget(m_okBtn);
 
-  connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
+  QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
 
   // Finally, acquire current selection
   onCellSwitched();
@@ -707,9 +708,10 @@ void MeshifyPopup::showEvent(QShowEvent *se) {
   TFrameHandle *frameHandle   = TApp::instance()->getCurrentFrame();
   TColumnHandle *columnHandle = TApp::instance()->getCurrentColumn();
 
-  connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(onCellSwitched()));
-  connect(columnHandle, SIGNAL(columnIndexSwitched()), this,
-          SLOT(onCellSwitched()));
+  QObject::connect(frameHandle, SIGNAL(frameSwitched()), this,
+                   SLOT(onCellSwitched()));
+  QObject::connect(columnHandle, SIGNAL(columnIndexSwitched()), this,
+                   SLOT(onCellSwitched()));
 
   onCellSwitched();
 }
@@ -722,10 +724,10 @@ void MeshifyPopup::hideEvent(QHideEvent *he) {
   TFrameHandle *frameHandle   = TApp::instance()->getCurrentFrame();
   TColumnHandle *columnHandle = TApp::instance()->getCurrentColumn();
 
-  disconnect(frameHandle, SIGNAL(frameSwitched()), this,
-             SLOT(onCellSwitched()));
-  disconnect(columnHandle, SIGNAL(columnIndexSwitched()), this,
-             SLOT(onCellSwitched()));
+  QObject::disconnect(frameHandle, SIGNAL(frameSwitched()), this,
+                      SLOT(onCellSwitched()));
+  QObject::disconnect(columnHandle, SIGNAL(columnIndexSwitched()), this,
+                      SLOT(onCellSwitched()));
 
   m_viewer->clear();
   m_r = -1, m_c = -1, m_cell = TXshCell();

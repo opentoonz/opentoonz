@@ -496,7 +496,7 @@ namespace XsheetGUI {
 RenameCellField::RenameCellField(QWidget *parent, XsheetViewer *viewer)
     : QLineEdit(parent), m_viewer(viewer), m_row(-1), m_col(-1) {
   setFixedSize(XsheetGUI::ColumnWidth + 3, XsheetGUI::RowHeight + 4);
-  connect(this, SIGNAL(returnPressed()), SLOT(onReturnPressed()));
+  QObject::connect(this, SIGNAL(returnPressed()), SLOT(onReturnPressed()));
   setContextMenuPolicy(Qt::PreventContextMenu);
 }
 
@@ -2147,8 +2147,8 @@ void CellArea::createCellMenu(QMenu &menu, bool isCellSelected) {
           ->listLevels(levels);
       if (!levels.empty()) {
         QMenu *replaceMenu = menu.addMenu(tr("Replace"));
-        connect(replaceMenu, SIGNAL(triggered(QAction *)), this,
-                SLOT(onReplaceByCastedLevel(QAction *)));
+        QObject::connect(replaceMenu, SIGNAL(triggered(QAction *)), this,
+                         SLOT(onReplaceByCastedLevel(QAction *)));
         for (int i = 0; i < (int)levels.size(); i++) {
           if (!levels[i]->getSimpleLevel() && !levels[i]->getChildLevel())
             continue;
@@ -2307,8 +2307,8 @@ void CellArea::createKeyLineMenu(QMenu &menu, int row, int col) {
     actionGroup->addAction(act);
     menu.addAction(act);
   }
-  connect(actionGroup, SIGNAL(triggered(QAction *)), this,
-          SLOT(onStepChanged(QAction *)));
+  QObject::connect(actionGroup, SIGNAL(triggered(QAction *)), this,
+                   SLOT(onStepChanged(QAction *)));
 #endif
 }
 
@@ -2317,9 +2317,10 @@ void CellArea::createKeyLineMenu(QMenu &menu, int row, int col) {
 void CellArea::createNoteMenu(QMenu &menu) {
   QAction *openAct   = menu.addAction(tr("Open Memo"));
   QAction *deleteAct = menu.addAction(tr("Delete Memo"));
-  bool ret = connect(openAct, SIGNAL(triggered()), this, SLOT(openNote()));
-  ret =
-      ret && connect(deleteAct, SIGNAL(triggered()), this, SLOT(deleteNote()));
+  bool ret =
+      QObject::connect(openAct, SIGNAL(triggered()), this, SLOT(openNote()));
+  ret = ret && QObject::connect(deleteAct, SIGNAL(triggered()), this,
+                                SLOT(deleteNote()));
 }
 
 //-----------------------------------------------------------------------------

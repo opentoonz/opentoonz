@@ -35,28 +35,17 @@ public:
   };
 
 public:
-  TRendererStartInvoker() {
-    qRegisterMetaType<StartInvokerRenderData>("StartInvokerRenderData");
-
-    connect(this, SIGNAL(startRender(TRendererImp *, StartInvokerRenderData)),
-            this, SLOT(doStartRender(TRendererImp *, StartInvokerRenderData)),
-            Qt::QueuedConnection);
-  }
-  ~TRendererStartInvoker() {}
-
-  static TRendererStartInvoker *instance() {
-    static TRendererStartInvoker theInstance;
-    return &theInstance;
-  }
+  TRendererStartInvoker();
+  ~TRendererStartInvoker();
 
   void emitStartRender(TRendererImp *renderer, StartInvokerRenderData rd);
 
-Q_SIGNALS:
+  static TRendererStartInvoker *instance();
 
+signals:
   void startRender(TRendererImp *, StartInvokerRenderData);
 
-public Q_SLOTS:
-
+public slots:
   void doStartRender(TRendererImp *, StartInvokerRenderData rd);
 };
 

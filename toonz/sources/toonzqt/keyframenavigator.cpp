@@ -37,36 +37,39 @@ using namespace std;
 KeyframeNavigator::KeyframeNavigator(QWidget *parent, TFrameHandle *frameHandle)
     : QToolBar(parent), m_frameHandle(frameHandle) {
   setLayoutDirection(Qt::LeftToRight);
-
   setIconSize(QSize(15, 23));
-
   setObjectName("keyFrameNavigator");
 
   QIcon previewActIcon = createQIconPNG("prevkey");
   previewActIcon.addFile(QString(":Resources/prevkey_disabled.png"), QSize(),
                          QIcon::Disabled);
   m_actPreviewKey = new QAction(previewActIcon, tr("Previous Key"), this);
-  connect(m_actPreviewKey, SIGNAL(triggered()), SLOT(togglePrevKeyAct()));
+  QObject::connect(m_actPreviewKey, &QAction::triggered,  //
+                   this, &KeyframeNavigator::togglePrevKeyAct);
   addAction(m_actPreviewKey);
 
   m_actKeyNo = new QAction(createQIconPNG("key_no"), tr("Set Key"), this);
-  connect(m_actKeyNo, SIGNAL(triggered()), SLOT(toggleKeyAct()));
+  QObject::connect(m_actKeyNo, &QAction::triggered,  //
+                   this, &KeyframeNavigator::toggleKeyAct);
   addAction(m_actKeyNo);
 
   m_actKeyPartial =
       new QAction(createQIconPNG("key_partial"), tr("Set Key"), this);
-  connect(m_actKeyPartial, SIGNAL(triggered()), SLOT(toggleKeyAct()));
+  QObject::connect(m_actKeyPartial, &QAction::triggered,  //
+                   this, &KeyframeNavigator::toggleKeyAct);
   addAction(m_actKeyPartial);
 
   m_actKeyTotal = new QAction(createQIconPNG("key_total"), tr("Set Key"), this);
-  connect(m_actKeyTotal, SIGNAL(triggered()), SLOT(toggleKeyAct()));
+  QObject::connect(m_actKeyTotal, &QAction::triggered,  //
+                   this, &KeyframeNavigator::toggleKeyAct);
   addAction(m_actKeyTotal);
 
   QIcon nextActIcon = createQIconPNG("nextkey");
   nextActIcon.addFile(QString(":Resources/nextkey_disabled.png"), QSize(),
                       QIcon::Disabled);
   m_actNextKey = new QAction(nextActIcon, tr("Next Key"), this);
-  connect(m_actNextKey, SIGNAL(triggered()), SLOT(toggleNextKeyAct()));
+  QObject::connect(m_actNextKey, &QAction::triggered,  //
+                   this, &KeyframeNavigator::toggleNextKeyAct);
   addAction(m_actNextKey);
 }
 
@@ -113,14 +116,15 @@ void KeyframeNavigator::update() {
 void KeyframeNavigator::showEvent(QShowEvent *e) {
   update();
   if (!m_frameHandle) return;
-  connect(m_frameHandle, SIGNAL(frameSwitched()), this, SLOT(update()));
+  QObject::connect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                   this, &KeyframeNavigator::update);
 }
 
 //-----------------------------------------------------------------------------
 
 void KeyframeNavigator::hideEvent(QHideEvent *e) {
   if (!m_frameHandle) return;
-  disconnect(m_frameHandle);
+  QObject::disconnect(m_frameHandle);
 }
 
 //=============================================================================
@@ -246,8 +250,10 @@ void ViewerKeyframeNavigator::goPrev() {
 
 void ViewerKeyframeNavigator::showEvent(QShowEvent *e) {
   if (!m_objectHandle) return;
-  connect(m_objectHandle, SIGNAL(objectSwitched()), this, SLOT(update()));
-  connect(m_objectHandle, SIGNAL(objectChanged(bool)), this, SLOT(update()));
+  QObject::connect(m_objectHandle, &TObjectHandle::objectSwitched,  //
+                   this, &ViewerKeyframeNavigator::update);
+  QObject::connect(m_objectHandle, &TObjectHandle::objectChanged,  //
+                   this, &ViewerKeyframeNavigator::update);
   KeyframeNavigator::showEvent(e);
 }
 
@@ -255,7 +261,7 @@ void ViewerKeyframeNavigator::showEvent(QShowEvent *e) {
 
 void ViewerKeyframeNavigator::hideEvent(QHideEvent *e) {
   if (!m_objectHandle) return;
-  disconnect(m_objectHandle);
+  QObject::disconnect(m_objectHandle);
   KeyframeNavigator::hideEvent(e);
 }
 
@@ -398,9 +404,12 @@ void PaletteKeyframeNavigator::goPrev() {
 
 void PaletteKeyframeNavigator::showEvent(QShowEvent *e) {
   if (!m_paletteHandle) return;
-  connect(m_paletteHandle, SIGNAL(paletteSwitched()), this, SLOT(update()));
-  connect(m_paletteHandle, SIGNAL(paletteChanged()), this, SLOT(update()));
-  connect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this, SLOT(update()));
+  QObject::connect(m_paletteHandle, &TPaletteHandle::paletteSwitched,  //
+                   this, &PaletteKeyframeNavigator::update);
+  QObject::connect(m_paletteHandle, &TPaletteHandle::paletteChanged,  //
+                   this, &PaletteKeyframeNavigator::update);
+  QObject::connect(m_paletteHandle, &TPaletteHandle::colorStyleSwitched,  //
+                   this, &PaletteKeyframeNavigator::update);
   KeyframeNavigator::showEvent(e);
 }
 
@@ -408,7 +417,7 @@ void PaletteKeyframeNavigator::showEvent(QShowEvent *e) {
 
 void PaletteKeyframeNavigator::hideEvent(QHideEvent *e) {
   if (!m_paletteHandle) return;
-  disconnect(m_paletteHandle);
+  QObject::disconnect(m_paletteHandle);
   KeyframeNavigator::hideEvent(e);
 }
 
@@ -611,7 +620,6 @@ void FxKeyframeNavigator::goPrev() {
   int frame = getPrevKeyframe(fx, getCurrentFrame());
   if (frame < getCurrentFrame()) {
     setCurrentFrame(frame);
-    //		m_fxHandle->notifyFxChanged();
   }
 }
 
@@ -619,8 +627,10 @@ void FxKeyframeNavigator::goPrev() {
 
 void FxKeyframeNavigator::showEvent(QShowEvent *e) {
   if (!m_fxHandle) return;
-  connect(m_fxHandle, SIGNAL(fxSwitched()), this, SLOT(update()));
-  connect(m_fxHandle, SIGNAL(fxChanged()), this, SLOT(update()));
+  QObject::connect(m_fxHandle, &TFxHandle::fxSwitched,  //
+                   this, &FxKeyframeNavigator::update);
+  QObject::connect(m_fxHandle, &TFxHandle::fxChanged,  //
+                   this, &FxKeyframeNavigator::update);
   KeyframeNavigator::showEvent(e);
 }
 
@@ -628,6 +638,6 @@ void FxKeyframeNavigator::showEvent(QShowEvent *e) {
 
 void FxKeyframeNavigator::hideEvent(QHideEvent *e) {
   if (!m_fxHandle) return;
-  disconnect(m_fxHandle);
+  QObject::disconnect(m_fxHandle);
   KeyframeNavigator::hideEvent(e);
 }

@@ -51,7 +51,8 @@ void tipc::SocketController::onDisconnected() {
 //*******************************************************************************
 
 tipc::Server::Server() : m_lock(false) {
-  connect(this, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+  QObject::connect(this, &Server::newConnection, //
+                   this, &Server::onNewConnection);
 
   // Add default parsers
   addParser(new DefaultMessageParser<SHMEM_REQUEST>);
@@ -96,11 +97,15 @@ void tipc::Server::onNewConnection() {
   controller->m_socket         = socket;
 
   // Connect the controller to the socket's signals
-  connect(socket, SIGNAL(readyRead()), controller, SLOT(onReadyRead()));
-  connect(socket, SIGNAL(disconnected()), controller, SLOT(onDisconnected()));
-  connect(socket, SIGNAL(disconnected()), socket, SLOT(deleteLater()));
-  connect(socket, SIGNAL(error(QLocalSocket::LocalSocketError)), this,
-          SLOT(onError(QLocalSocket::LocalSocketError)));
+  QObject::connect(socket, &QLocalSocket::readyRead, controller,
+                   &SocketController::onReadyRead);
+  QObject::connect(socket, &QLocalSocket::disconnected, controller,
+                   &SocketController::onDisconnected);
+  QObject::connect(socket, &QLocalSocket::disconnected, socket,
+                   &QLocalSocket::deleteLater);
+
+  QObject::connect<void (QLocalSocket::*)(QLocalSocket::LocalSocketError)>(
+    socket, &QLocalSocket::error, this, &Server::onError);
 }
 
 //-----------------------------------------------------------------------

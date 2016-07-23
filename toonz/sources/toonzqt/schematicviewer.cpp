@@ -13,6 +13,7 @@
 #include "toonzqt/gutil.h"
 #include "toonzqt/imageutils.h"
 #include "toonzqt/dvscrollwidget.h"
+#include "toonzqt/selection.h"
 
 // TnzLib includes
 #include "toonz/txsheethandle.h"
@@ -77,8 +78,8 @@ SchematicScene::~SchematicScene() { clearAllItems(); }
 
 void SchematicScene::showEvent(QShowEvent *se) {
   TSelectionHandle *selHandle = TSelectionHandle::getCurrent();
-  connect(selHandle, SIGNAL(selectionSwitched(TSelection *, TSelection *)),
-          this, SLOT(onSelectionSwitched(TSelection *, TSelection *)));
+  QObject::connect(selHandle, &TSelectionHandle::selectionSwitched,  //
+                   this, &SchematicScene::onSelectionSwitched);
   clearSelection();
 }
 
@@ -86,8 +87,8 @@ void SchematicScene::showEvent(QShowEvent *se) {
 
 void SchematicScene::hideEvent(QHideEvent *se) {
   TSelectionHandle *selHandle = TSelectionHandle::getCurrent();
-  disconnect(selHandle, SIGNAL(selectionSwitched(TSelection *, TSelection *)),
-             this, SLOT(onSelectionSwitched(TSelection *, TSelection *)));
+  QObject::disconnect(selHandle, &TSelectionHandle::selectionSwitched,  //
+                      this, &SchematicScene::onSelectionSwitched);
 }
 
 //------------------------------------------------------------------
@@ -483,18 +484,19 @@ SchematicViewer::SchematicViewer(QWidget *parent)
   }
   setLayout(mainLayout);
 
-  connect(m_fxScene, SIGNAL(showPreview(TFxP)), this,
-          SIGNAL(showPreview(TFxP)));
-  connect(m_fxScene, SIGNAL(doCollapse(const QList<TFxP> &)), this,
-          SIGNAL(doCollapse(const QList<TFxP> &)));
-  connect(m_stageScene, SIGNAL(doCollapse(QList<TStageObjectId>)), this,
-          SIGNAL(doCollapse(QList<TStageObjectId>)));
-  connect(m_fxScene, SIGNAL(doExplodeChild(const QList<TFxP> &)), this,
-          SIGNAL(doExplodeChild(const QList<TFxP> &)));
-  connect(m_stageScene, SIGNAL(doExplodeChild(QList<TStageObjectId>)), this,
-          SIGNAL(doExplodeChild(QList<TStageObjectId>)));
-  connect(m_stageScene, SIGNAL(editObject()), this, SIGNAL(editObject()));
-  connect(m_fxScene, SIGNAL(editObject()), this, SIGNAL(editObject()));
+  QObject::connect(m_fxScene, SIGNAL(showPreview(TFxP)), this,
+                   SIGNAL(showPreview(TFxP)));
+  QObject::connect(m_fxScene, SIGNAL(doCollapse(const QList<TFxP> &)), this,
+                   SIGNAL(doCollapse(const QList<TFxP> &)));
+  QObject::connect(m_stageScene, SIGNAL(doCollapse(QList<TStageObjectId>)),
+                   this, SIGNAL(doCollapse(QList<TStageObjectId>)));
+  QObject::connect(m_fxScene, SIGNAL(doExplodeChild(const QList<TFxP> &)), this,
+                   SIGNAL(doExplodeChild(const QList<TFxP> &)));
+  QObject::connect(m_stageScene, SIGNAL(doExplodeChild(QList<TStageObjectId>)),
+                   this, SIGNAL(doExplodeChild(QList<TStageObjectId>)));
+  QObject::connect(m_stageScene, SIGNAL(editObject()), this,
+                   SIGNAL(editObject()));
+  QObject::connect(m_fxScene, SIGNAL(editObject()), this, SIGNAL(editObject()));
 
   m_viewer->setScene(m_stageScene);
   m_fxToolbar->hide();
@@ -571,24 +573,28 @@ void SchematicViewer::createActions() {
     QIcon fitSchematicIcon = createQIconOnOffPNG("fit", false);
     m_fitSchematic =
         new QAction(fitSchematicIcon, tr("&Fit to Window"), m_commonToolbar);
-    connect(m_fitSchematic, SIGNAL(triggered()), m_viewer, SLOT(fitScene()));
+    QObject::connect(m_fitSchematic, &QAction::triggered,  //
+                     m_viewer, &SchematicSceneViewer::fitScene);
 
     // Center On
     QIcon centerOnIcon = createQIconOnOffPNG("centerselection", false);
     m_centerOn =
         new QAction(centerOnIcon, tr("&Focus on Current"), m_commonToolbar);
-    connect(m_centerOn, SIGNAL(triggered()), m_viewer, SLOT(centerOnCurrent()));
+    QObject::connect(m_centerOn, &QAction::triggered,  //
+                     m_viewer, &SchematicSceneViewer::centerOnCurrent);
 
     // Reorder schematic
     QIcon reorderIcon = createQIconOnOffPNG("reorder", false);
     m_reorder = new QAction(reorderIcon, tr("&Reorder Nodes"), m_commonToolbar);
-    connect(m_reorder, SIGNAL(triggered()), m_viewer, SLOT(reorderScene()));
+    QObject::connect(m_reorder, &QAction::triggered,  //
+                     m_viewer, &SchematicSceneViewer::reorderScene);
 
     // Normalize schematic schematic
     QIcon normalizeIcon = createQIconOnOffPNG("resetsize", false);
     m_normalize =
         new QAction(normalizeIcon, tr("&Reset Size"), m_commonToolbar);
-    connect(m_normalize, SIGNAL(triggered()), m_viewer, SLOT(normalizeScene()));
+    QObject::connect(m_normalize, &QAction::triggered,  //
+                     m_viewer, &SchematicSceneViewer::normalizeScene);
 
     QIcon nodeSizeIcon = createQIconOnOffPNG(
         m_maximizedNode ? "minimizenodes" : "maximizenodes", false);
@@ -596,29 +602,30 @@ void SchematicViewer::createActions() {
         new QAction(nodeSizeIcon, m_maximizedNode ? tr("&Minimize Nodes")
                                                   : tr("&Maximize Nodes"),
                     m_commonToolbar);
-    connect(m_nodeSize, SIGNAL(triggered()), this, SLOT(changeNodeSize()));
+    QObject::connect(m_nodeSize, &QAction::triggered,  //
+                     this, &SchematicViewer::changeNodeSize);
 
     if (m_fullSchematic) {
       // AddPegbar
       addPegbar           = new QAction(tr("&New Pegbar"), m_stageToolbar);
       QIcon addPegbarIcon = createQIconOnOffPNG("pegbar", false);
       addPegbar->setIcon(addPegbarIcon);
-      connect(addPegbar, SIGNAL(triggered()), m_stageScene,
-              SLOT(onPegbarAdded()));
+      QObject::connect(addPegbar, &QAction::triggered,  //
+                       m_stageScene, &StageSchematicScene::onPegbarAdded);
 
       // AddCamera
       addCamera           = new QAction(tr("&New Camera"), m_stageToolbar);
       QIcon addCameraIcon = createQIconOnOffPNG("camera", false);
       addCamera->setIcon(addCameraIcon);
-      connect(addCamera, SIGNAL(triggered()), m_stageScene,
-              SLOT(onCameraAdded()));
+      QObject::connect(addCamera, &QAction::triggered,  //
+                       m_stageScene, &StageSchematicScene::onCameraAdded);
 
       // AddSpline
       addSpline           = new QAction(tr("&New Motion Path"), m_stageToolbar);
       QIcon addSplineIcon = createQIconOnOffPNG("motionpath", false);
       addSpline->setIcon(addSplineIcon);
-      connect(addSpline, SIGNAL(triggered()), m_stageScene,
-              SLOT(onSplineAdded()));
+      QObject::connect(addSpline, &QAction::triggered,  //
+                       m_stageScene, &StageSchematicScene::onSplineAdded);
 
       // Switch display of stage schematic's output port
       switchPort =
@@ -627,8 +634,9 @@ void SchematicViewer::createActions() {
       switchPort->setChecked(m_stageScene->isShowLetterOnPortFlagEnabled());
       QIcon switchPortIcon = createQIconOnOffPNG("switchport");
       switchPort->setIcon(switchPortIcon);
-      connect(switchPort, SIGNAL(toggled(bool)), m_stageScene,
-              SLOT(onSwitchPortModeToggled(bool)));
+      QObject::connect(switchPort, &QAction::toggled,  //
+                       m_stageScene,
+                       &StageSchematicScene::onSwitchPortModeToggled);
 
       // InsertFx
       insertFx = CommandManager::instance()->getAction("MI_InsertFx");
@@ -648,8 +656,8 @@ void SchematicViewer::createActions() {
           CommandManager::instance()->getAction("A_FxSchematicToggle", true);
       if (m_changeScene) {
         m_changeScene->setIcon(changeSchematicIcon);
-        connect(m_changeScene, SIGNAL(triggered()), this,
-                SLOT(onSceneChanged()));
+        QObject::connect(m_changeScene, &QAction::triggered,  //
+                         this, &SchematicViewer::onSceneChanged);
       } else
         m_changeScene = 0;
     }

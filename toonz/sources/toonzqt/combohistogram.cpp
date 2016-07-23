@@ -277,8 +277,8 @@ ChannelHisto::ChannelHisto(int channelIndex, int *channelValue,
   setLayout(mainLayout);
 
   if (channelIndex == 3) {
-    connect(showAlphaChannelButton, SIGNAL(toggled(bool)), this,
-            SLOT(onShowAlphaButtonToggled(bool)));
+    QObject::connect(showAlphaChannelButton, &QPushButton::toggled,   //
+                     this, &ChannelHisto::onShowAlphaButtonToggled);  //
     onShowAlphaButtonToggled(false);
   }
 }

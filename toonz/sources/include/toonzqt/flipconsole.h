@@ -64,8 +64,9 @@ public:
   void emitNextFrame(int fps) { emit nextFrame(fps); }
 
 signals:
-  void nextFrame(int fps);  // Must be connect with Qt::BlockingQueuedConnection
-                            // connection type.
+  void nextFrame(
+      int fps);  // Must be QObject::connect with Qt::BlockingQueuedConnection
+                 // connection type.
 };
 
 //-----------------------------------------------------------------------------

@@ -279,13 +279,16 @@ LevelCreatePopup::LevelCreatePopup()
 
   //---- signal-slot connections
   bool ret = true;
-  ret      = ret &&
-        connect(m_levelTypeOm, SIGNAL(currentIndexChanged(const QString &)),
-                SLOT(onLevelTypeChanged(const QString &)));
-  ret = ret && connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkBtn()));
-  ret = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+
+  ret = ret && QObject::connect(m_levelTypeOm,
+                                SIGNAL(currentIndexChanged(const QString &)),
+                                SLOT(onLevelTypeChanged(const QString &)));
   ret =
-      ret && connect(applyBtn, SIGNAL(clicked()), this, SLOT(onApplyButton()));
+      ret && QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkBtn()));
+  ret = ret &&
+        QObject::connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  ret = ret && QObject::connect(applyBtn, SIGNAL(clicked()), this,
+                                SLOT(onApplyButton()));
 
   setSizeWidgetEnable(false);
 }

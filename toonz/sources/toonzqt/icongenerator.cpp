@@ -462,15 +462,16 @@ IconRenderer::IconRenderer(const std::string &id, const TDimension &iconSize)
     , m_id(id)
     , m_started(false)
     , m_terminated(false) {
-  connect(this, SIGNAL(started(TThread::RunnableP)), IconGenerator::instance(),
-          SLOT(onStarted(TThread::RunnableP)));
-  connect(this, SIGNAL(finished(TThread::RunnableP)), IconGenerator::instance(),
-          SLOT(onFinished(TThread::RunnableP)));
-  connect(this, SIGNAL(canceled(TThread::RunnableP)), IconGenerator::instance(),
-          SLOT(onCanceled(TThread::RunnableP)), Qt::QueuedConnection);
-  connect(this, SIGNAL(terminated(TThread::RunnableP)),
-          IconGenerator::instance(), SLOT(onTerminated(TThread::RunnableP)),
-          Qt::QueuedConnection);
+  QObject::connect(this, &IconRenderer::started,  //
+                   IconGenerator::instance(), &IconGenerator::onStarted);
+  QObject::connect(this, &IconRenderer::finished,  //
+                   IconGenerator::instance(), &IconGenerator::onFinished);
+  QObject::connect(this, &IconRenderer::canceled,  //
+                   IconGenerator::instance(), &IconGenerator::onCanceled,
+                   Qt::QueuedConnection);
+  QObject::connect(this, &IconRenderer::terminated,  //
+                   IconGenerator::instance(), &IconGenerator::onTerminated,
+                   Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------

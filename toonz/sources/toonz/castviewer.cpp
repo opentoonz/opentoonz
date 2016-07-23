@@ -113,29 +113,31 @@ CastTreeViewer::CastTreeViewer(QWidget *parent)
   // m_treeViewer->setColumnCount(1);
 
   setAcceptDrops(true);
-  connect(this, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this,
-          SLOT(onItemChanged(QTreeWidgetItem *, int)));
-  connect(this,
-          SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-          this, SLOT(onFolderChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
-  connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()), this,
-          SLOT(rebuildCastTree()));
-  connect(TApp::instance()->getCurrentScene(),
-          SIGNAL(castFolderAdded(const TFilePath &)), this,
-          SLOT(onCastFolderAdded(const TFilePath &)));
+  QObject::connect(this, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this,
+                   SLOT(onItemChanged(QTreeWidgetItem *, int)));
+  QObject::connect(
+      this, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
+      this, SLOT(onFolderChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
+  QObject::connect(TApp::instance()->getCurrentScene(), SIGNAL(sceneSwitched()),
+                   this, SLOT(rebuildCastTree()));
+  QObject::connect(TApp::instance()->getCurrentScene(),
+                   SIGNAL(castFolderAdded(const TFilePath &)), this,
+                   SLOT(onCastFolderAdded(const TFilePath &)));
 
-  connect(TApp::instance()->getCurrentScene(), SIGNAL(nameSceneChanged()), this,
-          SLOT(onSceneNameChanged()));
+  QObject::connect(TApp::instance()->getCurrentScene(),
+                   SIGNAL(nameSceneChanged()), this,
+                   SLOT(onSceneNameChanged()));
 
   // Connect all possible changes that can alter the
   // bottom horizontal scrollbar to resize contents...
-  connect(this, SIGNAL(expanded(const QModelIndex &)), this,
-          SLOT(resizeToConts()));
+  QObject::connect(this, SIGNAL(expanded(const QModelIndex &)), this,
+                   SLOT(resizeToConts()));
 
-  connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
-          SLOT(resizeToConts()));
+  QObject::connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
+                   SLOT(resizeToConts()));
 
-  connect(this->model(), SIGNAL(layoutChanged()), this, SLOT(resizeToConts()));
+  QObject::connect(this->model(), SIGNAL(layoutChanged()), this,
+                   SLOT(resizeToConts()));
 
   rebuildCastTree();
 }
@@ -510,20 +512,25 @@ CastBrowser::CastBrowser(QWidget *parent, Qt::WFlags flags)
 
   TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
 
-  connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(refresh()));
-  connect(sceneHandle, SIGNAL(castChanged()), this, SLOT(refresh()));
+  QObject::connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(refresh()));
+  QObject::connect(sceneHandle, SIGNAL(castChanged()), this, SLOT(refresh()));
 
   TXsheetHandle *xhseetHandle = TApp::instance()->getCurrentXsheet();
-  connect(xhseetHandle, SIGNAL(xsheetChanged()), m_itemViewer, SLOT(update()));
+  QObject::connect(xhseetHandle, SIGNAL(xsheetChanged()), m_itemViewer,
+                   SLOT(update()));
 
-  connect(buttonBar, SIGNAL(folderUp()), m_treeViewer, SLOT(folderUp()));
-  connect(buttonBar, SIGNAL(newFolder()), m_treeViewer, SLOT(newFolder()));
+  QObject::connect(buttonBar, SIGNAL(folderUp()), m_treeViewer,
+                   SLOT(folderUp()));
+  QObject::connect(buttonBar, SIGNAL(newFolder()), m_treeViewer,
+                   SLOT(newFolder()));
 
-  connect(m_treeViewer,
-          SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-          this, SLOT(folderChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
+  QObject::connect(
+      m_treeViewer,
+      SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this,
+      SLOT(folderChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
 
-  connect(m_treeViewer, SIGNAL(itemMovedToFolder()), this, SLOT(refresh()));
+  QObject::connect(m_treeViewer, SIGNAL(itemMovedToFolder()), this,
+                   SLOT(refresh()));
 }
 
 //-----------------------------------------------------------------------------

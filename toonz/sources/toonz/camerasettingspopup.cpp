@@ -104,10 +104,11 @@ CameraSettingsPopup::CameraSettingsPopup()
 
   //---- signal-slot connections
   bool ret = true;
-  ret      = ret &&
-        connect(m_cameraSettingsWidget, SIGNAL(changed()), SLOT(onChanged()));
-  ret = ret &&
-        connect(m_nameFld, SIGNAL(editingFinished()), SLOT(onNameChanged()));
+
+  ret = ret && QObject::connect(m_cameraSettingsWidget, SIGNAL(changed()),
+                                SLOT(onChanged()));
+  ret = ret && QObject::connect(m_nameFld, SIGNAL(editingFinished()),
+                                SLOT(onNameChanged()));
   assert(ret);
 }
 
@@ -129,20 +130,21 @@ void CameraSettingsPopup::showEvent(QShowEvent *e) {
   TXshLevelHandle *levelHandle = TApp::instance()->getCurrentLevel();
 
   bool ret = true;
-  ret =
-      ret && connect(sceneHandle, SIGNAL(sceneChanged()), SLOT(updateFields()));
+  ret      = ret && QObject::connect(sceneHandle, SIGNAL(sceneChanged()),
+                                SLOT(updateFields()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(sceneSwitched()),
+                                SLOT(updateFields()));
+  ret = ret && QObject::connect(objectHandle, SIGNAL(objectChanged(bool)),
+                                SLOT(updateFields(bool)));
+  ret = ret && QObject::connect(objectHandle, SIGNAL(objectSwitched()),
+                                SLOT(updateFields()));
+  ret = ret && QObject::connect(xsheetHandle, SIGNAL(xsheetSwitched()),
+                                SLOT(updateFields()));
+  ret = ret && QObject::connect(xsheetHandle, SIGNAL(xsheetChanged()),
+                                SLOT(updateFields()));
   ret = ret &&
-        connect(sceneHandle, SIGNAL(sceneSwitched()), SLOT(updateFields()));
-  ret = ret && connect(objectHandle, SIGNAL(objectChanged(bool)),
-                       SLOT(updateFields(bool)));
-  ret = ret &&
-        connect(objectHandle, SIGNAL(objectSwitched()), SLOT(updateFields()));
-  ret = ret &&
-        connect(xsheetHandle, SIGNAL(xsheetSwitched()), SLOT(updateFields()));
-  ret = ret &&
-        connect(xsheetHandle, SIGNAL(xsheetChanged()), SLOT(updateFields()));
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)),
-                       SLOT(onLevelSwitched(TXshLevel *)));
+        QObject::connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)),
+                         SLOT(onLevelSwitched(TXshLevel *)));
   assert(ret);
 }
 
@@ -162,20 +164,22 @@ void CameraSettingsPopup::hideEvent(QHideEvent *e) {
   TXshLevelHandle *levelHandle = TApp::instance()->getCurrentLevel();
 
   bool ret = true;
-  ret      = ret && disconnect(sceneHandle, SIGNAL(sceneChanged()), this,
-                          SLOT(updateFields()));
-  ret = ret && disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
-                          SLOT(updateFields()));
-  ret = ret && disconnect(objectHandle, SIGNAL(objectChanged(bool)), this,
-                          SLOT(updateFields(bool)));
-  ret = ret && disconnect(objectHandle, SIGNAL(objectSwitched()), this,
-                          SLOT(updateFields()));
-  ret = ret && disconnect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
-                          SLOT(updateFields()));
-  ret = ret && disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
-                          SLOT(updateFields()));
-  ret = ret && disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)),
-                          this, SLOT(onLevelSwitched(TXshLevel *)));
+
+  ret = ret && QObject::disconnect(sceneHandle, SIGNAL(sceneChanged()), this,
+                                   SLOT(updateFields()));
+  ret = ret && QObject::disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                                   SLOT(updateFields()));
+  ret = ret && QObject::disconnect(objectHandle, SIGNAL(objectChanged(bool)),
+                                   this, SLOT(updateFields(bool)));
+  ret = ret && QObject::disconnect(objectHandle, SIGNAL(objectSwitched()), this,
+                                   SLOT(updateFields()));
+  ret = ret && QObject::disconnect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
+                                   SLOT(updateFields()));
+  ret = ret && QObject::disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                                   SLOT(updateFields()));
+  ret = ret &&
+        QObject::disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)),
+                            this, SLOT(onLevelSwitched(TXshLevel *)));
   assert(ret);
 }
 

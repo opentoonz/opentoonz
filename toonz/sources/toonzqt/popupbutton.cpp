@@ -15,14 +15,15 @@ PopupButton::PopupButton(QWidget *parent) : QPushButton(parent), m_index(-1) {
   QMenu *menu = new QMenu(this);
   setMenu(menu);
 
-  connect(this, SIGNAL(clicked(bool)), this, SLOT(showMenu()));
+  QObject::connect(this, &PopupButton::clicked, this, &PopupButton::showMenu);
 }
 
 //--------------------------------------------------------------------------
 
 QAction *PopupButton::addItem(const QString &text) {
   QAction *action = menu()->addAction(text);
-  connect(action, SIGNAL(triggered(bool)), this, SLOT(onIndexChange()));
+  QObject::connect(action, &QAction::triggered,  //
+                   this, &PopupButton::onIndexChange);
   m_actions.push_back(action);
   return action;
 }
@@ -31,7 +32,8 @@ QAction *PopupButton::addItem(const QString &text) {
 
 QAction *PopupButton::addItem(const QIcon &icon, const QString &text) {
   QAction *action = menu()->addAction(icon, text);
-  connect(action, SIGNAL(triggered(bool)), this, SLOT(onIndexChange()));
+  QObject::connect(action, &QAction::triggered,  //
+                   this, &PopupButton::onIndexChange);
   m_actions.push_back(action);
   return action;
 }

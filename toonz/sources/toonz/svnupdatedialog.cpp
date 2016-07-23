@@ -96,8 +96,8 @@ SVNUpdateDialog::SVNUpdateDialog(QWidget *parent, const QString &workingDir,
     m_updateSceneContentsCheckBox->setChecked(false);
     m_updateSceneContentsCheckBox->setText(tr("Get Scene Contents"));
     m_updateSceneContentsCheckBox->hide();
-    connect(m_updateSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
-            SLOT(onUpdateSceneContentsToggled(bool)));
+    QObject::connect(m_updateSceneContentsCheckBox, SIGNAL(toggled(bool)), this,
+                     SLOT(onUpdateSceneContentsToggled(bool)));
 
     checkBoxLayout->addStretch();
     checkBoxLayout->addWidget(m_updateSceneContentsCheckBox);
@@ -115,29 +115,30 @@ SVNUpdateDialog::SVNUpdateDialog(QWidget *parent, const QString &workingDir,
 
   m_updateButton = new QPushButton(tr("Update"));
   m_updateButton->hide();
-  if (m_updateToRevision)
-    connect(m_updateButton, SIGNAL(clicked()), this,
-            SLOT(onUpdateToRevisionButtonClicked()));
-  else
-    connect(m_updateButton, SIGNAL(clicked()), this,
-            SLOT(onUpdateButtonClicked()));
+  if (m_updateToRevision) {
+    QObject::connect(m_updateButton, SIGNAL(clicked()), this,
+                     SLOT(onUpdateToRevisionButtonClicked()));
+  } else {
+    QObject::connect(m_updateButton, SIGNAL(clicked()), this,
+                     SLOT(onUpdateButtonClicked()));
+  }
 
   m_closeButton = new QPushButton(tr("Close"));
   m_closeButton->setEnabled(false);
-  connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
+  QObject::connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
 
   m_cancelButton = new QPushButton(tr("Cancel"));
-  connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(m_updateButton, m_closeButton, m_cancelButton);
 
   // 0. Connect for svn errors (that may occurs everythings)
-  connect(&m_thread, SIGNAL(error(const QString &)), this,
-          SLOT(onError(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(error(const QString &)), this,
+                   SLOT(onError(const QString &)));
 
   // 1. Getting status
-  connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
-          SLOT(onStatusRetrieved(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(statusRetrieved(const QString &)), this,
+                   SLOT(onStatusRetrieved(const QString &)));
   m_thread.getSVNStatus(m_workingDir, m_files, true, false, true);
 }
 
@@ -205,8 +206,8 @@ void SVNUpdateDialog::onStatusRetrieved(const QString &xmlResponse) {
       m_conflictWidget->setFiles(fileswithConflict);
       m_conflictWidget->show();
       adjustSize();
-      connect(m_conflictWidget, SIGNAL(allConflictSetted()), this,
-              SLOT(onConflictSetted()));
+      QObject::connect(m_conflictWidget, SIGNAL(allConflictSetted()), this,
+                       SLOT(onConflictSetted()));
     } else
       updateFiles();
   }
@@ -278,10 +279,10 @@ void SVNUpdateDialog::updateFiles() {
   if (m_nonRecursive) args << "--non-recursive";
 
   m_thread.disconnect(SIGNAL(done(const QString &)));
-  connect(&m_thread, SIGNAL(outputRetrieved(const QString &)),
-          SLOT(addOutputText(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)),
-          SLOT(onUpdateDone(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(outputRetrieved(const QString &)),
+                   SLOT(addOutputText(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(onUpdateDone(const QString &)));
   m_thread.executeCommand(m_workingDir, "svn", args, false);
 }
 
@@ -335,10 +336,10 @@ void SVNUpdateDialog::onUpdateToRevisionButtonClicked() {
 
   args << "-r" << revisionString;
 
-  connect(&m_thread, SIGNAL(outputRetrieved(const QString &)),
-          SLOT(addOutputText(const QString &)));
-  connect(&m_thread, SIGNAL(done(const QString &)),
-          SLOT(onUpdateDone(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(outputRetrieved(const QString &)),
+                   SLOT(addOutputText(const QString &)));
+  QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                   SLOT(onUpdateDone(const QString &)));
   m_thread.executeCommand(m_workingDir, "svn", args, false);
 }
 
@@ -357,8 +358,8 @@ void SVNUpdateDialog::onUpdateButtonClicked() {
          << "mine-full";
 
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(done(const QString &)),
-            SLOT(onUpdateToMineDone()));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                     SLOT(onUpdateToMineDone()));
     m_thread.executeCommand(m_workingDir, "svn", args);
   } else
     onUpdateToMineDone();
@@ -379,8 +380,8 @@ void SVNUpdateDialog::onUpdateToMineDone() {
          << "theirs-full";
 
     m_thread.disconnect(SIGNAL(done(const QString &)));
-    connect(&m_thread, SIGNAL(done(const QString &)),
-            SLOT(onConflictResolved()));
+    QObject::connect(&m_thread, SIGNAL(done(const QString &)),
+                     SLOT(onConflictResolved()));
     m_thread.executeCommand(m_workingDir, "svn", args);
   } else
     onConflictResolved();

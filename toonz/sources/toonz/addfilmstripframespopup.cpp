@@ -57,8 +57,10 @@ AddFilmstripFramesPopup::AddFilmstripFramesPopup()
     m_buttonLayout->addWidget(m_cancelBtn);
   }
 
-  connect(m_okBtn, SIGNAL(clicked()), this, SLOT(onOk()));
-  connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_okBtn, &QPushButton::clicked,  //
+                   this, &AddFilmstripFramesPopup::onOk);
+  QObject::connect(m_cancelBtn, &QPushButton::clicked,  //
+                   this, &AddFilmstripFramesPopup::reject);
 
   update();
 }

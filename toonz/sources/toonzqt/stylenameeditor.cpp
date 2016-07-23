@@ -56,18 +56,21 @@ StyleNameEditor::StyleNameEditor(QWidget *parent)
 
   setGeometry(640, 512, 420, 80);
 
-  connect(m_okButton, SIGNAL(pressed()), this, SLOT(onOkPressed()));
-  connect(m_cancelButton, SIGNAL(pressed()), this, SLOT(onCancelPressed()));
-  connect(m_applyButton, SIGNAL(pressed()), this, SLOT(onApplyPressed()));
+  QObject::connect(m_okButton, &QPushButton::pressed,         //
+                   this, &StyleNameEditor::onOkPressed);      //
+  QObject::connect(m_cancelButton, &QPushButton::pressed,     //
+                   this, &StyleNameEditor::onCancelPressed);  //
+  QObject::connect(m_applyButton, &QPushButton::pressed,      //
+                   this, &StyleNameEditor::onApplyPressed);   //
 }
 
 //-------
 void StyleNameEditor::setPaletteHandle(TPaletteHandle *ph) {
   m_paletteHandle = ph;
-  connect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
-          SLOT(onStyleSwitched()));
-  connect(m_paletteHandle, SIGNAL(paletteSwitched()), this,
-          SLOT(onStyleSwitched()));
+  QObject::connect(m_paletteHandle, &TPaletteHandle::colorStyleSwitched,  //
+                   this, &StyleNameEditor::onStyleSwitched);              //
+  QObject::connect(m_paletteHandle, &TPaletteHandle::paletteSwitched,     //
+                   this, &StyleNameEditor::onStyleSwitched);              //
   m_styleName->setEnabled(true);
   m_okButton->setEnabled(true);
   m_applyButton->setEnabled(true);
@@ -76,14 +79,14 @@ void StyleNameEditor::setPaletteHandle(TPaletteHandle *ph) {
 //-------
 void StyleNameEditor::showEvent(QShowEvent *e) {
   if (m_paletteHandle) {
-    disconnect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
-               SLOT(onStyleSwitched()));
-    disconnect(m_paletteHandle, SIGNAL(paletteSwitched()), this,
-               SLOT(onStyleSwitched()));
-    connect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
-            SLOT(onStyleSwitched()));
-    connect(m_paletteHandle, SIGNAL(paletteSwitched()), this,
-            SLOT(onStyleSwitched()));
+    QObject::disconnect(m_paletteHandle, &TPaletteHandle::colorStyleSwitched,
+                        this, &StyleNameEditor::onStyleSwitched);
+    QObject::disconnect(m_paletteHandle, &TPaletteHandle::paletteSwitched,  //
+                        this, &StyleNameEditor::onStyleSwitched);           //
+    QObject::connect(m_paletteHandle, &TPaletteHandle::colorStyleSwitched,  //
+                     this, &StyleNameEditor::onStyleSwitched);              //
+    QObject::connect(m_paletteHandle, &TPaletteHandle::paletteSwitched,     //
+                     this, &StyleNameEditor::onStyleSwitched);              //
   }
   // update view
   onStyleSwitched();
@@ -91,10 +94,10 @@ void StyleNameEditor::showEvent(QShowEvent *e) {
 
 //-------disconnection
 void StyleNameEditor::hideEvent(QHideEvent *e) {
-  disconnect(m_paletteHandle, SIGNAL(colorStyleSwitched()), this,
-             SLOT(onStyleSwitched()));
-  disconnect(m_paletteHandle, SIGNAL(paletteSwitched()), this,
-             SLOT(onStyleSwitched()));
+  QObject::disconnect(m_paletteHandle, &TPaletteHandle::colorStyleSwitched,
+                      this, &StyleNameEditor::onStyleSwitched);
+  QObject::disconnect(m_paletteHandle, &TPaletteHandle::paletteSwitched,  //
+                      this, &StyleNameEditor::onStyleSwitched);           //
 }
 
 //-----update display when the current style is switched

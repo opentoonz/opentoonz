@@ -233,14 +233,14 @@ void HistoryPane::resizeEvent(QResizeEvent *e) {
 //-----------------------------------------------------------------------------
 
 void HistoryPane::showEvent(QShowEvent *) {
-  connect(TUndoManager::manager(), SIGNAL(historyChanged()), this,
-          SLOT(onHistoryChanged()));
+  QObject::connect(TUndoManager::manager(), SIGNAL(historyChanged()), this,
+                   SLOT(onHistoryChanged()));
   onHistoryChanged();
 }
 
 //-----------------------------------------------------------------------------
 
 void HistoryPane::hideEvent(QHideEvent *) {
-  disconnect(TUndoManager::manager(), SIGNAL(historyChanged()), this,
-             SLOT(onHistoryChanged()));
+  QObject::disconnect(TUndoManager::manager(), SIGNAL(historyChanged()), this,
+                      SLOT(onHistoryChanged()));
 }

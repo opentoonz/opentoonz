@@ -224,8 +224,9 @@ FlipBook::FlipBook(QWidget *parent, QString viewerTitle,
   setLayout(mainLayout);
 
   // signal-slot connection
-  bool ret = connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
-                     this, SLOT(onButtonPressed(FlipConsole::EGadget)));
+  bool ret = QObject::connect(m_flipConsole,
+                              SIGNAL(buttonPressed(FlipConsole::EGadget)), this,
+                              SLOT(onButtonPressed(FlipConsole::EGadget)));
 
   m_flipConsole->setFrameRate(TApp::instance()
                                   ->getCurrentScene()
@@ -238,12 +239,13 @@ FlipBook::FlipBook(QWidget *parent, QString viewerTitle,
 
   m_previewUpdateTimer.setSingleShot(true);
 
-  ret = ret && connect(parentWidget(), SIGNAL(closeButtonPressed()), this,
-                       SLOT(onCloseButtonPressed()));
-  ret = ret && connect(parentWidget(), SIGNAL(doubleClick(QMouseEvent *)), this,
-                       SLOT(onDoubleClick(QMouseEvent *)));
-  ret = ret && connect(&m_previewUpdateTimer, SIGNAL(timeout()), this,
-                       SLOT(performFxUpdate()));
+  ret = ret && QObject::connect(parentWidget(), SIGNAL(closeButtonPressed()),
+                                this, SLOT(onCloseButtonPressed()));
+  ret = ret &&
+        QObject::connect(parentWidget(), SIGNAL(doubleClick(QMouseEvent *)),
+                         this, SLOT(onDoubleClick(QMouseEvent *)));
+  ret = ret && QObject::connect(&m_previewUpdateTimer, SIGNAL(timeout()), this,
+                                SLOT(performFxUpdate()));
 
   assert(ret);
 
@@ -272,7 +274,8 @@ void FlipBook::addFreezeButtonToTitleBar() {
                                               ":Resources/freeze_on.png");
     m_freezeButton->setToolTip("Freeze");
     titleBar->add(QPoint(-55, 1), m_freezeButton);
-    connect(m_freezeButton, SIGNAL(toggled(bool)), this, SLOT(freeze(bool)));
+    QObject::connect(m_freezeButton, SIGNAL(toggled(bool)), this,
+                     SLOT(freeze(bool)));
     QPoint p(titleBar->width() - 62, 1);
     m_freezeButton->move(p);
     m_freezeButton->show();
@@ -419,17 +422,18 @@ LoadImagesPopup::LoadImagesPopup(FlipBook *flip)
   // Make signal-slot connections
   bool ret = true;
 
-  ret = ret && connect(m_fromField, SIGNAL(editingFinished()), this,
-                       SLOT(onEditingFinished()));
-  ret = ret && connect(m_toField, SIGNAL(editingFinished()), this,
-                       SLOT(onEditingFinished()));
-  ret = ret && connect(m_stepField, SIGNAL(editingFinished()), this,
-                       SLOT(onEditingFinished()));
-  ret = ret && connect(m_shrinkField, SIGNAL(editingFinished()), this,
-                       SLOT(onEditingFinished()));
+  ret = ret && QObject::connect(m_fromField, SIGNAL(editingFinished()), this,
+                                SLOT(onEditingFinished()));
+  ret = ret && QObject::connect(m_toField, SIGNAL(editingFinished()), this,
+                                SLOT(onEditingFinished()));
+  ret = ret && QObject::connect(m_stepField, SIGNAL(editingFinished()), this,
+                                SLOT(onEditingFinished()));
+  ret = ret && QObject::connect(m_shrinkField, SIGNAL(editingFinished()), this,
+                                SLOT(onEditingFinished()));
 
-  ret = ret && connect(this, SIGNAL(filePathClicked(const TFilePath &)),
-                       SLOT(onFilePathClicked(const TFilePath &)));
+  ret =
+      ret && QObject::connect(this, SIGNAL(filePathClicked(const TFilePath &)),
+                              SLOT(onFilePathClicked(const TFilePath &)));
 
   assert(ret);
 
@@ -1869,11 +1873,12 @@ void FlipBook::reset() {
 
 void FlipBook::showEvent(QShowEvent *e) {
   TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
-  connect(sceneHandle, SIGNAL(sceneChanged()), m_imageViewer, SLOT(update()));
+  QObject::connect(sceneHandle, SIGNAL(sceneChanged()), m_imageViewer,
+                   SLOT(update()));
   // for updating the blank frame button
   if (!m_imageViewer->isColorModel()) {
-    connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
-            SLOT(onPreferenceChanged()));
+    QObject::connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
+                     SLOT(onPreferenceChanged()));
     m_flipConsole->onPreferenceChanged();
   }
   m_flipConsole->setActive(true);
@@ -1884,8 +1889,8 @@ void FlipBook::showEvent(QShowEvent *e) {
 
 void FlipBook::hideEvent(QHideEvent *e) {
   TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
-  disconnect(sceneHandle, SIGNAL(sceneChanged()), m_imageViewer,
-             SLOT(update()));
+  QObject::disconnect(sceneHandle, SIGNAL(sceneChanged()), m_imageViewer,
+                      SLOT(update()));
   m_flipConsole->setActive(false);
 }
 

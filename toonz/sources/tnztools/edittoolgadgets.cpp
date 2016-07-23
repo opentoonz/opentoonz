@@ -945,9 +945,10 @@ FxGadgetController::FxGadgetController(TTool *tool)
     , m_selectedGadget(0)
     , m_editingNonZeraryFx(false) {
   m_idBase = m_nextId = 5000;
-  connect(m_fxHandle, SIGNAL(fxSwitched()), this, SLOT(onFxSwitched()));
-  connect(tool->getApplication()->getCurrentXsheet(), SIGNAL(xsheetChanged()),
-          this, SLOT(onFxSwitched()));
+  QObject::connect(m_fxHandle, SIGNAL(fxSwitched()), this,
+                   SLOT(onFxSwitched()));
+  QObject::connect(tool->getApplication()->getCurrentXsheet(),
+                   SIGNAL(xsheetChanged()), this, SLOT(onFxSwitched()));
   onFxSwitched();
 }
 

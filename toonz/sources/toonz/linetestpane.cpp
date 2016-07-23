@@ -141,25 +141,26 @@ LineTestPane::LineTestPane(QWidget *parent, Qt::WFlags flags)
   m_flipConsole = new FlipConsole(mainLayout, buttons, false, m_keyFrameButton,
                                   "SceneViewerConsole");
 
-  ret = ret && connect(m_sceneViewer, SIGNAL(onZoomChanged()),
-                       SLOT(changeWindowTitle()));
-  ret = ret && connect(m_lineTestViewer, SIGNAL(onZoomChanged()),
-                       SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(m_sceneViewer, SIGNAL(onZoomChanged()),
+                                SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(m_lineTestViewer, SIGNAL(onZoomChanged()),
+                                SLOT(changeWindowTitle()));
 
-  ret = connect(m_flipConsole,
-                SIGNAL(drawFrame(int, const ImagePainter::VisualSettings &)),
-                this,
-                SLOT(onDrawFrame(int, const ImagePainter::VisualSettings &)));
-  ret = ret && connect(m_flipConsole, SIGNAL(playStateChanged(bool)), this,
-                       SLOT(onPlayStateChanged(bool)));
-  ret = ret &&
-        connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
-                m_lineTestViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
-  ret = ret &&
-        connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
-                m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
-  ret = ret && connect(m_flipConsole, SIGNAL(sliderReleased()), this,
-                       SLOT(onFlipSliderReleased()));
+  ret = QObject::connect(
+      m_flipConsole,
+      SIGNAL(drawFrame(int, const ImagePainter::VisualSettings &)), this,
+      SLOT(onDrawFrame(int, const ImagePainter::VisualSettings &)));
+  ret = ret && QObject::connect(m_flipConsole, SIGNAL(playStateChanged(bool)),
+                                this, SLOT(onPlayStateChanged(bool)));
+  ret = ret && QObject::connect(m_flipConsole,
+                                SIGNAL(buttonPressed(FlipConsole::EGadget)),
+                                m_lineTestViewer,
+                                SLOT(onButtonPressed(FlipConsole::EGadget)));
+  ret = ret && QObject::connect(
+                   m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
+                   m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
+  ret = ret && QObject::connect(m_flipConsole, SIGNAL(sliderReleased()), this,
+                                SLOT(onFlipSliderReleased()));
 
   m_flipConsole->setFrameRate(app->getCurrentScene()
                                   ->getScene()
@@ -173,11 +174,12 @@ LineTestPane::LineTestPane(QWidget *parent, Qt::WFlags flags)
 
   initializeTitleBar(getTitleBar());
 
-  ret = ret && connect(&m_mixAudioThread, SIGNAL(computedBuffer()), this,
-                       SLOT(onComputedBuffer()), Qt::DirectConnection);
+  ret =
+      ret && QObject::connect(&m_mixAudioThread, SIGNAL(computedBuffer()), this,
+                              SLOT(onComputedBuffer()), Qt::DirectConnection);
 
-  ret = ret && connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this,
-                       SLOT(onSceneSwitched()));
+  ret = ret && QObject::connect(app->getCurrentScene(), SIGNAL(sceneSwitched()),
+                                this, SLOT(onSceneSwitched()));
 
   assert(ret);
   setCurrentViewType(0);
@@ -201,29 +203,30 @@ void LineTestPane::showEvent(QShowEvent *) {
 
   bool ret = true;
 
-  ret = ret && connect(xshHandle, SIGNAL(xsheetChanged()), this,
-                       SLOT(onSceneChanged()));
+  ret = ret && QObject::connect(xshHandle, SIGNAL(xsheetChanged()), this,
+                                SLOT(onSceneChanged()));
 
-  ret = ret && connect(sceneHandle, SIGNAL(sceneChanged()), this,
-                       SLOT(onSceneChanged()));
-  ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
-                       SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(sceneChanged()), this,
+                                SLOT(onSceneChanged()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
+                                SLOT(changeWindowTitle()));
 
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-                       SLOT(onXshLevelSwitched(TXshLevel *)));
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this,
-                       SLOT(changeWindowTitle()));
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelTitleChanged()), this,
-                       SLOT(changeWindowTitle()));
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this,
-                       SLOT(updateFrameRange()));
+  ret = ret &&
+        QObject::connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)),
+                         this, SLOT(onXshLevelSwitched(TXshLevel *)));
+  ret = ret && QObject::connect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                                SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(levelHandle, SIGNAL(xshLevelTitleChanged()),
+                                this, SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                                SLOT(updateFrameRange()));
 
-  ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this,
-                       SLOT(changeWindowTitle()));
-  ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this,
-                       SLOT(onFrameSwitched()));
-  ret = ret && connect(frameHandle, SIGNAL(frameTypeChanged()), this,
-                       SLOT(onFrameTypeChanged()));
+  ret = ret && QObject::connect(frameHandle, SIGNAL(frameSwitched()), this,
+                                SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(frameHandle, SIGNAL(frameSwitched()), this,
+                                SLOT(onFrameSwitched()));
+  ret = ret && QObject::connect(frameHandle, SIGNAL(frameTypeChanged()), this,
+                                SLOT(onFrameTypeChanged()));
 
   assert(ret);
 
@@ -241,27 +244,29 @@ void LineTestPane::hideEvent(QHideEvent *) {
   TObjectHandle *objectHandle  = app->getCurrentObject();
   TXsheetHandle *xshHandle     = app->getCurrentXsheet();
 
-  disconnect(xshHandle, SIGNAL(xsheetChanged()), this, SLOT(onSceneChanged()));
+  QObject::disconnect(xshHandle, SIGNAL(xsheetChanged()), this,
+                      SLOT(onSceneChanged()));
 
-  disconnect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
-  disconnect(sceneHandle, SIGNAL(nameSceneChanged()), this,
-             SLOT(changeWindowTitle()));
+  QObject::disconnect(sceneHandle, SIGNAL(sceneChanged()), this,
+                      SLOT(onSceneChanged()));
+  QObject::disconnect(sceneHandle, SIGNAL(nameSceneChanged()), this,
+                      SLOT(changeWindowTitle()));
 
-  disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-             SLOT(onXshLevelSwitched(TXshLevel *)));
-  disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
-             SLOT(changeWindowTitle()));
-  disconnect(levelHandle, SIGNAL(xshLevelTitleChanged()), this,
-             SLOT(changeWindowTitle()));
-  disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
-             SLOT(updateFrameRange()));
+  QObject::disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+                      SLOT(onXshLevelSwitched(TXshLevel *)));
+  QObject::disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                      SLOT(changeWindowTitle()));
+  QObject::disconnect(levelHandle, SIGNAL(xshLevelTitleChanged()), this,
+                      SLOT(changeWindowTitle()));
+  QObject::disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                      SLOT(updateFrameRange()));
 
-  disconnect(frameHandle, SIGNAL(frameSwitched()), this,
-             SLOT(changeWindowTitle()));
-  disconnect(frameHandle, SIGNAL(frameSwitched()), this,
-             SLOT(onFrameSwitched()));
-  disconnect(frameHandle, SIGNAL(frameTypeChanged()), this,
-             SLOT(onFrameTypeChanged()));
+  QObject::disconnect(frameHandle, SIGNAL(frameSwitched()), this,
+                      SLOT(changeWindowTitle()));
+  QObject::disconnect(frameHandle, SIGNAL(frameSwitched()), this,
+                      SLOT(onFrameSwitched()));
+  QObject::disconnect(frameHandle, SIGNAL(frameTypeChanged()), this,
+                      SLOT(onFrameTypeChanged()));
 
   m_flipConsole->setActive(false);
 }
@@ -406,8 +411,8 @@ void LineTestPane::initializeTitleBar(TPanelTitleBar *titleBar) {
   titleBar->add(QPoint(x, 2), m_previewButton);
   m_previewButton->setButtonSet(viewModeButtonSet, 1);
 
-  ret = ret && connect(viewModeButtonSet, SIGNAL(selected(int)), this,
-                       SLOT(setCurrentViewType(int)));
+  ret = ret && QObject::connect(viewModeButtonSet, SIGNAL(selected(int)), this,
+                                SLOT(setCurrentViewType(int)));
   assert(ret);
 }
 

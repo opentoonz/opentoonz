@@ -116,7 +116,7 @@ protected:
   void wheelEvent(QWheelEvent *me) override;
   void showEvent(QShowEvent *se) override;
 
-protected slots:
+public slots:
 
   void fitScene();
   void centerOnCurrent();

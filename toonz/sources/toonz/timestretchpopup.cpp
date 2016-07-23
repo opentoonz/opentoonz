@@ -217,8 +217,8 @@ TimeStretchPopup::TimeStretchPopup()
   viewType << tr("Selected Cells") << tr("Selected Frame Range")
            << tr("Whole Xsheet");
   m_stretchType->addItems(viewType);
-  connect(m_stretchType, SIGNAL(currentIndexChanged(int)),
-          SLOT(setCurrentStretchType(int)));
+  QObject::connect(m_stretchType, SIGNAL(currentIndexChanged(int)),
+                   SLOT(setCurrentStretchType(int)));
   addWidget(tr("Stretch:"), m_stretchType);
 
   QHBoxLayout *rangeLayout = new QHBoxLayout(this);
@@ -236,8 +236,10 @@ TimeStretchPopup::TimeStretchPopup()
   m_okBtn = new QPushButton(tr("Stretch"), this);
   m_okBtn->setDefault(true);
   m_cancelBtn = new QPushButton(tr("Cancel"), this);
-  bool ret    = connect(m_okBtn, SIGNAL(clicked()), this, SLOT(stretch()));
-  ret = ret && connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  bool ret =
+      QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(stretch()));
+  ret = ret &&
+        QObject::connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
   assert(ret);
 
   addButtonBarWidget(m_okBtn, m_cancelBtn);
@@ -247,14 +249,16 @@ TimeStretchPopup::TimeStretchPopup()
 
 void TimeStretchPopup::showEvent(QShowEvent *) {
   TSelectionHandle *selectionHandle = TApp::instance()->getCurrentSelection();
-  bool ret = connect(selectionHandle, SIGNAL(selectionChanged(TSelection *)),
-                     this, SLOT(updateValues(TSelection *)));
-  ret = ret && connect(selectionHandle,
-                       SIGNAL(selectionSwitched(TSelection *, TSelection *)),
-                       this, SLOT(updateValues(TSelection *, TSelection *)));
+  bool ret =
+      QObject::connect(selectionHandle, SIGNAL(selectionChanged(TSelection *)),
+                       this, SLOT(updateValues(TSelection *)));
+  ret = ret &&
+        QObject::connect(selectionHandle,
+                         SIGNAL(selectionSwitched(TSelection *, TSelection *)),
+                         this, SLOT(updateValues(TSelection *, TSelection *)));
   TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
-  ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
-                       SLOT(updateValues()));
+  ret = ret && QObject::connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                                SLOT(updateValues()));
   assert(ret);
   updateValues(selectionHandle->getSelection());
 }
@@ -263,14 +267,16 @@ void TimeStretchPopup::showEvent(QShowEvent *) {
 
 void TimeStretchPopup::hideEvent(QHideEvent *e) {
   TSelectionHandle *selectionHandle = TApp::instance()->getCurrentSelection();
-  bool ret = disconnect(selectionHandle, SIGNAL(selectionChanged(TSelection *)),
-                        this, SLOT(updateValues(TSelection *)));
-  ret = ret && connect(selectionHandle,
-                       SIGNAL(selectionSwitched(TSelection *, TSelection *)),
-                       this, SLOT(updateValues(TSelection *, TSelection *)));
+  bool ret                          = QObject::disconnect(selectionHandle,
+                                 SIGNAL(selectionChanged(TSelection *)), this,
+                                 SLOT(updateValues(TSelection *)));
+  ret = ret &&
+        QObject::connect(selectionHandle,
+                         SIGNAL(selectionSwitched(TSelection *, TSelection *)),
+                         this, SLOT(updateValues(TSelection *, TSelection *)));
   TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
-  ret = ret && disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
-                          SLOT(updateValues()));
+  ret = ret && QObject::disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                                   SLOT(updateValues()));
   assert(ret);
   Dialog::hideEvent(e);
 }

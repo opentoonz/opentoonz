@@ -106,10 +106,10 @@ void FarmServerListView::openContextMenu(const QPoint &p) {
   QAction *action;
   if (state == Offline) {
     action = new QAction(tr("Activate"), this);
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(activate()));
+    QObject::connect(action, SIGNAL(triggered(bool)), this, SLOT(activate()));
   } else {
     action = new QAction(tr("Deactivate"), this);
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(deactivate()));
+    QObject::connect(action, SIGNAL(triggered(bool)), this, SLOT(deactivate()));
   }
 
   m_menu->addAction(action);
@@ -276,8 +276,8 @@ BatchServersViewer::BatchServersViewer(QWidget *parent, Qt::WFlags flags)
   type << tr("Local") << tr("Render Farm");
   m_processWith->addItems(type);
   layout->addWidget(m_processWith, row++, 1);
-  connect(m_processWith, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onProcessWith(int)));
+  QObject::connect(m_processWith, SIGNAL(currentIndexChanged(int)), this,
+                   SLOT(onProcessWith(int)));
 
   m_farmRootField = ::create(layout, tr("Farm Global Root:"), row, false);
 
@@ -286,14 +286,13 @@ BatchServersViewer::BatchServersViewer(QWidget *parent, Qt::WFlags flags)
     m_farmRootField->setText(path);
     TFarmStuff::setGlobalRoot(TFilePath(path.toStdWString()));
   }
-  connect(m_farmRootField, SIGNAL(editingFinished()), this, SLOT(setGRoot()));
+  QObject::connect(m_farmRootField, SIGNAL(editingFinished()), this,
+                   SLOT(setGRoot()));
 
   m_serverList = new FarmServerListView(this);
-  connect(m_serverList,
-          SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
-          this, SLOT(onCurrentItemChanged(QListWidgetItem *)));
-  // connect(m_serverList, SIGNAL(itemPressed(QListWidgetItem *)), this,
-  // SLOT(onCurrentItemChanged(QListWidgetItem *)));
+  QObject::connect(m_serverList, SIGNAL(currentItemChanged(QListWidgetItem *,
+                                                           QListWidgetItem *)),
+                   this, SLOT(onCurrentItemChanged(QListWidgetItem *)));
 
   layout->addWidget(m_serverList, row, 0, 18, 2);
   row += 18 + 1;

@@ -161,8 +161,8 @@ ExpressionField::ExpressionField(QWidget *parent)
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setTabChangesFocus(true);
-  // setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed));
-  connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+  QObject::connect(this, &ExpressionField::textChanged,     //
+                   this, &ExpressionField::onTextChanged);  //
 
 #ifdef MACOSX
   setFixedHeight(23);
@@ -176,8 +176,13 @@ ExpressionField::ExpressionField(QWidget *parent)
   m_completerPopup->setFocusPolicy(Qt::NoFocus);
   m_completerPopup->setFocusProxy(this);
   m_completerPopup->installEventFilter(this);
-  connect(m_completerPopup, SIGNAL(clicked(const QModelIndex &)), this,
-          SLOT(insertCompletion(const QModelIndex &)));
+  {
+    auto const insertCompletion =
+        static_cast<void (ExpressionField::*)(QModelIndex const &)>(
+            &ExpressionField::insertCompletion);
+    QObject::connect(m_completerPopup, &MyListView::clicked,  //
+                     this, insertCompletion);
+  }
 
   m_syntaxHighlighter = new SyntaxHighlighter(document());
 }

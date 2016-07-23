@@ -446,29 +446,33 @@ ConvertPopup::ConvertPopup(bool specifyInput)
   qRegisterMetaType<TFilePath>("TFilePath");
 
   bool ret = true;
-  ret = ret && connect(m_tlvMode, SIGNAL(currentIndexChanged(const QString &)),
-                       this, SLOT(onTlvModeSelected(const QString &)));
-  ret = ret && connect(m_fromFld, SIGNAL(editingFinished()), this,
-                       SLOT(onRangeChanged()));
-  ret = ret && connect(m_toFld, SIGNAL(editingFinished()), this,
-                       SLOT(onRangeChanged()));
+  ret      = ret && QObject::connect(m_tlvMode,
+                                SIGNAL(currentIndexChanged(const QString &)),
+                                this, SLOT(onTlvModeSelected(const QString &)));
+  ret = ret && QObject::connect(m_fromFld, SIGNAL(editingFinished()), this,
+                                SLOT(onRangeChanged()));
+  ret = ret && QObject::connect(m_toFld, SIGNAL(editingFinished()), this,
+                                SLOT(onRangeChanged()));
+  ret = ret && QObject::connect(m_fileFormat,
+                                SIGNAL(currentIndexChanged(const QString &)),
+                                this, SLOT(onFormatSelected(const QString &)));
+  ret = ret && QObject::connect(m_formatOptions, SIGNAL(clicked()), this,
+                                SLOT(onOptionsClicked()));
   ret =
-      ret && connect(m_fileFormat, SIGNAL(currentIndexChanged(const QString &)),
-                     this, SLOT(onFormatSelected(const QString &)));
-  ret = ret && connect(m_formatOptions, SIGNAL(clicked()), this,
-                       SLOT(onOptionsClicked()));
-  ret = ret && connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
-  ret = ret && connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
-  ret = ret && connect(m_notifier, SIGNAL(frameCompleted(int)),
-                       m_progressDialog, SLOT(setValue(int)));
-  ret = ret && connect(m_notifier, SIGNAL(levelCompleted(const TFilePath &)),
-                       this, SLOT(onLevelConverted(const TFilePath &)));
-  ret = ret && connect(m_progressDialog, SIGNAL(canceled()), m_notifier,
-                       SLOT(onCancelTask()));
+      ret && QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
+  ret = ret &&
+        QObject::connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  ret = ret && QObject::connect(m_notifier, SIGNAL(frameCompleted(int)),
+                                m_progressDialog, SLOT(setValue(int)));
+  ret = ret &&
+        QObject::connect(m_notifier, SIGNAL(levelCompleted(const TFilePath &)),
+                         this, SLOT(onLevelConverted(const TFilePath &)));
+  ret = ret && QObject::connect(m_progressDialog, SIGNAL(canceled()),
+                                m_notifier, SLOT(onCancelTask()));
 
   if (specifyInput)
-    ret = ret && connect(m_convertFileFld, SIGNAL(pathChanged()), this,
-                         SLOT(onFileInChanged()));
+    ret = ret && QObject::connect(m_convertFileFld, SIGNAL(pathChanged()), this,
+                                  SLOT(onFileInChanged()));
 
   assert(ret);
 }
@@ -595,8 +599,8 @@ QFrame *ConvertPopup::createTlvSettings() {
   frame->setLayout(gridLay);
 
   bool ret = true;
-  ret      = ret && connect(m_antialias, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onAntialiasSelected(int)));
+  ret = ret && QObject::connect(m_antialias, SIGNAL(currentIndexChanged(int)),
+                                this, SLOT(onAntialiasSelected(int)));
   assert(ret);
 
   frame->setVisible(false);
@@ -1068,11 +1072,11 @@ void ConvertPopup::apply() {
 
   m_converter = new Converter(this);
 #if QT_VERSION >= 0x050000
-  bool ret =
-      connect(m_converter, SIGNAL(finished()), this, SLOT(onConvertFinished()));
+  bool ret = QObject::connect(m_converter, SIGNAL(finished()), this,
+                              SLOT(onConvertFinished()));
 #else
-  int ret =
-      connect(m_converter, SIGNAL(finished()), this, SLOT(onConvertFinished()));
+  int ret = QObject::connect(m_converter, SIGNAL(finished()), this,
+                             SLOT(onConvertFinished()));
 #endif
   Q_ASSERT(ret);
 

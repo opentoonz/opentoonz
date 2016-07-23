@@ -130,7 +130,8 @@ public:
 
   FxSelection *getFxSelection() const { return m_selection; }
   //! Disconnects or connects selected item from the rest of the graph.
-  //! Selection must be a connected subgraph. If \b disconnect is true, the
+  //! Selection must be a connected subgraph. If \b QObject::disconnect is true,
+  //! the
   //! selection is disconnected; connected otherwise.
   void simulateDisconnectSelection(bool disconnect);
 
@@ -186,27 +187,36 @@ signals:
   void doExplodeChild(const QList<TFxP> &);
   void editObject();
 
+public slots:
+  void onDisconnectFromXSheet();
+  void onConnectToXSheet();
+  void onOpenSubxsheet();
+
+  void onRemoveOutput();
+  void onActivateOutput();
+
+  void onUnlinkFx();
+  void onDeleteFx();
+  void onDuplicateFx();
+  void onSavePresetFx();
+  void onMacroFx();
+  void onExplodeMacroFx();
+  void onOpenMacroFx();
+  void onCacheFx();
+  void onUncacheFx();
+
+  void onPreview();
+  void onEditGroup();
+
+  void onAddPaste();
+  void onInsertPaste();
+  void onReplacePaste();
+
 protected slots:
   void onSelectionSwitched(TSelection *oldSel, TSelection *newSel) override;
   void onSelectionChanged();
 
-  // void onOutputFxAdded();
-  void onDisconnectFromXSheet();
-  void onConnectToXSheet();
-  void onDeleteFx();
-  void onDuplicateFx();
-  void onUnlinkFx();
-  void onMacroFx();
-  void onExplodeMacroFx();
-  void onOpenMacroFx();
-  void onSavePresetFx();
-  void onRemoveOutput();
-  void onActivateOutput();
-  void onPreview();
-  void onCacheFx();
-  void onUncacheFx();
   void onCollapse(const QList<TFxP> &);
-  void onOpenSubxsheet();
 
   void onXsheetChanged();
   void onSceneChanged();
@@ -216,11 +226,7 @@ protected slots:
 
   void onFxNodeDoubleClicked();
 
-  void onInsertPaste();
-  void onAddPaste();
-  void onReplacePaste();
   void onAltModifierChanged(bool);
-  void onEditGroup();
 
 private:
   void setEnableCache(bool toggle);

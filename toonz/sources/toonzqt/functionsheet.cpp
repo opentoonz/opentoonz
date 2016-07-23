@@ -498,8 +498,9 @@ FunctionSheetCellViewer::FunctionSheetCellViewer(FunctionSheet *parent)
   m_lineEdit = new DVGui::LineEdit(this);
   // lineEdit->setGeometry(10,10,100,30);
   m_lineEdit->hide();
-  bool ret = connect(m_lineEdit, SIGNAL(editingFinished()), this,
-                     SLOT(onCellEditorEditingFinished()));
+  bool ret = QObject::connect(
+      m_lineEdit, &DVGui::LineEdit::editingFinished,  //
+      this, &FunctionSheetCellViewer::onCellEditorEditingFinished);
   assert(ret);
   setMouseTracking(true);
 

@@ -213,12 +213,18 @@ protected:
 
 public slots:
   /*! Connect channels to the two square axes:
-                  \li eRed : connect x-axis to eGreen and y-axis to eBlue;
-                  \li eGreen : connect x-axis to eRed and y-axis to eBlue;
-                  \li eBlue : connect x-axis to eRed and y-axis to eGreen;
-                  \li eHue : connect x-axis to eSaturation and y-axis to eValue;
-                  \li eSaturation : connect x-axis to eHue and y-axis to eValue;
-                  \li eValue : connect x-axis to eHue and y-axis to eSaturation;
+                  \li eRed : QObject::connect x-axis to eGreen and y-axis to
+     eBlue;
+                  \li eGreen : QObject::connect x-axis to eRed and y-axis to
+     eBlue;
+                  \li eBlue : QObject::connect x-axis to eRed and y-axis to
+     eGreen;
+                  \li eHue : QObject::connect x-axis to eSaturation and y-axis
+     to eValue;
+                  \li eSaturation : QObject::connect x-axis to eHue and y-axis
+     to eValue;
+                  \li eValue : QObject::connect x-axis to eHue and y-axis to
+     eSaturation;
      */
   void setChannel(int channel);
 

@@ -17,11 +17,12 @@ ScriptConsole::ScriptConsole(QWidget *parent)
   moveCursor(QTextCursor::EndOfLine);
 
   m_engine = new ScriptEngine();
-  connect(m_engine, SIGNAL(evaluationDone()), this, SLOT(onEvaluationDone()));
-  connect(m_engine, SIGNAL(output(int, const QString &)), this,
-          SLOT(output(int, const QString &)));
-  connect(this, SIGNAL(cursorPositionChanged()), this,
-          SLOT(onCursorPositionChanged()));
+  QObject::connect(m_engine, &ScriptEngine::evaluationDone,         //
+                   this, &ScriptConsole::onEvaluationDone);         //
+  QObject::connect(m_engine, &ScriptEngine::output,                 //
+                   this, &ScriptConsole::output);                   //
+  QObject::connect(this, &ScriptConsole::cursorPositionChanged,     //
+                   this, &ScriptConsole::onCursorPositionChanged);  //
 }
 
 ScriptConsole::~ScriptConsole() { delete m_engine; }

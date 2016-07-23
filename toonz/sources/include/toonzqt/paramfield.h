@@ -391,7 +391,7 @@ public:
   RgbLinkButton(QString str, QWidget *parent, PixelParamField *field1,
                 PixelParamField *field2);
 
-protected slots:
+public slots:
   void onButtonClicked();
 };
 

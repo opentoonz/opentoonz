@@ -55,8 +55,8 @@ OverwriteDialog::OverwriteDialog()
 
   QButtonGroup *buttonGroup = new QButtonGroup(this);
   buttonGroup->setExclusive(true);
-  bool ret = connect(buttonGroup, SIGNAL(buttonClicked(int)), this,
-                     SLOT(onButtonClicked(int)));
+  bool ret = QObject::connect(buttonGroup, SIGNAL(buttonClicked(int)), this,
+                              SLOT(onButtonClicked(int)));
 
   beginVLayout();
 
@@ -92,16 +92,18 @@ OverwriteDialog::OverwriteDialog()
   endVLayout();
 
   m_okBtn = new QPushButton(QString(tr("Apply")), this);
-  ret     = ret && connect(m_okBtn, SIGNAL(clicked()), this, SLOT(accept()));
+  ret =
+      ret && QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(accept()));
   addButtonBarWidget(m_okBtn);
 
   m_okToAllBtn = new QPushButton(QString(tr("Apply to All")), this);
-  ret =
-      ret && connect(m_okToAllBtn, SIGNAL(clicked()), this, SLOT(applyToAll()));
+  ret          = ret && QObject::connect(m_okToAllBtn, SIGNAL(clicked()), this,
+                                SLOT(applyToAll()));
   addButtonBarWidget(m_okToAllBtn);
 
   m_cancelBtn = new QPushButton(QString(tr("Cancel")), this);
-  ret = ret && connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(cancel()));
+  ret         = ret &&
+        QObject::connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(cancel()));
   addButtonBarWidget(m_cancelBtn);
 
   assert(ret);

@@ -65,8 +65,8 @@ RoomTabWidget::RoomTabWidget(QWidget *parent)
     , m_renameTextField(new DVGui::LineEdit(this))
     , m_isLocked(LockRoomTabToggle != 0) {
   m_renameTextField->hide();
-  connect(m_renameTextField, SIGNAL(editingFinished()), this,
-          SLOT(updateTabName()));
+  QObject::connect(m_renameTextField, SIGNAL(editingFinished()), this,
+                   SLOT(updateTabName()));
 }
 
 //-----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ void RoomTabWidget::contextMenuEvent(QContextMenuEvent *event) {
   m_tabToDeleteIndex = -1;
   QMenu *menu        = new QMenu(this);
   QAction *newRoom   = menu->addAction(tr("New Room"));
-  connect(newRoom, SIGNAL(triggered()), SLOT(addNewTab()));
+  QObject::connect(newRoom, SIGNAL(triggered()), SLOT(addNewTab()));
 
   int index = tabAt(event->pos());
   if (index >= 0) {
@@ -146,13 +146,14 @@ void RoomTabWidget::contextMenuEvent(QContextMenuEvent *event) {
     if (index != currentIndex()) {
       QAction *deleteRoom =
           menu->addAction(tr("Delete Room \"%1\"").arg(tabText(index)));
-      connect(deleteRoom, SIGNAL(triggered()), SLOT(deleteTab()));
+      QObject::connect(deleteRoom, SIGNAL(triggered()), SLOT(deleteTab()));
     }
 #if defined(_WIN32) || defined(_CYGWIN_)
     /*- customize menubar -*/
     QAction *customizeMenuBar = menu->addAction(
         tr("Customize Menu Bar of Room \"%1\"").arg(tabText(index)));
-    connect(customizeMenuBar, SIGNAL(triggered()), SLOT(onCustomizeMenuBar()));
+    QObject::connect(customizeMenuBar, SIGNAL(triggered()),
+                     SLOT(onCustomizeMenuBar()));
 #endif
   }
   menu->exec(event->globalPos());
@@ -1455,18 +1456,21 @@ TopBar::TopBar(QWidget *parent) : QToolBar(parent) {
   addWidget(m_containerFrame);
 
   bool ret = true;
-  ret      = ret && connect(m_roomTabBar, SIGNAL(currentChanged(int)),
-                       m_stackedMenuBar, SLOT(setCurrentIndex(int)));
 
-  ret = ret && connect(m_roomTabBar, SIGNAL(indexSwapped(int, int)),
-                       m_stackedMenuBar, SLOT(onIndexSwapped(int, int)));
-  ret = ret && connect(m_roomTabBar, SIGNAL(insertNewTabRoom()),
-                       m_stackedMenuBar, SLOT(insertNewMenuBar()));
-  ret = ret && connect(m_roomTabBar, SIGNAL(deleteTabRoom(int)),
-                       m_stackedMenuBar, SLOT(deleteMenuBar(int)));
-  ret = ret && connect(m_roomTabBar, SIGNAL(customizeMenuBar(int)),
-                       m_stackedMenuBar, SLOT(doCustomizeMenuBar(int)));
-  ret = ret && connect(m_lockRoomCB, SIGNAL(toggled(bool)), m_roomTabBar,
-                       SLOT(setIsLocked(bool)));
+  ret = ret && QObject::connect(m_roomTabBar, SIGNAL(currentChanged(int)),
+                                m_stackedMenuBar, SLOT(setCurrentIndex(int)));
+
+  ret =
+      ret && QObject::connect(m_roomTabBar, SIGNAL(indexSwapped(int, int)),
+                              m_stackedMenuBar, SLOT(onIndexSwapped(int, int)));
+  ret = ret && QObject::connect(m_roomTabBar, SIGNAL(insertNewTabRoom()),
+                                m_stackedMenuBar, SLOT(insertNewMenuBar()));
+  ret = ret && QObject::connect(m_roomTabBar, SIGNAL(deleteTabRoom(int)),
+                                m_stackedMenuBar, SLOT(deleteMenuBar(int)));
+  ret =
+      ret && QObject::connect(m_roomTabBar, SIGNAL(customizeMenuBar(int)),
+                              m_stackedMenuBar, SLOT(doCustomizeMenuBar(int)));
+  ret = ret && QObject::connect(m_lockRoomCB, SIGNAL(toggled(bool)),
+                                m_roomTabBar, SLOT(setIsLocked(bool)));
   assert(ret);
 }

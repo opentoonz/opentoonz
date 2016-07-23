@@ -349,24 +349,25 @@ CleanupPopup::CleanupPopup()
   //--- signal-slot connections
 
   bool ret = true;
-  ret      = ret && connect(m_progressBar, SIGNAL(valueChanged(int)), this,
-                       SLOT(onValueChanged(int)));
+
+  ret = ret && QObject::connect(m_progressBar, SIGNAL(valueChanged(int)), this,
+                                SLOT(onValueChanged(int)));
 
   // NOTE: On MAC it seems that QAbstractButton's pressed() signal is reemitted
   // at
   // every mouseMoveEvent when the button is pressed...
   // This is why clicked() substitutes pressed() below.
 
-  ret = ret && connect(m_cleanupButton, SIGNAL(clicked()), this,
-                       SLOT(onCleanupFrame()));
-  ret = ret &&
-        connect(m_skipButton, SIGNAL(clicked()), this, SLOT(onSkipFrame()));
-  ret = ret && connect(m_cleanupAllButton, SIGNAL(clicked()), this,
-                       SLOT(onCleanupAllFrame()));
-  ret = ret &&
-        connect(cancelButton, SIGNAL(clicked()), this, SLOT(onCancelCleanup()));
-  ret = ret && connect(m_imgViewBox, SIGNAL(toggled(bool)), this,
-                       SLOT(onImgViewBoxToggled(bool)));
+  ret = ret && QObject::connect(m_cleanupButton, SIGNAL(clicked()), this,
+                                SLOT(onCleanupFrame()));
+  ret = ret && QObject::connect(m_skipButton, SIGNAL(clicked()), this,
+                                SLOT(onSkipFrame()));
+  ret = ret && QObject::connect(m_cleanupAllButton, SIGNAL(clicked()), this,
+                                SLOT(onCleanupAllFrame()));
+  ret = ret && QObject::connect(cancelButton, SIGNAL(clicked()), this,
+                                SLOT(onCancelCleanup()));
+  ret = ret && QObject::connect(m_imgViewBox, SIGNAL(toggled(bool)), this,
+                                SLOT(onImgViewBoxToggled(bool)));
 
   assert(ret);
 
@@ -1411,8 +1412,8 @@ CleanupPopup::OverwriteDialog::OverwriteDialog()
     : DVGui::ValidatedChoiceDialog(TApp::instance()->getMainWindow()) {
   setWindowTitle(tr("Warning!"));
 
-  bool ret = connect(m_buttonGroup, SIGNAL(buttonClicked(int)),
-                     SLOT(onButtonClicked(int)));
+  bool ret = QObject::connect(m_buttonGroup, SIGNAL(buttonClicked(int)),
+                              SLOT(onButtonClicked(int)));
   assert(ret);
 
   // Option 1: OVERWRITE

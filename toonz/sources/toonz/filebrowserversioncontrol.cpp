@@ -490,8 +490,9 @@ void FileBrowser::getRevisionHistory() {
   files.removeAt(files.indexOf(file));
 
   SVNTimeline *timelineDialog = new SVNTimeline(this, path, file, files);
-  connect(timelineDialog, SIGNAL(commandDone(const QStringList &)), this,
-          SLOT(onVersionControlCommandDone(const QStringList &)));
+  QObject::connect(timelineDialog, SIGNAL(commandDone(const QStringList &)),
+                   this,
+                   SLOT(onVersionControlCommandDone(const QStringList &)));
 
   timelineDialog->show();
   timelineDialog->raise();

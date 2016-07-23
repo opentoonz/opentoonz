@@ -199,10 +199,11 @@ VectorizationSwatchTask::VectorizationSwatchTask(int row, int col)
   // Establish connections to default slots; the started one must be blocking,
   // so that run() awaits until it has been performed.
 
-  connect(this, SIGNAL(myStarted(TThread::RunnableP)),
-          SLOT(onStarted(TThread::RunnableP)), Qt::BlockingQueuedConnection);
-  connect(this, SIGNAL(finished(TThread::RunnableP)),
-          SLOT(onFinished(TThread::RunnableP)));
+  QObject::connect(this, SIGNAL(myStarted(TThread::RunnableP)),
+                   SLOT(onStarted(TThread::RunnableP)),
+                   Qt::BlockingQueuedConnection);
+  QObject::connect(this, SIGNAL(finished(TThread::RunnableP)),
+                   SLOT(onFinished(TThread::RunnableP)));
 }
 
 //-----------------------------------------------------------------------------
@@ -487,11 +488,12 @@ void VectorizerSwatchArea::connectUpdates() {
   TFrameHandle *frameHandle    = TApp::instance()->getCurrentFrame();
   TXshLevelHandle *levelHandle = TApp::instance()->getCurrentLevel();
 
-  connect(frameHandle, SIGNAL(frameSwitched()), this, SLOT(updateContents()));
-  connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-          SLOT(updateContents()));
-  connect(levelHandle, SIGNAL(xshLevelChanged()), this,
-          SLOT(invalidateContents()));
+  QObject::connect(frameHandle, SIGNAL(frameSwitched()), this,
+                   SLOT(updateContents()));
+  QObject::connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+                   SLOT(updateContents()));
+  QObject::connect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                   SLOT(invalidateContents()));
 
   VectorizationBuilder::instance()->addListener(this);
 }
@@ -502,8 +504,8 @@ void VectorizerSwatchArea::disconnectUpdates() {
   TFrameHandle *frameHandle    = TApp::instance()->getCurrentFrame();
   TXshLevelHandle *levelHandle = TApp::instance()->getCurrentLevel();
 
-  disconnect(frameHandle, 0, this, 0);
-  disconnect(levelHandle, 0, this, 0);
+  QObject::disconnect(frameHandle, 0, this, 0);
+  QObject::disconnect(levelHandle, 0, this, 0);
 
   VectorizationBuilder::instance()->removeListener(this);
 }

@@ -438,14 +438,14 @@ MenuItemHandler::MenuItemHandler(const char *cmdId) {
 
 DVAction::DVAction(const QString &text, QObject *parent)
     : QAction(text, parent) {
-  connect(this, SIGNAL(triggered()), this, SLOT(onTriggered()));
+  QObject::connect(this, &DVAction::triggered, this, &DVAction::onTriggered);
 }
 
 //-----------------------------------------------------------------------------
 
 DVAction::DVAction(const QIcon &icon, const QString &text, QObject *parent)
     : QAction(icon, text, parent) {
-  connect(this, SIGNAL(triggered()), this, SLOT(onTriggered()));
+  QObject::connect(this, &DVAction::triggered, this, &DVAction::onTriggered);
 }
 
 //-----------------------------------------------------------------------------
@@ -468,8 +468,8 @@ DVMenuAction::DVMenuAction(const QString &text, QWidget *parent,
     : QMenu(text, parent), m_triggeredActionIndex(-1) {
   int i;
   for (i = 0; i < actions.size(); i++) addAction(actions.at(i));
-  connect(this, SIGNAL(triggered(QAction *)), this,
-          SLOT(onTriggered(QAction *)));
+  QObject::connect(this, &DVMenuAction::triggered,  //
+                   this, &DVMenuAction::onTriggered);
 }
 
 //-----------------------------------------------------------------------------

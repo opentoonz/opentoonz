@@ -95,8 +95,9 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
   fsWidget->setWidget(m_sceneViewer = new SceneViewer(fsWidget));
 
   bool ret = true;
-  ret      = ret && connect(m_sceneViewer, SIGNAL(onZoomChanged()),
-                       SLOT(changeWindowTitle()));
+
+  ret = ret && QObject::connect(m_sceneViewer, SIGNAL(onZoomChanged()),
+                                SLOT(changeWindowTitle()));
 
   Ruler *vRuler = new Ruler(viewer, m_sceneViewer, true);
   Ruler *hRuler = new Ruler(viewer, m_sceneViewer, false);
@@ -140,18 +141,18 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
 
   m_flipConsole->setFrameHandle(TApp::instance()->getCurrentFrame());
 
-  ret = ret &&
-        connect(m_flipConsole, SIGNAL(playStateChanged(bool)),
-                TApp::instance()->getCurrentFrame(), SLOT(setPlaying(bool)));
-  ret = ret &&
-        connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
-                m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
+  ret = ret && QObject::connect(m_flipConsole, SIGNAL(playStateChanged(bool)),
+                                TApp::instance()->getCurrentFrame(),
+                                SLOT(setPlaying(bool)));
+  ret = ret && QObject::connect(
+                   m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
+                   m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
 
-  ret = ret && connect(m_sceneViewer, SIGNAL(previewStatusChanged()), this,
-                       SLOT(update()));
+  ret = ret && QObject::connect(m_sceneViewer, SIGNAL(previewStatusChanged()),
+                                this, SLOT(update()));
 
-  ret = ret && connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), this,
-                       SLOT(onSceneSwitched()));
+  ret = ret && QObject::connect(app->getCurrentScene(), SIGNAL(sceneSwitched()),
+                                this, SLOT(onSceneSwitched()));
 
   assert(ret);
 
@@ -229,35 +230,36 @@ void SceneViewerPanel::showEvent(QShowEvent *) {
 
   bool ret = true;
 
-  ret = ret && connect(xshHandle, SIGNAL(xsheetChanged()), this,
-                       SLOT(onSceneChanged()));
+  ret = ret && QObject::connect(xshHandle, SIGNAL(xsheetChanged()), this,
+                                SLOT(onSceneChanged()));
 
-  ret = ret && connect(sceneHandle, SIGNAL(sceneChanged()), this,
-                       SLOT(onSceneChanged()));
-  ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
-                       SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(sceneChanged()), this,
+                                SLOT(onSceneChanged()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
+                                SLOT(changeWindowTitle()));
 
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-                       SLOT(onXshLevelSwitched(TXshLevel *)));
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this,
-                       SLOT(changeWindowTitle()));
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelTitleChanged()), this,
-                       SLOT(changeWindowTitle()));
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelChanged()), this,
-                       SLOT(updateFrameRange()));
+  ret = ret &&
+        QObject::connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)),
+                         this, SLOT(onXshLevelSwitched(TXshLevel *)));
+  ret = ret && QObject::connect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                                SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(levelHandle, SIGNAL(xshLevelTitleChanged()),
+                                this, SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                                SLOT(updateFrameRange()));
 
-  ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this,
-                       SLOT(changeWindowTitle()));
-  ret = ret && connect(frameHandle, SIGNAL(frameSwitched()), this,
-                       SLOT(onFrameSwitched()));
-  ret = ret && connect(frameHandle, SIGNAL(frameTypeChanged()), this,
-                       SLOT(onFrameTypeChanged()));
+  ret = ret && QObject::connect(frameHandle, SIGNAL(frameSwitched()), this,
+                                SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(frameHandle, SIGNAL(frameSwitched()), this,
+                                SLOT(onFrameSwitched()));
+  ret = ret && QObject::connect(frameHandle, SIGNAL(frameTypeChanged()), this,
+                                SLOT(onFrameTypeChanged()));
 
-  ret = ret && connect(app->getCurrentTool(), SIGNAL(toolSwitched()),
-                       m_sceneViewer, SLOT(onToolSwitched()));
+  ret = ret && QObject::connect(app->getCurrentTool(), SIGNAL(toolSwitched()),
+                                m_sceneViewer, SLOT(onToolSwitched()));
 
-  ret = ret && connect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
-                       SLOT(onPreferenceChanged()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(preferenceChanged()),
+                                m_flipConsole, SLOT(onPreferenceChanged()));
   m_flipConsole->onPreferenceChanged();
 
   assert(ret);
@@ -277,33 +279,35 @@ void SceneViewerPanel::hideEvent(QHideEvent *) {
   TObjectHandle *objectHandle  = app->getCurrentObject();
   TXsheetHandle *xshHandle     = app->getCurrentXsheet();
 
-  disconnect(xshHandle, SIGNAL(xsheetChanged()), this, SLOT(onSceneChanged()));
+  QObject::disconnect(xshHandle, SIGNAL(xsheetChanged()), this,
+                      SLOT(onSceneChanged()));
 
-  disconnect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
-  disconnect(sceneHandle, SIGNAL(nameSceneChanged()), this,
-             SLOT(changeWindowTitle()));
+  QObject::disconnect(sceneHandle, SIGNAL(sceneChanged()), this,
+                      SLOT(onSceneChanged()));
+  QObject::disconnect(sceneHandle, SIGNAL(nameSceneChanged()), this,
+                      SLOT(changeWindowTitle()));
 
-  disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-             SLOT(onXshLevelSwitched(TXshLevel *)));
-  disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
-             SLOT(changeWindowTitle()));
-  disconnect(levelHandle, SIGNAL(xshLevelTitleChanged()), this,
-             SLOT(changeWindowTitle()));
-  disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
-             SLOT(updateFrameRange()));
+  QObject::disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+                      SLOT(onXshLevelSwitched(TXshLevel *)));
+  QObject::disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                      SLOT(changeWindowTitle()));
+  QObject::disconnect(levelHandle, SIGNAL(xshLevelTitleChanged()), this,
+                      SLOT(changeWindowTitle()));
+  QObject::disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                      SLOT(updateFrameRange()));
 
-  disconnect(frameHandle, SIGNAL(frameSwitched()), this,
-             SLOT(changeWindowTitle()));
-  disconnect(frameHandle, SIGNAL(frameSwitched()), this,
-             SLOT(onFrameSwitched()));
-  disconnect(frameHandle, SIGNAL(frameTypeChanged()), this,
-             SLOT(onFrameTypeChanged()));
+  QObject::disconnect(frameHandle, SIGNAL(frameSwitched()), this,
+                      SLOT(changeWindowTitle()));
+  QObject::disconnect(frameHandle, SIGNAL(frameSwitched()), this,
+                      SLOT(onFrameSwitched()));
+  QObject::disconnect(frameHandle, SIGNAL(frameTypeChanged()), this,
+                      SLOT(onFrameTypeChanged()));
 
-  disconnect(app->getCurrentTool(), SIGNAL(toolSwitched()), m_sceneViewer,
-             SLOT(onToolSwitched()));
+  QObject::disconnect(app->getCurrentTool(), SIGNAL(toolSwitched()),
+                      m_sceneViewer, SLOT(onToolSwitched()));
 
-  disconnect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
-             SLOT(onPreferenceChanged()));
+  QObject::disconnect(sceneHandle, SIGNAL(preferenceChanged()), m_flipConsole,
+                      SLOT(onPreferenceChanged()));
 
   m_flipConsole->setActive(false);
 }
@@ -331,10 +335,10 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
                                     ":Resources/freeze_on.png");
   button->setToolTip(tr("Freeze"));
   titleBar->add(QPoint(x, 2), button);
-  ret = ret && connect(button, SIGNAL(toggled(bool)), m_sceneViewer,
-                       SLOT(freeze(bool)));
-  ret = ret && connect(m_sceneViewer, SIGNAL(freezeStateChanged(bool)), button,
-                       SLOT(setPressed(bool)));
+  ret = ret && QObject::connect(button, SIGNAL(toggled(bool)), m_sceneViewer,
+                                SLOT(freeze(bool)));
+  ret = ret && QObject::connect(m_sceneViewer, SIGNAL(freezeStateChanged(bool)),
+                                button, SLOT(setPressed(bool)));
 
   button = new TPanelTitleBarButton(titleBar, ":Resources/standard.png",
                                     ":Resources/standard_over.png",
@@ -360,8 +364,8 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   x += 5 + iconWidth;
   titleBar->add(QPoint(x, 2), button);
   button->setButtonSet(viewModeButtonSet, SceneViewer::CAMERA_REFERENCE);
-  ret = ret && connect(viewModeButtonSet, SIGNAL(selected(int)), m_sceneViewer,
-                       SLOT(setReferenceMode(int)));
+  ret = ret && QObject::connect(viewModeButtonSet, SIGNAL(selected(int)),
+                                m_sceneViewer, SLOT(setReferenceMode(int)));
 
   m_previewButton = new TPanelTitleBarButton(
       titleBar, ":Resources/viewpreview.png", ":Resources/viewpreview_over.png",
@@ -369,8 +373,8 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   x += 18 + iconWidth;
   titleBar->add(QPoint(x, 2), m_previewButton);
   m_previewButton->setToolTip(tr("Preview"));
-  ret = ret && connect(m_previewButton, SIGNAL(toggled(bool)),
-                       SLOT(enableFullPreview(bool)));
+  ret = ret && QObject::connect(m_previewButton, SIGNAL(toggled(bool)),
+                                SLOT(enableFullPreview(bool)));
 
   m_subcameraPreviewButton =
       new TPanelTitleBarButton(titleBar, ":Resources/subcamera_preview.png",
@@ -379,8 +383,8 @@ void SceneViewerPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   x += 5 + iconWidth;
   titleBar->add(QPoint(x, 2), m_subcameraPreviewButton);
   m_subcameraPreviewButton->setToolTip(tr("Sub-camera Preview"));
-  ret = ret && connect(m_subcameraPreviewButton, SIGNAL(toggled(bool)),
-                       SLOT(enableSubCameraPreview(bool)));
+  ret = ret && QObject::connect(m_subcameraPreviewButton, SIGNAL(toggled(bool)),
+                                SLOT(enableSubCameraPreview(bool)));
 
   assert(ret);
 }

@@ -306,33 +306,34 @@ void FilmstripFrames::showEvent(QShowEvent *) {
 
   // cambiamenti al livello
   TXshLevelHandle *levelHandle = app->getCurrentLevel();
-  connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-          SLOT(onLevelSwitched(TXshLevel *)));
-  connect(levelHandle, SIGNAL(xshLevelChanged()), this, SLOT(onLevelChanged()));
-  connect(levelHandle, SIGNAL(xshLevelViewChanged()), this,
-          SLOT(onLevelChanged()));
+  QObject::connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+                   SLOT(onLevelSwitched(TXshLevel *)));
+  QObject::connect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                   SLOT(onLevelChanged()));
+  QObject::connect(levelHandle, SIGNAL(xshLevelViewChanged()), this,
+                   SLOT(onLevelChanged()));
 
   // al frame corrente
-  connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-          SLOT(onFrameSwitched()));
-  connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
-          SLOT(update()));
+  QObject::connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+                   SLOT(onFrameSwitched()));
+  QObject::connect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
+                   SLOT(update()));
 
   // iconcine
-  connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
-          SLOT(update()));
+  QObject::connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
+                   SLOT(update()));
 
   // onion skin
-  connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
-          SLOT(update()));
+  QObject::connect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()),
+                   this, SLOT(update()));
 
   // enable navigator link with the Viewer in the InknPaint page
   ComboViewerPanel *inknPaintViewerPanel = app->getInknPaintViewerPanel();
   if (inknPaintViewerPanel) {
     SceneViewer *viewer = inknPaintViewerPanel->getSceneViewer();
     if (viewer) {
-      connect(viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
-      connect(viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
+      QObject::connect(viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
+      QObject::connect(viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
     }
   }
 }
@@ -343,28 +344,29 @@ void FilmstripFrames::hideEvent(QHideEvent *) {
   TApp *app = TApp::instance();
 
   // cambiamenti al livello
-  disconnect(app->getCurrentLevel());
+  QObject::disconnect(app->getCurrentLevel());
 
   // al frame corrente
-  disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-             SLOT(onFrameSwitched()));
-  disconnect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
-             SLOT(update()));
+  QObject::disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+                      SLOT(onFrameSwitched()));
+  QObject::disconnect(app->getCurrentFrame(), SIGNAL(frameTypeChanged()), this,
+                      SLOT(update()));
 
   // iconcine
-  disconnect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
-             SLOT(update()));
+  QObject::disconnect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
+                      SLOT(update()));
 
   // onion skin
-  disconnect(app->getCurrentOnionSkin(), SIGNAL(onionSkinMaskChanged()), this,
-             SLOT(update()));
+  QObject::disconnect(app->getCurrentOnionSkin(),
+                      SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
 
   ComboViewerPanel *inknPaintViewerPanel = app->getInknPaintViewerPanel();
   if (inknPaintViewerPanel) {
     SceneViewer *viewer = inknPaintViewerPanel->getSceneViewer();
     if (viewer) {
-      disconnect(viewer, SIGNAL(onZoomChanged()), this, SLOT(update()));
-      disconnect(viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
+      QObject::disconnect(viewer, SIGNAL(onZoomChanged()), this,
+                          SLOT(update()));
+      QObject::disconnect(viewer, SIGNAL(refreshNavi()), this, SLOT(update()));
     }
   }
 }
@@ -1069,8 +1071,8 @@ Filmstrip::Filmstrip(QWidget *parent, Qt::WFlags flags)
   // signal-slot connections
   // switch the current level when the current index of m_chooseLevelCombo is
   // changed
-  connect(m_chooseLevelCombo, SIGNAL(activated(int)), this,
-          SLOT(onChooseLevelComboChanged(int)));
+  QObject::connect(m_chooseLevelCombo, SIGNAL(activated(int)), this,
+                   SLOT(onChooseLevelComboChanged(int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -1214,34 +1216,36 @@ Filmstrip::~Filmstrip() {}
 void Filmstrip::showEvent(QShowEvent *) {
   TApp *app                    = TApp::instance();
   TXshLevelHandle *levelHandle = app->getCurrentLevel();
-  bool ret = connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)),
-                     SLOT(onLevelSwitched(TXshLevel *)));
-  ret = ret &&
-        connect(levelHandle, SIGNAL(xshLevelChanged()), SLOT(onLevelChanged()));
+  bool ret =
+      QObject::connect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)),
+                       SLOT(onLevelSwitched(TXshLevel *)));
+  ret = ret && QObject::connect(levelHandle, SIGNAL(xshLevelChanged()),
+                                SLOT(onLevelChanged()));
 
   // updateWindowTitle is called in the onLevelChanged
-  ret = ret && connect(app->getPaletteController()->getCurrentLevelPalette(),
-                       SIGNAL(colorStyleChangedOnMouseRelease()),
-                       SLOT(onLevelChanged()));
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelTitleChanged()),
-                       SLOT(onLevelChanged()));
+  ret = ret &&
+        QObject::connect(app->getPaletteController()->getCurrentLevelPalette(),
+                         SIGNAL(colorStyleChangedOnMouseRelease()),
+                         SLOT(onLevelChanged()));
+  ret = ret && QObject::connect(levelHandle, SIGNAL(xshLevelTitleChanged()),
+                                SLOT(onLevelChanged()));
 
-  ret =
-      ret && connect(m_frameArea->verticalScrollBar(),
-                     SIGNAL(valueChanged(int)), this, SLOT(onSliderMoved(int)));
+  ret = ret && QObject::connect(m_frameArea->verticalScrollBar(),
+                                SIGNAL(valueChanged(int)), this,
+                                SLOT(onSliderMoved(int)));
 
   TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
-  ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this,
-                       SLOT(updateChooseLevelComboItems()));
-  ret = ret && connect(sceneHandle, SIGNAL(castChanged()), this,
-                       SLOT(updateChooseLevelComboItems()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                                SLOT(updateChooseLevelComboItems()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(castChanged()), this,
+                                SLOT(updateChooseLevelComboItems()));
 
-  ret = ret &&
-        connect(TApp::instance()->getCurrentXsheet(), SIGNAL(xsheetChanged()),
-                this, SLOT(updateChooseLevelComboItems()));
+  ret = ret && QObject::connect(TApp::instance()->getCurrentXsheet(),
+                                SIGNAL(xsheetChanged()), this,
+                                SLOT(updateChooseLevelComboItems()));
 
-  ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-                       SLOT(onFrameSwitched()));
+  ret = ret && QObject::connect(app->getCurrentFrame(), SIGNAL(frameSwitched()),
+                                this, SLOT(onFrameSwitched()));
 
   assert(ret);
 
@@ -1255,31 +1259,33 @@ void Filmstrip::showEvent(QShowEvent *) {
 void Filmstrip::hideEvent(QHideEvent *) {
   TApp *app                    = TApp::instance();
   TXshLevelHandle *levelHandle = app->getCurrentLevel();
-  disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
-             SLOT(onLevelSwitched(TXshLevel *)));
-  disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
-             SLOT(onLevelChanged()));
-  disconnect(TApp::instance()->getPaletteController()->getCurrentLevelPalette(),
-             SIGNAL(colorStyleChangedOnMouseRelease()), this,
-             SLOT(onLevelChanged()));
+  QObject::disconnect(levelHandle, SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+                      SLOT(onLevelSwitched(TXshLevel *)));
+  QObject::disconnect(levelHandle, SIGNAL(xshLevelChanged()), this,
+                      SLOT(onLevelChanged()));
+  QObject::disconnect(
+      TApp::instance()->getPaletteController()->getCurrentLevelPalette(),
+      SIGNAL(colorStyleChangedOnMouseRelease()), this, SLOT(onLevelChanged()));
 
-  disconnect(levelHandle, SIGNAL(xshLevelTitleChanged()), this,
-             SLOT(onLevelChanged()));
+  QObject::disconnect(levelHandle, SIGNAL(xshLevelTitleChanged()), this,
+                      SLOT(onLevelChanged()));
 
-  disconnect(m_frameArea->verticalScrollBar(), SIGNAL(valueChanged(int)), this,
-             SLOT(onSliderMoved(int)));
+  QObject::disconnect(m_frameArea->verticalScrollBar(),
+                      SIGNAL(valueChanged(int)), this,
+                      SLOT(onSliderMoved(int)));
 
   TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
-  disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
-             SLOT(updateChooseLevelComboItems()));
-  disconnect(sceneHandle, SIGNAL(castChanged()), this,
-             SLOT(updateChooseLevelComboItems()));
+  QObject::disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                      SLOT(updateChooseLevelComboItems()));
+  QObject::disconnect(sceneHandle, SIGNAL(castChanged()), this,
+                      SLOT(updateChooseLevelComboItems()));
 
-  disconnect(TApp::instance()->getCurrentXsheet(), SIGNAL(xsheetChanged()),
-             this, SLOT(updateChooseLevelComboItems()));
+  QObject::disconnect(TApp::instance()->getCurrentXsheet(),
+                      SIGNAL(xsheetChanged()), this,
+                      SLOT(updateChooseLevelComboItems()));
 
-  disconnect(TApp::instance()->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-             SLOT(onFrameSwitched()));
+  QObject::disconnect(TApp::instance()->getCurrentFrame(),
+                      SIGNAL(frameSwitched()), this, SLOT(onFrameSwitched()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1396,8 +1402,8 @@ InbetweenDialog::InbetweenDialog(QWidget *parent)
 
   QPushButton *okBtn     = new QPushButton(tr("Inbetween"), this);
   QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-  connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
+  QObject::connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(okBtn, cancelBtn);
 }

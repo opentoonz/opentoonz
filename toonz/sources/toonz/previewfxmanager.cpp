@@ -1167,29 +1167,29 @@ PreviewFxManager::PreviewFxManager() : QObject() {
   qRegisterMetaType<TRenderPort::RenderData>("TRenderPort::RenderData");
 
   /*-- Rendering終了時、各RenderPortからEmit → Flipbookの更新を行う --*/
-  connect(this, SIGNAL(renderedFrame(unsigned long, TRenderPort::RenderData)),
-          this, SLOT(onRenderedFrame(unsigned long, TRenderPort::RenderData)));
+  QObject::connect(
+      this, SIGNAL(renderedFrame(unsigned long, TRenderPort::RenderData)), this,
+      SLOT(onRenderedFrame(unsigned long, TRenderPort::RenderData)));
   /*-- Rendering開始時、各RenderPortからEmit →
    * Flipbookのプログレスバーのステータスを「計算中」にする --*/
-  connect(this, SIGNAL(startedFrame(unsigned long, TRenderPort::RenderData)),
-          this, SLOT(onStartedFrame(unsigned long, TRenderPort::RenderData)));
+  QObject::connect(
+      this, SIGNAL(startedFrame(unsigned long, TRenderPort::RenderData)), this,
+      SLOT(onStartedFrame(unsigned long, TRenderPort::RenderData)));
 
-  // connect(app->getPaletteController()->getCurrentPalette(),
-  // SIGNAL(colorStyleChangedOnMouseRelease()),SLOT(onLevelChanged()));
-  // connect(app->getPaletteController()->getCurrentPalette(),
-  // SIGNAL(paletteChanged()),   SLOT(onLevelChanged()));
-  connect(app->getPaletteController()->getCurrentLevelPalette(),
-          SIGNAL(colorStyleChangedOnMouseRelease()), SLOT(onLevelChanged()));
-  connect(app->getPaletteController()->getCurrentLevelPalette(),
-          SIGNAL(paletteChanged()), SLOT(onLevelChanged()));
+  QObject::connect(app->getPaletteController()->getCurrentLevelPalette(),
+                   SIGNAL(colorStyleChangedOnMouseRelease()),
+                   SLOT(onLevelChanged()));
+  QObject::connect(app->getPaletteController()->getCurrentLevelPalette(),
+                   SIGNAL(paletteChanged()), SLOT(onLevelChanged()));
 
-  connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), this,
-          SLOT(onLevelChanged()));
-  connect(app->getCurrentFx(), SIGNAL(fxChanged()), this, SLOT(onFxChanged()));
-  connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
-          SLOT(onXsheetChanged()));
-  connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)), this,
-          SLOT(onObjectChanged(bool)));
+  QObject::connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), this,
+                   SLOT(onLevelChanged()));
+  QObject::connect(app->getCurrentFx(), SIGNAL(fxChanged()), this,
+                   SLOT(onFxChanged()));
+  QObject::connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), this,
+                   SLOT(onXsheetChanged()));
+  QObject::connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)), this,
+                   SLOT(onObjectChanged(bool)));
 
   /*-- 上記の on○○Changed() は、全て refreshViewRects をEmitしている。
           → これまでの計算を止め、新たにstartRenderをする。
@@ -1197,8 +1197,9 @@ PreviewFxManager::PreviewFxManager() : QObject() {
   は、イベントループの手が空いた時に初めてSLOTを呼ぶ、ということ）
   --*/
   // Due to current implementation of PreviewFxInstance::refreshViewRects().
-  connect(this, SIGNAL(refreshViewRects(unsigned long)), this,
-          SLOT(onRefreshViewRects(unsigned long)), Qt::QueuedConnection);
+  QObject::connect(this, SIGNAL(refreshViewRects(unsigned long)), this,
+                   SLOT(onRefreshViewRects(unsigned long)),
+                   Qt::QueuedConnection);
 
   previewerInstance = this;
 }

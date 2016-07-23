@@ -590,26 +590,30 @@ PencilTestPopup::PencilTestPopup()
 
   //---- signal-slot connections ----
   bool ret = true;
-  ret      = ret && connect(refreshCamListButton, SIGNAL(pressed()), this,
-                       SLOT(refreshCameraList()));
-  ret = ret && connect(m_cameraListCombo, SIGNAL(activated(int)), this,
-                       SLOT(onCameraListComboActivated(int)));
-  ret = ret && connect(m_resolutionCombo, SIGNAL(activated(const QString&)),
-                       this, SLOT(onResolutionComboActivated(const QString&)));
-  ret = ret && connect(m_fileFormatOptionButton, SIGNAL(pressed()), this,
-                       SLOT(onFileFormatOptionButtonPressed()));
+
+  ret = ret && QObject::connect(refreshCamListButton, SIGNAL(pressed()), this,
+                                SLOT(refreshCameraList()));
+  ret = ret && QObject::connect(m_cameraListCombo, SIGNAL(activated(int)), this,
+                                SLOT(onCameraListComboActivated(int)));
+  ret = ret && QObject::connect(
+                   m_resolutionCombo, SIGNAL(activated(const QString&)), this,
+                   SLOT(onResolutionComboActivated(const QString&)));
+  ret = ret && QObject::connect(m_fileFormatOptionButton, SIGNAL(pressed()),
+                                this, SLOT(onFileFormatOptionButtonPressed()));
+  ret = ret && QObject::connect(nextLevelButton, SIGNAL(pressed()), this,
+                                SLOT(onNextName()));
   ret = ret &&
-        connect(nextLevelButton, SIGNAL(pressed()), this, SLOT(onNextName()));
-  ret = ret && connect(m_colorTypeCombo, SIGNAL(currentIndexChanged(int)), this,
-                       SLOT(onColorTypeComboChanged(int)));
-  ret = ret && connect(m_captureWhiteBGButton, SIGNAL(pressed()), this,
-                       SLOT(onCaptureWhiteBGButtonPressed()));
-  ret = ret && connect(m_onionSkinCB, SIGNAL(toggled(bool)), this,
-                       SLOT(onOnionCBToggled(bool)));
-  ret = ret && connect(m_onionOpacityFld, SIGNAL(valueEditedByHand()), this,
-                       SLOT(onOnionOpacityFldEdited()));
-  ret = ret && connect(m_upsideDownCB, SIGNAL(toggled(bool)),
-                       m_cameraViewfinder, SLOT(onUpsideDownChecked(bool)));
+        QObject::connect(m_colorTypeCombo, SIGNAL(currentIndexChanged(int)),
+                         this, SLOT(onColorTypeComboChanged(int)));
+  ret = ret && QObject::connect(m_captureWhiteBGButton, SIGNAL(pressed()), this,
+                                SLOT(onCaptureWhiteBGButtonPressed()));
+  ret = ret && QObject::connect(m_onionSkinCB, SIGNAL(toggled(bool)), this,
+                                SLOT(onOnionCBToggled(bool)));
+  ret = ret && QObject::connect(m_onionOpacityFld, SIGNAL(valueEditedByHand()),
+                                this, SLOT(onOnionOpacityFldEdited()));
+  ret = ret &&
+        QObject::connect(m_upsideDownCB, SIGNAL(toggled(bool)),
+                         m_cameraViewfinder, SLOT(onUpsideDownChecked(bool)));
   ret = ret && connect(m_timerCB, SIGNAL(toggled(bool)), this,
                        SLOT(onTimerCBToggled(bool)));
   ret = ret && connect(m_captureTimer, SIGNAL(timeout()), this,
@@ -677,8 +681,9 @@ void PencilTestPopup::onCameraListComboActivated(int index) {
   m_currentCamera    = new QCamera(cameras.at(index), this);
   m_deviceName       = cameras.at(index).deviceName();
   if (m_cameraImageCapture) {
-    disconnect(m_cameraImageCapture, SIGNAL(imageCaptured(int, const QImage&)),
-               this, SLOT(onImageCaptured(int, const QImage&)));
+    QObject::disconnect(m_cameraImageCapture,
+                        SIGNAL(imageCaptured(int, const QImage&)), this,
+                        SLOT(onImageCaptured(int, const QImage&)));
     delete m_cameraImageCapture;
   }
   m_cameraImageCapture = new QCameraImageCapture(m_currentCamera, this);
@@ -688,8 +693,9 @@ void PencilTestPopup::onCameraListComboActivated(int index) {
   //  std::cout << "it does not support CaptureToBuffer" << std::endl;
   m_cameraImageCapture->setCaptureDestination(
       QCameraImageCapture::CaptureToBuffer);
-  connect(m_cameraImageCapture, SIGNAL(imageCaptured(int, const QImage&)), this,
-          SLOT(onImageCaptured(int, const QImage&)));
+  QObject::connect(m_cameraImageCapture,
+                   SIGNAL(imageCaptured(int, const QImage&)), this,
+                   SLOT(onImageCaptured(int, const QImage&)));
 
   // loading new camera
   m_currentCamera->load();
@@ -948,7 +954,6 @@ void PencilTestPopup::onTimerCBToggled(bool on) {
 }
 
 //-----------------------------------------------------------------------------
-
 void PencilTestPopup::onCaptureButtonClicked(bool on) {
   if (m_timerCB->isChecked()) {
     m_timerCB->setDisabled(on);

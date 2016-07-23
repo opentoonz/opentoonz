@@ -430,14 +430,14 @@ MatchlinesDialog::MatchlinesDialog()
 
   //----signal-slot connections
 
-  connect(m_button2, SIGNAL(toggled(bool)), this,
-          SLOT(onChooseInkClicked(bool)));
-  connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
-  connect(lineStackButtonGroup, SIGNAL(buttonPressed(int)),
-          SLOT(onLineStackButtonPressed(int)));
-  connect(m_inkPrevalence, SIGNAL(valueChanged(bool)),
-          SLOT(onInkPrevalenceChanged(bool)));
+  QObject::connect(m_button2, SIGNAL(toggled(bool)), this,
+                   SLOT(onChooseInkClicked(bool)));
+  QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
+  QObject::connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(lineStackButtonGroup, SIGNAL(buttonPressed(int)),
+                   SLOT(onLineStackButtonPressed(int)));
+  QObject::connect(m_inkPrevalence, SIGNAL(valueChanged(bool)),
+                   SLOT(onInkPrevalenceChanged(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -983,8 +983,8 @@ DeleteInkDialog::DeleteInkDialog(const QString &str, int inkIndex)
     m_buttonLayout->addWidget(cancelBtn);
   }
 
-  connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
+  QObject::connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
 void DeleteInkDialog::setRange(const QString &str) { m_frames->setText(str); }
@@ -995,8 +995,8 @@ void DeleteInkDialog::setRange(const QString &str) { m_frames->setText(str); }
          DeleteLinesコマンドから呼ばれる場合：chooseInkがtrue
 --*/
 
-static void doDeleteMatchlines(TXshSimpleLevel *sl, const std::set<TFrameId> &fids,
-                               bool chooseInk) {
+static void doDeleteMatchlines(TXshSimpleLevel *sl,
+                               const std::set<TFrameId> &fids, bool chooseInk) {
   std::vector<int> indexes;
   // vector<TToonzImageP> images;
   std::vector<TFrameId> frames;

@@ -75,10 +75,11 @@ TFxP TFxUtil::makeOver(const TFxP &dn, const TFxP &up) {
 // ------------------------------------------------------------------ -
 
 TFxP TFxUtil::makeDarken(const TFxP &dn, const TFxP &up) {
-  if (!dn)
+  if (!dn) {
     return up;
-  else if (!up)
+  } else if (!up) {
     return dn;
+  }
   assert(dn);
   assert(up);
 
@@ -112,8 +113,9 @@ TFxP TFxUtil::makeBlur(const TFxP &arg, double blurValue) {
   TFxP fx = TFx::create("STD_blurFx");
   assert(fx);
   setParam(fx, "value", blurValue);
-  if (!fx->connect("Source", arg.getPointer()))
+  if (!fx->connect("Source", arg.getPointer())) {
     assert(!"Could not connect ports!");
+  }
   return fx;
 }
 

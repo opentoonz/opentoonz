@@ -62,7 +62,6 @@ public:
   void notifyPaletteDirtyFlagChanged() { emit paletteDirtyFlagChanged(); }
   void notifyPaletteLockChanged() { emit paletteLockChanged(); }
 
-public:
 signals:
 
   void paletteSwitched();
@@ -80,9 +79,7 @@ private:
   bool connectBroadcasts(const QObject *receiver);
   bool disconnectBroadcasts(const QObject *receiver);
 
-private:
 signals:
-
   // Internal broadcaster signals to multiple palette handles.
   // Do not connect to user code.
 

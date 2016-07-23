@@ -282,16 +282,17 @@ void MenuBarTree::contextMenuEvent(QContextMenuEvent* event) {
   if (item != currentItem()) setCurrentItem(item);
   QMenu* menu = new QMenu(this);
   QAction* action;
-  if (!item || indexOfTopLevelItem(item) >= 0)
+  if (!item || indexOfTopLevelItem(item) >= 0) {
     action = menu->addAction(tr("Insert Menu"));
-  else
+  } else {
     action = menu->addAction(tr("Insert Submenu"));
+  }
 
-  connect(action, SIGNAL(triggered()), this, SLOT(insertMenu()));
+  QObject::connect(action, SIGNAL(triggered()), this, SLOT(insertMenu()));
 
   if (item) {
     action = menu->addAction(tr("Remove \"%1\"").arg(item->text(0)));
-    connect(action, SIGNAL(triggered()), this, SLOT(removeItem()));
+    QObject::connect(action, SIGNAL(triggered()), this, SLOT(removeItem()));
   }
 
   menu->exec(event->globalPos());
@@ -507,8 +508,10 @@ MenuBarPopup::MenuBarPopup(Room* room)
 
   //--- signal/slot connections
 
-  bool ret = connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkPressed()));
-  ret      = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  bool ret =
+      QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkPressed()));
+  ret = ret &&
+        QObject::connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
   assert(ret);
 }
 

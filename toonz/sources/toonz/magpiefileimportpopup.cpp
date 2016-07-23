@@ -83,8 +83,8 @@ MagpieFileImportPopup::MagpieFileImportPopup()
   m_levelField = new DVGui::FileField(this);
   m_levelField->setFileMode(QFileDialog::AnyFile);
   m_levelField->setFixedWidth(200);
-  bool ret =
-      connect(m_levelField, SIGNAL(pathChanged()), SLOT(onLevelPathChanged()));
+  bool ret = QObject::connect(m_levelField, SIGNAL(pathChanged()),
+                              SLOT(onLevelPathChanged()));
 
   addWidget(tr("Level:"), m_levelField);
 
@@ -134,8 +134,10 @@ MagpieFileImportPopup::MagpieFileImportPopup()
   QPushButton *okBtn = new QPushButton(tr("Import"), this);
   okBtn->setDefault(true);
   QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-  ret = ret && connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkPressed()));
-  ret = ret && connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  ret                    = ret &&
+        QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(onOkPressed()));
+  ret = ret &&
+        QObject::connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
   assert(ret);
 
   addButtonBarWidget(okBtn, cancelBtn);

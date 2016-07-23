@@ -1005,9 +1005,10 @@ void ControlPointSelection::addMenuItems(QMenu *menu) {
   QAction *linear   = menu->addAction(tr("Set Linear Control Point"));
   QAction *unlinear = menu->addAction(tr("Set Nonlinear Control Point"));
   menu->addSeparator();
-  bool ret = connect(linear, SIGNAL(triggered()), this, SLOT(setLinear()));
-  ret =
-      ret && connect(unlinear, SIGNAL(triggered()), this, SLOT(setUnlinear()));
+  bool ret =
+      QObject::connect(linear, SIGNAL(triggered()), this, SLOT(setLinear()));
+  ret = ret && QObject::connect(unlinear, SIGNAL(triggered()), this,
+                                SLOT(setUnlinear()));
   assert(ret);
 }
 

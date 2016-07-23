@@ -204,27 +204,30 @@ void SchematicScenePanel::showEvent(QShowEvent *e) {
     setWindowTitle("Fx Schematic");
 
   TApp *app = TApp::instance();
-  connect(m_schematicViewer, SIGNAL(showPreview(TFxP)), this,
-          SLOT(onShowPreview(TFxP)));
-  connect(m_schematicViewer, SIGNAL(doCollapse(const QList<TFxP> &)), this,
-          SLOT(onCollapse(const QList<TFxP> &)));
-  connect(m_schematicViewer, SIGNAL(doCollapse(QList<TStageObjectId>)), this,
-          SLOT(onCollapse(QList<TStageObjectId>)));
-  connect(m_schematicViewer, SIGNAL(doExplodeChild(const QList<TFxP> &)), this,
-          SLOT(onExplodeChild(const QList<TFxP> &)));
-  connect(m_schematicViewer, SIGNAL(doExplodeChild(QList<TStageObjectId>)),
-          this, SLOT(onExplodeChild(QList<TStageObjectId>)));
-  connect(m_schematicViewer, SIGNAL(editObject()), this, SLOT(onEditObject()));
-  connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()), m_schematicViewer,
-          SLOT(updateScenes()));
-  connect(app->getCurrentObject(), SIGNAL(objectSwitched()), m_schematicViewer,
-          SLOT(updateScenes()));
-  connect(app->getCurrentXsheet(), SIGNAL(xsheetSwitched()), m_schematicViewer,
-          SLOT(updateSchematic()));
-  connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()), m_schematicViewer,
-          SLOT(updateSchematic()));
-  connect(app->getCurrentScene(), SIGNAL(sceneSwitched()), m_schematicViewer,
-          SLOT(onSceneSwitched()));
+  QObject::connect(m_schematicViewer, SIGNAL(showPreview(TFxP)), this,
+                   SLOT(onShowPreview(TFxP)));
+  QObject::connect(m_schematicViewer, SIGNAL(doCollapse(const QList<TFxP> &)),
+                   this, SLOT(onCollapse(const QList<TFxP> &)));
+  QObject::connect(m_schematicViewer, SIGNAL(doCollapse(QList<TStageObjectId>)),
+                   this, SLOT(onCollapse(QList<TStageObjectId>)));
+  QObject::connect(m_schematicViewer,
+                   SIGNAL(doExplodeChild(const QList<TFxP> &)), this,
+                   SLOT(onExplodeChild(const QList<TFxP> &)));
+  QObject::connect(m_schematicViewer,
+                   SIGNAL(doExplodeChild(QList<TStageObjectId>)), this,
+                   SLOT(onExplodeChild(QList<TStageObjectId>)));
+  QObject::connect(m_schematicViewer, SIGNAL(editObject()), this,
+                   SLOT(onEditObject()));
+  QObject::connect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()),
+                   m_schematicViewer, SLOT(updateScenes()));
+  QObject::connect(app->getCurrentObject(), SIGNAL(objectSwitched()),
+                   m_schematicViewer, SLOT(updateScenes()));
+  QObject::connect(app->getCurrentXsheet(), SIGNAL(xsheetSwitched()),
+                   m_schematicViewer, SLOT(updateSchematic()));
+  QObject::connect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()),
+                   m_schematicViewer, SLOT(updateSchematic()));
+  QObject::connect(app->getCurrentScene(), SIGNAL(sceneSwitched()),
+                   m_schematicViewer, SLOT(onSceneSwitched()));
   m_schematicViewer->updateSchematic();
 }
 
@@ -232,28 +235,32 @@ void SchematicScenePanel::showEvent(QShowEvent *e) {
 
 void SchematicScenePanel::hideEvent(QHideEvent *e) {
   TApp *app = TApp::instance();
-  disconnect(m_schematicViewer, SIGNAL(showPreview(TFxP)), this,
-             SLOT(onShowPreview(TFxP)));
-  disconnect(m_schematicViewer, SIGNAL(doCollapse(const QList<TFxP> &)), this,
-             SLOT(onCollapse(const QList<TFxP> &)));
-  disconnect(m_schematicViewer, SIGNAL(doCollapse(QList<TStageObjectId>)), this,
-             SLOT(onCollapse(QList<TStageObjectId>)));
-  disconnect(m_schematicViewer, SIGNAL(doExplodeChild(const QList<TFxP> &)),
-             this, SLOT(onExplodeChild(const QList<TFxP> &)));
-  disconnect(m_schematicViewer, SIGNAL(doExplodeChild(QList<TStageObjectId>)),
-             this, SLOT(onExplodeChild(QList<TStageObjectId>)));
-  disconnect(m_schematicViewer, SIGNAL(editObject()), this,
-             SLOT(onEditObject()));
-  disconnect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()),
-             m_schematicViewer, SLOT(updateScenes()));
-  disconnect(app->getCurrentObject(), SIGNAL(objectSwitched()),
-             m_schematicViewer, SLOT(updateScenes()));
-  disconnect(app->getCurrentXsheet(), SIGNAL(xsheetSwitched()),
-             m_schematicViewer, SLOT(updateSchematic()));
-  disconnect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()),
-             m_schematicViewer, SLOT(updateSchematic()));
-  disconnect(app->getCurrentScene(), SIGNAL(sceneSwitched()), m_schematicViewer,
-             SLOT(onSceneSwitched()));
+  QObject::disconnect(m_schematicViewer, SIGNAL(showPreview(TFxP)), this,
+                      SLOT(onShowPreview(TFxP)));
+  QObject::disconnect(m_schematicViewer,
+                      SIGNAL(doCollapse(const QList<TFxP> &)), this,
+                      SLOT(onCollapse(const QList<TFxP> &)));
+  QObject::disconnect(m_schematicViewer,
+                      SIGNAL(doCollapse(QList<TStageObjectId>)), this,
+                      SLOT(onCollapse(QList<TStageObjectId>)));
+  QObject::disconnect(m_schematicViewer,
+                      SIGNAL(doExplodeChild(const QList<TFxP> &)), this,
+                      SLOT(onExplodeChild(const QList<TFxP> &)));
+  QObject::disconnect(m_schematicViewer,
+                      SIGNAL(doExplodeChild(QList<TStageObjectId>)), this,
+                      SLOT(onExplodeChild(QList<TStageObjectId>)));
+  QObject::disconnect(m_schematicViewer, SIGNAL(editObject()), this,
+                      SLOT(onEditObject()));
+  QObject::disconnect(app->getCurrentLevel(), SIGNAL(xshLevelChanged()),
+                      m_schematicViewer, SLOT(updateScenes()));
+  QObject::disconnect(app->getCurrentObject(), SIGNAL(objectSwitched()),
+                      m_schematicViewer, SLOT(updateScenes()));
+  QObject::disconnect(app->getCurrentXsheet(), SIGNAL(xsheetSwitched()),
+                      m_schematicViewer, SLOT(updateSchematic()));
+  QObject::disconnect(app->getCurrentXsheet(), SIGNAL(xsheetChanged()),
+                      m_schematicViewer, SLOT(updateSchematic()));
+  QObject::disconnect(app->getCurrentScene(), SIGNAL(sceneSwitched()),
+                      m_schematicViewer, SLOT(onSceneSwitched()));
 }
 
 //=============================================================================
@@ -304,10 +311,10 @@ FunctionViewerPanel::FunctionViewerPanel(QWidget *parent)
 
   attachHandles();
 
-  bool ret =
-      connect(m_functionViewer,
-              SIGNAL(curveIo(int, TDoubleParam *, const std::string &)), this,
-              SLOT(onIoCurve(int, TDoubleParam *, const std::string &)));
+  bool ret = QObject::connect(
+      m_functionViewer,
+      SIGNAL(curveIo(int, TDoubleParam *, const std::string &)), this,
+      SLOT(onIoCurve(int, TDoubleParam *, const std::string &)));
   ret &&connect(m_functionViewer, SIGNAL(editObject()), this,
                 SLOT(onEditObject()));
 
@@ -404,10 +411,10 @@ public:
 
 PaletteViewerPanel::PaletteViewerPanel(QWidget *parent) : TPanel(parent) {
   m_paletteHandle = new TPaletteHandle();
-  connect(m_paletteHandle, SIGNAL(colorStyleSwitched()),
-          SLOT(onColorStyleSwitched()));
-  connect(m_paletteHandle, SIGNAL(paletteSwitched()),
-          SLOT(onPaletteSwitched()));
+  QObject::connect(m_paletteHandle, SIGNAL(colorStyleSwitched()),
+                   SLOT(onColorStyleSwitched()));
+  QObject::connect(m_paletteHandle, SIGNAL(paletteSwitched()),
+                   SLOT(onPaletteSwitched()));
 
   TApp *app       = TApp::instance();
   m_paletteViewer = new PaletteViewer(this, PaletteViewerGUI::LEVEL_PALETTE);
@@ -419,7 +426,8 @@ PaletteViewerPanel::PaletteViewerPanel(QWidget *parent) : TPanel(parent) {
   m_paletteViewer->setLevelHandle(app->getCurrentLevel());
 
   TSceneHandle *sceneHandle = app->getCurrentScene();
-  connect(sceneHandle, SIGNAL(sceneSwitched()), SLOT(onSceneSwitched()));
+  QObject::connect(sceneHandle, SIGNAL(sceneSwitched()),
+                   SLOT(onSceneSwitched()));
 
   CurrentStyleChangeCommand *currentStyleChangeCommand =
       new CurrentStyleChangeCommand();
@@ -456,8 +464,8 @@ void PaletteViewerPanel::initializeTitleBar() {
       ":Resources/switch_on.png");
   getTitleBar()->add(QPoint(-54, 2), m_isCurrentButton);
   m_isCurrentButton->setPressed(true);
-  connect(m_isCurrentButton, SIGNAL(toggled(bool)),
-          SLOT(onCurrentButtonToggled(bool)));
+  QObject::connect(m_isCurrentButton, SIGNAL(toggled(bool)),
+                   SLOT(onCurrentButtonToggled(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -577,13 +585,13 @@ OpenFloatingPanel openPaletteCommand(MI_OpenPalette, "LevelPalette",
 StudioPaletteViewerPanel::StudioPaletteViewerPanel(QWidget *parent)
     : TPanel(parent) {
   m_studioPaletteHandle = new TPaletteHandle();
-  connect(m_studioPaletteHandle, SIGNAL(colorStyleSwitched()),
-          SLOT(onColorStyleSwitched()));
-  connect(m_studioPaletteHandle, SIGNAL(paletteSwitched()),
-          SLOT(onPaletteSwitched()));
+  QObject::connect(m_studioPaletteHandle, SIGNAL(colorStyleSwitched()),
+                   SLOT(onColorStyleSwitched()));
+  QObject::connect(m_studioPaletteHandle, SIGNAL(paletteSwitched()),
+                   SLOT(onPaletteSwitched()));
 
-  connect(m_studioPaletteHandle, SIGNAL(paletteLockChanged()),
-          SLOT(onPaletteSwitched()));
+  QObject::connect(m_studioPaletteHandle, SIGNAL(paletteLockChanged()),
+                   SLOT(onPaletteSwitched()));
 
   TApp *app             = TApp::instance();
   m_studioPaletteViewer = new StudioPaletteViewer(
@@ -665,17 +673,18 @@ void ColorFieldEditorController::edit(DVGui::ColorField *colorField) {
   TApp::instance()->getPaletteController()->setCurrentPalette(
       m_colorFieldHandle);
 
-  connect(m_currentColorField, SIGNAL(colorChanged(const TPixel32 &, bool)),
-          SLOT(onColorChanged(const TPixel32 &, bool)));
-  connect(m_colorFieldHandle, SIGNAL(colorStyleChanged()),
-          SLOT(onColorStyleChanged()));
+  QObject::connect(m_currentColorField,
+                   SIGNAL(colorChanged(const TPixel32 &, bool)),
+                   SLOT(onColorChanged(const TPixel32 &, bool)));
+  QObject::connect(m_colorFieldHandle, SIGNAL(colorStyleChanged()),
+                   SLOT(onColorStyleChanged()));
 }
 
 //-----------------------------------------------------------------------------
 
 void ColorFieldEditorController::hide() {
-  disconnect(m_colorFieldHandle, SIGNAL(colorStyleChanged()), this,
-             SLOT(onColorStyleChanged()));
+  QObject::disconnect(m_colorFieldHandle, SIGNAL(colorStyleChanged()), this,
+                      SLOT(onColorStyleChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -746,15 +755,15 @@ void CleanupColorFieldEditorController::edit(
   TApp::instance()->getPaletteController()->setCurrentPalette(
       m_colorFieldHandle);
 
-  connect(m_colorFieldHandle, SIGNAL(colorStyleChanged()),
-          SLOT(onColorStyleChanged()));
+  QObject::connect(m_colorFieldHandle, SIGNAL(colorStyleChanged()),
+                   SLOT(onColorStyleChanged()));
 }
 
 //-----------------------------------------------------------------------------
 
 void CleanupColorFieldEditorController::hide() {
-  disconnect(m_colorFieldHandle, SIGNAL(colorStyleChanged()), this,
-             SLOT(onColorStyleChanged()));
+  QObject::disconnect(m_colorFieldHandle, SIGNAL(colorStyleChanged()), this,
+                      SLOT(onColorStyleChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -910,8 +919,8 @@ FlipbookPanel::FlipbookPanel(QWidget *parent) : TPanel(parent) {
   MainWindow *mw =
       qobject_cast<MainWindow *>(TApp::instance()->getMainWindow());
   if (mw && mw->getLayoutName() == QString("flip"))
-    connect(m_flipbook, SIGNAL(imageLoaded(QString &)), mw,
-            SLOT(changeWindowTitle(QString &)));
+    QObject::connect(m_flipbook, SIGNAL(imageLoaded(QString &)), mw,
+                     SLOT(changeWindowTitle(QString &)));
 }
 
 //-----------------------------------------------------------------------------
@@ -931,12 +940,14 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
                                           ":Resources/safearea_on.png");
   safeAreaButton->setToolTip("Safe Area (Right Click to Select)");
   titleBar->add(QPoint(x, 1), safeAreaButton);
-  ret = ret && connect(safeAreaButton, SIGNAL(toggled(bool)),
-                       CommandManager::instance()->getAction(MI_SafeArea),
-                       SLOT(trigger()));
-  ret = ret && connect(CommandManager::instance()->getAction(MI_SafeArea),
-                       SIGNAL(triggered(bool)), safeAreaButton,
-                       SLOT(setPressed(bool)));
+  ret = ret &&
+        QObject::connect(safeAreaButton, SIGNAL(toggled(bool)),
+                         CommandManager::instance()->getAction(MI_SafeArea),
+                         SLOT(trigger()));
+  ret = ret &&
+        QObject::connect(CommandManager::instance()->getAction(MI_SafeArea),
+                         SIGNAL(triggered(bool)), safeAreaButton,
+                         SLOT(setPressed(bool)));
   // sync the initial state
   safeAreaButton->setPressed(
       CommandManager::instance()->getAction(MI_SafeArea)->isChecked());
@@ -950,8 +961,8 @@ void FlipbookPanel::initializeTitleBar(TPanelTitleBar *titleBar) {
   m_button->setPressed(false);
 
   titleBar->add(QPoint(x, 1), m_button);
-  ret = ret && connect(m_button, SIGNAL(toggled(bool)), this,
-                       SLOT(onMinimizeButtonToggled(bool)));
+  ret = ret && QObject::connect(m_button, SIGNAL(toggled(bool)), this,
+                                SLOT(onMinimizeButtonToggled(bool)));
   assert(ret);
 }
 

@@ -41,7 +41,8 @@ SchematicWindowEditor::SchematicWindowEditor(
   m_nameItem->setPos(-2, -2);
   m_nameItem->setZValue(1);
   m_nameItem->hide();
-  connect(m_nameItem, SIGNAL(focusOut()), this, SLOT(onNameChanged()));
+  QObject::connect(m_nameItem, &SchematicName::focusOut,  //
+                   this, &SchematicWindowEditor::onNameChanged);
 }
 
 //---------------------------------------------------------------
@@ -168,7 +169,8 @@ void SchematicWindowEditor::contextMenuEvent(
   }
   QMenu menu(scene()->views()[0]);
   QAction *close = new QAction(tr("&Close Editor"), &menu);
-  connect(close, SIGNAL(triggered()), this, SLOT(closeEditor()));
+  QObject::connect(close, &QAction::triggered,  //
+                   this, &SchematicWindowEditor::closeEditor);
 
   menu.addAction(close);
   menu.exec(e->screenPos());

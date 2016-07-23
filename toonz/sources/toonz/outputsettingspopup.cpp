@@ -511,77 +511,86 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
   bool ret = true;
 
   if (!isPreview) {
-    ret = ret && connect(m_saveInFileFld, SIGNAL(pathChanged()), this,
-                         SLOT(onPathChanged()));
-    ret = ret && connect(m_fileNameFld, SIGNAL(editingFinished()),
-                         SLOT(onNameChanged()));
-    ret = ret &&
-          connect(m_fileFormat, SIGNAL(currentIndexChanged(const QString &)),
-                  SLOT(onFormatChanged(const QString &)));
-    ret = ret && connect(m_fileFormatButton, SIGNAL(pressed()), this,
-                         SLOT(openSettingsPopup()));
+    ret = ret && QObject::connect(m_saveInFileFld, SIGNAL(pathChanged()), this,
+                                  SLOT(onPathChanged()));
+    ret = ret && QObject::connect(m_fileNameFld, SIGNAL(editingFinished()),
+                                  SLOT(onNameChanged()));
+    ret = ret && QObject::connect(m_fileFormat,
+                                  SIGNAL(currentIndexChanged(const QString &)),
+                                  SLOT(onFormatChanged(const QString &)));
+    ret = ret && QObject::connect(m_fileFormatButton, SIGNAL(pressed()), this,
+                                  SLOT(openSettingsPopup()));
   }
-  ret = ret &&
-        connect(m_outputCameraOm, SIGNAL(currentIndexChanged(const QString &)),
-                SLOT(onCameraChanged(const QString &)));
-  ret = ret && connect(m_startFld, SIGNAL(editingFinished()),
-                       SLOT(onFrameFldEditFinished()));
-  ret = ret && connect(m_endFld, SIGNAL(editingFinished()),
-                       SLOT(onFrameFldEditFinished()));
-  ret = ret && connect(m_stepFld, SIGNAL(editingFinished()),
-                       SLOT(onFrameFldEditFinished()));
-  ret = ret && connect(m_shrinkFld, SIGNAL(editingFinished()),
-                       SLOT(onFrameFldEditFinished()));
+  ret = ret && QObject::connect(m_outputCameraOm,
+                                SIGNAL(currentIndexChanged(const QString &)),
+                                SLOT(onCameraChanged(const QString &)));
+  ret = ret && QObject::connect(m_startFld, SIGNAL(editingFinished()),
+                                SLOT(onFrameFldEditFinished()));
+  ret = ret && QObject::connect(m_endFld, SIGNAL(editingFinished()),
+                                SLOT(onFrameFldEditFinished()));
+  ret = ret && QObject::connect(m_stepFld, SIGNAL(editingFinished()),
+                                SLOT(onFrameFldEditFinished()));
+  ret = ret && QObject::connect(m_shrinkFld, SIGNAL(editingFinished()),
+                                SLOT(onFrameFldEditFinished()));
 
   if (isPreview) {
-    ret = ret && connect(m_applyShrinkChk, SIGNAL(stateChanged(int)),
-                         SLOT(onApplyShrinkChecked(int)));
+    ret = ret && QObject::connect(m_applyShrinkChk, SIGNAL(stateChanged(int)),
+                                  SLOT(onApplyShrinkChecked(int)));
   }
 
-  ret = ret && connect(m_resampleBalanceOm, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onResampleChanged(int)));
-  ret = ret && connect(m_channelWidthOm, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onChannelWidthChanged(int)));
+  ret = ret &&
+        QObject::connect(m_resampleBalanceOm, SIGNAL(currentIndexChanged(int)),
+                         SLOT(onResampleChanged(int)));
+  ret = ret &&
+        QObject::connect(m_channelWidthOm, SIGNAL(currentIndexChanged(int)),
+                         SLOT(onChannelWidthChanged(int)));
 
   if (!isPreview) {
-    ret = ret && connect(m_gammaFld, SIGNAL(editingFinished()),
-                         SLOT(onGammaFldEditFinished()));
-    ret = ret && connect(m_dominantFieldOm, SIGNAL(currentIndexChanged(int)),
-                         SLOT(onDominantFieldChanged(int)));
-    ret = ret && connect(m_frameRateFld, SIGNAL(editingFinished()), this,
-                         SLOT(onFrameRateEditingFinished()));
-    ret = ret && connect(m_stretchFromFld, SIGNAL(editingFinished()),
-                         SLOT(onStretchFldEditFinished()));
-    ret = ret && connect(m_stretchToFld, SIGNAL(editingFinished()),
-                         SLOT(onStretchFldEditFinished()));
-    ret = ret && connect(m_multimediaOm, SIGNAL(currentIndexChanged(int)), this,
-                         SLOT(onMultimediaChanged(int)));
-    ret = ret && connect(showOtherSettingsButton, SIGNAL(toggled(bool)),
-                         otherSettingsFrame, SLOT(setVisible(bool)));
-    ret = ret && connect(showCameraSettingsButton, SIGNAL(toggled(bool)),
-                         cameraSettingsBox, SLOT(setVisible(bool)));
-    ret = ret && connect(addPresetButton, SIGNAL(pressed()), this,
-                         SLOT(onAddPresetButtonPressed()));
-    ret = ret && connect(removePresetButton, SIGNAL(pressed()), this,
-                         SLOT(onRemovePresetButtonPressed()));
-    ret = ret && connect(m_presetCombo, SIGNAL(activated(const QString &)),
-                         this, SLOT(onPresetSelected(const QString &)));
-    ret = ret && connect(m_cameraSettings, SIGNAL(changed()), this,
-                         SLOT(onCameraSettingsChanged()));
-    ret = ret && connect(m_doStereoscopy, SIGNAL(stateChanged(int)),
-                         SLOT(onStereoChecked(int)));
-    ret = ret && connect(m_stereoShift, SIGNAL(editingFinished()),
-                         SLOT(onStereoChanged()));
+    ret = ret && QObject::connect(m_gammaFld, SIGNAL(editingFinished()),
+                                  SLOT(onGammaFldEditFinished()));
+    ret = ret &&
+          QObject::connect(m_dominantFieldOm, SIGNAL(currentIndexChanged(int)),
+                           SLOT(onDominantFieldChanged(int)));
+    ret = ret && QObject::connect(m_frameRateFld, SIGNAL(editingFinished()),
+                                  this, SLOT(onFrameRateEditingFinished()));
+    ret = ret && QObject::connect(m_stretchFromFld, SIGNAL(editingFinished()),
+                                  SLOT(onStretchFldEditFinished()));
+    ret = ret && QObject::connect(m_stretchToFld, SIGNAL(editingFinished()),
+                                  SLOT(onStretchFldEditFinished()));
+    ret = ret &&
+          QObject::connect(m_multimediaOm, SIGNAL(currentIndexChanged(int)),
+                           this, SLOT(onMultimediaChanged(int)));
+    ret =
+        ret && QObject::connect(showOtherSettingsButton, SIGNAL(toggled(bool)),
+                                otherSettingsFrame, SLOT(setVisible(bool)));
+    ret =
+        ret && QObject::connect(showCameraSettingsButton, SIGNAL(toggled(bool)),
+                                cameraSettingsBox, SLOT(setVisible(bool)));
+    ret = ret && QObject::connect(addPresetButton, SIGNAL(pressed()), this,
+                                  SLOT(onAddPresetButtonPressed()));
+    ret = ret && QObject::connect(removePresetButton, SIGNAL(pressed()), this,
+                                  SLOT(onRemovePresetButtonPressed()));
+    ret = ret &&
+          QObject::connect(m_presetCombo, SIGNAL(activated(const QString &)),
+                           this, SLOT(onPresetSelected(const QString &)));
+    ret = ret && QObject::connect(m_cameraSettings, SIGNAL(changed()), this,
+                                  SLOT(onCameraSettingsChanged()));
+    ret = ret && QObject::connect(m_doStereoscopy, SIGNAL(stateChanged(int)),
+                                  SLOT(onStereoChecked(int)));
+    ret = ret && QObject::connect(m_stereoShift, SIGNAL(editingFinished()),
+                                  SLOT(onStereoChanged()));
   }
 
-  ret = ret && connect(m_threadsComboOm, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onThreadsComboChanged(int)));
-  ret = ret && connect(m_rasterGranularityOm, SIGNAL(currentIndexChanged(int)),
-                       SLOT(onRasterGranularityChanged(int)));
+  ret = ret &&
+        QObject::connect(m_threadsComboOm, SIGNAL(currentIndexChanged(int)),
+                         SLOT(onThreadsComboChanged(int)));
+  ret = ret && QObject::connect(m_rasterGranularityOm,
+                                SIGNAL(currentIndexChanged(int)),
+                                SLOT(onRasterGranularityChanged(int)));
 
   if (m_subcameraChk)
-    ret = ret && connect(m_subcameraChk, SIGNAL(stateChanged(int)),
-                         SLOT(onSubcameraChecked(int)));
+    ret = ret && QObject::connect(m_subcameraChk, SIGNAL(stateChanged(int)),
+                                  SLOT(onSubcameraChecked(int)));
 
   assert(ret);
 }
@@ -611,13 +620,13 @@ TOutputProperties *OutputSettingsPopup::getProperties() const {
 void OutputSettingsPopup::showEvent(QShowEvent *) {
   TSceneHandle *sceneHandle   = TApp::instance()->getCurrentScene();
   TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
-  bool ret =
-      connect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(updateField()));
-  ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this,
-                       SLOT(updateField()));
+  bool ret = QObject::connect(sceneHandle, SIGNAL(sceneChanged()), this,
+                              SLOT(updateField()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                                SLOT(updateField()));
 
-  ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
-                       SLOT(updateField()));
+  ret = ret && QObject::connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                                SLOT(updateField()));
   updateField();
   assert(ret);
 }
@@ -627,13 +636,13 @@ void OutputSettingsPopup::showEvent(QShowEvent *) {
 void OutputSettingsPopup::hideEvent(QHideEvent *e) {
   TSceneHandle *sceneHandle   = TApp::instance()->getCurrentScene();
   TXsheetHandle *xsheetHandle = TApp::instance()->getCurrentXsheet();
-  bool ret = disconnect(sceneHandle, SIGNAL(sceneChanged()), this,
-                        SLOT(updateField()));
-  ret = ret && disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
-                          SLOT(updateField()));
+  bool ret = QObject::disconnect(sceneHandle, SIGNAL(sceneChanged()), this,
+                                 SLOT(updateField()));
+  ret = ret && QObject::disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                                   SLOT(updateField()));
 
-  ret = ret && disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
-                          SLOT(updateField()));
+  ret = ret && QObject::disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                                   SLOT(updateField()));
   assert(ret);
   Dialog::hideEvent(e);
 }
@@ -989,8 +998,8 @@ void OutputSettingsPopup::onCameraChanged(const QString &str) {
                                        : tree->getCurrentCameraId();
   if (currentCameraId != cameraId) {
     TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
-    disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
-               SLOT(updateField()));
+    QObject::disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                        SLOT(updateField()));
 
     if (m_isPreviewSettings)
       tree->setCurrentPreviewCameraId(cameraId);
@@ -999,7 +1008,8 @@ void OutputSettingsPopup::onCameraChanged(const QString &str) {
     app->getCurrentScene()->setDirtyFlag(true);
     xsheetHandle->notifyXsheetChanged();
 
-    connect(xsheetHandle, SIGNAL(xsheetChanged()), this, SLOT(updateField()));
+    QObject::connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                     SLOT(updateField()));
   }
   if (m_presetCombo) m_presetCombo->setCurrentIndex(0);
 }

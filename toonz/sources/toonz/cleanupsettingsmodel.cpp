@@ -156,8 +156,8 @@ CleanupSettingsModel::CleanupSettingsModel()
   TSceneHandle *sceneHandle = TApp::instance()->getCurrentScene();
 
   bool ret = true;
-  ret      = ret &&
-        connect(sceneHandle, SIGNAL(sceneSwitched()), SLOT(onSceneSwitched()));
+  ret      = ret && QObject::connect(sceneHandle, SIGNAL(sceneSwitched()),
+                                SLOT(onSceneSwitched()));
   assert(ret);
 
   onSceneSwitched();
@@ -246,14 +246,14 @@ void CleanupSettingsModel::connectSignals() {
   // selection issues with cln cancels.
   bool ret = true;
 
-  ret = ret && connect(frameHandle, SIGNAL(frameSwitched()),
-                       SLOT(onCellChanged()), Qt::QueuedConnection);
-  ret = ret && connect(columnHandle, SIGNAL(columnIndexSwitched()),
-                       SLOT(onCellChanged()), Qt::QueuedConnection);
-  ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged()),
-                       SLOT(onPaletteChanged()), Qt::QueuedConnection);
-  ret = ret && connect(paletteHandle, SIGNAL(paletteChanged()),
-                       SLOT(onPaletteChanged()), Qt::QueuedConnection);
+  ret = ret && QObject::connect(frameHandle, SIGNAL(frameSwitched()),
+                                SLOT(onCellChanged()), Qt::QueuedConnection);
+  ret = ret && QObject::connect(columnHandle, SIGNAL(columnIndexSwitched()),
+                                SLOT(onCellChanged()), Qt::QueuedConnection);
+  ret = ret && QObject::connect(paletteHandle, SIGNAL(colorStyleChanged()),
+                                SLOT(onPaletteChanged()), Qt::QueuedConnection);
+  ret = ret && QObject::connect(paletteHandle, SIGNAL(paletteChanged()),
+                                SLOT(onPaletteChanged()), Qt::QueuedConnection);
 
   assert(ret);
 

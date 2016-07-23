@@ -31,8 +31,10 @@ void FrameScroller::connectScroller(FrameScroller *scroller) {
     scroller->connectScroller(this);
     QScrollBar *sb0 = getFrameScrollArea()->verticalScrollBar();
     QScrollBar *sb1 = scroller->getFrameScrollArea()->verticalScrollBar();
-    QObject::connect(sb0, SIGNAL(valueChanged(int)), sb1, SLOT(setValue(int)));
-    QObject::connect(sb1, SIGNAL(valueChanged(int)), sb0, SLOT(setValue(int)));
+    QObject::connect(sb0, &QScrollBar::valueChanged,  //
+                     sb1, &QScrollBar::setValue);
+    QObject::connect(sb1, &QScrollBar::valueChanged,  //
+                     sb0, &QScrollBar::setValue);
   }
 }
 
@@ -42,10 +44,10 @@ void FrameScroller::disconnectScroller(FrameScroller *scroller) {
     scroller->disconnectScroller(this);
     QScrollBar *sb0 = getFrameScrollArea()->verticalScrollBar();
     QScrollBar *sb1 = scroller->getFrameScrollArea()->verticalScrollBar();
-    QObject::disconnect(sb0, SIGNAL(valueChanged(int)), sb1,
-                        SLOT(setValue(int)));
-    QObject::disconnect(sb1, SIGNAL(valueChanged(int)), sb0,
-                        SLOT(setValue(int)));
+    QObject::disconnect(sb0, &QScrollBar::valueChanged,  //
+                        sb1, &QScrollBar::setValue);
+    QObject::disconnect(sb1, &QScrollBar::valueChanged,  //
+                        sb0, &QScrollBar::setValue);
   }
 }
 
@@ -457,21 +459,28 @@ SpreadsheetViewer::SpreadsheetViewer(QWidget *parent)
   //---signal-slot connections
 
   // vertical slider: cell <=> row
-  connect(m_rowScrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
-          m_cellScrollArea->verticalScrollBar(), SLOT(setValue(int)));
-  connect(m_cellScrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
-          m_rowScrollArea->verticalScrollBar(), SLOT(setValue(int)));
+  QObject::connect(m_rowScrollArea->verticalScrollBar(),
+                   &QScrollBar::valueChanged,  //
+                   m_cellScrollArea->verticalScrollBar(),
+                   &QScrollBar::setValue);
+  QObject::connect(m_cellScrollArea->verticalScrollBar(),
+                   &QScrollBar::valueChanged,  //
+                   m_rowScrollArea->verticalScrollBar(), &QScrollBar::setValue);
 
   // horizontal slider: cell <=> column
-  connect(m_columnScrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)),
-          m_cellScrollArea->horizontalScrollBar(), SLOT(setValue(int)));
-  connect(m_cellScrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)),
-          m_columnScrollArea->horizontalScrollBar(), SLOT(setValue(int)));
+  QObject::connect(
+      m_columnScrollArea->horizontalScrollBar(), &QScrollBar::valueChanged,  //
+      m_cellScrollArea->horizontalScrollBar(), &QScrollBar::setValue);
+  QObject::connect(
+      m_cellScrollArea->horizontalScrollBar(), &QScrollBar::valueChanged,  //
+      m_columnScrollArea->horizontalScrollBar(), &QScrollBar::setValue);
 
-  connect(m_cellScrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
-          SLOT(onVSliderChanged(int)));
-  connect(m_cellScrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)),
-          SLOT(onHSliderChanged(int)));
+  QObject::connect(m_cellScrollArea->verticalScrollBar(),
+                   &QScrollBar::valueChanged,  //
+                   this, &SpreadsheetViewer::onVSliderChanged);
+  QObject::connect(m_cellScrollArea->horizontalScrollBar(),
+                   &QScrollBar::valueChanged,  //
+                   this, &SpreadsheetViewer::onHSliderChanged);
 }
 
 SpreadsheetViewer::~SpreadsheetViewer() {}
@@ -482,8 +491,8 @@ void SpreadsheetViewer::setFrameHandle(TFrameHandle *frameHandle) {
   m_frameHandle = frameHandle;
 
   if (isVisible() && m_frameHandle) {
-    connect(m_frameHandle, SIGNAL(frameSwitched()), this,
-            SLOT(onFrameSwitched()));
+    QObject::connect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                     this, &SpreadsheetViewer::frameSwitched);
     update();
   }
 }
@@ -632,11 +641,10 @@ void SpreadsheetViewer::showEvent(QShowEvent *) {
   int actualContentHeight = qMax(contentHeight, vSc->value() + viewportHeight);
   m_rowScrollArea->widget()->setFixedHeight(actualContentHeight);
   m_cellScrollArea->widget()->setFixedHeight(actualContentHeight);
-  if (m_frameHandle)
-    connect(m_frameHandle, SIGNAL(frameSwitched()), this,
-            SLOT(onFrameSwitched()));
-
-  // updateAreasSize();
+  if (m_frameHandle) {
+    QObject::connect(m_frameHandle, &TFrameHandle::frameSwitched,  //
+                     this, &SpreadsheetViewer::frameSwitched);
+  }
 }
 
 void SpreadsheetViewer::hideEvent(QHideEvent *) {
@@ -646,27 +654,6 @@ void SpreadsheetViewer::hideEvent(QHideEvent *) {
 void SpreadsheetViewer::resizeEvent(QResizeEvent *e) {
   QFrame::resizeEvent(e);
   refreshContentSize(0, 0);
-  /*
-  int w = width();
-  int h = height();
-
-int hSpacing = 4;
-int vSpacing = 4;
-
-int x = m_rowScrollAreaWidth + hSpacing;
-int y = m_columnScrollAreaHeight + vSpacing;
-
-  m_cellScrollArea->setGeometry(x,y, w-x, h-y);
-
-int sh = m_cellScrollArea->horizontalScrollBar()->height();
-int sw = m_cellScrollArea->verticalScrollBar()->width();
-
-  m_columnScrollArea->setGeometry(x, 0, w-x-sw, m_columnScrollAreaHeight);
-m_rowScrollArea->setGeometry(0, y, m_rowScrollAreaWidth, h-y-sh);
-
-updateSizeToScroll(0,0); //Non updateAreeSize() perche' si deve tener conto
-degli scrollbar.
-*/
 }
 
 void SpreadsheetViewer::wheelEvent(QWheelEvent *event) {

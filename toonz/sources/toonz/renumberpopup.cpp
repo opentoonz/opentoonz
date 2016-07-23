@@ -28,8 +28,8 @@ RenumberPopup::RenumberPopup()
   m_okBtn = new QPushButton(tr("Renumber"), this);
   m_okBtn->setDefault(true);
   m_cancelBtn = new QPushButton(tr("Cancel"), this);
-  connect(m_okBtn, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(accept()));
+  QObject::connect(m_cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(m_okBtn, m_cancelBtn);
 }

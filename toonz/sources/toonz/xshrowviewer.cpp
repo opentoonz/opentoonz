@@ -58,11 +58,11 @@ RowArea::RowArea(XsheetViewer *parent, Qt::WFlags flags)
     , m_isPanning(false) {
   setFocusPolicy(Qt::NoFocus);
   setMouseTracking(true);
-  connect(TApp::instance()->getCurrentOnionSkin(),
-          SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
+  QObject::connect(TApp::instance()->getCurrentOnionSkin(),
+                   SIGNAL(onionSkinMaskChanged()), this, SLOT(update()));
   // for displaying the pinned center keys when the skeleton tool is selected
-  connect(TApp::instance()->getCurrentTool(), SIGNAL(toolSwitched()), this,
-          SLOT(update()));
+  QObject::connect(TApp::instance()->getCurrentTool(), SIGNAL(toolSwitched()),
+                   this, SLOT(update()));
 }
 
 //-----------------------------------------------------------------------------
@@ -685,15 +685,16 @@ void RowArea::contextMenuEvent(QContextMenuEvent *event) {
 
   QMenu *menu             = new QMenu(this);
   QAction *setStartMarker = menu->addAction(tr("Set Start Marker"));
-  connect(setStartMarker, SIGNAL(triggered()), SLOT(onSetStartMarker()));
+  QObject::connect(setStartMarker, SIGNAL(triggered()),
+                   SLOT(onSetStartMarker()));
   QAction *setStopMarker = menu->addAction(tr("Set Stop Marker"));
-  connect(setStopMarker, SIGNAL(triggered()), SLOT(onSetStopMarker()));
+  QObject::connect(setStopMarker, SIGNAL(triggered()), SLOT(onSetStopMarker()));
   QAction *removeMarkers = menu->addAction(tr("Remove Markers"));
-  connect(removeMarkers, SIGNAL(triggered()), SLOT(onRemoveMarkers()));
+  QObject::connect(removeMarkers, SIGNAL(triggered()), SLOT(onRemoveMarkers()));
 
   // set both the from and to markers at the specified row
   QAction *previewThis = menu->addAction(tr("Preview This"));
-  connect(previewThis, SIGNAL(triggered()), SLOT(onPreviewThis()));
+  QObject::connect(previewThis, SIGNAL(triggered()), SLOT(onPreviewThis()));
 
   menu->addSeparator();
 

@@ -402,7 +402,7 @@ signals:
   void currentColumnChanged(int index);
   void editObject();
 
-protected slots:
+public slots:
   void onHandleReleased();
 };
 

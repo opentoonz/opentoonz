@@ -754,22 +754,24 @@ AdjustThicknessPopup::AdjustThicknessPopup()
 
   // Establish connections
   bool ret = true;
-  ret      = connect(m_thicknessMode, SIGNAL(currentIndexChanged(int)), this,
-                SLOT(onModeChanged())) &&
+
+  ret = QObject::connect(m_thicknessMode, SIGNAL(currentIndexChanged(int)),
+                         this, SLOT(onModeChanged())) &&
         ret;
-  ret = connect(m_fromScale, SIGNAL(valueChanged(bool)), this,
-                SLOT(onParamsChanged())) &&
+  ret = QObject::connect(m_fromScale, SIGNAL(valueChanged(bool)), this,
+                         SLOT(onParamsChanged())) &&
         ret;
-  ret = connect(m_fromDisplacement, SIGNAL(valueChanged(bool)), this,
-                SLOT(onParamsChanged())) &&
+  ret = QObject::connect(m_fromDisplacement, SIGNAL(valueChanged(bool)), this,
+                         SLOT(onParamsChanged())) &&
         ret;
-  ret = connect(m_toScale, SIGNAL(valueChanged(bool)), this,
-                SLOT(onParamsChanged())) &&
+  ret = QObject::connect(m_toScale, SIGNAL(valueChanged(bool)), this,
+                         SLOT(onParamsChanged())) &&
         ret;
-  ret = connect(m_toDisplacement, SIGNAL(valueChanged(bool)), this,
-                SLOT(onParamsChanged())) &&
+  ret = QObject::connect(m_toDisplacement, SIGNAL(valueChanged(bool)), this,
+                         SLOT(onParamsChanged())) &&
         ret;
-  ret = connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply())) && ret;
+  ret =
+      QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply())) && ret;
   assert(ret);
 
   m_viewer->resize(0, 350);
@@ -787,24 +789,26 @@ void AdjustThicknessPopup::showEvent(QShowEvent *se) {
   TColumnHandle *columnHandle       = app->getCurrentColumn();
 
   bool ret = true;
-  ret = connect(selectionHandle, SIGNAL(selectionChanged(TSelection *)), this,
-                SLOT(onSelectionChanged())) &&
+
+  ret =
+      QObject::connect(selectionHandle, SIGNAL(selectionChanged(TSelection *)),
+                       this, SLOT(onSelectionChanged())) &&
+      ret;
+  ret = QObject::connect(selectionHandle,
+                         SIGNAL(selectionSwitched(TSelection *, TSelection *)),
+                         this, SLOT(onSelectionChanged())) &&
         ret;
-  ret = connect(selectionHandle,
-                SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
-                SLOT(onSelectionChanged())) &&
+  ret = QObject::connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                         SLOT(onXsheetChanged())) &&
         ret;
-  ret = connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
-                SLOT(onXsheetChanged())) &&
+  ret = QObject::connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
+                         SLOT(onXsheetChanged())) &&
         ret;
-  ret = connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
-                SLOT(onXsheetChanged())) &&
+  ret = QObject::connect(frameHandle, SIGNAL(frameSwitched()), this,
+                         SLOT(onFrameChanged())) &&
         ret;
-  ret = connect(frameHandle, SIGNAL(frameSwitched()), this,
-                SLOT(onFrameChanged())) &&
-        ret;
-  ret = connect(columnHandle, SIGNAL(columnIndexSwitched()), this,
-                SLOT(onFrameChanged())) &&
+  ret = QObject::connect(columnHandle, SIGNAL(columnIndexSwitched()), this,
+                         SLOT(onFrameChanged())) &&
         ret;
   assert(ret);
 

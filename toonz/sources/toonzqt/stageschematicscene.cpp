@@ -141,11 +141,12 @@ StageSchematicScene::StageSchematicScene(QWidget *parent)
   m_firstPos          = TPointD(sceneCenter.x(), sceneCenter.y());
 
   m_selection = new StageObjectSelection();
-  connect(m_selection, SIGNAL(doCollapse(QList<TStageObjectId>)), this,
-          SLOT(onCollapse(QList<TStageObjectId>)));
-  connect(m_selection, SIGNAL(doExplodeChild(QList<TStageObjectId>)), this,
-          SIGNAL(doExplodeChild(QList<TStageObjectId>)));
-  connect(this, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+  QObject::connect(m_selection, &StageObjectSelection::doCollapse,  //
+                   this, &StageSchematicScene::onCollapse);
+  QObject::connect(m_selection, &StageObjectSelection::doExplodeChild,  //
+                   this, &StageSchematicScene::doExplodeChild);
+  QObject::connect(this, &StageSchematicScene::selectionChanged,  //
+                   this, &StageSchematicScene::onSelectionChanged);
   m_highlightedLinks.clear();
 }
 
@@ -235,8 +236,9 @@ void StageSchematicScene::updateScene() {
     StageSchematicSplineNode *node = addSchematicSplineNode(spline);
     if (node != 0) {
       m_splineTable[spline] = node;
-      connect(node, SIGNAL(currentObjectChanged(const TStageObjectId &, bool)),
-              this, SLOT(onCurrentObjectChanged(const TStageObjectId &, bool)));
+      QObject::connect(node,
+                       &StageSchematicSplineNode::currentObjectChanged,  //
+                       this, &StageSchematicScene::onCurrentObjectChanged);
     }
   }
 
@@ -356,13 +358,16 @@ StageSchematicNode *StageSchematicScene::addStageSchematicNode(
   // create the node according to the type of StageObject
   StageSchematicNode *node = createStageSchematicNode(this, pegbar);
   if (!node) return 0;
-  connect(node, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
-  connect(node, SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
-  connect(node, SIGNAL(currentObjectChanged(const TStageObjectId &, bool)),
-          this, SLOT(onCurrentObjectChanged(const TStageObjectId &, bool)));
-  connect(node, SIGNAL(currentColumnChanged(int)), this,
-          SLOT(onCurrentColumnChanged(int)));
-  connect(node, SIGNAL(editObject()), this, SIGNAL(editObject()));
+  QObject::connect(node, &StageSchematicNode::sceneChanged,  //
+                   this, &StageSchematicScene::onSceneChanged);
+  QObject::connect(node, &StageSchematicNode::xsheetChanged,  //
+                   this, &StageSchematicScene::onXsheetChanged);
+  QObject::connect(node, &StageSchematicNode::currentObjectChanged,  //
+                   this, &StageSchematicScene::onCurrentObjectChanged);
+  QObject::connect(node, &StageSchematicNode::currentColumnChanged,  //
+                   this, &StageSchematicScene::onCurrentColumnChanged);
+  QObject::connect(node, &StageSchematicNode::editObject,  //
+                   this, &StageSchematicScene::editObject);
 
   // specify the node position
   if (pegbar->getDagNodePos() == TConst::nowhere) {
@@ -387,13 +392,16 @@ StageSchematicGroupNode *StageSchematicScene::addStageGroupNode(
   TStageObject *root        = getRoot(objs, objTree);
   StageSchematicGroupNode *node = new StageSchematicGroupNode(this, root, objs);
   if (!node) return 0;
-  connect(node, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
-  connect(node, SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
-  connect(node, SIGNAL(currentObjectChanged(const TStageObjectId &, bool)),
-          this, SLOT(onCurrentObjectChanged(const TStageObjectId &, bool)));
-  connect(node, SIGNAL(currentColumnChanged(int)), this,
-          SLOT(onCurrentColumnChanged(int)));
-  connect(node, SIGNAL(editObject()), this, SIGNAL(editObject()));
+  QObject::connect(node, &StageSchematicGroupNode::sceneChanged,  //
+                   this, &StageSchematicScene::onSceneChanged);
+  QObject::connect(node, &StageSchematicGroupNode::xsheetChanged,  //
+                   this, &StageSchematicScene::onXsheetChanged);
+  QObject::connect(node, &StageSchematicGroupNode::currentObjectChanged,  //
+                   this, &StageSchematicScene::onCurrentObjectChanged);
+  QObject::connect(node, &StageSchematicGroupNode::currentColumnChanged,  //
+                   this, &StageSchematicScene::onCurrentColumnChanged);
+  QObject::connect(node, &StageSchematicGroupNode::editObject,  //
+                   this, &StageSchematicScene::editObject);
   if (root->getDagNodePos() == TConst::nowhere) {
     placeNode(node);
   } else
@@ -601,8 +609,10 @@ void StageSchematicScene::updateSplinePositionOnResize(TStageObjectSpline *spl,
 StageSchematicSplineNode *StageSchematicScene::addSchematicSplineNode(
     TStageObjectSpline *spline) {
   StageSchematicSplineNode *node = new StageSchematicSplineNode(this, spline);
-  connect(node, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
-  connect(node, SIGNAL(xsheetChanged()), this, SLOT(onXsheetChanged()));
+  QObject::connect(node, &StageSchematicSplineNode::sceneChanged,  //
+                   this, &StageSchematicScene::onSceneChanged);
+  QObject::connect(node, &StageSchematicSplineNode::xsheetChanged,  //
+                   this, &StageSchematicScene::onXsheetChanged);
   if (!node) return 0;
   if (spline->getDagNodePos() == TConst::nowhere) {
     node->resize(m_gridDimension == 0);
@@ -1117,15 +1127,18 @@ void StageSchematicScene::contextMenuEvent(
 
   // AddPegbar
   QAction *addPegbar = new QAction(tr("&New Pegbar"), &menu);
-  connect(addPegbar, SIGNAL(triggered()), this, SLOT(onPegbarAdded()));
+  QObject::connect(addPegbar, &QAction::triggered,  //
+                   this, &StageSchematicScene::onPegbarAdded);
 
   // AddSpline
   QAction *addSpline = new QAction(tr("&New Motion Path"), &menu);
-  connect(addSpline, SIGNAL(triggered()), this, SLOT(onSplineAdded()));
+  QObject::connect(addSpline, &QAction::triggered,  //
+                   this, &StageSchematicScene::onSplineAdded);
 
   // AddCamera
   QAction *addCamera = new QAction(tr("&New Camera"), &menu);
-  connect(addCamera, SIGNAL(triggered()), this, SLOT(onCameraAdded()));
+  QObject::connect(addCamera, &QAction::triggered,  //
+                   this, &StageSchematicScene::onCameraAdded);
 
   QAction *paste = CommandManager::instance()->getAction("MI_Paste");
 

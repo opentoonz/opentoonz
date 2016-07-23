@@ -190,21 +190,21 @@ void PlasticTool::addContextMenuActions_animate(QMenu *menu) {
 
   if (!m_svSel.isEmpty()) {
     QAction *setKey = menu->addAction(tr("Set Key"));
-    ret = ret && connect(setKey, SIGNAL(triggered()), &l_plasticTool,
-                         SLOT(setKey_undo()));
+    ret = ret && QObject::connect(setKey, SIGNAL(triggered()), &l_plasticTool,
+                                  SLOT(setKey_undo()));
 
     QAction *setRestKey = menu->addAction(tr("Set Rest Key"));
-    ret = ret && connect(setRestKey, SIGNAL(triggered()), &l_plasticTool,
-                         SLOT(setRestKey_undo()));
+    ret = ret && QObject::connect(setRestKey, SIGNAL(triggered()),
+                                  &l_plasticTool, SLOT(setRestKey_undo()));
   }
 
   QAction *setGlobalKey = menu->addAction(tr("Set Global Key"));
-  ret = ret && connect(setGlobalKey, SIGNAL(triggered()), &l_plasticTool,
-                       SLOT(setGlobalKey_undo()));
+  ret = ret && QObject::connect(setGlobalKey, SIGNAL(triggered()),
+                                &l_plasticTool, SLOT(setGlobalKey_undo()));
 
   QAction *setGlobalRestKey = menu->addAction(tr("Set Global Rest Key"));
-  ret = ret && connect(setGlobalRestKey, SIGNAL(triggered()), &l_plasticTool,
-                       SLOT(setGlobalRestKey_undo()));
+  ret = ret && QObject::connect(setGlobalRestKey, SIGNAL(triggered()),
+                                &l_plasticTool, SLOT(setGlobalRestKey_undo()));
 
   menu->addSeparator();
 

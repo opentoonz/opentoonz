@@ -757,15 +757,22 @@ RadioButtonDialog::RadioButtonDialog(const QString &labelText,
     addWidget(radioButton);
   }
 
-  bool ret = connect(buttonGroup, SIGNAL(buttonClicked(int)),
-                     SLOT(onButtonClicked(int)));
+  bool ret = true;
+
+  ret = ret && QObject::connect<void (QButtonGroup::*)(int),
+                                void (RadioButtonDialog::*)(int)>(
+                   buttonGroup, &QButtonGroup::buttonClicked,  //
+                   this, &RadioButtonDialog::onButtonClicked);
 
   endVLayout();
 
-  QPushButton *applyButton = new QPushButton(QObject::tr("Apply"));
-  ret = ret && connect(applyButton, SIGNAL(pressed()), this, SLOT(onApply()));
+  QPushButton *applyButton  = new QPushButton(QObject::tr("Apply"));
   QPushButton *cancelButton = new QPushButton(QObject::tr("Cancel"));
-  ret = ret && connect(cancelButton, SIGNAL(pressed()), this, SLOT(onCancel()));
+
+  ret = ret && QObject::connect(applyButton, &QPushButton::pressed,   //
+                                this, &RadioButtonDialog::onApply);   //
+  ret = ret && QObject::connect(cancelButton, &QPushButton::pressed,  //
+                                this, &RadioButtonDialog::onCancel);  //
 
   addButtonBarWidget(applyButton, cancelButton);
 
@@ -836,9 +843,13 @@ void ProgressDialog::setLabelText(const QString &text) {
 
 void ProgressDialog::setCancelButton(QPushButton *cancelButton) {
   m_cancelButton = cancelButton;
-  bool ret = connect(cancelButton, SIGNAL(pressed()), this, SLOT(onCancel()));
-  ret =
-      ret && connect(cancelButton, SIGNAL(pressed()), this, SIGNAL(canceled()));
+  bool ret       = true;
+
+  ret = ret && QObject::connect(cancelButton, &QPushButton::pressed,  //
+                                this, &ProgressDialog::onCancel);     //
+  ret = ret && QObject::connect(cancelButton, &QPushButton::pressed,  //
+                                this, &ProgressDialog::canceled);     //
+
   assert(ret);
   addButtonBarWidget(m_cancelButton);
 }
@@ -928,9 +939,8 @@ int DVGui::MsgBox(MsgType type, const QString &text,
     buttonGroup->addButton(button, i + 1);
   }
 
-  QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), &dialog,
-                   SLOT(done(int)));
-
+  QObject::connect<void (QButtonGroup::*)(int)>(
+      buttonGroup, &QButtonGroup::buttonPressed, &dialog, &Dialog::done);
   dialog.raise();
 
   return dialog.exec();
@@ -978,8 +988,9 @@ void DVGui::MsgBoxInPopup(MsgType type, const QString &text) {
   button->setDefault(true);
   dialog.addButtonBarWidget(button);
   buttonGroup->addButton(button, 1);
-  QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), &dialog,
-                   SLOT(done(int)));
+
+  QObject::connect<void (QButtonGroup::*)(int)>(
+      buttonGroup, &QButtonGroup::buttonPressed, &dialog, &Dialog::done);
 
   while (!messageQueue.empty()) {
     MsgType type1 = messageQueue.first().first;
@@ -1052,8 +1063,9 @@ int DVGui::MsgBox(const QString &text, const QString &button1Text,
   dialog.addButtonBarWidget(button3);
   buttonGroup->addButton(button3, 3);
 
-  QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), &dialog,
-                   SLOT(done(int)));
+  QObject::connect<void (QButtonGroup::*)(int)>(
+      buttonGroup, &QButtonGroup::buttonPressed, &dialog, &Dialog::done);
+
   dialog.raise();
   return dialog.exec();
 }
@@ -1113,8 +1125,8 @@ Dialog *DVGui::createMsgBox(MsgType type, const QString &text,
     buttonGroup->addButton(button, i + 1);
   }
 
-  QObject::connect(buttonGroup, SIGNAL(buttonPressed(int)), dialog,
-                   SLOT(done(int)));
+  QObject::connect<void (QButtonGroup::*)(int)>(
+      buttonGroup, &QButtonGroup::buttonPressed, dialog, &Dialog::done);
 
   return dialog;
 }
@@ -1141,8 +1153,8 @@ QString DVGui::getText(const QString &title, const QString &labelText,
   QPushButton *okBtn = new QPushButton(dialog.tr("OK"), &dialog);
   okBtn->setDefault(true);
   QPushButton *cancelBtn = new QPushButton(dialog.tr("Cancel"), &dialog);
-  QObject::connect(okBtn, SIGNAL(clicked()), &dialog, SLOT(accept()));
-  QObject::connect(cancelBtn, SIGNAL(clicked()), &dialog, SLOT(reject()));
+  QObject::connect(okBtn, &QPushButton::clicked, &dialog, &Dialog::accept);
+  QObject::connect(cancelBtn, &QPushButton::clicked, &dialog, &Dialog::reject);
 
   dialog.addButtonBarWidget(okBtn, cancelBtn);
 

@@ -150,10 +150,10 @@ EditableMarksBar::EditableMarksBar(QWidget *parent) : QFrame(parent) {
   colors.fill(Qt::black, 2);
 
   // MarksBar dominates values change notifications
-  bool ret =
-      connect(m_marksBar, SIGNAL(marksUpdated()), this, SLOT(updateFields()));
-  ret = ret && connect(m_marksBar, SIGNAL(marksUpdated()), this,
-                       SIGNAL(paramsChanged()));
+  bool ret = QObject::connect(m_marksBar, SIGNAL(marksUpdated()), this,
+                              SLOT(updateFields()));
+  ret = ret && QObject::connect(m_marksBar, SIGNAL(marksUpdated()), this,
+                                SIGNAL(paramsChanged()));
 
   // Add fields layout
   QHBoxLayout *hLayout = new QHBoxLayout;
@@ -164,15 +164,15 @@ EditableMarksBar::EditableMarksBar(QWidget *parent) : QFrame(parent) {
   m_fields[0] = new DVGui::IntLineEdit;
 
   hLayout->addWidget(m_fields[0]);
-  ret = ret && connect(m_fields[0], SIGNAL(editingFinished()), this,
-                       SLOT(onFieldEdited()));
+  ret = ret && QObject::connect(m_fields[0], SIGNAL(editingFinished()), this,
+                                SLOT(onFieldEdited()));
 
   hLayout->addStretch(1);
 
   m_fields[1] = new DVGui::IntLineEdit;
   hLayout->addWidget(m_fields[1]);
-  ret = ret && connect(m_fields[1], SIGNAL(editingFinished()), this,
-                       SLOT(onFieldEdited()));
+  ret = ret && QObject::connect(m_fields[1], SIGNAL(editingFinished()), this,
+                                SLOT(onFieldEdited()));
 
   updateFields();
 }
@@ -285,8 +285,8 @@ AdjustLevelsPopup::AdjustLevelsPopup()
 
       // Set margins up to cover the histogram
       editableMarksBar->layout()->setContentsMargins(6, 0, 5, 0);
-      connect(editableMarksBar, SIGNAL(paramsChanged()), this,
-              SLOT(onParamsChanged()));
+      QObject::connect(editableMarksBar, SIGNAL(paramsChanged()), this,
+                       SLOT(onParamsChanged()));
 
       histogramViewLayout->insertWidget(1 + (j << 1), editableMarksBar);
     }
@@ -312,24 +312,24 @@ AdjustLevelsPopup::AdjustLevelsPopup()
   QPushButton *clampRange = new QPushButton(tr("Clamp"), topWidget);
   clampRange->setMinimumSize(65, 25);
   buttonsLayout->addWidget(clampRange);
-  connect(clampRange, SIGNAL(clicked(bool)), this, SLOT(clampRange()));
+  QObject::connect(clampRange, SIGNAL(clicked(bool)), this, SLOT(clampRange()));
 
   QPushButton *autoAdjust = new QPushButton(tr("Auto"), topWidget);
   autoAdjust->setMinimumSize(65, 25);
   buttonsLayout->addWidget(autoAdjust);
-  connect(autoAdjust, SIGNAL(clicked(bool)), this, SLOT(autoAdjust()));
+  QObject::connect(autoAdjust, SIGNAL(clicked(bool)), this, SLOT(autoAdjust()));
 
   QPushButton *resetBtn = new QPushButton(tr("Reset"), topWidget);
   resetBtn->setMinimumSize(65, 25);
   buttonsLayout->addWidget(resetBtn);
-  connect(resetBtn, SIGNAL(clicked(bool)), this, SLOT(reset()));
+  QObject::connect(resetBtn, SIGNAL(clicked(bool)), this, SLOT(reset()));
 
   buttonsLayout->addStretch(1);
 
   m_okBtn = new QPushButton(tr("Apply"));
   addButtonBarWidget(m_okBtn);
 
-  connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
+  QObject::connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
 
   // Finally, acquire current selection
   acquireRaster();
@@ -342,8 +342,8 @@ AdjustLevelsPopup::AdjustLevelsPopup()
 
 void AdjustLevelsPopup::showEvent(QShowEvent *se) {
   TSelectionHandle *selectionHandle = TApp::instance()->getCurrentSelection();
-  connect(selectionHandle, SIGNAL(selectionChanged(TSelection *)), this,
-          SLOT(onSelectionChanged()));
+  QObject::connect(selectionHandle, SIGNAL(selectionChanged(TSelection *)),
+                   this, SLOT(onSelectionChanged()));
 
   acquireRaster();
 }
@@ -354,8 +354,8 @@ void AdjustLevelsPopup::hideEvent(QHideEvent *he) {
   Dialog::hideEvent(he);
 
   TSelectionHandle *selectionHandle = TApp::instance()->getCurrentSelection();
-  disconnect(selectionHandle, SIGNAL(selectionChanged(TSelection *)), this,
-             SLOT(onSelectionChanged()));
+  QObject::disconnect(selectionHandle, SIGNAL(selectionChanged(TSelection *)),
+                      this, SLOT(onSelectionChanged()));
 
   m_inputRas         = TRasterP();
   m_viewer->raster() = TRasterP();

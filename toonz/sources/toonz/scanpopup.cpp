@@ -202,8 +202,8 @@ DefineScannerPopup::DefineScannerPopup()
   QPushButton *okBtn = new QPushButton(tr("OK"), this);
   okBtn->setDefault(true);
   QPushButton *cancelBtn = new QPushButton(tr("Cancel"), this);
-  connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
+  QObject::connect(okBtn, SIGNAL(clicked()), this, SLOT(accept()));
+  QObject::connect(cancelBtn, SIGNAL(clicked()), this, SLOT(reject()));
 
   addButtonBarWidget(okBtn, cancelBtn);
 }
@@ -307,23 +307,25 @@ void ScanSettingsPopup::hideEvent(QHideEvent *event) {
 
 void ScanSettingsPopup::connectAll() {
   bool ret = true;
-  ret      = ret &&
-        connect(m_paperFormatOm, SIGNAL(currentIndexChanged(const QString &)),
-                SLOT(onPaperChanged(const QString &)));
-  ret = ret && connect(m_reverseOrderCB, SIGNAL(stateChanged(int)),
-                       SLOT(onToggle(int)));
-  ret = ret && connect(m_paperFeederCB, SIGNAL(stateChanged(int)),
-                       SLOT(onToggle(int)));
+
+  ret = ret && QObject::connect(m_paperFormatOm,
+                                SIGNAL(currentIndexChanged(const QString &)),
+                                SLOT(onPaperChanged(const QString &)));
+  ret = ret && QObject::connect(m_reverseOrderCB, SIGNAL(stateChanged(int)),
+                                SLOT(onToggle(int)));
+  ret = ret && QObject::connect(m_paperFeederCB, SIGNAL(stateChanged(int)),
+                                SLOT(onToggle(int)));
+  ret = ret && QObject::connect(m_dpi, SIGNAL(valueChanged(bool)),
+                                SLOT(onValueChanged(bool)));
+  ret = ret && QObject::connect(m_brightness, SIGNAL(valueChanged(bool)),
+                                SLOT(onValueChanged(bool)));
+  ret = ret && QObject::connect(m_threshold, SIGNAL(valueChanged(bool)),
+                                SLOT(onValueChanged(bool)));
   ret = ret &&
-        connect(m_dpi, SIGNAL(valueChanged(bool)), SLOT(onValueChanged(bool)));
-  ret = ret && connect(m_brightness, SIGNAL(valueChanged(bool)),
-                       SLOT(onValueChanged(bool)));
-  ret = ret && connect(m_threshold, SIGNAL(valueChanged(bool)),
-                       SLOT(onValueChanged(bool)));
-  ret = ret && connect(m_modeOm, SIGNAL(currentIndexChanged(const QString &)),
-                       SLOT(onModeChanged(const QString &)));
-  ret = ret && connect(TApp::instance()->getCurrentScene(),
-                       SIGNAL(sceneSwitched()), SLOT(updateUI()));
+        QObject::connect(m_modeOm, SIGNAL(currentIndexChanged(const QString &)),
+                         SLOT(onModeChanged(const QString &)));
+  ret = ret && QObject::connect(TApp::instance()->getCurrentScene(),
+                                SIGNAL(sceneSwitched()), SLOT(updateUI()));
   assert(ret);
 }
 
@@ -338,8 +340,9 @@ void ScanSettingsPopup::disconnectAll() {
   ret      = ret && m_threshold->disconnect();
   ret      = ret && m_brightness->disconnect();
   ret      = ret && m_modeOm->disconnect();
-  ret      = ret && disconnect(TApp::instance()->getCurrentScene(),
-                          SIGNAL(sceneSwitched()), this, SLOT(updateUI()));
+  ret      = ret &&
+        QObject::disconnect(TApp::instance()->getCurrentScene(),
+                            SIGNAL(sceneSwitched()), this, SLOT(updateUI()));
   assert(ret);
 }
 
@@ -455,10 +458,10 @@ void ScanSettingsPopup::updateUI() {
   m_modeOm->show(), m_modeLbl->show();
   m_paperFormatOm->show(), m_formatLbl->show();
 
-  disconnect(m_modeOm);
+  QObject::disconnect(m_modeOm);
   fillOutputType(m_modeOm, params);
-  connect(m_modeOm, SIGNAL(currentIndexChanged(const QString &)),
-          SLOT(onModeChanged(const QString &)));
+  QObject::connect(m_modeOm, SIGNAL(currentIndexChanged(const QString &)),
+                   SLOT(onModeChanged(const QString &)));
 
   m_modeOm->setEnabled(true);
   switch (params->getScanType()) {
@@ -557,14 +560,15 @@ AutocenterPopup::AutocenterPopup() : DVGui::Dialog(0, false, true) {
   endHLayout();
 
   bool ret = true;
-  ret      = ret && connect(m_autocenter, SIGNAL(toggled(bool)), this,
-                       SLOT(onAutocenterToggled(bool)));
-  ret = ret &&
-        connect(m_pegbarHoles, SIGNAL(currentIndexChanged(const QString &)),
-                this, SLOT(onPegbarHolesChanged(const QString &)));
-  ret =
-      ret && connect(m_fieldGuide, SIGNAL(currentIndexChanged(const QString &)),
-                     this, SLOT(onFieldGuideChanged(const QString &)));
+
+  ret = ret && QObject::connect(m_autocenter, SIGNAL(toggled(bool)), this,
+                                SLOT(onAutocenterToggled(bool)));
+  ret = ret && QObject::connect(
+                   m_pegbarHoles, SIGNAL(currentIndexChanged(const QString &)),
+                   this, SLOT(onPegbarHolesChanged(const QString &)));
+  ret = ret && QObject::connect(
+                   m_fieldGuide, SIGNAL(currentIndexChanged(const QString &)),
+                   this, SLOT(onFieldGuideChanged(const QString &)));
   assert(ret);
 }
 
@@ -670,8 +674,8 @@ MyScannerListener::MyScannerListener(const ScanList &scanList)
                    QString::number(frameCount);
     m_progressDialog =
         new DVGui::ProgressDialog(text, QObject::tr("Cancel"), 0, frameCount);
-    connect(m_progressDialog, SIGNAL(canceled()), this,
-            SLOT(cancelButtonPressed()));
+    QObject::connect(m_progressDialog, SIGNAL(canceled()), this,
+                     SLOT(cancelButtonPressed()));
     m_progressDialog->setWindowModality(Qt::WindowModal);
     m_progressDialog->show();
   }

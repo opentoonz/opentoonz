@@ -130,20 +130,15 @@ bool readVersion(FILE *chan, int &version) {
   fread(&magic, sizeof(char), 8, chan);
   if (memcmp(magic, "TLV10", 5) == 0) {
     version = 10;
-  }
-  else if (memcmp(magic, "TLV11", 5) == 0) {
+  } else if (memcmp(magic, "TLV11", 5) == 0) {
     version = 11;
-  }
-  else if (memcmp(magic, "TLV12", 5) == 0) {
+  } else if (memcmp(magic, "TLV12", 5) == 0) {
     version = 12;
-  }
-  else if (memcmp(magic, "TLV13", 5) == 0) {
+  } else if (memcmp(magic, "TLV13", 5) == 0) {
     version = 13;
-  }
-  else if (memcmp(magic, "TLV14", 5) == 0) {
+  } else if (memcmp(magic, "TLV14", 5) == 0) {
     version = 14;
-  }
-  else {
+  } else {
     return false;
   }
   return true;

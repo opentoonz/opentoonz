@@ -342,23 +342,17 @@ void TreeView::resizeEvent(QResizeEvent *event) {
 
 void TreeView::setModel(TreeModel *model) {
   QTreeView::setModel(model);
-  disconnect();
+  QObject::disconnect();
 
-  connect(this, SIGNAL(expanded(const QModelIndex &)), model,
-          SLOT(onExpanded(const QModelIndex &)));
-  connect(this, SIGNAL(collapsed(const QModelIndex &)), model,
-          SLOT(onCollapsed(const QModelIndex &)));
-  // setItemDelegate(new Delegate(this));
+  QObject::connect(this, &TreeView::expanded, model, &TreeModel::onExpanded);
+  QObject::connect(this, &TreeView::collapsed, model, &TreeModel::onCollapsed);
 
-  // Connect all possible changes that can alter the
-  // bottom horizontal scrollbar to resize contents...
-  connect(this, SIGNAL(expanded(const QModelIndex &)), this,
-          SLOT(resizeToConts()));
-
-  connect(this, SIGNAL(collapsed(const QModelIndex &)), this,
-          SLOT(resizeToConts()));
-
-  connect(this->model(), SIGNAL(layoutChanged()), this, SLOT(resizeToConts()));
+  // Connect all possible changes that can alter the bottom
+  // horizontal scrollbar to resize contents
+  QObject::connect(this, &TreeView::expanded, this, &TreeView::resizeToConts);
+  QObject::connect(this, &TreeView::collapsed, this, &TreeView::resizeToConts);
+  QObject::connect(model, &TreeModel::layoutChanged,  //
+                   this, &TreeView::resizeToConts);   //
 }
 
 //----------------------------------------------------------------------------------------------------------------

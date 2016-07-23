@@ -93,11 +93,11 @@ ColorModelViewer::ColorModelViewer(QWidget *parent)
   setToolCursor(m_imageViewer, ToolCursor::PickerCursor);
 
   // Do not call the special procedure for flipbook closures...
-  disconnect(parentWidget(), SIGNAL(closeButtonPressed()), this,
-             SLOT(onCloseButtonPressed()));
+  QObject::disconnect(parentWidget(), SIGNAL(closeButtonPressed()), this,
+                      SLOT(onCloseButtonPressed()));
 
-  bool ret = connect(this, SIGNAL(refImageNotFound()), this,
-                     SLOT(onRefImageNotFound()), Qt::QueuedConnection);
+  bool ret = QObject::connect(this, SIGNAL(refImageNotFound()), this,
+                              SLOT(onRefImageNotFound()), Qt::QueuedConnection);
   assert(ret);
 
   m_imageViewer->setMouseTracking(true);
@@ -219,12 +219,14 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
 
   QAction *loadCurrentFrame =
       new QAction(QString(tr("Use Current Frame")), this);
-  connect(loadCurrentFrame, SIGNAL(triggered()), SLOT(loadCurrentFrame()));
+  QObject::connect(loadCurrentFrame, SIGNAL(triggered()),
+                   SLOT(loadCurrentFrame()));
   menu.addAction(loadCurrentFrame);
 
   QAction *removeColorModel =
       new QAction(QString(tr("Remove Color Model")), this);
-  connect(removeColorModel, SIGNAL(triggered()), SLOT(removeColorModel()));
+  QObject::connect(removeColorModel, SIGNAL(triggered()),
+                   SLOT(removeColorModel()));
   menu.addAction(removeColorModel);
 
   menu.addSeparator();
@@ -232,12 +234,13 @@ void ColorModelViewer::contextMenuEvent(QContextMenuEvent *event) {
   QString shortcut = QString::fromStdString(
       CommandManager::instance()->getShortcutFromId(V_ZoomReset));
   QAction *reset = menu.addAction(tr("Reset View") + "\t " + shortcut);
-  connect(reset, SIGNAL(triggered()), m_imageViewer, SLOT(resetView()));
+  QObject::connect(reset, SIGNAL(triggered()), m_imageViewer,
+                   SLOT(resetView()));
 
   shortcut = QString::fromStdString(
       CommandManager::instance()->getShortcutFromId(V_ZoomFit));
   QAction *fit = menu.addAction(tr("Fit to Window") + "\t" + shortcut);
-  connect(fit, SIGNAL(triggered()), m_imageViewer, SLOT(fitView()));
+  QObject::connect(fit, SIGNAL(triggered()), m_imageViewer, SLOT(fitView()));
 
   menu.exec(event->globalPos());
 }
@@ -315,18 +318,20 @@ void ColorModelViewer::hideEvent(QHideEvent *e) {
   TPaletteHandle *paletteHandle = getPaletteHandle();
   TXshLevelHandle *levelHandle  = TApp::instance()->getCurrentLevel();
   ToolHandle *toolHandle        = TApp::instance()->getCurrentTool();
-  disconnect(paletteHandle, SIGNAL(paletteSwitched()), this,
-             SLOT(showCurrentImage()));
-  disconnect(paletteHandle, SIGNAL(paletteChanged()), this,
-             SLOT(showCurrentImage()));
-  disconnect(paletteHandle, SIGNAL(colorStyleChanged()), this,
-             SLOT(showCurrentImage()));
+  QObject::disconnect(paletteHandle, SIGNAL(paletteSwitched()), this,
+                      SLOT(showCurrentImage()));
+  QObject::disconnect(paletteHandle, SIGNAL(paletteChanged()), this,
+                      SLOT(showCurrentImage()));
+  QObject::disconnect(paletteHandle, SIGNAL(colorStyleChanged()), this,
+                      SLOT(showCurrentImage()));
 
-  disconnect(toolHandle, SIGNAL(toolSwitched()), this, SLOT(changePickType()));
-  disconnect(toolHandle, SIGNAL(toolChanged()), this, SLOT(changePickType()));
+  QObject::disconnect(toolHandle, SIGNAL(toolSwitched()), this,
+                      SLOT(changePickType()));
+  QObject::disconnect(toolHandle, SIGNAL(toolChanged()), this,
+                      SLOT(changePickType()));
 
-  disconnect(levelHandle, SIGNAL(xshLevelViewChanged()), this,
-             SLOT(updateViewer()));
+  QObject::disconnect(levelHandle, SIGNAL(xshLevelViewChanged()), this,
+                      SLOT(updateViewer()));
 }
 
 //-----------------------------------------------------------------------------
@@ -335,19 +340,19 @@ void ColorModelViewer::showEvent(QShowEvent *e) {
   TPaletteHandle *paletteHandle = getPaletteHandle();
   TXshLevelHandle *levelHandle  = TApp::instance()->getCurrentLevel();
   ToolHandle *toolHandle        = TApp::instance()->getCurrentTool();
-  bool ret = connect(paletteHandle, SIGNAL(paletteSwitched()), this,
-                     SLOT(showCurrentImage()));
-  ret = ret && connect(paletteHandle, SIGNAL(paletteChanged()), this,
-                       SLOT(showCurrentImage()));
-  ret = ret && connect(paletteHandle, SIGNAL(colorStyleChanged()), this,
-                       SLOT(showCurrentImage()));
+  bool ret = QObject::connect(paletteHandle, SIGNAL(paletteSwitched()), this,
+                              SLOT(showCurrentImage()));
+  ret = ret && QObject::connect(paletteHandle, SIGNAL(paletteChanged()), this,
+                                SLOT(showCurrentImage()));
+  ret = ret && QObject::connect(paletteHandle, SIGNAL(colorStyleChanged()),
+                                this, SLOT(showCurrentImage()));
   /*- ツールのTypeに合わせてPickのタイプも変え、カーソルも切り替える -*/
-  ret = ret && connect(toolHandle, SIGNAL(toolSwitched()), this,
-                       SLOT(changePickType()));
-  ret = ret && connect(toolHandle, SIGNAL(toolChanged()), this,
-                       SLOT(changePickType()));
-  ret = ret && connect(levelHandle, SIGNAL(xshLevelViewChanged()), this,
-                       SLOT(updateViewer()));
+  ret = ret && QObject::connect(toolHandle, SIGNAL(toolSwitched()), this,
+                                SLOT(changePickType()));
+  ret = ret && QObject::connect(toolHandle, SIGNAL(toolChanged()), this,
+                                SLOT(changePickType()));
+  ret = ret && QObject::connect(levelHandle, SIGNAL(xshLevelViewChanged()),
+                                this, SLOT(updateViewer()));
   assert(ret);
   changePickType();
   showCurrentImage();

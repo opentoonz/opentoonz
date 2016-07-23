@@ -21,16 +21,19 @@ DVGui::ValidatedChoiceDialog::ValidatedChoiceDialog(QWidget *parent,
 
   bool ret = true;
 
-  QPushButton *okBtn = new QPushButton(QString(tr("Apply")), this);
-  ret                = ret && connect(okBtn, SIGNAL(clicked()), SLOT(accept()));
-  addButtonBarWidget(okBtn);
-
+  QPushButton *okBtn      = new QPushButton(QString(tr("Apply")), this);
   QPushButton *okToAllBtn = new QPushButton(QString(tr("Apply to All")), this);
-  ret = ret && connect(okToAllBtn, SIGNAL(clicked()), SLOT(onApplyToAll()));
-  addButtonBarWidget(okToAllBtn);
+  QPushButton *cancelBtn  = new QPushButton(QString(tr("Cancel")), this);
 
-  QPushButton *cancelBtn = new QPushButton(QString(tr("Cancel")), this);
-  ret = ret && connect(cancelBtn, SIGNAL(clicked()), SLOT(reject()));
+  ret = ret && QObject::connect(okBtn, &QPushButton::clicked,                 //
+                                this, &ValidatedChoiceDialog::accept);        //
+  ret = ret && QObject::connect(okToAllBtn, &QPushButton::clicked,            //
+                                this, &ValidatedChoiceDialog::onApplyToAll);  //
+  ret = ret && QObject::connect(cancelBtn, &QPushButton::clicked,             //
+                                this, &ValidatedChoiceDialog::reject);        //
+
+  addButtonBarWidget(okBtn);
+  addButtonBarWidget(okToAllBtn);
   addButtonBarWidget(cancelBtn);
 
   assert(ret);

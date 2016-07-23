@@ -201,19 +201,23 @@ XsheetViewer::XsheetViewer(QWidget *parent, Qt::WFlags flags)
   m_rowScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_rowScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-  connect(m_rowScrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
-          m_cellScrollArea->verticalScrollBar(), SLOT(setValue(int)));
-  connect(m_cellScrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
-          m_rowScrollArea->verticalScrollBar(), SLOT(setValue(int)));
-  connect(m_columnScrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)),
-          m_cellScrollArea->horizontalScrollBar(), SLOT(setValue(int)));
-  connect(m_cellScrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)),
-          m_columnScrollArea->horizontalScrollBar(), SLOT(setValue(int)));
+  QObject::connect(m_rowScrollArea->verticalScrollBar(),
+                   SIGNAL(valueChanged(int)),
+                   m_cellScrollArea->verticalScrollBar(), SLOT(setValue(int)));
+  QObject::connect(m_cellScrollArea->verticalScrollBar(),
+                   SIGNAL(valueChanged(int)),
+                   m_rowScrollArea->verticalScrollBar(), SLOT(setValue(int)));
+  QObject::connect(
+      m_columnScrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)),
+      m_cellScrollArea->horizontalScrollBar(), SLOT(setValue(int)));
+  QObject::connect(
+      m_cellScrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)),
+      m_columnScrollArea->horizontalScrollBar(), SLOT(setValue(int)));
 
-  connect(m_cellScrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
-          SLOT(updateCellRowAree()));
-  connect(m_cellScrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)),
-          SLOT(updateCellColumnAree()));
+  QObject::connect(m_cellScrollArea->verticalScrollBar(),
+                   SIGNAL(valueChanged(int)), SLOT(updateCellRowAree()));
+  QObject::connect(m_cellScrollArea->horizontalScrollBar(),
+                   SIGNAL(valueChanged(int)), SLOT(updateCellColumnAree()));
 }
 
 //-----------------------------------------------------------------------------
@@ -588,49 +592,53 @@ void XsheetViewer::showEvent(QShowEvent *) {
 
   TApp *app = TApp::instance();
 
-  bool ret = connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()),
-                     this, SLOT(onCurrentColumnSwitched()));
-  ret = ret && connect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-                       SLOT(onCurrentFrameSwitched()));
-  ret = ret && connect(app->getCurrentFrame(), SIGNAL(isPlayingStatusChanged()),
-                       this, SLOT(onPlayingStatusChanged()));
-  ret = ret && connect(app->getCurrentFrame(), SIGNAL(scrubStopped()), this,
-                       SLOT(onScrubStopped()));
+  bool ret =
+      QObject::connect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()),
+                       this, SLOT(onCurrentColumnSwitched()));
+  ret = ret && QObject::connect(app->getCurrentFrame(), SIGNAL(frameSwitched()),
+                                this, SLOT(onCurrentFrameSwitched()));
+  ret = ret && QObject::connect(app->getCurrentFrame(),
+                                SIGNAL(isPlayingStatusChanged()), this,
+                                SLOT(onPlayingStatusChanged()));
+  ret = ret && QObject::connect(app->getCurrentFrame(), SIGNAL(scrubStopped()),
+                                this, SLOT(onScrubStopped()));
 
-  ret = ret && connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)),
-                       this, SLOT(updateAllAree(bool)));
+  ret = ret &&
+        QObject::connect(app->getCurrentObject(), SIGNAL(objectChanged(bool)),
+                         this, SLOT(updateAllAree(bool)));
 
   TSceneHandle *sceneHandle = app->getCurrentScene();
-  ret = ret && connect(sceneHandle, SIGNAL(sceneSwitched()), this,
-                       SLOT(onSceneSwitched()));
-  ret = ret && connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
-                       SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                                SLOT(onSceneSwitched()));
+  ret = ret && QObject::connect(sceneHandle, SIGNAL(nameSceneChanged()), this,
+                                SLOT(changeWindowTitle()));
 
   TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
-  ret = ret && connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
-                       SLOT(updateAllAree()));
-  ret = ret && connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
-                       SLOT(resetXsheetNotes()));
-  ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
-                       SLOT(onXsheetChanged()));
-  ret = ret && connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
-                       SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
+                                SLOT(updateAllAree()));
+  ret = ret && QObject::connect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
+                                SLOT(resetXsheetNotes()));
+  ret = ret && QObject::connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                                SLOT(onXsheetChanged()));
+  ret = ret && QObject::connect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                                SLOT(changeWindowTitle()));
 
-  ret = ret &&
-        connect(app->getCurrentSelection(),
-                SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
-                SLOT(onSelectionSwitched(TSelection *, TSelection *)));
+  ret = ret && QObject::connect(
+                   app->getCurrentSelection(),
+                   SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
+                   SLOT(onSelectionSwitched(TSelection *, TSelection *)));
   // update titlebar when the cell selection region is changed
-  ret = ret && connect(app->getCurrentSelection(),
-                       SIGNAL(selectionChanged(TSelection *)), this,
-                       SLOT(onSelectionChanged(TSelection *)));
+  ret = ret && QObject::connect(app->getCurrentSelection(),
+                                SIGNAL(selectionChanged(TSelection *)), this,
+                                SLOT(onSelectionChanged(TSelection *)));
   // show the current level name to title bar
-  ret = ret &&
-        connect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)),
-                this, SLOT(changeWindowTitle()));
+  ret = ret && QObject::connect(app->getCurrentLevel(),
+                                SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+                                SLOT(changeWindowTitle()));
 
-  ret = ret && connect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
-                       SLOT(updateColumnArea()));
+  ret = ret &&
+        QObject::connect(IconGenerator::instance(), SIGNAL(iconGenerated()),
+                         this, SLOT(updateColumnArea()));
 
   assert(ret);
   refreshContentSize(0, 0);
@@ -644,42 +652,45 @@ void XsheetViewer::hideEvent(QHideEvent *) {
 
   TApp *app = TApp::instance();
 
-  disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()), this,
-             SLOT(onCurrentColumnSwitched()));
-  disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
-             SLOT(onCurrentFrameSwitched()));
-  disconnect(app->getCurrentFrame(), SIGNAL(scrubStopped()), this,
-             SLOT(onScrubStopped()));
+  QObject::disconnect(app->getCurrentColumn(), SIGNAL(columnIndexSwitched()),
+                      this, SLOT(onCurrentColumnSwitched()));
+  QObject::disconnect(app->getCurrentFrame(), SIGNAL(frameSwitched()), this,
+                      SLOT(onCurrentFrameSwitched()));
+  QObject::disconnect(app->getCurrentFrame(), SIGNAL(scrubStopped()), this,
+                      SLOT(onScrubStopped()));
 
-  disconnect(app->getCurrentObject(), SIGNAL(objectChanged(bool)), this,
-             SLOT(updateAllAree(bool)));
+  QObject::disconnect(app->getCurrentObject(), SIGNAL(objectChanged(bool)),
+                      this, SLOT(updateAllAree(bool)));
 
   TSceneHandle *sceneHandle = app->getCurrentScene();
-  disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
-             SLOT(onSceneSwitched()));
-  disconnect(sceneHandle, SIGNAL(nameSceneChanged()), this,
-             SLOT(changeWindowTitle()));
+  QObject::disconnect(sceneHandle, SIGNAL(sceneSwitched()), this,
+                      SLOT(onSceneSwitched()));
+  QObject::disconnect(sceneHandle, SIGNAL(nameSceneChanged()), this,
+                      SLOT(changeWindowTitle()));
 
   TXsheetHandle *xsheetHandle = app->getCurrentXsheet();
-  disconnect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
-             SLOT(updateAllAree()));
-  disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
-             SLOT(onXsheetChanged()));
-  disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
-             SLOT(changeWindowTitle()));
+  QObject::disconnect(xsheetHandle, SIGNAL(xsheetSwitched()), this,
+                      SLOT(updateAllAree()));
+  QObject::disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                      SLOT(onXsheetChanged()));
+  QObject::disconnect(xsheetHandle, SIGNAL(xsheetChanged()), this,
+                      SLOT(changeWindowTitle()));
 
-  disconnect(app->getCurrentSelection(),
-             SIGNAL(selectionSwitched(TSelection *, TSelection *)), this,
-             SLOT(onSelectionSwitched(TSelection *, TSelection *)));
+  QObject::disconnect(app->getCurrentSelection(),
+                      SIGNAL(selectionSwitched(TSelection *, TSelection *)),
+                      this,
+                      SLOT(onSelectionSwitched(TSelection *, TSelection *)));
 
-  disconnect(app->getCurrentSelection(), SIGNAL(selectionChanged(TSelection *)),
-             this, SLOT(onSelectionChanged(TSelection *)));
+  QObject::disconnect(app->getCurrentSelection(),
+                      SIGNAL(selectionChanged(TSelection *)), this,
+                      SLOT(onSelectionChanged(TSelection *)));
 
-  disconnect(app->getCurrentLevel(), SIGNAL(xshLevelSwitched(TXshLevel *)),
-             this, SLOT(changeWindowTitle()));
+  QObject::disconnect(app->getCurrentLevel(),
+                      SIGNAL(xshLevelSwitched(TXshLevel *)), this,
+                      SLOT(changeWindowTitle()));
 
-  disconnect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
-             SLOT(updateColumnArea()));
+  QObject::disconnect(IconGenerator::instance(), SIGNAL(iconGenerated()), this,
+                      SLOT(updateColumnArea()));
 }
 
 //-----------------------------------------------------------------------------

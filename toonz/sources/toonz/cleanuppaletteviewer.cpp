@@ -85,14 +85,18 @@ CleanupPaletteViewer::CleanupPaletteViewer(QWidget *parent)
 
   //----- signal-slot connections
   bool ret = true;
-  ret      = ret && connect(m_ph, SIGNAL(paletteSwitched()), SLOT(buildGUI()));
-  ret      = ret && connect(m_ph, SIGNAL(paletteChanged()), SLOT(buildGUI()));
-  ret      = ret &&
-        connect(m_ph, SIGNAL(colorStyleChanged()), SLOT(onColorStyleChanged()));
 
-  ret = ret && connect(m_add, SIGNAL(clicked(bool)), SLOT(onAddClicked(bool)));
   ret = ret &&
-        connect(m_remove, SIGNAL(clicked(bool)), SLOT(onRemoveClicked(bool)));
+        QObject::connect(m_ph, SIGNAL(paletteSwitched()), SLOT(buildGUI()));
+  ret =
+      ret && QObject::connect(m_ph, SIGNAL(paletteChanged()), SLOT(buildGUI()));
+  ret = ret && QObject::connect(m_ph, SIGNAL(colorStyleChanged()),
+                                SLOT(onColorStyleChanged()));
+
+  ret = ret && QObject::connect(m_add, SIGNAL(clicked(bool)),
+                                SLOT(onAddClicked(bool)));
+  ret = ret && QObject::connect(m_remove, SIGNAL(clicked(bool)),
+                                SLOT(onRemoveClicked(bool)));
   assert(ret);
 }
 
@@ -129,8 +133,8 @@ void CleanupPaletteViewer::buildGUI() {
         new CleanupColorField(m_scrollWidget, cs, m_ph, m_greyMode);
     cs->enableContrast(m_contrastEnabled);
 
-    ret = ret && connect(cf, SIGNAL(StyleSelected(TCleanupStyle *)),
-                         SLOT(onColorStyleSelected(TCleanupStyle *)));
+    ret = ret && QObject::connect(cf, SIGNAL(StyleSelected(TCleanupStyle *)),
+                                  SLOT(onColorStyleSelected(TCleanupStyle *)));
 
     scrollLayout->addWidget(cf);
     m_colorFields.push_back(cf);

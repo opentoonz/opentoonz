@@ -934,8 +934,8 @@ int Executor::maxActiveLoad() const {
 //----------------------------------
 
 ExecutorImpSlots::ExecutorImpSlots() {
-  connect(this, SIGNAL(refreshAssignments()), this,
-          SLOT(onRefreshAssignments()));
+  QObject::connect(this, &ExecutorImpSlots::refreshAssignments,     //
+                   this, &ExecutorImpSlots::onRefreshAssignments);  //
 }
 
 //---------------------------------------------------------------------
@@ -974,8 +974,8 @@ inline void ExecutorId::newWorker(RunnableP &task) {
   } else {
     worker = new Worker;
     globalImp->m_workers.insert(worker);
-    QObject::connect(worker, SIGNAL(finished()), globalImpSlots,
-                     SLOT(onTerminated()));
+    QObject::connect(worker, &Worker::finished, globalImpSlots,
+                     &ExecutorImpSlots::onTerminated);
     worker->m_task = task;
     worker->updateCountsOnTake();
     worker->start();

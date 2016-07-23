@@ -119,19 +119,19 @@ DvTextEdit::DvTextEdit(QWidget *parent)
 
   m_button = new DvTextEditButton(0);
   m_button->hide();
-  connect(m_button, SIGNAL(clicked()), this, SLOT(onShowMiniToolBarClicked()));
+  QObject::connect(m_button, &DvTextEditButton::clicked,          //
+                   this, &DvTextEdit::onShowMiniToolBarClicked);  //
 
   fontChanged(font());
   setTextColor(TPixel32::Black, false);
   alignmentChanged(alignment());
 
-  connect(this, SIGNAL(currentCharFormatChanged(const QTextCharFormat &)), this,
-          SLOT(onCurrentCharFormatChanged(const QTextCharFormat &)));
-
-  connect(this, SIGNAL(cursorPositionChanged()), this,
-          SLOT(onCursorPositionChanged()));
-
-  connect(this, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+  QObject::connect(this, &DvTextEdit::currentCharFormatChanged,     //
+                   this, &DvTextEdit::onCurrentCharFormatChanged);  //
+  QObject::connect(this, &DvTextEdit::cursorPositionChanged,        //
+                   this, &DvTextEdit::onCursorPositionChanged);     //
+  QObject::connect(this, &DvTextEdit::selectionChanged,             //
+                   this, &DvTextEdit::onSelectionChanged);          //
 }
 
 //-----------------------------------------------------------------------------
@@ -152,27 +152,29 @@ DvTextEdit::~DvTextEdit() {}
 void DvTextEdit::createActions() {
   m_boldAction = new QAction(createQIconOnOffPNG("bold"), tr("Bold"), this);
   m_boldAction->setCheckable(true);
-  connect(m_boldAction, SIGNAL(triggered()), this, SLOT(setTextBold()));
+  QObject::connect(m_boldAction, &QAction::triggered,  //
+                   this, &DvTextEdit::setTextBold);    //
 
   m_italicAction =
       new QAction(createQIconOnOffPNG("italic"), tr("Italic"), this);
   m_italicAction->setCheckable(true);
-  connect(m_italicAction, SIGNAL(triggered()), this, SLOT(setTextItalic()));
+  QObject::connect(m_italicAction, &QAction::triggered,  //
+                   this, &DvTextEdit::setTextItalic);    //
 
   m_underlineAction =
       new QAction(createQIconOnOffPNG("underline"), tr("Underline"), this);
   m_underlineAction->setCheckable(true);
-  connect(m_underlineAction, SIGNAL(triggered()), this,
-          SLOT(setTextUnderline()));
+  QObject::connect(m_underlineAction, &QAction::triggered,  //
+                   this, &DvTextEdit::setTextUnderline);    //
 
   m_colorField = new DVGui::ColorField(this, true, TPixel32(), 30);
   m_colorField->hideChannelsFields(true);
-  connect(m_colorField, SIGNAL(colorChanged(const TPixel32 &, bool)), this,
-          SLOT(setTextColor(const TPixel32 &, bool)));
+  QObject::connect(m_colorField, &ColorField::colorChanged,  //
+                   this, &DvTextEdit::setTextColor);         //
 
   m_alignActionGroup = new QActionGroup(this);
-  connect(m_alignActionGroup, SIGNAL(triggered(QAction *)), this,
-          SLOT(setTextAlign(QAction *)));
+  QObject::connect(m_alignActionGroup, &QActionGroup::triggered,  //
+                   this, &DvTextEdit::setTextAlign);              //
 
   m_alignLeftAction = new QAction(createQIconOnOffPNG("align_left"),
                                   tr("Align Left"), m_alignActionGroup);
@@ -199,8 +201,9 @@ void DvTextEdit::createMiniToolBar() {
   m_fontComboBox->setMaximumHeight(20);
   m_fontComboBox->setMinimumWidth(140);
 
-  connect(m_fontComboBox, SIGNAL(activated(const QString &)), this,
-          SLOT(setTextFamily(const QString &)));
+  QObject::connect<void (QFontComboBox::*)(QString const &)>(
+      m_fontComboBox, &QFontComboBox::activated,  //
+      this, &DvTextEdit::setTextFamily);
 
   m_sizeComboBox = new QComboBox(toolBarUp);
   m_sizeComboBox->setEditable(true);
@@ -211,8 +214,8 @@ void DvTextEdit::createMiniToolBar() {
   foreach (int size, db.standardSizes())
     m_sizeComboBox->addItem(QString::number(size));
 
-  connect(m_sizeComboBox, SIGNAL(activated(const QString &)), this,
-          SLOT(setTextSize(const QString &)));
+  QObject::connect<void (QComboBox::*)(QString const &)>(
+      m_sizeComboBox, &QComboBox::activated, this, &DvTextEdit::setTextSize);
 
   toolBarUp->addWidget(m_fontComboBox);
   toolBarUp->addWidget(m_sizeComboBox);
