@@ -1726,6 +1726,14 @@ void MainWindow::defineActions() {
                          "");
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
+  createMenuXsheetAction(MI_FirstFrame, tr("First Frame"), "");
+  createMenuXsheetAction(MI_LastFrame, tr("Last Frame"), "");
+  createMenuXsheetAction(MI_PrevFrame, tr("Previous Frame"), "Shift+A");
+  createMenuXsheetAction(MI_NextFrame, tr("Next Frame"), "Shift+S");
+  createMenuXsheetAction(MI_NextDrawing, tr("Next Drawing"), "Shift+X");
+  createMenuXsheetAction(MI_PrevDrawing, tr("Prev Drawing"), "Shift+Z");
+  createMenuXsheetAction(MI_NextStep, tr("Next Step"), "");
+  createMenuXsheetAction(MI_PrevStep, tr("Prev Step"), "");
 
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
   createMenuCellsAction(MI_Swing, tr("&Swing"), "");
@@ -1829,17 +1837,17 @@ void MainWindow::defineActions() {
   createPlaybackAction(MI_Play, tr("Play"), "");
   createPlaybackAction(MI_Loop, tr("Loop"), "");
   createPlaybackAction(MI_Pause, tr("Pause"), "");
-  createPlaybackAction(MI_FirstFrame, tr("First Frame"), "");
-  createPlaybackAction(MI_LastFrame, tr("Last Frame"), "");
-  createPlaybackAction(MI_PrevFrame, tr("Previous Frame"), "Shift+A");
-  createPlaybackAction(MI_NextFrame, tr("Next Frame"), "Shift+S");
+  //createPlaybackAction(MI_FirstFrame, tr("First Frame"), "");
+  //createPlaybackAction(MI_LastFrame, tr("Last Frame"), "");
+  //createPlaybackAction(MI_PrevFrame, tr("Previous Frame"), "Shift+A");
+  //createPlaybackAction(MI_NextFrame, tr("Next Frame"), "Shift+S");
 
-  createAction(MI_NextDrawing, tr("Next Drawing"), "Shift+X",
-               PlaybackCommandType);
-  createAction(MI_PrevDrawing, tr("Prev Drawing"), "Shift+Z",
-               PlaybackCommandType);
-  createAction(MI_NextStep, tr("Next Step"), "", PlaybackCommandType);
-  createAction(MI_PrevStep, tr("Prev Step"), "", PlaybackCommandType);
+  //createAction(MI_NextDrawing, tr("Next Drawing"), "Shift+X",
+  //             PlaybackCommandType);
+  //createAction(MI_PrevDrawing, tr("Prev Drawing"), "Shift+Z",
+  //             PlaybackCommandType);
+  //createAction(MI_NextStep, tr("Next Step"), "", PlaybackCommandType);
+  //createAction(MI_PrevStep, tr("Prev Step"), "", PlaybackCommandType);
 
   createRGBAAction(MI_RedChannel, tr("Red Channel"), "");
   createRGBAAction(MI_GreenChannel, tr("Green Channel"), "");
