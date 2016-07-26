@@ -27,6 +27,7 @@
 #include "toonz/tcamera.h"
 #include "toonz/levelproperties.h"
 #include "toonz/tonionskinmaskhandle.h"
+#include "toonz/stage.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -217,20 +218,20 @@ Preferences::LevelFormat PreferencesPopup::FormatProperties::levelFormat()
 void PreferencesPopup::onPixelsOnlyChanged(int index) {
   bool enabled = index == Qt::Checked;
   if (enabled) {
-    m_pref->setDefLevelDpi(53.33333);
+	  m_pref->setDefLevelDpi(Stage::inch);
     m_pref->setPixelsOnly(true);
     TCamera *camera;
     camera =
         TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
     TDimension camRes = camera->getRes();
     TDimensionD camSize;
-    camSize.lx = camRes.lx / 53.33333;
-    camSize.ly = camRes.ly / 53.33333;
+	camSize.lx = camRes.lx / Stage::inch;
+	camSize.ly = camRes.ly / Stage::inch;
     camera->setSize(camSize);
     TDimension cleanupRes = CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.getRes();
     TDimensionD cleanupSize;
-    cleanupSize.lx = cleanupRes.lx / 53.33333;
-    cleanupSize.ly = cleanupRes.ly / 53.33333;
+	cleanupSize.lx = cleanupRes.lx / Stage::inch;
+	cleanupSize.ly = cleanupRes.ly / Stage::inch;
     CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.setSize(cleanupSize);
 	m_pref->storeOldUnits();
     if (m_unitOm->currentIndex() != 4) m_unitOm->setCurrentIndex(4);
@@ -238,7 +239,7 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
     m_unitOm->setDisabled(true);
     m_cameraUnitOm->setDisabled(true);
     m_defLevelDpi->setDisabled(true);
-    m_defLevelDpi->setValue(53.33333);
+	m_defLevelDpi->setValue(Stage::inch);
     m_defLevelWidth->setMeasure("camera.lx");
     m_defLevelHeight->setMeasure("camera.ly");
     m_defLevelWidth->setValue(m_pref->getDefLevelWidth());
