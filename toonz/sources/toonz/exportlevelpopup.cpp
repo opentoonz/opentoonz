@@ -708,7 +708,7 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
 
     QLabel *bgColorLabel = new QLabel(tr("Background Color:"));
     m_bgColorField =
-        new DVGui::ColorField(0, false, TPixel32::Black, 35, false);
+        new DVGui::ColorField(0, false, TPixel32::White, 35, false);
     layout->addWidget(bgColorLabel, row, 1, Qt::AlignRight);
     layout->addWidget(m_bgColorField, row++, 2, Qt::AlignLeft);
 
