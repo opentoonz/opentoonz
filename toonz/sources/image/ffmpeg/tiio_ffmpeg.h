@@ -32,6 +32,7 @@ public:
   bool checkFilesExist();
   static bool checkFfmpeg();
   static bool checkFfprobe();
+  static bool checkFormat(std::string format);
   double getFrameRate();
   TDimension getSize();
   int getFrameCount();

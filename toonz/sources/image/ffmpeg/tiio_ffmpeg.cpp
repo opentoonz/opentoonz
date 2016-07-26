@@ -60,6 +60,28 @@ bool Ffmpeg::checkFfprobe() {
   return false;
 }
 
+bool Ffmpeg::checkFormat(std::string format) {
+	QString path = Preferences::instance()->getFfmpegPath() + "/ffmpeg";
+#if defined(_WIN32)
+	path = path + ".exe";
+#endif
+	QStringList args;
+	args << "-formats";
+	QProcess ffmpeg;
+	ffmpeg.start(path, args);
+	ffmpeg.waitForFinished();
+	QString results = ffmpeg.readAllStandardError();
+	results += ffmpeg.readAllStandardOutput();
+	ffmpeg.close();
+	std::string strResults = results.toStdString();
+	std::string::size_type n;
+	n = strResults.find(format);
+	if (n != std::string::npos) return true;
+	else return false;
+}
+
+
+
 TFilePath Ffmpeg::getFfmpegCache() {
   QString cacheRoot = ToonzFolder::getCacheRootFolder().getQString();
   if (!TSystem::doesExistFileOrLevel(TFilePath(cacheRoot + "/ffmpeg"))) {
