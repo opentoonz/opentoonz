@@ -163,6 +163,7 @@ void initImageIo(bool lightVersion) {
   Tiio::defineWriterProperties("rgb", new Tiio::SgiWriterProperties());
 
   // ffmpeg
+#if !defined(_WIN32) || defined(x64)
   if (Ffmpeg::checkFfmpeg()) {
 	  bool ffprobe = Ffmpeg::checkFfprobe();
 	  if (Ffmpeg::checkFormat("webm")) {
@@ -187,6 +188,7 @@ void initImageIo(bool lightVersion) {
 		  Tiio::defineWriterProperties("mp4", new Tiio::Mp4WriterProperties());
 	  }
   }
+#endif
   // end ffmpeg
 
   if (!lightVersion) {

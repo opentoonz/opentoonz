@@ -326,7 +326,7 @@ TDimension Ffmpeg::getSize() {
   sizeArgs << m_path.getQString();
 
   QString sizeResults = runFfprobe(sizeArgs);
-  QStringList split   = sizeResults.split("\r");
+  QStringList split   = sizeResults.split("\n");
   m_lx                = split[0].split("=")[1].toInt();
   m_ly                = split[1].split("=")[1].toInt();
   return TDimension(m_lx, m_ly);
