@@ -461,6 +461,30 @@ void FullColorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
       setValue(prop, value);
     }
 
+	void addMin(TIntPairProperty &prop, double add) {
+		if (add == 0.0) return;
+		const TIntPairProperty::Range &range = prop.getRange();
+
+		TIntPairProperty::Value value = prop.getValue();
+		if (value.first + add > value.second) value.second = value.first + add;
+		value.first = tcrop<double>(value.first + add, range.first, range.second);
+		value.second = tcrop<double>(value.second, range.first, range.second);
+
+		setValue(prop, value);
+	}
+
+	void addMax(TIntPairProperty &prop, double add) {
+		if (add == 0.0) return;
+		const TIntPairProperty::Range &range = prop.getRange();
+
+		TIntPairProperty::Value value = prop.getValue();
+		if (value.second + add < value.first) value.first = value.second + add;
+		value.first = tcrop<double>(value.first, range.first, range.second);
+		value.second = tcrop<double>(value.second + add, range.first, range.second);
+
+		setValue(prop, value);
+	}
+
   } locals = {this};
 
   switch (e.getModifiersMask()) {
@@ -475,6 +499,26 @@ void FullColorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
     locals.addMinMax(m_thickness, int(add));
 
     break;
+  }
+
+  case TMouseEvent::SHIFT_KEY: {
+	  // User wants to alter the minimum brush size
+	  const TPointD &diff = pos - m_mousePos;
+	  double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
+
+	  locals.addMin(m_thickness, int(add));
+
+	  break;
+  }
+
+  case TMouseEvent::CTRL_KEY: {
+	  // User wants to alter the minimum brush size
+	  const TPointD &diff = pos - m_mousePos;
+	  double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
+
+	  locals.addMax(m_thickness, int(add));
+
+	  break;
   }
 
   default:
