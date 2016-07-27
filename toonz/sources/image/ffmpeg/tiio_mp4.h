@@ -73,8 +73,8 @@ class Mp4WriterProperties : public TPropertyGroup {
 public:
   // TEnumProperty m_pixelSize;
   // TBoolProperty m_matte;
-  TEnumProperty m_vidQuality;
-  TEnumProperty m_scale;
+  TIntProperty m_vidQuality;
+  TIntProperty m_scale;
   Mp4WriterProperties();
 };
 

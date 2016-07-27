@@ -37,7 +37,7 @@ private:
 TLevelWriterGif::TLevelWriterGif(const TFilePath &path, TPropertyGroup *winfo)
     : TLevelWriter(path, winfo) {
   if (!m_properties) m_properties = new Tiio::GifWriterProperties();
-  std::string scale = ((TEnumProperty *)(m_properties->getProperty("Scale")))
+  std::string scale = m_properties->getProperty("Scale")
                           ->getValueAsString();
   m_scale = QString::fromStdString(scale).toInt();
   TBoolProperty *looping =
@@ -66,6 +66,9 @@ TLevelWriterGif::~TLevelWriterGif() {
   // set scaling
   outLx = m_lx * m_scale / 100;
   outLy = m_ly * m_scale / 100;
+  //ffmpeg doesn't like resolutions that aren't divisible by 2.
+  if (outLx % 2 != 0) outLx++;
+  if (outLy % 2 != 0) outLy++;
 
   QString palette;
   QString filters = "fps=" + QString::number(m_frameRate) + ",scale=" +
@@ -231,16 +234,9 @@ TImageP TLevelReaderGif::load(int frameIndex) {
 }
 
 Tiio::GifWriterProperties::GifWriterProperties()
-    : m_scale("Scale")
+	: m_scale("Scale", 1, 100, 100)
     , m_looping("Looping", true)
     , m_palette("Generate Palette", true) {
-  m_scale.addValue(L"100");
-  m_scale.addValue(L"90");
-  m_scale.addValue(L"75");
-  m_scale.addValue(L"50");
-  m_scale.addValue(L"25");
-  m_scale.addValue(L"10");
-  m_scale.setValue(L"100");
   bind(m_scale);
   bind(m_looping);
   bind(m_palette);
