@@ -63,7 +63,7 @@ private:
   DVGui::IntLineEdit *m_minuteFld, *m_chunkSizeFld, *m_iconSizeLx,
       *m_iconSizeLy, *m_viewShrink, *m_viewStep, *m_blanksCount,
       *m_onionPaperThickness, *m_animationStepField, *m_undoMemorySize,
-      *m_xsheetStep;
+      *m_xsheetStep, *m_ffmpegTimeout;
 
   QPushButton *m_addLevelFormat, *m_removeLevelFormat, *m_editLevelFormat;
 
@@ -152,6 +152,7 @@ private slots:
   void onPaletteTypeForRasterColorModelChanged(int index);
   void onShowKeyframesOnCellAreaChanged(int);
   void onFfmpegPathChanged();
+  void onFfmpegTimeoutChanged();
 };
 
 //**********************************************************************************

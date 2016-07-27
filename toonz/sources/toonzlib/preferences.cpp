@@ -286,7 +286,8 @@ Preferences::Preferences()
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
-    , m_precompute(true) {
+	, m_precompute(true)
+	, m_ffmpegTimeout(30) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -543,6 +544,8 @@ Preferences::Preferences()
   QString ffmpegPath = m_settings->value("ffmpegPath").toString();
   if (ffmpegPath != "") m_ffmpegPath = ffmpegPath;
   setFfmpegPath(m_ffmpegPath.toStdString());
+  getValue(*m_settings, "ffmpegTimeout",
+	  m_ffmpegTimeout);
 }
 
 //-----------------------------------------------------------------
@@ -1194,6 +1197,14 @@ void Preferences::setFfmpegPath(std::string path) {
 void Preferences::setPrecompute(bool enabled) { m_precompute = enabled; }
 
 //-----------------------------------------------------------------
+
+void Preferences::setFfmpegTimeout(int seconds) { 
+	m_ffmpegTimeout = seconds; 
+	m_settings->setValue("ffmpegTimeout", seconds);
+}
+
+//-----------------------------------------------------------------
+
 
 int Preferences::addLevelFormat(const LevelFormat &format) {
   LevelFormatVector::iterator lft = m_levelFormats.insert(

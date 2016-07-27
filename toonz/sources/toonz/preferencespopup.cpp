@@ -849,6 +849,12 @@ void PreferencesPopup::onFfmpegPathChanged() {
   m_pref->setFfmpegPath(text.toStdString());
 }
 
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onFfmpegTimeoutChanged() {
+	m_pref->setFfmpegTimeout(m_ffmpegTimeout->getValue());
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -984,6 +990,7 @@ PreferencesPopup::PreferencesPopup()
   //--- Import/Export ------------------------------
   categoryList->addItem(tr("Import/Export"));
   m_ffmpegPathFileFld = new DVGui::FileField(this, QString(""));
+  m_ffmpegTimeout = new DVGui::IntLineEdit(this, 30, 1);
 
   //--- Drawing ------------------------------
   categoryList->addItem(tr("Drawing"));
@@ -1187,6 +1194,7 @@ PreferencesPopup::PreferencesPopup()
   //--- Import/Export ------------------------------
   QString path = m_pref->getFfmpegPath();
   m_ffmpegPathFileFld->setPath(path);
+  m_ffmpegTimeout->setValue(m_pref->getFfmpegTimeout());
 
   //--- Drawing ------------------------------
   keepOriginalCleanedUpCB->setChecked(m_pref->isSaveUnpaintedInCleanupEnable());
@@ -1555,6 +1563,14 @@ PreferencesPopup::PreferencesPopup()
         ioGridLay->addWidget(new QLabel(tr("FFmpeg Path: ")), 0, 0,
                              Qt::AlignRight);
         ioGridLay->addWidget(m_ffmpegPathFileFld, 0, 1, 1, 3);
+		ioGridLay->addWidget(new QLabel(" "), 1, 0);
+		ioGridLay->addWidget(new QLabel(tr("Number of seconds to wait for FFmpeg to complete "
+										"processing the output:")), 2, 0, 1, 4);
+		ioGridLay->addWidget(new QLabel(tr("Note: FFmpeg begins working once all images "
+										"have been processed.")), 3, 0, 1, 4);
+		ioGridLay->addWidget(new QLabel(tr("FFmpeg Timeout:")), 4, 0,
+							 Qt::AlignRight);
+		ioGridLay->addWidget(m_ffmpegTimeout, 4, 1, 1, 3);
       }
       ioLay->addLayout(ioGridLay);
       ioLay->addStretch(1);
@@ -1903,6 +1919,8 @@ PreferencesPopup::PreferencesPopup()
   //--- Import/Export ----------------------
   ret = ret && connect(m_ffmpegPathFileFld, SIGNAL(pathChanged()), this,
                        SLOT(onFfmpegPathChanged()));
+  ret = ret && connect(m_ffmpegTimeout, SIGNAL(editingFinished()), this,
+					   SLOT(onFfmpegTimeoutChanged()));
 
   //--- Drawing ----------------------
   ret = ret && connect(keepOriginalCleanedUpCB, SIGNAL(stateChanged(int)), this,

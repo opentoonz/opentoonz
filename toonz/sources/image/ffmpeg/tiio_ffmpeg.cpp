@@ -11,6 +11,7 @@
 
 Ffmpeg::Ffmpeg() {
   m_ffmpegPath         = Preferences::instance()->getFfmpegPath();
+  m_ffmpegTimeout = Preferences::instance()->getFfmpegTimeout() * 1000;
   std::string strPath  = m_ffmpegPath.toStdString();
   m_intermediateFormat = "png";
 }
@@ -158,9 +159,10 @@ void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs,
   // write the file
   QProcess ffmpeg;
   ffmpeg.start(m_ffmpegPath + "/ffmpeg", args);
-  ffmpeg.waitForFinished();
+  ffmpeg.waitForFinished(m_ffmpegTimeout);
   QString results = ffmpeg.readAllStandardError();
   results += ffmpeg.readAllStandardOutput();
+  int exitCode = ffmpeg.exitCode();
   ffmpeg.close();
   std::string strResults = results.toStdString();
 }
@@ -168,9 +170,10 @@ void Ffmpeg::runFfmpeg(QStringList preIArgs, QStringList postIArgs,
 QString Ffmpeg::runFfprobe(QStringList args) {
   QProcess ffmpeg;
   ffmpeg.start(m_ffmpegPath + "/ffprobe", args);
-  ffmpeg.waitForFinished();
+  ffmpeg.waitForFinished(m_ffmpegTimeout);
   QString results = ffmpeg.readAllStandardError();
   results += ffmpeg.readAllStandardOutput();
+  int exitCode = ffmpeg.exitCode();
   ffmpeg.close();
   std::string strResults = results.toStdString();
   return results;

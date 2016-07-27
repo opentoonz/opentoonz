@@ -386,6 +386,8 @@ public:
   QString getFfmpegPath() const { return m_ffmpegPath; }
   void setPrecompute(bool enabled);
   bool getPrecompute() { return m_precompute; }
+  void setFfmpegTimeout(int seconds);
+  int getFfmpegTimeout() { return m_ffmpegTimeout; }
 
   // Uncategorized - internals
 
@@ -437,7 +439,8 @@ private:
 
   int m_autosavePeriod,  // minutes
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
-      m_textureSize, m_autocreationType, m_keyframeType, m_animationStep;
+      m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
+	  m_ffmpegTimeout; //seconds
 
   int m_currentLanguage, m_currentStyleSheet,
       m_undoMemorySize,  // in megabytes
