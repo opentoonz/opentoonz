@@ -71,8 +71,8 @@ TLevelWriterGif::~TLevelWriterGif() {
   if (outLy % 2 != 0) outLy++;
 
   QString palette;
-  QString filters = "fps=" + QString::number(m_frameRate) + ",scale=" +
-                    QString::number(outLx) + ":-1:flags=lanczos";
+  QString filters = "scale=" + QString::number(outLx) + ":-1:flags=lanczos";
+  QString paletteFilters = filters + " [x]; [x][1:v] paletteuse";
   if (m_palette) {
     palette = m_path.getQString() + "palette.png";
     palettePreIArgs << "-v";
@@ -90,12 +90,17 @@ TLevelWriterGif::~TLevelWriterGif() {
 
   preIArgs << "-v";
   preIArgs << "warning";
-
+  preIArgs << "-r";
+  preIArgs << QString::number(m_frameRate);
   if (m_palette) {
     postIArgs << "-i";
     postIArgs << palette;
     postIArgs << "-lavfi";
-    postIArgs << filters + " [x]; [x][1:v] paletteuse";
+    postIArgs << paletteFilters;
+  }
+  else {
+	postIArgs << "-lavfi";
+	postIArgs << filters;
   }
 
   if (!m_looping) {
