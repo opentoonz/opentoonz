@@ -461,69 +461,37 @@ void FullColorBrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
       setValue(prop, value);
     }
 
-	void addMin(TIntPairProperty &prop, double add) {
-		if (add == 0.0) return;
+	void addMinMaxSeparate(TIntPairProperty &prop, double min, double max) {
+		if (min == 0.0 && max == 0.0) return;
 		const TIntPairProperty::Range &range = prop.getRange();
 
 		TIntPairProperty::Value value = prop.getValue();
-		if (value.first + add > value.second) value.second = value.first + add;
-		value.first = tcrop<double>(value.first + add, range.first, range.second);
-		value.second = tcrop<double>(value.second, range.first, range.second);
-
-		setValue(prop, value);
-	}
-
-	void addMax(TIntPairProperty &prop, double add) {
-		if (add == 0.0) return;
-		const TIntPairProperty::Range &range = prop.getRange();
-
-		TIntPairProperty::Value value = prop.getValue();
-		if (value.second + add < value.first) value.first = value.second + add;
+		value.first += min;
+		value.second += max;
+		if (value.first > value.second) value.first = value.second;
 		value.first = tcrop<double>(value.first, range.first, range.second);
-		value.second = tcrop<double>(value.second + add, range.first, range.second);
+		value.second = tcrop<double>(value.second, range.first, range.second);
 
 		setValue(prop, value);
 	}
 
   } locals = {this};
 
-  switch (e.getModifiersMask()) {
-  /*--
-   * Altキー+マウス移動で、ブラシサイズ（Min/Maxとも）を変える（CtrlやShiftでは誤操作の恐れがある）
-   * --*/
-  case TMouseEvent::ALT_KEY: {
-    // User wants to alter the minimum brush size
-    const TPointD &diff = pos - m_mousePos;
-    double add          = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
-
-    locals.addMinMax(m_thickness, int(add));
-
-    break;
-  }
-
-  case TMouseEvent::SHIFT_KEY: {
-	  // User wants to alter the minimum brush size
+  if (e.isAltPressed()) {
 	  const TPointD &diff = pos - m_mousePos;
-	  double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
+	  double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x / 4 : diff.y / 4;
 
-	  locals.addMin(m_thickness, int(add));
-
-	  break;
+	  locals.addMinMax(m_thickness, int(add));
   }
-
-  case TMouseEvent::CTRL_KEY: {
-	  // User wants to alter the minimum brush size
+  else if (e.isCtrlPressed() && e.isShiftPressed()) {
 	  const TPointD &diff = pos - m_mousePos;
-	  double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
+	  double min = diff.y / 4;
+	  double max = diff.x / 4;
 
-	  locals.addMax(m_thickness, int(add));
-
-	  break;
+	  locals.addMinMaxSeparate(m_thickness, int(min), int(max));
   }
-
-  default:
-    m_brushPos = pos;
-    break;
+  else {
+	  m_brushPos = pos;
   }
 
   m_mousePos = pos;
