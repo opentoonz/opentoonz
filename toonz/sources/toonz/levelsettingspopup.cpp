@@ -659,14 +659,15 @@ void LevelSettingsPopup::onNameChanged() {
     error("The name " + text +
           " you entered for the level is not valid.\n Please enter a different "
           "name.");
+	m_nameFld->setFocus();
     return;
   }
 
   /*-- Level名に変更がない場合 --*/
-  if (level->getName() == text.toStdWString()) {
-    warning("Level name unchanged.");
-    return;
-  }
+  //if (level->getName() == text.toStdWString()) {
+  //  warning("Level name unchanged.");
+  //  return;
+  //}
 
   TLevelSet *levelSet =
       TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
@@ -675,6 +676,7 @@ void LevelSettingsPopup::onNameChanged() {
     error("The name " + text +
           " you entered for the level is already used.\nPlease enter a "
           "different name.");
+	m_nameFld->setFocus();
     return;
   }
 
