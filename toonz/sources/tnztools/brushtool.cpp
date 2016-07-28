@@ -1633,17 +1633,17 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 
   } locals = {this};
 
-  if (e.isAltPressed()) {
+  if (e.isAltPressed() && !e.isCtrlPressed()) {
 	  const TPointD &diff = pos - m_mousePos;
-	  double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x / 4 : diff.y / 4;
+	  double add = (fabs(diff.x) > fabs(diff.y)) ? diff.x : diff.y;
 
 	  locals.addMinMax(
 		  TToonzImageP(getImage(false, 1)) ? m_rasThickness : m_thickness, add);
   }
-  else if (e.isCtrlPressed() && e.isShiftPressed()) {
+  else if (e.isCtrlPressed() && e.isAltPressed()) {
 	  const TPointD &diff = pos - m_mousePos;
-	  double min = diff.y / 4;
-	  double max = diff.x / 4;
+	  double max = diff.y;
+	  double min = diff.x;
 
 	  locals.addMinMaxSeparate(
 		  TToonzImageP(getImage(false, 1)) ? m_rasThickness : m_thickness, min, max);
