@@ -1,10 +1,11 @@
 
 
 #include "shortcutpopup.h"
-
+#include "toonzqt/gutil.h"
 // Tnz6 includes
 #include "menubarcommandids.h"
 #include "tapp.h"
+#include "tenv.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -24,6 +25,7 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QLineEdit>
+#include <QSettings>
 
 // STD includes
 #include <vector>
@@ -159,6 +161,16 @@ void ShortcutViewer::removeShortcut() {
     emit shortcutChanged();
     update();
   }
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutViewer::removeShortcutAndDefault() {
+	if (m_action) {
+		CommandManager::instance()->setShortcut(m_action, "", false);
+		emit shortcutChanged();
+		update();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -341,7 +353,11 @@ void ShortcutTree::onShortcutChanged() {
 ShortcutPopup::ShortcutPopup()
     : Dialog(TApp::instance()->getMainWindow(), false, false, "Shortcut") {
   setWindowTitle(tr("Configure Shortcuts"));
-
+  m_presetChoiceCB = new QComboBox(this);
+  QStringList presets;
+  presets << "" << "OpenToonz" << "Toon Boom Harmony" << "Adobe Animate(Flash)";
+  m_presetChoiceCB->addItems(presets);
+  m_presetChoiceCB->setCurrentIndex(0);
   m_list = new ShortcutTree(this);
   m_list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   m_list->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -358,7 +374,15 @@ ShortcutPopup::ShortcutPopup()
   m_topLayout->setMargin(5);
   m_topLayout->setSpacing(8);
   {
-    QHBoxLayout *searchLay = new QHBoxLayout();
+	QHBoxLayout *presetLay = new QHBoxLayout();
+	presetLay->setMargin(0);
+	presetLay->setSpacing(5);
+	{
+		presetLay->addWidget(new QLabel("Set All To:", this), 0);
+		presetLay->addWidget(m_presetChoiceCB, 1);
+	}
+	m_topLayout->addLayout(presetLay, 0);
+	QHBoxLayout *searchLay = new QHBoxLayout();
     searchLay->setMargin(0);
     searchLay->setSpacing(5);
     {
@@ -399,6 +423,8 @@ ShortcutPopup::ShortcutPopup()
           SLOT(setHidden(bool)));
   connect(searchEdit, SIGNAL(textChanged(const QString &)), this,
           SLOT(onSearchTextChanged(const QString &)));
+  connect(m_presetChoiceCB, SIGNAL(currentIndexChanged(int)),
+	  SLOT(onPresetChanged(int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -413,6 +439,74 @@ void ShortcutPopup::onSearchTextChanged(const QString &text) {
   busy = true;
   m_list->searchItems(text);
   busy = false;
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::onPresetChanged(int index) {
+	if (index == 0) return;
+	if (index == 1) {
+		clearAllShortcuts();
+	}
+	if (index == 2) {
+		clearAllShortcuts();
+		setHarmonyShortcuts();
+	}
+	//addFolder(tr("Fill"), FillCommandType);
+	//addFolder(tr("File"), MenuFileCommandType, menuCommandFolder);
+	//addFolder(tr("Edit"), MenuEditCommandType, menuCommandFolder);
+	//addFolder(tr("Scan & Cleanup"), MenuScanCleanupCommandType,
+	//	menuCommandFolder);
+	//addFolder(tr("Level"), MenuLevelCommandType, menuCommandFolder);
+	//addFolder(tr("Xsheet"), MenuXsheetCommandType, menuCommandFolder);
+	//addFolder(tr("Cells"), MenuCellsCommandType, menuCommandFolder);
+	//addFolder(tr("View"), MenuViewCommandType, menuCommandFolder);
+	//addFolder(tr("Windows"), MenuWindowsCommandType, menuCommandFolder);
+
+	//addFolder(tr("Right-click Menu Commands"), RightClickMenuCommandType);
+
+	//addFolder(tr("Tools"), ToolCommandType);
+	//addFolder(tr("Tool Modifiers"), ToolModifierCommandType);
+	//addFolder(tr("Visualization"), ZoomCommandType);
+	//addFolder(tr("Misc"), MiscCommandType);
+	//addFolder(tr("Playback Controls"), PlaybackCommandType);
+	//addFolder(tr("RGBA Channels"), RGBACommandType);
+}
+
+void ShortcutPopup::clearAllShortcuts() {
+	//std::vector<CommandType> commandTypes;
+	for (int commandType = UndefinedCommandType; commandType <= MenuCommandType; commandType++) {
+		std::vector<QAction *> actions;
+		CommandManager::instance()->getActions((CommandType)commandType, actions);
+		for (QAction *action : actions) {
+			//CommandManager::instance()->setShortcut(action, "");
+			//emit shortcutChanged();
+			//update();
+			std::string actStr = action->text().toStdString();
+			std::string comId = CommandManager::instance()->getIdFromAction(action);
+			//CommandManager::instance()->setShortcut(action, "/", false);
+			m_sViewer->setAction(action);
+			m_sViewer->removeShortcutAndDefault();
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::setHarmonyShortcuts() {
+	TFilePath fp = TEnv::getConfigDir() + TFilePath("harmony.ini");
+	QSettings harmony(toQString(fp), QSettings::IniFormat);
+	harmony.beginGroup("shortcuts");
+	QStringList allIds = harmony.allKeys();
+	QAction *action;
+	for (QString id : allIds) {
+		QByteArray ba = id.toLatin1();
+		const char *charId = ba.data();
+		action = CommandManager::instance()->getAction((CommandId)charId);
+		CommandManager::instance()->setShortcut(action, harmony.value(id).toString().toStdString(), false);
+	}
+	harmony.endGroup();
+	m_sViewer->shortcutChanged();
 }
 
 //-----------------------------------------------------------------------------

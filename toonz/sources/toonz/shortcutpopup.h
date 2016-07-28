@@ -5,6 +5,7 @@
 
 #include <QDialog>
 #include <QTreeWidget>
+#include <QComboBox>
 
 #include "toonzqt/dvdialog.h"
 
@@ -39,6 +40,7 @@ protected:
 public slots:
   void setAction(QAction *action);
   void removeShortcut();
+  void removeShortcutAndDefault();
 
 signals:
   void shortcutChanged();
@@ -92,13 +94,19 @@ class ShortcutPopup final : public DVGui::Dialog {
   QPushButton *m_removeBtn;
   ShortcutViewer *m_sViewer;
   ShortcutTree *m_list;
+  QComboBox *m_presetChoiceCB;
 
 public:
   ShortcutPopup();
   ~ShortcutPopup();
 
+private:
+	void clearAllShortcuts();
+	void setHarmonyShortcuts();
+
 protected slots:
   void onSearchTextChanged(const QString &text);
+  void onPresetChanged(int index);
 };
 
 #endif  //  SHORTCUTPOPUP_H
