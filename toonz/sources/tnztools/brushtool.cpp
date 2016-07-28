@@ -1626,7 +1626,6 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
 		if (value.first > value.second) value.first = value.second;
 		value.first = tcrop(value.first, range.first, range.second);
 		value.second = tcrop(value.second, range.first, range.second);
-		//value.second = tcrop(value.second, range.first, range.second);
 
 		setValue(prop, value);
 	}
