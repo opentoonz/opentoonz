@@ -102,7 +102,8 @@ public:
 
 private:
 	void clearAllShortcuts();
-	void setHarmonyShortcuts();
+	void setPresetShortcuts(QString name);
+	void setAdobeShortcuts();
 
 protected slots:
   void onSearchTextChanged(const QString &text);

@@ -26,6 +26,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QSettings>
+#include <QApplication>
 
 // STD includes
 #include <vector>
@@ -374,14 +375,6 @@ ShortcutPopup::ShortcutPopup()
   m_topLayout->setMargin(5);
   m_topLayout->setSpacing(8);
   {
-	QHBoxLayout *presetLay = new QHBoxLayout();
-	presetLay->setMargin(0);
-	presetLay->setSpacing(5);
-	{
-		presetLay->addWidget(new QLabel("Set All To:", this), 0);
-		presetLay->addWidget(m_presetChoiceCB, 1);
-	}
-	m_topLayout->addLayout(presetLay, 0);
 	QHBoxLayout *searchLay = new QHBoxLayout();
     searchLay->setMargin(0);
     searchLay->setSpacing(5);
@@ -409,6 +402,15 @@ ShortcutPopup::ShortcutPopup()
       bottomLayout->addWidget(m_removeBtn, 0);
     }
     m_topLayout->addLayout(bottomLayout, 0);
+	m_topLayout->addSpacing(5);
+	QHBoxLayout *presetLay = new QHBoxLayout();
+	presetLay->setMargin(0);
+	presetLay->setSpacing(5);
+	{
+		presetLay->addWidget(new QLabel("Set All To:", this), 0);
+		presetLay->addWidget(m_presetChoiceCB, 1);
+	}
+	m_topLayout->addLayout(presetLay, 0);
   }
 
   connect(m_list, SIGNAL(actionSelected(QAction *)), m_sViewer,
@@ -445,32 +447,41 @@ void ShortcutPopup::onSearchTextChanged(const QString &text) {
 
 void ShortcutPopup::onPresetChanged(int index) {
 	if (index == 0) return;
+	QString question(tr("This will overwrite all current shortcuts. Continue?"));
+	int ret =
+		DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);
+	if (ret == 0 || ret == 2) {
+		// cancel (or closed message box window)
+		m_presetChoiceCB->setCurrentIndex(0);
+		return;
+	}
+	DVGui::Dialog *dialog = new DVGui::Dialog(this, false, false);
+	dialog->setWindowTitle(tr("OpenToonz - Setting Shortcuts"));
+	//dialog->setLabelWidth(0);
+	dialog->setModal(false);
+
+	dialog->setTopMargin(10);
+	dialog->setTopSpacing(10);
+	dialog->setLabelWidth(500);
+	dialog->beginVLayout();
+	dialog->addWidget(new QLabel(tr("Setting and Saving Shortcuts, Please Wait."), this), false);
+	dialog->addWidget(new QLabel(tr("This may take a little while."), this), false);
+	dialog->endVLayout();
+	dialog->show();
+	
 	if (index == 1) {
 		clearAllShortcuts();
+		setPresetShortcuts("opentoonz");
 	}
 	if (index == 2) {
 		clearAllShortcuts();
-		setHarmonyShortcuts();
+		setPresetShortcuts("harmony");
 	}
-	//addFolder(tr("Fill"), FillCommandType);
-	//addFolder(tr("File"), MenuFileCommandType, menuCommandFolder);
-	//addFolder(tr("Edit"), MenuEditCommandType, menuCommandFolder);
-	//addFolder(tr("Scan & Cleanup"), MenuScanCleanupCommandType,
-	//	menuCommandFolder);
-	//addFolder(tr("Level"), MenuLevelCommandType, menuCommandFolder);
-	//addFolder(tr("Xsheet"), MenuXsheetCommandType, menuCommandFolder);
-	//addFolder(tr("Cells"), MenuCellsCommandType, menuCommandFolder);
-	//addFolder(tr("View"), MenuViewCommandType, menuCommandFolder);
-	//addFolder(tr("Windows"), MenuWindowsCommandType, menuCommandFolder);
-
-	//addFolder(tr("Right-click Menu Commands"), RightClickMenuCommandType);
-
-	//addFolder(tr("Tools"), ToolCommandType);
-	//addFolder(tr("Tool Modifiers"), ToolModifierCommandType);
-	//addFolder(tr("Visualization"), ZoomCommandType);
-	//addFolder(tr("Misc"), MiscCommandType);
-	//addFolder(tr("Playback Controls"), PlaybackCommandType);
-	//addFolder(tr("RGBA Channels"), RGBACommandType);
+	if (index == 3) {
+		clearAllShortcuts();
+		setPresetShortcuts("adobe");
+	}
+	dialog->hide();
 }
 
 void ShortcutPopup::clearAllShortcuts() {
@@ -479,12 +490,15 @@ void ShortcutPopup::clearAllShortcuts() {
 		std::vector<QAction *> actions;
 		CommandManager::instance()->getActions((CommandType)commandType, actions);
 		for (QAction *action : actions) {
+			qApp->processEvents();
 			//CommandManager::instance()->setShortcut(action, "");
 			//emit shortcutChanged();
 			//update();
-			std::string actStr = action->text().toStdString();
-			std::string comId = CommandManager::instance()->getIdFromAction(action);
+			//std::string actStr = action->text().toStdString();
+			//std::string comId = CommandManager::instance()->getIdFromAction(action);
+			//std::string default = CommandManager::instance()->getShortcutFromAction(action);
 			//CommandManager::instance()->setShortcut(action, "/", false);
+			//CommandManager::instance()->setShortcut(action, default, false);
 			m_sViewer->setAction(action);
 			m_sViewer->removeShortcutAndDefault();
 		}
@@ -493,19 +507,37 @@ void ShortcutPopup::clearAllShortcuts() {
 
 //-----------------------------------------------------------------------------
 
-void ShortcutPopup::setHarmonyShortcuts() {
-	TFilePath fp = TEnv::getConfigDir() + TFilePath("harmony.ini");
-	QSettings harmony(toQString(fp), QSettings::IniFormat);
-	harmony.beginGroup("shortcuts");
-	QStringList allIds = harmony.allKeys();
+void ShortcutPopup::setPresetShortcuts(QString name) {
+	TFilePath fp = TEnv::getConfigDir() + TFilePath(name + ".ini");
+	QSettings preset(toQString(fp), QSettings::IniFormat);
+	preset.beginGroup("shortcuts");
+	QStringList allIds = preset.allKeys();
 	QAction *action;
 	for (QString id : allIds) {
 		QByteArray ba = id.toLatin1();
 		const char *charId = ba.data();
 		action = CommandManager::instance()->getAction((CommandId)charId);
-		CommandManager::instance()->setShortcut(action, harmony.value(id).toString().toStdString(), false);
+		CommandManager::instance()->setShortcut(action, preset.value(id).toString().toStdString(), false);
 	}
-	harmony.endGroup();
+	preset.endGroup();
+	m_sViewer->shortcutChanged();
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::setAdobeShortcuts() {
+	TFilePath fp = TEnv::getConfigDir() + TFilePath("adobe.ini");
+	QSettings adobe(toQString(fp), QSettings::IniFormat);
+	adobe.beginGroup("shortcuts");
+	QStringList allIds = adobe.allKeys();
+	QAction *action;
+	for (QString id : allIds) {
+		QByteArray ba = id.toLatin1();
+		const char *charId = ba.data();
+		action = CommandManager::instance()->getAction((CommandId)charId);
+		CommandManager::instance()->setShortcut(action, adobe.value(id).toString().toStdString(), false);
+	}
+	adobe.endGroup();
 	m_sViewer->shortcutChanged();
 }
 
