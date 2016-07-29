@@ -1,4 +1,8 @@
 #!/bin/bash
+pushd toonz/sources
+chmod +x beautification.sh
+./beautification.sh && git diff --exit-code || exit 1
+popd
 pushd thirdparty/tiff-4.0.3
 ./configure && make
 popd
