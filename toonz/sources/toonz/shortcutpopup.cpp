@@ -1,13 +1,14 @@
 
 
 #include "shortcutpopup.h"
-#include "toonzqt/gutil.h"
+
 // Tnz6 includes
 #include "menubarcommandids.h"
 #include "tapp.h"
 #include "tenv.h"
 
 // TnzQt includes
+#include "toonzqt/gutil.h"
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/dvdialog.h"
 
@@ -27,6 +28,7 @@
 #include <QLineEdit>
 #include <QSettings>
 #include <QApplication>
+#include <QTextStream>
 
 // STD includes
 #include <vector>
@@ -158,20 +160,10 @@ void ShortcutViewer::keyPressEvent(QKeyEvent *event) {
 
 void ShortcutViewer::removeShortcut() {
   if (m_action) {
-    CommandManager::instance()->setShortcut(m_action, "");
+    CommandManager::instance()->setShortcut(m_action, "", false);
     emit shortcutChanged();
     update();
   }
-}
-
-//-----------------------------------------------------------------------------
-
-void ShortcutViewer::removeShortcutAndDefault() {
-	if (m_action) {
-		CommandManager::instance()->setShortcut(m_action, "", false);
-		emit shortcutChanged();
-		update();
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -356,7 +348,7 @@ ShortcutPopup::ShortcutPopup()
   setWindowTitle(tr("Configure Shortcuts"));
   m_presetChoiceCB = new QComboBox(this);
   QStringList presets;
-  presets << "" << "OpenToonz" << "Toon Boom Harmony" << "Adobe Animate(Flash)";
+  presets << "" << "OpenToonz" << "Toon Boom Harmony" << "Adobe Animate(Flash)" << tr("Load from file. . .") << tr("Remove all shortcuts");
   m_presetChoiceCB->addItems(presets);
   m_presetChoiceCB->setCurrentIndex(0);
   m_list = new ShortcutTree(this);
@@ -366,6 +358,10 @@ ShortcutPopup::ShortcutPopup()
 
   m_sViewer   = new ShortcutViewer(this);
   m_removeBtn = new QPushButton(tr("Remove"), this);
+  m_loadShortcutsPopup = NULL;
+  m_saveShortcutsPopup = NULL;
+  m_dialog = NULL;
+  m_exportButton = new QPushButton(tr("Export Current Shortcuts"), this);
   QLabel *noSearchResultLabel =
       new QLabel(tr("Couldn't find any matching command."), this);
   noSearchResultLabel->setHidden(true);
@@ -402,15 +398,17 @@ ShortcutPopup::ShortcutPopup()
       bottomLayout->addWidget(m_removeBtn, 0);
     }
     m_topLayout->addLayout(bottomLayout, 0);
-	m_topLayout->addSpacing(5);
+	m_topLayout->addSpacing(10);
 	QHBoxLayout *presetLay = new QHBoxLayout();
 	presetLay->setMargin(0);
 	presetLay->setSpacing(5);
 	{
-		presetLay->addWidget(new QLabel("Set All To:", this), 0);
+		presetLay->addWidget(new QLabel("Use Preset:", this), 0);
 		presetLay->addWidget(m_presetChoiceCB, 1);
 	}
 	m_topLayout->addLayout(presetLay, 0);
+	m_topLayout->addSpacing(10);
+	m_topLayout->addWidget(m_exportButton, 0);
   }
 
   connect(m_list, SIGNAL(actionSelected(QAction *)), m_sViewer,
@@ -427,6 +425,7 @@ ShortcutPopup::ShortcutPopup()
           SLOT(onSearchTextChanged(const QString &)));
   connect(m_presetChoiceCB, SIGNAL(currentIndexChanged(int)),
 	  SLOT(onPresetChanged(int)));
+  connect(m_exportButton, SIGNAL(clicked()), SLOT(backupShortcuts()));
 }
 
 //-----------------------------------------------------------------------------
@@ -447,68 +446,76 @@ void ShortcutPopup::onSearchTextChanged(const QString &text) {
 
 void ShortcutPopup::onPresetChanged(int index) {
 	if (index == 0) return;
-	QString question(tr("This will overwrite all current shortcuts. Continue?"));
-	int ret =
-		DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);
-	if (ret == 0 || ret == 2) {
-		// cancel (or closed message box window)
-		m_presetChoiceCB->setCurrentIndex(0);
-		return;
+	if (index == 4) {
+		m_loadShortcutsPopup = new GenericLoadFilePopup("Load Shortcuts File");
+		m_loadShortcutsPopup->addFilterType("ini");
+		//m_loadShortcutsPopup->exec();
+		TFilePath shortcutPath = m_loadShortcutsPopup->getPath();
+		if (shortcutPath == TFilePath()) {
+			m_presetChoiceCB->setCurrentIndex(0);
+			return;
+		}
+		else {
+			if (showConfirmDialog()) {
+				clearAllShortcuts();
+				setPresetShortcuts(shortcutPath);
+				m_presetChoiceCB->setCurrentIndex(0);
+				return;
+			}
+			else {
+				m_presetChoiceCB->setCurrentIndex(0);
+				return;
+			}
+		}
 	}
-	DVGui::Dialog *dialog = new DVGui::Dialog(this, false, false);
-	dialog->setWindowTitle(tr("OpenToonz - Setting Shortcuts"));
-	//dialog->setLabelWidth(0);
-	dialog->setModal(false);
 
-	dialog->setTopMargin(10);
-	dialog->setTopSpacing(10);
-	dialog->setLabelWidth(500);
-	dialog->beginVLayout();
-	dialog->addWidget(new QLabel(tr("Setting and Saving Shortcuts, Please Wait."), this), false);
-	dialog->addWidget(new QLabel(tr("This may take a little while."), this), false);
-	dialog->endVLayout();
-	dialog->show();
+	if (!showConfirmDialog()) return;
 	
 	if (index == 1) {
 		clearAllShortcuts();
-		setPresetShortcuts("opentoonz");
+		TFilePath fp = TEnv::getConfigDir() + TFilePath("opentoonz.ini");
+		setPresetShortcuts(fp);
+		return;
 	}
 	if (index == 2) {
 		clearAllShortcuts();
-		setPresetShortcuts("harmony");
+		TFilePath fp = TEnv::getConfigDir() + TFilePath("harmony.ini");
+		setPresetShortcuts(fp);
+		return;
 	}
 	if (index == 3) {
 		clearAllShortcuts();
-		setPresetShortcuts("adobe");
+		TFilePath fp = TEnv::getConfigDir() + TFilePath("adobe.ini");
+		setPresetShortcuts(fp);
+		return;
 	}
-	dialog->hide();
+	if (index == 5) {
+		clearAllShortcuts();
+		m_presetChoiceCB->setCurrentIndex(0);
+		return;
+		
+	}
 }
 
+//-----------------------------------------------------------------------------
+
 void ShortcutPopup::clearAllShortcuts() {
+	showDialog();
 	//std::vector<CommandType> commandTypes;
 	for (int commandType = UndefinedCommandType; commandType <= MenuCommandType; commandType++) {
 		std::vector<QAction *> actions;
 		CommandManager::instance()->getActions((CommandType)commandType, actions);
 		for (QAction *action : actions) {
 			qApp->processEvents();
-			//CommandManager::instance()->setShortcut(action, "");
-			//emit shortcutChanged();
-			//update();
-			//std::string actStr = action->text().toStdString();
-			//std::string comId = CommandManager::instance()->getIdFromAction(action);
-			//std::string default = CommandManager::instance()->getShortcutFromAction(action);
-			//CommandManager::instance()->setShortcut(action, "/", false);
-			//CommandManager::instance()->setShortcut(action, default, false);
 			m_sViewer->setAction(action);
-			m_sViewer->removeShortcutAndDefault();
+			m_sViewer->removeShortcut();
 		}
 	}
 }
 
 //-----------------------------------------------------------------------------
 
-void ShortcutPopup::setPresetShortcuts(QString name) {
-	TFilePath fp = TEnv::getConfigDir() + TFilePath(name + ".ini");
+void ShortcutPopup::setPresetShortcuts(TFilePath fp) {
 	QSettings preset(toQString(fp), QSettings::IniFormat);
 	preset.beginGroup("shortcuts");
 	QStringList allIds = preset.allKeys();
@@ -521,24 +528,67 @@ void ShortcutPopup::setPresetShortcuts(QString name) {
 	}
 	preset.endGroup();
 	m_sViewer->shortcutChanged();
+	m_dialog->hide();
 }
 
 //-----------------------------------------------------------------------------
 
-void ShortcutPopup::setAdobeShortcuts() {
-	TFilePath fp = TEnv::getConfigDir() + TFilePath("adobe.ini");
-	QSettings adobe(toQString(fp), QSettings::IniFormat);
-	adobe.beginGroup("shortcuts");
-	QStringList allIds = adobe.allKeys();
-	QAction *action;
-	for (QString id : allIds) {
-		QByteArray ba = id.toLatin1();
-		const char *charId = ba.data();
-		action = CommandManager::instance()->getAction((CommandId)charId);
-		CommandManager::instance()->setShortcut(action, adobe.value(id).toString().toStdString(), false);
+bool ShortcutPopup::showConfirmDialog() {
+	QString question(tr("This will overwrite all current shortcuts. Continue?"));
+	int ret =
+		DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);
+	if (ret == 0 || ret == 2) {
+		// cancel (or closed message box window)
+		m_presetChoiceCB->setCurrentIndex(0);
+		return false;
 	}
-	adobe.endGroup();
-	m_sViewer->shortcutChanged();
+	else return true;
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::showDialog() {
+	if (m_dialog == NULL) {
+		m_dialog = new DVGui::Dialog(this, false, false);
+		m_dialog->setWindowTitle(tr("OpenToonz - Setting Shortcuts"));
+		//dialog->setLabelWidth(0);
+		m_dialog->setModal(false);
+
+		m_dialog->setTopMargin(10);
+		m_dialog->setTopSpacing(10);
+		m_dialog->setLabelWidth(500);
+		m_dialog->beginVLayout();
+		m_dialog->addWidget(new QLabel(tr("Saving Shortcuts, Please Wait."), this), false);
+		m_dialog->endVLayout();
+	}
+	m_dialog->show();
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::backupShortcuts() {
+	m_saveShortcutsPopup = new GenericSaveFilePopup("Save Current Shortcuts");
+	m_saveShortcutsPopup->addFilterType("ini");
+	TFilePath path = m_saveShortcutsPopup->getPath();
+	if (path == TFilePath()) return;
+	showDialog();
+	QString shortcutString = "[shortcuts]\n";
+	for (int commandType = UndefinedCommandType; commandType <= MenuCommandType; commandType++) {
+		std::vector<QAction *> actions;
+		CommandManager::instance()->getActions((CommandType)commandType, actions);
+		for (QAction *action : actions) {
+			qApp->processEvents();
+			std::string id = CommandManager::instance()->getIdFromAction(action);
+			std::string shortcut = CommandManager::instance()->getShortcutFromAction(action);
+			shortcutString = shortcutString + QString::fromStdString(id) + "=" + QString::fromStdString(shortcut) + "\n";
+		}
+	}
+	QFile file(path.getQString());
+	file.open(QIODevice::WriteOnly | QIODevice::Text);
+	QTextStream out(&file);
+	out << shortcutString;
+	file.close();
+	m_dialog->hide();
 }
 
 //-----------------------------------------------------------------------------

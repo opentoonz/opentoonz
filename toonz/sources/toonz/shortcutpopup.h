@@ -6,7 +6,7 @@
 #include <QDialog>
 #include <QTreeWidget>
 #include <QComboBox>
-
+#include "filebrowserpopup.h"
 #include "toonzqt/dvdialog.h"
 
 // forward declaration
@@ -40,7 +40,6 @@ protected:
 public slots:
   void setAction(QAction *action);
   void removeShortcut();
-  void removeShortcutAndDefault();
 
 signals:
   void shortcutChanged();
@@ -95,6 +94,10 @@ class ShortcutPopup final : public DVGui::Dialog {
   ShortcutViewer *m_sViewer;
   ShortcutTree *m_list;
   QComboBox *m_presetChoiceCB;
+  DVGui::Dialog *m_dialog;
+  GenericLoadFilePopup *m_loadShortcutsPopup;
+  GenericSaveFilePopup *m_saveShortcutsPopup;
+  QPushButton *m_exportButton;
 
 public:
   ShortcutPopup();
@@ -102,12 +105,14 @@ public:
 
 private:
 	void clearAllShortcuts();
-	void setPresetShortcuts(QString name);
-	void setAdobeShortcuts();
+	void setPresetShortcuts(TFilePath fp);
+	void showDialog();
+	bool showConfirmDialog();
 
 protected slots:
   void onSearchTextChanged(const QString &text);
   void onPresetChanged(int index);
+  void backupShortcuts();
 };
 
 #endif  //  SHORTCUTPOPUP_H
