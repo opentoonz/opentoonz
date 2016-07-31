@@ -226,7 +226,8 @@ public:
 //  Some useful utility inlines
 
 inline bool isMovieType(std::string type) {
-  return (type == "mov" || type == "avi" || type == "3gp");
+  return (type == "mov" || type == "avi" || type == "3gp" || type == "webm" ||
+          type == "mp4");
 }
 
 //-----------------------------------------------------------

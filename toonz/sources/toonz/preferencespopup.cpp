@@ -227,12 +227,15 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
     camSize.lx = camRes.lx / 53.33333;
     camSize.ly = camRes.ly / 53.33333;
     camera->setSize(camSize);
-    TDimension cleanupRes = CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.getRes();
+    TDimension cleanupRes = CleanupSettingsModel::instance()
+                                ->getCurrentParameters()
+                                ->m_camera.getRes();
     TDimensionD cleanupSize;
     cleanupSize.lx = cleanupRes.lx / 53.33333;
     cleanupSize.ly = cleanupRes.ly / 53.33333;
-    CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.setSize(cleanupSize);
-	m_pref->storeOldUnits();
+    CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.setSize(
+        cleanupSize);
+    m_pref->storeOldUnits();
     if (m_unitOm->currentIndex() != 4) m_unitOm->setCurrentIndex(4);
     if (m_cameraUnitOm->currentIndex() != 4) m_cameraUnitOm->setCurrentIndex(4);
     m_unitOm->setDisabled(true);
@@ -839,6 +842,19 @@ void PreferencesPopup::onRegionAntialiasChanged(int on) {
   m_pref->setRegionAntialias(on);
 }
 
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onFfmpegPathChanged() {
+  QString text = m_ffmpegPathFileFld->getPath();
+  m_pref->setFfmpegPath(text.toStdString());
+}
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onFfmpegTimeoutChanged() {
+	m_pref->setFfmpegTimeout(m_ffmpegTimeout->getValue());
+}
+
 //**********************************************************************************
 //    PrefencesPopup's  constructor
 //**********************************************************************************
@@ -970,6 +986,11 @@ PreferencesPopup::PreferencesPopup()
   m_editLevelFormat   = new QPushButton(tr("Edit"));
 
   QComboBox *paletteTypeForRasterColorModelComboBox = new QComboBox(this);
+
+  //--- Import/Export ------------------------------
+  categoryList->addItem(tr("Import/Export"));
+  m_ffmpegPathFileFld = new DVGui::FileField(this, QString(""));
+  m_ffmpegTimeout = new DVGui::IntLineEdit(this, 30, 1);
 
   //--- Drawing ------------------------------
   categoryList->addItem(tr("Drawing"));
@@ -1169,6 +1190,11 @@ PreferencesPopup::PreferencesPopup()
   paletteTypeForRasterColorModelComboBox->addItems(paletteTypes);
   paletteTypeForRasterColorModelComboBox->setCurrentIndex(
       m_pref->getPaletteTypeOnLoadRasterImageAsColorModel());
+
+  //--- Import/Export ------------------------------
+  QString path = m_pref->getFfmpegPath();
+  m_ffmpegPathFileFld->setPath(path);
+  m_ffmpegTimeout->setValue(m_pref->getFfmpegTimeout());
 
   //--- Drawing ------------------------------
   keepOriginalCleanedUpCB->setChecked(m_pref->isSaveUnpaintedInCleanupEnable());
@@ -1505,6 +1531,55 @@ PreferencesPopup::PreferencesPopup()
     loadingBox->setLayout(loadingFrameLay);
     stackedWidget->addWidget(loadingBox);
 
+    //--- Import/Export --------------------------
+    QWidget *ioBox     = new QWidget(this);
+    QVBoxLayout *ioLay = new QVBoxLayout();
+    ioLay->setMargin(15);
+    ioLay->setSpacing(10);
+    {
+      ioLay->addWidget(
+          new QLabel(
+              tr("OpenToonz can use FFmpeg for additional file formats.")),
+          0, Qt::AlignCenter | Qt::AlignVCenter);
+      ioLay->addWidget(new QLabel(tr("FFmpeg is not bundled with OpenToonz")),
+                       0, Qt::AlignCenter | Qt::AlignVCenter);
+	  ioLay->addWidget(new QLabel(" "),
+		  0, Qt::AlignCenter | Qt::AlignVCenter);
+	  ioLay->addWidget(new QLabel(tr("NOTE: This is an experimental feature.")),
+		  0, Qt::AlignCenter | Qt::AlignVCenter);
+	  ioLay->addWidget(new QLabel(tr("Please SAVE YOUR WORK before exporting "
+		                             "in MP4, WEBM, or GIF format.")),
+		  0, Qt::AlignCenter | Qt::AlignVCenter);
+	  ioLay->addWidget(new QLabel(" "),
+		  0, Qt::AlignCenter | Qt::AlignVCenter);
+      ioLay->addWidget(new QLabel(tr("Please provide the path where FFmpeg is "
+                                     "located on your computer.")),
+                       0, Qt::AlignLeft | Qt::AlignVCenter);
+      QGridLayout *ioGridLay = new QGridLayout();
+      ioGridLay->setVerticalSpacing(10);
+      ioGridLay->setHorizontalSpacing(15);
+      ioGridLay->setMargin(0);
+      {
+        ioGridLay->addWidget(new QLabel(tr("FFmpeg Path: ")), 0, 0,
+                             Qt::AlignRight);
+        ioGridLay->addWidget(m_ffmpegPathFileFld, 0, 1, 1, 3);
+		ioGridLay->addWidget(new QLabel(" "), 1, 0);
+		ioGridLay->addWidget(new QLabel(tr("Number of seconds to wait for FFmpeg to complete "
+										"processing the output:")), 2, 0, 1, 4);
+		ioGridLay->addWidget(new QLabel(tr("Note: FFmpeg begins working once all images "
+										"have been processed.")), 3, 0, 1, 4);
+		ioGridLay->addWidget(new QLabel(tr("FFmpeg Timeout:")), 4, 0,
+							 Qt::AlignRight);
+		ioGridLay->addWidget(m_ffmpegTimeout, 4, 1, 1, 3);
+      }
+      ioLay->addLayout(ioGridLay);
+      ioLay->addStretch(1);
+
+      ioLay->addWidget(note_version, 0);
+    }
+    ioBox->setLayout(ioLay);
+    stackedWidget->addWidget(ioBox);
+
     //--- Drawing --------------------------
     QWidget *drawingBox          = new QWidget(this);
     QVBoxLayout *drawingFrameLay = new QVBoxLayout();
@@ -1840,6 +1915,12 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(paletteTypeForRasterColorModelComboBox,
                        SIGNAL(currentIndexChanged(int)), this,
                        SLOT(onPaletteTypeForRasterColorModelChanged(int)));
+
+  //--- Import/Export ----------------------
+  ret = ret && connect(m_ffmpegPathFileFld, SIGNAL(pathChanged()), this,
+                       SLOT(onFfmpegPathChanged()));
+  ret = ret && connect(m_ffmpegTimeout, SIGNAL(editingFinished()), this,
+					   SLOT(onFfmpegTimeoutChanged()));
 
   //--- Drawing ----------------------
   ret = ret && connect(keepOriginalCleanedUpCB, SIGNAL(stateChanged(int)), this,

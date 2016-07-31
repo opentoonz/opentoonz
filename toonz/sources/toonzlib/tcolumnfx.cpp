@@ -1348,15 +1348,23 @@ void TLevelColumnFx::getImageInfo(TImageInfo &info, TXshSimpleLevel *sl,
   if (!storedInfo)  // sulle pict caricate info era nullo, ma l'immagine c'e'!
   // con la getFullSampleFrame riprendo   l'immagine e ricalcolo la savebox...
   {
-    TImageP img;
+    TImageP img; 
     if (!(img =
               sl->getFullsampledFrame(frameId, ImageManager::dontPutInCache))) {
       assert(false);
       return;
     }
-
-    info.m_lx = (int)img->getBBox().getLx();
-    info.m_ly = (int)img->getBBox().getLy();
+	//Raster levels from ffmpeg were not giving the right dimensions without the raster cast and check
+	TRasterImageP rasterImage = (TRasterImageP)img;
+	if (rasterImage)
+	{
+		info.m_lx = (int)rasterImage->getRaster()->getLx();
+		info.m_ly = (int)rasterImage->getRaster()->getLy();
+	}
+	else {
+		info.m_lx = (int)img->getBBox().getLx();
+		info.m_ly = (int)img->getBBox().getLy();
+	}
     info.m_x0 = info.m_y0 = 0;
     info.m_x1             = (int)img->getBBox().getP11().x;
     info.m_y1             = (int)img->getBBox().getP11().y;
