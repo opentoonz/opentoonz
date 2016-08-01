@@ -6,7 +6,10 @@
 #include "menubarcommandids.h"
 #include "tapp.h"
 #include "tenv.h"
+#include "tsystem.h"
 
+#include "toonz/preferences.h"
+#include "toonz/toonzfolders.h"
 // TnzQt includes
 #include "toonzqt/gutil.h"
 #include "toonzqt/menubarcommand.h"
@@ -347,9 +350,9 @@ ShortcutPopup::ShortcutPopup()
     : Dialog(TApp::instance()->getMainWindow(), false, false, "Shortcut") {
   setWindowTitle(tr("Configure Shortcuts"));
   m_presetChoiceCB = new QComboBox(this);
-  QStringList presets;
-  presets << "" << "OpenToonz" << "Toon Boom Harmony" << "Adobe Animate(Flash)" << tr("Load from file. . .") << tr("Remove all shortcuts");
-  m_presetChoiceCB->addItems(presets);
+  buildPresets();
+  
+  
   m_presetChoiceCB->setCurrentIndex(0);
   m_list = new ShortcutTree(this);
   m_list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -362,6 +365,17 @@ ShortcutPopup::ShortcutPopup()
   m_saveShortcutsPopup = NULL;
   m_dialog = NULL;
   m_exportButton = new QPushButton(tr("Export Current Shortcuts"), this);
+  m_exportButton->setToolTip(tr("Export Current Shortcuts"));
+  m_deletePresetButton = new QPushButton("Delete", this);
+  m_deletePresetButton->setToolTip(tr("Delete Current Preset"));
+  m_deletePresetButton->setIcon(QIcon(":Resources/delete_on.png"));
+  m_savePresetButton = new QPushButton("Save As", this);
+  m_savePresetButton->setToolTip(tr("Save Current Shortcuts as New Preset"));
+  m_savePresetButton->setIcon(QIcon(":Resources/saveas_on.png"));
+  m_loadPresetButton = new QPushButton(tr("Apply"));
+  m_loadPresetButton->setToolTip(tr("Use selected preset as shortcuts"));
+  m_loadPresetButton->setIcon(QIcon(":Resources/green.png"));
+  m_clearAllShortcutsButton = new QPushButton(tr("Clear All Shortcuts"));
   QLabel *noSearchResultLabel =
       new QLabel(tr("Couldn't find any matching command."), this);
   noSearchResultLabel->setHidden(true);
@@ -403,12 +417,23 @@ ShortcutPopup::ShortcutPopup()
 	presetLay->setMargin(0);
 	presetLay->setSpacing(5);
 	{
-		presetLay->addWidget(new QLabel("Use Preset:", this), 0);
+		presetLay->addWidget(new QLabel("Preset:", this), 0);
 		presetLay->addWidget(m_presetChoiceCB, 1);
+		presetLay->addWidget(m_loadPresetButton, 0);
+		presetLay->addWidget(m_savePresetButton, 0);
+		presetLay->addWidget(m_deletePresetButton, 0);
 	}
 	m_topLayout->addLayout(presetLay, 0);
 	m_topLayout->addSpacing(10);
-	m_topLayout->addWidget(m_exportButton, 0);
+	QHBoxLayout *exportLay = new QHBoxLayout();
+	exportLay->setMargin(0);
+	exportLay->setSpacing(5);
+	{
+		exportLay->addWidget(m_exportButton, 0);
+		exportLay->addWidget(m_clearAllShortcutsButton, 0);
+	}
+	m_topLayout->addLayout(exportLay, 0);
+	//m_topLayout->addWidget(m_exportButton, 0);
   }
 
   connect(m_list, SIGNAL(actionSelected(QAction *)), m_sViewer,
@@ -425,7 +450,11 @@ ShortcutPopup::ShortcutPopup()
           SLOT(onSearchTextChanged(const QString &)));
   connect(m_presetChoiceCB, SIGNAL(currentIndexChanged(int)),
 	  SLOT(onPresetChanged(int)));
-  connect(m_exportButton, SIGNAL(clicked()), SLOT(backupShortcuts()));
+  connect(m_exportButton, SIGNAL(clicked()), SLOT(onExportButton()));
+  connect(m_deletePresetButton, SIGNAL(clicked()), SLOT(onDeletePreset()));
+  connect(m_savePresetButton, SIGNAL(clicked()), SLOT(onSavePreset()));
+  connect(m_loadPresetButton, SIGNAL(clicked()), SLOT(onLoadPreset()));
+  connect(m_clearAllShortcutsButton, SIGNAL(clicked()), SLOT(clearAllShortcuts()));
 }
 
 //-----------------------------------------------------------------------------
@@ -445,63 +474,25 @@ void ShortcutPopup::onSearchTextChanged(const QString &text) {
 //-----------------------------------------------------------------------------
 
 void ShortcutPopup::onPresetChanged(int index) {
-	if (index == 0) return;
-	if (index == 4) {
-		m_loadShortcutsPopup = new GenericLoadFilePopup("Load Shortcuts File");
-		m_loadShortcutsPopup->addFilterType("ini");
-		//m_loadShortcutsPopup->exec();
-		TFilePath shortcutPath = m_loadShortcutsPopup->getPath();
-		if (shortcutPath == TFilePath()) {
-			m_presetChoiceCB->setCurrentIndex(0);
-			return;
-		}
-		else {
-			if (showConfirmDialog()) {
-				clearAllShortcuts();
-				setPresetShortcuts(shortcutPath);
-				m_presetChoiceCB->setCurrentIndex(0);
-				return;
-			}
-			else {
-				m_presetChoiceCB->setCurrentIndex(0);
-				return;
-			}
-		}
-	}
-
-	if (!showConfirmDialog()) return;
-	
-	if (index == 1) {
-		clearAllShortcuts();
-		TFilePath fp = TEnv::getConfigDir() + TFilePath("opentoonz.ini");
-		setPresetShortcuts(fp);
-		return;
-	}
-	if (index == 2) {
-		clearAllShortcuts();
-		TFilePath fp = TEnv::getConfigDir() + TFilePath("harmony.ini");
-		setPresetShortcuts(fp);
-		return;
-	}
-	if (index == 3) {
-		clearAllShortcuts();
-		TFilePath fp = TEnv::getConfigDir() + TFilePath("adobe.ini");
-		setPresetShortcuts(fp);
-		return;
-	}
-	if (index == 5) {
-		clearAllShortcuts();
-		m_presetChoiceCB->setCurrentIndex(0);
-		return;
-		
+	if (m_presetChoiceCB->currentText() == "Load from file...")
+	{
+		importPreset();
 	}
 }
 
 //-----------------------------------------------------------------------------
 
-void ShortcutPopup::clearAllShortcuts() {
-	showDialog();
-	//std::vector<CommandType> commandTypes;
+void ShortcutPopup::clearAllShortcuts(bool warning) {
+	if (warning) {
+		QString question(tr("This will erase ALL shortcuts. Continue?"));
+		int ret =
+			DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);
+		if (ret == 0 || ret == 2) {
+			// cancel (or closed message box window)
+			return;
+		}
+		showDialog("Clearing All Shortcuts");
+	}
 	for (int commandType = UndefinedCommandType; commandType <= MenuCommandType; commandType++) {
 		std::vector<QAction *> actions;
 		CommandManager::instance()->getActions((CommandType)commandType, actions);
@@ -511,6 +502,9 @@ void ShortcutPopup::clearAllShortcuts() {
 			m_sViewer->removeShortcut();
 		}
 	}
+	setCurrentPresetPref("DELETED");
+	//if warning is true, this was called directly- need to hide the dialog after
+	if (warning) m_dialog->hide();
 }
 
 //-----------------------------------------------------------------------------
@@ -529,6 +523,8 @@ void ShortcutPopup::setPresetShortcuts(TFilePath fp) {
 	preset.endGroup();
 	m_sViewer->shortcutChanged();
 	m_dialog->hide();
+	buildPresets();
+	setCurrentPresetPref(QString::fromStdString(fp.getName()));
 }
 
 //-----------------------------------------------------------------------------
@@ -539,7 +535,6 @@ bool ShortcutPopup::showConfirmDialog() {
 		DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);
 	if (ret == 0 || ret == 2) {
 		// cancel (or closed message box window)
-		m_presetChoiceCB->setCurrentIndex(0);
 		return false;
 	}
 	else return true;
@@ -547,8 +542,22 @@ bool ShortcutPopup::showConfirmDialog() {
 
 //-----------------------------------------------------------------------------
 
-void ShortcutPopup::showDialog() {
+bool ShortcutPopup::showOverwriteDialog(QString name) {
+	QString question(tr("A file named ") + name + tr(" already exists.  Do you want to replace it?"));
+	int ret =
+		DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"), 0);
+	if (ret == 0 || ret == 2) {
+		// cancel (or closed message box window)
+		return false;
+	}
+	else return true;
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::showDialog(QString text) {
 	if (m_dialog == NULL) {
+		m_dialogLabel = new QLabel("", this);
 		m_dialog = new DVGui::Dialog(this, false, false);
 		m_dialog->setWindowTitle(tr("OpenToonz - Setting Shortcuts"));
 		//dialog->setLabelWidth(0);
@@ -558,20 +567,23 @@ void ShortcutPopup::showDialog() {
 		m_dialog->setTopSpacing(10);
 		m_dialog->setLabelWidth(500);
 		m_dialog->beginVLayout();
-		m_dialog->addWidget(new QLabel(tr("Saving Shortcuts, Please Wait."), this), false);
+		m_dialog->addWidget(m_dialogLabel, false);
 		m_dialog->endVLayout();
 	}
+	m_dialogLabel->setText(text);
 	m_dialog->show();
 }
 
 //-----------------------------------------------------------------------------
 
-void ShortcutPopup::backupShortcuts() {
-	m_saveShortcutsPopup = new GenericSaveFilePopup("Save Current Shortcuts");
-	m_saveShortcutsPopup->addFilterType("ini");
-	TFilePath path = m_saveShortcutsPopup->getPath();
-	if (path == TFilePath()) return;
-	showDialog();
+void ShortcutPopup::onExportButton(TFilePath fp) {
+	if (fp == TFilePath()) {
+		m_saveShortcutsPopup = new GenericSaveFilePopup("Save Current Shortcuts");
+		m_saveShortcutsPopup->addFilterType("ini");
+		fp = m_saveShortcutsPopup->getPath();
+		if (fp == TFilePath()) return;
+	}
+	showDialog("Saving Shortcuts");
 	QString shortcutString = "[shortcuts]\n";
 	for (int commandType = UndefinedCommandType; commandType <= MenuCommandType; commandType++) {
 		std::vector<QAction *> actions;
@@ -583,7 +595,7 @@ void ShortcutPopup::backupShortcuts() {
 			shortcutString = shortcutString + QString::fromStdString(id) + "=" + QString::fromStdString(shortcut) + "\n";
 		}
 	}
-	QFile file(path.getQString());
+	QFile file(fp.getQString());
 	file.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream out(&file);
 	out << shortcutString;
@@ -592,5 +604,182 @@ void ShortcutPopup::backupShortcuts() {
 }
 
 //-----------------------------------------------------------------------------
+
+void ShortcutPopup::onDeletePreset() {
+	if (m_presetChoiceCB->currentIndex() <= 4) {
+		//QString info = "Included presets cannot be deleted.";
+		//int ret = DVGui::MsgBox(info, QObject::tr("OK"), 0);
+		DVGui::MsgBox(DVGui::CRITICAL, tr("Included presets cannot be deleted."));
+		return;
+	}
+
+	QString question(tr("Are you sure you want to delete the preset: ") + m_presetChoiceCB->currentText() + tr("?"));
+	int ret =
+		DVGui::MsgBox(question, QObject::tr("Yes"), QObject::tr("No"), 0);
+	if (ret == 0 || ret == 2) {
+		// cancel (or closed message box window)
+		return;
+	}
+	TFilePath presetDir = ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
+	QString presetName = m_presetChoiceCB->currentText();
+	if (TSystem::doesExistFileOrLevel(presetDir + TFilePath(presetName + ".ini"))) {
+		TSystem::deleteFile(presetDir + TFilePath(presetName + ".ini"));
+		buildPresets();
+		m_presetChoiceCB->setCurrentIndex(0);
+	}
+	if (Preferences::instance()->getShortcutPreset() == presetName)
+		setCurrentPresetPref("DELETED");
+	getCurrentPresetPref();
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::importPreset() {
+	m_loadShortcutsPopup = new GenericLoadFilePopup("Load Shortcuts File");
+	m_loadShortcutsPopup->addFilterType("ini");
+	//m_loadShortcutsPopup->exec();
+	TFilePath shortcutPath = m_loadShortcutsPopup->getPath();
+	if (shortcutPath == TFilePath()) {
+		m_presetChoiceCB->setCurrentIndex(0);
+		return;
+	}
+	if (!showConfirmDialog()) return;
+
+	TFilePath presetDir = ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
+	QString name = shortcutPath.withoutParentDir().getQString();
+	std::string strName = name.toStdString();
+	if (TSystem::doesExistFileOrLevel(presetDir + TFilePath(name))) {
+		if (!showOverwriteDialog(name)) return;
+	}
+	showDialog("Importing Shortcuts");
+	TSystem::copyFile(presetDir + TFilePath(name), shortcutPath, true);
+	clearAllShortcuts(false);
+	setPresetShortcuts(presetDir + TFilePath(name));
+	return;
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::onLoadPreset() {
+	QString preset = m_presetChoiceCB->currentText();
+	TFilePath presetDir = ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
+	if (preset == "") return;
+	if (preset == "Load from file...") {
+		importPreset();
+		return;
+	}
+
+	if (!showConfirmDialog()) return;
+	showDialog("Setting Shortcuts");
+	if (preset == "OpenToonz") {
+		clearAllShortcuts(false);
+		TFilePath fp = TEnv::getConfigDir() + TFilePath("defopentoonz.ini");
+		setPresetShortcuts(fp);
+		return;
+	}
+	else if (preset == "Toon Boom Harmony") {
+		clearAllShortcuts(false);
+		TFilePath fp = TEnv::getConfigDir() + TFilePath("otharmony.ini");
+		setPresetShortcuts(fp);
+		return;
+	}
+	else if (preset == "Adobe Animate(Flash)") {
+		clearAllShortcuts(false);
+		TFilePath fp = TEnv::getConfigDir() + TFilePath("otadobe.ini");
+		setPresetShortcuts(fp);
+		return;
+	}
+	else if (preset == "RETAS PaintMan") {
+		clearAllShortcuts(false);
+		TFilePath fp = TEnv::getConfigDir() + TFilePath("otretas.ini");
+		setPresetShortcuts(fp);
+		return;
+	}
+	else if (TSystem::doesExistFileOrLevel(presetDir + TFilePath(preset + ".ini"))) {
+		clearAllShortcuts(false);
+		TFilePath fp = presetDir + TFilePath(preset + ".ini");
+		setPresetShortcuts(fp);
+		return;
+	}
+	m_dialog->hide();
+}
+
+//-----------------------------------------------------------------------------
+
+QStringList ShortcutPopup::buildPresets() {
+	QStringList presets;
+	presets << "" << "OpenToonz" << "RETAS PaintMan" << "Toon Boom Harmony" << "Adobe Animate(Flash)";
+	TFilePath presetDir = ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
+	if (!TSystem::doesExistFileOrLevel(presetDir)) {
+		return QStringList();
+	}
+	TFilePathSet fps = TSystem::readDirectory(presetDir, true, true, false);
+	QStringList customPresets;
+	for (TFilePath fp : fps) {
+		if (fp.getType() == "ini") {
+			customPresets << QString::fromStdString(fp.getName());
+			std::string name = fp.getName();
+		}
+	}
+	customPresets.sort();
+	presets = presets + customPresets;
+	presets << tr("Load from file...");
+	m_presetChoiceCB->clear();
+	m_presetChoiceCB->addItems(presets);
+	return presets;
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::onSavePreset() {
+	QString presetName = DVGui::getText("Enter Preset Name", "Preset Name:", "");
+	if (presetName == "") return;
+	TFilePath presetDir = ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
+	if (!TSystem::doesExistFileOrLevel(presetDir)) {
+		TSystem::mkDir(presetDir);
+	}
+	TFilePath fp;
+	fp = presetDir + TFilePath(presetName + ".ini");
+	if (TSystem::doesExistFileOrLevel(fp)) {
+		if (!showOverwriteDialog(QString::fromStdString(fp.getName())))
+			return;
+	}
+	onExportButton(fp);
+
+	buildPresets();
+	setCurrentPresetPref(presetName);
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::showEvent(QShowEvent *se) {
+	getCurrentPresetPref();
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::setCurrentPresetPref(QString name) {
+	Preferences::instance()->setShortcutPreset(name.toStdString());
+	getCurrentPresetPref();
+}
+
+//-----------------------------------------------------------------------------
+
+void ShortcutPopup::getCurrentPresetPref() {
+	QString name = Preferences::instance()->getShortcutPreset();
+	if (name == "DELETED")
+		m_presetChoiceCB->setCurrentText("");
+	else if (name == "defopentoonz")
+		m_presetChoiceCB->setCurrentText("OpenToonz");
+	else if (name == "otharmony")
+		m_presetChoiceCB->setCurrentText("Toon Boom Harmony");
+	else if (name == "otadobe")
+		m_presetChoiceCB->setCurrentText("Adobe Animate(Flash)");
+	else if (name == "otretas")
+		m_presetChoiceCB->setCurrentText("RETAS PaintMan");
+	
+	else 
+		m_presetChoiceCB->setCurrentText(name);
+}
 
 OpenPopupCommandHandler<ShortcutPopup> openShortcutPopup(MI_ShortcutPopup);

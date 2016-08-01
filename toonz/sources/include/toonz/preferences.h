@@ -400,6 +400,9 @@ public:
   int getTextureSize() const { return m_textureSize; }
   bool useDrawPixel() { return m_textureSize == 0; }
 
+  void setShortcutPreset(std::string preset);
+  QString getShortcutPreset() { return m_shortcutPreset; }
+
   int getShmMax() const {
     return m_shmmax;
   }  //! \sa The \p sysctl unix command.
@@ -427,7 +430,7 @@ private:
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
-      m_oldUnits, m_oldCameraUnits, m_ffmpegPath;
+      m_oldUnits, m_oldCameraUnits, m_ffmpegPath, m_shortcutPreset;
   ;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;

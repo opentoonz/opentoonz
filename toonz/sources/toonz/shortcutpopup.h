@@ -98,21 +98,35 @@ class ShortcutPopup final : public DVGui::Dialog {
   GenericLoadFilePopup *m_loadShortcutsPopup;
   GenericSaveFilePopup *m_saveShortcutsPopup;
   QPushButton *m_exportButton;
+  QPushButton *m_deletePresetButton;
+  QPushButton *m_savePresetButton;
+  QPushButton *m_loadPresetButton;
+  QPushButton *m_clearAllShortcutsButton;
+  QLabel *m_dialogLabel;
 
 public:
   ShortcutPopup();
   ~ShortcutPopup();
 
 private:
-	void clearAllShortcuts();
 	void setPresetShortcuts(TFilePath fp);
-	void showDialog();
+	void showDialog(QString text);
 	bool showConfirmDialog();
+	bool showOverwriteDialog(QString name);
+	void importPreset();
+	QStringList buildPresets();
+	void showEvent(QShowEvent *se) override;
+	void setCurrentPresetPref(QString preset);
+	void getCurrentPresetPref();
 
 protected slots:
+  void clearAllShortcuts(bool warning = true);
   void onSearchTextChanged(const QString &text);
   void onPresetChanged(int index);
-  void backupShortcuts();
+  void onExportButton(TFilePath fp = TFilePath());
+  void onDeletePreset();
+  void onSavePreset();
+  void onLoadPreset();
 };
 
 #endif  //  SHORTCUTPOPUP_H
