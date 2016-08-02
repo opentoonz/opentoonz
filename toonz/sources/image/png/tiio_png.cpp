@@ -20,9 +20,9 @@ using namespace std;
 
 extern "C" {
 
-void tnz_abort(jmp_buf, int) {}
+static void tnz_abort(jmp_buf, int) {}
 
-void tnz_error_fun(png_structp pngPtr, png_const_charp error_message) {
+static void tnz_error_fun(png_structp pngPtr, png_const_charp error_message) {
   *(int *)png_get_error_ptr(pngPtr) = 0;
 }
 }

@@ -103,7 +103,7 @@ void ToolHandle::setToolBusy(bool value) {
 
 QIcon currentIcon;
 
-QIcon getCurrentIcon() { return currentIcon; }
+static QIcon getCurrentIcon() { return currentIcon; }
 
 //-----------------------------------------------------------------------------
 

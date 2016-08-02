@@ -157,9 +157,11 @@ void FormatSettingsPopup::buildValueField(int index, TPropertyGroup *props) {
   m_mainLayout->addWidget(new QLabel(tr(prop->getName().c_str()) + ":", this),
                           row, 0, Qt::AlignRight | Qt::AlignVCenter);
   m_mainLayout->addWidget(v, row, 1);
-
+  // get value here - bug loses value if the range doesn't start with 0
+  double value = prop->getValue();
   v->setValues(prop->getValue(), prop->getRange().first,
                prop->getRange().second);
+  if (prop->getValue() != value) { prop->setValue(value); }
 }
 
 //-----------------------------------------------------------------------------

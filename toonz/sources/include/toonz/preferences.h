@@ -386,6 +386,14 @@ public:
   bool isAutomaticSVNFolderRefreshEnabled() const {
     return m_automaticSVNFolderRefreshEnabled;
   }
+  // Import Export Tab
+
+  void setFfmpegPath(std::string path);
+  QString getFfmpegPath() const { return m_ffmpegPath; }
+  void setPrecompute(bool enabled);
+  bool getPrecompute() { return m_precompute; }
+  void setFfmpegTimeout(int seconds);
+  int getFfmpegTimeout() { return m_ffmpegTimeout; }
 
   // Uncategorized - internals
 
@@ -425,7 +433,12 @@ private:
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
+<<<<<<< HEAD
       m_oldUnits, m_oldCameraUnits, m_customProjectRoot;
+=======
+      m_oldUnits, m_oldCameraUnits, m_ffmpegPath;
+  ;
+>>>>>>> master
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
 
@@ -437,7 +450,11 @@ private:
   int m_autosavePeriod,  // minutes
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
       m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
+<<<<<<< HEAD
 	  m_projectRoot;
+=======
+	  m_ffmpegTimeout; //seconds
+>>>>>>> master
 
   int m_currentLanguage, m_currentStyleSheet,
       m_undoMemorySize,  // in megabytes
@@ -478,6 +495,7 @@ private:
   bool m_moveCurrentFrameByClickCellArea;
   bool m_onionSkinEnabled;
   bool m_multiLayerStylePickerEnabled;
+  bool m_precompute;
   /*--
   Color Modelにラスタ画像を読み込んだとき、パレットをどのように作るか
   0 : 全ての異なるピクセルの色を別のStyleにする, 1 :

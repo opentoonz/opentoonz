@@ -3,6 +3,7 @@
 #include "trop.h"
 #include "loop_macros.h"
 #include "tpixelutils.h"
+#include "quickputP.h"
 
 #ifndef TNZCORE_LIGHT
 #include "tpalette.h"

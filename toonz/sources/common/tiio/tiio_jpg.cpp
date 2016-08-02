@@ -29,8 +29,10 @@ const std::string Tiio::JpgWriterProperties::QUALITY("Quality");
 
 //=========================================================
 
-extern "C" void tnz_error_exit(j_common_ptr cinfo) {
+extern "C" {
+static void tnz_error_exit(j_common_ptr cinfo) {
   //  throw "merda";
+}
 }
 
 #ifdef CICCIO

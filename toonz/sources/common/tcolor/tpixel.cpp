@@ -47,17 +47,17 @@ const TPixelGR8 TPixelGR8::Black(0);
 const TPixelGR16 TPixelGR16::White(maxChannelValue);
 const TPixelGR16 TPixelGR16::Black(0);
 
-std::ostream &operator<<(std::ostream &out, const TPixel32 &pixel) {
+static std::ostream &operator<<(std::ostream &out, const TPixel32 &pixel) {
   return out << "PixRGBM32(" << (int)pixel.r << ", " << (int)pixel.g << ", "
              << (int)pixel.b << ", " << (int)pixel.m << ")";
 }
 
-std::ostream &operator<<(std::ostream &out, const TPixel64 &pixel) {
+static std::ostream &operator<<(std::ostream &out, const TPixel64 &pixel) {
   return out << "PixRGBM64(" << pixel.r << ", " << pixel.g << ", " << pixel.b
              << ", " << pixel.m << ")";
 }
 
-std::ostream &operator<<(std::ostream &out, const TPixelD &pixel) {
+static std::ostream &operator<<(std::ostream &out, const TPixelD &pixel) {
   return out << "PixD(" << pixel.r << ", " << pixel.g << ", " << pixel.b << ", "
              << pixel.m << ")";
 }

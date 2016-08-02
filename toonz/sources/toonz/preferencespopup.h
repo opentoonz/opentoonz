@@ -63,7 +63,7 @@ private:
   DVGui::IntLineEdit *m_minuteFld, *m_chunkSizeFld, *m_iconSizeLx,
       *m_iconSizeLy, *m_viewShrink, *m_viewStep, *m_blanksCount,
       *m_onionPaperThickness, *m_animationStepField, *m_undoMemorySize,
-      *m_xsheetStep;
+      *m_xsheetStep, *m_ffmpegTimeout;
 
   QPushButton *m_addLevelFormat, *m_removeLevelFormat, *m_editLevelFormat;
 
@@ -72,6 +72,8 @@ private:
 	  *m_projectRootDesktop, *m_projectRootCustom;
 
   DVGui::FileField *m_customProjectRootFileField;
+
+  DVGui::FileField *m_ffmpegPathFileFld;
 
 private:
   // QWidget* create(const QString& lbl, bool def, const char* slot);
@@ -154,6 +156,8 @@ private slots:
   void onShowFrameNumberWithLettersChanged(int index);
   void onPaletteTypeForRasterColorModelChanged(int index);
   void onShowKeyframesOnCellAreaChanged(int);
+  void onFfmpegPathChanged();
+  void onFfmpegTimeoutChanged();
 };
 
 //**********************************************************************************

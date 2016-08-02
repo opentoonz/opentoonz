@@ -428,7 +428,7 @@ void subdivision(const TPointD &p00, const TPointD &p10, const TPointD &p11,
 // ------------------------------------------------------------------------
 #define TINY 1.0e-20
 
-int splitMatrix(double **a, int n, int *index) {
+static int splitMatrix(double **a, int n, int *index) {
   int i, imax = 0, j, k;
   double big, dum, sum, temp;
   double *vv, d;
@@ -488,8 +488,8 @@ int splitMatrix(double **a, int n, int *index) {
 
 /*-----------------------------------------------------------------*/
 
-void buildMatrixes(const FourPoints &ss, const FourPoints &dd, double **a,
-                   double *b) {
+static void buildMatrixes(const FourPoints &ss, const FourPoints &dd, double **a,
+                          double *b) {
   int i;
   TPointD s[4], d[4];
 
@@ -515,7 +515,7 @@ void buildMatrixes(const FourPoints &ss, const FourPoints &dd, double **a,
 
 /*-----------------------------------------------------------------*/
 
-void computeSolutions(double **a, int *index, double *b) {
+static void computeSolutions(double **a, int *index, double *b) {
   int i, ii = 0, ip, j;
   double sum;
 
@@ -538,7 +538,7 @@ void computeSolutions(double **a, int *index, double *b) {
 
 /*-----------------------------------------------------------------*/
 
-void solveSystems(double **a, double *bx) {
+static void solveSystems(double **a, double *bx) {
   int index[255], i, count = 0, bad_line;
   double **atmp;
   int n = 8;
@@ -568,8 +568,8 @@ void solveSystems(double **a, double *bx) {
 
 /*-----------------------------------------------------------------*/
 
-void computeTransformation(const FourPoints &s, const FourPoints &d,
-                           TAffine &aff, TPointD &perspectDen) {
+static void computeTransformation(const FourPoints &s, const FourPoints &d,
+                                  TAffine &aff, TPointD &perspectDen) {
   double **a, *b;
 
   int i;

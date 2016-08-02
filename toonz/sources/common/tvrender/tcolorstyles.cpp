@@ -451,8 +451,8 @@ void TColorStyle::declare(TColorStyle *style) {
 
 //===================================================================
 
-double computeAverageThickness(const TStroke *s, double &minThickness,
-                               double &maxThickness) {
+static double computeAverageThickness(const TStroke *s, double &minThickness,
+                                      double &maxThickness) {
   int count = s->getControlPointCount();
 
   minThickness    = 1000;

@@ -1809,7 +1809,7 @@ TLevelWriterSvg::TLevelWriterSvg(const TFilePath &path, TPropertyGroup *winfo)
 
 //-----------------------------------------------------------------------------
 
-void writeRegion(TRegion *r, TPalette *plt, QTextStream &out, double ly) {
+static void writeRegion(TRegion *r, TPalette *plt, QTextStream &out, double ly) {
   if (r->getEdgeCount() == 0) return;
   std::vector<const TQuadratic *> quadsOutline;
 
@@ -1872,8 +1872,8 @@ void writeRegion(TRegion *r, TPalette *plt, QTextStream &out, double ly) {
 
 //--------------------------------------------------------------------------------------
 
-void writeOutlineStroke(TStroke *s, TPalette *plt, QTextStream &out, double ly,
-                        double quality) {
+static void writeOutlineStroke(TStroke *s, TPalette *plt, QTextStream &out, double ly,
+                               double quality) {
   if (s->getChunkCount() == 0) return;
   if (s->getMaxThickness() == 0) return;
 
@@ -1898,7 +1898,7 @@ void writeOutlineStroke(TStroke *s, TPalette *plt, QTextStream &out, double ly,
 
 //----------------------------------------------------------
 
-double computeAverageThickness(const TStroke *s) {
+static double computeAverageThickness(const TStroke *s) {
   int count = s->getControlPointCount();
 
   double resThick = 0;
@@ -1914,8 +1914,8 @@ double computeAverageThickness(const TStroke *s) {
 
 //----------------------------------------------------------------
 
-void writeCenterlineStroke(TStroke *s, TPalette *plt, QTextStream &out,
-                           double ly) {
+static void writeCenterlineStroke(TStroke *s, TPalette *plt, QTextStream &out,
+                                  double ly) {
   if (s->getChunkCount() == 0) return;
   if (s->getMaxThickness() == 0) return;
 

@@ -155,8 +155,8 @@ struct Closer {
 
 //==============================================================================
 
-std::pair<double, int> closestVertex(const TTextureMesh &mesh,
-                                     const TPointD &pos) {
+static std::pair<double, int> closestVertex(const TTextureMesh &mesh,
+                                            const TPointD &pos) {
   Closer closer = {mesh, pos};
   int vIdx      = int(
       std::min_element(mesh.vertices().begin(), mesh.vertices().end(), closer)
@@ -167,8 +167,8 @@ std::pair<double, int> closestVertex(const TTextureMesh &mesh,
 
 //------------------------------------------------------------------------
 
-std::pair<double, int> closestEdge(const TTextureMesh &mesh,
-                                   const TPointD &pos) {
+static std::pair<double, int> closestEdge(const TTextureMesh &mesh,
+                                          const TPointD &pos) {
   Closer closer = {mesh, pos};
   int eIdx =
       int(std::min_element(mesh.edges().begin(), mesh.edges().end(), closer)

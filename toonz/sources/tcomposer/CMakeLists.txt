@@ -1,5 +1,6 @@
 add_executable(tcomposer
-    tcomposer.cpp)
+    tcomposer.cpp
+)
 
 target_link_libraries(tcomposer
     Qt5::Core
@@ -11,4 +12,5 @@ target_link_libraries(tcomposer
     sound
     image
     colorfx
-    toonzqt)
+    toonzqt
+)

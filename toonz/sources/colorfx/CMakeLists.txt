@@ -4,7 +4,8 @@ set(HEADERS
     rasterstyles.h
     regionstyles.h
     strokestyles.h
-    zigzagstyles.h)
+    zigzagstyles.h
+)
 
 set(SOURCES
     colorfx.cpp
@@ -12,7 +13,8 @@ set(SOURCES
     rasterstyles.cpp
     regionstyles.cpp
     strokestyles.cpp
-    zigzagstyles.cpp)
+    zigzagstyles.cpp
+)
 
 add_translation(colorfx ${HEADERS} ${SOURCES})
 

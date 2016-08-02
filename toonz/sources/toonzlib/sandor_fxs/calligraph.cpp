@@ -24,6 +24,7 @@
 #include "SDef.h"
 #include "CallCircle.h"
 #include "CallParam.h"
+#include "calligraph.h"
 //#include "tmsg.h"
 
 using namespace std;

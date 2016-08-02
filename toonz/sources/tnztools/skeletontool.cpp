@@ -80,7 +80,7 @@ inline std::string removeTrailingH(std::string handle) {
 
 // return true iff column ancestorIndex is column descentIndex or its parent or
 // the parent of the parent, etc.
-bool isAncestorOf(int ancestorIndex, int descendentIndex) {
+static bool isAncestorOf(int ancestorIndex, int descendentIndex) {
   TStageObjectId ancestorId   = TStageObjectId::ColumnId(ancestorIndex);
   TStageObjectId descendentId = TStageObjectId::ColumnId(descendentIndex);
   TXsheet *xsh = TTool::getApplication()->getCurrentXsheet()->getXsheet();
@@ -91,8 +91,8 @@ bool isAncestorOf(int ancestorIndex, int descendentIndex) {
 
 //------------------------------------------------------------
 
-void getHooks(std::vector<HookData> &hooks, TXsheet *xsh, int row, int col,
-              TPointD dpiScale) {
+static void getHooks(std::vector<HookData> &hooks, TXsheet *xsh, int row, int col,
+                     TPointD dpiScale) {
   // nota. hook position is in the coordinate system of the parent object.
   // a inch is Stage::inch
 
@@ -138,8 +138,8 @@ void getHooks(std::vector<HookData> &hooks, TXsheet *xsh, int row, int col,
 
 //-------------------------------------------------------------------
 
-void getConnectedColumns(std::set<int> &connectedColumns, TXsheet *xsh,
-                         int col) {
+static void getConnectedColumns(std::set<int> &connectedColumns, TXsheet *xsh,
+                                int col) {
   TStageObjectId id;
   // insert col and all column ancestors
   id = TStageObjectId::ColumnId(col);
@@ -165,7 +165,7 @@ void getConnectedColumns(std::set<int> &connectedColumns, TXsheet *xsh,
   }
 }
 
-bool canShowBone(Skeleton::Bone *bone, TXsheet *xsh, int row) {
+static bool canShowBone(Skeleton::Bone *bone, TXsheet *xsh, int row) {
   TStageObjectId id = bone->getStageObject()->getId();
   if (!xsh->getCell(row, id.getIndex()).isEmpty() &&
       xsh->getColumn(id.getIndex())->isCamstandVisible())
