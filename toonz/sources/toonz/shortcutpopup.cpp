@@ -710,19 +710,18 @@ QStringList ShortcutPopup::buildPresets() {
 	QStringList presets;
 	presets << "" << "OpenToonz" << "RETAS PaintMan" << "Toon Boom Harmony" << "Adobe Animate(Flash)";
 	TFilePath presetDir = ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
-	if (!TSystem::doesExistFileOrLevel(presetDir)) {
-		return QStringList();
-	}
-	TFilePathSet fps = TSystem::readDirectory(presetDir, true, true, false);
-	QStringList customPresets;
-	for (TFilePath fp : fps) {
-		if (fp.getType() == "ini") {
-			customPresets << QString::fromStdString(fp.getName());
-			std::string name = fp.getName();
+	if (TSystem::doesExistFileOrLevel(presetDir)) {
+		TFilePathSet fps = TSystem::readDirectory(presetDir, true, true, false);
+		QStringList customPresets;
+		for (TFilePath fp : fps) {
+			if (fp.getType() == "ini") {
+				customPresets << QString::fromStdString(fp.getName());
+				std::string name = fp.getName();
+			}
 		}
+		customPresets.sort();
+		presets = presets + customPresets;
 	}
-	customPresets.sort();
-	presets = presets + customPresets;
 	presets << tr("Load from file...");
 	m_presetChoiceCB->clear();
 	m_presetChoiceCB->addItems(presets);
