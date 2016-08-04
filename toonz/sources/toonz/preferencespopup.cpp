@@ -918,8 +918,8 @@ PreferencesPopup::PreferencesPopup()
       new DVGui::IntLineEdit(this, m_pref->getDefaultTaskChunkSize(), 1, 2000);
   CheckBox *sceneNumberingCB = new CheckBox(tr("Show Info in Rendered Frames"));
 
-  m_projectRootDocuments = new CheckBox(tr("My Documents*"), this);
-  m_projectRootDesktop = new CheckBox(tr("Desktop*"), this);
+  m_projectRootDocuments = new CheckBox(tr("My Documents/OpenToonz*"), this);
+  m_projectRootDesktop = new CheckBox(tr("Desktop/OpenToonz*"), this);
   m_projectRootCustom = new CheckBox(tr("Custom*"), this);
   m_customProjectRootFileField = new DVGui::FileField(this, QString(""));
   m_customProjectRootLabel = new QLabel(tr("Custom Project Path(s): "));
