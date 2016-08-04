@@ -863,8 +863,10 @@ bool DockLayout::undockItem(DockWidget *item) {
 //! Search for the \b nearest n-ple from a \b target one, under conditions:
 //!\b 1) nearest elements belong to \b fixed \b intervals; \b 2) their \b sum is
 //!\b fixed too.
-static void calculateNearest(std::vector<double> target, std::vector<double> &nearest,
-                             std::vector<std::pair<int, int>> intervals, double sum) {
+static void calculateNearest(std::vector<double> target,
+                             std::vector<double> &nearest,
+                             std::vector<std::pair<int, int>> intervals,
+                             double sum) {
   // Solving a small Lagrange multipliers problem to find solution on constraint
   // (2)
   assert(target.size() == intervals.size());

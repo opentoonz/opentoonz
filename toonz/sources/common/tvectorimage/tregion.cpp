@@ -34,7 +34,9 @@ void foo()
 
 //=============================================================================
 
-static bool compareEdge(const TEdge &a, const TEdge &b) { return a.m_s == b.m_s; }
+static bool compareEdge(const TEdge &a, const TEdge &b) {
+  return a.m_s == b.m_s;
+}
 
 //-----------------------------------------------------------------------------
 

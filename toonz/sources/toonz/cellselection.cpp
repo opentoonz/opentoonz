@@ -1198,7 +1198,8 @@ void TCellSelection::copyCells() {
 
 //-----------------------------------------------------------------------------
 
-static void pasteStrokesInCell(int row, int col, const StrokesData *strokesData) {
+static void pasteStrokesInCell(int row, int col,
+                               const StrokesData *strokesData) {
   PasteStrokesInCellUndo *undo =
       new PasteStrokesInCellUndo(row, col, strokesData);
   std::vector<int> indices;
@@ -1775,7 +1776,8 @@ void setNewDrawing(TXsheet *xsh, int row, int col, const TImageP &img)
 
 //-----------------------------------------------------------------------------
 
-static void createNewDrawing(TXsheet *xsh, int row, int col, int preferredLevelType) {
+static void createNewDrawing(TXsheet *xsh, int row, int col,
+                             int preferredLevelType) {
   // search for the level
   TXshCell old = xsh->getCell(row, col);
   if (old.isEmpty()) {

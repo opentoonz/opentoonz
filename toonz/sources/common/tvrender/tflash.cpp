@@ -323,7 +323,8 @@ bool PolyStyle::operator<(const PolyStyle &p) const {
 
 //-------------------------------------------------------------------
 
-static void computeQuadChain(const TEdge &e, std::vector<TQuadratic *> &quadArray,
+static void computeQuadChain(const TEdge &e,
+                             std::vector<TQuadratic *> &quadArray,
                              std::vector<TQuadratic *> &toBeDeleted) {
   int chunk_b, chunk_e, chunk = -1;
   double t_b, t_e, w0, w1;

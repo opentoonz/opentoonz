@@ -852,7 +852,7 @@ void PreferencesPopup::onFfmpegPathChanged() {
 //-----------------------------------------------------------------------------
 
 void PreferencesPopup::onFfmpegTimeoutChanged() {
-	m_pref->setFfmpegTimeout(m_ffmpegTimeout->getValue());
+  m_pref->setFfmpegTimeout(m_ffmpegTimeout->getValue());
 }
 
 //**********************************************************************************
@@ -990,7 +990,7 @@ PreferencesPopup::PreferencesPopup()
   //--- Import/Export ------------------------------
   categoryList->addItem(tr("Import/Export"));
   m_ffmpegPathFileFld = new DVGui::FileField(this, QString(""));
-  m_ffmpegTimeout = new DVGui::IntLineEdit(this, 30, 1);
+  m_ffmpegTimeout     = new DVGui::IntLineEdit(this, 30, 1);
 
   //--- Drawing ------------------------------
   categoryList->addItem(tr("Drawing"));
@@ -1543,15 +1543,13 @@ PreferencesPopup::PreferencesPopup()
           0, Qt::AlignCenter | Qt::AlignVCenter);
       ioLay->addWidget(new QLabel(tr("FFmpeg is not bundled with OpenToonz")),
                        0, Qt::AlignCenter | Qt::AlignVCenter);
-	  ioLay->addWidget(new QLabel(" "),
-		  0, Qt::AlignCenter | Qt::AlignVCenter);
-	  ioLay->addWidget(new QLabel(tr("NOTE: This is an experimental feature.")),
-		  0, Qt::AlignCenter | Qt::AlignVCenter);
-	  ioLay->addWidget(new QLabel(tr("Please SAVE YOUR WORK before exporting "
-		                             "in MP4, WEBM, or GIF format.")),
-		  0, Qt::AlignCenter | Qt::AlignVCenter);
-	  ioLay->addWidget(new QLabel(" "),
-		  0, Qt::AlignCenter | Qt::AlignVCenter);
+      ioLay->addWidget(new QLabel(" "), 0, Qt::AlignCenter | Qt::AlignVCenter);
+      ioLay->addWidget(new QLabel(tr("NOTE: This is an experimental feature.")),
+                       0, Qt::AlignCenter | Qt::AlignVCenter);
+      ioLay->addWidget(new QLabel(tr("Please SAVE YOUR WORK before exporting "
+                                     "in MP4, WEBM, or GIF format.")),
+                       0, Qt::AlignCenter | Qt::AlignVCenter);
+      ioLay->addWidget(new QLabel(" "), 0, Qt::AlignCenter | Qt::AlignVCenter);
       ioLay->addWidget(new QLabel(tr("Please provide the path where FFmpeg is "
                                      "located on your computer.")),
                        0, Qt::AlignLeft | Qt::AlignVCenter);
@@ -1563,14 +1561,18 @@ PreferencesPopup::PreferencesPopup()
         ioGridLay->addWidget(new QLabel(tr("FFmpeg Path: ")), 0, 0,
                              Qt::AlignRight);
         ioGridLay->addWidget(m_ffmpegPathFileFld, 0, 1, 1, 3);
-		ioGridLay->addWidget(new QLabel(" "), 1, 0);
-		ioGridLay->addWidget(new QLabel(tr("Number of seconds to wait for FFmpeg to complete "
-										"processing the output:")), 2, 0, 1, 4);
-		ioGridLay->addWidget(new QLabel(tr("Note: FFmpeg begins working once all images "
-										"have been processed.")), 3, 0, 1, 4);
-		ioGridLay->addWidget(new QLabel(tr("FFmpeg Timeout:")), 4, 0,
-							 Qt::AlignRight);
-		ioGridLay->addWidget(m_ffmpegTimeout, 4, 1, 1, 3);
+        ioGridLay->addWidget(new QLabel(" "), 1, 0);
+        ioGridLay->addWidget(
+            new QLabel(tr("Number of seconds to wait for FFmpeg to complete "
+                          "processing the output:")),
+            2, 0, 1, 4);
+        ioGridLay->addWidget(
+            new QLabel(tr("Note: FFmpeg begins working once all images "
+                          "have been processed.")),
+            3, 0, 1, 4);
+        ioGridLay->addWidget(new QLabel(tr("FFmpeg Timeout:")), 4, 0,
+                             Qt::AlignRight);
+        ioGridLay->addWidget(m_ffmpegTimeout, 4, 1, 1, 3);
       }
       ioLay->addLayout(ioGridLay);
       ioLay->addStretch(1);
@@ -1920,7 +1922,7 @@ PreferencesPopup::PreferencesPopup()
   ret = ret && connect(m_ffmpegPathFileFld, SIGNAL(pathChanged()), this,
                        SLOT(onFfmpegPathChanged()));
   ret = ret && connect(m_ffmpegTimeout, SIGNAL(editingFinished()), this,
-					   SLOT(onFfmpegTimeoutChanged()));
+                       SLOT(onFfmpegTimeoutChanged()));
 
   //--- Drawing ----------------------
   ret = ret && connect(keepOriginalCleanedUpCB, SIGNAL(stateChanged(int)), this,

@@ -488,8 +488,8 @@ static int splitMatrix(double **a, int n, int *index) {
 
 /*-----------------------------------------------------------------*/
 
-static void buildMatrixes(const FourPoints &ss, const FourPoints &dd, double **a,
-                          double *b) {
+static void buildMatrixes(const FourPoints &ss, const FourPoints &dd,
+                          double **a, double *b) {
   int i;
   TPointD s[4], d[4];
 

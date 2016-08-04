@@ -112,11 +112,13 @@ ShadingContext::ShadingContext() : m_imp(new Imp) {
 
 ShadingContext::~ShadingContext() {
 #ifdef MACOSX
-  // Destructor of QGLPixelBuffer calls QOpenGLContext::makeCurrent() internally,
+  // Destructor of QGLPixelBuffer calls QOpenGLContext::makeCurrent()
+  // internally,
   // so the current thread must be the owner of QGLPixelBuffer context,
   // when the destructor of m_imp->m_context is called.
 
-  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(QThread::currentThread());
+  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(
+      QThread::currentThread());
 #endif
 }
 
@@ -165,7 +167,8 @@ USE HARDWARE ACCELERATION
 
 void ShadingContext::makeCurrent() {
 #ifdef MACOSX
-  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(QThread::currentThread());
+  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(
+      QThread::currentThread());
 #endif
   m_imp->m_pixelBuffer->makeCurrent();
 }

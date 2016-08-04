@@ -1693,7 +1693,8 @@ static void drawFilledSquare(const TPointD &pos, double radius) {
 
 //------------------------------------------------------------------------
 
-static void drawHandle(const TPointD &pos, double radius, const TPixel32 &color) {
+static void drawHandle(const TPointD &pos, double radius,
+                       const TPixel32 &color) {
   glColor4ub(0, 0, 0, color.m);  // Black border
   glLineWidth(4.0f);
   drawSquare(pos, radius);
@@ -1705,8 +1706,8 @@ static void drawHandle(const TPointD &pos, double radius, const TPixel32 &color)
 
 //------------------------------------------------------------------------
 
-static void drawFilledHandle(const TPointD &pos, double radius, double pixelSize,
-                             const TPixel32 &color) {
+static void drawFilledHandle(const TPointD &pos, double radius,
+                             double pixelSize, const TPixel32 &color) {
   glColor4ub(0, 0, 0, color.m);
   drawFilledSquare(pos, radius + pixelSize);
 
@@ -1716,7 +1717,8 @@ static void drawFilledHandle(const TPointD &pos, double radius, double pixelSize
 
 //------------------------------------------------------------------------
 
-static void drawText(const TPointD &pos, const QString &text, double fontScale) {
+static void drawText(const TPointD &pos, const QString &text,
+                     double fontScale) {
   // Get the world-to-window affine
   double matrix[16];
 

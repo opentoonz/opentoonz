@@ -456,7 +456,8 @@ void fill(const TRaster32P &ras, const TRaster32P &ref,
 
 //-----------------------------------------------------------------------------
 
-static void rectFill(const TRaster32P &ras, const TRect &r, const TPixel32 &color) {}
+static void rectFill(const TRaster32P &ras, const TRect &r,
+                     const TPixel32 &color) {}
 
 //-----------------------------------------------------------------------------
 
