@@ -1,5 +1,6 @@
 #!/bin/bash
 pushd toonz/sources
+clang-format --version
 ./beautification.sh && git diff --exit-code || exit 1
 popd
 pushd thirdparty/tiff-4.0.3
