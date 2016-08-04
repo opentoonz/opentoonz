@@ -1171,6 +1171,7 @@ QMenuBar *StackedMenuBar::createFullMenuBar() {
   addMenuItem(scanCleanupMenu, MI_CameraTest);
   addMenuItem(scanCleanupMenu, MI_Cleanup);
   scanCleanupMenu->addSeparator();
+  addMenuItem(scanCleanupMenu, MI_PencilTest);
 #endif
 
   // Menu' LEVEL
