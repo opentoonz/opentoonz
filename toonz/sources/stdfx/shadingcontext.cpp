@@ -14,6 +14,7 @@
 #include <QGLPixelBuffer>
 #include <QGLFramebufferObject>
 #include <QGLShaderProgram>
+#include <QOpenGLContext>
 
 // STD includes
 #include <map>
@@ -70,7 +71,9 @@ private:
 //--------------------------------------------------------
 
 ShadingContext::Imp::Imp()
-    : m_pixelBuffer(new QGLPixelBuffer(1, 1, format())) {}
+    : m_pixelBuffer(new QGLPixelBuffer(1, 1, format())) {
+  m_pixelBuffer->context()->contextHandle()->moveToThread(nullptr);
+}
 
 //--------------------------------------------------------
 
@@ -109,7 +112,12 @@ ShadingContext::ShadingContext() : m_imp(new Imp) {
 
 //--------------------------------------------------------
 
-ShadingContext::~ShadingContext() {}
+ShadingContext::~ShadingContext() {
+  // Destructor of QGLPixelBuffer calls QOpenGLContext::makeCurrent() internally,
+  // so the current thread must be the owner of QGLPixelBuffer context,
+  // when the destructor of m_imp->m_context is called.
+  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(QThread::currentThread());
+}
 
 //--------------------------------------------------------
 
@@ -154,11 +162,17 @@ USE HARDWARE ACCELERATION
 */
 //--------------------------------------------------------
 
-void ShadingContext::makeCurrent() { m_imp->m_pixelBuffer->makeCurrent(); }
+void ShadingContext::makeCurrent() {
+  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(QThread::currentThread());
+  m_imp->m_pixelBuffer->makeCurrent();
+}
 
 //--------------------------------------------------------
 
-void ShadingContext::doneCurrent() { m_imp->m_pixelBuffer->doneCurrent(); }
+void ShadingContext::doneCurrent() {
+  m_imp->m_pixelBuffer->doneCurrent();
+  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(nullptr);
+}
 
 //--------------------------------------------------------
 

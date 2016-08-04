@@ -230,11 +230,11 @@ public:
 class ShadingContextManager final : public QObject {
   mutable QMutex m_mutex;
 
-  ShadingContext m_shadingContext;
   TAtomicVar m_activeRenderInstances;
+  std::atomic<ShadingContext*> context_;
 
 public:
-  ShadingContextManager() {
+  ShadingContextManager(): context_(nullptr) {
     /*
 The ShadingContext's QGLPixelBuffer must be destroyed *before* the global
 QApplication
@@ -254,15 +254,46 @@ Suggestions are welcome as this is a tad beyond ridiculous...
     setParent(mainScopeBoundObject);  // otherwise reparenting fails
   }
 
-  static ShadingContextManager *instance() {
-    static ShadingContextManager *theManager = new ShadingContextManager;
-    return theManager;
+  ~ShadingContextManager() {
+    ShadingContext* context = context_;
+    if (context_.compare_exchange_weak(context, nullptr)) {
+      delete context;
+    }
+  }
+
+  static ShadingContextManager& instance() {
+    // On Win32, instantiation of ShadingContext before
+    // processing QSplashScreen caused crash on the
+    // start up process.
+    // So changed ShadingContext to be lazy evaluated
+    // when it is required in the main loop.
+    //
+    // On OSX, instantiation of ShadingContext in the
+    // main loop thread conflicts with not properly
+    // shared QOpenGLContext (such as QtOfflineGL).
+    // So changed ShadingContext to be immidiately
+    // instantiated when ShadingContextManeger created.
+
+    static ShadingContextManager* const manager = new ShadingContextManager();
+#ifndef _WIN32
+    manager->shadingContext();
+#endif
+    return *manager;
   }
 
   QMutex *mutex() const { return &m_mutex; }
 
-  const ShadingContext &shadingContext() const { return m_shadingContext; }
-  ShadingContext &shadingContext() { return m_shadingContext; }
+  ShadingContext& shadingContext() {
+    ShadingContext* context = context_;
+    if (!context) {
+      ShadingContext* new_context = new ShadingContext();
+      if (!context_.compare_exchange_weak(context, new_context)) {
+        delete new_context;
+      }
+    }
+
+    return *context_;
+  }
 
   void onRenderInstanceStart() { ++m_activeRenderInstances; }
 
@@ -271,8 +302,8 @@ Suggestions are welcome as this is a tad beyond ridiculous...
       QMutexLocker mLocker(&m_mutex);
 
       // Release the shading context's output buffer
-      ::ContextLocker cLocker(m_shadingContext);
-      m_shadingContext.resize(0, 0);
+      ::ContextLocker cLocker(shadingContext());
+      shadingContext().resize(0, 0);
 
 #ifdef DIAGNOSTICS
       DIAGNOSTICS_DUMP("ShaderLogs");
@@ -285,8 +316,8 @@ Suggestions are welcome as this is a tad beyond ridiculous...
     struct {
       ShadingContextManager *m_this;
       ShadingContext::Support support() {
-        QMutexLocker mLocker(&m_this->m_mutex);
-        ::ContextLocker cLocker(m_this->m_shadingContext);
+        QMutexLocker mLocker(m_this->mutex());
+        ::ContextLocker cLocker(m_this->shadingContext());
 
         return ShadingContext::support();
       }
@@ -324,12 +355,12 @@ template class DV_EXPORT_API TFxDeclarationT<ShaderFx>;
 //****************************************************************************
 
 class MessageCreateContext final : public TThread::Message {
-  ShadingContextManager *man;
+  ShadingContextManager& mgr_;
 
 public:
-  MessageCreateContext(ShadingContextManager *ctx) : man(ctx) {}
+  MessageCreateContext(ShadingContextManager& ctx) : mgr_(ctx) {}
 
-  void onDeliver() override { man->onRenderInstanceEnd(); }
+  void onDeliver() override { mgr_.onRenderInstanceEnd(); }
 
   TThread::Message *clone() const override {
     return new MessageCreateContext(*this);
@@ -340,7 +371,7 @@ class SCMDelegate final : public TRenderResourceManager {
   T_RENDER_RESOURCE_MANAGER
 
   void onRenderInstanceStart(unsigned long id) override {
-    ShadingContextManager::instance()->onRenderInstanceStart();
+    ShadingContextManager::instance().onRenderInstanceStart();
   }
 
   void onRenderInstanceEnd(unsigned long id) override {
@@ -348,7 +379,7 @@ class SCMDelegate final : public TRenderResourceManager {
       /* tofflinegl のときとは逆で main thread に dispatch する */
       MessageCreateContext(ShadingContextManager::instance()).sendBlocking();
     } else {
-      ShadingContextManager::instance()->onRenderInstanceEnd();
+      ShadingContextManager::instance().onRenderInstanceEnd();
     }
   }
 };
@@ -593,14 +624,14 @@ bool ShaderFx::doGetBBox(double frame, TRectD &bbox,
   const ShaderInterface::ShaderData &sd = m_shaderInterface->bboxShader();
   if (!sd.isValid()) return true;
 
-  ShadingContextManager *manager = ShadingContextManager::instance();
-  if (manager->touchSupport() != ShadingContext::OK) return true;
+  ShadingContextManager& manager = ShadingContextManager::instance();
+  if (manager.touchSupport() != ShadingContext::OK) return true;
 
   // Remember: info.m_affine MUST NOT BE CONSIDERED in doGetBBox's
   // implementation
   ::RectF bboxF(infiniteRectF);
 
-  QMutexLocker mLocker(manager->mutex());
+  QMutexLocker mLocker(manager.mutex());
 
   // ShadingContext& context = manager->shadingContext();
   std::shared_ptr<ShadingContext> shadingContextPtr(new ShadingContext);
@@ -977,12 +1008,12 @@ void ShaderFx::doCompute(TTile &tile, double frame,
     }
   };  // locals
 
-  ShadingContextManager *manager = ShadingContextManager::instance();
-  if (manager->touchSupport() != ShadingContext::OK) return;
+  ShadingContextManager& manager = ShadingContextManager::instance();
+  if (manager.touchSupport() != ShadingContext::OK) return;
 
-  QMutexLocker mLocker(
-      manager->mutex());  // As GPU access can be considered sequential anyway,
-                          // lock the full-scale mutex
+  // As GPU access can be considered sequential anyway,
+  // lock the full-scale mutex
+  QMutexLocker mLocker(manager.mutex());
 
   std::shared_ptr<ShadingContext> shadingContextPtr(new ShadingContext);
   ShadingContext &context = *shadingContextPtr.get();
@@ -1136,10 +1167,10 @@ void ShaderFx::doCompute(TTile &tile, double frame,
 
 void ShaderFx::doDryCompute(TRectD &rect, double frame,
                             const TRenderSettings &info) {
-  ShadingContextManager *manager = ShadingContextManager::instance();
-  if (manager->touchSupport() != ShadingContext::OK) return;
+  ShadingContextManager& manager = ShadingContextManager::instance();
+  if (manager.touchSupport() != ShadingContext::OK) return;
 
-  QMutexLocker mLocker(manager->mutex());
+  QMutexLocker mLocker(manager.mutex());
 
   // ShadingContext& context = manager->shadingContext();
   std::shared_ptr<ShadingContext> shadingContextPtr(new ShadingContext);
