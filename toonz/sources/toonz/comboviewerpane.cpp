@@ -578,6 +578,7 @@ void ComboViewerPanel::onXshLevelSwitched(TXshLevel *) {
 //-----------------------------------------------------------------------------
 
 void ComboViewerPanel::onPlayingStatusChanged(bool playing) {
+	if (Preferences::instance()->getOnionSkinDuringPlayback()) return;
 	OnionSkinMask osm =
 		TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
 	if (playing) {

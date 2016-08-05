@@ -27,6 +27,7 @@
 #include "toonz/tpalettehandle.h"
 #include "toonz/tonionskinmaskhandle.h"
 #include "toutputproperties.h"
+#include "toonz/preferences.h"
 
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
@@ -438,6 +439,7 @@ void SceneViewerPanel::onXshLevelSwitched(TXshLevel *) { changeWindowTitle(); }
 
 
 void SceneViewerPanel::onPlayingStatusChanged(bool playing) {
+	if (Preferences::instance()->getOnionSkinDuringPlayback()) return;
 	OnionSkinMask osm =
 		TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
 	if (playing) {
