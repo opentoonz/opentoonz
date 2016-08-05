@@ -651,6 +651,7 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName) {
             << "Cleanup"
             << "PltEdit"
             << "Schematic"
+			<< "Basics"
             << "QAR";
   /*--- ComboViewerのパーツのShow/Hideの再現 ---*/
   mySettings.beginGroup("ComboViewerPartsVisible");
@@ -675,6 +676,40 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName) {
         }
       }
     }
+  }
+  mySettings.endGroup();
+
+  QStringList defaultRooms;
+  defaultRooms << "Basics"
+	  << "Clean-Up"
+	  << "Drawing"
+	  << "Animation"
+	  << "Palette"
+	  << "Xsheet";
+
+  /*--- ComboViewerのパーツのShow/Hideの再現 ---*/
+  mySettings.beginGroup("ComboViewerPartsVisible");
+  {
+	  for (int r = 0; r < defaultRooms.size(); r++) {
+		  QString tmpRoomName = defaultRooms.at(r);
+		  Room *tmpRoom = getRoomByName(tmpRoomName);
+		  if (tmpRoom) {
+			  ComboViewerPanel *cvp = tmpRoom->getCentralViewerPanel();
+			  if (cvp) {
+				  if (r == 0)  // InknPaintRoom
+					  TApp::instance()->setInknPaintViewerPanel(cvp);
+				  mySettings.beginGroup(tmpRoomName);
+				  cvp->setShowHideFlag(CVPARTS_TOOLBAR,
+					  mySettings.value("Toolbar", false).toBool());
+				  cvp->setShowHideFlag(CVPARTS_TOOLOPTIONS,
+					  mySettings.value("ToolOptions", false).toBool());
+				  cvp->setShowHideFlag(CVPARTS_FLIPCONSOLE,
+					  mySettings.value("Console", true).toBool());
+				  cvp->updateShowHide();
+				  mySettings.endGroup();
+			  }
+		  }
+	  }
   }
   mySettings.endGroup();
 }
