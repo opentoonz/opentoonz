@@ -1013,7 +1013,8 @@ void getLoadingLevelRange(TFrameId &fromFid, TFrameId &toFid) {
   toFid   = loadingLevelRange.m_toFid;
 }
 
-static TFilePath getLevelPathAndSetNameWithPsdLevelName(TXshSimpleLevel *xshLevel) {
+static TFilePath getLevelPathAndSetNameWithPsdLevelName(
+    TXshSimpleLevel *xshLevel) {
   TFilePath retfp = xshLevel->getPath();
 
   QString name     = QString::fromStdWString(retfp.getWideName());
@@ -2169,8 +2170,9 @@ TFilePath TXshSimpleLevel::getExistingHookFile(
   }
 
   assert(h >= 0);
-  return (h < 0) ? TFilePath() : decodedLevelPath.getParentDir() +
-                                     TFilePath(hookFiles[h].toStdWString());
+  return (h < 0) ? TFilePath()
+                 : decodedLevelPath.getParentDir() +
+                       TFilePath(hookFiles[h].toStdWString());
 }
 
 //-----------------------------------------------------------------------------

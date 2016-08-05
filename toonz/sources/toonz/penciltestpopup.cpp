@@ -28,6 +28,7 @@
 #include "toonz/txshsimplelevel.h"
 #include "toonz/levelproperties.h"
 #include "toonz/tcamera.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -61,6 +62,8 @@
 #include <QKeyEvent>
 #include <QCommonStyle>
 #include <QTimer>
+#include <QIntValidator>
+#include <QRegExpValidator>
 
 using namespace DVGui;
 
@@ -235,6 +238,69 @@ TPointD getCurrentCameraDpi() {
   return TPointD(res.lx / size.lx, res.ly / size.ly);
 }
 
+//-----------------------------------------------------------------------------
+
+QChar numToLetter(int letterNum) {
+  switch (letterNum) {
+  case 0:
+    return QChar();
+    break;
+  case 1:
+    return 'A';
+    break;
+  case 2:
+    return 'B';
+    break;
+  case 3:
+    return 'C';
+    break;
+  case 4:
+    return 'D';
+    break;
+  case 5:
+    return 'E';
+    break;
+  case 6:
+    return 'F';
+    break;
+  case 7:
+    return 'G';
+    break;
+  case 8:
+    return 'H';
+    break;
+  case 9:
+    return 'I';
+    break;
+  default:
+    return QChar();
+    break;
+  }
+}
+
+int letterToNum(QChar appendix) {
+  if (appendix == QChar('A') || appendix == QChar('a'))
+    return 1;
+  else if (appendix == QChar('B') || appendix == QChar('b'))
+    return 2;
+  else if (appendix == QChar('C') || appendix == QChar('c'))
+    return 3;
+  else if (appendix == QChar('D') || appendix == QChar('d'))
+    return 4;
+  else if (appendix == QChar('E') || appendix == QChar('e'))
+    return 5;
+  else if (appendix == QChar('F') || appendix == QChar('f'))
+    return 6;
+  else if (appendix == QChar('G') || appendix == QChar('g'))
+    return 7;
+  else if (appendix == QChar('H') || appendix == QChar('h'))
+    return 8;
+  else if (appendix == QChar('I') || appendix == QChar('i'))
+    return 9;
+  else
+    return 0;
+}
+
 }  // namespace
 
 //=============================================================================
@@ -262,6 +328,8 @@ void MyViewFinder::paintEvent(QPaintEvent* event) {
     return;
   }
 
+  p.save();
+
   if (m_upsideDown) {
     p.translate(m_imageRect.center());
     p.rotate(180);
@@ -280,6 +348,8 @@ void MyViewFinder::paintEvent(QPaintEvent* event) {
     p.drawImage(m_imageRect, m_previousImage);
     p.setCompositionMode(QPainter::CompositionMode_SourceOver);
   }
+
+  p.restore();
 
   // draw countdown text
   if (m_countDownTime > 0) {
@@ -313,6 +383,72 @@ void MyViewFinder::resizeEvent(QResizeEvent* event) {
 
 //=============================================================================
 
+FrameNumberLineEdit::FrameNumberLineEdit(QWidget* parent, int value)
+    : LineEdit(parent) {
+  setFixedWidth(54);
+  m_intValidator = new QIntValidator(this);
+  setValue(value);
+  m_intValidator->setRange(1, 9999);
+
+  QRegExp rx("^[0-9]{1,4}[A-Ia-i]?$");
+  m_regexpValidator = new QRegExpValidator(rx, this);
+
+  updateValidator();
+}
+
+//-----------------------------------------------------------------------------
+
+void FrameNumberLineEdit::updateValidator() {
+  if (Preferences::instance()->isShowFrameNumberWithLettersEnabled())
+    setValidator(m_regexpValidator);
+  else
+    setValidator(m_intValidator);
+}
+
+//-----------------------------------------------------------------------------
+
+void FrameNumberLineEdit::setValue(int value) {
+  if (value <= 0)
+    value = 1;
+  else if (value > 9999)
+    value = 9999;
+
+  QString str;
+  if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
+    str.setNum((int)(value / 10));
+    while (str.length() < 3) str.push_front("0");
+    QChar letter = numToLetter(value % 10);
+    if (!letter.isNull()) str.append(letter);
+  } else {
+    str.setNum(value);
+    while (str.length() < 4) str.push_front("0");
+  }
+  setText(str);
+  setCursorPosition(0);
+}
+
+//-----------------------------------------------------------------------------
+
+int FrameNumberLineEdit::getValue() {
+  if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
+    QString str = text();
+    // if no letters added
+    if (str.at(str.size() - 1).isDigit())
+      return str.toInt() * 10;
+    else {
+      return str.left(str.size() - 1).toInt() * 10 +
+             letterToNum(str.at(str.size() - 1));
+    }
+  } else
+    return text().toInt();
+}
+
+//-----------------------------------------------------------------------------
+
+void FrameNumberLineEdit::focusOutEvent(QFocusEvent*) {}
+
+//=============================================================================
+
 PencilTestPopup::PencilTestPopup()
     : Dialog(TApp::instance()->getMainWindow(), false, false, "PencilTest")
     , m_currentCamera(0)
@@ -342,9 +478,14 @@ PencilTestPopup::PencilTestPopup()
   QPushButton* refreshCamListButton = new QPushButton(tr("Refresh"), this);
   m_resolutionCombo                 = new QComboBox(this);
 
-  QGroupBox* fileFrame     = new QGroupBox(tr("File"), this);
-  m_levelNameEdit          = new QLineEdit(this);
-  m_frameNumberEdit        = new IntLineEdit(this, 1, 1, INT_MAX, 4);
+  QGroupBox* fileFrame = new QGroupBox(tr("File"), this);
+  m_levelNameEdit      = new QLineEdit(this);
+  // set the start frame 10 if the option in preferences
+  // "Show ABC Appendix to the Frame Number in Xsheet Cell" is active.
+  // (frame 10 is displayed as "1" with this option)
+  int startFrame =
+      Preferences::instance()->isShowFrameNumberWithLettersEnabled() ? 10 : 1;
+  m_frameNumberEdit        = new FrameNumberLineEdit(this, startFrame);
   m_fileTypeCombo          = new QComboBox(this);
   m_fileFormatOptionButton = new QPushButton(tr("Options"), this);
   m_saveInFileFld          = new FileField(
@@ -798,7 +939,12 @@ void PencilTestPopup::onNextName() {
   }
 
   m_levelNameEdit->setText(QString::fromStdWString(levelName));
-  m_frameNumberEdit->setValue(1);
+  // set the start frame 10 if the option in preferences
+  // "Show ABC Appendix to the Frame Number in Xsheet Cell" is active.
+  // (frame 10 is displayed as "1" with this option)
+  int startFrame =
+      Preferences::instance()->isShowFrameNumberWithLettersEnabled() ? 10 : 1;
+  m_frameNumberEdit->setValue(startFrame);
 }
 
 //-----------------------------------------------------------------------------
@@ -825,7 +971,11 @@ void PencilTestPopup::onImageCaptured(int id, const QImage& image) {
     m_captureCue = false;
     if (importImage(procImg)) {
       m_cameraViewfinder->setPreviousImage(procImg);
-      m_frameNumberEdit->setValue(m_frameNumberEdit->getValue() + 1);
+      if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
+        int f = m_frameNumberEdit->getValue();
+        m_frameNumberEdit->setValue(((int)(f / 10) + 1) * 10);
+      } else
+        m_frameNumberEdit->setValue(m_frameNumberEdit->getValue() + 1);
 
       // restart interval timer for capturing next frame (it is single shot)
       if (m_timerCB->isChecked() && m_captureButton->isChecked()) {

@@ -21,8 +21,8 @@ namespace TScriptBinding {
 
 //=======================================================
 
-static QScriptValue getScene(QScriptContext *context, const QScriptValue &sceneArg,
-                             Scene *&scene) {
+static QScriptValue getScene(QScriptContext *context,
+                             const QScriptValue &sceneArg, Scene *&scene) {
   scene = qscriptvalue_cast<Scene *>(sceneArg);
   if (!scene)
     return context->throwError(

@@ -682,9 +682,10 @@ void RasterPainter::drawRasterImages(QPainter &p, QPolygon cameraPol) {
   m_nodes.clear();
 }
 
-static void buildAutocloseImage(TVectorImage *vaux, TVectorImage *vi,
-                                const std::vector<std::pair<int, double>> &startPoints,
-                                const std::vector<std::pair<int, double>> &endPoints) {
+static void buildAutocloseImage(
+    TVectorImage *vaux, TVectorImage *vi,
+    const std::vector<std::pair<int, double>> &startPoints,
+    const std::vector<std::pair<int, double>> &endPoints) {
   for (UINT i = 0; i < startPoints.size(); i++) {
     TThickPoint p1 = vi->getStroke(startPoints[i].first)
                          ->getThickPoint(startPoints[i].second);
@@ -861,7 +862,6 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
 
   delete cf;
 }
-
 
 //-----------------------------------------------------
 

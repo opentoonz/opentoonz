@@ -45,7 +45,8 @@ extern "C" {
 // --------------------------
 static void patternmapUC(
     const RASTER *iras, RASTER *oras, CPatternMapParam &pmP, const int border,
-    RASTER *imgContour)  // throw (SMemAllocError,SWriteRasterError,SFileReadError)
+    RASTER
+        *imgContour)  // throw (SMemAllocError,SWriteRasterError,SFileReadError)
 {
   try {
     SRECT rect = {border, border, iras->lx - border - 1, iras->ly - border - 1};
@@ -125,7 +126,8 @@ static void patternmapUC(
 // --------------------------
 static void patternmapUS(
     const RASTER *iras, RASTER *oras, CPatternMapParam &pmP, const int border,
-    RASTER *imgContour)  // throw (SMemAllocError,SWriteRasterError,SFileReadError)
+    RASTER
+        *imgContour)  // throw (SMemAllocError,SWriteRasterError,SFileReadError)
 {
   try {
     SRECT rect = {border, border, iras->lx - border - 1, iras->ly - border - 1};

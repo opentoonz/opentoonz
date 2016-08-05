@@ -69,8 +69,8 @@ TThread::Mutex CombineDataGuard;
 static std::list<GLdouble *> Combine_data;
 
 extern "C" {
-static void CALLBACK myCombine(GLdouble coords[3], GLdouble *d[4],
-                                   GLfloat w[4], GLdouble **dataOut) {
+static void CALLBACK myCombine(GLdouble coords[3], GLdouble *d[4], GLfloat w[4],
+                               GLdouble **dataOut) {
   GLdouble *newCoords = new GLdouble[3];
 
   newCoords[0] = coords[0];

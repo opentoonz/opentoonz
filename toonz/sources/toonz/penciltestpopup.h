@@ -4,6 +4,7 @@
 #define PENCILTESTPOPUP_H
 
 #include "toonzqt/dvdialog.h"
+#include "toonzqt/lineedit.h"
 
 #include <QFrame>
 
@@ -18,10 +19,11 @@ class QCheckBox;
 class QPushButton;
 class QVideoFrame;
 class QTimer;
+class QIntValidator;
+class QRegExpValidator;
 
 namespace DVGui {
 class FileField;
-class IntLineEdit;
 class IntField;
 }
 
@@ -67,6 +69,37 @@ protected slots:
 };
 
 //=============================================================================
+// FrameNumberLineEdit
+// a special Line Edit which accepts imputting alphabets if the preference
+// option
+// "Show ABC Appendix to the Frame Number in Xsheet Cell" is active.
+//-----------------------------------------------------------------------------
+
+class FrameNumberLineEdit : public DVGui::LineEdit {
+  Q_OBJECT
+  /* having two validators and switch them according to the preferences*/
+  QIntValidator* m_intValidator;
+  QRegExpValidator* m_regexpValidator;
+
+  void updateValidator();
+
+public:
+  FrameNumberLineEdit(QWidget* parent = 0, int value = 1);
+  ~FrameNumberLineEdit() {}
+
+  /*! Set text in field to \b value. */
+  void setValue(int value);
+  /*! Return an integer with text field value. */
+  int getValue();
+
+protected:
+  /*! If focus is lost and current text value is out of range emit signal
+  \b editingFinished.*/
+  void focusOutEvent(QFocusEvent*) override;
+  void showEvent(QShowEvent* event) override { updateValidator(); }
+};
+
+//=============================================================================
 // PencilTestPopup
 //-----------------------------------------------------------------------------
 
@@ -85,7 +118,7 @@ class PencilTestPopup : public DVGui::Dialog {
   QPushButton *m_fileFormatOptionButton, *m_captureWhiteBGButton,
       *m_captureButton;
   DVGui::FileField* m_saveInFileFld;
-  DVGui::IntLineEdit* m_frameNumberEdit;
+  FrameNumberLineEdit* m_frameNumberEdit;
   DVGui::IntField *m_thresholdFld, *m_contrastFld, *m_brightnessFld,
       *m_bgReductionFld, *m_onionOpacityFld, *m_timerIntervalFld;
 

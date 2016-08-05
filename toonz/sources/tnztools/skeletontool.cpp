@@ -91,8 +91,8 @@ static bool isAncestorOf(int ancestorIndex, int descendentIndex) {
 
 //------------------------------------------------------------
 
-static void getHooks(std::vector<HookData> &hooks, TXsheet *xsh, int row, int col,
-                     TPointD dpiScale) {
+static void getHooks(std::vector<HookData> &hooks, TXsheet *xsh, int row,
+                     int col, TPointD dpiScale) {
   // nota. hook position is in the coordinate system of the parent object.
   // a inch is Stage::inch
 
