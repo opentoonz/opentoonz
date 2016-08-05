@@ -32,11 +32,12 @@ build:
   verbosity: minimal
 after_build:
 - cmd: >-
-    C:\Qt\5.6\msvc2013_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz_1.0.exe
+    C:\Qt\5.6\msvc2013_64\bin\windeployqt.exe %CONFIGURATION%\OpenToonz_1.1.exe
 
     copy /Y ..\..\thirdparty\glut\3.7.6\lib\glut64.dll %CONFIGURATION%
 
     copy /Y ..\..\thirdparty\glew\glew-1.9.0\bin\64bit\glew32.dll %CONFIGURATION%
 artifacts:
 - path: toonz\$(PLATFORM)\$(CONFIGURATION)
-  name: OpenToonz_1.0
+  name: OpenToonz_1.1
+  
