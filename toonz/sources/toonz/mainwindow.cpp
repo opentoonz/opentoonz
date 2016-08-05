@@ -651,7 +651,6 @@ void MainWindow::readSettings(const QString &argumentLayoutFileName) {
             << "Cleanup"
             << "PltEdit"
             << "Schematic"
-			<< "Basics"
             << "QAR";
   /*--- ComboViewerのパーツのShow/Hideの再現 ---*/
   mySettings.beginGroup("ComboViewerPartsVisible");
