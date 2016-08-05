@@ -144,6 +144,9 @@ SceneViewerPanel::SceneViewerPanel(QWidget *parent, Qt::WFlags flags)
         connect(m_flipConsole, SIGNAL(playStateChanged(bool)),
                 TApp::instance()->getCurrentFrame(), SLOT(setPlaying(bool)));
   ret = ret &&
+	  connect(m_flipConsole, SIGNAL(playStateChanged(bool)),
+	  this, SLOT(onPlayingStatusChanged(bool)));
+  ret = ret &&
         connect(m_flipConsole, SIGNAL(buttonPressed(FlipConsole::EGadget)),
                 m_sceneViewer, SLOT(onButtonPressed(FlipConsole::EGadget)));
 
@@ -430,6 +433,29 @@ void SceneViewerPanel::enableFlipConsoleForCamerastand(bool on) {
 //-----------------------------------------------------------------------------
 
 void SceneViewerPanel::onXshLevelSwitched(TXshLevel *) { changeWindowTitle(); }
+
+//-----------------------------------------------------------------------------
+
+
+void SceneViewerPanel::onPlayingStatusChanged(bool playing) {
+	OnionSkinMask osm =
+		TApp::instance()->getCurrentOnionSkin()->getOnionSkinMask();
+	if (playing) {
+		m_onionSkinActive = osm.isEnabled();
+		if (m_onionSkinActive) {
+			osm.enable(false);
+			TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
+			TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
+		}
+	}
+	else {
+		if (m_onionSkinActive) {
+			osm.enable(true);
+			TApp::instance()->getCurrentOnionSkin()->setOnionSkinMask(osm);
+			TApp::instance()->getCurrentOnionSkin()->notifyOnionSkinMaskChanged();
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------
 
