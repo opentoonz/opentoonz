@@ -673,7 +673,8 @@ void TApp::autosave() {
   } else
     m_autosaveSuspended = false;
 
-  if (scene->isUntitled() && Preferences::instance()->isAutosaveSceneEnabled()) {
+  if (scene->isUntitled() &&
+      Preferences::instance()->isAutosaveSceneEnabled()) {
     DVGui::warning(
         tr("It is not possible to automatically save an untitled scene."));
     return;
@@ -684,14 +685,11 @@ void TApp::autosave() {
   pb.show();
   Preferences *pref = Preferences::instance();
   if (pref->isAutosaveSceneEnabled() && pref->isAutosaveOtherFilesEnabled()) {
-	  IoCmd::saveAll();
-  }
-  else if (pref->isAutosaveSceneEnabled()) {
-	  IoCmd::saveScene();
-  }
-  else if (pref->isAutosaveOtherFilesEnabled())
-  {
-	  IoCmd::saveNonSceneFiles();
+    IoCmd::saveAll();
+  } else if (pref->isAutosaveSceneEnabled()) {
+    IoCmd::saveScene();
+  } else if (pref->isAutosaveOtherFilesEnabled()) {
+    IoCmd::saveNonSceneFiles();
   }
 
   pb.setValue(1);
@@ -716,7 +714,7 @@ void TApp::onStartAutoSave() {
 //-----------------------------------------------------------------------------
 
 void TApp::onStopAutoSave() {
-  //assert(!Preferences::instance()->isAutosaveEnabled());
+  // assert(!Preferences::instance()->isAutosaveEnabled());
   m_autosaveTimer->stop();
 }
 

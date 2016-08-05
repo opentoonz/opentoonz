@@ -1178,15 +1178,16 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
                    "%1: the current scene has been modified.\n"
                    "What would you like to do?")
                    .arg(msg);
-	int ret = DVGui::MsgBox(question, QObject::tr("Save All"), QObject::tr("Save Scene Only"),
-                            QObject::tr("Discard Changes"), QObject::tr("Cancel"), 0);
+    int ret = DVGui::MsgBox(
+        question, QObject::tr("Save All"), QObject::tr("Save Scene Only"),
+        QObject::tr("Discard Changes"), QObject::tr("Cancel"), 0);
     if (ret == 0 || ret == 4) {
       // cancel (or closed message box window)
       return false;
-	} else if (ret == 1) {
-		// save all
-		if (!IoCmd::saveAll()) return false;
-	} else if (ret == 2) {
+    } else if (ret == 1) {
+      // save all
+      if (!IoCmd::saveAll()) return false;
+    } else if (ret == 2) {
       // save
       if (!IoCmd::saveScene()) return false;
     } else if (ret == 3) {
@@ -1206,24 +1207,24 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
     if (!dirtyResources.empty()) {
       QString question;
 
-      question =
-          msg + ":" + QObject::tr(" The following file(s) have been modified.\n\n");
+      question = msg + ":" +
+                 QObject::tr(" The following file(s) have been modified.\n\n");
       for (int i = 0; i < dirtyResources.size(); i++) {
         question += "   " + dirtyResources[i] + "\n";
       }
-      question +=
-          QObject::tr("\nWhat would you like to do? ");
+      question += QObject::tr("\nWhat would you like to do? ");
 
       int ret =
-		  DVGui::MsgBox(question, QObject::tr("Save Changes"), msg + QObject::tr(" Anyway"), QObject::tr("Cancel"), 0);
+          DVGui::MsgBox(question, QObject::tr("Save Changes"),
+                        msg + QObject::tr(" Anyway"), QObject::tr("Cancel"), 0);
       if (ret == 0 || ret == 3) {
         // cancel (or closed message box window)
         return false;
-	  } else if (ret == 1) {
-		  // save non scene files
-		  IoCmd::saveNonSceneFiles();
-		  return false;
-	  } else if (ret == 2) {
+      } else if (ret == 1) {
+        // save non scene files
+        IoCmd::saveNonSceneFiles();
+        return false;
+      } else if (ret == 2) {
         // quit
       }
 
@@ -1638,19 +1639,19 @@ bool IoCmd::saveAll() {
 //---------------------------------------------------------------------------
 
 void IoCmd::saveNonSceneFiles() {
-	// try to save non scene files
+  // try to save non scene files
 
-	TApp *app = TApp::instance();
-	ToonzScene *scene = app->getCurrentScene()->getScene();
-	bool untitled = scene->isUntitled();
-	SceneResources resources(scene, 0);
-	resources.save(scene->getScenePath());
-	if (untitled) scene->setUntitled();
-	resources.updatePaths();
+  TApp *app         = TApp::instance();
+  ToonzScene *scene = app->getCurrentScene()->getScene();
+  bool untitled     = scene->isUntitled();
+  SceneResources resources(scene, 0);
+  resources.save(scene->getScenePath());
+  if (untitled) scene->setUntitled();
+  resources.updatePaths();
 
-	// for update title bar
-	app->getCurrentLevel()->notifyLevelTitleChange();
-	app->getCurrentPalette()->notifyPaletteTitleChanged();
+  // for update title bar
+  app->getCurrentLevel()->notifyLevelTitleChange();
+  app->getCurrentPalette()->notifyPaletteTitleChanged();
 }
 
 //===========================================================================
@@ -2742,6 +2743,6 @@ public:
 //-----------------------------------------------------------------------------
 class SaveAllLevelsCommandHandler : public MenuItemHandler {
 public:
-	SaveAllLevelsCommandHandler() : MenuItemHandler(MI_SaveAllLevels) {}
-	void execute() { IoCmd::saveNonSceneFiles(); }
+  SaveAllLevelsCommandHandler() : MenuItemHandler(MI_SaveAllLevels) {}
+  void execute() { IoCmd::saveNonSceneFiles(); }
 } saveAllLevelsCommandHandler;

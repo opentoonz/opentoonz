@@ -68,7 +68,8 @@ private:
   QPushButton *m_addLevelFormat, *m_removeLevelFormat, *m_editLevelFormat;
 
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
-      *m_onionSkinVisibility, *m_autoSaveCB, *m_autoSaveSceneCB, *m_autoSaveOtherFilesCB, *m_pixelsOnlyCB;
+      *m_onionSkinVisibility, *m_autoSaveCB, *m_autoSaveSceneCB,
+      *m_autoSaveOtherFilesCB, *m_pixelsOnlyCB;
 
   DVGui::FileField *m_ffmpegPathFileFld;
 

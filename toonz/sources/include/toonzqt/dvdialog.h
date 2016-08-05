@@ -80,8 +80,9 @@ int DVAPI MsgBox(const QString &text, const QString &button1,
 
 // QUESTION: four botton user defined
 int DVAPI MsgBox(const QString &text, const QString &button1,
-	const QString &button2, const QString &button3, const QString &button4,
-	int defaultButtonIndex = 0, QWidget *parent = 0);
+                 const QString &button2, const QString &button3,
+                 const QString &button4, int defaultButtonIndex = 0,
+                 QWidget *parent = 0);
 
 Dialog DVAPI *createMsgBox(MsgType type, const QString &text,
                            const QStringList &buttons, int defaultButtonIndex,
@@ -235,7 +236,8 @@ public:
   void addButtonBarWidget(QWidget *widget);
   void addButtonBarWidget(QWidget *first, QWidget *second);
   void addButtonBarWidget(QWidget *first, QWidget *second, QWidget *third);
-  void addButtonBarWidget(QWidget *first, QWidget *second, QWidget *third, QWidget *fourth);
+  void addButtonBarWidget(QWidget *first, QWidget *second, QWidget *third,
+                          QWidget *fourth);
 
   void hideEvent(QHideEvent *event) override;
 
