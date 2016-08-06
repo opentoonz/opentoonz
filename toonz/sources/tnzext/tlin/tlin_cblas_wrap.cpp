@@ -55,7 +55,7 @@ extern "C" {
 
 //========================================================================================
 
-void sum(int n, const double *x, double *&y) {
+static void sum(int n, const double *x, double *&y) {
   /*
 void cblas_daxpy(blasint n, double a, double *x, blasint incx, double *y,
 blasint incy);

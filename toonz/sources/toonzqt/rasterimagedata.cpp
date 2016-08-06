@@ -294,7 +294,7 @@ StrokesData *FullColorImageData::toStrokesData(ToonzScene *scene) const {
       scene->getProperties()->getVectorizerParameters();
   assert(vParams);
 
-  std::auto_ptr<VectorizerConfiguration> config(
+  std::unique_ptr<VectorizerConfiguration> config(
       vParams->getCurrentConfiguration(0.0));
   TVectorImageP vi = vectorize(image, rect, *config, m_transformation);
 

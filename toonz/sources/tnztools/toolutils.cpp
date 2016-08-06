@@ -1066,10 +1066,9 @@ void ToolUtils::UndoPencil::undo() const {
   VIStroke *stroke = image->getStrokeById(m_strokeId);
   if (!stroke) return;
   image->deleteStroke(stroke);
-  TSelection *selection = app->getCurrentSelection()->getSelection();
+  TSelection *selection            = app->getCurrentSelection()->getSelection();
   StrokeSelection *strokeSelection = dynamic_cast<StrokeSelection *>(selection);
-  if (strokeSelection)
-    strokeSelection->selectNone();
+  if (strokeSelection) strokeSelection->selectNone();
 
   UINT size = m_fillInformation->size();
   TRegion *reg;

@@ -1092,7 +1092,7 @@ void AdjustThicknessPopup::apply() {
   double fromTransform[2], toTransform[2];
   getTransformParameters(fromTransform, toTransform);
 
-  std::auto_ptr<TUndo> undo(
+  std::unique_ptr<TUndo> undo(
       new AdjustThicknessUndo(m_selectionData, fromTransform, toTransform));
 
   undo->redo();

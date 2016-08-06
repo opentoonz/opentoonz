@@ -605,7 +605,7 @@ void TStyleSelection::cutStyles() {
     styleIds.push_back(page->getStyleId(*it));
   }
 
-  std::auto_ptr<TUndo> undo(new CutStylesUndo(this, data, oldData));
+  std::unique_ptr<TUndo> undo(new CutStylesUndo(this, data, oldData));
 
   if (m_xsheetHandle) {
     if (eraseStylesInDemand(palette, styleIds, m_xsheetHandle) == 0) return;
@@ -683,7 +683,7 @@ void TStyleSelection::deleteStyles() {
       return;
   }
 
-  std::auto_ptr<TUndo> undo(new DeleteStylesUndo(this, data));
+  std::unique_ptr<TUndo> undo(new DeleteStylesUndo(this, data));
 
   deleteStylesWithoutUndo(m_paletteHandle->getPalette(), m_paletteHandle,
                           m_pageIndex, &m_styleIndicesInPage);

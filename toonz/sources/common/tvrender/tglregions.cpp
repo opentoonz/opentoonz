@@ -436,7 +436,7 @@ void tglDraw(const TVectorRenderData &rd, const TStroke *s, bool pushAttribs) {
 
 //------------------------------------------------------------------------------------
 
-void tglDoDraw(const TVectorRenderData &rd, TRegion *r) {
+static void tglDoDraw(const TVectorRenderData &rd, TRegion *r) {
   bool visible   = false;
   int colorCount = 0;
   if (!r) return;
@@ -462,7 +462,7 @@ void tglDoDraw(const TVectorRenderData &rd, TRegion *r) {
 
 //------------------------------------------------------------------------------------
 
-void tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
+static void tglDoDraw(const TVectorRenderData &rd, const TStroke *s) {
   bool visible   = false;
   int colorCount = 0;
 

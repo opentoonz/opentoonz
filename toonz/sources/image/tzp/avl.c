@@ -1841,7 +1841,7 @@ typedef struct {
   CDB_PARAM *param;
 } CDB_EFFECT;
 
-char *strsave(const char *str) {
+static char *strsave(const char *str) {
   char *neww;
   if (!str) return 0;
   neww = malloc(strlen(str) + 1);
@@ -1852,7 +1852,7 @@ char *strsave(const char *str) {
 
 /*---------------------------------------------------------------------------*/
 
-char *strnsave(const char *str, int n) {
+static char *strnsave(const char *str, int n) {
   char *neww;
 
   neww = malloc(n + 1);

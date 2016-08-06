@@ -949,7 +949,6 @@ void PageViewer::mouseDoubleClickEvent(QMouseEvent *e) {
   }
 
   CommandManager::instance()->execute("MI_OpenStyleControl");
-
 }
 
 //-----------------------------------------------------------------------------

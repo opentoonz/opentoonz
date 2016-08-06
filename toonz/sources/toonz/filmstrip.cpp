@@ -34,6 +34,7 @@
 #include "toonz/tscenehandle.h"
 #include "toonz/toonzscene.h"
 #include "toonz/levelset.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
 #include "tpalette.h"
@@ -48,6 +49,46 @@
 #include <QMainWindow>
 #include <QMimeData>
 #include <QDrag>
+
+namespace {
+QString fidToFrameNumberWithLetter(int f) {
+  QString str = QString::number((int)(f / 10));
+  while (str.length() < 3) str.push_front("0");
+  switch (f % 10) {
+  case 1:
+    str.append('A');
+    break;
+  case 2:
+    str.append('B');
+    break;
+  case 3:
+    str.append('C');
+    break;
+  case 4:
+    str.append('D');
+    break;
+  case 5:
+    str.append('E');
+    break;
+  case 6:
+    str.append('F');
+    break;
+  case 7:
+    str.append('G');
+    break;
+  case 8:
+    str.append('H');
+    break;
+  case 9:
+    str.append('I');
+    break;
+  default:
+    str.append(' ');
+    break;
+  }
+  return str;
+}
+}  // namespace
 
 //=============================================================================
 // Filmstrip
@@ -538,17 +579,21 @@ void FilmstripFrames::paintEvent(QPaintEvent *evt) {
 
       p.setBrush(Qt::NoBrush);
       // for single frame
+      QString text;
       if (fid.getNumber() == TFrameId::EMPTY_FRAME ||
           fid.getNumber() == TFrameId::NO_FRAME) {
-        p.drawText(tmp_frameRect.adjusted(0, 0, -3, 2), "Single Frame",
-                   QTextOption(Qt::AlignRight | Qt::AlignBottom));
+        text = QString("Single Frame");
+      }
+      // for sequencial frame (with letter)
+      else if (Preferences::instance()->isShowFrameNumberWithLettersEnabled()) {
+        text = fidToFrameNumberWithLetter(fid.getNumber());
       }
       // for sequencial frame
       else {
-        p.drawText(tmp_frameRect.adjusted(0, 0, -3, 2),
-                   QString().setNum(fid.getNumber()).rightJustified(4, '0'),
-                   QTextOption(Qt::AlignRight | Qt::AlignBottom));
+        text = QString::number(fid.getNumber()).rightJustified(4, '0');
       }
+      p.drawText(tmp_frameRect.adjusted(0, 0, -3, 2), text,
+                 QTextOption(Qt::AlignRight | Qt::AlignBottom));
       p.setPen(Qt::NoPen);
 
       // Read-only frames (lock)

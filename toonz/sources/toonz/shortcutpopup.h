@@ -61,13 +61,14 @@ public:
   ShortcutTree(QWidget *parent = 0);
   ~ShortcutTree();
 
-  void searchItems(const QString& searchWord = QString());
+  void searchItems(const QString &searchWord = QString());
+
 protected:
   // aggiunge un blocco di QAction. commandType e' un
   // CommandType::MenubarCommandType
-  void addFolder(const QString &title, int commandType, 
+  void addFolder(const QString &title, int commandType,
                  QTreeWidgetItem *folder = 0);
-  
+
   void resizeEvent(QResizeEvent *event);
 
 public slots:
@@ -91,14 +92,13 @@ class ShortcutPopup final : public DVGui::Dialog {
   QPushButton *m_removeBtn;
   ShortcutViewer *m_sViewer;
   ShortcutTree *m_list;
-  
+
 public:
   ShortcutPopup();
   ~ShortcutPopup();
 
 protected slots:
   void onSearchTextChanged(const QString &text);
-
 };
 
 #endif  //  SHORTCUTPOPUP_H

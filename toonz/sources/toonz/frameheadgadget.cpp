@@ -659,4 +659,3 @@ public:
     enableOnionSkin(checked);
   }
 } onionSkinToggle;
-

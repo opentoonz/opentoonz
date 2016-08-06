@@ -805,7 +805,7 @@ ProgressDialog::ProgressDialog(const QString &labelText,
                                const QString &cancelButtonText, int minimum,
                                int maximum, QWidget *parent, Qt::WindowFlags f)
     : Dialog(parent, true, true), m_isCanceled(false) {
-  setWindowTitle(tr("Toonz"));
+  setWindowTitle(tr("OpenToonz"));
 
   setMinimumSize(20, 20);
 

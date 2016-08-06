@@ -14,6 +14,7 @@
 #include <QGLPixelBuffer>
 #include <QGLFramebufferObject>
 #include <QGLShaderProgram>
+#include <QOpenGLContext>
 
 // STD includes
 #include <map>
@@ -27,9 +28,9 @@
 
 namespace {
 
-typedef std::auto_ptr<QGLPixelBuffer> QGLPixelBufferP;
-typedef std::auto_ptr<QGLFramebufferObject> QGLFramebufferObjectP;
-typedef std::auto_ptr<QGLShaderProgram> QGLShaderProgramP;
+typedef std::unique_ptr<QGLPixelBuffer> QGLPixelBufferP;
+typedef std::unique_ptr<QGLFramebufferObject> QGLFramebufferObjectP;
+typedef std::unique_ptr<QGLShaderProgram> QGLShaderProgramP;
 
 struct CompiledShader {
   QGLShaderProgramP m_program;
@@ -53,7 +54,7 @@ struct ShadingContext::Imp {
   std::map<QString,
            CompiledShader>
       m_shaderPrograms;  //!< Shader Programs stored in the context.
-                         //!  \warning   Values have \p auto_ptr members.
+                         //!  \warning   Values have \p unique_ptr members.
 public:
   Imp();
 
@@ -109,7 +110,17 @@ ShadingContext::ShadingContext() : m_imp(new Imp) {
 
 //--------------------------------------------------------
 
-ShadingContext::~ShadingContext() {}
+ShadingContext::~ShadingContext() {
+#ifdef MACOSX
+  // Destructor of QGLPixelBuffer calls QOpenGLContext::makeCurrent()
+  // internally,
+  // so the current thread must be the owner of QGLPixelBuffer context,
+  // when the destructor of m_imp->m_context is called.
+
+  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(
+      QThread::currentThread());
+#endif
+}
 
 //--------------------------------------------------------
 
@@ -154,11 +165,22 @@ USE HARDWARE ACCELERATION
 */
 //--------------------------------------------------------
 
-void ShadingContext::makeCurrent() { m_imp->m_pixelBuffer->makeCurrent(); }
+void ShadingContext::makeCurrent() {
+#ifdef MACOSX
+  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(
+      QThread::currentThread());
+#endif
+  m_imp->m_pixelBuffer->makeCurrent();
+}
 
 //--------------------------------------------------------
 
-void ShadingContext::doneCurrent() { m_imp->m_pixelBuffer->doneCurrent(); }
+void ShadingContext::doneCurrent() {
+#ifdef MACOSX
+  m_imp->m_pixelBuffer->context()->contextHandle()->moveToThread(0);
+#endif
+  m_imp->m_pixelBuffer->doneCurrent();
+}
 
 //--------------------------------------------------------
 

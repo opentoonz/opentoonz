@@ -50,7 +50,7 @@ TToneCurveParam::TToneCurveParam() : TParam() {
 
 //---------------------------------------------------------
 
-TParamSetP getClonedParamSet(TParamSetP srcParamSet) {
+static TParamSetP getClonedParamSet(TParamSetP srcParamSet) {
   TParamSetP dstParamSet = new TParamSet(srcParamSet->getName());
   int i;
   for (i = 0; i < srcParamSet->getParamCount(); i++) {

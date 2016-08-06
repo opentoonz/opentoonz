@@ -93,7 +93,7 @@ class VectorizationSwatchTask final : public TThread::Runnable {
   int m_row, m_col;
   TImageP m_image;
 
-  std::auto_ptr<VectorizerConfiguration> m_config;
+  std::unique_ptr<VectorizerConfiguration> m_config;
 
 public:
   VectorizationSwatchTask(int row, int col);

@@ -302,7 +302,7 @@ void LevelCreatePopup::updatePath() {
 //-----------------------------------------------------------------------------
 
 void LevelCreatePopup::nextName() {
-  const std::auto_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
+  const std::unique_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(L""));
 
   TLevelSet *levelSet =
       TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
@@ -338,9 +338,13 @@ void LevelCreatePopup::showEvent(QShowEvent *) {
   if (Preferences::instance()->getUnits() == "pixel") {
     m_dpiFld->hide();
     m_dpiLabel->hide();
+    m_widthFld->setDecimals(0);
+    m_heightFld->setDecimals(0);
   } else {
     m_dpiFld->show();
     m_dpiLabel->show();
+    m_widthFld->setDecimals(4);
+    m_heightFld->setDecimals(4);
   }
 }
 
