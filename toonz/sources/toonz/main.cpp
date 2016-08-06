@@ -91,8 +91,8 @@ const char *rootVarName         = "LINETESTROOT";
 const char *systemVarPrefix     = "LINETEST";
 #else
 const char *applicationName     = "OpenToonz";
-const char *applicationVersion  = "1.0";
-const char *applicationRevision = "3";
+const char *applicationVersion  = "1.1";
+const char *applicationRevision = "0";
 const char *dllRelativePath     = "./toonz6.app/Contents/Frameworks";
 #endif
 
@@ -105,7 +105,7 @@ TEnv::IntVar EnvSoftwareCurrentFontSize("SoftwareCurrentFontSize", 12);
 TEnv::StringVar EnvSoftwareCurrentFontWeight("SoftwareCurrentFontWeightIsBold",
                                              "Yes");
 
-const char *applicationFullName = "OpenToonz 1.0.3";
+const char *applicationFullName = "OpenToonz 1.1.0";
 const char *rootVarName         = "TOONZROOT";
 const char *systemVarPrefix     = "TOONZ";
 

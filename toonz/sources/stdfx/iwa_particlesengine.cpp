@@ -1347,7 +1347,8 @@ void Iwa_Particles_Engine::fill_single_region(
  まだ出発していない粒子情報を初期化
 ----------------------------------------------------------------*/
 
-static bool potentialLessThan(const ParticleOrigin &po1, const ParticleOrigin &po2) {
+static bool potentialLessThan(const ParticleOrigin &po1,
+                              const ParticleOrigin &po2) {
   return po1.potential < po2.potential;
 }
 

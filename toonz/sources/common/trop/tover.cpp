@@ -250,7 +250,8 @@ void do_over(TRasterGR8P rout, const TRaster32P &rup) {
 
 //-----------------------------------------------------------------------------
 
-static void do_over(TRaster32P rout, const TRasterGR8P &rup, const TPixel32 &color) {
+static void do_over(TRaster32P rout, const TRasterGR8P &rup,
+                    const TPixel32 &color) {
   assert(rout->getSize() == rup->getSize());
   for (int y = rout->getLy(); --y >= 0;) {
     TPixel32 *out_pix       = rout->pixels(y);

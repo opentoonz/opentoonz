@@ -174,10 +174,9 @@ typedef list<TQuadratic> QuadraticList;
 
 //---------------------------------------------------------------------------
 
-static void splitCircularArcIntoQuadraticCurves(const TPointD &Center,
-                                                const TPointD &Pstart,
-                                                const TPointD &Pend,
-                                                vector<TQuadratic *> &quadArray) {
+static void splitCircularArcIntoQuadraticCurves(
+    const TPointD &Center, const TPointD &Pstart, const TPointD &Pend,
+    vector<TQuadratic *> &quadArray) {
   // It splits a circular anticlockwise arc into a sequence of quadratic bezier
   // curves
   // Every quadratic curve can approximate an arc no longer than 45 degrees (or

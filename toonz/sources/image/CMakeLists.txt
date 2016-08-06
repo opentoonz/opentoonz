@@ -20,6 +20,10 @@ set(HEADERS
     ../include/tnzimage.h
     mov/tiio_mov_proxy.h
     3gp/tiio_3gp_proxy.h
+    ffmpeg/tiio_gif.h
+    ffmpeg/tiio_webm.h
+    ffmpeg/tiio_mp4.h
+    ffmpeg/tiio_ffmpeg.h
     mesh/tiio_mesh.h
 )
 
@@ -47,6 +51,10 @@ set(SOURCES
     tzl/tiio_tzl.cpp
     mov/tiio_mov_proxy.cpp
     3gp/tiio_3gp_proxy.cpp
+    ffmpeg/tiio_gif.cpp
+    ffmpeg/tiio_webm.cpp
+    ffmpeg/tiio_mp4.cpp
+    ffmpeg/tiio_ffmpeg.cpp
     mesh/tiio_mesh.cpp
 )
 
@@ -114,11 +122,9 @@ if(WIN32)
     endif()
 endif()
 
-if(PLATFORM EQUAL 32)
-    _find_toonz_library(TNZLIBS "tnzcore;tnzbase")
-else()
-    _find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")
-endif()
+
+_find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")
+
 
 if(WIN32)
     set(EXTRA_LIBS
@@ -152,4 +158,4 @@ else()
     )
 endif()
 
-target_link_libraries(image Qt5::Core Qt5::Network ${Z_LIB} ${GLUT_LIB} ${GL_LIB} ${JPEG_LIB} ${TIFF_LIB} ${PNG_LIB} ${EXTRA_LIBS})
+target_link_libraries(image Qt5::Core Qt5::Gui Qt5::Network ${Z_LIB} ${GLUT_LIB} ${GL_LIB} ${JPEG_LIB} ${TIFF_LIB} ${PNG_LIB} ${EXTRA_LIBS})

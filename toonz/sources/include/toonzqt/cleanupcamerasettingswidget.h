@@ -60,7 +60,7 @@ public:
   void setCameraPresetListFile(const TFilePath &fp);
 
   // CleanupParameters => CleanupCameraSettingsWidget fields
-  void setFields(const CleanupParameters *cleanupParameters);
+  void setFields(CleanupParameters *cleanupParameters);
 
   // CleanupCameraSettingsWidget fields => CleanupParameters
   void getFields(CleanupParameters *cleanupParameters);

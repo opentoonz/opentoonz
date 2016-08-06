@@ -24,7 +24,8 @@
 #include <QFile>
 #include <QTextStream>
 
-static QScriptValue loadSceneFun(QScriptContext *context, QScriptEngine *engine) {
+static QScriptValue loadSceneFun(QScriptContext *context,
+                                 QScriptEngine *engine) {
   if (context->argumentCount() > 0) {
     QString fpArg = context->argument(0).toString();
     TFilePath fp(fpArg.toStdWString());
@@ -33,7 +34,8 @@ static QScriptValue loadSceneFun(QScriptContext *context, QScriptEngine *engine)
   return QScriptValue();
 }
 
-static QScriptValue saveSceneFun(QScriptContext *context, QScriptEngine *engine) {
+static QScriptValue saveSceneFun(QScriptContext *context,
+                                 QScriptEngine *engine) {
   if (context->argumentCount() > 0) {
     QString fpArg = context->argument(0).toString();
     TFilePath fp(fpArg.toStdWString());
@@ -42,7 +44,8 @@ static QScriptValue saveSceneFun(QScriptContext *context, QScriptEngine *engine)
   return QScriptValue();
 }
 
-static QScriptValue loadLevelFun(QScriptContext *context, QScriptEngine *engine) {
+static QScriptValue loadLevelFun(QScriptContext *context,
+                                 QScriptEngine *engine) {
   if (context->argumentCount() > 0) {
     QString fpArg = context->argument(0).toString();
     TFilePath fp(fpArg.toStdWString());

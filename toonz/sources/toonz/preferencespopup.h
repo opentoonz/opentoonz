@@ -9,6 +9,7 @@
 #include "toonzqt/doublefield.h"
 #include "toonzqt/colorfield.h"
 #include "toonzqt/checkbox.h"
+#include "toonzqt/filefield.h"
 
 // TnzLib includes
 #include "toonz/preferences.h"
@@ -62,12 +63,14 @@ private:
   DVGui::IntLineEdit *m_minuteFld, *m_chunkSizeFld, *m_iconSizeLx,
       *m_iconSizeLy, *m_viewShrink, *m_viewStep, *m_blanksCount,
       *m_onionPaperThickness, *m_animationStepField, *m_undoMemorySize,
-      *m_xsheetStep;
+      *m_xsheetStep, *m_ffmpegTimeout;
 
   QPushButton *m_addLevelFormat, *m_removeLevelFormat, *m_editLevelFormat;
 
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
       *m_onionSkinVisibility, *m_pixelsOnlyCB;
+
+  DVGui::FileField *m_ffmpegPathFileFld;
 
 private:
   // QWidget* create(const QString& lbl, bool def, const char* slot);
@@ -148,6 +151,8 @@ private slots:
   void onShowFrameNumberWithLettersChanged(int index);
   void onPaletteTypeForRasterColorModelChanged(int index);
   void onShowKeyframesOnCellAreaChanged(int);
+  void onFfmpegPathChanged();
+  void onFfmpegTimeoutChanged();
 };
 
 //**********************************************************************************

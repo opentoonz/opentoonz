@@ -1287,12 +1287,11 @@ void IoCmd::newScene() {
       TDimensionD((double)res.lx / cameraDpi, (double)res.ly / cameraDpi));
   scene->getProperties()->setBgColor(TPixel32::White);
   TProjectManager::instance()->initializeScene(scene);
-  if (Preferences::instance()->getPixelsOnly())
-  {
-	  TCamera *updateCamera = scene->getCurrentCamera();
-	  TDimension updateRes = updateCamera->getRes();
-	  updateCamera->setSize(
-		  TDimensionD((double)updateRes.lx / cameraDpi, (double)updateRes.ly / cameraDpi));
+  if (Preferences::instance()->getPixelsOnly()) {
+    TCamera *updateCamera = scene->getCurrentCamera();
+    TDimension updateRes  = updateCamera->getRes();
+    updateCamera->setSize(TDimensionD((double)updateRes.lx / cameraDpi,
+                                      (double)updateRes.ly / cameraDpi));
   }
   // Must set current scene after initializeScene!!
   app->getCurrentScene()->setScene(scene);
@@ -1960,7 +1959,8 @@ std::vector<int>
 
 //! Returns the number of actually loaded levels
 static int createSubXSheetFromPSDFolder(IoCmd::LoadResourceArguments &args,
-                                        TXsheet *xsh, int &col0, int psdLevelIndex,
+                                        TXsheet *xsh, int &col0,
+                                        int psdLevelIndex,
                                         PsdSettingsPopup *popup) {
   assert(popup->isFolder(psdLevelIndex));
 
@@ -2016,8 +2016,8 @@ static int createSubXSheetFromPSDFolder(IoCmd::LoadResourceArguments &args,
 
 //  Load a psd file
 //! Returns the number of actually loaded levels
-static int loadPSDResource(IoCmd::LoadResourceArguments &args, bool updateRecentFile,
-                           PsdSettingsPopup *popup) {
+static int loadPSDResource(IoCmd::LoadResourceArguments &args,
+                           bool updateRecentFile, PsdSettingsPopup *popup) {
   int &row0 = args.row0;
   int &col0 = args.col0;
   int &row1 = args.row1;

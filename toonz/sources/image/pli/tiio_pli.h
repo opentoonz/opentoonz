@@ -152,7 +152,6 @@ private:
 
 // Functions
 
-TPalette *readPalette(GroupTag *paletteTag, int majorVersion,
-                      int minorVersion);
+TPalette *readPalette(GroupTag *paletteTag, int majorVersion, int minorVersion);
 
 #endif  // TTIO_PLI_INCLUDED
