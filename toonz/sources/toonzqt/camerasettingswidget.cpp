@@ -21,6 +21,7 @@
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshleveltypes.h"
 #include "toonz/preferences.h"
+#include "toonz/stage.h"
 
 // TnzCore includes
 #include "tconvert.h"
@@ -189,11 +190,15 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
 
   m_arFld = new SimpleExpField(this);
 
-  m_xResFld = new DVGui::IntLineEdit();
-  m_yResFld = new DVGui::IntLineEdit();
-  m_xDpiFld = new DoubleLineEdit();
-  m_yDpiFld = new DoubleLineEdit();
-
+  m_xResFld   = new DVGui::IntLineEdit();
+  m_yResFld   = new DVGui::IntLineEdit();
+  m_xDpiFld   = new DoubleLineEdit();
+  m_yDpiFld   = new DoubleLineEdit();
+  m_unitLabel = new QLabel();
+  if (Preferences::instance()->getPixelsOnly())
+    m_unitLabel->setText("Pixels");
+  else
+    m_unitLabel->setText(Preferences::instance()->getCameraUnits());
   m_dpiLabel = new QLabel(tr("DPI"));
   m_resLabel = new QLabel(tr("Pixels"));
   m_xLabel   = new QLabel(tr("x"));
@@ -282,9 +287,7 @@ CameraSettingsWidget::CameraSettingsWidget(bool forCleanup)
       gridLay->addWidget(m_yPrev, 0, 4, Qt::AlignCenter);
 
       gridLay->addWidget(m_inchPrev, 1, 0, Qt::AlignRight | Qt::AlignVCenter);
-      QString units = Preferences::instance()->getCameraUnits();
-      gridLay->addWidget(new QLabel(units), 1, 1,
-                         Qt::AlignRight | Qt::AlignVCenter);
+      gridLay->addWidget(m_unitLabel, 1, 1, Qt::AlignRight | Qt::AlignVCenter);
       gridLay->addWidget(m_lxFld, 1, 2);
       gridLay->addWidget(new QLabel("x"), 1, 3, Qt::AlignCenter);
       gridLay->addWidget(m_lyFld, 1, 4);
@@ -380,6 +383,8 @@ void CameraSettingsWidget::showEvent(QShowEvent *e) {
     m_yDpiFld->hide();
     m_fspChk->hide();
     m_dotPrev->hide();
+    m_lxFld->setDecimals(0);
+    m_lyFld->setDecimals(0);
   } else {
     m_resLabel->show();
     m_dpiLabel->show();
@@ -390,7 +395,13 @@ void CameraSettingsWidget::showEvent(QShowEvent *e) {
     m_yDpiFld->show();
     m_fspChk->show();
     m_dotPrev->show();
+    m_lxFld->setDecimals(4);
+    m_lyFld->setDecimals(4);
   }
+  if (Preferences::instance()->getPixelsOnly())
+    m_unitLabel->setText("Pixels");
+  else
+    m_unitLabel->setText(Preferences::instance()->getCameraUnits());
 }
 
 void CameraSettingsWidget::loadPresetList() {
@@ -747,7 +758,11 @@ void CameraSettingsWidget::onYResChanged() {
 }
 
 void CameraSettingsWidget::onXDpiChanged() {
-  if (m_fspChk->isChecked()) m_yDpiFld->setValue(m_xDpiFld->getValue());
+  if (Preferences::instance()->getPixelsOnly()) {
+    m_xDpiFld->setValue(Stage::inch);
+    m_yDpiFld->setValue(Stage::inch);
+  } else if (m_fspChk->isChecked())
+    m_yDpiFld->setValue(m_xDpiFld->getValue());
 
   if (m_dotPrev->isChecked()) {
     vComputeLx();
@@ -765,7 +780,11 @@ void CameraSettingsWidget::onXDpiChanged() {
 }
 
 void CameraSettingsWidget::onYDpiChanged() {
-  if (m_fspChk->isChecked()) m_xDpiFld->setValue(m_yDpiFld->getValue());
+  if (Preferences::instance()->getPixelsOnly()) {
+    m_xDpiFld->setValue(Stage::inch);
+    m_yDpiFld->setValue(Stage::inch);
+  } else if (m_fspChk->isChecked())
+    m_xDpiFld->setValue(m_yDpiFld->getValue());
 
   if (m_dotPrev->isChecked()) {
     vComputeLy();
@@ -828,6 +847,11 @@ void CameraSettingsWidget::onPresetSelected(const QString &str) {
         hComputeLy();
       else
         hComputeLx();
+    }
+
+    if (Preferences::instance()->getPixelsOnly()) {
+      m_lxFld->setValue(xres / Stage::inch);
+      m_lyFld->setValue(yres / Stage::inch);
     }
 
     if (m_forCleanup && m_offsX && m_offsY && !xoffset.isEmpty() &&
