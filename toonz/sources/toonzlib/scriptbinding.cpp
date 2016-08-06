@@ -137,7 +137,7 @@ public:
   }
 };
 
-void deffoo(QScriptEngine &engine) {
+static void deffoo(QScriptEngine &engine) {
   QScriptValue f = engine.newFunction(
       Dummy<ToonzRasterConverter, &ToonzRasterConverter::convert>::dummy);
   engine.globalObject()

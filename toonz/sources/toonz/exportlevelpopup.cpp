@@ -393,7 +393,19 @@ void ExportLevelPopup::showEvent(QShowEvent *se) {
   {
     TSelectionHandle *selectionHandle = TApp::instance()->getCurrentSelection();
     TSelection *selection             = selectionHandle->getSelection();
-
+    if (Preferences::instance()->getPixelsOnly()) {
+      m_exportOptions->m_widthFld->hide();
+      m_exportOptions->m_heightFld->hide();
+      m_exportOptions->m_widthLabel->hide();
+      m_exportOptions->m_heightLabel->hide();
+      m_exportOptions->m_dpiLabel->hide();
+    } else {
+      m_exportOptions->m_widthFld->show();
+      m_exportOptions->m_heightFld->show();
+      m_exportOptions->m_widthLabel->show();
+      m_exportOptions->m_heightLabel->show();
+      m_exportOptions->m_dpiLabel->show();
+    }
     selectionHandle->pushSelection();
     selectionHandle->setSelection(selection);
   }
@@ -696,7 +708,7 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
 
     QLabel *bgColorLabel = new QLabel(tr("Background Color:"));
     m_bgColorField =
-        new DVGui::ColorField(0, false, TPixel32::Black, 35, false);
+        new DVGui::ColorField(0, false, TPixel32::White, 35, false);
     layout->addWidget(bgColorLabel, row, 1, Qt::AlignRight);
     layout->addWidget(m_bgColorField, row++, 2, Qt::AlignLeft);
 
@@ -725,12 +737,16 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
       layout->addLayout(exportBoxLayout, row++, 1, 1, 2, Qt::AlignLeft);
 
       {
-        m_widthFld  = new DVGui::MeasuredDoubleLineEdit;
-        m_heightFld = new DVGui::MeasuredDoubleLineEdit;
-        m_hResFld   = new DVGui::IntLineEdit;
-        m_vResFld   = new DVGui::IntLineEdit;
-        m_dpiLabel  = new QLabel;
-        m_resScale  = new DVGui::MeasuredDoubleLineEdit;
+        m_widthFld    = new DVGui::MeasuredDoubleLineEdit;
+        m_heightFld   = new DVGui::MeasuredDoubleLineEdit;
+        m_hResFld     = new DVGui::IntLineEdit;
+        m_vResFld     = new DVGui::IntLineEdit;
+        m_dpiLabel    = new QLabel;
+        m_widthLabel  = new QLabel;
+        m_heightLabel = new QLabel;
+        m_widthLabel->setText("Width: ");
+        m_heightLabel->setText("Height: ");
+        m_resScale = new DVGui::MeasuredDoubleLineEdit;
 
         m_widthFld->setRange(0, dmax);
         m_heightFld->setRange(0, dmax);
@@ -746,12 +762,9 @@ ExportLevelPopup::ExportOptions::ExportOptions(QWidget *parent)
         m_vResFld->setFixedSize(50, 20);
         m_hResFld->setFixedSize(50, 20);
         m_resScale->setFixedSize(50, 20);
-
-        exportBoxLayout->addWidget(new QLabel(tr("Width:")), 0, 0,
-                                   Qt::AlignRight);
+        exportBoxLayout->addWidget(m_widthLabel, 0, 0, Qt::AlignRight);
         exportBoxLayout->addWidget(m_widthFld, 0, 1, Qt::AlignLeft);
-        exportBoxLayout->addWidget(new QLabel(tr("Height:")), 0, 2,
-                                   Qt::AlignRight);
+        exportBoxLayout->addWidget(m_heightLabel, 0, 2, Qt::AlignRight);
         exportBoxLayout->addWidget(m_heightFld, 0, 3, Qt::AlignLeft);
         exportBoxLayout->addWidget(m_dpiLabel, 0, 4, Qt::AlignRight);
         exportBoxLayout->addWidget(new QLabel(tr("H Resolution:")), 1, 0,

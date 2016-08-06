@@ -18,18 +18,30 @@
 #include <math.h>
 
 // Platform-specific includes
-#ifdef _WIN32
+#if defined(_WIN32)
 
 #ifndef x64
 
-#define float_t Float_t
-#define GetProcessInformation GetProcessInformation_
+#define list QuickTime_list
+#define map QuickTime_map
+#define iterator QuickTime_iterator
+#define float_t QuickTime_float_t
+#define GetProcessInformation QuickTime_GetProcessInformation
+#define int_fast8_t QuickTime_int_fast8_t
+#define int_fast16_t QuickTime_int_fast16_t
+#define uint_fast16_t QuickTime_uint_fast16_t
 
 #include "QuickTimeComponents.h"
 #include "tquicktime.h"
 
+#undef list
+#undef map
+#undef iterator
 #undef float_t
 #undef GetProcessInformation
+#undef int_fast8_t
+#undef int_fast16_t
+#undef uint_fast16_t
 
 #endif
 
@@ -37,11 +49,11 @@
 #include "./3gp/tiio_3gp.h"
 #include "./zcc/tiio_zcc.h"
 
-#elif MACOSX
+#elif defined(MACOSX)
 #include "./mov/tiio_movM.h"
 #include "./3gp/tiio_3gpM.h"
 
-#elif LINUX  // No more supported by the way...
+#elif defined(LINUX)  // No more supported by the way...
 // #include "./mov/tiio_movL.h"
 #include "./mov/tiio_mov_proxy.h"
 #include "./3gp/tiio_3gp_proxy.h"
@@ -60,6 +72,9 @@
 #include "./pli/tiio_pli.h"
 #include "./tzl/tiio_tzl.h"
 #include "./svg/tiio_svg.h"
+#include "./ffmpeg/tiio_gif.h"
+#include "./ffmpeg/tiio_webm.h"
+#include "./ffmpeg/tiio_mp4.h"
 #include "./mesh/tiio_mesh.h"
 
 //-------------------------------------------------------------------
@@ -146,6 +161,32 @@ void initImageIo(bool lightVersion) {
   Tiio::defineWriterMaker("rgb", Tiio::makeSgiWriter, true);
   TFileType::declare("rgb", TFileType::RASTER_IMAGE);
   Tiio::defineWriterProperties("rgb", new Tiio::SgiWriterProperties());
+
+// ffmpeg
+#if !defined(_WIN32) || defined(x64)
+  if (Ffmpeg::checkFfmpeg()) {
+    bool ffprobe = Ffmpeg::checkFfprobe();
+    if (Ffmpeg::checkFormat("webm")) {
+      TLevelWriter::define("webm", TLevelWriterWebm::create, true);
+      if (ffprobe) TLevelReader::define("webm", TLevelReaderWebm::create);
+      TFileType::declare("webm", TFileType::RASTER_LEVEL);
+      Tiio::defineWriterProperties("webm", new Tiio::WebmWriterProperties());
+    }
+    if (Ffmpeg::checkFormat("gif")) {
+      TLevelWriter::define("gif", TLevelWriterGif::create, true);
+      if (ffprobe) TLevelReader::define("gif", TLevelReaderGif::create);
+      TFileType::declare("gif", TFileType::RASTER_LEVEL);
+      Tiio::defineWriterProperties("gif", new Tiio::GifWriterProperties());
+    }
+    if (Ffmpeg::checkFormat("mp4")) {
+      TLevelWriter::define("mp4", TLevelWriterMp4::create, true);
+      if (ffprobe) TLevelReader::define("mp4", TLevelReaderMp4::create);
+      TFileType::declare("mp4", TFileType::RASTER_LEVEL);
+      Tiio::defineWriterProperties("mp4", new Tiio::Mp4WriterProperties());
+    }
+  }
+#endif
+  // end ffmpeg
 
   if (!lightVersion) {
 #ifdef _WIN32

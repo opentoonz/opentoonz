@@ -218,7 +218,7 @@ TFilePath StudioPalette::getProjectPalettesRoot() {
 
 //-------------------------------------------------------------------
 
-bool loadRefImg(TPalette *palette, TFilePath dir) {
+static bool loadRefImg(TPalette *palette, TFilePath dir) {
   assert(palette);
   TFilePath fp = palette->getRefImgPath();
   if (fp == TFilePath() || !TSystem::doesExistFileOrLevel(fp)) return false;
@@ -463,7 +463,7 @@ TFilePath StudioPalette::importPalette(const TFilePath &dstFolder,
 
 //-------------------------------------------------------------------
 
-void foobar(std::wstring paletteId) { table.erase(paletteId); }
+static void foobar(std::wstring paletteId) { table.erase(paletteId); }
 
 TFilePath StudioPalette::getPalettePath(std::wstring paletteId) {
   std::map<std::wstring, TFilePath>::iterator it = table.find(paletteId);

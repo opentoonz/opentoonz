@@ -58,44 +58,44 @@ public:
   bool verifyRate();
 };
 
-  if (!isInterfaceSupported(AL_DEFAULT_OUTPUT, AL_SPEAKER_IF_TYPE))
-    return false;  // throw TException("Speakers are not supported");
+if (!isInterfaceSupported(AL_DEFAULT_OUTPUT, AL_SPEAKER_IF_TYPE))
+  return false;  // throw TException("Speakers are not supported");
 
-  int dev = alGetResourceByName(AL_SYSTEM, (char *)"Headphone/Speaker",
-                                AL_DEVICE_TYPE);
-  if (!dev) return false;  // throw TException("invalid device speakers");
+int dev =
+    alGetResourceByName(AL_SYSTEM, (char *)"Headphone/Speaker", AL_DEVICE_TYPE);
+if (!dev) return false;  // throw TException("invalid device speakers");
 
-  pvbuf[0].param   = AL_DEFAULT_OUTPUT;
-  pvbuf[0].value.i = dev;
-  alSetParams(AL_SYSTEM, pvbuf, 1);
+pvbuf[0].param   = AL_DEFAULT_OUTPUT;
+pvbuf[0].value.i = dev;
+alSetParams(AL_SYSTEM, pvbuf, 1);
 
-  ALfixed buf[2] = {alDoubleToFixed(0), alDoubleToFixed(0)};
+ALfixed buf[2] = {alDoubleToFixed(0), alDoubleToFixed(0)};
 
-  config = alNewConfig();
-  // qui devo metterci gli altoparlanti e poi setto i valori per il default
-  // output
-  pvbuf[0].param     = AL_RATE;
-  pvbuf[0].value.ll  = alDoubleToFixed((double)format.m_sampleRate);
-  pvbuf[1].param     = AL_GAIN;
-  pvbuf[1].value.ptr = buf;
-  pvbuf[1].sizeIn    = 8;
-  pvbuf[2].param     = AL_INTERFACE;
-  pvbuf[2].value.i   = AL_SPEAKER_IF_TYPE;
+config = alNewConfig();
+// qui devo metterci gli altoparlanti e poi setto i valori per il default
+// output
+pvbuf[0].param     = AL_RATE;
+pvbuf[0].value.ll  = alDoubleToFixed((double)format.m_sampleRate);
+pvbuf[1].param     = AL_GAIN;
+pvbuf[1].value.ptr = buf;
+pvbuf[1].sizeIn    = 8;
+pvbuf[2].param     = AL_INTERFACE;
+pvbuf[2].value.i   = AL_SPEAKER_IF_TYPE;
 
-  if (alSetParams(AL_DEFAULT_OUTPUT, pvbuf, 3) < 0) return false;
-  // throw TException("Unable to set params for output device");
+if (alSetParams(AL_DEFAULT_OUTPUT, pvbuf, 3) < 0) return false;
+// throw TException("Unable to set params for output device");
 
-  if (alSetChannels(config, format.m_channelCount) == -1)
-    return false;  // throw TException("Error to setting audio hardware.");
+if (alSetChannels(config, format.m_channelCount) == -1)
+  return false;  // throw TException("Error to setting audio hardware.");
 
-  int bytePerSample = format.m_bitPerSample >> 3;
-  switch (bytePerSample) {
-  case 3:
-    bytePerSample++;
-    break;
-  default:
-    break;
-  }
+int bytePerSample = format.m_bitPerSample >> 3;
+switch (bytePerSample) {
+case 3:
+  bytePerSample++;
+  break;
+default:
+  break;
+}
 
 bool TSoundOutputDeviceImp::doOpenDevice(const TSoundTrackFormat &format) {
 #ifdef __sgi

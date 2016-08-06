@@ -9,10 +9,6 @@
 #include <QString>
 #include <map>
 
-DV_IMPORT_API void splitSpeedInOutSegment(TDoubleKeyframe &k,
-                                          TDoubleKeyframe &k0,
-                                          TDoubleKeyframe &k1);
-
 //=============================================================================
 //
 // Keyframes Undo

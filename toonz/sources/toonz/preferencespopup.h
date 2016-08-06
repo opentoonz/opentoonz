@@ -9,6 +9,7 @@
 #include "toonzqt/doublefield.h"
 #include "toonzqt/colorfield.h"
 #include "toonzqt/checkbox.h"
+#include "toonzqt/filefield.h"
 
 // TnzLib includes
 #include "toonz/preferences.h"
@@ -51,21 +52,25 @@ private:
 
   QComboBox *m_keyframeType, *m_cellsDragBehaviour, *m_defScanLevelType,
       *m_defLevelType, *m_autocreationType, *m_levelFormatNames,
-      *m_columnIconOm;
+      *m_columnIconOm, *m_unitOm, *m_cameraUnitOm;
 
   DVGui::MeasuredDoubleLineEdit *m_defLevelWidth, *m_defLevelHeight;
 
   DVGui::DoubleLineEdit *m_defLevelDpi;
 
+  QLabel *m_dpiLabel;
+
   DVGui::IntLineEdit *m_minuteFld, *m_chunkSizeFld, *m_iconSizeLx,
       *m_iconSizeLy, *m_viewShrink, *m_viewStep, *m_blanksCount,
       *m_onionPaperThickness, *m_animationStepField, *m_undoMemorySize,
-      *m_xsheetStep;
+      *m_xsheetStep, *m_ffmpegTimeout;
 
   QPushButton *m_addLevelFormat, *m_removeLevelFormat, *m_editLevelFormat;
 
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
-      *m_onionSkinVisibility;
+      *m_onionSkinVisibility, *m_pixelsOnlyCB;
+
+  DVGui::FileField *m_ffmpegPathFileFld;
 
 private:
   // QWidget* create(const QString& lbl, bool def, const char* slot);
@@ -73,6 +78,7 @@ private:
 
 private slots:
 
+  void onPixelsOnlyChanged(int index);
   void onUnitChanged(int index);
   void onCameraUnitChanged(int index);
   void onRoomChoiceChanged(int index);
@@ -145,6 +151,8 @@ private slots:
   void onShowFrameNumberWithLettersChanged(int index);
   void onPaletteTypeForRasterColorModelChanged(int index);
   void onShowKeyframesOnCellAreaChanged(int);
+  void onFfmpegPathChanged();
+  void onFfmpegTimeoutChanged();
 };
 
 //**********************************************************************************

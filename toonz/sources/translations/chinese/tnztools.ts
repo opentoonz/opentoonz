@@ -332,6 +332,34 @@
         <source>Segment</source>
         <translation>自动分段</translation>
     </message>
+    <message>
+        <source>Lines</source>
+        <translation>线</translation>
+    </message>
+    <message>
+        <source>Areas</source>
+        <translation>区域</translation>
+    </message>
+    <message>
+        <source>Lines &amp;&amp; Areas</source>
+        <translation>线和区域</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>正常</translation>
+    </message>
+    <message>
+        <source>Rectangular</source>
+        <translation>矩形</translation>
+    </message>
+    <message>
+        <source>Freehand</source>
+        <translation>手绘</translation>
+    </message>
+    <message>
+        <source>Polyline</source>
+        <translation>多边形</translation>
+    </message>
 </context>
 <context>
     <name>FingerTool</name>
@@ -996,6 +1024,10 @@ Do you want to proceed?</source>
     <message>
         <source>Join Vectors</source>
         <translation>连接矢量</translation>
+    </message>
+    <message>
+        <source>Distance</source>
+        <translation>距离</translation>
     </message>
     <message>
         <source>Mode:</source>

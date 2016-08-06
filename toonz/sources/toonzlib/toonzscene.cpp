@@ -283,7 +283,7 @@ void fixBiancoProblem(ToonzScene *scene, TXsheet *xsh) {
 
 //=============================================================================
 
-void deleteAllUntitledScenes() {
+static void deleteAllUntitledScenes() {
   TFilePath tempDir = getUntitledScenesDir();
   try {
     if (TFileStatus(tempDir).isDirectory()) {
@@ -824,7 +824,7 @@ TXshLevel *ToonzScene::createNewLevel(int type, std::wstring levelName,
   // Select a different unique level name in case it already exists (either in
   // scene or on disk)
   {
-    const std::auto_ptr<NameBuilder> nameBuilder(
+    const std::unique_ptr<NameBuilder> nameBuilder(
         NameBuilder::getBuilder(levelName));
 
     for (;;) {
@@ -948,7 +948,7 @@ struct LevelType {
 
 //-----------------------------------------------------------------------------
 
-LevelType getLevelType(const TFilePath &fp) {
+static LevelType getLevelType(const TFilePath &fp) {
   LevelType ret;
   ret.m_ltype        = UNKNOWN_XSHLEVEL;
   ret.m_oldLevelFlag = false;
@@ -1176,7 +1176,8 @@ TXshLevel *ToonzScene::loadLevel(const TFilePath &actualPath,
       // We must check whether the image actually has a dpi.
       const TPointD &imageDpi = xl->getImageDpi();
 
-      if (imageDpi == TPointD()) {
+      if (imageDpi == TPointD() ||
+          Preferences::instance()->getUnits() == "pixel") {
         // Change to "Custom Dpi" policy and use camera dpi
         TStageObjectId cameraId =
             getXsheet()->getStageObjectTree()->getCurrentCameraId();

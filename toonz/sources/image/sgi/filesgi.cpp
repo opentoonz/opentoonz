@@ -1,6 +1,6 @@
 
 
-#if _MSC_VER >= 1400
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
 #define _CRT_SECURE_NO_DEPRECATE 1
 #pragma warning(disable : 4996)
 #endif
@@ -722,7 +722,7 @@ static TINT32 img_rle_compact(unsigned short *expbuf, int ibpp,
 
 /*-----------------------------------------------------------------------------*/
 
-void iclose(IMAGERGB *image) {
+static void iclose(IMAGERGB *image) {
   TINT32 tablesize;
 
   iflush(image);

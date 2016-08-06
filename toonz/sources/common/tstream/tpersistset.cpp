@@ -26,7 +26,7 @@ TPersistSet::~TPersistSet() {
 
 //------------------------------------------------------------------
 
-void TPersistSet::insert(std::auto_ptr<TPersist> object) {
+void TPersistSet::insert(std::unique_ptr<TPersist> object) {
   struct locals {
     inline static bool sameType(TPersist *a, TPersist *b) {
       return (typeid(*a) == typeid(*b));

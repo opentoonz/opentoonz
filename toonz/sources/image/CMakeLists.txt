@@ -20,7 +20,12 @@ set(HEADERS
     ../include/tnzimage.h
     mov/tiio_mov_proxy.h
     3gp/tiio_3gp_proxy.h
-    mesh/tiio_mesh.h)
+    ffmpeg/tiio_gif.h
+    ffmpeg/tiio_webm.h
+    ffmpeg/tiio_mp4.h
+    ffmpeg/tiio_ffmpeg.h
+    mesh/tiio_mesh.h
+)
 
 set(SOURCES
     tiio.cpp
@@ -46,35 +51,51 @@ set(SOURCES
     tzl/tiio_tzl.cpp
     mov/tiio_mov_proxy.cpp
     3gp/tiio_3gp_proxy.cpp
-    mesh/tiio_mesh.cpp)
+    ffmpeg/tiio_gif.cpp
+    ffmpeg/tiio_webm.cpp
+    ffmpeg/tiio_mp4.cpp
+    ffmpeg/tiio_ffmpeg.cpp
+    mesh/tiio_mesh.cpp
+)
 
 if(WIN32)
     set(HEADERS ${HEADERS}
         avi/tiio_avi.h
         mov/tiio_mov.h
-        3gp/tiio_3gp.h)
+        3gp/tiio_3gp.h
+    )
     set(SOURCES ${SOURCES}
         avi/tiio_avi.cpp
         mov/tiio_movW.cpp
-        3gp/tiio_3gpW.cpp)
+        3gp/tiio_3gpW.cpp
+    )
 else()
     set(HEADERS ${HEADERS}
         mov/tiio_movM.h
-        3gp/tiio_3gpM.h)
+        3gp/tiio_3gpM.h
+    )
     set(SOURCES ${SOURCES}
         mov/tiio_movM.cpp
-        3gp/tiio_3gpM.cpp)
+        3gp/tiio_3gpM.cpp
+    )
 elseif(UNIX)
     set(HEADERS ${HEADERS}
         3gp/tiio_3gp_proxy.h
-        mov/tiio_mov_proxy.h)
+        mov/tiio_mov_proxy.h
+    )
     set(SOURCES ${SOURCES}
         mov/tiio_mov_proxy.cpp
-        3gp/tiio_3gp_proxy.cpp)
+        3gp/tiio_3gp_proxy.cpp
+    )
 endif()
 
 add_library(image SHARED ${HEADERS} ${SOURCES})
-add_definitions(-DTNZIMAGE_DLL -D_USRDLL -DIMAGE_EXPORTS)
+add_definitions(
+    -DTNZIMAGE_DLL
+    -D_USRDLL
+    -DIMAGE_EXPORTS
+)
+
 if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libimage.dylib")
 endif()
@@ -83,35 +104,44 @@ message("subdir: image")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
 include_directories(
+    SYSTEM
     ${TIFF_INCLUDE_DIR}
-    ${SDKROOT}/LibJPEG/jpeg-9)
+    ${SDKROOT}/LibJPEG/jpeg-9
+)
+
 if(WIN32)
-    include_directories(${SDKROOT}/libpng-1.6.21)
+    include_directories(
+        SYSTEM
+        ${SDKROOT}/libpng-1.6.21
+    )
     if(PLATFORM EQUAL 32)
-        include_directories(${SDKROOT}/quicktime/QT73SDK/CIncludes)
+        include_directories(
+            SYSTEM
+            ${SDKROOT}/quicktime/QT73SDK/CIncludes
+        )
     endif()
 endif()
 
-if(PLATFORM EQUAL 32)
-    _find_toonz_library(TNZLIBS "tnzcore;tnzbase")
-else()
-    _find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")
-endif()
+
+_find_toonz_library(TNZLIBS "tnzcore;tnzbase;toonzlib")
+
 
 if(WIN32)
     set(EXTRA_LIBS
         ${TNZLIBS}
-        vfw32.lib)
+        vfw32.lib
+    )
 elseif(APPLE)
     if(PLATFORM EQUAL 32)
         find_library(CORE_SERVICES_LIB CoreServices)
         set(OSX_10_6_SDK_PATH "")
         if(NOT OSX_10_6_SDK_PATH)
-           message(FATAL_ERROR "Set variable 'OSX_10_6_SDK_PATH'")
+            message(FATAL_ERROR "Set variable 'OSX_10_6_SDK_PATH'")
         endif()
         find_library(QD_LIB
-          NAMES QD
-          PATHS OSX10_6_SDK_PATH)
+            NAMES QD
+            PATHS OSX10_6_SDK_PATH
+        )
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -F ${OSX_10_6_SDK_PATH}")
     endif()
     set(EXTRA_LIBS
@@ -119,11 +149,13 @@ elseif(APPLE)
         ${QT_LIB}
         ${CARBON_LIB}
         ${CORE_SERVICES_LIB}
-        ${QD_LIB})
+        ${QD_LIB}
+    )
 else()
     # Generic Unix
     set(EXTRA_LIBS
-        ${TNZLIBS})
+        ${TNZLIBS}
+    )
 endif()
 
-target_link_libraries(image Qt5::Core Qt5::Network ${Z_LIB} ${GLUT_LIB} ${GL_LIB} ${JPEG_LIB} ${TIFF_LIB} ${PNG_LIB} ${EXTRA_LIBS})
+target_link_libraries(image Qt5::Core Qt5::Gui Qt5::Network ${Z_LIB} ${GLUT_LIB} ${GL_LIB} ${JPEG_LIB} ${TIFF_LIB} ${PNG_LIB} ${EXTRA_LIBS})

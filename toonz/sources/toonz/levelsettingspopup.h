@@ -56,6 +56,9 @@ class LevelSettingsPopup final : public DVGui::Dialog {
   QLabel *m_cameraDpiLabel;
   QLabel *m_imageDpiLabel;
   QLabel *m_imageResLabel;
+  QLabel *m_cameraDpiTitle;
+  QLabel *m_imageDpiTitle;
+  QLabel *m_imageResTitle;
   DVGui::CheckBox *m_doPremultiply;
   DVGui::CheckBox *m_whiteTransp;
   DVGui::CheckBox *m_doAntialias;

@@ -471,7 +471,7 @@ void ClipListViewer::getSelectedClips(std::vector<TFilePath> &selectedClips) {
 
 //-----------------------------------------------------------------------------
 
-QByteArray packStringList(const QStringList &lst) {
+static QByteArray packStringList(const QStringList &lst) {
   QByteArray ba;
   QDataStream ds(&ba, QIODevice::WriteOnly);
   ds << (qint32)lst.size();
@@ -480,7 +480,7 @@ QByteArray packStringList(const QStringList &lst) {
   return ba;
 }
 
-QStringList unpackStringList(const QByteArray &ba) {
+static QStringList unpackStringList(const QByteArray &ba) {
   QStringList lst;
   QDataStream ds(ba);
   qint32 n = 0;

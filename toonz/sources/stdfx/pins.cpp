@@ -12,7 +12,7 @@
 #ifdef _WIN32
 #define ISNAN _isnan
 #else
-#define ISNAN isnan
+#define ISNAN std::isnan
 #endif
 
 namespace {
@@ -138,7 +138,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
   TRectD clippingRect =
       TRectD(tile.m_pos,
              TDimensionD(tile.getRaster()->getLx(), tile.getRaster()->getLy()));
-#if CREATE_GL_CONTEXT_ONE_TIME
+#ifdef CREATE_GL_CONTEXT_ONE_TIME
   int ret = wglMakeCurrent(m_offScreenGL.m_offDC, m_offScreenGL.m_hglRC);
   assert(ret == TRUE);
 #else
@@ -168,7 +168,7 @@ void subCompute(TRasterFxPort &m_input, TTile &tile, double frame,
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
   checkErrorsByGL
-#if !CREATE_GL_CONTEXT_ONE_TIME
+#ifndef CREATE_GL_CONTEXT_ONE_TIME
       TRaster32P rasaux;
   if (!wireframe) {
     TRaster32P texture(texWidth, texHeight);
@@ -428,7 +428,7 @@ void subdivision(const TPointD &p00, const TPointD &p10, const TPointD &p11,
 // ------------------------------------------------------------------------
 #define TINY 1.0e-20
 
-int splitMatrix(double **a, int n, int *index) {
+static int splitMatrix(double **a, int n, int *index) {
   int i, imax = 0, j, k;
   double big, dum, sum, temp;
   double *vv, d;
@@ -482,14 +482,14 @@ int splitMatrix(double **a, int n, int *index) {
       for (i = j + 1; i < n; i++) a[i][j] *= dum;
     }
   }
-  delete vv;
+  delete[] vv;
   return 0;
 }
 
 /*-----------------------------------------------------------------*/
 
-void buildMatrixes(const FourPoints &ss, const FourPoints &dd, double **a,
-                   double *b) {
+static void buildMatrixes(const FourPoints &ss, const FourPoints &dd,
+                          double **a, double *b) {
   int i;
   TPointD s[4], d[4];
 
@@ -515,7 +515,7 @@ void buildMatrixes(const FourPoints &ss, const FourPoints &dd, double **a,
 
 /*-----------------------------------------------------------------*/
 
-void computeSolutions(double **a, int *index, double *b) {
+static void computeSolutions(double **a, int *index, double *b) {
   int i, ii = 0, ip, j;
   double sum;
 
@@ -538,7 +538,7 @@ void computeSolutions(double **a, int *index, double *b) {
 
 /*-----------------------------------------------------------------*/
 
-void solveSystems(double **a, double *bx) {
+static void solveSystems(double **a, double *bx) {
   int index[255], i, count = 0, bad_line;
   double **atmp;
   int n = 8;
@@ -568,8 +568,8 @@ void solveSystems(double **a, double *bx) {
 
 /*-----------------------------------------------------------------*/
 
-void computeTransformation(const FourPoints &s, const FourPoints &d,
-                           TAffine &aff, TPointD &perspectDen) {
+static void computeTransformation(const FourPoints &s, const FourPoints &d,
+                                  TAffine &aff, TPointD &perspectDen) {
   double **a, *b;
 
   int i;

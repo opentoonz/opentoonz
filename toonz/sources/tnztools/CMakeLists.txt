@@ -10,7 +10,8 @@ set(MOC_HEADERS
     ../include/tools/tooloptions.h
     ../include/tools/screenpicker.h
     rgbpickertool.h
-    rulertool.h)
+    rulertool.h
+)
 
 set(HEADERS ${MOC_HEADERS}
     autofill.h
@@ -30,7 +31,8 @@ set(HEADERS ${MOC_HEADERS}
     ../include/tools/tool.h
     ../include/tools/toolcommandids.h
     ../include/tools/toolutils.h
-    ../include/tools/RGBpicker.h)
+    ../include/tools/RGBpicker.h
+)
 
 set(SOURCES
     autofillpli.cpp
@@ -88,7 +90,8 @@ set(SOURCES
     strokeselection.cpp
     screenpicker.cpp
     fingertool.cpp
-    rulertool.cpp)
+    rulertool.cpp
+)
 
 set(RESOURCES tnztools.qrc)
 
@@ -99,7 +102,9 @@ add_translation(tnztools ${HEADERS} ${SOURCES})
 qt5_wrap_cpp(SOURCES ${MOC_HEADERS})
 
 add_library(tnztools SHARED ${HEADERS} ${SOURCES} ${RESOURCES})
-add_definitions(-DTNZTOOLS_EXPORTS)
+add_definitions(
+    -DTNZTOOLS_EXPORTS
+)
 
 if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnztools.dylib")
@@ -108,7 +113,13 @@ endif()
 message("subdir: tnztools")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
-include_directories(../include/tools ${SDKROOT}/superlu/SupperLU_4.1/SRC)
+include_directories(
+    SYSTEM
+    ${SDKROOT}/superlu/SupperLU_4.1/SRC
+)
+include_directories(
+    ../include/tools
+)
 
 _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase;tnzext;toonzlib;toonzqt")
 

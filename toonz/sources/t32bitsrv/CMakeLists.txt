@@ -5,17 +5,22 @@ add_executable(t32bitsrv
     t32fontmsg.cpp
     t32fontmsg.h
     t32movmsg.cpp
-    t32movmsg.h)
+    t32movmsg.h
+)
 
 if(WIN32)
-    include_directories(${SDKROOT}/quicktime/QT73SDK/CIncludes)
+    include_directories(
+        SYSTEM
+        ${SDKROOT}/quicktime/QT73SDK/CIncludes
+    )
 endif()
 
 target_link_libraries(t32bitsrv
     Qt5::Core
     Qt5::Network
     tnzcore
-    image)
+    image
+)
 
 if(APPLE AND PLATFORM EQUAL 32)
     get_target_property(bin t32bitsrv LOCATION)
@@ -30,5 +35,6 @@ if(APPLE AND PLATFORM EQUAL 32)
 
     add_custom_command(TARGET t32bitsrv
         POST_BUILD COMMAND
-        ${CMAKE_INSTALL_NAME_TOOL} -add_rpath @executable_path/. ${bin})
+        ${CMAKE_INSTALL_NAME_TOOL} -add_rpath @executable_path/. ${bin}
+    )
 endif()

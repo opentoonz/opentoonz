@@ -1,8 +1,12 @@
-include_directories(../include)
+include_directories(
+    ../include
+)
 
 add_executable(tfarmserver
-    tfarmserver.cpp)
+    tfarmserver.cpp
+)
 
 target_link_libraries(tfarmserver
     Qt5::Core
-    tfarm)
+    tfarm
+)

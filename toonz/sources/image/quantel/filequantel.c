@@ -1,6 +1,6 @@
 
 
-#if _MSC_VER >= 1400
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
 #define _CRT_SECURE_NO_DEPRECATE 1
 #pragma warning(disable : 4996)
 #endif
@@ -88,7 +88,8 @@ static IMAGE *img_read_region_quantel_interlaced(T_CHAR *fname, int x1, int y1,
 
 /*---------------------------------------------------------------------------*/
 
-static void vpb_string(char *str, int field_type, char **p_h, char *stop) {
+static void vpb_string(const char *str, int field_type, char **p_h,
+                       char *stop) {
   char *h;
   int len;
 
@@ -536,8 +537,8 @@ int img_write_quantel(const T_CHAR *fname, void *buffer, int w, int h,
 
 /*---------------------------------------------------------------------------*/
 
-IMAGE *img_read_region_quantel(T_CHAR *fname, int x1, int y1, int x2, int y2,
-                               int scale, int type) {
+static IMAGE *img_read_region_quantel(T_CHAR *fname, int x1, int y1, int x2,
+                                      int y2, int scale, int type) {
   if (type == SDL_FORMAT)
     return (img_read_region_quantel_no_interlaced(fname, x1, y1, x2, y2, scale,
                                                   type));

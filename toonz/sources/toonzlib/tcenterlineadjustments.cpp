@@ -270,7 +270,7 @@ inline void findRoads(const Sequence &s) {
 //--------------------------------------------------------------------------
 
 // Find the 'roads' of the current Graph.
-void findRoads(const JointSequenceGraph &JSGraph) {
+static void findRoads(const JointSequenceGraph &JSGraph) {
   unsigned int i, j;
 
   // For all Sequence of currGraph, extract roads

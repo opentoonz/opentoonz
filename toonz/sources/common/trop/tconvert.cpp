@@ -11,7 +11,7 @@
 //    Conversion functions
 //******************************************************************
 
-void do_convert(const TRaster64P &dst, const TRaster32P &src) {
+static void do_convert(const TRaster64P &dst, const TRaster32P &src) {
   assert(dst->getSize() == src->getSize());
   int lx = src->getLx();
   for (int y = 0; y < src->getLy(); y++) {
@@ -29,7 +29,7 @@ void do_convert(const TRaster64P &dst, const TRaster32P &src) {
 
 //-----------------------------------------------------------------------------
 
-void do_convert(const TRasterGR8P &dst, const TRaster32P &src) {
+static void do_convert(const TRasterGR8P &dst, const TRaster32P &src) {
   assert(dst->getSize() == src->getSize());
 
   int lx = src->getLx();
@@ -45,7 +45,7 @@ void do_convert(const TRasterGR8P &dst, const TRaster32P &src) {
 
 //-----------------------------------------------------------------------------
 
-void do_convert(const TRasterGR16P &dst, const TRaster32P &src) {
+static void do_convert(const TRasterGR16P &dst, const TRaster32P &src) {
   assert(dst->getSize() == src->getSize());
 
   int lx = src->getLx();
@@ -62,7 +62,7 @@ void do_convert(const TRasterGR16P &dst, const TRaster32P &src) {
 
 //-----------------------------------------------------------------------------
 
-void do_convert(const TRasterGR16P &dst, const TRaster64P &src) {
+static void do_convert(const TRasterGR16P &dst, const TRaster64P &src) {
   assert(dst->getSize() == src->getSize());
   int lx = src->getLx();
   for (int y = 0; y < src->getLy(); y++) {
@@ -79,7 +79,7 @@ void do_convert(const TRasterGR16P &dst, const TRaster64P &src) {
 
 //-----------------------------------------------------------------------------
 
-void do_convert(const TRaster32P &dst, const TRasterGR8P &src) {
+static void do_convert(const TRaster32P &dst, const TRasterGR8P &src) {
   assert(dst->getSize() == src->getSize());
   int lx = src->getLx();
   for (int y = 0; y < src->getLy(); y++) {
@@ -150,7 +150,7 @@ inline void ditherConvert(TRaster64P inRas, TRaster32P outRas) {
 //    Obsolete conversion functions
 //******************************************************************
 
-void do_convert(const TRasterCM32P &dst, const TRasterGR8P &src) {
+static void do_convert(const TRasterCM32P &dst, const TRasterGR8P &src) {
   assert(dst->getSize() == src->getSize());
   TPixelCM32 bg = TPixelCM32(0, 0, TPixelCM32::getMaxTone());
 
@@ -169,7 +169,7 @@ void do_convert(const TRasterCM32P &dst, const TRasterGR8P &src) {
 
 //-----------------------------------------------------------------------------
 
-void do_convert(const TRasterCM32P &dst, const TRaster32P &src) {
+static void do_convert(const TRasterCM32P &dst, const TRaster32P &src) {
   assert(dst->getSize() == src->getSize());
   TPixelCM32 bg = TPixelCM32(0, 0, TPixelCM32::getMaxTone());
 
@@ -220,7 +220,7 @@ void do_convert(const TRasterCM32P &dst, const TRaster32P &src) {
 
 //-----------------------------------------------------------------------------
 
-void do_convert(const TRasterYUV422P &dst, const TRaster32P &src) {
+static void do_convert(const TRasterYUV422P &dst, const TRaster32P &src) {
   assert(src->getLx() & 0);
   long y1, y2, u, v, u1, u2, v1, v2;
   TPixel32 *pix     = (TPixel32 *)src->pixels();
@@ -271,7 +271,7 @@ void do_convert(const TRasterYUV422P &dst, const TRaster32P &src) {
 
 //-----------------------------------------------------------------------------
 
-void do_convert(const TRaster32P &dst, const TRasterYUV422P &src) {
+static void do_convert(const TRaster32P &dst, const TRasterYUV422P &src) {
   int long r, g, b, y1, y2, u, v;
   TPixel32 *buf     = dst->pixels();
   const UCHAR *in   = src->getRawData();

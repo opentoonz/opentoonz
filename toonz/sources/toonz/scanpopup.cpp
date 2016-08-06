@@ -800,7 +800,7 @@ void MyScannerListener::cancelButtonPressed() {
 
 //=============================================================================
 //
-void doScan() {
+static void doScan() {
   if (!checkScannerDefinition()) return;
   ScanList scanList;
   if (scanList.areScannedFramesSelected()) {

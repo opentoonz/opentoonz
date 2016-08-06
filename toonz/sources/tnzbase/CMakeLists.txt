@@ -1,6 +1,7 @@
 set(MOC_HEADERS
     ../include/tcacheresourcepool.h
-    ../common/tfx/trendererP.h)
+    ../common/tfx/trendererP.h
+)
 
 set(HEADERS ${MOC_HEADERS}
     ../common/twain/ttwain.h
@@ -61,7 +62,8 @@ set(HEADERS ${MOC_HEADERS}
     ../include/tparser.h
     ../include/ttokenizer.h
     ../include/tunit.h
-    ../include/tzeraryfx.h)
+    ../include/tzeraryfx.h
+)
 
 set(SOURCES
     permissionsmanager.cpp
@@ -109,14 +111,17 @@ set(SOURCES
     ../common/expressions/ttokenizer.cpp
     ../common/tunit/tunit.cpp
     tscanner/tscannerutil.cpp
-    tscanner/tscannerepson.cpp)
+    tscanner/tscannerepson.cpp
+)
 
 if(WIN32)
     set(SOURCES ${SOURCES}
-        tscanner/TScannerIO/TUSBScannerIO_W.cpp)
+        tscanner/TScannerIO/TUSBScannerIO_W.cpp
+    )
 else()
     set(SOURCES ${SOURCES}
-        tscanner/TScannerIO/TUSBScannerIO_M.cpp)
+        tscanner/TScannerIO/TUSBScannerIO_M.cpp
+    )
 endif()
 
 set(OBJCSOURCES
@@ -127,23 +132,27 @@ set(OBJCSOURCES
     ../common/twain/ttwain_util.c
     ../common/twain/ttwain_win.c
     tscanner/tscanner.cpp
-    tscanner/tscannertwain.cpp)
+    tscanner/tscannertwain.cpp
+)
 
 if(WIN32)
     set(OBJCSOURCES ${OBJCSOURCES}
         ../common/twain/ttwain_stateW.c
         ../common/twain/ttwain_utilW.c
-        ../common/twain/ttwain_winW.c)
+        ../common/twain/ttwain_winW.c
+    )
 elseif(APPLE)
     set(OBJCSOURCES ${OBJCSOURCES}
         ../common/twain/ttwain_stateM.c
         ../common/twain/ttwain_utilM.c
-        ../common/twain/ttwain_winM.c)
+        ../common/twain/ttwain_winM.c
+    )
 elseif(UNIX)
     set(OBJCSOURCES ${OBJCSOURCES}
         ../common/twain/ttwain_stateX.c
         ../common/twain/ttwain_utilX.c
-        ../common/twain/ttwain_winX.c)
+        ../common/twain/ttwain_winX.c
+    )
 endif()
 
 if(APPLE)
@@ -159,7 +168,14 @@ if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzbase.dylib")
 endif()
 
-add_definitions(-DTNZBASE_EXPORTS -DTPARAM_EXPORTS -DTXSHEET_EXPORTS -DTFX_EXPORTS -DTAPPTOOLS_EXPORTS -DTTEST_EXPORTS)
+add_definitions(
+    -DTNZBASE_EXPORTS
+    -DTPARAM_EXPORTS
+    -DTXSHEET_EXPORTS
+    -DTFX_EXPORTS
+    -DTAPPTOOLS_EXPORTS
+    -DTTEST_EXPORTS
+)
 
 message("subdir: tnzbase")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
@@ -167,11 +183,16 @@ message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 #message("Exe: " ${EXECUTABLE_OUTPUT_PATH})
 #message("Sources:" ${SOURCES})
 
-include_directories(../common/flash ${SDKROOT}/libusb/libusb-1.0.9/include)
+include_directories(
+    SYSTEM
+    ../common/flash
+    ${SDKROOT}/libusb/libusb-1.0.9/include
+)
 
 if(WIN32)
     set(EXTRA_LIBS
-        tnzcore)
+        tnzcore
+    )
 elseif(APPLE)
     find_library(TWAIN_LIB TWAIN)
     find_library(IOKIT_LIB IOKit)
@@ -182,14 +203,20 @@ elseif(APPLE)
         ${USB_LIB}
         ${TWAIN_LIB}
         ${IOKIT_LIB}
-        ${COCOA_LIB})
+        ${COCOA_LIB}
+    )
 
     target_link_libraries(tnzbase Qt5::Core Qt5::Gui)
 elseif(UNIX)
     _find_toonz_library(EXTRA_LIBS "tnzcore")
     set(EXTRA_LIBS ${EXTRA_LIBS}
-        ${SDL_LIB_LIBRARIES})
+        ${SDL_LIB_LIBRARIES}
+    )
 
+    include_directories(
+        SYSTEM
+        ${SDL_LIB_INCLUDE_DIRS}
+    )
     target_link_libraries(tnzbase Qt5::Core Qt5::Gui)
 endif()
 

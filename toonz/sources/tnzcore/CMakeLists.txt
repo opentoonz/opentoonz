@@ -5,7 +5,8 @@ set(MOC_HEADERS
     ../include/tipcsrv.h
     ../include/tipcsrvP.h
     ../include/tmsgcore.h
-    ../include/tfunctorinvoker.h)
+    ../include/tfunctorinvoker.h
+)
 
 set(HEADERS ${MOC_HEADERS}
     ../common/trop/loop_macros.h
@@ -118,7 +119,8 @@ set(HEADERS ${MOC_HEADERS}
     ../include/t32bitsrv_wrap.h
     ../include/tenv.h
     ../include/tmeshimage.h
-    ../include/tgldisplaylistsmanager.h)
+    ../include/tgldisplaylistsmanager.h
+)
 
 set(SOURCES
     ../common/tcore/tdata.cpp
@@ -240,25 +242,31 @@ set(SOURCES
     ../common/tsystem/tsystempd.cpp
     ../common/tapptools/tenv.cpp
     ../common/tmeshimage/tmeshimage.cpp
-    ../common/tmsgcore.cpp)
+    ../common/tmsgcore.cpp
+)
 
 if(WIN32)
     set(SOURCES ${SOURCES}
         ../common/tsound/tsound_nt.cpp
-        ../common/tvrender/tfont_nt.cpp)
+        ../common/tvrender/tfont_nt.cpp
+    )
 elseif(APPLE)
     set(SOURCES ${SOURCES}
         ../common/tsound/tsound_mac.cpp
-        ../common/tvrender/tfont_mac.cpp)
+        ../common/tvrender/tfont_mac.cpp
+    )
 elseif(UNIX)
     set(SOURCES ${SOURCES}
-        ../common/tvrender/tfont_qt.cpp)
+        ../common/tvrender/tfont_qt.cpp
+    )
     if(SDL_LIB_FOUND)
         set(SOURCES ${SOURCES}
-            ../common/tsound/tsound_sdl.cpp)
+            ../common/tsound/tsound_sdl.cpp
+        )
     else()
         set(SOURCES ${SOURCES}
-            ../common/tsound/tsound_x.cpp)
+            ../common/tsound/tsound_x.cpp
+        )
     endif()
 endif()
 
@@ -272,15 +280,38 @@ if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzcore.dylib")
 endif()
 
-add_definitions(-DTNZCORE_EXPORTS -DTCOLOR_EXPORTS -DTGEOMETRY_EXPORTS -DTRASTER_EXPORTS -DTIMAGE_EXPORTS -DTSYSTEM_EXPORTS -DTVECTORIMAGE_EXPORTS -DTGL_EXPORTS -DTSOUND_EXPORTS -DTIMAGE_IO_EXPORTS -DTRASTERIMAGE_EXPORTS -DTVRENDER_EXPORTS -DTFLASH_EXPORTS -DTROP_EXPORTS -DTSTREAM_EXPORTS)
+add_definitions(
+    -DTNZCORE_EXPORTS
+    -DTCOLOR_EXPORTS
+    -DTGEOMETRY_EXPORTS
+    -DTRASTER_EXPORTS
+    -DTIMAGE_EXPORTS
+    -DTSYSTEM_EXPORTS
+    -DTVECTORIMAGE_EXPORTS
+    -DTGL_EXPORTS
+    -DTSOUND_EXPORTS
+    -DTIMAGE_IO_EXPORTS
+    -DTRASTERIMAGE_EXPORTS
+    -DTVRENDER_EXPORTS
+    -DTFLASH_EXPORTS
+    -DTROP_EXPORTS
+    -DTSTREAM_EXPORTS
+)
 
 message("subdir: tnzcore")
-message("Sources:" ${SOURCES})
+#message("Sources:" ${SOURCES})
 
-include_directories(../common/flash ${SDKROOT}/Lz4/Lz4_131/lib/)
+include_directories(
+    SYSTEM
+    ../common/flash
+    ${SDKROOT}/Lz4/Lz4_131/lib/
+)
 if(WIN32)
     if(PLATFORM EQUAL 32)
-        include_directories(${SDKROOT}/quicktime/QT73SDK/CIncludes)
+        include_directories(
+            SYSTEM
+            ${SDKROOT}/quicktime/QT73SDK/CIncludes
+        )
     endif()
 endif()
 
@@ -290,7 +321,8 @@ if(WIN32)
         mpr.lib
         winmm.lib
         opengl32.lib
-        glu32.lib)
+        glu32.lib
+    )
 elseif(APPLE)
     find_library(AUDIOUNIT_LIB AudioUnit)
     find_library(AUDIOTB_LIB AudioToolbox)
@@ -299,15 +331,21 @@ elseif(APPLE)
     set(EXTRA_LIBS
         ${AUDIOUNIT_LIB}
         ${AUDIOTB_LIB}
-        ${CARBON_LIB})
+        ${CARBON_LIB}
+    )
 elseif(UNIX)
     set(QT_LIB)  # avoid warning
-    include_directories(${FREETYPE_INCLUDE_DIRS})
+    include_directories(
+        SYSTEM
+        ${FREETYPE_INCLUDE_DIRS}
+    )
     set(EXTRA_LIBS
-        ${GLU_LIB})
+        ${GLU_LIB}
+    )
 endif()
 
 target_link_libraries(tnzcore
     Qt5::OpenGL Qt5::Network
     ${GL_LIB} ${GLUT_LIB} ${QT_LIB} ${Z_LIB} ${JPEG_LIB} ${LZ4_LIB}
-    ${EXTRA_LIBS})
+    ${EXTRA_LIBS}
+)

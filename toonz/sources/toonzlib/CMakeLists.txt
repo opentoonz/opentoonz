@@ -151,7 +151,8 @@ set(MOC_HEADERS
     sandor_fxs/YOMBInputParam.h
     sandor_fxs/YOMBParam.h
     texturemanager.h
-    imagebuilders.h)
+    imagebuilders.h
+)
 
 set(HEADERS ${MOC_HEADERS})
 
@@ -308,11 +309,13 @@ set(SOURCES
     tbinarizer.cpp
     plasticdeformerfx.cpp
     txshmeshcolumn.cpp
-    textureutils.cpp)
+    textureutils.cpp
+)
 
 if(WIN32)
     set(SOURCES ${SOURCES}
-        avicodecrestrictions.cpp)
+        avicodecrestrictions.cpp
+    )
 endif()
 
 add_translation(toonzlib ${HEADERS} ${SOURCES})
@@ -324,27 +327,34 @@ if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtoonzlib.dylib")
 endif()
 
-add_definitions(-DTOONZLIB_EXPORTS)
+add_definitions(
+    -DTOONZLIB_EXPORTS
+)
 
 message("subdir: toonzlib")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
 
 include_directories(
+    SYSTEM
+    ${SDKROOT}/libusb/libusb-1.0.9/include
+)
+include_directories(
     ../toonzfarm/include
-    ${SDKROOT}/libusb/libusb-1.0.9/include)
-
+)
 
 if(WIN32)
     target_link_libraries(toonzlib
         Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script
         ${GLUT_LIB} ${GL_LIB} vfw32.lib
-        tnzcore tnzbase tnzext)
+        tnzcore tnzbase tnzext
+    )
 elseif(APPLE)
     set(EXTRA_LIBS
         ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.dylib
         ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.dylib
         ${CMAKE_CURRENT_BINARY_DIR}/../tnzext/libtnzext.dylib
-        ${USB_LIB})
+        ${USB_LIB}
+    )
 
     target_link_libraries(toonzlib Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Script ${GLUT_LIB} ${GL_LIB} ${EXTRA_LIBS})
 elseif(UNIX)

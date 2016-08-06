@@ -394,9 +394,9 @@ bool MyMultimediaRenderListener::onFrameFailed(int frame, int column,
 
 //==================================================================================
 
-std::pair<int, int> generateMovie(ToonzScene *scene, const TFilePath &fp,
-                                  int r0, int r1, int step, int shrink,
-                                  int threadCount, int maxTileSize) {
+static std::pair<int, int> generateMovie(ToonzScene *scene, const TFilePath &fp,
+                                         int r0, int r1, int step, int shrink,
+                                         int threadCount, int maxTileSize) {
   QWaitCondition renderCompleted;
 
   // riporto gli indici a base zero
@@ -565,7 +565,7 @@ int main(int argc, char *argv[]) {
 
   // Create a QObject destroyed just before app - see Tnz6's main.cpp for
   // rationale
-  std::auto_ptr<QObject> mainScope(new QObject(&app));
+  std::unique_ptr<QObject> mainScope(new QObject(&app));
   mainScope->setObjectName("mainScope");
 
 #ifdef _WIN32

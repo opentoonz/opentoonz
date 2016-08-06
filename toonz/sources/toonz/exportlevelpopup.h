@@ -141,7 +141,7 @@ private:
 
   DVGui::MeasuredDoubleLineEdit *m_resScale;
 
-  QLabel *m_dpiLabel;
+  QLabel *m_dpiLabel, *m_widthLabel, *m_heightLabel;
 
   QComboBox *m_thicknessTransformMode;
 

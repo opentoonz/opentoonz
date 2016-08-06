@@ -317,7 +317,7 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame,
 
   TScale worldMeshToMeshAff(meshDpi.x / Stage::inch, meshDpi.y / Stage::inch);
 
-  std::auto_ptr<const PlasticDeformerDataGroup> dataGroup(
+  std::unique_ptr<const PlasticDeformerDataGroup> dataGroup(
       PlasticDeformerStorage::instance()->processOnce(
           sdFrame, mi.getPointer(), sd.getPointer(), sd->skeletonId(sdFrame),
           worldMeshToMeshAff));
@@ -356,7 +356,7 @@ void PlasticDeformerFx::doCompute(TTile &tile, double frame,
     const std::string &texId = "render_tex " + std::to_string(++var);
 
     // Prepare an OpenGL context
-    std::auto_ptr<TOfflineGL> context(
+    std::unique_ptr<TOfflineGL> context(
         new TOfflineGL(tile.getRaster()->getSize()));
     context->makeCurrent();
 

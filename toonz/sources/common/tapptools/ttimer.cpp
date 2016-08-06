@@ -124,8 +124,8 @@ void CALLBACK ElapsedTimeCB(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1,
 };
 #elif LINUX
 
-#include <SDL/SDL_timer.h>
-#include <SDL/SDL.h>
+#include <SDL_timer.h>
+#include <SDL.h>
 #include "tthread.h"
 namespace {
 Uint32 ElapsedTimeCB(Uint32 interval, void *param);
@@ -187,7 +187,7 @@ Uint32 ElapsedTimeCB(Uint32 interval, void *param) {
 }
 }
 
-#elif __sgi
+#elif defined(__sgi)
 class TTimer::Imp {
 public:
   Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *timer)
@@ -219,7 +219,7 @@ public:
 
   TGenericTimerAction *m_action;
 };
-#elif MACOSX
+#elif defined(MACOSX)
 class TTimer::Imp {
 public:
   Imp(std::string name, UINT timerRes, TTimer::Type type, TTimer *timer)

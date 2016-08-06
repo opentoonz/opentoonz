@@ -66,12 +66,12 @@ class ParamCalculatorNode final : public CalculatorNode,
                                   public TParamObserver,
                                   public boost::noncopyable {
   TDoubleParamP m_param;
-  std::auto_ptr<CalculatorNode> m_frame;
+  std::unique_ptr<CalculatorNode> m_frame;
 
 public:
   ParamCalculatorNode(Calculator *calculator, const TDoubleParamP &param,
-                      std::auto_ptr<CalculatorNode> frame)
-      : CalculatorNode(calculator), m_param(param), m_frame(frame) {
+                      std::unique_ptr<CalculatorNode> frame)
+      : CalculatorNode(calculator), m_param(param), m_frame(std::move(frame)) {
     param->addObserver(this);
   }
 
@@ -122,15 +122,15 @@ class XsheetDrawingCalculatorNode final : public CalculatorNode,
   TXsheet *m_xsh;
   int m_columnIndex;
 
-  std::auto_ptr<CalculatorNode> m_frame;
+  std::unique_ptr<CalculatorNode> m_frame;
 
 public:
   XsheetDrawingCalculatorNode(Calculator *calc, TXsheet *xsh, int columnIndex,
-                              std::auto_ptr<CalculatorNode> frame)
+                              std::unique_ptr<CalculatorNode> frame)
       : CalculatorNode(calc)
       , m_xsh(xsh)
       , m_columnIndex(columnIndex)
-      , m_frame(frame) {}
+      , m_frame(std::move(frame)) {}
 
   double compute(double vars[3]) const override {
     double f = m_frame->compute(vars);
@@ -265,7 +265,7 @@ public:
                   const std::vector<Token> &tokens) const override {
     assert(tokens.size() >= 3);
 
-    std::auto_ptr<CalculatorNode> frameNode(
+    std::unique_ptr<CalculatorNode> frameNode(
         (tokens.size() == 6) ? popNode(stack)
                              : new VariableNode(calc, CalculatorNode::FRAME));
 
@@ -274,14 +274,15 @@ public:
     std::string field = toLower(tokens[2].getText());
     if (field == "cell" || field == "cel" || field == "cels") {
       int columnIndex = objectId.getIndex();
-      stack.push_back(
-          new XsheetDrawingCalculatorNode(calc, m_xsh, columnIndex, frameNode));
+      stack.push_back(new XsheetDrawingCalculatorNode(calc, m_xsh, columnIndex,
+                                                      std::move(frameNode)));
     } else {
       TStageObject *object              = m_xsh->getStageObject(objectId);
       TStageObject::Channel channelName = matchChannelName(tokens[2]);
       TDoubleParam *channel             = object->getParam(channelName);
       if (channel)
-        stack.push_back(new ParamCalculatorNode(calc, channel, frameNode));
+        stack.push_back(
+            new ParamCalculatorNode(calc, channel, std::move(frameNode)));
     }
   }
 };
@@ -388,7 +389,7 @@ public:
                   const std::vector<Token> &tokens) const override {
     int tokenSize = tokens.size();
 
-    std::auto_ptr<CalculatorNode> frameNode(
+    std::unique_ptr<CalculatorNode> frameNode(
         (tokenSize > 0 && tokens.back().getText() == ")")
             ? popNode(stack)
             : new VariableNode(calc, CalculatorNode::FRAME));
@@ -409,7 +410,8 @@ public:
       channel = param;
 
     if (channel.getPointer())
-      stack.push_back(new ParamCalculatorNode(calc, channel, frameNode));
+      stack.push_back(
+          new ParamCalculatorNode(calc, channel, std::move(frameNode)));
   }
 };
 
@@ -526,7 +528,7 @@ public:
                   const std::vector<Token> &tokens) const override {
     assert(tokens.size() > COMPONENT);
 
-    std::auto_ptr<CalculatorNode> frameNode(
+    std::unique_ptr<CalculatorNode> frameNode(
         (tokens.size() == POSITIONS_COUNT)
             ? popNode(stack)
             : new VariableNode(calc, CalculatorNode::FRAME));
@@ -550,7 +552,8 @@ public:
           if (component != componentsEnd) {
             const TDoubleParamP &param =
                 skvd->m_params[component->m_paramId].getPointer();
-            stack.push_back(new ParamCalculatorNode(calc, param, frameNode));
+            stack.push_back(
+                new ParamCalculatorNode(calc, param, std::move(frameNode)));
           }
         }
       }

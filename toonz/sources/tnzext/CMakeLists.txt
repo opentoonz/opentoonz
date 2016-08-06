@@ -34,7 +34,8 @@ set(HEADERS
     ../include/tlin/tlin_matrix.h
     ../include/tlin/tlin_sparsemat.h
     ../include/tlin/tlin_superlu_wrap.h
-    ../include/tlin/tlin_vector.h)
+    ../include/tlin/tlin_vector.h
+)
 
 set(SOURCES
     ContextStatus.cpp
@@ -65,7 +66,11 @@ set(SOURCES
     plasticskeletondeformation.cpp
     ttexturesstorage.cpp
     tlin/tlin_cblas_wrap.cpp
-    tlin/tlin_superlu_wrap.cpp)
+    tlin/tlin_superlu_wrap.cpp
+)
+
+set(OBJCSOURCES
+)
 
 if(WIN32 AND PLATFORM EQUAL 32)
     # can not link libopenblas_32.lib with SAFESEH
@@ -78,7 +83,9 @@ if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libtnzext.dylib")
 endif()
 
-add_definitions(-DTNZEXT_EXPORTS)
+add_definitions(
+    -DTNZEXT_EXPORTS
+)
 
 message("subdir: tnzext")
 message("Bin: " ${CMAKE_CURRENT_BINARY_DIR})
@@ -87,21 +94,27 @@ if(APPLE)
     find_library(ACCE_LIB Accelerate)
 endif()
 
-include_directories(${SDKROOT}/superlu/SuperLU_4.1/SRC)
+include_directories(
+    SYSTEM
+    ${SDKROOT}/superlu/SuperLU_4.1/SRC
+)
 
 if(WIN32)
     target_link_libraries(tnzext
         Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network
         ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${OPENBLAS_LIB} ${EXTRA_LIBS}
-        tnzcore tnzbase)
+        tnzcore tnzbase
+    )
 elseif(APPLE)
     set(EXTRA_LIBS
         ${CMAKE_CURRENT_BINARY_DIR}/../tnzcore/libtnzcore.dylib
-        ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.dylib)
+        ${CMAKE_CURRENT_BINARY_DIR}/../tnzbase/libtnzbase.dylib
+    )
 
     target_link_libraries(tnzext
         Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network
-        ${ACCE_LIB} ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${EXTRA_LIBS})
+        ${ACCE_LIB} ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${EXTRA_LIBS}
+    )
 elseif(UNIX)
     _find_toonz_library(EXTRA_LIBS "tnzcore;tnzbase")
 
@@ -109,5 +122,6 @@ elseif(UNIX)
 
     target_link_libraries(tnzext
         Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Network
-        ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${EXTRA_LIBS})
+        ${GLUT_LIB} ${GL_LIB} ${SUPERLU_LIB} ${EXTRA_LIBS}
+    )
 endif()

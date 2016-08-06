@@ -79,7 +79,9 @@ IGS_LINE_BLUR_EXPORT void convert(
 #include <iostream>
 #include <stdexcept>
 
+#ifdef _WIN32
 #include <windows.h>
+#endif
 
 namespace {
 

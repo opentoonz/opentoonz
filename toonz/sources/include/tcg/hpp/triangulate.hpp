@@ -9,12 +9,12 @@
 #include "../point_ops.h"
 
 // OS-specific includes
-#ifdef WIN32
+#if defined(_WIN32)
 #include "windows.h"
 #include <GL/glu.h>
-#elif MACOSX
+#elif defined(MACOSX)
 #include <GLUT/glut.h>
-#elif LINUX
+#elif defined(LINUX)
 #include <GL/glut.h>
 #include <cstring>
 #endif

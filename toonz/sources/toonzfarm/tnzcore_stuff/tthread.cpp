@@ -40,13 +40,13 @@ public:
   void join();
   void cancel();
 
-#if defined(WIN32) && (_MSC_VER == 1200)
+#if defined(_WIN32) && (_MSC_VER == 1200)
 #pragma warning(disable : 4290)
 #endif
 
   static void milestone() throw(TThread::Interrupt);
 
-#if defined(WIN32) && (_MSC_VER == 1200)
+#if defined(_WIN32) && (_MSC_VER == 1200)
 #pragma warning(default : 4290)
 #endif
 
@@ -240,7 +240,7 @@ void Thread::cancel() {
 
 //------------------------------------------------------------------------------
 // static member function
-#if defined(WIN32) && (_MSC_VER == 1200)
+#if defined(_WIN32) && (_MSC_VER == 1200)
 #pragma warning(disable : 4290)
 #endif
 
@@ -252,7 +252,7 @@ void Thread::milestone() throw(TThread::Interrupt) {
   if (Thread::Imp::m_state[key.m_id]) throw TThread::Interrupt();
 }
 
-#if defined(WIN32) && (_MSC_VER == 1200)
+#if defined(_WIN32) && (_MSC_VER == 1200)
 #pragma warning(default : 4290)
 #endif
 
@@ -278,13 +278,13 @@ void ThreadGroup::joinAll() { m_imp->m_boostThreadGroup.join_all(); }
 
 //==============================================================================
 
-#if defined(WIN32) && (_MSC_VER == 1200)
+#if defined(_WIN32) && (_MSC_VER == 1200)
 #pragma warning(disable : 4290)
 #endif
 
 void TThread::milestone() throw(TThread::Interrupt) { Thread::milestone(); }
 
-#if defined(WIN32) && (_MSC_VER == 1200)
+#if defined(_WIN32) && (_MSC_VER == 1200)
 #pragma warning(default : 4290)
 #endif
 

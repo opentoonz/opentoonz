@@ -410,6 +410,10 @@
         <source>Watercolor</source>
         <translation>Aquarello</translation>
     </message>
+    <message>
+        <source>Distance</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>TMatrioskaStrokeStyle</name>

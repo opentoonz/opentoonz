@@ -3,17 +3,22 @@ set(HEADERS
     aiff/tsio_aiff.h
     raw/tsio_raw.h
     ../include/tnzsound.h
-    tsio.h)
+    tsio.h
+)
 
 set(SOURCES
     tsio.cpp
     tsioutils.cpp
     wav/tsio_wav.cpp
     aiff/tsio_aiff.cpp
-    raw/tsio_raw.cpp)
+    raw/tsio_raw.cpp
+)
     
 add_library(sound SHARED ${HEADERS} ${SOURCES})
-add_definitions(-DSOUND_EXPORTS)
+add_definitions(
+    -DSOUND_EXPORTS
+)
+
 if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-install_name,@rpath/libsound.dylib")
 endif()

@@ -3,6 +3,7 @@
 #include "trop.h"
 #include "loop_macros.h"
 #include "tpixelutils.h"
+#include "quickputP.h"
 
 #ifndef TNZCORE_LIGHT
 #include "tpalette.h"
@@ -4276,18 +4277,20 @@ void quickPut(const TRasterP &dn, const TRasterP &up, const TAffine &aff,
     else
       doQuickPutNoFilter(dn32, up8, aff, colorScale);
   } else if (dn32 && up32) {
-    if (areAlmostEqual(aff.a12, 0) && areAlmostEqual(aff.a21, 0))
+    if (areAlmostEqual(aff.a12, 0) && areAlmostEqual(aff.a21, 0)) {
       if (bilinear)
         doQuickPutFilter(dn32, up32, aff.a11, aff.a22, aff.a13, aff.a23);
-      else
+      else {
         doQuickPutNoFilter(dn32, up32, aff.a11, aff.a22, aff.a13, aff.a23,
                            colorScale, doPremultiply, whiteTransp, firstColumn,
                            doRasterDarkenBlendedView);
-    else if (bilinear)
+      }
+    } else if (bilinear)
       doQuickPutFilter(dn32, up32, aff);
-    else
+    else {
       doQuickPutNoFilter(dn32, up32, aff, colorScale, doPremultiply,
                          whiteTransp, firstColumn, doRasterDarkenBlendedView);
+    }
   } else if (dn32 && up64)
     doQuickPutNoFilter(dn32, up64, aff, doPremultiply, firstColumn);
   else

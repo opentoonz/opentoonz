@@ -1,6 +1,6 @@
 
 
-#if _MSC_VER >= 1400
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
 #define _CRT_SECURE_NO_DEPRECATE 1
 #pragma warning(disable : 4996)
 #endif
@@ -70,7 +70,7 @@ struct TgaHeader {
 
 //============================================================
 
-void readTgaHeader(TgaHeader &header, FILE *chan) {
+static void readTgaHeader(TgaHeader &header, FILE *chan) {
   header.IdentificationField = fgetc(chan);
   header.ColorMapType        = fgetc(chan);
   header.ImageTypeCode       = fgetc(chan);
@@ -87,7 +87,7 @@ void readTgaHeader(TgaHeader &header, FILE *chan) {
 
 //------------------------------------------------------------
 
-void writeTgaHeader(TgaHeader &header, FILE *chan) {
+static void writeTgaHeader(TgaHeader &header, FILE *chan) {
   fputc(header.IdentificationField, chan);
   fputc(header.ColorMapType, chan);
   fputc(header.ImageTypeCode, chan);

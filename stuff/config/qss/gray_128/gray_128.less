@@ -195,6 +195,19 @@ QCheckBox {
 	}
 }
 
+QGroupBox {
+	border: 1px solid;
+	.set_margin( 5px, 5px );
+	.set_padding( 3px, 5px );
+	&::title {
+		subcontrol-origin: margin;
+		padding: 0px;
+		margin-top: -4px;
+		/*bottom: 3px;*/
+		left: 15px;
+	}
+}
+
 /* ------ Toonz Classes Difinitions ------ */
 
 /* ------ Palette ------ */
@@ -1157,4 +1170,8 @@ QDialog #dialogButtonFrame {
 	&:hover {
 		background-color: rgb(220,220,220);
 	}
+}
+
+#LargeSizedText {
+    font-size: 17px;
 }

@@ -187,7 +187,7 @@ OutputSettingsPopup::OutputSettingsPopup(bool isPreview)
     removePresetButton       = new QPushButton(tr("Remove"), this);
     m_presetCombo            = new QComboBox(this);
 
-    m_doStereoscopy = new DVGui::CheckBox("Do stereoscopy", this);
+    m_doStereoscopy = new DVGui::CheckBox(tr("Do stereoscopy"), this);
     m_stereoShift   = new DVGui::DoubleLineEdit(this, 0.05);
   }
   // Threads
@@ -943,6 +943,13 @@ void OutputSettingsPopup::onFormatChanged(const QString &str) {
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 
   if (m_presetCombo) m_presetCombo->setCurrentIndex(0);
+  if (str == "mp4" || str == "gif" || str == "webm") {
+    m_threadsComboOm->setDisabled(true);
+    m_threadsComboOm->setCurrentIndex(0);
+  } else {
+    m_threadsComboOm->setDisabled(false);
+    m_threadsComboOm->setCurrentIndex(2);
+  }
 }
 
 //-----------------------------------------------------------------------------

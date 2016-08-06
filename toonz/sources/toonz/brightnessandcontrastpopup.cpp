@@ -301,7 +301,7 @@ BrightnessAndContrastPopup::BrightnessAndContrastPopup()
 
   //--------------------------- Button ----------------------------
 
-  m_okBtn = new QPushButton(QString("Apply"), this);
+  m_okBtn = new QPushButton(QString(tr("Apply")), this);
   connect(m_okBtn, SIGNAL(clicked()), this, SLOT(apply()));
 
   addButtonBarWidget(m_okBtn);

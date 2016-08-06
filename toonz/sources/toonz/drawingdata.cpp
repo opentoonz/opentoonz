@@ -385,7 +385,7 @@ TImageP DrawingData::getImage(QString imageId, TXshSimpleLevel *sl,
       ToonzScene *scene = sl->getScene();
       assert(scene);
 
-      std::auto_ptr<VectorizerConfiguration> config(
+      std::unique_ptr<VectorizerConfiguration> config(
           scene->getProperties()
               ->getVectorizerParameters()
               ->getCurrentConfiguration(0.0));

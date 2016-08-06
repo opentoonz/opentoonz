@@ -107,7 +107,7 @@ public:
 
 extern "C" {
 
-void sdl_fill_audio(void *udata, Uint8 *stream, int len) {
+static void sdl_fill_audio(void *udata, Uint8 *stream, int len) {
   TSoundOutputDeviceImp *_this = (TSoundOutputDeviceImp *)udata;
   MyData *myData               = _this->m_data;
 
@@ -284,7 +284,7 @@ void TSoundOutputDeviceImp::play(const TSoundTrackP &st, TINT32 s0, TINT32 s1,
 #endif
 
   //	myData->maxPacketSize = fileASBD.mFramesPerPacket *
-  //fileASBD.mBytesPerFrame;
+  // fileASBD.mBytesPerFrame;
   {
     // TThread::ScopedLock sl(MutexOut);
     m_isPlaying = true;

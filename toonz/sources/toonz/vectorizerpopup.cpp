@@ -243,7 +243,8 @@ void Vectorizer::setLevel(const TXshSimpleLevelP &level) {
   // Build the new level name
   std::wstring levelName = sl->getName() + L"v";
   {
-    std::auto_ptr<NameBuilder> nameBuilder(NameBuilder::getBuilder(levelName));
+    std::unique_ptr<NameBuilder> nameBuilder(
+        NameBuilder::getBuilder(levelName));
 
     for (;;) {
       levelName = nameBuilder->getNext();
@@ -1411,8 +1412,8 @@ void VectorizerPopup::saveParameters() {
       // Replace data to be saved
       VectorizerParameters *params = getCurrentVectorizerParameters();
 
-      std::auto_ptr<TPersist> paramsClone(new VectorizerParameters(*params));
-      levelSettings.insert(paramsClone);
+      levelSettings.insert(
+          std::unique_ptr<TPersist>(new VectorizerParameters(*params)));
 
       // Save the new settings
       TOStream os(fp);

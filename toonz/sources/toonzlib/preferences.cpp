@@ -208,14 +208,15 @@ bool Preferences::LevelFormat::matches(const TFilePath &fp) const {
 //**********************************************************************************
 
 Preferences::Preferences()
-    : m_units("mm")
+    : m_pixelsOnly(false)
+    , m_units("mm")
     , m_cameraUnits("inch")
     , m_currentRoomChoice("Default")
     , m_scanLevelType("tif")
     , m_defLevelWidth(0.0)
     , m_defLevelHeight(0.0)
     , m_defLevelDpi(0.0)
-    , m_iconSize(160, 120)
+    , m_iconSize(160, 90)
     , m_blankColor(TPixel32::White)
     , m_frontOnionColor(TPixel::Black)
     , m_backOnionColor(TPixel::Black)
@@ -284,7 +285,9 @@ Preferences::Preferences()
     , m_onionSkinEnabled(true)
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
-    , m_showKeyframesOnXsheetCellArea(true) {
+    , m_showKeyframesOnXsheetCellArea(true)
+    , m_precompute(true)
+    , m_ffmpegTimeout(30) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -373,7 +376,21 @@ Preferences::Preferences()
   setUndoMemorySize(m_undoMemorySize);
   m_blankColor = TPixel32(r, g, b);
 
+  // for Pixels only
+
+  getValue(*m_settings, "pixelsOnly",
+           m_pixelsOnly);  // doesn't work for some reason.
+  QString pos                     = m_settings->value("pixelsOnly").toString();
+  if (pos == "true") m_pixelsOnly = true;
+
   QString units;
+  units      = m_settings->value("oldUnits", m_units).toString();
+  m_oldUnits = units;
+
+  units = m_settings->value("oldCameraUnits", m_cameraUnits).toString();
+  m_oldCameraUnits = units;
+  // end for pixels only
+
   units                    = m_settings->value("linearUnits").toString();
   if (units != "") m_units = units;
   setUnits(m_units.toStdString());
@@ -524,6 +541,10 @@ Preferences::Preferences()
            m_paletteTypeOnLoadRasterImageAsColorModel);
   getValue(*m_settings, "showKeyframesOnXsheetCellArea",
            m_showKeyframesOnXsheetCellArea);
+  QString ffmpegPath = m_settings->value("ffmpegPath").toString();
+  if (ffmpegPath != "") m_ffmpegPath = ffmpegPath;
+  setFfmpegPath(m_ffmpegPath.toStdString());
+  getValue(*m_settings, "ffmpegTimeout", m_ffmpegTimeout);
 }
 
 //-----------------------------------------------------------------
@@ -919,12 +940,24 @@ void Preferences::setViewValues(int shrink, int step) {
 
 //-----------------------------------------------------------------
 
-void setCurrentUnits(std::string measureName, std::string units) {
+static void setCurrentUnits(std::string measureName, std::string units) {
   TMeasure *m = TMeasureManager::instance()->get(measureName);
   if (!m) return;
   TUnit *u = m->getUnit(::to_wstring(units));
   if (!u) return;
   m->setCurrentUnit(u);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setPixelsOnly(bool state) {
+  m_pixelsOnly = state;
+  m_settings->setValue("pixelsOnly", m_pixelsOnly);
+  if (state) {
+    storeOldUnits();
+  } else {
+    resetOldUnits();
+  }
 }
 
 //-----------------------------------------------------------------
@@ -948,6 +981,24 @@ void Preferences::setCameraUnits(std::string units) {
   m_settings->setValue("cameraUnits", m_cameraUnits);
   setCurrentUnits("camera.lx", units);
   setCurrentUnits("camera.ly", units);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::storeOldUnits() {
+  m_oldUnits       = getUnits();
+  m_oldCameraUnits = getCameraUnits();
+  m_settings->setValue("oldUnits", m_oldUnits);
+  m_settings->setValue("oldCameraUnits", m_oldCameraUnits);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::resetOldUnits() {
+  if (m_oldUnits != "" && m_oldCameraUnits != "") {
+    setUnits(m_oldUnits.toStdString());
+    setCameraUnits(m_oldCameraUnits.toStdString());
+  }
 }
 
 //-----------------------------------------------------------------
@@ -1130,6 +1181,25 @@ void Preferences::setDefLevelDpi(double dpi) {
 void Preferences::setPaletteTypeOnLoadRasterImageAsColorModel(int type) {
   m_paletteTypeOnLoadRasterImageAsColorModel = type;
   m_settings->setValue("paletteTypeOnLoadRasterImageAsColorModel", type);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setFfmpegPath(std::string path) {
+  m_ffmpegPath        = QString::fromStdString(path);
+  std::string strPath = m_ffmpegPath.toStdString();
+  m_settings->setValue("ffmpegPath", m_ffmpegPath);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setPrecompute(bool enabled) { m_precompute = enabled; }
+
+//-----------------------------------------------------------------
+
+void Preferences::setFfmpegTimeout(int seconds) {
+  m_ffmpegTimeout = seconds;
+  m_settings->setValue("ffmpegTimeout", seconds);
 }
 
 //-----------------------------------------------------------------

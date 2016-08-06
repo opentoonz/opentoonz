@@ -25,6 +25,8 @@
     <command>MI_Scan</command>
     <command>MI_SetScanCropbox</command>
     <command>MI_ResetScanCropbox</command>
+    <separator/>
+    <command>MI_PencilTest</command>
   </menu>
   <menu title="Settings">
     <command>MI_CleanupSettings</command>

@@ -424,7 +424,8 @@ void FarmServerProxy::removeTask(const QString &taskId) {
 
 //------------------------------------------------------------------------------
 
-bool doTestConnection(const QString &hostName, const QString &addr, int port) {
+static bool doTestConnection(const QString &hostName, const QString &addr,
+                             int port) {
   TTcpIpClient client;
 
   int sock;
@@ -512,7 +513,7 @@ class TaskId {
   int m_subId;
 
 public:
-  TaskId(int id, int subId = -1) : m_id(id), m_subId(m_subId){};
+  TaskId(int id, int subId = -1) : m_id(id), m_subId(subId){};
   TaskId(const QString &id) {
     int pos = id.indexOf(".");
     if (pos != -1) {

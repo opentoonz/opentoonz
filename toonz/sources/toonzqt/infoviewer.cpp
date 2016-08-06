@@ -171,9 +171,7 @@ void InfoViewerImp::onSliderChanged() {
 //----------------------------------------------------------------
 
 namespace {
-void setLabelStyle(QLabel *l) {
-  l->setObjectName("TitleTxtLabel");
-}
+void setLabelStyle(QLabel *l) { l->setObjectName("TitleTxtLabel"); }
 }
 
 //----------------------------------------------------------------

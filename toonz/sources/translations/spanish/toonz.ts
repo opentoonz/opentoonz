@@ -280,6 +280,10 @@ Detenerla o esperar a su finalización antes de eliminarla.</translation>
         <source>Contrast:</source>
         <translation>Contraste:</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>BrowserPopup</name>
@@ -705,6 +709,22 @@ What do you want to do?</source>
         <translation>Desmanchado:</translation>
     </message>
     <message>
+        <source>Save In</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Please fill the Save In field.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cleanup Settings (Global)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cleanup Settings: </source>
+        <translation> </translation>
+    </message>
+    <message>
         <source>Cleanup Settings</source>
         <translation>Opciones de limpieza</translation>
     </message>
@@ -795,6 +815,30 @@ What do you want to do?</source>
 </context>
 <context>
     <name>ComboViewerPanel</name>
+    <message>
+        <source>Safe Area (Right Click to Select)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Field Guide</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera Stand View</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>3D View</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Camera View</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Freeze</source>
+        <translation></translation>
+    </message>
     <message>
         <source>GUI Show / Hide</source>
         <translation>Mostrar / Ocultar interfaz</translation>
@@ -1299,6 +1343,22 @@ before color designing.</source>
         <source>Export File List</source>
         <translation>Exportar lista de archivos</translation>
     </message>
+    <message>
+        <source>Up</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Icon</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>List</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>DvItemViewerPanel</name>
@@ -1547,6 +1607,10 @@ before color designing.</source>
 <context>
     <name>FileBrowser</name>
     <message>
+        <source>Folder: </source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Can&apos;t change file extension</source>
         <translation>No es posible cambiar la extensión del archivo</translation>
     </message>
@@ -1732,6 +1796,10 @@ before color designing.</source>
     <message>
         <source>Apply</source>
         <translation>Aplicar</translation>
+    </message>
+    <message>
+        <source>Folder name:</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2362,6 +2430,10 @@ Do you want to create it?</source>
         <source>Intensity:</source>
         <translation>Intensidad:</translation>
     </message>
+    <message>
+        <source>Apply</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>LoadColorModelPopup</name>
@@ -2441,6 +2513,18 @@ Do you want to create it?</source>
 </context>
 <context>
     <name>LoadLevelPopup</name>
+    <message>
+        <source>On Demand</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>All Icons</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>All Icons &amp; Images</source>
+        <translation></translation>
+    </message>
     <message>
         <source>Load Level</source>
         <translation>Cargar nivel</translation>
@@ -2717,6 +2801,10 @@ Do you want to create it?</source>
     <message>
         <source>&amp;Save Palette As...</source>
         <translation>&amp;Guardar paleta como...</translation>
+    </message>
+    <message>
+        <source>&amp;Save Palette</source>
+        <translation>.</translation>
     </message>
     <message>
         <source>&amp;Load Color Model...</source>
@@ -3127,6 +3215,22 @@ Do you want to create it?</source>
         <translation>&amp;Clonar</translation>
     </message>
     <message>
+        <source>Drawing Substitution Forward</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Drawing Substitution Backward</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Similar Drawing Substitution Forward</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Similar Drawing Substitution Backward</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>&amp;Set Key</source>
         <translation>&amp;Definir clave</translation>
     </message>
@@ -3293,6 +3397,10 @@ Do you want to create it?</source>
     <message>
         <source>&amp;Schematic</source>
         <translation>&amp;Diagrama</translation>
+    </message>
+    <message>
+        <source>Toggle FX/Stage schematic</source>
+        <translation></translation>
     </message>
     <message>
         <source>&amp;Scene Cast</source>
@@ -3539,6 +3647,14 @@ Do you want to create it?</source>
         <translation>Rellenar</translation>
     </message>
     <message>
+        <source>Fill Tool - Areas</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Fill Tool - Lines</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Paint Brush Tool</source>
         <translation>Pincel de pintura</translation>
     </message>
@@ -3553,6 +3669,14 @@ Do you want to create it?</source>
     <message>
         <source>Style Picker Tool</source>
         <translation>Selector de estilo</translation>
+    </message>
+    <message>
+        <source>Style Picker Tool - Areas</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Style Picker Tool - Lines</source>
+        <translation></translation>
     </message>
     <message>
         <source>RGB Picker Tool</source>
@@ -3789,6 +3913,30 @@ Do you want to create it?</source>
     <message>
         <source>TypeTool Style</source>
         <translation>Estilo del texto</translation>
+    </message>
+    <message>
+        <source>Active Axis</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Position</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Rotation</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Scale</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Shear</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Active Axis - Center</source>
+        <translation></translation>
     </message>
     <message>
         <source>Build Skeleton Mode</source>
@@ -4165,6 +4313,10 @@ Do you want to create it?</source>
     <message>
         <source>Swap Lock/Unlock</source>
         <translation>Alternar bloquear/desbloquear</translation>
+    </message>
+    <message>
+        <source>Hide Upper Columns</source>
+        <translation></translation>
     </message>
     <message>
         <source>Ruler Tool</source>
@@ -4579,7 +4731,11 @@ What do you want to do?</source>
     </message>
     <message>
         <source>Multiple Rendering: </source>
-        <translation type="vanished">Procesamiento múltiple: </translation>
+        <translation>Procesamiento múltiple: </translation>
+    </message>
+    <message>
+        <source>Do stereoscopy</source>
+        <translation>: </translation>
     </message>
     <message>
         <source>Apply Shrink to Main Viewer</source>
@@ -5196,6 +5352,19 @@ What do you want to do?</source>
         <source>Default Level Type:</source>
         <translation>Tipo de nivel predefinido:</translation>
     </message>
+    <message>
+        <source>Toonz Vector Level</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Toonz Raster Level</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Raster Level</source>
+        <translation></translation>
+    </message>
+
     <message>
         <source>Width:</source>
         <translation>Ancho:</translation>
@@ -8305,9 +8474,21 @@ Por favor enviar o revertir los cambios antes.</translation>
         <source>Regenerate Frame Preview</source>
         <translation>Regenerar previsualización de fotograma</translation>
     </message>
+   <message>
+        <source>Select </source>
+        <translation></translation>
+    </message>
     <message>
-        <source>Select</source>
-        <translation type="vanished">Seleccionar</translation>
+        <source>Show </source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Hide </source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Show / Hide</source>
+        <translation></translation>
     </message>
     <message>
         <source>Reset Subcamera</source>

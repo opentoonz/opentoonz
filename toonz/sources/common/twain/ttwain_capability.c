@@ -273,6 +273,7 @@ int TTWAIN_SetCap(TW_UINT16 cap_id, TW_UINT16 conType, TW_UINT16 itemType,
   if (!capabilityH) {
     GLOBAL_UNLOCK(containerH);
     GLOBAL_FREE(containerH);
+    containerH = NULL;
     goto done;
   }
 

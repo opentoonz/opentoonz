@@ -249,6 +249,14 @@ QPushButton:checked {
   border-right-color: #868686;
   border-bottom-color: #9a9a9a;
 }
+QPushButton:pressed {
+  background-color: #626262;
+  border-style: inset;
+  border-left-color: #3a3a3a;
+  border-top-color: #1a1a1a;
+  border-right-color: #868686;
+  border-bottom-color: #9a9a9a;
+}
 QPushButton:hover {
   background-color: #626262;
   border-style: outset;
@@ -1344,6 +1352,9 @@ QDialog #dialogButtonFrame {
 }
 #MatchLineButton::pressed {
   background-color: #949494;
+}
+#LargeSizedText {
+  font-size: 17px;
 }
 
 //# sourceMappingURL=gray_072.qss.map

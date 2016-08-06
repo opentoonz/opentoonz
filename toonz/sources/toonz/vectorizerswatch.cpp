@@ -59,9 +59,9 @@ inline TImageP getXsheetImage(int row, int col) {
 
 //-----------------------------------------------------------------------------
 
-std::auto_ptr<VectorizerConfiguration> getCurrentVectorizerConfiguration(
+std::unique_ptr<VectorizerConfiguration> getCurrentVectorizerConfiguration(
     int row, int col) {
-  typedef std::auto_ptr<VectorizerConfiguration> result_type;
+  typedef std::unique_ptr<VectorizerConfiguration> result_type;
 
   TApp *app    = TApp::instance();
   TXsheet *xsh = app->getCurrentXsheet()->getXsheet();

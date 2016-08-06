@@ -67,7 +67,7 @@ inline double doubleFromUlong1(TUINT32 hi, TUINT32 lo) {
 
 /*=====================================================================*/
 
-TThickPoint operator*(const TAffine &aff, const TThickPoint &p) {
+static TThickPoint operator*(const TAffine &aff, const TThickPoint &p) {
   TPointD p1(p.x, p.y);
   return TThickPoint(aff * p1, p.thick);
 }
@@ -280,18 +280,7 @@ UINT TStyleParam::getSize() {
 
 /*=====================================================================*/
 
-#ifdef _WIN32
 #define CHECK_FOR_READ_ERROR(filePath)
-#else
-#define CHECK_FOR_READ_ERROR(filePath)                                         \
-  {                                                                            \
-    /*if (m_iChan.flags()&(ios::failbit|ios::eofbit))          \ \ \ \                                                                             \
-    {                                                          \ \ \ \                                                                             \
-    m_lastError = PREMATURE_EOF;                               \ \ \ \                                                                             \
-    throw TImageException( filePath, "Error on reading file"); \ \ \ \                                                                             \
-    }*/                                                                        \
-  }
-#endif
 
 #define CHECK_FOR_WRITE_ERROR(filePath)                                        \
   {                                                                            \
@@ -1110,7 +1099,7 @@ PliTag *ParsedPliImp::readPaletteTag() {
 
   PaletteTag *tag = new PaletteTag(numColors, plt);
 
-  delete plt;
+  delete[] plt;
 
   return tag;
 }
@@ -1132,7 +1121,7 @@ PliTag *ParsedPliImp::readPaletteWithAlphaTag() {
 
   PaletteWithAlphaTag *tag = new PaletteWithAlphaTag(numColors, plt);
 
-  delete plt;
+  delete[] plt;
 
   return tag;
 }
@@ -2154,7 +2143,7 @@ TUINT32 ParsedPliImp::writeImageTag(ImageTag *tag) {
 
   for (i = 0; i < tag->m_numObjects; i++) writeDinamicData(objectOffset[i]);
 
-  delete objectOffset;
+  delete[] objectOffset;
 
   return offset;
 }

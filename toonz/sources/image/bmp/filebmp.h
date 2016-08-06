@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 /*
-#if defined(WIN32)
+#if defined(_WIN32)
 typedef struct {unsigned char b,g,r,m;}  LPIXEL;
 #elif defined(__sgi)
 typedef struct { unsigned char  m,b,g,r; } LPIXEL;

@@ -38,6 +38,7 @@
 #include "toonz/levelset.h"
 #include "toonz/txshchildlevel.h"
 #include "toonz/fxdag.h"
+#include "toonz/tcolumnfx.h"
 #include "toonz/tcolumnfxset.h"
 #include "toonz/stage.h"
 #include "toonz/fill.h"
@@ -183,7 +184,8 @@ std::string getAlias(TXsheet *xsh, double frame, const TRenderSettings &info) {
 //    Local namespace  -  Colormap (Sandor) Fxs stuff
 //****************************************************************************************
 
-bool vectorMustApplyCmappedFx(const std::vector<TRasterFxRenderDataP> &fxs) {
+static bool vectorMustApplyCmappedFx(
+    const std::vector<TRasterFxRenderDataP> &fxs) {
   std::vector<TRasterFxRenderDataP>::const_iterator ft, fEnd(fxs.end());
   for (ft = fxs.begin(); ft != fEnd; ++ft) {
     PaletteFilterFxRenderData *paletteFilterData =
@@ -220,7 +222,7 @@ Will have to inquire further, though...
 
 //-------------------------------------------------------------------
 
-bool mustApplySandorFx(const std::vector<TRasterFxRenderDataP> &fxs) {
+static bool mustApplySandorFx(const std::vector<TRasterFxRenderDataP> &fxs) {
   std::vector<TRasterFxRenderDataP>::const_iterator ft, fEnd(fxs.end());
   for (ft = fxs.begin(); ft != fEnd; ++ft) {
     SandorFxRenderData *sandorData =
@@ -233,7 +235,8 @@ bool mustApplySandorFx(const std::vector<TRasterFxRenderDataP> &fxs) {
 
 //-------------------------------------------------------------------
 
-int getEnlargement(const std::vector<TRasterFxRenderDataP> &fxs, double scale) {
+static int getEnlargement(const std::vector<TRasterFxRenderDataP> &fxs,
+                          double scale) {
   int enlargement = 1;
 
   std::vector<TRasterFxRenderDataP>::const_iterator ft, fEnd(fxs.end());
@@ -287,8 +290,8 @@ int getEnlargement(const std::vector<TRasterFxRenderDataP> &fxs, double scale) {
 
 //-------------------------------------------------------------------
 
-void applyPaletteFilter(TPalette *&plt, bool keep, const set<int> &colors,
-                        const TPalette *srcPlt) {
+static void applyPaletteFilter(TPalette *&plt, bool keep,
+                               const set<int> &colors, const TPalette *srcPlt) {
   if (colors.empty()) return;
 
   if (!plt) plt = srcPlt->clone();
@@ -309,7 +312,7 @@ void applyPaletteFilter(TPalette *&plt, bool keep, const set<int> &colors,
 
 //-------------------------------------------------------------------
 
-TPalette *getPliPalette(const TFilePath &path) {
+static TPalette *getPliPalette(const TFilePath &path) {
   TLevelReaderP levelReader = TLevelReaderP(path);
   if (!levelReader.getPointer()) return 0;
 
@@ -348,7 +351,7 @@ inline void sortCmappedFxs(std::vector<TRasterFxRenderDataP> &fxs) {
 
 //-------------------------------------------------------------------
 
-std::vector<int> getAllBut(std::vector<int> &colorIds) {
+static std::vector<int> getAllBut(std::vector<int> &colorIds) {
   assert(TPixelCM32::getMaxInk() == TPixelCM32::getMaxPaint());
 
   std::vector<int> curColorIds;
@@ -378,9 +381,9 @@ std::vector<int> getAllBut(std::vector<int> &colorIds) {
 //! that of
 //! optimizing memory usage, please avoid copying the entire image buffer...
 
-TImageP applyCmappedFx(TToonzImageP &ti,
-                       const std::vector<TRasterFxRenderDataP> &fxs, int frame,
-                       double scale) {
+static TImageP applyCmappedFx(TToonzImageP &ti,
+                              const std::vector<TRasterFxRenderDataP> &fxs,
+                              int frame, double scale) {
   TImageP result = ti;
   TTile resultTile;  // Just a quick wrapper to the ImageCache
   TPalette *inPalette, *tempPlt;
@@ -671,8 +674,9 @@ TImageP applyCmappedFx(TToonzImageP &ti,
 
 //-------------------------------------------------------------------
 
-void applyCmappedFx(TVectorImageP &vi,
-                    const std::vector<TRasterFxRenderDataP> &fxs, int frame) {
+static void applyCmappedFx(TVectorImageP &vi,
+                           const std::vector<TRasterFxRenderDataP> &fxs,
+                           int frame) {
   TRasterP ras;
   bool keep = false;
   TPaletteP modPalette;
@@ -1353,9 +1357,16 @@ void TLevelColumnFx::getImageInfo(TImageInfo &info, TXshSimpleLevel *sl,
       assert(false);
       return;
     }
-
-    info.m_lx = (int)img->getBBox().getLx();
-    info.m_ly = (int)img->getBBox().getLy();
+    // Raster levels from ffmpeg were not giving the right dimensions without
+    // the raster cast and check
+    TRasterImageP rasterImage = (TRasterImageP)img;
+    if (rasterImage) {
+      info.m_lx = (int)rasterImage->getRaster()->getLx();
+      info.m_ly = (int)rasterImage->getRaster()->getLy();
+    } else {
+      info.m_lx = (int)img->getBBox().getLx();
+      info.m_ly = (int)img->getBBox().getLy();
+    }
     info.m_x0 = info.m_y0 = 0;
     info.m_x1             = (int)img->getBBox().getP11().x;
     info.m_y1             = (int)img->getBBox().getP11().y;

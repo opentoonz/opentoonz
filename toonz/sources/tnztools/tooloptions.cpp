@@ -427,6 +427,7 @@ ArrowToolOptionsBox::ArrowToolOptionsBox(
     TObjectHandle *objHandle, TXsheetHandle *xshHandle, ToolHandle *toolHandle)
     : ToolOptionsBox(parent)
     , m_pg(pg)
+    , m_splined(false)
     , m_tool(tool)
     , m_frameHandle(frameHandle)
     , m_objHandle(objHandle)
@@ -1828,6 +1829,14 @@ RulerToolOptionsBox::RulerToolOptionsBox(QWidget *parent, TTool *tool)
   m_HpixelFld = new QLabel(this);
 
   m_Afld->setMeasure("angle");
+
+  if (Preferences::instance()->getUnits() == "pixel") {
+    m_Xfld->setMeasure("length.x");
+    m_Yfld->setMeasure("length.y");
+    m_Wfld->setMeasure("length.x");
+    m_Hfld->setMeasure("length.y");
+    m_Lfld->setMeasure("length.x");
+  }
 
   m_Xfld->setObjectName("RulerToolOptionValues");
   m_Yfld->setObjectName("RulerToolOptionValues");

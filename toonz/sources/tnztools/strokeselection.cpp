@@ -118,7 +118,7 @@ bool pasteStrokesWithoutUndo(TVectorImageP image, std::set<int> &outIndexes,
         scene->getProperties()->getVectorizerParameters();
     assert(vParams);
 
-    std::auto_ptr<VectorizerConfiguration> config(
+    std::unique_ptr<VectorizerConfiguration> config(
         vParams->getCurrentConfiguration(0.0));
     vectorizeToonzImageData(image, tiData, indexes, image->getPalette(),
                             *config);

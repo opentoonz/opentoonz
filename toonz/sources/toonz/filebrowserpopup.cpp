@@ -189,11 +189,11 @@ void FileBrowserPopup::addFilterType(const QString &type) {
 
 void FileBrowserPopup::setFileMode(bool isDirectoryOnly) {
   if (m_isDirectoryOnly = isDirectoryOnly) {
-    m_nameFieldLabel->setText("Folder name:");
+    m_nameFieldLabel->setText(tr("Folder name:"));
     connect(m_browser, SIGNAL(treeFolderChanged(const TFilePath &)), this,
             SLOT(onFilePathClicked(const TFilePath &)));
   } else {
-    m_nameFieldLabel->setText("File name:");
+    m_nameFieldLabel->setText(tr("File name:"));
     disconnect(m_browser, SIGNAL(treeFolderChanged(const TFilePath &)), this,
                SLOT(onFilePathClicked(const TFilePath &)));
   }
@@ -631,8 +631,8 @@ LoadLevelPopup::LoadLevelPopup()
 
   //----
   QStringList behaviorList;
-  behaviorList << QString("On Demand") << QString("All Icons")
-               << QString("All Icons & Images");
+  behaviorList << QString(tr("On Demand")) << QString(tr("All Icons"))
+               << QString(tr("All Icons & Images"));
   m_loadTlvBehaviorComboBox->addItems(behaviorList);
   // use the default value set in the preference
   m_loadTlvBehaviorComboBox->setCurrentIndex(
@@ -1246,7 +1246,7 @@ void LoadLevelPopup::updateBottomGUI() {
       TLevelReaderP lr(fp);
       TLevelP level;
       if (lr) level = lr->loadInfo();
-      if (!level.getPointer()) return;
+      if (!level.getPointer() || level->getTable()->size() == 0) return;
 
       firstFrame = level->begin()->first;
       lastFrame  = (--level->end())->first;
@@ -1456,6 +1456,38 @@ void SaveLevelAsPopup::initFolder() {
   if (scene) fp = scene->decodeFilePath(project->getFolder(TProject::Drawings));
   setFolder(fp);
 }
+
+//---------------------------------------------------------------------------
+/*
+  For Save Level As command, it is needed to check if the current level is
+  selected (just like Save Level command) BEFORE opening the popup. So I decided
+  to use an original MenuItemHandler rather than OpenPopupCommandHandler.
+  06/07/2016 Shun
+*/
+
+class SaveLevelAsCommandHandler final : public MenuItemHandler {
+  SaveLevelAsPopup *m_popup;
+
+public:
+  SaveLevelAsCommandHandler() : MenuItemHandler(MI_SaveLevelAs), m_popup(0) {}
+  void execute() override {
+    TXshSimpleLevel *sl = TApp::instance()->getCurrentLevel()->getSimpleLevel();
+    if (!sl) {
+      DVGui::warning(QObject::tr("No Current Level"));
+      return;
+    }
+    ToonzScene *scene = TApp::instance()->getCurrentScene()->getScene();
+    if (!scene) {
+      DVGui::warning(QObject::tr("No Current Scene"));
+      return;
+    }
+    if (!m_popup) m_popup = new SaveLevelAsPopup();
+    m_popup->show();
+    m_popup->raise();
+    m_popup->activateWindow();
+  }
+} saveLevelAsCommandHandler;
+
 //=============================================================================
 // ReplaceLevelPopup
 
@@ -2040,8 +2072,6 @@ OpenPopupCommandHandler<SaveSceneAsPopup> saveSceneAsPopupCommand(
 OpenPopupCommandHandler<SaveSubSceneAsPopup> saveSubSceneAsPopupCommand(
     MI_SaveSubxsheetAs);
 OpenPopupCommandHandler<LoadLevelPopup> loadLevelPopupCommand(MI_LoadLevel);
-OpenPopupCommandHandler<SaveLevelAsPopup> saveLevelAsPopupCommand(
-    MI_SaveLevelAs);
 OpenPopupCommandHandler<ConvertPopupWithInput> convertWithInputPopupCommand(
     MI_ConvertFileWithInput);
 OpenPopupCommandHandler<ReplaceLevelPopup> replaceLevelPopupCommand(
