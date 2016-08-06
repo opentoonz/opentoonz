@@ -1549,9 +1549,9 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
           // revert subsampling
           m_properties->setSubsampling(oldSubs);
           m_path = oldPath;
-          throw TSystemException(
-              decodedFp, "can't fopen.\nSomeone may be saving the same " -
-                             "file. Please wait a while and retry.");
+          throw TSystemException(decodedFp,
+                                 "can't fopen.\nSomeone may be saving the same "
+                                 "file. Please wait a while and retry.");
         }
 
         lw->setOverwritePaletteFlag(overwritePalette);
@@ -2170,8 +2170,9 @@ TFilePath TXshSimpleLevel::getExistingHookFile(
   }
 
   assert(h >= 0);
-  return (h < 0) ? TFilePath() : decodedLevelPath.getParentDir() +
-                                     TFilePath(hookFiles[h].toStdWString());
+  return (h < 0) ? TFilePath()
+                 : decodedLevelPath.getParentDir() +
+                       TFilePath(hookFiles[h].toStdWString());
 }
 
 //-----------------------------------------------------------------------------
