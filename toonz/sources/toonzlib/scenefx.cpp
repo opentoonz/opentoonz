@@ -398,7 +398,8 @@ TStageObjectId getMotionObjectId(MotionObjectType type, int index) {
 
 //-------------------------------------------------------------------
 
-static TPointD getColumnSpeed(TXsheet *xsh, double row, int col, bool isPreview) {
+static TPointD getColumnSpeed(TXsheet *xsh, double row, int col,
+                              bool isPreview) {
   TAffine aff;
   TPointD a, b;
   const double h = 0.001;
@@ -428,8 +429,9 @@ static TPointD getColumnSpeed(TXsheet *xsh, double row, int col, bool isPreview)
         objectId: 移動の参考にするオブジェクト。自分自身の場合はNoneId
 --*/
 static QList<TPointD> getColumnMotionPoints(TXsheet *xsh, double row, int col,
-                                            TStageObjectId &objectId, bool isPreview,
-                                            double shutterStart, double shutterEnd,
+                                            TStageObjectId &objectId,
+                                            bool isPreview, double shutterStart,
+                                            double shutterEnd,
                                             int traceResolution) {
   /*-- 前後フレームが共に０なら空のリストを返す --*/
   if (shutterStart == 0.0 && shutterEnd == 0.0) return QList<TPointD>();

@@ -337,11 +337,11 @@ void getStrokeStyleInformationInArea(
 }
 
 //--------------------------------------------------------------------
-static void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt,
-                          const TLevelWriterP &lw, const std::vector<TFrameId> &frames,
-                          const TAffine &aff, const TRop::ResampleFilterType &resType,
-                          FrameTaskNotifier *frameNotifier, const TPixel &bgColor,
-                          bool removeDotBeforeFrameNumber = false) {
+static void convertFromCM(
+    const TLevelReaderP &lr, const TPaletteP &plt, const TLevelWriterP &lw,
+    const std::vector<TFrameId> &frames, const TAffine &aff,
+    const TRop::ResampleFilterType &resType, FrameTaskNotifier *frameNotifier,
+    const TPixel &bgColor, bool removeDotBeforeFrameNumber = false) {
   for (int i = 0; i < (int)frames.size(); i++) {
     if (frameNotifier->abortTask()) break;
     try {
@@ -403,7 +403,8 @@ static void convertFromCM(const TLevelReaderP &lr, const TPaletteP &plt,
 //--------------------------------------------------------------------
 
 static void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt,
-                          const TLevelWriterP &lw, const std::vector<TFrameId> &frames,
+                          const TLevelWriterP &lw,
+                          const std::vector<TFrameId> &frames,
                           const TRop::ResampleFilterType &resType, int width,
                           FrameTaskNotifier *frameNotifier) {
   QString msg;
@@ -457,13 +458,11 @@ static void convertFromVI(const TLevelReaderP &lr, const TPaletteP &plt,
 
 //-----------------------------------------------------------------------
 
-static void convertFromFullRaster(const TLevelReaderP &lr, const TLevelWriterP &lw,
-                                  const std::vector<TFrameId> &_frames,
-                                  const TAffine &aff,
-                                  const TRop::ResampleFilterType &resType,
-                                  FrameTaskNotifier *frameNotifier,
-                                  const TPixel &bgColor,
-                                  bool removeDotBeforeFrameNumber = false) {
+static void convertFromFullRaster(
+    const TLevelReaderP &lr, const TLevelWriterP &lw,
+    const std::vector<TFrameId> &_frames, const TAffine &aff,
+    const TRop::ResampleFilterType &resType, FrameTaskNotifier *frameNotifier,
+    const TPixel &bgColor, bool removeDotBeforeFrameNumber = false) {
   std::vector<TFrameId> frames = _frames;
   if (frames.empty() &&
       lr->loadInfo()->getFrameCount() ==

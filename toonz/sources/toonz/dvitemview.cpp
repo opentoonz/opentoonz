@@ -1878,9 +1878,9 @@ DvItemViewerButtonBar::DvItemViewerButtonBar(DvItemViewer *itemViewer,
   connect(listView, SIGNAL(triggered()), itemViewer->getPanel(),
           SLOT(setTableView()));
   //	connect(listView      , SIGNAL(triggered()), itemViewer->getPanel(),
-  //SLOT(setListView()));
+  // SLOT(setListView()));
   //	connect(tableView     , SIGNAL(triggered()), itemViewer->getPanel(),
-  //SLOT(setTableView()));
+  // SLOT(setTableView()));
 
   connect(m_folderBack, SIGNAL(triggered()), SIGNAL(folderBack()));
   connect(m_folderFwd, SIGNAL(triggered()), SIGNAL(folderFwd()));

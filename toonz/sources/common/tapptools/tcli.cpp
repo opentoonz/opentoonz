@@ -744,7 +744,8 @@ void RangeQualifier::fetch(int index, int &argc, char *argv[]) {
   }
 }
 
-static std::ostream &operator<<(std::ostream &out, const RangeQualifier &range) {
+static std::ostream &operator<<(std::ostream &out,
+                                const RangeQualifier &range) {
   return out << "[" << range.getFrom() << ", " << range.getTo() << "]";
 }
 

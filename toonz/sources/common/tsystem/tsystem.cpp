@@ -416,7 +416,7 @@ public:
     const wstring a_str = a.getWideString();
     const wstring b_str = b.getWideString();
 
-    unsigned int i = 0;
+    unsigned int i   = 0;
     int case_compare = -1;
     while (a_str[i] || b_str[i]) {
       if (a_str[i] != b_str[i]) {
