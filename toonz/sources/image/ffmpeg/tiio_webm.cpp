@@ -39,8 +39,9 @@ TLevelWriterWebm::TLevelWriterWebm(const TFilePath &path, TPropertyGroup *winfo)
     : TLevelWriter(path, winfo) {
   if (!m_properties) m_properties = new Tiio::WebmWriterProperties();
   std::string scale = m_properties->getProperty("Scale")->getValueAsString();
-  m_scale = QString::fromStdString(scale).toInt();
-  std::string quality = m_properties->getProperty("Quality")->getValueAsString();
+  m_scale           = QString::fromStdString(scale).toInt();
+  std::string quality =
+      m_properties->getProperty("Quality")->getValueAsString();
   m_vidQuality = QString::fromStdString(quality).toInt();
   ffmpegWriter = new Ffmpeg();
   ffmpegWriter->setPath(m_path);
@@ -62,7 +63,7 @@ TLevelWriterWebm::~TLevelWriterWebm() {
     outLx = m_lx * m_scale / 100;
     outLy = m_ly * m_scale / 100;
   }
-  //ffmpeg doesn't like resolutions that aren't divisible by 2.
+  // ffmpeg doesn't like resolutions that aren't divisible by 2.
   if (outLx % 2 != 0) outLx++;
   if (outLy % 2 != 0) outLy++;
 
@@ -215,9 +216,9 @@ TImageP TLevelReaderWebm::load(int frameIndex) {
 }
 
 Tiio::WebmWriterProperties::WebmWriterProperties()
-	: m_vidQuality("Quality", 1, 100, 90), m_scale("Scale", 1, 100, 100) {
-	bind(m_vidQuality);
-	bind(m_scale);
+    : m_vidQuality("Quality", 1, 100, 90), m_scale("Scale", 1, 100, 100) {
+  bind(m_vidQuality);
+  bind(m_scale);
 }
 
 // Tiio::Reader* Tiio::makeWebmReader(){ return nullptr; }

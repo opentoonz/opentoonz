@@ -161,7 +161,9 @@ void FormatSettingsPopup::buildValueField(int index, TPropertyGroup *props) {
   double value = prop->getValue();
   v->setValues(prop->getValue(), prop->getRange().first,
                prop->getRange().second);
-  if (prop->getValue() != value) { prop->setValue(value); }
+  if (prop->getValue() != value) {
+    prop->setValue(value);
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -33,6 +33,7 @@
 #include "toonz/stage2.h"
 #include "toonz/txshsimplelevel.h"
 #include "toonz/txshleveltypes.h"
+#include "toonz/preferences.h"
 
 // TnzCore includes
 #include "tconvert.h"
@@ -241,6 +242,10 @@ void CameraSettingsPopup::updateFields() {
   if (!cameraObject) return;  // it should never happen
   m_nameFld->setText(QString(cameraObject->getName().c_str()));
   TCamera *camera = cameraObject->getCamera();
+  if (Preferences::instance()->getPixelsOnly()) {
+    TDimension res = camera->getRes();
+    camera->setSize(TDimensionD(res.lx / Stage::inch, res.ly / Stage::inch));
+  }
   if (camera) m_cameraSettingsWidget->setFields(camera);
 }
 

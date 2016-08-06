@@ -9,7 +9,7 @@ using namespace TScannerUtil;
 
 extern "C" {
 #include "../common/twain/ttwain_util.h"
-#include "../common/twain/ttwain_global_def.h"  /* forward declare functions */
+#include "../common/twain/ttwain_global_def.h" /* forward declare functions */
 }
 
 /* callback used to handle TTWAIN done/error status*/
@@ -20,7 +20,7 @@ extern "C" void TTWAIN_ErrorBox(const char *msg) { throwIT(msg); }
 
 extern "C" {
 static int onDoneCB(UCHAR *buffer, TTWAIN_PIXTYPE pixelType, int lx, int ly,
-                        int wrap, float xdpi, float ydpi, void *usrData) {
+                    int wrap, float xdpi, float ydpi, void *usrData) {
   TRasterP ras;
   switch (pixelType) {
   case TTWAIN_BW:
@@ -223,7 +223,8 @@ param.m_version = string(TTWAIN_GetVersion());
 
 //-----------------------------------------------------------------------------
 
-static void setupParameters(const TScannerParameters &params, bool isAreaSupported) {
+static void setupParameters(const TScannerParameters &params,
+                            bool isAreaSupported) {
   if (isAreaSupported) {
     TRectD scanArea = params.getScanArea();
     float L         = (float)(scanArea.getP00().x / 25.4);

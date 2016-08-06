@@ -50,7 +50,8 @@ static void getStyles(std::vector<TColorStyle *> &styles,
 
 //-----------------------------------------------------------------------------
 
-static void getStyleIds(std::vector<int> &styleIds, const TStyleSelection &selection) {
+static void getStyleIds(std::vector<int> &styleIds,
+                        const TStyleSelection &selection) {
   styleIds.clear();
   int pageIndex        = selection.getPageIndex();
   TPaletteP palette    = selection.getPalette();

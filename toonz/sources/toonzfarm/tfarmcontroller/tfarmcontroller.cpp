@@ -424,7 +424,8 @@ void FarmServerProxy::removeTask(const QString &taskId) {
 
 //------------------------------------------------------------------------------
 
-static bool doTestConnection(const QString &hostName, const QString &addr, int port) {
+static bool doTestConnection(const QString &hostName, const QString &addr,
+                             int port) {
   TTcpIpClient client;
 
   int sock;

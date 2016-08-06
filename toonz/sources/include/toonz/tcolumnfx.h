@@ -285,7 +285,6 @@ private:
 //    TColumnFx functions
 //*******************************************************************************************
 
-bool isSubsheetChainOnColumn0(TXsheet *topXsheet, TXsheet *subsheet,
-                              int frame);
+bool isSubsheetChainOnColumn0(TXsheet *topXsheet, TXsheet *subsheet, int frame);
 
 #endif  // TCOLUMNFX_H

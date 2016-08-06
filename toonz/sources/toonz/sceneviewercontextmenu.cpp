@@ -81,7 +81,7 @@ static void onShowHideSelectObject(QAction *action) {
 }
 
 static int addShowHideStageObjectCmds(const std::vector<int> &columnIndexes,
-                               QMenu *menu, bool isShow) {
+                                      QMenu *menu, bool isShow) {
   int ii, columnIndex = -1;
   bool flag = true;
 
@@ -248,7 +248,7 @@ void SceneViewerContextMenu::addShowHideCommand(QMenu *menu,
   TXsheet *xsh  = TApp::instance()->getCurrentXsheet()->getXsheet();
   TStageObject *stageObject =
       xsh->getStageObject(TStageObjectId::ColumnId(column->getIndex()));
-  QString text    = (isHidden ? tr("Show ") : tr("Hide ")) + getName(stageObject);
+  QString text = (isHidden ? tr("Show ") : tr("Hide ")) + getName(stageObject);
   QAction *action = new QAction(text, this);
   action->setData(column->getIndex());
   connect(action, SIGNAL(triggered()), this, SLOT(onShowHide()));

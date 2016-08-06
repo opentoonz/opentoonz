@@ -440,7 +440,7 @@ private:
   int m_autosavePeriod,  // minutes
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
       m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
-	  m_ffmpegTimeout; //seconds
+      m_ffmpegTimeout;  // seconds
 
   int m_currentLanguage, m_currentStyleSheet,
       m_undoMemorySize,  // in megabytes

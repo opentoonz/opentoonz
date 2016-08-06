@@ -212,8 +212,9 @@ paints[i]  = TPixelFloat(paints2[i]);
 
 //-----------------------------------------------------------------------------------------------
 
-static void do_convert(const TTile &dst, const TTile &src, const TPaletteP palette,
-                       bool transparencyCheck, bool applyFx) {
+static void do_convert(const TTile &dst, const TTile &src,
+                       const TPaletteP palette, bool transparencyCheck,
+                       bool applyFx) {
   // assert(palette);
   // assert(_rasOut && _rasIn);
   // assert(rasOut->getSize() == rasIn->getSize());
