@@ -135,7 +135,7 @@ public:
   void doCompute(TTile &tile, double frame, const TRenderSettings &ri) override;
 };
 
-double normalize_h(double h) {
+static double normalize_h(double h) {
   if (h < 0) h += 360;
   if (h > 360) h -= 360;
   return h;

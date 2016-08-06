@@ -83,8 +83,8 @@ inline QString getStr(const TFrameId &id) {
 
 const QString Fmt = "dd MMM yy   hh:mm";
 
-QString getLine(int counter, const QDateTime &date,
-                const set<TFrameId> &frames) {
+static QString getLine(int counter, const QDateTime &date,
+                       const set<TFrameId> &frames) {
   static QString user;
   static QString machine;
   if (user == "") {
@@ -127,7 +127,7 @@ QString getLine(int counter, const QDateTime &date,
 
 //--------------------------------------------------------------------
 
-int getCurrentCount(const QString &str) {
+static int getCurrentCount(const QString &str) {
   if (str == "") return 0;
 
   int from = str.lastIndexOf('#') + 1;

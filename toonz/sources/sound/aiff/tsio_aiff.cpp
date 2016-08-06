@@ -5,7 +5,7 @@
 #include "tsound_t.h"
 #include "tsystem.h"
 #include "tfilepath_io.h"
-#include "tfilepath_io.h"
+#include "tsioutils.h"
 #include <math.h>
 
 #define DEFAULT_OFFSET 0
@@ -20,8 +20,6 @@ TNZ_LITTLE_ENDIAN undefined !!
 #endif
 
     using namespace std;
-
-void swapAndCopySamples(short *srcBuffer, short *dstBuffer, TINT32 sampleCount);
 
 TUINT32 convertToLong(UCHAR *buffer);
 void storeFloat(unsigned char *buffer, TUINT32 value);
@@ -136,7 +134,7 @@ public:
 
 //--------------------------------------------------------------------
 
-ostream &operator<<(ostream &os, const TCOMMChunk &commChunk) {
+static ostream &operator<<(ostream &os, const TCOMMChunk &commChunk) {
   commChunk.print(os);
   return os;
 }
@@ -191,7 +189,7 @@ public:
 
 //--------------------------------------------------------------------
 
-ostream &operator<<(ostream &os, const TSSNDChunk &ssndChunk) {
+static ostream &operator<<(ostream &os, const TSSNDChunk &ssndChunk) {
   os << "name      = '" << ssndChunk.m_name << endl;
   os << "length    = '" << ssndChunk.m_length << endl;
   os << "offset    = '" << (unsigned int)ssndChunk.m_offset << endl;
@@ -208,7 +206,7 @@ ostream &operator<<(ostream &os, const TSSNDChunk &ssndChunk) {
 
 //==========================================================
 
-void flipLong(unsigned char *ptrc) {
+static void flipLong(unsigned char *ptrc) {
   unsigned char val;
 
   val         = *(ptrc);
@@ -222,7 +220,7 @@ void flipLong(unsigned char *ptrc) {
 
 //--------------------------------------------------------------------
 
-TUINT32 fetchLong(TUINT32 *ptrl) { return (*ptrl); }
+static TUINT32 fetchLong(TUINT32 *ptrl) { return (*ptrl); }
 
 //--------------------------------------------------------------------
 
@@ -249,7 +247,7 @@ TUINT32 convertToLong(UCHAR *buffer) {
 
 //--------------------------------------------------------------------
 
-void storeLong(TUINT32 val, TUINT32 *ptr) { *ptr = val; }
+static void storeLong(TUINT32 val, TUINT32 *ptr) { *ptr = val; }
 
 //--------------------------------------------------------------------
 

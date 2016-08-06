@@ -107,7 +107,7 @@ public:
   double m_xDpi, m_yDpi;
 
   std::set<MovieRenderer::Listener *> m_listeners;
-  std::auto_ptr<LevelUpdater> m_levelUpdaterA, m_levelUpdaterB;
+  std::unique_ptr<LevelUpdater> m_levelUpdaterA, m_levelUpdaterB;
   TSoundTrackP m_st;
 
   std::map<double, std::pair<TRasterP, TRasterP>> m_toBeSaved;

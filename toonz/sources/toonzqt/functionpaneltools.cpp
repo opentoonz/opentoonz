@@ -207,9 +207,6 @@ void MovePointDragTool::click(QMouseEvent *e) {
 //-----------------------------------------------------------------------------
 
 void MovePointDragTool::drag(QMouseEvent *e) {
-  // need ctrl modifier
-  if (0 == (e->modifiers() & Qt::ControlModifier)) return;
-
   QPoint pos = e->pos();
 
   // if shift is pressed then apply constraints (only horizontal or vertical
@@ -331,9 +328,6 @@ void MoveHandleDragTool::click(QMouseEvent *e) {
 //-----------------------------------------------------------------------------
 
 void MoveHandleDragTool::drag(QMouseEvent *e) {
-  // need ctrl modifier
-  if (0 == (e->modifiers() & Qt::ControlModifier)) return;
-
   if (!m_curve) return;
   QPoint pos = e->pos();
 

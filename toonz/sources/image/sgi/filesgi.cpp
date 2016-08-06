@@ -722,7 +722,7 @@ static TINT32 img_rle_compact(unsigned short *expbuf, int ibpp,
 
 /*-----------------------------------------------------------------------------*/
 
-void iclose(IMAGERGB *image) {
+static void iclose(IMAGERGB *image) {
   TINT32 tablesize;
 
   iflush(image);

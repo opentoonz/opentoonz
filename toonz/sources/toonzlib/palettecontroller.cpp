@@ -12,7 +12,8 @@
 
 #include "toonz/palettecontroller.h"
 
-TEnv::IntVar PaletteControllerAutoApplyState("PaletteControllerAutoApplyState", 1);
+TEnv::IntVar PaletteControllerAutoApplyState("PaletteControllerAutoApplyState",
+                                             1);
 
 PaletteController::PaletteController()
     : QObject()
@@ -20,7 +21,7 @@ PaletteController::PaletteController()
     , m_currentCleanupPalette(0)
     , m_originalCurrentPalette(0)
     , m_currentPalette(0)
-    , m_colorAutoApplyEnabled( PaletteControllerAutoApplyState != 0 )
+    , m_colorAutoApplyEnabled(PaletteControllerAutoApplyState != 0)
     , m_colorSample() {
   m_currentLevelPalette   = new TPaletteHandle;
   m_currentCleanupPalette = new TPaletteHandle;
@@ -93,7 +94,7 @@ void PaletteController::editCleanupPalette() {
 
 void PaletteController::enableColorAutoApply(bool enabled) {
   if (m_colorAutoApplyEnabled != enabled) {
-    m_colorAutoApplyEnabled = enabled;
+    m_colorAutoApplyEnabled         = enabled;
     PaletteControllerAutoApplyState = (enabled) ? 1 : 0;
     emit colorAutoApplyEnabled(m_colorAutoApplyEnabled);
   }

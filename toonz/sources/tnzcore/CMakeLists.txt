@@ -5,7 +5,8 @@ set(MOC_HEADERS
     ../include/tipcsrv.h
     ../include/tipcsrvP.h
     ../include/tmsgcore.h
-    ../include/tfunctorinvoker.h)
+    ../include/tfunctorinvoker.h
+)
 
 set(HEADERS ${MOC_HEADERS}
     ../common/trop/loop_macros.h
@@ -118,7 +119,8 @@ set(HEADERS ${MOC_HEADERS}
     ../include/t32bitsrv_wrap.h
     ../include/tenv.h
     ../include/tmeshimage.h
-    ../include/tgldisplaylistsmanager.h)
+    ../include/tgldisplaylistsmanager.h
+)
 
 set(SOURCES
     ../common/tcore/tdata.cpp
@@ -240,25 +242,31 @@ set(SOURCES
     ../common/tsystem/tsystempd.cpp
     ../common/tapptools/tenv.cpp
     ../common/tmeshimage/tmeshimage.cpp
-    ../common/tmsgcore.cpp)
+    ../common/tmsgcore.cpp
+)
 
 if(WIN32)
     set(SOURCES ${SOURCES}
         ../common/tsound/tsound_nt.cpp
-        ../common/tvrender/tfont_nt.cpp)
+        ../common/tvrender/tfont_nt.cpp
+    )
 elseif(APPLE)
     set(SOURCES ${SOURCES}
         ../common/tsound/tsound_mac.cpp
-        ../common/tvrender/tfont_mac.cpp)
+        ../common/tvrender/tfont_mac.cpp
+    )
 elseif(UNIX)
     set(SOURCES ${SOURCES}
-        ../common/tvrender/tfont_qt.cpp)
+        ../common/tvrender/tfont_qt.cpp
+    )
     if(SDL_LIB_FOUND)
         set(SOURCES ${SOURCES}
-            ../common/tsound/tsound_sdl.cpp)
+            ../common/tsound/tsound_sdl.cpp
+        )
     else()
         set(SOURCES ${SOURCES}
-            ../common/tsound/tsound_x.cpp)
+            ../common/tsound/tsound_x.cpp
+        )
     endif()
 endif()
 
@@ -313,7 +321,8 @@ if(WIN32)
         mpr.lib
         winmm.lib
         opengl32.lib
-        glu32.lib)
+        glu32.lib
+    )
 elseif(APPLE)
     find_library(AUDIOUNIT_LIB AudioUnit)
     find_library(AUDIOTB_LIB AudioToolbox)
@@ -322,7 +331,8 @@ elseif(APPLE)
     set(EXTRA_LIBS
         ${AUDIOUNIT_LIB}
         ${AUDIOTB_LIB}
-        ${CARBON_LIB})
+        ${CARBON_LIB}
+    )
 elseif(UNIX)
     set(QT_LIB)  # avoid warning
     include_directories(
@@ -330,10 +340,12 @@ elseif(UNIX)
         ${FREETYPE_INCLUDE_DIRS}
     )
     set(EXTRA_LIBS
-        ${GLU_LIB})
+        ${GLU_LIB}
+    )
 endif()
 
 target_link_libraries(tnzcore
     Qt5::OpenGL Qt5::Network
     ${GL_LIB} ${GLUT_LIB} ${QT_LIB} ${Z_LIB} ${JPEG_LIB} ${LZ4_LIB}
-    ${EXTRA_LIBS})
+    ${EXTRA_LIBS}
+)

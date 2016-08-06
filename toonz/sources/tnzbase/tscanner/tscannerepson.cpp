@@ -18,8 +18,8 @@
 
 using namespace TScannerUtil;
 
-void sense(bool) {}
-int scsi_maxlen() {
+static void sense(bool) {}
+static int scsi_maxlen() {
   assert(0);
   return 0;
 }

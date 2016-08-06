@@ -110,7 +110,8 @@ namespace XsheetGUI {
 
 //-----------------------------------------------------------------------------
 
-static void getVolumeCursorRect(QRect &out, double volume, const QPoint &origin) {
+static void getVolumeCursorRect(QRect &out, double volume,
+                                const QPoint &origin) {
   int ly = 60;
   int v  = tcrop(0, ly, (int)(volume * ly));
   out.setX(origin.x() + 11);

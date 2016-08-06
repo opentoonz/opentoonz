@@ -40,7 +40,7 @@ TFilePath TVectorImagePatternStrokeStyle::m_rootDir = TFilePath();
 //-----------------------------------------------------------------------------
 
 #ifndef NDEBUG
-void checkGlError() {
+static void checkGlError() {
   GLenum err = glGetError();
   assert(err != GL_INVALID_ENUM);
   assert(err != GL_INVALID_VALUE);

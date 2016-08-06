@@ -389,8 +389,10 @@ void ColorField::setAlphaActive(bool active) {
     connect(m_alphaChannel, SIGNAL(valueChanged(int, bool)),
             SLOT(onAlphaChannelChanged(int, bool)));
     assert(m_color.m == 255);
-    // m_color.m = m_alphaChannel->getChannel();
-    // m_colorSample->setColor(m_color);
+    m_alphaChannel->setChannel(0);
+    m_color.m = 0;
+    m_colorSample->setColor(m_color);
+    emit colorChanged(m_color, false);
   } else if (!active && m_alphaChannel->isVisible()) {
     m_alphaChannel->hide();
     disconnect(m_alphaChannel, SIGNAL(valueChanged(int, bool)), this,

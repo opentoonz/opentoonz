@@ -41,7 +41,7 @@ void readKey(FILE *f, struct dictentry *parent, TPSDLayerInfo *li);
 void readLayer16(FILE *f, struct dictentry *parent, TPSDLayerInfo *li);
 //----end forward declarations
 
-char swapByte(unsigned char src) {
+static char swapByte(unsigned char src) {
   unsigned char out = 0;
   for (int i = 0; i < 8; ++i) {
     out = out << 1;

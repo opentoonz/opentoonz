@@ -249,7 +249,7 @@ void InsertFxPopup::loadFolder(QTreeWidgetItem *parent) {
       // Found a sub-folder
       QString folderName = QString::fromStdString(tagName);
 
-      std::auto_ptr<QTreeWidgetItem> folder(
+      std::unique_ptr<QTreeWidgetItem> folder(
           new QTreeWidgetItem((QTreeWidget *)0, QStringList(folderName)));
       folder->setIcon(0, m_folderIcon);
 

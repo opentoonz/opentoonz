@@ -75,7 +75,7 @@ typedef int TTWAIN_ONDONE_CB(UCHAR *buffer, TTWAIN_PIXTYPE pixelType, int lx,
 typedef void TTWAIN_ONERROR_CB(void *usrData, void *alwaysZero);
 
 int TTWAIN_IsAvailable(void);
-void TWAIN_RegisterApp(
+void TTWAIN_RegisterApp(
     int majorNum, int minorNum, /* app. revision*/
     int nLanguage,    /* (human) language (use TWLG_xxx from TWAIN.H) */
     int nCountry,     /* country (use TWCY_xxx from TWAIN.H)	     */

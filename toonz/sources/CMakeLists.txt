@@ -145,7 +145,8 @@ find_package(Qt5 REQUIRED
     Widgets
     PrintSupport
     LinguistTools
-    Multimedia)
+    Multimedia
+)
 
 if(WIN32)
     include_directories(
@@ -200,15 +201,18 @@ if(WIN32)
     set(GL_LIB opengl32.lib)
     set(Z_LIB
         optimized ${SDKROOT}/zlib-1.2.8/lib/zlib-1.2.8_${MSVC_LIB_VERSION}${PLATFORM2}.lib
-        debug ${SDKROOT}/zlib-1.2.8/lib/zlib-1.2.8_${MSVC_LIB_VERSION}${PLATFORM2}d.lib)
+        debug ${SDKROOT}/zlib-1.2.8/lib/zlib-1.2.8_${MSVC_LIB_VERSION}${PLATFORM2}d.lib
+    )
     set(JPEG_LIB ${SDKROOT}/LibJPEG/jpeg-9/lib/LibJPEG-9_${MSVC_LIB_VERSION}${PLATFORM2}.lib)
     set(TIFF_INCLUDE_DIR ${SDKROOT}/tiff-4.0.3/libtiff)
     set(TIFF_LIB
         optimized ${SDKROOT}/tiff-4.0.3/lib/LibTIFF-4.0.3_${MSVC_LIB_VERSION}${PLATFORM2}.lib
-        debug  ${SDKROOT}/tiff-4.0.3/lib/LibTIFF-4.0.3_${MSVC_LIB_VERSION}${PLATFORM2}d.lib)
+        debug  ${SDKROOT}/tiff-4.0.3/lib/LibTIFF-4.0.3_${MSVC_LIB_VERSION}${PLATFORM2}d.lib
+    )
     set(PNG_LIB
         optimized ${SDKROOT}/libpng-1.6.21/lib/libpng16_${MSVC_LIB_VERSION}${PLATFORM2}.lib
-        debug  ${SDKROOT}/libpng-1.6.21/lib/libpng16_${MSVC_LIB_VERSION}${PLATFORM2}d.lib)
+        debug  ${SDKROOT}/libpng-1.6.21/lib/libpng16_${MSVC_LIB_VERSION}${PLATFORM2}d.lib
+    )
     set(GLEW_LIB ${SDKROOT}/glew/glew-1.9.0/lib/glew${PLATFORM}.lib)
     set(LZ4_LIB ${SDKROOT}/Lz4/Lz4_131/lz4_${PLATFORM}.lib)
     set(SUPERLU_LIB ${SDKROOT}/superlu/SuperLU_${MSVC_LIB_VERSION}_${PLATFORM}.lib)
@@ -336,9 +340,11 @@ set(CXX_WARNINGS)
 if(CMAKE_COMPILER_IS_GNUCC)
     ADD_CHECK_C_COMPILER_FLAG(C_WARNINGS C_WARN_WRITE_STRINGS -Wwrite-strings)
     ADD_CHECK_C_COMPILER_FLAG(C_WARNINGS C_WARN_UNDEF -Wundef)
+    ADD_CHECK_C_COMPILER_FLAG(C_WARNINGS C_WARN_MISSING_DECLARATIONS -Wmissing-declarations)
 
     ADD_CHECK_CXX_COMPILER_FLAG(CXX_WARNINGS CXX_WARN_WRITE_STRINGS -Wwrite-strings)
     ADD_CHECK_CXX_COMPILER_FLAG(CXX_WARNINGS CXX_WARN_UNDEF -Wundef)
+    ADD_CHECK_CXX_COMPILER_FLAG(CXX_WARNINGS CXX_WARN_MISSING_DECLARATIONS -Wmissing-declarations)
 endif()
 
 
@@ -419,14 +425,16 @@ function(add_translation module)
         set(name "${CMAKE_SOURCE_DIR}/translations/${lang}/${module}.ts")
         list(APPEND translation ${name})
         set_source_files_properties(${name} PROPERTIES
-            OUTPUT_LOCATION "${CMAKE_BINARY_DIR}/loc/${lang}")
+            OUTPUT_LOCATION "${CMAKE_BINARY_DIR}/loc/${lang}"
+        )
     endforeach()
 
     qt5_create_translation(message ${translation} ${ARGN})
 
     add_custom_target("translation_${module}" DEPENDS ${message})
     set_target_properties("translation_${module}" PROPERTIES
-        EXCLUDE_FROM_DEFAULT_BUILD TRUE)
+        EXCLUDE_FROM_DEFAULT_BUILD TRUE
+    )
 endfunction()
 
 set(CMAKE_C_FLAGS "${C_WARNINGS} ${CMAKE_C_FLAGS}")
@@ -464,5 +472,6 @@ if(APPLE)
     add_custom_command(TARGET executable
         POST_BUILD COMMAND
         ${CMAKE_INSTALL_NAME_TOOL} -add_rpath ${CMAKE_INSTALL_RPATH}
-        $<TARGET_FILE:executable>)
+        $<TARGET_FILE:executable>
+    )
 endif()
