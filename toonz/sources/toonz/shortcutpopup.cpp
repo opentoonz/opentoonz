@@ -651,6 +651,9 @@ void ShortcutPopup::importPreset() {
 
   TFilePath presetDir =
       ToonzFolder::getMyModuleDir() + TFilePath("shortcutpresets");
+  if (!TSystem::doesExistFileOrLevel(presetDir)) {
+      TSystem::mkDir(presetDir);
+  }
   QString name        = shortcutPath.withoutParentDir().getQString();
   std::string strName = name.toStdString();
   if (TSystem::doesExistFileOrLevel(presetDir + TFilePath(name))) {
