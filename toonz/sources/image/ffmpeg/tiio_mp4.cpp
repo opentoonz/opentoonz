@@ -39,8 +39,9 @@ TLevelWriterMp4::TLevelWriterMp4(const TFilePath &path, TPropertyGroup *winfo)
     : TLevelWriter(path, winfo) {
   if (!m_properties) m_properties = new Tiio::Mp4WriterProperties();
   std::string scale = m_properties->getProperty("Scale")->getValueAsString();
-  m_scale = QString::fromStdString(scale).toInt();
-  std::string quality = m_properties->getProperty("Quality")->getValueAsString();
+  m_scale           = QString::fromStdString(scale).toInt();
+  std::string quality =
+      m_properties->getProperty("Quality")->getValueAsString();
   m_vidQuality = QString::fromStdString(quality).toInt();
   ffmpegWriter = new Ffmpeg();
   ffmpegWriter->setPath(m_path);
@@ -62,7 +63,7 @@ TLevelWriterMp4::~TLevelWriterMp4() {
     outLx = m_lx * m_scale / 100;
     outLy = m_ly * m_scale / 100;
   }
-  //ffmpeg doesn't like resolutions that aren't divisible by 2.
+  // ffmpeg doesn't like resolutions that aren't divisible by 2.
   if (outLx % 2 != 0) outLx++;
   if (outLy % 2 != 0) outLy++;
 
@@ -211,7 +212,7 @@ TImageP TLevelReaderMp4::load(int frameIndex) {
 }
 
 Tiio::Mp4WriterProperties::Mp4WriterProperties()
-	: m_vidQuality("Quality", 1, 100, 90), m_scale("Scale", 1, 100, 100) {
+    : m_vidQuality("Quality", 1, 100, 90), m_scale("Scale", 1, 100, 100) {
   bind(m_vidQuality);
   bind(m_scale);
 }

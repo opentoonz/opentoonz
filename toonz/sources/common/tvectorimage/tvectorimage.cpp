@@ -1939,7 +1939,8 @@ assert(m_strokes[strokeIndex-wSize+1]->m_edgeList.empty());*/
 //-----------------------------------------------------------------------------
 
 static void computeEdgeList(TStroke *newS, const std::list<TEdge *> &edgeList1,
-                            bool join1AtBegin, const std::list<TEdge *> &edgeList2,
+                            bool join1AtBegin,
+                            const std::list<TEdge *> &edgeList2,
                             bool join2AtBegin, std::list<TEdge *> &edgeList) {
   std::list<TEdge *>::const_iterator it;
 

@@ -316,7 +316,8 @@ void createStroke(ThickQuadraticChainTag *quadTag, TVectorImage *outVectImage,
 
 //-----------------------------------------------------------------------------
 
-static void createGroup(GroupTag *groupTag, TVectorImage *vi, CreateStrokeData &data) {
+static void createGroup(GroupTag *groupTag, TVectorImage *vi,
+                        CreateStrokeData &data) {
   int count = vi->getStrokeCount();
   for (int j = 0; j < groupTag->m_numObjects; j++) {
     if (groupTag->m_object[j]->m_type == PliTag::COLOR_NGOBJ)

@@ -73,8 +73,8 @@ class WebmWriterProperties : public TPropertyGroup {
 public:
   // TEnumProperty m_pixelSize;
   // TBoolProperty m_matte;
-	TIntProperty m_vidQuality;
-	TIntProperty m_scale;
+  TIntProperty m_vidQuality;
+  TIntProperty m_scale;
   WebmWriterProperties();
 };
 

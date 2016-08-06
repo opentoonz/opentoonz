@@ -738,7 +738,8 @@ void Cluster::getMeanAxis(KEYER_FLOAT axis[3]) {
 //#define METODO_USATO_SU_TOONZ46
 
 static void buildPaletteForBlendedImages(std::set<TPixel32> &palette,
-                                         const TRaster32P &raster, int maxColorCount) {
+                                         const TRaster32P &raster,
+                                         int maxColorCount) {
   int lx = raster->getLx();
   int ly = raster->getLy();
 

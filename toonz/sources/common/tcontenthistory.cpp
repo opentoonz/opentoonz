@@ -84,7 +84,7 @@ inline QString getStr(const TFrameId &id) {
 const QString Fmt = "dd MMM yy   hh:mm";
 
 static QString getLine(int counter, const QDateTime &date,
-                const set<TFrameId> &frames) {
+                       const set<TFrameId> &frames) {
   static QString user;
   static QString machine;
   if (user == "") {

@@ -21,7 +21,6 @@ TNZ_LITTLE_ENDIAN undefined !!
 
     using namespace std;
 
-
 TUINT32 convertToLong(UCHAR *buffer);
 void storeFloat(unsigned char *buffer, TUINT32 value);
 

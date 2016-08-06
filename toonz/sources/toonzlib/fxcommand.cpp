@@ -2037,7 +2037,7 @@ QString DeleteLinksUndo::getHistoryString() {
 //=============================================================
 
 static void deleteLinks(const std::list<TFxCommand::Link> &links,
-                 TXsheetHandle *xshHandle) {
+                        TXsheetHandle *xshHandle) {
   std::unique_ptr<FxCommandUndo> undo(new DeleteLinksUndo(links, xshHandle));
   if (undo->isConsistent()) {
     undo->redo();
@@ -2299,7 +2299,7 @@ QString DeleteFxOrColumnUndo::getHistoryString() {
 //=============================================================
 
 static void deleteFxs(const std::list<TFxP> &fxs, TXsheetHandle *xshHandle,
-               TFxHandle *fxHandle) {
+                      TFxHandle *fxHandle) {
   TUndoManager *undoManager = TUndoManager::manager();
   TXsheet *xsh              = xshHandle->getXsheet();
 
@@ -2345,8 +2345,8 @@ void TFxCommand::removeOutputFx(TFx *fx, TXsheetHandle *xshHandle,
 //    Delete Columns  command
 //**********************************************************************
 
-static void deleteColumns(const std::list<int> &columns, TXsheetHandle *xshHandle,
-                   TFxHandle *fxHandle) {
+static void deleteColumns(const std::list<int> &columns,
+                          TXsheetHandle *xshHandle, TFxHandle *fxHandle) {
   TUndoManager *undoManager = TUndoManager::manager();
 
   undoManager->beginBlock();
