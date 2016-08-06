@@ -338,9 +338,13 @@ void LevelCreatePopup::showEvent(QShowEvent *) {
   if (Preferences::instance()->getUnits() == "pixel") {
     m_dpiFld->hide();
     m_dpiLabel->hide();
+    m_widthFld->setDecimals(0);
+    m_heightFld->setDecimals(0);
   } else {
     m_dpiFld->show();
     m_dpiLabel->show();
+    m_widthFld->setDecimals(4);
+    m_heightFld->setDecimals(4);
   }
 }
 
