@@ -1552,7 +1552,7 @@ void TXshSimpleLevel::saveSimpleLevel(const TFilePath &decodedFp,
           throw TSystemException(decodedFp,
                                  "Can't open file.\nAccess may be denied or \n"
                                  "someone else may be saving the same file.\n"
-								 "Please wait and try again.");
+                                 "Please wait and try again.");
         }
 
         lw->setOverwritePaletteFlag(overwritePalette);
@@ -2171,9 +2171,8 @@ TFilePath TXshSimpleLevel::getExistingHookFile(
   }
 
   assert(h >= 0);
-  return (h < 0) ? TFilePath()
-                 : decodedLevelPath.getParentDir() +
-                       TFilePath(hookFiles[h].toStdWString());
+  return (h < 0) ? TFilePath() : decodedLevelPath.getParentDir() +
+                                     TFilePath(hookFiles[h].toStdWString());
 }
 
 //-----------------------------------------------------------------------------
