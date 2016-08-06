@@ -664,10 +664,10 @@ void LevelSettingsPopup::onNameChanged() {
   }
 
   /*-- Level名に変更がない場合 --*/
-  //if (level->getName() == text.toStdWString()) {
-  //  warning("Level name unchanged.");
-  //  return;
-  //}
+  if (level->getName() == text.toStdWString()) {
+  // warning("Level name unchanged.");
+    return;
+  }
 
   TLevelSet *levelSet =
       TApp::instance()->getCurrentScene()->getScene()->getLevelSet();
