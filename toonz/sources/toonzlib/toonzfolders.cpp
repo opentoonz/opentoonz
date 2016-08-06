@@ -59,8 +59,7 @@ TFilePath ToonzFolder::getProfileFolder() {
 }
 
 TFilePath ToonzFolder::getReslistPath(bool forCleanup) {
-  return getConfigDir() +
-         (forCleanup ? "cleanupreslist.txt" : "reslist.txt");
+  return getConfigDir() + (forCleanup ? "cleanupreslist.txt" : "reslist.txt");
 }
 
 TFilePath ToonzFolder::getTemplateModuleDir() {
