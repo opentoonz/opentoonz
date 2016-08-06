@@ -279,7 +279,8 @@ int CommandManager::getKeyFromId(const char *id) {
 
 //---------------------------------------------------------
 
-void CommandManager::setShortcut(QAction *action, std::string shortcutString, bool keepDefault) {
+void CommandManager::setShortcut(QAction *action, std::string shortcutString,
+                                 bool keepDefault) {
   QString shortcut = QString::fromStdString(shortcutString);
 
   std::string oldShortcutString = action->shortcut().toString().toStdString();
@@ -329,7 +330,7 @@ void CommandManager::setShortcut(QAction *action, std::string shortcutString, bo
   settings.setValue(QString::fromStdString(node->m_id),
                     QString::fromStdString(shortcutString));
   if (keepDefault) {
-	  if (oldActionId != "") settings.remove(oldActionId);
+    if (oldActionId != "") settings.remove(oldActionId);
   }
   settings.endGroup();
 }

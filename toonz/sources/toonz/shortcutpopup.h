@@ -109,15 +109,15 @@ public:
   ~ShortcutPopup();
 
 private:
-	void setPresetShortcuts(TFilePath fp);
-	void showDialog(QString text);
-	bool showConfirmDialog();
-	bool showOverwriteDialog(QString name);
-	void importPreset();
-	QStringList buildPresets();
-	void showEvent(QShowEvent *se) override;
-	void setCurrentPresetPref(QString preset);
-	void getCurrentPresetPref();
+  void setPresetShortcuts(TFilePath fp);
+  void showDialog(QString text);
+  bool showConfirmDialog();
+  bool showOverwriteDialog(QString name);
+  void importPreset();
+  QStringList buildPresets();
+  void showEvent(QShowEvent *se) override;
+  void setCurrentPresetPref(QString preset);
+  void getCurrentPresetPref();
 
 protected slots:
   void clearAllShortcuts(bool warning = true);

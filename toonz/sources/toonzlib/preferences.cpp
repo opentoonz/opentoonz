@@ -1198,8 +1198,8 @@ void Preferences::setFfmpegPath(std::string path) {
 //-----------------------------------------------------------------
 
 void Preferences::setShortcutPreset(std::string preset) {
-	m_shortcutPreset = QString::fromStdString(preset);
-	m_settings->setValue("shortcutPreset", m_shortcutPreset);
+  m_shortcutPreset = QString::fromStdString(preset);
+  m_settings->setValue("shortcutPreset", m_shortcutPreset);
 }
 
 //-----------------------------------------------------------------
