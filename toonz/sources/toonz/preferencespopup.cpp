@@ -1144,6 +1144,7 @@ PreferencesPopup::PreferencesPopup()
 	  m_customProjectRootLabel->hide();
 	  m_projectRootDirections->hide();
   }
+  m_projectRootDocuments->hide();
   //--- Interface ------------------------------
   QStringList styleSheetList;
   for (int i = 0; i < m_pref->getStyleSheetCount(); i++) {
