@@ -1809,7 +1809,8 @@ TLevelWriterSvg::TLevelWriterSvg(const TFilePath &path, TPropertyGroup *winfo)
 
 //-----------------------------------------------------------------------------
 
-static void writeRegion(TRegion *r, TPalette *plt, QTextStream &out, double ly) {
+static void writeRegion(TRegion *r, TPalette *plt, QTextStream &out,
+                        double ly) {
   if (r->getEdgeCount() == 0) return;
   std::vector<const TQuadratic *> quadsOutline;
 
@@ -1872,8 +1873,8 @@ static void writeRegion(TRegion *r, TPalette *plt, QTextStream &out, double ly) 
 
 //--------------------------------------------------------------------------------------
 
-static void writeOutlineStroke(TStroke *s, TPalette *plt, QTextStream &out, double ly,
-                               double quality) {
+static void writeOutlineStroke(TStroke *s, TPalette *plt, QTextStream &out,
+                               double ly, double quality) {
   if (s->getChunkCount() == 0) return;
   if (s->getMaxThickness() == 0) return;
 

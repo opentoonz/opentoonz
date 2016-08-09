@@ -37,9 +37,8 @@ private:
 TLevelWriterGif::TLevelWriterGif(const TFilePath &path, TPropertyGroup *winfo)
     : TLevelWriter(path, winfo) {
   if (!m_properties) m_properties = new Tiio::GifWriterProperties();
-  std::string scale = m_properties->getProperty("Scale")
-                          ->getValueAsString();
-  m_scale = QString::fromStdString(scale).toInt();
+  std::string scale = m_properties->getProperty("Scale")->getValueAsString();
+  m_scale           = QString::fromStdString(scale).toInt();
   TBoolProperty *looping =
       (TBoolProperty *)m_properties->getProperty("Looping");
   m_looping = looping->getValue();
@@ -66,7 +65,7 @@ TLevelWriterGif::~TLevelWriterGif() {
   // set scaling
   outLx = m_lx * m_scale / 100;
   outLy = m_ly * m_scale / 100;
-  //ffmpeg doesn't like resolutions that aren't divisible by 2.
+  // ffmpeg doesn't like resolutions that aren't divisible by 2.
   if (outLx % 2 != 0) outLx++;
   if (outLy % 2 != 0) outLy++;
 
@@ -97,10 +96,9 @@ TLevelWriterGif::~TLevelWriterGif() {
     postIArgs << palette;
     postIArgs << "-lavfi";
     postIArgs << paletteFilters;
-  }
-  else {
-	postIArgs << "-lavfi";
-	postIArgs << filters;
+  } else {
+    postIArgs << "-lavfi";
+    postIArgs << filters;
   }
 
   if (!m_looping) {
@@ -239,7 +237,7 @@ TImageP TLevelReaderGif::load(int frameIndex) {
 }
 
 Tiio::GifWriterProperties::GifWriterProperties()
-	: m_scale("Scale", 1, 100, 100)
+    : m_scale("Scale", 1, 100, 100)
     , m_looping("Looping", true)
     , m_palette("Generate Palette", true) {
   bind(m_scale);

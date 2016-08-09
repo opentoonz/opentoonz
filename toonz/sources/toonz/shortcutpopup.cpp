@@ -170,9 +170,7 @@ void ShortcutViewer::enterEvent(QEvent *event) {
 
 //-----------------------------------------------------------------------------
 
-void ShortcutViewer::leaveEvent(QEvent *event) {
-  update();
-}
+void ShortcutViewer::leaveEvent(QEvent *event) { update(); }
 
 //=============================================================================
 // ShortcutTree

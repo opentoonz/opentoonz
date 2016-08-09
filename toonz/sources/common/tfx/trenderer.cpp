@@ -1107,7 +1107,7 @@ void RenderTask::onFinished(TThread::RunnableP) {
 
   // Update the render instance status
   bool instanceExpires = false;
-  bool isCanceled = false;
+  bool isCanceled      = false;
   {
     QMutexLocker sl(&rendererImp->m_renderInstancesMutex);
     std::map<unsigned long, TRendererImp::RenderInstanceInfos>::iterator it =
@@ -1116,7 +1116,7 @@ void RenderTask::onFinished(TThread::RunnableP) {
     if (it != rendererImp->m_activeInstances.end() &&
         (--it->second.m_activeTasks) <= 0) {
       instanceExpires = true;
-      isCanceled = (m_info.m_isCanceled && *m_info.m_isCanceled);
+      isCanceled      = (m_info.m_isCanceled && *m_info.m_isCanceled);
       rendererImp->m_activeInstances.erase(m_renderId);
       // m_info is freed, don't access further!
     }

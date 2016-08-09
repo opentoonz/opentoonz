@@ -444,9 +444,9 @@ private:
 
   int m_autosavePeriod,  // minutes
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
-      m_textureSize, m_autocreationType, m_keyframeType, m_animationStep, 
-	  m_ffmpegTimeout, m_projectRoot;
-
+      m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
+      m_ffmpegTimeout;  // seconds
+  int m_projectRoot;
   int m_currentLanguage, m_currentStyleSheet,
       m_undoMemorySize,  // in megabytes
       m_dragCellsBehaviour, m_lineTestFpsCapture, m_defLevelType, m_xsheetStep,

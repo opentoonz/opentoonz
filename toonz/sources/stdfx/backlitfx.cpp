@@ -11,8 +11,9 @@
 
 //---------------------------------------------------------------------
 
-static void backlit(TRaster32P lighted, TRaster32P light, TRaster32P out, double blur,
-                    const TPixel &color, double fade, double scale) {
+static void backlit(TRaster32P lighted, TRaster32P light, TRaster32P out,
+                    double blur, const TPixel &color, double fade,
+                    double scale) {
   assert(light && lighted && out);
 
   assert(lighted->getSize() == light->getSize());
@@ -92,8 +93,9 @@ static void backlit(TRaster32P lighted, TRaster32P light, TRaster32P out, double
 
 //---------------------------------------------------------------------
 
-static void backlit(TRaster64P lighted, TRaster64P light, TRaster64P out, double blur,
-                    const TPixel &color32, double fade, double scale) {
+static void backlit(TRaster64P lighted, TRaster64P light, TRaster64P out,
+                    double blur, const TPixel &color32, double fade,
+                    double scale) {
   assert(light && lighted && out);
 
   assert(lighted->getSize() == light->getSize());
