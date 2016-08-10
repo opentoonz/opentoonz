@@ -77,7 +77,7 @@ using namespace Stage;
    thickness of
                 images .pli.
 */
-// const double Stage::inch = 53.33333;
+// const double Stage::inch = 120 (old = 53.33333);
 
 //**********************************************************************************************
 //    Local namespace

@@ -1257,8 +1257,8 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
 void IoCmd::newScene() {
   RenderingSuspender suspender;
   TApp *app        = TApp::instance();
-  double cameraDpi = 53.33333;  // used to be 64, consider changing to 120 or
-                                // 160
+  double cameraDpi = Stage::inch;  // used to be 64, consider changing to 120 or
+                                // 160 (old = 53.33333)
   if (!saveSceneIfNeeded(QApplication::tr("New Scene"))) return;
 
   IconGenerator::instance()->clearRequests();
@@ -1281,7 +1281,6 @@ void IoCmd::newScene() {
 
   TCamera *camera = scene->getCurrentCamera();
   TDimension res(1920, 1080);
-  // TDimension res(768, 576);
   camera->setRes(res);
   camera->setSize(
       TDimensionD((double)res.lx / cameraDpi, (double)res.ly / cameraDpi));
