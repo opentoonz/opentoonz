@@ -214,6 +214,7 @@ public:
       , m_timeStretchFactor(1)
       , m_multimediaRender(0) {
     setCommandHandler("MI_Render", this, &RenderCommand::onRender);
+    setCommandHandler("MI_FastRender", this, &RenderCommand::onFastRender);
     setCommandHandler("MI_Preview", this, &RenderCommand::onPreview);
   }
 
@@ -222,6 +223,7 @@ public:
   void rasterRender(bool isPreview);
   void multimediaRender();
   void onRender();
+  void onFastRender();
   void onPreview();
   static void resetBgColor();
   void doRender(bool isPreview);
@@ -787,6 +789,32 @@ void RenderCommand::multimediaRender() {
 //===================================================================
 
 void RenderCommand::onRender() { doRender(false); }
+
+void RenderCommand::onFastRender() {
+  TOutputProperties *prop = TApp::instance()
+                                ->getCurrentScene()
+                                ->getScene()
+                                ->getProperties()
+                                ->getOutputProperties();
+  QString sceneName = QString::fromStdWString(
+      TApp::instance()->getCurrentScene()->getScene()->getSceneName());
+  QString location =
+      QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+  TFilePath path = TFilePath(location) + TFilePath(sceneName + ".mp4");
+  prop->setPath(path);
+  QStringList formats;
+  TImageWriter::getSupportedFormats(formats, true);
+  TLevelWriter::getSupportedFormats(formats, true);
+  Tiio::Writer::getSupportedFormats(formats, true);
+  if (!formats.contains("mp4")) {
+    QString msg = QObject::tr(
+        "FFmpeg not found, please set the location in the Preferences and "
+        "restart.");
+    DVGui::warning(msg);
+    return;
+  }
+  doRender(false);
+}
 
 void RenderCommand::onPreview() { doRender(true); }
 
