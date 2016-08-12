@@ -801,7 +801,8 @@ void RenderCommand::onFastRender() {
   QString location =
       QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
   TFilePath path = TFilePath(location) + TFilePath(sceneName + ".mp4");
-  prop->setPath(path);
+  TFilePath currPath = prop->getPath();
+  
   QStringList formats;
   TImageWriter::getSupportedFormats(formats, true);
   TLevelWriter::getSupportedFormats(formats, true);
@@ -813,7 +814,9 @@ void RenderCommand::onFastRender() {
     DVGui::warning(msg);
     return;
   }
+  prop->setPath(path);
   doRender(false);
+  prop->setPath(currPath);
 }
 
 void RenderCommand::onPreview() { doRender(true); }
