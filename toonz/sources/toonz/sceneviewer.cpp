@@ -793,7 +793,7 @@ void SceneViewer::showEvent(QShowEvent *) {
   TApp *app = TApp::instance();
 
   TSceneHandle *sceneHandle = app->getCurrentScene();
-  connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(resetSceneViewer()));
+  connect(sceneHandle, SIGNAL(sceneSwitched()), this, SLOT(fitToCamera()));
   connect(sceneHandle, SIGNAL(sceneChanged()), this, SLOT(onSceneChanged()));
 
   TFrameHandle *frameHandle = app->getCurrentFrame();
@@ -2190,6 +2190,7 @@ void SceneViewer::onObjectSwitched() {
 void SceneViewer::onSceneChanged() {
   onLevelChanged();
   update();
+  fitToCamera();
 }
 
 //-----------------------------------------------------------------------------
