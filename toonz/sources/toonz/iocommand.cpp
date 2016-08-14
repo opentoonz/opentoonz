@@ -1225,17 +1225,17 @@ bool IoCmd::saveSceneIfNeeded(QString msg) {
 
     //--- If both the level and scene is clean, then open the quit confirmation
     // dialog
-    if (!isLevelOrSceneIsDirty && msg == "Quit") {
-      QString question("Are you sure ?");
-      int ret =
-          DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);
-      if (ret == 0 || ret == 2) {
-        // cancel (or closed message box window)
-        return false;
-      } else if (ret == 1) {
-        // ok
-      }
-    }
+    //if (!isLevelOrSceneIsDirty && msg == "Quit") {
+    //  QString question("Are you sure ?");
+    //  int ret =
+    //      DVGui::MsgBox(question, QObject::tr("OK"), QObject::tr("Cancel"), 0);
+    //  if (ret == 0 || ret == 2) {
+    //    // cancel (or closed message box window)
+    //    return false;
+    //  } else if (ret == 1) {
+    //    // ok
+    //  }
+    //}
 
     RenderingSuspender suspender;
 
