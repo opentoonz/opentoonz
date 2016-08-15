@@ -54,7 +54,7 @@ TOfflineGL *currentOfflineGL = 0;
 //=============================================================================
 namespace {
 
-const VersionNumber l_currentVersion(71, 0);
+const VersionNumber l_currentVersion(71, 1);
 
 //-----------------------------------------------------------------------------
 

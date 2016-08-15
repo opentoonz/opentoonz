@@ -483,13 +483,30 @@ void TDoubleParam::copy(TParam *src) {
 }
 
 //---------------------------------------------------------
-
-void TDoubleParam::setValueRange(double min, double max, double step) {
+// 15/08/2016 shun-iwasawa
+// With the change of Stage::inch from 53.33333 to 120, default value and range
+// of
+// fx parameters with "fxLength" measure are undesirably changed.
+// So I will scale them in order to keep compatibility with old versions.
+// Note that this adjustment is intended to be done only for fxs which had been
+// impremented
+// before change of Stage::inch and you need to set
+// "isCreatedBeforeStageInchChange"
+// to false explicitly if you don't need it.
+//---------------------------------------------------------
+void TDoubleParam::setValueRange(double min, double max,
+                                 bool isCreatedBeforeStageInchChange) {
   if (min > max) min = max;
 
   m_imp->m_minValue = min;
   m_imp->m_maxValue = max;
-  // m_imp->m_valueStep = step;
+
+  if (isCreatedBeforeStageInchChange && getMeasureName() == "fxLength") {
+    double factor = 2.25;  // 120/53.33333
+    m_imp->m_minValue *= factor;
+    m_imp->m_maxValue *= factor;
+    m_imp->m_defaultValue *= factor;
+  }
 }
 
 //---------------------------------------------------------
@@ -1016,6 +1033,17 @@ const std::set<TParamObserver *> &TDoubleParam::observers() const {
 //---------------------------------------------------------
 
 void TDoubleParam::loadData(TIStream &is) {
+  /*
+    15/08/2016 shun-iwasawa
+    With the change of Stage::inch from 53.33333 to 120, loaded fx parameters
+    with "fxLength" measure are undesirably changed.
+    So I will scale them in order to keep compatibility with old versions.
+  */
+  VersionNumber tnzVersion = is.getVersion();
+  bool scaleNeeded =
+      (getMeasureName() == "fxLength" && tnzVersion < VersionNumber(71, 1));
+  double scaleFactor = 2.25;  // 120/53.33333
+
   string tagName;
   /*
 if(is.matchTag(tagName))
@@ -1052,6 +1080,7 @@ is >> m_imp->m_defaultValue;
       is >> oldType;
     } else if (tagName == "default") {
       is >> m_imp->m_defaultValue;
+      if (scaleNeeded) m_imp->m_defaultValue *= scaleFactor;
     } else if (tagName == "cycle") {
       string dummy;
       is >> dummy;
@@ -1146,6 +1175,7 @@ is >> m_imp->m_defaultValue;
       while (!is.eos()) {
         TDoubleKeyframe kk;
         kk.loadData(is);
+        if (scaleNeeded) kk.scaleValues(scaleFactor);
         TActualDoubleKeyframe k(kk);
         k.m_expression.setGrammar(m_imp->m_grammar);
         k.m_expression.setOwnerParameter(this);

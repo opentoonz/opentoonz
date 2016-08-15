@@ -20,7 +20,9 @@ TAffine getDpiAffine(TXshSimpleLevel *level, const TFrameId &fid,
                      bool forceFullSampling) {
   const double factor = Stage::inch;
 
-  if (level->getType() == PLI_XSHLEVEL) return TAffine();
+  if (level->getType() == PLI_XSHLEVEL)
+    return TScale(Stage::inch / Stage::vectorDpi);
+  // if (level->getType() == PLI_XSHLEVEL) return TAffine();
   LevelProperties *prop = level->getProperties();
   TAffine aff;
 

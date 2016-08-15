@@ -36,6 +36,7 @@
 #include "toonz/dpiscale.h"
 #include "toonz/tstageobjecttree.h"
 #include "toonz/txshsimplelevel.h"
+#include "toonz/stage.h"
 #include "toonzqt/selection.h"
 #include "toonzqt/imageutils.h"
 #include "toonzqt/dvdialog.h"
@@ -240,7 +241,10 @@ void SceneViewer::enterEvent(QEvent *) {
   if (level && level->getSimpleLevel())
     m_dpiScale =
         getCurrentDpiScale(level->getSimpleLevel(), tool->getCurrentFid());
-  else
+  else if (tool->getTargetType() & TTool::VectorImage) {
+    double fac = Stage::inch / Stage::vectorDpi;
+    m_dpiScale = TPointD(fac, fac);
+  } else
     m_dpiScale = TPointD(1, 1);
 
   if (m_freezedStatus != NO_FREEZED) return;

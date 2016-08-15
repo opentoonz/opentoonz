@@ -218,30 +218,31 @@ Preferences::LevelFormat PreferencesPopup::FormatProperties::levelFormat()
 void PreferencesPopup::onPixelsOnlyChanged(int index) {
   bool enabled = index == Qt::Checked;
   if (enabled) {
-	  m_pref->setDefLevelDpi(Stage::inch);
+    m_pref->setDefLevelDpi(Stage::inch);
     m_pref->setPixelsOnly(true);
     TCamera *camera;
     camera =
         TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
     TDimension camRes = camera->getRes();
     TDimensionD camSize;
-	camSize.lx = camRes.lx / Stage::inch;
-	camSize.ly = camRes.ly / Stage::inch;
+    camSize.lx = camRes.lx / Stage::inch;
+    camSize.ly = camRes.ly / Stage::inch;
     camera->setSize(camSize);
     TDimension cleanupRes = CleanupSettingsModel::instance()
                                 ->getCurrentParameters()
                                 ->m_camera.getRes();
     TDimensionD cleanupSize;
-	cleanupSize.lx = cleanupRes.lx / Stage::inch;
-	cleanupSize.ly = cleanupRes.ly / Stage::inch;
-    CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.setSize(cleanupSize);
-	m_pref->storeOldUnits();
+    cleanupSize.lx = cleanupRes.lx / Stage::inch;
+    cleanupSize.ly = cleanupRes.ly / Stage::inch;
+    CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.setSize(
+        cleanupSize);
+    m_pref->storeOldUnits();
     if (m_unitOm->currentIndex() != 4) m_unitOm->setCurrentIndex(4);
     if (m_cameraUnitOm->currentIndex() != 4) m_cameraUnitOm->setCurrentIndex(4);
     m_unitOm->setDisabled(true);
     m_cameraUnitOm->setDisabled(true);
     m_defLevelDpi->setDisabled(true);
-	m_defLevelDpi->setValue(Stage::inch);
+    m_defLevelDpi->setValue(Stage::inch);
     m_defLevelWidth->setMeasure("camera.lx");
     m_defLevelHeight->setMeasure("camera.ly");
     m_defLevelWidth->setValue(m_pref->getDefLevelWidth());

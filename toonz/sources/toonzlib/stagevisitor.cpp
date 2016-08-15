@@ -816,9 +816,13 @@ void RasterPainter::onVectorImage(TVectorImage *vi,
   } else if (player.m_opacity < 255)
     cf = new TTranspFader(player.m_opacity / 255.0);
 
-  TVectorRenderData rd(m_viewAff * player.m_placement, TRect(), vPalette, cf,
-                       true  // alpha enabled
-                       );
+  // apply scaling (Stage::inch / Stage::vectorDpi) in order to keep consistency
+  // of size of vector level
+  TVectorRenderData rd(
+      m_viewAff * player.m_placement * TScale(Stage::inch / Stage::vectorDpi),
+      TRect(), vPalette, cf,
+      true  // alpha enabled
+      );
 
   rd.m_drawRegions       = !inksOnly;
   rd.m_inkCheckEnabled   = tc & ToonzCheck::eInk;
@@ -992,7 +996,9 @@ void OpenGlPainter::onImage(const Stage::Player &player) {
   if (m_camera3d)
     glTranslated(
         0, 0,
-        player.m_z);  // Ok, move object along z as specified in the player
+        player.m_z * (Stage::inch / Stage::vectorDpi));  // Ok, move object
+                                                         // along z as specified
+                                                         // in the player
 
   // Attempt Plastic-deformed drawing
   if (TStageObject *obj =
@@ -1020,7 +1026,8 @@ void OpenGlPainter::onVectorImage(TVectorImage *vi,
   if (m_camera3d && (player.m_onionSkinDistance == c_noOnionSkin ||
                      player.m_onionSkinDistance == 0)) {
     const TRectD &bbox = player.m_placement * player.m_dpiAff * vi->getBBox();
-    draw3DShadow(bbox, player.m_z, m_phi);
+    draw3DShadow(bbox, 0, m_phi);
+    // draw3DShadow(bbox, player.m_z, m_phi);
   }
 
   TColorFunction *cf = 0;
@@ -1039,12 +1046,13 @@ void OpenGlPainter::onVectorImage(TVectorImage *vi,
   }
 
   TVectorRenderData rd =
-      isViewer() ? TVectorRenderData(TVectorRenderData::ViewerSettings(),
-                                     m_viewAff * player.m_placement, m_clipRect,
-                                     vPalette)
-                 : TVectorRenderData(TVectorRenderData::ProductionSettings(),
-                                     m_viewAff * player.m_placement, m_clipRect,
-                                     vPalette);
+      isViewer()
+          ? TVectorRenderData(TVectorRenderData::ViewerSettings(),
+                              m_viewAff * player.m_placement * player.m_dpiAff,
+                              m_clipRect, vPalette)
+          : TVectorRenderData(TVectorRenderData::ProductionSettings(),
+                              m_viewAff * player.m_placement * player.m_dpiAff,
+                              m_clipRect, vPalette);
 
   rd.m_alphaChannel = m_alphaEnabled;
   rd.m_is3dView     = m_camera3d;
@@ -1398,7 +1406,8 @@ void onPlasticDeformedImage(TStageObject *playerObj,
   TPointD slDpi(player.m_sl ? player.m_sl->getDpi(player.m_fid, 0) : TPointD());
   if (slDpi.x == 0.0 || slDpi.y == 0.0 ||
       player.m_sl->getType() == PLI_XSHLEVEL)
-    slDpi.x = slDpi.y = Stage::inch;
+    slDpi.x = slDpi.y = Stage::vectorDpi;
+  // slDpi.x = slDpi.y = Stage::inch;
 
   // Build reference transforms
 

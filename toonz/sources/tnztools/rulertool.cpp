@@ -55,8 +55,8 @@ void RulerTool::draw() {
   if (m_firstPos != TConst::nowhere) {
     tglColor((m_dragMode == MoveFirstPos) ? TPixel32(51, 204, 26)
                                           : TPixel32::Red);
-    tglDrawCircle(m_firstPos, 4);
-    tglDrawCircle(m_firstPos, 2);
+    tglDrawCircle(m_firstPos, 9);
+    tglDrawCircle(m_firstPos, 4.5);
     /*--- 終点が設定されていたら、その区間を描画 ---*/
     if (m_secondPos != TConst::nowhere) {
       tglColor((m_dragMode == MoveRuler) ? TPixel32(51, 204, 26)
@@ -67,7 +67,7 @@ void RulerTool::draw() {
       glEnd();
       tglColor((m_dragMode == MoveSecondPos) ? TPixel32(51, 204, 26)
                                              : TPixel32::Red);
-      tglDrawCircle(m_secondPos, 4);
+      tglDrawCircle(m_secondPos, 9);
     }
   }
 }

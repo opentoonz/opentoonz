@@ -571,7 +571,7 @@ void CameraTestTool::drawCleanupCamera(double pixelSize) {
   TPointD pos = rect.getP01() + TPointD(0, 4);
   glPushMatrix();
   glTranslated(pos.x, pos.y, 0);
-  glScaled(2, 2, 2);
+  glScaled(4.5, 4.5, 4.5);
   tglDrawText(TPointD(), "Cleanup Camera");
   glPopMatrix();
 }

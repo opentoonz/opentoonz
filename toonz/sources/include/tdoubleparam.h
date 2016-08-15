@@ -71,7 +71,8 @@ public:
   void setMeasureName(std::string name);
   TMeasure *getMeasure() const;
 
-  void setValueRange(double min, double max, double step = 1.0);
+  void setValueRange(double min, double max,
+                     bool isCreatedBeforeStageInchChange = true);
   bool getValueRange(double &min, double &max, double &step) const;
 
   double getDefaultValue() const;

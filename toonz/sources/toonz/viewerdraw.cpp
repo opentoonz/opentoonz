@@ -416,7 +416,9 @@ void ViewerDraw::draw3DCamera(unsigned long flags, double zmin, double phi) {
   double zcam             = xsh->getZ(cameraId, frame);
   TRectD rect             = getCameraRect();
 
-  double znear = 1000 + zcam - 100;
+  double scaleFactor = Stage::inch / Stage::vectorDpi;
+
+  double znear = Stage::bigBoxSize[2] + zcam * scaleFactor - 225;
 
   TPointD cameraCorners[4] = {camAff * rect.getP00(), camAff * rect.getP10(),
                               camAff * rect.getP11(), camAff * rect.getP01()};
@@ -432,15 +434,16 @@ void ViewerDraw::draw3DCamera(unsigned long flags, double zmin, double phi) {
   int columnIndex = app->getCurrentColumn()->getColumnIndex();
   if (columnIndex >= 0) {
     TStageObjectId objId = TStageObjectId::ColumnId(columnIndex);
-    double zcur          = xsh->getZ(objId, frame);
+    double zcur          = xsh->getZ(objId, frame) * scaleFactor;
     if (zcur < znear) cageZ.push_back(zcur);
   }
   std::sort(cageZ.begin(), cageZ.end());
   int m = (int)cageZ.size();
 
   for (int i = 0; i < m; i++) {
-    double z  = cageZ[i];
-    double sc = (1000 + zcam - z) * 0.001;
+    double z = cageZ[i];
+    double sc =
+        (Stage::bigBoxSize[2] + zcam - z) * (1.0 / Stage::bigBoxSize[2]);
     for (int j = 0; j < 4; j++)
       cage[i][j] =
           make3dPoint(cameraCenter + sc * (cameraCorners[j] - cameraCenter), z);
@@ -610,7 +613,7 @@ void ViewerDraw::drawCamera(unsigned long flags, double pixelSize) {
 
   // nome della camera
   if (!camera3d) {
-    TPointD pos = rect.getP01() + TPointD(0, 4);
+    TPointD pos = rect.getP01() + TPointD(0, 9);
     std::string name;
     if (CleanupPreviewCheck::instance()->isEnabled())
       name = "Cleanup Camera";
@@ -618,7 +621,7 @@ void ViewerDraw::drawCamera(unsigned long flags, double pixelSize) {
       name = xsh->getStageObject(cameraId)->getName();
     glPushMatrix();
     glTranslated(pos.x, pos.y, 0);
-    glScaled(2, 2, 2);
+    glScaled(4.5, 4.5, 4.5);
     tglDrawText(TPointD(), name);
     glPopMatrix();
   }
@@ -658,7 +661,8 @@ void ViewerDraw::draw3DFrame(double minZ, double phi) {
   double d = phi < 0 ? -a : a;
 
   double z0 = minZ;
-  double z1 = 1000;
+  double z1 = Stage::bigBoxSize[2];
+  // double z1 = 1000;
 
   glColor3d(0.9, 0.9, 0.86);
   glBegin(GL_LINES);
@@ -723,10 +727,13 @@ void ViewerDraw::drawFieldGuide() {
   for (i = 1; i <= n; i++) {
     TPointD delta = 0.03 * TPointD(ux, uy);
     std::string s = std::to_string(i);
-    tglDrawText(TPointD(0, i * uy) + delta, s);
-    tglDrawText(TPointD(0, -i * uy) + delta, s);
-    tglDrawText(TPointD(-i * ux, 0) + delta, s);
-    tglDrawText(TPointD(i * ux, 0) + delta, s);
+    // set scale 2.25 in order to make the text to be the same size as ones in
+    // Stage::inch = 53.33333.
+    double sizeFactor = Stage::inch / Stage::vectorDpi;  //=2.25
+    tglDrawText(TPointD(0, i * uy) + delta, s, GLUT_STROKE_ROMAN, sizeFactor);
+    tglDrawText(TPointD(0, -i * uy) + delta, s, GLUT_STROKE_ROMAN, sizeFactor);
+    tglDrawText(TPointD(-i * ux, 0) + delta, s, GLUT_STROKE_ROMAN, sizeFactor);
+    tglDrawText(TPointD(i * ux, 0) + delta, s, GLUT_STROKE_ROMAN, sizeFactor);
   }
   glPopMatrix();
 }

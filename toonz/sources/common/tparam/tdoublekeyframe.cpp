@@ -154,3 +154,9 @@ void TDoubleKeyframe::loadData(TIStream &is) {
   if (m_unitName == "default") m_unitName = "";
   m_isKeyframe                            = true;
 }
+
+void TDoubleKeyframe::scaleValues(double factor) {
+  m_value *= factor;
+  m_speedIn.y *= factor;
+  m_speedOut.y *= factor;
+}

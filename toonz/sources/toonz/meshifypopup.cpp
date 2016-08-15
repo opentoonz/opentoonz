@@ -98,7 +98,8 @@ TRaster32P render(const TVectorImageP &vi, double &rasDpi, int margin,
   if (bboxD.x0 >= bboxD.x1 || bboxD.y0 >= bboxD.y1) return TRaster32P();
 
   // Build the scale factor from scene's to specified dpi
-  double scale = rasDpi / Stage::inch;
+  double scale = rasDpi / Stage::vectorDpi;
+  // double scale = rasDpi / Stage::inch;
 
   // Ensure that the maximum lateral resolution is respected
   if (scale * bboxD.getLx() > RENDERED_IMAGES_MAX_LATERAL_RESOLUTION ||
@@ -118,7 +119,8 @@ TRaster32P render(const TVectorImageP &vi, double &rasDpi, int margin,
              tceil(bboxD.y1) - 1);
 
   worldOriginPos = -convert(bbox.getP00());
-  rasDpi         = scale * Stage::inch;
+  rasDpi         = scale * Stage::vectorDpi;
+  // rasDpi = scale * Stage::inch;
 
   // Initialize a corresponding OpenGL context
   std::unique_ptr<TOfflineGL> offlineGlContext(new TOfflineGL(bbox.getSize()));
@@ -146,7 +148,8 @@ TRaster32P render(const TXsheet *xsh, int row, double &rasDpi, int margin,
   bbox = cameraAff.inv() * bbox;
 
   // Build the scale factor from scene's to specified dpi
-  double scale = rasDpi / Stage::inch;
+  double scale = rasDpi / Stage::vectorDpi;
+  // double scale = rasDpi / Stage::inch;
 
   // Ensure that the maximum lateral resolution is respected
   if (scale * bbox.getLx() > RENDERED_IMAGES_MAX_LATERAL_RESOLUTION ||
@@ -166,7 +169,8 @@ TRaster32P render(const TXsheet *xsh, int row, double &rasDpi, int margin,
       TRectD(tfloor(bbox.x0), tfloor(bbox.y0), tceil(bbox.x1), tceil(bbox.y1));
 
   worldOriginPos = -bbox.getP00();
-  rasDpi         = scale * Stage::inch;
+  rasDpi         = scale * Stage::vectorDpi;
+  // rasDpi = scale * Stage::inch;
 
   // Draw the xsheet
   TRaster32P ras(tround(bbox.getLx()), tround(bbox.getLy()));
@@ -204,7 +208,8 @@ TXshSimpleLevel *createMeshLevel(TXshLevel *texturesLevel) {
     static void copyLevelProperties(TXshLevel *src, TXshSimpleLevel *dstSl) {
       LevelProperties *dstProp = dstSl->getProperties();
       dstProp->setDpiPolicy(LevelProperties::DP_ImageDpi);
-      dstProp->setDpi(TPointD(Stage::inch, Stage::inch));
+      dstProp->setDpi(TPointD(Stage::vectorDpi, Stage::vectorDpi));
+      // dstProp->setDpi(TPointD(Stage::inch, Stage::inch));
 
       TXshSimpleLevel *srcSl = dynamic_cast<TXshSimpleLevel *>(src);
       if (srcSl && srcSl->getType() != PLI_XSHLEVEL) {
@@ -475,7 +480,8 @@ void getRaster(const TImageP &img, TPointD &imgDpi, TRasterP &ras,
   if (vi) {
     ras      = render(vi, rasDpi.x, margin, worldOriginPos);
     rasDpi.y = rasDpi.x;
-    imgDpi   = TPointD(Stage::inch, Stage::inch);
+    imgDpi   = TPointD(Stage::vectorDpi, Stage::vectorDpi);
+    // imgDpi = TPointD(Stage::inch, Stage::inch);
   }
 }
 
@@ -579,7 +585,8 @@ public:
 
       // Push mesh-to-world coordinates change
       pushGLWorldCoordinates();
-      glScaled(Stage::inch / meshDpi.x, Stage::inch / meshDpi.y, 1.0);
+      glScaled(Stage::vectorDpi / meshDpi.x, Stage::vectorDpi / meshDpi.y, 1.0);
+      // glScaled(Stage::inch / meshDpi.x, Stage::inch / meshDpi.y, 1.0);
 
       glColor4f(0.0, 1.0, 0.0, 0.7);  // Translucent green
       tglDrawEdges(*m_meshImg);
@@ -839,7 +846,8 @@ namespace {
 TMeshImageP meshify(const TXshCell &cell, const MeshifyOptions &options) {
   struct locals {
     static inline void checkEmptyDpi(TPointD &dpi) {
-      if (dpi.x == 0.0 || dpi.y == 0.0) dpi.x = dpi.y = Stage::inch;
+      if (dpi.x == 0.0 || dpi.y == 0.0) dpi.x = dpi.y = Stage::vectorDpi;
+      // if (dpi.x == 0.0 || dpi.y == 0.0) dpi.x = dpi.y = Stage::inch;
     }
   };  // locals
 
@@ -879,7 +887,8 @@ TMeshImageP meshify(const TXshCell &cell, const MeshifyOptions &options) {
 
     ::getRaster(xsh, row, ras, rasDpi, worldOriginPos, opts.m_margin);
 
-    slDpi.x = slDpi.y = Stage::inch;
+    slDpi.x = slDpi.y = Stage::vectorDpi;
+    // slDpi.x = slDpi.y = Stage::inch;
     imageDpi = slDpi, shownDpi = rasDpi;
 
     opts.m_transparentColor = TPixel64::Transparent;

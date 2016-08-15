@@ -108,7 +108,7 @@ DVAPI double tglGetPixelSize2();
 //! Draw text in string s at position p.
 
 DVAPI void tglDrawText(const TPointD &p, const std::string &s,
-                       void *font = GLUT_STROKE_ROMAN);
+                       void *font = GLUT_STROKE_ROMAN, double sizeFactor = 1.0);
 DVAPI void tglDrawText(const TPointD &p, const std::wstring &s,
                        void *font = GLUT_STROKE_ROMAN);
 
