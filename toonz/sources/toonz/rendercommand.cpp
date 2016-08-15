@@ -798,8 +798,11 @@ void RenderCommand::onFastRender() {
                                 ->getOutputProperties();
   QString sceneName = QString::fromStdWString(
       TApp::instance()->getCurrentScene()->getScene()->getSceneName());
-  QString location =
-      QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+  QString location = Preferences::instance()->getFastRenderPath();
+  if (location == "desktop" || location == "Desktop") {
+      location =
+         QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+  }
   TFilePath path = TFilePath(location) + TFilePath(sceneName + ".mp4");
   TFilePath currPath = prop->getPath();
   

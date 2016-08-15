@@ -1593,7 +1593,7 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_OutputSettings, tr("&Output Settings..."), "");
   createMenuFileAction(MI_PreviewSettings, tr("&Preview Settings..."), "");
   createMenuFileAction(MI_Render, tr("&Render"), "");
-  createMenuFileAction(MI_FastRender, tr("&Fast Render to Desktop"), "Alt+R");
+  createMenuFileAction(MI_FastRender, tr("&Fast Render"), "Alt+R");
   createMenuFileAction(MI_Preview, tr("&Preview"), "Ctrl+R");
   createRightClickMenuAction(MI_SavePreviewedFrames,
                              tr("&Save Previewed Frames"), "");

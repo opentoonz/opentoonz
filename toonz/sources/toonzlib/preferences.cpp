@@ -287,6 +287,7 @@ Preferences::Preferences()
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
     , m_precompute(true)
+    , m_fastRenderPath("desktop")
     , m_ffmpegTimeout(30) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
@@ -544,6 +545,9 @@ Preferences::Preferences()
   QString ffmpegPath = m_settings->value("ffmpegPath").toString();
   if (ffmpegPath != "") m_ffmpegPath = ffmpegPath;
   setFfmpegPath(m_ffmpegPath.toStdString());
+  QString fastRenderPath = m_settings->value("fastRenderPath").toString();
+  if (fastRenderPath != "") m_fastRenderPath = fastRenderPath;
+  setFastRenderPath(m_fastRenderPath.toStdString());
   getValue(*m_settings, "ffmpegTimeout", m_ffmpegTimeout);
 }
 
@@ -1189,6 +1193,14 @@ void Preferences::setFfmpegPath(std::string path) {
   m_ffmpegPath        = QString::fromStdString(path);
   std::string strPath = m_ffmpegPath.toStdString();
   m_settings->setValue("ffmpegPath", m_ffmpegPath);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setFastRenderPath(std::string path) {
+    m_fastRenderPath = QString::fromStdString(path);
+    std::string strPath = m_ffmpegPath.toStdString();
+    m_settings->setValue("fastRenderPath", m_fastRenderPath);
 }
 
 //-----------------------------------------------------------------

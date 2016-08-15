@@ -70,7 +70,7 @@ private:
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
       *m_onionSkinVisibility, *m_pixelsOnlyCB;
 
-  DVGui::FileField *m_ffmpegPathFileFld;
+  DVGui::FileField *m_ffmpegPathFileFld, *m_fastRenderPathFileField;
 
 private:
   // QWidget* create(const QString& lbl, bool def, const char* slot);
@@ -153,6 +153,7 @@ private slots:
   void onShowKeyframesOnCellAreaChanged(int);
   void onFfmpegPathChanged();
   void onFfmpegTimeoutChanged();
+  void onFastRenderPathChanged();
 };
 
 //**********************************************************************************
