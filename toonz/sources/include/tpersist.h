@@ -142,10 +142,8 @@ public:
                 class TPersistDeclarationT
         */
 #define PERSIST_DECLARATION(T)                                                 \
-  \
 private:                                                                       \
   static TPersistDeclarationT<T> m_declaration;                                \
-  \
 public:                                                                        \
   const TPersistDeclaration *getDeclaration() const override {                 \
     return &m_declaration;                                                     \
