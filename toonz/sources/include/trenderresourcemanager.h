@@ -135,6 +135,7 @@ static TRenderResourceManagerGenerator* gen();
 public:                                                                        \
   static TRenderResourceManagerGenerator *gen();                               \
   static TRenderResourceManagerGenerator *deps();                              \
+                                                                               \
 private:
 
 //--------------------------------------------------------------------------------
