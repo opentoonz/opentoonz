@@ -82,11 +82,12 @@ double tglGetTextWidth(const std::string &s, void *font) {
 
 //-----------------------------------------------------------------------------
 
-void tglDrawText(const TPointD &p, const std::string &s, void *character) {
+void tglDrawText(const TPointD &p, const std::string &s, void *character,
+                 double sizeFactor) {
 #ifndef __sgi
   glPushMatrix();
   glTranslated(p.x, p.y, 0);
-  double factor = 0.07;
+  double factor = 0.07 * sizeFactor;
   glScaled(factor, factor, factor);
   for (int i = 0; i < (int)s.size(); i++) glutStrokeCharacter(character, s[i]);
   glPopMatrix();

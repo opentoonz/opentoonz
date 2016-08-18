@@ -195,7 +195,8 @@ bool PlasticDeformerFx::buildTextureDataSl(double frame, TRenderSettings &info,
   // Build dpi data
   TPointD texDpi(texSl->getDpi(texFid, 0));
   if (texDpi.x == 0.0 || texDpi.y == 0.0 || texSl->getType() == PLI_XSHLEVEL)
-    texDpi.x = texDpi.y = Stage::inch;
+    texDpi.x = texDpi.y = Stage::vectorDpi;
+  // texDpi.x = texDpi.y = Stage::inch;
 
   // Build reference transforms data
 

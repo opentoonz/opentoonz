@@ -70,6 +70,8 @@ public:
   ~TDoubleKeyframe();
 
   bool operator<(const TDoubleKeyframe &k) const { return m_frame < k.m_frame; }
+
+  void scaleValues(double factor);
 };
 
 #endif

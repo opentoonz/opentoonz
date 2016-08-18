@@ -1290,9 +1290,11 @@ void SceneViewer::drawOverlay() {
     glGetDoublev(GL_PROJECTION_MATRIX, projection3D);
     glGetIntegerv(GL_VIEWPORT, viewport3D);
 
+    const double *bbs = Stage::bigBoxSize;
+
     if (m_phi3D > 0) {
       T3DPointD topRasterPos3D = computeNew3DPosition(
-          T3DPointD(500, 500, 1000), TPointD(-10, -10), m_topRasterPos,
+          T3DPointD(bbs[0], bbs[1], bbs[2]), TPointD(-10, -10), m_topRasterPos,
           modelView3D, projection3D, viewport3D);
       glRasterPos3f(topRasterPos3D.x, topRasterPos3D.y, topRasterPos3D.z);
       glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
@@ -1300,15 +1302,15 @@ void SceneViewer::drawOverlay() {
                    m_3DTop->getRawData());
 
       T3DPointD sideRasterPos3D = computeNew3DPosition(
-          T3DPointD(-500, -500, 1000), TPointD(-10, -10), m_sideRasterPos,
-          modelView3D, projection3D, viewport3D);
+          T3DPointD(-bbs[0], -bbs[1], bbs[2]), TPointD(-10, -10),
+          m_sideRasterPos, modelView3D, projection3D, viewport3D);
       glRasterPos3f(sideRasterPos3D.x, sideRasterPos3D.y, sideRasterPos3D.z);
       glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
       glDrawPixels(m_3DSideR->getWrap(), m_3DSideR->getLy(), TGL_FMT, TGL_TYPE,
                    m_3DSideR->getRawData());
     } else {
       T3DPointD topRasterPos3D = computeNew3DPosition(
-          T3DPointD(-500, 500, 1000), TPointD(-10, -10), m_topRasterPos,
+          T3DPointD(-bbs[0], bbs[1], bbs[2]), TPointD(-10, -10), m_topRasterPos,
           modelView3D, projection3D, viewport3D);
       glRasterPos3f(topRasterPos3D.x, topRasterPos3D.y, topRasterPos3D.z);
       glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
@@ -1316,8 +1318,8 @@ void SceneViewer::drawOverlay() {
                    m_3DTop->getRawData());
 
       T3DPointD sideRasterPos3D = computeNew3DPosition(
-          T3DPointD(500, -500, 1000), TPointD(-10, -10), m_sideRasterPos,
-          modelView3D, projection3D, viewport3D);
+          T3DPointD(bbs[0], -bbs[1], bbs[2]), TPointD(-10, -10),
+          m_sideRasterPos, modelView3D, projection3D, viewport3D);
       glRasterPos3f(sideRasterPos3D.x, sideRasterPos3D.y, sideRasterPos3D.z);
       glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
       glDrawPixels(m_3DSideL->getWrap(), m_3DSideL->getLy(), TGL_FMT, TGL_TYPE,
@@ -1342,6 +1344,7 @@ void SceneViewer::drawOverlay() {
     if (m_draw3DMode) {
       mult3DMatrix();
       tglMultMatrix(tool->getMatrix());
+      glScaled(1, 1, Stage::inch / Stage::vectorDpi);
     } else
       tglMultMatrix(getViewMatrix() * tool->getMatrix());
     if (tool->getToolType() & TTool::LevelTool &&
@@ -2147,7 +2150,10 @@ void SceneViewer::onLevelChanged() {
     if (level && level->getSimpleLevel())
       m_dpiScale =
           getCurrentDpiScale(level->getSimpleLevel(), tool->getCurrentFid());
-    else
+    else if (tool->getTargetType() & TTool::VectorImage) {
+      double fac = Stage::inch / Stage::vectorDpi;
+      m_dpiScale = TPointD(fac, fac);
+    } else
       m_dpiScale = TPointD(1, 1);
   }
 }
@@ -2162,7 +2168,10 @@ void SceneViewer::onLevelSwitched() {
   if (level && level->getSimpleLevel())
     m_dpiScale =
         getCurrentDpiScale(level->getSimpleLevel(), tool->getCurrentFid());
-  else
+  else if (tool->getTargetType() & TTool::VectorImage) {
+    double fac = Stage::inch / Stage::vectorDpi;
+    m_dpiScale = TPointD(fac, fac);
+  } else
     m_dpiScale = TPointD(1, 1);
 }
 

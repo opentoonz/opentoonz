@@ -7,6 +7,7 @@
 #include "tconvert.h"
 #include "tdoubleparam.h"
 #include "tdoublekeyframe.h"
+#include "toonz/stage.h"
 
 #include <QDebug>
 
@@ -200,6 +201,13 @@ void TStageObjectSpline::loadData(TIStream &is) {
         for (i = 0; i < n; i++) {
           TThickPoint p;
           is >> p.x >> p.y >> p.thick;
+
+          if (tnzVersion < VersionNumber(71, 1)) {
+            double scaleFactor = Stage::inch / Stage::vectorDpi;
+            p.x *= scaleFactor;
+            p.y *= scaleFactor;
+          }
+
           points.push_back(p);
         }
       }

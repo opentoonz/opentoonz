@@ -1146,12 +1146,10 @@ void EditTool::draw() {
     tglColor(m_highlightedDevice == ZTranslation ? highlightedColor
                                                  : normalColor);
 
-    glPushMatrix();
     double z = xsh->getZ(objId, frame);
     glTranslated(0, -1, z);
     drawArrow(50, isPicking());
     glPopName();
-    glPopMatrix();
 
     glPopMatrix();
     return;
