@@ -1045,7 +1045,7 @@ bool checkIfCellsHaveTheSameContent(int &r0, int &c0, int &r1, int &c1,
 }
 
 void renameCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1,
-                            TXshCell &cell) {
+                            const TXshCell &cell) {
   TApp *app    = TApp::instance();
   TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
   for (int c = c0; c <= c1; c++) {
@@ -1063,43 +1063,53 @@ void renameCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1,
 }
 
 class RenameCellsUndo final : public TUndo {
-  TCellSelection::Range m_range;
+  TCellSelection *m_selection;
   QMimeData *m_data;
   TXshCell m_cell;
 
 public:
-  RenameCellsUndo(TCellSelection::Range range, QMimeData *data, TXshCell &cell)
-      : m_range(range), m_data(data), m_cell(cell) {}
+  RenameCellsUndo(TCellSelection *selection, QMimeData *data, TXshCell &cell)
+      : m_data(data), m_cell(cell) {
+    int r0, c0, r1, c1;
+    selection->getSelectedCells(r0, c0, r1, c1);
+    m_selection = new TCellSelection();
+    m_selection->selectCells(r0, c0, r1, c1);
+  }
 
-  ~RenameCellsUndo() { delete m_data; }
+  ~RenameCellsUndo() {
+    delete m_selection;
+    delete m_data;
+  }
 
   void undo() const override {
+    int r0, c0, r1, c1;
+    m_selection->getSelectedCells(r0, c0, r1, c1);
     TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
-    for (int c = m_range.m_c0; c <= m_range.m_c1; c++) {
-      xsh->clearCells(m_range.m_r0, c, m_range.m_r1 - m_range.m_r0 + 1);
+    for (int c = c0; c <= c1; c++) {
+      xsh->clearCells(r0, c, r1 - r0 + 1);
     }
     const TCellData *cellData = dynamic_cast<const TCellData *>(m_data);
-    pasteCellsWithoutUndo(cellData, (int)m_range.m_r0, (int)m_range.m_c0,
-                          (int)m_range.m_r1, (int)m_range.m_c1, false, false);
+    pasteCellsWithoutUndo(cellData, r0, c0, r1, c1, false, false);
     TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
   }
 
   void redo() const override {
-    renameCellsWithoutUndo((int)m_range.m_r0, (int)m_range.m_c0,
-                           (int)m_range.m_r1, (int)m_range.m_c1,
-                           TXshCell(m_cell));
+    int r0, c0, r1, c1;
+    m_selection->getSelectedCells(r0, c0, r1, c1);
+    renameCellsWithoutUndo(r0, c0, r1, c1, m_cell);
   }
 
   int getSize() const override { return sizeof(*this); }
 
   QString getHistoryString() override {
-    QString colRange = QString::number(m_range.m_c0 + 1);
-    if (m_range.m_c0 != m_range.m_c1)
-      colRange.append(QString(" - %1").arg(QString::number(m_range.m_c1 + 1)));
-    QString frameRange = QString::number(m_range.m_r0 + 1);
-    if (m_range.m_r0 != m_range.m_r1)
-      frameRange.append(
-          QString(" - %1").arg(QString::number(m_range.m_r1 + 1)));
+    int r0, c0, r1, c1;
+    m_selection->getSelectedCells(r0, c0, r1, c1);
+    QString colRange = QString::number(c0 + 1);
+    if (c0 != c1)
+      colRange.append(QString(" - %1").arg(QString::number(c1 + 1)));
+    QString frameRange = QString::number(r0 + 1);
+    if (r0 != r1)
+      frameRange.append(QString(" - %1").arg(QString::number(r1 + 1)));
 
     return QObject::tr("Rename Cell  at Column %1  Frame %2")
         .arg(colRange)
@@ -2035,7 +2045,7 @@ void TCellSelection::renameCells(TXshCell &cell) {
   TCellData *data = new TCellData();
   TXsheet *xsh    = TApp::instance()->getCurrentXsheet()->getXsheet();
   data->setCells(xsh, r0, c0, r1, c1);
-  RenameCellsUndo *undo = new RenameCellsUndo(m_range, data, cell);
+  RenameCellsUndo *undo = new RenameCellsUndo(this, data, cell);
   undo->redo();
 
   TUndoManager::manager()->add(undo);
