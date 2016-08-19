@@ -1740,14 +1740,6 @@ void MainWindow::defineActions() {
                          "");
   createMenuXsheetAction(MI_RemoveGlobalKeyframe, tr("Remove Multiple Keys"),
                          "");
-  //createMenuXsheetAction(MI_FirstFrame, tr("First Frame"), "");
-  //createMenuXsheetAction(MI_LastFrame, tr("Last Frame"), "");
-  //createMenuXsheetAction(MI_PrevFrame, tr("Previous Frame"), "Shift+A");
-  //createMenuXsheetAction(MI_NextFrame, tr("Next Frame"), "Shift+S");
-  //createMenuXsheetAction(MI_NextDrawing, tr("Next Drawing"), "Shift+X");
-  //createMenuXsheetAction(MI_PrevDrawing, tr("Prev Drawing"), "Shift+Z");
-  //createMenuXsheetAction(MI_NextStep, tr("Next Step"), "");
-  //createMenuXsheetAction(MI_PrevStep, tr("Prev Step"), "");
 
   createMenuCellsAction(MI_Reverse, tr("&Reverse"), "");
   createMenuCellsAction(MI_Swing, tr("&Swing"), "");
