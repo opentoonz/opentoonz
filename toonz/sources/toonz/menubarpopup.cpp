@@ -362,6 +362,7 @@ CommandListTree::CommandListTree(QWidget* parent) : QTreeWidget(parent) {
             menuCommandFolder);
 
   addFolder(ShortcutTree::tr("Tools"), ToolCommandType);
+  addFolder(ShortcutTree::tr("Playback"), PlaybackCommandType);
 
   MenuBarSeparatorItem* sep = new MenuBarSeparatorItem(0);
   sep->setToolTip(0, QObject::tr("[Drag&Drop] to copy separator to menu bar"));
