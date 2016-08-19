@@ -57,7 +57,8 @@ static double average(std::vector<double> &values, double range = 2.5) {
 //--------------------------------------------------------------------------------------
 
 static double weightedAverage(std::vector<double> &values,
-                              std::vector<double> &weights, double range = 2.5) {
+                              std::vector<double> &weights,
+                              double range = 2.5) {
   UINT size = values.size();
   if (size == 0) return std::numeric_limits<double>::signaling_NaN();
 
@@ -181,8 +182,8 @@ static void eraseSmallAngles(std::vector<std::pair<int, double>> &corners,
 // max is tha maximum angle greater or equal to minDegree
 
 static void detectCorners(const TStroke *stroke, double minDegree,
-                          std::vector<std::pair<int, double>> &corners, double &min,
-                          double &max) {
+                          std::vector<std::pair<int, double>> &corners,
+                          double &min, double &max) {
   const double minSin = fabs(sin(minDegree * M_PI_180));
   double angle, vectorialProduct, metaCornerLen, partialLen;
 

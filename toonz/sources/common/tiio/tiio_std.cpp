@@ -15,6 +15,9 @@ void Tiio::defineStd() {
   declare("jpg", TFileType::RASTER_IMAGE);
   defineWriterProperties("jpg", new JpgWriterProperties());
 
+  defineReaderMaker("jpeg", Tiio::makeJpgReader);
+  declare("jpeg", TFileType::RASTER_IMAGE);
+
   defineReaderMaker("bmp", Tiio::makeBmpReader);
   defineWriterMaker("bmp", Tiio::makeBmpWriter, true);
   declare("bmp", TFileType::RASTER_IMAGE);

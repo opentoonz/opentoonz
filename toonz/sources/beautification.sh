@@ -1,2 +1,2 @@
 #!/bin/sh
-git ls-files | egrep \\.\(c\|cpp\|h\|hpp\)$ | xargs clang-format -i
+git diff master --name-only | egrep \\.\(c\|cpp\|h\|hpp\)$ | xargs clang-format -i

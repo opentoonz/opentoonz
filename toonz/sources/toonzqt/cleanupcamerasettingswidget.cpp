@@ -3,6 +3,8 @@
 #include "toonzqt/cleanupcamerasettingswidget.h"
 #include "toonzqt/camerasettingswidget.h"
 #include "toonz/cleanupparameters.h"
+#include "toonz/preferences.h"
+#include "toonz/stage.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -89,7 +91,12 @@ void CleanupCameraSettingsWidget::setCameraPresetListFile(const TFilePath &fp) {
 }
 
 void CleanupCameraSettingsWidget::setFields(
-    const CleanupParameters *cleanupParameters) {
+    CleanupParameters *cleanupParameters) {
+  if (Preferences::instance()->getPixelsOnly()) {
+    TDimension res = cleanupParameters->m_camera.getRes();
+    cleanupParameters->m_camera.setSize(
+        TDimensionD(res.lx / Stage::inch, res.ly / Stage::inch));
+  }
   m_cameraWidget->setFields(&cleanupParameters->m_camera);
   m_offsX->setValue(cleanupParameters->m_offx);
   m_offsY->setValue(cleanupParameters->m_offy);

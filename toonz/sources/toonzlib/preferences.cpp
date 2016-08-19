@@ -283,9 +283,12 @@ Preferences::Preferences()
     , m_columnIconLoadingPolicy((int)LoadAtOnce)
     , m_moveCurrentFrameByClickCellArea(true)
     , m_onionSkinEnabled(true)
+    , m_onionSkinDuringPlayback(false)
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
-    , m_showKeyframesOnXsheetCellArea(true) {
+    , m_showKeyframesOnXsheetCellArea(true)
+    , m_precompute(true)
+    , m_ffmpegTimeout(30) {
   TCamera camera;
   m_defLevelType   = PLI_XSHLEVEL;
   m_defLevelWidth  = camera.getSize().lx;
@@ -533,12 +536,17 @@ Preferences::Preferences()
   getValue(*m_settings, "moveCurrentFrameByClickCellArea",
            m_moveCurrentFrameByClickCellArea);
   getValue(*m_settings, "onionSkinEnabled", m_onionSkinEnabled);
+  getValue(*m_settings, "onionSkinDuringPlayback", m_onionSkinDuringPlayback);
   getValue(*m_settings, "multiLayerStylePickerEnabled",
            m_multiLayerStylePickerEnabled);
   getValue(*m_settings, "paletteTypeOnLoadRasterImageAsColorModel",
            m_paletteTypeOnLoadRasterImageAsColorModel);
   getValue(*m_settings, "showKeyframesOnXsheetCellArea",
            m_showKeyframesOnXsheetCellArea);
+  QString ffmpegPath = m_settings->value("ffmpegPath").toString();
+  if (ffmpegPath != "") m_ffmpegPath = ffmpegPath;
+  setFfmpegPath(m_ffmpegPath.toStdString());
+  getValue(*m_settings, "ffmpegTimeout", m_ffmpegTimeout);
 }
 
 //-----------------------------------------------------------------
@@ -892,6 +900,13 @@ void Preferences::enableOnionSkin(bool on) {
 
 //-----------------------------------------------------------------
 
+void Preferences::setOnionSkinDuringPlayback(bool on) {
+  m_onionSkinDuringPlayback = on;
+  m_settings->setValue("onionSkinDuringPlayback", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
 void Preferences::setShow0ThickLines(bool on) {
   m_show0ThickLines = on;
   m_settings->setValue(s_show0ThickLines, s_bool[on]);
@@ -1175,6 +1190,25 @@ void Preferences::setDefLevelDpi(double dpi) {
 void Preferences::setPaletteTypeOnLoadRasterImageAsColorModel(int type) {
   m_paletteTypeOnLoadRasterImageAsColorModel = type;
   m_settings->setValue("paletteTypeOnLoadRasterImageAsColorModel", type);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setFfmpegPath(std::string path) {
+  m_ffmpegPath        = QString::fromStdString(path);
+  std::string strPath = m_ffmpegPath.toStdString();
+  m_settings->setValue("ffmpegPath", m_ffmpegPath);
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setPrecompute(bool enabled) { m_precompute = enabled; }
+
+//-----------------------------------------------------------------
+
+void Preferences::setFfmpegTimeout(int seconds) {
+  m_ffmpegTimeout = seconds;
+  m_settings->setValue("ffmpegTimeout", seconds);
 }
 
 //-----------------------------------------------------------------

@@ -92,8 +92,8 @@ static TPointD computeSpeed(TPointD p0, TPointD p1, double factor) {
 
 //-----------------------------------------------------------------------------
 
-static TRect drawBluredBrush(const TRasterImageP &ri, TStroke *stroke, int thick,
-                             double hardness, double opacity) {
+static TRect drawBluredBrush(const TRasterImageP &ri, TStroke *stroke,
+                             int thick, double hardness, double opacity) {
   TStroke *s       = new TStroke(*stroke);
   TPointD riCenter = ri->getRaster()->getCenterD();
   s->transform(TTranslation(riCenter));

@@ -360,7 +360,8 @@ public:
     frontOnionColor = m_frontOnionColor, backOnionColor = m_backOnionColor,
     inksOnly = m_inksOnly;
   }
-
+  bool getOnionSkinDuringPlayback() { return m_onionSkinDuringPlayback; }
+  void setOnionSkinDuringPlayback(bool on);
   // Transparency Check  tab
 
   void setTranspCheckData(const TPixel &bg, const TPixel &ink,
@@ -380,6 +381,14 @@ public:
   bool isAutomaticSVNFolderRefreshEnabled() const {
     return m_automaticSVNFolderRefreshEnabled;
   }
+  // Import Export Tab
+
+  void setFfmpegPath(std::string path);
+  QString getFfmpegPath() const { return m_ffmpegPath; }
+  void setPrecompute(bool enabled);
+  bool getPrecompute() { return m_precompute; }
+  void setFfmpegTimeout(int seconds);
+  int getFfmpegTimeout() { return m_ffmpegTimeout; }
 
   // Uncategorized - internals
 
@@ -419,7 +428,8 @@ private:
   std::vector<LevelFormat> m_levelFormats;
 
   QString m_units, m_cameraUnits, m_scanLevelType, m_currentRoomChoice,
-      m_oldUnits, m_oldCameraUnits;
+      m_oldUnits, m_oldCameraUnits, m_ffmpegPath;
+  ;
 
   double m_defLevelWidth, m_defLevelHeight, m_defLevelDpi;
 
@@ -430,7 +440,8 @@ private:
 
   int m_autosavePeriod,  // minutes
       m_chunkSize, m_blanksCount, m_onionPaperThickness, m_step, m_shrink,
-      m_textureSize, m_autocreationType, m_keyframeType, m_animationStep;
+      m_textureSize, m_autocreationType, m_keyframeType, m_animationStep,
+      m_ffmpegTimeout;  // seconds
 
   int m_currentLanguage, m_currentStyleSheet,
       m_undoMemorySize,  // in megabytes
@@ -447,7 +458,7 @@ private:
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,
       m_sceneNumberingEnabled, m_animationSheetEnabled, m_inksOnly;
   bool m_fillOnlySavebox, m_show0ThickLines, m_regionAntialias;
-
+  bool m_onionSkinDuringPlayback;
   TPixel32 m_viewerBGColor, m_previewBGColor, m_chessboardColor1,
       m_chessboardColor2;
   bool m_showRasterImagesDarkenBlendedInViewer,
@@ -471,6 +482,7 @@ private:
   bool m_moveCurrentFrameByClickCellArea;
   bool m_onionSkinEnabled;
   bool m_multiLayerStylePickerEnabled;
+  bool m_precompute;
   /*--
   Color Modelにラスタ画像を読み込んだとき、パレットをどのように作るか
   0 : 全ての異なるピクセルの色を別のStyleにする, 1 :
