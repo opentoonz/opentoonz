@@ -1594,6 +1594,7 @@ void MainWindow::defineActions() {
   createMenuFileAction(MI_PreviewSettings, tr("&Preview Settings..."), "");
   createMenuFileAction(MI_Render, tr("&Render"), "");
   createMenuFileAction(MI_Preview, tr("&Preview"), "Ctrl+R");
+  createMenuFileAction(MI_SoundTrack, tr("&Export Soundtrack"), "Alt+S");
   createRightClickMenuAction(MI_SavePreviewedFrames,
                              tr("&Save Previewed Frames"), "");
   createRightClickMenuAction(MI_RegeneratePreview, tr("&Regenerate Preview"),
