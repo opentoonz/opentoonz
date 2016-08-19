@@ -69,7 +69,7 @@ private:
 
   DVGui::CheckBox *m_inksOnly, *m_enableVersionControl, *m_levelsBackup,
       *m_onionSkinVisibility, *m_autoSaveCB, *m_autoSaveSceneCB,
-      *m_autoSaveOtherFilesCB, *m_pixelsOnlyCB;
+      *m_autoSaveOtherFilesCB, *m_pixelsOnlyCB, *m_onionSkinDuringPlayback;
 
   DVGui::FileField *m_ffmpegPathFileFld;
 
@@ -144,6 +144,7 @@ private slots:
   void onColumnIconChange(const QString &);
   void onReplaceAfterSaveLevelAsChanged(int index);
   void onOnionSkinVisibilityChanged(int);
+  void onOnionSkinDuringPlaybackChanged(int);
   void onActualPixelOnSceneModeChanged(int);
   void onMultiLayerStylePickerChanged(int);
   void onLevelNameOnEachMarkerChanged(int);

@@ -407,7 +407,10 @@ TFilePath GenericLoadFilePopup::getPath() {
 //***********************************************************************************
 
 GenericSaveFilePopup::GenericSaveFilePopup(const QString &title)
-    : FileBrowserPopup(title) {}
+    : FileBrowserPopup(title) {
+  connect(m_nameField, SIGNAL(returnPressedNow()), m_okButton,
+          SLOT(animateClick()));
+}
 
 //-----------------------------------------------------------------------------
 
@@ -546,6 +549,8 @@ void LoadSubScenePopup::showEvent(QShowEvent *e) {
 SaveSceneAsPopup::SaveSceneAsPopup() : FileBrowserPopup(tr("Save Scene")) {
   setOkText(tr("Save"));
   addFilterType("tnz");
+  connect(m_nameField, SIGNAL(returnPressedNow()), m_okButton,
+          SLOT(animateClick()));
 }
 
 bool SaveSceneAsPopup::execute() {
@@ -575,6 +580,8 @@ void SaveSceneAsPopup::initFolder() {
 SaveSubSceneAsPopup::SaveSubSceneAsPopup()
     : FileBrowserPopup(tr("Sub-xsheet")) {
   setOkText(tr("Save"));
+  connect(m_nameField, SIGNAL(returnPressedNow()), m_okButton,
+          SLOT(animateClick()));
 }
 
 bool SaveSubSceneAsPopup::execute() {
@@ -1323,6 +1330,8 @@ void LoadLevelPopup::onSelectionChanged(TSelection *selection) {
 
 SaveLevelAsPopup::SaveLevelAsPopup() : FileBrowserPopup(tr("Save Level")) {
   setOkText(tr("Save"));
+  connect(m_nameField, SIGNAL(returnPressedNow()), m_okButton,
+          SLOT(animateClick()));
 }
 
 bool SaveLevelAsPopup::execute() {
@@ -1603,6 +1612,8 @@ SavePaletteAsPopup::SavePaletteAsPopup()
     : FileBrowserPopup(tr("Save Palette")) {
   setOkText(tr("Save"));
   addFilterType("tpl");
+  connect(m_nameField, SIGNAL(returnPressedNow()), m_okButton,
+          SLOT(animateClick()));
 }
 
 bool SavePaletteAsPopup::execute() {

@@ -345,7 +345,8 @@ void ProjectPopup::updateChooseProjectCombo() {
   m_projectPaths.clear();
   m_chooseProjectCombo->clear();
 
-  TFilePath sandboxFp = TProjectManager::instance()->getSandboxProjectFolder();
+  TFilePath sandboxFp = TProjectManager::instance()->getSandboxProjectFolder() +
+                        "sandbox_otprj.xml";
   m_projectPaths.push_back(sandboxFp);
   m_chooseProjectCombo->addItem("sandbox");
 
