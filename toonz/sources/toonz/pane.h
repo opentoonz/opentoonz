@@ -99,6 +99,9 @@ class TPanelTitleBar final : public QFrame {
   bool m_closeButtonHighlighted;
   std::vector<std::pair<QPoint, QWidget *>> m_buttons;
 
+  QPixmap m_borderPm, m_activeBorderPm, m_floatBorderPm, m_floatActiveBorderPm;
+  QColor m_titleColor, m_activeTitleColor;
+
 public:
   TPanelTitleBar(QWidget *parent                      = 0,
                  TDockWidget::Orientation orientation = TDockWidget::vertical);
@@ -112,6 +115,23 @@ public:
   // pos = widget position. n.b. if pos.x()<0 then origin is topright corner
   void add(const QPoint &pos, QWidget *widget);
 
+  QPixmap getBorderPixmap() const { return m_borderPm; }
+  void setBorderPixmap(const QPixmap &pixmap) { m_borderPm = pixmap; }
+  QPixmap getActiveBorderPixmap() const { return m_activeBorderPm; }
+  void setActiveBorderPixmap(const QPixmap &pixmap) {
+    m_activeBorderPm = pixmap;
+  }
+  QPixmap getFloatBorderPixmap() const { return m_floatBorderPm; }
+  void setFloatBorderPixmap(const QPixmap &pixmap) { m_floatBorderPm = pixmap; }
+  QPixmap getFloatActiveBorderPixmap() const { return m_floatActiveBorderPm; }
+  void setFloatActiveBorderPixmap(const QPixmap &pixmap) {
+    m_floatActiveBorderPm = pixmap;
+  }
+  QColor getTitleColor() const { return m_titleColor; }
+  void setTitleColor(const QColor &color) { m_titleColor = color; }
+  QColor getActiveTitleColor() const { return m_activeTitleColor; }
+  void setActiveTitleColor(const QColor &color) { m_activeTitleColor = color; }
+
 protected:
   void resizeEvent(QResizeEvent *e) override;
 
@@ -122,6 +142,17 @@ protected:
   void mouseMoveEvent(QMouseEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
   void mouseDoubleClickEvent(QMouseEvent *) override;
+
+  Q_PROPERTY(QPixmap BorderPixmap READ getBorderPixmap WRITE setBorderPixmap);
+  Q_PROPERTY(QPixmap ActiveBorderPixmap READ getActiveBorderPixmap WRITE
+                 setActiveBorderPixmap);
+  Q_PROPERTY(QPixmap FloatBorderPixmap READ getFloatBorderPixmap WRITE
+                 setFloatBorderPixmap);
+  Q_PROPERTY(QPixmap FloatActiveBorderPixmap READ getFloatActiveBorderPixmap
+                 WRITE setFloatActiveBorderPixmap);
+  Q_PROPERTY(QColor TitleColor READ getTitleColor WRITE setTitleColor);
+  Q_PROPERTY(QColor ActiveTitleColor READ getActiveTitleColor WRITE
+                 setActiveTitleColor);
 
 signals:
 

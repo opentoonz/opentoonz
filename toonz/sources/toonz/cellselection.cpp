@@ -15,6 +15,7 @@
 
 // TnzTools includes
 #include "tools/toolutils.h"
+#include "tools/toolhandle.h"
 
 // TnzQt includes
 #include "toonzqt/strokesdata.h"
@@ -44,6 +45,7 @@
 #include "toonz/toonzimageutils.h"
 #include "toonz/trasterimageutils.h"
 #include "toonz/levelset.h"
+#include "toonz/tstageobjecttree.h"
 
 // TnzCore includes
 #include "timagecache.h"
@@ -1030,6 +1032,94 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+// if at least one of the cell in the range, return false
+bool checkIfCellsHaveTheSameContent(int &r0, int &c0, int &r1, int &c1,
+                                    TXshCell &cell) {
+  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+  for (int c = c0; c <= c1; c++) {
+    for (int r = r0; r <= r1; r++) {
+      if (cell != xsh->getCell(r, c)) return false;
+    }
+  }
+  return true;
+}
+
+void renameCellsWithoutUndo(int &r0, int &c0, int &r1, int &c1,
+                            const TXshCell &cell) {
+  TApp *app    = TApp::instance();
+  TXsheet *xsh = app->getCurrentXsheet()->getXsheet();
+  for (int c = c0; c <= c1; c++) {
+    for (int r = r0; r <= r1; r++) {
+      xsh->setCell(r, c, TXshCell(cell));
+    }
+  }
+  app->getCurrentXsheet()->notifyXsheetChanged();
+  int currentFrame = app->getCurrentFrame()->getFrame();
+  if (r0 <= currentFrame && currentFrame <= r1) {
+    app->getCurrentTool()->onImageChanged(
+        (TImage::Type)app->getCurrentImageType());
+    xsh->getStageObjectTree()->invalidateAll();
+  }
+}
+
+class RenameCellsUndo final : public TUndo {
+  TCellSelection *m_selection;
+  QMimeData *m_data;
+  TXshCell m_cell;
+
+public:
+  RenameCellsUndo(TCellSelection *selection, QMimeData *data, TXshCell &cell)
+      : m_data(data), m_cell(cell) {
+    int r0, c0, r1, c1;
+    selection->getSelectedCells(r0, c0, r1, c1);
+    m_selection = new TCellSelection();
+    m_selection->selectCells(r0, c0, r1, c1);
+  }
+
+  ~RenameCellsUndo() {
+    delete m_selection;
+    delete m_data;
+  }
+
+  void undo() const override {
+    int r0, c0, r1, c1;
+    m_selection->getSelectedCells(r0, c0, r1, c1);
+    TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+    for (int c = c0; c <= c1; c++) {
+      xsh->clearCells(r0, c, r1 - r0 + 1);
+    }
+    const TCellData *cellData = dynamic_cast<const TCellData *>(m_data);
+    pasteCellsWithoutUndo(cellData, r0, c0, r1, c1, false, false);
+    TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+  }
+
+  void redo() const override {
+    int r0, c0, r1, c1;
+    m_selection->getSelectedCells(r0, c0, r1, c1);
+    renameCellsWithoutUndo(r0, c0, r1, c1, m_cell);
+  }
+
+  int getSize() const override { return sizeof(*this); }
+
+  QString getHistoryString() override {
+    int r0, c0, r1, c1;
+    m_selection->getSelectedCells(r0, c0, r1, c1);
+    QString colRange = QString::number(c0 + 1);
+    if (c0 != c1)
+      colRange.append(QString(" - %1").arg(QString::number(c1 + 1)));
+    QString frameRange = QString::number(r0 + 1);
+    if (r0 != r1)
+      frameRange.append(QString(" - %1").arg(QString::number(r1 + 1)));
+
+    return QObject::tr("Rename Cell  at Column %1  Frame %2")
+        .arg(colRange)
+        .arg(frameRange);
+  }
+
+  int getHistoryType() override { return HistoryType::Xsheet; }
+};
+
+//-----------------------------------------------------------------------------
 }  // namespace
 //-----------------------------------------------------------------------------
 
@@ -1467,10 +1557,12 @@ void TCellSelection::pasteCells() {
 
 void TCellSelection::deleteCells() {
   if (isEmpty()) return;
-  TCellData *data = new TCellData();
-  TXsheet *xsh    = TApp::instance()->getCurrentXsheet()->getXsheet();
   int r0, c0, r1, c1;
   getSelectedCells(r0, c0, r1, c1);
+  TXsheet *xsh = TApp::instance()->getCurrentXsheet()->getXsheet();
+  // if all the selected cells are already empty, then do nothing
+  if (xsh->isRectEmpty(r0, c0, r1, c1)) return;
+  TCellData *data = new TCellData();
   data->setCells(xsh, r0, c0, r1, c1);
   DeleteCellsUndo *undo =
       new DeleteCellsUndo(new TCellSelection(m_range), data);
@@ -1939,6 +2031,24 @@ void TCellSelection::overWritePasteCells() {
     DVGui::error(QObject::tr("Cannot paste data \n Nothing to paste"));
 
   TApp::instance()->getCurrentXsheet()->notifyXsheetChanged();
+}
+
+//-----------------------------------------------------------------------------
+// called from RenameCellField::RenameCell
+
+void TCellSelection::renameCells(TXshCell &cell) {
+  if (isEmpty()) return;
+  int r0, c0, r1, c1;
+  getSelectedCells(r0, c0, r1, c1);
+  // register undo only if the cell is modified
+  if (checkIfCellsHaveTheSameContent(r0, c0, r1, c1, cell)) return;
+  TCellData *data = new TCellData();
+  TXsheet *xsh    = TApp::instance()->getCurrentXsheet()->getXsheet();
+  data->setCells(xsh, r0, c0, r1, c1);
+  RenameCellsUndo *undo = new RenameCellsUndo(this, data, cell);
+  undo->redo();
+
+  TUndoManager::manager()->add(undo);
 }
 
 //-----------------------------------------------------------------------------
