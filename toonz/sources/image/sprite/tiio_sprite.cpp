@@ -50,9 +50,22 @@ TLevelWriterSprite::TLevelWriterSprite(const TFilePath &path, TPropertyGroup *wi
   if (!m_properties) m_properties = new Tiio::SpriteWriterProperties();
   std::string scale = m_properties->getProperty("Scale")->getValueAsString();
   m_scale           = QString::fromStdString(scale).toInt();
-  std::string padding =
-      m_properties->getProperty("Image Padding")->getValueAsString();
-  m_padding = QString::fromStdString(padding).toInt();
+  std::string topPadding =
+      m_properties->getProperty("Top Padding")->getValueAsString();
+  m_topPadding = QString::fromStdString(topPadding).toInt();
+  std::string bottomPadding =
+	  m_properties->getProperty("Bottom Padding")->getValueAsString();
+  m_bottomPadding = QString::fromStdString(bottomPadding).toInt();
+  std::string leftPadding =
+	  m_properties->getProperty("Left Padding")->getValueAsString();
+  m_leftPadding = QString::fromStdString(leftPadding).toInt();
+  std::string rightPadding =
+	  m_properties->getProperty("Right Padding")->getValueAsString();
+  m_rightPadding = QString::fromStdString(rightPadding).toInt();
+  m_format =
+	  QString::fromStdWString(((TEnumProperty *)(m_properties->getProperty("Format")))
+	  ->getValue());
+  
   if (TSystem::doesExistFileOrLevel(m_path)) TSystem::deleteFile(m_path);
 }
 
@@ -73,17 +86,36 @@ TLevelWriterSprite::~TLevelWriterSprite() {
 		m_imagesResized.push_back(copy);
 	}
 	m_images.clear();
-	int dim = 1; 
-	while (dim * dim < m_imagesResized.size()) dim++;
-	int totalPadding = dim * m_padding * 2;
-	int spriteSheetWidth = dim * resizedWidth + totalPadding;
-	int dim2 = dim;
-	int totalPadding2 = totalPadding;
-	if (dim * dim - dim >= m_imagesResized.size()) {
-		dim2 = dim - 1;
-		totalPadding2 = dim2 * m_padding * 2;
+	int horizDim = 1; 
+	int vertDim = 1;
+	int vertPadding = m_topPadding + m_bottomPadding;
+	int horizPadding = m_leftPadding + m_rightPadding;
+	int totalVertPadding = 0;
+	int totalHorizPadding = 0;
+	int spriteSheetWidth;
+	int spriteSheetHeight;
+	if (m_format == "Grid") {
+		while (horizDim * horizDim < m_imagesResized.size()) horizDim++;
+		totalHorizPadding = horizDim * horizPadding;
+		spriteSheetWidth = horizDim * resizedWidth + totalHorizPadding;
+		vertDim = horizDim;
+		if (vertDim * vertDim - vertDim >= m_imagesResized.size()) {
+			vertDim = vertDim - 1;
+			totalVertPadding = vertDim * vertPadding;
+		}
+		spriteSheetHeight = vertDim * resizedHeight + totalVertPadding;
 	}
-	int spriteSheetHeight = dim2 * resizedHeight + totalPadding2;
+	else if (m_format == "Vertical") {
+		spriteSheetWidth = resizedWidth + horizPadding;
+		spriteSheetHeight = m_imagesResized.size() * (resizedHeight + vertPadding);
+		vertDim = m_imagesResized.size();
+	}
+	else if (m_format == "Horizontal") {
+		spriteSheetWidth = m_imagesResized.size() * (resizedWidth + horizPadding);
+		spriteSheetHeight = resizedHeight + vertPadding;;
+		horizDim = m_imagesResized.size();
+	}
+	
 	QImage spriteSheet = QImage(spriteSheetWidth, spriteSheetHeight, QImage::Format_ARGB32);
 	spriteSheet.fill(qRgba(0, 0, 0, 0));
 	QPainter painter;
@@ -93,12 +125,12 @@ TLevelWriterSprite::~TLevelWriterSprite() {
 	int rowPadding;
 	int columnPadding;
 	int currentImage = 0;
-	while (row < dim) {
-		while (column < dim) {
-			rowPadding = m_padding;
-			columnPadding = m_padding;
-			rowPadding += row * (m_padding * 2);
-			columnPadding += column * (m_padding * 2);
+	while (row < vertDim) {
+		while (column < horizDim) {
+			rowPadding = m_topPadding;
+			columnPadding = m_leftPadding;
+			rowPadding += row * vertPadding;
+			columnPadding += column * horizPadding;
 			painter.drawImage(column * resizedWidth + columnPadding, row * resizedHeight + rowPadding, m_imagesResized[currentImage]);
 			currentImage++;
 			column++;
@@ -117,9 +149,20 @@ TLevelWriterSprite::~TLevelWriterSprite() {
 	QFile file(path);
 	file.open(QIODevice::WriteOnly | QIODevice::Text);
 	QTextStream out(&file);
-	out << "Total Pictures: " << m_imagesResized.size() << "\n";
-	out << "Width: " << resizedWidth + m_padding * 2 << "\nHeight: " << resizedHeight + m_padding * 2 << "\n";
-	// optional, as QFile destructor will already do it:
+	out << "Total Images: " << m_imagesResized.size() << "\n";
+	out << "Individual Image Width: " << resizedWidth << "\n";
+	out << "Individual Image Height: " << resizedHeight << "\n";
+	out << "Individual Image Width with Padding: " << resizedWidth + horizPadding << "\n";
+	out << "Individual Image Height with Padding: " << resizedHeight + vertPadding << "\n";
+	out << "Images Across: " << horizDim << "\n";
+	out << "Images Down : " << vertDim << "\n";
+	out << "Top Padding: " << m_topPadding << "\n";
+	out << "Bottom Padding: " << m_bottomPadding << "\n";
+	out << "Left Padding: " << m_leftPadding << "\n";
+	out << "Right Padding: " << m_rightPadding << "\n";
+	out << "Horizontal Space Between Images: " << horizPadding << "\n";
+	out << "Vertical Space Between Images: " << vertPadding << "\n";
+
 	file.close();
 	m_imagesResized.clear();
 }
@@ -204,8 +247,21 @@ void TLevelWriterSprite::save(const TImageP &img, int frameIndex) {
 }
 
 Tiio::SpriteWriterProperties::SpriteWriterProperties()
-    : m_padding("Image Padding", 0, 100, 1), m_scale("Scale", 1, 100, 100) {
-  bind(m_padding);
+    : m_topPadding("Top Padding", 0, 100, 0),
+	m_bottomPadding("Bottom Padding", 0, 100, 0),
+	m_leftPadding("Left Padding", 0, 100, 0),
+	m_rightPadding("Right Padding", 0, 100, 0),
+	m_scale("Scale", 1, 100, 100),
+	m_format("Format") {
+	m_format.addValue(L"Grid");
+	m_format.addValue(L"Vertical");
+	m_format.addValue(L"Horizontal");
+	m_format.setValue(L"Grid");
+	bind(m_format);
+  bind(m_topPadding);
+  bind(m_bottomPadding);
+  bind(m_leftPadding);
+  bind(m_rightPadding);
   bind(m_scale);
 }
 

@@ -33,11 +33,12 @@ public:
 private:
   int m_lx, m_ly;
   int m_scale;
-  int m_padding;
+  int m_topPadding, m_bottomPadding, m_leftPadding, m_rightPadding;
   int m_left = 0, m_right = 0, m_top = 0, m_bottom = 0;
   std::vector<QImage*> m_images;
   std::vector<QImage> m_imagesResized;
   bool m_firstPass = true;
+  QString m_format;
   // void *m_buffer;
 };
 
@@ -49,9 +50,8 @@ namespace Tiio {
 
 class SpriteWriterProperties : public TPropertyGroup {
 public:
-  // TEnumProperty m_pixelSize;
-  // TBoolProperty m_matte;
-  TIntProperty m_padding;
+  TEnumProperty m_format;
+  TIntProperty m_topPadding, m_bottomPadding, m_leftPadding, m_rightPadding;
   TIntProperty m_scale;
   SpriteWriterProperties();
 };
