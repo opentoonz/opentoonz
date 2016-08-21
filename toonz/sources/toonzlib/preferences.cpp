@@ -283,6 +283,7 @@ Preferences::Preferences()
     , m_columnIconLoadingPolicy((int)LoadAtOnce)
     , m_moveCurrentFrameByClickCellArea(true)
     , m_onionSkinEnabled(true)
+    , m_onionSkinDuringPlayback(false)
     , m_multiLayerStylePickerEnabled(false)
     , m_paletteTypeOnLoadRasterImageAsColorModel(0)
     , m_showKeyframesOnXsheetCellArea(true)
@@ -535,6 +536,7 @@ Preferences::Preferences()
   getValue(*m_settings, "moveCurrentFrameByClickCellArea",
            m_moveCurrentFrameByClickCellArea);
   getValue(*m_settings, "onionSkinEnabled", m_onionSkinEnabled);
+  getValue(*m_settings, "onionSkinDuringPlayback", m_onionSkinDuringPlayback);
   getValue(*m_settings, "multiLayerStylePickerEnabled",
            m_multiLayerStylePickerEnabled);
   getValue(*m_settings, "paletteTypeOnLoadRasterImageAsColorModel",
@@ -894,6 +896,13 @@ void Preferences::enableReplaceAfterSaveLevelAs(bool on) {
 void Preferences::enableOnionSkin(bool on) {
   m_onionSkinEnabled = on;
   m_settings->setValue("onionSkinEnabled", on ? "1" : "0");
+}
+
+//-----------------------------------------------------------------
+
+void Preferences::setOnionSkinDuringPlayback(bool on) {
+  m_onionSkinDuringPlayback = on;
+  m_settings->setValue("onionSkinDuringPlayback", on ? "1" : "0");
 }
 
 //-----------------------------------------------------------------

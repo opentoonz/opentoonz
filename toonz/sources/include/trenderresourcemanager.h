@@ -132,11 +132,10 @@ static TRenderResourceManagerGenerator* gen();
 */
 
 #define T_RENDER_RESOURCE_MANAGER                                              \
-  \
 public:                                                                        \
   static TRenderResourceManagerGenerator *gen();                               \
   static TRenderResourceManagerGenerator *deps();                              \
-  \
+                                                                               \
 private:
 
 //--------------------------------------------------------------------------------
