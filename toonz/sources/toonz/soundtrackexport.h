@@ -22,6 +22,7 @@ public:
   bool hasSoundTrack();
   void makeSoundtrack(int r0, int r1, double fps);
   void saveSoundtrack();
+
 protected:
   bool m_hasSoundtrack;
   TSoundTrackP m_st;
