@@ -142,6 +142,15 @@ QGroupBox::title {
   left: 15px;
 }
 /* ------ Toonz Classes Difinitions ------ */
+/* ------ TPanel ------ */
+TPanelTitleBar {
+  qproperty-BorderPixmap: url("imgs/tpaneltitlebar_border.png");
+  qproperty-ActiveBorderPixmap: url("imgs/tpaneltitlebar_border_active.png");
+  qproperty-FloatBorderPixmap: url("imgs/tpaneltitlebar_border_float.png");
+  qproperty-FloatActiveBorderPixmap: url("imgs/tpaneltitlebar_border_float_active.png");
+  qproperty-TitleColor: #c0c0c0;
+  qproperty-ActiveTitleColor: #ffffff;
+}
 /* ------ Palette ------ */
 PaletteViewer #ToolBarContainer {
   margin: 0px;
