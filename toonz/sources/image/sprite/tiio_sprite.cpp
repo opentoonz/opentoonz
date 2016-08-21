@@ -9,6 +9,7 @@
 #include <QtGui/QImage>
 #include <QStringList>
 #include <QPainter>
+#include <QTextStream>
 #include "toonz/preferences.h"
 #include "toonz/toonzfolders.h"
 
@@ -108,8 +109,18 @@ TLevelWriterSprite::~TLevelWriterSprite() {
 		if (currentImage >= m_imagesResized.size()) break;
 	}
 	painter.end();
-
-	spriteSheet.save("C:\\bin\\com.png", "PNG", -1);
+	QString path = m_path.getQString();
+	path = path.replace(".spritesheet", ".png");
+	spriteSheet.save(path, "PNG", -1);
+	
+	path = path.replace(".png", ".txt");
+	QFile file(path);
+	file.open(QIODevice::WriteOnly | QIODevice::Text);
+	QTextStream out(&file);
+	out << "Total Pictures: " << m_imagesResized.size() << "\n";
+	out << "Width: " << resizedWidth + m_padding * 2 << "\nHeight: " << resizedHeight + m_padding * 2 << "\n";
+	// optional, as QFile destructor will already do it:
+	file.close();
 	m_imagesResized.clear();
 }
 
