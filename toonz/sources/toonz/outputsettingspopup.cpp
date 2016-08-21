@@ -943,7 +943,7 @@ void OutputSettingsPopup::onFormatChanged(const QString &str) {
   TApp::instance()->getCurrentScene()->setDirtyFlag(true);
 
   if (m_presetCombo) m_presetCombo->setCurrentIndex(0);
-  if (str == "mp4" || str == "gif" || str == "webm") {
+  if (str == "mp4" || str == "gif" || str == "webm" || str == "spritesheet") {
     m_threadsComboOm->setDisabled(true);
     m_threadsComboOm->setCurrentIndex(0);
   } else {
