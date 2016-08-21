@@ -165,7 +165,8 @@ void initImageIo(bool lightVersion) {
 
   TLevelWriter::define("spritesheet", TLevelWriterSprite::create, true);
   TFileType::declare("spritesheet", TFileType::RASTER_LEVEL);
-  Tiio::defineWriterProperties("spritesheet", new Tiio::SpriteWriterProperties());
+  Tiio::defineWriterProperties("spritesheet",
+                               new Tiio::SpriteWriterProperties());
 
 // ffmpeg
 #if !defined(_WIN32) || defined(x64)

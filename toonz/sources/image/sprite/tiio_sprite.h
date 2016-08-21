@@ -35,7 +35,7 @@ private:
   int m_scale;
   int m_topPadding, m_bottomPadding, m_leftPadding, m_rightPadding;
   int m_left = 0, m_right = 0, m_top = 0, m_bottom = 0;
-  std::vector<QImage*> m_images;
+  std::vector<QImage *> m_images;
   std::vector<QImage> m_imagesResized;
   bool m_firstPass = true;
   QString m_format;
