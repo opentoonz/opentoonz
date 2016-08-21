@@ -50,6 +50,7 @@ class ComboViewerPanel final : public TPanel, public FlipConsoleOwner {
   Ruler *m_vRuler;
   Ruler *m_hRuler;
   bool m_visibleFlag[CVPARTS_COUNT];
+  bool m_onionSkinActive = false;
 
   TPanelTitleBarButton *m_previewButton;
   TPanelTitleBarButton *m_subcameraPreviewButton;
@@ -103,7 +104,7 @@ public slots:
   void changeWindowTitle();
   void updateFrameRange();
   void onXshLevelSwitched(TXshLevel *);
-
+  void onPlayingStatusChanged(bool playing);
   // for showing/hiding the parts
   void onShowHideActionTriggered(QAction *);
   void enableFlipConsoleForCamerastand(bool on);

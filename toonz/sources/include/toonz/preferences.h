@@ -360,7 +360,8 @@ public:
     frontOnionColor = m_frontOnionColor, backOnionColor = m_backOnionColor,
     inksOnly = m_inksOnly;
   }
-
+  bool getOnionSkinDuringPlayback() { return m_onionSkinDuringPlayback; }
+  void setOnionSkinDuringPlayback(bool on);
   // Transparency Check  tab
 
   void setTranspCheckData(const TPixel &bg, const TPixel &ink,
@@ -457,7 +458,7 @@ private:
       m_levelsBackupEnabled, m_minimizeSaveboxAfterEditing,
       m_sceneNumberingEnabled, m_animationSheetEnabled, m_inksOnly;
   bool m_fillOnlySavebox, m_show0ThickLines, m_regionAntialias;
-
+  bool m_onionSkinDuringPlayback;
   TPixel32 m_viewerBGColor, m_previewBGColor, m_chessboardColor1,
       m_chessboardColor2;
   bool m_showRasterImagesDarkenBlendedInViewer,

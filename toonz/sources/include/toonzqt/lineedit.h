@@ -49,6 +49,7 @@ protected:
 
 signals:
   void focusIn();
+  void returnPressedNow();
 };
 
 //-----------------------------------------------------------------------------
