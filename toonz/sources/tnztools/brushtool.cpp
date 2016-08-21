@@ -1644,8 +1644,9 @@ void BrushTool::mouseMove(const TPointD &pos, const TMouseEvent &e) {
     double max          = diff.x / 2;
     double min          = diff.y / 2;
 
-    locals.addMinMaxSeparate((m_targetType & TTool::ToonzImage) ? m_rasThickness : 
-           m_thickness, min, max);
+    locals.addMinMaxSeparate(
+        (m_targetType & TTool::ToonzImage) ? m_rasThickness : m_thickness, min,
+        max);
   } else {
     m_brushPos = pos;
   }
