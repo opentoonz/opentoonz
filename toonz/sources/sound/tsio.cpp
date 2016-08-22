@@ -26,9 +26,9 @@ void initSoundIo() {
   TFileType::declare("raw", TFileType::AUDIO_LEVEL);
 
   if (FfmpegAudio::checkFfmpeg()) {
-	  TSoundTrackReader::define("mp3", TSoundTrackReaderMp3::create);
-	  //TSoundTrackWriter::define("mp3", TSoundTrackWriterMp3::create);
-	  TFileType::declare("mp3", TFileType::AUDIO_LEVEL);
+    TSoundTrackReader::define("mp3", TSoundTrackReaderMp3::create);
+    // TSoundTrackWriter::define("mp3", TSoundTrackWriterMp3::create);
+    TFileType::declare("mp3", TFileType::AUDIO_LEVEL);
   }
   // return &info;
 }

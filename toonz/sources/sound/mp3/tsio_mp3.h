@@ -31,11 +31,12 @@ Returns a soundtrack reader able to read .mp3 audio files
 
 class FfmpegAudio {
 public:
-	TFilePath getRawAudio(TFilePath path);
-	static bool checkFfmpeg();
+  TFilePath getRawAudio(TFilePath path);
+  static bool checkFfmpeg();
+
 private:
-	TFilePath getFfmpegCache();
-	void runFfmpeg(QStringList args);
+  TFilePath getFfmpegCache();
+  void runFfmpeg(QStringList args);
 };
 
 #endif
