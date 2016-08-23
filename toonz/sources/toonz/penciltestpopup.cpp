@@ -383,20 +383,20 @@ void MyViewFinder::resizeEvent(QResizeEvent* event) {
 }
 
 void MyViewFinder::setSize() {
-	QSize cameraReso = m_camera->viewfinderSettings().resolution();
-	double cameraAR = (double)cameraReso.width() / (double)cameraReso.height();
-	// in case the camera aspect is wider than this widget
-	if (cameraAR >= (double)width() / (double)height()) {
-		m_imageRect.setWidth(width());
-		m_imageRect.setHeight((int)((double)width() / cameraAR));
-		m_imageRect.moveTo(0, (height() - m_imageRect.height()) / 2);
-	}
-	// in case the camera aspect is thinner than this widget
-	else {
-		m_imageRect.setHeight(height());
-		m_imageRect.setWidth((int)((double)height() * cameraAR));
-		m_imageRect.moveTo((width() - m_imageRect.width()) / 2, 0);
-	}
+  QSize cameraReso = m_camera->viewfinderSettings().resolution();
+  double cameraAR  = (double)cameraReso.width() / (double)cameraReso.height();
+  // in case the camera aspect is wider than this widget
+  if (cameraAR >= (double)width() / (double)height()) {
+    m_imageRect.setWidth(width());
+    m_imageRect.setHeight((int)((double)width() / cameraAR));
+    m_imageRect.moveTo(0, (height() - m_imageRect.height()) / 2);
+  }
+  // in case the camera aspect is thinner than this widget
+  else {
+    m_imageRect.setHeight(height());
+    m_imageRect.setWidth((int)((double)height() * cameraAR));
+    m_imageRect.moveTo((width() - m_imageRect.width()) / 2, 0);
+  }
 }
 
 //=============================================================================
