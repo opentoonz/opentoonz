@@ -52,6 +52,7 @@ public:
     update();
   }
   void setCamera(QCamera* camera) { m_camera = camera; }
+  void setSize();
   void setShowOnionSkin(bool on) { m_showOnionSkin = on; }
   void setOnionOpacity(int value) { m_onionOpacity = value; }
   void setPreviousImage(QImage& prevImage) { m_previousImage = prevImage; }
