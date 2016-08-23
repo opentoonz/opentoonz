@@ -116,7 +116,7 @@ class PencilTestPopup : public DVGui::Dialog {
   QLineEdit* m_levelNameEdit;
   QCheckBox *m_upsideDownCB, *m_onionSkinCB, *m_saveOnCaptureCB, *m_timerCB;
   QPushButton *m_fileFormatOptionButton, *m_captureWhiteBGButton,
-      *m_captureButton;
+      *m_captureButton, *m_loadImageButton;
   DVGui::FileField* m_saveInFileFld;
   FrameNumberLineEdit* m_frameNumberEdit;
   DVGui::IntField *m_thresholdFld, *m_contrastFld, *m_brightnessFld,
@@ -155,6 +155,7 @@ protected slots:
   void onImageCaptured(int, const QImage&);
   void onCaptureWhiteBGButtonPressed();
   void onOnionCBToggled(bool);
+  void onLoadImageButtonPressed();
   void onOnionOpacityFldEdited();
   void onTimerCBToggled(bool);
   void onCaptureTimerTimeout();

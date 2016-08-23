@@ -5,7 +5,8 @@
 #include "menubarcommandids.h"
 #include "formatsettingspopups.h"
 #include "filebrowsermodel.h"
-
+#include "cellselection.h"
+#include "toonzqt/tselectionhandle.h"
 // TnzQt includes
 #include "toonzqt/menubarcommand.h"
 #include "toonzqt/filefield.h"
@@ -507,6 +508,7 @@ PencilTestPopup::PencilTestPopup()
 
   QGroupBox* displayFrame = new QGroupBox(tr("Display"), this);
   m_onionSkinCB           = new QCheckBox(tr("Show onion skin"), this);
+  m_loadImageButton = new QPushButton(tr("Load Selected Image"), this);
   m_onionOpacityFld       = new IntField(this);
 
   QGroupBox* timerFrame = new QGroupBox(tr("Interval timer"), this);
@@ -692,10 +694,11 @@ PencilTestPopup::PencilTestPopup()
       displayLay->setVerticalSpacing(10);
       {
         displayLay->addWidget(m_onionSkinCB, 0, 0, 1, 2);
-
+		
         displayLay->addWidget(new QLabel(tr("Opacity(%):"), this), 1, 0,
                               Qt::AlignRight);
         displayLay->addWidget(m_onionOpacityFld, 1, 1);
+		displayLay->addWidget(m_loadImageButton, 2, 0, 1, 2);
       }
       displayLay->setColumnStretch(0, 0);
       displayLay->setColumnStretch(1, 1);
@@ -747,6 +750,8 @@ PencilTestPopup::PencilTestPopup()
                        SLOT(onCaptureWhiteBGButtonPressed()));
   ret = ret && connect(m_onionSkinCB, SIGNAL(toggled(bool)), this,
                        SLOT(onOnionCBToggled(bool)));
+  ret = ret && connect(m_loadImageButton, SIGNAL(pressed()), this,
+                       SLOT(onLoadImageButtonPressed()));
   ret = ret && connect(m_onionOpacityFld, SIGNAL(valueEditedByHand()), this,
                        SLOT(onOnionOpacityFldEdited()));
   ret = ret && connect(m_upsideDownCB, SIGNAL(toggled(bool)),
@@ -1077,6 +1082,72 @@ void PencilTestPopup::onCaptureWhiteBGButtonPressed() {
 void PencilTestPopup::onOnionCBToggled(bool on) {
   m_cameraViewfinder->setShowOnionSkin(on);
   m_onionOpacityFld->setEnabled(on);
+}
+
+//-----------------------------------------------------------------------------
+
+void PencilTestPopup::onLoadImageButtonPressed() {
+	TCellSelection *cellSelection = dynamic_cast<TCellSelection *>(
+		TApp::instance()->getCurrentSelection()->getSelection());
+	if (cellSelection) {
+		int c0;
+		int r0;
+		TCellSelection::Range range = cellSelection->getSelectedCells();
+		if (range.isEmpty()) {
+			error(tr(
+				"No image selected.  Please select an image in the Xsheet."));
+			return;
+		}
+		c0 = range.m_c0;
+		r0 = range.m_r0;
+		TXshCell cell = TApp::instance()->getCurrentXsheet()->getXsheet()->getCell(r0, c0);
+		if (cell.getSimpleLevel() == nullptr) {
+			error(tr(
+				"No image selected.  Please select an image in the Xsheet."));
+			return;
+		}
+		TXshSimpleLevel *level = cell.getSimpleLevel();
+		int type = level->getType();
+		if (type != TXshLevelType::OVL_XSHLEVEL) {
+			error(tr(
+				"The selected image is not in a raster level."));
+			return;
+		}
+		TImageP origImage = cell.getImage(false);
+		TRasterImageP tempImage(origImage);
+		TRasterImage *image = (TRasterImage *)tempImage->cloneImage();
+
+		int m_lx = image->getRaster()->getLx();
+		int m_ly = image->getRaster()->getLy();
+		QString res = m_resolutionCombo->currentText();
+		QStringList texts = res.split(' ');
+		if (m_lx != texts[0].toInt() || m_ly != texts[2].toInt()) {
+			error(tr(
+				"The selected image size does not match the current camera settings."));
+			return;
+		}
+		int m_bpp = image->getRaster()->getPixelSize();
+		int totalBytes = m_lx * m_ly * m_bpp;
+		image->getRaster()->yMirror();
+
+		// lock raster to get data
+		image->getRaster()->lock();
+		void *buffin = image->getRaster()->getRawData();
+		assert(buffin);
+		void *buffer = malloc(totalBytes);
+		memcpy(buffer, buffin, totalBytes);
+
+		image->getRaster()->unlock();
+
+		QImage qi = QImage((uint8_t *)buffer, m_lx, m_ly, QImage::Format_ARGB32);
+		QImage qi2(qi.size(), QImage::Format_ARGB32);
+		qi2.fill(QColor(Qt::white).rgb());
+		QPainter painter(&qi2);
+		painter.drawImage(0, 0, qi);
+		m_cameraViewfinder->setPreviousImage(qi2);
+		m_onionSkinCB->setChecked(true);
+		free(buffer);
+	}
 }
 
 //-----------------------------------------------------------------------------
