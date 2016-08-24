@@ -54,6 +54,8 @@ public:
 
   void notifyPreferenceChanged() { emit preferenceChanged(); }
 
+  void notifyPixelUnitSelected(bool on) { emit pixelUnitSelected(on); }
+
   void setDirtyFlag(bool dirtyFlag) {
     if (m_dirtyFlag == dirtyFlag) return;
     m_dirtyFlag = dirtyFlag;
@@ -75,6 +77,7 @@ signals:
   void castFolderAdded(const TFilePath &path);
   void nameSceneChanged();
   void preferenceChanged();
+  void pixelUnitSelected(bool on);
 };
 
 #endif  // TSCENEHANDLE_H

@@ -27,6 +27,7 @@
 #include "toonz/tcamera.h"
 #include "toonz/levelproperties.h"
 #include "toonz/tonionskinmaskhandle.h"
+#include "toonz/stage.h"
 
 // TnzCore includes
 #include "tsystem.h"
@@ -217,22 +218,22 @@ Preferences::LevelFormat PreferencesPopup::FormatProperties::levelFormat()
 void PreferencesPopup::onPixelsOnlyChanged(int index) {
   bool enabled = index == Qt::Checked;
   if (enabled) {
-    m_pref->setDefLevelDpi(53.33333);
+    m_pref->setDefLevelDpi(Stage::standardDpi);
     m_pref->setPixelsOnly(true);
     TCamera *camera;
     camera =
         TApp::instance()->getCurrentScene()->getScene()->getCurrentCamera();
     TDimension camRes = camera->getRes();
     TDimensionD camSize;
-    camSize.lx = camRes.lx / 53.33333;
-    camSize.ly = camRes.ly / 53.33333;
+    camSize.lx = camRes.lx / Stage::standardDpi;
+    camSize.ly = camRes.ly / Stage::standardDpi;
     camera->setSize(camSize);
     TDimension cleanupRes = CleanupSettingsModel::instance()
                                 ->getCurrentParameters()
                                 ->m_camera.getRes();
     TDimensionD cleanupSize;
-    cleanupSize.lx = cleanupRes.lx / 53.33333;
-    cleanupSize.ly = cleanupRes.ly / 53.33333;
+    cleanupSize.lx = cleanupRes.lx / Stage::standardDpi;
+    cleanupSize.ly = cleanupRes.ly / Stage::standardDpi;
     CleanupSettingsModel::instance()->getCurrentParameters()->m_camera.setSize(
         cleanupSize);
     m_pref->storeOldUnits();
@@ -241,7 +242,7 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
     m_unitOm->setDisabled(true);
     m_cameraUnitOm->setDisabled(true);
     m_defLevelDpi->setDisabled(true);
-    m_defLevelDpi->setValue(53.33333);
+    m_defLevelDpi->setValue(Stage::standardDpi);
     m_defLevelWidth->setMeasure("camera.lx");
     m_defLevelHeight->setMeasure("camera.ly");
     m_defLevelWidth->setValue(m_pref->getDefLevelWidth());
@@ -274,6 +275,15 @@ void PreferencesPopup::onPixelsOnlyChanged(int index) {
     m_defLevelWidth->setDecimals(4);
   }
 }
+
+//-----------------------------------------------------------------------------
+
+void PreferencesPopup::onPixelUnitExternallySelected(bool on) {
+  // call slot function onPixelsOnlyChanged() accordingly
+  m_pixelsOnlyCB->setCheckState((on) ? Qt::Checked : Qt::Unchecked);
+}
+
+//-----------------------------------------------------------------------------
 
 void PreferencesPopup::onUnitChanged(int index) {
   if (index == 4 && m_pixelsOnlyCB->isChecked() == false) {
@@ -1844,6 +1854,11 @@ PreferencesPopup::PreferencesPopup()
                        SLOT(onStyleSheetTypeChanged(int)));
   ret = ret && connect(m_pixelsOnlyCB, SIGNAL(stateChanged(int)),
                        SLOT(onPixelsOnlyChanged(int)));
+  // pixels unit may deactivated externally on loading scene (see
+  // IoCmd::loadScene())
+  ret = ret && connect(TApp::instance()->getCurrentScene(),
+                       SIGNAL(pixelUnitSelected(bool)), this,
+                       SLOT(onPixelUnitExternallySelected(bool)));
   ret = ret && connect(m_unitOm, SIGNAL(currentIndexChanged(int)),
                        SLOT(onUnitChanged(int)));
   ret = ret && connect(m_cameraUnitOm, SIGNAL(currentIndexChanged(int)),
