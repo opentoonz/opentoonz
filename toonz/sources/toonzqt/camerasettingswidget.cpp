@@ -759,8 +759,8 @@ void CameraSettingsWidget::onYResChanged() {
 
 void CameraSettingsWidget::onXDpiChanged() {
   if (Preferences::instance()->getPixelsOnly()) {
-    m_xDpiFld->setValue(Stage::inch);
-    m_yDpiFld->setValue(Stage::inch);
+    m_xDpiFld->setValue(Stage::standardDpi);
+    m_yDpiFld->setValue(Stage::standardDpi);
   } else if (m_fspChk->isChecked())
     m_yDpiFld->setValue(m_xDpiFld->getValue());
 
@@ -781,8 +781,8 @@ void CameraSettingsWidget::onXDpiChanged() {
 
 void CameraSettingsWidget::onYDpiChanged() {
   if (Preferences::instance()->getPixelsOnly()) {
-    m_xDpiFld->setValue(Stage::inch);
-    m_yDpiFld->setValue(Stage::inch);
+    m_xDpiFld->setValue(Stage::standardDpi);
+    m_yDpiFld->setValue(Stage::standardDpi);
   } else if (m_fspChk->isChecked())
     m_xDpiFld->setValue(m_yDpiFld->getValue());
 
@@ -850,8 +850,8 @@ void CameraSettingsWidget::onPresetSelected(const QString &str) {
     }
 
     if (Preferences::instance()->getPixelsOnly()) {
-      m_lxFld->setValue(xres / Stage::inch);
-      m_lyFld->setValue(yres / Stage::inch);
+      m_lxFld->setValue(xres / Stage::standardDpi);
+      m_lyFld->setValue(yres / Stage::standardDpi);
     }
 
     if (m_forCleanup && m_offsX && m_offsY && !xoffset.isEmpty() &&

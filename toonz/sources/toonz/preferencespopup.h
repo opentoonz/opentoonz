@@ -79,6 +79,7 @@ private:
 private slots:
 
   void onPixelsOnlyChanged(int index);
+  void onPixelUnitExternallySelected(bool on);
   void onUnitChanged(int index);
   void onCameraUnitChanged(int index);
   void onRoomChoiceChanged(int index);
