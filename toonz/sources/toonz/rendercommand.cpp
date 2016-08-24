@@ -172,7 +172,7 @@ public:
             app->getCurrentXsheet()->getXsheet()->makeSound(prop);
         // keeps ffmpeg files from being previewed until import is fixed
         if (m_fp.getType() != "mp4" && m_fp.getType() != "webm" &&
-            m_fp.getType() != "gif") {
+            m_fp.getType() != "gif" && m_fp.getType() != "spritesheet") {
           if (outputSettings.getRenderSettings().m_stereoscopic) {
             assert(!isPreview);
             ::viewFile(m_fp.withName(m_fp.getName() + "_l"), r0 + 1, r1 + 1,
