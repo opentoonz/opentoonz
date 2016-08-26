@@ -248,7 +248,7 @@ QToolBar
 QLineEdit {
 	/*darken little bit*/
 	.base_inset(light, 15%);
-	margin: 2px;
+	margin: 1px;
 	border-width: 1px;
  	border-radius: 2px;
 	border-top-color: rgb(100,100,100);
@@ -265,54 +265,53 @@ QLineEdit {
 	}
 }
 QComboBox {
-	/*darken little bit*/
-	.base_inset(light, 20%);
-	border-width: 5px;
-	border-radius: 2px;
+	.base_inset(light, 15%);
 	.set_padding( 3px, 0px );
 	margin: 3px;
+	border-width: 1px;
+	border-radius: 2px;
 	border-top-color: rgb(100,100,100);
 	border-left-color: rgb(100,100,100);
 	border-right-color: rgb(100,100,100);
 	border-bottom-color: rgb(100,100,100);
 	/*arrow button*/
 	&::drop-down {
-		.base_outset(light, 10%);
+		.base_outset(light, 5%);
 		//.base_outset;
 		border-width: 1px;
 		border-radius: 1px;
 		border-top-color: rgb(100,100,100);
-	border-left-color: rgb(100,100,100);
-	border-right-color: rgb(100,100,100);
-	border-bottom-color: rgb(100,100,100);
+		border-left-color: rgb(100,100,100);
+		border-right-color: rgb(100,100,100);
+		border-bottom-color: rgb(100,100,100);
 		/*pressed state*/
 		&:on {
-			.base_inset(10%);
+			.base_inset(5%);
 			border-top-color: rgb(100,100,100);
-	border-left-color: rgb(100,100,100);
-	border-right-color: rgb(100,100,100);
-	border-bottom-color: rgb(100,100,100);
+			border-left-color: rgb(100,100,100);
+			border-right-color: rgb(100,100,100);
+			border-bottom-color: rgb(100,100,100);
 		}
 		&:hover {
-	    .base_outset(light, 5%);
-		border-top-color: rgb(100,100,100);
-	border-left-color: rgb(100,100,100);
-	border-right-color: rgb(100,100,100);
-	border-bottom-color: rgb(100,100,100);
-	}
+			.base_outset(light, 0%);
+			border-top-color: rgb(100,100,100);
+			border-left-color: rgb(100,100,100);
+			border-right-color: rgb(100,100,100);
+			border-bottom-color: rgb(100,100,100);
+		}
+		&:disabled {
+			.base_outset;
+		}
 	}
 	/*arrow button triangle*/
 	&::down-arrow {
 		image: url("@{image_url}/combo_down_arrow.png");
 		
 	}
-	&:disabled {
+	&::disabled {
 	    .base_inset(light, 2%);
 		color: @m_disabledTxtColor;
-		&::drop-down {
-			//.base_outset;
-			border-width: 0px;
-		}
+
 	}
 
 }
@@ -368,9 +367,9 @@ QPushButton {
 		.base_outset(light, 5%);
 		color: rgb(80,80,80);
 		border-top-color: rgb(80,80,80);
-	border-left-color: rgb(80,80,80);
-	border-right-color: rgb(80,80,80);
-	border-bottom-color: rgb(80,80,80);
+		border-left-color: rgb(80,80,80);
+		border-right-color: rgb(80,80,80);
+		border-bottom-color: rgb(80,80,80);
 	}
 }
 
@@ -386,9 +385,13 @@ QCheckBox {
 		color: @m_disabledTxtColor;
 	}
 	&::indicator {
-		.base_inset(light, 20%);
-		border-width: 0px;
+		.base_inset(light, 15%);
+		border-width: 1px;
 		border-radius: 2px;
+		border-top-color: rgb(80,80,80);
+		border-left-color: rgb(80,80,80);
+		border-right-color: rgb(80,80,80);
+		border-bottom-color: rgb(80,80,80);
 		image: url("@{image_url}/check_indicator_off.png");
 		&:disabled {
 			.base_inset(light, 5%);
@@ -1339,14 +1342,14 @@ PopupButton {
 	&::tab {
 		.set_margin(5px, 0px);
 		.set_padding(8px, 0px);
-	    .baseBG( light, 5% );
+	    .baseBG( light, 10% );
 		height: 22px;
 	    border: 0px solid white; 
 		&:selected {
-		    background-color: rgb(195,56,37);
+		    background-color: rgb(33,127,188);
 		}
 		&:hover {
-		    background-color: rgb(234,75,53);
+		    background-color: rgb(101,163,201);
 		}
 	}
 }

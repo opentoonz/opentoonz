@@ -167,7 +167,7 @@ QLineEdit {
   border-top-color: #262626;
   border-right-color: #7e7e7e;
   border-bottom-color: #929292;
-  margin: 2px;
+  margin: 1px;
   border-width: 1px;
   border-radius: 2px;
   border-top-color: #646464;
@@ -189,20 +189,19 @@ QLineEdit:disabled {
   border-bottom-color: #646464;
 }
 QComboBox {
-  /*darken little bit*/
-  background-color: #787878;
+  background-color: #6b6b6b;
   border-style: inset;
-  border-left-color: #3f3f3f;
-  border-top-color: #333333;
-  border-right-color: #8b8b8b;
-  border-bottom-color: #9f9f9f;
-  border-width: 5px;
-  border-radius: 2px;
+  border-left-color: #323232;
+  border-top-color: #262626;
+  border-right-color: #7e7e7e;
+  border-bottom-color: #929292;
   padding-left: 3px;
   padding-right: 3px;
   padding-top: 0px;
   padding-bottom: 0px;
   margin: 3px;
+  border-width: 1px;
+  border-radius: 2px;
   border-top-color: #646464;
   border-left-color: #646464;
   border-right-color: #646464;
@@ -211,12 +210,12 @@ QComboBox {
   /*arrow button triangle*/
 }
 QComboBox::drop-down {
-  background-color: #5f5f5f;
+  background-color: #525252;
   border-style: outset;
-  border-left-color: #727272;
-  border-top-color: #868686;
-  border-right-color: #262626;
-  border-bottom-color: #1a1a1a;
+  border-left-color: #656565;
+  border-top-color: #797979;
+  border-right-color: #191919;
+  border-bottom-color: #0d0d0d;
   border-width: 1px;
   border-radius: 1px;
   border-top-color: #646464;
@@ -226,33 +225,41 @@ QComboBox::drop-down {
   /*pressed state*/
 }
 QComboBox::drop-down:on {
-  background-color: #2b2b2b;
+  background-color: #383838;
   border-style: inset;
   border-left-color: #000000;
   border-top-color: #000000;
-  border-right-color: #3f3f3f;
-  border-bottom-color: #525252;
+  border-right-color: #4b4b4b;
+  border-bottom-color: #5f5f5f;
   border-top-color: #646464;
   border-left-color: #646464;
   border-right-color: #646464;
   border-bottom-color: #646464;
 }
 QComboBox::drop-down:hover {
-  background-color: #525252;
+  background-color: #454545;
   border-style: outset;
-  border-left-color: #656565;
-  border-top-color: #797979;
-  border-right-color: #191919;
-  border-bottom-color: #0d0d0d;
+  border-left-color: #585858;
+  border-top-color: #6c6c6c;
+  border-right-color: #0c0c0c;
+  border-bottom-color: #000000;
   border-top-color: #646464;
   border-left-color: #646464;
   border-right-color: #646464;
   border-bottom-color: #646464;
 }
+QComboBox::drop-down:disabled {
+  background-color: #454545;
+  border-style: outset;
+  border-left-color: #585858;
+  border-top-color: #6c6c6c;
+  border-right-color: #0c0c0c;
+  border-bottom-color: #000000;
+}
 QComboBox::down-arrow {
   image: url("imgs/combo_down_arrow.png");
 }
-QComboBox:disabled {
+QComboBox::disabled {
   background-color: #4a4a4a;
   border-style: inset;
   border-left-color: #111111;
@@ -260,9 +267,6 @@ QComboBox:disabled {
   border-right-color: #5d5d5d;
   border-bottom-color: #717171;
   color: #808080;
-}
-QComboBox:disabled::drop-down {
-  border-width: 0px;
 }
 QPushButton {
   background-color: #5f5f5f;
@@ -368,14 +372,18 @@ QCheckBox:disabled {
   color: #808080;
 }
 QCheckBox::indicator {
-  background-color: #787878;
+  background-color: #6b6b6b;
   border-style: inset;
-  border-left-color: #3f3f3f;
-  border-top-color: #333333;
-  border-right-color: #8b8b8b;
-  border-bottom-color: #9f9f9f;
-  border-width: 0px;
+  border-left-color: #323232;
+  border-top-color: #262626;
+  border-right-color: #7e7e7e;
+  border-bottom-color: #929292;
+  border-width: 1px;
   border-radius: 2px;
+  border-top-color: #505050;
+  border-left-color: #505050;
+  border-right-color: #505050;
+  border-bottom-color: #505050;
   image: url("imgs/check_indicator_off.png");
 }
 QCheckBox::indicator:disabled {
@@ -1339,15 +1347,15 @@ PopupButton::menu-indicator:disabled {
   padding-right: 8px;
   padding-top: 0px;
   padding-bottom: 0px;
-  background-color: #525252;
+  background-color: #5f5f5f;
   height: 22px;
   border: 0px solid white;
 }
 #TopBarTab::tab:selected {
-  background-color: #c33825;
+  background-color: #217fbc;
 }
 #TopBarTab::tab:hover {
-  background-color: #ea4b35;
+  background-color: #65a3c9;
 }
 #StackedMenuBar {
   background: #a0a0a0;
