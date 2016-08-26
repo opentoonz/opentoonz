@@ -503,7 +503,7 @@ void RenderCommand::rasterRender(bool isPreview) {
   // fixes background colors for non alpha-enabled export types (eventually
   // transparent gif would be good)
   if (ext == "jpg" || ext == "avi" || ext == "bmp" || ext == "mp4" ||
-      ext == "webm" || ext == "gif") {
+      ext == "webm") {
     currBgColor.m = 255;
     scene->getProperties()->setBgColor(currBgColor);
   }
