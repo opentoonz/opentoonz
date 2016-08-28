@@ -73,12 +73,12 @@ TLevelWriterSprite::TLevelWriterSprite(const TFilePath &path,
 //-----------------------------------------------------------
 
 TLevelWriterSprite::~TLevelWriterSprite() {
-  int finalWidth    = m_right - m_left;
-  int finalHeight   = m_bottom - m_top;
+  int finalWidth    = m_right - m_left + 1;
+  int finalHeight   = m_bottom - m_top + 1;
   int resizedWidth  = finalWidth * m_scale / 100;
   int resizedHeight = finalHeight * m_scale / 100;
   for (QImage *image : m_images) {
-    QImage copy = image->copy(m_left, m_top, m_right, m_bottom);
+    QImage copy = image->copy(m_left, m_top, finalWidth, finalHeight);
     if (m_scale != 100) {
       int width  = (copy.width() * m_scale) / 100;
       int height = (copy.height() * m_scale) / 100;
